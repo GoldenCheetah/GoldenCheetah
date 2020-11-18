@@ -848,7 +848,7 @@ TrainSidebar::updateMetricLapDistance()
     // XXX This might have sub-optimal display in the final lap of a file.
     double currentposition = displayWorkoutDistance*1000;
     double lapmarker = ergFile->currentLap(currentposition);
-    if (lapmarker == -1) {
+    if (lapmarker < 0.) {
         displayLapDistance = 0;
         return;
     }
@@ -875,7 +875,7 @@ TrainSidebar::updateMetricLapDistanceRemaining()
     // perhaps we should look at course length.
     double currentposition = displayWorkoutDistance*1000;
     double lapmarker = ergFile->nextLap(currentposition);
-    if (lapmarker == -1) {
+    if (lapmarker < 0.) {
         // In this case, there are either no lap markers, or we are in last lap (and so no next lap)
         displayLapDistanceRemaining = -1;
         return;
@@ -1821,7 +1821,7 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
 
                     // alert when 3 seconds from end of ERG lap, or 20 meters from end of CRS lap
                     if ((status&RT_MODE_ERGO && lapTimeRemaining > 0 && lapTimeRemaining < 3000) ||
-                        (status&RT_MODE_SLOPE && lapmarker != -1 && lapmarker - currentposition < 20)) {
+                        (status&RT_MODE_SLOPE && (lapmarker >= 0.) && lapmarker - currentposition < 20)) {
                         lapAudioThisLap = false;
                         QSound::play(":audio/lap.wav");
                     }
@@ -1842,19 +1842,22 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
                     }
                 }
 
-                if(lapTimeRemaining < 0) {
-                        if (ergFile) lapTimeRemaining =  ergFile->Duration - load_msecs;
+                // Maintain time in ERGO mode
+                if (status& RT_MODE_ERGO) {
+                    if (lapTimeRemaining < 0) {
+                        if (ergFile) lapTimeRemaining = ergFile->Duration - load_msecs;
                         if (lapTimeRemaining < 0)
                             lapTimeRemaining = 0;
-                }
-                rtData.setLapMsecsRemaining(lapTimeRemaining);
+                    }
+                    rtData.setLapMsecsRemaining(lapTimeRemaining);
 
-                if (ergTimeRemaining < 0) {
-                        if (ergFile) ergTimeRemaining =  ergFile->Duration - load_msecs;
+                    if (ergTimeRemaining < 0) {
+                        if (ergFile) ergTimeRemaining = ergFile->Duration - load_msecs;
                         if (ergTimeRemaining < 0)
                             ergTimeRemaining = 0;
+                    }
+                    rtData.setErgMsecsRemaining(ergTimeRemaining);
                 }
-                rtData.setErgMsecsRemaining(ergTimeRemaining);
             } else {
                 rtData.setDistance(displayDistance);
                 rtData.setRouteDistance(displayWorkoutDistance);
@@ -2088,12 +2091,15 @@ void TrainSidebar::loadUpdate()
         }
     } else {
 
-        if(displayWorkoutLap != curLap)
-        {
+        // Call gradientAt to obtain current lap num.
+        ergFile->gradientAt(displayWorkoutDistance * 1000., curLap);
+        
+        if(displayWorkoutLap != curLap) {
             context->notifyNewLap();
             updateMetricLapDistance();
             updateMetricLapDistanceRemaining();
         }
+
         displayWorkoutLap = curLap;
 
         // we got to the end!
@@ -2429,6 +2435,9 @@ void TrainSidebar::FFwd()
     }
     else displayWorkoutDistance += 1; // jump forward a kilometer in the workout
 
+    updateMetricLapDistance();
+    updateMetricLapDistanceRemaining();
+
     emit setNotification(tr("Fast forward.."), 2);
 }
 
@@ -2450,6 +2459,9 @@ void TrainSidebar::Rewind()
         if (displayWorkoutDistance < 0) displayWorkoutDistance = 0;
     }
 
+    updateMetricLapDistance();
+    updateMetricLapDistanceRemaining();
+
     emit setNotification(tr("Rewind.."), 2);
 }
 
@@ -2463,11 +2475,11 @@ void TrainSidebar::FFwdLap()
 
     if (status&RT_MODE_ERGO) {
         lapmarker = ergFile->nextLap(load_msecs);
-        if (lapmarker != -1) load_msecs = lapmarker; // jump forward to lapmarker
+        if (lapmarker >= 0.) load_msecs = lapmarker; // jump forward to lapmarker
         context->notifySeek(load_msecs);
     } else {
         lapmarker = ergFile->nextLap(displayWorkoutDistance*1000);
-        if (lapmarker != -1) displayWorkoutDistance = lapmarker/1000; // jump forward to lapmarker
+        if (lapmarker >= 0.) displayWorkoutDistance = lapmarker/1000; // jump forward to lapmarker
     }
 }
 

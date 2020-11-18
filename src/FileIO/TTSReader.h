@@ -172,6 +172,17 @@ namespace NS_TTSReader {
             distance(_distance), lat(_lat), lon(_lon), alt(_alt) {}
     };
 
+    struct Segment {
+        double       startKM;
+        double       endKM;
+        std::wstring name;
+        std::wstring description;
+
+        void reset() { startKM = -1.; endKM = -1.; name.clear(); description.clear(); }
+        bool IsValid() const { return (startKM >= 0. && endKM >= 0.); }
+        Segment() { reset(); }
+    };
+
     class TTSReader {
 
         std::vector<Point>        pointList;   // frame mapping data
@@ -181,6 +192,9 @@ namespace NS_TTSReader {
         std::vector<ByteArray>    content;
         ByteArray pre;
 
+        std::vector<Segment>      segmentList;
+        Segment                   pendingSegment;
+
         int imageId;
 
         double   frameRate;
@@ -188,6 +202,10 @@ namespace NS_TTSReader {
         double   maxSlope;
         double   minSlope;
         XYSeries series;
+
+        std::wstring ttsName;
+        std::wstring routeName;
+        std::wstring routeDescription;
 
         std::vector<Point> points;  // Final list of combined data
 
@@ -221,6 +239,9 @@ namespace NS_TTSReader {
 
         const XYSeries           & getSeries() const;
         const std::vector<Point> & getPoints() const;
+        const std::vector<Segment>& getSegments() const;
+        const std::wstring        & getRouteName() const;
+        const std::wstring        & getRouteDescription() const;
         double                     getDistanceMeters() const;
         int                        routeType() const;
         double                     getMaxSlope() const;
@@ -231,24 +252,6 @@ namespace NS_TTSReader {
         bool                       deriveMinMaxSlopes(double &minSlope, double &maxSlope, double &variance) const;
 
         void                       recomputeAltitudeFromGradient();
-
-#if 0
-        static final Map<Integer, String> strings = new HashMap<Integer, String>();
-
-        static {
-            strings.put(1001, "route name");
-            strings.put(1002, "route description");
-            strings.put(1041, "segment name");
-            strings.put(1042, "segment description");
-            strings.put(2001, "company");
-            strings.put(2004, "serial");
-            strings.put(2005, "time");
-            strings.put(2007, "link");
-            strings.put(5001, "product");
-            strings.put(5002, "video name");
-            strings.put(6001, "infobox #1");
-        }
-#endif
 
         double getFrameRate()     const { return frameRate; }
         double getTotalDistance() const { return totalDistance; }
@@ -261,6 +264,19 @@ namespace NS_TTSReader {
 
         bool loadHeaders();
         void blockProcessing(int blockType, int version, ByteArray &data);
+
+        void segmentRange(int version, ByteArray& data);
+        void segmentInfo(int version, ByteArray& data);
+
+        bool flushPendingSegment() {
+            bool fRet = false;
+            if (pendingSegment.IsValid()) {
+                segmentList.push_back(pendingSegment);
+                pendingSegment.reset();
+                fRet = true;
+            }
+            return fRet;
+        }
 
         // it looks like part of GENERALINFO, definition of type is included:
         // DWORD WattSlopePulse;//0 = Watt program, 1 = Slope program, 2 = Pulse
