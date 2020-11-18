@@ -77,7 +77,7 @@ class ErgFileText
 {
     public:
         ErgFileText() : x(0), duration(0), text("") {}
-        ErgFileText(double x, int duration, QString text) : x(x), duration(duration), text(text) {}
+        ErgFileText(double x, int duration, const QString &text) : x(x), duration(duration), text(text) {}
 
         double x;
         int duration;
@@ -87,10 +87,13 @@ class ErgFileText
 class ErgFileLap
 {
     public:
-        long x;     // when does this LAP marker occur? (time in msecs or distance in meters
-        int LapNum;     // from 1 - n
-        bool selected; // used by the editor
+        ErgFileLap() : name(""), x(0), LapNum(0), selected(false) {}
+        ErgFileLap(double x, int LapNum, const QString& name) : name(name), x(x), LapNum(LapNum), selected(false) {}
+
         QString name;
+        double x;      // when does this LAP marker occur? (time in msecs or distance in meters
+        int LapNum;    // from 1 - n
+        bool selected; // used by the editor
 };
 
 class ErgFile
@@ -126,8 +129,8 @@ class ErgFile
         double gradientAt(double, int&); // return the gradient value for the passed meter
         bool locationAt  (double x, int& lapnum, geolocation &geoLoc, double &slope100); // location at meter
 
-        int nextLap(long);      // return the start value (erg - time(ms) or slope - distance(m)) for the next lap
-        int currentLap(long);   // return the start value (erg - time(ms) or slope - distance(m)) for the current lap
+        double nextLap(long);            // return the start value (erg - time(ms) or slope - distance(m)) for the next lap
+        double currentLap(long);         // return the start value (erg - time(ms) or slope - distance(m)) for the current lap
 
         int nextText(long);     // return the index for the next text cue
 

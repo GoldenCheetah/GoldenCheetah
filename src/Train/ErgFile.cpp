@@ -679,6 +679,7 @@ void ErgFile::parseComputrainer(QString p)
         if (mode == CRS) {
             // Add the last point for a crs file
             ErgFilePoint add;
+
             add.x = rdist;
             add.val = 0.0;
             add.y = ralt;
@@ -688,6 +689,7 @@ void ErgFile::parseComputrainer(QString p)
             // Add a final meta-lap at the end - causes the system to correctly mark off laps.
             // An improvement would be to check for a lap marker at end, and only add this if required.
             ErgFileLap lap;
+
             lap.x = rdist;
             lap.LapNum = ++lapcounter;
             lap.selected = false;
@@ -698,6 +700,7 @@ void ErgFile::parseComputrainer(QString p)
         // add a start point if it doesn't exist
         if (Points.at(0).x > 0) {
             ErgFilePoint add;
+
             add.x = 0;
             add.y = Points.at(0).y;
             add.val = Points.at(0).val;
@@ -984,6 +987,104 @@ void ErgFile::parseTTS()
     // smooth so we might consider it usable (even though its wrong.)
     if (fHasSlope) {
         fHasAlt = true;
+    }
+
+    // Populate lap and text lists with route and segment info from tts.
+    // Push everything in segment order, then sort by location.
+    const std::vector<NS_TTSReader::Segment> segments = ttsReader.getSegments();
+    int segmentCount = (int)segments.size();
+    for (int i = 0; i < segmentCount; i++) {
+        const NS_TTSReader::Segment &segment = segments[i];
+
+        // Truncate distances to meter precision for text name.
+        int segmentStart = (int)(segment.startKM * 1000);
+        int segmentEnd   = (int)(segment.endKM * 1000);
+
+        std::wstring rangeString = L" ["
+            + std::to_wstring(segmentStart)
+            + L"m ->"
+            + std::to_wstring(segmentEnd)
+            + L"m]";
+
+        // Populate Texts with segment text.
+        if (segment.name.length() + segment.description.length() > 0) {
+            QString text(QString::fromStdWString(
+                segment.name + L": " +
+                segment.description +
+                rangeString));
+
+            double x = segment.startKM * 1000.;
+            int duration = (segment.endKM - segment.startKM) * 1000.;
+            Texts << ErgFileText(x, duration, text);
+        }
+
+        // Populate Laps with segment info. Create a lap for the start and another for the end.
+        ErgFileLap add;
+
+        // Segment Start
+        add.x = segment.startKM * 1000.;
+        add.LapNum = (i * 2) + 1;
+        add.selected = false;
+
+        add.name = QString::fromStdWString(L"Starting Segment: " + segment.name + rangeString);
+
+        Laps << add;
+
+        // Segment End
+        add.x = segment.endKM * 1000.;
+        add.LapNum = (i * 2) + 2;
+        add.selected = false;
+        add.name = QString::fromStdWString(L"Ending Segment: " + segment.name + rangeString);
+        
+        Laps << add;
+    }
+
+    // The following sort preserves segment overlap. If A is a superset of B then order will be:
+    // - start A
+    // - start B
+    // - end B
+    // - end A
+    //
+    // For cases of partial overlap of A then B it will do:
+    // - Start A
+    // - Start B
+    // - End A
+    // - End B
+
+    // Sort text and laps:
+    std::sort(Laps.begin(), Laps.end(), [](const ErgFileLap & a, const ErgFileLap & b) {
+        // If distance is the same the lesser lap num goes first.
+        if (a.x == b.x) return a.LapNum < b.LapNum;
+        return a.x < b.x;
+    });
+
+    std::sort(Texts.begin(), Texts.end(), [](const ErgFileText& a, const ErgFileText& b) {
+        // If distance is the same the lesser distance goes first.
+        if (a.x == b.x) return a.duration < b.duration;
+        return a.x < b.x;
+    });
+
+    // Renumber laps to follow the sorted entry distance order:
+    int lapNum = 1;
+    for (auto &a : Laps) {
+        a.LapNum = lapNum++;
+    }
+
+    // This is load time so debug print isn't so expensive.
+    // Laps seem pretty buggy right now. Lets debug print the data
+    // to help people figure out what is happening.
+    int xx = 0;
+    qDebug() << "LAPS:";
+    for (const auto &a : Laps) {
+        qDebug() << xx << ": " << a.LapNum << " start:" << a.x / 1000. << "km, name: " << a.name;
+        xx++;
+    }
+
+    qDebug() << "TEXTS:";
+    xx = 0;
+    for (const auto &a : Texts) {
+        qDebug() << xx << ": " << a.x / 1000. << " duration: " << a.duration << " text:" << a.text;
+        xx++;
     }
 
     ttsFile.close();
@@ -1594,7 +1695,7 @@ bool ErgFile::locationAt(double meters, int &lapnum, geolocation &geoLoc, double
 // Retrieve the offset for the start of next lap.
 // Params: x - current workout distance (m) / time (ms)
 // Returns: distance (m) / time (ms) offset for next lap.
-int ErgFile::nextLap(long x)
+double ErgFile::nextLap(long x)
 {
     if (!isValid()) return -1; // not a valid ergfile
 
@@ -1611,7 +1712,7 @@ int ErgFile::nextLap(long x)
 // Retrieve the offset for the start of current lap.
 // Params: x - current workout distance (m) / time (ms)
 // Returns: distance (m) / time (ms) offset for start of current lap.
-int
+double
 ErgFile::currentLap(long x)
 {
     if (!isValid()) return -1; // not a valid ergfile
