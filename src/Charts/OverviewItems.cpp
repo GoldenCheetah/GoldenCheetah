@@ -3519,6 +3519,16 @@ Routeline::~Routeline()
     delete animator;
 }
 
+// Spherical pseudo-Mercator projection. Only needs to be applied to the
+// latitude of a coordinate.
+// See also https://wiki.openstreetmap.org/wiki/Mercator
+static inline double mercator_projection(double lat) {
+    double y = lat / 90 + 1;
+    y = y * M_PI / 4;
+    y = log(tan(y));
+    return y * 180 / M_PI;
+}
+
 void
 Routeline::setData(RideItem *item)
 {
@@ -3552,8 +3562,10 @@ Routeline::setData(RideItem *item)
             p->lon < -180 || p->lon > 180 ||
             p->lat < -90 || p->lat > 90) continue;
 
-        if (p->lat > maxlat) maxlat=p->lat;
-        if (p->lat < minlat) minlat=p->lat;
+        double projected_lat = mercator_projection(p->lat);
+
+        if (projected_lat > maxlat) maxlat=projected_lat;
+        if (projected_lat < minlat) minlat=projected_lat;
         if (p->lon < minlon) minlon=p->lon;
         if (p->lon > maxlon) maxlon=p->lon;
     }
@@ -3585,7 +3597,7 @@ Routeline::setData(RideItem *item)
             //            yoff+(geom.height()-(geom.height() / (ydiff / (p->lat - minlat)))));
 
             path.moveTo((geom.width() / (xdiff / (p->lon - minlon))),
-                        (height-(height / (ydiff / (p->lat - minlat)))));
+                        (height-(height / (ydiff / (mercator_projection(p->lat) - minlat)))));
             count=div;
 
         } else if (count == 0) {
@@ -3593,7 +3605,7 @@ Routeline::setData(RideItem *item)
             //path.lineTo(xoff+(geom.width() / (xdiff / (p->lon - minlon))),
             //            yoff+(geom.height()-(geom.height() / (ydiff / (p->lat - minlat)))));
             path.lineTo((geom.width() / (xdiff / (p->lon - minlon))),
-                        (height-(height / (ydiff / (p->lat - minlat)))));
+                        (height-(height / (ydiff / (mercator_projection(p->lat) - minlat)))));
             count=div;
             lines++;
 
