@@ -2502,7 +2502,12 @@ void TrainSidebar::FFwdLap()
         if (lapmarker >= 0.) load_msecs = lapmarker; // jump forward to lapmarker
         context->notifySeek(load_msecs);
     } else {
-        lapmarker = ergFileQueryAdapter.nextLap(displayWorkoutDistance*1000);
+        static const double s_BeforeOffset = 10.1;
+        lapmarker = ergFileQueryAdapter.nextLap((displayWorkoutDistance*1000) + s_BeforeOffset);
+
+        // Go to slightly before lap marker so the lap transition message will be displayed.
+        lapmarker = std::max(0., lapmarker - s_BeforeOffset);
+
         if (lapmarker >= 0.) displayWorkoutDistance = lapmarker/1000; // jump forward to lapmarker
     }
 
@@ -2511,6 +2516,38 @@ void TrainSidebar::FFwdLap()
 
     if (lapmarker >= 0) emit setNotification(tr("Next Lap.."), 2);
 }
+
+// jump to next Lap marker (if there is one?)
+void TrainSidebar::RewindLap()
+{
+    if (((status & RT_RUNNING) == 0) || (status & RT_PAUSED)) return;
+
+    double lapmarker;
+
+    if (status & RT_MODE_ERGO) {
+        // Search for lap prior to 1 second ago.
+        long target = std::max<long>(0, load_msecs - 1000);
+        lapmarker = ergFileQueryAdapter.prevLap(target);
+        if (lapmarker >= 0.) load_msecs = lapmarker; // jump to lapmarker
+        context->notifySeek(load_msecs);
+    }
+    else {
+        // Search for lap prior to 50 meters ago.
+        double target = std::max(0., (displayWorkoutDistance * 1000) - 50.);
+        lapmarker = ergFileQueryAdapter.prevLap(target);
+
+        // Go to slightly before lap marker so the lap transition message will be displayed.
+        lapmarker = std::max(0., lapmarker - 10.1);
+
+        if (lapmarker >= 0.) displayWorkoutDistance = lapmarker / 1000; // jump to lapmarker
+    }
+
+    updateMetricLapDistance();
+    updateMetricLapDistanceRemaining();
+
+    if (lapmarker >= 0) emit setNotification(tr("Next Lap.."), 2);
+}
+
 
 // higher load/gradient
 void TrainSidebar::Higher()

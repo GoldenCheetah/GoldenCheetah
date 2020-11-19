@@ -1475,7 +1475,7 @@ ErgFile::isValid() const
 // Retrieve the offset for the start of next lap.
 // Params: x - current workout distance (m) / time (ms)
 // Returns: distance (m) / time (ms) offset for next lap.
-double ErgFile::nextLap(long x) const
+double ErgFile::nextLap(double x) const
 {
     if (!isValid()) return -1; // not a valid ergfile
 
@@ -1489,11 +1489,28 @@ double ErgFile::nextLap(long x) const
     return -1; // nope, no marker ahead of there
 }
 
+// Retrieve the offset for the start of previous lap.
+// Params: x - current workout distance (m) / time (ms)
+// Returns: distance (m) / time (ms) offset for previous lap.
+double ErgFile::prevLap(double x) const
+{
+    if (!isValid()) return -1; // not a valid ergfile
+
+    // do we need to return the Lap marker?
+    if (Laps.count() > 0) {
+        for (int i = 0; i < Laps.count(); i++) {
+            if (x < Laps.at(i).x) return Laps.at(std::max(0, i - 1)).x;
+        }
+    }
+    return -1; // nope, no marker behind us.
+}
+
+
 // Retrieve the offset for the start of current lap.
 // Params: x - current workout distance (m) / time (ms)
 // Returns: distance (m) / time (ms) offset for start of current lap.
 double
-ErgFile::currentLap(long x) const
+ErgFile::currentLap(double x) const
 {
     if (!isValid()) return -1; // not a valid ergfile
 
@@ -1507,7 +1524,7 @@ ErgFile::currentLap(long x) const
 // Retrieve the index of next text cue.
 // Params: x - current workout distance (m) / time (ms)
 // Returns: index of next text cue.
-int ErgFile::nextText(long x) const
+int ErgFile::nextText(double x) const
 {
     if (!isValid()) return -1; // not a valid ergfile
 

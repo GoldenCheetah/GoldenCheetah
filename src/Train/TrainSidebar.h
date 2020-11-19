@@ -185,6 +185,7 @@ class TrainSidebar : public GcWindow
         void FFwd();        // jump forward when in a workout
         void Rewind();      // jump backwards when in a workout
         void FFwdLap();     // jump forward to next Lap marker
+        void RewindLap();   // jump backwards to previous Lap marker
         void Higher();      // set load/gradient higher
         void Lower();       // set load/gradient higher
         void newLap();      // start new Lap!

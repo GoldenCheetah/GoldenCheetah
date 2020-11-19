@@ -130,10 +130,11 @@ public:
         bool hasGradient() const { return CRS == format; }
         bool hasWatts()    const { return ERG == format || MRC == format; }
 
-        double nextLap(long) const;    // return the start value (erg - time(ms) or slope - distance(m)) for the next lap
-        double currentLap(long) const; // return the start value (erg - time(ms) or slope - distance(m)) for the current lap
+        double nextLap(double) const;    // return the start value (erg - time(ms) or slope - distance(m)) for the next lap
+        double prevLap(double) const;    // return the start value (erg - time(ms) or slope - distance(m)) for the prev lap
+        double currentLap(double) const; // return the start value (erg - time(ms) or slope - distance(m)) for the current lap
 
-        int  nextText(long) const;   // return the index for the next text cue
+        int  nextText(double) const;   // return the index for the next text cue
 
         // turn the ergfile into a series of sections rather
         // than a list of points
@@ -219,9 +220,10 @@ public:
     bool   hasGradient() const { return ergFile && ergFile->hasGradient(); }
     bool   hasWatts()    const { return ergFile && ergFile->hasWatts();    }
 
-    int    nextLap   (long l) const { return !ergFile ? -1 : ergFile->nextLap(l);    }
-    int    currentLap(long l) const { return !ergFile ? -1 : ergFile->currentLap(l); }
-    int    nextText  (long l) const { return !ergFile ? -1 : ergFile->nextText(l);   }
+    double nextLap   (double x) const { return !ergFile ? -1 : ergFile->nextLap(x);    }
+    double prevLap   (double x) const { return !ergFile ? -1 : ergFile->prevLap(x);    }
+    double currentLap(double x) const { return !ergFile ? -1 : ergFile->currentLap(x); }
+    int    nextText  (double x) const { return !ergFile ? -1 : ergFile->nextText(x);   }
 
     double currentTime() const { return !ergFile ? 0. : ergFile->Points.at(qs.rightPoint).x; }
 
