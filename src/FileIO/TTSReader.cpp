@@ -462,6 +462,9 @@ bool TTSReader::deriveMinMaxSlopes(double &minSlope, double &maxSlope, double &v
 
 void TTSReader::recomputeAltitudeFromGradient() {
 
+    if (points.size() < 3)
+        return;
+
     // Some tts files I see have an altitude crisis around the start: Fixup altitude
     // of index 0 and 1 by linear interpolating.
     double d2d1delta = points[2].getDistanceFromStart() - points[1].getDistanceFromStart();
@@ -943,9 +946,11 @@ bool TTSReader::loadHeaders() {
 
     // fill in speed for first point
 
-    points[0].setSpeed(points[1].getSpeed());
-
-    totalDistance = points[points.size() - 1].getDistanceFromStart();
+    totalDistance = 0;
+    if (points.size() > 2) {
+        points[0].setSpeed(points[1].getSpeed());
+        totalDistance = points[points.size() - 1].getDistanceFromStart();
+    }
 
     return true;
 }
