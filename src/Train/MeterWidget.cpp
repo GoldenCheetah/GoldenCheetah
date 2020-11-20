@@ -365,52 +365,62 @@ void NeedleMeterWidget::paintEvent(QPaintEvent* paintevent)
 }
 
 ElevationMeterWidget::ElevationMeterWidget(QString Name, QWidget *parent, QString Source, Context *context) : MeterWidget(Name, parent, Source), context(context),
-    m_minX(0.), m_maxX(0.), m_savedWidth(0), m_savedHeight(0), gradientValue(0.)
+    m_minX(0.), m_maxX(0.), m_savedWidth(0), m_savedHeight(0), m_savedMinY(0), m_savedMaxY(0), gradientValue(0.)
 {
     forceSquareRatio = false;
 }
 
 // Compute polygon for elevation graph based on widget size.
-// This is two full scans of the ergfile point array.
-void ElevationMeterWidget::lazyDimensionCompute(void)
+void ElevationMeterWidget::lazySetup(void)
 {
-    // Nothing to compute unless there is an erg file.
-    if (!context || !context->currentErgFile())
+    // Nothing to compute unless there is a valid erg file.
+    if (!context)
         return;
 
-    // Compute if size has changed
-    if (m_savedWidth != m_Width || m_savedHeight != m_Height) {
+    const ErgFile* ergFile = context->currentErgFile();
+    if (!ergFile || !ergFile->isValid())
+        return;
 
-        // Determine extents of route
-        double minX, minY, maxX, maxY;
-        minX = maxX = context->currentErgFile()->Points[0].x; // meters
-        minY = maxY = context->currentErgFile()->Points[0].y; // meters or altitude???
-        foreach(ErgFilePoint x, context->currentErgFile()->Points) {
-            minX = std::min(minX, x.x);
-            minY = std::min(minY, x.y);
-            maxX = std::max(maxX, x.x);
-            maxY = std::max(maxY, x.y);
-        }
+    // Compute if size has changed. Store truncated values to allow equality comparison.
+    double minX = 0.;
+    double maxX = floor(ergFile->Duration);
+    double minY = floor(ergFile->minY);
+    double maxY = floor(ergFile->maxY);
+    if (m_savedWidth != m_Width || m_savedHeight != m_Height || m_savedMinY != minY || m_savedMaxY != maxY) {
 
-        if (m_Width != 0 && (maxY - minY) / 0.05 < (double)m_Height * 0.80 * (maxX - minX) / (double)m_Width)
-            maxY = minY + (double)m_Height * 0.80 * (maxX - minX) / (double)m_Width * 0.05;
+        m_savedMinY = minY;
+        m_savedMaxY = maxY;
+
+        if (m_Width != 0 && (maxY - minY) / 0.05 < m_Height * 0.80 * (maxX - minX) / m_Width)
+            maxY = minY + m_Height * 0.80 * (maxX - minX) / m_Width * 0.05;
         minY -= (maxY - minY) * 0.20f; // add 20% as bottom headroom (slope gradient will be shown there in a bubble)
 
         // Populate elevation route polygon
         m_elevationPolygon.clear();
-        m_elevationPolygon << QPoint(0.0, (double)m_Height);
-        double x = 0, y = 0;
-        double nextX = 1;
-        for (double pt=0; pt < context->currentErgFile()->Points.size(); pt++) {
-            for (; x < nextX && pt < context->currentErgFile()->Points.size(); pt++) {
-                x = (context->currentErgFile()->Points[pt].x - minX) * (double)m_Width / (maxX - minX);
-                y = (context->currentErgFile()->Points[pt].y - minY) * (double)m_Height / (maxY - minY);
-            }
-            // Add points to polygon only once every time the x coordinate integer part changes.
-            m_elevationPolygon << QPoint(x, (double)m_Height - y);
-            nextX = floor(x) + 1.0;
+        m_elevationPolygon << QPoint(0.0, m_Height);
+
+        // Scaling Multiples.
+        const double xScale = m_Width  / (maxX - minX);
+        const double yScale = m_Height / (maxY - minY);
+
+        int lastPixelX = -1; // always draw first point.
+        foreach(const ErgFilePoint &p, ergFile->Points) {
+
+            int pixelX = (int)floor((p.x - minX) * xScale);
+
+            // Skip over segment points that are less than a pixel to the right of the last segment we drew.
+            if (pixelX == lastPixelX)
+                continue;
+
+            int pixelY = (int)(m_Height - floor((p.y - minY) * yScale));
+
+            m_elevationPolygon << QPoint(pixelX, pixelY);
+
+            lastPixelX = pixelX;
         }
-        m_elevationPolygon << QPoint((double)m_Width, (double)m_Height);
+
+        // Complete a final segment from elevation profile to bottom right of display rect.
+        m_elevationPolygon << QPoint(m_Width, m_Height);
 
         // Save distance extent, used to situate rider location within widget display.
         m_minX = minX;
@@ -443,7 +453,7 @@ void ElevationMeterWidget::paintEvent(QPaintEvent* paintevent)
     // Lazy compute of min, max and route elevation polygon on init or if dimensions
     // change. Ideally we'd use the resize event but we are computing from ergfile
     // which isnt available when initial resize occurs.
-    lazyDimensionCompute();
+    lazySetup();
 
     double bubbleSize = (double)m_Height * 0.010f;
 
@@ -476,7 +486,7 @@ void ElevationMeterWidget::paintEvent(QPaintEvent* paintevent)
     if (cyclistX < m_Width * 0.5)
         gradientDrawX += 5.;
     else
-        gradientDrawX =- 45.;
+        gradientDrawX -= 45.;
 
     painter.drawText(gradientDrawX, gradientDrawY, gradientString);
 

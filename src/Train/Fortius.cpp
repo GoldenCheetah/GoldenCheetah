@@ -103,8 +103,8 @@ void Fortius::setBrakeCalibrationFactor(double brakeCalibrationFactor)
 // output power adjusted by this value so user can compare with hub or crank based readings
 void Fortius::setPowerScaleFactor(double powerScaleFactor)
 {
-    if (weight < 0.8) weight = 0.8;
-    if (weight > 1.2) weight = 1.2;
+    if (powerScaleFactor < 0.8) powerScaleFactor = 0.8;
+    if (powerScaleFactor > 1.2) powerScaleFactor = 1.2;
     
     pvars.lock();
     this->powerScaleFactor = powerScaleFactor;

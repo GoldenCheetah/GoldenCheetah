@@ -59,6 +59,7 @@
 //
 CredentialsPage::CredentialsPage(Context *context) : context(context)
 {
+    setBackgroundRole(QPalette::Base);
     QGridLayout *mainLayout = new QGridLayout(this);
 
     addButton = new QPushButton(tr("+"));
@@ -195,11 +196,6 @@ AboutRiderPage::AboutRiderPage(QWidget *parent, Context *context) : QWidget(pare
 
     QVBoxLayout *all = new QVBoxLayout(this);
     QGridLayout *grid = new QGridLayout;
-#ifdef Q_OS_MAX
-    setContentsMargins(10,10,10,10);
-    grid->setSpacing(5 *dpiXFactor);
-    all->setSpacing(5 *dpiXFactor);
-#endif
 
     QLabel *nicklabel = new QLabel(tr("Nickname"));
     QLabel *doblabel = new QLabel(tr("Date of Birth"));
@@ -431,11 +427,6 @@ AboutModelPage::AboutModelPage(Context *context) : context(context)
 {
     QVBoxLayout *all = new QVBoxLayout(this);
     QGridLayout *grid = new QGridLayout;
-#ifdef Q_OS_MAX
-    setContentsMargins(10,10,10,10);
-    grid->setSpacing(5 *dpiXFactor);
-    all->setSpacing(5 *dpiXFactor);
-#endif
 
     //
     // W'bal Tau
@@ -517,11 +508,6 @@ BackupPage::BackupPage(Context *context) : context(context)
 {
     QVBoxLayout *all = new QVBoxLayout(this);
     QGridLayout *grid = new QGridLayout;
-#ifdef Q_OS_MAX
-    setContentsMargins(10,10,10,10);
-    grid->setSpacing(5 *dpiXFactor);
-    all->setSpacing(5 *dpiXFactor);
-#endif
 
     //
     // Auto Backup
@@ -587,12 +573,6 @@ MeasuresPage::MeasuresPage(QWidget *parent, Context *context, MeasuresGroup *mea
     QVBoxLayout *all = new QVBoxLayout(this);
     QGridLayout *measuresGrid = new QGridLayout;
     Qt::Alignment alignment = Qt::AlignLeft|Qt::AlignVCenter;
-
-#ifdef Q_OS_MAX
-    setContentsMargins(10,10,10,10);
-    grid->setSpacing(5 *dpiXFactor);
-    all->setSpacing(5 *dpiXFactor);
-#endif
 
     QLabel* seperatorText = new QLabel(tr("Time dependent %1 measures").arg(measuresGroup->getName()));
     all->addWidget(seperatorText);
@@ -814,8 +794,11 @@ MeasuresPage::addOReditClicked()
     }
 
     addMeasure.when = dateTimeEdit->dateTime();
-    for (int k = 0; k < valuesEdit.count(); k++)
-        addMeasure.values[k] = valuesEdit[k]->value();
+    QList<double> unitsFactors = measuresGroup->getFieldUnitsFactors();
+    for (int k = 0; k < valuesEdit.count(); k++) {
+        const double unitsFactor = (metricUnits ? 1.0 : unitsFactors[k]);
+        addMeasure.values[k] = valuesEdit[k]->value() / unitsFactor;
+    }
     addMeasure.comment = comment->text();
     addMeasure.source = Measure::Manual;
     addMeasure.originalSource = "";
@@ -877,8 +860,11 @@ MeasuresPage::rangeSelectionChanged()
         Measure current = measures[index];
 
         dateTimeEdit->setDateTime(current.when);
-        for (int k = 0; k < valuesEdit.count(); k++)
-            valuesEdit[k]->setValue(current.values[k]);
+        QList<double> unitsFactors = measuresGroup->getFieldUnitsFactors();
+        for (int k = 0; k < valuesEdit.count(); k++) {
+            const double unitsFactor = (metricUnits ? 1.0 : unitsFactors[k]);
+            valuesEdit[k]->setValue(current.values[k]*unitsFactor);
+        }
         comment->setText(current.comment);
 
         updateButton->hide();
@@ -3222,9 +3208,9 @@ SeasonsPage::SeasonsPage(QWidget *parent, Context *context) : QWidget(parent), c
         // type
         add->setText(1, Season::types[static_cast<int>(season.type)]);
         // from
-        add->setText(2, season.start.toString(tr("ddd MMM d, yyyy")));
+        add->setText(2, season.getStart().toString(tr("ddd MMM d, yyyy")));
         // to
-        add->setText(3, season.end.toString(tr("ddd MMM d, yyyy")));
+        add->setText(3, season.getEnd().toString(tr("ddd MMM d, yyyy")));
         // guid -- hidden
         add->setText(4, season.id().toString());
 

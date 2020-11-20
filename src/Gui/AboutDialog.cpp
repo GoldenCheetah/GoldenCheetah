@@ -190,6 +190,7 @@ ContributorsPage::ContributorsPage(Context *context) : context(context)
     contributors.append("Roberto Massa");
     contributors.append("Ron Alford");
     contributors.append("Satoru Kurashiki");
+    contributors.append("Scott Conover");
     contributors.append("Sean Rhea");
     contributors.append("Simon Brewer");
     contributors.append("Stefan Schake");
@@ -200,6 +201,7 @@ ContributorsPage::ContributorsPage(Context *context) : context(context)
     contributors.append("Ugo Borello");
     contributors.append("Vianney Boyer");
     contributors.append("Walter B&#252;rki");
+    contributors.append("Ward Muylaert");
     contributors.append("Yves Arrouye");
 
     QString contributorsTable = "<center><table><tr>";

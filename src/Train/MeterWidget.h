@@ -126,12 +126,12 @@ class ElevationMeterWidget : public MeterWidget
     Context* context;
     QPolygon m_elevationPolygon;
     double m_minX, m_maxX;
-    int m_savedWidth, m_savedHeight;
+    int m_savedWidth, m_savedHeight, m_savedMinY, m_savedMaxY;
 
   protected:
     virtual void paintEvent(QPaintEvent* paintevent);
 
-    void lazyDimensionCompute(void);
+    void lazySetup(void);
 
   public:
     explicit ElevationMeterWidget(QString name, QWidget *parent = 0, QString Source = QString("None"), Context *context = NULL);

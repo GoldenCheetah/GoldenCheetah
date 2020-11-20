@@ -175,7 +175,11 @@ APIWebService::listAthletes(HttpRequest &, HttpResponse &response)
         // sure fire sign the athlete has been upgraded to post 3.2 and not some
         // random directory full of other things & check something basic is set
         QString ridedb = home.absolutePath() + "/" + name + "/cache/rideDB.json";
-        if (QFile(ridedb).exists() && appsettings->cvalue(name, GC_SEX, "") != "") {
+        if (QFile(ridedb).exists()) {
+            // we need to initialize athlete settings for cvalue to work
+            appsettings->initializeQSettingsAthlete(home.absolutePath(), name);
+            if (appsettings->cvalue(name, GC_SEX, "") == "") continue;
+
             // we got one
             QString line = name;
             line += ", " + appsettings->cvalue(name, GC_DOB).toDate().toString("yyyy/MM/dd");

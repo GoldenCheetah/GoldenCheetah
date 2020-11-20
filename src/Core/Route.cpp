@@ -145,6 +145,7 @@ RouteSegment::search(RideItem *item, RideFile*ride, QList<IntervalItem*>&here)
     for (int n=0; n< this->getPoints().count();n++) {
         RoutePoint routepoint = this->getPoints().at(n);
 
+        bool resetroute = false;
         bool present = false;
         RideFilePoint* point;
 
@@ -229,8 +230,9 @@ RouteSegment::search(RideItem *item, RideFile*ride, QList<IntervalItem*>&here)
                         if (diverge>2) {
                             //qDebug() << "    STOP route diverge at " << point->secs << "(" << i <<") after " << (point->secs-start)<< "secs for " << minimumdistance << "km " << routepoint.lat << "-" << routepoint.lon << "/" << point->lat << "-" << point->lon << "\r\n";
 
-                            start = -1; //try to restart
-                            n = 0;
+                            //try to restart
+                            resetroute = true;  // reset the route point to the first route point
+                            break;  // break out of the ride point loop
                         }
                         //present = true;
                     }
@@ -239,7 +241,7 @@ RouteSegment::search(RideItem *item, RideFile*ride, QList<IntervalItem*>&here)
         }
 
 
-        if (!present) {
+        if (!present && !resetroute) {
             //qDebug() << "    Route not identified (distance " << precision << "km)\r\n";
 
             break;
@@ -264,10 +266,13 @@ RouteSegment::search(RideItem *item, RideFile*ride, QList<IntervalItem*>&here)
             intervalItem->route = id();
             here << intervalItem;
 
-            // reset to restart find on next iteration
-            start = -1;
-            n=0;
+            // reset route point to begining to restart find on next iteration
+            resetroute = true;
+	}
 
+	if (resetroute) {
+	    start = -1;
+	    n = -1;
             // skip on a few samples to avoid finding the same
             // segment again - this happens when a segment is very
             // short and ends at lights or top of a hill.

@@ -200,8 +200,8 @@ class XPace : public RideMetric {
         return time_to_string(value(metric)*60);
     }
 
-    QString toString(bool metric, double v) const {
-        return time_to_string(value(v, metric)*60, true);
+    QString toString(double v) const {
+        return time_to_string(v*60, true);
     }
 
     void initialize() {

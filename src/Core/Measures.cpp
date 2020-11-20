@@ -264,8 +264,8 @@ Measures::Measures(QDir dir, bool withData) : dir(dir), withData(withData)
         QList<QStringList>()<<
             (QStringList()<<"weightkg")<<
             (QStringList()<<"fatkg")<<
-            (QStringList()<<"boneskg")<<
             (QStringList()<<"musclekg")<<
+            (QStringList()<<"boneskg")<<
             (QStringList()<<"leankg")<<
             (QStringList()<<"fatpercent"),
         dir, withData));

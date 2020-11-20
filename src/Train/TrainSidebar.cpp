@@ -317,8 +317,6 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
 
     connect(workoutTree->selectionModel(), SIGNAL(selectionChanged(QItemSelection, QItemSelection)), this, SLOT(workoutTreeWidgetSelectionChanged()));
 
-    //XXX ??? main = parent;
-    ergFile = NULL;
     videosyncFile = NULL;
     calibrating = false;
 
@@ -746,14 +744,15 @@ TrainSidebar::workoutTreeWidgetSelectionChanged()
     QModelIndex target = sortModel->mapToSource(current);
     QString filename = workoutModel->data(workoutModel->index(target.row(), 0), Qt::DisplayRole).toString();
 
-    // wip away the current selected workout once we've told everyone
+    // wipe away the current selected workout once we've told everyone
     // since they might be editing it and want to save changes first (!!)
-    ErgFile *prior = ergFile;
+    ErgFile *prior = const_cast<ErgFile*>(ergFileQueryAdapter.getErgFile());
 
     if (filename == "") {
 
         // an empty workout
         context->notifyErgFileSelected(NULL);
+        ergFileQueryAdapter.setErgFile(NULL);
 
         // clean last
         if (prior) delete prior;
@@ -766,7 +765,7 @@ TrainSidebar::workoutTreeWidgetSelectionChanged()
     if (index == 0) {
         // ergo mode
         context->notifyErgFileSelected(NULL);
-        ergFile=NULL;
+        ergFileQueryAdapter.setErgFile(NULL);
         mode = ERG;
         setLabels();
         clearStatusFlags(RT_WORKOUT);
@@ -774,14 +773,14 @@ TrainSidebar::workoutTreeWidgetSelectionChanged()
     } else if (index == 1) {
         // slope mode
         context->notifyErgFileSelected(NULL);
-        ergFile=NULL;
+        ergFileQueryAdapter.setErgFile(NULL);
         mode = CRS;
         setLabels();
         clearStatusFlags(RT_WORKOUT);
         //ergPlot->setVisible(false);
     } else {
         // workout mode
-        ergFile = new ErgFile(filename, mode, context);
+        ErgFile* ergFile = new ErgFile(filename, mode, context);
         mode = ergFile->mode;
 
         if (ergFile->isValid()) {
@@ -792,6 +791,7 @@ TrainSidebar::workoutTreeWidgetSelectionChanged()
             // setup the course profile in the
             // display!
             context->notifyErgFileSelected(ergFile);
+            ergFileQueryAdapter.setErgFile(ergFile);
             adjustIntensity(100);
             setLabels();
         } else {
@@ -800,6 +800,7 @@ TrainSidebar::workoutTreeWidgetSelectionChanged()
             delete ergFile;
             ergFile = NULL;
             context->notifyErgFileSelected(NULL);
+            ergFileQueryAdapter.setErgFile(NULL);
             removeInvalidWorkout();
             mode = ERG;
             clearStatusFlags(RT_WORKOUT);
@@ -824,10 +825,10 @@ TrainSidebar::workoutTreeWidgetSelectionChanged()
     }
 
     updateMetricLapDistanceRemaining();
+    ergFileQueryAdapter.resetQueryState();
 
     // clean last
     if (prior) delete prior;
-
 }
 
 /*
@@ -839,6 +840,8 @@ TrainSidebar::workoutTreeWidgetSelectionChanged()
 void
 TrainSidebar::updateMetricLapDistance()
 {
+    const ErgFile* ergFile = ergFileQueryAdapter.getErgFile();
+
     // lapDistance is only relevant for SLOPE ERG files
     if (!ergFile || !(status&RT_MODE_SLOPE)) {
         displayLapDistance = 0;
@@ -848,7 +851,7 @@ TrainSidebar::updateMetricLapDistance()
     // XXX This might have sub-optimal display in the final lap of a file.
     double currentposition = displayWorkoutDistance*1000;
     double lapmarker = ergFile->currentLap(currentposition);
-    if (lapmarker == -1) {
+    if (lapmarker < 0.) {
         displayLapDistance = 0;
         return;
     }
@@ -865,6 +868,8 @@ TrainSidebar::updateMetricLapDistance()
 void
 TrainSidebar::updateMetricLapDistanceRemaining()
 {
+    const ErgFile* ergFile = ergFileQueryAdapter.getErgFile();
+
     // lapDistanceRemaining is only relevant for SLOPE ERG files
     if (!ergFile || !(status&RT_MODE_SLOPE)) {
         displayLapDistanceRemaining = -1;
@@ -875,7 +880,7 @@ TrainSidebar::updateMetricLapDistanceRemaining()
     // perhaps we should look at course length.
     double currentposition = displayWorkoutDistance*1000;
     double lapmarker = ergFile->nextLap(currentposition);
-    if (lapmarker == -1) {
+    if (lapmarker < 0.) {
         // In this case, there are either no lap markers, or we are in last lap (and so no next lap)
         displayLapDistanceRemaining = -1;
         return;
@@ -1449,6 +1454,8 @@ void TrainSidebar::Stop(int deviceStatus)        // when stop button is pressed
     displayLapDistance = 0;
     displayLapDistanceRemaining = -1;
     displayAltitude = 0;
+
+    ergFileQueryAdapter.resetQueryState();
     guiUpdate();
 
     emit setNotification(tr("Stopped.."), 2);
@@ -1578,6 +1585,11 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
         CFStringRef reasonForActivity = CFSTR("TrainSidebar::guiUpdate");
         IOPMAssertionID assertionID;
         IOReturn suspendSreensaverSuccess = IOPMAssertionCreateWithName(kIOPMAssertionTypeNoDisplaySleep, kIOPMAssertionLevelOn, reasonForActivity, &assertionID);
+
+#elif defined(WIN32)
+        // Multimedia applications, such as video players and presentation applications, must use ES_DISPLAY_REQUIRED
+        // when they display video for long periods of time without user input.
+        SetThreadExecutionState(ES_DISPLAY_REQUIRED);
 #endif
 
         if(calibrating) {
@@ -1677,6 +1689,7 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
                     rtData.setSpeed(local.getSpeed());
                     rtData.setDistance(local.getDistance());
                     rtData.setRouteDistance(local.getRouteDistance());
+                    rtData.setDistanceRemaining(local.getDistanceRemaining());
                     rtData.setLapDistance(local.getLapDistance());
                     rtData.setLapDistanceRemaining(local.getLapDistanceRemaining());
                 }
@@ -1719,18 +1732,16 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
                 displayDistance += distanceTick;
                 displayLapDistance += distanceTick;
                 displayLapDistanceRemaining -= distanceTick;
+                displayWorkoutDistance += distanceTick;
 
                 if (!(status&RT_MODE_ERGO) && (context->currentVideoSyncFile()))
                 {
-                    displayWorkoutDistance = context->currentVideoSyncFile()->km;
                     // If we reached the end of the RLV then stop
                     if (displayWorkoutDistance >= context->currentVideoSyncFile()->Distance) {
                         Stop(DEVICE_OK);
                         return;
                     }
                     // TODO : graphs to be shown at seek position
-                } else {
-                    displayWorkoutDistance += distanceTick;
                 }
 
                 // If we just tripped over the end of the lap, we need to look at base data
@@ -1745,42 +1756,51 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
                 rtData.setLapDistance(displayLapDistance);
                 rtData.setLapDistanceRemaining(displayLapDistanceRemaining);
 
-                // Trust ergFile for location data, if available.
-                bool fAltitudeSet = false;
-                if (!(status&RT_MODE_ERGO) && ergFile) {
-                    if (!ergFile->StrictGradient) {
-                        // Attempt to obtain location and derived slope from altitude in ergfile.
-                        geolocation geoloc;
-                        if (ergFile->locationAt(displayWorkoutDistance * 1000, displayWorkoutLap, geoloc, slope)) {
-                            displayLatitude = geoloc.Lat();
-                            displayLongitude = geoloc.Long();
-                            displayAltitude = geoloc.Alt();
+                const ErgFile* ergFile = ergFileQueryAdapter.getErgFile();
+                if (ergFile) {
 
-                            if (displayLatitude && displayLongitude) {
-                                rtData.setLatitude(displayLatitude);
-                                rtData.setLongitude(displayLongitude);
+                    // update DistanceRemaining
+                    if (ergFile->Duration / 1000.0 > displayWorkoutDistance)
+                        rtData.setDistanceRemaining(ergFile->Duration / 1000.0 - displayWorkoutDistance);
+                    else
+                        rtData.setDistanceRemaining(0.0);
+
+                    // If ergfile has no gradient then there is no location, or altitude (or slope.)
+                    if (ergFile->hasGradient()) {
+                        bool fAltitudeSet = false;
+                        if (!ergFile->StrictGradient) {
+                            // Attempt to obtain location and derived slope from altitude in ergfile.
+                            geolocation geoloc;
+                            if (ergFileQueryAdapter.locationAt(displayWorkoutDistance * 1000, displayWorkoutLap, geoloc, slope)) {
+                                displayLatitude = geoloc.Lat();
+                                displayLongitude = geoloc.Long();
+                                displayAltitude = geoloc.Alt();
+
+                                if (displayLatitude && displayLongitude) {
+                                    rtData.setLatitude(displayLatitude);
+                                    rtData.setLongitude(displayLongitude);
+                                }
+                                fAltitudeSet = true;
                             }
-                            fAltitudeSet = true;
                         }
+
+                        if (ergFile->StrictGradient || !fAltitudeSet) {
+                            slope = ergFileQueryAdapter.gradientAt(displayWorkoutDistance * 1000, displayWorkoutLap);
+                        }
+
+                        if (!fAltitudeSet) {
+                            // For classic rlv with no location data:
+                            // Estimate vertical change based upon time passed and slope.
+                            // Note this isn't exactly right but is very close - we should use the previous slope for the time passed.
+                            double altitudeDeltaMeters = slope * (10 * distanceTick); // ((slope / 100) * distanceTick) * 1000
+
+                            displayAltitude += altitudeDeltaMeters;
+                        }
+
+                        rtData.setSlope(slope);
+                        rtData.setAltitude(displayAltitude);
                     }
-
-                    if (ergFile->StrictGradient || !fAltitudeSet) {
-                        slope = ergFile->gradientAt(displayWorkoutDistance * 1000, displayWorkoutLap);
-                    }
-
-                    rtData.setSlope(slope);
                 }
-
-                if (!fAltitudeSet) {
-                    // For classic rlv with no location data:
-                    // Estimate vertical change based upon time passed and slope.
-                    // Note this isn't exactly right but is very close - we should use the previous slope for the time passed.
-                    double altitudeDeltaMeters = slope * (10 * distanceTick); // ((slope / 100) * distanceTick) * 1000
-
-                    displayAltitude += altitudeDeltaMeters;
-                }
-
-                rtData.setAltitude(displayAltitude);
 
                 // time
                 total_msecs = session_elapsed_msec + session_time.elapsed();
@@ -1794,7 +1814,7 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
                 else lapTimeRemaining = 0;
 
                 long ergTimeRemaining;
-                if (ergFile) ergTimeRemaining = ergFile->Points.at(ergFile->rightPoint).x - load_msecs;
+                if (ergFile) ergTimeRemaining = ergFileQueryAdapter.currentTime() - load_msecs;
                 else ergTimeRemaining = 0;
 
                 // alert when approaching end of lap
@@ -1808,7 +1828,7 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
 
                     // alert when 3 seconds from end of ERG lap, or 20 meters from end of CRS lap
                     if ((status&RT_MODE_ERGO && lapTimeRemaining > 0 && lapTimeRemaining < 3000) ||
-                        (status&RT_MODE_SLOPE && lapmarker != -1 && lapmarker - currentposition < 20)) {
+                        (status&RT_MODE_SLOPE && (lapmarker >= 0.) && lapmarker - currentposition < 20)) {
                         lapAudioThisLap = false;
                         QSound::play(":audio/lap.wav");
                     }
@@ -1829,19 +1849,22 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
                     }
                 }
 
-                if(lapTimeRemaining < 0) {
-                        if (ergFile) lapTimeRemaining =  ergFile->Duration - load_msecs;
+                // Maintain time in ERGO mode
+                if (status& RT_MODE_ERGO) {
+                    if (lapTimeRemaining < 0) {
+                        if (ergFile) lapTimeRemaining = ergFile->Duration - load_msecs;
                         if (lapTimeRemaining < 0)
                             lapTimeRemaining = 0;
-                }
-                rtData.setLapMsecsRemaining(lapTimeRemaining);
+                    }
+                    rtData.setLapMsecsRemaining(lapTimeRemaining);
 
-                if (ergTimeRemaining < 0) {
-                        if (ergFile) ergTimeRemaining =  ergFile->Duration - load_msecs;
+                    if (ergTimeRemaining < 0) {
+                        if (ergFile) ergTimeRemaining = ergFile->Duration - load_msecs;
                         if (ergTimeRemaining < 0)
                             ergTimeRemaining = 0;
+                    }
+                    rtData.setErgMsecsRemaining(ergTimeRemaining);
                 }
-                rtData.setErgMsecsRemaining(ergTimeRemaining);
             } else {
                 rtData.setDistance(displayDistance);
                 rtData.setRouteDistance(displayWorkoutDistance);
@@ -2056,7 +2079,7 @@ void TrainSidebar::loadUpdate()
     load_msecs += load_period.restart();
 
     if (status&RT_MODE_ERGO) {
-        load = ergFile->wattsAt(load_msecs, curLap);
+        load = ergFileQueryAdapter.wattsAt(load_msecs, curLap);
 
         if(displayWorkoutLap != curLap)
         {
@@ -2075,12 +2098,15 @@ void TrainSidebar::loadUpdate()
         }
     } else {
 
-        if(displayWorkoutLap != curLap)
-        {
+        // Call gradientAt to obtain current lap num.
+        ergFileQueryAdapter.gradientAt(displayWorkoutDistance * 1000., curLap);
+        
+        if(displayWorkoutLap != curLap) {
             context->notifyNewLap();
             updateMetricLapDistance();
             updateMetricLapDistanceRemaining();
         }
+
         displayWorkoutLap = curLap;
 
         // we got to the end!
@@ -2271,7 +2297,23 @@ void TrainSidebar::updateCalibration()
                     finishCalibration = true;
                 break;
 
+            case CALIBRATION_STATE_FAILURE_SPINDOWN_TOO_FAST:
+                status = QString(tr("Calibration Failed: Loosen Roller"));
+
+                // No further ANT messages to set state, so must move ourselves on..
+                if ((stateCount % 25) == 0)
+                    finishCalibration = true;
+                break;
+
+            case CALIBRATION_STATE_FAILURE_SPINDOWN_TOO_SLOW:
+                status = QString(tr("Calibration Failed: Tighten Roller"));
+
+                // No further ANT messages to set state, so must move ourselves on..
+                if ((stateCount % 25) == 0)
+                    finishCalibration = true;
+                break;
             }
+
             break;
 
         case CALIBRATION_TYPE_ZERO_OFFSET:
@@ -2391,14 +2433,26 @@ void TrainSidebar::FFwd()
     if (((status&RT_RUNNING) == 0) || (status&RT_PAUSED)) return;
 
     if (status&RT_MODE_ERGO) {
+        // In ergo mode seek is of time.
         load_msecs += 10000; // jump forward 10 seconds
         context->notifySeek(load_msecs);
     }
-    else if (context->currentVideoSyncFile())
-    {
-        context->notifySeek(+1); // in case of video with RLV file synchronisation just ask to go forward
+    else {
+        // Otherwise Seek is of Distance.
+        double stepSize = 1.; // jump forward a kilometer in the workout
+        if (context->currentVideoSyncFile()) {
+            // If step would take us past the end then step to end.
+            double videoDistance = context->currentVideoSyncFile()->Distance;
+            if ((displayWorkoutDistance + stepSize) > videoDistance) {
+                stepSize = videoDistance - displayWorkoutDistance;
+            }
+            context->notifySeek(stepSize); // in case of video with RLV file synchronisation just ask to go forward
+        }
+        displayWorkoutDistance += stepSize;
     }
-    else displayWorkoutDistance += 1; // jump forward a kilometer in the workout
+
+    updateMetricLapDistance();
+    updateMetricLapDistanceRemaining();
 
     emit setNotification(tr("Fast forward.."), 2);
 }
@@ -2408,18 +2462,29 @@ void TrainSidebar::Rewind()
     if (((status&RT_RUNNING) == 0) || (status&RT_PAUSED)) return;
 
     if (status&RT_MODE_ERGO) {
+        // In ergo mode seek is of time.
         load_msecs -=10000; // jump back 10 seconds
         if (load_msecs < 0) load_msecs = 0;
         context->notifySeek(load_msecs);
     }
-    else if (context->currentVideoSyncFile())
-    {
-        context->notifySeek(-1); // in case of video with RLV file synchronisation just ask to go backward
-    }
     else {
-        displayWorkoutDistance -=1; // jump back a kilometer
-        if (displayWorkoutDistance < 0) displayWorkoutDistance = 0;
+        // Otherwise Seek is of distance.
+        double stepSize = -1.; // jump back a kilometer
+
+        // If step would take us before the start then step to the start.
+        if ((displayWorkoutDistance + stepSize) < 0) {
+            stepSize = -displayWorkoutDistance;
+        }
+
+        if (context->currentVideoSyncFile()) {
+            context->notifySeek(stepSize);
+        }
+
+        displayWorkoutDistance += stepSize;
     }
+
+    updateMetricLapDistance();
+    updateMetricLapDistanceRemaining();
 
     emit setNotification(tr("Rewind.."), 2);
 }
@@ -2433,14 +2498,57 @@ void TrainSidebar::FFwdLap()
     double lapmarker;
 
     if (status&RT_MODE_ERGO) {
-        lapmarker = ergFile->nextLap(load_msecs);
-        if (lapmarker != -1) load_msecs = lapmarker; // jump forward to lapmarker
+        lapmarker = ergFileQueryAdapter.nextLap(load_msecs);
+        if (lapmarker >= 0.) load_msecs = lapmarker; // jump forward to lapmarker
         context->notifySeek(load_msecs);
     } else {
-        lapmarker = ergFile->nextLap(displayWorkoutDistance*1000);
-        if (lapmarker != -1) displayWorkoutDistance = lapmarker/1000; // jump forward to lapmarker
+        static const double s_BeforeOffset = 10.1;
+        lapmarker = ergFileQueryAdapter.nextLap((displayWorkoutDistance*1000) + s_BeforeOffset);
+
+        // Go to slightly before lap marker so the lap transition message will be displayed.
+        lapmarker = std::max(0., lapmarker - s_BeforeOffset);
+
+        if (lapmarker >= 0.) displayWorkoutDistance = lapmarker/1000; // jump forward to lapmarker
     }
+
+    updateMetricLapDistance();
+    updateMetricLapDistanceRemaining();
+
+    if (lapmarker >= 0) emit setNotification(tr("Next Lap.."), 2);
 }
+
+// jump to next Lap marker (if there is one?)
+void TrainSidebar::RewindLap()
+{
+    if (((status & RT_RUNNING) == 0) || (status & RT_PAUSED)) return;
+
+    double lapmarker;
+
+    if (status & RT_MODE_ERGO) {
+        // Search for lap prior to 1 second ago.
+        long target = std::max<long>(0, load_msecs - 1000);
+        lapmarker = ergFileQueryAdapter.prevLap(target);
+        if (lapmarker >= 0.) load_msecs = lapmarker; // jump to lapmarker
+        context->notifySeek(load_msecs);
+    }
+    else {
+        // Search for lap prior to 50 meters ago.
+        double target = std::max(0., (displayWorkoutDistance * 1000) - 50.);
+
+        lapmarker = ergFileQueryAdapter.prevLap(target);
+
+        // Go to slightly before lap marker so the lap transition message will be displayed.
+        lapmarker = std::max(0., lapmarker - 10.1);
+
+        if (lapmarker >= 0.) displayWorkoutDistance = lapmarker / 1000; // jump to lapmarker
+    }
+
+    updateMetricLapDistance();
+    updateMetricLapDistanceRemaining();
+
+    if (lapmarker >= 0) emit setNotification(tr("Back Lap.."), 2);
+}
+
 
 // higher load/gradient
 void TrainSidebar::Higher()
@@ -2474,7 +2582,7 @@ void TrainSidebar::Lower()
 
     if (context->currentErgFile()) {
         // adjust the workout IF
-        adjustIntensity(lastAppliedIntensity-5);
+        adjustIntensity(std::max<int>(5, lastAppliedIntensity - 5));
 
     } else {
 
@@ -2518,12 +2626,12 @@ void TrainSidebar::setLabels()
 
 void TrainSidebar::adjustIntensity(int value)
 {
-    if (value == lastAppliedIntensity)
-    {
+    if (value == lastAppliedIntensity) {
         return;
     }
 
-    if (!context->currentErgFile()) return; // no workout selected
+    ErgFile* ergFile = const_cast<ErgFile*>(ergFileQueryAdapter.getErgFile());
+    if (!ergFile) return; // no workout selected
 
     // block signals temporarily
     context->mainWindow->blockSignals(true);
@@ -2534,6 +2642,7 @@ void TrainSidebar::adjustIntensity(int value)
 
     double from = double(lastAppliedIntensity) / 100.00;
     double to = double(value) / 100.00;
+
     lastAppliedIntensity = value;
 
     long starttime = context->getNow();
@@ -2542,48 +2651,56 @@ void TrainSidebar::adjustIntensity(int value)
 
     // what about gradient courses?
     ErgFilePoint last;
-    for(int i = 0; i < context->currentErgFile()->Points.count(); i++) {
+    for(int i = 0; i < ergFile->Points.count(); i++) {
 
-        if (context->currentErgFile()->Points.at(i).x >= starttime) {
+        if (ergFile->Points.at(i).x >= starttime) {
 
             if (insertedNow == false) {
 
                 if (i) {
                     // add a point to adjust from
-                    ErgFilePoint add;
+
+                    // This pass simply modifies load or gradient.
+                    // Start with copy of 'last', then overwrite only the part we wish to change,
+                    // this is necessary so crs point will start with an intact location and not
+                    // zeros.
+                    ErgFilePoint add = last;
                     add.x = context->getNow();
                     add.val = last.val / from * to;
 
                     // recalibrate altitude if gradient changing
-                    if (context->currentErgFile()->format == CRS) add.y = last.y + ((add.x-last.x) * (add.val/100));
+                    if (ergFile->format == CRS) add.y = last.y + ((add.x-last.x) * (add.val/100));
                     else add.y = add.val;
 
-                    context->currentErgFile()->Points.insert(i, add);
+                    ergFile->Points.insert(i, add);
 
                     last = add;
                     i++; // move on to next point (i.e. where we were!)
-
                 }
                 insertedNow = true;
             }
 
-            ErgFilePoint *p = &context->currentErgFile()->Points[i];
+            ErgFilePoint *p = &ergFile->Points[i];
 
             // recalibrate altitude if in CRS mode
             p->val = p->val / from * to;
-            if (context->currentErgFile()->format == CRS) {
+            if (ergFile->format == CRS) {
                 if (i) p->y = last.y + ((p->x-last.x) * (last.val/100));
             }
             else p->y = p->val;
         }
 
         // remember last
-        last = context->currentErgFile()->Points.at(i);
+        last = ergFile->Points.at(i);
     }
 
     // recalculate metrics
-    context->currentErgFile()->calculateMetrics();
+    ergFile->calculateMetrics();
     setLabels();
+
+    // Ergfile points have been edited so reset interpolation and
+    // query state.
+    ergFileQueryAdapter.resetQueryState();
 
     // unblock signals now we are done
     context->mainWindow->blockSignals(false);

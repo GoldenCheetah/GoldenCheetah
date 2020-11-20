@@ -47,7 +47,7 @@ init:
 - set PATH=%PATH%;C:\"Program Files (x86)"\NSIS
 
 cache:
-- gc-ci-libs.zip
+- gc-ci-libs.zip -> appveyor.yml
 - jom_1_1_3.zip
 - sip-4.19.8.zip
 - C:\R

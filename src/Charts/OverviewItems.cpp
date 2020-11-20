@@ -32,6 +32,7 @@
 
 #include "DataFilter.h"
 #include "Utils.h"
+#include "TimeUtils.h"
 #include "Tab.h"
 #include "LTMTool.h"
 #include "RideNavigator.h"
@@ -100,7 +101,7 @@ RPEOverviewItem::~RPEOverviewItem()
     delete sparkline;
 }
 
-KPIOverviewItem::KPIOverviewItem(ChartSpace *parent, QString name, double start, double stop, QString program, QString units) : ChartSpaceItem(parent, name)
+KPIOverviewItem::KPIOverviewItem(ChartSpace *parent, QString name, double start, double stop, QString program, QString units, bool istime) : ChartSpaceItem(parent, name)
 {
 
     this->type = OverviewItemType::KPI;
@@ -108,6 +109,7 @@ KPIOverviewItem::KPIOverviewItem(ChartSpace *parent, QString name, double start,
     this->stop = stop;
     this->program = program;
     this->units = units;
+    this->istime = istime;
 
     value ="0";
     progressbar = new ProgressBar(this, start, stop, value.toDouble());
@@ -436,6 +438,9 @@ KPIOverviewItem::setData(RideItem *item)
     // now set the progressbar
     progressbar->setValue(start, stop, value.toDouble());
 
+    // convert value to hh:mm:ss when istime
+    if (istime) value = time_to_string(value.toDouble(), true);
+
     // show/hide widgets on the basis of geometry
     itemGeometryChanged();
 }
@@ -454,6 +459,9 @@ KPIOverviewItem::setDateRange(DateRange dr)
 
     // now set the progressbar
     progressbar->setValue(start, stop, value.toDouble());
+
+    // convert value to hh:mm:ss when istime
+    if (istime) value = time_to_string(value.toDouble(), true);
 
     // show/hide widgets on the basis of geometry
     itemGeometryChanged();
@@ -686,9 +694,9 @@ MetricOverviewItem::setData(RideItem *item)
     const RideMetricFactory &factory = RideMetricFactory::instance();
     const RideMetric *m = factory.rideMetric(symbol);
     if (m) {
-        upper = m->toString(GlobalContext::context()->useMetricUnits, max);
-        lower = m->toString(GlobalContext::context()->useMetricUnits, min);
-        mean = m->toString(GlobalContext::context()->useMetricUnits, avg);
+        upper = m->toString(max);
+        lower = m->toString(min);
+        mean = m->toString(avg);
     }
 }
 
@@ -758,10 +766,8 @@ MetricOverviewItem::setDateRange(DateRange dr)
     const RideMetricFactory &factory = RideMetricFactory::instance();
     RideMetric *m = const_cast<RideMetric*>(factory.rideMetric(symbol));
     if (std::isinf(v) || std::isnan(v)) v=0;
-    m->setValue(v);
-    m->setCount(c);
     if (m) {
-        value = m->toString(GlobalContext::context()->useMetricUnits, v);
+        value = m->toString(v);
     } else {
         value = Utils::removeDP(QString("%1").arg(v));
         if (value == "nan") value ="";
@@ -1434,6 +1440,8 @@ IntervalOverviewItem::setDateRange(DateRange dr)
     RideMetricFactory &factory = RideMetricFactory::instance();
     const RideMetric *xm = factory.rideMetric(xsymbol);
     const RideMetric *ym = factory.rideMetric(ysymbol);
+    if (!xm || !ym) return; // avoid crashes when metrics are not available
+
     xdp = xm->precision();
     ydp = ym->precision();
     bubble->setAxisNames(xm ? xm->name() : "NA", ym ? ym->name() : "NA");
@@ -1507,6 +1515,7 @@ IntervalOverviewItem::setData(RideItem *item)
     RideMetricFactory &factory = RideMetricFactory::instance();
     const RideMetric *xm = factory.rideMetric(xsymbol);
     const RideMetric *ym = factory.rideMetric(ysymbol);
+    if (!xm || !ym) return; // avoid crashes when metrics are not available
     xdp = xm->precision();
     ydp = ym->precision();
     bubble->setAxisNames(xm ? xm->name() : "NA", ym ? ym->name() : "NA");
@@ -1717,7 +1726,7 @@ void
 KPIOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
 
     double addy = 0;
-    if (units != "" && units != tr("seconds")) addy = QFontMetrics(parent->smallfont).height();
+    if (units != "") addy = QFontMetrics(parent->smallfont).height();
 
     // mid is slightly higher to account for space around title, move mid up
     double mid = (ROWHEIGHT*1.5f) + ((geometry().height() - (ROWHEIGHT*2)) / 2.0f) - (addy/2);
@@ -1756,15 +1765,15 @@ KPIOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, 
         painter->setPen(QColor(100,100,100));
         painter->setFont(parent->smallfont);
 
-        QString stoptext = Utils::removeDP(QString("%1").arg(stop));
-        QString starttext = Utils::removeDP(QString("%1").arg(start));
+        QString stoptext = istime ? time_to_string(stop, true) : Utils::removeDP(QString("%1").arg(stop));
+        QString starttext = istime ? time_to_string (start, true) : Utils::removeDP(QString("%1").arg(start));
         painter->drawText(QPointF(right - QFontMetrics(parent->smallfont).width(stoptext), bottom), stoptext);
         painter->drawText(QPointF(left, bottom), starttext);
 
         // percentage in mid font...
         if (geometry().height() >= (ROWHEIGHT*8)) {
 
-            double percent = round((value.toDouble()-start)/(stop-start) * 100.0);
+            double percent = round((progressbar->getCurrentValue()-start)/(stop-start) * 100.0);
             QString percenttext = Utils::removeDP(QString("%1%").arg(percent));
 
             QFontMetrics mfm(parent->midfont);
@@ -2477,6 +2486,11 @@ OverviewItemConfig::OverviewItemConfig(ChartSpaceItem *item) : QWidget(item->par
         connect(editor, SIGNAL(syntaxErrors(QStringList&)), this, SLOT(setErrors(QStringList&)));
         connect(editor, SIGNAL(textChanged()), this, SLOT(dataChanged()));
 
+        // istime
+        cb1 = new QCheckBox(this);
+        layout->addRow(tr("Time"), cb1);
+        connect(cb1, SIGNAL(stateChanged(int)), this, SLOT(dataChanged()));
+
         // units
         string1 = new QLineEdit(this);
         layout->addRow(tr("Units"), string1);
@@ -2587,6 +2601,7 @@ OverviewItemConfig::setWidgets()
             editor->setText(mi->program);
             double1->setValue(mi->start);
             double2->setValue(mi->stop);
+            cb1->setChecked(mi->istime);
             string1->setText(mi->units);
         }
     }
@@ -2690,6 +2705,7 @@ OverviewItemConfig::dataChanged()
         {
             KPIOverviewItem *mi = dynamic_cast<KPIOverviewItem*>(item);
             mi->name = name->text();
+            mi->istime = cb1->isChecked();
             mi->units = string1->text();
             mi->program = editor->toPlainText();
             mi->start = double1->value();
@@ -3300,8 +3316,8 @@ BubbleViz::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
     const RideMetric *m = factory.rideMetric(parent->xsymbol);
     QString smin, smax;
     if (m) {
-        smin = m->toString(GlobalContext::context()->useMetricUnits, round(minx+xoff));
-        smax = m->toString(GlobalContext::context()->useMetricUnits, round(maxx+xoff));
+        smin = m->toString(round(minx+xoff));
+        smax = m->toString(round(maxx+xoff));
     } else {
         smin = QString("%1").arg(round(minx+xoff));
         smax = QString("%1").arg(round(maxx+xoff));
@@ -3342,7 +3358,7 @@ BubbleViz::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
         // xlabel
         const RideMetric *m = factory.rideMetric(parent->xsymbol);
         QString xlab;
-        if (m)  xlab = m->toString(GlobalContext::context()->useMetricUnits, nearest.x+xoff);
+        if (m)  xlab = m->toString(nearest.x+xoff);
         else xlab = Utils::removeDP(QString("%1").arg(nearest.x+xoff,0,'f',parent->xdp));
         bminx = tfm.tightBoundingRect(QString("%1").arg(xlab));
         bminx.moveTo(center.x() - (bminx.width()/2),  xlabelspace.bottom()-bminx.height());
@@ -3352,7 +3368,7 @@ BubbleViz::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
         // ylabel
         m = factory.rideMetric(parent->ysymbol);
         QString ylab;
-        if (m)  ylab = m->toString(GlobalContext::context()->useMetricUnits, nearest.y+yoff);
+        if (m)  ylab = m->toString(nearest.y+yoff);
         else ylab = Utils::removeDP(QString("%1").arg(nearest.y+yoff,0,'f',parent->ydp));
         bminy = tfm.tightBoundingRect(QString("%1").arg(ylab));
         bminy.moveTo(ylabelspace.right() - bminy.width(),  center.y() - (bminy.height()/2));
@@ -3503,6 +3519,16 @@ Routeline::~Routeline()
     delete animator;
 }
 
+// Spherical pseudo-Mercator projection. Only needs to be applied to the
+// latitude of a coordinate.
+// See also https://wiki.openstreetmap.org/wiki/Mercator
+static inline double mercator_projection(double lat) {
+    double y = lat / 90 + 1;
+    y = y * M_PI / 4;
+    y = log(tan(y));
+    return y * 180 / M_PI;
+}
+
 void
 Routeline::setData(RideItem *item)
 {
@@ -3536,8 +3562,10 @@ Routeline::setData(RideItem *item)
             p->lon < -180 || p->lon > 180 ||
             p->lat < -90 || p->lat > 90) continue;
 
-        if (p->lat > maxlat) maxlat=p->lat;
-        if (p->lat < minlat) minlat=p->lat;
+        double projected_lat = mercator_projection(p->lat);
+
+        if (projected_lat > maxlat) maxlat=projected_lat;
+        if (projected_lat < minlat) minlat=projected_lat;
         if (p->lon < minlon) minlon=p->lon;
         if (p->lon > maxlon) maxlon=p->lon;
     }
@@ -3569,7 +3597,7 @@ Routeline::setData(RideItem *item)
             //            yoff+(geom.height()-(geom.height() / (ydiff / (p->lat - minlat)))));
 
             path.moveTo((geom.width() / (xdiff / (p->lon - minlon))),
-                        (height-(height / (ydiff / (p->lat - minlat)))));
+                        (height-(height / (ydiff / (mercator_projection(p->lat) - minlat)))));
             count=div;
 
         } else if (count == 0) {
@@ -3577,7 +3605,7 @@ Routeline::setData(RideItem *item)
             //path.lineTo(xoff+(geom.width() / (xdiff / (p->lon - minlon))),
             //            yoff+(geom.height()-(geom.height() / (ydiff / (p->lat - minlat)))));
             path.lineTo((geom.width() / (xdiff / (p->lon - minlon))),
-                        (height-(height / (ydiff / (p->lat - minlat)))));
+                        (height-(height / (ydiff / (mercator_projection(p->lat) - minlat)))));
             count=div;
             lines++;
 

@@ -83,10 +83,7 @@ FortiusController::getRealtimeData(RealtimeData &rtData)
 
     if(!myFortius->isRunning())
     {
-        QMessageBox msgBox;
-        msgBox.setText(tr("Cannot Connect to Fortius"));
-        msgBox.setIcon(QMessageBox::Critical);
-        msgBox.exec();
+        emit setNotification(tr("Cannot Connect to Fortius"), 2);
         parent->Stop(1);
         return;
     }

@@ -2133,7 +2133,7 @@ Bindings::season(bool all, bool compare) const
     } else if (all) {
         // list all seasons
         foreach(Season season, context->athlete->seasons->seasons) {
-            worklist << DateRange(season.start, season.end, season.name, QColor(127,127,127));
+            worklist << DateRange(season.getStart(), season.getEnd(), season.name, QColor(127,127,127));
         }
 
     } else {

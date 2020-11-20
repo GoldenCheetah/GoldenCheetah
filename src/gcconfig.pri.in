@@ -174,7 +174,7 @@
 
 # if you want video playback on training mode then
 # download and install vlc (videolan) from
-# ftp.videolan.org/pub/vlc/1.1.8 or http://download.videolan.org/vlc/ for 
+# ftp.videolan.org/pub/vlc/3.0.8 or http://download.videolan.org/vlc/ for
 # your platform there are sdks for Mac and Windows. On Linux you
 # will need to use the latest distro (e.g. Meerkat
 # on Ubuntu) to be sure apt-get installs the latest

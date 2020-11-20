@@ -623,6 +623,7 @@ class AthleteWeight : public RideMetric {
         if (weight <= 0.00) weight = 80.00;
 
         setValue(weight);
+        setCount(1);
     }
 
     MetricClass classification() const { return Undefined; }

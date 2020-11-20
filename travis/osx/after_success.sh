@@ -7,6 +7,10 @@ GoldenCheetah.app/Contents/MacOS/GoldenCheetah --version
 echo "About to create dmg file and fix up"
 mkdir GoldenCheetah.app/Contents/Frameworks
 
+# Add VLC dylibs and plugins
+cp ../VLC/lib/libvlc.dylib ../VLC/lib/libvlccore.dylib GoldenCheetah.app/Contents/Frameworks
+cp -R ../VLC/plugins GoldenCheetah.app/Contents/Frameworks
+
 # This is a hack to include libicudata.*.dylib, not handled by macdployqt[fix]
 cp /usr/local/opt/icu4c/lib/libicudata.*.dylib GoldenCheetah.app/Contents/Frameworks
 
@@ -44,8 +48,9 @@ do
 done
 popd
 
-# Final deployment to generate dmg
-/usr/local/opt/qt5/bin/macdeployqt GoldenCheetah.app -verbose=2 -fs=hfs+ -dmg
+# Final deployment to generate dmg (may take longer than 10' wihout output)
+python3.7 -m pip install travis-wait-improved
+/Library/Frameworks/Python.framework/Versions/3.7/bin/travis-wait-improved --timeout 20m /usr/local/opt/qt5/bin/macdeployqt GoldenCheetah.app -verbose=2 -fs=hfs+ -dmg
 
 echo "Renaming dmg file to branch and build number ready for deploy"
 export FINAL_NAME=GoldenCheetah_v3.6-DEV_x64.dmg
@@ -67,7 +72,7 @@ aws s3 rm s3://goldencheetah-binaries/MacOS --recursive # keep only the last one
 aws s3 cp --acl public-read $FINAL_NAME s3://goldencheetah-binaries/MacOS/$FINAL_NAME
 aws s3 cp --acl public-read GCversionMacOS.txt s3://goldencheetah-binaries/MacOS/GCversionMacOS.txt
 else
-curl --max-time 60 --upload-file $FINAL_NAME https://transfer.sh/$FINAL_NAME
+curl --max-time 300 --upload-file $FINAL_NAME https://free.keep.sh/$FINAL_NAME
 fi
 
 echo "Make sure we are back in the Travis build directory"

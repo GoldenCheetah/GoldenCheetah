@@ -61,6 +61,21 @@ const log_disabled_output& operator << (const log_disabled_output& any, const st
 
 using namespace NS_TTSReader;
 
+// This is the static const string table that tts files may refer to by string key.
+static const std::map<int, const char*> tts_string_table = {
+    {1001, "route name" },
+    {1002, "route description"},
+    {1041, "segment name"},
+    {1042, "segment description"},
+    {2001, "company"},
+    {2004, "serial"},
+    {2005, "time"},
+    {2007, "link"},
+    {5001, "product"},
+    {5002, "video name"},
+    {6001, "infobox #1"}
+};
+
 /*
  * Utility Routines For TTS Reader
  */
@@ -282,7 +297,7 @@ void videoInfo(int version, ByteArray & data) {
     Q_UNUSED(data);
 }
 
-void segmentRange(int version, ByteArray &data) {
+void TTSReader::segmentRange(int version, ByteArray &data) {
 
     Q_UNUSED(version);
 
@@ -290,11 +305,16 @@ void segmentRange(int version, ByteArray &data) {
         DEBUG_LOG << "Segment Range data wrong length " << data.size() << "\n";
     }
 
-    DEBUG_LOG << "[segment range]\n";
+    DEBUG_LOG << "[segment range token]";
 
+    // In the files I've seen this segmentRange token is only set once and contains the route length.
+    // Note this code seems to permit a segment to have multiple ranges. I have no example so not sure.
     for (unsigned int i = 0; i < data.size() / 10; i++) {
 
-        DEBUG_LOG << " [" << i << "=" << (getUInt(data, i * 10 + 0) / 100000.0) << "-" << (getUInt(data, i * 10 + 4) / 100000.0) << "\n";
+        double startKM = (getUInt(data, i * 10 + 0) / 100000.0);
+        double endKM = (getUInt(data, i * 10 + 4) / 100000.0);
+
+        DEBUG_LOG << " [" << i << "=" << startKM << "-" << endKM << "\n";
 
         if (getUShort(data, i * 10 + 6) != 0) {
             DEBUG_LOG << "/0x" << std::hex << (getUShort(data, i * 10 + 6)) << std::dec << "\n";
@@ -305,13 +325,29 @@ void segmentRange(int version, ByteArray &data) {
 }
 
 // segment range; 548300 is 5.483km. What is short value in "old" files?
-void segmentInfo(int version, ByteArray &data) {
+void TTSReader::segmentInfo(int version, ByteArray &data) {
 
     if ((version == 1104) && (data.size() == 8)) {
-        DEBUG_LOG << "[segment range] " << (getUInt(data, 0) / 100000.0) << "-" << (getUInt(data, 4) / 100000.0) << "\n";
+        double startKM = (getUInt(data, 0) / 100000.0);
+        double endKM = (getUInt(data, 4) / 100000.0);
+
+        pendingSegment.startKM = startKM;
+        pendingSegment.endKM = endKM;
+
+        DEBUG_LOG << "[segment range] " << startKM << "-" << endKM << "\n";
     }
 
     if ((version == 1000) && (data.size() == 10)) {
+        double startKM = (getUInt(data, 2) / 100000.0);
+        double endKM = (getUInt(data, 6) / 100000.0);
+
+        // NOTE: From the wattzapp debug print it looks like this 3rd value is a divisor.
+        // In my test files its always 1. so no harm to divide - but beware I'm just guessing.
+        double divisor = getUShort(data, 0);
+
+        pendingSegment.startKM = startKM / divisor;
+        pendingSegment.endKM = endKM / divisor;
+
         DEBUG_LOG << "[segment range] " << (getUInt(data, 2) / 100000.0) << "-" << (getUInt(data, 6) / 100000.0) << "/" << getUShort(data, 0) << "\n";
     }
 }
@@ -370,8 +406,19 @@ const std::vector<Point> & TTSReader::getPoints() const {
     return points;
 }
 
+const std::vector<Segment>& TTSReader::getSegments() const {
+    return segmentList;
+}
+
+const std::wstring& TTSReader::getRouteName()        const {
+    return routeName; 
+}
+
+const std::wstring& TTSReader::getRouteDescription() const {
+    return routeDescription;
+}
+
 double TTSReader::getDistanceMeters() const {
-    // TODO Auto-generated method stub
     return totalDistance;
 }
 
@@ -380,12 +427,10 @@ int TTSReader::routeType() const {
 }
 
 double TTSReader::getMaxSlope() const {
-    // TODO Auto-generated method stub
     return maxSlope;
 }
 
 double TTSReader::getMinSlope() const {
-    // TODO Auto-generated method stub
     return minSlope;
 }
 
@@ -416,6 +461,9 @@ bool TTSReader::deriveMinMaxSlopes(double &minSlope, double &maxSlope, double &v
 }
 
 void TTSReader::recomputeAltitudeFromGradient() {
+
+    if (points.size() < 3)
+        return;
 
     // Some tts files I see have an altitude crisis around the start: Fixup altitude
     // of index 0 and 1 by linear interpolating.
@@ -642,8 +690,6 @@ bool TTSReader::loadHeaders() {
 
             DEBUG_LOG << "::";
 
-            //String result = null;
-
             switch (stringType) {
 
             case CRC:
@@ -665,32 +711,45 @@ bool TTSReader::loadHeaders() {
 
             case STRING:
 
-                // GOLDEN CHEETAH TODO: Strings? Pssht!
+            {
+                if (tts_string_table.count(blockType + stringId)) {
+                    DEBUG_LOG << "[" << tts_string_table.at(blockType + stringId) << "]";
+                } else {
+                    DEBUG_LOG << "[" << blockType << "." << stringId << "]";
+                }
 
-                //if (strings.containsKey(blockType + stringId)) {
-                //    logger.debug("[" + strings.get(blockType + stringId)
-                //        + "]");
-                //}
-                //else {
-                //    logger.debug("[" + blockType + "." + stringId + "]");
-                //}
-                //
-                //StringBuilder str = new StringBuilder();
-                //for (int i = 0; i < decrD.length / 2; i++) {
-                //    Char c = (Char)(decrD[2 * i] | (int)decrD[2 * i + 1] << 8);
-                //    str.append(c);
-                //}
-                //
-                //result = str.toString();
-                //switch (blockType + stringId) {
-                //case 5002: // Video Name
-                //    ttsName = result;
-                //    break;
-                //default:
-                //    logger.debug("[" + result + "]");
-                //}
+                std::wstring result;
 
-                break;
+                for (int i = 0; i < decrD.size() / 2; i++) {
+                    Char c = (Char)(decrD[2 * i] | (int)decrD[2 * i + 1] << 8);
+                    result.append(1, c);
+                }
+
+                switch (blockType + stringId) {
+                case 5002: // Video Name
+                    ttsName = result;
+                    break;
+                case 1001: // Route Name
+                    routeName = result;
+                    break;
+                case 1002: // Route Description
+                    routeDescription = result;
+                    break;
+                case 1041: // Segment Name
+                    // Push of pending segment to segment list is triggered by finding a new
+                    // segment name. If pending segment is valid then push it, then clear
+                    // pending to start a new one.
+                    flushPendingSegment();
+                    pendingSegment.name = result;
+                    break;
+                case 1042: // Segment Description
+                    pendingSegment.description = result;
+                    break;
+                }
+
+                DEBUG_LOG << "[" << result << "]";
+            }
+            break;
 
             case BLOCK:
             {
@@ -702,8 +761,6 @@ bool TTSReader::loadHeaders() {
             }
         }
 
-        DEBUG_LOG << "\n";
-
         bytes += (int)data.size();
     }
 
@@ -711,6 +768,7 @@ bool TTSReader::loadHeaders() {
     // - pointList holds framemapping info (if any)
     // - programList holds slope info
     // - gpsList holds gps info
+    // - segmentList holds the segments and their names
     //
     // GPS Info is optional.
     // FrameMapping Info is optional.
@@ -725,6 +783,10 @@ bool TTSReader::loadHeaders() {
     // One stream is chosen to be the basis for the interpolation of
     // the other streams. Choose whichever has the most data points,
     // then interpolate the other two onto it.
+
+    // First thing, flush any pending segment.
+    flushPendingSegment();
+
     size_t gpsCount = gpsPoints.size();
     size_t slopeCount = programList.size();
     size_t frameMapCount = pointList.size();
@@ -884,9 +946,11 @@ bool TTSReader::loadHeaders() {
 
     // fill in speed for first point
 
-    points[0].setSpeed(points[1].getSpeed());
-
-    totalDistance = points[points.size() - 1].getDistanceFromStart();
+    totalDistance = 0;
+    if (points.size() > 2) {
+        points[0].setSpeed(points[1].getSpeed());
+        totalDistance = points[points.size() - 1].getDistanceFromStart();
+    }
 
     return true;
 }

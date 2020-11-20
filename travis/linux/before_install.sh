@@ -23,8 +23,11 @@ sudo cp libssl.so.1.1 libcrypto.so.1.1 /usr/local/lib/
 sudo ldconfig
 cd ..
 
-# Add VLC 2.2.2
-sudo apt-get install -qq vlc libvlc-dev libvlccore-dev
+# Add VLC 3
+sudo add-apt-repository -y ppa:jonathonf/vlc-3
+sudo add-apt-repository -y ppa:jonathonf/ffmpeg-4
+sudo apt-get update -qq
+sudo apt-get install -y vlc libvlc-dev libvlccore-dev
 
 # R 3.6
 sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E298A3A825C0D65DFD57CBB651716619E084DAB9
@@ -40,9 +43,10 @@ if [ -z "$(ls -A D2XX)" ]; then
 fi
 
 # SRMIO
-wget http://www.zuto.de/project/files/srmio/srmio-0.1.1~git1.tar.gz
-tar xf srmio-0.1.1~git1.tar.gz
-cd srmio-0.1.1~git1
+wget https://github.com/rclasen/srmio/archive/v0.1.1git1.tar.gz
+tar xf v0.1.1git1.tar.gz
+cd srmio-0.1.1git1
+sh genautomake.sh
 ./configure --disable-shared --enable-static
 make --silent -j3
 sudo make install

@@ -1690,7 +1690,7 @@ struct FitFileReaderState
 
             double deve_value = 0.0;
 
-            if( value == NA_VALUE )
+            if( _values.type == SingleValue && value == NA_VALUE )
                 continue;
 
             int native_num = field.num;

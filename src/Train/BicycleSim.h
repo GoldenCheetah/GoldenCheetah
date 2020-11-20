@@ -19,9 +19,11 @@
 #if !defined(BICYCLESIM_H)
 #define BICYCLESIM_H
 
+#include <chrono>
+
 #include "RealtimeData.h"
 #include "PhysicsUtility.h"
-#include <chrono>
+#include "ErgFile.h"
 
 class BicycleWheel
 {
@@ -101,6 +103,14 @@ public:
         this->Altitude() = rtData.getAltitude();
         this->Slope()    = rtData.getSlope();
         this->Watts()    = rtData.getWatts();
+    }
+
+    BicycleSimState(double watts, double slope, double altitude)
+    {
+        Clear();
+        this->Altitude() = altitude;
+        this->Slope()    = slope;
+        this->Watts()    = watts;
     }
 
     // Linear interpolate all fields to new sim state.
@@ -184,5 +194,6 @@ public:
              double v) const;                        // current velocity
 
 };
+
 
 #endif // BICYCLESIM_H

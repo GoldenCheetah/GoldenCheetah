@@ -272,6 +272,7 @@ RideImportWizard::init(QList<QString> original, Context * /*mainWindow*/)
     todayButton->addItem(tr("Last Sunday"));
     todayButton->addItem(tr("Choose Date"));
     cancelButton = new QPushButton(tr("Cancel"));
+    cancelButton->setAutoDefault(false);
     abortButton = new QPushButton(tr("Abort"));
     //overFiles = new QCheckBox(tr("Overwrite Existing Files"));  // deprecate for this release... XXX
     // initially the cancel, overwrite and today widgets are hidden

@@ -623,6 +623,8 @@ greaterThan(QT_MAJOR_VERSION, 4) {
     HEADERS += Train/Ergofit.h Train/ErgofitController.h Train/ErgofitConnection.h
     SOURCES += Train/DaumController.cpp Train/Daum.cpp
     HEADERS += Train/DaumController.h Train/Daum.h
+    SOURCES += Train/KurtInRide.cpp Train/KurtSmartControl.cpp
+    HEADERS += Train/KurtInRide.h Train/KurtSmartControl.h
 
     # bluetooth in QT5.5 or higher(5.4 was only a tech preview)
     greaterThan(QT_MINOR_VERSION, 4) {
@@ -756,7 +758,8 @@ greaterThan(QT_MAJOR_VERSION, 4) {
 
 HEADERS += Train/TrainBottom.h Train/TrainDB.h Train/TrainSidebar.h \
            Train/VideoLayoutParser.h Train/VideoSyncFile.h Train/WorkoutPlotWindow.h Train/WebPageWindow.h \
-           Train/WorkoutWidget.h Train/WorkoutWidgetItems.h Train/WorkoutWindow.h Train/WorkoutWizard.h Train/ZwoParser.h
+           Train/WorkoutWidget.h Train/WorkoutWidgetItems.h Train/WorkoutWindow.h Train/WorkoutWizard.h Train/ZwoParser.h \
+           Train/LiveMapWebPageWindow.h
 
 
 ###=============
@@ -859,7 +862,8 @@ greaterThan(QT_MAJOR_VERSION, 4) {
 
 SOURCES += Train/TrainBottom.cpp Train/TrainDB.cpp Train/TrainSidebar.cpp \
            Train/VideoLayoutParser.cpp Train/VideoSyncFile.cpp Train/WorkoutPlotWindow.cpp Train/WebPageWindow.cpp \
-           Train/WorkoutWidget.cpp Train/WorkoutWidgetItems.cpp Train/WorkoutWindow.cpp Train/WorkoutWizard.cpp Train/ZwoParser.cpp
+           Train/WorkoutWidget.cpp Train/WorkoutWidgetItems.cpp Train/WorkoutWindow.cpp Train/WorkoutWizard.cpp Train/ZwoParser.cpp \
+           Train/LiveMapWebPageWindow.cpp
 
 ## Crash Handling
 win32-msvc* {

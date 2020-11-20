@@ -18,6 +18,7 @@
 
 #include <QtGui>
 #include <QSettings>
+#include <QWidget>
 
 #include "Context.h"
 #include "Athlete.h"
@@ -152,20 +153,56 @@ AthleteConfig::AthleteConfig(QDir home, Context *context) :
     mainLayout->setSpacing(0);
     mainLayout->setContentsMargins(0,0,0,0);
 
+    QWidget *mc = new QWidget(this);
+    QVBoxLayout *ml = new QVBoxLayout(mc);
     QTabWidget *measuresTab = new QTabWidget(this);
+    ml->addWidget(measuresTab);
+    measuresTab->setContentsMargins(10*dpiXFactor,10*dpiXFactor,10*dpiXFactor,10*dpiXFactor);
     for (int i=0; i<context->athlete->measures->getGroupNames().count(); i++)
         measuresTab->addTab(measuresPages[i], context->athlete->measures->getGroupNames()[i]);
 
+    QWidget *zc = new QWidget(this);
+    QVBoxLayout *zl = new QVBoxLayout(zc);
     QTabWidget *zonesTab = new QTabWidget(this);
-    zonesTab->addTab(zonePage, tr("Power Zones"));
-    zonesTab->addTab(hrZonePage, tr("Heartrate Zones"));
-    zonesTab->addTab(paceZonePage, tr("Pace Zones"));
+    zl->addWidget(zonesTab);
+    zonesTab->setContentsMargins(10*dpiXFactor,10*dpiXFactor,10*dpiXFactor,10*dpiXFactor);
+    zonesTab->addTab(zonePage, tr("Power"));
+    zonesTab->addTab(hrZonePage, tr("Heartrate"));
+    zonesTab->addTab(paceZonePage, tr("Pace"));
+
+    // if the plot background and window background
+    // are the same color, lets use the accent color since
+    // it fits in with the rest of the color theme
+    // otherwise just use same as the system color for text
+    QPalette std;
+    QColor tabselect = std.color(QPalette::Text);
+    if (GColor(CPLOTBACKGROUND) == std.color(QPalette::Base)) tabselect = GColor(CPLOTMARKER);
+
+    QString styling = QString("QTabWidget { background: %1; }"
+                          "QTabWidget::pane { border: 0px; }"
+                          "QTabBar::tab { background: %1; "
+                          "               color: %6; "
+                          "               min-width: %5px; "
+                          "               padding: %4px; "
+                          "               border-top: 0px;"
+                          "               border-left: 0px;"
+                          "               border-right: 0px;"
+                          "               border-bottom: %3px solid %1; } "
+                          "QTabBar::tab:selected { border-bottom-right-radius: 0px; border-bottom-left-radius: 0px; border-bottom-color: %2; }"
+                         ).arg(std.color(QPalette::Base).name())                      // 1 tab background color
+                          .arg(tabselect.name())                                      // 2 selected bar color
+                          .arg(4*dpiYFactor)                                          // 3 selected bar width
+                          .arg(2*dpiXFactor)                                          // 4 padding
+                          .arg(75*dpiXFactor)                                         // 5 tab minimum width
+                          .arg(std.color(QPalette::Text).name()); // 6 tab text color
+    zonesTab->setStyleSheet(styling);
+    measuresTab->setStyleSheet(styling);
 
     QTabWidget *tabs = new QTabWidget(this);
     tabs->addTab(athletePage, tr("About"));
     tabs->addTab(credentialsPage, tr("Accounts"));
-    tabs->addTab(zonesTab, tr("Zones"));
-    tabs->addTab(measuresTab, tr("Measures"));
+    tabs->addTab(zc, tr("Zones"));
+    tabs->addTab(mc, tr("Measures"));
     tabs->addTab(modelPage, tr("Model"));
     tabs->addTab(autoImportPage, tr("Auto Import"));
     tabs->addTab(backupPage, tr("Backup"));
