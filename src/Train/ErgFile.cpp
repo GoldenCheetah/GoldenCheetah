@@ -158,9 +158,9 @@ void ErgFile::parseZwift()
 
     // extract contents into ErgFile....
     // each watts value is in percent terms so apply CP
-    // and put into out format
+    // and put into our format as integer
     foreach(ErgFilePoint p, handler.points) {
-        double watts = p.y * CP / 100.0;
+        double watts = int(p.y * CP / 100.0);
         Points << ErgFilePoint(p.x, watts, watts);
         if (watts > MaxWatts) MaxWatts = watts;
         Duration = p.x;
@@ -595,7 +595,7 @@ void ErgFile::parseComputrainer(QString p)
                 case MRC:       // its a percent relative to CP (mrc file)
                     add.y *= CP;
                     add.y /= 100.00;
-                    add.val = add.y;
+                    add.val = add.y = int(add.y);
                     break;
                 }
                 Points.append(add);
