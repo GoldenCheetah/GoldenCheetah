@@ -202,17 +202,21 @@ Library::importFiles(Context *context, QStringList files, bool forcedialog)
 
             // set target filename
             targetWorkout = workoutDir + "/" + QFileInfo(source).fileName();
-            if (targetWorkout != QFileInfo(source).absoluteFilePath() && !source.copy(targetWorkout)) {
 
-                QMessageBox::warning(NULL, tr("Copy Workout Failed"),
-                    QString(tr("%1 cannot be written to workout library %2, check permissions and free space")).arg(QFileInfo(targetWorkout).fileName()).arg(workoutDir));
+            // Some (highly advanced) files can be both workouts and videosync.
+            // If we find a videosync here in the workout list then it was
+            // emplaced above so don't the file copy again.
+            if (!VideoSyncFile::isVideoSync(QFileInfo(source).fileName())) {
+                if (targetWorkout != QFileInfo(source).absoluteFilePath() && !source.copy(targetWorkout)) {
+                    QMessageBox::warning(NULL, tr("Copy Workout Failed"),
+                        QString(tr("%1 cannot be written to workout library %2, check permissions and free space")).arg(QFileInfo(targetWorkout).fileName()).arg(workoutDir));
+                }
             }
 
-            // still add it, it may noit have been scanned...
+            // still add it, it may not have been scanned...
             int mode=0;
             ErgFile file(targetWorkout, mode, context);
             trainDB->importWorkout(targetWorkout, &file);
-
         }
 
         trainDB->endLUW();
