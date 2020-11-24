@@ -104,6 +104,8 @@ class ErgFile
 
         ~ErgFile();             // delete the contents
 
+        void finalize();        // finish up ergfile creation
+
         void setFrom(ErgFile *f); // clone an existing workout
         bool save(QStringList &errors); // save back, with changes
 
@@ -126,13 +128,18 @@ class ErgFile
         double Cp;
         int format;             // ERG, CRS, MRC, ERG2 currently supported
 
-public:
         bool hasGradient() const { return CRS == format; }
         bool hasWatts()    const { return ERG == format || MRC == format; }
+
+private:
+        void sortLaps() const;
+public:
 
         double nextLap(double) const;    // return the start value (erg - time(ms) or slope - distance(m)) for the next lap
         double prevLap(double) const;    // return the start value (erg - time(ms) or slope - distance(m)) for the prev lap
         double currentLap(double) const; // return the start value (erg - time(ms) or slope - distance(m)) for the current lap
+
+        int    addNewLap(double loc) const; // creates new lap at location, returns index of new lap.
 
         int  nextText(double) const;   // return the index for the next text cue
 
@@ -157,9 +164,9 @@ public:
         int     mode;
         bool    StrictGradient; // should gradient be strict or smoothed?
 
-        QList<ErgFilePoint> Points;    // points in workout
-        QList<ErgFileLap>   Laps;      // interval markers in the file
-        QList<ErgFileText>  Texts;     // texts to display
+        QList<ErgFilePoint>         Points; // points in workout
+        mutable QList<ErgFileLap>   Laps;   // interval markers in the file
+        QList<ErgFileText>          Texts;  // texts to display
 
         GeoPointInterpolator gpi;      // Location interpolator
 
@@ -206,11 +213,13 @@ public:
     const ErgFile* getErgFile() const     { return ergFile; }
     void     setErgFile(const ErgFile* p) { ergFile = p; }
     void     resetQueryState()            { qs.Reset(); }
+    int      addNewLap(double loc) const;
 
 private:
     const QList<ErgFilePoint>& Points() const { return ergFile->Points; }
     const QList<ErgFileLap>  & Laps()   const { return ergFile->Laps; }
     const QList<ErgFileText> & Texts()  const { return ergFile->Texts; }
+
 
     // Common helper to setup query state for query. Returns false if bracket cannot be established.
     bool   updateQueryStateFromDistance(double x, int& lapnum) const;

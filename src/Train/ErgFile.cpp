@@ -95,7 +95,10 @@ ErgFile *
 ErgFile::fromContent(QString contents, Context *context)
 {
     ErgFile *p = new ErgFile(context);
+
     p->parseComputrainer(contents);
+    p->finalize();
+
     return p;
 }
 
@@ -103,7 +106,10 @@ ErgFile *
 ErgFile::fromContent2(QString contents, Context *context)
 {
     ErgFile *p = new ErgFile(context);
+
     p->parseErg2(contents);
+    p->finalize();
+
     return p;
 }
 
@@ -122,6 +128,8 @@ void ErgFile::reload()
     else if (filename.endsWith(".erg2",   Qt::CaseInsensitive)) parseErg2();
     else if (filename.endsWith(".tts",    Qt::CaseInsensitive)) parseTTS();
     else parseComputrainer();
+
+    finalize();
 }
 
 void ErgFile::parseZwift()
@@ -1018,14 +1026,10 @@ void ErgFile::parseTTS()
     // - End B
 
     // Sort text and laps:
-    std::sort(Laps.begin(), Laps.end(), [](const ErgFileLap & a, const ErgFileLap & b) {
-        // If distance is the same the lesser lap num goes first.
-        if (a.x == b.x) return a.LapNum < b.LapNum;
-        return a.x < b.x;
-    });
+    sortLaps();
 
     std::sort(Texts.begin(), Texts.end(), [](const ErgFileText& a, const ErgFileText& b) {
-        // If distance is the same the lesser distance goes first.
+        // If distance is the same the lesser distance comes first.
         if (a.x == b.x) return a.duration < b.duration;
         return a.x < b.x;
     });
@@ -1466,6 +1470,47 @@ ErgFile::~ErgFile()
     Points.clear();
 }
 
+void ErgFile::sortLaps() const
+{
+    if (Laps.count()) {
+        // Sort laps by start, then by existing lap num
+        std::sort(Laps.begin(), Laps.end(), [](const ErgFileLap& a, const ErgFileLap& b) {
+            // If start is the same then lesser lap num comes first.
+            if (a.x == b.x) return a.LapNum < b.LapNum;
+            return a.x < b.x;
+        });
+
+        // Renumber laps to follow the new entry distance order:
+        int lapNum = 1;
+        for (auto& a : Laps)
+            a.LapNum = lapNum++;
+    }
+}
+
+void ErgFile::finalize()
+{
+    if (Laps.count() == 0) {
+        // If there are no laps then add a pair of laps which bracket the entire workout.
+
+        // Start lap
+        ErgFileLap lap;
+        lap.x = 0;
+        lap.LapNum = 1;
+        lap.selected = false;
+        lap.name = "Route Start";
+        Laps.append(lap);
+
+        // End lap
+        lap.x = Duration;
+        lap.LapNum = 2;
+        lap.selected = false;
+        lap.name = "Route End";
+        Laps.append(lap);
+    }
+
+    sortLaps();
+}
+
 bool
 ErgFile::isValid() const
 {
@@ -1520,6 +1565,24 @@ ErgFile::currentLap(double x) const
     }
     return -1; // No matching lap
 }
+
+// Adds new lap at location, returns lap index.
+int
+ErgFile::addNewLap(double loc) const
+{
+    if (!isValid()) return -1; // not a valid ergfile
+
+    ErgFileLap add;
+
+    add.x = loc;
+    add.LapNum = Laps.count();
+    add.selected = false;
+    add.name = "user lap";
+    Laps.append(add);
+
+    sortLaps();
+}
+
 
 // Retrieve the index of next text cue.
 // Params: x - current workout distance (m) / time (ms)
@@ -1841,4 +1904,9 @@ bool ErgFileQueryAdapter::locationAt(double meters, int& lapnum, geolocation& ge
     slope100 *= 100;
 
     return true;
+}
+
+int ErgFileQueryAdapter::addNewLap(double loc) const
+{
+    return getErgFile() ? getErgFile()->addNewLap(loc) : -1;
 }
