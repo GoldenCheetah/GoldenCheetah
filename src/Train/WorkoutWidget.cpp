@@ -1450,7 +1450,7 @@ WorkoutWidget::ergFileSelected(ErgFile *ergFile)
 
         // add points for this....
         foreach(ErgFilePoint point, ergFile->Points) {
-            WWPoint *add = new WWPoint(this, point.x / 1000.0f, point.y); // in ms
+            WWPoint *add = new WWPoint(this, round(point.x / 1000.0f), point.y); // in ms
 
             // increase view and workout maxes to match workout loaded
            // as we goo these just increase to the last point
