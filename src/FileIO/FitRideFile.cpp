@@ -656,6 +656,9 @@ struct FitFileReaderState
     QString getNameForExtraNative(int native_num) {
         switch (native_num) {
 
+            case 32: // VERTICAL_SPEED
+                    return "VERTICALSPEED"; // Vertical Speed
+
             case 40: // STANCE_TIME_PERCENT
                     return "STANCETIMEPERCENT"; // Stance Time Percent
 
@@ -693,6 +696,9 @@ struct FitFileReaderState
 
     float getScaleForExtraNative(int native_num) {
         switch (native_num) {
+
+            case 32: // VERTICAL_SPEED
+                    return 1000.0;
 
             case 40: // STANCE_TIME_PERCENT
             case 83: // VERTICAL_RATIO
@@ -1799,6 +1805,10 @@ struct FitFileReaderState
                     case 31: // GPS Accuracy
                              break;
 
+                    case 32: // VERTICAL_SPEED
+                             native_num = -1;
+                             break;
+
                     case 39: // VERTICAL OSCILLATION
                              if (!native_profile && field.deve_idx>-1)
                                 rvert = deve_value;
@@ -1912,6 +1922,9 @@ struct FitFileReaderState
                                  rightBottomPeakPowerPhase = 0;
                              }
                              break;
+                    case 81: // BATTERY_SOC
+                             native_num = -1;
+                             break;
                     case 83: // VERTICAL_RATIO
                              native_num = -1;
                              break;
@@ -1921,14 +1934,20 @@ struct FitFileReaderState
                     case 85: // STEP_LENGTH
                              native_num = -1;
                              break;
-
                     case 87: // ???
                              break;
-
                     case 90: // PERFORMANCE_CONDITION
                              native_num = -1;
                              break;
-
+                    case 108: // to confirm : RESPIRATIONRATE
+                             native_num = -1;
+                             break;
+                    case 114: // MTB Dynamics - Grit
+                             native_num = -1;
+                             break;
+                    case 115: // MTB Dynamics - Flow
+                             native_num = -1;
+                             break;
                     default:
                             unknown_record_fields.insert(native_num);
                             native_num = -1;
