@@ -82,8 +82,6 @@ static const std::map<int, const char*> tts_string_table = {
 
  // Handy utils
 float AsFloat(unsigned u) {
-    return reinterpret_cast<float&>(u);
-
     float t;
     static_assert(sizeof(u) == sizeof(t), "Error: mismatched reinterpret sizes");
     memcpy(&t, &u, sizeof(u));
@@ -91,8 +89,6 @@ float AsFloat(unsigned u) {
 }
 
 float AsFloat(int i) {
-    return reinterpret_cast<float&>(i);
-
     float t;
     static_assert(sizeof(i) == sizeof(t), "Error: mismatched reinterpret sizes");
     memcpy(&t, &i, sizeof(i));

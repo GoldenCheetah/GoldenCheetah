@@ -87,12 +87,14 @@ class ErgFileText
 class ErgFileLap
 {
     public:
-        ErgFileLap() : name(""), x(0), LapNum(0), selected(false) {}
-        ErgFileLap(double x, int LapNum, const QString& name) : name(name), x(x), LapNum(LapNum), selected(false) {}
+        ErgFileLap() : name(""), x(0), LapNum(0), LapRangeNum(0), selected(false) {}
+        ErgFileLap(double x, int LapNum, const QString& name) : name(name), x(x), LapNum(LapNum), LapRangeNum(0), selected(false) {}
+        ErgFileLap(double x, int LapNum, int LapRangeNum, const QString& name) : name(name), x(x), LapNum(LapNum), LapRangeNum(LapRangeNum), selected(false) {}
 
         QString name;
         double x;      // when does this LAP marker occur? (time in msecs or distance in meters
         int LapNum;    // from 1 - n
+        int LapRangeNum; // Identify laps that are part of the same range or series.
         bool selected; // used by the editor
 };
 
@@ -133,6 +135,7 @@ class ErgFile
 
 private:
         void sortLaps() const;
+        void sortTexts() const;
 public:
 
         double nextLap(double) const;    // return the start value (erg - time(ms) or slope - distance(m)) for the next lap
@@ -141,7 +144,7 @@ public:
 
         int    addNewLap(double loc) const; // creates new lap at location, returns index of new lap.
 
-        int  nextText(double) const;   // return the index for the next text cue
+        bool textsInRange(double searchStart, double searchRange, int& rangeStart, int& rangeEnd) const;
 
         // turn the ergfile into a series of sections rather
         // than a list of points
@@ -166,7 +169,7 @@ public:
 
         QList<ErgFilePoint>         Points; // points in workout
         mutable QList<ErgFileLap>   Laps;   // interval markers in the file
-        QList<ErgFileText>          Texts;  // texts to display
+        mutable QList<ErgFileText>  Texts;  // texts to display
 
         GeoPointInterpolator gpi;      // Location interpolator
 
@@ -232,7 +235,10 @@ public:
     double nextLap   (double x) const { return !ergFile ? -1 : ergFile->nextLap(x);    }
     double prevLap   (double x) const { return !ergFile ? -1 : ergFile->prevLap(x);    }
     double currentLap(double x) const { return !ergFile ? -1 : ergFile->currentLap(x); }
-    int    nextText  (double x) const { return !ergFile ? -1 : ergFile->nextText(x);   }
+
+    bool   textsInRange(double searchStart, double searchRange, int& rangeStart, int& rangeEnd) const {
+        return !ergFile ? false : ergFile->textsInRange(searchStart, searchRange, rangeStart, rangeEnd);
+    }
 
     double currentTime() const { return !ergFile ? 0. : ergFile->Points.at(qs.rightPoint).x; }
 
