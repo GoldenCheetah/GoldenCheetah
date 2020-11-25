@@ -314,6 +314,7 @@ RideFile::seriesName(SeriesType series, bool compat)
         case RideFile::rcontact: return QString("gct");
         case RideFile::gear: return QString("gearratio");
         case RideFile::index: return QString("index");
+        case RideFile::tcore: return QString("tcore");
         default: return QString("unknown");
         }
     } else {
@@ -370,6 +371,7 @@ RideFile::seriesName(SeriesType series, bool compat)
         case RideFile::gear: return QString(tr("Gear Ratio"));
         case RideFile::wbal: return QString(tr("W' Consumed"));
         case RideFile::index: return QString(tr("Sample Index"));
+        case RideFile::tcore: return QString("Core Temperature");
         default: return QString(tr("Unknown"));
         }
     }
@@ -436,6 +438,8 @@ RideFile::colorFor(SeriesType series)
 QString
 RideFile::unitName(SeriesType series, Context *context)
 {
+    Q_UNUSED(context)
+
     bool useMetricUnits = GlobalContext::context()->useMetricUnits;
 
     switch (series) {
@@ -3256,6 +3260,7 @@ static struct {
 	{ "LEFTPPPE", RideFile::lpppe },
     { "RIGHTPPPE", RideFile::rpppe },
     { "WBAL", RideFile::wbal },
+    { "TCORE", RideFile::tcore },
 	{ "", RideFile::none  },
 };
 

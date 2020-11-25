@@ -352,7 +352,7 @@ AllPlotObject::AllPlotObject(AllPlot *plot, QList<UserData*> user) : plot(plot)
     hrCurve->setPaintAttribute(QwtPlotCurve::FilterPoints, true);
     hrCurve->setYAxis(QwtAxisId(QwtAxis::yLeft, 1));
 
-    tcoreCurve = new QwtPlotCurve(tr("Core Temp"));
+    tcoreCurve = new QwtPlotCurve(tr("Core Temperature"));
     tcoreCurve->setPaintAttribute(QwtPlotCurve::FilterPoints, true);
     tcoreCurve->setYAxis(QwtAxisId(QwtAxis::yLeft, 1));
 
@@ -2925,7 +2925,7 @@ AllPlot::setYMax()
             double step = 0.00f;
             if (ymin < 100.00f) step = (ymax - ymin) / 4;
 
-            // we just have Core Temp ...
+            // we just have Core Temperature ...
             setAxisScale(QwtAxisId(QwtAxis::yLeft, 1),ymin<100.0f?ymin:0, ymax, step);
 
         } else {
@@ -3727,7 +3727,7 @@ AllPlot::setDataFromPlot(AllPlot *plot)
         {
         ourCurve = standard->tcoreCurve;
         thereCurve = referencePlot->standard->tcoreCurve;
-        title = tr("Core Temp");
+        title = tr("Core Temperature");
         }
         break;
 
@@ -4420,10 +4420,10 @@ AllPlot::setDataFromPlots(QList<AllPlot *> plots)
 
             case RideFile::tcore:
                 {
-                ourCurve = new QwtPlotCurve(tr("Core Temp"));
+                ourCurve = new QwtPlotCurve(tr("Core Temperature"));
                 ourCurve->setPaintAttribute(QwtPlotCurve::FilterPoints, true);
                 thereCurve = referencePlot->standard->tcoreCurve;
-                title = tr("Core Temp");
+                title = tr("Core Temperature");
                 }
                 break;
 
