@@ -264,14 +264,12 @@ class TrainSidebar : public GcWindow
         double displayLatitude, displayLongitude, displayAltitude; // geolocation
         long load;
         double slope;
-        int displayLap;            // user increment for Lap
         int displayWorkoutLap;     // which Lap in the workout are we at?
         bool lapAudioEnabled;
         bool lapAudioThisLap;
         bool useSimulatedSpeed;
 
-        void updateMetricLapDistance();
-        void updateMetricLapDistanceRemaining();
+        void maintainLapDistanceState();
 
         // for non-zero average calcs
         int pwrcount, cadcount, hrcount, spdcount, lodcount, grdcount; // for NZ average calc

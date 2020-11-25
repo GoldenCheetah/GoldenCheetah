@@ -340,7 +340,7 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
     mode = ERG;
     pendingConfigChange = false;
 
-    displayWorkoutLap = displayLap = 0;
+    displayWorkoutLap = 0;
     pwrcount = 0;
     cadcount = 0;
     hrcount = 0;
@@ -824,7 +824,8 @@ TrainSidebar::workoutTreeWidgetSelectionChanged()
         foreach(int dev, activeDevices) Devices[dev].controller->setMode(RT_MODE_SPIN);
     }
 
-    updateMetricLapDistanceRemaining();
+    maintainLapDistanceState();
+    
     ergFileQueryAdapter.resetQueryState();
 
     // clean last
@@ -832,61 +833,43 @@ TrainSidebar::workoutTreeWidgetSelectionChanged()
 }
 
 /*
- * Calculates the current lap distance
- *
- * Needs to be called as the lapping occurs, otherwise you get
- * skew due to inaccuracies in lap calculations.
- */
-void
-TrainSidebar::updateMetricLapDistance()
-{
-    const ErgFile* ergFile = ergFileQueryAdapter.getErgFile();
-
-    // lapDistance is only relevant for SLOPE ERG files
-    if (!ergFile || !(status&RT_MODE_SLOPE)) {
-        displayLapDistance = 0;
-        return;
-    }
-
-    // XXX This might have sub-optimal display in the final lap of a file.
-    double currentposition = displayWorkoutDistance*1000;
-    double lapmarker = ergFile->currentLap(currentposition);
-    if (lapmarker < 0.) {
-        displayLapDistance = 0;
-        return;
-    }
-
-    displayLapDistance = (currentposition - lapmarker) / (double) 1000;
-}
-
-/*
+ * Calculate Lap State with respect to distance.
+ * Doesn't apply to time-based workouts.
+ * Calculates the current lap distance.
  * Calculates the lap distance remaining in the current lap.
- *
- * Can be called at any time, but better to just decrement the displayLapDistanceRemaining
- * variable as the workout progresses.
+ * Route span is used if workout has no laps.
  */
 void
-TrainSidebar::updateMetricLapDistanceRemaining()
+TrainSidebar::maintainLapDistanceState()
 {
-    const ErgFile* ergFile = ergFileQueryAdapter.getErgFile();
-
-    // lapDistanceRemaining is only relevant for SLOPE ERG files
-    if (!ergFile || !(status&RT_MODE_SLOPE)) {
+    // lapDistance, lapDistanceRemaining are only relevant when
+    // running in slope mode.
+    if (!ergFileQueryAdapter.getErgFile() || !(status&RT_MODE_SLOPE)) {
+        displayLapDistance = 0;
         displayLapDistanceRemaining = -1;
         return;
     }
 
-    // Review what happens when we are at the end of the course and there are no more lap markers.
-    // perhaps we should look at course length.
-    double currentposition = displayWorkoutDistance*1000;
-    double lapmarker = ergFile->nextLap(currentposition);
-    if (lapmarker < 0.) {
-        // In this case, there are either no lap markers, or we are in last lap (and so no next lap)
-        displayLapDistanceRemaining = -1;
+    double currentpositionM = displayWorkoutDistance * 1000.;
+    double lapmarkerM = ergFileQueryAdapter.currentLap(currentpositionM);
+
+    // If no current lap then handle route as lap.
+    if (lapmarkerM < 0.) {
+        displayLapDistance = displayWorkoutDistance;
+        displayLapDistanceRemaining = (ergFileQueryAdapter.Duration() / 1000.) - displayWorkoutDistance;
         return;
     }
 
-    displayLapDistanceRemaining = (lapmarker - currentposition) / (double) 1000;
+    displayLapDistance = (currentpositionM - lapmarkerM) / 1000.;
+    double nextlapmarkerM = ergFileQueryAdapter.nextLap(currentpositionM);
+
+    // If no next lap then use distance to end of route.
+    if (nextlapmarkerM < 0.) {
+        displayLapDistanceRemaining = (ergFileQueryAdapter.Duration() / 1000.) - displayWorkoutDistance;
+        return;
+    }
+
+    displayLapDistanceRemaining = (nextlapmarkerM - currentpositionM) / 1000.;
 }
 
 QStringList
@@ -1131,6 +1114,8 @@ void TrainSidebar::Start()       // when start button is pressed
         // Reset speed simulation timer.
         bicycle.reset();
 
+        maintainLapDistanceState();
+
         //foreach(int dev, activeDevices) Devices[dev].controller->restart();
         //gui_timer->start(REFRESHRATE);
         if (status & RT_RECORDING) disk_timer->start(SAMPLERATE);
@@ -1202,6 +1187,8 @@ void TrainSidebar::Start()       // when start button is pressed
 
         // Reset Speed Simulation
         bicycle.clear();
+
+        maintainLapDistanceState();
 
         if (mode == ERG || mode == MRC) {
             setStatusFlags(RT_MODE_ERGO);
@@ -1443,7 +1430,7 @@ void TrainSidebar::Stop(int deviceStatus)        // when stop button is pressed
     hrcount = 0;
     spdcount = 0;
     lodcount = 0;
-    displayWorkoutLap = displayLap =0;
+    displayWorkoutLap = 0;
     wbalr = 0;
     wbal = WPRIME;
     session_elapsed_msec = 0;
@@ -1569,7 +1556,7 @@ void TrainSidebar::Disconnect()
 void TrainSidebar::guiUpdate()           // refreshes the telemetry
 {
     RealtimeData rtData;
-    rtData.setLap(displayLap + displayWorkoutLap); // user laps + predefined workout lap
+    rtData.setLap(displayWorkoutLap);
     rtData.mode = mode;
 
     // get latest telemetry from devices
@@ -1748,7 +1735,7 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
                 // to find distance to next lap. This is primarily due to lap display updates
                 // -0.999 is chosen as a number that is less than 0, but greater than -1
                 if (displayLapDistanceRemaining < 0 && displayLapDistanceRemaining > -0.999) {
-                    updateMetricLapDistanceRemaining();
+                    maintainLapDistanceState();
                 }
 
                 rtData.setDistance(displayDistance);
@@ -1947,16 +1934,14 @@ void TrainSidebar::newLap()
     qDebug() << "running:" << (status&RT_RUNNING) << "paused:" << (status&RT_PAUSED);
 
     if ((status&RT_RUNNING) && ((status&RT_PAUSED) == 0)) {
-        displayLap++;
 
         pwrcount  = 0;
         cadcount  = 0;
         hrcount   = 0;
         spdcount  = 0;
 
-        // This forces a hard reset of the lap marker.
-        displayLapDistance = 0;
-        updateMetricLapDistanceRemaining();
+        ergFileQueryAdapter.addNewLap(displayWorkoutDistance * 1000.);
+        maintainLapDistanceState();
 
         context->notifyNewLap();
 
@@ -1970,7 +1955,7 @@ void TrainSidebar::resetLapTimer()
     lap_elapsed_msec = 0;
     lapAudioThisLap = true;
     displayLapDistance = 0;
-    this->updateMetricLapDistanceRemaining();
+    this->maintainLapDistanceState();
 }
 
 // Can be called from the controller - when user steers to scroll display
@@ -2049,7 +2034,7 @@ void TrainSidebar::diskUpdate()
     recordFileStream    << "," // headwind
                         << "," // slope
                         << "," // temp
-                        << "," << (displayLap + displayWorkoutLap)
+                        << "," << displayWorkoutLap
                         << "," << displayLRBalance
                         << "," << displayLTE
                         << "," << displayRTE
@@ -2084,8 +2069,7 @@ void TrainSidebar::loadUpdate()
         if(displayWorkoutLap != curLap)
         {
             context->notifyNewLap();
-            updateMetricLapDistance();
-            updateMetricLapDistanceRemaining();
+            maintainLapDistanceState();
         }
         displayWorkoutLap = curLap;
 
@@ -2103,8 +2087,7 @@ void TrainSidebar::loadUpdate()
         
         if(displayWorkoutLap != curLap) {
             context->notifyNewLap();
-            updateMetricLapDistance();
-            updateMetricLapDistanceRemaining();
+            maintainLapDistanceState();            
         }
 
         displayWorkoutLap = curLap;
@@ -2451,8 +2434,7 @@ void TrainSidebar::FFwd()
         displayWorkoutDistance += stepSize;
     }
 
-    updateMetricLapDistance();
-    updateMetricLapDistanceRemaining();
+    maintainLapDistanceState();
 
     emit setNotification(tr("Fast forward.."), 2);
 }
@@ -2483,8 +2465,7 @@ void TrainSidebar::Rewind()
         displayWorkoutDistance += stepSize;
     }
 
-    updateMetricLapDistance();
-    updateMetricLapDistanceRemaining();
+    maintainLapDistanceState();
 
     emit setNotification(tr("Rewind.."), 2);
 }
@@ -2504,15 +2485,15 @@ void TrainSidebar::FFwdLap()
     } else {
         static const double s_BeforeOffset = 10.1;
         lapmarker = ergFileQueryAdapter.nextLap((displayWorkoutDistance*1000) + s_BeforeOffset);
+        if (lapmarker >= 0) {
+            // Go to slightly before lap marker so the lap transition message will be displayed.
+            lapmarker = std::max(0., lapmarker - s_BeforeOffset);
 
-        // Go to slightly before lap marker so the lap transition message will be displayed.
-        lapmarker = std::max(0., lapmarker - s_BeforeOffset);
-
-        if (lapmarker >= 0.) displayWorkoutDistance = lapmarker/1000; // jump forward to lapmarker
+            displayWorkoutDistance = lapmarker / 1000; // jump forward to lapmarker
+        }
     }
 
-    updateMetricLapDistance();
-    updateMetricLapDistanceRemaining();
+    maintainLapDistanceState();    
 
     if (lapmarker >= 0) emit setNotification(tr("Next Lap.."), 2);
 }
@@ -2543,8 +2524,7 @@ void TrainSidebar::RewindLap()
         if (lapmarker >= 0.) displayWorkoutDistance = lapmarker / 1000; // jump to lapmarker
     }
 
-    updateMetricLapDistance();
-    updateMetricLapDistanceRemaining();
+    maintainLapDistanceState();
 
     if (lapmarker >= 0) emit setNotification(tr("Back Lap.."), 2);
 }
