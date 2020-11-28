@@ -1416,14 +1416,15 @@ LTMWindow::dataTable(bool html)
         // formatting ...
         LTMScaleDraw lsd(settings.start, groupForDate(settings.start.date()), settings.groupBy);
 
+        QString sLabel = (settings.groupBy == LTM_TOD) ? tr("Time of Day") : tr("Date");
         if (html) {
             // table and headings 50% for 1 metric, 70% for 2 metrics, 90% for 3 metrics or more
             QString tableStart = "<table border=0 cellspacing=3 width=\"%1%%\"><tr><td align=\"center\" valigne=\"top\"><b>%2</b></td>";
-            tableStart = tableStart.arg(settings.metrics.count() >= 3 ? 90 : (30 + (settings.metrics.count() * 20))).arg(tr("Date"));
+            tableStart = tableStart.arg(settings.metrics.count() >= 3 ? 90 : (30 + (settings.metrics.count() * 20))).arg(sLabel);
 
             summary += tableStart;
         } else {
-            summary += tr("Date");
+            summary += sLabel;
         }
 
         QList<QVector<double> > hdatas;
@@ -1564,9 +1565,9 @@ LTMWindow::dataTable(bool html)
             }
 
             // First column, date / month year etc
-            if (html) rowSummary += "<td align=\"center\" valign=\"top\">%1</td>";
-            else rowSummary += "%1";
-            rowSummary = rowSummary.arg(lsd.label(columns[0].x[row]+0.5).text().replace("\n", " "));
+            QString sDate = lsd.label(columns[0].x[row]+0.5).text().replace("\n", " ");
+            if (html) rowSummary += QString("<td align=\"center\" valign=\"top\">%1</td>").arg(sDate);
+            else rowSummary += (settings.groupBy == LTM_ALL || settings.groupBy == LTM_TOD) ? sDate : lsd.toDate(columns[0].x[row]+0.5).toString(Qt::ISODate);
 
             // Remaining columns - each metric value
             for(int j=0; j<columns.count(); j++) {
@@ -1662,6 +1663,7 @@ LTMWindow::exportData()
 
         // open stream and write header
         QTextStream stream(&f);
+        stream.setCodec("UTF-8"); // Names and Units can be translated
         stream << content;
 
         // and we're done

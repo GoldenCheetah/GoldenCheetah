@@ -2250,8 +2250,8 @@ CPPlot::exportBests(QString filename)
             }
 
             // values
-            if (expmodel) stream << int(xvalue * 60.00f) << "," << yvalue << "," << modelvalue << "," << date.toString() << endl;
-            else stream << int(xvalue * 60.00f) << "," << yvalue << "," << date.toString() << endl;
+            if (expmodel) stream << int(xvalue * 60.00f) << "," << yvalue << "," << modelvalue << "," << date.toString(Qt::ISODate) << endl;
+            else stream << int(xvalue * 60.00f) << "," << yvalue << "," << date.toString(Qt::ISODate) << endl;
         }
     }
 

@@ -449,6 +449,7 @@ RideCache::writeAsCSV(QString filename)
     };
     file.resize(0);
     QTextStream out(&file);
+    out.setCodec("UTF-8"); // Metric names can be translated
 
     // write headings
     out<<"date, time, filename";
@@ -464,7 +465,7 @@ RideCache::writeAsCSV(QString filename)
     foreach(RideItem *item, rides()) {
 
         // date, time, filename
-        out << item->dateTime.date().toString("MM/dd/yy");
+        out << item->dateTime.date().toString(Qt::ISODate);
         out << "," << item->dateTime.time().toString("hh:mm:ss");
         out << "," << item->fileName;
 
