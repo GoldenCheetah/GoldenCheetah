@@ -1349,6 +1349,9 @@ LTMWindow::dataTable(bool html)
         else
             ltmPlot->createTODCurveData(context, &settings, metricDetail, add.x, add.y, add.n, true);
 
+        // adjust to avoid empty chart when there is only 1 group
+        if (settings.groupBy != LTM_TOD) add.n++;
+
         columns << add;
 
         // check if "x" value of all metrics is the same for all colums and find
@@ -1538,7 +1541,7 @@ LTMWindow::dataTable(bool html)
             summary += "\n";
         }
 
-        for(int row=0; row<=rows; row++) {
+        for(int row=0; row<rows; row++) {
 
             QString rowSummary;
 
