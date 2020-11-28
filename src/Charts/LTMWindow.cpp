@@ -1344,7 +1344,10 @@ LTMWindow::dataTable(bool html)
         TableCurveData add;
 
         ltmPlot->settings=&settings; // for stack mode ltmPlot isn't set
-        ltmPlot->createCurveData(context, &settings, metricDetail, add.x, add.y, add.n, true);
+        if (settings.groupBy != LTM_TOD)
+            ltmPlot->createCurveData(context, &settings, metricDetail, add.x, add.y, add.n, true);
+        else
+            ltmPlot->createTODCurveData(context, &settings, metricDetail, add.x, add.y, add.n, true);
 
         columns << add;
 
