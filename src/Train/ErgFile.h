@@ -87,14 +87,12 @@ class ErgFileText
 class ErgFileLap
 {
     public:
-        ErgFileLap() : name(""), x(0), LapNum(0), LapRangeNum(0), selected(false) {}
-        ErgFileLap(double x, int LapNum, const QString& name) : name(name), x(x), LapNum(LapNum), LapRangeNum(0), selected(false) {}
-        ErgFileLap(double x, int LapNum, int LapRangeNum, const QString& name) : name(name), x(x), LapNum(LapNum), LapRangeNum(LapRangeNum), selected(false) {}
+        ErgFileLap() : name(""), x(0), LapNum(0), selected(false) {}
+        ErgFileLap(double x, int LapNum, const QString& name) : name(name), x(x), LapNum(LapNum), selected(false) {}
 
         QString name;
         double x;      // when does this LAP marker occur? (time in msecs or distance in meters
         int LapNum;    // from 1 - n
-        int LapRangeNum; // Identify laps that are part of the same range or series.
         bool selected; // used by the editor
 };
 
