@@ -40,6 +40,7 @@
 
 #include "SearchFilterBox.h"
 
+#include "qxtstringspinbox.h"
 #include <QtGui>
 #include <QCheckBox>
 #include <QFormLayout>
@@ -89,7 +90,7 @@ class HistogramWindow : public GcChartWindow
 
         // get/set properties
         int series() const { return seriesCombo->currentIndex(); }
-        void setSeries(int x) { seriesCombo->setCurrentIndex(x); }
+        void setSeries(int x) { seriesCombo->setCurrentIndex(x); rSeriesSelector->setValue(x); }
         int percent() const { return showSumY->currentIndex(); }
         void setPercent(int x) { showSumY->setCurrentIndex(x); }
         double bin() const { return binWidthLineEdit->text().toDouble(); }
@@ -161,6 +162,7 @@ class HistogramWindow : public GcChartWindow
 
         // we changed the series to plot
         void seriesChanged();
+        void rSeriesSelectorChanged(int);
 
         // in rangemode we choose data series or metric
         void metricToggled(bool);
@@ -208,6 +210,7 @@ class HistogramWindow : public GcChartWindow
         QLineEdit *rBinEdit;    // set Bin Width from the line edit
         QSlider *rBinSlider;        // seet Bin Width from a slider
         QCheckBox *rShade, *rZones;
+        QxtStringSpinBox *rSeriesSelector;
 
         QList<RideFile::SeriesType> seriesList;
         void addSeries();
