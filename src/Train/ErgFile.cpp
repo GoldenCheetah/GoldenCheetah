@@ -1007,7 +1007,6 @@ void ErgFile::parseTTS()
         // Segment Start
         add.x = segment.startKM * 1000.;
         add.LapNum = (i * 2) + 1;
-        add.LapRangeNum = i + 1;
         add.selected = false;
 
         add.name = QObject::tr("Starting") + ": " + QString::fromStdWString(segment.name + rangeString);
@@ -1017,7 +1016,6 @@ void ErgFile::parseTTS()
         // Segment End
         add.x = segment.endKM * 1000.;
         add.LapNum = (i * 2) + 2;
-        add.LapRangeNum = i + 1;
         add.selected = false;
         add.name = QObject::tr("Ending") + ": " + QString::fromStdWString(segment.name + rangeString);
         
@@ -1046,7 +1044,7 @@ void ErgFile::parseTTS()
     int xx = 0;
     qDebug() << "LAPS:";
     for (const auto &a : Laps) {
-        qDebug() << xx << ": " << a.LapNum << " start:" << a.x / 1000. << "km, name: " << a.name << " RangeId:" << a.LapRangeNum;
+        qDebug() << xx << ": " << a.LapNum << " start:" << a.x / 1000. << "km, name: " << a.name;
         xx++;
     }
 
@@ -1593,7 +1591,7 @@ ErgFile::addNewLap(double loc) const
         sortLaps();
 
         auto itr = std::find_if(Laps.begin(), Laps.end(), [&add](const ErgFileLap& otherLap) {
-            return add.x == otherLap.x && add.LapRangeNum == otherLap.LapRangeNum && add.name == otherLap.name;
+            return add.x == otherLap.x && add.name == otherLap.name;
         });
         if (itr != Laps.end()) 
             return (*itr).LapNum;
