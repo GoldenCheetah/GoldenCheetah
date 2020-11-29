@@ -974,52 +974,52 @@ void ErgFile::parseTTS()
 
     // Populate lap and text lists with route and segment info from tts.
     // Push everything in segment order, then sort by location.
-    const std::vector<NS_TTSReader::Segment> segments = ttsReader.getSegments();
+    std::vector<NS_TTSReader::Segment> segments = ttsReader.getSegments();
     int segmentCount = (int)segments.size();
-    for (int i = 0; i < segmentCount; i++) {
-        const NS_TTSReader::Segment &segment = segments[i];
+    if (segmentCount) {
+        std::sort(segments.begin(), segments.end(), [](const NS_TTSReader::Segment& a, const NS_TTSReader::Segment& b) {
+            // Segment sort order:
+            // 1) Start Distance, first comes first
+            // 2) Segment Distance, longest comes first
+            if (a.startKM != b.startKM) return a.startKM < b.startKM;
+            return (a.endKM - a.startKM) > (b.endKM - b.startKM);
+        });
 
-        // Truncate distances to meter precision for text name.
-        int segmentStart = (int)(segment.startKM * 1000);
-        int segmentEnd   = (int)(segment.endKM * 1000);
+        // Now segments are sorted by start and longer duration.
 
-        std::wstring rangeString = L" ["
-            + std::to_wstring(segmentStart)
-            + L"m ->"
-            + std::to_wstring(segmentEnd)
-            + L"m]";
+        for (int i = 0; i < segmentCount; i++) {
+            const NS_TTSReader::Segment& segment = segments[i];
 
-        // Populate Texts with segment text.
-        if (segment.name.length() + segment.description.length() > 0) {
-            QString text(QString::fromStdWString(
-                segment.name + L": " +
-                segment.description +
-                rangeString));
+            // Truncate distances to meter precision for text name.
+            int segmentStart = (int)(segment.startKM * 1000);
+            int segmentEnd = (int)(segment.endKM * 1000);
 
-            double x = segment.startKM * 1000.;
-            int duration = (segment.endKM - segment.startKM) * 1000.;
-            Texts << ErgFileText(x, duration, text);
+            std::wstring rangeString = L" ["
+                + std::to_wstring(segmentStart)
+                + L"m ->"
+                + std::to_wstring(segmentEnd)
+                + L"m]";
+
+            // Populate Texts with segment text.
+            if (segment.name.length() + segment.description.length() > 0) {
+                QString text(QString::fromStdWString(
+                    segment.name + L": " +
+                    segment.description +
+                    rangeString));
+
+                double x = segment.startKM * 1000.;
+                int duration = (segment.endKM - segment.startKM) * 1000.;
+                Texts << ErgFileText(x, duration, text);
+            }
+
+            // Populate Laps with segment info.
+            // In order to support navigation, each segment is converted into
+            // two laps that are linked by sharing a non-zero group id.
+            Laps << ErgFileLap(segment.startKM * 1000., (2 * i) + 1, i + 1,
+                QString::fromStdWString(segment.name));
+
+            Laps << ErgFileLap(segment.endKM * 1000, (2 * i) + 2, i + 1, "");
         }
-
-        // Populate Laps with segment info. Create a lap for the start and another for the end.
-        ErgFileLap add;
-
-        // Segment Start
-        add.x = segment.startKM * 1000.;
-        add.LapNum = (i * 2) + 1;
-        add.selected = false;
-
-        add.name = QObject::tr("Starting") + ": " + QString::fromStdWString(segment.name + rangeString);
-
-        Laps << add;
-
-        // Segment End
-        add.x = segment.endKM * 1000.;
-        add.LapNum = (i * 2) + 2;
-        add.selected = false;
-        add.name = QObject::tr("Ending") + ": " + QString::fromStdWString(segment.name + rangeString);
-        
-        Laps << add;
     }
 
     // The following sort preserves segment overlap. If A is a superset of B then order will be:
@@ -1044,7 +1044,7 @@ void ErgFile::parseTTS()
     int xx = 0;
     qDebug() << "LAPS:";
     for (const auto &a : Laps) {
-        qDebug() << xx << ": " << a.LapNum << " start:" << a.x / 1000. << "km, name: " << a.name;
+        qDebug() << xx << ": " << a.LapNum << " start:" << a.x / 1000. << "km, rangeId: " << a.lapRangeId << "km, name: " << a.name;
         xx++;
     }
 
@@ -1473,9 +1473,15 @@ void ErgFile::sortLaps() const
     if (Laps.count()) {
         // Sort laps by start, then by existing lap num
         std::sort(Laps.begin(), Laps.end(), [](const ErgFileLap& a, const ErgFileLap& b) {
-            // If start is the same then lesser lap num comes first.
-            if (a.x == b.x) return a.LapNum < b.LapNum;
-            return a.x < b.x;
+            // 1) Start, first comes first
+            if (a.x != b.x) return a.x < b.x;
+
+            // 2) range id, lowest first. This ordering is chosen prior to segments being
+            // devolved into lap markers, so can be used to impose semantic order on laps.
+            if (a.lapRangeId != b.lapRangeId) return a.lapRangeId < b.lapRangeId;
+
+            // 3) LapNum
+            return a.LapNum < b.LapNum;
         });
 
         // Renumber laps to follow the new entry distance order:
@@ -1580,18 +1586,14 @@ ErgFile::addNewLap(double loc) const
 {
     if (isValid())
     {
-        ErgFileLap add;
+        ErgFileLap add(loc, Laps.count(), "user lap");
 
-        add.x = loc;
-        add.LapNum = Laps.count();
-        add.selected = false;
-        add.name = "user lap";
         Laps.append(add);
 
         sortLaps();
 
         auto itr = std::find_if(Laps.begin(), Laps.end(), [&add](const ErgFileLap& otherLap) {
-            return add.x == otherLap.x && add.name == otherLap.name;
+            return add.x == otherLap.x && add.lapRangeId == otherLap.lapRangeId && add.name == otherLap.name;
         });
         if (itr != Laps.end()) 
             return (*itr).LapNum;

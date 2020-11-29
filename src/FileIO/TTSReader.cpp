@@ -324,25 +324,31 @@ void TTSReader::segmentRange(int version, ByteArray &data) {
 void TTSReader::segmentInfo(int version, ByteArray &data) {
 
     if ((version == 1104) && (data.size() == 8)) {
-        double startKM = (getUInt(data, 0) / 100000.0);
-        double endKM = (getUInt(data, 4) / 100000.0);
+        unsigned startCM = getUInt(data, 0);
+        unsigned endCM   = getUInt(data, 4);
+
+        double startKM = (startCM / 100) / 1000.;
+        double endKM   = (endCM   / 100) / 1000.;
 
         pendingSegment.startKM = startKM;
-        pendingSegment.endKM = endKM;
+        pendingSegment.endKM   = endKM;
 
         DEBUG_LOG << "[segment range] " << startKM << "-" << endKM << "\n";
     }
 
     if ((version == 1000) && (data.size() == 10)) {
-        double startKM = (getUInt(data, 2) / 100000.0);
-        double endKM = (getUInt(data, 6) / 100000.0);
+        unsigned startCM = getUInt(data, 2);
+        unsigned endCM   = getUInt(data, 6);
 
         // NOTE: From the wattzapp debug print it looks like this 3rd value is a divisor.
         // In my test files its always 1. so no harm to divide - but beware I'm just guessing.
         double divisor = getUShort(data, 0);
 
-        pendingSegment.startKM = startKM / divisor;
-        pendingSegment.endKM = endKM / divisor;
+        double startKM = ((startCM / 100) / 1000.) / divisor;
+        double endKM   = ((endCM   / 100) / 1000.) / divisor;
+
+        pendingSegment.startKM = startKM;
+        pendingSegment.endKM   = endKM;
 
         DEBUG_LOG << "[segment range] " << (getUInt(data, 2) / 100000.0) << "-" << (getUInt(data, 6) / 100000.0) << "/" << getUShort(data, 0) << "\n";
     }
