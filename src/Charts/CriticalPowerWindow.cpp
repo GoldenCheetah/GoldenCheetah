@@ -61,6 +61,8 @@ CriticalPowerWindow::CriticalPowerWindow(Context *context, bool rangemode) :
     QHBoxLayout *revealLayout = new QHBoxLayout;
     revealLayout->setContentsMargins(0,0,0,0);
 
+    QLabel *rSeriesLabel = new QLabel(tr("Data Series"), this);
+    rSeriesSelector = new QxtStringSpinBox();
     rPercent = new QCheckBox(this);
     rPercent->setText(tr("Percentage of Best"));
     rHeat = new QCheckBox(this);
@@ -81,6 +83,9 @@ CriticalPowerWindow::CriticalPowerWindow(Context *context, bool rangemode) :
     checks->addStretch();
 
     revealLayout->addStretch();
+    revealLayout->addWidget(rSeriesLabel);
+    revealLayout->addWidget(rSeriesSelector);
+    revealLayout->addSpacing(20);
     revealLayout->addLayout(checks);
     revealLayout->addStretch();
 
@@ -564,6 +569,7 @@ CriticalPowerWindow::CriticalPowerWindow(Context *context, bool rangemode) :
     connect(showPPCheck, SIGNAL(stateChanged(int)), this, SLOT(showPPChanged(int)));
     connect(showHeatCheck, SIGNAL(stateChanged(int)), this, SLOT(showHeatChanged(int)));
     connect(showCSLinearCheck, SIGNAL(stateChanged(int)), this, SLOT(showCSLinearChanged(int)));
+    connect(rSeriesSelector, SIGNAL(valueChanged(int)), this, SLOT(rSeriesSelectorChanged(int)));
     connect(rHeat, SIGNAL(stateChanged(int)), this, SLOT(rHeatChanged(int)));
     connect(rDelta, SIGNAL(stateChanged(int)), this, SLOT(rDeltaChanged()));
     connect(rDeltaPercent, SIGNAL(stateChanged(int)), this, SLOT(rDeltaChanged()));
@@ -1362,6 +1368,9 @@ CriticalPowerWindow::event(QEvent *event)
 void
 CriticalPowerWindow::setSeries(int index)
 {
+    // update reveal control
+    rSeriesSelector->setValue(index);
+
     if (index >= 0) {
 
         // need a helper any more ?
@@ -1627,9 +1636,14 @@ CriticalPowerWindow::addSeries()
                << work
                << veloclinicplot;
 
+    QStringList seriesNames;
+
     foreach (CriticalSeriesType x, seriesList) {
         seriesCombo->addItem(seriesName(x), static_cast<int>(x));
+        seriesNames << seriesName(x);
     }
+
+    rSeriesSelector->setStrings(seriesNames);
 }
 
 void
@@ -1866,6 +1880,13 @@ CriticalPowerWindow::showPowerIndexChanged(int state)
     // redraw
     if (rangemode) dateRangeChanged(DateRange());
     else cpPlot->setRide(currentRide);
+}
+
+void
+CriticalPowerWindow::rSeriesSelectorChanged(int value)
+{
+    seriesCombo->setCurrentIndex(value);
+    setSeries(value);
 }
 
 void

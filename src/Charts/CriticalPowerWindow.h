@@ -27,6 +27,7 @@
 #include "RideFile.h"
 #include "SearchFilterBox.h"
 
+#include "qxtstringspinbox.h"
 #include <QtGui>
 #include <QFormLayout>
 #include <QCheckBox>
@@ -105,7 +106,7 @@ class CriticalPowerWindow : public GcChartWindow
 
         // set/get properties
         int mode() const { return seriesCombo->currentIndex(); }
-        void setMode(int x) { seriesCombo->setCurrentIndex(x); }
+        void setMode(int x) { seriesCombo->setCurrentIndex(x); rSeriesSelector->setValue(x); }
 
         int cpModel() const { return modelCombo->currentIndex(); }
         void setCPModel(int x) { modelCombo->setCurrentIndex(x); }
@@ -272,6 +273,7 @@ class CriticalPowerWindow : public GcChartWindow
         void fitChanged();
 
         // reveal controls changed
+        void rSeriesSelectorChanged(int);
         void rPercentChanged(int check);
         void rHeatChanged(int check);
         void rDeltaChanged();
@@ -329,6 +331,7 @@ class CriticalPowerWindow : public GcChartWindow
         QCheckBox *showTestCheck;
         QCheckBox *filterBestCheck;
         QCheckBox *showGridCheck;
+        QxtStringSpinBox *rSeriesSelector;
         QCheckBox *rPercent, *rHeat, *rDelta, *rDeltaPercent;
         QCheckBox *showCSLinearCheck;
         QCheckBox *modelDecayCheck;
