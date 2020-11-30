@@ -255,10 +255,10 @@ void Daum::requestRealtimeData() {
     }
 
     // local cache of telemetry data
-    int pwr = data[5];
-    int rpm = data[6];
+    int pwr = (unsigned char) data[5];
+    int rpm = (unsigned char) data[6];
     int speed = data[7];
-    int pulse = data[14];
+    int pulse = (unsigned char) data[14];
 
     // sanity check
     if (pwr >= 5 && pwr <= 160) {
