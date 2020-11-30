@@ -69,6 +69,7 @@ private:
     bool openPort(QString dev);
     bool closePort();
     void initializeConnection();
+    bool configureForCockpitType(int cockpitType);
 
     virtual bool ResetDevice();
     virtual bool StartProgram(unsigned int prog);
@@ -95,6 +96,8 @@ private:
 
     char deviceAddress_;
     unsigned int maxDeviceLoad_;
+    unsigned int serialWriteDelay_;
+    bool playSound_;
 
     // state
     bool paused_;
@@ -108,6 +111,17 @@ private:
     // outbound
     volatile int load_, loadToWrite_;
     const bool forceUpdate_;
+
+    enum CockpitType {
+        COCKPIT_CARDIO = 0x10,
+        COCKPIT_FITNESS = 0x20,
+        COCKPIT_VITA_DE_LUXE = 0x30,
+        COCKPIT_8008 = 0x40,
+        COCKPIT_8080 = 0x50,
+        COCKPIT_UNKNOWN = 0x55,
+        COCKPIT_THERAPIE = 0x60,
+        COCKPIT_8008_TRS_PRO = 0x64
+    };
 
 private slots:
     void requestRealtimeData();
