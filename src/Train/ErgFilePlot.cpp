@@ -350,7 +350,7 @@ public:
 
             auto e = lapRangeIdMap.find(lap.lapRangeId);
             if (e != lapRangeIdMap.end()) {
-                std::tie(startIdx, endIdx) = e->second;// lapRangeIdMap[lap.lapRangeId];
+                std::tie(startIdx, endIdx) = e->second;
                 if (lap.x < laps.at(startIdx).x)
                     startIdx = i;
 
@@ -358,7 +358,7 @@ public:
                     endIdx = i;
             }
 
-            lapRangeIdMap[lap.lapRangeId] = { startIdx, endIdx };
+            lapRangeIdMap[lap.lapRangeId] = std::make_tuple(startIdx, endIdx);
         }
 
         // Part 2: Generate segmentRowMap, this is a map from lap to what row that lap should be printed upon.
