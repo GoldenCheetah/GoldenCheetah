@@ -338,11 +338,6 @@ public:
         // Map provides instant access to start and end of rangeid.
         int lapCount = laps.count();
 
-        int maxRangeId = 0;
-        for (int i = 0; i < lapCount; i++) {
-            maxRangeId = std::max(maxRangeId, laps.at(i).lapRangeId);
-        }
-
         for (int i = 0; i < lapCount; i++) {
             const ErgFileLap& lap = laps.at(i);
 
@@ -361,9 +356,15 @@ public:
             lapRangeIdMap[lap.lapRangeId] = std::make_tuple(startIdx, endIdx);
         }
 
-        // Part 2: Generate segmentRowMap, this is a map from lap to what row that lap should be printed upon.
+        // Part 2: Generate segmentRowMap, this is a map from lap to what row
+        // that lap should be printed upon.
 
-         // Tracks what segments are live at what row during search
+        // Tracks what segments are live at what row during search
+        // Grows when a segment is found that can't fit into an existing
+        // row.
+        //
+        // Note: This is a greedy packing, not optimal, but seems to look good
+        // because adjacent segments tend to appear adjacent on the same row.
         std::vector<int> segmentRowLiveMap;
         for (int i = 0; i < lapCount; i++) {
             const ErgFileLap& lap = laps.at(i);
@@ -477,19 +478,24 @@ ErgFilePlot::setData(ErgFile *ergfile)
             LapRowDistributor::ResultEnum distributionResult = lapRowDistributor.GetInfo(i, row);
 
             // Danger: ASCII ART. Somebody please replace this with graphics?
-            QString decName;
+            QString decoratedName;
+            Qt::Alignment labelAlignment = Qt::AlignRight | Qt::AlignTop;
+
             switch(distributionResult) {
             case LapRowDistributor::StartOfRange:
-                decName = "<" + lap.name;
+                decoratedName = "<" + lap.name;
                 break;
             case LapRowDistributor::EndOfRange:
-                decName = ">";
+                decoratedName = ">";
+                labelAlignment = Qt::AlignLeft | Qt::AlignTop;
                 break;
             case LapRowDistributor::SimpleLap:
-                decName = QString::number(lap.LapNum) + ":" + lap.name;
+                decoratedName = QString::number(lap.LapNum) + ":" + lap.name;
                 break;
-
             case LapRowDistributor::InternalRange:
+                decoratedName = "o";
+                labelAlignment = Qt::AlignHCenter | Qt::AlignTop;
+                break;
             case LapRowDistributor::Failed:
             default:
                 // Nothing to do.
@@ -497,11 +503,8 @@ ErgFilePlot::setData(ErgFile *ergfile)
             };
 
             // Literal row translation. We loves ascii art...
-            QString prefix;
-            for (int r = 0; r < row; r++)
-                prefix = prefix + "\n";
-
-            QwtText text(prefix + decName);
+            QString prefix = (row > 0) ? QString("\n").repeated(row) : "";
+            QwtText text(prefix + decoratedName);
                 
             text.setFont(QFont("Helvetica", 10, QFont::Bold));
             text.setColor(GColor(CPLOTMARKER));
@@ -510,10 +513,7 @@ ErgFilePlot::setData(ErgFile *ergfile)
             QwtPlotMarker *add = new QwtPlotMarker();
             add->setLineStyle(QwtPlotMarker::VLine);
             add->setLinePen(QPen(GColor(CPLOTMARKER), 0, Qt::DashDotLine));
-            add->setLabelAlignment(
-                (LapRowDistributor::EndOfRange == distributionResult)
-                ? Qt::AlignLeft | Qt::AlignTop 
-                : Qt::AlignRight | Qt::AlignTop);
+            add->setLabelAlignment(labelAlignment);
             add->setValue(lap.x, 0);
             add->setLabel(text);
             add->attach(this);
