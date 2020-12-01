@@ -190,6 +190,7 @@ class TrainSidebar : public GcWindow
         void Lower();       // set load/gradient higher
         void newLap();      // start new Lap!
         void resetLapTimer(); //reset the lap timer
+        void resetTextAudioEmitTracking();
         void steerScroll(int scrollAmount);   // Scroll the train display
 
         void toggleCalibration();
@@ -267,6 +268,7 @@ class TrainSidebar : public GcWindow
         int displayWorkoutLap;     // which Lap in the workout are we at?
         bool lapAudioEnabled;
         bool lapAudioThisLap;
+        double textPositionEmitted;
         bool useSimulatedSpeed;
 
         void maintainLapDistanceState();

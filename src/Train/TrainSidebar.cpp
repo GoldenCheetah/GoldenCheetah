@@ -1216,7 +1216,8 @@ void TrainSidebar::Start()       // when start button is pressed
         lap_elapsed_msec = 0;
         wbalr = 0;
         wbal = WPRIME;
-        lapAudioThisLap = true;
+        
+        resetTextAudioEmitTracking();
 
         //reset all calibration data
         calibrating = startCalibration = restartCalibration = finishCalibration = false;
@@ -1804,36 +1805,39 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
                 if (ergFile) ergTimeRemaining = ergFileQueryAdapter.currentTime() - load_msecs;
                 else ergTimeRemaining = 0;
 
+                double lapPosition = status & RT_MODE_ERGO ? load_msecs : displayWorkoutDistance * 1000;
+
                 // alert when approaching end of lap
                 if (lapAudioEnabled && lapAudioThisLap) {
 
-                    double currentposition = displayWorkoutDistance*1000;
-
-                    double lapmarker = -1;
-                    if (ergFile)
-                        lapmarker = ergFile->nextLap(displayWorkoutDistance*1000);
-
                     // alert when 3 seconds from end of ERG lap, or 20 meters from end of CRS lap
-                    if ((status&RT_MODE_ERGO && lapTimeRemaining > 0 && lapTimeRemaining < 3000) ||
-                        (status&RT_MODE_SLOPE && (lapmarker >= 0.) && lapmarker - currentposition < 20)) {
+                    bool fPlayAudio = false;
+                    if (status & RT_MODE_ERGO && lapTimeRemaining > 0 && lapTimeRemaining < 3000) {
+                        fPlayAudio = true;
+                    } else {
+                        double lapmarker = ergFileQueryAdapter.nextLap(lapPosition);
+                        if (status&RT_MODE_SLOPE && (lapmarker >= 0.) && lapmarker - lapPosition < 20) {
+                            fPlayAudio = true;
+                        }
+                    }
+
+                    if (fPlayAudio) {
                         lapAudioThisLap = false;
                         QSound::play(":audio/lap.wav");
                     }
                 }
 
                 // Text Cues
-                if (ergFile && ergFile->Texts.count() > 0) {
-                    // find the next cue
-                    double pos = status&RT_MODE_ERGO ? load_msecs : displayWorkoutDistance*1000;
-                    int idx = ergFile->nextText(pos);
-                    if (idx >= 0) {
-                        ErgFileText cue = ergFile->Texts.at(idx);
-                        // show when we are approaching it
-                        if (((status&RT_MODE_ERGO) && cue.x<load_msecs+1000) ||
-                            ((status&RT_MODE_SLOPE) && cue.x < displayWorkoutDistance*1000 + 10)) {
+                if (lapPosition > textPositionEmitted) {
+                    double searchRange = (status & RT_MODE_ERGO) ? 1000 : 10;
+                    int rangeStart, rangeEnd;
+                    if (ergFileQueryAdapter.textsInRange(lapPosition, searchRange, rangeStart, rangeEnd)) {
+                        for (int idx = rangeStart; idx <= rangeEnd; idx++) {
+                            ErgFileText cue = ergFile->Texts.at(idx);
                             emit setNotification(cue.text, cue.duration);
                         }
                     }
+                    textPositionEmitted = lapPosition + searchRange;
                 }
 
                 // Maintain time in ERGO mode
@@ -1941,6 +1945,8 @@ void TrainSidebar::newLap()
         spdcount  = 0;
 
         ergFileQueryAdapter.addNewLap(displayWorkoutDistance * 1000.);
+        
+        resetTextAudioEmitTracking();
         maintainLapDistanceState();
 
         context->notifyNewLap();
@@ -1953,9 +1959,15 @@ void TrainSidebar::resetLapTimer()
 {
     lap_time.restart();
     lap_elapsed_msec = 0;
-    lapAudioThisLap = true;
     displayLapDistance = 0;
+    this->resetTextAudioEmitTracking();
     this->maintainLapDistanceState();
+}
+
+void TrainSidebar::resetTextAudioEmitTracking()
+{
+    lapAudioThisLap = true;
+    textPositionEmitted = -1;
 }
 
 // Can be called from the controller - when user steers to scroll display
@@ -2434,6 +2446,8 @@ void TrainSidebar::FFwd()
         displayWorkoutDistance += stepSize;
     }
 
+    resetTextAudioEmitTracking();
+
     maintainLapDistanceState();
 
     emit setNotification(tr("Fast forward.."), 2);
@@ -2465,6 +2479,8 @@ void TrainSidebar::Rewind()
         displayWorkoutDistance += stepSize;
     }
 
+    resetTextAudioEmitTracking();
+
     maintainLapDistanceState();
 
     emit setNotification(tr("Rewind.."), 2);
@@ -2492,6 +2508,8 @@ void TrainSidebar::FFwdLap()
             displayWorkoutDistance = lapmarker / 1000; // jump forward to lapmarker
         }
     }
+
+    resetTextAudioEmitTracking();
 
     maintainLapDistanceState();    
 
@@ -2523,6 +2541,8 @@ void TrainSidebar::RewindLap()
 
         if (lapmarker >= 0.) displayWorkoutDistance = lapmarker / 1000; // jump to lapmarker
     }
+
+    resetTextAudioEmitTracking();
 
     maintainLapDistanceState();
 

@@ -133,6 +133,7 @@ class ErgFile
 
 private:
         void sortLaps() const;
+        void sortTexts() const;
 public:
 
         double nextLap(double) const;    // return the start value (erg - time(ms) or slope - distance(m)) for the next lap
@@ -141,7 +142,7 @@ public:
 
         int    addNewLap(double loc) const; // creates new lap at location, returns index of new lap.
 
-        int  nextText(double) const;   // return the index for the next text cue
+        bool textsInRange(double searchStart, double searchRange, int& rangeStart, int& rangeEnd) const;
 
         // turn the ergfile into a series of sections rather
         // than a list of points
@@ -166,7 +167,7 @@ public:
 
         QList<ErgFilePoint>         Points; // points in workout
         mutable QList<ErgFileLap>   Laps;   // interval markers in the file
-        QList<ErgFileText>          Texts;  // texts to display
+        mutable QList<ErgFileText>  Texts;  // texts to display
 
         GeoPointInterpolator gpi;      // Location interpolator
 
@@ -232,7 +233,10 @@ public:
     double nextLap   (double x) const { return !ergFile ? -1 : ergFile->nextLap(x);    }
     double prevLap   (double x) const { return !ergFile ? -1 : ergFile->prevLap(x);    }
     double currentLap(double x) const { return !ergFile ? -1 : ergFile->currentLap(x); }
-    int    nextText  (double x) const { return !ergFile ? -1 : ergFile->nextText(x);   }
+
+    bool   textsInRange(double searchStart, double searchRange, int& rangeStart, int& rangeEnd) const {
+        return !ergFile ? false : ergFile->textsInRange(searchStart, searchRange, rangeStart, rangeEnd);
+    }
 
     double currentTime() const { return !ergFile ? 0. : ergFile->Points.at(qs.rightPoint).x; }
 

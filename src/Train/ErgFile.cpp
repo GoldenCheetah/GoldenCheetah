@@ -771,6 +771,10 @@ void ErgFile::parseFromRideFileFactory()
 
         prevPoint = point;
         point = nextPoint;
+
+        if (!point)
+            break;
+
         nextPoint = ((i + 1) < pointCount) ? (ride->dataPoints()[i + 1]) : NULL;
 
         // Determine slope to next point
@@ -915,7 +919,12 @@ void ErgFile::parseTTS()
 
         prevPoint = point;
         point = nextPoint;
+
+        if (!point)
+            break;
+
         nextPoint = ((i + 1) >= pointCount) ? &ttsPoints[i] : &ttsPoints[i + 1];
+
 
         // Determine slope to next point
         double slope = 0.0;
@@ -1000,7 +1009,7 @@ void ErgFile::parseTTS()
         add.LapNum = (i * 2) + 1;
         add.selected = false;
 
-        add.name = QString::fromStdWString(L"Starting Segment: " + segment.name + rangeString);
+        add.name = QObject::tr("Starting") + ": " + QString::fromStdWString(segment.name + rangeString);
 
         Laps << add;
 
@@ -1008,7 +1017,7 @@ void ErgFile::parseTTS()
         add.x = segment.endKM * 1000.;
         add.LapNum = (i * 2) + 2;
         add.selected = false;
-        add.name = QString::fromStdWString(L"Ending Segment: " + segment.name + rangeString);
+        add.name = QObject::tr("Ending") + ": " + QString::fromStdWString(segment.name + rangeString);
         
         Laps << add;
     }
@@ -1025,20 +1034,9 @@ void ErgFile::parseTTS()
     // - End A
     // - End B
 
-    // Sort text and laps:
+    // Sort laps and texts
     sortLaps();
-
-    std::sort(Texts.begin(), Texts.end(), [](const ErgFileText& a, const ErgFileText& b) {
-        // If distance is the same the lesser distance comes first.
-        if (a.x == b.x) return a.duration < b.duration;
-        return a.x < b.x;
-    });
-
-    // Renumber laps to follow the sorted entry distance order:
-    int lapNum = 1;
-    for (auto &a : Laps) {
-        a.LapNum = lapNum++;
-    }
+    sortTexts();
 
     // This is load time so debug print isn't so expensive.
     // Laps seem pretty buggy right now. Lets debug print the data
@@ -1487,6 +1485,15 @@ void ErgFile::sortLaps() const
     }
 }
 
+void ErgFile::sortTexts() const
+{
+    std::sort(Texts.begin(), Texts.end(), [](const ErgFileText& a, const ErgFileText& b) {
+        // If distance is the same the lesser distance comes first.
+        if (a.x == b.x) return a.duration < b.duration;
+        return a.x < b.x;
+    });
+}
+
 void ErgFile::finalize()
 {
     if (Laps.count() == 0) {
@@ -1509,6 +1516,7 @@ void ErgFile::finalize()
     }
 
     sortLaps();
+    sortTexts();
 }
 
 bool
@@ -1566,36 +1574,62 @@ ErgFile::currentLap(double x) const
     return -1; // No matching lap
 }
 
-// Adds new lap at location, returns lap index.
+// Adds new lap at location, returns index of new lap
 int
 ErgFile::addNewLap(double loc) const
 {
-    if (!isValid()) return -1; // not a valid ergfile
+    if (isValid())
+    {
+        ErgFileLap add;
 
-    ErgFileLap add;
+        add.x = loc;
+        add.LapNum = Laps.count();
+        add.selected = false;
+        add.name = "user lap";
+        Laps.append(add);
 
-    add.x = loc;
-    add.LapNum = Laps.count();
-    add.selected = false;
-    add.name = "user lap";
-    Laps.append(add);
+        sortLaps();
 
-    sortLaps();
+        auto itr = std::find_if(Laps.begin(), Laps.end(), [&add](const ErgFileLap& otherLap) {
+            return add.x == otherLap.x && add.name == otherLap.name;
+        });
+        if (itr != Laps.end()) 
+            return (*itr).LapNum;
+    }
+
+    return -1;
 }
 
-
-// Retrieve the index of next text cue.
-// Params: x - current workout distance (m) / time (ms)
-// Returns: index of next text cue.
-int ErgFile::nextText(double x) const
+bool ErgFile::textsInRange(double searchStart, double searchRange, int& rangeStart, int& rangeEnd) const
 {
-    if (!isValid()) return -1; // not a valid ergfile
+    bool retVal = false;
 
-    // If the current position is before the text, then the text is next
-    for (int i=0; i<Texts.count(); i++) {
-        if (x <= Texts.at(i).x) return i;
+    if (isValid()) {
+
+        searchStart = std::floor(searchStart);
+
+        // find first text in range, continue to last text in range.
+        rangeStart = -1;
+        rangeEnd = -1;
+
+        double searchLimit = searchStart + searchRange;
+
+        for (int i = 0; i < Texts.count(); i++) {
+            double distance = Texts.at(i).x;
+            if (distance >= searchStart && distance <= searchLimit) {
+                if (rangeStart < 0) {
+                    rangeStart = i;
+                    retVal = true;
+                }
+                rangeEnd = i;
+            }
+
+            // Texts are sorted by distance so no need to look further.
+            if (distance > searchLimit)
+                break;
+        }
     }
-    return -1; // nope, no marker ahead of there
+    return retVal;
 }
 
 void
@@ -1910,3 +1944,4 @@ int ErgFileQueryAdapter::addNewLap(double loc) const
 {
     return getErgFile() ? getErgFile()->addNewLap(loc) : -1;
 }
+
