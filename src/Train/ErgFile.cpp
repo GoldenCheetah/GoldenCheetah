@@ -819,15 +819,18 @@ void ErgFile::parseFromRideFileFactory()
         Points.append(add);
     }
 
-    // Add intervals as lap markers and names as text cues
-    int lapNum = 1;
-    auto intervals = ride->intervals();
-    std::sort(intervals.begin(), intervals.end(), [](RideFileInterval* i1, RideFileInterval* i2) { return *i1 < *i2; });
-    foreach(const RideFileInterval* lap, intervals) {
+    // Add intervals as lap markers and text cues
+    int i = 0;
+    foreach(const RideFileInterval* lap, ride->intervals()) {
         double x = ride->timeToDistance(lap->start) * 1000.0;
+        double y = ride->timeToDistance(lap->stop) * 1000.0;
         int duration = lap->stop - lap->start + 1;
         if (x > 0 && duration > 0 && !lap->name.isEmpty()) {
-            Laps<<ErgFileLap(x, lapNum++, lap->name);
+            // In order to support navigation, each interval is converted into
+            // two laps that are linked by sharing a non-zero group id.
+            Laps<<ErgFileLap(x, 2*i+1, i+1, lap->name);
+            Laps<<ErgFileLap(y, 2*i+2, i+1, "");
+            i++;
             Texts<<ErgFileText(x, duration, lap->name);
         }
     }
