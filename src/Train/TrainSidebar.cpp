@@ -1056,7 +1056,10 @@ TrainSidebar::mediaTreeWidgetSelectionChanged()
     QModelIndex current = mediaTree->currentIndex();
     QModelIndex target = vsortModel->mapToSource(current);
     QString filename = videoModel->data(videoModel->index(target.row(), 0), Qt::DisplayRole).toString();
-    context->notifyMediaSelected(filename);
+    if (filename == context->videoFilename)
+        context->notifyMediaSelected(""); // CTRL+Click to clear selection
+    else
+        context->notifyMediaSelected(filename);
 }
 
 void
