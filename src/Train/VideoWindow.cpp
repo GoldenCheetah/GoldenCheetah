@@ -376,9 +376,10 @@ void VideoWindow::telemetryUpdate(RealtimeData rtd)
                 double dLon = rtd.getLongitude();
                 double dAlt = rtd.getAltitude();
 
-                // show/plot or hide depending on existance of valid location data
+                // show/plot or hide depending on existance of valid location
+                // data, only when there is a video to play
                 geolocation geo(dLat, dLon, dAlt);
-                if (geo.IsReasonableGeoLocation()) 
+                if (m && geo.IsReasonableGeoLocation())
                 {
                     liveMapWidget->plotNewLatLng(dLat, dLon);
                     liveMapWidget->show();
