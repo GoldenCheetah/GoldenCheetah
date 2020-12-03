@@ -71,16 +71,16 @@ private:
     void initializeConnection();
     bool configureForCockpitType(int cockpitType);
 
-    virtual bool ResetDevice();
-    virtual bool StartProgram(unsigned int prog);
-    virtual bool StopProgram(unsigned int prog);
-    virtual int GetAddress();
-    virtual int CheckCockpit();
-    virtual int GetDeviceVersion();
-    virtual bool SetProgram(unsigned int prog);
-    virtual bool SetDate();
-    virtual bool SetTime();
-    virtual void PlaySound();
+    bool ResetDevice();
+    bool StartProgram(unsigned int prog);
+    bool StopProgram(unsigned int prog);
+    int GetAddress();
+    int CheckCockpit();
+    int GetDeviceVersion();
+    bool SetProgram(unsigned int prog);
+    bool SetDate();
+    bool SetTime();
+    void PlaySound();
 
     QByteArray WriteDataAndGetAnswer(QByteArray const& dat, int response_bytes);
     char MapLoadToByte(unsigned int load) const;
