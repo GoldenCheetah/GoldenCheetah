@@ -47,8 +47,6 @@ public:
     Daum(QObject *parent = 0, QString device = "", QString profile = "");
     virtual ~Daum();
 
-    QObject *parent;
-
     int start();
     int restart();
     int pause();

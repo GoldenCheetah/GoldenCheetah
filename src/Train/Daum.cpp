@@ -35,8 +35,6 @@ Daum::Daum(QObject *parent, QString device, QString profile) : QThread(parent),
     load_(kDefaultLoad),
     loadToWrite_(kDefaultLoad),
     forceUpdate_(profile.contains("force", Qt::CaseInsensitive)) {
-
-    this->parent = parent;
 }
 
 Daum::~Daum() {}
