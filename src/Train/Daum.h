@@ -44,7 +44,7 @@ public:
     const int kDefaultLoad = 100;
     const int kQueryIntervalMS = 1000;
 
-    Daum(QObject *parent = 0, QString device = "", QString profile = "");
+    Daum(QObject *parent, QString device, QString profile);
 
     int start();
     int restart();
