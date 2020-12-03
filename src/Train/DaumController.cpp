@@ -22,7 +22,6 @@
 #include "RealtimeData.h"
 
 #include <QMessageBox>
-#include <QSerialPort>
 
 DaumController::DaumController(TrainSidebar *parent,  DeviceConfiguration *dc) : RealtimeController(parent, dc) {
     daumDevice_ = new Daum(this, dc != 0 ? dc->portSpec : "", dc != 0 ? dc->deviceProfile : "");

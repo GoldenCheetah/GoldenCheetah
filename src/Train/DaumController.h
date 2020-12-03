@@ -17,7 +17,6 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
- #include <QSharedPointer>
 #include "GoldenCheetah.h"
 
 #include "RealtimeController.h"
