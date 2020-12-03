@@ -240,6 +240,7 @@ void VideoWindow::showMeters()
         p_meterWidget->update();
         p_meterWidget->raise();
         p_meterWidget->show();
+        p_meterWidget->startPlayback(context);
     }
     prevPosition = mapToGlobal(pos());
 }
@@ -295,8 +296,10 @@ void VideoWindow::stopPlayback()
 #ifdef GC_VIDEO_QT5
     mp->stop();
 #endif
-    foreach(MeterWidget* p_meterWidget , m_metersWidget)
+    foreach(MeterWidget * p_meterWidget, m_metersWidget) {
+        p_meterWidget->stopPlayback();
         p_meterWidget->hide();
+    }
 }
 
 void VideoWindow::pausePlayback()

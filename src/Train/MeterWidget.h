@@ -21,9 +21,9 @@
 
 #include <QWidget>
 #include "Context.h"
+#include <QtWebChannel>
 #include <QWebEnginePage>
 #include <QWebEngineView>
-#include <QtWebEngineWidgets>
 
 class MeterWidget : public QWidget
 {
@@ -45,6 +45,8 @@ class MeterWidget : public QWidget
     virtual void AdjustSizePos();
     virtual void ComputeSize();
     virtual void paintEvent(QPaintEvent* paintevent);
+    virtual void startPlayback(Context* context);
+    virtual void stopPlayback();
     virtual QSize sizeHint() const;
     virtual QSize minimumSize() const;
     void    setColor(QColor  mainColor);
@@ -137,20 +139,53 @@ class ElevationMeterWidget : public MeterWidget
     float gradientValue;
 };
 
+// Connect JS with C++
+class WebClass : public QObject
+{
+    Q_OBJECT
+    //Q_PROPERTY(QString jsFuncName MEMBER m_jsFuncName)
+public slots:
+    Q_INVOKABLE void jscallme(const QString &datafromjs);
+    //Q_INVOKABLE void jscallme();
+
+public:
+    QString jsFuncReturn;
+    bool jsFuncinitMapLoaded, jsFuncmoveMarkerLoaded, jsFuncshowMyMarkerLoaded, jsFunccenterMapLoaded, jsFuncshowRouteLoaded = false;
+};
+
+// Display live map as overlay on video
 class LiveMapWidget : public MeterWidget
 {
-  public:
-    explicit LiveMapWidget(QString name, QWidget *parent = 0, QString Source = QString("None"));
-    void plotNewLatLng (double newLat, double newLong);
+    Q_OBJECT
+    Context* context;
 
-  protected:
-    void createHtml(double sLon, double sLat, int mapZoom);
-    void initLiveMap(double sLon, double sLat);
-    void resizeEvent(QResizeEvent *);
+public:
+    explicit LiveMapWidget(QString name, QWidget* parent = 0, QString Source = QString("None"), Context* context = NULL);
+    ~LiveMapWidget();
+    virtual void startPlayback(Context* context);
+    virtual void stopPlayback();
+    void setContext(Context* context) { this->context = context; }
+    void plotNewLatLng(double newLat, double newLong);
+    void initLiveMap(Context* context);
+    void loadingLiveMap();
+    int  m_Zoom;
+    QString  m_osmURL;
 
-    bool liveMapInitialized;
+private slots:
+
+protected:
+    void createHtml(QString sBaseUrl, QString autoRunJS);
+    void buildRouteArrayLatLngs(Context* context);
+    void resizeEvent(QResizeEvent*);
     QWebEngineView *liveMapView;
+    QWebEnginePage *webPage;
+    WebClass *webobj;
+    QWebChannel *channel;
+
+    QString routeLatLngs;
     QString currentPage;
+    bool routeInitialized, mapInitialized;
+   
 };
 
 #endif // _MeterWidget_h
