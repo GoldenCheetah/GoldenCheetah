@@ -53,7 +53,6 @@ MeterWidget::MeterWidget(QString Name, QWidget *parent, QString Source) : QWidge
     m_RangeMax = 100;
     m_Angle = 180.0;
     m_SubRange = 10;
-    m_Zoom = 16;
     boundingRectVisibility = false;
     backgroundVisibility = false;
     forceSquareRatio = true;
@@ -512,6 +511,8 @@ void ElevationMeterWidget::paintEvent(QPaintEvent* paintevent)
 
 LiveMapWidget::LiveMapWidget(QString Name, QWidget* parent, QString Source, Context* context) : MeterWidget(Name, parent, Source), context(context)
 {
+    m_Zoom = 16;
+    m_osmURL = "http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png";
     forceSquareRatio = false;
     liveMapView = new QWebEngineView(this);
     webPage = new QWebEnginePage(liveMapView);
