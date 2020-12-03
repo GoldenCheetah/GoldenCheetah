@@ -37,8 +37,6 @@ Daum::Daum(QObject *parent, QString device, QString profile) : QThread(parent),
     forceUpdate_(profile.contains("force", Qt::CaseInsensitive)) {
 }
 
-Daum::~Daum() {}
-
 int Daum::start() {
     QThread::start();
     return isRunning() ? 0 : 1;

@@ -45,7 +45,6 @@ public:
     const int kQueryIntervalMS = 1000;
 
     Daum(QObject *parent = 0, QString device = "", QString profile = "");
-    virtual ~Daum();
 
     int start();
     int restart();
