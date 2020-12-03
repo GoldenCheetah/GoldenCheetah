@@ -20,9 +20,9 @@
 #include "Daum.h"
 
 Daum::Daum(QObject *parent, QString device, QString profile) : QThread(parent),
-    timer_(0),
+    timer_(nullptr),
     serialDeviceName_(device),
-    serial_dev_(0),
+    serial_dev_(nullptr),
     deviceAddress_(-1),
     maxDeviceLoad_(800),
     serialWriteDelay_(0),
@@ -111,8 +111,8 @@ double Daum::getHeartRate() const {
 
 bool Daum::openPort(QString dev) {
     QMutexLocker locker(&pvars);
-    if (serial_dev_ == 0) {
-        serial_dev_ = new QSerialPort;
+    if (serial_dev_ == nullptr) {
+        serial_dev_ = new QSerialPort();
     }
     if (serial_dev_->isOpen()) {
         serial_dev_->close();
@@ -134,7 +134,8 @@ bool Daum::openPort(QString dev) {
 
 bool Daum::closePort() {
     QMutexLocker locker(&pvars);
-    delete serial_dev_; serial_dev_ = 0;
+    delete serial_dev_;
+    serial_dev_ = nullptr;
     return true;
 }
 
@@ -146,12 +147,12 @@ void Daum::run() {
 
     {
         QMutexLocker locker(&pvars);
-        timer_ = new QTimer();
-        if (timer_ == 0) {
-            exit(-1);
+        if (timer_ == nullptr) {
+            timer_ = new QTimer();
+
+            connect(this, SIGNAL(finished()), timer_, SLOT(stop()), Qt::DirectConnection);
+            connect(timer_, SIGNAL(timeout()), this, SLOT(requestRealtimeData()), Qt::DirectConnection);
         }
-        connect(this, SIGNAL(finished()), timer_, SLOT(stop()), Qt::DirectConnection);
-        connect(timer_, SIGNAL(timeout()), this, SLOT(requestRealtimeData()), Qt::DirectConnection);
 
         // discard prev. read data
         serial_dev_->readAll();
