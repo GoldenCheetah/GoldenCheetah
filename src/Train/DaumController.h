@@ -32,8 +32,6 @@ class DaumController : public RealtimeController
 public:
     DaumController (TrainSidebar *, DeviceConfiguration *);
 
-    Daum *daumDevice_;     // device instance
-
     // device control
     int start();            // start capturing
     int restart();          // restart after paused
@@ -52,6 +50,9 @@ public:
 
     void setLoad(double);
     void setMode(int) { return; }
+
+private:
+    Daum daumDevice_;     // device instance
 };
 
 #endif // _GC_DaumController_h
