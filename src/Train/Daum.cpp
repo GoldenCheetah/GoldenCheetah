@@ -52,7 +52,7 @@ int Daum::pause() {
     return 0;
 }
 int Daum::stop() {
-    this->exit(-1);
+    exit(-1);
     return 0;
 }
 
@@ -188,7 +188,7 @@ void Daum::initializeConnection() {
     }
     if (addr < 0) {
         qWarning() << "unable to detect device address";
-        this->exit(-1);
+        exit(-1);
     }
 
     QThread::msleep(100);
@@ -446,7 +446,7 @@ QByteArray Daum::WriteDataAndGetAnswer(QByteArray const& dat, int response_bytes
     s.write(dat);
     if(!s.waitForBytesWritten(1000)) {
         qWarning() << "failed to write data to daum cockpit";
-        this->exit(-1);
+        exit(-1);
     }
 
     if (response_bytes > 0) {
