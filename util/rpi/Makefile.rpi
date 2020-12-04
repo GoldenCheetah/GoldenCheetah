@@ -1,0 +1,45 @@
+SRC_DIR= ~pi/src
+REPO_URL=git://github.com/GoldenCheetah/GoldenCheetah.git
+BRANCH_ID=release_3.5.0
+
+TARGETS=gc/deps gc/rules gc/sources gc/config gc/build gc/icon
+.PHONY: $(TARGETS)
+
+gc/all: $(TARGETS)
+
+gc/deps:
+	sudo apt-get -y install qt5-default qtcreator libqt5svg5-dev libqt5serialport5-dev \
+	libqt5charts5-dev qtmultimedia5-dev qtconnectivity5-dev \
+	libqt5webkit5-dev libusb-1.0-0-dev libical-dev libvlc-dev \
+	libvlccore-dev bison flex
+
+gc/pre:
+	sudo apt update
+	sudo apt -yf full-upgrade
+	sudo apt-get -y --purge autoremove 
+	sudo apt-get autoclean
+	sudo reboot now
+
+gc/rules:
+	sudo sh -c "cat goldencheetah/52-garmin-usb.rules >> /etc/udev/rules.d/52-garmin-usb.rules"
+
+gc/sources:
+	mkdir -p $(SRC_DIR) ;\
+	cd $(SRC_DIR)	;\
+	git clone $(REPO_URL) --branch $(BRANCH_ID) ;\
+	cd GoldenCheetah/qwt ;\
+  cp qwtconfig.pri.in qwtconfig.pri ;\
+
+gc/config: goldencheetah/gcconfig.pri
+	cp goldencheetah/gcconfig.pri	$(SRC_DIR)/GoldenCheetah/src/
+
+gc/build:
+	date >> $(SRC_DIR)/GoldenCheetah/build.date.start
+	cd $(SRC_DIR)/GoldenCheetah;\
+	git pull ;\
+	qmake -recursive;\
+	time make -j4 ;\
+	date >> $(SRC_DIR)/GoldenCheetah/build.date.end
+
+gc/icon: goldencheetah/GoldenCheetah.desktop
+	cat $< > ~pi/Desktop/GoldenCheetah.desktop
