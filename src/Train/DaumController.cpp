@@ -22,30 +22,29 @@
 #include "RealtimeData.h"
 
 #include <QMessageBox>
-#include <QSerialPort>
 
-DaumController::DaumController(TrainSidebar *parent,  DeviceConfiguration *dc) : RealtimeController(parent, dc) {
-    daumDevice_ = new Daum(this, dc != 0 ? dc->portSpec : "", dc != 0 ? dc->deviceProfile : "");
+DaumController::DaumController(TrainSidebar *parent,  DeviceConfiguration *dc) : RealtimeController(parent, dc)
+    , daumDevice_(this, dc ? dc->portSpec : "", dc ? dc->deviceProfile : "") {
 }
 
 int DaumController::start() {
-    return daumDevice_->start();
+    return daumDevice_.start();
 }
 
 int DaumController::restart() {
-    return daumDevice_->restart();
+    return daumDevice_.restart();
 }
 
 int DaumController::pause() {
-    return daumDevice_->pause();
+    return daumDevice_.pause();
 }
 
 int DaumController::stop() {
-    return daumDevice_->stop();
+    return daumDevice_.stop();
 }
 
 bool DaumController::discover(QString name) {
-   return daumDevice_->discover(name);
+   return daumDevice_.discover(name);
 }
 
 /*
@@ -54,7 +53,7 @@ bool DaumController::discover(QString name) {
  * act accordingly.
  */
 void DaumController::getRealtimeData(RealtimeData &rtData) {
-    if(!daumDevice_->isRunning()) {
+    if(!daumDevice_.isRunning()) {
         QMessageBox msgBox;
         msgBox.setText(tr("Cannot Connect to Daum"));
         msgBox.setIcon(QMessageBox::Critical);
@@ -63,12 +62,12 @@ void DaumController::getRealtimeData(RealtimeData &rtData) {
         return;
     }
 
-    rtData.setWatts(daumDevice_->getPower());
-    rtData.setHr(daumDevice_->getHeartRate());
-    rtData.setCadence(daumDevice_->getCadence());
-    rtData.setSpeed(daumDevice_->getSpeed());
+    rtData.setWatts(daumDevice_.getPower());
+    rtData.setHr(daumDevice_.getHeartRate());
+    rtData.setCadence(daumDevice_.getCadence());
+    rtData.setSpeed(daumDevice_.getSpeed());
 }
 
 void DaumController::setLoad(double load) {
-    daumDevice_->setLoad(load);
+    daumDevice_.setLoad(load);
 }
