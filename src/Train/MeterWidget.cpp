@@ -22,8 +22,9 @@
 #include "ErgFile.h"
 #include "Context.h"
 #include "Units.h"
-
-#include <QtWebEngineWidgets/QWebEngineView>
+#include "LocationInterpolation.h"
+#include <QWebEngineScriptCollection>
+#include <QWebEngineProfile>
 
 MeterWidget::MeterWidget(QString Name, QWidget *parent, QString Source) : QWidget(parent), m_Name(Name), m_container(parent), m_Source(Source)
 {
@@ -52,7 +53,6 @@ MeterWidget::MeterWidget(QString Name, QWidget *parent, QString Source) : QWidge
     m_RangeMax = 100;
     m_Angle = 180.0;
     m_SubRange = 10;
-    m_Zoom = 16;
     boundingRectVisibility = false;
     backgroundVisibility = false;
     forceSquareRatio = true;
@@ -114,6 +114,17 @@ QSize MeterWidget::minimumSize() const
 {
     return QSize(m_Width, m_Height);
 }
+
+void MeterWidget::startPlayback(Context* context)
+{
+
+}
+
+void MeterWidget::stopPlayback()
+{
+
+}
+
 
 void MeterWidget::paintEvent(QPaintEvent* paintevent)
 {
@@ -421,11 +432,11 @@ void ElevationMeterWidget::lazySetup(void)
 
 void ElevationMeterWidget::paintEvent(QPaintEvent* paintevent)
 {
+    MeterWidget::paintEvent(paintevent);
+
     // TODO : show Power when not in slope simulation mode
     if (!context || !context->currentErgFile() || context->currentErgFile()->Points.size()<=1)
         return;
-
-    MeterWidget::paintEvent(paintevent);
 
     m_MainBrush = QBrush(m_MainColor);
     m_BackgroundBrush = QBrush(m_BackgroundColor);
@@ -498,86 +509,231 @@ void ElevationMeterWidget::paintEvent(QPaintEvent* paintevent)
     painter.drawText(distanceDrawX, distanceDrawY, distanceString);
 }
 
-
-LiveMapWidget::LiveMapWidget(QString Name, QWidget *parent, QString Source) : MeterWidget(Name, parent, Source)
+LiveMapWidget::LiveMapWidget(QString Name, QWidget* parent, QString Source, Context* context) : MeterWidget(Name, parent, Source), context(context)
 {
+    m_Zoom = 16;
+    m_osmURL = "http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png";
     forceSquareRatio = false;
     liveMapView = new QWebEngineView(this);
-    liveMapInitialized = false;
+    webPage = new QWebEnginePage(liveMapView);
+    liveMapView->setPage(webPage);
+    routeInitialized = false;
+    mapInitialized = false;
+    // Connect JS to C++
+    webobj = new WebClass();
+    channel = new QWebChannel(this);
+    channel->registerObject("webobj", webobj);
+    liveMapView->page()->setWebChannel(channel);
+    loadingLiveMap();
 }
 
-void LiveMapWidget::resizeEvent(QResizeEvent *)
+void LiveMapWidget::startPlayback(Context* context)
+{
+    MeterWidget::startPlayback(context);
+    if (context->currentErgFile()) 
+    {
+        buildRouteArrayLatLngs(context);
+        if (!mapInitialized) {
+            initLiveMap(context);
+            mapInitialized = true;
+        }
+    }
+    else 
+    {
+        qDebug() << "Error: LiveMap cannot find Ergfile";
+    }
+}
+
+LiveMapWidget::~LiveMapWidget()
+{
+    delete webobj;
+    delete channel;
+    delete webPage;
+    delete liveMapView;
+}
+
+void LiveMapWidget::stopPlayback()
+{
+    MeterWidget::stopPlayback();
+    loadingLiveMap();
+    mapInitialized = false;
+}
+
+void LiveMapWidget::resizeEvent(QResizeEvent*)
 {
     liveMapView->resize(m_Width, m_Height);
 }
 
+void LiveMapWidget::loadingLiveMap() 
+{
+    //Set initial page to display loading map. 
+    currentPage = QString("<html><head></head>\n"
+        "<body><center><h1>Loading map...</h1></center>\n"
+        "</body></html>\n");
+    liveMapView->page()->setHtml(currentPage);
+}
+
+// Initialize map, build route and show it
+void LiveMapWidget::initLiveMap(Context* context)
+{
+    QString startingLat = QVariant(context->currentErgFile()->Points[0].lat).toString();
+    QString startingLon = QVariant(context->currentErgFile()->Points[0].lon).toString();
+
+    if (startingLat == "0" && startingLon == "0")
+    {
+        currentPage = QString("<html><head></head>\n"
+            "<body><center><h1>Ride contains invalid data</h1></center>\n"
+            "</body></html>\n");
+        liveMapView->page()->setHtml(currentPage);
+    }
+    else
+    {
+        QString js = ("<div><script type=\"text/javascript\">initMap("
+            + startingLat + "," + startingLon + ",16);"
+            "showMyMarker(" + startingLat + "," + startingLon + ");</script></div>\n");
+        routeLatLngs = "[";
+        QString code = "";
+
+        for (int pt = 0; pt < context->currentErgFile()->Points.size() - 1; pt++) {
+
+            geolocation geoloc(context->currentErgFile()->Points[pt].lat, context->currentErgFile()->Points[pt].lon, context->currentErgFile()->Points[pt].y);
+            if (geoloc.IsReasonableGeoLocation()) {
+                if (pt == 0) { routeLatLngs += "["; }
+                else { routeLatLngs += ",["; }
+                routeLatLngs += QVariant(context->currentErgFile()->Points[pt].lat).toString();
+                routeLatLngs += ",";
+                routeLatLngs += QVariant(context->currentErgFile()->Points[pt].lon).toString();
+                routeLatLngs += "]";
+            }
+
+        }
+        routeLatLngs += "]";
+        // We can either setHTML page or runJavaScript but not both. 
+        // So we create divs with the 2 methods we need to run when the document loads
+        code = QString("showRoute (" + routeLatLngs + ");");
+        js += ("<div><script type=\"text/javascript\">" + code + "</script></div>\n");
+        createHtml(m_osmURL, js);
+        liveMapView->page()->setHtml(currentPage);
+        routeInitialized = true;
+    }
+}
+
+// Show route or move the marker at the next location
 void LiveMapWidget::plotNewLatLng(double dLat, double dLon)
 {
-    if ( ! liveMapInitialized ) initLiveMap(dLat, dLon);
-
+    QString code = "";
     QString sLat = QString::number(dLat);
     QString sLon = QString::number(dLon);
-    QString code = QString("moveMarker(" + sLat + " , "  + sLon + ")");
+    QString sMapZoom = QString::number(m_Zoom);
 
-    liveMapView->page()->runJavaScript(code);
+    if (!routeInitialized)
+    {
+        code = QString("showRoute(" + routeLatLngs + ");");
+        liveMapView->page()->runJavaScript(code);
+        routeInitialized = true;
+    }
+    else {
+        code += QString("moveMarker(" + sLat + " , " + sLon + ");");
+        liveMapView->page()->runJavaScript(code);
+    }
 }
 
-void LiveMapWidget::initLiveMap(double dLat, double dLon)
+// Build LatLon array for selected workout
+void LiveMapWidget::buildRouteArrayLatLngs(Context* context)
 {
-    createHtml(dLat, dLon, m_Zoom);
-    liveMapView->page()->setHtml(currentPage);
-    liveMapView->show();
-    liveMapInitialized = true;
+    routeLatLngs = "[";
+    for (int pt = 0; pt < context->currentErgFile()->Points.size() - 1; pt++) {
+        if (pt == 0) { routeLatLngs += "["; }
+        else { routeLatLngs += ",["; }
+        routeLatLngs += QVariant(context->currentErgFile()->Points[pt].lat).toString();
+        routeLatLngs += ",";
+        routeLatLngs += QVariant(context->currentErgFile()->Points[pt].lon).toString();
+        routeLatLngs += "]";
+    }
+    routeLatLngs += "]";
 }
 
-void LiveMapWidget::createHtml(double dLat, double dLon, int iMapZoom)
+
+// Build HTML code with all the javascript functions to be called later
+// to update the postion on the map
+void LiveMapWidget::createHtml(QString sBaseUrl, QString autoRunJS)
 {
-    QString sLat = QString::number(dLat);
-    QString sLon = QString::number(dLon);
-    QString sWidth = QString::number(m_Width);
-    QString sHeight = QString::number(m_Height);
-    QString sMapZoom = QString::number(iMapZoom);
     currentPage = "";
 
     currentPage = QString("<html><head>\n"
-    "<meta name=\"viewport\" content=\"initial-scale=1.0, user-scalable=yes\"/> \n"
-    "<meta http-equiv=\"content-type\" content=\"text/html; charset=UTF-8\"/>\n"
-    "<title>GoldenCheetah LiveMap - TrainView</title>\n");
-    //Leaflet CSS and JS
-    currentPage += QString("<link rel=\"stylesheet\" href=\"https://unpkg.com/leaflet@1.6.0/dist/leaflet.css\"\n"
-    "integrity=\"sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ==\" crossorigin=\"\"/>\n"
-	"<script src=\"https://unpkg.com/leaflet@1.6.0/dist/leaflet.js\"\n"
-    "integrity=\"sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew==\" crossorigin=\"\"></script>\n"
-	"<style>#mapid {height:100%; width:100%}</style></head>\n");
-
-    // local functions
-    currentPage += QString("<body><div id=\"mapid\"></div>\n"
-    "<script type=\"text/javascript\">\n");
-    // Create Map options
-    currentPage += QString("var mapOptions = {\n"
-        "    center: [" + sLat + ", " + sLon + "] ,\n"
-        "    zoom : " + sMapZoom + ",\n"
+        "<meta name=\"viewport\" content=\"initial-scale=1.0, user-scalable=yes\"/> \n"
+        "<meta http-equiv=\"content-type\" content=\"text/html; charset=UTF-8\"/>\n"
+        "<title>GoldenCheetah LiveMap - TrainView</title>\n"
+        "<link rel=\"stylesheet\" href=\"https://unpkg.com/leaflet@1.6.0/dist/leaflet.css\"\n"
+        "integrity=\"sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ==\" crossorigin=\"\"/>\n"
+        "<script src=\"https://unpkg.com/leaflet@1.6.0/dist/leaflet.js\"\n"
+        "integrity=\"sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew==\" crossorigin=\"\"></script>\n"
+        "<style>#mapid {height:100%;width:100%}</style></head>\n"
+        "<body><div id=\"mapid\"></div>\n"
+        "<script type=\"text/javascript\">\n"
+        "var mapOptions, mymap, mylayer, mymarker, latlng, myscale, routepolyline\n"
+        "function moveMarker(myLat, myLon) {\n"
+        "    mymap.panTo(new L.LatLng(myLat, myLon));\n"
+        "    mymarker.setLatLng(new L.latLng(myLat, myLon));\n"
+        "}\n"
+        "function initMap(myLat, myLon, myZoom) {\n"
+        "    mapOptions = {\n"
+        "    center: [myLat, myLon],\n"
+        "    zoom : myZoom,\n"
         "    zoomControl : true,\n"
         "    scrollWheelZoom : false,\n"
         "    dragging : false,\n"
-        "    doubleClickZoom : false}\n");
-    // Create map object
-    currentPage += QString("var mymap = L.map('mapid', mapOptions);\n");
-    // Create layer object
-    currentPage += QString("var layer = new L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png');\n");
-    // Add layer to the map
-    currentPage += QString("mymap.addLayer(layer);\n");
-    // mymarker var
-    currentPage += QString("var mymarker = new L.marker([" + sLat + ", " + sLon + "], {\n"
-    "    draggable: false,\n"
-    "    title: \"GoldenCheetah - Workout LiveMap\",\n"
-    "    alt: \"GoldenCheetah - Workout LiveMap\",\n"
-    "    riseOnHover: true\n"
-    "}).addTo(mymap)\n");
-    // Move marker function
-    currentPage += QString(    "function moveMarker(myLat, myLon) { \n"
-    "   mymap.panTo(new L.LatLng(myLat, myLon));\n"
-    "    mymarker.setLatLng(new L.latLng(myLat, myLon));}\n"
-    "</script>\n"
-    "</body></html>\n");
+        "    doubleClickZoom : false }\n"
+        "    mymap = L.map('mapid', mapOptions);\n"
+        "    myscale = L.control.scale().addTo(mymap);\n"
+        "    mylayer = new L.tileLayer('" + sBaseUrl + "');\n"
+        "    mymap.addLayer(mylayer);\n"
+        "}\n"
+        "function showMyMarker(myLat, myLon) {\n"
+        "    mymarker = new L.marker([myLat, myLon], {\n"
+        "    draggable: false,\n"
+        "    title : \"GoldenCheetah - Workout LiveMap\",\n"
+        "    alt : \"GoldenCheetah - Workout LiveMap\",\n"
+        "    riseOnHover : true\n"
+        "        }).addTo(mymap);\n"
+        "}\n"
+        "function centerMap(myLat, myLon, myZoom) {\n"
+        "    latlng = L.latLng(myLat, myLon);\n"
+        "    mymap.setView(latlng, myZoom)\n"
+        "}\n"
+        "function showRoute(myRouteLatlngs) {\n"
+        "    routepolyline = L.polyline(myRouteLatlngs, { color: 'red' }).addTo(mymap);\n"
+        //"    mymap.fitBounds(routepolyline.getBounds());\n"
+        "}\n"
+        "</script>\n"
+        + autoRunJS +
+        "</body></html>\n"
+    );
+}
+
+// This method is called from the HTML page javascript using: webobj.jscallme(#);
+void WebClass::jscallme(const QString &datafromjs)
+{
+    //qDebug() << "INFO: ===> I was called by js function: " << datafromjs;
+    switch (datafromjs.toInt()) {
+    case 0:
+        jsFuncinitMapLoaded = false;
+        break;
+    case 1:
+        jsFuncinitMapLoaded = true;
+        break;
+    case 2:
+        jsFuncmoveMarkerLoaded = true;
+        break;
+    case 3:
+        jsFuncshowMyMarkerLoaded = true;
+        break;
+    case 4:
+        jsFunccenterMapLoaded = true;
+        break;
+    case 5:
+        jsFuncshowRouteLoaded = true;
+        break;
+    }
+    
 }
