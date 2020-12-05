@@ -30,8 +30,8 @@ gc/sources:
 	cd GoldenCheetah/qwt ;\
   cp qwtconfig.pri.in qwtconfig.pri ;\
 
-gc/config: goldencheetah/gcconfig.pri
-	cp goldencheetah/gcconfig.pri	$(SRC_DIR)/GoldenCheetah/src/
+gc/config: ./gcconfig.pri.for_rpi
+	cp ./gcconfig.pri.for_rpi	$(SRC_DIR)/GoldenCheetah/src/
 
 gc/build:
 	date >> $(SRC_DIR)/GoldenCheetah/build.date.start
