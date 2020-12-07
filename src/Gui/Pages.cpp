@@ -738,6 +738,9 @@ TrainOptionsPage::TrainOptionsPage(QWidget *parent, Context *context) : QWidget(
     useSimulatedSpeed = new QCheckBox(tr("Use simulated Speed in slope mode"), this);
     useSimulatedSpeed->setChecked(appsettings->value(this, TRAIN_USESIMULATEDSPEED, false).toBool());
 
+    useSimulatedHypoxia = new QCheckBox(tr("Simulate Relative Hypoxia"), this);
+    useSimulatedHypoxia->setChecked(appsettings->value(this, TRAIN_USESIMULATEDHYPOXIA, false).toBool());
+
     autoConnect = new QCheckBox(tr("Auto-connect devices in Train View"), this);
     autoConnect->setChecked(appsettings->value(this, TRAIN_AUTOCONNECT, false).toBool());
 
@@ -755,6 +758,7 @@ TrainOptionsPage::TrainOptionsPage(QWidget *parent, Context *context) : QWidget(
 
     QVBoxLayout *all = new QVBoxLayout(this);
     all->addWidget(useSimulatedSpeed);
+    all->addWidget(useSimulatedHypoxia);
     all->addWidget(multiCheck);
     all->addWidget(autoConnect);
     all->addWidget(autoHide);
@@ -768,6 +772,7 @@ TrainOptionsPage::saveClicked()
 {
     // Save the train view settings...
     appsettings->setValue(TRAIN_USESIMULATEDSPEED, useSimulatedSpeed->isChecked());
+    appsettings->setValue(TRAIN_USESIMULATEDHYPOXIA, useSimulatedHypoxia->isChecked());
     appsettings->setValue(TRAIN_MULTI, multiCheck->isChecked());
     appsettings->setValue(TRAIN_AUTOCONNECT, autoConnect->isChecked());
     appsettings->setValue(TRAIN_AUTOHIDE, autoHide->isChecked());
@@ -913,7 +918,8 @@ const SimBicyclePartEntry& SimBicyclePage::GetSimBicyclePartEntry(int e)
         { tr("Coefficient of power train loss"     )  , GC_SIM_BICYCLE_Cm,                   1.0,               3,           tr("Power train loss between reported watts and wheel. For direct drive trainer like kickr there is no relevant loss and value shold be 1.0.")},      // Cm
         { tr("Coefficient of drag"                 )  , GC_SIM_BICYCLE_Cd,        (1.0 - 0.0045),               5,           tr("Coefficient of drag of rider and bicycle")},                                      // Cd
         { tr("Frontal Area (m^2)"                  )  , GC_SIM_BICYCLE_Am2,                  0.5,               2,           tr("Effective frontal area of rider and bicycle")},                                   // Am2
-        { tr("Temperature (K)"                     )  , GC_SIM_BICYCLE_Tk,                 293.15,              2,           tr("Temperature in kelvin, used with altitude to compute air density")}               // Tk
+        { tr("Temperature (K)"                     )  , GC_SIM_BICYCLE_Tk,                 293.15,              2,           tr("Temperature in kelvin, used with altitude to compute air density")},              // Tk
+        { tr("ActualTrainerAltitude (M)"           )  , GC_SIM_BICYCLE_ACTUALTRAINERALTITUDEM, 0.,              0,           tr("Actual altitude of indoor trainer, in meters")}                                   // ActualTrainerAltitudeM
     };
 
     if (e < 0 || e >= LastPart) e = 0;
@@ -1002,7 +1008,8 @@ SimBicyclePage::SetStatsLabelArray(double )
         m_SpinBoxArr[SimBicyclePage::Cm] ->value(),
         m_SpinBoxArr[SimBicyclePage::Cd] ->value(),
         m_SpinBoxArr[SimBicyclePage::Am2]->value(),
-        m_SpinBoxArr[SimBicyclePage::Tk] ->value());
+        m_SpinBoxArr[SimBicyclePage::Tk] ->value(),
+        1.);
 
     Bicycle bicycle(NULL, constants, riderMassKG, bicycleMassWithoutWheelsG / 1000., frontWheel, rearWheel);
 

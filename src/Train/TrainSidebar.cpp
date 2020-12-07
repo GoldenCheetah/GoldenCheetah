@@ -695,6 +695,9 @@ TrainSidebar::configChanged(qint32)
         FTP = context->athlete->zones(false)->getCP(range);
         WPRIME = context->athlete->zones(false)->getWprime(range);
     }
+
+    // Reinit Bicycle
+    bicycle.Reset(context);
 }
 
 /*----------------------------------------------------------------------
@@ -1115,7 +1118,7 @@ void TrainSidebar::Start()       // when start button is pressed
         clearStatusFlags(RT_PAUSED);
 
         // Reset speed simulation timer.
-        bicycle.reset();
+        bicycle.resettimer();
 
         maintainLapDistanceState();
 

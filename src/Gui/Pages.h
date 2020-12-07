@@ -230,6 +230,7 @@ class TrainOptionsPage : public QWidget
     private:
         Context     *context;
         QCheckBox   *useSimulatedSpeed;
+        QCheckBox   *useSimulatedHypoxia;
         QCheckBox   *multiCheck;
         QCheckBox   *autoConnect;
         QCheckBox   *autoHide;
@@ -275,6 +276,7 @@ public:
         FrontWheelG, FrontSpokeCount, FrontSpokeNippleG, FrontRimG, FrontRotorG, FrontSkewerG, FrontTireG, FrontTubeSealantG, FrontOuterRadiusM, FrontRimInnerRadiusM,
         RearWheelG, RearSpokeCount, RearSpokeNippleG, RearRimG, RearRotorG, RearSkewerG, RearTireG, RearTubeSealantG, RearOuterRadiusM, RearRimInnerRadiusM,
         CassetteG, CRR, Cm, Cd, Am2, Tk,
+        ActualTrainerAltitudeM,
         LastPart
     };
 
