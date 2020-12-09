@@ -149,6 +149,24 @@ class IntervalConfig : public QWidget
         IntervalsPage *intervalsPage;
 };
 
+// MEASURES PAGE
+class MeasuresConfig : public QWidget
+{
+    Q_OBJECT
+
+    public:
+        MeasuresConfig(QDir home, Context *context);
+
+    public slots:
+        qint32 saveClicked();
+
+    private:
+        QDir home;
+        Context *context;
+
+        MeasuresConfigPage *measuresPage;
+};
+
 class ConfigDialog : public QMainWindow
 {
     Q_OBJECT
@@ -178,6 +196,7 @@ class ConfigDialog : public QMainWindow
         DataConfig *data;
         MetricConfig *metric;
         IntervalConfig *interval;
+        MeasuresConfig *measures;
         TrainConfig *train;
 };
 #endif

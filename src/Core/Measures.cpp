@@ -249,49 +249,105 @@ MeasuresGroup::unserialize(QFile &file, QList<Measure> &data)
     return true;
 }
 
+MeasuresField
+MeasuresGroup::getField(int field)
+{
+    MeasuresField fieldSettings;
+
+    if (field >= 0 && field < symbols.count()) {
+
+        fieldSettings.symbol = symbols[field];
+        fieldSettings.name = names[field];
+        fieldSettings.metricUnits = metricUnits[field];
+        fieldSettings.imperialUnits = imperialUnits[field];
+        fieldSettings.unitsFactor = unitsFactors[field];
+        fieldSettings.headers = headers[field];
+    }
+
+    return fieldSettings;
+}
+
+void
+MeasuresGroup::addField(MeasuresField &fieldSettings)
+{
+    symbols.append(fieldSettings.symbol);
+    names.append(fieldSettings.name);
+    metricUnits.append(fieldSettings.metricUnits);
+    imperialUnits.append(fieldSettings.imperialUnits);
+    unitsFactors.append(fieldSettings.unitsFactor);
+    headers.append(fieldSettings.headers);
+}
+
+void
+MeasuresGroup::setField(int field, MeasuresField &fieldSettings)
+{
+    if (field >= 0 && field < symbols.count()) {
+        symbols[field] = fieldSettings.symbol;
+        names[field] = fieldSettings.name;
+        metricUnits[field] = fieldSettings.metricUnits;
+        imperialUnits[field] = fieldSettings.imperialUnits;
+        unitsFactors[field] = fieldSettings.unitsFactor;
+        headers[field] = fieldSettings.headers;
+    }
+}
+
+void
+MeasuresGroup::removeField(int field)
+{
+    if (field >= 0 && field < symbols.count()) {
+        symbols.removeAt(field);
+        names.removeAt(field);
+        metricUnits.removeAt(field);
+        imperialUnits.removeAt(field);
+        unitsFactors.removeAt(field);
+        headers.removeAt(field);
+    }
+}
+
 ///////////////////////////// Measures class ////////////////////////////////
 
 Measures::Measures(QDir dir, bool withData) : dir(dir), withData(withData)
 {
-    // pre-load mandatory measures in MeasuresGroupType order
-
-    groups.append(new MeasuresGroup("Body", tr("Body"),
-        QStringList()<<"WEIGHTKG"<<"FATKG"<<"MUSCLEKG"<<"BONESKG"<<"LEANKG"<<"FATPERCENT",
-        QStringList()<<tr("Weight")<<tr("Fat Mass")<<tr("Muscle Mass")<<tr("Bone Mass")<<tr("Lean Mass")<<tr("Fat Percent"),
-        QStringList()<<tr("kg")<<tr("kg")<<tr("kg")<<tr("kg")<<tr("kg")<<tr("%"),
-        QStringList()<<tr("lbs")<<tr("lbs")<<tr("lbs")<<tr("lbs")<<tr("lbs")<<tr("%"),
-        QList<double>()<<LB_PER_KG<<LB_PER_KG<<LB_PER_KG<<LB_PER_KG<<LB_PER_KG<<1.0,
-        QList<QStringList>()<<
-            (QStringList()<<"weightkg")<<
-            (QStringList()<<"fatkg")<<
-            (QStringList()<<"musclekg")<<
-            (QStringList()<<"boneskg")<<
-            (QStringList()<<"leankg")<<
-            (QStringList()<<"fatpercent"),
-        dir, withData));
-
-    groups.append(new MeasuresGroup("Hrv", tr("Hrv"),
-        QStringList()<<"RMSSD"<<"HR"<<"AVNN"<<"SDNN"<<"PNN50"<<"LF"<<"HF"<<"RECOVERY_POINTS",
-        QStringList()<<tr("RMSSD")<<tr("HR")<<tr("AVNN")<<tr("SDNN")<<tr("PNN50")<<tr("LF")<<tr("HF")<<tr("Recovery Points"),
-        QStringList()<<tr("msec")<<tr("bpm")<<tr("msec")<<tr("msec")<<tr("%")<<tr("msec^2")<<tr("msec^2")<<tr("Rec.Points"),
-        QStringList()<<tr("msec")<<tr("bpm")<<tr("msec")<<tr("msec")<<tr("%")<<tr("msec^2")<<tr("msec^2")<<tr("Rec.Points"),
-        QList<double>()<<1.0<<1.0<<1.0<<1.0<<1.0<<1.0<<1.0<<1.0,
-        QList<QStringList>()<<
-            (QStringList()<<"rMSSD"<<"rMSSD_lying"<<"Rmssd")<<
-            (QStringList()<<"HR"<<"HR_lying")<<
-            (QStringList()<<"AVNN"<<"AVNN_lying")<<
-            (QStringList()<<"SDNN"<<"SDNN_lying"<<"Sdnn")<<
-            (QStringList()<<"pNN50"<<"pNN50_lying"<<"Pnn50")<<
-            (QStringList()<<"LF"<<"LF_lying")<<
-            (QStringList()<<"HF"<<"HF_lying")<<
-            (QStringList()<<"HRV4T_Recovery_Points"<<"lnRmssd"),
-        dir, withData));
-
     // load user defined measures from measures.ini
     QString filename = QDir(gcroot).canonicalPath() + "/measures.ini";
+
     if (!QFile(filename).exists()) {
-        // other standard measures can be loaded from resources
-        filename = ":/ini/measures.ini";
+        // pre-load mandatory measures in MeasuresGroupType order
+
+        groups.append(new MeasuresGroup("Body", tr("Body"),
+            QStringList()<<"WEIGHTKG"<<"FATKG"<<"MUSCLEKG"<<"BONESKG"<<"LEANKG"<<"FATPERCENT",
+            QStringList()<<tr("Weight")<<tr("Fat Mass")<<tr("Muscle Mass")<<tr("Bone Mass")<<tr("Lean Mass")<<tr("Fat Percent"),
+            QStringList()<<tr("kg")<<tr("kg")<<tr("kg")<<tr("kg")<<tr("kg")<<tr("%"),
+            QStringList()<<tr("lbs")<<tr("lbs")<<tr("lbs")<<tr("lbs")<<tr("lbs")<<tr("%"),
+            QList<double>()<<LB_PER_KG<<LB_PER_KG<<LB_PER_KG<<LB_PER_KG<<LB_PER_KG<<1.0,
+            QList<QStringList>()<<
+                (QStringList()<<"weightkg")<<
+                (QStringList()<<"fatkg")<<
+                (QStringList()<<"musclekg")<<
+                (QStringList()<<"boneskg")<<
+                (QStringList()<<"leankg")<<
+                (QStringList()<<"fatpercent"),
+            dir, withData));
+
+        groups.append(new MeasuresGroup("Hrv", tr("Hrv"),
+            QStringList()<<"RMSSD"<<"HR"<<"AVNN"<<"SDNN"<<"PNN50"<<"LF"<<"HF"<<"RECOVERY_POINTS",
+            QStringList()<<tr("RMSSD")<<tr("HR")<<tr("AVNN")<<tr("SDNN")<<tr("PNN50")<<tr("LF")<<tr("HF")<<tr("Recovery Points"),
+            QStringList()<<tr("msec")<<tr("bpm")<<tr("msec")<<tr("msec")<<tr("%")<<tr("msec^2")<<tr("msec^2")<<tr("Rec.Points"),
+            QStringList()<<tr("msec")<<tr("bpm")<<tr("msec")<<tr("msec")<<tr("%")<<tr("msec^2")<<tr("msec^2")<<tr("Rec.Points"),
+            QList<double>()<<1.0<<1.0<<1.0<<1.0<<1.0<<1.0<<1.0<<1.0,
+            QList<QStringList>()<<
+                (QStringList()<<"rMSSD"<<"rMSSD_lying"<<"Rmssd")<<
+                (QStringList()<<"HR"<<"HR_lying")<<
+                (QStringList()<<"AVNN"<<"AVNN_lying")<<
+                (QStringList()<<"SDNN"<<"SDNN_lying"<<"Sdnn")<<
+                (QStringList()<<"pNN50"<<"pNN50_lying"<<"Pnn50")<<
+                (QStringList()<<"LF"<<"LF_lying")<<
+                (QStringList()<<"HF"<<"HF_lying")<<
+                (QStringList()<<"HRV4T_Recovery_Points"<<"lnRmssd"),
+            dir, withData));
+
+            // other standard measures can be loaded from resources
+            filename = ":/ini/measures.ini";
     }
 
     QSettings config(filename, QSettings::IniFormat);
@@ -309,19 +365,34 @@ Measures::Measures(QDir dir, bool withData) : dir(dir), withData(withData)
         if (fields.count() == 0 || fields.count() > MAX_MEASURES) continue;
 
         QStringList names = config.value("Names", "").toStringList();
-        if (names.count() == 0) names = fields;
+        if (names.count() == 1 && names[0] == "") names = fields;
         if (fields.count() != names.count()) continue;
 
         QStringList units = config.value("MetricUnits", "").toStringList();
-        if (units.count() == 0) foreach (QString field, fields) units << "";
+        if (units.count() == 1 && units[0] == "") {
+            units = QStringList();
+            for (int i=0; i<fields.count(); i++) units << "";
+        }
         if (fields.count() != units.count()) continue;
 
         QStringList imperialUnits = config.value("ImperialUnits", units).toStringList();
+        if (imperialUnits.count() == 1 && imperialUnits[0] == "") {
+            imperialUnits = QStringList();
+            for (int i=0; i<fields.count(); i++) imperialUnits << "";
+        }
         if (fields.count() != imperialUnits.count()) continue;
 
+        QStringList factors = config.value("UnitsFactors", "").toStringList();
+        if (factors.count() == 1 && factors[0] == "") {
+            factors = QStringList();
+            for (int i=0; i<fields.count(); i++) factors << "1";
+        }
+        if (fields.count() != factors.count()) continue;
         QList<double> unitsFactors;
-        foreach (QString field, fields) {
-            unitsFactors.append(1.0);
+        foreach (QString factor, factors) {
+            bool ok;
+            double unitFactor = factor.toDouble(&ok);
+            unitsFactors.append(ok ? unitFactor : 1.0);
         }
 
         QList<QStringList> headersList;
@@ -340,6 +411,38 @@ Measures::~Measures()
 {
     foreach (MeasuresGroup* measuresGroup, groups)
         delete measuresGroup;
+}
+
+void
+Measures::saveConfig()
+{
+    // save measures configuration to measures.ini
+    QString filename = QDir(gcroot).canonicalPath() + "/measures.ini";
+    QSettings config(filename, QSettings::IniFormat);
+    config.setIniCodec("UTF-8"); // to allow translated names
+    config.clear();
+
+    foreach (MeasuresGroup* group, getGroups()) {
+
+        config.beginGroup(group->getSymbol());
+
+        config.setValue("Name", group->getName());
+        config.setValue("Fields", group->getFieldSymbols());
+        config.setValue("Names", group->getFieldNames());
+        config.setValue("MetricUnits", group->getFieldMetricUnits());
+        config.setValue("ImperialUnits", group->getFieldImperialUnits());
+
+        QStringList unitsFactors;
+        foreach (double unitsFactor, group->getFieldUnitsFactors())
+            unitsFactors<<QString::number(unitsFactor);
+        config.setValue("UnitsFactors", unitsFactors);
+
+        for (int i=0; i < group->getFieldSymbols().count(); i++)
+            config.setValue(group->getField(i).symbol, group->getFieldHeaders(i));
+
+        config.endGroup();
+    }
+    config.sync();
 }
 
 QStringList
@@ -367,6 +470,21 @@ Measures::getGroup(int group)
         return groups[group];
     else
         return NULL;
+}
+
+void
+Measures::removeGroup(int group)
+{
+    if (group >= 0 && group < groups.count())
+        groups.removeAt(group);
+}
+
+void
+Measures::addGroup(MeasuresGroup* measuresGroup)
+{
+    if (!getGroupSymbols().contains(measuresGroup->getSymbol()) &&
+        !getGroupNames().contains(measuresGroup->getName()))
+        groups.append(measuresGroup);
 }
 
 QStringList

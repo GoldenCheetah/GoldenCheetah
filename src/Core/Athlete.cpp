@@ -485,7 +485,10 @@ Athlete::getWeight(QDate date, RideFile *ride)
     double weight;
 
     // daily weight first
-    weight = measures->getGroup(Measures::Body)->getFieldValue(date);
+    if (measures->getGroup(Measures::Body))
+        weight = measures->getGroup(Measures::Body)->getFieldValue(date);
+    else
+        weight = 0.0;
 
     // ride (if available)
     if (!weight && ride)

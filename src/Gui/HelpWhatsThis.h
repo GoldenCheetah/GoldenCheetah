@@ -161,6 +161,7 @@ Q_OBJECT
                  Preferences_Passwords,
                  Preferences_Appearance,
                  Preferences_Intervals,
+                 Preferences_Measures,
                  Preferences_DataFields,
                  Preferences_DataFields_Fields,
                  Preferences_DataFields_Notes_Keywords,
