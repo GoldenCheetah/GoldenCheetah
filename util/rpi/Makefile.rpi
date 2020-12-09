@@ -1,4 +1,4 @@
-SRC_DIR= ~pi/src
+SRC_DIR?= ~pi/src
 REPO_URL=git://github.com/GoldenCheetah/GoldenCheetah.git
 BRANCH_ID=release_3.5.0
 
@@ -31,11 +31,11 @@ gc/sources:
 	cd $(SRC_DIR)	;\
 	git clone $(REPO_URL) --branch $(BRANCH_ID) ;\
 	cd GoldenCheetah/qwt ;\
-	cp qwtconfig.pri.in qwtconfig.pri ;\
+	cp qwtconfig.pri.in qwtconfig.pri
 
 # Edit the necessary pieces in the config file so GC compiles in the system
 gc/config: ./gcconfig.pri.for_rpi
-	cp ./gcconfig.pri.for_rpi	$(SRC_DIR)/GoldenCheetah/src/
+	cp ./gcconfig.pri.for_rpi	$(SRC_DIR)/GoldenCheetah/src/gcconfig.pri
 
 # Let's burn some cpu (compile the sources)
 # This takes 30 minutes in a RPI 4 with 4GB and the filesystem mounted in a usb drive
@@ -45,9 +45,9 @@ gc/build:
 	cd $(SRC_DIR)/GoldenCheetah;\
 	git pull ;\
 	qmake -recursive;\
-	time make -j4 ;\
+	make -j4 ;\
 	date >> $(SRC_DIR)/GoldenCheetah/build.date.end
 
 # Create an icon in the desktop
-gc/icon: goldencheetah/GoldenCheetah.desktop
-	cat $< > ~pi/Desktop/GoldenCheetah.desktop
+gc/icon:
+	sh ./create_icon.sh $(SRC_DIR) > ~pi/Desktop/GoldenCheetah.desktop

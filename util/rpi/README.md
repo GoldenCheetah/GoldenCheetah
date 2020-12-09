@@ -16,17 +16,15 @@ Open a terminal (as user pi) and run:
 ```sh
 $ git clone https://github.com/GoldenCheetah/GoldenCheetah.git
 $ cd GoldenCheetah/util/rpi
-$ make
+$ make -f Makefile.rpi pre
 # ...
-# Wait for the processes to complete and restart the machine
+# Wait for the processes to complete and *restart* the machine
 
-$ cd GoldenCheetah/util/rpi
-$ make gc/desp gc/rules
+$ make -f Makefile.rpi gc/deps gc/rules
 # ...
-# Wait for the processes to complete and restart the machine
+# Wait for the processes to complete and *restart* the machine
 
-$ cd GoldenCheetah/util/rpi
-$ make gc/config gc/build gc/icon
+$ make -f Makefile.rpi gc/sources gc/config gc/build gc/icon
 # Wait for the processes to complete
 ```
 
