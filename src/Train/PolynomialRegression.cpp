@@ -92,7 +92,7 @@ public:
 };
 
 template <typename T, typename T_inittype>
-struct FractionalPolynomialFitter : public T {
+struct FractionalPolynomialFitter : virtual public T {
     typedef typename T::value_type T_fptype;
 
     std::array<T_fptype, 3> arr;
@@ -105,7 +105,9 @@ struct FractionalPolynomialFitter : public T {
     FractionalPolynomialFitter(const T_inittype& n, const typename T_inittype::value_type& s) : arr(), scale(s) {
         for (size_t i = 0; i < n.size(); i++) arr[i] = n[i];
     }
-    
+
+    ~FractionalPolynomialFitter() {}
+
     T_fptype Fit(T_fptype v) const {
         // Scale v, for example mph -> kph
         v = v * scale;
@@ -142,7 +144,7 @@ struct FractionalPolynomialFitter : public T {
 };
 
 template <size_t T_size, size_t T_num, typename T, typename T_inittype>
-struct RationalFitter : public T {
+struct RationalFitter : virtual public T {
     typedef typename T::value_type T_fptype;
 
     std::array<T_fptype, T_size> arr;
@@ -163,6 +165,8 @@ struct RationalFitter : public T {
             i++;
         }
     }
+
+    ~RationalFitter() {}
 
     // Compute Fit.
     // Because fitter has templated size the compiler is able to fully unroll the fit

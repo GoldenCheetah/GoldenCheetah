@@ -24,11 +24,14 @@
 template <typename T_fptype>
 struct PolyFit {
     typedef T_fptype value_type;
+    virtual ~PolyFit() = 0;
     virtual value_type Fit(value_type v) const = 0;
     virtual value_type Slope(value_type v) const = 0;
     virtual value_type Integrate(value_type from, value_type to) const = 0;
     virtual void append(std::string& s) const = 0;
 };
+
+template <typename T_fptype> PolyFit<T_fptype>::~PolyFit() {}
 
 struct PolyFitGenerator {
     // Following methods return heap allocated objects. delete when finished with them.

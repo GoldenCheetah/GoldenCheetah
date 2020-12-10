@@ -272,7 +272,7 @@ public:
         return Valid();
     }
 
-    T_PolyRegressionizer(T_fptype e = 0.1, unsigned mo = 3) : maxOrder(mo), order(0), stddev(0.), epsilon(e) {}
+    T_PolyRegressionizer(T_fptype e = 0.1, unsigned mo = 3) : stddev(0.), epsilon(e), maxOrder(mo), order(0) {}
 
     virtual T_fptype Fit(T_fptype kph)   const { return coefs.Fit(kph); }
     virtual T_fptype Slope(T_fptype kph) const { return coefs.Slope(kph); }
@@ -636,7 +636,7 @@ class T_RationalPolyRegressionizer : public T_RegressionizerBase<T> {
 
 public:
 
-    T_RationalPolyRegressionizer(T_fptype e = 0.1, unsigned mo = 3) : maxOrder(mo), stddev(-1.), epsilon(e) {}
+    T_RationalPolyRegressionizer(T_fptype e = 0.1, unsigned mo = 3) : stddev(-1.), epsilon(e), maxOrder(mo) {}
 
     // Build computes poly fit for data, then divides data by poly fitted values, then finds poly fit for those residuals.
     bool Build(const T& xy, double e) {
