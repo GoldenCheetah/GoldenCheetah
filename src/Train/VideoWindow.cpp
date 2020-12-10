@@ -36,6 +36,8 @@ VideoWindow::VideoWindow(Context *context)  :
     QHBoxLayout *layout = new QHBoxLayout();
     setChartLayout(layout);
 
+    videoSyncTimeAdjustFactor = 1.f;
+
     curPosition = 1;
 
     init = true; // assume initialisation was ok ...
@@ -252,6 +254,14 @@ void VideoWindow::resizeEvent(QResizeEvent * )
     prevPosition = mapToGlobal(pos());
 }
 
+VideoSyncFilePoint VideoWindow::VideoSyncPointAdjust(const VideoSyncFilePoint& vsfp) const
+{
+    VideoSyncFilePoint r(vsfp);
+    r.secs *= videoSyncTimeAdjustFactor;
+    r.km *= videoSyncDistanceAdjustFactor;
+    return r;
+}
+
 void VideoWindow::startPlayback()
 {
 #ifdef GC_VIDEO_VLC
@@ -281,11 +291,77 @@ void VideoWindow::startPlayback()
     mp->play();
 #endif
 
+    // Compute VideoSync unit correction factors.
+    videoSyncTimeAdjustFactor = 1.;
+    videoSyncDistanceAdjustFactor = 1.;
+    VideoSyncFile* currentVideoSyncFile = context->currentVideoSyncFile();
+    if (currentVideoSyncFile) {
+
+        // VideoSync Distance Correction.
+
+        // Adjust distance factor wrt ratio of videosync distance duration to ergfile workout duraction
+        // For example if videosync is for a route is 20 km long, and workout says it is 15km long, then
+        // videosync's distances must all be adjusted by 15 / 20.
+
+        // This commonly occurs when a gpx file is used for workout with an older
+        // tts used for videosync. Example: CH_Umbrail, or pretty much any older
+        // tacx video where tts doesn't contain location data.
+        double videoSyncDistanceMeters = currentVideoSyncFile->Distance * 1000.;
+        if (videoSyncDistanceMeters > 0.) {
+            ErgFile* currentErgFile = context->currentErgFile();
+            if (currentErgFile) {
+                double ergFileDistanceMeters = currentErgFile->Duration;
+                if (ergFileDistanceMeters > 0.) {
+                    videoSyncDistanceAdjustFactor = ergFileDistanceMeters / videoSyncDistanceMeters;
+                }
+            }
+        }
+
+        // VideoSync Time Correction.
+
+        // Videosync files will often declare a framerate that differs from its associated
+        // video's frame rate. The videosyncs declarated time points must be translated
+        // into video time. This is done by multiplying all videosync time by the
+        // videoSyncFrameAdjustFactor, which is Videosync-FrameRate / Actual-Media-FrameRate.
+
+        // The videoSyncFrameAdjustFactor is applied by loading each videosync point through the
+        // VideoSyncTimeAdjust method and using its rewritten form.
+
+        // This rewrite must wait until media load time since that is the earliest that we can
+        // query for media's actual frame rate.
+
+        // This issue occurs on almost all tacx virtual rides.
+#ifdef GC_VIDEO_VLC
+        double videoSyncFrameRate = currentVideoSyncFile->VideoFrameRate;
+        if (videoSyncFrameRate > 0.) {
+            double mediaFrameRate = libvlc_media_player_get_fps(mp);
+            if (mediaFrameRate > 0.) {
+                videoSyncTimeAdjustFactor = videoSyncFrameRate / mediaFrameRate;
+            }
+        }
+#endif
+#if defined(GC_VIDEO_QT5)
+        // QT doesn't expose media frame rate so make due with duration.
+        double videoSyncDuration = currentVideoSyncFile->Duration;
+        if (videoSyncDuration > 0) {
+            double mediaDuration = (double)mp->duration();
+            if (mediaDuration > 0) {
+                videoSyncTimeAdjustFactor = mediaDuration / videoSyncDuration;
+            }
+        }
+#endif
+    }
+
+
     showMeters();
 }
 
 void VideoWindow::stopPlayback()
 {
+    foreach(MeterWidget * p_meterWidget, m_metersWidget) {
+        p_meterWidget->hide();
+    }
+
 #ifdef GC_VIDEO_VLC
     if (!m) return; // ignore if no media selected
 
@@ -296,9 +372,9 @@ void VideoWindow::stopPlayback()
 #ifdef GC_VIDEO_QT5
     mp->stop();
 #endif
+
     foreach(MeterWidget * p_meterWidget, m_metersWidget) {
         p_meterWidget->stopPlayback();
-        p_meterWidget->hide();
     }
 }
 
@@ -524,14 +600,15 @@ void VideoWindow::telemetryUpdate(RealtimeData rtd)
         double CurrentDistance = qBound(0.0, rtd.getRouteDistance(), context->currentVideoSyncFile()->Distance);
 
         // make sure the current position is less than the new distance
-        while ((VideoSyncFiledataPoints[curPosition].km > CurrentDistance) && (curPosition > 1))
+        while ((VideoSyncPointAdjust(VideoSyncFiledataPoints[curPosition]).km > CurrentDistance) && (curPosition > 1))
             curPosition--;
-        while ((VideoSyncFiledataPoints[curPosition].km <= CurrentDistance) && (curPosition < VideoSyncFiledataPoints.count()-1))
+        while ((VideoSyncPointAdjust(VideoSyncFiledataPoints[curPosition]).km <= CurrentDistance) && (curPosition < VideoSyncFiledataPoints.count()-1))
             curPosition++;
 
         /* Create an RFP to represent where we are */
-        VideoSyncFilePoint syncPrevious = VideoSyncFiledataPoints[curPosition-1];
-        VideoSyncFilePoint syncNext = VideoSyncFiledataPoints[curPosition];
+        VideoSyncFilePoint syncPrevious = VideoSyncPointAdjust(VideoSyncFiledataPoints[curPosition-1]);
+        VideoSyncFilePoint syncNext     = VideoSyncPointAdjust(VideoSyncFiledataPoints[curPosition]);
+
         double syncKmDelta = syncNext.km - syncPrevious.km;
         double syncKphDelta = syncNext.kph - syncPrevious.kph;
         double syncTimeDelta = syncNext.secs - syncPrevious.secs;

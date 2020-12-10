@@ -170,6 +170,17 @@ class VideoWindow : public GcChartWindow
 
         void resizeEvent(QResizeEvent *);
 
+        // media data
+
+         // Support case where media fps and videosync fps disagree.
+        double videoSyncTimeAdjustFactor;
+
+        // Support case where workout distance and videosync distance disagree.
+        double videoSyncDistanceAdjustFactor;
+
+        // Adjust time in videosync file point on load.
+        VideoSyncFilePoint VideoSyncPointAdjust(const VideoSyncFilePoint& vsfp) const;
+
         // current data
         int curPosition;
         RideFilePoint rfp;
