@@ -36,7 +36,8 @@ VideoWindow::VideoWindow(Context *context)  :
     QHBoxLayout *layout = new QHBoxLayout();
     setChartLayout(layout);
 
-    videoSyncTimeAdjustFactor = 1.f;
+    videoSyncDistanceAdjustFactor = 1.;
+    videoSyncTimeAdjustFactor = 1.;
 
     curPosition = 1;
 
@@ -358,9 +359,6 @@ void VideoWindow::startPlayback()
 
 void VideoWindow::stopPlayback()
 {
-    foreach(MeterWidget * p_meterWidget, m_metersWidget) {
-        p_meterWidget->hide();
-    }
 
 #ifdef GC_VIDEO_VLC
     if (!m) return; // ignore if no media selected
@@ -375,6 +373,7 @@ void VideoWindow::stopPlayback()
 
     foreach(MeterWidget * p_meterWidget, m_metersWidget) {
         p_meterWidget->stopPlayback();
+        p_meterWidget->hide();
     }
 }
 
