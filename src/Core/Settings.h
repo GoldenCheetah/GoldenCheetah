@@ -232,6 +232,7 @@
 #define TRAIN_AUTOHIDE                  "<global-trainmode>train/autohide"
 #define TRAIN_LAPALERT                  "<global-trainmode>train/lapalert"
 #define TRAIN_USESIMULATEDSPEED         "<global-trainmode>train/usesimulatedspeed"
+#define TRAIN_USESIMULATEDHYPOXIA       "<global-trainmode>train/usesimulatedhypoxia"
 #define GC_REMOTE_START                 "<global-trainmode>remote/start"
 #define GC_REMOTE_STOP                  "<global-trainmode>remote/stop"
 #define GC_REMOTE_LAP                   "<global-trainmode>remote/lap"
@@ -340,6 +341,7 @@
 #define GC_SIM_BICYCLE_Cd                     "<athlete-preferences>sim_bicycle/Cd"
 #define GC_SIM_BICYCLE_Am2                    "<athlete-preferences>sim_bicycle/Am2"
 #define GC_SIM_BICYCLE_Tk                     "<athlete-preferences>sim_bicycle/Tk"
+#define GC_SIM_BICYCLE_ACTUALTRAINERALTITUDEM "<athlete-preferences>sim_bicycle/ActualTrainerAltitudeM"
 
 #define GC_RWGPSUSER                    "<athlete-private>rwgps/user"
 #define GC_RWGPSPASS                    "<athlete-private>rwgps/pass"

@@ -20,7 +20,142 @@
 #include "Settings.h"
 #include "Pages.h"
 #include "ErgFile.h"
+#include "MultiRegressionizer.h"
 #include "Integrator.h"
+
+const PolyFit<double>* GetAltitudeFit(unsigned maxOrder) {
+    // Aerobic Power Adjustment for Altitude
+    T_MultiRegressionizer<XYVector<double>> fit(0, maxOrder);
+
+#if 1
+    // Data from : Prediction of Critical Powerand W? in Hypoxia : Application to Work - Balance Modelling
+    //             by Nathan E.Townsend1, David S.Nichols, Philip F.Skiba, Sebastien Racinais and Julien D.Périard
+    //
+    // Data in paper doesn't exceed 4250m. Cubic equation in paper decreases slope after 5000m, which doesn't
+    // make sense, so using best fit 3rd order rational instead. Our equation continues at constant slope from
+    // 5000 - 7000m.
+    //
+    // Someday in the future we'll have more data and can simply add it to this table to automatically
+    // generate a new fit.
+    static const std::vector<std::tuple<double, double>> NathenTownsendAltitudeData =
+    {
+        std::make_tuple<double, double>(0      ,1        ),
+        std::make_tuple<double, double>(0.01   ,1        ),
+        std::make_tuple<double, double>(0.02   ,1        ),
+        std::make_tuple<double, double>(0.03   ,1        ),
+        std::make_tuple<double, double>(0.04   ,1        ),
+        std::make_tuple<double, double>(0.05   ,1        ),
+        std::make_tuple<double, double>(0.06   ,1        ),
+        std::make_tuple<double, double>(0.07   ,1        ),
+        std::make_tuple<double, double>(0.08   ,1        ),
+        std::make_tuple<double, double>(0.09   ,1        ),
+        std::make_tuple<double, double>(0.1    ,0.9996446),
+        std::make_tuple<double, double>(0.2    ,0.9964848),
+        std::make_tuple<double, double>(0.3    ,0.9930302),
+        std::make_tuple<double, double>(0.4    ,0.9892904),
+        std::make_tuple<double, double>(0.5    ,0.985275 ),
+        std::make_tuple<double, double>(0.6    ,0.9809936),
+        std::make_tuple<double, double>(0.7    ,0.9764558),
+        std::make_tuple<double, double>(0.8    ,0.9716712),
+        std::make_tuple<double, double>(0.9    ,0.9666494),
+        std::make_tuple<double, double>(1      ,0.9614   ),
+        std::make_tuple<double, double>(1.1    ,0.9559326),
+        std::make_tuple<double, double>(1.2    ,0.9502568),
+        std::make_tuple<double, double>(1.3    ,0.9443822),
+        std::make_tuple<double, double>(1.4    ,0.9383184),
+        std::make_tuple<double, double>(1.5    ,0.932075 ),
+        std::make_tuple<double, double>(1.6    ,0.9256616),
+        std::make_tuple<double, double>(1.7    ,0.9190878),
+        std::make_tuple<double, double>(1.8    ,0.9123632),
+        std::make_tuple<double, double>(1.9    ,0.9054974),
+        std::make_tuple<double, double>(2      ,0.8985   ),
+        std::make_tuple<double, double>(2.1    ,0.8913806),
+        std::make_tuple<double, double>(2.2    ,0.8841488),
+        std::make_tuple<double, double>(2.3    ,0.8768142),
+        std::make_tuple<double, double>(2.4    ,0.8693864),
+        std::make_tuple<double, double>(2.5    ,0.861875 ),
+        std::make_tuple<double, double>(2.6    ,0.8542896),
+        std::make_tuple<double, double>(2.7    ,0.8466398),
+        std::make_tuple<double, double>(2.8    ,0.8389352),
+        std::make_tuple<double, double>(2.9    ,0.8311854),
+        std::make_tuple<double, double>(3      ,0.8234   ),
+        std::make_tuple<double, double>(3.1    ,0.8155886),
+        std::make_tuple<double, double>(3.2    ,0.8077608),
+        std::make_tuple<double, double>(3.3    ,0.7999262),
+        std::make_tuple<double, double>(3.4    ,0.7920944),
+        std::make_tuple<double, double>(3.5    ,0.784275 ),
+        std::make_tuple<double, double>(3.6    ,0.7764776),
+        std::make_tuple<double, double>(3.7    ,0.7687118),
+        std::make_tuple<double, double>(3.8    ,0.7609872),
+        std::make_tuple<double, double>(3.9    ,0.7533134),
+        std::make_tuple<double, double>(4      ,0.7457   ),
+        std::make_tuple<double, double>(4.1    ,0.7381566),
+        std::make_tuple<double, double>(4.2    ,0.7306928),
+
+        // Below this line data is projected as linear.
+        std::make_tuple<double, double>(4.3    ,0.722483 ),
+        std::make_tuple<double, double>(4.4    ,0.714783 ),
+        std::make_tuple<double, double>(4.5    ,0.707083 ),
+        std::make_tuple<double, double>(4.6    ,0.699383 ),
+        std::make_tuple<double, double>(4.7    ,0.691683 ),
+        std::make_tuple<double, double>(4.8    ,0.683983 ),
+        std::make_tuple<double, double>(4.9    ,0.676283 ),
+        std::make_tuple<double, double>(5      ,0.668583 ),
+        std::make_tuple<double, double>(5.1    ,0.660883 ),
+        std::make_tuple<double, double>(5.2    ,0.653183 ),
+        std::make_tuple<double, double>(5.3    ,0.645483 ),
+        std::make_tuple<double, double>(5.4    ,0.637783 ),
+        std::make_tuple<double, double>(5.5    ,0.630083 ),
+        std::make_tuple<double, double>(5.6    ,0.622383 ),
+        std::make_tuple<double, double>(5.7    ,0.614683 ),
+        std::make_tuple<double, double>(5.8    ,0.606983 ),
+        std::make_tuple<double, double>(5.9    ,0.599283 ),
+        std::make_tuple<double, double>(6      ,0.591583 ),
+        std::make_tuple<double, double>(6.1    ,0.583883 ),
+        std::make_tuple<double, double>(6.2    ,0.576183 ),
+        std::make_tuple<double, double>(6.3    ,0.568483 ),
+        std::make_tuple<double, double>(6.4    ,0.560783 ),
+        std::make_tuple<double, double>(6.5    ,0.553083 ),
+        std::make_tuple<double, double>(6.6    ,0.545383 ),
+        std::make_tuple<double, double>(6.7    ,0.537683 ),
+        std::make_tuple<double, double>(6.8    ,0.529983 ),
+        std::make_tuple<double, double>(6.9    ,0.522283 ),
+        std::make_tuple<double, double>(7      ,0.514583 )
+    };
+
+    for (int i = 0; i < NathenTownsendAltitudeData.size(); i++) {
+        const std::tuple<double, double>& v = NathenTownsendAltitudeData.at(i);
+
+        fit.Push({ std::get<0>(v), std::get<1>(v) });
+    }
+
+    const PolyFit<double>* pf = fit.AsPolyFit();
+
+#else
+    // Closed form for current rational polynomial fit - avoids solving for least squares
+    // For if this construction is ever on a hot path.
+    const PolyFit<double>* pf = PolyFitGenerator::GetRationalPolyFit(
+        { 1.0009048349382108, 0.37214585400953015, -0.039387977741974042, 0.00069424347367219726 },
+        { 1., 0.38762014584456522 }, 1.);
+#endif
+
+    // Print table for debug or graphing
+    //for (double a = 0.; a < 7.; a += 0.1) {
+    //    qDebug() << a << "," << pf->Fit(a)<< ", " << pf->Slope(a);
+    //}
+
+    return pf;
+}
+
+double GetAltitudeAdjustmentFactor(double altitudeKM)
+{
+    // Third order rational fit to Townsend data.
+    static const PolyFit<double>* s_pf3 = GetAltitudeFit(3);
+
+    if (!s_pf3) return 1.;
+
+    return s_pf3->Fit(altitudeKM);
+}
 
 BicycleWheel::BicycleWheel(double outerR,         // outer radius in meters (for circumference)
                            double innerR,         // inner rim radius
@@ -43,7 +178,7 @@ BicycleWheel::BicycleWheel(double outerR,         // outer radius in meters (for
     m_equivalentMassKG = m_I / (outerR * outerR);
 }
 
-void Bicycle::Init(BicycleConstants constants, double riderMassKG, double bicycleMassWithoutWheelsKG, BicycleWheel frontWheel, BicycleWheel rearWheel)
+void Bicycle::Init(bool fUseSimulatedHypoxia, BicycleConstants constants, double riderMassKG, double bicycleMassWithoutWheelsKG, BicycleWheel frontWheel, BicycleWheel rearWheel)
 {
     m_constants = constants;
     m_riderMassKG = riderMassKG;
@@ -53,6 +188,8 @@ void Bicycle::Init(BicycleConstants constants, double riderMassKG, double bicycl
 
     // Precompute effective mass for KE calc here since it never changes.
     m_KEMass = (MassKG() + EquivalentMassKG());
+
+    m_useSimulatedHypoxia = fUseSimulatedHypoxia;
 
     if (m_KEMass < 0) // Should be impossible but bad if it happens.
     {
@@ -66,10 +203,17 @@ void Bicycle::Init(BicycleConstants constants, double riderMassKG, double bicycl
 Bicycle::Bicycle(Context *context, BicycleConstants constants, double riderMassKG, double bicycleMassWithoutWheelsKG, BicycleWheel frontWheel, BicycleWheel rearWheel)
 {
     Q_UNUSED(context)
-    Init(constants, riderMassKG, bicycleMassWithoutWheelsKG, frontWheel, rearWheel);
+
+    Init(true, constants, riderMassKG, bicycleMassWithoutWheelsKG, frontWheel, rearWheel);
 }
 
 Bicycle::Bicycle(Context* context)
+{
+    this->Reset(context);
+}
+
+// Reset - gather new data from athlete settings.
+void Bicycle::Reset(Context* context)
 {
     // Tolerate NULL context since used by NullTrainer for testing.
 
@@ -106,6 +250,8 @@ Bicycle::Bicycle(Context* context)
     const double rearTubeOrSealantG        = simBikeValues[SimBicyclePage::RearTubeSealantG     ];
     const double cassetteG                 = simBikeValues[SimBicyclePage::CassetteG            ];
 
+    const double actualTrainerAltitudeM    = simBikeValues[SimBicyclePage::ActualTrainerAltitudeM];
+
     const double frontWheelG = bareFrontWheelG + frontRotorG + frontSkewerG + frontTireG + frontTubeOrSealantG;
     const double frontWheelRotatingG = frontRimG + frontTireG + frontTubeOrSealantG + (frontSpokeCount * frontSpokeNippleG);
     const double frontWheelCenterG = frontWheelG - frontWheelRotatingG;
@@ -123,9 +269,12 @@ Bicycle::Bicycle(Context* context)
         simBikeValues[SimBicyclePage::Cm],
         simBikeValues[SimBicyclePage::Cd],
         simBikeValues[SimBicyclePage::Am2],
-        simBikeValues[SimBicyclePage::Tk]);
+        simBikeValues[SimBicyclePage::Tk],
+        1./GetAltitudeAdjustmentFactor(actualTrainerAltitudeM / 1000.));
 
-    Init(constants, riderMassKG, bicycleMassWithoutWheelsG / 1000., frontWheel, rearWheel);
+    bool useSimulatedHypoxia = appsettings->value(NULL, TRAIN_USESIMULATEDHYPOXIA, false).toBool();
+
+    Init(useSimulatedHypoxia, constants, riderMassKG, bicycleMassWithoutWheelsG / 1000., frontWheel, rearWheel);
 }
 
 double Bicycle::MassKG() const
@@ -278,7 +427,7 @@ double Bicycle::SampleDT()
 }
 
 // Detect and filter obvious power spikes.
-double Bicycle::FilterWattIncrease(double watts)
+double Bicycle::FilterWattIncrease(double watts, double altitudeMeters)
 {
     // Not possible to gain an imperial ton of watts in a single sample.
     static const double s_imperialWattTon = 800.;
@@ -290,6 +439,16 @@ double Bicycle::FilterWattIncrease(double watts)
         // distance - no free watts.
         watts = m_state.Watts() + s_wattGrowthLimit;
     }
+
+    // adjust power due to altitude
+    if (m_useSimulatedHypoxia) {
+        double adjustmentFactor = GetAltitudeAdjustmentFactor(altitudeMeters / 1000.);
+        
+        double newWatts = watts * adjustmentFactor * m_constants.m_AltitudeCorrectionFactor;
+
+        watts = newWatts;
+    }
+
     return watts;
 }
 
@@ -298,7 +457,7 @@ SpeedDistance
 Bicycle::SampleSpeed(BicycleSimState &nowState)
 {
     // Detect and filter obvious power spikes.
-    nowState.Watts() = FilterWattIncrease(nowState.Watts());
+    nowState.Watts() = FilterWattIncrease(nowState.Watts(), nowState.Altitude());
 
     // Record current time and return dt since last sample.
     double dt = SampleDT();
