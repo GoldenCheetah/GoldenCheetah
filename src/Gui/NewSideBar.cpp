@@ -249,8 +249,11 @@ NewSideBarItem::configChanged(qint32)
     else bg_hover = QColor(Qt::lightGray);
 
     iconNormal = QPixmap::fromImage(imageRGB(icon, fg_normal), Qt::ColorOnly|Qt::PreferDither|Qt::DiffuseAlphaDither);
+    iconNormal = iconNormal.scaled(24*dpiXFactor, 24*dpiXFactor, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
     iconSelect = QPixmap::fromImage(imageRGB(icon, fg_select), Qt::ColorOnly|Qt::PreferDither|Qt::DiffuseAlphaDither);
+    iconSelect = iconSelect.scaled(24*dpiXFactor, 24*dpiXFactor, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
     iconDisabled = QPixmap::fromImage(imageRGB(icon, fg_disabled), Qt::ColorOnly|Qt::PreferDither|Qt::DiffuseAlphaDither);
+    iconDisabled = iconDisabled.scaled(24*dpiXFactor, 24*dpiXFactor, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
 }
 
 void
