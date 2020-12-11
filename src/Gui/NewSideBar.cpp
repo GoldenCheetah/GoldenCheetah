@@ -260,7 +260,7 @@ void
 NewSideBarItem::paintEvent(QPaintEvent *)
 {
     QPainter painter(this);
-
+	
     // background is normal, unless selected or hovering
     QBrush brush(bg_normal);
     if (selected) brush = QBrush(bg_select);
