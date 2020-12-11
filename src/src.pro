@@ -14,6 +14,7 @@
 # You must configure your settings by copying from gcconfig.pri.in.
 # The file contains instructions on settings to make
 include(gcconfig.pri)
+include(QtAwesome/QtAwesome.pri)
 
 # You can also define your own local source to add to build
 HEADERS += $${LOCALHEADERS}
@@ -219,7 +220,8 @@ QMAKE_EXTRA_COMPILERS += TSQM
 ### RESOURCES
 ###==========
 
-RESOURCES = $${PWD}/Resources/application.qrc
+RESOURCES = $${PWD}/Resources/application.qrc \
+    QtAwesome/QtAwesome.qrc
 
 
 
