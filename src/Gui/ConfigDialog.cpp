@@ -64,6 +64,7 @@ ConfigDialog::ConfigDialog(QDir _home, Context *context) :
     static QIcon dataIcon(QPixmap(":/images/toolbar/data.png"));
     static QIcon metricsIcon(QPixmap(":/images/toolbar/abacus.png"));
     static QIcon intervalIcon(QPixmap(":/images/stopwatch.png"));
+    static QIcon measuresIcon(QPixmap(":/images/toolbar/main/measures.png"));
     static QIcon devicesIcon(QPixmap(":/images/devices/kickr.png"));
 
     // Setup the signal mapping so the right config
@@ -96,10 +97,14 @@ ConfigDialog::ConfigDialog(QDir _home, Context *context) :
     connect(added, SIGNAL(triggered()), iconMapper, SLOT(map()));
     iconMapper->setMapping(added, 4);
 
+    added =head->addAction(measuresIcon, tr("Measures"));
+    connect(added, SIGNAL(triggered()), iconMapper, SLOT(map()));
+    iconMapper->setMapping(added, 5);
+
 
     added =head->addAction(devicesIcon, tr("Training"));
     connect(added, SIGNAL(triggered()), iconMapper, SLOT(map()));
-    iconMapper->setMapping(added, 5);
+    iconMapper->setMapping(added, 6);
 
     // more space
     spacer = new QWidget(this);
@@ -135,6 +140,11 @@ ConfigDialog::ConfigDialog(QDir _home, Context *context) :
     HelpWhatsThis *intervalHelp = new HelpWhatsThis(interval);
     interval->setWhatsThis(intervalHelp->getWhatsThisText(HelpWhatsThis::Preferences_Intervals));
     pagesWidget->addWidget(interval);
+
+    measures = new MeasuresConfig(_home, context);
+    HelpWhatsThis *measuresHelp = new HelpWhatsThis(measures);
+    measures->setWhatsThis(intervalHelp->getWhatsThisText(HelpWhatsThis::Preferences_Measures));
+    pagesWidget->addWidget(measures);
 
     train = new TrainConfig(_home, context);
     HelpWhatsThis *trainHelp = new HelpWhatsThis(train);
@@ -209,6 +219,7 @@ void ConfigDialog::saveClicked()
     changed |= data->saveClicked();
     changed |= train->saveClicked();
     changed |= interval->saveClicked();
+    changed |= measures->saveClicked();
 
     hide();
 
@@ -313,7 +324,7 @@ qint32 DataConfig::saveClicked()
     return dataPage->saveClicked();
 }
 
-// GENERAL CONFIG
+// METRIC CONFIG
 MetricConfig::MetricConfig(QDir home, Context *context) :
     home(home), context(context)
 {
@@ -348,6 +359,7 @@ qint32 MetricConfig::saveClicked()
     return state;
 }
 
+// INTERVALS CONFIG
 IntervalConfig::IntervalConfig(QDir home, Context *context) :
     home(home), context(context)
 {
@@ -372,7 +384,31 @@ qint32 IntervalConfig::saveClicked()
     return state;
 }
 
-// GENERAL CONFIG
+// MEASURES CONFIG
+MeasuresConfig::MeasuresConfig(QDir home, Context *context) :
+    home(home), context(context)
+{
+    // the widgets
+    measuresPage = new MeasuresConfigPage(this, context);
+
+    setContentsMargins(0,0,0,0);
+    QVBoxLayout *mainLayout = new QVBoxLayout(this);
+    mainLayout->setSpacing(0);
+    mainLayout->setContentsMargins(0,0,0,0);
+
+    mainLayout->addWidget(measuresPage);
+}
+
+qint32 MeasuresConfig::saveClicked()
+{
+    qint32 state = 0;
+
+    state |= measuresPage->saveClicked();
+
+    return state;
+}
+
+// TRAIN CONFIG
 TrainConfig::TrainConfig(QDir home, Context *context) :
     home(home), context(context)
 {

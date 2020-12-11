@@ -47,7 +47,7 @@ public:
         this->originalSource = other.originalSource;
         for (int i = 0; i<MAX_MEASURES; i++) this->values[i] = other.values[i];
     }
-    virtual ~Measure() {}
+    ~Measure() {}
 
     QDateTime when;              // when was this reading taken
     QString comment;             // user commentary regarding this measurement
@@ -63,10 +63,20 @@ public:
     }
     // calculate a CRC for the Measure data - used to see if
     // data is changed in Configuration pages
-    virtual quint16 getFingerprint() const;
+    quint16 getFingerprint() const;
 
     // getdescription text for source
-    virtual QString getSourceDescription() const;
+    QString getSourceDescription() const;
+};
+
+class MeasuresField {
+
+public:
+    MeasuresField() : symbol(""), name(""), metricUnits(""), imperialUnits(""), unitsFactor(0.0), headers(QStringList()) {}
+
+    QString symbol, name, metricUnits, imperialUnits;
+    double unitsFactor;
+    QStringList headers;
 };
 
 class MeasuresGroup {
@@ -76,33 +86,44 @@ public:
     // directory and withData must be provided to access data.
     MeasuresGroup(QString symbol, QString name, QStringList symbols, QStringList names, QStringList metricUnits, QStringList imperialUnits, QList<double> unitsFactors, QList<QStringList> headers,  QDir dir=QDir(), bool withData=false);
     MeasuresGroup(QDir dir=QDir(), bool withData=false) : dir(dir), withData(withData) {}
-    virtual ~MeasuresGroup() {}
-    virtual void write();
-    virtual QList<Measure>& measures() { return measures_; }
-    virtual void setMeasures(QList<Measure>&x);
-    virtual void getMeasure(QDate date, Measure&) const;
+    ~MeasuresGroup() {}
+    void write();
+    QList<Measure>& measures() { return measures_; }
+    void setMeasures(QList<Measure>&x);
+    void getMeasure(QDate date, Measure&) const;
 
     // Common access to Measures
-    virtual QString getSymbol() const { return symbol; }
-    virtual QString getName() const { return name; }
-    virtual QStringList getFieldSymbols() const { return symbols; }
-    virtual QStringList getFieldNames() const { return names; }
-    virtual QStringList getFieldHeaders(int field) const { return headers.value(field); }
-    virtual QString getFieldUnits(int field, bool useMetricUnits=true) const { return useMetricUnits ? metricUnits.value(field) : imperialUnits.value(field); }
-    virtual QList<double> getFieldUnitsFactors() const { return unitsFactors; }
-    virtual double getFieldValue(QDate date, int field=0, bool useMetricUnits=true) const;
-    virtual QDate getStartDate() const;
-    virtual QDate getEndDate() const;
+    QString getSymbol() const { return symbol; }
+    QString getName() const { return name; }
+    MeasuresField getField(int field);
+    QStringList getFieldSymbols() const { return symbols; }
+    QStringList getFieldNames() const { return names; }
+    QStringList getFieldMetricUnits() const { return metricUnits; }
+    QStringList getFieldImperialUnits() const { return imperialUnits; }
+    QStringList getFieldHeaders(int field) const { return headers.value(field); }
+    QList<double> getFieldUnitsFactors() const { return unitsFactors; }
+
+    QString getFieldUnits(int field, bool useMetricUnits=true) const { return useMetricUnits ? metricUnits.value(field) : imperialUnits.value(field); }
+    double getFieldValue(QDate date, int field=0, bool useMetricUnits=true) const;
+    QDate getStartDate() const;
+    QDate getEndDate() const;
+
+    // Setters for config
+    void setSymbol(QString s) { symbol = s; }
+    void setName(QString n) { name = n; }
+    void addField(MeasuresField &fieldSettings);
+    void setField(int field, MeasuresField &fieldSettings);
+    void removeField(int field);
 
 protected:
     const QDir dir;
     const bool withData;
 
 private:
-    const QString symbol, name;
-    const QStringList symbols, names, metricUnits, imperialUnits;
-    const QList<double> unitsFactors;
-    const QList<QStringList> headers;
+    QString symbol, name;
+    QStringList symbols, names, metricUnits, imperialUnits;
+    QList<double> unitsFactors;
+    QList<QStringList> headers;
     QList<Measure> measures_;
 
     bool serialize(QString, QList<Measure> &);
@@ -116,10 +137,14 @@ public:
     // directory and withData must be provided to access data.
     Measures(QDir dir=QDir(), bool withData=false);
     ~Measures();
+    void saveConfig();
 
     QStringList getGroupSymbols() const;
     QStringList getGroupNames() const;
+    QList<MeasuresGroup*> getGroups() { return groups; };
     MeasuresGroup* getGroup(int group);
+    void removeGroup(int group);
+    void addGroup(MeasuresGroup* measuresGroup);
 
     enum measuresgrouptype { Body = 0, Hrv = 1 };
     typedef enum measuresgrouptype MeasuresGroupType;

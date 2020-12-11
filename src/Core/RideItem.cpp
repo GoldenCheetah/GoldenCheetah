@@ -691,7 +691,7 @@ RideItem::getWeight(int type)
 {
     // get any body measurements first
     MeasuresGroup* pBodyMeasures = context->athlete->measures->getGroup(Measures::Body);
-    double m = pBodyMeasures->getFieldValue(dateTime.date(), type);
+    double m = pBodyMeasures ? pBodyMeasures->getFieldValue(dateTime.date(), type) : 0.0;
 
     // return what was asked for!
     if (type == Measure::WeightKg) {

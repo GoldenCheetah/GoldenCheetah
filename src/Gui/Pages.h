@@ -709,4 +709,86 @@ class IntervalsPage : public QWidget
     private slots:
 };
 
+class MeasuresConfigPage : public QWidget
+{
+    Q_OBJECT
+    G_OBJECT
+
+    public:
+        MeasuresConfigPage(QWidget *parent, Context *context);
+        ~MeasuresConfigPage();
+        qint32 saveClicked();
+
+    public slots:
+
+    private:
+        Context *context;
+        Measures *measures;
+
+        QTreeWidget *measuresTable;
+        QTreeWidget *measuresFieldsTable;
+
+        QPushButton *resetMeasures, *editMeasures, *addMeasures, *removeMeasures;
+        QPushButton *editMeasuresField, *addMeasuresField, *removeMeasuresField;
+
+        void refreshMeasuresTable();
+        void refreshMeasuresFieldsTable();
+
+    private slots:
+        void measuresSelected();
+        void measuresDoubleClicked(QTreeWidgetItem *item, int column);
+        void measuresFieldDoubleClicked(QTreeWidgetItem *item, int column);
+
+        void resetMeasuresClicked();
+        void editMeasuresClicked();
+        void addMeasuresClicked();
+        void removeMeasuresClicked();
+
+        void editMeasuresFieldClicked();
+        void addMeasuresFieldClicked();
+        void removeMeasuresFieldClicked();
+};
+
+class MeasuresSettingsDialog : public QDialog
+{
+    Q_OBJECT
+
+    public:
+        MeasuresSettingsDialog(QWidget *parent, QString &symbol, QString &name);
+
+    private slots:
+        void okClicked();
+
+    private:
+        QString &symbol, &name;
+
+        QLineEdit *symbolEdit;
+        QLineEdit *nameEdit;
+
+        QPushButton *cancelButton, *okButton;
+
+};
+
+class MeasuresFieldSettingsDialog : public QDialog
+{
+    Q_OBJECT
+
+    public:
+        MeasuresFieldSettingsDialog(QWidget *parent, MeasuresField &field);
+
+    private slots:
+        void okClicked();
+
+    private:
+        MeasuresField &field;
+        QLineEdit *symbolEdit;
+        QLineEdit *nameEdit;
+        QLineEdit *metricUnitsEdit;
+        QLineEdit *imperialUnitsEdit;
+        QDoubleSpinBox *unitsFactorEdit;
+        QLineEdit *headersEdit;
+
+        QPushButton *cancelButton, *okButton;
+};
+
 #endif
