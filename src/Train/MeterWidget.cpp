@@ -622,8 +622,9 @@ void LiveMapWidget::initLiveMap(Context* context)
 void LiveMapWidget::plotNewLatLng(double dLat, double dLon)
 {
     QString code = "";
-    QString sLat = QString::number(dLat);
-    QString sLon = QString::number(dLon);
+    // these values need extended precision or place marker jumps around.
+    QString sLat = QString::number(dLat, 'g', 10);
+    QString sLon = QString::number(dLon, 'g', 10);
     QString sMapZoom = QString::number(m_Zoom);
 
     if (!routeInitialized)

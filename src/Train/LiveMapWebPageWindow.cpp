@@ -139,8 +139,9 @@ void LiveMapWebPageWindow::ergFileSelected(ErgFile* f)
     if (f && f->filename != "" )
     {
         setIsBlank(false);
-        QString startingLat = QString::number(((f->Points)[0]).lat);
-        QString startingLon = QString::number(((f->Points)[0]).lon);
+        // these values need extended precision or place marker jumps around.
+        QString startingLat = QString::number(((f->Points)[0]).lat, 'g', 10);
+        QString startingLon = QString::number(((f->Points)[0]).lon, 'g', 10);
         if (startingLat == "0" && startingLon == "0")
         {
             markerIsVisible = false;
