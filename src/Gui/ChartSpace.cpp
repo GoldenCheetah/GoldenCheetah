@@ -30,10 +30,12 @@
 #include <QJsonObject>
 #include <QJsonArray>
 #include <QJsonValue>
+#include "QtAwesome.h"
+
 
 double gl_major;
-static QIcon grayConfig, whiteConfig, accentConfig;
 ChartSpaceItemRegistry *ChartSpaceItemRegistry::_instance;
+QtAwesome* awesome;
 
 ChartSpace::ChartSpace(Context *context, int scope) :
     state(NONE), context(context), scope(scope), group(NULL), fixedZoom(0), _viewY(0),
@@ -105,6 +107,9 @@ ChartSpace::ChartSpace(Context *context, int scope) :
     configured=false;
     stale=true;
     currentRideItem=NULL;
+
+    awesome = new QtAwesome( qApp );
+    awesome->initFontAwesome();
 }
 
 // add the item
@@ -332,15 +337,26 @@ ChartSpaceItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *opt, QW
 
                 // draw the config button and make it more obvious
                 // when hovering over the card
-                painter->drawPixmap(geometry().width()-20-(ROWHEIGHT*1), 20, ROWHEIGHT*1, ROWHEIGHT*1, accentConfig.pixmap(QSize(ROWHEIGHT*1, ROWHEIGHT*1)));
-
+                int drawSize = ROWHEIGHT*1;
+                QChar chr = QChar( static_cast<int>(fa::cog) );
+                painter->setFont( awesome->font( drawSize ) );
+                painter->setPen( QColor(150,150,150) );
+                painter->drawText( QRect( QPoint(geometry().width()-20-(ROWHEIGHT*1), 20), QSize(ROWHEIGHT*1, ROWHEIGHT*1) ), chr , QTextOption( Qt::AlignCenter|Qt::AlignVCenter ) );
             } else {
-
                 // hover on card - make it more obvious there is a config button
-                painter->drawPixmap(geometry().width()-20-(ROWHEIGHT*1), 20, ROWHEIGHT*1, ROWHEIGHT*1, whiteConfig.pixmap(QSize(ROWHEIGHT*1, ROWHEIGHT*1)));
+                int drawSize = ROWHEIGHT*1;
+                QChar chr = QChar( static_cast<int>(fa::cog) );
+                painter->setFont( awesome->font( drawSize ) );
+                painter->setPen( QColor(100,100,100) );
+                painter->drawText( QRect( QPoint(geometry().width()-20-(ROWHEIGHT*1), 20), QSize(ROWHEIGHT*1, ROWHEIGHT*1) ), chr , QTextOption( Qt::AlignCenter|Qt::AlignVCenter ) );
             }
-
-        } else painter->drawPixmap(geometry().width()-20-(ROWHEIGHT*1), 20, ROWHEIGHT*1, ROWHEIGHT*1, grayConfig.pixmap(QSize(ROWHEIGHT*1, ROWHEIGHT*1)));
+        } else {
+            int drawSize = ROWHEIGHT*1;
+            QChar chr = QChar( static_cast<int>(fa::cog) );
+            painter->setFont( awesome->font( drawSize ) );
+            painter->setPen( GColor(COVERVIEWBACKGROUND).lighter(75) );
+            painter->drawText( QRect( QPoint(geometry().width()-20-(ROWHEIGHT*1), 20), QSize(ROWHEIGHT*1, ROWHEIGHT*1) ), chr , QTextOption( Qt::AlignCenter|Qt::AlignVCenter ) );
+        }
     }
 
     // thin border
@@ -381,7 +397,7 @@ ChartSpace::updateGeometry()
     group = new QParallelAnimationGroup(this);
 
     // order the items to their positions
-    qSort(items.begin(), items.end(), ChartSpaceItemSort);
+    std::sort(items.begin(), items.end(), ChartSpaceItemSort);
 
     int y=SPACING;
     int maxy = y;
@@ -470,10 +486,6 @@ ChartSpace::updateGeometry()
 void
 ChartSpace::configChanged(qint32)
 {
-    grayConfig = colouredIconFromPNG(":images/configure.png", GColor(COVERVIEWBACKGROUND).lighter(75));
-    whiteConfig = colouredIconFromPNG(":images/configure.png", QColor(100,100,100));
-    accentConfig = colouredIconFromPNG(":images/configure.png", QColor(150,150,150));
-
     // set fonts
     bigfont.setPixelSize(pixelSizeForFont(bigfont, ROWHEIGHT *2.5f));
     titlefont.setPixelSize(pixelSizeForFont(titlefont, ROWHEIGHT)); // need a bit of space

@@ -45,6 +45,7 @@
 #include <QJsonObject>
 #include <QJsonArray>
 #include <QJsonValue>
+#include "QtAwesome.h"
 
 static bool _registerItems()
 {
@@ -325,11 +326,6 @@ MetricOverviewItem::MetricOverviewItem(ChartSpace *parent, QString name, QString
     RideMetricFactory &factory = RideMetricFactory::instance();
     this->metric = const_cast<RideMetric*>(factory.rideMetric(symbol));
     if (metric) units = metric->units(GlobalContext::context()->useMetricUnits);
-
-    // prepare the gold, silver and bronze medal
-    gold = colouredPixmapFromPNG(":/images/medal.png", QColor(249,166,2)).scaledToWidth(ROWHEIGHT*2);
-    silver = colouredPixmapFromPNG(":/images/medal.png", QColor(192,192,192)).scaledToWidth(ROWHEIGHT*2);
-    bronze = colouredPixmapFromPNG(":/images/medal.png", QColor(184,115,51)).scaledToWidth(ROWHEIGHT*2);
 
     // we may plot the metric sparkline if the tile is big enough
     bool bigdot = parent->scope == ANALYSIS ? true : false;
@@ -1857,27 +1853,36 @@ RPEOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, 
 void
 MetricOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
 
+    QtAwesome* awesome;
+    awesome = new QtAwesome( qApp );
+    awesome->initFontAwesome();
     // put the medal up so all else paints over it
     if (parent->scope == OverviewScope::ANALYSIS && metric && metric->isDate() == false && rank < 4) {
 
         // paint a medal
-        QPixmap *medal;
+        QColor medalColor;
         switch(rank) {
-        case 1: medal=&gold; break;
-        case 2: medal=&silver; break;
-        default:
-        case 3: medal=&bronze; break;
+            case 1: medalColor=QColor(249,166,2); break;
+            case 2: medalColor= QColor(192,192,192); break;
+            default:
+            case 3: medalColor=QColor(184,115,51); break;
         }
 
         // draw unscaled
         painter->setClipRect(0,0,geometry().width(),geometry().height());
-        painter->drawPixmap(QPointF(ROWHEIGHT, ROWHEIGHT*2), *medal);
+
+        int drawSize = ROWHEIGHT*1;
+        QChar chr = QChar( static_cast<int>(fa::trophy) );
+        painter->setFont( awesome->font( drawSize ) );
+        painter->setPen( medalColor );
+        painter->drawText( QRect( QPoint(ROWHEIGHT*1, ROWHEIGHT*2), QSize(ROWHEIGHT*1, ROWHEIGHT*1) ), chr , QTextOption( Qt::AlignCenter|Qt::AlignVCenter ) );
+
 
         // rank
         if (beststring == tr("Career"))  painter->setPen(GColor(CPLOTMARKER));
         else painter->setPen(QPen(QColor(150,150,150)));
         painter->setFont(parent->midfont);
-        painter->drawText(QRectF(0, (ROWHEIGHT*2)+medal->height()+10, medal->width()+(ROWHEIGHT*2), ROWHEIGHT*2), beststring, Qt::AlignTop|Qt::AlignHCenter);
+        painter->drawText(QRectF(0, (ROWHEIGHT*2)+ROWHEIGHT*1+10, ROWHEIGHT*1+(ROWHEIGHT*2), ROWHEIGHT*2), beststring, Qt::AlignTop|Qt::AlignHCenter);
     }
 
     double addy = 0;
