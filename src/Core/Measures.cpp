@@ -353,7 +353,7 @@ Measures::Measures(QDir dir, bool withData) : dir(dir), withData(withData)
     QSettings config(filename, QSettings::IniFormat);
     config.setIniCodec("UTF-8"); // to allow translated names
 
-    foreach (QString group, config.childGroups()) {
+    foreach (QString group, config.value("Measures", "").toStringList()) {
 
         if (getGroupSymbols().contains(group)) continue;
 
@@ -421,6 +421,8 @@ Measures::saveConfig()
     QSettings config(filename, QSettings::IniFormat);
     config.setIniCodec("UTF-8"); // to allow translated names
     config.clear();
+
+    config.setValue("Measures", getGroupSymbols());
 
     foreach (MeasuresGroup* group, getGroups()) {
 
