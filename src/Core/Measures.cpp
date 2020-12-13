@@ -270,18 +270,22 @@ MeasuresGroup::getField(int field)
 void
 MeasuresGroup::addField(MeasuresField &fieldSettings)
 {
-    symbols.append(fieldSettings.symbol);
-    names.append(fieldSettings.name);
-    metricUnits.append(fieldSettings.metricUnits);
-    imperialUnits.append(fieldSettings.imperialUnits);
-    unitsFactors.append(fieldSettings.unitsFactor);
-    headers.append(fieldSettings.headers);
+    if (symbols.count() < MAX_MEASURES && !symbols.contains(fieldSettings.symbol) && !names.contains(fieldSettings.name)) {
+
+        symbols.append(fieldSettings.symbol);
+        names.append(fieldSettings.name);
+        metricUnits.append(fieldSettings.metricUnits);
+        imperialUnits.append(fieldSettings.imperialUnits);
+        unitsFactors.append(fieldSettings.unitsFactor);
+        headers.append(fieldSettings.headers);
+    }
 }
 
 void
 MeasuresGroup::setField(int field, MeasuresField &fieldSettings)
 {
-    if (field >= 0 && field < symbols.count()) {
+    if (field >= 0 && field < symbols.count() && (symbols[field] == fieldSettings.symbol || !symbols.contains(fieldSettings.symbol))) {
+
         symbols[field] = fieldSettings.symbol;
         names[field] = fieldSettings.name;
         metricUnits[field] = fieldSettings.metricUnits;

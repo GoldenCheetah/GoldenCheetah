@@ -72,7 +72,7 @@ public:
 class MeasuresField {
 
 public:
-    MeasuresField() : symbol(""), name(""), metricUnits(""), imperialUnits(""), unitsFactor(0.0), headers(QStringList()) {}
+    MeasuresField() : symbol(""), name(""), metricUnits(""), imperialUnits(""), unitsFactor(1.0), headers(QStringList()) {}
 
     QString symbol, name, metricUnits, imperialUnits;
     double unitsFactor;
