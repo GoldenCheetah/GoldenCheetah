@@ -1707,8 +1707,10 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
                 }
             }
 
-            // Compute speed from watts if in slope mode and simulation enabled
-            if (useSimulatedSpeed && status&RT_MODE_SLOPE) {
+            // If simulated speed is *not* checked then you get speed reported by
+            // trainer which in ergo mode will be dictated by your gear and cadence,
+            // and in slope mode is whatever the trainer happens to implement.
+            if (useSimulatedSpeed) {
                 BicycleSimState newState(rtData);
                 SpeedDistance ret = bicycle.SampleSpeed(newState);
 
