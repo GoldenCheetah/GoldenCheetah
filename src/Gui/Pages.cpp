@@ -735,11 +735,17 @@ bool deviceModel::setData(const QModelIndex &index, const QVariant &value, int r
 //
 TrainOptionsPage::TrainOptionsPage(QWidget *parent, Context *context) : QWidget(parent), context(context)
 {
-    useSimulatedSpeed = new QCheckBox(tr("Use simulated Speed in slope mode"), this);
+    useSimulatedSpeed = new QCheckBox(tr("Simulate Speed From Power"), this);
     useSimulatedSpeed->setChecked(appsettings->value(this, TRAIN_USESIMULATEDSPEED, false).toBool());
+    useSimulatedSpeed->setToolTip(tr("Simulation physics uses current athlete parameters and settings\n"
+                                     "from the virtual bicycle specifications tab. For Erg Mode workouts\n"
+                                     "the slope is assumed to be zero."));
 
     useSimulatedHypoxia = new QCheckBox(tr("Simulate Relative Hypoxia"), this);
     useSimulatedHypoxia->setChecked(appsettings->value(this, TRAIN_USESIMULATEDHYPOXIA, false).toBool());
+    useSimulatedHypoxia->setToolTip(tr("Power used by simulation is adjusted for hypoxia relative to\n"
+                                       "ActualTrainingAltitude value in virtual bicycle specifications\n"
+                                       "tab."));
 
     autoConnect = new QCheckBox(tr("Auto-connect devices in Train View"), this);
     autoConnect->setChecked(appsettings->value(this, TRAIN_AUTOCONNECT, false).toBool());
