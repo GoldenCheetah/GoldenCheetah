@@ -170,7 +170,18 @@ MeasuresCsvImport::getMeasures(MeasuresGroup *measuresGroup, QString &error, QDa
           } else {
               for (int k=0; k<fieldCount; k++)
                   if (measuresGroup->getFieldHeaders(k).contains(h)) {
-                      m.values[k] = i.toDouble(&ok);
+                      if (i.contains(":")) {
+                          // sexagesimal format
+                          double f = 1.0;
+                          foreach (QString s, i.split(":")) {
+                              m.values[k] += s.toDouble(&ok) / f;
+                              if (!ok) break;
+                              f *= 60;
+                          }
+                      } else {
+                          // decimal format
+                          m.values[k] = i.toDouble(&ok);
+                      }
                       if (!ok) {
                           error = tr("Invalid '%1' - in line %2")
                               .arg(measuresGroup->getFieldHeaders(k).join("/"))
