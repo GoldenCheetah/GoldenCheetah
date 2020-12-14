@@ -899,7 +899,7 @@ const SimBicyclePartEntry& SimBicyclePage::GetSimBicyclePartEntry(int e)
     static const SimBicyclePartEntry arr[] = {
           // SpinBox Title                              Path to athlete value                Default Value      Decimal      Tooltip                                                                              enum
         { tr("Bicycle Mass Without Wheels (g)"     )  , GC_SIM_BICYCLE_MASSWITHOUTWHEELSG,   4000,              0,           tr("Mass of everything that isn't wheels, tires, skewers...")},                       // BicycleWithoutWheelsG
-        { tr("Front Wheel Mass (g)"                )  , GC_SIM_BICYCLE_FRONTWHEELG,          739,               0,           tr("Mass of front wheel including tires and skewers...")},                            // FrontWheelG
+        { tr("Front Wheel Mass (g)"                )  , GC_SIM_BICYCLE_FRONTWHEELG,          739,               0,           tr("Mass of front wheel excluding tires and skewers...")},                            // FrontWheelG
         { tr("Front Spoke Count"                   )  , GC_SIM_BICYCLE_FRONTSPOKECOUNT,      24,                0,           tr("")},                                                                              // FrontSpokeCount
         { tr("Front Spoke & Nipple Mass - Each (g)")  , GC_SIM_BICYCLE_FRONTSPOKENIPPLEG,    5.6,               1,           tr("Mass of a single spoke and nipple, washers, etc.")},                              // FrontSpokeNippleG
         { tr("Front Rim Mass (g)"                  )  , GC_SIM_BICYCLE_FRONTRIMG,            330,               0,           tr("")},                                                                              // FrontRimG
@@ -909,7 +909,7 @@ const SimBicyclePartEntry& SimBicyclePage::GetSimBicyclePartEntry(int e)
         { tr("Front Tube or Sealant Mass (g)"      )  , GC_SIM_BICYCLE_FRONTTUBESEALANTG,    26,                0,           tr("Mass of anything inside the tire: sealant, tube...")},                            // FrontTubeSealantG
         { tr("Front Rim Outer Radius (m)"          )  , GC_SIM_BICYCLE_FRONTOUTERRADIUSM,    .35,               3,           tr("Functional outer radius of wheel, used for computing wheel circumference")},      // FrontOuterRadiusM
         { tr("Front Rim Inner Radius (m)"          )  , GC_SIM_BICYCLE_FRONTRIMINNERRADIUSM, .3,                3,           tr("Inner radius of rim, for computing wheel inertia")},                              // FrontRimInnerRadiusM
-        { tr("Rear Wheel Mass (g)"                 )  , GC_SIM_BICYCLE_REARWHEELG,           739,               0,           tr("Mass of front wheel including tires and skewers...")},                            // RearWheelG
+        { tr("Rear Wheel Mass (g)"                 )  , GC_SIM_BICYCLE_REARWHEELG,           739,               0,           tr("Mass of rear wheel excluding tires and skewers...")},                             // RearWheelG
         { tr("Rear Spoke Count"                    )  , GC_SIM_BICYCLE_REARSPOKECOUNT,       24,                0,           tr("")},                                                                              // RearSpokeCount
         { tr("Rear Spoke & Nipple Mass - Each (g)" )  , GC_SIM_BICYCLE_REARSPOKENIPPLEG,     5.6,               1,           tr("Mass of a single spoke and nipple, washers, etc.")},                              // RearSpokeNippleG
         { tr("Rear Rim Mass (g)"                   )  , GC_SIM_BICYCLE_REARRIMG,             330,               0,           tr("")},                                                                              // RearRimG
@@ -925,7 +925,7 @@ const SimBicyclePartEntry& SimBicyclePage::GetSimBicyclePartEntry(int e)
         { tr("Coefficient of drag"                 )  , GC_SIM_BICYCLE_Cd,        (1.0 - 0.0045),               5,           tr("Coefficient of drag of rider and bicycle")},                                      // Cd
         { tr("Frontal Area (m^2)"                  )  , GC_SIM_BICYCLE_Am2,                  0.5,               2,           tr("Effective frontal area of rider and bicycle")},                                   // Am2
         { tr("Temperature (K)"                     )  , GC_SIM_BICYCLE_Tk,                 293.15,              2,           tr("Temperature in kelvin, used with altitude to compute air density")},              // Tk
-        { tr("ActualTrainerAltitude (M)"           )  , GC_SIM_BICYCLE_ACTUALTRAINERALTITUDEM, 0.,              0,           tr("Actual altitude of indoor trainer, in meters")}                                   // ActualTrainerAltitudeM
+        { tr("ActualTrainerAltitude (m)"           )  , GC_SIM_BICYCLE_ACTUALTRAINERALTITUDEM, 0.,              0,           tr("Actual altitude of indoor trainer, in meters")}                                   // ActualTrainerAltitudeM
     };
 
     if (e < 0 || e >= LastPart) e = 0;
@@ -1019,7 +1019,7 @@ SimBicyclePage::SetStatsLabelArray(double )
 
     Bicycle bicycle(NULL, constants, riderMassKG, bicycleMassWithoutWheelsG / 1000., frontWheel, rearWheel);
 
-    m_StatsLabelArr[StatsLabel]              ->setText(QString(tr("------ Derived Stats -------")));
+    m_StatsLabelArr[StatsLabel]              ->setText(QString(tr("------ Derived Statistics -------")));
     m_StatsLabelArr[StatsTotalKEMass]        ->setText(QString(tr("Total KEMass:         \t%1g")).arg(bicycle.KEMass()));
     m_StatsLabelArr[StatsFrontWheelKEMass]   ->setText(QString(tr("FrontWheel KEMass:    \t%1g")).arg(bicycle.FrontWheel().KEMass() * 1000));
     m_StatsLabelArr[StatsFrontWheelMass]     ->setText(QString(tr("FrontWheel Mass:      \t%1g")).arg(bicycle.FrontWheel().MassKG() * 1000));
@@ -1030,7 +1030,6 @@ SimBicyclePage::SetStatsLabelArray(double )
     m_StatsLabelArr[StatsRearWheelEquivMass] ->setText(QString(tr("Rear Wheel EquivMass: \t%1g")).arg(bicycle.RearWheel().EquivalentMassKG() * 1000));
     m_StatsLabelArr[StatsRearWheelI]         ->setText(QString(tr("Rear Wheel I:         \t%1")).arg(bicycle.RearWheel().I()));
 }
-
 
 SimBicyclePage::SimBicyclePage(QWidget *parent, Context *context) : QWidget(parent), context(context)
 {
@@ -1044,12 +1043,11 @@ SimBicyclePage::SimBicyclePage(QWidget *parent, Context *context) : QWidget(pare
 #endif
 
     // Populate m_LabelArr and m_SpinBoxArr
-    for (int e = 0; e < LastPart; e++)
-    {
+    for (int e = 0; e < LastPart; e++) {
         AddSpecBox(e);
     }
 
-    Qt::Alignment alignment = Qt::AlignLeft | Qt::AlignVCenter;
+    Qt::Alignment alignment = Qt::AlignLeft;
 
     // Two sections. Bike mass properties are in two rows to the left.
     // Other properties like cd, ca and temp go in section to the right.
@@ -1059,45 +1057,27 @@ SimBicyclePage::SimBicyclePage(QWidget *parent, Context *context) : QWidget(pare
     int Section2Start = Section1End;
     int Section2End = BicycleParts::LastPart;
 
+    // ------------------------------------------------------------------
     // Column 0
     int column = 0;
     int row = 0;
-    for (int i = Section1Start; i < Section1End; i++) {
-        grid->addWidget(m_LabelArr[i], row, column, alignment);
-        row++;
-    }
+    grid->addWidget(new QLabel(tr("The values on this page inform the bicycle physics\n"
+                                  "models for simulating speed in trainer mode. These\n"
+                                  "values are used by smart trainers and also by the\n"
+                                  "speed simulation enabled by the 'Simulate Speed From\n"
+                                  "Power' option in the training preferences tab.")),
+                                  row, column,
+                                  4, // use 4 rows of grid
+                                  2, // span across 2 columns of grid (cols 0,2)
+                                  alignment);
 
-    // Column 1
-    column = 1;
-    row = 0;
-    for (int i = Section1Start; i < Section1End; i++) {
-        grid->addWidget(m_SpinBoxArr[i], row, column, alignment);
-        row++;
-    }
+    // Set first row +4 + 1 so there's a gap after title label.
+    int section2FirstRow = row + 5;
 
-    // Column 2
-    column = 2;
-    row = 0;
-    grid->addWidget(new QLabel("These values are used to compute correct inertia\n"
-                               "for simulated speed in trainer mode.These values\n"
-                               "only have effect when the 'Use simulated speed in\n"
-                               "slope mode' option is set on the training preferences\n"
-                               " tab."), row, column, alignment);
-
-    int section2FirstRow = row + 1;
-
-    // Now add section 2.
+    // Now add section 2 as a separate grid under above description text.
     row = section2FirstRow;
     for (int i = Section2Start; i < Section2End; i++) {
         grid->addWidget(m_LabelArr[i], row, column, alignment);
-        row++;
-    }
-
-    column++;
-
-    row = section2FirstRow;
-    for (int i = Section2Start; i < Section2End; i++) {
-        grid->addWidget(m_SpinBoxArr[i], row, column, alignment);
         row++;
     }
 
@@ -1105,7 +1085,6 @@ SimBicyclePage::SimBicyclePage(QWidget *parent, Context *context) : QWidget(pare
     // about the virtual bicycle.
 
     int statsFirstRow = row + 1;
-    column = 2;
 
     // Create Stats Labels
     for (int i = StatsLabel; i < StatsLastPart; i++) {
@@ -1117,12 +1096,40 @@ SimBicyclePage::SimBicyclePage(QWidget *parent, Context *context) : QWidget(pare
 
     row = statsFirstRow;
     for (int i = StatsLabel; i < StatsLastPart; i++) {
-        grid->addWidget(m_StatsLabelArr[i], row, column, alignment);
+        grid->addWidget(m_StatsLabelArr[i], row, column, 1, 2, alignment);
+        row++;
+    }
+
+
+    // ------------------------------------------------------------------
+    // Column 1 - physics spinboxes
+    column++;
+
+    row = section2FirstRow;
+    for (int i = Section2Start; i < Section2End; i++) {
+        grid->addWidget(m_SpinBoxArr[i], row, column, alignment);
+        row++;
+    }
+
+    // ------------------------------------------------------------------
+    // Column 2 - mass labels
+    column = 2;
+    row = 0;
+    for (int i = Section1Start; i < Section1End; i++) {
+        grid->addWidget(m_LabelArr[i], row, column, alignment);
+        row++;
+    }
+
+    // ------------------------------------------------------------------
+    // Column 3 - mass spinboxes
+    column++;
+    row = 0;
+    for (int i = Section1Start; i < Section1End; i++) {
+        grid->addWidget(m_SpinBoxArr[i], row, column, alignment);
         row++;
     }
 
     all->addLayout(grid);
-    all->addStretch();
 
     for (int i = 0; i < LastPart; i++) {
         connect(m_SpinBoxArr[i], SIGNAL(valueChanged(double)), this, SLOT(SetStatsLabelArray(double)));
