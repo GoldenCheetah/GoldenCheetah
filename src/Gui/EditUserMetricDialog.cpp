@@ -281,7 +281,8 @@ EditUserMetricDialog::setErrors(QStringList &list)
 void
 EditUserMetricDialog::enableOk()
 {
-    okButton->setEnabled(!symbol->text().isEmpty() && !name->text().isEmpty());
+    // Check symbol and name are non-empty, and "_" is not used in name.
+    okButton->setEnabled(!symbol->text().isEmpty() && !name->text().isEmpty() && !name->text().contains("_"));
 }
 
 bool
