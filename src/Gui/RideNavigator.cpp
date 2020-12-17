@@ -1108,11 +1108,14 @@ void NavigatorCellDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
 
     if ((m=rideNavigator->columnMetrics.value(columnName, NULL)) != NULL) {
 
-        // get double from sqlmodel
-        value = index.model()->data(index, Qt::DisplayRole).toString();
+        // get double from model, special case QTime to avoid default .000 msecs
+        if ((QMetaType::Type)index.model()->data(index, Qt::DisplayRole).type() == QMetaType::QTime)
+            value = index.model()->data(index, Qt::DisplayRole).toTime().toString("hh:mm:ss");
+        else
+            value = index.model()->data(index, Qt::DisplayRole).toString();
 
         // get rid of 0 its ugly
-        if (value =="nan" || value == "0" || value == "0.0" || value == "0.00") value="";
+        if (value =="nan" || value == "0" || value == "0.0" || value == "0.00" || value == "00:00:00") value="";
 
     } else {
         // is this the ride date/time ?
