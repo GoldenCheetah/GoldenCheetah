@@ -265,6 +265,7 @@ class TrainSidebar : public GcWindow
         double displayLatitude, displayLongitude, displayAltitude; // geolocation
         long load;
         double slope;
+        double resistanceNewtons;  // newtons of resistance for gradient mode.
         int displayWorkoutLap;     // which Lap in the workout are we at?
         bool lapAudioEnabled;
         bool lapAudioThisLap;

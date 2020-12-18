@@ -30,27 +30,37 @@ class FortiusController : public RealtimeController
     Q_OBJECT
 
 public:
+    static const int calibrationDurationLimit_s = 60;
+
     FortiusController (TrainSidebar *, DeviceConfiguration *);
 
     Fortius *myFortius;               // the device itself
 
-    int start();
-    int restart();                              // restart after paused
-    int pause();                                // pauses data collection, inbound telemetry is discarded
-    int stop();                                 // stops data collection thread
+    int start() override;
+    int restart() override;           // restart after paused
+    int pause() override;             // pauses data collection, inbound telemetry is discarded
+    int stop() override;              // stops data collection thread
 
-    bool find();
-    bool discover(QString);              // tell if a device is present at port passed
+    bool find() override;
+    bool discover(QString) override;  // tell if a device is present at port passed
 
 
     // telemetry push pull
-    bool doesPush(), doesPull(), doesLoad();
-    void getRealtimeData(RealtimeData &rtData);
-    void pushRealtimeData(RealtimeData &rtData);
-    void setLoad(double);
-    void setGradient(double);
-    void setMode(int);
-    void setWeight(double);
+    bool doesPush() override, doesPull() override, doesLoad() override;
+    void getRealtimeData(RealtimeData &rtData) override;
+    void pushRealtimeData(RealtimeData &rtData) override;
+    void setLoad(double) override;
+    void setGradientWithSimState(double, double, double) override;
+    void setMode(int) override;
+    void setWeight(double) override;
+
+    // calibration
+    uint8_t  getCalibrationType() override;
+    double   getCalibrationTargetSpeed() override;
+    uint8_t  getCalibrationState() override;
+    void     setCalibrationState(uint8_t state) override;
+    uint16_t getCalibrationZeroOffset() override;
+    void     resetCalibrationState() override;
 };
 
 #endif // _GC_FortiusController_h

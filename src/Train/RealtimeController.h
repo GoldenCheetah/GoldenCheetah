@@ -102,7 +102,12 @@ public:
 
     // only relevant for Computrainer like devices
     virtual void setLoad(double) { return; }
+private:
+    // This function exists to be overridden by existing drivers, but should
+    // not be called by simulation loop.
     virtual void setGradient(double) { return; }
+public:
+    virtual void setGradientWithSimState(double gradient, double, double) { setGradient(gradient); }
     virtual void setMode(int) { return; }
     virtual void setWindSpeed(double) { return; }
     virtual void setWeight(double) { return; }

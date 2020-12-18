@@ -349,7 +349,7 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
     wbalr = wbal = 0;
     load_msecs = total_msecs = lap_msecs = 0;
     displayWorkoutDistance = displayDistance = displayPower = displayHeartRate =
-    displaySpeed = displayCadence = slope = load = 0;
+    displaySpeed = displayCadence = slope = resistanceNewtons = load = 0;
     displaySMO2 = displayTHB = displayO2HB = displayHHB = 0;
     displayLRBalance = displayLTE = displayRTE = displayLPS = displayRPS = 0;
     displayLatitude = displayLongitude = displayAltitude = 0.0;
@@ -1126,7 +1126,7 @@ void TrainSidebar::Start()       // when start button is pressed
         //gui_timer->start(REFRESHRATE);
         if (status & RT_RECORDING) disk_timer->start(SAMPLERATE);
         load_period.restart();
-        if (status & RT_WORKOUT) load_timer->start(LOADRATE);
+        load_timer->start(LOADRATE);
 
 #if !defined GC_VIDEO_NONE
         mediaTree->setEnabled(false);
@@ -1151,7 +1151,7 @@ void TrainSidebar::Start()       // when start button is pressed
         //foreach(int dev, activeDevices) Devices[dev].controller->pause();
         //gui_timer->stop();
         if (status & RT_RECORDING) disk_timer->stop();
-        if (status & RT_WORKOUT) load_timer->stop();
+        load_timer->stop();
         load_msecs += load_period.restart();
 
 #if !defined GC_VIDEO_NONE
@@ -1190,6 +1190,7 @@ void TrainSidebar::Start()       // when start button is pressed
         // START!
         load = 100;
         slope = 0.0;
+        resistanceNewtons = 0.0;
 
         // Reset Speed Simulation
         bicycle.clear();
@@ -1237,9 +1238,7 @@ void TrainSidebar::Start()       // when start button is pressed
         //    Devices[dev].controller->resetCalibrationState();
         //}
 
-        if (status & RT_WORKOUT) {
-            load_timer->start(LOADRATE);      // start recording
-        }
+        load_timer->start(LOADRATE);      // start recording
 
         if (recordSelector->isChecked()) {
             setStatusFlags(RT_RECORDING);
@@ -1293,7 +1292,7 @@ void TrainSidebar::Pause()        // pause capture to recalibrate
         gui_timer->start(REFRESHRATE);
         if (status & RT_RECORDING) disk_timer->start(SAMPLERATE);
         load_period.restart();
-        if (status & RT_WORKOUT) load_timer->start(LOADRATE);
+        load_timer->start(LOADRATE);
 
 #if !defined GC_VIDEO_NONE
         mediaTree->setEnabled(false);
@@ -1312,7 +1311,7 @@ void TrainSidebar::Pause()        // pause capture to recalibrate
         setStatusFlags(RT_PAUSED);
         gui_timer->stop();
         if (status & RT_RECORDING) disk_timer->stop();
-        if (status & RT_WORKOUT) load_timer->stop();
+        load_timer->stop();
         load_msecs += load_period.restart();
 
         // enable media tree so we can change movie
@@ -1364,6 +1363,7 @@ void TrainSidebar::Stop(int deviceStatus)        // when stop button is pressed
 
     load = 0;
     slope = 0.0;
+    resistanceNewtons = 0.0;
 
     QDateTime now = QDateTime::currentDateTime();
 
@@ -1409,10 +1409,8 @@ void TrainSidebar::Stop(int deviceStatus)        // when stop button is pressed
         status &= ~RT_RECORDING;
     }
 
-    if (status & RT_WORKOUT) {
-        load_timer->stop();
-        load_msecs = 0;
-    }
+    load_timer->stop();
+    load_msecs = 0;
 
     // get back to normal after it may have been adusted by the user
     //lastAppliedIntensity=100;
@@ -1898,6 +1896,15 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
 
             rtData.setVirtualSpeed(vs);
 
+            // Compute resisting watts needed for current slope and speed. This can be used to
+            // drive resistance of trainers that only support ergo mode.
+            double speedMS = displaySpeed / 3.6;
+            double resistanceWatts = (status & RT_MODE_SLOPE)
+                ? bicycle.WattsForV(BicycleSimState(rtData), speedMS)
+                : displayPower;
+            resistanceNewtons = speedMS > 0. ? resistanceWatts / speedMS : 0;
+            rtData.setResistanceNewtons(resistanceNewtons);
+
             // W'bal on the fly
             // using Dave Waterworth's reformulation
             double TAU = appsettings->cvalue(context->athlete->cyclist, GC_WBALTAU, 300).toInt();
@@ -1914,19 +1921,6 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
 
             // go update the displays...
             context->notifyTelemetryUpdate(rtData); // signal everyone to update telemetry
-
-            // set now to current time when not using a workout
-            // but limit to almost every second (account for
-            // slight timing errors of 100ms or so)
-
-            // Do some rounding to the hundreds because as time goes by, rtData.getMsecs() drifts just below and then it does not pass the mod 1000 < 100 test
-            // For example:  msecs = 42199.  Mod 1000 = 199 versus msecs = 42000.  Mod 1000 = 0
-            // With this, it will now call tick just about every second
-            long rmsecs = round((rtData.getMsecs() + 99) / 100) * 100;
-            // Test for <= 100ms
-            if (!(status&RT_WORKOUT) && ((rmsecs % 1000) <= 100)) {
-                context->notifySetNow(rtData.getMsecs());
-            }
         }
 
 #ifdef Q_OS_MAC
@@ -2084,14 +2078,16 @@ void TrainSidebar::loadUpdate()
     load_msecs += load_period.restart();
 
     if (status&RT_MODE_ERGO) {
-        load = ergFileQueryAdapter.wattsAt(load_msecs, curLap);
+        if (context->currentErgFile()) {
+            load = ergFileQueryAdapter.wattsAt(load_msecs, curLap);
 
-        if(displayWorkoutLap != curLap)
-        {
-            context->notifyNewLap();
-            maintainLapDistanceState();
+            if (displayWorkoutLap != curLap)
+            {
+                context->notifyNewLap();
+                maintainLapDistanceState();
+            }
+            displayWorkoutLap = curLap;
         }
-        displayWorkoutLap = curLap;
 
         // we got to the end!
         if (load == -100) {
@@ -2102,21 +2098,23 @@ void TrainSidebar::loadUpdate()
         }
     } else {
 
-        // Call gradientAt to obtain current lap num.
-        ergFileQueryAdapter.gradientAt(displayWorkoutDistance * 1000., curLap);
-        
-        if(displayWorkoutLap != curLap) {
-            context->notifyNewLap();
-            maintainLapDistanceState();            
-        }
+        if (context->currentErgFile()) {
+            // Call gradientAt to obtain current lap num.
+            ergFileQueryAdapter.gradientAt(displayWorkoutDistance * 1000., curLap);
 
-        displayWorkoutLap = curLap;
+            if (displayWorkoutLap != curLap) {
+                context->notifyNewLap();
+                maintainLapDistanceState();
+            }
+
+            displayWorkoutLap = curLap;
+        }
 
         // we got to the end!
         if (slope == -100) {
             Stop(DEVICE_OK);
         } else {
-            foreach(int dev, activeDevices) Devices[dev].controller->setGradient(slope);
+            foreach(int dev, activeDevices) Devices[dev].controller->setGradientWithSimState(slope, resistanceNewtons, displaySpeed);
             context->notifySetNow(displayWorkoutDistance * 1000);
         }
     }
@@ -2143,7 +2141,7 @@ void TrainSidebar::toggleCalibration()
         load_period.restart();
 
         clearStatusFlags(RT_CALIBRATING);
-        if (status & RT_WORKOUT) load_timer->start(LOADRATE);
+        load_timer->start(LOADRATE);
         if (status & RT_RECORDING) disk_timer->start(SAMPLERATE);
         context->notifyUnPause(); // get video started again, amongst other things
 
@@ -2163,7 +2161,7 @@ void TrainSidebar::toggleCalibration()
                 if (calibrationDeviceIndex == dev) {
                     Devices[dev].controller->setCalibrationState(CALIBRATION_STATE_IDLE);
                     Devices[dev].controller->setMode(RT_MODE_SPIN);
-                    Devices[dev].controller->setGradient(slope);
+                    Devices[dev].controller->setGradientWithSimState(slope, resistanceNewtons, displaySpeed);
                 }
             }
         }
@@ -2177,7 +2175,7 @@ void TrainSidebar::toggleCalibration()
 
         setStatusFlags(RT_CALIBRATING);
         if (status & RT_RECORDING) disk_timer->stop();
-        if (status & RT_WORKOUT) load_timer->stop();
+        load_timer->stop();
         load_msecs += load_period.restart();
 
         context->notifyPause(); // get video started again, amongst other things
@@ -2193,7 +2191,7 @@ void TrainSidebar::toggleCalibration()
                 if (status&RT_MODE_ERGO)
                     Devices[dev].controller->setLoad(0);
                 else
-                    Devices[dev].controller->setGradient(0);
+                    Devices[dev].controller->setGradientWithSimState(0, 0, 0);
 
 
                 Devices[dev].controller->setMode(RT_MODE_CALIBRATE);
@@ -2422,6 +2420,62 @@ void TrainSidebar::updateCalibration()
             }
             break;
 
+        case CALIBRATION_TYPE_FORTIUS:
+
+            switch (calibrationState) {
+
+            case CALIBRATION_STATE_IDLE:
+            case CALIBRATION_STATE_PENDING:
+                break;
+
+            case CALIBRATION_STATE_REQUESTED:
+                status = QString(tr("Give the pedal a kick to start calibration...\nThe motor will run until calibration is complete."));
+                break;
+
+            case CALIBRATION_STATE_STARTING:
+                status = QString(tr("Calibrating... DO NOT PEDAL, remain seated...\nGathering enough samples to calculate average: %1"))
+                            .arg(QString::number((int16_t)calibrationZeroOffset));
+                break;
+
+            case CALIBRATION_STATE_STARTED:
+                {
+                    const double calibrationPower_W = Fortius::rawForce_to_N(calibrationZeroOffset) * Fortius::kph_to_ms(calibrationTargetSpeed);
+                    status = QString(tr("Calibrating... DO NOT PEDAL, remain seated...\nWaiting for calibration value to stabilize (max %1s): %2 (%3W @ %4kph)"))
+                            .arg(QString::number((int16_t)FortiusController::calibrationDurationLimit_s),
+                                 QString::number((int16_t)calibrationZeroOffset),
+                                 QString::number((int16_t)calibrationPower_W),
+                                 QString::number((int16_t)calibrationTargetSpeed));
+                }
+                break;
+
+            case CALIBRATION_STATE_POWER:
+            case CALIBRATION_STATE_COAST:
+                break;
+
+            case CALIBRATION_STATE_SUCCESS:
+                {
+                    const double calibrationPower_W = Fortius::rawForce_to_N(calibrationZeroOffset) * Fortius::kph_to_ms(calibrationTargetSpeed);
+                    status = QString(tr("Calibration completed successfully!\nFinal calibration value %1 (%2W @ %3kph)"))
+                            .arg(QString::number((int16_t)calibrationZeroOffset),
+                                 QString::number((int16_t)calibrationPower_W),
+                                 QString::number((int16_t)calibrationTargetSpeed));
+
+                    // No further ANT messages to set state, so must move ourselves on..
+                    if ((stateCount % 25) == 0)
+                        finishCalibration = true;
+                }
+                break;
+
+            case CALIBRATION_STATE_FAILURE:
+                status = QString(tr("Calibration failed! Do not pedal which calibration is taking place."));
+
+                // No further ANT messages to set state, so must move ourselves on..
+                if ((stateCount % 25) == 0)
+                    finishCalibration = true;
+                break;
+            }
+            break;
+ 
         }
 
         lastState = calibrationState;
@@ -2577,7 +2631,7 @@ void TrainSidebar::Higher()
         if (status&RT_MODE_ERGO)
             foreach(int dev, activeDevices) Devices[dev].controller->setLoad(load);
         else
-            foreach(int dev, activeDevices) Devices[dev].controller->setGradient(slope);
+            foreach(int dev, activeDevices) Devices[dev].controller->setGradientWithSimState(slope, resistanceNewtons, displaySpeed);
     }
 
     emit setNotification(tr("Increasing intensity.."), 2);
@@ -2603,7 +2657,7 @@ void TrainSidebar::Lower()
         if (status&RT_MODE_ERGO)
             foreach(int dev, activeDevices) Devices[dev].controller->setLoad(load);
         else
-            foreach(int dev, activeDevices) Devices[dev].controller->setGradient(slope);
+            foreach(int dev, activeDevices) Devices[dev].controller->setGradientWithSimState(slope, resistanceNewtons, displaySpeed);
     }
 
     emit setNotification(tr("Decreasing intensity.."), 2);

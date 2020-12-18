@@ -25,7 +25,7 @@ RealtimeData::RealtimeData()
 {
     name[0] = '\0';
     hr= watts= altWatts= speed= wheelRpm= load= slope= torque= 0.0;
-    cadence = distance = altDistance = virtualSpeed = wbal = 0.0;
+    cadence = distance = altDistance = virtualSpeed = wbal = resistanceNewtons = 0.0;
     lap = msecs = lapMsecs = lapMsecsRemaining = ergMsecsRemaining = 0;
     thb = smo2 = o2hb = hhb = 0.0;
     lrbalance = rte = lte = lps = rps = 0.0;
@@ -77,6 +77,10 @@ void RealtimeData::setWbal(double wbal)
 void RealtimeData::setVirtualSpeed(double speed)
 {
     this->virtualSpeed = speed;
+}
+void RealtimeData::setResistanceNewtons(double x)
+{
+    this->resistanceNewtons = x;
 }
 void RealtimeData::setWheelRpm(double wheelRpm, bool fMarkWheelRpmTime)
 {
@@ -199,6 +203,10 @@ double RealtimeData::getWbal() const
 double RealtimeData::getVirtualSpeed() const
 {
     return virtualSpeed;
+}
+double RealtimeData::getResistanceNewtons() const
+{
+    return resistanceNewtons;
 }
 double RealtimeData::getWheelRpm() const
 {
@@ -379,6 +387,9 @@ double RealtimeData::value(DataSeries series) const
     case VirtualSpeed: return virtualSpeed;
         break;
 
+    case ResistanceNewtons: return resistanceNewtons;
+        break;
+
     case Cadence: return cadence;
         break;
 
@@ -504,6 +515,7 @@ const QList<RealtimeData::DataSeries> &RealtimeData::listDataSeries()
         seriesList << AvgCadenceLap;
         seriesList << AvgHeartRateLap;
         seriesList << VirtualSpeed;
+        seriesList << ResistanceNewtons;
         seriesList << AltWatts;
         seriesList << LRBalance;
         seriesList << LapTimeRemaining;
@@ -596,6 +608,9 @@ QString RealtimeData::seriesName(DataSeries series)
         break;
 
     case VirtualSpeed: return tr("Virtual Speed");
+        break;
+
+    case ResistanceNewtons: return tr("Resistance Newtons");
         break;
 
     case Cadence: return tr("Cadence");
