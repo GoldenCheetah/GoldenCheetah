@@ -878,7 +878,10 @@ GcChartWindow::addHelper(QString name, QWidget *widget)
 void GcChartWindow:: saveImage()
 {
     QString fileName = title()+".png";
-    fileName = QFileDialog::getSaveFileName(this, tr("Save Chart Image"),  fileName, title()+".png (*.png)"+";;"+title()+".svg (*.svg)");
+    QString suffix; // what was selected?
+    fileName = QFileDialog::getSaveFileName(this, tr("Save Chart Image"),
+               fileName, title()+".png (*.png)"+";;"+title()+".svg (*.svg)",
+               &suffix, QFileDialog::DontUseNativeDialog); // native dialog hangs when threads in use (!)
 
     if (fileName.isEmpty()) return; // no filename selected, abort
 
