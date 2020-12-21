@@ -507,7 +507,7 @@ MainWindow::MainWindow(const QDir &home)
 
     uploadMenu = shareMenu->addMenu(tr("Upload Activity..."));
     syncMenu = shareMenu->addMenu(tr("Synchronise Activities..."));
-    shareMenu->addAction(tr("Get &Daily Measurements..."), this, SLOT (downloadMeasures()));
+    measuresMenu = shareMenu->addMenu(tr("Get Measures..."));
     shareMenu->addSeparator();
     checkAction = new QAction(tr("Check For New Activities"), this);
     checkAction->setShortcut(tr("Ctrl-C"));
@@ -521,6 +521,8 @@ MainWindow::MainWindow(const QDir &home)
 
     connect(uploadMenu, SIGNAL(triggered(QAction*)), this, SLOT(uploadCloud(QAction*)));
     connect(syncMenu, SIGNAL(triggered(QAction*)), this, SLOT(syncCloud(QAction*)));
+    connect(measuresMenu, SIGNAL(aboutToShow()), this, SLOT(setMeasuresMenu()));
+    connect(measuresMenu, SIGNAL(triggered(QAction*)), this, SLOT(downloadMeasures(QAction*)));
 
     HelpWhatsThis *helpShare = new HelpWhatsThis(shareMenu);
     shareMenu->setWhatsThis(helpShare->getWhatsThisText(HelpWhatsThis::MenuBar_Share));
@@ -2211,12 +2213,31 @@ MainWindow::configChanged(qint32)
  *--------------------------------------------------------------------*/
 
 void
-MainWindow::downloadMeasures()
+MainWindow::setMeasuresMenu()
 {
+    measuresMenu->clear();
+    if (currentTab->context->athlete == nullptr) return;
+    Measures *measures = currentTab->context->athlete->measures;
+    int group = 0;
+    foreach(QString name, measures->getGroupNames()) {
 
-    MeasuresDownload dialog(currentTab->context);
+        // we use the group index to identify the measures group
+        QAction *service = new QAction(NULL);
+        service->setText(name);
+        service->setData(group++);
+        measuresMenu->addAction(service);
+    }
+}
+
+void
+MainWindow::downloadMeasures(QAction *action)
+{
+    // download or import from CSV file
+    if (currentTab->context->athlete == nullptr) return;
+    Measures *measures = currentTab->context->athlete->measures;
+    int group = action->data().toInt();
+    MeasuresDownload dialog(currentTab->context, measures->getGroup(group));
     dialog.exec();
-
 }
 
 void

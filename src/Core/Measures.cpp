@@ -72,7 +72,7 @@ MeasuresGroup::MeasuresGroup(QString symbol, QString name, QStringList symbols, 
     // don't load data if not requested
     if (!withData) return;
 
-    // get measurements if the file exists
+    // get measures if the file exists
     QFile measuresFile(QString("%1/%2measures.json").arg(dir.canonicalPath()).arg(symbol.toLower()));
     if (measuresFile.exists()) {
         QList<Measure> measures;
@@ -157,7 +157,7 @@ MeasuresGroup::serialize(QString filename, QList<Measure> &data)
     if (!file.open(QFile::WriteOnly)) {
         QMessageBox msgBox;
         msgBox.setIcon(QMessageBox::Critical);
-        msgBox.setText(QObject::tr("Problem Saving HRV Measurements"));
+        msgBox.setText(QObject::tr("Problem Saving Measures"));
         msgBox.setInformativeText(QObject::tr("File: %1 cannot be opened for 'Writing'. Please check file properties.").arg(filename));
         msgBox.exec();
         return false;
@@ -206,7 +206,7 @@ MeasuresGroup::unserialize(QFile &file, QList<Measure> &data)
     if (!file.open(QFile::ReadOnly)) {
         QMessageBox msgBox;
         msgBox.setIcon(QMessageBox::Critical);
-        msgBox.setText(QObject::tr("Problem Reading HRV Measurements"));
+        msgBox.setText(QObject::tr("Problem Reading Measures"));
         msgBox.setInformativeText(QObject::tr("File: %1 cannot be opened for 'Reading'. Please check file properties.").arg(file.fileName()));
         msgBox.exec();
         return false;
@@ -220,7 +220,7 @@ MeasuresGroup::unserialize(QFile &file, QList<Measure> &data)
     if (parseError.error != QJsonParseError::NoError || document.isEmpty() || document.isNull()) {
         QMessageBox msgBox;
         msgBox.setIcon(QMessageBox::Critical);
-        msgBox.setText(QObject::tr("Problem Parsing HRV Measurements"));
+        msgBox.setText(QObject::tr("Problem Parsing Measures"));
         msgBox.setInformativeText(QObject::tr("File: %1 is not a proper JSON file. Parsing error: %2").arg(file.fileName()).arg(parseError.errorString()));
         msgBox.exec();
         return false;
