@@ -29,24 +29,16 @@
 #include <QMessageBox>
 
 
-MeasuresDownload::MeasuresDownload(Context *context) : context(context) {
+MeasuresDownload::MeasuresDownload(Context *context, MeasuresGroup *measuresGroup) : context(context), measuresGroup(measuresGroup) {
 
-    setWindowTitle(tr("Time Dependent Measures download"));
+    if (measuresGroup == nullptr) return; // avoid crashes, it should not happen
+
+    setWindowTitle(tr("%1 Measures download").arg(measuresGroup->getName()));
+
     HelpWhatsThis *help = new HelpWhatsThis(this);
     this->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::MenuBar_Tools_Download_Measures));
 
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
-
-    QLabel *measuresLabel = new QLabel(tr("Measures Group"));
-    measuresCombo = new QComboBox();
-    foreach (QString name, context->athlete->measures->getGroupNames())
-        measuresCombo->addItem(name);
-    measuresCombo->setCurrentIndex(0);
-    QHBoxLayout *measuresLayout = new QHBoxLayout;
-    measuresLayout->addWidget(measuresLabel);
-    measuresLayout->addWidget(measuresCombo);
-    measuresLayout->addStretch();
-    mainLayout->addLayout(measuresLayout);
 
     QGroupBox *groupBox1 = new QGroupBox(tr("Choose the download or import source"));
     downloadWithings = new QRadioButton(tr("Withings"));
@@ -89,7 +81,7 @@ MeasuresDownload::MeasuresDownload(Context *context) : context(context) {
     groupBox2->setLayout(vbox2);
     mainLayout->addWidget(groupBox2);
 
-    discardExistingMeasures = new QCheckBox(tr("Discard all existing measurements"), this);
+    discardExistingMeasures = new QCheckBox(tr("Discard all existing measures"), this);
     discardExistingMeasures->setChecked(false);
     mainLayout->addWidget(discardExistingMeasures);
 
@@ -110,7 +102,6 @@ MeasuresDownload::MeasuresDownload(Context *context) : context(context) {
     mainLayout->addLayout(buttonLayout);
 
 
-    connect(measuresCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(measuresChanged(int)));
     connect(downloadButton, SIGNAL(clicked()), this, SLOT(download()));
     connect(closeButton, SIGNAL(clicked()), this, SLOT(close()));
     connect(dateRangeAll, SIGNAL(toggled(bool)), this, SLOT(dateRangeAllSettingChanged(bool)));
@@ -121,8 +112,30 @@ MeasuresDownload::MeasuresDownload(Context *context) : context(context) {
     connect(downloadTP, SIGNAL(toggled(bool)), this, SLOT(downloadTPSettingChanged(bool)));
     connect(downloadCSV, SIGNAL(toggled(bool)), this, SLOT(downloadCSVSettingChanged(bool)));
 
-    // set buttons initial state
-    measuresChanged(0);
+    // don't allow options which are not authorized
+    downloadWithings->setEnabled((measuresGroup->getSymbol() == "Body") &&
+        (appsettings->cvalue(context->athlete->cyclist, GC_NOKIA_TOKEN, "").toString() !=""));
+    downloadTP->setEnabled((measuresGroup->getSymbol() == "Body") &&
+        (appsettings->cvalue(context->athlete->cyclist, GC_TODAYSPLAN_TOKEN, "").toString() != ""));
+
+    // select the default checked / based on available properties and last selection
+    int last_selection = appsettings->cvalue(context->athlete->cyclist, GC_BM_LAST_TYPE, 0).toInt();
+    bool done = false;
+    if (downloadWithings->isEnabled()) {
+        if (last_selection == 0 || last_selection == WITHINGS) {
+            downloadWithings->setChecked(true);
+            done = true;
+        }
+    }
+    if (!done && downloadTP->isEnabled()) {
+        if (last_selection == 0 || last_selection == TP) {
+            downloadTP->setChecked(true);
+            done = true;
+        }
+    }
+    if (!done) {
+        downloadCSV->setChecked(true);
+    }
 
     // set the default from "last"
     int last_timeframe = appsettings->cvalue(context->athlete->cyclist, GC_BM_LAST_TIMEFRAME, ALL).toInt();
@@ -170,41 +183,6 @@ MeasuresDownload::~MeasuresDownload() {
 }
 
 
-
-void
-MeasuresDownload::measuresChanged(int) {
-
-    // don't allow options which are not authorized
-    QString strToken =appsettings->cvalue(context->athlete->cyclist, GC_WITHINGS_TOKEN, "").toString();
-    QString strSecret= appsettings->cvalue(context->athlete->cyclist, GC_WITHINGS_SECRET, "").toString();
-
-    QString strToken2 =appsettings->cvalue(context->athlete->cyclist, GC_NOKIA_TOKEN, "").toString();
-
-    downloadWithings->setEnabled((measuresCombo->currentIndex() == 0) && (strToken2 != "" || strToken != "" || strSecret != ""));
-
-    QString token = appsettings->cvalue(context->athlete->cyclist, GC_TODAYSPLAN_TOKEN, "").toString();
-    downloadTP->setEnabled((measuresCombo->currentIndex() == 0) && (token != ""));
-
-    // select the default checked / based on available properties and last selection
-    int last_selection = appsettings->cvalue(context->athlete->cyclist, GC_BM_LAST_TYPE, 0).toInt();
-    bool done = false;
-    if (downloadWithings->isEnabled()) {
-        if (last_selection == 0 || last_selection == WITHINGS) {
-            downloadWithings->setChecked(true);
-            done = true;
-        }
-    }
-    if (!done && downloadTP->isEnabled()) {
-        if (last_selection == 0 || last_selection == TP) {
-            downloadTP->setChecked(true);
-            done = true;
-        }
-    }
-    if (!done) {
-        downloadCSV->setChecked(true);
-    }
-}
-
 void
 MeasuresDownload::download() {
 
@@ -216,7 +194,6 @@ MeasuresDownload::download() {
    progressBar->setValue(0);
 
    // do the job
-   MeasuresGroup* measuresGroup = context->athlete->measures->getGroup(measuresCombo->currentIndex());
    if (!measuresGroup) return; // it shouldn't happen, but just in case...
    QList<Measure> current = measuresGroup->measures();
    QList<Measure> measures;
@@ -248,7 +225,7 @@ MeasuresDownload::download() {
        toDate = QDateTime::currentDateTimeUtc();
    } else if (dateRangeManual->isChecked()) {
        if (manualFromDate->dateTime() > manualToDate->dateTime()) {
-           QMessageBox::warning(this, tr("Body Measurements"), tr("Invalid date range - please check your input"));
+           QMessageBox::warning(this, tr("%1 Measures").arg(measuresGroup->getName()), tr("Invalid date range - please check your input"));
            // re-activate the buttons
            downloadButton->setEnabled(true);
            closeButton->setEnabled(true);
@@ -294,7 +271,7 @@ MeasuresDownload::download() {
 
    } else {
        // handle error document in err String
-       QMessageBox::warning(this, tr("Measurements"), tr("Downloading of measurements failed with error: %1").arg(err));
+       QMessageBox::warning(this, tr("%1 Measures").arg(measuresGroup->getName()), tr("Downloading of measures failed with error: %1").arg(err));
    }
 
    // re-activate the buttons

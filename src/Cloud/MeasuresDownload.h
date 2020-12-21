@@ -39,7 +39,7 @@ class MeasuresDownload : public QDialog
     Q_OBJECT
 
 public:
-    MeasuresDownload(Context *context);
+    MeasuresDownload(Context *context, MeasuresGroup *measuresGroup);
     ~MeasuresDownload();
     static void updateMeasures(Context *context,
                                MeasuresGroup *measuresGroup,
@@ -50,7 +50,7 @@ private:
 
      Context *context;
 
-     QComboBox *measuresCombo;
+     MeasuresGroup *measuresGroup;
 
      WithingsDownload *withingsDownload;
      TodaysPlanBodyMeasures *todaysPlanBodyMeasureDownload;
@@ -88,7 +88,6 @@ private:
                     } ;
 
 private slots:
-     void measuresChanged(int);
      void download();
      void close();
      void dateRangeAllSettingChanged(bool);

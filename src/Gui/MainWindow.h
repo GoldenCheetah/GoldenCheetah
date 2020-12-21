@@ -215,7 +215,8 @@ class MainWindow : public QMainWindow
         void importWorkout();
 
         // Measures
-        void downloadMeasures();
+        void setMeasuresMenu();
+        void downloadMeasures(QAction *);
 
         // cloud
         void uploadCloud(QAction *);
@@ -299,7 +300,7 @@ class MainWindow : public QMainWindow
         QSignalMapper *tabMapper;
 
         // upload and sync menu
-        QMenu *uploadMenu, *syncMenu;
+        QMenu *uploadMenu, *syncMenu, *measuresMenu;
 
         // backup
         QMenu *backupAthleteMenu;
