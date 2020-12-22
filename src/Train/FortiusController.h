@@ -51,6 +51,23 @@ public:
     void setGradient(double);
     void setMode(int);
     void setWeight(double);
+    void setWindSpeed(double);
+    void setRollingResistance(double);
+    void setWindResistance(double);
+
+    // calibration
+    uint8_t  getCalibrationType();
+    double   getCalibrationTargetSpeed();
+    uint8_t  getCalibrationState();
+    void     setCalibrationState(uint8_t state);
+    uint16_t getCalibrationZeroOffset();
+    void     resetCalibrationState();
+
+private:
+    uint8_t  calibrationState = CALIBRATION_STATE_IDLE;
+
+    double readCurrentCalibrationValue();
+    double readCurrentSpeedValue();
 };
 
 #endif // _GC_FortiusController_h

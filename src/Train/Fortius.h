@@ -71,8 +71,13 @@
 #define DEFAULT_LOAD         100.00
 #define DEFAULT_GRADIENT     2.00
 #define DEFAULT_WEIGHT       77
-#define DEFAULT_CALIBRATION  0.00
+#define DEFAULT_CALIBRATION_ADJUST 0.00
+#define DEFAULT_CALIBRATION_VALUE  1040
 #define DEFAULT_SCALING      1.00
+
+#define DEFAULT_WIND_SPEED         0.0
+#define DEFAULT_ROLLING_RESISTANCE 0.004
+#define DEFAULT_WIND_RESISTANCE    0.51
 
 #define FT_USB_TIMEOUT      500
 
@@ -96,31 +101,36 @@ public:
     bool discover(QString deviceFilename);        // confirm CT is attached to device
 
     // SET
+    void setCalibrationValue(uint16_t value);   // set the calibration value for ERGOMODE and SSMODE
     void setLoad(double load);                  // set the load to generate in ERGOMODE
     void setGradient(double gradient);          // set the load to generate in SSMODE
     void setBrakeCalibrationFactor(double calibrationFactor);     // Impacts relationship between brake setpoint and load
     void setPowerScaleFactor(double calibrationFactor);         // Scales output power, so user can adjust to match hub or crank power meter
     void setMode(int mode);
     void setWeight(double weight);                 // set the total weight of rider + bike in kg's
+    void setWindSpeed(double);
+    void setRollingResistance(double);
+    void setWindResistance(double);
     
-    int getMode();
-    double getGradient();
-    double getLoad();
-    double getBrakeCalibrationFactor();
-    double getPowerScaleFactor();
-    double getWeight();
+    int getMode() const;
+    double getGradient() const;
+    double getLoad() const;
+    double getBrakeCalibrationFactor() const;
+    double getPowerScaleFactor() const;
+    double getWeight() const;
     
     // GET TELEMETRY AND STATUS
     // direct access to class variables is not allowed because we need to use wait conditions
     // to sync data read/writes between the run() thread and the main gui thread
-    void getTelemetry(double &power, double &heartrate, double &cadence, double &speed, double &distance, int &buttons, int &steering, int &status);
+    void getTelemetry(double &power, double& resistance, double &heartrate, double &cadence, double &speed, double &distance, int &buttons, int &steering, int &status);
 
 private:
     void run();                                 // called by start to kick off the CT comtrol thread
 
     uint8_t ERGO_Command[12],
-            SLOPE_Command[12];
-    
+            SLOPE_Command[12],
+            CALIBRATE_Command[12];
+
     // Utility and BG Thread functions
     int openPort();
     int closePort();
@@ -129,32 +139,39 @@ private:
     int sendRunCommand(int16_t pedalSensor);
     int sendOpenCommand();
     int sendCloseCommand();
-    
+    int sendCalibrateCommand();
+
     // Protocol decoding
     int readMessage();
     //void unpackTelemetry(int &b1, int &b2, int &b3, int &buttons, int &type, int &value8, int &value12);
 
     // Mutex for controlling accessing private data
-    QMutex pvars;
+    mutable QMutex pvars;
 
     // INBOUND TELEMETRY - all volatile since it is updated by the run() thread
-    volatile double devicePower;            // current output power in Watts
-    volatile double deviceHeartRate;        // current heartrate in BPM
-    volatile double deviceCadence;          // current cadence in RPM
-    volatile double deviceSpeed;            // current speed in KPH
-    volatile double deviceDistance;         // odometer in meters
-    volatile int    deviceButtons;          // Button status
-    volatile int    deviceStatus;           // Device status running, paused, disconnected
-    volatile int    deviceSteering;            // Steering angle
+    double devicePower;            // current output power in Watts
+    double deviceResistance;       // current output force in ~1/137 N
+    double deviceHeartRate;        // current heartrate in BPM
+    double deviceCadence;          // current cadence in RPM
+    double deviceSpeed;            // current speed in KPH (derived from wheel speed)
+    double deviceWheelSpeed;       // current wheel speed from device
+    double deviceDistance;         // odometer in meters
+    int    deviceButtons;          // Button status
+    int    deviceStatus;           // Device status running, paused, disconnected
+    int    deviceSteering;         // Steering angle
     
     // OUTBOUND COMMANDS - all volatile since it is updated by the GUI thread
-    volatile int mode;
-    volatile double load;
-    volatile double gradient;
-    volatile double brakeCalibrationFactor;
-    volatile double powerScaleFactor;
-    volatile double weight;
-    
+    int    mode;
+    double load;
+    double gradient;
+    double brakeCalibrationFactor;
+    double powerScaleFactor;
+    double weight;
+    double windSpeed_ms;
+    double rollingResistance;
+    double windResistance;
+    double brakeCalibrationValue;
+
     // i/o message holder
     uint8_t buf[64];
 

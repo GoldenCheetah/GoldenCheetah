@@ -26,6 +26,7 @@
 #define CALIBRATION_TYPE_ZERO_OFFSET                 0x02
 #define CALIBRATION_TYPE_ZERO_OFFSET_SRM             0x04
 #define CALIBRATION_TYPE_SPINDOWN                    0x08
+#define CALIBRATION_TYPE_FORTIUS                     0x10
 
 #define CALIBRATION_STATE_IDLE                       0x00
 #define CALIBRATION_STATE_PENDING                    0x01

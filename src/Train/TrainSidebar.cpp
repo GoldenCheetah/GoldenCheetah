@@ -2422,6 +2422,45 @@ void TrainSidebar::updateCalibration()
             }
             break;
 
+        case CALIBRATION_TYPE_FORTIUS:
+
+            switch (calibrationState) {
+
+            case CALIBRATION_STATE_IDLE:
+            case CALIBRATION_STATE_PENDING:
+            case CALIBRATION_STATE_REQUESTED:
+                break;
+
+            case CALIBRATION_STATE_STARTING:
+                status = QString(tr("Give the pedal a kick to start calibration...\nThe motor will run until calibration is complete."));
+                break;
+
+            case CALIBRATION_STATE_STARTED:
+                status = QString(tr("Calibrating... DO NOT PEDAL, remain seated...\nWaiting for calibration value to stabilize: %1")).arg(QString::number((int16_t)calibrationZeroOffset));
+                break;
+
+            case CALIBRATION_STATE_POWER:
+            case CALIBRATION_STATE_COAST:
+                break;
+
+            case CALIBRATION_STATE_SUCCESS:
+                status = QString(tr("Calibration completed successfully!\nFinal calibration value %1")).arg(QString::number((int16_t)calibrationZeroOffset));
+
+                // No further ANT messages to set state, so must move ourselves on..
+                if ((stateCount % 25) == 0)
+                    finishCalibration = true;
+                break;
+
+            case CALIBRATION_STATE_FAILURE:
+                status = QString(tr("Calibration failed! Do not pedal which calibration is taking place."));
+
+                // No further ANT messages to set state, so must move ourselves on..
+                if ((stateCount % 25) == 0)
+                    finishCalibration = true;
+                break;
+            }
+            break;
+
         }
 
         lastState = calibrationState;
