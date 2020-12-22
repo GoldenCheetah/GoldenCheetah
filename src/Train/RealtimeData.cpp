@@ -25,6 +25,7 @@ RealtimeData::RealtimeData()
 {
     name[0] = '\0';
     hr= watts= altWatts= speed= wheelRpm= load= slope= torque= 0.0;
+    deviceSpeed = simulatedSpeed = 0;
     cadence = distance = altDistance = virtualSpeed = wbal = 0.0;
     lap = msecs = lapMsecs = lapMsecsRemaining = ergMsecsRemaining = 0;
     thb = smo2 = o2hb = hhb = 0.0;
@@ -73,6 +74,14 @@ void RealtimeData::setSpeed(double speed)
 void RealtimeData::setWbal(double wbal)
 {
     this->wbal = wbal;
+}
+void RealtimeData::setDeviceSpeed(double speed)
+{
+    this->deviceSpeed = speed;
+}
+void RealtimeData::setSimulatedSpeed(double speed)
+{
+    this->simulatedSpeed = speed;
 }
 void RealtimeData::setVirtualSpeed(double speed)
 {
@@ -195,6 +204,14 @@ double RealtimeData::getSpeed() const
 double RealtimeData::getWbal() const
 {
     return wbal;
+}
+double RealtimeData::getDeviceSpeed() const
+{
+    return deviceSpeed;
+}
+double RealtimeData::getSimulatedSpeed() const
+{
+    return simulatedSpeed;
 }
 double RealtimeData::getVirtualSpeed() const
 {
@@ -376,6 +393,12 @@ double RealtimeData::value(DataSeries series) const
     case Speed: return speed;
         break;
 
+    case DeviceSpeed: return deviceSpeed;
+        break;
+
+    case SimulatedSpeed: return simulatedSpeed;
+        break;
+
     case VirtualSpeed: return virtualSpeed;
         break;
 
@@ -503,6 +526,8 @@ const QList<RealtimeData::DataSeries> &RealtimeData::listDataSeries()
         seriesList << AvgSpeedLap;
         seriesList << AvgCadenceLap;
         seriesList << AvgHeartRateLap;
+        seriesList << DeviceSpeed;
+        seriesList << SimulatedSpeed;
         seriesList << VirtualSpeed;
         seriesList << AltWatts;
         seriesList << LRBalance;
@@ -593,6 +618,12 @@ QString RealtimeData::seriesName(DataSeries series)
         break;
 
     case Speed: return tr("Speed");
+        break;
+
+    case DeviceSpeed: return tr("Device Speed");
+        break;
+
+    case SimulatedSpeed: return tr("Simulated Speed");
         break;
 
     case VirtualSpeed: return tr("Virtual Speed");

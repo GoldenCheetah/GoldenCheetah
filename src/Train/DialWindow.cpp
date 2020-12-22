@@ -237,6 +237,8 @@ DialWindow::telemetryUpdate(const RealtimeData &rtData)
         break;
 
     case RealtimeData::Speed:
+    case RealtimeData::DeviceSpeed:
+    case RealtimeData::SimulatedSpeed:
     case RealtimeData::VirtualSpeed:
         if (!GlobalContext::context()->useMetricUnits) value *= MILES_PER_KM;
         valueLabel->setText(QString("%1").arg(value, 0, 'f', 1));
@@ -648,6 +650,8 @@ void DialWindow::seriesChanged()
             break;
 
     case RealtimeData::Speed:
+    case RealtimeData::DeviceSpeed:
+    case RealtimeData::SimulatedSpeed:
     case RealtimeData::VirtualSpeed:
     case RealtimeData::AvgSpeed:
     case RealtimeData::AvgSpeedLap:
