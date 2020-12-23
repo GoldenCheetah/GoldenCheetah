@@ -928,7 +928,6 @@ void ErgFile::parseTTS()
 
         nextPoint = ((i + 1) >= pointCount) ? &ttsPoints[i] : &ttsPoints[i + 1];
 
-
         // Determine slope to next point
         double slope = 0.0;
 
@@ -967,6 +966,81 @@ void ErgFile::parseTTS()
         if (add.y > MaxWatts) MaxWatts = add.y;
 
         Points.append(add);
+    }
+
+    // There is an outlier near the end of T1956.54 Alpine Classic I that will
+    // cause 4.01m of videosync skew because it incorrectly extends max ride
+    // distance. This is caused because an outlier point near the end has a
+    // distance that exceeds the final route distance.
+    //
+    // 1
+    // 1.3
+    // 7    <--- Outlier
+    // 1.6
+    // 1.8
+    // 2
+    // -- end --
+    //
+    // When an outlier distance appears towards the end it can skew all of videosync,
+    // so its important to remove those points. In above case route distance would be
+    // seen as 7 but videosync intended max distance to be 1.3. If the '7' point is
+    // left in the entire videosync will be skewed by +5m.
+    //
+    // There are lots of complicated ways to remediate this issue but none
+    // are perfect.
+    //
+    // Approach taken here is to identify and rewrite distance of all single point
+    // outliers.
+    //
+    // We consider two sorts of outlier:
+    //
+    //   Negative Outlier:
+    //
+    //   A negative outlier is a single point that is less than both its successor
+    //   and its predecessor.
+    //
+    //   1
+    //   2
+    //   0 <- negative outlier
+    //   4
+    //   5
+    //
+    //   Postive outlier:
+    //
+    //   A positive outlier is a single point that is higher than its predecessor and
+    //   its successor, and the successor is greater than the predecessor.
+    //
+    //   1
+    //   2
+    //   5 <- positive outlier
+    //   4
+    //   6
+    //
+    //   These two cases occur on tacx tts files and can be easily and cleanly handled - so we do.
+
+    double predDistance = Points[0].x;
+    double curDistance = Points[1].x;
+    double nextDistance;
+    int count = Points.size();
+    for (int i = 1; i < count - 1; i++) {
+        nextDistance = Points[i + 1].x;
+
+        bool fIsNegativeOutlier = curDistance < predDistance && predDistance < nextDistance;
+        bool fIsPositiveOutlier = nextDistance < curDistance&& curDistance > predDistance && predDistance <= nextDistance;
+
+        if (fIsNegativeOutlier || fIsPositiveOutlier) {
+
+            double newDistance = (nextDistance + predDistance) / 2.;
+
+            qDebug() << curDistance << (fIsNegativeOutlier ? ": NegativeOutlier " : ": PositiveOutlier ") << "rewriting to " << newDistance;
+
+            curDistance = newDistance;
+
+            Points[i].x = curDistance;
+        }
+
+        predDistance = curDistance;
+        curDistance = nextDistance;
     }
 
     // Altitude is interpolated if there is slope. Actually this slope is
