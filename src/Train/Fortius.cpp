@@ -581,18 +581,16 @@ int Fortius::sendRunCommand(int16_t pedalSensor)
 {
     int retCode = 0;
 
-    {
-        Lock lock(pvars);
-
-        int mode = this->mode;
-        double gradient = this->gradient;
-        double load = this->load;
-        double weight = this->weight;
-        double brakeCalibrationFactor = this->brakeCalibrationFactor;
-        double windSpeed_ms = this->windSpeed_ms;
-        double rollingResistance = this->rollingResistance;
-        double windResistance = this->windResistance;
-    }
+    pvars.lock();
+    int mode = this->mode;
+    double gradient = this->gradient;
+    double load = this->load;
+    double weight = this->weight;
+    double brakeCalibrationFactor = this->brakeCalibrationFactor;
+    double windSpeed_ms = this->windSpeed_ms;
+    double rollingResistance = this->rollingResistance;
+    double windResistance = this->windResistance;
+    pvars.unlock();
 
     // The fortius power range only applies at high rpm. The device cannot
     // hold against the torque of high power at low rpm.
