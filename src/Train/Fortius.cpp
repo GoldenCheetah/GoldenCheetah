@@ -53,9 +53,12 @@ const static uint8_t calibrate_command[12] = {
 // From switchabl on FortAnt project, based on
 //  https://github.com/totalreverse/ttyT1941/wiki#newer-usb-1264-bytes-protocol
 //
-// Power resistance factor is 137 * 289.75 * 3.6 ~= 142905
+static const double s_resistance_to_N  = 137.0;
 static const double s_wheelSpeedFactor = 289.75;
-static const double s_powerResistanceFactor = 137 * s_wheelSpeedFactor * 3.6;
+static const double s_ms_to_kph        =   3.6;
+
+// Power resistance factor is 137 * 289.75 * 3.6 ~= 142905
+static const double s_powerResistanceFactor = s_resistance_to_N * s_wheelSpeedFactor * s_ms_to_kph;
 
 class Lock
 {
@@ -70,20 +73,20 @@ public:
  * ---------------------------------------------------------------------- */
 Fortius::Fortius(QObject *parent) : QThread(parent)
 {
-
-    devicePower = deviceResistance = deviceHeartRate = deviceCadence = deviceSpeed = deviceWheelSpeed = 0.00;
-    mode = FT_IDLE;
-    load = DEFAULT_LOAD;
-    gradient = DEFAULT_GRADIENT;
-    weight = DEFAULT_WEIGHT;
-    brakeCalibrationFactor = DEFAULT_CALIBRATION_ADJUST;
-    brakeCalibrationValue = DEFAULT_CALIBRATION_VALUE;
-    powerScaleFactor = DEFAULT_SCALING;
-    windSpeed_ms = DEFAULT_WIND_SPEED;
-    rollingResistance = DEFAULT_ROLLING_RESISTANCE;
-    windResistance = DEFAULT_WIND_RESISTANCE;
-    deviceStatus=0;
     this->parent = parent;
+
+    devicePower_W = deviceResistance_raw = deviceHeartRate_bpm = deviceCadence_rpm = deviceSpeed_kph = deviceWheelSpeed_raw = 0.00;
+    mode                   = FT_IDLE;
+    load_W                 = DEFAULT_LOAD;
+    gradient_percent       = DEFAULT_GRADIENT;
+    weight_kg              = DEFAULT_WEIGHT;
+    brakeCalibrationFactor = DEFAULT_CALIBRATION_ADJUST;
+    brakeCalibrationValue  = DEFAULT_CALIBRATION_VALUE;
+    powerScaleFactor       = DEFAULT_SCALING;
+    windSpeed_ms           = DEFAULT_WIND_SPEED;
+    rollingResistance      = DEFAULT_ROLLING_RESISTANCE;
+    windResistance         = DEFAULT_WIND_RESISTANCE;
+    deviceStatus           = 0;
 
     /* 12 byte control sequence, composed of 8 command packets
      * where the last packet sets the load. The first byte
@@ -131,14 +134,14 @@ void Fortius::setPowerScaleFactor(double powerScaleFactor)
 }
 
 // User weight used by brake in slope mode
-void Fortius::setWeight(double weight)
+void Fortius::setWeight(double weight_kg)
 {
     // need to apply range as same byte used to signify erg mode
-    if (weight < 50) weight = 50;
-    if (weight > 120) weight = 120;
+    if (weight_kg < 50)  weight_kg = 50;
+    if (weight_kg > 120) weight_kg = 120;
 
     Lock lock(pvars);
-    this->weight = weight;
+    this->weight_kg = weight_kg;
 }
 
 void
@@ -170,24 +173,24 @@ void Fortius::setCalibrationValue(uint16_t val)
 }
 
 // Load in watts when in power mode
-void Fortius::setLoad(double load)
+void Fortius::setLoad(double load_W)
 {
     // we can only do 50-1000w on a Fortius
-    if (load > 1000) load = 1000;
-    if (load < 50) load = 50;
+    if (load_W > 1000) load_W = 1000;
+    if (load_W < 50)   load_W = 50;
         
     Lock lock(pvars);
-    this->load = load;
+    this->load_W = load_W;
 }
 
 // Load as slope % when in slope mode
-void Fortius::setGradient(double gradient)
+void Fortius::setGradient(double gradient_percent)
 {
-    if (gradient > 20) gradient = 20;
-    if (gradient < -5) gradient = -5;
+    if (gradient_percent > 20) gradient_percent = 20;
+    if (gradient_percent < -5) gradient_percent = -5;
     
     Lock lock(pvars);
-    this->gradient = gradient;
+    this->gradient_percent = gradient_percent;
 }
 
 
@@ -197,20 +200,20 @@ void Fortius::setGradient(double gradient)
 void Fortius::getTelemetry(double &power, double &resistance, double &heartrate, double &cadence, double &speed, double &distance, int &buttons, int &steering, int &status)
 {
     Lock lock(pvars);
-    power = devicePower;
-    resistance = deviceResistance;
-    heartrate = deviceHeartRate;
-    cadence = deviceCadence;
-    speed = deviceSpeed;
-    distance = deviceDistance;
-    buttons = deviceButtons;
-    steering = deviceSteering;
-    status = deviceStatus;
+    power      = devicePower_W;
+    resistance = deviceResistance_raw;
+    heartrate  = deviceHeartRate_bpm;
+    cadence    = deviceCadence_rpm;
+    speed      = deviceSpeed_kph;
+    distance   = deviceDistance_m;
+    buttons    = deviceButtons_bitfield;
+    steering   = deviceSteering_deg;
+    status     = deviceStatus;
     
     // work around to ensure controller doesn't miss button press. 
     // The run thread will only set the button bits, they don't get
     // reset until the ui reads the device state
-    deviceButtons = 0; 
+    deviceButtons_bitfield = 0; 
 }
 
 int Fortius::getMode() const
@@ -222,19 +225,19 @@ int Fortius::getMode() const
 double Fortius::getLoad() const
 {
     Lock lock(pvars);
-    return load;
+    return load_W;
 }
 
 double Fortius::getGradient() const
 {
     Lock lock(pvars);
-    return gradient;
+    return gradient_percent;
 }
 
 double Fortius::getWeight() const
 {
     Lock lock(pvars);
-    return weight;
+    return weight_kg;
 }
 
 double Fortius::getBrakeCalibrationFactor() const
@@ -344,40 +347,40 @@ void Fortius::run()
     int curstatus;
 
     // variables for telemetry, copied to fields on each brake update
-    double curPower;                      // current output power in Watts
-    double curResistance;                 // current resistance in ~1/137 N
-    double curHeartRate;                  // current heartrate in BPM
-    double curCadence;                    // current cadence in RPM
-    double curSpeed;                      // current speed in KPH
-    double curWheelSpeed;                 // current wheel speed from trainer
-    // UNUSED double curDistance;                    // odometer?
-    int curButtons;                       // Button status
-    int curSteering;                    // Angle of steering controller
+    double curPower_W;                    // current output power in Watts
+    double curResistance_raw;             // current resistance in ~1/137 N
+    double curHeartRate_bpm;              // current heartrate in BPM
+    double curCadence_rpm;                // current cadence in RPM
+    double curSpeed_kph;                  // current speed in KPH
+    double curWheelSpeed_raw;             // current wheel speed from trainer
+    // UNUSED double curDistance;            // odometer?
+    int curButtons_bitfield;              // Button status
+    int curSteering_deg;                  // Angle of steering controller
     // UNUSED int curStatus;
-    uint8_t pedalSensor;                // 1 when using is cycling else 0, fed back to brake although appears unnecessary
+    uint8_t pedalSensor;                  // 1 when using is cycling else 0, fed back to brake although appears unnecessary
 
     // we need to average out power for the last second
     // since we get updates every 10ms (100hz)
-    int powerhist[10];     // last 10 values received
-    int powertot=0;        // running total
-    int powerindex=0;      // index into the powerhist array
-    for (int i=0; i<10; i++) powerhist[i]=0; 
+    // NO_SMOOTHING int powerhist[10];     // last 10 values received
+    // NO_SMOOTHING int powertot=0;        // running total
+    // NO_SMOOTHING int powerindex=0;      // index into the powerhist array
+    // NO_SMOOTHING for (int i=0; i<10; i++) powerhist[i]=0; 
                                         
     // initialise local cache & main vars
     {
         Lock lock(pvars);
 
-        // UNUSED curStatus = this->deviceStatus;
-        curPower = this->devicePower = 0;
-        curResistance = this->deviceResistance = 0;
-        curHeartRate = this->deviceHeartRate = 0;
-        curCadence = this->deviceCadence = 0;
-        curSpeed = this->deviceSpeed = 0;
-        curWheelSpeed = this->deviceWheelSpeed = 0;
-        // UNUSED curDistance = this->deviceDistance = 0;
-        curSteering = this->deviceSteering = 0;
-        curButtons = this->deviceButtons = 0;
-        pedalSensor = 0;
+        // UNUSED curStatus    = this->deviceStatus;
+        curPower_W          = this->devicePower_W = 0;
+        curResistance_raw   = this->deviceResistance_raw = 0;
+        curHeartRate_bpm    = this->deviceHeartRate_bpm = 0;
+        curCadence_rpm      = this->deviceCadence_rpm = 0;
+        curSpeed_kph        = this->deviceSpeed_kph = 0;
+        curWheelSpeed_raw   = this->deviceWheelSpeed_raw = 0;
+        // UNUSED curDistance  = this->deviceDistance_m = 0;
+        curSteering_deg     = this->deviceSteering_deg = 0;
+        curButtons_bitfield = this->deviceButtons_bitfield = 0;
+        pedalSensor         = 0;
     }
 
     // open the device
@@ -440,16 +443,16 @@ void Fortius::run()
                 // buf[47] varies even when the system is idle
                 
                 // buttons
-                curButtons = buf[13];
+                curButtons_bitfield = buf[13];
 
                 // steering angle
-                curSteering = buf[18] | (buf[19] << 8);
+                curSteering_deg = buf[18] | (buf[19] << 8);
                 
                 // update public fields
                 {
                     Lock lock(pvars);
-                    deviceButtons |= curButtons;    // workaround to ensure controller doesn't miss button pushes
-                    deviceSteering = curSteering;
+                    deviceButtons_bitfield |= curButtons_bitfield;    // workaround to ensure controller doesn't miss button pushes
+                    deviceSteering_deg = curSteering_deg;
                 }
             }
             if (actualLength >= 48) {
@@ -462,39 +465,39 @@ void Fortius::run()
                 
                 // UNUSED curDistance = (buf[28] | (buf[29] << 8) | (buf[30] << 16) | (buf[31] << 24)) / 16384.0;
 
-                curCadence = buf[44];
+                curCadence_rpm = buf[44];
 				
                 // speed
 
-                curWheelSpeed = (double)(qFromLittleEndian<quint16>(&buf[32]));
-                curSpeed = curWheelSpeed / s_wheelSpeedFactor;
+                curWheelSpeed_raw = (double)(qFromLittleEndian<quint16>(&buf[32]));
+                curSpeed_kph = curWheelSpeed_raw / s_wheelSpeedFactor;
 
                 // Power is torque * wheelspeed - adjusted by device resistance factor.
-                curResistance = (qFromLittleEndian<qint16>(&buf[38]));
-                curPower = curResistance * curWheelSpeed / s_powerResistanceFactor;
-                if (mode != FT_CALIBRATE && curPower < 0.0) curPower = 0.0;  // brake power can be -ve when coasting. 
+                curResistance_raw = (qFromLittleEndian<qint16>(&buf[38]));
+                curPower_W = curResistance_raw * curWheelSpeed_raw / s_powerResistanceFactor;
+                if (mode != FT_CALIBRATE && curPower_W < 0.0) curPower_W = 0.0;  // brake power can be -ve when coasting. 
                 
                 // average power over last 10 readings
-                powertot += curPower;
-                powertot -= powerhist[powerindex];
-                powerhist[powerindex] = curPower;
+                // NO_SMOOTHING powertot += curPower_W;
+                // NO_SMOOTHING powertot -= powerhist[powerindex];
+                // NO_SMOOTHING powerhist[powerindex] = curPower_W;
 
-                curPower = powertot / 10;
-                powerindex = (powerindex == 9) ? 0 : powerindex+1; 
+                // NO_SMOOTHING curPower_W = powertot / 10;
+                // NO_SMOOTHING powerindex = (powerindex == 9) ? 0 : powerindex+1; 
 
-                curPower *= powerScaleFactor; // apply scale factor
+                curPower_W *= powerScaleFactor; // apply scale factor
                 
-                curHeartRate = buf[12];
+                curHeartRate_bpm = buf[12];
 
                 // update public fields
                 {
                     Lock lock(pvars);
-                    deviceSpeed = curSpeed;
-                    deviceWheelSpeed = curWheelSpeed;
-                    deviceCadence = curCadence;
-                    deviceHeartRate = curHeartRate;
-                    devicePower = curPower;
-                    deviceResistance = curResistance;
+                    deviceSpeed_kph      = curSpeed_kph;
+                    deviceWheelSpeed_raw = curWheelSpeed_raw;
+                    deviceCadence_rpm    = curCadence_rpm;
+                    deviceHeartRate_bpm  = curHeartRate_bpm;
+                    devicePower_W        = curPower_W;
+                    deviceResistance_raw = curResistance_raw;
                 }
             }
         }
@@ -583,9 +586,9 @@ int Fortius::sendRunCommand(int16_t pedalSensor)
 
     pvars.lock();
     int mode = this->mode;
-    double gradient = this->gradient;
-    double load = this->load;
-    double weight = this->weight;
+    double gradient_percent = this->gradient_percent;
+    double load_W = this->load_W;
+    double weight_kg = this->weight_kg;
     double brakeCalibrationFactor = this->brakeCalibrationFactor;
     double windSpeed_ms = this->windSpeed_ms;
     double rollingResistance = this->rollingResistance;
@@ -599,9 +602,9 @@ int Fortius::sendRunCommand(int16_t pedalSensor)
     // you should use a higher gear to drive trainer faster.
     static const auto LimitResistanceAtLowSpeed = [&](double r)
     {
-        if (this->deviceSpeed <= 10 && r >= 6000)
+        if (this->deviceSpeed_kph <= 10 && r >= 6000)
         {
-            r = 1500 + (this->deviceSpeed * 300);
+            r = 1500 + (this->deviceSpeed_kph * 300);
         }
         r = std::min<double>(SHRT_MAX, r);
         return r;
@@ -609,9 +612,9 @@ int Fortius::sendRunCommand(int16_t pedalSensor)
 
     if (mode == FT_ERGOMODE)
     {
-		//qDebug() << "send load " << load;
+		//qDebug() << "send load_W " << load_W;
 		
-        const double resistance = load * (s_powerResistanceFactor / this->deviceWheelSpeed);
+        const double resistance = load_W * (s_powerResistanceFactor / this->deviceWheelSpeed_raw);
         const double adjusted_resistance = LimitResistanceAtLowSpeed(resistance);
         qToLittleEndian<int16_t>((int16_t)adjusted_resistance, &ERGO_Command[4]);
         ERGO_Command[6] = pedalSensor;
@@ -622,24 +625,24 @@ int Fortius::sendRunCommand(int16_t pedalSensor)
     }
     else if (mode == FT_SSMODE)
     {
-        const double v_ms       = this->deviceSpeed / 3.6;
+        const double v_ms       = this->deviceSpeed_kph / 3.6;
 
-        const double Froll      = rollingResistance * weight * 9.81;
+        const double Froll      = rollingResistance * weight_kg * 9.81;
         const double Fair       = 0.5 * windResistance * (v_ms + windSpeed_ms) * abs(v_ms + windSpeed_ms) * 1.0;
-        const double Fslope     = gradient/100.0 * weight * 9.81;
+        const double Fslope     = gradient_percent/100.0 * weight_kg * 9.81;
 
         const double Prequired  = v_ms * (Froll + Fair + Fslope);
-        const double resistance = Prequired * (s_powerResistanceFactor / this->deviceWheelSpeed);
+        const double resistance = Prequired * (s_powerResistanceFactor / this->deviceWheelSpeed_raw);
         const double adjusted_resistance = LimitResistanceAtLowSpeed(resistance);
 
         qToLittleEndian<int16_t>((int16_t)adjusted_resistance, &SLOPE_Command[4]);
         SLOPE_Command[6] = pedalSensor;
-        SLOPE_Command[9] = (unsigned int)weight;
+        SLOPE_Command[9] = (unsigned int)weight_kg;
         
         qToLittleEndian<int16_t>((int16_t)(130 * brakeCalibrationFactor + this->brakeCalibrationValue), &SLOPE_Command[10]);
         
         retCode = rawWrite(SLOPE_Command, 12);
-        // qDebug() << "Send Gradient " << gradient << ", Weight " << weight << ", Command " << QByteArray((const char *)SLOPE_Command, 12).toHex(':');
+        // qDebug() << "Send Gradient " << gradient_percent << ", Weight " << weight_kg << ", Command " << QByteArray((const char *)SLOPE_Command, 12).toHex(':');
     }
     else if (mode == FT_IDLE)
     {

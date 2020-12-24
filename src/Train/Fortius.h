@@ -58,7 +58,7 @@
 #define FT_SSMODE      0x02
 #define FT_CALIBRATE   0x04
 
-/* Buttons */
+/* Buttons_bitfield */
 #define FT_PLUS        0x04
 #define FT_MINUS       0x02
 #define FT_CANCEL      0x08
@@ -102,15 +102,15 @@ public:
 
     // SET
     void setCalibrationValue(uint16_t value);   // set the calibration value for ERGOMODE and SSMODE
-    void setLoad(double load);                  // set the load to generate in ERGOMODE
-    void setGradient(double gradient);          // set the load to generate in SSMODE
+    void setLoad(double load_W);                // set the load to generate in ERGOMODE
+    void setGradient(double gradient_percent);  // set the load to generate in SSMODE
     void setBrakeCalibrationFactor(double calibrationFactor);     // Impacts relationship between brake setpoint and load
     void setPowerScaleFactor(double calibrationFactor);         // Scales output power, so user can adjust to match hub or crank power meter
     void setMode(int mode);
-    void setWeight(double weight);                 // set the total weight of rider + bike in kg's
-    void setWindSpeed(double);
-    void setRollingResistance(double);
-    void setWindResistance(double);
+    void setWeight(double weight_kg);           // set the total weight of rider + bike in kg's, for power calculation and virtual flywheel in SSMODE
+    void setWindSpeed(double);                  // set the wind speed for power calculation in SSMODE
+    void setRollingResistance(double);          // set the rolling resistance coefficient for power calculation in SSMODE
+    void setWindResistance(double);             // set the wind resistance coefficient for power calculation in SSMODE
     
     int getMode() const;
     double getGradient() const;
@@ -149,24 +149,24 @@ private:
     mutable QMutex pvars;
 
     // INBOUND TELEMETRY - all volatile since it is updated by the run() thread
-    double devicePower;            // current output power in Watts
-    double deviceResistance;       // current output force in ~1/137 N
-    double deviceHeartRate;        // current heartrate in BPM
-    double deviceCadence;          // current cadence in RPM
-    double deviceSpeed;            // current speed in KPH (derived from wheel speed)
-    double deviceWheelSpeed;       // current wheel speed from device
-    double deviceDistance;         // odometer in meters
-    int    deviceButtons;          // Button status
+    double devicePower_W;          // current output power in Watts
+    double deviceResistance_raw;   // current output force in ~1/137 N
+    double deviceHeartRate_bpm;    // current heartrate in BPM
+    double deviceCadence_rpm;      // current cadence in RPM
+    double deviceSpeed_kph;        // current speed in KPH (derived from wheel speed)
+    double deviceWheelSpeed_raw;   // current wheel speed from device
+    double deviceDistance_m;       // odometer in meters
+    int    deviceButtons_bitfield; // Button status
     int    deviceStatus;           // Device status running, paused, disconnected
-    int    deviceSteering;         // Steering angle
+    int    deviceSteering_deg;     // Steering angle
     
     // OUTBOUND COMMANDS - all volatile since it is updated by the GUI thread
     int    mode;
-    double load;
-    double gradient;
+    double load_W;
+    double gradient_percent;
     double brakeCalibrationFactor;
     double powerScaleFactor;
-    double weight;
+    double weight_kg;
     double windSpeed_ms;
     double rollingResistance;
     double windResistance;
