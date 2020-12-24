@@ -150,11 +150,10 @@ private:
 
     // INBOUND TELEMETRY - all volatile since it is updated by the run() thread
     double devicePower_W;          // current output power in Watts
-    double deviceResistance_raw;   // current output force in ~1/137 N
+    double deviceForce_N;          // current output force N
     double deviceHeartRate_bpm;    // current heartrate in BPM
     double deviceCadence_rpm;      // current cadence in RPM
-    double deviceSpeed_kph;        // current speed in KPH (derived from wheel speed)
-    double deviceWheelSpeed_raw;   // current wheel speed from device
+    double deviceSpeed_ms;         // current speed in m/s
     double deviceDistance_m;       // odometer in meters
     int    deviceButtons_bitfield; // Button status
     int    deviceStatus;           // Device status running, paused, disconnected
