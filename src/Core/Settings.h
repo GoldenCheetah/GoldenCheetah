@@ -149,6 +149,7 @@
 #define GC_BIKESCOREMODE                    "<global-general>bikeScoreMode"
 #define GC_WARNCONVERT                  "<global-general>warnconvert"
 #define GC_WARNEXIT                     "<global-general>warnexit"
+#define GC_OPENLASTATHLETE              "<global-general>openlastathlete"
 #define GC_HIST_BIN_WIDTH               "<global-general>histogamWindow/binWidth"
 #define GC_WORKOUTDIR                   "<global-general>workoutDir"                         // used for Workouts and Videosyn files
 #define GC_LINEWIDTH                    "<global-general>linewidth"

@@ -87,7 +87,6 @@ class GeneralPage : public QWidget
         QCheckBox *metricRunPace, *metricSwimPace;
 
     public slots:
-        void browseWorkoutDir();
         void browseAthleteDir();
 #ifdef GC_WANT_PYTHON
         void browsePythonDir();
@@ -105,6 +104,7 @@ class GeneralPage : public QWidget
         QComboBox *wbalForm;
         QCheckBox *garminSmartRecord;
         QCheckBox *warnOnExit;
+        QCheckBox *openLastAthlete;
 #ifdef GC_WANT_HTTP
         QCheckBox *startHttp;
 #endif
@@ -118,8 +118,6 @@ class GeneralPage : public QWidget
         QLineEdit *garminHWMarkedit;
         QLineEdit *hystedit;
         QLineEdit *athleteDirectory;
-        QLineEdit *workoutDirectory;
-        QPushButton *workoutBrowseButton;
         QPushButton *athleteBrowseButton;
 
 #ifdef GC_WANT_PYTHON
@@ -134,7 +132,6 @@ class GeneralPage : public QWidget
 #endif
         QLabel *langLabel;
         QLabel *warningLabel;
-        QLabel *workoutLabel;
         QLabel *athleteLabel;
 
         struct {
@@ -227,8 +224,14 @@ class TrainOptionsPage : public QWidget
         TrainOptionsPage(QWidget *parent, Context *context);
         qint32 saveClicked();
 
+    public slots:
+        void browseWorkoutDir();
+
     private:
         Context     *context;
+        QLabel      *workoutLabel;
+        QLineEdit   *workoutDirectory;
+        QPushButton *workoutBrowseButton;
         QCheckBox   *useSimulatedSpeed;
         QCheckBox   *useSimulatedHypoxia;
         QCheckBox   *multiCheck;
