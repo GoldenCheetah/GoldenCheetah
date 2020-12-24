@@ -185,14 +185,20 @@ GeneralPage::GeneralPage(Context *context) : context(context)
     configLayout->addWidget(warnOnExit, 8,1, Qt::AlignLeft);
 
     //
+    // Open last Athlete
+    openLastAthlete = new QCheckBox(tr("Start with last opened Athlete"), this);
+    openLastAthlete->setChecked(appsettings->value(NULL, GC_OPENLASTATHLETE, true).toBool());
+    configLayout->addWidget(openLastAthlete, 9,1, Qt::AlignLeft);
+
+    //
     // Run API web services when running
     //
-    int offset=0;
+    int offset=1;
 #ifdef GC_WANT_HTTP
-    offset += 1;
     startHttp = new QCheckBox(tr("Enable API Web Services"), this);
     startHttp->setChecked(appsettings->value(NULL, GC_START_HTTP, false).toBool());
-    configLayout->addWidget(startHttp, 9,1, Qt::AlignLeft);
+    configLayout->addWidget(startHttp, 9+offset,1, Qt::AlignLeft);
+    offset += 1;
 #endif
 #ifdef GC_WANT_R
     embedR = new QCheckBox(tr("Enable R"), this);
@@ -233,25 +239,6 @@ GeneralPage::GeneralPage(Context *context) : context(context)
     configLayout->addWidget(athleteBrowseButton, 9 + offset,2);
 
     connect(athleteBrowseButton, SIGNAL(clicked()), this, SLOT(browseAthleteDir()));
-
-    //
-    // Workout directory (train view)
-    //
-    QVariant workoutDir = appsettings->value(this, GC_WORKOUTDIR, "");
-    // fix old bug..
-    if (workoutDir == "0") workoutDir = "";
-    workoutLabel = new QLabel(tr("Workout and VideoSync Library"));
-    workoutDirectory = new QLineEdit;
-    workoutDirectory->setText(workoutDir.toString());
-    workoutBrowseButton = new QPushButton(tr("Browse"));
-    //XXworkoutBrowseButton->setFixedWidth(120);
-
-    configLayout->addWidget(workoutLabel, 10 + offset,0, Qt::AlignRight);
-    configLayout->addWidget(workoutDirectory, 10 + offset,1);
-    configLayout->addWidget(workoutBrowseButton, 10 + offset,2);
-
-    connect(workoutBrowseButton, SIGNAL(clicked()), this, SLOT(browseWorkoutDir()));
-    offset++;
 
 #ifdef GC_WANT_R
     //
@@ -301,7 +288,6 @@ GeneralPage::GeneralPage(Context *context) : context(context)
     b4.metricSwimPace = metricSwimPace->isChecked();
     b4.hyst = elevationHysteresis.toFloat();
     b4.wbal = wbalForm->currentIndex();
-    b4.warn = warnOnExit->isChecked();
 #ifdef GC_WANT_HTTP
     b4.starthttp = startHttp->isChecked();
 #endif
@@ -342,8 +328,10 @@ GeneralPage::saveClicked()
     // save on exit
     appsettings->setValue(GC_WARNEXIT, warnOnExit->isChecked());
 
+    // open last athlete on start
+    appsettings->setValue(GC_OPENLASTATHLETE, openLastAthlete->isChecked());
+
     // Directories
-    appsettings->setValue(GC_WORKOUTDIR, workoutDirectory->text());
     appsettings->setValue(GC_HOMEDIR, athleteDirectory->text());
 #ifdef GC_WANT_R
     appsettings->setValue(GC_R_HOME, rDirectory->text());
@@ -441,17 +429,6 @@ GeneralPage::browsePythonDir()
      }
 }
 #endif
-
-void
-GeneralPage::browseWorkoutDir()
-{
-    QString currentDir = workoutDirectory->text();
-    if (!QDir(currentDir).exists()) currentDir = "";
-    QString dir = QFileDialog::getExistingDirectory(this, tr("Select Workout Library"),
-                            currentDir, QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
-    if (dir != "") workoutDirectory->setText(dir);  //only overwrite current dir, if a new was selected
-}
-
 
 void
 GeneralPage::browseAthleteDir()
@@ -735,6 +712,18 @@ bool deviceModel::setData(const QModelIndex &index, const QVariant &value, int r
 //
 TrainOptionsPage::TrainOptionsPage(QWidget *parent, Context *context) : QWidget(parent), context(context)
 {
+    //
+    // Workout directory (train view)
+    //
+    QVariant workoutDir = appsettings->value(this, GC_WORKOUTDIR, "");
+    // fix old bug..
+    if (workoutDir == "0") workoutDir = "";
+    workoutLabel = new QLabel(tr("Workout and VideoSync Library"));
+    workoutDirectory = new QLineEdit;
+    workoutDirectory->setText(workoutDir.toString());
+    workoutBrowseButton = new QPushButton(tr("Browse"));
+    connect(workoutBrowseButton, SIGNAL(clicked()), this, SLOT(browseWorkoutDir()));
+
     useSimulatedSpeed = new QCheckBox(tr("Simulate Speed From Power"), this);
     useSimulatedSpeed->setChecked(appsettings->value(this, TRAIN_USESIMULATEDSPEED, false).toBool());
     useSimulatedSpeed->setToolTip(tr("Simulation physics uses current athlete parameters and settings\n"
@@ -763,6 +752,13 @@ TrainOptionsPage::TrainOptionsPage(QWidget *parent, Context *context) : QWidget(
     lapAlert->setChecked(appsettings->value(this, TRAIN_LAPALERT, false).toBool());
 
     QVBoxLayout *all = new QVBoxLayout(this);
+
+    QGridLayout *wdLayout = new QGridLayout;
+    wdLayout->addWidget(workoutLabel, 0,0, Qt::AlignRight);
+    wdLayout->addWidget(workoutDirectory, 0,1);
+    wdLayout->addWidget(workoutBrowseButton, 0,2);
+    all->addLayout(wdLayout);
+
     all->addWidget(useSimulatedSpeed);
     all->addWidget(useSimulatedHypoxia);
     all->addWidget(multiCheck);
@@ -777,6 +773,7 @@ qint32
 TrainOptionsPage::saveClicked()
 {
     // Save the train view settings...
+    appsettings->setValue(GC_WORKOUTDIR, workoutDirectory->text());
     appsettings->setValue(TRAIN_USESIMULATEDSPEED, useSimulatedSpeed->isChecked());
     appsettings->setValue(TRAIN_USESIMULATEDHYPOXIA, useSimulatedHypoxia->isChecked());
     appsettings->setValue(TRAIN_MULTI, multiCheck->isChecked());
@@ -785,6 +782,16 @@ TrainOptionsPage::saveClicked()
     appsettings->setValue(TRAIN_LAPALERT, lapAlert->isChecked());
 
     return 0;
+}
+
+void
+TrainOptionsPage::browseWorkoutDir()
+{
+    QString currentDir = workoutDirectory->text();
+    if (!QDir(currentDir).exists()) currentDir = "";
+    QString dir = QFileDialog::getExistingDirectory(this, tr("Select Workout Library"),
+                            currentDir, QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+    if (dir != "") workoutDirectory->setText(dir);  //only overwrite current dir, if a new was selected
 }
 
 

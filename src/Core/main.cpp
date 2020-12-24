@@ -583,7 +583,7 @@ main(int argc, char *argv[])
             // folder and athlete
             lastOpened = args.at(2);
 
-        } else {
+        } else if (appsettings->value(NULL, GC_OPENLASTATHLETE, true).toBool()) {
 
             // no parameters passed lets open the last athlete we worked with
             lastOpened = appsettings->value(NULL, GC_SETTINGS_LAST);
