@@ -112,7 +112,7 @@ KPIOverviewItem::KPIOverviewItem(ChartSpace *parent, QString name, double start,
     this->units = units;
     this->istime = istime;
 
-    value ="0";
+    value ="";
     progressbar = new ProgressBar(this, start, stop, value.toDouble());
 }
 
@@ -427,9 +427,8 @@ KPIOverviewItem::setData(RideItem *item)
     Result res = parser.evaluate(item, NULL);
 
     // set to zero for daft values
-    value = QString("%1").arg(res.number());
+    value = res.string();
     if (value == "nan") value ="";
-    value=Utils::removeDP(value);
 
     // now set the progressbar
     progressbar->setValue(start, stop, value.toDouble());
@@ -449,9 +448,8 @@ KPIOverviewItem::setDateRange(DateRange dr)
     Result res = parser.evaluate(dr, datafilter);
 
     // set to zero for daft values
-    value = QString("%1").arg(res.number());
+    value = res.string();
     if (value == "nan") value ="";
-    value=Utils::removeDP(value);
 
     // now set the progressbar
     progressbar->setValue(start, stop, value.toDouble());
