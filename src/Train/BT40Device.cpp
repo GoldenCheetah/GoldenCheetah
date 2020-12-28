@@ -558,6 +558,9 @@ BT40Device::updateValue(const QLowEnergyCharacteristic &c, const QByteArray &val
             case INRIDE_STATE_SPINDOWN_ACTIVE:
                 notifyString = QString("SPINDOWN_ACTIVE-COAST TO STOP    : ");
                 break;
+            default:
+                qDebug()<<QString("Unexpected INRIDE state: %1").arg(ipd.state);
+                break;
             }
         
             notifyString.append(QString::number(ipd.speedKPH));
@@ -631,6 +634,9 @@ BT40Device::updateValue(const QLowEnergyCharacteristic &c, const QByteArray &val
                 break;
             case SMART_CONTROL_CALIBRATION_STATE_SPEED_UP_DETECTED:
                 notifyString = QString(tr("Smart Control - Interference Detected - Try Again"));
+                break;
+            default:
+                qDebug()<<QString("Unexpected Kurt Smart Control calibration stae: %1").arg(sccd.calibrationState);
                 break;
             }
 
@@ -827,6 +833,9 @@ BT40Device::setMode(int m)
                     QLowEnergyService::WriteWithResponse);
                 break;
             }
+        default:
+            qDebug()<<QString("Enter calibration requested for unsupported device type: %1").arg(loadType);
+            break;
         }
     }
     // Leaving Calibration Mode
@@ -856,6 +865,9 @@ BT40Device::setMode(int m)
                     QLowEnergyService::WriteWithResponse);
                 break;
             }
+        default:
+            qDebug()<<QString("Exit calibration requested for unsupported device type: %1").arg(loadType);
+            break;
         }
     }
 
