@@ -1190,7 +1190,6 @@ void TTSReader::programData(int version, ByteArray &data) {
 
     double distance = 0;
     int pointCount = (int)data.size() / 6;
-    double bias = 0;
 
     for (int i = 0; i < pointCount; i++) {
         int slope = getUShort(data, i * 6);
@@ -1205,6 +1204,7 @@ void TTSReader::programData(int version, ByteArray &data) {
         ProgramPoint p;
 
         p.slope = (double)slope / 100;
+        p.distance = distance;
 
         if (i == 0) {
             // first time thru'
@@ -1220,15 +1220,13 @@ void TTSReader::programData(int version, ByteArray &data) {
             maxSlope = p.slope;
         }
 
-        // If first point isn't zero distance then bias
-        // it and all subseequent points by this distance.
-        // This might be rubbish but appears to help every
-        // tts I've tried.
+        // If first point isn't zero distance then create fake
+        // first point. This matters for a few early tts rides
+        // including NO_OCEAN from lunicus and IT_Mortirolo from
+        // tacx.
         if (i == 0 && distance != 0.) {
-            bias = -distance;
+            programList.push_back({0, 0});
         }
-
-        p.distance = distance + bias;
 
         programList.push_back(p);
     }
