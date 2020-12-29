@@ -958,8 +958,8 @@ AddPair::validatePage()
 // Pair devices
 AddPairBTLE::AddPairBTLE(AddDeviceWizard *parent) : QWizardPage(parent), wizard(parent)
 {
-    setTitle(tr("Pair Devices"));
-    setSubTitle(tr("Search for and pair Bluetooth 4.0 devices"));
+    setTitle(tr("Bluetooth 4.0 Sensors"));
+    setSubTitle(tr("Search for and pair of BTLE sensors happens at Train session startup"));
 
     QVBoxLayout *layout = new QVBoxLayout;
     setLayout(layout);
@@ -990,7 +990,7 @@ AddPairBTLE::initializePage()
     channelWidget->setUniformRowHeights(true);
     channelWidget->setIndentation(0);
 
-    channelWidget->header()->resizeSection(0,175*dpiXFactor); // type
+    channelWidget->header()->resizeSection(0,330*dpiXFactor); // type
     channelWidget->header()->resizeSection(1,110*dpiXFactor); // status
 
     // which services/sensors are supported?
@@ -1015,7 +1015,7 @@ AddPairBTLE::initializePage()
 
         // status
         QLabel *status = new QLabel(this);
-        status->setText(tr("Auto detect on device StartUp"));
+        status->setText(tr("Auto detect at Startup"));
         channelWidget->setItemWidget(add, 1, status);
     }
 }
