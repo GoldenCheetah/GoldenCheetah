@@ -138,12 +138,12 @@ struct FitFileReaderState
     double last_altitude; // to avoid problems when records lacks altitude
     QVariant isGarminSmartRecording;
     QVariant GarminHWM;
-    XDataSeries *weatherXdata = nullptr;
-    XDataSeries *gearsXdata = nullptr;
-    XDataSeries *swimXdata = nullptr;
-    XDataSeries *deveXdata = nullptr;
-    XDataSeries *extraXdata = nullptr;
-    XDataSeries *hrvXdata = nullptr;
+    XDataSeries *weatherXdata;
+    XDataSeries *gearsXdata;
+    XDataSeries *swimXdata;
+    XDataSeries *deveXdata;
+    XDataSeries *extraXdata;
+    XDataSeries *hrvXdata;
     QMap<int, QString> deviceInfos, session_device_info_;
     QList<QString> dataInfos, session_data_info_;
 
@@ -3134,10 +3134,10 @@ struct FitFileReaderState
         swimXdata->valuename << "STROKES";
         swimXdata->unitname << "";
 
-	    hrvXdata = new XDataSeries();
-	    hrvXdata->name = "HRV";
-	    hrvXdata->valuename << "R-R";
-	    hrvXdata->unitname << "msecs";
+	hrvXdata = new XDataSeries();
+	hrvXdata->name = "HRV";
+	hrvXdata->valuename << "R-R";
+	hrvXdata->unitname << "msecs";
 
         gearsXdata = new XDataSeries();
         gearsXdata->name = "GEARS";
@@ -3243,7 +3243,7 @@ struct FitFileReaderState
 
             appendXData(rideFile);
 
-            if (swimXdata != nullptr) {   // ptj need to check swimXdata
+            if (!swimXdata->datapoints.empty()) {
                 // Build synthetic kph, km and cad sample data for Lap Swims
                 DataProcessor* fixLapDP = DataProcessorFactory::instance().getProcessors(true).value("Fix Lap Swim");
                 if (fixLapDP) fixLapDP->postProcess(rideFile, NULL, "NEW");
@@ -3280,37 +3280,31 @@ struct FitFileReaderState
             rf->addXData("WEATHER", weatherXdata);
         else
             delete weatherXdata;
-            weatherXdata = nullptr;
 
         if (!swimXdata->datapoints.empty())
             rf->addXData("SWIM", swimXdata);
         else
             delete swimXdata;
-            swimXdata = nullptr;
 
         if (!hrvXdata->datapoints.empty())
             rf->addXData("HRV", hrvXdata);
         else
             delete hrvXdata;
-            hrvXdata = nullptr;
 
         if (!gearsXdata->datapoints.empty())
             rf->addXData("GEARS", gearsXdata);
         else
             delete gearsXdata;
-            gearsXdata = nullptr;
 
         if (!deveXdata->datapoints.empty())
             rf->addXData("DEVELOPER", deveXdata);
         else
             delete deveXdata;
-            deveXdata = nullptr;
 
         if (!extraXdata->datapoints.empty())
             rf->addXData("EXTRA", extraXdata);
         else
             delete extraXdata;
-            extraXdata = nullptr;
     }
 
     RideFile *splitSessions(QList<RideFile*> *rides) {
