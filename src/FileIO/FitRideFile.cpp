@@ -3262,7 +3262,7 @@ struct FitFileReaderState
 
             appendXData(rideFile);
 
-            if (!swimXdata->datapoints.empty()) {
+            if (rideFile->xdata("SWIM")) {
                 // Build synthetic kph, km and cad sample data for Lap Swims
                 DataProcessor* fixLapDP = DataProcessorFactory::instance().getProcessors(true).value("Fix Lap Swim");
                 if (fixLapDP) fixLapDP->postProcess(rideFile, NULL, "NEW");
