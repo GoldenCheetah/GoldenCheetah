@@ -138,12 +138,12 @@ struct FitFileReaderState
     double last_altitude; // to avoid problems when records lacks altitude
     QVariant isGarminSmartRecording;
     QVariant GarminHWM;
-    XDataSeries *weatherXdata;
-    XDataSeries *gearsXdata;
-    XDataSeries *swimXdata;
-    XDataSeries *deveXdata;
-    XDataSeries *extraXdata;
-    XDataSeries *hrvXdata;
+    XDataSeries *weatherXdata = nullptr;
+    XDataSeries *gearsXdata = nullptr;
+    XDataSeries *swimXdata = nullptr;
+    XDataSeries *deveXdata = nullptr;
+    XDataSeries *extraXdata = nullptr;
+    XDataSeries *hrvXdata = nullptr;
     QMap<int, QString> deviceInfos, session_device_info_;
     QList<QString> dataInfos, session_data_info_;
 
@@ -2189,8 +2189,7 @@ struct FitFileReaderState
         time_t time = 0;
         if (time_offset > 0)
             time = last_time + time_offset;
-        double km = 0;
-
+        
         int length_type = 0;
         int swim_stroke = 0;
         int total_strokes = 0;
@@ -3243,7 +3242,7 @@ struct FitFileReaderState
 
             appendXData(rideFile);
 
-            if (!swimXdata->datapoints.empty()) {
+            if (swimXdata != nullptr) {
                 // Build synthetic kph, km and cad sample data for Lap Swims
                 DataProcessor* fixLapDP = DataProcessorFactory::instance().getProcessors(true).value("Fix Lap Swim");
                 if (fixLapDP) fixLapDP->postProcess(rideFile, NULL, "NEW");
@@ -3280,16 +3279,19 @@ struct FitFileReaderState
             rf->addXData("WEATHER", weatherXdata);
         else
             delete weatherXdata;
+            weatherXdata = nullptr;
 
         if (!swimXdata->datapoints.empty())
             rf->addXData("SWIM", swimXdata);
         else
             delete swimXdata;
+            swimXdata = nullptr;
 
         if (!hrvXdata->datapoints.empty())
             rf->addXData("HRV", hrvXdata);
         else
             delete hrvXdata;
+            hrvXdata = nullptr;
 
         if (!gearsXdata->datapoints.empty())
             rf->addXData("GEARS", gearsXdata);
@@ -3300,11 +3302,13 @@ struct FitFileReaderState
             rf->addXData("DEVELOPER", deveXdata);
         else
             delete deveXdata;
+            deveXdata = nullptr;
 
         if (!extraXdata->datapoints.empty())
             rf->addXData("EXTRA", extraXdata);
         else
             delete extraXdata;
+            extraXdata = nullptr;
     }
 
     RideFile *splitSessions(QList<RideFile*> *rides) {
