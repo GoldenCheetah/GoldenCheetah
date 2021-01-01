@@ -493,8 +493,11 @@ struct FitFileReaderState
                 default: return QString("Stages Cycling %1").arg(prod);
             }
         } else if (manu == 70) {
-            // does not set product at this point
-           return "Sigmasport ROX";
+            // Sigma
+            switch (prod) {
+                case 45: return "Sigmasport iD.FREE";
+                default: return "Sigmasport ROX";
+            }
         } else if (manu == 76) {
             // Moxy
             return "Moxy Monitor";
