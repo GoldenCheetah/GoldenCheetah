@@ -2,6 +2,7 @@
 #include "AthleteConfigDialog.h"
 #include "TabView.h"
 #include "JsonRideFile.h" // for DATETIME_FORMAT
+#include "MainWindow.h" // for SKIP_QTWE_CACHE
 
 // athlete card
 static bool _registerItems()
@@ -35,11 +36,10 @@ AthleteView::AthleteView(Context *context) : ChartSpace(context, OverviewScope::
 
         QString name = i.next();
 
-        // if there is no avatar its not a real folder, even a blank athlete
-        // will get the default avatar. This is to avoid having to work out
-        // what all the random folders are that Qt creates on Windows when
-        // using QtWebEngine, or Python or R or created by user scripts
-        if (!QFile(gcroot + "/" + name + "/config/avatar.png").exists()) continue;
+        SKIP_QTWE_CACHE  // skip Folder Names created by QTWebEngine on Windows
+
+        // ignore dot folders
+        if (name.startsWith(".")) continue;
 
         // add a card for each athlete
         AthleteCard *ath = new AthleteCard(this, name);
@@ -85,11 +85,14 @@ AthleteCard::AthleteCard(ChartSpace *parent, QString path) : ChartSpaceItem(pare
     // avatar
     QRectF img(ROWHEIGHT,ROWHEIGHT*2,ROWHEIGHT* gl_avatar_width, ROWHEIGHT* gl_avatar_width);
 
-    QImage original = QImage(gcroot + "/" + path + "/config/avatar.png").scaled(img.width(), img.height());
+    QString filename = gcroot + "/" + path + "/config/avatar.png";
+    // athletes created using old versions may not have avatar
+    QImage original = QImage(QFile(filename).exists() ?  filename : ":/images/noavatar.png");
+
     QPixmap canvas(img.width(), img.height());
     canvas.fill(Qt::transparent);
     QPainter painter(&canvas);
-    painter.setBrush(original);
+    painter.setBrush(original.scaled(img.width(), img.height()));
     painter.setPen(Qt::NoPen);
     painter.setRenderHint(QPainter::Antialiasing, true);
     painter.drawEllipse(0, 0, img.width(), img.height());
@@ -133,7 +136,7 @@ AthleteCard::AthleteCard(ChartSpace *parent, QString path) : ChartSpaceItem(pare
     if (loadprogress == 0) {
 
         // unloaded athletes we just say when last activity was
-        QDate today = QDateTime::currentDateTime().date();
+        //QDate today = QDateTime::currentDateTime().date();
         QDir dir(gcroot + "/" + path + "/activities");
         QStringListIterator i(RideFileFactory::instance().listRideFiles(dir));
         while (i.hasNext()) {
