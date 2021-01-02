@@ -77,6 +77,8 @@
 #include "TrainDB.h"
 #include "Library.h"
 
+double IntensifyNewtons(double N, double intensity);
+
 TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(context),
     bicycle(context)
 {
@@ -86,6 +88,7 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
     setControls(c);
     autoConnect = false;
     useSimulatedSpeed = false;
+    intensityFactor = 1.;
 
     cl->setSpacing(0);
     cl->setContentsMargins(0,0,0,0);
@@ -1191,6 +1194,7 @@ void TrainSidebar::Start()       // when start button is pressed
         load = 100;
         slope = 0.0;
         resistanceNewtons = 0.0;
+        intensityFactor = 1.;
 
         // Reset Speed Simulation
         bicycle.clear();
@@ -1650,16 +1654,20 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
                 // get spinscan data from a computrainer?
                 if (Devices[dev].type == DEV_CT) {
                     memcpy((uint8_t*)rtData.spinScan, (uint8_t*)local.spinScan, 24);
-                    rtData.setLoad(local.getLoad()); // and get load in case it was adjusted
-                    rtData.setSlope(local.getSlope()); // and get slope in case it was adjusted
-                    // to within defined limits
+                    if (!useSimulatedSpeed) {
+                        rtData.setLoad(local.getLoad());   // and get load in case it was adjusted
+                        rtData.setSlope(local.getSlope()); // and get slope in case it was adjusted
+                                                           // to within defined limits
+                    }
                 }
 
-                if (Devices[dev].type == DEV_FORTIUS || Devices[dev].type == DEV_IMAGIC) {
-	                rtData.setLoad(local.getLoad()); // and get load in case it was adjusted
-                    rtData.setSlope(local.getSlope()); // and get slope in case it was adjusted
-					// to within defined limits
-				}
+                if (!useSimulatedSpeed) {
+                    if (Devices[dev].type == DEV_FORTIUS || Devices[dev].type == DEV_IMAGIC) {
+                        rtData.setLoad(local.getLoad());   // and get load in case it was adjusted
+                        rtData.setSlope(local.getSlope()); // and get slope in case it was adjusted
+                                                           // to within defined limits
+                    }
+                }
 
                 if (Devices[dev].type == DEV_ANTLOCAL || Devices[dev].type == DEV_NULL) {
                     rtData.setHb(local.getSmO2(), local.gettHb()); //only moxy data from ant and robot devices right now
@@ -1678,12 +1686,14 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
                 if (dev == bpmTelemetry) rtData.setHr(local.getHr());
                 if (dev == rpmTelemetry) rtData.setCadence(local.getCadence());
                 if (dev == kphTelemetry) {
-                    rtData.setSpeed(local.getSpeed());
-                    rtData.setDistance(local.getDistance());
-                    rtData.setRouteDistance(local.getRouteDistance());
-                    rtData.setDistanceRemaining(local.getDistanceRemaining());
-                    rtData.setLapDistance(local.getLapDistance());
-                    rtData.setLapDistanceRemaining(local.getLapDistanceRemaining());
+                    if (!useSimulatedSpeed) {
+                        rtData.setSpeed(local.getSpeed());
+                        rtData.setDistance(local.getDistance());
+                        rtData.setRouteDistance(local.getRouteDistance());
+                        rtData.setDistanceRemaining(local.getDistanceRemaining());
+                        rtData.setLapDistance(local.getLapDistance());
+                        rtData.setLapDistanceRemaining(local.getLapDistanceRemaining());
+                    }
                 }
                 if (dev == wattsTelemetry) {
                     rtData.setWatts(local.getWatts());
@@ -2093,7 +2103,7 @@ void TrainSidebar::loadUpdate()
         if (load == -100) {
             Stop(DEVICE_OK);
         } else {
-            foreach(int dev, activeDevices) Devices[dev].controller->setLoad(load);
+            foreach(int dev, activeDevices) Devices[dev].controller->setLoad(intensityFactor * load);
             context->notifySetNow(load_msecs);
         }
     } else {
@@ -2114,7 +2124,11 @@ void TrainSidebar::loadUpdate()
         if (slope == -100) {
             Stop(DEVICE_OK);
         } else {
-            foreach(int dev, activeDevices) Devices[dev].controller->setGradientWithSimState(slope, resistanceNewtons, displaySpeed);
+            double N = IntensifyNewtons(resistanceNewtons, intensityFactor);
+            double gradient = getIntensifiedGradient();
+
+            foreach(int dev, activeDevices)
+                Devices[dev].controller->setGradientWithSimState(gradient, N, displaySpeed);
             context->notifySetNow(displayWorkoutDistance * 1000);
         }
     }
@@ -2150,18 +2164,22 @@ void TrainSidebar::toggleCalibration()
 
             foreach(int dev, activeDevices) {
                 if (calibrationDeviceIndex == dev) {
-                    Devices[dev].controller->setCalibrationState(CALIBRATION_STATE_IDLE);
-                    Devices[dev].controller->setMode(RT_MODE_ERGO);
-                    Devices[dev].controller->setLoad(load);
+                    RealtimeController* c = Devices[dev].controller;
+                    c->setCalibrationState(CALIBRATION_STATE_IDLE);
+                    c->setMode(RT_MODE_ERGO);
+                    c->setLoad(intensityFactor * load);
                 }
             }
         } else {
+            double N        = IntensifyNewtons(resistanceNewtons, intensityFactor);
+            double gradient = getIntensifiedGradient();
 
             foreach(int dev, activeDevices) {
                 if (calibrationDeviceIndex == dev) {
-                    Devices[dev].controller->setCalibrationState(CALIBRATION_STATE_IDLE);
-                    Devices[dev].controller->setMode(RT_MODE_SPIN);
-                    Devices[dev].controller->setGradientWithSimState(slope, resistanceNewtons, displaySpeed);
+                    RealtimeController* c = Devices[dev].controller;
+                    c->setCalibrationState(CALIBRATION_STATE_IDLE);
+                    c->setMode(RT_MODE_SPIN);
+                    c->setGradientWithSimState(gradient, N, displaySpeed);
                 }
             }
         }
@@ -2612,55 +2630,105 @@ void TrainSidebar::RewindLap()
 }
 
 
+// Comment about implementation of ::Higher and ::Lower
+//
+// Two ways to adjust intensity:
+// - rewrite entire workout to match new intensity
+// - virtual gearing: change the intensity factor
+//
+// Approach #1:
+//   IF there is a workout file
+//   AND its a wattage based workout
+//   THEN rewrite the ergfile.
+//
+//   Result is that rewritten workout intensity will show on the workout,
+//   and new intensity is honored.
+//
+// Approach #2:
+//   IF there is no workout file
+//   OR we are not running wattage based workout
+//   THEN simply change the intensity factor
+//
+//   Result is that intensity is adjusted and workout (if any) is unchanged.
+//   Benefit for slope mode is that intensity changes without modifying
+//   amount that must be climbed, lower watts means rider goes slower.
+//   This is 'virtual gearing', so long as simspeed is enabled.
+//   If simspeed is not enabled the slope is decreased and user will make
+//   unfair progress, but that would be true even if we rewrote the route.
+//
+// NOTE: Intensity step size is different for ergo and gradient modes.
+static const double s_GradientIntensityFactor = (8.8 / 8.); // +10%
+
 // higher load/gradient
 void TrainSidebar::Higher()
 {
     if ((status&RT_CONNECTED) == 0) return;
 
-    if (context->currentErgFile()) {
-        // adjust the workout IF
-        adjustIntensity(lastAppliedIntensity+5);
-
-    } else {
-        if (status&RT_MODE_ERGO) load += 5;
-        else slope += 0.1;
-
-        if (load >1500) load = 1500;
-        if (slope >40) slope = 40;
-
-        if (status&RT_MODE_ERGO)
-            foreach(int dev, activeDevices) Devices[dev].controller->setLoad(load);
-        else
-            foreach(int dev, activeDevices) Devices[dev].controller->setGradientWithSimState(slope, resistanceNewtons, displaySpeed);
+    // Wattage based workout
+    if (status& RT_MODE_ERGO) {
+        if (context->currentErgFile()) {
+            // ergo mode, workout file: rewrite the workout
+            adjustIntensity(lastAppliedIntensity + 5);
+            emit setNotification(tr("Increased intensity to ") + QString::number(lastAppliedIntensity, 'f', 2), 2);
+        } else {
+            // ergo mode, no workout: adjust intensity up by 5%
+            intensityFactor += 0.05;
+            emit setNotification(tr("Increased intensity to ") + QString::number(100. * intensityFactor, 'f', 0) + "%", 2);
+        }
     }
-
-    emit setNotification(tr("Increasing intensity.."), 2);
+    // Slope based workout:
+    else {
+        intensityFactor *= s_GradientIntensityFactor;
+        emit setNotification(tr("Increased intensity to ") + QString::number(100. * intensityFactor, 'f', 0) + "%", 2);
+    }
 }
 
 // lower load/gradient
 void TrainSidebar::Lower()
 {
-    if ((status&RT_CONNECTED) == 0) return;
+    if ((status & RT_CONNECTED) == 0) return;
 
-    if (context->currentErgFile()) {
-        // adjust the workout IF
-        adjustIntensity(std::max<int>(5, lastAppliedIntensity - 5));
-
-    } else {
-
-        if (status&RT_MODE_ERGO) load -= 5;
-        else slope -= 0.1;
-
-        if (load <0) load = 0;
-        if (slope <-40) slope = -40;
-
-        if (status&RT_MODE_ERGO)
-            foreach(int dev, activeDevices) Devices[dev].controller->setLoad(load);
-        else
-            foreach(int dev, activeDevices) Devices[dev].controller->setGradientWithSimState(slope, resistanceNewtons, displaySpeed);
+    // Wattage based workout
+    if (status & RT_MODE_ERGO) {
+        if (context->currentErgFile()) {
+            // ergo mode, workout file: rewrite the workout
+            if (lastAppliedIntensity > 6) adjustIntensity(lastAppliedIntensity - 5);
+            emit setNotification(tr("Decreased intensity to ") + QString::number(lastAppliedIntensity, 'f', 2), 2);
+        }
+        else {
+            // ergo mode, no workout: adjust intensity by -5%
+            if (intensityFactor > 0.06) intensityFactor = intensityFactor - 0.05;
+            emit setNotification(tr("Decreased intensity to ") + QString::number(100. * intensityFactor, 'f', 0) + "%", 2);
+        }
     }
+    // Slope based workout: adjust intensity
+    else {
+        if (intensityFactor > 0.02) intensityFactor /= s_GradientIntensityFactor;
+        emit setNotification(tr("Decreased intensity to ") + QString::number(100. * intensityFactor, 'f',0) + "%", 2);
+    }
+}
 
-    emit setNotification(tr("Decreasing intensity.."), 2);
+// Map slope and intensity to new slope for controlling smart
+// trainer resistance. This is 'virtual gears'.
+//
+// intensityFactor is a scalar to control how difficult it is
+// to pedal relative to 'correct', where 1. means no change,
+// and 0.5 means you feel 1/2 the force that you should at current
+// speed.
+
+// For newtons of force intensityFactor is a simple scalar.
+double IntensifyNewtons(double N, double intensity) {
+    return N * intensity;
+}
+
+// Compute gradient needed to apply intensity factor to current state.
+double TrainSidebar::getIntensifiedGradient() const {
+    double speedMS = displaySpeed / 3.6;
+    return bicycle.GradientForIntensity(BicycleSimState(resistanceNewtons * speedMS, // watts
+        slope,                       // gradient
+        displayAltitude),            // meters
+        speedMS,
+        intensityFactor);
 }
 
 void TrainSidebar::setLabels()

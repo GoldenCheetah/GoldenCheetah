@@ -191,6 +191,7 @@ public:
     double VFromKE(double ke) const; // Compute velocity (m/s) from kinetic energy of bike and rider (J)
 
     double WattsForV(const BicycleSimState &simState, double v) const;
+    double GradientForIntensity(const BicycleSimState& simState, double v, double intensity) const;
 
     // Compute new velocity in m/s after simState applied for dt seconds.
     double V(const BicycleSimState &simState,   // current sim state

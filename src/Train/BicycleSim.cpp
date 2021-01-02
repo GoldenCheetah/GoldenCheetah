@@ -356,24 +356,78 @@ struct MotionStatePair
 // Returns power needed to maintain speed v against current simstate.
 double Bicycle::WattsForV(const BicycleSimState &simState, double v) const
 {
-    double sl = simState.Slope() / 100; // 10% = 0.1
-    const double CrV = 0.1;             // Coefficient for velocity - dependent dynamic rolling resistance, here approximated with 0.1
-    double CrVn = CrV * cos(sl);        // Coefficient for the dynamic rolling resistance, normalized to road inclination; CrVn = CrV*cos(slope)
+    double sl = simState.Slope() / 100;        // 10% = 0.1
+
+    sl = std::max<double>(-1, std::min<double>(1, sl)); // -1 <= sl <= 1
 
     double cosBeta = 1 / std::sqrt(sl*sl + 1); // cos(atan(sl))
     double sinBeta = sl * cosBeta;             // sin(atan(sl))
 
+    static const double s_CrV = 0.1;           // Coefficient for velocity - dependent dynamic rolling resistance, here approximated with 0.1
+    double CrVn = s_CrV * cosBeta;             // Coefficient for the dynamic rolling resistance, normalized to road inclination; CrVn = CrV*cos(asin(sl))
+
     double m = MassKG();
     double Frg = s_g0 * m * (m_constants.m_crr * cosBeta + sinBeta);
 
-    double Hnn = simState.Altitude();   // Altitude above sea level (m).
+    double Hnn = simState.Altitude();          // Altitude above sea level (m).
     double Rho = AirDensity(Hnn, m_constants.m_T);
     double CdARho = m_constants.m_Cd * m_constants.m_A * Rho;
 
-    const double W = 0;                 // Windspeed
-    double wattsForV = m_constants.m_Cm * v * (CdARho / 2 * (v + W)*(v + W) + Frg + v * CrVn);
+    const double W = 0;                        // Windspeed
+    double wattsForV = m_constants.m_Cm * v * (CdARho / 2 * (v + W) * std::abs(v + W) + Frg + v * CrVn);
 
     return wattsForV;
+}
+
+// Compute new gradient for current state that achieves desired intensity.
+// This is needed to implement virtual gears when running a smart trainer 
+// in 'slope mode'
+double Bicycle::GradientForIntensity(const BicycleSimState& simState, double v, double intensity) const
+{
+    // Speed below 'almost zero' and there is nothing to be done.
+    if (v < 0.1) return simState.Slope();
+
+    // Derive intensified slope from how force changes with gradient.
+    // Compute derivative of force with respect slope:
+    //
+    // dNdm is:
+    //
+    //       m_Cm(CrV m v + crr g0 kg m - g0 kg)
+    //     - -----------------------------------
+    //                    2     3/2
+    //                  (m  + 1)
+
+    // Coefficient for velocity - dependent dynamic rolling resistance, here approximated with 0.1
+    static const double s_CrV = 0.1; 
+
+
+    // gradient to slope and clamp to -1 to 1.
+    double m = std::max<double>(-1, std::min<double>(1, simState.Slope() / 100));
+
+    // Determine dN: desired change in force
+    double N = simState.Watts() / v;
+
+    // Apply 1/intensity when force < 0.
+    // Logic: increased intensity is the same as reduced easyness.
+    double appliedIntensity = (N >= 0) ? intensity : 1 / intensity;
+
+    double targetN = N * appliedIntensity;
+    double dN = targetN - N; // desired change in force
+
+    // dNdm
+    double mg = MassKG() * s_g0;
+    double n = -m_constants.m_Cm * (s_CrV * m * v + m_constants.m_crr * mg * m - mg);
+    double cb = sqrt(m * m + 1); // 1 / cos(atan(m))
+    double dNdm = n / sqrt(cb * cb * cb);
+
+    // compute needed change in slope: dm
+    double dm = dNdm ? (dN / dNdm) : 0;
+
+    // clamp output to (+/-)0.4
+    double mNew = std::min<double>(0.4, std::max<double>(-0.4, m + dm));
+
+    // slope to gradient
+    return mNew * 100;
 }
 
 // Return ms/s from current state, speed and impulse duration.
