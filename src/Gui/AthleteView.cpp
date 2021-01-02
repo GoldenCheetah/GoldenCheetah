@@ -2,7 +2,6 @@
 #include "AthleteConfigDialog.h"
 #include "TabView.h"
 #include "JsonRideFile.h" // for DATETIME_FORMAT
-#include "MainWindow.h" // for SKIP_QTWE_CACHE
 
 // athlete card
 static bool _registerItems()
@@ -36,10 +35,9 @@ AthleteView::AthleteView(Context *context) : ChartSpace(context, OverviewScope::
 
         QString name = i.next();
 
-        SKIP_QTWE_CACHE  // skip Folder Names created by QTWebEngine on Windows
-
-        // ignore dot folders
-        if (name.startsWith(".")) continue;
+        // ignore non-athlete folders created by Qt or users
+        AthleteDirectoryStructure athleteHome(QDir(gcroot + "/" + name));
+        if (!athleteHome.upgradedDirectoriesHaveData()) continue;
 
         // add a card for each athlete
         AthleteCard *ath = new AthleteCard(this, name);
