@@ -443,6 +443,7 @@ void VideoWindow::telemetryUpdate(RealtimeData rtd)
                 elevationMeterWidget->gradientValue = rtd.getSlope();
             }
         }
+#ifdef GC_VIDEO_VLC
         else if (p_meterWidget->Source() == QString("LiveMap"))
         {
             LiveMapWidget* liveMapWidget = dynamic_cast<LiveMapWidget*>(p_meterWidget);
@@ -468,6 +469,7 @@ void VideoWindow::telemetryUpdate(RealtimeData rtd)
                 }
             }
         }
+#endif
         else if (p_meterWidget->Source() == QString("Cadence"))
         {
             p_meterWidget->Value = rtd.getCadence();
