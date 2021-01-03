@@ -3358,6 +3358,12 @@ SeasonsPage::saveClicked()
     return 0;
 }
 
+enum WizardTable2 {
+    DIRECTORY_AUTO_COLUMN = 0,
+    IMPORT_AUTO_RULE_COLUMN,
+    COPY_ON_IMPORT_AUTO_COLUMN,
+    TOTAL_NUM_AUTO_COLUMNS,
+};
 
 AutoImportPage::AutoImportPage(Context *context) : context(context)
 {
@@ -3366,6 +3372,7 @@ AutoImportPage::AutoImportPage(Context *context) : context(context)
     addButton = new QPushButton(tr("+"));
     deleteButton = new QPushButton(tr("-"));
     browseButton = new QPushButton(tr("Browse"));
+
 #ifndef Q_OS_MAC
     upButton = new QToolButton(this);
     downButton = new QToolButton(this);
@@ -3381,6 +3388,7 @@ AutoImportPage::AutoImportPage(Context *context) : context(context)
     upButton = new QPushButton(tr("Up"));
     downButton = new QPushButton(tr("Down"));
 #endif
+
     QHBoxLayout *actionButtons = new QHBoxLayout;
     actionButtons->setSpacing(2 *dpiXFactor);
     actionButtons->addWidget(upButton);
@@ -3392,36 +3400,47 @@ AutoImportPage::AutoImportPage(Context *context) : context(context)
     actionButtons->addWidget(deleteButton);
 
     fields = new QTreeWidget;
-    fields->headerItem()->setText(0, tr("Directory"));
-    fields->headerItem()->setText(1, tr("Import Rule"));
-    fields->setColumnWidth(0,400 *dpiXFactor);
-    fields->setColumnWidth(1,100 *dpiXFactor);
-    fields->setColumnCount(2);
+    fields->headerItem()->setText(DIRECTORY_AUTO_COLUMN, tr("Directory"));
+    fields->headerItem()->setText(IMPORT_AUTO_RULE_COLUMN, tr("Import Rule"));
+    fields->headerItem()->setText(COPY_ON_IMPORT_AUTO_COLUMN, tr("Backup to Import Folder"));
+    fields->setColumnWidth(DIRECTORY_AUTO_COLUMN,400 *dpiXFactor);
+    fields->setColumnWidth(IMPORT_AUTO_RULE_COLUMN,200 *dpiXFactor);
+    fields->setColumnWidth(COPY_ON_IMPORT_AUTO_COLUMN,100 *dpiXFactor);
+    fields->setColumnCount(TOTAL_NUM_AUTO_COLUMNS);
     fields->setSelectionMode(QAbstractItemView::SingleSelection);
     //fields->setUniformRowHeights(true);
     fields->setIndentation(0);
 
-    fields->setCurrentItem(fields->invisibleRootItem()->child(0));
+    fields->setCurrentItem(fields->invisibleRootItem()->child(DIRECTORY_AUTO_COLUMN));
 
-    mainLayout->addWidget(fields, 0,0);
-    mainLayout->addLayout(actionButtons, 1,0);
+    mainLayout->addWidget(fields, 1,0);
+    mainLayout->addLayout(actionButtons, 2,0);
 
     context->athlete->autoImportConfig->readConfig();
     QList<RideAutoImportRule> rules = context->athlete->autoImportConfig->getConfig();
     int index = 0;
     foreach (RideAutoImportRule rule, rules) {
+        QComboBox* comboFileButton = new QComboBox(this);
+        comboFileButton->addItem(tr("No"));
+        comboFileButton->addItem(tr("Yes"));
+
         QComboBox *comboButton = new QComboBox(this);
         addRuleTypes(comboButton);
+
         QTreeWidgetItem *add = new QTreeWidgetItem;
         fields->invisibleRootItem()->insertChild(index, add);
         add->setFlags(add->flags() | Qt::ItemIsEditable);
 
-        add->setTextAlignment(0, Qt::AlignLeft | Qt::AlignVCenter);
-        add->setText(0, rule.getDirectory());
+        add->setTextAlignment(DIRECTORY_AUTO_COLUMN, Qt::AlignLeft | Qt::AlignVCenter);
+        add->setText(DIRECTORY_AUTO_COLUMN, rule.getDirectory());
 
-        add->setTextAlignment(1, Qt::AlignHCenter | Qt::AlignVCenter);
+        add->setTextAlignment(IMPORT_AUTO_RULE_COLUMN, Qt::AlignLeft | Qt::AlignVCenter);
         comboButton->setCurrentIndex(rule.getImportRule());
-        fields->setItemWidget(add, 1, comboButton);
+        fields->setItemWidget(add, IMPORT_AUTO_RULE_COLUMN, comboButton);
+
+        add->setTextAlignment(COPY_ON_IMPORT_AUTO_COLUMN, Qt::AlignLeft | Qt::AlignVCenter);
+        comboFileButton->setCurrentIndex(rule.getCopyFilesOnImport());
+        fields->setItemWidget(add, COPY_ON_IMPORT_AUTO_COLUMN, comboFileButton);
         index++;
     }
 
@@ -3506,16 +3525,20 @@ AutoImportPage::deleteClicked()
 qint32
 AutoImportPage::saveClicked()
 {
-
     rules.clear();
+
     for(int i=0; i<fields->invisibleRootItem()->childCount(); i++) {
 
         RideAutoImportRule rule;
-        rule.setDirectory(fields->invisibleRootItem()->child(i)->text(0));
+        rule.setDirectory(fields->invisibleRootItem()->child(i)->text(DIRECTORY_AUTO_COLUMN));
 
-        QWidget *button = fields->itemWidget(fields->invisibleRootItem()->child(i),1);
+        QWidget *button = fields->itemWidget(fields->invisibleRootItem()->child(i), IMPORT_AUTO_RULE_COLUMN);
         rule.setImportRule(((QComboBox*)button)->currentIndex());
-        rules.append(rule);
+        
+        QWidget *copyButton = fields->itemWidget(fields->invisibleRootItem()->child(i), COPY_ON_IMPORT_AUTO_COLUMN);
+        rule.setCopyFilesOnImport(((QComboBox*)copyButton)->currentIndex());
+
+        rules.append(rule);                                                             
 
     }
 

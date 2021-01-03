@@ -33,6 +33,18 @@
 #include "Context.h"
 #include "RideAutoImportConfig.h"
 
+// Utility class to associate the imported filename with whether it should be backed up in the Imports directory upon successful importation
+class ImportFile {
+
+public:
+    QString name;
+    bool copyOnImport;
+
+    ImportFile(); 
+    ImportFile(const QString& name);
+    ImportFile(const QString& name, bool copyOnImport);
+};
+
 // Dialog class to show filenames, import progress and to capture user input
 // of ride date and time
 
@@ -52,7 +64,7 @@ public:
     void done(int);
 
     // explicitly only expand archives like .zip or .gz that contain >1 file
-    QList<QString> expandFiles(QList<QString>);
+    QList<ImportFile> expandFiles(QList<ImportFile>);
 
     int getNumberOfFiles();  // get the number of files selected for processing
     int process();
@@ -67,10 +79,11 @@ private slots:
     void activateSave();
 
 private:
-    void init(QList<QString> files, Context *context);
+    void init(QList<ImportFile> files, Context *context);
     bool moveFile(const QString &source, const QString &target);
+    void copySourceFileToImportDir(int i, bool srcInImportsDir, const QString& importsTarget);
 
-    QList <QString> filenames; // list of filenames passed
+    QList <ImportFile> filenames; // list of filenames passed
     int numberOfFiles; // number of files to be processed
     QList <bool> blanks; // record of which have a RideFileReader returned date & time
     QDir homeImports; // target directory for source files

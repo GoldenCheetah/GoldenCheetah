@@ -29,16 +29,19 @@
 RideAutoImportRule::RideAutoImportRule() {
     _directory = "";
     _importRule = noImport;
+    _copyFilesOnImport = true;
 
     _ruleDescriptions.append(tr("No autoimport"));
-    _ruleDescriptions.append(tr("Autoimport with dialog"));
-    _ruleDescriptions.append(tr("Autoimport with dialog - past  90 days"));
-    _ruleDescriptions.append(tr("Autoimport with dialog - past 180 days"));
-    _ruleDescriptions.append(tr("Autoimport with dialog - past 360 days"));
-    _ruleDescriptions.append(tr("Autoimport in background"));
-    _ruleDescriptions.append(tr("Autoimport in background - past  90 days"));
-    _ruleDescriptions.append(tr("Autoimport in background - past 180 days"));
-    _ruleDescriptions.append(tr("Autoimport in background - past 360 days"));
+    _ruleDescriptions.append(tr("All files with dialog"));
+    _ruleDescriptions.append(tr("Last 30 days with dialog"));
+    _ruleDescriptions.append(tr("Last 90 days with dialog"));
+    _ruleDescriptions.append(tr("Last 180 days with dialog"));
+    _ruleDescriptions.append(tr("Last 360 days with dialog"));
+    _ruleDescriptions.append(tr("All files in background"));
+    _ruleDescriptions.append(tr("Last 30 days in background"));
+    _ruleDescriptions.append(tr("Last 90 days in background"));
+    _ruleDescriptions.append(tr("Last 180 days in background"));
+    _ruleDescriptions.append(tr("Last 360 days in background"));
 
 
 }
@@ -54,6 +57,15 @@ RideAutoImportRule::setImportRule(int rule) { _importRule = rule; }
 
 int
 RideAutoImportRule::getImportRule() { return _importRule; }
+
+void
+RideAutoImportRule::setCopyFilesOnImport(bool copyFile) { _copyFilesOnImport = copyFile; }
+
+bool
+RideAutoImportRule::getCopyFilesOnImport() { return _copyFilesOnImport; }
+
+QString
+RideAutoImportRule::getCopyFilesOnImportText() { return _copyFilesOnImport ? "Yes" : "No"; }
 
 QList<QString>
 RideAutoImportRule::getRuleDescriptions() { return _ruleDescriptions; }
@@ -107,6 +119,10 @@ RideAutoImportConfigParser::endElement( const QString&, const QString&, const QS
     }
     else if(qName == "importrule") {
         rule.setImportRule(buffer.trimmed().toInt());
+        buffer.clear();
+    }
+    else if (qName == "copyFilesOnImport") {
+        rule.setCopyFilesOnImport(buffer.trimmed().toInt());
         buffer.clear();
     }
      else if(qName == "rule") {
@@ -173,8 +189,10 @@ RideAutoImportConfigParser::serialize(QString filename, QList<RideAutoImportRule
 
             out<<QString("\t<rule>\n"
                   "\t\t<directory>%1</directory>\n"
-                  "\t\t<importrule>%2</importrule>\n").arg(EncodeXML(dir))
-                                                      .arg(QString::number(rule.getImportRule()));
+                  "\t\t<importrule>%2</importrule>\n"
+                  "\t\t<copyFilesOnImport>%3</copyFilesOnImport>\n").arg(EncodeXML(dir))
+                                                                      .arg(QString::number(rule.getImportRule()))
+                                                                      .arg(QString::number(rule.getCopyFilesOnImport()));
             out <<QString("\t</rule>\n");
     }
 

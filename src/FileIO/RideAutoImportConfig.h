@@ -30,9 +30,8 @@ class RideAutoImportRule {
 
 public:
     static QList<QString> rules;
-    enum ImportRule { noImport=0, importAll=1, importLast90days=2, importLast180days=3, importLast360days=4,
-                      importBackgroundAll=5, importBackground90=6, importBackground180=7, importBackground360=8 };
-
+    enum ImportRule { noImport=0, importAll=1, importLast30days=2, importLast90days=3, importLast180days=4, importLast360days=5,
+                      importBackgroundAll=6, importBackground30=7, importBackground90=8, importBackground180=9, importBackground360=10 };
     RideAutoImportRule();
 
     void setDirectory(QString);
@@ -41,13 +40,17 @@ public:
     void setImportRule(int);
     int getImportRule();
 
+    void setCopyFilesOnImport(bool);
+    bool getCopyFilesOnImport();
+    QString getCopyFilesOnImportText();
+
     QList<QString> getRuleDescriptions();
 
 private:
     QString _directory;
     int _importRule; // enum
+    bool _copyFilesOnImport;
     QList<QString> _ruleDescriptions;
-
 
 };
 
