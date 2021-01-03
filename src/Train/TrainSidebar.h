@@ -169,6 +169,7 @@ class TrainSidebar : public GcWindow
         int  getCalibrationIndex(void);
 
         double getIntensifiedGradient() const;
+        double getAdjustedInertialMass() const;
 
     public slots:
         void configChanged(qint32);
@@ -248,7 +249,8 @@ class TrainSidebar : public GcWindow
         QTreeWidgetItem *videosync;
         QTreeWidgetItem *media;
 
-        int lastAppliedIntensity;// remember how we scaled last time
+        int    lastAppliedIntensity; // remember how we scaled last time
+        double lastDeviceSpeed;      // remember previous speed obtained from device
 
         int FTP; // current FTP / CP
         int WPRIME; // current W'
