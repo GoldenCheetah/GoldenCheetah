@@ -483,23 +483,19 @@ main(int argc, char *argv[])
         // Now work through the order of precedence of the possible paths for the GC data to update the home directory.
 
         // Check the user hasn't provided too many parameters, if so its not possible to interpret them
-        if (args.count() > 3)
-        {
+        if (args.count() > 3) {
             QMessageBox::critical(NULL, "Exiting", QString("Too many command line parameters"));
             exit(0);
         }
 
         // So has the user provided a directory path on the command line?
-        if (args.count() == 3) // $ ./GoldenCheetah ~/Athletes Mark
-        {
+        if (args.count() == 3) { // $ ./GoldenCheetah ~/Athletes Mark
             // is the first parameter a folder that exists?
-            if (QFileInfo(args.at(1)).isDir())
-            {
+            if (QFileInfo(args.at(1)).isDir()) {
                 // set home to folder pass via command line
                 home.cd(args.at(1));
                 homeSetup = true;
-            }
-            else {
+            } else {
                 QMessageBox::critical(NULL, "Exiting", QString("argv[1] is not a directory (%1)").arg(args.at(1)));
                 exit(0);
             }
@@ -509,41 +505,35 @@ main(int argc, char *argv[])
         // current directory where GC will look for files to allow USB stick support
         QString localLibraryPath("Library/GoldenCheetah");
 
-        if (!homeSetup && QDir(localLibraryPath).exists() || home.exists(localLibraryPath))
-        {
+        if (!homeSetup && QDir(localLibraryPath).exists() || home.exists(localLibraryPath)) {
             home.cd(localLibraryPath);
             homeSetup = true;
         }
 
         // Or did we override the localLibraryPath in settings ?
-        if (!homeSetup && !appsettings->value(NULL, GC_HOMEDIR, "").toString().isEmpty()) 
-        {
+        if (!homeSetup && !appsettings->value(NULL, GC_HOMEDIR, "").toString().isEmpty()) {
             QString OveriddenLibPath(appsettings->value(NULL, GC_HOMEDIR, "").toString());
 
-            if (QDir(OveriddenLibPath).exists() || home.exists(OveriddenLibPath))
-            {
+            if (QDir(OveriddenLibPath).exists() || home.exists(OveriddenLibPath)) {
                 home.cd(OveriddenLibPath);
                 homeSetup = true;
             }
         }
 
-        if (!homeSetup) // lets try the old style path next
-        {
+        if (!homeSetup) { // lets try the old style path next
             // this is the path that used to be used for all platforms
             // and is checked first to make things easier for long-time users
             QString oldStyleLibraryPath(QDir::home().canonicalPath() + "/Library/GoldenCheetah");
 
             home = QDir::home();
-            if (home.exists(oldStyleLibraryPath))
-            {
+            if (home.exists(oldStyleLibraryPath)) {
                 home.cd(oldStyleLibraryPath);
                 homeSetup = true;
             }
         }
 
         // finally lets check the new platform specific paths
-        if (!homeSetup)
-        {
+        if (!homeSetup) {
 
 #if defined(Q_OS_MACX)
             QString PlatformlibraryPath("Library/GoldenCheetah");
@@ -555,15 +545,11 @@ main(int argc, char *argv[])
             QString PlatformlibraryPath(".goldencheetah");
 #endif //   
 
-            if (home.exists(PlatformlibraryPath))
-            {
+            if (home.exists(PlatformlibraryPath)) {
                 home.cd(PlatformlibraryPath);
                 homeSetup = true;
-            }
-            else // things are getting bad, lets try and create the platform directory
-            {
-                if (!(homeSetup = home.mkpath(PlatformlibraryPath)))
-                {
+            } else { // things are getting bad, lets try and create the platform directory
+                if (!(homeSetup = home.mkpath(PlatformlibraryPath))) {
                     // tell user why we aborted !
                     QMessageBox::critical(NULL, "Exiting", QString("Cannot create library directory (%1)").arg(PlatformlibraryPath));
                     exit(0);
@@ -583,26 +569,20 @@ main(int argc, char *argv[])
         // Lets now setup the athlete to open, taking notice of any overriding user preferences on the command line
         QVariant athleteToOpen;
 
-        switch (args.count())
-        {
-            case 3: // $ ./GoldenCheetah ~/Athletes Mark
-            {
+        switch (args.count()) {
+            case 3: {// $ ./GoldenCheetah ~/Athletes Mark
                 // The first parameter is checked as a folder earlier and exits if its not valid
                 //  athlete
                 athleteToOpen = args.at(2);
             } break;
 
-            case 2: // $ ./GoldenCheetah Mark -or- ./GoldenCheetah --server ~/athletedir
-            {
-                if (!server)
-                {
+            case 2: {// $ ./GoldenCheetah Mark -or- ./GoldenCheetah --server ~/athletedir
+                if (!server) {
                     // athlete
                     athleteToOpen = args.at(1);
-                }
-                else {
+                } else {
                     // GC is a server so set the directory if it exists
-                    if (QFileInfo(args.at(1)).isDir())
-                    {
+                    if (QFileInfo(args.at(1)).isDir()) {
                         home.cd(args.at(1));
                     } else {
                         QMessageBox::critical(NULL, "Exiting", QString("argv[1] is not a directory (%1)").arg(args.at(1)));
@@ -611,26 +591,23 @@ main(int argc, char *argv[])
                 }
             } break;
 
-            default: // no parameters passed, note too many parameters are checked at the start of the home directory processing
-            {
+            default: { // no parameters passed, note too many parameters are checked at the start of the home directory processing
                 // so lets open the last athlete we worked with
-                if (appsettings->value(NULL, GC_OPENLASTATHLETE, true).toBool())
-                {  
+                if (appsettings->value(NULL, GC_OPENLASTATHLETE, true).toBool()) {  
+
                     QVariant lastOpenedAthlete = appsettings->value(NULL, GC_SETTINGS_LAST);
 
                     // does lastOpenedAthlete Directory exists at all
                     QDir lastOpenedAthleteDir(gcroot + "/" + lastOpenedAthlete.toString());
 
-                    if (lastOpenedAthleteDir.exists())
-                    {
+                    if (lastOpenedAthleteDir.exists()) {
                         athleteToOpen = lastOpenedAthlete;
                           
                         // ensure athlete specific config is loaded before accessing it.
                         appsettings->initializeQSettingsAthlete(gcroot, lastOpenedAthlete.toString());
 
                         // but hang on, check they didn't crash? if so we need to open with a menu
-                        if (appsettings->cvalue(lastOpenedAthlete.toString(), GC_SAFEEXIT, true).toBool() != true)
-                        {
+                        if (appsettings->cvalue(lastOpenedAthlete.toString(), GC_SAFEEXIT, true).toBool() != true) {
                             athleteToOpen = QVariant();
                         }
                     }
@@ -661,12 +638,9 @@ main(int argc, char *argv[])
         QTranslator gcTranslator;
         QString translation_file = "/gc_" + lang.toString() + ".qm";
 
-        if (gcTranslator.load(gcroot + translation_file))
-        {
+        if (gcTranslator.load(gcroot + translation_file)) {
             qDebug() << "Loaded translation from" + gcroot + translation_file;
-        }
-        else
-        {
+        } else {
             gcTranslator.load(":translations" + translation_file);
         }
         application->installTranslator(&gcTranslator);
