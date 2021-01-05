@@ -96,6 +96,7 @@
 // 4000 - V3.6 DEVELOPMENT 2005 (MAY 2020)
 // 4001 - V3.6 DEVELOPMENT 2006 (JUN 2020)
 // 4002 - V3.6 DEVELOPMENT 2009 (SEP 2020)
+// 4003 - V3.6 DEVELOPMENT 2101 (JAN 2021)
 
 #define VERSION3_BUILD    3010 // released
 #define VERSION3_SP1      3030 // released
@@ -112,8 +113,8 @@
 #define VERSION31_BUILD VERSION31_UPG
 
 // the next two will with each build/release
-#define VERSION_LATEST 4002
-#define VERSION_STRING "V3.6-DEV2009"
+#define VERSION_LATEST 4003
+#define VERSION_STRING "V3.6-DEV2101"
 
 // default config for this release cycle
 #define VERSION_CONFIG_PREFIX "http://www.goldencheetah.org/defaults/3.5"
