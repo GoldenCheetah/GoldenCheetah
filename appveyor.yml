@@ -114,7 +114,7 @@ install:
 
 before_build:
 # Define GC version string, only for tagged builds
-- if %APPVEYOR_REPO_TAG%==true echo DEFINES+=GC_VERSION=VERSION_STRING >> src/gcconfig.pri
+- if %APPVEYOR_REPO_TAG%==true echo DEFINES+=GC_VERSION=VERSION_STRING >> src\gcconfig.pri
 
 # Enable CloudDB
 - echo CloudDB=active >> src\gcconfig.pri
