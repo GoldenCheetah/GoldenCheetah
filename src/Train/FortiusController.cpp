@@ -23,7 +23,7 @@
 FortiusController::FortiusController(TrainSidebar *parent,  DeviceConfiguration *dc) : RealtimeController(parent, dc)
 {
     myFortius = new Fortius (parent);
-    myFortius->calibrationState = CALIBRATION_STATE_IDLE;
+    myFortius->m_calibrationState = CALIBRATION_STATE_IDLE;
 }
 
 
@@ -177,13 +177,13 @@ FortiusController::getCalibrationTargetSpeed()
 uint8_t
 FortiusController::getCalibrationState()
 {
-    return myFortius->calibrationState;
+    return myFortius->m_calibrationState;
 }
 
 void
 FortiusController::setCalibrationState(uint8_t state)
 {
-    myFortius->calibrationState = state;
+    myFortius->m_calibrationState = state;
     switch (state)
     {
     case CALIBRATION_STATE_IDLE:
@@ -192,7 +192,7 @@ FortiusController::setCalibrationState(uint8_t state)
 
     case CALIBRATION_STATE_PENDING:
         myFortius->setMode(Fortius::FT_CALIBRATE);
-        myFortius->calibrationState = CALIBRATION_STATE_REQUESTED;
+        myFortius->m_calibrationState = CALIBRATION_STATE_REQUESTED;
         break;
 
     default:
@@ -205,7 +205,7 @@ FortiusController::setCalibrationState(uint8_t state)
 uint16_t
 FortiusController::getCalibrationZeroOffset()
 {
-    switch (myFortius->calibrationState)
+    switch (myFortius->m_calibrationState)
     {
         // Waiting for use to kick pedal...
         case CALIBRATION_STATE_REQUESTED:
@@ -215,8 +215,8 @@ FortiusController::getCalibrationZeroOffset()
 
             if (telemetry.Speed_ms > Fortius::kph_to_ms(19.9))
             {
-                myFortius->calibration_values.reset();
-                myFortius->calibrationState = CALIBRATION_STATE_STARTING;
+                myFortius->m_calibrationValues.reset();
+                myFortius->m_calibrationState = CALIBRATION_STATE_STARTING;
             }
             return 0;
         }
@@ -229,19 +229,19 @@ FortiusController::getCalibrationZeroOffset()
             myFortius->getTelemetry(telemetry);
 
             const double latest = telemetry.Force_N;
-            myFortius->calibration_values.update(latest);
+            myFortius->m_calibrationValues.update(latest);
 
             // unexpected resistance (pedalling) will cause calibration to terminate
             if (latest > 0)
             {
-                myFortius->calibrationState = CALIBRATION_STATE_FAILURE;
+                myFortius->m_calibrationState = CALIBRATION_STATE_FAILURE;
                 return 0;
             }
 
-            if (myFortius->calibration_values.is_full())
+            if (myFortius->m_calibrationValues.is_full())
             {
-                myFortius->calibrationState = CALIBRATION_STATE_STARTED;
-                myFortius->calibrationStarted = time(nullptr);
+                myFortius->m_calibrationState = CALIBRATION_STATE_STARTED;
+                myFortius->m_calibrationStarted = time(nullptr);
             }
             return Fortius::N_to_rawForce(latest);
         }
@@ -254,18 +254,18 @@ FortiusController::getCalibrationZeroOffset()
             myFortius->getTelemetry(telemetry);
 
             const double latest = telemetry.Force_N;
-            myFortius->calibration_values.update(latest);
+            myFortius->m_calibrationValues.update(latest);
 
             // unexpected resistance (pedalling) will cause calibration to terminate
             if (latest > 0)
             {
-                myFortius->calibrationState = CALIBRATION_STATE_FAILURE;
+                myFortius->m_calibrationState = CALIBRATION_STATE_FAILURE;
                 return 0;
             }
 
             // calculate the average
-            const double mean   = myFortius->calibration_values.mean();
-            const double stddev = myFortius->calibration_values.stddev();
+            const double mean   = myFortius->m_calibrationValues.mean();
+            const double stddev = myFortius->m_calibrationValues.stddev();
 
             // wait until stddev within threshold
             // perhaps this isn't the best numerical solution to detect settling
@@ -276,11 +276,11 @@ FortiusController::getCalibrationZeroOffset()
 
             // termination (settling) conditions
             if (stddev < stddev_threshold
-                || (time(nullptr) - myFortius->calibrationStarted) > calibrationDurationLimit_s)
+                || (time(nullptr) - myFortius->m_calibrationStarted) > calibrationDurationLimit_s)
             {
                 // accept the current average as the final valibration value
                 myFortius->setBrakeCalibrationForce(-mean);
-                myFortius->calibrationState = CALIBRATION_STATE_SUCCESS;
+                myFortius->m_calibrationState = CALIBRATION_STATE_SUCCESS;
                 myFortius->setMode(Fortius::FT_IDLE);
 
                 // TODO... just because we have determined the current value
@@ -291,7 +291,7 @@ FortiusController::getCalibrationZeroOffset()
             }
 
             // Need to return a uint16_t, and TrainSidebar displays to user as raw value
-            return Fortius::N_to_rawForce(-(myFortius->calibration_values.is_full() ? mean : latest));
+            return Fortius::N_to_rawForce(-(myFortius->m_calibrationValues.is_full() ? mean : latest));
         }
 
         case CALIBRATION_STATE_SUCCESS:
@@ -305,6 +305,6 @@ FortiusController::getCalibrationZeroOffset()
 void
 FortiusController::resetCalibrationState()
 {
-    myFortius->calibrationState = CALIBRATION_STATE_IDLE;
+    myFortius->m_calibrationState = CALIBRATION_STATE_IDLE;
     myFortius->setMode(Fortius::FT_IDLE);
 }

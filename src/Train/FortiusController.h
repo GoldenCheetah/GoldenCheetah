@@ -49,10 +49,10 @@ public:
     bool doesPush() override, doesPull() override, doesLoad() override;
     void getRealtimeData(RealtimeData &rtData) override;
     void pushRealtimeData(RealtimeData &rtData) override;
-    void setLoad(double) override;
-    void setGradientWithSimState(double, double, double) override;
+    void setLoad(double watts) override;
+    void setGradientWithSimState(double gradient, double force_N, double speed_kph) override;
     void setMode(int) override;
-    void setWeight(double) override;
+    void setWeight(double kg) override;
 
     // calibration
     uint8_t  getCalibrationType() override;

@@ -40,24 +40,24 @@ Fortius::Fortius(QObject *parent) : QThread(parent)
 {
     this->parent = parent;
 
-    _device.Force_N = _device.Power_W = _device.HeartRate = _device.Cadence = _device.Speed_ms = 0.00;
-    deviceStatus=0;
+    m_device.Force_N = m_device.Power_W = m_device.HeartRate = m_device.Cadence = m_device.Speed_ms = 0.00;
+    m_deviceStatus=0;
 
-    _control.mode                         = FT_IDLE;
-    _control.brakeCalibrationFactor       = 0.0;
-    _control.brakeCalibrationForce_N      = 0.0; // loaded from settings on connect, or set upon calibration
-    _control.targetPower_W                = 100.0;
-    _control.gradient                     = 2.0;
-    _control.weight_kg                    = 77;
-    _control.powerScaleFactor             = 1.0;
+    m_control.mode                         = FT_IDLE;
+    m_control.brakeCalibrationFactor       = 0.0;
+    m_control.brakeCalibrationForce_N      = 0.0; // loaded from settings on connect, or set upon calibration
+    m_control.targetPower_W                = 100.0;
+    m_control.gradient                     = 2.0;
+    m_control.weight_kg                    = 77;
+    m_control.powerScaleFactor             = 1.0;
 
     // for interacting over the USB port
-    usb2 = new LibUsb(TYPE_FORTIUS);
+    m_usb2 = new LibUsb(TYPE_FORTIUS);
 }
 
 Fortius::~Fortius()
 {
-    delete usb2;
+    delete m_usb2;
 }
 
 /* ----------------------------------------------------------------------
@@ -65,15 +65,15 @@ Fortius::~Fortius()
  * ---------------------------------------------------------------------- */
 void Fortius::setMode(int mode)
 {
-    Lock lock(pvars);
-    _control.mode = mode;
+    Lock lock(m_lock);
+    m_control.mode = mode;
 }
 
 // Alters the relationship between brake setpoint at load.
 void Fortius::setBrakeCalibrationFactor(double brakeCalibrationFactor)
 {
-    Lock lock(pvars);
-    _control.brakeCalibrationFactor = brakeCalibrationFactor;
+    Lock lock(m_lock);
+    m_control.brakeCalibrationFactor = brakeCalibrationFactor;
 }
 
 // output power adjusted by this value so user can compare with hub or crank based readings
@@ -82,8 +82,8 @@ void Fortius::setPowerScaleFactor(double powerScaleFactor)
     if (powerScaleFactor < 0.8) powerScaleFactor = 0.8;
     if (powerScaleFactor > 1.2) powerScaleFactor = 1.2;
 
-    Lock lock(pvars);
-    _control.powerScaleFactor = powerScaleFactor;
+    Lock lock(m_lock);
+    m_control.powerScaleFactor = powerScaleFactor;
 }
 
 // User weight used by brake in slope mode
@@ -93,8 +93,8 @@ void Fortius::setWeight(double weight_kg)
     if (weight_kg < 50)  weight_kg = 50;
     if (weight_kg > 120) weight_kg = 120;
 
-    Lock lock(pvars);
-    _control.weight_kg = weight_kg;
+    Lock lock(m_lock);
+    m_control.weight_kg = weight_kg;
 }
 
 void Fortius::setBrakeCalibrationForce(double force_N)
@@ -102,24 +102,24 @@ void Fortius::setBrakeCalibrationForce(double force_N)
     // save raw calibration value
     appsettings->setValue(TRAIN_FORTIUSCALIBRATION, static_cast<int>(N_to_rawForce(force_N)));
 
-    Lock lock(pvars);
-    _control.brakeCalibrationForce_N = force_N;
+    Lock lock(m_lock);
+    m_control.brakeCalibrationForce_N = force_N;
 }
 
 // Load in watts when in power mode
 void Fortius::setLoad(double targetPower_W)
 {
-    Lock lock(pvars);
-    _control.targetPower_W = targetPower_W;
+    Lock lock(m_lock);
+    m_control.targetPower_W = targetPower_W;
 }
 
 // Resistance in newtons when implementing 'slope' mode
 void Fortius::setGradientWithSimState(double gradient, double targetForce_N, double speed_kph)
 {
-    Lock lock(pvars);
-    _control.targetForce_N = targetForce_N;
-    _control.simSpeed_ms   = kph_to_ms(speed_kph); // for aligning simulator and trainer speeds
-    _control.gradient      = gradient;
+    Lock lock(m_lock);
+    m_control.targetForce_N = targetForce_N;
+    m_control.simSpeed_ms   = kph_to_ms(speed_kph); // for aligning simulator and trainer speeds
+    m_control.gradient      = gradient;
 }
 
 /* ----------------------------------------------------------------------
@@ -127,55 +127,55 @@ void Fortius::setGradientWithSimState(double gradient, double targetForce_N, dou
  * ---------------------------------------------------------------------- */
 void Fortius::getTelemetry(DeviceTelemetry& copy)
 {
-    Lock lock(pvars);
-    copy = _device;
+    Lock lock(m_lock);
+    copy = m_device;
 
     // work around to ensure controller doesn't miss button press.
     // The run thread will only set the button bits, they don't get
     // reset until the ui reads the device state
-    _device.Buttons = 0;
+    m_device.Buttons = 0;
 }
 
 int Fortius::getMode() const
 {
-    Lock lock(pvars);
-    return _control.mode;
+    Lock lock(m_lock);
+    return m_control.mode;
 }
 
 double Fortius::getLoad() const
 {
-    Lock lock(pvars);
-    return _control.targetPower_W;
+    Lock lock(m_lock);
+    return m_control.targetPower_W;
 }
 
 double Fortius::getGradient() const
 {
-    Lock lock(pvars);
-    return _control.gradient;
+    Lock lock(m_lock);
+    return m_control.gradient;
 }
 
 double Fortius::getWeight() const
 {
-    Lock lock(pvars);
-    return _control.weight_kg;
+    Lock lock(m_lock);
+    return m_control.weight_kg;
 }
 
 double Fortius::getBrakeCalibrationForce() const
 {
-    Lock lock(pvars);
-    return _control.brakeCalibrationForce_N;
+    Lock lock(m_lock);
+    return m_control.brakeCalibrationForce_N;
 }
 
 double Fortius::getBrakeCalibrationFactor() const
 {
-    Lock lock(pvars);
-    return _control.brakeCalibrationFactor;
+    Lock lock(m_lock);
+    return m_control.brakeCalibrationFactor;
 }
 
 double Fortius::getPowerScaleFactor() const
 {
-    Lock lock(pvars);
-    return _control.powerScaleFactor;
+    Lock lock(m_lock);
+    return m_control.powerScaleFactor;
 }
 
 
@@ -200,12 +200,12 @@ int
 Fortius::start()
 {
     {
-        Lock lock(pvars);
-        deviceStatus = FT_RUNNING;
+        Lock lock(m_lock);
+        m_deviceStatus = FT_RUNNING;
 
         // Lead raw calibration value, and convert to N
         const double raw_saved_calibration = appsettings->value(this, TRAIN_FORTIUSCALIBRATION, 0x0410).toInt();
-        _control.brakeCalibrationForce_N = rawForce_to_N(raw_saved_calibration);
+        m_control.brakeCalibrationForce_N = rawForce_to_N(raw_saved_calibration);
     }
 
     QThread::start();
@@ -215,15 +215,15 @@ Fortius::start()
 int Fortius::restart()
 {
     // get current status
-    Lock lock(pvars);
+    Lock lock(m_lock);
 
-    int status = deviceStatus;
+    int status = m_deviceStatus;
 
     // what state are we in anyway?
     if (status & FT_RUNNING && status & FT_PAUSED)
     {
         status &= ~FT_PAUSED;
-        deviceStatus = status;
+        m_deviceStatus = status;
         return 0; // ok its running again!
     }
     return 2;
@@ -232,24 +232,24 @@ int Fortius::restart()
 int Fortius::stop()
 {
     // what state are we in anyway?
-    Lock lock(pvars);
-    deviceStatus = 0; // Terminate it!
+    Lock lock(m_lock);
+    m_deviceStatus = 0; // Terminate it!
     return 0;
 }
 
 int Fortius::pause()
 {
-    Lock lock(pvars);
+    Lock lock(m_lock);
 
     // get current status
-    int status = deviceStatus;
+    int status = m_deviceStatus;
 
     if (status & FT_PAUSED) return 2; // already paused you muppet!
     else if (!(status & FT_RUNNING)) return 4; // not running anyway, fool!
     else {
         // ok we're running and not paused so lets pause
         status |= FT_PAUSED;
-        deviceStatus = status;
+        m_deviceStatus = status;
 
         return 0;
     }
@@ -316,34 +316,34 @@ void Fortius::run()
             // UPDATE BASIC TELEMETRY (HR, CAD, SPD et al)
             // The data structure is very simple, no bit twiddling needed here
             //----------------------------------------------------------------
-            // The first 12 bytes are almost always identical, with buf[10] being
+            // The first 12 bytes are almost always identical, with m_buf[10] being
             // exceptionally 40 instead of 50:
             //
             // 20 9f 00 00 08 01 00 00 07 00 50 bd
             //
-            // buf[12] is heart rate
-            // buf[13] is buttons
-            // buf[14, 15] change from time to time, 00 00 or 00 01 (controller status?)
-            // buf[16, 17] remain around 6d 02
-            // buf[18, 19] is the steering
-            // buf[20 - 27] remain constant at d0 07 d0 07 03 13 02 00
-            // buf[28 - 31] is the distance
-            // buf[32, 33] is the speed
-            // buf[34] varies around 2c
-            // buf[35] jumps mostly between 02 and 0e.
-            // buf[36, 37] vary with the speed but go to 0 more quickly than the speed or power
-            // buf[38, 39] is the torque output of the cyclist
-            // buf[40, 41] also vary somewhat with speed
-            // buf[42] pedal sensor, normally 0, 1 when the pedal passes near the sensor
-            // buf[43] remains 0
-            // buf[44, 45] cadence
-            // buf[46] is 0x02 when active, 0x00 at the end
-            // buf[47] varies even when the system is idle
+            // m_buf[12] is heart rate
+            // m_buf[13] is buttons
+            // m_buf[14, 15] change from time to time, 00 00 or 00 01 (controller status?)
+            // m_buf[16, 17] remain around 6d 02
+            // m_buf[18, 19] is the steering
+            // m_buf[20 - 27] remain constant at d0 07 d0 07 03 13 02 00
+            // m_buf[28 - 31] is the distance
+            // m_buf[32, 33] is the speed
+            // m_buf[34] varies around 2c
+            // m_buf[35] jumps mostly between 02 and 0e.
+            // m_buf[36, 37] vary with the speed but go to 0 more quickly than the speed or power
+            // m_buf[38, 39] is the torque output of the cyclist
+            // m_buf[40, 41] also vary somewhat with speed
+            // m_buf[42] pedal sensor, normally 0, 1 when the pedal passes near the sensor
+            // m_buf[43] remains 0
+            // m_buf[44, 45] cadence
+            // m_buf[46] is 0x02 when active, 0x00 at the end
+            // m_buf[47] varies even when the system is idle
 
             if (actualLength >= 24) {
-                cur.HeartRate = buf[12];
-                cur.Buttons   = buf[13];
-                cur.Steering  = buf[18] | (buf[19] << 8);
+                cur.HeartRate = m_buf[12];
+                cur.Buttons   = m_buf[13];
+                cur.Steering  = m_buf[18] | (m_buf[19] << 8);
             }
 
             if (actualLength >= 48) {
@@ -352,18 +352,18 @@ void Fortius::run()
                 //curBrakeStatus = buf[46?];
 
                 // pedal sensor is 0x01 when crank passes sensor
-                pedalSensor   = buf[42];
+                pedalSensor   = m_buf[42];
 
                 // UNUSED curDistance = (buf[28] | (buf[29] << 8) | (buf[30] << 16) | (buf[31] << 24)) / 16384.0;
 
-                cur.Cadence   = buf[44];
+                cur.Cadence   = m_buf[44];
 
                 // speed
 
-                cur.Speed_ms  = rawSpeed_to_ms(qFromLittleEndian<quint16>(&buf[32]));
+                cur.Speed_ms  = rawSpeed_to_ms(qFromLittleEndian<quint16>(&m_buf[32]));
 
                 // Power is torque * wheelspeed - adjusted by device resistance factor.
-                cur.Force_N   = rawForce_to_N(qFromLittleEndian<qint16>(&buf[38]));
+                cur.Force_N   = rawForce_to_N(qFromLittleEndian<qint16>(&m_buf[38]));
                 cur.Power_W   = cur.Force_N * cur.Speed_ms;
                 cur.Power_W  *= getPowerScaleFactor(); // apply scale factor
 
@@ -373,8 +373,8 @@ void Fortius::run()
             if (actualLength >= 24) // ie, if either of the two blocks above were executed
             {
                 // update public fields
-                Lock lock(pvars);
-                _device = cur;
+                Lock lock(m_lock);
+                m_device = cur;
             }
         }
 
@@ -382,8 +382,8 @@ void Fortius::run()
         // LISTEN TO GUI CONTROL COMMANDS
         //----------------------------------------------------------------
         {
-            Lock lock(pvars);
-            curstatus = deviceStatus;
+            Lock lock(m_lock);
+            curstatus = m_deviceStatus;
         }
 
         /* time to shut up shop */
@@ -474,9 +474,9 @@ namespace {
 
 int Fortius::sendRunCommand(double deviceSpeed_ms, int16_t pedalSensor)
 {
-    pvars.lock();
-    const ControlParameters c = _control; // local copy
-    pvars.unlock();
+    m_lock.lock();
+    const ControlParameters c = m_control; // local copy
+    m_lock.unlock();
 
     // Depending on mode, send the appropriate command to the trainer
     int rc = 0;
@@ -550,14 +550,14 @@ int Fortius::sendCommand_OPEN()
     return rawWrite(command, 4);
 }
 
-int Fortius::sendCommand_GENERIC(uint8_t mode, double rawForce, uint8_t pedecho, uint8_t weight_kg, uint16_t calibration)
+int Fortius::sendCommand_GENERIC(uint8_t mode, double rawForce, uint8_t pedalEcho, uint8_t weight_kg, uint16_t calibration)
 {
     uint8_t command[12] = { 0x01, 0x08, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 
     const double resistance = std::min<double>(SHRT_MAX, rawForce);
     qToLittleEndian<int16_t>(resistance, &command[4]);
 
-    command[6] = pedecho;
+    command[6] = pedalEcho;
     command[8] = mode;
     command[9] = weight_kg;
 
@@ -570,13 +570,13 @@ int Fortius::sendCommand_IDLE()
     return sendCommand_GENERIC(FT_MODE_IDLE, 0, 0, 0x52 /* flywheel enabled at 82 kg */, 0);
 }
 
-int Fortius::sendCommand_RESISTANCE(double force_N, uint8_t pedecho, uint8_t weight_kg)
+int Fortius::sendCommand_RESISTANCE(double force_N, uint8_t pedalEcho, uint8_t weight_kg)
 {
     const double brakeCalibrationFactor = getBrakeCalibrationFactor(); // thread-safe
     const double brakeCalibrationForce_N = getBrakeCalibrationForce(); // thread-safe
     const double calibration = (130 * brakeCalibrationFactor) + N_to_rawForce(brakeCalibrationForce_N);
 
-    return sendCommand_GENERIC(FT_MODE_ACTIVE, N_to_rawForce(force_N), pedecho, weight_kg, calibration);
+    return sendCommand_GENERIC(FT_MODE_ACTIVE, N_to_rawForce(force_N), pedalEcho, weight_kg, calibration);
 }
 
 int Fortius::sendCommand_CALIBRATE(double speed_ms)
@@ -600,21 +600,21 @@ int Fortius::readMessage()
 {
     int rc;
 
-    rc = rawRead(buf, 64);
+    rc = rawRead(m_buf, 64);
     //qDebug() << "usb status " << rc;
     return rc;
 }
 
 int Fortius::closePort()
 {
-    usb2->close();
+    m_usb2->close();
     return 0;
 }
 
 bool Fortius::find()
 {
     int rc;
-    rc = usb2->find();
+    rc = m_usb2->find();
     //qDebug() << "usb status " << rc;
     return rc;
 }
@@ -622,20 +622,20 @@ bool Fortius::find()
 int Fortius::openPort()
 {
     int rc;
-    // on windows we try on USB2 then on USB1 then fail...
-    rc = usb2->open();
+    // on windows we try on m_usb2 then on USB1 then fail...
+    rc = m_usb2->open();
     //qDebug() << "usb status " << rc;
     return rc;
 }
 
 int Fortius::rawWrite(const uint8_t *bytes, int size) // unix!!
 {
-    return usb2->write((char *)bytes, size, FT_USB_TIMEOUT);
+    return m_usb2->write((char *)bytes, size, FT_USB_TIMEOUT);
 }
 
 int Fortius::rawRead(uint8_t bytes[], int size)
 {
-    return usb2->read((char *)bytes, size, FT_USB_TIMEOUT);
+    return m_usb2->read((char *)bytes, size, FT_USB_TIMEOUT);
 }
 
 // check to see of there is a port at the device specified

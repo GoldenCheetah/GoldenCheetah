@@ -164,10 +164,10 @@ public:
     void getTelemetry(DeviceTelemetry&);
 
     // calibration data for use by controller
-    uint8_t  calibrationState;
-    time_t   calibrationStarted;
+    uint8_t  m_calibrationState;
+    time_t   m_calibrationStarted;
 
-    NSampleSmoothing<100> calibration_values;
+    NSampleSmoothing<100> m_calibrationValues;
 
 private:
     void run();                                 // called by start to kick off the CT comtrol thread
@@ -181,9 +181,9 @@ private:
 
     int sendCommand_OPEN();
     int sendCommand_IDLE();
-    int sendCommand_RESISTANCE(double force_N, uint8_t pedecho, uint8_t weight_kg);
+    int sendCommand_RESISTANCE(double force_N, uint8_t pedalEcho, uint8_t weight_kg);
     int sendCommand_CALIBRATE(double speed_ms);
-    int sendCommand_GENERIC(uint8_t mode, double rawForce, uint8_t pedecho, uint8_t weight_kg, uint16_t calibration);
+    int sendCommand_GENERIC(uint8_t mode, double rawForce, uint8_t pedalEcho, uint8_t weight_kg, uint16_t calibration);
 
 
     // Protocol decoding
@@ -191,13 +191,13 @@ private:
     //void unpackTelemetry(int &b1, int &b2, int &b3, int &buttons, int &type, int &value8, int &value12);
 
     // Mutex for controlling accessing private data
-    mutable QMutex pvars;
+    mutable QMutex m_lock;
 
     // Device status running, paused, disconnected
-    int deviceStatus; // must acquire pvars for read/write
+    int m_deviceStatus; // must acquire pvars for read/write
 
     // INBOUND TELEMETRY - read & write requires lock since written by run() thread
-    DeviceTelemetry _device; // must acquire pvars for read/write
+    DeviceTelemetry m_device; // must acquire pvars for read/write
 
     // OUTBOUND COMMANDS read & write requires lock since written by gui() thread
     struct ControlParameters {
@@ -210,14 +210,14 @@ private:
         double weight_kg;
         double brakeCalibrationFactor;
         double brakeCalibrationForce_N;
-    } _control; // must acquire pvars for read/write
+    } m_control; // must acquire pvars for read/write
 
 
     // i/o message holder
-    uint8_t buf[64];
+    uint8_t m_buf[64];
 
     // device port
-    LibUsb *usb2;                   // used for USB2 support
+    LibUsb *m_usb2;                   // used for USB2 support
     static const int FT_USB_TIMEOUT = 500;
 
     // raw device utils
