@@ -4,7 +4,7 @@
 
 ## About 
 
-GoldenCheetah is a desktop application for cyclists and triathletes and coaches, providing a rich set of tools and models to analyse, track and predict performance, optimimise aerodynamics and train indoors.
+GoldenCheetah is a desktop application for cyclists and triathletes and coaches, providing a rich set of tools and models to analyse, track and predict performance, optimise aerodynamics and train indoors.
 
 GoldenCheetah integrates with most popular cloud services like Strava and Todays Plan, imports data from bike computers, imports downloads from any website like TrainingPeaks and Garmin and will also connect to smart trainers using ANT+ and Bluetooth.
 
