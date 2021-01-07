@@ -40,6 +40,7 @@ cp /usr/local/lib/libcrypto.so.1.1 appdir/lib
 
 ### Add vlc 3
 cp -r /usr/lib/x86_64-linux-gnu/vlc appdir/lib/vlc
+sudo appdir/lib/vlc/vlc-cache-gen appdir/lib/vlc/plugins
 
 ### Download current version of linuxdeployqt
 wget --no-verbose -c https://github.com/probonopd/linuxdeployqt/releases/download/6/linuxdeployqt-6-x86_64.AppImage
