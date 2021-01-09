@@ -47,7 +47,7 @@ public:
     void pushRealtimeData(RealtimeData &rtData);
     
     void setLoad(double);
-    void setGradient(double);
+    void setGradientWithSimState(double gradient, double targetForce_N, double speed_kph) override;
     void setMode(int) { return ; }
 };
 

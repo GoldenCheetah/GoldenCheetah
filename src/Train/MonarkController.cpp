@@ -98,7 +98,6 @@ MonarkController::getRealtimeData(RealtimeData &rtData)
     rtData.setWatts(m_monark->power());
     rtData.setHr(m_monark->pulse());
     rtData.setCadence(m_monark->cadence());
-    rtData.setSlope(m_monark->kp());
 }
 
 void MonarkController::pushRealtimeData(RealtimeData &) { } // update realtime data with current values
@@ -108,8 +107,8 @@ void MonarkController::setLoad(double load)
     m_monark->setLoad(load);
 }
 
-void MonarkController::setGradient(double gradient)
+void MonarkController::setGradientWithSimState(double, double targetForce_N, double)
 {
-    // Repurpose gradient as kp for Monarks
-    m_monark->setKp(gradient);
+    static const double s_NewtonsPerKilopond = 9.80665;
+    m_monark->setKp(s_NewtonsPerKilopond * targetForce_N);
 }

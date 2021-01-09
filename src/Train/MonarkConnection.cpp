@@ -172,6 +172,9 @@ void MonarkConnection::requestAll()
     {
         // Calculate what wattage to request to simulate selected kp
         // watt = kp * cadence * 0.98
+
+        // Leaving alone because no device to test but 
+        // QUESTION: Would it be better to compute watts using kp and simspeed?
         unsigned int load = (m_kpToWrite * m_cadence) * 0.98;
 
         QString cmd = QString("power %1\r").arg(load);
