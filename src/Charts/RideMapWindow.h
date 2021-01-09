@@ -109,9 +109,9 @@ class RideMapWindow : public GcChartWindow
     Q_PROPERTY(bool showmarkers READ showMarkers WRITE setShowMarkers USER true)
     Q_PROPERTY(bool showfullplot READ showFullPlot WRITE setFullPlot USER true)
     Q_PROPERTY(bool showintervals READ showIntervals WRITE setShowIntervals USER true)
+    Q_PROPERTY(bool showShadedZones READ showShadedZones WRITE setShowShadedZones USER true)
     Q_PROPERTY(int osmts READ osmTS WRITE setOsmTS USER true)
     Q_PROPERTY(QString googleKey READ googleKey WRITE setGoogleKey USER true)
-    Q_PROPERTY(QString styleoptions READ getStyleOptions WRITE setStyleOptions  USER false)
 
     public:
         typedef enum {
@@ -119,7 +119,7 @@ class RideMapWindow : public GcChartWindow
             GOOGLE,
         } MapType;
 
-        RideMapWindow(Context *, int mapType);
+        RideMapWindow(Context *, MapType mapType);
         virtual ~RideMapWindow();
 
         QWebEngineView *browser() { return view; }
@@ -128,8 +128,11 @@ class RideMapWindow : public GcChartWindow
         int mapType() const { return mapCombo->currentIndex(); }
         void setMapType(int x) { mapCombo->setCurrentIndex(x >= 0 && x < mapCombo->count() ? x : OSM); } // default to OSM for invalid mapType, s.t. deprecated Bing
 
-        bool showIntervals() const { return showInt->isChecked(); }
-        void setShowIntervals(bool x) { showInt->setChecked(x); }
+        bool showIntervals() const { return showIntCk->isChecked(); }
+        void setShowIntervals(bool x) { showIntCk->setChecked(x); }
+
+        bool showShadedZones() const { return showShadedZonesCk->isChecked(); }
+        void setShowShadedZones(bool x) { showShadedZonesCk->setChecked(x); }
 
         bool showMarkers() const { return ( showMarkersCk->checkState() == Qt::Checked); }
         void setShowMarkers(bool x) { if (x) showMarkersCk->setCheckState(Qt::Checked); else showMarkersCk->setCheckState(Qt::Unchecked) ;}
@@ -143,9 +146,6 @@ class RideMapWindow : public GcChartWindow
             setTileServerUrlForTileType(x);
         }
 
-        QString getStyleOptions() const { return styleoptions; }
-        void setStyleOptions(QString x) { styleoptions=x; }
-
         QString googleKey() const { return gkey->text(); }
         void setGoogleKey(QString x) { gkey->setText(x); }
 
@@ -155,6 +155,7 @@ class RideMapWindow : public GcChartWindow
         void tileTypeSelected(int x);
         void showMarkersChanged(int value);
         void showFullPlotChanged(int value);
+        void showShadedZonesChanged(int value);
         void showIntervalsChanged(int value);
         void osmCustomTSURLEditingFinished();
 
@@ -172,10 +173,9 @@ class RideMapWindow : public GcChartWindow
     private:
 
         bool first;
-        QString styleoptions;
 
         QComboBox *mapCombo, *tileCombo;
-        QCheckBox *showMarkersCk, *showFullPlotCk, *showInt;
+        QCheckBox *showMarkersCk, *showFullPlotCk, *showShadedZonesCk, *showIntCk;
         QLabel *osmTSTitle, *osmTSLabel, *osmTSUrlLabel;
         QLineEdit *osmTSUrl;
 
