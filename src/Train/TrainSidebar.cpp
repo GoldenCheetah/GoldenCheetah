@@ -1797,6 +1797,18 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
                         rtData.setAltitude(displayAltitude);
                     }
                 }
+                else // no erg file, compute altitude from gradient and distance travelled.
+                {
+                    double altitudeDeltaMeters = slope * (10 * distanceTick); // ((slope / 100) * distanceTick) * 1000
+
+                    displayAltitude += altitudeDeltaMeters;
+                    rtData.setAltitude(displayAltitude);
+                }
+
+                // VAMinator
+                displayVAM = vaminator.Push(displayAltitude, session_time.elapsed(), displayWorkoutDistance);
+                if (!GlobalContext::context()->useMetricUnits) displayVAM *= (1. / 0.3048);
+                rtData.setVAM(displayVAM);
 
                 // time
                 total_msecs = session_elapsed_msec + session_time.elapsed();
