@@ -123,7 +123,7 @@ public:
 
         // Push element if its > 1 second ahead of newest
         if (fDoPush)
-            q.push_back({ altitude, sessionMS, routeLocationKM });
+            q.push_back(std::make_tuple( altitude, sessionMS, routeLocationKM ));
 
         double vertDeltaM = std::get<0>(q.back()) - std::get<0>(q.front());
         double timeDeltaHour = (std::get<1>(q.back()) - std::get<1>(q.front())) / (1000. * 60. * 60);
