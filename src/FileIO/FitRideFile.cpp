@@ -1800,7 +1800,12 @@ struct FitFileReaderState
                     case 29: // ACCUMULATED_POWER
                              break;
                     case 30: //LEFT_RIGHT_BALANCE
-                             lrbalance = (value & 0x80 ? 100 - (value & 0x7F) : value & 0x7F);
+                             // When bit 7 is 1 value are right power contribution
+                             // not '1' the location of the contribution is undefined
+                             if (value > 0)
+                                lrbalance = 100 - (value & 0x7F);
+                             else
+                                lrbalance = RideFile::NA;
                              break;
                     case 31: // GPS Accuracy
                              break;
@@ -3952,7 +3957,8 @@ void write_record(QByteArray *array, const RideFile *ride, bool withAlt, bool wi
             write_int8(ridePoint, point->temp);
         }
         if ( (type&2)==2 ) {
-            write_int8(ridePoint, point->lrbalance);
+            // write right power contribution
+            write_int8(ridePoint, 0x80 + (100-point->lrbalance));
         }
 
         array->append(ridePoint->data(), ridePoint->size());
