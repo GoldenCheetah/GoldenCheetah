@@ -597,7 +597,6 @@ void DialWindow::seriesChanged()
     case RealtimeData::IF:
     case RealtimeData::VI:
     case RealtimeData::SkibaVI:
-    case RealtimeData::Slope:
     case RealtimeData::FeO2:
         foreground = GColor(CFEO2);
         break;
@@ -627,6 +626,7 @@ void DialWindow::seriesChanged()
         break;
 
     case RealtimeData::Load:
+    case RealtimeData::Slope:        
             foreground = GColor(CLOAD);
             break;
 
