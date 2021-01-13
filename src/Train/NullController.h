@@ -57,7 +57,8 @@ class NullController : public RealtimeController
         bool doesLoad() {  return false; }
 
         void setMode(int);
-        void setLoad(double watts) { load = watts; }
+        // Dont set load for null trainer: it generates fixed power regardless of load.
+        void setLoad(double) { /*load = watts*/; }
         void getRealtimeData(RealtimeData &rtData);
         void pushRealtimeData(RealtimeData &rtData);
 
