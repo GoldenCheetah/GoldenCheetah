@@ -348,8 +348,8 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
     lodcount = 0;
     wbalr = wbal = 0;
     load_msecs = total_msecs = lap_msecs = 0;
-    displayWorkoutDistance = displayDistance = displayPower = displayHeartRate =
-    displaySpeed = displayCadence = slope = load = 0;
+    displayWorkoutDistance = displayDistance = displayPower = displayHeartRate = 0;
+    displaySpeed = displayCadence = slope = resistanceNewtons = load = 0;
     displaySMO2 = displayTHB = displayO2HB = displayHHB = 0;
     displayLRBalance = displayLTE = displayRTE = displayLPS = displayRPS = 0;
     displayLatitude = displayLongitude = displayAltitude = 0.0;
@@ -1190,6 +1190,7 @@ void TrainSidebar::Start()       // when start button is pressed
         // START!
         load = 100;
         slope = 0.0;
+        resistanceNewtons = 0.0;
 
         // Reset Speed Simulation
         bicycle.clear();
@@ -1362,6 +1363,7 @@ void TrainSidebar::Stop(int deviceStatus)        // when stop button is pressed
 
     load = 0;
     slope = 0.0;
+    resistanceNewtons = 0.0;
 
     QDateTime now = QDateTime::currentDateTime();
 
@@ -1894,6 +1896,15 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
 
             rtData.setVirtualSpeed(vs);
 
+            // Compute resisting watts needed for current slope and speed. This can be used to
+            // drive resistance of trainers that only support ergo mode.
+            double speedMS = displaySpeed / 3.6;
+            double resistanceWatts = (status & RT_MODE_SLOPE)
+                ? bicycle.WattsForV(BicycleSimState(rtData), speedMS)
+                : displayPower;
+            resistanceNewtons = speedMS > 0. ? resistanceWatts / speedMS : 0;
+            rtData.setResistanceNewtons(resistanceNewtons);
+
             // W'bal on the fly
             // using Dave Waterworth's reformulation
             double TAU = appsettings->cvalue(context->athlete->cyclist, GC_WBALTAU, 300).toInt();
@@ -2102,7 +2113,10 @@ void TrainSidebar::loadUpdate()
         if (slope == -100) {
             Stop(DEVICE_OK);
         } else {
-            foreach(int dev, activeDevices) Devices[dev].controller->setGradient(slope);
+            foreach(int dev, activeDevices) {
+                RealtimeController* c = Devices[dev].controller;
+                c->setGradientWithSimState(slope, resistanceNewtons, displaySpeed);
+            }
             context->notifySetNow(displayWorkoutDistance * 1000);
         }
     }
@@ -2147,9 +2161,10 @@ void TrainSidebar::toggleCalibration()
 
             foreach(int dev, activeDevices) {
                 if (calibrationDeviceIndex == dev) {
-                    Devices[dev].controller->setCalibrationState(CALIBRATION_STATE_IDLE);
-                    Devices[dev].controller->setMode(RT_MODE_SPIN);
-                    Devices[dev].controller->setGradient(slope);
+                    RealtimeController* c = Devices[dev].controller;
+                    c->setCalibrationState(CALIBRATION_STATE_IDLE);
+                    c->setMode(RT_MODE_SPIN);
+                    c->setGradientWithSimState(slope, resistanceNewtons, displaySpeed);
                 }
             }
         }
@@ -2179,8 +2194,8 @@ void TrainSidebar::toggleCalibration()
                 if (status&RT_MODE_ERGO)
                     Devices[dev].controller->setLoad(0);
                 else
-                    Devices[dev].controller->setGradient(0);
-
+                    Devices[dev].controller->setGradientWithSimState(0, 0, 0);
+                
 
                 Devices[dev].controller->setMode(RT_MODE_CALIBRATE);
                 Devices[dev].controller->setCalibrationState(CALIBRATION_STATE_PENDING);
@@ -2563,7 +2578,7 @@ void TrainSidebar::Higher()
         if (status&RT_MODE_ERGO)
             foreach(int dev, activeDevices) Devices[dev].controller->setLoad(load);
         else
-            foreach(int dev, activeDevices) Devices[dev].controller->setGradient(slope);
+            foreach(int dev, activeDevices) Devices[dev].controller->setGradientWithSimState(slope, resistanceNewtons, displaySpeed);
     }
 
     emit setNotification(tr("Increasing intensity.."), 2);
@@ -2589,7 +2604,7 @@ void TrainSidebar::Lower()
         if (status&RT_MODE_ERGO)
             foreach(int dev, activeDevices) Devices[dev].controller->setLoad(load);
         else
-            foreach(int dev, activeDevices) Devices[dev].controller->setGradient(slope);
+            foreach(int dev, activeDevices) Devices[dev].controller->setGradientWithSimState(slope, resistanceNewtons, displaySpeed);
     }
 
     emit setNotification(tr("Decreasing intensity.."), 2);
