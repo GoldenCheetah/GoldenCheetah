@@ -67,6 +67,7 @@ private:
     bool closePort();
     void initializeConnection();
     bool configureForCockpitType(int cockpitType);
+    bool configureFromProfile();
 
     bool ResetDevice();
     bool StartProgram(unsigned int prog);
@@ -108,6 +109,7 @@ private:
     // outbound
     volatile int load_, loadToWrite_;
     const bool forceUpdate_;
+    const QString profile_;
 
     enum CockpitType {
         COCKPIT_CARDIO = 0x10,
