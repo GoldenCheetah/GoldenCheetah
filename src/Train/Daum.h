@@ -112,6 +112,7 @@ private:
     enum CockpitType {
         COCKPIT_CARDIO = 0x10,
         COCKPIT_FITNESS = 0x20,
+        COCKPIT_8008_TRS = 0x2a,
         COCKPIT_VITA_DE_LUXE = 0x30,
         COCKPIT_8008 = 0x40,
         COCKPIT_8080 = 0x50,

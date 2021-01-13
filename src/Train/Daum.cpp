@@ -240,19 +240,14 @@ bool Daum::configureForCockpitType(int cockpitType) {
 
     switch (cockpitType) {
     case COCKPIT_CARDIO:
-        return true;
     case COCKPIT_FITNESS:
-        return true;
     case COCKPIT_VITA_DE_LUXE:
-        return true;
-    case COCKPIT_8008:
-        return true;
-    case COCKPIT_8080:
-        return true;
     case COCKPIT_UNKNOWN:
-        return true;
     case COCKPIT_THERAPIE:
         return true;
+    case COCKPIT_8008:
+    case COCKPIT_8080:
+    case COCKPIT_8008_TRS:
     case COCKPIT_8008_TRS_PRO:
         serialWriteDelay_ = 50;
         playSound_ = true;
