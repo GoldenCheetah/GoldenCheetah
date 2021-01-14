@@ -168,6 +168,8 @@ class TrainSidebar : public GcWindow
 
         int  getCalibrationIndex(void);
 
+        double getIntensifiedGradient() const;
+
     public slots:
         void configChanged(qint32);
         void deleteWorkouts(); // deletes selected workouts
@@ -271,6 +273,7 @@ class TrainSidebar : public GcWindow
         bool lapAudioThisLap;
         double textPositionEmitted;
         bool useSimulatedSpeed;
+        double intensityFactor;
 
         void maintainLapDistanceState();
 
