@@ -2127,7 +2127,7 @@ struct FitFileReaderState
             double deltaLat = lat - prevPoint->lat;
             // double deltaHeadwind = headwind - prevPoint->headwind;
             double deltaSlope = slope - prevPoint->slope;
-            double deltaLeftRightBalance = lrbalance - prevPoint->lrbalance;
+            double deltaLeftRightBalance = (lrbalance>=0?lrbalance:50.0) - (prevPoint->lrbalance?prevPoint->lrbalance:50.0);
             double deltaLeftTE = leftTorqueEff - prevPoint->lte;
             double deltaRightTE = rightTorqueEff - prevPoint->rte;
             double deltaLeftPS = leftPedalSmooth - prevPoint->lps;
