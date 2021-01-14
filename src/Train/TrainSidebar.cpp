@@ -1653,17 +1653,8 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
 
                 // get spinscan data from a computrainer?
                 if (Devices[dev].type == DEV_CT) {
-                    memcpy((uint8_t*)rtData.spinScan, (uint8_t*)local.spinScan, 24);
-                    rtData.setLoad(local.getLoad()); // and get load in case it was adjusted
-                    rtData.setSlope(local.getSlope()); // and get slope in case it was adjusted
-                    // to within defined limits
+                    memcpy((uint8_t*)rtData.spinScan, (uint8_t*)local.spinScan, 24);                
                 }
-
-                if (Devices[dev].type == DEV_FORTIUS || Devices[dev].type == DEV_IMAGIC) {
-	                rtData.setLoad(local.getLoad()); // and get load in case it was adjusted
-                    rtData.setSlope(local.getSlope()); // and get slope in case it was adjusted
-					// to within defined limits
-				}
 
                 if (Devices[dev].type == DEV_ANTLOCAL || Devices[dev].type == DEV_NULL) {
                     rtData.setHb(local.getSmO2(), local.gettHb()); //only moxy data from ant and robot devices right now
