@@ -188,9 +188,9 @@ VideoWindow::~VideoWindow()
     // unload vlc
     libvlc_instance_t* capture_inst = this->inst;
     vlcDispatch.AsyncCall([capture_inst]() {libvlc_release(capture_inst); });
-#endif
 
     vlcDispatch.Drain();
+#endif
 
 #ifdef GC_VIDEO_QT5
     // QT MEDIA
@@ -211,6 +211,8 @@ bool VideoWindow::hasActiveVideo() const
     case libvlc_Playing:
     case libvlc_Paused:
         return true;
+    default:
+        break; // needed for compiler warning
     }
 #endif
 #ifdef GC_VIDEO_QT5
