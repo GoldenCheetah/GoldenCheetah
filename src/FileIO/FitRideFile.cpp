@@ -526,8 +526,20 @@ struct FitFileReaderState
         } else if (manu == 115) {
             // igpsport
             switch(prod) {
-                case -1: return "igpsport";
-                default: return QString("igpsport %1").arg(prod);
+                case -1: return "iGPSPORT";
+                default: return QString("iGPSPORT %1").arg(prod);
+            }
+        } else if (manu == 116) {
+            // thinkrider
+            switch(prod) {
+                case -1: return "Thinkrider";
+                default: return QString("Thinkrider %1").arg(prod);
+            }
+        } else if (manu == 132) {
+            // cycplus
+            switch(prod) {
+                case -1: return "Cycplus";
+                default: return QString("Cycplus %1").arg(prod);
             }
         } else if (manu == 258) {
             // Lezyne
