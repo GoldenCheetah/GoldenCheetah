@@ -31,139 +31,198 @@
 
 #ifndef _GC_Fortius_h
 #define _GC_Fortius_h 1
-#include "GoldenCheetah.h"
+
+#include <cmath>
 
 #include <QString>
-#include <QDialog>
-#include <QDebug>
 #include <QThread>
 #include <QMutex>
-#include <QFile>
-#include <QtCore/qendian.h>
-#include "RealtimeController.h"
 
 #include "LibUsb.h"
 
-#include <stdio.h>
-#include <stdint.h>
-#include <stddef.h>
-#include <stdlib.h>
-#include <errno.h>
-#include <fcntl.h>
-#include <sys/types.h>
+template <size_t N>
+class NSampleSmoothing
+{
+private:
+    int    nSamples = 0;
+    double samples[N];
+    int    index = 0;
+    double total = 0;
+    bool   full = false;
 
-/* Device operation mode */
-#define FT_IDLE        0x00
-#define FT_ERGOMODE    0x01
-#define FT_SSMODE      0x02
-#define FT_CALIBRATE   0x04
+public:
+    NSampleSmoothing()
+    {
+        reset();
+    }
 
-/* Buttons */
-#define FT_PLUS        0x04
-#define FT_MINUS       0x02
-#define FT_CANCEL      0x08
-#define FT_ENTER       0x01
+    void reset()
+    {
+        for (int i = 0; i < N; ++i)
+            samples[i] = 0.;
+        nSamples = 0;
+        index = 0;
+        total = 0;
+        full = false;
+    }
 
-/* Control status */
-#define FT_RUNNING     0x01
-#define FT_PAUSED      0x02
+    void update(double newVal)
+    {
+        ++nSamples;
 
-#define DEFAULT_LOAD         100.00
-#define DEFAULT_GRADIENT     2.00
-#define DEFAULT_WEIGHT       77
-#define DEFAULT_CALIBRATION  0.00
-#define DEFAULT_SCALING      1.00
+        total += newVal - samples[index];
+        samples[index] = newVal;
+        if (++index == N) { index = 0; full = true; }
+    }
 
-#define FT_USB_TIMEOUT      500
+    bool is_full() const
+    {
+        return full;
+    }
+
+    double mean() const
+    {
+        // average if we have enough values, otherwise return latest
+        return total / N;//(nSamples > N) ? (total / N) : samples[(index + (N-1))%N];
+    }
+
+    double stddev() const
+    {
+        const double avg = mean();
+        const double sum_squares = std::accumulate(std::begin(samples), std::end(samples), 0.0, [avg](double acc, double sample) {return acc + (sample - avg) * (sample - avg); });
+        return sqrt(sum_squares / static_cast<double>(N));
+    }
+};
 
 class Fortius : public QThread
 {
+private:
+    enum FortiusControlStatus    { FT_RUNNING = 0x01, FT_PAUSED = 0x02 };
+    enum FortiusCommandModeValue { FT_MODE_IDLE = 0x00, FT_MODE_ACTIVE = 0x02, FT_MODE_CALIBRATE = 0x03 };
 
 public:
-    Fortius(QObject *parent=0);                   // pass device
+    static inline double kph_to_ms      (double kph) { return kph / 3.6; }
+    static inline double ms_to_kph      (double ms)  { return ms  * 3.6; }
+
+    static inline double rawForce_to_N  (double raw) { return raw / 137.; }
+    static inline double N_to_rawForce  (double N)   { return N   * 137.; }
+
+    static inline double rawSpeed_to_ms (double raw) { return raw / 1043.1; } // 289.75*3.6
+    static inline double ms_to_rawSpeed (double ms)  { return ms  * 1043.1; } // 289.75*3.6
+
+    enum FortiusMode    { FT_IDLE, FT_ERGOMODE, FT_SSMODE, FT_CALIBRATE };
+    enum FortiusButtons { FT_ENTER = 0x01, FT_MINUS = 0x02, FT_PLUS = 0x04, FT_CANCEL = 0x08 };
+
+    Fortius(QObject *parent=0);                  // pass device
     ~Fortius();
 
     QObject *parent;
 
     // HIGH-LEVEL FUNCTIONS
-    int start();                                // Calls QThread to start
-    int restart();                              // restart after paused
-    int pause();                                // pauses data collection, inbound telemetry is discarded
-    int stop();                                 // stops data collection thread
-    int quit(int error);                        // called by thread before exiting
+    int start();                                 // Calls QThread to start
+    int restart();                               // restart after paused
+    int pause();                                 // pauses data collection, inbound telemetry is discarded
+    int stop();                                  // stops data collection thread
+    int quit(int error);                         // called by thread before exiting
 
-    bool find();                                // either unconfigured or configured device found
-    bool discover(QString deviceFilename);        // confirm CT is attached to device
+    bool find();                                 // either unconfigured or configured device found
+    bool discover(QString deviceFilename);       // confirm CT is attached to device
 
     // SET
-    void setLoad(double load);                  // set the load to generate in ERGOMODE
-    void setGradient(double gradient);          // set the load to generate in SSMODE
-    void setBrakeCalibrationFactor(double calibrationFactor);     // Impacts relationship between brake setpoint and load
-    void setPowerScaleFactor(double calibrationFactor);         // Scales output power, so user can adjust to match hub or crank power meter
-    void setMode(int mode);
-    void setWeight(double weight);                 // set the total weight of rider + bike in kg's
-    
-    int getMode();
-    double getGradient();
-    double getLoad();
-    double getBrakeCalibrationFactor();
-    double getPowerScaleFactor();
-    double getWeight();
-    
+    void setLoad(double load);                   // set the load to generate in ERGOMODE
+    void setGradientWithSimState(double gradient,
+        double targetForce_N, double speed_kph); // set the load to generate in SSMODE
+    void setBrakeCalibrationForce(double value); // set the calibration force (N) for ERGOMODE and SSMODE
+    void setBrakeCalibrationFactor(double);      // Impacts relationship between brake setpoint and load
+    void setPowerScaleFactor(double);            // Scales output power, so user can adjust to match hub or crank power meter
+    void setMode(int mode);                      // set the mode
+    void setWeight(double weight_kg);            // set the total weight of rider + bike in kg's
+
+    // GET
+    int    getMode() const;
+    double getGradient() const;
+    double getLoad() const;
+    double getBrakeCalibrationForce() const;
+    double getBrakeCalibrationFactor() const;
+    double getPowerScaleFactor() const;
+    double getWeight() const;
+
     // GET TELEMETRY AND STATUS
     // direct access to class variables is not allowed because we need to use wait conditions
     // to sync data read/writes between the run() thread and the main gui thread
-    void getTelemetry(double &power, double &heartrate, double &cadence, double &speed, double &distance, int &buttons, int &steering, int &status);
+    struct DeviceTelemetry
+    {
+        double Force_N;       // current output force in Newtons
+        double Power_W;       // current output power in Watts
+        double HeartRate;     // current heartrate in BPM
+        double Cadence;       // current cadence in RPM
+        double Speed_ms;      // current speed in Meters per second (derived from wheel speed)
+        double Distance;      // odometer in meters
+        int    Buttons;       // Button status
+        int    Steering;      // Steering angle
+    };
+    void getTelemetry(DeviceTelemetry&);
+
+    // calibration data for use by controller
+    uint8_t  m_calibrationState;
+    time_t   m_calibrationStarted;
+
+    NSampleSmoothing<100> m_calibrationValues;
 
 private:
     void run();                                 // called by start to kick off the CT comtrol thread
 
-    uint8_t ERGO_Command[12],
-            SLOPE_Command[12];
-    
     // Utility and BG Thread functions
     int openPort();
     int closePort();
 
     // Protocol encoding
-    int sendRunCommand(int16_t pedalSensor);
-    int sendOpenCommand();
-    int sendCloseCommand();
-    
+    int sendRunCommand(double deviceSpeed_ms, int16_t pedalSensor);
+
+    int sendCommand_OPEN();
+    int sendCommand_IDLE();
+    int sendCommand_RESISTANCE(double force_N, uint8_t pedalEcho, uint8_t weight_kg);
+    int sendCommand_CALIBRATE(double speed_ms);
+    int sendCommand_GENERIC(uint8_t mode, double rawForce, uint8_t pedalEcho, uint8_t weight_kg, uint16_t calibration);
+
+
     // Protocol decoding
     int readMessage();
     //void unpackTelemetry(int &b1, int &b2, int &b3, int &buttons, int &type, int &value8, int &value12);
 
     // Mutex for controlling accessing private data
-    QMutex pvars;
+    mutable QMutex m_lock;
 
-    // INBOUND TELEMETRY - all volatile since it is updated by the run() thread
-    volatile double devicePower;            // current output power in Watts
-    volatile double deviceHeartRate;        // current heartrate in BPM
-    volatile double deviceCadence;          // current cadence in RPM
-    volatile double deviceSpeed;            // current speed in KPH
-    volatile double deviceDistance;         // odometer in meters
-    volatile int    deviceButtons;          // Button status
-    volatile int    deviceStatus;           // Device status running, paused, disconnected
-    volatile int    deviceSteering;            // Steering angle
-    
-    // OUTBOUND COMMANDS - all volatile since it is updated by the GUI thread
-    volatile int mode;
-    volatile double load;
-    volatile double gradient;
-    volatile double brakeCalibrationFactor;
-    volatile double powerScaleFactor;
-    volatile double weight;
-    
+    // Device status running, paused, disconnected
+    int m_deviceStatus; // must acquire pvars for read/write
+
+    // INBOUND TELEMETRY - read & write requires lock since written by run() thread
+    DeviceTelemetry m_device; // must acquire pvars for read/write
+
+    // OUTBOUND COMMANDS read & write requires lock since written by gui() thread
+    struct ControlParameters {
+        int    mode;
+        double targetPower_W;      // set-point power demanded for ERGO mode
+        double targetForce_N;      // load demanded by simulator
+        double simSpeed_ms;        // simulator's speed, a speed to match if possible
+        double gradient;           // may be used in reworked/alternative slope algorithm
+        double powerScaleFactor;
+        double weight_kg;
+        double brakeCalibrationFactor;
+        double brakeCalibrationForce_N;
+    } m_control; // must acquire pvars for read/write
+
+
     // i/o message holder
-    uint8_t buf[64];
+    uint8_t m_buf[64];
 
     // device port
-    LibUsb *usb2;                   // used for USB2 support
+    LibUsb *m_usb2;                   // used for USB2 support
+    static const int FT_USB_TIMEOUT = 500;
 
     // raw device utils
-    int rawWrite(uint8_t *bytes, int size); // unix!!
-    int rawRead(uint8_t *bytes, int size); // unix!!
+    int rawWrite(const uint8_t *bytes, int size); // unix!!
+    int rawRead(uint8_t *bytes, int size);  // unix!!
 };
 
 #endif // _GC_Fortius_h
