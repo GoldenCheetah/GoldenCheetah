@@ -47,7 +47,7 @@ public slots:
     void requestCadence();
     int readConfiguredLoad();
     void identifyModel();
-    void setLoad(unsigned int load);
+    void setLoad(unsigned int load, bool fSetMode = true);
     void setKp(double kp);
 
 private:

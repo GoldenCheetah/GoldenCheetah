@@ -142,46 +142,38 @@ void MonarkConnection::requestAll()
     requestPulse();
     requestCadence();
 
-    if ((m_loadToWrite != m_load) && m_mode == MONARK_MODE_WATT && canDoLoad())
-    {
+    switch (m_mode) {
+    case MONARK_MODE_KP:
+        if (m_kpToWrite == m_kp) break;
+        
+        if (canDoKp()) {
+            QString cmd = QString("kp %1\r").arg(QString::number(m_kpToWrite, 'f', 1));
+            m_serial->write(cmd.toStdString().c_str());
+            if (!m_serial->waitForBytesWritten(500)) {
+                // failure to write to device, bail out
+                this->exit(-1);
+            }
+            m_kp = m_kpToWrite;
+            QByteArray data = m_serial->readAll();
+
+            break;
+        }
+        // fall through
+
+    case MONARK_MODE_WATT:
+    default:
+        if (m_loadToWrite == m_load) break;
+        if (!canDoLoad()) break;
+
         QString cmd = QString("power %1\r").arg(m_loadToWrite);
         m_serial->write(cmd.toStdString().c_str());
-        if (!m_serial->waitForBytesWritten(500))
-        {
+        if (!m_serial->waitForBytesWritten(500)) {
             // failure to write to device, bail out
             this->exit(-1);
         }
         m_load = m_loadToWrite;
         QByteArray data = m_serial->readAll();
-    }
-
-    if ((m_kpToWrite != m_kp) && m_mode == MONARK_MODE_KP && canDoKp())
-    {
-        QString cmd = QString("kp %1\r").arg(QString::number(m_kpToWrite, 'f', 1 ));
-        m_serial->write(cmd.toStdString().c_str());
-        if (!m_serial->waitForBytesWritten(500))
-        {
-            // failure to write to device, bail out
-            this->exit(-1);
-        }
-        m_kp = m_kpToWrite;
-        QByteArray data = m_serial->readAll();
-    }
-
-    if ((m_mode == MONARK_MODE_KP) && canDoLoad() && !canDoKp())
-    {
-        // Calculate what wattage to request to simulate selected kp
-        // watt = kp * cadence * 0.98
-        unsigned int load = (m_kpToWrite * m_cadence) * 0.98;
-
-        QString cmd = QString("power %1\r").arg(load);
-        m_serial->write(cmd.toStdString().c_str());
-        if (!m_serial->waitForBytesWritten(500))
-        {
-            // failure to write to device, bail out
-            this->exit(-1);
-        }
-        QByteArray data = m_serial->readAll();
+        break;
     }
 
     m_mutex.unlock();
@@ -302,10 +294,10 @@ void MonarkConnection::identifyModel()
 
 }
 
-void MonarkConnection::setLoad(unsigned int load)
+void MonarkConnection::setLoad(unsigned int load, bool fSetMode)
 {
     m_loadToWrite = load;
-    m_mode = MONARK_MODE_WATT;
+    if (fSetMode) m_mode = MONARK_MODE_WATT;
 }
 
 void MonarkConnection::setKp(double kp)

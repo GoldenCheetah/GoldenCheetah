@@ -98,7 +98,6 @@ MonarkController::getRealtimeData(RealtimeData &rtData)
     rtData.setWatts(m_monark->power());
     rtData.setHr(m_monark->pulse());
     rtData.setCadence(m_monark->cadence());
-    rtData.setSlope(m_monark->kp());
 }
 
 void MonarkController::pushRealtimeData(RealtimeData &) { } // update realtime data with current values
@@ -108,8 +107,13 @@ void MonarkController::setLoad(double load)
     m_monark->setLoad(load);
 }
 
-void MonarkController::setGradient(double gradient)
+void MonarkController::setGradientWithSimState(double, double targetForce_N, double simSpeedKph)
 {
-    // Repurpose gradient as kp for Monarks
-    m_monark->setKp(gradient);
+    // Set Kp second to keep monark in Kp mode.
+    static const double s_KilopondsPerNewton = 9.80665;                // acceleration due to gravity
+    m_monark->setKp(s_KilopondsPerNewton * targetForce_N);
+
+    // Some monarks dont support kp so set load also.
+    // Do not change device mode.
+    m_monark->setLoad(simSpeedKph * targetForce_N * (1 / 3.6), false); // speed and force to watts
 }
