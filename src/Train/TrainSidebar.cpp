@@ -95,6 +95,7 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
 
     // don't set the source for telemetry
     lastAppliedIntensity = 100;
+    lastDeviceSpeed = 0;
     bpmTelemetry = wattsTelemetry = kphTelemetry = rpmTelemetry = -1;
 
 #if !defined GC_VIDEO_NONE
@@ -1195,6 +1196,7 @@ void TrainSidebar::Start()       // when start button is pressed
         slope = 0.0;
         resistanceNewtons = 0.0;
         intensityFactor = 1.;
+        lastDeviceSpeed = 0.0;
 
         // Reset Speed Simulation
         bicycle.clear();
@@ -1673,7 +1675,8 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
                 if (dev == bpmTelemetry) rtData.setHr(local.getHr());
                 if (dev == rpmTelemetry) rtData.setCadence(local.getCadence());
                 if (dev == kphTelemetry) {
-                    rtData.setSpeed(local.getSpeed());
+                    lastDeviceSpeed = local.getSpeed();
+                    rtData.setSpeed(lastDeviceSpeed);
                     rtData.setDistance(local.getDistance());
                     rtData.setRouteDistance(local.getRouteDistance());
                     rtData.setDistanceRemaining(local.getDistanceRemaining());
@@ -2110,8 +2113,10 @@ void TrainSidebar::loadUpdate()
         } else {
             double N = IntensifyNewtons(resistanceNewtons, intensityFactor);
             double gradient = getIntensifiedGradient();
+            double simMass = getAdjustedInertialMass();
             foreach(int dev, activeDevices) {
                 RealtimeController* c = Devices[dev].controller;
+                c->setWeight(simMass);
                 c->setGradientWithSimState(gradient, N, displaySpeed);
             }
             context->notifySetNow(displayWorkoutDistance * 1000);
@@ -2158,12 +2163,14 @@ void TrainSidebar::toggleCalibration()
         } else {
             double N = IntensifyNewtons(resistanceNewtons, intensityFactor);
             double gradient = getIntensifiedGradient();
+            double simMass = getAdjustedInertialMass();
 
             foreach(int dev, activeDevices) {
                 if (calibrationDeviceIndex == dev) {
                     RealtimeController* c = Devices[dev].controller;
                     c->setCalibrationState(CALIBRATION_STATE_IDLE);
                     c->setMode(RT_MODE_SPIN);
+                    c->setWeight(simMass);
                     c->setGradientWithSimState(gradient, N, displaySpeed);
                 }
             }
@@ -2647,6 +2654,23 @@ void TrainSidebar::Lower()
 // For newtons of force intensityFactor is a simple scalar.
 double IntensifyNewtons(double N, double intensity) {
     return N * intensity;
+}
+
+// When there is a divergence between simulated speed and device speed
+// adjust mass sent to device so it can emulate the simulated kinetic
+// energy.
+double TrainSidebar::getAdjustedInertialMass() const {
+    double simMass = bicycle.MassKG();
+
+    if (!useSimulatedSpeed || displaySpeed < 0.1 || lastDeviceSpeed < 0.1) // avoid zeros
+        return simMass;
+
+    double simMassFactor = (displaySpeed / lastDeviceSpeed);
+
+    // Clamp computed factor to some reasonable range: 0.1 to 5
+    simMassFactor = std::min<double>(5, std::max<double>(0.1, simMassFactor));
+
+    return simMass * simMassFactor;
 }
 
 // Compute gradient needed to apply intensity factor to current state.
