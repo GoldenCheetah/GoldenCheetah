@@ -442,10 +442,11 @@ void Fortius::run()
 				
                 // speed
 
-                curSpeed = 1.3f * (double)(qFromLittleEndian<quint16>(&buf[32])) / (3.6f * 100.00f);
+                curSpeed = ms_to_kph(rawSpeed_to_ms(qFromLittleEndian<quint16>(&buf[32])));
 
                 // If this is torque, we could also compute power from distance and time				
-                curPower = qFromLittleEndian<qint16>(&buf[38]) * curSpeed / 448.5;
+                const double curForce_N = rawForce_to_N(qFromLittleEndian<qint16>(&buf[38]));
+                curPower = curForce_N * kph_to_ms(curSpeed);
                 if (curPower < 0.0) curPower = 0.0;  // brake power can be -ve when coasting. 
                 
                 // average power over last 10 readings
@@ -554,7 +555,11 @@ int Fortius::sendRunCommand(int16_t pedalSensor)
     {
 		//qDebug() << "send load " << load;
 		
-        qToLittleEndian<int16_t>((int16_t)(13 * load), &ERGO_Command[4]);
+        // Set trainer resistance to the force required to maintain requested power at current speed
+        const double   targetNewtons  = load / kph_to_ms(deviceSpeed);
+        const uint16_t targetRawForce = N_to_rawForce(targetNewtons);
+
+        qToLittleEndian<int16_t>(targetRawForce, &ERGO_Command[4]);
         ERGO_Command[6] = pedalSensor;
         
         qToLittleEndian<int16_t>((int16_t)(130 * brakeCalibrationFactor + 1040), &ERGO_Command[10]);
@@ -563,7 +568,16 @@ int Fortius::sendRunCommand(int16_t pedalSensor)
     }
     else if (mode == FT_SSMODE)
     {
-        qToLittleEndian<int16_t>((int16_t)(650 * gradient), &SLOPE_Command[4]);
+        // Set trainer resistance to the force required to maintain current speed at current grade
+        // The trainer's virtual flywheel itself will limit acceleration accordingly
+
+        // TODO.1 Fortius has issues with high force at low speed, to be addressed in subsequent PR
+        // TODO.2 expectation is that another PR will provide targetNewtons based upon intertial simulation
+
+        const double   targetNewtons  = NewtonsForV(gradient, weight, kph_to_ms(deviceSpeed));
+        const uint16_t targetRawForce = N_to_rawForce(targetNewtons);
+
+        qToLittleEndian<int16_t>(targetRawForce, &SLOPE_Command[4]);
         SLOPE_Command[6] = pedalSensor;
         SLOPE_Command[9] = (unsigned int)weight;
         
@@ -645,4 +659,24 @@ int Fortius::rawRead(uint8_t bytes[], int size)
 bool Fortius::discover(QString)
 {
     return true;
+}
+
+// Calculate the force in Newtons required to sustain speed at gradient
+// Units: force (N), gradient (%), speed (m/s), mass (kg)
+double Fortius::NewtonsForV(double gradient, double m, double v)
+{
+    // TODO.3 substitute values from trainer interface for some of the constants defined here
+    static const double g               = 9.81;
+    static const double Crr             = 0.004;
+    static const double CdA             = 0.51;
+    static const double v_wind          = 0.0;
+    static const double drafting_factor = 1.0;
+
+    // Resistive forces due to gravity, rolling resistance and aerodynamic drag
+    const double F_slope = gradient/100 * m * g;
+    const double F_roll  = Crr * m * g;
+    const double F_air   = 0.5 * CdA * (v + v_wind) * abs(v + v_wind) * drafting_factor;
+
+    // Return sum of resistive forces
+    return F_slope + F_roll + F_air;
 }

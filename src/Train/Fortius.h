@@ -164,6 +164,20 @@ private:
     // raw device utils
     int rawWrite(uint8_t *bytes, int size); // unix!!
     int rawRead(uint8_t *bytes, int size); // unix!!
+
+
+    // Unit conversion routines
+    static inline double kph_to_ms      (double kph) { return kph / 3.6; }
+    static inline double ms_to_kph      (double ms)  { return ms  * 3.6; }
+
+    static inline double rawForce_to_N  (double raw) { return raw / 137.; }
+    static inline double N_to_rawForce  (double N)   { return N   * 137.; }
+
+    static inline double rawSpeed_to_ms (double raw) { return raw / 1043.1; } // 289.75*3.6
+
+
+    // Parameterised calculation of resistive forces in steady-state
+    static double NewtonsForV(double gradient_percent, double weight_kg, double speed_ms);
 };
 
 #endif // _GC_Fortius_h
