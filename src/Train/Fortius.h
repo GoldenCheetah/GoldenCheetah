@@ -170,9 +170,13 @@ private:
     static inline double kph_to_ms      (double kph) { return kph / 3.6; }
     static inline double ms_to_kph      (double ms)  { return ms  * 3.6; }
 
+    // Source: https://github.com/totalreverse/ttyT1941/wiki
+    //         - "A force of 1 N ~= 137 'load units'"
     static inline double rawForce_to_N  (double raw) { return raw / 137.; }
     static inline double N_to_rawForce  (double N)   { return N   * 137.; }
 
+    // Source: https://github.com/totalreverse/ttyT1941/wiki
+    //         - "speed = 'kph * 289.75'"
     static inline double rawSpeed_to_ms (double raw) { return raw / 1043.1; } // 289.75*3.6
 
 
