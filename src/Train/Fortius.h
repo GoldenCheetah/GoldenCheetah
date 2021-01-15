@@ -51,6 +51,7 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <sys/types.h>
+#include <limits>
 
 /* Device operation mode */
 #define FT_IDLE        0x00
@@ -178,6 +179,15 @@ private:
     // Source: https://github.com/totalreverse/ttyT1941/wiki
     //         - "speed = 'kph * 289.75'"
     static inline double rawSpeed_to_ms (double raw) { return raw / 1043.1; } // 289.75*3.6
+
+    // Convert double value to type T, clipping to range of type T, if necessary
+    template <typename T>
+    static inline T clip_double_to_type(double d)
+    {
+        static const double MAX = std::numeric_limits<T>::max();
+        static const double MIN = std::numeric_limits<T>::min();
+        return std::max(MIN, std::min(MAX, d));
+    }
 
 
     // Parameterised calculation of resistive forces in steady-state

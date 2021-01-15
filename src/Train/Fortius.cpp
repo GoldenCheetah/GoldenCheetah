@@ -556,8 +556,8 @@ int Fortius::sendRunCommand(int16_t pedalSensor)
 		//qDebug() << "send load " << load;
 		
         // Set trainer resistance to the force required to maintain requested power at current speed
-        const double   targetNewtons  = load / kph_to_ms(deviceSpeed);
-        const uint16_t targetRawForce = N_to_rawForce(targetNewtons);
+        const double  targetNewtons  = load / kph_to_ms(deviceSpeed);
+        const int16_t targetRawForce = clip_double_to_type<int16_t>(N_to_rawForce(targetNewtons));
 
         qToLittleEndian<int16_t>(targetRawForce, &ERGO_Command[4]);
         ERGO_Command[6] = pedalSensor;
@@ -574,8 +574,8 @@ int Fortius::sendRunCommand(int16_t pedalSensor)
         // TODO.1 Fortius has issues with high force at low speed, to be addressed in subsequent PR
         // TODO.2 expectation is that another PR will provide targetNewtons based upon intertial simulation
 
-        const double   targetNewtons  = NewtonsForV(gradient, weight, kph_to_ms(deviceSpeed));
-        const uint16_t targetRawForce = N_to_rawForce(targetNewtons);
+        const double  targetNewtons  = NewtonsForV(gradient, weight, kph_to_ms(deviceSpeed));
+        const int16_t targetRawForce = clip_double_to_type<int16_t>(N_to_rawForce(targetNewtons));
 
         qToLittleEndian<int16_t>(targetRawForce, &SLOPE_Command[4]);
         SLOPE_Command[6] = pedalSensor;
