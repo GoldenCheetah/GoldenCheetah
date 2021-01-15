@@ -74,6 +74,9 @@
 #define DEFAULT_WEIGHT       77
 #define DEFAULT_CALIBRATION  0.00
 #define DEFAULT_SCALING      1.00
+#define DEFAULT_WINDSPEED    0.00
+#define DEFAULT_Crr          0.004
+#define DEFAULT_CdA          0.51
 
 #define FT_USB_TIMEOUT      500
 
@@ -103,6 +106,9 @@ public:
     void setPowerScaleFactor(double calibrationFactor);         // Scales output power, so user can adjust to match hub or crank power meter
     void setMode(int mode);
     void setWeight(double weight);                 // set the total weight of rider + bike in kg's
+    void setWindSpeed(double windSpeed);                 // set the wind speed in m/s
+    void setRollingResistance(double rollingResistance); // set the rolling resistance (Crr)
+    void setWindResistance(double windResistance);       // set the wind resistance (CdA)
     
     int getMode();
     double getGradient();
@@ -136,7 +142,7 @@ private:
     //void unpackTelemetry(int &b1, int &b2, int &b3, int &buttons, int &type, int &value8, int &value12);
 
     // Mutex for controlling accessing private data
-    QMutex pvars;
+    mutable QMutex pvars;
 
     // INBOUND TELEMETRY - all volatile since it is updated by the run() thread
     volatile double devicePower;            // current output power in Watts
@@ -155,6 +161,9 @@ private:
     volatile double brakeCalibrationFactor;
     volatile double powerScaleFactor;
     volatile double weight;
+    volatile double windSpeed;
+    volatile double rollingResistance;
+    volatile double windResistance;
     
     // i/o message holder
     uint8_t buf[64];
@@ -191,7 +200,7 @@ private:
 
 
     // Parameterised calculation of resistive forces in steady-state
-    static double NewtonsForV(double gradient_percent, double weight_kg, double speed_ms);
+    double NewtonsForV(double speed_ms) const;
 };
 
 #endif // _GC_Fortius_h

@@ -59,6 +59,9 @@ Fortius::Fortius(QObject *parent) : QThread(parent)
     load = DEFAULT_LOAD;
     gradient = DEFAULT_GRADIENT;
     weight = DEFAULT_WEIGHT;
+    windSpeed = DEFAULT_WINDSPEED;
+    rollingResistance = DEFAULT_Crr;
+    windResistance = DEFAULT_CdA;
     brakeCalibrationFactor = DEFAULT_CALIBRATION;
     powerScaleFactor = DEFAULT_SCALING;
     deviceStatus=0;
@@ -146,6 +149,29 @@ void Fortius::setGradient(double gradient)
     pvars.unlock();
 }
 
+// Wind speed used to calculate trainer force in slope mode
+void Fortius::setWindSpeed(double windSpeed)
+{
+    pvars.lock();
+    this->windSpeed = windSpeed;
+    pvars.unlock();
+}
+
+// Rolling resistance used to calculate trainer force in slope mode
+void Fortius::setRollingResistance(double rollingResistance)
+{
+    pvars.lock();
+    this->rollingResistance = rollingResistance;
+    pvars.unlock();
+}
+
+// Wind resistance used to calculate trainer force in slope mode
+void Fortius::setWindResistance(double windResistance)
+{
+    pvars.lock();
+    this->windResistance = windResistance;
+    pvars.unlock();
+}
 
 /* ----------------------------------------------------------------------
  * GET
@@ -574,7 +600,7 @@ int Fortius::sendRunCommand(int16_t pedalSensor)
         // TODO.1 Fortius has issues with high force at low speed, to be addressed in subsequent PR
         // TODO.2 expectation is that another PR will provide targetNewtons based upon intertial simulation
 
-        const double  targetNewtons  = NewtonsForV(gradient, weight, kph_to_ms(deviceSpeed));
+        const double  targetNewtons  = NewtonsForV(kph_to_ms(deviceSpeed));
         const int16_t targetRawForce = clip_double_to_type<int16_t>(N_to_rawForce(targetNewtons));
 
         qToLittleEndian<int16_t>(targetRawForce, &SLOPE_Command[4]);
@@ -663,19 +689,22 @@ bool Fortius::discover(QString)
 
 // Calculate the force in Newtons required to sustain speed at gradient
 // Units: force (N), gradient (%), speed (m/s), mass (kg)
-double Fortius::NewtonsForV(double gradient, double m, double v)
+double Fortius::NewtonsForV(double v) const
 {
-    // TODO.3 substitute values from trainer interface for some of the constants defined here
-    static const double g               = 9.81;
-    static const double Crr             = 0.004;
-    static const double CdA             = 0.51;
-    static const double v_wind          = 0.0;
-    static const double drafting_factor = 1.0;
+    static const double g = 9.81;
+
+    pvars.lock();
+    const double gradient = this->gradient;
+    const double m        = this->weight;
+    const double Crr      = this->rollingResistance;
+    const double CdA      = this->windResistance;
+    const double v_wind   = this->windSpeed;
+    pvars.unlock();
 
     // Resistive forces due to gravity, rolling resistance and aerodynamic drag
     const double F_slope = gradient/100 * m * g;
     const double F_roll  = Crr * m * g;
-    const double F_air   = 0.5 * CdA * (v + v_wind) * abs(v + v_wind) * drafting_factor;
+    const double F_air   = 0.5 * CdA * (v + v_wind) * abs(v + v_wind);
 
     // Return sum of resistive forces
     return F_slope + F_roll + F_air;

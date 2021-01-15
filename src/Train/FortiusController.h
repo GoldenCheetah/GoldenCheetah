@@ -51,6 +51,9 @@ public:
     void setGradient(double);
     void setMode(int);
     void setWeight(double);
+    void setWindSpeed(double);
+    void setRollingResistance(double);
+    void setWindResistance(double);
 };
 
 #endif // _GC_FortiusController_h
