@@ -51,6 +51,7 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <sys/types.h>
+#include <limits>
 
 /* Device operation mode */
 #define FT_IDLE        0x00
@@ -73,6 +74,9 @@
 #define DEFAULT_WEIGHT       77
 #define DEFAULT_CALIBRATION  0.00
 #define DEFAULT_SCALING      1.00
+#define DEFAULT_WINDSPEED    0.00
+#define DEFAULT_Crr          0.004
+#define DEFAULT_CdA          0.51
 
 #define FT_USB_TIMEOUT      500
 
@@ -102,6 +106,9 @@ public:
     void setPowerScaleFactor(double calibrationFactor);         // Scales output power, so user can adjust to match hub or crank power meter
     void setMode(int mode);
     void setWeight(double weight);                 // set the total weight of rider + bike in kg's
+    void setWindSpeed(double windSpeed);                 // set the wind speed in m/s
+    void setRollingResistance(double rollingResistance); // set the rolling resistance (Crr)
+    void setWindResistance(double windResistance);       // set the wind resistance (CdA)
     
     int getMode();
     double getGradient();
@@ -135,7 +142,7 @@ private:
     //void unpackTelemetry(int &b1, int &b2, int &b3, int &buttons, int &type, int &value8, int &value12);
 
     // Mutex for controlling accessing private data
-    QMutex pvars;
+    mutable QMutex pvars;
 
     // INBOUND TELEMETRY - all volatile since it is updated by the run() thread
     volatile double devicePower;            // current output power in Watts
@@ -154,6 +161,9 @@ private:
     volatile double brakeCalibrationFactor;
     volatile double powerScaleFactor;
     volatile double weight;
+    volatile double windSpeed;
+    volatile double rollingResistance;
+    volatile double windResistance;
     
     // i/o message holder
     uint8_t buf[64];
@@ -164,6 +174,37 @@ private:
     // raw device utils
     int rawWrite(uint8_t *bytes, int size); // unix!!
     int rawRead(uint8_t *bytes, int size); // unix!!
+
+
+    // Unit conversion routines
+    static inline double kph_to_ms      (double kph) { return kph / 3.6; }
+    static inline double ms_to_kph      (double ms)  { return ms  * 3.6; }
+
+    // Source: https://github.com/totalreverse/ttyT1941/wiki
+    //         - "A force of 1 N ~= 137 'load units'"
+    static inline double rawForce_to_N  (double raw) { return raw / 137.; }
+    static inline double N_to_rawForce  (double N)   { return N   * 137.; }
+
+    // Source: https://github.com/totalreverse/ttyT1941/wiki
+    //         - "speed = 'kph * 289.75'"
+    static inline double rawSpeed_to_ms (double raw) { return raw / 1043.1; } // 289.75*3.6
+
+    // Convert double value to type T, clipping to range of type T, if necessary
+    template <typename T>
+    static inline T clip_double_to_type(double d)
+    {
+        static const double MAX = std::numeric_limits<T>::max();
+        static const double MIN = std::numeric_limits<T>::min();
+        return std::max(MIN, std::min(MAX, d));
+    }
+
+
+    // Parameterised calculation of resistive forces in steady-state
+    double NewtonsForV(double speed_ms) const;
+
+    // Routine to limit trainer resistance value at low wheel speeds
+    // Source: https://github.com/WouterJD/FortiusANT/blob/master/pythoncode/usbTrainer.py
+    static int16_t rawForce_FortiusANT_AvoidCycleOfDeath(int16_t rawForce, double speedKph);
 };
 
 #endif // _GC_Fortius_h

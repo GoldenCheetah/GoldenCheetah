@@ -158,5 +158,24 @@ void
 FortiusController::setWeight(double weight)
 {
     myFortius->setWeight(weight);
+
+}
+
+void
+FortiusController::setWindSpeed(double speed)
+{
+    myFortius->setWindSpeed(speed);
+}
+
+void
+FortiusController::setRollingResistance(double rollingResistance)
+{
+    myFortius->setRollingResistance(rollingResistance);
+}
+
+void
+FortiusController::setWindResistance(double windResistance)
+{
+    myFortius->setWindResistance(windResistance);
 }
 
