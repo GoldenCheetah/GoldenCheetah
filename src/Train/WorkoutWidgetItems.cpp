@@ -373,7 +373,7 @@ WWTelemetry::paint(QPainter *painter)
     // Draw POWER
     if (workoutWidget()->shouldPlotPwr())
     {
-        updateAvg(workoutWidget()->watts, workoutWidget()->pwrAvg, workoutWidget()->vo2PlotAvgLength());
+        updateAvg(workoutWidget()->watts, workoutWidget()->pwrAvg, workoutWidget()->pwrPlotAvgLength());
         paintSampleList(painter, GColor(CPOWER), workoutWidget()->pwrAvg, WorkoutWidget::POWER);
     }
 
