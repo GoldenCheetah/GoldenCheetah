@@ -149,12 +149,18 @@ WorkoutWidget::start()
     // clear previous data
     wbal.clear();
     watts.clear();
+    pwrAvg.clear();
     hr.clear();
+    hrAvg.clear();
     speed.clear();
+    speedAvg.clear();
     cadence.clear();
+    cadenceAvg.clear();
     sampleTimes.clear();
     vo2.clear();
+    vo2Avg.clear();
     ventilation.clear();
+    ventilationAvg.clear();
 
     // and resampling data
     count = wbalSum = wattsSum = hrSum = speedSum = cadenceSum = vo2Sum = ventilationSum = 0;
