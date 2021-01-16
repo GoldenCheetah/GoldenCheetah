@@ -201,6 +201,10 @@ private:
 
     // Parameterised calculation of resistive forces in steady-state
     double NewtonsForV(double speed_ms) const;
+
+    // Routine to limit trainer resistance value at low wheel speeds
+    // Source: https://github.com/WouterJD/FortiusANT/blob/master/pythoncode/usbTrainer.py
+    static int16_t rawForce_FortiusANT_AvoidCycleOfDeath(int16_t rawForce, double speedKph);
 };
 
 #endif // _GC_Fortius_h

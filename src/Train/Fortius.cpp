@@ -582,10 +582,11 @@ int Fortius::sendRunCommand(int16_t pedalSensor)
 		//qDebug() << "send load " << load;
 		
         // Set trainer resistance to the force required to maintain requested power at current speed
-        const double  targetNewtons  = load / kph_to_ms(deviceSpeed);
-        const int16_t targetRawForce = clip_double_to_type<int16_t>(N_to_rawForce(targetNewtons));
+        const double  targetNewtons   = load / kph_to_ms(deviceSpeed);
+        const int16_t targetRawForce  = clip_double_to_type<int16_t>(N_to_rawForce(targetNewtons));
+        const int16_t limitedRawForce = rawForce_FortiusANT_AvoidCycleOfDeath(targetRawForce, deviceSpeed);
 
-        qToLittleEndian<int16_t>(targetRawForce, &ERGO_Command[4]);
+        qToLittleEndian<int16_t>(limitedRawForce, &ERGO_Command[4]);
         ERGO_Command[6] = pedalSensor;
         
         qToLittleEndian<int16_t>((int16_t)(130 * brakeCalibrationFactor + 1040), &ERGO_Command[10]);
@@ -597,13 +598,11 @@ int Fortius::sendRunCommand(int16_t pedalSensor)
         // Set trainer resistance to the force required to maintain current speed at current grade
         // The trainer's virtual flywheel itself will limit acceleration accordingly
 
-        // TODO.1 Fortius has issues with high force at low speed, to be addressed in subsequent PR
-        // TODO.2 expectation is that another PR will provide targetNewtons based upon intertial simulation
+        const double  targetNewtons   = NewtonsForV(kph_to_ms(deviceSpeed));
+        const int16_t targetRawForce  = clip_double_to_type<int16_t>(N_to_rawForce(targetNewtons));
+        const int16_t limitedRawForce = rawForce_FortiusANT_AvoidCycleOfDeath(targetRawForce, deviceSpeed);
 
-        const double  targetNewtons  = NewtonsForV(kph_to_ms(deviceSpeed));
-        const int16_t targetRawForce = clip_double_to_type<int16_t>(N_to_rawForce(targetNewtons));
-
-        qToLittleEndian<int16_t>(targetRawForce, &SLOPE_Command[4]);
+        qToLittleEndian<int16_t>(limitedRawForce, &SLOPE_Command[4]);
         SLOPE_Command[6] = pedalSensor;
         SLOPE_Command[9] = (unsigned int)weight;
         
@@ -708,4 +707,24 @@ double Fortius::NewtonsForV(double v) const
 
     // Return sum of resistive forces
     return F_slope + F_roll + F_air;
+}
+
+// Routine to limit trainer resistance value at low wheel speeds
+// Source: https://github.com/WouterJD/FortiusANT/blob/master/pythoncode/usbTrainer.py (16th Jan, 2021)
+//
+// Selected comments from source as an explanation of context:
+//
+//    # Resistance must be limited to a maximum at low wheel-speeds
+//    # Fortius does not perform well for high resistances at low wheelspeed.
+//    # Higher resistances cause stuttering.
+//    # The protection is that when Speed drops below 10km/hr, the resistance is limited.
+//    # The minium of 1500 is chosen above calibration level to avoid that the
+//      brake is going to spin (negative power mode).
+int16_t Fortius::rawForce_FortiusANT_AvoidCycleOfDeath(int16_t rawForce, double speedKph)
+{
+    if (speedKph <= 10 && rawForce >= 6000)
+    {
+        rawForce = 1500 + speedKph * 300;
+    }
+    return rawForce;
 }
