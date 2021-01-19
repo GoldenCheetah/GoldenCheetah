@@ -18,6 +18,11 @@
 
 #include "Fortius.h"
 
+#include <Core/Settings.h>
+#define TRAIN_FORTIUSCALIBRATION "<global-trainmode>train/fortiuscalibration"
+// could (should?) be defined in Core/Settings.h
+// but they are not currently used anywhere other than Fortius.cpp
+
 //
 // Outbound control message has the format:
 // Byte          Value / Meaning
@@ -62,7 +67,12 @@ Fortius::Fortius(QObject *parent) : QThread(parent)
     windSpeed = DEFAULT_WINDSPEED;
     rollingResistance = DEFAULT_Crr;
     windResistance = DEFAULT_CdA;
-    brakeCalibrationFactor = DEFAULT_CALIBRATION;
+
+    // Lead raw calibration value, and convert to N
+    const double raw_saved_calibration = appsettings->value(this, TRAIN_FORTIUSCALIBRATION, DEFAULT_CALIBRATION_FORCE_N).toInt();
+    brakeCalibrationForce_N = rawForce_to_N(raw_saved_calibration);
+
+    brakeCalibrationFactor = DEFAULT_CALIBRATION_FACTOR;
     powerScaleFactor = DEFAULT_SCALING;
     deviceStatus=0;
     this->parent = parent;
@@ -92,6 +102,17 @@ void Fortius::setMode(int mode)
 {
     pvars.lock();
     this->mode = mode;
+    pvars.unlock();
+}
+
+// TODO description
+void Fortius::setBrakeCalibrationForce(double force_N)
+{
+    // save raw calibration value
+    appsettings->setValue(TRAIN_FORTIUSCALIBRATION, static_cast<int>(N_to_rawForce(force_N)));
+
+    pvars.lock();
+    brakeCalibrationForce_N = force_N;
     pvars.unlock();
 }
 
@@ -176,11 +197,12 @@ void Fortius::setWindResistance(double windResistance)
 /* ----------------------------------------------------------------------
  * GET
  * ---------------------------------------------------------------------- */
-void Fortius::getTelemetry(double &power, double &heartrate, double &cadence, double &speed, double &distance, int &buttons, int &steering, int &status)
+void Fortius::getTelemetry(double &power, double &force, double &heartrate, double &cadence, double &speed, double &distance, int &buttons, int &steering, int &status)
 {
 
     pvars.lock();
     power = devicePower;
+    force = deviceForce_N;
     heartrate = deviceHeartRate;
     cadence = deviceCadence;
     speed = deviceSpeed;
@@ -228,6 +250,15 @@ double Fortius::getWeight()
     double tmp;
     pvars.lock();
     tmp = weight;
+    pvars.unlock();
+    return tmp;
+}
+
+double Fortius::getBrakeCalibrationForce() const
+{
+    double tmp;
+    pvars.lock();
+    tmp = brakeCalibrationForce_N;
     pvars.unlock();
     return tmp;
 }
@@ -353,6 +384,7 @@ void Fortius::run()
 
     // variables for telemetry, copied to fields on each brake update
     double curPower;                      // current output power in Watts
+    double curForce_N;                    // current output force in Newtons
     double curHeartRate;                  // current heartrate in BPM
     double curCadence;                    // current cadence in RPM
     double curSpeed;                      // current speed in KPH
@@ -373,6 +405,7 @@ void Fortius::run()
     pvars.lock();
     // UNUSED curStatus = this->deviceStatus;
     curPower = this->devicePower = 0;
+    curForce_N = this->deviceForce_N = 0;
     curHeartRate = this->deviceHeartRate = 0;
     curCadence = this->deviceCadence = 0;
     curSpeed = this->deviceSpeed = 0;
@@ -471,7 +504,7 @@ void Fortius::run()
                 curSpeed = ms_to_kph(rawSpeed_to_ms(qFromLittleEndian<quint16>(&buf[32])));
 
                 // If this is torque, we could also compute power from distance and time				
-                const double curForce_N = rawForce_to_N(qFromLittleEndian<qint16>(&buf[38]));
+                curForce_N = rawForce_to_N(qFromLittleEndian<qint16>(&buf[38]));
                 curPower = curForce_N * kph_to_ms(curSpeed);
                 if (curPower < 0.0) curPower = 0.0;  // brake power can be -ve when coasting. 
                 
@@ -492,6 +525,7 @@ void Fortius::run()
                 deviceSpeed = curSpeed;
                 deviceCadence = curCadence;
                 deviceHeartRate = curHeartRate;
+                deviceForce_N = curForce_N;
                 devicePower = curPower;
                 pvars.unlock();
             }
@@ -574,6 +608,7 @@ int Fortius::sendRunCommand(int16_t pedalSensor)
     double gradient = this->gradient;
     double load = this->load;
     double weight = this->weight;
+    double brakeCalibrationForce_N = this->brakeCalibrationForce_N;
     double brakeCalibrationFactor = this->brakeCalibrationFactor;
     pvars.unlock();
     
@@ -589,7 +624,7 @@ int Fortius::sendRunCommand(int16_t pedalSensor)
         qToLittleEndian<int16_t>(limitedRawForce, &ERGO_Command[4]);
         ERGO_Command[6] = pedalSensor;
         
-        qToLittleEndian<int16_t>((int16_t)(130 * brakeCalibrationFactor + 1040), &ERGO_Command[10]);
+        qToLittleEndian<int16_t>((int16_t)(130 * brakeCalibrationFactor + N_to_rawForce(brakeCalibrationForce_N)), &ERGO_Command[10]);
                 
         retCode = rawWrite(ERGO_Command, 12);
     }
@@ -606,7 +641,7 @@ int Fortius::sendRunCommand(int16_t pedalSensor)
         SLOPE_Command[6] = pedalSensor;
         SLOPE_Command[9] = (unsigned int)weight;
         
-        qToLittleEndian<int16_t>((int16_t)(130 * brakeCalibrationFactor + 1040), &SLOPE_Command[10]);
+        qToLittleEndian<int16_t>((int16_t)(130 * brakeCalibrationFactor + N_to_rawForce(brakeCalibrationForce_N)), &SLOPE_Command[10]);
         
         retCode = rawWrite(SLOPE_Command, 12);
         // qDebug() << "Send Gradient " << gradient << ", Weight " << weight << ", Command " << QByteArray((const char *)SLOPE_Command, 12).toHex(':');
