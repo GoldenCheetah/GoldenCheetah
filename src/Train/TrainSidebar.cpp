@@ -2428,7 +2428,7 @@ void TrainSidebar::updateCalibration()
             case CALIBRATION_STATE_STARTED:
                 {
                     const double calibrationPower_W = Fortius::rawForce_to_N(calibrationZeroOffset) * Fortius::kph_to_ms(calibrationTargetSpeed);
-                    status = QString(tr("Calibrating... DO NOT PEDAL, remain seated...\nWaiting for calibration value to stabilize (max %1s): %2 (%3W @ %4kph)"))
+                    status = QString(tr("Calibrating... DO NOT PEDAL, remain seated...\nWaiting for value to stabilize (max %1s): %2 (%3W @ %4kph)"))
                             .arg(QString::number((int16_t)FortiusController::calibrationDurationLimit_s),
                                  QString::number((int16_t)calibrationZeroOffset),
                                  QString::number((int16_t)calibrationPower_W),

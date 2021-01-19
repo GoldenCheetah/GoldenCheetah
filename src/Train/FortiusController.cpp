@@ -263,8 +263,8 @@ FortiusController::getCalibrationZeroOffset()
             }
 
             // Return value for presentation in the GUI
-            // Need to return a uint16_t, use rawForce
-            return Fortius::N_to_rawForce(Force_N);
+            // Need to return a uint16_t, use +ve rawForce
+            return Fortius::N_to_rawForce(-Force_N);
         }
 
         // Calibration started, runs until standard deviation is below some threshold
@@ -321,8 +321,8 @@ FortiusController::getCalibrationZeroOffset()
             }
 
             // Return value for presentation in the GUI
-            // Need to return a uint16_t, use rawForce
-            return Fortius::N_to_rawForce(mean);
+            // Need to return a uint16_t, use +ve rawForce
+            return Fortius::N_to_rawForce(-mean);
         }
 
         case CALIBRATION_STATE_SUCCESS:
