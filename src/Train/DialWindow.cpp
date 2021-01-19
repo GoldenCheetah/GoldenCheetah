@@ -584,13 +584,6 @@ void DialWindow::seriesChanged()
     case RealtimeData::LapTime:
     case RealtimeData::LapTimeRemaining:
     case RealtimeData::ErgTimeRemaining:
-    case RealtimeData::Distance:
-    case RealtimeData::RouteDistance:
-    case RealtimeData::DistanceRemaining:
-    case RealtimeData::Latitude:
-    case RealtimeData::Longitude:
-    case RealtimeData::LapDistance:
-    case RealtimeData::LapDistanceRemaining:
     case RealtimeData::LRBalance:
     case RealtimeData::Lap:
     case RealtimeData::RI:
@@ -600,6 +593,14 @@ void DialWindow::seriesChanged()
     case RealtimeData::FeO2:
         foreground = GColor(CFEO2);
         break;
+            
+    case RealtimeData::Distance:
+    case RealtimeData::RouteDistance:
+    case RealtimeData::DistanceRemaining:
+    case RealtimeData::Latitude:
+    case RealtimeData::Longitude:
+    case RealtimeData::LapDistance:
+    case RealtimeData::LapDistanceRemaining:
     case RealtimeData::RER:
     case RealtimeData::None:
             foreground = GColor(CDIAL);
@@ -625,10 +626,13 @@ void DialWindow::seriesChanged()
         foreground = GColor(CTIDALVOLUME);
         break;
 
+    case RealtimeData::Slope:  
+        foreground = GColor(CSLOPE);
+        break;
+            
     case RealtimeData::Load:
-    case RealtimeData::Slope:        
-            foreground = GColor(CLOAD);
-            break;
+        foreground = GColor(CLOAD);
+        break;
 
     case RealtimeData::BikeScore:
             foreground = GColor(CBIKESCORE);
@@ -651,6 +655,7 @@ void DialWindow::seriesChanged()
     case RealtimeData::VirtualSpeed:
     case RealtimeData::AvgSpeed:
     case RealtimeData::AvgSpeedLap:
+    case RealtimeData::VAM:
             foreground = GColor(CSPEED);
             break;
 
