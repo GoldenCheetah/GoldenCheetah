@@ -139,6 +139,7 @@ private:
     int sendRunCommand(int16_t pedalSensor);
     int sendOpenCommand();
     int sendCloseCommand();
+    int sendCalibrateCommand();
     
     // Protocol decoding
     int readMessage();

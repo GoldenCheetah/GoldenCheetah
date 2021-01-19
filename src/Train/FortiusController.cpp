@@ -233,53 +233,53 @@ FortiusController::getCalibrationZeroOffset()
             double Power, Force_N, HeartRate, Cadence, SpeedKmh, Distance;
             myFortius->getTelemetry(Power, Force_N, HeartRate, Cadence, SpeedKmh, Distance, Buttons, Steering, Status);
 
+            // Once we're up to speed, move on to next stage
             if (SpeedKmh > 19.9) // up to speed
             {
                 m_calibrationValues.reset();
                 m_calibrationState = CALIBRATION_STATE_STARTING;
             }
+
+            // Return value for presentation in the GUI
             return 0;
         }
 
         // Calibration starting, waiting until we have enough values
         case CALIBRATION_STATE_STARTING:
         {
-            // Get current value and push onto the list of recent values
+            // Get current force value
             int Buttons, Status, Steering;
             double Power, Force_N, HeartRate, Cadence, SpeedKmh, Distance;
             myFortius->getTelemetry(Power, Force_N, HeartRate, Cadence, SpeedKmh, Distance, Buttons, Steering, Status);
 
-            const double latest = Force_N;
-            m_calibrationValues.update(latest);
+            // Push onto the list of recent values
+            m_calibrationValues.update(Force_N);
 
-            // unexpected resistance (pedalling) will cause calibration to terminate
-            if (latest > 0)
-            {
-                m_calibrationState = CALIBRATION_STATE_FAILURE;
-                return 0;
-            }
-
+            // If we have enough values, move on to next stage
             if (m_calibrationValues.is_full())
             {
                 m_calibrationState = CALIBRATION_STATE_STARTED;
                 m_calibrationStarted = time(nullptr);
             }
-            return Fortius::N_to_rawForce(latest);
+
+            // Return value for presentation in the GUI
+            // Need to return a uint16_t, use rawForce
+            return Fortius::N_to_rawForce(Force_N);
         }
 
         // Calibration started, runs until standard deviation is below some threshold
         case CALIBRATION_STATE_STARTED:
         {
-            // Get current value and push onto the list of recent values
+            // Get current force value
             int Buttons, Status, Steering;
             double Power, Force_N, HeartRate, Cadence, SpeedKmh, Distance;
             myFortius->getTelemetry(Power, Force_N, HeartRate, Cadence, SpeedKmh, Distance, Buttons, Steering, Status);
 
-            const double latest = Force_N;
-            m_calibrationValues.update(latest);
+            // Push onto the list of recent values
+            m_calibrationValues.update(Force_N);
 
             // unexpected resistance (pedalling) will cause calibration to terminate
-            if (latest > 0)
+            if (Force_N > 0)
             {
                 m_calibrationState = CALIBRATION_STATE_FAILURE;
                 return 0;
@@ -297,23 +297,32 @@ FortiusController::getCalibrationZeroOffset()
             static const double stddev_threshold = 0.05;
 
             // termination (settling) conditions
-            if (stddev < stddev_threshold
-                || (time(nullptr) - m_calibrationStarted) > calibrationDurationLimit_s)
+            const time_t calibrationDuration = time(nullptr) - m_calibrationStarted;
+            if (stddev < stddev_threshold || calibrationDuration > calibrationDurationLimit_s)
             {
-                // accept the current average as the final valibration value
-                myFortius->setBrakeCalibrationForce(-mean);
-                m_calibrationState = CALIBRATION_STATE_SUCCESS;
-                myFortius->setMode(FT_IDLE);
-
                 // TODO... just because we have determined the current value
                 // doesn't mean it's "right"... TTS4 had a red-green bar and
                 // plotted the value on that bar, and user was to adjust wheel
                 // pressure if it was outside the green range.
-                // There were no units. We should probably look at that...
+
+                // Source: https://github.com/totalreverse/ttyT1941/wiki
+                //   ; If the 'gauge' of the calibration screen is perfect in the
+                //   ; "green" middle of the calibration bar, then TTS4 sets the
+                //   ; calibration value to 0x0492 (= 90*13) 
+
+
+                // accept the current average as the final valibration value
+                // Note: call setBrakeCalibrationForce() with +ve value
+                myFortius->setBrakeCalibrationForce(-mean);
+
+                // complete calibration
+                m_calibrationState = CALIBRATION_STATE_SUCCESS;
+                myFortius->setMode(FT_IDLE);
             }
 
-            // Need to return a uint16_t, and TrainSidebar displays to user as raw value
-            return Fortius::N_to_rawForce(-(m_calibrationValues.is_full() ? mean : latest));
+            // Return value for presentation in the GUI
+            // Need to return a uint16_t, use rawForce
+            return Fortius::N_to_rawForce(mean);
         }
 
         case CALIBRATION_STATE_SUCCESS:

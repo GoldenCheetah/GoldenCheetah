@@ -105,7 +105,7 @@ void Fortius::setMode(int mode)
     pvars.unlock();
 }
 
-// TODO description
+// Compensate for trainer friction (at 20 kph)
 void Fortius::setBrakeCalibrationForce(double force_N)
 {
     // save raw calibration value
@@ -579,6 +579,7 @@ void Fortius::run()
  * sendOpenCommand() - initialises training session
  * sendCloseCommand() - finalises training session
  * sendRunCommand(int) - update brake setpoint
+ * sendCalibrateCommand() - start calibration at 20 kph
  *
  * ---------------------------------------------------------------------- */
 int Fortius::sendOpenCommand()
@@ -596,6 +597,15 @@ int Fortius::sendCloseCommand()
     uint8_t close_command[] = {0x01,0x08,0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x52,0x10,0x04};
     
     int retCode = rawWrite(close_command, 12);
+	//qDebug() << "usb status " << retCode;
+	return retCode;
+}
+
+int Fortius::sendCalibrateCommand()
+{
+    uint8_t calibrate_command[] = {0x01,0x08,0x01,0x00,0xa3,0x16,0x00,0x00,0x03,0x00,0x00,0x00};
+    
+    int retCode = rawWrite(calibrate_command, 12);
 	//qDebug() << "usb status " << retCode;
 	return retCode;
 }
@@ -652,9 +662,7 @@ int Fortius::sendRunCommand(int16_t pedalSensor)
     }
     else if (mode == FT_CALIBRATE)
     {
-        // Not yet implemented, easy enough to start calibration but appears that the calibration factor needs
-        // to be calculated by observing the brake power and speed after calibration starts (i.e. it's not returned
-        // by the brake).
+        retCode = sendCalibrateCommand();
     }
 
 	//qDebug() << "usb status " << retCode;
