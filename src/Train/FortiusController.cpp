@@ -233,8 +233,8 @@ FortiusController::getCalibrationZeroOffset()
             double Power, Force_N, HeartRate, Cadence, SpeedKmh, Distance;
             myFortius->getTelemetry(Power, Force_N, HeartRate, Cadence, SpeedKmh, Distance, Buttons, Steering, Status);
 
-            // Once we're up to speed, move on to next stage
-            if (SpeedKmh > 19.9) // up to speed
+            // Once we're up to speed (only takes a second or so), move on to next stage
+            if (SpeedKmh > 0.995 * getCalibrationTargetSpeed()) // Within 0.005 of the target speed
             {
                 m_calibrationValues.reset();
                 m_calibrationState = CALIBRATION_STATE_STARTING;
