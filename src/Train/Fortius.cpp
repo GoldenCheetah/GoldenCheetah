@@ -67,11 +67,7 @@ Fortius::Fortius(QObject *parent) : QThread(parent)
     windSpeed = DEFAULT_WINDSPEED;
     rollingResistance = DEFAULT_Crr;
     windResistance = DEFAULT_CdA;
-
-    // Lead raw calibration value, and convert to N
-    const double raw_saved_calibration = appsettings->value(this, TRAIN_FORTIUSCALIBRATION, DEFAULT_CALIBRATION_FORCE_N).toInt();
-    brakeCalibrationForce_N = rawForce_to_N(raw_saved_calibration);
-
+    brakeCalibrationForce_N = appsettings->value(this, TRAIN_FORTIUSCALIBRATION, DEFAULT_CALIBRATION_FORCE_N).toDouble();
     brakeCalibrationFactor = DEFAULT_CALIBRATION_FACTOR;
     powerScaleFactor = DEFAULT_SCALING;
     deviceStatus=0;
@@ -108,9 +104,10 @@ void Fortius::setMode(int mode)
 // Compensate for trainer friction (at 20 kph)
 void Fortius::setBrakeCalibrationForce(double force_N)
 {
-    // save raw calibration value
-    appsettings->setValue(TRAIN_FORTIUSCALIBRATION, static_cast<int>(N_to_rawForce(force_N)));
+    // persist calibration value in global settings
+    appsettings->setValue(TRAIN_FORTIUSCALIBRATION, force_N);
 
+    // update variable used to construct trainer commands
     pvars.lock();
     brakeCalibrationForce_N = force_N;
     pvars.unlock();
