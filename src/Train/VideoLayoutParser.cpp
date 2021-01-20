@@ -185,6 +185,10 @@ bool VideoLayoutParser::startElement( const QString&, const QString&,
         {
             meterWidget = new ElevationMeterWidget(meterName, containerWidget, source);
         }
+        else if (meterType == QString("ElevationZoomed"))
+        {
+            meterWidget = new ElevationZoomedMeterWidget(meterName, containerWidget, source);
+        }
         else if (meterType == QString("LiveMap"))
         {
             meterWidget = new LiveMapWidget(meterName, containerWidget, source);
