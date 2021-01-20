@@ -17,11 +17,7 @@
  */
 
 #include "Fortius.h"
-
 #include <Core/Settings.h>
-#define TRAIN_FORTIUSCALIBRATION "<global-trainmode>train/fortiuscalibration"
-// could (should?) be defined in Core/Settings.h
-// but they are not currently used anywhere other than Fortius.cpp
 
 //
 // Outbound control message has the format:
@@ -67,7 +63,7 @@ Fortius::Fortius(QObject *parent) : QThread(parent)
     windSpeed = DEFAULT_WINDSPEED;
     rollingResistance = DEFAULT_Crr;
     windResistance = DEFAULT_CdA;
-    brakeCalibrationForce_N = appsettings->value(this, TRAIN_FORTIUSCALIBRATION, DEFAULT_CALIBRATION_FORCE_N).toDouble();
+    brakeCalibrationForce_N = appsettings->value(this, FORTIUS_CALIBRATION, DEFAULT_CALIBRATION_FORCE_N).toDouble();
     brakeCalibrationFactor = DEFAULT_CALIBRATION_FACTOR;
     powerScaleFactor = DEFAULT_SCALING;
     deviceStatus=0;
@@ -105,7 +101,7 @@ void Fortius::setMode(int mode)
 void Fortius::setBrakeCalibrationForce(double force_N)
 {
     // persist calibration value in global settings
-    appsettings->setValue(TRAIN_FORTIUSCALIBRATION, force_N);
+    appsettings->setValue(FORTIUS_CALIBRATION, force_N);
 
     // update variable used to construct trainer commands
     pvars.lock();
