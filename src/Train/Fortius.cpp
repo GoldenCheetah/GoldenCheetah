@@ -17,7 +17,7 @@
  */
 
 #include "Fortius.h"
-#include <Core/Settings.h>
+#include "Settings.h"
 
 //
 // Outbound control message has the format:
