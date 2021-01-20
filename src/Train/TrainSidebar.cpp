@@ -2455,7 +2455,7 @@ void TrainSidebar::updateCalibration()
                 break;
 
             case CALIBRATION_STATE_FAILURE:
-                status = QString(tr("Calibration failed! Do not pedal while calibration is taking place."));
+                status = QString(tr("Calibration failed! Do not pedal while calibration is taking place.\nAllow wheel to run freely."));
 
                 // No further ANT messages to set state, so must move ourselves on..
                 if ((stateCount % 25) == 0)

@@ -252,6 +252,13 @@ FortiusController::getCalibrationZeroOffset()
             double Power, Force_N, HeartRate, Cadence, SpeedKmh, Distance;
             myFortius->getTelemetry(Power, Force_N, HeartRate, Cadence, SpeedKmh, Distance, Buttons, Steering, Status);
 
+            // unexpected drop in wheel speed will cause calibration to terminate
+            if (SpeedKmh < 0.9 * getCalibrationTargetSpeed()) // 10% underspeed would be considered an error case
+            {
+                m_calibrationState = CALIBRATION_STATE_FAILURE;
+                return 0;
+            }
+
             // Push onto the list of recent values
             m_calibrationValues.update(Force_N);
 
@@ -280,6 +287,13 @@ FortiusController::getCalibrationZeroOffset()
 
             // unexpected resistance (pedalling) will cause calibration to terminate
             if (Force_N > 0)
+            {
+                m_calibrationState = CALIBRATION_STATE_FAILURE;
+                return 0;
+            }
+
+            // unexpected drop in wheel speed will cause calibration to terminate
+            if (SpeedKmh < 0.9 * getCalibrationTargetSpeed()) // 10% underspeed would be considered an error case
             {
                 m_calibrationState = CALIBRATION_STATE_FAILURE;
                 return 0;
