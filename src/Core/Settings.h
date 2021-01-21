@@ -227,6 +227,7 @@
 #define GC_DEV_VIRTUAL                  "<global-trainmode>devicepostProcess"
 #define GC_DEV_VIRTUALPOWER             "<global-trainmode>devicevirtualPower"
 #define FORTIUS_FIRMWARE                "<global-trainmode>fortius/firmware"
+#define FORTIUS_CALIBRATION             "<global-trainmode>fortius/calibration"
 #define IMAGIC_FIRMWARE                 "<global-trainmode>imagic/firmware"
 #define TRAIN_MULTI                     "<global-trainmode>train/multi"
 #define TRAIN_AUTOCONNECT               "<global-trainmode>train/autoconnect"
