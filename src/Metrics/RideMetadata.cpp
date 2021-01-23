@@ -258,11 +258,11 @@ RideMetadata::configChanged(qint32)
 
             QString name = i.next();
 
-            // if there is no avatar its not a real folder, even a blank athlete
-            // will get the default avatar. This is to avoid having to work out
-            // what all the random folders are that Qt creates on Windows when
-            // using QtWebEngine, or Python or R or created by user scripts
-            if (!QFile(gcroot + "/" + name + "/config/avatar.png").exists()) continue;
+            // if there is no metadata.xml it is not an athlete folder
+            // or it is one still using default metadata.xml, so skip it
+            // since there is no custom configuration to preserve.
+            QString filename = gcroot + "/" + name + "/config/metadata.xml";
+            if (!QFile(filename).exists()) continue;
 
             // athlete specific configuration
             QList<KeywordDefinition> a_keywordDefinitions;
@@ -270,8 +270,7 @@ RideMetadata::configChanged(qint32)
             QList<DefaultDefinition>   a_defaultDefinitions;
             QString a_colorfield;
 
-            // read in athlete sepcific
-            QString filename = gcroot + "/" + name + "/config/metadata.xml";
+            // read in athlete specific
             readXML(filename, a_keywordDefinitions, a_fieldDefinitions, a_colorfield, a_defaultDefinitions);
 
             // first one, just use them all

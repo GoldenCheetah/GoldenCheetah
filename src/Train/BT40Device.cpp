@@ -558,6 +558,9 @@ BT40Device::updateValue(const QLowEnergyCharacteristic &c, const QByteArray &val
             case INRIDE_STATE_SPINDOWN_ACTIVE:
                 notifyString = QString("SPINDOWN_ACTIVE-COAST TO STOP    : ");
                 break;
+            default:
+                qDebug()<<QString("Unexpected INRIDE state: %1").arg(ipd.state);
+                break;
             }
         
             notifyString.append(QString::number(ipd.speedKPH));
@@ -631,6 +634,9 @@ BT40Device::updateValue(const QLowEnergyCharacteristic &c, const QByteArray &val
                 break;
             case SMART_CONTROL_CALIBRATION_STATE_SPEED_UP_DETECTED:
                 notifyString = QString(tr("Smart Control - Interference Detected - Try Again"));
+                break;
+            default:
+                qDebug()<<QString("Unexpected Kurt Smart Control calibration stae: %1").arg(sccd.calibrationState);
                 break;
             }
 
@@ -827,6 +833,9 @@ BT40Device::setMode(int m)
                     QLowEnergyService::WriteWithResponse);
                 break;
             }
+        default:
+            qDebug()<<QString("Enter calibration requested for unsupported device type: %1").arg(loadType);
+            break;
         }
     }
     // Leaving Calibration Mode
@@ -856,6 +865,9 @@ BT40Device::setMode(int m)
                     QLowEnergyService::WriteWithResponse);
                 break;
             }
+        default:
+            qDebug()<<QString("Exit calibration requested for unsupported device type: %1").arg(loadType);
+            break;
         }
     }
 
@@ -923,7 +935,16 @@ BT40Device::setLoadErg(double l)  // Load in Watts
 {
     load = l;
 
-    if(loadType == Wahoo_Kickr) {
+    if(loadType == Tacx_UART) {
+        qDebug() << "[+] Tacx: write target power" << load;
+
+        // Based on https://github.com/abellono/tacx-ios-bluetooth-example/blob/master/How-to%20FE-C%20over%20BLE%20v1_0_0.pdf, channel must be 5.
+        const auto Msg = ANTMessage::fecSetTargetPower(5, (int)load);
+        loadService->writeCharacteristic(loadCharacteristic,
+                QByteArray{(const char*) &Msg.data[0], Msg.length},
+                QLowEnergyService::WriteWithoutResponse);
+
+    } else if(loadType == Wahoo_Kickr) {
         QByteArray command;
         command.resize(3);
         command[0] = 0x42;
@@ -931,6 +952,7 @@ BT40Device::setLoadErg(double l)  // Load in Watts
         command[2] = (char)(((int)load) >> 8);
         qDebug() << "BTLE SetLoadErg " << load << " " << loadCharacteristic.uuid() << command.toHex(':');
         commandSend(command);
+
     } else if (loadType == Kurt_SmartControl) {
         qDebug() << tr("Kurt_SmartControl: set_mode_erg ") << load;
         loadService->writeCharacteristic(loadCharacteristic,

@@ -149,6 +149,7 @@
 #define GC_BIKESCOREMODE                    "<global-general>bikeScoreMode"
 #define GC_WARNCONVERT                  "<global-general>warnconvert"
 #define GC_WARNEXIT                     "<global-general>warnexit"
+#define GC_OPENLASTATHLETE              "<global-general>openlastathlete"
 #define GC_HIST_BIN_WIDTH               "<global-general>histogamWindow/binWidth"
 #define GC_WORKOUTDIR                   "<global-general>workoutDir"                         // used for Workouts and Videosyn files
 #define GC_LINEWIDTH                    "<global-general>linewidth"
@@ -226,6 +227,7 @@
 #define GC_DEV_VIRTUAL                  "<global-trainmode>devicepostProcess"
 #define GC_DEV_VIRTUALPOWER             "<global-trainmode>devicevirtualPower"
 #define FORTIUS_FIRMWARE                "<global-trainmode>fortius/firmware"
+#define FORTIUS_CALIBRATION             "<global-trainmode>fortius/calibration"
 #define IMAGIC_FIRMWARE                 "<global-trainmode>imagic/firmware"
 #define TRAIN_MULTI                     "<global-trainmode>train/multi"
 #define TRAIN_AUTOCONNECT               "<global-trainmode>train/autoconnect"

@@ -526,8 +526,20 @@ struct FitFileReaderState
         } else if (manu == 115) {
             // igpsport
             switch(prod) {
-                case -1: return "igpsport";
-                default: return QString("igpsport %1").arg(prod);
+                case -1: return "iGPSPORT";
+                default: return QString("iGPSPORT %1").arg(prod);
+            }
+        } else if (manu == 116) {
+            // thinkrider
+            switch(prod) {
+                case -1: return "Thinkrider";
+                default: return QString("Thinkrider %1").arg(prod);
+            }
+        } else if (manu == 132) {
+            // cycplus
+            switch(prod) {
+                case -1: return "Cycplus";
+                default: return QString("Cycplus %1").arg(prod);
             }
         } else if (manu == 258) {
             // Lezyne
@@ -1800,7 +1812,12 @@ struct FitFileReaderState
                     case 29: // ACCUMULATED_POWER
                              break;
                     case 30: //LEFT_RIGHT_BALANCE
-                             lrbalance = (value & 0x80 ? 100 - (value & 0x7F) : value & 0x7F);
+                             // When bit 7 is 1 value are right power contribution
+                             // not '1' the location of the contribution is undefined
+                             if (value > 0)
+                                lrbalance = 100 - (value & 0x7F);
+                             else
+                                lrbalance = RideFile::NA;
                              break;
                     case 31: // GPS Accuracy
                              break;
@@ -2110,7 +2127,7 @@ struct FitFileReaderState
             double deltaLat = lat - prevPoint->lat;
             // double deltaHeadwind = headwind - prevPoint->headwind;
             double deltaSlope = slope - prevPoint->slope;
-            double deltaLeftRightBalance = lrbalance - prevPoint->lrbalance;
+            double deltaLeftRightBalance = (lrbalance>=0?lrbalance:50.0) - (prevPoint->lrbalance?prevPoint->lrbalance:50.0);
             double deltaLeftTE = leftTorqueEff - prevPoint->lte;
             double deltaRightTE = rightTorqueEff - prevPoint->rte;
             double deltaLeftPS = leftPedalSmooth - prevPoint->lps;
@@ -3262,7 +3279,7 @@ struct FitFileReaderState
 
             appendXData(rideFile);
 
-            if (!swimXdata->datapoints.empty()) {
+            if (rideFile->xdata("SWIM")) {
                 // Build synthetic kph, km and cad sample data for Lap Swims
                 DataProcessor* fixLapDP = DataProcessorFactory::instance().getProcessors(true).value("Fix Lap Swim");
                 if (fixLapDP) fixLapDP->postProcess(rideFile, NULL, "NEW");
@@ -3952,7 +3969,8 @@ void write_record(QByteArray *array, const RideFile *ride, bool withAlt, bool wi
             write_int8(ridePoint, point->temp);
         }
         if ( (type&2)==2 ) {
-            write_int8(ridePoint, point->lrbalance);
+            // write right power contribution
+            write_int8(ridePoint, 0x80 + (100-point->lrbalance));
         }
 
         array->append(ridePoint->data(), ridePoint->size());

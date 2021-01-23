@@ -2836,7 +2836,7 @@ class AvgLTE : public RideMetric {
         while (it.hasNext()) {
             struct RideFilePoint *point = it.next();
 
-            if (point->lte && point->watts > 0.0f && point->cad && point->lrbalance > 0.0f && point->lrbalance < 100.0f) {
+            if (point->lte && point->watts > 0.0f && point->cad && point->lrbalance != RideFile::NA) {
                 samples ++;
                 total += point->lte;
             }
@@ -2890,7 +2890,7 @@ class AvgRTE : public RideMetric {
         RideFileIterator it(item->ride(), spec);
         while (it.hasNext()) {
             struct RideFilePoint *point = it.next();
-            if (point->rte && point->watts > 0.0f && point->cad && point->lrbalance > 0.0f && point->lrbalance < 100.0f) {
+            if (point->rte && point->watts > 0.0f && point->cad && point->lrbalance != RideFile::NA) {
                 samples ++;
                 total += point->rte;
             }
@@ -2944,7 +2944,7 @@ class AvgLPS : public RideMetric {
         RideFileIterator it(item->ride(), spec);
         while (it.hasNext()) {
             struct RideFilePoint *point = it.next();
-            if (point->lps && point->watts > 0.0f && point->cad && point->lrbalance > 0.0f && point->lrbalance < 100.0f) {
+            if (point->lps && point->watts > 0.0f && point->cad && point->lrbalance != RideFile::NA) {
                 samples ++;
                 total += point->lps;
             }
@@ -2998,7 +2998,7 @@ class AvgRPS : public RideMetric {
         RideFileIterator it(item->ride(), spec);
         while (it.hasNext()) {
             struct RideFilePoint *point = it.next();
-            if (point->rps && point->watts > 0.0f && point->cad && point->lrbalance > 0.0f && point->lrbalance < 100.0f) {
+            if (point->rps && point->watts > 0.0f && point->cad && point->lrbalance != RideFile::NA) {
                 samples ++;
                 total += point->rps;
             }

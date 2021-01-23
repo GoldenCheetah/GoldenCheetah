@@ -17,6 +17,7 @@
  */
 
 #include "Fortius.h"
+#include "Settings.h"
 
 //
 // Outbound control message has the format:
@@ -59,7 +60,11 @@ Fortius::Fortius(QObject *parent) : QThread(parent)
     load = DEFAULT_LOAD;
     gradient = DEFAULT_GRADIENT;
     weight = DEFAULT_WEIGHT;
-    brakeCalibrationFactor = DEFAULT_CALIBRATION;
+    windSpeed = DEFAULT_WINDSPEED;
+    rollingResistance = DEFAULT_Crr;
+    windResistance = DEFAULT_CdA;
+    brakeCalibrationForce_N = appsettings->value(this, FORTIUS_CALIBRATION, DEFAULT_CALIBRATION_FORCE_N).toDouble();
+    brakeCalibrationFactor = DEFAULT_CALIBRATION_FACTOR;
     powerScaleFactor = DEFAULT_SCALING;
     deviceStatus=0;
     this->parent = parent;
@@ -89,6 +94,18 @@ void Fortius::setMode(int mode)
 {
     pvars.lock();
     this->mode = mode;
+    pvars.unlock();
+}
+
+// Compensate for trainer friction (at 20 kph)
+void Fortius::setBrakeCalibrationForce(double force_N)
+{
+    // persist calibration value in global settings
+    appsettings->setValue(FORTIUS_CALIBRATION, force_N);
+
+    // update variable used to construct trainer commands
+    pvars.lock();
+    brakeCalibrationForce_N = force_N;
     pvars.unlock();
 }
 
@@ -146,15 +163,39 @@ void Fortius::setGradient(double gradient)
     pvars.unlock();
 }
 
+// Wind speed used to calculate trainer force in slope mode
+void Fortius::setWindSpeed(double windSpeed)
+{
+    pvars.lock();
+    this->windSpeed = windSpeed;
+    pvars.unlock();
+}
+
+// Rolling resistance used to calculate trainer force in slope mode
+void Fortius::setRollingResistance(double rollingResistance)
+{
+    pvars.lock();
+    this->rollingResistance = rollingResistance;
+    pvars.unlock();
+}
+
+// Wind resistance used to calculate trainer force in slope mode
+void Fortius::setWindResistance(double windResistance)
+{
+    pvars.lock();
+    this->windResistance = windResistance;
+    pvars.unlock();
+}
 
 /* ----------------------------------------------------------------------
  * GET
  * ---------------------------------------------------------------------- */
-void Fortius::getTelemetry(double &power, double &heartrate, double &cadence, double &speed, double &distance, int &buttons, int &steering, int &status)
+void Fortius::getTelemetry(double &power, double &force, double &heartrate, double &cadence, double &speed, double &distance, int &buttons, int &steering, int &status)
 {
 
     pvars.lock();
     power = devicePower;
+    force = deviceForce_N;
     heartrate = deviceHeartRate;
     cadence = deviceCadence;
     speed = deviceSpeed;
@@ -202,6 +243,15 @@ double Fortius::getWeight()
     double tmp;
     pvars.lock();
     tmp = weight;
+    pvars.unlock();
+    return tmp;
+}
+
+double Fortius::getBrakeCalibrationForce() const
+{
+    double tmp;
+    pvars.lock();
+    tmp = brakeCalibrationForce_N;
     pvars.unlock();
     return tmp;
 }
@@ -327,6 +377,7 @@ void Fortius::run()
 
     // variables for telemetry, copied to fields on each brake update
     double curPower;                      // current output power in Watts
+    double curForce_N;                    // current output force in Newtons
     double curHeartRate;                  // current heartrate in BPM
     double curCadence;                    // current cadence in RPM
     double curSpeed;                      // current speed in KPH
@@ -347,6 +398,7 @@ void Fortius::run()
     pvars.lock();
     // UNUSED curStatus = this->deviceStatus;
     curPower = this->devicePower = 0;
+    curForce_N = this->deviceForce_N = 0;
     curHeartRate = this->deviceHeartRate = 0;
     curCadence = this->deviceCadence = 0;
     curSpeed = this->deviceSpeed = 0;
@@ -442,10 +494,11 @@ void Fortius::run()
 				
                 // speed
 
-                curSpeed = 1.3f * (double)(qFromLittleEndian<quint16>(&buf[32])) / (3.6f * 100.00f);
+                curSpeed = ms_to_kph(rawSpeed_to_ms(qFromLittleEndian<quint16>(&buf[32])));
 
                 // If this is torque, we could also compute power from distance and time				
-                curPower = qFromLittleEndian<qint16>(&buf[38]) * curSpeed / 448.5;
+                curForce_N = rawForce_to_N(qFromLittleEndian<qint16>(&buf[38]));
+                curPower = curForce_N * kph_to_ms(curSpeed);
                 if (curPower < 0.0) curPower = 0.0;  // brake power can be -ve when coasting. 
                 
                 // average power over last 10 readings
@@ -465,6 +518,7 @@ void Fortius::run()
                 deviceSpeed = curSpeed;
                 deviceCadence = curCadence;
                 deviceHeartRate = curHeartRate;
+                deviceForce_N = curForce_N;
                 devicePower = curPower;
                 pvars.unlock();
             }
@@ -518,6 +572,7 @@ void Fortius::run()
  * sendOpenCommand() - initialises training session
  * sendCloseCommand() - finalises training session
  * sendRunCommand(int) - update brake setpoint
+ * sendCalibrateCommand() - start calibration at 20 kph
  *
  * ---------------------------------------------------------------------- */
 int Fortius::sendOpenCommand()
@@ -539,6 +594,15 @@ int Fortius::sendCloseCommand()
 	return retCode;
 }
 
+int Fortius::sendCalibrateCommand()
+{
+    uint8_t calibrate_command[] = {0x01,0x08,0x01,0x00,0xa3,0x16,0x00,0x00,0x03,0x00,0x00,0x00};
+    
+    int retCode = rawWrite(calibrate_command, 12);
+	//qDebug() << "usb status " << retCode;
+	return retCode;
+}
+
 int Fortius::sendRunCommand(int16_t pedalSensor)
 {
     int retCode = 0;
@@ -547,6 +611,7 @@ int Fortius::sendRunCommand(int16_t pedalSensor)
     double gradient = this->gradient;
     double load = this->load;
     double weight = this->weight;
+    double brakeCalibrationForce_N = this->brakeCalibrationForce_N;
     double brakeCalibrationFactor = this->brakeCalibrationFactor;
     pvars.unlock();
     
@@ -554,20 +619,32 @@ int Fortius::sendRunCommand(int16_t pedalSensor)
     {
 		//qDebug() << "send load " << load;
 		
-        qToLittleEndian<int16_t>((int16_t)(13 * load), &ERGO_Command[4]);
+        // Set trainer resistance to the force required to maintain requested power at current speed
+        const double  targetNewtons   = load / kph_to_ms(deviceSpeed);
+        const int16_t targetRawForce  = clip_double_to_type<int16_t>(N_to_rawForce(targetNewtons));
+        const int16_t limitedRawForce = rawForce_FortiusANT_AvoidCycleOfDeath(targetRawForce, deviceSpeed);
+
+        qToLittleEndian<int16_t>(limitedRawForce, &ERGO_Command[4]);
         ERGO_Command[6] = pedalSensor;
         
-        qToLittleEndian<int16_t>((int16_t)(130 * brakeCalibrationFactor + 1040), &ERGO_Command[10]);
+        qToLittleEndian<int16_t>((int16_t)(130 * brakeCalibrationFactor + N_to_rawForce(brakeCalibrationForce_N)), &ERGO_Command[10]);
                 
         retCode = rawWrite(ERGO_Command, 12);
     }
     else if (mode == FT_SSMODE)
     {
-        qToLittleEndian<int16_t>((int16_t)(650 * gradient), &SLOPE_Command[4]);
+        // Set trainer resistance to the force required to maintain current speed at current grade
+        // The trainer's virtual flywheel itself will limit acceleration accordingly
+
+        const double  targetNewtons   = NewtonsForV(kph_to_ms(deviceSpeed));
+        const int16_t targetRawForce  = clip_double_to_type<int16_t>(N_to_rawForce(targetNewtons));
+        const int16_t limitedRawForce = rawForce_FortiusANT_AvoidCycleOfDeath(targetRawForce, deviceSpeed);
+
+        qToLittleEndian<int16_t>(limitedRawForce, &SLOPE_Command[4]);
         SLOPE_Command[6] = pedalSensor;
         SLOPE_Command[9] = (unsigned int)weight;
         
-        qToLittleEndian<int16_t>((int16_t)(130 * brakeCalibrationFactor + 1040), &SLOPE_Command[10]);
+        qToLittleEndian<int16_t>((int16_t)(130 * brakeCalibrationFactor + N_to_rawForce(brakeCalibrationForce_N)), &SLOPE_Command[10]);
         
         retCode = rawWrite(SLOPE_Command, 12);
         // qDebug() << "Send Gradient " << gradient << ", Weight " << weight << ", Command " << QByteArray((const char *)SLOPE_Command, 12).toHex(':');
@@ -578,9 +655,7 @@ int Fortius::sendRunCommand(int16_t pedalSensor)
     }
     else if (mode == FT_CALIBRATE)
     {
-        // Not yet implemented, easy enough to start calibration but appears that the calibration factor needs
-        // to be calculated by observing the brake power and speed after calibration starts (i.e. it's not returned
-        // by the brake).
+        retCode = sendCalibrateCommand();
     }
 
 	//qDebug() << "usb status " << retCode;
@@ -645,4 +720,47 @@ int Fortius::rawRead(uint8_t bytes[], int size)
 bool Fortius::discover(QString)
 {
     return true;
+}
+
+// Calculate the force in Newtons required to sustain speed at gradient
+// Units: force (N), gradient (%), speed (m/s), mass (kg)
+double Fortius::NewtonsForV(double v) const
+{
+    static const double g = 9.81;
+
+    pvars.lock();
+    const double gradient = this->gradient;
+    const double m        = this->weight;
+    const double Crr      = this->rollingResistance;
+    const double CdA      = this->windResistance;
+    const double v_wind   = this->windSpeed;
+    pvars.unlock();
+
+    // Resistive forces due to gravity, rolling resistance and aerodynamic drag
+    const double F_slope = gradient/100 * m * g;
+    const double F_roll  = Crr * m * g;
+    const double F_air   = 0.5 * CdA * (v + v_wind) * abs(v + v_wind);
+
+    // Return sum of resistive forces
+    return F_slope + F_roll + F_air;
+}
+
+// Routine to limit trainer resistance value at low wheel speeds
+// Source: https://github.com/WouterJD/FortiusANT/blob/master/pythoncode/usbTrainer.py (16th Jan, 2021)
+//
+// Selected comments from source as an explanation of context:
+//
+//    # Resistance must be limited to a maximum at low wheel-speeds
+//    # Fortius does not perform well for high resistances at low wheelspeed.
+//    # Higher resistances cause stuttering.
+//    # The protection is that when Speed drops below 10km/hr, the resistance is limited.
+//    # The minium of 1500 is chosen above calibration level to avoid that the
+//      brake is going to spin (negative power mode).
+int16_t Fortius::rawForce_FortiusANT_AvoidCycleOfDeath(int16_t rawForce, double speedKph)
+{
+    if (speedKph <= 10 && rawForce >= 6000)
+    {
+        rawForce = 1500 + speedKph * 300;
+    }
+    return rawForce;
 }

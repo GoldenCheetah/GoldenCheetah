@@ -85,7 +85,7 @@ install:
 # Get Python embeddable and install packages
 - ps: >-
     if (-not (Test-Path 'C:\Python')) {
-      Start-FileDownload "https://www.python.org/ftp/python/3.7.7/python-3.7.7-embed-amd64.zip" Python.zip
+      Start-FileDownload "https://www.python.org/ftp/python/3.7.9/python-3.7.9-embed-amd64.zip" Python.zip
       7z x Python.zip -oC:\Python\
       echo python37.zip . '' 'import site' | Out-File C:\Python\python37._pth -Encoding ascii
       mkdir C:\Python\lib\site-packages
@@ -114,7 +114,7 @@ install:
 
 before_build:
 # Define GC version string, only for tagged builds
-- if %APPVEYOR_REPO_TAG%==true echo DEFINES+=GC_VERSION=VERSION_STRING >> src/gcconfig.pri
+- if %APPVEYOR_REPO_TAG%==true echo DEFINES+=GC_VERSION=VERSION_STRING >> src\gcconfig.pri
 
 # Enable CloudDB
 - echo CloudDB=active >> src\gcconfig.pri

@@ -26,7 +26,7 @@ Daum::Daum(QObject *parent, QString device, QString profile) : QThread(parent),
     deviceAddress_(-1),
     maxDeviceLoad_(800),
     serialWriteDelay_(0),
-    playSound_(false),
+    playSound_(profile.contains("sound", Qt::CaseInsensitive)),
     paused_(false),
     devicePower_(0),
     deviceHeartRate_(0),
@@ -34,7 +34,8 @@ Daum::Daum(QObject *parent, QString device, QString profile) : QThread(parent),
     deviceSpeed_(0),
     load_(kDefaultLoad),
     loadToWrite_(kDefaultLoad),
-    forceUpdate_(profile.contains("force", Qt::CaseInsensitive)) {
+    forceUpdate_(profile.contains("force", Qt::CaseInsensitive)),
+    profile_(profile) {
 }
 
 int Daum::start() {
@@ -211,6 +212,8 @@ void Daum::initializeConnection() {
 
     if (configureForCockpitType(dat)) {
         qDebug() << "Daum cockpit type: " << Qt::hex << dat;
+        qDebug() << "  Using communication delay:" << serialWriteDelay_ << "msec";
+        qDebug() << "  Playing sound:" << playSound_;
     } else {
         qWarning() << "unable to identify daum cockpit type" << Qt::hex << dat;
         exit(-1);
@@ -236,29 +239,49 @@ void Daum::initializeConnection() {
 
 bool Daum::configureForCockpitType(int cockpitType) {
     serialWriteDelay_ = 0;
-    playSound_ = false;
+
+    if (configureFromProfile()) {
+        // the profile string contains a valid configuration
+        return true;
+    }
 
     switch (cockpitType) {
     case COCKPIT_CARDIO:
-        return true;
     case COCKPIT_FITNESS:
-        return true;
     case COCKPIT_VITA_DE_LUXE:
-        return true;
-    case COCKPIT_8008:
-        return true;
-    case COCKPIT_8080:
-        return true;
     case COCKPIT_UNKNOWN:
-        return true;
     case COCKPIT_THERAPIE:
         return true;
+    case COCKPIT_8008:
+    case COCKPIT_8080:
+    case COCKPIT_8008_TRS:
     case COCKPIT_8008_TRS_PRO:
         serialWriteDelay_ = 50;
         playSound_ = true;
         return true;
     }
     return false;
+}
+
+bool Daum::configureFromProfile() {
+    QRegularExpression re("(\\d+)");
+    QRegularExpressionMatch match = re.match(profile_);
+    bool ok = false;
+
+    if (!match.hasMatch() || match.lastCapturedIndex() == 0) {
+        // no delay found in the profile
+
+        // if the string sound was found, use delay 0 and enable sound
+        return playSound_;
+    }
+
+    uint delay = match.captured(1).toUInt(&ok);
+    if (ok) {
+        // use the matched number found as the command delay
+        serialWriteDelay_ = delay;
+    }
+
+    return true;
 }
 
 void Daum::requestRealtimeData() {

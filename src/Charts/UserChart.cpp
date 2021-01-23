@@ -28,6 +28,7 @@
 #include "ColorButton.h"
 #include "MainWindow.h"
 #include "UserChartData.h"
+#include "TimeUtils.h"
 
 #include <limits>
 #include <QScrollArea>
@@ -170,8 +171,24 @@ UserChart::setRide(RideItem *item)
         // pie charts need labels
         if (chartinfo.type == GC_CHART_PIE) {
             series.labels.clear();
-            for(int i=0; i<ucd->x.asString().count(); i++) series.labels << ucd->x.asString()[i];
-
+            foreach (GenericAxisInfo axis, axisinfo) {
+                if (series.xname == axis.name) {
+                    // DATERANGE values are days from 01-01-1900
+                    QDateTime earliest(QDate(1900,01,01), QTime(0,0,0), Qt::LocalTime);
+                    switch (axis.type) {
+                        case GenericAxisInfo::TIME:
+                            for(int i=0; i<ucd->x.asNumeric().count(); i++) series.labels << time_to_string(ucd->x.asNumeric()[i], true);
+                            break;
+                        case GenericAxisInfo::DATERANGE:
+                            for(int i=0; i<ucd->x.asNumeric().count(); i++) series.labels << earliest.addDays(ucd->x.asNumeric()[i]).toString("dd MMM yy");
+                            break;
+                        default:
+                            for(int i=0; i<ucd->x.asString().count(); i++) series.labels << ucd->x.asString()[i];
+                            break;
+                    }
+                    break;
+                }
+            }
             series.colors.clear();
             QColor min=QColor(series.color);
             QColor max=GCColor::invertColor(GColor(CPLOTBACKGROUND));
@@ -211,13 +228,26 @@ UserChart::setRide(RideItem *item)
         // find the first series for this axis and set the categories
         // to the x series values.
         if (chartinfo.type == GC_CHART_BAR && axis.orientation == Qt::Horizontal) {
+            // DATERANGE values are days from 01-01-1900
+            QDateTime earliest(QDate(1900,01,01), QTime(0,0,0), Qt::LocalTime);
+
             // find the first series for axis.name
             foreach(GenericSeriesInfo s, seriesinfo) {
                 if (s.xname == axis.name && s.user1) {
-                    axis.type =  GenericAxisInfo::CATEGORY;
                     axis.categories.clear();
                     UserChartData *ucd = static_cast<UserChartData*>(s.user1);
-                    for(int i=0; i<ucd->x.asString().count(); i++) axis.categories << ucd->x.asString()[i];
+                    switch (axis.type) {
+                        case GenericAxisInfo::TIME:
+                            for(int i=0; i<ucd->x.asNumeric().count(); i++) axis.categories << time_to_string(ucd->x.asNumeric()[i], true);
+                            break;
+                        case GenericAxisInfo::DATERANGE:
+                            for(int i=0; i<ucd->x.asNumeric().count(); i++) axis.categories << earliest.addDays(ucd->x.asNumeric()[i]).toString("dd MMM yy");
+                            break;
+                        default:
+                            for(int i=0; i<ucd->x.asString().count(); i++) axis.categories << ucd->x.asString()[i];
+                            break;
+                    }
+                    axis.type =  GenericAxisInfo::CATEGORY;
                     break;
                 }
             }

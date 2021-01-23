@@ -2042,7 +2042,17 @@ AllPlot::recalc(AllPlotObject *objects)
                         totalTemp   += objects->tempArray[i];
                     }
                 }
-                if (!objects->balanceArray.empty()) totalBalance   += (objects->balanceArray[i]>0?objects->balanceArray[i]:50);
+
+                if (!objects->balanceArray.empty()) {
+                    if (objects->balanceArray[i] == RideFile::NA) {
+                        dp.lrbalance = 50.0;
+                        totalBalance   += dp.lrbalance;
+                    }
+                    else {
+                        totalBalance   += objects->balanceArray[i];
+                    }
+                }
+
                 if (!objects->lteArray.empty()) totalLTE   += (objects->lteArray[i]>0?objects->lteArray[i]:0);
                 if (!objects->rteArray.empty()) totalRTE   += (objects->rteArray[i]>0?objects->rteArray[i]:0);
                 if (!objects->lpsArray.empty()) totalLPS   += (objects->lpsArray[i]>0?objects->lpsArray[i]:0);
@@ -2112,7 +2122,8 @@ AllPlot::recalc(AllPlotObject *objects)
                 totalRPPPB  -= dp.rpppb;
                 totalLPPPE  -= dp.lpppe;
                 totalRPPPE  -= dp.rpppe;
-                totalBalance   -= (dp.lrbalance>0?dp.lrbalance:50);
+                totalBalance   -= (dp.lrbalance>RideFile::NA?dp.lrbalance:50.0);
+
                 for(int k=0; k<utotals.count(); k++) utotals[k] -= dp.user[k];
 
                 list.removeFirst();
@@ -2202,10 +2213,7 @@ AllPlot::recalc(AllPlotObject *objects)
 
                 // left /right pedal data
                 double balance = totalBalance / list.size();
-                if (balance == 0) {
-                    objects->smoothBalanceL[secs]    = 50;
-                    objects->smoothBalanceR[secs]    = 50;
-                } else if (balance >= 50) {
+                if (balance >= 50) {
                     objects->smoothBalanceL[secs]    = balance;
                     objects->smoothBalanceR[secs]    = 50;
                 }
@@ -2313,7 +2321,7 @@ AllPlot::recalc(AllPlotObject *objects)
             objects->smoothWind.append(GlobalContext::context()->useMetricUnits ? dp->headwind : dp->headwind * MILES_PER_KM);
             objects->smoothTorque.append(dp->nm);
 
-            if (dp->lrbalance == RideFile::NA || (dp->lrbalance == 0)) {
+            if (dp->lrbalance == RideFile::NA) {
                 objects->smoothBalanceL.append(50);
                 objects->smoothBalanceR.append(50);
             }
