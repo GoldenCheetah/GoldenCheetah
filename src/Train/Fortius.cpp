@@ -434,6 +434,10 @@ void Fortius::run()
         		return; // couldn't write to the device
 			}
 			
+            // The controller updates faster than the brake. Setting this to a low value (<50ms) increases the frequency of controller
+            // only packages (24byte). Tacx software uses 100ms.
+            msleep(50);
+
             int actualLength = readMessage();
 			if (actualLength < 0) {
 				qDebug() << "usb read error " << actualLength;
@@ -558,11 +562,6 @@ void Fortius::run()
                         
             timer.restart();
         }
-
-        
-        // The controller updates faster than the brake. Setting this to a low value (<50ms) increases the frequency of controller
-        // only packages (24byte). Tacx software uses 100ms.
-        msleep(50);
     }
 }
 
