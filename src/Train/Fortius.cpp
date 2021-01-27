@@ -417,7 +417,7 @@ void Fortius::run()
     pedalSensor = 0;
     pvars.unlock();
 
-    if(openDevice()) return;
+    if (openDevice()) return;
     isDeviceOpen = true;
 
     QTime timer;
@@ -452,10 +452,10 @@ void Fortius::run()
             for(int i = 0; i < 5; i++) {
                 actualLength = readMessage();
                 if (actualLength < 0) {
-	            qDebug() << "usb read error " << actualLength;
-	        }
+                    qDebug() << "usb read error " << actualLength;
+                }
                 // qDebug() << "Read reply " << QByteArray((const char *)buf, actualLength).toHex(':');
-                if(actualLength >= 48) break;
+                if (actualLength == 48 || (actualLength == 64 && i > 0)) break;
             }
 
             if (actualLength >= 24) {
@@ -569,7 +569,7 @@ void Fortius::run()
 
         } else if (!(curstatus&FT_PAUSED) && (curstatus&FT_RUNNING) && isDeviceOpen == false) {
 
-            if(openDevice()) return;
+            if (openDevice()) return;
             isDeviceOpen = true;        
                         
             timer.restart();
@@ -583,6 +583,7 @@ int Fortius::openDevice()
     const int READ_REPLY_RETRY = 5;
     int i = 0, j = 0;
     int actualLength = 0;
+    QString version;
 
     // open the device
     if (openPort()) {
@@ -607,7 +608,7 @@ int Fortius::openDevice()
                 qDebug() << "usb read error " << actualLength;
             }
         }
-        if(j < READ_REPLY_RETRY) break;
+        if (j < READ_REPLY_RETRY) break;
     }
 
     // Decode the proper version reply obtained
@@ -621,13 +622,15 @@ int Fortius::openDevice()
         motorBrakeYear = (motorBrakeRawSerialNumber % 10000000) / 100000;
         motorBrakeSerialNumber = motorBrakeRawSerialNumber % 100000;
 
-        QString version = QString(tr("Motor Brake Unit Firmware=%1 Serial=%2\n    year=%3 type=T19%4\n    Version2=%5 MotorBrake=%6"))
+        version = QString(tr("Motor Brake Unit Firmware=%1 Serial=%2\n    year=%3 type=T19%4\n    Version2=%5 MotorBrake=%6"))
             .arg(QString::number(motorBrakeFirmwareVersion), QString::number(motorBrakeSerialNumber),
             QString::number(motorBrakeYear + 2000), QString::number(motorBrakeType),
             QString::number(motorBrakeVersion), QString::number(motorBrake));
         qDebug() << version;
-        emit dynamic_cast<RealtimeController*>(parent)->setNotification(version, 0);
     }
+    else version = QString(tr("Motor Brake Unit version cannot be read\n    Is the motor brake on?"));
+
+    emit dynamic_cast<RealtimeController*>(parent)->setNotification(version, 0);
     return 0;
 }
 
