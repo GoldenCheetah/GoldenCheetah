@@ -447,6 +447,9 @@ void Fortius::run()
             // If you simply reissue the run command when 24 bytes are
             // received, the following 48 bytes reply will match the force echo
             // of the before last run command.
+            //
+            // On the T1932, replies are always 64 bytes. The best strategy seems to
+            // be simply skipping the first reply.
 
             msleep(50);
             for(int i = 0; i < 5; i++) {
