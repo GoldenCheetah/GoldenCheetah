@@ -597,6 +597,37 @@ int Fortius::sendCalibrateCommand()
 {
     uint8_t calibrate_command[] = {0x01,0x08,0x01,0x00,0xa3,0x16,0x00,0x00,0x03,0x00,0x00,0x00};
     
+    static double excess_speed = 0;
+
+    // Detect initial condition... rider is already in excess of 20kph calibration speed (ie performing a rolling calibration)
+    // If so, we want to apply lower calibration speed gradually, otherwise the feel at the pedals is NOT GOOD
+
+    // Notes - if rider is below 20, or at 0, go immediately to calibration speed, as the bike's freewheel will allow this (unless they're on a fixie!!)
+    //       - use 21kph as excess threshold, don't want false-positives when in steady state, it's never EXACTLY 20 when calibration is running
+    //       - if user happens to be just below 21kph and initiates a rolling calibration, it may start with a little "bump", but it's REALLY not a big deal
+    //       - even using 21 as the excess threshold, this can trigger from a standing start as wheel speed can overshoot the target
+    //         (never mind becuase this logic will just decay it nice and smoothly, rather than it "snapping back" to 20)
+
+    if (deviceSpeed > 21 && excess_speed == 0)
+    {
+        // Record excess speed
+        excess_speed = deviceSpeed - 20;
+    }
+
+    // Each time period during calibration, if we have excess_speed to decay, decay it
+    // Note: ignore deviceSpeed, otherwise we can introduce oscillation
+    //       wheel speed responds very forcefully in calibration mode and can over/undershoot
+    if (excess_speed > 0)
+    {
+        // Decay speed
+        // Note: rate at which excess speed decays is a combination of the next line, and the update period
+        // At the time of writing, 0.2kph per 50ms feels good, speed drops by ~4kph per second
+        excess_speed = std::max(0., excess_speed - 0.2); // note, always reaches 0 if calibration is not interrupted
+
+        // Write modified target speed to the calibration command before sending
+        qToLittleEndian<int16_t>(ms_to_rawSpeed(kph_to_ms((20 + excess_speed))), &calibrate_command[4]);
+    }
+
     int retCode = rawWrite(calibrate_command, 12);
 	//qDebug() << "usb status " << retCode;
 	return retCode;
