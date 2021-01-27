@@ -132,6 +132,7 @@ private:
             SLOPE_Command[12];
     
     // Utility and BG Thread functions
+    int openDevice();
     int openPort();
     int closePort();
 
@@ -170,6 +171,15 @@ private:
     volatile double windSpeed;
     volatile double rollingResistance;
     volatile double windResistance;
+
+    // Model version
+    unsigned int motorBrakeFirmwareVersion;
+    unsigned int motorBrakeRawSerialNumber;
+    unsigned int motorBrakeVersion;
+    unsigned int motorBrakeType;
+    unsigned int motorBrakeYear;
+    unsigned int motorBrakeSerialNumber;
+    bool motorBrake;
     
     // i/o message holder
     uint8_t buf[64];

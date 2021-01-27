@@ -69,6 +69,14 @@ Fortius::Fortius(QObject *parent) : QThread(parent)
     deviceStatus=0;
     this->parent = parent;
 
+    motorBrakeFirmwareVersion = 0;
+    motorBrakeRawSerialNumber = 0;
+    motorBrakeVersion = 0;
+    motorBrakeType = 0;
+    motorBrakeYear = 0;
+    motorBrakeSerialNumber = 0;
+    motorBrake = false;
+
     /* 12 byte control sequence, composed of 8 command packets
      * where the last packet sets the load. The first byte
      * is a CRC for the value being issued (e.g. Load in WATTS)
@@ -386,6 +394,7 @@ void Fortius::run()
     int curSteering;                    // Angle of steering controller
     // UNUSED int curStatus;
     uint8_t pedalSensor;                // 1 when using is cycling else 0, fed back to brake although appears unnecessary
+    int actualLength;
 
     // we need to average out power for the last second
     // since we get updates every 10ms (100hz)
@@ -408,15 +417,8 @@ void Fortius::run()
     pedalSensor = 0;
     pvars.unlock();
 
-
-    // open the device
-    if (openPort()) {
-        quit(2);
-        return; // open failed!
-    } else {
-        isDeviceOpen = true;
-        sendOpenCommand();
-    }
+    if(openDevice()) return;
+    isDeviceOpen = true;
 
     QTime timer;
     timer.start();
@@ -434,14 +436,28 @@ void Fortius::run()
         		return; // couldn't write to the device
 			}
 			
-            // The controller updates faster than the brake. Setting this to a low value (<50ms) increases the frequency of controller
-            // only packages (24byte). Tacx software uses 100ms.
-            msleep(50);
+            // On the T1942, the controller head returns 24 bytes for each read,
+            // except 48 bytes once as reply to a run command.
+            //
+            // It takes about 50ms for the 48 bytes reply to be ready.
+            // The force on the run command is echoed in the reply.
+            // You need to discard one or two 24 bytes replies, before getting
+            // the 48 bytes reply with matching force echo.
+            //
+            // If you simply reissue the run command when 24 bytes are
+            // received, the following 48 bytes reply will match the force echo
+            // of the before last run command.
 
-            int actualLength = readMessage();
-			if (actualLength < 0) {
-				qDebug() << "usb read error " << actualLength;
-			}
+            msleep(50);
+            for(int i = 0; i < 5; i++) {
+                actualLength = readMessage();
+                if (actualLength < 0) {
+	            qDebug() << "usb read error " << actualLength;
+	        }
+                // qDebug() << "Read reply " << QByteArray((const char *)buf, actualLength).toHex(':');
+                if(actualLength >= 48) break;
+            }
+
             if (actualLength >= 24) {
 
                 //----------------------------------------------------------------
@@ -553,16 +569,66 @@ void Fortius::run()
 
         } else if (!(curstatus&FT_PAUSED) && (curstatus&FT_RUNNING) && isDeviceOpen == false) {
 
-            if (openPort()) {
-                quit(2);
-                return; // open failed!
-            }
+            if(openDevice()) return;
             isDeviceOpen = true;        
-            sendOpenCommand();
                         
             timer.restart();
         }
     }
+}
+
+int Fortius::openDevice()
+{
+    const int SEND_RETRY = 3;
+    const int READ_REPLY_RETRY = 5;
+    int i = 0, j = 0;
+    int actualLength = 0;
+
+    // open the device
+    if (openPort()) {
+        quit(2);
+        return 1; // open failed!
+    }
+
+    // we need to flush queued packets, and retry a few times
+    actualLength = readMessage();  // skip
+    actualLength = readMessage();  // skip
+
+    for(i = 0; i < SEND_RETRY; i++) {
+        sendOpenCommand();
+        msleep(50);
+        for(j = 0; j < READ_REPLY_RETRY; j++) {
+            actualLength = readMessage();
+            // qDebug() << "Read version, " << QByteArray((const char *)buf, actualLength).toHex(':');
+
+            // Check that this is a proper version reply
+            if (actualLength >= 40 && buf[24] == 0x03 && buf[25] == 0x0c && buf[26] == 0 && buf[27] == 0) break;
+            if (actualLength < 0) {
+                qDebug() << "usb read error " << actualLength;
+            }
+        }
+        if(j < READ_REPLY_RETRY) break;
+    }
+
+    // Decode the proper version reply obtained
+    if (i < SEND_RETRY) {
+        motorBrakeFirmwareVersion = qFromLittleEndian<quint32>(&buf[28]);
+        motorBrakeRawSerialNumber = qFromLittleEndian<quint32>(&buf[32]);
+        motorBrakeVersion = qFromLittleEndian<quint16>(&buf[36]);
+        motorBrakeType = motorBrakeRawSerialNumber / 10000000;
+        // T1941 (230V, type 41) and T1946 (110V, type 46) are motor brake
+        motorBrake = motorBrakeType == 41 || motorBrakeType == 46;
+        motorBrakeYear = (motorBrakeRawSerialNumber % 10000000) / 100000;
+        motorBrakeSerialNumber = motorBrakeRawSerialNumber % 100000;
+
+        QString version = QString(tr("Motor Brake Unit Firmware=%1 Serial=%2\n    year=%3 type=T19%4\n    Version2=%5 MotorBrake=%6"))
+            .arg(QString::number(motorBrakeFirmwareVersion), QString::number(motorBrakeSerialNumber),
+            QString::number(motorBrakeYear + 2000), QString::number(motorBrakeType),
+            QString::number(motorBrakeVersion), QString::number(motorBrake));
+        qDebug() << version;
+        emit dynamic_cast<RealtimeController*>(parent)->setNotification(version, 0);
+    }
+    return 0;
 }
 
 /* ----------------------------------------------------------------------
@@ -580,6 +646,7 @@ int Fortius::sendOpenCommand()
     uint8_t open_command[] = {0x02,0x00,0x00,0x00};
     
     int retCode = rawWrite(open_command, 4);
+    // qDebug() << "Open command " << QByteArray((const char *)open_command, 4).toHex(':');
 	//qDebug() << "usb status " << retCode;
 	return retCode;
 }
@@ -629,6 +696,7 @@ int Fortius::sendRunCommand(int16_t pedalSensor)
         qToLittleEndian<int16_t>((int16_t)(130 * brakeCalibrationFactor + N_to_rawForce(brakeCalibrationForce_N)), &ERGO_Command[10]);
                 
         retCode = rawWrite(ERGO_Command, 12);
+        // qDebug() << "Ergo command " << QByteArray((const char *)ERGO_Command, 12).toHex(':');
     }
     else if (mode == FT_SSMODE)
     {
@@ -646,7 +714,7 @@ int Fortius::sendRunCommand(int16_t pedalSensor)
         qToLittleEndian<int16_t>((int16_t)(130 * brakeCalibrationFactor + N_to_rawForce(brakeCalibrationForce_N)), &SLOPE_Command[10]);
         
         retCode = rawWrite(SLOPE_Command, 12);
-        // qDebug() << "Send Gradient " << gradient << ", Weight " << weight << ", Command " << QByteArray((const char *)SLOPE_Command, 12).toHex(':');
+        // qDebug() << "Slope Command " << QByteArray((const char *)SLOPE_Command, 12).toHex(':');
     }
     else if (mode == FT_IDLE)
     {
