@@ -22,7 +22,7 @@
 
 FortiusController::FortiusController(TrainSidebar *parent,  DeviceConfiguration *dc) : RealtimeController(parent, dc)
 {
-    myFortius = new Fortius (parent);
+    myFortius = new Fortius (this);
 }
 
 
