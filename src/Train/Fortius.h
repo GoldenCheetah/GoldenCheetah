@@ -77,7 +77,7 @@
 #define DEFAULT_SCALING      1.00
 #define DEFAULT_WINDSPEED    0.00
 #define DEFAULT_Crr          0.004
-#define DEFAULT_CdA          0.51
+#define DEFAULT_CdARho       0.51
 
 #define FT_USB_TIMEOUT      500
 
@@ -110,7 +110,7 @@ public:
     void setWeight(double weight);                 // set the total weight of rider + bike in kg's
     void setWindSpeed(double windSpeed);                 // set the wind speed in m/s
     void setRollingResistance(double rollingResistance); // set the rolling resistance (Crr)
-    void setWindResistance(double windResistance);       // set the wind resistance (CdA)
+    void setWindResistance(double windResistance);       // set the wind resistance (CdARho)
     
     int getMode();
     double getGradient();
