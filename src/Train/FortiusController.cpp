@@ -226,7 +226,7 @@ FortiusController::getCalibrationZeroOffset()
 {
     switch (m_calibrationState)
     {
-        // Waiting for user to kick pedal...
+        // Waiting for user to kick pedal, or speed to decay...
         case CALIBRATION_STATE_REQUESTED:
         {
             int Buttons, Status, Steering;
@@ -240,8 +240,10 @@ FortiusController::getCalibrationZeroOffset()
                 m_calibrationState = CALIBRATION_STATE_STARTING;
             }
 
-            // Return value for presentation in the GUI
-            return 0;
+            // Return value to determine message to user in the GUI
+            //  -  0 instructs user to "Give the pedal a kick"
+            //  - >0 instructs user to "Allow wheel speed to settle"
+            return SpeedKmh;
         }
 
         // Calibration starting, waiting until we have enough values
