@@ -1949,6 +1949,26 @@ ErgFileQueryAdapter::gradientAt(double x, int& lapnum) const
     return gradient;
 }
 
+// Altitude
+double
+ErgFileQueryAdapter::altitudeAt(double x, int& lapnum) const
+{
+    // Establish index bracket for query.
+    if (!updateQueryStateFromDistance(x, lapnum))
+        return -1000;
+
+    assert(hasGradient()); // altitudeAt should not be called if ergfile has no gradient and altitude.
+    if (!hasGradient())
+        return -1000;
+
+    ErgFilePoint p1 = Points().at(qs.leftPoint);
+    ErgFilePoint p2 = Points().at(qs.rightPoint);
+    double altitude = p1.y;
+    if(p1.x != p2.x) altitude += (p2.y - p1.y) * (x - p1.x) / (p2.x - p1.x);
+
+    return altitude;
+}
+
 // Returns true if a location is determined, otherwise returns false.
 // This is the const stateless edition(tm), which does not rely on location
 // state. This method is used to make queries independant of the main ergfile
