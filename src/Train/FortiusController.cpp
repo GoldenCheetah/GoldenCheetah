@@ -226,22 +226,24 @@ FortiusController::getCalibrationZeroOffset()
 {
     switch (m_calibrationState)
     {
-        // Waiting for user to kick pedal...
+        // Waiting for user to kick pedal, or speed to decay...
         case CALIBRATION_STATE_REQUESTED:
         {
             int Buttons, Status, Steering;
             double Power, Force_N, HeartRate, Cadence, SpeedKmh, Distance;
             myFortius->getTelemetry(Power, Force_N, HeartRate, Cadence, SpeedKmh, Distance, Buttons, Steering, Status);
 
-            // Once we're up to speed (only takes a second or so), move on to next stage
-            if (SpeedKmh > 0.995 * getCalibrationTargetSpeed()) // Within 0.005 of the target speed
+            // Once we're at target speed (only takes a second or so), move on to next stage
+            if (SpeedKmh > 0.995 * getCalibrationTargetSpeed() && SpeedKmh < 1.005 * getCalibrationTargetSpeed()) // Within 0.005 of the target speed
             {
                 m_calibrationValues.reset();
                 m_calibrationState = CALIBRATION_STATE_STARTING;
             }
 
-            // Return value for presentation in the GUI
-            return 0;
+            // Return value to determine message to user in the GUI
+            //  -  0 instructs user to "Give the pedal a kick"
+            //  - >0 instructs user to "Allow wheel speed to settle"
+            return SpeedKmh;
         }
 
         // Calibration starting, waiting until we have enough values

@@ -206,6 +206,7 @@ private:
     // Source: https://github.com/totalreverse/ttyT1941/wiki
     //         - "speed = 'kph * 289.75'"
     static inline double rawSpeed_to_ms (double raw) { return raw / 1043.1; } // 289.75*3.6
+    static inline double ms_to_rawSpeed (double raw) { return raw * 1043.1; } // 289.75*3.6
 
     // Convert double value to type T, clipping to range of type T, if necessary
     template <typename T>

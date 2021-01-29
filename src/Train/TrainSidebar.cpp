@@ -2415,7 +2415,11 @@ void TrainSidebar::updateCalibration()
                 break;
 
             case CALIBRATION_STATE_REQUESTED:
-                status = QString(tr("Give the pedal a kick to start calibration...\nThe motor will run until calibration is complete."));
+                if (calibrationZeroOffset == 0)
+                    status = QString(tr("Give the pedal a kick to start calibration...\nThe motor will run until calibration is complete."));
+                else
+                    status = QString(tr("Allow wheel speed to settle, DO NOT PEDAL...\nThe motor will run until calibration is complete."));
+
                 break;
 
             case CALIBRATION_STATE_STARTING:
