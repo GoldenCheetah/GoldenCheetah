@@ -1901,9 +1901,10 @@ ErgFileQueryAdapter::wattsAt(double x, int& lapnum) const
     if (!updateQueryStateFromDistance(x, lapnum))
         return -100;
 
-    assert(hasWatts()); // wattsAt should not be called unless ergfile has watts.
-    if (!hasWatts())
+    if (!hasWatts()) {
+        qDebug() << "wattsAt should not be called unless ergfile has watts";
         return -100;
+    }
 
     // two different points in time but the same watts
     // at both, it doesn't really matter which value
@@ -1940,9 +1941,10 @@ ErgFileQueryAdapter::gradientAt(double x, int& lapnum) const
     if (!updateQueryStateFromDistance(x, lapnum))
         return -100;
 
-    assert(hasGradient()); // gradientAt should not be called if ergfile has no gradient.
-    if (!hasGradient())
+    if (!hasGradient()) {
+        qDebug() << "gradientAt should not be called if ergfile has no gradient";
         return -100;
+    }
 
     double gradient = Points().at(qs.leftPoint).val;
 
@@ -1957,9 +1959,10 @@ ErgFileQueryAdapter::altitudeAt(double x, int& lapnum) const
     if (!updateQueryStateFromDistance(x, lapnum))
         return -1000;
 
-    assert(hasGradient()); // altitudeAt should not be called if ergfile has no gradient and altitude.
-    if (!hasGradient())
+    if (!hasGradient()) {
+        qDebug() << "altitudeAt should not be called if ergfile has no gradient";
         return -1000;
+    }
 
     ErgFilePoint p1 = Points().at(qs.leftPoint);
     ErgFilePoint p2 = Points().at(qs.rightPoint);
@@ -1979,9 +1982,10 @@ bool ErgFileQueryAdapter::locationAt(double meters, int& lapnum, geolocation& ge
     if (!updateQueryStateFromDistance(meters, lapnum))
         return false;
 
-    assert(hasGradient()); // locationAt should not be called if ergfile has no gradient.
-    if (!hasGradient())
+    if (!hasGradient()) {
+        qDebug() << "locationAt should not be called if ergfile has no gradient";
         return false;
+    }
 
     // At this point leftpoint and rightpoint bracket the query distance. Three cases:
     // Bracket Covered: If query bracket compatible with the current interpolation bracket then simply interpolate
