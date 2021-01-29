@@ -130,7 +130,7 @@ class ErgFile
         double Cp;
         int format;             // ERG, CRS, MRC, ERG2 currently supported
 
-        bool hasGradient() const { return CRS == format; }
+        bool hasGradient() const { return CRS == format; } // Has Gradient and Altitude
         bool hasWatts()    const { return ERG == format || MRC == format; }
 
 private:
@@ -247,6 +247,7 @@ public:
     // State queries (maintain mutable state.)
     double wattsAt(double msec, int& lapnum) const;
     double gradientAt(double meters, int& lapnum) const;
+    double altitudeAt(double meters, int& lapnum) const;
     bool   locationAt(double meters, int& lapnum, geolocation& geoLoc, double& slope100) const;
 };
 
