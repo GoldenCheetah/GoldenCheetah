@@ -2684,7 +2684,7 @@ void TrainSidebar::adjustIntensity(int value)
     if (ergFile->hasGradient()) {
         // Don't rewrite gradient courses, changing lastAppliedIntensity is enough
         lastAppliedIntensity = value;
-        slopeToTrainer = slope * lastAppliedIntensity/100.; // also updated in loadUpdate()
+        slopeToTrainer = slope * lastAppliedIntensity/100.; // also updated in guiUpdate()
         emit intensityChanged(lastAppliedIntensity);
         return;
     }
