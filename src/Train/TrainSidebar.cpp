@@ -1693,6 +1693,12 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
                 }
             }
 
+            // In order to differentiate trainer speed from simulated speed it would be ideal
+            // to have trainers setTrainerSpeed() directly, instead of setSpeed() as current
+            // Here, we cross populate value, and call setSpeed() later with the correct value
+            // to keep the "Speed" dataseries in the train GUI showing correctly
+            rtData.setTrainerSpeed(rtData.getSpeed());
+
             // If simulated speed is *not* checked then you get speed reported by
             // trainer which in ergo mode will be dictated by your gear and cadence,
             // and in slope mode is whatever the trainer happens to implement.
@@ -1859,11 +1865,14 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
                 rtData.setLapMsecs(lap_elapsed_msec);
             }
 
+            // Set correct value for "Speed" dataseries in GUI, also affects dispalySpeed below
+            rtData.setSpeed(useSimulatedSpeed ? rtData.getSimulatedSpeed() : rtData.getTrainerSpeed());
+
             // local stuff ...
             displayPower = rtData.getWatts();
             displayCadence = rtData.getCadence();
             displayHeartRate = rtData.getHr();
-            displaySpeed = useSimulatedSpeed ? rtData.getSimulatedSpeed() : rtData.getSpeed();
+            displaySpeed = rtData.getSpeed();
             displayLRBalance = rtData.getLRBalance();
             displayLTE = rtData.getLTE();
             displayRTE = rtData.getRTE();

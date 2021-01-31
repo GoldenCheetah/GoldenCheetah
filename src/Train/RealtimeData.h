@@ -66,6 +66,7 @@ public:
     void setTime(long time);
     void setSpeed(double speed);
     void setWbal(double speed);
+    void setTrainerSpeed(double speed);
     void setSimulatedSpeed(double speed);
     void setVirtualSpeed(double speed);
     void setWheelRpm(double wheelRpm, bool fMarkTimeSample = false);
@@ -125,6 +126,7 @@ public:
     long getTime() const;
     double getSpeed() const;
     double getWbal() const;
+    double getTrainerSpeed() const;
     double getSimulatedSpeed() const;
     double getVirtualSpeed() const;
     double getWheelRpm() const;
@@ -185,6 +187,7 @@ private:
     double distanceRemaining;
     double lapDistance;
     double lapDistanceRemaining;
+    double trainerSpeed;
     double simulatedSpeed;
     double virtualSpeed;
     double wbal;
