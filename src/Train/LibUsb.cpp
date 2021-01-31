@@ -446,6 +446,7 @@ usb_dev_handle* LibUsb::OpenFortius()
                                 } else {
                                     if (OperatingSystem == WINDOWS) {
                                         // fails on Mac OS X, we don't actually need it anyway
+                                        qDebug()<<"calling usb_set_altinterface";
                                         rc = usb_set_altinterface(udev, alternate);
                                         if (rc < 0) qDebug()<<"usb_set_altinterface Error: "<< usb_strerror();
                                     }
