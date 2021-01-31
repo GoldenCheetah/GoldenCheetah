@@ -1701,9 +1701,8 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
                 BicycleSimState newState(rtData);
                 SpeedDistance ret = bicycle.SampleSpeed(newState);
 
-                rtData.setSpeed(ret.v);
+                rtData.setSimulatedSpeed(ret.v);
 
-                displaySpeed = ret.v;
                 distanceTick = ret.d;
             } else {
                 distanceTick = displaySpeed / (5 * 3600); // assumes 200ms refreshrate
@@ -1864,7 +1863,7 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
             displayPower = rtData.getWatts();
             displayCadence = rtData.getCadence();
             displayHeartRate = rtData.getHr();
-            displaySpeed = rtData.getSpeed();
+            displaySpeed = useSimulatedSpeed ? rtData.getSimulatedSpeed() : rtData.getSpeed();
             displayLRBalance = rtData.getLRBalance();
             displayLTE = rtData.getLTE();
             displayRTE = rtData.getRTE();

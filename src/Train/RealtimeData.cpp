@@ -74,6 +74,10 @@ void RealtimeData::setWbal(double wbal)
 {
     this->wbal = wbal;
 }
+void RealtimeData::setSimulatedSpeed(double speed)
+{
+    this->simulatedSpeed = speed;
+}
 void RealtimeData::setVirtualSpeed(double speed)
 {
     this->virtualSpeed = speed;
@@ -195,6 +199,10 @@ double RealtimeData::getSpeed() const
 double RealtimeData::getWbal() const
 {
     return wbal;
+}
+double RealtimeData::getSimulatedSpeed() const
+{
+    return simulatedSpeed;
 }
 double RealtimeData::getVirtualSpeed() const
 {

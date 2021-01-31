@@ -66,6 +66,7 @@ public:
     void setTime(long time);
     void setSpeed(double speed);
     void setWbal(double speed);
+    void setSimulatedSpeed(double speed);
     void setVirtualSpeed(double speed);
     void setWheelRpm(double wheelRpm, bool fMarkTimeSample = false);
     void setCadence(double aCadence);
@@ -124,6 +125,7 @@ public:
     long getTime() const;
     double getSpeed() const;
     double getWbal() const;
+    double getSimulatedSpeed() const;
     double getVirtualSpeed() const;
     double getWheelRpm() const;
     std::chrono::high_resolution_clock::time_point getWheelRpmSampleTime() const;
@@ -183,6 +185,7 @@ private:
     double distanceRemaining;
     double lapDistance;
     double lapDistanceRemaining;
+    double simulatedSpeed;
     double virtualSpeed;
     double wbal;
     double hhb, o2hb;
