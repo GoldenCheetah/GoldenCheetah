@@ -127,6 +127,8 @@ EditUserDataDialog::EditUserDataDialog(Context *context, UserData *here) :
     list << "config(w')";
     list << "config(pmax)";
     list << "config(cv)";
+    list << "config(sex)";
+    list << "config(dob)";
     list << "config(height)";
     list << "config(weight)";
     list << "config(lthr)";
