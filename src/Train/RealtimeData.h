@@ -73,6 +73,7 @@ public:
     void setCadence(double aCadence);
     void setLoad(double load);
     void setSlope(double slope);
+    void setSlopeToTrainer(double slope);
     void setMsecs(long);
     void setLapMsecs(long);
     void setLapMsecsRemaining(long);
@@ -134,6 +135,7 @@ public:
     double getCadence() const;
     double getLoad() const;
     double getSlope() const;
+    double getSlopeToTrainer() const;
     long getMsecs() const;
     long getLapMsecs() const;
     double getDistance() const;
@@ -187,6 +189,7 @@ private:
     double distanceRemaining;
     double lapDistance;
     double lapDistanceRemaining;
+    double slopeToTrainer;
     double trainerSpeed;
     double simulatedSpeed;
     double virtualSpeed;

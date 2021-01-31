@@ -1784,7 +1784,8 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
                         // Reading a new slope from ergFile with gradient means we may need to adjust slopeToTrainer, if intensity is not 100%
                         // This (possibly modified) value is used to populate the GUI
                         slopeToTrainer = slope * lastAppliedIntensity/100.;
-                        rtData.setSlope(slopeToTrainer);
+                        rtData.setSlopeToTrainer(slopeToTrainer);
+                        rtData.setSlope(slopeToTrainer); // maintain "Slope" dataseries with modified gradient
 
                         rtData.setAltitude(displayAltitude);
                     }
@@ -2692,7 +2693,6 @@ void TrainSidebar::adjustIntensity(int value)
     if (ergFile->hasGradient()) {
         // Don't rewrite gradient courses, changing lastAppliedIntensity is enough
         lastAppliedIntensity = value;
-        slopeToTrainer = slope * lastAppliedIntensity/100.; // also updated in guiUpdate()
         emit intensityChanged(lastAppliedIntensity);
         return;
     }

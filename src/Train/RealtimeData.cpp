@@ -101,6 +101,10 @@ void RealtimeData::setSlope(double slope)
 {
     this->slope = slope;
 }
+void RealtimeData::setSlopeToTrainer(double slope)
+{
+    this->slopeToTrainer = slope;
+}
 void RealtimeData::setLoad(double load)
 {
     this->load = load;
@@ -231,6 +235,10 @@ double RealtimeData::getCadence() const
 double RealtimeData::getSlope() const
 {
     return slope;
+}
+double RealtimeData::getSlopeToTrainer() const
+{
+    return slopeToTrainer;
 }
 double RealtimeData::getLoad() const
 {
