@@ -1544,7 +1544,7 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
             // is the symbol valid?
             QRegExp bestValidSymbols("^(apower|power|hr|cadence|speed|torque|vam|xpower|isopower|wpk)$", Qt::CaseInsensitive);
             QRegExp tizValidSymbols("^(power|hr)$", Qt::CaseInsensitive);
-            QRegExp configValidSymbols("^(cranklength|cp|ftp|w\\'|pmax|cv|height|weight|lthr|maxhr|rhr|units)$", Qt::CaseInsensitive);
+            QRegExp configValidSymbols("^(cranklength|cp|ftp|w\\'|pmax|cv|height|weight|lthr|maxhr|rhr|units|dob|sex)$", Qt::CaseInsensitive);
             QRegExp constValidSymbols("^(e|pi)$", Qt::CaseInsensitive); // just do basics for now
             QRegExp dateRangeValidSymbols("^(start|stop)$", Qt::CaseInsensitive); // date range
             QRegExp pmcValidSymbols("^(stress|lts|sts|sb|rr|date)$", Qt::CaseInsensitive);
@@ -3328,6 +3328,12 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, Result x, long it, RideItem
                 return Result(appsettings->cvalue(m->context->athlete->cyclist, GC_CRANKLENGTH, 175.00f).toDouble() / 1000.0);
             }
 
+            //
+            // DOB and SEX
+            //
+            double DOB = QDate(1900,1,1).daysTo(appsettings->cvalue(m->context->athlete->cyclist, GC_DOB).toDate());
+            QString SEX = appsettings->cvalue(m->context->athlete->cyclist, GC_SEX).toInt() ? "Female" : "Male";
+
             if (symbol == "cp") {
                 return Result(CP);
             }
@@ -3360,6 +3366,12 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, Result x, long it, RideItem
             }
             if (symbol == "units") {
                 return Result(GlobalContext::context()->useMetricUnits ? 1 : 0);
+            }
+            if (symbol == "dob") {
+                return Result(DOB);
+            }
+            if (symbol == "sex") {
+                return Result(SEX);
             }
         }
 
