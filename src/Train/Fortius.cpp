@@ -647,7 +647,7 @@ int Fortius::openDevice()
  *
  * ---------------------------------------------------------------------- */
 
-const uint8_t open_command[] = {0x02,0x00,0x00,0x00};
+uint8_t open_command[] = {0x02,0x00,0x00,0x00};
 
 int Fortius::sendOpenCommand()
 {    
