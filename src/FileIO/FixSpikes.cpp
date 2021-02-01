@@ -48,18 +48,18 @@ class FixSpikesConfig : public DataProcessorConfig
             layout->setContentsMargins(0,0,0,0);
             setContentsMargins(0,0,0,0);
 
-            maxLabel = new QLabel(tr("Max"));
-            varianceLabel = new QLabel(tr("Variance"));
+            maxLabel = new QLabel(tr("Max Watts"));
+            varianceLabel = new QLabel(tr("Watt Variance"));
 
             max = new QDoubleSpinBox();
-            max->setMaximum(9999.99);
+            max->setMaximum(9995);
             max->setMinimum(0);
-            max->setSingleStep(1);
+            max->setSingleStep(5);
 
             variance = new QDoubleSpinBox();
-            variance->setMaximum(9999);
+            variance->setMaximum(9995);
             variance->setMinimum(0);
-            variance->setSingleStep(10);
+            variance->setSingleStep(5);
 
             layout->addWidget(maxLabel);
             layout->addWidget(max);
@@ -74,24 +74,24 @@ class FixSpikesConfig : public DataProcessorConfig
 
         QString explain() {
             return(QString(tr("Power meters will occasionally report erroneously "
-                           " high values for power. For crank based "
-                           "power meters such as SRM and Quarq this is "
-                           "caused by an erroneous cadence reading "
-                           "as a result of triggering a reed switch "
-                           "whilst pushing off\n\n"
-                           "This function will look for spikes/anomalies "
-                           "in power data and replace the erroneous data "
-                           "by smoothing/interpolating the data from either "
-                           "side of the point in question\n\n"
-                           "It takes the following parameters:\n\n"
-                           "Absolute Max - this defines an absolute value "
-                           "for watts, and will smooth any values above this "
-                           "absolute value that have been identified as being "
-                           "anomalies (i.e. at odds with the data surrounding it)\n\n"
-                           "Variance (%) - this will smooth any values which "
-                           "are higher than this percentage of the rolling "
-                           "average wattage for the 30 seconds leading up "
-                           "to the spike.\n\n")));
+                " high values for power. For crank based "
+                "power meters such as SRM and Quarq this is "
+                "caused by an erroneous cadence reading "
+                "as a result of triggering a reed switch "
+                "whilst pushing off.\n\n"
+                "This function will look for spikes/anomalies "
+                "in power data and replace the erroneous data "
+                "by smoothing/interpolating the data from either "
+                "side of the point in question.\n\n"
+                "It takes the following parameters:\n\n"
+                "Absolute Max - this defines an absolute value "
+                "for watts, and will smooth any values above this "
+                "absolute value that have been identified as being "
+                "anomalies (i.e. at odds with the data surrounding it)\n\n"
+                "Watt Variance - data values that differ by more "
+                "than this variance wattage from the 30 second "
+                "rolling average preceding the spike will be "
+                "considered anomalous/spikes.\n\n")));
         }
 
         void readConfig() {
@@ -180,7 +180,7 @@ FixSpikes::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString op
 
         // An entry is a fixup candidate only if its variance is high AND it is above a concerning power level.
         double y = outliers->getYForRank(i);
-        if (   outliers->getDeviationForRank(i) < variance
+        if (fabs(outliers->getDeviationForRank(i)) < variance
             || y < max)
             continue;
 
