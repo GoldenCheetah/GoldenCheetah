@@ -646,11 +646,11 @@ int Fortius::openDevice()
  * sendCalibrateCommand() - start calibration at 20 kph
  *
  * ---------------------------------------------------------------------- */
-int Fortius::sendOpenCommand()
-{
 
-    uint8_t open_command[] = {0x02,0x00,0x00,0x00};
-    
+const uint8_t open_command[] = {0x02,0x00,0x00,0x00};
+
+int Fortius::sendOpenCommand()
+{    
     int retCode = rawWrite(open_command, 4);
     // qDebug() << "Open command " << QByteArray((const char *)open_command, 4).toHex(':');
 	//qDebug() << "usb status " << retCode;
@@ -782,7 +782,7 @@ int Fortius::readMessage()
     int rc;
 
     rc = rawRead(buf, 64);
-	//qDebug() << "usb status " << rc;
+    if(rc < 0) qDebug() << "Usb read error, status " << rc;
     return rc;
 }
 
@@ -803,20 +803,43 @@ bool Fortius::find()
 int Fortius::openPort()
 {
 	int rc;
-    // on windows we try on USB2 then on USB1 then fail...
-    rc = usb2->open();
-	//qDebug() << "usb status " << rc;
+
+    for(int i = 0; i < 3; i++) {
+        rc = usb2->open();
+        if(rc < 0) qDebug() << "Usb open error, status " << rc;
+        else break;
+    }
     return rc;
 }
 
 int Fortius::rawWrite(uint8_t *bytes, int size) // unix!!
 {
-    return usb2->write((char *)bytes, size, FT_USB_TIMEOUT);
+    int rc, rco;
+    
+    // Retry 3 times just the write, then close/open/open_command, and retry 3 more times
+    for(int i = 0; i < 6; i++) {
+        rc = usb2->write((char *)bytes, size, FT_USB_TIMEOUT);
+        if(rc < 0) {
+            qDebug() << "Usb write error, status " << rc;
+            if(i == 2) {
+                usb2->close();
+                rco = openPort();
+                if(rco < 0) return rc;
+                rco = usb2->write((char *)open_command, 4, FT_USB_TIMEOUT);
+            }
+        }
+        else break;
+    }
+    return rc;
 }
 
 int Fortius::rawRead(uint8_t bytes[], int size)
 {
-    return usb2->read((char *)bytes, size, FT_USB_TIMEOUT);
+    int rc;
+    
+    rc = usb2->read((char *)bytes, size, FT_USB_TIMEOUT);
+    if(rc < 0) qDebug() << "Usb read error, status " << rc;
+    return rc;
 }
 
 // check to see of there is a port at the device specified
