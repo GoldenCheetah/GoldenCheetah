@@ -74,6 +74,14 @@ void RealtimeData::setWbal(double wbal)
 {
     this->wbal = wbal;
 }
+void RealtimeData::setTrainerSpeed(double speed)
+{
+    this->trainerSpeed = speed;
+}
+void RealtimeData::setSimulatedSpeed(double speed)
+{
+    this->simulatedSpeed = speed;
+}
 void RealtimeData::setVirtualSpeed(double speed)
 {
     this->virtualSpeed = speed;
@@ -92,6 +100,10 @@ void RealtimeData::setCadence(double aCadence)
 void RealtimeData::setSlope(double slope)
 {
     this->slope = slope;
+}
+void RealtimeData::setSlopeToTrainer(double slope)
+{
+    this->slopeToTrainer = slope;
 }
 void RealtimeData::setLoad(double load)
 {
@@ -196,6 +208,14 @@ double RealtimeData::getWbal() const
 {
     return wbal;
 }
+double RealtimeData::getTrainerSpeed() const
+{
+    return trainerSpeed;
+}
+double RealtimeData::getSimulatedSpeed() const
+{
+    return simulatedSpeed;
+}
 double RealtimeData::getVirtualSpeed() const
 {
     return virtualSpeed;
@@ -215,6 +235,10 @@ double RealtimeData::getCadence() const
 double RealtimeData::getSlope() const
 {
     return slope;
+}
+double RealtimeData::getSlopeToTrainer() const
+{
+    return slopeToTrainer;
 }
 double RealtimeData::getLoad() const
 {
