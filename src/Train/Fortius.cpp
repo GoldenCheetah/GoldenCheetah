@@ -793,7 +793,7 @@ bool Fortius::find()
 {
 	int rc;
     rc = usb2->find();
-	//qDebug() << "usb status " << rc;
+    qDebug() << timestamp() << "Usb find, status " << rc;
     return rc;
 }
 
@@ -816,15 +816,15 @@ int Fortius::rawWrite(uint8_t *bytes, int size) // unix!!
     // Retry 3 times just the write, then close/open/open_command, and retry 3 more times
     for(int i = 0; i < 6; i++) {
         rc = usb2->write((char *)bytes, size, FT_USB_TIMEOUT);
+        qDebug() << timestamp() << "Usb write, status " << rc << ", command " <<
+            QByteArray((const char *)bytes, size).toHex(':');
         if(rc < 0) {
-            qDebug() << timestamp() << "Usb write error, status " << rc << ", command " << 
-                QByteArray((const char *)bytes, size).toHex(':');
             if(i == 2) {
                 rco = closePort();
                 rco = openPort();
                 if(rco < 0) return rc;
                 rco = usb2->write((char *)open_command, 4, FT_USB_TIMEOUT);
-                if(rco < 0) qDebug() << timestamp() << "Usb write open command error, status " << rc;
+                qDebug() << timestamp() << "Usb write open command, status " << rco;
             }
         }
         else break;
@@ -837,7 +837,8 @@ int Fortius::rawRead(uint8_t bytes[], int size)
     int rc;
     
     rc = usb2->read((char *)bytes, size, FT_USB_TIMEOUT);
-    if(rc < 0) qDebug() << timestamp() << "Usb read error, status " << rc;
+    qDebug() << timestamp() << "Usb read, status " << rc;
+    if(rc > 0) qDebug() << "    " << QByteArray((const char *)bytes, size).toHex(':');
     return rc;
 }
 
