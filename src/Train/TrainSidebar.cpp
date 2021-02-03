@@ -349,7 +349,7 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
     wbalr = wbal = 0;
     load_msecs = total_msecs = lap_msecs = 0;
     displayWorkoutDistance = displayDistance = displayPower = displayHeartRate =
-    displaySpeed = displayCadence = slope = slopeToTrainer = load = 0;
+    displaySpeed = displayCadence = slope = load = 0;
     displaySMO2 = displayTHB = displayO2HB = displayHHB = 0;
     displayLRBalance = displayLTE = displayRTE = displayLPS = displayRPS = 0;
     displayLatitude = displayLongitude = displayAltitude = 0.0;
@@ -1189,7 +1189,7 @@ void TrainSidebar::Start()       // when start button is pressed
 
         // START!
         load = 100;
-        slope = slopeToTrainer = 0.0;
+        slope = 0.0;
 
         // Reset Speed Simulation
         bicycle.clear();
@@ -1361,7 +1361,7 @@ void TrainSidebar::Stop(int deviceStatus)        // when stop button is pressed
     //}
 
     load = 0;
-    slope = slopeToTrainer = 0.0;
+    slope = 0.0;
 
     QDateTime now = QDateTime::currentDateTime();
 
@@ -1633,7 +1633,7 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
             return;
         } else {
             rtData.setLoad(load); // always set load..
-            rtData.setSlope(slope); // always set (original) slope..
+            rtData.setSlope(slope); // always set load..
             rtData.setAltitude(displayAltitude); // always set display altitude
 
             double distanceTick = 0;
@@ -1647,7 +1647,16 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
                 // get spinscan data from a computrainer?
                 if (Devices[dev].type == DEV_CT) {
                     memcpy((uint8_t*)rtData.spinScan, (uint8_t*)local.spinScan, 24);
+                    rtData.setLoad(local.getLoad()); // and get load in case it was adjusted
+                    rtData.setSlope(local.getSlope()); // and get slope in case it was adjusted
+                    // to within defined limits
                 }
+
+                if (Devices[dev].type == DEV_FORTIUS || Devices[dev].type == DEV_IMAGIC) {
+	                rtData.setLoad(local.getLoad()); // and get load in case it was adjusted
+                    rtData.setSlope(local.getSlope()); // and get slope in case it was adjusted
+					// to within defined limits
+				}
 
                 if (Devices[dev].type == DEV_ANTLOCAL || Devices[dev].type == DEV_NULL) {
                     rtData.setHb(local.getSmO2(), local.gettHb()); //only moxy data from ant and robot devices right now
@@ -1693,22 +1702,16 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
                 }
             }
 
-            // In order to differentiate trainer speed from simulated speed it would be ideal
-            // to have trainers setTrainerSpeed() directly, instead of setSpeed() as current
-            // Here, we cross populate value, and call setSpeed() later with the correct value
-            // to keep the "Speed" dataseries in the train GUI showing correctly
-            rtData.setTrainerSpeed(rtData.getSpeed());
-
             // If simulated speed is *not* checked then you get speed reported by
             // trainer which in ergo mode will be dictated by your gear and cadence,
             // and in slope mode is whatever the trainer happens to implement.
-            // Note: at this point, rtData.getSlope() reflects the original slope
             if (useSimulatedSpeed) {
                 BicycleSimState newState(rtData);
                 SpeedDistance ret = bicycle.SampleSpeed(newState);
 
-                rtData.setSimulatedSpeed(ret.v);
+                rtData.setSpeed(ret.v);
 
+                displaySpeed = ret.v;
                 distanceTick = ret.d;
             } else {
                 distanceTick = displaySpeed / (5 * 3600); // assumes 200ms refreshrate
@@ -1781,12 +1784,7 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
                             displayAltitude = ergFileQueryAdapter.altitudeAt(displayWorkoutDistance * 1000, displayWorkoutLap);
                         }
 
-                        // Reading a new slope from ergFile with gradient means we may need to adjust slopeToTrainer, if intensity is not 100%
-                        // This (possibly modified) value is used to populate the GUI
-                        slopeToTrainer = slope * lastAppliedIntensity/100.;
-                        rtData.setSlopeToTrainer(slopeToTrainer);
-                        rtData.setSlope(slopeToTrainer); // maintain "Slope" dataseries with modified gradient
-
+                        rtData.setSlope(slope);
                         rtData.setAltitude(displayAltitude);
                     }
                 }
@@ -1866,14 +1864,13 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
                 rtData.setLapMsecs(lap_elapsed_msec);
             }
 
-            // Set correct value for "Speed" dataseries in GUI, also affects dispalySpeed below
-            rtData.setSpeed(useSimulatedSpeed ? rtData.getSimulatedSpeed() : rtData.getTrainerSpeed());
-
             // local stuff ...
             displayPower = rtData.getWatts();
             displayCadence = rtData.getCadence();
             displayHeartRate = rtData.getHr();
             displaySpeed = rtData.getSpeed();
+            load = rtData.getLoad();
+            slope = rtData.getSlope();
             displayLRBalance = rtData.getLRBalance();
             displayLTE = rtData.getLTE();
             displayRTE = rtData.getRTE();
@@ -2101,7 +2098,7 @@ void TrainSidebar::loadUpdate()
             Stop(DEVICE_OK);
         } else {
             foreach(int dev, activeDevices) {
-                Devices[dev].controller->setGradient(slopeToTrainer);
+                Devices[dev].controller->setGradient(slope);
                 Devices[dev].controller->setWindResistance(bicycle.WindResistance(displayAltitude));
             }
             context->notifySetNow(displayWorkoutDistance * 1000);
@@ -2150,7 +2147,7 @@ void TrainSidebar::toggleCalibration()
                 if (calibrationDeviceIndex == dev) {
                     Devices[dev].controller->setCalibrationState(CALIBRATION_STATE_IDLE);
                     Devices[dev].controller->setMode(RT_MODE_SPIN);
-                    Devices[dev].controller->setGradient(slopeToTrainer);
+                    Devices[dev].controller->setGradient(slope);
                 }
             }
         }
@@ -2620,12 +2617,11 @@ void TrainSidebar::Higher()
 
         if (load >1500) load = 1500;
         if (slope >40) slope = 40;
-        slopeToTrainer = slope;
 
         if (status&RT_MODE_ERGO)
             foreach(int dev, activeDevices) Devices[dev].controller->setLoad(load);
         else
-            foreach(int dev, activeDevices) Devices[dev].controller->setGradient(slopeToTrainer);
+            foreach(int dev, activeDevices) Devices[dev].controller->setGradient(slope);
     }
 
     emit setNotification(tr("Increasing intensity.."), 2);
@@ -2647,12 +2643,11 @@ void TrainSidebar::Lower()
 
         if (load <0) load = 0;
         if (slope <-40) slope = -40;
-        slopeToTrainer = slope;
 
         if (status&RT_MODE_ERGO)
             foreach(int dev, activeDevices) Devices[dev].controller->setLoad(load);
         else
-            foreach(int dev, activeDevices) Devices[dev].controller->setGradient(slopeToTrainer);
+            foreach(int dev, activeDevices) Devices[dev].controller->setGradient(slope);
     }
 
     emit setNotification(tr("Decreasing intensity.."), 2);
@@ -2690,13 +2685,6 @@ void TrainSidebar::adjustIntensity(int value)
     ErgFile* ergFile = const_cast<ErgFile*>(ergFileQueryAdapter.getErgFile());
     if (!ergFile) return; // no workout selected
 
-    if (ergFile->hasGradient()) {
-        // Don't rewrite gradient courses, changing lastAppliedIntensity is enough
-        lastAppliedIntensity = value;
-        emit intensityChanged(lastAppliedIntensity);
-        return;
-    }
-
     // block signals temporarily
     context->mainWindow->blockSignals(true);
 
@@ -2713,6 +2701,7 @@ void TrainSidebar::adjustIntensity(int value)
 
     bool insertedNow = context->getNow() ? false : true; // don't add if at start
 
+    // what about gradient courses?
     ErgFilePoint last;
     for(int i = 0; i < ergFile->Points.count(); i++) {
 
