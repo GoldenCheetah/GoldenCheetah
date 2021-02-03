@@ -18,6 +18,7 @@
 
 #include "Fortius.h"
 #include "Settings.h"
+#include <QDateTime>
 
 //
 // Outbound control message has the format:
@@ -362,10 +363,14 @@ int Fortius::pause()
     }
 }
 
+// Timestamp to help debug communication errors
+qint64 timestamp() { return QDateTime::currentMSecsSinceEpoch(); }
+
 // used by thread to set variables and emit event if needed
 // on unexpected exit
 int Fortius::quit(int code)
 {
+    if(code) qDebug() << timestamp() << "Fortius quit error, status " << code;
     // event code goes here!
     exit(code);
     return 0; // never gets here obviously but shuts up the compiler!
@@ -429,8 +434,6 @@ void Fortius::run()
 
 			int rc = sendRunCommand(pedalSensor) ;
 			if (rc < 0) {
-				qDebug() << "usb write error " << rc;
-				// send failed - ouch!
 				closePort(); // need to release that file handle!!
 				quit(4);
         		return; // couldn't write to the device
@@ -454,9 +457,6 @@ void Fortius::run()
             msleep(50);
             for(int i = 0; i < 5; i++) {
                 actualLength = readMessage();
-                if (actualLength < 0) {
-                    qDebug() << "usb read error " << actualLength;
-                }
                 // qDebug() << "Read reply " << QByteArray((const char *)buf, actualLength).toHex(':');
                 if (actualLength == 48 || (actualLength == 64 && i > 0)) break;
             }
@@ -607,9 +607,6 @@ int Fortius::openDevice()
 
             // Check that this is a proper version reply
             if (actualLength >= 40 && buf[24] == 0x03 && buf[25] == 0x0c && buf[26] == 0 && buf[27] == 0) break;
-            if (actualLength < 0) {
-                qDebug() << "usb read error " << actualLength;
-            }
         }
         if (j < READ_REPLY_RETRY) break;
     }
@@ -782,13 +779,13 @@ int Fortius::readMessage()
     int rc;
 
     rc = rawRead(buf, 64);
-    if(rc < 0) qDebug() << "Usb read error, status " << rc;
     return rc;
 }
 
 int Fortius::closePort()
 {
     usb2->close();
+    qDebug() << timestamp() << "Usb close";
     return 0;
 }
 
@@ -806,8 +803,8 @@ int Fortius::openPort()
 
     for(int i = 0; i < 3; i++) {
         rc = usb2->open();
-        if(rc < 0) qDebug() << "Usb open error, status " << rc;
-        else break;
+        qDebug() << timestamp() << "Usb open, status " << rc;
+        if(rc >= 0) break;
     }
     return rc;
 }
@@ -820,12 +817,14 @@ int Fortius::rawWrite(uint8_t *bytes, int size) // unix!!
     for(int i = 0; i < 6; i++) {
         rc = usb2->write((char *)bytes, size, FT_USB_TIMEOUT);
         if(rc < 0) {
-            qDebug() << "Usb write error, status " << rc;
+            qDebug() << timestamp() << "Usb write error, status " << rc << ", command " << 
+                QByteArray((const char *)bytes, size).toHex(':');
             if(i == 2) {
-                usb2->close();
+                rco = closePort();
                 rco = openPort();
                 if(rco < 0) return rc;
                 rco = usb2->write((char *)open_command, 4, FT_USB_TIMEOUT);
+                if(rco < 0) qDebug() << timestamp() << "Usb write open command error, status " << rc;
             }
         }
         else break;
@@ -838,7 +837,7 @@ int Fortius::rawRead(uint8_t bytes[], int size)
     int rc;
     
     rc = usb2->read((char *)bytes, size, FT_USB_TIMEOUT);
-    if(rc < 0) qDebug() << "Usb read error, status " << rc;
+    if(rc < 0) qDebug() << timestamp() << "Usb read error, status " << rc;
     return rc;
 }
 
