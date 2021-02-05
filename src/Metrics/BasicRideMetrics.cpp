@@ -661,6 +661,10 @@ class AthleteFat : public RideMetric {
     void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &) {
 
         setValue(item->getWeight(Measure::FatKg));
+        if (item->getWeight(Measure::FatKg) > 0)
+            setValue(item->getWeight(Measure::FatKg));
+        else
+            setValue(item->getWeight() * item->getWeight(Measure::FatPercent) / 100.0);
         setCount(1);
     }
 
@@ -809,7 +813,7 @@ class AthleteFatP : public RideMetric {
     void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &) {
         if (item->getWeight(Measure::FatPercent) > 0)
             setValue(item->getWeight(Measure::FatPercent));
-        else if (item->getWeight(Measure::FatKg) > 0 && item->getWeight() > 0)
+        else if (item->getWeight() > 0)
             setValue(100 * item->getWeight(Measure::FatKg) / item->getWeight());
         else
             setValue(0.0);
