@@ -1000,7 +1000,7 @@ RideImportWizard::abortClicked()
     }
 
     QChar zero = QLatin1Char ( '0' );
-
+    int notifiableRides = 0;
 
     // Saving now - process the files one-by-one
     for (int i=0; i< filenames.count(); i++) {
@@ -1032,13 +1032,13 @@ RideImportWizard::abortClicked()
         QString finalActivitiesFulltarget = homeActivities.canonicalPath() + "/" + activitiesTarget;
 
         // check if a ride at this point of time already exists in /activities - if yes, skip import
-        if (QFileInfo(finalActivitiesFulltarget).exists()) { tableWidget->item(i,STATUS_COLUMN)->setText(tr("Error - Activity file exists")); continue; }
+        if (QFileInfo(finalActivitiesFulltarget).exists()) { tableWidget->item(i, STATUS_COLUMN)->setText(tr("Error - Activity file exists")); continue; }
 
         // in addition, also check the RideCache for a Ride with the same point in Time in UTC, which also indicates
         // that there was already a ride imported - reason is that RideCache start time is in UTC, while the file Name is in "localTime"
         // which causes problems when importing the same file (for files which do not have time/date in the file name),
         // while the computer has been set to a different time zone
-        if (context->athlete->rideCache->getRide(ridedatetime.toUTC())) { tableWidget->item(i,STATUS_COLUMN)->setText(tr("Error - Activity file with same start date/time exists")); continue; };
+        if (context->athlete->rideCache->getRide(ridedatetime.toUTC())) { tableWidget->item(i, STATUS_COLUMN)->setText(tr("Error - Activity file with same start date/time exists")); continue; }
 
         // SAVE STEP 4 - copy the source file to "/imports" directory (if it's not taken from there as source)
         // add the date/time of the target to the source file name (for identification)
@@ -1104,8 +1104,8 @@ RideImportWizard::abortClicked()
                 // - only after the step was successful the file is moved
                 // to the "clean" activities folder
                 context->athlete->addRide(QFileInfo(tmpActivitiesFulltarget).fileName(),
-                                          tableWidget->rowCount() < 20 ? true : false, // don't signal if mass importing
-                                          true, true);                                       // file is available only in /tmpActivities, so use this one please
+                                          notifiableRides++ < 20 ? true : false,    // only notify first 20 successful activities, don't signal everthing if mass importing
+                                          true, true);                              // file is available only in /tmpActivities, so use this one please
                 // rideCache is successfully updated, let's move the file to the real /activities
                 if (moveFile(tmpActivitiesFulltarget, finalActivitiesFulltarget)) {
                     tableWidget->item(i,STATUS_COLUMN)->setText(tr("File Saved"));

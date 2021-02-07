@@ -122,6 +122,9 @@ class RideNavigator : public GcChartWindow
         // bring it back in view
         void cursorRide();
 
+        // Update table height and layout
+        void rideAdded(RideItem*);
+
         // if current ride is deleted we need to invaldate
         void rideDeleted(RideItem*);
 
