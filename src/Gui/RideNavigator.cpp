@@ -35,11 +35,6 @@
 #include <QStyleFactory>
 #include <QScrollBar>
 
-const int SINGLE_ROW = 1;
-const int GROUP_BY_ROWS = 2;
-const int CALENDAR_TEXT_ROWS = 3;
-const int MAX_ACTIVITY_ROWS = 4;
-
 RideNavigator::RideNavigator(Context *context, bool mainwindow) : GcChartWindow(context), context(context), active(false), _groupBy(-1)
 {
     // get column headings
@@ -119,14 +114,14 @@ RideNavigator::RideNavigator(Context *context, bool mainwindow) : GcChartWindow(
         tableView->setWhatsThis(helpTableView->getWhatsThisText(HelpWhatsThis::ChartDiary_Navigator));
 
     // good to go
-    refresh();
     tableView->show();
+    resetView();
    
     // refresh when config changes (metric/imperial?)
     connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
 
     // refresh when rides added/removed
-    connect(context, SIGNAL(rideAdded(RideItem*)), this, SLOT(rideAdded(RideItem*)));
+    connect(context, SIGNAL(rideAdded(RideItem*)), this, SLOT(refresh()));
     connect(context, SIGNAL(rideDeleted(RideItem*)), this, SLOT(rideDeleted(RideItem*)));
     connect(context, SIGNAL(rideSelected(RideItem*)), this, SLOT(setRide(RideItem*)));
 
@@ -204,17 +199,6 @@ RideNavigator::configChanged(qint32 state)
 }
 
 void
-RideNavigator::rideAdded(RideItem* /* item */)
-{
-    active = false;
-
-    setWidth(geometry().width());
-
-    tableView->doItemsLayout();
-    repaint();
-}
-
-void
 RideNavigator::rideDeleted(RideItem*item)
 {
     if (currentItem == item) currentItem = NULL;
@@ -228,9 +212,6 @@ RideNavigator::refresh()
 
     setWidth(geometry().width());
     cursorRide();
-
-    tableView->doItemsLayout();
-    repaint();
 }
 
 void
@@ -242,7 +223,11 @@ RideNavigator::backgroundRefresh()
 void
 RideNavigator::resizeEvent(QResizeEvent*)
 {
-    refresh();
+    // ignore if main window .. we get told to resize
+    // by the splitter mover
+    if (mainwindow) return;
+
+    setWidth(geometry().width());
 }
 
 void
@@ -964,7 +949,7 @@ void
 RideNavigator::setRide(RideItem*rideItem)
 {
     // if we have a selection and its this one just ignore.
-    if (rideItem == NULL || (currentItem == rideItem && tableView->selectionModel()->selectedRows().count() != 0)) { return; }
+    if (rideItem == NULL || (currentItem == rideItem && tableView->selectionModel()->selectedRows().count() != 0)) return;
 
     for (int i=0; i<tableView->model()->rowCount(); i++) {
 
@@ -981,6 +966,7 @@ RideNavigator::setRide(RideItem*rideItem)
                 tableView->scrollTo(tableView->model()->index(j,3,group), QAbstractItemView::PositionAtCenter);
 
                 currentItem = rideItem;
+                tableView->doItemsLayout();
                 repaint();
                 active = false;
                 return;
@@ -1084,42 +1070,14 @@ void NavigatorCellDelegate::updateEditorGeometry(QWidget *, const QStyleOptionVi
 void NavigatorCellDelegate::setModelData(QWidget *, QAbstractItemModel *, const QModelIndex &) const { }
 bool NavigatorCellDelegate::helpEvent(QHelpEvent*, QAbstractItemView*, const QStyleOptionViewItem&, const QModelIndex&) { return true; }
 
-QSize NavigatorCellDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const 
+QSize NavigatorCellDelegate::sizeHint(const QStyleOptionViewItem & /*option*/, const QModelIndex &index) const 
 {
     QSize s;
 
-    // default to a single row
-    s.setHeight(rideNavigator->fontHeight + 2);
-
-    if (rideNavigator->groupByModel->mapToSource(rideNavigator->sortModel->mapToSource(index)) == QModelIndex())
-    {
-        // set the group by separator to the height of two rows
-        s.setHeight((rideNavigator->fontHeight + 2) * GROUP_BY_ROWS);
-    } else {
-
-        QString cellTxt = rideNavigator->groupByModel->data(rideNavigator->sortModel->mapToSource(index), Qt::UserRole).toString();
-
-        // calculate the calendar text dynamically from the string length, when rendered it uses textwrap,
-        // so will automatically fit the rows allowed for here
-        if (cellTxt != "")
-        {
-            // pwidth can be undefined at startup, so protect against divide by zero
-            if (rideNavigator->pwidth > 0) {
-
-                // Allow for for the scrollbar & text indent (20) width as this is included in the pwidth value.
-                double calendarTxtLength = QFontMetrics(option.font).horizontalAdvance(cellTxt) + 20;
-
-                // add a row for the activity
-                int rowsRequired = SINGLE_ROW + ceil(calendarTxtLength / rideNavigator->pwidth);
-
-                // limit the number of rows for the activity & calendar text
-                if (rowsRequired > MAX_ACTIVITY_ROWS) rowsRequired = MAX_ACTIVITY_ROWS;
-
-                s.setHeight((rideNavigator->fontHeight + 2) * rowsRequired);
-            }
-        }
-    }
-    
+    if (rideNavigator->groupByModel->mapToSource(rideNavigator->sortModel->mapToSource(index)) != QModelIndex() &&
+        rideNavigator->groupByModel->data(rideNavigator->sortModel->mapToSource(index), Qt::UserRole).toString() != "") {
+        s.setHeight((rideNavigator->fontHeight+2) * 4);
+    } else s.setHeight(rideNavigator->fontHeight + 2);
     return s;
 }
 
@@ -1255,13 +1213,12 @@ void NavigatorCellDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
 
         // now get the calendar text to appear ...
         if (calendarText != "") {
-            QRect high(myOption.rect.x()+myOption.rect.width() - (7*dpiXFactor), myOption.rect.y(), (7*dpiXFactor), (rideNavigator->fontHeight+2) * MAX_ACTIVITY_ROWS);
+            QRect high(myOption.rect.x()+myOption.rect.width() - (7*dpiXFactor), myOption.rect.y(), (7*dpiXFactor), (rideNavigator->fontHeight+2) * 4);
 
             myOption.rect.setX(0);
-            // shift calendar text rect down one row
             myOption.rect.setY(myOption.rect.y() + rideNavigator->fontHeight + 2);//was +23
             myOption.rect.setWidth(rideNavigator->pwidth);
-            myOption.rect.setHeight(rideNavigator->fontHeight * CALENDAR_TEXT_ROWS); //was 36
+            myOption.rect.setHeight(rideNavigator->fontHeight * 3); //was 36
             //myOption.font.setPointSize(myOption.font.pointSize());
             myOption.font.setWeight(QFont::Normal);
 
@@ -1306,8 +1263,7 @@ void NavigatorCellDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
         if (value != "") {
             myOption.displayAlignment = Qt::AlignLeft | Qt::AlignBottom;
             myOption.rect.setX(0);
-            myOption.rect.setY(myOption.rect.y() + rideNavigator->fontHeight + 2);
-            myOption.rect.setHeight((rideNavigator->fontHeight + 2) * GROUP_BY_ROWS); // rect height is 2 rows, as per that returned in setHint
+            myOption.rect.setHeight(rideNavigator->fontHeight + 2);
             myOption.rect.setWidth(rideNavigator->pwidth);
             painter->fillRect(myOption.rect, GColor(CPLOTBACKGROUND));
         }
