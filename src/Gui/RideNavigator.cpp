@@ -966,7 +966,6 @@ RideNavigator::setRide(RideItem*rideItem)
                 tableView->scrollTo(tableView->model()->index(j,3,group), QAbstractItemView::PositionAtCenter);
 
                 currentItem = rideItem;
-                tableView->doItemsLayout();
                 repaint();
                 active = false;
                 return;
