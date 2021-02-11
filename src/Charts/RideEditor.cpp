@@ -605,21 +605,30 @@ AnomalyDialog::check()
         // get spike config
         double max = appsettings->value(this, GC_DPFS_MAX, "200").toDouble();
         double variance = appsettings->value(this, GC_DPFS_VARIANCE, "20").toDouble();
+        int avgWindowTime = appsettings->value(this, GC_DPFS_WINDOWTIME, "30").toDouble();
+        bool fixdropOuts = appsettings->value(this, GC_DPFS_DROPOUTS, false).toBool();
 
-        LTMOutliers outliers(secs.data(), power.data(), power.count(), 30, false);
+        int windowsize = avgWindowTime / rideEditor->ride->ride()->recIntSecs();
+
+        LTMOutliers outliers(secs.data(), power.data(), power.count(), windowsize, false);
 
         // run through the ranked list
         for (int i=0; i<secs.count(); i++) {
 
             // is this over variance threshold?
-            if (outliers.getDeviationForRank(i) < variance) continue;
+            if ((fixdropOuts && fabs(outliers.getDeviationForRank(i)) < variance) ||
+                (!fixdropOuts && outliers.getDeviationForRank(i) < variance)) continue;
 
             // ok, so its highly variant but is it over
             // the max value we are willing to accept?
             if (outliers.getYForRank(i) < max) continue;
 
             // which one is it
-            rideEditor->data->anomalies.insert(xsstring(outliers.getIndexForRank(i), RideFile::watts), tr("Data spike candidate"));
+            if (outliers.getDeviationForRank(i) > 0) {
+                rideEditor->data->anomalies.insert(xsstring(outliers.getIndexForRank(i), RideFile::watts), tr("Data spike candidate"));
+            } else {
+                rideEditor->data->anomalies.insert(xsstring(outliers.getIndexForRank(i), RideFile::watts), tr("Data dropout candidate"));
+            }
         }
     }
 

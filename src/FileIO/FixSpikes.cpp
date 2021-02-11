@@ -32,10 +32,10 @@ class FixSpikesConfig : public DataProcessorConfig
 
     friend class ::FixSpikes;
     protected:
-        QHBoxLayout *layout;
-        QLabel *maxLabel, *varianceLabel;
-        QDoubleSpinBox *max,
-                       *variance;
+        QHBoxLayout*layout;
+        QLabel *maxLabel, *varianceLabel, *avgWindowLabel;
+        QDoubleSpinBox *max, *variance, *avgWindow;
+        QCheckBox * dropOuts;
 
     public:
         FixSpikesConfig(QWidget *parent) : DataProcessorConfig(parent) {
@@ -50,6 +50,7 @@ class FixSpikesConfig : public DataProcessorConfig
 
             maxLabel = new QLabel(tr("Max Watts"));
             varianceLabel = new QLabel(tr("Watt Variance"));
+            avgWindowLabel = new QLabel(tr("Avg Window (secs)"));
 
             max = new QDoubleSpinBox();
             max->setMaximum(9995);
@@ -61,10 +62,20 @@ class FixSpikesConfig : public DataProcessorConfig
             variance->setMinimum(0);
             variance->setSingleStep(5);
 
+            avgWindow = new QDoubleSpinBox();
+            avgWindow->setMaximum(61);
+            avgWindow->setMinimum(5);
+            avgWindow->setSingleStep(1);
+
+            dropOuts = new QCheckBox(tr("Fix Dropouts"));
+
             layout->addWidget(maxLabel);
             layout->addWidget(max);
             layout->addWidget(varianceLabel);
             layout->addWidget(variance);
+            layout->addWidget(avgWindowLabel);
+            layout->addWidget(avgWindow);
+            layout->addWidget(dropOuts);
 
             layout->addStretch();
         }
@@ -97,13 +108,19 @@ class FixSpikesConfig : public DataProcessorConfig
         void readConfig() {
             double tol = appsettings->value(NULL, GC_DPFS_MAX, "200").toDouble();
             double stop = appsettings->value(NULL, GC_DPFS_VARIANCE, "20").toDouble();
+            int wtime = appsettings->value(NULL, GC_DPFS_WINDOWTIME, "30").toDouble();
+            bool fixneg = appsettings->value(NULL, GC_DPFS_DROPOUTS, false).toBool();
             max->setValue(tol);
             variance->setValue(stop);
+            avgWindow->setValue(wtime);
+            dropOuts->setChecked(fixneg);
         }
 
         void saveConfig() {
             appsettings->setValue(GC_DPFS_MAX, max->value());
             appsettings->setValue(GC_DPFS_VARIANCE, variance->value());
+            appsettings->setValue(GC_DPFS_WINDOWTIME, avgWindow->value());
+            appsettings->setValue(GC_DPFS_DROPOUTS, dropOuts->isChecked());
         }
 };
 
@@ -145,18 +162,23 @@ FixSpikes::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString op
     if (ride->areDataPresent()->watts == false) return false;
 
     // get settings
-    double variance, max;
+    double variance, max, avgWindowTime;
+    bool fixdropOuts;
     if (config == NULL) { // being called automatically
         max = appsettings->value(NULL, GC_DPFS_MAX, "200").toDouble();
         variance = appsettings->value(NULL, GC_DPFS_VARIANCE, "20").toDouble();
+        avgWindowTime = appsettings->value(NULL, GC_DPFS_WINDOWTIME, "30").toDouble();
+        fixdropOuts = appsettings->value(NULL, GC_DPFS_DROPOUTS, false).toBool();
     } else { // being called manually
         max = ((FixSpikesConfig*)(config))->max->value();
         variance = ((FixSpikesConfig*)(config))->variance->value();
+        avgWindowTime = ((FixSpikesConfig*)(config))->avgWindow->value();
+        fixdropOuts = ((FixSpikesConfig*)(config))->dropOuts->isChecked();
     }
+   
+    int windowsize = avgWindowTime / ride->recIntSecs();
 
-    int windowsize = 30 / ride->recIntSecs();
-
-    // We use a window size of 30s to find spikes
+    // We use a window size (default 30 secs) to find spikes
     // if the ride is shorter, don't bother
     // is no way of post processing anyway (e.g. manual workouts)
     if (windowsize > ride->dataPoints().count()) return false;
@@ -180,8 +202,8 @@ FixSpikes::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString op
 
         // An entry is a fixup candidate only if its variance is high AND it is above a concerning power level.
         double y = outliers->getYForRank(i);
-        if (fabs(outliers->getDeviationForRank(i)) < variance
-            || y < max)
+        if ((fixdropOuts && (fabs(outliers->getDeviationForRank(i)) < variance)) ||
+            (!fixdropOuts && (outliers->getDeviationForRank(i) < variance)) || y < max)
             continue;
 
         // Houston, we have a spike

@@ -593,6 +593,8 @@ GSettings::upgradeGlobal() {
     migrateValue(GC_DPFG_STOP);
     migrateValue(GC_DPFS_MAX);
     migrateValue(GC_DPFS_VARIANCE);
+    migrateValue(GC_DPFS_WINDOWTIME);
+    migrateValue(GC_DPFS_DROPOUTS);
     migrateValue(GC_DPTA);
     migrateValue(GC_DPPA);
     migrateValue(GC_DPFHRS_MAX);
