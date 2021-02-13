@@ -588,8 +588,9 @@ void LiveMapWidget::initLiveMap(Context* context)
     }
     else
     {
+        QString sMapZoom = QString::number(m_Zoom);
         QString js = ("<div><script type=\"text/javascript\">initMap("
-            + startingLat + "," + startingLon + ",16);"
+            + startingLat + "," + startingLon + "," + sMapZoom + ");"
             "showMyMarker(" + startingLat + "," + startingLon + ");</script></div>\n");
         routeLatLngs = "[";
         QString code = "";
