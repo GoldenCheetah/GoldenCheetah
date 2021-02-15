@@ -1814,7 +1814,7 @@ struct FitFileReaderState
                     case 30: //LEFT_RIGHT_BALANCE
                              // When bit 7 is 1 value are right power contribution
                              // not '1' the location of the contribution is undefined
-                             if (value > 0)
+                             if (value & 0x80)
                                 lrbalance = 100 - (value & 0x7F);
                              else
                                 lrbalance = RideFile::NA;
