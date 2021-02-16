@@ -110,10 +110,13 @@ TcxFileReader::toByteArray(Context *context, const RideFile *ride, bool withAlt,
     QDomElement creator = doc.createElement("Creator");
     creator.setAttribute("xsi:type", "Device_t");
     QDomElement creatorName = doc.createElement("Name");
-    if (ride->deviceType().toLower().contains("zwift") ) {
+    QString device(ride->deviceType());
+    if (device.toLower().contains("zwift") ) {
         text = doc.createTextNode("Zwift");
-    } else {
+    } else if (device.toLower().contains("unknown")) {
         text = doc.createTextNode("Garmin TCX");
+    } else {
+        text = doc.createTextNode(device);
     }
     creatorName.appendChild(text);
     creator.appendChild(creatorName);
