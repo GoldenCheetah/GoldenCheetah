@@ -100,7 +100,7 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
     enum temperature { degF, degC, degNone };
     typedef enum temperature Temperature;
     static Temperature tempType = degNone;
-    QDateTime startTime;
+    QDateTime startTime, iBikeTime;
 
     // Minutes,Torq (N-m),Km/h,Watts,Km,Cadence,Hrate,ID
     // Minutes, Torq (N-m),Km/h,Watts,Km,Cadence,Hrate,ID
@@ -455,6 +455,7 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                 if (lineno == 2) {
                     QStringList f = line.split(",");
                     if (f.size() == 6) {
+                        // iBike line 2 is a local time.
                         startTime = QDateTime(
                             QDate(f[0].toInt(), f[1].toInt(), f[2].toInt()),
                             QTime(f[3].toInt(), f[4].toInt(), f[5].toInt()));
@@ -498,10 +499,11 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                 // when merged with external GPS data.
                 else if (lineno == 6)
                 {
-                   QString timestamp = line.section( ',', 14, 14);
-                     if (timestamp.length()>0){
-                         startTime = QDateTime::fromString(timestamp, Qt::ISODate);
-                     }
+                    // iBike line 6 is a UTC time.
+                    QString timestamp = line.section( ',', 14, 14);
+                    if (timestamp.length()>0){
+                        iBikeTime = QDateTime::fromString(timestamp, Qt::ISODate);
+                    }
                 }
             }
 
@@ -782,7 +784,7 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                      minutes = (recInterval * lineno - unitsHeader)/60.0;
                      QString timestamp = line.section( ',', 14, 14);
                      if (timestamp.length()>0){
-                         minutes = startTime.secsTo(QDateTime::fromString(timestamp, Qt::ISODate))/60.0;
+                         minutes = iBikeTime.secsTo(QDateTime::fromString(timestamp, Qt::ISODate))/60.0;
                      }
                      nm = 0; //no torque
                      kph = line.section(',', 0, 0).toDouble();
