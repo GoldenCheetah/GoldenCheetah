@@ -71,7 +71,7 @@ GpxFileReader::toByteArray(Context *, const RideFile *ride, bool withAlt, bool w
                      "http://www.garmin.com/xmlschemas/PowerExtensionv1.xsd"        );
 
     gpx.setAttribute("version", "1.1");
-    gpx.setAttribute("creator", QString("GoldenCheetah (build %1)").arg(VERSION_LATEST));
+    gpx.setAttribute("creator", QString("GoldenCheetah (build %1) with Barometer").arg(VERSION_LATEST));
     doc.appendChild(gpx);
 
 

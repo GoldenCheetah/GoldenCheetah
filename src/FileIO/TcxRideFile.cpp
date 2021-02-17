@@ -113,7 +113,7 @@ TcxFileReader::toByteArray(Context *context, const RideFile *ride, bool withAlt,
     if (ride->deviceType().toLower().contains("zwift") ) {
         text = doc.createTextNode("Zwift");
     } else {
-        text = doc.createTextNode("Garmin TCX");
+        text = doc.createTextNode("Garmin TCX with Barometer");
     }
     creatorName.appendChild(text);
     creator.appendChild(creatorName);
