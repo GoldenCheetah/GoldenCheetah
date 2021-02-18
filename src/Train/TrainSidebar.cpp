@@ -2406,6 +2406,7 @@ void TrainSidebar::updateCalibration()
             }
             break;
 
+#ifdef GC_HAVE_LIBUSB
         case CALIBRATION_TYPE_FORTIUS:
 
             switch (calibrationState) {
@@ -2465,6 +2466,7 @@ void TrainSidebar::updateCalibration()
                 break;
             }
             break;
+#endif
 
         }
 
