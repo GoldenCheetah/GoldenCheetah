@@ -325,6 +325,10 @@ RTool::RTool()
                                 "GC.CHART.SCATTER<-2\n"
                                 "GC.CHART.BAR<-3\n"
                                 "GC.CHART.PIE<-4\n"
+                                "GC.AXIS.CONTINUOUS<-0\n"
+                                "GC.AXIS.DATE<-1\n"
+                                "GC.AXIS.TIME<-2\n"
+                                "GC.AXIS.CATEGORY<-3\n"
 
                                // version and build
                                "GC.version <- function() { return(\"%1\") }\n"
