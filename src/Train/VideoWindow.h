@@ -112,11 +112,107 @@ extern "C" {
 // QT stuff etc
 #include <QtGui>
 #include <QTimer>
+#include <QMutex>
 #include "Context.h"
 #include "DeviceConfiguration.h"
 #include "DeviceTypes.h"
 #include "RealtimeData.h"
 #include "TrainSidebar.h"
+
+#include <mutex>
+#include <thread>
+
+// Class to perform ordered async execution of functions.
+// - Async dispatch does not block and cannot return a value
+// - Syncronous dispatch function can return a value but must
+//   first block until all pending work is complete.
+//
+// VLC, QT, Slow Disc, High Latency Video Decode, and Widgets don't play nicely
+// together and common result is that vlc hangs when stop is called because it
+// cannot obtain access to the render surface in order to release it. This
+// is not a vlc bug but something to do with how widgets are dispatched by qt.
+//
+// It appears the problem can be avoided if we never call vlc stop from the gui
+// thread. The ordered dispatch exists to ensure all operations occur in-order,
+// even if they are running in seprate threads.
+//
+// This class is used to wrap all interactions with VLC - since stop must be
+// asynchronous, ordering forces all other operations to run on the same queue.
+
+class OrderedAsync {
+    std::unique_ptr<std::thread>      m_workerThread;
+    std::list<std::function<void()>>  m_workQueue;
+    std::mutex                        m_queueLock;
+    std::condition_variable           m_queuePendingWork;
+    std::condition_variable           m_queueEmpty;
+    bool                              m_fDoExit;
+
+    void WorkerThreadLoop() {
+        std::function<void()> work; // tmp to hold work task after pop from queue
+        while (true) // loop until told to exit
+        {
+            std::unique_lock<std::mutex> lock(m_queueLock);
+
+            // Support drain: If queue is empty then notufy empty event.
+            if (m_workQueue.empty()) m_queueEmpty.notify_one();
+
+            // Wait until notified that queue is not empty
+            m_queuePendingWork.wait(lock, [&]() { return m_fDoExit || !m_workQueue.empty(); });
+
+            // Break out of loop if exit sign has been received.
+            if (m_fDoExit)
+                return;
+
+            // Pop task from queue
+            work = std::move(m_workQueue.front());
+            m_workQueue.pop_front();
+
+            // Unlock
+            lock.unlock();
+
+            work(); // Execute task
+        }
+    }
+
+    void pushWork(std::function<void()> job) {
+        std::lock_guard<std::mutex> lock(m_queueLock);
+        m_workQueue.push_back(job);
+        m_queuePendingWork.notify_one();
+    }
+
+public:
+
+    OrderedAsync() :m_fDoExit(false) {
+        m_workerThread = std::unique_ptr<std::thread>(new std::thread(std::bind(&OrderedAsync::WorkerThreadLoop, this)));
+    }
+
+    ~OrderedAsync() {
+        Drain();                           // ensure all work is complete
+        m_fDoExit = true;
+        m_queueLock.lock();
+        m_queuePendingWork.notify_one();   // notify
+        m_queueLock.unlock();
+        m_workerThread->join();            // wait for worker thread to terminate
+    }
+
+    void Drain() {
+        std::unique_lock<std::mutex> lock(m_queueLock);
+        m_queueEmpty.wait(lock, [&]() { return m_fDoExit || m_workQueue.empty(); });
+    }
+
+    // Syncronous calls execute after all pending work and may return any type.
+    template<typename T_RET> T_RET SyncCall(std::function<T_RET()> work) {
+        Drain();                           // ensure all previous tasks have completed
+        return (work)();                   // execute the synchronous task and return result
+    }
+
+    // push task onto queue and notify worker thread
+    void AsyncCall(std::function<void()> work) {
+        std::lock_guard<std::mutex> lock(m_queueLock);
+        m_workQueue.push_back(std::move(work));
+        m_queuePendingWork.notify_one();
+    }
+};
 
 // regardless we always have a media helper
 class MediaHelper
@@ -165,6 +261,7 @@ class VideoWindow : public GcChartWindow
         void telemetryUpdate(RealtimeData rtd);
         void seekPlayback(long ms);
         void mediaSelected(QString filename);
+        bool hasActiveVideo() const;
 
     protected:
 
@@ -200,12 +297,14 @@ class VideoWindow : public GcChartWindow
         void showMeters();
 
 #ifdef GC_VIDEO_VLC
-
         // vlc for older QT
         libvlc_instance_t * inst;
         //libvlc_exception_t exceptions;
         libvlc_media_player_t *mp;
         libvlc_media_t *m;
+
+        // Calls to libvlc are made via OrderedASync
+        mutable OrderedAsync vlcDispatch;
 #endif
 
 #ifdef GC_VIDEO_QT5
@@ -218,6 +317,11 @@ class VideoWindow : public GcChartWindow
         QWidget *container;
         QComboBox *layoutSelector;
         QPushButton *resetLayoutBtn;
+
+        enum PlaybackState { None, Playing, Paused };
+
+        PlaybackState state;
+        mutable QRecursiveMutex stateLock;
 
         bool init; // we initialised ok ?
 };
