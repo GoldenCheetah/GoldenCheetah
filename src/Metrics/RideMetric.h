@@ -302,6 +302,9 @@ public:
     // Get the value and apply conversion if needed
     double value(bool metric) const;
 
+    // Apply conversion if needed to the supplied value
+    double value(double v, bool metric) const;
+
     // for averages the count of items included in the average
     double count() const; 
 
