@@ -164,6 +164,14 @@ UserMetric::value(bool metric) const
     else return (value() * conversion()) + conversionSum();
 }
 
+// Apply conversion if needed to the supplied value
+double
+UserMetric::value(double v, bool metric) const
+{
+    if (metric) return v;
+    else return (v * conversion()) + conversionSum();
+}
+
 // for averages the count of items included in the average
 double
 UserMetric::count() const
