@@ -495,15 +495,15 @@ struct FitFileReaderState
         } else if (manu == 70) {
             // SIGMA SPORT Germany
             switch (prod) {
-		case 15: return "SIGMA ROX 10.0";
-		case 18: return "SIGMA ROX 7.0";
+                case 15: return "SIGMA ROX 10.0";
+                case 18: return "SIGMA ROX 7.0";
                 case 41: return "SIGMA ROX 11.0";
                 case 42: return "SIGMA iD.RUN";
-		case 43: return "SIGMA iD.RUN";
-		case 44: return "SIGMA ROX 12.0";
-		case 45: return "SIGMA iD.FREE";
-		case 46: return "SIGMA iD.TRI";
-		default: return "SIGMA SPORT Device";
+                case 43: return "SIGMA iD.RUN";
+                case 44: return "SIGMA ROX 12.0";
+                case 45: return "SIGMA iD.FREE";
+                case 46: return "SIGMA iD.TRI";
+                default: return "SIGMA SPORT Device";
             }
         } else if (manu == 76) {
             // Moxy
