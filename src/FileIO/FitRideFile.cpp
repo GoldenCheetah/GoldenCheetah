@@ -503,7 +503,7 @@ struct FitFileReaderState
                 case 44: return "SIGMA ROX 12.0";
                 case 45: return "SIGMA iD.FREE";
                 case 46: return "SIGMA iD.TRI";
-                default: return "SIGMA SPORT Device";
+                default: return QString("SIGMA SPORT %1").arg(prod);
             }
         } else if (manu == 76) {
             // Moxy
