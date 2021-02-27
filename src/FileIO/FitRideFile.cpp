@@ -493,10 +493,17 @@ struct FitFileReaderState
                 default: return QString("Stages Cycling %1").arg(prod);
             }
         } else if (manu == 70) {
-            // Sigma
+            // SIGMA SPORT Germany
             switch (prod) {
-                case 45: return "Sigmasport iD.FREE";
-                default: return "Sigmasport ROX";
+                case 15: return "SIGMA ROX 10.0";
+                case 18: return "SIGMA ROX 7.0";
+                case 41: return "SIGMA ROX 11.0";
+                case 42: return "SIGMA iD.RUN";
+                case 43: return "SIGMA iD.RUN HR";
+                case 44: return "SIGMA ROX 12.0";
+                case 45: return "SIGMA iD.FREE";
+                case 46: return "SIGMA iD.TRI";
+                default: return QString("SIGMA SPORT %1").arg(prod);
             }
         } else if (manu == 76) {
             // Moxy
