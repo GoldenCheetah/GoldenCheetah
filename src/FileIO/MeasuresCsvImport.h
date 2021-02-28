@@ -31,7 +31,7 @@ class MeasuresCsvImport : public QObject {
 
     public:
 
-        MeasuresCsvImport(Context *context);
+        MeasuresCsvImport(Context *context, QWidget *parent);
         ~MeasuresCsvImport();
 
         // get the data
@@ -44,7 +44,7 @@ class MeasuresCsvImport : public QObject {
 
     private:
         Context *context;
-
+        QWidget *parent;
 };
 
 class CsvString : public QString

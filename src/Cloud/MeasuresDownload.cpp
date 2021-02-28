@@ -158,7 +158,7 @@ MeasuresDownload::MeasuresDownload(Context *context, MeasuresGroup *measuresGrou
     // initialize the downloader
     withingsDownload = new WithingsDownload(context);
     todaysPlanBodyMeasureDownload = new TodaysPlanBodyMeasures(context);
-    csvFileImport = new MeasuresCsvImport(context);
+    csvFileImport = new MeasuresCsvImport(context, this);
 
     // connect the progress bar
     connect(todaysPlanBodyMeasureDownload, SIGNAL(downloadStarted(int)), this, SLOT(downloadProgressStart(int)));
