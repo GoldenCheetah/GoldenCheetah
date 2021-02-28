@@ -27,7 +27,8 @@
 
 
 
-MeasuresCsvImport::MeasuresCsvImport(Context *context) : context(context) {
+MeasuresCsvImport::MeasuresCsvImport(Context *context, QWidget *parent) : context(context), parent(parent)
+{
 }
 
 MeasuresCsvImport::~MeasuresCsvImport()
@@ -43,7 +44,7 @@ MeasuresCsvImport::getMeasures(MeasuresGroup *measuresGroup, QString &error, QDa
   bool dateExists = false;
   bool reqFieldExists = false; // the first field is required
 
-  QString fileName = QFileDialog::getOpenFileName(NULL, tr("Select %1 measurements file to import").arg(measuresGroup->getName()), "", tr("CSV Files (*.csv)"));
+  QString fileName = QFileDialog::getOpenFileName(parent, tr("Select %1 measurements file to import").arg(measuresGroup->getName()), "", tr("CSV Files (*.csv)"));
   if (fileName.isEmpty()) {
       error = tr("No file selected.");
       return false;
