@@ -454,8 +454,8 @@ MainWindow::MainWindow(const QDir &home)
     // ATHLETE (FILE) MENU
     QMenu *fileMenu = menuBar()->addMenu(tr("&Athlete"));
 
-    //openTabMenu = fileMenu->addMenu(tr("Open...")); use athlete view
-    //connect(openTabMenu, SIGNAL(aboutToShow()), this, SLOT(setOpenTabMenu()));
+    openTabMenu = fileMenu->addMenu(tr("Open..."));
+    connect(openTabMenu, SIGNAL(aboutToShow()), this, SLOT(setOpenTabMenu()));
 
     tabMapper = new QSignalMapper(this); // maps each option
     connect(tabMapper, SIGNAL(mapped(const QString &)), this, SLOT(openTab(const QString &)));
@@ -1690,7 +1690,10 @@ MainWindow::newCyclistTab()
     QDir newHome = currentTab->context->athlete->home->root();
     newHome.cdUp();
     QString name = ChooseCyclistDialog::newCyclistDialog(newHome, this);
-    if (!name.isEmpty()) openTab(name);
+    if (!name.isEmpty()) {
+        emit newAthlete(name);
+        openTab(name);
+    }
 }
 
 void

@@ -29,35 +29,42 @@ AthleteView::AthleteView(Context *context) : ChartSpace(context, OverviewScope::
     connect(GlobalContext::context(), SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
 
     // lets look for athletes
-    int row=0, col=0;
+    row=0; col=0;
     QStringListIterator i(QDir(gcroot).entryList(QDir::Dirs | QDir::NoDotAndDotDot));
     while (i.hasNext()) {
 
         QString name = i.next();
 
-        // ignore non-athlete folders created by Qt or users
-        AthleteDirectoryStructure athleteHome(QDir(gcroot + "/" + name));
-        if (!athleteHome.upgradedDirectoriesHaveData()) continue;
-
-        // add a card for each athlete
-        AthleteCard *ath = new AthleteCard(this, name);
-        addItem(row,col,gl_athletes_deep,ath);
-
-        // we have 3 athletes per row
-        if (++col >= gl_athletes_per_row) {
-            col=0;
-            row++;
-        }
+        newAthlete(name);
     }
 
     // set colors
     configChanged(0);
 
+    // athlete config dialog...
+    connect(this, SIGNAL(itemConfigRequested(ChartSpaceItem*)), this, SLOT(configItem(ChartSpaceItem*)));
+    // new athlete
+    connect(context->mainWindow, SIGNAL(newAthlete(QString)), this, SLOT(newAthlete(QString)));
+}
+
+void
+AthleteView::newAthlete(QString name)
+{
+    // ignore non-athlete folders created by Qt or users
+    AthleteDirectoryStructure athleteHome(QDir(gcroot + "/" + name));
+    if (!athleteHome.upgradedDirectoriesHaveData()) return;
+
+    // add a card for each athlete
+    AthleteCard *ath = new AthleteCard(this, name);
+    addItem(row,col,gl_athletes_deep,ath);
+
+    // we have 5 athletes per row
+    if (++col >= gl_athletes_per_row) {
+        col=0;
+        row++;
+    }
     // setup geometry
     updateGeometry();
-
-    // athelte config dialog...
-    connect(this, SIGNAL(itemConfigRequested(ChartSpaceItem*)), this, SLOT(configItem(ChartSpaceItem*)));
 }
 
 void
