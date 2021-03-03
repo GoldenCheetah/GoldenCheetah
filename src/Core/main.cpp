@@ -140,24 +140,32 @@ void sigabort(int x)
 }
 #endif
 
-// redirect errors to `home'/goldencheetah.log
-// sadly, no equivalent on Windows
-#ifndef WIN32
-#include "stdio.h"
-#include "unistd.h"
-void nostderr(QString dir)
+// redirect errors to `home'/goldencheetah.log or to the file specified with --debug-file
+#ifdef WIN32
+#include <windows.h>
+#endif
+
+#include <stdio.h>
+#include <unistd.h>
+
+void nostderr(QString file)
 {
     // redirect stderr to a file
-    QFile fp(QString("%1/goldencheetah.log").arg(dir));
+    QFile fp(file);
     if (fp.open(QIODevice::WriteOnly|QIODevice::Truncate) == true) {
         close(STDERR_FILENO);
         if(dup(fp.handle()) != STDERR_FILENO) fprintf(stderr, "GoldenCheetah: cannot redirect stderr\n");
         fp.close();
+
+#ifdef WIN32
+        HANDLE fileHandle = (HANDLE) _get_osfhandle(STDERR_FILENO);
+        SetStdHandle(STD_ERROR_HANDLE, fileHandle) ;
+#endif
+
     } else {
         fprintf(stderr, "GoldenCheetah: cannot redirect stderr\n");
     }
 }
-#endif
 
 //
 // By default will open last athlete, but will also provide
@@ -203,13 +211,20 @@ main(int argc, char *argv[])
 #else
     bool debug = false;
 #endif
+    QString debugFile = NULL;
+    QString debugFormat = QString("[%{time h:mm:ss.zzz}] %{type}: %{message} (%{file}:%{line})");
+    QString debugRules = QString("*.debug=true;qt.*.debug=false");
+
     bool server = false;
     nogui = false;
     bool help = false;
     bool newgui = false;
 
     // honour command line switches
-    foreach (QString arg, sargs) {
+    QString arg;
+    for(int i = 0; i < sargs.length();) {
+        arg = sargs[i];
+        i++;
 
         // help, usage or version requested, basic information
         if (arg == "--help" || arg == "--usage" || arg == "--version") {
@@ -233,6 +248,10 @@ main(int argc, char *argv[])
 #else
             fprintf(stderr, "--debug             to direct diagnostic messages to the terminal instead of goldencheetah.log\n");
 #endif
+            fprintf(stderr, "--debug-file file   to direct diagnostic messages to file\n");
+            fprintf(stderr, "--debug-rules \"rules\" to specify which diagnostic messages to output, using the same syntax as QT_LOGGING_RULES\n");
+            fprintf(stderr, "--debug-format \"format\" to specify the format of diagnostic messages, using the same syntax as QT_MESSAGE_PATTERN\n");
+
 #ifdef GC_HAS_CLOUD_DB
             fprintf(stderr, "--clouddbcurator    to add CloudDB curator specific functions to the menus\n");
 #endif
@@ -281,6 +300,15 @@ main(int argc, char *argv[])
 #else
             debug = true;
 #endif
+        } else if (arg == "--debug-file" && i < sargs.length()) {
+            debugFile = QString(sargs[i]);
+            i++;
+        } else if (arg == "--debug-format" && i < sargs.length()) {
+            debugFormat = QString(sargs[i]);
+            i++;
+        } else if (arg == "--debug-rules" && i < sargs.length()) {
+            debugRules = QString(sargs[i]);
+            i++;
         } else if (arg == "--clouddbcurator") {
 #ifdef GC_HAS_CLOUD_DB
             CloudDBCommon::addCuratorFeatures = true;
@@ -531,12 +559,11 @@ main(int argc, char *argv[])
         appsettings->initializeQSettingsGlobal(gcroot);
 
 
-        // now redirect stderr
-#ifndef WIN32
-        if (!debug) nostderr(home.canonicalPath());
-#else
-        Q_UNUSED(debug)
-#endif
+        // now redirect stderr and set the log filter and format
+        if (debugFile != NULL) nostderr(debugFile);
+        else if (!debug) nostderr(QString("%1/%2").arg(home.canonicalPath()).arg("goldencheetah.log"));
+        qSetMessagePattern(debugFormat);
+        QLoggingCategory::setFilterRules(debugRules.replace(";", "\n")); // accept ; as separator like QT_LOGGING_RULES
 
         // install QT Translator to enable QT Dialogs translation
         // we may have restarted JUST to get this!
