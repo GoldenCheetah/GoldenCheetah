@@ -11,7 +11,10 @@ public:
 public slots:
     void configChanged(qint32);
     void configItem(ChartSpaceItem*);
+    void newAthlete(QString);
 
+private:
+    int row, col;
 };
 
 // the athlete display

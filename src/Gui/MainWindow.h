@@ -125,6 +125,7 @@ class MainWindow : public QMainWindow
         void backClicked();
         void forwardClicked();
         void openingAthlete(QString, Context *);
+        void newAthlete(QString);
 
     public slots:
 
