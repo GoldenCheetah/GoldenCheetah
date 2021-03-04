@@ -126,6 +126,7 @@ class MainWindow : public QMainWindow
         void forwardClicked();
         void openingAthlete(QString, Context *);
         void newAthlete(QString);
+        void deletedAthlete(QString);
 
     public slots:
 
@@ -164,6 +165,10 @@ class MainWindow : public QMainWindow
         // Athlete Backup
         void setBackupAthleteMenu();
         void backupAthlete(QString name);
+
+        // Athlete Delete
+        void setDeleteAthleteMenu();
+        void deleteAthlete(QString name);
 
         // Search / Filter
         void setFilter(QStringList);
@@ -306,6 +311,10 @@ class MainWindow : public QMainWindow
         // backup
         QMenu *backupAthleteMenu;
         QSignalMapper *backupMapper;
+
+        // delete
+        QMenu *deleteAthleteMenu;
+        QSignalMapper *deleteMapper;
 
         // chart menus
         QMenu *chartMenu;

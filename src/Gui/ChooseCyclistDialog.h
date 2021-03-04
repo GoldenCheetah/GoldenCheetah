@@ -44,6 +44,7 @@ class ChooseCyclistDialog : public QDialog
         QString choice();
         void getList();
         static QString newCyclistDialog(QDir &homeDir, QWidget *parent);
+        static bool deleteAthlete(QDir &homeDir, QString name, QWidget *parent);
 
     private slots:
         void newClicked();
