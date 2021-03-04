@@ -140,7 +140,10 @@ void sigabort(int x)
 }
 #endif
 
-// redirect errors to `home'/goldencheetah.log or to the file specified with --debug-file
+//
+// redirect stderr to `home'/goldencheetah.log or to the file specified with --debug-file
+//
+#include <stdio.h>
 #ifdef WIN32
 #include <windows.h>
 #include <io.h>
@@ -150,15 +153,15 @@ void sigabort(int x)
 
 void nostderr(QString file)
 {
-    // redirect stderr to a file
+    int stderr_fd = fileno(stderr);
     QFile fp(file);
     if (fp.open(QIODevice::WriteOnly|QIODevice::Truncate) == true) {
-        close(STDERR_FILENO);
-        if(dup(fp.handle()) != STDERR_FILENO) fprintf(stderr, "GoldenCheetah: cannot redirect stderr\n");
+        close(stderr_fd);
+        if(dup(fp.handle()) != stderr_fd) fprintf(stderr, "GoldenCheetah: cannot redirect stderr\n");
         fp.close();
 
 #ifdef WIN32
-        HANDLE fileHandle = (HANDLE) _get_osfhandle(STDERR_FILENO);
+        HANDLE fileHandle = (HANDLE) _get_osfhandle(stderr_fd);
         SetStdHandle(STD_ERROR_HANDLE, fileHandle) ;
 #endif
 
