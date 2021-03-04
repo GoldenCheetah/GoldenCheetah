@@ -20,7 +20,7 @@ FunctionEnd
 !define PRODUCT_WEB_SITE_FILENAME "GoldenCheetah WebSite"
 !define PRODUCT_WEB_SITE_URL "http://www.goldencheetah.org"
 !define PRODUCT_WIKI_FILENAME "GoldenCheetah Wiki"
-!define PRODUCT_WIKI_URL "http://www.goldencheetah.org/wiki.html"
+!define PRODUCT_WIKI_URL "https://github.com/GoldenCheetah/GoldenCheetah/wiki"
 !define PRODUCT_DIR_REGKEY "Software\Microsoft\Windows\CurrentVersion\App Paths\GoldenCheetah.exe"
 !define PRODUCT_UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"
 !define PRODUCT_SETTINGS_KEY "Software\goldencheetah.org"
