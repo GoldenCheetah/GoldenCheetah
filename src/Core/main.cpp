@@ -143,10 +143,10 @@ void sigabort(int x)
 // redirect errors to `home'/goldencheetah.log or to the file specified with --debug-file
 #ifdef WIN32
 #include <windows.h>
-#endif
-
-#include <stdio.h>
+#include <io.h>
+#else
 #include <unistd.h>
+#endif
 
 void nostderr(QString file)
 {
