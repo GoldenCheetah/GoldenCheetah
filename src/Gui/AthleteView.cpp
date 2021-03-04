@@ -75,6 +75,7 @@ AthleteView::deleteAthlete(QString name)
     foreach(ChartSpaceItem* item, allItems()) {
         if (item->name == name) {
             removeItem(item);
+            break;
         }
     }
 }
