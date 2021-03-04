@@ -45,6 +45,8 @@ AthleteView::AthleteView(Context *context) : ChartSpace(context, OverviewScope::
     connect(this, SIGNAL(itemConfigRequested(ChartSpaceItem*)), this, SLOT(configItem(ChartSpaceItem*)));
     // new athlete
     connect(context->mainWindow, SIGNAL(newAthlete(QString)), this, SLOT(newAthlete(QString)));
+    // delete athlete
+    connect(context->mainWindow, SIGNAL(deletedAthlete(QString)), this, SLOT(deleteAthlete(QString)));
 }
 
 void
@@ -65,6 +67,16 @@ AthleteView::newAthlete(QString name)
     }
     // setup geometry
     updateGeometry();
+}
+
+void
+AthleteView::deleteAthlete(QString name)
+{
+    foreach(ChartSpaceItem* item, allItems()) {
+        if (item->name == name) {
+            removeItem(item);
+        }
+    }
 }
 
 void
