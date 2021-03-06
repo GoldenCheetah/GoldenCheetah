@@ -179,11 +179,11 @@ quint16
 RideMetric::userMetricFingerprint(QList<UserMetricSettings> these)
 {
     // run through loaded metrics and compute a fingerprint CRC
-    QByteArray fingers;
+    quint16 fingerprint = 0;
     foreach(UserMetricSettings x, these)
-        fingers += x.fingerprint.toLocal8Bit();
+        fingerprint += x.getFingerprint();
 
-    return qChecksum(fingers.constData(), fingers.size());
+    return fingerprint;
 }
 
 QHash<QString,RideMetricPtr>
