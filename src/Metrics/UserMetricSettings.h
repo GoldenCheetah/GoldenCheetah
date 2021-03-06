@@ -78,8 +78,7 @@ class UserMetricSettings {
         double  conversion,
                 conversionSum;
 
-        QString program,
-                fingerprint; // condensed form of program
+        QString program;
 };
 
 class EditUserMetricDialog : public QDialog {
