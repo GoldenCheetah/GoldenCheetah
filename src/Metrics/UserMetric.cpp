@@ -324,6 +324,7 @@ UserMetric::addCompatibility(QList<UserMetricSettings>&metrics)
         c1.precision = 0;
         c1.istime = false;
         c1.aggzero = true;
+        c1.fingerprint = c1.symbol + DataFilter::fingerprint(c1.program);
         metrics.insert(0, c1);
         f.compatibilitymetrics << "TSS";
     }
@@ -344,6 +345,7 @@ UserMetric::addCompatibility(QList<UserMetricSettings>&metrics)
         c2.precision = 3;
         c2.istime = false;
         c2.aggzero = true;
+        c2.fingerprint = c2.symbol + DataFilter::fingerprint(c2.program);
         metrics.insert(0, c2);
         f.compatibilitymetrics << "IF";
     }
@@ -364,6 +366,7 @@ UserMetric::addCompatibility(QList<UserMetricSettings>&metrics)
         c3.precision = 0;
         c3.istime = false;
         c3.aggzero = true;
+        c3.fingerprint = c3.symbol + DataFilter::fingerprint(c3.program);
         metrics.insert(0, c3);
         f.compatibilitymetrics << "NP";
     }
