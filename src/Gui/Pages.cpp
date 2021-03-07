@@ -1888,12 +1888,22 @@ BestsMetricsPage::saveClicked()
     return 0;
 }
 
+static quint16 userMetricsCRC(QList<UserMetricSettings> userMetrics)
+{
+    // run through metrics and compute a CRC to detect changes
+    quint16 crc = 0;
+    foreach(UserMetricSettings userMetric, userMetrics)
+        crc += userMetric.getCRC();
+
+    return crc;
+}
+
 CustomMetricsPage::CustomMetricsPage(QWidget *parent, Context *context) :
     QWidget(parent), context(context)
 {
     // copy as current, so we can edit...
     metrics = _userMetrics;
-    b4.crc = RideMetric::userMetricFingerprint(metrics);
+    b4.crc = userMetricsCRC(metrics);
 
     table = new QTreeWidget;
     table->headerItem()->setText(0, tr("Symbol"));
@@ -2269,7 +2279,7 @@ CustomMetricsPage::saveClicked()
     qint32 returning=0;
 
     // did we actually change them ?
-    if (b4.crc != RideMetric::userMetricFingerprint(metrics))
+    if (b4.crc != userMetricsCRC(metrics))
         returning |= CONFIG_USERMETRICS;
 
     // save away OUR version to top-level NOT athlete dir
