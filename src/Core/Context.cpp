@@ -109,21 +109,15 @@ GlobalContext::userMetricsConfigChanged()
     }
 
 
-    // change the schema version
-    quint16 changed = RideMetric::userMetricFingerprint(_userMetrics);
+    // change the schema version, this may trigger metrics recomputation
+    UserMetricSchemaVersion = RideMetric::userMetricFingerprint(_userMetrics);
 
-    if (UserMetricSchemaVersion != changed) {
+    // update metric factory deleting originals
+    RideMetricFactory::instance().removeUserMetrics();
 
-        // we'll fix it
-        UserMetricSchemaVersion = changed;
-
-        // update metric factory deleting originals
-        RideMetricFactory::instance().removeUserMetrics();
-
-        // now add user metrics
-        foreach(UserMetricSettings m, _userMetrics) {
-            RideMetricFactory::instance().addMetric(UserMetric(_contexts.at(0), m));
-        }
+    // now add user metrics
+    foreach(UserMetricSettings m, _userMetrics) {
+        RideMetricFactory::instance().addMetric(UserMetric(_contexts.at(0), m));
     }
 }
 
