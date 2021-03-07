@@ -72,6 +72,7 @@ bool UserMetricParser::startElement( const QString&, const QString&, const QStri
         if (attrs.qName(i) == "unitsImperial") add.unitsImperial=Utils::unprotect(attrs.value(i));
         if (attrs.qName(i) == "conversion") add.conversion=Utils::unprotect(attrs.value(i)).toDouble();
         if (attrs.qName(i) == "conversionSum") add.conversionSum=Utils::unprotect(attrs.value(i)).toDouble();
+        if (attrs.qName(i) == "fingerprint") add.fingerprint=Utils::unprotect(attrs.value(i));
     }
 
     return true;
@@ -142,6 +143,7 @@ UserMetricParser::serializeToQTextStream(QTextStream& out, QList<UserMetricSetti
         out <<"type=\"" << metric.type << "\" ";
         out <<"conversion=\"" << metric.conversion << "\" ";
         out <<"conversionSum=\"" << metric.conversionSum << "\" ";
+        out <<"fingerprint=\"" << Utils::xmlprotect(metric.fingerprint) << "\" ";
 
         out << ">\n";
         out << Utils::xmlprotect(metric.program);

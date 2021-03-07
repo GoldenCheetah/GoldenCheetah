@@ -317,6 +317,7 @@ EditUserMetricDialog::setSettings(UserMetricSettings &here)
     here.istime = istime->isChecked();
     here.precision = precision->value();
     here.program = formulaEdit->document()->toPlainText();
+    here.fingerprint = here.symbol + DataFilter::fingerprint(here.program);
 }
 
 void
