@@ -142,33 +142,87 @@ void sigabort(int x)
 
 //
 // redirect stderr to `home'/goldencheetah.log or to the file specified with --debug-file
-//
-#include <stdio.h>
-#ifdef WIN32
-#include <windows.h>
-#include <io.h>
-#else
-#include <unistd.h>
-#endif
-
+#include "stdio.h"
+#ifndef WIN32
+#include "unistd.h"
 void nostderr(QString file)
 {
-    int stderr_fd = fileno(stderr);
     QFile fp(file);
     if (fp.open(QIODevice::WriteOnly|QIODevice::Truncate) == true) {
-        close(stderr_fd);
-        if(dup(fp.handle()) != stderr_fd) fprintf(stderr, "GoldenCheetah: cannot redirect stderr\n");
+        close(STDERR_FILENO);
+        if(dup(fp.handle()) != STDERR_FILENO) qDebug() << "GoldenCheetah: cannot redirect stderr";
         fp.close();
-
-#ifdef WIN32
-        HANDLE fileHandle = (HANDLE) _get_osfhandle(stderr_fd);
-        SetStdHandle(STD_ERROR_HANDLE, fileHandle) ;
-#endif
-
     } else {
-        fprintf(stderr, "GoldenCheetah: cannot redirect stderr\n");
+        qDebug() << "GoldenCheetah: cannot redirect stderr, unable to open file " << file;
     }
 }
+#else
+#include <windows.h>
+#include <io.h>
+void nostderr(QString file)
+{
+    QFile fp(file);
+    int fd;
+    HANDLE fileHandle;
+
+    if (file.at(0) == 't') {
+        qDebug() << "Creating log file with CreateFile";
+        fileHandle = CreateFile(file.toStdString().c_str(), GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+        if (fileHandle == INVALID_HANDLE_VALUE) {
+            qDebug() << "GoldenCheetah: cannot redirect stderr, unable to open file " << file;
+            return;
+        }
+        fd = _open_osfhandle(fileHandle, O_WRONLY|O_TEXT);
+        if (fd < 0) qDebug() << "GoldenCheetah: invalid handle obtained from get_osfhandle " << fd;
+    } else {
+        qDebug() << "Creating log file with QFile::open";
+        if (fp.open(QIODevice::WriteOnly|QIODevice::Truncate) == false) {
+            qDebug() << "GoldenCheetah: cannot redirect stderr, unable to open file " << file;
+            return;
+        }
+        fd = fp->handle(); 
+        if (fd < 0) qDebug() << "GoldenCheetah: invalid handle obtained from QFile::handle " << fd;
+        fileHandle = (HANDLE)_get_osfhandle(fd);
+        if(fileHandle == INVALID_HANDLE_VALUE) qDebug() << "GoldenCheetah: cannot get handle for redirecting stderr";
+    }
+
+    fflush(stderr);
+    bool res = SetStdHandle(STD_ERROR_HANDLE, fileHandle) ;
+    if (!res) qDebug() << "GoldenCheetah: cannot change STD_ERROR_HANDLE, SetStdHandle returns false";
+    if (fd < 0) return;
+    int ret = dup2(fd, 2);
+    if (ret < 0) {
+        qDebug() << "Goldencheetah: dup2 failed with return value " << ret;
+        return;
+    }
+    ret = close(fd);
+    if (ret < 0) qDebug() << "Goldencheetah: close failed with return value " << ret;
+    
+    for(int i = 0; i < 10; i++) {
+        qDebug() << "Testing qDebug redirection at iteration " << i;
+        fprintf(stderr, "Testing fprintf redirection at iteration %d\n", i);
+    }
+}
+#endif
+
+// void nostderr(QString file)
+// {
+//     int stderr_fd = fileno(stderr);
+//     QFile fp(file);
+//     if (fp.open(QIODevice::WriteOnly|QIODevice::Truncate) == true) {
+//         close(stderr_fd);
+//         if(dup(fp.handle()) != stderr_fd) fprintf(stderr, "GoldenCheetah: cannot redirect stderr\n");
+//         fp.close();
+//
+// #ifdef WIN32
+//         HANDLE fileHandle = (HANDLE) _get_osfhandle(stderr_fd);
+//         SetStdHandle(STD_ERROR_HANDLE, fileHandle) ;
+// #endif
+//
+//    } else {
+//        fprintf(stderr, "GoldenCheetah: cannot redirect stderr\n");
+//    }
+// }
 
 //
 // By default will open last athlete, but will also provide
