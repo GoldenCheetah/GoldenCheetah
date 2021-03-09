@@ -167,36 +167,43 @@ void nostderr(QString file)
     int fd;
     HANDLE fileHandle;
 
-    if (file.at(0) == 't') {
+    if (file.endsWith(".cf")) {
         qDebug() << "Creating log file with CreateFile";
         fileHandle = CreateFile((const wchar_t*) file.utf16(), GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
         if (fileHandle == INVALID_HANDLE_VALUE) {
             qDebug() << "GoldenCheetah: cannot redirect stderr, unable to open file " << file;
             return;
         }
+        qDebug() << "Create File success"; fflush(stderr);
         fd = _open_osfhandle((intptr_t)fileHandle, O_WRONLY|O_TEXT);
         if (fd < 0) qDebug() << "GoldenCheetah: invalid handle obtained from get_osfhandle " << fd;
+        qDebug() << "Open osfhandle returns " << fd; fflush(stderr);
     } else {
         qDebug() << "Creating log file with QFile::open";
         if (fp.open(QIODevice::WriteOnly|QIODevice::Truncate) == false) {
             qDebug() << "GoldenCheetah: cannot redirect stderr, unable to open file " << file;
             return;
         }
+        qDebug() << "Open File success"; fflush(stderr);
         fd = fp.handle(); 
+        qDebug() << "Get handle " << fd; fflush(stderr);
         if (fd < 0) qDebug() << "GoldenCheetah: invalid handle obtained from QFile::handle " << fd;
         fileHandle = (HANDLE)_get_osfhandle(fd);
         if(fileHandle == INVALID_HANDLE_VALUE) qDebug() << "GoldenCheetah: cannot get handle for redirecting stderr";
+        qDebug() << "Get HANDLE success"; fflush(stderr);
     }
 
     fflush(stderr);
     bool res = SetStdHandle(STD_ERROR_HANDLE, fileHandle) ;
     if (!res) qDebug() << "GoldenCheetah: cannot change STD_ERROR_HANDLE, SetStdHandle returns false";
+    qDebug() << "SetStdHandle success"; fflush(stderr);
     if (fd < 0) return;
     int ret = dup2(fd, 2);
     if (ret < 0) {
         qDebug() << "Goldencheetah: dup2 failed with return value " << ret;
         return;
     }
+    qDebug() << "Dup2 returns " << ret; fflush(stderr);
     ret = close(fd);
     if (ret < 0) qDebug() << "Goldencheetah: close failed with return value " << ret;
     
