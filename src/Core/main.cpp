@@ -159,6 +159,8 @@ void nostderr(QString file)
 #else
 #include <windows.h>
 #include <io.h>
+#include <fcntl.h>
+
 void nostderr(QString file)
 {
     QFile fp(file);
@@ -167,7 +169,7 @@ void nostderr(QString file)
 
     if (file.at(0) == 't') {
         qDebug() << "Creating log file with CreateFile";
-        fileHandle = CreateFile(file.toStdString().c_str(), GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+        fileHandle = CreateFile((const wchar_t*) file.strVariable1.utf16(), GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
         if (fileHandle == INVALID_HANDLE_VALUE) {
             qDebug() << "GoldenCheetah: cannot redirect stderr, unable to open file " << file;
             return;
@@ -180,7 +182,7 @@ void nostderr(QString file)
             qDebug() << "GoldenCheetah: cannot redirect stderr, unable to open file " << file;
             return;
         }
-        fd = fp->handle(); 
+        fd = fp.handle(); 
         if (fd < 0) qDebug() << "GoldenCheetah: invalid handle obtained from QFile::handle " << fd;
         fileHandle = (HANDLE)_get_osfhandle(fd);
         if(fileHandle == INVALID_HANDLE_VALUE) qDebug() << "GoldenCheetah: cannot get handle for redirecting stderr";
