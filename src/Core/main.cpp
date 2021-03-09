@@ -169,12 +169,12 @@ void nostderr(QString file)
 
     if (file.at(0) == 't') {
         qDebug() << "Creating log file with CreateFile";
-        fileHandle = CreateFile((const wchar_t*) file.strVariable1.utf16(), GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+        fileHandle = CreateFile((const wchar_t*) file.utf16(), GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
         if (fileHandle == INVALID_HANDLE_VALUE) {
             qDebug() << "GoldenCheetah: cannot redirect stderr, unable to open file " << file;
             return;
         }
-        fd = _open_osfhandle(fileHandle, O_WRONLY|O_TEXT);
+        fd = _open_osfhandle((intptr_t)fileHandle, O_WRONLY|O_TEXT);
         if (fd < 0) qDebug() << "GoldenCheetah: invalid handle obtained from get_osfhandle " << fd;
     } else {
         qDebug() << "Creating log file with QFile::open";
