@@ -160,15 +160,18 @@ void nostderr(QString file)
 #include <windows.h>
 #include <io.h>
 #include <fcntl.h>
+#include <iostream>
+#include <cstdio>
 
 void nostderr(QString file)
 {
-    QFile fp(file);
+    QFile qf(file);
     int fd;
+    FILE *fp;
     HANDLE fileHandle;
 
     if (file.endsWith(".cf")) {
-        qDebug() << "Creating log file with CreateFile";
+        qDebug() << "Creating log file with CreateFile"; fflush(stderr);
         fileHandle = CreateFile((const wchar_t*) file.utf16(), GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
         if (fileHandle == INVALID_HANDLE_VALUE) {
             qDebug() << "GoldenCheetah: cannot redirect stderr, unable to open file " << file;
@@ -178,25 +181,39 @@ void nostderr(QString file)
         fd = _open_osfhandle((intptr_t)fileHandle, O_WRONLY|O_TEXT);
         if (fd < 0) qDebug() << "GoldenCheetah: invalid handle obtained from get_osfhandle " << fd;
         qDebug() << "Open osfhandle returns " << fd; fflush(stderr);
-    } else {
-        qDebug() << "Creating log file with QFile::open";
-        if (fp.open(QIODevice::WriteOnly|QIODevice::Truncate) == false) {
+    } else (file.endsWith(".qf")) {
+        qDebug() << "Creating log file with QFile::open"; fflush(stderr);
+        if (qf.open(QIODevice::WriteOnly|QIODevice::Truncate) == false) {
             qDebug() << "GoldenCheetah: cannot redirect stderr, unable to open file " << file;
             return;
         }
         qDebug() << "Open File success"; fflush(stderr);
-        fd = fp.handle(); 
+        fd = qf.handle(); 
         qDebug() << "Get handle " << fd; fflush(stderr);
         if (fd < 0) qDebug() << "GoldenCheetah: invalid handle obtained from QFile::handle " << fd;
         fileHandle = (HANDLE)_get_osfhandle(fd);
         if(fileHandle == INVALID_HANDLE_VALUE) qDebug() << "GoldenCheetah: cannot get handle for redirecting stderr";
         qDebug() << "Get HANDLE success"; fflush(stderr);
+    } else {
+        qDebug() << "Creating log file with freopen"; fflush(stderr);
+        fp = freopen(file.toLocal8Bit(), "w", stderr);
+        if (fp == NULL) {
+            qDebug() << "GoldenCheetah: cannot redirect stderr, unable to freopen file " << file;
+            return;
+        }
+        qDebug() << "Open File success"; fflush(stderr);
+        fd = fileno(stderr); 
+        qDebug() << "Get handle " << fd << " / " << fileno(fp) ; fflush(stderr);
+        if (fd < 0) qDebug() << "GoldenCheetah: invalid handle obtained from fileno " << fd;
+        fileHandle = (HANDLE)_get_osfhandle(fd);
+        if(fileHandle == INVALID_HANDLE_VALUE) qDebug() << "GoldenCheetah: cannot get handle for redirecting stderr";
+        qDebug() << "Get HANDLE success"; fflush(stderr);
     }
 
-    fflush(stderr);
     bool res = SetStdHandle(STD_ERROR_HANDLE, fileHandle) ;
     if (!res) qDebug() << "GoldenCheetah: cannot change STD_ERROR_HANDLE, SetStdHandle returns false";
     qDebug() << "SetStdHandle success"; fflush(stderr);
+
     if (fd < 0) return;
     int ret = dup2(fd, 2);
     if (ret < 0) {
@@ -204,12 +221,29 @@ void nostderr(QString file)
         return;
     }
     qDebug() << "Dup2 returns " << ret; fflush(stderr);
-    ret = close(fd);
-    if (ret < 0) qDebug() << "Goldencheetah: close failed with return value " << ret;
-    
+
+    if (file.endsWith(".qf") || file.endsWith(".cf")) {
+        ret = close(fd);
+        if (ret < 0) qDebug() << "Goldencheetah: close failed with return value " << ret; fflush(stderr);
+        fp = _fdopen(2, "w");
+        *stderr = *fp;
+        // setvbuf(stderr, NULL, _IONBF, 0);
+    }
+
+    // make cout, wcout, cin, wcin, wcerr, cerr, wclog and clog point to console as well
+    std::ios::sync_with_stdio();
+
+    HANDLE test_std_error = GetStdHandle(STD_ERROR_HANDLE);
+    DWORD nb_written;
+    char test_wf_str[] = "Testing WriteFile\n";
+    char test_wr_str[] = "Testing write(2)\n";
+
     for(int i = 0; i < 10; i++) {
+        WriteFile(test_std_error, test_wf_str, strlen(test_wf_str), &nb_written, NULL);
+        write(2, test_wr_str, strlen(test_wr_str));
         qDebug() << "Testing qDebug redirection at iteration " << i;
         fprintf(stderr, "Testing fprintf redirection at iteration %d\n", i);
+        cerr << "Testing cerr redirection at iteration " << i;
     }
 }
 #endif
