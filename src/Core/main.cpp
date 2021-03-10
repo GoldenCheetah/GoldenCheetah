@@ -239,11 +239,11 @@ void nostderr(QString file)
     char test_wr_str[] = "Testing write(2)\n";
 
     for(int i = 0; i < 10; i++) {
-        WriteFile(test_std_error, test_wf_str, strlen(test_wf_str), &nb_written, NULL);
-        write(2, test_wr_str, strlen(test_wr_str));
+        WriteFile(test_std_error, test_wf_str, (DWORD)strlen(test_wf_str), &nb_written, NULL);
+        write(2, test_wr_str, (unsigned int)strlen(test_wr_str));
         qDebug() << "Testing qDebug redirection at iteration " << i;
         fprintf(stderr, "Testing fprintf redirection at iteration %d\n", i);
-        cerr << "Testing cerr redirection at iteration " << i;
+        std::cerr << "Testing cerr redirection at iteration " << i;
         fflush(stderr);
     }
 }
