@@ -154,24 +154,6 @@ void sigabort(int x)
 #include <unistd.h>
 #endif
 
-void testredirect()
-{
-    char test_wf_str[] = "Testing WriteFile\n";
-    char test_wr_str[] = "Testing write(2)\n";
-
-    for(int i = 0; i < 10; i++) {
-#ifdef WIN32
-        DWORD nb_written;
-        WriteFile(GetStdHandle(STD_ERROR_HANDLE), test_wf_str, (DWORD)strlen(test_wf_str), &nb_written, NULL);
-#endif
-        write(2, test_wr_str, (unsigned int)strlen(test_wr_str));
-        qDebug() << "Testing qDebug redirection at iteration " << i;
-        fprintf(stderr, "Testing fprintf redirection at iteration %d\n", i);
-        std::cerr << "Testing cerr redirection at iteration " << i << std::endl;
-        fflush(stderr);
-    }
-}
-
 void nostderr(QString file)
 {
     int fd;
@@ -180,6 +162,7 @@ void nostderr(QString file)
 
     // On Windows, stderr is not connected to fd_stderr = 2
     // freopen seems the only function available to redirect stderr
+    qDebug() << "GoldenCheetah: redirecting stderr to file " << file;
     fp = freopen(file.toLocal8Bit(), "w", stderr);
     if (fp == NULL) {
         qDebug() << "GoldenCheetah: cannot redirect stderr, unable to open file " << file;
@@ -212,8 +195,6 @@ void nostderr(QString file)
     bool res = SetStdHandle(STD_ERROR_HANDLE, fileHandle);
     if (!res) qDebug() << "GoldenCheetah: cannot redirect STD_ERROR_HANDLE";
 #endif
-
-    testredirect();
 }
 
 //
