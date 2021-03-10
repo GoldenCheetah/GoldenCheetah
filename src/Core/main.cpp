@@ -181,7 +181,7 @@ void nostderr(QString file)
         fd = _open_osfhandle((intptr_t)fileHandle, O_WRONLY|O_TEXT);
         if (fd < 0) qDebug() << "GoldenCheetah: invalid handle obtained from get_osfhandle " << fd;
         qDebug() << "Open osfhandle returns " << fd; fflush(stderr);
-    } else (file.endsWith(".qf")) {
+    } else if (file.endsWith(".qf")) {
         qDebug() << "Creating log file with QFile::open"; fflush(stderr);
         if (qf.open(QIODevice::WriteOnly|QIODevice::Truncate) == false) {
             qDebug() << "GoldenCheetah: cannot redirect stderr, unable to open file " << file;
@@ -203,14 +203,14 @@ void nostderr(QString file)
         }
         qDebug() << "Open File success"; fflush(stderr);
         fd = fileno(stderr); 
-        qDebug() << "Get handle " << fd << " / " << fileno(fp) ; fflush(stderr);
+        qDebug() << "Get handle " << fd << " / " << fileno(fp); fflush(stderr);
         if (fd < 0) qDebug() << "GoldenCheetah: invalid handle obtained from fileno " << fd;
         fileHandle = (HANDLE)_get_osfhandle(fd);
         if(fileHandle == INVALID_HANDLE_VALUE) qDebug() << "GoldenCheetah: cannot get handle for redirecting stderr";
         qDebug() << "Get HANDLE success"; fflush(stderr);
     }
 
-    bool res = SetStdHandle(STD_ERROR_HANDLE, fileHandle) ;
+    bool res = SetStdHandle(STD_ERROR_HANDLE, fileHandle);
     if (!res) qDebug() << "GoldenCheetah: cannot change STD_ERROR_HANDLE, SetStdHandle returns false";
     qDebug() << "SetStdHandle success"; fflush(stderr);
 
@@ -244,6 +244,7 @@ void nostderr(QString file)
         qDebug() << "Testing qDebug redirection at iteration " << i;
         fprintf(stderr, "Testing fprintf redirection at iteration %d\n", i);
         cerr << "Testing cerr redirection at iteration " << i;
+        fflush(stderr);
     }
 }
 #endif
