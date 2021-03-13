@@ -62,6 +62,7 @@ public:
 
     // will work with old config via site and new via cloudservice (which is null for calendar and withings for now)
     OAuthDialog(Context *context, OAuthSite site, CloudService *service, QString baseURL="", QString clientsecret="");
+    ~OAuthDialog();
 
     bool sslLibMissing() { return noSSLlib; }
 

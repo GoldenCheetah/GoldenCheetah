@@ -125,6 +125,7 @@ class GcUpgradeLogDialog : public QDialog
 
     public:
         GcUpgradeLogDialog(QDir);
+        ~GcUpgradeLogDialog();
         void enableButtons();
         void append(QString, int level=0);
 

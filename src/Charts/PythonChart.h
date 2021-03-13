@@ -101,6 +101,7 @@ class PythonChart : public GcChartWindow, public PythonHost {
 
     public:
         PythonChart(Context *context, bool ridesummary);
+        ~PythonChart();
 
         // reveal
         bool hasReveal() { return true; }
