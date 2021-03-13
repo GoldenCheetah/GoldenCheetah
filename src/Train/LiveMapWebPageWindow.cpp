@@ -131,6 +131,7 @@ void LiveMapWebPageWindow::userUrl()
 
 LiveMapWebPageWindow::~LiveMapWebPageWindow()
 {
+  if (view) delete view->page();
 }
 
 void LiveMapWebPageWindow::ergFileSelected(ErgFile* f)

@@ -173,6 +173,7 @@ RideMapWindow::RideMapWindow(Context *context, int mapType) : GcChartWindow(cont
 RideMapWindow::~RideMapWindow()
 {
     delete webBridge;
+    if (view) delete view->page();
 }
 
 void

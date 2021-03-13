@@ -154,6 +154,11 @@ GcCrashDialog::GcCrashDialog(QDir homeDir) : QDialog(NULL, Qt::Dialog), home(hom
     setHTML();
 }
 
+GcCrashDialog::~GcCrashDialog()
+{
+    if (report) delete report->page();
+}
+
 QString GcCrashDialog::versionHTML()
 {
     // -- OS ----

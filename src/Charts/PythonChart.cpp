@@ -410,6 +410,10 @@ PythonChart::PythonChart(Context *context, bool ridesummary) : GcChartWindow(con
     web->setChecked(true);
 }
 
+PythonChart::~PythonChart()
+{
+    if (canvas) delete canvas->page();
+}
 
 // switch between rendering to a web page and rendering to a chart page
 void
