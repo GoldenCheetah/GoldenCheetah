@@ -146,6 +146,7 @@ RideSummaryWindow::~RideSummaryWindow()
     // cancel background thread if needed
     future.cancel();
     future.waitForFinished();
+    if (rideSummary) delete rideSummary->page();
 }
 
 void

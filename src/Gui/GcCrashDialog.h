@@ -35,6 +35,7 @@ class GcCrashDialog : public QDialog
 
     public:
         GcCrashDialog(QDir);
+        ~GcCrashDialog();
         AthleteDirectoryStructure home;
         static QString versionHTML();
 

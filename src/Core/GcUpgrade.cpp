@@ -981,6 +981,11 @@ GcUpgradeLogDialog::GcUpgradeLogDialog(QDir homeDir) : QDialog(NULL, Qt::Dialog)
     report->page()->setHtml(reportText);
 }
 
+GcUpgradeLogDialog::~GcUpgradeLogDialog()
+{
+    if (report) delete report->page();
+}
+
 void
 GcUpgradeLogDialog::saveAs()
 {

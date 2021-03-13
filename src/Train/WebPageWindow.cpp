@@ -181,6 +181,7 @@ WebPageWindow::WebPageWindow(Context *context) : GcChartWindow(context), context
 
 WebPageWindow::~WebPageWindow()
 {
+  if (view) delete view->page();
 }
 
 void 

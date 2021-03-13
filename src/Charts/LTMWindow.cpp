@@ -356,6 +356,7 @@ LTMWindow::LTMWindow(Context *context) :
 LTMWindow::~LTMWindow()
 {
     delete popup;
+    if (dataSummary) delete dataSummary->page();
 }
 
 void
