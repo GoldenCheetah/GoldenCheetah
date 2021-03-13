@@ -229,6 +229,7 @@
 #define FORTIUS_FIRMWARE                "<global-trainmode>fortius/firmware"
 #define FORTIUS_CALIBRATION             "<global-trainmode>fortius/calibration"
 #define IMAGIC_FIRMWARE                 "<global-trainmode>imagic/firmware"
+#define SRM_OFFSET                      "<global-trainmode>srm/offset"
 #define TRAIN_MULTI                     "<global-trainmode>train/multi"
 #define TRAIN_AUTOCONNECT               "<global-trainmode>train/autoconnect"
 #define TRAIN_AUTOHIDE                  "<global-trainmode>train/autohide"
