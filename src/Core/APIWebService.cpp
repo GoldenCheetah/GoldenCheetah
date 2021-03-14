@@ -551,12 +551,13 @@ APIWebService::listZones(QString athlete, QStringList, HttpRequest &request, Htt
             if (zones->read(zonesFile)) {
 
                 // success - write out
-                response.write("date, lthr, maxhr, rhr\n");
+                response.write("date, lthr, aethr, maxhr, rhr\n");
                 for(int i=0; i<zones->getRangeSize(); i++) {
                     response.write(
-                    QString("%1, %2, %3, %4\n")
+                    QString("%1, %2, %3, %4, %5\n")
                            .arg(zones->getStartDate(i).toString("yyyy/MM/dd"))
                            .arg(zones->getLT(i))
+                           .arg(zones->getAeT(i))
                            .arg(zones->getMaxHr(i))
                            .arg(zones->getRestHr(i))
                            .toLocal8Bit()

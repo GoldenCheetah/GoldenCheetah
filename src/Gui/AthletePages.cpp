@@ -1964,8 +1964,8 @@ LTPage::LTPage(Context *context, HrZones *hrZones, HrSchemePage *schemePage) :
 {
     active = false;
 
-    QVBoxLayout *mainLayout = new QVBoxLayout(this);
-    mainLayout->setSpacing(5 *dpiXFactor);
+    QGridLayout *mainLayout = new QGridLayout(this);
+    mainLayout->setSpacing(10 *dpiXFactor);
 
     updateButton = new QPushButton(tr("Update"));
     updateButton->hide();
@@ -1993,14 +1993,6 @@ LTPage::LTPage(Context *context, HrZones *hrZones, HrSchemePage *schemePage) :
     deleteZoneButton->setText(tr("Delete"));
 #endif
 
-    QHBoxLayout *actionButtons = new QHBoxLayout;
-    actionButtons->setSpacing(2 *dpiXFactor);
-    actionButtons->addStretch();
-    actionButtons->addWidget(updateButton);
-    actionButtons->addWidget(addButton);
-    actionButtons->addWidget(deleteButton);
-    //actionButtons->addWidget(defaultButton); moved to zoneButtons
-
     QHBoxLayout *zoneButtons = new QHBoxLayout;
     zoneButtons->addStretch();
     zoneButtons->addWidget(addZoneButton);
@@ -2009,10 +2001,19 @@ LTPage::LTPage(Context *context, HrZones *hrZones, HrSchemePage *schemePage) :
 
     QHBoxLayout *addLayout = new QHBoxLayout;
     QLabel *dateLabel = new QLabel(tr("From Date"));
-    QLabel *ltLabel = new QLabel(tr("Lactate Threshold"));
     dateEdit = new QDateEdit;
     dateEdit->setDate(QDate::currentDate());
     dateEdit->setCalendarPopup(true);
+
+    addLayout->addWidget(dateLabel);
+    addLayout->addWidget(dateEdit);
+    addLayout->addStretch();
+
+    QHBoxLayout *addLayout2 = new QHBoxLayout;
+    QLabel *ltLabel = new QLabel(tr("Lactate Threshold"));
+    QLabel *aetLabel = new QLabel(tr("Aerobic Threshold"));
+    QLabel *restHrLabel = new QLabel(tr("Rest HR"));
+    QLabel *maxHrLabel = new QLabel(tr("Max HR"));
 
     ltEdit = new QDoubleSpinBox;
     ltEdit->setMinimum(0);
@@ -2020,15 +2021,11 @@ LTPage::LTPage(Context *context, HrZones *hrZones, HrSchemePage *schemePage) :
     ltEdit->setSingleStep(1.0);
     ltEdit->setDecimals(0);
 
-    addLayout->addWidget(dateLabel);
-    addLayout->addWidget(dateEdit);
-    addLayout->addWidget(ltLabel);
-    addLayout->addWidget(ltEdit);
-    addLayout->addStretch();
-
-    QHBoxLayout *addLayout2 = new QHBoxLayout;
-    QLabel *restHrLabel = new QLabel(tr("Rest HR"));
-    QLabel *maxHrLabel = new QLabel(tr("Max HR"));
+    aetEdit = new QDoubleSpinBox;
+    aetEdit->setMinimum(0);
+    aetEdit->setMaximum(240);
+    aetEdit->setSingleStep(1.0);
+    aetEdit->setDecimals(0);
 
     restHrEdit = new QDoubleSpinBox;
     restHrEdit->setMinimum(0);
@@ -2042,23 +2039,31 @@ LTPage::LTPage(Context *context, HrZones *hrZones, HrSchemePage *schemePage) :
     maxHrEdit->setSingleStep(1.0);
     maxHrEdit->setDecimals(0);
 
-    addLayout2->addWidget(restHrLabel);
-    addLayout2->addWidget(restHrEdit);
-    addLayout2->addWidget(maxHrLabel);
-    addLayout2->addWidget(maxHrEdit);
-    addLayout2->addStretch();
+    QHBoxLayout *actionButtons = new QHBoxLayout;
+    actionButtons->setSpacing(2 *dpiXFactor);
+    actionButtons->addWidget(ltLabel);
+    actionButtons->addWidget(ltEdit);
+    actionButtons->addWidget(aetLabel);
+    actionButtons->addWidget(aetEdit);
+    actionButtons->addWidget(restHrLabel);
+    actionButtons->addWidget(restHrEdit);
+    actionButtons->addWidget(maxHrLabel);
+    actionButtons->addWidget(maxHrEdit);
+    actionButtons->addStretch();
+    actionButtons->addWidget(updateButton);
+    actionButtons->addWidget(addButton);
+    actionButtons->addWidget(deleteButton);
 
     ranges = new QTreeWidget;
     ranges->headerItem()->setText(0, tr("From Date"));
     ranges->headerItem()->setText(1, tr("Lactate Threshold"));
-    ranges->headerItem()->setText(2, tr("Rest HR"));
-    ranges->headerItem()->setText(3, tr("Max HR"));
-    ranges->setColumnCount(4);
+    ranges->headerItem()->setText(2, tr("Aerobic Threshold"));
+    ranges->headerItem()->setText(3, tr("Rest HR"));
+    ranges->headerItem()->setText(4, tr("Max HR"));
+    ranges->setColumnCount(5);
     ranges->setSelectionMode(QAbstractItemView::SingleSelection);
-    //ranges->setEditTriggers(QAbstractItemView::SelectedClicked); // allow edit
     ranges->setUniformRowHeights(true);
     ranges->setIndentation(0);
-    //ranges->header()->resizeSection(0,180);
 
     // setup list of ranges
     for (int i=0; i< hrZones->getRangeSize(); i++) {
@@ -2079,13 +2084,17 @@ LTPage::LTPage(Context *context, HrZones *hrZones, HrSchemePage *schemePage) :
         add->setText(1, QString("%1").arg(hrZones->getLT(i)));
         add->setFont(1, font);
 
-        // Rest HR
-        add->setText(2, QString("%1").arg(hrZones->getRestHr(i)));
+        // AeT
+        add->setText(2, QString("%1").arg(hrZones->getAeT(i)));
         add->setFont(2, font);
 
-        // Max HR
-        add->setText(3, QString("%1").arg(hrZones->getMaxHr(i)));
+        // Rest HR
+        add->setText(3, QString("%1").arg(hrZones->getRestHr(i)));
         add->setFont(3, font);
+
+        // Max HR
+        add->setText(4, QString("%1").arg(hrZones->getMaxHr(i)));
+        add->setFont(4, font);
     }
 
     zones = new QTreeWidget;
@@ -2098,21 +2107,17 @@ LTPage::LTPage(Context *context, HrZones *hrZones, HrSchemePage *schemePage) :
     zones->setEditTriggers(QAbstractItemView::SelectedClicked); // allow edit
     zones->setUniformRowHeights(true);
     zones->setIndentation(0);
-    //zones->header()->resizeSection(0,50);
-    //zones->header()->resizeSection(1,150);
-    //zones->header()->resizeSection(2,65);
-    //zones->header()->resizeSection(3,65);
 
-    mainLayout->addLayout(addLayout);
-    mainLayout->addLayout(addLayout2);
-    mainLayout->addLayout(actionButtons);
-    mainLayout->addWidget(ranges);
-    mainLayout->addLayout(zoneButtons);
-    mainLayout->addWidget(zones);
+    mainLayout->addLayout(addLayout, 0, 0);
+    mainLayout->addLayout(actionButtons, 1, 0);
+    mainLayout->addWidget(ranges, 2, 0);
+    mainLayout->addLayout(zoneButtons, 3, 0);
+    mainLayout->addWidget(zones, 4, 0);
 
     // edit connect
     connect(dateEdit, SIGNAL(dateChanged(QDate)), this, SLOT(rangeEdited()));
     connect(ltEdit, SIGNAL(valueChanged(double)), this, SLOT(rangeEdited()));
+    connect(aetEdit, SIGNAL(valueChanged(double)), this, SLOT(rangeEdited()));
     connect(restHrEdit, SIGNAL(valueChanged(double)), this, SLOT(rangeEdited()));
     connect(maxHrEdit, SIGNAL(valueChanged(double)), this, SLOT(rangeEdited()));
 
@@ -2133,8 +2138,7 @@ LTPage::addClicked()
     // get current scheme
     hrZones->setScheme(schemePage->getScheme());
 
-    //int index = ranges->invisibleRootItem()->childCount();
-    int index = hrZones->addHrZoneRange(dateEdit->date(), ltEdit->value(), restHrEdit->value(), maxHrEdit->value());
+    int index = hrZones->addHrZoneRange(dateEdit->date(), ltEdit->value(), aetEdit->value(), restHrEdit->value(), maxHrEdit->value());
 
     // new item
     QTreeWidgetItem *add = new QTreeWidgetItem;
@@ -2146,10 +2150,12 @@ LTPage::addClicked()
 
     // LT
     add->setText(1, QString("%1").arg(ltEdit->value()));
+    // AeT
+    add->setText(2, QString("%1").arg(aetEdit->value()));
     // Rest HR
-    add->setText(2, QString("%1").arg(restHrEdit->value()));
+    add->setText(3, QString("%1").arg(restHrEdit->value()));
     // Max HR
-    add->setText(3, QString("%1").arg(maxHrEdit->value()));
+    add->setText(4, QString("%1").arg(maxHrEdit->value()));
 }
 
 void
@@ -2168,12 +2174,15 @@ LTPage::editClicked()
     // LT
     hrZones->setLT(index, ltEdit->value());
     edit->setText(1, QString("%1").arg(ltEdit->value()));
+    // AeT
+    hrZones->setAeT(index, aetEdit->value());
+    edit->setText(2, QString("%1").arg(aetEdit->value()));
     // Rest HR
     hrZones->setRestHr(index, restHrEdit->value());
-    edit->setText(2, QString("%1").arg(restHrEdit->value()));
+    edit->setText(3, QString("%1").arg(restHrEdit->value()));
     // Max HR
     hrZones->setMaxHr(index, maxHrEdit->value());
-    edit->setText(3, QString("%1").arg(maxHrEdit->value()));
+    edit->setText(4, QString("%1").arg(maxHrEdit->value()));
 }
 
 void
@@ -2227,13 +2236,16 @@ LTPage::rangeEdited()
         int lt = ltEdit->value();
         int olt = hrZones->getLT(index);
 
+        int aet = aetEdit->value();
+        int oaet = hrZones->getAeT(index);
+
         int maxhr = maxHrEdit->value();
         int omaxhr = hrZones->getMaxHr(index);
 
         int resthr = restHrEdit->value();
         int oresthr = hrZones->getRestHr(index);
 
-        if (date != odate || lt != olt || maxhr != omaxhr || resthr != oresthr)
+        if (date != odate || lt != olt || aet != oaet || maxhr != omaxhr || resthr != oresthr)
             updateButton->show();
         else
             updateButton->hide();
@@ -2259,6 +2271,7 @@ LTPage::rangeSelectionChanged()
 
         dateEdit->setDate(hrZones->getStartDate(index));
         ltEdit->setValue(hrZones->getLT(index));
+        aetEdit->setValue(hrZones->getAeT(index));
         maxHrEdit->setValue(hrZones->getMaxHr(index));
         restHrEdit->setValue(hrZones->getRestHr(index));
 

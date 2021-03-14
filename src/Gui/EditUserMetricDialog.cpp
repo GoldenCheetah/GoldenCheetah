@@ -134,6 +134,7 @@ EditUserMetricDialog::EditUserMetricDialog(QWidget *parent, Context *context, Us
     list << "config(height)";
     list << "config(weight)";
     list << "config(lthr)";
+    list << "config(aethr)";
     list << "config(maxhr)";
     list << "config(rhr)";
     list << "config(units)";
