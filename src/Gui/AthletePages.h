@@ -377,6 +377,7 @@ class LTPage : public QWidget
 
         QDateEdit *dateEdit;
         QDoubleSpinBox *ltEdit;
+        QDoubleSpinBox *aetEdit;
         QDoubleSpinBox *restHrEdit;
         QDoubleSpinBox *maxHrEdit;
 

@@ -335,7 +335,7 @@ NewCyclistDialog::saveClicked()
 
                 // HR Zones too!
                 HrZones hrzones;
-                hrzones.addHrZoneRange(QDate(1900, 01, 01), lthr->value(), resthr->value(), maxhr->value());
+                hrzones.addHrZoneRange(QDate(1900, 01, 01), lthr->value(), 0, resthr->value(), maxhr->value());
                 hrzones.write(athleteHome->config().canonicalPath());
 
                 // Pace Zones for Run

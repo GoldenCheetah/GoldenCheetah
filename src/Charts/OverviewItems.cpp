@@ -2429,6 +2429,7 @@ OverviewItemConfig::OverviewItemConfig(ChartSpaceItem *item) : QWidget(item->par
         list << "config(height)";
         list << "config(weight)";
         list << "config(lthr)";
+        list << "config(aethr)";
         list << "config(maxhr)";
         list << "config(rhr)";
         list << "config(units)";

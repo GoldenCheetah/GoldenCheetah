@@ -60,15 +60,16 @@ struct HrZoneInfo {
 struct HrZoneRange {
     QDate begin, end;
     int lt;
+    int aet;
     int restHr;
     int maxHr;
 
     QList<HrZoneInfo> zones;
     bool hrZonesSetFromLT;
     HrZoneRange(const QDate &b, const QDate &e) :
-        begin(b), end(e), lt(0), hrZonesSetFromLT(false) {}
-    HrZoneRange(const QDate &b, const QDate &e, int _lt, int _restHr, int _maxHr) :
-        begin(b), end(e), lt(_lt), restHr(_restHr), maxHr(_maxHr), hrZonesSetFromLT(false) {}
+        begin(b), end(e), lt(0), aet(0), hrZonesSetFromLT(false) {}
+    HrZoneRange(const QDate &b, const QDate &e, int _lt, int _aet, int _restHr, int _maxHr) :
+        begin(b), end(e), lt(_lt), aet(_aet), restHr(_restHr), maxHr(_maxHr), hrZonesSetFromLT(false) {}
 
     // used by qSort()
     bool operator< (HrZoneRange right) const {
@@ -132,8 +133,8 @@ class HrZones : public QObject
         int getRangeSize() const;
 
         // Add ranges
-        void addHrZoneRange(QDate _start, QDate _end, int _lt, int _restHr, int _maxHr);
-        int addHrZoneRange(QDate _start, int _lt, int _restHr, int _maxHr);
+        void addHrZoneRange(QDate _start, QDate _end, int _lt, int _aet, int _restHr, int _maxHr);
+        int addHrZoneRange(QDate _start, int _lt, int _aet, int _restHr, int _maxHr);
         void addHrZoneRange();
 
         // insert a range from the given date to the end date of the range
@@ -147,6 +148,10 @@ class HrZones : public QObject
         // get and set LT for a given range
         int getLT(int rnum) const;
         void setLT(int rnum, int cp);
+
+        // get and set AeT Hr for a given range
+        int getAeT(int rnum) const;
+        void setAeT(int rnum, int aet);
 
         // get and set Rest Hr for a given range
         int getRestHr(int rnum) const;
