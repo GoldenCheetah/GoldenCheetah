@@ -1166,6 +1166,7 @@ CPPage::CPPage(Context *context, Zones *zones_, SchemePage *schemePage) :
     QHBoxLayout *addLayout = new QHBoxLayout;
     QLabel *dateLabel = new QLabel(tr("From Date"));
     QLabel *cpLabel = new QLabel(tr("Critical Power"));
+    QLabel *aetLabel = new QLabel(tr("AeTP"));
     QLabel *ftpLabel = new QLabel(tr("FTP"));
     QLabel *wLabel = new QLabel(tr("W'"));
     QLabel *pmaxLabel = new QLabel(tr("Pmax"));
@@ -1186,6 +1187,12 @@ CPPage::CPPage(Context *context, Zones *zones_, SchemePage *schemePage) :
     cpEdit->setMaximum(1000);
     cpEdit->setSingleStep(1.0);
     cpEdit->setDecimals(0);
+
+    aetEdit = new QDoubleSpinBox;
+    aetEdit->setMinimum(0);
+    aetEdit->setMaximum(1000);
+    aetEdit->setSingleStep(1.0);
+    aetEdit->setDecimals(0);
 
     ftpEdit = new QDoubleSpinBox;
     ftpEdit->setMinimum(0);
@@ -1211,6 +1218,8 @@ CPPage::CPPage(Context *context, Zones *zones_, SchemePage *schemePage) :
     actionButtons->addWidget(cpEdit);
 
 
+    actionButtons->addWidget(aetLabel);
+    actionButtons->addWidget(aetEdit);
     actionButtons->addWidget(ftpLabel);
     actionButtons->addWidget(ftpEdit);
 
@@ -1222,7 +1231,6 @@ CPPage::CPPage(Context *context, Zones *zones_, SchemePage *schemePage) :
     actionButtons->addWidget(updateButton);
     actionButtons->addWidget(addButton);
     actionButtons->addWidget(deleteButton);
-    //actionButtons->addWidget(defaultButton); // moved to zoneButtons
 
     addLayout->addWidget(dateLabel);
     addLayout->addWidget(dateEdit);
@@ -1241,8 +1249,6 @@ CPPage::CPPage(Context *context, Zones *zones_, SchemePage *schemePage) :
     zones->setEditTriggers(QAbstractItemView::SelectedClicked); // allow edit
     zones->setUniformRowHeights(true);
     zones->setIndentation(0);
-    //zones->header()->resizeSection(0,80);
-    //zones->header()->resizeSection(1,150);
 
     mainLayout->addLayout(addLayout, 0,0);
     mainLayout->addLayout(actionButtons, 1,0);
@@ -1253,6 +1259,7 @@ CPPage::CPPage(Context *context, Zones *zones_, SchemePage *schemePage) :
     // edit connect
     connect(dateEdit, SIGNAL(dateChanged(QDate)), this, SLOT(rangeEdited()));
     connect(cpEdit, SIGNAL(valueChanged(double)), this, SLOT(rangeEdited()));
+    connect(aetEdit, SIGNAL(valueChanged(double)), this, SLOT(rangeEdited()));
     connect(ftpEdit, SIGNAL(valueChanged(double)), this, SLOT(rangeEdited()));
     connect(wEdit, SIGNAL(valueChanged(double)), this, SLOT(rangeEdited()));
     connect(pmaxEdit, SIGNAL(valueChanged(double)), this, SLOT(rangeEdited()));
@@ -1279,33 +1286,26 @@ CPPage::saveClicked()
 
 void
 CPPage::initializeRanges() {
-    bool useCPForFTP = (useCPForFTPCombo->currentIndex() == 0? true : false);
-
-    int column = 0;
-
-    bool resize = (ranges->columnCount() == 4);
 
     while( int nb = ranges->topLevelItemCount () )
     {
         delete ranges->takeTopLevelItem( nb - 1 );
     }
+
+    int column = 0;
     ranges->headerItem()->setText(column++, tr("From Date"));
-
     ranges->headerItem()->setText(column++, tr("Critical Power"));
-    if (!useCPForFTP) {
-        ranges->headerItem()->setText(column++, tr("FTP"));
-    }
-
+    ranges->headerItem()->setText(column++, tr("AeTP"));
+    ranges->headerItem()->setText(column++, tr("FTP"));
     ranges->headerItem()->setText(column++, tr("W'"));
     ranges->headerItem()->setText(column++, tr("Pmax"));
 
-    if (resize)
-        ranges->setColumnWidth(3, (ranges->columnWidth(3)/2) *dpiXFactor);
-
     ranges->setColumnCount(column);
 
+    bool useCPForFTP = (useCPForFTPCombo->currentIndex() == 0 ? true : false);
+    ranges->setColumnHidden(3, useCPForFTP);
+
     ranges->setSelectionMode(QAbstractItemView::SingleSelection);
-    //ranges->setEditTriggers(QAbstractItemView::SelectedClicked); // allow edit
     ranges->setUniformRowHeights(true);
     ranges->setIndentation(0);
 
@@ -1329,11 +1329,13 @@ CPPage::initializeRanges() {
         add->setText(column, QString("%1").arg(zones_->getCP(i)));
         add->setFont(column++, font);
 
-        if (!useCPForFTP) {
-            // FTP
-            add->setText(column, QString("%1").arg(zones_->getFTP(i)));
-            add->setFont(column++, font);
-        }
+        // AeT
+        add->setText(column, QString("%1").arg(zones_->getAeT(i)));
+        add->setFont(column++, font);
+
+        // FTP
+        add->setText(column, QString("%1").arg(zones_->getFTP(i)));
+        add->setFont(column++, font);
 
         // W'
         add->setText(column, QString("%1").arg(zones_->getWprime(i)));
@@ -1364,13 +1366,12 @@ CPPage::addClicked()
         return;
     }
 
-    //int index = ranges->invisibleRootItem()->childCount();
     int wp = wEdit->value() ? wEdit->value() : 20000;
     if (wp < 1000) wp *= 1000; // entered in kJ we want joules
 
     int pmax = pmaxEdit->value() ? pmaxEdit->value() : 1000;
 
-    int index = zones_->addZoneRange(dateEdit->date(), cpEdit->value(), ftpEdit->value(), wp, pmax);
+    int index = zones_->addZoneRange(dateEdit->date(), cpEdit->value(), aetEdit->value(), ftpEdit->value(), wp, pmax);
 
     // new item
     QTreeWidgetItem *add = new QTreeWidgetItem;
@@ -1385,10 +1386,11 @@ CPPage::addClicked()
     // CP
     add->setText(column++, QString("%1").arg(cpEdit->value()));
 
+    // AeT
+    add->setText(column++, QString("%1").arg(aetEdit->value()));
+
     // FTP
-    if (useCPForFTPCombo->currentIndex() == 1) {
-        add->setText(column++, QString("%1").arg(ftpEdit->value()));
-    }
+    add->setText(column++, QString("%1").arg(ftpEdit->value()));
 
     // W'
     add->setText(column++, QString("%1").arg(wp));
@@ -1434,11 +1436,13 @@ CPPage::editClicked()
     zones_->setCP(index, cp);
     edit->setText(columns++, QString("%1").arg(cp));
 
+    // AeT
+    zones_->setAeT(index, aetEdit->value());
+    edit->setText(columns++, QString("%1").arg(aetEdit->value()));
+
     // show FTP if we use FTP for Coggan Metrics
-    if (useCPForFTPCombo->currentIndex() == 1) {
-        zones_->setFTP(index, ftp);
-        edit->setText(columns++, QString("%1").arg(ftp));
-    }
+    zones_->setFTP(index, ftp);
+    edit->setText(columns++, QString("%1").arg(ftp));
 
     // W'
     zones_->setWprime(index, wp);
@@ -1500,6 +1504,9 @@ CPPage::rangeEdited()
         int cp = cpEdit->value();
         int ocp = zones_->getCP(index);
 
+        int aet = aetEdit->value();
+        int oaet = zones_->getAeT(index);
+
         int ftp = ftpEdit->value();
         int oftp = zones_->getFTP(index);
 
@@ -1509,7 +1516,7 @@ CPPage::rangeEdited()
         int pmax = pmaxEdit->value();
         int opmax = zones_->getPmax(index);
 
-        if (date != odate || cp != ocp || ftp != oftp || wp != owp || pmax != opmax)
+        if (date != odate || cp != ocp || aet != oaet || ftp != oftp || wp != owp || pmax != opmax)
             updateButton->show();
         else
             updateButton->hide();
@@ -1536,6 +1543,7 @@ CPPage::rangeSelectionChanged()
 
         dateEdit->setDate(zones_->getStartDate(index));
         cpEdit->setValue(zones_->getCP(index));
+        aetEdit->setValue(zones_->getAeT(index));
         ftpEdit->setValue(zones_->getFTP(index));
         wEdit->setValue(zones_->getWprime(index));
         pmaxEdit->setValue(zones_->getPmax(index));

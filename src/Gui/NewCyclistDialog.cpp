@@ -330,7 +330,7 @@ NewCyclistDialog::saveClicked()
 
                 // Setup Power Zones
                 Zones zones;
-                zones.addZoneRange(QDate(1900, 01, 01), cp->value(), cp->value(), w->value(), pmax->value());
+                zones.addZoneRange(QDate(1900, 01, 01), cp->value(), 0, cp->value(), w->value(), pmax->value());
                 zones.write(athleteHome->config().canonicalPath());
 
                 // HR Zones too!

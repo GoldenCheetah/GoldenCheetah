@@ -1544,7 +1544,7 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
             // is the symbol valid?
             QRegExp bestValidSymbols("^(apower|power|hr|cadence|speed|torque|vam|xpower|isopower|wpk)$", Qt::CaseInsensitive);
             QRegExp tizValidSymbols("^(power|hr)$", Qt::CaseInsensitive);
-            QRegExp configValidSymbols("^(cranklength|cp|ftp|w\\'|pmax|cv|height|weight|lthr|aethr|maxhr|rhr|units|dob|sex)$", Qt::CaseInsensitive);
+            QRegExp configValidSymbols("^(cranklength|cp|aetp|ftp|w\\'|pmax|cv|height|weight|lthr|aethr|maxhr|rhr|units|dob|sex)$", Qt::CaseInsensitive);
             QRegExp constValidSymbols("^(e|pi)$", Qt::CaseInsensitive); // just do basics for now
             QRegExp dateRangeValidSymbols("^(start|stop)$", Qt::CaseInsensitive); // date range
             QRegExp pmcValidSymbols("^(stress|lts|sts|sb|rr|date)$", Qt::CaseInsensitive);
@@ -3267,6 +3267,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, Result x, long it, RideItem
             // Get CP and W' estimates for date of ride
             //
             double CP = 0;
+            double AeTP = 0;
             double FTP = 0;
             double WPRIME = 0;
             double PMAX = 0;
@@ -3277,6 +3278,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, Result x, long it, RideItem
                 // if range is -1 we need to fall back to a default value
                 zoneRange = m->context->athlete->zones(m->isRun)->whichRange(m->dateTime.date());
                 FTP = CP = zoneRange >= 0 ? m->context->athlete->zones(m->isRun)->getCP(zoneRange) : 0;
+                AeTP = zoneRange >= 0 ? m->context->athlete->zones(m->isRun)->getAeT(zoneRange) : 0;
                 WPRIME = zoneRange >= 0 ? m->context->athlete->zones(m->isRun)->getWprime(zoneRange) : 0;
                 PMAX = zoneRange >= 0 ? m->context->athlete->zones(m->isRun)->getPmax(zoneRange) : 0;
 
@@ -3337,6 +3339,9 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, Result x, long it, RideItem
 
             if (symbol == "cp") {
                 return Result(CP);
+            }
+            if (symbol == "aetp") {
+                return Result(AeTP);
             }
             if (symbol == "ftp") {
                 return Result(FTP);

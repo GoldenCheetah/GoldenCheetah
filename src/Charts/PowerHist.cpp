@@ -1940,6 +1940,7 @@ PowerHist::setArraysFromRide(RideFile *ride, HistData &standard, const Zones *zo
     // cp and zones
     int zoneRange = zones ? zones->whichRange(ride->startTime().date()) : -1;
     int CP = zoneRange != -1 ? zones->getCP(zoneRange) : 0;
+    int AeTP = zoneRange != -1 ? zones->getAeT(zoneRange) : 0;
     double WPRIME = zoneRange != -1 ? zones->getWprime(zoneRange) : 22000;
 
     int hrZoneRange = context->athlete->hrZones(ride->isRun()) ? context->athlete->hrZones(ride->isRun())->whichRange(ride->startTime().date()) : -1;
@@ -2047,7 +2048,7 @@ PowerHist::setArraysFromRide(RideFile *ride, HistData &standard, const Zones *zo
 
                 if (p1->watts < 1 && withz) { // I zero watts
                     standard.wattsCPZoneArray[0] ++;
-                } else if (p1->watts < (CP * 0.85f)) { // I
+                } else if (p1->watts < AeTP) { // I
                     standard.wattsCPZoneArray[0] ++;
                 } else if (p1->watts < CP) { // II
                     standard.wattsCPZoneArray[1] ++;

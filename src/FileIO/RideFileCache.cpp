@@ -1567,8 +1567,12 @@ RideFileCache::computeDistribution(QVector<float> &array, RideFile::SeriesType s
     int hrZoneRange = context->athlete->hrZones(ride->isRun()) ? context->athlete->hrZones(ride->isRun())->whichRange(ride->startTime().date()) : -1;
     int paceZoneRange = context->athlete->paceZones(ride->isSwim()) ? context->athlete->paceZones(ride->isSwim())->whichRange(ride->startTime().date()) : -1;
 
-    if (zoneRange != -1) CP=context->athlete->zones(ride->isRun())->getCP(zoneRange);
-    else CP=0;
+    CP=0;
+    int AeTP=0;
+    if (zoneRange != -1) {
+        CP=context->athlete->zones(ride->isRun())->getCP(zoneRange);
+        AeTP=context->athlete->zones(ride->isRun())->getAeT(zoneRange);
+    }
 
     if (zoneRange != -1) WPRIME=context->athlete->zones(ride->isRun())->getWprime(zoneRange);
     else WPRIME=0;
@@ -1637,11 +1641,11 @@ RideFileCache::computeDistribution(QVector<float> &array, RideFile::SeriesType s
                 if (index >=0) wattsTimeInZone[index] += ride->recIntSecs();
             }
 
-            // Polarized zones :- I(<0.85*CP), II (<CP and >0.85*CP), III (>CP)
+            // Polarized zones :- I(<AeTP), II (<CP and >0.85*CP), III (>CP)
             if (series == RideFile::watts && zoneRange != -1 && CP) {
                 if (dp->value(series) < 1) // I zero watts
                     wattsCPTimeInZone[0] += ride->recIntSecs();
-                else if (dp->value(series) < (CP*0.85f)) // I
+                else if (dp->value(series) < AeTP) // I
                     wattsCPTimeInZone[1] += ride->recIntSecs();
                 else if (dp->value(series) < CP) // II
                     wattsCPTimeInZone[2] += ride->recIntSecs();
