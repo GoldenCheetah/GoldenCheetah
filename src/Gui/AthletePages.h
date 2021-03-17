@@ -481,6 +481,7 @@ class CVPage : public QWidget
 
         QDateEdit *dateEdit;
         QTimeEdit *cvEdit;
+        QTimeEdit *aetEdit;
 
         PaceZones* paceZones;
         PaceSchemePage *schemePage;

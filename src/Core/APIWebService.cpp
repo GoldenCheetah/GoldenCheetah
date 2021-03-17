@@ -585,12 +585,13 @@ APIWebService::listZones(QString athlete, QStringList, HttpRequest &request, Htt
             if (zones->read(zonesFile)) {
 
                 // success - write out
-                response.write("date, CV\n");
+                response.write("date, CV, AeTV\n");
                 for(int i=0; i<zones->getRangeSize(); i++) {
                     response.write(
-                    QString("%1, %2\n")
+                    QString("%1, %2, %3\n")
                            .arg(zones->getStartDate(i).toString("yyyy/MM/dd"))
                            .arg(zones->getCV(i))
+                           .arg(zones->getAeT(i))
                            .toLocal8Bit()
                     );
                 }
@@ -614,12 +615,13 @@ APIWebService::listZones(QString athlete, QStringList, HttpRequest &request, Htt
             if (zones->read(zonesFile)) {
 
                 // success - write out
-                response.write("date, CV\n");
+                response.write("date, CV, AeTV\n");
                 for(int i=0; i<zones->getRangeSize(); i++) {
                     response.write(
-                    QString("%1, %2\n")
+                    QString("%1, %2, %3\n")
                            .arg(zones->getStartDate(i).toString("yyyy/MM/dd"))
                            .arg(zones->getCV(i))
+                           .arg(zones->getAeT(i))
                            .toLocal8Bit()
                     );
                 }

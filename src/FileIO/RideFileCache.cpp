@@ -1584,8 +1584,12 @@ RideFileCache::computeDistribution(QVector<float> &array, RideFile::SeriesType s
         AeTHR=context->athlete->hrZones(ride->isRun())->getAeT(hrZoneRange);
     }
 
-    if (paceZoneRange != -1) CV=context->athlete->paceZones(ride->isSwim())->getCV(paceZoneRange);
-    else CV=0;
+    CV=0;
+    double AeTV=0;
+    if (paceZoneRange != -1) {
+        CV=context->athlete->paceZones(ride->isSwim())->getCV(paceZoneRange);
+        AeTV=context->athlete->paceZones(ride->isSwim())->getAeT(paceZoneRange);
+    }
 
     // setup the array based upon the ride
     int decimals = decimalsFor(series); //RideFile::decimalsFor(series) ? 1 : 0;
@@ -1677,14 +1681,11 @@ RideFileCache::computeDistribution(QVector<float> &array, RideFile::SeriesType s
                 if (index >= 0) paceTimeInZone[index] += ride->recIntSecs();
             }
 
-            // Polarized zones Run:- I(<0.9*CV), II (<CV and >0.9*CV), III (>CV)
-            // Polarized zones Swim:- I(<0.975*CV), II (<CV and >0.975*CV), III (>CV)
+            // Polarized Pace Zones: I(<AeTV), II (>=AeTV and <CV), III (>=CV)
             if (series == RideFile::kph && paceZoneRange != -1 && CV && (ride->isRun() || ride->isSwim())) {
                 if (dp->value(series) < 0.1) // I zero
                     paceCPTimeInZone[0] += ride->recIntSecs();
-                else if (ride->isRun() && dp->value(series) < (CV*0.9f)) // I for run
-                    paceCPTimeInZone[1] += ride->recIntSecs();
-                else if (ride->isSwim() && dp->value(series) < (CV*0.975f)) // I for swim
+                else if (dp->value(series) < AeTV) // I
                     paceCPTimeInZone[1] += ride->recIntSecs();
                 else if (dp->value(series) < CV) // II
                     paceCPTimeInZone[2] += ride->recIntSecs();

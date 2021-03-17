@@ -340,12 +340,12 @@ NewCyclistDialog::saveClicked()
 
                 // Pace Zones for Run
                 PaceZones rnPaceZones(false);
-                rnPaceZones.addZoneRange(QDate(1900, 01, 01), rnPaceZones.kphFromTime(cvRn, useMetricUnits));
+                rnPaceZones.addZoneRange(QDate(1900, 01, 01), rnPaceZones.kphFromTime(cvRn, useMetricUnits), 0);
                 rnPaceZones.write(athleteHome->config().canonicalPath());
 
                 // Pace Zones for Run
                 PaceZones swPaceZones(true);
-                swPaceZones.addZoneRange(QDate(1900, 01, 01), swPaceZones.kphFromTime(cvSw, useMetricUnits));
+                swPaceZones.addZoneRange(QDate(1900, 01, 01), swPaceZones.kphFromTime(cvSw, useMetricUnits), 0);
                 swPaceZones.write(athleteHome->config().canonicalPath());
 
                 appsettings->syncQSettingsAllAthletes();

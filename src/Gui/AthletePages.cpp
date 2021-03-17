@@ -1345,7 +1345,8 @@ CPPage::initializeRanges() {
         add->setText(column, QString("%1").arg(zones_->getPmax(i)));
         add->setFont(column++, font);
     }
-
+    for(int i = 0; i < ranges->columnCount(); i++)
+        ranges->resizeColumnToContents(i);
 }
 
 
@@ -1360,7 +1361,7 @@ CPPage::addClicked()
     int cp = cpEdit->value();
     if( cp <= 0 ) {
         QMessageBox err;
-        err.setText(tr("CP must be > 0"));
+        err.setText(tr("Critical Power must be > 0"));
         err.setIcon(QMessageBox::Warning);
         err.exec();
         return;
@@ -1410,7 +1411,7 @@ CPPage::editClicked()
 
     if( cp <= 0 ){
         QMessageBox err;
-        err.setText(tr("CP must be > 0"));
+        err.setText(tr("Critical Power must be > 0"));
         err.setIcon(QMessageBox::Warning);
         err.exec();
         return;
@@ -1579,6 +1580,8 @@ CPPage::rangeSelectionChanged()
             zones->setItemWidget(add, 2, loedit);
             connect(loedit, SIGNAL(valueChanged(double)), this, SLOT(zonesChanged()));
         }
+        for(int i = 0; i < zones->columnCount(); i++)
+            zones->resizeColumnToContents(i);
     }
 
     active = false;
@@ -2104,6 +2107,8 @@ LTPage::LTPage(Context *context, HrZones *hrZones, HrSchemePage *schemePage) :
         add->setText(4, QString("%1").arg(hrZones->getMaxHr(i)));
         add->setFont(4, font);
     }
+    for(int i = 0; i < ranges->columnCount(); i++)
+        ranges->resizeColumnToContents(i);
 
     zones = new QTreeWidget;
     zones->headerItem()->setText(0, tr("Short"));
@@ -2143,6 +2148,14 @@ LTPage::LTPage(Context *context, HrZones *hrZones, HrSchemePage *schemePage) :
 void
 LTPage::addClicked()
 {
+    if(ltEdit->value() <= 0 ) {
+        QMessageBox err;
+        err.setText(tr("Lactate Threshold must be > 0"));
+        err.setIcon(QMessageBox::Warning);
+        err.exec();
+        return;
+    }
+
     // get current scheme
     hrZones->setScheme(schemePage->getScheme());
 
@@ -2169,6 +2182,14 @@ LTPage::addClicked()
 void
 LTPage::editClicked()
 {
+    if(ltEdit->value() <= 0 ) {
+        QMessageBox err;
+        err.setText(tr("Lactate Threshold must be > 0"));
+        err.setIcon(QMessageBox::Warning);
+        err.exec();
+        return;
+    }
+
     // get current scheme
     hrZones->setScheme(schemePage->getScheme());
 
@@ -2325,6 +2346,8 @@ LTPage::rangeSelectionChanged()
             connect(trimpedit, SIGNAL(editingFinished()), this, SLOT(zonesChanged()));
 
         }
+        for(int i = 0; i < zones->columnCount(); i++)
+            zones->resizeColumnToContents(i);
     }
 
     active = false;
@@ -2745,20 +2768,20 @@ CVPage::CVPage(PaceZones* paceZones, PaceSchemePage *schemePage) :
     QHBoxLayout *addLayout = new QHBoxLayout;
     QLabel *dateLabel = new QLabel(tr("From Date"));
     QLabel *cpLabel = new QLabel(tr("Critical Velocity"));
+    QLabel *aetLabel = new QLabel(tr("Aerobic Threshold"));
     dateEdit = new QDateEdit;
     dateEdit->setDate(QDate::currentDate());
     dateEdit->setCalendarPopup(true);
 
-    // CV default is 4min/km for Running a round number inline with
-    // CP default and 1:36min/100 for swimming (4:1 relation)
-    cvEdit = new QTimeEdit(QTime::fromString(paceZones->isSwim() ? "01:36" : "04:00", "mm:ss"));
-    if (!metricPace) { // convert to Imperial
-        double kphCV = paceZones->kphFromTime(cvEdit, !metricPace);
-        cvEdit->setTime(QTime::fromString(paceZones->kphToPaceString(kphCV, metricPace), "mm:ss"));
-    }
-    cvEdit->setMinimumTime(QTime::fromString("01:00", "mm:ss"));
+    cvEdit = new QTimeEdit();
+    cvEdit->setMinimumTime(QTime::fromString("00:00", "mm:ss"));
     cvEdit->setMaximumTime(QTime::fromString("20:00", "mm:ss"));
     cvEdit->setDisplayFormat("mm:ss");
+
+    aetEdit = new QTimeEdit();
+    aetEdit->setMinimumTime(QTime::fromString("00:00", "mm:ss"));
+    aetEdit->setMaximumTime(QTime::fromString("20:00", "mm:ss"));
+    aetEdit->setDisplayFormat("mm:ss");
 
     per = new QLabel(this);
     per->setText(paceZones->paceUnits(metricPace));
@@ -2767,8 +2790,9 @@ CVPage::CVPage(PaceZones* paceZones, PaceSchemePage *schemePage) :
     actionButtons->setSpacing(2 *dpiXFactor);
     actionButtons->addWidget(cpLabel);
     actionButtons->addWidget(cvEdit);
+    actionButtons->addWidget(aetLabel);
+    actionButtons->addWidget(aetEdit);
     actionButtons->addWidget(per);
-    actionButtons->addStretch();
     actionButtons->addStretch();
     actionButtons->addWidget(updateButton);
     actionButtons->addWidget(addButton);
@@ -2782,12 +2806,11 @@ CVPage::CVPage(PaceZones* paceZones, PaceSchemePage *schemePage) :
     ranges = new QTreeWidget;
     ranges->headerItem()->setText(0, tr("From Date"));
     ranges->headerItem()->setText(1, tr("Critical Velocity"));
-    ranges->setColumnCount(2);
+    ranges->headerItem()->setText(2, tr("Aerobic Threshold"));
+    ranges->setColumnCount(3);
     ranges->setSelectionMode(QAbstractItemView::SingleSelection);
-    //ranges->setEditTriggers(QAbstractItemView::SelectedClicked); // allow edit
     ranges->setUniformRowHeights(true);
     ranges->setIndentation(0);
-    //ranges->header()->resizeSection(0,180);
 
     // setup list of ranges
     for (int i=0; i< paceZones->getRangeSize(); i++) {
@@ -2806,7 +2829,6 @@ CVPage::CVPage(PaceZones* paceZones, PaceSchemePage *schemePage) :
 
         // CV
         double kph = paceZones->getCV(i);
-
         add->setText(1, QString("%1 %2 %3 %4")
                     .arg(paceZones->kphToPaceString(kph, true))
                     .arg(paceZones->paceUnits(true))
@@ -2814,7 +2836,17 @@ CVPage::CVPage(PaceZones* paceZones, PaceSchemePage *schemePage) :
                     .arg(paceZones->paceUnits(false)));
         add->setFont(1, font);
 
+        // AeT
+        kph = paceZones->getAeT(i);
+        add->setText(2, QString("%1 %2 %3 %4")
+                    .arg(paceZones->kphToPaceString(kph, true))
+                    .arg(paceZones->paceUnits(true))
+                    .arg(paceZones->kphToPaceString(kph, false))
+                    .arg(paceZones->paceUnits(false)));
+        add->setFont(2, font);
     }
+    for(int i = 0; i < ranges->columnCount(); i++)
+        ranges->resizeColumnToContents(i);
 
     zones = new QTreeWidget;
     zones->headerItem()->setText(0, tr("Short"));
@@ -2825,8 +2857,6 @@ CVPage::CVPage(PaceZones* paceZones, PaceSchemePage *schemePage) :
     zones->setEditTriggers(QAbstractItemView::SelectedClicked); // allow edit
     zones->setUniformRowHeights(true);
     zones->setIndentation(0);
-    //zones->header()->resizeSection(0,80);
-    //zones->header()->resizeSection(1,150);
 
     mainLayout->addLayout(addLayout, 0,0);
     mainLayout->addLayout(actionButtons, 1,0);
@@ -2837,6 +2867,7 @@ CVPage::CVPage(PaceZones* paceZones, PaceSchemePage *schemePage) :
     // edit connect
     connect(dateEdit, SIGNAL(dateChanged(QDate)), this, SLOT(rangeEdited()));
     connect(cvEdit, SIGNAL(timeChanged(QTime)), this, SLOT(rangeEdited()));
+    connect(aetEdit, SIGNAL(timeChanged(QTime)), this, SLOT(rangeEdited()));
 
     // button connect
     connect(updateButton, SIGNAL(clicked()), this, SLOT(editClicked()));
@@ -2852,19 +2883,18 @@ CVPage::CVPage(PaceZones* paceZones, PaceSchemePage *schemePage) :
 void
 CVPage::addClicked()
 {
-    // get current scheme
-    paceZones->setScheme(schemePage->getScheme());
-
-    int cp = paceZones->kphFromTime(cvEdit, metricPace);
-    if( cp <= 0 ){
+    if( paceZones->kphFromTime(cvEdit, metricPace) <= 0 ) {
         QMessageBox err;
-        err.setText(tr("CV must be > 0"));
+        err.setText(tr("Critical Velocity must be > 0"));
         err.setIcon(QMessageBox::Warning);
         err.exec();
         return;
     }
 
-    int index = paceZones->addZoneRange(dateEdit->date(), paceZones->kphFromTime(cvEdit, metricPace));
+    // get current scheme
+    paceZones->setScheme(schemePage->getScheme());
+
+    int index = paceZones->addZoneRange(dateEdit->date(), paceZones->kphFromTime(cvEdit, metricPace), paceZones->kphFromTime(aetEdit, metricPace));
 
     // new item
     QTreeWidgetItem *add = new QTreeWidgetItem;
@@ -2876,8 +2906,15 @@ CVPage::addClicked()
 
     // CV
     double kph = paceZones->kphFromTime(cvEdit, metricPace);
-
     add->setText(1, QString("%1 %2 %3 %4")
+            .arg(paceZones->kphToPaceString(kph, true))
+            .arg(paceZones->paceUnits(true))
+            .arg(paceZones->kphToPaceString(kph, false))
+            .arg(paceZones->paceUnits(false)));
+
+    // AeT
+    kph = paceZones->kphFromTime(aetEdit, metricPace);
+    add->setText(2, QString("%1 %2 %3 %4")
             .arg(paceZones->kphToPaceString(kph, true))
             .arg(paceZones->paceUnits(true))
             .arg(paceZones->kphToPaceString(kph, false))
@@ -2888,6 +2925,14 @@ CVPage::addClicked()
 void
 CVPage::editClicked()
 {
+    if( paceZones->kphFromTime(cvEdit, metricPace) <= 0 ) {
+        QMessageBox err;
+        err.setText(tr("Critical Velocity must be > 0"));
+        err.setIcon(QMessageBox::Warning);
+        err.exec();
+        return;
+    }
+
     // get current scheme
     paceZones->setScheme(schemePage->getScheme());
 
@@ -2902,6 +2947,15 @@ CVPage::editClicked()
     double kph = paceZones->kphFromTime(cvEdit, metricPace);
     paceZones->setCV(index, kph);
     edit->setText(1, QString("%1 %2 %3 %4")
+            .arg(paceZones->kphToPaceString(kph, true))
+            .arg(paceZones->paceUnits(true))
+            .arg(paceZones->kphToPaceString(kph, false))
+            .arg(paceZones->paceUnits(false)));
+
+    // AeT
+    kph = paceZones->kphFromTime(aetEdit, metricPace);
+    paceZones->setAeT(index, kph);
+    edit->setText(2, QString("%1 %2 %3 %4")
             .arg(paceZones->kphToPaceString(kph, true))
             .arg(paceZones->paceUnits(true))
             .arg(paceZones->kphToPaceString(kph, false))
@@ -2956,8 +3010,10 @@ CVPage::rangeEdited()
         QDate odate = paceZones->getStartDate(index);
         QTime cv = cvEdit->time();
         QTime ocv = QTime::fromString(paceZones->kphToPaceString(paceZones->getCV(index), metricPace), "mm:ss");
+        QTime aet = aetEdit->time();
+        QTime oaet = QTime::fromString(paceZones->kphToPaceString(paceZones->getAeT(index), metricPace), "mm:ss");
 
-        if (date != odate || cv != ocv)
+        if (date != odate || cv != ocv || aet != oaet)
             updateButton->show();
         else
             updateButton->hide();
@@ -2982,6 +3038,7 @@ CVPage::rangeSelectionChanged()
         PaceZoneRange current = paceZones->getZoneRange(index);
         dateEdit->setDate(paceZones->getStartDate(index));
         cvEdit->setTime(QTime::fromString(paceZones->kphToPaceString(paceZones->getCV(index), metricPace), "mm:ss"));
+        aetEdit->setTime(QTime::fromString(paceZones->kphToPaceString(paceZones->getAeT(index), metricPace), "mm:ss"));
 
         if (current.zonesSetFromCV) {
 
@@ -3012,6 +3069,8 @@ CVPage::rangeSelectionChanged()
             zones->setItemWidget(add, 2, loedit);
             connect(loedit, SIGNAL(editingFinished()), this, SLOT(zonesChanged()));
         }
+        for(int i = 0; i < zones->columnCount(); i++)
+            zones->resizeColumnToContents(i);
     }
 
     active = false;

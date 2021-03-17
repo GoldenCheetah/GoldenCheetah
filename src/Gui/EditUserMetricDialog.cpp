@@ -130,6 +130,7 @@ EditUserMetricDialog::EditUserMetricDialog(QWidget *parent, Context *context, Us
     list << "config(w')";
     list << "config(pmax)";
     list << "config(cv)";
+    list << "config(aetv)";
     list << "config(sex)";
     list << "config(dob)";
     list << "config(height)";

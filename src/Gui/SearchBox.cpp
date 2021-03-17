@@ -163,6 +163,7 @@ SearchBox::configChanged(qint32)
     list << "config(w')";
     list << "config(pmax)";
     list << "config(cv)";
+    list << "config(aetv)";
     list << "config(sex)";
     list << "config(dob)";
     list << "config(height)";
