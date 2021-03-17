@@ -162,7 +162,7 @@ void nostderr(QString file)
 
     // On Windows, stderr is not connected to fd_stderr = 2
     // freopen seems the only function available to redirect stderr
-    qDebug() << "GoldenCheetah: redirecting stderr to file " << file;
+    qDebug() << "GoldenCheetah: redirecting log messages (stderr) to file " << file;
     fp = freopen(file.toLocal8Bit(), "w", stderr);
     if (fp == NULL) {
         qDebug() << "GoldenCheetah: cannot redirect stderr, unable to open file " << file;
@@ -238,11 +238,12 @@ main(int argc, char *argv[])
 #endif
 #ifdef GC_DEBUG
     bool debug = true;
+    QString debugFormat = QString("[%{time h:mm:ss.zzz}] %{type}: %{message} (%{file}:%{line})");
 #else
     bool debug = false;
+    QString debugFormat = QString("[%{time h:mm:ss.zzz}] %{type}: %{message}");
 #endif
     QString debugFile = NULL;
-    QString debugFormat = QString("[%{time h:mm:ss.zzz}] %{type}: %{message} (%{file}:%{line})");
     QString debugRules = QString("*.debug=true;qt.*.debug=false");
 
     bool server = false;
