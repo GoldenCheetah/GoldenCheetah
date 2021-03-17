@@ -158,6 +158,7 @@ SearchBox::configChanged(qint32)
     // add special functions (older code needs fixing !)
     list << "config(cranklength)";
     list << "config(cp)";
+    list << "config(aetp)";
     list << "config(ftp)";
     list << "config(w')";
     list << "config(pmax)";

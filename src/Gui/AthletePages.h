@@ -274,6 +274,7 @@ class CPPage : public QWidget
 
         QDateEdit *dateEdit;
         QDoubleSpinBox *cpEdit;
+        QDoubleSpinBox *aetEdit;
         QDoubleSpinBox *ftpEdit;
         QDoubleSpinBox *wEdit;
         QDoubleSpinBox *pmaxEdit;
