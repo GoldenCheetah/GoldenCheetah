@@ -1544,7 +1544,7 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
             // is the symbol valid?
             QRegExp bestValidSymbols("^(apower|power|hr|cadence|speed|torque|vam|xpower|isopower|wpk)$", Qt::CaseInsensitive);
             QRegExp tizValidSymbols("^(power|hr)$", Qt::CaseInsensitive);
-            QRegExp configValidSymbols("^(cranklength|cp|aetp|ftp|w\\'|pmax|cv|height|weight|lthr|aethr|maxhr|rhr|units|dob|sex)$", Qt::CaseInsensitive);
+            QRegExp configValidSymbols("^(cranklength|cp|aetp|ftp|w\\'|pmax|cv|aetv|height|weight|lthr|aethr|maxhr|rhr|units|dob|sex)$", Qt::CaseInsensitive);
             QRegExp constValidSymbols("^(e|pi)$", Qt::CaseInsensitive); // just do basics for now
             QRegExp dateRangeValidSymbols("^(start|stop)$", Qt::CaseInsensitive); // date range
             QRegExp pmcValidSymbols("^(stress|lts|sts|sb|rr|date)$", Qt::CaseInsensitive);
@@ -3317,6 +3317,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, Result x, long it, RideItem
                                 -1;
 
             double CV = (paceZoneRange != -1) ? m->context->athlete->paceZones(m->isSwim)->getCV(paceZoneRange) : 0.0;
+            double AeTV = (paceZoneRange != -1) ? m->context->athlete->paceZones(m->isSwim)->getAeT(paceZoneRange) : 0.0;
 
             //
             // HEIGHT and WEIGHT
@@ -3354,6 +3355,9 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, Result x, long it, RideItem
             }
             if (symbol == "cv") {
                 return Result(CV);
+            }
+            if (symbol == "aetv") {
+                return Result(AeTV);
             }
             if (symbol == "lthr") {
                 return Result(LTHR);

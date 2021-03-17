@@ -2425,6 +2425,7 @@ OverviewItemConfig::OverviewItemConfig(ChartSpaceItem *item) : QWidget(item->par
         list << "config(w')";
         list << "config(pmax)";
         list << "config(cv)";
+        list << "config(aetv)";
         list << "config(sex)";
         list << "config(dob)";
         list << "config(height)";

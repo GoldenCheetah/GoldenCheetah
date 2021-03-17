@@ -1949,6 +1949,7 @@ PowerHist::setArraysFromRide(RideFile *ride, HistData &standard, const Zones *zo
 
     int paceZoneRange = context->athlete->paceZones(ride->isSwim()) ? context->athlete->paceZones(ride->isSwim())->whichRange(ride->startTime().date()) : -1;
     double CV = (paceZoneRange != -1) ? context->athlete->paceZones(ride->isSwim())->getCV(paceZoneRange) : 0.0;
+    double AeTV = (paceZoneRange != -1) ? context->athlete->paceZones(ride->isSwim())->getAeT(paceZoneRange) : 0.0;
 
     // get it from the wprimeData()->ydata() if we're plotting
     // w'bal, otherwise its from the ride data
@@ -2183,9 +2184,7 @@ PowerHist::setArraysFromRide(RideFile *ride, HistData &standard, const Zones *zo
 
                 if (p1->kph < 0.1 && withz) { // I zero kph
                     standard.paceCPZoneArray[0] ++;
-                } else if (ride->isRun() && p1->kph < (CV * 0.9f)) { // I Run
-                    standard.paceCPZoneArray[0] ++;
-                } else if (ride->isSwim() && p1->kph < (CV * 0.975f)) { // I Swim
+                } else if (p1->kph < AeTV) { // I
                     standard.paceCPZoneArray[0] ++;
                 } else if (p1->kph < CV) { // II
                     standard.paceCPZoneArray[1] ++;
