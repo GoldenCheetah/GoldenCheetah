@@ -1788,6 +1788,13 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
                         rtData.setAltitude(displayAltitude);
                     }
                 }
+                else if (!(status & RT_MODE_ERGO)) {
+                    // For manual slope mode, estimate vertical change based upon time passed and slope.
+                    // Note this isn't exactly right but is very close - we should use the previous slope for the time passed.
+                    double altitudeDeltaMeters = slope * (10 * distanceTick); // ((slope / 100) * distanceTick) * 1000
+                    displayAltitude += altitudeDeltaMeters;
+                    rtData.setAltitude(displayAltitude);
+                }
 
                 // time
                 total_msecs = session_elapsed_msec + session_time.elapsed();
