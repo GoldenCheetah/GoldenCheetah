@@ -69,13 +69,15 @@ RideMapWindow::RideMapWindow(Context *context, int mapType) : GcChartWindow(cont
 
     showMarkersCk = new QCheckBox();
     showFullPlotCk = new QCheckBox();
-    showInt = new QCheckBox();
-    showInt->setChecked(true);
+    showShadedZonesCk = new QCheckBox();
+    showIntCk = new QCheckBox();
+    showIntCk->setChecked(true);
 
     commonLayout->addRow(new QLabel(tr("Map")), mapCombo);
     commonLayout->addRow(new QLabel(tr("Show Markers")), showMarkersCk);
     commonLayout->addRow(new QLabel(tr("Show Full Plot")), showFullPlotCk);
-    commonLayout->addRow(new QLabel(tr("Show Intervals Overlay")), showInt);
+    commonLayout->addRow(new QLabel(tr("Show Shaded Zones")), showShadedZonesCk);
+    commonLayout->addRow(new QLabel(tr("Show Intervals Overlay")), showIntCk);
     commonLayout->addRow(new QLabel(""));
 
     osmTSTitle = new QLabel(tr("Open Street Map - Custom Tile Server settings"));
@@ -107,8 +109,9 @@ RideMapWindow::RideMapWindow(Context *context, int mapType) : GcChartWindow(cont
 
     connect(mapCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(mapTypeSelected(int)));
     connect(showMarkersCk, SIGNAL(stateChanged(int)), this, SLOT(showMarkersChanged(int)));
-    connect(showInt, SIGNAL(stateChanged(int)), this, SLOT(showIntervalsChanged(int)));
+    connect(showIntCk, SIGNAL(stateChanged(int)), this, SLOT(showIntervalsChanged(int)));
     connect(showFullPlotCk, SIGNAL(stateChanged(int)), this, SLOT(showFullPlotChanged(int)));
+    connect(showShadedZonesCk, SIGNAL(stateChanged(int)), this, SLOT(showShadedZonesChanged(int)));
     connect(osmTSUrl, SIGNAL(editingFinished()), this, SLOT(osmCustomTSURLEditingFinished()));
     connect(tileCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(tileTypeSelected(int)));
 
@@ -251,6 +254,13 @@ void
 RideMapWindow::showFullPlotChanged(int value)
 {
     smallPlot->setVisible(value != 0);
+}
+
+void
+RideMapWindow::showShadedZonesChanged(int value)
+{
+    Q_UNUSED(value);
+    forceReplot();
 }
 
 
@@ -450,7 +460,7 @@ void RideMapWindow::createHtml()
             "        stroke : true,\n"
             "        color: '%1',\n"
             "        opacity: %2,\n"
-            "        weight: 10,\n"
+            "        weight: %3,\n"
             "        zIndex: -2\n"
             "    };\n"
 
@@ -470,8 +480,9 @@ void RideMapWindow::createHtml()
             "routeYellow.on('mouseover', function(event) { webBridge.hoverPath(event.latlng.lat, event.latlng.lng); });\n"
             "routeYellow.on('mousemove', function(event) { webBridge.hoverPath(event.latlng.lat, event.latlng.lng); });\n"
 
-            "}\n").arg(styleoptions == "" ? "#FFFF00" : GColor(CPLOTMARKER).name())
-            .arg(styleoptions == "" ? 0.4 : 1.0);
+            "}\n").arg(showShadedZones() ? "#00000" : "#FFFF00")   // If shaded Zones are drawn then we don't need to draw this route, otherwise the opacity causes issues
+                  .arg(showShadedZones() ? 0.0 : 0.4)
+                  .arg(showShadedZones() ? 0 : 10);
     }
     else if (mapCombo->currentIndex() == GOOGLE) {
 
@@ -484,7 +495,7 @@ void RideMapWindow::createHtml()
            "    var routeOptionsYellow = {\n"
            "        strokeColor: '%1',\n"
            "        strokeOpacity: %2,\n"
-           "        strokeWeight: 10,\n"
+           "        strokeWeight: %3,\n"
            "        zIndex: -2\n"
            "    };\n"
 
@@ -505,8 +516,9 @@ void RideMapWindow::createHtml()
            "    google.maps.event.addListener(routeYellow, 'mouseup',   function(event) { map.setOptions({draggable: true, zoomControl: true, scrollwheel: true, disableDoubleClickZoom: false}); webBridge.mouseup(); });\n"
            "    google.maps.event.addListener(routeYellow, 'mouseover', function(event) { webBridge.hoverPath(event.latLng.lat(), event.latLng.lng()); });\n"
 
-           "}\n").arg(styleoptions == "" ? "#FFFF00" : GColor(CPLOTMARKER).name())
-           .arg(styleoptions == "" ? 0.4f : 1.0f);
+           "}\n").arg(showShadedZones() ? "#00000" : "#FFFF00")   // If shaded Zones are drawn then we don't need to draw this route, otherwise the opacity causes issues
+                 .arg(showShadedZones() ? 0.0 : 0.4f)
+                 .arg(showShadedZones() ? 0 : 10);
     }
 
     currentPage += QString("function drawIntervals() { \n"
@@ -652,12 +664,12 @@ void RideMapWindow::createHtml()
         "      style: google.maps.MapTypeControlStyle.DEFAULT\n"
         "    };\n");
 
-    } else {
+        } else {
 
-    // USER DEFINED STYLE OPTIONS
-    currentPage += QString(""
-        "var styledMapType = new google.maps.StyledMapType( %1 "
-        " , {name: 'Styled Map'} );\n" ).arg(styleoptions);
+            // USER DEFINED STYLE OPTIONS
+            currentPage += QString(""
+                "var styledMapType = new google.maps.StyledMapType( %1 "
+                " , {name: 'Styled Map'} );\n" ).arg(styleoptions);
         }
 
         currentPage += QString(
@@ -742,12 +754,13 @@ QColor RideMapWindow::GetColor(int watts)
 void
 RideMapWindow::drawShadedRoute()
 {
-    int intervalTime = 60;  // 60 seconds
+    int intervalTime = 60;
     double rtime=0; // running total for accumulated data
-    int count = 0;  // how many samples processed
-    int rwatts = 0; // running total of watts
     double prevtime = 0; // time for previous point
     double endRideItemtime = myRideItem->ride()->dataPoints().last()->secs;
+    int count=0;  // how many samples processed
+    int rwatts=0; // running total of watts
+
 
     QString code;
 
@@ -1226,7 +1239,7 @@ MapWebBridge::drawOverlays()
     mw->createMarkers();
 
     // overlay a shaded route
-    if (mw->getStyleOptions() == "") mw->drawShadedRoute();
+    mw->drawShadedRoute();
 
     // Get the latest new selection lap number.
     RideItem *rideItem = mw->property("ride").value<RideItem*>();
