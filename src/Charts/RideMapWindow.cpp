@@ -470,8 +470,8 @@ void RideMapWindow::createHtml()
             "routeYellow.on('mouseover', function(event) { webBridge.hoverPath(event.latlng.lat, event.latlng.lng); });\n"
             "routeYellow.on('mousemove', function(event) { webBridge.hoverPath(event.latlng.lat, event.latlng.lng); });\n"
 
-            "}\n").arg(styleoptions == "" ? "#FFFF00" : GColor(CPLOTMARKER).name())
-                  .arg(styleoptions == "" ? 0.4 : 1.0);
+            "}\n").arg("#FFFF00")
+                  .arg(0.4);
     }
     else if (mapCombo->currentIndex() == GOOGLE) {
 
@@ -505,8 +505,8 @@ void RideMapWindow::createHtml()
            "    google.maps.event.addListener(routeYellow, 'mouseup',   function(event) { map.setOptions({draggable: true, zoomControl: true, scrollwheel: true, disableDoubleClickZoom: false}); webBridge.mouseup(); });\n"
            "    google.maps.event.addListener(routeYellow, 'mouseover', function(event) { webBridge.hoverPath(event.latLng.lat(), event.latLng.lng()); });\n"
 
-           "}\n").arg(styleoptions == "" ? "#FFFF00" : GColor(CPLOTMARKER).name())
-                 .arg(styleoptions == "" ? 0.4f : 1.0f);
+           "}\n").arg("#FFFF00")
+                 .arg(0.4f);
     }
 
     currentPage += QString("function drawIntervals() { \n"
@@ -640,25 +640,15 @@ void RideMapWindow::createHtml()
             // initialise function called when map loaded
             "function initialize() {\n");
 
-        if (styleoptions == "") {
-
-            // TERRAIN style map please and make it draggable
-            // note that because QT webkit offers touch/gesture
-            // support the Google API only supports dragging
-            // via gestures - this is alrady registered as a bug
-            // with the google map team
-            currentPage += QString(""
-            "    var controlOptions = {\n"
-            "      style: google.maps.MapTypeControlStyle.DEFAULT\n"
-            "    };\n");
-
-        } else {
-
-            // USER DEFINED STYLE OPTIONS
-            currentPage += QString(""
-            "var styledMapType = new google.maps.StyledMapType( %1 "
-            " , {name: 'Styled Map'} );\n" ).arg(styleoptions);
-        }
+        // TERRAIN style map please and make it draggable
+        // note that because QT webkit offers touch/gesture
+        // support the Google API only supports dragging
+        // via gestures - this is alrady registered as a bug
+        // with the google map team
+        currentPage += QString(""
+        "    var controlOptions = {\n"
+        "      style: google.maps.MapTypeControlStyle.DEFAULT\n"
+        "    };\n");
 
         currentPage += QString(
             "    var myOptions = {\n"
@@ -668,8 +658,8 @@ void RideMapWindow::createHtml()
             "      disableDefaultUI: %2,\n"
             "      tilt: 45,\n"
             "      streetViewControl: false,\n"
-            "    };\n").arg(styleoptions != "" ? "'styled_map'" : "google.maps.MapTypeId.TERRAIN")
-                       .arg(styleoptions != "" ? "true" : "false");
+            "    };\n").arg("google.maps.MapTypeId.TERRAIN")
+                       .arg("false");
 
 
 
@@ -684,12 +674,6 @@ void RideMapWindow::createHtml()
                 arg(maxLat,0,'g',GPS_COORD_TO_STRING).
                 arg(maxLon,0,'g',GPS_COORD_TO_STRING);
 
-
-        if (styleoptions != "") {
-            currentPage += QString(""
-            "   map.mapTypes.set('styled_map', styledMapType);\n"
-            "   map.setMapTypeId('styled_map');\n");
-        }
 
         currentPage += QString(""
             // add the bike layer, useful in some areas, but coverage
@@ -747,6 +731,7 @@ RideMapWindow::drawShadedRoute()
     int count=0;  // how many samples ?
     int rwatts=0; // running total of watts
     double prevtime=0; // time for previous point
+
 
     QString code;
 
@@ -812,8 +797,8 @@ RideMapWindow::drawShadedRoute()
                                 "polyline.on('mouseup',   function(event) { map.dragging.enable();L.DomEvent.stopPropagation(event);webBridge.mouseup(); });\n" // setOptions ?
                                 "polyline.on('mouseover', function(event) { webBridge.hoverPath(event.latlng.lat, event.latlng.lng); });\n"
                                 "path = polyline.getLatLngs();\n"
-                                "}\n").arg(styleoptions == "" ? color.name() : GColor(CPLOTMARKER).name())
-                                .arg(styleoptions == "" ? 0.5 : 1.0);
+                                "}\n").arg(color.name())
+                                      .arg(0.5);
             } else if (mapCombo->currentIndex() == GOOGLE) {
                 // color the polyline
                 code += QString("var polyOptions = {\n"
@@ -823,15 +808,14 @@ RideMapWindow::drawShadedRoute()
                                 "    zIndex: 0,\n"
                                 "}\n"
                                 "polyline.setOptions(polyOptions);\n"
-                                "}\n").arg(styleoptions == "" ? color.name() : GColor(CPLOTMARKER).name())
-                                      .arg(styleoptions == "" ? 0.5f : 1.0f);
+                                "}\n").arg(color.name())
+                                      .arg(0.5f);
 
             }
             view->page()->runJavaScript(code);
         }
     }
-
-}
+    }
 
 void
 RideMapWindow::clearTempInterval() {
@@ -1225,7 +1209,7 @@ MapWebBridge::drawOverlays()
     mw->createMarkers();
 
     // overlay a shaded route
-    if (mw->getStyleOptions() == "") mw->drawShadedRoute();
+    mw->drawShadedRoute();
 
     // Get the latest new selection lap number.
     RideItem *rideItem = mw->property("ride").value<RideItem*>();

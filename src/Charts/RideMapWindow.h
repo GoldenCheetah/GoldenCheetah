@@ -111,7 +111,6 @@ class RideMapWindow : public GcChartWindow
     Q_PROPERTY(bool showintervals READ showIntervals WRITE setShowIntervals USER true)
     Q_PROPERTY(int osmts READ osmTS WRITE setOsmTS USER true)
     Q_PROPERTY(QString googleKey READ googleKey WRITE setGoogleKey USER true)
-    Q_PROPERTY(QString styleoptions READ getStyleOptions WRITE setStyleOptions  USER false)
 
     public:
         typedef enum {
@@ -143,9 +142,6 @@ class RideMapWindow : public GcChartWindow
             setTileServerUrlForTileType(x);
         }
 
-        QString getStyleOptions() const { return styleoptions; }
-        void setStyleOptions(QString x) { styleoptions=x; }
-
         QString googleKey() const { return gkey->text(); }
         void setGoogleKey(QString x) { gkey->setText(x); }
 
@@ -172,7 +168,6 @@ class RideMapWindow : public GcChartWindow
     private:
 
         bool first;
-        QString styleoptions;
 
         QComboBox *mapCombo, *tileCombo;
         QCheckBox *showMarkersCk, *showFullPlotCk, *showInt;
