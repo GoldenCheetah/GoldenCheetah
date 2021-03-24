@@ -64,7 +64,7 @@ MetricSelect::MetricSelect(QWidget *parent, Context *context, int scope)
 void
 MetricSelect::setSymbol(QString symbol)
 {
-    if (scope&Metric == 0) return;
+    if ((scope & MetricSelect::Metric) == 0) return;
 
     // get the ridemetric
     RideMetricFactory &factory = RideMetricFactory::instance();
