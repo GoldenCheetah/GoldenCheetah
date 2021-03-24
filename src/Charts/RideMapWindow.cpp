@@ -746,7 +746,7 @@ void RideMapWindow::createHtml()
 
 QColor RideMapWindow::GetColor(int watts)
 {
-    if (range < 0) return Qt::red;
+    if (range < 0 || !showShadedZones()) return Qt::red;
     else return zoneColor(context->athlete->zones(myRideItem ? myRideItem->isRun : false)->whichZone(range, watts), 7);
 }
 
