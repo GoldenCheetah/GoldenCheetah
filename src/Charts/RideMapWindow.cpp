@@ -654,22 +654,22 @@ void RideMapWindow::createHtml()
 
         if (styleoptions == "") {
 
-        // TERRAIN style map please and make it draggable
-        // note that because QT webkit offers touch/gesture
-        // support the Google API only supports dragging
-        // via gestures - this is alrady registered as a bug
-        // with the google map team
-        currentPage += QString(""
-        "    var controlOptions = {\n"
-        "      style: google.maps.MapTypeControlStyle.DEFAULT\n"
-        "    };\n");
+            // TERRAIN style map please and make it draggable
+            // note that because QT webkit offers touch/gesture
+            // support the Google API only supports dragging
+            // via gestures - this is alrady registered as a bug
+            // with the google map team
+            currentPage += QString(""
+            "    var controlOptions = {\n"
+            "      style: google.maps.MapTypeControlStyle.DEFAULT\n"
+            "    };\n");
 
         } else {
 
             // USER DEFINED STYLE OPTIONS
             currentPage += QString(""
-                "var styledMapType = new google.maps.StyledMapType( %1 "
-                " , {name: 'Styled Map'} );\n" ).arg(styleoptions);
+            "var styledMapType = new google.maps.StyledMapType( %1 "
+            " , {name: 'Styled Map'} );\n" ).arg(styleoptions);
         }
 
         currentPage += QString(
@@ -681,7 +681,7 @@ void RideMapWindow::createHtml()
             "      tilt: 45,\n"
             "      streetViewControl: false,\n"
             "    };\n").arg(styleoptions != "" ? "'styled_map'" : "google.maps.MapTypeId.TERRAIN")
-            .arg(styleoptions != "" ? "true" : "false");
+                       .arg(styleoptions != "" ? "true" : "false");
 
 
 
@@ -699,8 +699,8 @@ void RideMapWindow::createHtml()
 
         if (styleoptions != "") {
             currentPage += QString(""
-                "   map.mapTypes.set('styled_map', styledMapType);\n"
-                "   map.setMapTypeId('styled_map');\n");
+            "   map.mapTypes.set('styled_map', styledMapType);\n"
+            "   map.setMapTypeId('styled_map');\n");
         }
 
         currentPage += QString(""
@@ -826,8 +826,8 @@ RideMapWindow::drawShadedRoute()
                                 "polyline.on('mouseup',   function(event) { map.dragging.enable();L.DomEvent.stopPropagation(event);webBridge.mouseup(); });\n" // setOptions ?
                                 "polyline.on('mouseover', function(event) { webBridge.hoverPath(event.latlng.lat, event.latlng.lng); });\n"
                                 "path = polyline.getLatLngs();\n"
-                    "}\n").arg(styleoptions == "" ? color.name() : GColor(CPLOTMARKER).name())
-                    .arg(styleoptions == "" ? 0.5 : 1.0);
+                                "}\n").arg(styleoptions == "" ? color.name() : GColor(CPLOTMARKER).name())
+                                .arg(styleoptions == "" ? 0.5 : 1.0);
             } else if (mapCombo->currentIndex() == GOOGLE) {
                 // color the polyline
                 code += QString("var polyOptions = {\n"
@@ -837,15 +837,15 @@ RideMapWindow::drawShadedRoute()
                                 "    zIndex: 0,\n"
                                 "}\n"
                                 "polyline.setOptions(polyOptions);\n"
-                    "}\n").arg(styleoptions == "" ? color.name() : GColor(CPLOTMARKER).name())
-                    .arg(styleoptions == "" ? 0.5f : 1.0f);
+                                "}\n").arg(styleoptions == "" ? color.name() : GColor(CPLOTMARKER).name())
+                                      .arg(styleoptions == "" ? 0.5f : 1.0f);
 
             }
             view->page()->runJavaScript(code);
         }
     }
 
-    }
+}
 
 void
 RideMapWindow::clearTempInterval() {
