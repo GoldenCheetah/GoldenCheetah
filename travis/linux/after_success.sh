@@ -33,21 +33,17 @@ EOF
 # Icon
 cp Resources/images/gc.png appdir/
 
-### Add OpenSSL 1.1 libs (to make it easier for Xenial users)
-mkdir appdir/lib
-cp /usr/local/lib/libssl.so.1.1 appdir/lib
-cp /usr/local/lib/libcrypto.so.1.1 appdir/lib
-
 ### Add vlc 3
+mkdir appdir/lib
 cp -r /usr/lib/x86_64-linux-gnu/vlc appdir/lib/vlc
 sudo appdir/lib/vlc/vlc-cache-gen appdir/lib/vlc/plugins
 
 ### Download current version of linuxdeployqt
-wget --no-verbose -c https://github.com/probonopd/linuxdeployqt/releases/download/6/linuxdeployqt-6-x86_64.AppImage
-chmod a+x linuxdeployqt-6-x86_64.AppImage
+wget --no-verbose -c https://github.com/probonopd/linuxdeployqt/releases/download/7/linuxdeployqt-7-x86_64.AppImage
+chmod a+x linuxdeployqt-7-x86_64.AppImage
 
 ### Deploy to appdir
-./linuxdeployqt-6-x86_64.AppImage appdir/GoldenCheetah -verbose=2 -bundle-non-qt-libs -exclude-libs=libqsqlmysql,libqsqlpsql,libnss3,libnssutil3,libxcb-dri3.so.0
+./linuxdeployqt-7-x86_64.AppImage appdir/GoldenCheetah -verbose=2 -bundle-non-qt-libs -exclude-libs=libqsqlmysql,libqsqlpsql,libnss3,libnssutil3,libxcb-dri3.so.0 -unsupported-allow-new-glibc
 
 # Add Python and core modules
 wget https://github.com/niess/python-appimage/releases/download/python3.7/python3.7.9-cp37-cp37m-manylinux1_x86_64.AppImage
@@ -67,7 +63,7 @@ chmod a+x appimagetool-x86_64.AppImage
 ./appimagetool-x86_64.AppImage appdir
 
 ### Cleanup
-rm linuxdeployqt-6-x86_64.AppImage
+rm linuxdeployqt-7-x86_64.AppImage
 rm appimagetool-x86_64.AppImage
 rm -rf appdir
 

@@ -41,7 +41,7 @@ jobs:
     osx_image: xcode11.3
     compiler: clang
   - os: linux
-    dist: xenial
+    dist: bionic
     compiler: gcc
 
 before_install:
