@@ -2,26 +2,16 @@
 set -ev
 
 # Add recent Qt dependency ppa, update on a newer qt version.
-sudo add-apt-repository -y ppa:beineri/opt-qt-5.14.2-xenial
+sudo add-apt-repository -y ppa:beineri/opt-qt-5.14.2-bionic
 sudo apt-get update -qq
 sudo apt-get install -qq qt5-default qt514base qt514tools qt514serialport\
  qt514svg qt514multimedia qt514connectivity qt514webengine qt514charts-no-lgpl\
  qt514networkauth-no-lgpl qt514translations
 
-sudo apt-get install -qq libglu1-mesa-dev libgstreamer0.10-0 libgstreamer-plugins-base0.10-0
-sudo apt-get install -y --allow-downgrades libpulse0=1:8.0-0ubuntu3
-sudo apt-get install -qq libssl-dev libsamplerate0-dev libpulse-dev
-sudo apt-get install -qq libical-dev libkml-dev libboost-all-dev
-
-# Add OpenSSL 1.1.1 (required by Qt 5.14)
-wget https://www.openssl.org/source/openssl-1.1.1d.tar.gz
-tar xf openssl-1.1.1d.tar.gz
-cd openssl-1.1.1d
-./Configure shared --prefix=/usr --openssldir=/usr/lib/ssl --libdir=lib no-idea no-mdc2 no-rc5 no-zlib no-ssl3 enable-ec_nistp_64_gcc_128 linux-x86_64
-make -j4
-sudo cp libssl.so.1.1 libcrypto.so.1.1 /usr/local/lib/
-sudo ldconfig
-cd ..
+sudo apt-get install -qq libglu1-mesa-dev
+sudo apt-get install -qq libsamplerate0-dev
+sudo apt-get install -qq libkml-dev
+sudo apt-get install -qq libical-dev
 
 # Add VLC 3
 sudo add-apt-repository -y ppa:jonathonf/vlc-3
@@ -29,9 +19,9 @@ sudo add-apt-repository -y ppa:jonathonf/ffmpeg-4
 sudo apt-get update -qq
 sudo apt-get install -y vlc libvlc-dev libvlccore-dev
 
-# R 3.6
+# R 4.0
 sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E298A3A825C0D65DFD57CBB651716619E084DAB9
-sudo add-apt-repository -y "deb https://cloud.r-project.org/bin/linux/ubuntu xenial-cran35/"
+sudo add-apt-repository -y "deb https://cloud.r-project.org/bin/linux/ubuntu bionic-cran40/"
 sudo apt-get update -qq
 sudo apt-get install r-base-dev
 R --version
