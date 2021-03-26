@@ -640,15 +640,15 @@ void RideMapWindow::createHtml()
             // initialise function called when map loaded
             "function initialize() {\n");
 
-        // TERRAIN style map please and make it draggable
-        // note that because QT webkit offers touch/gesture
-        // support the Google API only supports dragging
-        // via gestures - this is alrady registered as a bug
-        // with the google map team
-        currentPage += QString(""
-        "    var controlOptions = {\n"
-        "      style: google.maps.MapTypeControlStyle.DEFAULT\n"
-        "    };\n");
+            // TERRAIN style map please and make it draggable
+            // note that because QT webkit offers touch/gesture
+            // support the Google API only supports dragging
+            // via gestures - this is alrady registered as a bug
+            // with the google map team
+            currentPage += QString(""
+            "    var controlOptions = {\n"
+            "      style: google.maps.MapTypeControlStyle.DEFAULT\n"
+            "    };\n");
 
         currentPage += QString(
             "    var myOptions = {\n"
@@ -732,7 +732,6 @@ RideMapWindow::drawShadedRoute()
     int rwatts=0; // running total of watts
     double prevtime=0; // time for previous point
 
-
     QString code;
 
     foreach(RideFilePoint *rfp, myRideItem->ride()->dataPoints()) {
@@ -815,7 +814,8 @@ RideMapWindow::drawShadedRoute()
             view->page()->runJavaScript(code);
         }
     }
-    }
+
+}
 
 void
 RideMapWindow::clearTempInterval() {
