@@ -32,10 +32,13 @@ class FixSpikesConfig : public DataProcessorConfig
 
     friend class ::FixSpikes;
     protected:
-        QHBoxLayout*layout;
-        QLabel *maxLabel, *varianceLabel, *avgWindowLabel;
-        QDoubleSpinBox *max, *variance, *avgWindow;
-        QCheckBox * dropOuts;
+        QHBoxLayout *layout;
+        QLabel *maxLabel, *varianceLabel;
+        QDoubleSpinBox *max,
+                       *variance;
+        QLabel* avgWindowLabel;
+        QDoubleSpinBox *avgWindow;
+        QCheckBox *dropOuts;
 
     public:
         FixSpikesConfig(QWidget *parent) : DataProcessorConfig(parent) {
@@ -53,14 +56,14 @@ class FixSpikesConfig : public DataProcessorConfig
             avgWindowLabel = new QLabel(tr("Avg Window (secs)"));
 
             max = new QDoubleSpinBox();
-            max->setMaximum(9995);
+            max->setMaximum(9999.99);
             max->setMinimum(0);
-            max->setSingleStep(5);
+            max->setSingleStep(1);
 
             variance = new QDoubleSpinBox();
-            variance->setMaximum(9995);
+            variance->setMaximum(9999);
             variance->setMinimum(0);
-            variance->setSingleStep(5);
+            variance->setSingleStep(10);
 
             avgWindow = new QDoubleSpinBox();
             avgWindow->setMaximum(61);
@@ -100,9 +103,12 @@ class FixSpikesConfig : public DataProcessorConfig
                 "absolute value that have been identified as being "
                 "anomalies (i.e. at odds with the data surrounding it)\n\n"
                 "Watt Variance - data values that differ by more "
-                "than this variance wattage from the 30 second "
-                "rolling average preceding the spike will be "
-                "considered anomalous/spikes.\n\n")));
+                "than this variance wattage from the rolling average "
+                "preceding the spike will be considered anomalous/spikes.\n\n"
+                "Avg Window - defines the duration of the rolling average window (default 30sec).\n\n"
+                "Fix Dropouts - data values that differ by less "
+                "than the variance wattage from the rolling average "
+                "preceding the spike will be considered anomalous/dropouts.\n\n")));
         }
 
         void readConfig() {
