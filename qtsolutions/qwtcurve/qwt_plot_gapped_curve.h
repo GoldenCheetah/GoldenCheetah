@@ -29,6 +29,9 @@ public:
     virtual void drawSeries(QPainter *painter, const QwtScaleMap &xMap,
                                                 const QwtScaleMap &yMap, const QRectF &canvRect, int from, int to) const;
 
+    virtual void drawLines(QPainter *p, const QwtScaleMap &xMap, const QwtScaleMap &yMap,
+                           const QRectF &canvasRect, int from, int to ) const;
+
     void setNAValue(double x) { naValue_=x; }
 
 private:
