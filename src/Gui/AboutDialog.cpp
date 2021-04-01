@@ -52,6 +52,7 @@ AboutPage::AboutPage(Context *context) : context(context)
     QLabel *text;
     text=new QLabel(this);
     text->setContentsMargins(0,0,0,0);
+    text->setOpenExternalLinks(true);
     text->setText(
               tr(
                 "<center>"
