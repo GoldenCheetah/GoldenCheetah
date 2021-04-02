@@ -1791,6 +1791,8 @@ WorkoutWidget::qwkcode()
     //    5x30s@450r30s    - 5 times 30seconds at 450w followed by 30s at 'recovery'
     //    20m@100-400       - 20 minutes going from 100w to 400w
     //
+    //    NOTE: only integer watts are supported, floating point numbers are
+    //    rounded when qwkcode is generated.
     //
     //    XXX COME AND FIX THIS EXAMPLE XXX
     //    A complete workout example;
@@ -1805,7 +1807,7 @@ WorkoutWidget::qwkcode()
     // just loop through for now doing xx@yy and optionally add rxx
     if (points_.count() == 1) {
         // just a single point?
-        codeStrings << QString("%1@%2").arg(qduration(points_[0]->x)).arg(points_[0]->y);
+        codeStrings << QString("%1@%2").arg(qduration(points_[0]->x)).arg(round(points_[0]->y));
         codePoints<<0;
     }
 
@@ -1841,7 +1843,7 @@ WorkoutWidget::qwkcode()
             if (i==0 || points_[i]->x - points_[i-1]->x <= 0) {
 
                 // its a block
-                section = QString("0@%1-%2").arg(points_[i]->y).arg(points_[i+1]->y);
+                section = QString("0@%1-%2").arg(round(points_[i]->y)).arg(round(points_[i+1]->y));
                 ap = points_[i]->y;
 
             } else {
@@ -1855,14 +1857,14 @@ WorkoutWidget::qwkcode()
         if (doubles_equal(points_[i+1]->y, points_[i]->y)) {
 
             // its a block
-            section = QString("%1@%2").arg(qduration(duration)).arg(points_[i]->y);
+            section = QString("%1@%2").arg(qduration(duration)).arg(round(points_[i]->y));
             ap = points_[i]->y;
 
         } else {
             // its a rise
             section = QString("%1@%2-%3").arg(qduration(duration))
-                                         .arg(points_[i]->y)
-                                         .arg(points_[i+1]->y);
+                                         .arg(round(points_[i]->y))
+                                         .arg(round(points_[i+1]->y));
             ap = ((points_[i]->y + points_[i+1]->y) / 2);
         }
 
@@ -1910,6 +1912,7 @@ WorkoutWidget::qwkcode()
                 break; // stop when end of matches
         }
 
+        /* Text cues are not supported on qwkcode yet
         foreach (const ErgFileText cue, texts_) {
             int secs = i > 0 ? points_[sectionp[i-1]]->x : 0;
             int offset = cue.x/1000 - secs;
@@ -1920,6 +1923,7 @@ WorkoutWidget::qwkcode()
                 codePoints << sectionp[i];
             }
         }
+        */
 
         // multiple or no ..
         if (count > 1) {
