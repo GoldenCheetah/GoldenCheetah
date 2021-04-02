@@ -440,9 +440,7 @@ void RideMapWindow::createHtml()
     "\n");
 
     if (mapCombo->currentIndex() == OSM) {
-        // when we have style options we draw the route in cplotmarker colors
-        // and no opacity since its just a stylised map used for dashboards or
-        // small thumbnails.
+
         currentPage += QString("function drawRouteForLatLons(latlons) {\n"
 
 
@@ -476,9 +474,6 @@ void RideMapWindow::createHtml()
     }
     else if (mapCombo->currentIndex() == GOOGLE) {
 
-       // when we have style options we draw the route in cplotmarker colors
-       // and no opacity since its just a stylised map used for dashboards or
-       // small thumbnails.
        currentPage += QString("function drawRouteForLatLons(latlons) {\n"
 
            // route will be drawn with these options
