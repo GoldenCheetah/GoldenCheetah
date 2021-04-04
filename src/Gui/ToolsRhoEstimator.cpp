@@ -52,10 +52,10 @@ ToolsRhoEstimator::ToolsRhoEstimator(Context *context, QWidget *parent) : QDialo
   // forcing them to change their preference in the preferences menu.)
   QHBoxLayout *rads = new QHBoxLayout;
   metBut = new QRadioButton(tr("Metric"));
-  metBut->setChecked(context->athlete->useMetricUnits);
+  metBut->setChecked(GlobalContext::context()->useMetricUnits);
   rads->addWidget(metBut);
   impBut = new QRadioButton(tr("Imperial"));
-  impBut->setChecked(!context->athlete->useMetricUnits);
+  impBut->setChecked(!GlobalContext::context()->useMetricUnits);
   // note that we only need to connect one of the radio button
   // signals, since changing one also changes the other.
   connect(impBut, SIGNAL(toggled(bool)),
@@ -68,7 +68,7 @@ ToolsRhoEstimator::ToolsRhoEstimator(Context *context, QWidget *parent) : QDialo
   tempSpinBox = new QDoubleSpinBox(this);
   tempSpinBox->setDecimals(2);
   tempSpinBox->setRange(-200, 200);
-  if (context->athlete->useMetricUnits) {
+  if (GlobalContext::context()->useMetricUnits) {
     tempLabel = new QLabel(tr("Temperature (C):"));
     thl->addWidget(tempLabel);
     tempSpinBox->setValue(15);
@@ -89,7 +89,7 @@ ToolsRhoEstimator::ToolsRhoEstimator(Context *context, QWidget *parent) : QDialo
   pressSpinBox = new QDoubleSpinBox(this);
   pressSpinBox->setDecimals(2);
   pressSpinBox->setRange(0, 2000);
-  if (context->athlete->useMetricUnits) {
+  if (GlobalContext::context()->useMetricUnits) {
     pressLabel = new QLabel(tr("Air Pressure (hPa):"));
     phl->addWidget(pressLabel);
     pressSpinBox->setValue(1018);
@@ -110,7 +110,7 @@ ToolsRhoEstimator::ToolsRhoEstimator(Context *context, QWidget *parent) : QDialo
   dewpSpinBox = new QDoubleSpinBox(this);
   dewpSpinBox->setDecimals(2);
   dewpSpinBox->setRange(-200, 200);
-  if (context->athlete->useMetricUnits) {
+  if (GlobalContext::context()->useMetricUnits) {
     dewpLabel = new QLabel(tr("Dewpoint (C):"));
     dhl->addWidget(dewpLabel);
     dewpSpinBox->setValue(7.5);

@@ -44,10 +44,7 @@ public:
     const int kDefaultLoad = 100;
     const int kQueryIntervalMS = 1000;
 
-    Daum(QObject *parent = 0, QString device = "", QString profile = "");
-    virtual ~Daum();
-
-    QObject *parent;
+    Daum(QObject *parent, QString device, QString profile);
 
     int start();
     int restart();
@@ -69,17 +66,19 @@ private:
     bool openPort(QString dev);
     bool closePort();
     void initializeConnection();
+    bool configureForCockpitType(int cockpitType);
+    bool configureFromProfile();
 
-    virtual bool ResetDevice();
-    virtual bool StartProgram(unsigned int prog);
-    virtual bool StopProgram(unsigned int prog);
-    virtual int GetAddress();
-    virtual int CheckCockpit();
-    virtual int GetDeviceVersion();
-    virtual bool SetProgram(unsigned int prog);
-    virtual bool SetDate();
-    virtual bool SetTime();
-    virtual void PlaySound();
+    bool ResetDevice();
+    bool StartProgram(unsigned int prog);
+    bool StopProgram(unsigned int prog);
+    int GetAddress();
+    int CheckCockpit();
+    int GetDeviceVersion();
+    bool SetProgram(unsigned int prog);
+    bool SetDate();
+    bool SetTime();
+    void PlaySound();
 
     QByteArray WriteDataAndGetAnswer(QByteArray const& dat, int response_bytes);
     char MapLoadToByte(unsigned int load) const;
@@ -95,6 +94,8 @@ private:
 
     char deviceAddress_;
     unsigned int maxDeviceLoad_;
+    unsigned int serialWriteDelay_;
+    bool playSound_;
 
     // state
     bool paused_;
@@ -108,6 +109,19 @@ private:
     // outbound
     volatile int load_, loadToWrite_;
     const bool forceUpdate_;
+    const QString profile_;
+
+    enum CockpitType {
+        COCKPIT_CARDIO = 0x10,
+        COCKPIT_FITNESS = 0x20,
+        COCKPIT_8008_TRS = 0x2a,
+        COCKPIT_VITA_DE_LUXE = 0x30,
+        COCKPIT_8008 = 0x40,
+        COCKPIT_8080 = 0x50,
+        COCKPIT_UNKNOWN = 0x55,
+        COCKPIT_THERAPIE = 0x60,
+        COCKPIT_8008_TRS_PRO = 0x64
+    };
 
 private slots:
     void requestRealtimeData();

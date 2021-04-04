@@ -563,7 +563,7 @@ public:
 
     void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &)
     {
-        setValue(item->getHrvMeasure(HrvMeasure::HR));
+        setValue(item->getHrvMeasure("HR"));
         setCount(0);
     }
 
@@ -599,7 +599,7 @@ public:
 
     void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &)
     {
-        setValue(item->getHrvMeasure(HrvMeasure::AVNN));
+        setValue(item->getHrvMeasure("AVNN"));
         setCount(0);
     }
 
@@ -636,7 +636,7 @@ public:
 
     void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &)
     {
-        setValue(item->getHrvMeasure(HrvMeasure::SDNN));
+        setValue(item->getHrvMeasure("SDNN"));
         setCount(0);
     }
 
@@ -673,7 +673,7 @@ public:
 
     void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &)
     {
-        setValue(item->getHrvMeasure(HrvMeasure::RMSSD));
+        setValue(item->getHrvMeasure("RMSSD"));
         setCount(0);
     }
 
@@ -710,7 +710,7 @@ public:
 
     void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &)
     {
-        setValue(item->getHrvMeasure(HrvMeasure::PNN50));
+        setValue(item->getHrvMeasure("PNN50"));
         setCount(0);
     }
 
@@ -748,7 +748,7 @@ public:
 
     void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &)
     {
-        setValue(item->getHrvMeasure(HrvMeasure::LF));
+        setValue(item->getHrvMeasure("LF"));
         setCount(0);
     }
 
@@ -786,7 +786,7 @@ public:
 
     void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &)
     {
-        setValue(item->getHrvMeasure(HrvMeasure::HF));
+        setValue(item->getHrvMeasure("HF"));
         setCount(0);
     }
 
@@ -824,10 +824,10 @@ public:
 
     void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &)
     {
-        if (item->getHrvMeasure(HrvMeasure::RECOVERY_POINTS) > 0)
-            setValue(item->getHrvMeasure(HrvMeasure::RECOVERY_POINTS));
-        else if (item->getHrvMeasure(HrvMeasure::RMSSD) > 0)
-            setValue(1.5 * log(item->getHrvMeasure(HrvMeasure::RMSSD)) + 2);
+        if (item->getHrvMeasure("RECOVERY_POINTS") > 0)
+            setValue(item->getHrvMeasure("RECOVERY_POINTS"));
+        else if (item->getHrvMeasure("RMSSD") > 0)
+            setValue(1.5 * log(item->getHrvMeasure("RMSSD")) + 2);
         else
             setValue(0.0);
         setCount(0);

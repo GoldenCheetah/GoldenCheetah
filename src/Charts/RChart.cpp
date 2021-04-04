@@ -22,6 +22,7 @@
 
 #include "Colors.h"
 #include "TabView.h"
+#include "GenericChart.h"
 
 // unique identifier for each chart
 static int id=0;
@@ -275,7 +276,14 @@ void RConsole::contextMenuEvent(QContextMenuEvent *e)
 
 RChart::RChart(Context *context, bool ridesummary) : GcChartWindow(context), context(context), ridesummary(ridesummary)
 {
-    setControls(NULL);
+    // settings - just choosing output type
+    plotOnChartSetting = new QCheckBox(tr("Use GC charts"), this);
+    plotOnChartSetting->setChecked(false);// by default we use R graphics device (legacy charts)
+    QWidget *c=new QWidget(this);
+    QVBoxLayout *cl = new QVBoxLayout(c);
+    cl->addWidget(plotOnChartSetting);
+    cl->addStretch();
+    setControls(c);
 
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->setSpacing(0);
@@ -338,7 +346,16 @@ RChart::RChart(Context *context, bool ridesummary) : GcChartWindow(context), con
 
         canvas = new RCanvas(context, this);
         canvas->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
-        splitter->addWidget(canvas);
+
+        chart = new GenericChart(this, context);
+        chart->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
+
+        stack = new QStackedWidget(this);
+        stack->addWidget(canvas);
+        stack->addWidget(chart);
+        stack->setCurrentIndex(0);
+
+        splitter->addWidget(stack);
 
         // make splitter reasonable
         QList<int> sizes;
@@ -352,8 +369,7 @@ RChart::RChart(Context *context, bool ridesummary) : GcChartWindow(context), con
             connect(context, SIGNAL(compareIntervalsStateChanged(bool)), this, SLOT(runScript()));
             connect(context, SIGNAL(compareIntervalsChanged()), this, SLOT(runScript()));
 
-            // refresh when intervals changed / selected
-            connect(context, SIGNAL(intervalsChanged()), this, SLOT(runScript()));
+            // refresh when intervals are selected
             connect(context, SIGNAL(intervalSelected()), this, SLOT(runScript()));
 
         } else {
@@ -370,6 +386,9 @@ RChart::RChart(Context *context, bool ridesummary) : GcChartWindow(context), con
 
         // reveal controls
         connect(showCon, SIGNAL(stateChanged(int)), this, SLOT(showConChanged(int)));
+
+        // output to graphics device or qt chart
+        connect(plotOnChartSetting, SIGNAL(stateChanged(int)), this, SLOT(plotOnChartChanged()));
 
         // config changes
         connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
@@ -391,6 +410,27 @@ RChart::RChart(Context *context, bool ridesummary) : GcChartWindow(context), con
         showCon = NULL;
         leftsplitter = NULL;
     }
+}
+
+bool
+RChart::plotOnChart() const
+{
+    return plotOnChartSetting->isChecked();
+}
+
+void
+RChart::setPlotOnChart(bool x)
+{
+    plotOnChartSetting->setChecked(x);
+}
+
+void
+RChart::plotOnChartChanged()
+{
+
+    // now deal with that by adjusting which is visible.
+    if (plotOnChartSetting->isChecked()) stack->setCurrentIndex(1); // generic chart
+    else stack->setCurrentIndex(0); // r graphics device
 }
 
 bool
@@ -535,6 +575,9 @@ RChart::runScript()
             // clear
             canvas->newPage();
         }
+
+        // finalise the chart (even if not on show)
+        chart->finaliseChart();
 
         // turn off updates for a sec
         setUpdatesEnabled(true);

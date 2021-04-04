@@ -76,8 +76,9 @@ class DataProcessor
         DataProcessor() {}
         virtual ~DataProcessor() {}
         virtual bool postProcess(RideFile *, DataProcessorConfig*settings=0, QString op="") = 0;
-        virtual DataProcessorConfig *processorConfig(QWidget *parent) = 0;
+        virtual DataProcessorConfig *processorConfig(QWidget *parent, const RideFile* ride = NULL) = 0;
         virtual QString name() = 0; // Localized Name for user interface
+        virtual bool isCoreProcessor() { return true; }
 };
 
 // all data processors
@@ -93,9 +94,11 @@ class DataProcessorFactory {
 
     public:
 
+        ~DataProcessorFactory();
         static DataProcessorFactory &instance();
         bool registerProcessor(QString name, DataProcessor *processor);
-        QMap<QString,DataProcessor*> getProcessors() const { return processors; }
+        void unregisterProcessor(QString name);
+        QMap<QString,DataProcessor*> getProcessors(bool coreProcessorsOnly = false) const;
         bool autoProcess(RideFile *, QString mode, QString op); // run auto processes (after open rideFile)
         void setAutoProcessRule(bool b) { autoprocess = b; } // allows to switch autoprocess off (e.g. for Upgrades)
 };

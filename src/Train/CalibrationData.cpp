@@ -157,8 +157,16 @@ void CalibrationData::setActiveChannel()
     uint8_t count=0;
 
     // Do nothing if calibration in progress
-    if (state != CALIBRATION_STATE_IDLE && state != CALIBRATION_STATE_SUCCESS && state != CALIBRATION_STATE_FAILURE)
+    switch(state) {
+    default:
         return;
+    case CALIBRATION_STATE_IDLE:
+    case CALIBRATION_STATE_SUCCESS:
+    case CALIBRATION_STATE_FAILURE:
+    case CALIBRATION_STATE_FAILURE_SPINDOWN_TOO_FAST:
+    case CALIBRATION_STATE_FAILURE_SPINDOWN_TOO_SLOW:
+        break;
+    }
 
     // How many devices support calibration?
     for (int i = 0; i < CALIBRATION_MAX_CHANNELS; i++) {

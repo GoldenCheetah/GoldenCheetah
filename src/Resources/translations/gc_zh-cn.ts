@@ -29,7 +29,7 @@
     <message>
         <location filename="../../ANT/ANTlocalController.cpp" line="73"/>
         <source>Found Garmin Express service</source>
-        <translation type="unfinished"></translation>
+        <translation>已找到Garmin Express服务</translation>
     </message>
     <message>
         <location filename="../../ANT/ANTlocalController.cpp" line="74"/>
@@ -37,18 +37,22 @@
 This can block GoldenCheetah from accessing your ANT+ stick.
 
 Do you want to temporarily disable the service?</source>
-        <translation type="unfinished"></translation>
+        <translation>Garmin Express服务正在本计算机上运行,
+可能阻碍GC连接到ANT+棒.
+
+是否暂时禁用这一服务?</translation>
     </message>
     <message>
         <location filename="../../ANT/ANTlocalController.cpp" line="84"/>
         <source>Failed stopping Garmin Express service</source>
-        <translation type="unfinished"></translation>
+        <translation>停止Garmin Express服务失败</translation>
     </message>
     <message>
         <location filename="../../ANT/ANTlocalController.cpp" line="85"/>
         <source>GoldenCheetah failed to stop the Garmin Express service.
 It might be necessary to manually disable it.</source>
-        <translation type="unfinished"></translation>
+        <translation>GC停止Garmin Express服务失败.
+可能需要手动禁止.</translation>
     </message>
     <message>
         <location filename="../../ANT/ANTlocalController.cpp" line="164"/>
@@ -132,7 +136,7 @@ It might be necessary to manually disable it.</source>
     <message>
         <location filename="../../Gui/AboutDialog.cpp" line="56"/>
         <source>&lt;center&gt;&lt;img src=&quot;:images/gc.png&quot; height=80&gt;&lt;h2&gt;GoldenCheetah&lt;/h2&gt;Cycling Power Analysis Software&lt;br&gt;for Linux, Mac, and Windows&lt;p&gt;GoldenCheetah is licensed under the&lt;br&gt;&lt;a href=&quot;http://www.gnu.org/copyleft/gpl.html&quot;&gt;GNU General Public License&lt;/a&gt;.&lt;p&gt;Source code can be obtained from&lt;br&gt;&lt;a href=&quot;http://goldencheetah.org/&quot;&gt;http://goldencheetah.org/&lt;/a&gt;.&lt;br&gt;&lt;p&gt;Activity files and other data are stored in&lt;br&gt;&lt;a href=&quot;%1&quot;&gt;%2&lt;/a&gt;&lt;p&gt;Athlete ID %3&lt;br&gt;&lt;p&gt;Trademarks used with permission&lt;br&gt;BikeScore, xPower, SwimScore courtesy of &lt;a href=&quot;http://www.physfarm.com&quot;&gt;Physfarm Training Systems&lt;/a&gt;.&lt;br&gt;Virtual Speed courtesy of Tom Compton &lt;a href=&quot;http://www.analyticcycling.com&quot;&gt;AnalyticCycling&lt;/a&gt;.&lt;br&gt;&lt;br&gt;The core body temperature module was developed by the &lt;br&gt;&lt;a href=&quot;http://www.usariem.army.mil/&quot;&gt;U.S. Army Research Institute of Environmental Medicine&lt;/a&gt;&lt;br&gt; and is patent pending&lt;br&gt;&lt;/center&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;center&gt;&lt;img src=&quot;:images/gc.png&quot; height=80&gt;&lt;h2&gt;GoldenCheetah&lt;/h2&gt;自行车功率分析软件&lt;br&gt;适配Linux,Mac和Windows.&lt;p&gt;GoldenCheetah使用&lt;br&gt;&lt;a href=&quot;http://www.gnu.org/copyleft/gpl.html&quot;&gt;GNU General Public License&lt;/a&gt;协议.&lt;p&gt;源代码可从&lt;br&gt;&lt;a href=&quot;http://goldencheetah.org/&quot;&gt;http://goldencheetah.org/&lt;/a&gt;获得.&lt;br&gt;&lt;p&gt;活动及其它数据存储于&lt;br&gt;&lt;a href=&quot;%1&quot;&gt;%2&lt;/a&gt;&lt;p&gt;运动员ID%3&lt;br&gt;&lt;p&gt;获准使用的商标&lt;br&gt;BikeScore,xPower,SwimScore来自&lt;a href=&quot;http://www.physfarm.com&quot;&gt;Physfarm Training Systems&lt;/a&gt;.&lt;br&gt;Virtual Speed来自Tom Compton &lt;a href=&quot;http://www.analyticcycling.com&quot;&gt;AnalyticCycling&lt;/a&gt;.&lt;br&gt;&lt;br&gt;核心体温模块由&lt;br&gt;&lt;a href=&quot;http://www.usariem.army.mil/&quot;&gt;U.S. Army Research Institute of Environmental Medicine&lt;/a&gt;&lt;br&gt;美国陆军环境医学研究所开发且专利未决.&lt;br&gt;&lt;/center&gt;</translation>
     </message>
 </context>
 <context>
@@ -276,7 +280,7 @@ It might be necessary to manually disable it.</source>
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="3816"/>
         <source>A checksum for the activity, can be used to trigger cache refresh in R scripts.</source>
-        <translation>活动的校验和，可在R脚本中被用来触发缓存刷新.</translation>
+        <translation>活动的校验和,可在R脚本中被用来触发缓存刷新.</translation>
     </message>
 </context>
 <context>
@@ -339,7 +343,7 @@ It might be necessary to manually disable it.</source>
     <message>
         <location filename="../../Cloud/AddCloudWizard.cpp" line="289"/>
         <source>Message</source>
-        <translation type="unfinished"></translation>
+        <translation>信息</translation>
     </message>
     <message>
         <location filename="../../Cloud/AddCloudWizard.cpp" line="368"/>
@@ -367,7 +371,7 @@ It might be necessary to manually disable it.</source>
     <message>
         <location filename="../../Cloud/AddCloudWizard.cpp" line="99"/>
         <source>Sync activities with services like Today&apos;s Plan, Strava, Dropbox and Google Drive</source>
-        <translation>使用服务同步活动，如Today&apos;s Plan, Strava, Dropbox和Google Drive</translation>
+        <translation>使用服务同步活动,如Today&apos;s Plan, Strava, Dropbox和Google Drive</translation>
     </message>
     <message>
         <location filename="../../Cloud/AddCloudWizard.cpp" line="106"/>
@@ -377,12 +381,12 @@ It might be necessary to manually disable it.</source>
     <message>
         <location filename="../../Cloud/AddCloudWizard.cpp" line="106"/>
         <source>Sync measurements such as weight, body fat, HRV and sleep.</source>
-        <translation>同步体重、体脂、HRV和睡眠等参数</translation>
+        <translation>同步体重,体脂,HRV和睡眠等参数.</translation>
     </message>
     <message>
         <location filename="../../Cloud/AddCloudWizard.cpp" line="113"/>
         <source>Sync planned workouts to WebDAV and CalDAV calendars like Google Calendar.</source>
-        <translation type="unfinished"></translation>
+        <translation>同步计划训练至WebDAV和CalDAV日历(如Google日历).</translation>
     </message>
     <message>
         <source>Measures</source>
@@ -416,17 +420,17 @@ It might be necessary to manually disable it.</source>
     <message>
         <location filename="../../Cloud/AddCloudWizard.cpp" line="216"/>
         <source>Terms of Service</source>
-        <translation type="unfinished"></translation>
+        <translation>服务条款</translation>
     </message>
     <message>
         <location filename="../../Cloud/AddCloudWizard.cpp" line="217"/>
         <source>Your consent is needed</source>
-        <translation type="unfinished"></translation>
+        <translation>需要您的同意</translation>
     </message>
     <message>
         <location filename="../../Cloud/AddCloudWizard.cpp" line="227"/>
         <source>Accept</source>
-        <translation type="unfinished"></translation>
+        <translation>接受</translation>
     </message>
 </context>
 <context>
@@ -440,409 +444,439 @@ It might be necessary to manually disable it.</source>
 <context>
     <name>AddFinal</name>
     <message>
-        <location filename="../../Train/AddDeviceWizard.cpp" line="1178"/>
+        <location filename="../../Train/AddDeviceWizard.cpp" line="1026"/>
         <source>Done</source>
         <translation>完成</translation>
     </message>
     <message>
-        <location filename="../../Train/AddDeviceWizard.cpp" line="1179"/>
+        <location filename="../../Train/AddDeviceWizard.cpp" line="1027"/>
         <source>Confirm configuration and add device</source>
         <translation>确认设置并添加设备</translation>
     </message>
     <message>
-        <location filename="../../Train/AddDeviceWizard.cpp" line="1184"/>
+        <location filename="../../Train/AddDeviceWizard.cpp" line="1032"/>
         <source>We will now add a new device with the configuration shown below. Please take a moment to review and then click Finish to add the device and complete this wizard, or press the Back button to make amendments.
 
 </source>
-        <translation>将按下列设置添加新设备,请仔细检查并点击“完成”添加设备或点击后退按钮修改.</translation>
+        <translation>将按下列设置添加新设备,请仔细检查并点击&quot;完成&quot;添加设备或点击后退按钮修改.</translation>
     </message>
     <message>
-        <location filename="../../Train/AddDeviceWizard.cpp" line="1195"/>
+        <location filename="../../Train/AddDeviceWizard.cpp" line="1043"/>
         <source>Name*</source>
         <translation>名称</translation>
     </message>
     <message>
-        <location filename="../../Train/AddDeviceWizard.cpp" line="1196"/>
+        <location filename="../../Train/AddDeviceWizard.cpp" line="1044"/>
         <source>Port</source>
         <translation>端口</translation>
     </message>
     <message>
-        <location filename="../../Train/AddDeviceWizard.cpp" line="1197"/>
+        <location filename="../../Train/AddDeviceWizard.cpp" line="1045"/>
         <source>Profile</source>
         <translation>简介</translation>
     </message>
     <message>
-        <location filename="../../Train/AddDeviceWizard.cpp" line="1206"/>
+        <location filename="../../Train/AddDeviceWizard.cpp" line="1054"/>
         <source>Virtual</source>
         <translation>虚拟</translation>
     </message>
     <message>
-        <location filename="../../Train/AddDeviceWizard.cpp" line="1293"/>
+        <location filename="../../Train/AddDeviceWizard.cpp" line="1147"/>
         <source>mm</source>
         <translation>mm</translation>
     </message>
     <message>
-        <location filename="../../Train/AddDeviceWizard.cpp" line="1311"/>
+        <location filename="../../Train/AddDeviceWizard.cpp" line="1165"/>
         <source>Wheel Size</source>
         <translation>车轮尺寸</translation>
     </message>
     <message>
-        <location filename="../../Train/AddDeviceWizard.cpp" line="1210"/>
+        <location filename="../../Train/AddDeviceWizard.cpp" line="1058"/>
         <source>None</source>
         <translation>无</translation>
     </message>
     <message>
-        <location filename="../../Train/AddDeviceWizard.cpp" line="1211"/>
+        <location filename="../../Train/AddDeviceWizard.cpp" line="1059"/>
         <source>Power - Kurt Kinetic Cyclone</source>
         <translation>功率 - Kurt Kinetic Cyclone</translation>
     </message>
     <message>
-        <location filename="../../Train/AddDeviceWizard.cpp" line="1212"/>
+        <location filename="../../Train/AddDeviceWizard.cpp" line="1060"/>
         <source>Power - Kurt Kinetic Road Machine</source>
         <translation>功率 - Kurt Kinetic Road Machine</translation>
     </message>
     <message>
-        <location filename="../../Train/AddDeviceWizard.cpp" line="1213"/>
+        <location filename="../../Train/AddDeviceWizard.cpp" line="1061"/>
         <source>Power - Cyclops Fluid 2</source>
         <translation>功率 - Cyclops Fluid 2</translation>
     </message>
     <message>
-        <location filename="../../Train/AddDeviceWizard.cpp" line="1214"/>
+        <location filename="../../Train/AddDeviceWizard.cpp" line="1062"/>
         <source>Power - BT Advanced Training System</source>
         <translation>功率 - BT Advanced Training System</translation>
     </message>
     <message>
-        <location filename="../../Train/AddDeviceWizard.cpp" line="1215"/>
+        <location filename="../../Train/AddDeviceWizard.cpp" line="1063"/>
         <source>Power - LeMond Revolution</source>
         <translation>功率 - LeMond Revolution</translation>
     </message>
     <message>
-        <location filename="../../Train/AddDeviceWizard.cpp" line="1216"/>
+        <location filename="../../Train/AddDeviceWizard.cpp" line="1064"/>
         <source>Power - 1UP USA Trainer</source>
         <translation>功率 - 1UP USA Trainer</translation>
     </message>
     <message>
-        <location filename="../../Train/AddDeviceWizard.cpp" line="1217"/>
+        <location filename="../../Train/AddDeviceWizard.cpp" line="1065"/>
         <source>Power - Minoura V100 Trainer (H)</source>
         <translation>功率 - Minoura V100 Trainer (H)</translation>
     </message>
     <message>
-        <location filename="../../Train/AddDeviceWizard.cpp" line="1218"/>
+        <location filename="../../Train/AddDeviceWizard.cpp" line="1066"/>
         <source>Power - Minoura V100 Trainer (5)</source>
         <translation>功率 - Minoura V100 Trainer (5)</translation>
     </message>
     <message>
-        <location filename="../../Train/AddDeviceWizard.cpp" line="1219"/>
+        <location filename="../../Train/AddDeviceWizard.cpp" line="1067"/>
         <source>Power - Minoura V100 Trainer (4)</source>
         <translation>功率 - Minoura V100 Trainer (4)</translation>
     </message>
     <message>
-        <location filename="../../Train/AddDeviceWizard.cpp" line="1220"/>
+        <location filename="../../Train/AddDeviceWizard.cpp" line="1068"/>
         <source>Power - Minoura V100 Trainer (3)</source>
         <translation>功率 - Minoura V100 Trainer (3)</translation>
     </message>
     <message>
-        <location filename="../../Train/AddDeviceWizard.cpp" line="1221"/>
+        <location filename="../../Train/AddDeviceWizard.cpp" line="1069"/>
         <source>Power - Minoura V100 Trainer (2)</source>
         <translation>功率 - Minoura V100 Trainer (2)</translation>
     </message>
     <message>
-        <location filename="../../Train/AddDeviceWizard.cpp" line="1222"/>
+        <location filename="../../Train/AddDeviceWizard.cpp" line="1070"/>
         <source>Power - Minoura V100 Trainer (1)</source>
         <translation>功率 - Minoura V100 Trainer (1)</translation>
     </message>
     <message>
-        <location filename="../../Train/AddDeviceWizard.cpp" line="1223"/>
+        <location filename="../../Train/AddDeviceWizard.cpp" line="1071"/>
         <source>Power - Minoura V100 Trainer (L)</source>
         <translation>功率 - Minoura V100 Trainer (L)</translation>
     </message>
     <message>
-        <location filename="../../Train/AddDeviceWizard.cpp" line="1224"/>
+        <location filename="../../Train/AddDeviceWizard.cpp" line="1072"/>
         <source>Power - Minoura V270/V150/V130/LR340/LR540 Trainer (H)</source>
         <translation>功率 - Minoura V270/V150/V130/LR340/LR540 (H)</translation>
     </message>
     <message>
-        <location filename="../../Train/AddDeviceWizard.cpp" line="1225"/>
+        <location filename="../../Train/AddDeviceWizard.cpp" line="1073"/>
         <source>Power - Minoura V270/V150/V130/LR340/LR540 Trainer (5)</source>
         <translation>功率 - Minoura V270/V150/V130/LR340/LR540 (5)</translation>
     </message>
     <message>
-        <location filename="../../Train/AddDeviceWizard.cpp" line="1226"/>
+        <location filename="../../Train/AddDeviceWizard.cpp" line="1074"/>
         <source>Power - Minoura V270/V150/V130/LR340/LR540 Trainer (4)</source>
         <translation>功率 - Minoura V270/V150/V130/LR340/LR540 (4)</translation>
     </message>
     <message>
-        <location filename="../../Train/AddDeviceWizard.cpp" line="1227"/>
+        <location filename="../../Train/AddDeviceWizard.cpp" line="1075"/>
         <source>Power - Minoura V270/V150/V130/LR340/LR540 Trainer (3)</source>
         <translation>功率 - Minoura V270/V150/V130/LR340/LR540 (3)</translation>
     </message>
     <message>
-        <location filename="../../Train/AddDeviceWizard.cpp" line="1228"/>
+        <location filename="../../Train/AddDeviceWizard.cpp" line="1076"/>
         <source>Power - Minoura V270/V150/V130/LR340/LR540 Trainer (2)</source>
         <translation>功率 - Minoura V270/V150/V130/LR340/LR540 (2)</translation>
     </message>
     <message>
-        <location filename="../../Train/AddDeviceWizard.cpp" line="1229"/>
+        <location filename="../../Train/AddDeviceWizard.cpp" line="1077"/>
         <source>Power - Minoura V270/V150/V130/LR340/LR540 Trainer (1)</source>
         <translation>功率 - Minoura V270/V150/V130/LR340/LR540 (1)</translation>
     </message>
     <message>
-        <location filename="../../Train/AddDeviceWizard.cpp" line="1230"/>
+        <location filename="../../Train/AddDeviceWizard.cpp" line="1078"/>
         <source>Power - Minoura V270/V150/V130/LR340/LR540 Trainer (L)</source>
         <translation>功率 - Minoura V270/V150/V130/LR340/LR540 (L)</translation>
     </message>
     <message>
-        <location filename="../../Train/AddDeviceWizard.cpp" line="1231"/>
+        <location filename="../../Train/AddDeviceWizard.cpp" line="1079"/>
         <source>Power - Saris Powerbeam Pro</source>
         <translation>功率 - Saris Powerbeam Pro</translation>
     </message>
     <message>
-        <location filename="../../Train/AddDeviceWizard.cpp" line="1232"/>
+        <location filename="../../Train/AddDeviceWizard.cpp" line="1080"/>
         <source>Power - Tacx Satori (2)</source>
         <translation>功率 - Tacx Satori (2)</translation>
     </message>
     <message>
-        <location filename="../../Train/AddDeviceWizard.cpp" line="1233"/>
+        <location filename="../../Train/AddDeviceWizard.cpp" line="1081"/>
         <source>Power - Tacx Satori (4)</source>
         <translation>功率 - Tacx Satori (4)</translation>
     </message>
     <message>
-        <location filename="../../Train/AddDeviceWizard.cpp" line="1234"/>
+        <location filename="../../Train/AddDeviceWizard.cpp" line="1082"/>
         <source>Power - Tacx Satori (6)</source>
         <translation>功率 - Tacx Satori (6)</translation>
     </message>
     <message>
-        <location filename="../../Train/AddDeviceWizard.cpp" line="1235"/>
+        <location filename="../../Train/AddDeviceWizard.cpp" line="1083"/>
         <source>Power - Tacx Satori (8)</source>
         <translation>功率 - Tacx Satori (8)</translation>
     </message>
     <message>
-        <location filename="../../Train/AddDeviceWizard.cpp" line="1236"/>
+        <location filename="../../Train/AddDeviceWizard.cpp" line="1084"/>
         <source>Power - Tacx Satori (10)</source>
         <translation>功率 - Tacx Satori (10)</translation>
     </message>
     <message>
-        <location filename="../../Train/AddDeviceWizard.cpp" line="1237"/>
+        <location filename="../../Train/AddDeviceWizard.cpp" line="1085"/>
         <source>Power - Tacx Flow (0)</source>
         <translation>功率 - Tacx Flow (0)</translation>
     </message>
     <message>
-        <location filename="../../Train/AddDeviceWizard.cpp" line="1238"/>
+        <location filename="../../Train/AddDeviceWizard.cpp" line="1086"/>
         <source>Power - Tacx Flow (2)</source>
         <translation>功率 - Tacx Flow (2)</translation>
     </message>
     <message>
-        <location filename="../../Train/AddDeviceWizard.cpp" line="1239"/>
+        <location filename="../../Train/AddDeviceWizard.cpp" line="1087"/>
         <source>Power - Tacx Flow (4)</source>
         <translation>功率 - Tacx Flow (4)</translation>
     </message>
     <message>
-        <location filename="../../Train/AddDeviceWizard.cpp" line="1240"/>
+        <location filename="../../Train/AddDeviceWizard.cpp" line="1088"/>
         <source>Power - Tacx Flow (6)</source>
         <translation>功率 - Tacx Flow (6)</translation>
     </message>
     <message>
-        <location filename="../../Train/AddDeviceWizard.cpp" line="1241"/>
+        <location filename="../../Train/AddDeviceWizard.cpp" line="1089"/>
         <source>Power - Tacx Flow (8)</source>
         <translation>功率 - Tacx Flow (8)</translation>
     </message>
     <message>
-        <location filename="../../Train/AddDeviceWizard.cpp" line="1242"/>
+        <location filename="../../Train/AddDeviceWizard.cpp" line="1090"/>
         <source>Power - Tacx Blue Twist (1)</source>
         <translation>功率 - Tacx Blue Twist (1)</translation>
     </message>
     <message>
-        <location filename="../../Train/AddDeviceWizard.cpp" line="1243"/>
+        <location filename="../../Train/AddDeviceWizard.cpp" line="1091"/>
         <source>Power - Tacx Blue Twist (3)</source>
         <translation>功率 - Tacx Blue Twist (3)</translation>
     </message>
     <message>
-        <location filename="../../Train/AddDeviceWizard.cpp" line="1244"/>
+        <location filename="../../Train/AddDeviceWizard.cpp" line="1092"/>
         <source>Power - Tacx Blue Twist (5)</source>
         <translation>功率 - Tacx Blue Twist (5)</translation>
     </message>
     <message>
-        <location filename="../../Train/AddDeviceWizard.cpp" line="1245"/>
+        <location filename="../../Train/AddDeviceWizard.cpp" line="1093"/>
         <source>Power - Tacx Blue Twist (7)</source>
         <translation>功率 - Tacx Blue Twist (7)</translation>
     </message>
     <message>
-        <location filename="../../Train/AddDeviceWizard.cpp" line="1246"/>
+        <location filename="../../Train/AddDeviceWizard.cpp" line="1094"/>
         <source>Power - Tacx Blue Motion (2)</source>
         <translation>功率 - Tacx Blue Motion (2)</translation>
     </message>
     <message>
-        <location filename="../../Train/AddDeviceWizard.cpp" line="1247"/>
+        <location filename="../../Train/AddDeviceWizard.cpp" line="1095"/>
         <source>Power - Tacx Blue Motion (4)</source>
         <translation>功率 - Tacx Blue Motion (4)</translation>
     </message>
     <message>
-        <location filename="../../Train/AddDeviceWizard.cpp" line="1248"/>
+        <location filename="../../Train/AddDeviceWizard.cpp" line="1096"/>
         <source>Power - Tacx Blue Motion (6)</source>
         <translation>功率 - Tacx Blue Motion (6)</translation>
     </message>
     <message>
-        <location filename="../../Train/AddDeviceWizard.cpp" line="1249"/>
+        <location filename="../../Train/AddDeviceWizard.cpp" line="1097"/>
         <source>Power - Tacx Blue Motion (8)</source>
         <translation>功率 - Tacx Blue Motion (8)</translation>
     </message>
     <message>
-        <location filename="../../Train/AddDeviceWizard.cpp" line="1250"/>
+        <location filename="../../Train/AddDeviceWizard.cpp" line="1098"/>
         <source>Power - Tacx Blue Motion (10)</source>
         <translation>功率 - Tacx Blue Motion (10)</translation>
     </message>
     <message>
-        <location filename="../../Train/AddDeviceWizard.cpp" line="1251"/>
+        <location filename="../../Train/AddDeviceWizard.cpp" line="1099"/>
         <source>Power - Elite Supercrono Powermag (1)</source>
         <translation>功率 - Elite Supercrono Powermag (1)</translation>
     </message>
     <message>
-        <location filename="../../Train/AddDeviceWizard.cpp" line="1252"/>
+        <location filename="../../Train/AddDeviceWizard.cpp" line="1100"/>
         <source>Power - Elite Supercrono Powermag (2)</source>
         <translation>功率 - Elite Supercrono Powermag (2)</translation>
     </message>
     <message>
-        <location filename="../../Train/AddDeviceWizard.cpp" line="1253"/>
+        <location filename="../../Train/AddDeviceWizard.cpp" line="1101"/>
         <source>Power - Elite Supercrono Powermag (3)</source>
         <translation>功率 - Elite Supercrono Powermag (3)</translation>
     </message>
     <message>
-        <location filename="../../Train/AddDeviceWizard.cpp" line="1254"/>
+        <location filename="../../Train/AddDeviceWizard.cpp" line="1102"/>
         <source>Power - Elite Supercrono Powermag (4)</source>
         <translation>功率 - Elite Supercrono Powermag (4)</translation>
     </message>
     <message>
-        <location filename="../../Train/AddDeviceWizard.cpp" line="1255"/>
+        <location filename="../../Train/AddDeviceWizard.cpp" line="1103"/>
         <source>Power - Elite Supercrono Powermag (5)</source>
         <translation>功率 - Elite Supercrono Powermag (5)</translation>
     </message>
     <message>
-        <location filename="../../Train/AddDeviceWizard.cpp" line="1256"/>
+        <location filename="../../Train/AddDeviceWizard.cpp" line="1104"/>
         <source>Power - Elite Supercrono Powermag (6)</source>
         <translation>功率 - Elite Supercrono Powermag (6)</translation>
     </message>
     <message>
-        <location filename="../../Train/AddDeviceWizard.cpp" line="1257"/>
+        <location filename="../../Train/AddDeviceWizard.cpp" line="1105"/>
         <source>Power - Elite Supercrono Powermag (7)</source>
         <translation>功率 - Elite Supercrono Powermag (7)</translation>
     </message>
     <message>
-        <location filename="../../Train/AddDeviceWizard.cpp" line="1258"/>
+        <location filename="../../Train/AddDeviceWizard.cpp" line="1106"/>
         <source>Power - Elite Supercrono Powermag (8)</source>
         <translation>功率 - Elite Supercrono Powermag (8)</translation>
     </message>
     <message>
-        <location filename="../../Train/AddDeviceWizard.cpp" line="1259"/>
+        <location filename="../../Train/AddDeviceWizard.cpp" line="1107"/>
         <source>Power - Elite Turbo Muin (2013)</source>
         <translation>功率 - Elite Turbo Muin (2013)</translation>
     </message>
     <message>
-        <location filename="../../Train/AddDeviceWizard.cpp" line="1260"/>
+        <location filename="../../Train/AddDeviceWizard.cpp" line="1108"/>
         <source>Power - Elite Qubo Power Fluid</source>
         <translation>功率 - Elite Qubo Power Fluid</translation>
     </message>
     <message>
-        <location filename="../../Train/AddDeviceWizard.cpp" line="1261"/>
+        <location filename="../../Train/AddDeviceWizard.cpp" line="1109"/>
         <source>Power - Cyclops Magneto Pro (Road)</source>
         <translation>功率 - Cyclops Magneto Pro (Road)</translation>
     </message>
     <message>
-        <location filename="../../Train/AddDeviceWizard.cpp" line="1262"/>
+        <location filename="../../Train/AddDeviceWizard.cpp" line="1110"/>
         <source>Power - Elite Arion Mag (0)</source>
         <translation>功率 - Elite Arion Mag (0)</translation>
     </message>
     <message>
-        <location filename="../../Train/AddDeviceWizard.cpp" line="1263"/>
+        <location filename="../../Train/AddDeviceWizard.cpp" line="1111"/>
         <source>Power - Elite Arion Mag (1)</source>
         <translation>功率 - Elite Arion Mag (1)</translation>
     </message>
     <message>
-        <location filename="../../Train/AddDeviceWizard.cpp" line="1264"/>
+        <location filename="../../Train/AddDeviceWizard.cpp" line="1112"/>
         <source>Power - Elite Arion Mag (2)</source>
         <translation>功率 - Elite Arion Mag (2)</translation>
     </message>
     <message>
-        <location filename="../../Train/AddDeviceWizard.cpp" line="1265"/>
+        <location filename="../../Train/AddDeviceWizard.cpp" line="1113"/>
         <source>Power - Blackburn Tech Fluid</source>
         <translation>功率 - Blackburn Tech Fluid</translation>
     </message>
     <message>
-        <location filename="../../Train/AddDeviceWizard.cpp" line="1266"/>
+        <location filename="../../Train/AddDeviceWizard.cpp" line="1114"/>
         <source>Power - Tacx Sirius (1)</source>
         <translation>功率 - Tacx Sirius (1)</translation>
     </message>
     <message>
-        <location filename="../../Train/AddDeviceWizard.cpp" line="1267"/>
+        <location filename="../../Train/AddDeviceWizard.cpp" line="1115"/>
         <source>Power - Tacx Sirius (2)</source>
         <translation>功率 - Tacx Sirius (2)</translation>
     </message>
     <message>
-        <location filename="../../Train/AddDeviceWizard.cpp" line="1268"/>
+        <location filename="../../Train/AddDeviceWizard.cpp" line="1116"/>
         <source>Power - Tacx Sirius (3)</source>
         <translation>功率 - Tacx Sirius (3)</translation>
     </message>
     <message>
-        <location filename="../../Train/AddDeviceWizard.cpp" line="1269"/>
+        <location filename="../../Train/AddDeviceWizard.cpp" line="1117"/>
         <source>Power - Tacx Sirius (4)</source>
         <translation>功率 - Tacx Sirius (4)</translation>
     </message>
     <message>
-        <location filename="../../Train/AddDeviceWizard.cpp" line="1270"/>
+        <location filename="../../Train/AddDeviceWizard.cpp" line="1118"/>
         <source>Power - Tacx Sirius (5)</source>
         <translation>功率 - Tacx Sirius (5)</translation>
     </message>
     <message>
-        <location filename="../../Train/AddDeviceWizard.cpp" line="1271"/>
+        <location filename="../../Train/AddDeviceWizard.cpp" line="1119"/>
         <source>Power - Tacx Sirius (6)</source>
         <translation>功率 - Tacx Sirius (6)</translation>
     </message>
     <message>
-        <location filename="../../Train/AddDeviceWizard.cpp" line="1272"/>
+        <location filename="../../Train/AddDeviceWizard.cpp" line="1120"/>
         <source>Power - Tacx Sirius (7)</source>
         <translation>功率 - Tacx Sirius (7)</translation>
     </message>
     <message>
-        <location filename="../../Train/AddDeviceWizard.cpp" line="1273"/>
+        <location filename="../../Train/AddDeviceWizard.cpp" line="1121"/>
         <source>Power - Tacx Sirius (8)</source>
         <translation>功率 - Tacx Sirius (8)</translation>
     </message>
     <message>
-        <location filename="../../Train/AddDeviceWizard.cpp" line="1274"/>
+        <location filename="../../Train/AddDeviceWizard.cpp" line="1122"/>
         <source>Power - Tacx Sirius (9)</source>
         <translation>功率 - Tacx Sirius (9)</translation>
     </message>
     <message>
-        <location filename="../../Train/AddDeviceWizard.cpp" line="1275"/>
+        <location filename="../../Train/AddDeviceWizard.cpp" line="1123"/>
         <source>Power - Tacx Sirius (10)</source>
         <translation>功率 - Tacx Sirius (10)</translation>
     </message>
     <message>
-        <location filename="../../Train/AddDeviceWizard.cpp" line="1312"/>
+        <location filename="../../Train/AddDeviceWizard.cpp" line="1124"/>
+        <source>Power - Elite Crono Fluid ElastoGel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Train/AddDeviceWizard.cpp" line="1125"/>
+        <source>Power - Elite Turbo Muin (2015)</source>
+        <translation type="unfinished">功率 - Elite Turbo Muin (2013) {2015)?}</translation>
+    </message>
+    <message>
+        <location filename="../../Train/AddDeviceWizard.cpp" line="1126"/>
+        <source>Power - CycleOps JetFluid Pro</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Train/AddDeviceWizard.cpp" line="1127"/>
+        <source>Power - Elite Crono Mag Elastogel (3/5)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Train/AddDeviceWizard.cpp" line="1128"/>
+        <source>Power - Tacx Magnetic T1820 (4/7)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Train/AddDeviceWizard.cpp" line="1129"/>
+        <source>Power - Tacx Magnetic T1820 (7/7)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Train/AddDeviceWizard.cpp" line="1166"/>
         <source>Stride Length (cm)</source>
         <translation>步幅 (cm)</translation>
     </message>
     <message>
-        <location filename="../../Train/AddDeviceWizard.cpp" line="1317"/>
+        <location filename="../../Train/AddDeviceWizard.cpp" line="1171"/>
         <source>Selected by default</source>
         <translation>默认选项</translation>
     </message>
     <message>
-        <location filename="../../Train/AddDeviceWizard.cpp" line="1324"/>
+        <location filename="../../Train/AddDeviceWizard.cpp" line="1178"/>
         <source>Power</source>
         <translation>功率</translation>
     </message>
     <message>
-        <location filename="../../Train/AddDeviceWizard.cpp" line="1325"/>
+        <location filename="../../Train/AddDeviceWizard.cpp" line="1179"/>
         <source>Heartrate</source>
         <translation>心率</translation>
     </message>
     <message>
-        <location filename="../../Train/AddDeviceWizard.cpp" line="1326"/>
+        <location filename="../../Train/AddDeviceWizard.cpp" line="1180"/>
         <source>Speed</source>
         <translation>速度</translation>
     </message>
     <message>
-        <location filename="../../Train/AddDeviceWizard.cpp" line="1327"/>
+        <location filename="../../Train/AddDeviceWizard.cpp" line="1181"/>
         <source>Cadence</source>
         <translation>踏频</translation>
     </message>
@@ -941,9 +975,9 @@ Please take care to ensure that the file is the latest version of the Firmware f
 If you choose to copy to library the file will be copied into the GoldenCheetah library, otherwise we will reference it. </source>
         <translation>Tacx Fortius骑行台需要Tacx提供的固件文件.该文件受版权保护,无法由GoldenCheetah分发.
 
-在Windows上,一般安装在C:\Windows\system32,文件名为“FortiusSWPID1942Renum.hex”.
+在Windows上,一般安装在C:\Windows\system32,文件名为&quot;FortiusSWPID1942Renum.hex&quot;.
 
-在Linux和Apple电脑上,需要从VR软件CD中提取.需要的软件在“data2.cab”文件中,是一个InstallShield文件,可使用“unshield”工具读取.
+在Linux和Apple电脑上,需要从VR软件CD中提取.需要的软件在&quot;data2.cab&quot;文件中,是一个InstallShield文件,可使用&quot;unshield&quot;工具读取.
 
 请小心确认文件是最新版本的固件.
 
@@ -970,22 +1004,22 @@ If you choose to copy to library the file will be copied into the GoldenCheetah 
     <message>
         <location filename="../../Train/AddDeviceWizard.cpp" line="586"/>
         <source>Select Device driver</source>
-        <translation type="unfinished"></translation>
+        <translation>选择设备驱动</translation>
     </message>
     <message>
         <location filename="../../Train/AddDeviceWizard.cpp" line="587"/>
         <source>Select Driver for Tacx Imagic</source>
-        <translation type="unfinished"></translation>
+        <translation>选择Tacx Imagic驱动</translation>
     </message>
     <message>
         <location filename="../../Train/AddDeviceWizard.cpp" line="590"/>
         <source>Browse</source>
-        <translation type="unfinished">浏览</translation>
+        <translation>浏览</translation>
     </message>
     <message>
         <location filename="../../Train/AddDeviceWizard.cpp" line="591"/>
         <source>Copy to Library</source>
-        <translation type="unfinished">复制到档案库</translation>
+        <translation>复制到库</translation>
     </message>
     <message>
         <location filename="../../Train/AddDeviceWizard.cpp" line="597"/>
@@ -999,22 +1033,31 @@ On later TTS cds it is in support\drivers_usb_interface\32
 Place a copy of this file somewhere on this PC and reference it above.
 
 If you choose to copy to library the file will be copied into the GoldenCheetah library, otherwise we will reference it in place. </source>
-        <translation type="unfinished"></translation>
+        <translation>Tacx Imagic骑行台需要加载固件.此固件是设备驱动I-magic.sys的一部分,此驱动由Tacx BV提供,并受版权保护,无法与GC一起提供.
+在安装了Tacx Fortius/Imagic的Windows系统上,通常会在C:\Windows\system32中找到.
+
+或者,可以从Tacx软件CD中提取
+在较旧的Fortius CD中,固件位于FortiusInstall\Support\driver_imagic文件夹中.
+在较新的TTS CD中,固件位于support\drivers_usb_interface\32文件夹中
+
+将此文件的副本保存在本电脑上并在上面引用.
+
+如果选择复制到库,文件将被复制到GoldenCheetah库中,否则我们将在适当的位置引用它.</translation>
     </message>
     <message>
         <location filename="../../Train/AddDeviceWizard.cpp" line="611"/>
         <source>File:</source>
-        <translation type="unfinished">文件:</translation>
+        <translation>文件:</translation>
     </message>
     <message>
         <location filename="../../Train/AddDeviceWizard.cpp" line="667"/>
         <source>Open File</source>
-        <translation type="unfinished">打开文件</translation>
+        <translation>打开文件</translation>
     </message>
     <message>
         <location filename="../../Train/AddDeviceWizard.cpp" line="667"/>
         <source>Tacx Device driver (*.sys)</source>
-        <translation type="unfinished"></translation>
+        <translation>Tacx设备驱动 (*.sys)</translation>
     </message>
 </context>
 <context>
@@ -1026,6 +1069,7 @@ If you choose to copy to library the file will be copied into the GoldenCheetah 
     </message>
     <message>
         <location filename="../../Gui/AddIntervalDialog.cpp" line="59"/>
+        <location filename="../../Gui/AddIntervalDialog.cpp" line="535"/>
         <source>Peak Power</source>
         <translation>峰值功率</translation>
     </message>
@@ -1066,11 +1110,13 @@ If you choose to copy to library the file will be copied into the GoldenCheetah 
     </message>
     <message>
         <location filename="../../Gui/AddIntervalDialog.cpp" line="79"/>
+        <location filename="../../Gui/AddIntervalDialog.cpp" line="538"/>
         <source>Peak Speed</source>
         <translation>峰值速度</translation>
     </message>
     <message>
         <location filename="../../Gui/AddIntervalDialog.cpp" line="84"/>
+        <location filename="../../Gui/AddIntervalDialog.cpp" line="541"/>
         <source>Peak Pace</source>
         <translation>峰值配速</translation>
     </message>
@@ -1158,6 +1204,11 @@ If you choose to copy to library the file will be copied into the GoldenCheetah 
         <location filename="../../Gui/AddIntervalDialog.cpp" line="501"/>
         <source>No activity selected!</source>
         <translation>未选择活动！</translation>
+    </message>
+    <message>
+        <location filename="../../Gui/AddIntervalDialog.cpp" line="544"/>
+        <source>Peak HR</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../Gui/AddIntervalDialog.cpp" line="630"/>
@@ -1318,50 +1369,47 @@ If you choose to copy to library the file will be copied into the GoldenCheetah 
         <translation>搜索并配对蓝牙4.0设备</translation>
     </message>
     <message>
-        <location filename="../../Train/AddDeviceWizard.cpp" line="1008"/>
+        <location filename="../../Train/AddDeviceWizard.cpp" line="976"/>
         <source>Sensor</source>
         <translation>传感器</translation>
     </message>
     <message>
-        <location filename="../../Train/AddDeviceWizard.cpp" line="1009"/>
+        <location filename="../../Train/AddDeviceWizard.cpp" line="1008"/>
+        <source>Auto detect on device StartUp</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>BLE Id</source>
-        <translation>蓝牙BLE ID</translation>
+        <translation type="vanished">蓝牙BLE ID</translation>
     </message>
     <message>
-        <location filename="../../Train/AddDeviceWizard.cpp" line="1010"/>
         <source>Value</source>
-        <translation>数值</translation>
+        <translation type="vanished">数值</translation>
     </message>
     <message>
-        <location filename="../../Train/AddDeviceWizard.cpp" line="1011"/>
+        <location filename="../../Train/AddDeviceWizard.cpp" line="977"/>
         <source>Status</source>
         <translation>状态</translation>
     </message>
     <message>
-        <location filename="../../Train/AddDeviceWizard.cpp" line="1043"/>
-        <location filename="../../Train/AddDeviceWizard.cpp" line="1087"/>
         <source>none</source>
-        <translation>无</translation>
+        <translation type="vanished">无</translation>
     </message>
     <message>
-        <location filename="../../Train/AddDeviceWizard.cpp" line="1057"/>
         <source>Un-Paired</source>
-        <translation>未配对</translation>
+        <translation type="vanished">未配对</translation>
     </message>
     <message>
-        <location filename="../../Train/AddDeviceWizard.cpp" line="1094"/>
         <source>Unused</source>
-        <translation>未使用</translation>
+        <translation type="vanished">未使用</translation>
     </message>
     <message>
-        <location filename="../../Train/AddDeviceWizard.cpp" line="1096"/>
         <source>Searching...</source>
-        <translation>搜索中...</translation>
+        <translation type="vanished">搜索中...</translation>
     </message>
     <message>
-        <location filename="../../Train/AddDeviceWizard.cpp" line="1107"/>
         <source>Paired</source>
-        <translation>已配对</translation>
+        <translation type="vanished">已配对</translation>
     </message>
 </context>
 <context>
@@ -1376,7 +1424,7 @@ If you choose to copy to library the file will be copied into the GoldenCheetah 
         <source>Please make sure your device is connected, switched on and working. We will scan for the device type you have selected at known ports.
 
 </source>
-        <translation>请确认设备已连接、开机且正常工作,将在已知端口扫描选定的设备类型.</translation>
+        <translation>请确认设备已连接,开机且正常工作,将在已知端口扫描选定的设备类型.</translation>
     </message>
     <message>
         <location filename="../../Train/AddDeviceWizard.cpp" line="297"/>
@@ -1584,7 +1632,7 @@ Press Next to Continue
     <message>
         <location filename="../../Charts/Aerolab.cpp" line="777"/>
         <source>No ride selected</source>
-        <translation type="unfinished"></translation>
+        <translation>未选择骑行</translation>
     </message>
     <message>
         <location filename="../../Charts/Aerolab.cpp" line="882"/>
@@ -1688,473 +1736,473 @@ Press Next to Continue
 <context>
     <name>AllPlot</name>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="3856"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4569"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4572"/>
+        <location filename="../../Charts/AllPlot.cpp" line="3865"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4578"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4581"/>
         <source>Power</source>
         <translation>功率</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="4484"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4493"/>
         <source>Heart Rate</source>
         <translation>心率</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="3840"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4547"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4554"/>
-        <location filename="../../Charts/AllPlot.cpp" line="7040"/>
+        <location filename="../../Charts/AllPlot.cpp" line="3849"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4556"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4563"/>
+        <location filename="../../Charts/AllPlot.cpp" line="7050"/>
         <source>Speed</source>
         <translation>速度</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="2981"/>
+        <location filename="../../Charts/AllPlot.cpp" line="2989"/>
         <source>Percent</source>
         <translation>百分比</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="3764"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4466"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4469"/>
+        <location filename="../../Charts/AllPlot.cpp" line="3773"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4475"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4478"/>
         <source>Cadence</source>
         <translation>踏频</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="3780"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4487"/>
+        <location filename="../../Charts/AllPlot.cpp" line="3789"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4496"/>
         <source>Heartrate</source>
         <translation>心率</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="3796"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4502"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4505"/>
+        <location filename="../../Charts/AllPlot.cpp" line="3805"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4511"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4514"/>
         <source>Acceleration</source>
         <translation>加速度</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="3804"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4511"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4514"/>
+        <location filename="../../Charts/AllPlot.cpp" line="3813"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4520"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4523"/>
         <source>Power Delta</source>
         <translation>功率变化(Power Delta)</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="3812"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4520"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4523"/>
+        <location filename="../../Charts/AllPlot.cpp" line="3821"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4529"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4532"/>
         <source>Cadence Delta</source>
         <translation>踏频变化(Cadence Delta)</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="3820"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4529"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4532"/>
+        <location filename="../../Charts/AllPlot.cpp" line="3829"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4538"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4541"/>
         <source>Torque Delta</source>
         <translation>扭矩变化(Torque Delta)</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="3828"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4538"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4541"/>
+        <location filename="../../Charts/AllPlot.cpp" line="3837"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4547"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4550"/>
         <source>Heartrate Delta</source>
         <translation>心率变化(Heartrate Delta)</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="3866"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4587"/>
+        <location filename="../../Charts/AllPlot.cpp" line="3875"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4596"/>
         <source>W&apos;bal</source>
         <translation>W&apos;平衡</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="3875"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4594"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4598"/>
+        <location filename="../../Charts/AllPlot.cpp" line="3884"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4603"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4607"/>
         <source>Altitude</source>
         <translation>海拔</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="3896"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4620"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4622"/>
+        <location filename="../../Charts/AllPlot.cpp" line="3905"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4629"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4631"/>
         <source>Headwind</source>
         <translation>逆风</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="3904"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4628"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4631"/>
+        <location filename="../../Charts/AllPlot.cpp" line="3913"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4637"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4640"/>
         <source>Temperature</source>
         <translation>温度</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="3848"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4560"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4563"/>
+        <location filename="../../Charts/AllPlot.cpp" line="3857"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4569"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4572"/>
         <source>Torque</source>
         <translation>扭矩</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="2854"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4578"/>
+        <location filename="../../Charts/AllPlot.cpp" line="2862"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4587"/>
         <source>W&apos; Balance (kJ)</source>
         <translation>W&apos; 平衡 (kJ)</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="2893"/>
+        <location filename="../../Charts/AllPlot.cpp" line="2901"/>
         <source>RR</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="2904"/>
-        <location filename="../../Charts/AllPlot.cpp" line="2952"/>
+        <location filename="../../Charts/AllPlot.cpp" line="2912"/>
+        <location filename="../../Charts/AllPlot.cpp" line="2960"/>
         <source>Core Temperature</source>
         <translation>核心温度</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="2911"/>
-        <location filename="../../Charts/AllPlot.cpp" line="3968"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4700"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4703"/>
+        <location filename="../../Charts/AllPlot.cpp" line="2919"/>
+        <location filename="../../Charts/AllPlot.cpp" line="3977"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4709"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4712"/>
         <source>SmO2</source>
         <translation>SmO2</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="2986"/>
-        <location filename="../../Charts/AllPlot.cpp" line="3888"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4611"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4614"/>
+        <location filename="../../Charts/AllPlot.cpp" line="2994"/>
+        <location filename="../../Charts/AllPlot.cpp" line="3897"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4620"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4623"/>
         <source>Slope</source>
         <translation>坡度</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="3036"/>
-        <location filename="../../Charts/AllPlot.cpp" line="3067"/>
-        <location filename="../../Charts/AllPlot.cpp" line="7054"/>
+        <location filename="../../Charts/AllPlot.cpp" line="3044"/>
+        <location filename="../../Charts/AllPlot.cpp" line="3075"/>
+        <location filename="../../Charts/AllPlot.cpp" line="7064"/>
         <source>Hb</source>
         <translation>Hb</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="3260"/>
+        <location filename="../../Charts/AllPlot.cpp" line="3268"/>
         <source>** Minimum CP=%1 **</source>
         <translation>** 最小 CP=%1 **</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="3262"/>
+        <location filename="../../Charts/AllPlot.cpp" line="3270"/>
         <source>** Check W&apos; is set correctly **</source>
         <translation>** 请确认W&apos;已正确设定 **</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="3267"/>
+        <location filename="../../Charts/AllPlot.cpp" line="3275"/>
         <source>Tau=%1, CP=%2, W&apos;=%3, %4 match &gt;2kJ (%5 kJ) %6</source>
         <translation>Tau=%1, CP=%2, W&apos;=%3, %4 匹配 &gt;2kJ (%5 kJ) %6</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="3270"/>
+        <location filename="../../Charts/AllPlot.cpp" line="3278"/>
         <source>Tau=%1, CP=%2, W&apos;=%3, %4 matches &gt;2kJ (%5 kJ) %6</source>
         <translation>Tau=%1, CP=%2, W&apos;=%3, %4 匹配 &gt;2kJ (%5 kJ) %6</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="3772"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4475"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4478"/>
+        <location filename="../../Charts/AllPlot.cpp" line="3781"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4484"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4487"/>
         <source>Core Temp</source>
         <translation>核心温度</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="3788"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4493"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4496"/>
-        <location filename="../../Charts/AllPlot.cpp" line="7056"/>
+        <location filename="../../Charts/AllPlot.cpp" line="3797"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4502"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4505"/>
+        <location filename="../../Charts/AllPlot.cpp" line="7066"/>
         <source>R-R</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="3879"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4600"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4604"/>
+        <location filename="../../Charts/AllPlot.cpp" line="3888"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4609"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4613"/>
         <source>Alt/Slope</source>
         <translation>海拔/坡度</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="3912"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4637"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4640"/>
+        <location filename="../../Charts/AllPlot.cpp" line="3921"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4646"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4649"/>
         <source>Anaerobic TISS</source>
         <translation>无氧(Anaerobic)TISS</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="3920"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4646"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4649"/>
+        <location filename="../../Charts/AllPlot.cpp" line="3929"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4655"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4658"/>
         <source>Aerobic TISS</source>
         <translation>有氧(Aerobic)TISS</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="3928"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4655"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4658"/>
+        <location filename="../../Charts/AllPlot.cpp" line="3937"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4664"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4667"/>
         <source>IsoPower</source>
         <translation>标准化功率</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="3936"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4664"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4667"/>
-        <source>Vertical Oscillation</source>
-        <translation>垂直振动</translation>
-    </message>
-    <message>
-        <location filename="../../Charts/AllPlot.cpp" line="3944"/>
+        <location filename="../../Charts/AllPlot.cpp" line="3945"/>
         <location filename="../../Charts/AllPlot.cpp" line="4673"/>
         <location filename="../../Charts/AllPlot.cpp" line="4676"/>
+        <source>Vertical Oscillation</source>
+        <translation>垂直振幅</translation>
+    </message>
+    <message>
+        <location filename="../../Charts/AllPlot.cpp" line="3953"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4682"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4685"/>
         <source>Run Cadence</source>
         <translation>步频</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="3952"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4682"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4685"/>
+        <location filename="../../Charts/AllPlot.cpp" line="3961"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4691"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4694"/>
         <source>GCT</source>
         <translation>触地时间</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="3960"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4691"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4694"/>
-        <location filename="../../Charts/AllPlot.cpp" line="7058"/>
+        <location filename="../../Charts/AllPlot.cpp" line="3969"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4700"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4703"/>
+        <location filename="../../Charts/AllPlot.cpp" line="7068"/>
         <source>Gear Ratio</source>
         <translation>齿比</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="3976"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4709"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4712"/>
+        <location filename="../../Charts/AllPlot.cpp" line="3985"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4718"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4721"/>
         <source>tHb</source>
         <translation>tHb</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="3984"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4718"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4721"/>
+        <location filename="../../Charts/AllPlot.cpp" line="3993"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4727"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4730"/>
         <source>O2Hb</source>
         <translation>O2Hb</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="3992"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4727"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4730"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4001"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4736"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4739"/>
         <source>HHb</source>
         <translation>HHb</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="4000"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4736"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4739"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4009"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4745"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4748"/>
         <source>xPower</source>
         <translation>xPower</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="4008"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4745"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4748"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4017"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4754"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4757"/>
         <source>Left Pedal Smoothness</source>
         <translation>左踏板平滑度</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="4016"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4754"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4757"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4025"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4763"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4766"/>
         <source>Right Pedal Smoothness</source>
         <translation>右踏板平滑度</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="4024"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4763"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4766"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4033"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4772"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4775"/>
         <source>Left Torque Efficiency</source>
         <translation>左扭矩效率</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="4032"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4772"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4775"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4041"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4781"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4784"/>
         <source>Right Torque Efficiency</source>
         <translation>右扭矩效率</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="4043"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4788"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4052"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4797"/>
         <source>Left/Right Pedal Center Offset</source>
         <translation>左/右踏板偏移(Center Offset)</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="4051"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4795"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4797"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4060"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4804"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4806"/>
         <source>Left Power Phase</source>
         <translation>左功率相(Power Phase)</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="4059"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4804"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4806"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4068"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4813"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4815"/>
         <source>Right Power Phase</source>
         <translation>右功率相(Power Phase)</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="4067"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4813"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4815"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4076"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4822"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4824"/>
         <source>Left Peak Power Phase</source>
         <translation>左功率相峰值</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="4075"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4822"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4824"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4084"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4831"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4833"/>
         <source>Right Peak Power Phase</source>
         <translation>右功率相峰值</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="4085"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4836"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4094"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4845"/>
         <source>L/R Balance</source>
         <translation>左/右平衡</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="4093"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4842"/>
-        <location filename="../../Charts/AllPlot.cpp" line="4845"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4102"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4851"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4854"/>
         <source>aPower</source>
         <translation>aPower</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="4580"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4589"/>
         <source>Matches</source>
         <translation>匹配</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="4782"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4791"/>
         <source>Left Pedal Center Offset</source>
         <translation>左踏板偏移(Center Offset)</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="4785"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4794"/>
         <source>Right Pedal Center Offset</source>
         <translation>右踏板偏移(Center Offset)</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="4830"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4839"/>
         <source>Left Balance</source>
         <translation>左平衡</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="4832"/>
+        <location filename="../../Charts/AllPlot.cpp" line="4841"/>
         <source>Right Balance</source>
         <translation>右平衡</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="7044"/>
+        <location filename="../../Charts/AllPlot.cpp" line="7054"/>
         <source>min/km</source>
         <translation>min/km</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="7044"/>
+        <location filename="../../Charts/AllPlot.cpp" line="7054"/>
         <source>min/mile</source>
         <translation>min/mi</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="7045"/>
-        <location filename="../../Charts/AllPlot.cpp" line="7049"/>
+        <location filename="../../Charts/AllPlot.cpp" line="7055"/>
+        <location filename="../../Charts/AllPlot.cpp" line="7059"/>
         <source>
 %1 %2</source>
         <translation>
 %1 %2</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="7048"/>
+        <location filename="../../Charts/AllPlot.cpp" line="7058"/>
         <source>min/100m</source>
         <translation>min/100m</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="7048"/>
+        <location filename="../../Charts/AllPlot.cpp" line="7058"/>
         <source>min/100yd</source>
         <translation>min/100yd</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="7051"/>
+        <location filename="../../Charts/AllPlot.cpp" line="7061"/>
         <source>W&apos;</source>
         <translation>W&apos;</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="2595"/>
-        <location filename="../../Charts/AllPlot.cpp" line="2601"/>
+        <location filename="../../Charts/AllPlot.cpp" line="2603"/>
+        <location filename="../../Charts/AllPlot.cpp" line="2609"/>
         <source>Match</source>
         <translation>匹配</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="2725"/>
+        <location filename="../../Charts/AllPlot.cpp" line="2733"/>
         <source>Power Ref</source>
         <translation>功率基准</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="2735"/>
+        <location filename="../../Charts/AllPlot.cpp" line="2743"/>
         <source>Heart Rate Ref</source>
         <translation>心率基准</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="2746"/>
+        <location filename="../../Charts/AllPlot.cpp" line="2754"/>
         <source>Cadence Ref</source>
         <translation>踏频基准</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="2846"/>
+        <location filename="../../Charts/AllPlot.cpp" line="2854"/>
         <source>TISS</source>
         <translation>TISS</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="2878"/>
+        <location filename="../../Charts/AllPlot.cpp" line="2886"/>
         <source>Watts</source>
         <translation>W</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="2897"/>
+        <location filename="../../Charts/AllPlot.cpp" line="2905"/>
         <source>BPM</source>
         <translation>心率 (bpm)</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="2918"/>
+        <location filename="../../Charts/AllPlot.cpp" line="2926"/>
         <source>RPM</source>
         <translation>踏频(RPM)</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="3015"/>
+        <location filename="../../Charts/AllPlot.cpp" line="3023"/>
         <source>KPH</source>
         <translation>km/h</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="3015"/>
+        <location filename="../../Charts/AllPlot.cpp" line="3023"/>
         <source>MPH</source>
         <translation>mi/h</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="3044"/>
+        <location filename="../../Charts/AllPlot.cpp" line="3052"/>
         <source>Nm</source>
         <translation>Nm</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="3044"/>
+        <location filename="../../Charts/AllPlot.cpp" line="3052"/>
         <source>ftLb</source>
         <translation>ftLb</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="3093"/>
+        <location filename="../../Charts/AllPlot.cpp" line="3101"/>
         <source>Meters</source>
         <translation>m</translation>
     </message>
     <message>
-        <location filename="../../Charts/AllPlot.cpp" line="3093"/>
+        <location filename="../../Charts/AllPlot.cpp" line="3101"/>
         <source>Feet</source>
         <translation>英尺</translation>
     </message>
@@ -2184,7 +2232,7 @@ Press Next to Continue
     <message>
         <location filename="../../Charts/AllPlot.cpp" line="307"/>
         <source>Vertical Oscillation</source>
-        <translation>垂直振动</translation>
+        <translation>垂直振幅</translation>
     </message>
     <message>
         <location filename="../../Charts/AllPlot.cpp" line="311"/>
@@ -2524,7 +2572,7 @@ Press Next to Continue
     <message>
         <location filename="../../Charts/AllPlotWindow.cpp" line="319"/>
         <source>Vertical Oscillation</source>
-        <translation>垂直振动</translation>
+        <translation>垂直振幅</translation>
     </message>
     <message>
         <location filename="../../Charts/AllPlotWindow.cpp" line="321"/>
@@ -2539,7 +2587,7 @@ Press Next to Continue
     <message>
         <location filename="../../Charts/AllPlotWindow.cpp" line="329"/>
         <source>Cadence </source>
-        <translation type="unfinished"></translation>
+        <translation>踏频 </translation>
     </message>
     <message>
         <location filename="../../Charts/AllPlotWindow.cpp" line="335"/>
@@ -2865,7 +2913,7 @@ Press Next to Continue
     <message>
         <location filename="../../Gui/AnalysisSidebar.cpp" line="571"/>
         <source>Mark as a performance test</source>
-        <translation type="unfinished"></translation>
+        <translation>标记为表现测试</translation>
     </message>
     <message>
         <location filename="../../Gui/AnalysisSidebar.cpp" line="595"/>
@@ -2880,7 +2928,7 @@ Press Next to Continue
     <message>
         <location filename="../../Gui/AnalysisSidebar.cpp" line="617"/>
         <source>Create a performance test</source>
-        <translation type="unfinished"></translation>
+        <translation>创建表现测试</translation>
     </message>
     <message>
         <location filename="../../Gui/AnalysisSidebar.cpp" line="625"/>
@@ -2900,18 +2948,18 @@ Press Next to Continue
     <message>
         <location filename="../../Gui/AnalysisSidebar.cpp" line="730"/>
         <source>Performance Test</source>
-        <translation type="unfinished"></translation>
+        <translation>表现测试</translation>
     </message>
     <message>
         <location filename="../../Gui/AnalysisSidebar.cpp" line="809"/>
         <source>Are you sure you want to delete selected interval?</source>
-        <translation type="unfinished"></translation>
+        <translation>确认删除选中的区段?</translation>
     </message>
     <message>
         <location filename="../../Gui/AnalysisSidebar.cpp" line="810"/>
         <location filename="../../Gui/AnalysisSidebar.cpp" line="859"/>
         <source>Remove</source>
-        <translation type="unfinished">删除</translation>
+        <translation>删除</translation>
     </message>
     <message>
         <location filename="../../Gui/AnalysisSidebar.cpp" line="836"/>
@@ -2926,7 +2974,7 @@ Press Next to Continue
     <message>
         <location filename="../../Gui/AnalysisSidebar.cpp" line="858"/>
         <source>Are you sure you want to stop tracking this segment?</source>
-        <translation type="unfinished"></translation>
+        <translation>确认停止跟踪此分段?</translation>
     </message>
     <message>
         <location filename="../../Gui/AnalysisSidebar.cpp" line="408"/>
@@ -3188,7 +3236,7 @@ Press Next to Continue
     <message>
         <location filename="../../Core/Athlete.cpp" line="322"/>
         <source>BikeStress and BikeIntensity</source>
-        <translation type="unfinished"></translation>
+        <translation>BikeStress与BikeIntensity</translation>
     </message>
     <message>
         <location filename="../../Core/Athlete.cpp" line="323"/>
@@ -3558,15 +3606,15 @@ Press Next to Continue
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="574"/>
         <source>Weight in kg or lbs: first from Athlete body measurements, then from Activity metadata and last from Athlete configuration with 75kg default</source>
-        <translation>依次来自身体参数、活动元数据或运动员设置的体重 (单位为kg或lbs),默认为75kg</translation>
+        <translation>依次来自身体参数,活动元数据或运动员设置的体重 (单位为kg或lbs),默认为75kg</translation>
     </message>
     <message>
         <source>Weight in kg or lbs: first from Withings data, then from Activity metadata and last from Athlete configuration with 75kg default</source>
-        <translation type="vanished">来自Withings数据、活动元数据和运动员设置的体重(单位为kg或lbs),默认为75kg</translation>
+        <translation type="vanished">来自Withings数据,活动元数据和运动员设置的体重(单位为kg或lbs),默认为75kg</translation>
     </message>
     <message>
         <source>Weight in kg or lbs: first from Withings data, then from Activity metadaa and last from Athlete configuration with 75kg default</source>
-        <translation type="vanished">来自Withings数据、活动元数据和运动员设置的体重(单位为kg或lbs),默认为75kg</translation>
+        <translation type="vanished">来自Withings数据,活动元数据和运动员设置的体重(单位为kg或lbs),默认为75kg</translation>
     </message>
 </context>
 <context>
@@ -4094,18 +4142,18 @@ Press Next to Continue
     <message>
         <location filename="../../Metrics/RunMetrics.cpp" line="520"/>
         <source>Average Stance Time Percent</source>
-        <translation type="unfinished"></translation>
+        <translation>平均站姿时间百分比</translation>
     </message>
     <message>
         <location filename="../../Metrics/RunMetrics.cpp" line="521"/>
         <location filename="../../Metrics/RunMetrics.cpp" line="522"/>
         <source>%</source>
-        <translation type="unfinished">%</translation>
+        <translation>%</translation>
     </message>
     <message>
         <location filename="../../Metrics/RunMetrics.cpp" line="525"/>
         <source>Average Stance Time Percent (%): Ground Contact Time / Step Time</source>
-        <translation type="unfinished"></translation>
+        <translation>平均站姿时间百分比 (%): 触地时间/每步时间</translation>
     </message>
 </context>
 <context>
@@ -4114,7 +4162,7 @@ Press Next to Continue
         <location filename="../../Metrics/RunMetrics.cpp" line="216"/>
         <location filename="../../Metrics/RunMetrics.cpp" line="222"/>
         <source>Average Vertical Oscillation</source>
-        <translation>平均垂直振动</translation>
+        <translation>平均垂直振幅</translation>
     </message>
     <message>
         <location filename="../../Metrics/RunMetrics.cpp" line="217"/>
@@ -4132,18 +4180,18 @@ Press Next to Continue
     <message>
         <location filename="../../Metrics/RunMetrics.cpp" line="460"/>
         <source>Average Vertical Ratio</source>
-        <translation type="unfinished"></translation>
+        <translation>平均垂直步幅比</translation>
     </message>
     <message>
         <location filename="../../Metrics/RunMetrics.cpp" line="461"/>
         <location filename="../../Metrics/RunMetrics.cpp" line="462"/>
         <source>%</source>
-        <translation type="unfinished">%</translation>
+        <translation>%</translation>
     </message>
     <message>
         <location filename="../../Metrics/RunMetrics.cpp" line="465"/>
         <source>Average Vertical Ratio (%): Vertical Oscillation / Step Length</source>
-        <translation type="unfinished"></translation>
+        <translation>平均垂直步幅比 (%): 垂直振幅/步幅</translation>
     </message>
 </context>
 <context>
@@ -4193,18 +4241,18 @@ Press Next to Continue
     <message>
         <location filename="../../Metrics/RunMetrics.cpp" line="580"/>
         <source>Average Step Length</source>
-        <translation type="unfinished"></translation>
+        <translation>平均步幅</translation>
     </message>
     <message>
         <location filename="../../Metrics/RunMetrics.cpp" line="581"/>
         <location filename="../../Metrics/RunMetrics.cpp" line="582"/>
         <source>mm</source>
-        <translation type="unfinished">mm</translation>
+        <translation>mm</translation>
     </message>
     <message>
         <location filename="../../Metrics/RunMetrics.cpp" line="585"/>
         <source>Average Step Length: average single step (L to R / R to L) length in mm</source>
-        <translation type="unfinished"></translation>
+        <translation>平均步幅: 平均单步长度,单位为mm</translation>
     </message>
 </context>
 <context>
@@ -5055,53 +5103,53 @@ Let&apos;s get you setup.</source>
     <message>
         <location filename="../../Core/BodyMeasures.cpp" line="187"/>
         <source>Weight</source>
-        <translation type="unfinished">体重</translation>
+        <translation>体重</translation>
     </message>
     <message>
         <location filename="../../Core/BodyMeasures.cpp" line="187"/>
         <source>Fat Mass</source>
-        <translation type="unfinished">体脂重量</translation>
+        <translation>体脂重量</translation>
     </message>
     <message>
         <location filename="../../Core/BodyMeasures.cpp" line="187"/>
         <source>Muscle Mass</source>
-        <translation type="unfinished"></translation>
+        <translation>肌肉重量</translation>
     </message>
     <message>
         <location filename="../../Core/BodyMeasures.cpp" line="187"/>
         <source>Bones Mass</source>
-        <translation type="unfinished"></translation>
+        <translation>骨重量</translation>
     </message>
     <message>
         <location filename="../../Core/BodyMeasures.cpp" line="187"/>
         <source>Lean Mass</source>
-        <translation type="unfinished">瘦体重</translation>
+        <translation>瘦体重</translation>
     </message>
     <message>
         <location filename="../../Core/BodyMeasures.cpp" line="187"/>
         <source>Fat Percent</source>
-        <translation type="unfinished"></translation>
+        <translation>体脂率</translation>
     </message>
     <message>
         <location filename="../../Core/BodyMeasures.cpp" line="209"/>
         <source>kg</source>
-        <translation type="unfinished">kg</translation>
+        <translation>kg</translation>
     </message>
     <message>
         <location filename="../../Core/BodyMeasures.cpp" line="209"/>
         <location filename="../../Core/BodyMeasures.cpp" line="210"/>
         <source>%</source>
-        <translation type="unfinished">%</translation>
+        <translation>%</translation>
     </message>
     <message>
         <location filename="../../Core/BodyMeasures.cpp" line="210"/>
         <source>lbs</source>
-        <translation type="unfinished">磅</translation>
+        <translation>磅</translation>
     </message>
     <message>
         <location filename="../../Core/BodyMeasures.h" line="73"/>
         <source>Body</source>
-        <translation type="unfinished"></translation>
+        <translation>身体</translation>
     </message>
 </context>
 <context>
@@ -5258,7 +5306,7 @@ Let&apos;s get you setup.</source>
     <message>
         <location filename="../../Cloud/BodyMeasuresDownload.cpp" line="310"/>
         <source>Download completed.</source>
-        <translation type="unfinished"></translation>
+        <translation>下载完成.</translation>
     </message>
     <message>
         <location filename="../../Cloud/BodyMeasuresDownload.cpp" line="316"/>
@@ -5444,7 +5492,7 @@ Let&apos;s get you setup.</source>
     <message>
         <location filename="../../Charts/CPPlot.cpp" line="103"/>
         <location filename="../../Charts/CPPlot.cpp" line="1923"/>
-        <location filename="../../Charts/CPPlot.cpp" line="2168"/>
+        <location filename="../../Charts/CPPlot.cpp" line="2173"/>
         <source>Percent of Best</source>
         <translation>最佳百分比</translation>
     </message>
@@ -5456,6 +5504,7 @@ Let&apos;s get you setup.</source>
     <message>
         <location filename="../../Charts/CPPlot.cpp" line="211"/>
         <location filename="../../Charts/CPPlot.cpp" line="1122"/>
+        <location filename="../../Charts/CPPlot.cpp" line="2147"/>
         <source>kJ</source>
         <translation>kJ</translation>
     </message>
@@ -5707,52 +5756,52 @@ Let&apos;s get you setup.</source>
         <translation type="vanished">km/h %1 mi/h</translation>
     </message>
     <message>
-        <location filename="../../Charts/CPPlot.cpp" line="2147"/>
-        <location filename="../../Charts/CPPlot.cpp" line="3157"/>
+        <location filename="../../Charts/CPPlot.cpp" line="2152"/>
+        <location filename="../../Charts/CPPlot.cpp" line="3162"/>
         <source>%1 mph</source>
         <translation>%1 mi/h</translation>
     </message>
     <message>
-        <location filename="../../Charts/CPPlot.cpp" line="2152"/>
+        <location filename="../../Charts/CPPlot.cpp" line="2157"/>
         <source>%1 Percent</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 %</translation>
     </message>
     <message>
-        <location filename="../../Charts/CPPlot.cpp" line="2153"/>
+        <location filename="../../Charts/CPPlot.cpp" line="2158"/>
         <source>%1 Power Index</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 功率指数</translation>
     </message>
     <message>
-        <location filename="../../Charts/CPPlot.cpp" line="2188"/>
+        <location filename="../../Charts/CPPlot.cpp" line="2193"/>
         <source>
 %1 m</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Charts/CPPlot.cpp" line="2189"/>
+        <location filename="../../Charts/CPPlot.cpp" line="2194"/>
         <source>
 %1 yd</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Charts/CPPlot.cpp" line="2193"/>
+        <location filename="../../Charts/CPPlot.cpp" line="2198"/>
         <source>
 %1 km</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Charts/CPPlot.cpp" line="2194"/>
+        <location filename="../../Charts/CPPlot.cpp" line="2199"/>
         <source>
 %1 mi</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Charts/CPPlot.cpp" line="3165"/>
+        <location filename="../../Charts/CPPlot.cpp" line="3170"/>
         <source>%1 km</source>
         <translation>%1 km</translation>
     </message>
     <message>
-        <location filename="../../Charts/CPPlot.cpp" line="3167"/>
+        <location filename="../../Charts/CPPlot.cpp" line="3172"/>
         <source>%1 mi</source>
         <translation>%1 mi</translation>
     </message>
@@ -5761,25 +5810,26 @@ Let&apos;s get you setup.</source>
         <location filename="../../Charts/CPPlot.cpp" line="2130"/>
         <location filename="../../Charts/CPPlot.cpp" line="2136"/>
         <location filename="../../Charts/CPPlot.cpp" line="2141"/>
-        <location filename="../../Charts/CPPlot.cpp" line="2154"/>
+        <location filename="../../Charts/CPPlot.cpp" line="2146"/>
+        <location filename="../../Charts/CPPlot.cpp" line="2159"/>
         <source>%1 %2</source>
         <translation>%1 %2</translation>
     </message>
     <message>
         <location filename="../../Charts/CPPlot.cpp" line="379"/>
         <source>Energy/Time </source>
-        <translation type="unfinished"></translation>
+        <translation>能量/时间 </translation>
     </message>
     <message>
         <location filename="../../Charts/CPPlot.cpp" line="415"/>
         <source>No Model</source>
-        <translation type="unfinished"></translation>
+        <translation>无模型</translation>
     </message>
     <message>
         <location filename="../../Charts/CPPlot.cpp" line="741"/>
         <location filename="../../Charts/CPPlot.cpp" line="777"/>
         <source>Percentile</source>
-        <translation type="unfinished"></translation>
+        <translation>百分位数</translation>
     </message>
     <message>
         <location filename="../../Charts/CPPlot.cpp" line="823"/>
@@ -5799,7 +5849,7 @@ Let&apos;s get you setup.</source>
     <message>
         <location filename="../../Charts/CPPlot.cpp" line="1947"/>
         <source>Power Index</source>
-        <translation type="unfinished"></translation>
+        <translation>功率指数</translation>
     </message>
     <message>
         <location filename="../../Charts/CPPlot.cpp" line="2137"/>
@@ -5807,8 +5857,8 @@ Let&apos;s get you setup.</source>
         <translation>%</translation>
     </message>
     <message>
-        <location filename="../../Charts/CPPlot.cpp" line="2146"/>
-        <location filename="../../Charts/CPPlot.cpp" line="3155"/>
+        <location filename="../../Charts/CPPlot.cpp" line="2151"/>
+        <location filename="../../Charts/CPPlot.cpp" line="3160"/>
         <source>%1 kph</source>
         <translation>%1 km/h</translation>
     </message>
@@ -5868,7 +5918,7 @@ yyyy年M月d日,ddd</translation>
 %1 km %2 英里</translation>
     </message>
     <message>
-        <location filename="../../Charts/CPPlot.cpp" line="2688"/>
+        <location filename="../../Charts/CPPlot.cpp" line="2693"/>
         <source>%10 %</source>
         <translation>%10 %</translation>
     </message>
@@ -6046,17 +6096,17 @@ yyyy年M月d日,ddd</translation>
     <message>
         <location filename="../../Cloud/CalDAVCloud.h" line="70"/>
         <source>Google Calendar using CalDAV protocol and authenticate using Google Account</source>
-        <translation type="unfinished"></translation>
+        <translation>Google日历使用CalDAV协议并需要Google账户授权</translation>
     </message>
     <message>
         <location filename="../../Cloud/CalDAVCloud.h" line="71"/>
         <source>Web Calendar using iCal format as a web resource</source>
-        <translation type="unfinished"></translation>
+        <translation>使用iCal格式的网络日历</translation>
     </message>
     <message>
         <location filename="../../Cloud/CalDAVCloud.h" line="73"/>
         <source>Generic CalDAV Calendar such as Apple iCloud calendar</source>
-        <translation type="unfinished"></translation>
+        <translation>一般CalDAV日历,如苹果iCloud日历</translation>
     </message>
 </context>
 <context>
@@ -6127,12 +6177,17 @@ yyyy年M月d日,ddd</translation>
         <translation>新增图表</translation>
     </message>
     <message>
-        <location filename="../../Charts/ChartBar.cpp" line="126"/>
+        <location filename="../../Charts/ChartBar.cpp" line="125"/>
+        <source>Import Chart...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Charts/ChartBar.cpp" line="128"/>
         <source>Upload Chart...</source>
         <translation>上传图表...</translation>
     </message>
     <message>
-        <location filename="../../Charts/ChartBar.cpp" line="127"/>
+        <location filename="../../Charts/ChartBar.cpp" line="129"/>
         <source>Download Chart...</source>
         <translation>下载图表...</translation>
     </message>
@@ -6207,7 +6262,7 @@ Are you sure?</source>
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="522"/>
         <source>According to Dan Conelly: Elevation Gain ^2 / Distance / 1000, 100 is HARD</source>
-        <translation>据Dan Conelly,按：爬升^2 / 距离 / 1000计算,100为艰难(HARD) </translation>
+        <translation>据Dan Conelly,按:爬升^2 / 距离 / 1000计算,100为艰难(HARD) </translation>
     </message>
 </context>
 <context>
@@ -6225,7 +6280,7 @@ Are you sure?</source>
     <message>
         <location filename="../../Cloud/CloudDBCommon.cpp" line="56"/>
         <source>&lt;center&gt;&lt;b&gt;What is GoldenCheetah CloudDB&lt;/b&gt;&lt;br&gt;You have requested a function with shares or retrieves GoldenCheetah configuration artifacts like chart definitions, worksouts, custom metrics,... in a cloud based data storage extension which is running on Google App Engine in a data center of variable location as provided by Google and/or choosen by the GoldenCheetah team.&lt;br&gt;&lt;center&gt;&lt;b&gt;License and Privacy Rules for Sharing Artifacts&lt;/b&gt;&lt;br&gt;By sharing an artifact to CloudDB you agree to provide it under &lt;a href=&quot;http://creativecommons.org/licenses/by/4.0/&quot; target=&quot;_blank&quot;&gt;Creative Common License 4.0&lt;/a&gt;. When sharing you are asked to enter a &apos;Nickname&apos; and an &apos;Email-Address&apos; which are stored together with a unique identifier (which is automatically created for your athlete) in the CloudDB. This data is only used to support the CloudDB service and will not be disclosed or shared for other purposes (e.g. advertisement).&lt;br&gt;&lt;center&gt;&lt;b&gt;License and Rules for Importing Artifacts&lt;/b&gt;&lt;br&gt;By importing an artifact from CloudDB you accept the license agreement &lt;a href=&quot;http://creativecommons.org/licenses/by/4.0/&quot; target=&quot;_blank&quot;&gt;Creative Common License 4.0&lt;/a&gt;. Any artifcats are provided as-is without warranty of any kind, either expressed or implied, including, but not limited to, the implied warrenty of fitness for a particular purpose. The entire risk related to the quality of the artifact is with you. There is no liability regarding damages to your data trough the use of any of the artifacts and there will be no quality check/ensurance by the GoldenCheetah team for the provided artifacts.&lt;br&gt;&lt;center&gt;&lt;b&gt;CloudDB Service Availability Disclaimer&lt;/b&gt;&lt;br&gt;The service is provisioned free-of-charge to the users of GoldenCheetah. There is no guarantee nor service level agreement on the 7x24 availabiliy of CloudDB services. The GoldenCheetah team has the right to delete artifacts from the CloudDB at any time and without prior notice to the providing user (e.g. due to quality issues, or due to limitations in storage capacity). The GoldenCheetah team has the right to suspend or stop the complete service or parts of the service at any time and without prior notice to the users.&lt;br&gt;&lt;center&gt;&lt;b&gt;CloudDB Service Rules&lt;/b&gt;&lt;br&gt;The use of the service is exclusively granted to GoldenCheetah users - and the only permitted way to access any of the artifacts is through the GoldenCheetah application. Any attempt to access CloudDB data directly is forbidden and will either be blocked or may even end in suspending or stopping the service in general.&lt;br&gt;&lt;center&gt;&lt;b&gt;Accept or Reject&lt;/b&gt;&lt;br&gt;By pressing &apos;Accept the rules and conditions of CloudDB&apos; you confirm that you have read and fully understood the above text and you agree to follow all of these. This decision is recorded so that you will not asked again when using CloudDB related functions. &lt;br&gt;&lt;br&gt;If you are not sure you can choose &apos;Reject and don&apos;t use CloudDB&apos;. In this case this agreement request will appear again whenever you request to use a CloudDB related function in GoldenCheetah.&lt;br&gt;&lt;center&gt;&lt;b&gt;CloudDB Source Code&lt;/b&gt;&lt;br&gt;The source code of CloudDB is published under &apos;GNU AFFERO GENERAL PUBLIC LICENSE Version 3&apos; here: &lt;a href= &quot;https://github.com/GoldenCheetah/CloudDB&quot; target=&quot;_blank&quot;&gt;CloudDB Repository&lt;/a&gt;&lt;br&gt;&lt;br&gt;</source>
-        <translation>&lt;center&gt;&lt;b&gt;什么是GoldenCheetah云数据库&lt;/b&gt;&lt;br&gt;GC设置文件,如图表定义、训练、自定义指标等,将保存到基于云的数据存储空间(运行在由Google提供的Google App Engine上).&lt;br&gt;&lt;center&gt;&lt;b&gt;文件分享的授权和隐私规则&lt;/b&gt;&lt;br&gt;通过将文件分享至云数据库,即代表您同意将其置于&lt;a href=&quot;http://creativecommons.org/licenses/by/4.0/&quot; target=&quot;_blank&quot;&gt;创意通用许可4.0&lt;/a&gt;之下. 在分享时您将被要求提供“昵称”和“电邮地址”,它们将与一个独特识别码(为你的运动员自动生成)共同保存在云数据库. 该数据将只被用于支持云数据库服务,且不会被公开或分享用于其他目的(如广告).&lt;br&gt;&lt;center&gt;&lt;b&gt;文件导入的授权和隐私规则&lt;/b&gt;&lt;br&gt;通过从云数据库导入文件,即代表您接受授权协议&lt;a href=&quot;http://creativecommons.org/licenses/by/4.0/&quot; target=&quot;_blank&quot;&gt;创意通用许可4.0&lt;/a&gt;. 任何提供的文件将不受任何担保,无论通过明示或暗示,包括且不限于,适合于某种特殊目的的默示担保. 与文件质量相关的全部风险将由您承担. 在文件使用过程中,将不会出现与数据损坏有关的责任,而且Golden Cheetah团队将不会对提供的文件进行质量检查或保证.&lt;br&gt;&lt;center&gt;&lt;b&gt;云数据库服务可用性声明&lt;/b&gt;&lt;br&gt;该服务供GC用户免费使用. 对于云数据库服务的7x24可用性,将不会有任何保证或服务水平协议. GC团队保留不通知用户、在任何时间从云数据库删除文件的权力(如,由于质量问题或存储能力的不足). GC团队拥有不通知用户、在任何时间暂停或停止整个或部分服务的权力.&lt;br&gt;&lt;center&gt;&lt;b&gt;云数据库服务规则&lt;/b&gt;&lt;br&gt;本服务的使用权独家授予GC用户 - 且通过GoldenCheetah软件是接触任何文件的唯一许可途径. 任何直接接触云数据库的尝试都是被禁止的,且将被屏蔽或导致一般服务的暂停或停止.&lt;br&gt;&lt;center&gt;&lt;b&gt;接受或拒绝&lt;/b&gt;&lt;br&gt;通过点击“接受云数据库规则和条件”,您将确认已阅读、完全理解并同意遵循全部内容. 该决定将被记录,您在使用云数据库相关功能时将不会被再次询问. &lt;br&gt;&lt;br&gt;若您不确定,可选择“拒绝且不使用云数据库”. 这样该协议请求将在您欲使用GC的云数据库相关功能时再次出现.&lt;br&gt;&lt;center&gt;&lt;b&gt;云数据库源代码&lt;/b&gt;&lt;br&gt;云数据库源代码遵循“GNU AFFERO通用公共许可 Version 3”,发布于: &lt;a href= &quot;https://github.com/GoldenCheetah/CloudDB&quot; target=&quot;_blank&quot;&gt;CloudDB Repository&lt;/a&gt;&lt;br&gt;&lt;br&gt;</translation>
+        <translation>&lt;center&gt;&lt;b&gt;什么是GoldenCheetah云数据库&lt;/b&gt;&lt;br&gt;GC设置文件,如图表定义,训练,自定义指标等,将保存到基于云的数据存储空间(运行在由Google提供的Google App Engine上).&lt;br&gt;&lt;center&gt;&lt;b&gt;文件分享的授权和隐私规则&lt;/b&gt;&lt;br&gt;通过将文件分享至云数据库,即代表您同意将其置于&lt;a href=&quot;http://creativecommons.org/licenses/by/4.0/&quot; target=&quot;_blank&quot;&gt;创意通用许可4.0&lt;/a&gt;之下. 在分享时您将被要求提供&quot;昵称&quot;和&quot;电邮地址&quot;,它们将与一个独特识别码(为你的运动员自动生成)共同保存在云数据库. 该数据将只被用于支持云数据库服务,且不会被公开或分享用于其他目的(如广告).&lt;br&gt;&lt;center&gt;&lt;b&gt;文件导入的授权和隐私规则&lt;/b&gt;&lt;br&gt;通过从云数据库导入文件,即代表您接受授权协议&lt;a href=&quot;http://creativecommons.org/licenses/by/4.0/&quot; target=&quot;_blank&quot;&gt;创意通用许可4.0&lt;/a&gt;. 任何提供的文件将不受任何担保,无论通过明示或暗示,包括且不限于,适合于某种特殊目的的默示担保. 与文件质量相关的全部风险将由您承担. 在文件使用过程中,将不会出现与数据损坏有关的责任,而且Golden Cheetah团队将不会对提供的文件进行质量检查或保证.&lt;br&gt;&lt;center&gt;&lt;b&gt;云数据库服务可用性声明&lt;/b&gt;&lt;br&gt;该服务供GC用户免费使用. 对于云数据库服务的7x24可用性,将不会有任何保证或服务水平协议. GC团队保留不通知用户,在任何时间从云数据库删除文件的权力(如,由于质量问题或存储能力的不足). GC团队拥有不通知用户,在任何时间暂停或停止整个或部分服务的权力.&lt;br&gt;&lt;center&gt;&lt;b&gt;云数据库服务规则&lt;/b&gt;&lt;br&gt;本服务的使用权独家授予GC用户 - 且通过GoldenCheetah软件是接触任何文件的唯一许可途径. 任何直接接触云数据库的尝试都是被禁止的,且将被屏蔽或导致一般服务的暂停或停止.&lt;br&gt;&lt;center&gt;&lt;b&gt;接受或拒绝&lt;/b&gt;&lt;br&gt;通过点击&quot;接受云数据库规则和条件&quot;,您将确认已阅读,完全理解并同意遵循全部内容. 该决定将被记录,您在使用云数据库相关功能时将不会被再次询问. &lt;br&gt;&lt;br&gt;若您不确定,可选择&quot;拒绝且不使用云数据库&quot;. 这样该协议请求将在您欲使用GC的云数据库相关功能时再次出现.&lt;br&gt;&lt;center&gt;&lt;b&gt;云数据库源代码&lt;/b&gt;&lt;br&gt;云数据库源代码遵循&quot;GNU AFFERO通用公共许可 Version 3&quot;,发布于: &lt;a href= &quot;https://github.com/GoldenCheetah/CloudDB&quot; target=&quot;_blank&quot;&gt;CloudDB Repository&lt;/a&gt;&lt;br&gt;&lt;br&gt;</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudDBCommon.cpp" line="112"/>
@@ -6361,17 +6416,17 @@ Are you sure?</source>
     <message>
         <location filename="../../Cloud/CloudDBChart.cpp" line="853"/>
         <source>The chart your are downloading requires &apos;R&apos; to be installed                                                                               and activated for GoldenCheetah to show any graphics. Either &apos;R&apos; is not activated                                                                               in the preferences, or not even installed.&lt;br&gt;&lt;br&gt; Please ensure &apos;R&apos;                                                                               is installed and activated to be able to use this chart.</source>
-        <translation>正在下载的图表需要安装并激活&apos;R&apos;后, GC才能显示图形.&lt;br&gt;&lt;br&gt;为了使用此图表，请确保已安装并激活&apos;R&apos;.</translation>
+        <translation>正在下载的图表需要安装并激活&apos;R&apos;后, GC才能显示图形.&lt;br&gt;&lt;br&gt;为了使用此图表,请确保已安装并激活&apos;R&apos;.</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudDBChart.cpp" line="864"/>
         <source>Chart requires &apos;Python&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>图表需要&apos;Python&apos;</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudDBChart.cpp" line="864"/>
         <source>The chart your are downloading requires &apos;Python&apos; to be installed                                                                               and activated for GoldenCheetah to show any graphics. Either &apos;Python&apos; is not activated                                                                               in the preferences, or not even installed.&lt;br&gt;&lt;br&gt; Please ensure &apos;Python&apos;                                                                               is installed and activated to be able to use this chart.</source>
-        <translation type="unfinished"></translation>
+        <translation>正在下载的图表需要安装并激活&apos;Python&apos;后, GC才能显示图形.&lt;br&gt;&lt;br&gt;为了使用此图表,请确保已安装并激活&apos;Python&apos;.</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudDBChart.cpp" line="958"/>
@@ -6423,7 +6478,7 @@ Are you sure?</source>
     <message>
         <location filename="../../Cloud/CloudDBChart.cpp" line="565"/>
         <source>Set selected chart &apos;Curated&apos;</source>
-        <translation>设置选中图表为“已甄选”</translation>
+        <translation>设置选中图表为&quot;已甄选&quot;</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudDBChart.cpp" line="627"/>
@@ -6433,7 +6488,7 @@ Are you sure?</source>
     <message>
         <location filename="../../Cloud/CloudDBChart.cpp" line="633"/>
         <source>Curator chart maintenance - Curate, Edit or Delete Charts</source>
-        <translation>管理员图表维护 - 甄选、编辑或删除图表</translation>
+        <translation>管理员图表维护 - 甄选,编辑或删除图表</translation>
     </message>
     <message>
         <source>Select a Chart</source>
@@ -6524,7 +6579,7 @@ Are you sure?</source>
         <location filename="../../Cloud/CloudDBChart.cpp" line="1403"/>
         <location filename="../../Cloud/CloudDBChart.cpp" line="1464"/>
         <source>Please enter a valid chart name with min. 5 characters length.</source>
-        <translation>请输入有效图表名称，不少于5个字符.</translation>
+        <translation>请输入有效图表名称,不少于5个字符.</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudDBChart.cpp" line="1408"/>
@@ -7013,19 +7068,21 @@ Are you sure?</source>
     <message>
         <location filename="../../Cloud/CloudService.cpp" line="907"/>
         <source>One of your activities has unsaved changes.</source>
-        <translation type="unfinished"></translation>
+        <translation>某一活动中有未保存的修改.</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudService.cpp" line="909"/>
         <source>%1 of your activities have unsaved changes.</source>
-        <translation type="unfinished"></translation>
+        <translation>%1个活动中有未保存的修改.</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudService.cpp" line="911"/>
         <source>Changes in activities which are not saved, will not be synchronized. 
 
 This may lead to inconsistencies between your local GoldenCheetah activities and the uploaded activities. We recommend to save the changed activities before proceeding.</source>
-        <translation type="unfinished"></translation>
+        <translation>活动中未保存的修改将不会被同步.
+
+这可能导致本地活动和上传的活动不一致.建议在继续前保存修改的活动.</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudService.cpp" line="1024"/>
@@ -7150,19 +7207,21 @@ This may lead to inconsistencies between your local GoldenCheetah activities and
     <message>
         <location filename="../../Cloud/CloudService.cpp" line="340"/>
         <source>Upload to </source>
-        <translation type="unfinished"></translation>
+        <translation>上传至 </translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudService.cpp" line="341"/>
         <source>The activity you want to upload has unsaved changes.</source>
-        <translation type="unfinished"></translation>
+        <translation>待上传活动中有未保存的修改.</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudService.cpp" line="342"/>
         <source>Unsaved changes in activities will be uploaded as well. 
 
 This may lead to inconsistencies between your local activities and the uploaded activities if you do not save the activity in GoldenCheetah. We recommend to save the changed activity before proceeding.</source>
-        <translation type="unfinished"></translation>
+        <translation>活动中未保存的修改也将会被上传.
+
+若未在本地保存修改,这可能导致本地活动和上传的活动不一致.建议在继续前保存修改的活动.</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudService.cpp" line="382"/>
@@ -7740,7 +7799,7 @@ Do you want to apply and restart GoldenCheetah?</source>
     <message>
         <location filename="../../Charts/CriticalPowerWindow.cpp" line="210"/>
         <source>Show Power Profile</source>
-        <translation type="unfinished"></translation>
+        <translation>显示功率谱</translation>
     </message>
     <message>
         <location filename="../../Charts/CriticalPowerWindow.cpp" line="215"/>
@@ -7750,7 +7809,7 @@ Do you want to apply and restart GoldenCheetah?</source>
     <message>
         <location filename="../../Charts/CriticalPowerWindow.cpp" line="220"/>
         <source>Show Performance Tests</source>
-        <translation type="unfinished"></translation>
+        <translation>显示表现测试</translation>
     </message>
     <message>
         <location filename="../../Charts/CriticalPowerWindow.cpp" line="225"/>
@@ -7770,7 +7829,7 @@ Do you want to apply and restart GoldenCheetah?</source>
     <message>
         <location filename="../../Charts/CriticalPowerWindow.cpp" line="240"/>
         <source>Show as Power Index</source>
-        <translation type="unfinished"></translation>
+        <translation>显示功率指数</translation>
     </message>
     <message>
         <location filename="../../Charts/CriticalPowerWindow.cpp" line="245"/>
@@ -7795,7 +7854,7 @@ Do you want to apply and restart GoldenCheetah?</source>
     <message>
         <location filename="../../Charts/CriticalPowerWindow.cpp" line="265"/>
         <source>Show time scale linear</source>
-        <translation type="unfinished"></translation>
+        <translation>显示线性时间</translation>
     </message>
     <message>
         <location filename="../../Charts/CriticalPowerWindow.cpp" line="280"/>
@@ -7825,37 +7884,37 @@ Do you want to apply and restart GoldenCheetah?</source>
     <message>
         <location filename="../../Charts/CriticalPowerWindow.cpp" line="292"/>
         <source>Envelope</source>
-        <translation type="unfinished"></translation>
+        <translation>包络</translation>
     </message>
     <message>
         <location filename="../../Charts/CriticalPowerWindow.cpp" line="293"/>
         <source>Least Squares (LMA)</source>
-        <translation type="unfinished"></translation>
+        <translation>最小二乘 (LMA)</translation>
     </message>
     <message>
         <location filename="../../Charts/CriticalPowerWindow.cpp" line="294"/>
         <source>Linear Regression (Work)</source>
-        <translation type="unfinished"></translation>
+        <translation>线性回归(做功)</translation>
     </message>
     <message>
         <location filename="../../Charts/CriticalPowerWindow.cpp" line="296"/>
         <source>Curve Fit</source>
-        <translation type="unfinished"></translation>
+        <translation>曲线拟合</translation>
     </message>
     <message>
         <location filename="../../Charts/CriticalPowerWindow.cpp" line="299"/>
         <source>MMP bests</source>
-        <translation type="unfinished"></translation>
+        <translation>最佳MMP</translation>
     </message>
     <message>
         <location filename="../../Charts/CriticalPowerWindow.cpp" line="300"/>
         <source>Performance tests</source>
-        <translation type="unfinished"></translation>
+        <translation>表现测试</translation>
     </message>
     <message>
         <location filename="../../Charts/CriticalPowerWindow.cpp" line="302"/>
         <source>Data to fit</source>
-        <translation type="unfinished"></translation>
+        <translation>拟合日期</translation>
     </message>
     <message>
         <location filename="../../Charts/CriticalPowerWindow.cpp" line="304"/>
@@ -7866,7 +7925,7 @@ Do you want to apply and restart GoldenCheetah?</source>
     <message>
         <location filename="../../Charts/CriticalPowerWindow.cpp" line="306"/>
         <source>CP and W&apos; Decay</source>
-        <translation type="unfinished"></translation>
+        <translation>CP和W&apos;衰减</translation>
     </message>
     <message>
         <location filename="../../Charts/CriticalPowerWindow.cpp" line="311"/>
@@ -8254,8 +8313,8 @@ Do you want to apply and restart GoldenCheetah?</source>
 <context>
     <name>DataFilter</name>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1608"/>
-        <location filename="../../Core/DataFilter.cpp" line="1647"/>
+        <location filename="../../Core/DataFilter.cpp" line="1617"/>
+        <location filename="../../Core/DataFilter.cpp" line="1656"/>
         <source>malformed expression.</source>
         <translation>表达式有误</translation>
     </message>
@@ -8348,7 +8407,7 @@ Do you want to apply and restart GoldenCheetah?</source>
     <message>
         <location filename="../../Train/DaumController.cpp" line="59"/>
         <source>Cannot Connect to Daum</source>
-        <translation type="unfinished"></translation>
+        <translation>无法连接Daum</translation>
     </message>
 </context>
 <context>
@@ -8517,17 +8576,17 @@ Do you want to apply and restart GoldenCheetah?</source>
     <message>
         <location filename="../../Train/DeviceTypes.cpp" line="36"/>
         <source>ANT+ devices and Trainers such as Kickr, NEO, Muin, SRM and Powertap power meters, Heart rate belts, speed or cadence meters via a Garmin ANT+ USB1 or USB2 stick</source>
-        <translation>通过Garmin ANT+ USB1或USB2棒的ANT+设备和骑行台,如Kickr、NEO、Muin,SRM和Powertap功率计,心率带,速度或踏频传感器</translation>
+        <translation>通过Garmin ANT+ USB1或USB2棒的ANT+设备和骑行台,如Kickr,NEO,Muin,SRM和Powertap功率计,心率带,速度或踏频传感器</translation>
     </message>
     <message>
         <location filename="../../Train/DeviceTypes.cpp" line="41"/>
         <source>ANT+ devices and Trainers such as Kickr, NEO, Muin, SRM, Powertap or Quarq power meters, Heart rate belts, speed or cadence meters via a Garmin ANT+ USB1 or USB2 stick</source>
-        <translation>通过Garmin ANT+ USB1或USB2棒的ANT+设备和骑行台,如Kickr、NEO、Muin,SRM和Powertap功率计,心率带,速度或踏频传感器</translation>
+        <translation>通过Garmin ANT+ USB1或USB2棒的ANT+设备和骑行台,如Kickr,NEO,Muin,SRM和Powertap功率计,心率带,速度或踏频传感器</translation>
     </message>
     <message>
         <location filename="../../Train/DeviceTypes.cpp" line="48"/>
         <source>Bluetooth Low Energy devices such as KK Inride, Stages PM, Blue HR and Blue SC</source>
-        <translation>低能量蓝牙设备BLE,如KK Inride,Stages功率计,蓝牙心率带、速度、踏频传感器</translation>
+        <translation>低能量蓝牙设备BLE,如KK Inride,Stages功率计,蓝牙心率带,速度,踏频传感器</translation>
     </message>
     <message>
         <source>The Wahoo Fitness Kickr cycling trainer via its Bluetooth smart interface. </source>
@@ -8556,17 +8615,17 @@ Do you want to apply and restart GoldenCheetah?</source>
     <message>
         <location filename="../../Train/DeviceTypes.cpp" line="67"/>
         <source>Daum Serial Device </source>
-        <translation type="unfinished"></translation>
+        <translation>Daum串口设备 </translation>
     </message>
     <message>
         <location filename="../../Train/DeviceTypes.cpp" line="72"/>
         <source>Tacx Fortius bike trainer with the handlebar controller connected to a USB port. Please make sure you have device firmware to hand.</source>
-        <translation type="unfinished"></translation>
+        <translation>Tacx Fortius骑行台,通过USB端口连接.请确保已有设备固件.</translation>
     </message>
     <message>
         <location filename="../../Train/DeviceTypes.cpp" line="76"/>
         <source>Tacx iMagic bike trainer with the handlebar controller connected to a USB port.</source>
-        <translation type="unfinished"></translation>
+        <translation>Tacx iMagic骑行台,通过USB端口连接.</translation>
     </message>
     <message>
         <source>Tacx Fortius/iMagic bike trainer with the handlebar controller connected to a USB port. Please make sure you have device firmware to hand.</source>
@@ -8764,7 +8823,7 @@ then click &quot;Rescan&quot; to check again.</source>
     <message>
         <location filename="../../Gui/DownloadRideDialog.cpp" line="366"/>
         <source>File %1 has no valid timestamp, falling back to &apos;now&apos;</source>
-        <translation>文件 %1 无有效的时间戳,回滚到“现在”</translation>
+        <translation>文件 %1 无有效的时间戳,回滚到&quot;现在&quot;</translation>
     </message>
     <message>
         <location filename="../../Gui/DownloadRideDialog.cpp" line="378"/>
@@ -8882,7 +8941,7 @@ You may need to (re)install the FTDI or PL2303 drivers before downloading.</sour
     <name>Dropbox</name>
     <message>
         <source>Network Problem reading Dropbox data</source>
-        <translation type="vanished">网络错误，读取Dropbox数据错误</translation>
+        <translation type="vanished">网络错误,读取Dropbox数据错误</translation>
     </message>
     <message>
         <source>invalid root path.</source>
@@ -8899,7 +8958,7 @@ You may need to (re)install the FTDI or PL2303 drivers before downloading.</sour
     <message>
         <location filename="../../Cloud/Dropbox.cpp" line="68"/>
         <source>Problem accessing Dropbox data</source>
-        <translation type="unfinished"></translation>
+        <translation>访问Dropbox数据错误</translation>
     </message>
     <message>
         <location filename="../../Cloud/Dropbox.cpp" line="130"/>
@@ -8909,7 +8968,7 @@ You may need to (re)install the FTDI or PL2303 drivers before downloading.</sour
     <message>
         <location filename="../../Cloud/Dropbox.cpp" line="199"/>
         <source>Parsing Error: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>解析错误: %1</translation>
     </message>
     <message>
         <location filename="../../Cloud/Dropbox.cpp" line="287"/>
@@ -8994,7 +9053,7 @@ You may need to (re)install the FTDI or PL2303 drivers before downloading.</sour
     <message>
         <location filename="../../Core/IntervalItem.cpp" line="207"/>
         <source>Performance Test</source>
-        <translation type="unfinished"></translation>
+        <translation>表现测试</translation>
     </message>
     <message>
         <location filename="../../Core/IntervalItem.cpp" line="230"/>
@@ -9002,7 +9061,7 @@ You may need to (re)install the FTDI or PL2303 drivers before downloading.</sour
         <translation>确定(&amp;O)</translation>
     </message>
     <message>
-        <location filename="../../Core/IntervalItem.cpp" line="231"/>
+        <location filename="../../Core/IntervalItem.cpp" line="232"/>
         <source>&amp;Cancel</source>
         <translation>取消(&amp;C)</translation>
     </message>
@@ -9010,12 +9069,12 @@ You may need to (re)install the FTDI or PL2303 drivers before downloading.</sour
 <context>
     <name>EditMetricDetailDialog</name>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="2049"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2065"/>
         <source>Name</source>
         <translation>名称</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="2050"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2066"/>
         <source>Axis Label / Units</source>
         <translation>轴标签/单位</translation>
     </message>
@@ -9061,7 +9120,7 @@ You may need to (re)install the FTDI or PL2303 drivers before downloading.</sour
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="1613"/>
         <source>PMC</source>
-        <translation type="unfinished">PMC</translation>
+        <translation>PMC</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="1614"/>
@@ -9071,17 +9130,17 @@ You may need to (re)install the FTDI or PL2303 drivers before downloading.</sour
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="1615"/>
         <source>Measure</source>
-        <translation type="unfinished"></translation>
+        <translation>信息</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="1616"/>
         <source>Performance</source>
-        <translation type="unfinished">表现</translation>
+        <translation>表现</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="1617"/>
         <source>Banister</source>
-        <translation type="unfinished"></translation>
+        <translation>Banister</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="1689"/>
@@ -9156,17 +9215,17 @@ You may need to (re)install the FTDI or PL2303 drivers before downloading.</sour
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="1844"/>
         <source>Weekly Best Performances</source>
-        <translation type="unfinished"></translation>
+        <translation>每周最佳表现</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="1845"/>
         <source>Submaximal Weekly Best</source>
-        <translation type="unfinished"></translation>
+        <translation>每周次佳</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="1846"/>
         <source>Performance Tests</source>
-        <translation type="unfinished"></translation>
+        <translation>表现测试</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="1934"/>
@@ -9196,245 +9255,250 @@ You may need to (re)install the FTDI or PL2303 drivers before downloading.</sour
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="1950"/>
         <source>Negative Training Effect (NTE)</source>
-        <translation type="unfinished"></translation>
+        <translation>消极训练效应 (NTE)</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="1951"/>
         <source>Positive Training Effect (PTE)</source>
-        <translation type="unfinished"></translation>
+        <translation>积极训练效应 (PTE)</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="1952"/>
         <source>Performance (Power Index)</source>
-        <translation type="unfinished"></translation>
+        <translation>表现(功率指数)</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="1953"/>
         <source>Predicted CP (Watts)</source>
-        <translation type="unfinished"></translation>
+        <translation>预计临界功率(W)</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="1961"/>
+        <location filename="../../Charts/LTMTool.cpp" line="1970"/>
         <source>Curve Type</source>
+        <translation>曲线类型</translation>
+    </message>
+    <message>
+        <location filename="../../Charts/LTMTool.cpp" line="1977"/>
+        <source>Perf. Metric</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="1991"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2007"/>
         <source>Metadata Field</source>
         <translation>元数据字段</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="1992"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2008"/>
         <source>PMC metric</source>
         <translation>PMC指标</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="2017"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2033"/>
         <source>Measure Group</source>
-        <translation type="unfinished"></translation>
+        <translation>信息分组</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="2025"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2041"/>
         <source>Measure Field</source>
-        <translation type="unfinished"></translation>
+        <translation>信息字段</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="2045"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2061"/>
         <source>Filter</source>
         <translation>过滤器</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="2056"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2072"/>
         <source>Style</source>
         <translation>风格</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="2058"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2074"/>
         <source>Bar</source>
         <translation>柱状图</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="2059"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2075"/>
         <source>Line</source>
         <translation>线条</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="2060"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2076"/>
         <source>Sticks</source>
         <translation>棍状图</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="2061"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2077"/>
         <source>Dots</source>
         <translation>点</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="2064"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2080"/>
         <source>Stack</source>
         <translation>堆叠</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="2069"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2085"/>
         <source>Symbol</source>
         <translation>符号</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="2071"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2087"/>
         <source>None</source>
         <translation>无</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="2072"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2088"/>
         <source>Circle</source>
         <translation>圆圈</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="2073"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2089"/>
         <source>Square</source>
         <translation>方块</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="2074"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2090"/>
         <source>Diamond</source>
         <translation>菱形</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="2075"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2091"/>
         <source>Triangle</source>
         <translation>三角形</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="2076"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2092"/>
         <source>Cross</source>
         <translation>叉</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="2077"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2093"/>
         <source>Hexagon</source>
         <translation>六边形</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="2078"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2094"/>
         <source>Star</source>
         <translation>星形</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="2081"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2097"/>
         <source>Color</source>
         <translation>颜色</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="2084"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2101"/>
         <source>Fill curve</source>
         <translation>填充曲线</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="2088"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2105"/>
         <source>Data labels</source>
         <translation>数据标签</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="2095"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2112"/>
         <source>Highlight Highest</source>
         <translation>高亮最高值</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="2103"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2120"/>
         <source>Highlight Lowest</source>
         <translation>高亮最小值</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="2111"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2128"/>
         <source>Highlight Outliers</source>
         <translation>高亮逸出值</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="2119"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2136"/>
         <source>Baseline</source>
         <translation>基线</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="2127"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2144"/>
         <source>Smooth Curve</source>
         <translation>平滑曲线</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="2131"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2148"/>
         <source>No trend Line</source>
         <translation>无趋势线</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="2132"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2149"/>
         <source>Linear Trend</source>
         <translation>线性趋势</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="2133"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2150"/>
         <source>Quadratic Trend</source>
         <translation>二次趋势</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="2134"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2151"/>
         <source>Moving Average</source>
         <translation>移动平均</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="2135"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2152"/>
         <source>Simple Average</source>
         <translation>简单平均</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="2180"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2197"/>
         <source>&amp;OK</source>
         <translation>确定(&amp;O)</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="2181"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2199"/>
         <source>&amp;Cancel</source>
         <translation>取消(&amp;C)</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="2394"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2413"/>
         <source>Peak %1</source>
         <translation>峰值 %1</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="2396"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2415"/>
         <source> second </source>
         <translation>秒</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="2397"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2416"/>
         <source> minute </source>
         <translation>分</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="2399"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2418"/>
         <source> hour </source>
         <translation>时</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="2419"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2438"/>
         <source>%1 - %2</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 - %2</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="2433"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2452"/>
         <source>Performances</source>
-        <translation type="unfinished"></translation>
+        <translation>表现</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="2434"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2453"/>
         <source>Power Index</source>
-        <translation type="unfinished"></translation>
+        <translation>功率指数</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="2551"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2570"/>
         <source>Performances_%1_%2_%3</source>
-        <translation type="unfinished"></translation>
+        <translation>表现_%1_%2_%3</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMTool.cpp" line="2641"/>
+        <location filename="../../Charts/LTMTool.cpp" line="2663"/>
         <source>Choose Metric Color</source>
         <translation>选择指标颜色</translation>
     </message>
@@ -9442,38 +9506,38 @@ You may need to (re)install the FTDI or PL2303 drivers before downloading.</sour
 <context>
     <name>EditNamedSearches</name>
     <message>
-        <location filename="../../Core/NamedSearch.cpp" line="236"/>
+        <location filename="../../Core/NamedSearch.cpp" line="234"/>
         <source>Manage Filters</source>
         <translation>管理过滤器</translation>
     </message>
     <message>
-        <location filename="../../Core/NamedSearch.cpp" line="251"/>
-        <location filename="../../Core/NamedSearch.cpp" line="282"/>
+        <location filename="../../Core/NamedSearch.cpp" line="249"/>
+        <location filename="../../Core/NamedSearch.cpp" line="280"/>
         <source>Name</source>
         <translation>名称</translation>
     </message>
     <message>
-        <location filename="../../Core/NamedSearch.cpp" line="257"/>
+        <location filename="../../Core/NamedSearch.cpp" line="255"/>
         <source>Filter</source>
         <translation>过滤器</translation>
     </message>
     <message>
-        <location filename="../../Core/NamedSearch.cpp" line="266"/>
+        <location filename="../../Core/NamedSearch.cpp" line="264"/>
         <source>Add</source>
         <translation>新增</translation>
     </message>
     <message>
-        <location filename="../../Core/NamedSearch.cpp" line="268"/>
+        <location filename="../../Core/NamedSearch.cpp" line="266"/>
         <source>Update</source>
         <translation>更新</translation>
     </message>
     <message>
-        <location filename="../../Core/NamedSearch.cpp" line="283"/>
+        <location filename="../../Core/NamedSearch.cpp" line="281"/>
         <source>Query</source>
         <translation>查询</translation>
     </message>
     <message>
-        <location filename="../../Core/NamedSearch.cpp" line="298"/>
+        <location filename="../../Core/NamedSearch.cpp" line="296"/>
         <source>Delete</source>
         <translation>删除</translation>
     </message>
@@ -9634,12 +9698,12 @@ You may need to (re)install the FTDI or PL2303 drivers before downloading.</sour
     <message>
         <location filename="../../Core/Season.cpp" line="239"/>
         <source>Priority</source>
-        <translation type="unfinished"></translation>
+        <translation>优先级</translation>
     </message>
     <message>
         <location filename="../../Core/Season.cpp" line="240"/>
         <source>Description</source>
-        <translation type="unfinished">描述</translation>
+        <translation>描述</translation>
     </message>
     <message>
         <location filename="../../Core/Season.cpp" line="271"/>
@@ -9688,7 +9752,7 @@ You may need to (re)install the FTDI or PL2303 drivers before downloading.</sour
     <message>
         <location filename="../../Core/UserData.cpp" line="199"/>
         <source>Zone string</source>
-        <translation type="unfinished"></translation>
+        <translation>区间字符串</translation>
     </message>
     <message>
         <location filename="../../Core/UserData.cpp" line="201"/>
@@ -9900,7 +9964,7 @@ You may need to (re)install the FTDI or PL2303 drivers before downloading.</sour
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="383"/>
         <source>Elevation gained at low speed with no power nor cadence</source>
-        <translation>低速、无功率和踏频时获得的爬升</translation>
+        <translation>低速,无功率和踏频时获得的爬升</translation>
     </message>
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="803"/>
@@ -10231,7 +10295,7 @@ You may need to (re)install the FTDI or PL2303 drivers before downloading.</sour
     <message>
         <location filename="../../Metrics/WattsPerKilogram.cpp" line="373"/>
         <source>Estimated Average Power relative to Athlete Weight using Dr Ferrari formula based on VAM for gradient higher than or equal to 7%: VAM / (2 + (gradient/10)) / 100</source>
-        <translation>使用Dr Ferrari的公式,根据坡度大于或等于7%时的VAM,估计相对于运动员体重的平均功率：VAM / (2 + (坡度/10)) / 100</translation>
+        <translation>使用Dr Ferrari的公式,根据坡度大于或等于7%时的VAM,估计相对于运动员体重的平均功率:VAM / (2 + (坡度/10)) / 100</translation>
     </message>
 </context>
 <context>
@@ -10356,7 +10420,7 @@ You may need to (re)install the FTDI or PL2303 drivers before downloading.</sour
     <message>
         <location filename="../../Gui/Pages.cpp" line="3664"/>
         <source>Screen Tab</source>
-        <translation>标签</translation>
+        <translation>标签页</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="3665"/>
@@ -10688,7 +10752,7 @@ You may need to (re)install the FTDI or PL2303 drivers before downloading.</sour
   - &quot;Filter window size&quot; distance on either side of the current interval
   - &quot;Set Rest HRV&quot; if checked the computed HRV metrics are set as Rest HRV Measures
 </source>
-        <translation>过滤R-R逸出值 (参见HRV X数据中的&quot;R-R标志&quot;). 非逸出值记为“1”.
+        <translation>过滤R-R逸出值 (参见HRV X数据中的&quot;R-R标志&quot;). 非逸出值记为&quot;1&quot;.
   - &quot;R-R最小值和最大值&quot; 排除最值之外的样本 (标志 -1). 与过滤范围同时有效.
   - &quot;过滤范围&quot; 平均值附近一定窗口内的范围 (标志 0).
   - &quot;过滤窗口大小&quot; 目前区段两侧的距离.
@@ -10701,7 +10765,7 @@ You may need to (re)install the FTDI or PL2303 drivers before downloading.</sour
   - &quot;Filter range&quot; of the average within a window (flag 0)
   - &quot;Filter window size&quot; distance on either side of the current interval
 </source>
-        <translation type="vanished">过滤R-R逸出值 (参见HRV X数据中的&quot;R-R标志&quot;). 非逸出值记为“1”.
+        <translation type="vanished">过滤R-R逸出值 (参见HRV X数据中的&quot;R-R标志&quot;). 非逸出值记为&quot;1&quot;.
   - &quot;R-R最小值和最大值&quot; 排除最值之外的样本 (标志 1). 与过滤范围同时有效.
   - &quot;过滤范围&quot; 平均值附近一定窗口内的范围 (标志 0).
   - &quot;过滤窗口大小&quot; 目前区段两侧的距离.
@@ -10802,7 +10866,7 @@ You may need to (re)install the FTDI or PL2303 drivers before downloading.</sour
     <message>
         <location filename="../../FileIO/FixAeroPod.cpp" line="103"/>
         <source>Set XData.CdA from HR</source>
-        <translation type="unfinished"></translation>
+        <translation>从心率设置X数据的CdA</translation>
     </message>
 </context>
 <context>
@@ -10810,7 +10874,7 @@ You may need to (re)install the FTDI or PL2303 drivers before downloading.</sour
     <message>
         <location filename="../../FileIO/FixAeroPod.cpp" line="65"/>
         <source>When recording with an iBike AeroPod (in HR mode) the CdA data is sent as HR. This tool will update the activity file to move the values from HR into the XData.CdA series.</source>
-        <translation type="unfinished"></translation>
+        <translation>使用iBike AeroPod(HR模式)时,CdA数据被设置为心率.本工具会将心率值移动至X数据中的CdA系列.</translation>
     </message>
 </context>
 <context>
@@ -10842,7 +10906,7 @@ Some unit doesn&apos;t record distance without a speedometer but record position
     <message>
         <location filename="../../FileIO/FixDeriveDistance.cpp" line="54"/>
         <source>Use Cubic Splines</source>
-        <translation type="unfinished"></translation>
+        <translation>使用三次样条</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixDeriveDistance.cpp" line="74"/>
@@ -10851,7 +10915,11 @@ Some unit doesn&apos;t record distance without a speedometer but record position
 This process will populate distance information (and override existing distance information if present.)The cubic splines processing estimates distance across polynomial curve, otherwise this feature will compute geometric arc distance between ride points.
 
 </source>
-        <translation type="unfinished"></translation>
+        <translation>根据活动文件中的GPS位置计算距离
+
+该过程将生成距离信息(并覆盖已有的距离信息).三次样条方法会在多项式曲线上估计距离,否则本功能将计算各点之间的几何距离
+
+</translation>
     </message>
 </context>
 <context>
@@ -10911,9 +10979,8 @@ This process will populate distance information (and override existing distance 
         <translation>风速(km/h)</translation>
     </message>
     <message>
-        <location filename="../../FileIO/FixDerivePower.cpp" line="71"/>
         <source>, heading</source>
-        <translation>, 风向</translation>
+        <translation type="vanished">, 风向</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixDerivePower.cpp" line="130"/>
@@ -10943,12 +11010,13 @@ CdA是以平方米为单位的有效迎风面积, 与姿势和装备有关.
 
 风速单位为km/h
 风向用-179度到180度表示(北=0,东=90,南=180,西=-90)
-注意：骑行文件中包含的风数据
+注意:骑行文件中包含的风数据
      将会被此处手动输入的数据覆盖</translation>
     </message>
     <message>
+        <location filename="../../FileIO/FixDerivePower.cpp" line="71"/>
         <source>, direction</source>
-        <translation type="vanished">风向</translation>
+        <translation>风向</translation>
     </message>
     <message>
         <source>Derive estimated power data based on speed/elevation/weight etc
@@ -10967,7 +11035,7 @@ Note: if the ride file already contain wind data
 CRR指滚动阻力系数(coefficient of rolling resistance),与轮胎和路面情况有关
 风速单位为km/h
 风向用-179度到180度表示(北=0,东=90,南=180,西=-90)
-注意：骑行文件中包含的风数据
+注意:骑行文件中包含的风数据
      将会被此处手动输入的数据覆盖</translation>
     </message>
 </context>
@@ -11194,7 +11262,7 @@ Pool Length (in meters) allows to re-define the field if value is &gt; 0</source
     <message>
         <location filename="../../FileIO/FixPower.cpp" line="50"/>
         <source>Percent Adjustment</source>
-        <translation type="unfinished"></translation>
+        <translation>按百分比调整</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixPower.cpp" line="52"/>
@@ -11204,12 +11272,12 @@ Pool Length (in meters) allows to re-define the field if value is &gt; 0</source
     <message>
         <location filename="../../FileIO/FixPower.cpp" line="54"/>
         <source>Fix Adjustment</source>
-        <translation type="unfinished"></translation>
+        <translation>固定值调整</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixPower.cpp" line="56"/>
         <source>watt</source>
-        <translation type="unfinished"></translation>
+        <translation>W</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixPower.cpp" line="74"/>
@@ -11220,7 +11288,13 @@ Percent Adjustment - this defines percentage  to modify values by. Negative valu
 Fix Adjustment - this defines an fix amount  to modify values by. Negative values are supported.
 
 If both parameters are given, first the relative adjustment takes place, then the fix value adjustment is applied on the result.</source>
-        <translation type="unfinished"></translation>
+        <translation>功率值调整能够按照百分比或固定值向上或向下调整功率值.需要2个参数:
+
+按百分比调整 - 确定调整的百分比,支持负值.
+
+固定值调整 - 确定固定的调整量,支持负值.
+
+若给出了两个参数,将先按百分比调整,并在此基础上按固定值调整.</translation>
     </message>
     <message>
         <source>Adjusting power values allows you to uplift or degrade the power values by a percentage. It takes a single parameter:
@@ -11276,8 +11350,12 @@ This tools convert to revolutions or cycles per minute</source>
     </message>
     <message>
         <location filename="../../FileIO/FixRunningPower.cpp" line="65"/>
+        <source>, direction</source>
+        <translation type="unfinished">风向</translation>
+    </message>
+    <message>
         <source>, heading</source>
-        <translation>, 风向</translation>
+        <translation type="vanished">, 风向</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixRunningPower.cpp" line="108"/>
@@ -11290,13 +11368,13 @@ Draft Mult. parameter is the multiplier to adjust for drafting, 1 is no drafting
 wind speed shall be indicated in kph
 wind direction (origin) unit is degrees from -179 to +180 (-90=W, 0=N, 90=E, 180=S)
 Note: if the file already contain wind data it will be overridden if wind is entered</source>
-        <translation>根据速度/海拔/重量等、使用di Prampero系数估算得到的跑步功率
+        <translation>根据速度/海拔/重量等,使用di Prampero系数估算得到的跑步功率
 
-破风系数是根据破风情况调整的参数，例如1是没有破风，组队跑时可取0.7
+破风系数是根据破风情况调整的参数,例如1是没有破风,组队跑时可取0.7
 
 风速单位应为km/h
-风向单位为°，从-179到+180(正西=-90、正北=0、正东=+90、正南=+180)
-注意：若文件已包含风数据，其将被输入的风数据覆盖</translation>
+风向单位为°,从-179到+180(正西=-90,正北=0,正东=+90,正南=+180)
+注意:若文件已包含风数据,其将被输入的风数据覆盖</translation>
     </message>
 </context>
 <context>
@@ -11304,7 +11382,7 @@ Note: if the file already contain wind data it will be overridden if wind is ent
     <message>
         <location filename="../../FileIO/FixSmO2.cpp" line="123"/>
         <source>Fix SmO2 and/or tHb Anomaly</source>
-        <translation type="unfinished"></translation>
+        <translation>修正SmO2与tHb异常</translation>
     </message>
 </context>
 <context>
@@ -11320,17 +11398,17 @@ This function will look for spikes/anomalies in SmO2 data and replace the errone
     <message>
         <location filename="../../FileIO/FixSmO2.cpp" line="51"/>
         <source>Fix SmO2</source>
-        <translation type="unfinished"></translation>
+        <translation>修正SmO2</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixSmO2.cpp" line="52"/>
         <source>Fix tHb</source>
-        <translation type="unfinished"></translation>
+        <translation>修正tHb</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixSmO2.cpp" line="53"/>
         <source>Max. tHb</source>
-        <translation type="unfinished"></translation>
+        <translation>最大tHb</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixSmO2.cpp" line="74"/>
@@ -11342,7 +11420,14 @@ Fix SmO2 - check to fix anomalies in SmO2 data
 Fix tHb - check to fix anomalies in tHb data 
 Max. tHb - any tHb above is considered an outlier 
 </source>
-        <translation type="unfinished"></translation>
+        <translation>偶尔,SmO2(%)和/或tHb(%)会报告错误的值(SmO2:0%或&gt;100%/tHb:0%或大于最大tHb).
+
+本功能将在SmO2和tHb数据中搜索这些异常,并使用异常数据一侧的3个数据点对其进行平滑/插值后替换.需要以下参数:
+
+修正SmO2 - 检查并修正SmO2数据的异常 
+修正 - 检查并修正tHb数据的异常 
+最大tHb - 任何大于此值的tHb将被视为异常 
+</translation>
     </message>
 </context>
 <context>
@@ -11366,7 +11451,7 @@ Max. tHb - any tHb above is considered an outlier
 This tool replaces the existing speed channel, or creates a new one if not present, based on travelled distance
 
 Moving Average Seconds parameter allows to set the seconds of the MA filter to smooth speed spikes</source>
-        <translation>某些设备记录的速度与距离的变化不匹配,如使用计步器测速、GPS测距.
+        <translation>某些设备记录的速度与距离的变化不匹配,如使用计步器测速,GPS测距.
 本工具根据移动距离替代或创建已有速度数据.
 
 移动平均秒数规定了平滑速度峰的移动平均滤波器的长度.</translation>
@@ -11440,7 +11525,7 @@ Variance (%) - this will smooth any values which are higher than this percentage
 Torque Adjust - this defines an absolute value in poinds per square inch or newton meters to modify values by. Negative values are supported. (e.g. enter &quot;1.2 nm&quot; or &quot;-0.5 pi&quot;).</source>
         <translation>当功率计校正错误时,扭矩值调整将上下调整扭矩值需要一个参数:
 
-扭矩调整 - 确定调整的绝对值,单位为磅每平方英寸或牛米.支持负值.如“1.2 nm”或“-0.5 pi”.</translation>
+扭矩调整 - 确定调整的绝对值,单位为磅每平方英寸或牛米.支持负值.如&quot;1.2 nm&quot;或&quot;-0.5 pi&quot;.</translation>
     </message>
 </context>
 <context>
@@ -11633,7 +11718,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Gui/Colors.cpp" line="157"/>
         <source>Run Vertical Oscillation</source>
-        <translation>跑步垂直振动</translation>
+        <translation>跑步垂直振幅</translation>
     </message>
     <message>
         <location filename="../../Gui/Colors.cpp" line="158"/>
@@ -12105,18 +12190,18 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
         <translation>导出图表失败,请检查权限</translation>
     </message>
     <message>
-        <location filename="../../Charts/GoldenCheetah.cpp" line="1094"/>
-        <location filename="../../Charts/GoldenCheetah.cpp" line="1101"/>
+        <location filename="../../Charts/GoldenCheetah.cpp" line="1095"/>
+        <location filename="../../Charts/GoldenCheetah.cpp" line="1102"/>
         <source>Upload not possible</source>
         <translation>无法上传</translation>
     </message>
     <message>
-        <location filename="../../Charts/GoldenCheetah.cpp" line="1094"/>
+        <location filename="../../Charts/GoldenCheetah.cpp" line="1095"/>
         <source>Standard charts without configuration cannot be uploaded to the GoldenCheetah Cloud.</source>
         <translation>无配置的标准图表无法上传至GC云.</translation>
     </message>
     <message>
-        <location filename="../../Charts/GoldenCheetah.cpp" line="1101"/>
+        <location filename="../../Charts/GoldenCheetah.cpp" line="1102"/>
         <source>Charts containing user defined metrics cannot be uploaded to the GoldenCheetah Cloud.</source>
         <translation>含有用户定义指标的图表无法上传至GC云.</translation>
     </message>
@@ -12131,7 +12216,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Gui/GcCrashDialog.cpp" line="114"/>
         <source>&lt;b&gt;GoldenCheetah appears to have PREVIOUSLY crashed for this athlete. &lt;/b&gt;&lt;br&gt;&lt;br&gt;The report below gives some diagnostic information that will be useful to the developers. Feel free to post this with a short description of what was occurring when the crash happened to the &lt;href a=&quot;https://groups.google.com/forum/?fromgroups=#!forum/golden-cheetah-users&quot;&gt;GoldenCheetah forums&lt;/href&gt;&lt;br&gt;&lt;b&gt;&lt;br&gt;We respect privacy - this log does NOT contain ids, passwords or personal information.&lt;/b&gt;&lt;br&gt;&lt;b&gt;&lt;br&gt;When this dialog is closed the athlete will be opened.&lt;/b&gt;</source>
-        <translation>&lt;b&gt;此前发生了崩溃 &lt;/b&gt;&lt;br&gt;&lt;br&gt;下面的报告给出了一些诊断信息,将会对开发者有帮助.您可以将其连同奔溃时的情形描述发送至&lt;href a=&quot;https://groups.google.com/forum/?fromgroups=#!forum/golden-cheetah-users&quot;&gt;GoldenCheetah论坛&lt;/href&gt;&lt;br&gt;&lt;b&gt;&lt;br&gt;我们尊重隐私,本日志不含id、密码或个人信息.&lt;/b&gt;&lt;br&gt;&lt;b&gt;&lt;br&gt;本窗口关闭时,将打开程序.&lt;/b&gt;</translation>
+        <translation>&lt;b&gt;此前发生了崩溃 &lt;/b&gt;&lt;br&gt;&lt;br&gt;下面的报告给出了一些诊断信息,将会对开发者有帮助.您可以将其连同奔溃时的情形描述发送至&lt;href a=&quot;https://groups.google.com/forum/?fromgroups=#!forum/golden-cheetah-users&quot;&gt;GoldenCheetah论坛&lt;/href&gt;&lt;br&gt;&lt;b&gt;&lt;br&gt;我们尊重隐私,本日志不含id,密码或个人信息.&lt;/b&gt;&lt;br&gt;&lt;b&gt;&lt;br&gt;本窗口关闭时,将打开程序.&lt;/b&gt;</translation>
     </message>
     <message>
         <location filename="../../Gui/GcCrashDialog.cpp" line="150"/>
@@ -12144,22 +12229,22 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
         <translation>关闭</translation>
     </message>
     <message>
-        <location filename="../../Gui/GcCrashDialog.cpp" line="256"/>
+        <location filename="../../Gui/GcCrashDialog.cpp" line="260"/>
         <source>&lt;p&gt;Build date: %1 %2&lt;br&gt;Build id: %3&lt;br&gt;Version: %4&lt;br&gt;DB Schema: %5&lt;br&gt;Metrics: %7&lt;br&gt;OS: %6&lt;br&gt;</source>
         <translation>&lt;p&gt;版本日期: %1 %2&lt;br&gt;版本id: %3&lt;br&gt;版本号: %4&lt;br&gt;数据库构架: %5&lt;br&gt;指标: %7&lt;br&gt;操作系统: %6&lt;br&gt;</translation>
     </message>
     <message>
-        <location filename="../../Gui/GcCrashDialog.cpp" line="276"/>
+        <location filename="../../Gui/GcCrashDialog.cpp" line="280"/>
         <source>&lt;table&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;QT&lt;/td&gt;&lt;td&gt;%1&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;QWT&lt;/td&gt;&lt;td&gt;%2&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;%3&lt;/td&gt;&lt;td&gt;%4&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;SRMIO&lt;/td&gt;&lt;td&gt;%5&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;D2XX&lt;/td&gt;&lt;td&gt;%6&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;KML&lt;/td&gt;&lt;td&gt;%8&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;ICAL&lt;/td&gt;&lt;td&gt;%9&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;USBXPRESS&lt;/td&gt;&lt;td&gt;%10&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;LIBUSB&lt;/td&gt;&lt;td&gt;%11&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;VLC&lt;/td&gt;&lt;td&gt;%12&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;VIDEO&lt;/td&gt;&lt;td&gt;%13&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;SAMPLERATE&lt;/td&gt;&lt;td&gt;%14&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;SSL&lt;/td&gt;&lt;td&gt;%15&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;R&lt;/td&gt;&lt;td&gt;%16&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;Python&lt;/td&gt;&lt;td&gt;%18&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;WEBKIT&lt;/td&gt;&lt;td&gt;%17&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;LMFIT&lt;/td&gt;&lt;td&gt;7.0&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;LEVMAR&lt;/td&gt;&lt;td&gt;%19&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;table&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;QT&lt;/td&gt;&lt;td&gt;%1&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;QWT&lt;/td&gt;&lt;td&gt;%2&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;%3&lt;/td&gt;&lt;td&gt;%4&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;SRMIO&lt;/td&gt;&lt;td&gt;%5&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;D2XX&lt;/td&gt;&lt;td&gt;%6&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;KML&lt;/td&gt;&lt;td&gt;%8&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;ICAL&lt;/td&gt;&lt;td&gt;%9&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;USBXPRESS&lt;/td&gt;&lt;td&gt;%10&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;LIBUSB&lt;/td&gt;&lt;td&gt;%11&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;VLC&lt;/td&gt;&lt;td&gt;%12&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;VIDEO&lt;/td&gt;&lt;td&gt;%13&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;SAMPLERATE&lt;/td&gt;&lt;td&gt;%14&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;SSL&lt;/td&gt;&lt;td&gt;%15&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;R&lt;/td&gt;&lt;td&gt;%16&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;Python&lt;/td&gt;&lt;td&gt;%18&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;WEBKIT&lt;/td&gt;&lt;td&gt;%17&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;LMFIT&lt;/td&gt;&lt;td&gt;7.0&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;LEVMAR&lt;/td&gt;&lt;td&gt;%19&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;</translation>
     </message>
     <message>
-        <location filename="../../Gui/GcCrashDialog.cpp" line="493"/>
+        <location filename="../../Gui/GcCrashDialog.cpp" line="497"/>
         <source>Save Diagnostics</source>
         <translation>保存诊断信息</translation>
     </message>
     <message>
-        <location filename="../../Gui/GcCrashDialog.cpp" line="493"/>
+        <location filename="../../Gui/GcCrashDialog.cpp" line="497"/>
         <source>Text File (*.txt)</source>
         <translation>文本文件 (*.txt)</translation>
     </message>
@@ -12291,7 +12376,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Core/GcUpgrade.cpp" line="766"/>
         <source>-&gt; Error: Deletion of copied file &apos;%1&apos; failed</source>
-        <translation>-&gt; 错误:删除“%1”文件失败</translation>
+        <translation>-&gt; 错误:删除&quot;%1&quot;文件失败</translation>
     </message>
     <message>
         <location filename="../../Core/GcUpgrade.cpp" line="775"/>
@@ -12306,7 +12391,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Core/GcUpgrade.cpp" line="285"/>
         <source>TSS</source>
-        <translation type="unfinished"></translation>
+        <translation>TSS</translation>
     </message>
     <message>
         <location filename="../../Core/GcUpgrade.cpp" line="468"/>
@@ -12406,7 +12491,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Core/GcUpgrade.cpp" line="721"/>
         <source>&lt;center&gt;&lt;br&gt;After choosing &apos;Proceed to Athlete&apos;, the system will open the athlete window using the converted data. Depending on the errors this might lead to follow-up errors and incomplete athlete data. You may either fix the error(s) in your directory directly, or go back to your last backup and correct the error(s) in the source data. &lt;br&gt;The upgrade process will be done again each time you open the athlete, until the conversion was successful - and had no more errors.&lt;/center&gt;</source>
-        <translation>&lt;center&gt;&lt;br&gt;选择“继续至运动员”后,系统将使用转换的数据打开运动员窗口.根据错误,这可能导致后续错误和不完整的运动员数据.可在文件夹直接修正错误,或使用上次的备份修正源数据的错误.&lt;br&gt;每次打开运动员,升级过程将继续,直至转换成功且无错.&lt;/center&gt;</translation>
+        <translation>&lt;center&gt;&lt;br&gt;选择&quot;继续至运动员&quot;后,系统将使用转换的数据打开运动员窗口.根据错误,这可能导致后续错误和不完整的运动员数据.可在文件夹直接修正错误,或使用上次的备份修正源数据的错误.&lt;br&gt;每次打开运动员,升级过程将继续,直至转换成功且无错.&lt;/center&gt;</translation>
     </message>
     <message>
         <location filename="../../Core/GcUpgrade.cpp" line="728"/>
@@ -12429,7 +12514,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Core/GcUpgrade.cpp" line="845"/>
         <source>&lt;center&gt;&lt;b&gt;Backup your &apos;Athlete&apos; data first!&lt;br&gt;&lt;b&gt;Please read carefully before proceeding!&lt;/b&gt;&lt;/center&gt; &lt;br&gt; &lt;br&gt;With Version 3.2 the &apos;Athlete&apos; directory has been refactored by adding a set of subdirectories which hold the different types of GoldenCheetah files.&lt;br&gt;&lt;br&gt;The new structure is:&lt;br&gt;-&gt; Activity files: &lt;samp&gt;/activities&lt;/samp&gt;&lt;br&gt;-&gt; Configuration files: &lt;samp&gt;/config&lt;/samp&gt;&lt;br&gt;-&gt; Download files: &lt;samp&gt;/downloads&lt;/samp&gt;&lt;br&gt;-&gt; Import files: &lt;samp&gt;/imports&lt;/samp&gt;&lt;br&gt;-&gt; Backups of Activity files: &lt;samp&gt;/bak&lt;/samp&gt;&lt;br&gt;-&gt; Workout related files: &lt;samp&gt;/workouts&lt;/samp&gt;&lt;br&gt;-&gt; Cache files: &lt;samp&gt;/cache&lt;/samp&gt;&lt;br&gt;-&gt; Calendar files: &lt;samp&gt;/calendar&lt;/samp&gt;&lt;br&gt;-&gt; Log files: &lt;samp&gt;/logs&lt;/samp&gt;&lt;br&gt;-&gt; Temp files: &lt;samp&gt;/temp&lt;/samp&gt;&lt;br&gt;-&gt; Temp for Activities: &lt;samp&gt;/tempActivities&lt;/samp&gt;&lt;br&gt;-&gt; Train View recordings: &lt;samp&gt;/recordings&lt;/samp&gt;&lt;br&gt;-&gt; Quarantined files: &lt;samp&gt;/quarantine&lt;/samp&gt;&lt;br&gt;&lt;br&gt;The upgrade process will create the new directory structure and move the existing files to the new directories as needed. During the upgrade all activity files will be converted to GoldenCheetah&apos;s native file format .JSON and moved to the &lt;br&gt;&lt;samp&gt;/activities&lt;/samp&gt; folder. The source files are moved to the &lt;samp&gt;/imports&lt;/samp&gt; folder.&lt;br&gt;&lt;br&gt;Starting with version 3.2 all downloads from devices or imported activity files will be converted to GoldenCheetah&apos;s file format during import/download. The original files will be stored - depending on the source - in &lt;samp&gt;/downloads&lt;/samp&gt; or &lt;br&gt;&lt;samp&gt;/imports&lt;/samp&gt; folder.&lt;br&gt;&lt;br&gt;&lt;center&gt;&lt;b&gt;Please make sure that you have done a backup of your athlete data before proceeding with the upgrade. We can&apos;t take responsibility for any loss of data during the process. &lt;/b&gt; &lt;/center&gt; &lt;br&gt;</source>
-        <translation>&lt;center&gt;&lt;b&gt;请先备份“运动员”数据！&lt;br&gt;&lt;b&gt;继续前请认真阅读！&lt;/b&gt;&lt;/center&gt; &lt;br&gt; &lt;br&gt;在3.2版中,“运动员”文件夹中添加了一系列子目录以保存不同的GC文件&lt;br&gt;&lt;br&gt;新的结构是:&lt;br&gt;-&gt; 活动文件: &lt;samp&gt;/activities&lt;/samp&gt;&lt;br&gt;-&gt; 设置文件: &lt;samp&gt;/config&lt;/samp&gt;&lt;br&gt;-&gt; 下载文件: &lt;samp&gt;/downloads&lt;/samp&gt;&lt;br&gt;-&gt; 导入文件: &lt;samp&gt;/imports&lt;/samp&gt;&lt;br&gt;-&gt; 活动文件备份: &lt;samp&gt;/bak&lt;/samp&gt;&lt;br&gt;-&gt; 训练相关文件: &lt;samp&gt;/workouts&lt;/samp&gt;&lt;br&gt;-&gt; 缓存文件: &lt;samp&gt;/cache&lt;/samp&gt;&lt;br&gt;-&gt; 日历文件: &lt;samp&gt;/calendar&lt;/samp&gt;&lt;br&gt;-&gt; 日志文件: &lt;samp&gt;/logs&lt;/samp&gt;&lt;br&gt;-&gt; 临时文件: &lt;samp&gt;/temp&lt;/samp&gt;&lt;br&gt;-&gt; 活动临时文件: &lt;samp&gt;/tempActivities&lt;/samp&gt;&lt;br&gt;-&gt; 训练视图记录: &lt;samp&gt;/recordings&lt;/samp&gt;&lt;br&gt;-&gt; 隔离文件: &lt;samp&gt;/quarantine&lt;/samp&gt;&lt;br&gt;&lt;br&gt;升级过程将根据需要创建新的文件夹结构并将现有文件移动至新文件夹.升级过程中所有活动文件将被转换为GC的本地文件格式 .JSON并被移至&lt;br&gt;&lt;samp&gt;/activities&lt;/samp&gt;文件夹.源文件被移至 &lt;samp&gt;/imports&lt;/samp&gt; 文件夹.&lt;br&gt;&lt;br&gt;从3.2版开始,下载自设备或导入的活动文件将在下载或导入时被转换为GC文件.根据来源,原始文件将被保存至 &lt;samp&gt;/downloads&lt;/samp&gt; 或 &lt;br&gt;&lt;samp&gt;/imports&lt;/samp&gt; 文件夹.&lt;br&gt;&lt;br&gt;&lt;center&gt;&lt;b&gt;在继续升级之前,请确保已备份运动员数据.我们将不对这一过程中的任何数据损失负责&lt;/b&gt; &lt;/center&gt; &lt;br&gt;</translation>
+        <translation>&lt;center&gt;&lt;b&gt;请先备份&quot;运动员&quot;数据！&lt;br&gt;&lt;b&gt;继续前请认真阅读！&lt;/b&gt;&lt;/center&gt; &lt;br&gt; &lt;br&gt;在3.2版中,&quot;运动员&quot;文件夹中添加了一系列子目录以保存不同的GC文件&lt;br&gt;&lt;br&gt;新的结构是:&lt;br&gt;-&gt; 活动文件: &lt;samp&gt;/activities&lt;/samp&gt;&lt;br&gt;-&gt; 设置文件: &lt;samp&gt;/config&lt;/samp&gt;&lt;br&gt;-&gt; 下载文件: &lt;samp&gt;/downloads&lt;/samp&gt;&lt;br&gt;-&gt; 导入文件: &lt;samp&gt;/imports&lt;/samp&gt;&lt;br&gt;-&gt; 活动文件备份: &lt;samp&gt;/bak&lt;/samp&gt;&lt;br&gt;-&gt; 训练相关文件: &lt;samp&gt;/workouts&lt;/samp&gt;&lt;br&gt;-&gt; 缓存文件: &lt;samp&gt;/cache&lt;/samp&gt;&lt;br&gt;-&gt; 日历文件: &lt;samp&gt;/calendar&lt;/samp&gt;&lt;br&gt;-&gt; 日志文件: &lt;samp&gt;/logs&lt;/samp&gt;&lt;br&gt;-&gt; 临时文件: &lt;samp&gt;/temp&lt;/samp&gt;&lt;br&gt;-&gt; 活动临时文件: &lt;samp&gt;/tempActivities&lt;/samp&gt;&lt;br&gt;-&gt; 训练视图记录: &lt;samp&gt;/recordings&lt;/samp&gt;&lt;br&gt;-&gt; 隔离文件: &lt;samp&gt;/quarantine&lt;/samp&gt;&lt;br&gt;&lt;br&gt;升级过程将根据需要创建新的文件夹结构并将现有文件移动至新文件夹.升级过程中所有活动文件将被转换为GC的本地文件格式 .JSON并被移至&lt;br&gt;&lt;samp&gt;/activities&lt;/samp&gt;文件夹.源文件被移至 &lt;samp&gt;/imports&lt;/samp&gt; 文件夹.&lt;br&gt;&lt;br&gt;从3.2版开始,下载自设备或导入的活动文件将在下载或导入时被转换为GC文件.根据来源,原始文件将被保存至 &lt;samp&gt;/downloads&lt;/samp&gt; 或 &lt;br&gt;&lt;samp&gt;/imports&lt;/samp&gt; 文件夹.&lt;br&gt;&lt;br&gt;&lt;center&gt;&lt;b&gt;在继续升级之前,请确保已备份运动员数据.我们将不对这一过程中的任何数据损失负责&lt;/b&gt; &lt;/center&gt; &lt;br&gt;</translation>
     </message>
     <message>
         <location filename="../../Core/GcUpgrade.cpp" line="884"/>
@@ -12606,12 +12691,12 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Gui/GcWindowRegistry.cpp" line="103"/>
         <source>Python Chart</source>
-        <translation type="unfinished"></translation>
+        <translation>Python图表</translation>
     </message>
     <message>
         <location filename="../../Gui/GcWindowRegistry.cpp" line="104"/>
         <source>Python Chart </source>
-        <translation type="unfinished"></translation>
+        <translation>Python图表 </translation>
     </message>
     <message>
         <location filename="../../Gui/GcWindowRegistry.cpp" line="106"/>
@@ -12806,12 +12891,12 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Gui/Pages.cpp" line="192"/>
         <source>Enable Python</source>
-        <translation type="unfinished"></translation>
+        <translation>启用Python</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="200"/>
         <source>Share to the OpenData project</source>
-        <translation type="unfinished"></translation>
+        <translation>分享到OpenData项目</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="212"/>
@@ -12831,7 +12916,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Gui/Pages.cpp" line="270"/>
         <source>Python Home</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="395"/>
@@ -12841,18 +12926,19 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Gui/Pages.cpp" line="406"/>
         <source>Python Installation (PYTHONHOME)</source>
-        <translation type="unfinished"></translation>
+        <translation>Python安装路径 (PYTHONHOME)</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="415"/>
         <source>Invalid Folder</source>
-        <translation type="unfinished"></translation>
+        <translation>无效文件夹</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="415"/>
         <source>Python does not appear to be installed in that location.
 </source>
-        <translation type="unfinished"></translation>
+        <translation>Python似乎并未安装在此位置.
+</translation>
     </message>
     <message>
         <source>Smart Recording Threshold (secs):</source>
@@ -13104,7 +13190,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Train/WorkoutWizard.cpp" line="551"/>
         <source>Manually create a workout based on gradient (slope) and distance, maximum grade is +-40.</source>
-        <translation type="unfinished"></translation>
+        <translation>根据坡度和距离手动创建训练,最大坡度为+-40.</translation>
     </message>
     <message>
         <location filename="../../Train/WorkoutWizard.cpp" line="557"/>
@@ -13385,7 +13471,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="71"/>
         <source>Analysis of a number of activities (e.g. a date range ) like PMC, long term metrics view, ... and data summaries</source>
-        <translation>某些活动的分析,如PMC、长期指标视图等,以及数据总结</translation>
+        <translation>某些活动的分析,如PMC,长期指标视图等,以及数据总结</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="73"/>
@@ -13401,7 +13487,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
         <location filename="../../Gui/HelpWhatsThis.cpp" line="83"/>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="98"/>
         <source>Direct download from Powertap, SRM, Joule, Joule GPS, Moxy Monitor or Macro-X device</source>
-        <translation>直接从Powertap、SRM、Joule、Moxy或Macro-X设备下载</translation>
+        <translation>直接从Powertap,SRM,Joule,Moxy或Macro-X设备下载</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="85"/>
@@ -13422,7 +13508,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="96"/>
         <source>Main functions related to activities like Activity Creation, Sharing and Export, and Splitting or Combining Activities</source>
-        <translation>与活动有关的主要功能,如活动创建、分享、导出、分割与合并</translation>
+        <translation>与活动有关的主要功能,如活动创建,分享,导出,分割与合并</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="102"/>
@@ -13476,12 +13562,12 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="89"/>
         <source>Activate / De-activate the Compare Pane - which allows to compare activities, intervals or date ranges - also across athletes</source>
-        <translation>激活/关闭比较面板 - 可对比活动、区段或数据范围,并能在不同运动员之间比较</translation>
+        <translation>激活/关闭比较面板 - 可对比活动,区段或数据范围,并能在不同运动员之间比较</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="104"/>
         <source>Laps Editor allows to enter a sequence of work-rest intervals series -defined by number of repetitions (reps), distance (dist, units according to preferences in Pace Zones) and duration (min and sec)- to generate the data points for the activity</source>
-        <translation>通过计圈编辑器可根据重复次数、距离和事件输入一系列区段,从而生成活动的数据点</translation>
+        <translation>通过计圈编辑器可根据重复次数,距离和事件输入一系列区段,从而生成活动的数据点</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="117"/>
@@ -13506,12 +13592,12 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="139"/>
         <source>Creates an activity heat map using the selected activities and stores it in the choosen folder - &quot;HeatMap.htm&quot;. Opened in a Web-Browser the map shows where most activity took place.</source>
-        <translation>根据选择的活动创建活动热力图并保存在指定文件夹 - “HeatMap.htm”.在浏览器中打开可显示活动的分布情况</translation>
+        <translation>根据选择的活动创建活动热力图并保存在指定文件夹 - &quot;HeatMap.htm&quot;.在浏览器中打开可显示活动的分布情况</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="142"/>
         <source>Wizards which fix, adjust, add series data of the current activity</source>
-        <translation>对目前活动修正、调整和添加数据系列的向导</translation>
+        <translation>对目前活动修正,调整和添加数据系列的向导</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="144"/>
@@ -13571,7 +13657,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="175"/>
         <source>Options to show/hide views (e.g. Sidebar) as well as adding charts and resetting chart layouts to factory settings</source>
-        <translation>显示/隐藏视图(如侧边栏)、以及添加图表和重置图表布局的选项</translation>
+        <translation>显示/隐藏视图(如侧边栏),以及添加图表和重置图表布局的选项</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="177"/>
@@ -13581,7 +13667,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="181"/>
         <source>Full configurable chart type to track performance and trends for metrics, user-definable best durations and model estimates</source>
-        <translation>跟踪表现、指标趋势、用户定义最佳区段和模型预测的可完全自定义图表类型</translation>
+        <translation>跟踪表现,指标趋势,用户定义最佳区段和模型预测的可完全自定义图表类型</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="183"/>
@@ -13617,7 +13703,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="215"/>
         <source>Editor for activity file data - allowing to change/correct data, find entries and find anomalies</source>
-        <translation>活动文件数据编辑器 - 允许改变/修正数据、搜索条目和异常</translation>
+        <translation>活动文件数据编辑器 - 允许改变/修正数据,搜索条目和异常</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="218"/>
@@ -13718,7 +13804,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="173"/>
         <source>Fix SmO2/tHb outliers</source>
-        <translation type="unfinished"></translation>
+        <translation>修正SmO2与tHb异常</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="185"/>
@@ -13734,7 +13820,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
         <location filename="../../Gui/HelpWhatsThis.cpp" line="199"/>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="227"/>
         <source>Basic configuration like date range, what series to use and how to plot</source>
-        <translation>设置数据范围、数据系列和绘图方式的基本设置</translation>
+        <translation>设置数据范围,数据系列和绘图方式的基本设置</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="201"/>
@@ -13777,7 +13863,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="247"/>
         <source>Overview/summary of the selected data range - data shown in &apos;Athlete&apos;s Best&apos; are configurable</source>
-        <translation>所选数据范围的概览/总结 - “运动员最佳”中显示的数据可设置</translation>
+        <translation>所选数据范围的概览/总结 - &quot;运动员最佳&quot;中显示的数据可设置</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="249"/>
@@ -13787,7 +13873,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="255"/>
         <source>Definition of points in time &apos;Events&apos; which are marked explicitely on time related diagrams</source>
-        <translation>设置显示在与时间相关的图表上的“赛事”</translation>
+        <translation>设置显示在与时间相关的图表上的&quot;赛事&quot;</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="257"/>
@@ -13865,7 +13951,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="309"/>
         <source>Definition of processing default parameters for the fix, adjust,... tools</source>
-        <translation>修正、调整工具进行处理的默认参数设置</translation>
+        <translation>修正,调整工具进行处理的默认参数设置</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="311"/>
@@ -13875,17 +13961,17 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="313"/>
         <source>Metrics shown in &apos;Bests&apos;</source>
-        <translation>“最佳”中显示的指标</translation>
+        <translation>&quot;最佳&quot;中显示的指标</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="315"/>
         <source>Metrics shown in &apos;Summary&apos;</source>
-        <translation>“总结”中显示的指标</translation>
+        <translation>&quot;总结&quot;中显示的指标</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="317"/>
         <source>Metrics shown in &apos;Intervals&apos;</source>
-        <translation>“区段”中显示的指标</translation>
+        <translation>&quot;区段&quot;中显示的指标</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="319"/>
@@ -13913,7 +13999,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Gui/HelpWindow.cpp" line="56"/>
         <source>&lt;center&gt;&lt;img src=&quot;:images/gc.png&quot; height=80&gt;&lt;h2&gt;Help Options&lt;/h2&gt;&lt;b&gt;&lt;tt&gt;&quot;Shift&quot;+&quot;F1&quot;&lt;/tt&gt;&lt;/b&gt;&lt;br&gt;provides a context specific short description of a feature including the link to the Wiki page explaining more details&lt;hr&gt;&lt;br&gt;&lt;a href=&quot;http://www.goldencheetah.org&quot;&gt;Golden Cheetah Website&lt;/a&gt;&lt;br&gt;&lt;a href=&quot;http://www.goldencheetah.org/#section-tutorials&quot;&gt;Golden Cheetah Website - Video Tutorials&lt;/a&gt;&lt;br&gt;&lt;a href=&quot;http://www.goldencheetah.org/#section-science&quot;&gt;Golden Cheetah Website - Science in Golden Cheetah&lt;/a&gt;&lt;br&gt;&lt;a href=&quot;https://github.com/GoldenCheetah/GoldenCheetah/wiki&quot;&gt;Wiki Overview&lt;/a&gt;&lt;br&gt;&lt;a href=&quot;https://github.com/GoldenCheetah/GoldenCheetah/wiki/UG_Main-Page_Users-Guide&quot;&gt;Wiki - User&apos;s Guide&lt;/a&gt;&lt;br&gt;&lt;a href=&quot;https://github.com/GoldenCheetah/GoldenCheetah/wiki/FAQ&quot;&gt;Wiki - Frequently Asked Questions&lt;/a&gt;</source>
-        <translation>&lt;center&gt;&lt;img src=&quot;:images/gc.png&quot; height=80&gt;&lt;h2&gt;帮助选线&lt;/h2&gt;&lt;b&gt;&lt;tt&gt;&quot;Shift&quot;+&quot;F1&quot;&lt;/tt&gt;&lt;/b&gt;&lt;br&gt;提供功能简介,以及详细Wiki页面的链接&lt;hr&gt;&lt;br&gt;&lt;a href=&quot;http://www.goldencheetah.org&quot;&gt;Golden Cheetah网站&lt;/a&gt;&lt;br&gt;&lt;a href=&quot;http://www.goldencheetah.org/#section-tutorials&quot;&gt;Golden Cheetah网站 - 视频教程&lt;/a&gt;&lt;br&gt;&lt;a href=&quot;http://www.goldencheetah.org/#section-science&quot;&gt;Golden Cheetah网站 - GC的科学原理&lt;/a&gt;&lt;br&gt;&lt;a href=&quot;https://github.com/GoldenCheetah/GoldenCheetah/wiki&quot;&gt;Wiki概览&lt;/a&gt;&lt;br&gt;&lt;a href=&quot;https://github.com/GoldenCheetah/GoldenCheetah/wiki/UG_Main-Page_Users-Guide&quot;&gt;Wiki - User&apos;s Guide&lt;/a&gt;&lt;br&gt;&lt;a href=&quot;https://github.com/GoldenCheetah/GoldenCheetah/wiki/FAQ&quot;&gt;Wiki - 常见问题&lt;/a&gt;</translation>
+        <translation>&lt;center&gt;&lt;img src=&quot;:images/gc.png&quot; height=80&gt;&lt;h2&gt;帮助选项&lt;/h2&gt;&lt;b&gt;&lt;tt&gt;&quot;Shift&quot;+&quot;F1&quot;&lt;/tt&gt;&lt;/b&gt;&lt;br&gt;提供功能简介及详细Wiki页面的链接&lt;hr&gt;&lt;br&gt;&lt;a href=&quot;http://www.goldencheetah.org&quot;&gt;Golden Cheetah网站&lt;/a&gt;&lt;br&gt;&lt;a href=&quot;http://www.goldencheetah.org/#section-tutorials&quot;&gt;Golden Cheetah网站 - 视频教程&lt;/a&gt;&lt;br&gt;&lt;a href=&quot;http://www.goldencheetah.org/#section-science&quot;&gt;Golden Cheetah网站 - GC的科学原理&lt;/a&gt;&lt;br&gt;&lt;a href=&quot;https://github.com/GoldenCheetah/GoldenCheetah/wiki&quot;&gt;Wiki概览&lt;/a&gt;&lt;br&gt;&lt;a href=&quot;https://github.com/GoldenCheetah/GoldenCheetah/wiki/UG_Main-Page_Users-Guide&quot;&gt;Wiki - 用户指南&lt;/a&gt;&lt;br&gt;&lt;a href=&quot;https://github.com/GoldenCheetah/GoldenCheetah/wiki/FAQ&quot;&gt;Wiki - 常见问题&lt;/a&gt;</translation>
     </message>
 </context>
 <context>
@@ -14379,12 +14465,12 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Metrics/PeakHr.cpp" line="43"/>
         <source>Hr Zone</source>
-        <translation type="unfinished"></translation>
+        <translation>心率区间</translation>
     </message>
     <message>
         <location filename="../../Metrics/PeakHr.cpp" line="47"/>
         <source>Hr Zone fractional number determined from Average Hr.</source>
-        <translation type="unfinished"></translation>
+        <translation>由平均心率确定的心率区间序号.</translation>
     </message>
 </context>
 <context>
@@ -14896,72 +14982,72 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Core/HrvMeasures.cpp" line="193"/>
         <source>HR</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../Core/HrvMeasures.cpp" line="193"/>
         <source>AVNN</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../Core/HrvMeasures.cpp" line="193"/>
         <source>SDNN</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../Core/HrvMeasures.cpp" line="193"/>
         <source>RMSSD</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../Core/HrvMeasures.cpp" line="193"/>
         <source>PNN50</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../Core/HrvMeasures.cpp" line="193"/>
         <source>LF</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../Core/HrvMeasures.cpp" line="193"/>
         <source>HF</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../Core/HrvMeasures.cpp" line="193"/>
         <source>Recovery Points</source>
-        <translation type="unfinished"></translation>
+        <translation>恢复点</translation>
     </message>
     <message>
         <location filename="../../Core/HrvMeasures.cpp" line="216"/>
         <source>bpm</source>
-        <translation type="unfinished">bpm</translation>
+        <translation>bpm</translation>
     </message>
     <message>
         <location filename="../../Core/HrvMeasures.cpp" line="216"/>
         <source>msec</source>
-        <translation type="unfinished">ms</translation>
+        <translation>ms</translation>
     </message>
     <message>
         <location filename="../../Core/HrvMeasures.cpp" line="216"/>
         <source>%</source>
-        <translation type="unfinished">%</translation>
+        <translation>%</translation>
     </message>
     <message>
         <location filename="../../Core/HrvMeasures.cpp" line="216"/>
         <source>msec^2</source>
-        <translation type="unfinished">ms^2</translation>
+        <translation>ms^2</translation>
     </message>
     <message>
         <location filename="../../Core/HrvMeasures.cpp" line="216"/>
         <source>Rec.Points</source>
-        <translation type="unfinished">记录点</translation>
+        <translation>记录点</translation>
     </message>
     <message>
         <location filename="../../Core/HrvMeasures.h" line="75"/>
         <source>Hrv</source>
-        <translation type="unfinished"></translation>
+        <translation>Hrv</translation>
     </message>
 </context>
 <context>
@@ -15018,27 +15104,27 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../FileIO/HrvMeasuresCsvImport.cpp" line="85"/>
         <source>Column &apos;timestamp_measurement&apos;/&apos;Datetime&apos;/&apos;date&apos; is missing.</source>
-        <translation type="unfinished"></translation>
+        <translation>无&apos;timestamp_measurement&apos;或&apos;Datetime&apos;或&apos;date&apos;列数据.</translation>
     </message>
     <message>
         <location filename="../../FileIO/HrvMeasuresCsvImport.cpp" line="89"/>
         <source>Column &apos;rMSSD&apos;/&apos;rMSSD_lying&apos;/&apos;Rmssd&apos; is missing.</source>
-        <translation type="unfinished"></translation>
+        <translation>无&apos;rMSSD&apos;或&apos;rMSSD_lying&apos;或&apos;Rmssd&apos;列数据.</translation>
     </message>
     <message>
         <location filename="../../FileIO/HrvMeasuresCsvImport.cpp" line="102"/>
         <source>Number of data columns: %1 in line %2 lower than header columns: %3</source>
-        <translation type="unfinished"></translation>
+        <translation>%1列%2行的数值小于标题列%3</translation>
     </message>
     <message>
         <location filename="../../FileIO/HrvMeasuresCsvImport.cpp" line="129"/>
         <source>Invalid &apos;timestamp&apos; - Date/Time not ISO 8601 format - in line %1</source>
-        <translation type="unfinished"></translation>
+        <translation>%1行有无效的&apos;timestamp&apos;数据 - Date/Time不符合ISO 8601格式</translation>
     </message>
     <message>
         <location filename="../../FileIO/HrvMeasuresCsvImport.cpp" line="142"/>
         <source>Invalid &apos;date&apos; - Date not yyyy-dd-MM format - in line %1</source>
-        <translation type="unfinished"></translation>
+        <translation>%1行含有无效的&apos;date&apos;数据 - 不符合yyyy-dd-MM格式</translation>
     </message>
     <message>
         <location filename="../../FileIO/HrvMeasuresCsvImport.cpp" line="151"/>
@@ -15146,7 +15232,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Cloud/HrvMeasuresDownload.cpp" line="201"/>
         <source>Download completed.</source>
-        <translation type="unfinished"></translation>
+        <translation>下载完成.</translation>
     </message>
     <message>
         <location filename="../../Cloud/HrvMeasuresDownload.cpp" line="207"/>
@@ -15178,7 +15264,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Gui/Pages.cpp" line="1486"/>
         <source>Comment</source>
-        <translation type="unfinished">注释</translation>
+        <translation>注释</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="1525"/>
@@ -15274,12 +15360,12 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Core/ICalendar.cpp" line="41"/>
         <source>Level</source>
-        <translation type="unfinished"></translation>
+        <translation>级别</translation>
     </message>
     <message>
         <location filename="../../Core/ICalendar.cpp" line="42"/>
         <source>Event Identifier</source>
-        <translation type="unfinished"></translation>
+        <translation>时间识别码</translation>
     </message>
     <message>
         <location filename="../../Core/ICalendar.cpp" line="43"/>
@@ -15289,7 +15375,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Core/ICalendar.cpp" line="44"/>
         <source>Class</source>
-        <translation type="unfinished"></translation>
+        <translation>类别</translation>
     </message>
     <message>
         <location filename="../../Core/ICalendar.cpp" line="45"/>
@@ -15309,58 +15395,58 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Core/ICalendar.cpp" line="49"/>
         <source>Contact</source>
-        <translation type="unfinished"></translation>
+        <translation>联系人</translation>
     </message>
     <message>
         <location filename="../../Core/ICalendar.cpp" line="50"/>
         <source>Date Created</source>
-        <translation type="unfinished"></translation>
+        <translation>创建日期</translation>
     </message>
     <message>
         <location filename="../../Core/ICalendar.cpp" line="51"/>
         <source>CSID?</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../Core/ICalendar.cpp" line="52"/>
         <location filename="../../Core/ICalendar.cpp" line="76"/>
         <source>No later than</source>
-        <translation type="unfinished"></translation>
+        <translation>不晚于</translation>
     </message>
     <message>
         <location filename="../../Core/ICalendar.cpp" line="53"/>
         <source>No earlier than</source>
-        <translation type="unfinished"></translation>
+        <translation>不早于</translation>
     </message>
     <message>
         <location filename="../../Core/ICalendar.cpp" line="54"/>
         <source>Decreed</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../Core/ICalendar.cpp" line="55"/>
         <source>Default character set</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../Core/ICalendar.cpp" line="56"/>
         <source>Default locale</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../Core/ICalendar.cpp" line="57"/>
         <source>Default timezone</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../Core/ICalendar.cpp" line="58"/>
         <source>Default VCar</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../Core/ICalendar.cpp" line="59"/>
         <source>Deny</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../Core/ICalendar.cpp" line="60"/>
@@ -15375,7 +15461,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Core/ICalendar.cpp" line="62"/>
         <source>Timestamp</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../Core/ICalendar.cpp" line="63"/>
@@ -15385,212 +15471,212 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Core/ICalendar.cpp" line="64"/>
         <source>Due Date</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../Core/ICalendar.cpp" line="65"/>
         <source>Duration</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../Core/ICalendar.cpp" line="66"/>
         <source>Expiry Date</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../Core/ICalendar.cpp" line="67"/>
         <source>Expand</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../Core/ICalendar.cpp" line="68"/>
         <source>Exclusive rule</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../Core/ICalendar.cpp" line="69"/>
         <source>Freebusy</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../Core/ICalendar.cpp" line="70"/>
         <source>Geo</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../Core/ICalendar.cpp" line="71"/>
         <source>Grant</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../Core/ICalendar.cpp" line="72"/>
         <source>ITIP Version</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../Core/ICalendar.cpp" line="73"/>
         <source>Modified Date</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../Core/ICalendar.cpp" line="74"/>
         <source>Location</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../Core/ICalendar.cpp" line="75"/>
         <source>Max component size</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../Core/ICalendar.cpp" line="77"/>
         <source>Maximum results</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../Core/ICalendar.cpp" line="78"/>
         <source>Maximum results size</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../Core/ICalendar.cpp" line="79"/>
         <source>Method</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../Core/ICalendar.cpp" line="80"/>
         <source>Np earlier than</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../Core/ICalendar.cpp" line="81"/>
         <source>Is Multipart</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../Core/ICalendar.cpp" line="82"/>
         <source>Name</source>
-        <translation type="unfinished">名称</translation>
+        <translation>名称</translation>
     </message>
     <message>
         <location filename="../../Core/ICalendar.cpp" line="83"/>
         <source>Organised by</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../Core/ICalendar.cpp" line="84"/>
         <source>Owner</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../Core/ICalendar.cpp" line="85"/>
         <source>Percent Complete</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../Core/ICalendar.cpp" line="86"/>
         <source>Permissions</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../Core/ICalendar.cpp" line="87"/>
         <source>Priority</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../Core/ICalendar.cpp" line="88"/>
         <source>Prod Identifier</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../Core/ICalendar.cpp" line="89"/>
         <source>Query</source>
-        <translation type="unfinished">查询</translation>
+        <translation>查询</translation>
     </message>
     <message>
         <location filename="../../Core/ICalendar.cpp" line="90"/>
         <source>Query Level</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../Core/ICalendar.cpp" line="91"/>
         <source>Query Identifier</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../Core/ICalendar.cpp" line="92"/>
         <source>Query Name</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../Core/ICalendar.cpp" line="93"/>
         <source>Recurring Date</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../Core/ICalendar.cpp" line="94"/>
         <source>Recurring Accepted</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../Core/ICalendar.cpp" line="95"/>
         <source>Recurring Expanded</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../Core/ICalendar.cpp" line="96"/>
         <source>Recur no later than</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../Core/ICalendar.cpp" line="97"/>
         <source>Reccurrence Identifier</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../Core/ICalendar.cpp" line="98"/>
         <source>Related to</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../Core/ICalendar.cpp" line="99"/>
         <source>Related to Calendar Identifier</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../Core/ICalendar.cpp" line="100"/>
         <source>Repeat</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../Core/ICalendar.cpp" line="101"/>
         <source>Request Status</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../Core/ICalendar.cpp" line="102"/>
         <source>Resources</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../Core/ICalendar.cpp" line="103"/>
         <source>Restriction</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../Core/ICalendar.cpp" line="104"/>
         <source>Rule</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../Core/ICalendar.cpp" line="105"/>
         <source>Scope</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../Core/ICalendar.cpp" line="106"/>
         <source>Sequence Number</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../Core/ICalendar.cpp" line="107"/>
@@ -15600,7 +15686,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Core/ICalendar.cpp" line="108"/>
         <source>Stores Expanded</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../Core/ICalendar.cpp" line="109"/>
@@ -15610,102 +15696,102 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Core/ICalendar.cpp" line="110"/>
         <source>Target</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../Core/ICalendar.cpp" line="111"/>
         <source>Transport</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../Core/ICalendar.cpp" line="112"/>
         <source>Trigger</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../Core/ICalendar.cpp" line="113"/>
         <source>Timezone Identifier</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../Core/ICalendar.cpp" line="114"/>
         <source>Timezone Name</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../Core/ICalendar.cpp" line="115"/>
         <source>Timezone Offset from</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../Core/ICalendar.cpp" line="116"/>
         <source>Timezone Offset to</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../Core/ICalendar.cpp" line="117"/>
         <source>Timezone URL</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../Core/ICalendar.cpp" line="118"/>
         <source>Unique Identifier</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../Core/ICalendar.cpp" line="119"/>
         <source>URL</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../Core/ICalendar.cpp" line="121"/>
         <source>X-Property</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../Core/ICalendar.cpp" line="122"/>
         <source>XLI Class</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../Core/ICalendar.cpp" line="123"/>
         <source>XLI Cluster count</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../Core/ICalendar.cpp" line="124"/>
         <source>XLI error</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../Core/ICalendar.cpp" line="125"/>
         <source>XLI mime character set</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../Core/ICalendar.cpp" line="126"/>
         <source>XLI mime class Identifier</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../Core/ICalendar.cpp" line="127"/>
         <source>XLI mime content type</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../Core/ICalendar.cpp" line="128"/>
         <source>XLI mime encoding</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../Core/ICalendar.cpp" line="129"/>
         <source>XLI mime filename</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../Core/ICalendar.cpp" line="130"/>
         <source>XLI mime optional information</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -15726,7 +15812,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Train/ImagicController.cpp" line="87"/>
         <source>Cannot Connect to Imagic</source>
-        <translation type="unfinished"></translation>
+        <translation>无法连接Imagic</translation>
     </message>
 </context>
 <context>
@@ -15749,12 +15835,12 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Charts/HomeWindow.cpp" line="1670"/>
         <source>View</source>
-        <translation type="unfinished">视图</translation>
+        <translation>视图</translation>
     </message>
     <message>
         <location filename="../../Charts/HomeWindow.cpp" line="1671"/>
         <source>Title</source>
-        <translation type="unfinished">标题</translation>
+        <translation>标题</translation>
     </message>
     <message>
         <location filename="../../Charts/HomeWindow.cpp" line="1695"/>
@@ -15859,7 +15945,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Train/WorkoutWizard.cpp" line="672"/>
         <source>Maximum supported grade is +-40</source>
-        <translation type="unfinished"></translation>
+        <translation>支持的最大坡度为+-40</translation>
     </message>
     <message>
         <location filename="../../Train/WorkoutWizard.cpp" line="680"/>
@@ -15985,7 +16071,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Metrics/Coggan.cpp" line="50"/>
         <source>Iso Power is an estimate of the power that you could have maintained for the same physiological &apos;cost&apos; if your power output had been perfectly constant.</source>
-        <translation>标准化功率是对能够产生同等生理“代价”的常值功率的一种估计.</translation>
+        <translation>标准化功率是对能够产生同等生理&quot;代价&quot;的常值功率的一种估计.</translation>
     </message>
 </context>
 <context>
@@ -16143,33 +16229,33 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Cloud/KentUniversity.cpp" line="319"/>
         <source>You must authorise with KentUniversity first</source>
-        <translation type="unfinished"></translation>
+        <translation>必须首先通过Kent University授权</translation>
     </message>
     <message>
         <location filename="../../Cloud/KentUniversity.cpp" line="336"/>
         <source>No such directory, try setting a new location in options.</source>
-        <translation type="unfinished">无此文件夹,请在设置中设定新位置.</translation>
+        <translation>无此文件夹,请在设置中设定新位置.</translation>
     </message>
     <message>
         <location filename="../../Cloud/KentUniversity.cpp" line="656"/>
         <location filename="../../Cloud/KentUniversity.cpp" line="672"/>
         <source>Completed.</source>
-        <translation type="unfinished">完成.</translation>
+        <translation>完成.</translation>
     </message>
     <message>
         <location filename="../../Cloud/KentUniversity.cpp" line="660"/>
         <source>Upload failed</source>
-        <translation type="unfinished">上传失败</translation>
+        <translation>上传失败</translation>
     </message>
     <message>
         <location filename="../../Cloud/KentUniversity.h" line="49"/>
         <source>University of Kent</source>
-        <translation type="unfinished"></translation>
+        <translation>University of Kent</translation>
     </message>
     <message>
         <location filename="../../Cloud/KentUniversity.h" line="50"/>
         <source>Participate in academic studies sharing data via google drive.</source>
-        <translation type="unfinished"></translation>
+        <translation>通过Google Drive分享数据以参与学术研究.</translation>
     </message>
 </context>
 <context>
@@ -16177,59 +16263,59 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Cloud/KentUniversity.cpp" line="827"/>
         <source>Upload to Kent University</source>
-        <translation type="unfinished"></translation>
+        <translation>上传活动至Kent University</translation>
     </message>
     <message>
         <location filename="../../Cloud/KentUniversity.cpp" line="838"/>
         <source>Session Perceived Exertion (sRPE)</source>
-        <translation type="unfinished"></translation>
+        <translation>活动RPE(sRPE)</translation>
     </message>
     <message>
         <location filename="../../Cloud/KentUniversity.cpp" line="854"/>
         <source>Post Session Fatigue (ROF)</source>
-        <translation type="unfinished"></translation>
+        <translation>活动后疲劳(ROF)</translation>
     </message>
     <message>
         <location filename="../../Cloud/KentUniversity.cpp" line="869"/>
         <source>Notes</source>
-        <translation type="unfinished">注释</translation>
+        <translation>注释</translation>
     </message>
     <message>
         <location filename="../../Cloud/KentUniversity.cpp" line="877"/>
         <source>Missed workouts</source>
-        <translation type="unfinished"></translation>
+        <translation>错过的训练</translation>
     </message>
     <message>
         <location filename="../../Cloud/KentUniversity.cpp" line="882"/>
         <source>Is a self administered test workout</source>
-        <translation type="unfinished"></translation>
+        <translation>这是一个自主的测试训练</translation>
     </message>
     <message>
         <location filename="../../Cloud/KentUniversity.cpp" line="885"/>
         <source>Uploading %1 bytes...</source>
-        <translation type="unfinished">正在上传%1字节...</translation>
+        <translation>正在上传%1字节...</translation>
     </message>
     <message>
         <location filename="../../Cloud/KentUniversity.cpp" line="895"/>
         <source>Upload</source>
-        <translation type="unfinished">上传</translation>
+        <translation>上传</translation>
     </message>
     <message>
         <location filename="../../Cloud/KentUniversity.cpp" line="942"/>
         <location filename="../../Cloud/KentUniversity.cpp" line="970"/>
         <source>Upload Failed</source>
-        <translation type="unfinished">上传失败</translation>
+        <translation>上传失败</translation>
     </message>
     <message>
         <location filename="../../Cloud/KentUniversity.cpp" line="943"/>
         <location filename="../../Cloud/KentUniversity.cpp" line="971"/>
         <source>Unable to upload, check your configuration in preferences.</source>
-        <translation type="unfinished">无法上传, 请检查设置.</translation>
+        <translation>无法上传, 请检查设置.</translation>
     </message>
     <message>
         <location filename="../../Cloud/KentUniversity.cpp" line="1010"/>
         <source>Done</source>
-        <translation type="unfinished">完成</translation>
+        <translation>完成</translation>
     </message>
 </context>
 <context>
@@ -16930,7 +17016,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Gui/LTMSidebar.cpp" line="1288"/>
         <source>The new event could not be uploaded to your remote calendar.</source>
-        <translation type="unfinished"></translation>
+        <translation>新赛事无法上传到远程日历.</translation>
     </message>
     <message>
         <location filename="../../Gui/LTMSidebar.cpp" line="1417"/>
@@ -17108,7 +17194,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="115"/>
         <source>Show Banister Helper</source>
-        <translation type="unfinished"></translation>
+        <translation>显示Banister助手</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="356"/>
@@ -17190,7 +17276,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="416"/>
         <source>Skiba LTS Ramp</source>
-        <translation>Skiba长期期压力斜率</translation>
+        <translation>Skiba长期压力斜率</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="432"/>
@@ -17381,17 +17467,17 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="1318"/>
         <source>Measure</source>
-        <translation type="unfinished"></translation>
+        <translation>信息</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="1320"/>
         <source>Performance</source>
-        <translation type="unfinished">表现</translation>
+        <translation>表现</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="1322"/>
         <source>Banister</source>
-        <translation type="unfinished"></translation>
+        <translation>Banister</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="1499"/>
@@ -17608,7 +17694,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     </message>
     <message>
         <location filename="../../Charts/LTMWindow.cpp" line="217"/>
-        <location filename="../../Charts/LTMWindow.cpp" line="1319"/>
+        <location filename="../../Charts/LTMWindow.cpp" line="1344"/>
         <source>All</source>
         <translation>全部</translation>
     </message>
@@ -17636,105 +17722,110 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
         <translation type="vanished">导出图表设置至云数据库...</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMWindow.cpp" line="1300"/>
+        <location filename="../../Charts/LTMWindow.cpp" line="1325"/>
         <source> grouped by </source>
         <translation>分组</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMWindow.cpp" line="1304"/>
+        <location filename="../../Charts/LTMWindow.cpp" line="1329"/>
         <source>day</source>
         <translation>天</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMWindow.cpp" line="1307"/>
+        <location filename="../../Charts/LTMWindow.cpp" line="1332"/>
         <source>week</source>
         <translation>周</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMWindow.cpp" line="1310"/>
+        <location filename="../../Charts/LTMWindow.cpp" line="1335"/>
         <source>month</source>
         <translation>月</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMWindow.cpp" line="1313"/>
+        <location filename="../../Charts/LTMWindow.cpp" line="1338"/>
         <source>year</source>
         <translation>年</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMWindow.cpp" line="1316"/>
+        <location filename="../../Charts/LTMWindow.cpp" line="1341"/>
         <source>time of day</source>
         <translation>时间</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMWindow.cpp" line="1501"/>
-        <location filename="../../Charts/LTMWindow.cpp" line="1551"/>
+        <location filename="../../Charts/LTMWindow.cpp" line="1526"/>
+        <location filename="../../Charts/LTMWindow.cpp" line="1577"/>
         <source>seconds</source>
         <translation>秒</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMWindow.cpp" line="1402"/>
-        <location filename="../../Charts/LTMWindow.cpp" line="1404"/>
+        <location filename="../../Charts/LTMWindow.cpp" line="1427"/>
+        <location filename="../../Charts/LTMWindow.cpp" line="1429"/>
         <source>Date</source>
         <translation>日期</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMWindow.cpp" line="260"/>
         <source>Banister Model</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../Charts/LTMWindow.cpp" line="273"/>
-        <source>Impulse Metric</source>
-        <translation type="unfinished"></translation>
+        <translation>Banister模型</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMWindow.cpp" line="274"/>
-        <source>Peak</source>
-        <translation type="unfinished">峰值</translation>
+        <source>Impulse Metric</source>
+        <translation>刺激指标</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMWindow.cpp" line="277"/>
-        <source>Positive decay</source>
+        <location filename="../../Charts/LTMWindow.cpp" line="275"/>
+        <source>Perf. Metric</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMWindow.cpp" line="278"/>
-        <location filename="../../Charts/LTMWindow.cpp" line="280"/>
-        <source>days</source>
-        <translation type="unfinished">天</translation>
+        <location filename="../../Charts/LTMWindow.cpp" line="276"/>
+        <source>Peak</source>
+        <translation>峰值</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMWindow.cpp" line="279"/>
-        <source>Negative decay</source>
-        <translation type="unfinished"></translation>
+        <source>Positive decay</source>
+        <translation>积极衰减</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMWindow.cpp" line="1477"/>
+        <location filename="../../Charts/LTMWindow.cpp" line="280"/>
+        <location filename="../../Charts/LTMWindow.cpp" line="282"/>
+        <source>days</source>
+        <translation>天</translation>
+    </message>
+    <message>
+        <location filename="../../Charts/LTMWindow.cpp" line="281"/>
+        <source>Negative decay</source>
+        <translation>消极衰减</translation>
+    </message>
+    <message>
+        <location filename="../../Charts/LTMWindow.cpp" line="1502"/>
         <source>Coggan Acute Training Load</source>
         <translation>Coggan短期训练负荷</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMWindow.cpp" line="1478"/>
+        <location filename="../../Charts/LTMWindow.cpp" line="1503"/>
         <source>Coggan Chronic Training Load</source>
         <translation>Coggan长期训练负荷</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMWindow.cpp" line="1479"/>
+        <location filename="../../Charts/LTMWindow.cpp" line="1504"/>
         <source>Coggan Training Stress Balance</source>
         <translation>Coggan训练压力平衡</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMWindow.cpp" line="1501"/>
+        <location filename="../../Charts/LTMWindow.cpp" line="1526"/>
         <source>hours</source>
         <translation>时</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMWindow.cpp" line="1595"/>
+        <location filename="../../Charts/LTMWindow.cpp" line="1625"/>
         <source>Export Chart Config</source>
         <translation>导出图表设置</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMWindow.cpp" line="1608"/>
+        <location filename="../../Charts/LTMWindow.cpp" line="1638"/>
         <source>Save Chart Data as CSV</source>
         <translation>保存图表数据为CSV</translation>
     </message>
@@ -17918,12 +18009,12 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Core/DataFilter.cpp" line="1090"/>
         <source>Array subscript needs a symbol name.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../Core/DataFilter.cpp" line="1102"/>
         <source>Index must be numeric.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../Core/DataFilter.cpp" line="1122"/>
@@ -17956,115 +18047,119 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
         <translation>至少有两个参数的功能</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1192"/>
         <source>should be banister(metric, nte|pte|perf|cp)</source>
+        <translation type="vanished">应为Banister指标(nte|pte|perf|cp)</translation>
+    </message>
+    <message>
+        <location filename="../../Core/DataFilter.cpp" line="1192"/>
+        <source>should be banister(load_metric, perf_metric, nte|pte|perf|cp)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1221"/>
+        <location filename="../../Core/DataFilter.cpp" line="1230"/>
         <source>XDATA needs 3 parameters.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1228"/>
+        <location filename="../../Core/DataFilter.cpp" line="1237"/>
         <source>XDATA expects a string for first two parameters</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1235"/>
+        <location filename="../../Core/DataFilter.cpp" line="1244"/>
         <source>XDATA expects a symbol, one of sparse, repeat, interpolate or resample for third parameter.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1242"/>
+        <location filename="../../Core/DataFilter.cpp" line="1251"/>
         <source>XDATA expects one of sparse, repeat, interpolate or resample for third parameter. (%1)</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1265"/>
+        <location filename="../../Core/DataFilter.cpp" line="1274"/>
         <source>XDATA_UNITS needs 2 parameters.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1272"/>
+        <location filename="../../Core/DataFilter.cpp" line="1281"/>
         <source>XDATA_UNITS expects a string for first two parameters</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1287"/>
+        <location filename="../../Core/DataFilter.cpp" line="1296"/>
         <source>isset/set/unset function first parameter is field/metric to set.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1300"/>
+        <location filename="../../Core/DataFilter.cpp" line="1309"/>
         <source>%1 is not supported in isset/set/unset operations</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1310"/>
+        <location filename="../../Core/DataFilter.cpp" line="1319"/>
         <source>isset has one parameter, a symbol to check.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1317"/>
+        <location filename="../../Core/DataFilter.cpp" line="1326"/>
         <source>set function needs 3 paramaters; symbol, value and expression.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1318"/>
+        <location filename="../../Core/DataFilter.cpp" line="1327"/>
         <source>unset function needs 2 paramaters; symbol and expression.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1336"/>
+        <location filename="../../Core/DataFilter.cpp" line="1345"/>
         <source>estimate function expects model name as first parameter.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1342"/>
+        <location filename="../../Core/DataFilter.cpp" line="1351"/>
         <source>estimate function expects model name as first parameter</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1353"/>
+        <location filename="../../Core/DataFilter.cpp" line="1362"/>
         <source>estimate function expects parameter or duration as second parameter</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1373"/>
+        <location filename="../../Core/DataFilter.cpp" line="1382"/>
         <source>function &apos;%1&apos; expects %2 parameter(s) not %3</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1385"/>
+        <location filename="../../Core/DataFilter.cpp" line="1394"/>
         <source>unknown function %1</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1395"/>
+        <location filename="../../Core/DataFilter.cpp" line="1404"/>
         <source>unary negation on a string!</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1415"/>
-        <location filename="../../Core/DataFilter.cpp" line="1432"/>
-        <source>variables must be numeric.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
+        <location filename="../../Core/DataFilter.cpp" line="1424"/>
         <location filename="../../Core/DataFilter.cpp" line="1441"/>
+        <source>variables must be numeric.</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../Core/DataFilter.cpp" line="1450"/>
         <source>assignment must be to a symbol.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1454"/>
+        <location filename="../../Core/DataFilter.cpp" line="1463"/>
         <source>comparing strings with numbers</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1461"/>
+        <location filename="../../Core/DataFilter.cpp" line="1470"/>
         <source>using a string operations with a number</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -18083,7 +18178,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Metrics/LeftRightBalance.cpp" line="46"/>
         <source>Left/Right Balance shows the proportion of power coming from each pedal for rides and the proportion of Ground Contact Time from each leg for runs.</source>
-        <translation type="unfinished"></translation>
+        <translation>左/右平衡表示来自每侧踏板的功率所占的百分比,或跑步时左右脚的触地时间百分比.</translation>
     </message>
     <message>
         <source>Left/Right Balance shows the proportion of power coming from each pedal.</source>
@@ -18095,12 +18190,12 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Train/Library.cpp" line="128"/>
         <source>Import Videos, VideoSyncs and Workouts</source>
-        <translation>导入视频、视频同步和训练</translation>
+        <translation>导入视频,视频同步和训练</translation>
     </message>
     <message>
         <location filename="../../Train/Library.cpp" line="129"/>
         <source>No supported videos, videoSyncs or workouts were found to import</source>
-        <translation>未找到支持的视频、视频同步或训练</translation>
+        <translation>未找到支持的视频,视频同步或训练</translation>
     </message>
     <message>
         <location filename="../../Train/Library.cpp" line="179"/>
@@ -18120,7 +18215,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Train/Library.cpp" line="208"/>
         <source>%1 cannot be written to workout library %2, check permissions and free space</source>
-        <translation type="unfinished"></translation>
+        <translation>%1无法写入到库%2,请检查权限及可用空间</translation>
     </message>
     <message>
         <source>%1 already exists in workout library: %2</source>
@@ -18132,7 +18227,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Train/Library.cpp" line="253"/>
         <source>Search for Workouts, Syncs and Media</source>
-        <translation>搜索训练、视频同步和媒体</translation>
+        <translation>搜索训练,视频同步和媒体</translation>
     </message>
     <message>
         <location filename="../../Train/Library.cpp" line="260"/>
@@ -18267,7 +18362,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Charts/MUPlot.cpp" line="73"/>
         <source>w(x)</source>
-        <translation></translation>
+        <translation>w(x)</translation>
     </message>
     <message>
         <location filename="../../Charts/MUPlot.cpp" line="89"/>
@@ -18350,7 +18445,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../FileIO/MacroDevice.cpp" line="156"/>
         <source>Failed to create temporary file </source>
-        <translation>创建临时文件失败</translation>
+        <translation>创建临时文件失败 </translation>
     </message>
     <message>
         <location filename="../../FileIO/MacroDevice.cpp" line="188"/>
@@ -18369,7 +18464,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
         <location filename="../../FileIO/MacroDevice.cpp" line="49"/>
         <source>Make sure the Macro unit is turned
 on and that its display says, &quot;PC Link&quot;</source>
-        <translation>确认Macro设备开机且显示“PC连接”(“PC Link”)</translation>
+        <translation>确认Macro设备开机且显示&quot;PC Link&quot;</translation>
     </message>
 </context>
 <context>
@@ -18415,8 +18510,8 @@ on and that its display says, &quot;PC Link&quot;</source>
 <context>
     <name>MainWindow</name>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1785"/>
-        <location filename="../../Gui/MainWindow.cpp" line="1827"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1798"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1840"/>
         <source>Ctrl+N</source>
         <translation>Ctrl+N</translation>
     </message>
@@ -18460,7 +18555,7 @@ on and that its display says, &quot;PC Link&quot;</source>
         <translation>切换侧边栏</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1514"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1527"/>
         <source>Delete Activity</source>
         <translation>删除活动</translation>
     </message>
@@ -18571,12 +18666,12 @@ on and that its display says, &quot;PC Link&quot;</source>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="471"/>
         <source>Import workouts, videos, videoSyncs...</source>
-        <translation>导入训练、视频和视频同步...</translation>
+        <translation>导入训练,视频和视频同步...</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="472"/>
         <source>Scan disk for workouts, videos, videoSyncs...</source>
-        <translation>在硬盘扫描训练、视频和视频同步...</translation>
+        <translation>在硬盘扫描训练,视频和视频同步...</translation>
     </message>
     <message>
         <source>CloudDB Status...</source>
@@ -18601,21 +18696,21 @@ on and that its display says, &quot;PC Link&quot;</source>
         <translation>维护图表</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="946"/>
-        <location filename="../../Gui/MainWindow.cpp" line="1660"/>
-        <location filename="../../Gui/MainWindow.cpp" line="1677"/>
+        <location filename="../../Gui/MainWindow.cpp" line="959"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1673"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1690"/>
         <source>Activity Import</source>
         <translation>活动导入</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="946"/>
-        <location filename="../../Gui/MainWindow.cpp" line="1660"/>
-        <location filename="../../Gui/MainWindow.cpp" line="1677"/>
+        <location filename="../../Gui/MainWindow.cpp" line="959"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1673"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1690"/>
         <source>Closing of athlete window not possible while background activity import is in progress...</source>
         <translation>后台活动导入中,无法关闭运动员窗口...</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1257"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1270"/>
         <source>Chart Import</source>
         <translation>图表导入</translation>
     </message>
@@ -18624,52 +18719,52 @@ on and that its display says, &quot;PC Link&quot;</source>
         <translation type="vanished">已导入%1个图表</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1401"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1414"/>
         <source>Failed to export activity, please check permissions</source>
         <translation>导出活动失败,请检查权限</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1437"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1450"/>
         <source>No Activity To Save</source>
         <translation>无活动可保存</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1438"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1451"/>
         <source>There is no currently selected activity to save.</source>
         <translation>目前无选中活动以保存</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1490"/>
-        <location filename="../../Gui/MainWindow.cpp" line="1492"/>
-        <location filename="../../Gui/MainWindow.cpp" line="1502"/>
-        <location filename="../../Gui/MainWindow.cpp" line="1504"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1503"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1505"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1515"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1517"/>
         <source>Split Activity</source>
         <translation>分割活动</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1490"/>
-        <location filename="../../Gui/MainWindow.cpp" line="1502"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1503"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1515"/>
         <source>No activity selected</source>
         <translation>未选择活动</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1492"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1505"/>
         <source>Current activity contains no data to split</source>
         <translation>目前活动无可分割的数据</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1504"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1517"/>
         <source>Current activity contains no data to merge</source>
         <translation>目前活动无可合并的数据</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1520"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1533"/>
         <source>Are you sure you want to delete the activity:</source>
         <translation>确认删除活动:</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1994"/>
-        <location filename="../../Gui/MainWindow.cpp" line="2016"/>
+        <location filename="../../Gui/MainWindow.cpp" line="2007"/>
+        <location filename="../../Gui/MainWindow.cpp" line="2029"/>
         <source>The workout directory is not configured, or the directory selected no longer exists.
 
 Please check your preference settings.</source>
@@ -18678,12 +18773,12 @@ Please check your preference settings.</source>
 请检查设置.</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="2233"/>
+        <location filename="../../Gui/MainWindow.cpp" line="2246"/>
         <source>CloudDB</source>
         <translation>云数据库</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="2233"/>
+        <location filename="../../Gui/MainWindow.cpp" line="2246"/>
         <source>Current athlete is not registered as curator - please contact the GoldenCheetah team</source>
         <translation>目前运动员未注册为管理员 - 请联系GC团队</translation>
     </message>
@@ -18818,23 +18913,23 @@ Please check your preference settings.</source>
         <translation>活动</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="563"/>
+        <location filename="../../Gui/MainWindow.cpp" line="564"/>
         <source>Tabbed not Tiled</source>
         <translation>标签显示</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1048"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1061"/>
         <source>You are about to reset all charts to the default setup</source>
         <translation>将重置所有图表至默认设置</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1049"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1062"/>
         <source>Do you want to continue?</source>
         <translation>确认继续?</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1785"/>
-        <location filename="../../Gui/MainWindow.cpp" line="1827"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1798"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1840"/>
         <source>&amp;New Athlete...</source>
         <translation>新建运动员(&amp;N)...</translation>
     </message>
@@ -18848,23 +18943,23 @@ Please check your preference settings.</source>
         <translation>寻找区段...</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1334"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1347"/>
         <source>Select Activity</source>
         <translation>选择活动</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1334"/>
-        <location filename="../../Gui/MainWindow.cpp" line="1514"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1347"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1527"/>
         <source>No activity selected!</source>
         <translation>未选择活动！</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1347"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1360"/>
         <source>Export Activity</source>
         <translation>导出活动</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1400"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1413"/>
         <source>Export Failed</source>
         <translation>导出失败</translation>
     </message>
@@ -19005,84 +19100,109 @@ Please check your preference settings.</source>
         <translation>趋势</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="558"/>
+        <location filename="../../Gui/MainWindow.cpp" line="557"/>
+        <source>Import Chart...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Gui/MainWindow.cpp" line="559"/>
         <source>Upload Chart...</source>
         <translation>上传图表...</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="559"/>
+        <location filename="../../Gui/MainWindow.cpp" line="560"/>
         <source>Download Chart...</source>
         <translation>下载图表...</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="562"/>
+        <location filename="../../Gui/MainWindow.cpp" line="563"/>
         <source>Reset Layout</source>
         <translation>重置布局</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="575"/>
+        <location filename="../../Gui/MainWindow.cpp" line="576"/>
         <source>&amp;Help</source>
         <translation>帮助(&amp;H)</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="576"/>
+        <location filename="../../Gui/MainWindow.cpp" line="577"/>
         <source>&amp;Help Overview</source>
         <translation>帮助概览(&amp;H)</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="578"/>
+        <location filename="../../Gui/MainWindow.cpp" line="579"/>
         <source>&amp;User Guide</source>
         <translation>用户手册(&amp;U)</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="579"/>
+        <location filename="../../Gui/MainWindow.cpp" line="580"/>
         <source>&amp;Log a bug or feature request</source>
         <translation>提交问题或功能请求(&amp;L)</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="580"/>
+        <location filename="../../Gui/MainWindow.cpp" line="581"/>
         <source>&amp;Discussion and Support Forum</source>
         <translation>讨论与支持论坛(&amp;D)</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="582"/>
+        <location filename="../../Gui/MainWindow.cpp" line="583"/>
         <source>&amp;About GoldenCheetah</source>
         <translation>关于Golden Cheetah(&amp;A)</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1257"/>
+        <location filename="../../Gui/MainWindow.cpp" line="827"/>
+        <source>Select Chart file to import</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Gui/MainWindow.cpp" line="827"/>
+        <source>GoldenCheetah Chart Files (*.gchart)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Gui/MainWindow.cpp" line="830"/>
+        <source>Import Chart</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Gui/MainWindow.cpp" line="830"/>
+        <source>No chart file selected!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Gui/MainWindow.cpp" line="1270"/>
         <source>Imported %1 metric charts</source>
         <translation>已导入%1个指标图表</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1422"/>
-        <location filename="../../Gui/MainWindow.cpp" line="1963"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1435"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1976"/>
         <source>Import from File</source>
         <translation>从文件导入</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1936"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1949"/>
         <source>Refresh in Progress</source>
         <translation>刷新中</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1942"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1955"/>
         <source>Export Metrics</source>
         <translation>导出指标</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1942"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1955"/>
         <source>Comma Separated Variables (*.csv)</source>
         <translation>逗号分隔值 (*.csv)</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1993"/>
-        <location filename="../../Gui/MainWindow.cpp" line="2015"/>
+        <location filename="../../Gui/MainWindow.cpp" line="2006"/>
+        <location filename="../../Gui/MainWindow.cpp" line="2028"/>
         <source>Workout Directory Invalid</source>
         <translation>训练文件夹无效</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1522"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1535"/>
         <source>Delete</source>
         <translation>删除</translation>
     </message>
@@ -19268,7 +19388,7 @@ Please check your preference settings.</source>
     <message>
         <location filename="../../Charts/RideMapWindow.cpp" line="1326"/>
         <source>Selection #</source>
-        <translation type="unfinished"></translation>
+        <translation>选择#</translation>
     </message>
     <message>
         <location filename="../../Charts/RideMapWindow.cpp" line="1400"/>
@@ -19541,27 +19661,27 @@ Please check your preference settings.</source>
     <message>
         <location filename="../../Core/Measures.cpp" line="41"/>
         <source>Manual entry</source>
-        <translation type="unfinished">手动创建</translation>
+        <translation>手动创建</translation>
     </message>
     <message>
         <location filename="../../Core/Measures.cpp" line="43"/>
         <source>Withings</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../Core/Measures.cpp" line="45"/>
         <source>Today&apos;s Plan</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../Core/Measures.cpp" line="47"/>
         <source>CSV Upload</source>
-        <translation type="unfinished">CSV上传</translation>
+        <translation>CSV上传</translation>
     </message>
     <message>
         <location filename="../../Core/Measures.cpp" line="49"/>
         <source>Unknown</source>
-        <translation type="unfinished">未知</translation>
+        <translation>未知</translation>
     </message>
 </context>
 <context>
@@ -19575,7 +19695,7 @@ Please check your preference settings.</source>
 <context>
     <name>MergeAdjust</name>
     <message>
-        <location filename="../../Gui/MergeActivityWizard.cpp" line="1083"/>
+        <location filename="../../Gui/MergeActivityWizard.cpp" line="1104"/>
         <source>Adjust Alignment</source>
         <translation>调整对齐</translation>
     </message>
@@ -19584,17 +19704,17 @@ Please check your preference settings.</source>
         <translation type="vanished">调整合并时间对齐</translation>
     </message>
     <message>
-        <location filename="../../Gui/MergeActivityWizard.cpp" line="1084"/>
+        <location filename="../../Gui/MergeActivityWizard.cpp" line="1105"/>
         <source>Adjust merge alignment in time (use cursor and pgDown/pgUp keys for precise alignment)</source>
-        <translation type="unfinished"></translation>
+        <translation>调整合并时间对齐(使用鼠标和pgdn/pgup键来精准对齐)</translation>
     </message>
     <message>
-        <location filename="../../Gui/MergeActivityWizard.cpp" line="1129"/>
+        <location filename="../../Gui/MergeActivityWizard.cpp" line="1150"/>
         <source>Adjust:</source>
         <translation>调整:</translation>
     </message>
     <message>
-        <location filename="../../Gui/MergeActivityWizard.cpp" line="1132"/>
+        <location filename="../../Gui/MergeActivityWizard.cpp" line="1153"/>
         <source>Reset</source>
         <translation>重置</translation>
     </message>
@@ -19602,32 +19722,32 @@ Please check your preference settings.</source>
 <context>
     <name>MergeChoose</name>
     <message>
-        <location filename="../../Gui/MergeActivityWizard.cpp" line="838"/>
+        <location filename="../../Gui/MergeActivityWizard.cpp" line="859"/>
         <source>Choose an Activity</source>
         <translation>选择一个活动</translation>
     </message>
     <message>
-        <location filename="../../Gui/MergeActivityWizard.cpp" line="839"/>
+        <location filename="../../Gui/MergeActivityWizard.cpp" line="860"/>
         <source>Choose an Existing activity to Combine</source>
         <translation>选择一个已有活动以合并</translation>
     </message>
     <message>
-        <location filename="../../Gui/MergeActivityWizard.cpp" line="847"/>
+        <location filename="../../Gui/MergeActivityWizard.cpp" line="868"/>
         <source>Filename</source>
         <translation>文件名</translation>
     </message>
     <message>
-        <location filename="../../Gui/MergeActivityWizard.cpp" line="848"/>
+        <location filename="../../Gui/MergeActivityWizard.cpp" line="869"/>
         <source>Date</source>
         <translation>日期</translation>
     </message>
     <message>
-        <location filename="../../Gui/MergeActivityWizard.cpp" line="849"/>
+        <location filename="../../Gui/MergeActivityWizard.cpp" line="870"/>
         <source>Time</source>
         <translation>时间</translation>
     </message>
     <message>
-        <location filename="../../Gui/MergeActivityWizard.cpp" line="864"/>
+        <location filename="../../Gui/MergeActivityWizard.cpp" line="885"/>
         <source>dd MMM yyyy</source>
         <translation>yyyy年M月d日</translation>
     </message>
@@ -19635,17 +19755,17 @@ Please check your preference settings.</source>
 <context>
     <name>MergeConfirm</name>
     <message>
-        <location filename="../../Gui/MergeActivityWizard.cpp" line="1381"/>
+        <location filename="../../Gui/MergeActivityWizard.cpp" line="1402"/>
         <source>Confirm</source>
         <translation>确认</translation>
     </message>
     <message>
-        <location filename="../../Gui/MergeActivityWizard.cpp" line="1382"/>
+        <location filename="../../Gui/MergeActivityWizard.cpp" line="1403"/>
         <source>Complete and Save</source>
         <translation>完成并保存</translation>
     </message>
     <message>
-        <location filename="../../Gui/MergeActivityWizard.cpp" line="1387"/>
+        <location filename="../../Gui/MergeActivityWizard.cpp" line="1408"/>
         <source>Press Finish to update the current activity with  the combined data.
 
 The changes will be saved and cannot be undone.
@@ -19661,17 +19781,17 @@ If you press continue the activity will be saved, if you do not want to continue
 <context>
     <name>MergeDownload</name>
     <message>
-        <location filename="../../Gui/MergeActivityWizard.cpp" line="757"/>
+        <location filename="../../Gui/MergeActivityWizard.cpp" line="778"/>
         <source>Download Activity</source>
         <translation>下载活动</translation>
     </message>
     <message>
-        <location filename="../../Gui/MergeActivityWizard.cpp" line="758"/>
+        <location filename="../../Gui/MergeActivityWizard.cpp" line="779"/>
         <source>Download Activity to Combine</source>
         <translation>下载活动以合并</translation>
     </message>
     <message>
-        <location filename="../../Gui/MergeActivityWizard.cpp" line="811"/>
+        <location filename="../../Gui/MergeActivityWizard.cpp" line="832"/>
         <source>Error - Unknown file type</source>
         <translation>错误 - 未知的文件类型</translation>
     </message>
@@ -19679,32 +19799,32 @@ If you press continue the activity will be saved, if you do not want to continue
 <context>
     <name>MergeMode</name>
     <message>
-        <location filename="../../Gui/MergeActivityWizard.cpp" line="918"/>
+        <location filename="../../Gui/MergeActivityWizard.cpp" line="939"/>
         <source>Select Mode</source>
         <translation>选择模式</translation>
     </message>
     <message>
-        <location filename="../../Gui/MergeActivityWizard.cpp" line="919"/>
+        <location filename="../../Gui/MergeActivityWizard.cpp" line="940"/>
         <source>How would you like to combine the data ?</source>
         <translation>如何合并数据?</translation>
     </message>
     <message>
-        <location filename="../../Gui/MergeActivityWizard.cpp" line="928"/>
+        <location filename="../../Gui/MergeActivityWizard.cpp" line="949"/>
         <source>Merge Data to add another data series</source>
         <translation>合并数据以添加另一数据系列</translation>
     </message>
     <message>
-        <location filename="../../Gui/MergeActivityWizard.cpp" line="929"/>
+        <location filename="../../Gui/MergeActivityWizard.cpp" line="950"/>
         <source>Merge data series from one recording into the current activity where different types of data (e.g. O2 data from a Moxy) have been  recorded by different devices. Taking care to align the data in time.</source>
         <translation>将一个活动记录合并至目前活动,其中不同数据类型(如Moxy的O2数据)由不同设备记录.请仔细对齐时间数据.</translation>
     </message>
     <message>
-        <location filename="../../Gui/MergeActivityWizard.cpp" line="937"/>
+        <location filename="../../Gui/MergeActivityWizard.cpp" line="958"/>
         <source>Join Data to form a longer activity</source>
         <translation>合并数据以形成更长的活动</translation>
     </message>
     <message>
-        <location filename="../../Gui/MergeActivityWizard.cpp" line="938"/>
+        <location filename="../../Gui/MergeActivityWizard.cpp" line="959"/>
         <source>Append the data to the end of the current activity  to create a longer activity that was recorded in multiple parts.</source>
         <translation>将数据附到目前活动结尾以创建更长的活动.</translation>
     </message>
@@ -19712,91 +19832,91 @@ If you press continue the activity will be saved, if you do not want to continue
 <context>
     <name>MergeSelect</name>
     <message>
-        <location filename="../../Gui/MergeActivityWizard.cpp" line="1240"/>
+        <location filename="../../Gui/MergeActivityWizard.cpp" line="1261"/>
         <source>Merge Data Series</source>
         <translation>合并数据系列</translation>
     </message>
     <message>
-        <location filename="../../Gui/MergeActivityWizard.cpp" line="1241"/>
+        <location filename="../../Gui/MergeActivityWizard.cpp" line="1262"/>
         <source>Select the series to merge together</source>
         <translation>选择要合并的系列</translation>
     </message>
     <message>
-        <location filename="../../Gui/MergeActivityWizard.cpp" line="1249"/>
+        <location filename="../../Gui/MergeActivityWizard.cpp" line="1270"/>
         <source>Target activity</source>
-        <translation type="unfinished"></translation>
+        <translation>目标活动</translation>
     </message>
     <message>
-        <location filename="../../Gui/MergeActivityWizard.cpp" line="1250"/>
+        <location filename="../../Gui/MergeActivityWizard.cpp" line="1271"/>
         <source>Source of additional data series</source>
-        <translation type="unfinished"></translation>
+        <translation>数据系列来源</translation>
     </message>
     <message>
-        <location filename="../../Gui/MergeActivityWizard.cpp" line="1304"/>
-        <location filename="../../Gui/MergeActivityWizard.cpp" line="1307"/>
+        <location filename="../../Gui/MergeActivityWizard.cpp" line="1325"/>
+        <location filename="../../Gui/MergeActivityWizard.cpp" line="1328"/>
         <source>d MMM yy hh:mm:ss</source>
-        <translation type="unfinished"></translation>
+        <translation>yyyy年M月d日 hh:mm:ss</translation>
     </message>
 </context>
 <context>
     <name>MergeSource</name>
     <message>
-        <location filename="../../Gui/MergeActivityWizard.cpp" line="611"/>
+        <location filename="../../Gui/MergeActivityWizard.cpp" line="632"/>
         <source>Select Source</source>
         <translation>选择来源</translation>
     </message>
     <message>
-        <location filename="../../Gui/MergeActivityWizard.cpp" line="612"/>
+        <location filename="../../Gui/MergeActivityWizard.cpp" line="633"/>
         <source>Where is the data you want to combine ?</source>
         <translation>想要合并的数据在哪里?</translation>
     </message>
     <message>
-        <location filename="../../Gui/MergeActivityWizard.cpp" line="621"/>
+        <location filename="../../Gui/MergeActivityWizard.cpp" line="642"/>
         <source>Import from a File</source>
         <translation>从文件导入</translation>
     </message>
     <message>
-        <location filename="../../Gui/MergeActivityWizard.cpp" line="622"/>
+        <location filename="../../Gui/MergeActivityWizard.cpp" line="643"/>
         <source>Import and combine from a file on your hard disk or device mounted as a USB disk to combine with the current activity.</source>
         <translation>从文件导入并与目前活动合并</translation>
     </message>
     <message>
-        <location filename="../../Gui/MergeActivityWizard.cpp" line="631"/>
+        <location filename="../../Gui/MergeActivityWizard.cpp" line="652"/>
         <source>Download from Device</source>
         <translation>从设备下载</translation>
     </message>
     <message>
-        <location filename="../../Gui/MergeActivityWizard.cpp" line="632"/>
+        <location filename="../../Gui/MergeActivityWizard.cpp" line="653"/>
         <source>Download data from a serial port device such as a Moxy Muscle Oxygen Monitor or bike computer to combine with the current activity.</source>
         <translation>从串口设备(如Moxy肌肉氧气监视器或码表)下载数据并与目前活动合并</translation>
     </message>
     <message>
-        <location filename="../../Gui/MergeActivityWizard.cpp" line="640"/>
+        <location filename="../../Gui/MergeActivityWizard.cpp" line="661"/>
         <source>Existing Activity</source>
         <translation>已有活动</translation>
     </message>
     <message>
-        <location filename="../../Gui/MergeActivityWizard.cpp" line="641"/>
+        <location filename="../../Gui/MergeActivityWizard.cpp" line="662"/>
         <source>Combine data from an activity that has already been imported or downloaded into GoldenCheetah. Selecting from a list of all available activities. </source>
         <translation>从GC中已有活动合并数据.从可用活动列表选择.</translation>
     </message>
     <message>
-        <location filename="../../Gui/MergeActivityWizard.cpp" line="700"/>
+        <location filename="../../Gui/MergeActivityWizard.cpp" line="721"/>
         <source>All Supported Formats (%1)</source>
         <translation>所有支持格式 (%1)</translation>
     </message>
     <message>
-        <location filename="../../Gui/MergeActivityWizard.cpp" line="703"/>
+        <location filename="../../Gui/MergeActivityWizard.cpp" line="724"/>
         <source>All files (*.*)</source>
         <translation>所有文件 (*.*)</translation>
     </message>
     <message>
-        <location filename="../../Gui/MergeActivityWizard.cpp" line="705"/>
+        <location filename="../../Gui/MergeActivityWizard.cpp" line="726"/>
         <source>Import from File</source>
         <translation>从文件导入</translation>
     </message>
     <message>
-        <location filename="../../Gui/MergeActivityWizard.cpp" line="747"/>
+        <location filename="../../Gui/MergeActivityWizard.cpp" line="768"/>
         <source>Error - Unknown file type</source>
         <translation>错误 - 未知的文件类型</translation>
     </message>
@@ -19804,80 +19924,80 @@ If you press continue the activity will be saved, if you do not want to continue
 <context>
     <name>MergeStrategy</name>
     <message>
-        <location filename="../../Gui/MergeActivityWizard.cpp" line="980"/>
+        <location filename="../../Gui/MergeActivityWizard.cpp" line="1001"/>
         <source>Select Strategy</source>
         <translation>选择策略</translation>
     </message>
     <message>
-        <location filename="../../Gui/MergeActivityWizard.cpp" line="981"/>
+        <location filename="../../Gui/MergeActivityWizard.cpp" line="1002"/>
         <source>How should we align the data ?</source>
         <translation>如何对齐数据?</translation>
     </message>
     <message>
-        <location filename="../../Gui/MergeActivityWizard.cpp" line="990"/>
+        <location filename="../../Gui/MergeActivityWizard.cpp" line="1011"/>
         <source>Align using start time</source>
         <translation>按开始时间对齐</translation>
     </message>
     <message>
-        <location filename="../../Gui/MergeActivityWizard.cpp" line="991"/>
+        <location filename="../../Gui/MergeActivityWizard.cpp" line="1012"/>
         <source>Align the data from the two activities based upon the start time for the activities. This will work well if the devices used to record the data have their clocks synchronised / close to each other.</source>
         <translation>根据活动开始时间对齐数据.适用于时钟同步或接近的设备.</translation>
     </message>
     <message>
-        <location filename="../../Gui/MergeActivityWizard.cpp" line="999"/>
+        <location filename="../../Gui/MergeActivityWizard.cpp" line="1020"/>
         <source>Align using shared data series</source>
         <translation>按共有数据系列对齐</translation>
     </message>
     <message>
-        <location filename="../../Gui/MergeActivityWizard.cpp" line="1000"/>
+        <location filename="../../Gui/MergeActivityWizard.cpp" line="1021"/>
         <source>If the two activities both contain the same data series, for example where both devices recorded cadence or perhaps HR, then we can align the other data series in time by matching the peaks and troughs in the shared data.</source>
         <translation>若活动含有相同的数据系列,例如设备均记录了踏频或心率,可按时间匹配共有数据的峰值和谷值来对齐其他数据.</translation>
     </message>
     <message>
-        <location filename="../../Gui/MergeActivityWizard.cpp" line="1008"/>
+        <location filename="../../Gui/MergeActivityWizard.cpp" line="1029"/>
         <source>Align starting together</source>
         <translation>同时开始对齐</translation>
     </message>
     <message>
-        <location filename="../../Gui/MergeActivityWizard.cpp" line="1009"/>
+        <location filename="../../Gui/MergeActivityWizard.cpp" line="1030"/>
         <source>Regardless of the timestamp on the activity, align with both activities starting at the same time.</source>
         <translation>忽略活动时间戳,按活动同时开始对齐.</translation>
     </message>
     <message>
-        <location filename="../../Gui/MergeActivityWizard.cpp" line="1016"/>
+        <location filename="../../Gui/MergeActivityWizard.cpp" line="1037"/>
         <source>Align ending together</source>
         <translation>同时结束对齐</translation>
     </message>
     <message>
-        <location filename="../../Gui/MergeActivityWizard.cpp" line="1017"/>
+        <location filename="../../Gui/MergeActivityWizard.cpp" line="1038"/>
         <source>Regardless of the timestamp on the activity, align with both activities ending at the same time.</source>
         <translation>忽略活动时间戳,按活动同时结束对齐.</translation>
     </message>
     <message>
-        <location filename="../../Gui/MergeActivityWizard.cpp" line="1024"/>
+        <location filename="../../Gui/MergeActivityWizard.cpp" line="1045"/>
         <source>Interpolate location data based upon distance</source>
-        <translation type="unfinished"></translation>
+        <translation>根据距离插值位置数据</translation>
     </message>
     <message>
-        <location filename="../../Gui/MergeActivityWizard.cpp" line="1025"/>
+        <location filename="../../Gui/MergeActivityWizard.cpp" line="1046"/>
         <source>Merge the two activity streams, interpolating location and slope values based upon mutual distance.</source>
-        <translation type="unfinished"></translation>
+        <translation>合并两个活动,根据同一距离插值位置和坡度.</translation>
     </message>
 </context>
 <context>
     <name>MergeWelcome</name>
     <message>
-        <location filename="../../Gui/MergeActivityWizard.cpp" line="591"/>
+        <location filename="../../Gui/MergeActivityWizard.cpp" line="612"/>
         <source>Combine Activities</source>
         <translation>合并活动</translation>
     </message>
     <message>
-        <location filename="../../Gui/MergeActivityWizard.cpp" line="592"/>
+        <location filename="../../Gui/MergeActivityWizard.cpp" line="613"/>
         <source>Lets get started</source>
         <translation>开始！</translation>
     </message>
     <message>
-        <location filename="../../Gui/MergeActivityWizard.cpp" line="597"/>
+        <location filename="../../Gui/MergeActivityWizard.cpp" line="618"/>
         <source>This wizard will help you combine data with the currently selected activity.
 
 You will be able to import or download data before merging or joining the data and manually adjusting the alignment of data series before it is saved.</source>
@@ -20111,7 +20231,7 @@ You will be able to import or download data before merging or joining the data a
     </message>
     <message>
         <source>Running Vertical Oscillation</source>
-        <translation type="vanished">跑步垂直振动</translation>
+        <translation type="vanished">跑步垂直振幅</translation>
     </message>
     <message>
         <source>Running Ground Contact Time</source>
@@ -20302,7 +20422,7 @@ You will be able to import or download data before merging or joining the data a
     </message>
     <message>
         <source>Running Vertical Oscillation</source>
-        <translation type="vanished">跑步垂直振动</translation>
+        <translation type="vanished">跑步垂直振幅</translation>
     </message>
     <message>
         <source>Running Cadence</source>
@@ -20534,12 +20654,12 @@ No rides found to import.
     <message>
         <location filename="../../FileIO/MoxyDevice.cpp" line="553"/>
         <source>failed to write &apos;%1&apos; to device: %2</source>
-        <translation>写入“%1”到设备%2失败</translation>
+        <translation>写入&quot;%1&quot;到设备%2失败</translation>
     </message>
     <message>
         <location filename="../../FileIO/MoxyDevice.cpp" line="555"/>
         <source>timeout writing &apos;%1&apos; to device</source>
-        <translation>写入“%1”到设备超时</translation>
+        <translation>写入&quot;%1&quot;到设备超时</translation>
     </message>
 </context>
 <context>
@@ -20553,7 +20673,7 @@ No rides found to import.
 <context>
     <name>MultiDeviceDialog</name>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="2520"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2524"/>
         <source>Multiple Device Configuration</source>
         <translation>多设备设置</translation>
     </message>
@@ -20561,17 +20681,17 @@ No rides found to import.
 <context>
     <name>NamedSearches</name>
     <message>
-        <location filename="../../Core/NamedSearch.cpp" line="95"/>
+        <location filename="../../Core/NamedSearch.cpp" line="93"/>
         <source>Swim</source>
         <translation>游泳</translation>
     </message>
     <message>
-        <location filename="../../Core/NamedSearch.cpp" line="98"/>
+        <location filename="../../Core/NamedSearch.cpp" line="96"/>
         <source>Bike</source>
         <translation>骑车</translation>
     </message>
     <message>
-        <location filename="../../Core/NamedSearch.cpp" line="101"/>
+        <location filename="../../Core/NamedSearch.cpp" line="99"/>
         <source>Run</source>
         <translation>跑步</translation>
     </message>
@@ -20929,7 +21049,7 @@ No rides found to import.
     <message>
         <location filename="../../Cloud/OAuthDialog.cpp" line="592"/>
         <source>Kent University Google Drive authorization was successful.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kent University Google Drive授权成功.</translation>
     </message>
     <message>
         <location filename="../../Cloud/OAuthDialog.cpp" line="601"/>
@@ -20970,52 +21090,52 @@ No rides found to import.
     <message>
         <location filename="../../Cloud/OpenData.cpp" line="118"/>
         <source>Fetching server list.</source>
-        <translation type="unfinished"></translation>
+        <translation>获取服务器列表</translation>
     </message>
     <message>
         <location filename="../../Cloud/OpenData.cpp" line="133"/>
         <source>Network Problem reading server list</source>
-        <translation type="unfinished"></translation>
+        <translation>读取服务器列表时出现网络错误</translation>
     </message>
     <message>
         <location filename="../../Cloud/OpenData.cpp" line="149"/>
         <source>Invalid server list, please try again later</source>
-        <translation type="unfinished"></translation>
+        <translation>无效服务器列表,请稍后再试</translation>
     </message>
     <message>
         <location filename="../../Cloud/OpenData.cpp" line="159"/>
         <source>Finding an available server.</source>
-        <translation type="unfinished"></translation>
+        <translation>寻找可用服务器.</translation>
     </message>
     <message>
         <location filename="../../Cloud/OpenData.cpp" line="202"/>
         <source>No servers available, please try later.</source>
-        <translation type="unfinished"></translation>
+        <translation>无可用服务器,请稍后再试.</translation>
     </message>
     <message>
         <location filename="../../Cloud/OpenData.cpp" line="212"/>
         <source>Preparing data to send.</source>
-        <translation type="unfinished"></translation>
+        <translation>准备发送数据.</translation>
     </message>
     <message>
         <location filename="../../Cloud/OpenData.cpp" line="287"/>
         <source>Sending data to server.</source>
-        <translation type="unfinished"></translation>
+        <translation>正在传送数据到服务器.</translation>
     </message>
     <message>
         <location filename="../../Cloud/OpenData.cpp" line="330"/>
         <source>Server replied:</source>
-        <translation type="unfinished"></translation>
+        <translation>服务器回应:</translation>
     </message>
     <message>
         <location filename="../../Cloud/OpenData.cpp" line="339"/>
         <source>Finishing.</source>
-        <translation type="unfinished"></translation>
+        <translation>正在完成.</translation>
     </message>
     <message>
         <location filename="../../Cloud/OpenData.cpp" line="348"/>
         <source>Done</source>
-        <translation type="unfinished">完成</translation>
+        <translation>完成</translation>
     </message>
 </context>
 <context>
@@ -21023,27 +21143,27 @@ No rides found to import.
     <message>
         <location filename="../../Cloud/OpenData.cpp" line="357"/>
         <source>OpenData</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../Cloud/OpenData.cpp" line="373"/>
         <source>&lt;b&gt;&lt;big&gt;OpenData Project&lt;/big&gt;&lt;/b&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;&lt;big&gt;OpenData项目&lt;/big&gt;&lt;/b&gt;</translation>
     </message>
     <message>
         <location filename="../../Cloud/OpenData.cpp" line="383"/>
         <source>We have started a new project to collect user activity data to enable researchers, coaches and others to develop new models and solutions using real world data.&lt;p&gt;All data that is shared is &lt;b&gt;anonymous&lt;/b&gt; and cannot be traced back to the original user, no personal data is shared and the workout data is limited to Power, Heartrate, Altitude, Cadence and Distance data along with metrics and distributions. No personally identifiable information is collected at all.&lt;p&gt;The data will be published to the general public in exactly the same format you have provided it in. And you can choose to remove your data at any time. You can also choose to opt out again in athlete preferences.&lt;p&gt;&lt;center&gt;Your data will only be sent once every year or so.&lt;/center&gt;&lt;br&gt;&lt;b&gt;WE WILL NOT&lt;/b&gt;:&lt;p&gt;- Collect personal information &lt;p&gt;- Collect GPS information &lt;p&gt;- Collect notes or other metadata  &lt;p&gt;&lt;p&gt;&lt;br&gt;&lt;b&gt;WE WILL&lt;/b&gt;:&lt;p&gt;- Collect basic athlete info: Gender, Year of Birth and UUID&lt;p&gt;- Collect basic activity samples for HR, Cadence, Power, Distance, Altitude&lt;p&gt;- Collect metrics for every activity stored for this athlete&lt;p&gt;- Collect distribution and mean-max aggregates of activity data&lt;p&gt;&lt;p&gt;&lt;br&gt;We publish the data at the &lt;a href=&quot;https://cos.io/&quot;&gt;Center for Open Science&lt;/a&gt; as an &lt;a href=&quot;https://osf.io/6hfpz/&quot;&gt;OpenData project&lt;/a&gt; open to everyone. &lt;p&gt;We have also setup an &lt;a href=&quot;https://github.com/GoldenCheetah/OpenData&quot;&gt;OpenData github project&lt;/a&gt; to publish tools for working with the dataset.&lt;p&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>我们启动了一个新项目,收集用户活动数据提供给研究人员,教练和其他人,来使用真实数据开发新的模型和解决方案.&lt;p&gt;所有数据均为&lt;b&gt;匿名&lt;/b&gt;共享,无法追溯到原始用户,不共享个人数据,且运动数据仅限于功率,心率,海拔,踏频,节奏,距离数据及指标与分布.不会收集任何可识别个人身份的信息.&lt;p&gt;数据将以您提供的格式发布给公众.您可以选择在任何时候删除您的数据.您也可以运动员设置中选择退出.&lt;p&gt;&lt;center&gt;您的数据大约每年只发送一次.&lt;/center&gt;&lt;br&gt;&lt;b&gt;我们不会&lt;/b&gt;: &lt;p&gt;-收集个人信息&lt;p&gt;-收集GPS信息&lt;p&gt;-收集注释或其他元数据&lt;p&gt;&lt;p&gt;&lt;br&gt;&lt;b&gt;我们将&lt;/b&gt;:&lt;p&gt;-收集运动员基本信息:性别,出生年份和UUID&lt;p&gt;-收集心率,踏频,功率,距离,海拔的基本活动样本&lt;p&gt;-收集该运动员每个活动中存储的指标&lt;p&gt;-收集活动数据的分布和平均/最大值&lt;p&gt;&lt;p&gt;&lt;br&gt;我们会在 &lt;a href=&quot;https://cos/&quot;&gt;开放科学中心&lt;/a&gt;以&lt;a href=&quot;https://osf.io/6hfpz/&quot;&gt;OpenData项目&lt;/a&gt;向所有人开放数据.我们还设置了一个&lt;a href=&quot;https://github.com/GoldenCheetah/OpenData&quot;&gt;OpenData github项目&lt;/a&gt;来发布处理数据集的工具.&lt;p&gt;</translation>
     </message>
     <message>
         <location filename="../../Cloud/OpenData.cpp" line="416"/>
         <source>Yes, I want to share</source>
-        <translation type="unfinished"></translation>
+        <translation>是的,我同意共享</translation>
     </message>
     <message>
         <location filename="../../Cloud/OpenData.cpp" line="419"/>
         <source>No thanks</source>
-        <translation type="unfinished"></translation>
+        <translation>算了</translation>
     </message>
 </context>
 <context>
@@ -21076,7 +21196,7 @@ No rides found to import.
     <message>
         <location filename="../../Charts/OverviewWindow.cpp" line="186"/>
         <source>HRV rMSSD</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../Charts/OverviewWindow.cpp" line="187"/>
@@ -21169,22 +21289,22 @@ No rides found to import.
     <message>
         <location filename="../../Metrics/PDModel.h" line="115"/>
         <source>W&apos;: Formerly known as Anaerobic Work Capacity (AWC). An estimate for the fixed amount of work, expressed in kJ, that you can do above Critical Power.</source>
-        <translation type="unfinished"></translation>
+        <translation>W&apos;:以前称为无氧做功能力(AWC),是对在CP以上做功量的一个估计,单位为kJ.</translation>
     </message>
     <message>
         <location filename="../../Metrics/PDModel.h" line="116"/>
         <source>Critical Power. An estimate of the power that, theoretically, can be maintained for a long time without fatigue.</source>
-        <translation type="unfinished"></translation>
+        <translation>临界功率:是对可长时间保持而不疲劳的功率的一个理论估计.</translation>
     </message>
     <message>
         <location filename="../../Metrics/PDModel.h" line="117"/>
         <source>Functional Threshold Power. The highest power that a rider can maintain in a quasi-steady state without fatiguing for approximately one hour.</source>
-        <translation type="unfinished"></translation>
+        <translation>功能性阈值功率:能够在约1小时内保持基本稳定输出的最大功率.</translation>
     </message>
     <message>
         <location filename="../../Metrics/PDModel.h" line="118"/>
         <source>P-max: An estimate of the maximal power over one full rotation of the cranks.</source>
-        <translation type="unfinished"></translation>
+        <translation>P-max:对曲柄转动一周时的最大功率的一个估计.</translation>
     </message>
 </context>
 <context>
@@ -21192,22 +21312,22 @@ No rides found to import.
     <message>
         <location filename="../../Metrics/PMCData.cpp" line="627"/>
         <source>CTL/LTS : Chronic Training Load/Long Term Stress. The dose of training you accumulated over a longer period of time, computed as an exponentially weighted moving average of the selected Training Load metric typically from 4-8 weeks, 42 days by default. It is claimed to relate to your fitness.</source>
-        <translation type="unfinished"></translation>
+        <translation>CTL/LTS : 长期训练负荷/长期压力.在较长时间内累积的训练量,默认情况下为4-8周(默认为42天)内的所选训练负荷指标的指数加权移动平均值.与健康状态有关.</translation>
     </message>
     <message>
         <location filename="../../Metrics/PMCData.cpp" line="632"/>
         <source>ATL/STS : Acute Training Load/Short Term Stress. The dose of training that you accumulated over a short period of time, computed as an exponentially weighted moving average of the selected Training Load metric from 3 to 10 days in general, 7 by default. It is claimed to relate to your fatigue.</source>
-        <translation type="unfinished"></translation>
+        <translation>ATL/STS : 短期训练负荷/短期压力.在短时间内累积的训练量,通常计算为3至7天(默认为7天)内,所选训练负荷指标的指数加权移动平均值.与疲劳状态有关.</translation>
     </message>
     <message>
         <location filename="../../Metrics/PMCData.cpp" line="637"/>
         <source>TSB/SB : Training Stress Balance/Stress Balance. It&apos;s the result of subtracting yesterday&apos;s Acute Training Load/Short Term Stress from yesterday&apos;s Chronic Training Load/Long Term Stress. It is claimed to relate to your freshness.</source>
-        <translation type="unfinished"></translation>
+        <translation>TSB/SB : 训练压力平衡/压力平衡.从昨天的长期训练负荷/长期压力减去昨天的短期训练负荷/短期压力的结果.与新鲜感有关.</translation>
     </message>
     <message>
         <location filename="../../Metrics/PMCData.cpp" line="642"/>
         <source>RR : Ramp Rate. The rate at which CTL/LTS increases over a given time period. Large values up and down indicate a risk of injury and aggressive taper respectively.</source>
-        <translation type="unfinished"></translation>
+        <translation>RR : 斜率.给定时间段内CTL/LTS增长的速率.较大的数值增减分别预示了受伤的风险和过分的训练减少.</translation>
     </message>
 </context>
 <context>
@@ -22058,13 +22178,13 @@ Do you want to continue?</source>
     <message>
         <location filename="../../Metrics/PeakHr.cpp" line="245"/>
         <source>10 min Peak Hr</source>
-        <translation type="unfinished"></translation>
+        <translation>10分钟最大心率</translation>
     </message>
     <message>
         <location filename="../../Metrics/PeakHr.cpp" line="246"/>
         <location filename="../../Metrics/PeakHr.cpp" line="247"/>
         <source>bpm</source>
-        <translation type="unfinished">bpm</translation>
+        <translation>bpm</translation>
     </message>
 </context>
 <context>
@@ -22072,13 +22192,13 @@ Do you want to continue?</source>
     <message>
         <location filename="../../Metrics/PeakHr.cpp" line="150"/>
         <source>1 min Peak Hr</source>
-        <translation type="unfinished"></translation>
+        <translation>1分钟最大心率</translation>
     </message>
     <message>
         <location filename="../../Metrics/PeakHr.cpp" line="151"/>
         <location filename="../../Metrics/PeakHr.cpp" line="152"/>
         <source>bpm</source>
-        <translation type="unfinished">bpm</translation>
+        <translation>bpm</translation>
     </message>
 </context>
 <context>
@@ -22086,13 +22206,13 @@ Do you want to continue?</source>
     <message>
         <location filename="../../Metrics/PeakHr.cpp" line="264"/>
         <source>20 min Peak Hr</source>
-        <translation type="unfinished"></translation>
+        <translation>20分钟最大心率</translation>
     </message>
     <message>
         <location filename="../../Metrics/PeakHr.cpp" line="265"/>
         <location filename="../../Metrics/PeakHr.cpp" line="266"/>
         <source>bpm</source>
-        <translation type="unfinished">bpm</translation>
+        <translation>bpm</translation>
     </message>
 </context>
 <context>
@@ -22100,13 +22220,13 @@ Do you want to continue?</source>
     <message>
         <location filename="../../Metrics/PeakHr.cpp" line="169"/>
         <source>2 min Peak Hr</source>
-        <translation type="unfinished"></translation>
+        <translation>2分钟最大心率</translation>
     </message>
     <message>
         <location filename="../../Metrics/PeakHr.cpp" line="170"/>
         <location filename="../../Metrics/PeakHr.cpp" line="171"/>
         <source>bpm</source>
-        <translation type="unfinished">bpm</translation>
+        <translation>bpm</translation>
     </message>
 </context>
 <context>
@@ -22114,13 +22234,13 @@ Do you want to continue?</source>
     <message>
         <location filename="../../Metrics/PeakHr.cpp" line="283"/>
         <source>30 min Peak Hr</source>
-        <translation type="unfinished"></translation>
+        <translation>30分钟最大心率</translation>
     </message>
     <message>
         <location filename="../../Metrics/PeakHr.cpp" line="284"/>
         <location filename="../../Metrics/PeakHr.cpp" line="285"/>
         <source>bpm</source>
-        <translation type="unfinished">bpm</translation>
+        <translation>bpm</translation>
     </message>
 </context>
 <context>
@@ -22128,13 +22248,13 @@ Do you want to continue?</source>
     <message>
         <location filename="../../Metrics/PeakHr.cpp" line="188"/>
         <source>3 min Peak Hr</source>
-        <translation type="unfinished"></translation>
+        <translation>3分钟最大心率</translation>
     </message>
     <message>
         <location filename="../../Metrics/PeakHr.cpp" line="189"/>
         <location filename="../../Metrics/PeakHr.cpp" line="190"/>
         <source>bpm</source>
-        <translation type="unfinished">bpm</translation>
+        <translation>bpm</translation>
     </message>
 </context>
 <context>
@@ -22142,13 +22262,13 @@ Do you want to continue?</source>
     <message>
         <location filename="../../Metrics/PeakHr.cpp" line="207"/>
         <source>5 min Peak Hr</source>
-        <translation type="unfinished"></translation>
+        <translation>5分钟最大心率</translation>
     </message>
     <message>
         <location filename="../../Metrics/PeakHr.cpp" line="208"/>
         <location filename="../../Metrics/PeakHr.cpp" line="209"/>
         <source>bpm</source>
-        <translation type="unfinished">bpm</translation>
+        <translation>bpm</translation>
     </message>
 </context>
 <context>
@@ -22156,13 +22276,13 @@ Do you want to continue?</source>
     <message>
         <location filename="../../Metrics/PeakHr.cpp" line="302"/>
         <source>60 min Peak Hr</source>
-        <translation type="unfinished"></translation>
+        <translation>60分钟最大心率</translation>
     </message>
     <message>
         <location filename="../../Metrics/PeakHr.cpp" line="303"/>
         <location filename="../../Metrics/PeakHr.cpp" line="304"/>
         <source>bpm</source>
-        <translation type="unfinished">bpm</translation>
+        <translation>bpm</translation>
     </message>
 </context>
 <context>
@@ -22170,13 +22290,13 @@ Do you want to continue?</source>
     <message>
         <location filename="../../Metrics/PeakHr.cpp" line="226"/>
         <source>8 min Peak Hr</source>
-        <translation type="unfinished"></translation>
+        <translation>8分钟最大心率</translation>
     </message>
     <message>
         <location filename="../../Metrics/PeakHr.cpp" line="227"/>
         <location filename="../../Metrics/PeakHr.cpp" line="228"/>
         <source>bpm</source>
-        <translation type="unfinished">bpm</translation>
+        <translation>bpm</translation>
     </message>
 </context>
 <context>
@@ -22184,13 +22304,13 @@ Do you want to continue?</source>
     <message>
         <location filename="../../Metrics/PeakHr.cpp" line="321"/>
         <source>90 min Peak Hr</source>
-        <translation type="unfinished"></translation>
+        <translation>90分钟最大心率</translation>
     </message>
     <message>
         <location filename="../../Metrics/PeakHr.cpp" line="322"/>
         <location filename="../../Metrics/PeakHr.cpp" line="323"/>
         <source>bpm</source>
-        <translation type="unfinished">bpm</translation>
+        <translation>bpm</translation>
     </message>
 </context>
 <context>
@@ -23393,6 +23513,7 @@ Do you want to continue?</source>
         <translation>解析Polar Flow数据错误</translation>
     </message>
     <message>
+        <location filename="../../Cloud/PolarFlow.cpp" line="87"/>
         <location filename="../../Cloud/PolarFlow.cpp" line="158"/>
         <source>You must authorise with Polar Flow first</source>
         <translation>必须首先通过Polar Flow授权</translation>
@@ -23598,16 +23719,16 @@ Do you want to continue?</source>
 <context>
     <name>PowerIndex</name>
     <message>
-        <location filename="../../Metrics/Banister.cpp" line="598"/>
         <location filename="../../Metrics/Banister.cpp" line="601"/>
+        <location filename="../../Metrics/Banister.cpp" line="604"/>
         <source>Power Index</source>
-        <translation type="unfinished"></translation>
+        <translation>功率指数</translation>
     </message>
     <message>
-        <location filename="../../Metrics/Banister.cpp" line="599"/>
-        <location filename="../../Metrics/Banister.cpp" line="600"/>
+        <location filename="../../Metrics/Banister.cpp" line="602"/>
+        <location filename="../../Metrics/Banister.cpp" line="603"/>
         <source>%</source>
-        <translation type="unfinished">%</translation>
+        <translation>%</translation>
     </message>
 </context>
 <context>
@@ -23616,7 +23737,7 @@ Do you want to continue?</source>
         <location filename="../../FileIO/PowerTapDevice.cpp" line="38"/>
         <source>Make sure the PowerTap unit is turned
 on and that its display says, &quot;Host&quot;</source>
-        <translation>确认PowerTap设备已启动且显示“Host”</translation>
+        <translation>确认PowerTap设备已启动且显示&quot;Host&quot;</translation>
     </message>
     <message>
         <location filename="../../FileIO/PowerTapDevice.cpp" line="143"/>
@@ -23649,7 +23770,7 @@ on and that its display says, &quot;Host&quot;</source>
     <message>
         <location filename="../../FileIO/PowerTapDevice.cpp" line="95"/>
         <source>failed to read back hardware echo: %2</source>
-        <translation>读取设备返回失败：%2</translation>
+        <translation>读取设备返回失败:%2</translation>
     </message>
     <message>
         <location filename="../../FileIO/PowerTapDevice.cpp" line="97"/>
@@ -23793,7 +23914,7 @@ on and that its display says, &quot;Host&quot;</source>
     <message>
         <location filename="../../Charts/PythonChart.cpp" line="287"/>
         <source>Show Console</source>
-        <translation type="unfinished">显示控制台</translation>
+        <translation>显示控制台</translation>
     </message>
 </context>
 <context>
@@ -23801,7 +23922,7 @@ on and that its display says, &quot;Host&quot;</source>
     <message>
         <location filename="../../Charts/PythonChart.cpp" line="49"/>
         <source>Python Console (%1)</source>
-        <translation type="unfinished"></translation>
+        <translation>Python控制台 (%1)</translation>
     </message>
 </context>
 <context>
@@ -23828,8 +23949,8 @@ on and that its display says, &quot;Host&quot;</source>
         <translation>骑车</translation>
     </message>
     <message>
-        <location filename="../../FileIO/FitRideFile.cpp" line="1506"/>
-        <location filename="../../FileIO/FitRideFile.cpp" line="2502"/>
+        <location filename="../../FileIO/FitRideFile.cpp" line="1510"/>
+        <location filename="../../FileIO/FitRideFile.cpp" line="2536"/>
         <location filename="../../FileIO/TcxParser.cpp" line="410"/>
         <source>Lap %1</source>
         <translation>第%1圈</translation>
@@ -23875,7 +23996,7 @@ yyyy年</translation>
     <message>
         <location filename="../../FileIO/KmlRideFile.cpp" line="274"/>
         <source>vertical oscillation</source>
-        <translation>垂直振动</translation>
+        <translation>垂直振幅</translation>
     </message>
     <message>
         <location filename="../../FileIO/KmlRideFile.cpp" line="276"/>
@@ -23952,7 +24073,7 @@ yyyy年</translation>
     <message>
         <location filename="../../Core/BodyMeasures.cpp" line="57"/>
         <location filename="../../Core/HrvMeasures.cpp" line="59"/>
-        <location filename="../../Core/NamedSearch.cpp" line="197"/>
+        <location filename="../../Core/NamedSearch.cpp" line="195"/>
         <location filename="../../Core/RouteParser.cpp" line="108"/>
         <location filename="../../Core/SeasonParser.cpp" line="179"/>
         <location filename="../../FileIO/RideAutoImportConfig.cpp" line="158"/>
@@ -23978,7 +24099,7 @@ yyyy年</translation>
         <translation>保存训练库错误</translation>
     </message>
     <message>
-        <location filename="../../Core/NamedSearch.cpp" line="196"/>
+        <location filename="../../Core/NamedSearch.cpp" line="194"/>
         <source>Problem Saving Named Search Configuration</source>
         <translation>保存搜索设置错误</translation>
     </message>
@@ -24186,12 +24307,12 @@ yyyy年</translation>
     <message>
         <location filename="../../FileIO/FixElevation.cpp" line="292"/>
         <source>Gateway Timeout</source>
-        <translation type="unfinished"></translation>
+        <translation>网关超时</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixElevation.cpp" line="294"/>
         <source>Connection to remote server timed out</source>
-        <translation type="unfinished"></translation>
+        <translation>连接远程服务器超时</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixElevation.cpp" line="296"/>
@@ -24221,135 +24342,137 @@ yyyy年</translation>
     <message>
         <location filename="../../Cloud/KentUniversity.cpp" line="798"/>
         <source>0 Rest</source>
-        <translation type="unfinished"></translation>
+        <translation>0 休息</translation>
     </message>
     <message>
         <location filename="../../Cloud/KentUniversity.cpp" line="799"/>
         <source>1 Very, very easy</source>
-        <translation type="unfinished"></translation>
+        <translation>1 非常非常轻松</translation>
     </message>
     <message>
         <location filename="../../Cloud/KentUniversity.cpp" line="800"/>
         <source>2 Easy</source>
-        <translation type="unfinished"></translation>
+        <translation>2 轻松</translation>
     </message>
     <message>
         <location filename="../../Cloud/KentUniversity.cpp" line="801"/>
         <source>3 Moderate</source>
-        <translation type="unfinished"></translation>
+        <translation>3 适中</translation>
     </message>
     <message>
         <location filename="../../Cloud/KentUniversity.cpp" line="802"/>
         <source>4 Somewhat hard</source>
-        <translation type="unfinished"></translation>
+        <translation>4 稍有困难</translation>
     </message>
     <message>
         <location filename="../../Cloud/KentUniversity.cpp" line="803"/>
         <source>5 Hard</source>
-        <translation type="unfinished"></translation>
+        <translation>5 困难</translation>
     </message>
     <message>
         <location filename="../../Cloud/KentUniversity.cpp" line="804"/>
         <source>6 Hard+</source>
-        <translation type="unfinished"></translation>
+        <translation>6 困难+</translation>
     </message>
     <message>
         <location filename="../../Cloud/KentUniversity.cpp" line="805"/>
         <source>7 Very hard</source>
-        <translation type="unfinished"></translation>
+        <translation>7 非常困难</translation>
     </message>
     <message>
         <location filename="../../Cloud/KentUniversity.cpp" line="806"/>
         <source>8 Very hard+</source>
-        <translation type="unfinished"></translation>
+        <translation>8 非常困难+</translation>
     </message>
     <message>
         <location filename="../../Cloud/KentUniversity.cpp" line="807"/>
         <source>9 Very hard++</source>
-        <translation type="unfinished"></translation>
+        <translation>9 非常困难++</translation>
     </message>
     <message>
         <location filename="../../Cloud/KentUniversity.cpp" line="808"/>
         <source>10 Maximum</source>
-        <translation type="unfinished"></translation>
+        <translation>10 极限</translation>
     </message>
     <message>
         <location filename="../../Cloud/KentUniversity.cpp" line="811"/>
         <source>0 Not Fatigued At All</source>
-        <translation type="unfinished"></translation>
+        <translation>0 完全不疲劳</translation>
     </message>
     <message>
         <location filename="../../Cloud/KentUniversity.cpp" line="812"/>
         <source>1 </source>
-        <translation type="unfinished">3D {1 ?}</translation>
+        <translation>1 </translation>
     </message>
     <message>
         <location filename="../../Cloud/KentUniversity.cpp" line="813"/>
         <source>2 A Little Fatigued</source>
-        <translation type="unfinished"></translation>
+        <translation>2 稍有疲劳</translation>
     </message>
     <message>
         <location filename="../../Cloud/KentUniversity.cpp" line="814"/>
         <source>3 </source>
-        <translation type="unfinished">3D {3 ?}</translation>
+        <translation>3 </translation>
     </message>
     <message>
         <location filename="../../Cloud/KentUniversity.cpp" line="815"/>
         <source>4 </source>
-        <translation type="unfinished">3D {4 ?}</translation>
+        <translation>4 </translation>
     </message>
     <message>
         <location filename="../../Cloud/KentUniversity.cpp" line="816"/>
         <source>5 Moderately Fatigued</source>
-        <translation type="unfinished"></translation>
+        <translation>5 中等疲劳</translation>
     </message>
     <message>
         <location filename="../../Cloud/KentUniversity.cpp" line="817"/>
         <source>6 </source>
-        <translation type="unfinished">3D {6 ?}</translation>
+        <translation>6 </translation>
     </message>
     <message>
         <location filename="../../Cloud/KentUniversity.cpp" line="818"/>
         <source>7 Very fatigued+</source>
-        <translation type="unfinished"></translation>
+        <translation>7 很疲劳+</translation>
     </message>
     <message>
         <location filename="../../Cloud/KentUniversity.cpp" line="819"/>
         <source>8 </source>
-        <translation type="unfinished">3D {8 ?}</translation>
+        <translation>8 </translation>
     </message>
     <message>
         <location filename="../../Cloud/KentUniversity.cpp" line="820"/>
         <source>9 </source>
-        <translation type="unfinished">3D {9 ?}</translation>
+        <translation>9 </translation>
     </message>
     <message>
         <location filename="../../Cloud/KentUniversity.cpp" line="821"/>
         <source>10 Total Fatigue, Nothing Left</source>
-        <translation type="unfinished"></translation>
+        <translation>10 极度疲劳,毫无余力</translation>
     </message>
     <message>
         <location filename="../../Python/PythonEmbed.cpp" line="287"/>
         <source>Python not installed or in path</source>
-        <translation type="unfinished"></translation>
+        <translation>未安装Python或路径错误</translation>
     </message>
     <message>
         <location filename="../../Python/PythonEmbed.cpp" line="287"/>
         <source>Python v3.%1 is required for Python embedding.
 Python disabled in preferences.</source>
-        <translation type="unfinished"></translation>
+        <translation>需要Python v3.%1.
+设置中已禁用Python.</translation>
     </message>
     <message>
         <location filename="../../R/RTool.cpp" line="222"/>
         <source>The version of R installed is too old. You must have R version 3.4 or higher.
 </source>
-        <translation type="unfinished"></translation>
+        <translation>R版本过旧.需要R 3.4或更高.</translation>
     </message>
     <message>
         <location filename="../../R/RTool.cpp" line="231"/>
         <source>The version of R installed is too new. You must have R version 3.3 or older.
 </source>
-        <translation type="unfinished"></translation>
+        <translation>R版本过高.需要R 3.3或更低.
+</translation>
     </message>
 </context>
 <context>
@@ -24436,7 +24559,7 @@ Python disabled in preferences.</source>
     <message>
         <location filename="../../Train/RealtimeData.cpp" line="484"/>
         <source>Section Time Remaining</source>
-        <translation type="unfinished"></translation>
+        <translation>分段剩余时间</translation>
     </message>
     <message>
         <location filename="../../Train/RealtimeData.cpp" line="487"/>
@@ -24616,27 +24739,27 @@ Python disabled in preferences.</source>
     <message>
         <location filename="../../Train/RealtimeData.cpp" line="595"/>
         <source>Lap Distance</source>
-        <translation type="unfinished"></translation>
+        <translation>单圈距离</translation>
     </message>
     <message>
         <location filename="../../Train/RealtimeData.cpp" line="598"/>
         <source>Lap Distance Remaining</source>
-        <translation type="unfinished"></translation>
+        <translation>单圈剩余距离</translation>
     </message>
     <message>
         <location filename="../../Train/RealtimeData.cpp" line="601"/>
         <source>Latitude</source>
-        <translation type="unfinished">纬度</translation>
+        <translation>纬度</translation>
     </message>
     <message>
         <location filename="../../Train/RealtimeData.cpp" line="604"/>
         <source>Longitude</source>
-        <translation type="unfinished">经度</translation>
+        <translation>经度</translation>
     </message>
     <message>
         <location filename="../../Train/RealtimeData.cpp" line="607"/>
         <source>Altitude</source>
-        <translation type="unfinished"></translation>
+        <translation>海拔</translation>
     </message>
 </context>
 <context>
@@ -24839,17 +24962,17 @@ Python disabled in preferences.</source>
 <context>
     <name>RenameIntervalDialog</name>
     <message>
-        <location filename="../../Core/IntervalItem.cpp" line="279"/>
+        <location filename="../../Core/IntervalItem.cpp" line="280"/>
         <source>Rename Intervals</source>
         <translation>重命名区段</translation>
     </message>
     <message>
-        <location filename="../../Core/IntervalItem.cpp" line="297"/>
+        <location filename="../../Core/IntervalItem.cpp" line="298"/>
         <source>&amp;OK</source>
         <translation>确定(&amp;O)</translation>
     </message>
     <message>
-        <location filename="../../Core/IntervalItem.cpp" line="298"/>
+        <location filename="../../Core/IntervalItem.cpp" line="299"/>
         <source>&amp;Cancel</source>
         <translation>取消(&amp;C)</translation>
     </message>
@@ -25184,7 +25307,7 @@ Python disabled in preferences.</source>
         <location filename="../../Charts/RideEditor.cpp" line="345"/>
         <location filename="../../Charts/RideEditor.cpp" line="999"/>
         <source>Vertical Oscillation</source>
-        <translation>垂直振动</translation>
+        <translation>垂直振幅</translation>
     </message>
     <message>
         <location filename="../../Charts/RideEditor.cpp" line="346"/>
@@ -25316,386 +25439,385 @@ Do you want to continue?</source>
         <translation>游泳</translation>
     </message>
     <message>
-        <location filename="../../FileIO/RideFile.cpp" line="296"/>
+        <location filename="../../FileIO/RideFile.cpp" line="297"/>
         <source>Time</source>
         <translation>时间</translation>
     </message>
     <message>
-        <location filename="../../FileIO/RideFile.cpp" line="297"/>
+        <location filename="../../FileIO/RideFile.cpp" line="298"/>
         <source>Cadence</source>
         <translation>踏频</translation>
     </message>
     <message>
-        <location filename="../../FileIO/RideFile.cpp" line="298"/>
+        <location filename="../../FileIO/RideFile.cpp" line="299"/>
         <source>Heartrate</source>
         <translation>心率</translation>
     </message>
     <message>
-        <location filename="../../FileIO/RideFile.cpp" line="299"/>
+        <location filename="../../FileIO/RideFile.cpp" line="300"/>
         <source>Distance</source>
         <translation>距离</translation>
     </message>
     <message>
-        <location filename="../../FileIO/RideFile.cpp" line="300"/>
+        <location filename="../../FileIO/RideFile.cpp" line="301"/>
         <source>Speed</source>
         <translation>速度</translation>
     </message>
     <message>
-        <location filename="../../FileIO/RideFile.cpp" line="301"/>
+        <location filename="../../FileIO/RideFile.cpp" line="302"/>
         <source>Acceleration</source>
         <translation>加速度</translation>
     </message>
     <message>
-        <location filename="../../FileIO/RideFile.cpp" line="302"/>
+        <location filename="../../FileIO/RideFile.cpp" line="303"/>
         <source>Power %1</source>
         <translation>功率 %1</translation>
     </message>
     <message>
-        <location filename="../../FileIO/RideFile.cpp" line="303"/>
+        <location filename="../../FileIO/RideFile.cpp" line="304"/>
         <source>Cadence %1</source>
         <translation>踏频 %1</translation>
     </message>
     <message>
-        <location filename="../../FileIO/RideFile.cpp" line="304"/>
+        <location filename="../../FileIO/RideFile.cpp" line="305"/>
         <source>Torque %1</source>
         <translation>扭矩 %1</translation>
     </message>
     <message>
-        <location filename="../../FileIO/RideFile.cpp" line="305"/>
+        <location filename="../../FileIO/RideFile.cpp" line="306"/>
         <source>Heartrate %1</source>
         <translation>心率 %1</translation>
     </message>
     <message>
-        <location filename="../../FileIO/RideFile.cpp" line="306"/>
+        <location filename="../../FileIO/RideFile.cpp" line="307"/>
         <source>Torque</source>
         <translation>扭矩</translation>
     </message>
     <message>
-        <location filename="../../FileIO/RideFile.cpp" line="307"/>
+        <location filename="../../FileIO/RideFile.cpp" line="308"/>
         <source>Power</source>
         <translation>功率</translation>
     </message>
     <message>
-        <location filename="../../FileIO/RideFile.cpp" line="308"/>
+        <location filename="../../FileIO/RideFile.cpp" line="309"/>
         <source>xPower</source>
         <translation>xPower</translation>
     </message>
     <message>
-        <location filename="../../FileIO/RideFile.cpp" line="309"/>
+        <location filename="../../FileIO/RideFile.cpp" line="310"/>
         <source>aPower</source>
         <translation>aPower</translation>
     </message>
     <message>
-        <location filename="../../FileIO/RideFile.cpp" line="310"/>
+        <location filename="../../FileIO/RideFile.cpp" line="311"/>
         <source>aTISS</source>
         <translation>有氧TISS</translation>
     </message>
     <message>
-        <location filename="../../FileIO/RideFile.cpp" line="311"/>
+        <location filename="../../FileIO/RideFile.cpp" line="312"/>
         <source>anTISS</source>
         <translation>无氧TISS</translation>
     </message>
     <message>
-        <location filename="../../FileIO/RideFile.cpp" line="312"/>
+        <location filename="../../FileIO/RideFile.cpp" line="313"/>
         <source>Iso Power</source>
         <translation>标准化功率</translation>
     </message>
     <message>
-        <location filename="../../FileIO/RideFile.cpp" line="313"/>
+        <location filename="../../FileIO/RideFile.cpp" line="314"/>
         <source>Altitude</source>
         <translation>海拔</translation>
     </message>
     <message>
-        <location filename="../../FileIO/RideFile.cpp" line="314"/>
+        <location filename="../../FileIO/RideFile.cpp" line="315"/>
         <source>Longitude</source>
         <translation>经度</translation>
     </message>
     <message>
-        <location filename="../../FileIO/RideFile.cpp" line="315"/>
+        <location filename="../../FileIO/RideFile.cpp" line="316"/>
         <source>Latitude</source>
         <translation>纬度</translation>
     </message>
     <message>
-        <location filename="../../FileIO/RideFile.cpp" line="316"/>
+        <location filename="../../FileIO/RideFile.cpp" line="317"/>
         <source>Headwind</source>
         <translation>逆风</translation>
     </message>
     <message>
-        <location filename="../../FileIO/RideFile.cpp" line="317"/>
+        <location filename="../../FileIO/RideFile.cpp" line="318"/>
         <source>Slope</source>
         <translation>坡度</translation>
     </message>
     <message>
-        <location filename="../../FileIO/RideFile.cpp" line="318"/>
+        <location filename="../../FileIO/RideFile.cpp" line="319"/>
         <source>Temperature</source>
         <translation>温度</translation>
     </message>
     <message>
-        <location filename="../../FileIO/RideFile.cpp" line="319"/>
+        <location filename="../../FileIO/RideFile.cpp" line="320"/>
         <source>Left/Right Balance</source>
         <translation>左/右平衡</translation>
     </message>
     <message>
-        <location filename="../../FileIO/RideFile.cpp" line="320"/>
+        <location filename="../../FileIO/RideFile.cpp" line="321"/>
         <source>Left Torque Efficiency</source>
         <translation>左扭矩效率</translation>
     </message>
     <message>
-        <location filename="../../FileIO/RideFile.cpp" line="321"/>
+        <location filename="../../FileIO/RideFile.cpp" line="322"/>
         <source>Right Torque Efficiency</source>
         <translation>右扭矩效率</translation>
     </message>
     <message>
-        <location filename="../../FileIO/RideFile.cpp" line="322"/>
+        <location filename="../../FileIO/RideFile.cpp" line="323"/>
         <source>Left Pedal Smoothness</source>
         <translation>左踏板平滑度</translation>
     </message>
     <message>
-        <location filename="../../FileIO/RideFile.cpp" line="324"/>
+        <location filename="../../FileIO/RideFile.cpp" line="325"/>
         <source>Left Platform Center Offset</source>
         <translation>左踏板偏移</translation>
     </message>
     <message>
-        <location filename="../../FileIO/RideFile.cpp" line="325"/>
+        <location filename="../../FileIO/RideFile.cpp" line="326"/>
         <source>Right Platform Center Offset</source>
         <translation>右踏板偏移</translation>
     </message>
     <message>
-        <location filename="../../FileIO/RideFile.cpp" line="326"/>
+        <location filename="../../FileIO/RideFile.cpp" line="327"/>
         <source>Left Power Phase Start</source>
         <translation>左功率相起始角度</translation>
     </message>
     <message>
-        <location filename="../../FileIO/RideFile.cpp" line="327"/>
+        <location filename="../../FileIO/RideFile.cpp" line="328"/>
         <source>Right Power Phase Start</source>
         <translation>右功率相起始角度</translation>
     </message>
     <message>
-        <location filename="../../FileIO/RideFile.cpp" line="328"/>
+        <location filename="../../FileIO/RideFile.cpp" line="329"/>
         <source>Left Power Phase End</source>
         <translation>左功率相结束角度</translation>
     </message>
     <message>
-        <location filename="../../FileIO/RideFile.cpp" line="329"/>
+        <location filename="../../FileIO/RideFile.cpp" line="330"/>
         <source>Right Power Phase End</source>
         <translation>右功率相结束角度</translation>
     </message>
     <message>
-        <location filename="../../FileIO/RideFile.cpp" line="330"/>
+        <location filename="../../FileIO/RideFile.cpp" line="331"/>
         <source>Left Peak Power Phase Start</source>
         <translation>左功率相峰值起始角度</translation>
     </message>
     <message>
-        <location filename="../../FileIO/RideFile.cpp" line="331"/>
+        <location filename="../../FileIO/RideFile.cpp" line="332"/>
         <source>Right Peak Power Phase Start</source>
         <translation>右功率相峰值起始角度</translation>
     </message>
     <message>
-        <location filename="../../FileIO/RideFile.cpp" line="332"/>
+        <location filename="../../FileIO/RideFile.cpp" line="333"/>
         <source>Left Peak Power Phase End</source>
         <translation>左功率相峰值结束角度</translation>
     </message>
     <message>
-        <location filename="../../FileIO/RideFile.cpp" line="333"/>
+        <location filename="../../FileIO/RideFile.cpp" line="334"/>
         <source>Right Peak Power Phase End</source>
         <translation>右功率相峰值结束角度</translation>
     </message>
     <message>
-        <location filename="../../FileIO/RideFile.cpp" line="334"/>
-        <location filename="../../FileIO/RideFile.cpp" line="457"/>
+        <location filename="../../FileIO/RideFile.cpp" line="335"/>
+        <location filename="../../FileIO/RideFile.cpp" line="458"/>
         <source>Interval</source>
         <translation>区段</translation>
     </message>
     <message>
-        <location filename="../../FileIO/RideFile.cpp" line="335"/>
+        <location filename="../../FileIO/RideFile.cpp" line="336"/>
         <source>VAM</source>
         <translation>VAM</translation>
     </message>
     <message>
-        <location filename="../../FileIO/RideFile.cpp" line="336"/>
+        <location filename="../../FileIO/RideFile.cpp" line="337"/>
         <source>Watts per Kilogram</source>
         <translation>每千克功率</translation>
     </message>
     <message>
-        <location filename="../../FileIO/RideFile.cpp" line="337"/>
+        <location filename="../../FileIO/RideFile.cpp" line="338"/>
         <source>W&apos; balance</source>
         <translation>W&apos;平衡</translation>
     </message>
     <message>
-        <location filename="../../FileIO/RideFile.cpp" line="338"/>
+        <location filename="../../FileIO/RideFile.cpp" line="339"/>
         <source>SmO2</source>
         <translation>SmO2</translation>
     </message>
     <message>
-        <location filename="../../FileIO/RideFile.cpp" line="339"/>
+        <location filename="../../FileIO/RideFile.cpp" line="340"/>
         <source>THb</source>
         <translation>tHb</translation>
     </message>
     <message>
-        <location filename="../../FileIO/RideFile.cpp" line="340"/>
+        <location filename="../../FileIO/RideFile.cpp" line="341"/>
         <source>O2Hb</source>
         <translation>O2Hb</translation>
     </message>
     <message>
-        <location filename="../../FileIO/RideFile.cpp" line="341"/>
+        <location filename="../../FileIO/RideFile.cpp" line="342"/>
         <source>HHb</source>
         <translation>HHb</translation>
     </message>
     <message>
-        <location filename="../../FileIO/RideFile.cpp" line="342"/>
+        <location filename="../../FileIO/RideFile.cpp" line="343"/>
         <source>Vertical Oscillation</source>
-        <translation>垂直振动</translation>
+        <translation>垂直振幅</translation>
     </message>
     <message>
-        <location filename="../../FileIO/RideFile.cpp" line="343"/>
+        <location filename="../../FileIO/RideFile.cpp" line="344"/>
         <source>Run Cadence</source>
         <translation>步频</translation>
     </message>
     <message>
-        <location filename="../../FileIO/RideFile.cpp" line="344"/>
+        <location filename="../../FileIO/RideFile.cpp" line="345"/>
         <source>GCT</source>
         <translation>触地时间</translation>
     </message>
     <message>
-        <location filename="../../FileIO/RideFile.cpp" line="345"/>
+        <location filename="../../FileIO/RideFile.cpp" line="346"/>
         <source>Gear Ratio</source>
         <translation>齿比</translation>
     </message>
     <message>
-        <location filename="../../FileIO/RideFile.cpp" line="346"/>
+        <location filename="../../FileIO/RideFile.cpp" line="347"/>
         <source>W&apos; Consumed</source>
         <translation>W&apos;平衡消耗</translation>
     </message>
     <message>
-        <location filename="../../FileIO/RideFile.cpp" line="347"/>
+        <location filename="../../FileIO/RideFile.cpp" line="348"/>
         <source>Sample Index</source>
         <translation>采样率</translation>
     </message>
     <message>
-        <location filename="../../FileIO/RideFile.cpp" line="348"/>
+        <location filename="../../FileIO/RideFile.cpp" line="349"/>
         <source>R-R</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../FileIO/RideFile.cpp" line="349"/>
-        <location filename="../../FileIO/RideFile.cpp" line="470"/>
+        <location filename="../../FileIO/RideFile.cpp" line="350"/>
+        <location filename="../../FileIO/RideFile.cpp" line="471"/>
         <source>Unknown</source>
         <translation>未知</translation>
     </message>
     <message>
-        <location filename="../../FileIO/RideFile.cpp" line="419"/>
-        <location filename="../../FileIO/RideFile.cpp" line="469"/>
+        <location filename="../../FileIO/RideFile.cpp" line="420"/>
+        <location filename="../../FileIO/RideFile.cpp" line="470"/>
         <source>seconds</source>
         <translation>秒</translation>
     </message>
     <message>
-        <location filename="../../FileIO/RideFile.cpp" line="420"/>
+        <location filename="../../FileIO/RideFile.cpp" line="421"/>
         <source>rpm</source>
         <translation>rpm</translation>
     </message>
     <message>
-        <location filename="../../FileIO/RideFile.cpp" line="421"/>
+        <location filename="../../FileIO/RideFile.cpp" line="422"/>
         <source>rpm/s</source>
         <translation>rpm/s</translation>
     </message>
     <message>
-        <location filename="../../FileIO/RideFile.cpp" line="422"/>
+        <location filename="../../FileIO/RideFile.cpp" line="423"/>
         <source>bpm</source>
         <translation>bpm</translation>
     </message>
     <message>
-        <location filename="../../FileIO/RideFile.cpp" line="423"/>
+        <location filename="../../FileIO/RideFile.cpp" line="424"/>
         <source>bpm/s</source>
         <translation>bpm/s</translation>
     </message>
     <message>
-        <location filename="../../FileIO/RideFile.cpp" line="424"/>
+        <location filename="../../FileIO/RideFile.cpp" line="425"/>
         <source>km</source>
         <translation>km</translation>
     </message>
     <message>
-        <location filename="../../FileIO/RideFile.cpp" line="424"/>
+        <location filename="../../FileIO/RideFile.cpp" line="425"/>
         <source>miles</source>
         <translation>mi</translation>
     </message>
     <message>
-        <location filename="../../FileIO/RideFile.cpp" line="425"/>
-        <location filename="../../FileIO/RideFile.cpp" line="439"/>
+        <location filename="../../FileIO/RideFile.cpp" line="426"/>
+        <location filename="../../FileIO/RideFile.cpp" line="440"/>
         <source>kph</source>
         <translation>km/h</translation>
     </message>
     <message>
-        <location filename="../../FileIO/RideFile.cpp" line="425"/>
+        <location filename="../../FileIO/RideFile.cpp" line="426"/>
         <source>mph</source>
         <translation>mi/h</translation>
     </message>
     <message>
-        <location filename="../../FileIO/RideFile.cpp" line="426"/>
+        <location filename="../../FileIO/RideFile.cpp" line="427"/>
         <source>m/s/s</source>
         <translation>m/s/s</translation>
     </message>
     <message>
-        <location filename="../../FileIO/RideFile.cpp" line="427"/>
+        <location filename="../../FileIO/RideFile.cpp" line="428"/>
         <source>N</source>
         <translation>N</translation>
     </message>
     <message>
-        <location filename="../../FileIO/RideFile.cpp" line="428"/>
+        <location filename="../../FileIO/RideFile.cpp" line="429"/>
         <source>N/s</source>
         <translation>N/s</translation>
     </message>
     <message>
-        <location filename="../../FileIO/RideFile.cpp" line="429"/>
-        <location filename="../../FileIO/RideFile.cpp" line="431"/>
+        <location filename="../../FileIO/RideFile.cpp" line="430"/>
         <location filename="../../FileIO/RideFile.cpp" line="432"/>
-        <location filename="../../FileIO/RideFile.cpp" line="435"/>
+        <location filename="../../FileIO/RideFile.cpp" line="433"/>
+        <location filename="../../FileIO/RideFile.cpp" line="436"/>
         <source>watts</source>
         <translation>W</translation>
     </message>
     <message>
-        <location filename="../../FileIO/RideFile.cpp" line="430"/>
+        <location filename="../../FileIO/RideFile.cpp" line="431"/>
         <source>watts/s</source>
         <translation>W/s</translation>
     </message>
     <message>
-        <location filename="../../FileIO/RideFile.cpp" line="433"/>
         <location filename="../../FileIO/RideFile.cpp" line="434"/>
+        <location filename="../../FileIO/RideFile.cpp" line="435"/>
         <source>TISS</source>
         <translation>TISS</translation>
     </message>
     <message>
-        <location filename="../../FileIO/RideFile.cpp" line="436"/>
+        <location filename="../../FileIO/RideFile.cpp" line="437"/>
         <source>metres</source>
         <translation>m</translation>
     </message>
     <message>
-        <location filename="../../FileIO/RideFile.cpp" line="436"/>
+        <location filename="../../FileIO/RideFile.cpp" line="437"/>
         <source>feet</source>
         <translation>ft</translation>
     </message>
     <message>
-        <location filename="../../FileIO/RideFile.cpp" line="437"/>
+        <location filename="../../FileIO/RideFile.cpp" line="438"/>
         <source>lon</source>
         <translation>经度</translation>
     </message>
     <message>
-        <location filename="../../FileIO/RideFile.cpp" line="438"/>
+        <location filename="../../FileIO/RideFile.cpp" line="439"/>
         <source>lat</source>
         <translation>纬度</translation>
     </message>
     <message>
-        <location filename="../../FileIO/RideFile.cpp" line="440"/>
-        <location filename="../../FileIO/RideFile.cpp" line="442"/>
+        <location filename="../../FileIO/RideFile.cpp" line="441"/>
         <location filename="../../FileIO/RideFile.cpp" line="443"/>
         <location filename="../../FileIO/RideFile.cpp" line="444"/>
         <location filename="../../FileIO/RideFile.cpp" line="445"/>
         <location filename="../../FileIO/RideFile.cpp" line="446"/>
-        <location filename="../../FileIO/RideFile.cpp" line="461"/>
+        <location filename="../../FileIO/RideFile.cpp" line="447"/>
+        <location filename="../../FileIO/RideFile.cpp" line="462"/>
         <source>%</source>
         <translation>%</translation>
     </message>
     <message>
-        <location filename="../../FileIO/RideFile.cpp" line="449"/>
         <location filename="../../FileIO/RideFile.cpp" line="450"/>
         <location filename="../../FileIO/RideFile.cpp" line="451"/>
         <location filename="../../FileIO/RideFile.cpp" line="452"/>
@@ -25703,6 +25825,7 @@ Do you want to continue?</source>
         <location filename="../../FileIO/RideFile.cpp" line="454"/>
         <location filename="../../FileIO/RideFile.cpp" line="455"/>
         <location filename="../../FileIO/RideFile.cpp" line="456"/>
+        <location filename="../../FileIO/RideFile.cpp" line="457"/>
         <source>°</source>
         <translation>°</translation>
     </message>
@@ -25711,58 +25834,58 @@ Do you want to continue?</source>
         <translation type="vanished">无效的文件名</translation>
     </message>
     <message>
-        <location filename="../../FileIO/RideFile.cpp" line="447"/>
         <location filename="../../FileIO/RideFile.cpp" line="448"/>
+        <location filename="../../FileIO/RideFile.cpp" line="449"/>
         <source>mm</source>
         <translation>mm</translation>
     </message>
     <message>
-        <location filename="../../FileIO/RideFile.cpp" line="323"/>
+        <location filename="../../FileIO/RideFile.cpp" line="324"/>
         <source>Right Pedal Smoothness</source>
         <translation>右踏板平滑度</translation>
     </message>
     <message>
-        <location filename="../../FileIO/RideFile.cpp" line="441"/>
+        <location filename="../../FileIO/RideFile.cpp" line="442"/>
         <source>°C</source>
         <translation>°C</translation>
     </message>
     <message>
-        <location filename="../../FileIO/RideFile.cpp" line="458"/>
+        <location filename="../../FileIO/RideFile.cpp" line="459"/>
         <source>meters per hour</source>
         <translation>m/h</translation>
     </message>
     <message>
-        <location filename="../../FileIO/RideFile.cpp" line="459"/>
+        <location filename="../../FileIO/RideFile.cpp" line="460"/>
         <source>watts/kg</source>
         <translation>W/kg</translation>
     </message>
     <message>
-        <location filename="../../FileIO/RideFile.cpp" line="460"/>
+        <location filename="../../FileIO/RideFile.cpp" line="461"/>
         <source>joules</source>
         <translation>J</translation>
     </message>
     <message>
-        <location filename="../../FileIO/RideFile.cpp" line="462"/>
+        <location filename="../../FileIO/RideFile.cpp" line="463"/>
         <source>g/dL</source>
         <translation>g/dL</translation>
     </message>
     <message>
-        <location filename="../../FileIO/RideFile.cpp" line="465"/>
+        <location filename="../../FileIO/RideFile.cpp" line="466"/>
         <source>spm</source>
         <translation>spm</translation>
     </message>
     <message>
-        <location filename="../../FileIO/RideFile.cpp" line="466"/>
+        <location filename="../../FileIO/RideFile.cpp" line="467"/>
         <source>cm</source>
         <translation>cm</translation>
     </message>
     <message>
-        <location filename="../../FileIO/RideFile.cpp" line="467"/>
+        <location filename="../../FileIO/RideFile.cpp" line="468"/>
         <source>ms</source>
         <translation>ms</translation>
     </message>
     <message>
-        <location filename="../../FileIO/RideFile.cpp" line="468"/>
+        <location filename="../../FileIO/RideFile.cpp" line="469"/>
         <source>ratio</source>
         <translation>比</translation>
     </message>
@@ -25774,7 +25897,7 @@ Skipping file...</source>
 跳过文件...</translation>
     </message>
     <message>
-        <location filename="../../FileIO/RideFile.cpp" line="2345"/>
+        <location filename="../../FileIO/RideFile.cpp" line="2346"/>
         <source>Wheelsize</source>
         <translation>车轮尺寸</translation>
     </message>
@@ -25782,107 +25905,107 @@ Skipping file...</source>
 <context>
     <name>RideFileInterval</name>
     <message>
-        <location filename="../../FileIO/RideFile.cpp" line="543"/>
+        <location filename="../../FileIO/RideFile.cpp" line="544"/>
         <source>ALL</source>
         <translation>全部</translation>
     </message>
     <message>
-        <location filename="../../FileIO/RideFile.cpp" line="544"/>
+        <location filename="../../FileIO/RideFile.cpp" line="545"/>
         <source>DEVICE</source>
         <translation>设备</translation>
     </message>
     <message>
-        <location filename="../../FileIO/RideFile.cpp" line="545"/>
+        <location filename="../../FileIO/RideFile.cpp" line="546"/>
         <source>USER</source>
         <translation>用户</translation>
     </message>
     <message>
-        <location filename="../../FileIO/RideFile.cpp" line="546"/>
+        <location filename="../../FileIO/RideFile.cpp" line="547"/>
         <source>PEAK PACE</source>
         <translation>峰值配速</translation>
     </message>
     <message>
-        <location filename="../../FileIO/RideFile.cpp" line="547"/>
+        <location filename="../../FileIO/RideFile.cpp" line="548"/>
         <source>PEAK POWER</source>
         <translation>峰值功率</translation>
     </message>
     <message>
-        <location filename="../../FileIO/RideFile.cpp" line="548"/>
+        <location filename="../../FileIO/RideFile.cpp" line="549"/>
         <source>SEGMENTS</source>
         <translation>分段</translation>
     </message>
     <message>
-        <location filename="../../FileIO/RideFile.cpp" line="549"/>
+        <location filename="../../FileIO/RideFile.cpp" line="550"/>
         <source>CLIMBING</source>
         <translation>爬坡</translation>
     </message>
     <message>
-        <location filename="../../FileIO/RideFile.cpp" line="550"/>
+        <location filename="../../FileIO/RideFile.cpp" line="551"/>
         <source>EFFORTS</source>
         <translation>成就</translation>
     </message>
     <message>
-        <location filename="../../FileIO/RideFile.cpp" line="557"/>
+        <location filename="../../FileIO/RideFile.cpp" line="558"/>
         <source>The entire activity</source>
         <translation>整个活动</translation>
     </message>
     <message>
-        <location filename="../../FileIO/RideFile.cpp" line="558"/>
+        <location filename="../../FileIO/RideFile.cpp" line="559"/>
         <source>Device specific intervals</source>
         <translation>设备特有的区段</translation>
     </message>
     <message>
-        <location filename="../../FileIO/RideFile.cpp" line="559"/>
+        <location filename="../../FileIO/RideFile.cpp" line="560"/>
         <source>User defined laps or marked intervals</source>
         <translation>用户定义的计圈或标记的区段</translation>
     </message>
     <message>
-        <location filename="../../FileIO/RideFile.cpp" line="560"/>
+        <location filename="../../FileIO/RideFile.cpp" line="561"/>
         <source>Peak pace for running and swimming</source>
         <translation>跑步和游泳的峰值配速</translation>
     </message>
     <message>
-        <location filename="../../FileIO/RideFile.cpp" line="561"/>
+        <location filename="../../FileIO/RideFile.cpp" line="562"/>
         <source>Peak powers for cycling 1s thru 1hr</source>
         <translation>骑车的1秒到1小时峰值功率</translation>
     </message>
     <message>
-        <location filename="../../FileIO/RideFile.cpp" line="562"/>
+        <location filename="../../FileIO/RideFile.cpp" line="563"/>
         <source>Route segments using GPS data</source>
         <translation>GPS数据的路线分段</translation>
     </message>
     <message>
-        <location filename="../../FileIO/RideFile.cpp" line="563"/>
+        <location filename="../../FileIO/RideFile.cpp" line="564"/>
         <source>Ascents for hills and mountains</source>
         <translation>山路的上升</translation>
     </message>
     <message>
-        <location filename="../../FileIO/RideFile.cpp" line="564"/>
+        <location filename="../../FileIO/RideFile.cpp" line="565"/>
         <source>Sustained efforts and matches using power</source>
         <translation>根据功率的持续努力和匹配</translation>
     </message>
     <message>
-        <location filename="../../FileIO/RideFile.cpp" line="3172"/>
+        <location filename="../../FileIO/RideFile.cpp" line="3173"/>
         <source>Peak</source>
         <translation>峰值</translation>
     </message>
     <message>
-        <location filename="../../FileIO/RideFile.cpp" line="3172"/>
+        <location filename="../../FileIO/RideFile.cpp" line="3173"/>
         <source>Find</source>
         <translation>搜索</translation>
     </message>
     <message>
-        <location filename="../../FileIO/RideFile.cpp" line="3179"/>
+        <location filename="../../FileIO/RideFile.cpp" line="3180"/>
         <source>Match</source>
         <translation>匹配</translation>
     </message>
     <message>
-        <location filename="../../FileIO/RideFile.cpp" line="3185"/>
+        <location filename="../../FileIO/RideFile.cpp" line="3186"/>
         <source>Climb</source>
         <translation>爬坡</translation>
     </message>
     <message>
-        <location filename="../../FileIO/RideFile.cpp" line="3191"/>
+        <location filename="../../FileIO/RideFile.cpp" line="3192"/>
         <source>Best</source>
         <translation>最佳</translation>
     </message>
@@ -26047,7 +26170,7 @@ Skipping file...</source>
     <message>
         <location filename="../../FileIO/RideFileTableModel.cpp" line="197"/>
         <source>Vertical Oscillation</source>
-        <translation>垂直振动</translation>
+        <translation>垂直振幅</translation>
     </message>
     <message>
         <location filename="../../FileIO/RideFileTableModel.cpp" line="201"/>
@@ -26335,12 +26458,12 @@ Skipping file...</source>
     <message>
         <location filename="../../Gui/RideImportWizard.cpp" line="494"/>
         <source>Error - Opendata summary.</source>
-        <translation type="unfinished"></translation>
+        <translation>错误 - Opendata汇总.</translation>
     </message>
     <message>
         <location filename="../../Gui/RideImportWizard.cpp" line="506"/>
         <source>undefined</source>
-        <translation type="unfinished"></translation>
+        <translation>未定义</translation>
     </message>
     <message>
         <location filename="../../Gui/RideImportWizard.cpp" line="658"/>
@@ -26376,7 +26499,7 @@ Skipping file...</source>
     <message>
         <location filename="../../Gui/RideImportWizard.cpp" line="1089"/>
         <source>Processing...</source>
-        <translation type="unfinished">处理中...</translation>
+        <translation>处理中...</translation>
     </message>
     <message>
         <location filename="../../Gui/RideImportWizard.cpp" line="1093"/>
@@ -26585,27 +26708,27 @@ Skipping file...</source>
     <message>
         <location filename="../../Charts/RideMapWindow.cpp" line="91"/>
         <source>Custom Tile Server A</source>
-        <translation type="unfinished"></translation>
+        <translation>自定义图块服务器A</translation>
     </message>
     <message>
         <location filename="../../Charts/RideMapWindow.cpp" line="92"/>
         <source>Custom Tile Server B</source>
-        <translation type="unfinished"></translation>
+        <translation>自定义图块服务器B</translation>
     </message>
     <message>
         <location filename="../../Charts/RideMapWindow.cpp" line="93"/>
         <source>Custom Tile Server C</source>
-        <translation type="unfinished"></translation>
+        <translation>自定义图块服务器C</translation>
     </message>
     <message>
         <location filename="../../Charts/RideMapWindow.cpp" line="99"/>
         <source>Google API key</source>
-        <translation type="unfinished"></translation>
+        <translation>Google API key</translation>
     </message>
     <message>
         <location filename="../../Charts/RideMapWindow.cpp" line="1154"/>
         <source>Interval</source>
-        <translation type="unfinished">区段</translation>
+        <translation>区段</translation>
     </message>
     <message>
         <source>Custom</source>
@@ -26783,7 +26906,7 @@ Skipping file...</source>
         <location filename="../../Charts/RideSummaryWindow.cpp" line="669"/>
         <location filename="../../Charts/RideSummaryWindow.cpp" line="674"/>
         <source>&lt;tr&gt;&lt;td&gt;%3&lt;/td&gt;&lt;td align=&quot;right&quot;&gt;&lt;font color=&quot;%2&quot;&gt;%1&lt;/font&gt;&lt;/td&gt;&lt;/tr&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../Charts/RideSummaryWindow.cpp" line="738"/>
@@ -26791,7 +26914,7 @@ Skipping file...</source>
         <location filename="../../Charts/RideSummaryWindow.cpp" line="742"/>
         <location filename="../../Charts/RideSummaryWindow.cpp" line="744"/>
         <source>&lt;tr&gt;&lt;td&gt;%4&lt;/td&gt;&lt;td align=&quot;right&quot;&gt;%3 (%1 - %2)&lt;/td&gt;&lt;/tr&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../Charts/RideSummaryWindow.cpp" line="824"/>
@@ -27350,7 +27473,7 @@ Skipping file...</source>
     <message>
         <location filename="../../Metrics/SwimMetrics.cpp" line="388"/>
         <source>Strokes per length, counting the arm using the watch plus time in seconds, Pool Length defaults to 50m for open water swims</source>
-        <translation>单位长度的划水次数，根据手表计数和秒数计算，开放水域游泳默认泳池长度为50m</translation>
+        <translation>单位长度的划水次数,根据手表计数和秒数计算,开放水域游泳默认泳池长度为50m</translation>
     </message>
 </context>
 <context>
@@ -27511,7 +27634,7 @@ native format. Should we do so?
     <message>
         <location filename="../../Charts/ScatterPlot.cpp" line="139"/>
         <source>Circumferential Pedal Velocity (m/s)</source>
-        <translation type="unfinished">圆周踏板速度 (m/s)</translation>
+        <translation>圆周踏板速度 (m/s)</translation>
     </message>
     <message>
         <location filename="../../Charts/ScatterPlot.cpp" line="140"/>
@@ -27561,7 +27684,7 @@ native format. Should we do so?
     <message>
         <location filename="../../Charts/ScatterPlot.cpp" line="152"/>
         <source>Running Vertical Oscillation</source>
-        <translation>跑步垂直振动</translation>
+        <translation>跑步垂直振幅</translation>
     </message>
     <message>
         <location filename="../../Charts/ScatterPlot.cpp" line="153"/>
@@ -27856,7 +27979,7 @@ native format. Should we do so?
         <location filename="../../Charts/ScatterWindow.cpp" line="49"/>
         <location filename="../../Charts/ScatterWindow.cpp" line="82"/>
         <source>Running Vertical Oscillation</source>
-        <translation>跑步垂直振动</translation>
+        <translation>跑步垂直振幅</translation>
     </message>
     <message>
         <location filename="../../Charts/ScatterWindow.cpp" line="50"/>
@@ -28099,27 +28222,27 @@ native format. Should we do so?
     <message>
         <location filename="../../Core/Season.cpp" line="32"/>
         <source>A</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../Core/Season.cpp" line="32"/>
         <source>B</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../Core/Season.cpp" line="32"/>
         <source>C</source>
-        <translation type="unfinished">ºC</translation>
+        <translation>ºC</translation>
     </message>
     <message>
         <location filename="../../Core/Season.cpp" line="32"/>
         <source>D</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../Core/Season.cpp" line="32"/>
         <source>E</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -28158,7 +28281,7 @@ native format. Should we do so?
     <message>
         <location filename="../../Core/Season.cpp" line="375"/>
         <source>Last 24 hours</source>
-        <translation type="unfinished"></translation>
+        <translation>最近24小时</translation>
     </message>
     <message>
         <location filename="../../Core/Season.cpp" line="382"/>
@@ -28183,7 +28306,7 @@ native format. Should we do so?
     <message>
         <location filename="../../Core/Season.cpp" line="410"/>
         <source>Last 6 weeks</source>
-        <translation type="unfinished"></translation>
+        <translation>最近6周</translation>
     </message>
     <message>
         <location filename="../../Core/Season.cpp" line="417"/>
@@ -28379,11 +28502,11 @@ native format. Should we do so?
     </message>
     <message>
         <source>Choose which sites you wish to share on: </source>
-        <translation type="vanished">选择要分享的网站： </translation>
+        <translation type="vanished">选择要分享的网站: </translation>
     </message>
     <message>
         <source>Choose a name for your activity: </source>
-        <translation type="vanished">为活动命名： </translation>
+        <translation type="vanished">为活动命名: </translation>
     </message>
     <message>
         <source>Private</source>
@@ -28407,7 +28530,7 @@ native format. Should we do so?
     </message>
     <message>
         <source>Choose which data series you wish to send: </source>
-        <translation type="vanished">选择要发送的数据系列： </translation>
+        <translation type="vanished">选择要发送的数据系列: </translation>
     </message>
     <message>
         <source>Altitude</source>
@@ -28984,7 +29107,7 @@ If you do not choose to keep the original it will be backed up before removing i
     <message>
         <location filename="../../Gui/SplitActivityWizard.cpp" line="580"/>
         <source>WARNING: The current activity will be backed up and removed, but a backup already exists. The existing backup will therefore be overwritten.</source>
-        <translation>警告：目前活动将被备份且删除,但已存在一个备份,已有备份将被覆盖.</translation>
+        <translation>警告:目前活动将被备份且删除,但已存在一个备份,已有备份将被覆盖.</translation>
     </message>
 </context>
 <context>
@@ -29082,11 +29205,11 @@ If the newly created activity clashes with an existing activity (same date and t
     </message>
     <message>
         <source>request failed: </source>
-        <translation type="vanished">请求失败： </translation>
+        <translation type="vanished">请求失败: </translation>
     </message>
     <message>
         <source>request failed, Server response: %1 %2</source>
-        <translation type="vanished">请求失败,服务器响应：%1 %2</translation>
+        <translation type="vanished">请求失败,服务器响应:%1 %2</translation>
     </message>
     <message>
         <source>failed to upload file (cod. %1)</source>
@@ -29166,34 +29289,34 @@ If the newly created activity clashes with an existing activity (same date and t
         <location filename="../../FileIO/SrmDevice.cpp" line="136"/>
         <location filename="../../FileIO/SrmDevice.cpp" line="151"/>
         <source>failed to allocate device handle: %1</source>
-        <translation>定位设备句柄失败：%1</translation>
+        <translation>定位设备句柄失败:%1</translation>
     </message>
     <message>
         <location filename="../../FileIO/SrmDevice.cpp" line="141"/>
         <location filename="../../FileIO/SrmDevice.cpp" line="156"/>
         <location filename="../../FileIO/SrmDevice.cpp" line="162"/>
         <source>device type %1 is unsupported</source>
-        <translation>不支持的设备类型：%1</translation>
+        <translation>不支持的设备类型:%1</translation>
     </message>
     <message>
         <location filename="../../FileIO/SrmDevice.cpp" line="169"/>
         <source>opening PCV at %1</source>
-        <translation>正在打开PCV：%1</translation>
+        <translation>正在打开PCV:%1</translation>
     </message>
     <message>
         <location filename="../../FileIO/SrmDevice.cpp" line="175"/>
         <source>opening PC6/7 at %1</source>
-        <translation>正在打开PC6/7：%1</translation>
+        <translation>正在打开PC6/7:%1</translation>
     </message>
     <message>
         <location filename="../../FileIO/SrmDevice.cpp" line="180"/>
         <source>unsupported SRM Protocol version: %1</source>
-        <translation>不支持的SRM协议版本：%1</translation>
+        <translation>不支持的SRM协议版本:%1</translation>
     </message>
     <message>
         <location filename="../../FileIO/SrmDevice.cpp" line="185"/>
         <source>failed to allocate Powercontrol handle: %1</source>
-        <translation>定位PC句柄失败：%1</translation>
+        <translation>定位PC句柄失败:%1</translation>
     </message>
     <message>
         <location filename="../../FileIO/SrmDevice.cpp" line="191"/>
@@ -29203,29 +29326,29 @@ If the newly created activity clashes with an existing activity (same date and t
     <message>
         <location filename="../../FileIO/SrmDevice.cpp" line="200"/>
         <source>Couldn&apos;t set logging function: %1</source>
-        <translation>无法设置日志功能：%1</translation>
+        <translation>无法设置日志功能:%1</translation>
     </message>
     <message>
         <location filename="../../FileIO/SrmDevice.cpp" line="206"/>
         <source>failed to set Powercontrol io handle: %1</source>
-        <translation>设置PC输入输出句柄失败：%1</translation>
+        <translation>设置PC输入输出句柄失败:%1</translation>
     </message>
     <message>
         <location filename="../../FileIO/SrmDevice.cpp" line="212"/>
         <source>failed to initialize Powercontrol communication: %1</source>
-        <translation>PC通信初始化失败：%1</translation>
+        <translation>PC通信初始化失败:%1</translation>
     </message>
     <message>
         <location filename="../../FileIO/SrmDevice.cpp" line="272"/>
         <location filename="../../FileIO/SrmDevice.cpp" line="361"/>
         <source>failed to start download: %1</source>
-        <translation>开始下载失败：%1</translation>
+        <translation>开始下载失败:%1</translation>
     </message>
     <message>
         <location filename="../../FileIO/SrmDevice.cpp" line="278"/>
         <location filename="../../FileIO/SrmDevice.cpp" line="367"/>
         <source>failed to get number of data blocks: %1</source>
-        <translation>获取数据块数量失败：%1</translation>
+        <translation>获取数据块数量失败:%1</translation>
     </message>
     <message>
         <location filename="../../FileIO/SrmDevice.cpp" line="282"/>
@@ -29236,12 +29359,12 @@ If the newly created activity clashes with an existing activity (same date and t
         <location filename="../../FileIO/SrmDevice.cpp" line="302"/>
         <location filename="../../FileIO/SrmDevice.cpp" line="308"/>
         <source>preview failed: %1</source>
-        <translation>预览失败：%1</translation>
+        <translation>预览失败:%1</translation>
     </message>
     <message>
         <location filename="../../FileIO/SrmDevice.cpp" line="350"/>
         <source>failed to allocate data handle: %1</source>
-        <translation>定位数据句柄失败：%1</translation>
+        <translation>定位数据句柄失败:%1</translation>
     </message>
     <message>
         <location filename="../../FileIO/SrmDevice.cpp" line="356"/>
@@ -29263,19 +29386,19 @@ If the newly created activity clashes with an existing activity (same date and t
     <message>
         <location filename="../../FileIO/SrmDevice.cpp" line="449"/>
         <source>adding chunk failed: %1</source>
-        <translation>添加数据块失败：%1</translation>
+        <translation>添加数据块失败:%1</translation>
     </message>
     <message>
         <location filename="../../FileIO/SrmDevice.cpp" line="459"/>
         <location filename="../../FileIO/SrmDevice.cpp" line="477"/>
         <source>adding marker failed: %1</source>
-        <translation>添加标记失败：%1</translation>
+        <translation>添加标记失败:%1</translation>
     </message>
     <message>
         <location filename="../../FileIO/SrmDevice.cpp" line="497"/>
         <location filename="../../FileIO/SrmDevice.cpp" line="503"/>
         <source>download failed: %1</source>
-        <translation>下载失败：%1</translation>
+        <translation>下载失败:%1</translation>
     </message>
     <message>
         <location filename="../../FileIO/SrmDevice.cpp" line="508"/>
@@ -29290,22 +29413,22 @@ If the newly created activity clashes with an existing activity (same date and t
     <message>
         <location filename="../../FileIO/SrmDevice.cpp" line="522"/>
         <source>Couldn&apos;t split data: %1</source>
-        <translation>无法分割数据：%1</translation>
+        <translation>无法分割数据:%1</translation>
     </message>
     <message>
         <location filename="../../FileIO/SrmDevice.cpp" line="540"/>
         <source>Couldn&apos;t fixup data: %1</source>
-        <translation>无法修正数据：%1</translation>
+        <translation>无法修正数据:%1</translation>
     </message>
     <message>
         <location filename="../../FileIO/SrmDevice.cpp" line="557"/>
         <source>Couldn&apos;t get start time of data: %1</source>
-        <translation>无法获得数据开始时间：%1</translation>
+        <translation>无法获得数据开始时间:%1</translation>
     </message>
     <message>
         <location filename="../../FileIO/SrmDevice.cpp" line="566"/>
         <source>failed to open file %1: %2</source>
-        <translation>打开文件%1失败：%2</translation>
+        <translation>打开文件%1失败:%2</translation>
     </message>
     <message>
         <location filename="../../FileIO/SrmDevice.cpp" line="574"/>
@@ -29320,7 +29443,7 @@ If the newly created activity clashes with an existing activity (same date and t
     <message>
         <location filename="../../FileIO/SrmDevice.cpp" line="622"/>
         <source>failed to clear Powercontrol memory: %1</source>
-        <translation>清除PC内存失败：%1</translation>
+        <translation>清除PC内存失败:%1</translation>
     </message>
 </context>
 <context>
@@ -29423,7 +29546,7 @@ If the newly created activity clashes with an existing activity (same date and t
     <message>
         <location filename="../../Metrics/SwimMetrics.cpp" line="253"/>
         <source>Stroke Rate in strokes/min, counting both arms for freestyle/backstroke, corrected by 3m push-off length for pool swims</source>
-        <translation>划水频率，自由泳和仰泳计两臂划水次数，泳池游泳加3m长度修正</translation>
+        <translation>划水频率,自由泳和仰泳计两臂划水次数,泳池游泳加3m长度修正</translation>
     </message>
 </context>
 <context>
@@ -29442,7 +29565,7 @@ If the newly created activity clashes with an existing activity (same date and t
     <message>
         <location filename="../../Metrics/SwimMetrics.cpp" line="318"/>
         <source>Strokes per length, counting the arm using the watch, Pool Length defaults to 50m for open water swims</source>
-        <translation>单位长度划水次数，使用手表计数，开放水域游泳默认泳池长度为50m</translation>
+        <translation>单位长度划水次数,使用手表计数,开放水域游泳默认泳池长度为50m</translation>
     </message>
 </context>
 <context>
@@ -29496,7 +29619,7 @@ If the newly created activity clashes with an existing activity (same date and t
     <message>
         <location filename="../../Metrics/SwimMetrics.cpp" line="196"/>
         <source>Average Swim Pace, computed only when Cadence &gt; 0 to avoid kick/drill lengths</source>
-        <translation>平均游泳配速，仅计算划水时配速</translation>
+        <translation>平均游泳配速,仅计算划水时配速</translation>
     </message>
 </context>
 <context>
@@ -29571,7 +29694,7 @@ If the newly created activity clashes with an existing activity (same date and t
     <message>
         <location filename="../../Metrics/SwimMetrics.cpp" line="476"/>
         <source>Average Swim Pace, computed only when Cadence &gt; 0 to avoid kick/drill lengths</source>
-        <translation>平均游泳配速，仅计算划水时配速</translation>
+        <translation>平均游泳配速,仅计算划水时配速</translation>
     </message>
 </context>
 <context>
@@ -29586,7 +29709,7 @@ If the newly created activity clashes with an existing activity (same date and t
     <name>TPAthlete</name>
     <message>
         <source>Error:</source>
-        <translation type="vanished">错误：</translation>
+        <translation type="vanished">错误:</translation>
     </message>
 </context>
 <context>
@@ -29720,7 +29843,7 @@ If the newly created activity clashes with an existing activity (same date and t
     <name>TPUpload</name>
     <message>
         <source>Error:</source>
-        <translation type="vanished">错误：</translation>
+        <translation type="vanished">错误:</translation>
     </message>
     <message>
         <source>Upload successful</source>
@@ -29942,18 +30065,18 @@ If the newly created activity clashes with an existing activity (same date and t
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="194"/>
         <source>Time Recording</source>
-        <translation type="unfinished"></translation>
+        <translation>记录时间</translation>
     </message>
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="195"/>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="196"/>
         <source>seconds</source>
-        <translation type="unfinished">秒</translation>
+        <translation>秒</translation>
     </message>
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="197"/>
         <source>Time when device was recording, excludes gaps in recording due to pauses or missing samples</source>
-        <translation type="unfinished"></translation>
+        <translation>设备进行记录的时间,不包括暂停或样本丢失造成的间断</translation>
     </message>
 </context>
 <context>
@@ -30253,7 +30376,7 @@ If the newly created activity clashes with an existing activity (same date and t
     <message>
         <location filename="../../Gui/ToolsRhoEstimator.cpp" line="48"/>
         <source>Enter measured values for the following:</source>
-        <translation>输入下列测量值：</translation>
+        <translation>输入下列测量值:</translation>
     </message>
     <message>
         <location filename="../../Gui/ToolsRhoEstimator.cpp" line="54"/>
@@ -30269,13 +30392,13 @@ If the newly created activity clashes with an existing activity (same date and t
         <location filename="../../Gui/ToolsRhoEstimator.cpp" line="72"/>
         <location filename="../../Gui/ToolsRhoEstimator.cpp" line="182"/>
         <source>Temperature (C):</source>
-        <translation>温度 (ºC)：</translation>
+        <translation>温度 (ºC):</translation>
     </message>
     <message>
         <location filename="../../Gui/ToolsRhoEstimator.cpp" line="76"/>
         <location filename="../../Gui/ToolsRhoEstimator.cpp" line="172"/>
         <source>Temperature (F):</source>
-        <translation>温度 (ºF)：</translation>
+        <translation>温度 (ºF):</translation>
     </message>
     <message>
         <location filename="../../Gui/ToolsRhoEstimator.cpp" line="93"/>
@@ -30293,18 +30416,18 @@ If the newly created activity clashes with an existing activity (same date and t
         <location filename="../../Gui/ToolsRhoEstimator.cpp" line="114"/>
         <location filename="../../Gui/ToolsRhoEstimator.cpp" line="187"/>
         <source>Dewpoint (C):</source>
-        <translation>露点 (ºC)：</translation>
+        <translation>露点 (ºC):</translation>
     </message>
     <message>
         <location filename="../../Gui/ToolsRhoEstimator.cpp" line="118"/>
         <location filename="../../Gui/ToolsRhoEstimator.cpp" line="177"/>
         <source>Dewpoint (F):</source>
-        <translation>露点 (ºF)：</translation>
+        <translation>露点 (ºF):</translation>
     </message>
     <message>
         <location filename="../../Gui/ToolsRhoEstimator.cpp" line="132"/>
         <source>Estimated air density (rho):</source>
-        <translation>空气密度估计值(Rho)：</translation>
+        <translation>空气密度估计值(Rho):</translation>
     </message>
     <message>
         <location filename="../../Gui/ToolsRhoEstimator.cpp" line="140"/>
@@ -30338,7 +30461,7 @@ If the newly created activity clashes with an existing activity (same date and t
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="3747"/>
         <source>Total Calories estimated from Time Moving, Heart Rate, Weight, Sex and Age</source>
-        <translation>根据移动时间、心率、体重、性别和年龄估计的总热量</translation>
+        <translation>根据移动时间,心率,体重,性别和年龄估计的总热量</translation>
     </message>
 </context>
 <context>
@@ -30503,128 +30626,128 @@ Click Cancel to exit.</source>
         <translation>视频同步</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="424"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="425"/>
         <source>Import Workout from File</source>
         <translation>从文件导入训练</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="425"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="426"/>
         <source>Get Workouts from ErgDB</source>
         <translation>从ErgDB获取训练</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="426"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="427"/>
         <source>Get Workouts from Today&apos;s Plan</source>
         <translation>从Today&apos;s Plan获取训练</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="427"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="428"/>
         <source>Create Workout via Wizard</source>
         <translation>通过向导创建训练</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="428"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="429"/>
         <source>Scan for Workouts</source>
         <translation>扫描训练</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="452"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="453"/>
         <source>Delete selected Workout</source>
         <translation>删除选中的训练</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="455"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="456"/>
         <source>Delete %1 selected Workouts</source>
         <translation>删除选中的%1个训练</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="479"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="480"/>
         <source>Train mode active</source>
         <translation>训练模式已激活</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="479"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="480"/>
         <source>Please stop the train mode before closing the window or application.</source>
         <translation>关闭窗口或应用请停止训练模式.</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="549"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="550"/>
         <source>Remove reference to selected video</source>
         <translation>移除选中视频的引用</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="564"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="565"/>
         <source>Import VideoSync from File</source>
         <translation>从文件导入视频同步</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="565"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="566"/>
         <source>Scan for VideoSyncs</source>
         <translation>扫描视频同步</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="578"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="579"/>
         <source>Delete selected VideoSync</source>
         <translation>删除选中的视频同步</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="904"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="905"/>
         <source>Are you sure you want to remove the reference to this video?</source>
         <translation>确认删除此视频的引用?</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="906"/>
-        <location filename="../../Train/TrainSidebar.cpp" line="968"/>
-        <location filename="../../Train/TrainSidebar.cpp" line="1044"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="907"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="969"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="1045"/>
         <source>Remove</source>
         <translation>删除</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="939"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="940"/>
         <source>Are you sure you want to delete this VideoSync?</source>
         <translation>确认删除此视频同步?</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="966"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="967"/>
         <source>The VideoSync file is either not valid or not existing and will be removed from the library.</source>
         <translation>此视频同步文件无效或不存在,将被从库中删除.</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="1000"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="1001"/>
         <source>Are you sure you want to delete this Workout?</source>
         <translation>确认删除此训练?</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="1003"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="1004"/>
         <source>Are you sure you want to delete this %1 workouts?</source>
         <translation>确认删除这%1个训练?</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="1042"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="1043"/>
         <source>The Workout file is either not valid or not existing and will be removed from the library.</source>
         <translation>此训练文件无效或不存在,将被从库中删除.</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="1864"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="1866"/>
         <source>Recalibrating steering..</source>
-        <translation type="unfinished"></translation>
+        <translation>正在校准转向..</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="2154"/>
         <location filename="../../Train/TrainSidebar.cpp" line="2158"/>
-        <location filename="../../Train/TrainSidebar.cpp" line="2211"/>
-        <location filename="../../Train/TrainSidebar.cpp" line="2262"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2162"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2215"/>
         <location filename="../../Train/TrainSidebar.cpp" line="2266"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2270"/>
         <source>Requesting calibration..</source>
         <translation>正在请求校准..</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="2165"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2169"/>
         <source>Calibrating...</source>
         <translation>校准中...</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="2169"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2173"/>
         <source>Calibrating...
 Current speed %1 kph
 Increase speed to %2 kph</source>
@@ -30633,14 +30756,14 @@ Increase speed to %2 kph</source>
 加快速度到 %2 km/h</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="2173"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2177"/>
         <source>Calibrating...
 Stop pedalling until speed drops to 0</source>
         <translation>校准中...
-停止踩踏，直到速度为0</translation>
+停止踩踏,直到速度为0</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="2178"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2182"/>
         <source>Calibration completed successfully!
 Spindown %1 ms
 Zero Offset %2</source>
@@ -30649,29 +30772,29 @@ Zero Offset %2</source>
 零值偏移 %2</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="2186"/>
-        <location filename="../../Train/TrainSidebar.cpp" line="2237"/>
-        <location filename="../../Train/TrainSidebar.cpp" line="2289"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2190"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2241"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2293"/>
         <source>Calibration failed!</source>
         <translation>校准失败!</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="2205"/>
-        <location filename="../../Train/TrainSidebar.cpp" line="2256"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2209"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2260"/>
         <source>Unclip or stop pedalling to begin calibration..</source>
         <translation>解锁或停止踩踏来开始校准...</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="2224"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2228"/>
         <source>Calibrating...
 Unclip or stop pedalling until process is completed..
 Torque %1</source>
         <translation>校准中...
-解锁或停止踩踏，直到过程结束...
+解锁或停止踩踏,直到过程结束...
 扭矩 %1</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="2229"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2233"/>
         <source>Calibration completed successfully!
 Zero Offset %1
 Torque %2</source>
@@ -30680,16 +30803,16 @@ Torque %2</source>
 扭矩 %2</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="2276"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2280"/>
         <source>Calibrating...
 Unclip or stop pedalling until process is completed..
 Zero Offset %1</source>
         <translation>校准中...
-解锁或停止踩踏，直到过程结束...
+解锁或停止踩踏,直到过程结束...
 零值偏移 %1</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="2281"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2285"/>
         <source>Calibration completed successfully!
 Zero Offset %1
 Slope %2</source>
@@ -30698,99 +30821,99 @@ Slope %2</source>
 斜率 %2</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="2322"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2326"/>
         <source>Fast forward..</source>
         <translation>快进..</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="2343"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2347"/>
         <source>Rewind..</source>
         <translation>快退..</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="2386"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2390"/>
         <source>Increasing intensity..</source>
         <translation>增大阻力..</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="2412"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2416"/>
         <source>Decreasing intensity..</source>
         <translation>减小阻力..</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="535"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="536"/>
         <source>Import Video from File</source>
         <translation>从文件导入视频</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="536"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="537"/>
         <source>Scan for Videos</source>
         <translation>扫描视频</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="941"/>
-        <location filename="../../Train/TrainSidebar.cpp" line="1013"/>
-        <location filename="../../Train/TrainSidebar.cpp" line="2655"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="942"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="1014"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2659"/>
         <source>Delete</source>
         <translation>删除</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="1136"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="1137"/>
         <source>Resuming..</source>
         <translation>恢复中..</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="1163"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="1164"/>
         <source>Paused..</source>
         <translation>已暂停..</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="1264"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="1266"/>
         <source>Starting..</source>
         <translation>开始中..</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="1432"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="1434"/>
         <source>Stopped..</source>
         <translation>已停止..</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="1505"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="1507"/>
         <source>Connected..</source>
         <translation>已连接..</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="1523"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="1525"/>
         <source>Disconnected..</source>
         <translation>已断开..</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="1847"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="1849"/>
         <source>New lap..</source>
         <translation>新计圈..</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="1876"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="1878"/>
         <source>No Devices Configured</source>
         <translation>未设定设备</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="1876"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="1878"/>
         <source>Please configure a device in Preferences.</source>
         <translation>请在选项中设置一个设备.</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="2116"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2120"/>
         <source>Exiting calibration..</source>
         <translation>退出校准..</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="2131"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2135"/>
         <source>Calibration not supported for this device.</source>
         <translation>不支持此设备的校准.</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="2138"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2142"/>
         <source>Calibrating...
 Press F3 on Controller when done.</source>
         <translation>校准中...
@@ -30801,19 +30924,19 @@ Press F3 on Controller when done.</source>
         <translation type="vanished">完成</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="2607"/>
-        <location filename="../../Train/TrainSidebar.cpp" line="2625"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2611"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2629"/>
         <source>Add Device</source>
         <translation>新增设备</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="2612"/>
-        <location filename="../../Train/TrainSidebar.cpp" line="2630"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2616"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2634"/>
         <source>Delete Device</source>
         <translation>删除设备</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="2653"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2657"/>
         <source>Are you sure you want to delete this device?</source>
         <translation>确认删除此设备?</translation>
     </message>
@@ -30822,11 +30945,11 @@ Press F3 on Controller when done.</source>
     <name>TrainingStageBuch</name>
     <message>
         <source>failed to parse Settings response: </source>
-        <translation type="obsolete">解析设置响应失败： </translation>
+        <translation type="obsolete">解析设置响应失败: </translation>
     </message>
     <message>
         <source>failed to get settings: </source>
-        <translation type="obsolete">获取设置失败： </translation>
+        <translation type="obsolete">获取设置失败: </translation>
     </message>
     <message>
         <source>failed to parse Session response: </source>
@@ -30834,7 +30957,7 @@ Press F3 on Controller when done.</source>
     </message>
     <message>
         <source>failed to get new session: </source>
-        <translation type="obsolete">获取新会话失败： </translation>
+        <translation type="obsolete">获取新会话失败: </translation>
     </message>
     <message>
         <source>got empty session</source>
@@ -30905,7 +31028,7 @@ Press F3 on Controller when done.</source>
     </message>
     <message>
         <source>successfully uploaded to Trainingstagebuch.org as %1</source>
-        <translation type="vanished">成功上传至Trainingstagebuch.org：%1</translation>
+        <translation type="vanished">成功上传至Trainingstagebuch.org:%1</translation>
     </message>
     <message>
         <source>getting Settings from Trainingstagebuch.org...</source>
@@ -30921,7 +31044,7 @@ Press F3 on Controller when done.</source>
     </message>
     <message>
         <source>temporary file too large for upload: %1 &gt; %1 bytes</source>
-        <translation type="vanished">临时文件过大无法上传：%1 &gt; %1字节</translation>
+        <translation type="vanished">临时文件过大无法上传:%1 &gt; %1字节</translation>
     </message>
     <message>
         <source>sending to Trainingstagebuch.org ...</source>
@@ -30929,19 +31052,19 @@ Press F3 on Controller when done.</source>
     </message>
     <message>
         <source>request failed: </source>
-        <translation type="vanished">请求失败： </translation>
+        <translation type="vanished">请求失败: </translation>
     </message>
     <message>
         <source>request failed, Server response: %1 %2</source>
-        <translation type="vanished">请求失败,服务器响应：%1 %2</translation>
+        <translation type="vanished">请求失败,服务器响应:%1 %2</translation>
     </message>
     <message>
         <source>failed to parse Settings response: </source>
-        <translation type="vanished">解析设置响应失败： </translation>
+        <translation type="vanished">解析设置响应失败: </translation>
     </message>
     <message>
         <source>failed to get settings: </source>
-        <translation type="vanished">获取设置失败： </translation>
+        <translation type="vanished">获取设置失败: </translation>
     </message>
     <message>
         <source>failed to parse Session response: </source>
@@ -30949,7 +31072,7 @@ Press F3 on Controller when done.</source>
     </message>
     <message>
         <source>failed to get new session: </source>
-        <translation type="vanished">获取新会话失败： </translation>
+        <translation type="vanished">获取新会话失败: </translation>
     </message>
     <message>
         <source>got empty session</source>
@@ -30957,11 +31080,11 @@ Press F3 on Controller when done.</source>
     </message>
     <message>
         <source>failed to parse upload response: </source>
-        <translation type="vanished">解析上传响应失败： </translation>
+        <translation type="vanished">解析上传响应失败: </translation>
     </message>
     <message>
         <source>failed to upload file: </source>
-        <translation type="vanished">上传文件失败： </translation>
+        <translation type="vanished">上传文件失败: </translation>
     </message>
     <message>
         <source>got empty exercise</source>
@@ -31025,19 +31148,19 @@ Press F3 on Controller when done.</source>
     <name>TriScore</name>
     <message>
         <source>TriScore combined stress metric based on Dr. Skiba stress metrics, defined as BikeScore for cycling, GOVSS for running and SwimScore for swimming</source>
-        <translation type="vanished">TriScore综合了基于Dr. Skiba指标的压力指标,定义为骑车的BikeScore、跑步的GOVSS和游泳的SwimScore</translation>
+        <translation type="vanished">TriScore综合了基于Dr. Skiba指标的压力指标,定义为骑车的BikeScore,跑步的GOVSS和游泳的SwimScore</translation>
     </message>
     <message>
         <location filename="../../Metrics/SwimScore.cpp" line="390"/>
         <source>TriScore combined stress metric based on Dr. Skiba stress metrics, defined as BikeScore for cycling, GOVSS for running and SwimScore for swimming. On zero fallback to TRIMP Zonal Points for HR based score.</source>
-        <translation type="unfinished"></translation>
+        <translation>TriScore综合了基于Dr. Skiba指标的压力指标,定义为骑车的BikeScore,跑步的GOVSS和游泳的SwimScore.</translation>
     </message>
 </context>
 <context>
     <name>TwitterDialog</name>
     <message>
         <source>Choose which metrics you wish to tweet: </source>
-        <translation type="vanished">选择发推的数据： </translation>
+        <translation type="vanished">选择发推的数据: </translation>
     </message>
     <message>
         <source>Workout Time</source>
@@ -31089,7 +31212,7 @@ Press F3 on Controller when done.</source>
     </message>
     <message>
         <source>Twitter Message:</source>
-        <translation type="vanished">推文内容：</translation>
+        <translation type="vanished">推文内容:</translation>
     </message>
     <message>
         <source>Message Length: </source>
@@ -31101,7 +31224,7 @@ Press F3 on Controller when done.</source>
     </message>
     <message>
         <source>Time Moving: %1 </source>
-        <translation type="vanished">移动时间：%1 </translation>
+        <translation type="vanished">移动时间:%1 </translation>
     </message>
     <message>
         <source>&amp;Cancel</source>
@@ -31133,7 +31256,7 @@ Press F3 on Controller when done.</source>
     </message>
     <message>
         <source>Internal error in OAuth request - NULL, invalid Endpoint or invalid request</source>
-        <translation type="vanished">授权请求内部错误 - NULL、结束符无效或请求无效</translation>
+        <translation type="vanished">授权请求内部错误 - NULL,结束符无效或请求无效</translation>
     </message>
     <message>
         <source>Tweet sent</source>
@@ -31278,7 +31401,7 @@ Press F3 on Controller when done.</source>
     <message>
         <location filename="../../Metrics/VDOTCalculator.cpp" line="84"/>
         <source>Your Test Race:</source>
-        <translation>测试比赛：</translation>
+        <translation>测试比赛:</translation>
     </message>
     <message>
         <location filename="../../Metrics/VDOTCalculator.cpp" line="137"/>
@@ -31288,7 +31411,7 @@ Press F3 on Controller when done.</source>
     <message>
         <location filename="../../Metrics/VDOTCalculator.cpp" line="150"/>
         <source>Your Training Paces:</source>
-        <translation>训练配速：</translation>
+        <translation>训练配速:</translation>
     </message>
     <message>
         <location filename="../../Metrics/VDOTCalculator.cpp" line="156"/>
@@ -31338,12 +31461,12 @@ Press F3 on Controller when done.</source>
     <message>
         <location filename="../../Metrics/VDOTCalculator.cpp" line="179"/>
         <source>Your Target Race:</source>
-        <translation>目标比赛：</translation>
+        <translation>目标比赛:</translation>
     </message>
     <message>
         <location filename="../../Metrics/VDOTCalculator.cpp" line="200"/>
         <source>Equivalent Time:</source>
-        <translation>等效时间：</translation>
+        <translation>等效时间:</translation>
     </message>
     <message>
         <location filename="../../Metrics/VDOTCalculator.cpp" line="213"/>
@@ -31401,7 +31524,7 @@ Press F3 on Controller when done.</source>
     </message>
     <message>
         <source>temporary file too large for upload: %1 &gt; %1 bytes</source>
-        <translation type="vanished">临时文件过大无法上传：%1 &gt; %1字节</translation>
+        <translation type="vanished">临时文件过大无法上传:%1 &gt; %1字节</translation>
     </message>
     <message>
         <source>sending to VeloHero...</source>
@@ -31409,11 +31532,11 @@ Press F3 on Controller when done.</source>
     </message>
     <message>
         <source>request failed: </source>
-        <translation type="vanished">请求失败： </translation>
+        <translation type="vanished">请求失败: </translation>
     </message>
     <message>
         <source>request failed, server response: %1 %2</source>
-        <translation type="vanished">请求失败,服务器响应：%1 %2</translation>
+        <translation type="vanished">请求失败,服务器响应:%1 %2</translation>
     </message>
     <message>
         <source>failed to parse session response: </source>
@@ -31421,7 +31544,7 @@ Press F3 on Controller when done.</source>
     </message>
     <message>
         <source>failed to get new session: </source>
-        <translation type="vanished">获取新会话失败： </translation>
+        <translation type="vanished">获取新会话失败: </translation>
     </message>
     <message>
         <source>got empty session</source>
@@ -31429,11 +31552,11 @@ Press F3 on Controller when done.</source>
     </message>
     <message>
         <source>failed to parse upload response: </source>
-        <translation type="vanished">解析上传响应失败： </translation>
+        <translation type="vanished">解析上传响应失败: </translation>
     </message>
     <message>
         <source>failed to upload file: </source>
-        <translation type="vanished">上传文件失败： </translation>
+        <translation type="vanished">上传文件失败: </translation>
     </message>
     <message>
         <source>got empty exercise</source>
@@ -31450,7 +31573,7 @@ Press F3 on Controller when done.</source>
     <message>
         <location filename="../../Cloud/Velohero.cpp" line="128"/>
         <source>failed to get new session: </source>
-        <translation>获取新会话失败： </translation>
+        <translation>获取新会话失败: </translation>
     </message>
     <message>
         <location filename="../../Cloud/Velohero.cpp" line="135"/>
@@ -31557,7 +31680,7 @@ Press F3 on Controller when done.</source>
     <message>
         <location filename="../../Metrics/WattsPerKilogram.cpp" line="334"/>
         <source>Estimated VO2max from 5 min Peak Power relative to Athlete Weight using new ACSM formula: 10.8 * Watts / KG + 7 (3.5 per leg).</source>
-        <translation>由5min最大功率和运动员体重、使用新的ACSM公式: 10.8 * W/kg + 7 (每条腿3.5).</translation>
+        <translation>由5min最大功率和运动员体重,使用新的ACSM公式: 10.8 * W/kg + 7 (每条腿3.5).</translation>
     </message>
 </context>
 <context>
@@ -31957,7 +32080,7 @@ Press F3 on Controller when done.</source>
     <message>
         <location filename="../../Cloud/Withings.h" line="38"/>
         <source>Download weight, body fat etc from the connected health specialists.</source>
-        <translation>从联通的健康专家下载体重、体脂等参数.</translation>
+        <translation>从联通的健康专家下载体重,体脂等参数.</translation>
     </message>
 </context>
 <context>
@@ -31985,7 +32108,7 @@ Press F3 on Controller when done.</source>
     <message>
         <location filename="../../Cloud/WithingsDownload.cpp" line="177"/>
         <source>Error parsing Withings API response. Please check the error description.</source>
-        <translation type="unfinished"></translation>
+        <translation>解析Withings API响应错误.请检查错误描述.</translation>
     </message>
     <message>
         <source>Withings Data Download</source>
@@ -32132,7 +32255,7 @@ You can remove references when managing the library via the context menu options
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="146"/>
         <source>Total Duration including pauses a.k.a. Elapsed Time</source>
-        <translation type="unfinished"></translation>
+        <translation>包括暂停的总时间,即经过时间</translation>
     </message>
     <message>
         <source>Total Duration</source>
@@ -32526,7 +32649,7 @@ You can remove references when managing the library via the context menu options
     <message>
         <location filename="../../Metrics/BikeScore.cpp" line="57"/>
         <source>xPower is an estimate of the power that you could have maintained for the same physiological &apos;cost&apos; if your power output had been perfectly constant, similar to IsoPower.</source>
-        <translation>xPower是假定功率输出完美恒定时产生同等生理“代价”的功率,与NP类似.</translation>
+        <translation>xPower是假定功率输出完美恒定时产生同等生理&quot;代价&quot;的功率,与NP类似.</translation>
     </message>
 </context>
 <context>
@@ -32553,33 +32676,33 @@ You can remove references when managing the library via the context menu options
     <message>
         <location filename="../../Cloud/Xert.cpp" line="139"/>
         <source>JSON parser error</source>
-        <translation type="unfinished">JSON解析错误</translation>
+        <translation>JSON解析错误</translation>
     </message>
     <message>
         <location filename="../../Cloud/Xert.cpp" line="174"/>
         <source>You must authorise with Xert first</source>
-        <translation type="unfinished"></translation>
+        <translation>必须首先通过Xert授权</translation>
     </message>
     <message>
         <location filename="../../Cloud/Xert.cpp" line="478"/>
         <location filename="../../Cloud/Xert.cpp" line="569"/>
         <source>Completed.</source>
-        <translation type="unfinished">完成.</translation>
+        <translation>完成.</translation>
     </message>
     <message>
         <location filename="../../Cloud/Xert.cpp" line="571"/>
         <source>Network Error - Upload failed.</source>
-        <translation type="unfinished">网络错误 - 上传失败.</translation>
+        <translation>网络错误 - 上传失败.</translation>
     </message>
     <message>
         <location filename="../../Cloud/Xert.h" line="38"/>
         <source>Xert</source>
-        <translation type="unfinished"></translation>
+        <translation>Xert</translation>
     </message>
     <message>
         <location filename="../../Cloud/Xert.h" line="39"/>
         <source>Sync with the innovative site for fitness monitoring, tracking, and planning.</source>
-        <translation type="unfinished"></translation>
+        <translation>与健康监测,跟踪和计划的创新性网站同步.</translation>
     </message>
 </context>
 <context>
@@ -33095,7 +33218,7 @@ You can remove references when managing the library via the context menu options
     <message>
         <location filename="../../Metrics/aBikeScore.cpp" line="208"/>
         <source>Skiba&apos;s altitude adjusted stress score taking into account both the intensity and the duration of the training session plus the altitude effect, similar to aBikeStress it can be computed as 100 * hours * (aPower Relative Intensity)^2</source>
-        <translation>Skiba的海拔调整压力指数同时考虑训练的强度、长度,以及海拔效应,与aTSS类似,按照100*小时数*(aPower相对强度)^2计算</translation>
+        <translation>Skiba的海拔调整压力指数同时考虑训练的强度,长度,以及海拔效应,与aTSS类似,按照100*小时数*(aPower相对强度)^2计算</translation>
     </message>
 </context>
 <context>
@@ -33132,7 +33255,7 @@ You can remove references when managing the library via the context menu options
     <message>
         <location filename="../../Metrics/aCoggan.cpp" line="47"/>
         <source>Altitude Adjusted Iso Power is an estimate of the power that you could have maintained for the same physiological &apos;cost&apos; if your power output had been perfectly constant accounting for altitude.</source>
-        <translation>海拔调整标准化功率是考虑海拔、对能够产生同等生理“代价”的常值功率的一种估计.</translation>
+        <translation>海拔调整标准化功率是考虑海拔,对能够产生同等生理&quot;代价&quot;的常值功率的一种估计.</translation>
     </message>
 </context>
 <context>
@@ -33234,7 +33357,7 @@ You can remove references when managing the library via the context menu options
     <message>
         <location filename="../../Metrics/aBikeScore.cpp" line="56"/>
         <source>Altitude Adjusted xPower is an estimate of the power that you could have maintained for the same physiological &apos;cost&apos; if your power output had been perfectly constant at altitude, similar to aIsoPower.</source>
-        <translation>海拔调整xPower是在某一海拔假定功率输出完美恒定时产生同等生理“代价”的功率,与aNP类似.</translation>
+        <translation>海拔调整xPower是在某一海拔假定功率输出完美恒定时产生同等生理&quot;代价&quot;的功率,与aNP类似.</translation>
     </message>
 </context>
 <context>
@@ -33325,7 +33448,7 @@ You can remove references when managing the library via the context menu options
         <location filename="../../Metrics/HrvMetrics.cpp" line="521"/>
         <location filename="../../Metrics/HrvMetrics.cpp" line="522"/>
         <source>pct</source>
-        <translatorcomment>？</translatorcomment>
+        <translatorcomment>?</translatorcomment>
         <translation>%</translation>
     </message>
     <message>
@@ -33502,7 +33625,7 @@ You can remove references when managing the library via the context menu options
     <message>
         <location filename="../../Metrics/HrvMetrics.cpp" line="254"/>
         <source>Standard deviation of all NN intervals in all 5-minute segments of a 24-hour recording</source>
-        <translation>24小时记录的全部5分钟区间中，全部NN区段的标准差</translation>
+        <translation>24小时记录的全部5分钟区间中,全部NN区段的标准差</translation>
     </message>
 </context>
 <context>
@@ -33540,7 +33663,7 @@ You can remove references when managing the library via the context menu options
     <message>
         <location filename="../../Metrics/HrvMetrics.cpp" line="348"/>
         <source>Average of the standard deviations of NN intervals in all 5-minute segments of a 24-hour recording</source>
-        <translation>24小时记录的全部5分钟区间中，全部NN区段的标准差平均值</translation>
+        <translation>24小时记录的全部5分钟区间中,全部NN区段的标准差平均值</translation>
     </message>
 </context>
 <context>

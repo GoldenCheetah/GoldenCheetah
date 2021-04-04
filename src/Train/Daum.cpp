@@ -20,11 +20,13 @@
 #include "Daum.h"
 
 Daum::Daum(QObject *parent, QString device, QString profile) : QThread(parent),
-    timer_(0),
+    timer_(nullptr),
     serialDeviceName_(device),
-    serial_dev_(0),
+    serial_dev_(nullptr),
     deviceAddress_(-1),
     maxDeviceLoad_(800),
+    serialWriteDelay_(0),
+    playSound_(profile.contains("sound", Qt::CaseInsensitive)),
     paused_(false),
     devicePower_(0),
     deviceHeartRate_(0),
@@ -32,12 +34,9 @@ Daum::Daum(QObject *parent, QString device, QString profile) : QThread(parent),
     deviceSpeed_(0),
     load_(kDefaultLoad),
     loadToWrite_(kDefaultLoad),
-    forceUpdate_(profile.contains("force", Qt::CaseInsensitive)) {
-
-    this->parent = parent;
+    forceUpdate_(profile.contains("force", Qt::CaseInsensitive)),
+    profile_(profile) {
 }
-
-Daum::~Daum() {}
 
 int Daum::start() {
     QThread::start();
@@ -54,7 +53,7 @@ int Daum::pause() {
     return 0;
 }
 int Daum::stop() {
-    this->exit(-1);
+    exit(-1);
     return 0;
 }
 
@@ -113,8 +112,8 @@ double Daum::getHeartRate() const {
 
 bool Daum::openPort(QString dev) {
     QMutexLocker locker(&pvars);
-    if (serial_dev_ == 0) {
-        serial_dev_ = new QSerialPort;
+    if (serial_dev_ == nullptr) {
+        serial_dev_ = new QSerialPort();
     }
     if (serial_dev_->isOpen()) {
         serial_dev_->close();
@@ -136,7 +135,8 @@ bool Daum::openPort(QString dev) {
 
 bool Daum::closePort() {
     QMutexLocker locker(&pvars);
-    delete serial_dev_; serial_dev_ = 0;
+    delete serial_dev_;
+    serial_dev_ = nullptr;
     return true;
 }
 
@@ -148,12 +148,12 @@ void Daum::run() {
 
     {
         QMutexLocker locker(&pvars);
-        timer_ = new QTimer();
-        if (timer_ == 0) {
-            exit(-1);
+        if (timer_ == nullptr) {
+            timer_ = new QTimer();
+
+            connect(this, SIGNAL(finished()), timer_, SLOT(stop()), Qt::DirectConnection);
+            connect(timer_, SIGNAL(timeout()), this, SLOT(requestRealtimeData()), Qt::DirectConnection);
         }
-        connect(this, SIGNAL(finished()), timer_, SLOT(stop()), Qt::DirectConnection);
-        connect(timer_, SIGNAL(timeout()), this, SLOT(requestRealtimeData()), Qt::DirectConnection);
 
         // discard prev. read data
         serial_dev_->readAll();
@@ -180,6 +180,9 @@ void Daum::run() {
 }
 
 void Daum::initializeConnection() {
+
+    serialWriteDelay_ = 0;
+
     char addr = (char)GetAddress();
     {
         QMutexLocker locker(&pvars);
@@ -187,33 +190,33 @@ void Daum::initializeConnection() {
     }
     if (addr < 0) {
         qWarning() << "unable to detect device address";
-        this->exit(-1);
+        exit(-1);
     }
+
+    QThread::msleep(100);
 
     // reset device
     if (!ResetDevice()) {
         qWarning() << "reset device failed";
     }
 
+    QThread::msleep(100);
+
     // unused so far
     qDebug() << "CheckCockpit() returned " << CheckCockpit();
 
+    QThread::msleep(100);
+
     // check version info for know devices
     int dat = GetDeviceVersion();
-    switch (dat) {
-    case 0x10:
-    case 0x20:
-    case 0x30:
-    case 0x40:
-    case 0x50:
-    case 0x55:
-    case 0x60:
-        qDebug() << "Daum cockpit verison: " << dat;
-        break;
-    default:
-        qWarning() << "unable to identify daum cockpit version";
-        this->exit(-1);
-        break;  // unreached
+
+    if (configureForCockpitType(dat)) {
+        qDebug() << "Daum cockpit type: " << Qt::hex << dat;
+        qDebug() << "  Using communication delay:" << serialWriteDelay_ << "msec";
+        qDebug() << "  Playing sound:" << playSound_;
+    } else {
+        qWarning() << "unable to identify daum cockpit type" << Qt::hex << dat;
+        exit(-1);
     }
 
     if (!SetDate()) {
@@ -232,6 +235,53 @@ void Daum::initializeConnection() {
     }
 
     PlaySound();
+}
+
+bool Daum::configureForCockpitType(int cockpitType) {
+    serialWriteDelay_ = 0;
+
+    if (configureFromProfile()) {
+        // the profile string contains a valid configuration
+        return true;
+    }
+
+    switch (cockpitType) {
+    case COCKPIT_CARDIO:
+    case COCKPIT_FITNESS:
+    case COCKPIT_VITA_DE_LUXE:
+    case COCKPIT_UNKNOWN:
+    case COCKPIT_THERAPIE:
+        return true;
+    case COCKPIT_8008:
+    case COCKPIT_8080:
+    case COCKPIT_8008_TRS:
+    case COCKPIT_8008_TRS_PRO:
+        serialWriteDelay_ = 50;
+        playSound_ = true;
+        return true;
+    }
+    return false;
+}
+
+bool Daum::configureFromProfile() {
+    QRegularExpression re("(\\d+)");
+    QRegularExpressionMatch match = re.match(profile_);
+    bool ok = false;
+
+    if (!match.hasMatch() || match.lastCapturedIndex() == 0) {
+        // no delay found in the profile
+
+        // if the string sound was found, use delay 0 and enable sound
+        return playSound_;
+    }
+
+    uint delay = match.captured(1).toUInt(&ok);
+    if (ok) {
+        // use the matched number found as the command delay
+        serialWriteDelay_ = delay;
+    }
+
+    return true;
 }
 
 void Daum::requestRealtimeData() {
@@ -255,10 +305,10 @@ void Daum::requestRealtimeData() {
     }
 
     // local cache of telemetry data
-    int pwr = data[5];
-    int rpm = data[6];
+    int pwr = (unsigned char) data[5];
+    int rpm = (unsigned char) data[6];
     int speed = data[7];
-    int pulse = data[14];
+    int pulse = (unsigned char) data[14];
 
     // sanity check
     if (pwr >= 5 && pwr <= 160) {
@@ -389,11 +439,12 @@ bool Daum::SetTime() {
     return WriteDataAndGetAnswer(dat, 2).length() == 2;
 }
 void Daum::PlaySound() {
-    return;
-    // might be buggy in device
-    QByteArray dat;
-    dat.append((char)0xd3).append((char)   0).append((char)   0);
-    WriteDataAndGetAnswer(dat, 0);
+    if (playSound_) {
+        // might be buggy in device
+        QByteArray dat;
+        dat.append((char)0xd3).append((char)0x27).append((char)0x10);
+        WriteDataAndGetAnswer(dat, 2);
+    }
 }
 
 char Daum::MapLoadToByte(unsigned int load) const {
@@ -414,11 +465,14 @@ QByteArray Daum::WriteDataAndGetAnswer(QByteArray const& dat, int response_bytes
     if (!s.isOpen()) {
         return ret;
     }
+
+    QThread::msleep(serialWriteDelay_);
     s.write(dat);
     if(!s.waitForBytesWritten(1000)) {
         qWarning() << "failed to write data to daum cockpit";
-        this->exit(-1);
+        exit(-1);
     }
+
     if (response_bytes > 0) {
         int retries = 20;
         do {

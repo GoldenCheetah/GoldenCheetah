@@ -738,10 +738,10 @@ CloudDBChartListDialog::updateCurrentPresets(int index, int count) {
         tableWidget->setRowHeight(i, chartImageHeight+20);
 
         QString cellText = QString(tr("<h3>%1</h3><h4>Last Edited At: %2 - Creator: %3</h4>%4"))
-                .arg(encodeHTML(preset.name))
+                .arg(CloudDBCommon::encodeHTML(preset.name))
                 .arg(preset.createdAt.date().toString(Qt::ISODate))
-                .arg(encodeHTML(preset.creatorNick))
-                .arg(encodeHTML(preset.description));
+                .arg(CloudDBCommon::encodeHTML(preset.creatorNick))
+                .arg(CloudDBCommon::encodeHTML(preset.description));
 
         QTextEdit *formattedText = new QTextEdit;
         formattedText->setHtml(cellText);
@@ -1171,41 +1171,6 @@ CloudDBChartListDialog::cellDoubleClicked(int row, int /*column */) {
 }
 
 
-QString
-CloudDBChartListDialog::encodeHTML ( const QString& encodeMe )
-{
-    QString temp;
-
-    for (int index(0); index < encodeMe.size(); index++)
-    {
-        QChar character(encodeMe.at(index));
-
-        switch (character.unicode())
-        {
-        case '&':
-            temp += "&amp;"; break;
-
-        case '\'':
-            temp += "&apos;"; break;
-
-        case '"':
-            temp += "&quot;"; break;
-
-        case '<':
-            temp += "&lt;"; break;
-
-        case '>':
-            temp += "&gt;"; break;
-
-        default:
-            temp += character;
-            break;
-        }
-    }
-
-    return temp;
-}
-
 CloudDBChartShowPictureDialog::CloudDBChartShowPictureDialog(QByteArray imageData) : imageData(imageData) {
 
     QRect rec = QApplication::desktop()->screenGeometry();
@@ -1318,8 +1283,8 @@ CloudDBChartObjectDialog::CloudDBChartObjectDialog(ChartAPIv1 data, QString athl
 
        email->setText(appsettings->cvalue(athlete, GC_CLOUDDB_EMAIL, "").toString());
    }
-   // regexp: simple e-mail validation / also allow long domain types
-   QRegExp email_rx("^.+@[a-zA-Z_]+\\.[a-zA-Z]{2,10}$");
+   // regexp: simple e-mail validation / also allow long domain types & subdomains
+   QRegExp email_rx("^.+@([a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,10}$");
    QValidator *email_validator = new QRegExpValidator(email_rx, this);
    email->setValidator(email_validator);
    emailOk = !email->text().isEmpty(); // email from properties is ok when loaded

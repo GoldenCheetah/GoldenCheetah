@@ -31,7 +31,7 @@
 // BikeScore in "Analysis of Power Output and Training Stress in Cyclists: The
 // Development of the BikeScore(TM) Algorithm", page 5, by Phil Skiba:
 //
-// http://www.physfarm.com/Analysis%20of%20Power%20Output%20and%20Training%20Stress%20in%20Cyclists-%20BikeScore.pdf
+// https://github.com/GoldenCheetah/GoldenCheetah/blob/master/doc/user/bikescore.pdf
 //
 // The weighting factors for the exponentially weighted average are taken from
 // a spreadsheet provided by Dr. Skiba.

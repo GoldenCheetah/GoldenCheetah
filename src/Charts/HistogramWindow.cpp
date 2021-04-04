@@ -64,6 +64,8 @@ HistogramWindow::HistogramWindow(Context *context, bool rangemode) : GcChartWind
     //
 
     // reveal controls
+    QLabel *rSeriesLabel = new QLabel(tr("Data Series"), this);
+    rSeriesSelector = new QxtStringSpinBox();
     rWidth = new QLabel(tr("Bin Width"));
     rBinEdit = new QLineEdit();
     rBinEdit->setFixedWidth(40);
@@ -79,14 +81,22 @@ HistogramWindow::HistogramWindow(Context *context, bool rangemode) : GcChartWind
     QHBoxLayout *r = new QHBoxLayout;
     r->setContentsMargins(0,0,0,0);
     r->addStretch();
-    r->addWidget(rWidth);
-    r->addWidget(rBinEdit);
-    r->addWidget(rBinSlider);
-    QVBoxLayout *v = new QVBoxLayout;
-    v->addWidget(rShade);
-    v->addWidget(rZones);
+    QVBoxLayout *v1 = new QVBoxLayout;
+    QHBoxLayout *h1 = new QHBoxLayout;
+    h1->addWidget(rSeriesLabel);
+    h1->addWidget(rSeriesSelector);
+    v1->addLayout(h1);
+    QHBoxLayout *h2 = new QHBoxLayout;
+    h2->addWidget(rWidth);
+    h2->addWidget(rBinEdit);
+    h2->addWidget(rBinSlider);
+    v1->addLayout(h2);
+    r->addLayout(v1);
+    QVBoxLayout *v2 = new QVBoxLayout;
+    v2->addWidget(rShade);
+    v2->addWidget(rZones);
     r->addSpacing(20);
-    r->addLayout(v);
+    r->addLayout(v2);
     r->addStretch();
     setRevealLayout(r);
 
@@ -327,6 +337,7 @@ HistogramWindow::HistogramWindow(Context *context, bool rangemode) : GcChartWind
     connect(showLnY, SIGNAL(stateChanged(int)), this, SLOT(forceReplot()));
     connect(showZeroes, SIGNAL(stateChanged(int)), this, SLOT(forceReplot()));
     connect(seriesCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(seriesChanged()));
+    connect(rSeriesSelector, SIGNAL(valueChanged(int)), this, SLOT(rSeriesSelectorChanged(int)));
     connect(showInCPZones, SIGNAL(stateChanged(int)), this, SLOT(setCPZoned(int)));
     connect(showInCPZones, SIGNAL(stateChanged(int)), this, SLOT(forceReplot()));
     connect(showInZones, SIGNAL(stateChanged(int)), this, SLOT(setZoned(int)));
@@ -693,6 +704,9 @@ HistogramWindow::treeSelectionChanged()
 void
 HistogramWindow::seriesChanged()
 {
+    // update reveal control
+    rSeriesSelector->setValue(seriesCombo->currentIndex());
+
     // series changed so tell power hist
     powerHist->setSeries(static_cast<RideFile::SeriesType>(seriesCombo->itemData(seriesCombo->currentIndex()).toInt()));
     powerHist->setDelta(getDelta());
@@ -707,6 +721,13 @@ HistogramWindow::seriesChanged()
     // replot
     stale = true;
     updateChart();
+}
+
+void
+HistogramWindow::rSeriesSelectorChanged(int value)
+{
+    seriesCombo->setCurrentIndex(value);
+    seriesChanged();
 }
 
 //
@@ -852,8 +873,14 @@ void HistogramWindow::addSeries()
                << RideFile::smo2
                << RideFile::wbal;
 
-    foreach (RideFile::SeriesType x, seriesList) 
+    QStringList seriesNames;
+
+    foreach (RideFile::SeriesType x, seriesList) {
         seriesCombo->addItem(RideFile::seriesName(x), static_cast<int>(x));
+        seriesNames << RideFile::seriesName(x);
+    }
+
+    rSeriesSelector->setStrings(seriesNames);
 }
 
 void
@@ -945,8 +972,7 @@ HistogramWindow::updateChart()
 
     // If no data present show the blank state page
     if (!rangemode) {
-        RideFile::SeriesType baseSeries = (series == RideFile::wattsKg || series == RideFile::wbal) ? RideFile::watts : series;
-        if (rideItem() != NULL && rideItem()->ride()->isDataPresent(baseSeries))
+        if (rideItem() != NULL)
             setIsBlank(false);
         else
             setIsBlank(true);

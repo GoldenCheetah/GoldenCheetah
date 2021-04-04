@@ -173,9 +173,9 @@ RideFileTableModel::setHeadings(RideFile::SeriesType series)
             headings_ << tr("Left Peak Power Phase End");
             headingsType << RideFile::lpppe;
         }
-        if (series == RideFile::lpppb || ride->areDataPresent()->rpppb) {
+        if (series == RideFile::rpppb || ride->areDataPresent()->rpppb) {
             headings_ << tr("Right Peak Power Phase Start");
-            headingsType << RideFile::lpppb;
+            headingsType << RideFile::rpppb;
         }
         if (series == RideFile::rpppe || ride->areDataPresent()->rpppe) {
             headings_ << tr("Right Peak Power Phase End");

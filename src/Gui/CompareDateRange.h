@@ -31,7 +31,7 @@ class RideFileCache;
 class CompareDateRange
 {
     public:
-        CompareDateRange() : context(NULL), days(0), sourceContext(NULL), checked(false), cache(NULL) {}
+        CompareDateRange() : context(NULL), sourceContext(NULL), checked(false), cache(NULL) {}
         ~CompareDateRange();
 
         Context *context;
@@ -39,7 +39,6 @@ class CompareDateRange
         QColor color;
         Specification specification;
         QDate start, end;
-        int days;
         Context *sourceContext;
         bool checked;
 

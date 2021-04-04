@@ -21,6 +21,7 @@
 #include "Settings.h"
 #include "Units.h"
 #include "HelpWhatsThis.h"
+#include "LocationInterpolation.h"
 #include <algorithm>
 #include <QVector>
 
@@ -143,8 +144,10 @@ class FixDerivePowerConfig : public DataProcessorConfig
                               "wind speed shall be indicated in kph\n"
                               "wind direction (origin) unit is degrees "
                               "from -179 to +180 (-90=W, 0=N, 90=E, 180=S)\n"
-                              "Note: if the ride file already contain wind data\n"
-                              "      it will be overridden if wind is entered manually")));
+                              "Note: when the file already contains wind data, "
+                              "it will be overridden if wind speed is set\n\n"
+                              "The activity has to be a Ride with Speed and "
+                              "Altitude.")));
         }
 
         void readConfig() {
@@ -183,7 +186,8 @@ class FixDerivePower : public DataProcessor {
         bool postProcess(RideFile *, DataProcessorConfig* config, QString op);
 
         // the config widget
-        DataProcessorConfig* processorConfig(QWidget *parent) {
+        DataProcessorConfig* processorConfig(QWidget *parent, const RideFile * ride = NULL) {
+            Q_UNUSED(ride);
             return new FixDerivePowerConfig(parent);
         }
 
@@ -226,16 +230,16 @@ FixDerivePower::postProcess(RideFile *ride, DataProcessorConfig *config=0, QStri
     // Do nothing for swims and runs
     if (ride->isSwim() || ride->isRun()) return false;
 
-    // if its already there do nothing !
-    if (ride->areDataPresent()->watts) return false;
+    // if called automatically and power already present, do nothing !
+    if (!config && ride->areDataPresent()->watts) return false;
 
     // no dice if we don't have alt and speed
     if (!ride->areDataPresent()->alt || !ride->areDataPresent()->kph) return false;
 
     // Power Estimation Constants (mostly constants...)
     double hRider = ride->getHeight(); //Height in m
-    double M = ride->getWeight(); //Weight kg
-    double T = 15; //Temp degC in not in ride data
+    double M = ride->getWeight() + MBik; //Total Mass kg
+    double T = 15; // Temp degC if not in ride data
     double W = 0;  // headwind (from records or based on wind parameters entered manually)
     double bearing = 0.0; //cyclist direction used to compute headwind
     double cCad=.002;
@@ -255,8 +259,7 @@ FixDerivePower::postProcess(RideFile *ride, DataProcessorConfig *config=0, QStri
     // apply the change
     ride->command->startLUW("Estimate Power");
 
-    if (ride->areDataPresent()->slope && ride->areDataPresent()->alt
-     && ride->areDataPresent()->km) {
+    if (ride->areDataPresent()->slope) {
         for (int i=0; i<ride->dataPoints().count(); i++) {
             RideFilePoint *p = ride->dataPoints()[i];
 
@@ -266,11 +269,16 @@ FixDerivePower::postProcess(RideFile *ride, DataProcessorConfig *config=0, QStri
                 RideFilePoint *prevPoint = ride->dataPoints()[i-1];
 
                 // ensure a movement occurred and valid lat/lon in order to compute cyclist direction
-                if (  (prevPoint->lat != p->lat || prevPoint->lon != p->lon )
-                   && (prevPoint->lat != 0 || prevPoint->lon != 0 )
-                   && (p->lat != 0 || p->lon != 0 ) )
-                            bearing = atan2(cos(p->lat)*sin(p->lon - prevPoint->lon),
-                                            cos(prevPoint->lat)*sin(p->lat)-sin(prevPoint->lat)*cos(p->lat)*cos(p->lon - prevPoint->lon));
+                if ( prevPoint->lat != p->lat || prevPoint->lon != p->lon ) 
+                {
+                    geolocation prevLoc(prevPoint->lat, prevPoint->lon, prevPoint->alt);
+                    geolocation loc(p->lat, p->lon, p->alt);
+
+                    if (prevLoc.IsReasonableGeoLocation() && loc.IsReasonableGeoLocation()) 
+                    {
+                        bearing = prevLoc.BearingTo(loc);
+                    }
+                }
             }
             // else keep previous bearing (or 0 at the beginning)
 
@@ -291,7 +299,7 @@ FixDerivePower::postProcess(RideFile *ride, DataProcessorConfig *config=0, QStri
                 double CrDyn = 0.1 * cos(Slope);
 
                 double Ka;
-                double Frg = 9.81 * (MBik + M) * (CrEff * cos(Slope) + sin(Slope));
+                double Frg = 9.81 * M * (CrEff * cos(Slope) + sin(Slope));
 
                 double vw=V+W; // Wind speed against cyclist = cyclist speed + wind speed
 

@@ -22,7 +22,7 @@
 
 FortiusController::FortiusController(TrainSidebar *parent,  DeviceConfiguration *dc) : RealtimeController(parent, dc)
 {
-    myFortius = new Fortius (parent);
+    myFortius = new Fortius (this);
 }
 
 
@@ -79,19 +79,16 @@ FortiusController::getRealtimeData(RealtimeData &rtData)
     // Added Distance and Steering here but yet to RealtimeData
 
     int Buttons, Status, Steering;
-    double Power, HeartRate, Cadence, Speed, Distance;
+    double Power, Force_N, HeartRate, Cadence, Speed, Distance;
 
     if(!myFortius->isRunning())
     {
-        QMessageBox msgBox;
-        msgBox.setText(tr("Cannot Connect to Fortius"));
-        msgBox.setIcon(QMessageBox::Critical);
-        msgBox.exec();
+        emit setNotification(tr("Cannot Connect to Fortius"), 2);
         parent->Stop(1);
         return;
     }
     // get latest telemetry
-    myFortius->getTelemetry(Power, HeartRate, Cadence, Speed, Distance, Buttons, Steering, Status);
+    myFortius->getTelemetry(Power, Force_N, HeartRate, Cadence, Speed, Distance, Buttons, Steering, Status);
 
     //
     // PASS BACK TELEMETRY
@@ -156,3 +153,206 @@ FortiusController::setMode(int mode)
     
     myFortius->setMode(mode);
 }
+
+void
+FortiusController::setWeight(double weight)
+{
+    myFortius->setWeight(weight);
+
+}
+
+void
+FortiusController::setWindSpeed(double speed)
+{
+    myFortius->setWindSpeed(speed);
+}
+
+void
+FortiusController::setRollingResistance(double rollingResistance)
+{
+    myFortius->setRollingResistance(rollingResistance);
+}
+
+void
+FortiusController::setWindResistance(double windResistance)
+{
+    myFortius->setWindResistance(windResistance);
+}
+
+
+
+// Calibration
+
+uint8_t
+FortiusController::getCalibrationType()
+{
+    return CALIBRATION_TYPE_FORTIUS;
+}
+
+double
+FortiusController::getCalibrationTargetSpeed()
+{
+    return 20; // kph
+}
+
+uint8_t
+FortiusController::getCalibrationState()
+{
+    return m_calibrationState;
+}
+
+void
+FortiusController::setCalibrationState(uint8_t state)
+{
+    m_calibrationState = state;
+    switch (state)
+    {
+    case CALIBRATION_STATE_IDLE:
+        myFortius->setMode(FT_IDLE);
+        break;
+
+    case CALIBRATION_STATE_PENDING:
+        myFortius->setMode(FT_CALIBRATE);
+        m_calibrationState = CALIBRATION_STATE_REQUESTED;
+        break;
+
+    default:
+        break;
+    }
+}
+
+uint16_t
+FortiusController::getCalibrationZeroOffset()
+{
+    switch (m_calibrationState)
+    {
+        // Waiting for user to kick pedal, or speed to decay...
+        case CALIBRATION_STATE_REQUESTED:
+        {
+            int Buttons, Status, Steering;
+            double Power, Force_N, HeartRate, Cadence, SpeedKmh, Distance;
+            myFortius->getTelemetry(Power, Force_N, HeartRate, Cadence, SpeedKmh, Distance, Buttons, Steering, Status);
+
+            // Once we're at target speed (only takes a second or so), move on to next stage
+            if (SpeedKmh > 0.995 * getCalibrationTargetSpeed() && SpeedKmh < 1.005 * getCalibrationTargetSpeed()) // Within 0.005 of the target speed
+            {
+                m_calibrationValues.reset();
+                m_calibrationState = CALIBRATION_STATE_STARTING;
+            }
+
+            // Return value to determine message to user in the GUI
+            //  -  0 instructs user to "Give the pedal a kick"
+            //  - >0 instructs user to "Allow wheel speed to settle"
+            return SpeedKmh;
+        }
+
+        // Calibration starting, waiting until we have enough values
+        case CALIBRATION_STATE_STARTING:
+        {
+            // Get current force value
+            int Buttons, Status, Steering;
+            double Power, Force_N, HeartRate, Cadence, SpeedKmh, Distance;
+            myFortius->getTelemetry(Power, Force_N, HeartRate, Cadence, SpeedKmh, Distance, Buttons, Steering, Status);
+
+            // unexpected drop in wheel speed will cause calibration to terminate
+            if (SpeedKmh < 0.9 * getCalibrationTargetSpeed()) // 10% underspeed would be considered an error case
+            {
+                m_calibrationState = CALIBRATION_STATE_FAILURE;
+                return 0;
+            }
+
+            // Push onto the list of recent values
+            m_calibrationValues.update(Force_N);
+
+            // If we have enough values, move on to next stage
+            if (m_calibrationValues.is_full())
+            {
+                m_calibrationState = CALIBRATION_STATE_STARTED;
+                m_calibrationStarted = time(nullptr);
+            }
+
+            // Return value for presentation in the GUI
+            // Need to return a uint16_t, use +ve rawForce
+            return Fortius::N_to_rawForce(-Force_N);
+        }
+
+        // Calibration started, runs until standard deviation is below some threshold
+        case CALIBRATION_STATE_STARTED:
+        {
+            // Get current force value
+            int Buttons, Status, Steering;
+            double Power, Force_N, HeartRate, Cadence, SpeedKmh, Distance;
+            myFortius->getTelemetry(Power, Force_N, HeartRate, Cadence, SpeedKmh, Distance, Buttons, Steering, Status);
+
+            // Push onto the list of recent values
+            m_calibrationValues.update(Force_N);
+
+            // unexpected resistance (pedalling) will cause calibration to terminate
+            if (Force_N > 0)
+            {
+                m_calibrationState = CALIBRATION_STATE_FAILURE;
+                return 0;
+            }
+
+            // unexpected drop in wheel speed will cause calibration to terminate
+            if (SpeedKmh < 0.9 * getCalibrationTargetSpeed()) // 10% underspeed would be considered an error case
+            {
+                m_calibrationState = CALIBRATION_STATE_FAILURE;
+                return 0;
+            }
+
+            // calculate the average
+            const double mean   = m_calibrationValues.mean();
+            const double stddev = m_calibrationValues.stddev();
+
+            // wait until stddev within threshold
+            // perhaps this isn't the best numerical solution to detect settling
+            // but it's better than the previous attempt which was based on diff(min/max)
+            // I'd prefer a tighter threshold, eg 0.02
+            // but runtime would be too long for users, especially from cold
+            static const double stddev_threshold = 0.05;
+
+            // termination (settling) conditions
+            const time_t calibrationDuration = time(nullptr) - m_calibrationStarted;
+            if (stddev < stddev_threshold || calibrationDuration > calibrationDurationLimit_s)
+            {
+                // TODO... just because we have determined the current value
+                // doesn't mean it's "right"... TTS4 had a red-green bar and
+                // plotted the value on that bar, and user was to adjust wheel
+                // pressure if it was outside the green range.
+
+                // Source: https://github.com/totalreverse/ttyT1941/wiki
+                //   ; If the 'gauge' of the calibration screen is perfect in the
+                //   ; "green" middle of the calibration bar, then TTS4 sets the
+                //   ; calibration value to 0x0492 (= 90*13) 
+
+
+                // accept the current average as the final valibration value
+                // Note: call setBrakeCalibrationForce() with +ve value
+                myFortius->setBrakeCalibrationForce(-mean);
+
+                // complete calibration
+                m_calibrationState = CALIBRATION_STATE_SUCCESS;
+                myFortius->setMode(FT_IDLE);
+            }
+
+            // Return value for presentation in the GUI
+            // Need to return a uint16_t, use +ve rawForce
+            return Fortius::N_to_rawForce(-mean);
+        }
+
+        case CALIBRATION_STATE_SUCCESS:
+            return Fortius::N_to_rawForce(myFortius->getBrakeCalibrationForce());
+
+        default:
+            return 0;
+    }
+}
+
+void
+FortiusController::resetCalibrationState()
+{
+    m_calibrationState = CALIBRATION_STATE_IDLE;
+    myFortius->setMode(FT_IDLE);
+}
+

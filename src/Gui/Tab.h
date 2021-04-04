@@ -24,14 +24,18 @@
 
 class RideNavigator;
 class MainWindow;
+class AthleteLoader;
 class ProgressLine;
 class QPaintEvent;
+class NavigationModel;
 
 class Tab: public QWidget
 {
     Q_OBJECT
 
     public:
+
+        bool init; // am I ready yet?
 
         Tab(Context *context);
         ~Tab();
@@ -41,14 +45,21 @@ class Tab: public QWidget
         int currentView() { return views->currentIndex(); }
         TabView *view(int index);
 
+        NavigationModel *nav; // back/forward for this tab
         RideNavigator *rideNavigator(); // to get logical headings
 
     protected:
 
         friend class ::MainWindow;
+        friend class ::NavigationModel;
+        friend class ::AthleteLoader;
         Context *context;
 
     signals:
+
+        void viewChanged(int);
+        void rideItemSelected(RideItem*);
+        void dateRangeSelected(DateRange);
 
     public slots:
 
@@ -56,6 +67,7 @@ class Tab: public QWidget
 
         // set Ride
         void setRide(RideItem*);
+        void setNoSwitch(bool x) { noswitch = x; }
 
         // tile mode
         void setTiled(bool);
@@ -84,6 +96,9 @@ class Tab: public QWidget
 
     private:
 
+        // constructor finished and navigation
+        // model isn't undo/redo ride selection
+        bool noswitch;
 
         // Each of the views
         QStackedWidget *views;

@@ -62,7 +62,8 @@ class AllPlotWindow : public GcChartWindow
     Q_PROPERTY(int stackWidth READ _stackWidth WRITE setStackWidth USER true)
     Q_PROPERTY(int showGrid READ isShowGrid WRITE setShowGrid USER true)
     Q_PROPERTY(int showFull READ isShowFull WRITE setShowFull USER true)
-    Q_PROPERTY(int showInterval READ isShowInterval WRITE setShowInterval USER true)
+    Q_PROPERTY(int showIntervalMarkers READ isShowIntervalMarkers WRITE setShowIntervalMarkers USER true)
+    Q_PROPERTY(int showIntervalNavigator READ isShowIntervalNavigator WRITE setShowIntervalNavigator USER true)
     Q_PROPERTY(int hovering READ isHovering WRITE setHovering USER true)
     Q_PROPERTY(int showHelp READ isShowHelp WRITE setShowHelp USER true)
     Q_PROPERTY(int showATISS READ isShowATISS WRITE setShowATISS USER true)
@@ -78,7 +79,6 @@ class AllPlotWindow : public GcChartWindow
     Q_PROPERTY(int showSlope READ isShowSlope WRITE setShowSlope USER true)
     Q_PROPERTY(int showAltSlope READ isShowAltSlope WRITE setShowAltSlope USER true)
     Q_PROPERTY(int showHr READ isShowHr WRITE setShowHr USER true)
-    Q_PROPERTY(int showHRV READ isShowHRV WRITE setShowHRV USER true)
     Q_PROPERTY(int showTcore READ isShowTcore WRITE setShowTcore USER true)
     Q_PROPERTY(int showCadD READ isShowCadD WRITE setShowCadD USER true)
     Q_PROPERTY(int showTorqueD READ isShowTorqueD WRITE setShowTorqueD USER true)
@@ -130,7 +130,8 @@ class AllPlotWindow : public GcChartWindow
         int _stackWidth() const { return stackWidth; }
         int isShowGrid() const { return showGrid->checkState(); }
         int isShowFull() const { return showFull->checkState(); }
-        int isShowInterval() const { return showInterval->checkState(); }
+        int isShowIntervalMarkers() const { return showIntervalMarkers->checkState(); }
+        int isShowIntervalNavigator() const { return showIntervalNavigator->checkState(); }
         int isShowHelp() const { return showHelp->checkState(); }
         int isShowATISS() const { return showATISS->checkState(); }
         int isShowANTISS() const { return showANTISS->checkState(); }
@@ -146,7 +147,6 @@ class AllPlotWindow : public GcChartWindow
         int isShowCad() const { return showCad->checkState(); }
         int isShowTorque() const { return showTorque->checkState(); }
         int isShowHr() const { return showHr->checkState(); }
-        int isShowHRV() const { return showHRV->checkState(); }
         int isShowTcore() const { return showTcore->checkState(); }
         int isShowPowerD() const { return showPowerD->checkState(); }
         int isShowCadD() const { return showCadD->checkState(); }
@@ -206,7 +206,6 @@ class AllPlotWindow : public GcChartWindow
         void setShowCad(int state);
         void setShowTorque(int state);
         void setShowHr(int state);
-        void setShowHRV(int state);
         void setShowTcore(int state);
         void setShowPowerD(int state);
         void setShowCadD(int state);
@@ -230,7 +229,8 @@ class AllPlotWindow : public GcChartWindow
         void setShowGrid(int state);
         void setPaintBrush(int state);
         void setShowFull(int state);
-        void setShowInterval(int state);
+        void setShowIntervalNavigator(int state);
+        void setShowIntervalMarkers(int state);
         void setShowHelp(int state);
         void setSmoothing(int value);
         void setByDistance(int value);
@@ -322,7 +322,8 @@ class AllPlotWindow : public GcChartWindow
         QCheckBox *showBySeries;
         QCheckBox *showGrid;
         QCheckBox *showFull;
-        QCheckBox *showInterval;
+        QCheckBox *showIntervalMarkers;
+        QCheckBox *showIntervalNavigator;
         QCheckBox *showHelp;
         QCheckBox *paintBrush;
         QCheckBox *showAlt;
@@ -339,7 +340,6 @@ class AllPlotWindow : public GcChartWindow
         QCheckBox *showCad;
         QCheckBox *showTorque;
         QCheckBox *showHr;
-        QCheckBox *showHRV;
         QCheckBox *showTcore;
         QCheckBox *showPowerD;
         QCheckBox *showCadD;

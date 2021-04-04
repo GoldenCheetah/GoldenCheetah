@@ -60,11 +60,11 @@ ConfigDialog::ConfigDialog(QDir _home, Context *context) :
 
     // icons
     static QIcon generalIcon(QPixmap(":images/toolbar/GeneralPreferences.png"));
-    static QIcon athleteIcon(QPixmap(":/images/toolbar/user.png"));
     static QIcon appearanceIcon(QPixmap(":/images/toolbar/color.png"));
     static QIcon dataIcon(QPixmap(":/images/toolbar/data.png"));
     static QIcon metricsIcon(QPixmap(":/images/toolbar/abacus.png"));
     static QIcon intervalIcon(QPixmap(":/images/stopwatch.png"));
+    static QIcon measuresIcon(QPixmap(":/images/toolbar/main/measures.png"));
     static QIcon devicesIcon(QPixmap(":/images/devices/kickr.png"));
 
     // Setup the signal mapping so the right config
@@ -81,23 +81,23 @@ ConfigDialog::ConfigDialog(QDir _home, Context *context) :
     connect(added, SIGNAL(triggered()), iconMapper, SLOT(map()));
     iconMapper->setMapping(added, 0);
 
-    added =head->addAction(athleteIcon, tr("Athlete"));
+    added =head->addAction(appearanceIcon, tr("Appearance"));
     connect(added, SIGNAL(triggered()), iconMapper, SLOT(map()));
     iconMapper->setMapping(added, 1);
 
-    added =head->addAction(appearanceIcon, tr("Appearance"));
+    added =head->addAction(dataIcon, tr("Data Fields"));
     connect(added, SIGNAL(triggered()), iconMapper, SLOT(map()));
     iconMapper->setMapping(added, 2);
 
-    added =head->addAction(dataIcon, tr("Data Fields"));
+    added =head->addAction(metricsIcon, tr("Metrics"));
     connect(added, SIGNAL(triggered()), iconMapper, SLOT(map()));
     iconMapper->setMapping(added, 3);
 
-    added =head->addAction(metricsIcon, tr("Metrics"));
+    added =head->addAction(intervalIcon, tr("Intervals"));
     connect(added, SIGNAL(triggered()), iconMapper, SLOT(map()));
     iconMapper->setMapping(added, 4);
 
-    added =head->addAction(intervalIcon, tr("Intervals"));
+    added =head->addAction(measuresIcon, tr("Measures"));
     connect(added, SIGNAL(triggered()), iconMapper, SLOT(map()));
     iconMapper->setMapping(added, 5);
 
@@ -121,15 +121,6 @@ ConfigDialog::ConfigDialog(QDir _home, Context *context) :
     general->setWhatsThis(generalHelp->getWhatsThisText(HelpWhatsThis::Preferences_General));
     pagesWidget->addWidget(general);
 
-    athlete = new AthleteConfig(_home, context);
-    HelpWhatsThis *athleteHelp = new HelpWhatsThis(athlete);
-    athlete->setWhatsThis(athleteHelp->getWhatsThisText(HelpWhatsThis::Preferences_Athlete_About));
-    pagesWidget->addWidget(athlete);
-
-    // units change on general affects units used on entry in athlete pages
-    connect (general->generalPage->unitCombo, SIGNAL(currentIndexChanged(int)), athlete->athletePage, SLOT(unitChanged(int)));
-    connect (general->generalPage->unitCombo, SIGNAL(currentIndexChanged(int)), athlete->athletePhysPage, SLOT(unitChanged(int)));
-
     appearance = new AppearanceConfig(_home, context);
     HelpWhatsThis *appearanceHelp = new HelpWhatsThis(appearance);
     appearance->setWhatsThis(appearanceHelp->getWhatsThisText(HelpWhatsThis::Preferences_Appearance));
@@ -149,6 +140,11 @@ ConfigDialog::ConfigDialog(QDir _home, Context *context) :
     HelpWhatsThis *intervalHelp = new HelpWhatsThis(interval);
     interval->setWhatsThis(intervalHelp->getWhatsThisText(HelpWhatsThis::Preferences_Intervals));
     pagesWidget->addWidget(interval);
+
+    measures = new MeasuresConfig(_home, context);
+    HelpWhatsThis *measuresHelp = new HelpWhatsThis(measures);
+    measures->setWhatsThis(intervalHelp->getWhatsThisText(HelpWhatsThis::Preferences_Measures));
+    pagesWidget->addWidget(measures);
 
     train = new TrainConfig(_home, context);
     HelpWhatsThis *trainHelp = new HelpWhatsThis(train);
@@ -189,6 +185,12 @@ ConfigDialog::ConfigDialog(QDir _home, Context *context) :
     connect(saveButton, SIGNAL(clicked()), this, SLOT(saveClicked()));
 }
 
+ConfigDialog::~ConfigDialog()
+{
+    // hack for raise event
+    configdialog_ptr = NULL;
+}
+
 void ConfigDialog::changePage(int index)
 {
     pagesWidget->setCurrentIndex(index);
@@ -196,9 +198,6 @@ void ConfigDialog::changePage(int index)
 
 void ConfigDialog::closeClicked()
 {
-    // hack for raise event
-    configdialog_ptr = NULL;
-
     // don't save!
     close();
 }
@@ -215,12 +214,12 @@ void ConfigDialog::saveClicked()
     qint32 changed = 0;
 
     changed |= general->saveClicked();
-    changed |= athlete->saveClicked();
     changed |= appearance->saveClicked();
     changed |= metric->saveClicked();
     changed |= data->saveClicked();
     changed |= train->saveClicked();
     changed |= interval->saveClicked();
+    changed |= measures->saveClicked();
 
     hide();
 
@@ -267,8 +266,10 @@ void ConfigDialog::saveClicked()
 
     } 
 
-    // we're done.
-    context->notifyConfigChanged(changed);
+    // global context changed, will be cascaded to each athlete context
+    GlobalContext::context()->notifyConfigChanged(changed);
+
+    // done.
     close();
 }
 
@@ -287,94 +288,6 @@ GeneralConfig::GeneralConfig(QDir home, Context *context) :
 qint32 GeneralConfig::saveClicked()
 {
     return generalPage->saveClicked();
-}
-
-// ATHLETE CONFIG
-AthleteConfig::AthleteConfig(QDir home, Context *context) :
-    home(home), context(context)
-{
-    //static QIcon passwordIcon(QPixmap(":/images/toolbar/cloud.png")); //Not used for now
-
-    // the widgets
-    athletePage = new AboutRiderPage(this, context);
-    HelpWhatsThis *athleteHelp = new HelpWhatsThis(athletePage);
-    athletePage->setWhatsThis(athleteHelp->getWhatsThisText(HelpWhatsThis::Preferences_Athlete_About));
-
-    modelPage = new AboutModelPage(context);
-    HelpWhatsThis *athleteModelHelp = new HelpWhatsThis(modelPage);
-    modelPage->setWhatsThis(athleteModelHelp->getWhatsThisText(HelpWhatsThis::Preferences_Athlete_About_Model));
-
-    athletePhysPage = new RiderPhysPage(this, context);
-    HelpWhatsThis *athletePhysHelp = new HelpWhatsThis(athletePhysPage);
-    athletePhysPage->setWhatsThis(athletePhysHelp->getWhatsThisText(HelpWhatsThis::Preferences_Athlete_About_Phys));
-
-    hrvPage = new HrvPage(this, context);
-    HelpWhatsThis *hrvHelp = new HelpWhatsThis(hrvPage);
-    hrvPage->setWhatsThis(hrvHelp->getWhatsThisText(HelpWhatsThis::Preferences_Athlete_Hrv));
-
-    zonePage = new ZonePage(context);
-    HelpWhatsThis *zoneHelp = new HelpWhatsThis(zonePage);
-    zonePage->setWhatsThis(zoneHelp->getWhatsThisText(HelpWhatsThis::Preferences_Athlete_TrainingZones_Power));
-
-    hrZonePage = new HrZonePage(context);
-    HelpWhatsThis *hrZoneHelp = new HelpWhatsThis(hrZonePage);
-    hrZonePage->setWhatsThis(hrZoneHelp->getWhatsThisText(HelpWhatsThis::Preferences_Athlete_TrainingZones_HR));
-
-    paceZonePage = new PaceZonePage(context);
-    HelpWhatsThis *paceZoneHelp = new HelpWhatsThis(paceZonePage);
-    paceZonePage->setWhatsThis(paceZoneHelp->getWhatsThisText(HelpWhatsThis::Preferences_Athlete_TrainingZones_Pace));
-
-    credentialsPage = new CredentialsPage(context);
-    HelpWhatsThis *credentialsHelp = new HelpWhatsThis(credentialsPage);
-    credentialsPage->setWhatsThis(credentialsHelp->getWhatsThisText(HelpWhatsThis::Preferences_Passwords));
-
-    autoImportPage = new AutoImportPage(context);
-    HelpWhatsThis *autoImportHelp = new HelpWhatsThis(autoImportPage);
-    autoImportPage->setWhatsThis(autoImportHelp->getWhatsThisText(HelpWhatsThis::Preferences_Athlete_Autoimport));
-
-    backupPage = new BackupPage(context);
-    HelpWhatsThis *backupPageHelp = new HelpWhatsThis(backupPage);
-    autoImportPage->setWhatsThis(backupPageHelp->getWhatsThisText(HelpWhatsThis::Preferences_Athlete_Backup));
-
-    setContentsMargins(0,0,0,0);
-    QHBoxLayout *mainLayout = new QHBoxLayout(this);
-    mainLayout->setSpacing(0);
-    mainLayout->setContentsMargins(0,0,0,0);
-
-    QTabWidget *zonesTab = new QTabWidget(this);
-    zonesTab->addTab(zonePage, tr("Power Zones"));
-    zonesTab->addTab(hrZonePage, tr("Heartrate Zones"));
-    zonesTab->addTab(paceZonePage, tr("Pace Zones"));
-
-    QTabWidget *tabs = new QTabWidget(this);
-    tabs->addTab(athletePage, tr("About"));
-    tabs->addTab(modelPage, tr("Model"));
-    tabs->addTab(athletePhysPage, tr("Measurements"));
-    tabs->addTab(hrvPage, tr("HRV"));
-    tabs->addTab(zonesTab, tr("Zones"));
-    tabs->addTab(credentialsPage, tr("Accounts"));
-    tabs->addTab(autoImportPage, tr("Auto Import"));
-    tabs->addTab(backupPage, tr("Backup"));
-
-    mainLayout->addWidget(tabs);
-}
-
-qint32 AthleteConfig::saveClicked()
-{
-    qint32 state = 0;
-
-    state |= athletePage->saveClicked();
-    state |= modelPage->saveClicked();
-    state |= athletePhysPage->saveClicked();
-    state |= hrvPage->saveClicked();
-    state |= zonePage->saveClicked();
-    state |= hrZonePage->saveClicked();
-    state |= paceZonePage->saveClicked();
-    state |= credentialsPage->saveClicked();
-    state |= autoImportPage->saveClicked();
-    state |= backupPage->saveClicked();
-
-    return state;
 }
 
 // APPEARANCE CONFIG
@@ -411,7 +324,7 @@ qint32 DataConfig::saveClicked()
     return dataPage->saveClicked();
 }
 
-// GENERAL CONFIG
+// METRIC CONFIG
 MetricConfig::MetricConfig(QDir home, Context *context) :
     home(home), context(context)
 {
@@ -446,6 +359,7 @@ qint32 MetricConfig::saveClicked()
     return state;
 }
 
+// INTERVALS CONFIG
 IntervalConfig::IntervalConfig(QDir home, Context *context) :
     home(home), context(context)
 {
@@ -470,7 +384,31 @@ qint32 IntervalConfig::saveClicked()
     return state;
 }
 
-// GENERAL CONFIG
+// MEASURES CONFIG
+MeasuresConfig::MeasuresConfig(QDir home, Context *context) :
+    home(home), context(context)
+{
+    // the widgets
+    measuresPage = new MeasuresConfigPage(this, context);
+
+    setContentsMargins(0,0,0,0);
+    QVBoxLayout *mainLayout = new QVBoxLayout(this);
+    mainLayout->setSpacing(0);
+    mainLayout->setContentsMargins(0,0,0,0);
+
+    mainLayout->addWidget(measuresPage);
+}
+
+qint32 MeasuresConfig::saveClicked()
+{
+    qint32 state = 0;
+
+    state |= measuresPage->saveClicked();
+
+    return state;
+}
+
+// TRAIN CONFIG
 TrainConfig::TrainConfig(QDir home, Context *context) :
     home(home), context(context)
 {
@@ -479,6 +417,7 @@ TrainConfig::TrainConfig(QDir home, Context *context) :
     devicePage = new DevicePage(this, context);
     optionsPage = new TrainOptionsPage(this, context);
     remotePage = new RemotePage(this, context);
+    simBicyclePage = new SimBicyclePage(this, context);
 
     setContentsMargins(0,0,0,0);
     QHBoxLayout *mainLayout = new QHBoxLayout(this);
@@ -489,6 +428,7 @@ TrainConfig::TrainConfig(QDir home, Context *context) :
     tabs->addTab(devicePage, tr("Train Devices"));
     tabs->addTab(optionsPage, tr("Preferences"));
     tabs->addTab(remotePage, tr("Remote Controls"));
+    tabs->addTab(simBicyclePage, tr("Virtual Bicycle Specifications"));
 
     mainLayout->addWidget(tabs);
 }
@@ -500,6 +440,7 @@ qint32 TrainConfig::saveClicked()
     state |= devicePage->saveClicked();
     state |= optionsPage->saveClicked();
     state |= remotePage->saveClicked();
+    state |= simBicyclePage->saveClicked();
 
     return state;
 }

@@ -26,31 +26,34 @@
 #include "VideoLayoutParser.h"
 #include "MeterWidget.h"
 
-VideoLayoutParser::VideoLayoutParser (QList<MeterWidget*>* metersWidget, QWidget* VideoContainer)
-    : metersWidget(metersWidget), VideoContainer(VideoContainer)
+VideoLayoutParser::VideoLayoutParser (QList<MeterWidget*>* metersWidget, QList<QString>* layoutNames, QWidget* VideoContainer)
+    : metersWidget(metersWidget), layoutNames(layoutNames), VideoContainer(VideoContainer)
 {
     nonameindex = 0;
+    skipLayout = false;
+    layoutPosition = 0;
     meterWidget = NULL;
 }
 
 void VideoLayoutParser::SetDefaultValues()
 {
-    if (meterWidget)
-    {
-        meterWidget->m_RelativeWidth = 20.0;
-        meterWidget->m_RelativeHeight = 20.0;
-        meterWidget->m_RelativePosX = 50.0;
-        meterWidget->m_RelativePosY = 80.0;
-
-        meterWidget->m_RangeMin = 0.0;
-        meterWidget->m_RangeMax = 80.0;
-        meterWidget->m_MainColor = QColor(255,0,0,200);
-        meterWidget->m_ScaleColor = QColor(255,255,255,200);
-        meterWidget->m_OutlineColor = QColor(100,100,100,200);
-        meterWidget->m_BackgroundColor = QColor(100,100,100,200);
-        meterWidget->m_MainFont = QFont(meterWidget->font().family(), 64);
-        meterWidget->m_AltFont = QFont(meterWidget->font().family(), 48);
-    }
+    meterWidget->m_RelativeWidth = 20.0;
+    meterWidget->m_RelativeHeight = 20.0;
+    meterWidget->m_RelativePosX = 50.0;
+    meterWidget->m_RelativePosY = 80.0;
+    meterWidget->m_RangeMin = 0.0;
+    meterWidget->m_RangeMax = 80.0;
+    meterWidget->m_MainColor = QColor(255,0,0,200);
+    meterWidget->m_ScaleColor = QColor(255,255,255,200);
+    meterWidget->m_OutlineColor = QColor(100,100,100,200);
+    meterWidget->m_BackgroundColor = QColor(100,100,100,0);
+    meterWidget->m_BoundingRectColor = QColor(150,150,150,100);
+    meterWidget->m_MainFont = QFont(meterWidget->font().family(), 64);
+    meterWidget->m_AltFont = QFont(meterWidget->font().family(), 48);
+    meterWidget->m_VideoContainer = VideoContainer;
+    meterWidget->Text = "";
+    meterWidget->AltText = "";
+    meterWidget->AltTextSuffix = "";
 }
 
 QColor GetColorFromFields(const QXmlAttributes& qAttributes)
@@ -74,9 +77,27 @@ bool VideoLayoutParser::startElement( const QString&, const QString&,
     const QString& qName,
     const QXmlAttributes& qAttributes)
 {
+    QString source;
+    QString meterName;
+    QString meterType;
+    QString container; // will be "Video" when not defined otherwise another meter name (allows positioning of one meter inside another one)
+    int textWidth;
+    Qt::Alignment alignment;
+    bool boundingRectVisibility;
+    bool backgroundVisibility;
+
+    if(skipLayout) return true;
+
     buffer.clear();
 
-    if(qName == "meter")
+    if(qName == "layout")
+    {
+        int i = qAttributes.index("name");
+        layoutNames->append(i >= 0 ? qAttributes.value(i) : QString("noname_") + QString::number(layoutPosition));
+
+        if(layoutPositionSelected != layoutPosition) skipLayout = true;
+    }
+    else if(qName == "meter")
     {
         int i = qAttributes.index("name"); // To be used to enclose another sub meter (typ. text within NeedleMeter)
         if(i >= 0)
@@ -101,6 +122,32 @@ bool VideoLayoutParser::startElement( const QString&, const QString&,
             meterType = qAttributes.value(i);
         else
             meterType = QString("Text");
+
+        i = qAttributes.index("alignment");
+        if(i >= 0)
+            if(qAttributes.value(i) == QString("AlignLeft")) alignment = Qt::AlignLeft;
+            else if(qAttributes.value(i) == QString("AlignRight")) alignment = Qt::AlignRight;
+            else alignment = Qt::AlignHCenter;
+        else
+            alignment = Qt::AlignHCenter;
+
+        i = qAttributes.index("textWidth");
+        if(i >= 0)
+            textWidth = qAttributes.value(i).toInt();
+        else
+            textWidth = 0;
+
+        i = qAttributes.index("BoundingRect");
+        if(i >= 0 && qAttributes.value(i) == QString("true"))
+            boundingRectVisibility = true;
+        else
+            boundingRectVisibility = false;
+
+        i = qAttributes.index("Background");
+        if(i >= 0 && qAttributes.value(i) == QString("true"))
+            backgroundVisibility = true;
+        else
+            backgroundVisibility = false;
 
         //TODO: allow creation of meter when container will be created later
         QWidget* containerWidget = NULL;
@@ -134,12 +181,27 @@ bool VideoLayoutParser::startElement( const QString&, const QString&,
         {
             meterWidget = new CircularBargraphMeterWidget(meterName, containerWidget, source);
         }
+        else if (meterType == QString("Elevation"))
+        {
+            meterWidget = new ElevationMeterWidget(meterName, containerWidget, source);
+        }
+        else if (meterType == QString("LiveMap"))
+        {
+            meterWidget = new LiveMapWidget(meterName, containerWidget, source);
+        }
         else
         {
             qDebug() << QObject::tr("Error creating meter");
         }
 
-        SetDefaultValues();
+        if (meterWidget)
+        {
+            SetDefaultValues();
+            meterWidget->textWidth = textWidth;
+            meterWidget->alignment = alignment;
+            meterWidget->boundingRectVisibility = boundingRectVisibility;
+            meterWidget->backgroundVisibility = backgroundVisibility;
+        }
     }
     else if ((qName == "MainColor") && meterWidget)
         meterWidget->m_MainColor =  GetColorFromFields(qAttributes);
@@ -149,6 +211,8 @@ bool VideoLayoutParser::startElement( const QString&, const QString&,
         meterWidget->m_ScaleColor =  GetColorFromFields(qAttributes);
     else if ((qName == "BackgroundColor") && meterWidget)
         meterWidget->m_BackgroundColor =  GetColorFromFields(qAttributes);
+    else if ((qName == "BoundingRectColor") && meterWidget)
+        meterWidget->m_BoundingRectColor =  GetColorFromFields(qAttributes);
 
     else if ((qName == "RelativeSize") && meterWidget)
     {
@@ -184,6 +248,8 @@ bool VideoLayoutParser::startElement( const QString&, const QString&,
         if ((i = qAttributes.index("Size")) >= 0)
             FontSize = qAttributes.value(i).toInt();
         meterWidget->m_MainFont = QFont(FontName, FontSize);
+        // Set fixed width, otherwise the meter digits keep moving sideways from a thin "1" to a fat "5" 
+        meterWidget->m_MainFont.setFixedPitch(true);
     }
     else if ((qName == "AltFont") && meterWidget)
     {
@@ -195,6 +261,11 @@ bool VideoLayoutParser::startElement( const QString&, const QString&,
         if ((i = qAttributes.index("Size")) >= 0)
             FontSize = qAttributes.value(i).toInt();
         meterWidget->m_AltFont = QFont(FontName, FontSize);
+        meterWidget->m_AltFont.setFixedPitch(true);
+    }
+    else if(qName != "layouts" && qName != "Text" && qName != "AltText" && qName != "Angle" && qName != "SubRange" && qName != "Zoom")
+    {
+        qDebug() << QObject::tr("Unknown start element ") << qName;
     }
 
     return true;
@@ -202,6 +273,15 @@ bool VideoLayoutParser::startElement( const QString&, const QString&,
 
 bool VideoLayoutParser::endElement( const QString&, const QString&, const QString& qName)
 {
+    if(qName == "layout")
+    {
+        layoutPosition++;
+        skipLayout = false;
+        return true;
+    }
+
+    if(skipLayout) return true;
+
     if (meterWidget)
     {
         if (qName == "Angle")
@@ -210,12 +290,23 @@ bool VideoLayoutParser::endElement( const QString&, const QString&, const QStrin
             meterWidget->m_SubRange = buffer.toInt();
         else if (qName == "Text")
             meterWidget->Text = QString(buffer);
+        else if (qName == "AltText")
+            meterWidget->AltTextSuffix = QString(buffer);
 
         else if (qName == "meter")
         {
             if (metersWidget)
                 metersWidget->append(meterWidget);
             meterWidget = NULL;
+        }
+
+        LiveMapWidget* liveMapWidget = dynamic_cast<LiveMapWidget*>(meterWidget);
+        if (liveMapWidget != NULL)
+        {
+            if (qName == "Zoom")
+                liveMapWidget->m_Zoom = buffer.toInt();
+            else if (qName == "osmURL")
+                liveMapWidget->m_osmURL = QString(buffer);
         }
 
         return true;
@@ -226,6 +317,8 @@ bool VideoLayoutParser::endElement( const QString&, const QString&, const QStrin
 
 bool VideoLayoutParser::characters( const QString& str )
 {
+    if(skipLayout) return true;
+
     buffer += str;
     return true;
 }

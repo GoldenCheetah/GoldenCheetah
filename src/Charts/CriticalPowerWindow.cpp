@@ -61,6 +61,8 @@ CriticalPowerWindow::CriticalPowerWindow(Context *context, bool rangemode) :
     QHBoxLayout *revealLayout = new QHBoxLayout;
     revealLayout->setContentsMargins(0,0,0,0);
 
+    QLabel *rSeriesLabel = new QLabel(tr("Data Series"), this);
+    rSeriesSelector = new QxtStringSpinBox();
     rPercent = new QCheckBox(this);
     rPercent->setText(tr("Percentage of Best"));
     rHeat = new QCheckBox(this);
@@ -81,6 +83,9 @@ CriticalPowerWindow::CriticalPowerWindow(Context *context, bool rangemode) :
     checks->addStretch();
 
     revealLayout->addStretch();
+    revealLayout->addWidget(rSeriesLabel);
+    revealLayout->addWidget(rSeriesSelector);
+    revealLayout->addSpacing(20);
     revealLayout->addLayout(checks);
     revealLayout->addStretch();
 
@@ -156,6 +161,8 @@ CriticalPowerWindow::CriticalPowerWindow(Context *context, bool rangemode) :
 
     // add additional menu items before setting
     // controls since the menu is SET from setControls
+    QAction *showsettings = new QAction(tr("Chart Settings..."));
+    addAction(showsettings);
     QAction *exportData = new QAction(tr("Export Chart Data..."), this);
     addAction(exportData);
 
@@ -528,6 +535,7 @@ CriticalPowerWindow::CriticalPowerWindow(Context *context, bool rangemode) :
     connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideSelected()));
     connect(context, SIGNAL(configChanged(qint32)), cpPlot, SLOT(configChanged(qint32)));
     connect(exportData, SIGNAL(triggered()), this, SLOT(exportData()));
+    connect(showsettings, SIGNAL(triggered()), this, SIGNAL(showControls()));
 
     // model updated?
     connect(modelCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(modelChanged()));
@@ -561,6 +569,7 @@ CriticalPowerWindow::CriticalPowerWindow(Context *context, bool rangemode) :
     connect(showPPCheck, SIGNAL(stateChanged(int)), this, SLOT(showPPChanged(int)));
     connect(showHeatCheck, SIGNAL(stateChanged(int)), this, SLOT(showHeatChanged(int)));
     connect(showCSLinearCheck, SIGNAL(stateChanged(int)), this, SLOT(showCSLinearChanged(int)));
+    connect(rSeriesSelector, SIGNAL(valueChanged(int)), this, SLOT(rSeriesSelectorChanged(int)));
     connect(rHeat, SIGNAL(stateChanged(int)), this, SLOT(rHeatChanged(int)));
     connect(rDelta, SIGNAL(stateChanged(int)), this, SLOT(rDeltaChanged()));
     connect(rDeltaPercent, SIGNAL(stateChanged(int)), this, SLOT(rDeltaChanged()));
@@ -611,7 +620,8 @@ CriticalPowerWindow::setEditFromSlider()
         // force replot...
         if (rangemode) {
 
-            // Refresh aggregated curve (ride added/filter changed)
+            // Refresh aggregated curve
+            stale = true;
             dateRangeChanged(myDateRange);
 
         } else {
@@ -1285,18 +1295,16 @@ CriticalPowerWindow::rideSelected()
             hoverCurve = NULL;
         }
 
-        // when plotting a single ride, the date range is either as selected
-        // for a fixed period (e.g. 2018) or it is for a fixed period
-        // prior to the ride (e.g. Last 28 days), we look at the
-        // date range id to map to known first, then just use the season
-        // range, that way as you look at older rides the dates being
-        // used change to reflect capability at that time, whilst in
-        // range mode (trends) its just the season selected.
         Season season = seasons->seasons.at(cComboSeason->currentIndex());
 
-        // Refresh aggregated curve (ride added/filter changed)
-        if (season.prior() == 0) cpPlot->setDateRange(season.getStart(), season.getEnd()); // fixed
-        else if (myRideItem) cpPlot->setDateRange(myRideItem->dateTime.date().addDays(season.prior()), myRideItem->dateTime.date());
+        if (myRideItem) {
+            // if the range selected is relative (e.g. "This Year" or
+            // "Last 28 days", compute it with respect to the ride's
+            // date
+            cpPlot->setDateRange(season.getStart(myRideItem->dateTime.date()), season.getEnd(myRideItem->dateTime.date()));
+        } else {
+            cpPlot->setDateRange(season.getStart(), season.getEnd());
+        }
     }
 
     if (!amVisible()) return;
@@ -1360,6 +1368,9 @@ CriticalPowerWindow::event(QEvent *event)
 void
 CriticalPowerWindow::setSeries(int index)
 {
+    // update reveal control
+    rSeriesSelector->setValue(index);
+
     if (index >= 0) {
 
         // need a helper any more ?
@@ -1625,9 +1636,14 @@ CriticalPowerWindow::addSeries()
                << work
                << veloclinicplot;
 
+    QStringList seriesNames;
+
     foreach (CriticalSeriesType x, seriesList) {
         seriesCombo->addItem(seriesName(x), static_cast<int>(x));
+        seriesNames << seriesName(x);
     }
+
+    rSeriesSelector->setStrings(seriesNames);
 }
 
 void
@@ -1864,6 +1880,13 @@ CriticalPowerWindow::showPowerIndexChanged(int state)
     // redraw
     if (rangemode) dateRangeChanged(DateRange());
     else cpPlot->setRide(currentRide);
+}
+
+void
+CriticalPowerWindow::rSeriesSelectorChanged(int value)
+{
+    seriesCombo->setCurrentIndex(value);
+    setSeries(value);
 }
 
 void

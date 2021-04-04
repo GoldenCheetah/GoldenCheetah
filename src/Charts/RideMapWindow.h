@@ -35,15 +35,8 @@
 
 #include <QDialog>
 
-#ifdef NOWEBKIT
 #include <QWebEnginePage>
 #include <QWebEngineView>
-#else
-#include <QtWebKit>
-#include <QWebPage>
-#include <QWebView>
-#include <QWebFrame>
-#endif
 
 class QMouseEvent;
 class RideItem;
@@ -57,20 +50,9 @@ class SmallPlot;
 
 // trick the maps api into ignoring gestures by
 // pretending to be chrome. see: http://developer.qt.nokia.com/forums/viewthread/1643/P15
-#ifdef NOWEBKIT
 class mapWebPage : public QWebEnginePage
 {
 };
-#else
-class mapWebPage : public QWebPage
-{
-#if 0
-    virtual QString userAgentForUrl(const QUrl&) const {
-        return "Mozilla/5.0";
-    }
-#endif
-};
-#endif
 
 class MapWebBridge : public QObject
 {
@@ -129,7 +111,6 @@ class RideMapWindow : public GcChartWindow
     Q_PROPERTY(bool showintervals READ showIntervals WRITE setShowIntervals USER true)
     Q_PROPERTY(int osmts READ osmTS WRITE setOsmTS USER true)
     Q_PROPERTY(QString googleKey READ googleKey WRITE setGoogleKey USER true)
-    Q_PROPERTY(QString styleoptions READ getStyleOptions WRITE setStyleOptions  USER false)
 
     public:
         typedef enum {
@@ -140,10 +121,7 @@ class RideMapWindow : public GcChartWindow
         RideMapWindow(Context *, int mapType);
         virtual ~RideMapWindow();
 
-#ifdef NOWEBKIT
         QWebEngineView *browser() { return view; }
-#endif
-
 
         // set/get properties
         int mapType() const { return mapCombo->currentIndex(); }
@@ -163,9 +141,6 @@ class RideMapWindow : public GcChartWindow
             tileCombo->setCurrentIndex(tileCombo->findData(x));
             setTileServerUrlForTileType(x);
         }
-
-        QString getStyleOptions() const { return styleoptions; }
-        void setStyleOptions(QString x) { styleoptions=x; }
 
         QString googleKey() const { return gkey->text(); }
         void setGoogleKey(QString x) { gkey->setText(x); }
@@ -193,7 +168,6 @@ class RideMapWindow : public GcChartWindow
     private:
 
         bool first;
-        QString styleoptions;
 
         QComboBox *mapCombo, *tileCombo;
         QCheckBox *showMarkersCk, *showFullPlotCk, *showInt;
@@ -206,12 +180,7 @@ class RideMapWindow : public GcChartWindow
         Context *context;
         QVBoxLayout *layout;
 
-#ifdef NOWEBKIT
         QWebEngineView *view;
-#else
-        QWebView *view;
-#endif
-
         MapWebBridge *webBridge;
 
         RideMapWindow();  // default ctor

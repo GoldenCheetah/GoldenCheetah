@@ -31,17 +31,11 @@
 // found here http://www.withings.com/en/api/bodyscale
 //
 
-#define WITHINGS_WEIGHT     0
-#define WITHINGS_FATKG      1
-#define WITHINGS_FATPERCENT 2
-#define WITHINGS_LEANKG     3
-#define WITHINGS_HEIGHT     4
-
 class WithingsReading {
 
 public:
     WithingsReading() : category(0), groupId(0), attribution(0), when(QDateTime()), comment(""),
-                        weightkg(0), fatkg(0), leankg(0), fatpercent(0), sizemeter(0) {}
+                        weightkg(0), fatkg(0), leankg(0), fatpercent(0), sizemeter(0), musclekg(0), boneskg(0) {}
 
     int category;           // 1 = target, 2 = measurement
     int groupId;            // serialized for synchronizing
@@ -54,7 +48,9 @@ public:
             fatkg,          // fat in Kilograms
             leankg,         // lean mass in Kilograms
             fatpercent,     // body fat as a percentage of weight
-            sizemeter;      // height ?
+            sizemeter,      // height
+            musclekg,       // muscle mass (kg)
+            boneskg;        // bone mass (kg)
 
     // used by qSort()
     bool operator< (WithingsReading right) const {

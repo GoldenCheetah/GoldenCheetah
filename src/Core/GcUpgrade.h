@@ -23,15 +23,8 @@
 #include "Athlete.h"
 #include <QString>
 
-#ifdef NOWEBKIT
 #include <QWebEngineView>
 #include <QWebEngineSettings>
-#else
-#include <QWebView>
-#include <QWebFrame>
-#include <QWebSettings>
-#endif
-
 
 // Build ID History
 //
@@ -94,7 +87,16 @@
 // 3968 - V3.5 DEVELOPMENT 1810
 // 3969 - V3.5 DEVELOPMENT 1901
 // 3970 - V3.5 DEVELOPMENT 1903
-
+// 3980 - V3.5 RC1
+// 3981 - V3.5 RC2
+// 3982 - V3.5 RC2X
+// 3990 - V3.5 RELEASE (January 2020)
+// 3991 - V3.5 RELEASE RE-ISSUE STRAVA RATE LIMIT (January 2020)
+// 3992 - V3.6 DEVELOPMENT
+// 4000 - V3.6 DEVELOPMENT 2005 (MAY 2020)
+// 4001 - V3.6 DEVELOPMENT 2006 (JUN 2020)
+// 4002 - V3.6 DEVELOPMENT 2009 (SEP 2020)
+// 4003 - V3.6 DEVELOPMENT 2101 (JAN 2021)
 
 #define VERSION3_BUILD    3010 // released
 #define VERSION3_SP1      3030 // released
@@ -104,17 +106,18 @@
 #define VERSION32_BUILD   3200 // released
 #define VERSION33_BUILD   3933 // development release
 #define VERSION34_BUILD   3955 // released
-#define VERSION35_BUILD   3970 // development release
+#define VERSION35_BUILD   3990 // released
+#define VERSION36_BUILD   4002 // development build September 2020
 
 // will keep changing during testing and before final release
 #define VERSION31_BUILD VERSION31_UPG
 
 // the next two will with each build/release
-#define VERSION_LATEST 3970
-#define VERSION_STRING "DEV-V3.5 1903"
+#define VERSION_LATEST 4003
+#define VERSION_STRING "V3.6-DEV2101"
 
 // default config for this release cycle
-#define VERSION_CONFIG_PREFIX "http://www.goldencheetah.org/defaults/4.0"
+#define VERSION_CONFIG_PREFIX "http://www.goldencheetah.org/defaults/3.5"
 
 class GcUpgradeLogDialog : public QDialog
 {
@@ -122,6 +125,7 @@ class GcUpgradeLogDialog : public QDialog
 
     public:
         GcUpgradeLogDialog(QDir);
+        ~GcUpgradeLogDialog();
         void enableButtons();
         void append(QString, int level=0);
 
@@ -132,11 +136,7 @@ class GcUpgradeLogDialog : public QDialog
 
     private:
 
-#ifdef NOWEBKIT
         QWebEngineView *report;
-#else
-        QWebView *report;
-#endif
         AthleteDirectoryStructure home;
         QString reportText;
         QPushButton *proceedButton;

@@ -340,7 +340,7 @@ double
 AllPlotIntervalData::x(size_t i) const
 {
     //if (interval == NULL) return 0; // out of bounds !?
-    double multiplier = context->athlete->useMetricUnits ? 1 : MILES_PER_KM;
+    double multiplier = GlobalContext::context()->useMetricUnits ? 1 : MILES_PER_KM;
 
     // which point are we returning?
     switch (i%4) {

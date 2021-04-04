@@ -229,6 +229,7 @@ TodaysPlan::readdir(QString path, QStringList &errors, QDateTime from, QDateTime
         QNetworkRequest request(url);
         QNetworkReply *reply;
         request.setRawHeader("Authorization", (QString("Bearer %1").arg(token)).toLatin1());
+        request.setRawHeader("tp-nodecorate", "true"); // without fields description
         if (offset == 0) {
 
             // Prepare the Search Payload for First Call to Search
@@ -240,8 +241,10 @@ TodaysPlan::readdir(QString path, QStringList &errors, QDateTime from, QDateTime
                 jsonString += "\"user\": "+ QString("%1").arg(userId) +", ";
             jsonString += "\"fromTs\": \""+ QString("%1").arg(from.toMSecsSinceEpoch()) +"\", ";
             jsonString += "\"toTs\": \"" + QString("%1").arg(to.addDays(1).addSecs(-1).toMSecsSinceEpoch()) + "\", ";
-            jsonString += "\"isNotNull\": [\"fileId\"]}, ";
-            jsonString += "\"fields\": [\"fileId\",\"name\",\"fileindex.id\",\"distance\",\"startTs\",\"training\",\"rpe\",\"tqr\",\"pain\"], "; //\"avgWatts\"
+            jsonString += "\"isNotNull\": [\"fileId\"], ";
+            jsonString += "\"sports\": [\"ride\",\"swim\",\"run\"] ";
+            jsonString += "}, "; // end of "criteria"
+            jsonString += "\"fields\": [\"fileId\",\"name\",\"fileindex.id\",\"distance\",\"startTs\",\"training\", \"type\", \"rpe\",\"tqr\",\"pain\"], ";
             jsonString += "\"opts\": 1 "; // without fields description
             jsonString += "}";
 
@@ -303,7 +306,7 @@ TodaysPlan::readdir(QString path, QStringList &errors, QDateTime from, QDateTime
                 add->label = QFileInfo(each["name"].toString()).fileName();
                 add->id = QString("%1").arg(each["fileId"].toInt());
                 add->isDir = false;
-                add->distance = each["distance"].toInt()/1000.0;
+                add->distance = each["distance"].toDouble()/1000.0;
                 add->duration = each["training"].toInt();
                 add->name = QDateTime::fromMSecsSinceEpoch(each["startTs"].toDouble()).toString("yyyy_MM_dd_HH_mm_ss")+"."+suffix;
 
@@ -525,7 +528,6 @@ TodaysPlan::listAthletes()
     // did we get a good response ?
     QByteArray r = reply->readAll();
 
-#if QT_VERSION > 0x050000
     QJsonParseError parseError;
     QJsonDocument document = QJsonDocument::fromJson(r, &parseError);
 
@@ -550,7 +552,6 @@ TodaysPlan::listAthletes()
             }
         }
     }
- #endif
     return returning;
 }
 

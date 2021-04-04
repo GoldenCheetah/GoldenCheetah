@@ -127,7 +127,7 @@ WPrime::setRide(RideFile *input)
     // create a raw time series in the format QwtSpline wants
     QVector<QPointF> points;
     QVector<QPointF> pointsd;
-    double convert = input->context->athlete->useMetricUnits ? 1.00f : MILES_PER_KM;
+    double convert = GlobalContext::context()->useMetricUnits ? 1.00f : MILES_PER_KM;
 
     last=0;
     double offset = 0; // always start from zero seconds (e.g. intervals start at and offset in ride)
@@ -491,16 +491,18 @@ WPrime::setErg(ErgFile *input)
     }
 
     // no data or no power data then forget it.
-    bool bydist = (input->format == CRS || input->format == CRS_LOC) ? true : false;
+    bool bydist = (input->format == CRS) ? true : false;
     if (!input->isValid() || bydist) {
         return; // needs to be a valid erg file...
     }
+
+    ErgFileQueryAdapter ergFileQueryAdapter(input);
 
     minY = maxY = WPRIME;
 
     if (integral) {
 
-        last = input->Duration / 1000; 
+        last = ergFileQueryAdapter.Duration() / 1000; 
         values.resize(last);
         xvalues.resize(last);
 
@@ -514,7 +516,7 @@ WPrime::setErg(ErgFile *input)
 
             // get watts at point in time
             int lap;
-            int value = input->wattsAt(i*1000, lap);
+            int value = ergFileQueryAdapter.wattsAt(i*1000, lap);
 
             powerValues[i] = value > CP ? value-CP : 0;
 
@@ -555,7 +557,7 @@ WPrime::setErg(ErgFile *input)
     } else {
 
         // how many points ?
-        last = input->Duration / 1000; 
+        last = ergFileQueryAdapter.Duration() / 1000; 
         values.resize(last);
         xvalues.resize(last);
 
@@ -563,10 +565,11 @@ WPrime::setErg(ErgFile *input)
         // and will also contain non-zero values
         double W = WPRIME;
         int lap; // passed by reference
+
         for (int i=0; i<last; i++) {
 
             // get watts at point in time
-            int value = input->wattsAt(i*1000, lap);
+            int value = ergFileQueryAdapter.wattsAt(i*1000, lap);
 
             if(value < CP) {
                 W  = W + (CP-value)*(WPRIME-W)/WPRIME;

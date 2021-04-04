@@ -29,7 +29,7 @@ void QwtPlotGappedCurve::drawSeries(QPainter *painter, const QwtScaleMap &xMap,
         return;
 
     if (to < 0)
-        to = dataSize() - 1;
+        to = dataSize();
 
     int i = from;
     double last = 0;

@@ -51,10 +51,8 @@ static QString protect(const QString string)
 // Un-Escape special characters (JSON compliance)
 static QString unprotect(const QString string)
 {
-    QString string2 = QString::fromLocal8Bit(string.toLatin1().data());
-
     // this is a quoted string
-    QString s = string2.mid(1,string2.length()-2);
+    QString s = string.mid(1,string.length()-2);
 
     // now un-escape the control characters
     s.replace("\\t", "\t");  // tab
@@ -291,9 +289,13 @@ EditNamedSearches::EditNamedSearches(QWidget *parent, Context *context) : QDialo
 #endif
     searchList->header()->setStretchLastSection(true);
 
-    // delete button
+    // up/down/delete button
     QHBoxLayout *row4 = new QHBoxLayout;
     layout->addLayout(row4);
+    upButton = new QPushButton(tr("Up"), this);
+    row4->addWidget(upButton);
+    downButton = new QPushButton(tr("Down"), this);
+    row4->addWidget(downButton);
     row4->addStretch();
     deleteButton = new QPushButton(tr("Delete"), this);
     row4->addWidget(deleteButton);
@@ -316,6 +318,8 @@ EditNamedSearches::EditNamedSearches(QWidget *parent, Context *context) : QDialo
     connect(addButton, SIGNAL(clicked()), this, SLOT(addClicked()));
     connect(deleteButton, SIGNAL(clicked()), this, SLOT(deleteClicked()));
     connect(updateButton, SIGNAL(clicked()), this, SLOT(updateClicked()));
+    connect(upButton, SIGNAL(clicked()), this, SLOT(upClicked()));
+    connect(downButton, SIGNAL(clicked()), this, SLOT(downClicked()));
 }
 
 void
@@ -376,6 +380,46 @@ EditNamedSearches::updateClicked()
 }
 
 void
+EditNamedSearches::upClicked()
+{
+    if (active || searchList->currentItem() == NULL) return;
+    active = true;
+
+    int index = searchList->invisibleRootItem()->indexOfChild(searchList->currentItem());
+    int newIndex = index - 1;
+
+    if (index > 0) {
+        context->athlete->namedSearches->getList().swapItemsAt(newIndex, index);
+        QTreeWidgetItem* child = searchList->invisibleRootItem()->takeChild(index);
+        searchList->invisibleRootItem()->insertChild(newIndex, child);
+        searchList->setCurrentItem(child);
+    }
+
+    active = false;
+    selectionChanged(); // QT signals whilst rows are being removed, this is very confusing
+}
+
+void
+EditNamedSearches::downClicked()
+{
+    if (active || searchList->currentItem() == NULL) return;
+    active = true;
+
+    int index = searchList->invisibleRootItem()->indexOfChild(searchList->currentItem());
+    int newIndex = index + 1;
+
+    if (index < (context->athlete->namedSearches->getList().size() - 1)) {
+        context->athlete->namedSearches->getList().swapItemsAt(newIndex, index);
+        QTreeWidgetItem* child = searchList->invisibleRootItem()->takeChild(index);
+        searchList->invisibleRootItem()->insertChild(newIndex, child);
+        searchList->setCurrentItem(child);
+    }
+
+    active = false;
+    selectionChanged(); // QT signals whilst rows are being removed, this is very confusing
+}
+
+void
 EditNamedSearches::deleteClicked()
 {
     if (active || searchList->currentItem() == NULL) return;
@@ -393,7 +437,7 @@ EditNamedSearches::deleteClicked()
 void EditNamedSearches::closeEvent(QCloseEvent*) { writeSearches(); }
 void EditNamedSearches::reject() { writeSearches(); }
 
-void 
+void
 EditNamedSearches::writeSearches()
 {
     context->athlete->namedSearches->write();

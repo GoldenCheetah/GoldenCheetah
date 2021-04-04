@@ -26,6 +26,15 @@ BT40Controller::BT40Controller(TrainSidebar *parent, DeviceConfiguration *dc) : 
     localDevice = new QBluetoothLocalDevice(this);
     discoveryAgent = new QBluetoothDeviceDiscoveryAgent();
     localDc = dc;
+    load = 0;
+    gradient = 0;
+    mode = RT_MODE_SLOPE;
+    windSpeed = 0;
+    weight = 80;
+    rollingResistance = 0.0033;
+    windResistance = 0.6;
+    wheelSize = 2100;
+
     connect(discoveryAgent, SIGNAL(deviceDiscovered(const QBluetoothDeviceInfo&)),
 	    this, SLOT(addDevice(const QBluetoothDeviceInfo&)));
     connect(discoveryAgent, SIGNAL(error(QBluetoothDeviceDiscoveryAgent::Error)),
@@ -73,8 +82,10 @@ int
 BT40Controller::stop()
 {
     foreach (BT40Device* const &device, devices) {
-	device->disconnectDevice();
+        device->disconnectDevice();
+        delete device;
     }
+    devices.clear();
     return 0;
 }
 
@@ -114,9 +125,44 @@ void
 BT40Controller::addDevice(const QBluetoothDeviceInfo &info)
 {
     if (info.coreConfigurations() & QBluetoothDeviceInfo::LowEnergyCoreConfiguration) {
-	BT40Device* dev = new BT40Device(this, info);
-	devices.append(dev);
-	dev->connectDevice();
+        // Check if device is already created for this uuid/address
+        // At least on MacOS the deviceDiscovered signal can/will be sent multiple times
+        // for the same device during discovery.
+        foreach(BT40Device* dev, devices)
+        {
+            if (info.address().isNull())
+            {
+                // On MacOS there's no address, so check deviceUuid
+                if (dev->deviceInfo().deviceUuid() == info.deviceUuid())
+                {
+                    return;
+                }
+            } else {
+                if (dev->deviceInfo().address() == info.address())
+                {
+                    return;
+                }
+            }
+        }
+
+        BT40Device* dev = new BT40Device(this, info);
+        devices.append(dev);
+
+        // When start() is called, it initiates the device scan and returns immediately.
+        // Then, commands like setWeight() may come before any device is discovered.
+        // In that case, the weight is stored but is sent to an empty list of devices.
+        // However, when devices are added, the stored parameters are sent.
+        dev->setWheelCircumference(wheelSize);
+        dev->setRollingResistance(rollingResistance);
+        dev->setWindResistance(windResistance);
+        dev->setWeight(weight);
+        dev->setWindSpeed(windSpeed);
+        dev->setMode(mode);
+        if (mode == RT_MODE_ERGO) dev->setLoad(load);
+        else dev->setGradient(gradient);
+
+        dev->connectDevice();
+        connect(dev, &BT40Device::setNotification, this, &BT40Controller::setNotification);
     }
 }
 
@@ -124,6 +170,7 @@ BT40Controller::addDevice(const QBluetoothDeviceInfo &info)
 void
 BT40Controller::scanFinished()
 {
+    emit setNotification(tr("Bluetooth scan finished"), 2);
     qDebug() << "BT scan finished";
 }
 
@@ -134,12 +181,139 @@ BT40Controller::deviceScanError(QBluetoothDeviceDiscoveryAgent::Error error)
     qWarning() << "Error while scanning BT devices:" << error;
 }
 
+uint8_t
+BT40Controller::getCalibrationType() {
+    for (auto* dev : devices) {
+        uint8_t caltype = dev->getCalibrationType();
+        if (caltype != CALIBRATION_TYPE_NOT_SUPPORTED) {
+            return caltype;
+        }
+    }
+    return CALIBRATION_TYPE_NOT_SUPPORTED;
+}
+
+uint8_t
+BT40Controller::getCalibrationState() {
+    for (auto* dev : devices) {
+        uint8_t caltype = dev->getCalibrationType();
+        if (caltype != CALIBRATION_TYPE_NOT_SUPPORTED) {
+            return dev->getCalibrationState();
+        }
+    }
+    return CALIBRATION_STATE_IDLE;
+}
+
+double
+BT40Controller::getCalibrationTargetSpeed() {
+    for (auto* dev : devices) {
+        uint8_t caltype = dev->getCalibrationType();
+        if (caltype != CALIBRATION_TYPE_NOT_SUPPORTED) {
+            return dev->getCalibrationTargetSpeed();
+        }
+    }
+    return 0;
+}
+
+uint16_t
+BT40Controller::getCalibrationSpindownTime() {
+    for (auto* dev : devices) {
+        uint8_t caltype = dev->getCalibrationType();
+        if (caltype != CALIBRATION_TYPE_NOT_SUPPORTED) {
+            return dev->getCalibrationSpindownTime();
+        }
+    }
+    return 0;
+}
+
+uint16_t
+BT40Controller::getCalibrationZeroOffset() {
+    for (auto* dev : devices) {
+        uint8_t caltype = dev->getCalibrationType();
+        if (caltype != CALIBRATION_TYPE_NOT_SUPPORTED) {
+            return dev->getCalibrationZeroOffset();
+        }
+    }
+    return 0;
+}
+
+uint16_t
+BT40Controller::getCalibrationSlope() {
+    for (auto* dev : devices) {
+        uint8_t caltype = dev->getCalibrationType();
+        if (caltype != CALIBRATION_TYPE_NOT_SUPPORTED) {
+            return dev->getCalibrationSlope();
+        }
+    }
+    return 0;
+}
 
 void
 BT40Controller::setWheelRpm(double wrpm) {
-    telemetry.setWheelRpm(wrpm);
-    int wheel;
-    if (localDc) wheel = localDc->wheelSize;
-    else wheel = 2100;
-    telemetry.setSpeed(wrpm * wheel / 1000 * 60 / 1000);
+    telemetry.setWheelRpm(wrpm, true); // record time sample for new rpm data
+    telemetry.setSpeed(wrpm * wheelSize / 1000.0 * 60.0 / 1000.0);
 }
+
+void BT40Controller::setLoad(double l)
+{
+  load = l;
+  for (auto* dev: devices) {
+    dev->setLoad(l);
+  }
+}
+
+void BT40Controller::setGradient(double g) 
+{
+  gradient = g;
+  for (auto* dev: devices) {
+    dev->setGradient(g);
+  }
+}
+
+void BT40Controller::setMode(int m)
+{
+  mode = m;
+  for (auto* dev: devices) {
+    dev->setMode(m);
+  }
+}
+
+void BT40Controller::setWindSpeed(double s)
+{
+  windSpeed = s;
+  for (auto* dev: devices) {
+    dev->setWindSpeed(s);
+  }
+}
+
+void BT40Controller::setWeight(double w)
+{
+  weight = w;
+  for (auto* dev: devices) {
+    dev->setWeight(w);
+  }
+}
+
+void BT40Controller::setRollingResistance(double rr)
+{
+  rollingResistance = rr;
+  for (auto* dev: devices) {
+    dev->setRollingResistance(rr);
+  }
+}
+
+void BT40Controller::setWindResistance(double wr)
+{
+  windResistance = wr;
+  for (auto* dev: devices) {
+    dev->setWindResistance(wr);
+  }
+}
+
+void BT40Controller::setWheelCircumference(double wc)
+{
+  wheelSize = wc;
+  for (auto* dev: devices) {
+    dev->setWheelCircumference(wc);
+  }
+}
+

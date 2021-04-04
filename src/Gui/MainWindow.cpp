@@ -33,6 +33,7 @@
 #include "MainWindow.h"
 #include "Context.h"
 #include "Athlete.h"
+#include "AthleteView.h"
 #include "AthleteBackup.h"
 
 #include "Colors.h"
@@ -66,28 +67,28 @@
 #include "GenerateHeatMapDialog.h"
 #include "BatchExportDialog.h"
 #include "TodaysPlan.h"
-#include "BodyMeasuresDownload.h"
-#include "HrvMeasuresDownload.h"
+#include "MeasuresDownload.h"
 #include "WorkoutWizard.h"
 #include "ErgDBDownloadDialog.h"
 #include "AddDeviceWizard.h"
-#if QT_VERSION > 0x050000
 #include "Dropbox.h"
 #include "GoogleDrive.h"
 #include "KentUniversity.h"
 #include "SixCycle.h"
 #include "OpenData.h"
-#endif
 #include "AddCloudWizard.h"
 #include "LocalFileStore.h"
 #include "CloudService.h"
+#ifdef GC_WANT_PYTHON
+#include "FixPyScriptsDialog.h"
+#endif
 
 // GUI Widgets
 #include "Tab.h"
 #include "GcToolBar.h"
+#include "NewSideBar.h"
 #include "HelpWindow.h"
 #include "HomeWindow.h"
-#include "GcScopeBar.h"
 #if !defined(Q_OS_MAC)
 #include "QTFullScreen.h" // not mac!
 #endif
@@ -104,6 +105,7 @@
 #ifdef GC_HAS_CLOUD_DB
 #include "CloudDBCommon.h"
 #include "CloudDBChart.h"
+#include "CloudDBUserMetric.h"
 #include "CloudDBCurator.h"
 #include "CloudDBStatus.h"
 #include "CloudDBTelemetry.h"
@@ -120,6 +122,9 @@
 // We keep track of all theopen mainwindows
 QList<MainWindow *> mainwindows;
 extern QDesktopWidget *desktop;
+extern ConfigDialog *configdialog_ptr;
+extern QString gl_version;
+extern double gl_major; // 1.x 2.x 3.x - we insist on 2.x or higher to enable OpenGL
 
 MainWindow::MainWindow(const QDir &home)
 {
@@ -210,14 +215,38 @@ MainWindow::MainWindow(const QDir &home)
      appsettings->setValue(GC_SETTINGS_LAST, context->athlete->home->root().dirName());
 
     /*----------------------------------------------------------------------
-     * ScopeBar
+     * ScopeBar as sidebar from v3.6
      *--------------------------------------------------------------------*/
-    scopebar = new GcScopeBar(context);
-    connect(scopebar, SIGNAL(selectDiary()), this, SLOT(selectDiary()));
-    connect(scopebar, SIGNAL(selectHome()), this, SLOT(selectHome()));
-    connect(scopebar, SIGNAL(selectAnal()), this, SLOT(selectAnalysis()));
-    connect(scopebar, SIGNAL(selectTrain()), this, SLOT(selectTrain()));
-    connect(scopebar, SIGNAL(selectInterval()), this, SLOT(selectInterval()));
+
+    sidebar = new NewSideBar(context, this);
+    sidebar->addItem(QImage(":sidebar/athlete.png"), tr("athletes"), 0);
+    sidebar->setItemEnabled(1, false);
+
+    sidebar->addItem(QImage(":sidebar/plan.png"), tr("plan"), 1);
+    sidebar->setItemEnabled(1, false);
+
+    sidebar->addItem(QImage(":sidebar/trends.png"), tr("trends"), 2);
+    sidebar->addItem(QImage(":sidebar/assess.png"), tr("activities"), 3);
+    sidebar->setItemSelected(3, true);
+
+    sidebar->addItem(QImage(":sidebar/reflect.png"), tr("reflect"), 4);
+    sidebar->setItemEnabled(4, false);
+
+    sidebar->addItem(QImage(":sidebar/train.png"), tr("train"), 5);
+
+    sidebar->addStretch();
+    sidebar->addItem(QImage(":sidebar/apps.png"), tr("apps"), 6);
+    sidebar->setItemEnabled(6, false);
+    sidebar->addStretch();
+
+    // we can click on the quick icons, but they aren't selectable views
+    sidebar->addItem(QImage(":sidebar/sync.png"), tr("sync"), 7);
+    sidebar->setItemSelectable(7, false);
+    sidebar->addItem(QImage(":sidebar/prefs.png"), tr("options"), 8);
+    sidebar->setItemSelectable(8, false);
+
+    connect(sidebar, SIGNAL(itemClicked(int)), this, SLOT(sidebarClicked(int)));
+    connect(sidebar, SIGNAL(itemSelected(int)), this, SLOT(sidebarSelected(int)));
 
     /*----------------------------------------------------------------------
      * What's this Context Help
@@ -236,11 +265,7 @@ MainWindow::MainWindow(const QDir &home)
      *--------------------------------------------------------------------*/
     head = new GcToolBar(this);
 
-#if QT_VERSION > 0x50000
     QStyle *toolStyle = QStyleFactory::create("fusion");
-#else
-    QStyle *toolStyle = QStyleFactory::create("Cleanlooks");
-#endif
     QPalette metal;
     metal.setColor(QPalette::Button, QColor(215,215,215));
 
@@ -249,7 +274,25 @@ MainWindow::MainWindow(const QDir &home)
     lowbarIcon = iconFromPNG(":images/mac/lowbar.png");
     tabbedIcon = iconFromPNG(":images/mac/tabbed.png");
     tiledIcon = iconFromPNG(":images/mac/tiled.png");
+    backIcon = iconFromPNG(":images/mac/back.png");
+    forwardIcon = iconFromPNG(":images/mac/forward.png");
     QSize isize(19 *dpiXFactor,19 *dpiYFactor);
+
+    back = new QPushButton(this);
+    back->setIcon(backIcon);
+    back->setFixedHeight(24 *dpiYFactor);
+    back->setFixedWidth(32 *dpiYFactor);
+    back->setIconSize(isize);
+    back->setStyle(toolStyle);
+    connect(back, SIGNAL(clicked(bool)), this, SIGNAL(backClicked()));
+
+    forward = new QPushButton(this);
+    forward->setIcon(forwardIcon);
+    forward->setFixedHeight(24 *dpiYFactor);
+    forward->setFixedWidth(32 *dpiYFactor);
+    forward->setIconSize(isize);
+    forward->setStyle(toolStyle);
+    connect(forward, SIGNAL(clicked(bool)), this, SIGNAL(forwardClicked()));
 
     lowbar = new QPushButton(this);
     lowbar->setIcon(lowbarIcon);
@@ -262,16 +305,16 @@ MainWindow::MainWindow(const QDir &home)
     HelpWhatsThis *helpLowBar = new HelpWhatsThis(lowbar);
     lowbar->setWhatsThis(helpLowBar->getWhatsThisText(HelpWhatsThis::ToolBar_ToggleComparePane));
 
-    sidebar = new QPushButton(this);
-    sidebar->setIcon(sidebarIcon);
-    sidebar->setFixedHeight(24 * dpiYFactor);
-    sidebar->setIconSize(isize);
-    sidebar->setStyle(toolStyle);
-    sidebar->setToolTip(tr("Toggle Sidebar"));
-    sidebar->setPalette(metal);
-    connect(sidebar, SIGNAL(clicked(bool)), this, SLOT(toggleSidebar()));
-    HelpWhatsThis *helpSideBar = new HelpWhatsThis(sidebar);
-    sidebar->setWhatsThis(helpSideBar->getWhatsThisText(HelpWhatsThis::ToolBar_ToggleSidebar));
+    sidelist = new QPushButton(this);
+    sidelist->setIcon(sidebarIcon);
+    sidelist->setFixedHeight(24 * dpiYFactor);
+    sidelist->setIconSize(isize);
+    sidelist->setStyle(toolStyle);
+    sidelist->setToolTip(tr("Toggle Sidebar"));
+    sidelist->setPalette(metal);
+    connect(sidelist, SIGNAL(clicked(bool)), this, SLOT(toggleSidebar()));
+    HelpWhatsThis *helpSideBar = new HelpWhatsThis(sidelist);
+    sidelist->setWhatsThis(helpSideBar->getWhatsThisText(HelpWhatsThis::ToolBar_ToggleSidebar));
 
     styleSelector = new QtSegmentControl(this);
     styleSelector->setStyle(toolStyle);
@@ -291,50 +334,75 @@ MainWindow::MainWindow(const QDir &home)
     if (dpiXFactor > 1) {
         QString nopad = QString("QPushButton { padding-left: 0px; padding-right: 0px; "
                                 "              padding-top:  0px; padding-bottom: 0px; }");
-        sidebar->setStyleSheet(nopad);
+        sidelist->setStyleSheet(nopad);
         lowbar->setStyleSheet(nopad);
     }
 #endif
 
-    head->addWidget(new Spacer(this));
-    head->addStretch();
-    head->addWidget(scopebar);
-    head->addStretch();
-    head->addWidget(sidebar);
-    head->addWidget(lowbar);
-    head->addWidget(styleSelector);
-    head->setFixedHeight(scopebar->height() + 7);
-
     // add a search box on far right, but with a little space too
     searchBox = new SearchFilterBox(this,context,false);
-    anim = new QPropertyAnimation(searchBox, "xwidth", this);
 
     searchBox->setStyle(toolStyle);
-    searchBox->setFixedWidth(150 * dpiYFactor);
-    head->addWidget(searchBox);
+    searchBox->setFixedWidth(400 * dpiXFactor);
+    searchBox->setFixedHeight(28 * dpiYFactor);
+
+    QWidget *space = new QWidget(this);
+    space->setAutoFillBackground(false);
+    space->setFixedWidth(5 * dpiYFactor);
+
+    head->addWidget(space);
+    head->addWidget(back);
+    head->addWidget(forward);
+    head->addStretch();
+    head->addWidget(sidelist);
+    head->addWidget(lowbar);
+    head->addWidget(styleSelector);
+    head->setFixedHeight(searchBox->height() + (16 *dpiXFactor));
+
     connect(searchBox, SIGNAL(searchResults(QStringList)), this, SLOT(setFilter(QStringList)));
     connect(searchBox, SIGNAL(searchClear()), this, SLOT(clearFilter()));
-    connect(searchBox->searchbox, SIGNAL(haveFocus()), this, SLOT(searchFocusIn()));
-    connect(searchBox->searchbox, SIGNAL(lostFocus()), this, SLOT(searchFocusOut()));
     HelpWhatsThis *helpSearchBox = new HelpWhatsThis(searchBox);
     searchBox->setWhatsThis(helpSearchBox->getWhatsThisText(HelpWhatsThis::SearchFilterBox));
 
     Spacer *spacer = new Spacer(this);
     spacer->setFixedWidth(5 *dpiYFactor);
     head->addWidget(spacer);
+    head->addWidget(searchBox);
+    spacer = new Spacer(this);
+    spacer->setFixedWidth(5 *dpiYFactor);
+    head->addWidget(spacer);
 
+#ifdef Q_OS_LINUX
+    // check opengl is available with version 2 or higher
+    // only do this on Linux since Windows and MacOS have opengl "issues"
+    QOffscreenSurface surf;
+    surf.create();
+
+    QOpenGLContext ctx;
+    ctx.create();
+    ctx.makeCurrent(&surf);
+
+    // OpenGL version number
+    gl_version = QString::fromUtf8((char *)(ctx.functions()->glGetString(GL_VERSION)));
+    gl_major = Utils::number(gl_version);
+#endif
 
     /*----------------------------------------------------------------------
      * Central Widget
      *--------------------------------------------------------------------*/
 
     tabbar = new DragBar(this);
-    tabbar->setTabsClosable(true);
+    tabbar->setTabsClosable(false); // use athlete view
 #ifdef Q_OS_MAC
     tabbar->setDocumentMode(true);
 #endif
 
+    athleteView = new AthleteView(context);
+    viewStack = new QStackedWidget(this);
+    viewStack->addWidget(athleteView);
+
     tabStack = new QStackedWidget(this);
+    viewStack->addWidget(tabStack);
 
     // first tab
     tabs.insert(currentTab->context->athlete->home->root().dirName(), currentTab);
@@ -347,7 +415,7 @@ MainWindow::MainWindow(const QDir &home)
 
     connect(tabbar, SIGNAL(dragTab(int)), this, SLOT(switchTab(int)));
     connect(tabbar, SIGNAL(currentChanged(int)), this, SLOT(switchTab(int)));
-    connect(tabbar, SIGNAL(tabCloseRequested(int)), this, SLOT(closeTabClicked(int)));
+    //connect(tabbar, SIGNAL(tabCloseRequested(int)), this, SLOT(closeTabClicked(int))); // use athlete view
 
     /*----------------------------------------------------------------------
      * Central Widget
@@ -360,8 +428,17 @@ MainWindow::MainWindow(const QDir &home)
     mainLayout->setSpacing(0);
     mainLayout->setContentsMargins(0,0,0,0);
     mainLayout->addWidget(head);
-    mainLayout->addWidget(tabbar);
-    mainLayout->addWidget(tabStack);
+    QHBoxLayout *lrlayout = new QHBoxLayout();
+    mainLayout->addLayout(lrlayout);
+    lrlayout->setSpacing(0);
+    lrlayout->setContentsMargins(0,0,0,0);
+    lrlayout->addWidget(sidebar);
+    QVBoxLayout *tablayout = new QVBoxLayout();
+    tablayout->setSpacing(0);
+    tablayout->setContentsMargins(0,0,0,0);
+    lrlayout->addLayout(tablayout);
+    tablayout->addWidget(tabbar);
+    tablayout->addWidget(viewStack);
     setCentralWidget(central);
 
     /*----------------------------------------------------------------------
@@ -377,29 +454,29 @@ MainWindow::MainWindow(const QDir &home)
     // ATHLETE (FILE) MENU
     QMenu *fileMenu = menuBar()->addMenu(tr("&Athlete"));
 
-    openWindowMenu = fileMenu->addMenu(tr("Open &Window"));
-    openTabMenu = fileMenu->addMenu(tr("Open &Tab"));
-    connect(openWindowMenu, SIGNAL(aboutToShow()), this, SLOT(setOpenWindowMenu()));
+    openTabMenu = fileMenu->addMenu(tr("Open..."));
     connect(openTabMenu, SIGNAL(aboutToShow()), this, SLOT(setOpenTabMenu()));
-
-    windowMapper = new QSignalMapper(this); // maps each option
-    connect(windowMapper, SIGNAL(mapped(const QString &)), this, SLOT(openWindow(const QString &)));
 
     tabMapper = new QSignalMapper(this); // maps each option
     connect(tabMapper, SIGNAL(mapped(const QString &)), this, SLOT(openTab(const QString &)));
 
     fileMenu->addSeparator();
-    backupAthleteMenu = fileMenu->addMenu(tr("Backup Athlete Data"));
+    backupAthleteMenu = fileMenu->addMenu(tr("Backup..."));
     connect(backupAthleteMenu, SIGNAL(aboutToShow()), this, SLOT(setBackupAthleteMenu()));
     backupMapper = new QSignalMapper(this); // maps each option
     connect(backupMapper, SIGNAL(mapped(const QString &)), this, SLOT(backupAthlete(const QString &)));
 
     fileMenu->addSeparator();
+    deleteAthleteMenu = fileMenu->addMenu(tr("Delete..."));
+    connect(deleteAthleteMenu, SIGNAL(aboutToShow()), this, SLOT(setDeleteAthleteMenu()));
+    deleteMapper = new QSignalMapper(this); // maps each option
+    connect(deleteMapper, SIGNAL(mapped(const QString &)), this, SLOT(deleteAthlete(const QString &)));
+
+    fileMenu->addSeparator();
     fileMenu->addAction(tr("Save all modified activities"), this, SLOT(saveAllUnsavedRides()));
     fileMenu->addSeparator();
     fileMenu->addAction(tr("Close Window"), this, SLOT(closeWindow()));
-    fileMenu->addAction(tr("&Close Tab"), this, SLOT(closeTab()));
-    fileMenu->addAction(tr("&Quit All Windows"), this, SLOT(closeAll()), tr("Ctrl+Q"));
+    //fileMenu->addAction(tr("&Close Tab"), this, SLOT(closeTab())); use athlete view
 
     HelpWhatsThis *fileMenuHelp = new HelpWhatsThis(fileMenu);
     fileMenu->setWhatsThis(fileMenuHelp->getWhatsThisText(HelpWhatsThis::MenuBar_Athlete));
@@ -436,8 +513,7 @@ MainWindow::MainWindow(const QDir &home)
 
     uploadMenu = shareMenu->addMenu(tr("Upload Activity..."));
     syncMenu = shareMenu->addMenu(tr("Synchronise Activities..."));
-    shareMenu->addAction(tr("Get &Body Measurements..."), this, SLOT (downloadBodyMeasures()));
-    shareMenu->addAction(tr("Get &HRV Measurements..."), this, SLOT (downloadHrvMeasures()));
+    measuresMenu = shareMenu->addMenu(tr("Get Measures..."));
     shareMenu->addSeparator();
     checkAction = new QAction(tr("Check For New Activities"), this);
     checkAction->setShortcut(tr("Ctrl-C"));
@@ -451,6 +527,8 @@ MainWindow::MainWindow(const QDir &home)
 
     connect(uploadMenu, SIGNAL(triggered(QAction*)), this, SLOT(uploadCloud(QAction*)));
     connect(syncMenu, SIGNAL(triggered(QAction*)), this, SLOT(syncCloud(QAction*)));
+    connect(measuresMenu, SIGNAL(aboutToShow()), this, SLOT(setMeasuresMenu()));
+    connect(measuresMenu, SIGNAL(triggered(QAction*)), this, SLOT(downloadMeasures(QAction*)));
 
     HelpWhatsThis *helpShare = new HelpWhatsThis(shareMenu);
     shareMenu->setWhatsThis(helpShare->getWhatsThisText(HelpWhatsThis::MenuBar_Share));
@@ -465,9 +543,7 @@ MainWindow::MainWindow(const QDir &home)
     optionsMenu->addSeparator();
     optionsMenu->addAction(tr("Create a new workout..."), this, SLOT(showWorkoutWizard()));
     optionsMenu->addAction(tr("Download workouts from ErgDB..."), this, SLOT(downloadErgDB()));
-#if QT_VERSION > 0x050000
     optionsMenu->addAction(tr("Download workouts from Today's Plan..."), this, SLOT(downloadTodaysPlanWorkouts()));
-#endif
     optionsMenu->addAction(tr("Import workouts, videos, videoSyncs..."), this, SLOT(importWorkout()));
     optionsMenu->addAction(tr("Scan disk for workouts, videos, videoSyncs..."), this, SLOT(manageLibrary()));
 
@@ -481,10 +557,12 @@ MainWindow::MainWindow(const QDir &home)
 
     QMenu *cloudDBMenu = optionsMenu->addMenu(tr("Cloud Contributions"));
     cloudDBMenu->addAction(tr("Maintain charts"), this, SLOT(cloudDBuserEditChart()));
+    cloudDBMenu->addAction(tr("Maintain user metrics"), this, SLOT(cloudDBuserEditUserMetric()));
 
     if (CloudDBCommon::addCuratorFeatures) {
         QMenu *cloudDBCurator = optionsMenu->addMenu(tr("Cloud Curator"));
         cloudDBCurator->addAction(tr("Curate charts"), this, SLOT(cloudDBcuratorEditChart()));
+        cloudDBCurator->addAction(tr("Curate user metrics"), this, SLOT(cloudDBcuratorEditUserMetric()));
     }
 
 #endif
@@ -502,7 +580,7 @@ MainWindow::MainWindow(const QDir &home)
     QMenu *editMenu = menuBar()->addMenu(tr("&Edit"));
     // Add all the data processors to the tools menu
     const DataProcessorFactory &factory = DataProcessorFactory::instance();
-    QMap<QString, DataProcessor*> processors = factory.getProcessors();
+    QMap<QString, DataProcessor*> processors = factory.getProcessors(true);
 
     if (processors.count()) {
 
@@ -520,6 +598,13 @@ MainWindow::MainWindow(const QDir &home)
             toolMapper->setMapping(action, i.key());
         }
     }
+
+#ifdef GC_WANT_PYTHON
+    // add custom python fix entry to edit menu
+    pyFixesMenu = editMenu->addMenu(tr("Python fixes"));
+    connect(editMenu, SIGNAL(aboutToShow()), this, SLOT(onEditMenuAboutToShow()));
+    connect(pyFixesMenu, SIGNAL(aboutToShow()), this, SLOT(buildPyFixesMenu()));
+#endif
 
     HelpWhatsThis *editMenuHelp = new HelpWhatsThis(editMenu);
     editMenu->setWhatsThis(editMenuHelp->getWhatsThisText(HelpWhatsThis::MenuBar_Edit));
@@ -544,16 +629,13 @@ MainWindow::MainWindow(const QDir &home)
     showhideTabbar->setCheckable(true);
     showhideTabbar->setChecked(true);
 
-    //connect(showhideSidebar, SIGNAL(triggered(bool)), this, SLOT(showSidebar(bool)));
     viewMenu->addSeparator();
     viewMenu->addAction(tr("Activities"), this, SLOT(selectAnalysis()));
     viewMenu->addAction(tr("Trends"), this, SLOT(selectHome()));
     viewMenu->addAction(tr("Train"), this, SLOT(selectTrain()));
-#ifdef GC_HAVE_ICAL
-    viewMenu->addAction(tr("Diary"), this, SLOT(selectDiary()));
-#endif
     viewMenu->addSeparator();
     subChartMenu = viewMenu->addMenu(tr("Add Chart"));
+    viewMenu->addAction(tr("Import Chart..."), this, SLOT(importChart()));
 #ifdef GC_HAS_CLOUD_DB
     viewMenu->addAction(tr("Upload Chart..."), this, SLOT(exportChartToCloudDB()));
     viewMenu->addAction(tr("Download Chart..."), this, SLOT(addChartFromCloudDB()));
@@ -602,8 +684,8 @@ MainWindow::MainWindow(const QDir &home)
 
     installEventFilter(this);
 
-    // catch config changes
-    connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
+    // catch global config changes
+    connect(GlobalContext::context(), SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
     configChanged(CONFIG_APPEARANCE);
 
     init = true;
@@ -612,7 +694,7 @@ MainWindow::MainWindow(const QDir &home)
      * Lets ask for telemetry and check for updates
      *--------------------------------------------------------------------*/
 
-#if QT_VERSION > 0x050000 && !defined(OPENDATA_DISABLE)
+#if !defined(OPENDATA_DISABLE)
     OpenData::check(currentTab->context);
 #else
     fprintf(stderr, "OpenData disabled, secret not defined.\n"); fflush(stderr);
@@ -809,15 +891,29 @@ MainWindow::setChartMenu(QMenu *menu)
 void
 MainWindow::addChart(QAction*action)
 {
+    // & removed to avoid issues with kde AutoCheckAccelerators
+    QString actionText = QString(action->text()).replace("&", "");
     GcWinID id = GcWindowTypes::None;
     for (int i=0; GcWindows[i].relevance; i++) {
-        if (GcWindows[i].name == action->text()) {
+        if (GcWindows[i].name == actionText) {
             id = GcWindows[i].id;
             break;
         }
     }
     if (id != GcWindowTypes::None)
         currentTab->addChart(id); // called from MainWindow to inset chart
+}
+
+void
+MainWindow::importChart()
+{
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Select Chart file to import"), "", tr("GoldenCheetah Chart Files (*.gchart)"));
+
+    if (fileName.isEmpty()) {
+        QMessageBox::critical(this, tr("Import Chart"), tr("No chart file selected!"));
+    } else {
+        importCharts(QStringList()<<fileName);
+    }
 }
 
 #ifdef GC_HAS_CLOUD_DB
@@ -915,11 +1011,14 @@ MainWindow::resizeEvent(QResizeEvent*)
 void
 MainWindow::showOptions()
 {
-    ConfigDialog *cd = new ConfigDialog(currentTab->context->athlete->home->root(), currentTab->context);
+    // Create a new config dialog only if it doesn't exist
+    ConfigDialog *cd = configdialog_ptr ? configdialog_ptr
+                                        : new ConfigDialog(currentTab->context->athlete->home->root(), currentTab->context);
 
     // move to the centre of the screen
     cd->move(geometry().center()-QPoint(cd->geometry().width()/2, cd->geometry().height()/2));
     cd->show();
+    cd->raise();
 }
 
 void
@@ -971,12 +1070,10 @@ MainWindow::closeEvent(QCloseEvent* event)
 
         // save global mainwindow settings
         appsettings->setValue(GC_TABBAR, showhideTabbar->isChecked());
-#if QT_VERSION > 0x050200
         // wait for threads.. max of 10 seconds before just exiting anyway
         for (int i=0; i<10 && QThreadPool::globalInstance()->activeThreadCount(); i++) {
             QThread::sleep(1);
         }
-#endif
     }
     appsettings->setValue(GC_SETTINGS_MAIN_GEOM, saveGeometry());
     appsettings->setValue(GC_SETTINGS_MAIN_STATE, saveState());
@@ -986,24 +1083,12 @@ MainWindow::~MainWindow()
 {
     // aside from the tabs, we may need to clean
     // up any dangling widgets created in MainWindow::MainWindow (?)
+    if (configdialog_ptr) configdialog_ptr->close();
 }
 
 // global search/data filter
 void MainWindow::setFilter(QStringList f) { currentTab->context->setFilter(f); }
 void MainWindow::clearFilter() { currentTab->context->clearFilter(); }
-
-void
-MainWindow::closeAll()
-{
-    QList<MainWindow *> windows = mainwindows; // get a copy, since it is updated as closed
-
-    foreach(MainWindow *window, windows)
-        if (window != this)
-            window->closeWindow();
-
-    // now close us down!
-    closeWindow();
-}
 
 void
 MainWindow::aboutDialog()
@@ -1065,6 +1150,26 @@ void MainWindow::manualProcess(QString name)
     // then call it!
     RideItem *rideitem = (RideItem*)currentTab->context->currentRideItem();
     if (rideitem) {
+
+#ifdef GC_WANT_PYTHON
+        if (name.startsWith("_fix_py_")) {
+            name = name.remove(0, 8);
+
+            FixPyScript *script = fixPySettings->getScript(name);
+            if (script == nullptr) {
+                return;
+            }
+
+            QString errText;
+            FixPyRunner pyRunner(currentTab->context);
+            if (pyRunner.run(script->source, script->iniKey, errText) != 0) {
+                QMessageBox::critical(this, "GoldenCheetah", errText);
+            }
+
+            return;
+        }
+#endif
+
         ManualDataProcessorDialog *p = new ManualDataProcessorDialog(currentTab->context, name, rideitem);
         p->setWindowModality(Qt::ApplicationModal); // don't allow select other ride or it all goes wrong!
         p->exec();
@@ -1100,8 +1205,46 @@ MainWindow::support()
 }
 
 void
+MainWindow::sidebarClicked(int id)
+{
+    // sync quick link
+    if (id == 7) checkCloud();
+
+    // prefs
+    if (id == 8) showOptions();
+
+}
+
+void
+MainWindow::sidebarSelected(int id)
+{
+    switch (id) {
+    case 0: // athlete not written yet
+            selectAthlete();
+            break;
+    case 1: // plan not written yet
+            break;
+    case 2: selectHome(); break;
+    case 3: selectAnalysis(); break;
+    case 4: // reflect not written yet
+            break;
+    case 5: selectTrain(); break;
+    case 6: // apps not written yet
+            break;
+    }
+}
+
+void
+MainWindow::selectAthlete()
+{
+    viewStack->setCurrentIndex(0);
+}
+
+void
 MainWindow::selectAnalysis()
 {
+    viewStack->setCurrentIndex(1);
+    sidebar->setItemSelected(3, true);
     currentTab->selectView(1);
     setToolButtons();
 }
@@ -1109,6 +1252,8 @@ MainWindow::selectAnalysis()
 void
 MainWindow::selectTrain()
 {
+    viewStack->setCurrentIndex(1);
+    sidebar->setItemSelected(5, true);
     currentTab->selectView(3);
     setToolButtons();
 }
@@ -1116,6 +1261,7 @@ MainWindow::selectTrain()
 void
 MainWindow::selectDiary()
 {
+    viewStack->setCurrentIndex(1);
     currentTab->selectView(2);
     setToolButtons();
 }
@@ -1123,6 +1269,8 @@ MainWindow::selectDiary()
 void
 MainWindow::selectHome()
 {
+    viewStack->setCurrentIndex(1);
+    sidebar->setItemSelected(2, true);
     currentTab->selectView(0);
     setToolButtons();
 }
@@ -1175,12 +1323,8 @@ MainWindow::setToolButtons()
     }
 #endif
 #ifdef Q_OS_MAC // bizarre issue with searchbox focus on tab voew change
-    anim->stop();
     searchBox->clearFocus();
-    searchFocusOut();
-    scopebar->setFocus(Qt::TabFocusReason);
 #endif
-    scopebar->setSelected(index);
 }
 
 /*----------------------------------------------------------------------
@@ -1237,7 +1381,8 @@ MainWindow::dropEvent(QDropEvent *event)
             xmlReader.parse(source);
             imported += handler.getSettings();
 
-        } else if (ErgFile::isWorkout(filename)) {
+        // Look for Workout files only in Train view
+        } else if (currentTab->currentView() == 3 && ErgFile::isWorkout(filename)) {
             workouts << filename;
         } else {
             filenames.append(filename);
@@ -1267,7 +1412,7 @@ MainWindow::dropEvent(QDropEvent *event)
     if (list.count())  importCharts(list);
 
     // import workouts
-    if (workouts.count()) Library::importFiles(currentTab->context, filenames, true);
+    if (workouts.count()) Library::importFiles(currentTab->context, workouts, true);
 
     // if there is anything left, process based upon view...
     if (filenames.count()) {
@@ -1546,41 +1691,15 @@ MainWindow::addDevice()
  *--------------------------------------------------------------------*/
 
 void
-MainWindow::newCyclistWindow()
-{
-    QDir newHome = currentTab->context->athlete->home->root();
-    newHome.cdUp();
-    QString name = ChooseCyclistDialog::newCyclistDialog(newHome, this);
-    if (!name.isEmpty()) openWindow(name);
-}
-
-void
 MainWindow::newCyclistTab()
 {
     QDir newHome = currentTab->context->athlete->home->root();
     newHome.cdUp();
     QString name = ChooseCyclistDialog::newCyclistDialog(newHome, this);
-    if (!name.isEmpty()) openTab(name);
-}
-
-void
-MainWindow::openWindow(QString name)
-{
-    // open window...
-    QDir home(gcroot);
-    appsettings->initializeQSettingsGlobal(gcroot);
-    home.cd(name);
-
-    if (!home.exists()) return;
-    appsettings->initializeQSettingsAthlete(gcroot, name);
-
-    GcUpgrade v3;
-    if (!v3.upgradeConfirmedByUser(home)) return;
-
-    // main window will register itself
-    MainWindow *main = new MainWindow(home);
-    main->show();
-    main->ridesAutoImport();
+    if (!name.isEmpty()) {
+        emit newAthlete(name);
+        openTab(name);
+    }
 }
 
 void
@@ -1604,20 +1723,24 @@ MainWindow::openTab(QString name)
     GcUpgrade v3;
     if (!v3.upgradeConfirmedByUser(home)) return;
 
-    setUpdatesEnabled(false);
+    Context *con= new Context(this);
+    con->athlete = NULL;
+    emit openingAthlete(name, con);
 
-    // splash screen - progress whilst loading tab
-    setSplash();
+    connect(con, SIGNAL(loadCompleted(QString,Context*)), this, SLOT(loadCompleted(QString, Context*)));
 
-    // bootstrap
-    Context *context = new Context(this);
-    context->athlete = new Athlete(context, home);
+    // will emit loadCompleted when done
+    con->athlete = new Athlete(con, home);
+}
 
-    // now open up a new tab
+void
+MainWindow::loadCompleted(QString name, Context *context)
+{
+    // athlete loaded
     currentTab = new Tab(context);
 
     // clear splash - progress whilst loading tab
-    clearSplash();
+    //clearSplash();
 
     // first tab
     tabs.insert(currentTab->context->athlete->home->root().dirName(), currentTab);
@@ -1630,19 +1753,12 @@ MainWindow::openTab(QString name)
     // switch to newly created athlete
     tabbar->setCurrentIndex(tabList.count()-1);
 
-    // kick off on analysis
-    setWindowTitle(currentTab->context->athlete->home->root().dirName());
-    selectAnalysis(); // sets scope bar ..
-
-    // now apply current
-    saveGCState(currentTab->context);
-    restoreGCState(currentTab->context);
-
     // show the tabbar if we're gonna open tabs -- but wait till the last second
     // to show it to avoid crappy paint artefacts
     showTabbar(true);
 
-    setUpdatesEnabled(true);
+    // tell everyone
+    currentTab->context->notifyLoadDone(name, context);
 
     // now do the automatic ride file import
     context->athlete->importFilesWhenOpeningAthlete();
@@ -1666,6 +1782,18 @@ MainWindow::closeTabClicked(int index)
 
     // lets wipe it
     removeTab(tab);
+}
+
+bool
+MainWindow::closeTab(QString name)
+{
+    for(int i=0; i<tabbar->count(); i++) {
+        if (name == tabbar->tabText(i)) {
+            closeTabClicked(i);
+            return true;
+        }
+    }
+    return false;
 }
 
 bool
@@ -1700,6 +1828,9 @@ MainWindow::removeTab(Tab *tab)
     setUpdatesEnabled(false);
 
     if (tabList.count() == 2) showTabbar(false); // don't need it for one!
+
+    // cancel ridecache refresh if its in progress
+    tab->context->athlete->rideCache->cancel();
 
     // save the named searches
     tab->context->athlete->namedSearches->write();
@@ -1741,48 +1872,6 @@ MainWindow::removeTab(Tab *tab)
     setUpdatesEnabled(true);
 
     return;
-}
-
-void
-MainWindow::setOpenWindowMenu()
-{
-    // wipe existing
-    openWindowMenu->clear();
-
-    // get a list of all cyclists
-    QStringListIterator i(QDir(gcroot).entryList(QDir::Dirs | QDir::NoDotAndDotDot));
-    while (i.hasNext()) {
-
-        QString name = i.next();
-        SKIP_QTWE_CACHE  // skip Folder Names created by QTWebEngine on Windows
-        // new action
-        QAction *action = new QAction(QString("%1").arg(name), this);
-
-        // get the config directory
-        AthleteDirectoryStructure subDirs(name);
-        // icon / mugshot ?
-        QString icon = QString("%1/%2/%3/avatar.png").arg(gcroot).arg(name).arg(subDirs.config().dirName());
-        if (QFile(icon).exists()) action->setIcon(QIcon(icon));
-
-        // only allow selection of cyclists which are not already open
-        foreach (MainWindow *x, mainwindows) {
-            QMapIterator<QString, Tab*> t(x->tabs);
-            while (t.hasNext()) {
-                t.next();
-                if (t.key() == name)
-                    action->setEnabled(false);
-            }
-        }
-
-        // add to menu
-        openWindowMenu->addAction(action);
-        connect(action, SIGNAL(triggered()), windowMapper, SLOT(map()));
-        windowMapper->setMapping(action, name);
-    }
-
-    // add create new option
-    openWindowMenu->addSeparator();
-    openWindowMenu->addAction(tr("&New Athlete..."), this, SLOT(newCyclistWindow()), tr("Ctrl+N"));
 }
 
 void
@@ -1865,6 +1954,54 @@ MainWindow::backupAthlete(QString name)
 }
 
 void
+MainWindow::setDeleteAthleteMenu()
+{
+    // wipe existing
+    deleteAthleteMenu->clear();
+
+    // get a list of all cyclists
+    QStringListIterator i(QDir(gcroot).entryList(QDir::Dirs | QDir::NoDotAndDotDot));
+    while (i.hasNext()) {
+
+        QString name = i.next();
+        SKIP_QTWE_CACHE  // skip Folder Names created by QTWebEngine on Windows
+        // new action
+        QAction *action = new QAction(QString("%1").arg(name), this);
+
+        // get the config directory
+        AthleteDirectoryStructure subDirs(name);
+        // icon / mugshot ?
+        QString icon = QString("%1/%2/%3/avatar.png").arg(gcroot).arg(name).arg(subDirs.config().dirName());
+        if (QFile(icon).exists()) action->setIcon(QIcon(icon));
+
+        // only allow selection of cyclists which are not already open
+        foreach (MainWindow *x, mainwindows) {
+            QMapIterator<QString, Tab*> t(x->tabs);
+            while (t.hasNext()) {
+                t.next();
+                if (t.key() == name)
+                    action->setEnabled(false);
+            }
+        }
+
+        // add to menu
+        deleteAthleteMenu->addAction(action);
+        connect(action, SIGNAL(triggered()), deleteMapper, SLOT(map()));
+        deleteMapper->setMapping(action, name);
+    }
+}
+
+void
+MainWindow::deleteAthlete(QString name)
+{
+    QDir home(gcroot);
+    if(ChooseCyclistDialog::deleteAthlete(home, name, this)) {
+        // notify deletion
+        emit deletedAthlete(name);
+    }
+}
+
+void
 MainWindow::saveGCState(Context *context)
 {
     // save all the current state to the supplied context
@@ -1874,7 +2011,6 @@ MainWindow::saveGCState(Context *context)
     context->showToolbar = showhideToolbar->isChecked();
     context->searchText = searchBox->text();
     context->style = styleAction->isChecked();
-    context->setIndex(scopebar->selected());
 }
 
 void
@@ -1885,9 +2021,6 @@ MainWindow::restoreGCState(Context *context)
     showToolbar(context->showToolbar);
     //showTabbar(context->showTabbar);
     showLowbar(context->showLowbar);
-    scopebar->setSelected(context->viewIndex);
-    scopebar->setContext(context);
-    scopebar->setHighlighted(); // to reflect context
     searchBox->setContext(context);
     searchBox->setText(context->searchText);
 }
@@ -1899,6 +2032,7 @@ MainWindow::switchTab(int index)
 
     setUpdatesEnabled(false);
 
+#if 0 // use athlete view, these buttons don't exist
 #ifdef Q_OS_MAC // close buttons on the left on Mac
     // Only have close button on current tab (prettier)
     for(int i=0; i<tabbar->count(); i++) tabbar->tabButton(i, QTabBar::LeftSide)->hide();
@@ -1907,6 +2041,7 @@ MainWindow::switchTab(int index)
     // Only have close button on current tab (prettier)
     for(int i=0; i<tabbar->count(); i++) tabbar->tabButton(i, QTabBar::RightSide)->hide();
     tabbar->tabButton(index, QTabBar::RightSide)->show();
+#endif
 #endif
 
     // save how we are
@@ -2000,7 +2135,6 @@ MainWindow::downloadErgDB()
  * TodaysPlan Workouts
  *--------------------------------------------------------------------*/
 
-#if QT_VERSION > 0x050000
 void
 MainWindow::downloadTodaysPlanWorkouts()
 {
@@ -2017,7 +2151,6 @@ MainWindow::downloadTodaysPlanWorkouts()
         "Please check your preference settings."));
     }
 }
-#endif
 
 /*----------------------------------------------------------------------
  * Workout/Media Library
@@ -2052,17 +2185,25 @@ MainWindow::checkCloud()
 }
 
 void
+MainWindow::importCloud()
+{
+    // lets get a new cloud service account
+    AddCloudWizard *p = new AddCloudWizard(currentTab->context, "", true);
+    p->show();
+}
+
+void
 MainWindow::uploadCloud(QAction *action)
 {
     // upload current ride, if we have one
     if (currentTab->context->ride) {
+        // & removed to avoid issues with kde AutoCheckAccelerators
+        QString actionText = QString(action->text()).replace("&", "");
 
-        if (action->text() == "University of Kent") {
-#if QT_VERSION > 0x50000
+        if (actionText == "University of Kent") {
             CloudService *db = CloudServiceFactory::instance().newService(action->data().toString(), currentTab->context);
             KentUniversityUploadDialog uploader(this, db, currentTab->context->ride);
             int ret = uploader.exec();
- #endif
         } else {
             CloudService *db = CloudServiceFactory::instance().newService(action->data().toString(), currentTab->context);
             CloudService::upload(this, currentTab->context, db, currentTab->context->ride);
@@ -2092,27 +2233,32 @@ void
 MainWindow::configChanged(qint32)
 {
 
-// Windows and Linux menu bar should match chrome
 #if defined (WIN32) || defined (Q_OS_LINUX)
+    // Windows and Linux menu bar should match chrome
     QColor textCol(Qt::black);
     if (GCColor::luminance(GColor(CCHROME)) < 127)  textCol = QColor(Qt::white);
     QString menuColorString = (GCColor::isFlat() ? GColor(CCHROME).name() : "rgba(225,225,225)");
     menuBar()->setStyleSheet(QString("QMenuBar { color: %1; background: %2; }"
                              "QMenuBar::item { color: %1; background: %2; }")
                              .arg(textCol.name()).arg(menuColorString));
-#endif
+    // search filter box match chrome color
+    searchBox->setStyleSheet(QString("QLineEdit { background: %1; color: %2; }").arg(GColor(CCHROME).name()).arg(GCColor::invertColor(GColor(CCHROME)).name()));
 
-// Mac and Linux
+#endif
+    QString buttonstyle = QString("QPushButton { border: none; background-color: %1; }").arg(CCHROME);
+    back->setStyleSheet(buttonstyle);
+    forward->setStyleSheet(buttonstyle);
+
+    // All platforms
     QPalette tabbarPalette;
     tabbar->setAutoFillBackground(true);
     tabbar->setShape(QTabBar::RoundedSouth);
     tabbar->setDrawBase(false);
 
-    if (GCColor::isFlat())
-        tabbarPalette.setBrush(backgroundRole(), GColor(CCHROME));
-    else
-        tabbarPalette.setBrush(backgroundRole(), QColor("#B3B4B6"));
+    tabbarPalette.setBrush(backgroundRole(), GColor(CCHROME));
+    tabbarPalette.setBrush(foregroundRole(), GCColor::invertColor(GColor(CCHROME)));
     tabbar->setPalette(tabbarPalette);
+    athleteView->setPalette(tabbarPalette);
 
     head->updateGeometry();
     repaint();
@@ -2124,21 +2270,31 @@ MainWindow::configChanged(qint32)
  *--------------------------------------------------------------------*/
 
 void
-MainWindow::downloadBodyMeasures()
+MainWindow::setMeasuresMenu()
 {
+    measuresMenu->clear();
+    if (currentTab->context->athlete == nullptr) return;
+    Measures *measures = currentTab->context->athlete->measures;
+    int group = 0;
+    foreach(QString name, measures->getGroupNames()) {
 
-    BodyMeasuresDownload dialog(currentTab->context);
-    dialog.exec();
-
+        // we use the group index to identify the measures group
+        QAction *service = new QAction(NULL);
+        service->setText(name);
+        service->setData(group++);
+        measuresMenu->addAction(service);
+    }
 }
 
 void
-MainWindow::downloadHrvMeasures()
+MainWindow::downloadMeasures(QAction *action)
 {
-
-    HrvMeasuresDownload dialog(currentTab->context);
+    // download or import from CSV file
+    if (currentTab->context->athlete == nullptr) return;
+    Measures *measures = currentTab->context->athlete->measures;
+    int group = action->data().toInt();
+    MeasuresDownload dialog(currentTab->context, measures->getGroup(group));
     dialog.exec();
-
 }
 
 void
@@ -2172,25 +2328,40 @@ MainWindow::ridesAutoImport() {
 
 }
 
-// grow/shrink searchbox if there is space...
-void
-MainWindow::searchFocusIn()
+#ifdef GC_WANT_PYTHON
+void MainWindow::onEditMenuAboutToShow()
 {
-    if (searchBox->searchbox->hasFocus()) {
-        anim->setDuration(300);
-        anim->setEasingCurve(QEasingCurve::InOutQuad);
-        anim->setStartValue(searchBox->width());
-        anim->setEndValue(500 * dpiYFactor);
-        anim->start();
-    }
+    bool embedPython = appsettings->value(nullptr, GC_EMBED_PYTHON, true).toBool();
+    pyFixesMenu->menuAction()->setVisible(embedPython);
 }
 
-void
-MainWindow::searchFocusOut()
+void MainWindow::buildPyFixesMenu()
 {
-    anim->stop();
-    searchBox->setFixedWidth(150 *dpiYFactor);
+    pyFixesMenu->clear();
+
+    QList<FixPyScript *> fixPyScripts = fixPySettings->getScripts();
+    foreach (FixPyScript *fixPyScript, fixPyScripts) {
+        QAction *action = new QAction(QString("%1...").arg(fixPyScript->name), this);
+        pyFixesMenu->addAction(action);
+        connect(action, SIGNAL(triggered()), toolMapper, SLOT(map()));
+        toolMapper->setMapping(action, "_fix_py_" + fixPyScript->name);
+    }
+
+    pyFixesMenu->addSeparator();
+    pyFixesMenu->addAction(tr("New Python Fix..."), this, SLOT (showCreateFixPyScriptDlg()));
+    pyFixesMenu->addAction(tr("Manage Python Fixes..."), this, SLOT (showManageFixPyScriptsDlg()));
 }
+
+void MainWindow::showManageFixPyScriptsDlg() {
+    ManageFixPyScriptsDialog dlg(currentTab->context);
+    dlg.exec();
+}
+
+void MainWindow::showCreateFixPyScriptDlg() {
+    EditFixPyScriptDialog dlg(currentTab->context, nullptr, this);
+    dlg.exec();
+}
+#endif
 
 #ifdef GC_HAS_CLOUD_DB
 void
@@ -2215,6 +2386,27 @@ MainWindow::cloudDBuserEditChart()
 }
 
 void
+MainWindow::cloudDBuserEditUserMetric()
+{
+    if (!(appsettings->cvalue(currentTab->context->athlete->cyclist, GC_CLOUDDB_TC_ACCEPTANCE, false).toBool())) {
+       CloudDBAcceptConditionsDialog acceptDialog(currentTab->context->athlete->cyclist);
+       acceptDialog.setModal(true);
+       if (acceptDialog.exec() == QDialog::Rejected) {
+          return;
+       };
+    }
+
+    if (currentTab->context->cdbUserMetricListDialog == NULL) {
+        currentTab->context->cdbUserMetricListDialog = new CloudDBUserMetricListDialog();
+    }
+
+    // force refresh in prepare to allways get the latest data here
+    if (currentTab->context->cdbUserMetricListDialog->prepareData(currentTab->context->athlete->cyclist, CloudDBCommon::UserEdit)) {
+        currentTab->context->cdbUserMetricListDialog->exec(); // no action when closed
+    }
+}
+
+void
 MainWindow::cloudDBcuratorEditChart()
 {
     // first check if the user is a curator
@@ -2228,6 +2420,27 @@ MainWindow::cloudDBcuratorEditChart()
         // force refresh in prepare to allways get the latest data here
         if (currentTab->context->cdbChartListDialog->prepareData(currentTab->context->athlete->cyclist, CloudDBCommon::CuratorEdit)) {
             currentTab->context->cdbChartListDialog->exec(); // no action when closed
+        }
+    } else {
+        QMessageBox::warning(0, tr("CloudDB"), QString(tr("Current athlete is not registered as curator - please contact the GoldenCheetah team")));
+
+    }
+}
+
+void
+MainWindow::cloudDBcuratorEditUserMetric()
+{
+    // first check if the user is a curator
+    CloudDBCuratorClient *curatorClient = new CloudDBCuratorClient;
+    if (curatorClient->isCurator(appsettings->cvalue(currentTab->context->athlete->cyclist, GC_ATHLETE_ID, "" ).toString())) {
+
+        if (currentTab->context->cdbUserMetricListDialog == NULL) {
+            currentTab->context->cdbUserMetricListDialog = new CloudDBUserMetricListDialog();
+        }
+
+        // force refresh in prepare to allways get the latest data here
+        if (currentTab->context->cdbUserMetricListDialog->prepareData(currentTab->context->athlete->cyclist, CloudDBCommon::CuratorEdit)) {
+            currentTab->context->cdbUserMetricListDialog->exec(); // no action when closed
         }
     } else {
         QMessageBox::warning(0, tr("CloudDB"), QString(tr("Current athlete is not registered as curator - please contact the GoldenCheetah team")));

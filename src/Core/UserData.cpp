@@ -115,7 +115,7 @@ EditUserDataDialog::EditUserDataDialog(Context *context, UserData *here) :
     QStringList names = context->tab->rideNavigator()->logicalHeadings;
 
     // start with just a list of functions
-    list = DataFilter::builtins();
+    list = DataFilter::builtins(context);
 
     // ridefile data series symbols
     list += RideFile::symbols();
@@ -123,14 +123,18 @@ EditUserDataDialog::EditUserDataDialog(Context *context, UserData *here) :
     // add special functions (older code needs fixing !)
     list << "config(cranklength)";
     list << "config(cp)";
+    list << "config(aetp)";
     list << "config(ftp)";
     list << "config(w')";
     list << "config(pmax)";
     list << "config(cv)";
-    list << "config(scv)";
+    list << "config(aetv)";
+    list << "config(sex)";
+    list << "config(dob)";
     list << "config(height)";
     list << "config(weight)";
     list << "config(lthr)";
+    list << "config(aethr)";
     list << "config(maxhr)";
     list << "config(rhr)";
     list << "config(units)";
@@ -239,12 +243,9 @@ EditUserDataDialog::cancelClicked()
 void
 EditUserDataDialog::colorClicked()
 {
-    QColorDialog picker(context->mainWindow);
-    picker.setCurrentColor(color);
-
     // don't use native dialog, since there is a nasty bug causing focus loss
     // see https://bugreports.qt-project.org/browse/QTBUG-14889
-    QColor newcolor = picker.getColor(color, this, tr("Choose Metric Color"), QColorDialog::DontUseNativeDialog);
+    QColor newcolor = QColorDialog::getColor(color, this, tr("Choose Metric Color"), QColorDialog::DontUseNativeDialog);
 
     if (newcolor.isValid()) {
         setButtonIcon(color=newcolor);
@@ -359,7 +360,7 @@ UserData::setRideItem(RideItem*m)
             // run through each sample and create an equivalent
             foreach(RideFilePoint *p, rideItem->ride()->dataPoints()) {
                 Result res = parser.evaluate(rideItem, p);
-                vector << res.number;
+                vector << res.number();
             }
 
             // cache for next time !

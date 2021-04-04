@@ -20,8 +20,15 @@
 #define _LOCATION_INTERPOLATION_H
 
 #include <tuple>
+#include <ratio>
 
 #include "qwt_math.h"
+
+#if defined(_MSC_VER)
+#define NOINLINE __declspec(noinline)
+#else
+#define NOINLINE
+#endif
 
 struct geolocation;
 
@@ -39,13 +46,13 @@ public:
     double  y() const { return std::get<1>(m_t); }
     double  z() const { return std::get<2>(m_t); }
 
-    double& x()       { return std::get<0>(m_t); }
-    double& y()       { return std::get<1>(m_t); }
-    double& z()       { return std::get<2>(m_t); }
+    double& x() { return std::get<0>(m_t); }
+    double& y() { return std::get<1>(m_t); }
+    double& z() { return std::get<2>(m_t); }
 
     v3 add(const v3 &a)      const { return v3(x() + a.x(), y() + a.y(), z() + a.z()); }
     v3 subtract(const v3 &a) const { return v3(x() - a.x(), y() - a.y(), z() - a.z()); }
-    v3 scale(double d)       const { return v3(x() * d,     y() * d,     z() * d); }
+    v3 scale(double d)       const { return v3(x() * d, y() * d, z() * d); }
 
     double magnitude()       const { return sqrt(dot(*this)); }
 
@@ -117,12 +124,19 @@ struct geolocation : v3
         return dist;
     }
 
-    bool IsReasonableGeoLocation () const {
-        return  (this->Lat() &&  this->Lat()  >= double(-90)  && this->Lat()  <= double(90) &&
-                 this->Long() && this->Long() >= double(-180) && this->Long() <= double(180) &&
-                 this->Alt() >= -1000 && this->Alt() < 10000);
+    bool IsReasonableAltitude() const {
+        return (this->Alt() >= -1000 && this->Alt() < 10000);
     }
 
+    bool IsReasonableGeoLocation() const {
+        return  (this->Lat() && this->Lat() >= double(-90) && this->Lat() <= double(90) &&
+            this->Long() && this->Long() >= double(-180) && this->Long() <= double(180) &&
+            IsReasonableAltitude());
+    }
+
+    // Compute initial bearing from this geoloc to another, in RADIANS.
+    // Note that unless bearing is 0 or pi it will vary on the path from one to the other.
+    double BearingTo(const geolocation& to) const;
 };
 
 // Class to wrap classic game spherical interpolation
@@ -169,16 +183,136 @@ struct SphericalTwoPointInterpolator : public TwoPointInterpolator
     xyz InterpolateNext(xyz p0, xyz p1);
 };
 
+// Coefficient caching. A large benefit is that by performing compute separate
+// from use the use will be inlined. Cache efficiency depends on route point
+// distances but typical rides cache succeeds 5-10 times before invalidated.
+class LazyCoefficients
+{
+    mutable bool m_CoefsValid;
+public:
+    bool Valid()       const { return m_CoefsValid; }
+    void Validate()    const { m_CoefsValid = true; }
+    void Invalidate()  const { m_CoefsValid = false; }
+
+    LazyCoefficients() : m_CoefsValid(false) {}
+};
+
+template <typename T_SourceCoefType, typename T_Ratio>
+class LazyLocationCoefficients : public LazyCoefficients
+{
+    // Cache of computed coefficients for location computation.
+    mutable std::tuple<double, double, double, double> m_coefs;
+
+    // Computes and stores coefficients for cubic splne location calculation.
+    NOINLINE void Compute(const T_SourceCoefType& base) const
+    {
+        // Curvature-parameterized CatmullRom equation courtesy of wolfram alpha:
+        // [1, u, u ^ 2, u ^ 3] * [[0, 1, 0, 0], [-t, 0, t, 0], [2 * t, t - 3, 3 - 2t, -t], [-t, 2 - t, t - 2, t]] * [p0, p1, p2, p3]
+
+        double t = (double)T_Ratio::num / (double)T_Ratio::den;
+
+        double p0 = std::get<0>(base);
+        double p1 = std::get<1>(base);
+        double p2 = std::get<2>(base);
+        double p3 = std::get<3>(base);
+
+        double A = ((p3 + p2 - p1 - p0) * t - 2 * p2 + 2 * p1);
+        double B = ((-p3 - 2 * p2 + p1 + 2 * p0) * t + 3 * p2 - 3 * p1);
+        double C = (p2 - p0) * t;
+        double D = p1;
+
+        std::get<0>(m_coefs) = A;
+        std::get<1>(m_coefs) = B;
+        std::get<2>(m_coefs) = C;
+        std::get<3>(m_coefs) = D;
+
+        Validate();
+    }
+
+public:
+
+    void Get(const T_SourceCoefType &base, double &A, double &B, double &C, double &D) const
+    {
+        if (!Valid()) {
+            Compute(base);
+        }
+
+        A = std::get<0>(m_coefs);
+        B = std::get<1>(m_coefs);
+        C = std::get<2>(m_coefs);
+        D = std::get<3>(m_coefs);
+    }
+};
+
+template <typename T_SourceCoefType, typename T_Ratio>
+class LazyTangentCoefficients : public LazyCoefficients
+{
+    // Cache of computed coefficients for tangent computation.
+    mutable std::tuple<double, double, double> m_coefs;
+
+    // Computes and stores coefficients for cubic splne tangent calculation.
+    NOINLINE void Compute(const T_SourceCoefType &base) const
+    {
+        // d f(u)/ du of Curvature-parameterized CatmullRom equation courtesy of wolfram alpha:
+        // [1, u, u ^ 2, u ^ 3] * [[0, 1, 0, 0], [-t, 0, t, 0], [2 * t, t - 3, 3 - 2t, -t], [-t, 2 - t, t - 2, t]] * [p0, p1, p2, p3]
+        double t = (double)T_Ratio::num / (double)T_Ratio::den;
+
+        double p0 = std::get<0>(base);
+        double p1 = std::get<1>(base);
+        double p2 = std::get<2>(base);
+        double p3 = std::get<3>(base);
+
+        double A = 3 * ((p3 + p2 - p1 - p0) * t - 2 * p2 + 2 * p1);
+        double B = 2 * ((-p3 - 2 * p2 + p1 + 2 * p0)*t + 3 * p2 - 3 * p1);
+        double C = (p2 - p0) * t;
+
+        std::get<0>(m_coefs) = A;
+        std::get<1>(m_coefs) = B;
+        std::get<2>(m_coefs) = C;
+
+        Validate();
+    }
+
+public:
+
+    LazyTangentCoefficients() {};
+
+    void Get(const T_SourceCoefType &base, double &A, double &B, double &C) const
+    {
+        if (!Valid()) {
+            Compute(base);
+        }
+
+        A = std::get<0>(m_coefs);
+        B = std::get<1>(m_coefs);
+        C = std::get<2>(m_coefs);
+    }
+};
+
+
 class UnitCatmullRomInterpolator
 {
-    std::tuple<double, double, double, double> m_p;
+    // Control curvature:
+    //   0   is standard (straigtest)
+    //   0.5 is called centripetal
+    //   1   is chordal (loopiest)
+    typedef std::ratio<1, 2> T;
+
+    typedef std::tuple<double, double, double, double> CoefType;
+
+    CoefType m_baseCoefs;
+
+    LazyLocationCoefficients<CoefType, T> m_locCoefs;
+    LazyTangentCoefficients<CoefType, T>  m_tanCoefs;
 
 public:
 
     void Init(double pm1, double p0, double p1, double p2);
     UnitCatmullRomInterpolator();
     UnitCatmullRomInterpolator(double pm1, double p0, double p1, double p2);
-    double Interpolate(double u);
+    double Location(double u) const;
+    double Tangent(double u) const;
+    bool   Inverse(double r, double &u) const;
 };
 
 class UnitCatmullRomInterpolator3D
@@ -190,7 +324,8 @@ public:
     void Init(xyz pm1, xyz p0, xyz p1, xyz p2);
     UnitCatmullRomInterpolator3D() : x(), y(), z() {}
     UnitCatmullRomInterpolator3D(xyz pm1, xyz p0, xyz p1, xyz p2);
-    xyz Interpolate(double frac);
+    xyz Location(double frac) const;
+    xyz Tangent(double frac) const;
 };
 
 // Visual studio has an error in how it compiles bitset that prevents
@@ -199,38 +334,49 @@ public:
 template <size_t T_bitsize> class MyBitset
 {
     static_assert(T_bitsize <= 32, "T_bitsize must be <= 32.");
-    static_assert(T_bitsize >= 1,  "T_bitsize must be >= 1.");
+    static_assert(T_bitsize >= 1, "T_bitsize must be >= 1.");
 
     unsigned m_mask;
 
     unsigned popcnt(unsigned x) const {
         x = x - ((x >> 1) & 0x55555555);
-        x = (x & 0x33333333) + ((x >> 2) & 0x33333333);  
-        return ((x + (x >> 4) & 0xF0F0F0F) * 0x1010101) >> 24;
+        x = (x & 0x33333333) + ((x >> 2) & 0x33333333);
+        return (((x + (x >> 4)) & 0xF0F0F0F) * 0x1010101) >> 24;
     }
 
-    void truncate() { m_mask &= (((unsigned)(-1 << (32 - T_bitsize))) >> (32 - T_bitsize)); }
+    void truncate() { m_mask &= ((~0U << (32 - T_bitsize)) >> (32 - T_bitsize)); }
 
 public:
 
     MyBitset(unsigned m) : m_mask(m) {}
-    void reset()                           { m_mask = 0; }
-    bool test(unsigned u) const            { return ((m_mask >> u) & 1) != 0; }
-    void set(unsigned u)                   { m_mask |= (1 << u); truncate(); }
-    unsigned count() const                 { return popcnt(m_mask); }
+    void reset() { m_mask = 0; }
+    bool test(unsigned u) const { return ((m_mask >> u) & 1) != 0; }
+    void set(unsigned u) { m_mask |= (1 << u); truncate(); }
+    unsigned count() const { return popcnt(m_mask); }
     MyBitset<T_bitsize>& operator <<=(unsigned u) { m_mask <<= u; truncate(); return (*this); }
 };
 
 // 4 element sliding window to hold interpolation points
 template <typename T> class SlidingWindow
 {
-    std::tuple<T, T, T, T> m_Window;
-    MyBitset<4>            m_ElementExists;
-    //std::bitset<4>         m_ElementExists; // Visual studio error prevents bitset use alongside qtbase header.
+    std::tuple<T, T, T, T>     m_Window;
+    MyBitset<4>                m_ElementExists;
+    //std::bitset<4>             m_ElementExists; // Visual studio error prevents bitset use alongside qtbase header.
+
+    UnitCatmullRomInterpolator u;
+    bool                       m_InterpolatorNeedsInit;
+
+    void Maintain()
+    {
+        if (m_InterpolatorNeedsInit) {
+            u.Init(pm1(), p0(), p1(), p2());
+            m_InterpolatorNeedsInit = false;
+        }
+    }
 
 public:
 
-    SlidingWindow() : m_ElementExists(0) {}
+    SlidingWindow() : m_ElementExists(0), m_InterpolatorNeedsInit(true) {}
 
     void Reset() {
         m_ElementExists.reset();
@@ -238,10 +384,10 @@ public:
 
     unsigned Count() const { return (unsigned)m_ElementExists.count(); }
 
-    T& pm1()               { return std::get<0>(m_Window); }
-    T& p0()                { return std::get<1>(m_Window); }
-    T& p1()                { return std::get<2>(m_Window); }
-    T& p2()                { return std::get<3>(m_Window); }
+    T& pm1(){ m_InterpolatorNeedsInit = true; return std::get<0>(m_Window); }
+    T& p0() { m_InterpolatorNeedsInit = true; return std::get<1>(m_Window); }
+    T& p1() { m_InterpolatorNeedsInit = true; return std::get<2>(m_Window); }
+    T& p2() { m_InterpolatorNeedsInit = true; return std::get<3>(m_Window); }
 
     T  pm1()         const { return std::get<0>(m_Window); }
     T  p0()          const { return std::get<1>(m_Window); }
@@ -253,8 +399,37 @@ public:
     bool  hasp1()    const { return m_ElementExists.test(1); }
     bool  hasp2()    const { return m_ElementExists.test(0); }
 
+    bool BracketFromDistance(double distance, double &bracket)
+    {
+        Maintain();
+
+        return u.Inverse(distance, bracket);
+    }
+
+    // Returns rate of change of distance spline at bracket [0..1].
+    double FrameSpeed(double frac) const
+    {
+        // Do not call Maintain() here. frac input implies that current
+        // interpolator state should be queried.
+        // If anything assert that interpolator state needs no update.
+
+        double frameSpeed = u.Tangent(frac);
+
+        // Slope can be zero at start (when prior distance window entries are zero.)
+        // Just use average until there are enough datapoints to interpolate.
+
+        // Note frameSpeed should never be negative since that would imply
+        // route distance can decrease.
+
+        frameSpeed = (frameSpeed > 0.) ? frameSpeed : (p1() - p0());
+
+        return frameSpeed;
+    }
+
     void Push(const T& t)
     {
+        m_InterpolatorNeedsInit = true;
+
         m_ElementExists <<= 1;
         m_ElementExists.set(0); // set p2 existing
 
@@ -266,6 +441,8 @@ public:
 
     void Advance()
     {
+        m_InterpolatorNeedsInit = true;
+
         m_ElementExists <<= 1;
 
         pm1() = p0();
@@ -308,124 +485,138 @@ public:
         m_DidChange = true;
     }
 
+    bool NeedsUpdate() { return m_DidChange; }
+
     // Update interpolator if input state has changed
     // This method synthesizes fake points to allow interpolation on partially filled point queue
     // which occurs when there are insufficient points or at the start and end of the interpolation.
-    void update()
+    NOINLINE void Update()
     {
         // Queue changed, update interpolator with new points, interpolate new points if necessary
-        if (m_DidChange) {
-            xyz pm1(m_PointWindow.pm1());
-            xyz p0(m_PointWindow.p0());
-            xyz p1(m_PointWindow.p1());
-            xyz p2(m_PointWindow.p2());
+        xyz pm1(m_PointWindow.pm1());
+        xyz p0(m_PointWindow.p0());
+        xyz p1(m_PointWindow.p1());
+        xyz p2(m_PointWindow.p2());
 
-            switch (m_PointWindow.Count()) {
-            case 4:
-                // All points are set.
-                break;
-
-            case 3:
-                // Either pm1 or p2 is missing, interpolate the missing one.
-            {
-                xyz *s, *e, *pr;
-                if (!m_PointWindow.haspm1()) {
-                    s = &p1;
-                    e = &p0;
-                    pr = &pm1;
-                } else {
-                    s = &p0;
-                    e = &p1;
-                    pr = &p2;
-                }
-                *pr = this->InterpolateNext(*s, *e);
-            }
+        switch (m_PointWindow.Count()) {
+        case 4:
+            // All points are set.
             break;
 
-            case 2:
-
-            {
-                xyz *pr0, *pr1, *s0, *s1, *e0, *e1;
-
-                // pm1 and p2
-                // p1 and p2
-                if (!m_PointWindow.haspm1() && !m_PointWindow.hasp0()) {
-                    pr0 = &p0;
-                    s0 = &p2;
-                    e0 = &p1;
-
-                    pr1 = &pm1;
-                    s1 = &p1;
-                    e1 = pr0;
-                } else if (!m_PointWindow.haspm1()) {
-                    // interpolate to pm1 and p2
-                    pr0 = &pm1;
-                    s0 = &p1;
-                    e0 = &p0;
-
-                    pr1 = &p2;
-                    s1 = &p0;
-                    e1 = &p1;
-                } else {
-                    // interpolate to p1 and p2
-                    pr0 = &p1;
-                    s0 = &pm1;
-                    e0 = &p0;
-
-                    pr1 = &p2;
-                    s1 = &p0;
-                    e1 = pr0;
-                }
-
-                *pr0 = this->InterpolateNext(*s0, *e0);
-                *pr1 = this->InterpolateNext(*s1, *e1);
+        case 3:
+            // Either pm1 or p2 is missing, interpolate the missing one.
+        {
+            xyz *s, *e, *pr;
+            if (!m_PointWindow.haspm1()) {
+                s = &p1;
+                e = &p0;
+                pr = &pm1;
             }
-            break;
-
-            case 1:
-                // one point is present, propagate it to remaining entries.
-            {
-                xyz t = p2;
-                if (m_PointWindow.hasp1()) t = p1;
-                else if (m_PointWindow.hasp0()) t = p0;
-                else if (m_PointWindow.haspm1()) t = pm1;
-
-                pm1 = t;
-                p0 = t;
-                p1 = t;
-                p2 = t;
+            else {
+                s = &p0;
+                e = &p1;
+                pr = &p2;
             }
-            break;
-
-            case 0:
-            {
-                // no points, default 0.0 is as good as anything.
-                // or assert?
-                xyz zero(0, 0, 0);
-                pm1 = zero;
-                p0 = zero;
-                p1 = zero;
-                p2 = zero;
-            }
-            break;
-            }
-
-            m_Interpolator.Init(pm1, p0, p1, p2);
-            m_DidChange = false;
+            *pr = this->InterpolateNext(*s, *e);
         }
+        break;
+
+        case 2:
+
+        {
+            xyz *pr0, *pr1, *s0, *s1, *e0, *e1;
+
+            // pm1 and p2
+            // p1 and p2
+            if (!m_PointWindow.haspm1() && !m_PointWindow.hasp0()) {
+                pr0 = &p0;
+                s0 = &p2;
+                e0 = &p1;
+
+                pr1 = &pm1;
+                s1 = &p1;
+                e1 = pr0;
+            }
+            else if (!m_PointWindow.haspm1()) {
+                // interpolate to pm1 and p2
+                pr0 = &pm1;
+                s0 = &p1;
+                e0 = &p0;
+
+                pr1 = &p2;
+                s1 = &p0;
+                e1 = &p1;
+            }
+            else {
+                // interpolate to p1 and p2
+                pr0 = &p1;
+                s0 = &pm1;
+                e0 = &p0;
+
+                pr1 = &p2;
+                s1 = &p0;
+                e1 = pr0;
+            }
+
+            *pr0 = this->InterpolateNext(*s0, *e0);
+            *pr1 = this->InterpolateNext(*s1, *e1);
+        }
+        break;
+
+        case 1:
+            // one point is present, propagate it to remaining entries.
+        {
+            xyz t = p2;
+            if (m_PointWindow.hasp1()) t = p1;
+            else if (m_PointWindow.hasp0()) t = p0;
+            else if (m_PointWindow.haspm1()) t = pm1;
+
+            pm1 = t;
+            p0 = t;
+            p1 = t;
+            p2 = t;
+        }
+        break;
+
+        case 0:
+        {
+            // no points, default 0.0 is as good as anything.
+            // or assert?
+            xyz zero(0, 0, 0);
+            pm1 = zero;
+            p0 = zero;
+            p1 = zero;
+            p2 = zero;
+        }
+        break;
+        }
+
+        m_Interpolator.Init(pm1, p0, p1, p2);
+        m_DidChange = false;
     }
 
     // Interpolate between points[1] and points[2].
     // If points[0] and points[3] dont exist then
     // create them.
-    xyz Interpolate(double frac)
+    xyz Location(double frac)
     {
         // Ensure interpolator has current state - synthesize fake points if needed.
-        update();
+        if (NeedsUpdate())
+            Update();
 
-        // assert frac in range 0-1.
+        return m_Interpolator.Location(frac);
+    }
 
-        return m_Interpolator.Interpolate(frac);
+    // Interpolate between points[1] and points[2].
+    // If points[0] and points[3] dont exist then
+    // create them.
+    xyz Tangent(double frac)
+    {
+        // Ensure interpolator has current state - synthesize fake points if needed.
+        if (NeedsUpdate())
+            Update();
+
+        return m_Interpolator.Tangent(frac);
     }
 };
 
@@ -435,10 +626,65 @@ template <typename T_TwoPointInterpolator> class DistancePointInterpolator
     SlidingWindow<double>                                      m_DistanceWindow;
     bool                                                       m_fInputComplete;
 
-    static double OffsetInRangeToFraction(double distance, double start, double end)
+    static double OffsetInRangeToRatio(double distance, double start, double end)
     {
-        // assert distance >= start && distance <= end
+        if (end == start)
+            return 0;
+
         return (distance - start) / (end - start);
+    }
+
+    // Prepare interpolation window for query at distance, then return
+    // bracket ratio for distance within current bracket.
+    double DistanceToBracketRatio(double distance)
+    {
+        // Continue to advance queue after input is complete.
+        if (m_fInputComplete) {
+            // When input is finished we must continue to advance the point state based on distance
+            while (m_DistanceWindow.hasp1() && distance >= m_DistanceWindow.p1()) {
+                m_DistanceWindow.Advance();
+                m_Interpolator.Advance();
+            }
+        }
+
+        // Determine fraction of range that this distance specifies (frac must be 0-1.)
+        double ratio = 0.0;
+        switch (m_DistanceWindow.Count())
+        {
+        case 0:
+        case 1:
+            break;
+        case 2:
+            if (!m_DistanceWindow.haspm1() && !m_DistanceWindow.hasp0()) {
+                // missing: pm1 && p0
+                // Query distance comes before any known range.
+                ratio = 1.0;
+            }
+            else if (!m_DistanceWindow.haspm1()) {
+                // missing: pm1 && p2
+                ratio = OffsetInRangeToRatio(distance, m_DistanceWindow.p0(), m_DistanceWindow.p1());
+            }
+            else {
+                // missing: p1  && p2
+                ratio = 0.0;
+            }
+            break;
+        case 3:
+            ratio = OffsetInRangeToRatio(distance, m_DistanceWindow.p0(), m_DistanceWindow.p1());
+            break;
+        case 4:
+            {
+                if (distance == m_DistanceWindow.p0()) return 0.;
+                if (distance == m_DistanceWindow.p1()) return 1.;
+                bool fInv = m_DistanceWindow.BracketFromDistance(distance, ratio);
+                if (!fInv) {
+                    ratio = OffsetInRangeToRatio(distance, m_DistanceWindow.p0(), m_DistanceWindow.p1());
+                }
+            }
+            break;
+        }
+
+        return ratio;
     }
 
 public:
@@ -482,6 +728,7 @@ public:
         return r;
     }
 
+    // Return center two points of the four point interpolation window.
     bool GetBracket(double &d0, double &d1)
     {
         if (!m_DistanceWindow.hasp0() || !m_DistanceWindow.hasp1())
@@ -493,44 +740,39 @@ public:
         return true;
     }
 
-    xyz Interpolate(double distance)
+    // Location interpolation when tangent isn't needed.
+    xyz Location(double distance)
     {
-        // Continue to advance queue after input is complete.
-        if (m_fInputComplete) {
-            // When input is finished we must continue to advance the point state based on distance
-            while (m_DistanceWindow.hasp1() && distance >= m_DistanceWindow.p1()) {
-                m_DistanceWindow.Advance();
-                m_Interpolator.Advance();
-            }
-        }
+        double ratio = DistanceToBracketRatio(distance);
+        xyz newXYZLocation = m_Interpolator.Location(ratio);
+        return newXYZLocation;
+    }
 
-        // Determine fraction of range that this distance specifies (frac must be 0-1.)
-        double frac = 0.0;
-        switch (m_DistanceWindow.Count())
-        {
-        case 0:
-        case 1:
-            break;
-        case 2:
-            if (!m_DistanceWindow.haspm1() && !m_DistanceWindow.hasp0()) {
-                // missing: pm1 && p0
-                // Query distance comes before any known range.
-                frac = 1.0;
-            } else if (!m_DistanceWindow.haspm1()) {
-                // missing: pm1 && p2
-                frac = OffsetInRangeToFraction(distance, m_DistanceWindow.p0(), m_DistanceWindow.p1());
-            } else {
-                // missing: p1  && p2
-                frac = 0.0;
-            }
-            break;
-        case 3:
-        case 4:
-            frac = OffsetInRangeToFraction(distance, m_DistanceWindow.p0(), m_DistanceWindow.p1());
-            break;
-        }
+    // Location interpolation including tangent vector computation
+    xyz Location(double distance, xyz &tangentVector)
+    {
+        double bracketRatio = DistanceToBracketRatio(distance);
 
-        return m_Interpolator.Interpolate(frac);
+        tangentVector = m_Interpolator.Tangent(bracketRatio);
+
+        // Frame speed is speed of parametric distance.
+        // Remove frame speed from tangent vector.
+        double frameSpeed = m_DistanceWindow.FrameSpeed(bracketRatio);
+        double tangentSpeed = tangentVector.magnitude();
+        double correctionScale = tangentSpeed ? (frameSpeed / (tangentSpeed * tangentSpeed)) : 1.;
+
+        // This rescale converts tangent vector into a unit vector
+        // WRT parametric route velocity.
+        // Tangent vector's remaining non-unit-ness is due to
+        // distortion from mapping route speed to geometric
+        // speed, but that cannot be corrected here since we
+        // are in ECEF and vector's altitude component is not
+        // distorted while orthagonal plane is.
+        tangentVector = tangentVector.scale(correctionScale);
+
+        xyz l0xyz = m_Interpolator.Location(bracketRatio);
+
+        return l0xyz;
     }
 
 private:
@@ -638,14 +880,14 @@ public:
             const double inter1 = d0 + thirdspan + thirdspan;
 
             // Step 2
-            const xyz pm1 = this->Interpolate(d0);
-            const xyz  p0 = this->Interpolate(inter0);
-            const xyz  p1 = this->Interpolate(inter1);
-            const xyz  p2 = this->Interpolate(d1);
+            const xyz pm1 = this->Location(d0);
+            const xyz  p0 = this->Location(inter0);
+            const xyz  p1 = this->Location(inter1);
+            const xyz  p2 = this->Location(d1);
 
             // Step 3
             double linearDistance = p2.DistanceFrom(pm1);
-            if (linearDistance < 0.000001)
+            if (linearDistance < 0.0001)
                 break;
 
             // Step 4
@@ -663,7 +905,7 @@ public:
                 finalLength += arcDistance;
             } else {
                 // 5B: otherwise push the 3 new subsegments onto worklist.
-                worklist.Push(CalcSplineLengthBracketPair(d0,     inter0));
+                worklist.Push(CalcSplineLengthBracketPair(d0, inter0));
                 worklist.Push(CalcSplineLengthBracketPair(inter0, inter1));
                 worklist.Push(CalcSplineLengthBracketPair(inter1, d1));
             }
@@ -675,13 +917,25 @@ public:
 
 class GeoPointInterpolator : public DistancePointInterpolator<SphericalTwoPointInterpolator>
 {
+    enum LocationState { Unset, YesLocation, NoLocation};
+    LocationState m_locationState;
+
 public:
 
-    GeoPointInterpolator() : DistancePointInterpolator<SphericalTwoPointInterpolator>() {}
+    GeoPointInterpolator() : DistancePointInterpolator<SphericalTwoPointInterpolator>(), m_locationState(Unset) {}
 
-    geolocation Interpolate(double distance);
+    void Reset() {
+        m_locationState = Unset;
+        DistancePointInterpolator<SphericalTwoPointInterpolator>::Reset();
+    }
+
+    geolocation Location(double distance);
+    geolocation Location(double distance, double &slope);
+
+    bool HasLocation() { return m_locationState == YesLocation; }
 
     void Push(double distance, geolocation point);
+    void Push(double distance, double altitude);
 };
 
 #endif

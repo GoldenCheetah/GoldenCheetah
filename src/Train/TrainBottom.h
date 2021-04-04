@@ -35,7 +35,7 @@ public:
 private:
     TrainSidebar *m_trainSidebar;
     QPushButton *m_playButton, *m_rewindButton, *m_stopButton, *m_forwardButton;
-    QPushButton *m_lapButton, *m_connectButton, *loadDown, *loadUp, *cal;
+    QPushButton *m_lapButton, *m_connectButton, *loadDown, *loadUp, *cal, *fwdLap, *backLap;
     QSlider *intensitySlider;
     QPlainTextEdit *notificationText;
     QTimer *notificationTimer;

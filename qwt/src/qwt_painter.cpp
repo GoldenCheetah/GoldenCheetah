@@ -19,6 +19,7 @@
 #include <qpainter.h>
 #include <qpalette.h>
 #include <qpaintdevice.h>
+#include <qpainterpath.h>
 #include <qpixmap.h>
 #include <qstyle.h>
 #include <qtextdocument.h>

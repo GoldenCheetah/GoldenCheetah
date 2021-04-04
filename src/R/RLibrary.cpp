@@ -268,7 +268,7 @@ RLibrary::resolve(const char *symbol)
     QFunctionPointer returning = libR->resolve(symbol);
     if (returning) return returning;
     else {
-        errors << QString("R lib: failed to resolve symbol: '%1'").arg(symbol);
+        errors << tr("R lib: failed to resolve symbol: '%1'").arg(symbol);
         loaded = false;
         return NULL;
     }
@@ -302,8 +302,8 @@ RLibrary::load()
     // if home still blanks
     bool sethome = false;
     if (home == "") {
-        errors << "R_HOME has not been configured in options or the system environment"
-                  " so we looked in the common places to find the R install.\n\n";
+        errors << tr("R_HOME has not been configured in options or the system environment"
+                  " so we looked in the common places to find the R install.\n\n");
         sethome = true;
     }
 
@@ -341,7 +341,7 @@ RLibrary::load()
     QString full = QString("%1/%2").arg(home).arg(name);
     if (QFile(full).exists()) {
 
-        errors << QString("The R library was found at '%1'\n").arg(full);
+        errors << tr("The R library was found at '%1'\n").arg(full);
 
         // we need to make sure the dependants are loaded so update
         // LD_LIBRARY_PATH or PATH so they can be found - this only
@@ -361,11 +361,11 @@ RLibrary::load()
         // snaffle away errors
         errors <<libR->errorString();
     } else {
-        errors << "We failed to find the R shared libraries.";
+        errors << tr("We failed to find the R shared libraries.");
     }
 
     if (!loaded) {
-        errors <<"The dynamic library load failed.";
+        errors <<tr("The dynamic library load failed.");
         return loaded;
     }
 

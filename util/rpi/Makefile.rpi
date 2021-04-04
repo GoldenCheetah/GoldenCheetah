@@ -1,0 +1,53 @@
+SRC_DIR?= ~pi/src
+REPO_URL=git://github.com/GoldenCheetah/GoldenCheetah.git
+BRANCH_ID=release_3.5.0
+
+TARGETS=gc/pre gc/deps gc/rules gc/sources gc/config gc/build gc/icon
+.PHONY: $(TARGETS)
+
+gc/all: $(TARGETS)
+
+# Sync up the pkg repos so we have the latest versions of the deps
+gc/pre:
+	sudo apt -y update
+	sudo apt -yf full-upgrade
+	sudo apt-get -y --purge autoremove 
+	sudo apt-get -y autoclean
+
+# Get the necessary dependencies
+gc/deps:
+	sudo apt-get -y install qt5-default qtcreator libqt5svg5-dev libqt5serialport5-dev \
+	libqt5charts5-dev qtmultimedia5-dev qtconnectivity5-dev \
+	libqt5webkit5-dev libusb-1.0-0-dev libical-dev libvlc-dev \
+	libvlccore-dev bison flex
+
+# Add the USB rules so the system detects sub2ant stick
+gc/rules:
+	sudo sh -c "cat goldencheetah/52-garmin-usb.rules >> /etc/udev/rules.d/52-garmin-usb.rules"
+
+# Get the GC sources
+gc/sources:
+	mkdir -p $(SRC_DIR) ;\
+	cd $(SRC_DIR)	;\
+	git clone $(REPO_URL) --branch $(BRANCH_ID) ;\
+	cd GoldenCheetah/qwt ;\
+	cp qwtconfig.pri.in qwtconfig.pri
+
+# Edit the necessary pieces in the config file so GC compiles in the system
+gc/config: ./gcconfig.pri.for_rpi
+	cp ./gcconfig.pri.for_rpi	$(SRC_DIR)/GoldenCheetah/src/gcconfig.pri
+
+# Let's burn some cpu (compile the sources)
+# This takes 30 minutes in a RPI 4 with 4GB and the filesystem mounted in a usb drive
+# Expect 1:30 min if you run from a SSD card.
+gc/build:
+	date >> $(SRC_DIR)/GoldenCheetah/build.date.start
+	cd $(SRC_DIR)/GoldenCheetah;\
+	git pull ;\
+	qmake -recursive;\
+	make -j4 ;\
+	date >> $(SRC_DIR)/GoldenCheetah/build.date.end
+
+# Create an icon in the desktop
+gc/icon:
+	sh ./create_icon.sh $(SRC_DIR) > ~pi/Desktop/GoldenCheetah.desktop

@@ -42,8 +42,9 @@
 // 1.7      20 Feb 17  Mark Liversedge         Metric count (if nonzero) added
 // 1.8      22 Feb 17  Mark Liversedge         Metric stdmean() stdvariance() added
 // 1.9      29 Jul 18  Mark Liversedge         Mark intervals as performance tests
+// 2.0      04 Apr 20  Ale Martinez            sport replaces isRun and isSwim
 
-#define RIDEDB_VERSION "1.9"
+#define RIDEDB_VERSION "2.0"
 
 class APIWebService;
 class HttpResponse;
@@ -51,6 +52,9 @@ class HttpRequest;
 
 // using context (we are reentrant)
 struct RideDBContext {
+
+    // athlete folder name
+    QString folder;
 
     // either reading a cache or providing an api ...
     RideCache *cache;
@@ -77,6 +81,7 @@ struct RideDBContext {
 
     // is cache/rideDB.json an older version ?
     bool old;
+    int loading;
 };
 
 #endif

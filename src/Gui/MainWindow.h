@@ -31,6 +31,7 @@
 #include "DragBar.h"
 #ifdef GC_HAS_CLOUD_DB
 #include "CloudDBChart.h"
+#include "CloudDBUserMetric.h"
 #include "CloudDBVersion.h"
 #include "CloudDBTelemetry.h"
 #endif
@@ -40,7 +41,7 @@
 #include <AvailabilityMacros.h>
 #endif
 
-#if defined(NOWEBKIT) && defined(WIN32)
+#if defined(WIN32)
 // Macro to avoid Code Duplication in multiple files
 // QtWebEngine puts it's cache into the User directory (only on Windows) - so do not show in list
 # define SKIP_QTWE_CACHE \
@@ -55,16 +56,18 @@
 
 class QTFullScreen;
 class GcToolBar;
-class GcScopeBar;
 class Library;
 class QtSegmentControl;
 class SaveSingleDialogWidget;
 class ChooseCyclistDialog;
 class SearchFilterBox;
+class NewSideBar;
+class AthleteView;
 
 
 class MainWindow;
 class Athlete;
+class AthleteLoader;
 class Context;
 class Tab;
 
@@ -92,13 +95,20 @@ class MainWindow : public QMainWindow
 
         // currently selected tab
         Tab *athleteTab() { return currentTab; }
+        NewSideBar *newSidebar() { return sidebar; }
+
+        // tab view keeps this up to date
+        QAction *showhideSidebar;
 
     protected:
 
         // used by ChooseCyclistDialog to see which athletes
         // have already been opened
         friend class ::ChooseCyclistDialog;
+        friend class ::AthleteLoader;
         QMap<QString,Tab*> tabs;
+        Tab *currentTab;
+        QList<Tab*> tabList;
 
         virtual void resizeEvent(QResizeEvent*);
         virtual void moveEvent(QMoveEvent*);
@@ -110,6 +120,13 @@ class MainWindow : public QMainWindow
         QWidget *splash;
         void setSplash(bool first=false);
         void clearSplash();
+
+    signals:
+        void backClicked();
+        void forwardClicked();
+        void openingAthlete(QString, Context *);
+        void newAthlete(QString);
+        void deletedAthlete(QString);
 
     public slots:
 
@@ -127,35 +144,37 @@ class MainWindow : public QMainWindow
         // chart importing
         void importCharts(QStringList);
 
-        // search box gets and loses focus - make big/small
-        void searchFocusIn();
-        void searchFocusOut();
-
         // open and closing windows and tabs
-        void closeAll();    // close all windows and tabs
-
-        void setOpenWindowMenu(); // set the Open Window menu
-        void newCyclistWindow();  // create a new Cyclist
-        void openWindow(QString name);
         void closeWindow();
 
         void setOpenTabMenu(); // set the Open Tab menu
         void newCyclistTab();  // create a new Cyclist
         void openTab(QString name);
+        void loadCompleted(QString name, Context *context);
         void closeTabClicked(int index); // user clicked to close tab
+        bool closeTab(QString name); // close named athlete
         bool closeTab();       // close current, might not if the user
                                // changes mind if there are unsaved changes.
         void removeTab(Tab*);  // remove without question
         void switchTab(int index); // for switching between one tab and another
 
+        // sidebar selecting views and actions
+        void sidebarClicked(int id);
+        void sidebarSelected(int id);
+
         // Athlete Backup
         void setBackupAthleteMenu();
         void backupAthlete(QString name);
+
+        // Athlete Delete
+        void setDeleteAthleteMenu();
+        void deleteAthlete(QString name);
 
         // Search / Filter
         void setFilter(QStringList);
         void clearFilter();
 
+        void selectAthlete();
         void selectHome();
         void selectDiary();
         void selectAnalysis();
@@ -166,11 +185,13 @@ class MainWindow : public QMainWindow
         void setSubChartMenu();
         void setChartMenu(QMenu *);
         void addChart(QAction*);
+        void importChart();
 
         // menus to reflect cloud
         void setUploadMenu();
         void setSyncMenu();
         void checkCloud();
+        void importCloud(); // used to setup and sync in one on first run (see BlankState.cpp)
 
         void showOptions();
 
@@ -194,16 +215,14 @@ class MainWindow : public QMainWindow
         // Training View
         void addDevice();
         void downloadErgDB();
-#if QT_VERSION > 0x050000
         void downloadTodaysPlanWorkouts();
-#endif
         void manageLibrary();
         void showWorkoutWizard();
         void importWorkout();
 
-        // Measures View
-        void downloadBodyMeasures();
-        void downloadHrvMeasures();
+        // Measures
+        void setMeasuresMenu();
+        void downloadMeasures(QAction *);
 
         // cloud
         void uploadCloud(QAction *);
@@ -234,10 +253,20 @@ class MainWindow : public QMainWindow
         // autoload rides from athlete specific directory (preferences)
         void ridesAutoImport();
 
+#ifdef GC_WANT_PYTHON
+        // Python fix scripts
+        void onEditMenuAboutToShow();
+        void buildPyFixesMenu();
+        void showManageFixPyScriptsDlg();
+        void showCreateFixPyScriptDlg();
+#endif
+
 #ifdef GC_HAS_CLOUD_DB
         // CloudDB actions
         void cloudDBuserEditChart();
         void cloudDBcuratorEditChart();
+        void cloudDBuserEditUserMetric();
+        void cloudDBcuratorEditUserMetric();
         void cloudDBshowStatus();
         void addChartFromCloudDB();
         void exportChartToCloudDB();
@@ -250,39 +279,42 @@ class MainWindow : public QMainWindow
 
     private:
 
-        GcScopeBar *scopebar;
-        Tab *currentTab;
-        QList<Tab*> tabList;
+        NewSideBar *sidebar;
+        AthleteView *athleteView;
 
 #ifndef Q_OS_MAC
         QTFullScreen *fullScreen;
 #endif
-        QPropertyAnimation *anim;
 
         SearchFilterBox *searchBox;
 
         // Not on Mac so use other types
-        QPushButton *sidebar, *lowbar;
+        QPushButton *sidelist, *lowbar;
+        QPushButton *back, *forward;
         QtSegmentControl *styleSelector;
         GcToolBar *head;
 
         // the icons
-        QIcon sidebarIcon, lowbarIcon, tabbedIcon, tiledIcon;
+        QIcon backIcon, forwardIcon, sidebarIcon, lowbarIcon, tabbedIcon, tiledIcon;
 
         // tab bar (that supports swtitching on drag and drop)
         DragBar *tabbar;
-        QStackedWidget *tabStack;
+        QStackedWidget *viewStack, *tabStack;
 
         // window and tab menu
-        QMenu *openWindowMenu, *openTabMenu;
-        QSignalMapper *windowMapper, *tabMapper;
+        QMenu *openTabMenu;
+        QSignalMapper *tabMapper;
 
         // upload and sync menu
-        QMenu *uploadMenu, *syncMenu;
+        QMenu *uploadMenu, *syncMenu, *measuresMenu;
 
         // backup
         QMenu *backupAthleteMenu;
         QSignalMapper *backupMapper;
+
+        // delete
+        QMenu *deleteAthleteMenu;
+        QSignalMapper *deleteMapper;
 
         // chart menus
         QMenu *chartMenu;
@@ -290,7 +322,6 @@ class MainWindow : public QMainWindow
 
         // Toolbar state checkables in View menu / context
         QAction *styleAction;
-        QAction *showhideSidebar;
         QAction *showhideLowbar;
         QAction *showhideToolbar;
         QAction *showhideTabbar;
@@ -301,6 +332,9 @@ class MainWindow : public QMainWindow
         // Miscellany
         QSignalMapper *toolMapper;
 
+#ifdef GC_WANT_PYTHON
+        QMenu *pyFixesMenu;
+#endif
 
 #ifdef GC_HAS_CLOUD_DB
         CloudDBVersionClient *versionClient;

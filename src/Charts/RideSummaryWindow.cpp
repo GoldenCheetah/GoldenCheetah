@@ -91,15 +91,9 @@ RideSummaryWindow::RideSummaryWindow(Context *context, bool ridesummary) :
     vlayout->setSpacing(0);
     vlayout->setContentsMargins(10,10,10,10);
 
-#ifdef NOWEBKIT
     rideSummary = new QWebEngineView(this);
-#if QT_VERSION >= 0x050800
     // stop stealing focus!
     rideSummary->settings()->setAttribute(QWebEngineSettings::FocusOnNavigationEnabled, false);
-#endif
-#else
-    rideSummary = new QWebView(this);
-#endif
 
     rideSummary->setContentsMargins(0,0,0,0);
     rideSummary->page()->view()->setContentsMargins(0,0,0,0);
@@ -152,6 +146,7 @@ RideSummaryWindow::~RideSummaryWindow()
     // cancel background thread if needed
     future.cancel();
     future.waitForFinished();
+    if (rideSummary) delete rideSummary->page();
 }
 
 void
@@ -164,7 +159,6 @@ RideSummaryWindow::configChanged(qint32)
     defaultFont.fromString(appsettings->value(NULL, GC_FONT_DEFAULT, QFont().toString()).toString());
     defaultFont.setPointSize(appsettings->value(NULL, GC_FONT_DEFAULT_SIZE, 10).toInt());
 
-#ifdef NOWEBKIT
 #ifdef Q_OS_MAC
     rideSummary->settings()->setFontSize(QWebEngineSettings::DefaultFontSize, defaultFont.pointSize()+1);
 #else
@@ -180,14 +174,6 @@ RideSummaryWindow::configChanged(qint32)
     }
 #endif
     rideSummary->settings()->setFontFamily(QWebEngineSettings::StandardFont, defaultFont.family());
-#else
-#ifdef Q_OS_MAC
-    rideSummary->settings()->setFontSize(QWebSettings::DefaultFontSize, defaultFont.pointSize()+1);
-#else
-    rideSummary->settings()->setFontSize(QWebSettings::DefaultFontSize, defaultFont.pointSize()+2);
-#endif
-    rideSummary->settings()->setFontFamily(QWebSettings::StandardFont, defaultFont.family());
-#endif
 
     force = true;
     refresh();
@@ -348,22 +334,14 @@ RideSummaryWindow::refresh()
             }
         }
 
-#ifdef NOWEBKIT
         rideSummary->page()->setHtml(htmlCompareSummary());
-#else
-        rideSummary->page()->mainFrame()->setHtml(htmlCompareSummary());
-#endif
 
     } else { // NOT COMPARE MODE - NORMAL MODE
 
         // if we're summarising a ride but have no ride to summarise
         if (ridesummary && !myRideItem) {
             setSubTitle(tr("Summary"));
-#ifdef NOWEBKIT
             rideSummary->page()->setHtml(GCColor::css(ridesummary));
-#else
-            rideSummary->page()->mainFrame()->setHtml(GCColor::css(ridesummary));
-#endif
             return;
         }
 
@@ -388,12 +366,7 @@ RideSummaryWindow::refresh()
             specification.setFilterSet(fs);
         }
 
-#ifdef NOWEBKIT
         rideSummary->page()->setHtml(htmlSummary());
-#else
-        rideSummary->page()->mainFrame()->setHtml(htmlSummary());
-#endif
-
         setUpdatesEnabled(true); // ready to update now
     }
 }
@@ -446,7 +419,7 @@ RideSummaryWindow::htmlSummary()
 
     if (!ride && !ridesummary) return ""; // didn't parse!
 
-    bool useMetricUnits = context->athlete->useMetricUnits;
+    bool useMetricUnits = GlobalContext::context()->useMetricUnits;
 
     // ride summary and there were ridefile read errors?
     if (ridesummary && !ride) {
@@ -615,7 +588,8 @@ RideSummaryWindow::htmlSummary()
         pmc = context->athlete->getPMCFor(
                                     rideItem->isSwim ? "swimscore" :
                                     rideItem->isRun ? "govss" :
-                                    "coggan_tss");
+                                    rideItem->isBike ? "coggan_tss" :
+                                    "triscore");
     } else {
         // For data range use base metric for single sport if homogeneous
         // or combined if mixed
@@ -1158,9 +1132,11 @@ RideSummaryWindow::htmlSummary()
         int runs = 0;
         int rides = 0;
         int swims = 0;
+        int xtrains = 0;
         int totalruns = 0;
         int totalrides = 0;
         int totalswims = 0;
+        int totalxtrains = 0;
 
         foreach (RideItem *item, context->athlete->rideCache->rides()) {
 
@@ -1169,8 +1145,10 @@ RideSummaryWindow::htmlSummary()
                 totalruns++;
             } else if (item->isSwim) {
                 totalswims++;
-            } else {
+            } else if (item->isBike) {
                 totalrides++;
+            } else {
+                totalxtrains++;
             }
 
             if (!specification.pass(item)) continue;
@@ -1180,14 +1158,16 @@ RideSummaryWindow::htmlSummary()
                 runs++;
             } else if (item->isSwim) {
                 swims++;
-            } else {
+            } else if (item->isBike) {
                 rides++;
+            } else {
+                xtrains++;
             }
             activities++;
         }
 
         // Select relevant metrics for activities of each sport
-        QStringList rideMetrics, runMetrics, swimMetrics;
+        QStringList rideMetrics, runMetrics, swimMetrics, xtrainMetrics;
         for (j = 0; j< metricColumn.count(); ++j) {
             QString symbol = metricColumn[j];
             const RideMetric *m = factory.rideMetric(symbol);
@@ -1195,6 +1175,7 @@ RideSummaryWindow::htmlSummary()
             if (context->athlete->rideCache->isMetricRelevantForRides(specification, m, RideCache::OnlyRides)) rideMetrics << symbol;
             if (context->athlete->rideCache->isMetricRelevantForRides(specification, m, RideCache::OnlyRuns)) runMetrics << symbol;
             if (context->athlete->rideCache->isMetricRelevantForRides(specification, m, RideCache::OnlySwims)) swimMetrics << symbol;
+            if (context->athlete->rideCache->isMetricRelevantForRides(specification, m, RideCache::OnlyXtrains)) xtrainMetrics << symbol;
         }
 
         // some people have a LOT of metrics, so we only show so many since
@@ -1207,6 +1188,7 @@ RideSummaryWindow::htmlSummary()
         int rideCols = rideMetrics.count() > 7 ? 7 : rideMetrics.count();
         int runCols = runMetrics.count() > 7 ? 7 : runMetrics.count();
         int swimCols = swimMetrics.count() > 7 ? 7 : swimMetrics.count();
+        int xtrainCols = xtrainMetrics.count() > 6 ? 6 : xtrainMetrics.count();
 
         //Rides first
         if (context->ishomefiltered || context->isfiltered || filtered) {
@@ -1278,7 +1260,7 @@ RideSummaryWindow::htmlSummary()
             // apply the filter if there is one active
             if (!specification.pass(ride)) continue;
 
-            if (ride->isRun || ride->isSwim) continue;
+            if (!ride->isBike) continue;
 
             if (even) summary += "<tr>";
             else {
@@ -1407,7 +1389,7 @@ RideSummaryWindow::htmlSummary()
         }
         summary += "</table><br>";
 
-        //Swims Last
+        // and Swims
         if (context->ishomefiltered || context->isfiltered || filtered) {
 
             // "n of x activities" shown in header of list when filtered
@@ -1506,6 +1488,111 @@ RideSummaryWindow::htmlSummary()
         }
         summary += "</table><br>";
 
+        //xtrains last
+        if (context->ishomefiltered || context->isfiltered || filtered) {
+
+            // "n of x activities" shown in header of list when filtered
+            summary += ("<p><h3>" +
+                        QString(tr("%1 of %2")).arg(xtrains).arg(totalxtrains)
+                                           + (totalxtrains == 1 ? tr(" xtrain") : tr(" xtrains")) +
+                        "</h3><p>");
+        } else {
+
+            // just "n activities" shown in header of list when not filtered
+            summary += ("<p><h3>" +
+                        QString("%1").arg(xtrains) + (xtrains == 1 ? tr(" xtrain") : tr(" xtrains")) +
+                        "</h3><p>");
+        }
+
+        // table of activities
+        summary += "<table align=\"center\" width=\"80%\" border=\"0\">";
+
+        // header row 1 - name
+        summary += "<tr>";
+        summary += tr("<td align=\"center\">Date</td>");
+        summary += tr("<td align=\"center\">Sport</td>");
+        for (j = 0; j< totalCols; ++j) {
+            QString symbol = rtotalColumn[j];
+            const RideMetric *m = factory.rideMetric(symbol);
+
+            summary += QString("<td align=\"center\">%1</td>").arg(addTooltip(m->name(), m->description()));
+        }
+        for (j = 0; j< xtrainCols; ++j) {
+            QString symbol = xtrainMetrics[j];
+            const RideMetric *m = factory.rideMetric(symbol);
+
+            summary += QString("<td align=\"center\">%1</td>").arg(addTooltip(m->name(), m->description()));
+        }
+        summary += "</tr>";
+
+        // header row 2 - units
+        summary += "<tr>";
+        summary += tr("<td align=\"center\"></td>"); // date no units
+        summary += tr("<td align=\"center\"></td>"); // Sport no units
+        for (j = 0; j< totalCols; ++j) {
+            QString symbol = rtotalColumn[j];
+            const RideMetric *m = factory.rideMetric(symbol);
+
+            QString units = m->units(useMetricUnits);
+            if (units == "seconds" || units == tr("seconds")) units = "";
+            summary += QString("<td align=\"center\">%1</td>").arg(units);
+        }
+        for (j = 0; j< xtrainCols; ++j) {
+            QString symbol = xtrainMetrics[j];
+            const RideMetric *m = factory.rideMetric(symbol);
+
+            QString units = m->units(useMetricUnits);
+            if (units == "seconds" || units == tr("seconds")) units = "";
+            summary += QString("<td align=\"center\">%1</td>").arg(units);
+        }
+        summary += "</tr>";
+
+        // activities 1 per row - in reverse order
+        even = false;
+
+        // iterate once again
+        ridelist.toBack();
+        while (ridelist.hasPrevious()) {
+
+            RideItem *ride = ridelist.previous();
+
+            // apply the filter if there is one active
+            if (!specification.pass(ride)) continue;
+
+            if (ride->isBike || ride->isRun || ride->isSwim) continue;
+
+            if (even) summary += "<tr>";
+            else {
+                    summary += "<tr bgcolor='" + altColor.name() + "'>";
+            }
+            even = !even;
+
+            // date of xtrain
+            summary += QString("<td align=\"center\">%1</td>")
+                       .arg(ride->dateTime.date().toString(tr("dd MMM yyyy")));
+
+            // Sport of xtrain
+            summary += QString("<td align=\"center\">%1</td>")
+                       .arg(ride->getText("Sport", ""));
+
+            for (j = 0; j< totalCols; ++j) {
+                QString symbol = rtotalColumn[j];
+
+                // get this value
+                QString value = ride->getStringForSymbol(symbol,useMetricUnits);
+                summary += QString("<td align=\"center\">%1</td>").arg(value);
+            }
+            for (j = 0; j< xtrainCols; ++j) {
+                QString symbol = xtrainMetrics[j];
+
+                // get this value
+                QString value = ride->getStringForSymbol(symbol,useMetricUnits);
+                summary += QString("<td align=\"center\">%1</td>").arg(value);
+            }
+            summary += "</tr>";
+        }
+        summary += "</table><br>";
+
     }
 
     // summarise errors reading file if it was a ride summary
@@ -1517,6 +1604,12 @@ RideSummaryWindow::htmlSummary()
             summary += " <li>" + i.next();
         summary += "</ul>";
     }
+
+    // add link to view on Strava if was downloaded from there (StravaID will be set)
+    if (ridesummary && rideItem && rideItem->ride() && rideItem->ride()->getTag("StravaID","") != "") {
+        summary += "<a href=\"https://www.strava.com/activities/" + rideItem->ride()->getTag("StravaID","") + "\">View on Strava</a>";
+    }
+
     summary += "<br></center>";
 
     return summary;
@@ -1549,7 +1642,7 @@ RideSummaryWindow::getPDEstimates(bool run)
             if (est.wpk != wpk) continue;
 
             // We only use the extended model for now
-            if (est.model != "Ext" ) continue;
+            if (est.model != "ext" ) continue;
 
             // summarising a season or date range
             if (!ridesummary && (est.from > myDateRange.to || est.to < myDateRange.from)) continue;
@@ -1790,8 +1883,8 @@ RideSummaryWindow::htmlCompareSummary() const
                 relevantMetricsList << symbol;
 
                 QString name, units;
-                if (!(m->units(context->athlete->useMetricUnits) == "seconds" || m->units(context->athlete->useMetricUnits) == tr("seconds")))
-                        units = m->units(context->athlete->useMetricUnits);
+                if (!(m->units(GlobalContext::context()->useMetricUnits) == "seconds" || m->units(GlobalContext::context()->useMetricUnits) == tr("seconds")))
+                        units = m->units(GlobalContext::context()->useMetricUnits);
                 if (units != "") name = QString("%1 (%2)").arg(addTooltip(m->name(), m->description())).arg(units);
                 else name = QString("%1").arg(addTooltip(m->name(), m->description()));
 
@@ -1826,8 +1919,8 @@ RideSummaryWindow::htmlCompareSummary() const
 
                     // get value and convert if needed (use local context for units)
                     double value = metrics->getForSymbol(symbol) 
-                                * (context->athlete->useMetricUnits ? 1 : m->conversion()) 
-                                + (context->athlete->useMetricUnits ? 0 : m->conversionSum());
+                                * (GlobalContext::context()->useMetricUnits ? 1 : m->conversion()) 
+                                + (GlobalContext::context()->useMetricUnits ? 0 : m->conversionSum());
 
                     // use right precision
                     QString strValue = QString("%1").arg(value, 0, 'f', m->precision());
@@ -1843,8 +1936,8 @@ RideSummaryWindow::htmlCompareSummary() const
 
                         // calculate me vs the original
                         double value0 = intervalMetrics[0]->getForSymbol(symbol) 
-                                * (context->athlete->useMetricUnits ? 1 : m->conversion()) 
-                                + (context->athlete->useMetricUnits ? 0 : m->conversionSum());
+                                * (GlobalContext::context()->useMetricUnits ? 1 : m->conversion()) 
+                                + (GlobalContext::context()->useMetricUnits ? 0 : m->conversionSum());
 
                         value -= value0; // delta
 
@@ -1875,7 +1968,7 @@ RideSummaryWindow::htmlCompareSummary() const
             nActivities++;
             if (metrics->isRun) nRuns++;
             else if (metrics->isSwim) nSwims++;
-            else nRides++;
+            else if (metrics->isBike) nRides++;
         }
 
         //
@@ -2157,8 +2250,8 @@ RideSummaryWindow::htmlCompareSummary() const
                 relevantMetricsList << symbol;
 
                 QString name, units;
-                if (!(m->units(context->athlete->useMetricUnits) == "seconds" || m->units(context->athlete->useMetricUnits) == tr("seconds")))
-                    units = m->units(context->athlete->useMetricUnits);
+                if (!(m->units(GlobalContext::context()->useMetricUnits) == "seconds" || m->units(GlobalContext::context()->useMetricUnits) == tr("seconds")))
+                    units = m->units(GlobalContext::context()->useMetricUnits);
                 if (units != "") name = QString("%1 (%2)").arg(addTooltip(m->name(), m->description())).arg(units);
                 else name = QString("%1").arg(addTooltip(m->name(), m->description()));
 
@@ -2189,7 +2282,7 @@ RideSummaryWindow::htmlCompareSummary() const
 
                     // get value and convert if needed (use local context for units)
                     double value = dr.context->athlete->rideCache->getAggregate(symbol, dr.specification,
-                                                                                 context->athlete->useMetricUnits, true).toDouble();
+                                                                                 GlobalContext::context()->useMetricUnits, true).toDouble();
 
                     // use right precision
                     QString strValue = QString("%1").arg(value, 0, 'f', m->precision());
@@ -2206,7 +2299,7 @@ RideSummaryWindow::htmlCompareSummary() const
                         // calculate me vs the original
                         double value0 = context->compareDateRanges[0].context->athlete->rideCache->getAggregate(symbol,
                                                                                  context->compareDateRanges[0].specification,
-                                                                                 context->athlete->useMetricUnits, true).toDouble();
+                                                                                 GlobalContext::context()->useMetricUnits, true).toDouble();
 
                         value -= value0; // delta
 
@@ -2288,11 +2381,11 @@ RideSummaryWindow::htmlCompareSummary() const
                     foreach (ZoneInfo zone, zones) {
 
                         int timeZone = dr.context->athlete->rideCache->getAggregate(timeInZones[idx], dr.specification,
-                                                                                 context->athlete->useMetricUnits, true).toDouble();
+                                                                                 GlobalContext::context()->useMetricUnits, true).toDouble();
 
                         int dt = timeZone - context->compareDateRanges[0].context->athlete->rideCache->getAggregate(timeInZones[idx],
                                                                         context->compareDateRanges[0].specification,
-                                                                        context->athlete->useMetricUnits, true).toDouble();
+                                                                        GlobalContext::context()->useMetricUnits, true).toDouble();
 
                         idx++;
 
@@ -2347,20 +2440,20 @@ RideSummaryWindow::htmlCompareSummary() const
 #if 0 // See bug #1305
                         // above cp W'bal time in zone
                         int cptimeZone = dr.context->athlete->rideCache->getAggregate(timeInZonesCPWBAL[idx], dr.specification,
-                                                                                 context->athlete->useMetricUnits, true).toDouble();
+                                                                                 GlobalContext::context()->useMetricUnits, true).toDouble();
 
                         int cpdt = cptimeZone - context->compareDateRanges[0].context->athlete->rideCache->getAggregate(timeInZonesCPWBAL[idx],
                                                                         context->compareDateRanges[0].specification,
-                                                                        context->athlete->useMetricUnits, true).toDouble();
+                                                                        GlobalContext::context()->useMetricUnits, true).toDouble();
 #endif // See bug #1305
 
                         // all W'bal time in zone
                         int timeZone = dr.context->athlete->rideCache->getAggregate(timeInZonesWBAL[idx], dr.specification,
-                                                                                 context->athlete->useMetricUnits, true).toDouble();
+                                                                                 GlobalContext::context()->useMetricUnits, true).toDouble();
 
                         int dt = timeZone - context->compareDateRanges[0].context->athlete->rideCache->getAggregate(timeInZonesWBAL[idx],
                                                                         context->compareDateRanges[0].specification,
-                                                                        context->athlete->useMetricUnits, true).toDouble();
+                                                                        GlobalContext::context()->useMetricUnits, true).toDouble();
 
                         idx++;
 
@@ -2429,11 +2522,11 @@ RideSummaryWindow::htmlCompareSummary() const
                     foreach (HrZoneInfo zone, zones) {
 
                         int timeZone = dr.context->athlete->rideCache->getAggregate(timeInZonesHR[idx], dr.specification,
-                                                                                 context->athlete->useMetricUnits, true).toDouble();
+                                                                                 GlobalContext::context()->useMetricUnits, true).toDouble();
 
                         int dt = timeZone - context->compareDateRanges[0].context->athlete->rideCache->getAggregate(timeInZonesHR[idx],
                                                                         context->compareDateRanges[0].specification,
-                                                                        context->athlete->useMetricUnits, true).toDouble();
+                                                                        GlobalContext::context()->useMetricUnits, true).toDouble();
                         idx++;
 
                         // time and then +time
@@ -2502,11 +2595,11 @@ RideSummaryWindow::htmlCompareSummary() const
                     foreach (PaceZoneInfo zone, zones) {
 
                         int timeZone = dr.context->athlete->rideCache->getAggregate(paceTimeInZones[idx], dr.specification,
-                                                                                 context->athlete->useMetricUnits, true).toDouble();
+                                                                                 GlobalContext::context()->useMetricUnits, true).toDouble();
 
                         int dt = timeZone - context->compareDateRanges[0].context->athlete->rideCache->getAggregate(paceTimeInZones[idx],
                                                                         context->compareDateRanges[0].specification,
-                                                                        context->athlete->useMetricUnits, true).toDouble();
+                                                                        GlobalContext::context()->useMetricUnits, true).toDouble();
 
                         idx++;
 

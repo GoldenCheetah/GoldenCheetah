@@ -21,21 +21,24 @@
 
 #include <stdint.h> // uint8_t etc
 
-#define CALIBRATION_TYPE_NOT_SUPPORTED      0x00
-#define CALIBRATION_TYPE_COMPUTRAINER       0x01
-#define CALIBRATION_TYPE_ZERO_OFFSET        0x02
-#define CALIBRATION_TYPE_ZERO_OFFSET_SRM    0x04
-#define CALIBRATION_TYPE_SPINDOWN           0x08
+#define CALIBRATION_TYPE_NOT_SUPPORTED               0x00
+#define CALIBRATION_TYPE_COMPUTRAINER                0x01
+#define CALIBRATION_TYPE_ZERO_OFFSET                 0x02
+#define CALIBRATION_TYPE_ZERO_OFFSET_SRM             0x04
+#define CALIBRATION_TYPE_SPINDOWN                    0x08
+#define CALIBRATION_TYPE_FORTIUS                     0x10
 
-#define CALIBRATION_STATE_IDLE          0x00
-#define CALIBRATION_STATE_PENDING       0x01
-#define CALIBRATION_STATE_REQUESTED     0x02
-#define CALIBRATION_STATE_STARTING      0x04
-#define CALIBRATION_STATE_STARTED       0x08
-#define CALIBRATION_STATE_POWER         0x10
-#define CALIBRATION_STATE_COAST         0x20
-#define CALIBRATION_STATE_SUCCESS       0x40
-#define CALIBRATION_STATE_FAILURE       0x80
+#define CALIBRATION_STATE_IDLE                       0x00
+#define CALIBRATION_STATE_PENDING                    0x01
+#define CALIBRATION_STATE_REQUESTED                  0x02
+#define CALIBRATION_STATE_STARTING                   0x03
+#define CALIBRATION_STATE_STARTED                    0x04
+#define CALIBRATION_STATE_POWER                      0x05
+#define CALIBRATION_STATE_COAST                      0x06
+#define CALIBRATION_STATE_SUCCESS                    0x07
+#define CALIBRATION_STATE_FAILURE                    0x08
+#define CALIBRATION_STATE_FAILURE_SPINDOWN_TOO_SLOW  0x09
+#define CALIBRATION_STATE_FAILURE_SPINDOWN_TOO_FAST  0x0a
 
 #define CALIBRATION_MAX_CHANNELS        8
 
@@ -83,7 +86,6 @@ private:
     uint16_t spindowntime;
     uint16_t slope;
     double   targetspeed;
-
 };
 
 #endif /* SRC_CALIBRATIONDATA_H_ */

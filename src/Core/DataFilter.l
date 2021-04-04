@@ -78,16 +78,12 @@ int DataFiltercolumn = 1;
 [Bb][Ee][Ss][Tt]                            strcpy(DataFilterlval.function, "best"); return BEST;
 [Tt][Ii][Zz]                                strcpy(DataFilterlval.function, "tiz"); return TIZ;
 [Cc][Oo][Nn][Ff][Ii][Gg]                    strcpy(DataFilterlval.function, "config"); return CONFIG;
-[Dd][Aa][Tt][Ee][Rr][Aa][Nn][Gg][Ee]        strcpy(DataFilterlval.function, "daterange"); return DATERANGE;
 [Cc][Oo][Nn][Ss][Tt]                        strcpy(DataFilterlval.function, "const"); return CONST_;
 
 "&&"                                        DataFilterlval.op = AND; return AND;
 [Aa][nN][Dd]                                DataFilterlval.op = AND; return AND;
 "||"                                        DataFilterlval.op = OR; return OR;
 [Oo][Rr]                                    DataFilterlval.op = OR; return OR;
-
-"[["                                        return LSB; /* start date range */
-"]]"                                        return RSB; /* end date range */
 
 [0-9]+                                      return DF_INTEGER;
 [0-9]+e-[0-9]+                              return DF_FLOAT;

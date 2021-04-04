@@ -74,6 +74,7 @@ class HomeWindow : public GcWindow
         void tabSelected(int id);
         void tabSelected(int id, bool forride);
         void tabMoved(int from, int to);
+        void tabMenu(int index, int x);
         virtual void dragEnterEvent(QDragEnterEvent *);
         virtual void dropEvent(QDropEvent *);
         void resizeEvent(QResizeEvent *);

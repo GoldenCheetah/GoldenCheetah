@@ -143,6 +143,18 @@ NewCyclistDialog::NewCyclistDialog(QDir home) : QDialog(NULL, Qt::Dialog), home(
     avatarButton->setFixedHeight(140);
     avatarButton->setFixedWidth(140);
 
+    templatelabel = new QLabel(tr("Use template Athlete"));
+    templateCombo = new QComboBox();
+    templateCombo->addItem(tr("None")); // No template athlete, use default
+    // get a list of all athletes
+    QStringListIterator i(QDir(gcroot).entryList(QDir::Dirs | QDir::NoDotAndDotDot));
+    while (i.hasNext()) {
+
+        QString name = i.next();
+        SKIP_QTWE_CACHE  // skip Folder Names created by QTWebEngine on Windows
+        templateCombo->addItem(name);
+    }
+
     Qt::Alignment alignment = Qt::AlignLeft|Qt::AlignVCenter;
 
     grid->addWidget(namelabel, 0, 0, alignment);
@@ -160,7 +172,8 @@ NewCyclistDialog::NewCyclistDialog(QDir home) : QDialog(NULL, Qt::Dialog), home(
     grid->addWidget(maxhrlabel, 12, 0, alignment);
     grid->addWidget(cvRnlabel, 13, 0, alignment);
     grid->addWidget(cvSwlabel, 14, 0, alignment);
-    grid->addWidget(biolabel, 15, 0, alignment);
+    grid->addWidget(templatelabel, 15, 0, alignment);
+    grid->addWidget(biolabel, 16, 0, alignment);
 
     grid->addWidget(name, 0, 1, alignment);
     grid->addWidget(dob, 1, 1, alignment);
@@ -177,7 +190,8 @@ NewCyclistDialog::NewCyclistDialog(QDir home) : QDialog(NULL, Qt::Dialog), home(
     grid->addWidget(maxhr, 12, 1, alignment);
     grid->addWidget(cvRn, 13, 1, alignment);
     grid->addWidget(cvSw, 14, 1, alignment);
-    grid->addWidget(bio, 16, 0, 1, 4);
+    grid->addWidget(templateCombo, 15, 1);
+    grid->addWidget(bio, 17, 0, 1, 4);
 
     grid->addWidget(avatarButton, 0, 2, 4, 2, Qt::AlignRight|Qt::AlignVCenter);
     all->addLayout(grid);
@@ -316,25 +330,37 @@ NewCyclistDialog::saveClicked()
 
                 // Setup Power Zones
                 Zones zones;
-                zones.addZoneRange(QDate(1900, 01, 01), cp->value(), cp->value(), w->value(), pmax->value());
+                zones.addZoneRange(QDate(1900, 01, 01), cp->value(), 0, cp->value(), w->value(), pmax->value());
                 zones.write(athleteHome->config().canonicalPath());
 
                 // HR Zones too!
                 HrZones hrzones;
-                hrzones.addHrZoneRange(QDate(1900, 01, 01), lthr->value(), resthr->value(), maxhr->value());
+                hrzones.addHrZoneRange(QDate(1900, 01, 01), lthr->value(), 0, resthr->value(), maxhr->value());
                 hrzones.write(athleteHome->config().canonicalPath());
 
                 // Pace Zones for Run
                 PaceZones rnPaceZones(false);
-                rnPaceZones.addZoneRange(QDate(1900, 01, 01), rnPaceZones.kphFromTime(cvRn, useMetricUnits));
+                rnPaceZones.addZoneRange(QDate(1900, 01, 01), rnPaceZones.kphFromTime(cvRn, useMetricUnits), 0);
                 rnPaceZones.write(athleteHome->config().canonicalPath());
 
                 // Pace Zones for Run
                 PaceZones swPaceZones(true);
-                swPaceZones.addZoneRange(QDate(1900, 01, 01), swPaceZones.kphFromTime(cvSw, useMetricUnits));
+                swPaceZones.addZoneRange(QDate(1900, 01, 01), swPaceZones.kphFromTime(cvSw, useMetricUnits), 0);
                 swPaceZones.write(athleteHome->config().canonicalPath());
 
                 appsettings->syncQSettingsAllAthletes();
+
+                // If template athlete was selected, copy xml files
+                if (templateCombo->currentIndex()) {
+
+                    QDir templateDir = QDir(home.canonicalPath()+'/'+templateCombo->currentText());
+                    AthleteDirectoryStructure *templateHome = new AthleteDirectoryStructure(templateDir);
+                    foreach(QString fileName, templateHome->config().entryList(QStringList()<<"*.xml", QDir::Files)) {
+
+                        QFile::copy(templateHome->config().canonicalPath()+"/"+fileName,
+                                    athleteHome->config().canonicalPath()+"/"+fileName);
+                    }
+                }
 
                 accept();
             } else {

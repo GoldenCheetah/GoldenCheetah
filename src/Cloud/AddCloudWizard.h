@@ -42,7 +42,7 @@ class AddCloudWizard : public QWizard
     Q_OBJECT
 
 public:
-    AddCloudWizard(Context *context, QString sname="");
+    AddCloudWizard(Context *context, QString sname="", bool sync=false);
     QSize sizeHint() const { return QSize(600,650); }
 
     Context *context;
@@ -53,6 +53,9 @@ public:
 
     // which service have we selected?
     QString service;
+
+    // sync straight away, so first timers can download from BlankState
+    bool fsync;
 
     // this is cloned for our context
     CloudService *cloudService;

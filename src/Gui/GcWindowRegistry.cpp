@@ -29,7 +29,7 @@
 #endif
 #include "HistogramWindow.h"
 #include "LTMWindow.h"
-#ifdef Q_OS_MAC
+#if defined(GC_VIDEO_AV) || defined(GC_VIDEO_QUICKTIME)
 #include "QtMacVideoWindow.h"
 #else
 #include "VideoWindow.h"
@@ -39,6 +39,7 @@
 #include "RideEditor.h"
 #include "RideNavigator.h"
 #include "RideSummaryWindow.h"
+#include "RideMapWindow.h"
 #include "ScatterWindow.h"
 #include "SummaryWindow.h"
 #include "MetadataWindow.h"
@@ -48,11 +49,8 @@
 #include "SpinScanPlotWindow.h"
 #include "WorkoutPlotWindow.h"
 #include "WorkoutWindow.h"
-#ifndef NOWEBKIT
-#include "RideWindow.h"
-#endif
-#include "RideMapWindow.h"
 #include "WebPageWindow.h"
+#include "LiveMapWebPageWindow.h"
 #ifdef GC_WANT_R
 #include "RChart.h"
 #endif
@@ -61,8 +59,9 @@
 #endif
 #include "PlanningWindow.h"
 #ifdef GC_HAVE_OVERVIEW
-#include "OverviewWindow.h"
+#include "Overview.h"
 #endif
+#include "UserChart.h"
 // Not until v4.0
 //#include "RouteWindow.h"
 
@@ -80,19 +79,22 @@ GcWindowRegistry::initialize()
 {
   static GcWindowRegistry GcWindowsInit[34] = {
     // name                     GcWinID
-    { VIEW_HOME|VIEW_DIARY, tr("Metric Trends"),GcWindowTypes::LTM },
-    { VIEW_HOME|VIEW_DIARY, tr("Collection TreeMap"),GcWindowTypes::TreeMap },
+    { VIEW_HOME|VIEW_DIARY, tr("Overview "),GcWindowTypes::OverviewTrends },
+    { VIEW_HOME|VIEW_DIARY, tr("User Chart"),GcWindowTypes::UserTrends },
+    { VIEW_HOME|VIEW_DIARY, tr("Trends"),GcWindowTypes::LTM },
+    { VIEW_HOME|VIEW_DIARY, tr("TreeMap"),GcWindowTypes::TreeMap },
     //{ VIEW_HOME, tr("Weekly Summary"),GcWindowTypes::WeeklySummary },// DEPRECATED
-    { VIEW_HOME|VIEW_DIARY,  tr("Critical Mean Maximal"),GcWindowTypes::CriticalPowerSummary },
+    { VIEW_HOME|VIEW_DIARY,  tr("Power Duration "),GcWindowTypes::CriticalPowerSummary },
     //{ VIEW_HOME,  tr("Training Plan"),GcWindowTypes::SeasonPlan },
     //{ VIEW_HOME|VIEW_DIARY,  tr("Performance Manager"),GcWindowTypes::PerformanceManager },
+    { VIEW_ANALYSIS, tr("User Chart "),GcWindowTypes::UserAnalysis },
     { VIEW_ANALYSIS, tr("Overview"),GcWindowTypes::Overview },
-    { VIEW_ANALYSIS|VIEW_INTERVAL, tr("Activity Summary"),GcWindowTypes::RideSummary },
-    { VIEW_ANALYSIS, tr("Details"),GcWindowTypes::MetadataWindow },
-    { VIEW_ANALYSIS, tr("Summary and Details"),GcWindowTypes::Summary },
-    { VIEW_ANALYSIS, tr("Editor"),GcWindowTypes::RideEditor },
+    { VIEW_ANALYSIS|VIEW_INTERVAL, tr("Summary"),GcWindowTypes::RideSummary },
+    { VIEW_ANALYSIS, tr("Data"),GcWindowTypes::MetadataWindow },
+    //{ VIEW_ANALYSIS, tr("Summary and Details"),GcWindowTypes::Summary },
+    //{ VIEW_ANALYSIS, tr("Editor"),GcWindowTypes::RideEditor },
     { VIEW_ANALYSIS|VIEW_INTERVAL, tr("Performance"),GcWindowTypes::AllPlot },
-    { VIEW_ANALYSIS, tr("Critical Mean Maximals"),GcWindowTypes::CriticalPower },
+    { VIEW_ANALYSIS, tr("Power Duration"),GcWindowTypes::CriticalPower },
     { VIEW_ANALYSIS, tr("Histogram"),GcWindowTypes::Histogram },
     { VIEW_HOME|VIEW_DIARY, tr("Distribution"),GcWindowTypes::Distribution },
     { VIEW_ANALYSIS, tr("Pedal Force vs Velocity"),GcWindowTypes::PfPv },
@@ -103,19 +105,18 @@ GcWindowRegistry::initialize()
     { VIEW_ANALYSIS, tr("Python Chart"),GcWindowTypes::Python },
     { VIEW_HOME, tr("Python Chart "),GcWindowTypes::PythonSeason },
     //{ VIEW_ANALYSIS, tr("Bing Map"),GcWindowTypes::BingMap },
-    { VIEW_ANALYSIS, tr("2d Plot"),GcWindowTypes::Scatter },
-    { VIEW_ANALYSIS, tr("Aerolab Chung Analysis"),GcWindowTypes::Aerolab },
+    { VIEW_ANALYSIS, tr("Scatter"),GcWindowTypes::Scatter },
+    { VIEW_ANALYSIS, tr("Aerolab"),GcWindowTypes::Aerolab },
     { VIEW_DIARY, tr("Calendar"),GcWindowTypes::Diary },
     { VIEW_DIARY, tr("Navigator"), GcWindowTypes::ActivityNavigator },
-    { VIEW_DIARY|VIEW_HOME, tr("Summary"), GcWindowTypes::DateRangeSummary },
+    { VIEW_DIARY|VIEW_HOME, tr("Summary "), GcWindowTypes::DateRangeSummary },
     { VIEW_TRAIN, tr("Telemetry"),GcWindowTypes::DialWindow },
     { VIEW_TRAIN, tr("Workout"),GcWindowTypes::WorkoutPlot },
     { VIEW_TRAIN, tr("Realtime"),GcWindowTypes::RealtimePlot },
     { VIEW_TRAIN, tr("Pedal Stroke"),GcWindowTypes::SpinScanPlot },
-    // { VIEW_TRAIN, tr("Map"), GcWindowTypes::MapWindow },               // DEPRECATED for now
-    // { VIEW_TRAIN, tr("StreetView"), GcWindowTypes::StreetViewWindow }, // DEPRECATED for now, since it causes problems and memory leaks
     { VIEW_TRAIN, tr("Video Player"),GcWindowTypes::VideoPlayer },
     { VIEW_TRAIN, tr("Workout Editor"),GcWindowTypes::WorkoutWindow },
+    { VIEW_TRAIN, tr("Live Map"),GcWindowTypes::LiveMapWebPageWindow },
     { VIEW_ANALYSIS|VIEW_HOME|VIEW_TRAIN, tr("Web page"),GcWindowTypes::WebPageWindow },
     { 0, "", GcWindowTypes::None }};
   // initialize the global registry
@@ -207,11 +208,11 @@ GcWindowRegistry::newGcWindow(GcWinID id, Context *context)
     case GcWindowTypes::Model: returning = new GcChartWindow(context); break;
     case GcWindowTypes::PfPv: returning = new PfPvWindow(context); break;
     case GcWindowTypes::HrPw: returning = new HrPwWindow(context); break;
-    case GcWindowTypes::RideEditor: returning = new RideEditor(context); break;
+    case GcWindowTypes::RideEditor: returning = NULL; break;
     case GcWindowTypes::RideSummary: returning = new RideSummaryWindow(context, true); break;
     case GcWindowTypes::DateRangeSummary: returning = new RideSummaryWindow(context, false); break;
     case GcWindowTypes::Scatter: returning = new ScatterWindow(context); break;
-    case GcWindowTypes::Summary: returning = new SummaryWindow(context); break;
+    case GcWindowTypes::Summary: returning = NULL; break;
     case GcWindowTypes::TreeMap: returning = new TreeMapWindow(context); break;
     case GcWindowTypes::WeeklySummary: returning = new SummaryWindow(context); break; // deprecated
 #ifdef GC_VIDEO_NONE
@@ -225,14 +226,9 @@ GcWindowRegistry::newGcWindow(GcWinID id, Context *context)
     case GcWindowTypes::RealtimePlot: returning = new RealtimePlotWindow(context); break;
     case GcWindowTypes::SpinScanPlot: returning = new SpinScanPlotWindow(context); break;
     case GcWindowTypes::WorkoutPlot: returning = new WorkoutPlotWindow(context); break;
-#ifdef NOWEBKIT
     case GcWindowTypes::MapWindow:
     case GcWindowTypes::StreetViewWindow:
         returning = new GcChartWindow(context); break;
-#else
-    case GcWindowTypes::MapWindow: returning = new MapWindow(context); break;
-    case GcWindowTypes::StreetViewWindow: returning = new StreetViewWindow(context); break;
-#endif
     // old maps (GoogleMap and BingMap) replaced by RideMapWindow
     case GcWindowTypes::GoogleMap: id=GcWindowTypes::RideMapWindow; returning = new RideMapWindow(context, RideMapWindow::GOOGLE); break; // new GoogleMapControl(context);
     case GcWindowTypes::BingMap: id=GcWindowTypes::RideMapWindow; returning = new RideMapWindow(context, RideMapWindow::OSM); break; //returning = new BingMap(context);
@@ -243,17 +239,22 @@ GcWindowRegistry::newGcWindow(GcWinID id, Context *context)
     case GcWindowTypes::WorkoutWindow: returning = new WorkoutWindow(context); break;
 
     case GcWindowTypes::WebPageWindow: returning = new WebPageWindow(context); break;
+    case GcWindowTypes::LiveMapWebPageWindow: returning = new LiveMapWebPageWindow(context); break;
 #if 0 // not till v4.0
     case GcWindowTypes::RouteSegment: returning = new RouteWindow(context); break;
 #else
     case GcWindowTypes::RouteSegment: returning = new GcChartWindow(context); break;
 #endif
 #if GC_HAVE_OVERVIEW
-    case GcWindowTypes::Overview: returning = new OverviewWindow(context); break;
+    case GcWindowTypes::Overview: returning = new OverviewWindow(context, ANALYSIS); break;
+    case GcWindowTypes::OverviewTrends: returning = new OverviewWindow(context, TRENDS); break;
 #else
+    case GcWindowTypes::OverviewTrends:
     case GcWindowTypes::Overview: returning = new GcChartWindow(context); break;
 #endif
     case GcWindowTypes::SeasonPlan: returning = new PlanningWindow(context); break;
+    case GcWindowTypes::UserAnalysis: returning = new UserChart(context, false); break;
+    case GcWindowTypes::UserTrends: returning = new UserChart(context, true); break;
     default: return NULL; break;
     }
     if (returning) returning->setProperty("type", QVariant::fromValue<GcWinID>(id));

@@ -25,12 +25,15 @@
 #include "IntervalTreeView.h"
 #include "MainWindow.h"
 #include "Colors.h"
+#include "NewSideBar.h"
+#include "NavigationModel.h"
 
 #include <QPaintEvent>
 
-Tab::Tab(Context *context) : QWidget(context->mainWindow), context(context)
+Tab::Tab(Context *context) : QWidget(context->mainWindow), context(context), noswitch(true)
 {
     context->tab = this;
+    init = false;
 
     setContentsMargins(0,0,0,0);
     QVBoxLayout *main = new QVBoxLayout(this);
@@ -88,6 +91,12 @@ Tab::Tab(Context *context) : QWidget(context->mainWindow), context(context)
     chartSettings->setMaximumHeight(600);
     chartSettings->hide();
 
+    // navigation model after main items as it uses the observer
+    // pattern on views etc, so they need to be created first
+    // but we need to get setup before ride selection happens
+    // below, so we can observe the iniital ride select
+    nav = new NavigationModel(this);
+
     // cpx aggregate cache check
     connect(context,SIGNAL(rideSelected(RideItem*)), this, SLOT(rideSelected(RideItem*)));
 
@@ -100,9 +109,14 @@ Tab::Tab(Context *context) : QWidget(context->mainWindow), context(context)
             break;
         }
     }
+
     // otherwise just the latest
-    if (context->currentRideItem() == NULL && context->athlete->rideCache->rides().count() != 0) 
+    if (context->currentRideItem() == NULL && context->athlete->rideCache->rides().count() != 0) {
         context->athlete->selectRideFile(context->athlete->rideCache->rides().last()->fileName);
+    }
+
+    noswitch = false; // we only let it happen when we're initialised
+    init = true;
 }
 
 Tab::~Tab()
@@ -112,6 +126,7 @@ Tab::~Tab()
     delete trainView;
     delete diaryView;
     delete views;
+    delete nav;
 }
 
 RideNavigator *
@@ -174,6 +189,8 @@ Tab::view(int index)
 void
 Tab::selectView(int index)
 {
+    emit viewChanged(index);
+
     // first we deselect the current
     view(views->currentIndex())->setSelected(false);
 
@@ -187,6 +204,8 @@ Tab::selectView(int index)
 void
 Tab::rideSelected(RideItem*)
 {
+    emit rideItemSelected(context->ride);
+
     // update the ride property on all widgets
     // to let them know they need to replot new
     // selected ride (now the tree is up to date)
@@ -194,6 +213,16 @@ Tab::rideSelected(RideItem*)
 
     // notify that the intervals have been cleared too
     context->notifyIntervalsChanged();
+
+    // if we selected a ride we should be on the analysis
+    // view-- this is new with the overview and click thru
+    // coming in other charts but when navigation model is
+    // going back we need to stay on the target view
+    // so noswitch is set by the nav model whilst it is working
+    if (!noswitch && views->currentIndex() != 1) {
+        context->mainWindow->newSidebar()->setItemSelected(3, true);
+        selectView(1);
+    }
 }
 
 ProgressLine::ProgressLine(QWidget *parent, Context *context) : QWidget(parent), context(context)

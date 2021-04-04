@@ -90,14 +90,6 @@ Athlete::Athlete(Context *context, const QDir &homeDir)
     int returnCode = v3.upgrade(home->root());
     if (returnCode != 0) return;
 
-    // metric / non-metric
-    QVariant unit = appsettings->value(NULL, GC_UNIT, GC_UNIT_METRIC);
-    if (unit == 0) {
-        // Default to system locale
-        unit = QLocale::system().measurementSystem() == QLocale::MetricSystem ? GC_UNIT_METRIC : GC_UNIT_IMPERIAL;
-        appsettings->setValue(GC_UNIT, unit);
-    }
-    useMetricUnits = (unit.toString() == GC_UNIT_METRIC);
 
     // Power Zones for Bike & Run
     for (int i=0; i < 2; i++) {
@@ -157,9 +149,6 @@ Athlete::Athlete(Context *context, const QDir &homeDir)
 
     // Metadata
     rideCache = NULL; // let metadata know we don't have a ridecache yet
-    rideMetadata_ = new RideMetadata(context,true);
-    rideMetadata_->hide();
-    colorEngine = new ColorEngine(context);
 
     // Date Ranges
     seasons = new Seasons(home->config());
@@ -178,8 +167,19 @@ Athlete::Athlete(Context *context, const QDir &homeDir)
     connect(context, SIGNAL(refreshEnd()), cloudAutoDownload, SLOT(autoDownload()));
 
     // now most dependencies are in get cache
+    QEventLoop loop;
     rideCache = new RideCache(context);
+    connect(rideCache, SIGNAL(loadComplete()), &loop, SLOT(quit()));
+    connect(rideCache, SIGNAL(loadComplete()), this, SLOT(loadComplete()));
 
+    // we need to block on load complete if first (before mainwindow ready)
+    if (context->mainWindow->progress)  loop.exec();
+}
+
+void
+Athlete::loadComplete()
+{
+    // once ridecache is up and running load the rest
     // read athlete's charts.xml and translate etc, it needs to be
     // after RideCache creation to allow for Custom Metrics initialization
     loadCharts();
@@ -198,11 +198,17 @@ Athlete::Athlete(Context *context, const QDir &homeDir)
     connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
     connect(context,SIGNAL(rideAdded(RideItem*)),this,SLOT(checkCPX(RideItem*)));
     connect(context,SIGNAL(rideDeleted(RideItem*)),this,SLOT(checkCPX(RideItem*)));
+
+    // done, tell main window
+    context->notifyLoadCompleted(cyclist, context);
 }
 
 void
 Athlete::close()
 {
+    // let everyone know we're going
+    context->notifyAthleteClose(cyclist, context);
+
     // set to latest so we don't repeat
     appsettings->setCValue(context->athlete->home->root().dirName(), GC_VERSION_USED, VERSION_LATEST);
     appsettings->setCValue(context->athlete->home->root().dirName(), GC_SAFEEXIT, true);
@@ -218,7 +224,7 @@ Athlete::loadCharts()
 {
     presets.clear();
     LTMSettings reader;
-    reader.readChartXML(context->athlete->home->config(), context->athlete->useMetricUnits, presets);
+    reader.readChartXML(context->athlete->home->config(), GlobalContext::context()->useMetricUnits, presets);
     translateDefaultCharts(presets);
 }
 
@@ -245,8 +251,6 @@ Athlete::~Athlete()
     delete seasons;
     delete measures;
 
-    delete rideMetadata_;
-    delete colorEngine;
     for (int i=0; i<2; i++) delete zones_[i];
     for (int i=0; i<2; i++) delete hrzones_[i];
     for (int i=0; i<2; i++) delete pacezones_[i];
@@ -346,12 +350,6 @@ Athlete::translateDefaultCharts(QList<LTMSettings>&charts)
 void
 Athlete::configChanged(qint32 state)
 {
-    // change units
-    if (state & CONFIG_UNITS) {
-        QVariant unit = appsettings->value(NULL, GC_UNIT, GC_UNIT_METRIC);
-        useMetricUnits = (unit.toString() == GC_UNIT_METRIC);
-    }
-
     // invalidate PMC data
     if (state & (CONFIG_PMC | CONFIG_SEASONS)) {
         QMapIterator<QString, PMCData *> pmcs(pmcData);
@@ -487,7 +485,10 @@ Athlete::getWeight(QDate date, RideFile *ride)
     double weight;
 
     // daily weight first
-    weight = measures->getGroup(Measures::Body)->getFieldValue(date);
+    if (measures->getGroup(Measures::Body))
+        weight = measures->getGroup(Measures::Body)->getFieldValue(date);
+    else
+        weight = 0.0;
 
     // ride (if available)
     if (!weight && ride)
@@ -525,19 +526,19 @@ Athlete::getHeight(RideFile *ride)
 
 // working with Banister data series
 Banister *
-Athlete::getBanisterFor(QString metricName, int t1 , int t2)
+Athlete::getBanisterFor(QString metricName, QString perfMetricName, int t1 , int t2)
 {
     Banister *returning = NULL;
 
     // if we don't already have one, create it
-    returning = banisterData.value(metricName, NULL); // we do
+    returning = banisterData.value(metricName+perfMetricName, NULL); // we do
     if (!returning) {
 
         // specification is blank and passes for all
-        returning = new Banister(context, metricName, t1, t2); // we don't seed t1/t2 yet. (maybe never will)
+        returning = new Banister(context, metricName, perfMetricName, t1, t2); // we don't seed t1/t2 yet. (maybe never will)
 
         // add to our collection
-        banisterData.insert(metricName, returning);
+        banisterData.insert(metricName+perfMetricName, returning);
     }
 
     return returning;

@@ -87,7 +87,8 @@ class FixElevation : public DataProcessor {
         bool postProcess(RideFile *, DataProcessorConfig* config, QString op);
 
         // the config widget
-        DataProcessorConfig* processorConfig(QWidget *parent) {
+        DataProcessorConfig* processorConfig(QWidget *parent, const RideFile * ride = NULL) {
+            Q_UNUSED(ride);
             return new FixElevationConfig(parent);
         }
 
@@ -146,9 +147,10 @@ FixElevation::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString
             if (latLngCollection.length() != 0) {
                 latLngCollection.append(',');
             }
-            latLngCollection.append(QString::number(point->lat));
+            // these values need extended precision or place marker jumps around.
+            latLngCollection.append(QString::number(point->lat,'g',10));
             latLngCollection.append(',');
-            latLngCollection.append(QString::number(point->lon));
+            latLngCollection.append(QString::number(point->lon,'g',10));
             if (pointCount == 400) {
                 elevationPoints = elevationPoints + FetchElevationDataFromMapQuest(latLngCollection);
                 latLngCollection = "";

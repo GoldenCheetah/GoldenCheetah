@@ -82,7 +82,7 @@ class HrZone : public RideMetric {
             // use MaxHr as upper bound, this is used
             // for the limit of upper zone ALWAYS
             const int pmax = zones->getMaxHr(item->hrZoneRange);
-            high = std::max(high, pmax);
+            high = std::min(high, pmax);
 
             // how far in?
             percent = double(ahr-low) / double(high-low);

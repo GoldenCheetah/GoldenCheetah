@@ -17,7 +17,6 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
- #include <QSharedPointer>
 #include "GoldenCheetah.h"
 
 #include "RealtimeController.h"
@@ -32,8 +31,6 @@ class DaumController : public RealtimeController
 
 public:
     DaumController (TrainSidebar *, DeviceConfiguration *);
-
-    Daum *daumDevice_;     // device instance
 
     // device control
     int start();            // start capturing
@@ -53,6 +50,9 @@ public:
 
     void setLoad(double);
     void setMode(int) { return; }
+
+private:
+    Daum daumDevice_;     // device instance
 };
 
 #endif // _GC_DaumController_h

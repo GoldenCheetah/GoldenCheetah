@@ -144,15 +144,22 @@ class XPaceSwim : public RideMetric {
     bool isLowerBetter() const { return true; }
     // Overrides to use Swim Pace units setting
     QString units(bool) const {
-        bool metricRunPace = appsettings->value(NULL, GC_SWIMPACE, true).toBool();
-        return RideMetric::units(metricRunPace);
+        bool metricPace = appsettings->value(NULL, GC_SWIMPACE, true).toBool();
+        return RideMetric::units(metricPace);
     }
     double value(bool) const {
-        bool metricRunPace = appsettings->value(NULL, GC_SWIMPACE, true).toBool();
-        return RideMetric::value(metricRunPace);
+        bool metricPace = appsettings->value(NULL, GC_SWIMPACE, true).toBool();
+        return RideMetric::value(metricPace);
+    }
+    double value(double v, bool) const {
+        bool metricPace = appsettings->value(NULL, GC_SWIMPACE, true).toBool();
+        return RideMetric::value(v, metricPace);
     }
     QString toString(bool metric) const {
         return time_to_string(value(metric)*60);
+    }
+    QString toString(double v) const {
+        return time_to_string(v*60);
     }
     void initialize() {
         setName(tr("xPace Swim"));

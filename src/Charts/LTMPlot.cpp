@@ -323,7 +323,7 @@ LTMPlot::setData(LTMSettings *set)
 
     // how many ?
     maxX = groupForDate(settings->end.date(), settings->groupBy) -
-           groupForDate(settings->start.date(), settings->groupBy);
+           groupForDate(settings->start.date(), settings->groupBy) + 1;
 
     // no data to display so that all folks
     if (context->athlete->rideCache->rides().count() == 0 || maxX <= 0) {
@@ -2558,7 +2558,7 @@ LTMPlot::createTODCurveData(Context *context, LTMSettings *settings, MetricDetai
         // Special computed metrics (LTS/STS) have a null metric pointer
         if (metricDetail.metric) {
             // convert from stored metric value to imperial
-            if (context->athlete->useMetricUnits == false) {
+            if (GlobalContext::context()->useMetricUnits == false) {
                 value *= metricDetail.metric->conversion();
                 value += metricDetail.metric->conversionSum();
             }
@@ -2609,7 +2609,7 @@ LTMPlot::createCurveData(Context *context, LTMSettings *settings, MetricDetail m
 {
     // resize the curve array to maximum possible size
     int maxdays = groupForDate(settings->end.date(), settings->groupBy)
-                    - groupForDate(settings->start.date(), settings->groupBy);
+                  - groupForDate(settings->start.date(), settings->groupBy) + 1;
 
     if (maxdays <= 0) return;
 
@@ -2649,7 +2649,7 @@ LTMPlot::createMetricData(Context *context, LTMSettings *settings, MetricDetail 
 
     // resize the curve array to maximum possible size
     int maxdays = groupForDate(settings->end.date(), settings->groupBy)
-                    - groupForDate(settings->start.date(), settings->groupBy);
+                  - groupForDate(settings->start.date(), settings->groupBy) + 1;
 
     x.resize(maxdays+3); // one for start from zero plus two for 0 value added at head and tail
     y.resize(maxdays+3); // one for start from zero plus two for 0 value added at head and tail
@@ -2698,7 +2698,7 @@ LTMPlot::createMetricData(Context *context, LTMSettings *settings, MetricDetail 
 
         if (metricDetail.metric) {
             // convert from stored metric value to imperial
-            if (context->athlete->useMetricUnits == false) {
+            if (GlobalContext::context()->useMetricUnits == false) {
                 value *= metricDetail.metric->conversion();
                 value += metricDetail.metric->conversionSum();
             }
@@ -2734,6 +2734,7 @@ LTMPlot::createMetricData(Context *context, LTMSettings *settings, MetricDetail 
 
                 // only increment counter if nonzero or we aggregate zeroes
                 if (value || aggZero) secondsPerGroupBy = seconds; 
+                else secondsPerGroupBy = 0;
 
             } else {
                 // sum totals, average averages and choose best for Peaks
@@ -2792,7 +2793,8 @@ LTMPlot::createMetricData(Context *context, LTMSettings *settings, MetricDetail 
                         }
                     break;
                 }
-                secondsPerGroupBy += seconds; // increment for same group
+                // increment group counter if nonzero or we aggregate zeroes
+                if (value || aggZero) secondsPerGroupBy += seconds;
             }
             lastDay = currentDay;
         }
@@ -2806,7 +2808,7 @@ LTMPlot::createFormulaData(Context *context, LTMSettings *settings, MetricDetail
 
     // resize the curve array to maximum possible size
     int maxdays = groupForDate(settings->end.date(), settings->groupBy)
-                    - groupForDate(settings->start.date(), settings->groupBy);
+                  - groupForDate(settings->start.date(), settings->groupBy) + 1;
 
     x.resize(maxdays+3); // one for start from zero plus two for 0 value added at head and tail
     y.resize(maxdays+3); // one for start from zero plus two for 0 value added at head and tail
@@ -2841,7 +2843,7 @@ LTMPlot::createFormulaData(Context *context, LTMSettings *settings, MetricDetail
 
         // PARSE + EVALUATE
         Result res = parser.evaluate(ride, NULL);
-        if (res.isNumber) value = res.number;
+        if (res.isNumber) value = res.number();
 
         // check values are bounded to stop QWT going berserk
         if (std::isnan(value) || std::isinf(value)) value = 0;
@@ -2877,6 +2879,7 @@ LTMPlot::createFormulaData(Context *context, LTMSettings *settings, MetricDetail
 
                 // only increment counter if nonzero or we aggregate zeroes
                 if (value || aggZero) secondsPerGroupBy = seconds; 
+                else secondsPerGroupBy = 0;
 
             } else {
                 // sum totals, average averages and choose best for Peaks
@@ -2908,7 +2911,8 @@ LTMPlot::createFormulaData(Context *context, LTMSettings *settings, MetricDetail
                     if (value) y[n] = sqrt((pow(y[n],2)*secondsPerGroupBy + pow(value,2)*value)/(secondsPerGroupBy+seconds));
                     break;
                 }
-                secondsPerGroupBy += seconds; // increment for same group
+                // increment group counter if nonzero or we aggregate zeroes
+                if (value || aggZero) secondsPerGroupBy += seconds;
             }
             lastDay = currentDay;
         }
@@ -2929,7 +2933,7 @@ LTMPlot::createBestsData(Context *, LTMSettings *settings, MetricDetail metricDe
 {
     // resize the curve array to maximum possible size
     int maxdays = groupForDate(settings->end.date(), settings->groupBy)
-                    - groupForDate(settings->start.date(), settings->groupBy);
+                  - groupForDate(settings->start.date(), settings->groupBy) + 1;
 
     x.resize(maxdays+3); // one for start from zero plus two for 0 value added at head and tail
     y.resize(maxdays+3); // one for start from zero plus two for 0 value added at head and tail
@@ -3003,6 +3007,7 @@ LTMPlot::createBestsData(Context *, LTMSettings *settings, MetricDetail metricDe
 
                 // only increment counter if nonzero or we aggregate zeroes
                 if (value || aggZero) secondsPerGroupBy = seconds; 
+                else secondsPerGroupBy = 0;
 
             } else {
                 // sum totals, average averages and choose best for Peaks
@@ -3038,7 +3043,8 @@ LTMPlot::createBestsData(Context *, LTMSettings *settings, MetricDetail metricDe
                     if (value) y[n] = sqrt((pow(y[n],2)*secondsPerGroupBy + pow(value,2)*value)/(secondsPerGroupBy+seconds));
                     break;
                 }
-                secondsPerGroupBy += seconds; // increment for same group
+                // increment group counter if nonzero or we aggregate zeroes
+                if (value || aggZero) secondsPerGroupBy += seconds;
             }
             lastDay = currentDay;
         }
@@ -3059,7 +3065,7 @@ LTMPlot::createEstimateData(Context *context, LTMSettings *settings, MetricDetai
 
     // resize the curve array to maximum possible size (even if we don't need it)
     int maxdays = groupForDate(settings->end.date(), settings->groupBy)
-                    - groupForDate(settings->start.date(), settings->groupBy);
+                  - groupForDate(settings->start.date(), settings->groupBy) + 1;
 
     n = 0;
     x.resize(maxdays+3); // one for start from zero plus two for 0 value added at head and tail
@@ -3425,7 +3431,7 @@ LTMPlot::createPMCData(Context *context, LTMSettings *settings, MetricDetail met
     PMCData *pmcData = localPMC ? localPMC : athletePMC;
 
     int maxdays = groupForDate(settings->end.date(), settings->groupBy)
-                    - groupForDate(settings->start.date(), settings->groupBy);
+                  - groupForDate(settings->start.date(), settings->groupBy) + 1;
 
     // skip for negative or empty time periods.
     if (maxdays <=0) return;
@@ -3518,7 +3524,6 @@ LTMPlot::createPMCData(Context *context, LTMSettings *settings, MetricDetail met
                 y[n] = value;
                 x[n] = currentDay - groupForDate(settings->start.date(), settings->groupBy);
 
-                // only increment counter if nonzero or we aggregate zeroes
                 secondsPerGroupBy = seconds; 
 
             } else {
@@ -3568,7 +3573,7 @@ LTMPlot::createBanisterData(Context *context, LTMSettings *settings, MetricDetai
                                               QVector<double>&x,QVector<double>&y,int&n, bool)
 {
     // banister model
-    Banister *banister = context->athlete->getBanisterFor(metricDetail.symbol, 50,11);
+    Banister *banister = context->athlete->getBanisterFor(metricDetail.symbol, metricDetail.perfSymbol, 50,11);
 
     // should never happen...
     if (banister==NULL) {
@@ -3577,7 +3582,7 @@ LTMPlot::createBanisterData(Context *context, LTMSettings *settings, MetricDetai
     }
 
     int maxdays = groupForDate(settings->end.date(), settings->groupBy)
-                    - groupForDate(settings->start.date(), settings->groupBy);
+                  - groupForDate(settings->start.date(), settings->groupBy) + 1;
 
     // skip for negative or empty time periods.
     if (maxdays <=0) return;
@@ -3620,7 +3625,6 @@ LTMPlot::createBanisterData(Context *context, LTMSettings *settings, MetricDetai
                 y[n] = value;
                 x[n] = currentDay - groupForDate(settings->start.date(), settings->groupBy);
 
-                // only increment counter if nonzero or we aggregate zeroes
                 secondsPerGroupBy = seconds;
 
             } else {
@@ -3666,7 +3670,7 @@ void
 LTMPlot::createMeasureData(Context *context, LTMSettings *settings, MetricDetail metricDetail, QVector<double>&x,QVector<double>&y,int&n, bool)
 {
     int maxdays = groupForDate(settings->end.date(), settings->groupBy)
-                    - groupForDate(settings->start.date(), settings->groupBy);
+                  - groupForDate(settings->start.date(), settings->groupBy) + 1;
 
     // skip for negative or empty time periods.
     if (maxdays <=0) return;
@@ -3686,7 +3690,7 @@ LTMPlot::createMeasureData(Context *context, LTMSettings *settings, MetricDetail
         int currentDay = groupForDate(date, settings->groupBy);
 
         // value for day
-        double value = context->athlete->measures->getFieldValue(metricDetail.measureGroup, date, metricDetail.measureField, context->athlete->useMetricUnits);
+        double value = context->athlete->measures->getFieldValue(metricDetail.measureGroup, date, metricDetail.measureField, GlobalContext::context()->useMetricUnits);
 
         if (value || wantZero) {
             unsigned long seconds = 1;
@@ -3705,7 +3709,6 @@ LTMPlot::createMeasureData(Context *context, LTMSettings *settings, MetricDetail
                 y[n] = value;
                 x[n] = currentDay - groupForDate(settings->start.date(), settings->groupBy);
 
-                // only increment counter if nonzero or we aggregate zeroes
                 secondsPerGroupBy = seconds;
 
             } else {
@@ -3756,7 +3759,7 @@ LTMPlot::createPerformanceData(Context *context, LTMSettings *settings, MetricDe
     metricDetail.run = (nRuns > 0 && nActivities == nRuns);
 
     int maxdays = groupForDate(settings->end.date(), settings->groupBy)
-                    - groupForDate(settings->start.date(), settings->groupBy);
+                  - groupForDate(settings->start.date(), settings->groupBy) + 1;
 
     // skip for negative or empty time periods.
     if (maxdays <=0) return;
@@ -3841,7 +3844,6 @@ LTMPlot::createPerformanceData(Context *context, LTMSettings *settings, MetricDe
                 y[n] = value;
                 x[n] = currentDay - groupForDate(settings->start.date(), settings->groupBy);
 
-                // only increment counter if nonzero or we aggregate zeroes
                 secondsPerGroupBy = seconds;
 
             } else {
@@ -4038,7 +4040,7 @@ LTMPlot::pointHover(QwtPlotCurve *curve, int index)
             c.next();
             if (c.value() == curve) {
                 const RideMetric *metric =factory.rideMetric(c.key());
-                units = metric ? metric->units(context->athlete->useMetricUnits) : "";
+                units = metric ? metric->units(GlobalContext::context()->useMetricUnits) : "";
                 precision = metric ? metric->precision() : 1;
 
                 // BikeScore, RI and Daniels Points have no units
@@ -4272,51 +4274,49 @@ LTMPlot::refreshMarkers(LTMSettings *settings, QDate from, QDate to, int groupby
     if (settings->events) {
         QList<Season> tmpSeasons = context->athlete->seasons->seasons;
         qSort(tmpSeasons.begin(),tmpSeasons.end(),Season::LessThanForStarts);
-        foreach (Season s, tmpSeasons) {
-
-            if (s.type != Season::temporary && s.getName() != settings->title && s.getStart() >= from && s.getStart() <= to) {
-                QwtIndPlotMarker *mrk = new QwtIndPlotMarker;
-                markers.append(mrk);
-                mrk->attach(this);
-                mrk->setLineStyle(QwtIndPlotMarker::VLine);
-                mrk->setLabelAlignment(Qt::AlignRight | Qt::AlignTop);
-                mrk->setLinePen(QPen(color, 0, Qt::DashLine));
-                mrk->setValue(double(groupForDate(s.getStart(), groupby)) - baseday,0);
-
-                if (position % viewDepth == 0) {
-                    QwtText text(s.getName());
-                    text.setFont(QFont("Helvetica", 10, QFont::Bold));
-                    text.setColor(color);
-                    mrk->setLabel(text);
-                }
-            }
-        } //end foreach season
 
         foreach (Season s, tmpSeasons) {
-            /* if (s.type != Season::temporary && s.name != settings->title && s.getStart() >= from && s.getStart() < to) { */
-            if ((s.getStart() >= from && s.getStart() <= to) || (s.getEnd() >= from && s.getEnd() <= to)) {
-            foreach (SeasonEvent event, s.events) {
-                if (event.date >= from && event.date <= to) {
-
-                    // and the events...
+            // for each season that intersects the date range
+            if (s.getStart() <= to && s.getEnd() >= from) {
+                // add a season marker
+                if (s.type != Season::temporary && s.getName() != settings->title && s.getStart() >= from) {
                     QwtIndPlotMarker *mrk = new QwtIndPlotMarker;
                     markers.append(mrk);
                     mrk->attach(this);
                     mrk->setLineStyle(QwtIndPlotMarker::VLine);
                     mrk->setLabelAlignment(Qt::AlignRight | Qt::AlignTop);
-                    mrk->setLinePen(QPen(color, 0, Qt::SolidLine));
-                    mrk->setValue(double(groupForDate(event.date, groupby)) - baseday, 10.0);
+                    mrk->setLinePen(QPen(color, 0, Qt::DashLine));
+                    mrk->setValue(double(groupForDate(s.getStart(), groupby)) - baseday,0);
 
                     if (position % viewDepth == 0) {
-                        QwtText text(event.name);
+                        QwtText text(s.getName());
                         text.setFont(QFont("Helvetica", 10, QFont::Bold));
-                        text.setColor(Qt::red);
+                        text.setColor(color);
                         mrk->setLabel(text);
                     }
                 }
+
+                // add event markers
+                foreach (SeasonEvent event, s.events) {
+                    if (event.date >= from && event.date <= to) {
+                        QwtIndPlotMarker *mrk = new QwtIndPlotMarker;
+                        markers.append(mrk);
+                        mrk->attach(this);
+                        mrk->setLineStyle(QwtIndPlotMarker::VLine);
+                        mrk->setLabelAlignment(Qt::AlignCenter | Qt::AlignTop);
+                        mrk->setLinePen(QPen(color, 0, Qt::SolidLine));
+                        mrk->setValue(double(groupForDate(event.date, groupby)) - baseday, 10.0);
+
+                        if (position % viewDepth == 0) {
+                            QwtText text(event.name);
+                            text.setFont(QFont("Helvetica", 10, QFont::Bold));
+                            text.setColor(Qt::red);
+                            mrk->setLabel(text);
+                        }
+                    }
+                }
             }
-            }
-        }//end foreach season
+        } //end foreach season
     }
 
     // Add marker for today when the date range goes to the future
@@ -4377,5 +4377,7 @@ void LTMPlot::refreshZoneLabels(QwtAxisId axisid)
 
 bool LTMPlot::isMinutes(QString units)
 {
-    return units == "minutes" || units == tr("minutes") || PaceZones::isPaceUnit(units);
+    static const QSet<QString> MinutesHash = { "minutes", tr("minutes") };
+
+    return MinutesHash.contains(units) || PaceZones::isPaceUnit(units);
 }

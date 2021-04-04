@@ -51,7 +51,7 @@ class FixSpeedConfig : public DataProcessorConfig
             maLabel = new QLabel(tr("Moving Average Seconds"));
 
             ma = new QSpinBox();
-            ma->setMaximum(60);
+            ma->setMaximum(600);
             ma->setMinimum(0);
             ma->setSingleStep(1);
             layout->addWidget(maLabel);
@@ -97,7 +97,8 @@ class FixSpeed : public DataProcessor {
         bool postProcess(RideFile *, DataProcessorConfig* config, QString op);
 
         // the config widget
-        DataProcessorConfig* processorConfig(QWidget *parent) {
+        DataProcessorConfig* processorConfig(QWidget *parent, const RideFile * ride = NULL) {
+            Q_UNUSED(ride);
             return new FixSpeedConfig(parent);
         }
 
@@ -107,7 +108,7 @@ class FixSpeed : public DataProcessor {
         }
 };
 
-static bool FixSpeedAdded = DataProcessorFactory::instance().registerProcessor(QString("Fix Speed"), new FixSpeed());
+static bool FixSpeedAdded = DataProcessorFactory::instance().registerProcessor(QString("Fix Speed from Distance"), new FixSpeed());
 
 bool
 FixSpeed::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString op="")
@@ -160,7 +161,7 @@ FixSpeed::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString op=
             // ok, lets start a luw if not already changed
             if (!changed) {
                 changed = true;
-                ride->command->startLUW("Fix Speed");
+                ride->command->startLUW("Fix Speed from Distance");
             }
             ride->command->setPointValue(i, RideFile::kph, kph);
         }
@@ -170,7 +171,7 @@ FixSpeed::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString op=
         km = p->km;
     }
 
-    if (changed) {
+    if (changed || !ride->areDataPresent()->kph) {
         ride->setDataPresent(ride->kph, true);
         ride->command->endLUW();
         return true;

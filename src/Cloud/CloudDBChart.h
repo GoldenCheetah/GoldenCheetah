@@ -64,7 +64,6 @@ public:
     void incrementDownloadCounterByID(qint64 id);
     bool getAllChartHeader(QList<CommonAPIHeaderV1>* header);
 
-    void updateChartInCache(qint64 id);
     bool sslLibMissing() { return noSSLlib; }
 
 public slots:
@@ -201,7 +200,6 @@ private:
     void setVisibleButtonsForRole();
     void applyAllFilters();
     bool refreshStaleChartHeader();
-    QString encodeHTML ( const QString& );
 
 };
 
