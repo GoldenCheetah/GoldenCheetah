@@ -141,7 +141,7 @@ WebPageWindow::WebPageWindow(Context *context) : GcChartWindow(context), context
 
     // add a download interceptor
     WebDownloadInterceptor *interceptor = new WebDownloadInterceptor;
-    view->page()->profile()->setRequestInterceptor(interceptor);
+    view->page()->profile()->setUrlRequestInterceptor(interceptor);
 
     // cookies and storage
     view->page()->profile()->setPersistentCookiesPolicy(QWebEngineProfile::ForcePersistentCookies);
