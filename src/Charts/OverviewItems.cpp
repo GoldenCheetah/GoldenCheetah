@@ -144,6 +144,11 @@ static const QStringList timeInZones = QStringList()
         << "time_in_zone_L9"
         << "time_in_zone_L10";
 
+static const QStringList timeInZonesPolarized = QStringList()
+        << "time_in_zone_LI"
+        << "time_in_zone_LII"
+        << "time_in_zone_LIII";
+
 static const QStringList paceTimeInZones = QStringList()
         << "time_in_zone_P1"
         << "time_in_zone_P2"
@@ -155,6 +160,11 @@ static const QStringList paceTimeInZones = QStringList()
         << "time_in_zone_P8"
         << "time_in_zone_P9"
         << "time_in_zone_P10";
+
+static const QStringList paceTimeInZonesPolarized = QStringList()
+        << "time_in_zone_PI"
+        << "time_in_zone_PII"
+        << "time_in_zone_PIII";
 
 static const QStringList timeInZonesHR = QStringList()
         << "time_in_zone_H1"
@@ -168,17 +178,23 @@ static const QStringList timeInZonesHR = QStringList()
         << "time_in_zone_H9"
         << "time_in_zone_H10";
 
+static const QStringList timeInZonesHRPolarized = QStringList()
+        << "time_in_zone_HI"
+        << "time_in_zone_HII"
+        << "time_in_zone_HIII";
+
 static const QStringList timeInZonesWBAL = QStringList()
         << "wtime_in_zone_L1"
         << "wtime_in_zone_L2"
         << "wtime_in_zone_L3"
         << "wtime_in_zone_L4";
 
-ZoneOverviewItem::ZoneOverviewItem(ChartSpace *parent, QString name, RideFile::seriestype series) : ChartSpaceItem(parent, name)
+ZoneOverviewItem::ZoneOverviewItem(ChartSpace *parent, QString name, RideFile::seriestype series, bool polarized) : ChartSpaceItem(parent, name)
 {
 
     this->type = OverviewItemType::ZONE;
     this->series = series;
+    this->polarized = polarized;
 
     // basic chart setup
     chart = new QChart(this);
@@ -216,7 +232,7 @@ ZoneOverviewItem::ZoneOverviewItem(ChartSpace *parent, QString name, RideFile::s
     //
     // HEARTRATE
     //
-    if (series == RideFile::hr && parent->context->athlete->hrZones(false)) {
+    if (!polarized && series == RideFile::hr && parent->context->athlete->hrZones(false)) {
         // set the zero values
         for(int i=0; i<parent->context->athlete->hrZones(false)->getScheme().nzones_default; i++) {
             *barset << 0;
@@ -227,7 +243,7 @@ ZoneOverviewItem::ZoneOverviewItem(ChartSpace *parent, QString name, RideFile::s
     //
     // POWER
     //
-    if (series == RideFile::watts && parent->context->athlete->zones(false)) {
+    if (!polarized && series == RideFile::watts && parent->context->athlete->zones(false)) {
         // set the zero values
         for(int i=0; i<parent->context->athlete->zones(false)->getScheme().nzones_default; i++) {
             *barset << 0;
@@ -238,7 +254,7 @@ ZoneOverviewItem::ZoneOverviewItem(ChartSpace *parent, QString name, RideFile::s
     //
     // PACE
     //
-    if (series == RideFile::kph && parent->context->athlete->paceZones(false)) {
+    if (!polarized && series == RideFile::kph && parent->context->athlete->paceZones(false)) {
         // set the zero values
         for(int i=0; i<parent->context->athlete->paceZones(false)->getScheme().nzones_default; i++) {
             *barset << 0;
@@ -247,11 +263,14 @@ ZoneOverviewItem::ZoneOverviewItem(ChartSpace *parent, QString name, RideFile::s
     }
 
     //
-    // W'BAL
+    // W'BAL and Polarized
     //
     if (series == RideFile::wbal) {
         categories << "Low" << "Med" << "High" << "Ext";
         *barset << 0 << 0 << 0 << 0;
+    } else if (polarized) {
+        categories << "I" << "II" << "III";
+        *barset << 0 << 0 << 0;
     }
 
     // bar series and categories setup, same for all
@@ -1191,7 +1210,11 @@ ZoneOverviewItem::setDateRange(DateRange dr)
             //
             case RideFile::hr:
             {
-                if (parent->context->athlete->hrZones(item->isRun)) {
+                if (polarized) {
+                    for(int i=0; i<3; i++) {
+                        vals[i] += item->getForSymbol(timeInZonesHRPolarized[i]);
+                    }
+                } else if (parent->context->athlete->hrZones(item->isRun)) {
 
                     int numhrzones;
                     int hrrange = parent->context->athlete->hrZones(item->isRun)->whichRange(item->dateTime.date());
@@ -1213,7 +1236,11 @@ ZoneOverviewItem::setDateRange(DateRange dr)
             default:
             case RideFile::watts:
             {
-                if (parent->context->athlete->zones(item->isRun)) {
+                if (polarized) {
+                    for(int i=0; i<3; i++) {
+                        vals[i] += item->getForSymbol(timeInZonesPolarized[i]);
+                    }
+                } else if (parent->context->athlete->zones(item->isRun)) {
 
                     int numzones;
                     int range = parent->context->athlete->zones(item->isRun)->whichRange(item->dateTime.date());
@@ -1234,7 +1261,11 @@ ZoneOverviewItem::setDateRange(DateRange dr)
             //
             case RideFile::kph:
             {
-                if ((item->isRun || item->isSwim) && parent->context->athlete->paceZones(item->isSwim)) {
+                if (polarized) {
+                    for(int i=0; i<3; i++) {
+                        vals[i] += item->getForSymbol(paceTimeInZonesPolarized[i]);
+                    }
+                } else if ((item->isRun || item->isSwim) && parent->context->athlete->paceZones(item->isSwim)) {
 
                     int numzones;
                     int range = parent->context->athlete->paceZones(item->isSwim)->whichRange(item->dateTime.date());
@@ -1289,7 +1320,18 @@ ZoneOverviewItem::setData(RideItem *item)
     //
     case RideFile::hr:
     {
-        if (parent->context->athlete->hrZones(item->isRun)) {
+        if (polarized) {
+            // get total time in zones
+            double sum=0;
+            for(int i=0; i<3; i++) sum += round(item->getForSymbol(timeInZonesHRPolarized[i]));
+
+            // update as percent of total
+            for(int i=0; i<3; i++) {
+                double time =round(item->getForSymbol(timeInZonesHRPolarized[i]));
+                if (time > 0 && sum > 0) barset->replace(i, round((time/sum) * 100));
+                else barset->replace(i, 0);
+            }
+        } else if (parent->context->athlete->hrZones(item->isRun)) {
 
             int numhrzones;
             int hrrange = parent->context->athlete->hrZones(item->isRun)->whichRange(item->dateTime.date());
@@ -1327,7 +1369,18 @@ ZoneOverviewItem::setData(RideItem *item)
     default:
     case RideFile::watts:
     {
-        if (parent->context->athlete->zones(item->isRun)) {
+        if (polarized) {
+            // get total time in zones
+            double sum=0;
+            for(int i=0; i<3; i++) sum += round(item->getForSymbol(timeInZonesPolarized[i]));
+
+            // update as percent of total
+            for(int i=0; i<3; i++) {
+                double time =round(item->getForSymbol(timeInZonesPolarized[i]));
+                if (time > 0 && sum > 0) barset->replace(i, round((time/sum) * 100));
+                else barset->replace(i, 0);
+            }
+        } else if (parent->context->athlete->zones(item->isRun)) {
 
             int numzones;
             int range = parent->context->athlete->zones(item->isRun)->whichRange(item->dateTime.date());
@@ -1364,7 +1417,18 @@ ZoneOverviewItem::setData(RideItem *item)
     //
     case RideFile::kph:
     {
-        if ((item->isRun || item->isSwim) && parent->context->athlete->paceZones(item->isSwim)) {
+        if (polarized) {
+            // get total time in zones
+            double sum=0;
+            for(int i=0; i<3; i++) sum += round(item->getForSymbol(paceTimeInZonesPolarized[i]));
+
+            // update as percent of total
+            for(int i=0; i<3; i++) {
+                double time =round(item->getForSymbol(paceTimeInZonesPolarized[i]));
+                if (time > 0 && sum > 0) barset->replace(i, round((time/sum) * 100));
+                else barset->replace(i, 0);
+            }
+        } else if ((item->isRun || item->isSwim) && parent->context->athlete->paceZones(item->isSwim)) {
 
             int numzones;
             int range = parent->context->athlete->paceZones(item->isSwim)->whichRange(item->dateTime.date());
@@ -2381,6 +2445,11 @@ OverviewItemConfig::OverviewItemConfig(ChartSpaceItem *item) : QWidget(item->par
         series1 = new SeriesSelect(this, SeriesSelect::Zones);
         connect(series1, SIGNAL(currentIndexChanged(int)), this, SLOT(dataChanged()));
         layout->addRow(tr("Zone Series"), series1);
+
+        // polarized
+        cb1 = new QCheckBox(this);
+        layout->addRow(tr("Polarized"), cb1);
+        connect(cb1, SIGNAL(stateChanged(int)), this, SLOT(dataChanged()));
     }
 
     if (item->type == OverviewItemType::KPI) {
@@ -2569,6 +2638,7 @@ OverviewItemConfig::setWidgets()
             ZoneOverviewItem *mi = dynamic_cast<ZoneOverviewItem*>(item);
             name->setText(mi->name);
             series1->setSeries(mi->series);
+            cb1->setChecked(mi->polarized);
         }
         break;
 
@@ -2676,6 +2746,7 @@ OverviewItemConfig::dataChanged()
             ZoneOverviewItem *mi = dynamic_cast<ZoneOverviewItem*>(item);
             mi->name = name->text();
             if (series1->currentIndex() >= 0) mi->series = static_cast<RideFile::SeriesType>(series1->itemData(series1->currentIndex(), Qt::UserRole).toInt());
+            mi->polarized = cb1->isChecked();
         }
         break;
 

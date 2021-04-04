@@ -86,7 +86,7 @@ class OverviewItemConfig : public QWidget
 
         QLineEdit *name, *string1; // all of them
         QDoubleSpinBox *double1, *double2; // KPI
-        QCheckBox *cb1; // KPI
+        QCheckBox *cb1; // KPI/Zone
         MetricSelect *metric1, *metric2, *metric3; // Metric/Interval/PMC
         MetricSelect *meta1; // Meta
         SeriesSelect *series1; // Zone Histogram
@@ -300,7 +300,7 @@ class ZoneOverviewItem : public ChartSpaceItem
 
     public:
 
-        ZoneOverviewItem(ChartSpace *parent, QString name, RideFile::seriestype);
+        ZoneOverviewItem(ChartSpace *parent, QString name, RideFile::seriestype, bool polarized);
         ~ZoneOverviewItem();
 
         void itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *);
@@ -311,9 +311,10 @@ class ZoneOverviewItem : public ChartSpaceItem
         QWidget *config() { return new OverviewItemConfig(this); }
 
         // create and config
-        static ChartSpaceItem *create(ChartSpace *parent) { return new ZoneOverviewItem(parent, tr("Power Zones"), RideFile::watts); }
+        static ChartSpaceItem *create(ChartSpace *parent) { return new ZoneOverviewItem(parent, tr("Power Zones"), RideFile::watts, false); }
 
         RideFile::seriestype series;
+        bool polarized;
 
         QChart *chart;
         QBarSet *barset;
