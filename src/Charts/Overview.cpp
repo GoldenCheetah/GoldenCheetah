@@ -150,6 +150,7 @@ OverviewWindow::getConfiguration() const
             {
                 ZoneOverviewItem *zone = reinterpret_cast<ZoneOverviewItem*>(item);
                 config += "\"series\":" + QString("%1").arg(static_cast<int>(zone->series)) + ",";
+                config += "\"polarized\":" + QString("%1").arg(zone->polarized) + ",";
             }
             break;
         case OverviewItemType::KPI:
@@ -223,7 +224,7 @@ OverviewWindow::setConfiguration(QString config)
             add = new MetricOverviewItem(space, tr("Heartrate"), "average_hr");
             space->addItem(2,1,5, add);
 
-            add = new ZoneOverviewItem(space, tr("Heartrate Zones"), RideFile::hr);
+            add = new ZoneOverviewItem(space, tr("Heartrate Zones"), RideFile::hr, false);
             space->addItem(3,1,11, add);
 
             add = new MetricOverviewItem(space, tr("Climbing"), "elevation_gain");
@@ -242,7 +243,7 @@ OverviewWindow::setConfiguration(QString config)
             add = new MetricOverviewItem(space, tr("Stress"), "coggan_tss");
             space->addItem(2,2,5, add);
 
-            add = new ZoneOverviewItem(space, tr("Fatigue Zones"), RideFile::wbal);
+            add = new ZoneOverviewItem(space, tr("Fatigue Zones"), RideFile::wbal, false);
             space->addItem(3,2,11, add);
 
             add = new IntervalOverviewItem(space, tr("Intervals"), "elapsed_time", "average_power", "workout_time");
@@ -255,7 +256,7 @@ OverviewWindow::setConfiguration(QString config)
             add = new MetricOverviewItem(space, tr("IsoPower"), "coggan_np");
             space->addItem(2,3,5, add);
 
-            add = new ZoneOverviewItem(space, tr("Power Zones"), RideFile::watts);
+            add = new ZoneOverviewItem(space, tr("Power Zones"), RideFile::watts, false);
             space->addItem(3,3,11, add);
 
             add = new MetricOverviewItem(space, tr("Peak Power Index"), "peak_power_index");
@@ -271,7 +272,7 @@ OverviewWindow::setConfiguration(QString config)
             add = new MetricOverviewItem(space, tr("Speed"), "average_speed");
             space->addItem(2,4,5, add);
 
-            add = new ZoneOverviewItem(space, tr("Pace Zones"), RideFile::kph);
+            add = new ZoneOverviewItem(space, tr("Pace Zones"), RideFile::kph, false);
             space->addItem(3,4,11, add);
 
             add = new RouteOverviewItem(space, tr("Route"));
@@ -303,7 +304,7 @@ OverviewWindow::setConfiguration(QString config)
             add = new MetricOverviewItem(space, tr("Average Power"), "average_power");
             space->addItem(2,1,7, add);
 
-            add = new ZoneOverviewItem(space, tr("Power Zones"), RideFile::watts);
+            add = new ZoneOverviewItem(space, tr("Power Zones"), RideFile::watts, false);
             space->addItem(3,1,9, add);
 
             add = new MetricOverviewItem(space, tr("Total TSS"), "coggan_tss");
@@ -330,7 +331,7 @@ OverviewWindow::setConfiguration(QString config)
             space->addItem(2,3,7, add);
 
 
-            add = new ZoneOverviewItem(space, tr("Fatigue Zones"), RideFile::wbal);
+            add = new ZoneOverviewItem(space, tr("Fatigue Zones"), RideFile::wbal, false);
             space->addItem(3,3,9, add);
 
             add = new MetricOverviewItem(space, tr("Total Work"), "total_work");
@@ -447,7 +448,8 @@ OverviewWindow::setConfiguration(QString config)
             case OverviewItemType::ZONE :
                 {
                     RideFile::SeriesType series = static_cast<RideFile::SeriesType>(obj["series"].toInt());
-                    add = new ZoneOverviewItem(space, name, series);
+                    bool polarized = obj["polarized"].toInt();
+                    add = new ZoneOverviewItem(space, name, series, polarized);
                     add->datafilter = datafilter;
                     space->addItem(order,column,deep, add);
 
