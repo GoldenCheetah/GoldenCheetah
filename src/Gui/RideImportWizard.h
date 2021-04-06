@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2007 Sean C. Rhea (srhea@srhea.net)
+ * Additions Copyright (c) 2021 Paul Johnson (paulj49457@gmail.com)
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
@@ -33,6 +34,36 @@
 #include "Context.h"
 #include "RideAutoImportConfig.h"
 
+typedef enum {
+    COPY_ON_IMPORT = 0,
+    EXCLUDED_FROM_IMPORT,
+} importCopyType;
+
+// Utility class to associate the imported filename with the data and paths
+class ImportFile {
+
+public:
+    // These attributes are populated for all file considered for importation.
+    QString activityFullSource;
+    importCopyType copyOnImport;
+    bool overwriteableFile;
+
+    // These attributes are populated for files that can be imported
+    // i.e. no errors, no exclusion, no duplicates in activities
+    int tableRow;
+    QDateTime ridedatetime;
+    QString targetNoSuffix;
+    QString targetWithSuffix;
+    QString tmpActivitiesFulltarget;
+    QString finalActivitiesFulltarget;
+
+    ImportFile(); 
+    ImportFile(const QString& name);
+
+    static importCopyType stringToCopyType(const QString& importString);
+    static QString copyTypeToString(const importCopyType importCopy);
+};
+
 // Dialog class to show filenames, import progress and to capture user input
 // of ride date and time
 
@@ -52,7 +83,7 @@ public:
     void done(int);
 
     // explicitly only expand archives like .zip or .gz that contain >1 file
-    QList<QString> expandFiles(QList<QString>);
+    QList<ImportFile> expandFiles(QList<ImportFile>);
 
     int getNumberOfFiles();  // get the number of files selected for processing
     int process();
@@ -63,14 +94,17 @@ private slots:
     void abortClicked();
     void cancelClicked();
     void todayClicked(int index);
-    // void overClicked(); // deprecate for this release... XXX
+    void overClicked();
     void activateSave();
 
 private:
-    void init(QList<QString> files, Context *context);
+    void init(QList<ImportFile> files, Context *context);
     bool moveFile(const QString &source, const QString &target);
+    bool isFileExcludedFromImportation(const int i);
+    void addFileToImportExclusionList(const QString& importExcludedFile);
+    void copySourceFileToImportDir(const ImportFile& source, const QString& importsTarget, bool srcInImportsDir);
 
-    QList <QString> filenames; // list of filenames passed
+    QList <ImportFile> filenames; // list of filenames passed
     int numberOfFiles; // number of files to be processed
     QList <bool> blanks; // record of which have a RideFileReader returned date & time
     QDir homeImports; // target directory for source files
@@ -84,11 +118,11 @@ private:
     QTableWidget *tableWidget;
     QTableWidget *directoryWidget;
     QProgressBar *progressBar;
-    QPushButton *abortButton; // also used for save and finish
+    QPushButton *abortButton;  // also used for save and finish
     QPushButton *cancelButton; // cancel when asking for dates
     QComboBox *todayButton;    // set date to today when asking for dates
-    // QCheckBox *overFiles;      // chance to set overwrite when asking for dates // deprecate for this release... XXX
-    // bool overwriteFiles; // flag to overwrite files from checkbox               // deprecate for this release... XXX
+    QCheckBox *overFiles;      // chance to set overwrite when asking for dates
+    bool overwriteFiles;       // flag to overwrite files from checkbox
     Context *context; // caller
     RideAutoImportConfig *importConfig;
 
@@ -124,6 +158,7 @@ public:
 private slots:
     void commitAndCloseTimeEditor();
     void commitAndCloseDateEditor();
+    void commitAndCloseAutoImportEditor(int index);
 
 private:
     int dateColumn; // date is always followed by time
