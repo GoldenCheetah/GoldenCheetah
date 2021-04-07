@@ -68,7 +68,7 @@ ZwoParser::startElement(const QString &, const QString &, const QString &qName, 
     // POINTS
 
     // basic from/to, with different names for some odd reason
-    if (qName == "Warmup" || qName == "SteadyState"  || qName == "Cooldown" || qName == "FreeRide" || qName == "Freeride") {
+    if (qName == "Warmup" || qName == "SteadyState"  || qName == "Cooldown" || qName == "Ramp" || qName == "FreeRide" || qName == "Freeride") {
 
         int from = int(100.0 * PowerLow);
         int to = int(100.0 * PowerHigh);
