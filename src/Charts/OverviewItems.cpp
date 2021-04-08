@@ -518,7 +518,7 @@ RPEOverviewItem::setData(RideItem *item)
         // only activities with matching sport flags
         if (prior->isRun == item->isRun && prior->isSwim == item->isSwim) {
 
-           v = prior->getText("RPE", "0").toDouble();
+           double v = prior->getText("RPE", "0").toDouble();
            if (std::isinf(v) || std::isnan(v)) v=0;
 
            // new no zero value
@@ -592,6 +592,8 @@ MetricOverviewItem::setData(RideItem *item)
 
         // only activities with matching sport flags
         if (prior->isRun == item->isRun && prior->isSwim == item->isSwim) {
+
+            double v;
 
             if (units == tr("seconds")) v = prior->getForSymbol(symbol, GlobalContext::context()->useMetricUnits);
             else {
