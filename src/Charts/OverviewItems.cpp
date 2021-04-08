@@ -569,7 +569,7 @@ MetricOverviewItem::setData(RideItem *item)
     // get the metric value
     value = item->getStringForSymbol(symbol, GlobalContext::context()->useMetricUnits);
     if (value == "nan") value ="";
-    double v = (units == tr("seconds")) ? item->getForSymbol(symbol, GlobalContext::context()->useMetricUnits) : value.toDouble();
+    double v = item->getForSymbol(symbol, GlobalContext::context()->useMetricUnits);
     if (std::isinf(v) || std::isnan(v)) v=0;
 
     points << QPointF(SPARKDAYS, v);
@@ -593,15 +593,7 @@ MetricOverviewItem::setData(RideItem *item)
         // only activities with matching sport flags
         if (prior->isRun == item->isRun && prior->isSwim == item->isSwim) {
 
-            double v;
-
-            if (units == tr("seconds")) v = prior->getForSymbol(symbol, GlobalContext::context()->useMetricUnits);
-            else {
-                QString vs = prior->getStringForSymbol(symbol, GlobalContext::context()->useMetricUnits);
-                if (vs == "nan") vs="0";
-                v = vs.toDouble();
-            }
-
+            double v = prior->getForSymbol(symbol, GlobalContext::context()->useMetricUnits);
             if (std::isinf(v) || std::isnan(v)) v=0;
 
             // new no zero value
