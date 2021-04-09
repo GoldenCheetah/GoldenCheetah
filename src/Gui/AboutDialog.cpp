@@ -181,6 +181,7 @@ ContributorsPage::ContributorsPage(Context *context) : context(context)
     contributors.append("Okano Takayoshi");
     contributors.append("Omar Torres");
     contributors.append("Patrick McNerthney");
+    contributors.append("Paul Johnson");
     contributors.append("Peter Kanatselis");
     contributors.append("Dr Phil Skiba");
     contributors.append("Philip Willoughby");
