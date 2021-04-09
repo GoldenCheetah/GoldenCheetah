@@ -224,12 +224,27 @@ RideMapWindow::setTileServerUrlForTileType(int x)
         break;
     case 10:
         ts = appsettings->cvalue(context->athlete->cyclist, GC_OSM_TS_A, "").toString();
+        // set/save some useful default if empty
+        if (ts.isEmpty()) {
+           ts = "http://tile.openstreetmap.de";
+           appsettings->setCValue(context->athlete->cyclist, GC_OSM_TS_A, ts);
+        }
         break;
     case 20:
         ts = appsettings->cvalue(context->athlete->cyclist, GC_OSM_TS_B, "").toString();
+        // set/save some useful default if empty
+        if (ts.isEmpty()) {
+           ts = "http://a.tile.openstreetmap.fr/osmfr";
+           appsettings->setCValue(context->athlete->cyclist, GC_OSM_TS_B, ts);
+        }
         break;
     case 30:
         ts = appsettings->cvalue(context->athlete->cyclist, GC_OSM_TS_C, "").toString();
+        // set/save some useful default if empty
+        if (ts.isEmpty()) {
+           ts = "https://tile.opentopomap.org";
+           appsettings->setCValue(context->athlete->cyclist, GC_OSM_TS_C, ts);
+        }
         break;
     }
     osmTSUrl->setText(ts);
@@ -602,11 +617,15 @@ void RideMapWindow::createHtml()
                                arg(maxLat,0,'g',GPS_COORD_TO_STRING).
                                arg(maxLon,0,'g',GPS_COORD_TO_STRING);
 
+        // If provided URL doesn't contain the required part, we add it,
+        // otherwise it is used without changes to allow inclusion of apikey.
+        QString tsReq = "/{z}/{x}/{y}.png";
+        QString tsUrl = osmTSUrl->text().contains(tsReq) ? osmTSUrl->text() : osmTSUrl->text() + tsReq;
         currentPage += QString(""
-                               "    L.tileLayer('%1/{z}/{x}/{y}.png', {"
+                               "    L.tileLayer('%1', {"
                                "                 attribution: '&copy; <a href=\"http://openstreetmap.org\">OpenStreetMap</a> contributors',"
                                "                 maxZoom: 18"
-                               "              }).addTo(map);\n").arg(osmTSUrl->text());
+                               "              }).addTo(map);\n").arg(tsUrl);
 
         currentPage += QString(""
                                // initialise local variables
