@@ -964,7 +964,7 @@ RideMapWindow::createMarkers()
     if (loop) {
         if (mapCombo->currentIndex() == OSM) {
             code = QString("{ var latlng = new L.LatLng(%1,%2);"
-                           "var image = new L.icon({iconUrl:'qrc:images/maps/loop.png'});"
+                           "var image = new L.icon({iconUrl:'qrc:images/maps/loop.png',iconAnchor:[16,37]});"
                            "var marker = new L.marker(latlng, { icon: image });"
                            "marker.addTo(map); }").arg(points[0]->lat,0,'g',GPS_COORD_TO_STRING).arg(points[0]->lon,0,'g',GPS_COORD_TO_STRING);
         } else if (mapCombo->currentIndex() == GOOGLE) {
@@ -982,7 +982,7 @@ RideMapWindow::createMarkers()
 
         if (mapCombo->currentIndex() == OSM) {
             code = QString("{ var latlng = new L.LatLng(%1,%2);"
-                           "var image = new L.icon({iconUrl:'%3'});"
+                           "var image = new L.icon({iconUrl:'%3',iconAnchor:[16,37]});"
                            "var marker = new L.marker(latlng, { icon: image });"
                            "marker.addTo(map); }").arg(points[0]->lat,0,'g',GPS_COORD_TO_STRING).arg(points[0]->lon,0,'g',GPS_COORD_TO_STRING).arg(marker);
         } else if (mapCombo->currentIndex() == GOOGLE) {
@@ -994,7 +994,7 @@ RideMapWindow::createMarkers()
         view->page()->runJavaScript(code);
         if (mapCombo->currentIndex() == OSM) {
             code = QString("{ var latlng = new L.LatLng(%1,%2);"
-                           "var image = new L.icon({iconUrl:'qrc:images/maps/finish.png'});"
+                           "var image = new L.icon({iconUrl:'qrc:images/maps/finish.png',iconAnchor:[16,37]});"
                            "var marker = new L.marker(latlng, { icon: image });"
                            "marker.addTo(map); }").arg(points[points.count()-1]->lat,0,'g',GPS_COORD_TO_STRING).arg(points[points.count()-1]->lon,0,'g',GPS_COORD_TO_STRING);
         } else if (mapCombo->currentIndex() == GOOGLE) {
@@ -1050,7 +1050,7 @@ RideMapWindow::createMarkers()
 
                 if (mapCombo->currentIndex() == OSM) {
                     code = QString("{ var latlng = new L.LatLng(%1,%2);"
-                                   "var image = new L.icon({iconUrl:'%3'});"
+                                   "var image = new L.icon({iconUrl:'%3',iconAnchor:[16,37]});"
                                    "var marker = new L.marker(latlng, { icon: image });"
                                    "marker.addTo(map); }").arg(rfp->lat,0,'g',GPS_COORD_TO_STRING).arg(rfp->lon,0,'g',GPS_COORD_TO_STRING).arg(marker);
                 } else if (mapCombo->currentIndex() == GOOGLE) {
