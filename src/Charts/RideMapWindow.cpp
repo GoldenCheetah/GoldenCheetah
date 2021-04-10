@@ -55,8 +55,6 @@ RideMapWindow::RideMapWindow(Context *context, int mapType) : GcChartWindow(cont
 
     QWidget *settingsWidget = new QWidget(this);
     settingsWidget->setContentsMargins(0,0,0,0);
-    //HelpWhatsThis *helpSettings = new HelpWhatsThis(settingsWidget);
-    //settingsWidget->setWhatsThis(helpSettings->getWhatsThisText(HelpWhatsThis::ChartRides_Critical_MM_Config_Settings));
 
     QFormLayout *commonLayout = new QFormLayout(settingsWidget);
 
@@ -218,7 +216,7 @@ RideMapWindow::setTileServerUrlForTileType(int x)
         ts = appsettings->cvalue(context->athlete->cyclist, GC_OSM_TS_DEFAULT, "").toString();
         // set/save the default if necessary
         if (ts.isEmpty()) {
-           ts = "http://tile.openstreetmap.org";
+           ts = "http://{s}.tile.openstreetmap.org";
            appsettings->setCValue(context->athlete->cyclist, GC_OSM_TS_DEFAULT, ts);
         }
         break;
@@ -226,7 +224,7 @@ RideMapWindow::setTileServerUrlForTileType(int x)
         ts = appsettings->cvalue(context->athlete->cyclist, GC_OSM_TS_A, "").toString();
         // set/save some useful default if empty
         if (ts.isEmpty()) {
-           ts = "http://tile.openstreetmap.de";
+           ts = "http://{s}.tile.openstreetmap.de";
            appsettings->setCValue(context->athlete->cyclist, GC_OSM_TS_A, ts);
         }
         break;
@@ -234,7 +232,7 @@ RideMapWindow::setTileServerUrlForTileType(int x)
         ts = appsettings->cvalue(context->athlete->cyclist, GC_OSM_TS_B, "").toString();
         // set/save some useful default if empty
         if (ts.isEmpty()) {
-           ts = "http://a.tile.openstreetmap.fr/osmfr";
+           ts = "http://{s}.tile.openstreetmap.fr/osmfr";
            appsettings->setCValue(context->athlete->cyclist, GC_OSM_TS_B, ts);
         }
         break;
@@ -242,7 +240,7 @@ RideMapWindow::setTileServerUrlForTileType(int x)
         ts = appsettings->cvalue(context->athlete->cyclist, GC_OSM_TS_C, "").toString();
         // set/save some useful default if empty
         if (ts.isEmpty()) {
-           ts = "https://tile.opentopomap.org";
+           ts = "https://{s}.tile.opentopomap.org";
            appsettings->setCValue(context->athlete->cyclist, GC_OSM_TS_C, ts);
         }
         break;

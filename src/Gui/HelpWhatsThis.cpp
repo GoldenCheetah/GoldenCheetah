@@ -235,7 +235,7 @@ HelpWhatsThis::getText(GCHelp chapter) {
     case ChartRides_HRvsPw:
         return text.arg("ChartTypes_Activities#heartrate-vs-power").arg(tr("Analysis of heartrate vs. power along the activity data"));
     case ChartRides_Map:
-        return text.arg("ChartTypes_Activities#google-map--bing-map").arg(tr("Map of activity"));
+        return text.arg("ChartTypes_Activities#map").arg(tr("Map of activity"));
     case ChartRides_2D:
         return text.arg("ChartTypes_Activities#2d-plot").arg(tr("Configurable 2D scatter plot of the current activity"));
     case ChartRides_3D:
