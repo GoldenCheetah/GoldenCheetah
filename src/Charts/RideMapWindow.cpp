@@ -69,12 +69,18 @@ RideMapWindow::RideMapWindow(Context *context, int mapType) : GcChartWindow(cont
 
     showMarkersCk = new QCheckBox();
     showFullPlotCk = new QCheckBox();
+    hideShadedZonesCk = new QCheckBox();
+    hideShadedZonesCk->setChecked(false);
+    hideYellowLineCk = new QCheckBox();
+    hideYellowLineCk->setChecked(false);
     showInt = new QCheckBox();
     showInt->setChecked(true);
 
     commonLayout->addRow(new QLabel(tr("Map")), mapCombo);
     commonLayout->addRow(new QLabel(tr("Show Markers")), showMarkersCk);
     commonLayout->addRow(new QLabel(tr("Show Full Plot")), showFullPlotCk);
+    commonLayout->addRow(new QLabel(tr("Hide Shaded Zones")), hideShadedZonesCk);
+    commonLayout->addRow(new QLabel(tr("Hide Yellow Line")), hideYellowLineCk);
     commonLayout->addRow(new QLabel(tr("Show Intervals Overlay")), showInt);
     commonLayout->addRow(new QLabel(""));
 
@@ -109,6 +115,8 @@ RideMapWindow::RideMapWindow(Context *context, int mapType) : GcChartWindow(cont
     connect(showMarkersCk, SIGNAL(stateChanged(int)), this, SLOT(showMarkersChanged(int)));
     connect(showInt, SIGNAL(stateChanged(int)), this, SLOT(showIntervalsChanged(int)));
     connect(showFullPlotCk, SIGNAL(stateChanged(int)), this, SLOT(showFullPlotChanged(int)));
+    connect(hideShadedZonesCk, SIGNAL(stateChanged(int)), this, SLOT(hideShadedZonesChanged(int)));
+    connect(hideYellowLineCk, SIGNAL(stateChanged(int)), this, SLOT(hideYellowLineChanged(int)));
     connect(osmTSUrl, SIGNAL(editingFinished()), this, SLOT(osmCustomTSURLEditingFinished()));
     connect(tileCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(tileTypeSelected(int)));
 
@@ -216,12 +224,27 @@ RideMapWindow::setTileServerUrlForTileType(int x)
         break;
     case 10:
         ts = appsettings->cvalue(context->athlete->cyclist, GC_OSM_TS_A, "").toString();
+        // set/save some useful default if empty
+        if (ts.isEmpty()) {
+           ts = "http://tile.openstreetmap.de";
+           appsettings->setCValue(context->athlete->cyclist, GC_OSM_TS_A, ts);
+        }
         break;
     case 20:
         ts = appsettings->cvalue(context->athlete->cyclist, GC_OSM_TS_B, "").toString();
+        // set/save some useful default if empty
+        if (ts.isEmpty()) {
+           ts = "http://a.tile.openstreetmap.fr/osmfr";
+           appsettings->setCValue(context->athlete->cyclist, GC_OSM_TS_B, ts);
+        }
         break;
     case 30:
         ts = appsettings->cvalue(context->athlete->cyclist, GC_OSM_TS_C, "").toString();
+        // set/save some useful default if empty
+        if (ts.isEmpty()) {
+           ts = "https://tile.opentopomap.org";
+           appsettings->setCValue(context->athlete->cyclist, GC_OSM_TS_C, ts);
+        }
         break;
     }
     osmTSUrl->setText(ts);
@@ -254,7 +277,19 @@ RideMapWindow::showFullPlotChanged(int value)
     smallPlot->setVisible(value != 0);
 }
 
+void
+RideMapWindow::hideShadedZonesChanged(int value)
+{
+    Q_UNUSED(value);
+    forceReplot();
+}
 
+void
+RideMapWindow::hideYellowLineChanged(int value)
+{
+    Q_UNUSED(value);
+    forceReplot();
+}
 void
 RideMapWindow::osmCustomTSURLEditingFinished()
 {
@@ -447,8 +482,8 @@ void RideMapWindow::createHtml()
             // route will be drawn with these options
             "    var routeOptionsYellow = {\n"
             "        stroke : true,\n"
-            "        color: '%1',\n"
-            "        opacity: %2,\n"
+            "        color: '#FFFF00',\n"
+            "        opacity: %1,\n"
             "        weight: 10,\n"
             "        zIndex: -2\n"
             "    };\n"
@@ -469,8 +504,7 @@ void RideMapWindow::createHtml()
             "routeYellow.on('mouseover', function(event) { webBridge.hoverPath(event.latlng.lat, event.latlng.lng); });\n"
             "routeYellow.on('mousemove', function(event) { webBridge.hoverPath(event.latlng.lat, event.latlng.lng); });\n"
 
-            "}\n").arg("#FFFF00")
-                  .arg(0.4);
+            "}\n").arg(hideYellowLine() ? 0.0 : 0.4f);
     }
     else if (mapCombo->currentIndex() == GOOGLE) {
 
@@ -478,8 +512,8 @@ void RideMapWindow::createHtml()
 
            // route will be drawn with these options
            "    var routeOptionsYellow = {\n"
-           "        strokeColor: '%1',\n"
-           "        strokeOpacity: %2,\n"
+           "        strokeColor: '#FFFF00',\n"
+           "        strokeOpacity: %1,\n"
            "        strokeWeight: 10,\n"
            "        zIndex: -2\n"
            "    };\n"
@@ -501,8 +535,7 @@ void RideMapWindow::createHtml()
            "    google.maps.event.addListener(routeYellow, 'mouseup',   function(event) { map.setOptions({draggable: true, zoomControl: true, scrollwheel: true, disableDoubleClickZoom: false}); webBridge.mouseup(); });\n"
            "    google.maps.event.addListener(routeYellow, 'mouseover', function(event) { webBridge.hoverPath(event.latLng.lat(), event.latLng.lng()); });\n"
 
-           "}\n").arg("#FFFF00")
-                 .arg(0.4f);
+           "}\n").arg(hideYellowLine() ? 0.0 : 0.4f);
     }
 
     currentPage += QString("function drawIntervals() { \n"
@@ -584,11 +617,15 @@ void RideMapWindow::createHtml()
                                arg(maxLat,0,'g',GPS_COORD_TO_STRING).
                                arg(maxLon,0,'g',GPS_COORD_TO_STRING);
 
+        // If provided URL doesn't contain the required part, we add it,
+        // otherwise it is used without changes to allow inclusion of apikey.
+        QString tsReq = "/{z}/{x}/{y}.png";
+        QString tsUrl = osmTSUrl->text().contains(tsReq) ? osmTSUrl->text() : osmTSUrl->text() + tsReq;
         currentPage += QString(""
-                               "    L.tileLayer('%1/{z}/{x}/{y}.png', {"
+                               "    L.tileLayer('%1', {"
                                "                 attribution: '&copy; <a href=\"http://openstreetmap.org\">OpenStreetMap</a> contributors',"
                                "                 maxZoom: 18"
-                               "              }).addTo(map);\n").arg(osmTSUrl->text());
+                               "              }).addTo(map);\n").arg(tsUrl);
 
         currentPage += QString(""
                                // initialise local variables
@@ -714,7 +751,7 @@ void RideMapWindow::createHtml()
 
 QColor RideMapWindow::GetColor(int watts)
 {
-    if (range < 0) return Qt::red;
+    if (range < 0 || hideShadedZones()) return Qt::red;
     else return zoneColor(context->athlete->zones(myRideItem ? myRideItem->isRun : false)->whichZone(range, watts), 7);
 }
 
@@ -727,6 +764,7 @@ RideMapWindow::drawShadedRoute()
     int count=0;  // how many samples ?
     int rwatts=0; // running total of watts
     double prevtime=0; // time for previous point
+    double endRideItemtime = myRideItem->ride()->dataPoints().last()->secs;
 
     QString code;
 
@@ -763,8 +801,8 @@ RideMapWindow::drawShadedRoute()
         prevtime = rfp->secs;
         count++;
 
-        // end of segment
-        if (rtime >= intervalTime) {
+        // end of segment or the segment is truncated by finding the last data point
+        if ((rtime >= intervalTime) || (rfp->secs >= endRideItemtime)) {
             if (mapCombo->currentIndex() == OSM) {
                 // Finalize variable "latLons" for the segment.
                 if (code.endsWith(", "))
@@ -945,7 +983,7 @@ RideMapWindow::createMarkers()
     if (loop) {
         if (mapCombo->currentIndex() == OSM) {
             code = QString("{ var latlng = new L.LatLng(%1,%2);"
-                           "var image = new L.icon({iconUrl:'qrc:images/maps/loop.png'});"
+                           "var image = new L.icon({iconUrl:'qrc:images/maps/loop.png',iconAnchor:[16,37]});"
                            "var marker = new L.marker(latlng, { icon: image });"
                            "marker.addTo(map); }").arg(points[0]->lat,0,'g',GPS_COORD_TO_STRING).arg(points[0]->lon,0,'g',GPS_COORD_TO_STRING);
         } else if (mapCombo->currentIndex() == GOOGLE) {
@@ -963,7 +1001,7 @@ RideMapWindow::createMarkers()
 
         if (mapCombo->currentIndex() == OSM) {
             code = QString("{ var latlng = new L.LatLng(%1,%2);"
-                           "var image = new L.icon({iconUrl:'%3'});"
+                           "var image = new L.icon({iconUrl:'%3',iconAnchor:[16,37]});"
                            "var marker = new L.marker(latlng, { icon: image });"
                            "marker.addTo(map); }").arg(points[0]->lat,0,'g',GPS_COORD_TO_STRING).arg(points[0]->lon,0,'g',GPS_COORD_TO_STRING).arg(marker);
         } else if (mapCombo->currentIndex() == GOOGLE) {
@@ -975,7 +1013,7 @@ RideMapWindow::createMarkers()
         view->page()->runJavaScript(code);
         if (mapCombo->currentIndex() == OSM) {
             code = QString("{ var latlng = new L.LatLng(%1,%2);"
-                           "var image = new L.icon({iconUrl:'qrc:images/maps/finish.png'});"
+                           "var image = new L.icon({iconUrl:'qrc:images/maps/finish.png',iconAnchor:[16,37]});"
                            "var marker = new L.marker(latlng, { icon: image });"
                            "marker.addTo(map); }").arg(points[points.count()-1]->lat,0,'g',GPS_COORD_TO_STRING).arg(points[points.count()-1]->lon,0,'g',GPS_COORD_TO_STRING);
         } else if (mapCombo->currentIndex() == GOOGLE) {
@@ -1031,7 +1069,7 @@ RideMapWindow::createMarkers()
 
                 if (mapCombo->currentIndex() == OSM) {
                     code = QString("{ var latlng = new L.LatLng(%1,%2);"
-                                   "var image = new L.icon({iconUrl:'%3'});"
+                                   "var image = new L.icon({iconUrl:'%3',iconAnchor:[16,37]});"
                                    "var marker = new L.marker(latlng, { icon: image });"
                                    "marker.addTo(map); }").arg(rfp->lat,0,'g',GPS_COORD_TO_STRING).arg(rfp->lon,0,'g',GPS_COORD_TO_STRING).arg(marker);
                 } else if (mapCombo->currentIndex() == GOOGLE) {
