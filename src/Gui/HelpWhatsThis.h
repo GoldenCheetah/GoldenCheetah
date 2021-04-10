@@ -85,6 +85,7 @@ Q_OBJECT
                  MenuBar_Edit_FixGPSErrors,
                  MenuBar_Edit_FixHRSpikes,
                  MenuBar_Edit_FixPowerSpikes,
+                 MenuBar_Edit_FixPowerSpikesMed,
                  MenuBar_Edit_FixSpeed,
                  MenuBar_Edit_FixLapSwim,
                  MenuBar_Edit_FixFreewheeling,

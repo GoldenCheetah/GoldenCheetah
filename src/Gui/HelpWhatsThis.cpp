@@ -164,6 +164,8 @@ HelpWhatsThis::getText(GCHelp chapter) {
         return text.arg("Menu%20Bar_Edit").arg(tr("Fix HR Spikes"));
     case MenuBar_Edit_FixPowerSpikes:
         return text.arg("Menu%20Bar_Edit").arg(tr("Fix Power Spikes"));
+    case MenuBar_Edit_FixPowerSpikesMed:
+        return text.arg("Menu%20Bar_Edit").arg(tr("Fix Power Spikes Median"));
     case MenuBar_Edit_FixSpeed:
         return text.arg("Menu%20Bar_Edit").arg(tr("Fix Speed"));
     case MenuBar_Edit_FixFreewheeling:
