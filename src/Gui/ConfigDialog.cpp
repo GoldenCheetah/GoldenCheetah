@@ -52,6 +52,9 @@ ConfigDialog::ConfigDialog(QDir _home, Context *context) :
     setMinimumSize(800 *dpiXFactor,650 *dpiYFactor);   //changed for hidpi sizing
 #endif
 
+    // Enable What's this button and disable minimize/maximize buttons
+    setWindowFlags(Qt::Window | Qt::WindowContextHelpButtonHint | Qt::WindowCloseButtonHint);
+
     // center
     QWidget *spacer = new QWidget(this);
     spacer->setAutoFillBackground(false);
