@@ -3719,36 +3719,44 @@ void write_lap(QByteArray *array, const RideFile *ride) {
     write_field_definition(array, 2, 4, 134); // start_time (2)
     write_field_definition(array, 24, 1, 2); // trigger (24)
 
+    foreach (RideFileInterval *i, ride->intervals()) {
+        if (i->stop > 0) {
+            // Record ------
+            int record_header = 0;
+            write_int8(array, record_header);
 
-    // Record ------
-    int record_header = 0;
-    write_int8(array, record_header);
 
-    // 1. timestamp
-    int value = ride->startTime().toTime_t() - qbase_time.toTime_t();;
-    if (ride->dataPoints().count() > 0) {
-        value += ride->dataPoints().last()->secs+ride->recIntSecs();
+            // 1. timestamp
+            int stop_ = i->stop -1 + ride->startTime().toTime_t() - qbase_time.toTime_t();
+            //if (ride->dataPoints().count() > 0) {
+            //    value += ride->dataPoints().last()->secs+ride->recIntSecs();
+            //}
+            write_int32(array, stop_, true);
+
+            // 2. message_index (254)
+            write_int16(array, 0, true);
+
+            // 3. event
+            int value = 9; // session=8, lap=9
+            write_int8(array, value);
+
+            // 4. event_type
+            value = 1; // stop_all=9, stop=1
+            write_int8(array, value);
+
+            // 5. start_time
+            int start_ = stop_ - i->stop + i->start ;
+            write_int32(array, start_, true);
+
+            // 6. trigger
+            value = 7; // session_end
+            write_int8(array, value);
+
+            // 7. Debug
+            qDebug() << "Start: " + QString::number(i->start) + " -> Stop:" + QString::number(i->stop);
+            qDebug() << "Start Timestamp: " + QString::number(start_) + " -> Stop Timestamp:" + QString::number(stop_);QString::number(start_);
+        }
     }
-    write_int32(array, value, true);
-
-    // 2. message_index (254)
-    write_int16(array, 0, true);
-
-    // 3. event
-    value = 9; // session=8, lap=9
-    write_int8(array, value);
-
-    // 4. event_type
-    value = 1; // stop_all=9, stop=1
-    write_int8(array, value);
-
-    // 5. start_time
-    value = ride->startTime().toTime_t() - qbase_time.toTime_t();;
-    write_int32(array, value, true);
-
-    // 6. trigger
-    value = 7; // session_end
-    write_int8(array, value);
 
 }
 

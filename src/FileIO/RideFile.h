@@ -317,6 +317,10 @@ class RideFile : public QObject // QObject to emit signals
         void setId(const QString &value) { id_ = value; }
 
         // Working with INTERVALS
+
+        // Moving from "protected" to "public" so we can use "Intervals" in the Fit export.
+        const QList<RideFileInterval*> &intervals() const { return intervals_; }
+
         void addInterval(RideFileInterval::IntervalType type, double start, double stop, const QString &name, QColor color=Qt::black, bool test=false) {
             intervals_.append(new RideFileInterval(type, start, stop, name, color, test));
         }
@@ -400,11 +404,12 @@ class RideFile : public QObject // QObject to emit signals
 
     protected:
 
-        //  should access via IntervalItem
-        const QList<RideFileInterval*> &intervals() const { return intervals_; }
-
         // xdata series
         QMap<QString, XDataSeries*> xdata_;
+
+        //  should access via IntervalItem <- Yes, But FitRideFile, for example, uses RideFile *ride and not RideItem nor IntervalItem *item
+        // => moving it to public is the simplest way I think
+        //const QList<RideFileInterval*> &intervals() const { return intervals_; }
 
         void clearIntervals();
         void fillInIntervals();
