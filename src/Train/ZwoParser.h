@@ -40,6 +40,7 @@ public:
     int secs;  // rolling secs as points read
     int sSecs; // rolling starting secs as points read
     int watts; // watts set at last point
+    int laps_count; // to count the laps
 
     // the data in it
     QString name,               // <name>
@@ -58,5 +59,7 @@ public:
     // texts
     QList<ErgFileText> texts;
 
+    // Laps
+    QList<ErgFileLap> laps;
 };
 #endif //ZwoParser

@@ -173,6 +173,8 @@ void ErgFile::parseZwift()
         if (watts > MaxWatts) MaxWatts = watts;
         Duration = p.x;
     }
+    // Laps
+    Laps = handler.laps;
 
     // texts
     Texts = handler.texts;
