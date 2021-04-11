@@ -174,6 +174,9 @@ void ErgFile::parseZwift()
         Duration = p.x;
     }
 
+    // Laps
+    Laps = handler.laps;
+
     // texts
     Texts = handler.texts;
 

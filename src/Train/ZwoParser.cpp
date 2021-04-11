@@ -24,6 +24,7 @@ bool ZwoParser::startDocument()
     secs = 0;
     sSecs = 0;
     watts = 0;
+    laps_count = 0;
     return true;
 }
 
@@ -95,6 +96,9 @@ ZwoParser::startElement(const QString &, const QString &, const QString &qName, 
         points << ErgFilePoint(secs * 1000, to, to);
         watts = to;
 
+        // LAPS
+        laps << ErgFileLap(sSecs * 1000, laps_count, "Z"+QString::number(laps_count+1));
+        laps_count ++;
     // repeated intervals with a recovery portion
     } else if (qName == "IntervalsT") {
 
@@ -131,6 +135,9 @@ ZwoParser::startElement(const QString &, const QString &, const QString &qName, 
 
         sSecs = secs;
         while (count--) {
+            // LAPS
+            laps << ErgFileLap(secs * 1000, laps_count, "Z"+QString::number(laps_count+1));
+            laps_count ++;
 
             // add if not already on that wattage
             if (watts != onLow) {
@@ -143,6 +150,9 @@ ZwoParser::startElement(const QString &, const QString &, const QString &qName, 
 
             // recovery interval (if defined)
             if (offDuration > 0) {
+                // LAPS
+                laps << ErgFileLap(secs * 1000, laps_count, "Z"+QString::number(laps_count+1));
+                laps_count ++;
                 if (watts != offLow) {
                     points << ErgFilePoint(secs * 1000, offLow, offLow);
                     watts = offLow;
