@@ -927,8 +927,10 @@ RideItem::updateIntervals()
            (interval->start <= begin->secs && (interval->stop+f->recIntSecs()) >= end->secs))))
              continue;
 
-        // skip empty backward intervals
-        if (interval->start >= interval->stop) continue;
+        // skip empty backward intervals --> No because FIT intervals lenght (in sec) is "interval->stop - interval->start + 1" and start/stops are defined in secs: so what append if start = 3s and stop=3.8s ?
+        // So skip empty backward intervals only if start==stop==0;
+        if (interval->start == 0 || interval->stop == 0) continue;
+        qDebug() << "RideItem: " + QString::number(interval->start);
 
         // create a new interval item
         const int seq = count; // if passed directly, it could be incremented BEFORE being evaluated for the sequence arg as arg eval order is undefined
