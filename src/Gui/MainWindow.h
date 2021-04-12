@@ -205,6 +205,7 @@ class MainWindow : public QMainWindow
         void setStyleFromSegment(int); // special case for linux/win qtsegmentcontrol toggline
         void toggleLowbar();
         void showLowbar(bool want);
+        void enterWhatsThisMode();
 
         // Analysis View
         void showEstimateCP();
@@ -289,7 +290,7 @@ class MainWindow : public QMainWindow
         SearchFilterBox *searchBox;
 
         // Not on Mac so use other types
-        QPushButton *sidelist, *lowbar;
+        QPushButton *sidelist, *lowbar, *whatsthis;
         QPushButton *back, *forward;
         QtSegmentControl *styleSelector;
         GcToolBar *head;

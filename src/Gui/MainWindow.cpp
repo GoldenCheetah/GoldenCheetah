@@ -336,8 +336,19 @@ MainWindow::MainWindow(const QDir &home)
                                 "              padding-top:  0px; padding-bottom: 0px; }");
         sidelist->setStyleSheet(nopad);
         lowbar->setStyleSheet(nopad);
+        whatsthis->setStyleSheet(nopad);
     }
 #endif
+
+    // What's this button
+    whatsthis = new QPushButton(this);
+    whatsthis->setIcon(myHelper->icon());
+    whatsthis->setFixedHeight(24 * dpiYFactor);
+    whatsthis->setIconSize(isize);
+    whatsthis->setStyle(toolStyle);
+    whatsthis->setToolTip(tr("What's This?"));
+    whatsthis->setPalette(metal);
+    connect(whatsthis, SIGNAL(clicked(bool)), this, SLOT(enterWhatsThisMode()));
 
     // add a search box on far right, but with a little space too
     searchBox = new SearchFilterBox(this,context,false);
@@ -357,6 +368,7 @@ MainWindow::MainWindow(const QDir &home)
     head->addWidget(sidelist);
     head->addWidget(lowbar);
     head->addWidget(styleSelector);
+    head->addWidget(whatsthis);
     head->setFixedHeight(searchBox->height() + (16 *dpiXFactor));
 
     connect(searchBox, SIGNAL(searchResults(QStringList)), this, SLOT(setFilter(QStringList)));
@@ -656,6 +668,7 @@ MainWindow::MainWindow(const QDir &home)
     // HELP MENU
     QMenu *helpMenu = menuBar()->addMenu(tr("&Help"));
     helpMenu->addAction(tr("&Help Overview"), this, SLOT(helpWindow()));
+    helpMenu->addAction(myHelper);
     helpMenu->addSeparator();
     helpMenu->addAction(tr("&User Guide"), this, SLOT(helpView()));
     helpMenu->addAction(tr("&Log a bug or feature request"), this, SLOT(logBug()));
@@ -801,6 +814,12 @@ MainWindow::showLowbar(bool want)
     if (currentTab->hasBottom()) currentTab->setBottomRequested(want);
     showhideLowbar->setChecked(want);
     setToolButtons();
+}
+
+void
+MainWindow::enterWhatsThisMode()
+{
+    QWhatsThis::enterWhatsThisMode();
 }
 
 void
