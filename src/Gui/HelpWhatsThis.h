@@ -134,6 +134,14 @@ Q_OBJECT
                  Chart_Summary,
                  Chart_Summary_Config,
 
+                 ChartTrain_Telemetry,
+                 ChartTrain_Workout,
+                 ChartTrain_Realtime,
+                 ChartTrain_PedalStroke,
+                 ChartTrain_VideoPlayer,
+                 ChartTrain_WorkoutEditor,
+                 ChartTrain_LiveMap,
+
                  SideBarTrendsView_DateRanges,
                  SideBarTrendsView_Events,
                  SideBarTrendsView_Summary,
@@ -144,6 +152,10 @@ Q_OBJECT
                  SideBarRidesView_Intervals,
                  SideBarDiaryView_Calendar,
                  SideBarDiaryView_Summary,
+                 SideBarTrainView_Devices,
+                 SideBarTrainView_Workouts,
+                 SideBarTrainView_Media,
+                 SideBarTrainView_VideoSync,
 
                  SearchFilterBox,
                  FindIntervals,

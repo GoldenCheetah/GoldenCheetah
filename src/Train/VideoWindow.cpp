@@ -26,6 +26,7 @@
 #include "RideFile.h"
 #include "MeterWidget.h"
 #include "VideoLayoutParser.h"
+#include "HelpWhatsThis.h"
 
 class Lock
 {
@@ -38,6 +39,9 @@ public:
 VideoWindow::VideoWindow(Context *context)  :
     GcChartWindow(context), context(context), m_MediaChanged(false), layoutSelector(NULL)
 {
+    HelpWhatsThis *helpContents = new HelpWhatsThis(this);
+    this->setWhatsThis(helpContents->getWhatsThisText(HelpWhatsThis::ChartTrain_VideoPlayer));
+
     QWidget *c = NULL;
     setProperty("color", QColor(Qt::black));
 
@@ -104,6 +108,8 @@ VideoWindow::VideoWindow(Context *context)  :
 
         // Create the layout selector form
         c = new QWidget(this);
+        HelpWhatsThis *helpConfig = new HelpWhatsThis(c);
+        c->setWhatsThis(helpConfig->getWhatsThisText(HelpWhatsThis::ChartTrain_VideoPlayer));
         c->setContentsMargins(0,0,0,0);
         QVBoxLayout *cl = new QVBoxLayout(c);
         QFormLayout *controlsLayout = new QFormLayout();

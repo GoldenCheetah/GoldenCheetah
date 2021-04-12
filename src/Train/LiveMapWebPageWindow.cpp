@@ -43,13 +43,17 @@
 #include "TabView.h"
 #include "GcOverlayWidget.h"
 #include "IntervalSummaryWindow.h"
+#include "HelpWhatsThis.h"
 
 // declared in main, we only want to use it to get QStyle
 extern QApplication *application;
 
 LiveMapWebPageWindow::LiveMapWebPageWindow(Context *context) : GcChartWindow(context), context(context)
 {
-     // Connect signal to receive updates on lat/lon for ploting on map.
+    HelpWhatsThis *helpContents = new HelpWhatsThis(this);
+    this->setWhatsThis(helpContents->getWhatsThisText(HelpWhatsThis::ChartTrain_LiveMap));
+
+    // Connect signal to receive updates on lat/lon for ploting on map.
     connect(context, SIGNAL(telemetryUpdate(RealtimeData)), this, SLOT(telemetryUpdate(RealtimeData)));
     connect(context, SIGNAL(stop()), this, SLOT(stop()));
     connect(context, SIGNAL(ergFileSelected(ErgFile*)), this, SLOT(ergFileSelected(ErgFile*)));
@@ -71,6 +75,8 @@ LiveMapWebPageWindow::LiveMapWebPageWindow(Context *context) : GcChartWindow(con
 
     // Chart settings
     QWidget * settingsWidget = new QWidget(this);
+    HelpWhatsThis *helpConfig = new HelpWhatsThis(settingsWidget);
+    settingsWidget->setWhatsThis(helpConfig->getWhatsThisText(HelpWhatsThis::ChartTrain_LiveMap));
     settingsWidget->setContentsMargins(0,0,0,0);
     setProperty("color", GColor(CTRAINPLOTBACKGROUND));
 

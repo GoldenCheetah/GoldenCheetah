@@ -26,6 +26,7 @@
 #include "DeviceTypes.h"
 #include "DeviceConfiguration.h"
 #include "RideImportWizard.h"
+#include "HelpWhatsThis.h"
 #include <QApplication>
 #include <QtGui>
 #include <QRegExp>
@@ -133,7 +134,8 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
     QStyle *cde = QStyleFactory::create(OS_STYLE);
     mediaTree->verticalScrollBar()->setStyle(cde);
 #endif
-
+    HelpWhatsThis *helpMediaTree = new HelpWhatsThis(mediaTree);
+    mediaTree->setWhatsThis(helpMediaTree->getWhatsThisText(HelpWhatsThis::SideBarTrainView_Media));
 
 #ifdef GC_HAVE_VLC  // RLV currently only support for VLC
     videosyncModel = new QSqlTableModel(this, trainDB->connection());
@@ -174,6 +176,8 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
     QStyle *cdevideosync = QStyleFactory::create(OS_STYLE);
     videosyncTree->verticalScrollBar()->setStyle(cdevideosync);
 #endif
+    HelpWhatsThis *helpVideosyncTree = new HelpWhatsThis(videosyncTree);
+    videosyncTree->setWhatsThis(helpVideosyncTree->getWhatsThisText(HelpWhatsThis::SideBarTrainView_VideoSync));
 
 #endif //GC_HAVE_VLC
 
@@ -195,6 +199,8 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
     QStyle *xde = QStyleFactory::create(OS_STYLE);
     deviceTree->verticalScrollBar()->setStyle(xde);
 #endif
+    HelpWhatsThis *helpDeviceTree = new HelpWhatsThis(deviceTree);
+    deviceTree->setWhatsThis(helpDeviceTree->getWhatsThisText(HelpWhatsThis::SideBarTrainView_Devices));
 
     workoutModel = new QSqlTableModel(this, trainDB->connection());
     workoutModel->setTable("workouts");
@@ -234,6 +240,9 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
     xde = QStyleFactory::create(OS_STYLE);
     workoutTree->verticalScrollBar()->setStyle(xde);
 #endif
+    HelpWhatsThis *helpWorkoutTree = new HelpWhatsThis(workoutTree);
+    workoutTree->setWhatsThis(helpWorkoutTree->getWhatsThisText(HelpWhatsThis::SideBarTrainView_Workouts));
+
 
     connect(context, SIGNAL(newLap()), this, SLOT(resetLapTimer()));
     connect(context, SIGNAL(viewChanged(int)), this, SLOT(viewChanged(int)));

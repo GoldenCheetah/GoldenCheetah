@@ -20,15 +20,21 @@
 #include "DialWindow.h"
 #include "Athlete.h"
 #include "Context.h"
+#include "HelpWhatsThis.h"
 
 DialWindow::DialWindow(Context *context) :
     GcChartWindow(context), context(context), average(1), isNewLap(false)
 {
+    HelpWhatsThis *helpContents = new HelpWhatsThis(this);
+    this->setWhatsThis(helpContents->getWhatsThisText(HelpWhatsThis::ChartTrain_Telemetry));
+
     rolling.resize(150); // enough for 30 seconds at 5hz
 
     setContentsMargins(0,0,0,0);
 
     QWidget *c = new QWidget;
+    HelpWhatsThis *helpConfig = new HelpWhatsThis(c);
+    c->setWhatsThis(helpConfig->getWhatsThisText(HelpWhatsThis::ChartTrain_Telemetry));
     QVBoxLayout *cl = new QVBoxLayout(c);
     setControls(c);
 
