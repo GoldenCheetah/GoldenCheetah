@@ -20,6 +20,7 @@
 #include "WorkoutWindow.h"
 #include "WorkoutWidget.h"
 #include "WorkoutWidgetItems.h"
+#include "HelpWhatsThis.h"
 
 static int MINTOOLHEIGHT = 350; // smaller than this, lose the toolbar
 
@@ -39,6 +40,9 @@ WorkoutWindow::WorkoutWindow(Context *context) :
     plotVentilationAvg(1),
     plotSpeedAvg(1)
 {
+    HelpWhatsThis *helpContents = new HelpWhatsThis(this);
+    this->setWhatsThis(helpContents->getWhatsThisText(HelpWhatsThis::ChartTrain_WorkoutEditor));
+
     setContentsMargins(0,0,0,0);
     setProperty("color", GColor(CTRAINPLOTBACKGROUND));
 
@@ -47,6 +51,8 @@ WorkoutWindow::WorkoutWindow(Context *context) :
     //
 
     QWidget *settingsWidget = new QWidget(this);
+    HelpWhatsThis *helpConfig = new HelpWhatsThis(settingsWidget);
+    settingsWidget->setWhatsThis(helpConfig->getWhatsThisText(HelpWhatsThis::ChartTrain_WorkoutEditor));
     settingsWidget->setContentsMargins(0,0,0,0);
 
     QGridLayout *gridLayout = new QGridLayout(settingsWidget);

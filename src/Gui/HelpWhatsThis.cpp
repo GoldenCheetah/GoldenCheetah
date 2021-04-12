@@ -248,6 +248,21 @@ HelpWhatsThis::getText(GCHelp chapter) {
     case Chart_Summary_Config:
         return text.arg("ChartTypes_Trends#summary").arg(tr("Chart specific filter/search and date range settings"));
 
+    case ChartTrain_Telemetry:
+        return text.arg("ChartTypes_Train#telemetry").arg(tr("Real time data display"));
+    case ChartTrain_Workout:
+        return text.arg("ChartTypes_Train#workout").arg(tr("Display of the content of the currently selected workout"));
+    case ChartTrain_Realtime:
+        return text.arg("ChartTypes_Train#realtime").arg(tr("Real time graph over time of the selected metrics"));
+    case ChartTrain_PedalStroke:
+        return text.arg("ChartTypes_Train#pedal-stroke").arg(tr("Computrainer SpinScan, displays the torque on each pedal as a function of the angle, over the past few rotations"));
+    case ChartTrain_VideoPlayer:
+        return text.arg("ChartTypes_Train#video-player").arg(tr("Reproduces the currently selected media file"));
+    case ChartTrain_WorkoutEditor:
+        return text.arg("ChartTypes_Train#workout-editor").arg(tr("Edition and diplay of ergometer type workout files"));
+    case ChartTrain_LiveMap:
+        return text.arg("ChartTypes_Train#live-map").arg(tr("Real time display of the route of simulation workouts in an Open Street Map"));
+
     // Sidebars
     case SideBarTrendsView_DateRanges:
         return text.arg("Side-Bar_Trends-view#date-ranges").arg(tr("Predefined and configurable set of data ranges for selection of activities to be analysed"));
@@ -269,6 +284,15 @@ HelpWhatsThis::getText(GCHelp chapter) {
         return text.arg("Side%20Bar_Diary%20view#calendar").arg(tr("Calendar"));
     case SideBarDiaryView_Summary:
         return text.arg("Side%20Bar_Diary%20view#summary").arg(tr("Simple summary view"));
+
+    case SideBarTrainView_Devices:
+        return text.arg("Side-Bar_Train-view#devices").arg(tr("Configurable list of training devices"));
+    case SideBarTrainView_Workouts:
+        return text.arg("Side-Bar_Train-view#workouts").arg(tr("Configurable list of workout files"));
+    case SideBarTrainView_Media:
+        return text.arg("Side-Bar_Train-view#media").arg(tr("Configurable list of video files"));
+    case SideBarTrainView_VideoSync:
+        return text.arg("Side-Bar_Train-view#videosync").arg(tr("Configurable list of video sync files"));
 
     // Cross Functions
     case SearchFilterBox:
