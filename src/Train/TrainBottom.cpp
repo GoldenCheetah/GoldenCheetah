@@ -18,6 +18,7 @@
 
 #include "TrainBottom.h"
 #include "TrainSidebar.h"
+#include "HelpWhatsThis.h"
 
 #include <QHBoxLayout>
 #include <QPushButton>
@@ -30,6 +31,9 @@ TrainBottom::TrainBottom(TrainSidebar *trainSidebar, QWidget *parent) :
     QWidget(parent),
     m_trainSidebar(trainSidebar)
 {
+    HelpWhatsThis *help = new HelpWhatsThis(this);
+    this->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::WorkoutControl));
+
     // Control buttons
     QHBoxLayout *toolbuttons = new QHBoxLayout;
     toolbuttons->setSpacing(0);

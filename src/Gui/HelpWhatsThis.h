@@ -163,6 +163,9 @@ Q_OBJECT
                  SideBarTrainView_Media,
                  SideBarTrainView_VideoSync,
 
+                 ComparePane,
+                 WorkoutControl,
+
                  SearchFilterBox,
                  FindIntervals,
 

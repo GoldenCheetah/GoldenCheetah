@@ -311,6 +311,10 @@ HelpWhatsThis::getText(GCHelp chapter) {
         return text.arg("Special-Topics_SearchFilter").arg(tr("Entry field for sophisticated Searching and Filtering of activities"));
     case FindIntervals:
         return text.arg("Side-Bar_Activities-view#intervals").arg(tr("Adding intervals to an activity using simple query methods"));
+    case ComparePane:
+        return text.arg("Compare-Pane_General").arg(tr("To compare Activities/Intervals in Activity View and Date Ranges in Trends View"));
+    case WorkoutControl:
+        return text.arg("Workout-Control_General").arg(tr("Workout Control, Intensity Adjustments and Notifications Display"));
 
     // Preferences
     case Preferences_General:

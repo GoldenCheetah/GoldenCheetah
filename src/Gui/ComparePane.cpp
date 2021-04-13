@@ -31,6 +31,7 @@
 #include "Units.h"
 #include "Zones.h"
 #include "Utils.h"
+#include "HelpWhatsThis.h"
 
 #include <QCheckBox>
 #include <QFormLayout>
@@ -115,6 +116,9 @@ class CTableWidgetItem : public QTableWidgetItem
 
 ComparePane::ComparePane(Context *context, QWidget *parent, CompareMode mode) : QWidget(parent), context(context), mode_(mode)
 {
+    HelpWhatsThis *help = new HelpWhatsThis(this);
+    this->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::ComparePane));
+
     QVBoxLayout *layout = new QVBoxLayout(this);
     layout->setContentsMargins(0,0,0,0);
     layout->setSpacing(0);
