@@ -19,6 +19,7 @@
 #include "AddChartWizard.h"
 #include "Context.h"
 #include "MainWindow.h"
+#include "HelpWhatsThis.h"
 
 #include <QCommandLinkButton>
 #include <QMessageBox>
@@ -35,6 +36,9 @@
 // Main wizard - if passed a service name we are in edit mode, not add mode.
 AddChartWizard::AddChartWizard(Context *context, ChartSpace *space, int scope) : QWizard(context->mainWindow), context(context), scope(scope), space(space)
 {
+    HelpWhatsThis *help = new HelpWhatsThis(this);
+    if (scope & OverviewScope::ANALYSIS) this->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::ChartRides_Overview));
+    else this->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::Chart_Overview));
 #ifdef Q_OS_MAC
     setWizardStyle(QWizard::ModernStyle);
 #endif

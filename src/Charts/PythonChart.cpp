@@ -23,6 +23,7 @@
 #include "Colors.h"
 #include "TabView.h"
 #include "RideFileCommand.h"
+#include "HelpWhatsThis.h"
 
 #include <QtConcurrent>
 
@@ -279,8 +280,13 @@ void PythonConsole::contextMenuEvent(QContextMenuEvent *e)
 
 PythonChart::PythonChart(Context *context, bool ridesummary) : GcChartWindow(context), context(context), ridesummary(ridesummary)
 {
+    HelpWhatsThis *helpContents = new HelpWhatsThis(this);
+    this->setWhatsThis(helpContents->getWhatsThisText(HelpWhatsThis::Chart_Python));
+
     // controls widget
     QWidget *c = new QWidget;
+    HelpWhatsThis *helpConfig = new HelpWhatsThis(c);
+    c->setWhatsThis(helpConfig->getWhatsThisText(HelpWhatsThis::Chart_Python));
     setControls(c);
     //HelpWhatsThis *helpConfig = new HelpWhatsThis(c);
     //c->setWhatsThis(helpConfig->getWhatsThisText(HelpWhatsThis::ChartRides_Performance));

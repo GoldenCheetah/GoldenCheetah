@@ -23,6 +23,7 @@
 #include "Colors.h"
 #include "TabView.h"
 #include "GenericChart.h"
+#include "HelpWhatsThis.h"
 
 // unique identifier for each chart
 static int id=0;
@@ -276,10 +277,15 @@ void RConsole::contextMenuEvent(QContextMenuEvent *e)
 
 RChart::RChart(Context *context, bool ridesummary) : GcChartWindow(context), context(context), ridesummary(ridesummary)
 {
+    HelpWhatsThis *helpContents = new HelpWhatsThis(this);
+    this->setWhatsThis(helpContents->getWhatsThisText(HelpWhatsThis::Chart_R));
+
     // settings - just choosing output type
     plotOnChartSetting = new QCheckBox(tr("Use GC charts"), this);
     plotOnChartSetting->setChecked(false);// by default we use R graphics device (legacy charts)
     QWidget *c=new QWidget(this);
+    HelpWhatsThis *helpConfig = new HelpWhatsThis(c);
+    c->setWhatsThis(helpConfig->getWhatsThisText(HelpWhatsThis::Chart_R));
     QVBoxLayout *cl = new QVBoxLayout(c);
     cl->addWidget(plotOnChartSetting);
     cl->addStretch();

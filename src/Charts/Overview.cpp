@@ -21,6 +21,7 @@
 #include "OverviewItems.h"
 #include "AddChartWizard.h"
 #include "Utils.h"
+#include "HelpWhatsThis.h"
 
 static QIcon grayConfig, whiteConfig, accentConfig;
 
@@ -41,6 +42,10 @@ OverviewWindow::OverviewWindow(Context *context, int scope) : GcChartWindow(cont
 
     space = new ChartSpace(context, scope);
     main->addWidget(space);
+
+    HelpWhatsThis *help = new HelpWhatsThis(space);
+    if (scope & OverviewScope::ANALYSIS) space->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::ChartRides_Overview));
+    else space->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::Chart_Overview));
 
     // all the widgets
     setChartLayout(main);

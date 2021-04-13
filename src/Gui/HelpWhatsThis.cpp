@@ -207,6 +207,8 @@ HelpWhatsThis::getText(GCHelp chapter) {
         return text.arg("ChartTypes_Diary#calendar").arg(tr("Calendar"));
     case ChartDiary_Navigator:
         return text.arg("ChartTypes_Diary#navigator").arg(tr("Configurable activity log - with build in search capabilities"));
+    case ChartRides_Overview:
+        return text.arg("ChartTypes_Activities#Overview").arg(tr("Dashboard for a single activity - the tiles shown here are configurable"));
     case ChartRides_Summary:
         return text.arg("ChartTypes_Activities#activity-summary").arg(tr("Detailed information of a single activity - the metrics shown here are configurable"));
     case ChartRides_Details:
@@ -247,6 +249,16 @@ HelpWhatsThis::getText(GCHelp chapter) {
         return text.arg("ChartTypes_Trends#summary").arg(tr("Overview/summary of the selected data range - data shown in 'Athlete's Best' are configurable"));
     case Chart_Summary_Config:
         return text.arg("ChartTypes_Trends#summary").arg(tr("Chart specific filter/search and date range settings"));
+    case Chart_Overview:
+        return text.arg("ChartTypes_Trends#Overview").arg(tr("Dashboard for the selected data range - the tiles shown are configurable"));
+    case Chart_R:
+        return text.arg("Special-Topics_Working-with-R").arg(tr("Embedded R Chart"));
+    case Chart_Python:
+        return text.arg("Special-Topics_Working-with-Python").arg(tr("Embedded Python Chart"));
+    case Chart_User:
+        return text.arg("Special-Topics_Working-with-User-Charts").arg(tr("Native chart programable using simple formulas with visualization control"));
+    case Chart_Web:
+        return text.arg("Special-Topics_Web-Chart").arg(tr("Configurable web page with file download intercept"));
 
     case ChartTrain_Telemetry:
         return text.arg("ChartTypes_Train#telemetry").arg(tr("Real time data display"));
