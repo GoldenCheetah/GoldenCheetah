@@ -29,6 +29,7 @@
 #include "MainWindow.h"
 #include "UserChartData.h"
 #include "TimeUtils.h"
+#include "HelpWhatsThis.h"
 
 #include <limits>
 #include <QScrollArea>
@@ -36,6 +37,9 @@
 
 UserChart::UserChart(Context *context, bool rangemode) : GcChartWindow(context), context(context), rangemode(rangemode), stale(true), last(NULL)
 {
+    HelpWhatsThis *helpContents = new HelpWhatsThis(this);
+    this->setWhatsThis(helpContents->getWhatsThisText(HelpWhatsThis::Chart_User));
+
     // the config
     settingsTool = new UserChartSettings(context, rangemode, chartinfo, seriesinfo, axisinfo);
     setControls(settingsTool);
@@ -472,6 +476,9 @@ UserChart::applySettings(QString x)
 UserChartSettings::UserChartSettings(Context *context, bool rangemode, GenericChartInfo &chart, QList<GenericSeriesInfo> &series, QList<GenericAxisInfo> &axes) :
   context(context), rangemode(rangemode), chartinfo(chart), seriesinfo(series), axisinfo(axes), updating(false)
 {
+    HelpWhatsThis *helpConfig = new HelpWhatsThis(this);
+    this->setWhatsThis(helpConfig->getWhatsThisText(HelpWhatsThis::Chart_User));
+
     QVBoxLayout *layout = new QVBoxLayout(this);
     tabs = new QTabWidget(this);
     layout->addWidget(tabs);

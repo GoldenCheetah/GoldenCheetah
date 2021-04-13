@@ -113,6 +113,7 @@ Q_OBJECT
                  ChartDiary_Calendar,
                  ChartDiary_Navigator,
 
+                 ChartRides_Overview,
                  ChartRides_Summary,
                  ChartRides_Details,
                  ChartRides_Editor,
@@ -133,6 +134,11 @@ Q_OBJECT
 
                  Chart_Summary,
                  Chart_Summary_Config,
+                 Chart_Overview,
+                 Chart_R,
+                 Chart_Python,
+                 Chart_User,
+                 Chart_Web,
 
                  ChartTrain_Telemetry,
                  ChartTrain_Workout,
