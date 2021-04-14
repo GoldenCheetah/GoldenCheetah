@@ -67,16 +67,20 @@ HelpWhatsThis::getText(GCHelp chapter) {
         return text.arg("Main-Page_Table-of-contents").arg("Table of Contents");
 
     // Scope Bar
+    case ScopeBar:
+         return text.arg("ScopeBar_Views").arg(tr("Quick access to main Views and common actions"));
+    case ScopeBar_Athletes:
+         return text.arg("ScopeBar_Views#athletes").arg(tr("Athletes Status and Configuration"));
     case ScopeBar_Trends:
          return text.arg("ScopeBar_Views#trends").arg(tr("Analysis of a number of activities (e.g. a date range ) like PMC, long term metrics view, ... and data summaries"));
-    case ScopeBar_Diary:
-         return text.arg("ScopeBar_Views#diary").arg(tr("Extended Calendar view and configurable activity list, plus long term metrics charts and diagram types"));
     case ScopeBar_Rides:
          return text.arg("ScopeBar_Views#activities").arg(tr("Analysis of a single activity with diagrams like activity plot, W'bal, ... and Chung's Aerolab"));
-    case ScopeBar_Intervals:
-        return text.arg("ScopeBar_Views#intervals").arg("Intervals");
     case ScopeBar_Train:
         return text.arg("ScopeBar_Views#train").arg(tr("Ride indoors, following pre-programmed workouts - with multi device and video playback support"));
+    case ScopeBar_Sync:
+        return text.arg("ScopeBar_Views#sync").arg(tr("Sync with all Cloud Services with Sync on Start Up option enabled"));
+    case ScopeBar_Options:
+        return text.arg("ScopeBar_Views#options").arg(tr("Application level Options/Preferences for all athletes"));
 
     // Tool Bar
     case ToolBar_Download:
@@ -317,22 +321,27 @@ HelpWhatsThis::getText(GCHelp chapter) {
         return text.arg("Workout-Control_General").arg(tr("Workout Control, Intensity Adjustments and Notifications Display"));
 
     // Preferences
-    case Preferences_General:
-        return text.arg("Preferences_General").arg(tr("General"));
     case Preferences_Athlete_About:
         return text.arg("Preferences_Athlete").arg(tr("Athlete"));
-    case Preferences_Athlete_About_Phys:
-        return text.arg("Preferences_Athlete_Phys").arg(tr("Athlete"));
+    case Preferences_Athlete_About_Model:
+        return text.arg("Preferences_Athlete#model").arg(tr("Athlete Model"));
     case Preferences_Athlete_TrainingZones_Power:
         return text.arg("Preferences_Athlete_Training-Zones#power-zones").arg(tr("Training Zone definition for power"));
     case Preferences_Athlete_TrainingZones_HR:
         return text.arg("Preferences_Athlete_Training-Zones#heartrate-zones").arg(tr("Training Zone definition for heartrate"));
     case Preferences_Athlete_TrainingZones_Pace:
         return text.arg("Preferences_Athlete_Training-Zones#pace-zones").arg(tr("Training Zone definition for Swim and Run"));
+    case Preferences_Athlete_Measures:
+        return text.arg("Preferences_Athlete#measures").arg(tr("Athlete Measures"));
     case Preferences_Athlete_Autoimport:
-        return text.arg("Preferences_Athlete_Autoimport").arg(tr("Autoimport"));
+        return text.arg("Preferences_Athlete#auto-import").arg(tr("Auto Import"));
+    case Preferences_Athlete_Backup:
+        return text.arg("Preferences_Athlete#backup").arg(tr("Backup"));
     case Preferences_Passwords:
-        return text.arg("Preferences_Passwords").arg(tr("Passwords"));
+        return text.arg("Preferences_Accounts").arg(tr("Cloud Accounts"));
+
+    case Preferences_General:
+        return text.arg("Preferences_General").arg(tr("General"));
     case Preferences_Appearance:
         return text.arg("Preferences_Appearance").arg(tr("Appearance"));
     case Preferences_Intervals:
@@ -355,6 +364,8 @@ HelpWhatsThis::getText(GCHelp chapter) {
         return text.arg("Preferences_Metrics#summary").arg(tr("Metrics shown in 'Summary'"));
     case Preferences_Metrics_Intervals:
         return text.arg("Preferences_Metrics#intervals").arg(tr("Metrics shown in 'Intervals'"));
+    case Preferences_Measures:
+        return text.arg("Preferences_Measures").arg(tr("Measures"));
     case Preferences_Training:
         return text.arg("Preferences_Training").arg(tr("Training"));
     case Preferences_Training_RemoteControls:

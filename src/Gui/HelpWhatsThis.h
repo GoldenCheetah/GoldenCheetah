@@ -33,11 +33,13 @@ Q_OBJECT
  public:
     enum GCHelp{ Default,
 
+                 ScopeBar,
+                 ScopeBar_Athletes,
                  ScopeBar_Trends,
-                 ScopeBar_Diary,
                  ScopeBar_Rides,
-                 ScopeBar_Intervals,
                  ScopeBar_Train,
+                 ScopeBar_Sync,
+                 ScopeBar_Options,
 
                  ToolBar_Download,
                  ToolBar_Manual,
@@ -171,7 +173,6 @@ Q_OBJECT
 
                  Preferences_General,
                  Preferences_Athlete_About,
-                 Preferences_Athlete_About_Phys,
                  Preferences_Athlete_Measures,
                  Preferences_Athlete_About_Model,
                  Preferences_Athlete_TrainingZones_Power,

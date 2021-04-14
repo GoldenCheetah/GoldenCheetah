@@ -57,12 +57,13 @@ NewSideBar::selected(int id)
 }
 
 int
-NewSideBar::addItem(QImage icon, QString name, int id)
+NewSideBar::addItem(QImage icon, QString name, int id, QString whatsThisText)
 {
     // allocated an id
     if (id == -1) id=lastid++;
 
     NewSideBarItem *add = new NewSideBarItem(this, id, icon, name);
+    if (!whatsThisText.isEmpty()) add->setWhatsThis(whatsThisText);
     layout->addWidget(add);
     items.insert(id, add);
 

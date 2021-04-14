@@ -219,30 +219,33 @@ MainWindow::MainWindow(const QDir &home)
      *--------------------------------------------------------------------*/
 
     sidebar = new NewSideBar(context, this);
-    sidebar->addItem(QImage(":sidebar/athlete.png"), tr("athletes"), 0);
+    HelpWhatsThis *helpNewSideBar = new HelpWhatsThis(sidebar);
+    sidebar->setWhatsThis(helpNewSideBar->getWhatsThisText(HelpWhatsThis::ScopeBar));
+
+    sidebar->addItem(QImage(":sidebar/athlete.png"), tr("athletes"), 0, helpNewSideBar->getWhatsThisText(HelpWhatsThis::ScopeBar_Athletes));
     sidebar->setItemEnabled(1, false);
 
-    sidebar->addItem(QImage(":sidebar/plan.png"), tr("plan"), 1);
+    sidebar->addItem(QImage(":sidebar/plan.png"), tr("plan"), 1), tr("Feature not implemented yet");
     sidebar->setItemEnabled(1, false);
 
-    sidebar->addItem(QImage(":sidebar/trends.png"), tr("trends"), 2);
-    sidebar->addItem(QImage(":sidebar/assess.png"), tr("activities"), 3);
+    sidebar->addItem(QImage(":sidebar/trends.png"), tr("trends"), 2, helpNewSideBar->getWhatsThisText(HelpWhatsThis::ScopeBar_Trends));
+    sidebar->addItem(QImage(":sidebar/assess.png"), tr("activities"), 3, helpNewSideBar->getWhatsThisText(HelpWhatsThis::ScopeBar_Rides));
     sidebar->setItemSelected(3, true);
 
-    sidebar->addItem(QImage(":sidebar/reflect.png"), tr("reflect"), 4);
+    sidebar->addItem(QImage(":sidebar/reflect.png"), tr("reflect"), 4), tr("Feature not implemented yet");
     sidebar->setItemEnabled(4, false);
 
-    sidebar->addItem(QImage(":sidebar/train.png"), tr("train"), 5);
+    sidebar->addItem(QImage(":sidebar/train.png"), tr("train"), 5, helpNewSideBar->getWhatsThisText(HelpWhatsThis::ScopeBar_Train));
 
     sidebar->addStretch();
-    sidebar->addItem(QImage(":sidebar/apps.png"), tr("apps"), 6);
+    sidebar->addItem(QImage(":sidebar/apps.png"), tr("apps"), 6, tr("Feature not implemented yet"));
     sidebar->setItemEnabled(6, false);
     sidebar->addStretch();
 
     // we can click on the quick icons, but they aren't selectable views
-    sidebar->addItem(QImage(":sidebar/sync.png"), tr("sync"), 7);
+    sidebar->addItem(QImage(":sidebar/sync.png"), tr("sync"), 7, helpNewSideBar->getWhatsThisText(HelpWhatsThis::ScopeBar_Sync));
     sidebar->setItemSelectable(7, false);
-    sidebar->addItem(QImage(":sidebar/prefs.png"), tr("options"), 8);
+    sidebar->addItem(QImage(":sidebar/prefs.png"), tr("options"), 8, helpNewSideBar->getWhatsThisText(HelpWhatsThis::ScopeBar_Options));
     sidebar->setItemSelectable(8, false);
 
     connect(sidebar, SIGNAL(itemClicked(int)), this, SLOT(sidebarClicked(int)));
@@ -1238,9 +1241,7 @@ void
 MainWindow::sidebarSelected(int id)
 {
     switch (id) {
-    case 0: // athlete not written yet
-            selectAthlete();
-            break;
+    case 0: selectAthlete(); break;
     case 1: // plan not written yet
             break;
     case 2: selectHome(); break;

@@ -146,7 +146,7 @@ AthleteConfig::AthleteConfig(QDir home, Context *context) :
 
     backupPage = new BackupPage(context);
     HelpWhatsThis *backupPageHelp = new HelpWhatsThis(backupPage);
-    autoImportPage->setWhatsThis(backupPageHelp->getWhatsThisText(HelpWhatsThis::Preferences_Athlete_Backup));
+    backupPage->setWhatsThis(backupPageHelp->getWhatsThisText(HelpWhatsThis::Preferences_Athlete_Backup));
 
     setContentsMargins(0,0,0,0);
     QHBoxLayout *mainLayout = new QHBoxLayout(this);

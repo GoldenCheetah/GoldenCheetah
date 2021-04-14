@@ -2,6 +2,7 @@
 #include "AthleteConfigDialog.h"
 #include "TabView.h"
 #include "JsonRideFile.h" // for DATETIME_FORMAT
+#include "HelpWhatsThis.h"
 
 // athlete card
 static bool _registerItems()
@@ -23,6 +24,9 @@ static const int gl_button_width = ROWHEIGHT*5;
 
 AthleteView::AthleteView(Context *context) : ChartSpace(context, OverviewScope::ATHLETES)
 {
+    HelpWhatsThis *help = new HelpWhatsThis(this);
+    this->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::ScopeBar_Athletes));
+
     // fixed width - 1200 col width, 70 margins + scrollbar
     setFixedZoom(50 + (gl_athletes_per_row*1200) + ((gl_athletes_per_row+1) * 70));
 
