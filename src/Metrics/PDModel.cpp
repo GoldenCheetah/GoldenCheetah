@@ -989,16 +989,6 @@ ExtendedModel::onIntervalsChanged()
 void
 ExtendedModel::deriveExtCPParameters()
 {
-    // initial estimates
-    paa = 1000;
-    etau = 1.2;
-    ecp = 300;
-    paa_dec = -2;
-    ecp_del = -0.9;
-    tau_del = -4.8;
-    ecp_dec = -0.6;
-    ecp_dec_del = -180;
-
 #if 0
     // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     // LEAST SQUARES FIT WITH ECP MODEL REQUIRES
@@ -1114,6 +1104,15 @@ ExtendedModel::deriveExtCPParameters()
                 break;
 
 
+        // initial estimates
+        paa = 1000;
+        etau = 1.2;
+        ecp = 300;
+        paa_dec = -2;
+        ecp_del = -0.9;
+        tau_del = -4.8;
+        ecp_dec = -0.6;
+        ecp_dec_del = -180;
 
         // previous loop values
         double etau_prev;
