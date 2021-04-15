@@ -401,6 +401,7 @@ struct FitFileReaderState
                 case 3291: case 3516: return "Garmin Fenix 6x";
                 case 3299: return "Garmin HRM-Dual";
                 case 3405: case 3639: return "Garmin Swim 2";
+                case 3570: return "Garmin Edge 1030 Plus";
                 case 3592: return "Garmin Varia RTL515";
                 case 20119: return "Garmin Training Center";
                 case 65532: return "Android ANT+ Plugin";
@@ -1130,6 +1131,10 @@ struct FitFileReaderState
                 case 253: //timestamp
                     this_timestamp = value + qbase_time.toTime_t();
                     active_session_["_timestamp"] = static_cast<quint32>(this_timestamp);
+                    break;
+                case 168:   /* undocumented: Firstbeat EPOC based Exercise Load */
+                    active_session_["EPOC"] = QString::number(round(value / 65536.0 ));
+                    rideFile->setTag("EPOC", QString::number(round(value / 65536.0 )));
                     break;
                 case 254: //index
                 case 0:   //event

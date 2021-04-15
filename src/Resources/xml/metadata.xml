@@ -286,6 +286,13 @@
 		</field>
 		<field>
 			<fieldtab>"Metric"</fieldtab>
+			<fieldname>"EPOC"</fieldname>
+			<fieldtype>4</fieldtype>
+			<fieldvalues>""</fieldvalues>
+			<fielddiary>0</fielddiary>
+		</field>
+		<field>
+			<fieldtab>"Metric"</fieldtab>
 			<fieldname>"Recovery Time"</fieldname>
 			<fieldtype>4</fieldtype>
 			<fieldvalues>""</fieldvalues>
