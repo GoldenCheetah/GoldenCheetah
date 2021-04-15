@@ -29,27 +29,13 @@
 #include <QJsonObject>
 #include <QJsonValue>
 
-#ifndef SPORTTRACKS_DEBUG
-// TODO(gille): This should be a command line flag.
-#define SPORTTRACKS_DEBUG false
-#endif
+Q_DECLARE_LOGGING_CATEGORY(gcSportTracks)
+Q_LOGGING_CATEGORY(gcSportTracks, "gc.sporttracks")
+
 #ifdef Q_CC_MSVC
-#define printd(fmt, ...) do {                                                \
-    if (SPORTTRACKS_DEBUG) {                                 \
-        printf("[%s:%d %s] " fmt , __FILE__, __LINE__,        \
-               __FUNCTION__, __VA_ARGS__);                    \
-        fflush(stdout);                                       \
-    }                                                         \
-} while(0)
+#define printd(fmt, ...) qCDebug(gcSportTracks, fmt, __VA_ARGS__);
 #else
-#define printd(fmt, args...)                                            \
-    do {                                                                \
-        if (SPORTTRACKS_DEBUG) {                                       \
-            printf("[%s:%d %s] " fmt , __FILE__, __LINE__,              \
-                   __FUNCTION__, ##args);                               \
-            fflush(stdout);                                             \
-        }                                                               \
-    } while(0)
+#define printd(fmt, args...) qCDebug(gcSportTracks, fmt, ##args);
 #endif
 
 SportTracks::SportTracks(Context *context) : CloudService(context), context(context), root_(NULL) {
