@@ -243,8 +243,11 @@ main(int argc, char *argv[])
     bool debug = false;
     QString debugFormat = QString("[%{time h:mm:ss.zzz}] %{type}: %{message}");
 #endif
+
+    // By default, print messages from all categories, but not those from
+    // specialised categories like qt.* or gc.* which can be quite verbose
+    QString debugRules = QString("*.debug=true;gc.*.debug=false;qt.*.debug=false");
     QString debugFile = NULL;
-    QString debugRules = QString("*.debug=true;qt.*.debug=false");
 
     bool server = false;
     nogui = false;
