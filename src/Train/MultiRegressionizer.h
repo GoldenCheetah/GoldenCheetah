@@ -392,7 +392,7 @@ public:
     }
     
     bool Build(const XYVector<T_fptype>& xy, double epsilon) {
-        epsilon; // This function has no ability to honor epsilon
+        Q_UNUSED(epsilon) // This function has no ability to honor epsilon
         m_stddev = ComputeCoefs(xy);
         return Valid();
     }
