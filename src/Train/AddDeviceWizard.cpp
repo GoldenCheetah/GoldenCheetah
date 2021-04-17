@@ -682,7 +682,7 @@ AddImagic::browseClicked()
 AddPair::AddPair(AddDeviceWizard *parent) : QWizardPage(parent), wizard(parent)
 {
     setTitle(tr("Pair Devices"));
-    setSubTitle(tr("Search for and pair ANT+ devices"));
+    setSubTitle(tr("Search for and pair ANT+ devices (Pair FE-C sensor only for FE-C devices)"));
 
     signalMapper = NULL;
 
@@ -1032,18 +1032,21 @@ AddPairBTLE::validatePage()
 void
 AddVirtualPower::mySpinBoxChanged(int i)
 {
+    Q_UNUSED(i)
     drawConfig();
 }
 
 void
 AddVirtualPower::myDoubleSpinBoxChanged(double d)
 {
+    Q_UNUSED(d)
     drawConfig();
 }
 
 void
 AddVirtualPower::myCellChanged(int nRow, int nCol) 
 {
+    Q_UNUSED(nCol)
     bool state = this->blockSignals(true);
     if (state) return;
 
@@ -1077,6 +1080,7 @@ AddVirtualPower::myCellChanged(int nRow, int nCol)
 
 // Sort the virtualPowerTableWidget
 void AddVirtualPower::mySortTable(int i) {
+    Q_UNUSED(i)
 
     bool state = this->blockSignals(true);
     if (state) return;
@@ -1174,6 +1178,11 @@ AddVirtualPower::mySetTableFromComboBox(int i) {
     drawConfig();
 
     this->blockSignals(state);
+}
+
+void
+AddVirtualPower::virtualPowerNameChanged() {
+    virtualPowerCreateButton->setEnabled(!virtualPowerNameEdit->text().isEmpty());
 }
 
 void
@@ -1349,22 +1358,12 @@ AddVirtualPower::AddVirtualPower(AddDeviceWizard* parent) : QWizardPage(parent),
 
     // ---------------------------------------------
     // Virtual Power
+    //
+    QGroupBox* groupBox = new QGroupBox(tr("Custom Virtual Power Curve"));
+    groupBox->setFlat(true);
+    QVBoxLayout* virtualPowerGroupLayout = new QVBoxLayout;
+
     QHBoxLayout* virtualPowerLayout = new QHBoxLayout;
-
-    QHBoxLayout* virtualPowerNameLayout = new QHBoxLayout;
-    virtualPowerNameLabel = new QLabel(tr("Custom Virtual Power Curve Name:"));
-    virtualPowerNameEdit = new QLineEdit(this);
-    virtualPowerCreateButton = new QPushButton(tr("Create"), this);
-    virtualPowerCreateButton->setToolTip(tr("Give the current fit a name that this device can use."));
-
-    virtualPowerNameLayout->addWidget(virtualPowerNameLabel);
-    virtualPowerNameLayout->addWidget(virtualPowerNameEdit);
-    virtualPowerNameLayout->addWidget(virtualPowerCreateButton);
-
-    connect(virtualPowerCreateButton, SIGNAL(clicked()),
-        this, SLOT(myCreateCustomPowerCurve()));
-
-    layout->addLayout(virtualPowerNameLayout);
 
     // Virtual Power Input Table
     virtualPowerTableWidget = new QTableWidget(1, 2, this);
@@ -1393,7 +1392,7 @@ AddVirtualPower::AddVirtualPower(AddDeviceWizard* parent) : QWizardPage(parent),
 
     virtualPowerLayout->addWidget(virtualPowerScatterChartView);
 
-    layout->addLayout(virtualPowerLayout);
+    virtualPowerGroupLayout->addLayout(virtualPowerLayout);
 
     QString fitOrderSpinBoxText = tr("Max Polynomial Order:");
     fitOrderSpinBoxLabel = new QLabel(fitOrderSpinBoxText);
@@ -1430,7 +1429,28 @@ AddVirtualPower::AddVirtualPower(AddDeviceWizard* parent) : QWizardPage(parent),
     virtualPowerSpinBoxLayout->addWidget(fitOrderLabel);
     virtualPowerSpinBoxLayout->addWidget(fitStdDevLabel);
 
-    layout->addLayout(virtualPowerSpinBoxLayout);
+    virtualPowerGroupLayout->addLayout(virtualPowerSpinBoxLayout);
+
+    QHBoxLayout* virtualPowerNameLayout = new QHBoxLayout;
+    virtualPowerNameLabel = new QLabel(tr("Name:"));
+    virtualPowerNameEdit = new QLineEdit(this);
+    virtualPowerCreateButton = new QPushButton(tr("Create and Select"), this);
+    virtualPowerCreateButton->setEnabled(false);
+    virtualPowerCreateButton->setToolTip(tr("Give the current fit a name and use for this device."));
+
+    virtualPowerNameLayout->addWidget(virtualPowerNameLabel);
+    virtualPowerNameLayout->addWidget(virtualPowerNameEdit);
+    virtualPowerNameLayout->addWidget(virtualPowerCreateButton);
+
+    connect(virtualPowerNameEdit, SIGNAL(textChanged(const QString&)),
+        this, SLOT(virtualPowerNameChanged()));
+    connect(virtualPowerCreateButton, SIGNAL(clicked()),
+        this, SLOT(myCreateCustomPowerCurve()));
+
+    virtualPowerGroupLayout->addLayout(virtualPowerNameLayout);
+
+    groupBox->setLayout(virtualPowerGroupLayout);
+    layout->addWidget(groupBox);
 
     connect(fitOrderSpinBox,   SIGNAL(valueChanged(int)), this, SLOT(mySpinBoxChanged(int)));
     connect(fitEpsilonSpinBox, SIGNAL(valueChanged(double)), this, SLOT(myDoubleSpinBoxChanged(double)));

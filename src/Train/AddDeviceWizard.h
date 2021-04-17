@@ -273,6 +273,7 @@ private slots:
     void myDoubleSpinBoxChanged(double d);
     void mySortTable(int i);
     void mySetTableFromComboBox(int i);
+    void virtualPowerNameChanged();
     void myCreateCustomPowerCurve();
 };
 
