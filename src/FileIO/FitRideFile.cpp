@@ -387,6 +387,7 @@ struct FitFileReaderState
                 case 2787: return "Garmin Vector 3";
                 case 2886: case 2888: return "Garmin FR645";
                 case 2900: return "Garmin Fenix 5s +";
+                case 2909: case 3092: return "Garmin Edge 130";
                 case 3028: return "Garmin GPSMap 66";
                 case 3110: return "Garmin Fenix 5 +";
                 case 3111: return "Garmin Fenix 5x +";
@@ -401,6 +402,7 @@ struct FitFileReaderState
                 case 3291: case 3516: return "Garmin Fenix 6x";
                 case 3299: return "Garmin HRM-Dual";
                 case 3405: case 3639: return "Garmin Swim 2";
+                case 3558: return "Garmin Edge 130 Plus";
                 case 3570: return "Garmin Edge 1030 Plus";
                 case 3592: return "Garmin Varia RTL515";
                 case 20119: return "Garmin Training Center";
