@@ -1520,14 +1520,11 @@ ErgFile::save(QStringList &errors)
                                   << "PowerHigh=\"" <<sections[i].end/CP << "\"";
                 if (Texts.count() > 0) {
                     out << ">\n";
-                    QString message = "";
                     foreach (ErgFileText cue, Texts) {
                         if (cue.x >= msecs && cue.x <= msecs+sections[i].duration) {
-                            message = cue.text;
-                            message.replace(R"(")", R"(&quot;)");
                             out << "          <textevent "
                                 << "timeoffset=\""<<(cue.x-msecs)/1000
-                                << "\" message=\"" << message
+                                << "\" message=\"" << Utils::xmlprotect(cue.text)
                                 << "\" duration=\"" << cue.duration << "\"/>\n";
                         }
                     }
