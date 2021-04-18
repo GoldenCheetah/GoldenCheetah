@@ -1520,12 +1520,14 @@ ErgFile::save(QStringList &errors)
                                   << "PowerHigh=\"" <<sections[i].end/CP << "\"";
                 if (Texts.count() > 0) {
                     out << ">\n";
-                    foreach (ErgFileText cue, Texts)
-                        if (cue.x >= msecs && cue.x <= msecs+sections[i].duration)
+                    foreach (ErgFileText cue, Texts) {
+                        if (cue.x >= msecs && cue.x <= msecs+sections[i].duration) {
                             out << "          <textevent "
                                 << "timeoffset=\""<<(cue.x-msecs)/1000
-                                << "\" message=\"" << cue.text
+                                << "\" message=\"" << Utils::xmlprotect(cue.text)
                                 << "\" duration=\"" << cue.duration << "\"/>\n";
+                        }
+                    }
                     out << "        </" << tag << ">\n";
                 } else {
                     out << "/>\n";
