@@ -1537,17 +1537,6 @@ AddFinal::AddFinal(AddDeviceWizard *parent) : QWizardPage(parent), wizard(parent
     virtualPowerName->setEnabled(false); // no edit
     hlayout->addLayout(formlayout);
 
-    selectDefault = new QGroupBox(tr("Selected by default"), this);
-    selectDefault->setCheckable(true);
-    selectDefault->setChecked(false);
-    layout->addWidget(selectDefault);
-
-    QGridLayout *grid = new QGridLayout;
-    selectDefault->setLayout(grid);
-    grid->addWidget((defWatts=new QCheckBox(tr("Power"))), 0,0, Qt::AlignVCenter|Qt::AlignLeft);
-    grid->addWidget((defBPM=new QCheckBox(tr("Heartrate"))), 1,0, Qt::AlignVCenter|Qt::AlignLeft);
-    grid->addWidget((defKPH=new QCheckBox(tr("Speed"))), 0,1, Qt::AlignVCenter|Qt::AlignLeft);
-    grid->addWidget((defRPM=new QCheckBox(tr("Cadence"))), 1,1, Qt::AlignVCenter|Qt::AlignLeft);
     layout->addStretch();
 }
 
@@ -1572,11 +1561,6 @@ AddFinal::validatePage()
         add.name = name->text();
         add.portSpec = port->text();
         add.deviceProfile = profile->text();
-        add.defaultString = QString(defWatts->isChecked() ? "P" : "") +
-                            QString(defBPM->isChecked() ? "H" : "") +
-                            QString(defRPM->isChecked() ? "C" : "") +
-                            QString(defKPH->isChecked() ? "S" : "");
-
         add.postProcess = wizard->virtualPowerIndex;
         add.wheelSize = wizard->wheelSize;
         add.inertialMomentKGM2 = wizard->inertialMomentKGM2;

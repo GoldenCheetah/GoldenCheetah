@@ -637,8 +637,6 @@ GSettings::upgradeGlobal() {
         migrateValue(configStr);
         configStr = QString("%1%2").arg(GC_DEV_PROF).arg(i+1);
         migrateValue(configStr);
-        configStr = QString("%1%2").arg(GC_DEV_DEF).arg(i+1);
-        migrateValue(configStr);
         configStr = QString("%1%2").arg(GC_DEV_VIRTUAL).arg(i+1);
         migrateValue(configStr);
     }
