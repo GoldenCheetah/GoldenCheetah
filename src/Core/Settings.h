@@ -222,7 +222,6 @@
 #define GC_DEV_PROF                     "<global-trainmode>deviceprof"
 #define GC_DEV_TYPE                     "<global-trainmode>devicetype"
 #define GC_DEV_STRIDE                   "<global-trainmode>devicestride"
-#define GC_DEV_DEF                      "<global-trainmode>devicedef"
 #define GC_DEV_WHEEL                    "<global-trainmode>devicewheel"
 #define GC_DEV_VIRTUAL                  "<global-trainmode>devicepostProcess"
 #define GC_DEV_VIRTUALPOWER             "<global-trainmode>devicevirtualPower"

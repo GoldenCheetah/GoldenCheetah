@@ -297,8 +297,6 @@ class AddFinal : public QWizardPage
         QLineEdit *port;
         QLineEdit *profile;
         QLineEdit *virtualPowerName;
-        QGroupBox *selectDefault;
-        QCheckBox *defWatts, *defBPM, *defKPH, *defRPM;
 };
 
 class DeviceScanner : public QThread
