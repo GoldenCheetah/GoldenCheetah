@@ -76,7 +76,8 @@ public:
     DeviceScanner *scanner;
 
     // Device Data
-    int    virtualPowerIndex;      // index of selected virtual power function
+    int    virtualPowerIndex;   // index of selected virtual power function
+    QString virtualPowerName;   // name of selected virtual power curve
     int    wheelSize;
     int    strideLength;
     double inertialMomentKGM2;  // inertial moment of trainer in (KG M^2)
@@ -235,6 +236,7 @@ class AddVirtualPower : public QWizardPage
 public:
     AddVirtualPower(AddDeviceWizard*);
     void initializePage();
+    bool validatePage();
 
 private:
     AddDeviceWizard* wizard;
@@ -294,6 +296,7 @@ class AddFinal : public QWizardPage
         QLineEdit *name;
         QLineEdit *port;
         QLineEdit *profile;
+        QLineEdit *virtualPowerName;
         QGroupBox *selectDefault;
         QCheckBox *defWatts, *defBPM, *defKPH, *defRPM;
 };

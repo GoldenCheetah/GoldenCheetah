@@ -1360,7 +1360,6 @@ AddVirtualPower::AddVirtualPower(AddDeviceWizard* parent) : QWizardPage(parent),
     // Virtual Power
     //
     QGroupBox* groupBox = new QGroupBox(tr("Custom Virtual Power Curve"));
-    groupBox->setFlat(true);
     QVBoxLayout* virtualPowerGroupLayout = new QVBoxLayout;
 
     QHBoxLayout* virtualPowerLayout = new QHBoxLayout;
@@ -1483,6 +1482,13 @@ AddVirtualPower::initializePage()
     this->blockSignals(state);
 }
 
+bool
+AddVirtualPower::validatePage()
+{
+    wizard->virtualPowerName = virtualPower->currentText();
+    return true;
+}
+
 void
 AddVirtualPower::calcWheelSize()
 {
@@ -1526,11 +1532,9 @@ AddFinal::AddFinal(AddDeviceWizard *parent) : QWizardPage(parent), wizard(parent
     formlayout->addRow(new QLabel(tr("Name*"), this), (name=new QLineEdit(this)));
     formlayout->addRow(new QLabel(tr("Port"), this), (port=new QLineEdit(this)));
     formlayout->addRow(new QLabel(tr("Profile"), this), (profile=new QLineEdit(this)));
-    formlayout->setFieldGrowthPolicy(QFormLayout::FieldsStayAtSizeHint);
-    //profile->setFixedWidth(200);
-    port->setFixedWidth(150);
+    formlayout->addRow(new QLabel(tr("Virtual Power"), this), (virtualPowerName=new QLineEdit(this)));
     port->setEnabled(false); // no edit
-    //name->setFixedWidth(230);
+    virtualPowerName->setEnabled(false); // no edit
     hlayout->addLayout(formlayout);
 
     selectDefault = new QGroupBox(tr("Selected by default"), this);
@@ -1552,6 +1556,7 @@ AddFinal::initializePage()
 {
     port->setText(wizard->portSpec);
     profile->setText(wizard->profile);
+    virtualPowerName->setText(wizard->virtualPowerName);
 }
 
 bool
