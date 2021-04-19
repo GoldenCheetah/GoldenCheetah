@@ -134,8 +134,6 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
     QStyle *cde = QStyleFactory::create(OS_STYLE);
     mediaTree->verticalScrollBar()->setStyle(cde);
 #endif
-    HelpWhatsThis *helpMediaTree = new HelpWhatsThis(mediaTree);
-    mediaTree->setWhatsThis(helpMediaTree->getWhatsThisText(HelpWhatsThis::SideBarTrainView_Media));
 
 #ifdef GC_HAVE_VLC  // RLV currently only support for VLC
     videosyncModel = new QSqlTableModel(this, trainDB->connection());
@@ -176,8 +174,6 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
     QStyle *cdevideosync = QStyleFactory::create(OS_STYLE);
     videosyncTree->verticalScrollBar()->setStyle(cdevideosync);
 #endif
-    HelpWhatsThis *helpVideosyncTree = new HelpWhatsThis(videosyncTree);
-    videosyncTree->setWhatsThis(helpVideosyncTree->getWhatsThisText(HelpWhatsThis::SideBarTrainView_VideoSync));
 
 #endif //GC_HAVE_VLC
 
@@ -199,8 +195,6 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
     QStyle *xde = QStyleFactory::create(OS_STYLE);
     deviceTree->verticalScrollBar()->setStyle(xde);
 #endif
-    HelpWhatsThis *helpDeviceTree = new HelpWhatsThis(deviceTree);
-    deviceTree->setWhatsThis(helpDeviceTree->getWhatsThisText(HelpWhatsThis::SideBarTrainView_Devices));
 
     workoutModel = new QSqlTableModel(this, trainDB->connection());
     workoutModel->setTable("workouts");
@@ -240,9 +234,6 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
     xde = QStyleFactory::create(OS_STYLE);
     workoutTree->verticalScrollBar()->setStyle(xde);
 #endif
-    HelpWhatsThis *helpWorkoutTree = new HelpWhatsThis(workoutTree);
-    workoutTree->setWhatsThis(helpWorkoutTree->getWhatsThisText(HelpWhatsThis::SideBarTrainView_Workouts));
-
 
     connect(context, SIGNAL(newLap()), this, SLOT(resetLapTimer()));
     connect(context, SIGNAL(viewChanged(int)), this, SLOT(viewChanged(int)));
@@ -268,9 +259,15 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
     connect(moreWorkoutAct, SIGNAL(triggered(void)), this, SLOT(workoutPopup(void)));
 
     deviceItem->addWidget(deviceTree);
+    HelpWhatsThis *helpDeviceTree = new HelpWhatsThis(deviceTree);
+    deviceTree->setWhatsThis(helpDeviceTree->getWhatsThisText(HelpWhatsThis::SideBarTrainView_Devices));
     trainSplitter->addWidget(deviceItem);
+
     workoutItem->addWidget(workoutTree);
+    HelpWhatsThis *helpWorkoutTree = new HelpWhatsThis(workoutTree);
+    workoutTree->setWhatsThis(helpWorkoutTree->getWhatsThisText(HelpWhatsThis::SideBarTrainView_Workouts));
     trainSplitter->addWidget(workoutItem);
+
     cl->addWidget(trainSplitter);
 
 
@@ -280,6 +277,8 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
     mediaItem->addAction(moreMediaAct);
     connect(moreMediaAct, SIGNAL(triggered(void)), this, SLOT(mediaPopup(void)));
     mediaItem->addWidget(mediaTree);
+    HelpWhatsThis *helpMediaTree = new HelpWhatsThis(mediaTree);
+    mediaTree->setWhatsThis(helpMediaTree->getWhatsThisText(HelpWhatsThis::SideBarTrainView_Media));
     trainSplitter->addWidget(mediaItem);
 
 #ifdef GC_HAVE_VLC  // RLV currently only support for VLC
@@ -288,6 +287,8 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
     videosyncItem->addAction(moreVideoSyncAct);
     connect(moreVideoSyncAct, SIGNAL(triggered(void)), this, SLOT(videosyncPopup(void)));
     videosyncItem->addWidget(videosyncTree);
+    HelpWhatsThis *helpVideosyncTree = new HelpWhatsThis(videosyncTree);
+    videosyncTree->setWhatsThis(helpVideosyncTree->getWhatsThisText(HelpWhatsThis::SideBarTrainView_VideoSync));
     trainSplitter->addWidget(videosyncItem);
 #endif //GC_HAVE_VLC
 #endif //GC_VIDEO_NONE
