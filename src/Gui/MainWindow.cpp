@@ -332,6 +332,16 @@ MainWindow::MainWindow(const QDir &home)
     styleSelector->setPalette(metal);
     connect(styleSelector, SIGNAL(segmentSelected(int)), this, SLOT(setStyleFromSegment(int))); //avoid toggle infinitely
 
+    // What's this button
+    whatsthis = new QPushButton(this);
+    whatsthis->setIcon(myHelper->icon());
+    whatsthis->setFixedHeight(24 * dpiYFactor);
+    whatsthis->setIconSize(isize);
+    whatsthis->setStyle(toolStyle);
+    whatsthis->setToolTip(tr("What's This?"));
+    whatsthis->setPalette(metal);
+    connect(whatsthis, SIGNAL(clicked(bool)), this, SLOT(enterWhatsThisMode()));
+
  #if defined(WIN32) || defined (Q_OS_LINUX)
     // are we in hidpi mode? if so undo global defaults for toolbar pushbuttons
     if (dpiXFactor > 1) {
@@ -342,16 +352,6 @@ MainWindow::MainWindow(const QDir &home)
         whatsthis->setStyleSheet(nopad);
     }
 #endif
-
-    // What's this button
-    whatsthis = new QPushButton(this);
-    whatsthis->setIcon(myHelper->icon());
-    whatsthis->setFixedHeight(24 * dpiYFactor);
-    whatsthis->setIconSize(isize);
-    whatsthis->setStyle(toolStyle);
-    whatsthis->setToolTip(tr("What's This?"));
-    whatsthis->setPalette(metal);
-    connect(whatsthis, SIGNAL(clicked(bool)), this, SLOT(enterWhatsThisMode()));
 
     // add a search box on far right, but with a little space too
     searchBox = new SearchFilterBox(this,context,false);
