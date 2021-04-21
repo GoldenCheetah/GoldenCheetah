@@ -196,8 +196,11 @@ Q_OBJECT
                  Preferences_Metrics_Intervals,
 
                  Preferences_Training,
+                 Preferences_Training_Preferences,
                  Preferences_Training_RemoteControls,
                  Preferences_Training_TrainDevices,
+                 Preferences_Training_AddDeviceWizard,
+                 Preferences_Training_VirtualBicycleSpecifications,
 
                  };
 
