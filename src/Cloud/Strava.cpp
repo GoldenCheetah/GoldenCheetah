@@ -373,11 +373,11 @@ Strava::writeFile(QByteArray &data, QString remotename, RideFile *ride)
     //XXXprivatePart.setBody(parent->privateChk->isChecked() ? "1" : "0");
     //XXXmultiPart->append(privatePart);
 
-    //XXXQHttpPart commutePart;
-    //XXXcommutePart.setHeader(QNetworkRequest::ContentDispositionHeader,
-    //XXX                      QVariant("form-data; name=\"commute\""));
-    //XXXcommutePart.setBody(parent->commuteChk->isChecked() ? "1" : "0");
-    //XXXmultiPart->append(commutePart);
+    QHttpPart commutePart;
+    commutePart.setHeader(QNetworkRequest::ContentDispositionHeader,
+                          QVariant("form-data; name=\"commute\""));
+    commutePart.setBody(ride->getTag("Commute", "0").toInt() ? "1" : "0");
+    multiPart->append(commutePart);
 
     //XXXQHttpPart trainerPart;
     //XXXtrainerPart.setHeader(QNetworkRequest::ContentDispositionHeader,
@@ -915,6 +915,10 @@ Strava::prepareResponse(QByteArray* data)
         if (!each["description"].isNull()) {
             QString meta = getSetting(GC_STRAVA_ACTIVITY_NAME, QVariant("")).toString();
             if (meta != "Notes") ride->setTag("Notes", each["description"].toString());
+        }
+
+        if (!each["commute"].isNull()) {
+            ride->setTag("Commute", each["commute"].toBool() ? "1" : "0");
         }
 
         if (each["manual"].toBool()) {
