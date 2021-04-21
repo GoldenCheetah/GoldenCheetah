@@ -22,6 +22,7 @@
 #include "Context.h"
 #include "Colors.h"
 #include "ConfigDialog.h"
+#include "HelpWhatsThis.h"
 
 #include "RealtimeController.h" // for power trainer definitions
 #include "MultiRegressionizer.h"
@@ -41,6 +42,9 @@
 // Main wizard
 AddDeviceWizard::AddDeviceWizard(Context *context) : QWizard(context->mainWindow), context(context), controller(NULL)
 {
+    HelpWhatsThis *help = new HelpWhatsThis(this);
+    this->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::Preferences_Training_AddDeviceWizard));
+
 #ifdef Q_OS_MAC
     setWizardStyle(QWizard::ModernStyle);
 #endif

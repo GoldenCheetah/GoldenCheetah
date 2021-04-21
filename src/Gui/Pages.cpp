@@ -445,6 +445,9 @@ GeneralPage::browseAthleteDir()
 //
 DevicePage::DevicePage(QWidget *parent, Context *context) : QWidget(parent), context(context)
 {
+    HelpWhatsThis *help = new HelpWhatsThis(this);
+    this->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::Preferences_Training_TrainDevices));
+
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
 
     DeviceTypes all;
@@ -712,6 +715,9 @@ bool deviceModel::setData(const QModelIndex &index, const QVariant &value, int r
 //
 TrainOptionsPage::TrainOptionsPage(QWidget *parent, Context *context) : QWidget(parent), context(context)
 {
+    HelpWhatsThis *help = new HelpWhatsThis(this);
+    this->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::Preferences_Training_Preferences));
+
     //
     // Workout directory (train view)
     //
@@ -800,6 +806,9 @@ TrainOptionsPage::browseWorkoutDir()
 //
 RemotePage::RemotePage(QWidget *parent, Context *context) : QWidget(parent), context(context)
 {
+    HelpWhatsThis *help = new HelpWhatsThis(this);
+    this->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::Preferences_Training_RemoteControls));
+
     remote = new RemoteControl;
 
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
@@ -1040,6 +1049,9 @@ SimBicyclePage::SetStatsLabelArray(double )
 
 SimBicyclePage::SimBicyclePage(QWidget *parent, Context *context) : QWidget(parent), context(context)
 {
+    HelpWhatsThis *help = new HelpWhatsThis(this);
+    this->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::Preferences_Training_VirtualBicycleSpecifications));
+
     QVBoxLayout *all = new QVBoxLayout(this);
     QGridLayout *grid = new QGridLayout;
 

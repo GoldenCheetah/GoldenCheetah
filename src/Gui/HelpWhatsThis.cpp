@@ -367,11 +367,17 @@ HelpWhatsThis::getText(GCHelp chapter) {
     case Preferences_Measures:
         return text.arg("Preferences_Measures").arg(tr("Measures"));
     case Preferences_Training:
-        return text.arg("Preferences_Training").arg(tr("Training"));
+        return text.arg("Preferences_Training").arg(tr("Train View devices configuration and preferences"));
+    case Preferences_Training_Preferences:
+        return text.arg("Preferences_Training#preferences").arg(tr("Train View Preferences"));
     case Preferences_Training_RemoteControls:
-        return text.arg("Preferences_Training_Remote Controls").arg(tr("Remote Controls"));
+        return text.arg("Preferences_Training#remote-controls").arg(tr("Remote Controls Configuration"));
     case Preferences_Training_TrainDevices:
-        return text.arg("Preferences_Training_Train Devices").arg(tr("Train Devices"));
+        return text.arg("Preferences_Training#train-devices").arg(tr("Add/Remove Train Devices"));
+    case Preferences_Training_AddDeviceWizard:
+        return text.arg("Preferences_Training#add-device-wizard").arg(tr("Add Train Devices"));
+    case Preferences_Training_VirtualBicycleSpecifications:
+        return text.arg("Preferences_Training#virtual-bicycle-specifications").arg(tr("Virtual Bicycle configuration for simulation rides"));
 
     }
 
