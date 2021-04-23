@@ -104,6 +104,13 @@
 		</field>
 		<field>
 			<fieldtab>"Workout"</fieldtab>
+			<fieldname>"Equipment"</fieldname>
+			<fieldtype>0</fieldtype>
+			<fieldvalues>""</fieldvalues>
+			<fielddiary>0</fielddiary>
+		</field>
+		<field>
+			<fieldtab>"Workout"</fieldtab>
 			<fieldname>"Objective"</fieldname>
 			<fieldtype>1</fieldtype>
 			<fieldvalues>""</fieldvalues>

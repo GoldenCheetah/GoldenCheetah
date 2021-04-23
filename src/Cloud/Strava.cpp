@@ -687,6 +687,53 @@ Strava::addSamples(RideFile* ret, QString remoteid)
 }
 
 void
+Strava::addEquipment(RideFile* ret, QString gear_id)
+{
+    printd("Strava::addEquipment(%s)\n", gear_id.toStdString().c_str());
+
+    // do we have a token ?
+    QString token = getSetting(GC_STRAVA_TOKEN, "").toString();
+    if (token == "") return;
+
+    // lets connect and get equipment info
+    QString urlstr = QString("https://www.strava.com/api/v3/gear/%1").arg(gear_id);
+
+    QUrl url = QUrl( urlstr );
+    printd("url:%s\n", url.url().toStdString().c_str());
+
+    // request using the bearer token
+    QNetworkRequest request(url);
+    request.setRawHeader("Authorization", (QString("Bearer %1").arg(token)).toLatin1());
+
+    // put the file
+    QNetworkReply *reply = nam->get(request);
+
+    // blocking request
+    QEventLoop loop;
+    connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
+    loop.exec();
+
+    if (reply->error() != QNetworkReply::NoError) {
+        qDebug() << "error" << reply->errorString();
+        return;
+    }
+    // did we get a good response ?
+    QByteArray r = reply->readAll();
+    printd("response: %s\n", r.toStdString().c_str());
+
+    QJsonParseError parseError;
+    QJsonDocument document = QJsonDocument::fromJson(r, &parseError);
+
+    // if path was returned all is good, lets set Equipment
+    if (parseError.error == QJsonParseError::NoError) {
+        // Just name, for now
+        if (!document["name"].isNull()) {
+            ret->setTag("Equipment", document["name"].toString());
+        }
+    }
+}
+
+void
 Strava:: fixLapSwim(RideFile* ret, QJsonArray laps)
 {
     // Lap Swim & SmartRecording enabled: use distance from laps to fix samples
@@ -950,6 +997,8 @@ Strava::prepareResponse(QByteArray* data)
 
         } else {
             addSamples(ride, QString("%1").arg(each["id"].toVariant().toULongLong()));
+
+            if (!each["gear_id"].isNull()) addEquipment(ride, each["gear_id"].toString());
             // laps?
             if (!each["laps"].isNull()) {
                 QJsonArray laps = each["laps"].toArray();
