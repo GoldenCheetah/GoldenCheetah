@@ -114,6 +114,7 @@ class AboutRiderPage : public QWidget
         bool metricUnits;
 
         QLineEdit *nickname;
+        QLineEdit *athleteID;
         QDateEdit *dob;
         QComboBox *sex;
         QLabel *weightlabel;
