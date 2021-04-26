@@ -506,6 +506,10 @@ struct FitFileReaderState
                 case 44: return "SIGMA ROX 12.0";
                 case 45: return "SIGMA iD.FREE";
                 case 46: return "SIGMA iD.TRI";
+                case 47: return "SIGMA PURE GPS";
+                case 49: return "SIGMA ROX 11.1";
+                case 51: return "SIGMA ROX 2.0";
+                case 52: return "SIGMA ROX 4.0";
                 default: return QString("SIGMA SPORT %1").arg(prod);
             }
         } else if (manu == 76) {
