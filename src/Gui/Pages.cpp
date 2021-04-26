@@ -19,6 +19,7 @@
 #include "Athlete.h"
 #include <QtGui>
 #include <QIntValidator>
+#include <qtooltip.h>
 
 #include <assert.h>
 
@@ -226,18 +227,36 @@ GeneralPage::GeneralPage(Context *context) : context(context)
     // Athlete directory (home of athletes)
     //
     QVariant athleteDir = appsettings->value(this, GC_HOMEDIR);
-    athleteLabel = new QLabel(tr("Athlete Library"));
+    athleteLabel = new QLabel(tr("Default Athlete Library"));
     athleteDirectory = new QLineEdit;
     athleteDirectory->setText(athleteDir.toString() == "0" ? "" : athleteDir.toString());
     athleteWAS = athleteDirectory->text(); // remember what we started with ...
     athleteBrowseButton = new QPushButton(tr("Browse"));
     //XXathleteBrowseButton->setFixedWidth(120);
 
+    QString defaultLib(tr("The Default Athlete Library is the path GC will use at startup to find the\n"
+                          "Athlete database; it can overridden when a path is provided on the command line.\n"));
+    athleteLabel->setToolTip(defaultLib);
+    athleteDirectory->setToolTip(defaultLib);
     configLayout->addWidget(athleteLabel, 9 + offset,0, Qt::AlignRight);
     configLayout->addWidget(athleteDirectory, 9 + offset,1);
     configLayout->addWidget(athleteBrowseButton, 9 + offset,2);
 
     connect(athleteBrowseButton, SIGNAL(clicked()), this, SLOT(browseAthleteDir()));
+    offset++;
+
+    activeAthleteLabel = new QLabel(tr("Active Athlete Library"));
+    activeAthleteDirectory = new QLineEdit;
+    activeAthleteDirectory->setText(gcroot);
+    activeAthleteDirectory->setEnabled(false);
+
+    QString activeLib(tr("The Active Athlete Library is the path GC is currently using to access the Athlete data.\n"));
+    activeAthleteLabel->setToolTip(activeLib);
+    activeAthleteDirectory->setToolTip(activeLib);
+
+    configLayout->addWidget(activeAthleteLabel, 9 + offset, 0, Qt::AlignRight);
+    configLayout->addWidget(activeAthleteDirectory, 9 + offset, 1);
+    offset++;
 
 #ifdef GC_WANT_R
     //

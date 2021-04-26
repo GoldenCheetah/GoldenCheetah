@@ -116,6 +116,7 @@ class GeneralPage : public QWidget
         QLineEdit *garminHWMarkedit;
         QLineEdit *hystedit;
         QLineEdit *athleteDirectory;
+        QLineEdit *activeAthleteDirectory;
         QPushButton *athleteBrowseButton;
 
 #ifdef GC_WANT_PYTHON
@@ -131,6 +132,7 @@ class GeneralPage : public QWidget
         QLabel *langLabel;
         QLabel *warningLabel;
         QLabel *athleteLabel;
+        QLabel* activeAthleteLabel;
 
         struct {
             int unit;

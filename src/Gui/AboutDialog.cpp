@@ -64,9 +64,6 @@ AboutPage::AboutPage(Context *context) : context(context)
                 "<p>Source code can be obtained from<br>"
                 "<a href=\"https://www.goldencheetah.org/\">"
                 "https://www.goldencheetah.org/</a>."
-                "<br><p>Activity files and other data are stored in<br>"
-                "<a href=\"%1\">%2</a>"
-                "<p>Athlete ID %3<br>"
                 "<p>Trademarks used with permission<br>"
                 "BikeScore, xPower, SwimScore courtesy of <a href=\"http://www.physfarm.com\">"
                 "Physfarm Training Systems</a>.<br>"
@@ -77,11 +74,7 @@ AboutPage::AboutPage(Context *context) : context(context)
                 "<br> and is patent pending<br>"
                 "<br><img src=\":images/services/strava_compatible.png\"/><br>"
                 "</center>"
-                )
-                .arg(QString(QUrl::fromLocalFile(context->athlete->home->root().absolutePath()).toEncoded()))
-                .arg(context->athlete->home->root().absolutePath().replace(" ", "&nbsp;"))
-                .arg(context->athlete->id.toString())
-    );
+                ));
 
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->setSpacing(0);

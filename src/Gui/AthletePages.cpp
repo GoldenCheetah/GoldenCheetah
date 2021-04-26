@@ -201,6 +201,7 @@ AboutRiderPage::AboutRiderPage(QWidget *parent, Context *context) : QWidget(pare
     QLabel *sexlabel = new QLabel(tr("Sex"));
     weightlabel = new QLabel(tr("Weight"));
     heightlabel = new QLabel(tr("Height"));
+    QLabel* athleteIDlabel = new QLabel(tr("Athlete ID"));
 
     nickname = new QLineEdit(this);
     nickname->setText(appsettings->cvalue(context->athlete->cyclist, GC_NICKNAME, "").toString());
@@ -307,6 +308,16 @@ AboutRiderPage::AboutRiderPage(QWidget *parent, Context *context) : QWidget(pare
     connect(tireSizeCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(calcWheelSize()));
     connect(wheelSizeEdit, SIGNAL(textEdited(QString)), this, SLOT(resetWheelSize()));
 
+    athleteID = new QLineEdit(this);
+    athleteID->setText(context->athlete->id.toString());
+    athleteID->setEnabled(false);
+
+    QVariant activeAthleteDir = context->athlete->home->root().absolutePath();
+    QLabel* activeAthleteLabel = new QLabel(tr("Athlete Library Path"));
+    QLineEdit* activeAthleteDirectory = new QLineEdit;
+    activeAthleteDirectory->setText(activeAthleteDir.toString());
+    activeAthleteDirectory->setEnabled(false);
+
     Qt::Alignment alignment = Qt::AlignLeft|Qt::AlignVCenter;
 
     grid->addWidget(nicklabel, 0, 0, alignment);
@@ -325,6 +336,12 @@ AboutRiderPage::AboutRiderPage(QWidget *parent, Context *context) : QWidget(pare
     grid->addWidget(crankLengthCombo, 5, 1, alignment);
     grid->addWidget(wheelSizeLabel, 6, 0, alignment);
     grid->addLayout(wheelSizeLayout, 6, 1, 1, 2, alignment);
+
+    grid->addWidget(athleteIDlabel, 8, 0, alignment);
+    grid->addWidget(athleteID, 8, 1, 1, 2);
+
+    grid->addWidget(activeAthleteLabel, 9, 0, alignment);
+    grid->addWidget(activeAthleteDirectory, 9, 1, 1, 2);
 
     grid->addWidget(avatarButton, 0, 1, 4, 2, Qt::AlignRight|Qt::AlignVCenter);
     all->addLayout(grid);
