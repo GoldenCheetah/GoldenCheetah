@@ -956,6 +956,7 @@ FormField::editFinished()
         if (ourRideItem->ride()->deviceType() != text) {
             changed = true;
             ourRideItem->ride()->setDeviceType(text);
+            ourRideItem->ride()->setTag("Device", text);
         }
 
     } else if (definition.name == "Identifier") {
