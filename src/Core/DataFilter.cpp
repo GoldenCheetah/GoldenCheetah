@@ -2489,7 +2489,6 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
                                 !symbol.compare("Today", Qt::CaseInsensitive) ||
                                 !symbol.compare("Current", Qt::CaseInsensitive) ||
                                 !symbol.compare("RECINTSECS", Qt::CaseInsensitive) ||
-                                !symbol.compare("Device", Qt::CaseInsensitive) ||
                                 !symbol.compare("NA", Qt::CaseInsensitive) ||
                                 df->dataSeriesSymbols.contains(symbol) ||
                                 symbol == "isRide" || symbol == "isSwim" ||

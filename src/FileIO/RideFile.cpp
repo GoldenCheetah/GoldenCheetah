@@ -64,7 +64,7 @@ const QChar deltaChar(0x0394);
 
 RideFile::RideFile(const QDateTime &startTime, double recIntSecs) :
             wstale(true), startTime_(startTime), recIntSecs_(recIntSecs),
-            deviceType_("unknown"), data(NULL), wprime_(NULL), 
+            data(NULL), wprime_(NULL),
             weight_(0), totalCount(0), totalTemp(0), dstale(true)
 {
     command = new RideFileCommand(this);
@@ -79,13 +79,13 @@ RideFile::RideFile(const QDateTime &startTime, double recIntSecs) :
 // when constructing a temporary ridefile when computing intervals
 // and we want to get special fields and ESPECIALLY "CP" and "Weight"
 RideFile::RideFile(RideFile *p) :
-    wstale(true), recIntSecs_(p->recIntSecs_), deviceType_(p->deviceType_), data(NULL), wprime_(NULL), 
+    wstale(true), recIntSecs_(p->recIntSecs_), data(NULL), wprime_(NULL),
     weight_(p->weight_), totalCount(0), dstale(true)
 {
     startTime_ = p->startTime_;
     tags_ = p->tags_;
     referencePoints_ = p->referencePoints_;
-    deviceType_ = p->deviceType_;
+    setDeviceType(p->deviceType());
     fileFormat_ = p->fileFormat_;
     intervals_ = p->intervals_;
     calibrations_ = p->calibrations_;
@@ -100,7 +100,7 @@ RideFile::RideFile(RideFile *p) :
 }
 
 RideFile::RideFile() : 
-    wstale(true), recIntSecs_(0.0), deviceType_("unknown"), data(NULL), wprime_(NULL), 
+    wstale(true), recIntSecs_(0.0), data(NULL), wprime_(NULL),
     weight_(0), totalCount(0), dstale(true)
 {
     command = new RideFileCommand(this);
@@ -912,7 +912,6 @@ RideFile *RideFileFactory::openRideFile(Context *context, QFile &file,
 
         // set other "special" fields
         result->setTag("Filename", QFileInfo(file.fileName()).fileName());
-        result->setTag("Device", result->deviceType());
         result->setTag("File Format", result->fileFormat());
         if (context) result->setTag("Athlete", context->athlete->cyclist);
         result->setTag("Year", result->startTime().toString("yyyy"));
