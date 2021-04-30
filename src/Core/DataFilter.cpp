@@ -1996,7 +1996,8 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
                             int field = context->athlete->measures->getFieldSymbols(group).indexOf(field_symbol);
                             if (field < 0 && field_symbol != "date") {
                                 leaf->inerror = true;
-                                DataFiltererrors << QString(tr("invalid measures field '%1' for group '%2'.").arg(field_symbol).arg(group_symbol));
+                                DataFiltererrors << QString(tr("invalid measures field '%1' for group '%2', should be one of: %3.").arg(field_symbol).arg(group_symbol)
+                                .arg(context->athlete->measures->getFieldSymbols(group).join(", ")));
                             }
                         }
                     }
