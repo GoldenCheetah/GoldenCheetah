@@ -77,7 +77,6 @@ class Strava : public CloudService {
         QByteArray* prepareResponse(QByteArray* data);
 
         void addSamples(RideFile* ret, QString remoteid);
-        void addEquipment(RideFile* ret, QString gear_id);
         void fixLapSwim(RideFile* ret, QJsonArray laps);
         void fixSmartRecording(RideFile* ret);
 
