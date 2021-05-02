@@ -1833,6 +1833,9 @@ AllPlot::recalc(AllPlotObject *objects)
     // if recintsecs is longer than the smoothing, or equal to the smoothing there is no point in even trying
     int applysmooth = smooth <= rideItem->ride()->recIntSecs() ? 0 : smooth;
 
+    // Smoothing is time based, when secs are not available it doesn't work.
+    if (!rideItem->ride()->isDataPresent(RideFile::secs)) applysmooth = 0;
+
     // compare mode breaks
     if (context->isCompareIntervals && applysmooth == 0) applysmooth = 1;
     
