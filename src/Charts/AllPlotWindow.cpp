@@ -1813,8 +1813,10 @@ AllPlotWindow::rideSelected()
         return;
     }
 
-    // ignore if null, or manual / empty
-    if (!ride || !ride->ride() || !ride->ride()->dataPoints().count()) {
+    // ignore if null, or manual / empty, or x-axis series is not present
+    if (!ride || !ride->ride() || !ride->ride()->dataPoints().count() ||
+        (comboDistance->currentIndex() == 1 && !ride->ride()->isDataPresent(RideFile::km)) ||
+        (comboDistance->currentIndex() != 1 && !ride->ride()->isDataPresent(RideFile::secs))) {
         current = NULL;
         setIsBlank(true);
         return;
