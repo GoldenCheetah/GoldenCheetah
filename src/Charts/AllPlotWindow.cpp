@@ -3360,16 +3360,8 @@ AllPlotWindow::setByDistance(int value)
     intervalPlot->setByDistance(value);
     allPlot->setByDistance(value);
 
-    // refresh controls, specifically spanSlider
-    setAllPlotWidgets(fullPlot->rideItem);
-
-    // refresh
-    setupSeriesStack = setupStack = false;
-    redrawFullPlot();
-    redrawAllPlot();
-    setupStackPlots();
-    setupSeriesStackPlots();
-    redrawIntervalPlot();
+    // replot
+    forceReplot();
 
     active = false;
 }
