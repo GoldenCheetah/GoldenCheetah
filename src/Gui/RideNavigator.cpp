@@ -123,8 +123,13 @@ RideNavigator::RideNavigator(Context *context, bool mainwindow) : GcChartWindow(
     // refresh when rides added/removed
     connect(context, SIGNAL(rideAdded(RideItem*)), this, SLOT(refresh()));
     connect(context, SIGNAL(rideDeleted(RideItem*)), this, SLOT(rideDeleted(RideItem*)));
-    connect(context, SIGNAL(rideSelected(RideItem*)), this, SLOT(setRide(RideItem*)));
 
+    // Update table once, after when ride importation is complete
+    connect(context, SIGNAL(ridesImportComplete()), this, SLOT(refresh()));
+
+    // user selected a different ride somewhere else, we need to align with that
+    connect(context, SIGNAL(rideSelected(RideItem*)), this, SLOT(setRide(RideItem*)));
+        
     // user selected a ride on the ride list, we should reflect that too..
     connect(tableView, SIGNAL(rowSelected(QItemSelection)), this, SLOT(selectionChanged(QItemSelection)));
 
@@ -201,7 +206,10 @@ RideNavigator::configChanged(qint32 state)
 void
 RideNavigator::rideDeleted(RideItem*item)
 {
-    if (currentItem == item) currentItem = NULL;
+    if (currentItem == item) {
+        disconnect(currentItem, SIGNAL(rideMetadataChanged()), this, SLOT(refresh()));
+        currentItem = NULL;
+    }
     refresh();
 }
 
@@ -211,6 +219,10 @@ RideNavigator::refresh()
     active=false;
 
     setWidth(geometry().width());
+
+    tableView->doItemsLayout();
+    repaint();
+
     cursorRide();
 }
 
@@ -951,6 +963,10 @@ RideNavigator::setRide(RideItem*rideItem)
     // if we have a selection and its this one just ignore.
     if (rideItem == NULL || (currentItem == rideItem && tableView->selectionModel()->selectedRows().count() != 0)) return;
 
+    // if the selection is different current item then disconnect notifications for the current item
+    if ((currentItem != NULL) && (rideItem->fileName != currentItem->fileName))
+        disconnect(currentItem, SIGNAL(rideMetadataChanged()), this, SLOT(refresh()));
+
     for (int i=0; i<tableView->model()->rowCount(); i++) {
 
         QModelIndex group = tableView->model()->index(i,0,QModelIndex());
@@ -966,6 +982,10 @@ RideNavigator::setRide(RideItem*rideItem)
                 tableView->scrollTo(tableView->model()->index(j,3,group), QAbstractItemView::PositionAtCenter);
 
                 currentItem = rideItem;
+
+                // add notifications for the new current item
+                connect(currentItem, SIGNAL(rideMetadataChanged()), this, SLOT(refresh()));
+
                 repaint();
                 active = false;
                 return;
@@ -985,11 +1005,18 @@ RideNavigator::selectionChanged(QItemSelection selected)
     QModelIndex fileIndex = tableView->model()->index(ref.row(), 3, ref.parent());
     QString filename = tableView->model()->data(fileIndex, Qt::DisplayRole).toString();
 
+    // if selected is different current item then disconnect notifications for the current item
+    if ((currentItem != NULL) && (filename != currentItem->fileName))
+        disconnect(currentItem, SIGNAL(rideMetadataChanged()), this, SLOT(refresh()));
+
     // lets make sure we know what we've selected, so we don't
     // select it twice
     foreach(RideItem *item, context->athlete->rideCache->rides()) {
        if (item->fileName == filename) {
            currentItem = item;
+
+           // add notifications for the new current item
+           connect(currentItem, SIGNAL(rideMetadataChanged()), this, SLOT(refresh()));
            break;
        }
     }

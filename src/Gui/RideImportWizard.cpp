@@ -1134,6 +1134,10 @@ RideImportWizard::abortClicked()
         this->repaint();
     }
 
+    // Notify others that the rides importation is complete, useful when more
+    // than 20 rides are imported as they are not then individual signalled.
+    context->notifyRidesImportComplete();
+
     // how did we get on in the end then ...
     int completed = 0;
     for (int i=0; i< filenames.count(); i++)
