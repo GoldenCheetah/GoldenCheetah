@@ -72,10 +72,21 @@ PMCData::PMCData(Context *context, Specification spec, Leaf *expr, DataFilterRun
     // get defaults if not passed
     useDefaults = false;
 
-    // use an expression
-    fromDataFilter = true;
-    this->df = df;
-    this->expr = expr;
+    // If expr is just a metric name, we can use the faster and specific case
+    QString metricName = df->lookupMap.value(expr->toString(),"");
+    RideMetricFactory &factory = RideMetricFactory::instance();
+    if (factory.haveMetric(metricName)) {
+        // use a metric name
+        metricName_ = metricName;
+        fromDataFilter = false;
+        df = NULL;
+        expr = NULL;
+    } else {
+        // use an expression - TODO: are df and expr still valid at refresh?
+        fromDataFilter = true;
+        this->df = df;
+        this->expr = expr;
+    }
 
     if (ltsDays < 0) {
         QVariant lts = appsettings->cvalue(context->athlete->cyclist, GC_LTS_DAYS);
