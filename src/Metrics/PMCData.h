@@ -116,7 +116,6 @@ class PMCData : public QObject {
         Specification specification_;
 
         bool fromDataFilter;
-        DataFilterRuntime *df;
         Leaf *expr;
 
         // parameters
