@@ -41,7 +41,6 @@ PMCData::PMCData(Context *context, Specification spec, QString metricName, int s
 
     // we're not from a datafilter
     fromDataFilter = false;
-    df = NULL;
     expr = NULL;
 
     if (ltsDays < 0) {
@@ -79,12 +78,10 @@ PMCData::PMCData(Context *context, Specification spec, Leaf *expr, DataFilterRun
         // use a metric name
         metricName_ = metricName;
         fromDataFilter = false;
-        df = NULL;
         expr = NULL;
     } else {
-        // use an expression - TODO: are df and expr still valid at refresh?
+        // use an expression
         fromDataFilter = true;
-        this->df = df;
         this->expr = expr;
     }
 
@@ -255,6 +252,8 @@ void PMCData::refresh()
         }
     }
 
+    DataFilter* df = new DataFilter(this, context);
+
     // add the stress scores
     foreach(RideItem *item, context->athlete->rideCache->rides()) {
 
@@ -267,7 +266,7 @@ void PMCData::refresh()
             // although metrics are cleansed, we check here because development
             // builds have a rideDB.json that has nan and inf values in it.
             double value = 0;;
-            if (fromDataFilter) value = expr->eval(df, expr, 0, 0, item).number();
+            if (fromDataFilter) value = expr->eval(&df->rt, expr, 0, 0, item).number();
             else value = item->getForSymbol(metricName_);
 
             if (!std::isinf(value) && !std::isnan(value)) {
@@ -279,6 +278,8 @@ void PMCData::refresh()
             }
         }
     }
+
+    delete df;
 
     //
     // STEP THREE Calculate sts/lts, sb and rr
