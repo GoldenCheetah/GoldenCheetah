@@ -231,6 +231,7 @@
 #define SRM_OFFSET                      "<global-trainmode>srm/offset"
 #define TRAIN_MULTI                     "<global-trainmode>train/multi"
 #define TRAIN_AUTOCONNECT               "<global-trainmode>train/autoconnect"
+#define TRAIN_STARTDELAY                "<global-trainmode>train/startdelay"
 #define TRAIN_AUTOHIDE                  "<global-trainmode>train/autohide"
 #define TRAIN_LAPALERT                  "<global-trainmode>train/lapalert"
 #define TRAIN_USESIMULATEDSPEED         "<global-trainmode>train/usesimulatedspeed"

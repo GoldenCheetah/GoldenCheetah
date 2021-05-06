@@ -337,11 +337,14 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
     gui_timer = new QTimer(this);
     disk_timer = new QTimer(this);
     load_timer = new QTimer(this);
+    start_timer = new QTimer(this);
+    start_timer->setSingleShot(true);
 
     session_time = QTime();
     session_elapsed_msec = 0;
     lap_time = QTime();
     lap_elapsed_msec = 0;
+    secs_to_start = 0;
 
     rrFile = recordFile = vo2File = NULL;
     lastRecordSecs = 0;
@@ -367,6 +370,7 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
     connect(gui_timer, SIGNAL(timeout()), this, SLOT(guiUpdate()));
     connect(disk_timer, SIGNAL(timeout()), this, SLOT(diskUpdate()));
     connect(load_timer, SIGNAL(timeout()), this, SLOT(loadUpdate()));
+    connect(start_timer, SIGNAL(timeout()), this, SLOT(Start()));
 
     configChanged(CONFIG_APPEARANCE | CONFIG_DEVICES | CONFIG_ZONES); // will reset the workout tree
     setLabels();
@@ -1178,6 +1182,18 @@ void TrainSidebar::Start()       // when start button is pressed
         emit setNotification(tr("Paused.."), 2);
 
     } else if (status&RT_CONNECTED) {
+
+        // Delayed start handling
+        if (secs_to_start == 0) {
+            secs_to_start = appsettings->value(this, TRAIN_STARTDELAY, 0).toUInt();
+        } else {
+            secs_to_start--;
+        }
+        if (secs_to_start > 0) {
+            emit setNotification(tr("Starting in %1").arg(secs_to_start), 1);
+            start_timer->start(1000);
+            return;
+        }
 
         qDebug() << "start...";
 

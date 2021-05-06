@@ -236,6 +236,8 @@ class TrainOptionsPage : public QWidget
         QCheckBox   *useSimulatedHypoxia;
         QCheckBox   *multiCheck;
         QCheckBox   *autoConnect;
+        QLabel      *delayLabel;
+        QSpinBox    *startDelay;
         QCheckBox   *autoHide;
         QCheckBox   *lapAlert;
 };
