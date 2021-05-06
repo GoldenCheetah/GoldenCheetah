@@ -300,11 +300,12 @@ class TrainSidebar : public GcWindow
              load_msecs;
         QTime load_period;
 
-        uint session_elapsed_msec, lap_elapsed_msec;
+        uint session_elapsed_msec, lap_elapsed_msec, secs_to_start;
         QTime session_time, lap_time;
 
         QTimer      *gui_timer,     // refresh the gui
                     *load_timer,    // change the load on the device
+                    *start_timer,   // delayed start
                     *disk_timer;    // write to .CSV file
 
         bool autoConnect;
