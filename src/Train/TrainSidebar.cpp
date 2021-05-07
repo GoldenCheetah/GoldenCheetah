@@ -1558,6 +1558,12 @@ void TrainSidebar::Connect()
 
 void TrainSidebar::Disconnect()
 {
+    // cancel any pending start
+    if (secs_to_start > 0) {
+        secs_to_start = 0;
+        start_timer->stop();
+    }
+
     // don't try to disconnect if running or not connected
     if ((status&RT_RUNNING) || ((status&RT_CONNECTED) == 0)) return;
 
