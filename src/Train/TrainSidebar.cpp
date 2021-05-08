@@ -1270,10 +1270,16 @@ void TrainSidebar::Start()       // when start button is pressed
         }
 
         if (status & RT_RECORDING) {
+
+            QString workoutName;
+            if (context->currentErgFile()) {
+                workoutName = QFileInfo(context->currentErgFile()->filename).baseName();
+            }
+
             QDateTime now = QDateTime::currentDateTime();
 
             // setup file
-            QString filename = now.toString(QString("yyyy_MM_dd_hh_mm_ss")) + QString(".csv");
+            QString filename = now.toString(QString("yyyy_MM_dd_hh_mm_ss")) + "_" + workoutName + QString(".csv");
 
             if (!context->athlete->home->records().exists())
                 context->athlete->home->createAllSubdirs();
