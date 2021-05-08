@@ -51,7 +51,7 @@
     } while(0)
 #endif
 
-static const QString VELOHERO_URL( "http://app.velohero.com" );
+static const QString VELOHERO_URL( "https://app.velohero.com" );
 
 Velohero::Velohero(Context *context) : CloudService(context), context(context), root_(NULL) {
 
@@ -99,6 +99,7 @@ Velohero::open(QStringList &errors)
     request.setRawHeader("Accept-Encoding", "identity");
     request.setRawHeader("Accept", "application/xml");
     request.setRawHeader("Accept-Charset", "utf-8");
+    request.setRawHeader("User-Agent", "GoldenCheetah/1.0");
 
     QEventLoop loop;
     reply = nam->get(request);
@@ -179,6 +180,7 @@ Velohero::writeFile(QByteArray &data, QString remotename, RideFile *ride)
     request.setRawHeader( "Accept-Encoding", "identity" );
     request.setRawHeader( "Accept", "application/xml" );
     request.setRawHeader( "Accept-Charset", "utf-8" );
+    request.setRawHeader( "User-Agent", "GoldenCheetah/1.0" );
 
     // this must be performed asyncronously and call made
     // to notifyWriteCompleted(QString remotename, QString message) when done
