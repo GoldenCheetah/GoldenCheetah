@@ -811,6 +811,18 @@ TrainSidebar::workoutTreeWidgetSelectionChanged()
             ergFileQueryAdapter.setErgFile(ergFile);
             adjustIntensity(100);
             setLabels();
+
+#if !defined GC_VIDEO_NONE
+            // Try to select matching media and videosync files
+            QString workoutName = QFileInfo(filename).baseName();
+            mediaTree->setFocus();
+            mediaTree->keyboardSearch(workoutName);
+#ifdef GC_HAVE_VLC  // RLV currently only support for VLC
+            videosyncTree->setFocus();
+            videosyncTree->keyboardSearch(workoutName);
+#endif
+            workoutTree->setFocus();
+#endif
         } else {
 
             // couldn't parse fall back to ERG mode
