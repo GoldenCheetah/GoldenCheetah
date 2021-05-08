@@ -51,7 +51,7 @@
     } while(0)
 #endif
 
-static const QString VELOHERO_URL( "http://app.velohero.com" );
+static const QString VELOHERO_URL( "https://app.velohero.com" );
 
 Velohero::Velohero(Context *context) : CloudService(context), context(context), root_(NULL) {
 
