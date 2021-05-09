@@ -43,6 +43,10 @@ EpmParser::startElement(const QString&, const QString&,
 
         double secs = attrs.value("frame").toDouble() / framerate;
         double dist = attrs.value("distance").toDouble() / 1000.0;
+        // Old EPM files may have dpf instead of distance tag.
+        if (dist == 0) {
+            dist = lastDist + attrs.value("dpf").toDouble() * (secs - lastSecs) * framerate / 1000.0;
+        }
         double speed = 3600.0*(dist - lastDist)/(secs - lastSecs);
         lastSecs = secs;
         lastDist = dist;
