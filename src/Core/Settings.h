@@ -181,6 +181,8 @@
 #define GC_DPFG_STOP                    "<global-general>dataprocess/fixgaps/stop"
 #define GC_DPFS_MAX                     "<global-general>dataprocess/fixspikes/max"
 #define GC_DPFS_VARIANCE                "<global-general>dataprocess/fixspikes/variance"
+#define GC_DPFS_MEDWINSIZ               "<global-general>dataprocess/fixspikes/medwinsiz"
+#define GC_DPFS_MEDALGO                 "<global-general>dataprocess/fixspikes/medalgo"
 #define GC_DPTA                         "<global-general>dataprocess/torqueadjust/adjustment"
 #define GC_DPPA                         "<global-general>dataprocess/poweradjust/adjustment"
 #define GC_DPPA_ABS                     "<global-general>dataprocess/poweradjust/adjustment_abs"
