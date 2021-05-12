@@ -63,7 +63,7 @@ EpmParser::startElement(const QString&, const QString&,
         double lon = attrs.value("lon").toDouble();
         double alt = attrs.value("height").toDouble();
         double secs = rideFile->distanceToTime(dist);
-        rideFile->appendOrUpdatePoint(secs, 0, 0, dist, 0, 0, 0, alt,
+        rideFile->appendOrUpdatePoint(secs, 0, 0, 0, 0, 0, 0, alt,
                                       lon, lat, 0, 0.0, RideFile::NA, 0.0,
                                       0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
                                       0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
