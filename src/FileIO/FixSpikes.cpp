@@ -238,7 +238,8 @@ FixSpikes::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString op
             if (pos > 0) left = ride->dataPoints()[pos-1]->watts;
             if (pos < (ride->dataPoints().count()-1)) right = ride->dataPoints()[pos+1]->watts;
 
-            ride->command->setPointValue(pos, RideFile::watts, (left+right)/2.0);
+            // Integer precision should be prefectly adequate for our correction.
+            ride->command->setPointValue(pos, RideFile::watts, floor(((left + right) / 2.0)+ 0.5));
         }
 
         delete outliers;
