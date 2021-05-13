@@ -445,6 +445,16 @@ QVector<FormField *> RideMetadata::getFormFields()
     return formFields;
 }
 
+// Are there fields enabled for CalendarText?
+bool
+RideMetadata::hasCalendarText()
+{
+    foreach (FieldDefinition field, getFields()) {
+        if (field.diary) return true;
+    }
+    return false;
+}
+
 // Construct the summary text used on the calendar
 QString
 RideMetadata::calendarText(RideItem *rideItem)
