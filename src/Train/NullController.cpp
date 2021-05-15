@@ -55,7 +55,7 @@ bool NullController::find() {
     return true;
 }
 
-void NullController::setMode(int i) {
+void NullController::setMode(int ) {
     restart();
 }
 

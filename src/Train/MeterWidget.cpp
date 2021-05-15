@@ -115,7 +115,7 @@ QSize MeterWidget::minimumSize() const
     return QSize(m_Width, m_Height);
 }
 
-void MeterWidget::startPlayback(Context* context)
+void MeterWidget::startPlayback(Context* )
 {
 
 }
