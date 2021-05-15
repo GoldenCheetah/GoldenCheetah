@@ -22,6 +22,9 @@
 #endif
 
 
+#pragma GCC diagnostic ignored "-Wimplicit-fallthrough"
+#pragma GCC diagnostic ignored "-Wcpp"
+
 /* precision-specific definitions */
 #define LEVMAR_CHKJAC LM_ADD_PREFIX(levmar_chkjac)
 #define LEVMAR_FDIF_FORW_JAC_APPROX LM_ADD_PREFIX(levmar_fdif_forw_jac_approx)
@@ -426,7 +429,7 @@ int info, rank, worksz, *iwork, iworksz;
 static int LEVMAR_LUINVERSE(LM_REAL *A, LM_REAL *B, int m)
 {
 void *buf=NULL;
-int buf_sz=0;
+//int buf_sz=0;
 
 register int i, j, k, l;
 int *idx, maxi=-1, idx_sz, a_sz, x_sz, work_sz, tot_sz;
@@ -439,7 +442,7 @@ LM_REAL *a, *x, *work, max, sum, tmp;
   work_sz=m;
   tot_sz=(a_sz + x_sz + work_sz)*sizeof(LM_REAL) + idx_sz*sizeof(int); /* should be arranged in that order for proper doubles alignment */
 
-  buf_sz=tot_sz;
+  //buf_sz=tot_sz;
   buf=(void *)malloc(tot_sz);
   if(!buf){
     fprintf(stderr, RCAT("memory allocation in ", LEVMAR_LUINVERSE) "() failed!\n");
