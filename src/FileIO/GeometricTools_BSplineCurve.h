@@ -2,6 +2,10 @@
 // BSplineCurve.h from Geometric Tools along with all the GTC headers
 // it requires.
 
+// disable warning messages
+#pragma GCC diagnostic ignored "-Wunused-value"
+#pragma GCC diagnostic ignored "-Wunused-but-set-variable"
+
 #define LogError(a)    (0); return 0;
 #define LogAssert(a,b) (0)
 
