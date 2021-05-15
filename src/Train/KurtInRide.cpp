@@ -171,7 +171,7 @@ void inride_BTDeviceInfoToSystemID(const QBluetoothDeviceInfo &devinfo, uint8_t 
     }
 
 
-    qDebug() << "SystemID: " << hex << systemID[0] << systemID[1] << systemID[2] << systemID[3] << systemID[4] << systemID[5];
+    qDebug() << "SystemID: " << Qt::hex << systemID[0] << systemID[1] << systemID[2] << systemID[3] << systemID[4] << systemID[5];
 }
 
 
@@ -232,6 +232,7 @@ alpha_coast alpha(uint32_t interval, uint32_t ticks, uint32_t revs, double speed
 int power_for_speed(double kph, double spindown, double alpha, uint32_t revolutions)
 {
     Q_UNUSED(alpha);
+    Q_UNUSED(revolutions);
     double mph = kph * 0.621371;
     double rawPower = (5.244820 * mph) + (0.019168 * (mph * mph * mph));
     double dragOffset = 0;
