@@ -381,7 +381,7 @@ GCColor::themes()
     return allThemes;
 }
 
-ColorEngine::ColorEngine(GlobalContext *gc) : gc(gc), defaultColor(QColor(Qt::white))
+ColorEngine::ColorEngine(GlobalContext *gc) : defaultColor(QColor(Qt::white)), gc(gc)
 {
     configChanged(CONFIG_NOTECOLOR);
     connect(gc, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));

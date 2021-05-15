@@ -24,6 +24,8 @@
 #include <QObject>
 #include <QColor>
 #include <QLabel>
+#include <QGradient>
+#include <QLinearGradient>
 
 
 // A selection of distinct colours, user can adjust also
