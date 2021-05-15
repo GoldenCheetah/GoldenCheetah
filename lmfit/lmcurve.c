@@ -32,6 +32,7 @@ void lmcurve_evaluate(
     const double *const par, const int m_dat, const void *const data,
     double *const fvec, int *const info)
 {
+    (void)(info);
     for (int i = 0; i < m_dat; i++ )
         fvec[i] =
             ((lmcurve_data_struct*)data)->y[i] -
