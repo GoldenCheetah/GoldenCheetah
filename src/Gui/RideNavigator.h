@@ -185,6 +185,7 @@ class RideNavigator : public GcChartWindow
         NavigatorCellDelegate *delegate;
         QVBoxLayout *mainLayout;
         RideItem *currentItem;
+        bool hasCalendarText;
 
         // properties
         int _sortByIndex;
