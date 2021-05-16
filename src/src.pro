@@ -57,8 +57,14 @@ QMAKE_CFLAGS_ISYSTEM =
 ###=======================================================================
 
 # qwt, qxt, libz, json, lmfit and qwtcurve
-INCLUDEPATH += ../qwt/src ../contrib/qxt/src ../contrib/qtsolutions/json \
-               ../contrib/qtsolutions/qwtcurve ../contrib/lmfit ../contrib/levmar
+INCLUDEPATH +=  ../qwt/src \
+                ../contrib/qxt/src \
+                ../contrib/qtsolutions/json \
+                ../contrib/qtsolutions/qwtcurve \
+                ../contrib/lmfit \
+                ../contrib/levmar \
+                ../contrib/boost 
+
 DEFINES += QXT_STATIC
 
 # to make sure we are toolchain neutral we NEVER refer to a lib
@@ -748,7 +754,8 @@ HEADERS += ../contrib/qtsolutions/codeeditor/codeeditor.h ../contrib/qtsolutions
            ../contrib/qxt/src/qxtspanslider_p.h ../contrib/qxt/src/qxtstringspinbox.h ../contrib/qzip/zipreader.h \
            ../contrib/qzip/zipwriter.h ../contrib/lmfit/lmcurve.h  ../contrib/lmfit/lmcurve_tyd.h \
            ../contrib/lmfit/lmmin.h  ../contrib/lmfit/lmstruct.h \
-           ../contrib/levmar/compiler.h  ../contrib/levmar/levmar.h  ../contrib/levmar/lm.h  ../contrib/levmar/misc.h
+           ../contrib/levmar/compiler.h  ../contrib/levmar/levmar.h  ../contrib/levmar/lm.h  ../contrib/levmar/misc.h \
+           ../contrib/boost/GeometricTools_BSplineCurve.h
 
 # Train View
 HEADERS += Train/AddDeviceWizard.h Train/CalibrationData.h Train/ComputrainerController.h Train/Computrainer.h Train/DeviceConfiguration.h \
