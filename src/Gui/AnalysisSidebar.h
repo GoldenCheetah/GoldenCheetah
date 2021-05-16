@@ -97,6 +97,7 @@ class AnalysisSidebar : public QWidget
         QWidget *activityHistory;
         GcSplitterItem *activityItem;
         QSignalMapper *groupByMapper;
+        QSignalMapper* activitySizeMapper;
 
         GcSplitterItem *calendarItem;
         GcMultiCalendar *calendarWidget;

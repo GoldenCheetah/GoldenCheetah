@@ -35,6 +35,9 @@
 #include <QStyleFactory>
 #include <QScrollBar>
 
+ // Default GC activity display
+const int DEFAULT_ACT_ROWS = 4;
+
 RideNavigator::RideNavigator(Context *context, bool mainwindow) : GcChartWindow(context), context(context), active(false), _groupBy(-1)
 {
     // get column headings
@@ -47,6 +50,8 @@ RideNavigator::RideNavigator(Context *context, bool mainwindow) : GcChartWindow(
     this->mainwindow = mainwindow;
     _groupBy = -1;
     fontHeight = QFontMetrics(QFont()).height();
+    numActivityRows = DEFAULT_ACT_ROWS;
+
     reverseColor = GlobalContext::context()->colorEngine->reverseColor;
     currentItem = NULL;
     hasCalendarText = false;
@@ -341,6 +346,9 @@ RideNavigator::resetView()
         columnnumber++;
     }
 
+    // Reset the displayed activity lines to the default
+    numActivityRows = DEFAULT_ACT_ROWS;
+
     setGroupByColumn();
 
     active = false;
@@ -391,6 +399,26 @@ QStringList
 RideNavigator::columnNames() const
 {
     return visualHeadings;
+}
+
+void
+RideNavigator::setActivitySize(QString size)
+{
+    if (size == "1-Line") {
+        numActivityRows = 1; // ensure the same appearance as no calendar data
+    }
+    else if (size == "2-Lines") {
+        numActivityRows = 2;
+    }
+    else if (size == "3-Lines") {
+        numActivityRows = 3;
+    }
+    else if (size == "Default") {
+        numActivityRows = DEFAULT_ACT_ROWS; // ensure the same default GC behavior
+    }
+
+    // Update the heights
+    tableView->doItemsLayout();
 }
 
 void
@@ -1077,7 +1105,7 @@ QSize NavigatorCellDelegate::sizeHint(const QStyleOptionViewItem & /*option*/, c
 
     if (rideNavigator->groupByModel->mapToSource(rideNavigator->sortModel->mapToSource(index)) != QModelIndex() &&
         rideNavigator->hasCalendarText) {
-        s.setHeight((rideNavigator->fontHeight+2) * 4);
+        s.setHeight((rideNavigator->fontHeight+2) * (rideNavigator->numActivityRows));
     } else s.setHeight(rideNavigator->fontHeight + 2);
     return s;
 }
@@ -1214,12 +1242,12 @@ void NavigatorCellDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
 
         // now get the calendar text to appear ...
         if (rideNavigator->hasCalendarText) {
-            QRect high(myOption.rect.x()+myOption.rect.width() - (7*dpiXFactor), myOption.rect.y(), (7*dpiXFactor), (rideNavigator->fontHeight+2) * 4);
+            QRect high(myOption.rect.x()+myOption.rect.width() - (7*dpiXFactor), myOption.rect.y(), (7*dpiXFactor), (rideNavigator->fontHeight+2) * (rideNavigator->numActivityRows));
 
             myOption.rect.setX(0);
             myOption.rect.setY(myOption.rect.y() + rideNavigator->fontHeight + 2);//was +23
             myOption.rect.setWidth(rideNavigator->pwidth);
-            myOption.rect.setHeight(rideNavigator->fontHeight * 3); //was 36
+            myOption.rect.setHeight(rideNavigator->fontHeight * (rideNavigator->numActivityRows-1)); //was 36
             //myOption.font.setPointSize(myOption.font.pointSize());
             myOption.font.setWeight(QFont::Normal);
 

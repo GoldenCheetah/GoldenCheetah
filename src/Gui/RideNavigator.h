@@ -155,6 +155,7 @@ class RideNavigator : public GcChartWindow
         QStringList columnNames() const;
         void setGroupByColumnName(QString); // set blank turns it off
         void noGroups() { currentColumn=-1; setGroupByColumn(); }
+        void setActivitySize(QString); // set activity lines displayed
 
         QString widths() const { return _widths; }
         void setWidths (QString x="") { _widths = x; resetView(); } // only reset once widths are set, witdths="" resets to default columns
@@ -171,6 +172,7 @@ class RideNavigator : public GcChartWindow
         // keep track of the headers
         QList<QString> logicalHeadings;
         QList<QString> visualHeadings;
+        int numActivityRows;
 
         // this maps friendly names to metric names
         QMap <QString, QString> nameMap;
