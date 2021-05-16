@@ -6,6 +6,9 @@
 ###############################################################################
 
 !versionAtLeast(QT_VERSION, 5.13):error("Use at least Qt version 5.13")
+greaterThan(QT_MAJOR_VERSION, 5) {
+    error("Qt6 is unsupported whilst we wait for key dependencies to be included.")
+}
 
 ###==========================
 ### IMPORT USER CONFIGURATION
@@ -53,7 +56,8 @@ QMAKE_CFLAGS_ISYSTEM =
 ###=======================================================================
 
 # qwt, qxt, libz, json, lmfit and qwtcurve
-INCLUDEPATH += ../qwt/src ../qxt/src ../qtsolutions/json ../qtsolutions/qwtcurve ../lmfit ../levmar
+INCLUDEPATH += ../qwt/src ../contrib/qxt/src ../contrib/qtsolutions/json \
+               ../contrib/qtsolutions/qwtcurve ../contrib/lmfit ../contrib/levmar
 DEFINES += QXT_STATIC
 
 # to make sure we are toolchain neutral we NEVER refer to a lib
@@ -174,8 +178,8 @@ macx {
 }
 
 #### these are no longer non-mac only
-HEADERS += ../qtsolutions/segmentcontrol/qtsegmentcontrol.h
-SOURCES += ../qtsolutions/segmentcontrol/qtsegmentcontrol.cpp
+HEADERS += ../contrib/qtsolutions/segmentcontrol/qtsegmentcontrol.h
+SOURCES += ../contrib/qtsolutions/segmentcontrol/qtsegmentcontrol.cpp
 
 # X11
 if (defined(GC_WANT_X11)) {
@@ -498,42 +502,40 @@ contains(DEFINES, "GC_WANT_R") {
 
 
 ###==================================
-### OPTIONAL => HTTP API WEB SERVICES
+### HTTP API WEB SERVICES
 ###==================================
 
-!isEmpty (HTPATH) {
+HTPATH = ../contrib/httpserver
+INCLUDEPATH += $$HTPATH
+DEPENDPATH += $$HTPATH
 
-    INCLUDEPATH += $$HTPATH
-    DEPENDPATH += $$HTPATH
+DEFINES += GC_WANT_HTTP
 
-    DEFINES += GC_WANT_HTTP
+HEADERS +=  Core/APIWebService.h
+SOURCES +=  Core/APIWebService.cpp
 
-    HEADERS +=  Core/APIWebService.h
-    SOURCES +=  Core/APIWebService.cpp
-
-    HEADERS +=  $$HTPATH/httpglobal.h \
-                $$HTPATH/httplistener.h \
-                $$HTPATH/httpconnectionhandler.h \
-                $$HTPATH/httpconnectionhandlerpool.h \
-                $$HTPATH/httprequest.h \
-                $$HTPATH/httpresponse.h \
-                $$HTPATH/httpcookie.h \
-                $$HTPATH/httprequesthandler.h \
-                $$HTPATH/httpsession.h \
-                $$HTPATH/httpsessionstore.h \
-                $$HTPATH/staticfilecontroller.h
-    SOURCES +=  $$HTPATH/httpglobal.cpp \
-                $$HTPATH/httplistener.cpp \
-                $$HTPATH/httpconnectionhandler.cpp \
-                $$HTPATH/httpconnectionhandlerpool.cpp \
-                $$HTPATH/httprequest.cpp \
-                $$HTPATH/httpresponse.cpp \
-                $$HTPATH/httpcookie.cpp \
-                $$HTPATH/httprequesthandler.cpp \
-                $$HTPATH/httpsession.cpp \
-                $$HTPATH/httpsessionstore.cpp \
-                $$HTPATH/staticfilecontroller.cpp
-}
+HEADERS +=  $$HTPATH/httpglobal.h \
+            $$HTPATH/httplistener.h \
+            $$HTPATH/httpconnectionhandler.h \
+            $$HTPATH/httpconnectionhandlerpool.h \
+            $$HTPATH/httprequest.h \
+            $$HTPATH/httpresponse.h \
+            $$HTPATH/httpcookie.h \
+            $$HTPATH/httprequesthandler.h \
+            $$HTPATH/httpsession.h \
+            $$HTPATH/httpsessionstore.h \
+            $$HTPATH/staticfilecontroller.h
+SOURCES +=  $$HTPATH/httpglobal.cpp \
+            $$HTPATH/httplistener.cpp \
+            $$HTPATH/httpconnectionhandler.cpp \
+            $$HTPATH/httpconnectionhandlerpool.cpp \
+            $$HTPATH/httprequest.cpp \
+            $$HTPATH/httpresponse.cpp \
+            $$HTPATH/httpcookie.cpp \
+            $$HTPATH/httprequesthandler.cpp \
+            $$HTPATH/httpsession.cpp \
+            $$HTPATH/httpsessionstore.cpp \
+            $$HTPATH/staticfilecontroller.cpp
 
 
 ###=====================================================
@@ -739,10 +741,12 @@ HEADERS += Metrics/Banister.h Metrics/CPSolver.h Metrics/Estimator.h Metrics/Ext
 HEADERS += Planning/PlanningWindow.h
 
 # contrib
-HEADERS += ../qtsolutions/codeeditor/codeeditor.h ../qtsolutions/json/mvjson.h ../qtsolutions/qwtcurve/qwt_plot_gapped_curve.h \
-           ../qxt/src/qxtspanslider.h ../qxt/src/qxtspanslider_p.h ../qxt/src/qxtstringspinbox.h ../qzip/zipreader.h \
-           ../qzip/zipwriter.h ../lmfit/lmcurve.h  ../lmfit/lmcurve_tyd.h  ../lmfit/lmmin.h  ../lmfit/lmstruct.h \
-           ../levmar/compiler.h  ../levmar/levmar.h  ../levmar/lm.h  ../levmar/misc.h
+HEADERS += ../contrib/qtsolutions/codeeditor/codeeditor.h ../contrib/qtsolutions/json/mvjson.h \
+           ../contrib/qtsolutions/qwtcurve/qwt_plot_gapped_curve.h  ../contrib/qxt/src/qxtspanslider.h \
+           ../contrib/qxt/src/qxtspanslider_p.h ../contrib/qxt/src/qxtstringspinbox.h ../contrib/qzip/zipreader.h \
+           ../contrib/qzip/zipwriter.h ../contrib/lmfit/lmcurve.h  ../contrib/lmfit/lmcurve_tyd.h \
+           ../contrib/lmfit/lmmin.h  ../contrib/lmfit/lmstruct.h \
+           ../contrib/levmar/compiler.h  ../contrib/levmar/levmar.h  ../contrib/levmar/lm.h  ../contrib/levmar/misc.h
 
 # Train View
 HEADERS += Train/AddDeviceWizard.h Train/CalibrationData.h Train/ComputrainerController.h Train/Computrainer.h Train/DeviceConfiguration.h \
@@ -840,13 +844,14 @@ SOURCES += Metrics/aBikeScore.cpp Metrics/aCoggan.cpp Metrics/AerobicDecoupling.
 SOURCES += Planning/PlanningWindow.cpp
 
 ## Contributed solutions
-SOURCES += ../qtsolutions/codeeditor/codeeditor.cpp ../qtsolutions/json/mvjson.cpp ../qtsolutions/qwtcurve/qwt_plot_gapped_curve.cpp \
-           ../qxt/src/qxtspanslider.cpp ../qxt/src/qxtstringspinbox.cpp ../qzip/zip.cpp \
-           ../lmfit/lmcurve.c ../lmfit/lmmin.c \
-           ../levmar/Axb.c ../levmar/lm_core.c ../levmar/lmbc_core.c \
-           ../levmar/lmblec_core.c ../levmar/lmbleic_core.c ../levmar/lmlec.c ../levmar/misc.c \
-           ../levmar/Axb_core.c ../levmar/lm.c ../levmar/lmbc.c ../levmar/lmblec.c ../levmar/lmbleic.c \
-           ../levmar/lmlec_core.c ../levmar/misc_core.c
+SOURCES += ../contrib/qtsolutions/codeeditor/codeeditor.cpp ../contrib/qtsolutions/json/mvjson.cpp \
+           ../contrib/qtsolutions/qwtcurve/qwt_plot_gapped_curve.cpp \
+           ../contrib/qxt/src/qxtspanslider.cpp ../contrib/qxt/src/qxtstringspinbox.cpp ../contrib/qzip/zip.cpp \
+           ../contrib/lmfit/lmcurve.c ../contrib/lmfit/lmmin.c \
+           ../contrib/levmar/Axb.c ../contrib/levmar/lm_core.c ../contrib/levmar/lmbc_core.c \
+           ../contrib/levmar/lmblec_core.c ../contrib/levmar/lmbleic_core.c ../contrib/levmar/lmlec.c ../contrib/levmar/misc.c \
+           ../contrib/levmar/Axb_core.c ../contrib/levmar/lm.c ../contrib/levmar/lmbc.c ../contrib/levmar/lmblec.c ../contrib/levmar/lmbleic.c \
+           ../contrib/levmar/lmlec_core.c ../contrib/levmar/misc_core.c
 
 ## Train View Components
 SOURCES += Train/AddDeviceWizard.cpp Train/CalibrationData.cpp Train/ComputrainerController.cpp Train/Computrainer.cpp Train/DeviceConfiguration.cpp \
