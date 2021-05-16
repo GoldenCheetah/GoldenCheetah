@@ -64,6 +64,7 @@ AnalysisSidebar::AnalysisSidebar(Context *context) : QWidget(context->mainWindow
     context->rideNavigator = rideNavigator = new RideNavigator(context, true);
     rideNavigator->showMore(false);
     groupByMapper = NULL;
+    activitySizeMapper = NULL;
 
     // retrieve settings (properties are saved when we close the window)
     if (appsettings->cvalue(context->athlete->cyclist, GC_NAVHEADINGS, "").toString() != "") {
@@ -424,7 +425,7 @@ AnalysisSidebar::showActivityMenu(const QPoint &pos)
 
         } else {
 
-            QMenu *groupByMenu = new QMenu(tr("Group By"), rideNavigator);
+            QMenu* groupByMenu = new QMenu(tr("Group By"), this);
             groupByMenu->setEnabled(true);
             menu.addMenu(groupByMenu);
 
@@ -453,6 +454,35 @@ AnalysisSidebar::showActivityMenu(const QPoint &pos)
         QAction *collapseAll = new QAction(tr("Collapse All"), rideNavigator);
         connect(collapseAll, SIGNAL(triggered(void)), rideNavigator->tableView, SLOT(collapseAll()));
         menu.addAction(collapseAll);
+
+        QMenu* activitySizeMenu = new QMenu(tr("Activity Lines"), this);
+        activitySizeMenu->setEnabled(true);
+        menu.addMenu(activitySizeMenu);
+
+        if (activitySizeMapper) delete activitySizeMapper;
+        activitySizeMapper = new QSignalMapper(this);
+        connect(activitySizeMapper, SIGNAL(mapped(const QString&)), rideNavigator, SLOT(setActivitySize(QString)));
+
+        // add menu options for Activity Size
+        QAction* activitySizeAct = new QAction("Default", rideNavigator);
+        connect(activitySizeAct, SIGNAL(triggered()), activitySizeMapper, SLOT(map()));
+        activitySizeMenu->addAction(activitySizeAct);
+        activitySizeMapper->setMapping(activitySizeAct, "Default");
+
+        activitySizeAct = new QAction("3 Lines", rideNavigator);
+        connect(activitySizeAct, SIGNAL(triggered()), activitySizeMapper, SLOT(map()));
+        activitySizeMenu->addAction(activitySizeAct);
+        activitySizeMapper->setMapping(activitySizeAct, "3-Lines");
+
+        activitySizeAct = new QAction("2 Lines", rideNavigator);
+        connect(activitySizeAct, SIGNAL(triggered()), activitySizeMapper, SLOT(map()));
+        activitySizeMenu->addAction(activitySizeAct);
+        activitySizeMapper->setMapping(activitySizeAct, "2-Lines");
+
+        activitySizeAct = new QAction("1 Line", rideNavigator);
+        connect(activitySizeAct, SIGNAL(triggered()), activitySizeMapper, SLOT(map()));
+        activitySizeMenu->addAction(activitySizeAct);
+        activitySizeMapper->setMapping(activitySizeAct, "1-Line");
 
         // reset to default
         QAction *resetToDefault = new QAction(tr("Reset to default"), rideNavigator);
