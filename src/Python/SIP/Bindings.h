@@ -112,6 +112,9 @@ class Bindings {
         bool deleteActivitySample(int index = -1, PyObject *activity = NULL) const;
         bool deleteSeries(int type, PyObject *activity = NULL) const;
         bool postProcess(QString processor, PyObject *activity = NULL) const;
+        bool setTag(QString name, QString value, PyObject *activity = NULL) const;
+        bool delTag(QString name, PyObject *activity = NULL) const;
+        bool hasTag(QString name, PyObject *activity = NULL) const;
 
         // working with charts
         bool configChart(QString title, int type, bool animate, int pos, bool stack, int orientation) const;
