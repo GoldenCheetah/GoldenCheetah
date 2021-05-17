@@ -1694,6 +1694,74 @@ Bindings::postProcess(QString processor, PyObject *activity) const
     return dp->postProcess(f, nullptr, "PYTHON");
 }
 
+bool
+Bindings::setTag(QString name, QString value, PyObject *activity) const
+{
+    bool readOnly = python->contexts.value(threadid()).readOnly;
+    if (readOnly) return false;
+
+    Context *context = python->contexts.value(threadid()).context;
+    if (context == nullptr) return false;
+
+    RideItem* m = fromDateTime(activity);
+    if (m == nullptr) m = const_cast<RideItem*>(context->currentRideItem());
+    if (m == nullptr) return false;
+
+    RideFile *f = m->ride();
+    if (f == nullptr) return false;
+
+    f->setTag(name, value);
+
+    // rideFile is now dirty!
+    m->setDirty(true);
+    // get refresh done, coz overrides state has changed
+    m->notifyRideMetadataChanged();
+
+    return true;
+}
+
+bool
+Bindings::delTag(QString name, PyObject *activity) const
+{
+    bool readOnly = python->contexts.value(threadid()).readOnly;
+    if (readOnly) return false;
+
+    Context *context = python->contexts.value(threadid()).context;
+    if (context == nullptr) return false;
+
+    RideItem* m = fromDateTime(activity);
+    if (m == nullptr) m = const_cast<RideItem*>(context->currentRideItem());
+    if (m == nullptr) return false;
+
+    RideFile *f = m->ride();
+    if (f == nullptr) return false;
+
+    if (f->removeTag(name)) {
+
+        // rideFile is now dirty!
+        m->setDirty(true);
+        // get refresh done, coz overrides state has changed
+        m->notifyRideMetadataChanged();
+
+        return true;
+    }
+
+    return false;
+}
+
+bool
+Bindings::hasTag(QString name, PyObject *activity) const
+{
+    Context *context = python->contexts.value(threadid()).context;
+    if (context == nullptr) return false;
+
+    RideItem* m = fromDateTime(activity);
+    if (m == nullptr) m = const_cast<RideItem*>(context->currentRideItem());
+    if (m == nullptr) return false;
+
+    return m->hasText(name);
+}
+
 PythonDataSeries*
 Bindings::metrics(QString metric, bool all, QString filter) const
 {
