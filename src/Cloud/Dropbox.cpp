@@ -159,6 +159,12 @@ Dropbox::readdir(QString path, QStringList &errors)
         connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
         loop.exec();
 
+        // oops, no dice
+        if (reply->error() != 0) {
+            errors << reply->errorString();
+            return returning;
+        }
+
         // did we get a good response ?
         QByteArray r = reply->readAll();
 
