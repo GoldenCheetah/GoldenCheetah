@@ -1710,7 +1710,24 @@ Bindings::setTag(QString name, QString value, PyObject *activity) const
     RideFile *f = m->ride();
     if (f == nullptr) return false;
 
-    f->setTag(name, value);
+    name = name.replace("_"," ");
+    if (GlobalContext::context()->specialFields.isMetric(name)) {
+
+        QString symbol = GlobalContext::context()->specialFields.metricSymbol(name);
+        // lets set the override
+        QMap<QString,QString> override;
+        override  = f->metricOverrides.value(symbol);
+
+        // clear and reset override value for this metric
+        override.insert("value", QString("%1").arg(value.toDouble()));
+
+        // update overrides for this metric in the main QMap
+        f->metricOverrides.insert(symbol, override);
+
+    } else {
+
+        f->setTag(name, value);
+    }
 
     // rideFile is now dirty!
     m->setDirty(true);
@@ -1736,17 +1753,33 @@ Bindings::delTag(QString name, PyObject *activity) const
     RideFile *f = m->ride();
     if (f == nullptr) return false;
 
-    if (f->removeTag(name)) {
+    name = name.replace("_"," ");
+    if (GlobalContext::context()->specialFields.isMetric(name)) {
 
-        // rideFile is now dirty!
-        m->setDirty(true);
-        // get refresh done, coz overrides state has changed
-        m->notifyRideMetadataChanged();
+        if (f->metricOverrides.remove(GlobalContext::context()->specialFields.metricSymbol(name))) {
 
-        return true;
+            // rideFile is now dirty!
+            m->setDirty(true);
+            // get refresh done, coz overrides state has changed
+            m->notifyRideMetadataChanged();
+
+            return true;
+        }
+        return false;
+
+    } else {
+
+        if (f->removeTag(name)) {
+
+            // rideFile is now dirty!
+            m->setDirty(true);
+            // get refresh done, coz overrides state has changed
+            m->notifyRideMetadataChanged();
+
+            return true;
+        }
+        return false;
     }
-
-    return false;
 }
 
 bool
@@ -1759,7 +1792,12 @@ Bindings::hasTag(QString name, PyObject *activity) const
     if (m == nullptr) m = const_cast<RideItem*>(context->currentRideItem());
     if (m == nullptr) return false;
 
-    return m->hasText(name);
+    name = name.replace("_"," ");
+    if (GlobalContext::context()->specialFields.isMetric(name)) {
+        return m->overrides_.contains(GlobalContext::context()->specialFields.metricSymbol(name));
+    } else {
+        return m->hasText(name);
+    }
 }
 
 PythonDataSeries*
