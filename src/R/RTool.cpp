@@ -729,7 +729,7 @@ RTool::zones(SEXP pDate, SEXP pSport)
 
     // compress here
     QList<gcZoneConfig> compressed;
-    qSort(config);
+    std::sort(config.begin(),config.end());
 
     // all will have date zero
     gcZoneConfig lastRun("run"), lastBike("bike"), lastSwim("swim");
@@ -814,7 +814,7 @@ RTool::zones(SEXP pDate, SEXP pSport)
 
     // now use the new compressed ones
     config = compressed;
-    qSort(config);
+    std::sort(config.begin(),config.end());
     int size = config.count();
 
     // CREATE A DATAFRAME OF CONFIG

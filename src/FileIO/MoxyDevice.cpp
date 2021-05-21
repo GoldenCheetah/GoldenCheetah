@@ -231,7 +231,7 @@ MoxyDevice::download( const QDir &tmpdir,
 
     // we need to sort the data by timestamp since the moxy uses a circular
     // buffer which mean new lines arrive before old ones.
-    qSort(data);
+    std::sort(data.begin(), data.end());
 
     // for deciding when to split rides
     QDateTime last = QDateTime();

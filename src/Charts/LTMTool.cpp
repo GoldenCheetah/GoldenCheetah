@@ -240,7 +240,7 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
     }
 
     // sort the list
-    qSort(metrics);
+    std::sort(metrics.begin(), metrics.end());
 
     //----------------------------------------------------------------------------------------------------------
     // Custom Curves (4th TAB)
@@ -1909,7 +1909,7 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
     list << "best(vam, 3600)";
     list << "best(wpk, 3600)";
 
-    qSort(names.begin(), names.end(), insensitiveLessThan);
+    std::sort(names.begin(), names.end(), insensitiveLessThan);
 
     foreach(QString name, names) {
 

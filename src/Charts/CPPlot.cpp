@@ -1138,7 +1138,7 @@ CPPlot::plotTests(RideItem *rideitem)
         }
 
         // now sort the points on x so we can feed to model fit
-        qSort(points.begin(), points.end(), qpointflessthan);
+        std::sort(points.begin(), points.end(), qpointflessthan);
         foreach(QPointF point, points) {
             testtime << point.x() / 60.0f;
             testpower << point.y();
@@ -2539,8 +2539,7 @@ CPPlot::plotCentile(RideItem *rideItem)
             }
 
         }
-        //qSort(sums.begin(), sums.end());
-        qSort(sums);
+        std::sort(sums.begin(), sums.end());
 
         qDebug() << "sums (" << slice << ") : " << sums.size() << " max " << sums[sums.size()-1];
 
@@ -2618,8 +2617,7 @@ CPPlot::plotCentile(RideItem *rideItem)
                 sums[index++] = sum / windowsize;
 
         }
-        //qSort(sums.begin(), sums.end());
-        qSort(sums);
+        std::sort(sums.begin(), sums.end());
 
         qDebug() << "sums (" << slice << ") : " << sums.size() << " max " << sums[sums.size()-1];
 

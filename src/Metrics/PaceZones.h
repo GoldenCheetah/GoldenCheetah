@@ -48,7 +48,7 @@ struct PaceZoneInfo {
     PaceZoneInfo(const QString &n, const QString &d, double l, double h) :
         name(n), desc(d), lo(l), hi(h) {}
 
-    // used by qSort()
+    // used by std::sort
     bool operator< (PaceZoneInfo right) const {
         return ((lo < right.lo) || ((lo == right.lo) && (hi < right.hi)));
     }
@@ -71,7 +71,7 @@ struct PaceZoneRange {
     PaceZoneRange(const QDate &b, const QDate &e, double _cv, double _aet) :
         begin(b), end(e), cv(_cv), aet(_aet), zonesSetFromCV(false) {}
 
-    // used by qSort()
+    // used by std::sort
     bool operator< (PaceZoneRange right) const {
         return (((! right.begin.isNull()) &&
                 (begin.isNull() || begin < right.begin )) ||

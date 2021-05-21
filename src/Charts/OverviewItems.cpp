@@ -823,10 +823,8 @@ MetricOverviewItem::setDateRange(DateRange dr)
 
 }
 
-static bool entrylessthan(struct topnentry &a, const topnentry &b)
-{
-    return a.v < b.v;
-}
+static bool entrylessthan(struct topnentry &a, const topnentry &b) { return a.v < b.v; }
+static bool entrymorethan(struct topnentry &a, const topnentry &b) { return a.v > b.v; }
 
 void
 TopNOverviewItem::setDateRange(DateRange dr)
@@ -872,8 +870,8 @@ TopNOverviewItem::setDateRange(DateRange dr)
     }
 
     // sort the list
-    if (metric->type() == RideMetric::Low || metric->isLowerBetter()) qSort(ranked.begin(), ranked.end(), entrylessthan);
-    else qSort(ranked);
+    if (metric->type() == RideMetric::Low || metric->isLowerBetter()) std::sort(ranked.begin(), ranked.end(), entrylessthan);
+    else std::sort(ranked.begin(), ranked.end(), entrymorethan);
 
     // change painting details
     itemGeometryChanged();
@@ -1087,7 +1085,7 @@ DonutOverviewItem::setDateRange(DateRange dr)
     for(int i=0; i<values.count(); i++) values[i].percentage = (values[i].value / sum) * 100;
 
     // sort with highest values first
-    qSort(values.begin(), values.end(), lessthan);
+    std::sort(values.begin(), values.end(), lessthan);
 
     // wipe any existing series
     chart->removeAllSeries();
@@ -2521,7 +2519,7 @@ OverviewItemConfig::OverviewItemConfig(ChartSpaceItem *item) : QWidget(item->par
         list << "best(vam, 3600)";
         list << "best(wpk, 3600)";
 
-        qSort(names.begin(), names.end(), insensitiveLessThan);
+        std::sort(names.begin(), names.end(), insensitiveLessThan);
 
         foreach(QString name, names) {
 
@@ -3148,7 +3146,7 @@ BubbleViz::setPoints(QList<BPointF> p, double minx, double maxx, double miny, do
     }
 
     // sort scores high to low
-    qSort(scores.begin(), scores.end(), scoresBiggerThan);
+    std::sort(scores.begin(), scores.end(), scoresBiggerThan);
 
     // now assign - from best match to worst
     foreach(BubbleVizTuple score, scores){

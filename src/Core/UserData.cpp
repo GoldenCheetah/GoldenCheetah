@@ -163,7 +163,7 @@ EditUserDataDialog::EditUserDataDialog(Context *context, UserData *here) :
     list << "RECINTSECS";
     list << "NA";
 
-    qSort(names.begin(), names.end(), insensitiveLessThan);
+    std::sort(names.begin(), names.end(), insensitiveLessThan);
 
     foreach(QString name, names) {
 

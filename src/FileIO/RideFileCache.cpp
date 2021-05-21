@@ -2161,7 +2161,7 @@ int RideFileCache::rank(Context *context, RideFile::SeriesType series, int durat
     }
 
     // sort the list
-    qSort(values.begin(), values.end(), qGreater<double>());
+    std::sort(values.begin(), values.end());
 
     // get the ranking and count
     of = values.count();

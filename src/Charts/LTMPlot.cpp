@@ -4273,7 +4273,7 @@ LTMPlot::refreshMarkers(LTMSettings *settings, QDate from, QDate to, int groupby
     // seasons and season events
     if (settings->events) {
         QList<Season> tmpSeasons = context->athlete->seasons->seasons;
-        qSort(tmpSeasons.begin(),tmpSeasons.end(),Season::LessThanForStarts);
+        std::sort(tmpSeasons.begin(),tmpSeasons.end(),Season::LessThanForStarts);
 
         foreach (Season s, tmpSeasons) {
             // for each season that intersects the date range

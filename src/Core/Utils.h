@@ -21,6 +21,7 @@
 
 // Common shared utility functions
 #include <QVector>
+#include <math.h>
 
 #ifdef WIN32
 #define PATHSEP ";"
@@ -50,7 +51,19 @@ namespace Utils
     QVector<int> arguniq(QVector<QString> &v);
     QVector<double> smooth_sma(QVector<double>&, int pos, int window);
     QVector<double> smooth_ewma(QVector<double>&, double alpha);
-};
 
+    // used std::sort, std::lower_bound et al
+    struct comparedouble { bool operator()(const double p1, const double p2) { return p1 < p2; } };
+    struct compareqstring { bool operator()(const QString p1, const QString p2) { return p1 < p2; } };
+
+    bool doubledescend(const double &s1, const double &s2);
+    bool doubleascend(const double &s1, const double &s2);
+
+    bool qstringdescend(const QString &s1, const QString &s2);
+    bool qstringascend(const QString &s1, const QString &s2);
+
+    double myisinf(double x);
+    double myisnan(double x);
+};
 
 #endif

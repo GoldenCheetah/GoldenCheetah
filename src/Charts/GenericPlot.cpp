@@ -370,8 +370,8 @@ GenericPlot::plotAreaChanged()
     //           because we're only doing y-axis- label rects and title rects have
     //           same sort order left to right (x-axis) so we can then associate
     //           the label rect at position [i] with the axisrect at position [i]
-    qSort(ar);
-    qSort(lr.begin(), lr.end(), myqRectLess);
+    std::sort(ar.begin(), ar.end());
+    std::sort(lr.begin(), lr.end(), myqRectLess);
 
     axisRect.clear(); // class member that tracks axis->scene rectangle
     for(int i=0; i< ar.count() && i <lr.count(); i++) {

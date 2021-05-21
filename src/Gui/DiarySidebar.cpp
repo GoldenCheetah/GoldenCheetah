@@ -483,7 +483,7 @@ void
 GcMiniCalendar::previous()
 {
     QList<QDateTime> allDates = context->athlete->rideCache->getAllDates();
-    qSort(allDates);
+    std::sort(allDates.begin(), allDates.end());
 
     // begin of month
     QDateTime bom(QDate(year,month,01), QTime(0,0,0));
@@ -517,7 +517,7 @@ void
 GcMiniCalendar::next()
 {
     QList<QDateTime> allDates = context->athlete->rideCache->getAllDates();
-    qSort(allDates);
+    std::sort(allDates.begin(), allDates.end());
 
     // end of month
     QDateTime eom(QDate(year,month,01).addMonths(1), QTime(00,00,00));

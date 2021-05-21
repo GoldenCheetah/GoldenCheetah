@@ -44,7 +44,7 @@ struct ZoneInfo {
     ZoneInfo(const QString &n, const QString &d, int l, int h) :
         name(n), desc(d), lo(l), hi(h) {}
 
-    // used by qSort()
+    // used by std::sort
     bool operator< (ZoneInfo right) const {
         return ((lo < right.lo) || ((lo == right.lo) && (hi < right.hi)));
     }
@@ -70,7 +70,7 @@ struct ZoneRange {
     ZoneRange(const QDate &b, const QDate &e, int _cp, int _aet, int _ftp, int _wprime, int pmax) :
         begin(b), end(e), cp(_cp), aet(_aet), ftp(_ftp), wprime(_wprime), pmax(pmax), zonesSetFromCP(false) {}
 
-    // used by qSort()
+    // used by std::sort
     bool operator< (ZoneRange right) const {
         return (((! right.begin.isNull()) &&
                 (begin.isNull() || begin < right.begin )) ||

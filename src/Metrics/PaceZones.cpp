@@ -237,7 +237,7 @@ bool PaceZones::read(QFile &file)
 
                     } else {
 
-                        qSort(range.zones);
+                        std::sort(range.zones.begin(), range.zones.end());
 
                     }
                     ranges.append(range);
@@ -399,7 +399,7 @@ next_line: {}
 
         } else {
 
-            qSort(range.zones);
+            std::sort(range.zones.begin(), range.zones.end());
         }
 
         ranges.append(range);
@@ -407,7 +407,7 @@ next_line: {}
     file.close();
 
     // sort the ranges
-    qSort(ranges);
+    std::sort(ranges.begin(), ranges.end());
 
     // set the default zones if not in file
     if (!scheme.nzones_default)  {
@@ -634,7 +634,7 @@ void PaceZones::setZonesFromCV(PaceZoneRange &range)
 
     // sort the zones (some may be pct, others absolute, so zones need to be sorted,
     // rather than the defaults
-    qSort(range.zones);
+    std::sort(range.zones.begin(), range.zones.end());
 
     // set zone end dates
     for (int i = 0; i < range.zones.size(); i++) {

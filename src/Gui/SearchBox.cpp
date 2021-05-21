@@ -201,7 +201,7 @@ SearchBox::configChanged(qint32)
 
     // get sorted list
     QStringList names = context->tab->rideNavigator()->logicalHeadings;
-    qSort(names.begin(), names.end(), insensitiveLessThan);
+    std::sort(names.begin(), names.end(), insensitiveLessThan);
 
     foreach(QString name, names) {
 
@@ -221,7 +221,7 @@ SearchBox::configChanged(qint32)
     }
 
     // sort the list
-    qSort(list.begin(), list.end(), insensitiveLessThan);
+    std::sort(list.begin(), list.end(), insensitiveLessThan);
 
     // set new list
     completer->setList(list);
