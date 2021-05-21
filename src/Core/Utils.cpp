@@ -525,7 +525,7 @@ bool doubleascend(const double &s1, const double &s2) { return s1 < s2; }
 bool qstringdescend(const QString &s1, const QString &s2) { return s1 > s2; }
 bool qstringascend(const QString &s1, const QString &s2) { return s1 < s2; }
 
-double myisinf(double x) { return std::isinf(x); }
+double myisinf(double x) { return isinf(x); } // math.h
 double myisnan(double x) { return isnan(x); } // math.h
 
 };
