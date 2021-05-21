@@ -217,7 +217,7 @@ bool HrZones::read(QFile &file)
                             return false;
                         }
                     } else {
-                        qSort(range.zones);
+                        std::sort(range.zones.begin(), range.zones.end());
                     }
                     ranges.append(range);
                 }
@@ -331,7 +331,7 @@ bool HrZones::read(QFile &file)
             }
         } else {
 
-            qSort(range.zones);
+            std::sort(range.zones.begin(), range.zones.end());
         }
         ranges.append(range);
     }
@@ -340,7 +340,7 @@ bool HrZones::read(QFile &file)
     file.close();
 
     // sort the ranges
-    qSort(ranges);
+    std::sort(ranges.begin(), ranges.end());
 
     //
     // POST-PROCESS / FIX-UP ZONES
@@ -568,7 +568,7 @@ void HrZones::setHrZonesFromLT(HrZoneRange &range) {
 
     // sort the zones (some may be pct, others absolute, so zones need to be sorted,
     // rather than the defaults
-    qSort(range.zones);
+    std::sort(range.zones.begin(), range.zones.end());
 
     // set zone end dates
     for (int i = 0; i < range.zones.size(); i ++)

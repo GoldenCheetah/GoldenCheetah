@@ -288,8 +288,8 @@ rank(QVector<double> &v, bool ascending)
     QVector<QPointF> tuple;
     for(int i=0; i<v.count(); i++) tuple << QPointF(v[i],i);
 
-    if (ascending) qSort(tuple.begin(), tuple.end(), qpointflessthan);
-    else qSort(tuple.begin(), tuple.end(), qpointfgreaterthan);
+    if (ascending) std::sort(tuple.begin(), tuple.end(), qpointflessthan);
+    else std::sort(tuple.begin(), tuple.end(), qpointfgreaterthan);
 
     // rank is offset into sorted vector, y contains original position
     QVector<int> returning(v.count());
@@ -305,8 +305,8 @@ argsort(QVector<double> &v, bool ascending)
     QVector<QPointF> tuple;
     for(int i=0; i<v.count(); i++) tuple << QPointF(v[i],i);
 
-    if (ascending) qSort(tuple.begin(), tuple.end(), qpointflessthan);
-    else qSort(tuple.begin(), tuple.end(), qpointfgreaterthan);
+    if (ascending) std::sort(tuple.begin(), tuple.end(), qpointflessthan);
+    else std::sort(tuple.begin(), tuple.end(), qpointfgreaterthan);
 
     // now create vector of indexes
     QVector<int> returning;
@@ -331,8 +331,8 @@ argsort(QVector<QString>&v, bool ascending)
     QVector<stringtuple> tuple;
     for(int i=0; i<v.count(); i++) tuple << stringtuple(v[i],i);
 
-    if (ascending) qSort(tuple.begin(), tuple.end(), stringtuplelessthan);
-    else qSort(tuple.begin(), tuple.end(), stringtuplegreaterthan);
+    if (ascending) std::sort(tuple.begin(), tuple.end(), stringtuplelessthan);
+    else std::sort(tuple.begin(), tuple.end(), stringtuplegreaterthan);
 
     // now create vector of indexes
     QVector<int> returning;
@@ -374,7 +374,7 @@ arguniq(QVector<double> &v)
             i--;
         }
     }
-    qSort(returning);
+    std::sort(returning.begin(), returning.end());
 
     return returning;
 }
@@ -412,7 +412,7 @@ arguniq(QVector<QString> &v)
             i--;
         }
     }
-    qSort(returning);
+    std::sort(returning.begin(), returning.end());
 
     return returning;
 }
@@ -440,7 +440,7 @@ smooth_sma(QVector<double>&data, int pos, int window)
 
     int window_start=0, window_end=0;
     int index=0;
-    double ma=0;
+    //double ma=0;
 
     // window is offset from index depending upon the forward/backward/centred position
     switch (pos) {
@@ -516,6 +516,17 @@ number(QString x)
     }
     return extract.toDouble();
 }
+
+// used std::sort, std::lower_bound et al
+
+bool doubledescend(const double &s1, const double &s2) { return s1 > s2; }
+bool doubleascend(const double &s1, const double &s2) { return s1 < s2; }
+
+bool qstringdescend(const QString &s1, const QString &s2) { return s1 > s2; }
+bool qstringascend(const QString &s1, const QString &s2) { return s1 < s2; }
+
+double myisinf(double x) { return std::isinf(x); }
+double myisnan(double x) { return std::isnan(x); }
 
 };
 

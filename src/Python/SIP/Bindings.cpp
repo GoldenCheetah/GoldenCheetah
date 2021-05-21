@@ -406,7 +406,7 @@ Bindings::athleteZones(PyObject* date, QString sport) const
 
     // COMPRESS CONFIG TOGETHER BY SPORT
     QList<gcZoneConfig> compressed;
-    qSort(config);
+    std::sort(config.begin(),config.end());
 
     // all will have date zero
     gcZoneConfig lastRun("run"), lastBike("bike"), lastSwim("swim");
@@ -491,7 +491,7 @@ Bindings::athleteZones(PyObject* date, QString sport) const
 
     // now use the new compressed ones
     config = compressed;
-    qSort(config);
+    std::sort(config.begin(),config.end());
     int size = config.count();
 
     // CREATE A DICT OF CONFIG

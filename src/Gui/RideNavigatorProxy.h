@@ -527,7 +527,7 @@ public:
             }
 
             // rank the entries
-            qSort(rankedRows); // sort by value
+            std::sort(rankedRows.begin(), rankedRows.end()); // sort by value
             for (int i=0; i<rankedRows.count(); i++) {
                 rankedRows[i].value = i;
             }

@@ -137,7 +137,7 @@ RideCache::RideCache(Context *context) : context(context)
     }
 
     // now sort it - we need to use find on it
-    qSort(rides_.begin(), rides_.end(), rideCacheLessThan);
+    std::sort(rides_.begin(), rides_.end(), rideCacheLessThan);
 
     // load the store - will unstale once cache restored
     RideCacheLoader *rideCacheLoader = new RideCacheLoader(this);
@@ -299,7 +299,7 @@ RideCache::addRide(QString name, bool dosignal, bool select, bool useTempActivit
     if (!added) {
         model_->beginReset();
         rides_ << last;
-        qSort(rides_.begin(), rides_.end(), rideCacheLessThan);
+        std::sort(rides_.begin(), rides_.end(), rideCacheLessThan);
         model_->endReset();
     }
 
@@ -541,7 +541,7 @@ RideCache::refresh()
     // and future watcher can notify of updates
     if (staleCount)  {
         reverse_ = rides_;
-        qSort(reverse_.begin(), reverse_.end(), rideCacheGreaterThan);
+        std::sort(reverse_.begin(), reverse_.end(), rideCacheGreaterThan);
         future = QtConcurrent::map(reverse_, itemRefresh);
         watcher.setFuture(future);
 
@@ -773,7 +773,7 @@ RideCache::getDistinctValues(QString field)
     }
 
     // sort from big to small
-    qSort(ranked.begin(), ranked.end(), rideCacheOrderListGreaterThan);
+    std::sort(ranked.begin(), ranked.end(), rideCacheOrderListGreaterThan);
 
     // extract ordered values
     foreach(OrderedList x, ranked)

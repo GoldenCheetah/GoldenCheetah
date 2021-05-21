@@ -168,7 +168,7 @@ void
 AllPlotInterval::sortIntervals(QList<IntervalItem*> &intervals, QList< QList<IntervalItem*> > &intervalsGroups)
 {
     // Sort by duration
-    qSort(intervals.begin(), intervals.end(), intervalBiggerThan);
+    std::sort(intervals.begin(), intervals.end(), intervalBiggerThan);
 
     QList<IntervalItem*> matchesGroup;
 

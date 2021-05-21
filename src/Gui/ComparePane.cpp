@@ -851,7 +851,7 @@ ComparePane::dropEvent(QDropEvent *event)
             if (matches.count() > 1 ) {
 
                 // sort matches so most recent first
-                qSort(matches.begin(), matches.end(), dateRecentFirst);
+                std::sort(matches.begin(), matches.end(), dateRecentFirst);
 
                 // ok, lets crank up a dialog to ask
                 // one only, or the season to use

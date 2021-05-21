@@ -1521,7 +1521,7 @@ RideItem::updateIntervals()
         for (int j=0; j<10; j++) stiz[j] = 0.00f;
 
         // get and sort the intervals by zone high to low
-        qSort(efforts.begin(), efforts.end(), intervalGreaterThanZone);
+        std::sort(efforts.begin(), efforts.end(), intervalGreaterThanZone);
 
         foreach(RideFilePoint *p, f->dataPoints()) {
 

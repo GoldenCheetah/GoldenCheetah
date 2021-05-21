@@ -168,7 +168,7 @@ class AthleteBest
     QString value; // formatted value
     QDate date;
 
-    // for qsort
+    // for std::sort
     bool operator< (AthleteBest right) const { return (nvalue < right.nvalue); }
 };
 

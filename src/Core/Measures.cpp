@@ -96,7 +96,7 @@ void
 MeasuresGroup::setMeasures(QList<Measure>&x)
 {
     measures_ = x;
-    qSort(measures_); // date order
+    std::sort(measures_.begin(), measures_.end()); // date order
 }
 
 QDate

@@ -1081,7 +1081,7 @@ SchemePage::deleteClicked()
     }
 }
 
-// just for qSorting
+// just for sorting
 struct schemeitem {
     QString name, desc;
     int lo;
@@ -1107,7 +1107,7 @@ SchemePage::getScheme()
     }
 
     // sort the list into ascending order
-    qSort(table);
+    std::sort(table.begin(),table.end());
 
     // now update the results
     results.nzones_default = 0;
@@ -1692,7 +1692,7 @@ CPPage::zonesChanged()
             }
 
             // now sort the list
-            qSort(zoneinfos);
+            std::sort(zoneinfos.begin(), zoneinfos.end());
 
             // now fill the highs
             for(int i=0; i<zoneinfos.count(); i++) {
@@ -1953,7 +1953,7 @@ HrSchemePage::getScheme()
     }
 
     // sort the list into ascending order
-    qSort(table);
+    std::sort(table.begin(),table.end());
 
     // now update the results
     results.nzones_default = 0;
@@ -2469,7 +2469,7 @@ LTPage::zonesChanged()
             }
 
             // now sort the list
-            qSort(zoneinfos);
+            std::sort(zoneinfos.begin(), zoneinfos.end());
 
             // now fill the highs
             for(int i=0; i<zoneinfos.count(); i++) {
@@ -2682,7 +2682,7 @@ PaceSchemePage::deleteClicked()
     }
 }
 
-// just for qSorting
+// just for sorting
 struct paceschemeitem {
     QString name, desc;
     int lo;
@@ -2708,7 +2708,7 @@ PaceSchemePage::getScheme()
     }
 
     // sort the list into ascending order
-    qSort(table);
+    std::sort(table.begin(),table.end());
 
     // now update the results
     results.nzones_default = 0;
@@ -3181,7 +3181,7 @@ CVPage::zonesChanged()
             }
 
             // now sort the list
-            qSort(zoneinfos);
+            std::sort(zoneinfos.begin(), zoneinfos.end());
 
             // now fill the highs
             for(int i=0; i<zoneinfos.count(); i++) {

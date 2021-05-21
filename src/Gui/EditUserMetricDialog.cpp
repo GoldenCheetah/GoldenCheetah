@@ -163,7 +163,7 @@ EditUserMetricDialog::EditUserMetricDialog(QWidget *parent, Context *context, Us
     list << "best(vam, 3600)";
     list << "best(wpk, 3600)";
 
-    qSort(names.begin(), names.end(), insensitiveLessThan);
+    std::sort(names.begin(), names.end(), insensitiveLessThan);
 
     foreach(QString name, names) {
 

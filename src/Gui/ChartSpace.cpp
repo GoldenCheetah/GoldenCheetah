@@ -381,7 +381,7 @@ ChartSpace::updateGeometry()
     group = new QParallelAnimationGroup(this);
 
     // order the items to their positions
-    qSort(items.begin(), items.end(), ChartSpaceItemSort);
+    std::sort(items.begin(), items.end(), ChartSpaceItemSort);
 
     int y=SPACING;
     int maxy = y;

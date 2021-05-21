@@ -1307,7 +1307,7 @@ ColumnChooser::ColumnChooser(QList<QString>&logicalHeadings)
     smallFont.setPointSizeF(baseFont.pointSizeF() *0.8f);
 
     QList<QString> buttonNames = logicalHeadings;
-    qSort(buttonNames.begin(), buttonNames.end(), insensitiveLessThan);
+    std::sort(buttonNames.begin(), buttonNames.end(), insensitiveLessThan);
 
     QString last;
     foreach (QString column, buttonNames) {

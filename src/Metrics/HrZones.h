@@ -45,7 +45,7 @@ struct HrZoneInfo {
     HrZoneInfo(const QString &n, const QString &d, int l, int h, double t) :
         name(n), desc(d), lo(l), hi(h), trimp(t) {}
 
-    // used by qSort()
+    // used by std::sort
     bool operator< (HrZoneInfo right) const {
         return ((lo < right.lo) || ((lo == right.lo) && (hi < right.hi)));
     }
@@ -71,7 +71,7 @@ struct HrZoneRange {
     HrZoneRange(const QDate &b, const QDate &e, int _lt, int _aet, int _restHr, int _maxHr) :
         begin(b), end(e), lt(_lt), aet(_aet), restHr(_restHr), maxHr(_maxHr), hrZonesSetFromLT(false) {}
 
-    // used by qSort()
+    // used by std::sort
     bool operator< (HrZoneRange right) const {
         return (((! right.begin.isNull()) &&
                 (begin.isNull() || begin < right.begin )) ||
