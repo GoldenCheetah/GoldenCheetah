@@ -67,7 +67,8 @@ CPPlot::CPPlot(CriticalPowerWindow *parent, Context *context, bool rangemode) : 
     rideSeries(RideFile::watts),
     isFiltered(false), shadeMode(2),
     shadeIntervals(true), rangemode(rangemode), 
-    showTest(true), showBest(true), filterBest(false), showPowerIndex(false), showPercent(false), showHeat(false), showPP(false), showHeatByDate(false), showDelta(false), showDeltaPercent(false),
+    showTest(true), showBest(true), filterBest(false), showPowerIndex(false), showPercent(false), showHeat(false),
+    showEffort(false), showPP(false), showHeatByDate(false), showDelta(false), showDeltaPercent(false),
     plotType(0),
     xAxisLinearOnSpeed(true),
 
