@@ -427,6 +427,10 @@ main(int argc, char *argv[])
     appsettings->migrateQSettingsSystem(); // colors must be setup before migration can take place, but reading has to be from the migrated ones
     GCColor::readConfig();
 
+    // output colors as configured so we can cut and paste into Colors.cpp
+    // uncomment when developers working on theme colors
+    //GCColor::dumpColors();
+
     // set defaultfont - may be adjusted below
     QFont font;
     font.fromString(appsettings->value(NULL, GC_FONT_DEFAULT, QFont().toString()).toString());
