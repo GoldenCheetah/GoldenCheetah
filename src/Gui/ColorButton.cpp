@@ -138,7 +138,7 @@ GColorDialog::GColorDialog(QColor selected, QWidget *parent) : QDialog(parent), 
     tabwidget->addTab(colordialog, tr("Custom"));
 
     // set the default to the current selection
-    if (original.red() == 1 and original.green() == 1) {
+    if (original.red() == 1 && original.green() == 1) {
         tabwidget->setCurrentIndex(0);
         colorlist->setCurrentItem(colorlist->invisibleRootItem()->child(original.blue()));
         colordialog->setCurrentColor(GColor(original.blue()));
