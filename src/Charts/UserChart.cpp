@@ -1227,7 +1227,8 @@ EditUserSeriesDialog::EditUserSeriesDialog(Context *context, bool rangemode, Gen
     zz->addWidget(legend);
     cf->addRow(tr("Symbol"), zz);
 
-    color = new ColorButton(this, "Color", Qt::red);
+    // we allow colors using the GC palette and default to power colors
+    color = new ColorButton(this, "Color", QColor(1,1,CPOWER), true, false);
     zz = new QHBoxLayout();
     zz->addWidget(color);
     zz->addStretch();
