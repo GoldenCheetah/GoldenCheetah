@@ -1371,7 +1371,7 @@ ColorsPage::applyThemeClicked()
         ColorTheme theme = GCColor::themes().themes[index];
 
         // reset to base
-        colorSet = GCColor::defaultColorSet();
+        colorSet = GCColor::defaultColorSet(theme.dark);
 
         // reset the color selection tools
         colors->clear();

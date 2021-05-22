@@ -78,10 +78,11 @@ public:
 class ColorTheme
 {
     public:
-        ColorTheme(QString name, QList<QColor>colors) : name(name), colors(colors) {}
+        ColorTheme(QString name, bool dark, QList<QColor>colors) : name(name), dark(dark), colors(colors) {}
 
         // all public
         QString name;
+        bool dark;
         QList<QColor> colors;
 };
 
@@ -116,7 +117,7 @@ class GCColor : public QObject
         static QColor getColor(int);
         static void setColor(int,QColor);
         static const Colors *colorSet();
-        static const Colors *defaultColorSet();
+        static const Colors *defaultColorSet(bool dark);
         static void resetColors();
         static struct SizeSettings defaultSizes(int width, int height);
         static double luminance(QColor color); // return the relative luminance
@@ -134,6 +135,7 @@ class GCColor : public QObject
         static QString stylesheet();
         static void readConfig();
         static void setupColors();
+        static void dumpColors();
 
         // for upgrade/migration of Config
         static QStringList getConfigKeys();

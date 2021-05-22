@@ -83,7 +83,9 @@ static bool init = initStandardColors();
 static Themes allThemes;
 
 // Number of configurable metric colors + 1 for sentinel value
-static Colors ColorList[CNUMOFCFGCOLORS+1], DefaultColorList[CNUMOFCFGCOLORS+1];
+static Colors ColorList[CNUMOFCFGCOLORS+1],
+              LightDefaultColorList[CNUMOFCFGCOLORS+1],
+              DarkDefaultColorList[CNUMOFCFGCOLORS+1];
 
 static void copyArray(Colors source[], Colors target[])
 {
@@ -249,9 +251,119 @@ void GCColor::setupColors()
         appsettings->setValue(GC_CHROME, "Flat");
     }
 #endif
-    copyArray(init, DefaultColorList);
+    copyArray(init, DarkDefaultColorList);
+    copyArray(init, LightDefaultColorList);
     copyArray(init, ColorList);
 
+    // lets update the Light colors to ones that are more
+    // appropriate on a light background, since the init versions
+    // were all selected on the basis of a dark background
+    // note: we don't update them all so old standard charts
+    // aren't affected to badly, but may do so in the future
+    LightDefaultColorList[0].color = QColor(255,255,255); // 0:Plot Background
+    LightDefaultColorList[1].color = QColor(255,255,255); // 1:Performance Plot Background
+    LightDefaultColorList[2].color = QColor(255,255,255); // 2:Trend Plot Background
+    LightDefaultColorList[3].color = QColor(255,255,255); // 3:Train Plot Background
+    LightDefaultColorList[4].color = QColor(101,105,165); // 4:Plot Symbols
+    LightDefaultColorList[5].color = QColor(101,105,165); // 5:Performance Plot X Axis
+    LightDefaultColorList[6].color = QColor(101,105,165); // 6:Performance Plot Y Axis
+    LightDefaultColorList[7].color = QColor(160,160,164); // 7:Plot Thumbnail Background
+    LightDefaultColorList[8].color = QColor(0,0,0); // 8:Plot Title
+    LightDefaultColorList[9].color = QColor(194,194,194); // 9:Plot Selection Pen
+    LightDefaultColorList[10].color = QColor(194,194,194); // 10:Plot TrackerPen
+    LightDefaultColorList[11].color = QColor(101,105,165); // 11:Plot Markers
+    LightDefaultColorList[12].color = QColor(232,232,232); // 12:Plot Grid
+    LightDefaultColorList[13].color = QColor(194,194,194); // 13:Interval Highlighter
+    LightDefaultColorList[14].color = QColor(255,0,0); // 14:Heart Rate
+    LightDefaultColorList[15].color = QColor(131,8,255); // 15:Core Temperature
+    LightDefaultColorList[16].color = QColor(0,102,0); // 16:Speed
+    LightDefaultColorList[17].color = QColor(0,146,146); // 17:Acceleration
+    LightDefaultColorList[18].color = QColor(255,170,0); // 18:Power
+    LightDefaultColorList[19].color = QColor(255,0,255); // 19:Iso Power
+    LightDefaultColorList[20].color = QColor(158,0,158); // 20:Skiba xPower
+    LightDefaultColorList[21].color = QColor(255,0,255); // 21:Altitude Power
+    LightDefaultColorList[22].color = QColor(0,0,255); // 22:Train Target Power
+    LightDefaultColorList[23].color = QColor(167,0,109); // 23:Critical Power
+    LightDefaultColorList[24].color = QColor(0,126,126); // 24:Cadence
+    LightDefaultColorList[25].color = QColor(119,119,122); // 25:Altitude
+    LightDefaultColorList[26].color = QColor(114,114,114); // 26:Altitude Shading
+    LightDefaultColorList[27].color = QColor(0,128,0); // 27:Wind Speed
+    LightDefaultColorList[28].color = QColor(111,0,111); // 28:Torque
+    LightDefaultColorList[29].color = QColor(0,127,0); // 29:Slope
+    LightDefaultColorList[30].color = QColor(255,144,0); // 30:Gear Ratio
+    LightDefaultColorList[31].color = QColor(255,144,0); // 31:Run Vertical Oscillation
+    LightDefaultColorList[32].color = QColor(255,144,0); // 32:Run Cadence
+    LightDefaultColorList[33].color = QColor(255,144,0); // 33:Run Ground Contact
+    LightDefaultColorList[34].color = QColor(0,137,119); // 34:Muscle Oxygen (SmO2)
+    LightDefaultColorList[35].color = QColor(163,68,2); // 35:Haemoglobin Mass (tHb)
+    LightDefaultColorList[36].color = QColor(209,5,114); // 36:Oxygenated Haemoglobin (O2Hb)
+    LightDefaultColorList[37].color = QColor(0,127,204); // 37:Deoxygenated Haemoglobin (HHb)
+    LightDefaultColorList[38].color = QColor(127,127,0); // 38:Load
+    LightDefaultColorList[39].color = QColor(0,81,0); // 39:BikeStress
+    LightDefaultColorList[40].color = QColor(227,12,255); // 40:Short Term Stress
+    LightDefaultColorList[41].color = QColor(16,0,195); // 41:Long Term Stress
+    LightDefaultColorList[42].color = QColor(209,193,23); // 42:Stress Balance
+    LightDefaultColorList[43].color = QColor(255,0,0); // 43:Daily Stress
+    LightDefaultColorList[44].color = QColor(160,160,164); // 44:Bike Score (TM)
+    LightDefaultColorList[45].color = QColor(0,0,0); // 45:Calendar Text
+    LightDefaultColorList[46].color = QColor(255,0,255); // 46:Power Zone 1 Shading
+    LightDefaultColorList[47].color = QColor(42,0,255); // 47:Power Zone 2 Shading
+    LightDefaultColorList[48].color = QColor(0,170,255); // 48:Power Zone 3 Shading
+    LightDefaultColorList[49].color = QColor(0,255,128); // 49:Power Zone 4 Shading
+    LightDefaultColorList[50].color = QColor(85,255,0); // 50:Power Zone 5 Shading
+    LightDefaultColorList[51].color = QColor(255,213,0); // 51:Power Zone 6 Shading
+    LightDefaultColorList[52].color = QColor(255,0,0); // 52:Power Zone 7 Shading
+    LightDefaultColorList[53].color = QColor(160,160,164); // 53:Power Zone 8 Shading
+    LightDefaultColorList[54].color = QColor(160,160,164); // 54:Power Zone 9 Shading
+    LightDefaultColorList[55].color = QColor(160,160,164); // 55:Power Zone 10 Shading
+    LightDefaultColorList[56].color = QColor(255,0,255); // 56:HR Zone 1 Shading
+    LightDefaultColorList[57].color = QColor(42,0,255); // 57:HR Zone 2 Shading
+    LightDefaultColorList[58].color = QColor(0,170,255); // 58:HR Zone 3 Shading
+    LightDefaultColorList[59].color = QColor(0,255,128); // 59:HR Zone 4 Shading
+    LightDefaultColorList[60].color = QColor(85,255,0); // 60:HR Zone 5 Shading
+    LightDefaultColorList[61].color = QColor(255,213,0); // 61:HR Zone 6 Shading
+    LightDefaultColorList[62].color = QColor(255,0,0); // 62:HR Zone 7 Shading
+    LightDefaultColorList[63].color = QColor(160,160,164); // 63:HR Zone 8 Shading
+    LightDefaultColorList[64].color = QColor(160,160,164); // 64:HR Zone 9 Shading
+    LightDefaultColorList[65].color = QColor(160,160,164); // 65:HR Zone 10 Shading
+    LightDefaultColorList[66].color = QColor(0,0,255); // 66:Aerolab VE
+    LightDefaultColorList[67].color = QColor(0,255,0); // 67:Aerolab Elevation
+    LightDefaultColorList[68].color = QColor(255,255,255); // 68:Calendar background
+    LightDefaultColorList[69].color = QColor(230,230,230); // 69:Calendar heading
+    LightDefaultColorList[70].color = QColor(48,140,198); // 70:Calendar Current Selection
+    LightDefaultColorList[71].color = QColor(0,255,0); // 71:Calendar Actual Workout
+    LightDefaultColorList[72].color = QColor(255,177,21); // 72:Calendar Planned Workout
+    LightDefaultColorList[73].color = QColor(0,255,255); // 73:Calendar Today
+    LightDefaultColorList[74].color = QColor(255,255,255); // 74:Pop Up Windows Background
+    LightDefaultColorList[75].color = QColor(119,119,119); // 75:Pop Up Windows Foreground
+    LightDefaultColorList[76].color = QColor(160,160,164); // 76:Chart Bar Unselected
+    LightDefaultColorList[77].color = QColor(255,255,0); // 77:Chart Bar Selected
+    LightDefaultColorList[78].color = QColor(239,239,239); // 78:ToolBar Background
+    LightDefaultColorList[79].color = QColor(236,246,255); // 79:Activity History Group
+    LightDefaultColorList[80].color = QColor(0,164,101); // 80:SpinScan Left
+    LightDefaultColorList[81].color = QColor(0,130,130); // 81:SpinScan Right
+    LightDefaultColorList[82].color = QColor(0,107,188); // 82:Temperature
+    LightDefaultColorList[83].color = QColor(160,160,164); // 83:Default Dial Color
+    LightDefaultColorList[84].color = QColor(255,0,255); // 84:Alternate Power
+    LightDefaultColorList[85].color = QColor(178,0,0); // 85:Left Balance
+    LightDefaultColorList[86].color = QColor(128,0,50); // 86:Right Balance
+    LightDefaultColorList[87].color = QColor(186,57,59); // 87:W' Balance
+    LightDefaultColorList[88].color = QColor(255,85,255); // 88:CP Curve
+    LightDefaultColorList[89].color = QColor(146,0,146); // 89:Aerobic TISS
+    LightDefaultColorList[90].color = QColor(0,130,130); // 90:Anaerobic TISS
+    LightDefaultColorList[91].color = QColor(0,137,137); // 91:Left Torque Effectiveness
+    LightDefaultColorList[92].color = QColor(145,0,145); // 92:Right Torque Effectiveness
+    LightDefaultColorList[93].color = QColor(0,146,146); // 93:Left Pedal Smoothness
+    LightDefaultColorList[94].color = QColor(117,0,117); // 94:Right Pedal Smoothness
+    LightDefaultColorList[95].color = QColor(54,55,75); // 95:Toolbar and Sidebar
+    LightDefaultColorList[96].color = QColor(227,224,232); // 96:Overview Background
+    LightDefaultColorList[97].color = QColor(255,255,255); // 97:Overview Card Background
+    LightDefaultColorList[98].color = QColor(255,25,167); // 98:VO2
+    LightDefaultColorList[99].color = QColor(27,203,177); // 99:Ventilation
+    LightDefaultColorList[100].color = QColor(0,121,0); // 100:VCO2
+    LightDefaultColorList[101].color = QColor(101,44,45); // 101:Tidal Volume
+    LightDefaultColorList[102].color = QColor(134,74,255); // 102:Respiratory Frequency
+    LightDefaultColorList[103].color = QColor(255,46,46); // 103:FeO2
 }
 
 // default settings for fonts etc
@@ -319,14 +431,15 @@ const Colors * GCColor::colorSet()
     return ColorList;
 }
 
-const Colors * GCColor::defaultColorSet()
+const Colors * GCColor::defaultColorSet(bool dark)
 {
-    return DefaultColorList;
+    if (dark) return DarkDefaultColorList;
+    else return LightDefaultColorList;
 }
 
 void GCColor::resetColors()
 {
-    copyArray(DefaultColorList, ColorList);
+    copyArray(DarkDefaultColorList, ColorList);
 }
 
 void
@@ -580,6 +693,15 @@ GCColor::linearGradient(int size, bool active, bool alternate)
     return returning; 
 }
 
+void
+GCColor::dumpColors()
+{
+    for(unsigned int i=0; ColorList[i].name != ""; i++) {
+        fprintf(stderr, "ColorList[%d].color = QColor(%d,%d,%d); // %d:%s\n", i, ColorList[i].color.red(),ColorList[i].color.green(),ColorList[i].color.blue(),
+                                                            i, ColorList[i].name.toStdString().c_str());
+    }
+}
+
 QStringList
 GCColor::getConfigKeys() {
 
@@ -599,7 +721,7 @@ Themes::Themes()
 {
     // initialise the array of themes, lets just start with a compiled in list
     QList<QColor> colors;
-    ColorTheme add("", QList<QColor>());
+    ColorTheme add("", true, QList<QColor>());
 
     //
     // Add all the standard themes
@@ -607,6 +729,7 @@ Themes::Themes()
 
     // MODERN DARK (Sublime Editor inspired)
     add.name = tr("Modern Dark");
+    add.dark = true;
     colors << QColor(19,19,19) // Plot Background
            << QColor(32,32,32) // Toolbar and Sidebar Chrome
            << QColor(85,170,255) // Accent color (markers)
@@ -626,11 +749,12 @@ Themes::Themes()
 
     // MODERN LIGHT (SAP Fiori Belize inspired)
     add.name = tr("Modern Light");
+    add.dark = false;
     colors << QColor(Qt::white)  // Plot Background
            << QColor(0xef,0xf4,0xf9) // Toolbar and Sidebar Chrome
            << QColor(0x26,0x84,0xf6) // Accent color (markers)
            << QColor(Qt::blue) // Selection color
-           << QColor(Qt::magenta) // Critical Power and W'Bal
+           << QColor(Qt::darkMagenta) // Critical Power and W'Bal
            << QColor(Qt::red) // Heartrate
            << QColor(85,170,0) // Speed
            << QColor(255,170,0) // Power
@@ -643,7 +767,7 @@ Themes::Themes()
     colors.clear();
 
     add.name = tr("Gnome Adwaita Dark");
-
+    add.dark = true;
     colors << QColor(19,19,19)  // Plot Background
            << QColor(44,49,51) // Toolbar and Sidebar Chrome
            << QColor(85,170,255) // Accent color (markers)
@@ -661,13 +785,14 @@ Themes::Themes()
     colors.clear();
 
     add.name = tr("Team Colours (light)");
+    add.dark = false;
     colors << QColor(Qt::white)  // Plot Background
            << QColor(0x36,0x37,0x4b) // Toolbar and Sidebar Chrome
            << QColor(0x65,0x69,0xa5) // Accent color (markers)
            << QColor(194,194,194) // Selection color
-           << QColor(Qt::yellow) // Critical Power and W'Bal
+           << QColor(Qt::darkMagenta) // Critical Power and W'Bal
            << QColor(Qt::red) // Heartrate
-           << QColor(Qt::green) // Speed
+           << QColor(Qt::darkGreen) // Speed
            << QColor(255,170,0) // Power
            << QColor(0,204,204) // Cadence
            << QColor(Qt::magenta) // Torque
@@ -678,11 +803,12 @@ Themes::Themes()
     colors.clear();
 
     add.name = tr("Ollie's Oatmeal (light)");
+    add.dark = false;
     colors << QColor(0xdd,0xef,0xe6)  // Plot Background
            << QColor(0x31,0x25,0x0b) // Toolbar and Sidebar Chrome
            << QColor(0x8d,0x57,0x30) // Accent color (markers)
            << QColor(194,194,194) // Selection color
-           << QColor(Qt::yellow) // Critical Power and W'Bal
+           << QColor(Qt::darkMagenta) // Critical Power and W'Bal
            << QColor(Qt::red) // Heartrate
            << QColor(Qt::green) // Speed
            << QColor(255,170,0) // Power
@@ -695,6 +821,7 @@ Themes::Themes()
     colors.clear();
 
     add.name = tr("Mustang (dark)"); // ** DARK **
+    add.dark = true;
     colors << QColor(0,0,0)  // Plot Background
            << QColor(35,35,35) // Toolbar and Sidebar Chrome
            << QColor(255,152,0) // Accent color (markers)
@@ -712,6 +839,7 @@ Themes::Themes()
     colors.clear();
 
     add.name = tr("Mono (dark)"); // New v3.1 default colors // ** DARK **
+    add.dark = true;
     colors << QColor(Qt::black)  // Plot Background
            << QColor(Qt::black) // Toolbar and Sidebar Chrome
            << QColor(Qt::white) // Accent color (markers)
@@ -729,6 +857,7 @@ Themes::Themes()
     colors.clear();
 
     add.name = tr("Mono (light)"); // New v3.1 default colors // ** LIGHT **
+    add.dark = false;
     colors  << QColor(Qt::white)  // Plot Background
            << QColor(Qt::white) // Toolbar and Sidebar Chrome
            << QColor(Qt::black) // Accent color (markers)
@@ -747,6 +876,7 @@ Themes::Themes()
 
     // we can add more later ....
     add.name = tr("Schoberer (light)"); // Old GoldenCheetah colors // ** LIGHT **
+    add.dark = false;
     colors << QColor(Qt::white)  // Plot Background
            << QColor(0xec,0xec,0xec) // Toolbar and Sidebar Chrome
            << QColor(Qt::black) // Accent color (markers)
@@ -852,7 +982,8 @@ GCColor::applyTheme(int index)
 
 
         default:
-            color = DefaultColorList[i].color;
+            if (theme.dark) color = DarkDefaultColorList[i].color;
+            else color = LightDefaultColorList[i].color;
         }
 
         // theme applied !
