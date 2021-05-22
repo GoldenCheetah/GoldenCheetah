@@ -468,6 +468,10 @@ GenericPlot::addCurve(QString name, QVector<double> xseries, QVector<double> yse
     // on a scatter chart the decoration is the line
     QString dname = QString("d_%1").arg(name);
 
+    // standard colors are encoded 1,1,x - where x is the index into the colorset
+    QColor applyColor = QColor(color);
+    if (applyColor.red() == 1 && applyColor.green() == 1) applyColor = GColor(applyColor.blue());
+
     // if curve already exists, remove it
     if (charttype==GC_CHART_LINE || charttype==GC_CHART_SCATTER || charttype==GC_CHART_PIE) {
         QAbstractSeries *existing = curves.value(name);
@@ -514,7 +518,7 @@ GenericPlot::addCurve(QString name, QVector<double> xseries, QVector<double> yse
         left = !left;
 
         // yaxis color matches, but not done for xaxis above
-        yaxis->labelcolor = yaxis->axiscolor = QColor(color);
+        yaxis->labelcolor = yaxis->axiscolor = QColor(applyColor);
 
         // add to list
         axisinfos.insert(yname, yaxis);
@@ -535,7 +539,7 @@ GenericPlot::addCurve(QString name, QVector<double> xseries, QVector<double> yse
 
             // aesthetics
             add->setBrush(Qt::NoBrush);
-            QPen pen(color);
+            QPen pen(applyColor);
             pen.setStyle(static_cast<Qt::PenStyle>(linestyle));
             pen.setWidth(size);
             add->setPen(pen);
@@ -560,7 +564,7 @@ GenericPlot::addCurve(QString name, QVector<double> xseries, QVector<double> yse
             else {
                 if (datalabels) {
                     add->setPointLabelsVisible(true);    // is false by default
-                    add->setPointLabelsColor(QColor(color));
+                    add->setPointLabelsColor(QColor(applyColor));
                     add->setPointLabelsFormat("@yPoint");
                 }
                 // fill curve?
@@ -572,12 +576,12 @@ GenericPlot::addCurve(QString name, QVector<double> xseries, QVector<double> yse
                 QAreaSeries *area = new QAreaSeries(add);
                 area->setName(name);
 
-                QPen pen(color);
+                QPen pen(applyColor);
                 pen.setStyle(static_cast<Qt::PenStyle>(linestyle));
                 pen.setWidth(size);
                 area->setPen(pen);
 
-                QColor col(color);
+                QColor col(applyColor);
                 col.setAlpha(64);
                 QBrush brush(col, Qt::SolidPattern);
                 area->setBrush(brush);
@@ -612,7 +616,7 @@ GenericPlot::addCurve(QString name, QVector<double> xseries, QVector<double> yse
                 // for our data points
                 if (linestyle == 0 && datalabels) {
                     dec->setPointLabelsVisible(true);    // is false by default
-                    dec->setPointLabelsColor(QColor(color));
+                    dec->setPointLabelsColor(QColor(applyColor));
                     dec->setPointLabelsFormat("@yPoint");
                 }
 
@@ -620,7 +624,7 @@ GenericPlot::addCurve(QString name, QVector<double> xseries, QVector<double> yse
                 if (symbol == 1) dec->setMarkerShape(QScatterSeries::MarkerShapeCircle);
                 else if (symbol == 2)  dec->setMarkerShape(QScatterSeries::MarkerShapeRectangle);
                 dec->setMarkerSize(size*6);
-                QColor col=QColor(color);
+                QColor col=QColor(applyColor);
                 dec->setBrush(QBrush(col));
                 dec->setPen(Qt::NoPen);
                 dec->setOpacity(double(opacity) / 100.0); // 0-100% to 0.0-1.0 values
@@ -656,7 +660,7 @@ GenericPlot::addCurve(QString name, QVector<double> xseries, QVector<double> yse
             else if (symbol == 1) add->setMarkerShape(QScatterSeries::MarkerShapeCircle);
             else if (symbol == 2)  add->setMarkerShape(QScatterSeries::MarkerShapeRectangle);
             add->setMarkerSize(size);
-            QColor col=QColor(color);
+            QColor col=QColor(applyColor);
             add->setBrush(QBrush(col));
             add->setPen(Qt::NoPen);
             add->setOpacity(double(opacity) / 100.0); // 0-100% to 0.0-1.0 values
@@ -677,7 +681,7 @@ GenericPlot::addCurve(QString name, QVector<double> xseries, QVector<double> yse
 
             if (datalabels) {
                 add->setPointLabelsVisible(true);    // is false by default
-                add->setPointLabelsColor(QColor(color));
+                add->setPointLabelsColor(QColor(applyColor));
                 add->setPointLabelsFormat("@yPoint");
             }
 
@@ -709,7 +713,7 @@ GenericPlot::addCurve(QString name, QVector<double> xseries, QVector<double> yse
 
                 // aesthetics
                 dec->setBrush(Qt::NoBrush);
-                QPen pen(color);
+                QPen pen(applyColor);
                 pen.setStyle(static_cast<Qt::PenStyle>(linestyle));
                 pen.setWidth(size);
                 dec->setPen(pen);
@@ -741,7 +745,7 @@ GenericPlot::addCurve(QString name, QVector<double> xseries, QVector<double> yse
             QBarSet *add= new QBarSet(name);
 
             // aesthetics
-            add->setBrush(QBrush(QColor(color)));
+            add->setBrush(QBrush(QColor(applyColor)));
             add->setPen(Qt::NoPen);
 
             // data and min/max values
