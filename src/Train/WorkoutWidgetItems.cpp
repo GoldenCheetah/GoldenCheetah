@@ -351,9 +351,9 @@ WWLine::paint(QPainter *painter)
         painter->setPen(Qt::NoPen);
 
             QColor brush_color1 = QColor(GColor(CTPOWER));
-            brush_color1.setAlpha(200);
+            brush_color1.setAlpha(240);
             QColor brush_color2 = QColor(GColor(CTPOWER));
-            brush_color2.setAlpha(64);
+            brush_color2.setAlpha(200);
 
             QLinearGradient linearGradient(0, 0, 0, workoutWidget()->transform(0,0).y());
             linearGradient.setColorAt(0.0, brush_color1);
