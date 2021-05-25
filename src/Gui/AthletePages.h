@@ -414,19 +414,17 @@ class HrZonePage : public QWidget
 
     private:
 
-        static const int nSports = 2;
-
         QLabel *sportLabel;
         QComboBox *sportCombo;
 
-        HrZones *hrZones[nSports];
-        quint16 b4Fingerprint[nSports]; // how did it start ?
-        HrSchemePage *schemePage[nSports];
-        LTPage *ltPage[nSports];
+        QHash<QString, HrZones*> hrZones;
+        QHash<QString, quint16> b4Fingerprint; // how did it start ?
+        QHash<QString, HrSchemePage*> schemePage;
+        QHash<QString, LTPage*> ltPage;
 
     private slots:
         
-        void changeSport(int i);
+        void changeSport();
 
 };
 

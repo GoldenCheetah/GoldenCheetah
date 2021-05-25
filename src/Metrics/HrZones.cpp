@@ -53,10 +53,10 @@ void HrZones::initializeZoneParameters()
     sizeof(initial_zone_default) /
     sizeof(initial_zone_default[0]);
 
-    if (run) {
-        fileName_ = "run-hr.zones";
-    } else {
+    if (sport_.isEmpty() || sport_ == "Bike") {
         fileName_ = "hr.zones";
+    } else {
+        fileName_ = sport_.toLower() + "-hr.zones";
     }
 
     scheme.zone_default.clear();

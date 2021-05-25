@@ -505,7 +505,7 @@ AnomalyDialog::check()
     anomalyList->horizontalHeader()->hide();
 
     // use MaxHR if available for suspicious, otherwise 200
-    const HrZones *hrZones = rideEditor->context->athlete->hrZones(rideEditor->ride->isRun);
+    const HrZones *hrZones = rideEditor->context->athlete->hrZones(rideEditor->ride->sport);
     int hrZR = hrZones ? hrZones->whichRange(rideEditor->ride->dateTime.date()) : -1;
     int maxHR = hrZR > 0 ? hrZones->getMaxHr(hrZR) : 200;
 

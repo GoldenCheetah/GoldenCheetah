@@ -162,6 +162,8 @@ class RideMetadata : public QWidget
         bool hasCalendarText();
         QString calendarText(RideItem *rideItem);
 
+        QStringList sports();
+
         QString getColorField() const { return colorfield; }
         void setColorField(QString x) { colorfield = x; }
 

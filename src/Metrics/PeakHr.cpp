@@ -57,7 +57,7 @@ class HrZone : public RideMetric {
     void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &deps) {
 
         // no zones
-        const HrZones* zones = item->context->athlete->hrZones(item->isRun);
+        const HrZones* zones = item->context->athlete->hrZones(item->sport);
         if (!zones || !item->ride()->areDataPresent()->hr) {
             setValue(RideFile::NIL);
             setCount(0);

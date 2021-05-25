@@ -554,30 +554,30 @@ RTool::zones(SEXP pDate, SEXP pSport)
         }
 
         // BIKE HR
-        if (rtool->context->athlete->hrZones(false)) {
+        if (rtool->context->athlete->hrZones("Bike")) {
 
-            int range=rtool->context->athlete->hrZones(false)->whichRange(forDate);
+            int range=rtool->context->athlete->hrZones("Bike")->whichRange(forDate);
             if (range >= 0) {
 
                 bike.date =  forDate;
-                bike.lthr =  rtool->context->athlete->hrZones(false)->getLT(range);
-                bike.aethr =  rtool->context->athlete->hrZones(false)->getAeT(range);
-                bike.rhr =  rtool->context->athlete->hrZones(false)->getRestHr(range);
-                bike.hrmax =  rtool->context->athlete->hrZones(false)->getMaxHr(range);
+                bike.lthr =  rtool->context->athlete->hrZones("Bike")->getLT(range);
+                bike.aethr =  rtool->context->athlete->hrZones("Bike")->getAeT(range);
+                bike.rhr =  rtool->context->athlete->hrZones("Bike")->getRestHr(range);
+                bike.hrmax =  rtool->context->athlete->hrZones("Bike")->getMaxHr(range);
             }
         }
 
         // RUN HR
-        if (rtool->context->athlete->hrZones(true)) {
+        if (rtool->context->athlete->hrZones("Run")) {
 
-            int range=rtool->context->athlete->hrZones(true)->whichRange(forDate);
+            int range=rtool->context->athlete->hrZones("Run")->whichRange(forDate);
             if (range >= 0) {
 
                 run.date =  forDate;
-                run.lthr =  rtool->context->athlete->hrZones(true)->getLT(range);
-                run.aethr =  rtool->context->athlete->hrZones(true)->getAeT(range);
-                run.rhr =  rtool->context->athlete->hrZones(true)->getRestHr(range);
-                run.hrmax =  rtool->context->athlete->hrZones(true)->getMaxHr(range);
+                run.lthr =  rtool->context->athlete->hrZones("Run")->getLT(range);
+                run.aethr =  rtool->context->athlete->hrZones("Run")->getAeT(range);
+                run.rhr =  rtool->context->athlete->hrZones("Run")->getRestHr(range);
+                run.hrmax =  rtool->context->athlete->hrZones("Run")->getMaxHr(range);
             }
         }
 
@@ -653,32 +653,32 @@ RTool::zones(SEXP pDate, SEXP pSport)
         }
 
         // BIKE HR
-        if (rtool->context->athlete->hrZones(false)) {
+        if (rtool->context->athlete->hrZones("Bike")) {
 
-            for (int range=0; range < rtool->context->athlete->hrZones(false)->getRangeSize(); range++) {
+            for (int range=0; range < rtool->context->athlete->hrZones("Bike")->getRangeSize(); range++) {
 
                 gcZoneConfig c("bike");
-                c.date =  rtool->context->athlete->hrZones(false)->getStartDate(range);
-                c.lthr =  rtool->context->athlete->hrZones(false)->getLT(range);
-                c.aethr =  rtool->context->athlete->hrZones(false)->getAeT(range);
-                c.rhr =  rtool->context->athlete->hrZones(false)->getRestHr(range);
-                c.hrmax =  rtool->context->athlete->hrZones(false)->getMaxHr(range);
+                c.date =  rtool->context->athlete->hrZones("Bike")->getStartDate(range);
+                c.lthr =  rtool->context->athlete->hrZones("Bike")->getLT(range);
+                c.aethr =  rtool->context->athlete->hrZones("Bike")->getAeT(range);
+                c.rhr =  rtool->context->athlete->hrZones("Bike")->getRestHr(range);
+                c.hrmax =  rtool->context->athlete->hrZones("Bike")->getMaxHr(range);
 
                 config << c;
             }
         }
 
         // RUN HR
-        if (rtool->context->athlete->hrZones(true)) {
+        if (rtool->context->athlete->hrZones("Run")) {
 
-            for (int range=0; range < rtool->context->athlete->hrZones(true)->getRangeSize(); range++) {
+            for (int range=0; range < rtool->context->athlete->hrZones("Run")->getRangeSize(); range++) {
 
                 gcZoneConfig c("run");
-                c.date =  rtool->context->athlete->hrZones(true)->getStartDate(range);
-                c.lthr =  rtool->context->athlete->hrZones(true)->getLT(range);
-                c.aethr =  rtool->context->athlete->hrZones(true)->getAeT(range);
-                c.rhr =  rtool->context->athlete->hrZones(true)->getRestHr(range);
-                c.hrmax =  rtool->context->athlete->hrZones(true)->getMaxHr(range);
+                c.date =  rtool->context->athlete->hrZones("Run")->getStartDate(range);
+                c.lthr =  rtool->context->athlete->hrZones("Run")->getLT(range);
+                c.aethr =  rtool->context->athlete->hrZones("Run")->getAeT(range);
+                c.rhr =  rtool->context->athlete->hrZones("Run")->getRestHr(range);
+                c.hrmax =  rtool->context->athlete->hrZones("Run")->getMaxHr(range);
 
                 config << c;
             }

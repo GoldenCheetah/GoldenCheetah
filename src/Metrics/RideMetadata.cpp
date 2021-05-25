@@ -477,6 +477,24 @@ RideMetadata::calendarText(RideItem *rideItem)
     return calendarText;
 }
 
+// Sports, as displayed to users
+QStringList
+RideMetadata::sports()
+{
+    QStringList sportList;
+    foreach (FieldDefinition field, getFields()) {
+        if (field.name == "Sport") {
+            sportList = field.values;
+	    break;
+        }
+    }
+
+    // Ensure default sport
+    if (sportList.isEmpty()) sportList << "Bike";
+
+    return sportList;
+}
+
 /*----------------------------------------------------------------------
  * Forms (one per tab)
  *--------------------------------------------------------------------*/
