@@ -3060,7 +3060,8 @@ LTMPlot::createEstimateData(Context *context, LTMSettings *settings, MetricDetai
     if (!SearchFilterBox::isNull(metricDetail.datafilter))
         spec.addMatches(SearchFilterBox::matches(context, metricDetail.datafilter));
     int nActivities, nRides, nRuns, nSwims;
-    context->athlete->rideCache->getRideTypeCounts(spec, nActivities, nRides, nRuns, nSwims);
+    QString sport;
+    context->athlete->rideCache->getRideTypeCounts(spec, nActivities, nRides, nRuns, nSwims, sport);
     metricDetail.run = (nRuns > 0 && nActivities == nRuns);
 
     // resize the curve array to maximum possible size (even if we don't need it)
@@ -3755,7 +3756,8 @@ LTMPlot::createPerformanceData(Context *context, LTMSettings *settings, MetricDe
     if (!SearchFilterBox::isNull(metricDetail.datafilter))
         spec.addMatches(SearchFilterBox::matches(context, metricDetail.datafilter));
     int nActivities, nRides, nRuns, nSwims;
-    context->athlete->rideCache->getRideTypeCounts(spec, nActivities, nRides, nRuns, nSwims);
+    QString sport;
+    context->athlete->rideCache->getRideTypeCounts(spec, nActivities, nRides, nRuns, nSwims, sport);
     metricDetail.run = (nRuns > 0 && nActivities == nRuns);
 
     int maxdays = groupForDate(settings->end.date(), settings->groupBy)

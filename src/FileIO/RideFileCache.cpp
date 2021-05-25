@@ -1564,7 +1564,7 @@ RideFileCache::computeDistribution(QVector<float> &array, RideFile::SeriesType s
 
     // get zones that apply, if any
     int zoneRange = context->athlete->zones(ride->isRun()) ? context->athlete->zones(ride->isRun())->whichRange(ride->startTime().date()) : -1;
-    int hrZoneRange = context->athlete->hrZones(ride->isRun()) ? context->athlete->hrZones(ride->isRun())->whichRange(ride->startTime().date()) : -1;
+    int hrZoneRange = context->athlete->hrZones(ride->sport()) ? context->athlete->hrZones(ride->sport())->whichRange(ride->startTime().date()) : -1;
     int paceZoneRange = context->athlete->paceZones(ride->isSwim()) ? context->athlete->paceZones(ride->isSwim())->whichRange(ride->startTime().date()) : -1;
 
     CP=0;
@@ -1580,8 +1580,8 @@ RideFileCache::computeDistribution(QVector<float> &array, RideFile::SeriesType s
     LTHR=0;
     int AeTHR=0;
     if (hrZoneRange != -1) {
-        LTHR=context->athlete->hrZones(ride->isRun())->getLT(hrZoneRange);
-        AeTHR=context->athlete->hrZones(ride->isRun())->getAeT(hrZoneRange);
+        LTHR=context->athlete->hrZones(ride->sport())->getLT(hrZoneRange);
+        AeTHR=context->athlete->hrZones(ride->sport())->getAeT(hrZoneRange);
     }
 
     CV=0;
@@ -1659,7 +1659,7 @@ RideFileCache::computeDistribution(QVector<float> &array, RideFile::SeriesType s
 
             // hr time in zone
             if (series == RideFile::hr && hrZoneRange != -1) {
-                int index = context->athlete->hrZones(ride->isRun())->whichZone(hrZoneRange, dp->value(series));
+                int index = context->athlete->hrZones(ride->sport())->whichZone(hrZoneRange, dp->value(series));
                 if (index >= 0) hrTimeInZone[index] += ride->recIntSecs();
             }
 

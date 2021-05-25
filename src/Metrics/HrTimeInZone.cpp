@@ -60,13 +60,13 @@ public:
         seconds = 0;
 
         // get zone ranges
-        if (item->context->athlete->hrZones(item->isRun) && item->hrZoneRange >= 0 && item->ride()->areDataPresent()->hr) {
+        if (item->context->athlete->hrZones(item->sport) && item->hrZoneRange >= 0 && item->ride()->areDataPresent()->hr) {
             // iterate and compute
             RideFileIterator it(item->ride(), spec);
             while (it.hasNext()) {
                 struct RideFilePoint *point = it.next();
                 totalSecs += item->ride()->recIntSecs();
-                if (item->context->athlete->hrZones(item->isRun)->whichZone(item->hrZoneRange, point->hr) == level)
+                if (item->context->athlete->hrZones(item->sport)->whichZone(item->hrZoneRange, point->hr) == level)
                     seconds += item->ride()->recIntSecs();
             }
         }
@@ -780,9 +780,9 @@ public:
         seconds = 0;
 
         // get zone ranges
-        if (item->context->athlete->hrZones(item->isRun) && item->hrZoneRange >= 0 && item->ride()->areDataPresent()->hr) {
+        if (item->context->athlete->hrZones(item->sport) && item->hrZoneRange >= 0 && item->ride()->areDataPresent()->hr) {
 
-            int AeT = item->context->athlete->hrZones(item->isRun)->getAeT(item->hrZoneRange);
+            int AeT = item->context->athlete->hrZones(item->sport)->getAeT(item->hrZoneRange);
 
             // iterate and compute
             RideFileIterator it(item->ride(), spec);
@@ -844,10 +844,10 @@ public:
         seconds = 0;
 
         // get zone ranges
-        if (item->context->athlete->hrZones(item->isRun) && item->hrZoneRange >= 0 && item->ride()->areDataPresent()->hr) {
+        if (item->context->athlete->hrZones(item->sport) && item->hrZoneRange >= 0 && item->ride()->areDataPresent()->hr) {
 
-            int AeT = item->context->athlete->hrZones(item->isRun)->getAeT(item->hrZoneRange);
-            int LT = item->context->athlete->hrZones(item->isRun)->getLT(item->hrZoneRange);
+            int AeT = item->context->athlete->hrZones(item->sport)->getAeT(item->hrZoneRange);
+            int LT = item->context->athlete->hrZones(item->sport)->getLT(item->hrZoneRange);
 
             // iterate and compute
             RideFileIterator it(item->ride(), spec);
@@ -909,9 +909,9 @@ public:
         seconds = 0;
 
         // get zone ranges
-        if (item->context->athlete->hrZones(item->isRun) && item->hrZoneRange >= 0 && item->ride()->areDataPresent()->hr) {
+        if (item->context->athlete->hrZones(item->sport) && item->hrZoneRange >= 0 && item->ride()->areDataPresent()->hr) {
 
-            int LT = item->context->athlete->hrZones(item->isRun)->getLT(item->hrZoneRange);
+            int LT = item->context->athlete->hrZones(item->sport)->getLT(item->hrZoneRange);
 
             // iterate and compute
             RideFileIterator it(item->ride(), spec);

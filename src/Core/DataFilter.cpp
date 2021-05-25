@@ -3289,14 +3289,14 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, Result x, long it, RideItem
             //
             // LTHR, AeTHR, MaxHR, RHR
             //
-            int hrZoneRange = m->context->athlete->hrZones(m->isRun) ?
-                              m->context->athlete->hrZones(m->isRun)->whichRange(m->dateTime.date())
+            int hrZoneRange = m->context->athlete->hrZones(m->sport) ?
+                              m->context->athlete->hrZones(m->sport)->whichRange(m->dateTime.date())
                               : -1;
 
-            int LTHR = hrZoneRange != -1 ?  m->context->athlete->hrZones(m->isRun)->getLT(hrZoneRange) : 0;
-            int AeTHR = hrZoneRange != -1 ?  m->context->athlete->hrZones(m->isRun)->getAeT(hrZoneRange) : 0;
-            int RHR = hrZoneRange != -1 ?  m->context->athlete->hrZones(m->isRun)->getRestHr(hrZoneRange) : 0;
-            int MaxHR = hrZoneRange != -1 ?  m->context->athlete->hrZones(m->isRun)->getMaxHr(hrZoneRange) : 0;
+            int LTHR = hrZoneRange != -1 ?  m->context->athlete->hrZones(m->sport)->getLT(hrZoneRange) : 0;
+            int AeTHR = hrZoneRange != -1 ?  m->context->athlete->hrZones(m->sport)->getAeT(hrZoneRange) : 0;
+            int RHR = hrZoneRange != -1 ?  m->context->athlete->hrZones(m->sport)->getRestHr(hrZoneRange) : 0;
+            int MaxHR = hrZoneRange != -1 ?  m->context->athlete->hrZones(m->sport)->getMaxHr(hrZoneRange) : 0;
 
             //
             // CV

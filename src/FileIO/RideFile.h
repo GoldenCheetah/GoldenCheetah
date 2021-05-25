@@ -242,6 +242,8 @@ class RideFile : public QObject // QObject to emit signals
         static double minimumFor(SeriesType series);
         static QColor colorFor(SeriesType series);
         static bool parseRideFileName(const QString &name, QDateTime *dt);
+
+        static QString sportTag(QString sport);
         QString sport() const;
         bool isBike() const;
         bool isRun() const;

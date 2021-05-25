@@ -213,6 +213,16 @@ RideFile::wprimeData()
 }
 
 QString
+RideFile::sportTag(QString sport)
+{
+    // Run, Bike and Swim are standarized, all others are up to the user
+    if (sport == "Bike" || sport == tr("Bike")) return "Bike";
+    if (sport == "Run" || sport == tr("Run")) return "Run";
+    if (sport == "Swim" || sport == tr("Swim")) return "Swim";
+    return sport;
+}
+
+QString
 RideFile::sport() const
 {
     // Run, Bike and Swim are standarized, all others are up to the user
@@ -227,7 +237,7 @@ RideFile::isBike() const
 {
     // for now we just look at Sport and default to Bike when Sport is not
     // set and isRun and isSwim are false
-    return (getTag("Sport", "") == "Bike" || getTag("Sport", "") == tr("Bike")) ||
+    return (sportTag(getTag("Sport", "")) == "Bike") ||
            (getTag("Sport","") == "" && !isRun() && !isSwim());
 }
 
@@ -236,7 +246,7 @@ RideFile::isRun() const
 {
     // for now we just look at Sport and if there are any
     // running specific data series in the data when Sport is not set
-    return (getTag("Sport", "") == "Run" || getTag("Sport", "") == tr("Run")) ||
+    return (sportTag(getTag("Sport", "")) == "Run") ||
            (getTag("Sport","") == "" && (areDataPresent()->rvert || areDataPresent()->rcad || areDataPresent()->rcontact));
 }
 
@@ -244,7 +254,7 @@ bool
 RideFile::isSwim() const
 {
     // for now we just look at Sport or presence of length data for lap swims
-    return (getTag("Sport", "") == "Swim" || getTag("Sport", "") == tr("Swim")) ||
+    return (sportTag(getTag("Sport", "")) == "Swim") ||
            (getTag("Sport","") == "" && xdata_.value("SWIM", NULL) != NULL);
 }
 

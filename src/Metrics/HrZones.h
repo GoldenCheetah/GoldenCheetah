@@ -90,7 +90,7 @@ class HrZones : public QObject
     private:
 
         // Sport
-        bool run;
+        QString sport_;
 
         // Scheme
         bool defaults_from_user;
@@ -105,7 +105,7 @@ class HrZones : public QObject
 
     public:
 
-        HrZones(bool run=false) : run(run), defaults_from_user(false) {
+        HrZones(QString sport="Bike") : sport_(sport), defaults_from_user(false) {
                 initializeZoneParameters();
         }
 
@@ -124,7 +124,7 @@ class HrZones : public QObject
         void initializeZoneParameters();
 
         // Sport
-        bool isRun() { return run; }
+        const QString& sport() const { return sport_; }
 
         //
         // Zone history - Ranges

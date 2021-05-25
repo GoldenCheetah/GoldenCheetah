@@ -241,30 +241,30 @@ Bindings::athleteZones(PyObject* date, QString sport) const
         }
 
         // BIKE HR
-        if (context->athlete->hrZones(false)) {
+        if (context->athlete->hrZones("Bike")) {
 
-            int range=context->athlete->hrZones(false)->whichRange(forDate);
+            int range=context->athlete->hrZones("Bike")->whichRange(forDate);
             if (range >= 0) {
 
                 bike.date =  forDate;
-                bike.lthr =  context->athlete->hrZones(false)->getLT(range);
-                bike.aethr =  context->athlete->hrZones(false)->getAeT(range);
-                bike.rhr =  context->athlete->hrZones(false)->getRestHr(range);
-                bike.hrmax =  context->athlete->hrZones(false)->getMaxHr(range);
+                bike.lthr =  context->athlete->hrZones("Bike")->getLT(range);
+                bike.aethr =  context->athlete->hrZones("Bike")->getAeT(range);
+                bike.rhr =  context->athlete->hrZones("Bike")->getRestHr(range);
+                bike.hrmax =  context->athlete->hrZones("Bike")->getMaxHr(range);
             }
         }
 
         // RUN HR
-        if (context->athlete->hrZones(true)) {
+        if (context->athlete->hrZones("Run")) {
 
-            int range=context->athlete->hrZones(true)->whichRange(forDate);
+            int range=context->athlete->hrZones("Run")->whichRange(forDate);
             if (range >= 0) {
 
                 run.date =  forDate;
-                run.lthr =  context->athlete->hrZones(true)->getLT(range);
-                run.aethr =  context->athlete->hrZones(true)->getAeT(range);
-                run.rhr =  context->athlete->hrZones(true)->getRestHr(range);
-                run.hrmax =  context->athlete->hrZones(true)->getMaxHr(range);
+                run.lthr =  context->athlete->hrZones("Run")->getLT(range);
+                run.aethr =  context->athlete->hrZones("Run")->getAeT(range);
+                run.rhr =  context->athlete->hrZones("Run")->getRestHr(range);
+                run.hrmax =  context->athlete->hrZones("Run")->getMaxHr(range);
             }
         }
 
@@ -340,32 +340,32 @@ Bindings::athleteZones(PyObject* date, QString sport) const
         }
 
         // BIKE HR
-        if (context->athlete->hrZones(false)) {
+        if (context->athlete->hrZones("Bike")) {
 
-            for (int range=0; range < context->athlete->hrZones(false)->getRangeSize(); range++) {
+            for (int range=0; range < context->athlete->hrZones("Bike")->getRangeSize(); range++) {
 
                 gcZoneConfig c("bike");
-                c.date =  context->athlete->hrZones(false)->getStartDate(range);
-                c.lthr =  context->athlete->hrZones(false)->getLT(range);
-                c.aethr =  context->athlete->hrZones(false)->getAeT(range);
-                c.rhr =  context->athlete->hrZones(false)->getRestHr(range);
-                c.hrmax =  context->athlete->hrZones(false)->getMaxHr(range);
+                c.date =  context->athlete->hrZones("Bike")->getStartDate(range);
+                c.lthr =  context->athlete->hrZones("Bike")->getLT(range);
+                c.aethr =  context->athlete->hrZones("Bike")->getAeT(range);
+                c.rhr =  context->athlete->hrZones("Bike")->getRestHr(range);
+                c.hrmax =  context->athlete->hrZones("Bike")->getMaxHr(range);
 
                 config << c;
             }
         }
 
         // RUN HR
-        if (context->athlete->hrZones(true)) {
+        if (context->athlete->hrZones("Run")) {
 
-            for (int range=0; range < context->athlete->hrZones(true)->getRangeSize(); range++) {
+            for (int range=0; range < context->athlete->hrZones("Run")->getRangeSize(); range++) {
 
                 gcZoneConfig c("run");
-                c.date =  context->athlete->hrZones(true)->getStartDate(range);
-                c.lthr =  context->athlete->hrZones(true)->getLT(range);
-                c.aethr =  context->athlete->hrZones(true)->getAeT(range);
-                c.rhr =  context->athlete->hrZones(true)->getRestHr(range);
-                c.hrmax =  context->athlete->hrZones(true)->getMaxHr(range);
+                c.date =  context->athlete->hrZones("Run")->getStartDate(range);
+                c.lthr =  context->athlete->hrZones("Run")->getLT(range);
+                c.aethr =  context->athlete->hrZones("Run")->getAeT(range);
+                c.rhr =  context->athlete->hrZones("Run")->getRestHr(range);
+                c.hrmax =  context->athlete->hrZones("Run")->getMaxHr(range);
 
                 config << c;
             }

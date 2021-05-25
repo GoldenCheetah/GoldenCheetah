@@ -72,7 +72,7 @@ class RideCache : public QObject
 
         // Count of activities matching specification
         void getRideTypeCounts(Specification specification, int& nActivities,
-                               int& nRides, int& nRuns, int& nSwims);
+                               int& nRides, int& nRuns, int& nSwims, QString& sport);
         // Check if metric is relevant for some  activity matching specification
         enum SportRestriction { AnySport, OnlyRides, OnlyRuns, OnlySwims, OnlyXtrains };
         bool isMetricRelevantForRides(Specification specification,

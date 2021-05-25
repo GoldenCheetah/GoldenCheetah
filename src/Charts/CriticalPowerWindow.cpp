@@ -1751,9 +1751,10 @@ CriticalPowerWindow::dateRangeChanged(DateRange dateRange)
         fs.addFilter(context->isfiltered, context->filters);
         fs.addFilter(context->ishomefiltered, context->homeFilters);
         int nActivities, nRides, nRuns, nSwims;
+        QString sport;
         context->athlete->rideCache->getRideTypeCounts(
                                         Specification(dateRange, fs),
-                                        nActivities, nRides, nRuns, nSwims);
+                                        nActivities, nRides, nRuns, nSwims, sport);
 
         // lets work out the average CP configure value
         if (series() != veloclinicplot && context->athlete->zones(nActivities == nRuns)) {

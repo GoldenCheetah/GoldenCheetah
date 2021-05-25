@@ -784,15 +784,20 @@ RideCache::getDistinctValues(QString field)
 
 void
 RideCache::getRideTypeCounts(Specification specification, int& nActivities,
-                             int& nRides, int& nRuns, int& nSwims)
+                             int& nRides, int& nRuns, int& nSwims, QString& sport)
 {
     nActivities = nRides = nRuns = nSwims = 0;
+    sport = "";
 
     // loop through and aggregate
     foreach (RideItem *ride, rides_) {
 
         // skip filtered rides
         if (!specification.pass(ride)) continue;
+
+        // sport is not empty only when all activities are from the same sport
+        if (nActivities == 0) sport = ride->sport;
+        else if (sport != ride-> sport) sport = "";
 
         nActivities++;
         if (ride->isSwim) nSwims++;

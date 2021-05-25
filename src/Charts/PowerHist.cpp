@@ -330,7 +330,7 @@ PowerHist::refreshHRZoneLabels()
     if (!rideItem) return;
 
     if (series == RideFile::hr) {
-        const HrZones *zones = context->athlete->hrZones(rideItem->isRun);
+        const HrZones *zones = context->athlete->hrZones(rideItem->sport);
         int zone_range = zones->whichRange(rideItem->dateTime.date());
 
         // generate labels for existing zones
@@ -707,7 +707,7 @@ PowerHist::recalcCompare()
             //
             if (!cpzoned) {
 
-                const HrZones *hrzones = context->athlete->hrZones(false);
+                const HrZones *hrzones = context->athlete->hrZones("Bike");
                 int hrzone_range = -1;
 
                 if (hrzones) {
@@ -928,16 +928,16 @@ PowerHist::recalc(bool force)
 
         // hr scale draw
         int hrRange;
-        if (series == RideFile::hr && zoned && rideItem && context->athlete->hrZones(rideItem->isRun) &&
-            (hrRange=context->athlete->hrZones(rideItem->isRun)->whichRange(rideItem->dateTime.date())) != -1) {
+        if (series == RideFile::hr && zoned && rideItem && context->athlete->hrZones(rideItem->sport) &&
+            (hrRange=context->athlete->hrZones(rideItem->sport)->whichRange(rideItem->dateTime.date())) != -1) {
 
             if (cpzoned) {
                 setAxisScaleDraw(QwtPlot::xBottom, new PolarisedZoneScaleDraw());
                 setAxisScale(QwtPlot::xBottom, -0.99, 3, 1);
             } else {
-                setAxisScaleDraw(QwtPlot::xBottom, new HrZoneScaleDraw(context->athlete->hrZones(rideItem->isRun), hrRange));
+                setAxisScaleDraw(QwtPlot::xBottom, new HrZoneScaleDraw(context->athlete->hrZones(rideItem->sport), hrRange));
                 if (hrRange >= 0)
-                    setAxisScale(QwtPlot::xBottom, -0.99, context->athlete->hrZones(rideItem->isRun)->numZones(hrRange), 1);
+                    setAxisScale(QwtPlot::xBottom, -0.99, context->athlete->hrZones(rideItem->sport)->numZones(hrRange), 1);
                 else
                     setAxisScale(QwtPlot::xBottom, -0.99, 0, 1);
             }
@@ -975,14 +975,14 @@ PowerHist::recalc(bool force)
         }
 
         // hr zoned for a time range
-        if (source == Cache && zoned && series == RideFile::hr && context->athlete->hrZones(false)) {
+        if (source == Cache && zoned && series == RideFile::hr && context->athlete->hrZones("Bike")) {
             if (cpzoned) {
                 setAxisScaleDraw(QwtPlot::xBottom, new PolarisedZoneScaleDraw());
                 setAxisScale(QwtPlot::xBottom, -0.99, 3, 1);
             } else {
-                setAxisScaleDraw(QwtPlot::xBottom, new HrZoneScaleDraw(context->athlete->hrZones(false), 0));
-                if (context->athlete->hrZones(false)->getRangeSize())
-                    setAxisScale(QwtPlot::xBottom, -0.99, context->athlete->hrZones(false)->numZones(0), 1); // use zones from first defined range
+                setAxisScaleDraw(QwtPlot::xBottom, new HrZoneScaleDraw(context->athlete->hrZones("Bike"), 0));
+                if (context->athlete->hrZones("Bike")->getRangeSize())
+                    setAxisScale(QwtPlot::xBottom, -0.99, context->athlete->hrZones("Bike")->numZones(0), 1); // use zones from first defined range
             }
         }
 
@@ -1943,9 +1943,9 @@ PowerHist::setArraysFromRide(RideFile *ride, HistData &standard, const Zones *zo
     int AeTP = zoneRange != -1 ? zones->getAeT(zoneRange) : 0;
     double WPRIME = zoneRange != -1 ? zones->getWprime(zoneRange) : 22000;
 
-    int hrZoneRange = context->athlete->hrZones(ride->isRun()) ? context->athlete->hrZones(ride->isRun())->whichRange(ride->startTime().date()) : -1;
-    int LTHR = hrZoneRange != -1 ? context->athlete->hrZones(ride->isRun())->getLT(hrZoneRange) : 0;
-    int AeTHR = hrZoneRange != -1 ? context->athlete->hrZones(ride->isRun())->getAeT(hrZoneRange) : 0;
+    int hrZoneRange = context->athlete->hrZones(ride->sport()) ? context->athlete->hrZones(ride->sport())->whichRange(ride->startTime().date()) : -1;
+    int LTHR = hrZoneRange != -1 ? context->athlete->hrZones(ride->sport())->getLT(hrZoneRange) : 0;
+    int AeTHR = hrZoneRange != -1 ? context->athlete->hrZones(ride->sport())->getAeT(hrZoneRange) : 0;
 
     int paceZoneRange = context->athlete->paceZones(ride->isSwim()) ? context->athlete->paceZones(ride->isSwim())->whichRange(ride->startTime().date()) : -1;
     double CV = (paceZoneRange != -1) ? context->athlete->paceZones(ride->isSwim())->getCV(paceZoneRange) : 0.0;
@@ -2146,7 +2146,7 @@ PowerHist::setArraysFromRide(RideFile *ride, HistData &standard, const Zones *zo
                     standard.hrCPZoneArray[2] ++;
                 }
 
-                hrIndex = context->athlete->hrZones(ride->isRun())->whichZone(hrZoneRange, p1->hr);
+                hrIndex = context->athlete->hrZones(ride->sport())->whichZone(hrZoneRange, p1->hr);
 
                 if (hrIndex >= 0 && hrIndex < maxSize) {
                     if (hrIndex >= standard.hrZoneArray.size())

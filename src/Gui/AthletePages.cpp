@@ -1719,22 +1719,23 @@ HrZonePage::HrZonePage(Context *context) : context(context)
 
     sportLabel = new QLabel(tr("Sport"));
     sportCombo = new QComboBox();
-    sportCombo->addItem(tr("Bike"));
-    sportCombo->addItem(tr("Run"));
-    sportCombo->setCurrentIndex(0);
     hlayout->addStretch();
     hlayout->addWidget(sportLabel);
     hlayout->addWidget(sportCombo);
     hlayout->addStretch();
     layout->addLayout(hlayout);
-    connect(sportCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(changeSport(int)));
+    connect(sportCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(changeSport()));
     tabs = new QTabWidget(this);
     layout->addWidget(tabs);
 
-    for (int i=0; i < nSports; i++) {
-        hrZones[i] = new HrZones(i > 0);
+    foreach (QString sport, GlobalContext::context()->rideMetadata->sports()) {
+        QString i = RideFile::sportTag(sport);
+
+        // Add sport to combo
+        sportCombo->addItem(sport, i);
 
         // get current config by reading it in (leave mainwindow zones alone)
+        hrZones[i] = new HrZones(i);
         QFile zonesFile(context->athlete->home->config().canonicalPath() + "/" + hrZones[i]->fileName());
         if (zonesFile.exists()) {
             hrZones[i]->read(zonesFile);
@@ -1746,20 +1747,22 @@ HrZonePage::HrZonePage(Context *context) : context(context)
         schemePage[i] = new HrSchemePage(hrZones[i]);
         ltPage[i] = new LTPage(context, hrZones[i], schemePage[i]);
     }
+    sportCombo->setCurrentIndex(0);
 
     // finish setup for the default sport
-    changeSport(sportCombo->currentIndex());
+    changeSport();
 }
 
 HrZonePage::~HrZonePage()
 {
-    for (int i=0; i<nSports; i++) delete hrZones[i];
+    foreach (HrZones* hrzones, hrZones) delete hrzones;
 }
 
 void
-HrZonePage::changeSport(int i)
+HrZonePage::changeSport()
 {
     // change tabs according to the selected sport
+    QString i = sportCombo->currentData().toString();
     tabs->clear();
     tabs->addTab(ltPage[i], tr("Lactate Threshold"));
     tabs->addTab(schemePage[i], tr("Default"));
@@ -1771,16 +1774,16 @@ HrZonePage::saveClicked()
     qint32 changed = 0;
 
     // write
-    for (int i=0; i < nSports; i++) {
+    foreach (QString i, hrZones.keys()) {
         hrZones[i]->setScheme(schemePage[i]->getScheme());
         hrZones[i]->write(context->athlete->home->config());
 
         // reread HR zones
         QFile hrzonesFile(context->athlete->home->config().canonicalPath() + "/" + context->athlete->hrzones_[i]->fileName());
         context->athlete->hrzones_[i]->read(hrzonesFile);
-        if (i == 1 && context->athlete->hrzones_[i]->getRangeSize() == 0) { // No running HR zones
+        if (context->athlete->hrzones_[i]->getRangeSize() == 0) { // No HR zones
             // Start with Cycling HR zones for backward compatibilty
-            QFile hrzonesFile(context->athlete->home->config().canonicalPath() + "/" + context->athlete->hrzones_[0]->fileName());
+            QFile hrzonesFile(context->athlete->home->config().canonicalPath() + "/" + HrZones().fileName());
             if (hrzonesFile.exists()) context->athlete->hrzones_[i]->read(hrzonesFile);
         }
 
