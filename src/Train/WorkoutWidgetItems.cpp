@@ -51,13 +51,13 @@ WWPowerScale::paint(QPainter *painter)
     int rnum = -1;
 
     // CP etc are not available so draw nothing
-    if (context->athlete->zones(false) == NULL || (rnum = context->athlete->zones(false)->whichRange(QDate::currentDate())) == -1) return;
+    if (context->athlete->zones("Bike") == NULL || (rnum = context->athlete->zones("Bike")->whichRange(QDate::currentDate())) == -1) return;
 
     // lets get the zones, CP and PMAX
-    int CP = context->athlete->zones(false)->getCP(rnum);
-    int Pmax = context->athlete->zones(false)->getPmax(rnum);
+    int CP = context->athlete->zones("Bike")->getCP(rnum);
+    int Pmax = context->athlete->zones("Bike")->getPmax(rnum);
     Q_UNUSED(Pmax); // for now ........
-    int numZones = context->athlete->zones(false)->numZones(rnum);
+    int numZones = context->athlete->zones("Bike")->numZones(rnum);
 
     QFontMetrics fontMetrics(workoutWidget()->markerFont);
     QFontMetrics bfontMetrics(workoutWidget()->bigFont);
@@ -69,7 +69,7 @@ WWPowerScale::paint(QPainter *painter)
         int low, high;
 
         // get zoneinfo  for a given range and zone
-        context->athlete->zones(false)->zoneInfo(rnum, i, name, description, low, high);
+        context->athlete->zones("Bike")->zoneInfo(rnum, i, name, description, low, high);
 
         // draw coordinates
         int ylow=workoutWidget()->transform(0,low).y();
@@ -154,10 +154,10 @@ WWWBalScale::paint(QPainter *painter)
     int rnum = -1;
 
     // CP etc are not available so draw nothing
-    if (context->athlete->zones(false) == NULL || (rnum = context->athlete->zones(false)->whichRange(QDate::currentDate())) == -1) return;
+    if (context->athlete->zones("Bike") == NULL || (rnum = context->athlete->zones("Bike")->whichRange(QDate::currentDate())) == -1) return;
 
     // lets get the zones, CP and PMAX
-    int WPRIME = context->athlete->zones(false)->getWprime(rnum);
+    int WPRIME = context->athlete->zones("Bike")->getWprime(rnum);
 
     QFontMetrics fontMetrics(workoutWidget()->markerFont);
     QFontMetrics bfontMetrics(workoutWidget()->bigFont);
@@ -417,11 +417,11 @@ WWTelemetry::paint(QPainter *painter)
         int rnum = -1;
 
         // CP etc are not available so draw nothing
-        if (context->athlete->zones(false) == NULL ||
-           (rnum = context->athlete->zones(false)->whichRange(QDate::currentDate())) == -1) return;
+        if (context->athlete->zones("Bike") == NULL ||
+           (rnum = context->athlete->zones("Bike")->whichRange(QDate::currentDate())) == -1) return;
 
         // lets get the zones, CP and PMAX
-        int WPRIME = context->athlete->zones(false)->getWprime(rnum);
+        int WPRIME = context->athlete->zones("Bike")->getWprime(rnum);
 
         // full color
         QColor color = GColor(CWBAL);
@@ -570,10 +570,10 @@ WWWBLine::paint(QPainter *painter)
     int rnum = -1;
 
     // CP etc are not available so draw nothing
-    if (context->athlete->zones(false) == NULL || (rnum = context->athlete->zones(false)->whichRange(QDate::currentDate())) == -1) return;
+    if (context->athlete->zones("Bike") == NULL || (rnum = context->athlete->zones("Bike")->whichRange(QDate::currentDate())) == -1) return;
 
     // lets get the zones, CP and PMAX
-    int WPRIME = context->athlete->zones(false)->getWprime(rnum);
+    int WPRIME = context->athlete->zones("Bike")->getWprime(rnum);
 
     // should be translucent if recording, as will be "overwritten"
     // by the actual W'bal value
