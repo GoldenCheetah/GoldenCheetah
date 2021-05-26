@@ -92,8 +92,9 @@ Athlete::Athlete(Context *context, const QDir &homeDir)
 
 
     // Power Zones for Bike & Run
-    for (int i=0; i < 2; i++) {
-        zones_[i] = new Zones(i>0);
+    foreach (QString sport, GlobalContext::context()->rideMetadata->sports()) {
+        QString i = RideFile::sportTag(sport);
+        zones_[i] = new Zones(i);
         QFile zonesFile(home->config().canonicalPath() + "/" + zones_[i]->fileName());
         if (zonesFile.exists()) {
             if (!zones_[i]->read(zonesFile)) {
@@ -102,16 +103,15 @@ Athlete::Athlete(Context *context, const QDir &homeDir)
                 QMessageBox::warning(context->mainWindow, tr("Reading Zones File %1").arg(zones_[i]->fileName()), zones_[i]->warningString());
             }
         }
-        if (i == 1 && zones_[i]->getRangeSize() == 0) { // No running Power zones
+        if (i != "Bike" && zones_[i]->getRangeSize() == 0) { // No Power zones
             // Start with Cycling Power zones for backward compatibilty
-            QFile zonesFile(home->config().canonicalPath() + "/" + zones_[0]->fileName());
+            QFile zonesFile(home->config().canonicalPath() + "/" + Zones().fileName());
             // Load without error/warning report to avoid repetition
             if (zonesFile.exists()) zones_[i]->read(zonesFile);
         }
     }
 
-    // Heartrate Zones for Bike & Run
-    QString defaultHrZoneFN = HrZones().fileName();
+    // Heartrate Zones
     foreach (QString sport, GlobalContext::context()->rideMetadata->sports()) {
         QString i = RideFile::sportTag(sport);
         hrzones_[i] = new HrZones(i);
@@ -253,7 +253,7 @@ Athlete::~Athlete()
     delete seasons;
     delete measures;
 
-    for (int i=0; i<2; i++) delete zones_[i];
+    foreach (Zones* zones, zones_) delete zones;
     foreach (HrZones* hrzones, hrzones_) delete hrzones;
     for (int i=0; i<2; i++) delete pacezones_[i];
     delete autoImportConfig;

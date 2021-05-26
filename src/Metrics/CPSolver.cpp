@@ -301,10 +301,10 @@ class BestR : public RideMetric {
                     double W = 20000;
 
                     // set from the ride
-                    if (item->context->athlete->zones(item->isRun)) {
-                        int zoneRange = item->context->athlete->zones(item->isRun)->whichRange(item->dateTime.date());
-                        CP = zoneRange >= 0 ? item->context->athlete->zones(item->isRun)->getCP(zoneRange) : 0;
-                        W = zoneRange >= 0 ? item->context->athlete->zones(item->isRun)->getWprime(zoneRange) : 0;
+                    if (item->context->athlete->zones(item->sport)) {
+                        int zoneRange = item->context->athlete->zones(item->sport)->whichRange(item->dateTime.date());
+                        CP = zoneRange >= 0 ? item->context->athlete->zones(item->sport)->getCP(zoneRange) : 0;
+                        W = zoneRange >= 0 ? item->context->athlete->zones(item->sport)->getWprime(zoneRange) : 0;
 
                         // did we override CP in metadata / metrics ?
                         int oCP = item->getText("CP","0").toInt();

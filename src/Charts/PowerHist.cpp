@@ -298,7 +298,7 @@ PowerHist::refreshZoneLabels()
 
     if (series == RideFile::watts || series == RideFile::wattsKg) {
 
-        const Zones *zones = context->athlete->zones(rideItem->isRun);
+        const Zones *zones = context->athlete->zones(rideItem->sport);
         int zone_range = zones->whichRange(rideItem->dateTime.date());
 
         // generate labels for existing zones
@@ -684,7 +684,7 @@ PowerHist::recalcCompare()
 
                 } else {
 
-                    const Zones *zones = context->athlete->zones(false);
+                    const Zones *zones = context->athlete->zones("Bike");
                     int zone_range = -1;
 
                     if (zones) {
@@ -911,16 +911,16 @@ PowerHist::recalc(bool force)
         curveSelected->setSamples(sx, sy);
 
         // zone scale draw
-        if ((series == RideFile::watts || series == RideFile::wattsKg) && zoned && rideItem && context->athlete->zones(rideItem->isRun)) {
+        if ((series == RideFile::watts || series == RideFile::wattsKg) && zoned && rideItem && context->athlete->zones(rideItem->sport)) {
 
             if (cpzoned) {
                 setAxisScaleDraw(QwtPlot::xBottom, new PolarisedZoneScaleDraw());
                 setAxisScale(QwtPlot::xBottom, -0.99, 3, 1);
             } else {
-                int zone_range = context->athlete->zones(rideItem->isRun)->whichRange(rideItem->dateTime.date());
-                setAxisScaleDraw(QwtPlot::xBottom, new ZoneScaleDraw(context->athlete->zones(rideItem->isRun), zone_range));
+                int zone_range = context->athlete->zones(rideItem->sport)->whichRange(rideItem->dateTime.date());
+                setAxisScaleDraw(QwtPlot::xBottom, new ZoneScaleDraw(context->athlete->zones(rideItem->sport), zone_range));
                 if (zone_range >= 0)
-                    setAxisScale(QwtPlot::xBottom, -0.99, context->athlete->zones(rideItem->isRun)->numZones(zone_range), 1);
+                    setAxisScale(QwtPlot::xBottom, -0.99, context->athlete->zones(rideItem->sport)->numZones(zone_range), 1);
                 else
                     setAxisScale(QwtPlot::xBottom, -0.99, 0, 1);
             }
@@ -963,14 +963,14 @@ PowerHist::recalc(bool force)
         }
 
         // watts zoned for a time range
-        if (source == Cache && zoned && (series == RideFile::watts || series == RideFile::wattsKg) && context->athlete->zones(false)) {
+        if (source == Cache && zoned && (series == RideFile::watts || series == RideFile::wattsKg) && context->athlete->zones("Bike")) {
             if (cpzoned) {
                 setAxisScaleDraw(QwtPlot::xBottom, new PolarisedZoneScaleDraw());
                 setAxisScale(QwtPlot::xBottom, -0.99, 3, 1);
             } else {
-                setAxisScaleDraw(QwtPlot::xBottom, new ZoneScaleDraw(context->athlete->zones(false), 0));
-                if (context->athlete->zones(false)->getRangeSize())
-                    setAxisScale(QwtPlot::xBottom, -0.99, context->athlete->zones(false)->numZones(0), 1); // use zones from first defined range
+                setAxisScaleDraw(QwtPlot::xBottom, new ZoneScaleDraw(context->athlete->zones("Bike"), 0));
+                if (context->athlete->zones("Bike")->getRangeSize())
+                    setAxisScale(QwtPlot::xBottom, -0.99, context->athlete->zones("Bike")->numZones(0), 1); // use zones from first defined range
             }
         }
 
@@ -1420,7 +1420,7 @@ PowerHist::intervalHover(IntervalItem *x)
 
         // set data
         HistData hoverData;
-        setArraysFromRide(rideItem->ride(), hoverData, context->athlete->zones(rideItem->isRun), x);
+        setArraysFromRide(rideItem->ride(), hoverData, context->athlete->zones(rideItem->sport), x);
 
         // set curve
         QVector<double>x,y,sx,sy;
@@ -1864,7 +1864,7 @@ PowerHist::setData(RideItem *_rideItem, bool force)
 
     if (ride && hasData) {
         //setTitle(ride->startTime().toString(GC_DATETIME_FORMAT));
-        setArraysFromRide(ride, standard, context->athlete->zones(rideItem->isRun), NULL);
+        setArraysFromRide(ride, standard, context->athlete->zones(rideItem->sport), NULL);
 
     } else {
 

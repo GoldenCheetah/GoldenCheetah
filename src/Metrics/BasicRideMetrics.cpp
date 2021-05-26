@@ -1684,10 +1684,10 @@ class APPercent : public RideMetric {
         double percent = 0.0f;
         AvgPower *pw = dynamic_cast<AvgPower*>(deps.value("average_power"));
 
-        if (pw->value(true) > 0.0f && item->context->athlete->zones(item->isRun) && item->zoneRange >= 0) {
+        if (pw->value(true) > 0.0f && item->context->athlete->zones(item->sport) && item->zoneRange >= 0) {
 
             // get Pmax
-            double pmax = item->context->athlete->zones(item->isRun)->getPmax(item->zoneRange);
+            double pmax = item->context->athlete->zones(item->sport)->getPmax(item->zoneRange);
             percent = pw->value(true)/pmax * 100;
         }
         setValue(percent);

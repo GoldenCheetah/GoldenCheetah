@@ -450,12 +450,12 @@ SolveCPDialog::solveClicked()
         if (static_cast<QCheckBox*>(dataTable->itemWidget(it, 0))->isChecked())
             item = static_cast<RideItem*>(it->data(0, Qt::UserRole).value<void *>());
 
-        if (item && item->context->athlete->zones(item->isRun)) {
+        if (item && item->context->athlete->zones(item->sport)) {
 
             // get CP etc
-            int zoneRange = item->context->athlete->zones(item->isRun)->whichRange(item->dateTime.date());
-            int CP = zoneRange >= 0 ? item->context->athlete->zones(item->isRun)->getCP(zoneRange) : 0;
-            int WPRIME = zoneRange >= 0 ? item->context->athlete->zones(item->isRun)->getWprime(zoneRange) : 0;
+            int zoneRange = item->context->athlete->zones(item->sport)->whichRange(item->dateTime.date());
+            int CP = zoneRange >= 0 ? item->context->athlete->zones(item->sport)->getCP(zoneRange) : 0;
+            int WPRIME = zoneRange >= 0 ? item->context->athlete->zones(item->sport)->getWprime(zoneRange) : 0;
 
             if (!mincp || CP < mincp) mincp = CP;
             if (!maxcp || CP > maxcp) maxcp = CP;

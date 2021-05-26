@@ -89,7 +89,7 @@ class Zones : public QObject
     private:
 
         // Sport
-        bool run;
+        QString sport_;
 
         // Scheme
         bool defaults_from_user;
@@ -104,7 +104,7 @@ class Zones : public QObject
 
     public:
 
-        Zones(bool run=false) : run(run), defaults_from_user(false) {
+        Zones(QString sport="Bike") : sport_(sport), defaults_from_user(false) {
                 initializeZoneParameters();
         }
 
@@ -123,7 +123,7 @@ class Zones : public QObject
         void initializeZoneParameters();
 
         // Sport
-        bool isRun() { return run; }
+        QString sport() { return sport_; }
 
         //
         // Zone history - Ranges

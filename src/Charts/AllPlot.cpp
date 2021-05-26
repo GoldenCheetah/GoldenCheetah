@@ -109,7 +109,7 @@ class AllPlotBackground: public QwtPlotItem
 
         if (parent->context->isCompareIntervals) {
 
-            zones = parent->context->athlete->zones(rideItem ? rideItem->isRun : false);
+            zones = parent->context->athlete->zones(rideItem ? rideItem->sport : "Bike");
             if (!zones) return;
 
             // use first compare interval date
@@ -120,10 +120,10 @@ class AllPlotBackground: public QwtPlotItem
             if (zone_range == -1)
                 zone_range = zones->whichRange(QDate::currentDate());
 
-        } else if (rideItem && parent->context->athlete->zones(rideItem->isRun)) {
+        } else if (rideItem && parent->context->athlete->zones(rideItem->sport)) {
 
-            zones = parent->context->athlete->zones(rideItem->isRun);
-            zone_range = parent->context->athlete->zones(rideItem->isRun)->whichRange(rideItem->dateTime.date());
+            zones = parent->context->athlete->zones(rideItem->sport);
+            zone_range = parent->context->athlete->zones(rideItem->sport)->whichRange(rideItem->dateTime.date());
 
         } else {
 
@@ -180,7 +180,7 @@ class AllPlotZoneLabel: public QwtPlotItem
 
             if (parent->context->isCompareIntervals) {
 
-                zones = parent->context->athlete->zones(rideItem ? rideItem->isRun : false);
+                zones = parent->context->athlete->zones(rideItem ? rideItem->sport : "Bike");
                 if (!zones) return;
 
                 // use first compare interval date
@@ -191,10 +191,10 @@ class AllPlotZoneLabel: public QwtPlotItem
                 if (zone_range == -1)
                     zone_range = zones->whichRange(QDate::currentDate());
 
-            } else if (rideItem && parent->context->athlete->zones(rideItem->isRun)) {
+            } else if (rideItem && parent->context->athlete->zones(rideItem->sport)) {
 
-                zones = parent->context->athlete->zones(rideItem->isRun);
-                zone_range = parent->context->athlete->zones(rideItem->isRun)->whichRange(rideItem->dateTime.date());
+                zones = parent->context->athlete->zones(rideItem->sport);
+                zone_range = parent->context->athlete->zones(rideItem->sport)->whichRange(rideItem->dateTime.date());
 
             } else {
 
@@ -1688,13 +1688,13 @@ void AllPlot::refreshZoneLabels()
     }
     zoneLabels.clear();
 
-    if (rideItem && context->athlete->zones(rideItem->isRun)) {
+    if (rideItem && context->athlete->zones(rideItem->sport)) {
 
-        int zone_range = context->athlete->zones(rideItem->isRun)->whichRange(rideItem->dateTime.date());
+        int zone_range = context->athlete->zones(rideItem->sport)->whichRange(rideItem->dateTime.date());
 
         // generate labels for existing zones
         if (zone_range >= 0) {
-            int num_zones = context->athlete->zones(rideItem->isRun)->numZones(zone_range);
+            int num_zones = context->athlete->zones(rideItem->sport)->numZones(zone_range);
             for (int z = 0; z < num_zones; z ++) {
                 AllPlotZoneLabel *label = new AllPlotZoneLabel(this, z);
                 label->attach(this);

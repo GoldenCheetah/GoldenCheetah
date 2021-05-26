@@ -63,7 +63,7 @@ CPPlot::CPPlot(CriticalPowerWindow *parent, Context *context, bool rangemode) : 
     model(0), modelVariant(0), fit(0), fitdata(0), modelDecay(false),
 
     // state
-    context(context), bestsCache(NULL), dateCV(0.0), isRun(false), isSwim(false),
+    context(context), bestsCache(NULL), dateCV(0.0), sport(""),
     rideSeries(RideFile::watts),
     isFiltered(false), shadeMode(2),
     shadeIntervals(true), rangemode(rangemode), 
@@ -810,7 +810,7 @@ CPPlot::updateModelHelper()
 
     } else if (rideSeries == RideFile::kph) {
 
-        const PaceZones *zones = (isRun || isSwim) ? context->athlete->paceZones(isSwim) : NULL;
+        const PaceZones *zones = (sport == "Run" || sport == "Swim") ? context->athlete->paceZones(sport=="Swim") : NULL;
         // Rank field is reused for pace according to sport
         bool metricPace = zones ? appsettings->value(this, zones->paceSetting(), GlobalContext::context()->useMetricUnits).toBool() : GlobalContext::context()->useMetricUnits;
         cpw->titleRank->setText(zones ? zones->paceUnits(metricPace) : "n/a");
@@ -1078,7 +1078,7 @@ CPPlot::plotTests(RideItem *rideitem)
 
         foreach(RideItem *r, context->athlete->rideCache->rides()) {
             // does it match ?
-            if ((r->isSwim == isSwim) && (r->isRun == isRun) && spec.pass(r))
+            if ((r->sport == sport) && spec.pass(r))
                 rides << r;
         }
 
@@ -1475,7 +1475,7 @@ CPPlot::plotBests(RideItem *rideItem)
 
             // set zones from shading CP
             QList <int> power_zone;
-            int n_zones = context->athlete->zones(isRun)->lowsFromCP(&power_zone, (int) int(shadingCP));
+            int n_zones = context->athlete->zones(sport)->lowsFromCP(&power_zone, (int) int(shadingCP));
 
             // now run through each zone and create a curve
             int high = maxNonZero - 1;
@@ -1530,7 +1530,7 @@ CPPlot::plotBests(RideItem *rideItem)
                 // now the labels
                 if (shadeMode && (criticalSeries != CriticalPowerWindow::work || work[high] > 100.0)) {
 
-                    QwtText text(context->athlete->zones(isRun)->getDefaultZoneName(zone));
+                    QwtText text(context->athlete->zones(sport)->getDefaultZoneName(zone));
                     text.setFont(QFont("Helvetica", 20, QFont::Bold));
                     color.setAlpha(255);
                     text.setColor(color);
@@ -1569,7 +1569,7 @@ CPPlot::plotBests(RideItem *rideItem)
 
             // set zones from shading CV
             QList <double> pace_zone;
-            int n_zones = context->athlete->paceZones(isSwim)->lowsFromCV(&pace_zone, shadingCV);
+            int n_zones = context->athlete->paceZones(sport=="Swim")->lowsFromCV(&pace_zone, shadingCV);
 
             // now run through each zone and create a curve
             int high = maxNonZero - 1;
@@ -1618,7 +1618,7 @@ CPPlot::plotBests(RideItem *rideItem)
                 // now the labels
                 if (shadeMode) {
 
-                    QwtText text(context->athlete->paceZones(isSwim)->getDefaultZoneName(zone));
+                    QwtText text(context->athlete->paceZones(sport=="Swim")->getDefaultZoneName(zone));
                     text.setFont(QFont("Helvetica", 20, QFont::Bold));
                     color.setAlpha(255);
                     text.setColor(color);
@@ -2013,7 +2013,7 @@ CPPlot::setRide(RideItem *rideItem)
     // if plotting in percentage mode, so get data and plot it now
     // delete if sport changed
     if (!rangemode) {
-        setSport(rideItem->isRun, rideItem->isSwim);
+        setSport(rideItem->sport);
         delete bestsCache;
         bestsCache = NULL;
         clearCurves();
@@ -2114,8 +2114,8 @@ CPPlot::pointHover(QwtPlotCurve *curve, int index)
 
         // use the right pace config
         bool metricPace = true;
-        if (isSwim) metricPace = appsettings->value(this, GC_SWIMPACE, GlobalContext::context()->useMetricUnits).toBool();
-        else if (isRun)  metricPace = appsettings->value(this, GC_PACE, GlobalContext::context()->useMetricUnits).toBool();
+        if (sport == "Swim") metricPace = appsettings->value(this, GC_SWIMPACE, GlobalContext::context()->useMetricUnits).toBool();
+        else if (sport == "Run")  metricPace = appsettings->value(this, GC_PACE, GlobalContext::context()->useMetricUnits).toBool();
         else  metricPace = GlobalContext::context()->useMetricUnits;
 
 
@@ -2180,16 +2180,16 @@ CPPlot::pointHover(QwtPlotCurve *curve, int index)
         // for speed series add pace with units according to settings
         if (criticalSeries == CriticalPowerWindow::kph) {
 
-            if (isRun || isSwim) {
+            if (sport == "Run" || sport == "Swim") {
 
-                const PaceZones *zones = context->athlete->paceZones(isSwim);
+                const PaceZones *zones = context->athlete->paceZones(sport=="Swim");
                 if (zones) paceStr = QString("\n%1 %2").arg(zones->kphToPaceString(yvalue, metricPace))
                                                        .arg(zones->paceUnits(metricPace));
 
             }
             
             const double km = yvalue*xvalue/60.0; // distance in km
-            if (isSwim) {
+            if (sport == "Swim") {
 
                 if (metricPace) paceStr += tr("\n%1 m").arg(1000*km, 0, 'f', 0);
                 else paceStr += tr("\n%1 yd").arg(1000*km/METERS_PER_YARD, 0, 'f', 0);

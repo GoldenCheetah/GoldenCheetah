@@ -942,30 +942,30 @@ RideSummaryWindow::htmlSummary()
     // or summarising date range with homogeneous activities
     //
     if ((ridesummary && rideItem && rideItem->present.contains("P")) ||
-        (!ridesummary && ((nActivities==nRides) || (nActivities==nRuns)))) {
+        (!ridesummary && !sport.isEmpty())) {
 
         // set to unknown just in case
         range = -1;
         int WPRIME=22000; // reasonable default
 
-        if (ridesummary && rideItem && context->athlete->zones(rideItem->isRun)) {
+        if (ridesummary && rideItem && context->athlete->zones(rideItem->sport)) {
 
             // get zones to use via ride for ridesummary
-            range = context->athlete->zones(rideItem->isRun)->whichRange(rideItem->dateTime.date());
+            range = context->athlete->zones(rideItem->sport)->whichRange(rideItem->dateTime.date());
             if (range > -1) {
-                numzones = context->athlete->zones(rideItem->isRun)->numZones(range);
-                WPRIME = context->athlete->zones(rideItem ? rideItem->isRun : false)->getWprime(range);
+                numzones = context->athlete->zones(rideItem->sport)->numZones(range);
+                WPRIME = context->athlete->zones(rideItem ? rideItem->sport : "Bike")->getWprime(range);
             }
 
         // or for end of daterange plotted for daterange summary with
         // homogeneous activites, use the corresponding Power Zones
-        } else if (!ridesummary && context->athlete->zones(nActivities==nRuns)) {
+        } else if (!ridesummary && context->athlete->zones(sport)) {
 
             // get from end if period
-            range = context->athlete->zones(nActivities==nRuns)->whichRange(myDateRange.to);
+            range = context->athlete->zones(sport)->whichRange(myDateRange.to);
             if (range > -1) {
-                numzones = context->athlete->zones(nActivities==nRuns)->numZones(range);
-                WPRIME = context->athlete->zones(nActivities==nRuns)->getWprime(range);
+                numzones = context->athlete->zones(sport)->numZones(range);
+                WPRIME = context->athlete->zones(sport)->getWprime(range);
             }
         }
 
@@ -982,8 +982,8 @@ RideSummaryWindow::htmlSummary()
             }
             summary += tr("<h3>Power Zones</h3>");
 
-            if (ridesummary) summary += context->athlete->zones(rideItem->isRun)->summarize(range, time_in_zone, altColor);
-            else summary += context->athlete->zones(nActivities==nRuns)->summarize(range, time_in_zone, altColor); //aggregating  for date range
+            if (ridesummary) summary += context->athlete->zones(rideItem->sport)->summarize(range, time_in_zone, altColor);
+            else summary += context->athlete->zones(sport)->summarize(range, time_in_zone, altColor); //aggregating  for date range
 
             // W'bal Zones
             QVector<double> wtime_in_zone(4);
@@ -1978,15 +1978,14 @@ RideSummaryWindow::htmlCompareSummary() const
         //
         // TIME IN POWER ZONES (we can't do w'bal compare at present)
         // when all rides or all runs, use zones accordingly
-        if (((nActivities==nRides) || (nActivities==nRuns)) &&
-            context->athlete->zones(nActivities==nRuns)) {
+        if (!sport.isEmpty() && context->athlete->zones(sport)) {
 
             // get from end if period
-            int rangeidx = context->athlete->zones(nActivities==nRuns)->whichRange(QDate::currentDate()); // use current zone names et al
+            int rangeidx = context->athlete->zones(sport)->whichRange(QDate::currentDate()); // use current zone names et al
             if (rangeidx > -1) {
 
                 // get the list of zones
-                ZoneRange range = const_cast<Zones*>(context->athlete->zones(nActivities==nRuns))->getZoneRange(rangeidx);
+                ZoneRange range = const_cast<Zones*>(context->athlete->zones(sport))->getZoneRange(rangeidx);
                 QList<ZoneInfo> zones = range.zones;
 
                 // we've got a range and a count of zones so all is well
@@ -2125,7 +2124,7 @@ RideSummaryWindow::htmlCompareSummary() const
         // TIME IN PACE ZONES
         // when all runs or all swims, use zones accordingly
         if (((nActivities==nRuns) || (nActivities==nSwims)) &&
-            context->athlete->zones(nActivities==nSwims)) {
+            context->athlete->paceZones(nActivities==nSwims)) {
 
             // get from end if period
             int rangeidx = context->athlete->paceZones(nActivities==nSwims)->whichRange(QDate::currentDate()); // use current zone names et al
@@ -2345,15 +2344,14 @@ RideSummaryWindow::htmlCompareSummary() const
         //
         // TIME IN POWER ZONES AND W'BAL ZONES
         // when all rides or all runs, use zones accordingly
-        if (((nActivities==nRides) || (nActivities==nRuns)) &&
-            context->athlete->zones(nActivities==nRuns)) {
+        if (!sport.isEmpty() && context->athlete->zones(sport)) {
 
             // get from end if period
-            int rangeidx = context->athlete->zones(nActivities==nRuns)->whichRange(QDate::currentDate()); // use current zone names et al
+            int rangeidx = context->athlete->zones(sport)->whichRange(QDate::currentDate()); // use current zone names et al
             if (rangeidx > -1) {
 
                 // get the list of zones
-                ZoneRange range = const_cast<Zones*>(context->athlete->zones(nActivities==nRuns))->getZoneRange(rangeidx);
+                ZoneRange range = const_cast<Zones*>(context->athlete->zones(sport))->getZoneRange(rangeidx);
                 QList<ZoneInfo> zones = range.zones;
 
                 // we've got a range and a count of zones so all is well
@@ -2559,7 +2557,7 @@ RideSummaryWindow::htmlCompareSummary() const
         // TIME IN PACE ZONES
         // when all runs or all swims, use zones accordingly
         if (((nActivities==nRuns) || (nActivities==nSwims)) &&
-            context->athlete->zones(nActivities==nSwims)) {
+            context->athlete->paceZones(nActivities==nSwims)) {
 
             // get from end if period
             int rangeidx = context->athlete->paceZones(nActivities==nSwims)->whichRange(QDate::currentDate()); // use current zone names et al

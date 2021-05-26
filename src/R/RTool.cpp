@@ -521,35 +521,35 @@ RTool::zones(SEXP pDate, SEXP pSport)
         gcZoneConfig swim("bike");
 
         // BIKE POWER
-        if (rtool->context->athlete->zones(false)) {
+        if (rtool->context->athlete->zones("Bike")) {
 
             // run through the bike zones
-            int range=rtool->context->athlete->zones(false)->whichRange(forDate);
+            int range=rtool->context->athlete->zones("Bike")->whichRange(forDate);
             if (range >= 0) {
                 bike.date =  forDate;
-                bike.cp = rtool->context->athlete->zones(false)->getCP(range);
-                bike.wprime = rtool->context->athlete->zones(false)->getWprime(range);
-                bike.pmax = rtool->context->athlete->zones(false)->getPmax(range);
-                bike.aetp = rtool->context->athlete->zones(false)->getAeT(range);
-                bike.ftp = rtool->context->athlete->zones(false)->getFTP(range);
-                bike.zoneslow = rtool->context->athlete->zones(false)->getZoneLows(range);
+                bike.cp = rtool->context->athlete->zones("Bike")->getCP(range);
+                bike.wprime = rtool->context->athlete->zones("Bike")->getWprime(range);
+                bike.pmax = rtool->context->athlete->zones("Bike")->getPmax(range);
+                bike.aetp = rtool->context->athlete->zones("Bike")->getAeT(range);
+                bike.ftp = rtool->context->athlete->zones("Bike")->getFTP(range);
+                bike.zoneslow = rtool->context->athlete->zones("Bike")->getZoneLows(range);
             }
         }
 
         // RUN POWER
-        if (rtool->context->athlete->zones(false)) {
+        if (rtool->context->athlete->zones("Run")) {
 
             // run through the bike zones
-            int range=rtool->context->athlete->zones(true)->whichRange(forDate);
+            int range=rtool->context->athlete->zones("Run")->whichRange(forDate);
             if (range >= 0) {
 
                 run.date = forDate;
-                run.cp = rtool->context->athlete->zones(true)->getCP(range);
-                run.wprime = rtool->context->athlete->zones(true)->getWprime(range);
-                run.pmax = rtool->context->athlete->zones(true)->getPmax(range);
-                run.aetp = rtool->context->athlete->zones(true)->getAeT(range);
-                run.ftp = rtool->context->athlete->zones(true)->getFTP(range);
-                run.zoneslow = rtool->context->athlete->zones(true)->getZoneLows(range);
+                run.cp = rtool->context->athlete->zones("Run")->getCP(range);
+                run.wprime = rtool->context->athlete->zones("Run")->getWprime(range);
+                run.pmax = rtool->context->athlete->zones("Run")->getPmax(range);
+                run.aetp = rtool->context->athlete->zones("Run")->getAeT(range);
+                run.ftp = rtool->context->athlete->zones("Run")->getFTP(range);
+                run.zoneslow = rtool->context->athlete->zones("Run")->getZoneLows(range);
             }
         }
 
@@ -612,41 +612,41 @@ RTool::zones(SEXP pDate, SEXP pSport)
     } else {
 
         // BIKE POWER
-        if (rtool->context->athlete->zones(false)) {
+        if (rtool->context->athlete->zones("Bike")) {
 
-            for (int range=0; range < rtool->context->athlete->zones(false)->getRangeSize(); range++) {
+            for (int range=0; range < rtool->context->athlete->zones("Bike")->getRangeSize(); range++) {
 
                 // run through the bike zones
                 gcZoneConfig c("bike");
 
-                c.date =  rtool->context->athlete->zones(false)->getStartDate(range);
-                c.cp = rtool->context->athlete->zones(false)->getCP(range);
-                c.wprime = rtool->context->athlete->zones(false)->getWprime(range);
-                c.pmax = rtool->context->athlete->zones(false)->getPmax(range);
-                c.aetp = rtool->context->athlete->zones(false)->getAeT(range);
-                c.ftp = rtool->context->athlete->zones(false)->getFTP(range);
-                c.zoneslow = rtool->context->athlete->zones(false)->getZoneLows(range);
+                c.date =  rtool->context->athlete->zones("Bike")->getStartDate(range);
+                c.cp = rtool->context->athlete->zones("Bike")->getCP(range);
+                c.wprime = rtool->context->athlete->zones("Bike")->getWprime(range);
+                c.pmax = rtool->context->athlete->zones("Bike")->getPmax(range);
+                c.aetp = rtool->context->athlete->zones("Bike")->getAeT(range);
+                c.ftp = rtool->context->athlete->zones("Bike")->getFTP(range);
+                c.zoneslow = rtool->context->athlete->zones("Bike")->getZoneLows(range);
 
                 config << c;
             }
         }
 
         // RUN POWER
-        if (rtool->context->athlete->zones(false)) {
+        if (rtool->context->athlete->zones("Run")) {
 
             // run through the bike zones
-            for (int range=0; range < rtool->context->athlete->zones(true)->getRangeSize(); range++) {
+            for (int range=0; range < rtool->context->athlete->zones("Run")->getRangeSize(); range++) {
 
                 // run through the bike zones
                 gcZoneConfig c("run");
 
-                c.date =  rtool->context->athlete->zones(true)->getStartDate(range);
-                c.cp = rtool->context->athlete->zones(true)->getCP(range);
-                c.wprime = rtool->context->athlete->zones(true)->getWprime(range);
-                c.pmax = rtool->context->athlete->zones(true)->getPmax(range);
-                c.aetp = rtool->context->athlete->zones(true)->getAeT(range);
-                c.ftp = rtool->context->athlete->zones(true)->getFTP(range);
-                c.zoneslow = rtool->context->athlete->zones(true)->getZoneLows(range);
+                c.date =  rtool->context->athlete->zones("Run")->getStartDate(range);
+                c.cp = rtool->context->athlete->zones("Run")->getCP(range);
+                c.wprime = rtool->context->athlete->zones("Run")->getWprime(range);
+                c.pmax = rtool->context->athlete->zones("Run")->getPmax(range);
+                c.aetp = rtool->context->athlete->zones("Run")->getAeT(range);
+                c.ftp = rtool->context->athlete->zones("Run")->getFTP(range);
+                c.zoneslow = rtool->context->athlete->zones("Run")->getZoneLows(range);
 
                 config << c;
             }

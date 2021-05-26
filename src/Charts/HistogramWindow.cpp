@@ -770,7 +770,7 @@ HistogramWindow::rideSelected()
 
     if (rangemode) {
         // get range that applies to this ride
-        powerRange = context->athlete->zones(ride->isRun)->whichRange(ride->dateTime.date());
+        powerRange = context->athlete->zones(ride->sport)->whichRange(ride->dateTime.date());
         hrRange = context->athlete->hrZones(ride->sport)->whichRange(ride->dateTime.date());
     }
 
