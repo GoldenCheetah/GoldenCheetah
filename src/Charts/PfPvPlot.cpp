@@ -67,7 +67,7 @@ public:
 
         if (parent->context->isCompareIntervals) {
 
-            zones = parent->context->athlete->zones(rideItem ? rideItem->isRun : false);
+            zones = parent->context->athlete->zones(rideItem ? rideItem->sport : "Bike");
             if (!zones) return;
 
             // use first compare interval date
@@ -78,9 +78,9 @@ public:
             if (zone_range == -1)
                 zone_range = zones->whichRange(QDate::currentDate());
 
-        } else if (rideItem && parent->context->athlete->zones(rideItem->isRun)) {
+        } else if (rideItem && parent->context->athlete->zones(rideItem->sport)) {
 
-            zones = parent->context->athlete->zones(rideItem->isRun);
+            zones = parent->context->athlete->zones(rideItem->sport);
             zone_range = zones->whichRange(rideItem->dateTime.date());
 
         } else {
@@ -297,7 +297,7 @@ PfPvPlot::refreshZoneItems()
 
     // set zones from ride or athlete and date of
     // first item in the compare set
-    const Zones *zones = context->athlete->zones(rideItem ? rideItem->isRun : false);
+    const Zones *zones = context->athlete->zones(rideItem ? rideItem->sport : "Bike");
     int zone_range = -1;
 
     // comparing does zones for items selected not current ride

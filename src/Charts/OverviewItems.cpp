@@ -243,11 +243,11 @@ ZoneOverviewItem::ZoneOverviewItem(ChartSpace *parent, QString name, RideFile::s
     //
     // POWER
     //
-    if (!polarized && series == RideFile::watts && parent->context->athlete->zones(false)) {
+    if (!polarized && series == RideFile::watts && parent->context->athlete->zones("Bike")) {
         // set the zero values
-        for(int i=0; i<parent->context->athlete->zones(false)->getScheme().nzones_default; i++) {
+        for(int i=0; i<parent->context->athlete->zones("Bike")->getScheme().nzones_default; i++) {
             *barset << 0;
-            categories << parent->context->athlete->zones(false)->getScheme().zone_default_name[i];
+            categories << parent->context->athlete->zones("Bike")->getScheme().zone_default_name[i];
         }
     }
 
@@ -1232,14 +1232,14 @@ ZoneOverviewItem::setDateRange(DateRange dr)
                     for(int i=0; i<3; i++) {
                         vals[i] += item->getForSymbol(timeInZonesPolarized[i]);
                     }
-                } else if (parent->context->athlete->zones(item->isRun)) {
+                } else if (parent->context->athlete->zones(item->sport)) {
 
                     int numzones;
-                    int range = parent->context->athlete->zones(item->isRun)->whichRange(item->dateTime.date());
+                    int range = parent->context->athlete->zones(item->sport)->whichRange(item->dateTime.date());
 
                     if (range > -1) {
 
-                        numzones = parent->context->athlete->zones(item->isRun)->numZones(range);
+                        numzones = parent->context->athlete->zones(item->sport)->numZones(range);
                         for(int i=0; i<categories.count() && i < numzones;i++) {
                             vals[i] += item->getForSymbol(timeInZones[i]);
                         }
@@ -1372,15 +1372,15 @@ ZoneOverviewItem::setData(RideItem *item)
                 if (time > 0 && sum > 0) barset->replace(i, round((time/sum) * 100));
                 else barset->replace(i, 0);
             }
-        } else if (parent->context->athlete->zones(item->isRun)) {
+        } else if (parent->context->athlete->zones(item->sport)) {
 
             int numzones;
-            int range = parent->context->athlete->zones(item->isRun)->whichRange(item->dateTime.date());
+            int range = parent->context->athlete->zones(item->sport)->whichRange(item->dateTime.date());
 
             if (range > -1) {
 
                 double sum=0;
-                numzones = parent->context->athlete->zones(item->isRun)->numZones(range);
+                numzones = parent->context->athlete->zones(item->sport)->numZones(range);
                 for(int i=0; i<categories.count() && i < numzones;i++) {
                     sum += item->getForSymbol(timeInZones[i]);
                 }

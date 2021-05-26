@@ -2358,10 +2358,10 @@ RideFile::recalculateDerivedSeries(bool force)
     double anTISS = 0.0f;
 
     // set WPrime and CP
-    if (context->athlete->zones(isRun())) {
-        int zoneRange = context->athlete->zones(isRun())->whichRange(startTime().date());
-        CP = zoneRange >= 0 ? context->athlete->zones(isRun())->getCP(zoneRange) : 0;
-        //WPRIME = zoneRange >= 0 ? context->athlete->zones(isRun())->getWprime(zoneRange) : 0;
+    if (context->athlete->zones(sport())) {
+        int zoneRange = context->athlete->zones(sport())->whichRange(startTime().date());
+        CP = zoneRange >= 0 ? context->athlete->zones(sport())->getCP(zoneRange) : 0;
+        //WPRIME = zoneRange >= 0 ? context->athlete->zones(sport())->getWprime(zoneRange) : 0;
 
         // did we override CP in metadata / metrics ?
         int oCP = getTag("CP","0").toInt();

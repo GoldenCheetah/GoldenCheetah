@@ -50,7 +50,7 @@ class ZoneTime : public RideMetric {
 
         // no ride or no samples
         if (spec.isEmpty(item->ride()) ||
-            item->context->athlete->zones(item->isRun) == NULL || item->zoneRange < 0 ||
+            item->context->athlete->zones(item->sport) == NULL || item->zoneRange < 0 ||
             !item->ride()->areDataPresent()->watts) {
             setValue(RideFile::NIL);
             setCount(0);
@@ -65,7 +65,7 @@ class ZoneTime : public RideMetric {
         while (it.hasNext()) {
             struct RideFilePoint *point = it.next();
             totalSecs += item->ride()->recIntSecs();
-            if (item->context->athlete->zones(item->isRun)->whichZone(item->zoneRange, point->watts) == level)
+            if (item->context->athlete->zones(item->sport)->whichZone(item->zoneRange, point->watts) == level)
                 seconds += item->ride()->recIntSecs();
         }
         setValue(seconds);
@@ -752,14 +752,14 @@ class ZoneTimeI : public RideMetric {
 
         // no ride or no samples
         if (spec.isEmpty(item->ride()) ||
-            item->context->athlete->zones(item->isRun) == NULL || item->zoneRange < 0 ||
+            item->context->athlete->zones(item->sport) == NULL || item->zoneRange < 0 ||
             !item->ride()->areDataPresent()->watts) {
             setValue(RideFile::NIL);
             setCount(0);
             return;
         }
 
-        int AeT = item->context->athlete->zones(item->isRun)->getAeT(item->zoneRange);
+        int AeT = item->context->athlete->zones(item->sport)->getAeT(item->zoneRange);
         double totalSecs = 0.0;
         seconds = 0;
 
@@ -811,15 +811,15 @@ class ZoneTimeII : public RideMetric {
 
         // no ride or no samples
         if (spec.isEmpty(item->ride()) ||
-            item->context->athlete->zones(item->isRun) == NULL || item->zoneRange < 0 ||
+            item->context->athlete->zones(item->sport) == NULL || item->zoneRange < 0 ||
             !item->ride()->areDataPresent()->watts) {
             setValue(RideFile::NIL);
             setCount(0);
             return;
         }
 
-        int AeT = item->context->athlete->zones(item->isRun)->getAeT(item->zoneRange);
-        int CP = item->context->athlete->zones(item->isRun)->getCP(item->zoneRange);
+        int AeT = item->context->athlete->zones(item->sport)->getAeT(item->zoneRange);
+        int CP = item->context->athlete->zones(item->sport)->getCP(item->zoneRange);
         double totalSecs = 0.0;
         seconds = 0;
 
@@ -871,14 +871,14 @@ class ZoneTimeIII : public RideMetric {
 
         // no ride or no samples
         if (spec.isEmpty(item->ride()) ||
-            item->context->athlete->zones(item->isRun) == NULL || item->zoneRange < 0 ||
+            item->context->athlete->zones(item->sport) == NULL || item->zoneRange < 0 ||
             !item->ride()->areDataPresent()->watts) {
             setValue(RideFile::NIL);
             setCount(0);
             return;
         }
 
-        int CP = item->context->athlete->zones(item->isRun)->getCP(item->zoneRange);
+        int CP = item->context->athlete->zones(item->sport)->getCP(item->zoneRange);
         double totalSecs = 0.0;
         seconds = 0;
 

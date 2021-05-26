@@ -51,10 +51,10 @@ void Zones::initializeZoneParameters()
         sizeof(initial_zone_default) /
         sizeof(initial_zone_default[0]);
 
-    if (run) {
-        fileName_ = "run-power.zones";
-    } else {
+    if (sport_.isEmpty() || sport_ == "Bike") {
         fileName_ = "power.zones";
+    } else {
+        fileName_ = sport_.toLower() + "-power.zones";
     }
 
     scheme.zone_default.clear();
@@ -1094,5 +1094,5 @@ Zones::getFingerprint(QDate forDate) const
 QString
 Zones::useCPforFTPSetting() const
 {
-    return run ? GC_USE_CP_FOR_FTP_RUN : GC_USE_CP_FOR_FTP;
+    return GC_USE_CP_FOR_FTP + ((sport_.isEmpty() || sport_ == "Bike") ? "" : sport_.toLower());
 }

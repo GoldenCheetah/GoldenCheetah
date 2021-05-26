@@ -81,10 +81,10 @@ class Athlete : public QObject
         const AthleteDirectoryStructure *directoryStructure() const {return home; }
 
         // zones
-        const Zones *zones(bool isRun) const { return zones_[isRun]; }
-        const HrZones *hrZones(QString sport) const { return hrzones_.value(sport); }
+        const Zones *zones(QString sport) const { return zones_.value(sport, zones_.value("Bike")); }
+        const HrZones *hrZones(QString sport) const { return hrzones_.value(sport, hrzones_.value("Bike")); }
         const PaceZones *paceZones(bool isSwim) const { return pacezones_[isSwim]; }
-        Zones *zones_[2];
+        QHash<QString, Zones*> zones_;
         QHash<QString, HrZones*> hrzones_;
         PaceZones *pacezones_[2];
         void setCriticalPower(int cp);

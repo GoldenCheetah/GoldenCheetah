@@ -355,9 +355,9 @@ RideMapWindow::rideSelected()
     rideCP = 300;
     stale = false;
 
-    if (context->athlete->zones(ride->isRun)) {
-        range = context->athlete->zones(ride->isRun)->whichRange(ride->dateTime.date());
-        if (range >= 0) rideCP = context->athlete->zones(ride->isRun)->getCP(range);
+    if (context->athlete->zones(ride->sport)) {
+        range = context->athlete->zones(ride->sport)->whichRange(ride->dateTime.date());
+        if (range >= 0) rideCP = context->athlete->zones(ride->sport)->getCP(range);
     }
 
     loadRide();
@@ -750,7 +750,7 @@ void RideMapWindow::createHtml()
 QColor RideMapWindow::GetColor(int watts)
 {
     if (range < 0 || hideShadedZones()) return Qt::red;
-    else return zoneColor(context->athlete->zones(myRideItem ? myRideItem->isRun : false)->whichZone(range, watts), 7);
+    else return zoneColor(context->athlete->zones(myRideItem ? myRideItem->sport : "Bike")->whichZone(range, watts), 7);
 }
 
 // create the ride line

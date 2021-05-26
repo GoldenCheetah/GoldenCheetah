@@ -881,22 +881,23 @@ ZonePage::ZonePage(Context *context) : context(context)
 
     sportLabel = new QLabel(tr("Sport"));
     sportCombo = new QComboBox();
-    sportCombo->addItem(tr("Bike"));
-    sportCombo->addItem(tr("Run"));
-    sportCombo->setCurrentIndex(0);
     hlayout->addStretch();
     hlayout->addWidget(sportLabel);
     hlayout->addWidget(sportCombo);
     hlayout->addStretch();
     layout->addLayout(hlayout);
-    connect(sportCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(changeSport(int)));
+    connect(sportCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(changeSport()));
     tabs = new QTabWidget(this);
     layout->addWidget(tabs);
 
-    for (int i=0; i < nSports; i++) {
-        zones[i] = new Zones(i > 0);
+    foreach (QString sport, GlobalContext::context()->rideMetadata->sports()) {
+        QString i = RideFile::sportTag(sport);
+
+        // Add sport to combo
+        sportCombo->addItem(sport, i);
 
         // get current config by reading it in (leave mainwindow zones alone)
+        zones[i] = new Zones(i);
         QFile zonesFile(context->athlete->home->config().canonicalPath() + "/" + zones[i]->fileName());
         if (zonesFile.exists()) {
             zones[i]->read(zonesFile);
@@ -908,20 +909,22 @@ ZonePage::ZonePage(Context *context) : context(context)
         schemePage[i] = new SchemePage(zones[i]);
         cpPage[i] = new CPPage(context, zones[i], schemePage[i]);
     }
+    sportCombo->setCurrentIndex(0);
 
     // finish setup for the default sport
-    changeSport(sportCombo->currentIndex());
+    changeSport();
 }
 
 ZonePage::~ZonePage()
 {
-    for (int i=0; i<nSports; i++) delete zones[i];
+    foreach (Zones* zone, zones) delete zone;
 }
 
 void
-ZonePage::changeSport(int i)
+ZonePage::changeSport()
 {
     // change tabs according to the selected sport
+    QString i = sportCombo->currentData().toString();
     tabs->clear();
     tabs->addTab(cpPage[i], tr("Critical Power"));
     tabs->addTab(schemePage[i], tr("Default"));
@@ -934,16 +937,16 @@ ZonePage::saveClicked()
     qint32 changed = 0;
     qint32 cppageChanged = 0;
     // write
-    for (int i=0; i < nSports; i++) {
+    foreach (QString i, zones.keys()) {
         zones[i]->setScheme(schemePage[i]->getScheme());
         zones[i]->write(context->athlete->home->config());
 
         // re-read Zones in case it changed
         QFile zonesFile(context->athlete->home->config().canonicalPath() + "/" + context->athlete->zones_[i]->fileName());
         context->athlete->zones_[i]->read(zonesFile);
-        if (i == 1 && context->athlete->zones_[i]->getRangeSize() == 0) { // No running Power zones
+        if (i != "Bike" && context->athlete->zones_[i]->getRangeSize() == 0) { // No Power zones
             // Start with Cycling Power zones for backward compatibilty
-            QFile zonesFile(context->athlete->home->config().canonicalPath() + "/" + context->athlete->zones_[0]->fileName());
+            QFile zonesFile(context->athlete->home->config().canonicalPath() + "/" + Zones().fileName());
             if (zonesFile.exists()) context->athlete->zones_[i]->read(zonesFile);
         }
 

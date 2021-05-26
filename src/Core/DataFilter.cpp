@@ -3262,20 +3262,20 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, Result x, long it, RideItem
             double PMAX = 0;
             int zoneRange;
 
-            if (m->context->athlete->zones(m->isRun)) {
+            if (m->context->athlete->zones(m->sport)) {
 
                 // if range is -1 we need to fall back to a default value
-                zoneRange = m->context->athlete->zones(m->isRun)->whichRange(m->dateTime.date());
-                FTP = CP = zoneRange >= 0 ? m->context->athlete->zones(m->isRun)->getCP(zoneRange) : 0;
-                AeTP = zoneRange >= 0 ? m->context->athlete->zones(m->isRun)->getAeT(zoneRange) : 0;
-                WPRIME = zoneRange >= 0 ? m->context->athlete->zones(m->isRun)->getWprime(zoneRange) : 0;
-                PMAX = zoneRange >= 0 ? m->context->athlete->zones(m->isRun)->getPmax(zoneRange) : 0;
+                zoneRange = m->context->athlete->zones(m->sport)->whichRange(m->dateTime.date());
+                FTP = CP = zoneRange >= 0 ? m->context->athlete->zones(m->sport)->getCP(zoneRange) : 0;
+                AeTP = zoneRange >= 0 ? m->context->athlete->zones(m->sport)->getAeT(zoneRange) : 0;
+                WPRIME = zoneRange >= 0 ? m->context->athlete->zones(m->sport)->getWprime(zoneRange) : 0;
+                PMAX = zoneRange >= 0 ? m->context->athlete->zones(m->sport)->getPmax(zoneRange) : 0;
 
                 // use CP for FTP, or is it configured separately
                 bool useCPForFTP = (appsettings->cvalue(m->context->athlete->cyclist,
-                                    m->context->athlete->zones(m->isRun)->useCPforFTPSetting(), 0).toInt() == 0);
+                                    m->context->athlete->zones(m->sport)->useCPforFTPSetting(), 0).toInt() == 0);
                 if (zoneRange >= 0 && !useCPForFTP) {
-                    FTP = m->context->athlete->zones(m->isRun)->getFTP(zoneRange);
+                    FTP = m->context->athlete->zones(m->sport)->getFTP(zoneRange);
                 }
 
                 // did we override CP in metadata ?

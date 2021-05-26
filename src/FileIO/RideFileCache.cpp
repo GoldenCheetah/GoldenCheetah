@@ -1563,18 +1563,18 @@ RideFileCache::computeDistribution(QVector<float> &array, RideFile::SeriesType s
     if (ride->isDataPresent(needSeries) == false) return;
 
     // get zones that apply, if any
-    int zoneRange = context->athlete->zones(ride->isRun()) ? context->athlete->zones(ride->isRun())->whichRange(ride->startTime().date()) : -1;
+    int zoneRange = context->athlete->zones(ride->sport()) ? context->athlete->zones(ride->sport())->whichRange(ride->startTime().date()) : -1;
     int hrZoneRange = context->athlete->hrZones(ride->sport()) ? context->athlete->hrZones(ride->sport())->whichRange(ride->startTime().date()) : -1;
     int paceZoneRange = context->athlete->paceZones(ride->isSwim()) ? context->athlete->paceZones(ride->isSwim())->whichRange(ride->startTime().date()) : -1;
 
     CP=0;
     int AeTP=0;
     if (zoneRange != -1) {
-        CP=context->athlete->zones(ride->isRun())->getCP(zoneRange);
-        AeTP=context->athlete->zones(ride->isRun())->getAeT(zoneRange);
+        CP=context->athlete->zones(ride->sport())->getCP(zoneRange);
+        AeTP=context->athlete->zones(ride->sport())->getAeT(zoneRange);
     }
 
-    if (zoneRange != -1) WPRIME=context->athlete->zones(ride->isRun())->getWprime(zoneRange);
+    if (zoneRange != -1) WPRIME=context->athlete->zones(ride->sport())->getWprime(zoneRange);
     else WPRIME=0;
 
     LTHR=0;
@@ -1641,7 +1641,7 @@ RideFileCache::computeDistribution(QVector<float> &array, RideFile::SeriesType s
 
             // watts time in zone
             if (series == RideFile::watts && zoneRange != -1) {
-                int index = context->athlete->zones(ride->isRun())->whichZone(zoneRange, dp->value(series));
+                int index = context->athlete->zones(ride->sport())->whichZone(zoneRange, dp->value(series));
                 if (index >=0) wattsTimeInZone[index] += ride->recIntSecs();
             }
 

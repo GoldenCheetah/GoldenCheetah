@@ -498,8 +498,8 @@ RideItem::checkStale()
             // HRV fingerprint added to detect changes on HRV Measures
 
             // get the new zone configuration fingerprint that applies for the ride date
-            unsigned long rfingerprint = static_cast<unsigned long>(context->athlete->zones(isRun)->getFingerprint(dateTime.date()))
-                        + (appsettings->cvalue(context->athlete->cyclist, context->athlete->zones(isRun)->useCPforFTPSetting(), 0).toInt() ? 1 : 0)
+            unsigned long rfingerprint = static_cast<unsigned long>(context->athlete->zones(sport)->getFingerprint(dateTime.date()))
+                        + (appsettings->cvalue(context->athlete->cyclist, context->athlete->zones(sport)->useCPforFTPSetting(), 0).toInt() ? 1 : 0)
                         + static_cast<unsigned long>(context->athlete->paceZones(isSwim)->getFingerprint(dateTime.date()))
                         + static_cast<unsigned long>(context->athlete->hrZones(sport)->getFingerprint(dateTime.date()))
                         + static_cast<unsigned long>(context->athlete->routes->getFingerprint())
@@ -601,7 +601,7 @@ RideItem::refresh()
         samples = f->dataPoints().count() > 0;
 
         // zone ranges
-        if (context->athlete->zones(isRun)) zoneRange = context->athlete->zones(isRun)->whichRange(dateTime.date());
+        if (context->athlete->zones(sport)) zoneRange = context->athlete->zones(sport)->whichRange(dateTime.date());
         else zoneRange = -1;
 
         if (context->athlete->hrZones(sport)) hrZoneRange = context->athlete->hrZones(sport)->whichRange(dateTime.date());
@@ -650,8 +650,8 @@ RideItem::refresh()
         updateIntervals();
 
         // update fingerprints etc, crc done above
-        fingerprint = static_cast<unsigned long>(context->athlete->zones(isRun)->getFingerprint(dateTime.date()))
-                    + (appsettings->cvalue(context->athlete->cyclist, context->athlete->zones(isRun)->useCPforFTPSetting(), 0).toInt() ? 1 : 0)
+        fingerprint = static_cast<unsigned long>(context->athlete->zones(sport)->getFingerprint(dateTime.date()))
+                    + (appsettings->cvalue(context->athlete->cyclist, context->athlete->zones(sport)->useCPforFTPSetting(), 0).toInt() ? 1 : 0)
                     + static_cast<unsigned long>(context->athlete->paceZones(isSwim)->getFingerprint(dateTime.date()))
                     + static_cast<unsigned long>(context->athlete->hrZones(sport)->getFingerprint(dateTime.date()))
                     + static_cast<unsigned long>(context->athlete->routes->getFingerprint()) +
@@ -861,12 +861,12 @@ RideItem::updateIntervals()
     double PMAX = 0;
     bool zoneok = false;
 
-    if (context->athlete->zones(isRun)) {
+    if (context->athlete->zones(sport)) {
 
         // if range is -1 we need to fall back to a default value
-        CP = zoneRange >= 0 ? context->athlete->zones(isRun)->getCP(zoneRange) : 0;
-        WPRIME = zoneRange >= 0 ? context->athlete->zones(isRun)->getWprime(zoneRange) : 0;
-        PMAX = zoneRange >= 0 ? context->athlete->zones(isRun)->getPmax(zoneRange) : 0;
+        CP = zoneRange >= 0 ? context->athlete->zones(sport)->getCP(zoneRange) : 0;
+        WPRIME = zoneRange >= 0 ? context->athlete->zones(sport)->getWprime(zoneRange) : 0;
+        PMAX = zoneRange >= 0 ? context->athlete->zones(sport)->getPmax(zoneRange) : 0;
 
         // did we override CP in metadata ?
         int oCP = getText("CP","0").toInt();
@@ -876,7 +876,7 @@ RideItem::updateIntervals()
         if (oW) WPRIME=oW;
         if (oPMAX) PMAX=oPMAX;
 
-        if (zoneRange >= 0 && context->athlete->zones(isRun)) zoneok=true;
+        if (zoneRange >= 0 && context->athlete->zones(sport)) zoneok=true;
     }
 
     // USER / DEVICE INTERVALS
@@ -1154,7 +1154,7 @@ RideItem::updateIntervals()
                         tte.duration = t;
                         tte.joules = integrated_series[i+t]-integrated_series[i];
                         tte.quality = tc / double(t);
-                        tte.zone = zoneok ? context->athlete->zones(isRun)->whichZone(zoneRange, tte.joules/tte.duration) : 1;
+                        tte.zone = zoneok ? context->athlete->zones(sport)->whichZone(zoneRange, tte.joules/tte.duration) : 1;
 
                     } else {
 
@@ -1165,7 +1165,7 @@ RideItem::updateIntervals()
                             tte.duration = t;
                             tte.joules = integrated_series[i+t]-integrated_series[i];
                             tte.quality = thisquality;
-                            tte.zone = zoneok ? context->athlete->zones(isRun)->whichZone(zoneRange, tte.joules/tte.duration) : 1;
+                            tte.zone = zoneok ? context->athlete->zones(sport)->whichZone(zoneRange, tte.joules/tte.duration) : 1;
                         }
 
                     }
@@ -1286,7 +1286,7 @@ RideItem::updateIntervals()
         foreach(effort x, candidates[i]) {
 
             IntervalItem *intervalItem=NULL;
-            int zone = zoneok ? 1 + context->athlete->zones(isRun)->whichZone(zoneRange, x.joules/x.duration) : 1;
+            int zone = zoneok ? 1 + context->athlete->zones(sport)->whichZone(zoneRange, x.joules/x.duration) : 1;
 
             if (x.quality >= 1.0f) {
                 intervalItem = new IntervalItem(this, 
@@ -1315,7 +1315,7 @@ RideItem::updateIntervals()
 
             IntervalItem *intervalItem=NULL;
 
-            int zone = zoneok ? 1 + context->athlete->zones(isRun)->whichZone(zoneRange, x.joules/x.duration) : 1;
+            int zone = zoneok ? 1 + context->athlete->zones(sport)->whichZone(zoneRange, x.joules/x.duration) : 1;
             intervalItem = new IntervalItem(this,
                                             QString(tr("L%3 SPRINT of %1 secs (%2 watts)")).arg(x.duration).arg(x.joules/x.duration).arg(zone),
                                             x.start, x.start+x.duration,
@@ -1491,7 +1491,7 @@ RideItem::updateIntervals()
                 // which zone was this match ?
                 double ap = intervalItem->getForSymbol("average_power");
                 double duration = intervalItem->getForSymbol("workout_time");
-                int zone = zoneok ? 1 + context->athlete->zones(isRun)->whichZone(zoneRange, ap) : 1;
+                int zone = zoneok ? 1 + context->athlete->zones(sport)->whichZone(zoneRange, ap) : 1;
 
                 intervalItem->name = QString(tr("L%1 %5 %2 (%3w %4 kJ)"))
                                                  .arg(zone)
