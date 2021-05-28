@@ -2186,6 +2186,9 @@ CPPlot::pointHover(QwtPlotCurve *curve, int index)
                 if (zones) paceStr = QString("\n%1 %2").arg(zones->kphToPaceString(yvalue, metricPace))
                                                        .arg(zones->paceUnits(metricPace));
 
+            } else if (sport == "Row") {
+
+                paceStr = QString("\n%1 %2").arg(kphToPace(yvalue*2, true, false)).arg(tr("min/500m"));
             }
             
             const double km = yvalue*xvalue/60.0; // distance in km

@@ -219,6 +219,8 @@ RideFile::sportTag(QString sport)
     if (sport == "Bike" || sport == tr("Bike")) return "Bike";
     if (sport == "Run" || sport == tr("Run")) return "Run";
     if (sport == "Swim" || sport == tr("Swim")) return "Swim";
+    if (sport == "Row" || sport == tr("Row") ||
+        sport == "Rowing" || sport == tr("Rowing")) return "Row";
     return sport;
 }
 
@@ -229,7 +231,7 @@ RideFile::sport() const
     if (isBike()) return "Bike";
     if (isRun()) return "Run";
     if (isSwim()) return "Swim";
-    return getTag("Sport","");
+    return sportTag(getTag("Sport",""));
 }
 
 bool
