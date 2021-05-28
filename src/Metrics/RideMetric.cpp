@@ -164,8 +164,9 @@
 // 154 18  Apr 2020 Mark Liversedge    Added PeakPowerIndex (only for full rides)
 // 155 27  Jun 2020 Mark Liversedge    Added Ride Date as days since 1900,01,01
 // 156 18  Mar 2021 Ale Martinez       Added Time and % in Zones I, II and III
+// 157 27  May 2021 Ale Martinez       Added Pace Row
 
-int DBSchemaVersion = 156;
+int DBSchemaVersion = 157;
 
 RideMetricFactory *RideMetricFactory::_instance;
 QVector<QString> RideMetricFactory::noDeps;

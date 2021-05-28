@@ -50,7 +50,7 @@
 			<fieldtab>"Workout"</fieldtab>
 			<fieldname>"Sport"</fieldname>
 			<fieldtype>2</fieldtype>
-			<fieldvalues>"Bike,Run,Swim"</fieldvalues>
+			<fieldvalues>"Bike,Run,Swim,Row"</fieldvalues>
 			<fielddiary>1</fielddiary>
 		</field>
 		<field>

@@ -6981,6 +6981,9 @@ AllPlot::pointHover(QwtPlotCurve *curve, int index)
                 bool metricPace = appsettings->value(this, GC_SWIMPACE, GlobalContext::context()->useMetricUnits).toBool();
                 QString paceunit = metricPace ? tr("min/100m") : tr("min/100yd");
                 paceStr = tr("\n%1 %2").arg(GlobalContext::context()->useMetricUnits ? kphToPace(yvalue, metricPace, true) : mphToPace(yvalue, metricPace, true)).arg(paceunit);
+            } else if (rideItem->sport == "Row") {
+                QString paceunit = tr("min/500m");
+                paceStr = tr("\n%1 %2").arg(GlobalContext::context()->useMetricUnits ? kphToPace(yvalue*2, true, false) : mphToPace(yvalue*2, true, false)).arg(paceunit);
             }
         } else if (curve->title().text().startsWith(tr("W'"))) {
             // need to scale for W' bal

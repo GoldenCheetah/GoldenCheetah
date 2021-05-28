@@ -501,9 +501,11 @@ RideSummaryWindow::htmlSummary()
         if (ride->isRun()) maximumColumn << "max_run_cadence";
         if (ride->isRun()) averageColumn << "pace";
         if (ride->isSwim()) averageColumn << "pace_swim";
+        if (ride->sport() == "Row") averageColumn << "pace_row";
     } else {
         if (nRuns > 0) averageColumn << "pace";
         if (nSwims > 0) averageColumn << "pace_swim";
+        if (sport == "Row") averageColumn << "pace_row";
     }
 
     // users determine the metrics to display
