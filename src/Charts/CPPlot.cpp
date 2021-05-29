@@ -813,15 +813,15 @@ CPPlot::updateModelHelper()
         const PaceZones *zones = (sport == "Run" || sport == "Swim") ? context->athlete->paceZones(sport=="Swim") : NULL;
         // Rank field is reused for pace according to sport
         bool metricPace = zones ? appsettings->value(this, zones->paceSetting(), GlobalContext::context()->useMetricUnits).toBool() : GlobalContext::context()->useMetricUnits;
-        cpw->titleRank->setText(zones ? zones->paceUnits(metricPace) : "n/a");
+        cpw->titleRank->setText(zones ? zones->paceUnits(metricPace) : (sport=="Row" ? "min/500m" : "n/a"));
 
         //DPrime
         cpw->wprimeTitle->setText(tr("D'"));
         if (pdModel->hasWPrime()) {
             cpw->wprimeValue->setText(kmToString(pdModel->WPrime()/1000.0));
             cpw->wprimeRank->setText(QString(tr("%1 %2"))
-                            .arg(pdModel->WPrime()/(metricPace ? 1.0 : METERS_PER_YARD), 0, 'f', 0)
-                            .arg(metricPace ? tr("m") : tr("yd")));
+                            .arg(pdModel->WPrime()/((metricPace || sport=="Row") ? 1.0 : METERS_PER_YARD), 0, 'f', 0)
+                            .arg((metricPace  || sport=="Row") ? tr("m") : tr("yd")));
         } else {
             cpw->wprimeValue->setText(tr("n/a"));
             cpw->wprimeRank->setText(tr("n/a"));
@@ -831,13 +831,15 @@ CPPlot::updateModelHelper()
         cpw->cpTitle->setText(tr("CV"));
         // TODO: Should metric instead depend on the swim/run/default unit settings?
         cpw->cpValue->setText(kphToString(pdModel->CP()));
-        cpw->cpRank->setText(zones ? zones->kphToPaceString(pdModel->CP(), metricPace) : "n/a");
+        cpw->cpRank->setText(zones ? zones->kphToPaceString(pdModel->CP(), metricPace)
+                                   : (sport=="Row" ? kphToPace(pdModel->CP()*2, true, false) : "n/a"));
 
         // V-MAX
         cpw->pmaxTitle->setText(tr("Vmax"));
         if (pdModel->hasPMax()) {
             cpw->pmaxValue->setText(kphToString(pdModel->PMax()));
-            cpw->pmaxRank->setText(zones ? zones->kphToPaceString(pdModel->PMax(), metricPace) : "n/a");
+            cpw->pmaxRank->setText(zones ? zones->kphToPaceString(pdModel->PMax(), metricPace)
+                                         : (sport=="Row" ? kphToPace(pdModel->PMax()*2, true, false) : "n/a"));
 
         } else  {
             cpw->pmaxValue->setText(tr("n/a"));
