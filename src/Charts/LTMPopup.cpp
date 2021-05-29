@@ -376,7 +376,7 @@ LTMPopup::setSummaryHTML(RideItem *item)
         << "average_power"
         << "average_hr"
         << "average_cad"
-        << (item->isSwim ? "pace_swim" : "pace");
+        << (item->isSwim ? "pace_swim" : (item->sport=="Row" ? "pace_row" : "pace"));
 
     static const QStringList maximumColumn = QStringList()
         << "max_speed"
