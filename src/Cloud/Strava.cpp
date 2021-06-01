@@ -328,20 +328,18 @@ Strava::writeFile(QByteArray &data, QString remotename, RideFile *ride)
                                       : QVariant("form-data; name=\"activity_type\""));
 
     // Map some known sports and default to ride for anything else
-    QString sport = ride->getTag("Sport", "");
-    QString subSport = ride->getTag("SubSport", "");
     if (ride->isRun())
-      activityTypePart.setBody("run");
+      activityTypePart.setBody("Run");
     else if (ride->isSwim())
-      activityTypePart.setBody("swim");
-    else if (sport == "Rowing")
+      activityTypePart.setBody("Swim");
+    else if (ride->sport() == "Row")
       activityTypePart.setBody("Rowing");
-    else if (sport == "XC Ski" || sport == "Cross country skiing")
-      activityTypePart.setBody("BackcountrySki");
-    else if (sport == "Strength" || subSport == "strength_training")
+    else if (ride->sport() == "Ski")
+      activityTypePart.setBody("NordicSki");
+    else if (ride->sport() == "Gym")
       activityTypePart.setBody("WeightTraining");
     else
-      activityTypePart.setBody("ride");
+      activityTypePart.setBody("Ride");
     multiPart->append(activityTypePart);
 
     QHttpPart activityNamePart;
@@ -896,6 +894,9 @@ Strava::prepareResponse(QByteArray* data)
             if (stype.endsWith("Ride")) ride->setTag("Sport", "Bike");
             else if (stype.endsWith("Run")) ride->setTag("Sport", "Run");
             else if (stype.endsWith("Swim")) ride->setTag("Sport", "Swim");
+            else if (stype.endsWith("Rowing")) ride->setTag("Sport", "Row");
+            else if (stype.endsWith("Ski")) ride->setTag("Sport", "Ski");
+            else if (stype.startsWith("Weight")) ride->setTag("Sport", "Gym");
             else ride->setTag("Sport", stype);
             // Set SubSport to preserve the original when Sport was mapped
             if (stype != ride->getTag("Sport", "")) ride->setTag("SubSport", stype);
