@@ -18,6 +18,7 @@
 
 #include <cmath>
 #include <algorithm>
+#include <limits>
 #include "BlinnSolver.h"
 
 int GetExponent(double a) {
