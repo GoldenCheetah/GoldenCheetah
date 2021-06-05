@@ -704,7 +704,7 @@ TrainSidebar::configChanged(qint32)
     FTP=285; // default to 285 if zones are not set
     WPRIME = 20000;
 
-    int range = context->athlete->zones("Bike")->whichRange(QDate::currentDate());
+    int range = context->athlete->zones("Bike") ? context->athlete->zones("Bike")->whichRange(QDate::currentDate()) : -1;
     if (range != -1) {
         FTP = context->athlete->zones("Bike")->getCP(range);
         WPRIME = context->athlete->zones("Bike")->getWprime(range);
