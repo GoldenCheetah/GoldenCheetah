@@ -29979,6 +29979,11 @@ Salto il file...</translation>
 <context>
     <name>RideMetadata</name>
     <message>
+        <location filename="../../Metrics/RideMetadata.cpp" line="497"/>
+        <source>Bike</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../../Metrics/RideMetadata.cpp" line="1391"/>
         <source>Problem Saving Meta Data</source>
         <translation>Problema durante salvataggio Metadati</translation>
