@@ -33397,6 +33397,11 @@ Fichier ignoré...</translation>
 <context>
     <name>RideMetadata</name>
     <message>
+        <location filename="../../Metrics/RideMetadata.cpp" line="497"/>
+        <source>Bike</source>
+        <translation type="unfinished">Vélo</translation>
+    </message>
+    <message>
         <location filename="../../Metrics/RideMetadata.cpp" line="1391"/>
         <source>Problem Saving Meta Data</source>
         <translation>Problème lors de la sauvegarde des meta données</translation>

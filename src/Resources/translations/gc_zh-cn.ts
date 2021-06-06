@@ -30135,6 +30135,11 @@ Skipping file...</source>
 <context>
     <name>RideMetadata</name>
     <message>
+        <location filename="../../Metrics/RideMetadata.cpp" line="497"/>
+        <source>Bike</source>
+        <translation type="unfinished">骑车</translation>
+    </message>
+    <message>
         <location filename="../../Metrics/RideMetadata.cpp" line="1391"/>
         <source>Problem Saving Meta Data</source>
         <translation>保存元数据错误</translation>

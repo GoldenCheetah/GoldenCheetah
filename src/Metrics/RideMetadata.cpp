@@ -494,7 +494,7 @@ RideMetadata::sports()
     foreach (QString sport, sportList) {
         if (RideFile::sportTag(sport) == "Bike") hasBike = true;
     }
-    if (!hasBike) sportList.prepend("Bike");
+    if (!hasBike) sportList.prepend(tr("Bike"));
 
     return sportList;
 }
