@@ -490,7 +490,11 @@ RideMetadata::sports()
     }
 
     // Ensure default sport
-    if (sportList.isEmpty()) sportList << "Bike";
+    bool hasBike = false;
+    foreach (QString sport, sportList) {
+        if (RideFile::sportTag(sport) == "Bike") hasBike = true;
+    }
+    if (!hasBike) sportList.prepend("Bike");
 
     return sportList;
 }
