@@ -27,6 +27,8 @@
 
 class MeterWidget : public QWidget
 {
+    Q_OBJECT
+
   public:
     explicit MeterWidget(QString name, QWidget *parent = 0, QString Source = QString("None"));
     QString Source() const { return m_Source; };
@@ -122,6 +124,8 @@ class NeedleMeterWidget : public MeterWidget
 
 class ElevationMeterWidget : public MeterWidget
 {
+    Q_OBJECT
+
     Context* context;
     QPolygon m_elevationPolygon;
     double m_minX, m_maxX;
