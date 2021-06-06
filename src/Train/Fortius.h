@@ -83,6 +83,7 @@
 
 class Fortius : public QThread
 {
+    Q_DECLARE_TR_FUNCTIONS(Fortius)
 
 public:
     Fortius(QObject *parent=0);                   // pass device
