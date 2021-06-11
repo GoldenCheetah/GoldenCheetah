@@ -1559,6 +1559,7 @@ WorkoutWidget::recompute(bool editing)
         parent->TSSlabel->setText("- Stress");
         parent->IFlabel->setText("- Intensity");
 
+        return; // nothing to do if zones are not available to get CP et.al.
     }
 
     //

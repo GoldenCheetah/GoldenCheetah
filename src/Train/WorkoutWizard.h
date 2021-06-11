@@ -287,7 +287,6 @@ class GradientPage : public WorkoutPage
     WorkoutEditorGradient *we;
     WorkoutMetricsSummary *metricsSummary;
     Context *context;
-    int ftp;
     bool metricUnits;
 
 private slots:

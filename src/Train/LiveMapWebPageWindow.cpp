@@ -26,7 +26,6 @@
 #include "SmallPlot.h"
 #include "Context.h"
 #include "Athlete.h"
-#include "Zones.h"
 #include "Settings.h"
 #include "Colors.h"
 #include "Units.h"

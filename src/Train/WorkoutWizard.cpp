@@ -405,8 +405,12 @@ RelWattagePage::RelWattagePage(QWidget *parent) : WorkoutPage(parent) {}
 
 void RelWattagePage::initializePage()
 {
-    int zoneRange = hackContext->athlete->zones("Bike")->whichRange(QDate::currentDate());
-    ftp = hackContext->athlete->zones("Bike")->getCP(zoneRange);
+    if (hackContext->athlete->zones("Bike") && hackContext->athlete->zones("Bike")->whichRange(QDate::currentDate()) >= 0) {
+        int zoneRange = hackContext->athlete->zones("Bike")->whichRange(QDate::currentDate());
+        ftp = hackContext->athlete->zones("Bike")->getCP(zoneRange);
+    } else {
+        ftp = 100; // if zones are not available let's make absolute watts match percentajes
+    }
 
     setTitle(tr("Workout Wizard"));
     QString subTitle = tr("Relative Wattage Workout Wizard, current CP60 = ") + QString::number(ftp);
@@ -539,8 +543,6 @@ GradientPage::GradientPage(QWidget *parent) : WorkoutPage(parent) {}
 
 void GradientPage::initializePage()
 {
-    int zoneRange = hackContext->athlete->zones("Bike")->whichRange(QDate::currentDate());
-    ftp = hackContext->athlete->zones("Bike")->getCP(zoneRange);
     metricUnits = GlobalContext::context()->useMetricUnits;
     setTitle(tr("Workout Wizard"));
 
