@@ -266,7 +266,7 @@ void PMCData::refresh()
             // although metrics are cleansed, we check here because development
             // builds have a rideDB.json that has nan and inf values in it.
             double value = 0;;
-            if (fromDataFilter) value = expr->eval(&df->rt, expr, 0, 0, item).number();
+            if (fromDataFilter) value = expr->eval(&df->rt, expr, Result(0), 0, item).number();
             else value = item->getForSymbol(metricName_);
 
             if (!std::isinf(value) && !std::isnan(value)) {
