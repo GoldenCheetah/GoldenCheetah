@@ -33,6 +33,7 @@ ChartBar::ChartBar(Context *context) : QWidget(context->mainWindow), context(con
     // left / right scroller icon
     static QIcon leftIcon = iconFromPNG(":images/mac/left.png");
     static QIcon rightIcon = iconFromPNG(":images/mac/right.png");
+    static QIcon showIcon = iconFromPNG(":images/mac/show.png");
 
     setContentsMargins(0,0,0,0);
 
@@ -94,6 +95,18 @@ ChartBar::ChartBar(Context *context) : QWidget(context->mainWindow), context(con
     right->setFocusPolicy(Qt::NoFocus);
     mlayout->addWidget(right);
     connect(right, SIGNAL(clicked()), this, SLOT(scrollRight()));
+
+    showButton = new QToolButton(this);
+    showButton->setStyleSheet("QToolButton { border: none; padding: 0px; }");
+    showButton->setAutoFillBackground(false);
+    showButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
+    showButton->setIcon(showIcon);
+    showButton->setIconSize(QSize(20*dpiXFactor,20*dpiYFactor));
+    showButton->setFocusPolicy(Qt::NoFocus);
+    mlayout->addWidget(showButton);
+
+    showMenu = new QMenu("Show");
+    connect(showButton, SIGNAL(clicked()), this, SLOT(showPopup()));
 
     // spacer to make the menuButton on the right
     QLabel *spacer = new QLabel("", this);
@@ -216,6 +229,17 @@ ChartBar::menuPopup()
 }
 
 void
+ChartBar::showPopup()
+{
+    showMenu->clear();
+    foreach (ChartBarItem *button, buttons) {
+        showMenu->addAction(button->text, button, SLOT(clicked()));
+    }
+    // set the point for the menu and call below
+    showMenu->exec(this->mapToGlobal(QPoint(menuButton->pos().x(), menuButton->pos().y()+20)));
+}
+
+void
 ChartBar::setText(int index, QString text)
 {
     buttons[index]->setText(text);
@@ -248,9 +272,9 @@ ChartBar::tidy(bool setwidth)
     }
 
     if (buttonBar->width() > scrollArea->width()) {
-        left->show(); right->show();
+        left->show(); right->show(); showButton->show();
     } else {
-        left->hide(); right->hide();
+        left->hide(); right->hide(); showButton->hide();
     }
 }
 
@@ -630,4 +654,10 @@ ChartBarItem::event(QEvent *e)
         update(); // in case hovering over stuff
     }
     return QWidget::event(e);
+}
+
+void
+ChartBarItem::clicked()
+{
+    emit clicked(true);
 }

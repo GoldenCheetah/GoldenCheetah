@@ -63,6 +63,7 @@ public slots:
     void tidy(bool setwidth);
     void setChartMenu();
     void menuPopup();
+    void showPopup();
     void configChanged(qint32); // appearance
 
 signals:
@@ -84,14 +85,14 @@ private:
     Context *context;
 
     ButtonBar *buttonBar;
-    QToolButton *left, *right; // scrollers, hidden if menu fits
+    QToolButton *left, *right, *showButton; // scrollers, hidden if menu fits
     QPropertyAnimation *anim; // scroll left and right - animated to show whats happening
     QToolButton *menuButton;
 
     QFont buttonFont;
     QSignalMapper *signalMapper, *menuMapper;
 
-    QMenu *barMenu, *chartMenu;
+    QMenu *barMenu, *chartMenu, *showMenu;
 
     int currentIndex_;
     bool state;
@@ -139,6 +140,7 @@ class ChartBarItem : public QWidget
     public slots:
         void paintEvent(QPaintEvent *);
         bool event(QEvent *e);
+        void clicked();
 
     private:
         ChartBar *chartbar;
