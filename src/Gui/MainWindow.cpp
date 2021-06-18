@@ -273,18 +273,18 @@ MainWindow::MainWindow(const QDir &home)
     metal.setColor(QPalette::Button, QColor(215,215,215));
 
     // get those icons
-    sidebarIcon = iconFromPNG(":images/mac/sidebar.png");
-    lowbarIcon = iconFromPNG(":images/mac/lowbar.png");
-    tabbedIcon = iconFromPNG(":images/mac/tabbed.png");
-    tiledIcon = iconFromPNG(":images/mac/tiled.png");
+    sidebarIcon = iconFromPNG(":images/mac/sidebar.png", QSize(16*dpiXFactor,16*dpiXFactor));
+    lowbarIcon = iconFromPNG(":images/mac/lowbar.png", QSize(16*dpiXFactor,16*dpiXFactor));
+    tabbedIcon = iconFromPNG(":images/mac/tabbed.png", QSize(20*dpiXFactor,20*dpiXFactor));
+    tiledIcon = iconFromPNG(":images/mac/tiled.png", QSize(20*dpiXFactor,20*dpiXFactor));
     backIcon = iconFromPNG(":images/mac/back.png");
     forwardIcon = iconFromPNG(":images/mac/forward.png");
-    QSize isize(19 *dpiXFactor,19 *dpiYFactor);
+    QSize isize(20 *dpiXFactor,20 *dpiYFactor);
 
     back = new QPushButton(this);
     back->setIcon(backIcon);
     back->setFixedHeight(24 *dpiYFactor);
-    back->setFixedWidth(32 *dpiYFactor);
+    back->setFixedWidth(24 *dpiYFactor);
     back->setIconSize(isize);
     back->setStyle(toolStyle);
     connect(back, SIGNAL(clicked(bool)), this, SIGNAL(backClicked()));
@@ -292,7 +292,7 @@ MainWindow::MainWindow(const QDir &home)
     forward = new QPushButton(this);
     forward->setIcon(forwardIcon);
     forward->setFixedHeight(24 *dpiYFactor);
-    forward->setFixedWidth(32 *dpiYFactor);
+    forward->setFixedWidth(24 *dpiYFactor);
     forward->setIconSize(isize);
     forward->setStyle(toolStyle);
     connect(forward, SIGNAL(clicked(bool)), this, SIGNAL(forwardClicked()));
@@ -327,7 +327,7 @@ MainWindow::MainWindow(const QDir &home)
     styleSelector->setSegmentToolTip(0, tr("Tabbed View"));
     styleSelector->setSegmentToolTip(1, tr("Tiled View"));
     styleSelector->setSelectionBehavior(QtSegmentControl::SelectOne); //wince. spelling. ugh
-    styleSelector->setFixedHeight(24 * dpiXFactor);
+    styleSelector->setFixedHeight(24 * dpiYFactor);
     styleSelector->setIconSize(isize);
     styleSelector->setPalette(metal);
     connect(styleSelector, SIGNAL(segmentSelected(int)), this, SLOT(setStyleFromSegment(int))); //avoid toggle infinitely
@@ -354,6 +354,12 @@ MainWindow::MainWindow(const QDir &home)
 #endif
 
     // add a search box on far right, but with a little space too
+    perspectiveSelector = new QComboBox(this);
+    perspectiveSelector->setStyle(toolStyle);
+    perspectiveSelector->setFixedWidth(200 * dpiXFactor);
+    perspectiveSelector->setFixedHeight(28 * dpiYFactor);
+    connect(perspectiveSelector, SIGNAL(currentIndexChanged(int)), this, SLOT(perspectiveSelected(int)));
+
     searchBox = new SearchFilterBox(this,context,false);
 
     searchBox->setStyle(toolStyle);
@@ -367,6 +373,7 @@ MainWindow::MainWindow(const QDir &home)
     head->addWidget(space);
     head->addWidget(back);
     head->addWidget(forward);
+    head->addWidget(perspectiveSelector);
     head->addStretch();
     head->addWidget(sidelist);
     head->addWidget(lowbar);
@@ -379,13 +386,13 @@ MainWindow::MainWindow(const QDir &home)
     HelpWhatsThis *helpSearchBox = new HelpWhatsThis(searchBox);
     searchBox->setWhatsThis(helpSearchBox->getWhatsThisText(HelpWhatsThis::SearchFilterBox));
 
-    Spacer *spacer = new Spacer(this);
-    spacer->setFixedWidth(5 *dpiYFactor);
-    head->addWidget(spacer);
+    space = new Spacer(this);
+    space->setFixedWidth(5 *dpiYFactor);
+    head->addWidget(space);
     head->addWidget(searchBox);
-    spacer = new Spacer(this);
-    spacer->setFixedWidth(5 *dpiYFactor);
-    head->addWidget(spacer);
+    space = new Spacer(this);
+    space->setFixedWidth(5 *dpiYFactor);
+    head->addWidget(space);
 
 #ifdef Q_OS_LINUX
     // check opengl is available with version 2 or higher
@@ -1258,6 +1265,7 @@ void
 MainWindow::selectAthlete()
 {
     viewStack->setCurrentIndex(0);
+    perspectiveSelector->hide();
 }
 
 void
@@ -1266,6 +1274,8 @@ MainWindow::selectAnalysis()
     viewStack->setCurrentIndex(1);
     sidebar->setItemSelected(3, true);
     currentTab->selectView(1);
+    currentTab->analysisView->setPerspectives(perspectiveSelector);
+    perspectiveSelector->show();
     setToolButtons();
 }
 
@@ -1275,6 +1285,8 @@ MainWindow::selectTrain()
     viewStack->setCurrentIndex(1);
     sidebar->setItemSelected(5, true);
     currentTab->selectView(3);
+    currentTab->trainView->setPerspectives(perspectiveSelector);
+    perspectiveSelector->show();
     setToolButtons();
 }
 
@@ -1283,6 +1295,8 @@ MainWindow::selectDiary()
 {
     viewStack->setCurrentIndex(1);
     currentTab->selectView(2);
+    currentTab->diaryView->setPerspectives(perspectiveSelector);
+    perspectiveSelector->show();
     setToolButtons();
 }
 
@@ -1292,6 +1306,8 @@ MainWindow::selectHome()
     viewStack->setCurrentIndex(1);
     sidebar->setItemSelected(2, true);
     currentTab->selectView(0);
+    currentTab->homeView->setPerspectives(perspectiveSelector);
+    perspectiveSelector->show();
     setToolButtons();
 }
 
@@ -1345,6 +1361,20 @@ MainWindow::setToolButtons()
 #ifdef Q_OS_MAC // bizarre issue with searchbox focus on tab voew change
     searchBox->clearFocus();
 #endif
+}
+
+void
+MainWindow::perspectiveSelected(int index)
+{
+    // set the perspective for the current view
+    int view = currentTab->currentView();
+
+    switch (view) {
+    case 0:  currentTab->homeView->perspectiveSelected(index); break;
+    case 1:  currentTab->diaryView->perspectiveSelected(index); break;
+    case 2:  currentTab->analysisView->perspectiveSelected(index); break;
+    case 3:  currentTab->trainView->perspectiveSelected(index); break;
+    }
 }
 
 /*----------------------------------------------------------------------
@@ -2263,6 +2293,14 @@ MainWindow::configChanged(qint32)
                              .arg(textCol.name()).arg(menuColorString));
     // search filter box match chrome color
     searchBox->setStyleSheet(QString("QLineEdit { background: %1; color: %2; }").arg(GColor(CCHROME).name()).arg(GCColor::invertColor(GColor(CCHROME)).name()));
+
+    // perspective selector mimics sidebar colors
+    QColor selected;
+    if (GCColor::invertColor(GColor(CCHROME)).name() == Qt::white) selected = QColor(Qt::lightGray);
+    else selected = QColor(Qt::darkGray);
+    perspectiveSelector->setStyleSheet(QString("QComboBox { background: %1; color: %2; }"
+                                               "QComboBox::item { background: %1; color: %2; }"
+                                               "QComboBox::item::selected { background: %3; color: %1; }").arg(GColor(CCHROME).name()).arg(GCColor::invertColor(GColor(CCHROME)).name()).arg(selected.name()));
 
 #endif
     QString buttonstyle = QString("QPushButton { border: none; background-color: %1; }").arg(CCHROME);

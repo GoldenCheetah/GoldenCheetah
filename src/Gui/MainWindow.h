@@ -141,6 +141,9 @@ class MainWindow : public QMainWindow
         void support();
         void actionClicked(int);
 
+        // perspective selected
+        void perspectiveSelected(int index);
+
         // chart importing
         void importCharts(QStringList);
 
@@ -287,6 +290,7 @@ class MainWindow : public QMainWindow
         QTFullScreen *fullScreen;
 #endif
 
+        QComboBox *perspectiveSelector;
         SearchFilterBox *searchBox;
 
         // Not on Mac so use other types

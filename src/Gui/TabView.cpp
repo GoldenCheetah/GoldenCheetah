@@ -34,7 +34,7 @@
 TabView::TabView(Context *context, int type) : 
     QWidget(context->tab), context(context), type(type),
     _sidebar(true), _tiled(false), _selected(false), lastHeight(130*dpiYFactor), sidewidth(0),
-    active(false), bottomRequested(false), bottomHideOnIdle(false),
+    active(false), bottomRequested(false), bottomHideOnIdle(false), perspectiveactive(false),
     stack(NULL), splitter(NULL), mainSplitter(NULL), 
     sidebar_(NULL), bottom_(NULL), page_(NULL), blank_(NULL)
 {
@@ -412,6 +412,30 @@ TabView::sidebarChanged()
 
     } else sidebar_->hide();
 }
+
+void
+TabView::setPerspectives(QComboBox *perspectiveSelector)
+{
+    perspectiveactive=true;
+    perspectiveSelector->clear();
+    perspectiveSelector->addItem("General");
+    perspectiveSelector->addItem("Bike");
+    perspectiveSelector->addItem("Run");
+    perspectiveSelector->addItem("Swim");
+    perspectiveSelector->addItem("Add New Perspective...");
+    perspectiveSelector->addItem("Manage Perspectives...");
+    perspectiveSelector->insertSeparator(4);
+    perspectiveactive=false;
+}
+
+
+void
+TabView::perspectiveSelected(int index)
+{
+    if (perspectiveactive || index <0) return;
+    fprintf(stderr, "Selected perspective: %d\n", index); fflush(stderr);
+}
+
 
 void
 TabView::tileModeChanged()

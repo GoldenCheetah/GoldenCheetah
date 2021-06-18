@@ -39,7 +39,7 @@ SearchBox::SearchBox(Context *context, QWidget *parent, bool nochooser)
     //clear button
     clearButton = new QToolButton(this);
     clearButton->setStyleSheet("QToolButton { border: none; padding: 0px; }");
-    QIcon pixmap(":images/toolbar/popbutton.png");
+    QIcon pixmap = QPixmap::fromImage(QImage(":images/toolbar/popbutton.png").scaled(12*dpiXFactor, 12*dpiXFactor));
     clearButton->setIcon(QIcon(pixmap));
     clearButton->setIconSize(QSize(12 *dpiXFactor,12 *dpiYFactor));
     clearButton->setCursor(Qt::ArrowCursor);
@@ -50,12 +50,13 @@ SearchBox::SearchBox(Context *context, QWidget *parent, bool nochooser)
 
     // make sure its underneath the toggle button
     toolButton = new QToolButton(this);
-    toolButton->setFixedSize(QSize(16 *dpiXFactor,16 *dpiYFactor));
+    toolButton->setFixedSize(QSize(12 *dpiXFactor,12 *dpiYFactor));
 #ifdef Q_OS_MAC
     toolButton->setStyleSheet("QToolButton { background: transparent; }");
 #else
     toolButton->setStyleSheet("QToolButton { border: none; padding: 0px; }");
 #endif
+    toolButton->move(10*dpiXFactor,0);
     toolButton->setCursor(Qt::ArrowCursor);
     toolButton->setPopupMode(QToolButton::InstantPopup);
 
@@ -66,11 +67,12 @@ SearchBox::SearchBox(Context *context, QWidget *parent, bool nochooser)
 
     // search button
     searchButton = new QToolButton(this);
-    QIcon search = iconFromPNG(":images/toolbar/search3.png", false);
-    searchButton->setStyleSheet("QToolButton { border: none; padding: 0px; }");
+    searchButton->setStyleSheet("QToolButton { border: none; padding: 1px; }");
+    QIcon search = iconFromPNG(":images/toolbar/search3.png", QSize(12 *dpiXFactor,12*dpiYFactor));
+    searchButton->setIconSize(QSize(12 *dpiXFactor,12 *dpiYFactor));
     searchButton->setIcon(search);
-    searchButton->setIconSize(QSize(11 *dpiXFactor,11 *dpiYFactor));
     searchButton->setCursor(Qt::ArrowCursor);
+    searchButton->move(3*dpiXFactor,6*dpiYFactor);
     connect(searchButton, SIGNAL(clicked()), this, SLOT(toggleMode()));
 
     // create an empty completer, configchanged will fix it
@@ -263,11 +265,11 @@ void SearchBox::resizeEvent(QResizeEvent *)
     QSize sz = clearButton->sizeHint();
     int frameWidth = style()->pixelMetric(QStyle::PM_DefaultFrameWidth);
     clearButton->move(rect().right() - frameWidth - sz.width() - 1, 3);
-    searchButton->move(5 *dpiXFactor, 3 *dpiYFactor);
+    searchButton->move(3 *dpiXFactor, 6 *dpiYFactor);
 #ifndef Q_OS_MAC
-    toolButton->move(15, 0);
+    toolButton->move(10*dpiXFactor, 0);
 #else
-    toolButton->move(13, 0);
+    toolButton->move(10*dpiXFactor, 0);
 #endif
 
     //container->move(rect().left(), rect().bottom() + 3); // named dialog...
@@ -287,9 +289,11 @@ void SearchBox::setMode(SearchBoxMode mode)
 
         case Filter:
         {
-            QIcon filter = iconFromPNG(":images/toolbar/filter3.png", false);
+            QIcon filter = iconFromPNG(":images/toolbar/filter3.png", QSize(12 *dpiXFactor,12*dpiYFactor));
+            searchButton->setStyleSheet("QToolButton { border: none; padding: 1px; }");
+            searchButton->setIconSize(QSize(12 *dpiXFactor,12 *dpiYFactor));
             searchButton->setIcon(filter);
-            searchButton->setIconSize(QSize(11 *dpiXFactor,11 *dpiYFactor));
+            searchButton->move(3 *dpiXFactor, 6 *dpiYFactor);
             setPlaceholderText(tr("Filter..."));
         }
         break;
@@ -297,9 +301,11 @@ void SearchBox::setMode(SearchBoxMode mode)
         case Search:
         default:
         {
-            QIcon search = iconFromPNG(":images/toolbar/search3.png", false);
+            QIcon search = iconFromPNG(":images/toolbar/search3.png", QSize(12 *dpiXFactor,12*dpiYFactor));
+            searchButton->setStyleSheet("QToolButton { border: none; padding: 1px; }");
+            searchButton->setIconSize(QSize(12 *dpiXFactor,12 *dpiYFactor));
             searchButton->setIcon(search);
-            searchButton->setIconSize(QSize(11 *dpiXFactor,11 *dpiYFactor));
+            searchButton->move(3 *dpiXFactor, 6 *dpiYFactor);
             setPlaceholderText(tr("Search..."));
         }
         break;

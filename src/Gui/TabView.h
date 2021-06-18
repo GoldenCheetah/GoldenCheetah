@@ -69,6 +69,10 @@ class TabView : public QWidget
         void setTiled(bool x) { _tiled=x; tileModeChanged(); }
         bool isTiled() const { return _tiled; }
 
+        // set perspective
+        void setPerspectives(QComboBox *perspectiveSelector); // set the combobox when view selected
+        void perspectiveSelected(int index); // combobox selections changed because the user selected a perspective
+
         // bottom
         void dragEvent(bool); // showbottom on drag event
         void setShowBottom(bool x);
@@ -139,6 +143,7 @@ class TabView : public QWidget
         bool active;
         bool bottomRequested;
         bool bottomHideOnIdle;
+        bool perspectiveactive;
 
         QStackedWidget *stack;
         QSplitter *splitter;
@@ -146,7 +151,8 @@ class TabView : public QWidget
         QPropertyAnimation *anim;
         QWidget *sidebar_;
         QWidget *bottom_;
-        HomeWindow *page_;
+        HomeWindow *page_; // currently selected page
+        QList<HomeWindow> pages_;
         BlankStatePage *blank_;
 
     private slots:
