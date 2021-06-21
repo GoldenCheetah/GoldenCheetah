@@ -1110,7 +1110,7 @@ EditUserSeriesDialog::EditUserSeriesDialog(Context *context, bool rangemode, Gen
     SpecialFields sp;
 
     // get sorted list
-    QStringList names = context->tab->rideNavigator()->logicalHeadings;
+    QStringList names = context->rideNavigator->logicalHeadings;
 
     // start with just a list of functions
     list = DataFilter::builtins(context);

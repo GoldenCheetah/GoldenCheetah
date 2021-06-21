@@ -28,7 +28,7 @@
 #include "HelpWhatsThis.h"
 
 #include "GcWindowRegistry.h" // for GcWinID types
-#include "HomeWindow.h" // for GcWindowDialog
+#include "Perspective.h" // for GcWindowDialog
 #include "LTMWindow.h" // for LTMWindow::settings()
 #include "LTMChartParser.h" // for LTMChartParser::serialize && ChartTreeView
 

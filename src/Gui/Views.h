@@ -48,7 +48,7 @@ class AnalysisView : public TabView
 
     private:
         AnalysisSidebar *analSidebar;
-        HomeWindow *hw;
+        Perspective *hw;
 
 };
 
@@ -70,7 +70,7 @@ class DiaryView : public TabView
 
     private:
         DiarySidebar *diarySidebar;
-        HomeWindow *hw;
+        Perspective *hw;
 
 };
 
@@ -93,7 +93,7 @@ class TrainView : public TabView
 
         TrainSidebar *trainTool;
         TrainBottom *trainBottom;
-        HomeWindow *hw;
+        Perspective *hw;
 
 private slots:
         void onAutoHideChanged(bool enabled);
@@ -110,7 +110,7 @@ class HomeView : public TabView
         ~HomeView();
 
         LTMSidebar *sidebar;
-        HomeWindow *hw;
+        Perspective *hw;
 
     signals:
         void dateChanged(DateRange);

@@ -291,6 +291,7 @@ class MainWindow : public QMainWindow
 #endif
 
         QComboBox *perspectiveSelector;
+        bool pactive; // when programmatically manipulating selector
         SearchFilterBox *searchBox;
 
         // Not on Mac so use other types

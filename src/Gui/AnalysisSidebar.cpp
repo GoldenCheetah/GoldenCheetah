@@ -61,7 +61,7 @@ AnalysisSidebar::AnalysisSidebar(Context *context) : QWidget(context->mainWindow
     calendarWidget->setWhatsThis(helpCalendar->getWhatsThisText(HelpWhatsThis::SideBarRidesView_Calendar));
 
     // Activity History
-    rideNavigator = new RideNavigator(context, true);
+    context->rideNavigator = rideNavigator = new RideNavigator(context, true);
     rideNavigator->showMore(false);
     groupByMapper = NULL;
 

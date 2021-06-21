@@ -1044,6 +1044,8 @@ Bindings::activityMetrics(RideItem* item) const
     PyObject* dict = PyDict_New();
     if (dict == NULL) return dict;
 
+    if (item == NULL) return NULL;
+
     const RideMetricFactory &factory = RideMetricFactory::instance();
 
     //

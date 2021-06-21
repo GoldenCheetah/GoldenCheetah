@@ -50,40 +50,46 @@ Tab::Tab(Context *context) : QWidget(context->mainWindow), context(context), nos
     masterControls->setCurrentIndex(0);
     masterControls->setContentsMargins(0,0,0,0);
 
-    // Home
-    homeControls = new QStackedWidget(this);
-    homeControls->setFrameStyle(QFrame::Plain | QFrame::NoFrame);
-    homeControls->setContentsMargins(0,0,0,0);
-    masterControls->addWidget(homeControls);
-    homeView = new HomeView(context, homeControls);
-    views->addWidget(homeView);
-
-    // Analysis
+    // Analysis - created first as sidebar is used elsewhere (yuk)
     analysisControls = new QStackedWidget(this);
     analysisControls->setFrameStyle(QFrame::Plain | QFrame::NoFrame);
     analysisControls->setCurrentIndex(0);
     analysisControls->setContentsMargins(0,0,0,0);
-    masterControls->addWidget(analysisControls);
     analysisView = new AnalysisView(context, analysisControls);
-    views->addWidget(analysisView);
+
+    // Home
+    homeControls = new QStackedWidget(this);
+    homeControls->setFrameStyle(QFrame::Plain | QFrame::NoFrame);
+    homeControls->setContentsMargins(0,0,0,0);
+    homeView = new HomeView(context, homeControls);
 
     // Diary
     diaryControls = new QStackedWidget(this);
     diaryControls->setFrameStyle(QFrame::Plain | QFrame::NoFrame);
     diaryControls->setCurrentIndex(0);
     diaryControls->setContentsMargins(0,0,0,0);
-    masterControls->addWidget(diaryControls);
     diaryView = new DiaryView(context, diaryControls);
-    views->addWidget(diaryView);
 
     // Train
     trainControls = new QStackedWidget(this);
     trainControls->setFrameStyle(QFrame::Plain | QFrame::NoFrame);
     trainControls->setCurrentIndex(0);
     trainControls->setContentsMargins(0,0,0,0);
-    masterControls->addWidget(trainControls);
     trainView = new TrainView(context, trainControls);
+
+    // although the views are created with analysis created first
+    // we add them to the views and master controls in the old
+    // order to make sure we select the right stack index
+    // when switching views
+    views->addWidget(homeView);
+    views->addWidget(analysisView);
+    views->addWidget(diaryView);
     views->addWidget(trainView);
+
+    masterControls->addWidget(homeControls);
+    masterControls->addWidget(analysisControls);
+    masterControls->addWidget(diaryControls);
+    masterControls->addWidget(trainControls);
 
     // the dialog box for the chart settings
     chartSettings = new ChartSettings(this, masterControls);
@@ -100,21 +106,6 @@ Tab::Tab(Context *context) : QWidget(context->mainWindow), context(context), nos
     // cpx aggregate cache check
     connect(context,SIGNAL(rideSelected(RideItem*)), this, SLOT(rideSelected(RideItem*)));
 
-    // selects the latest ride in the list:
-    // first skipping those in the future
-    QDateTime now = QDateTime::currentDateTime();
-    for (int i=context->athlete->rideCache->rides().count(); i>0; --i) {
-        if (context->athlete->rideCache->rides()[i-1]->dateTime <= now) {
-            context->athlete->selectRideFile(context->athlete->rideCache->rides()[i-1]->fileName);
-            break;
-        }
-    }
-
-    // otherwise just the latest
-    if (context->currentRideItem() == NULL && context->athlete->rideCache->rides().count() != 0) {
-        context->athlete->selectRideFile(context->athlete->rideCache->rides().last()->fileName);
-    }
-
     noswitch = false; // we only let it happen when we're initialised
     init = true;
 }
@@ -127,12 +118,6 @@ Tab::~Tab()
     delete diaryView;
     delete views;
     delete nav;
-}
-
-RideNavigator *
-Tab::rideNavigator()
-{
-    return analysisView->rideNavigator();
 }
 
 void

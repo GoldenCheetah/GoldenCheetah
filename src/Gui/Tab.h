@@ -46,7 +46,6 @@ class Tab: public QWidget
         TabView *view(int index);
 
         NavigationModel *nav; // back/forward for this tab
-        RideNavigator *rideNavigator(); // to get logical headings
 
     protected:
 

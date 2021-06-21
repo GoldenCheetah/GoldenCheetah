@@ -100,6 +100,7 @@ class GlobalContext : public QObject
 
 };
 
+class RideNavigator;
 class Context : public QObject
 {
     Q_OBJECT;
@@ -124,8 +125,9 @@ class Context : public QObject
         const RideItem *currentRideItem() { return ride; }
         DateRange currentDateRange() { return dr_; }
 
-        // current selections
+        // current selections and widgetry
         MainWindow * const mainWindow;
+        RideNavigator *rideNavigator;
         Tab *tab;
         Athlete *athlete;
         RideItem *ride;  // the currently selected ride

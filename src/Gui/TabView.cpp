@@ -22,7 +22,7 @@
 #include "Athlete.h"
 #include "RideItem.h"
 #include "BlankState.h"
-#include "HomeWindow.h"
+#include "Perspective.h"
 #include "GcWindowRegistry.h"
 #include "TrainDB.h"
 #include "RideNavigator.h"
@@ -30,13 +30,16 @@
 #include "IdleTimer.h"
 
 #include "Settings.h"
+#include "GcUpgrade.h"
+#include "LTMWindow.h"
 
 TabView::TabView(Context *context, int type) : 
     QWidget(context->tab), context(context), type(type),
     _sidebar(true), _tiled(false), _selected(false), lastHeight(130*dpiYFactor), sidewidth(0),
     active(false), bottomRequested(false), bottomHideOnIdle(false), perspectiveactive(false),
     stack(NULL), splitter(NULL), mainSplitter(NULL), 
-    sidebar_(NULL), bottom_(NULL), page_(NULL), blank_(NULL)
+    sidebar_(NULL), bottom_(NULL), page_(NULL), blank_(NULL),
+    loaded(false)
 {
     // setup the basic widget
     QVBoxLayout *layout = new QVBoxLayout(this);
@@ -82,16 +85,16 @@ TabView::TabView(Context *context, int type) :
 
 TabView::~TabView()
 {
-    if (page_) {
-        page_->saveState();
-        delete page_;
-    }
+    saveState(); // writes xxx-perspectives.xml
+
+    foreach(Perspective *p, pages_) delete p;
+    pages_.clear();
 }
 
 void
 TabView::setRide(RideItem*ride)
 {
-    page()->setProperty("ride", QVariant::fromValue<RideItem*>(dynamic_cast<RideItem*>(ride)));
+    if (loaded) page()->setProperty("ride", QVariant::fromValue<RideItem*>(dynamic_cast<RideItem*>(ride)));
 }
 
 void
@@ -113,8 +116,8 @@ TabView::splitterMoved(int pos,int)
     // we are the analysis view
     // all a bit of a hack to stop the column widths from
     // being adjusted as the splitter gets resized and reset
-    if (type == VIEW_ANALYSIS && active == false && context->tab->rideNavigator()->geometry().width() != 100)
-        context->tab->rideNavigator()->setWidth(context->tab->rideNavigator()->geometry().width());
+    if (type == VIEW_ANALYSIS && active == false && context->rideNavigator->geometry().width() != 100)
+        context->rideNavigator->setWidth(context->rideNavigator->geometry().width());
 }
 
 void
@@ -252,13 +255,248 @@ TabView::configChanged(qint32)
 }
 
 void
-TabView::setPage(HomeWindow *page)
+TabView::saveState()
 {
-    page_ = page;
+    // if its not loaded, don't save a blank file !
+    if (!loaded) return;
+
+    // run through each perspective and save its charts
+
+    // we do not save all the other Qt properties since
+    // we're not interested in them
+    // NOTE: currently we support QString, int, double and bool types - beware custom types!!
+
+    QString view = "none";
+    switch(type) {
+    case VIEW_ANALYSIS: view = "analysis"; break;
+    case VIEW_TRAIN: view = "train"; break;
+    case VIEW_DIARY: view = "diary"; break;
+    case VIEW_HOME: view = "home"; break;
+    }
+
+    QString filename = context->athlete->home->config().canonicalPath() + "/" + view + "-perspectives.xml";
+    QFile file(filename);
+    if (!file.open(QFile::WriteOnly)) {
+        QMessageBox msgBox;
+        msgBox.setIcon(QMessageBox::Critical);
+        msgBox.setText(tr("Problem Saving User GUI configuration"));
+        msgBox.setInformativeText(tr("File: %1 cannot be opened for 'Writing'. Please check file properties.").arg(filename));
+        msgBox.exec();
+        return;
+    };
+    file.resize(0);
+    QTextStream out(&file);
+    out.setCodec("UTF-8");
+
+    // is just a collection of layout (aka old HomeWindow name-layout.xml)
+    out<<"<layouts>\n";
+
+    // so lets run through the perspectives
+    foreach(Perspective *page, pages_) {
+
+        out<<"<layout name=\""<< page->title <<"\" style=\"" << page->currentStyle <<"\">\n";
+
+        // iterate over charts
+        foreach (GcChartWindow *chart, page->charts) {
+            GcWinID type = chart->property("type").value<GcWinID>();
+
+            out<<"\t<chart id=\""<<static_cast<int>(type)<<"\" "
+               <<"name=\""<<Utils::xmlprotect(chart->property("instanceName").toString())<<"\" "
+               <<"title=\""<<Utils::xmlprotect(chart->property("title").toString())<<"\" >\n";
+
+            // iterate over chart properties
+            const QMetaObject *m = chart->metaObject();
+            for (int i=0; i<m->propertyCount(); i++) {
+                QMetaProperty p = m->property(i);
+                if (p.isUser(chart)) {
+                   out<<"\t\t<property name=\""<<Utils::xmlprotect(p.name())<<"\" "
+                      <<"type=\""<<p.typeName()<<"\" "
+                      <<"value=\"";
+
+                    if (QString(p.typeName()) == "int") out<<p.read(chart).toInt();
+                    if (QString(p.typeName()) == "double") out<<p.read(chart).toDouble();
+                    if (QString(p.typeName()) == "QDate") out<<p.read(chart).toDate().toString();
+                    if (QString(p.typeName()) == "QString") out<<Utils::xmlprotect(p.read(chart).toString());
+                    if (QString(p.typeName()) == "bool") out<<p.read(chart).toBool();
+                    if (QString(p.typeName()) == "LTMSettings") {
+                        QByteArray marshall;
+                        QDataStream s(&marshall, QIODevice::WriteOnly);
+                        LTMSettings x = p.read(chart).value<LTMSettings>();
+                        s << x;
+                        out<<marshall.toBase64();
+                    }
+
+                    out<<"\" />\n";
+                }
+            }
+            out<<"\t</chart>\n";
+        }
+        out<<"</layout>\n";
+    }
+    out<<"</layouts>\n";
+    file.close();
+}
+
+void
+TabView::restoreState(bool useDefault)
+{
+    QString view = "none";
+    switch(type) {
+    case VIEW_ANALYSIS: view = "analysis"; break;
+    case VIEW_TRAIN: view = "train"; break;
+    case VIEW_DIARY: view = "diary"; break;
+    case VIEW_HOME: view = "home"; break;
+    }
+
+    // restore window state
+    QString filename = context->athlete->home->config().canonicalPath() + "/" + view + "-perspectives.xml";
+    QFileInfo finfo(filename);
+
+    QString content = "";
+    bool legacy = false;
+
+    // set content from the default
+    if (useDefault) {
+
+        // for getting config
+        QNetworkAccessManager nam;
+
+        // remove the current saved version
+        QFile::remove(filename);
+
+        // fetch from the goldencheetah.org website
+        QString request = QString("%1/%2-perspectives.xml")
+                             .arg(VERSION_CONFIG_PREFIX)
+                             .arg(view);
+
+        QNetworkReply *reply = nam.get(QNetworkRequest(QUrl(request)));
+
+        if (reply->error() == QNetworkReply::NoError) {
+
+            // lets wait for a response with an event loop
+            // it quits on a 5s timeout or reply coming back
+            QEventLoop loop;
+            QTimer timer;
+            timer.setSingleShot(true);
+            connect(&timer, SIGNAL(timeout()), &loop, SLOT(quit()));
+            connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
+            timer.start(5000);
+
+            // lets block until signal received
+            loop.exec(QEventLoop::WaitForMoreEvents);
+
+            // all good?
+            if (reply->error() == QNetworkReply::NoError) {
+                content = reply->readAll();
+            }
+        }
+    }
+
+    //  if we don't have content read from file/resource
+    if (content == "") {
+
+        // if no local perspectives file fall back to old
+        // layout file (pre-version 3.6) - will get a single perspective
+        if (!finfo.exists()) {
+            filename = context->athlete->home->config().canonicalPath() + "/" + view + "-layout.xml";
+            finfo.setFile(filename);
+            useDefault = false;
+            legacy = true;
+        }
+
+        // drop back to what is baked in
+        if (!finfo.exists()) {
+            filename = QString(":xml/%1-perspectives.xml").arg(view);
+            useDefault = true;
+            legacy = false;
+        }
+        QFile file(filename);
+        if (file.open(QIODevice::ReadOnly)) {
+            content = file.readAll();
+            file.close();
+        }
+    }
+
+    // if we *still* don't have content then something went
+    // badly wrong, so only reset if its not blank
+    if (content != "") {
+
+        // whilst this happens don't show user
+        setUpdatesEnabled(false);
+
+        // setup the handler
+        QXmlInputSource source;
+        source.setData(content);
+        QXmlSimpleReader xmlReader;
+        ViewParser handler(context);
+        xmlReader.setContentHandler(&handler);
+        xmlReader.setErrorHandler(&handler);
+
+        // parse and instantiate the charts
+        xmlReader.parse(source);
+        pages_ = handler.perspectives;
+
+    }
+    if (legacy && pages_.count() == 1) pages_[0]->title = "General";
+
+    if (pages_.count() == 0) {
+        page_ = new Perspective(context, "empty", type);
+        pages_ << page_;
+    }
+
+    // add to stack
+    foreach(Perspective *page, pages_) {
+        pstack->addWidget(page);
+        cstack->addWidget(page->controls());
+        page->configChanged(0); // set colors correctly- will have missed from startup
+    }
+
+    // default to first one
+    page_ = pages_[0];
+
+    // if this is analysis view then lets select the first ride now
+    if (type == VIEW_ANALYSIS) {
+
+        // used to happen in Tab.cpp on create, but we do it later now
+        QDateTime now = QDateTime::currentDateTime();
+        for (int i=context->athlete->rideCache->rides().count(); i>0; --i) {
+            if (context->athlete->rideCache->rides()[i-1]->dateTime <= now) {
+                context->athlete->selectRideFile(context->athlete->rideCache->rides()[i-1]->fileName);
+                break;
+            }
+        }
+
+        // otherwise just the latest
+        if (context->currentRideItem() == NULL && context->athlete->rideCache->rides().count() != 0) {
+            context->athlete->selectRideFile(context->athlete->rideCache->rides().last()->fileName);
+        }
+    }
+
+}
+
+void
+TabView::addPerspective(QString name)
+{
+    Perspective *page = new Perspective(context, name, type);
+
+    // tabbed unless on train view
+    if (type == VIEW_TRAIN) page->styleChanged(2);
+    else page->styleChanged(0);
+
+    pages_ << page;
+    pstack->addWidget(page);
+    cstack->addWidget(page->controls());
+    page->configChanged(0); // set colors correctly- will be empty...
+}
+
+void
+TabView::setPages(QStackedWidget *pages)
+{
+    pstack = pages;
 
     // add to mainSplitter
     // now reset the splitter
-    mainSplitter->insertWidget(-1, page);
+    mainSplitter->insertWidget(-1, pages);
     mainSplitter->setStretchFactor(0,0);
     mainSplitter->setCollapsible(0, false);
     splitter->insertWidget(-1, mainSplitter);
@@ -406,8 +644,8 @@ TabView::sidebarChanged()
         // we are the analysis view
         // all a bit of a hack to stop the column widths from
         // being adjusted as the splitter gets resized and reset
-        if (context->mainWindow->init && context->tab->init && type == VIEW_ANALYSIS && active == false && context->tab->rideNavigator()->geometry().width() != 100)
-            context->tab->rideNavigator()->setWidth(context->tab->rideNavigator()->geometry().width());
+        if (context->mainWindow->init && context->tab->init && type == VIEW_ANALYSIS && active == false && context->rideNavigator->geometry().width() != 100)
+            context->rideNavigator->setWidth(context->rideNavigator->geometry().width());
         setUpdatesEnabled(true);
 
     } else sidebar_->hide();
@@ -417,15 +655,25 @@ void
 TabView::setPerspectives(QComboBox *perspectiveSelector)
 {
     perspectiveactive=true;
+
+    // lazy load of charts- only do it when this view is selected
+    if (!loaded)  restoreState(false);
+
     perspectiveSelector->clear();
-    perspectiveSelector->addItem("General");
-    perspectiveSelector->addItem("Bike");
-    perspectiveSelector->addItem("Run");
-    perspectiveSelector->addItem("Swim");
+    foreach(Perspective *page, pages_) {
+        perspectiveSelector->addItem(page->title);
+    }
     perspectiveSelector->addItem("Add New Perspective...");
     perspectiveSelector->addItem("Manage Perspectives...");
-    perspectiveSelector->insertSeparator(4);
+    perspectiveSelector->insertSeparator(pages_.count());
     perspectiveactive=false;
+
+    // if we only just loaded the charts and views, we need to select
+    // one to get the ride item and date range selected
+    if (!loaded) {
+        loaded = true;
+        perspectiveSelected(0);
+    }
 }
 
 
@@ -433,7 +681,37 @@ void
 TabView::perspectiveSelected(int index)
 {
     if (perspectiveactive || index <0) return;
-    fprintf(stderr, "Selected perspective: %d\n", index); fflush(stderr);
+
+    // switch the stack to show the one selected
+    // set page to the one we want
+    setUpdatesEnabled(false);
+    if (index < pages_.count()) {
+
+        page_ = pages_[index];
+
+        // switch to this perspective's charts and controls
+        pstack->setCurrentIndex(index);
+        cstack->setCurrentIndex(index);
+        pstack->show();
+        cstack->show();
+
+        // set properties on the perspective as they propagate to charts
+        RideItem *notconst = (RideItem*)context->currentRideItem();
+        page_->setProperty("ride", QVariant::fromValue<RideItem*>(notconst));
+        page_->setProperty("dateRange", property("dateRange"));
+
+        // set to whatever we have currently selected
+        // bit of spooky updates at a distance here... xxx fixme back to Perspective class
+        for(int i = 0; i < page_->charts.count(); i++) {
+
+            page_->charts[i]->setProperty("ride", QVariant::fromValue<RideItem*>(notconst));
+            page_->charts[i]->setProperty("dateRange", property("dateRange"));
+            if (page_->currentStyle != 0) page_->charts[i]->show();
+        }
+
+        setUpdatesEnabled(true);
+        //if (page_->currentStyle == 0 && page_->charts.count()) page_->tabSelected(0);
+    }
 }
 
 
@@ -480,7 +758,11 @@ TabView::selectionChanged()
 void
 TabView::resetLayout()
 {
-    if (page_) page_->resetLayout();
+    // delete all current perspectives
+    // XXX TODO
+
+    // reload from default (website / baked in)
+    // XXX TODO
 }
 
 void
@@ -524,4 +806,138 @@ TabView::onActive()
     {
         setShowBottom(true);
     }
+}
+
+//
+// view layout parser - reads in athletehome/xxx-layout.xml
+//
+bool ViewParser::startDocument()
+{
+    page = NULL;
+    chart = NULL;
+    return true;
+}
+
+bool ViewParser::endElement( const QString&, const QString&, const QString &qName )
+{
+    if (qName == "chart" && chart && page) { // add chart to homewindow
+        page->addChart(chart);
+    }
+
+    if (qName == "layout" && page) {
+
+        // one we just did needs resolving translate the charts and add to the perspective
+
+        // are we english language?
+        QVariant lang = appsettings->value(NULL, GC_LANG, QLocale::system().name());
+        bool english = lang.toString().startsWith("en") ? true : false;
+
+        // translate the metrics, but only if the built-in "default.XML"s are read (and only for LTM charts)
+        // and only if the language is not English (i.e. translation is required).
+#if 0 // XXX fixme
+        if (useDefault && !english) {
+
+            // translate the titles
+            Perspective::translateChartTitles(charts);
+
+            // translate the LTM settings
+            for (int i=0; i<charts.count(); i++) {
+                // find out if it's an LTMWindow via dynamic_cast
+                LTMWindow* ltmW = dynamic_cast<LTMWindow*> (charts[i]);
+                if (ltmW) {
+                    // the current chart is an LTMWindow, let's translate
+
+                    // now get the LTMMetrics
+                    LTMSettings workSettings = ltmW->getSettings();
+                    // replace name and unit for translated versions
+                    workSettings.translateMetrics(GlobalContext::context()->useMetricUnits);
+                    ltmW->applySettings(workSettings);
+                }
+            }
+        }
+#endif
+        page->styleChanged(style);
+    }
+    return true;
+}
+
+bool ViewParser::startElement( const QString&, const QString&, const QString &name, const QXmlAttributes &attrs )
+{
+    if (name == "layout") {
+
+        QString name="General";
+        for(int i=0; i<attrs.count(); i++) {
+            if (attrs.qName(i) == "style") {
+                style = Utils::unprotect(attrs.value(i)).toInt();
+            }
+            if (attrs.qName(i) == "name") {
+                name =  Utils::unprotect(attrs.value(i));
+            }
+        }
+
+        // we need a new perspective
+        page = new Perspective(context, name, VIEW_HOME); //XXX fixme VIEW_HOME!!! XXX
+        perspectives.append(page);
+    }
+    else if (name == "chart") {
+
+        QString name="", title="", typeStr="";
+        GcWinID type;
+
+        // get attributes
+        for(int i=0; i<attrs.count(); i++) {
+            if (attrs.qName(i) == "name") name = Utils::unprotect(attrs.value(i));
+            if (attrs.qName(i) == "title") title = Utils::unprotect(attrs.value(i));
+            if (attrs.qName(i) == "id")  typeStr = Utils::unprotect(attrs.value(i));
+        }
+
+        // new chart
+        type = static_cast<GcWinID>(typeStr.toInt());
+        chart = GcWindowRegistry::newGcWindow(type, context);
+        if (chart != NULL) {
+            chart->hide();
+            chart->setProperty("title", QVariant(title));
+        }
+    }
+    else if (name == "property") {
+
+        QString name, type, value;
+
+        // get attributes
+        for(int i=0; i<attrs.count(); i++) {
+            if (attrs.qName(i) == "name") name = Utils::unprotect(attrs.value(i));
+            if (attrs.qName(i) == "value") value = Utils::unprotect(attrs.value(i));
+            if (attrs.qName(i) == "type")  type = Utils::unprotect(attrs.value(i));
+        }
+
+        // set the chart property
+        if (type == "int" && chart) chart->setProperty(name.toLatin1(), QVariant(value.toInt()));
+        if (type == "double" && chart) chart->setProperty(name.toLatin1(), QVariant(value.toDouble()));
+
+        // deprecate dateRange asa chart property THAT IS DSAVED IN STATE
+        if (type == "QString" && name != "dateRange" && chart) chart->setProperty(name.toLatin1(), QVariant(QString(value)));
+        if (type == "QDate" && chart) chart->setProperty(name.toLatin1(), QVariant(QDate::fromString(value)));
+        if (type == "bool" && chart) chart->setProperty(name.toLatin1(), QVariant(value.toInt() ? true : false));
+        if (type == "LTMSettings" && chart) {
+            QByteArray base64(value.toLatin1());
+            QByteArray unmarshall = QByteArray::fromBase64(base64);
+            QDataStream s(&unmarshall, QIODevice::ReadOnly);
+            LTMSettings x;
+            s >> x;
+            chart->setProperty(name.toLatin1(), QVariant().fromValue<LTMSettings>(x));
+        }
+
+    }
+    return true;
+}
+
+bool ViewParser::characters( const QString&)
+{
+    return true;
+}
+
+
+bool ViewParser::endDocument()
+{
+    return true;
 }

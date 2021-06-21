@@ -40,16 +40,21 @@
 
 class ChartBar;
 class LTMSettings;
+class TabView;
+class ViewParser;
 
-class HomeWindow : public GcWindow
+class Perspective : public GcWindow
 {
     Q_OBJECT
     G_OBJECT
 
+    friend ::TabView;
+    friend ::ViewParser;
+
     public:
 
-        HomeWindow(Context *, QString name, QString title);
-        ~HomeWindow();
+        Perspective(Context *, QString title, int type);
+        ~Perspective();
 
         void resetLayout();
         void importChart(QMap<QString,QString> properties, bool select);
@@ -93,10 +98,6 @@ class HomeWindow : public GcWindow
         void closeWindow(GcWindow*);
         void showControls();
 
-        // save / restore window state
-        void saveState();
-        void restoreState(bool useDefault = false);
-
         //notifiction that been made visible
         void selected();
 
@@ -116,13 +117,16 @@ class HomeWindow : public GcWindow
 
     protected:
         Context *context;
-        QString name;
         bool active; // ignore gui signals when changing views
         GcChartWindow *clicked; // keep track of selected charts
         bool dropPending;
 
+        // what are we?
+        int type;
+        QString view;
+
         // top bar
-        QLabel *title;
+        QString title;
         QLineEdit *titleEdit;
 
         QComboBox *styleSelector;
@@ -145,9 +149,7 @@ class HomeWindow : public GcWindow
         QList<GcChartWindow*> charts;
         int chartCursor;
 
-        bool loaded;
-
-        void translateChartTitles(QList<GcChartWindow*> charts);
+        static void translateChartTitles(QList<GcChartWindow*> charts);
 };
 
 // setup the chart
@@ -181,29 +183,6 @@ class GcWindowDialog : public QDialog
         QDoubleSpinBox *height, *width;
 };
 
-class ViewParser : public QXmlDefaultHandler
-{
-
-public:
-    ViewParser(Context *context) : style(2), context(context) {}
-
-    // the results!
-    QList<GcChartWindow*> charts;
-    int style;
-
-    // unmarshall
-    bool startDocument();
-    bool endDocument();
-    bool endElement( const QString&, const QString&, const QString &qName );
-    bool startElement( const QString&, const QString&, const QString &name, const QXmlAttributes &attrs );
-    bool characters( const QString& str );
-
-protected:
-    Context *context;
-    GcChartWindow *chart;
-
-};
-
 class ImportChartDialog : public QDialog
 {
     Q_OBJECT
@@ -225,4 +204,23 @@ class ImportChartDialog : public QDialog
 
 };
 
+class AddPerspectiveDialog : public QDialog
+{
+    Q_OBJECT
+
+    public:
+        AddPerspectiveDialog(Context *context, QString &name);
+
+    protected:
+        QLineEdit *nameEdit;
+        QPushButton *add, *cancel;
+
+    public slots:
+        void addClicked();
+        void cancelClicked();
+
+    private:
+        Context *context;
+        QString &name;
+};
 #endif // _GC_HomeWindow_h

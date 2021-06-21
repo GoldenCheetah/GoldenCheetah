@@ -20,7 +20,7 @@
 #include "Context.h"
 #include "Tab.h"
 #include "TabView.h"
-#include "HomeWindow.h"
+#include "Perspective.h"
 #include "LTMTool.h"
 #include "LTMSettings.h"
 #include "LTMWindow.h"
@@ -48,9 +48,9 @@
 static const int tileMargin = 20;
 static const int tileSpacing = 10;
 
-HomeWindow::HomeWindow(Context *context, QString name, QString /* windowtitle */) :
-    GcWindow(context), context(context), name(name), active(false),
-    clicked(NULL), dropPending(false), chartCursor(-2), loaded(false)
+Perspective::Perspective(Context *context, QString title, int type) :
+    GcWindow(context), context(context), active(false),  clicked(NULL), dropPending(false),
+    type(type), title(title), chartCursor(-2)
 {
     // setup control area
     QWidget *cw = new QWidget(this);
@@ -76,6 +76,12 @@ HomeWindow::HomeWindow(Context *context, QString name, QString /* windowtitle */
     cl->addWidget(controlStack);
     setControls(cw);
 
+    switch(this->type) {
+    case VIEW_ANALYSIS: view="analysis"; break;
+    case VIEW_DIARY: view="diary"; break;
+    case VIEW_HOME: view="home"; break;
+    case VIEW_TRAIN: view="train"; break;
+    }
     setProperty("isManager", true);
     nomenu=true;
     setAcceptDrops(true);
@@ -168,28 +174,28 @@ HomeWindow::HomeWindow(Context *context, QString name, QString /* windowtitle */
     connect(titleEdit, SIGNAL(textChanged(const QString&)), SLOT(titleChanged()));
 
     // trends view we should select a library chart when a chart is selected.
-    if (name == "home") connect(context, SIGNAL(presetSelected(int)), this, SLOT(presetSelected(int)));
+    if (type == VIEW_HOME) connect(context, SIGNAL(presetSelected(int)), this, SLOT(presetSelected(int)));
 
     // Allow realtime controllers to scroll train view with steering movements
-    if (name == "train") connect(context, SIGNAL(steerScroll(int)), this, SLOT(steerScroll(int)));
+    if (type == VIEW_TRAIN) connect(context, SIGNAL(steerScroll(int)), this, SLOT(steerScroll(int)));
 
     installEventFilter(this);
     qApp->installEventFilter(this);
 }
 
-HomeWindow::~HomeWindow()
+Perspective::~Perspective()
 {
     qApp->removeEventFilter(this);
 }
 
 void
-HomeWindow::rightClick(const QPoint & /*pos*/)
+Perspective::rightClick(const QPoint & /*pos*/)
 {
     return; //deprecated right click on homewindow -- bad UX
 }
 
 void
-HomeWindow::addChartFromMenu(QAction*action)
+Perspective::addChartFromMenu(QAction*action)
 {
     // & removed to avoid issues with kde AutoCheckAccelerators
     QString actionText = QString(action->text()).replace("&", "");
@@ -207,7 +213,7 @@ HomeWindow::addChartFromMenu(QAction*action)
 }
 
 void
-HomeWindow::importChart(QMap<QString,QString>properties, bool select)
+Perspective::importChart(QMap<QString,QString>properties, bool select)
 {
     // turn off updates whilst we do this...
     setUpdatesEnabled(false);
@@ -236,7 +242,7 @@ HomeWindow::importChart(QMap<QString,QString>properties, bool select)
     const QMetaObject *m = chart->metaObject();
 
     // set all the properties
-    chart->setProperty("view", name);
+    chart->setProperty("view", view);
 
     // each of the user properties
     QMapIterator<QString,QString> prop(properties);
@@ -282,7 +288,7 @@ HomeWindow::importChart(QMap<QString,QString>properties, bool select)
 }
 
 void
-HomeWindow::configChanged(qint32)
+Perspective::configChanged(qint32)
 {
     // update scroll bar
 //#ifndef Q_OS_MAC
@@ -306,15 +312,9 @@ HomeWindow::configChanged(qint32)
 }
 
 void
-HomeWindow::selected()
+Perspective::selected()
 {
     setUpdatesEnabled(false);
-
-    if (loaded == false) {
-        restoreState();
-        loaded = true;
-        if (!currentStyle && charts.count()) tabSelected(0);
-    }
 
     resizeEvent(NULL); // force a relayout
     rideSelected();
@@ -325,7 +325,7 @@ HomeWindow::selected()
 }
 
 void
-HomeWindow::titleChanged()
+Perspective::titleChanged()
 {
     if (charts.count() == 0) return;
 
@@ -345,7 +345,7 @@ HomeWindow::titleChanged()
 }
 
 void
-HomeWindow::rideSelected()
+Perspective::rideSelected()
 {
     // we need to notify of null rides immediately
     if (!myRideItem || isVisible()) {
@@ -366,7 +366,7 @@ HomeWindow::rideSelected()
 }
 
 void
-HomeWindow::tabMenu(int index, int x)
+Perspective::tabMenu(int index, int x)
 {
     // activate this tab's menu
     QPoint pos = QPoint(x, mapToGlobal(chartbar->geometry().bottomLeft()).y()+(2*dpiXFactor));
@@ -374,7 +374,7 @@ HomeWindow::tabMenu(int index, int x)
 }
 
 void
-HomeWindow::dateRangeChanged(DateRange dr)
+Perspective::dateRangeChanged(DateRange dr)
 { Q_UNUSED( dr )
     if (isVisible()) {
 
@@ -395,7 +395,7 @@ HomeWindow::dateRangeChanged(DateRange dr)
 }
 
 void
-HomeWindow::tabSelected(int index)
+Perspective::tabSelected(int index)
 {
     // user switched tabs -- tell tabe to redraw!
     if (active || currentStyle != 0) return;
@@ -427,7 +427,7 @@ HomeWindow::tabSelected(int index)
 }
 
 void
-HomeWindow::tabSelected(int index, bool forride)
+Perspective::tabSelected(int index, bool forride)
 {
     if (active || currentStyle != 0) return;
 
@@ -445,7 +445,7 @@ HomeWindow::tabSelected(int index, bool forride)
 }
 
 void
-HomeWindow::tabMoved(int to, int from)
+Perspective::tabMoved(int to, int from)
 {
      GcChartWindow *me = charts.takeAt(from);
      charts.insert(to, me);
@@ -468,7 +468,7 @@ HomeWindow::tabMoved(int to, int from)
 }
 
 void
-HomeWindow::styleChanged(int id)
+Perspective::styleChanged(int id)
 {
     // ignore if out of bounds or we're already using that style
     if (id > 2 || id < 0 || id == currentStyle) return;
@@ -558,7 +558,7 @@ HomeWindow::styleChanged(int id)
 }
 
 void
-HomeWindow::dragEnterEvent(QDragEnterEvent *)
+Perspective::dragEnterEvent(QDragEnterEvent *)
 {
 #if 0 // draw and drop chart no longer part of the UX
     if (event->mimeData()->formats().contains("application/x-qabstractitemmodeldatalist")) {
@@ -569,7 +569,7 @@ HomeWindow::dragEnterEvent(QDragEnterEvent *)
 }
 
 void
-HomeWindow::appendChart(GcWinID id)
+Perspective::appendChart(GcWinID id)
 {
     GcChartWindow *newone = NULL;
 
@@ -593,7 +593,7 @@ HomeWindow::appendChart(GcWinID id)
 }
 
 void
-HomeWindow::dropEvent(QDropEvent *)
+Perspective::dropEvent(QDropEvent *)
 {
 #if 0 // drah and drop chart no longer part of the UX
     QStandardItemModel model;
@@ -624,14 +624,14 @@ HomeWindow::dropEvent(QDropEvent *)
 }
 
 void
-HomeWindow::showControls()
+Perspective::showControls()
 {
     context->tab->chartsettings()->adjustSize();
     context->tab->chartsettings()->show();
 }
 
 void
-HomeWindow::addChart(GcChartWindow* newone)
+Perspective::addChart(GcChartWindow* newone)
 {
     int chartnum = charts.count();
 
@@ -656,7 +656,7 @@ HomeWindow::addChart(GcChartWindow* newone)
         newone->installEventFilter(this);
 
         RideItem *notconst = (RideItem*)context->currentRideItem();
-        newone->setProperty("view", name);
+        newone->setProperty("view", view);
         newone->setProperty("ride", QVariant::fromValue<RideItem*>(notconst));
         newone->setProperty("dateRange", property("dateRange"));
         newone->setProperty("style", currentStyle);
@@ -750,7 +750,7 @@ HomeWindow::addChart(GcChartWindow* newone)
 }
 
 bool
-HomeWindow::removeChart(int num, bool confirm)
+Perspective::removeChart(int num, bool confirm)
 {
     if (num >= charts.count()) return false; // out of bounds (!)
 
@@ -807,19 +807,13 @@ HomeWindow::removeChart(int num, bool confirm)
 }
 
 void
-HomeWindow::resetLayout()
-{
-    restoreState(true);
-}
-
-void
-HomeWindow::showEvent(QShowEvent *)
+Perspective::showEvent(QShowEvent *)
 {
     resizeEvent(NULL);
 }
 
 void
-HomeWindow::resizeEvent(QResizeEvent * /* e */)
+Perspective::resizeEvent(QResizeEvent * /* e */)
 {
     foreach (GcChartWindow *x, charts) {
 
@@ -867,7 +861,7 @@ HomeWindow::resizeEvent(QResizeEvent * /* e */)
 }
 
 bool
-HomeWindow::eventFilter(QObject *object, QEvent *e)
+Perspective::eventFilter(QObject *object, QEvent *e)
 {
     if (!isVisible()) return false; // ignore when we aren't visible
 
@@ -1006,7 +1000,7 @@ HomeWindow::eventFilter(QObject *object, QEvent *e)
 
 // which tile to place before, -1 means append
 int
-HomeWindow::pointTile(QPoint pos)
+Perspective::pointTile(QPoint pos)
 {
     // find the window that is to the right of
     // the drop point
@@ -1073,7 +1067,7 @@ HomeWindow::pointTile(QPoint pos)
 }
 
 void
-HomeWindow::windowMoved(GcWindow*w)
+Perspective::windowMoved(GcWindow*w)
 {
     // fix single click error
     if (chartCursor == -2) return; // no it didn't!
@@ -1111,12 +1105,12 @@ HomeWindow::windowMoved(GcWindow*w)
 }
 
 void
-HomeWindow::windowResized(GcWindow* /*w*/)
+Perspective::windowResized(GcWindow* /*w*/)
 {
 }
 
 void
-HomeWindow::windowMoving(GcWindow* /*w*/)
+Perspective::windowMoving(GcWindow* /*w*/)
 {
     // ensure the mouse pointer is visible, scrolls
     // as we get near to the margins...
@@ -1129,14 +1123,14 @@ HomeWindow::windowMoving(GcWindow* /*w*/)
 }
 
 void
-HomeWindow::windowResizing(GcWindow* /*w*/)
+Perspective::windowResizing(GcWindow* /*w*/)
 {
     QPoint pos = winWidget->mapFromGlobal(QCursor::pos());
     winArea->ensureVisible(pos.x(), pos.y(), 20, 20);
 }
 
 void
-HomeWindow::drawCursor()
+Perspective::drawCursor()
 {
     if (chartCursor == -2) return;
 
@@ -1283,7 +1277,7 @@ GcWindowDialog::exec()
  * +1 = single step downwards scroll                                   *
  * +2 = page step downwards scroll                                     *
  *--------------------------------------------------------------------*/
-void HomeWindow::steerScroll(int scrollAmount) {
+void Perspective::steerScroll(int scrollAmount) {
     QScrollBar *vertScroll;
     switch (currentStyle) {
     case 1 : { vertScroll = tileArea->verticalScrollBar(); }
@@ -1311,301 +1305,13 @@ void HomeWindow::steerScroll(int scrollAmount) {
     vertScroll->setValue(vertScroll->value() + scrollPix);
 }
 
-/*----------------------------------------------------------------------
- * Save and restore state (xxxx-layout.xml)
- *--------------------------------------------------------------------*/
-
-void
-HomeWindow::saveState()
-{
-    // run through each chart and save its USER properties
-    // we do not save all the other Qt properties since
-    // we're not interested in them
-    // NOTE: currently we support QString, int, double and bool types - beware custom types!!
-    if (charts.count() == 0) return; // don't save empty, use default instead
-
-    QString filename = context->athlete->home->config().canonicalPath() + "/" + name + "-layout.xml";
-    QFile file(filename);
-    if (!file.open(QFile::WriteOnly)) {
-        QMessageBox msgBox;
-        msgBox.setIcon(QMessageBox::Critical);
-        msgBox.setText(tr("Problem Saving Chart Bar Layout"));
-        msgBox.setInformativeText(tr("File: %1 cannot be opened for 'Writing'. Please check file properties.").arg(filename));
-        msgBox.exec();
-        return;
-    };
-    file.resize(0);
-    QTextStream out(&file);
-    out.setCodec("UTF-8");
-
-    out<<"<layout name=\""<< name <<"\" style=\"" << currentStyle <<"\">\n";
-
-    // iterate over charts
-    foreach (GcChartWindow *chart, charts) {
-        GcWinID type = chart->property("type").value<GcWinID>();
-
-        out<<"\t<chart id=\""<<static_cast<int>(type)<<"\" "
-           <<"name=\""<<Utils::xmlprotect(chart->property("instanceName").toString())<<"\" "
-           <<"title=\""<<Utils::xmlprotect(chart->property("title").toString())<<"\" >\n";
-
-        // iterate over chart properties
-        const QMetaObject *m = chart->metaObject();
-        for (int i=0; i<m->propertyCount(); i++) {
-            QMetaProperty p = m->property(i);
-            if (p.isUser(chart)) {
-               out<<"\t\t<property name=\""<<Utils::xmlprotect(p.name())<<"\" "
-                  <<"type=\""<<p.typeName()<<"\" "
-                  <<"value=\"";
-
-                if (QString(p.typeName()) == "int") out<<p.read(chart).toInt();
-                if (QString(p.typeName()) == "double") out<<p.read(chart).toDouble();
-                if (QString(p.typeName()) == "QDate") out<<p.read(chart).toDate().toString();
-                if (QString(p.typeName()) == "QString") out<<Utils::xmlprotect(p.read(chart).toString());
-                if (QString(p.typeName()) == "bool") out<<p.read(chart).toBool();
-                if (QString(p.typeName()) == "LTMSettings") {
-                    QByteArray marshall;
-                    QDataStream s(&marshall, QIODevice::WriteOnly);
-                    LTMSettings x = p.read(chart).value<LTMSettings>();
-                    s << x;
-                    out<<marshall.toBase64();
-                }
-
-                out<<"\" />\n";
-            }
-        }
-        out<<"\t</chart>\n";
-    }
-    out<<"</layout>\n";
-    file.close();
-}
-
-void
-HomeWindow::restoreState(bool useDefault)
-{
-    // restore window state
-    QString filename = context->athlete->home->config().canonicalPath() + "/" + name + "-layout.xml";
-    QFileInfo finfo(filename);
-
-    QString content = "";
-
-    // set content from the default
-    if (useDefault) {
-
-        // for getting config
-        QNetworkAccessManager nam;
-
-        // remove the current saved version
-        QFile::remove(filename);
-
-        // fetch from the goldencheetah.org website
-        QString request = QString("%1/%2-layout.xml")
-                             .arg(VERSION_CONFIG_PREFIX)
-                             .arg(name);
-
-        QNetworkReply *reply = nam.get(QNetworkRequest(QUrl(request)));
-
-        if (reply->error() == QNetworkReply::NoError) {
-
-            // lets wait for a response with an event loop
-            // it quits on a 5s timeout or reply coming back
-            QEventLoop loop;
-            QTimer timer;
-            timer.setSingleShot(true);
-            connect(&timer, SIGNAL(timeout()), &loop, SLOT(quit()));
-            connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
-            timer.start(5000);
-
-            // lets block until signal received
-            loop.exec(QEventLoop::WaitForMoreEvents);
-
-            // all good?
-            if (reply->error() == QNetworkReply::NoError) {
-                content = reply->readAll();
-            }
-        }
-    }
-
-    //  if we don't have content read from file/resource
-    if (content == "") {
-
-        // if no local file fall back to qresource
-        if (!finfo.exists()) {
-            filename = QString(":xml/%1-layout.xml").arg(name);
-            useDefault = true;
-        }
-
-        QFile file(filename);
-        if (file.open(QIODevice::ReadOnly)) {
-            content = file.readAll();
-            file.close();
-        }
-    }
-
-    // if we *still* don't have content then something went
-    // badly wrong, so only reset if its not blank
-    if (content != "") {
-
-        // whilst this happens don't show user
-        setUpdatesEnabled(false);
-
-        // clear whatever we got
-        int numCharts = charts.count();
-        for(int i = numCharts - 1; i >= 0; i--) {
-            removeChart(i,false);
-        }
-
-        // setup the handler
-        QXmlInputSource source;
-        source.setData(content);
-        QXmlSimpleReader xmlReader;
-        ViewParser handler(context);
-        xmlReader.setContentHandler(&handler);
-        xmlReader.setErrorHandler(&handler);
-
-        // parse and instantiate the charts
-        xmlReader.parse(source);
-
-        // are we english language?
-        QVariant lang = appsettings->value(this, GC_LANG, QLocale::system().name());
-        bool english = lang.toString().startsWith("en") ? true : false;
-
-        // translate the metrics, but only if the built-in "default.XML"s are read (and only for LTM charts)
-        // and only if the language is not English (i.e. translation is required).
-        if (useDefault && !english) {
-
-            // translate the titles
-            translateChartTitles(handler.charts);
-
-            // translate the LTM settings
-            for (int i=0; i<handler.charts.count(); i++) {
-                // find out if it's an LTMWindow via dynamic_cast
-                LTMWindow* ltmW = dynamic_cast<LTMWindow*> (handler.charts[i]);
-                if (ltmW) {
-                    // the current chart is an LTMWindow, let's translate
-
-                    // now get the LTMMetrics
-                    LTMSettings workSettings = ltmW->getSettings();
-                    // replace name and unit for translated versions
-                    workSettings.translateMetrics(GlobalContext::context()->useMetricUnits);
-                    ltmW->applySettings(workSettings);
-                }
-            }
-        }
-
-        // layout the results
-        styleChanged(handler.style);
-        foreach(GcChartWindow *chart, handler.charts) addChart(chart);
-    }
-
-    // set to whatever we have selected
-    for(int i = 0; i < charts.count(); i++) {
-        RideItem *notconst = (RideItem*)context->currentRideItem();
-        charts[i]->setProperty("ride", QVariant::fromValue<RideItem*>(notconst));
-        charts[i]->setProperty("dateRange", property("dateRange"));
-        if (currentStyle != 0) charts[i]->show();
-        
-    }
-
-    setUpdatesEnabled(true);
-    if (currentStyle == 0 && charts.count()) tabSelected(0);
-
-}
-
-//
-// view layout parser - reads in athletehome/xxx-layout.xml
-//
-bool ViewParser::startDocument()
-{
-    return true;
-}
-
-bool ViewParser::endElement( const QString&, const QString&, const QString &qName )
-{
-    if (qName == "chart" && chart) { // add to the list
-        charts.append(chart);
-    }
-    return true;
-}
-
-bool ViewParser::startElement( const QString&, const QString&, const QString &name, const QXmlAttributes &attrs )
-{
-    if (name == "layout") {
-        for(int i=0; i<attrs.count(); i++) {
-            if (attrs.qName(i) == "style") {
-                style = Utils::unprotect(attrs.value(i)).toInt();
-            }
-        }
-    }
-    else if (name == "chart") {
-
-        QString name="", title="", typeStr="";
-        GcWinID type;
-
-        // get attributes
-        for(int i=0; i<attrs.count(); i++) {
-            if (attrs.qName(i) == "name") name = Utils::unprotect(attrs.value(i));
-            if (attrs.qName(i) == "title") title = Utils::unprotect(attrs.value(i));
-            if (attrs.qName(i) == "id")  typeStr = Utils::unprotect(attrs.value(i));
-        }
-
-        // new chart
-        type = static_cast<GcWinID>(typeStr.toInt());
-        chart = GcWindowRegistry::newGcWindow(type, context);
-        if (chart != NULL) {
-            chart->hide();
-            chart->setProperty("title", QVariant(title));
-        }
-    }
-    else if (name == "property") {
-
-        QString name, type, value;
-
-        // get attributes
-        for(int i=0; i<attrs.count(); i++) {
-            if (attrs.qName(i) == "name") name = Utils::unprotect(attrs.value(i));
-            if (attrs.qName(i) == "value") value = Utils::unprotect(attrs.value(i));
-            if (attrs.qName(i) == "type")  type = Utils::unprotect(attrs.value(i));
-        }
-
-        // set the chart property
-        if (type == "int" && chart) chart->setProperty(name.toLatin1(), QVariant(value.toInt()));
-        if (type == "double" && chart) chart->setProperty(name.toLatin1(), QVariant(value.toDouble()));
-
-        // deprecate dateRange asa chart property THAT IS DSAVED IN STATE
-        if (type == "QString" && name != "dateRange" && chart) chart->setProperty(name.toLatin1(), QVariant(QString(value)));
-        if (type == "QDate" && chart) chart->setProperty(name.toLatin1(), QVariant(QDate::fromString(value)));
-        if (type == "bool" && chart) chart->setProperty(name.toLatin1(), QVariant(value.toInt() ? true : false));
-        if (type == "LTMSettings" && chart) {
-            QByteArray base64(value.toLatin1());
-            QByteArray unmarshall = QByteArray::fromBase64(base64);
-            QDataStream s(&unmarshall, QIODevice::ReadOnly);
-            LTMSettings x;
-            s >> x;
-            chart->setProperty(name.toLatin1(), QVariant().fromValue<LTMSettings>(x));
-        }
-
-    }
-    return true;
-}
-
-bool ViewParser::characters( const QString&)
-{
-    return true;
-}
-
-
-bool ViewParser::endDocument()
-{
-    return true;
-}
-
-void HomeWindow::closeWindow(GcWindow*thisone)
+void Perspective::closeWindow(GcWindow*thisone)
 {
     if (charts.contains(static_cast<GcChartWindow*>(thisone)))
         removeChart(charts.indexOf(static_cast<GcChartWindow*>(thisone)));
 }
 
-void HomeWindow::translateChartTitles(QList<GcChartWindow*> charts)
+void Perspective::translateChartTitles(QList<GcChartWindow*> charts)
 {
     // Map default (english) title to external (Localized) name, new default
     // charts in *layout.xml need to be added to this list to be translated
@@ -1656,7 +1362,7 @@ void HomeWindow::translateChartTitles(QList<GcChartWindow*> charts)
 }
 
 void
-HomeWindow::presetSelected(int n)
+Perspective::presetSelected(int n)
 {
     if (n > 0) {
 
@@ -1834,4 +1540,45 @@ void
 ImportChartDialog::cancelClicked()
 {
     accept();
+}
+
+AddPerspectiveDialog::AddPerspectiveDialog(Context *context, QString &name) :
+    context(context), name(name)
+{
+    setWindowFlags(windowFlags());
+    setWindowTitle(tr("Add Perspective"));
+    setWindowModality(Qt::ApplicationModal);
+    setMinimumWidth(200 * dpiXFactor);
+
+    QVBoxLayout *layout = new QVBoxLayout(this);
+
+    QFormLayout *form = new QFormLayout();
+    nameEdit = new QLineEdit(this);
+    nameEdit->setText(name);
+    form->addRow(new QLabel(tr("Perspective Name")), nameEdit);
+    layout->addLayout(form);
+
+    QHBoxLayout *buttons = new QHBoxLayout();
+    add = new QPushButton(tr("Add"), this);
+    cancel = new QPushButton(tr("Cancel"), this);
+    buttons->addStretch();
+    buttons->addWidget(cancel);
+    buttons->addWidget(add);
+    layout->addLayout(buttons);
+
+    connect(add, SIGNAL(clicked()), this, SLOT(addClicked()));
+    connect(cancel, SIGNAL(clicked()), this, SLOT(cancelClicked()));
+}
+
+void
+AddPerspectiveDialog::addClicked()
+{
+    name = nameEdit->text();
+    accept();
+}
+
+void
+AddPerspectiveDialog::cancelClicked()
+{
+    reject();
 }

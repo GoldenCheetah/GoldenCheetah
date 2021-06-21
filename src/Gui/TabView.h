@@ -26,7 +26,7 @@
 #include <QMetaObject>
 #include <QStackedWidget>
 
-#include "HomeWindow.h"
+#include "Perspective.h"
 #include "Colors.h"
 #include "GcSideBarItem.h"
 #include "GcWindowRegistry.h"
@@ -44,6 +44,8 @@ class TabView : public QWidget
     Q_PROPERTY(bool tiled READ isTiled WRITE setTiled USER true)
     Q_PROPERTY(bool selected READ isSelected WRITE setSelected USER true) // make this last always
 
+    friend class ::MainWindow;
+
     public:
 
         TabView(Context *context, int type);
@@ -53,8 +55,8 @@ class TabView : public QWidget
         // add the widgets to the view
         void setSidebar(QWidget *sidebar);
         QWidget *sidebar() { return sidebar_; }
-        void setPage(HomeWindow *page);
-        HomeWindow *page() { return page_;}
+        void setPages(QStackedWidget *pages);
+        Perspective *page() { return page_;}
         void setBlank(BlankStatePage *blank);
         BlankStatePage *blank() { return blank_; }
         void setBottom(QWidget *bottom);
@@ -69,9 +71,15 @@ class TabView : public QWidget
         void setTiled(bool x) { _tiled=x; tileModeChanged(); }
         bool isTiled() const { return _tiled; }
 
-        // set perspective
+        // load/save perspectives
+        void restoreState(bool useDefault = false);
+        void saveState();
+
         void setPerspectives(QComboBox *perspectiveSelector); // set the combobox when view selected
         void perspectiveSelected(int index); // combobox selections changed because the user selected a perspective
+
+        // add a new perspective
+        void addPerspective(QString);
 
         // bottom
         void dragEvent(bool); // showbottom on drag event
@@ -87,8 +95,6 @@ class TabView : public QWidget
         // select / deselect view
         void setSelected(bool x) { _selected=x; selectionChanged(); }
         bool isSelected() const { return _selected; }
-
-        void saveState() { if (page_) page_->saveState(); }
 
         int viewType() { return type; }
 
@@ -151,15 +157,45 @@ class TabView : public QWidget
         QPropertyAnimation *anim;
         QWidget *sidebar_;
         QWidget *bottom_;
-        HomeWindow *page_; // currently selected page
-        QList<HomeWindow> pages_;
+
+        Perspective *page_; // currently selected page
+        QList<Perspective *> pages_;
+
+        // the perspectives are stacked- charts and their associatated controls
+        QStackedWidget *pstack, *cstack;
         BlankStatePage *blank_;
+
+        bool loaded;
 
     private slots:
         void onIdle();
         void onActive();
 };
 
+// reads in perspectives
+class ViewParser : public QXmlDefaultHandler
+{
+
+public:
+    ViewParser(Context *context) : style(2), context(context) {}
+
+    // the results!
+    QList<Perspective*> perspectives;
+    int style;
+
+    // unmarshall
+    bool startDocument();
+    bool endDocument();
+    bool endElement( const QString&, const QString&, const QString &qName );
+    bool startElement( const QString&, const QString&, const QString &name, const QXmlAttributes &attrs );
+    bool characters( const QString& str );
+
+protected:
+    Context *context;
+    GcChartWindow *chart;
+    Perspective *page; // current
+
+};
 // we make our own view splitter for the bespoke handle
 class ViewSplitter : public QSplitter
 {

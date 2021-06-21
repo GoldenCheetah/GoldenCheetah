@@ -88,7 +88,7 @@
 #include "GcToolBar.h"
 #include "NewSideBar.h"
 #include "HelpWindow.h"
-#include "HomeWindow.h"
+#include "Perspective.h"
 #if !defined(Q_OS_MAC)
 #include "QTFullScreen.h" // not mac!
 #endif
@@ -133,7 +133,7 @@ MainWindow::MainWindow(const QDir &home)
      *--------------------------------------------------------------------*/
     setAttribute(Qt::WA_DeleteOnClose);
     mainwindows.append(this);  // add us to the list of open windows
-    init = false;
+    pactive = init = false;
 
     // create a splash to keep user informed on first load
     // first one in middle of display, not middle of window
@@ -952,7 +952,7 @@ MainWindow::exportChartToCloudDB()
 {
     // upload the current chart selected to the chart db
     // called from the sidebar menu
-    HomeWindow *page=currentTab->view(currentTab->currentView())->page();
+    Perspective *page=currentTab->view(currentTab->currentView())->page();
     if (page->currentStyle == 0 && page->currentChart())
         page->currentChart()->exportChartToCloudDB();
 }
@@ -1271,10 +1271,10 @@ MainWindow::selectAthlete()
 void
 MainWindow::selectAnalysis()
 {
+    currentTab->analysisView->setPerspectives(perspectiveSelector);
     viewStack->setCurrentIndex(1);
     sidebar->setItemSelected(3, true);
     currentTab->selectView(1);
-    currentTab->analysisView->setPerspectives(perspectiveSelector);
     perspectiveSelector->show();
     setToolButtons();
 }
@@ -1282,10 +1282,10 @@ MainWindow::selectAnalysis()
 void
 MainWindow::selectTrain()
 {
+    currentTab->trainView->setPerspectives(perspectiveSelector);
     viewStack->setCurrentIndex(1);
     sidebar->setItemSelected(5, true);
     currentTab->selectView(3);
-    currentTab->trainView->setPerspectives(perspectiveSelector);
     perspectiveSelector->show();
     setToolButtons();
 }
@@ -1293,9 +1293,9 @@ MainWindow::selectTrain()
 void
 MainWindow::selectDiary()
 {
+    currentTab->diaryView->setPerspectives(perspectiveSelector);
     viewStack->setCurrentIndex(1);
     currentTab->selectView(2);
-    currentTab->diaryView->setPerspectives(perspectiveSelector);
     perspectiveSelector->show();
     setToolButtons();
 }
@@ -1303,10 +1303,10 @@ MainWindow::selectDiary()
 void
 MainWindow::selectHome()
 {
+    currentTab->homeView->setPerspectives(perspectiveSelector);
     viewStack->setCurrentIndex(1);
     sidebar->setItemSelected(2, true);
     currentTab->selectView(0);
-    currentTab->homeView->setPerspectives(perspectiveSelector);
     perspectiveSelector->show();
     setToolButtons();
 }
@@ -1366,14 +1366,64 @@ MainWindow::setToolButtons()
 void
 MainWindow::perspectiveSelected(int index)
 {
+    if (pactive) return;
+
     // set the perspective for the current view
     int view = currentTab->currentView();
-
+    TabView *current = NULL;
     switch (view) {
-    case 0:  currentTab->homeView->perspectiveSelected(index); break;
-    case 1:  currentTab->diaryView->perspectiveSelected(index); break;
-    case 2:  currentTab->analysisView->perspectiveSelected(index); break;
-    case 3:  currentTab->trainView->perspectiveSelected(index); break;
+    case 0:  current = currentTab->homeView; break;
+    case 1:  current = currentTab->analysisView; break;
+    case 2:  current = currentTab->diaryView; break;
+    case 3:  current = currentTab->trainView; break;
+    }
+
+    // which perspective is currently being shown?
+    int prior = current->pages_.indexOf(current->page_);
+
+    if (index < current->pages_.count()) {
+
+        // a perspectives was selected
+        switch (view) {
+        case 0:  current->perspectiveSelected(index); break;
+        case 1:  current->perspectiveSelected(index); break;
+        case 2:  current->perspectiveSelected(index); break;
+        case 3:  current->perspectiveSelected(index); break;
+        }
+
+    } else {
+
+        // manage or add perspectives selected
+        pactive = true;
+
+        // set the combo back to where it was
+        perspectiveSelector->setCurrentIndex(prior);
+
+        // now open dialog etc
+        switch (index - current->pages_.count()) {
+        case 1 : // add perspectives
+            {
+                QString name;
+                AddPerspectiveDialog *dialog= new AddPerspectiveDialog(currentTab->context, name);
+                int ret= dialog->exec();
+                delete dialog;
+                if (ret == QDialog::Accepted && name != "") {
+
+                    // add...
+                    current->addPerspective(name);
+                    current->setPerspectives(perspectiveSelector);
+
+                    // and select remember pactive is true, so we do the heavy lifting here
+                    perspectiveSelector->setCurrentIndex(current->pages_.count()-1);
+                    current->perspectiveSelected(perspectiveSelector->currentIndex());
+                }
+            }
+            break;
+        case 2 : // manage perspectives
+            // XXX todo
+            break;
+        }
+        pactive = false;
     }
 }
 

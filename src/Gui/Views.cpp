@@ -33,13 +33,19 @@ extern QDesktopWidget *desktop;
 AnalysisView::AnalysisView(Context *context, QStackedWidget *controls) : TabView(context, VIEW_ANALYSIS)
 {
     analSidebar = new AnalysisSidebar(context);
-    hw = new HomeWindow(context, "analysis", "Activities");
-    controls->addWidget(hw->controls());
-    controls->setCurrentIndex(0);
     BlankStateAnalysisPage *b = new BlankStateAnalysisPage(context);
 
     setSidebar(analSidebar);
-    setPage(hw);
+
+    // perspectives are stacked
+    pstack = new QStackedWidget(this);
+    setPages(pstack);
+
+    // each perspective has a stack of controls
+    cstack = new QStackedWidget(this);
+    controls->addWidget(cstack);
+    controls->setCurrentIndex(0);
+
     setBlank(b);
     setBottom(new ComparePane(context, this, ComparePane::interval));
 
@@ -51,7 +57,7 @@ AnalysisView::AnalysisView(Context *context, QStackedWidget *controls) : TabView
 
 RideNavigator *AnalysisView::rideNavigator()
 {
-    return analSidebar->rideNavigator;
+    return context->rideNavigator;
 }
 
 AnalysisView::~AnalysisView()
@@ -96,13 +102,17 @@ AnalysisView::isBlank()
 DiaryView::DiaryView(Context *context, QStackedWidget *controls) : TabView(context, VIEW_DIARY)
 {
     diarySidebar = new DiarySidebar(context);
-    hw = new HomeWindow(context, "diary", "Diary");
-    controls->addWidget(hw->controls());
-    controls->setCurrentIndex(0);
     BlankStateDiaryPage *b = new BlankStateDiaryPage(context);
 
     setSidebar(diarySidebar);
-    setPage(hw);
+
+    // each perspective has a stack of controls
+    cstack = new QStackedWidget(this);
+    controls->addWidget(cstack);
+    controls->setCurrentIndex(0);
+
+    pstack = new QStackedWidget(this);
+    setPages(pstack);
     setBlank(b);
 
     setSidebarEnabled(appsettings->value(this,  GC_SETTINGS_MAIN_SIDEBAR "diary", true).toBool());
@@ -119,15 +129,17 @@ DiaryView::~DiaryView()
 void
 DiaryView::setRide(RideItem*ride)
 {
-    static_cast<DiarySidebar*>(sidebar())->setRide(ride);
-    page()->setProperty("ride", QVariant::fromValue<RideItem*>(dynamic_cast<RideItem*>(ride)));
+    if (loaded) {
+        static_cast<DiarySidebar*>(sidebar())->setRide(ride);
+        page()->setProperty("ride", QVariant::fromValue<RideItem*>(dynamic_cast<RideItem*>(ride)));
+    }
 }
 
 void
 DiaryView::dateRangeChanged(DateRange dr)
 {
     //context->notifyDateRangeChanged(dr); // diary view deprecated and not part of navigation model
-    page()->setProperty("dateRange", QVariant::fromValue<DateRange>(dr));
+    if (loaded) page()->setProperty("dateRange", QVariant::fromValue<DateRange>(dr));
 }
 
 bool
@@ -140,13 +152,17 @@ DiaryView::isBlank()
 HomeView::HomeView(Context *context, QStackedWidget *controls) : TabView(context, VIEW_HOME)
 {
     sidebar = new LTMSidebar(context);
-    hw = new HomeWindow(context, "home", "Trends");
-    controls->addWidget(hw->controls());
-    controls->setCurrentIndex(0);
     BlankStateHomePage *b = new BlankStateHomePage(context);
 
     setSidebar(sidebar);
-    setPage(hw);
+
+    // each perspective has a stack of controls
+    cstack = new QStackedWidget(this);
+    controls->addWidget(cstack);
+    controls->setCurrentIndex(0);
+
+    pstack = new QStackedWidget(this);
+    setPages(pstack);
     setBlank(b);
     setBottom(new ComparePane(context, this, ComparePane::season));
 
@@ -176,7 +192,7 @@ HomeView::dateRangeChanged(DateRange dr)
 {
     emit dateChanged(dr);
     context->notifyDateRangeChanged(dr);
-    page()->setProperty("dateRange", QVariant::fromValue<DateRange>(dr));
+    if (loaded) page()->setProperty("dateRange", QVariant::fromValue<DateRange>(dr));
 }
 bool
 HomeView::isBlank()
@@ -198,14 +214,17 @@ TrainView::TrainView(Context *context, QStackedWidget *controls) : TabView(conte
 {
     trainTool = new TrainSidebar(context);
     trainTool->hide();
-
-    hw = new HomeWindow(context, "train", "train");
-    controls->addWidget(hw->controls());
-    controls->setCurrentIndex(0);
     BlankStateTrainPage *b = new BlankStateTrainPage(context);
 
     setSidebar(trainTool->controls());
-    setPage(hw);
+
+    // each perspective has a stack of controls
+    cstack = new QStackedWidget(this);
+    controls->addWidget(cstack);
+    controls->setCurrentIndex(0);
+
+    pstack = new QStackedWidget(this);
+    setPages(pstack);
     setBlank(b);
 
     trainBottom = new TrainBottom(trainTool, this);

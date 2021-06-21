@@ -2465,7 +2465,7 @@ OverviewItemConfig::OverviewItemConfig(ChartSpaceItem *item) : QWidget(item->par
         SpecialFields sp;
 
         // get sorted list
-        QStringList names = item->parent->context->tab->rideNavigator()->logicalHeadings;
+        QStringList names = item->parent->context->rideNavigator->logicalHeadings;
 
         // start with just a list of functions
         list = DataFilter::builtins(item->parent->context);

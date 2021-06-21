@@ -202,7 +202,7 @@ SearchBox::configChanged(qint32)
     list << "NA";
 
     // get sorted list
-    QStringList names = context->tab->rideNavigator()->logicalHeadings;
+    QStringList names = context->rideNavigator->logicalHeadings;
     std::sort(names.begin(), names.end(), insensitiveLessThan);
 
     foreach(QString name, names) {
@@ -375,7 +375,7 @@ void SearchBox::runMenu(QAction *x)
 
     } else if (x->text() == tr("Column Chooser")) {
 
-        ColumnChooser *selector = new ColumnChooser(context->tab->rideNavigator()->logicalHeadings);
+        ColumnChooser *selector = new ColumnChooser(context->rideNavigator->logicalHeadings);
         selector->show();
 
     } else {
