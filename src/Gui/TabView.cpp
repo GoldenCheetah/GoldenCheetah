@@ -705,7 +705,7 @@ TabView::perspectiveSelected(int index)
         for(int i = 0; i < page_->charts.count(); i++) {
 
             page_->charts[i]->setProperty("ride", QVariant::fromValue<RideItem*>(notconst));
-            page_->charts[i]->setProperty("dateRange", property("dateRange"));
+            page_->charts[i]->setProperty("dateRange", QVariant::fromValue<DateRange>(context->currentDateRange()));
             if (page_->currentStyle != 0) page_->charts[i]->show();
         }
 
