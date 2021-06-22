@@ -673,6 +673,9 @@ TabView::setPerspectives(QComboBox *perspectiveSelector)
     if (!loaded) {
         loaded = true;
         perspectiveSelected(0);
+
+        // due to visibility optimisation we need to force the first tab to be selected in tab mode
+        if (page_->currentStyle == 0 && page_->charts.count()) page_->tabSelected(0);
     }
 }
 
@@ -683,9 +686,12 @@ TabView::perspectiveSelected(int index)
     if (perspectiveactive || index <0) return;
 
     // switch the stack to show the one selected
-    // set page to the one we want
-    setUpdatesEnabled(false);
+    // and set the date / ride property to help
+    // it catch up with what it missed whilst we
+    // were looking at another perspective
     if (index < pages_.count()) {
+
+        setUpdatesEnabled(false);
 
         page_ = pages_[index];
 
@@ -698,19 +704,9 @@ TabView::perspectiveSelected(int index)
         // set properties on the perspective as they propagate to charts
         RideItem *notconst = (RideItem*)context->currentRideItem();
         page_->setProperty("ride", QVariant::fromValue<RideItem*>(notconst));
-        page_->setProperty("dateRange", property("dateRange"));
-
-        // set to whatever we have currently selected
-        // bit of spooky updates at a distance here... xxx fixme back to Perspective class
-        for(int i = 0; i < page_->charts.count(); i++) {
-
-            page_->charts[i]->setProperty("ride", QVariant::fromValue<RideItem*>(notconst));
-            page_->charts[i]->setProperty("dateRange", QVariant::fromValue<DateRange>(context->currentDateRange()));
-            if (page_->currentStyle != 0) page_->charts[i]->show();
-        }
+        page_->setProperty("dateRange", QVariant::fromValue<DateRange>(context->currentDateRange()));
 
         setUpdatesEnabled(true);
-        //if (page_->currentStyle == 0 && page_->charts.count()) page_->tabSelected(0);
     }
 }
 
