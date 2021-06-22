@@ -597,6 +597,7 @@ ChartBarItem::event(QEvent *e)
             repaint();
 
             dragging = new ChartBarItem(chartbar);
+            dragging->setColor(color);
             dragging->state = Clone;
             dragging->text = text;
             dragging->checked = checked;
