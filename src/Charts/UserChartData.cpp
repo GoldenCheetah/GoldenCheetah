@@ -54,7 +54,7 @@ UserChartData::~UserChartData()
 void
 UserChartData::compute(RideItem *item, Specification spec, DateRange dr)
 {
-    if (!root)  return;
+    if (!root || item == NULL)  return;
 
     // clear rt indexes
     rt->indexes.clear();
