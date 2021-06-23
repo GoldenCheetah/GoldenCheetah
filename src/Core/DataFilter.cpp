@@ -1802,27 +1802,35 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
 
                 } else if (leaf->function == "xdata") {
 
-                    // will only get here if we have 2 parameters
-                    Leaf *first=leaf->fparms[0];
-                    Leaf *second=leaf->fparms[1];
+                    if (leaf->fparms.count() != 2) {
 
-                    if (first->type != Leaf::String) {
-                        DataFiltererrors << QString(tr("XDATA expects a string for the first parameters"));
+                        DataFiltererrors << QString(tr("XDATA expects two parameters"));
                         leaf->inerror = true;
-                    }
 
-                    if (second->type == Leaf::Symbol) {
+                    } else {
 
-                        QString symbol = *(leaf->fparms[1]->lvalue.n);
-                        if (symbol != "km" && symbol != "secs") {
-                            DataFiltererrors << QString(tr("xdata expects a string, 'km' or 'secs' for second parameters"));
+                        // will only get here if we have 2 parameters
+                        Leaf *first=leaf->fparms[0];
+                        Leaf *second=leaf->fparms[1];
+
+                        if (first->type != Leaf::String) {
+                            DataFiltererrors << QString(tr("XDATA expects a string for the first parameters"));
                             leaf->inerror = true;
                         }
 
-                    } else if (second->type != Leaf::String) {
+                        if (second->type == Leaf::Symbol) {
 
-                        DataFiltererrors << QString(tr("xdata expects a string, 'km' or 'secs' for second parameters"));
-                        leaf->inerror = true;
+                            QString symbol = *(leaf->fparms[1]->lvalue.n);
+                            if (symbol != "km" && symbol != "secs") {
+                                DataFiltererrors << QString(tr("xdata expects a string, 'km' or 'secs' for second parameters"));
+                                leaf->inerror = true;
+                            }
+
+                        } else if (second->type != Leaf::String) {
+
+                            DataFiltererrors << QString(tr("xdata expects a string, 'km' or 'secs' for second parameters"));
+                            leaf->inerror = true;
+                        }
                     }
 
                 } else if (leaf->function == "samples") {
