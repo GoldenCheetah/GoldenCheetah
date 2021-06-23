@@ -26,6 +26,8 @@
 #include "RideNavigator.h"
 #include "HelpWhatsThis.h"
 #include "Utils.h"
+#include "Colors.h" // NamedColor and RGBColor
+#include "ColorButton.h" // GColorDialog
 
 #include <QApplication>
 #include <QtGui>
@@ -2111,7 +2113,7 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
  
     // color background...
     penColor = metricDetail->penColor;
-    setButtonIcon(penColor);
+    setButtonIcon(RGBColor(penColor));
 
     QLabel *topN = new QLabel(tr("Highlight Highest"));
     showBest = new QDoubleSpinBox(this);
@@ -2483,7 +2485,7 @@ EditMetricDetailDialog::metricSelected()
         baseLine->setValue(ltmTool->metrics[index].baseline);
         penColor = ltmTool->metrics[index].penColor;
         trendType->setCurrentIndex(ltmTool->metrics[index].trendtype);
-        setButtonIcon(penColor);
+        setButtonIcon(RGBColor(penColor));
 
         // curve style
         switch (ltmTool->metrics[index].curveStyle) {
@@ -2659,13 +2661,12 @@ EditMetricDetailDialog::cancelClicked()
 void
 EditMetricDetailDialog::colorClicked()
 {
-    // don't use native dialog, since there is a nasty bug causing focus loss
-    // see https://bugreports.qt-project.org/browse/QTBUG-14889
-    QColor color = QColorDialog::getColor(metricDetail->penColor, this, tr("Choose Metric Color"), QColorDialog::DontUseNativeDialog);
+    QColor color = GColorDialog::getColor(penColor.name());
 
-    if (color.isValid()) {
-        setButtonIcon(penColor=color);
-    }
+    if (NamedColor(color)) { // named color
+        penColor=color;
+        setButtonIcon(RGBColor(color));
+    } else if (color.isValid()) setButtonIcon(penColor=color); // normal rgb color
 }
 
 void

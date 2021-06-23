@@ -37,6 +37,10 @@ extern QPixmap colouredPixmapFromPNG(QString filename, QColor color);
 extern double dpiXFactor, dpiYFactor;
 extern QFont baseFont;
 
+// turn color to rgb, checks if a named color
+#define NamedColor(x) (x.red()==1 && x.green()==1)
+#define RGBColor(x) (NamedColor(x) ? GColor(x.blue()) : x)
+
 // get the pixel size for a font that is no taller
 // than height in pixels (let QT adapt for device ratios)
 int pixelSizeForFont(QFont &font, int height);

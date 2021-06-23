@@ -462,7 +462,7 @@ LTMPlot::setData(LTMSettings *set)
         stacks.insert(current, stackcounter+1);
         if (appsettings->value(this, GC_ANTIALIAS, true).toBool() == true)
             current->setRenderHint(QwtPlotItem::RenderAntialiased);
-        QPen cpen = QPen(metricDetail.penColor);
+        QPen cpen = QPen(RGBColor(metricDetail.penColor));
         cpen.setWidth(width);
         current->setPen(cpen);
         current->setStyle(metricDetail.curveStyle);
@@ -494,7 +494,7 @@ LTMPlot::setData(LTMSettings *set)
         if (metricDetail.curveStyle == QwtPlotCurve::Steps) {
             
             // fill the bars
-            QColor brushColor = metricDetail.penColor;
+            QColor brushColor = RGBColor(metricDetail.penColor);
             if (metricDetail.stack == true) {
                 brushColor.setAlpha(255);
                 QBrush brush = QBrush(brushColor);
@@ -616,7 +616,7 @@ LTMPlot::setData(LTMSettings *set)
             curves.insert(metricDetail.symbol, current);
         if (appsettings->value(this, GC_ANTIALIAS, true).toBool() == true)
             current->setRenderHint(QwtPlotItem::RenderAntialiased);
-        QPen cpen = QPen(metricDetail.penColor);
+        QPen cpen = QPen(RGBColor(metricDetail.penColor));
         cpen.setWidth(width);
         current->setPen(cpen);
         current->setStyle(metricDetail.curveStyle);
@@ -668,7 +668,7 @@ LTMPlot::setData(LTMSettings *set)
                 trend->setVisible(!metricDetail.hidden);
 
                 // cosmetics
-                QPen cpen = QPen(metricDetail.penColor.darker(200));
+                QPen cpen = QPen(RGBColor(metricDetail.penColor).darker(200));
                 cpen.setWidth(2); // double thickness for trend lines
                 cpen.setStyle(Qt::SolidLine);
                 trend->setPen(cpen);
@@ -706,7 +706,7 @@ LTMPlot::setData(LTMSettings *set)
                 trend->setVisible(!metricDetail.hidden);
 
                 // cosmetics
-                QPen cpen = QPen(metricDetail.penColor.darker(200));
+                QPen cpen = QPen(RGBColor(metricDetail.penColor).darker(200));
                 cpen.setWidth(2); // double thickness for trend lines
                 cpen.setStyle(Qt::SolidLine);
                 trend->setPen(cpen);
@@ -748,7 +748,7 @@ LTMPlot::setData(LTMSettings *set)
                 trend->setVisible(!metricDetail.hidden);
 
                 // cosmetics
-                QPen cpen = QPen(metricDetail.penColor.darker(200));
+                QPen cpen = QPen(RGBColor(metricDetail.penColor).darker(200));
                 cpen.setWidth(2); // double thickness for trend lines
                 cpen.setStyle(Qt::SolidLine);
                 trend->setPen(cpen);
@@ -828,7 +828,7 @@ LTMPlot::setData(LTMSettings *set)
                 trend->setVisible(!metricDetail.hidden);
 
                 // cosmetics
-                QPen cpen = QPen(metricDetail.penColor.darker(200));
+                QPen cpen = QPen(RGBColor(metricDetail.penColor).darker(200));
                 cpen.setWidth(2); // double thickness for trend lines
                 cpen.setStyle(Qt::SolidLine);
                 trend->setPen(cpen);
@@ -902,9 +902,9 @@ LTMPlot::setData(LTMSettings *set)
                 sym->setStyle(metricDetail.symbolStyle);
                 sym->setSize(20*dpiXFactor);
             }
-            QColor lighter = metricDetail.penColor;
+            QColor lighter = RGBColor(metricDetail.penColor);
             lighter.setAlpha(50);
-            sym->setPen(metricDetail.penColor);
+            sym->setPen(RGBColor(metricDetail.penColor));
             sym->setBrush(lighter);
 
             out->setSymbol(sym);
@@ -994,9 +994,9 @@ LTMPlot::setData(LTMSettings *set)
                 sym->setStyle(metricDetail.symbolStyle);
                 sym->setSize(12*dpiXFactor);
             }
-            QColor lighter = metricDetail.penColor;
+            QColor lighter = RGBColor(metricDetail.penColor);
             lighter.setAlpha(200);
-            sym->setPen(metricDetail.penColor);
+            sym->setPen(RGBColor(metricDetail.penColor));
             sym->setBrush(lighter);
 
             top->setSymbol(sym);
@@ -1049,7 +1049,7 @@ LTMPlot::setData(LTMSettings *set)
                         // Qwt uses its own text objects
                         QwtText text(labelString);
                         text.setFont(labelFont);
-                        text.setColor(metricDetail.penColor);
+                        text.setColor(RGBColor(metricDetail.penColor));
 
                         // make that mark -- always above with topN
                         QwtPlotMarker *label = new QwtPlotMarker();
@@ -1071,9 +1071,9 @@ LTMPlot::setData(LTMSettings *set)
         if (metricDetail.curveStyle == QwtPlotCurve::Steps) {
             
             // fill the bars
-            QColor brushColor = metricDetail.penColor;
+            QColor brushColor = RGBColor(metricDetail.penColor);
             brushColor.setAlpha(200); // now side by side, less transparency required
-            QColor brushColor1 = metricDetail.penColor.darker();
+            QColor brushColor1 = RGBColor(metricDetail.penColor).darker();
             QLinearGradient linearGradient(0, 0, 0, height());
             linearGradient.setColorAt(0.0, brushColor1);
             linearGradient.setColorAt(1.0, brushColor);
@@ -1130,19 +1130,19 @@ LTMPlot::setData(LTMSettings *set)
 
         } else if (metricDetail.curveStyle == QwtPlotCurve::Lines) {
 
-            QPen cpen = QPen(metricDetail.penColor);
+            QPen cpen = QPen(RGBColor(metricDetail.penColor));
             cpen.setWidth(width);
             QwtSymbol *sym = new QwtSymbol;
             sym->setSize(6*dpiXFactor);
             sym->setStyle(metricDetail.symbolStyle);
-            sym->setPen(QPen(metricDetail.penColor));
-            sym->setBrush(QBrush(metricDetail.penColor));
+            sym->setPen(QPen(RGBColor(metricDetail.penColor)));
+            sym->setBrush(QBrush(RGBColor(metricDetail.penColor)));
             current->setSymbol(sym);
             current->setPen(cpen);
 
             // fill below the line
             if (metricDetail.fillCurve) {
-                QColor fillColor = metricDetail.penColor;
+                QColor fillColor = RGBColor(metricDetail.penColor);
                 fillColor.setAlpha(100);
                 current->setBrush(fillColor);
             }
@@ -1155,8 +1155,8 @@ LTMPlot::setData(LTMSettings *set)
                 double testfactor = metricDetail.type == METRIC_PERFORMANCE ? 2 : 1;
                 sym->setSize(6*dpiXFactor*testfactor);
                 sym->setStyle(metricDetail.symbolStyle);
-                sym->setPen(QPen(metricDetail.penColor));
-                sym->setBrush(QBrush(metricDetail.penColor));
+                sym->setPen(QPen(RGBColor(metricDetail.penColor)));
+                sym->setBrush(QBrush(RGBColor(metricDetail.penColor)));
                 current->setSymbol(sym);
             } else {
                 current->setStyle(QwtPlotCurve::NoCurve);
@@ -1167,7 +1167,7 @@ LTMPlot::setData(LTMSettings *set)
             QwtSymbol *sym = new QwtSymbol;
             sym->setSize(4*dpiXFactor);
             sym->setStyle(metricDetail.symbolStyle);
-            sym->setPen(QPen(metricDetail.penColor));
+            sym->setPen(QPen(RGBColor(metricDetail.penColor)));
             sym->setBrush(QBrush(Qt::white));
             current->setSymbol(sym);
 
@@ -1218,7 +1218,7 @@ LTMPlot::setData(LTMSettings *set)
                     // Qwt uses its own text objects
                     QwtText text(labelString);
                     text.setFont(labelFont);
-                    text.setColor(metricDetail.penColor);
+                    text.setColor(RGBColor(metricDetail.penColor));
 
                     // make that mark
                     QwtPlotMarker *label = new QwtPlotMarker();
@@ -1670,9 +1670,9 @@ LTMPlot::setCompareData(LTMSettings *set)
             
                 // fill the bars
                 QColor merge;
-                merge.setRed((metricDetail.penColor.red() + cd.color.red()) / 2);
-                merge.setGreen((metricDetail.penColor.green() + cd.color.green()) / 2);
-                merge.setBlue((metricDetail.penColor.blue() + cd.color.blue()) / 2);
+                merge.setRed((RGBColor(metricDetail.penColor).red() + cd.color.red()) / 2);
+                merge.setGreen((RGBColor(metricDetail.penColor).green() + cd.color.green()) / 2);
+                merge.setBlue((RGBColor(metricDetail.penColor).blue() + cd.color.blue()) / 2);
 
                 QColor brushColor = merge;
                 if (metricDetail.stack == true) {
@@ -1917,7 +1917,7 @@ LTMPlot::setCompareData(LTMSettings *set)
                     trend->setVisible(!metricDetail.hidden);
 
                     // cosmetics
-                    QPen cpen = QPen(metricDetail.penColor.darker(200));
+                    QPen cpen = QPen(RGBColor(metricDetail.penColor).darker(200));
                     cpen.setWidth(2); // double thickness for trend lines
                     cpen.setStyle(Qt::SolidLine);
                     trend->setPen(cpen);
