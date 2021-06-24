@@ -146,7 +146,7 @@ ConfigDialog::ConfigDialog(QDir _home, Context *context) :
 
     measures = new MeasuresConfig(_home, context);
     HelpWhatsThis *measuresHelp = new HelpWhatsThis(measures);
-    measures->setWhatsThis(intervalHelp->getWhatsThisText(HelpWhatsThis::Preferences_Measures));
+    measures->setWhatsThis(measuresHelp->getWhatsThisText(HelpWhatsThis::Preferences_Measures));
     pagesWidget->addWidget(measures);
 
     train = new TrainConfig(_home, context);
@@ -228,7 +228,7 @@ void ConfigDialog::saveClicked()
 
     // did the home directory change?
     QString shome = appsettings->value(this, GC_HOMEDIR).toString();
-    if (shome != general->generalPage->athleteWAS || QFileInfo(shome).absoluteFilePath() != QFileInfo(home.absolutePath()).absolutePath()) {
+    if (shome != general->generalPage->athleteWAS) {
 
         // are you sure you want to change the location of the athlete library?
         // if so we will restart, if not I'll revert to current directory
@@ -263,8 +263,8 @@ void ConfigDialog::saveClicked()
 
         } else {
 
-            // revert to current home and let everyone know
-            appsettings->setValue(GC_HOMEDIR, QFileInfo(home.absolutePath()).absolutePath());
+            // revert to previous home
+            appsettings->setValue(GC_HOMEDIR, general->generalPage->athleteWAS);
         }
 
     } 
