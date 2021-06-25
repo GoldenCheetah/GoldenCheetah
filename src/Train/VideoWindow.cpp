@@ -222,7 +222,7 @@ bool VideoWindow::hasActiveVideo() const
     }
 #endif
 #ifdef GC_VIDEO_QT5
-    if (LoadedMedia == mp->mediaStatus())
+    if (mp->state() != QMediaPlayer::StoppedState)
         return true;
 #endif
 
