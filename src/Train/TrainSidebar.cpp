@@ -218,7 +218,6 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
     workoutTree->setFrameStyle(QFrame::NoFrame);
     workoutTree->setAlternatingRowColors(false);
     workoutTree->setEditTriggers(QAbstractItemView::NoEditTriggers); // read-only
-    workoutTree->setSelectionMode(QAbstractItemView::ExtendedSelection);
     workoutTree->expandAll();
     workoutTree->header()->setCascadingSectionResizes(true); // easier to resize this way
     workoutTree->setContextMenuPolicy(Qt::CustomContextMenu);
