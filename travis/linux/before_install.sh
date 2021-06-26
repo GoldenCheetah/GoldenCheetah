@@ -1,6 +1,10 @@
 #!/bin/bash
 set -ev
 
+# install Bison 3.5 from focal
+wget http://mirrors.kernel.org/ubuntu/pool/main/b/bison/bison_3.5.1+dfsg-1_amd64.deb
+sudo dpkg -i bison_3.5.1+dfsg-1_amd64.deb
+
 # Add recent Qt dependency ppa, update on a newer qt version.
 sudo add-apt-repository -y ppa:beineri/opt-qt-5.14.2-bionic
 sudo apt-get update -qq

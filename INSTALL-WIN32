@@ -46,13 +46,10 @@ You need:
   -- When installing the SDK you have several options - for GoldenCheetah you need the "SDK" itself and
      in case you want to Debug also the "Debugging Tools" to be installed. All other parts (to my experience)
 	 are not required.
-	 
-- Flex and Bison (below the version working for me)
-  -- Download from here: https://sourceforge.net/projects/winflexbison/
-  -- Use the "win_flex_bison-latest.zip" version
-  -- Unzip whereever you like and make sure that the location "win_bison.exe" and "win_flex.exe
-     are added to your "Path" environment variable
-	 
+
+- Flex and Bison (bison 3.7.1, flex 2.6.4 seem to work)
+  -- Use `choco install winflexbison3`
+
 - Qt C++ Framework
   -- As of today, please use Qt 5.8.0 (which is the most recent official release) for Microsoft VC2015
   -- Download is available here: https://www.qt.io/download/ - the OpenSource version is sufficient

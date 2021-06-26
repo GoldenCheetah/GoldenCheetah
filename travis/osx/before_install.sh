@@ -12,6 +12,7 @@ brew unlink python@2 # to avoid conflicts with qt/libical dependence on python
 /usr/local/opt/qt5/bin/qmake --version
 
 brew install gsl
+brew install bison
 brew install libical
 brew upgrade libusb
 brew install srmio
