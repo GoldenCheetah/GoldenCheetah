@@ -13053,7 +13053,7 @@ Drehmomentkorrektur - Der absolute Korrekturwert in Nm (oder Pfund pro Quadratin
     <message>
         <location filename="../../Gui/GcWindowRegistry.cpp" line="104"/>
         <source>R Chart </source>
-        <translation>R Diagramm</translation>
+        <translation>R Diagramm </translation>
     </message>
     <message>
         <location filename="../../Gui/GcWindowRegistry.cpp" line="117"/>
