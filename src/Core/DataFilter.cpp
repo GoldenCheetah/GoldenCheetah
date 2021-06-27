@@ -2715,7 +2715,7 @@ DataFilter::DataFilter(QObject *parent, Context *context) : QObject(parent), con
 
     configChanged(CONFIG_FIELDS);
     connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
-    connect(context, SIGNAL(rideSelected(RideItem*)), this, SLOT(dynamicParse()));
+    //connect(context, SIGNAL(rideSelected(RideItem*)), this, SLOT(dynamicParse()));
 }
 
 DataFilter::DataFilter(QObject *parent, Context *context, QString formula) : QObject(parent), context(context), treeRoot(NULL)
