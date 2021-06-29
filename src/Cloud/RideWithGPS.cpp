@@ -232,7 +232,7 @@ RideWithGPS::writeFileCompleted()
 }
 
 static bool addRideWithGPS() {
-    CloudServiceFactory::instance().addService(new RideWithGPS(NULL));
+    //CloudServiceFactory::instance().addService(new RideWithGPS(NULL));
     return true;
 }
 
