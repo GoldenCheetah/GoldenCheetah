@@ -263,7 +263,7 @@ bool VideoLayoutParser::startElement( const QString&, const QString&,
         meterWidget->m_AltFont = QFont(FontName, FontSize);
         meterWidget->m_AltFont.setFixedPitch(true);
     }
-    else if(qName != "layouts" && qName != "Text" && qName != "AltText" && qName != "Angle" && qName != "SubRange" && qName != "Zoom")
+    else if(qName != "layouts" && qName != "Text" && qName != "AltText" && qName != "Angle" && qName != "SubRange" && qName != "Zoom" && qName != "osmURL")
     {
         qDebug() << QObject::tr("Unknown start element ") << qName;
     }

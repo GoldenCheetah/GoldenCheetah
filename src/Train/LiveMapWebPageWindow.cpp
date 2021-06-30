@@ -81,14 +81,11 @@ LiveMapWebPageWindow::LiveMapWebPageWindow(Context *context) : GcChartWindow(con
 
     QFormLayout* commonLayout = new QFormLayout(settingsWidget);
 
-    QString sValue = "";
     customUrlLabel = new QLabel(tr("OSM Base URL"));
     customUrl = new QLineEdit(this);
-    customUrl->setFixedWidth(300);
+    customUrl->setFixedWidth(600);
 
-    if (customUrl->text() == "") {
-        customUrl->setText("http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png");
-    }
+    if (customUrl->text() == "") customUrl->setText("https://tile.thunderforest.com/cycle/{z}/{x}/{y}.png?apikey=<YOUR_API_KEY>");
     commonLayout->addRow(customUrlLabel, customUrl);
 
     connect(customUrl, SIGNAL(returnPressed()), this, SLOT(userUrl()));
@@ -126,10 +123,7 @@ LiveMapWebPageWindow::LiveMapWebPageWindow(Context *context) : GcChartWindow(con
 
 void LiveMapWebPageWindow::userUrl()
 {
-    // add http:// if scheme is missing
-    QRegExp hasscheme("^[^:]*://.*");
-    QString url = rCustomUrl->text();
-    if (!hasscheme.exactMatch(url)) url = "http://" + url;
+    QString url = customUrl->text();
     view->setZoomFactor(dpiXFactor);
     view->setUrl(QUrl(url));
 }
@@ -177,6 +171,7 @@ void LiveMapWebPageWindow::ergFileSelected(ErgFile* f)
             // So we create divs with the 2 methods we need to run when the document loads
             code = QString("showRoute (" + routeLatLngs + ");");
             js += ("<div><script type=\"text/javascript\">" + code + "</script></div>\n");
+            if (customUrl->text() == "") customUrl->setText("https://tile.thunderforest.com/cycle/{z}/{x}/{y}.png?apikey=<YOUR_API_KEY>");
             createHtml(customUrl->text(), js);
             view->page()->setHtml(currentPage);
         }
