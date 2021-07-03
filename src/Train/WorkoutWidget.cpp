@@ -1808,7 +1808,7 @@ WorkoutWidget::qwkcode()
     // just loop through for now doing xx@yy and optionally add rxx
     if (points_.count() == 1) {
         // just a single point?
-        codeStrings << QString("%1@%2").arg(qduration(points_[0]->x)).arg(round(points_[0]->y));
+        codeStrings << QString("%1@0-%2").arg(qduration(points_[0]->x)).arg(round(points_[0]->y));
         codePoints<<0;
     }
 
@@ -2159,7 +2159,7 @@ WorkoutWidget::apply(QString code)
 
                 // EFFORT
                 // add a point for starting watts if not already there
-                if (w1 != watts) {
+                if (w1 != watts || points_.isEmpty()) {
                     index++;
                     new WWPoint(this, secs, w1);
                     bool addLap = laps_.isEmpty() ? secs != 0 : (laps_.last().x != secs*1000) && secs != 0;
