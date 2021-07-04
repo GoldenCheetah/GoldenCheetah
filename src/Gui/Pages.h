@@ -529,6 +529,7 @@ class ColorsPage : public QWidget
         void tabChanged();
 
         void scaleFont();
+        void searchFilter(QString);
 
     private:
 
@@ -549,6 +550,7 @@ class ColorsPage : public QWidget
         QTabWidget *colorTab;
 
         // Colors
+        QLineEdit *searchEdit;
         QTreeWidget *colors;
         QTreeWidget *themes;
         const Colors *colorSet;

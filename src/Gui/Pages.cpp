@@ -1206,6 +1206,12 @@ ColorsPage::ColorsPage(QWidget *parent) : QWidget(parent)
     themes->setIndentation(0);
     //colors->header()->resizeSection(0,300);
 
+    QLabel *searchLabel = new QLabel(tr("Search"));
+    searchEdit = new QLineEdit(this);
+    QHBoxLayout *searchLayout = new QHBoxLayout();
+    searchLayout->addWidget(searchLabel);
+    searchLayout->addWidget(searchEdit);
+
     colors = new QTreeWidget;
     colors->headerItem()->setText(0, tr("Color"));
     colors->headerItem()->setText(1, tr("Select"));
@@ -1301,7 +1307,12 @@ ColorsPage::ColorsPage(QWidget *parent) : QWidget(parent)
 
     colorTab = new QTabWidget(this);
     colorTab->addTab(themes, tr("Theme"));
-    colorTab->addTab(colors, tr("Colors"));
+
+    QWidget *colortab= new QWidget(this);
+    QVBoxLayout *colorLayout = new QVBoxLayout(colortab);
+    colorLayout->addLayout(searchLayout);
+    colorLayout->addWidget(colors);
+    colorTab->addTab(colortab, tr("Colors"));
     colorTab->setCornerWidget(applyTheme);
 
     mainLayout->addWidget(colorTab);
@@ -1331,6 +1342,7 @@ ColorsPage::ColorsPage(QWidget *parent) : QWidget(parent)
     connect(colorTab, SIGNAL(currentChanged(int)), this, SLOT(tabChanged()));
     connect(def, SIGNAL(currentFontChanged(QFont)), this, SLOT(scaleFont()));
     connect(fontscale, SIGNAL(valueChanged(int)), this, SLOT(scaleFont()));
+    connect(searchEdit, SIGNAL(textChanged(QString)), this, SLOT(searchFilter(QString)));
 
     // save initial values
     b4.alias = antiAliased->isChecked();
@@ -1340,6 +1352,30 @@ ColorsPage::ColorsPage(QWidget *parent) : QWidget(parent)
 #endif
     b4.line = lineWidth->value();
     b4.fingerprint = Colors::fingerprint(colorSet);
+}
+
+void
+ColorsPage::searchFilter(QString text)
+{
+    QStringList toks = text.split(" ", Qt::SkipEmptyParts);
+    bool empty;
+    if (toks.count() == 0 || text == "") empty=true;
+    else empty=false;
+
+    for(int i=0; i<colors->invisibleRootItem()->childCount(); i++) {
+        if (empty) colors->setRowHidden(i, colors->rootIndex(), false);
+        else {
+            QString text = colors->invisibleRootItem()->child(i)->text(0);
+            bool found=false;
+            foreach(QString tok, toks) {
+                if (text.contains(tok, Qt::CaseInsensitive)) {
+                    found = true;
+                    break;
+                }
+            }
+            colors->setRowHidden(i, colors->rootIndex(), !found);
+        }
+    }
 }
 
 void
