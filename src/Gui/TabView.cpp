@@ -38,7 +38,7 @@ TabView::TabView(Context *context, int type) :
     _sidebar(true), _tiled(false), _selected(false), lastHeight(130*dpiYFactor), sidewidth(0),
     active(false), bottomRequested(false), bottomHideOnIdle(false), perspectiveactive(false),
     stack(NULL), splitter(NULL), mainSplitter(NULL), 
-    sidebar_(NULL), bottom_(NULL), page_(NULL), blank_(NULL),
+    sidebar_(NULL), bottom_(NULL), perspective_(NULL), blank_(NULL),
     loaded(false)
 {
     // setup the basic widget
@@ -87,8 +87,8 @@ TabView::~TabView()
 {
     saveState(); // writes xxx-perspectives.xml
 
-    foreach(Perspective *p, pages_) delete p;
-    pages_.clear();
+    foreach(Perspective *p, perspectives_) delete p;
+    perspectives_.clear();
 }
 
 void
@@ -292,9 +292,9 @@ TabView::saveState()
     out<<"<layouts>\n";
 
     // so lets run through the perspectives
-    foreach(Perspective *page, pages_) {
+    foreach(Perspective *page, perspectives_) {
 
-        out<<"<layout name=\""<< page->title <<"\" style=\"" << page->currentStyle <<"\">\n";
+        out<<"<layout name=\""<< page->title_ <<"\" style=\"" << page->currentStyle <<"\">\n";
 
         // iterate over charts
         foreach (GcChartWindow *chart, page->charts) {
@@ -428,31 +428,31 @@ TabView::restoreState(bool useDefault)
         QXmlInputSource source;
         source.setData(content);
         QXmlSimpleReader xmlReader;
-        ViewParser handler(context);
+        ViewParser handler(context, type, useDefault);
         xmlReader.setContentHandler(&handler);
         xmlReader.setErrorHandler(&handler);
 
         // parse and instantiate the charts
         xmlReader.parse(source);
-        pages_ = handler.perspectives;
+        perspectives_ = handler.perspectives;
 
     }
-    if (legacy && pages_.count() == 1) pages_[0]->title = "General";
+    if (legacy && perspectives_.count() == 1) perspectives_[0]->title_ = "General";
 
-    if (pages_.count() == 0) {
-        page_ = new Perspective(context, "empty", type);
-        pages_ << page_;
+    if (perspectives_.count() == 0) {
+        perspective_ = new Perspective(context, "empty", type);
+        perspectives_ << perspective_;
     }
 
     // add to stack
-    foreach(Perspective *page, pages_) {
+    foreach(Perspective *page, perspectives_) {
         pstack->addWidget(page);
         cstack->addWidget(page->controls());
         page->configChanged(0); // set colors correctly- will have missed from startup
     }
 
     // default to first one
-    page_ = pages_[0];
+    perspective_ = perspectives_[0];
 
     // if this is analysis view then lets select the first ride now
     if (type == VIEW_ANALYSIS) {
@@ -483,10 +483,76 @@ TabView::addPerspective(QString name)
     if (type == VIEW_TRAIN) page->styleChanged(2);
     else page->styleChanged(0);
 
-    pages_ << page;
+    perspectives_ << page;
     pstack->addWidget(page);
     cstack->addWidget(page->controls());
     page->configChanged(0); // set colors correctly- will be empty...
+}
+
+void
+TabView::removePerspective(Perspective *p)
+{
+    if (perspectives_.count() == 1) return; // not allowed to have zero perspectives mate
+
+    int index = perspectives_.indexOf(p);
+
+    if (index < 0) return; // doesn't even exist
+
+    if (p == perspective_) { // need to switch before we zap it!
+        Perspective *original = perspective_;
+
+        // switch one after this one (if it exists)
+        if (index < (perspectives_.count()-1)) perspective_ = perspectives_[index + 1];
+        else if (index > 0) perspective_ = perspectives_[index -1];
+        else return; // no no no ???
+
+        // switch to another
+        if (original != perspective_)  perspectiveSelected(perspectives_.indexOf(perspective_));
+
+    }
+
+    // we can now remove from view
+    pstack->removeWidget(p);
+    cstack->removeWidget(p->controls());
+
+    // and model
+    perspectives_.removeAt(index);
+    delete p;
+}
+
+void
+TabView::swapPerspective(int from, int to) // is actually swapping as only move 1 position at a time
+{
+    if (from == to) return; // nowt to do in this case.
+
+    // make from always < to
+    if (from > to) {
+        int hold=from;
+        from = to;
+        to = hold;
+    }
+
+    // is from selected?
+    if (perspectives_[from] == perspective_) {
+        // remove and re-add to
+        QWidget *w = cstack->widget(to);
+        cstack->removeWidget(w);
+        cstack->insertWidget(from, w);
+        w = pstack->widget(to);
+        pstack->removeWidget(w);
+        pstack->insertWidget(from, w);
+    } else {
+        // remove and re-add from
+        QWidget *w = cstack->widget(from);
+        cstack->removeWidget(w);
+        cstack->insertWidget(to, w);
+        w = pstack->widget(from);
+        pstack->removeWidget(w);
+        pstack->insertWidget(to, w);
+    }
+    Perspective *hold = perspectives_[from];
+    perspectives_[from] = perspectives_[to];
+    perspectives_[to] = hold;
 }
 
 void
@@ -660,12 +726,12 @@ TabView::setPerspectives(QComboBox *perspectiveSelector)
     if (!loaded)  restoreState(false);
 
     perspectiveSelector->clear();
-    foreach(Perspective *page, pages_) {
-        perspectiveSelector->addItem(page->title);
+    foreach(Perspective *page, perspectives_) {
+        perspectiveSelector->addItem(page->title_);
     }
     perspectiveSelector->addItem("Add New Perspective...");
     perspectiveSelector->addItem("Manage Perspectives...");
-    perspectiveSelector->insertSeparator(pages_.count());
+    perspectiveSelector->insertSeparator(perspectives_.count());
     perspectiveactive=false;
 
     // if we only just loaded the charts and views, we need to select
@@ -675,7 +741,7 @@ TabView::setPerspectives(QComboBox *perspectiveSelector)
         perspectiveSelected(0);
 
         // due to visibility optimisation we need to force the first tab to be selected in tab mode
-        if (page_->currentStyle == 0 && page_->charts.count()) page_->tabSelected(0);
+        if (perspective_->currentStyle == 0 && perspective_->charts.count()) perspective_->tabSelected(0);
     }
 }
 
@@ -689,11 +755,11 @@ TabView::perspectiveSelected(int index)
     // and set the date / ride property to help
     // it catch up with what it missed whilst we
     // were looking at another perspective
-    if (index < pages_.count()) {
+    if (index < perspectives_.count()) {
 
         setUpdatesEnabled(false);
 
-        page_ = pages_[index];
+        perspective_ = perspectives_[index];
 
         // switch to this perspective's charts and controls
         pstack->setCurrentIndex(index);
@@ -703,8 +769,8 @@ TabView::perspectiveSelected(int index)
 
         // set properties on the perspective as they propagate to charts
         RideItem *notconst = (RideItem*)context->currentRideItem();
-        page_->setProperty("ride", QVariant::fromValue<RideItem*>(notconst));
-        page_->setProperty("dateRange", QVariant::fromValue<DateRange>(context->currentDateRange()));
+        perspective_->setProperty("ride", QVariant::fromValue<RideItem*>(notconst));
+        perspective_->setProperty("dateRange", QVariant::fromValue<DateRange>(context->currentDateRange()));
 
         setUpdatesEnabled(true);
     }
@@ -714,7 +780,7 @@ TabView::perspectiveSelected(int index)
 void
 TabView::tileModeChanged()
 {
-    if (page_) page_->setStyle(isTiled() ? 2 : 0);
+    if (perspective_) perspective_->setStyle(isTiled() ? 2 : 0);
 }
 
 void
@@ -727,14 +793,14 @@ TabView::selectionChanged()
         context->mainWindow->showhideSidebar->setChecked(_sidebar);
 
         // or do we need to show blankness?
-        if (isBlank() && blank_ && page_ && blank_->canShow()) {
+        if (isBlank() && blank_ && perspective_ && blank_->canShow()) {
 
             splitter->hide();
             blank()->show();
 
             stack->setCurrentIndex(1);
 
-        } else if (blank_ && page_) {
+        } else if (blank_ && perspective_) {
 
             blank()->hide();
             splitter->show();
@@ -764,7 +830,7 @@ TabView::resetLayout()
 void
 TabView::addChart(GcWinID id)
 {
-    if (page_) page_->appendChart(id);
+    if (perspective_) perspective_->appendChart(id);
 }
 
 void
@@ -830,16 +896,16 @@ bool ViewParser::endElement( const QString&, const QString&, const QString &qNam
 
         // translate the metrics, but only if the built-in "default.XML"s are read (and only for LTM charts)
         // and only if the language is not English (i.e. translation is required).
-#if 0 // XXX fixme
+
         if (useDefault && !english) {
 
             // translate the titles
-            Perspective::translateChartTitles(charts);
+            Perspective::translateChartTitles(page->charts);
 
             // translate the LTM settings
-            for (int i=0; i<charts.count(); i++) {
+            for (int i=0; i<page->charts.count(); i++) {
                 // find out if it's an LTMWindow via dynamic_cast
-                LTMWindow* ltmW = dynamic_cast<LTMWindow*> (charts[i]);
+                LTMWindow* ltmW = dynamic_cast<LTMWindow*> (page->charts[i]);
                 if (ltmW) {
                     // the current chart is an LTMWindow, let's translate
 
@@ -851,7 +917,7 @@ bool ViewParser::endElement( const QString&, const QString&, const QString &qNam
                 }
             }
         }
-#endif
+
         page->styleChanged(style);
     }
     return true;
@@ -871,8 +937,8 @@ bool ViewParser::startElement( const QString&, const QString&, const QString &na
             }
         }
 
-        // we need a new perspective
-        page = new Perspective(context, name, VIEW_HOME); //XXX fixme VIEW_HOME!!! XXX
+        // we need a new perspective for this view type
+        page = new Perspective(context, name, type);
         perspectives.append(page);
     }
     else if (name == "chart") {

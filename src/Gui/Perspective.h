@@ -42,6 +42,7 @@ class ChartBar;
 class LTMSettings;
 class TabView;
 class ViewParser;
+class PerspectiveDialog;
 
 class Perspective : public GcWindow
 {
@@ -50,11 +51,14 @@ class Perspective : public GcWindow
 
     friend ::TabView;
     friend ::ViewParser;
+    friend ::PerspectiveDialog;
 
     public:
 
         Perspective(Context *, QString title, int type);
         ~Perspective();
+
+        QString title() const { return title_; }
 
         void resetLayout();
         void importChart(QMap<QString,QString> properties, bool select);
@@ -91,7 +95,8 @@ class Perspective : public GcWindow
         void addChart(GcChartWindow* newone);
         void addChartFromMenu(QAction*action); // called with an action
         void appendChart(GcWinID id); // called from Context *to inset chart
-        bool removeChart(int, bool confirm = true);
+        bool removeChart(int, bool confirm = true, bool keep = false);
+        GcChartWindow *takeChart(GcChartWindow *wndow); // remove from view, but do not delete
         void titleChanged();
 
         // window wants to close...
@@ -126,7 +131,7 @@ class Perspective : public GcWindow
         QString view;
 
         // top bar
-        QString title;
+        QString title_;
         QLineEdit *titleEdit;
 
         QComboBox *styleSelector;

@@ -1103,6 +1103,8 @@ CriticalPowerWindow::intervalSelected()
 void
 CriticalPowerWindow::intervalHover(IntervalItem* x)
 {
+    if (myRideItem == NULL) return;
+
     // ignore in compare mode
     if (!amVisible() || context->isCompareIntervals) return;
 

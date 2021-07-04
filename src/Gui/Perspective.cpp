@@ -50,7 +50,7 @@ static const int tileSpacing = 10;
 
 Perspective::Perspective(Context *context, QString title, int type) :
     GcWindow(context), context(context), active(false),  clicked(NULL), dropPending(false),
-    type(type), title(title), chartCursor(-2)
+    type(type), title_(title), chartCursor(-2)
 {
     // setup control area
     QWidget *cw = new QWidget(this);
@@ -749,8 +749,23 @@ Perspective::addChart(GcChartWindow* newone)
     active = false;
 }
 
+GcChartWindow *
+Perspective::takeChart(GcChartWindow *chart)
+{
+    // lets find it...
+    int index = charts.indexOf(chart);
+
+    if (index >= 0) {
+        removeChart(index, false, true);
+        return chart;
+    }
+
+    // failed to find it
+    return NULL;
+}
+
 bool
-Perspective::removeChart(int num, bool confirm)
+Perspective::removeChart(int num, bool confirm, bool keep)
 {
     if (num >= charts.count()) return false; // out of bounds (!)
 
@@ -791,8 +806,10 @@ Perspective::removeChart(int num, bool confirm)
         default:
             break; // never reached
     }
-    ((GcChartWindow*)(charts[num]))->close(); // disconnect
-    ((GcChartWindow*)(charts[num]))->deleteLater();
+
+    ((GcChartWindow*)(charts[num]))->close(); // disconnect chart
+    ((GcChartWindow*)(charts[num]))->removeEventFilter(this); // stop watching events
+    if (!keep) ((GcChartWindow*)(charts[num]))->deleteLater();
     charts.removeAt(num);
 
     update();

@@ -143,6 +143,7 @@ class MainWindow : public QMainWindow
 
         // perspective selected
         void perspectiveSelected(int index);
+        void perspectivesChanged(); // when the list of perspectives is updated in PerspectivesDialog
 
         // chart importing
         void importCharts(QStringList);

@@ -89,6 +89,8 @@
 #include "NewSideBar.h"
 #include "HelpWindow.h"
 #include "Perspective.h"
+#include "PerspectiveDialog.h"
+
 #if !defined(Q_OS_MAC)
 #include "QTFullScreen.h" // not mac!
 #endif
@@ -1379,9 +1381,9 @@ MainWindow::perspectiveSelected(int index)
     }
 
     // which perspective is currently being shown?
-    int prior = current->pages_.indexOf(current->page_);
+    int prior = current->perspectives_.indexOf(current->perspective_);
 
-    if (index < current->pages_.count()) {
+    if (index < current->perspectives_.count()) {
 
         // a perspectives was selected
         switch (view) {
@@ -1400,7 +1402,7 @@ MainWindow::perspectiveSelected(int index)
         perspectiveSelector->setCurrentIndex(prior);
 
         // now open dialog etc
-        switch (index - current->pages_.count()) {
+        switch (index - current->perspectives_.count()) {
         case 1 : // add perspectives
             {
                 QString name;
@@ -1414,16 +1416,63 @@ MainWindow::perspectiveSelected(int index)
                     current->setPerspectives(perspectiveSelector);
 
                     // and select remember pactive is true, so we do the heavy lifting here
-                    perspectiveSelector->setCurrentIndex(current->pages_.count()-1);
+                    perspectiveSelector->setCurrentIndex(current->perspectives_.count()-1);
                     current->perspectiveSelected(perspectiveSelector->currentIndex());
                 }
             }
             break;
         case 2 : // manage perspectives
-            // XXX todo
+            PerspectiveDialog *dialog = new PerspectiveDialog(this, current);
+            connect(dialog, SIGNAL(perspectivesChanged()), this, SLOT(perspectivesChanged())); // update the selector and view
+            dialog->exec();
             break;
         }
         pactive = false;
+    }
+}
+
+// manage perspectives has done something (remove/add/reorder perspectives)
+// pactive MUST be true, see above
+void
+MainWindow::perspectivesChanged()
+{
+    int view = currentTab->currentView();
+    TabView *current = NULL;
+
+    switch (view) {
+    case 0:  current = currentTab->homeView; break;
+    case 1:  current = currentTab->analysisView; break;
+    case 2:  current = currentTab->diaryView; break;
+    case 3:  current = currentTab->trainView; break;
+    }
+
+    // which perspective is currently being selected (before we go setting the combobox)
+    Perspective *prior = current->perspective_;
+
+    // ok, so reset the combobox
+    current->setPerspectives(perspectiveSelector);
+
+    // is the old selected perspective still available?
+    int index = current->perspectives_.indexOf(prior);
+
+    // pretend a selection was made if the index needs to change
+    if (index >= 0 ) {
+        // still exists, but not currently selected for some reason
+        if (perspectiveSelector->currentIndex() != index)
+            perspectiveSelector->setCurrentIndex(index);
+
+        // no need to signal as its currently being shown
+    } else {
+
+        pactive = false; // dialog is active, but we need to force a change
+
+        // need to choose first as current got deleted
+        if (perspectiveSelector->currentIndex() != 0)
+            perspectiveSelector->setCurrentIndex(0);
+        else
+            emit perspectiveSelector->currentIndexChanged(0);
+
+        pactive = true;
     }
 }
 
