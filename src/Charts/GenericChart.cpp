@@ -382,7 +382,7 @@ GenericChart::finaliseChart()
             QListIterator<QStringList>l(p.annotateLabels);
             while(l.hasNext()) {
                 QStringList list=l.next();
-                newPlots[i].plot->addAnnotation(GenericPlot::LABEL, list.join(" "), QColor(p.color));
+                newPlots[i].plot->addAnnotation(GenericPlot::LABEL, list.join(" "), RGBColor(QColor(p.color)));
             }
 
         }

@@ -213,7 +213,7 @@ void GCColor::setupColors()
         { tr("Left Balance"), "CBALANCELEFT", QColor(178,0,0) },
         { tr("Right Balance"), "CBALANCERIGHT", QColor(128,0,50) },
         { tr("W' Balance"), "CWBAL", Qt::red },
-        { tr("CP Curve"), "CRIDECP", Qt::red },
+        { tr("Mean-maximal Power"), "CRIDECP", Qt::red },
         { tr("Aerobic TISS"), "CATISS", Qt::magenta },
         { tr("Anaerobic TISS"), "CANTISS", Qt::cyan },
         { tr("Left Torque Effectiveness"), "CLTE", Qt::cyan },
