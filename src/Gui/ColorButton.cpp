@@ -121,9 +121,6 @@ GColorDialog::GColorDialog(QColor selected, QWidget *parent) : QDialog(parent), 
     colorlist->setUniformRowHeights(true); // causes height problems when adding - in case of non-text fields
     colorlist->setIndentation(0);
 
-    // filter colors
-    colorlist->setRowHidden(0, colorlist->rootIndex(), true);
-
     // map button signals
     mapper = new QSignalMapper(this);
     connect(mapper, SIGNAL(mappedInt(int)), this, SLOT(gcClicked(int)));
@@ -173,8 +170,6 @@ GColorDialog::GColorDialog(QColor selected, QWidget *parent) : QDialog(parent), 
 void
 GColorDialog::searchFilter(QString text)
 {
-    fprintf(stderr, "filtering on: %s\n",text.toStdString().c_str());
-    fflush(stderr);
     QStringList toks = text.split(" ", Qt::SkipEmptyParts);
     bool empty;
     if (toks.count() == 0 || text == "") empty=true;
