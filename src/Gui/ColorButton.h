@@ -55,6 +55,7 @@ class QTabWidget;
 class QBoxLayout;
 class QTreeWidget;
 class QSignalMapper;
+class QLineEdit;
 class GColorDialog : public QDialog
 {
     Q_OBJECT
@@ -80,6 +81,10 @@ class GColorDialog : public QDialog
         static QColor getColor(QColor color);
 
     public slots:
+
+        // search filter
+        void searchFilter(QString);            // sets rows hidden if they are not found
+
         // trap buttons
         void cancelClicked();           // return what we got passed
 
@@ -102,6 +107,7 @@ class GColorDialog : public QDialog
         // gc dialog (second tab)
         const Colors *colorSet;
         QWidget *gcdialog;
+        QLineEdit *searchEdit;
         QTreeWidget *colorlist;
         QPushButton *cancel, *ok;
         QSignalMapper *mapper;
