@@ -80,6 +80,9 @@ class PerspectiveDialog : public QDialog
         void upPerspectiveClicked();
         void downPerspectiveClicked();
 
+        void exportPerspectiveClicked();
+        void importPerspectiveClicked();
+
         void perspectiveNameChanged(QTableWidgetItem *);
 
     signals:
@@ -91,6 +94,7 @@ class PerspectiveDialog : public QDialog
         PerspectiveTableWidget *perspectiveTable;
         ChartTableWidget *chartTable;
 
+        QPushButton *exportPerspective, *importPerspective;
         QPushButton *addPerspective, *removePerspective;
         QToolButton *upPerspective, *downPerspective;
         QLabel *instructions;

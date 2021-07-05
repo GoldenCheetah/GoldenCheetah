@@ -23,6 +23,7 @@
 #include <QFormLayout>
 #include <QLabel>
 #include <QMessageBox>
+#include <QFileDialog>
 
 ///
 /// PerspectiveDialog
@@ -31,7 +32,7 @@ PerspectiveDialog::PerspectiveDialog(QWidget *parent, TabView *tabView) : QDialo
 {
 
     setWindowTitle("Manage Perspectives");
-    setMinimumWidth(400*dpiXFactor);
+    setMinimumWidth(450*dpiXFactor);
     setMinimumHeight(450*dpiXFactor);
 
     //setAttribute(Qt::WA_DeleteOnClose);
@@ -77,6 +78,9 @@ PerspectiveDialog::PerspectiveDialog(QWidget *parent, TabView *tabView) : QDialo
     upPerspective->setFixedSize(20*dpiXFactor,20*dpiYFactor);
     downPerspective->setFixedSize(20*dpiXFactor,20*dpiYFactor);
 
+    importPerspective = new QPushButton(tr("Import"), this);
+    exportPerspective = new QPushButton(tr("Export"), this);
+
     addPerspective = new QPushButton("+", this);
     removePerspective = new QPushButton("-", this);
 
@@ -98,6 +102,9 @@ PerspectiveDialog::PerspectiveDialog(QWidget *parent, TabView *tabView) : QDialo
     xb->addWidget(upPerspective);
     xb->addWidget(downPerspective);
     xb->addStretch();
+    xb->addWidget(importPerspective);
+    xb->addWidget(exportPerspective);
+    xb->addStretch();
     xb->addWidget(addPerspective);
     xb->addWidget(removePerspective);
     mainLayout->addLayout(xb);
@@ -111,6 +118,9 @@ PerspectiveDialog::PerspectiveDialog(QWidget *parent, TabView *tabView) : QDialo
     connect(perspectiveTable, SIGNAL(currentItemChanged(QTableWidgetItem*,QTableWidgetItem*)), this, SLOT(perspectiveSelected()));
     connect(perspectiveTable, SIGNAL(chartMoved(GcChartWindow*)), this, SLOT(perspectiveSelected())); // just reset the chart list
     connect(perspectiveTable, SIGNAL(itemChanged(QTableWidgetItem*)), this, SLOT(perspectiveNameChanged(QTableWidgetItem*))); // user edit
+
+    connect(importPerspective, SIGNAL(clicked(bool)), this, SLOT(importPerspectiveClicked()));
+    connect(exportPerspective, SIGNAL(clicked(bool)), this, SLOT(exportPerspectiveClicked()));
 
     connect(removePerspective, SIGNAL(clicked(bool)), this, SLOT(removePerspectiveClicked()));
     connect(addPerspective, SIGNAL(clicked(bool)), this, SLOT(addPerspectiveClicked()));
@@ -224,6 +234,47 @@ PerspectiveDialog::addPerspectiveClicked()
         emit perspectivesChanged();
 
         setTables();
+    }
+}
+
+void
+PerspectiveDialog::exportPerspectiveClicked()
+{
+    int index = perspectiveTable->selectedItems()[0]->row();
+
+    // wipe it - tabView will worry about bounds and switching if we delete the currently selected one
+    Perspective *current = tabView->perspectives_[index];
+
+    // export the current perspective to a file
+    QString suffix;
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Export Persepctive"),
+                       QDir::homePath()+"/"+ current->title() + ".gchartset",
+                       ("*.gchartset;;"), &suffix, QFileDialog::DontUseNativeDialog); // native dialog hangs when threads in use (!)
+
+    if (fileName.isEmpty()) {
+        QMessageBox::critical(this, tr("Export Perspective"), tr("No perspective file selected!"));
+    } else {
+        tabView->exportPerspective(current, fileName);
+    }
+}
+
+void
+PerspectiveDialog::importPerspectiveClicked()
+{
+    // import a new perspective from a file
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Select Perspective file to export"), "", tr("GoldenCheetah Perspective Files (*.gchartset)"));
+    if (fileName.isEmpty()) {
+        QMessageBox::critical(this, tr("Import Perspective"), tr("No perspective file selected!"));
+    } else {
+
+        // import and select it
+        tabView->importPerspective(fileName);
+
+        // update the table
+        setTables();
+
+        // new one added
+        emit perspectivesChanged();
     }
 }
 

@@ -294,44 +294,8 @@ TabView::saveState()
     // so lets run through the perspectives
     foreach(Perspective *page, perspectives_) {
 
-        out<<"<layout name=\""<< page->title_ <<"\" style=\"" << page->currentStyle <<"\">\n";
-
-        // iterate over charts
-        foreach (GcChartWindow *chart, page->charts) {
-            GcWinID type = chart->property("type").value<GcWinID>();
-
-            out<<"\t<chart id=\""<<static_cast<int>(type)<<"\" "
-               <<"name=\""<<Utils::xmlprotect(chart->property("instanceName").toString())<<"\" "
-               <<"title=\""<<Utils::xmlprotect(chart->property("title").toString())<<"\" >\n";
-
-            // iterate over chart properties
-            const QMetaObject *m = chart->metaObject();
-            for (int i=0; i<m->propertyCount(); i++) {
-                QMetaProperty p = m->property(i);
-                if (p.isUser(chart)) {
-                   out<<"\t\t<property name=\""<<Utils::xmlprotect(p.name())<<"\" "
-                      <<"type=\""<<p.typeName()<<"\" "
-                      <<"value=\"";
-
-                    if (QString(p.typeName()) == "int") out<<p.read(chart).toInt();
-                    if (QString(p.typeName()) == "double") out<<p.read(chart).toDouble();
-                    if (QString(p.typeName()) == "QDate") out<<p.read(chart).toDate().toString();
-                    if (QString(p.typeName()) == "QString") out<<Utils::xmlprotect(p.read(chart).toString());
-                    if (QString(p.typeName()) == "bool") out<<p.read(chart).toBool();
-                    if (QString(p.typeName()) == "LTMSettings") {
-                        QByteArray marshall;
-                        QDataStream s(&marshall, QIODevice::WriteOnly);
-                        LTMSettings x = p.read(chart).value<LTMSettings>();
-                        s << x;
-                        out<<marshall.toBase64();
-                    }
-
-                    out<<"\" />\n";
-                }
-            }
-            out<<"\t</chart>\n";
-        }
-        out<<"</layout>\n";
+        // write to output stream
+        page->toXml(out);
     }
     out<<"</layouts>\n";
     file.close();
@@ -419,6 +383,7 @@ TabView::restoreState(bool useDefault)
 
     // if we *still* don't have content then something went
     // badly wrong, so only reset if its not blank
+    QList<Perspective*>restored;
     if (content != "") {
 
         // whilst this happens don't show user
@@ -434,22 +399,16 @@ TabView::restoreState(bool useDefault)
 
         // parse and instantiate the charts
         xmlReader.parse(source);
-        perspectives_ = handler.perspectives;
+        restored = handler.perspectives;
 
     }
-    if (legacy && perspectives_.count() == 1) perspectives_[0]->title_ = "General";
+    if (legacy && restored.count() == 1) restored[0]->title_ = "General";
 
-    if (perspectives_.count() == 0) {
-        perspective_ = new Perspective(context, "empty", type);
-        perspectives_ << perspective_;
-    }
+    // MUST have at least one
+    if (restored.count() == 0)  restored << new Perspective(context, "empty", type);
 
-    // add to stack
-    foreach(Perspective *page, perspectives_) {
-        pstack->addWidget(page);
-        cstack->addWidget(page->controls());
-        page->configChanged(0); // set colors correctly- will have missed from startup
-    }
+    // initialise them
+    foreach(Perspective *page, restored) appendPerspective(page);
 
     // default to first one
     perspective_ = perspectives_[0];
@@ -471,7 +430,29 @@ TabView::restoreState(bool useDefault)
             context->athlete->selectRideFile(context->athlete->rideCache->rides().last()->fileName);
         }
     }
+}
 
+void
+TabView::appendPerspective(Perspective *page)
+{
+    perspectives_ << page;
+    pstack->addWidget(page);
+    cstack->addWidget(page->controls());
+    page->configChanged(0); // set colors correctly- will have missed from startup
+}
+
+void
+TabView::importPerspective(QString filename)
+{
+    Perspective *newone = Perspective::fromFile(context, filename, type);
+    if (newone) appendPerspective(newone);
+}
+
+void
+TabView::exportPerspective(Perspective *p, QString filename)
+{
+    // write to file
+    p->toFile(filename);
 }
 
 void
@@ -483,10 +464,8 @@ TabView::addPerspective(QString name)
     if (type == VIEW_TRAIN) page->styleChanged(2);
     else page->styleChanged(0);
 
-    perspectives_ << page;
-    pstack->addWidget(page);
-    cstack->addWidget(page->controls());
-    page->configChanged(0); // set colors correctly- will be empty...
+    // append
+    appendPerspective(page);
 }
 
 void

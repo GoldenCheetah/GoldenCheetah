@@ -43,6 +43,7 @@ class LTMSettings;
 class TabView;
 class ViewParser;
 class PerspectiveDialog;
+class QTextStream;
 
 class Perspective : public GcWindow
 {
@@ -57,6 +58,11 @@ class Perspective : public GcWindow
 
         Perspective(Context *, QString title, int type);
         ~Perspective();
+
+        // import and export
+        static Perspective *fromFile(Context *context, QString filename, int type);
+        bool toFile(QString filename);
+        void toXml(QTextStream &out);
 
         QString title() const { return title_; }
 

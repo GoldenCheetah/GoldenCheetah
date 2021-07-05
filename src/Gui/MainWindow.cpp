@@ -658,6 +658,9 @@ MainWindow::MainWindow(const QDir &home)
     viewMenu->addAction(tr("Trends"), this, SLOT(selectHome()));
     viewMenu->addAction(tr("Train"), this, SLOT(selectTrain()));
     viewMenu->addSeparator();
+    viewMenu->addAction(tr("Import Perspective..."), this, SLOT(importPerspective()));
+    viewMenu->addAction(tr("Export Perspective..."), this, SLOT(exportPerspective()));
+    viewMenu->addSeparator();
     subChartMenu = viewMenu->addMenu(tr("Add Chart"));
     viewMenu->addAction(tr("Import Chart..."), this, SLOT(importChart()));
 #ifdef GC_HAS_CLOUD_DB
@@ -945,6 +948,64 @@ MainWindow::importChart()
     } else {
         importCharts(QStringList()<<fileName);
     }
+}
+
+void
+MainWindow::exportPerspective()
+{
+    int view = currentTab->currentView();
+    TabView *current = NULL;
+
+    switch (view) {
+    case 0:  current = currentTab->homeView; break;
+    case 1:  current = currentTab->analysisView; break;
+    case 2:  current = currentTab->diaryView; break;
+    case 3:  current = currentTab->trainView; break;
+    }
+
+    // export the current perspective to a file
+    QString suffix;
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Export Persepctive"),
+                       QDir::homePath()+"/"+ current->perspective_->title() + ".gchartset",
+                       ("*.gchartset;;"), &suffix, QFileDialog::DontUseNativeDialog); // native dialog hangs when threads in use (!)
+
+    if (fileName.isEmpty()) {
+        QMessageBox::critical(this, tr("Export Perspective"), tr("No perspective file selected!"));
+    } else {
+        current->exportPerspective(current->perspective_, fileName);
+    }
+}
+
+void
+MainWindow::importPerspective()
+{
+    int view = currentTab->currentView();
+    TabView *current = NULL;
+
+    switch (view) {
+    case 0:  current = currentTab->homeView; break;
+    case 1:  current = currentTab->analysisView; break;
+    case 2:  current = currentTab->diaryView; break;
+    case 3:  current = currentTab->trainView; break;
+    }
+
+    // import a new perspective from a file
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Select Perspective file to export"), "", tr("GoldenCheetah Perspective Files (*.gchartset)"));
+    if (fileName.isEmpty()) {
+        QMessageBox::critical(this, tr("Import Perspective"), tr("No perspective file selected!"));
+    } else {
+
+        // import and select it
+        pactive = true;
+        current->importPerspective(fileName);
+        current->setPerspectives(perspectiveSelector);
+
+        // and select remember pactive is true, so we do the heavy lifting here
+        perspectiveSelector->setCurrentIndex(current->perspectives_.count()-1);
+        current->perspectiveSelected(perspectiveSelector->currentIndex());
+        pactive = false;
+    }
+
 }
 
 #ifdef GC_HAS_CLOUD_DB

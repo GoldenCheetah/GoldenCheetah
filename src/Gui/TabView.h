@@ -76,6 +76,7 @@ class TabView : public QWidget
         // load/save perspectives
         void restoreState(bool useDefault = false);
         void saveState();
+        void appendPerspective(Perspective *page);
 
         void setPerspectives(QComboBox *perspectiveSelector); // set the combobox when view selected
         void perspectiveSelected(int index); // combobox selections changed because the user selected a perspective
@@ -103,6 +104,9 @@ class TabView : public QWidget
         int viewType() { return type; }
 
         void importChart(QMap<QString,QString>properties, bool select) { perspective_->importChart(properties, select); }
+
+        void importPerspective(QString filename);
+        void exportPerspective(Perspective *, QString filename);
 
     signals:
 

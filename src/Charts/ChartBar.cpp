@@ -119,13 +119,14 @@ ChartBar::ChartBar(Context *context) : QWidget(context->mainWindow), context(con
     connect(menuMapper, SIGNAL(mapped(int)), this, SLOT(triggerContextMenu(int)));
 
     barMenu = new QMenu("Add");
-    chartMenu = barMenu->addMenu(tr("New "));
+    chartMenu = barMenu->addMenu(tr("New Chart"));
 
-    barMenu->addAction(tr("Import ..."), context->mainWindow, SLOT(importChart()));
+    barMenu->addAction(tr("Import Chart ..."), context->mainWindow, SLOT(importChart()));
 
 #ifdef GC_HAS_CLOUD_DB
-    barMenu->addAction(tr("Download ..."), context->mainWindow, SLOT(addChartFromCloudDB()));
+    barMenu->addAction(tr("Download Chart..."), context->mainWindow, SLOT(addChartFromCloudDB()));
 #endif
+
     // menu
     connect(menuButton, SIGNAL(clicked()), this, SLOT(menuPopup()));
     connect(chartMenu, SIGNAL(aboutToShow()), this, SLOT(setChartMenu()));

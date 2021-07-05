@@ -1411,6 +1411,112 @@ Perspective::presetSelected(int n)
 }
 
 /*--------------------------------------------------------------------------------
+ *  Import and Export the Perspective to xml
+ * -----------------------------------------------------------------------------*/
+Perspective *Perspective::fromFile(Context *context, QString filename, int type)
+{
+    Perspective *returning = NULL;
+
+    QFileInfo finfo(filename);
+    QString content = "";
+
+    // no such file
+    if (!finfo.exists()) return returning;
+
+    QFile file(filename);
+    if (file.open(QIODevice::ReadOnly)) {
+        content = file.readAll();
+        file.close();
+    } else return returning;
+
+    // parse the content
+    QXmlInputSource source;
+    source.setData(content);
+    QXmlSimpleReader xmlReader;
+    ViewParser handler(context, type, false);
+    xmlReader.setContentHandler(&handler);
+    xmlReader.setErrorHandler(&handler);
+
+    // parse and instantiate the charts
+    xmlReader.parse(source);
+
+    // none loaded ?
+    if (handler.perspectives.count() == 0) return returning;
+
+    // return the first one (if there are multiple)
+    returning = handler.perspectives[0];
+
+    // delete any further perspectives
+    for(int i=1; i<handler.perspectives.count(); i++) delete (handler.perspectives[i]);
+
+    // return it, but bear in mind it hasn't been initialised (current ride, date range etc)
+    return returning;
+}
+
+bool
+Perspective::toFile(QString filename)
+{
+    QFile file(filename);
+    if (!file.open(QFile::WriteOnly)) return false;
+
+    // truncate and use 8bit encoding
+    file.resize(0);
+    QTextStream out(&file);
+    out.setCodec("UTF-8");
+
+    // write to output stream
+    toXml(out);
+
+    // all done
+    file.close();
+
+    return true;
+}
+
+void
+Perspective::toXml(QTextStream &out)
+{
+    out<<"<layout name=\""<< title_ <<"\" style=\"" << currentStyle <<"\">\n";
+
+    // iterate over charts
+    foreach (GcChartWindow *chart, charts) {
+        GcWinID type = chart->property("type").value<GcWinID>();
+
+        out<<"\t<chart id=\""<<static_cast<int>(type)<<"\" "
+           <<"name=\""<<Utils::xmlprotect(chart->property("instanceName").toString())<<"\" "
+           <<"title=\""<<Utils::xmlprotect(chart->property("title").toString())<<"\" >\n";
+
+        // iterate over chart properties
+        const QMetaObject *m = chart->metaObject();
+        for (int i=0; i<m->propertyCount(); i++) {
+            QMetaProperty p = m->property(i);
+            if (p.isUser(chart)) {
+               out<<"\t\t<property name=\""<<Utils::xmlprotect(p.name())<<"\" "
+                  <<"type=\""<<p.typeName()<<"\" "
+                  <<"value=\"";
+
+                if (QString(p.typeName()) == "int") out<<p.read(chart).toInt();
+                if (QString(p.typeName()) == "double") out<<p.read(chart).toDouble();
+                if (QString(p.typeName()) == "QDate") out<<p.read(chart).toDate().toString();
+                if (QString(p.typeName()) == "QString") out<<Utils::xmlprotect(p.read(chart).toString());
+                if (QString(p.typeName()) == "bool") out<<p.read(chart).toBool();
+                if (QString(p.typeName()) == "LTMSettings") {
+                    QByteArray marshall;
+                    QDataStream s(&marshall, QIODevice::WriteOnly);
+                    LTMSettings x = p.read(chart).value<LTMSettings>();
+                    s << x;
+                    out<<marshall.toBase64();
+                }
+
+                out<<"\" />\n";
+            }
+        }
+        out<<"\t</chart>\n";
+    }
+    out<<"</layout>\n";
+}
+
+/*--------------------------------------------------------------------------------
  *  Import Chart Dialog - select/deselect charts before importing them
  * -----------------------------------------------------------------------------*/
 ImportChartDialog::ImportChartDialog(Context *context, QList<QMap<QString,QString> >list, QWidget *parent) : QDialog(parent), context(context), list(list)
