@@ -997,12 +997,15 @@ MainWindow::importPerspective()
 
         // import and select it
         pactive = true;
-        current->importPerspective(fileName);
-        current->setPerspectives(perspectiveSelector);
+        if (current->importPerspective(fileName)) {
 
-        // and select remember pactive is true, so we do the heavy lifting here
-        perspectiveSelector->setCurrentIndex(current->perspectives_.count()-1);
-        current->perspectiveSelected(perspectiveSelector->currentIndex());
+            // on success we select the new one
+            current->setPerspectives(perspectiveSelector);
+
+            // and select remember pactive is true, so we do the heavy lifting here
+            perspectiveSelector->setCurrentIndex(current->perspectives_.count()-1);
+            current->perspectiveSelected(perspectiveSelector->currentIndex());
+        }
         pactive = false;
     }
 

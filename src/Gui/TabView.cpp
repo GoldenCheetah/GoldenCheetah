@@ -441,11 +441,18 @@ TabView::appendPerspective(Perspective *page)
     page->configChanged(0); // set colors correctly- will have missed from startup
 }
 
-void
+bool
 TabView::importPerspective(QString filename)
 {
     Perspective *newone = Perspective::fromFile(context, filename, type);
-    if (newone) appendPerspective(newone);
+    if (newone) {
+        appendPerspective(newone);
+        return true;
+    } else {
+        // no valid perspective found for this view... (maybe its for another type of view)
+        QMessageBox::information(this, tr("Perspective Import"), tr("No perspectives found that are appropriate for the current view."));
+        return false;
+    }
 }
 
 void
@@ -907,6 +914,7 @@ bool ViewParser::startElement( const QString&, const QString&, const QString &na
     if (name == "layout") {
 
         QString name="General";
+        int typetouse=type;
         for(int i=0; i<attrs.count(); i++) {
             if (attrs.qName(i) == "style") {
                 style = Utils::unprotect(attrs.value(i)).toInt();
@@ -914,10 +922,13 @@ bool ViewParser::startElement( const QString&, const QString&, const QString &na
             if (attrs.qName(i) == "name") {
                 name =  Utils::unprotect(attrs.value(i));
             }
+            if (attrs.qName(i) == "type") {
+                typetouse = Utils::unprotect(attrs.value(i)).toInt();
+            }
         }
 
         // we need a new perspective for this view type
-        page = new Perspective(context, name, type);
+        page = new Perspective(context, name, typetouse);
         perspectives.append(page);
     }
     else if (name == "chart") {

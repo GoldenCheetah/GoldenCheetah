@@ -105,7 +105,7 @@ class TabView : public QWidget
 
         void importChart(QMap<QString,QString>properties, bool select) { perspective_->importChart(properties, select); }
 
-        void importPerspective(QString filename);
+        bool importPerspective(QString filename);
         void exportPerspective(Perspective *, QString filename);
 
     signals:

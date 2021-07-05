@@ -268,13 +268,14 @@ PerspectiveDialog::importPerspectiveClicked()
     } else {
 
         // import and select it
-        tabView->importPerspective(fileName);
+        if (tabView->importPerspective(fileName)) {
 
-        // update the table
-        setTables();
+            // update the table
+            setTables();
 
-        // new one added
-        emit perspectivesChanged();
+            // new one added
+            emit perspectivesChanged();
+        }
     }
 }
 

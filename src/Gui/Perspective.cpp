@@ -1443,11 +1443,15 @@ Perspective *Perspective::fromFile(Context *context, QString filename, int type)
     // none loaded ?
     if (handler.perspectives.count() == 0) return returning;
 
-    // return the first one (if there are multiple)
-    returning = handler.perspectives[0];
+    // return the first one with the right type (if there are multiple)
+    for(int i=0; i<handler.perspectives.count(); i++)
+        if (returning == NULL && handler.perspectives[i]->type == type)
+            returning = handler.perspectives[i];
 
     // delete any further perspectives
-    for(int i=1; i<handler.perspectives.count(); i++) delete (handler.perspectives[i]);
+    for(int i=0; i<handler.perspectives.count(); i++)
+        if (handler.perspectives[i] != returning)
+            delete (handler.perspectives[i]);
 
     // return it, but bear in mind it hasn't been initialised (current ride, date range etc)
     return returning;
@@ -1476,7 +1480,7 @@ Perspective::toFile(QString filename)
 void
 Perspective::toXml(QTextStream &out)
 {
-    out<<"<layout name=\""<< title_ <<"\" style=\"" << currentStyle <<"\">\n";
+    out<<"<layout name=\""<< title_ <<"\" style=\"" << currentStyle <<"\" type=\"" << type<<"\">\n";
 
     // iterate over charts
     foreach (GcChartWindow *chart, charts) {
