@@ -245,10 +245,18 @@ PerspectiveDialog::exportPerspectiveClicked()
     // wipe it - tabView will worry about bounds and switching if we delete the currently selected one
     Perspective *current = tabView->perspectives_[index];
 
+    QString typedesc;
+    switch (tabView->type) {
+    case VIEW_HOME: typedesc="Trends"; break;
+    case VIEW_ANALYSIS: typedesc="Analysis"; break;
+    case VIEW_DIARY: typedesc="Diary"; break;
+    case VIEW_TRAIN: typedesc="Train"; break;
+    }
+
     // export the current perspective to a file
     QString suffix;
     QString fileName = QFileDialog::getSaveFileName(this, tr("Export Persepctive"),
-                       QDir::homePath()+"/"+ current->title() + ".gchartset",
+                       QDir::homePath()+"/"+ typedesc + " " + current->title() + ".gchartset",
                        ("*.gchartset;;"), &suffix, QFileDialog::DontUseNativeDialog); // native dialog hangs when threads in use (!)
 
     if (fileName.isEmpty()) {

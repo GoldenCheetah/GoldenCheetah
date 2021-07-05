@@ -956,17 +956,19 @@ MainWindow::exportPerspective()
     int view = currentTab->currentView();
     TabView *current = NULL;
 
+    QString typedesc;
+
     switch (view) {
-    case 0:  current = currentTab->homeView; break;
-    case 1:  current = currentTab->analysisView; break;
-    case 2:  current = currentTab->diaryView; break;
-    case 3:  current = currentTab->trainView; break;
+    case 0:  current = currentTab->homeView; typedesc = "Trends"; break;
+    case 1:  current = currentTab->analysisView; typedesc = "Analysis"; break;
+    case 2:  current = currentTab->diaryView; typedesc = "Diary"; break;
+    case 3:  current = currentTab->trainView; typedesc = "Train"; break;
     }
 
     // export the current perspective to a file
     QString suffix;
     QString fileName = QFileDialog::getSaveFileName(this, tr("Export Persepctive"),
-                       QDir::homePath()+"/"+ current->perspective_->title() + ".gchartset",
+                       QDir::homePath()+"/"+ typedesc + " " + current->perspective_->title() + ".gchartset",
                        ("*.gchartset;;"), &suffix, QFileDialog::DontUseNativeDialog); // native dialog hangs when threads in use (!)
 
     if (fileName.isEmpty()) {
