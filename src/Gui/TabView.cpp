@@ -735,8 +735,8 @@ TabView::setPerspectives(QComboBox *perspectiveSelector)
         // but on analysis view they get selected on the basis
         // of the currently selected ride
         RideItem *notconst = (RideItem*)context->currentRideItem();
+        perspectiveSelected(0);
         if (type == VIEW_ANALYSIS && notconst != NULL) setRide(notconst);
-        else perspectiveSelected(0);
 
         // due to visibility optimisation we need to force the first tab to be selected in tab mode
         if (perspective_->currentStyle == 0 && perspective_->charts.count()) perspective_->tabSelected(0);
