@@ -1432,6 +1432,13 @@ MainWindow::setToolButtons()
 }
 
 void
+MainWindow::switchPerspective(int index)
+{
+    if (index >=0 && index < perspectiveSelector->count())
+        perspectiveSelector->setCurrentIndex(index);
+}
+
+void
 MainWindow::perspectiveSelected(int index)
 {
     if (pactive) return;
@@ -1472,13 +1479,15 @@ MainWindow::perspectiveSelected(int index)
         case 1 : // add perspectives
             {
                 QString name;
-                AddPerspectiveDialog *dialog= new AddPerspectiveDialog(currentTab->context, name);
+                QString expression;
+                AddPerspectiveDialog *dialog= new AddPerspectiveDialog(currentTab->context, name, expression, current->type);
                 int ret= dialog->exec();
                 delete dialog;
                 if (ret == QDialog::Accepted && name != "") {
 
                     // add...
-                    current->addPerspective(name);
+                    Perspective *newone = current->addPerspective(name);
+                    newone->setExpression(expression);
                     current->setPerspectives(perspectiveSelector);
 
                     // and select remember pactive is true, so we do the heavy lifting here

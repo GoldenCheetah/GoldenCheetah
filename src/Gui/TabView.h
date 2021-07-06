@@ -82,7 +82,7 @@ class TabView : public QWidget
         void perspectiveSelected(int index); // combobox selections changed because the user selected a perspective
 
         // add a new perspective
-        void addPerspective(QString);
+        Perspective *addPerspective(QString);
         void removePerspective(Perspective *);
         void swapPerspective(int from, int to); // reorder by moving 1 pos at a time
 

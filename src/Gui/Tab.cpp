@@ -152,7 +152,7 @@ void Tab::addChart(GcWinID i) { view(currentView())->addChart(i); }
 void Tab::addIntervals() { analysisView->addIntervals(); }
 
 void Tab::setRide(RideItem*ride) 
-{ 
+{
     analysisView->setRide(ride);
     homeView->setRide(ride);
     trainView->setRide(ride);

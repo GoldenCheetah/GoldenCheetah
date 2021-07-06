@@ -78,6 +78,7 @@ PerspectiveDialog::PerspectiveDialog(QWidget *parent, TabView *tabView) : QDialo
     upPerspective->setFixedSize(20*dpiXFactor,20*dpiYFactor);
     downPerspective->setFixedSize(20*dpiXFactor,20*dpiYFactor);
 
+    editButton = new QPushButton(tr("Edit"), this);
     importPerspective = new QPushButton(tr("Import"), this);
     exportPerspective = new QPushButton(tr("Export"), this);
 
@@ -102,6 +103,8 @@ PerspectiveDialog::PerspectiveDialog(QWidget *parent, TabView *tabView) : QDialo
     xb->addWidget(upPerspective);
     xb->addWidget(downPerspective);
     xb->addStretch();
+    xb->addWidget(editButton);
+    xb->addStretch();
     xb->addWidget(importPerspective);
     xb->addWidget(exportPerspective);
     xb->addStretch();
@@ -119,6 +122,7 @@ PerspectiveDialog::PerspectiveDialog(QWidget *parent, TabView *tabView) : QDialo
     connect(perspectiveTable, SIGNAL(chartMoved(GcChartWindow*)), this, SLOT(perspectiveSelected())); // just reset the chart list
     connect(perspectiveTable, SIGNAL(itemChanged(QTableWidgetItem*)), this, SLOT(perspectiveNameChanged(QTableWidgetItem*))); // user edit
 
+    connect(editButton, SIGNAL(clicked(bool)), this, SLOT(editPerspectiveClicked()));
     connect(importPerspective, SIGNAL(clicked(bool)), this, SLOT(importPerspectiveClicked()));
     connect(exportPerspective, SIGNAL(clicked(bool)), this, SLOT(exportPerspectiveClicked()));
 
@@ -221,16 +225,38 @@ PerspectiveDialog::removePerspectiveClicked()
 }
 
 void
+PerspectiveDialog::editPerspectiveClicked()
+{
+    int index = perspectiveTable->selectedItems()[0]->row();
+
+    if (index >= 0 && index < tabView->perspectives_.count()) {
+
+        Perspective *editing = tabView->perspectives_[index];
+        QString expression=editing->expression();
+        AddPerspectiveDialog *dialog= new AddPerspectiveDialog(tabView->context, editing->title_, expression, tabView->type, true);
+        int ret= dialog->exec();
+        delete dialog;
+        if (ret == QDialog::Accepted) {
+            editing->setExpression(expression);
+            emit perspectivesChanged();
+            setTables();
+        }
+    }
+}
+
+void
 PerspectiveDialog::addPerspectiveClicked()
 {
     QString name;
-    AddPerspectiveDialog *dialog= new AddPerspectiveDialog(tabView->context, name);
+    QString expression;
+    AddPerspectiveDialog *dialog= new AddPerspectiveDialog(tabView->context, name, expression, tabView->type);
     int ret= dialog->exec();
     delete dialog;
     if (ret == QDialog::Accepted && name != "") {
 
          // add...
-        tabView->addPerspective(name);
+        Perspective *newone =tabView->addPerspective(name);
+        newone->setExpression(expression);
         emit perspectivesChanged();
 
         setTables();

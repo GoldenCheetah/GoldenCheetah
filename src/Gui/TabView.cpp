@@ -91,10 +91,15 @@ TabView::~TabView()
     perspectives_.clear();
 }
 
+// this generally gets re-implemented in the view, so e.g. AnalysisView
+// has its own version of this method that switches perspective to match
+// the type of activity based upon the perspective's associated "switch expression".
 void
 TabView::setRide(RideItem*ride)
 {
-    if (loaded) page()->setProperty("ride", QVariant::fromValue<RideItem*>(dynamic_cast<RideItem*>(ride)));
+    if (loaded) {
+        page()->setProperty("ride", QVariant::fromValue<RideItem*>(dynamic_cast<RideItem*>(ride)));
+    }
 }
 
 void
@@ -462,7 +467,7 @@ TabView::exportPerspective(Perspective *p, QString filename)
     p->toFile(filename);
 }
 
-void
+Perspective *
 TabView::addPerspective(QString name)
 {
     Perspective *page = new Perspective(context, name, type);
@@ -473,6 +478,7 @@ TabView::addPerspective(QString name)
 
     // append
     appendPerspective(page);
+    return page;
 }
 
 void
@@ -724,6 +730,10 @@ TabView::setPerspectives(QComboBox *perspectiveSelector)
     // one to get the ride item and date range selected
     if (!loaded) {
         loaded = true;
+
+        // generally we just go to the first perspective
+        // but on analysis view they get selected on the basis
+        // of the currently selected ride
         perspectiveSelected(0);
 
         // due to visibility optimisation we need to force the first tab to be selected in tab mode
@@ -915,12 +925,16 @@ bool ViewParser::startElement( const QString&, const QString&, const QString &na
 
         QString name="General";
         int typetouse=type;
+        QString expression;
         for(int i=0; i<attrs.count(); i++) {
             if (attrs.qName(i) == "style") {
                 style = Utils::unprotect(attrs.value(i)).toInt();
             }
             if (attrs.qName(i) == "name") {
                 name =  Utils::unprotect(attrs.value(i));
+            }
+            if (attrs.qName(i) == "expression") {
+                expression = Utils::unprotect(attrs.value(i));
             }
             if (attrs.qName(i) == "type") {
                 typetouse = Utils::unprotect(attrs.value(i)).toInt();
@@ -929,6 +943,7 @@ bool ViewParser::startElement( const QString&, const QString&, const QString &na
 
         // we need a new perspective for this view type
         page = new Perspective(context, name, typetouse);
+        page->setExpression(expression);
         perspectives.append(page);
     }
     else if (name == "chart") {

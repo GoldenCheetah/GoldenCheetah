@@ -100,6 +100,9 @@ class MainWindow : public QMainWindow
         // tab view keeps this up to date
         QAction *showhideSidebar;
 
+        // switch perspective
+        void switchPerspective(int index);
+
     protected:
 
         // used by ChooseCyclistDialog to see which athletes

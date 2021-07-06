@@ -44,6 +44,8 @@ class TabView;
 class ViewParser;
 class PerspectiveDialog;
 class QTextStream;
+class DataFilter;
+class SearchBox;
 
 class Perspective : public GcWindow
 {
@@ -58,6 +60,13 @@ class Perspective : public GcWindow
 
         Perspective(Context *, QString title, int type);
         ~Perspective();
+
+        // am I relevant? (for switching when ride selected)
+        bool relevant(RideItem*);
+
+        // get/set the expression (will compile df)
+        QString expression() const;
+        void setExpression(QString);
 
         // import and export
         static Perspective *fromFile(Context *context, QString filename, int type);
@@ -160,6 +169,10 @@ class Perspective : public GcWindow
         QList<GcChartWindow*> charts;
         int chartCursor;
 
+        // expression
+        DataFilter *df;
+        QString expression_;
+
         static void translateChartTitles(QList<GcChartWindow*> charts);
 };
 
@@ -220,10 +233,11 @@ class AddPerspectiveDialog : public QDialog
     Q_OBJECT
 
     public:
-        AddPerspectiveDialog(Context *context, QString &name);
+        AddPerspectiveDialog(Context *context, QString &name, QString &expression, int type, bool edit=false);
 
     protected:
         QLineEdit *nameEdit;
+        SearchBox *filterEdit;
         QPushButton *add, *cancel;
 
     public slots:
@@ -233,5 +247,7 @@ class AddPerspectiveDialog : public QDialog
     private:
         Context *context;
         QString &name;
+        QString &expression;
+        int type;
 };
 #endif // _GC_HomeWindow_h

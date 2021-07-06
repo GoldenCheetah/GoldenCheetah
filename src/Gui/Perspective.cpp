@@ -30,6 +30,7 @@
 #include "Overview.h" // for special case of Overview defaults
 #include "ChartBar.h"
 #include "Utils.h"
+#include "SearchBox.h"
 
 // When ESC pressed during R processing we cancel it
 #ifdef GC_WANT_R
@@ -50,7 +51,7 @@ static const int tileSpacing = 10;
 
 Perspective::Perspective(Context *context, QString title, int type) :
     GcWindow(context), context(context), active(false),  clicked(NULL), dropPending(false),
-    type(type), title_(title), chartCursor(-2)
+    type(type), title_(title), chartCursor(-2), df(NULL), expression_("")
 {
     // setup control area
     QWidget *cw = new QWidget(this);
@@ -349,6 +350,7 @@ Perspective::rideSelected()
 {
     // we need to notify of null rides immediately
     if (!myRideItem || isVisible()) {
+
         for (int i=0; i < charts.count(); i++) {
 
             // show if its not a tab
@@ -1480,7 +1482,8 @@ Perspective::toFile(QString filename)
 void
 Perspective::toXml(QTextStream &out)
 {
-    out<<"<layout name=\""<< title_ <<"\" style=\"" << currentStyle <<"\" type=\"" << type<<"\">\n";
+    out<<"<layout name=\""<< title_ <<"\" style=\"" << currentStyle
+       <<"\" type=\"" << type<<"\" expression=\"" << Utils::xmlprotect(expression_) << "\">\n";
 
     // iterate over charts
     foreach (GcChartWindow *chart, charts) {
@@ -1518,6 +1521,46 @@ Perspective::toXml(QTextStream &out)
         out<<"\t</chart>\n";
     }
     out<<"</layout>\n";
+}
+
+/*--------------------------------------------------------------------------------
+ *  Using an expression to switch/filter content
+ * -----------------------------------------------------------------------------*/
+
+QString
+Perspective::expression() const
+{
+    return expression_;
+}
+
+void
+Perspective::setExpression(QString expr)
+{
+    if (expression_ == expr) return;
+
+    if (df) {
+        delete df;
+        df = NULL;
+    }
+    expression_ = expr;
+
+    // non-blanks
+    if (expression_ != "")
+        df = new DataFilter(this, context, expression_);
+
+}
+
+bool
+Perspective::relevant(RideItem *item)
+{
+    if (type != VIEW_ANALYSIS) return true;
+    else if (df == NULL) return false;
+    else if (df == NULL || item == NULL) return false;
+
+    // validate
+    Result ret = df->evaluate(item, NULL);
+    return ret.number();
+
 }
 
 /*--------------------------------------------------------------------------------
@@ -1669,11 +1712,12 @@ ImportChartDialog::cancelClicked()
     accept();
 }
 
-AddPerspectiveDialog::AddPerspectiveDialog(Context *context, QString &name) :
-    context(context), name(name)
+AddPerspectiveDialog::AddPerspectiveDialog(Context *context, QString &name, QString &expression, int type, bool edit) :
+    context(context), name(name), expression(expression), type(type)
 {
     setWindowFlags(windowFlags());
-    setWindowTitle(tr("Add Perspective"));
+    if (edit) setWindowTitle(tr("Edit Perspective"));
+    else setWindowTitle(tr("Add Perspective"));
     setWindowModality(Qt::ApplicationModal);
     setMinimumWidth(200 * dpiXFactor);
 
@@ -1685,8 +1729,17 @@ AddPerspectiveDialog::AddPerspectiveDialog(Context *context, QString &name) :
     form->addRow(new QLabel(tr("Perspective Name")), nameEdit);
     layout->addLayout(form);
 
+    if (type == VIEW_ANALYSIS) {
+        filterEdit = new SearchBox(context, this);
+        filterEdit->setFixedMode(true);
+        filterEdit->setMode(SearchBox::Filter);
+        filterEdit->setText(expression);
+        form->addRow(new QLabel(tr("Switch expression")), filterEdit);
+    }
+
     QHBoxLayout *buttons = new QHBoxLayout();
-    add = new QPushButton(tr("Add"), this);
+    if (edit) add = new QPushButton(tr("OK"), this);
+    else add = new QPushButton(tr("Add"), this);
     cancel = new QPushButton(tr("Cancel"), this);
     buttons->addStretch();
     buttons->addWidget(cancel);
@@ -1701,6 +1754,7 @@ void
 AddPerspectiveDialog::addClicked()
 {
     name = nameEdit->text();
+    if (type == VIEW_ANALYSIS) expression = filterEdit->text();
     accept();
 }
 

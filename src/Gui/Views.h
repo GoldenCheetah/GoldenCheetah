@@ -35,15 +35,15 @@ class AnalysisView : public TabView
 
         AnalysisView(Context *context, QStackedWidget *controls);
         ~AnalysisView();
-        void close();
-        void setRide(RideItem*ride);
+        void close() override;
+        void setRide(RideItem*ride) override;
         void addIntervals();
 
         RideNavigator *rideNavigator();
 
     public slots:
 
-        bool isBlank();
+        bool isBlank() override;
         void compareChanged(bool);
 
     private:
@@ -61,11 +61,11 @@ class DiaryView : public TabView
 
         DiaryView(Context *context, QStackedWidget *controls);
         ~DiaryView();
-        void setRide(RideItem*ride);
+        void setRide(RideItem*ride) override;
 
     public slots:
 
-        bool isBlank();
+        bool isBlank() override;
         void dateRangeChanged(DateRange);
 
     private:
@@ -82,11 +82,11 @@ class TrainView : public TabView
 
         TrainView(Context *context, QStackedWidget *controls);
         ~TrainView();
-        void close();
+        void close() override;
 
     public slots:
 
-        bool isBlank();
+        bool isBlank() override;
         void onSelectionChanged();
 
     private:
@@ -117,7 +117,7 @@ class HomeView : public TabView
 
     public slots:
 
-        bool isBlank();
+        bool isBlank() override;
         void justSelected();
         void dateRangeChanged(DateRange);
         void compareChanged(bool);

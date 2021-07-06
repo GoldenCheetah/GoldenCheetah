@@ -74,6 +74,8 @@ class PerspectiveDialog : public QDialog
         void setTables();
         void close();
 
+        void editPerspectiveClicked();
+
         void removePerspectiveClicked();
         void addPerspectiveClicked();
 
@@ -94,6 +96,7 @@ class PerspectiveDialog : public QDialog
         PerspectiveTableWidget *perspectiveTable;
         ChartTableWidget *chartTable;
 
+        QPushButton *editButton;
         QPushButton *exportPerspective, *importPerspective;
         QPushButton *addPerspective, *removePerspective;
         QToolButton *upPerspective, *downPerspective;

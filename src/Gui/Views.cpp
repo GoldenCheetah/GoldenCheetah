@@ -70,7 +70,34 @@ AnalysisView::~AnalysisView()
 void
 AnalysisView::setRide(RideItem *ride)
 {
+    // when ride selected, but not from the sidebar.
     static_cast<AnalysisSidebar*>(sidebar())->setRide(ride); // save settings
+
+    // if we are the current view and the current perspective is no longer relevant
+    // then lets go find one to switch to..
+    if (context->mainWindow->athleteTab()->currentView() == 1 && page()->relevant(ride) != true) {
+
+        // lets find one to switch to
+        Perspective *found=page();
+        foreach(Perspective *p, perspectives_){
+            if (p->relevant(ride)) {
+                found =p;
+                break;
+            }
+        }
+
+        // none of them want to be selected, so we can stay on the current one
+        // so long as it doesn't have an expression that failed...
+        if (found == page() && page()->expression() != "")
+            found = perspectives_[0];
+
+        // if we need to switch, i.e. not already on it
+        if (found != page())  {
+            context->mainWindow->switchPerspective(perspectives_.indexOf(found));
+        }
+    }
+
+    // tell the perspective we have selected a ride
     page()->setProperty("ride", QVariant::fromValue<RideItem*>(dynamic_cast<RideItem*>(ride)));
 }
 

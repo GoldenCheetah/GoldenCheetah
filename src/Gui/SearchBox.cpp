@@ -33,7 +33,7 @@
 #include <QDebug>
 
 SearchBox::SearchBox(Context *context, QWidget *parent, bool nochooser)
-    : QLineEdit(parent), context(context), parent(parent), filtered(false), nochooser(nochooser), active(false)
+    : QLineEdit(parent), context(context), parent(parent), filtered(false), nochooser(nochooser), active(false), fixed(false)
 {
     setFixedHeight(28 *dpiYFactor);
     //clear button
@@ -276,8 +276,14 @@ void SearchBox::resizeEvent(QResizeEvent *)
     //checkMenu(); // not needed
 }
 
+void SearchBox::setFixedMode(bool fixed)
+{
+    this->fixed = fixed;
+}
 void SearchBox::toggleMode()
 {
+    if (fixed) return;
+
     clear(); // clear whatever is there first
     if (mode == Search) setMode(Filter);
     else setMode(Search);
