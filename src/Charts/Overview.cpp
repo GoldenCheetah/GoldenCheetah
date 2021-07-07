@@ -40,7 +40,7 @@ OverviewWindow::OverviewWindow(Context *context, int scope) : GcChartWindow(cont
     main->setSpacing(0);
     main->setContentsMargins(0,0,0,0);
 
-    space = new ChartSpace(context, scope);
+    space = new ChartSpace(context, scope, this);
     main->addWidget(space);
 
     HelpWhatsThis *help = new HelpWhatsThis(space);
@@ -59,7 +59,9 @@ OverviewWindow::OverviewWindow(Context *context, int scope) : GcChartWindow(cont
         connect(this, SIGNAL(dateRangeChanged(DateRange)), space, SLOT(dateRangeChanged(DateRange)));
         connect(context, SIGNAL(filterChanged()), space, SLOT(filterChanged()));
         connect(context, SIGNAL(homeFilterChanged()), space, SLOT(filterChanged()));
+        connect(this, SIGNAL(perspectiveFilterChanged(QString)), space, SLOT(filterChanged()));
     }
+    connect(this, SIGNAL(perspectiveChanged(Perspective*)), space, SLOT(refresh()));
     connect(context, SIGNAL(refreshEnd()), space, SLOT(refresh()));
     connect(context, SIGNAL(estimatesRefreshed()), space, SLOT(refresh()));
 

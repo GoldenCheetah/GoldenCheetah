@@ -53,6 +53,7 @@
 #include "LTMCanvasPicker.h"
 #include "TimeUtils.h"
 #include "Units.h"
+#include "Perspective.h"
 
 #include "LTMTrend.h"
 
@@ -1074,6 +1075,7 @@ CPPlot::plotTests(RideItem *rideitem)
         fs.addFilter(parent->searchBox->isFiltered(), SearchFilterBox::matches(context, parent->searchBox->filter())); // chart settings
         fs.addFilter(context->isfiltered, context->filters);
         fs.addFilter(context->ishomefiltered, context->homeFilters);
+        fs.addFilter(parent->myPerspective->isFiltered(), parent->myPerspective->filterlist(DateRange(startDate,endDate)));
         Specification spec;
         spec.setFilterSet(fs);
         spec.setDateRange(DateRange(startDate, endDate));
@@ -1198,7 +1200,18 @@ CPPlot::plotBests(RideItem *rideItem)
 
     // do we need to get the cache ?
     if (bestsCache == NULL) {
-        bestsCache = new RideFileCache(context, startDate, endDate, isFiltered, files, rangemode, rideItem);
+        // isFiltered and files are filters from CriticalPowerWindow's filter setting
+        // we also need to take into account the perspective filter if on trends so
+        // its easier to just aggregate the filter list here (bit hacky but works ok)
+        // but only if rangemode (aka on trends)
+        if (rangemode) {
+            bestsCache = new RideFileCache(context, startDate, endDate,
+                            isFiltered||parent->myPerspective->isFiltered(),
+                            files + (parent->myPerspective->isFiltered() ? parent->myPerspective->filterlist(DateRange(startDate,endDate)) : QStringList()),
+                            rangemode, rideItem);
+        } else {
+            bestsCache = new RideFileCache(context, startDate, endDate, isFiltered, files, rangemode, rideItem);
+        }
     }
 
     // how much we got ?
@@ -1758,6 +1771,7 @@ CPPlot::plotEfforts()
         FilterSet fs; // apply filters when selecting intervals
         fs.addFilter(context->isfiltered, context->filters);
         fs.addFilter(context->ishomefiltered, context->homeFilters);
+        fs.addFilter(parent->myPerspective->isFiltered(), parent->myPerspective->filterlist(DateRange(startDate,endDate)));
         Specification spec;
         spec.setFilterSet(fs);
         spec.setDateRange(DateRange(startDate, endDate));
@@ -2263,6 +2277,17 @@ CPPlot::exportBests(QString filename)
 
     // and we're done
     f.close();
+}
+
+// perspective filter changed, we need to replot with new bests
+void
+CPPlot::perspectiveFilterChanged()
+{
+    if (bestsCache) {
+        delete bestsCache;
+        bestsCache = NULL;
+    }
+    clearCurves();
 }
 
 // no filter

@@ -100,17 +100,19 @@ private slots:
 };
 
 class LTMSidebar;
-class HomeView : public TabView
+class TrendsView : public TabView
 {
     Q_OBJECT
 
     public:
 
-        HomeView(Context *context, QStackedWidget *controls);
-        ~HomeView();
+        TrendsView(Context *context, QStackedWidget *controls);
+        ~TrendsView();
 
         LTMSidebar *sidebar;
         Perspective *hw;
+
+        int countActivities(Perspective *, DateRange dr);
 
     signals:
         void dateChanged(DateRange);

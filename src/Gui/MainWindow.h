@@ -186,7 +186,7 @@ class MainWindow : public QMainWindow
         void clearFilter();
 
         void selectAthlete();
-        void selectHome();
+        void selectTrends();
         void selectDiary();
         void selectAnalysis();
         void selectTrain();

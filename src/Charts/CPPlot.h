@@ -112,6 +112,7 @@ class CPPlot : public QwtPlot
         void pointHover(QwtPlotCurve *curve, int index);
 
         // filter being applied
+        void perspectiveFilterChanged();
         void clearFilter();
         void setFilter(QStringList);
 

@@ -65,7 +65,7 @@ TabView::TabView(Context *context, int type) :
     stack->insertWidget(0, splitter); // splitter always at index 0
 
     QString heading = tr("Compare Activities and Intervals");
-    if (type == VIEW_HOME) heading = tr("Compare Date Ranges");
+    if (type == VIEW_TRENDS) heading = tr("Compare Date Ranges");
     else if (type == VIEW_TRAIN) heading = tr("Intensity Adjustments and Workout Control");
 
     mainSplitter = new ViewSplitter(Qt::Vertical, heading, this);
@@ -276,7 +276,7 @@ TabView::saveState()
     case VIEW_ANALYSIS: view = "analysis"; break;
     case VIEW_TRAIN: view = "train"; break;
     case VIEW_DIARY: view = "diary"; break;
-    case VIEW_HOME: view = "home"; break;
+    case VIEW_TRENDS: view = "home"; break;
     }
 
     QString filename = context->athlete->home->config().canonicalPath() + "/" + view + "-perspectives.xml";
@@ -314,7 +314,7 @@ TabView::restoreState(bool useDefault)
     case VIEW_ANALYSIS: view = "analysis"; break;
     case VIEW_TRAIN: view = "train"; break;
     case VIEW_DIARY: view = "diary"; break;
-    case VIEW_HOME: view = "home"; break;
+    case VIEW_TRENDS: view = "home"; break;
     }
 
     // restore window state

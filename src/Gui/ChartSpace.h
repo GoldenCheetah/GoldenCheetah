@@ -155,7 +155,7 @@ class ChartSpace : public QWidget
 
     public:
 
-        ChartSpace(Context *context, int scope);
+        ChartSpace(Context *context, int scope, GcWindow *window);
 
         // current state for event processing
         enum { NONE, DRAG, XRESIZE, YRESIZE } state;
@@ -173,6 +173,9 @@ class ChartSpace : public QWidget
         // to get paint device
         QGraphicsView *device() { return view; }
         const QList<ChartSpaceItem*> allItems() { return items; }
+
+        // window we are rendered in
+        GcWindow *window;
 
 
     signals:

@@ -655,7 +655,7 @@ MainWindow::MainWindow(const QDir &home)
 
     viewMenu->addSeparator();
     viewMenu->addAction(tr("Activities"), this, SLOT(selectAnalysis()));
-    viewMenu->addAction(tr("Trends"), this, SLOT(selectHome()));
+    viewMenu->addAction(tr("Trends"), this, SLOT(selectTrends()));
     viewMenu->addAction(tr("Train"), this, SLOT(selectTrain()));
     viewMenu->addSeparator();
     viewMenu->addAction(tr("Import Perspective..."), this, SLOT(importPerspective()));
@@ -874,12 +874,11 @@ MainWindow::setChartMenu()
     // setup to only show charts that are relevant
     // to this view
     switch(currentTab->currentView()) {
-        case 0 : mask = VIEW_HOME; break;
+        case 0 : mask = VIEW_TRENDS; break;
         default:
         case 1 : mask = VIEW_ANALYSIS; break;
         case 2 : mask = VIEW_DIARY; break;
         case 3 : mask = VIEW_TRAIN; break;
-        case 4 : mask = VIEW_INTERVAL; break;
     }
 
     chartMenu->clear();
@@ -905,12 +904,11 @@ MainWindow::setChartMenu(QMenu *menu)
     // setup to only show charts that are relevant
     // to this view
     switch(currentTab->currentView()) {
-        case 0 : mask = VIEW_HOME; break;
+        case 0 : mask = VIEW_TRENDS; break;
         default:
         case 1 : mask = VIEW_ANALYSIS; break;
         case 2 : mask = VIEW_DIARY; break;
         case 3 : mask = VIEW_TRAIN; break;
-        case 4 : mask = VIEW_INTERVAL; break;
     }
 
     menu->clear();
@@ -1319,7 +1317,7 @@ MainWindow::sidebarSelected(int id)
     case 0: selectAthlete(); break;
     case 1: // plan not written yet
             break;
-    case 2: selectHome(); break;
+    case 2: selectTrends(); break;
     case 3: selectAnalysis(); break;
     case 4: // reflect not written yet
             break;
@@ -1369,7 +1367,7 @@ MainWindow::selectDiary()
 }
 
 void
-MainWindow::selectHome()
+MainWindow::selectTrends()
 {
     currentTab->homeView->setPerspectives(perspectiveSelector);
     viewStack->setCurrentIndex(1);
@@ -1626,7 +1624,7 @@ MainWindow::dropEvent(QDropEvent *event)
         QMessageBox::information(this, tr("Chart Import"), QString(tr("Imported %1 metric charts")).arg(imported.count()));
 
         // switch to trend view if we aren't on it
-        selectHome();
+        selectTrends();
 
         // now select what was added
         currentTab->context->notifyPresetSelected(currentTab->context->athlete->presets.count()-1);

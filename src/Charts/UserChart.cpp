@@ -61,11 +61,13 @@ UserChart::UserChart(Context *context, bool rangemode) : GcChartWindow(context),
         connect(this, SIGNAL(dateRangeChanged(DateRange)), SLOT(setDateRange(DateRange)));
         connect(context, SIGNAL(homeFilterChanged()), this, SLOT(refresh()));
         connect(context, SIGNAL(filterChanged()), this, SLOT(refresh()));
+        connect(this, SIGNAL(perspectiveFilterChanged(QString)), this, SLOT(refresh()));
     }
 
     // need to refresh when chart settings change
     connect(settingsTool, SIGNAL(chartConfigChanged()), this, SLOT(chartConfigChanged()));
     connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
+    connect(this, SIGNAL(perspectiveChanged(Perspective*)), this, SLOT(refresh()));
 
     configChanged(0);
 }

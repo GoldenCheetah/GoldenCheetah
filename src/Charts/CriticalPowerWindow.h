@@ -26,6 +26,7 @@
 #include "Season.h"
 #include "RideFile.h"
 #include "SearchFilterBox.h"
+#include "Perspective.h"
 
 #include "qxtstringspinbox.h"
 #include <QtGui>
@@ -124,7 +125,7 @@ class CriticalPowerWindow : public GcChartWindow
         void setVariant(int x);
 
         // filter
-        bool isFiltered() const { return (searchBox->isFiltered() || context->ishomefiltered || context->isfiltered); }
+        bool isFiltered() const { return (searchBox->isFiltered() || myPerspective->isFiltered() || context->ishomefiltered || context->isfiltered); }
         QString filter() const { return searchBox->filter(); }
         void setFilter(QString x) { searchBox->setFilter(x); }
 
@@ -262,6 +263,7 @@ class CriticalPowerWindow : public GcChartWindow
         void resetSeasons();
         void filterChanged();
         void dateRangeChanged(DateRange);
+        void perspectiveFilterChanged();
 
         void useCustomRange(DateRange);
         void useStandardRange();

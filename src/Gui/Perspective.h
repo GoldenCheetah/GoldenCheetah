@@ -46,6 +46,7 @@ class PerspectiveDialog;
 class QTextStream;
 class DataFilter;
 class SearchBox;
+class TrendsView;
 
 class Perspective : public GcWindow
 {
@@ -53,6 +54,7 @@ class Perspective : public GcWindow
     G_OBJECT
 
     friend ::TabView;
+    friend ::TrendsView;
     friend ::ViewParser;
     friend ::PerspectiveDialog;
 
@@ -64,6 +66,10 @@ class Perspective : public GcWindow
         // am I relevant? (for switching when ride selected)
         bool relevant(RideItem*);
 
+        // the items I'd choose (for filtering on trends view)
+        bool isFiltered() const override { return (type_ == VIEW_TRENDS && df != NULL); }
+        QStringList filterlist(DateRange dr);
+
         // get/set the expression (will compile df)
         QString expression() const;
         void setExpression(QString);
@@ -73,6 +79,7 @@ class Perspective : public GcWindow
         bool toFile(QString filename);
         void toXml(QTextStream &out);
 
+        int type() const { return type_; }
         QString title() const { return title_; }
 
         void resetLayout();
@@ -142,7 +149,7 @@ class Perspective : public GcWindow
         bool dropPending;
 
         // what are we?
-        int type;
+        int type_;
         QString view;
 
         // top bar
@@ -175,6 +182,8 @@ class Perspective : public GcWindow
 
         static void translateChartTitles(QList<GcChartWindow*> charts);
 };
+
+Q_DECLARE_METATYPE(Perspective*);
 
 // setup the chart
 class GcWindowDialog : public QDialog

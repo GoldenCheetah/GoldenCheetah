@@ -153,6 +153,7 @@ class HistogramWindow : public GcChartWindow
         void zonesChanged();
         void clearFilter();
         void setFilter(QStringList files);
+        void perspectiveFilterChanged();
 
         // date settings
         void useCustomRange(DateRange);

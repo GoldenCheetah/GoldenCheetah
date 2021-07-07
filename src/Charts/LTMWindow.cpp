@@ -302,6 +302,8 @@ LTMWindow::LTMWindow(Context *context) :
     connect(this, SIGNAL(dateRangeChanged(DateRange)), this, SLOT(dateRangeChanged(DateRange)));
     connect(this, SIGNAL(styleChanged(int)), this, SLOT(styleChanged(int)));
     connect(ltmTool, SIGNAL(filterChanged()), this, SLOT(filterChanged()));
+    connect(this, SIGNAL(perspectiveFilterChanged(QString)), this, SLOT(filterChanged()));
+    connect(this, SIGNAL(perspectiveChanged(Perspective*)), this, SLOT(filterChanged()));
     connect(context, SIGNAL(homeFilterChanged()), this, SLOT(filterChanged()));
     connect(ltmTool->groupBy, SIGNAL(currentIndexChanged(int)), this, SLOT(groupBySelected(int)));
     connect(rGroupBy, SIGNAL(valueChanged(int)), this, SLOT(rGroupBySelected(int)));
@@ -635,6 +637,7 @@ LTMWindow::presetSelected(int index)
         fs.addFilter(context->isfiltered, context->filters);
         fs.addFilter(context->ishomefiltered, context->homeFilters);
         fs.addFilter(ltmTool->isFiltered(), ltmTool->filters());
+        fs.addFilter(myPerspective->isFiltered(), myPerspective->filterlist(myDateRange));
         settings.specification.setFilterSet(fs);
         settings.specification.setDateRange(DateRange(settings.start.date(), settings.end.date()));
 
@@ -1072,6 +1075,7 @@ LTMWindow::filterChanged()
     fs.addFilter(context->isfiltered, context->filters);
     fs.addFilter(context->ishomefiltered, context->homeFilters);
     fs.addFilter(ltmTool->isFiltered(), ltmTool->filters());
+    fs.addFilter(myPerspective->isFiltered(), myPerspective->filterlist(myDateRange));
     settings.specification.setFilterSet(fs);
     settings.specification.setDateRange(DateRange(settings.start.date(), settings.end.date()));
 
@@ -1198,6 +1202,7 @@ LTMWindow::applyClicked()
         fs.addFilter(context->isfiltered, context->filters);
         fs.addFilter(context->ishomefiltered, context->homeFilters);
         fs.addFilter(ltmTool->isFiltered(), ltmTool->filters());
+        fs.addFilter(myPerspective->isFiltered(), myPerspective->filterlist(myDateRange));
         settings.specification.setFilterSet(fs);
         settings.specification.setDateRange(DateRange(settings.start.date(), settings.end.date()));
 

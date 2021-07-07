@@ -142,7 +142,7 @@ class TabView : public QWidget
     protected:
 
         Context *context;
-        int type; // used by windowregistry; e.g VIEW_TRAIN VIEW_ANALYSIS VIEW_DIARY VIEW_HOME
+        int type; // used by windowregistry; e.g VIEW_TRAIN VIEW_ANALYSIS VIEW_DIARY VIEW_TRENDS
                   // we don't care what values are pass through to the GcWindowRegistry to decide
                   // what charts are relevant for this view.
 

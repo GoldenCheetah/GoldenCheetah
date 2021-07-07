@@ -22,7 +22,7 @@ static const int gl_progress_width = ROWHEIGHT/2;
 static const int gl_button_height = ROWHEIGHT*1.5;
 static const int gl_button_width = ROWHEIGHT*5;
 
-AthleteView::AthleteView(Context *context) : ChartSpace(context, OverviewScope::ATHLETES)
+AthleteView::AthleteView(Context *context) : ChartSpace(context, OverviewScope::ATHLETES, NULL)
 {
     HelpWhatsThis *help = new HelpWhatsThis(this);
     this->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::ScopeBar_Athletes));

@@ -191,6 +191,7 @@ void PythonConsole::keyPressEvent(QKeyEvent *e)
             if (pythonHost->chart()) {
                 python->canvas = pythonHost->chart()->canvas;
                 python->chart = pythonHost->chart();
+                python->perspective = myPerspective;
             }
 
             try {
@@ -228,6 +229,7 @@ void PythonConsole::keyPressEvent(QKeyEvent *e)
 
             // clear context
             python->canvas = NULL;
+            python->perspective = NULL;
             python->chart = NULL;
         }
 

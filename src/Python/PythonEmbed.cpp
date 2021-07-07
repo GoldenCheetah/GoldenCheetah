@@ -186,6 +186,8 @@ bool PythonEmbed::pythonInstalled(QString &pybin, QString &pypath, QString PYTHO
 PythonEmbed::PythonEmbed(const bool verbose, const bool interactive) : verbose(verbose), interactive(interactive)
 {
     loaded = false;
+    chart = NULL;
+    perspective = NULL;
     threadid=-1;
     name = QString("GoldenCheetah");
 

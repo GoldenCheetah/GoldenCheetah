@@ -95,6 +95,7 @@ class PythonEmbed {
 
     // context for caller - can be called in a thread
     QMap<long, ScriptContext> contexts;
+    Perspective *perspective;
     PythonChart *chart;
     QWidget *canvas;
 

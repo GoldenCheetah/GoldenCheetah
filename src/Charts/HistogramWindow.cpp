@@ -21,6 +21,7 @@
 #include "Specification.h"
 #include "HelpWhatsThis.h"
 #include "Utils.h"
+#include "Perspective.h"
 
 // predefined deltas for each series
 static const double wattsDelta = 1.0;
@@ -313,6 +314,10 @@ HistogramWindow::HistogramWindow(Context *context, bool rangemode) : GcChartWind
         connect(dateSetting, SIGNAL(useStandardRange()), this, SLOT(useStandardRange()));
         connect(distMetricTree, SIGNAL(itemSelectionChanged()), this, SLOT(treeSelectionChanged()));
         connect(totalMetricTree, SIGNAL(itemSelectionChanged()), this, SLOT(treeSelectionChanged()));
+
+        // perspective filter changed
+        connect(this, SIGNAL(perspectiveFilterChanged(QString)), this, SLOT(perspectiveFilterChanged()));
+        connect(this, SIGNAL(perspectiveChanged(Perspective*)), this, SLOT(perspectiveFilterChanged()));
 
         // replot when background refresh is progressing
         connect(context, SIGNAL(refreshUpdate(QDate)), this, SLOT(refreshUpdate(QDate)));
@@ -1008,7 +1013,11 @@ HistogramWindow::updateChart()
 
                 // plotting a data series, so refresh the ridefilecache
 
-                source = new RideFileCache(context, use.from, use.to, isfiltered, files, rangemode);
+                if (rangemode) {
+                    source = new RideFileCache(context, use.from, use.to, isfiltered||myPerspective->isFiltered(),
+                                                                          files + myPerspective->filterlist(use), rangemode);
+                } else source = new RideFileCache(context, use.from, use.to, isfiltered, files, rangemode);
+
                 cfrom = use.from;
                 cto = use.to;
                 stale = false;
@@ -1043,6 +1052,7 @@ HistogramWindow::updateChart()
                 fs.addFilter(isfiltered, files);
                 fs.addFilter(context->isfiltered, context->filters);
                 fs.addFilter(context->ishomefiltered, context->homeFilters);
+                fs.addFilter(myPerspective->isFiltered(), myPerspective->filterlist(use));
 
                 // setData using the summary metrics -- always reset since filters may
                 // have changed, or perhaps the bin width...
@@ -1083,6 +1093,14 @@ HistogramWindow::updateChart()
                         // of interval selection -- simplifies the setters
                         // and getters, so worth this 'hack'.
     } // if stale
+}
+
+void
+HistogramWindow::perspectiveFilterChanged()
+{
+    stale = true;
+    updateChart();
+    repaint();
 }
 
 void 

@@ -38,6 +38,7 @@ class RTool {
         // the canvas to plot on, it may be null
         // if no canvas is active
         RCanvas *canvas;
+        Perspective *perspective;
         RChart *chart;
 
         Context *context;

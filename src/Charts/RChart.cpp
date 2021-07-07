@@ -384,6 +384,10 @@ RChart::RChart(Context *context, bool ridesummary) : GcChartWindow(context), con
             // refresh when comparing
             connect(context, SIGNAL(compareDateRangesStateChanged(bool)), this, SLOT(runScript()));
             connect(context, SIGNAL(compareDateRangesChanged()), this, SLOT(runScript()));
+
+            // perspective or perspective filter changed
+            connect(this, SIGNAL(perspectiveFilterChanged(QString)), this, SLOT(runScript()));
+            connect(this, SIGNAL(perspectiveChanged(Perspective *)), this, SLOT(runScript()));
         }
 
         // we apply BOTH filters, so update when either change
@@ -537,6 +541,7 @@ RChart::runScript()
         // run it !!
         rtool->context = context;
         rtool->canvas = canvas;
+        rtool->perspective = myPerspective;
         rtool->chart = this;
 
         // set default page size
@@ -601,6 +606,7 @@ RChart::runScript()
         // clear context
         rtool->context = NULL;
         rtool->canvas = NULL;
+        rtool->perspective = NULL;
         rtool->chart = NULL;
     }
 }

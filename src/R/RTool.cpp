@@ -37,6 +37,7 @@
 #include "HrZones.h"
 #include "PaceZones.h"
 #include "GenericChart.h"
+#include "Perspective.h"
 
 // Structure used to register routines has changed in v3.4 of R
 //
@@ -68,6 +69,7 @@ RTool::RTool()
     failed = false;
     starting = true;
     canvas = NULL;
+    perspective = NULL;
     chart = NULL;
     context = NULL;
 
@@ -1227,6 +1229,7 @@ RTool::dfForDateRange(bool all, DateRange range, SEXP filter)
     FilterSet fs;
     fs.addFilter(rtool->context->isfiltered, rtool->context->filters);
     fs.addFilter(rtool->context->ishomefiltered, rtool->context->homeFilters);
+    fs.addFilter(rtool->perspective->isFiltered(), rtool->perspective->filterlist(range));
     specification.setFilterSet(fs);
 
     // did call contain any filters?
@@ -1451,6 +1454,7 @@ RTool::dfForDateRangeIntervals(DateRange range, QStringList types)
     FilterSet fs;
     fs.addFilter(rtool->context->isfiltered, rtool->context->filters);
     fs.addFilter(rtool->context->ishomefiltered, rtool->context->homeFilters);
+    fs.addFilter(rtool->perspective->isFiltered(), rtool->perspective->filterlist(range));
     specification.setFilterSet(fs);
 
     // we need to count intervals that are in range...
@@ -2629,6 +2633,12 @@ RTool::dfForDateRangeMeanmax(bool all, DateRange range, SEXP filter)
     }
     UNPROTECT(1);
 
+    // apply perspective filter if trends view and filtered
+    if (rtool->perspective && rtool->perspective->type() == VIEW_TRENDS && rtool->perspective->isFiltered()) {
+        filt = true;
+        filelist << rtool->perspective->filterlist(DateRange(range));
+    }
+
     // RideFileCache for a date range with our filters (if any)
     RideFileCache cache(rtool->context, range.from, range.to, filt, filelist, true, NULL);
 
@@ -2921,6 +2931,7 @@ RTool::dfForDateRangePeaks(bool all, DateRange range, SEXP filter, QList<RideFil
     FilterSet fs;
     fs.addFilter(rtool->context->isfiltered, rtool->context->filters);
     fs.addFilter(rtool->context->ishomefiltered, rtool->context->homeFilters);
+    fs.addFilter(rtool->perspective->isFiltered(), rtool->perspective->filterlist(range));
     specification.setFilterSet(fs);
 
     // did call contain any filters?

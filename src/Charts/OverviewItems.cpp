@@ -78,6 +78,11 @@ static void setFilter(ChartSpaceItem *item, Specification &spec)
         fs.addFilter(item->parent->context->isfiltered, item->parent->context->filters);
         fs.addFilter(item->parent->context->ishomefiltered, item->parent->context->homeFilters);
 
+        // property gets set after chartspace is initialised, so when we start up its not
+        // available, but comes later...
+        if (item->parent->window->property("perspective").isValid())
+            fs.addFilter(item->parent->window->myPerspective->isFiltered(), item->parent->window->myPerspective->filterlist(item->parent->myDateRange));
+
         // local filter
         fs.addFilter(item->datafilter != "", SearchFilterBox::matches(item->parent->context, item->datafilter));
         spec.setFilterSet(fs);
@@ -466,9 +471,13 @@ KPIOverviewItem::setData(RideItem *item)
 void
 KPIOverviewItem::setDateRange(DateRange dr)
 {
+    Specification spec;
+    spec.setDateRange(dr);
+    setFilter(this, spec);
+
     // calculate the value...
     DataFilter parser(this, parent->context, program);
-    Result res = parser.evaluate(dr, datafilter);
+    Result res = parser.evaluate(spec, dr);
 
     // set to zero for daft values
     value = res.string();

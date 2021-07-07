@@ -28,6 +28,7 @@
 #include "Units.h" // for MILES_PER_KM
 #include "HelpWhatsThis.h"
 #include "GoldenCheetah.h"
+#include "Perspective.h"
 
 #include <QtGui>
 #include <QString>
@@ -50,17 +51,17 @@ TreeMapWindow::TreeMapWindow(Context *context) :
     // the plot
     mainLayout = new QVBoxLayout;
 
-    ltmPlot = new TreeMapPlot(this, context);
-    ltmPlot->setVisible(true);
-    mainLayout->addWidget(ltmPlot);
+    treemapPlot = new TreeMapPlot(this, context);
+    treemapPlot->setVisible(true);
+    mainLayout->addWidget(treemapPlot);
     mainLayout->setSpacing(0);
     mainLayout->setContentsMargins(0,0,0,0);
     setChartLayout(mainLayout);
 
     setIsBlank(false);
 
-    HelpWhatsThis *helpLTMPlot = new HelpWhatsThis(ltmPlot);
-    ltmPlot->setWhatsThis(helpLTMPlot->getWhatsThisText(HelpWhatsThis::ChartTrends_CollectionTreeMap));
+    HelpWhatsThis *helpLTMPlot = new HelpWhatsThis(treemapPlot);
+    treemapPlot->setWhatsThis(helpLTMPlot->getWhatsThisText(HelpWhatsThis::ChartTrends_CollectionTreeMap));
 
     // read metadata.xml
     QString filename = QDir(gcroot).canonicalPath()+"/metadata.xml";
@@ -152,11 +153,13 @@ TreeMapWindow::TreeMapWindow(Context *context) :
     connect(context, SIGNAL(rideDeleted(RideItem*)), this, SLOT(refresh(void)));
     connect(context, SIGNAL(filterChanged()), this, SLOT(refresh(void)));
     connect(context, SIGNAL(homeFilterChanged()), this, SLOT(refresh(void)));
+    connect(this, SIGNAL(perspectiveFilterChanged(QString)), this, SLOT(refresh()));
+    connect(this, SIGNAL(perspectiveChanged(Perspective*)), this, SLOT(refresh()));
 
     connect(context, SIGNAL(configChanged(qint32)), this, SLOT(refresh()));
 
     // user clicked on a cell in the plot
-    connect(ltmPlot, SIGNAL(clicked(QString,QString)), this, SLOT(cellClicked(QString,QString)));
+    connect(treemapPlot, SIGNAL(clicked(QString,QString)), this, SLOT(cellClicked(QString,QString)));
 
     // date settings
     connect(dateSetting, SIGNAL(useCustomRange(DateRange)), this, SLOT(useCustomRange(DateRange)));
@@ -180,7 +183,7 @@ TreeMapWindow::rideSelected()
 void
 TreeMapWindow::refreshPlot()
 {
-    ltmPlot->setData(&settings);
+    treemapPlot->setData(&settings);
 }
 
 void
@@ -247,6 +250,7 @@ TreeMapWindow::refresh()
         FilterSet fs;
         fs.addFilter(context->isfiltered, context->filters);
         fs.addFilter(context->ishomefiltered, context->homeFilters);
+        fs.addFilter(myPerspective->isFiltered(), myPerspective->filterlist(dr));
         settings.specification.setFilterSet(fs);
         settings.specification.setDateRange(dr);
 

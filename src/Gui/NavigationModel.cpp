@@ -30,7 +30,7 @@ NavigationModel::NavigationModel(Tab *tab) : tab(tab), block(false), viewinit(fa
 {
     connect(tab, SIGNAL(viewChanged(int)), this, SLOT(viewChanged(int)));
     connect(tab, SIGNAL(rideItemSelected(RideItem*)), this, SLOT(rideChanged(RideItem*)));
-    connect(static_cast<HomeView*>(tab->view(0))->sidebar, SIGNAL(dateRangeChanged(DateRange)), this, SLOT(dateChanged(DateRange)));
+    connect(static_cast<TrendsView*>(tab->view(0))->sidebar, SIGNAL(dateRangeChanged(DateRange)), this, SLOT(dateChanged(DateRange)));
     connect(tab->context->mainWindow, SIGNAL(backClicked()), this, SLOT(back()));
     connect(tab->context->mainWindow, SIGNAL(forwardClicked()), this, SLOT(forward()));
 
@@ -185,7 +185,7 @@ NavigationModel::action(bool redo, NavigationEvent event)
     case NavigationEvent::DATERANGE:
     {
         dr = redo ? event.after.value<DateRange>() : event.before.value<DateRange>();
-        static_cast<HomeView*>(tab->view(0))->sidebar->selectDateRange(dr);
+        static_cast<TrendsView*>(tab->view(0))->sidebar->selectDateRange(dr);
     }
     break;
     }

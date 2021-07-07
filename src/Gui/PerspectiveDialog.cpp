@@ -273,7 +273,7 @@ PerspectiveDialog::exportPerspectiveClicked()
 
     QString typedesc;
     switch (tabView->type) {
-    case VIEW_HOME: typedesc="Trends"; break;
+    case VIEW_TRENDS: typedesc="Trends"; break;
     case VIEW_ANALYSIS: typedesc="Analysis"; break;
     case VIEW_DIARY: typedesc="Diary"; break;
     case VIEW_TRAIN: typedesc="Train"; break;
@@ -429,8 +429,13 @@ PerspectiveTableWidget::dropEvent(QDropEvent *event)
         // move, but only if source and dest are not the same
         if (perspective != hoverp) {
             chart = perspective->takeChart(chart);
-            if (chart) hoverp->addChart(chart);
-            emit chartMoved(chart);
+            if (chart) {
+                hoverp->addChart(chart);
+                emit chartMoved(chart);
+
+                // let the chart know it has moved perspectives.
+                chart->notifyPerspectiveChanged(hoverp);
+            }
         }
     }
 }

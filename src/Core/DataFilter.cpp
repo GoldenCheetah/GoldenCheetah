@@ -2788,21 +2788,9 @@ Result DataFilter::evaluate(RideItem *item, RideFilePoint *p)
     return res;
 }
 
-Result DataFilter::evaluate(DateRange dr, QString filter)
+Result DataFilter::evaluate(Specification spec, DateRange dr)
 {
-    // if there is no current ride item then there is no data
-    // so it really is ok to baulk at no current ride item here
-    // we must always have a ride since context is used
-    if (context->currentRideItem() == NULL || !treeRoot || DataFiltererrors.count()) return Result(0);
-
-    // reset stack
-    rt.stack = 0;
-
     Result res(0);
-
-    Specification spec;
-    spec.setDateRange(dr);
-    if (filter != "")  spec.addMatches(SearchFilterBox::matches(context, filter));
 
     // if we are a set of functions..
     if (rt.functions.count()) {
@@ -2818,6 +2806,23 @@ Result DataFilter::evaluate(DateRange dr, QString filter)
     }
 
     return res;
+}
+
+Result DataFilter::evaluate(DateRange dr, QString filter)
+{
+    // if there is no current ride item then there is no data
+    // so it really is ok to baulk at no current ride item here
+    // we must always have a ride since context is used
+    if (context->currentRideItem() == NULL || !treeRoot || DataFiltererrors.count()) return Result(0);
+
+    // reset stack
+    rt.stack = 0;
+
+    Specification spec;
+    spec.setDateRange(dr);
+    if (filter != "")  spec.addMatches(SearchFilterBox::matches(context, filter));
+
+    return evaluate(spec, dr);
 }
 
 QStringList DataFilter::check(QString query)

@@ -20,12 +20,14 @@
 #define _GC_GoldenCheetah_h
 class GcWindow;
 class Context;
+class Perspective;
 
 #define G_OBJECT
 //#define G_OBJECT Q_PROPERTY(QString instanceName READ instanceName WRITE setInstanceName)
 //#define setInstanceName(x) setProperty("instanceName", x)
 #define myRideItem property("ride").value<RideItem*>()
 #define myDateRange property("dateRange").value<DateRange>()
+#define myPerspective property("perspective").value<Perspective*>()
 
 #include <QString>
 #include <QMenu>
@@ -45,6 +47,7 @@ class Context;
 
 class RideItem;
 class GcOverlayWidget;
+class Perspective;
 
 
 class GcWindow : public QFrame
@@ -122,6 +125,8 @@ signals:
     void widthFactorChanged(double);
     void colorChanged(QColor);
     void dateRangeChanged(DateRange);
+    void perspectiveFilterChanged(QString);
+    void perspectiveChanged(Perspective*);
     void resizing(GcWindow*);
     void moving(GcWindow*);
     void resized(GcWindow*); // finished resizing
@@ -158,6 +163,9 @@ public:
 
     void setDateRange(DateRange);
     DateRange dateRange() const;
+
+    void notifyPerspectiveFilterChanged(QString x) { emit perspectiveFilterChanged(x); }
+    void notifyPerspectiveChanged(Perspective *x) { emit perspectiveChanged(x); }
 
     void setWidthFactor(double);
     double widthFactor() const;

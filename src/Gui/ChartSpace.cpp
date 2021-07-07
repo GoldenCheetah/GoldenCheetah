@@ -35,8 +35,8 @@ double gl_major;
 static QIcon grayConfig, whiteConfig, accentConfig;
 ChartSpaceItemRegistry *ChartSpaceItemRegistry::_instance;
 
-ChartSpace::ChartSpace(Context *context, int scope) :
-    state(NONE), context(context), scope(scope), group(NULL), fixedZoom(0), _viewY(0),
+ChartSpace::ChartSpace(Context *context, int scope, GcWindow *window) :
+    state(NONE), context(context), scope(scope), window(window), group(NULL), fixedZoom(0), _viewY(0),
     yresizecursor(false), xresizecursor(false), block(false), scrolling(false),
     setscrollbar(false), lasty(-1)
 {

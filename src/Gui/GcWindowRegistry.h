@@ -85,8 +85,7 @@ Q_DECLARE_METATYPE(GcWinID)
 #define VIEW_TRAIN    0x01
 #define VIEW_ANALYSIS 0x02
 #define VIEW_DIARY    0x04
-#define VIEW_HOME     0x08
-#define VIEW_INTERVAL 0x16
+#define VIEW_TRENDS   0x08
 
 class GcChartWindow;
 class GcWindowRegistry {

@@ -102,7 +102,7 @@ class Tab: public QWidget
         // Each of the views
         QStackedWidget *views;
         AnalysisView *analysisView;
-        HomeView *homeView;
+        TrendsView *homeView;
         TrainView *trainView;
         DiaryView *diaryView;
 
