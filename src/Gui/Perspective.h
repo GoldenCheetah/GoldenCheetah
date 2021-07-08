@@ -242,7 +242,7 @@ class AddPerspectiveDialog : public QDialog
     Q_OBJECT
 
     public:
-        AddPerspectiveDialog(Context *context, QString &name, QString &expression, int type, bool edit=false);
+        AddPerspectiveDialog(QWidget *parent, Context *context, QString &name, QString &expression, int type, bool edit=false);
 
     protected:
         QLineEdit *nameEdit;

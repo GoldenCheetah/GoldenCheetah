@@ -1743,8 +1743,8 @@ ImportChartDialog::cancelClicked()
     accept();
 }
 
-AddPerspectiveDialog::AddPerspectiveDialog(Context *context, QString &name, QString &expression, int type, bool edit) :
-    context(context), name(name), expression(expression), type(type)
+AddPerspectiveDialog::AddPerspectiveDialog(QWidget *parent, Context *context, QString &name, QString &expression, int type, bool edit) :
+    QDialog(parent), context(context), name(name), expression(expression), type(type)
 {
     setWindowFlags(windowFlags());
     if (edit) setWindowTitle(tr("Edit Perspective"));
@@ -1780,9 +1780,6 @@ AddPerspectiveDialog::AddPerspectiveDialog(Context *context, QString &name, QStr
 
     connect(add, SIGNAL(clicked()), this, SLOT(addClicked()));
     connect(cancel, SIGNAL(clicked()), this, SLOT(cancelClicked()));
-
-    // want on top
-    raise();
 }
 
 void

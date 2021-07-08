@@ -1478,7 +1478,7 @@ MainWindow::perspectiveSelected(int index)
             {
                 QString name;
                 QString expression;
-                AddPerspectiveDialog *dialog= new AddPerspectiveDialog(currentTab->context, name, expression, current->type);
+                AddPerspectiveDialog *dialog= new AddPerspectiveDialog(this, currentTab->context, name, expression, current->type);
                 int ret= dialog->exec();
                 delete dialog;
                 if (ret == QDialog::Accepted && name != "") {
