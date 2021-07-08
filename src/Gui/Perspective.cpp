@@ -1780,6 +1780,9 @@ AddPerspectiveDialog::AddPerspectiveDialog(Context *context, QString &name, QStr
 
     connect(add, SIGNAL(clicked()), this, SLOT(addClicked()));
     connect(cancel, SIGNAL(clicked()), this, SLOT(cancelClicked()));
+
+    // want on top
+    raise();
 }
 
 void
