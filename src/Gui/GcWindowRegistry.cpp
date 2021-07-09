@@ -38,10 +38,8 @@
 #include "HrPwWindow.h"
 #include "RideEditor.h"
 #include "RideNavigator.h"
-#include "RideSummaryWindow.h"
 #include "RideMapWindow.h"
 #include "ScatterWindow.h"
-#include "SummaryWindow.h"
 #include "MetadataWindow.h"
 #include "TreeMapWindow.h"
 #include "DialWindow.h"
@@ -83,7 +81,7 @@ GcWindowRegistry::initialize()
     //{ VIEW_TRENDS|VIEW_DIARY,  tr("Performance Manager"),GcWindowTypes::PerformanceManager },
     { VIEW_ANALYSIS, tr("User Chart "),GcWindowTypes::UserAnalysis },
     { VIEW_ANALYSIS, tr("Overview"),GcWindowTypes::Overview },
-    { VIEW_ANALYSIS, tr("Summary"),GcWindowTypes::RideSummary },
+    //{ VIEW_ANALYSIS, tr("Summary"),GcWindowTypes::RideSummary }, // DEPRECATED IN V3.6
     { VIEW_ANALYSIS, tr("Data"),GcWindowTypes::MetadataWindow },
     //{ VIEW_ANALYSIS, tr("Summary and Details"),GcWindowTypes::Summary },
     //{ VIEW_ANALYSIS, tr("Editor"),GcWindowTypes::RideEditor },
@@ -103,7 +101,7 @@ GcWindowRegistry::initialize()
     { VIEW_ANALYSIS, tr("Aerolab"),GcWindowTypes::Aerolab },
     { VIEW_DIARY, tr("Calendar"),GcWindowTypes::Diary },
     { VIEW_DIARY, tr("Navigator"), GcWindowTypes::ActivityNavigator },
-    { VIEW_DIARY|VIEW_TRENDS, tr("Summary "), GcWindowTypes::DateRangeSummary },
+    //{ VIEW_DIARY|VIEW_TRENDS, tr("Summary "), GcWindowTypes::DateRangeSummary }, // DEPRECATED IN V3.6
     { VIEW_TRAIN, tr("Telemetry"),GcWindowTypes::DialWindow },
     { VIEW_TRAIN, tr("Workout"),GcWindowTypes::WorkoutPlot },
     { VIEW_TRAIN, tr("Realtime"),GcWindowTypes::RealtimePlot },
@@ -203,12 +201,10 @@ GcWindowRegistry::newGcWindow(GcWinID id, Context *context)
     case GcWindowTypes::PfPv: returning = new PfPvWindow(context); break;
     case GcWindowTypes::HrPw: returning = new HrPwWindow(context); break;
     case GcWindowTypes::RideEditor: returning = NULL; break;
-    case GcWindowTypes::RideSummary: returning = new RideSummaryWindow(context, true); break;
-    case GcWindowTypes::DateRangeSummary: returning = new RideSummaryWindow(context, false); break;
+    case GcWindowTypes::RideSummary: returning = NULL; break;
     case GcWindowTypes::Scatter: returning = new ScatterWindow(context); break;
-    case GcWindowTypes::Summary: returning = NULL; break;
     case GcWindowTypes::TreeMap: returning = new TreeMapWindow(context); break;
-    case GcWindowTypes::WeeklySummary: returning = new SummaryWindow(context); break; // deprecated
+    case GcWindowTypes::WeeklySummary: returning = NULL; break; // deprecated
 #ifdef GC_VIDEO_NONE
     case GcWindowTypes::VideoPlayer: returning = new GcChartWindow(context); break;
 #else
@@ -239,13 +235,10 @@ GcWindowRegistry::newGcWindow(GcWinID id, Context *context)
 #else
     case GcWindowTypes::RouteSegment: returning = new GcChartWindow(context); break;
 #endif
-#if GC_HAVE_OVERVIEW
+    case GcWindowTypes::Summary: // deprecated so now replace with overview
     case GcWindowTypes::Overview: returning = new OverviewWindow(context, ANALYSIS); break;
+    case GcWindowTypes::DateRangeSummary: // deprecated so now replace with overview
     case GcWindowTypes::OverviewTrends: returning = new OverviewWindow(context, TRENDS); break;
-#else
-    case GcWindowTypes::OverviewTrends:
-    case GcWindowTypes::Overview: returning = new GcChartWindow(context); break;
-#endif
     case GcWindowTypes::SeasonPlan: returning = new PlanningWindow(context); break;
     case GcWindowTypes::UserAnalysis: returning = new UserChart(context, false); break;
     case GcWindowTypes::UserTrends: returning = new UserChart(context, true); break;

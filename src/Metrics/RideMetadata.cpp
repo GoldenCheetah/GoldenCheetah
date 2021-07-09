@@ -24,7 +24,6 @@
 #include "RideItem.h"
 #include "Context.h"
 #include "Athlete.h"
-#include "RideSummaryWindow.h"
 #include "Settings.h"
 #include "Colors.h"
 #include "Units.h"
@@ -44,7 +43,7 @@
 #define ourRideItem meta->property("ride").value<RideItem*>()
 
 /*----------------------------------------------------------------------
- * Master widget for Metadata Entry "on" RideSummaryWindow
+ * Master widget for Metadata Entry
  *--------------------------------------------------------------------*/
 RideMetadata::RideMetadata(Context *context, bool singlecolumn) :
     QWidget(context != NULL ? context->mainWindow : NULL), singlecolumn(singlecolumn), context(context)
@@ -775,11 +774,7 @@ FormField::~FormField()
             if (completer)
                 delete completer;
             break;
-        case FIELD_TEXTBOX : if (definition.name == "Summary")
-                                 delete ((RideSummaryWindow *)widget);
-                             else
-                                 delete ((GTextEdit*)widget);
-                             break;
+        case FIELD_TEXTBOX : delete ((GTextEdit*)widget); break;
         case FIELD_INTEGER : delete ((QSpinBox*)widget); break;
         case FIELD_DOUBLE : {
                                 if (!isTime) delete ((QDoubleSpinBox*)widget);

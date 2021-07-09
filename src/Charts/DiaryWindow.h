@@ -35,10 +35,6 @@
 #include <QTableView>
 #include "GcCalendarModel.h"
 
-// ride view
-#include "RideSummaryWindow.h"
-
-
 class DiaryWindow : public GcChartWindow
 {
     Q_OBJECT
