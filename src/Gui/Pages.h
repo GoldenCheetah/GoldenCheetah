@@ -362,7 +362,7 @@ class CustomMetricsPage : public QWidget
         } b4;
 };
 
-class IntervalMetricsPage : public QWidget
+class FavouriteMetricsPage : public QWidget
 {
     Q_OBJECT
     G_OBJECT
@@ -370,7 +370,7 @@ class IntervalMetricsPage : public QWidget
 
     public:
 
-        IntervalMetricsPage(QWidget *parent = NULL);
+        FavouriteMetricsPage(QWidget *parent = NULL);
 
     public slots:
 

@@ -332,7 +332,7 @@ MetricConfig::MetricConfig(QDir home, Context *context) :
     home(home), context(context)
 {
     // the widgets
-    intervalsPage = new IntervalMetricsPage(this);
+    intervalsPage = new FavouriteMetricsPage(this);
     customPage = new CustomMetricsPage(this, context);
 
     setContentsMargins(0,0,0,0);
@@ -342,7 +342,7 @@ MetricConfig::MetricConfig(QDir home, Context *context) :
 
     QTabWidget *tabs = new QTabWidget(this);
     tabs->addTab(customPage, tr("Custom"));
-    tabs->addTab(intervalsPage, tr("Intervals"));
+    tabs->addTab(intervalsPage, tr("Favourites"));
     mainLayout->addWidget(tabs);
 }
 

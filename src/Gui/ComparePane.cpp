@@ -185,8 +185,8 @@ ComparePane::refreshTable()
         // metric summary
         QStringList always;
         always << "workout_time" << "total_distance";
-        QString s = appsettings->value(this, GC_SETTINGS_INTERVAL_METRICS, GC_SETTINGS_INTERVAL_METRICS_DEFAULT).toString();
-        if (s == "") s = GC_SETTINGS_INTERVAL_METRICS_DEFAULT;
+        QString s = appsettings->value(this, GC_SETTINGS_FAVOURITE_METRICS, GC_SETTINGS_FAVOURITE_METRICS_DEFAULT).toString();
+        if (s == "") s = GC_SETTINGS_FAVOURITE_METRICS_DEFAULT;
         QStringList metricColumns = always + s.split(","); // always showm metrics plus user defined summary metrics
         metricColumns.removeDuplicates(); // where user has already added workout_time, total_distance
 
@@ -350,8 +350,8 @@ ComparePane::refreshTable()
         // metric summary
         QStringList always;
         always << "workout_time" << "total_distance";
-        QString s = appsettings->value(this, GC_SETTINGS_SUMMARY_METRICS, GC_SETTINGS_SUMMARY_METRICS_DEFAULT).toString();
-        if (s == "") s = GC_SETTINGS_SUMMARY_METRICS_DEFAULT;
+        QString s = appsettings->value(this, GC_SETTINGS_FAVOURITE_METRICS, GC_SETTINGS_FAVOURITE_METRICS_DEFAULT).toString();
+        if (s == "") s = GC_SETTINGS_FAVOURITE_METRICS_DEFAULT;
         QStringList metricColumns = always + s.split(","); // always showm metrics plus user defined summary metrics
         metricColumns.removeDuplicates(); // where user has already added workout_time, total_distance
 

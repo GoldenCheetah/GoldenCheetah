@@ -387,10 +387,10 @@ LTMPopup::setSummaryHTML(RideItem *item)
 
 
     // user defined
-    QString s = appsettings->value(this, GC_SETTINGS_SUMMARY_METRICS, GC_SETTINGS_SUMMARY_METRICS_DEFAULT).toString();
+    QString s = appsettings->value(this, GC_SETTINGS_FAVOURITE_METRICS, GC_SETTINGS_FAVOURITE_METRICS_DEFAULT).toString();
 
     // in case they were set tand then unset
-    if (s == "") s = GC_SETTINGS_SUMMARY_METRICS_DEFAULT;
+    if (s == "") s = GC_SETTINGS_FAVOURITE_METRICS_DEFAULT;
     QStringList metricColumn = s.split(",");
 
     // foreach of the metrics get the ride value

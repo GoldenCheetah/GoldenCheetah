@@ -1558,7 +1558,7 @@ ColorsPage::saveClicked()
         return 0;
 }
 
-IntervalMetricsPage::IntervalMetricsPage(QWidget *parent) :
+FavouriteMetricsPage::FavouriteMetricsPage(QWidget *parent) :
     QWidget(parent), changed(false)
 {
     HelpWhatsThis *help = new HelpWhatsThis(this);
@@ -1573,7 +1573,7 @@ IntervalMetricsPage::IntervalMetricsPage(QWidget *parent) :
     selectedList = new QListWidget;
     selectedList->setSelectionMode(QAbstractItemView::SingleSelection);
     QVBoxLayout *selectedLayout = new QVBoxLayout;
-    selectedLayout->addWidget(new QLabel(tr("Selected Metrics")));
+    selectedLayout->addWidget(new QLabel(tr("Favourites")));
     selectedLayout->addWidget(selectedList);
 #ifndef Q_OS_MAC
     upButton = new QToolButton(this);
@@ -1625,10 +1625,10 @@ IntervalMetricsPage::IntervalMetricsPage(QWidget *parent) :
     setLayout(hlayout);
 
     QString s;
-    if (appsettings->contains(GC_SETTINGS_INTERVAL_METRICS))
-        s = appsettings->value(this, GC_SETTINGS_INTERVAL_METRICS).toString();
+    if (appsettings->contains(GC_SETTINGS_FAVOURITE_METRICS))
+        s = appsettings->value(this, GC_SETTINGS_FAVOURITE_METRICS).toString();
     else
-        s = GC_SETTINGS_INTERVAL_METRICS_DEFAULT;
+        s = GC_SETTINGS_FAVOURITE_METRICS_DEFAULT;
     QStringList selectedMetrics = s.split(",");
 
     const RideMetricFactory &factory = RideMetricFactory::instance();
@@ -1668,7 +1668,7 @@ IntervalMetricsPage::IntervalMetricsPage(QWidget *parent) :
 }
 
 void
-IntervalMetricsPage::upClicked()
+FavouriteMetricsPage::upClicked()
 {
     assert(!selectedList->selectedItems().isEmpty());
     QListWidgetItem *item = selectedList->selectedItems().first();
@@ -1681,7 +1681,7 @@ IntervalMetricsPage::upClicked()
 }
 
 void
-IntervalMetricsPage::downClicked()
+FavouriteMetricsPage::downClicked()
 {
     assert(!selectedList->selectedItems().isEmpty());
     QListWidgetItem *item = selectedList->selectedItems().first();
@@ -1694,7 +1694,7 @@ IntervalMetricsPage::downClicked()
 }
 
 void
-IntervalMetricsPage::leftClicked()
+FavouriteMetricsPage::leftClicked()
 {
     assert(!selectedList->selectedItems().isEmpty());
     QListWidgetItem *item = selectedList->selectedItems().first();
@@ -1705,7 +1705,7 @@ IntervalMetricsPage::leftClicked()
 }
 
 void
-IntervalMetricsPage::rightClicked()
+FavouriteMetricsPage::rightClicked()
 {
     assert(!availList->selectedItems().isEmpty());
     QListWidgetItem *item = availList->selectedItems().first();
@@ -1715,13 +1715,13 @@ IntervalMetricsPage::rightClicked()
 }
 
 void
-IntervalMetricsPage::availChanged()
+FavouriteMetricsPage::availChanged()
 {
     rightButton->setEnabled(!availList->selectedItems().isEmpty());
 }
 
 void
-IntervalMetricsPage::selectedChanged()
+FavouriteMetricsPage::selectedChanged()
 {
     if (selectedList->selectedItems().isEmpty()) {
         upButton->setEnabled(false);
@@ -1743,14 +1743,14 @@ IntervalMetricsPage::selectedChanged()
 }
 
 qint32
-IntervalMetricsPage::saveClicked()
+FavouriteMetricsPage::saveClicked()
 {
     if (!changed) return 0;
 
     QStringList metrics;
     for (int i = 0; i < selectedList->count(); ++i)
         metrics << selectedList->item(i)->data(Qt::UserRole).toString();
-    appsettings->setValue(GC_SETTINGS_INTERVAL_METRICS, metrics.join(","));
+    appsettings->setValue(GC_SETTINGS_FAVOURITE_METRICS, metrics.join(","));
 
     return 0;
 }

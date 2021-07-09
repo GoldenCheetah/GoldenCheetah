@@ -568,11 +568,7 @@ GSettings::upgradeGlobal() {
     // only the properties still in use are migrated - and not any orphans for previous releases
 
     // NOTE: Migrating values is only required for settings introduced in GC version until v3.3
-
-
-    migrateValue(GC_SETTINGS_SUMMARY_METRICS);
-    migrateValue(GC_SETTINGS_BESTS_METRICS);
-    migrateValue(GC_SETTINGS_INTERVAL_METRICS);
+    migrateValue(GC_SETTINGS_FAVOURITE_METRICS);
     migrateValue(GC_TABBAR);
     migrateValue(GC_WBALFORM);
     migrateValue(GC_BIKESCOREDAYS);
