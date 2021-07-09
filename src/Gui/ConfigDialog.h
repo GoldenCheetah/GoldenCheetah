@@ -104,9 +104,7 @@ class MetricConfig : public QWidget
         QDir home;
         Context *context;
 
-        BestsMetricsPage *bestsPage;
         IntervalMetricsPage *intervalsPage;
-        SummaryMetricsPage *summaryPage;
         CustomMetricsPage *customPage;
 };
 

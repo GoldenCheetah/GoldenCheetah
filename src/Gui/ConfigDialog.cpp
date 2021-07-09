@@ -332,9 +332,7 @@ MetricConfig::MetricConfig(QDir home, Context *context) :
     home(home), context(context)
 {
     // the widgets
-    bestsPage = new BestsMetricsPage(this);
     intervalsPage = new IntervalMetricsPage(this);
-    summaryPage = new SummaryMetricsPage(this);
     customPage = new CustomMetricsPage(this, context);
 
     setContentsMargins(0,0,0,0);
@@ -344,8 +342,6 @@ MetricConfig::MetricConfig(QDir home, Context *context) :
 
     QTabWidget *tabs = new QTabWidget(this);
     tabs->addTab(customPage, tr("Custom"));
-    tabs->addTab(bestsPage, tr("Bests"));
-    tabs->addTab(summaryPage, tr("Summary"));
     tabs->addTab(intervalsPage, tr("Intervals"));
     mainLayout->addWidget(tabs);
 }
@@ -354,8 +350,6 @@ qint32 MetricConfig::saveClicked()
 {
     qint32 state = 0;
 
-    state |= bestsPage->saveClicked();
-    state |= summaryPage->saveClicked();
     state |= intervalsPage->saveClicked();
     state |= customPage->saveClicked();
 
