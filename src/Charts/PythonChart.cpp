@@ -599,6 +599,7 @@ PythonChart::runScript()
         // run it !!
         python->canvas = canvas;
         python->chart = this;
+        python->perspective = myPerspective;
 
         // set default page size
         //python->width = python->height = 0; // sets the canvas to the window size
@@ -662,6 +663,7 @@ PythonChart::runScript()
         // clear context
         python->canvas = NULL;
         python->chart = NULL;
+        python->perspective = NULL;
     }
 }
 
