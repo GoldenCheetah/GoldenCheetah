@@ -300,12 +300,25 @@ struct FitFileReaderState
         return i == 0x00000000 ? NA_VALUE : i;
     }
 
-    fit_float_value read_float32(int *count = NULL) {
+    fit_float_value read_float32(bool is_big_endian, int *count = NULL) {
         float f;
         if (file.read(reinterpret_cast<char*>(&f), 4) != 4)
             throw TruncatedRead();
         if (count)
             (*count) += 4;
+
+        if (is_big_endian) {
+            float f2;
+            char *floatToConvert = ( char* ) & f;
+            char *returnFloat = ( char* ) & f2;
+
+            // swap the bytes into a temporary buffer
+            returnFloat[0] = floatToConvert[3];
+            returnFloat[1] = floatToConvert[2];
+            returnFloat[2] = floatToConvert[1];
+            returnFloat[3] = floatToConvert[0];
+            f = f2;
+        }
 
         return f;
     }
@@ -486,7 +499,15 @@ struct FitFileReaderState
                 case 2: return "Pioneer SGX-CA500";
                 default: return QString("Pioneer %1").arg(prod);
             }
-        } else if (manu == 69) {
+        } else if (manu == 54) {
+            // ifor_powell
+            switch (prod) {
+                case -1:  return "Ifor powell";
+                case 1: return "IpBike";
+                default: return QString("Ifor powell %1").arg(prod);
+            }
+        }
+        else if (manu == 69) {
             // Stages Cycling
             switch (prod) {
                 case -1:  return "Stages Cycling";
@@ -2940,7 +2961,7 @@ struct FitFileReaderState
                         size = 4;
                         if (field.size==size) {
                             value.type = FloatValue;
-                            value.f = read_float32(&count);
+                            value.f = read_float32(def.is_big_endian, &count);
                             if (value.f != value.f) // No NAN
                                 value.f = 0;
                         } else { // Multi-values
