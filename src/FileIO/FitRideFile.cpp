@@ -2942,6 +2942,14 @@ struct FitFileReaderState
                     case 6: size = 4;
                             if (field.size==size) {
                                 value.type = SingleValue; value.v = read_uint32(def.is_big_endian, &count);
+                            } else if (field.size<size) {
+                                // Some device (eg Coros Pace 2) seems to declare uint32 with size 1
+                                value.type = SingleValue;
+                                if (field.size == 1)
+                                    value.v = read_uint8(&count);
+                                if (field.size == 2)
+                                    value.v = read_uint16(def.is_big_endian, &count);
+                                size = field.size;
                             } else { // Multi-values
                                 value.type = ListValue;
                                 value.list.clear();
@@ -2968,7 +2976,7 @@ struct FitFileReaderState
                             value.type = ListValue;
                             value.list.clear();
                             for (int i=0;i<field.size/size;i++) {
-                                value.list.append(read_float32(&count));
+                                value.list.append(read_float32(def.is_big_endian, &count));
                             }
                             size = field.size;
                         }
