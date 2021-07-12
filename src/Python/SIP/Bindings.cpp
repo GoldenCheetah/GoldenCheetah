@@ -584,7 +584,7 @@ Bindings::activities(QString filter) const
         FilterSet fs;
         fs.addFilter(context->isfiltered, context->filters);
         fs.addFilter(context->ishomefiltered, context->homeFilters);
-        fs.addFilter(python->perspective->isFiltered(), python->perspective->filterlist(DateRange(QDate(1,1,1970),QDate(31,12,3000))));
+        if (python->perspective) fs.addFilter(python->perspective->isFiltered(), python->perspective->filterlist(DateRange(QDate(1,1,1970),QDate(31,12,3000))));
 
         // did call contain any filters?
         if (filter != "") {
@@ -1189,7 +1189,7 @@ Bindings::seasonMetrics(bool all, DateRange range, QString filter) const
     FilterSet fs;
     fs.addFilter(context->isfiltered, context->filters);
     fs.addFilter(context->ishomefiltered, context->homeFilters);
-    fs.addFilter(python->perspective->isFiltered(), python->perspective->filterlist(DateRange(QDate(1,1,1970),QDate(31,12,3000))));
+    if (python->perspective) fs.addFilter(python->perspective->isFiltered(), python->perspective->filterlist(DateRange(QDate(1,1,1970),QDate(31,12,3000))));
 
     // did call contain a filter?
     if (filter != "") {
@@ -1383,7 +1383,7 @@ Bindings::seasonIntervals(DateRange range, QString type) const
     FilterSet fs;
     fs.addFilter(context->isfiltered, context->filters);
     fs.addFilter(context->ishomefiltered, context->homeFilters);
-    fs.addFilter(python->perspective->isFiltered(), python->perspective->filterlist(DateRange(QDate(1,1,1970),QDate(31,12,3000))));
+    if (python->perspective) fs.addFilter(python->perspective->isFiltered(), python->perspective->filterlist(DateRange(QDate(1,1,1970),QDate(31,12,3000))));
     specification.setFilterSet(fs);
 
     // we need to count intervals that are in range...
@@ -1821,7 +1821,7 @@ Bindings::metrics(QString metric, bool all, QString filter) const
     FilterSet fs;
     fs.addFilter(context->isfiltered, context->filters);
     fs.addFilter(context->ishomefiltered, context->homeFilters);
-    fs.addFilter(python->perspective->isFiltered(), python->perspective->filterlist(DateRange(QDate(1,1,1970),QDate(31,12,3000))));
+    if (python->perspective) fs.addFilter(python->perspective->isFiltered(), python->perspective->filterlist(DateRange(QDate(1,1,1970),QDate(31,12,3000))));
 
     // did call contain a filter?
     if (filter != "") {
@@ -1988,8 +1988,13 @@ Bindings::seasonMeanmax(bool all, DateRange range, QString filter) const
     if (all) range = DateRange(QDate(1900,01,01), QDate(2100,01,01));
 
     // did call contain any filters?
-    QStringList filelist=python->perspective->filterlist(DateRange(QDate(1,1,1970),QDate(31,12,3000)));
-    bool filt=python->perspective->isFiltered();
+    QStringList filelist;
+    bool filt=false;
+
+    if (python->perspective) {
+        filelist = python->perspective->filterlist(DateRange(QDate(1,1,1970),QDate(31,12,3000)));
+        filt = python->perspective->isFiltered();
+    }
 
     // if not empty write a filter
     if (filter != "") {
@@ -2218,7 +2223,7 @@ Bindings::seasonMeasures(bool all, QString group) const
             fields[i] = PyList_New(size);
 
         unsigned int index = 0;
-        for(int k=0; k < size; k++) {
+        for(unsigned int k=0; k < size; k++) {
 
             // day today
             if (start.addDays(k) >= range.from && start.addDays(k) <= range.to) {
@@ -2407,7 +2412,7 @@ Bindings::seasonPeaks(bool all, DateRange range, QString filter, QList<RideFile:
     FilterSet fs;
     fs.addFilter(context->isfiltered, context->filters);
     fs.addFilter(context->ishomefiltered, context->homeFilters);
-    fs.addFilter(python->perspective->isFiltered(), python->perspective->filterlist(DateRange(QDate(1,1,1970),QDate(31,12,3000))));
+    if (python->perspective) fs.addFilter(python->perspective->isFiltered(), python->perspective->filterlist(DateRange(QDate(1,1,1970),QDate(31,12,3000))));
     specification.setFilterSet(fs);
 
     // did call contain any filters?
