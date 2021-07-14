@@ -308,16 +308,7 @@ struct FitFileReaderState
             (*count) += 4;
 
         if (is_big_endian) {
-            float f2;
-            char *floatToConvert = ( char* ) & f;
-            char *returnFloat = ( char* ) & f2;
-
-            // swap the bytes into a temporary buffer
-            returnFloat[0] = floatToConvert[3];
-            returnFloat[1] = floatToConvert[2];
-            returnFloat[2] = floatToConvert[1];
-            returnFloat[3] = floatToConvert[0];
-            f = f2;
+            f = qbswap(f);
         }
 
         return f;
