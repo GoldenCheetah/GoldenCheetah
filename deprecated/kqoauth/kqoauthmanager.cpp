@@ -73,7 +73,7 @@ QMultiMap<QString, QString> KQOAuthManagerPrivate::createTokensFromResponse(QByt
     QMultiMap<QString, QString> result;
     QString replyString(reply);
 
-    QStringList parameterPairs = replyString.split('&', QString::SkipEmptyParts);
+    QStringList parameterPairs = replyString.split('&', Qt::SkipEmptyParts);
     foreach (const QString &parameterPair, parameterPairs) {
         QStringList parameter = parameterPair.split('=');
         result.insert(parameter.value(0), parameter.value(1));

@@ -270,7 +270,7 @@ WebPageWindow::downloadRequested(QWebEngineDownloadItem *item)
 
     // lets go get it!
     filenames.clear();
-    filenames << item->path();
+    filenames << item->downloadFileName();
 
     // set save
     connect(item, SIGNAL(downloadProgress(qint64, qint64)), this, SLOT(downloadProgress(qint64,qint64)));

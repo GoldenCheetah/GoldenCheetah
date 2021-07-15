@@ -152,7 +152,7 @@ MeasuresCsvImport::getMeasures(MeasuresGroup *measuresGroup, QString &error, QDa
               }
           } else if (!tsExists && h == "date") {
               // parse date (HRV4Training for Android)
-              m.when = QDateTime(QDate::fromString(i, "yyyy-dd-MM"));
+              m.when = QDate::fromString(i, "yyyy-dd-MM").startOfDay();
               if (m.when.date().isValid()) {
                   // skip line if not in date range
                   if (m.when < from || m.when > to) {

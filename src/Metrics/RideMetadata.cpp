@@ -574,7 +574,7 @@ Form::arrange()
     // special case -- a textbox and its the only field on the tab needs no label
     //                 this is how the "Notes" tab is created
     if (fields.count() == 1 && fields[0]->definition.type == FIELD_TEXTBOX) {
-        hlayout->addWidget(fields[0]->widget, 0, 0);
+        hlayout->addWidget(fields[0]->widget, 0, Qt::Alignment());
         ((GTextEdit*)(fields[0]->widget))->setFrameStyle(QFrame::NoFrame);
         ((GTextEdit*)(fields[0]->widget))->viewport()->setAutoFillBackground(false);
         return;
@@ -608,7 +608,7 @@ Form::arrange()
         Qt::Alignment labelalignment = Qt::AlignLeft|Qt::AlignTop;
         Qt::Alignment alignment = Qt::AlignLeft|Qt::AlignTop;
 
-        if (fields[i]->definition.type < FIELD_SHORTTEXT) alignment = 0; // text types
+        if (fields[i]->definition.type < FIELD_SHORTTEXT) alignment = Qt::Alignment(); // text types
 
         here->addWidget(fields[i]->label, y, 0, labelalignment);
 
@@ -1296,7 +1296,7 @@ FormField::metadataChanged()
 unsigned long
 FieldDefinition::fingerprint(QList<FieldDefinition> list)
 {
-    QByteArray ba;
+    QString ba;
 
     foreach(FieldDefinition def, list) {
 
@@ -1307,7 +1307,9 @@ FieldDefinition::fingerprint(QList<FieldDefinition> list)
         ba.append(def.values.join(""));
     }
 
-    return qChecksum(ba, ba.length());
+    // TODO: is this the right encoding?
+    QByteArray baLatin1 = ba.toLatin1();
+    return qChecksum(baLatin1, baLatin1.length());
 }
 
 QCompleter *
@@ -1359,7 +1361,7 @@ FieldDefinition::calendarText(QString value)
 unsigned long
 KeywordDefinition::fingerprint(QList<KeywordDefinition> list)
 {
-    QByteArray ba;
+    QString ba;
 
     foreach(KeywordDefinition def, list) {
 
@@ -1368,7 +1370,9 @@ KeywordDefinition::fingerprint(QList<KeywordDefinition> list)
         ba.append(def.tokens.join(""));
     }
 
-    return qChecksum(ba, ba.length());
+    // TODO: is this the right encoding?
+    QByteArray baLatin1 = ba.toLatin1();
+    return qChecksum(baLatin1, baLatin1.length());
 }
 
 /*----------------------------------------------------------------------
@@ -1548,7 +1552,7 @@ bool MetadataXMLParser::endElement( const QString&, const QString&, const QStrin
         if (field.tab != "" && field.type < 3 && field.name != "Filename" &&
             field.name != "Change History") field.diary = true; // default!
     } else if(qName == "fieldvalues") {
-        field.values = Utils::unprotect(buffer).split(",", QString::SkipEmptyParts);
+        field.values = Utils::unprotect(buffer).split(",", Qt::SkipEmptyParts);
     } else if (qName == "fielddiary") field.diary = (buffer.trimmed().toInt() != 0);
     else if(qName == "defaultfield") adefault.field =  Utils::unprotect(buffer);
     else if(qName == "defaultvalue") adefault.value =  Utils::unprotect(buffer);

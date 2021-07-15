@@ -534,9 +534,9 @@ StravaUploader::requestUploadStrava()
     QUrl url = QUrl( "https://www.strava.com/api/v3/uploads" ); // The V3 API doc said "https://api.strava.com" but it is not working yet
     QNetworkRequest request = QNetworkRequest(url);
 
-    //QString boundary = QString::number(qrand() * (90000000000) / (RAND_MAX + 1) + 10000000000, 16);
-    QString boundary = QVariant(qrand()).toString() +
-        QVariant(qrand()).toString() + QVariant(qrand()).toString();
+    //QString boundary = QString::number(QRandomGenerator::global()->generate() * (90000000000) / (RAND_MAX + 1) + 10000000000, 16);
+    QString boundary = QVariant(QRandomGenerator::global()->generate()).toString() +
+        QVariant(QRandomGenerator::global()->generate()).toString() + QVariant(QRandomGenerator::global()->generate()).toString();
 
     QByteArray file = zCompress(reader.toByteArray(
                                     context, ride->ride(),
@@ -996,7 +996,7 @@ TodaysPlanUploader::requestUploadTodaysPlan()
 
     QNetworkRequest request(url);
 
-    QString boundary = QVariant(qrand()).toString()+QVariant(qrand()).toString()+QVariant(qrand()).toString();
+    QString boundary = QVariant(QRandomGenerator::global()->generate()).toString()+QVariant(QRandomGenerator::global()->generate()).toString()+QVariant(QRandomGenerator::global()->generate()).toString();
 
     //TcxFileReader reader;
     JsonFileReader reader;
@@ -1146,7 +1146,7 @@ CyclingAnalyticsUploader::requestUploadCyclingAnalytics()
     QUrl url = QUrl( "https://www.cyclinganalytics.com/api/me/upload" );
     QNetworkRequest request = QNetworkRequest(url);
 
-    QString boundary = QVariant(qrand()).toString()+QVariant(qrand()).toString()+QVariant(qrand()).toString();
+    QString boundary = QVariant(QRandomGenerator::global()->generate()).toString()+QVariant(QRandomGenerator::global()->generate()).toString()+QVariant(QRandomGenerator::global()->generate()).toString();
 
     TcxFileReader reader;
     QByteArray file = reader.toByteArray(context, ride->ride(), parent->altitudeChk->isChecked(), parent->powerChk->isChecked(), parent->heartrateChk->isChecked(), parent->cadenceChk->isChecked());
@@ -1303,7 +1303,7 @@ SelfLoopsUploader::requestUploadSelfLoops()
     QUrl url = QUrl( "https://www.selfloops.com/restapi/public/activities/upload.json" );
     QNetworkRequest request = QNetworkRequest(url);
 
-    QString boundary = QVariant(qrand()).toString()+QVariant(qrand()).toString()+QVariant(qrand()).toString();
+    QString boundary = QVariant(QRandomGenerator::global()->generate()).toString()+QVariant(QRandomGenerator::global()->generate()).toString()+QVariant(QRandomGenerator::global()->generate()).toString();
 
     // The TCX file have to be gzipped
     TcxFileReader reader;
@@ -1591,7 +1591,7 @@ GarminUploader::requestUploadGarmin()
     QUrl url = QUrl( "http://connect.garmin.com/proxy/upload-service-1.1/json/upload/.tcx" );
     QNetworkRequest request = QNetworkRequest(url);
 
-    QString boundary = QVariant(qrand()).toString()+QVariant(qrand()).toString()+QVariant(qrand()).toString();
+    QString boundary = QVariant(QRandomGenerator::global()->generate()).toString()+QVariant(QRandomGenerator::global()->generate()).toString()+QVariant(QRandomGenerator::global()->generate()).toString();
 
     // The TCX file have to be gzipped
     TcxFileReader reader;

@@ -66,7 +66,7 @@ void BarChart::populate()
     {
         QVector<double> values;
         for ( int j = 0; j < numBars; j++ )
-            values += ( 2 + qrand() % 8 );
+            values += ( 2 + QRandomGenerator::global()->generate() % 8 );
 
         series += values;
     }

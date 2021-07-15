@@ -337,7 +337,7 @@ BT40Device::serviceStateChanged(QLowEnergyService::ServiceState s)
                             inride_BTDeviceInfoToSystemID(deviceInfo(), systemID);
 
                             qDebug() << "Starting indication for char with UUID: " << characteristic.uuid().toString() << " Kurt Inride Control";
-                            qDebug() << "InRide SystemID:" << hex << systemID[0] << systemID[1] << systemID[2] << systemID[3] << systemID[4] << systemID[5];
+                            qDebug() << "InRide SystemID:" << Qt::hex << systemID[0] << systemID[1] << systemID[2] << systemID[3] << systemID[4] << systemID[5];
 
                             loadService = service;
                             loadCharacteristic = characteristic;
@@ -814,7 +814,7 @@ BT40Device::setMode(int m)
                 inride_BTDeviceInfoToSystemID(deviceInfo(), systemID);
 
                 qDebug() << tr("Kurt_InRide: STARTING CALIBRATION:") << 
-                    hex <<
+                    Qt::hex <<
                     systemID[0] << systemID[1] << systemID[2] <<
                     systemID[3] << systemID[4] << systemID[5];
 
@@ -847,7 +847,7 @@ BT40Device::setMode(int m)
                 inride_BTDeviceInfoToSystemID(deviceInfo(), systemID);
 
                 qDebug() << tr("Kurt_InRide: STOPPING CALIBRATION, systemID:") <<
-                    hex <<
+                    Qt::hex <<
                     systemID[0] << systemID[1] << systemID[2] <<
                     systemID[3] << systemID[4] << systemID[5];
 

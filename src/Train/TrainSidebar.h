@@ -298,10 +298,10 @@ class TrainSidebar : public GcWindow
         long total_msecs,
              lap_msecs,
              load_msecs;
-        QTime load_period;
+        QElapsedTimer load_period;
 
         uint session_elapsed_msec, lap_elapsed_msec, secs_to_start;
-        QTime session_time, lap_time;
+        QElapsedTimer session_time, lap_time;
 
         QTimer      *gui_timer,     // refresh the gui
                     *load_timer,    // change the load on the device

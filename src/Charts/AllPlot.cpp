@@ -2849,7 +2849,7 @@ AllPlot::setYMax()
         // axisHeight will be zero before first show, so only do this if its non-zero!
         if (axisHeight) {
             QFontMetrics labelWidthMetric = QFontMetrics( QwtPlot::axisFont(yLeft) );
-            int labelWidth = labelWidthMetric.width( (maxY > 1000) ? " 8,888 " : " 888 " );
+            int labelWidth = labelWidthMetric.horizontalAdvance( (maxY > 1000) ? " 8,888 " : " 888 " );
 
             if (axisHeight > labelWidth*2) //Avoid insane iterations
                 while( ( qCeil(maxY / step) * labelWidth ) > axisHeight ) nextStep(step);
@@ -2916,7 +2916,7 @@ AllPlot::setYMax()
 
         if (axisHeight) {
             QFontMetrics labelWidthMetric = QFontMetrics( QwtPlot::axisFont(yLeft) );
-            int labelWidth = labelWidthMetric.width( "888 " );
+            int labelWidth = labelWidthMetric.horizontalAdvance( "888 " );
             ymax *= 1.05;
 
             if (axisHeight>labelWidth*2) //Avoid insane iterations
@@ -3030,7 +3030,7 @@ AllPlot::setYMax()
 
         if (axisHeight) {
             QFontMetrics labelWidthMetric = QFontMetrics( QwtPlot::axisFont(yRight) );
-            int labelWidth = labelWidthMetric.width( "888 " );
+            int labelWidth = labelWidthMetric.horizontalAdvance( "888 " );
             ymax *= 1.05;
 
             if (axisHeight>labelWidth*2) //Avoid insane iterations
@@ -3083,7 +3083,7 @@ AllPlot::setYMax()
 
         if (axisHeight) {
             QFontMetrics labelWidthMetric = QFontMetrics( QwtPlot::axisFont(yLeft) );
-            int labelWidth = labelWidthMetric.width( (ymax > 1000) ? " 8888 " : " 888 " );
+            int labelWidth = labelWidthMetric.horizontalAdvance( (ymax > 1000) ? " 8888 " : " 888 " );
 
             if (axisHeight>labelWidth*2) //Avoid insane iterations
                 while( ( qCeil( (ymax - ymin ) / step) * labelWidth ) > axisHeight ) nextStep(step);

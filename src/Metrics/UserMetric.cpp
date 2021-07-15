@@ -204,7 +204,7 @@ UserMetric::isRelevantForRide(const RideItem *item) const
 void
 UserMetric::compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &pc)
 {
-    QTime timer;
+    QElapsedTimer timer;
     timer.start();
 
     //qDebug()<<"CODE";

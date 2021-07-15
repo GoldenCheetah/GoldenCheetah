@@ -206,7 +206,7 @@ void CpuStat::lookUp( double values[NValues] ) const
             if ( line.startsWith( "cpu " ) )
             {
                 const QStringList valueList =
-                    line.split( " ",  QString::SkipEmptyParts );
+                    line.split( " ",  Qt::SkipEmptyParts );
                 if ( valueList.count() >= 5 )
                 {
                     for ( int i = 0; i < NValues; i++ )

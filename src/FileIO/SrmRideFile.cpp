@@ -217,7 +217,7 @@ RideFile *SrmFileReader::openRideFile(QFile &file, QStringList &errorStrings, QL
         // it seems safe to always treat this number as signed.
         qint32 hsecsincemidn = readLong(in);
         blockhdrs[i].chunkcnt = version < 9 ? readShort(in) : readLong(in);
-        blockhdrs[i].dt = QDateTime(date);
+        blockhdrs[i].dt = date.startOfDay();
         blockhdrs[i].dt = blockhdrs[i].dt.addMSecs(hsecsincemidn * 10);
         blockchunkcnt += blockhdrs[i].chunkcnt;
     }
@@ -249,7 +249,7 @@ RideFile *SrmFileReader::openRideFile(QFile &file, QStringList &errorStrings, QL
     if( blockcnt < 1 ){
         blockcnt = 0;
         blockhdrs[0].chunkcnt = datacnt;
-        blockhdrs[0].dt = QDateTime(date);
+        blockhdrs[0].dt = date.startOfDay();
     }
 
     // datacnt might overflow at 64k - so, use sum from blocks, instead

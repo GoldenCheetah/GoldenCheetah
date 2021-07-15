@@ -129,11 +129,11 @@ Plot::Plot( QWidget *parent, const QwtInterval &interval ):
     for ( int i = 0; i < numEllipses; i++ )
     {
         const double x = interval.minValue() +
-            qrand() % qRound( interval.width() );
+            QRandomGenerator::global()->generate() % qRound( interval.width() );
         const double y = interval.minValue() +
-            qrand() % qRound( interval.width() );
+            QRandomGenerator::global()->generate() % qRound( interval.width() );
         const double r = interval.minValue() +
-            qrand() % qRound( interval.width() / 6 );
+            QRandomGenerator::global()->generate() % qRound( interval.width() / 6 );
 
         const QRectF area( x - r, y - r , 2 * r, 2 * r );
 

@@ -6684,7 +6684,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
                 // CPU and 'hang' for badly written code..
                 static int maxwhile = 1000000;
                 int count=0;
-                QTime timer;
+                QElapsedTimer timer;
                 timer.start();
 
                 Result returning(0);

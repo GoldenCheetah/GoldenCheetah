@@ -96,7 +96,7 @@ LogTimeScaleDraw::drawLabel(QPainter *painter, double value) const
     const QwtMatrix m = labelTransformation( pos, labelSize).toAffine();
 
     painter->save();
-    painter->setMatrix(m, true);
+    painter->setWorldTransform(QTransform(m), true);
 
     lbl.draw (painter, QRect(QPoint(0, 0), labelSize.toSize()) );
     painter->restore();

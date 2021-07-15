@@ -47,7 +47,7 @@ class FilterSet
 
         // create one with a set
         FilterSet(bool on, QStringList list) {
-            if (on) filters_ << list.toSet();
+            if (on) filters_ << QSet<QString>(list.begin(), list.end());
         }
 
         // create an empty set
@@ -55,7 +55,7 @@ class FilterSet
 
         // add a new filter
         void addFilter(bool on, QStringList list) {
-            if (on) filters_ << list.toSet();
+            if (on) filters_ << QSet<QString>(list.begin(), list.end());
         }
 
         // clear the filter set

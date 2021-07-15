@@ -49,6 +49,15 @@ public:
        : position(OnlyOneSegment), selectedPosition(NotAdjacent) { }
     QtStyleOptionSegmentControlSegment(const QtStyleOptionSegmentControlSegment &other)
         : QStyleOption(Version, Type) { *this = other; }
+    QtStyleOptionSegmentControlSegment& operator=(const QtStyleOptionSegmentControlSegment &other) {
+        QStyleOption::operator=(other);
+        text = other.text;
+        icon = other.icon;
+        iconSize = other.iconSize;
+        position = other.position;
+        selectedPosition = other.selectedPosition;
+        return *this;
+    }
 
 protected:
     QtStyleOptionSegmentControlSegment(int version);
@@ -114,7 +123,7 @@ static void drawSegmentControlSegmentSegment(const QStyleOption *option, QPainte
             QSize buttonSize = widget->rect().size();
             QString key = QString("qt_segment %0 %1 %2").arg(option->state).arg(buttonSize.width()).arg(buttonSize.height());
 
-            if (!QPixmapCache::find(key, pm)) {
+            if (!QPixmapCache::find(key, &pm)) {
                 pm = QPixmap(buttonSize);
                 pm.fill(Qt::transparent);
                 QPainter pmPainter(&pm);

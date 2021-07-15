@@ -89,11 +89,11 @@ QSize RandomPlot::sizeHint() const
 
 void RandomPlot::appendPoint()
 {
-    double x = qrand() % c_rangeMax;
-    x += ( qrand() % 100 ) / 100;
+    double x = QRandomGenerator::global()->generate() % c_rangeMax;
+    x += ( QRandomGenerator::global()->generate() % 100 ) / 100;
 
-    double y = qrand() % c_rangeMax;
-    y += ( qrand() % 100 ) / 100;
+    double y = QRandomGenerator::global()->generate() % c_rangeMax;
+    y += ( QRandomGenerator::global()->generate() % 100 ) / 100;
 
     IncrementalPlot::appendPoint( QPointF( x, y ) );
 

@@ -23,7 +23,7 @@ class QWT_EXPORT QwtPlotSeriesItem: public QwtPlotItem,
     public virtual QwtAbstractSeriesStore
 {
 public:
-    explicit QwtPlotSeriesItem( const QString &title = QString::null );
+    explicit QwtPlotSeriesItem( const QString &title = QString() );
     explicit QwtPlotSeriesItem( const QwtText &title );
 
     virtual ~QwtPlotSeriesItem();

@@ -64,7 +64,7 @@ public:
         LegendColor
     };
 
-    explicit QwtPlotShapeItem( const QString &title = QString::null );
+    explicit QwtPlotShapeItem( const QString &title = QString() );
     explicit QwtPlotShapeItem( const QwtText &title );
 
     virtual ~QwtPlotShapeItem();

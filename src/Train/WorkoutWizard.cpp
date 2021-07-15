@@ -375,22 +375,22 @@ void AbsWattagePage::SaveWorkout()
     QVector<QPair<QString, QString> > rawData;
     we->rawData(rawData);
     double currentX = 0;
-    stream << "[COURSE DATA]" << endl;
+    stream << "[COURSE DATA]" << Qt::endl;
     QPair<QString, QString > p;
     foreach (p,rawData)
     {
         if(p.first == "LAP")
         {
-            stream << currentX << " LAP" << endl;
+            stream << currentX << " LAP" << Qt::endl;
         }
         else
         {
-            stream << currentX << " " << p.second << endl;
+            stream << currentX << " " << p.second << Qt::endl;
             currentX += p.first.toDouble();
-            stream << currentX << " " << p.second << endl;
+            stream << currentX << " " << p.second << Qt::endl;
         }
     }
-    stream << "[END COURSE DATA]" << endl;
+    stream << "[END COURSE DATA]" << Qt::endl;
     f.close();
 
     // import them via the workoutimporter
@@ -514,22 +514,22 @@ void RelWattagePage::SaveWorkout()
     QVector<QPair<QString, QString> > rawData;
     we->rawData(rawData);
     double currentX = 0;
-    stream << "[COURSE DATA]" << endl;
+    stream << "[COURSE DATA]" << Qt::endl;
     QPair<QString, QString > p;
     foreach (p,rawData)
     {
         if(p.first == "LAP")
         {
-            stream << currentX << " LAP" << endl;
+            stream << currentX << " LAP" << Qt::endl;
         }
         else
         {
-            stream << currentX << " " << p.second << endl;
+            stream << currentX << " " << p.second << Qt::endl;
             currentX += p.first.toDouble();
-            stream << currentX << " " << p.second << endl;
+            stream << currentX << " " << p.second << Qt::endl;
         }
     }
-    stream << "[END COURSE DATA]" << endl;
+    stream << "[END COURSE DATA]" << Qt::endl;
     f.close();
 
     // import them via the workoutimporter
@@ -613,22 +613,22 @@ void GradientPage::SaveWorkout()
     SaveWorkoutHeader(stream,f.fileName(),QString("golden cheetah"),QString("DISTANCE GRADE WIND"));
     QVector<QPair<QString, QString> > rawData;
     we->rawData(rawData);
-    stream << "[COURSE DATA]" << endl;
+    stream << "[COURSE DATA]" << Qt::endl;
     QPair<QString, QString > p;
     foreach (p,rawData)
     {
         if(p.first == "LAP")
         {
-            stream << "LAP" << endl;
+            stream << "LAP" << Qt::endl;
         }
         else
         {
             // header indicates metric units, so convert accordingly
             double currentX = p.first.toDouble()*(metricUnits ? 1.0 : KM_PER_MILE);
-            stream << currentX << " " << p.second << " 0" << endl;
+            stream << currentX << " " << p.second << " 0" << Qt::endl;
         }
     }
-    stream << "[END COURSE DATA]" << endl;
+    stream << "[END COURSE DATA]" << Qt::endl;
     f.close();
 
     // import them via the workoutimporter
@@ -768,17 +768,17 @@ void ImportPage::SaveWorkout()
     QTextStream stream(&f);
     // create the header
     SaveWorkoutHeader(stream,f.fileName(),QString("golden cheetah"),QString("DISTANCE GRADE WIND"));
-    stream << "[COURSE DATA]" << endl;
+    stream << "[COURSE DATA]" << Qt::endl;
     QPair<double,double> p;
     double prevDistance = 0;
     foreach (p,rideProfile)
     {
         // header indicates metric units, so convert accordingly
         double curDistance = p.first * (metricUnits ? 1.0 : KM_PER_MILE);
-        stream << curDistance - prevDistance << " " << p.second <<" 0" << endl;
+        stream << curDistance - prevDistance << " " << p.second <<" 0" << Qt::endl;
         prevDistance = curDistance;
     }
-    stream << "[END COURSE DATA]" << endl;
+    stream << "[END COURSE DATA]" << Qt::endl;
     f.close();
 
     // import them via the workoutimporter

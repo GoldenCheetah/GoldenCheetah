@@ -48,11 +48,11 @@ public:
     {
         QVector<QPointF> points;
 
-        double y = qrand() % 1000;
+        double y = QRandomGenerator::global()->generate() % 1000;
 
         for ( double x = 0.0; x <= 1000.0; x += 100.0 )
         {
-            double off = qrand() % 200 - 100;
+            double off = QRandomGenerator::global()->generate() % 200 - 100;
             if ( y + off > 980.0 || y + off < 20.0 )
                 off = -off;
 

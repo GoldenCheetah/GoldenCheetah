@@ -680,11 +680,11 @@ QtSoapType::Type QtSoapType::nameToType(const QString &name)
 }
 
 /*!
-    Returns QString::null.
+    Returns QString().
 */
 QString QtSoapType::toString() const
 {
-    return QString::null;
+    return QString();
 }
 
 /*!

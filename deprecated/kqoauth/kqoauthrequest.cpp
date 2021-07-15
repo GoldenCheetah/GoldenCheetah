@@ -217,7 +217,7 @@ QString KQOAuthRequestPrivate::oauthNonce() const {
         return oauthNonce_;
     }
 
-    return QString::number(qrand());
+    return QString::number(QRandomGenerator::global()->generate());
 }
 
 bool KQOAuthRequestPrivate::validateRequest() const {

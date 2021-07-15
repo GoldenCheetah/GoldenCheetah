@@ -148,7 +148,7 @@ QString QwtDateScaleDraw::dateFormat(
         return d_data->dateFormats[ intervalType ];
     }
 
-    return QString::null;
+    return QString();
 }
 
 /*!

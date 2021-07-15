@@ -29,7 +29,7 @@ static double wave( double x )
 
 static double noise( double )
 {
-    return 2.0 * ( qrand() / ( static_cast<double>( RAND_MAX ) + 1 ) ) - 1.0;
+    return 2.0 * ( QRandomGenerator::global()->generate() / ( static_cast<double>( RAND_MAX ) + 1 ) ) - 1.0;
 }
 
 #ifndef QWT_NO_OPENGL
