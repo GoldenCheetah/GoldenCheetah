@@ -469,7 +469,7 @@ MainWindow::MainWindow(const QDir &home)
      * Application Menus
      *--------------------------------------------------------------------*/
 #ifdef WIN32
-    QString menuColorString = (GCColor::isFlat() ? GColor(CCHROME).name() : "rgba(225,225,225)");
+    QString menuColorString = (GCColor::isFlat() ? GColor(CTOOLBAR).name() : "rgba(225,225,225)");
     menuBar()->setStyleSheet(QString("QMenuBar { color: black; background: %1; }"
                              "QMenuBar::item { color: black; background: %1; }").arg(menuColorString));
     menuBar()->setContentsMargins(0,0,0,0);
@@ -2458,24 +2458,24 @@ MainWindow::configChanged(qint32)
 #if defined (WIN32) || defined (Q_OS_LINUX)
     // Windows and Linux menu bar should match chrome
     QColor textCol(Qt::black);
-    if (GCColor::luminance(GColor(CCHROME)) < 127)  textCol = QColor(Qt::white);
-    QString menuColorString = (GCColor::isFlat() ? GColor(CCHROME).name() : "rgba(225,225,225)");
+    if (GCColor::luminance(GColor(CTOOLBAR)) < 127)  textCol = QColor(Qt::white);
+    QString menuColorString = (GCColor::isFlat() ? GColor(CTOOLBAR).name() : "rgba(225,225,225)");
     menuBar()->setStyleSheet(QString("QMenuBar { color: %1; background: %2; }"
                              "QMenuBar::item { color: %1; background: %2; }")
                              .arg(textCol.name()).arg(menuColorString));
     // search filter box match chrome color
-    searchBox->setStyleSheet(QString("QLineEdit { background: %1; color: %2; }").arg(GColor(CCHROME).name()).arg(GCColor::invertColor(GColor(CCHROME)).name()));
+    searchBox->setStyleSheet(QString("QLineEdit { background: %1; color: %2; }").arg(GColor(CTOOLBAR).name()).arg(GCColor::invertColor(GColor(CTOOLBAR)).name()));
 
     // perspective selector mimics sidebar colors
     QColor selected;
-    if (GCColor::invertColor(GColor(CCHROME)).name() == Qt::white) selected = QColor(Qt::lightGray);
+    if (GCColor::invertColor(GColor(CTOOLBAR)).name() == Qt::white) selected = QColor(Qt::lightGray);
     else selected = QColor(Qt::darkGray);
     perspectiveSelector->setStyleSheet(QString("QComboBox { background: %1; color: %2; }"
                                                "QComboBox::item { background: %1; color: %2; }"
-                                               "QComboBox::item::selected { background: %3; color: %1; }").arg(GColor(CCHROME).name()).arg(GCColor::invertColor(GColor(CCHROME)).name()).arg(selected.name()));
+                                               "QComboBox::item::selected { background: %3; color: %1; }").arg(GColor(CTOOLBAR).name()).arg(GCColor::invertColor(GColor(CTOOLBAR)).name()).arg(selected.name()));
 
 #endif
-    QString buttonstyle = QString("QPushButton { border: none; background-color: %1; }").arg(CCHROME);
+    QString buttonstyle = QString("QPushButton { border: none; background-color: %1; }").arg(CTOOLBAR);
     back->setStyleSheet(buttonstyle);
     forward->setStyleSheet(buttonstyle);
 
@@ -2485,8 +2485,8 @@ MainWindow::configChanged(qint32)
     tabbar->setShape(QTabBar::RoundedSouth);
     tabbar->setDrawBase(false);
 
-    tabbarPalette.setBrush(backgroundRole(), GColor(CCHROME));
-    tabbarPalette.setBrush(foregroundRole(), GCColor::invertColor(GColor(CCHROME)));
+    tabbarPalette.setBrush(backgroundRole(), GColor(CTOOLBAR));
+    tabbarPalette.setBrush(foregroundRole(), GCColor::invertColor(GColor(CTOOLBAR)));
     tabbar->setPalette(tabbarPalette);
     athleteView->setPalette(tabbarPalette);
 

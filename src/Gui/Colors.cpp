@@ -226,7 +226,7 @@ void GCColor::setupColors()
 #ifdef Q_OS_MAC
         { tr("Toolbar and Sidebar"), "CCHROME", QColor(213,213,213) },
 #else
-        { tr("Toolbar and Sidebar"), "CCHROME", QColor(0xec,0xec,0xec) },
+        { tr("Sidebar background"), "CCHROME", QColor(0xec,0xec,0xec) },
 #endif
 #endif
         { tr("Overview Background"), "COVERVIEWBACKGROUND", QColor(0,0,0) },
@@ -928,6 +928,7 @@ GCColor::applyTheme(int index)
             break;
 
         case CCHROME:
+        case CTOOLBAR: // we always keep them the same, but user can make different
             color = theme.colors[1];
             break;
 

@@ -152,7 +152,7 @@ ChartBar::configChanged(qint32)
     scrollArea->setFixedHeight(height);
     buttonBar->setFixedHeight(height);
 
-    QColor col=GColor(CCHROME);
+    QColor col=GColor(CTOOLBAR);
     scrollArea->setStyleSheet(QString("QScrollArea { background: rgb(%1,%2,%3); }").arg(col.red()).arg(col.green()).arg(col.blue()));
 
     foreach(ChartBarItem *b, buttons) {
@@ -386,7 +386,7 @@ ChartBar::paintBackground(QPaintEvent *)
     painter.save();
     QRect all(0,0,width(),height());
 
-    painter.fillRect(all, GColor(CCHROME));
+    painter.fillRect(all, GColor(CTOOLBAR));
 
     painter.restore();
 }
@@ -409,14 +409,10 @@ ButtonBar::paintBackground(QPaintEvent *)
     painter.save();
     QRect all(0,0,width(),height());
 
-    // linear gradients
-    QLinearGradient active = GCColor::linearGradient(23*dpiYFactor, true);
-    QLinearGradient inactive = GCColor::linearGradient(23*dpiYFactor, false);
-
     // fill with a linear gradient
     painter.setPen(Qt::NoPen);
     painter.fillRect(all, QColor(Qt::white));
-    painter.fillRect(all, isActiveWindow() ? active : inactive);
+    painter.fillRect(all, GColor(CTOOLBAR));
 
     if (!GCColor::isFlat()) {
         QPen black(QColor(100,100,100,200));
@@ -457,7 +453,7 @@ ChartBarItem::paintEvent(QPaintEvent *)
     painter.setPen(Qt::NoPen);
 
     // background - chrome or slected colour
-    QBrush brush(GColor(CCHROME));
+    QBrush brush(GColor(CTOOLBAR));
     if (underMouse() && !checked) brush = QBrush(Qt::darkGray);
     if (checked) brush = color;
     painter.fillRect(body, brush);
