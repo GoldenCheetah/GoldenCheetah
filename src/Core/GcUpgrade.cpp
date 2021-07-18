@@ -376,6 +376,16 @@ GcUpgrade::upgrade(const QDir &home)
         CloudServiceFactory::instance().upgrade(home.dirName());
     }
 
+    //----------------------------------------------------------------------
+    // 3.6 upgrade processing
+    //----------------------------------------------------------------------
+    if (last < VERSION36_BUILD) {
+
+        // reset themes on basis of plot background (first 2 themes are default dark and light themes
+        if (GCColor::luminance(GColor(CPLOTBACKGROUND)) < 127)  GCColor::applyTheme(0);
+        else GCColor::applyTheme(1);
+
+    }
 
     //----------------------------------------------------------------------
     // ... here any further Release Number dependent Upgrade Process is to be added ...
