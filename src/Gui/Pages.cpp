@@ -2460,7 +2460,7 @@ KeywordsPage::getDefinitions(QList<KeywordDefinition> &keywordList)
 
         add.name = item->text(0);
         add.color = ((ColorButton*)keywords->itemWidget(item, 1))->getColor();
-        add.tokens = item->text(2).split(",", QString::SkipEmptyParts);
+        add.tokens = item->text(2).split(",", Qt::SkipEmptyParts);
 
         keywordList.append(add);
     }
@@ -2666,7 +2666,7 @@ FieldsPage::getDefinitions(QList<FieldDefinition> &fieldList)
 
         add.tab = st.internalName(item->text(0));
         add.name = sp.internalName(item->text(1));
-        add.values = item->text(3).split(QRegExp("(, *|,)"), QString::KeepEmptyParts);
+        add.values = item->text(3).split(QRegExp("(, *|,)"), Qt::KeepEmptyParts);
         add.diary = ((QCheckBox*)fields->itemWidget(item, 4))->isChecked();
 
         if (sp.isMetric(add.name))

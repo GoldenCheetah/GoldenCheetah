@@ -1548,7 +1548,7 @@ bool MetadataXMLParser::endElement( const QString&, const QString&, const QStrin
         if (field.tab != "" && field.type < 3 && field.name != "Filename" &&
             field.name != "Change History") field.diary = true; // default!
     } else if(qName == "fieldvalues") {
-        field.values = Utils::unprotect(buffer).split(",", QString::SkipEmptyParts);
+        field.values = Utils::unprotect(buffer).split(",", Qt::SkipEmptyParts);
     } else if (qName == "fielddiary") field.diary = (buffer.trimmed().toInt() != 0);
     else if(qName == "defaultfield") adefault.field =  Utils::unprotect(buffer);
     else if(qName == "defaultvalue") adefault.value =  Utils::unprotect(buffer);
