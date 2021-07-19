@@ -87,7 +87,7 @@ QLayoutItem *GcWindowLayout::takeAt(int index)
 
 Qt::Orientations GcWindowLayout::expandingDirections() const
 {
-    return 0;
+    return Qt::Orientations();
 }
 
 bool GcWindowLayout::hasHeightForWidth() const

@@ -155,7 +155,7 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
     charts->setEditTriggers(QAbstractItemView::SelectedClicked); // allow edit
     charts->setIndentation(0);
 
-    presetLayout->addWidget(charts, 0,0);
+    presetLayout->addWidget(charts, 0, Qt::Alignment());
 
     applyButton = new QPushButton(tr("Apply")); // connected in LTMWindow.cpp (weird!?)
     newButton = new QPushButton(tr("Add Current"));
