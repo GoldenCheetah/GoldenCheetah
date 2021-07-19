@@ -219,6 +219,16 @@ struct FitFileReaderState
         return i == 0xff ? NA_VALUE : i;
     }
 
+    fit_value_t read_byte(int *count = NULL) {
+        quint8 i;
+        if (file.read(reinterpret_cast<char*>( &i), 1) != 1)
+            throw TruncatedRead();
+        if (count)
+            (*count) += 1;
+
+        return i;
+    }
+
     fit_value_t read_uint8z(int *count = NULL) {
         quint8 i;
         if (file.read(reinterpret_cast<char*>( &i), 1) != 1)
@@ -2725,9 +2735,12 @@ struct FitFileReaderState
                         dev_id = "";
 
                         foreach(fit_value_t val, value.list) {
+
                             if (val != NA_VALUE) {
                                 std::stringstream sstream;
                                 sstream << std::hex << val;
+                                if (val<16)
+                                    dev_id += "0";
                                 dev_id += sstream.str();
                             }
                         }
@@ -2745,9 +2758,12 @@ struct FitFileReaderState
                         dev_id = "";
 
                         foreach(fit_value_t val, value.list) {
+
                             if (val != NA_VALUE) {
                                 std::stringstream sstream;
                                 sstream << std::hex << val;
+                                if (val<16)
+                                    dev_id += "0";
                                 dev_id += sstream.str();
                             }
                         }
@@ -3097,7 +3113,7 @@ struct FitFileReaderState
                              value.type = ListValue;
                              value.list.clear();
                              for (int i=0;i<field.size;i++) {
-                                value.list.append(read_uint8(&count));
+                                value.list.append(read_byte(&count));
                              }
                              size = value.list.size();
                              break;
@@ -3153,7 +3169,7 @@ struct FitFileReaderState
                     else if (value.type == ListValue) {
                         printf( "values=");
                         for (int i=0;i<value.list.count();i++) {
-                            if (value.v == NA_VALUE)
+                            if (value.list.at(i) == NA_VALUE)
                                 printf( "NA,");
                             else
                                 printf( "%lld,", value.list.at(i) );
