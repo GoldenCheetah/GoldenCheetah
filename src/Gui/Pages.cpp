@@ -1421,9 +1421,14 @@ ColorsPage::applyThemeClicked()
             case CPLOTBACKGROUND:
             case CRIDEPLOTBACKGROUND:
             case CTRENDPLOTBACKGROUND:
-            case CTRAINPLOTBACKGROUND:
                 color = theme.colors[0]; // background color
                 break;
+
+            case CTRAINPLOTBACKGROUND:
+                // always, and I mean always default to a black background
+                color = QColor(Qt::black);
+                break;
+
 
             case COVERVIEWBACKGROUND:
                 // set back to light black for dark themes

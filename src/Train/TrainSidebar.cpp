@@ -616,13 +616,13 @@ TrainSidebar::configChanged(qint32)
 
     setProperty("color", GColor(CTRAINPLOTBACKGROUND));
 #if !defined GC_VIDEO_NONE
-    mediaTree->setStyleSheet(GCColor::stylesheet());
+    mediaTree->setStyleSheet(GCColor::stylesheet(true));
 #ifdef GC_HAVE_VLC  // RLV currently only support for VLC
-    videosyncTree->setStyleSheet(GCColor::stylesheet());
+    videosyncTree->setStyleSheet(GCColor::stylesheet(true));
 #endif
 #endif
-    workoutTree->setStyleSheet(GCColor::stylesheet());
-    deviceTree->setStyleSheet(GCColor::stylesheet());
+    workoutTree->setStyleSheet(GCColor::stylesheet(true));
+    deviceTree->setStyleSheet(GCColor::stylesheet(true));
 
     // DEVICES
 

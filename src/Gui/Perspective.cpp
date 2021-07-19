@@ -97,7 +97,7 @@ Perspective::Perspective(Context *context, QString title, int type) :
 
     QPalette palette;
     //palette.setBrush(backgroundRole(), QColor("#B3B4B6"));
-    palette.setBrush(backgroundRole(), GColor(CPLOTBACKGROUND));
+    palette.setBrush(backgroundRole(), type == VIEW_TRAIN ? GColor(CTRAINPLOTBACKGROUND) : GColor(CPLOTBACKGROUND));
     setAutoFillBackground(false);
 
     // each style has its own container widget
@@ -296,7 +296,7 @@ Perspective::configChanged(qint32)
     tileArea->verticalScrollBar()->setStyleSheet(TabView::ourStyleSheet());
 //#endif
     QPalette palette;
-    palette.setBrush(backgroundRole(), GColor(CPLOTBACKGROUND));
+    palette.setBrush(backgroundRole(), type() == VIEW_TRAIN ? GColor(CTRAINPLOTBACKGROUND) : GColor(CPLOTBACKGROUND));
     setPalette(palette);
     tileWidget->setPalette(palette);
     tileArea->setPalette(palette);
@@ -307,7 +307,10 @@ Perspective::configChanged(qint32)
     if (currentStyle == 0) {
         for (int i=0; i<charts.count(); i++) {
             if (charts[i]->type() == GcWindowTypes::Overview || charts[i]->type() == GcWindowTypes::OverviewTrends) chartbar->setColor(i, GColor(COVERVIEWBACKGROUND));
-            else chartbar->setColor(i, GColor(CPLOTBACKGROUND));
+            else {
+                if (type() == VIEW_TRAIN)chartbar->setColor(i, GColor(CTRAINPLOTBACKGROUND));
+                else chartbar->setColor(i, GColor(CPLOTBACKGROUND));
+            }
         }
     }
 }
@@ -676,7 +679,10 @@ Perspective::addChart(GcChartWindow* newone)
 
             // tab colors
             if (newone->type() == GcWindowTypes::Overview || newone->type() == GcWindowTypes::OverviewTrends) chartbar->setColor(chartnum, GColor(COVERVIEWBACKGROUND));
-            else chartbar->setColor(chartnum, GColor(CPLOTBACKGROUND));
+            else {
+                if (type() == VIEW_TRAIN)chartbar->setColor(chartnum, GColor(CTRAINPLOTBACKGROUND));
+                else chartbar->setColor(chartnum, GColor(CPLOTBACKGROUND));
+            }
 
             // weird bug- set margins *after* tabbed->addwidget since it resets margins (!!)
             if (newone->showTitle())  newone->setContentsMargins(0,25*dpiYFactor,0,0);

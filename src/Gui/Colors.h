@@ -136,7 +136,7 @@ class GCColor : public QObject
         static QLinearGradient linearGradient(int size, bool active, bool alternate=false);
         static QString css(bool ridesummary=true);
         static QPalette palette();
-        static QString stylesheet();
+        static QString stylesheet(bool train=false);
         static void readConfig();
         static void setupColors();
         static void dumpColors();

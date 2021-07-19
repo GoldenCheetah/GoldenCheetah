@@ -191,7 +191,7 @@ void GCColor::setupColors()
         { tr("HR Zone 8 Shading"), "HRCOLORZONE8", Qt::gray },
         { tr("HR Zone 9 Shading"), "HRCOLORZONE9", Qt::gray },
         { tr("HR Zone 10 Shading"), "HRCOLORZONE10", Qt::gray },
-        { tr("Aerolab VE"), "COLORAEROVE", Qt::blue },
+        { tr("Aerolab Vrtual Elevation"), "COLORAEROVE", Qt::blue },
         { tr("Aerolab Elevation"), "COLORAEROEL", Qt::green },
         { tr("Calendar background"), "CCALCELL", Qt::white },
         { tr("Calendar heading"), "CCALHEAD", QColor(230,230,230) },
@@ -593,10 +593,10 @@ GCColor::palette()
 }
 
 QString 
-GCColor::stylesheet()
+GCColor::stylesheet(bool train)
 {
     // make it to order to reflect current config
-    QColor bgColor = GColor(CPLOTBACKGROUND);
+    QColor bgColor = train ? GColor(CTRAINPLOTBACKGROUND) : GColor(CPLOTBACKGROUND);
     QColor fgColor = GCColor::invertColor(bgColor);
     return QString("QTreeView { color: %2; background: %1; }"
                    "QTableWidget { color: %2; background: %1; }"
@@ -913,8 +913,13 @@ GCColor::applyTheme(int index)
         case CPLOTBACKGROUND:
         case CRIDEPLOTBACKGROUND:
         case CTRENDPLOTBACKGROUND:
-        case CTRAINPLOTBACKGROUND:
+
             color = theme.colors[0]; // background color
+            break;
+
+        case CTRAINPLOTBACKGROUND:
+            // always, and I mean always default to a black background
+            color = QColor(Qt::black);
             break;
 
         case CCARDBACKGROUND:
