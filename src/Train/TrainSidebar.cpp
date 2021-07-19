@@ -339,9 +339,9 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
     start_timer = new QTimer(this);
     start_timer->setSingleShot(true);
 
-    session_time = QTime();
+    session_time.start();
     session_elapsed_msec = 0;
-    lap_time = QTime();
+    lap_time.start();
     lap_elapsed_msec = 0;
     secs_to_start = 0;
 
