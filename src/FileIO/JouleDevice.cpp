@@ -209,7 +209,7 @@ JouleDevice::download( const QDir &tmpdir,
                 files.append(file);
 
                 QTextStream os(&tmp);
-                os << hex;
+                os << Qt::hex;
 
                 qDebug() << tmp.fileName() << "-" << tmpl;
                 tmp.write(versionResponse.dataArray());
