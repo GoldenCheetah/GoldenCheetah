@@ -329,7 +329,7 @@ SolveCPDialog::SolveCPDialog(QWidget *parent, Context *context) : QDialog(parent
         t->setTextAlignment(2, Qt::AlignHCenter);
 
         // remember which rideitem this is for
-        t->setData(0, Qt::UserRole, qVariantFromValue(static_cast<void*>(item)));
+        t->setData(0, Qt::UserRole, QVariant::fromValue(static_cast<void*>(item)));
 
         // checkbox
         QCheckBox *check = new QCheckBox(this);
