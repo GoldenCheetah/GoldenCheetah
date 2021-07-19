@@ -106,7 +106,7 @@ EditUserMetricDialog::EditUserMetricDialog(QWidget *parent, Context *context, Us
     QFont courier("Courier", QFont().pointSize());
     QFontMetrics fm(courier);
     formulaEdit->setFont(courier);
-    formulaEdit->setTabStopWidth(4 * fm.width(' ')); // 4 char tabstop
+    formulaEdit->setTabStopDistance(4 * fm.horizontalAdvance(' ')); // 4 char tabstop
     formulaEdit->setText(settings.program);
     // get suitably formated list XXX XXX ffs, refactor this into FormulEdit !!! XXX XXX
     QList<QString> list;

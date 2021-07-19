@@ -3079,7 +3079,7 @@ void XDataEditor::setRideItem(RideItem *item)
 
     // but time is xx:xx:xx:xxx
     QFontMetrics fm(font());
-    int cwidth=fm.charWidth("X",0);
+    int cwidth=fm.horizontalAdvance(QChar('X'));
     setColumnWidth(0, 15 * cwidth * dpiXFactor);
 }
 

@@ -156,7 +156,7 @@ ChartBar::configChanged(qint32)
     scrollArea->setStyleSheet(QString("QScrollArea { background: rgb(%1,%2,%3); }").arg(col.red()).arg(col.green()).arg(col.blue()));
 
     foreach(ChartBarItem *b, buttons) {
-        int width = fs.width(b->text) + (60 * dpiXFactor);
+        int width = fs.horizontalAdvance(b->text) + (60 * dpiXFactor);
         if (width < (90*dpiXFactor)) width=90*dpiXFactor;
     	b->setFont(buttonFont);
         b->setFixedWidth(width);
@@ -173,7 +173,7 @@ ChartBar::addWidget(QString title)
 
     // make the right size
     QFontMetrics fontMetric(buttonFont);
-    int width = fontMetric.width(title) + (60 * dpiXFactor);
+    int width = fontMetric.horizontalAdvance(title) + (60 * dpiXFactor);
     int height = (fontMetric.height()+(spacing_*dpiXFactor));
     if (width < (90*dpiXFactor)) width=90*dpiXFactor;
     newbutton->setFixedWidth(width);
@@ -221,7 +221,7 @@ ChartBar::setText(int index, QString text)
 {
     buttons[index]->setText(text);
     QFontMetrics fontMetric(buttonFont);
-    int width = fontMetric.width(text) + (60*dpiXFactor);
+    int width = fontMetric.horizontalAdvance(text) + (60*dpiXFactor);
     buttons[index]->setWidth(width < (90*dpiXFactor) ? (90*dpiXFactor) : width);
     buttons[index]->update();
 
