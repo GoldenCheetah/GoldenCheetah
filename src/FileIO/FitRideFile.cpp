@@ -31,6 +31,7 @@
 #include <QTime>
 #include <cstdio>
 #include <stdint.h>
+#include <sstream>
 #include <time.h>
 #include <limits>
 #include <cmath>
@@ -2724,10 +2725,10 @@ struct FitFileReaderState
                         dev_id = "";
 
                         foreach(fit_value_t val, value.list) {
-                            char hex[1];
                             if (val != NA_VALUE) {
-                                sprintf(hex, "%x", (int)val);
-                                dev_id += hex;
+                                std::stringstream sstream;
+                                sstream << std::hex << val;
+                                dev_id += sstream.str();
                             }
                         }
                         if (dev_id.length()>=20) {
@@ -2744,10 +2745,10 @@ struct FitFileReaderState
                         dev_id = "";
 
                         foreach(fit_value_t val, value.list) {
-                            char hex[1];
                             if (val != NA_VALUE) {
-                                sprintf(hex, "%x", (int)val);
-                                dev_id += hex;
+                                std::stringstream sstream;
+                                sstream << std::hex << val;
+                                dev_id += sstream.str();
                             }
                         }
                         if (dev_id.length()>=20) {
