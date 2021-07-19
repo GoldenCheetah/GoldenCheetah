@@ -1432,7 +1432,7 @@ LTMTool::moveMetricUp()
     int index = customTable->row(items.first());
 
     if (index > 0) {
-        settings->metrics.swap(index, index-1);
+        settings->metrics.swapItemsAt(index, index-1);
          // refresh
         refreshCustomTable(index-1);
         curvesChanged();
@@ -1448,7 +1448,7 @@ LTMTool::moveMetricDown()
     int index = customTable->row(items.first());
 
     if (index+1 <  settings->metrics.size()) {
-        settings->metrics.swap(index, index+1);
+        settings->metrics.swapItemsAt(index, index+1);
          // refresh
         refreshCustomTable(index+1);
         curvesChanged();
