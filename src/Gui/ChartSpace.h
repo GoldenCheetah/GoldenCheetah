@@ -88,6 +88,7 @@ class ChartSpaceItem : public QGraphicsWidget
             setZValue(10);
 
             // a sensible default?
+            span = 1;
             type = 0;
             delcounter=0;
 
@@ -131,7 +132,7 @@ class ChartSpaceItem : public QGraphicsWidget
         QString datafilter;
 
         // which column, sequence and size in rows
-        int column, order, deep;
+        int column, span, order, deep;
         bool onscene, placing, drag;
         bool incorner;
         bool invisible;
@@ -158,7 +159,7 @@ class ChartSpace : public QWidget
         ChartSpace(Context *context, int scope, GcWindow *window);
 
         // current state for event processing
-        enum { NONE, DRAG, XRESIZE, YRESIZE } state;
+        enum { NONE, DRAG, SPAN, XRESIZE, YRESIZE } state;
 
         // used by children
         Context *context;
@@ -217,7 +218,7 @@ class ChartSpace : public QWidget
         void updateView();
 
         // add a ChartSpaceItem to the view
-        void addItem(int row, int column, int deep, ChartSpaceItem *item);
+        void addItem(int row, int column, int span, int deep, ChartSpaceItem *item);
 
         // remove an item
         void removeItem(ChartSpaceItem *item);
@@ -226,6 +227,9 @@ class ChartSpace : public QWidget
         // zoom width, so we don't get a massive athlete
         // card when only one athlete
         void setFixedZoom(int width);
+
+        // which column are we in for position x
+        int columnForX(int x);
 
     protected:
 
@@ -275,6 +279,7 @@ class ChartSpace : public QWidget
             } yresize;
 
             struct {
+                ChartSpaceItem *item; // span resize
                 double posx;
                 int width;
                 int column;

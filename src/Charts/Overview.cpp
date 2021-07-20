@@ -100,6 +100,7 @@ OverviewWindow::getConfiguration() const
         // basic stuff first - name, type etc
         config += "    { ";
         config += "\"type\":" + QString("%1").arg(static_cast<int>(item->type)) + ",";
+        config += "\"span\":" + QString("%1").arg(item->span) + ",";
         config += "\"deep\":" + QString("%1").arg(item->deep) + ",";
         config += "\"column\":" + QString("%1").arg(item->column) + ",";
         config += "\"order\":" + QString("%1").arg(item->order) + ",";
@@ -210,80 +211,80 @@ OverviewWindow::setConfiguration(QString config)
             // column 0
             ChartSpaceItem *add;
             add = new PMCOverviewItem(space, "coggan_tss");
-            space->addItem(1,0,9, add);
+            space->addItem(1,0,1,9, add);
 
             add = new MetaOverviewItem(space, tr("Sport"), "Sport");
-            space->addItem(2,0,5, add);
+            space->addItem(2,0,1,5, add);
 
             add = new MetaOverviewItem(space, tr("Workout Code"), "Workout Code");
-            space->addItem(3,0,5, add);
+            space->addItem(3,0,1,5, add);
 
             add = new MetricOverviewItem(space, tr("Duration"), "workout_time");
-            space->addItem(4,0,9, add);
+            space->addItem(4,0,1,9, add);
 
             add = new MetaOverviewItem(space, tr("Notes"), "Notes");
-            space->addItem(5,0,13, add);
+            space->addItem(5,0,1,13, add);
 
             // column 1
             add = new MetricOverviewItem(space, tr("HRV rMSSD"), "rMSSD");
-            space->addItem(1,1,9, add);
+            space->addItem(1,1,1,9, add);
 
             add = new MetricOverviewItem(space, tr("Heartrate"), "average_hr");
-            space->addItem(2,1,5, add);
+            space->addItem(2,1,1,5, add);
 
             add = new ZoneOverviewItem(space, tr("Heartrate Zones"), RideFile::hr, false);
-            space->addItem(3,1,11, add);
+            space->addItem(3,1,1,11, add);
 
             add = new MetricOverviewItem(space, tr("Climbing"), "elevation_gain");
-            space->addItem(4,1,5, add);
+            space->addItem(4,1,1,5, add);
 
             add = new MetricOverviewItem(space, tr("Cadence"), "average_cad");
-            space->addItem(5,1,5, add);
+            space->addItem(5,1,1,5, add);
 
             add = new MetricOverviewItem(space, tr("Work"), "total_work");
-            space->addItem(6,1,5, add);
+            space->addItem(6,1,1,5, add);
 
             // column 2
             add = new RPEOverviewItem(space, tr("RPE"));
-            space->addItem(1,2,9, add);
+            space->addItem(1,2,1,9, add);
 
             add = new MetricOverviewItem(space, tr("Stress"), "coggan_tss");
-            space->addItem(2,2,5, add);
+            space->addItem(2,2,1,5, add);
 
             add = new ZoneOverviewItem(space, tr("Fatigue Zones"), RideFile::wbal, false);
-            space->addItem(3,2,11, add);
+            space->addItem(3,2,1,11, add);
 
             add = new IntervalOverviewItem(space, tr("Intervals"), "elapsed_time", "average_power", "workout_time");
-            space->addItem(4,2,17, add);
+            space->addItem(4,2,1,17, add);
 
             // column 3
             add = new MetricOverviewItem(space, tr("Power"), "average_power");
-            space->addItem(1,3,9, add);
+            space->addItem(1,3,1,9, add);
 
             add = new MetricOverviewItem(space, tr("IsoPower"), "coggan_np");
-            space->addItem(2,3,5, add);
+            space->addItem(2,3,1,5, add);
 
             add = new ZoneOverviewItem(space, tr("Power Zones"), RideFile::watts, false);
-            space->addItem(3,3,11, add);
+            space->addItem(3,3,1,11, add);
 
             add = new MetricOverviewItem(space, tr("Peak Power Index"), "peak_power_index");
-            space->addItem(4,3,8, add);
+            space->addItem(4,3,1,8, add);
 
             add = new MetricOverviewItem(space, tr("Variability"), "coggam_variability_index");
-            space->addItem(5,3,8, add);
+            space->addItem(5,3,1,8, add);
 
             // column 4
             add = new MetricOverviewItem(space, tr("Distance"), "total_distance");
-            space->addItem(1,4,9, add);
+            space->addItem(1,4,1,9, add);
 
             add = new MetricOverviewItem(space, tr("Speed"), "average_speed");
-            space->addItem(2,4,5, add);
+            space->addItem(2,4,1,5, add);
 
             add = new ZoneOverviewItem(space, tr("Pace Zones"), RideFile::kph, false);
-            space->addItem(3,4,11, add);
+            space->addItem(3,4,1,11, add);
 
             add = new RouteOverviewItem(space, tr("Route"));
-            space->addItem(4,4,17, add);
+            space->addItem(4,4,1,17, add);
 
         }
 
@@ -293,66 +294,66 @@ OverviewWindow::setConfiguration(QString config)
 
             // column 0
             add = new KPIOverviewItem(space, tr("Distance"), 0, 10000, "{ round(sum(metrics(Distance))); }", "km", false);
-            space->addItem(0,0,8, add);
+            space->addItem(0,0,1,8, add);
 
             add = new TopNOverviewItem(space, tr("Going Long"), "total_distance");
-            space->addItem(1,0,25, add);
+            space->addItem(1,0,1,25, add);
 
             add = new KPIOverviewItem(space, tr("Weekly Hours"), 0, 15*3600, "{ weeks <- (daterange(stop)-daterange(start))/7; sum(metrics(Duration))/weeks; }", tr("hh:mm:ss"), true);
-            space->addItem(2,0,7, add);
+            space->addItem(2,0,1,7, add);
 
             // column 1
             add = new KPIOverviewItem(space, tr("Peak Power Index"), 0, 150, "{ round(sort(descend, metrics(Power_Index))[0]); }", "%", false);
-            space->addItem(0,1,8, add);
+            space->addItem(0,1,1,8, add);
 
             add = new MetricOverviewItem(space, tr("Max Power"), "max_power");
-            space->addItem(1,1,7, add);
+            space->addItem(1,1,1,7, add);
 
             add = new MetricOverviewItem(space, tr("Average Power"), "average_power");
-            space->addItem(2,1,7, add);
+            space->addItem(2,1,1,7, add);
 
             add = new ZoneOverviewItem(space, tr("Power Zones"), RideFile::watts, false);
-            space->addItem(3,1,9, add);
+            space->addItem(3,1,1,9, add);
 
             add = new MetricOverviewItem(space, tr("Total TSS"), "coggan_tss");
-            space->addItem(4,1,7, add);
+            space->addItem(4,1,1,7, add);
 
             // column 2
             add = new KPIOverviewItem(space, tr("Total Hours"), 0, 0, "{ sum(metrics(Duration)); }", "hh:mm:ss", true);
-            space->addItem(0,2,8, add);
+            space->addItem(0,2,1,8, add);
 
             add = new TopNOverviewItem(space, tr("Going Hard"), "skiba_wprime_exp");
-            space->addItem(1,2,25, add);
+            space->addItem(1,2,1,25, add);
 
             add = new MetricOverviewItem(space, tr("Total W' Work"), "skiba_wprime_exp");
-            space->addItem(2,2,7, add);
+            space->addItem(2,2,1,7, add);
 
             // column 3
             add = new KPIOverviewItem(space, tr("W' Ratio"), 0, 100, "{ round((sum(metrics(W'_Work)) / sum(metrics(Work))) * 100); }", "%", false);
-            space->addItem(0,3,8, add);
+            space->addItem(0,3,1,8, add);
 
             add = new KPIOverviewItem(space, tr("Peak CP Estimate "), 0, 360, "{ round(max(estimates(cp3,cp))); }", "watts", false);
-            space->addItem(1,3,7, add);
+            space->addItem(1,3,1,7, add);
 
             add = new KPIOverviewItem(space, tr("Peak W' Estimate "), 0, 25, "{ round(max(estimates(cp3,w')/1000)*10)/10; }", "kJ", false);
-            space->addItem(2,3,7, add);
+            space->addItem(2,3,1,7, add);
 
 
             add = new ZoneOverviewItem(space, tr("Fatigue Zones"), RideFile::wbal, false);
-            space->addItem(3,3,9, add);
+            space->addItem(3,3,1,9, add);
 
             add = new MetricOverviewItem(space, tr("Total Work"), "total_work");
-            space->addItem(4,3,7, add);
+            space->addItem(4,3,1,7, add);
 
             // column 4
             add = new MetricOverviewItem(space, tr("Intensity Factor"), "coggan_if");
-            space->addItem(0,4,8, add);
+            space->addItem(0,4,1,8, add);
 
             add = new TopNOverviewItem(space, tr("Going Deep"), "skiba_wprime_low");
-            space->addItem(1,4,25, add);
+            space->addItem(1,4,1,25, add);
 
             add = new KPIOverviewItem(space, tr("IF > 0.85"), 0, 0, "{ count(metrics(IF)[x>0.85]); }", "activities", false);
-            space->addItem(2,4,7, add);
+            space->addItem(2,4,1,7, add);
 
         }
 
@@ -390,6 +391,7 @@ OverviewWindow::setConfiguration(QString config)
             QString datafilter = Utils::jsonunprotect(obj["datafilter"].toString());
             int column = obj["column"].toInt();
             int order = obj["order"].toInt();
+            int span = obj.contains("span") ? obj["span"].toInt() : 1;
             int deep = obj["deep"].toInt();
             int type = obj["type"].toInt();
 
@@ -402,7 +404,7 @@ OverviewWindow::setConfiguration(QString config)
                 {
                     add = new RPEOverviewItem(space, name);
                     add->datafilter = datafilter;
-                    space->addItem(order,column,deep, add);
+                    space->addItem(order,column,span,deep, add);
                 }
                 break;
 
@@ -411,7 +413,7 @@ OverviewWindow::setConfiguration(QString config)
                     QString symbol=obj["symbol"].toString();
                     add = new TopNOverviewItem(space, name,symbol);
                     add->datafilter = datafilter;
-                    space->addItem(order,column,deep, add);
+                    space->addItem(order,column,span,deep, add);
                 }
                 break;
 
@@ -421,7 +423,7 @@ OverviewWindow::setConfiguration(QString config)
                     QString meta=obj["meta"].toString();
                     add = new DonutOverviewItem(space, name,symbol,meta);
                     add->datafilter = datafilter;
-                    space->addItem(order,column,deep, add);
+                    space->addItem(order,column,span,deep, add);
                 }
                 break;
 
@@ -430,7 +432,7 @@ OverviewWindow::setConfiguration(QString config)
                     QString symbol=obj["symbol"].toString();
                     add = new MetricOverviewItem(space, name,symbol);
                     add->datafilter = datafilter;
-                    space->addItem(order,column,deep, add);
+                    space->addItem(order,column,span,deep, add);
                 }
                 break;
 
@@ -439,7 +441,7 @@ OverviewWindow::setConfiguration(QString config)
                     QString symbol=obj["symbol"].toString();
                     add = new MetaOverviewItem(space, name,symbol);
                     add->datafilter = datafilter;
-                    space->addItem(order,column,deep, add);
+                    space->addItem(order,column,span,deep, add);
                 }
                 break;
 
@@ -448,7 +450,7 @@ OverviewWindow::setConfiguration(QString config)
                     QString symbol=obj["symbol"].toString();
                     add = new PMCOverviewItem(space, symbol); // doesn't have a title
                     add->datafilter = datafilter;
-                    space->addItem(order,column,deep, add);
+                    space->addItem(order,column,span,deep, add);
                 }
                 break;
 
@@ -458,7 +460,7 @@ OverviewWindow::setConfiguration(QString config)
                     bool polarized = obj["polarized"].toInt();
                     add = new ZoneOverviewItem(space, name, series, polarized);
                     add->datafilter = datafilter;
-                    space->addItem(order,column,deep, add);
+                    space->addItem(order,column,span,deep, add);
 
                 }
                 break;
@@ -467,7 +469,7 @@ OverviewWindow::setConfiguration(QString config)
                 {
                     add = new RouteOverviewItem(space, name); // doesn't have a title
                     add->datafilter = datafilter;
-                    space->addItem(order,column,deep, add);
+                    space->addItem(order,column,span,deep, add);
                 }
                 break;
 
@@ -480,7 +482,7 @@ OverviewWindow::setConfiguration(QString config)
 
                     add = new IntervalOverviewItem(space, name, xsymbol, ysymbol, zsymbol); // doesn't have a title
                     add->datafilter = datafilter;
-                    space->addItem(order,column,deep, add);
+                    space->addItem(order,column,span,deep, add);
                 }
                 break;
 
@@ -493,7 +495,7 @@ OverviewWindow::setConfiguration(QString config)
                     bool istime =obj["istime"].toInt();
                     add = new KPIOverviewItem(space, name, start, stop, program, units, istime);
                     add->datafilter = datafilter;
-                    space->addItem(order,column,deep, add);
+                    space->addItem(order,column,span,deep, add);
                 }
                 break;
             }

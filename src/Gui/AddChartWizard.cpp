@@ -182,7 +182,7 @@ AddChartFinal::validatePage()
 {
     // add to the top left
     if (wizard->item) {
-        wizard->item->parent->addItem(0,0,7, wizard->item);
+        wizard->item->parent->addItem(0,0,1,7, wizard->item);
         wizard->item->parent->updateGeometry();
     }
     return true;

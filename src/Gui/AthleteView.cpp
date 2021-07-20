@@ -62,7 +62,7 @@ AthleteView::newAthlete(QString name)
 
     // add a card for each athlete
     AthleteCard *ath = new AthleteCard(this, name);
-    addItem(row,col,gl_athletes_deep,ath);
+    addItem(row,col,1,gl_athletes_deep,ath);
 
     // we have 5 athletes per row
     if (++col >= gl_athletes_per_row) {

@@ -24,7 +24,6 @@
 #include "SearchFilterBox.h"
 #include "CPPlot.h"
 #include "Context.h"
-#include "Context.h"
 #include "Athlete.h"
 #include "RideItem.h"
 #include "TimeUtils.h"
@@ -511,6 +510,7 @@ CriticalPowerWindow::CriticalPowerWindow(Context *context, bool rangemode) :
     addHelper(QString(tr("Motor Unit Model")), new MUWidget(this, context));
 #endif
     addHelper(QString(tr("Model")), helper);
+    GcChartWindow::overlayWidget->move(100,100);
 
     if (rangemode) {
         connect(this, SIGNAL(dateRangeChanged(DateRange)), SLOT(dateRangeChanged(DateRange)));

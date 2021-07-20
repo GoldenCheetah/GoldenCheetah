@@ -109,9 +109,10 @@ ChartSpace::ChartSpace(Context *context, int scope, GcWindow *window) :
 
 // add the item
 void
-ChartSpace::addItem(int order, int column, int deep, ChartSpaceItem *item)
+ChartSpace::addItem(int order, int column, int span, int deep, ChartSpaceItem *item)
 {
     item->order= order;
+    item->span= span;
     item->column = column;
     item->deep = deep;
     items.append(item);
@@ -375,6 +376,10 @@ ChartSpace::updateGeometry()
 
     bool animated=false;
 
+    // keep a temporary list of spanning items
+    // so we can check overlapping as we go
+    QList<QRectF> spanners;
+
     // prevent a memory leak
     group->stop();
     delete group;
@@ -392,8 +397,7 @@ ChartSpace::updateGeometry()
     // just set their geometry for now, no interaction
     for(int i=0; i<items.count(); i++) {
 
-        // don't show hidden
-        if (!items[i]->isVisible()) continue;
+        if (!items[i]->isVisible()) continue; // not clear if this does anything
 
         // move on to next column, check if first item too
         if (items[i]->column > column) {
@@ -417,12 +421,21 @@ ChartSpace::updateGeometry()
         // set geometry
         int ty = y;
         int tx = x;
+
+        // tile width is for the column, or for the columns it spans
         int twidth = columns[column];
+        for(int c=1; c<items[i]->span && c<columns.count(); c++) twidth += columns[c+1] + SPACING;
+
         int theight = items[i]->deep * ROWHEIGHT;
 
         // make em smaller when configuring visual cue stolen from Windows Start Menu
         int add = 0; //XXX PERFORMANCE ISSSE XXX (state == DRAG) ? (ROWHEIGHT/2) : 0;
 
+        // check we don't overlap with any spanning items in earlier columns etc
+        foreach(QRectF spanner, spanners) {
+            if (spanner.intersects(QRect(tx,ty,twidth,theight+SPACING)))
+                ty = spanner.bottomLeft().y() + SPACING;
+        }
 
         // for setting the scene rectangle - but ignore a ChartSpaceItem if we are dragging it
         if (maxy < ty+theight+SPACING) maxy = ty+theight+SPACING;
@@ -439,14 +452,14 @@ ChartSpace::updateGeometry()
                     items[i]->geometry().width() != twidth-(add*2) ||
                     items[i]->geometry().height() != theight-(add*2))) {
 
-            // we've got an animation to perform
+            // we've got an animation to perform -- because we are moving an item
             animated = true;
 
             // add an animation for this movement
             QPropertyAnimation *animation = new QPropertyAnimation(items[i], "geometry");
             animation->setDuration(300);
             animation->setStartValue(items[i]->geometry());
-            animation->setEndValue(QRect(tx+add,ty+add,twidth-(add*2),theight-(add*2)));
+            animation->setEndValue(QRect(tx+add,ty+add,twidth-(add*2),theight-(add*2))); // moving to here
 
             // when placing a little feedback helps
             if (items[i]->placing) {
@@ -457,8 +470,15 @@ ChartSpace::updateGeometry()
             group->addAnimation(animation);
         }
 
+        // add us to spanners, so next tiles interaction
+        if (items[i]->span > 1) {
+            if (items[i]->drag)  spanners << QRectF(tx,ty,twidth-1,theight-1);
+            else spanners << items[i]->geometry();
+        }
+
         // set spot for next tile
-        y += theight + SPACING;
+        y = ty + theight + SPACING;
+
     }
 
     // set the scene rectangle, columns start at 0
@@ -531,7 +551,7 @@ ChartSpace::updateView()
     }
 
     // don'r scale whilst resizing on x?
-    if (scrolling || (state != YRESIZE && state != XRESIZE && state != DRAG)) {
+    if (scrolling || (state != SPAN && state != YRESIZE && state != XRESIZE && state != DRAG)) {
 
         // much of a resize / change ?
         double dx = fabs(viewRect.x() - sceneRect.x());
@@ -772,6 +792,8 @@ ChartSpace::eventFilter(QObject *, QEvent *event)
 
                if (item->geometry().height()-offy < 10) {
 
+                    // We can span resize a specific chartspaceitem
+                    // by pressing SHIFT when we click
                     state = YRESIZE;
 
                     stateData.yresize.item = item;
@@ -784,9 +806,11 @@ ChartSpace::eventFilter(QObject *, QEvent *event)
 
                } else if (item->geometry().width()-offx < 10) {
 
-                    state = XRESIZE;
+                    if (QGuiApplication::queryKeyboardModifiers() & Qt::ShiftModifier)  state = SPAN;
+                    else state = XRESIZE;
 
-                    stateData.xresize.column = item->column;
+                    stateData.xresize.item = item;
+                    stateData.xresize.column = item->column+item->span-1;
                     stateData.xresize.width = columns[item->column];
                     stateData.xresize.posx = pos.x();
 
@@ -824,18 +848,19 @@ ChartSpace::eventFilter(QObject *, QEvent *event)
     } else  if (event->type() == QEvent::GraphicsSceneMouseRelease) {
 
         // stop dragging
-        if (state == DRAG || state == YRESIZE || state == XRESIZE) {
+        if (state == DRAG || state == YRESIZE || state == SPAN || state == XRESIZE) {
 
             // we want this one
             event->accept();
             returning = true;
 
             // set back to visible if dragging
+            bool wasdrag=false;
             if (state == DRAG) {
+                wasdrag=true;
                 stateData.drag.item->invisible = false;
                 stateData.drag.item->setZValue(10);
                 stateData.drag.item->placing = true;
-                stateData.drag.item->setDrag(false);
             }
 
             // end state;
@@ -844,6 +869,15 @@ ChartSpace::eventFilter(QObject *, QEvent *event)
             // drop it down
             updateGeometry();
             updateView();
+
+            // clear drag status once its been placed, regardless
+            // we need to leave the item marked as dragging until
+            // it has been placed, since it may overlap with another
+            // tile based upon where the user dragged it to
+            // and we don't want to move tiles out of the way of where
+            // it currently is (unplaced, hovering over something)
+            // when they release it to drop into place
+            if (wasdrag) stateData.drag.item->setDrag(false);
         }
 
     } else if (event->type() == QEvent::GraphicsSceneMouseMove) {
@@ -1011,6 +1045,7 @@ ChartSpace::eventFilter(QObject *, QEvent *event)
             }
 
             if (changed) {
+
                 // drop it down
                 updateGeometry();
                 updateView();
@@ -1030,6 +1065,21 @@ ChartSpace::eventFilter(QObject *, QEvent *event)
             // drop it down
             updateGeometry();
             updateView();
+
+        } else if (state == SPAN) {
+
+            QPointF pos = static_cast<QGraphicsSceneMouseEvent*>(event)->scenePos();
+
+            // which column is the cursor currently in?
+            int col = columnForX(pos.x());
+            int span = stateData.xresize.item->span;
+            int newspan = col-stateData.xresize.item->column+1;
+            if (span != newspan) stateData.xresize.item->span = newspan;
+
+            // animate
+            updateGeometry();
+            updateView();
+
 
         } else if ( state == XRESIZE) {
 
@@ -1053,6 +1103,20 @@ ChartSpace::eventFilter(QObject *, QEvent *event)
     return returning;
 }
 
+// for x position, which column is that (starting at column 0) ?
+// used when span resizing a chartspace item
+int
+ChartSpace::columnForX(int x)
+{
+    int returning = 0;
+    int offset = SPACING;
+    for(int i=0; i<columns.count(); i++) {
+        if (x > offset) returning = i;
+        offset += columns[i] + SPACING;
+    }
+
+    return returning;
+}
 
 void
 ChartSpaceItem::clicked()
