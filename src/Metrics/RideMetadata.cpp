@@ -1300,11 +1300,11 @@ FieldDefinition::fingerprint(QList<FieldDefinition> list)
 
     foreach(FieldDefinition def, list) {
 
-        ba.append(def.tab);
-        ba.append(def.name);
+        ba.append(def.tab.toUtf8());
+        ba.append(def.name.toUtf8());
         ba.append(def.type);
         ba.append(def.diary);
-        ba.append(def.values.join(""));
+        ba.append(def.values.join("").toUtf8());
     }
 
     return qChecksum(ba, ba.length());
@@ -1363,9 +1363,9 @@ KeywordDefinition::fingerprint(QList<KeywordDefinition> list)
 
     foreach(KeywordDefinition def, list) {
 
-        ba.append(def.name);
-        ba.append(def.color.name());
-        ba.append(def.tokens.join(""));
+        ba.append(def.name.toUtf8());
+        ba.append(def.color.name().toUtf8());
+        ba.append(def.tokens.join("").toUtf8());
     }
 
     return qChecksum(ba, ba.length());

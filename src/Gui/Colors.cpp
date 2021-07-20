@@ -97,7 +97,7 @@ unsigned long Colors::fingerprint(const Colors *set)
 {
     QByteArray ba;
     while(set->name != "") {
-        ba.append(set->color.name());
+        ba.append(set->color.name().toUtf8());
         set++;
     }
     return qChecksum(ba, ba.length());

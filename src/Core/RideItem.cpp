@@ -164,8 +164,8 @@ RideItem::metaCRC()
         // with configuration, not user updates
         if (i.key() == "Calendar Text") continue;
 
-        ba.append(i.key());
-        ba.append(i.value());
+        ba.append(i.key().toUtf8());
+        ba.append(i.value().toUtf8());
     }
     return qChecksum(ba, ba.length());
 }
