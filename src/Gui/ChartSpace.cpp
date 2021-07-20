@@ -424,7 +424,7 @@ ChartSpace::updateGeometry()
 
         // tile width is for the column, or for the columns it spans
         int twidth = columns[column];
-        for(int c=1; c<items[i]->span && c<columns.count(); c++) twidth += columns[c+1] + SPACING;
+        for(int c=1; c<items[i]->span && (c+column)<columns.count(); c++) twidth += columns[column+c] + SPACING;
 
         int theight = items[i]->deep * ROWHEIGHT;
 
