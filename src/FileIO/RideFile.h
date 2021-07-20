@@ -562,13 +562,17 @@ public:
             string[i]="";
         }
     }
-    XDataPoint (const XDataPoint &other) {
+    XDataPoint(const XDataPoint &other) {
+        *this = other;
+    }
+    XDataPoint& operator=(const XDataPoint &other) {
         this->secs=other.secs;
         this->km=other.km;
         for(int i=0; i<XDATA_MAXVALUES; i++) {
             this->number[i]= other.number[i];
             this->string[i]= other.string[i];
         }
+        return *this;
     }
 
     double secs, km;
@@ -579,7 +583,8 @@ public:
 class XDataSeries {
 public:
     XDataSeries() {}
-    XDataSeries(XDataSeries &other) {
+    XDataSeries(const XDataSeries& other) { *this = other; }
+    XDataSeries& operator=(const XDataSeries &other) {
         name = other.name;
         valuename = other.valuename;
         unitname = other.unitname;
@@ -589,6 +594,7 @@ public:
         foreach (XDataPoint *p, other.datapoints) {
             datapoints.push_back(new XDataPoint(*p));
         }
+        return *this;
     }
 
     ~XDataSeries() { foreach(XDataPoint *p, datapoints) delete p; }
