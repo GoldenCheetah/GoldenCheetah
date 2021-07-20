@@ -685,7 +685,7 @@ RideCache::getBests(QString symbol, int n, Specification specification, bool use
     }
 
     // now sort
-    qStableSort(results.begin(), results.end(), metric->isLowerBetter() ?
+    std::stable_sort(results.begin(), results.end(), metric->isLowerBetter() ?
                                                 rideCachesummaryBestLowerThan :
                                                 rideCachesummaryBestGreaterThan);
 
