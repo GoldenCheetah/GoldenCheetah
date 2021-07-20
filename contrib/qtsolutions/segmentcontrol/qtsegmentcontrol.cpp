@@ -114,7 +114,7 @@ static void drawSegmentControlSegmentSegment(const QStyleOption *option, QPainte
             QSize buttonSize = widget->rect().size();
             QString key = QString("qt_segment %0 %1 %2").arg(option->state).arg(buttonSize.width()).arg(buttonSize.height());
 
-            if (!QPixmapCache::find(key, pm)) {
+            if (!QPixmapCache::find(key, &pm)) {
                 pm = QPixmap(buttonSize);
                 pm.fill(Qt::transparent);
                 QPainter pmPainter(&pm);
