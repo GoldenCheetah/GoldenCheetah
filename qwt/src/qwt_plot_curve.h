@@ -211,7 +211,7 @@ public:
     //! Paint attributes
     typedef QFlags<PaintAttribute> PaintAttributes;
 
-    explicit QwtPlotCurve( const QString &title = QString::null );
+    explicit QwtPlotCurve( const QString &title = QString() );
     explicit QwtPlotCurve( const QwtText &title );
 
     virtual ~QwtPlotCurve();

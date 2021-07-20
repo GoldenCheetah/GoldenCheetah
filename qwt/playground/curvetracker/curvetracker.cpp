@@ -88,7 +88,7 @@ QString CurveTracker::curveInfoAt(
 {
     const QLineF line = curveLineAt( curve, pos.x() );
     if ( line.isNull() )
-        return QString::null;
+        return QString();
 
     const double y = line.pointAt( 
         ( pos.x() - line.p1().x() ) / line.dx() ).y();

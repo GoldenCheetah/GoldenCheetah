@@ -67,7 +67,7 @@ public:
         LegendBarTitles
     };
 
-    explicit QwtPlotBarChart( const QString &title = QString::null );
+    explicit QwtPlotBarChart( const QString &title = QString() );
     explicit QwtPlotBarChart( const QwtText &title );
 
     virtual ~QwtPlotBarChart();

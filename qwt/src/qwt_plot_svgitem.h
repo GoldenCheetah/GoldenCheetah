@@ -27,7 +27,7 @@ class QByteArray;
 class QWT_EXPORT QwtPlotSvgItem: public QwtPlotItem
 {
 public:
-    explicit QwtPlotSvgItem( const QString& title = QString::null );
+    explicit QwtPlotSvgItem( const QString& title = QString() );
     explicit QwtPlotSvgItem( const QwtText& title );
     virtual ~QwtPlotSvgItem();
 

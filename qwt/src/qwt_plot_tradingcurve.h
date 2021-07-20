@@ -101,7 +101,7 @@ public:
     //! Paint attributes
     typedef QFlags<PaintAttribute> PaintAttributes;
 
-    explicit QwtPlotTradingCurve( const QString &title = QString::null );
+    explicit QwtPlotTradingCurve( const QString &title = QString() );
     explicit QwtPlotTradingCurve( const QwtText &title );
 
     virtual ~QwtPlotTradingCurve();

@@ -76,7 +76,7 @@ public:
         UserStyle = 100
     };
 
-    explicit QwtPlotHistogram( const QString &title = QString::null );
+    explicit QwtPlotHistogram( const QString &title = QString() );
     explicit QwtPlotHistogram( const QwtText &title );
     virtual ~QwtPlotHistogram();
 
