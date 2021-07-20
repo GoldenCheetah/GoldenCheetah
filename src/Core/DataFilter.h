@@ -46,6 +46,7 @@ class Result {
         // construct a result
         Result (double value) : isNumber(true), string_(""), number_(value) {}
         Result (QString value) : isNumber(false), string_(value), number_(0.0f) {}
+        Result (QVector<QString> &list) : isNumber(false), string_(""), number_(0.0f), strings(list) {}
         Result () : isNumber(true), string_(""), number_(0) {}
 
         // vectorize, turn into vector of size n

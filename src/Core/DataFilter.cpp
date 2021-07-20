@@ -326,6 +326,18 @@ static struct {
     { "fetch", 1 },    // fetch("name") retrieves a value previously stored returns 0 if the value
                        // is not in the athlete store
 
+    { "name", 0 },     // name(Average_Power, BikeStress) returns the metric name, crucially in the local
+                       // language. Will return a vector for multiple values
+
+    { "units", 0 },     // units(Average_Power, BikeStress) returns the metric unit name, crucially in the local
+                       // language. Will return a vector for multiple values
+
+    { "datestring", 1 }, // datestring(a) will return a vector of strings converting the passed parameter
+                        // from days since to a string
+
+    { "timestring", 1 }, // timestring(a) will return a vector of strings converting the passed parameter
+                        // from secs since midnight to a time string
+
     // add new ones above this line
     { "", -1 }
 };
@@ -1621,6 +1633,13 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
                         DataFiltererrors << QString(tr("daterange(start|stop) or daterange(datefrom, dateto, expression)"));
                         leaf->inerror = true;
                     }
+                } else if (leaf->function == "datestring" || leaf->function == "timestring") {
+
+                    if (leaf->fparms.count() != 1) {
+                        leaf->inerror = true;
+                        DataFiltererrors << QString(tr("%1 needs a single parameter")).arg(leaf->function);
+                    }
+
                 } else if (leaf->function == "filename") {
 
                     if (leaf->fparms.count() != 0) {
@@ -1891,6 +1910,30 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
                         }
                     }
 
+                } else if (leaf->function == "name" || leaf->function == "units") {
+
+                    // check the parameters are all valid metric names
+                    if (leaf->fparms.count() < 1) {
+                        // need at least one metric name
+                        leaf->inerror = true;
+                        DataFiltererrors << QString(tr("no metric specified, %1(symbol) symbol should be a metric name")).arg(leaf->function);
+
+                    } else {
+
+                        // check they are all valid metrics
+                        for(int i=0; i<leaf->fparms.count(); i++) {
+                            if (leaf->fparms[i]->type != Leaf::Symbol) {
+                                leaf->inerror = true;
+                                DataFiltererrors << QString(tr("only metric names are supported")).arg(leaf->function);
+                            } else {
+                                QString symbol=*(leaf->fparms[0]->lvalue.n);
+                                if (df->lookupMap.value(symbol,"") == "") {
+                                    inerror = true;
+                                    DataFiltererrors << QString(tr("unknown metric %1")).arg(symbol);
+                                }
+                            }
+                        }
+                    }
                 } else if (leaf->function == "metrics") {
 
                     // is the param a symbol and either a metric name or 'date'
@@ -3233,6 +3276,55 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
 
             // does it exist - as a function or symbol?
             return df->functions.contains(symbol) || df->symbols.contains(symbol);
+        }
+
+        if (leaf->function == "datestring" || leaf->function == "timestring") {
+
+            Result returning;
+
+            QDate earliest(1900,01,01);
+            bool wantdate = leaf->function == "datestring";
+            Result r=eval(df, leaf->fparms[0],x, it, m, p, c, s, d);
+
+            if (r.isVector()) {
+                QVector<QString> list;
+                foreach(double n, r.asNumeric()) {
+                    if (wantdate) list << earliest.addDays(n).toString("dd MMM yy");
+                    else list << time_to_string(n);
+                }
+                returning = Result(list);
+            } else {
+
+                float n = r.number();
+                if (wantdate) returning = Result(earliest.addDays(n).toString("dd MMM yy"));
+                else returning = Result(time_to_string(n));
+            }
+            return returning;
+        }
+
+        if (leaf->function == "name" || leaf->function == "units") {
+
+            bool wantname = (leaf->function == "name");
+            QVector<QString> list;
+
+            for(int i=0; i<leaf->fparms.count(); i++) {
+
+                // symbol dereference
+                QString symbol=*(leaf->fparms[i]->lvalue.n);
+                QString o_symbol = df->lookupMap.value(symbol,"");
+                RideMetricFactory &factory = RideMetricFactory::instance();
+                const RideMetric *e = factory.rideMetric(o_symbol);
+
+                if (e) {
+                    if (wantname) list << e->name();
+                    else list << e->units(GlobalContext::context()->useMetricUnits);
+                }
+                else list << "(null)";
+            }
+
+            // return a single value, or a list
+            if (list.count() == 1) return Result(list[0]);
+            else return Result(list);
         }
 
         if (leaf->function == "daterange") {
