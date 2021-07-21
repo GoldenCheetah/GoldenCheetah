@@ -1039,7 +1039,7 @@ LTMSidebar::autoFilterSelectionChanged()
     }
 
     // all done
-    autoFilterFiles = matched.toList();
+    autoFilterFiles = matched.values();
 
     // tell the world
     filterNotify();
