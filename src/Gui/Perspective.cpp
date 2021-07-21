@@ -1200,7 +1200,7 @@ GcWindowDialog::GcWindowDialog(GcWinID type, Context *context, GcChartWindow **h
     setWindowFlags(windowFlags());
     setWindowTitle(tr("Chart Setup"));
 
-    QRect size= desktop->availableGeometry();
+    QRect size= QGuiApplication::screens()[0]->availableGeometry();
     setMinimumHeight(500);
 
     // chart and settings side by side need to be big!

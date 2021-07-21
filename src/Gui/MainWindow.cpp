@@ -197,7 +197,7 @@ MainWindow::MainWindow(const QDir &home)
      } else {
          // first run -- lets set some sensible defaults...
          // lets put it in the middle of screen 1
-        QRect screenSize = desktop->availableGeometry();
+         QRect screenSize = QGuiApplication::screens()[0]->availableGeometry();
          struct SizeSettings app = GCColor::defaultSizes(screenSize.height(), screenSize.width());
 
          // center on the available screen (minus toolbar/sidebar)
@@ -783,7 +783,7 @@ MainWindow::setSplash(bool first)
 
     if (first) {
         // middle of screen
-        splash->move(desktop->availableGeometry().center()-QPoint(50, 25));
+        splash->move(QGuiApplication::screens()[0]->availableGeometry().center()-QPoint(50, 25));
     } else {
         // middle of mainwindow is appropriate
         splash->move(geometry().center()-QPoint(50, 25));

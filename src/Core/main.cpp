@@ -459,13 +459,13 @@ main(int argc, char *argv[])
     // 2560x1700 chromebook pixel before we get to truly hi-dpi
     // resolutions like apples MBP retina 2880x1800 up through
     // UHD, 4k and 5k displays at 3840x2160, 4096x2304 and 5120 x 2160.
-    QRect screenSize = desktop->availableGeometry();
+    QRect screenSize = QGuiApplication::screens()[0]->availableGeometry();
 
     // if we're running with dpiawareness of 0 the screen resolution
     // will be expressed taking into account the scaling applied
     // so for example a 3840x2160 screen will likely be expressed as
     // being 1920 x 1080 rather than the native resolution
-    if (desktop->screen()->devicePixelRatio() <= 1 && screenSize.width() > 2160) {
+    if (QGuiApplication::screens()[0]->devicePixelRatio() <= 1 && screenSize.width() > 2160) {
        // we're on a hidpi screen - lets create a multiplier - always use smallest
        dpiXFactor = screenSize.width() / 1280.0;
        dpiYFactor = screenSize.height() / 1024.0;
