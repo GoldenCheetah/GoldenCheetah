@@ -715,7 +715,7 @@ ExtendedCriticalPower::getPlotMarkerForExtendedCP(TestModel model)
     QwtPlotMarker* extendedCurveTitle2 = new QwtPlotMarker();
     QString extendedCurve2_title;
 
-    extendedCurve2_title.sprintf("CP=%.0f W, MMP60=%.0d W, Pmax=%.0d W, W'=%.0f kJ (%s)", model.ecp, model.mmp60, model.pMax, model.etau*model.ecp* 60.0 / 1000.0, model.version.toLatin1().constData());
+    extendedCurve2_title.asprintf("CP=%.0f W, MMP60=%.0d W, Pmax=%.0d W, W'=%.0f kJ (%s)", model.ecp, model.mmp60, model.pMax, model.etau*model.ecp* 60.0 / 1000.0, model.version.toLatin1().constData());
     QwtText text(extendedCurve2_title, QwtText::PlainText);
     text.setColor(GColor(CPLOTMARKER));
     extendedCurveTitle2->setLabel(text);
