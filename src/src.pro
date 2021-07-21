@@ -6,9 +6,6 @@
 ###############################################################################
 
 !versionAtLeast(QT_VERSION, 5.13):error("Use at least Qt version 5.13")
-greaterThan(QT_MAJOR_VERSION, 5) {
-    error("Qt6 is unsupported whilst we wait for key dependencies to be included.")
-}
 
 ###==========================
 ### IMPORT USER CONFIGURATION
@@ -40,7 +37,12 @@ CONFIG(debug, debug|release) { QMAKE_CXXFLAGS += -DGC_DEBUG }
 
 # always
 QT += xml sql network svg  widgets concurrent serialport multimedia multimediawidgets \
-      webengine webenginecore webenginewidgets webchannel positioning
+      webenginecore webenginewidgets webchannel positioning
+greaterThan(QT_MAJOR_VERSION, 5) {
+    QT += webenginequick core5compat
+} else {
+    QT += webengine
+}
 CONFIG += c++11
 
 
@@ -250,10 +252,6 @@ notsupported += $${QT_VERSION}
 
 contains(DEFINES, "GC_WANT_PYTHON") {
 
-    greaterThan(QT_MAJOR_VERSION, 4) {
-
-        greaterThan(QT_MINOR_VERSION, 7) {
-
             # add Python subdirectory to include path
             INCLUDEPATH += ./Python
 
@@ -282,17 +280,6 @@ contains(DEFINES, "GC_WANT_PYTHON") {
 
             SOURCES += FileIO/FixPyScriptsDialog.cpp FileIO/FixPySettings.cpp FileIO/FixPyRunner.cpp \
                        FileIO/FixPyDataProcessor.cpp
-
-         } else {
-            # QT5 but not 5.5 or higher
-            message($$notsupported)
-        }
-
-    } else {
-
-        # QT5 but not 5.5 or higher
-        message($$notsupported)
-    }
 
 }
 
@@ -557,10 +544,6 @@ notsupported += $${QT_VERSION}
 
 equals(CloudDB, active) {
 
-    greaterThan(QT_MAJOR_VERSION, 4) {
-
-        greaterThan(QT_MINOR_VERSION, 4) {
-
             HEADERS += Cloud/CloudDBChart.h Cloud/CloudDBCommon.h \
                        Cloud/CloudDBCurator.h Cloud/CloudDBStatus.h \
                        Cloud/CloudDBVersion.h Cloud/CloudDBTelemetry.h \
@@ -571,18 +554,6 @@ equals(CloudDB, active) {
                        Cloud/CloudDBUserMetric.cpp
 
             DEFINES += GC_HAS_CLOUD_DB
-
-        } else {
-
-            # QT5 but not 5.5 or higher
-            message($$notsupported)
-        }
-
-    } else {
-
-        # QT4 not supported
-        message($$notsupported)
-    }
 }
 
 
@@ -600,67 +571,55 @@ equals(CloudDB, active) {
 ### FEATURES ENABLED WHEN HAVE QT5 [or higher]
 ###===========================================
 
-greaterThan(QT_MAJOR_VERSION, 4) {
 
-    # Features that only work with QT5 or higher
-    SOURCES += Cloud/Dropbox.cpp
-    HEADERS += Cloud/Dropbox.h
-    SOURCES += Cloud/GoogleDrive.cpp Cloud/KentUniversity.cpp
-    HEADERS += Cloud/GoogleDrive.h Cloud/KentUniversity.h
-    SOURCES += Cloud/OpenData.cpp
-    HEADERS += Cloud/OpenData.h
+# Features that only work with QT5 or higher
+SOURCES += Cloud/Dropbox.cpp
+HEADERS += Cloud/Dropbox.h
+SOURCES += Cloud/GoogleDrive.cpp Cloud/KentUniversity.cpp
+HEADERS += Cloud/GoogleDrive.h Cloud/KentUniversity.h
+SOURCES += Cloud/OpenData.cpp
+HEADERS += Cloud/OpenData.h
 
-    greaterThan(QT_MINOR_VERSION, 3) {
-        SOURCES += Cloud/SixCycle.cpp
-        HEADERS += Cloud/SixCycle.h
-        SOURCES += Cloud/PolarFlow.cpp
-        HEADERS += Cloud/PolarFlow.h
-        SOURCES += Cloud/SportTracks.cpp
-        HEADERS += Cloud/SportTracks.h
-        SOURCES += Cloud/TodaysPlan.cpp
-        HEADERS += Cloud/TodaysPlan.h
-    }
+SOURCES += Cloud/SixCycle.cpp
+HEADERS += Cloud/SixCycle.h
+SOURCES += Cloud/PolarFlow.cpp
+HEADERS += Cloud/PolarFlow.h
+SOURCES += Cloud/SportTracks.cpp
+HEADERS += Cloud/SportTracks.h
+SOURCES += Cloud/TodaysPlan.cpp
+HEADERS += Cloud/TodaysPlan.h
 
-    SOURCES += Train/MonarkController.cpp Train/MonarkConnection.cpp
-    HEADERS += Train/MonarkController.h Train/MonarkConnection.h
-    SOURCES += Train/Kettler.cpp Train/KettlerController.cpp Train/KettlerConnection.cpp
-    HEADERS += Train/Kettler.h Train/KettlerController.h Train/KettlerConnection.h
-    SOURCES += Train/KettlerRacer.cpp Train/KettlerRacerController.cpp Train/KettlerRacerConnection.cpp
-    HEADERS += Train/KettlerRacer.h Train/KettlerRacerController.h Train/KettlerRacerConnection.h
-    SOURCES += Train/Ergofit.cpp Train/ErgofitController.cpp Train/ErgofitConnection.cpp
-    HEADERS += Train/Ergofit.h Train/ErgofitController.h Train/ErgofitConnection.h
-    SOURCES += Train/DaumController.cpp Train/Daum.cpp
-    HEADERS += Train/DaumController.h Train/Daum.h
-    SOURCES += Train/KurtInRide.cpp Train/KurtSmartControl.cpp
-    HEADERS += Train/KurtInRide.h Train/KurtSmartControl.h
+SOURCES += Train/MonarkController.cpp Train/MonarkConnection.cpp
+HEADERS += Train/MonarkController.h Train/MonarkConnection.h
+SOURCES += Train/Kettler.cpp Train/KettlerController.cpp Train/KettlerConnection.cpp
+HEADERS += Train/Kettler.h Train/KettlerController.h Train/KettlerConnection.h
+SOURCES += Train/KettlerRacer.cpp Train/KettlerRacerController.cpp Train/KettlerRacerConnection.cpp
+HEADERS += Train/KettlerRacer.h Train/KettlerRacerController.h Train/KettlerRacerConnection.h
+SOURCES += Train/Ergofit.cpp Train/ErgofitController.cpp Train/ErgofitConnection.cpp
+HEADERS += Train/Ergofit.h Train/ErgofitController.h Train/ErgofitConnection.h
+SOURCES += Train/DaumController.cpp Train/Daum.cpp
+HEADERS += Train/DaumController.h Train/Daum.h
+SOURCES += Train/KurtInRide.cpp Train/KurtSmartControl.cpp
+HEADERS += Train/KurtInRide.h Train/KurtSmartControl.h
 
-    # bluetooth in QT5.5 or higher(5.4 was only a tech preview)
-    greaterThan(QT_MINOR_VERSION, 4) {
-        QT += bluetooth
-        HEADERS += Train/BT40Controller.h Train/BT40Device.h
-        SOURCES += Train/BT40Controller.cpp Train/BT40Device.cpp
-        HEADERS += Train/VMProConfigurator.h Train/VMProWidget.h
-        SOURCES += Train/VMProConfigurator.cpp Train/VMProWidget.cpp
-    }
+QT += bluetooth
+HEADERS += Train/BT40Controller.h Train/BT40Device.h
+SOURCES += Train/BT40Controller.cpp Train/BT40Device.cpp
+HEADERS += Train/VMProConfigurator.h Train/VMProWidget.h
+SOURCES += Train/VMProConfigurator.cpp Train/VMProWidget.cpp
 
-    # qt charts is officially supported from QT5.8 or higher
-    # in 5.7 it is a tech preview and not always available
-    greaterThan(QT_MINOR_VERSION, 7) {
+QT += charts opengl
 
-        QT += charts opengl
+# Dashboard uses qt charts, so needs at least Qt 5.7
+DEFINES += GC_HAVE_OVERVIEW
+HEADERS += Gui/ChartSpace.h Charts/OverviewItems.h Charts/Overview.h
+SOURCES += Gui/ChartSpace.cpp Charts/OverviewItems.cpp Charts/Overview.cpp
 
-        # Dashboard uses qt charts, so needs at least Qt 5.7
-        DEFINES += GC_HAVE_OVERVIEW
-        HEADERS += Gui/ChartSpace.h Charts/OverviewItems.h Charts/Overview.h
-        SOURCES += Gui/ChartSpace.cpp Charts/OverviewItems.cpp Charts/Overview.cpp
+# generic chart
+DEFINES += GC_HAVE_GENERIC
+HEADERS += Charts/UserChart.h Charts/UserChartData.h Charts/GenericChart.h Charts/GenericPlot.h Charts/GenericSelectTool.h Charts/GenericLegend.h
+SOURCES += Charts/UserChart.cpp Charts/UserChartData.cpp Charts/GenericChart.cpp Charts/GenericPlot.cpp Charts/GenericSelectTool.cpp Charts/GenericLegend.cpp
 
-        # generic chart
-        DEFINES += GC_HAVE_GENERIC
-        HEADERS += Charts/UserChart.h Charts/UserChartData.h Charts/GenericChart.h Charts/GenericPlot.h Charts/GenericSelectTool.h Charts/GenericLegend.h
-        SOURCES += Charts/UserChart.cpp Charts/UserChartData.cpp Charts/GenericChart.cpp Charts/GenericPlot.cpp Charts/GenericSelectTool.cpp Charts/GenericLegend.cpp
-
-    }
-}
 
 
 ###=====================
