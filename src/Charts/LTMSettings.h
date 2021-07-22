@@ -221,8 +221,6 @@ class LTMSettings {
     public:
 
         LTMSettings() {
-            // we need to register the stream operators
-            qRegisterMetaTypeStreamOperators<LTMSettings>("LTMSettings");
             bests = NULL;
             ltmTool = NULL;
         }
