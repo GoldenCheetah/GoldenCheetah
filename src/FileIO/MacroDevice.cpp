@@ -154,7 +154,7 @@ MacroDevice::download( const QDir &tmpdir,
 
     if (!tmp.open()) {
         err = tr("Failed to create temporary file ")
-            + tmpl + ": " + tmp.error();
+            + tmpl + ": " + tmp.errorString();
         return false;
     }
 

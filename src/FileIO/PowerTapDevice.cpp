@@ -281,7 +281,7 @@ PowerTapDevice::download( const QDir &tmpdir,
     tmp.setAutoRemove(false);
     if (!tmp.open()) {
         err = tr("Failed to create temporary file ")
-            + tmpl + ": " + tmp.error();
+            + tmpl + ": " + tmp.errorString();
         return false;
     }
     // QTemporaryFile initially has permissions set to 0600.

@@ -25,6 +25,7 @@
 #include <QDir>
 #include <QVector>
 #include <QRegularExpression>
+#include <QStringRef>
 
 namespace Utils
 {
@@ -506,7 +507,7 @@ number(QString x)
         if (QString("0123456789").contains(x[i])) {
             innumber = true;
             extract += x[i];
-        } else if (innumber && (x[i] == "," ||  x[i]==".")) {
+        } else if (innumber && (x[i] == QChar(',') ||  x[i] == QChar('.'))) {
             if (seendp) break;
             else {
                 seendp = true;

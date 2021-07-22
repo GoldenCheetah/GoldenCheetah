@@ -247,7 +247,7 @@ main(int argc, char *argv[])
     // By default, print messages from all categories, but not those from
     // specialised categories like qt.* or gc.* which can be quite verbose
     QString debugRules = QString("*.debug=true;gc.*.debug=false;qt.*.debug=false");
-    QString debugFile = NULL;
+    QString debugFile = QString();
 
     bool server = false;
     nogui = false;
@@ -598,7 +598,7 @@ main(int argc, char *argv[])
 
 
         // now redirect stderr and set the log filter and format
-        if (debugFile != NULL) nostderr(debugFile);
+        if (debugFile != QString()) nostderr(debugFile);
         else if (!debug) nostderr(QString("%1/%2").arg(home.canonicalPath()).arg("goldencheetah.log"));
         qSetMessagePattern(debugFormat);
         QLoggingCategory::setFilterRules(debugRules.replace(";", "\n")); // accept ; as separator like QT_LOGGING_RULES
