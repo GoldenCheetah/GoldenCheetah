@@ -380,7 +380,6 @@ WorkoutWindow::configChanged(qint32)
     // text edit colors
     QPalette palette;
     palette.setColor(QPalette::Window, GColor(CTRAINPLOTBACKGROUND));
-    palette.setColor(QPalette::Background, GColor(CTRAINPLOTBACKGROUND));
 
     // only change base if moved away from white plots
     // which is a Mac thing

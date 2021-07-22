@@ -660,13 +660,11 @@ CriticalPowerWindow::configChanged(qint32)
     QPalette whitepalette;
     if (rangemode) {
         whitepalette.setBrush(QPalette::Window, QBrush(GColor(CTRENDPLOTBACKGROUND)));
-        whitepalette.setBrush(QPalette::Background, QBrush(GColor(CTRENDPLOTBACKGROUND)));
         whitepalette.setColor(QPalette::WindowText, GCColor::invertColor(GColor(CTRENDPLOTBACKGROUND)));
         whitepalette.setColor(QPalette::Base, GCColor::alternateColor(GColor(CPLOTBACKGROUND)));
         whitepalette.setColor(QPalette::Text, GCColor::invertColor(GColor(CTRENDPLOTBACKGROUND)));
     } else {
         whitepalette.setBrush(QPalette::Window, QBrush(GColor(CPLOTBACKGROUND)));
-        whitepalette.setBrush(QPalette::Background, QBrush(GColor(CPLOTBACKGROUND)));
         whitepalette.setColor(QPalette::WindowText, GCColor::invertColor(GColor(CPLOTBACKGROUND)));
         whitepalette.setColor(QPalette::Base, GCColor::alternateColor(GColor(CPLOTBACKGROUND)));
         whitepalette.setColor(QPalette::Text, GCColor::invertColor(GColor(CPLOTBACKGROUND)));

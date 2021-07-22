@@ -46,7 +46,7 @@ GenericChart::GenericChart(QWidget *parent, Context *context) : QWidget(parent),
 {
     // for scrollarea, since we see a little of it.
     QPalette palette;
-    palette.setBrush(QPalette::Background, QBrush(GColor(CRIDEPLOTBACKGROUND)));
+    palette.setBrush(QPalette::Window, QBrush(GColor(CRIDEPLOTBACKGROUND)));
 
     // main layout for widget
     QVBoxLayout *main=new QVBoxLayout(this);
@@ -93,7 +93,7 @@ GenericChart::configChanged(qint32)
 
     setProperty("color", GColor(CPLOTBACKGROUND));
     QPalette palette;
-    palette.setBrush(QPalette::Background, QBrush(GColor(CRIDEPLOTBACKGROUND)));
+    palette.setBrush(QPalette::Window, QBrush(GColor(CRIDEPLOTBACKGROUND)));
     setPalette(palette); // propagates to children
 
     // set style sheets

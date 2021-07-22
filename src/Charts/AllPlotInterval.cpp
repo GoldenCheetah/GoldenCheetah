@@ -122,7 +122,7 @@ void
 AllPlotInterval::configChanged(qint32)
 {
     QPalette pal = palette();
-    pal.setBrush(QPalette::Background, QBrush(GColor(CRIDEPLOTBACKGROUND)));
+    pal.setBrush(QPalette::Window, QBrush(GColor(CRIDEPLOTBACKGROUND)));
     setPalette(pal);
     setCanvasBackground(GColor(CRIDEPLOTBACKGROUND));
     static_cast<QwtPlotCanvas*>(canvas())->setFrameStyle(QFrame::NoFrame);

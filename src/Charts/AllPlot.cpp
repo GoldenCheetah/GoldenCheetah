@@ -997,7 +997,7 @@ AllPlot::AllPlot(QWidget *parent, AllPlotWindow *window, Context *context, RideF
     setAxisScaleDraw(QwtAxisId(QwtAxis::yLeft, 2), sd);
 
     QPalette pal = palette();
-    pal.setBrush(QPalette::Background, QBrush(GColor(CRIDEPLOTBACKGROUND)));
+    pal.setBrush(QPalette::Window, QBrush(GColor(CRIDEPLOTBACKGROUND)));
     pal.setColor(QPalette::WindowText, QColor(Qt::gray));
     pal.setColor(QPalette::Text, QColor(Qt::gray));
     axisWidget(QwtAxisId(QwtAxis::yLeft, 2))->setPalette(pal);
@@ -1471,7 +1471,7 @@ AllPlot::configChanged(qint32 what)
         }
 
         QPalette pal = palette();
-        pal.setBrush(QPalette::Background, QBrush(GColor(CRIDEPLOTBACKGROUND)));
+        pal.setBrush(QPalette::Window, QBrush(GColor(CRIDEPLOTBACKGROUND)));
         setPalette(pal);
 
         // tick draw
@@ -1575,7 +1575,7 @@ AllPlot::setLeftOnePalette()
     setAxisScaleDraw(QwtAxisId(QwtAxis::yLeft, 1), sd);
 
     QPalette pal = palette();
-    pal.setBrush(QPalette::Background, QBrush(GColor(CRIDEPLOTBACKGROUND)));
+    pal.setBrush(QPalette::Window, QBrush(GColor(CRIDEPLOTBACKGROUND)));
     pal.setColor(QPalette::WindowText, single);
     pal.setColor(QPalette::Text, single);
 
@@ -1617,7 +1617,7 @@ AllPlot::setRightPalette()
     setAxisScaleDraw(QwtAxisId(QwtAxis::yRight, 0), sd);
 
     QPalette pal = palette();
-    pal.setBrush(QPalette::Background, QBrush(GColor(CRIDEPLOTBACKGROUND)));
+    pal.setBrush(QPalette::Window, QBrush(GColor(CRIDEPLOTBACKGROUND)));
     pal.setColor(QPalette::WindowText, single);
     pal.setColor(QPalette::Text, single);
 

@@ -121,7 +121,6 @@ HrPwPlot::configChanged(qint32)
 
     QPalette palette;
     palette.setBrush(QPalette::Window, QBrush(GColor(CPLOTBACKGROUND)));
-    palette.setBrush(QPalette::Background, QBrush(GColor(CPLOTBACKGROUND)));
     palette.setColor(QPalette::WindowText, GColor(CPLOTMARKER));
     palette.setColor(QPalette::Text, GColor(CPLOTMARKER));
     setPalette(palette);
