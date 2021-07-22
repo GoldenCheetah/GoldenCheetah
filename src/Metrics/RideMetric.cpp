@@ -185,7 +185,7 @@ RideMetric::userMetricFingerprint(QList<UserMetricSettings> these)
     foreach(UserMetricSettings x, these)
         fingers += x.fingerprint.toLocal8Bit();
 
-    return qChecksum(fingers.constData(), fingers.size());
+    return qChecksum(fingers);
 }
 
 QHash<QString,RideMetricPtr>

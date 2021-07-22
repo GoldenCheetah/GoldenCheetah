@@ -1052,7 +1052,7 @@ Zones::getFingerprint() const
     QByteArray ba = QByteArray::number(x);
 
     // we spot other things separately
-    return qChecksum(ba, ba.length());
+    return qChecksum(ba);
 }
 
 // get fingerprint just for the range that applies on this date
@@ -1088,7 +1088,7 @@ Zones::getFingerprint(QDate forDate) const
     QByteArray ba = QByteArray::number(x);
 
     // limits to only zones now as we sport weight separately
-    return qChecksum(ba, ba.length());
+    return qChecksum(ba);
 }
 
 QString

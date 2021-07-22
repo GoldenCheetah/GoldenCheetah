@@ -335,7 +335,7 @@ Routes::getFingerprint() const
     foreach(RouteSegment segment, routes) ba += segment.id().toByteArray();
 
     // we spot other things separately
-    return qChecksum(ba, ba.length());
+    return qChecksum(ba);
 }
 
 void

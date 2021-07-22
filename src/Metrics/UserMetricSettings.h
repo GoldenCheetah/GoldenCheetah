@@ -53,15 +53,15 @@ class UserMetricSettings {
                                     this->description +
                                     this->unitsMetric +
                                     this->unitsImperial +
-                                    this->type +
-                                    this->precision +
-                                    this->aggzero +
-                                    this->istime +
-                                    this->conversion +
-                                    this->conversionSum +
+                                    QString::number(this->type) +
+                                    QString::number(this->precision) +
+                                    QString::number(this->aggzero) +
+                                    QString::number(this->istime) +
+                                    QString::number(this->conversion) +
+                                    QString::number(this->conversionSum) +
                                     this->program).toUtf8();
 
-            return qChecksum(ba, ba.length());
+            return qChecksum(ba);
         }
 
         QString symbol,

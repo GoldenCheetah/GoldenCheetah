@@ -44,7 +44,7 @@ Measure::getFingerprint() const
     QByteArray ba = QByteArray::number(x);
     ba.append(comment);
 
-    return qChecksum(ba, ba.length());
+    return qChecksum(ba);
 }
 
 QString
