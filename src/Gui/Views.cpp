@@ -28,9 +28,6 @@
 #include "TrainBottom.h"
 #include "Specification.h"
 
-#include <QDesktopWidget>
-extern QDesktopWidget *desktop;
-
 AnalysisView::AnalysisView(Context *context, QStackedWidget *controls) : TabView(context, VIEW_ANALYSIS)
 {
     analSidebar = new AnalysisSidebar(context);

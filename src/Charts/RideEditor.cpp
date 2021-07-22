@@ -1093,9 +1093,10 @@ RideEditor::pasteSpecial()
     PasteSpecialDialog *paster = new PasteSpecialDialog(this);
 
     // center the dialog
-    QDesktopWidget *desktop = QApplication::desktop();
-    int x = (desktop->width() - paster->size().width()) / 2;
-    int y = ((desktop->height() - paster->size().height()) / 2) -(50*dpiYFactor);
+    QScreen* screen = QGuiApplication::primaryScreen();
+    auto availableGeometry = screen->availableGeometry();
+    int x = (availableGeometry.width() - paster->size().width()) / 2;
+    int y = ((availableGeometry.height() - paster->size().height()) / 2) - (50 * dpiYFactor);
 
     // move window to desired coordinates
     paster->move(x,y);

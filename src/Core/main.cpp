@@ -30,7 +30,6 @@
 #include "GcCrashDialog.h" // for versionHTML
 
 #include <QApplication>
-#include <QDesktopWidget>
 #include <QtGui>
 #include <QFile>
 #include <QMessageBox>
@@ -69,7 +68,6 @@ static int gc_opened=0;
 //
 QString gcroot;
 QApplication *application;
-QDesktopWidget *desktop = NULL;
 
 #ifdef GC_WANT_HTTP
 #include "APIWebService.h"
@@ -439,9 +437,6 @@ main(int argc, char *argv[])
     // use the default before taking into account screen size
     baseFont = font;
 
-    // hidpi ratios -- single desktop for now
-    desktop = QApplication::desktop();
-
 
     // since almost all dialogs are sized for a screen resolution
     // of 1280x1024, to save issues we will scale DIALOGS to the
@@ -480,7 +475,8 @@ main(int argc, char *argv[])
        double height = screenSize.height() / 70;
 
        // points = height in inches * dpi
-       double pointsize = (height / QApplication::desktop()->logicalDpiY()) * 72;
+       double pointsize = (height / QApplication::primaryScreen()->
+               logicalDotsPerInchY()) * 72;
        baseFont.setPointSizeF(pointsize);
 
        // fixup some style issues from QT not adjusting defaults on hidpi displays

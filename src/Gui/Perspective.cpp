@@ -37,7 +37,6 @@
 #include "RTool.h"
 #endif
 
-#include <QDesktopWidget>
 #include <QStyle>
 #include <QStyleFactory>
 #include <QScrollBar>
