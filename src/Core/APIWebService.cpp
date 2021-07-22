@@ -395,7 +395,6 @@ APIWebService::listActivity(QString athlete, QStringList paths, HttpRequest &req
             // read in the whole thing
             out.open(QFile::ReadOnly | QFile::Text);
             QTextStream in(&out);
-            in.setCodec ("UTF-8");
             contents = in.readAll();
             out.close();
 

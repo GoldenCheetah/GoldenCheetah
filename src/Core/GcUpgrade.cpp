@@ -1005,7 +1005,6 @@ GcUpgradeLogDialog::saveAs()
     QFile file(fileName);
     file.resize(0);
     QTextStream out(&file);
-    out.setCodec("UTF-8");
 
     if (file.open(QIODevice::WriteOnly)) {
 

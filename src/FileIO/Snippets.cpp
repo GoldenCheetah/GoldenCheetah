@@ -123,8 +123,6 @@ Snippets::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString op=
 
         // setup streamer
         QTextStream out(&outfile);
-        // unified codepage and BOM for identification on all platforms
-        out.setCodec("UTF-8");
         //out.setGenerateByteOrderMark(true); << make it easier to parse with no BOM
 
         out << "{\n\t\"" << op << "\": {\n";

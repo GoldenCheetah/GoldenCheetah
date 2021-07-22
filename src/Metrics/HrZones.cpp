@@ -112,7 +112,6 @@ bool HrZones::read(QFile &file)
         return false;
     }
     QTextStream fileStream(&file);
-    fileStream.setCodec("UTF-8");
 
     QRegExp commentrx("\\s*#.*$");
     QRegExp blankrx("^[ \t]*$");
@@ -729,7 +728,6 @@ void HrZones::write(QDir home)
     if (file.open(QFile::WriteOnly))
     {
         QTextStream stream(&file);
-        stream.setCodec("UTF-8");
         stream << strzones;
         file.close();
     } else {

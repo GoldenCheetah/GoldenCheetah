@@ -932,7 +932,6 @@ GcChartWindow::saveChart()
 
     // lets go to it
     QTextStream out(&outfile);
-    out.setCodec ("UTF-8");
 
     serializeChartToQTextStream(out);
 
@@ -996,7 +995,6 @@ GcChartWindow::chartPropertiesFromFile(QString filename)
         // read in the whole thing
         QTextStream in(&file);
         // GC .JSON is stored in UTF-8 with BOM(Byte order mark) for identification
-        in.setCodec ("UTF-8");
         contents = in.readAll();
         file.close();
     }
@@ -1079,7 +1077,6 @@ GcChartWindow::exportChartToCloudDB()
     chart.Header.GcVersion =  QString::number(version);
     // get the gchart - definition json
     QTextStream out(&chart.ChartDef);
-    out.setCodec ("UTF-8");
     serializeChartToQTextStream(out);
     out.flush();
     // get Type and View from properties

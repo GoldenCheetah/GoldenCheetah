@@ -1390,7 +1390,6 @@ RideMetadata::serialize(QString filename, QList<KeywordDefinition>keywordDefinit
     };
     file.resize(0);
     QTextStream out(&file);
-    out.setCodec("UTF-8");
 
     // begin document
     out << "<metadata>\n";

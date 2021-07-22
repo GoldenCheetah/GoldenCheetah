@@ -275,7 +275,6 @@ GcFileReader::writeRideFile(Context *,const RideFile *ride, QFile &file) const
         return false;
     file.resize(0);
     QTextStream out(&file);
-    out.setCodec("UTF-8");
     out.setGenerateByteOrderMark(true);
     out << xml;
     out.flush();

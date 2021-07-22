@@ -96,7 +96,6 @@ LTMChartParser::serialize(QString filename, QList<LTMSettings> charts)
     };
     file.resize(0);
     QTextStream out(&file);
-    out.setCodec("UTF-8");
 
     serializeToQTextStream(out, charts);
 
@@ -108,7 +107,6 @@ void
 LTMChartParser::serializeToQString(QString* string, QList<LTMSettings> charts)
 {
     QTextStream out(string);
-    out.setCodec("UTF-8");
 
     serializeToQTextStream(out, charts);
 

@@ -305,7 +305,6 @@ UserChart::settings() const
     QString returning;
 
     QTextStream out(&returning);
-    out.setCodec("UTF-8");
     out << "{ ";
 
     // chartinfo

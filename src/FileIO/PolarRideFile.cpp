@@ -45,7 +45,6 @@ bool ScanPddFile(QFile &file, QString &hrmFile, QString &hrvFile, QString &gpxFi
       // from a QString
       QString contents;
       QTextStream in(&file);
-      in.setCodec("UTF-8");
       contents = in.readAll();
       file.close();
       // check if the text string contains the replacement character for UTF-8 encoding
@@ -59,7 +58,7 @@ bool ScanPddFile(QFile &file, QString &hrmFile, QString &hrvFile, QString &gpxFi
   file.open(QFile::ReadOnly);
   QTextStream is(&file);
   if (useISO8859)
-      is.setCodec ("ISO 8859-1");
+      is.setEncoding ( QStringConverter::Latin1 );
 
   while (!is.atEnd()) {
     // the readLine() method doesn't handle old Macintosh CR line
@@ -189,7 +188,6 @@ void HrmRideFile(RideFile *rideFile, RideFile*gpxresult, bool haveGPX, XDataSeri
       // from a QString
       QString contents;
       QTextStream in(&file);
-      in.setCodec("UTF-8");
       contents = in.readAll();
       file.close();
       // check if the text string contains the replacement character for UTF-8 encoding
@@ -204,7 +202,7 @@ void HrmRideFile(RideFile *rideFile, RideFile*gpxresult, bool haveGPX, XDataSeri
   file.open(QFile::ReadOnly);
   QTextStream is(&file);
   if (useISO8859)
-      is.setCodec ("ISO 8859-1");
+      is.setEncoding ( QStringConverter::Latin1 );
   QString section = NULL;
 
   if (haveGPX)

@@ -83,7 +83,6 @@ LibraryParser::serialize(QDir home)
     };
     file.resize(0);
     QTextStream out(&file);
-    out.setCodec("UTF-8");
 
 
     // write out to file

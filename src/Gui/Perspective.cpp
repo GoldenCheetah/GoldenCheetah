@@ -1481,7 +1481,6 @@ Perspective::toFile(QString filename)
     // truncate and use 8bit encoding
     file.resize(0);
     QTextStream out(&file);
-    out.setCodec("UTF-8");
 
     // write to output stream
     toXml(out);

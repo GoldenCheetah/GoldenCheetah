@@ -198,7 +198,6 @@ NamedSearchParser::serialize(QString filename, QList<NamedSearch>NamedSearches)
     };
     file.resize(0);
     QTextStream out(&file);
-    out.setCodec("UTF-8");
 
     // begin document
     out << "<NamedSearches>\n";

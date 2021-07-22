@@ -1669,7 +1669,6 @@ LTMWindow::exportData()
 
         // open stream and write header
         QTextStream stream(&f);
-        stream.setCodec("UTF-8"); // Names and Units can be translated
         stream << content;
 
         // and we're done

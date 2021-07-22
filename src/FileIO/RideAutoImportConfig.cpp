@@ -161,7 +161,6 @@ RideAutoImportConfigParser::serialize(QString filename, QList<RideAutoImportRule
     };
     file.resize(0);
     QTextStream out(&file);
-    out.setCodec("UTF-8");
 
     // begin document
     out << "<autoimportrules>\n";

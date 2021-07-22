@@ -1207,7 +1207,6 @@ ErgFile::save(QStringList &errors)
 
         // setup output stream to file
         QTextStream out(&f);
-        out.setCodec("UTF-8");
 
         // write the header
         //
@@ -1317,7 +1316,6 @@ ErgFile::save(QStringList &errors)
 
         // setup output stream to file
         QTextStream out(&f);
-        out.setCodec("UTF-8");
 
         // write the header
         //
@@ -1422,7 +1420,6 @@ ErgFile::save(QStringList &errors)
 
         // setup output stream to file
         QTextStream out(&f);
-        out.setCodec("UTF-8");
 
         out << "<workout_file>\n";
 

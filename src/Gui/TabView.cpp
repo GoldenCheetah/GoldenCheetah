@@ -291,7 +291,6 @@ TabView::saveState()
     };
     file.resize(0);
     QTextStream out(&file);
-    out.setCodec("UTF-8");
 
     // is just a collection of layout (aka old HomeWindow name-layout.xml)
     out<<"<layouts>\n";
