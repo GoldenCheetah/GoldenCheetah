@@ -176,7 +176,7 @@ MacroDevice::download( const QDir &tmpdir,
     DeviceDownloadFile file;
     file.extension = "osyn";
     file.name = tmp.fileName();
-    file.startTime.setTime_t( mktime( &start ));
+    file.startTime.setSecsSinceEpoch( mktime( &start ));
     files.append(file);
 
     QTextStream os(&tmp);

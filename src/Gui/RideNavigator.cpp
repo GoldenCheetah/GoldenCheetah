@@ -1130,7 +1130,7 @@ void NavigatorCellDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
             value = dateTime.toString("hh:mm:ss"); // same format as ride list
         } else if (columnName == tr("Last updated")) {
             QDateTime dateTime;
-            dateTime.setTime_t(index.model()->data(index, Qt::DisplayRole).toInt());
+            dateTime.setSecsSinceEpoch(index.model()->data(index, Qt::DisplayRole).toInt());
             value = dateTime.toString(tr("ddd MMM d, yyyy hh:mm")); // same format as ride list
         }
     }

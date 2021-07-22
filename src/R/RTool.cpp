@@ -1011,7 +1011,7 @@ RTool::activities(SEXP filter)
             if (!specification.pass(item)) continue;
 
             // add to the list
-            REAL(dates)[i++] = item->dateTime.toUTC().toTime_t();
+            REAL(dates)[i++] = item->dateTime.toUTC().toSecsSinceEpoch();
 
         }
 
@@ -1091,7 +1091,7 @@ RTool::dfForRideItem(const RideItem *ri)
     // TIME
     SEXP time;
     PROTECT(time=Rf_allocVector(REALSXP, rides));
-    REAL(time)[0] = item->dateTime.toUTC().toTime_t();
+    REAL(time)[0] = item->dateTime.toUTC().toSecsSinceEpoch();
 
     // POSIXct class
     SEXP clas;
@@ -1305,7 +1305,7 @@ RTool::dfForDateRange(bool all, DateRange range, SEXP filter)
     foreach(RideItem *ride, rtool->context->athlete->rideCache->rides()) {
         if (!specification.pass(ride)) continue;
         if (all || range.pass(ride->dateTime.date()))
-            REAL(time)[k++] = ride->dateTime.toUTC().toTime_t();
+            REAL(time)[k++] = ride->dateTime.toUTC().toSecsSinceEpoch();
     }
 
     // POSIXct class
@@ -1525,7 +1525,7 @@ RTool::dfForDateRangeIntervals(DateRange range, QStringList types)
         if (range.pass(ride->dateTime.date())) {
             foreach(IntervalItem *item, ride->intervals())
                 if (types.isEmpty() || types.contains(RideFileInterval::typeDescription(item->type)))
-                    REAL(time)[k++] = ride->dateTime.toUTC().toTime_t() + item->start;  // time offsets by time of interval
+                    REAL(time)[k++] = ride->dateTime.toUTC().toSecsSinceEpoch() + item->start;  // time offsets by time of interval
         }
     }
 
@@ -2262,7 +2262,7 @@ RTool::dfForActivity(RideFile *f, int split, QString join)
         pcount++;
 
         // fill with values for date and class
-        for(int k=0; k<points; k++) REAL(time)[k] = f->startTime().addSecs(f->dataPoints()[index+k]->secs).toUTC().toTime_t();
+        for(int k=0; k<points; k++) REAL(time)[k] = f->startTime().addSecs(f->dataPoints()[index+k]->secs).toUTC().toSecsSinceEpoch();
 
         // POSIXct class
         SEXP clas = PROTECT(Rf_allocVector(STRSXP, 2));
@@ -2974,7 +2974,7 @@ RTool::dfForDateRangePeaks(bool all, DateRange range, SEXP filter, QList<RideFil
         if (!specification.pass(item)) continue;
 
         if (all || range.pass(item->dateTime.date())) {
-            REAL(dates)[i++] = item->dateTime.toUTC().toTime_t();
+            REAL(dates)[i++] = item->dateTime.toUTC().toSecsSinceEpoch();
         }
     }
 
@@ -3963,7 +3963,7 @@ RTool::dfForActivityXData(RideFile*f, QString name)
     pcount++;
 
     // fill with values for date and class
-    for(int k=0; k<points; k++) REAL(time)[k] = f->startTime().addSecs(xds->datapoints[k]->secs).toUTC().toTime_t();
+    for(int k=0; k<points; k++) REAL(time)[k] = f->startTime().addSecs(xds->datapoints[k]->secs).toUTC().toSecsSinceEpoch();
 
     // POSIXct class
     SEXP clas = PROTECT(Rf_allocVector(STRSXP, 2));

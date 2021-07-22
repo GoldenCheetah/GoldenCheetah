@@ -517,7 +517,7 @@ RideItem::checkStale()
                 QFile file(fullPath);
 
                 // has timestamp changed ?
-                if (timestamp < QFileInfo(file).lastModified().toTime_t()) {
+                if (timestamp < QFileInfo(file).lastModified().toSecsSinceEpoch()) {
 
                     // if timestamp has changed then check crc
                     unsigned long fcrc = RideFile::computeFileCRC(fullPath);
@@ -660,7 +660,7 @@ RideItem::refresh()
 
         dbversion = DBSchemaVersion;
         udbversion = UserMetricSchemaVersion;
-        timestamp = QDateTime::currentDateTime().toTime_t();
+        timestamp = QDateTime::currentDateTime().toSecsSinceEpoch();
 
         // we now match
         metacrc = metaCRC();

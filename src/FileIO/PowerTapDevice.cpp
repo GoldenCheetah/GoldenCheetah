@@ -314,7 +314,7 @@ PowerTapDevice::download( const QDir &tmpdir,
         if (!time_set && PowerTapUtil::is_time(data + i, bIsVer81)) {
             struct tm time;
             time_t timet = PowerTapUtil::unpack_time(data + i, &time, bIsVer81);
-            file.startTime.setTime_t( timet );
+            file.startTime.setSecsSinceEpoch( timet );
             time_set = true;
         }
     }
