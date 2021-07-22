@@ -136,7 +136,9 @@ FixElevation::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString
 
     // get settings
     if (config == NULL) { // being called automatically
-        apiKey = appsettings->value(NULL, GC_DPFE_AK, "").toInt();
+        // TODO: here an integer was assigned to a QString. I assumed a number->string conversion
+        // should happen. But maybe this is wrong. Please clarify what should happen here
+        apiKey = QString::number(appsettings->value(NULL, GC_DPFE_AK, "").toInt());
     } else { // being called manually
         apiKey = ((FixElevationConfig*)(config))->ak->text();
     }
