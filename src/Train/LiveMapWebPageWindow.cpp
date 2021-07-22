@@ -111,8 +111,7 @@ LiveMapWebPageWindow::LiveMapWebPageWindow(Context *context) : GcChartWindow(con
     webPage = view->page();
     view->setPage(webPage);
 
-    view->setContentsMargins(0,0,0,0);
-    view->page()->view()->setContentsMargins(0,10,0,0);
+    view->setContentsMargins(0,10,0,0);
     view->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     view->setAcceptDrops(false);
     layout->addWidget(view);

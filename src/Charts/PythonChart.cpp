@@ -443,7 +443,6 @@ PythonChart::setWeb(bool x)
         // setup the canvas
         canvas = new QWebEngineView(this);
         canvas->setContentsMargins(0,0,0,0);
-        canvas->page()->view()->setContentsMargins(0,0,0,0);
         canvas->setZoomFactor(dpiXFactor);
         canvas->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
         // stop stealing focus!

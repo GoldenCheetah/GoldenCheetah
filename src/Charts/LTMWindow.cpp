@@ -151,7 +151,6 @@ LTMWindow::LTMWindow(Context *context) :
     }
     dataSummary->settings()->setFontFamily(QWebEngineSettings::StandardFont, defaultFont.family());
     dataSummary->setContentsMargins(0,0,0,0);
-    dataSummary->page()->view()->setContentsMargins(0,0,0,0);
     dataSummary->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     dataSummary->setAcceptDrops(false);
 

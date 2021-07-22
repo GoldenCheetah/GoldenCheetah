@@ -160,7 +160,6 @@ WebPageWindow::WebPageWindow(Context *context) : GcChartWindow(context), context
 
     view->setPage(new simpleWebPage());
     view->setContentsMargins(0,0,0,0);
-    view->page()->view()->setContentsMargins(0,0,0,0);
     view->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     view->setAcceptDrops(false);
     layout->addWidget(view);
