@@ -93,7 +93,7 @@ static QString DetermineKey(QString & key, int& store, int& fileIndex) {
     }
 
     // and make sure <> text is removed
-    return key.remove(QRegExp("^<.*>"));
+    return key.remove(QRegularExpression("^<.*>"));
 
 }
 
@@ -136,7 +136,7 @@ GSettings::value(const QObject * /*me*/, const QString key, const QVariant def) 
         }
 
     } else {
-        keyVar.remove(QRegExp("^<.*>"));
+        keyVar.remove(QRegularExpression("^<.*>"));
         return systemsettings->value(keyVar, def);
     }
     return QVariant();
@@ -163,7 +163,7 @@ GSettings::setValue(QString key, QVariant value)
 
         }
     } else {
-        keyVar.remove(QRegExp("^<.*>"));
+        keyVar.remove(QRegularExpression("^<.*>"));
         systemsettings->setValue(keyVar, value);
     }
 
@@ -199,7 +199,7 @@ GSettings::cvalue(QString athleteName, QString key, QVariant def) {
         }
 
     } else {
-        keyVar.remove(QRegExp("^<.*>"));
+        keyVar.remove(QRegularExpression("^<.*>"));
         return systemsettings->value(athleteName+"/"+keyVar, def);
     }
     return QVariant();
@@ -227,7 +227,7 @@ GSettings::setCValue(QString athleteName, QString key, QVariant value) {
             }
         } // if we do have have the athlete - then we do not store anything
     } else {
-        keyVar.remove(QRegExp("^<.*>"));
+        keyVar.remove(QRegularExpression("^<.*>"));
         systemsettings->setValue(athleteName + "/" + keyVar,value);
 
     }
@@ -301,7 +301,7 @@ GSettings::contains(const QString & key) const {
             break;
         }
     } else {
-        keyVar.remove(QRegExp("^<.*>"));
+        keyVar.remove(QRegularExpression("^<.*>"));
         return systemsettings->contains(keyVar);
     }
     return false;
@@ -471,7 +471,7 @@ void
 GSettings::migrateValue(QString key) {
 
     QString oldKey = key;
-    oldKey.remove(QRegExp("^<.*>"));
+    oldKey.remove(QRegularExpression("^<.*>"));
     if (oldsystemsettings->contains(oldKey)) {
         setValue(key, oldsystemsettings->value(oldKey));
     }
@@ -481,7 +481,7 @@ void
 GSettings::migrateCValue(QString athlete, QString key) {
 
     QString oldKey = key;
-    oldKey.remove(QRegExp("^<.*>"));
+    oldKey.remove(QRegularExpression("^<.*>"));
     if (oldsystemsettings->contains(athlete+"/"+oldKey)) {
         setCValue(athlete, key, oldsystemsettings->value(athlete+"/"+oldKey));
     }
@@ -490,7 +490,7 @@ GSettings::migrateCValue(QString athlete, QString key) {
 void
 GSettings::migrateAndRenameCValue(QString athlete, QString wrongKey, QString key) {
 
-    wrongKey.remove(QRegExp("^<.*>"));
+    wrongKey.remove(QRegularExpression("^<.*>"));
     if (oldsystemsettings->contains(athlete+"/"+wrongKey)) {
         setCValue(athlete, key, oldsystemsettings->value(athlete+"/"+wrongKey));
     }
@@ -500,7 +500,7 @@ void
 GSettings::migrateValueToCValue(QString athlete, QString key) {
 
     QString oldKey = key;
-    oldKey.remove(QRegExp("^<.*>"));
+    oldKey.remove(QRegularExpression("^<.*>"));
     if (oldsystemsettings->contains(oldKey)) {
         setCValue(athlete, key, oldsystemsettings->value(oldKey));
     }
@@ -512,7 +512,7 @@ GSettings::migrateCValueToValue(QString athlete, QString key) {
     // only migrate if the value does not yet exist on the target INI file
     if (!contains(key)) {
         QString oldKey = key;
-        oldKey.remove(QRegExp("^<.*>"));
+        oldKey.remove(QRegularExpression("^<.*>"));
         oldKey = athlete+"/"+oldKey;
         if (oldsystemsettings->contains(oldKey)) {
             setValue(key, oldsystemsettings->value(oldKey));
@@ -614,7 +614,7 @@ GSettings::upgradeGlobal() {
     // handle the Device configuration
     migrateValue(GC_DEV_COUNT);
     QString devCountKey = GC_DEV_COUNT;
-    devCountKey.remove(QRegExp("^<.*>"));
+    devCountKey.remove(QRegularExpression("^<.*>"));
     QVariant configVal = oldsystemsettings->value(devCountKey);
     int devicecount;
     if (configVal.isNull()) {

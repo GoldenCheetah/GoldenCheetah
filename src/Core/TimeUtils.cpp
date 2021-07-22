@@ -20,9 +20,9 @@
 #include "TimeUtils.h"
 #include "Colors.h"
 #include <cmath>
-#include <QRegExpValidator>
 #include <QFormLayout>
 #include <QLabel>
+#include <QRegExp>
 
 QString time_to_string(double secs, bool forceMinutes)
 {

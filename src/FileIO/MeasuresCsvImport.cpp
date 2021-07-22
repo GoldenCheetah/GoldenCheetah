@@ -61,7 +61,7 @@ MeasuresCsvImport::getMeasures(MeasuresGroup *measuresGroup, QString &error, QDa
   int fieldCount = std::min(measuresGroup->getFieldSymbols().count(), MAX_MEASURES);
 
   // get all lines considering both LF and CR endings
-  QStringList lines = QString(file.readAll()).split(QRegExp("[\n\r]"));
+  QStringList lines = QString(file.readAll()).split(QRegularExpression("[\n\r]"));
 
   // get headers first / and check if this is a valid measures file
   CsvString headerLine = lines[0];
