@@ -33,8 +33,6 @@
 #include "qwt_scale_map.h"
 #include "qwt_scale_draw.h"
 
-#include <qmatrix.h>
-#define QwtMatrix QMatrix
 #define QwtPointArray QPolygon
 
 struct tick_info_t {
