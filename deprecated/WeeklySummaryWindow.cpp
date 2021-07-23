@@ -44,7 +44,7 @@ WeeklySummaryWindow::WeeklySummaryWindow(bool useMetricUnits,
 
     // set up the weekly distance / duration plot:
     weeklyPlot = new QwtPlot();
-    weeklyPlot->enableAxis(QwtAxis::YRight, true);
+    weeklyPlot->setAxisVisible(QwtAxis::YRight, true);
     weeklyPlot->setAxisMaxMinor(QwtAxis::XBottom,0);
     weeklyPlot->setAxisScaleDraw(QwtAxis::XBottom, new DaysScaleDraw());
     QFont weeklyPlotAxisFont = weeklyPlot->axisFont(QwtAxis::YLeft);
@@ -75,7 +75,7 @@ WeeklySummaryWindow::WeeklySummaryWindow(bool useMetricUnits,
 
     // set up the weekly bike score plot:
     weeklyBSPlot = new QwtPlot();
-    weeklyBSPlot->enableAxis(QwtAxis::YRight, true);
+    weeklyBSPlot->setAxisVisible(QwtAxis::YRight, true);
     weeklyBSPlot->setAxisMaxMinor(QwtAxis::XBottom,0);
     weeklyBSPlot->setAxisScaleDraw(QwtAxis::XBottom, new DaysScaleDraw());
     QwtText textLabel = QwtText();

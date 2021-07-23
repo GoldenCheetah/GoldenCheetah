@@ -677,7 +677,7 @@ CPPlot::plotModel()
 
     setAxisVisible(QwtAxis::YRight, showHeat || ((showPowerIndex||showPercent) && rideCurve));
 
-   // setAxisVisible(YRight, showHeat || showPercent);
+   // setAxisVisible(QwtAxis::YRight, showHeat || showPercent);
 
     //
     // HEAT AGE

@@ -3069,9 +3069,9 @@ RideFile::resample(double newRecIntSecs, int /*interpolate*/)
                 }
 
                 // Now create a spline with the values we've cleaned
-                QwtSpline *spline = new QwtSpline();
-                spline->setSplineType(QwtSpline::Periodic);
-                spline->setPoints(QPolygonF(points));
+                QwtSpline *spline = new QwtSplineBasis();
+                // TODO spline->setSplineType(QwtSpline::Periodic);
+                // TODO spline->setPoints(QPolygonF(points));
                 splines.insert(series,spline);
             }
         }
@@ -3105,7 +3105,7 @@ RideFile::resample(double newRecIntSecs, int /*interpolate*/)
                 for (double i=0; i<1; i+= 0.25) {
                     double dt = seconds + (newRecIntSecs * i);
                     double dtn = seconds + (newRecIntSecs * (i+0.25f));
-                    sum += (spline->value(dt) + spline->value(dtn)) /2.0f;
+                     // TODO sum += (spline->value(dt) + spline->value(dtn)) /2.0f;
                 }
                 sum /= 4.0f;
 

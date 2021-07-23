@@ -70,8 +70,8 @@ SpinScanPlot::SpinScanPlot(QWidget *parent, uint8_t *spinData) : QwtPlot(parent)
     axisWidget(QwtAxis::YLeft)->setPalette(pal);
     axisWidget(QwtAxis::YLeft)->scaleDraw()->setTickLength(QwtScaleDiv::MajorTick, 3);
 
-    enableAxis(QwtAxis::XBottom, false); // very little value and some cpu overhead
-    enableAxis(QwtAxis::YLeft, true);
+    setAxisVisible(QwtAxis::XBottom, false); // very little value and some cpu overhead
+    setAxisVisible(QwtAxis::YLeft, true);
 
     // 30s Power curve
     rightCurve = new QwtPlotCurve("SpinScan Left");

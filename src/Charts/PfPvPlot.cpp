@@ -35,6 +35,7 @@
 #include <qwt_plot_marker.h>
 #include <qwt_scale_draw.h>
 #include <qwt_scale_widget.h>
+#include <qwt_scale_map.h>
 #include <qwt_symbol.h>
 #include <set>
 

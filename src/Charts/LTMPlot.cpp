@@ -78,7 +78,7 @@ LTMPlot::LTMPlot(LTMWindow *parent, Context *context, int position) :
     setAxesCount(QwtAxis::YLeft, 4);
     setAxesCount(QwtAxis::YRight, 4);
     setAxesCount(QwtAxis::XBottom, 1);
-    setAxesCount(QwtAxis::xTop, 0);
+    setAxesCount(QwtAxis::XTop, 0);
 
     for (int i=0; i<4; i++) {
 
@@ -111,9 +111,8 @@ LTMPlot::LTMPlot(LTMWindow *parent, Context *context, int position) :
     // get application settings
     insertLegend(new QwtLegend(), QwtPlot::BottomLegend);
     setAxisTitle(QwtAxis::XBottom, tr("Date"));
-    enableAxis(QwtAxis::XBottom, true);
     setAxisVisible(QwtAxis::XBottom, true);
-    setAxisVisible(QwtAxis::xTop, false);
+    setAxisVisible(QwtAxis::XTop, false);
     setAxisMaxMinor(QwtAxis::XBottom,-1);
     setAxisScaleDraw(QwtAxis::XBottom, new LTMScaleDraw(QDateTime::currentDateTime(), 0, LTM_DAY));
 
@@ -276,9 +275,8 @@ LTMPlot::setData(LTMSettings *set)
         setAxisTitle(QwtAxis::XBottom, tr("Date"));
     else
         setAxisTitle(QwtAxis::XBottom, tr("Time of Day"));
-    enableAxis(QwtAxis::XBottom, true);
     setAxisVisible(QwtAxis::XBottom, true);
-    setAxisVisible(QwtAxis::xTop, false);
+    setAxisVisible(QwtAxis::XTop, false);
 
     // wipe existing curves/axes details
     QHashIterator<QString, QwtPlotCurve*> c(curves);
@@ -312,7 +310,6 @@ LTMPlot::setData(LTMSettings *set)
     // disable all y axes until we have populated
     for (int i=0; i<8; i++) {
         setAxisVisible(supportedAxes[i], false);
-        enableAxis(supportedAxes[i].id, false);
     }
     axes.clear();
     axesObject.clear();
@@ -332,9 +329,8 @@ LTMPlot::setData(LTMSettings *set)
         setAxisScale(QwtAxis::XBottom, 0, maxX);
         setAxisScaleDraw(QwtAxis::XBottom, new LTMScaleDraw(settings->start,
                 groupForDate(settings->start.date(), settings->groupBy), settings->groupBy));
-        enableAxis(QwtAxis::XBottom, true);
         setAxisVisible(QwtAxis::XBottom, true);
-        setAxisVisible(QwtAxis::xTop, false);
+        setAxisVisible(QwtAxis::XTop, false);
 
         // remove the shading if it exists
         refreshZoneLabels(QwtAxisId(-1,-1)); // turn em off
@@ -1322,14 +1318,13 @@ LTMPlot::setData(LTMSettings *set)
         setAxisScaleDraw(QwtAxis::XBottom, new LTMScaleDraw(settings->start,
                     groupForDate(settings->start.date(), settings->groupBy), settings->groupBy));
     }
-    enableAxis(QwtAxis::XBottom, true);
     setAxisVisible(QwtAxis::XBottom, true);
-    setAxisVisible(QwtAxis::xTop, false);
+    setAxisVisible(QwtAxis::XTop, false);
 
     // run through the Y axis
     for (int i=0; i<8; i++) {
         // set the scale on the axis
-        if (i != XBottom && i != xTop) {
+        if (i != QwtAxis::XBottom && i != QwtAxis::XTop) {
             maxY[i] *= 1.1; // add 10% headroom
             if (maxY[i] == minY[i] && maxY[i] == 0)
                 setAxisScale(supportedAxes[i], 0.0f, 100.0f); // to stop ugly
@@ -1339,7 +1334,7 @@ LTMPlot::setData(LTMSettings *set)
     }
 
     QString format = axisTitle(QwtAxis::YLeft).text();
-    picker->setAxes(QwtAxis::XBottom, YLeft);
+    picker->setAxes(QwtAxis::XBottom, QwtAxis::YLeft);
     picker->setFormat(format);
 
     // draw zone labels axisid of -1 means delete whats there
@@ -1433,7 +1428,6 @@ LTMPlot::setCompareData(LTMSettings *set)
     // disable all y axes until we have populated
     for (int i=0; i<8; i++) {
         setAxisVisible(supportedAxes[i], false);
-        enableAxis(supportedAxes[i].id, false);
     }
     axes.clear();
     axesObject.clear();
@@ -1530,9 +1524,8 @@ LTMPlot::setCompareData(LTMSettings *set)
                 setAxisTitle(QwtAxis::XBottom, tr("Date"));
                 break;
         }
-        enableAxis(QwtAxis::XBottom, true);
         setAxisVisible(QwtAxis::XBottom, true);
-        setAxisVisible(QwtAxis::xTop, false);
+        setAxisVisible(QwtAxis::XTop, false);
 
 
         //qDebug()<<"Wiped previous.."<<timer.elapsed();
@@ -2434,14 +2427,13 @@ LTMPlot::setCompareData(LTMSettings *set)
         setAxisScaleDraw(QwtAxis::XBottom, new LTMScaleDraw(settings->start,
                     groupForDate(settings->start.date(), settings->groupBy), settings->groupBy));
     }
-    enableAxis(QwtAxis::XBottom, true);
     setAxisVisible(QwtAxis::XBottom, true);
-    setAxisVisible(QwtAxis::xTop, false);
+    setAxisVisible(QwtAxis::XTop, false);
 
     // run through the Y axis
     for (int i=0; i<8; i++) {
         // set the scale on the axis
-        if (i != XBottom && i != xTop) {
+        if (i != QwtAxis::XBottom && i != QwtAxis::XTop) {
             maxY[i] *= 1.2; // add 20% headroom
             setAxisScale(supportedAxes[i], minY[i], maxY[i]);
         }
@@ -2474,7 +2466,7 @@ LTMPlot::setCompareData(LTMSettings *set)
     }
 
     QString format = axisTitle(QwtAxis::YLeft).text();
-    picker->setAxes(QwtAxis::XBottom, YLeft);
+    picker->setAxes(QwtAxis::XBottom, QwtAxis::YLeft);
     picker->setFormat(format);
 
     // show legend?
@@ -3894,7 +3886,6 @@ LTMPlot::chooseYAxis(QString units)
         chosen = supportedAxes[axes.count()];
         if (units == "seconds" || units == tr("seconds")) setAxisTitle(chosen, tr("hours")); // we convert seconds to hours
         else setAxisTitle(chosen, units);
-        enableAxis(chosen.id, true);
         setAxisVisible(chosen, true);
         axes.insert(units, chosen);
         return chosen;

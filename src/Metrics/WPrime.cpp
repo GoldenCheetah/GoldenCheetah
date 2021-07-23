@@ -167,11 +167,12 @@ WPrime::setRide(RideFile *input)
     }
 
     // Create a spline
+    /* TODO
     distance.setSplineType(QwtSpline::Periodic);
     distance.setPoints(QPolygonF(pointsd));
     smoothed.setSplineType(QwtSpline::Periodic);
     smoothed.setPoints(QPolygonF(points));
-
+    */
     // Get CP
     CP = 250; // default
     WPRIME = 20000;
@@ -198,7 +199,7 @@ WPrime::setRide(RideFile *input)
     EXP = 0;
     for (int i=0; i<last; i++) {
 
-        int value = smoothed.value(i);
+        int value = 0;// TODO smoothed.value(i);
         if (value < 0) value = 0; // don't go negative now
 
         powerValues[i] = value > CP ? value-CP : 0;
@@ -250,7 +251,7 @@ WPrime::setRide(RideFile *input)
         for(int t=0; t <= last; t++) {
             double value = WPRIME - values[t];
             values[t] = value;
-            xdvalues[t] = distance.value(t);
+            // TODO xdvalues[t] = distance.value(t);
 
             if (value > maxY) maxY = value;
             if (value < minY) minY = value;
@@ -270,18 +271,20 @@ WPrime::setRide(RideFile *input)
         double W = WPRIME;
         for (int t=0; t<=last; t++) {
 
+            /* TODO
             if(smoothed.value(t) < CP) {
                 W  = W + (CP-smoothed.value(t))*(WPRIME-W)/WPRIME;
             } else {
                 W  = W + (CP-smoothed.value(t));
             }
+             */
 
             if (W > maxY) maxY = W;
             if (W < minY) minY = W;
 
             values[t] = W;
             xvalues[t] = double(t) / 60.00f;
-            xdvalues[t] = distance.value(t);
+            // TODO xdvalues[t] = distance.value(t);
         }
     }
 
@@ -298,8 +301,8 @@ WPrime::setRide(RideFile *input)
     smoothArray.resize(last+1);
     QVector<int> rawArray(last+1);
     for (int i=0; i<last; i++) {
-        smoothArray[i] = smoothed.value(i);
-        rawArray[i] = smoothed.value(i);
+        smoothArray[i] = 0; // TODO smoothed.value(i);
+        rawArray[i] = 0; // TODO smoothed.value(i);
     }
     
     // initialise rolling average
@@ -621,11 +624,13 @@ WPrime::minForCP(int cp)
     double W = WPRIME;
     for (int t=0; t<=last; t++) {
 
+        /* TODO
         if(smoothed.value(t) < cp) {
             W  = W + (cp-smoothed.value(t))*(WPRIME-W)/WPRIME;
         } else {
             W  = W + (cp-smoothed.value(t));
         }
+         */
 
         if (W < min) min = W;
     }

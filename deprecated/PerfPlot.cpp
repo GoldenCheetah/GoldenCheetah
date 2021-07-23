@@ -53,13 +53,13 @@ PerfPlot::PerfPlot() : STScurve(NULL), LTScurve(NULL), SBcurve(NULL), DAYcurve(N
     insertLegend(new QwtLegend(), QwtPlot::BottomLegend);
     setAxisTitle(YLeft, tr("Exponentially Weighted Average Stress"));
     setAxisTitle(XBottom, tr("Time (days)"));
-    setAxisTitle(YRight, tr("Daily Stress"));
-    enableAxis(YRight, true);
+    setAxisTitle(QwtAxis::YRight, tr("Daily Stress"));
+    setAxisVisible(QwtAxis::YRight, true);
     static_cast<QwtPlotCanvas*>(canvas())->setFrameStyle(QFrame::NoFrame);
 
     setAxisMaxMinor(XBottom, 0);
     setAxisMaxMinor(YLeft, 0);
-    setAxisMaxMinor(YRight, 0);
+    setAxisMaxMinor(QwtAxis::YRight, 0);
 
     QwtScaleDraw *sd = new QwtScaleDraw;
     sd->setTickLength(QwtScaleDiv::MajorTick, 3);
@@ -142,7 +142,7 @@ void PerfPlot::plot() {
     //                                     |
     //                                     V
     DAYcurve->setSamples(_sc->getDays()+xmin -1 ,_sc->getDAYvalues()+xmin,num);
-    DAYcurve->setYAxis(YRight);
+    DAYcurve->setYAxis(QwtAxis::YRight);
     DAYcurve->attach(this);
 
     if (STScurve) {

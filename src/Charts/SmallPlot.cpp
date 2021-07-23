@@ -208,7 +208,7 @@ void
 SmallPlot::setXTitle()
 {
     setAxisTitle(QwtAxis::XBottom, tr("Time (minutes)"));
-    enableAxis(QwtAxis::XBottom, true);
+    setAxisVisible(QwtAxis::XBottom, true);
 }
 
 void

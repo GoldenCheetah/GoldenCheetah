@@ -96,7 +96,7 @@ ErgFilePlot::ErgFilePlot(Context *context) : context(context)
 
     // Setup the left axis (Power)
     setAxisTitle(QwtAxis::YLeft, "Watts");
-    enableAxis(QwtAxis::YLeft, true);
+    setAxisVisible(QwtAxis::YLeft, true);
     QwtScaleDraw *sd = new QwtScaleDraw;
     sd->setTickLength(QwtScaleDiv::MajorTick, 3);
     setAxisMaxMinor(QwtAxis::YLeft, 0);
@@ -115,7 +115,7 @@ ErgFilePlot::ErgFilePlot(Context *context) : context(context)
     QwtPlot::setAxisFont(QwtAxis::YLeft, stGiles);
     QwtPlot::setAxisTitle(QwtAxis::YLeft, title);
 
-    enableAxis(QwtAxis::XBottom, true);
+    setAxisVisible(QwtAxis::XBottom, true);
     distdraw = new DistScaleDraw;
     distdraw->setTickLength(QwtScaleDiv::MajorTick, 3);
     timedraw = new HourTimeScaleDraw;
@@ -137,18 +137,18 @@ ErgFilePlot::ErgFilePlot(Context *context) : context(context)
 
     // axis 1 not currently used
     setAxisVisible(QwtAxisId(QwtAxis::YRight,1), false); // max speed of 60mph/60kmh seems ok to me!
-    enableAxis(QwtAxisId(QwtAxis::YRight,1).id, false);
+    setAxisVisible(QwtAxisId(QwtAxis::YRight,1).id, false);
 
     // set all the orher axes off but scaled
     setAxisScale(QwtAxis::YLeft, 0, 300); // max cadence and hr
-    enableAxis(QwtAxis::YLeft, true);
+    setAxisVisible(QwtAxis::YLeft, true);
     setAxisAutoScale(QwtAxis::YLeft, true);// we autoscale, since peaks are so much higher than troughs
 
-    setAxisScale(YRight, 0, 250); // max cadence and hr
-    enableAxis(YRight, false);
+    setAxisScale(QwtAxis::YRight, 0, 250); // max cadence and hr
+    setAxisVisible(QwtAxis::YRight, false);
     setAxisScale(QwtAxisId(QwtAxis::YRight,2), 0, 60); // max speed of 60mph/60kmh seems ok to me!
     setAxisVisible(QwtAxisId(QwtAxis::YRight,2), false); // max speed of 60mph/60kmh seems ok to me!
-    enableAxis(QwtAxisId(QwtAxis::YRight,2).id, false);
+    setAxisVisible(QwtAxisId(QwtAxis::YRight,2).id, false);
 
     // data bridge to ergfile
     lodData = new ErgFileData(context);
@@ -602,7 +602,6 @@ ErgFilePlot::setData(ErgFile *ergfile)
     }
 
     // make the XBottom scale visible
-    enableAxis(QwtAxis::XBottom, true);
     setAxisVisible(QwtAxis::XBottom, true);
 }
 

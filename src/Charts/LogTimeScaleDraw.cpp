@@ -32,6 +32,7 @@
 #include "qwt_scale_div.h"
 #include "qwt_scale_map.h"
 #include "qwt_scale_draw.h"
+#include "qwt_text.h"
 
 #include <qmatrix.h>
 #define QwtMatrix QMatrix

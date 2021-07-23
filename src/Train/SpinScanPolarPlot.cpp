@@ -82,8 +82,8 @@ SpinScanPolarPlot::SpinScanPolarPlot(QWidget *parent, uint8_t *spinData) : QwtPl
     axisWidget(QwtAxis::YLeft)->setPalette(pal);
     axisWidget(QwtAxis::YLeft)->scaleDraw()->setTickLength(QwtScaleDiv::MajorTick, 3);
 
-    enableAxis(QwtAxis::XBottom, false); // very little value and some cpu overhead
-    enableAxis(QwtAxis::YLeft, false);
+    setAxisVisible(QwtAxis::XBottom, false); // very little value and some cpu overhead
+    setAxisVisible(QwtAxis::YLeft, false);
 
     rightCurve = new QwtPlotCurve("SpinScan Right");
     rightCurve->setRenderHint(QwtPlotItem::RenderAntialiased); // too cpu intensive
