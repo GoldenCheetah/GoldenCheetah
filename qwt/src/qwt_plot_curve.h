@@ -14,10 +14,12 @@
 #include "qwt_plot_seriesitem.h"
 
 #include <qstring.h>
+#include <QColor>
 
 class QwtScaleMap;
 class QwtSymbol;
 class QwtCurveFitter;
+class QwtZone;
 template< typename T > class QwtSeriesData;
 class QwtText;
 class QPainter;
@@ -287,6 +289,9 @@ class QWT_EXPORT QwtPlotCurve
     void setBrush( const QBrush& );
     const QBrush& brush() const;
 
+    void setZones(QVector<QwtZone>);
+    QVector<QwtZone> &zones();
+
     void setBaseline( double );
     double baseline() const;
 
@@ -343,6 +348,14 @@ class QWT_EXPORT QwtPlotCurve
   private:
     class PrivateData;
     PrivateData* m_data;
+};
+
+class QwtZone {
+public:
+    QwtZone(double l, QColor c) : lim(l), color(c) {}
+    QwtZone() : lim(0), color(QColor(Qt::black)) {}
+    double lim;     // less than this?
+    QColor color;   // make it this color then
 };
 
 //! boundingRect().left()
