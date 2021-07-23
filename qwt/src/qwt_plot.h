@@ -241,9 +241,9 @@ class QWT_EXPORT QwtPlot : public QFrame, public QwtPlotDict
 #if QWT_AXIS_COMPAT
     enum Axis
     {
-        yLeft   = QwtAxis::YLeft,
+        YLeft   = QwtAxis::YLeft,
         yRight  = QwtAxis::YRight,
-        xBottom = QwtAxis::XBottom,
+        XBottom = QwtAxis::XBottom,
         xTop    = QwtAxis::XTop,
 
         axisCnt = QwtAxis::AxisCount

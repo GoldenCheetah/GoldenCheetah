@@ -240,113 +240,113 @@ RealtimePlot::RealtimePlot(Context *context) :
     smo2Data = new Realtimesmo2Data;
 
     // Setup the axis (of evil :-)
-    setAxisTitle(yLeft, "Watts");
+    setAxisTitle(YLeft, "Watts");
     setAxisTitle(yRight, "Cadence / Hb / HR");
-    setAxisTitle(QwtAxisId(QwtAxis::yRight,2).id, "Speed");
-    setAxisTitle(xBottom, "Seconds Ago");
-    setAxisMaxMinor(xBottom, 0);
-    setAxisMaxMinor(yLeft, 0);
+    setAxisTitle(QwtAxisId(QwtAxis::YRight,2).id, "Speed");
+    setAxisTitle(XBottom, "Seconds Ago");
+    setAxisMaxMinor(XBottom, 0);
+    setAxisMaxMinor(YLeft, 0);
     setAxisMaxMinor(yRight, 0);
-    setAxisMaxMinor(QwtAxisId(QwtAxis::yRight,2).id, 0);
+    setAxisMaxMinor(QwtAxisId(QwtAxis::YRight,2).id, 0);
 
     QPalette pal;
-    setAxisScale(yLeft, 0, 500); // watts
+    setAxisScale(YLeft, 0, 500); // watts
     pal.setColor(QPalette::WindowText, GColor(CPOWER));
     pal.setColor(QPalette::Text, GColor(CPOWER));
-    axisWidget(QwtPlot::yLeft)->setPalette(pal);
-    axisWidget(QwtPlot::yLeft)->scaleDraw()->setTickLength(QwtScaleDiv::MajorTick, 3);
+    axisWidget(QwtAxis::YLeft)->setPalette(pal);
+    axisWidget(QwtAxis::YLeft)->scaleDraw()->setTickLength(QwtScaleDiv::MajorTick, 3);
 
     setAxisScale(yRight, 0, 230); // cadence / hr
     pal.setColor(QPalette::WindowText, GColor(CHEARTRATE));
     pal.setColor(QPalette::Text, GColor(CHEARTRATE));
-    axisWidget(QwtPlot::yRight)->setPalette(pal);
-    axisWidget(QwtPlot::yRight)->scaleDraw()->setTickLength(QwtScaleDiv::MajorTick, 3);
+    axisWidget(QwtAxis::YRight)->setPalette(pal);
+    axisWidget(QwtAxis::YRight)->scaleDraw()->setTickLength(QwtScaleDiv::MajorTick, 3);
 
-    setAxisScale(xBottom, MAXSAMPLES, 0, 15); // time ago
+    setAxisScale(XBottom, MAXSAMPLES, 0, 15); // time ago
     pal.setColor(QPalette::WindowText, GColor(CPLOTMARKER));
     pal.setColor(QPalette::Text, GColor(CPLOTMARKER));
-    axisWidget(QwtPlot::xBottom)->setPalette(pal);
-    axisWidget(QwtPlot::xBottom)->scaleDraw()->setTickLength(QwtScaleDiv::MajorTick, 3);
+    axisWidget(QwtAxis::XBottom)->setPalette(pal);
+    axisWidget(QwtAxis::XBottom)->scaleDraw()->setTickLength(QwtScaleDiv::MajorTick, 3);
 
-    setAxisScale(QwtAxisId(QwtAxis::yRight,2).id, 0, 60); // speed km/h - 60kmh on a turbo is good going!
+    setAxisScale(QwtAxisId(QwtAxis::YRight,2).id, 0, 60); // speed km/h - 60kmh on a turbo is good going!
     pal.setColor(QPalette::WindowText, GColor(CSPEED));
     pal.setColor(QPalette::Text, GColor(CSPEED));
-    axisWidget(QwtAxisId(QwtAxis::yRight,2).id)->setPalette(pal);
-    axisWidget(QwtAxisId(QwtAxis::yRight,2).id)->scaleDraw()->setTickLength(QwtScaleDiv::MajorTick, 3);
+    axisWidget(QwtAxisId(QwtAxis::YRight,2).id)->setPalette(pal);
+    axisWidget(QwtAxisId(QwtAxis::YRight,2).id)->scaleDraw()->setTickLength(QwtScaleDiv::MajorTick, 3);
 
-	setAxisLabelRotation(QwtAxisId(QwtAxis::yRight,2).id,90);
-	setAxisLabelAlignment(QwtAxisId(QwtAxis::yRight,2).id,Qt::AlignVCenter);
+	setAxisLabelRotation(QwtAxisId(QwtAxis::YRight,2).id,90);
+	setAxisLabelAlignment(QwtAxisId(QwtAxis::YRight,2).id,Qt::AlignVCenter);
 
-    enableAxis(xBottom, false); // very little value and some cpu overhead
-    enableAxis(yLeft, true);
+    enableAxis(XBottom, false); // very little value and some cpu overhead
+    enableAxis(YLeft, true);
     enableAxis(yRight, true);
-    enableAxis(QwtAxisId(QwtAxis::yRight,2).id, true);
+    enableAxis(QwtAxisId(QwtAxis::YRight,2).id, true);
 
     // 30s Power curve
     pwr30Curve = new QwtPlotCurve("30s Power");
     pwr30Curve->setRenderHint(QwtPlotItem::RenderAntialiased); // too cpu intensive
     pwr30Curve->attach(this);
-    pwr30Curve->setYAxis(QwtPlot::yLeft);
+    pwr30Curve->setYAxis(QwtAxis::YLeft);
 
     // Power curve
     pwrCurve = new QwtPlotCurve("Power");
     //pwrCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
     pwrCurve->setData(pwrData);
     pwrCurve->attach(this);
-    pwrCurve->setYAxis(QwtPlot::yLeft);
+    pwrCurve->setYAxis(QwtAxis::YLeft);
 
     altPwrCurve = new QwtPlotCurve("Alt Power");
     //pwrCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
     altPwrCurve->setData(altPwrData);
     altPwrCurve->attach(this);
-    altPwrCurve->setYAxis(QwtPlot::yLeft);
+    altPwrCurve->setYAxis(QwtAxis::YLeft);
 
     // HR
     hrCurve = new QwtPlotCurve("HeartRate");
     //hrCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
     hrCurve->setData(hrData);
     hrCurve->attach(this);
-    hrCurve->setYAxis(QwtPlot::yRight);
+    hrCurve->setYAxis(QwtAxis::YRight);
 
     // Cadence
     cadCurve = new QwtPlotCurve("Cadence");
     //cadCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
     cadCurve->setData(cadData);
     cadCurve->attach(this);
-    cadCurve->setYAxis(QwtPlot::yRight);
+    cadCurve->setYAxis(QwtAxis::YRight);
 
     // Speed
     spdCurve = new QwtPlotCurve("Speed");
     //spdCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
     spdCurve->setData(spdData);
     spdCurve->attach(this);
-    spdCurve->setYAxis(QwtAxisId(QwtAxis::yRight,2).id);
+    spdCurve->setYAxis(QwtAxisId(QwtAxis::YRight,2).id);
 
     // hhb curve
     hhbCurve = new QwtPlotCurve("HHb");
     hhbCurve->setData(hhbData);
     hhbCurve->attach(this);
-    hhbCurve->setYAxis(QwtPlot::yRight);
+    hhbCurve->setYAxis(QwtAxis::YRight);
 
     // o2hb
     o2hbCurve = new QwtPlotCurve("O2Hb");
     o2hbCurve->setData(o2hbData);
     o2hbCurve->attach(this);
-    o2hbCurve->setYAxis(QwtPlot::yRight);
+    o2hbCurve->setYAxis(QwtAxis::YRight);
 
     // smo2
     smo2Curve = new QwtPlotCurve("SmO2");
     //cadCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
     smo2Curve->setData(smo2Data);
     smo2Curve->attach(this);
-    smo2Curve->setYAxis(QwtPlot::yRight);
+    smo2Curve->setYAxis(QwtAxis::YRight);
 
     // tHb
     thbCurve = new QwtPlotCurve("Speed");
     //spdCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
     thbCurve->setData(thbData);
     thbCurve->attach(this);
-    thbCurve->setYAxis(QwtPlot::yRight);
+    thbCurve->setYAxis(QwtAxis::YRight);
 
     // Load
 //    lodCurve = new QwtPlotCurve("Load");
@@ -359,7 +359,7 @@ RealtimePlot::RealtimePlot(Context *context) :
 //    lodCurve->setBrush(brush_color);   // fill below the line
 //    lodCurve->setData(lodData);
 //    lodCurve->attach(this);
-//    lodCurve->setYAxis(QwtPlot::yLeft);
+//    lodCurve->setYAxis(QwtAxis::YLeft);
     static_cast<QwtPlotCanvas*>(canvas())->setFrameStyle(QFrame::NoFrame);
 
     connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
@@ -436,7 +436,7 @@ RealtimePlot::showPower(int state)
 {
     showPowerState = state;
     pwrCurve->setVisible(state == Qt::Checked);
-    enableAxis(yLeft, showAltState == Qt::Checked || showPowerState == Qt::Checked || showPow30sState == Qt::Checked);
+    enableAxis(YLeft, showAltState == Qt::Checked || showPowerState == Qt::Checked || showPow30sState == Qt::Checked);
     replot();
 }
 
@@ -445,7 +445,7 @@ RealtimePlot::showPow30s(int state)
 {
     showPow30sState = state;
     pwr30Curve->setVisible(state == Qt::Checked);
-    enableAxis(yLeft, showAltState == Qt::Checked || showPowerState == Qt::Checked || showPow30sState == Qt::Checked);
+    enableAxis(YLeft, showAltState == Qt::Checked || showPowerState == Qt::Checked || showPow30sState == Qt::Checked);
     replot();
 }
 
@@ -465,7 +465,7 @@ RealtimePlot::showSpeed(int state)
 {
     showSpeedState = state;
     spdCurve->setVisible(state == Qt::Checked);
-    enableAxis(QwtAxisId(QwtAxis::yRight,2).id, state == Qt::Checked);
+    enableAxis(QwtAxisId(QwtAxis::YRight,2).id, state == Qt::Checked);
     replot();
 }
 
@@ -485,7 +485,7 @@ RealtimePlot::showAlt(int state)
 {
     showAltState = state;
     altPwrCurve->setVisible(state == Qt::Checked);
-    enableAxis(yLeft, showAltState == Qt::Checked || showPowerState == Qt::Checked || showPow30sState == Qt::Checked);
+    enableAxis(YLeft, showAltState == Qt::Checked || showPowerState == Qt::Checked || showPow30sState == Qt::Checked);
     replot();
 }
 

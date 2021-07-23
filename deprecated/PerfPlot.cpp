@@ -48,26 +48,26 @@ PerfPlot::PerfPlot() : STScurve(NULL), LTScurve(NULL), SBcurve(NULL), DAYcurve(N
 {
     xsd = new PPTimeScaleDraw(QDateTime());
     xsd->setTickLength(QwtScaleDiv::MajorTick, 3);
-    setAxisScaleDraw(QwtPlot::xBottom, xsd);
+    setAxisScaleDraw(QwtAxis::XBottom, xsd);
 
     insertLegend(new QwtLegend(), QwtPlot::BottomLegend);
-    setAxisTitle(yLeft, tr("Exponentially Weighted Average Stress"));
-    setAxisTitle(xBottom, tr("Time (days)"));
+    setAxisTitle(YLeft, tr("Exponentially Weighted Average Stress"));
+    setAxisTitle(XBottom, tr("Time (days)"));
     setAxisTitle(yRight, tr("Daily Stress"));
     enableAxis(yRight, true);
     static_cast<QwtPlotCanvas*>(canvas())->setFrameStyle(QFrame::NoFrame);
 
-    setAxisMaxMinor(xBottom, 0);
-    setAxisMaxMinor(yLeft, 0);
+    setAxisMaxMinor(XBottom, 0);
+    setAxisMaxMinor(YLeft, 0);
     setAxisMaxMinor(yRight, 0);
 
     QwtScaleDraw *sd = new QwtScaleDraw;
     sd->setTickLength(QwtScaleDiv::MajorTick, 3);
-    setAxisScaleDraw(QwtPlot::yLeft, sd);
+    setAxisScaleDraw(QwtAxis::YLeft, sd);
 
     sd = new QwtScaleDraw;
     sd->setTickLength(QwtScaleDiv::MajorTick, 3);
-    setAxisScaleDraw(QwtPlot::yRight, sd);
+    setAxisScaleDraw(QwtAxis::YRight, sd);
 
     grid = new QwtPlotGrid();
     grid->attach(this);
@@ -99,7 +99,7 @@ void PerfPlot::plot() {
     int  num, tics;
     tics = 42;
 
-    setAxisScale(yLeft, _sc->min(), _sc->max());
+    setAxisScale(YLeft, _sc->min(), _sc->max());
     num = xmax - xmin;
 
     /*
@@ -117,8 +117,8 @@ void PerfPlot::plot() {
     } else if (num < 364) {
 	tics  = 27;
     }
-    setAxisScale(xBottom, xmin, xmax,tics);
-    axisWidget(xBottom)->update();
+    setAxisScale(XBottom, xmin, xmax,tics);
+    axisWidget(XBottom)->update();
 
     // set base
     xsd->setBase(startDate);
@@ -186,7 +186,7 @@ void PerfPlot::plot() {
     SBcurve->setSamples(_sc->getDays()+xmin,_sc->getSBvalues()+xmin,num);
     SBcurve->attach(this);
 
-    axisWidget(QwtPlot::xBottom)->update();
+    axisWidget(QwtAxis::XBottom)->update();
     replot();
 
 }

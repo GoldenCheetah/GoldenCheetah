@@ -44,14 +44,14 @@ WeeklySummaryWindow::WeeklySummaryWindow(bool useMetricUnits,
 
     // set up the weekly distance / duration plot:
     weeklyPlot = new QwtPlot();
-    weeklyPlot->enableAxis(QwtPlot::yRight, true);
-    weeklyPlot->setAxisMaxMinor(QwtPlot::xBottom,0);
-    weeklyPlot->setAxisScaleDraw(QwtPlot::xBottom, new DaysScaleDraw());
-    QFont weeklyPlotAxisFont = weeklyPlot->axisFont(QwtPlot::yLeft);
+    weeklyPlot->enableAxis(QwtAxis::YRight, true);
+    weeklyPlot->setAxisMaxMinor(QwtAxis::XBottom,0);
+    weeklyPlot->setAxisScaleDraw(QwtAxis::XBottom, new DaysScaleDraw());
+    QFont weeklyPlotAxisFont = weeklyPlot->axisFont(QwtAxis::YLeft);
     weeklyPlotAxisFont.setPointSize(weeklyPlotAxisFont.pointSize() * 0.9f);
-    weeklyPlot->setAxisFont(QwtPlot::xBottom, weeklyPlotAxisFont);
-    weeklyPlot->setAxisFont(QwtPlot::yLeft, weeklyPlotAxisFont);
-    weeklyPlot->setAxisFont(QwtPlot::yRight, weeklyPlotAxisFont);
+    weeklyPlot->setAxisFont(QwtAxis::XBottom, weeklyPlotAxisFont);
+    weeklyPlot->setAxisFont(QwtAxis::YLeft, weeklyPlotAxisFont);
+    weeklyPlot->setAxisFont(QwtAxis::YRight, weeklyPlotAxisFont);
     weeklyPlot->canvas()->setFrameStyle(QFrame::NoFrame);
     weeklyPlot->setCanvasBackground(Qt::white);
 
@@ -70,18 +70,18 @@ WeeklySummaryWindow::WeeklySummaryWindow(bool useMetricUnits,
     weeklyDurationCurve->setBrush(QColor(255,200,0,255));
     weeklyDurationCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
     weeklyDurationCurve->setCurveAttribute(QwtPlotCurve::Inverted, true); // inverted, right-to-left
-    weeklyDurationCurve->setYAxis(QwtPlot::yRight);
+    weeklyDurationCurve->setYAxis(QwtAxis::YRight);
     weeklyDurationCurve->attach(weeklyPlot);
 
     // set up the weekly bike score plot:
     weeklyBSPlot = new QwtPlot();
-    weeklyBSPlot->enableAxis(QwtPlot::yRight, true);
-    weeklyBSPlot->setAxisMaxMinor(QwtPlot::xBottom,0);
-    weeklyBSPlot->setAxisScaleDraw(QwtPlot::xBottom, new DaysScaleDraw());
+    weeklyBSPlot->enableAxis(QwtAxis::YRight, true);
+    weeklyBSPlot->setAxisMaxMinor(QwtAxis::XBottom,0);
+    weeklyBSPlot->setAxisScaleDraw(QwtAxis::XBottom, new DaysScaleDraw());
     QwtText textLabel = QwtText();
-    weeklyBSPlot->setAxisFont(QwtPlot::xBottom, weeklyPlotAxisFont);
-    weeklyBSPlot->setAxisFont(QwtPlot::yLeft, weeklyPlotAxisFont);
-    weeklyBSPlot->setAxisFont(QwtPlot::yRight, weeklyPlotAxisFont);
+    weeklyBSPlot->setAxisFont(QwtAxis::XBottom, weeklyPlotAxisFont);
+    weeklyBSPlot->setAxisFont(QwtAxis::YLeft, weeklyPlotAxisFont);
+    weeklyBSPlot->setAxisFont(QwtAxis::YRight, weeklyPlotAxisFont);
     weeklyBSPlot->canvas()->setFrameStyle(QFrame::NoFrame);
     weeklyBSPlot->setCanvasBackground(Qt::white);
 
@@ -99,7 +99,7 @@ WeeklySummaryWindow::WeeklySummaryWindow(bool useMetricUnits,
     weeklyRICurve->setBrush(Qt::green);
     weeklyRICurve->setRenderHint(QwtPlotItem::RenderAntialiased);
     weeklyRICurve->setCurveAttribute(QwtPlotCurve::Inverted, true); // inverted, right-to-left
-    weeklyRICurve->setYAxis(QwtPlot::yRight);
+    weeklyRICurve->setYAxis(QwtAxis::YRight);
     weeklyRICurve->attach(weeklyBSPlot);
 
     // set baseline curves to obscure linewidth variations along baseline
@@ -342,13 +342,13 @@ WeeklySummaryWindow::refresh()
     weeklyPlotAxisTitleFont.setPointSize(10);
     weeklyPlotAxisTitleFont.setBold(true);
     textLabel.setFont(weeklyPlotAxisTitleFont);
-    weeklyPlot->setAxisTitle(QwtPlot::yLeft, textLabel);
+    weeklyPlot->setAxisTitle(QwtAxis::YLeft, textLabel);
     textLabel.setText("Minutes");
-    weeklyPlot->setAxisTitle(QwtPlot::yRight, textLabel);
+    weeklyPlot->setAxisTitle(QwtAxis::YRight, textLabel);
     textLabel.setText(useBikeScore ? "BikeScore" : "kJoules");
-    weeklyBSPlot->setAxisTitle(QwtPlot::yLeft, textLabel);
+    weeklyBSPlot->setAxisTitle(QwtAxis::YLeft, textLabel);
     textLabel.setText(useBikeScore ? "Intensity" : "xPower");
-    weeklyBSPlot->setAxisTitle(QwtPlot::yRight, textLabel);
+    weeklyBSPlot->setAxisTitle(QwtAxis::YRight, textLabel);
 
     // for the daily distance/duration and bikescore plots:
     // first point: establish zero position
@@ -428,18 +428,18 @@ WeeklySummaryWindow::refresh()
 
     // Distance/Duration plot:
     weeklyDistCurve->setData(xdist, ydist, 16);
-    weeklyPlot->setAxisScale(QwtPlot::yLeft, 0, weeklyDistCurve->maxYValue()*1.1, 0);
-    weeklyPlot->setAxisScale(QwtPlot::xBottom, 0.5, 7.5, 0);
-    weeklyPlot->setAxisTitle(QwtPlot::yLeft, useMetricUnits ? "Kilometers" : "Miles");
+    weeklyPlot->setAxisScale(QwtAxis::YLeft, 0, weeklyDistCurve->maxYValue()*1.1, 0);
+    weeklyPlot->setAxisScale(QwtAxis::XBottom, 0.5, 7.5, 0);
+    weeklyPlot->setAxisTitle(QwtAxis::YLeft, useMetricUnits ? "Kilometers" : "Miles");
 
     weeklyDurationCurve->setData(xdur, ydur, 16);
-    weeklyPlot->setAxisScale(QwtPlot::yRight, 0, weeklyDurationCurve->maxYValue()*1.1, 0);
+    weeklyPlot->setAxisScale(QwtAxis::YRight, 0, weeklyDurationCurve->maxYValue()*1.1, 0);
     weeklyPlot->replot();
 
     // BikeScore/Relative Intensity plot
     weeklyBSCurve->setData(xbsorw, ybsorw, 16);
-    weeklyBSPlot->setAxisScale(QwtPlot::yLeft, 0, weeklyBSCurve->maxYValue()*1.1, 0);
-    weeklyBSPlot->setAxisScale(QwtPlot::xBottom, 0.5, 7.5, 0);
+    weeklyBSPlot->setAxisScale(QwtAxis::YLeft, 0, weeklyBSCurve->maxYValue()*1.1, 0);
+    weeklyBSPlot->setAxisScale(QwtAxis::XBottom, 0.5, 7.5, 0);
 
     // set axis minimum for relative intensity
     double RImin = -1;
@@ -454,7 +454,7 @@ WeeklySummaryWindow::refresh()
 	    yriorxp[i] = RImin;
     weeklyRICurve->setBaseline(RImin);
     weeklyRICurve->setData(xriorxp, yriorxp, 16);
-    weeklyBSPlot->setAxisScale(QwtPlot::yRight, RImin, weeklyRICurve->maxYValue()*1.1, 0);
+    weeklyBSPlot->setAxisScale(QwtAxis::YRight, RImin, weeklyRICurve->maxYValue()*1.1, 0);
 
     weeklyBSPlot->replot();
 

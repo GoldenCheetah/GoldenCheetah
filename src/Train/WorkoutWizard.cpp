@@ -53,11 +53,11 @@ public:
     }
     void setYAxisTitle(QString title)
     {
-        setAxisTitle(QwtPlot::yLeft, title);
+        setAxisTitle(QwtAxis::YLeft, title);
     }
     void setXAxisTitle(QString title)
     {
-        setAxisTitle(QwtPlot::xBottom,title);
+        setAxisTitle(QwtAxis::XBottom,title);
     }
     void setData(QVector<double> &xData, QVector<double> &yData)
     {
@@ -285,8 +285,8 @@ void AbsWattagePage::initializePage()
     plot = new WorkoutPlot();
     plot->setYAxisTitle(tr("Wattage"));
     plot->setXAxisTitle(tr("Time (minutes)"));
-    plot->setAxisScale(QwtPlot::yLeft,0,500,0);
-    plot->setAxisScale(QwtPlot::xBottom,0,120,0);
+    plot->setAxisScale(QwtAxis::YLeft,0,500,0);
+    plot->setAxisScale(QwtAxis::XBottom,0,120,0);
     summaryLayout->addWidget(plot);
     summaryLayout->addStretch(1);
     layout->addLayout(summaryLayout);
@@ -334,8 +334,8 @@ void AbsWattagePage::updateMetrics()
 
     }
     // replot workoutplot
-    plot->setAxisAutoScale(QwtPlot::yLeft);
-    plot->setAxisAutoScale(QwtPlot::xBottom);
+    plot->setAxisAutoScale(QwtAxis::YLeft);
+    plot->setAxisAutoScale(QwtAxis::XBottom);
     plot->setData(x,y);
     plot->replot();
 
@@ -418,8 +418,8 @@ void RelWattagePage::initializePage()
     plot = new WorkoutPlot();
     plot->setYAxisTitle(tr("% of FTP"));
     plot->setXAxisTitle(tr("Time (minutes)"));
-    plot->setAxisScale(QwtPlot::yLeft,0,200,0);
-    plot->setAxisScale(QwtPlot::xBottom,0,120,0);
+    plot->setAxisScale(QwtAxis::YLeft,0,200,0);
+    plot->setAxisScale(QwtAxis::XBottom,0,120,0);
 
     QHBoxLayout *layout = new QHBoxLayout();
     setLayout(layout);
@@ -474,8 +474,8 @@ void RelWattagePage::updateMetrics()
     }
 
     // replot workoutplot
-    plot->setAxisAutoScale(QwtPlot::yLeft);
-    plot->setAxisAutoScale(QwtPlot::xBottom);
+    plot->setAxisAutoScale(QwtAxis::YLeft);
+    plot->setAxisAutoScale(QwtAxis::XBottom);
     plot->setData(x,y);;
     plot->replot();
 

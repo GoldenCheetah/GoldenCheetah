@@ -283,8 +283,8 @@ AerolabWindow::AerolabWindow(Context *context) :
 
   // tooltip on hover over point
   //************************************
-    aerolab->tooltip = new LTMToolTip( QwtPlot::xBottom,
-                                       QwtPlot::yLeft,
+    aerolab->tooltip = new LTMToolTip( QwtAxis::XBottom,
+                                       QwtAxis::YLeft,
                                        QwtPicker::VLineRubberBand,
                                        QwtPicker::AlwaysOn,
                                        aerolab->canvas(),

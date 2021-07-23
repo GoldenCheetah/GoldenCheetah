@@ -426,7 +426,7 @@ CriticalPowerWindow::CriticalPowerWindow(Context *context, bool rangemode) :
     grid->setZ(-20);
     QwtValueList ytick[QwtScaleDiv::NTickTypes];
     for (double i=0.0; i<=2500; i+= 100) ytick[QwtScaleDiv::MajorTick]<<i;
-    cpPlot->setAxisScaleDiv(QwtPlot::yLeft,QwtScaleDiv(0.0,2500.0,ytick));
+    cpPlot->setAxisScaleDiv(QwtAxis::YLeft,QwtScaleDiv(0.0,2500.0,ytick));
     grid->attach(cpPlot);
 
     // the model helper -- showing model parameters etc
@@ -1158,7 +1158,7 @@ CriticalPowerWindow::intervalHover(IntervalItem* x)
         hoverCurve = new QwtPlotCurve("Interval");
         hoverCurve->setPen(pen);
         if (appsettings->value(this, GC_ANTIALIAS, true).toBool() == true) hoverCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
-        hoverCurve->setYAxis(QwtPlot::yLeft);
+        hoverCurve->setYAxis(QwtAxis::YLeft);
         hoverCurve->setSamples(array);
         hoverCurve->setVisible(true);
         hoverCurve->setZ(100);

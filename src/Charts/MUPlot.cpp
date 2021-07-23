@@ -69,31 +69,31 @@ MUPlot::MUPlot(MUWidget *muw, CriticalPowerWindow *parent, Context *context)
     sd->setTickLength(QwtScaleDiv::MajorTick, 3);
     sd->enableComponent(QwtScaleDraw::Ticks, false);
     sd->enableComponent(QwtScaleDraw::Backbone, false);
-    setAxisScaleDraw(yLeft, sd);
-    setAxisTitle(yLeft, tr("w(x)"));
-    setAxisMaxMinor(yLeft, 0);
+    setAxisScaleDraw(YLeft, sd);
+    setAxisTitle(YLeft, tr("w(x)"));
+    setAxisMaxMinor(YLeft, 0);
     plotLayout()->setAlignCanvasToScales(true);
 
     // 0.5 increments on bottom axis
     QwtValueList ytick[QwtScaleDiv::NTickTypes];
     for (double i=0.0f; i<=10.0f; i+= 1.0)
         ytick[QwtScaleDiv::MajorTick]<<i;
-    setAxisScaleDiv(yLeft,QwtScaleDiv(0.0f,10.0f,ytick));
+    setAxisScaleDiv(YLeft,QwtScaleDiv(0.0f,10.0f,ytick));
 
     // bottom xAxis scale prettify
     sd = new QwtScaleDraw;
     sd->setTickLength(QwtScaleDiv::MajorTick, 3);
     sd->enableComponent(QwtScaleDraw::Ticks, false);
     sd->enableComponent(QwtScaleDraw::Backbone, false);
-    setAxisScaleDraw(xBottom, sd);
-    setAxisTitle(xBottom, tr("Motor Unit, x"));
-    setAxisMaxMinor(xBottom, 0);
+    setAxisScaleDraw(XBottom, sd);
+    setAxisTitle(XBottom, tr("Motor Unit, x"));
+    setAxisMaxMinor(XBottom, 0);
 
     // 0.2 increments on bottom axis
     QwtValueList xtick[QwtScaleDiv::NTickTypes];
     for (double i=0.0f; i<=1.0f; i+= 0.2)
         xtick[QwtScaleDiv::MajorTick]<<i;
-    setAxisScaleDiv(xBottom,QwtScaleDiv(0.0f,1.0f,xtick));
+    setAxisScaleDiv(XBottom,QwtScaleDiv(0.0f,1.0f,xtick));
 
     // now color everything we created
     configChanged(CONFIG_APPEARANCE);
@@ -117,8 +117,8 @@ MUPlot::configChanged(qint32)
     palette.setColor(QPalette::Text, GColor(CPLOTMARKER));
     setPalette(palette);
 
-    axisWidget(QwtPlot::xBottom)->setPalette(palette);
-    axisWidget(QwtPlot::yLeft)->setPalette(palette);
+    axisWidget(QwtAxis::XBottom)->setPalette(palette);
+    axisWidget(QwtAxis::YLeft)->setPalette(palette);
 
     setCanvasBackground(GColor(CPLOTBACKGROUND));
 }
@@ -258,7 +258,7 @@ MUPlot::setModel(int model)
 
             fastHandle = new QwtPlotMarker();
             fastHandle->setValue(x, y);
-            fastHandle->setYAxis(yLeft);
+            fastHandle->setYAxis(YLeft);
             fastHandle->setZ(100);
             fastHandle->setSymbol(sym);
             fastHandle->attach(this);
@@ -296,7 +296,7 @@ MUPlot::setModel(int model)
 
             slowHandle = new QwtPlotMarker();
             slowHandle->setValue(x, y);
-            slowHandle->setYAxis(yLeft);
+            slowHandle->setYAxis(YLeft);
             slowHandle->setZ(100);
             slowHandle->setSymbol(sym);
             slowHandle->attach(this);
@@ -391,8 +391,8 @@ MUPlot::eventFilter(QObject *, QEvent *e)
                 QPoint pos = QCursor::pos();
 
                 // slow handle ?
-                QPoint mpos = canvas()->mapToGlobal(QPoint(transform(xBottom, slowHandle->value().x()), 
-                                                    transform(yLeft, slowHandle->value().y())));
+                QPoint mpos = canvas()->mapToGlobal(QPoint(transform(XBottom, slowHandle->value().x()),
+                                                    transform(YLeft, slowHandle->value().y())));
 
                 int dx = mpos.x() - pos.x();
                 int dy = mpos.y() - pos.y();
@@ -405,8 +405,8 @@ MUPlot::eventFilter(QObject *, QEvent *e)
                 }
 
                 // fast handle ?
-                mpos = canvas()->mapToGlobal(QPoint(transform(xBottom, fastHandle->value().x()), 
-                                                    transform(yLeft, fastHandle->value().y())));
+                mpos = canvas()->mapToGlobal(QPoint(transform(XBottom, fastHandle->value().x()),
+                                                    transform(YLeft, fastHandle->value().y())));
 
                 dx = mpos.x() - pos.x();
                 dy = mpos.y() - pos.y();
@@ -449,8 +449,8 @@ MUPlot::mouseMoved()
     // cursor position
     QPoint cpos = canvas()->mapFromGlobal(pos);
 
-    double mean = invTransform(xBottom,cpos.x());
-    double variance = invTransform(yLeft, cpos.y()) / 40.0f;
+    double mean = invTransform(XBottom,cpos.x());
+    double variance = invTransform(YLeft, cpos.y()) / 40.0f;
 
     // dragging slow
     if (fastDrag) {
