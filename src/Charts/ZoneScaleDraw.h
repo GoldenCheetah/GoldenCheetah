@@ -100,13 +100,18 @@ class PolarisedZoneScaleDraw: public QwtScaleDraw
 class WbalZoneScaleDraw: public QwtScaleDraw
 {
     public:
-        WbalZoneScaleDraw() {
+        WbalZoneScaleDraw(const Zones *zones, int range=-1, bool zoneLimited=false) {
             setTickLength(QwtScaleDiv::MajorTick, 3);
 
-            labels << "Recovered"; // translate tr macros !?
-            labels << "Moderate";
-            labels << "Heavy";
-            labels << "Severe";
+            int WPRIME = range >= 0 ? zones->getWprime(range) : 0;
+            for (int i=0; i<WPrime::zoneCount(); i++) {
+                if (zoneLimited && WPRIME > 0) {
+                    if (i == WPrime::zoneCount()-1) labels << QString("%1 (%2- %3)").arg(WPrime::zoneName(i)).arg(WPrime::zoneLo(i, WPRIME)).arg(RideFile::unitName(RideFile::wprime, nullptr));
+		    else labels << QString("%1 (%2-%3)").arg(WPrime::zoneName(i)).arg(WPrime::zoneLo(i, WPRIME)).arg(WPrime::zoneHi(i, WPRIME));
+                } else {
+                    labels << WPrime::zoneDesc(i);
+                }
+            }
         }
 
         // return label

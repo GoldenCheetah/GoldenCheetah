@@ -753,8 +753,20 @@ PowerHist::recalcCompare()
             //
             if (!cpzoned && series == RideFile::wbal) {
 
-                setAxisScaleDraw(QwtPlot::xBottom, new WbalZoneScaleDraw());
-                setAxisScale(QwtPlot::xBottom, -0.99, 4, 1);
+                const Zones *zones = context->athlete->zones("Bike");
+                int zone_range = -1;
+
+                if (zones) {
+                    if (context->compareIntervals.count())
+                        zone_range = zones->whichRange(context->compareIntervals[0].data->startTime().date());
+                    if (zone_range == -1) zone_range = zones->whichRange(QDate::currentDate());
+
+                }
+                if (zones && zone_range != -1) {
+                    setAxisScaleDraw(QwtPlot::xBottom, new WbalZoneScaleDraw(zones, zone_range, zoneLimited));
+                    setAxisScale(QwtPlot::xBottom, -0.99, WPrime::zoneCount(), 1);
+                }
+
             }
 
             setAxisMaxMinor(QwtPlot::xBottom, 0);
@@ -1002,9 +1014,9 @@ PowerHist::recalc(bool force)
         }
 
         // w'bal zoned 
-        if (zoned && series == RideFile::wbal) { 
-            setAxisScaleDraw(QwtPlot::xBottom, new WbalZoneScaleDraw());
-            setAxisScale(QwtPlot::xBottom, -0.99, 4, 1);
+        if (zoned && series == RideFile::wbal && context->athlete->zones("Bike")) {
+            setAxisScaleDraw(QwtPlot::xBottom, new WbalZoneScaleDraw(context->athlete->zones("Bike"), 0, zoneLimited));
+            setAxisScale(QwtPlot::xBottom, -0.99, WPrime::zoneCount(), 1);
         }
         setAxisMaxMinor(QwtPlot::xBottom, 0);
     }

@@ -81,6 +81,8 @@ static struct WPRIMEZONES {
 
 QString WPrime::zoneName(int i) { return wbal_zones[i].name; }
 QString WPrime::zoneDesc(int i) { return qApp->translate("wbalzone", wbal_zones[i].desc); }
+int WPrime::zoneLo(int i, int WPRIME) { return WPRIME - (WPRIME / 100.0f * wbal_zones[i].lo); }
+int WPrime::zoneHi(int i, int WPRIME) { return WPRIME - (WPRIME / 100.0f * wbal_zones[i].hi); }
 
 WPrime::WPrime()
 {
