@@ -77,12 +77,20 @@ class ZoneScaleDraw: public QwtScaleDraw
 class PolarisedZoneScaleDraw: public QwtScaleDraw
 {
     public:
-        PolarisedZoneScaleDraw() {
+        PolarisedZoneScaleDraw(const Zones *zones, int range, bool zoneLimited) {
             setTickLength(QwtScaleDiv::MajorTick, 3);
 
-            labels << "I"; // translate tr macros !?
-            labels << "II";
-            labels << "III";
+            int AeT = zones && range >= 0 ? zones->getAeT(range) : 0;
+            int CP = zones && range >= 0 ? zones->getCP(range) : 0;
+            if (zoneLimited && AeT > 0 && CP > 0) {
+                labels << QString("I (%1- %2)").arg(AeT).arg(RideFile::unitName(RideFile::watts, nullptr));
+                labels << QString("II (%1-%2)").arg(AeT).arg(CP);
+                labels << QString("III (%1+ %2)").arg(CP).arg(RideFile::unitName(RideFile::watts, nullptr));
+            } else {
+                labels << "I";
+                labels << "II";
+                labels << "III";
+            }
         }
 
         // return label
@@ -176,6 +184,37 @@ class HrZoneScaleDraw: public QwtScaleDraw
 
 };
 
+class HrPolarisedZoneScaleDraw: public QwtScaleDraw
+{
+    public:
+        HrPolarisedZoneScaleDraw(const HrZones *zones, int range, bool zoneLimited) {
+            setTickLength(QwtScaleDiv::MajorTick, 3);
+
+            int AeT = zones && range >= 0 ? zones->getAeT(range) : 0;
+            int LT = zones && range >= 0 ? zones->getLT(range) : 0;
+            if (zoneLimited && AeT > 0 && LT > 0) {
+                labels << QString("I (%1- %2)").arg(AeT).arg(RideFile::unitName(RideFile::hr, nullptr));
+                labels << QString("II (%1-%2)").arg(AeT).arg(LT);
+                labels << QString("III (%1+ %2)").arg(LT).arg(RideFile::unitName(RideFile::hr, nullptr));
+            } else {
+                labels << "I";
+                labels << "II";
+                labels << "III";
+            }
+        }
+
+        // return label
+        virtual QwtText label(double v) const
+        {
+            int index = v;
+            if (index < 0 || index > labels.count()-1) return QString("");
+            return labels.at(index);
+        }
+
+    private:
+        QList <QString> labels;
+};
+
 class PaceZoneScaleDraw: public QwtScaleDraw
 {
     public:
@@ -226,5 +265,37 @@ class PaceZoneScaleDraw: public QwtScaleDraw
         QList <double> from, to;
         bool metricPace;
 
+};
+
+class PacePolarisedZoneScaleDraw: public QwtScaleDraw
+{
+    public:
+        PacePolarisedZoneScaleDraw(const PaceZones *zones, int range, bool zoneLimited) {
+            setTickLength(QwtScaleDiv::MajorTick, 3);
+
+            double AeT = zones && range >= 0 ? zones->getAeT(range) : 0;
+            double CV = zones && range >= 0 ? zones->getCV(range) : 0;
+            if (zoneLimited && AeT > 0 && CV > 0) {
+                bool metricPace = appsettings->value(nullptr, zones->paceSetting(), GlobalContext::context()->useMetricUnits).toBool();
+                labels << QString("I (%1- %2)").arg(zones->kphToPaceString(AeT, metricPace)).arg(zones->paceUnits(metricPace));
+                labels << QString("II (%1-%2)").arg(zones->kphToPaceString(AeT, metricPace)).arg(zones->kphToPaceString(CV, metricPace));
+                labels << QString("III (%1+ %2)").arg(zones->kphToPaceString(CV, metricPace)).arg(zones->paceUnits(metricPace));
+            } else {
+                labels << "I";
+                labels << "II";
+                labels << "III";
+            }
+        }
+
+        // return label
+        virtual QwtText label(double v) const
+        {
+            int index = v;
+            if (index < 0 || index > labels.count()-1) return QString("");
+            return labels.at(index);
+        }
+
+    private:
+        QList <QString> labels;
 };
 #endif
