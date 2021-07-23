@@ -27,7 +27,7 @@
 #include "RideMetric.h"
 #include <QVector>
 #include <QThread>
-#include <qwt_spline.h> // smoothing
+#include <qwt_spline_basis.h> // smoothing
 #include <cmath>
 
 struct Match {
@@ -95,7 +95,7 @@ class WPrime {
         QVector<double> mxvalues;      // W' time series in 1s intervals
         QVector<double> mxdvalues;      // W' distance
 
-        QwtSpline smoothed, distance;
+        QwtSplineBasis smoothed, distance;
         int last;
 
         void check(); // check we don't need to recompute

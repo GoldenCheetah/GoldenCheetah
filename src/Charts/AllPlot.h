@@ -32,7 +32,6 @@
 #include <qwt_plot_intervalcurve.h>
 #include <qwt_point_3d.h>
 #include <qwt_scale_widget.h>
-#include <qwt_compat.h>
 #include <QtGui>
 #include <QFont>
 

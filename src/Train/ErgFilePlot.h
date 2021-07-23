@@ -34,7 +34,6 @@
 #include <qwt_scale_div.h>
 #include <qwt_scale_widget.h>
 #include <qwt_symbol.h>
-#include <qwt_compat.h>
 #include "ErgFile.h"
 #include "WPrime.h"
 
@@ -47,7 +46,7 @@
 
 #define DEFAULT_TAU 450
 
-class ErgFileData : public QwtPointArrayData
+class ErgFileData : public QwtPointArrayData<double>
 {
     public:
     ErgFileData (Context *context) : QwtPointArrayData(QVector<double>(), QVector<double>()), context(context) {}
@@ -62,7 +61,7 @@ class ErgFileData : public QwtPointArrayData
     virtual QRectF boundingRect() const;
 };
 
-class NowData : public QwtPointArrayData
+class NowData : public QwtPointArrayData<double>
 {
     public:
     NowData (Context *context) : QwtPointArrayData(QVector<double>(), QVector<double>()), context(context) {}

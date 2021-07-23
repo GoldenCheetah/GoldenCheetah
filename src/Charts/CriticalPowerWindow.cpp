@@ -39,7 +39,6 @@
 #include <qwt_plot_curve.h>
 #include <qwt_series_data.h>
 #include <qwt_scale_div.h>
-#include <qwt_compat.h>
 #include <QFile>
 #include "Season.h"
 #include "SeasonParser.h"
