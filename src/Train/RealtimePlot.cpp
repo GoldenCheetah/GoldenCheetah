@@ -240,17 +240,17 @@ RealtimePlot::RealtimePlot(Context *context) :
     smo2Data = new Realtimesmo2Data;
 
     // Setup the axis (of evil :-)
-    setAxisTitle(YLeft, "Watts");
+    setAxisTitle(QwtAxis::YLeft, "Watts");
     setAxisTitle(YRight, "Cadence / Hb / HR");
     setAxisTitle(QwtAxisId(QwtAxis::YRight,2).id, "Speed");
-    setAxisTitle(XBottom, "Seconds Ago");
-    setAxisMaxMinor(XBottom, 0);
-    setAxisMaxMinor(YLeft, 0);
+    setAxisTitle(QwtAxis::XBottom, "Seconds Ago");
+    setAxisMaxMinor(QwtAxis::XBottom, 0);
+    setAxisMaxMinor(QwtAxis::YLeft, 0);
     setAxisMaxMinor(YRight, 0);
     setAxisMaxMinor(QwtAxisId(QwtAxis::YRight,2).id, 0);
 
     QPalette pal;
-    setAxisScale(YLeft, 0, 500); // watts
+    setAxisScale(QwtAxis::YLeft, 0, 500); // watts
     pal.setColor(QPalette::WindowText, GColor(CPOWER));
     pal.setColor(QPalette::Text, GColor(CPOWER));
     axisWidget(QwtAxis::YLeft)->setPalette(pal);
@@ -262,7 +262,7 @@ RealtimePlot::RealtimePlot(Context *context) :
     axisWidget(QwtAxis::YRight)->setPalette(pal);
     axisWidget(QwtAxis::YRight)->scaleDraw()->setTickLength(QwtScaleDiv::MajorTick, 3);
 
-    setAxisScale(XBottom, MAXSAMPLES, 0, 15); // time ago
+    setAxisScale(QwtAxis::XBottom, MAXSAMPLES, 0, 15); // time ago
     pal.setColor(QPalette::WindowText, GColor(CPLOTMARKER));
     pal.setColor(QPalette::Text, GColor(CPLOTMARKER));
     axisWidget(QwtAxis::XBottom)->setPalette(pal);
@@ -277,8 +277,8 @@ RealtimePlot::RealtimePlot(Context *context) :
 	setAxisLabelRotation(QwtAxisId(QwtAxis::YRight,2).id,90);
 	setAxisLabelAlignment(QwtAxisId(QwtAxis::YRight,2).id,Qt::AlignVCenter);
 
-    enableAxis(XBottom, false); // very little value and some cpu overhead
-    enableAxis(YLeft, true);
+    enableAxis(QwtAxis::XBottom, false); // very little value and some cpu overhead
+    enableAxis(QwtAxis::YLeft, true);
     enableAxis(YRight, true);
     enableAxis(QwtAxisId(QwtAxis::YRight,2).id, true);
 
@@ -436,7 +436,7 @@ RealtimePlot::showPower(int state)
 {
     showPowerState = state;
     pwrCurve->setVisible(state == Qt::Checked);
-    enableAxis(YLeft, showAltState == Qt::Checked || showPowerState == Qt::Checked || showPow30sState == Qt::Checked);
+    enableAxis(QwtAxis::YLeft, showAltState == Qt::Checked || showPowerState == Qt::Checked || showPow30sState == Qt::Checked);
     replot();
 }
 
@@ -445,7 +445,7 @@ RealtimePlot::showPow30s(int state)
 {
     showPow30sState = state;
     pwr30Curve->setVisible(state == Qt::Checked);
-    enableAxis(YLeft, showAltState == Qt::Checked || showPowerState == Qt::Checked || showPow30sState == Qt::Checked);
+    enableAxis(QwtAxis::YLeft, showAltState == Qt::Checked || showPowerState == Qt::Checked || showPow30sState == Qt::Checked);
     replot();
 }
 
@@ -485,7 +485,7 @@ RealtimePlot::showAlt(int state)
 {
     showAltState = state;
     altPwrCurve->setVisible(state == Qt::Checked);
-    enableAxis(YLeft, showAltState == Qt::Checked || showPowerState == Qt::Checked || showPow30sState == Qt::Checked);
+    enableAxis(QwtAxis::YLeft, showAltState == Qt::Checked || showPowerState == Qt::Checked || showPow30sState == Qt::Checked);
     replot();
 }
 

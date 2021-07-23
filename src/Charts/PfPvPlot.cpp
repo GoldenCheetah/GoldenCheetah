@@ -149,20 +149,20 @@ PfPvPlot::PfPvPlot(Context *context)
     static_cast<QwtPlotCanvas*>(canvas())->setFrameStyle(QFrame::NoFrame);
 
     setAutoFillBackground(true);
-    setAxisTitle(YLeft, tr("Average Effective Pedal Force (N)"));
-    setAxisScale(YLeft, 0, 600);
-    setAxisTitle(XBottom, tr("Circumferential Pedal Velocity (m/s)"));
-    setAxisScale(XBottom, 0, 3);
-    setAxisMaxMinor(YLeft, 0);
-    setAxisMaxMinor(XBottom, 0);
+    setAxisTitle(QwtAxis::YLeft, tr("Average Effective Pedal Force (N)"));
+    setAxisScale(QwtAxis::YLeft, 0, 600);
+    setAxisTitle(QwtAxis::XBottom, tr("Circumferential Pedal Velocity (m/s)"));
+    setAxisScale(QwtAxis::XBottom, 0, 3);
+    setAxisMaxMinor(QwtAxis::YLeft, 0);
+    setAxisMaxMinor(QwtAxis::XBottom, 0);
     QwtScaleDraw *sd = new QwtScaleDraw;
     sd->setTickLength(QwtScaleDiv::MajorTick, 3);
-    setAxisScaleDraw(XBottom, sd);
+    setAxisScaleDraw(QwtAxis::XBottom, sd);
     sd = new QwtScaleDraw;
     sd->setTickLength(QwtScaleDiv::MajorTick, 3);
     sd->enableComponent(QwtScaleDraw::Ticks, false);
     sd->enableComponent(QwtScaleDraw::Backbone, false);
-    setAxisScaleDraw(YLeft, sd);
+    setAxisScaleDraw(QwtAxis::YLeft, sd);
 
     mX = new QwtPlotMarker();
     mX->setLineStyle(QwtPlotMarker::VLine);
@@ -484,7 +484,7 @@ PfPvPlot::refreshIntervalMarkers()
 
             QwtPlotMarker *p = new QwtPlotMarker();
             p->setValue(cpv, aepf);
-            p->setYAxis(YLeft);
+            p->setYAxis(QwtAxis::YLeft);
             p->setSymbol(sym);
             p->attach(this);
             intervalMarkers << p;
@@ -949,14 +949,14 @@ PfPvPlot::recalcCompare()
 
     if (maxAEPF > 600) {
 
-        setAxisScale(YLeft, 0, (maxAEPF < 2500) ? (maxAEPF * 1.1) : 2500); // a bit of headroom
+        setAxisScale(QwtAxis::YLeft, 0, (maxAEPF < 2500) ? (maxAEPF * 1.1) : 2500); // a bit of headroom
         tiqMarker[0]->setYValue(maxAEPF);
         tiqMarker[1]->setYValue(maxAEPF);
 
     } else {
 
         maxAEPF = 600; // for background shading and CP curve
-        setAxisScale(YLeft, 0, 600);
+        setAxisScale(QwtAxis::YLeft, 0, 600);
         tiqMarker[0]->setYValue(580);
         tiqMarker[1]->setYValue(580);
     }
@@ -965,14 +965,14 @@ PfPvPlot::recalcCompare()
 
         // round *UP* to next integer for axis to fill nicely
         maxCPV = round(maxCPV + 0.5);
-        setAxisScale(XBottom, 0, maxCPV);
+        setAxisScale(QwtAxis::XBottom, 0, maxCPV);
         tiqMarker[0]->setXValue(maxCPV - 0.5);
         tiqMarker[3]->setXValue(maxCPV - 0.5);
 
     } else {
 
         maxCPV = 3; // for background shading and CP curve
-        setAxisScale(XBottom, 0, 3);
+        setAxisScale(QwtAxis::XBottom, 0, 3);
         tiqMarker[0]->setXValue(2.9);
         tiqMarker[3]->setXValue(2.9);
     }
@@ -1080,14 +1080,14 @@ PfPvPlot::recalc()
 
     if (maxAEPF > 600) {
 
-        setAxisScale(YLeft, 0, (maxAEPF < 2500) ? (maxAEPF * 1.1) : 2500); // a bit of headroom
+        setAxisScale(QwtAxis::YLeft, 0, (maxAEPF < 2500) ? (maxAEPF * 1.1) : 2500); // a bit of headroom
         tiqMarker[0]->setYValue(maxAEPF);
         tiqMarker[1]->setYValue(maxAEPF);
 
     } else {
 
         maxAEPF = 600; // for background shading and CP curve
-        setAxisScale(YLeft, 0, 600);
+        setAxisScale(QwtAxis::YLeft, 0, 600);
         tiqMarker[0]->setYValue(580);
         tiqMarker[1]->setYValue(580);
     }
@@ -1096,14 +1096,14 @@ PfPvPlot::recalc()
 
         // round *UP* to next integer for axis to fill nicely
         maxCPV = round(maxCPV + 0.5);
-        setAxisScale(XBottom, 0, maxCPV);
+        setAxisScale(QwtAxis::XBottom, 0, maxCPV);
         tiqMarker[0]->setXValue(maxCPV - 0.5);
         tiqMarker[3]->setXValue(maxCPV - 0.5);
 
     } else {
 
         maxCPV = 3; // for background shading and CP curve
-        setAxisScale(XBottom, 0, 3);
+        setAxisScale(QwtAxis::XBottom, 0, 3);
         tiqMarker[0]->setXValue(2.9);
         tiqMarker[3]->setXValue(2.9);
     }

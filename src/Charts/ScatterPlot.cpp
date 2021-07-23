@@ -207,8 +207,8 @@ ScatterPlot::ScatterPlot(Context *context) : context(context)
     ride = NULL;
     static_cast<QwtPlotCanvas*>(canvas())->setFrameStyle(QFrame::NoFrame);
 
-    setAxisMaxMinor(XBottom, 0);
-    setAxisMaxMinor(YLeft, 0);
+    setAxisMaxMinor(QwtAxis::XBottom, 0);
+    setAxisMaxMinor(QwtAxis::YLeft, 0);
 
     QwtScaleDraw *sd = new QwtScaleDraw;
     sd->setTickLength(QwtScaleDiv::MajorTick, 3);
@@ -565,18 +565,18 @@ void ScatterPlot::setData (ScatterSettings *settings)
     }
 
     // axis titles
-    setAxisTitle(YLeft, describeType(settings->y, true, GlobalContext::context()->useMetricUnits));
-    setAxisTitle(XBottom, describeType(settings->x, true, GlobalContext::context()->useMetricUnits));
+    setAxisTitle(QwtAxis::YLeft, describeType(settings->y, true, GlobalContext::context()->useMetricUnits));
+    setAxisTitle(QwtAxis::XBottom, describeType(settings->x, true, GlobalContext::context()->useMetricUnits));
 
     // axis scale
-    if (settings->y == MODEL_AEPF) setAxisScale(YLeft, 0, 600);
-    else setAxisScale(YLeft, minY, maxY);
-    if (settings->x == MODEL_CPV) setAxisScale(XBottom, 0, 3);
-    else setAxisScale(XBottom, minX, maxX);
+    if (settings->y == MODEL_AEPF) setAxisScale(QwtAxis::YLeft, 0, 600);
+    else setAxisScale(QwtAxis::YLeft, minY, maxY);
+    if (settings->x == MODEL_CPV) setAxisScale(QwtAxis::XBottom, 0, 3);
+    else setAxisScale(QwtAxis::XBottom, minX, maxX);
 
     // gear
-    if (settings->x == MODEL_GEAR) setAxisScale(XBottom, 0, 7);
-    if (settings->y == MODEL_GEAR) setAxisScale(YLeft, 0, 7);
+    if (settings->x == MODEL_GEAR) setAxisScale(QwtAxis::XBottom, 0, 7);
+    if (settings->y == MODEL_GEAR) setAxisScale(QwtAxis::YLeft, 0, 7);
 
 
     // and those interval markers
@@ -599,7 +599,7 @@ void ScatterPlot::mouseMoved()
         int index = 0;
         foreach (QwtPlotMarker *is, intervalMarkers) {
 
-            QPoint mpos = canvas()->mapToGlobal(QPoint(transform(XBottom, is->value().x()), transform(YLeft, is->value().y())));
+            QPoint mpos = canvas()->mapToGlobal(QPoint(transform(QwtAxis::XBottom, is->value().x()), transform(QwtAxis::YLeft, is->value().y())));
 
             int dx = mpos.x() - pos.x();
             int dy = mpos.y() - pos.y();
@@ -772,7 +772,7 @@ ScatterPlot::refreshIntervalMarkers(ScatterSettings *settings)
 
             QwtPlotMarker *p = new QwtPlotMarker();
             p->setValue(x, y);
-            p->setYAxis(YLeft);
+            p->setYAxis(QwtAxis::YLeft);
             p->setZ(100);
             p->setSymbol(sym);
             p->attach(this);
@@ -827,7 +827,7 @@ ScatterPlot::addTrendLine(QVector<double> xval, QVector<double> yval, int nbPoin
     if (appsettings->value(this, GC_ANTIALIAS, true).toBool()==true)
         trend->setRenderHint(QwtPlotItem::RenderAntialiased);
     trend->setBaseline(0);
-    trend->setYAxis(YLeft);
+    trend->setYAxis(QwtAxis::YLeft);
     trend->setStyle(QwtPlotCurve::Lines);
 
     // perform linear regression
@@ -852,7 +852,7 @@ ScatterPlot::addTrendLine(QVector<double> xval, QVector<double> yval, int nbPoin
     text.setColor(intervalColor.darker(200));
     label->setLabel(text);
     label->setValue(xtrend[1]*0.8, ytrend[1]*0.9);
-    label->setYAxis(YLeft);
+    label->setYAxis(QwtAxis::YLeft);
     label->setSpacing(6 *dpiXFactor); // not px but by yaxis value !? mad.
     label->setLabelAlignment(Qt::AlignTop | Qt::AlignCenter);
 

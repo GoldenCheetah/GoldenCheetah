@@ -521,9 +521,9 @@ Aerolab::setYMax(bool new_zoom)
             //************
 
   //if (veCurve->isVisible()) {
-   // setAxisTitle(YLeft, tr("Elevation"));
+   // setAxisTitle(QwtAxis::YLeft, tr("Elevation"));
     if ( !altArray.empty() ) {
-   //   setAxisScale(YLeft,
+   //   setAxisScale(QwtAxis::YLeft,
    //          min( veCurve->minYValue(), altCurve->minYValue() ) - 10,
    //          10.0 + max( veCurve->maxYValue(), altCurve->maxYValue() ) );
 
@@ -531,7 +531,7 @@ Aerolab::setYMax(bool new_zoom)
         maxY = 10.0 + max( veCurve->maxYValue(), altCurve->maxYValue() );
 
     } else {
-      //setAxisScale(YLeft,
+      //setAxisScale(QwtAxis::YLeft,
       //       veCurve->minYValue() ,
       //       1.05 * veCurve->maxYValue() );
 

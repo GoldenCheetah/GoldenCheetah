@@ -273,9 +273,9 @@ LTMPlot::setData(LTMSettings *set)
 
     //setTitle(settings->title);
     if (settings->groupBy != LTM_TOD)
-        setAxisTitle(XBottom, tr("Date"));
+        setAxisTitle(QwtAxis::XBottom, tr("Date"));
     else
-        setAxisTitle(XBottom, tr("Time of Day"));
+        setAxisTitle(QwtAxis::XBottom, tr("Time of Day"));
     enableAxis(QwtAxis::XBottom, true);
     setAxisVisible(QwtAxis::XBottom, true);
     setAxisVisible(QwtAxis::xTop, false);
@@ -329,7 +329,7 @@ LTMPlot::setData(LTMSettings *set)
     if (context->athlete->rideCache->rides().count() == 0 || maxX <= 0) {
 
 
-        setAxisScale(XBottom, 0, maxX);
+        setAxisScale(QwtAxis::XBottom, 0, maxX);
         setAxisScaleDraw(QwtAxis::XBottom, new LTMScaleDraw(settings->start,
                 groupForDate(settings->start.date(), settings->groupBy), settings->groupBy));
         enableAxis(QwtAxis::XBottom, true);
@@ -1313,12 +1313,12 @@ LTMPlot::setData(LTMSettings *set)
         } else {
             tics = 1 + maxX/10;
         }
-        setAxisScale(XBottom, -0.5, maxX, tics);
+        setAxisScale(QwtAxis::XBottom, -0.5, maxX, tics);
         setAxisScaleDraw(QwtAxis::XBottom, new LTMScaleDraw(settings->start,
                     groupForDate(settings->start.date(), settings->groupBy), settings->groupBy));
 
     } else {
-        setAxisScale(XBottom, 0, 24, 2);
+        setAxisScale(QwtAxis::XBottom, 0, 24, 2);
         setAxisScaleDraw(QwtAxis::XBottom, new LTMScaleDraw(settings->start,
                     groupForDate(settings->start.date(), settings->groupBy), settings->groupBy));
     }
@@ -1338,8 +1338,8 @@ LTMPlot::setData(LTMSettings *set)
         }
     }
 
-    QString format = axisTitle(YLeft).text();
-    picker->setAxes(XBottom, YLeft);
+    QString format = axisTitle(QwtAxis::YLeft).text();
+    picker->setAxes(QwtAxis::XBottom, YLeft);
     picker->setFormat(format);
 
     // draw zone labels axisid of -1 means delete whats there
@@ -1509,25 +1509,25 @@ LTMPlot::setCompareData(LTMSettings *set)
 
         switch (settings->groupBy) {
             case LTM_TOD:
-                setAxisTitle(XBottom, tr("Time of Day"));
+                setAxisTitle(QwtAxis::XBottom, tr("Time of Day"));
                 break;
             case LTM_DAY:
-                setAxisTitle(XBottom, tr("Day"));
+                setAxisTitle(QwtAxis::XBottom, tr("Day"));
                 break;
             case LTM_WEEK:
-                setAxisTitle(XBottom, tr("Week"));
+                setAxisTitle(QwtAxis::XBottom, tr("Week"));
                 break;
             case LTM_MONTH:
-                setAxisTitle(XBottom, tr("Month"));
+                setAxisTitle(QwtAxis::XBottom, tr("Month"));
                 break;
             case LTM_YEAR:
-                setAxisTitle(XBottom, tr("Year"));
+                setAxisTitle(QwtAxis::XBottom, tr("Year"));
                 break;
             case LTM_ALL:
-                setAxisTitle(XBottom, tr("All"));
+                setAxisTitle(QwtAxis::XBottom, tr("All"));
                 break;
             default:
-                setAxisTitle(XBottom, tr("Date"));
+                setAxisTitle(QwtAxis::XBottom, tr("Date"));
                 break;
         }
         enableAxis(QwtAxis::XBottom, true);
@@ -2425,12 +2425,12 @@ LTMPlot::setCompareData(LTMSettings *set)
         } else {
             tics = 1 + MAXX/10;
         }
-        setAxisScale(XBottom, -0.498f, MAXX+0.498f, tics);
+        setAxisScale(QwtAxis::XBottom, -0.498f, MAXX+0.498f, tics);
         setAxisScaleDraw(QwtAxis::XBottom, new CompareScaleDraw());
 
 
     } else {
-        setAxisScale(XBottom, 0, 24, 2);
+        setAxisScale(QwtAxis::XBottom, 0, 24, 2);
         setAxisScaleDraw(QwtAxis::XBottom, new LTMScaleDraw(settings->start,
                     groupForDate(settings->start.date(), settings->groupBy), settings->groupBy));
     }
@@ -2473,8 +2473,8 @@ LTMPlot::setCompareData(LTMSettings *set)
         axisWidget(axisid)->setPalette(pal);
     }
 
-    QString format = axisTitle(YLeft).text();
-    picker->setAxes(XBottom, YLeft);
+    QString format = axisTitle(QwtAxis::YLeft).text();
+    picker->setAxes(QwtAxis::XBottom, YLeft);
     picker->setFormat(format);
 
     // show legend?
@@ -2522,7 +2522,7 @@ LTMPlot::setMaxX(int x)
     } else {
         tics = 1 + MAXX/10;
     }
-    setAxisScale(XBottom, -0.498f, MAXX+0.498f, tics);
+    setAxisScale(QwtAxis::XBottom, -0.498f, MAXX+0.498f, tics);
     setAxisScaleDraw(QwtAxis::XBottom, new CompareScaleDraw());
 }
 
@@ -3937,7 +3937,7 @@ LTMPlot::eventFilter(QObject *obj, QEvent *event)
             int min = axisScaleDiv(QwtAxis::XBottom).lowerBound();
             int max = axisScaleDiv(QwtAxis::XBottom).upperBound();
             setData(settings);
-            setAxisScale(XBottom, min, max);
+            setAxisScale(QwtAxis::XBottom, min, max);
             replot();
         }
     }

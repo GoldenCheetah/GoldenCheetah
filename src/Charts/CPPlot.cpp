@@ -54,7 +54,7 @@
 #include "TimeUtils.h"
 #include "Units.h"
 #include "Perspective.h"
-
+#include "qwt_spline_curve_fitter.h"
 #include "LTMTrend.h"
 
 
@@ -718,15 +718,15 @@ CPPlot::plotModel()
     // Pmax is often higher than the test values (they're for
     // 3-20 mins typically so well short of pmax).
     if (!showDelta && rideSeries == RideFile::watts && pdModel && pdModel->PMax() > ymax) {
-        if (pdModel->PMax() > ymax) setAxisScale(YLeft, 0, (ymax=pdModel->PMax() * 1.1f));
+        if (pdModel->PMax() > ymax) setAxisScale(QwtAxis::YLeft, 0, (ymax=pdModel->PMax() * 1.1f));
     }
 
     // if we're showing the power profile, must be at least 1500
     if (ymax < 20 && showPP && rideSeries == RideFile::wattsKg) {
-        setAxisScale(YLeft, 0, (ymax=20));
+        setAxisScale(QwtAxis::YLeft, 0, (ymax=20));
     }
     if (ymax < 1500 && showPP && rideSeries == RideFile::watts) {
-        setAxisScale(YLeft, 0, (ymax=1500));
+        setAxisScale(QwtAxis::YLeft, 0, (ymax=1500));
     }
 }
 

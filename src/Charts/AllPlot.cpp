@@ -3587,7 +3587,6 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
     setYMax();
 
     setAxisScale(QwtAxis::XBottom, xaxis[0], xaxis[stopidx-startidx]);
-    enableAxis(QwtAxis::XBottom, true);
     setAxisVisible(QwtAxis::XBottom, true);
 
     refreshReferenceLines();
@@ -4086,7 +4085,7 @@ AllPlot::setDataFromPlot(AllPlot *plot)
             for (size_t i=0; i<thereCurve->data()->size(); i++) array << thereCurve->data()->sample(i);
 
             ourCurve->setSamples(array);
-            ourCurve->setYAxis(YLeft);
+            ourCurve->setYAxis(QwtAxis::YLeft);
             ourCurve->setBaseline(thereCurve->baseline());
             ourCurve->setStyle(thereCurve->style());
 
@@ -4877,7 +4876,7 @@ AllPlot::setDataFromPlots(QList<AllPlot *> plots)
                     for (size_t i=0; i<thereCurve2->data()->size(); i++) array << thereCurve2->data()->sample(i);
 
                     ourCurve2->setSamples(array);
-                    ourCurve2->setYAxis(YLeft);
+                    ourCurve2->setYAxis(QwtAxis::YLeft);
                     ourCurve2->setBaseline(thereCurve2->baseline());
 
                     if (ourCurve2->maxYValue() > MAXY) MAXY = ourCurve2->maxYValue();
@@ -4997,7 +4996,7 @@ AllPlot::setDataFromPlots(QList<AllPlot *> plots)
     refreshExhaustions();
 
     // always draw against YLeft in series mode
-    intervalHighlighterCurve->setYAxis(YLeft);
+    intervalHighlighterCurve->setYAxis(QwtAxis::YLeft);
     if (thereCurve)
         intervalHighlighterCurve->setBaseline(thereCurve->minYValue());
     else if (thereICurve)

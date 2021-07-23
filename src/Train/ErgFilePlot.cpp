@@ -95,11 +95,11 @@ ErgFilePlot::ErgFilePlot(Context *context) : context(context)
     setAxesCount(QwtAxis::YRight, 4);
 
     // Setup the left axis (Power)
-    setAxisTitle(YLeft, "Watts");
-    enableAxis(YLeft, true);
+    setAxisTitle(QwtAxis::YLeft, "Watts");
+    enableAxis(QwtAxis::YLeft, true);
     QwtScaleDraw *sd = new QwtScaleDraw;
     sd->setTickLength(QwtScaleDiv::MajorTick, 3);
-    setAxisMaxMinor(YLeft, 0);
+    setAxisMaxMinor(QwtAxis::YLeft, 0);
     //setAxisScaleDraw(QwtAxis::YLeft, sd);
 
     QPalette pal;
@@ -112,24 +112,24 @@ ErgFilePlot::ErgFilePlot(Context *context) : context(context)
     stGiles.setPointSize(appsettings->value(NULL, GC_FONT_CHARTLABELS_SIZE, 8).toInt());
     QwtText title("Watts");
     title.setFont(stGiles);
-    QwtPlot::setAxisFont(YLeft, stGiles);
-    QwtPlot::setAxisTitle(YLeft, title);
+    QwtPlot::setAxisFont(QwtAxis::YLeft, stGiles);
+    QwtPlot::setAxisTitle(QwtAxis::YLeft, title);
 
-    enableAxis(XBottom, true);
+    enableAxis(QwtAxis::XBottom, true);
     distdraw = new DistScaleDraw;
     distdraw->setTickLength(QwtScaleDiv::MajorTick, 3);
     timedraw = new HourTimeScaleDraw;
     timedraw->setTickLength(QwtScaleDiv::MajorTick, 3);
-    setAxisMaxMinor(XBottom, 0);
+    setAxisMaxMinor(QwtAxis::XBottom, 0);
     setAxisScaleDraw(QwtAxis::XBottom, timedraw);
 
     // set the axis so we default to an hour workout
-    setAxisScale(XBottom, (double)0, 1000 * 60  * 60 , 15 * 60 * 1000);
+    setAxisScale(QwtAxis::XBottom, (double)0, 1000 * 60  * 60 , 15 * 60 * 1000);
 
     title.setFont(stGiles);
     title.setText("Time (mins)");
-    QwtPlot::setAxisFont(XBottom, stGiles);
-    QwtPlot::setAxisTitle(XBottom, title);
+    QwtPlot::setAxisFont(QwtAxis::XBottom, stGiles);
+    QwtPlot::setAxisTitle(QwtAxis::XBottom, title);
 
     pal.setColor(QPalette::WindowText, GColor(CRIDEPLOTXAXIS));
     pal.setColor(QPalette::Text, GColor(CRIDEPLOTXAXIS));
@@ -140,8 +140,8 @@ ErgFilePlot::ErgFilePlot(Context *context) : context(context)
     enableAxis(QwtAxisId(QwtAxis::YRight,1).id, false);
 
     // set all the orher axes off but scaled
-    setAxisScale(YLeft, 0, 300); // max cadence and hr
-    enableAxis(YLeft, true);
+    setAxisScale(QwtAxis::YLeft, 0, 300); // max cadence and hr
+    enableAxis(QwtAxis::YLeft, true);
     setAxisAutoScale(QwtAxis::YLeft, true);// we autoscale, since peaks are so much higher than troughs
 
     setAxisScale(YRight, 0, 250); // max cadence and hr
@@ -533,39 +533,39 @@ ErgFilePlot::setData(ErgFile *ergfile)
                 else if (maxX < 5000) step = 1000;
 
                 // axis setup for distance
-                setAxisScale(XBottom, (double)0, maxX, step);
+                setAxisScale(QwtAxis::XBottom, (double)0, maxX, step);
 
                 QwtText title;
                 title.setFont(stGiles);
                 title.setText("Distance (km)");
-                QwtPlot::setAxisFont(XBottom, stGiles);
-                QwtPlot::setAxisTitle(XBottom, title);
+                QwtPlot::setAxisFont(QwtAxis::XBottom, stGiles);
+                QwtPlot::setAxisTitle(QwtAxis::XBottom, title);
 
                 pal.setColor(QPalette::WindowText, Qt::gray);
                 pal.setColor(QPalette::Text, Qt::gray);
                 axisWidget(QwtAxis::XBottom)->setPalette(pal);
 
                 // only allocate a new one if its not the current (they get freed by Qwt)
-                if (axisScaleDraw(XBottom) != distdraw)
+                if (axisScaleDraw(QwtAxis::XBottom) != distdraw)
                     setAxisScaleDraw(QwtAxis::XBottom, (distdraw=new DistScaleDraw()));
 
             } else {
 
                 // tics every 15 minutes, if workout shorter tics every minute
-                setAxisScale(XBottom, (double)0, maxX, maxX > (15*60*1000) ? 15*60*1000 : 60*1000);
+                setAxisScale(QwtAxis::XBottom, (double)0, maxX, maxX > (15*60*1000) ? 15*60*1000 : 60*1000);
 
                 QwtText title;
                 title.setFont(stGiles);
                 title.setText("Time (mins)");
-                QwtPlot::setAxisFont(XBottom, stGiles);
-                QwtPlot::setAxisTitle(XBottom, title);
+                QwtPlot::setAxisFont(QwtAxis::XBottom, stGiles);
+                QwtPlot::setAxisTitle(QwtAxis::XBottom, title);
 
                 pal.setColor(QPalette::WindowText, GColor(CRIDEPLOTXAXIS));
                 pal.setColor(QPalette::Text, GColor(CRIDEPLOTXAXIS));
                 axisWidget(QwtAxis::XBottom)->setPalette(pal);
 
                 // only allocate a new one if its not the current (they get freed by Qwt)
-                if (axisScaleDraw(XBottom) != timedraw)
+                if (axisScaleDraw(QwtAxis::XBottom) != timedraw)
                     setAxisScaleDraw(QwtAxis::XBottom, (timedraw=new HourTimeScaleDraw()));
             }
         }
@@ -588,22 +588,22 @@ ErgFilePlot::setData(ErgFile *ergfile)
         QwtText title;
         title.setFont(stGiles);
         title.setText("Time (mins)");
-        QwtPlot::setAxisFont(XBottom, stGiles);
-        QwtPlot::setAxisTitle(XBottom, title);
+        QwtPlot::setAxisFont(QwtAxis::XBottom, stGiles);
+        QwtPlot::setAxisTitle(QwtAxis::XBottom, title);
 
         pal.setColor(QPalette::WindowText, GColor(CRIDEPLOTXAXIS));
         pal.setColor(QPalette::Text, GColor(CRIDEPLOTXAXIS));
         axisWidget(QwtAxis::XBottom)->setPalette(pal);
 
         // set the axis so we default to an hour workout
-        if (axisScaleDraw(XBottom) != timedraw)
+        if (axisScaleDraw(QwtAxis::XBottom) != timedraw)
             setAxisScaleDraw(QwtAxis::XBottom, (timedraw=new HourTimeScaleDraw()));
-        setAxisScale(XBottom, (double)0, 1000 * 60 * 60, 15*60*1000);
+        setAxisScale(QwtAxis::XBottom, (double)0, 1000 * 60 * 60, 15*60*1000);
     }
 
     // make the XBottom scale visible
-    enableAxis(XBottom, true);
-    setAxisVisible(XBottom, true);
+    enableAxis(QwtAxis::XBottom, true);
+    setAxisVisible(QwtAxis::XBottom, true);
 }
 
 void
@@ -627,7 +627,7 @@ ErgFilePlot::performancePlot(RealtimeData rtdata)
     // want to control stepping and tick marking add another 30 mins
     if (!ergFile && axisScaleDiv(QwtAxis::XBottom).upperBound() <= x) {
         double maxX = x + ( 30 * 60 * 1000);
-        setAxisScale(XBottom, (double)0, maxX, maxX > (15*60*1000) ? 15*60*1000 : 60*1000);
+        setAxisScale(QwtAxis::XBottom, (double)0, maxX, maxX > (15*60*1000) ? 15*60*1000 : 60*1000);
     }
 
     double watts = rtdata.getWatts();

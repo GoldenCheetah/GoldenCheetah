@@ -171,7 +171,7 @@ SmallPlot::recalc()
     wattsCurve->setSamples(smoothTime.constData(), smoothWatts.constData(), rideTimeSecs + 1);
     hrCurve->setSamples(smoothTime.constData(), smoothHr.constData(), rideTimeSecs + 1);
     altCurve->setSamples(smoothTime.constData(), smoothAlt.constData(), rideTimeSecs + 1);
-    setAxisScale(XBottom, 0.0, smoothTime[rideTimeSecs]);
+    setAxisScale(QwtAxis::XBottom, 0.0, smoothTime[rideTimeSecs]);
 
     setYMax();
     replot();
@@ -207,8 +207,8 @@ SmallPlot::setYMax()
 void
 SmallPlot::setXTitle()
 {
-    setAxisTitle(XBottom, tr("Time (minutes)"));
-    enableAxis(XBottom, true);
+    setAxisTitle(QwtAxis::XBottom, tr("Time (minutes)"));
+    enableAxis(QwtAxis::XBottom, true);
 }
 
 void

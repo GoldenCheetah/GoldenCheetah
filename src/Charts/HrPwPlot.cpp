@@ -35,6 +35,7 @@
 #include <qwt_legend.h>
 #include <qwt_series_data.h>
 #include <qwt_scale_widget.h>
+#include <qwt_scale_map.h>
 
 
 static inline double
@@ -301,7 +302,7 @@ HrPwPlot::recalc()
         delete plotedHrArray[i];
     }       
 
-    setAxisScale(XBottom, 0.0, maxWatt);
+    setAxisScale(QwtAxis::XBottom, 0.0, maxWatt);
 
     setYMax();
     refreshZoneLabels();
@@ -359,8 +360,8 @@ HrPwPlot::setYMax()
             ymax = max(ymax, hrCurves[i]->maxYValue());
         }
     }
-    setAxisScale(YLeft, minHr, ymax * 1.2);
-    setAxisTitle(YLeft, tr("Heart Rate(BPM)"));
+    setAxisScale(QwtAxis::YLeft, minHr, ymax * 1.2);
+    setAxisTitle(QwtAxis::YLeft, tr("Heart Rate(BPM)"));
 }
 
 void
@@ -467,7 +468,7 @@ HrPwPlot::addRegLinCurve( double rslope, double rintercept)
 void
 HrPwPlot::setXTitle()
 {
-    setAxisTitle(XBottom, tr("Power (Watts)"));
+    setAxisTitle(QwtAxis::XBottom, tr("Power (Watts)"));
 }
 
 void

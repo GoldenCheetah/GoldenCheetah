@@ -58,20 +58,20 @@ void SpinScanData::init() { }
 SpinScanPlot::SpinScanPlot(QWidget *parent, uint8_t *spinData) : QwtPlot(parent), leftCurve(NULL), rightCurve(NULL), spinData(spinData)
 {
     // Setup the axis
-    setAxisTitle(YLeft, "SpinScan");
-    setAxisMaxMinor(XBottom, 0);
-    setAxisMaxMinor(YLeft, 0);
+    setAxisTitle(QwtAxis::YLeft, "SpinScan");
+    setAxisMaxMinor(QwtAxis::XBottom, 0);
+    setAxisMaxMinor(QwtAxis::YLeft, 0);
 
     QPalette pal;
-    setAxisScale(YLeft, 0, 90); // max 8 bit plus a little
-    setAxisScale(XBottom, 0, 24); // max 8 bit plus a little
+    setAxisScale(QwtAxis::YLeft, 0, 90); // max 8 bit plus a little
+    setAxisScale(QwtAxis::XBottom, 0, 24); // max 8 bit plus a little
     pal.setColor(QPalette::WindowText, GColor(CSPINSCANLEFT));
     pal.setColor(QPalette::Text, GColor(CSPINSCANLEFT));
     axisWidget(QwtAxis::YLeft)->setPalette(pal);
     axisWidget(QwtAxis::YLeft)->scaleDraw()->setTickLength(QwtScaleDiv::MajorTick, 3);
 
-    enableAxis(XBottom, false); // very little value and some cpu overhead
-    enableAxis(YLeft, true);
+    enableAxis(QwtAxis::XBottom, false); // very little value and some cpu overhead
+    enableAxis(QwtAxis::YLeft, true);
 
     // 30s Power curve
     rightCurve = new QwtPlotCurve("SpinScan Left");

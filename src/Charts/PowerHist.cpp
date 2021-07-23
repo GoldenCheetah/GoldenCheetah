@@ -85,7 +85,7 @@ PowerHist::PowerHist(Context *context, bool rangemode) :
     static_cast<QwtPlotCanvas*>(canvas())->setFrameStyle(QFrame::NoFrame);
 
     setParameterAxisTitle();
-    setAxisTitle(YLeft, absolutetime ? tr("Time (minutes)") : tr("Time (percent)"));
+    setAxisTitle(QwtAxis::YLeft, absolutetime ? tr("Time (minutes)") : tr("Time (percent)"));
 
     curve = new QwtPlotCurve("");
     curve->setStyle(QwtPlotCurve::Steps);
@@ -120,8 +120,8 @@ PowerHist::PowerHist(Context *context, bool rangemode) :
     // usually hidden, but shown for compare mode
     //XXX insertLegend(new QwtLegend(), QwtPlot::BottomLegend);
 
-    setAxisMaxMinor(XBottom, 0);
-    setAxisMaxMinor(YLeft, 0);
+    setAxisMaxMinor(QwtAxis::XBottom, 0);
+    setAxisMaxMinor(QwtAxis::YLeft, 0);
 
     configChanged(CONFIG_APPEARANCE);
 }
@@ -775,7 +775,7 @@ PowerHist::recalcCompare()
     // set axis etc
     if (!isZoningEnabled()) {
         //normal
-        setAxisScale(XBottom, minX, maxX);
+        setAxisScale(QwtAxis::XBottom, minX, maxX);
     } else {
         // zoned
     }
@@ -873,7 +873,7 @@ PowerHist::recalc(bool force)
                 }
             }
         }
-        setAxisScale(XBottom, minX, x[x.size()-1]);
+        setAxisScale(QwtAxis::XBottom, minX, x[x.size()-1]);
 
         // we only do zone labels when using absolute values
         refreshZoneLabels();
@@ -1285,7 +1285,7 @@ PowerHist::setYMax()
     }
 
     static const double tmin = 1.0/60;
-    setAxisScale(YLeft, (lny ? tmin : 0.0), MaxY * 1.1);
+    setAxisScale(QwtAxis::YLeft, (lny ? tmin : 0.0), MaxY * 1.1);
 
     QwtScaleDraw *sd = new QwtScaleDraw;
     sd->setTickLength(QwtScaleDiv::MajorTick, 3);
@@ -1824,14 +1824,14 @@ PowerHist::setData(Specification specification, QString totalMetric, QString dis
     if (xunits == "seconds" || xunits == tr("seconds")) xunits = tr("minutes");
 
     if (tm->units(GlobalContext::context()->useMetricUnits) != "")
-        setAxisTitle(YLeft, QString(tr("Total %1 (%2)")).arg(tm->name()).arg(yunits));
+        setAxisTitle(QwtAxis::YLeft, QString(tr("Total %1 (%2)")).arg(tm->name()).arg(yunits));
     else
-        setAxisTitle(YLeft, QString(tr("Total %1")).arg(tm->name()));
+        setAxisTitle(QwtAxis::YLeft, QString(tr("Total %1")).arg(tm->name()));
 
     if (m->units(GlobalContext::context()->useMetricUnits) != "")
-        setAxisTitle(XBottom, QString(tr("%1 of Activity (%2)")).arg(m->name()).arg(xunits));
+        setAxisTitle(QwtAxis::XBottom, QString(tr("%1 of Activity (%2)")).arg(m->name()).arg(xunits));
     else
-        setAxisTitle(XBottom, QString(tr("%1 of Activity")).arg(m->name()));
+        setAxisTitle(QwtAxis::XBottom, QString(tr("%1 of Activity")).arg(m->name()));
 
     // dont show legend in metric mode
     //XXX legend()->hide();
@@ -2305,13 +2305,13 @@ PowerHist::setlnY(bool value)
     lny=value;
     if (lny && !zoned) {
 
-        setAxisScaleEngine(YLeft, new QwtLogScaleEngine);
+        setAxisScaleEngine(QwtAxis::YLeft, new QwtLogScaleEngine);
         curve->setBaseline(1e-6);
         curveSelected->setBaseline(1e-6);
 
     } else {
 
-        setAxisScaleEngine(YLeft, new QwtLinearScaleEngine);
+        setAxisScaleEngine(QwtAxis::YLeft, new QwtLinearScaleEngine);
         curve->setBaseline(0);
         curveSelected->setBaseline(0);
 
@@ -2384,8 +2384,8 @@ PowerHist::setParameterAxisTitle()
             axislabel = QString(tr("Unknown data series"));
             break;
     }
-    setAxisTitle(XBottom, axislabel);
-    setAxisTitle(YLeft, absolutetime ? tr("Time (minutes)") : tr("Time (percent)"));
+    setAxisTitle(QwtAxis::XBottom, axislabel);
+    setAxisTitle(QwtAxis::YLeft, absolutetime ? tr("Time (minutes)") : tr("Time (percent)"));
 }
 
 void
