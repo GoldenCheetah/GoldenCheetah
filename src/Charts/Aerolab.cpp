@@ -567,7 +567,7 @@ Aerolab::setYMax(bool new_zoom)
     setAxisLabelAlignment(QwtAxis::YLeft,Qt::AlignVCenter);
   }
 
-  enableAxis(QwtAxis::YLeft, veCurve->isVisible());
+  setAxisVisible(QwtAxis::YLeft, veCurve->isVisible());
 }
 
 

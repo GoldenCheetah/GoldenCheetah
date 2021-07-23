@@ -39,6 +39,8 @@
 #include <qwt_plot_marker.h>
 #include <qwt_point_3d.h>
 #include <qwt_scale_draw.h>
+#include <qwt_scale_map.h>
+#include <qwt_text.h>
 #include <qsettings.h>
 #include <qvariant.h>
 #include <algorithm> // for std::min()

@@ -241,12 +241,12 @@ RealtimePlot::RealtimePlot(Context *context) :
 
     // Setup the axis (of evil :-)
     setAxisTitle(YLeft, "Watts");
-    setAxisTitle(yRight, "Cadence / Hb / HR");
+    setAxisTitle(YRight, "Cadence / Hb / HR");
     setAxisTitle(QwtAxisId(QwtAxis::YRight,2).id, "Speed");
     setAxisTitle(XBottom, "Seconds Ago");
     setAxisMaxMinor(XBottom, 0);
     setAxisMaxMinor(YLeft, 0);
-    setAxisMaxMinor(yRight, 0);
+    setAxisMaxMinor(YRight, 0);
     setAxisMaxMinor(QwtAxisId(QwtAxis::YRight,2).id, 0);
 
     QPalette pal;
@@ -256,7 +256,7 @@ RealtimePlot::RealtimePlot(Context *context) :
     axisWidget(QwtAxis::YLeft)->setPalette(pal);
     axisWidget(QwtAxis::YLeft)->scaleDraw()->setTickLength(QwtScaleDiv::MajorTick, 3);
 
-    setAxisScale(yRight, 0, 230); // cadence / hr
+    setAxisScale(YRight, 0, 230); // cadence / hr
     pal.setColor(QPalette::WindowText, GColor(CHEARTRATE));
     pal.setColor(QPalette::Text, GColor(CHEARTRATE));
     axisWidget(QwtAxis::YRight)->setPalette(pal);
@@ -279,7 +279,7 @@ RealtimePlot::RealtimePlot(Context *context) :
 
     enableAxis(XBottom, false); // very little value and some cpu overhead
     enableAxis(YLeft, true);
-    enableAxis(yRight, true);
+    enableAxis(YRight, true);
     enableAxis(QwtAxisId(QwtAxis::YRight,2).id, true);
 
     // 30s Power curve
@@ -454,7 +454,7 @@ RealtimePlot::showHr(int state)
 {
     showHrState = state;
     hrCurve->setVisible(state == Qt::Checked);
-    enableAxis(yRight, showCadState == Qt::Checked || showHrState == Qt::Checked ||
+    enableAxis(YRight, showCadState == Qt::Checked || showHrState == Qt::Checked ||
                        showO2HbState == Qt::Checked || showHHbState == Qt::Checked ||
                        showtHbState == Qt::Checked || showSmO2State == Qt::Checked);
     replot();
@@ -474,7 +474,7 @@ RealtimePlot::showCad(int state)
 {
     showCadState = state;
     cadCurve->setVisible(state == Qt::Checked);
-    enableAxis(yRight, showCadState == Qt::Checked || showHrState == Qt::Checked ||
+    enableAxis(YRight, showCadState == Qt::Checked || showHrState == Qt::Checked ||
                        showO2HbState == Qt::Checked || showHHbState == Qt::Checked ||
                        showtHbState == Qt::Checked || showSmO2State == Qt::Checked);
     replot();
@@ -494,7 +494,7 @@ RealtimePlot::showHHb(int state)
 {
     showHHbState = state;
     hhbCurve->setVisible(state == Qt::Checked);
-    enableAxis(yRight, showCadState == Qt::Checked || showHrState == Qt::Checked ||
+    enableAxis(YRight, showCadState == Qt::Checked || showHrState == Qt::Checked ||
                        showO2HbState == Qt::Checked || showHHbState == Qt::Checked ||
                        showtHbState == Qt::Checked || showSmO2State == Qt::Checked);
     replot();
@@ -505,7 +505,7 @@ RealtimePlot::showO2Hb(int state)
 {
     showO2HbState = state;
     o2hbCurve->setVisible(state == Qt::Checked);
-    enableAxis(yRight, showCadState == Qt::Checked || showHrState == Qt::Checked ||
+    enableAxis(YRight, showCadState == Qt::Checked || showHrState == Qt::Checked ||
                        showO2HbState == Qt::Checked || showHHbState == Qt::Checked ||
                        showtHbState == Qt::Checked || showSmO2State == Qt::Checked);
     replot();
@@ -516,7 +516,7 @@ RealtimePlot::showtHb(int state)
 {
     showtHbState = state;
     thbCurve->setVisible(state == Qt::Checked);
-    enableAxis(yRight, showCadState == Qt::Checked || showHrState == Qt::Checked ||
+    enableAxis(YRight, showCadState == Qt::Checked || showHrState == Qt::Checked ||
                        showO2HbState == Qt::Checked || showHHbState == Qt::Checked ||
                        showtHbState == Qt::Checked || showSmO2State == Qt::Checked);
     replot();
@@ -527,7 +527,7 @@ RealtimePlot::showSmO2(int state)
 {
     showSmO2State = state;
     smo2Curve->setVisible(state == Qt::Checked);
-    enableAxis(yRight, showCadState == Qt::Checked || showHrState == Qt::Checked ||
+    enableAxis(YRight, showCadState == Qt::Checked || showHrState == Qt::Checked ||
                        showO2HbState == Qt::Checked || showHHbState == Qt::Checked ||
                        showtHbState == Qt::Checked || showSmO2State == Qt::Checked);
     replot();

@@ -3,6 +3,7 @@
 #include "qwt_color_map.h"
 #include "qwt_scale_map.h"
 #include "qwt_painter.h"
+#include "qwt_text.h"
 #include <qpainter.h>
 
 class CpPlotCurve::PrivateData

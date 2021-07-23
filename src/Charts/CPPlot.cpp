@@ -78,22 +78,22 @@ CPPlot::CPPlot(CriticalPowerWindow *parent, Context *context, bool rangemode) : 
 
 {
     setAutoFillBackground(true);
-    setAxisTitle(XBottom, tr("Interval Length"));
+    setAxisTitle(QwtAxis::XBottom, tr("Interval Length"));
 
     // Log scale on x-axis
     ltsd = new LogTimeScaleDraw;
     ltsd->setTickLength(QwtScaleDiv::MajorTick, 3);
-    setAxisScaleDraw(XBottom, ltsd);
-    setAxisScaleEngine(XBottom, new QwtLogScaleEngine);
+    setAxisScaleDraw(QwtAxis::XBottom, ltsd);
+    setAxisScaleEngine(QwtAxis::XBottom, new QwtLogScaleEngine);
 
     // left yAxis scale prettify
     sd = new QwtScaleDraw;
     sd->setTickLength(QwtScaleDiv::MajorTick, 3);
     sd->enableComponent(QwtScaleDraw::Ticks, false);
     sd->enableComponent(QwtScaleDraw::Backbone, false);
-    setAxisScaleDraw(YLeft, sd);
-    setAxisTitle(YLeft, tr("Average Power (watts)"));
-    setAxisMaxMinor(YLeft, 0);
+    setAxisScaleDraw(QwtAxis::YLeft, sd);
+    setAxisTitle(QwtAxis::YLeft, tr("Average Power (watts)"));
+    setAxisMaxMinor(QwtAxis::YLeft, 0);
     plotLayout()->setAlignCanvasToScales(true);
 
     // right yAxis scale prettify
@@ -101,9 +101,9 @@ CPPlot::CPPlot(CriticalPowerWindow *parent, Context *context, bool rangemode) : 
     sd->setTickLength(QwtScaleDiv::MajorTick, 3);
     sd->enableComponent(QwtScaleDraw::Ticks, false);
     sd->enableComponent(QwtScaleDraw::Backbone, false);
-    setAxisScaleDraw(yRight, sd);
-    setAxisTitle(yRight, tr("Percent of Best"));
-    setAxisMaxMinor(yRight, 0);
+    setAxisScaleDraw(QwtAxis::YRight, sd);
+    setAxisTitle(QwtAxis::YRight, tr("Percent of Best"));
+    setAxisMaxMinor(QwtAxis::YRight, 0);
 
     // zoom
     zoomer = new penTooltip(static_cast<QwtPlotCanvas*>(this->canvas()));
@@ -313,25 +313,25 @@ CPPlot::setSeries(CriticalPowerWindow::CriticalSeriesType criticalSeries)
     }
 
     // set scale to match what's needed
-    if (scale != log) setAxisScaleEngine(XBottom, new QwtLinearScaleEngine);
-    else setAxisScaleEngine(XBottom, new QwtLogScaleEngine);
+    if (scale != log) setAxisScaleEngine(QwtAxis::XBottom, new QwtLinearScaleEngine);
+    else setAxisScaleEngine(QwtAxis::XBottom, new QwtLogScaleEngine);
 
     if (criticalSeries == CriticalPowerWindow::veloclinicplot) {
         sd = new QwtScaleDraw;
         sd->setTickLength(QwtScaleDiv::MajorTick, 3);
         sd->enableComponent(QwtScaleDraw::Ticks, false);
-        setAxisScaleDraw(XBottom, sd);
-        setAxisTitle(XBottom, tr("Power (W)"));
+        setAxisScaleDraw(QwtAxis::XBottom, sd);
+        setAxisTitle(QwtAxis::XBottom, tr("Power (W)"));
     } else {
         ltsd = new LogTimeScaleDraw;
         ltsd->setTickLength(QwtScaleDiv::MajorTick, 3);
         ltsd->enableComponent(QwtScaleDraw::Ticks, false);
-        setAxisScaleDraw(XBottom, ltsd);
-        setAxisTitle(XBottom, tr("Interval Length"));
+        setAxisScaleDraw(QwtAxis::XBottom, ltsd);
+        setAxisTitle(QwtAxis::XBottom, tr("Interval Length"));
     }
 
     // set axis title
-    setAxisTitle(YLeft, QString ("%1 %2 (%3) %4")
+    setAxisTitle(QwtAxis::YLeft, QString ("%1 %2 (%3) %4")
                  .arg(prefix)
                  .arg(series)
                  .arg(units)
@@ -668,16 +668,16 @@ CPPlot::plotModel()
         }
 
         heatCurve->setSamples(time, heat);
-        heatCurve->setYAxis(yRight);
-        setAxisScale(yRight, 0, 100);  // fine if only heat is shown and percentage Scale will be fixed if shown
-        if (showPercent) setAxisTitle(yRight, tr("Percent of Best / Heat Activities"));
-        else setAxisTitle(yRight, tr("Heat Activities"));
+        heatCurve->setYAxis(QwtAxis::YRight);
+        setAxisScale(QwtAxis::YRight, 0, 100);  // fine if only heat is shown and percentage Scale will be fixed if shown
+        if (showPercent) setAxisTitle(QwtAxis::YRight, tr("Percent of Best / Heat Activities"));
+        else setAxisTitle(QwtAxis::YRight, tr("Heat Activities"));
         heatCurve->attach(this);
     }
 
-    setAxisVisible(yRight, showHeat || ((showPowerIndex||showPercent) && rideCurve));
+    setAxisVisible(QwtAxis::YRight, showHeat || ((showPowerIndex||showPercent) && rideCurve));
 
-   // setAxisVisible(yRight, showHeat || showPercent);
+   // setAxisVisible(YRight, showHeat || showPercent);
 
     //
     // HEAT AGE
@@ -1716,24 +1716,24 @@ CPPlot::plotBests(RideItem *rideItem)
         max = ((max/100) + 1) * 100;
         if (rideSeries == RideFile::watts && showPP && max<1500) max=1500;
 
-        setAxisScale(YLeft, 0, max);
+        setAxisScale(QwtAxis::YLeft, 0, max);
 
     } else if (criticalSeries == CriticalPowerWindow::veloclinicplot) {
-        setAxisScale(YLeft, 0, 1.5*pdModel->WPrime());
+        setAxisScale(QwtAxis::YLeft, 0, 1.5*pdModel->WPrime());
 
     } else if (criticalSeries == CriticalPowerWindow::vam) {
         // VAM is very big anyway - so just 5% headroom
-        setAxisScale(YLeft, 0, 1.05*ymax);
+        setAxisScale(QwtAxis::YLeft, 0, 1.05*ymax);
 
     } else if (rideSeries == RideFile::wattsKg && showPP) {
         ymax *= 1.1;
         if (ymax<20) ymax = 20;
-        setAxisScale(YLeft, 0, ymax);
+        setAxisScale(QwtAxis::YLeft, 0, ymax);
 
     } else {
 
         // or just add 10% headroom
-        setAxisScale(YLeft, 0, 1.1*values[0]);
+        setAxisScale(QwtAxis::YLeft, 0, 1.1*values[0]);
     }
     zoomer->setZoomBase(false);
 }
@@ -1933,11 +1933,11 @@ CPPlot::plotRide(RideItem *rideItem)
             int max = rideCurve->maxYValue();
             if (max < 100) max = 100;
             else max = max * 1.05f;
-            setAxisScale(yRight, 0, max); // always 100
+            setAxisScale(QwtAxis::YRight, 0, max); // always 100
 
             // set the right titles in case both Heat and Percent of best is show
-            if (showHeat) setAxisTitle(yRight, tr("Percent of Best / Heat Activities"));
-            else setAxisTitle(yRight, tr("Percent of Best"));
+            if (showHeat) setAxisTitle(QwtAxis::YRight, tr("Percent of Best / Heat Activities"));
+            else setAxisTitle(QwtAxis::YRight, tr("Percent of Best"));
 
         } else if (showPowerIndex && bestsCache && (rideSeries == RideFile::wattsKg || rideSeries == RideFile::watts)) {
 
@@ -1958,27 +1958,27 @@ CPPlot::plotRide(RideItem *rideItem)
             int max = rideCurve->maxYValue();
             if (max < 1) max = 1;
             else max = max * 1.05f;
-            setAxisScale(yRight, 0, max); // always 100
+            setAxisScale(QwtAxis::YRight, 0, max); // always 100
 
             // set the right titles in case both Heat and Percent of best is show
-            setAxisTitle(yRight, tr("Power Index"));
+            setAxisTitle(QwtAxis::YRight, tr("Power Index"));
 
         } else {
 
             // JUST A NORMAL CURVE
-            rideCurve->setYAxis(YLeft);
+            rideCurve->setYAxis(QwtAxis::YLeft);
             rideCurve->setSamples(timeArray.data() + 1, rideItem->fileCache()->meanMaxArray(rideSeries).constData() + 1,
                                   maxNonZero > 0 ? maxNonZero-1 : 0);
 
             // Set the YAxis Title if Heat is active
-            if (showHeat) setAxisTitle(yRight, tr("Heat Activities"));
+            if (showHeat) setAxisTitle(QwtAxis::YRight, tr("Heat Activities"));
         }
     }
 
     // which axis should it be on?
     // and also make sure its visible
-    rideCurve->setYAxis((showPercent||showPowerIndex) ? yRight : YLeft);
-    setAxisVisible(yRight, showPercent || showPowerIndex || showHeat);
+    rideCurve->setYAxis((showPercent||showPowerIndex) ? QwtAxis::YRight : QwtAxis::YLeft);
+    setAxisVisible(QwtAxis::YRight, showPercent || showPowerIndex || showHeat);
     rideCurve->attach(this);
 
     zoomer->setZoomBase(false);
@@ -2969,17 +2969,17 @@ CPPlot::calculateForDateRanges(QList<CompareDateRange> compareDateRanges)
         max = ((max/100) + 1) * 100;
 
         if (showPP && max < 1500) max=1500;
-        setAxisScale(YLeft, 0, max);
+        setAxisScale(QwtAxis::YLeft, 0, max);
 
     } else if (showPP && rideSeries == RideFile::wattsKg) {
         ymax *=1.1;
         if (ymax<20) ymax = 20;
 
-        setAxisScale(YLeft, 0, ymax);
+        setAxisScale(QwtAxis::YLeft, 0, ymax);
     } else {
 
         // or just add 10% headroom
-        setAxisScale(YLeft, ymin *1.1, 1.1*ymax);
+        setAxisScale(QwtAxis::YLeft, ymin *1.1, 1.1*ymax);
     }
 
     plotPowerProfile();
@@ -3121,18 +3121,18 @@ CPPlot::calculateForIntervals(QList<CompareInterval> compareIntervals)
         ymax = ((ymax/100) + 1) * 100;
         if (showPP && ymax<1500) ymax=1500;
 
-        setAxisScale(YLeft, ymin, ymax);
+        setAxisScale(QwtAxis::YLeft, ymin, ymax);
 
     } else if (showPP && rideSeries == RideFile::wattsKg) {
         ymax *=1.1;
         if (ymax<20) ymax = 20;
 
-        setAxisScale(YLeft, 0, ymax);
+        setAxisScale(QwtAxis::YLeft, 0, ymax);
 
     } else {
 
         // or just add 10% headroom
-        setAxisScale(YLeft, ymin *1.1, 1.1*ymax);
+        setAxisScale(QwtAxis::YLeft, ymin *1.1, 1.1*ymax);
     }
 
     plotPowerProfile();

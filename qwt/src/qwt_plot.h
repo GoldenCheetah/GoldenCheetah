@@ -242,7 +242,7 @@ class QWT_EXPORT QwtPlot : public QFrame, public QwtPlotDict
     enum Axis
     {
         YLeft   = QwtAxis::YLeft,
-        yRight  = QwtAxis::YRight,
+        YRight  = QwtAxis::YRight,
         XBottom = QwtAxis::XBottom,
         xTop    = QwtAxis::XTop,
 

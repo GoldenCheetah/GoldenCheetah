@@ -15,7 +15,7 @@
 
 QDebug operator<<( QDebug debug, const QwtAxisId& axisId )
 {
-    static const char* posNames[] = { "YLeft", "yRight", "XBottom", "xTop" };
+    static const char* posNames[] = { "YLeft", "YRight", "XBottom", "xTop" };
 
     debug.nospace();
 

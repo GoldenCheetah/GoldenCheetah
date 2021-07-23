@@ -144,8 +144,8 @@ ErgFilePlot::ErgFilePlot(Context *context) : context(context)
     enableAxis(YLeft, true);
     setAxisAutoScale(QwtAxis::YLeft, true);// we autoscale, since peaks are so much higher than troughs
 
-    setAxisScale(yRight, 0, 250); // max cadence and hr
-    enableAxis(yRight, false);
+    setAxisScale(YRight, 0, 250); // max cadence and hr
+    enableAxis(YRight, false);
     setAxisScale(QwtAxisId(QwtAxis::YRight,2), 0, 60); // max speed of 60mph/60kmh seems ok to me!
     setAxisVisible(QwtAxisId(QwtAxis::YRight,2), false); // max speed of 60mph/60kmh seems ok to me!
     enableAxis(QwtAxisId(QwtAxis::YRight,2).id, false);

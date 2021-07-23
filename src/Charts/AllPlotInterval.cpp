@@ -31,6 +31,7 @@
 #include <qwt_plot_intervalcurve.h>
 #include <qwt_scale_div.h>
 #include <qwt_scale_widget.h>
+#include <qwt_scale_map.h>
 
 class AllPlotIntervalData : public QwtArraySeriesData<QwtIntervalSample>
 {
@@ -98,9 +99,9 @@ AllPlotInterval::AllPlotInterval(QWidget *parent, Context *context):
     //pal.setColor(QPalette::Text, GColor(CPLOTMARKER));
     //axisWidget(QwtAxis::XBottom)->setPalette(pal);
 
-    enableAxis(XBottom, false);
-    setAxisVisible(XBottom, false);
-    setAxisVisible(YLeft, false);
+    setAxisVisible(QwtAxis::XBottom, false);
+    setAxisVisible(QwtAxis::XBottom, false);
+    setAxisVisible(QwtAxis::YLeft, false);
 
     tooltip = new LTMToolTip(QwtAxis::XBottom, QwtAxis::YLeft,
                                    QwtPicker::NoRubberBand,
@@ -239,7 +240,7 @@ AllPlotInterval::placeIntervals()
     }
 
     setFixedHeight((1+intervalLigns.count())*(10*dpiYFactor));
-    setAxisScale(YLeft, 0, 3000*intervalLigns.count());
+    setAxisScale(QwtAxis::YLeft, 0, 3000*intervalLigns.count());
 }
 
 void

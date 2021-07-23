@@ -463,7 +463,6 @@ AllPlotWindow::AllPlotWindow(Context *context) :
 
     allPlot = new AllPlot(this, this, context);
     allPlot->setContentsMargins(0,0,0,0);
-    allPlot->enableAxis(QwtAxis::XBottom, true);
     allPlot->setAxisVisible(QwtAxis::XBottom, true);
     //allPlot->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     //allPlot->axisWidget(QwtAxis::YLeft)->installEventFilter(this);
@@ -1504,7 +1503,6 @@ AllPlotWindow::compareChanged()
             if (x.one == RideFile::watts) plot->setShadeZones(showPower->currentIndex() == 0);
             else plot->setShadeZones(false);
             plot->setAxisVisible(QwtAxis::XBottom, true);
-            plot->enableAxis(QwtAxis::XBottom, true);
             plot->setAxisTitle(QwtAxis::XBottom,NULL);
 
             // get rid of the User Data axis
@@ -3709,7 +3707,6 @@ AllPlotWindow::setupSeriesStackPlots()
 
         // No x axis titles
         _allPlot->setAxisVisible(QwtAxis::XBottom, true);
-        _allPlot->enableAxis(QwtAxis::XBottom, true);
         _allPlot->setAxisTitle(QwtAxis::XBottom,NULL);
         _allPlot->setAxisMaxMinor(QwtAxis::XBottom, 0);
         _allPlot->setAxisMaxMinor(QwtAxis::YLeft, 0);
@@ -3839,7 +3836,6 @@ AllPlotWindow::setupStackPlots()
 
         // No x axis titles
         _allPlot->setAxisVisible(QwtAxis::XBottom, true);
-        _allPlot->enableAxis(QwtAxis::XBottom, true);
         _allPlot->setAxisTitle(QwtAxis::XBottom,NULL);
         _allPlot->setAxisMaxMinor(QwtAxis::XBottom, 0);
         _allPlot->setAxisMaxMinor(QwtAxis::YLeft, 0);

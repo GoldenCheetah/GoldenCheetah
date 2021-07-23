@@ -587,7 +587,7 @@ class AllPlot : public QwtPlot
         void recalc(AllPlotObject *objects);
         void setYMax();
         void setLeftOnePalette(); // color of YLeft,1 axis
-        void setRightPalette(); // color of yRight,0 axis
+        void setRightPalette(); // color of YRight,0 axis
         void setXTitle();
         void setHighlightIntervals(bool);
 

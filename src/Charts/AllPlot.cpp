@@ -44,6 +44,7 @@
 #include <qwt_plot_marker.h>
 #include <qwt_scale_div.h>
 #include <qwt_scale_widget.h>
+#include <qwt_scale_map.h>
 #include <qwt_text.h>
 #include <qwt_legend.h>
 #include <qwt_series_data.h>
@@ -985,7 +986,7 @@ AllPlot::AllPlot(QWidget *parent, AllPlotWindow *window, Context *context, RideF
     standard->intervalHighlighterCurve->setSamples(new IntervalPlotData(this, context, window));
 
     setAxisMaxMinor(QwtAxis::XBottom, 0);
-    enableAxis(QwtAxis::XBottom, true);
+    setAxisVisible(QwtAxis::XBottom, true);
     setAxisVisible(QwtAxis::XBottom, true);
     axisWidget(QwtAxisId(QwtAxis::XBottom))->installEventFilter(this);
 
@@ -1481,8 +1482,7 @@ AllPlot::configChanged(qint32 what)
         pal.setColor(QPalette::WindowText, GColor(CPLOTMARKER));
         pal.setColor(QPalette::Text, GColor(CPLOTMARKER));
         axisWidget(QwtAxis::XBottom)->setPalette(pal);
-        enableAxis(XBottom, true);
-        setAxisVisible(XBottom, true);
+        setAxisVisible(QwtAxis::XBottom, true);
 
         ScaleScaleDraw *sd = new ScaleScaleDraw;
         sd->setTickLength(QwtScaleDiv::MajorTick, 3);
@@ -2703,7 +2703,7 @@ AllPlot::plotReferenceLine(const RideFilePoint *referencePoint)
 
     if (referencePoint->watts != 0)  {
         referenceLine = new QwtPlotCurve(tr("Power Ref"));
-        referenceLine->setYAxis(YLeft);
+        referenceLine->setYAxis(QwtAxis::YLeft);
         QPen wattsPen = QPen(GColor(CPOWER));
         wattsPen.setWidth(1);
         wattsPen.setStyle(Qt::DashLine);
@@ -2790,7 +2790,7 @@ AllPlot::setYMax()
                                                      standard->lteCurve->isVisible() ||
                                                      standard->lpsCurve->isVisible()  ||
                                                      standard->slopeCurve->isVisible() );
-        setAxisVisible(yRight, standard->speedCurve->isVisible() || standard->torqueCurve->isVisible() || 
+        setAxisVisible(QwtAxis::YRight, standard->speedCurve->isVisible() || standard->torqueCurve->isVisible() ||
                                standard->thbCurve->isVisible() || standard->o2hbCurve->isVisible() || standard->hhbCurve->isVisible());
 
         setAxisVisible(QwtAxisId(QwtAxis::YRight, 1), standard->altCurve->isVisible() ||
@@ -2815,8 +2815,8 @@ AllPlot::setYMax()
     }
 
     // might want xaxis
-    if (wantxaxis) setAxisVisible(XBottom, true);
-    else setAxisVisible(XBottom, false);
+    if (wantxaxis) setAxisVisible(QwtAxis::XBottom, true);
+    else setAxisVisible(QwtAxis::XBottom, false);
 
     // set axis scales
     // QwtAxis::YRight, 3
@@ -2848,16 +2848,16 @@ AllPlot::setYMax()
 
         // axisHeight will be zero before first show, so only do this if its non-zero!
         if (axisHeight) {
-            QFontMetrics labelWidthMetric = QFontMetrics( QwtPlot::axisFont(YLeft) );
+            QFontMetrics labelWidthMetric = QFontMetrics( QwtPlot::axisFont(QwtAxis::YLeft) );
             int labelWidth = labelWidthMetric.width( (maxY > 1000) ? " 8,888 " : " 888 " );
 
             if (axisHeight > labelWidth*2) //Avoid insane iterations
                 while( ( qCeil(maxY / step) * labelWidth ) > axisHeight ) nextStep(step);
         }
 
-        setAxisTitle(YLeft, tr("Watts"));
+        setAxisTitle(QwtAxis::YLeft, tr("Watts"));
         AllPlot::setAxisScaleDiv(QwtAxis::YLeft, 0, maxY, step);
-        axisWidget(YLeft)->update();
+        axisWidget(QwtAxis::YLeft)->update();
     }
 
     // QwtAxis::YLeft, 1
@@ -2915,7 +2915,7 @@ AllPlot::setYMax()
         int step = 10;
 
         if (axisHeight) {
-            QFontMetrics labelWidthMetric = QFontMetrics( QwtPlot::axisFont(YLeft) );
+            QFontMetrics labelWidthMetric = QFontMetrics( QwtPlot::axisFont(QwtAxis::YLeft) );
             int labelWidth = labelWidthMetric.width( "888 " );
             ymax *= 1.05;
 
@@ -3029,7 +3029,7 @@ AllPlot::setYMax()
         int step = 10;
 
         if (axisHeight) {
-            QFontMetrics labelWidthMetric = QFontMetrics( QwtPlot::axisFont(yRight) );
+            QFontMetrics labelWidthMetric = QFontMetrics( QwtPlot::axisFont(QwtAxis::YRight) );
             int labelWidth = labelWidthMetric.width( "888 " );
             ymax *= 1.05;
 
@@ -3082,7 +3082,7 @@ AllPlot::setYMax()
         int step = 100;
 
         if (axisHeight) {
-            QFontMetrics labelWidthMetric = QFontMetrics( QwtPlot::axisFont(YLeft) );
+            QFontMetrics labelWidthMetric = QFontMetrics( QwtPlot::axisFont(QwtAxis::YLeft) );
             int labelWidth = labelWidthMetric.width( (ymax > 1000) ? " 8888 " : " 888 " );
 
             if (axisHeight>labelWidth*2) //Avoid insane iterations
@@ -3099,11 +3099,10 @@ void
 AllPlot::setXTitle()
 {
     if (bydist)
-        setAxisTitle(XBottom, GlobalContext::context()->useMetricUnits ? "KM" : "Miles");
+        setAxisTitle(QwtAxis::XBottom, GlobalContext::context()->useMetricUnits ? "KM" : "Miles");
     else
-        setAxisTitle(XBottom, tr("")); // time is bloody obvious, less noise
-    enableAxis(XBottom, true);
-    setAxisVisible(XBottom, true);
+        setAxisTitle(QwtAxis::XBottom, tr("")); // time is bloody obvious, less noise
+    setAxisVisible(QwtAxis::XBottom, true);
 }
 
 // we do this a lot so trying to save a bit of cut and paste woe
@@ -3587,9 +3586,9 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
     setAltSlopePlotStyle(standard->altSlopeCurve);
     setYMax();
 
-    setAxisScale(XBottom, xaxis[0], xaxis[stopidx-startidx]);
-    enableAxis(XBottom, true);
-    setAxisVisible(XBottom, true);
+    setAxisScale(QwtAxis::XBottom, xaxis[0], xaxis[stopidx-startidx]);
+    enableAxis(QwtAxis::XBottom, true);
+    setAxisVisible(QwtAxis::XBottom, true);
 
     refreshReferenceLines();
     refreshExhaustions();
@@ -4116,7 +4115,7 @@ AllPlot::setDataFromPlot(AllPlot *plot)
             for (size_t i=0; i<thereCurve2->data()->size(); i++) array << thereCurve2->data()->sample(i);
 
             ourCurve2->setSamples(array);
-            ourCurve2->setYAxis(YLeft);
+            ourCurve2->setYAxis(QwtAxis::YLeft);
             ourCurve2->setBaseline(thereCurve2->baseline());
 
             // symbol when zoomed in super close
@@ -4144,7 +4143,7 @@ AllPlot::setDataFromPlot(AllPlot *plot)
             for (size_t i=0; i<thereICurve->data()->size(); i++) array << thereICurve->data()->sample(i);
 
             ourICurve->setSamples(array);
-            ourICurve->setYAxis(YLeft);
+            ourICurve->setYAxis(QwtAxis::YLeft);
         }
 
         if (ourASCurve && thereASCurve) {
@@ -4157,7 +4156,7 @@ AllPlot::setDataFromPlot(AllPlot *plot)
             for (size_t i=0; i<thereASCurve->data()->size(); i++) array << thereASCurve->data()->sample(i);
 
             ourASCurve->setSamples(array);
-            ourASCurve->setYAxis(YLeft);
+            ourASCurve->setYAxis(QwtAxis::YLeft);
             ourASCurve->setBaseline(thereASCurve->baseline());
             ourASCurve->setStyle(thereASCurve->style());
 
@@ -4169,17 +4168,16 @@ AllPlot::setDataFromPlot(AllPlot *plot)
 
         // x-axis
         if (thereCurve || thereASCurve)
-            setAxisScale(QwtAxis::XBottom, referencePlot->axisScaleDiv(XBottom).lowerBound(),
-                                           referencePlot->axisScaleDiv(XBottom).upperBound());
+            setAxisScale(QwtAxis::XBottom, referencePlot->axisScaleDiv(QwtAxis::XBottom).lowerBound(),
+                                           referencePlot->axisScaleDiv(QwtAxis::XBottom).upperBound());
         else if (thereICurve)
             setAxisScale(QwtAxis::XBottom, thereICurve->boundingRect().left(), thereICurve->boundingRect().right());
 
-        enableAxis(QwtAxis::XBottom, true);
         setAxisVisible(QwtAxis::XBottom, true);
         setXTitle();
 
         // y-axis YLeft
-        setAxisVisible(YLeft, true);
+        setAxisVisible(QwtAxis::YLeft, true);
         if (scope == RideFile::thb && thereCurve) {
 
             // minimum non-zero value... worst case its zero !
@@ -4248,7 +4246,7 @@ AllPlot::setDataFromPlot(AllPlot *plot)
         setAxisScaleDraw(QwtAxis::YLeft, sd);
 
         // title and colour
-        setAxisTitle(YLeft, title);
+        setAxisTitle(QwtAxis::YLeft, title);
         QPalette pal = palette();
         if (thereCurve) {
             pal.setColor(QPalette::WindowText, thereCurve->pen().color());
@@ -4265,7 +4263,7 @@ AllPlot::setDataFromPlot(AllPlot *plot)
         // hide other y axes
         setAxisVisible(QwtAxisId(QwtAxis::YLeft, 1), false);
         setAxisVisible(QwtAxisId(QwtAxis::YLeft, 3), false);
-        setAxisVisible(yRight, false);
+        setAxisVisible(QwtAxis::YRight, false);
         setAxisVisible(QwtAxisId(QwtAxis::YRight, 1), false);
         setAxisVisible(QwtAxisId(QwtAxis::YRight, 2), false);
         setAxisVisible(QwtAxisId(QwtAxis::YRight, 3), false);
@@ -4841,7 +4839,7 @@ AllPlot::setDataFromPlots(QList<AllPlot *> plots)
                     }
 
                     ourCurve->setSamples(x,y);
-                    ourCurve->setYAxis(YLeft);
+                    ourCurve->setYAxis(QwtAxis::YLeft);
                     ourCurve->setBaseline(thereCurve->baseline());
 
                     if (ourCurve->maxYValue() > MAXY) MAXY = ourCurve->maxYValue();
@@ -4914,7 +4912,7 @@ AllPlot::setDataFromPlots(QList<AllPlot *> plots)
                     for (size_t i=0; i<thereICurve->data()->size(); i++) array << thereICurve->data()->sample(i);
 
                     ourICurve->setSamples(array);
-                    ourICurve->setYAxis(YLeft);
+                    ourICurve->setYAxis(QwtAxis::YLeft);
 
                     //XXXX ???? DUNNO ?????
                     //XXXX FIX LATER XXXX if (ourICurve->maxYValue() > MAXY) MAXY = ourICurve->maxYValue();
@@ -4938,7 +4936,7 @@ AllPlot::setDataFromPlots(QList<AllPlot *> plots)
                     for (size_t i=0; i<thereASCurve->data()->size(); i++) array << thereASCurve->data()->sample(i);
 
                     ourASCurve->setSamples(array);
-                    ourASCurve->setYAxis(YLeft);
+                    ourASCurve->setYAxis(QwtAxis::YLeft);
                     ourASCurve->setBaseline(thereASCurve->baseline());
                     setAltSlopePlotStyle (ourASCurve);
 
@@ -4959,9 +4957,8 @@ AllPlot::setDataFromPlots(QList<AllPlot *> plots)
     }
 
     // x-axis
-    enableAxis(QwtAxis::XBottom, true);
     setAxisVisible(QwtAxis::XBottom, true);
-    setAxisVisible(YLeft, true);
+    setAxisVisible(QwtAxis::YLeft, true);
 
     // prettify the chart at the end
     ScaleScaleDraw *sd = new ScaleScaleDraw;
@@ -4977,7 +4974,7 @@ AllPlot::setDataFromPlots(QList<AllPlot *> plots)
     // hide other y axes
     setAxisVisible(QwtAxisId(QwtAxis::YLeft, 1), false);
     setAxisVisible(QwtAxisId(QwtAxis::YLeft, 3), false);
-    setAxisVisible(yRight, false);
+    setAxisVisible(QwtAxis::YRight, false);
     setAxisVisible(QwtAxisId(QwtAxis::YRight, 1), false);
     setAxisVisible(QwtAxisId(QwtAxis::YRight, 2), false);
     setAxisVisible(QwtAxisId(QwtAxis::YRight, 3), false);
@@ -5416,8 +5413,7 @@ AllPlot::setDataFromObject(AllPlotObject *object, AllPlot *reference)
     // set xaxis -- but not min/max as we get called during smoothing
     //              and massively quicker to reuse data and replot
     setXTitle();
-    enableAxis(XBottom, true);
-    setAxisVisible(XBottom, true);
+    setAxisVisible(QwtAxis::XBottom, true);
 
     // set the y-axis scales now
     referencePlot = NULL;
