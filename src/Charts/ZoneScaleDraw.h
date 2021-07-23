@@ -28,7 +28,7 @@
 class ZoneScaleDraw: public QwtScaleDraw
 {
     public:
-        ZoneScaleDraw(const Zones *zones, int range=-1) : zones(zones) {
+        ZoneScaleDraw(const Zones *zones, int range=-1, bool zoneLimited=false) : zones(zones), zoneLimited(zoneLimited) {
             setRange(range);
             setTickLength(QwtScaleDiv::MajorTick, 3);
         }
@@ -59,18 +59,17 @@ class ZoneScaleDraw: public QwtScaleDraw
         virtual QwtText label(double v) const
         {
             if (v <0 || v > (names.count()-1) || range < 0) return QString("");
+            else if (!zoneLimited) return names[v];
             else {
-                return names[v];
-#if 0
-                if (v == names.count()-1) return QString("%1\n%2w+").arg(names[v]).arg(from[v]);
-                else return QString("%1\n%2-%3w").arg(names[v]).arg(from[v]).arg(to[v]);
-#endif
+                if (v == names.count()-1) return QString("%1 (%2+ %3)").arg(names[v]).arg(from[v]).arg(RideFile::unitName(RideFile::watts, nullptr));
+                else return QString("%1 (%2-%3)").arg(names[v]).arg(from[v]).arg(to[v]);
             }
         }
 
     private:
         const Zones *zones;
         int range;
+        bool zoneLimited;
         QList<QString> names;
         QList <int> from, to;
 };
@@ -125,7 +124,7 @@ class WbalZoneScaleDraw: public QwtScaleDraw
 class HrZoneScaleDraw: public QwtScaleDraw
 {
     public:
-        HrZoneScaleDraw(const HrZones *zones, int range=-1) : zones(zones) {
+        HrZoneScaleDraw(const HrZones *zones, int range=-1, bool zoneLimited=false) : zones(zones), zoneLimited(zoneLimited) {
             setRange(range);
             setTickLength(QwtScaleDiv::MajorTick, 3);
         }
@@ -156,18 +155,17 @@ class HrZoneScaleDraw: public QwtScaleDraw
         virtual QwtText label(double v) const
         {
             if (v < 0 || v > (names.count()-1) || range < 0) return QString("");
+            else if (!zoneLimited) return names[v];
             else {
-                return names[v];
-#if 0
-                if (v == names.count()-1) return QString("%1\n%2bpm+").arg(names[v]).arg(from[v]);
-                else return QString("%1\n%2-%3bpm").arg(names[v]).arg(from[v]).arg(to[v]);
-#endif
+                if (v == names.count()-1) return QString("%1 (%2+ %3)").arg(names[v]).arg(from[v]).arg(RideFile::unitName(RideFile::hr, nullptr));
+                else return QString("%1 (%2-%3)").arg(names[v]).arg(from[v]).arg(to[v]);
             }
         }
 
     private:
         const HrZones *zones;
         int range;
+        bool zoneLimited;
         QList<QString> names;
         QList <int> from, to;
 
@@ -176,7 +174,7 @@ class HrZoneScaleDraw: public QwtScaleDraw
 class PaceZoneScaleDraw: public QwtScaleDraw
 {
     public:
-        PaceZoneScaleDraw(const PaceZones *zones, int range=-1) : zones(zones) {
+        PaceZoneScaleDraw(const PaceZones *zones, int range=-1, bool zoneLimited=false) : zones(zones), zoneLimited(zoneLimited) {
             setRange(range);
             setTickLength(QwtScaleDiv::MajorTick, 3);
         }
@@ -201,26 +199,27 @@ class PaceZoneScaleDraw: public QwtScaleDraw
                 from.clear();
                 to.clear();
             }
+            metricPace = appsettings->value(nullptr, zones->paceSetting(), GlobalContext::context()->useMetricUnits).toBool();
         }
 
         // return label
         virtual QwtText label(double v) const
         {
             if (v < 0 || v > (names.count()-1) || range < 0) return QString("");
+            else if (!zoneLimited) return names[v];
             else {
-                return names[v];
-#if 0
-                if (v == names.count()-1) return QString("%1\n%2kph+").arg(names[v]).arg(from[v]);
-                else return QString("%1\n%2-%3kph").arg(names[v]).arg(from[v]).arg(to[v]);
-#endif
+                if (v == names.count()-1) return QString("%1 (%2+ %3)").arg(names[v]).arg(zones->kphToPaceString(from[v], metricPace)).arg(zones->paceUnits(metricPace));
+                else return QString("%1 (%2-%3)").arg(names[v]).arg(zones->kphToPaceString(from[v], metricPace)).arg(zones->kphToPaceString(to[v], metricPace));
             }
         }
 
     private:
         const PaceZones *zones;
         int range;
+        bool zoneLimited;
         QList<QString> names;
         QList <double> from, to;
+        bool metricPace;
 
 };
 #endif

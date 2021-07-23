@@ -67,6 +67,7 @@ class HistogramWindow : public GcChartWindow
     Q_PROPERTY(bool shade READ shade WRITE setShade USER true)
     Q_PROPERTY(bool zoned READ zoned WRITE setZoned USER true)
     Q_PROPERTY(bool cpZoned READ cpZoned WRITE setCPZoned USER true)
+    Q_PROPERTY(bool zoneLimited READ zoneLimited WRITE setZoneLimited USER true)
     Q_PROPERTY(QString filter READ filter WRITE setFilter USER true)
     Q_PROPERTY(QDate fromDate READ fromDate WRITE setFromDate USER true)
     Q_PROPERTY(QDate toDate READ toDate WRITE setToDate USER true)
@@ -105,6 +106,8 @@ class HistogramWindow : public GcChartWindow
         void setCPZoned(bool x) { return showInCPZones->setChecked(x); }
         bool zoned() const { return showInZones->isChecked(); }
         void setZoned(bool x) { return showInZones->setChecked(x); }
+        bool zoneLimited() const { return showZoneLimits->isChecked(); }
+        void setZoneLimited(bool x) { return showZoneLimits->setChecked(x); }
         bool isFiltered() const { if (rangemode) return (isfiltered || context->ishomefiltered || context->isfiltered);
                                   else return false; }
         QString filter() const { return searchBox->filter(); }
@@ -172,6 +175,7 @@ class HistogramWindow : public GcChartWindow
 
         void setZoned(int);
         void setCPZoned(int);
+        void setZoneLimited(int);
         void setShade(int);
 
         // comparing things
@@ -204,6 +208,7 @@ class HistogramWindow : public GcChartWindow
         QCheckBox *shadeZones;      // Shade zone background
         QCheckBox *showInZones;       // Plot by Zone
         QCheckBox *showInCPZones;       // Plot by CP domain Moderate/Heavy/Severe Zone
+        QCheckBox *showZoneLimits;      // Show Zone limits in labels
         QComboBox *seriesCombo;         // Which data series to plot
 
         // reveal controls
@@ -242,7 +247,7 @@ class HistogramWindow : public GcChartWindow
         QLabel *comboLabel, *metricLabel1, *metricLabel2, *showLabel,
                *blankLabel1, *blankLabel2,
                *blankLabel3, *blankLabel4, *blankLabel5, *blankLabel6,
-               *blankLabel7, *colorLabel;
+               *blankLabel7, *blankLabel8, *colorLabel;
 
         // in range mode we can also plot a distribution chart
         // based upon metrics and not just data series

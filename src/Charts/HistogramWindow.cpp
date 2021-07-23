@@ -264,6 +264,10 @@ HistogramWindow::HistogramWindow(Context *context, bool rangemode) : GcChartWind
     showInCPZones->setText(tr("Use polarised zones"));
     cl->addRow(blankLabel7 = new QLabel(""), showInCPZones);
 
+    showZoneLimits = new QCheckBox;
+    showZoneLimits->setText(tr("Show Zone limits"));
+    cl->addRow(blankLabel8 = new QLabel(""), showZoneLimits);
+
     // bin width
     QHBoxLayout *binWidthLayout = new QHBoxLayout;
     QLabel *binWidthLabel = new QLabel(tr("Bin width"), this);
@@ -347,6 +351,8 @@ HistogramWindow::HistogramWindow(Context *context, bool rangemode) : GcChartWind
     connect(showInCPZones, SIGNAL(stateChanged(int)), this, SLOT(forceReplot()));
     connect(showInZones, SIGNAL(stateChanged(int)), this, SLOT(setZoned(int)));
     connect(showInZones, SIGNAL(stateChanged(int)), this, SLOT(forceReplot()));
+    connect(showZoneLimits, SIGNAL(stateChanged(int)), this, SLOT(setZoneLimited(int)));
+    connect(showZoneLimits, SIGNAL(stateChanged(int)), this, SLOT(forceReplot()));
     connect(shadeZones, SIGNAL(stateChanged(int)), this, SLOT(setShade(int)));
     connect(shadeZones, SIGNAL(stateChanged(int)), this, SLOT(forceReplot()));
     connect(showSumY, SIGNAL(currentIndexChanged(int)), this, SLOT(forceReplot()));
@@ -416,6 +422,7 @@ HistogramWindow::compareChanged()
         powerHist->setShading(shadeZones->isChecked() ? true : false);
         powerHist->setZoned(showInZones->isChecked() ? true : false);
         powerHist->setCPZoned(showInCPZones->isChecked() ? true : false);
+        powerHist->setZoneLimited(showZoneLimits->isChecked() ? true : false);
         powerHist->setlnY(showLnY->isChecked() ? true : false);
         powerHist->setWithZeros(showZeroes->isChecked() ? true : false);
         powerHist->setSumY(showSumY->currentIndex()== 0 ? true : false);
@@ -637,6 +644,7 @@ HistogramWindow::switchMode()
         shadeZones->show();
         showInZones->show();
         showInCPZones->show();
+        showZoneLimits->show();
 
         // select the series..
         seriesChanged();
@@ -658,6 +666,7 @@ HistogramWindow::switchMode()
         shadeZones->hide();
         showInZones->hide();
         showInCPZones->hide();
+        showZoneLimits->hide();
 
         // show all the metric controls
         blankLabel1->show();
@@ -932,6 +941,12 @@ HistogramWindow::setZoned(int x)
 }
 
 void
+HistogramWindow::setZoneLimited(int x)
+{
+    showZoneLimits->setCheckState((Qt::CheckState)x);
+}
+
+void
 HistogramWindow::setShade(int x)
 {
     rShade->setCheckState((Qt::CheckState)x);
@@ -1032,6 +1047,7 @@ HistogramWindow::updateChart()
                 powerHist->setShading(shadeZones->isChecked() ? true : false);
                 powerHist->setZoned(showInZones->isChecked() ? true : false);
                 powerHist->setCPZoned(showInCPZones->isChecked() ? true : false);
+                powerHist->setZoneLimited(showZoneLimits->isChecked() ? true : false);
                 powerHist->setlnY(showLnY->isChecked() ? true : false);
                 powerHist->setWithZeros(showZeroes->isChecked() ? true : false);
                 powerHist->setSumY(showSumY->currentIndex()== 0 ? true : false);
@@ -1073,6 +1089,7 @@ HistogramWindow::updateChart()
             powerHist->setShading(shadeZones->isChecked() ? true : false);
             powerHist->setZoned(showInZones->isChecked() ? true : false);
             powerHist->setCPZoned(showInCPZones->isChecked() ? true : false);
+            powerHist->setZoneLimited(showZoneLimits->isChecked() ? true : false);
             powerHist->setlnY(showLnY->isChecked() ? true : false);
             powerHist->setWithZeros(showZeroes->isChecked() ? true : false);
             powerHist->setSumY(showSumY->currentIndex()== 0 ? true : false);
