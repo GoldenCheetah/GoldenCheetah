@@ -641,7 +641,7 @@ AerolabWindow::doEstCdACrr()
 
 void
 AerolabWindow::zoomInterval(IntervalItem *which) {
-  QwtDoubleRect rect;
+  QRectF rect;
 
   if (!aerolab->byDistance()) {
     rect.setLeft(which->start/60);
@@ -668,13 +668,13 @@ void AerolabWindow::intervalSelected()
 
 double AerolabWindow::getCanvasTop() const
 {
-    const QwtDoubleRect &canvasRect = allZoomer->zoomRect();
+    const QRectF &canvasRect = allZoomer->zoomRect();
     return canvasRect.top();
 }
 
 double AerolabWindow::getCanvasBottom() const
 {
-    const QwtDoubleRect &canvasRect = allZoomer->zoomRect();
+    const QRectF &canvasRect = allZoomer->zoomRect();
     return canvasRect.bottom();
 }
 
