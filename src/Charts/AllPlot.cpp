@@ -1764,7 +1764,7 @@ AllPlot::recalc(AllPlotObject *objects)
     if (rideTimeSecs > SECONDS_IN_A_WEEK) {
 
         // clear all the curves
-        QwtArray<double> data;
+        QVector<double> data;
         QVector<QwtIntervalSample> intData;
 
         objects->wCurve->setSamples(data,data);

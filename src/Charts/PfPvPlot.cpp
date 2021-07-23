@@ -339,7 +339,7 @@ PfPvPlot::refreshZoneItems()
             QPen *pen = new QPen();
             pen->setStyle(Qt::NoPen);
 
-            QwtArray<double> yvalues;
+            QVector<double> yvalues;
 
             // generate x values
             for (int z = 0; z < num_zones; z ++) {
@@ -354,7 +354,7 @@ PfPvPlot::refreshZoneItems()
 
                 // generate data for curve
                 if (z < num_zones - 1) {
-                    QwtArray <double> contour_yvalues;
+                    QVector <double> contour_yvalues;
                     int watts = zone_power[z + 1];
                     int dwatts = (double) watts;
                     for (int i = 0; i < contour_xvalues.size(); i ++) {
@@ -365,8 +365,8 @@ PfPvPlot::refreshZoneItems()
                 } else {
 
                     // top zone has a curve at "infinite" power
-                    QwtArray <double> contour_x;
-                    QwtArray <double> contour_y;
+                    QVector <double> contour_x;
+                    QVector <double> contour_y;
                     contour_x.append(contour_xvalues[0]);
                     contour_x.append(contour_xvalues[contour_xvalues.size() - 1]);
                     contour_y.append(1e6);
@@ -607,8 +607,8 @@ PfPvPlot::setData(RideItem *_rideItem)
         } else {
             // Now that we have the set of points, transform them into the
             // QwtArrays needed to set the curve's data.
-            QwtArray<double> aepfArray;
-            QwtArray<double> cpvArray;
+            QVector<double> aepfArray;
+            QVector<double> cpvArray;
 
             std::set<std::pair<double, double> >::const_iterator j(dataSet.begin());
             while (j != dataSet.end()) {
@@ -649,8 +649,8 @@ PfPvPlot::setData(RideItem *_rideItem)
             gearRatioCurves.clear();
 
             // get the detailed data
-            QVector<QwtArray<double> > aepfArrayGearRatio(num_gearRatio_Plots);
-            QVector<QwtArray<double> > cpvArrayGearRatio(num_gearRatio_Plots);
+            QVector<QVector<double> > aepfArrayGearRatio(num_gearRatio_Plots);
+            QVector<QVector<double> > cpvArrayGearRatio(num_gearRatio_Plots);
 
             for (int i=0;i<num_gearRatio_Plots;i++) {
                 std::set<std::pair<double, double> >::const_iterator m(gearSet[i].begin());
@@ -837,8 +837,8 @@ PfPvPlot::showIntervals(RideItem *_rideItem)
 
            // Now that we have the set of points, transform them into the
            // QwtArrays needed to set the curve's data.
-           QVector<QwtArray<double> > aepfArrayInterval(num_intervals);
-           QVector<QwtArray<double> > cpvArrayInterval(num_intervals);
+           QVector<QVector<double> > aepfArrayInterval(num_intervals);
+           QVector<QVector<double> > cpvArrayInterval(num_intervals);
 
            for (int i=0;i<num_intervals;i++) {
                std::set<std::pair<double, double> >::const_iterator l(dataSetInterval[i].begin());
@@ -1179,7 +1179,7 @@ PfPvPlot::recalc()
 
     }
 
-    QwtArray<double> yvalues(contour_xvalues.size());
+    QVector<double> yvalues(contour_xvalues.size());
 
     if (cp_) {
 
@@ -1193,7 +1193,7 @@ PfPvPlot::recalc()
     } else {
 
         // an empty curve if no power (or zero power) is specified
-        QwtArray<double> data;
+        QVector<double> data;
         cpCurve->setSamples(data,data);
     }
     if (pmax_) {
@@ -1208,7 +1208,7 @@ PfPvPlot::recalc()
     } else {
 
         // an empty curve if no power (or zero power) is specified
-        QwtArray<double> data;
+        QVector<double> data;
         pmaxCurve->setSamples(data,data);
     }
 }
@@ -1371,8 +1371,8 @@ PfPvPlot::showCompareIntervals()
 
         // Now that we have the set of points, transform them into the
         // QwtArrays needed to set the curve's data.
-        QVector<QwtArray<double> > aepfArrayInterval(num_intervals);
-        QVector<QwtArray<double> > cpvArrayInterval(num_intervals);
+        QVector<QVector<double> > aepfArrayInterval(num_intervals);
+        QVector<QVector<double> > cpvArrayInterval(num_intervals);
 
         for (int i=0;i<num_intervals;i++) {
             std::set<std::pair<double, double> >::const_iterator l(dataSetInterval[i].begin());

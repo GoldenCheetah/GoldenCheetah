@@ -95,8 +95,8 @@ public:
 
 private:
     int d_count;
-    QwtArray<double> d_x;
-    QwtArray<double> d_y;
+    QVector<double> d_x;
+    QVector<double> d_y;
 };
 
 class DistScaleDraw: public QwtScaleDraw

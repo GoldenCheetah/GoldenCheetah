@@ -103,7 +103,7 @@ SmallPlot::recalc()
 
     long rideTimeSecs = (long) ceil(timeArray[arrayLength - 1]);
     if (rideTimeSecs < 0 || rideTimeSecs > SECONDS_IN_A_WEEK) {
-        QwtArray<double> data;
+        QVector<double> data;
         wattsCurve->setSamples(data, data);
         hrCurve->setSamples(data, data);
         altCurve->setSamples(data, data);

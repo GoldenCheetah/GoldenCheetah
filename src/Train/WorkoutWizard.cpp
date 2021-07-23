@@ -298,8 +298,8 @@ void AbsWattagePage::initializePage()
 void AbsWattagePage::updateMetrics()
 {
     QVector<QPair<QString,QString> > data;
-    QwtArray<double> x;
-    QwtArray<double> y;
+    QVector<double> x;
+    QVector<double> y;
 
     we->rawData(data);
 
@@ -442,8 +442,8 @@ void RelWattagePage::initializePage()
 void RelWattagePage::updateMetrics()
 {
     QVector<QPair<QString,QString> > data;
-    QwtArray<double> x;
-    QwtArray<double> y;
+    QVector<double> x;
+    QVector<double> y;
 
     we->rawData(data);
 
@@ -702,8 +702,8 @@ void ImportPage::initializePage()
 
 void ImportPage::updatePlot()
 {
-    QwtArray<double> x;
-    QwtArray<double> y;
+    QVector<double> x;
+    QVector<double> y;
     QPair<double,double> p;
 
     int segmentLength = segmentBox->value();

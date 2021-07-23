@@ -62,7 +62,7 @@ class PfPvPlot : public QwtPlot
         // zone shader uses this
         double maxAEPF;
         double maxCPV;
-        QwtArray<double> contour_xvalues;
+        QVector<double> contour_xvalues;
 
         RideItem *rideItem;
 
