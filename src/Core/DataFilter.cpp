@@ -5800,7 +5800,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
                         foreach(PDEstimate pde, m->context->athlete->getPDEstimates()) {
 
                             // does it match our criteria?
-                            if (pde.model == model && pde.parameters.count() != 0 && pde.from <= d.to && pde.to >= d.from && pde.run==false && pde.wpk==false) {
+                            if (pde.model == model && pde.parameters.count() != 0 && pde.from <= d.to && pde.to >= d.from && pde.run==m->isRun && pde.wpk==false) {
 
                                 // overlaps, but truncate the dates we return
                                 int dfrom, dto;
