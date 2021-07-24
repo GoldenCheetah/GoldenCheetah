@@ -617,6 +617,11 @@ HistogramWindow::switchMode()
 {
     if (!rangemode) return; // ! only valid in rangemode
 
+    // Show Zone Limits doesn't apply to rangemode since different activities
+    // can be zonified using different zone limits according to sport and date.
+    setZoneLimited(false);
+    showZoneLimits->hide();
+
     if (data->isChecked()) {
 
         // hide all the metric controls
@@ -644,7 +649,6 @@ HistogramWindow::switchMode()
         shadeZones->show();
         showInZones->show();
         showInCPZones->show();
-        showZoneLimits->show();
 
         // select the series..
         seriesChanged();
@@ -666,7 +670,6 @@ HistogramWindow::switchMode()
         shadeZones->hide();
         showInZones->hide();
         showInCPZones->hide();
-        showZoneLimits->hide();
 
         // show all the metric controls
         blankLabel1->show();
