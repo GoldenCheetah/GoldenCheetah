@@ -46,7 +46,7 @@ class ProgressBar;
 #define ROUTEPOINTS 250
 
 // types we use start from 100 to avoid clashing with main chart types
-enum OverviewItemType { RPE=100, METRIC, META, ZONE, INTERVAL, PMC, ROUTE, KPI, TOPN, DONUT, ACTIVITIES, ATHLETE };
+enum OverviewItemType { RPE=100, METRIC, META, ZONE, INTERVAL, PMC, ROUTE, KPI, TOPN, DONUT, ACTIVITIES, ATHLETE, DATATABLE };
 
 //
 // Configuration widget for ALL Overview Items
@@ -121,6 +121,37 @@ class KPIOverviewItem : public ChartSpaceItem
 
         // progress bar viz
         ProgressBar *progressbar;
+};
+
+class DataOverviewItem : public ChartSpaceItem
+{
+    Q_OBJECT
+
+    public:
+
+        DataOverviewItem(ChartSpace *parent, QString name, QString program);
+        ~DataOverviewItem();
+
+        void itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *);
+        void itemGeometryChanged();
+        void setData(RideItem *item);
+        void setDateRange(DateRange);
+        void postProcess(); // work with data returned from program
+        QWidget *config() { return new OverviewItemConfig(this); }
+
+        // create and config
+        static ChartSpaceItem *create(ChartSpace *parent);
+
+        // settings
+        QString program;
+        Leaf *fnames, *funits, *fvalues;
+
+        // the data
+        QVector<QString> names, units, values;
+
+        // display control
+        bool multirow;
+        QList<double> columnWidths;
 };
 
 class RPEOverviewItem : public ChartSpaceItem

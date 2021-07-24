@@ -190,15 +190,7 @@ PowerHist::configChanged(qint32)
         curveHover->setRenderHint(QwtPlotItem::RenderAntialiased);
     }
 
-    // use a linear gradient
-    if (rangemode) brush_color.setAlpha(GColor(CTRENDPLOTBACKGROUND) == QColor(Qt::white) ? 64 : 200);
-    else brush_color.setAlpha(GColor(CPLOTBACKGROUND) == QColor(Qt::white) ? 64 : 200);
-    QColor brush_color1 = brush_color.darker();
-    QLinearGradient linearGradient(0, 0, 0, height());
-    linearGradient.setColorAt(0.0, brush_color);
-    linearGradient.setColorAt(1.0, brush_color1);
-    linearGradient.setSpread(QGradient::PadSpread);
-    curve->setBrush(linearGradient);   // fill below the line
+    curve->setBrush(brush_color);   // fill below the line
 
     if (!isZoningEnabled()) {
         pen.setWidth(width);
@@ -1571,16 +1563,7 @@ PowerHist::setDataFromCompare()
         pen.setColor(color);
         pen.setWidth(width);
         newCurve->setPen(pen);
-
-        QColor brush_color = color;
-        if (rangemode) brush_color.setAlpha(GColor(CTRENDPLOTBACKGROUND) == QColor(Qt::white) ? 120 : 200);
-        else brush_color.setAlpha(GColor(CPLOTBACKGROUND) == QColor(Qt::white) ? 120 : 200);
-        QColor brush_color1 = brush_color.darker();
-        //QLinearGradient linearGradient(0, 0, 0, height());
-        //linearGradient.setColorAt(0.0, brush_color);
-        //linearGradient.setColorAt(1.0, brush_color1);
-        //linearGradient.setSpread(QGradient::PadSpread);
-        newCurve->setBrush(brush_color1);   // fill below the line
+        newCurve->setBrush(color);   // fill below the line
 
         // hide and show, but always attach
         newCurve->setVisible(ischecked);
@@ -1684,16 +1667,7 @@ PowerHist::setDataFromCompare(QString totalMetric, QString distMetric)
         pen.setColor(cd.color);
         pen.setWidth(width);
         newCurve->setPen(pen);
-
-        QColor brush_color = cd.color;
-        if (rangemode) brush_color.setAlpha(GColor(CTRENDPLOTBACKGROUND) == QColor(Qt::white) ? 120 : 200);
-        else brush_color.setAlpha(GColor(CPLOTBACKGROUND) == QColor(Qt::white) ? 120 : 200);
-        QColor brush_color1 = brush_color.darker();
-        //QLinearGradient linearGradient(0, 0, 0, height());
-        //linearGradient.setColorAt(0.0, brush_color);
-        //linearGradient.setColorAt(1.0, brush_color1);
-        //linearGradient.setSpread(QGradient::PadSpread);
-        newCurve->setBrush(brush_color1);   // fill below the line
+        newCurve->setBrush(cd.color);   // fill below the line
 
         // hide and show, but always attach
         newCurve->setVisible(cd.isChecked());

@@ -161,6 +161,12 @@ OverviewWindow::getConfiguration() const
                 config += "\"polarized\":" + QString("%1").arg(zone->polarized) + ",";
             }
             break;
+        case OverviewItemType::DATATABLE:
+            {
+                DataOverviewItem *data = reinterpret_cast<DataOverviewItem*>(item);
+                config += "\"program\":\"" + QString("%1").arg(Utils::jsonprotect(data->program)) + "\",";
+            }
+            break;
         case OverviewItemType::KPI:
             {
                 KPIOverviewItem *kpi = reinterpret_cast<KPIOverviewItem*>(item);
@@ -481,6 +487,15 @@ OverviewWindow::setConfiguration(QString config)
                     QString zsymbol=obj["zsymbol"].toString();
 
                     add = new IntervalOverviewItem(space, name, xsymbol, ysymbol, zsymbol); // doesn't have a title
+                    add->datafilter = datafilter;
+                    space->addItem(order,column,span,deep, add);
+                }
+                break;
+
+            case OverviewItemType::DATATABLE:
+                {
+                    QString program=Utils::jsonunprotect(obj["program"].toString());
+                    add = new DataOverviewItem(space, name, program);
                     add->datafilter = datafilter;
                     space->addItem(order,column,span,deep, add);
                 }

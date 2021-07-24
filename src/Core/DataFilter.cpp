@@ -329,7 +329,7 @@ static struct {
     { "name", 0 },     // name(Average_Power, BikeStress) returns the metric name, crucially in the local
                        // language. Will return a vector for multiple values
 
-    { "units", 0 },     // units(Average_Power, BikeStress) returns the metric unit name, crucially in the local
+    { "unit", 0 },     // unit(Average_Power, BikeStress) returns the metric unit name, crucially in the local
                        // language. Will return a vector for multiple values
 
     { "datestring", 1 }, // datestring(a) will return a vector of strings converting the passed parameter
@@ -337,6 +337,13 @@ static struct {
 
     { "timestring", 1 }, // timestring(a) will return a vector of strings converting the passed parameter
                         // from secs since midnight to a time string
+
+    { "asstring", 0 }, // asstring(Average_Power, BikeStress) returns the metric value as a string
+                       // so honouring decimal places and conversion to metric/imperial etc.
+
+    { "metricstrings", 0 }, // metricstrings(Metrics [,start [,stop]]) - same as metrics above but instead of
+                            // returning a vector of numbers, the values are converted to strings as
+                            // appropriate for the metric (e.g. rowing pace xxx/500m).
 
     // add new ones above this line
     { "", -1 }
@@ -1910,7 +1917,7 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
                         }
                     }
 
-                } else if (leaf->function == "name" || leaf->function == "units") {
+                } else if (leaf->function == "name" || leaf->function == "unit" || leaf->function == "asstring") {
 
                     // check the parameters are all valid metric names
                     if (leaf->fparms.count() < 1) {
@@ -1934,7 +1941,7 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
                             }
                         }
                     }
-                } else if (leaf->function == "metrics") {
+                } else if (leaf->function == "metrics" || leaf->function == "metricstrings") {
 
                     // is the param a symbol and either a metric name or 'date'
                     if (leaf->fparms.count() < 1 || leaf->fparms[0]->type != Leaf::Symbol) {
@@ -3302,9 +3309,11 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
             return returning;
         }
 
-        if (leaf->function == "name" || leaf->function == "units") {
+        if (leaf->function == "name" || leaf->function == "unit" || leaf->function == "asstring") {
 
             bool wantname = (leaf->function == "name");
+            bool wantunit = (leaf->function == "unit");
+
             QVector<QString> list;
 
             for(int i=0; i<leaf->fparms.count(); i++) {
@@ -3317,7 +3326,16 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
 
                 if (e) {
                     if (wantname) list << e->name();
-                    else list << e->units(GlobalContext::context()->useMetricUnits);
+                    else if (wantunit) list << e->units(GlobalContext::context()->useMetricUnits);
+                    else {
+                        // get metric value then convert to string
+                        double value = 0;
+                        if (c) value = RideMetric::getForSymbol(o_symbol, c);
+                        else value = m->getForSymbol(o_symbol);
+
+                        // use metric converter to get as string with correct dp etc
+                        list << e->toString(value);
+                    }
                 }
                 else list << "(null)";
             }
@@ -4017,13 +4035,22 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
             return returning;
         }
 
-        if (leaf->function == "metrics") {
+        if (leaf->function == "metrics" || leaf->function == "metricstrings") {
 
+            bool wantstrings = (leaf->function == "metricstrings");
             QDate earliest(1900,01,01);
             bool wantdate=false;
             QString symbol = *(leaf->fparms[0]->lvalue.n);
             if (symbol == "date") wantdate=true;
+
+            // find the metric
+            QString o_symbol = df->lookupMap.value(symbol,"");
+            RideMetricFactory &factory = RideMetricFactory::instance();
+            const RideMetric *e = factory.rideMetric(o_symbol);
+
+            // returning numbers or strings
             Result returning(0);
+            if (wantstrings) returning.isNumber=false;
 
             FilterSet fs;
             fs.addFilter(m->context->isfiltered, m->context->filters);
@@ -4067,10 +4094,21 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
                 count++;
 
                 double value=0;
-                if(wantdate) value= QDate(1900,01,01).daysTo(ride->dateTime.date());
-                else value =  ride->getForSymbol(df->lookupMap.value(symbol,""));
-                returning.number() += value;
-                returning.asNumeric().append(value);
+                QString asstring;
+                if(wantdate) {
+                    value= QDate(1900,01,01).daysTo(ride->dateTime.date());
+                    if (wantstrings) asstring = ride->dateTime.date().toString("dd MMM yyyy");
+                } else {
+                    value =  ride->getForSymbol(df->lookupMap.value(symbol,""));
+                    if (wantstrings) e ? asstring = e->toString(value) : "(null)";
+                }
+
+                if (wantstrings) {
+                    returning.asString().append(asstring);
+                } else {
+                    returning.number() += value;
+                    returning.asNumeric().append(value);
+                }
             }
             return returning;
         }

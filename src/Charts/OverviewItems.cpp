@@ -54,6 +54,7 @@ static bool _registerItems()
     // Register      TYPE                          SHORT                      DESCRIPTION                                        SCOPE            CREATOR
     registry.addItem(OverviewItemType::METRIC,     QObject::tr("Metric"),     QObject::tr("Metric and Sparkline"),               OverviewScope::ANALYSIS|OverviewScope::TRENDS, MetricOverviewItem::create);
     registry.addItem(OverviewItemType::KPI,        QObject::tr("KPI"),        QObject::tr("KPI calculation and progress bar"),   OverviewScope::ANALYSIS|OverviewScope::TRENDS, KPIOverviewItem::create);
+    registry.addItem(OverviewItemType::DATATABLE,  QObject::tr("Table"),      QObject::tr("Table of data"),                      OverviewScope::ANALYSIS|OverviewScope::TRENDS, DataOverviewItem::create);
     registry.addItem(OverviewItemType::TOPN,       QObject::tr("Bests"),      QObject::tr("Ranked list of bests"),               OverviewScope::TRENDS,                         TopNOverviewItem::create);
     registry.addItem(OverviewItemType::META,       QObject::tr("Metadata"),   QObject::tr("Metadata and Sparkline"),             OverviewScope::ANALYSIS,                       MetaOverviewItem::create);
     registry.addItem(OverviewItemType::ZONE,       QObject::tr("Zones"),      QObject::tr("Zone Histogram"),                     OverviewScope::ANALYSIS|OverviewScope::TRENDS, ZoneOverviewItem::create);
@@ -124,6 +125,116 @@ KPIOverviewItem::~KPIOverviewItem()
 {
     // delete progress bar; //XXX todo
     delete progressbar;
+}
+
+DataOverviewItem::DataOverviewItem(ChartSpace *parent, QString name, QString program) : ChartSpaceItem(parent, name)
+{
+
+    this->type = OverviewItemType::DATATABLE;
+    this->program = program;
+}
+
+DataOverviewItem::~DataOverviewItem()
+{
+}
+
+ChartSpaceItem *
+DataOverviewItem::create(ChartSpace *parent) {
+
+//
+// Trends view default program
+//
+QString trends =
+            "{\n"
+            "\n"
+            "# column names, if using metrics then best\n"
+            "# to use name() to get correct name for locale\n"
+            "# otherwise it won't translate to other languages\n"
+            "names {\n"
+            "    c(\"Date\", \n"
+            "    name(Duration,\n"
+            "         Time_Moving,\n"
+            "         Distance,\n"
+            "         Work,\n"
+            "         W'_Work), \"30m Peak\");\n"
+            "}\n"
+            "\n"
+            "# column units, if using metrics then best\n"
+            "# to use unit() function to get correct string\n"
+            "# for locale and metric/imperial\n"
+            "units {\n"
+            "       c(\"\", \n"
+            "         unit(Duration,\n"
+            "         Time_Moving,\n"
+            "         Distance,\n"
+            "         Work,\n"
+            "         W'_Work,\n"
+            "         30_min_Peak_Power));\n"
+            "}\n"
+            "\n"
+            "# values to display as doubles or strings\n"
+            "# if using metrics always best to use asstring()\n"
+            "# to convert correctly with dp, metric/imperial\n"
+            "# or specific formats eg. rowing pace xx/500m\n"
+            "values { \n"
+            "    c(metricstrings(date),\n"
+            "      metricstrings(Duration),\n"
+            "      metricstrings(Time_Moving),\n"
+            "      metricstrings(Distance),\n"
+            "      metricstrings(Work),\n"
+            "      metricstrings(W'_Work),\n"
+            "      metricstrings(30_min_Peak_Power)); \n"
+            "} \n"
+            "\n"
+            "}";
+
+    //
+    // Activity view default program
+    //
+    QString totals =
+            "{\n"
+            "\n"
+            "# column names, if using metrics then best\n"
+            "# to use name() to get correct name for locale\n"
+            "# otherwise it won't translate to other languages\n"
+            "names { \n"
+            "    name(Duration,\n"
+            "         Time_Moving,\n"
+            "         Distance,\n"
+            "         Work,\n"
+            "         W'_Work,\n"
+            "         Elevation_Gain);\n"
+            "}\n"
+            "\n"
+            "# column units, if using metrics then best\n"
+            "# to use unit() function to get correct string\n"
+            "# for locale and metric/imperial\n"
+            "units { \n"
+            "    unit(Duration,\n"
+            "         Time_Moving,\n"
+            "         Distance,\n"
+            "         Work,\n"
+            "         W'_Work,\n"
+            "         Elevation_Gain);\n"
+            "}\n"
+            "\n"
+            "# values to display as doubles or strings\n"
+            "# if using metrics always best to use asstring()\n"
+            "# to convert correctly with dp, metric/imperial\n"
+            "# or specific formats eg. rowing pace xx/500m\n"
+            "values { \n"
+            "    asstring(Duration,\n"
+            "             Time_Moving,\n"
+            "             Distance,\n"
+            "             Work,\n"
+            "             W'_Work,\n"
+            "             Elevation_Gain); \n"
+            "} \n"
+            "\n"
+            "}\n";
+
+    if (parent->scope == ANALYSIS) return new DataOverviewItem(parent, "Totals", totals);
+    else return new DataOverviewItem(parent, "Activities", trends);
 }
 
 RouteOverviewItem::RouteOverviewItem(ChartSpace *parent, QString name) : ChartSpaceItem(parent, name)
@@ -488,6 +599,152 @@ KPIOverviewItem::setDateRange(DateRange dr)
 
     // convert value to hh:mm:ss when istime
     if (istime) value = time_to_string(value.toDouble(), true);
+
+    // show/hide widgets on the basis of geometry
+    itemGeometryChanged();
+}
+
+void
+DataOverviewItem::setData(RideItem *item)
+{
+    // remove old values
+    names.clear();
+    units.clear();
+    values.clear();
+
+    if (item == NULL || item->ride() == NULL) return;
+
+    // calculate the value...
+    DataFilter parser(this, item->context, program);
+
+    // so long as it evaluated correctly we can call the functions
+    if (parser.root() && parser.errorList().isEmpty()) {
+
+        Specification spec;
+        DateRange dr;
+
+        // find them, users may forget or get it wrong ...
+        fnames = parser.rt.functions.contains("names") ? parser.rt.functions.value("names") : NULL;
+        funits = parser.rt.functions.contains("units") ? parser.rt.functions.value("units") : NULL;
+        fvalues = parser.rt.functions.contains("values") ? parser.rt.functions.value("values") : NULL;
+
+        // fetch the data
+        if (fnames) names = parser.root()->eval(&parser.rt, fnames, Result(0), 0, const_cast<RideItem*>(item), NULL, NULL, spec, dr).asString();
+        if (funits) units = parser.root()->eval(&parser.rt, funits, Result(0), 0, const_cast<RideItem*>(item), NULL, NULL, spec, dr).asString();
+        if (fvalues) values = parser.root()->eval(&parser.rt, fvalues, Result(0), 0, const_cast<RideItem*>(item), NULL, NULL, spec, dr).asString();
+
+        postProcess();
+    }
+
+    // show/hide widgets on the basis of geometry
+    itemGeometryChanged();
+}
+
+void
+DataOverviewItem::postProcess()
+{
+    // we never show units called "seconds" - they generally are time strings
+    for(int i=0; i<units.count(); i++)
+        if (units[i] == tr("seconds"))
+            units[i] = "";
+
+    // if we have more values than columns then show as rows
+    // otherwise its a simple 3 column table; name value unit
+    multirow = (values.count() > names.count());
+
+    // what are the max column sizes
+    QFontMetrics fm(parent->midfont);
+
+    // lets set the column widths by content
+    // when painting the overall geometry is
+    // taken into account to center/space this
+    // but we set the minimum columns widths
+    // based upon the data
+    columnWidths.clear();
+
+    if (!multirow) {
+
+        // Just 3 columns - name value unit
+        // max name width
+        double maxwidth=0;
+        foreach(QString name, names) {
+            double width = fm.boundingRect(name).width();
+            if (width > maxwidth) maxwidth=width;
+        }
+        columnWidths << maxwidth;
+
+        // max unit width
+        maxwidth=0;
+        foreach(QString unit, units) {
+            double width = fm.boundingRect(unit).width();
+            if (width > maxwidth) maxwidth=width;
+        }
+        columnWidths << maxwidth;
+
+        // max value width
+        maxwidth=0;
+        foreach(QString value, values) {
+            double width = fm.boundingRect(value).width();
+            if (width > maxwidth) maxwidth=width;
+        }
+        columnWidths << maxwidth;
+
+    } else {
+
+        // One column per series - name1  name2  name3  name4
+        //                         unit1  unit2  unit3  unit4
+        //                         val1   val4   val7   val10
+        //                         val2   val5   val8   val11
+        //                         val3   val6   val9   val12
+        int rows = values.count() / names.count();
+        for(int i=0; i<names.count(); i++) {
+
+            double maxwidth = fm.boundingRect(names[i]).width(); // heading row
+            double width = fm.boundingRect(units[i]).width();    // units row
+            if (width > maxwidth) maxwidth = width;
+
+            // now see if there are any values that are wider
+            int offset = rows * i;
+            for (int j=0; j<rows && offset+j < values.count(); j++) {
+                width = fm.boundingRect(values[offset + j]).width();
+                if (width > maxwidth) maxwidth = width;
+            }
+
+            columnWidths << maxwidth;
+        }
+    }
+}
+
+void
+DataOverviewItem::setDateRange(DateRange dr)
+{
+    // remove old values
+    names.clear();
+    units.clear();
+    values.clear();
+
+    // calculate the value...
+    DataFilter parser(this, parent->context, program);
+
+    // so long as it evaluated correctly we can call the functions
+    if (parser.root() && parser.errorList().isEmpty()) {
+
+        Specification spec;
+        spec.setDateRange(dr);
+        setFilter(this, spec);
+
+        // find them, users may forget or get it wrong ...
+        fnames = parser.rt.functions.contains("names") ? parser.rt.functions.value("names") : NULL;
+        funits = parser.rt.functions.contains("units") ? parser.rt.functions.value("units") : NULL;
+        fvalues = parser.rt.functions.contains("values") ? parser.rt.functions.value("values") : NULL;
+
+        // fetch the data
+        if (fnames) names = parser.root()->eval(&parser.rt, fnames, Result(0), 0, const_cast<RideItem*>(parent->context->currentRideItem()), NULL, NULL, spec, dr).asString();
+        if (funits) units = parser.root()->eval(&parser.rt, funits, Result(0), 0, const_cast<RideItem*>(parent->context->currentRideItem()), NULL, NULL, spec, dr).asString();
+        if (fvalues) values = parser.root()->eval(&parser.rt, fvalues, Result(0), 0, const_cast<RideItem*>(parent->context->currentRideItem()), NULL, NULL, spec, dr).asString();
+
+        postProcess();
+    }
 
     // show/hide widgets on the basis of geometry
     itemGeometryChanged();
@@ -1672,6 +1929,9 @@ KPIOverviewItem::itemGeometryChanged() {
 }
 
 void
+DataOverviewItem::itemGeometryChanged() {  } // only a data table and we crop when painting
+
+void
 MetricOverviewItem::itemGeometryChanged() {
 
     QRectF geom = geometry();
@@ -1851,6 +2111,106 @@ KPIOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, 
                 painter->setFont(parent->midfont);
                 painter->drawText(QPointF((geometry().width() - mrect.width()) / 2.0f, (ROWHEIGHT * 4.5) + mid + (mfm.ascent() / 3.0f)), percenttext); // divided by 3 to account for "gap" at top of font
             }
+        }
+    }
+}
+
+void
+DataOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
+
+    // paint nothing if no values - or a mismatch
+    if (values.count() < names.count()) return;
+
+    // we use the mid font, so lets get some font metrics
+    QFontMetrics fm(multirow ? parent->smallfont : parent->midfont, parent->device());
+    double lineheight = fm.boundingRect("XXX").height() * 1.2f;
+
+    // fonts and colors
+    painter->setFont(multirow ? parent->smallfont : parent->midfont);
+    if (GCColor::luminance(GColor(CCARDBACKGROUND)) < 127) painter->setPen(QColor(200,200,200));
+    else painter->setPen(QColor(70,70,70));
+
+    // our bounding rectangle
+    QRectF paintarea = QRectF(20,ROWHEIGHT*2, geometry().width()-40, geometry().height()-20-(ROWHEIGHT*2));
+
+    // default horizontal spacing, no flex here, is what it is
+    double hmargin=ROWHEIGHT;
+
+    if (multirow) {
+
+        // rows of data with column headings- will make paged and interactive in v3.7
+        //
+        // layout like this:  |hvvvsvvvsvvvsvvvsvvvh|
+        // where:
+        //     h is hmargin
+        //     vvv is metric value
+        //     s is hspace
+        //
+        double content = 0;
+        foreach(double width, columnWidths) content += width;
+        double hspace = geometry().width() - (content + hmargin + hmargin);
+        hspace = (hspace > 0) ? hspace / (columnWidths.count()-1) : hmargin; // minimum space
+
+        // heading row
+        double xoffset = hmargin;
+        double yoffset = paintarea.topLeft().y()+lineheight;
+        for(int i=0; i<names.count(); i++) {
+            painter->drawText(xoffset, yoffset, names[i]); // todo: centering
+            xoffset += columnWidths[i] + hspace;
+        }
+        yoffset += lineheight;
+
+        // units row
+        xoffset = hmargin;
+        for(int i=0; i<names.count(); i++) {
+            painter->drawText(xoffset, yoffset, units[i]); // todo: centering
+            xoffset += columnWidths[i] + hspace;
+        }
+
+        // data values
+        xoffset = hmargin;
+
+        int rows = values.count() / names.count();
+        for(int i=0; i<names.count(); i++) {
+
+            // start at top
+            yoffset = paintarea.topLeft().y()+(lineheight*3);
+
+            // paint values in columns
+            int offset = rows * i;
+            for (int j=0; j<rows && offset+j < values.count(); j++) {
+                QString value = values[offset+j];
+                painter->drawText(xoffset, yoffset, value);
+                yoffset += lineheight;
+            }
+
+            // move across to next column
+            xoffset += columnWidths[i] + hspace;
+        }
+
+    } else {
+
+        // names (units) - left aligned
+        double xoffset = hmargin;
+        double yoffset = paintarea.topLeft().y()+lineheight;
+        for(int i=0; i<names.count() && i<values.count(); i++) {
+
+            QString text = names[i];
+            if (i<units.count() && units[i] != "") text += " (" + units[i] + ")";
+
+            painter->drawText(xoffset, yoffset, text);
+            yoffset += lineheight;
+        }
+
+        // value - right aligned
+        yoffset = paintarea.topLeft().y()+lineheight;
+        for(int i=0; i<values.count(); i++) {
+
+            QRectF bound = fm.boundingRect(values[i]);
+            xoffset = geometry().width() - (bound.width() + hmargin);
+
+            painter->drawText(xoffset, yoffset, values[i]);
+            yoffset += lineheight;
         }
     }
 }
@@ -2391,12 +2751,12 @@ static bool insensitiveLessThan(const QString &a, const QString &b)
 {
     return a.toLower() < b.toLower();
 }
-OverviewItemConfig::OverviewItemConfig(ChartSpaceItem *item) : QWidget(item->parent), item(item), block(false)
+OverviewItemConfig::OverviewItemConfig(ChartSpaceItem *item) : QWidget(NULL), item(item), block(false)
 {
     QVBoxLayout *main = new QVBoxLayout(this);
     QFormLayout *layout = new QFormLayout();
     main->addLayout(layout);
-    main->addStretch();
+    if (item->type != OverviewItemType::KPI && item->type != OverviewItemType::DATATABLE) main->addStretch();
 
     // everyone except PMC
     if (item->type != OverviewItemType::PMC) {
@@ -2465,6 +2825,10 @@ OverviewItemConfig::OverviewItemConfig(ChartSpaceItem *item) : QWidget(item->par
         layout->addRow(tr("Stop"), double2);
         connect(double1, SIGNAL(valueChanged(double)), this, SLOT(dataChanged()));
         connect(double2, SIGNAL(valueChanged(double)), this, SLOT(dataChanged()));
+    }
+
+
+    if (item->type == OverviewItemType::KPI || item->type == OverviewItemType::DATATABLE) {
 
         //
         // Program editor... bit of a faff needs refactoring!!
@@ -2545,7 +2909,9 @@ OverviewItemConfig::OverviewItemConfig(ChartSpaceItem *item) : QWidget(item->par
         // program editor
         QVBoxLayout *pl= new QVBoxLayout();
         editor = new DataFilterEdit(this, item->parent->context);
-        editor->setMinimumHeight(50 * dpiXFactor); // give me some space!
+        editor->setMinimumHeight(250 * dpiXFactor); // give me some space!
+        editor->setMinimumWidth(450 * dpiXFactor); // give me some space!
+        editor->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
         DataFilterCompleter *completer = new DataFilterCompleter(list, this);
         editor->setCompleter(completer);
         errors = new QLabel(this);
@@ -2559,6 +2925,10 @@ OverviewItemConfig::OverviewItemConfig(ChartSpaceItem *item) : QWidget(item->par
         connect(editor, SIGNAL(syntaxErrors(QStringList&)), this, SLOT(setErrors(QStringList&)));
         connect(editor, SIGNAL(textChanged()), this, SLOT(dataChanged()));
 
+    }
+
+
+    if (item->type == OverviewItemType::KPI) {
         // istime
         cb1 = new QCheckBox(this);
         layout->addRow(tr("Time"), cb1);
@@ -2581,7 +2951,53 @@ OverviewItemConfig::setErrors(QStringList &list)
     errors->setText(list.join(";"));
 }
 
-OverviewItemConfig::~OverviewItemConfig() {}
+OverviewItemConfig::~OverviewItemConfig() {
+#if 0
+    // everyone except PMC
+    if (item->type != OverviewItemType::PMC)  delete name ;
+
+    // trends view always has a filter
+    if (item->parent->scope & OverviewScope::TRENDS)  delete filterEditor;
+
+    // single metric names
+    if (item->type == OverviewItemType::TOPN || item->type == OverviewItemType::METRIC  ||
+        item->type == OverviewItemType::PMC || item->type == OverviewItemType::DONUT) delete metric1;
+
+    // metric1, metric2 and metric3
+    if (item->type == OverviewItemType::INTERVAL || item->type == OverviewItemType::ACTIVITIES) {
+        delete metric1;
+        delete metric2;
+        delete metric3;
+    }
+
+    if (item->type == OverviewItemType::META || item->type == OverviewItemType::DONUT)  delete meta1;
+
+    if (item->type == OverviewItemType::ZONE) {
+        delete series1;
+        delete cb1;
+    }
+
+    if (item->type == OverviewItemType::KPI) {
+
+        delete double1;
+        delete double2;
+    }
+
+
+    if (item->type == OverviewItemType::KPI || item->type == OverviewItemType::DATATABLE) {
+
+        delete editor;
+        delete errors;
+    }
+
+
+    if (item->type == OverviewItemType::KPI) {
+        delete cb1;
+        delete string1;
+
+    }
+#endif
+}
 
 void
 OverviewItemConfig::setWidgets()
@@ -2665,6 +3081,14 @@ OverviewItemConfig::setWidgets()
         {
             PMCOverviewItem *mi = dynamic_cast<PMCOverviewItem*>(item);
             metric1->setSymbol(mi->symbol);
+        }
+        break;
+
+    case OverviewItemType::DATATABLE:
+        {
+            DataOverviewItem *mi = dynamic_cast<DataOverviewItem*>(item);
+            name->setText(mi->name);
+            editor->setText(mi->program);
         }
         break;
 
@@ -2773,6 +3197,14 @@ OverviewItemConfig::dataChanged()
         {
             PMCOverviewItem *mi = dynamic_cast<PMCOverviewItem*>(item);
             if (metric1->isValid()) mi->symbol = metric1->rideMetric()->symbol();
+        }
+        break;
+
+    case OverviewItemType::DATATABLE:
+        {
+            DataOverviewItem *mi = dynamic_cast<DataOverviewItem*>(item);
+            mi->name = name->text();
+            mi->program = editor->toPlainText();
         }
         break;
 
