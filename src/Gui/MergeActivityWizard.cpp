@@ -725,7 +725,7 @@ bool
 MergeSource::importFile(QList<QString> files)
 {
     // get fullpath name for processing
-    QFileInfo filename = QFileInfo(files[0]).absoluteFilePath();
+    QFileInfo filename = QFileInfo(files[0]);
 
     QFile thisfile(files[0]);
     QFileInfo thisfileinfo(files[0]);

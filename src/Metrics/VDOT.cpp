@@ -64,7 +64,7 @@ class VDOT : public RideMetric {
 
         // search for max VDOT from 4 min to 4 hr
         vdot = 0.0;
-        int iMax = std::min(rfc.meanMaxArray(RideFile::kph).size(), 14400);
+        int iMax = std::min(rfc.meanMaxArray(RideFile::kph).size(), (qsizetype)14400);
         for (int i = 240; i < iMax; i++) {
             double vel = rfc.meanMaxArray(RideFile::kph)[i]*1000.0/60.0;
             vdot = std::max(vdot, VDOTCalculator::vdot(i / 60.0, vel));

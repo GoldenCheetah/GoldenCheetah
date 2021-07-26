@@ -3401,7 +3401,7 @@ SeasonsPage::addClicked()
     addSeason.setEnd(toEdit->date());
     addSeason.setName(nameEdit->text());
     addSeason.setType(typeEdit->currentIndex());
-    addSeason.setId(id);
+    addSeason.setId(QUuid(id));
     array.append(Season());
 }
 

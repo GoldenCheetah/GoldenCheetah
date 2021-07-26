@@ -2468,7 +2468,7 @@ MainWindow::configChanged(qint32)
 
     // perspective selector mimics sidebar colors
     QColor selected;
-    if (GCColor::invertColor(GColor(CTOOLBAR)).name() == Qt::white) selected = QColor(Qt::lightGray);
+    if (GCColor::invertColor(GColor(CTOOLBAR)) == Qt::white) selected = QColor(Qt::lightGray);
     else selected = QColor(Qt::darkGray);
     perspectiveSelector->setStyleSheet(QString("QComboBox { background: %1; color: %2; }"
                                                "QComboBox::item { background: %1; color: %2; }"
