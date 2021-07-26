@@ -22,7 +22,7 @@
 #include "Colors.h"
 #include "TabView.h"
 
-#include <QGLWidget>
+
 
 //
 //
@@ -50,13 +50,6 @@ RCanvas::RCanvas(Context *context, QWidget *parent) : QGraphicsView(parent), con
     // no frame, its ugly
     setFrameStyle(QFrame::NoFrame);
 
-#ifdef Q_OS_LINUX // mac and windows both have issues. sigh.
-    // Enabled on Linux depending on Open GL version
-    if (QGLFormat::openGLVersionFlags().testFlag(QGLFormat::OpenGL_Version_2_0)) {
-        setViewport(new QGLWidget( QGLFormat(QGL::SampleBuffers)));
-        setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
-    }
-#endif
 
     // allow to click and drag
     setDragMode(QGraphicsView::ScrollHandDrag);

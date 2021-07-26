@@ -24,7 +24,6 @@
 
 #include <cmath>
 #include <QGraphicsSceneMouseEvent>
-#include <QGLWidget>
 
 #include <QJsonDocument>
 #include <QJsonObject>
@@ -50,15 +49,6 @@ ChartSpace::ChartSpace(Context *context, int scope, GcWindow *window) :
     scene = new QGraphicsScene(this);
     view = new QGraphicsView(this);
 
-#ifdef Q_OS_LINUX
-    // if we have OpenGL and its 2.0 or higher, lets use it.
-    // this is pretty much any GPU since 2004 and keeps Qt happy.
-    // we only do this on Linux since Windows and MacOS have issues
-    // on Windows AMD Radeon drivers are dreadful and on MacOS
-    // OpenGL support is deprecated and users have reported rendering
-    // issues when this is enabled.
-    if (gl_major >= 2.0)  view->setViewport(new QGLWidget(QGLFormat(QGL::SampleBuffers | QGL::DirectRendering)));
-#endif
 
     view->viewport()->setAttribute(Qt::WA_AcceptTouchEvents, false); // stops it stealing focus on mouseover
     scrollbar = new QScrollBar(Qt::Vertical, this);
