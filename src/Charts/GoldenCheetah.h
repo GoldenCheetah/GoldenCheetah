@@ -44,8 +44,14 @@ class Perspective;
 
 #include "GcWindowRegistry.h"
 #include "TimeUtils.h"
-
 class RideItem;
+
+#if QT_VERSION >= 0x060000
+// For the RideItem property, this is required.
+// A normal include would lead to a circular dependency here.
+Q_MOC_INCLUDE("RideItem.h");
+#endif
+
 class GcOverlayWidget;
 class Perspective;
 
