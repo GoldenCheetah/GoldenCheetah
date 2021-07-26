@@ -82,14 +82,14 @@ protected:
 
 public:
 
-    QString BuildSubstitutedString(QStringRef s) const
+    QString BuildSubstitutedString(QString s) const
     {
         QRegularExpression qr = GetFindAnyRegex();
 
         QRegularExpressionMatchIterator i = qr.globalMatch(s);
 
         if (!i.hasNext())
-            return s.toString();
+            return s;
 
         QString newstring;
 
@@ -133,7 +133,7 @@ struct RidefileUnEscaper : public StringSubstitutionizer
     }
 };
 
-QString RidefileUnEscape(const QStringRef s)
+QString RidefileUnEscape(const QString s)
 {
     // Static const object constructs it's search regex at load time.
     static const RidefileUnEscaper s_RidefileUnescaper;
