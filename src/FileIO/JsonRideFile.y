@@ -505,9 +505,9 @@ JsonFileReader::toByteArray(Context *, const RideFile *ride, bool withAlt, bool 
 
                 // comma separated
                 out += "\"" + j.key() + "\":\"" + j.value() + "\"";
-                if (j+1 != k.value().constEnd()) out += ", ";
+                if (std::next(j) != k.value().constEnd()) out += ", ";
             }
-            if (k+1 != ride->metricOverrides.constEnd()) out += " }},\n";
+            if (std::next(k) != ride->metricOverrides.constEnd()) out += " }},\n";
             else out += " }}\n";
         }
 
@@ -528,7 +528,7 @@ JsonFileReader::toByteArray(Context *, const RideFile *ride, bool withAlt, bool 
         for (i=ride->tags().constBegin(); i != ride->tags().constEnd(); i++) {
 
                 out += "\t\t\t\"" + i.key() + "\":\"" + protect(i.value()) + "\"";
-                if (i+1 != ride->tags().constEnd()) out += ",\n";
+                if (std::next(i) != ride->tags().constEnd()) out += ",\n";
                 else out += "\n";
         }
 
