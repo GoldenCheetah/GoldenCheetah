@@ -99,8 +99,8 @@ class CTableWidgetItem : public QTableWidgetItem
 
                              return t1 < t2;
 
-                         } else if (text().contains(QRegExp("[^0-9.,]")) ||
-                                    other.text().contains(QRegExp("[^0-9.,]"))) { // alpha
+                         } else if (text().contains(QRegularExpression("[^0-9.,]")) ||
+                                    other.text().contains(QRegularExpression("[^0-9.,]"))) { // alpha
 
                               return text() < other.text();
 

@@ -1402,8 +1402,8 @@ bool RideNavigatorSortProxyModel::lessThan(const QModelIndex &left,
     QString leftString = leftData.toString();
     QString rightString = rightData.toString();
 
-    if (leftString.contains(QRegExp("[^0-9.,]")) ||
-            rightString.contains(QRegExp("[^0-9.,]"))) { // alpha
+    if (leftString.contains(QRegularExpression("[^0-9.,]")) ||
+            rightString.contains(QRegularExpression("[^0-9.,]"))) { // alpha
         return QString::localeAwareCompare(leftString, rightString) < 0;
     }
     // assume numeric

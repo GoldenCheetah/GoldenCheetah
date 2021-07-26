@@ -113,7 +113,7 @@ RideImportWizard::RideImportWizard(RideAutoImportConfig *dirs, Context *context,
     // and get the allowed files formats
     const RideFileFactory &rff = RideFileFactory::instance();
     QStringList suffixList = rff.suffixes();
-    suffixList.replaceInStrings(QRegExp("^"), "*.");
+    suffixList.replaceInStrings(QRegularExpression("^"), "*.");
     QStringList allFormats;
     foreach(QString suffix, rff.suffixes())
         allFormats << QString("*.%1").arg(suffix);
