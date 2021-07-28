@@ -1934,7 +1934,7 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
                                 DataFiltererrors << QString(tr("only metric names are supported")).arg(leaf->function);
                             } else {
                                 QString symbol=*(leaf->fparms[0]->lvalue.n);
-                                if (df->lookupMap.value(symbol,"") == "") {
+                                if (symbol != "date" && df->lookupMap.value(symbol,"") == "") {
                                     inerror = true;
                                     DataFiltererrors << QString(tr("unknown metric %1")).arg(symbol);
                                 }
@@ -3324,20 +3324,24 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
                 RideMetricFactory &factory = RideMetricFactory::instance();
                 const RideMetric *e = factory.rideMetric(o_symbol);
 
-                if (e) {
-                    if (wantname) list << e->name();
-                    else if (wantunit) list << e->units(GlobalContext::context()->useMetricUnits);
-                    else {
-                        // get metric value then convert to string
-                        double value = 0;
-                        if (c) value = RideMetric::getForSymbol(o_symbol, c);
-                        else value = m->getForSymbol(o_symbol);
+                if (wantname && symbol == "date") list << tr("Date");
+                else if (wantunit && symbol == "date") list << "";
+                else {
+                    if (e) {
+                        if (wantname) list << e->name();
+                        else if (wantunit) list << e->units(GlobalContext::context()->useMetricUnits);
+                        else {
+                            // get metric value then convert to string
+                            double value = 0;
+                            if (c) value = RideMetric::getForSymbol(o_symbol, c);
+                            else value = m->getForSymbol(o_symbol);
 
-                        // use metric converter to get as string with correct dp etc
-                        list << e->toString(value);
+                            // use metric converter to get as string with correct dp etc
+                            list << e->toString(value);
+                        }
                     }
+                    else list << "(null)";
                 }
-                else list << "(null)";
             }
 
             // return a single value, or a list
