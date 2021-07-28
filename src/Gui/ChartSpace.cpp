@@ -368,6 +368,14 @@ static bool ChartSpaceItemSort(const ChartSpaceItem* left, const ChartSpaceItem*
     return (left->column < right->column ? true : (left->column == right->column && left->order < right->order ? true : false));
 }
 
+// convenient way to check if an item spans across a particular column
+// this is distinct from it being in that column, it must span it to the right
+static bool spanned(int column, ChartSpaceItem *item)
+{
+    if (item->column+1 <= column && (item->column + item->span -1) >= column) return true;
+    return false;
+}
+
 void
 ChartSpace::updateGeometry()
 {
@@ -394,25 +402,62 @@ ChartSpace::updateGeometry()
 
     int x=SPACING;
 
+    // ensure columns always start from 0
+    // can get out of whack when last entry
+    // from column 0 is dragged across to the right
+    // bit of a hack but easier to fix here
+    if (items.count() > 0 && items[0]->column == 1) {
+        for(int i=0; i<items.count(); i++) items[i]->column--;
+        for(int i=0; i<columns.count()-1; i++) columns[i]=columns[i+1];
+    }
+
     // just set their geometry for now, no interaction
     for(int i=0; i<items.count(); i++) {
 
         if (!items[i]->isVisible()) continue; // not clear if this does anything
 
+repeat:
         // move on to next column, check if first item too
         if (items[i]->column > column) {
 
             // once past the first column we need to update x
-            if (column >= 0) x+= columns[column] + SPACING;
+            if (column >= 0) {
 
-            int diff = items[i]->column - column - 1;
-            if (diff > 0) {
+                // the next column is contiguous so just move on
+                if (items[i]->column == column+1) x+= columns[column] + SPACING; // onto next column then
+                else {
 
-                // there are empty columns so shift the cols to the right
-                // to the left to fill  the gap left and all  the column
-                // widths also need to move down too
-                for(int j=items[i]->column-1; j < 8; j++) columns[j]=columns[j+1];
-                for(int j=i; j<items.count();j++) items[j]->column -= diff;
+                    // there are some empty columns, are they really empty
+                    // or does a spanned tile cover the first one?
+                    bool isspanned = false;
+                    for(int k=i-1; k>=0; k--)
+                        if (spanned(column+1, items[k]))
+                            isspanned = true;
+
+                    // the column is spanned, so its ok to move on
+                    if (isspanned) {
+                        // update x and try again
+                        x += columns[column] + SPACING;
+                        y = SPACING;
+                        column++;
+
+                        // we only checked if the first column is empty
+                        // but spanned, so lets loop round again in case
+                        // there are more (e.g. tile that spans many columns)
+                        // goto is simpler than a complete refactor here
+                        goto repeat;
+                    }
+
+                    // we missed some columns, there is a gap
+                    int diff = items[i]->column - column - 1;
+                    if (diff > 0) {
+                        // there are empty columns so shift the cols to the right
+                        // to the left to fill  the gap left and all  the column
+                        // widths also need to move down too
+                        for(int j=items[i]->column-1; j < 8; j++) columns[j]=columns[j+1];
+                        for(int j=i; j<items.count();j++) items[j]->column -= diff;
+                    }
+                }
             }
             y=SPACING; column = items[i]->column;
 
@@ -690,6 +735,17 @@ ChartSpace::setViewRect(QRectF rect)
 
     view->update();
 
+}
+
+int
+ChartSpace::columnCount(int col)
+{
+    int count = 0;
+    for(int i=0; i<items.count(); i++) {
+        if (items[i]->column == col)
+            count++;
+    }
+    return count;
 }
 
 bool
@@ -1004,7 +1060,6 @@ ChartSpace::eventFilter(QObject *, QEvent *event)
                 }
 
                 if (items.last()->column < 9 && targetcol < 0) {
-
                     // don't keep moving - if we're already alone in column 0 then no move is needed
                     if (stateData.drag.item->column != 0 || (items.count()>1 && items[1]->column == 0)) {
 
@@ -1019,6 +1074,17 @@ ChartSpace::eventFilter(QObject *, QEvent *event)
 
                         changed = true;
                     }
+
+                } else if (targetcol > 0 && targetcol <= 9 && columnCount(targetcol) == 0) {
+
+                    // we are over an empty column
+                    stateData.drag.item->column = targetcol;
+                    stateData.drag.item->order = 0;
+
+                    // make column width same as source width
+                    columns[stateData.drag.item->column] = stateData.drag.width;
+
+                    changed = true;
 
                 } else if (items.last()->column < 9 && items.last() && items.last()->column < targetcol) {
 

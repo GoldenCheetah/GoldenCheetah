@@ -230,6 +230,8 @@ class ChartSpace : public QWidget
 
         // which column are we in for position x
         int columnForX(int x);
+        // how many items are in this column?
+        int columnCount(int x);
 
     protected:
 
