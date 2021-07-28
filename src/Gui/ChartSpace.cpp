@@ -482,7 +482,13 @@ ChartSpace::updateGeometry()
     }
 
     // set the scene rectangle, columns start at 0
-    sceneRect = QRectF(0, 0, columns[column] + x + SPACING, maxy);
+    // bearing in mind we may have a spanner that extends across
+    // columns, so lets check that too?
+    x = x + columns[column];
+    foreach(QRectF spanner, spanners) {
+        if (spanner.topRight().x() > x) x = spanner.topRight().x();
+    }
+    sceneRect = QRectF(0, 0, x + SPACING, maxy);
 
     if (animated) group->start();
 }
