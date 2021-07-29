@@ -80,7 +80,7 @@ AddChartType::AddChartType(AddChartWizard *parent) : QWizardPage(parent), wizard
     scrollarea->setWidget(buttons);
 
     mapper = new QSignalMapper(this);
-    connect(mapper, SIGNAL(mapped(int)), this, SLOT(clicked(int)));
+    connect(mapper, &QSignalMapper::mappedInt, this, &AddChartType::clicked);
 
     layout->addWidget(scrollarea);
 

@@ -431,7 +431,7 @@ AnalysisSidebar::showActivityMenu(const QPoint &pos)
             // add menu options for each column
             if (groupByMapper) delete groupByMapper;
             groupByMapper = new QSignalMapper(this);
-            connect(groupByMapper, SIGNAL(mapped(const QString &)), rideNavigator, SLOT(setGroupByColumnName(QString)));
+            connect(groupByMapper, &QSignalMapper::mappedString, rideNavigator, &RideNavigator::setGroupByColumnName);
 
             foreach(QString heading, rideNavigator->columnNames()) {
                 if (heading == "*") continue; // special hidden column

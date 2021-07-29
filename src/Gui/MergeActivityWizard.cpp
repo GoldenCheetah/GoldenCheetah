@@ -623,7 +623,7 @@ MergeSource::MergeSource(MergeActivityWizard *parent) : QWizardPage(parent), wiz
     setLayout(layout);
 
     mapper = new QSignalMapper(this);
-    connect(mapper, SIGNAL(mapped(QString)), this, SLOT(clicked(QString)));
+    connect(mapper, &QSignalMapper::mappedString, this, &MergeSource::clicked);
 
     // select a file
     QCommandLinkButton *p = new QCommandLinkButton(tr("Import from a File"), 
@@ -930,7 +930,7 @@ MergeMode::MergeMode(MergeActivityWizard *parent) : QWizardPage(parent), wizard(
     setLayout(layout);
 
     mapper = new QSignalMapper(this);
-    connect(mapper, SIGNAL(mapped(QString)), this, SLOT(clicked(QString)));
+    connect(mapper, &QSignalMapper::mappedString, this, &MergeMode::clicked);
 
     // merge
     QCommandLinkButton *p = new QCommandLinkButton(tr("Merge Data to add another data series"), 
@@ -992,7 +992,7 @@ MergeStrategy::MergeStrategy(MergeActivityWizard *parent) : QWizardPage(parent),
     setLayout(layout);
 
     mapper = new QSignalMapper(this);
-    connect(mapper, SIGNAL(mapped(QString)), this, SLOT(clicked(QString)));
+    connect(mapper, &QSignalMapper::mappedString, this, &MergeStrategy::clicked);
 
     // time
     QCommandLinkButton *p = new QCommandLinkButton(tr("Align using start time"), 

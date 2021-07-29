@@ -862,7 +862,7 @@ RideEditor::borderMenu(const QPoint &pos)
         // add menu options for each column
         if (colMapper) delete colMapper;
         colMapper = new QSignalMapper(this);
-        connect(colMapper, SIGNAL(mapped(const QString &)), this, SLOT(insColumn(const QString &)));
+        connect(colMapper, &QSignalMapper::mappedString, this, &RideEditor::insColumn);
 
         foreach(QString heading, whatColumns()) {
             QAction *insColAct = new QAction(heading, table);

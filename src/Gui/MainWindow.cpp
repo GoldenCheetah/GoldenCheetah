@@ -482,19 +482,19 @@ MainWindow::MainWindow(const QDir &home)
     connect(openTabMenu, SIGNAL(aboutToShow()), this, SLOT(setOpenTabMenu()));
 
     tabMapper = new QSignalMapper(this); // maps each option
-    connect(tabMapper, SIGNAL(mapped(const QString &)), this, SLOT(openTab(const QString &)));
+    connect(tabMapper, &QSignalMapper::mappedString, this, &MainWindow::openTab);
 
     fileMenu->addSeparator();
     backupAthleteMenu = fileMenu->addMenu(tr("Backup..."));
     connect(backupAthleteMenu, SIGNAL(aboutToShow()), this, SLOT(setBackupAthleteMenu()));
     backupMapper = new QSignalMapper(this); // maps each option
-    connect(backupMapper, SIGNAL(mapped(const QString &)), this, SLOT(backupAthlete(const QString &)));
+    connect(backupMapper, &QSignalMapper::mappedString, this, &MainWindow::backupAthlete);
 
     fileMenu->addSeparator();
     deleteAthleteMenu = fileMenu->addMenu(tr("Delete..."));
     connect(deleteAthleteMenu, SIGNAL(aboutToShow()), this, SLOT(setDeleteAthleteMenu()));
     deleteMapper = new QSignalMapper(this); // maps each option
-    connect(deleteMapper, SIGNAL(mapped(const QString &)), this, SLOT(deleteAthlete(const QString &)));
+    connect(deleteMapper, &QSignalMapper::mappedString, this, &MainWindow::deleteAthlete);
 
     fileMenu->addSeparator();
     fileMenu->addAction(tr("Save all modified activities"), this, SLOT(saveAllUnsavedRides()));
@@ -610,7 +610,7 @@ MainWindow::MainWindow(const QDir &home)
 
         toolMapper = new QSignalMapper(this); // maps each option
         QMapIterator<QString, DataProcessor*> i(processors);
-        connect(toolMapper, SIGNAL(mapped(const QString &)), this, SLOT(manualProcess(const QString &)));
+        connect(toolMapper, &QSignalMapper::mappedString, this, &MainWindow::manualProcess);
 
         i.toFront();
         while (i.hasNext()) {

@@ -123,7 +123,7 @@ GColorDialog::GColorDialog(QColor selected, QWidget *parent) : QDialog(parent), 
 
     // map button signals
     mapper = new QSignalMapper(this);
-    connect(mapper, SIGNAL(mappedInt(int)), this, SLOT(gcClicked(int)));
+    connect(mapper, &QSignalMapper::mappedInt, this, &GColorDialog::gcClicked);
 
     // now add all the colours to select
     colorSet = GCColor::colorSet();
