@@ -102,7 +102,7 @@ AddType::AddType(AddDeviceWizard *parent) : QWizardPage(parent), wizard(parent)
     buttons->setLayout(layout);
 
     mapper = new QSignalMapper(this);
-    connect(mapper, SIGNAL(mapped(QString)), this, SLOT(clicked(QString)));
+    connect(mapper, &QSignalMapper::mappedString, this, &AddType::clicked);
 
     foreach(DeviceType t, wizard->deviceTypes.Supported) {
         if (t.type) {
@@ -836,7 +836,7 @@ AddPair::initializePage()
     enableDisable(channelWidget);
 
     updateValues.start(200); // 5hz
-    connect(signalMapper, SIGNAL(mapped(int)), this, SLOT(sensorChanged(int)));
+    connect(signalMapper, &QSignalMapper::mappedInt, this, &AddPair::sensorChanged);
     connect(&updateValues, SIGNAL(timeout()), this, SLOT(getChannelValues()));
     connect(wizard->controller, SIGNAL(foundDevice(int,int,int)), this, SLOT(channelInfo(int,int,int)));
     connect(wizard->controller, SIGNAL(searchTimeout(int)), this, SLOT(searchTimeout(int)));

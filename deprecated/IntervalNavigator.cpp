@@ -160,7 +160,7 @@ IntervalColumnChooser::IntervalColumnChooser(QList<QString>&logicalHeadings)
     setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint | Qt::Tool);
 
     clicked = new QSignalMapper(this); // maps each button click event
-    connect(clicked, SIGNAL(mapped(const QString &)), this, SLOT(buttonClicked(const QString &)));
+    connect(clicked, &QSignalMapper::mappedString, this, &IntervalColumnChooser::buttonClicked);
 
     buttons = new QGridLayout(this);
     buttons->setSpacing(0);
