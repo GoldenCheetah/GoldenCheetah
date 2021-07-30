@@ -38,7 +38,7 @@
 
 #include <QtWebChannel>
 #include <QWebEngineProfile>
-#include <QWebEngineDownloadItem>
+//#include <QWebEngineDownloadItem>
 
 // overlay helper
 #include "TabView.h"
@@ -258,6 +258,7 @@ WebPageWindow::event(QEvent *event)
 void
 WebPageWindow::downloadRequested(QWebEngineDownloadItem *item)
 {
+    /*
     // only do it if I am visible, as shared across web page instances
     if (!amVisible()) return;
 
@@ -278,6 +279,7 @@ WebPageWindow::downloadRequested(QWebEngineDownloadItem *item)
 
     // kick off download
     item->accept(); // lets download it!
+          */
 }
 
 void

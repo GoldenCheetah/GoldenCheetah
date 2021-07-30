@@ -38,7 +38,7 @@
 #include <QInputEvent>
 #include <QKeyEvent>
 
-#include <QSound>
+//#include <QSound>
 
 // Three current realtime device types supported are:
 #include "RealtimeController.h"
@@ -1878,7 +1878,7 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
 
                     if (fPlayAudio) {
                         lapAudioThisLap = false;
-                        QSound::play(":audio/lap.wav");
+    //                        QSound::play(":audio/lap.wav");
                     }
                 }
 
