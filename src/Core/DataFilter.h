@@ -45,6 +45,7 @@ class Result {
 
         // construct a result
         Result (double value) : isNumber(true), string_(""), number_(value) {}
+        Result (QVector<double>x) : isNumber(true), string_(""), number_(0) { foreach(double n, x) number_ += n; }
         Result (QString value) : isNumber(false), string_(value), number_(0.0f) {}
         Result (QVector<QString> &list) : isNumber(false), string_(""), number_(0.0f), strings(list) {}
         Result () : isNumber(true), string_(""), number_(0) {}

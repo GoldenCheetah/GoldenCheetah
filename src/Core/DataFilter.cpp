@@ -326,10 +326,10 @@ static struct {
     { "fetch", 1 },    // fetch("name") retrieves a value previously stored returns 0 if the value
                        // is not in the athlete store
 
-    { "name", 0 },     // name(Average_Power, BikeStress) returns the metric name, crucially in the local
+    { "metricname", 0 },     // metricname(Average_Power, BikeStress) returns the metric name, crucially in the local
                        // language. Will return a vector for multiple values
 
-    { "unit", 0 },     // unit(Average_Power, BikeStress) returns the metric unit name, crucially in the local
+    { "metricunit", 0 },     // unit(Average_Power, BikeStress) returns the metric unit name, crucially in the local
                        // language. Will return a vector for multiple values
 
     { "datestring", 1 }, // datestring(a) will return a vector of strings converting the passed parameter
@@ -344,6 +344,12 @@ static struct {
     { "metricstrings", 0 }, // metricstrings(Metrics [,start [,stop]]) - same as metrics above but instead of
                             // returning a vector of numbers, the values are converted to strings as
                             // appropriate for the metric (e.g. rowing pace xxx/500m).
+
+    { "zones", 3 },   // zones(run|swim|bike, power|hr|pace, name|description|low|high|unit|time|percent) - returns a vector of the zone
+                      // details, but not the time in zone metric which is available via tiz.
+
+    { "string", 1 }, // string(a) will convert the passed entries to a string if they are numeric.
+
 
     // add new ones above this line
     { "", -1 }
@@ -578,6 +584,10 @@ DataFilter::builtins(Context *context)
 
             // filename (or vector of names)
             returning << "filename()";
+
+        } else if (i== 118) {
+            // zone details
+            returning << "zones(run|bike|swim, hr|power|pace|fatigue, name|description|units|low|high|time|percent)";
 
         } else {
 
@@ -1654,6 +1664,41 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
                         DataFiltererrors << QString(tr("filename() has no parameters"));
                     }
 
+                } else if (leaf->function == "zones") {
+
+                    // need exactly 3 symbols
+                    if (leaf->fparms.count() != 3 ||
+                        leaf->fparms[0]->type != Leaf::Symbol ||
+                        leaf->fparms[1]->type != Leaf::Symbol ||
+                        leaf->fparms[2]->type != Leaf::Symbol) {
+                        leaf->inerror = true;
+
+                    } else {
+
+                        // each sport has slightly different zones that can be configured
+                        // note the fatigue zones are hard coded but should still be returned
+                        // as need to get language specific translations of name, description
+                        QRegExp resport("^(run|bike|swim)$", Qt::CaseInsensitive);
+                        QRegExp reswimseries("^pace$", Qt::CaseInsensitive);
+                        QRegExp rerunseries("^(hr|power|pace|fatigue)$", Qt::CaseInsensitive);
+                        QRegExp rebikeseries("^(hr|power|fatigue)$", Qt::CaseInsensitive);
+                        QRegExp refield("^(name|description|units|low|high|time|percent)$", Qt::CaseInsensitive);
+
+                        // lets check the combinations
+                        QString sport = *leaf->fparms[0]->lvalue.n;
+                        QString series = *leaf->fparms[1]->lvalue.n;
+                        QString field = *leaf->fparms[2]->lvalue.n;
+
+                        if (!resport.exactMatch(sport)) inerror=true;
+                        if (!refield.exactMatch(field)) inerror=true;
+                        if (sport == "run" && !rerunseries.exactMatch(series)) inerror=true;
+                        if (sport == "bike" && !rebikeseries.exactMatch(series)) inerror=true;
+                        if (sport == "swim" && !reswimseries.exactMatch(series)) inerror=true;
+                    }
+
+                    // same error for any badly formed function call
+                    if (leaf->inerror) DataFiltererrors << QString(tr("zones(run|bike|swim, hr|power|pace|fatigue, name|description|low|high|units|time|percent) needs 3 specific parameters"));
+
                 } else if (leaf->function == "exists") {
 
                     // needs one parameter and must be a string constant
@@ -1917,7 +1962,7 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
                         }
                     }
 
-                } else if (leaf->function == "name" || leaf->function == "unit" || leaf->function == "asstring") {
+                } else if (leaf->function == "metricname" || leaf->function == "metricunit" || leaf->function == "asstring") {
 
                     // check the parameters are all valid metric names
                     if (leaf->fparms.count() < 1) {
@@ -3309,10 +3354,10 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
             return returning;
         }
 
-        if (leaf->function == "name" || leaf->function == "unit" || leaf->function == "asstring") {
+        if (leaf->function == "metricname" || leaf->function == "metricunit" || leaf->function == "asstring") {
 
-            bool wantname = (leaf->function == "name");
-            bool wantunit = (leaf->function == "unit");
+            bool wantname = (leaf->function == "metricname");
+            bool wantunit = (leaf->function == "metricunit");
 
             QVector<QString> list;
 
@@ -3504,7 +3549,132 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
             }
         }
 
-        // bool(expr)
+        // zone descriptions and high / lows, but not cp/cv, w'/d' et al
+        if (leaf->function == "zones") {
+
+            // parms
+            QString sport = *leaf->fparms[0]->lvalue.n;
+            QString series = *leaf->fparms[1]->lvalue.n;
+            QString field = *leaf->fparms[2]->lvalue.n;
+
+            // what we will ultimately return
+            QVector<QString> strings;
+
+            // if m is null all bets are off
+            if (m == NULL) return Result(0);
+
+            // units are easy, we can do that without zoneinfo
+            if (field == "units") {
+                if (series == "power") return Result(tr("watts"));
+                else if (series == "hr") return Result(tr("bpm"));
+                else if (series == "pace") return Result(tr("%CV"));
+                else if (series == "fatigue") return Result(tr("W'bal (%)"));
+            }
+
+            // we want to minimise duplicated code
+            // so get the zones and ranges setup
+            // then loop through the zones in a single
+            // loop, so lets get the control variables here
+            const Zones *powerzones;
+            const HrZones *hrzones;
+            const PaceZones *pacezones;
+
+            // which range and how many zones are there
+            int range=-1, nzones = 0;
+
+            // metric prefix
+            QString metricprefix;
+
+            // setup
+            if (series == "power") {
+
+                // power zones are for Run or Bike, but not Swim
+                powerzones = m->context->athlete->zones(sport == "run" ? "Run" : "Bike");
+                range= powerzones->whichRange(m->dateTime.date());
+                if (range >= 0) nzones = powerzones->numZones(range);
+                metricprefix = "time_in_zone_L";
+
+            } else if (series == "hr") {
+
+                // hr zones are also for run or bike, but not Swim
+                hrzones = m->context->athlete->hrZones(sport == "run" ? "Run" : "Bike");
+                range= hrzones->whichRange(m->dateTime.date());
+                if (range >= 0) nzones = hrzones->numZones(range);
+                metricprefix = "time_in_zone_H";
+
+            } else if (series == "pace") {
+
+                // pace zones are for run or swim
+                pacezones = m->context->athlete->paceZones(sport == "run" ? "Run" : "Swim");
+                range= pacezones->whichRange(m->dateTime.date());
+                if (range >= 0) nzones = pacezones->numZones(range);
+                metricprefix = "time_in_zone_P";
+
+            } else if (series == "fatigue") {
+
+                // easy for us, they are hardcoded
+                if (field == "name") strings << "W1" << "W2" << "W3" << "W4";
+                else if (field == "description") strings << "Low" << "Medium" << "High" << "Extreme";
+                else if (field == "low") strings << "75" << "50" << "25" << "0";
+                else if (field == "high") strings << "100" << "75" << "50" << "25";
+                metricprefix = "wtime_in_zone_L";
+                range=-1;
+                nzones=4; // for metric lookup
+
+            }
+
+            if (field == "time" ) {
+
+                // time in zones and percent in zones use metrics
+                for(int n=0; n<nzones; n++) {
+                    QString name = QString("%1%2").arg(metricprefix).arg(n+1);
+                    strings << m->getStringForSymbol(name, GlobalContext::context()->useMetricUnits);
+                }
+
+            } else if (field == "percent") {
+
+                double duration = m->getForSymbol("workout_time", false);
+                for(int n=0; n<nzones; n++) {
+                    QString name = QString("%1%2").arg(metricprefix).arg(n+1);
+                    double value = m->getForSymbol(name, false);
+                    double percent = round(value/duration * 100.0);
+                    strings << QString("%1").arg(percent);
+                }
+
+            } else {
+
+                // all other fields use zoneinfo
+
+                for(int n=0; range >=0 && n<nzones; n++) {
+
+                    // placeholders for various zoneinfo calls
+                    QString name, desc;
+                    int ilow, ihigh;
+                    double low,high;
+                    double trimp; // ignored
+
+                    if (series == "power") { powerzones->zoneInfo(range, n, name, desc, ilow, ihigh); low=ilow; high=ihigh; }
+                    else if (series == "hr") { hrzones->zoneInfo(range, n, name, desc, ilow, ihigh, trimp);low=ilow; high=ihigh; }
+                    else if (series == "pace") pacezones->zoneInfo(range, n, name, desc, low, high);
+
+
+                    // so now we can do our thing - use the scheme for the names...
+                    if (field == "name")  strings << name;
+                    else if (field == "description") strings << desc;
+                    else if (field == "low") strings << QString("%1").arg(low);
+                    else if (field == "high") {
+                        if (n==nzones-1) strings << ""; // infinite, so make blank
+                        else strings << QString("%1").arg(high);
+                    }
+                }
+
+            }
+
+            // returning what was collected
+            return Result(strings);
+        }
+
+        // bool(expr) - convert to boolean
         if (leaf->function == "bool") {
             Result r=eval(df, leaf->fparms[0],x, it, m, p, c, s, d);
             if (r.isVector()) {
@@ -3519,6 +3689,26 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
                 if (r.number() != 0) return Result(1);
                 else return Result(0);
             }
+        }
+
+        // string(expr) convert to string
+        if (leaf->function == "string") {
+            Result r=eval(df, leaf->fparms[0],x, it, m, p, c, s, d);
+
+            if (r.isNumber) {
+                if (r.isVector()) {
+                    QVector<QString> results;
+                    for(int i=0; i<r.asNumeric().count(); i++) {
+                        QString asstring = Utils::removeDP(QString("%1").arg(r.asNumeric().at(i)));
+                        results << asstring;
+                    }
+                    return Result(results);
+                } else {
+                    return Result(Utils::removeDP(QString("%1").arg("g", r.number())));
+                }
+            }
+
+            return r; // just return what it is
         }
 
         // c (concat into a vector)
