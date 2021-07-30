@@ -377,7 +377,11 @@ GcMiniCalendar::GcMiniCalendar(Context *context, bool master) : context(context)
     layout->addStretch();
 
     // day clicked
-    connect(signalMapper, &QSignalMapper::mappedInt, this, &GcMiniCalendar::dayClicked);
+#if QT_VERSION >= 0x060000
+    connect(signalMapper, SIGNAL(mappedInt(int)), this, SLOT(dayClicked(int)));
+#else
+    connect(signalMapper, SIGNAL(mapped(int)), this, SLOT(dayClicked(int)));
+#endif
 
     // set up for current selections - and watch for future changes
     connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));

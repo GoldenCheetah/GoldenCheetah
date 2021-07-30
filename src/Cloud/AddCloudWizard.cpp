@@ -93,7 +93,11 @@ AddClass::AddClass(AddCloudWizard *parent) : QWizardPage(parent), wizard(parent)
     setLayout(layout);
 
     mapper = new QSignalMapper(this);
-    connect(mapper, &QSignalMapper::mappedInt, this, &AddClass::clicked);
+#if QT_VERSION >= 0x060000
+    connect(mapper, SIGNAL(mappedInt(int)), this, SLOT(clicked(int)));
+#else
+    connect(mapper, SIGNAL(mapped(int)), this, SLOT(clicked(int)));
+#endif
 
     // Activities
     QFont font;
@@ -147,7 +151,11 @@ AddService::AddService(AddCloudWizard *parent) : QWizardPage(parent), wizard(par
     scrollarea->setWidget(buttons);
 
     mapper = new QSignalMapper(this);
-    connect(mapper, &QSignalMapper::mappedString, this, &AddService::clicked);
+#if QT_VERSION >= 0x060000
+    connect(mapper, SIGNAL(mappedString(QString)), this, SLOT(clicked(QString)));
+#else
+    connect(mapper, SIGNAL(mapped(QString)), this, SLOT(clicked(QString)));
+#endif
 
     layout->addWidget(scrollarea);
 
@@ -472,7 +480,11 @@ AddAthlete::AddAthlete(AddCloudWizard *parent) : QWizardPage(parent), wizard(par
     scrollarea->setWidget(buttons);
 
     mapper = new QSignalMapper(this);
-    connect(mapper, &QSignalMapper::mappedInt, this, &AddAthlete::clicked);
+#if QT_VERSION >= 0x060000
+    connect(mapper, SIGNAL(mappedInt(int)), this, SLOT(clicked(int)));
+#else
+    connect(mapper, SIGNAL(mapped(int)), this, SLOT(clicked(int)));
+#endif
 
     layout->addWidget(scrollarea);
 

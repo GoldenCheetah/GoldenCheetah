@@ -1289,7 +1289,11 @@ ColumnChooser::ColumnChooser(QList<QString>&logicalHeadings)
     setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint | Qt::Tool);
 
     clicked = new QSignalMapper(this); // maps each button click event
-    connect(clicked, &QSignalMapper::mappedString, this, &ColumnChooser::buttonClicked);
+#if QT_VERSION >= 0x060000
+    connect(clicked, SIGNAL(mappedString(const QString &)), this, SLOT(buttonClicked(const QString &)));
+#else
+    connect(clicked, SIGNAL(mapped(const QString &)), this, SLOT(buttonClicked(const QString &)));
+#endif
 
     QVBoxLayout *us = new QVBoxLayout(this);
     us->setSpacing(0);

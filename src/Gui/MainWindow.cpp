@@ -482,19 +482,31 @@ MainWindow::MainWindow(const QDir &home)
     connect(openTabMenu, SIGNAL(aboutToShow()), this, SLOT(setOpenTabMenu()));
 
     tabMapper = new QSignalMapper(this); // maps each option
-    connect(tabMapper, &QSignalMapper::mappedString, this, &MainWindow::openTab);
+#if QT_VERSION >= 0x060000
+    connect(tabMapper, SIGNAL(mappedString(const QString &)), this, SLOT(openTab(const QString &)));
+#else
+    connect(tabMapper, SIGNAL(mapped(const QString &)), this, SLOT(openTab(const QString &)));
+#endif
 
     fileMenu->addSeparator();
     backupAthleteMenu = fileMenu->addMenu(tr("Backup..."));
     connect(backupAthleteMenu, SIGNAL(aboutToShow()), this, SLOT(setBackupAthleteMenu()));
     backupMapper = new QSignalMapper(this); // maps each option
-    connect(backupMapper, &QSignalMapper::mappedString, this, &MainWindow::backupAthlete);
+#if QT_VERSION >= 0x060000
+    connect(backupMapper, SIGNAL(mappedString(const QString &)), this, SLOT(backupAthlete(const QString &)));
+#else
+    connect(backupMapper, SIGNAL(mapped(const QString &)), this, SLOT(backupAthlete(const QString &)));
+#endif
 
     fileMenu->addSeparator();
     deleteAthleteMenu = fileMenu->addMenu(tr("Delete..."));
     connect(deleteAthleteMenu, SIGNAL(aboutToShow()), this, SLOT(setDeleteAthleteMenu()));
     deleteMapper = new QSignalMapper(this); // maps each option
-    connect(deleteMapper, &QSignalMapper::mappedString, this, &MainWindow::deleteAthlete);
+#if QT_VERSION >= 0x060000
+    connect(deleteMapper, SIGNAL(mappedString(const QString &)), this, SLOT(deleteAthlete(const QString &)));
+#else
+    connect(deleteMapper, SIGNAL(mapped(const QString &)), this, SLOT(deleteAthlete(const QString &)));
+#endif
 
     fileMenu->addSeparator();
     fileMenu->addAction(tr("Save all modified activities"), this, SLOT(saveAllUnsavedRides()));
@@ -610,7 +622,11 @@ MainWindow::MainWindow(const QDir &home)
 
         toolMapper = new QSignalMapper(this); // maps each option
         QMapIterator<QString, DataProcessor*> i(processors);
-        connect(toolMapper, &QSignalMapper::mappedString, this, &MainWindow::manualProcess);
+#if QT_VERSION >= 0x060000
+        connect(toolMapper, SIGNAL(mappedString(const QString &)), this, SLOT(manualProcess(const QString &)));
+#else
+        connect(toolMapper, SIGNAL(mapped(const QString &)), this, SLOT(manualProcess(const QString &)));
+#endif
 
         i.toFront();
         while (i.hasNext()) {

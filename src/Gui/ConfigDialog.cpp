@@ -73,7 +73,11 @@ ConfigDialog::ConfigDialog(QDir _home, Context *context) :
     // Setup the signal mapping so the right config
     // widget is displayed when the icon is clicked
     QSignalMapper *iconMapper = new QSignalMapper(this); // maps each option
-    connect(iconMapper, &QSignalMapper::mappedInt, this, &ConfigDialog::changePage);
+#if QT_VERSION >= 0x060000
+    connect(iconMapper, SIGNAL(mappedInt(int)), this, SLOT(changePage(int)));
+#else
+    connect(iconMapper, SIGNAL(mapped(int)), this, SLOT(changePage(int)));
+#endif
     head->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
     head->setIconSize(QSize(32*dpiXFactor,32*dpiXFactor)); // use XFactor for both to ensure aspect ratio maintained
 
