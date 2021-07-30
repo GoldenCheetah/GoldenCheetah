@@ -35,7 +35,7 @@ public:
     //! Paint attributes
     typedef QFlags<PaintAttribute> PaintAttributes;
 
-    explicit QwtPlotSpectroCurve( const QString &title = QString::null );
+    explicit QwtPlotSpectroCurve( const QString &title = QString() );
     explicit QwtPlotSpectroCurve( const QwtText &title );
 
     virtual ~QwtPlotSpectroCurve();

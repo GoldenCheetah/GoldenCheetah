@@ -210,8 +210,14 @@ contains(QWT_CONFIG, QwtOpenGL) {
 
     QT += opengl
 
-    HEADERS += qwt_plot_glcanvas.h
-    SOURCES += qwt_plot_glcanvas.cpp
+        lessThan(QT_MAJOR_VERSION, 6) {
+
+            HEADERS += \
+                qwt_plot_glcanvas.h
+
+            SOURCES += \
+                qwt_plot_glcanvas.cpp
+        }
 }
 else {
 

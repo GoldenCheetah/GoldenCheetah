@@ -11,6 +11,7 @@
 #include "qwt_painter.h"
 #include "qwt_scale_draw.h"
 #include "qwt_scale_map.h"
+#include "qwt.h"
 #include <qevent.h>
 #include <qdrawutil.h>
 #include <qpainter.h>
@@ -664,7 +665,7 @@ void QwtSlider::paintEvent( QPaintEvent *event )
     painter.setClipRegion( event->region() );
 
     QStyleOption opt;
-    opt.init(this);
+    opt.initFrom(this);
     style()->drawPrimitive(QStyle::PE_Widget, &opt, &painter, this);
 
     if ( d_data->scalePosition != QwtSlider::NoScale )
@@ -885,7 +886,7 @@ bool QwtSlider::hasGroove() const
 QSize QwtSlider::sizeHint() const
 {
     const QSize hint = minimumSizeHint();
-    return hint.expandedTo( QApplication::globalStrut() );
+    return qwtExpandedToGlobalStrut( hint );
 }
 
 /*!
@@ -948,11 +949,10 @@ QSize QwtSlider::minimumSizeHint() const
     }
 
     // finally add margins
-    int left, right, top, bottom;
-    getContentsMargins( &left, &top, &right, &bottom );
+    const QMargins m = contentsMargins();
 
-    w += left + right;
-    h += top + bottom;
+    w += m.left() + m.right();
+    h += m.top() + m.bottom();
 
     d_data->sizeHintCache = QSize( w, h );
     return d_data->sizeHintCache;

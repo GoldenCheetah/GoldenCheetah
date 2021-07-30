@@ -46,7 +46,7 @@ void QwtAxesMask::setEnabled( QwtAxisId axisId, bool on )
 
     QList<int> &axes = d_data->disabledAxes[ axisId.pos ];
     
-    QList<int>::iterator it = qLowerBound( axes.begin(), axes.end(), axisId.id );
+    QList<int>::iterator it = std::lower_bound( axes.begin(), axes.end(), axisId.id );
 
     const bool isEnabled = ( it != axes.end() ) && ( *it != axisId.id );
 
@@ -75,7 +75,7 @@ bool QwtAxesMask::isEnabled( QwtAxisId axisId ) const
     if ( QwtAxis::isValid( axisId.pos ) )
     {
         const QList<int> &axes = d_data->disabledAxes[ axisId.pos ];
-        return qFind( axes, axisId.id ) != axes.end();
+        return std::find( axes.begin(), axes.end(), axisId.id ) != axes.end();
     }
 
     return true;

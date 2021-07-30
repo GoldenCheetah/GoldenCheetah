@@ -95,7 +95,7 @@ QMap<double, QString> QwtCompassScaleDraw::labelMap() const
   label() looks in the labelMap() for a corresponding label for value
   or returns an null text.
 
-  \return Label, or QString::null
+  \return Label, or QString()
   \sa labelMap(), setLabelMap()
 */
 

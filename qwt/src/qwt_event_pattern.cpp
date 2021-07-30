@@ -59,7 +59,7 @@ void QwtEventPattern::initMousePattern( int numButtons )
         {
             setMousePattern( MouseSelect1, Qt::LeftButton );
             setMousePattern( MouseSelect2, Qt::RightButton );
-            setMousePattern( MouseSelect3, Qt::MidButton );
+            setMousePattern( MouseSelect3, Qt::MiddleButton );
         }
     }
 

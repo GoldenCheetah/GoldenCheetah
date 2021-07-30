@@ -10,6 +10,7 @@
 #include "qwt_wheel.h"
 #include "qwt_math.h"
 #include "qwt_painter.h"
+#include "qwt.h"
 #include <qevent.h>
 #include <qdrawutil.h>
 #include <qpainter.h>
@@ -75,7 +76,7 @@ public:
 
     // for the flying wheel effect
     int timerId;
-    QTime time;
+    QElapsedTimer timer;
     double speed;
     double mouseValue;
     double flyingValue;
@@ -173,7 +174,7 @@ void QwtWheel::mousePressEvent( QMouseEvent *event )
 
     if ( d_data->isScrolling )
     {
-        d_data->time.start();
+        d_data->timer.start();
         d_data->speed = 0.0;
         d_data->mouseValue = valueAt( event->pos() );
         d_data->mouseOffset = d_data->mouseValue - d_data->value;
@@ -199,7 +200,7 @@ void QwtWheel::mouseMoveEvent( QMouseEvent *event )
 
     if ( d_data->mass > 0.0 )
     {
-        double ms = d_data->time.restart();
+        double ms = d_data->timer.restart();
 
         // the interval when mouse move events are posted are somehow
         // random. To avoid unrealistic speed values we limit ms
@@ -252,7 +253,7 @@ void QwtWheel::mouseReleaseEvent( QMouseEvent *event )
 
     if ( d_data->mass > 0.0 )
     {
-        const int ms = d_data->time.elapsed();
+        const int ms = d_data->timer.elapsed();
         if ( ( qFabs( d_data->speed ) > 0.0 ) && ( ms < 50 ) )
             startFlying = true;
     }
@@ -328,7 +329,18 @@ void QwtWheel::timerEvent( QTimerEvent *event )
 */
 void QwtWheel::wheelEvent( QWheelEvent *event )
 {
-    if ( !wheelRect().contains( event->pos() ) )
+#if QT_VERSION < 0x050e00
+    const QPoint wheelPos = event->pos();
+    const int wheelDelta = event->delta();
+#else
+    const QPoint wheelPos = event->position().toPoint();
+
+    const QPoint delta = event->angleDelta();
+    const int wheelDelta = ( qAbs( delta.x() ) > qAbs( delta.y() ) )
+            ? delta.x() : delta.y();
+#endif
+
+    if ( !wheelRect().contains( wheelPos ) )
     {
         event->ignore();
         return;
@@ -341,17 +353,17 @@ void QwtWheel::wheelEvent( QWheelEvent *event )
 
     double increment = 0.0;
 
-    if ( ( event->modifiers() & Qt::ControlModifier) || 
-        ( event->modifiers() & Qt::ShiftModifier ) )
+    if ( ( event->modifiers() & Qt::ControlModifier ) ||
+    ( event->modifiers() & Qt::ShiftModifier ) )
     {
         // one page regardless of delta
         increment = d_data->singleStep * d_data->pageStepCount;
-        if ( event->delta() < 0 )
+        if ( wheelDelta < 0 )
             increment = -increment;
     }
     else
     {
-        const int numSteps = event->delta() / 120;
+        const int numSteps = wheelDelta / 120;
         increment = d_data->singleStep * numSteps;
     }
 
@@ -733,7 +745,7 @@ void QwtWheel::paintEvent( QPaintEvent *event )
     painter.setClipRegion( event->region() );
 
     QStyleOption opt;
-    opt.init(this);
+    opt.initFrom(this);
     style()->drawPrimitive(QStyle::PE_Widget, &opt, &painter, this);
 
     qDrawShadePanel( &painter, 
@@ -946,7 +958,7 @@ int QwtWheel::wheelWidth() const
 QSize QwtWheel::sizeHint() const
 {
     const QSize hint = minimumSizeHint();
-    return hint.expandedTo( QApplication::globalStrut() );
+    return qwtExpandedToGlobalStrut( hint );
 }
 
 /*!

@@ -26,12 +26,14 @@ static bool qwtHasScalablePen( const QPainter *painter )
     if ( pen.style() != Qt::NoPen && pen.brush().style() != Qt::NoBrush )
     {
         scalablePen = !pen.isCosmetic();
+#if QT_VERSION < 0x050000
         if ( !scalablePen && pen.widthF() == 0.0 )
         {
             const QPainter::RenderHints hints = painter->renderHints();
             if ( hints.testFlag( QPainter::NonCosmeticDefaultPen ) )
                 scalablePen = true;
         }
+#endif
     }
 
     return scalablePen;
@@ -78,12 +80,14 @@ static inline void qwtExecCommand(
                 && painter->transform().isScaling() )
             {
                 bool isCosmetic = painter->pen().isCosmetic();
+#if QT_VERSION < 0x050000
                 if ( isCosmetic && painter->pen().widthF() == 0.0 )
                 {
                     QPainter::RenderHints hints = painter->renderHints();
                     if ( hints.testFlag( QPainter::NonCosmeticDefaultPen ) )
                         isCosmetic = false;
                 }
+#endif
 
                 doMap = !isCosmetic;
             }
@@ -159,22 +163,11 @@ static inline void qwtExecCommand(
 
             if ( data->flags & QPaintEngine::DirtyHints) 
             {
-                const QPainter::RenderHints hints = data->renderHints;
-
-                painter->setRenderHint( QPainter::Antialiasing,
-                    hints.testFlag( QPainter::Antialiasing ) );
-
-                painter->setRenderHint( QPainter::TextAntialiasing,
-                    hints.testFlag( QPainter::TextAntialiasing ) );
-
-                painter->setRenderHint( QPainter::SmoothPixmapTransform,
-                    hints.testFlag( QPainter::SmoothPixmapTransform ) );
-
-                painter->setRenderHint( QPainter::HighQualityAntialiasing,
-                    hints.testFlag( QPainter::HighQualityAntialiasing ) );
-
-                painter->setRenderHint( QPainter::NonCosmeticDefaultPen,
-                    hints.testFlag( QPainter::NonCosmeticDefaultPen ) );
+                for ( int i = 0; i < 8; i++ )
+                {
+                    const QPainter::RenderHint hint = static_cast< QPainter::RenderHint >( 1 << i );
+                    painter->setRenderHint( hint, data->renderHints.testFlag( hint ) );
+                }
             }
 
             if ( data->flags & QPaintEngine::DirtyCompositionMode) 

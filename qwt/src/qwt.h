@@ -12,11 +12,15 @@
 
 #include "qwt_global.h"
 
+class QSize;
+
 /*!
   Some constants for use within Qwt.
 */
 namespace Qwt
 {
 };
+
+QWT_EXPORT QSize qwtExpandedToGlobalStrut( const QSize& );
 
 #endif

@@ -256,13 +256,14 @@ QwtText QwtPlotPicker::trackerTextF( const QPointF &pos ) const
     switch ( rubberBand() )
     {
         case HLineRubberBand:
-            text.sprintf( "%.4f", pos.y() );
+            text = QString::number( pos.y(), 'f', 4 );
             break;
-        case VLineRubberBand:
-            text.sprintf( "%.4f", pos.x() );
-            break;
-        default:
-            text.sprintf( "%.4f, %.4f", pos.x(), pos.y() );
+            case VLineRubberBand:
+                text = QString::number( pos.x(), 'f', 4 );
+                break;
+                default:
+                    text = QString::number( pos.x(), 'f', 4 )
+                            + ", " + QString::number( pos.y(), 'f', 4 );
     }
     return QwtText( text );
 }

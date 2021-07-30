@@ -239,33 +239,27 @@ void QwtPlotRenderer::renderDocument( QwtPlot *plot,
     const QRectF documentRect( 0.0, 0.0, size.width(), size.height() );
 
     const QString fmt = format.toLower();
-    if ( fmt == "pdf" )
+    if ( fmt == QLatin1String( "pdf" ) )
     {
-#ifndef QT_NO_PRINTER
+#if QWT_FORMAT_PDF
+
+#if QWT_PDF_WRITER
+        QPdfWriter pdfWriter( fileName );
+        pdfWriter.setPageSize( QPageSize( sizeMM, QPageSize::Millimeter ) );
+        pdfWriter.setTitle( title );
+        pdfWriter.setPageMargins( QMarginsF() );
+        pdfWriter.setResolution( resolution );
+
+        QPainter painter( &pdfWriter );
+        render( plot, &painter, documentRect );
+#else
         QPrinter printer;
-        printer.setColorMode( QPrinter::Color );
-        printer.setFullPage( true );
-        printer.setPaperSize( sizeMM, QPrinter::Millimeter );
-        printer.setDocName( title );
-        printer.setOutputFileName( fileName );
         printer.setOutputFormat( QPrinter::PdfFormat );
-        printer.setResolution( resolution );
-
-        QPainter painter( &printer );
-        render( plot, &painter, documentRect );
-#endif
-    }
-    else if ( fmt == "ps" )
-    {
-#if QT_VERSION < 0x050000
-#ifndef QT_NO_PRINTER
-        QPrinter printer;
         printer.setColorMode( QPrinter::Color );
         printer.setFullPage( true );
         printer.setPaperSize( sizeMM, QPrinter::Millimeter );
         printer.setDocName( title );
         printer.setOutputFileName( fileName );
-        printer.setOutputFormat( QPrinter::PostScriptFormat );
         printer.setResolution( resolution );
 
         QPainter painter( &printer );
@@ -273,11 +267,25 @@ void QwtPlotRenderer::renderDocument( QwtPlot *plot,
 #endif
 #endif
     }
-    else if ( fmt == "svg" )
+    else if ( fmt == QLatin1String( "ps" ) )
     {
-#ifndef QWT_NO_SVG
-#ifdef QT_SVG_LIB
-#if QT_VERSION >= 0x040500
+#if QWT_FORMAT_POSTSCRIPT
+        QPrinter printer;
+        printer.setOutputFormat( QPrinter::PostScriptFormat );
+        printer.setColorMode( QPrinter::Color );
+        printer.setFullPage( true );
+        printer.setPaperSize( sizeMM, QPrinter::Millimeter );
+        printer.setDocName( title );
+        printer.setOutputFileName( fileName );
+        printer.setResolution( resolution );
+
+        QPainter painter( &printer );
+        render( plot, &painter, documentRect );
+#endif
+    }
+    else if ( fmt == QLatin1String( "svg" ) )
+    {
+#if QWT_FORMAT_SVG
         QSvgGenerator generator;
         generator.setTitle( title );
         generator.setFileName( fileName );
@@ -287,13 +295,11 @@ void QwtPlotRenderer::renderDocument( QwtPlot *plot,
         QPainter painter( &generator );
         render( plot, &painter, documentRect );
 #endif
-#endif
-#endif
     }
     else
     {
         if ( QImageWriter::supportedImageFormats().indexOf(
-            format.toLatin1() ) >= 0 )
+                format.toLatin1() ) >= 0 )
         {
             const QRect imageRect = documentRect.toRect();
             const int dotsPerMeter = qRound( resolution * mmToInch * 1000.0 );
@@ -436,9 +442,8 @@ void QwtPlotRenderer::render( QwtPlot *plot,
     {
         // subtract the contents margins
 
-        int left, top, right, bottom;
-        plot->getContentsMargins( &left, &top, &right, &bottom );
-        layoutRect.adjust( left, top, -right, -bottom );
+        const QMargins m = plot->contentsMargins();
+        layoutRect.adjust( m.left(), m.top(), -m.right(), -m.bottom() );
     }
 
     QwtPlotLayout *layout = plot->plotLayout();

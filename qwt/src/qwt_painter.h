@@ -117,6 +117,11 @@ public:
     static void drawBackgound( QPainter *painter,
         const QRectF &rect, const QWidget *widget );
 
+    static int horizontalAdvance( const QFontMetrics&, const QString& );
+
+    static int horizontalAdvance( const QFontMetrics&, QChar );
+    static QFont scaledFont( const QFont&, const QPaintDevice* = nullptr );
+
     static QPixmap backingStore( QWidget *, const QSize & );
 
 private:

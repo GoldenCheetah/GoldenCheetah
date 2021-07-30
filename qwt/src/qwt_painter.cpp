@@ -27,7 +27,12 @@
 #include <qstyleoption.h>
 #include <qpaintengine.h>
 #include <qapplication.h>
+
+#if QT_VERSION >= 0x060000
+#include <qscreen.h>
+#else
 #include <qdesktopwidget.h>
+#endif
 
 #if QT_VERSION >= 0x050000
 #include <qwindow.h>
@@ -96,27 +101,47 @@ static inline void qwtDrawPolyline( QPainter *painter,
         painter->drawPolyline( points, pointCount );
 }
 
-static inline void qwtUnscaleFont( QPainter *painter )
-{
-    if ( painter->font().pixelSize() >= 0 )
-        return;
 
+static inline QSize qwtScreenResolution()
+{
     static QSize screenResolution;
     if ( !screenResolution.isValid() )
     {
-        QDesktopWidget *desktop = QApplication::desktop();
+        /*
+            We might have screens with different resolutions. TODO ...
+         */
+#if QT_VERSION >= 0x060000
+        QScreen* screen = QGuiApplication::primaryScreen();
+        if ( screen )
+        {
+            screenResolution.setWidth( screen->logicalDotsPerInchX() );
+            screenResolution.setHeight( screen->logicalDotsPerInchY() );
+        }
+#else
+        QDesktopWidget* desktop = QApplication::desktop();
         if ( desktop )
         {
             screenResolution.setWidth( desktop->logicalDpiX() );
             screenResolution.setHeight( desktop->logicalDpiY() );
         }
+#endif
     }
 
-    const QPaintDevice *pd = painter->device();
+    return screenResolution;
+}
+
+static inline void qwtUnscaleFont( QPainter *painter )
+{
+    if ( painter->font().pixelSize() >= 0 )
+        return;
+
+    const QSize screenResolution = qwtScreenResolution();
+
+    const QPaintDevice* pd = painter->device();
     if ( pd->logicalDpiX() != screenResolution.width() ||
-        pd->logicalDpiY() != screenResolution.height() )
+    pd->logicalDpiY() != screenResolution.height() )
     {
-        QFont pixelFont( painter->font(), QApplication::desktop() );
+        QFont pixelFont = QwtPainter::scaledFont( painter->font() );
         pixelFont.setPixelSize( QFontInfo( pixelFont ).pixelSize() );
 
         painter->setFont( pixelFont );
@@ -661,7 +686,7 @@ void QwtPainter::drawFocusRect( QPainter *painter, const QWidget *widget,
     const QRect &rect )
 {
     QStyleOptionFocusRect opt;
-    opt.init( widget );
+    opt.initFrom( widget );
     opt.rect = rect;
     opt.state |= QStyle::State_HasFocus;
 
@@ -1265,3 +1290,82 @@ QPixmap QwtPainter::backingStore( QWidget *widget, const QSize &size )
     return pm;
 }
 
+
+/*!
+   Distance appropriate for drawing a subsequent character after text.
+
+   \param fontMetrics Font metrics
+   \param text Text
+   \return horizontal advance in pixels
+ */
+int QwtPainter::horizontalAdvance( const QFontMetrics& fontMetrics, const QString& text )
+{
+#if QT_VERSION >= 0x050b00
+    return fontMetrics.horizontalAdvance( text );
+#else
+    return fontMetrics.width( text );
+#endif
+}
+
+/*!
+   Distance appropriate for drawing a subsequent character after ch.
+
+   \param fontMetrics Font metrics
+   \param ch Character
+   \return horizontal advance in pixels
+ */
+int QwtPainter::horizontalAdvance(const QFontMetrics& fontMetrics, QChar ch )
+{
+#if QT_VERSION >= 0x050b00
+    return fontMetrics.horizontalAdvance( ch );
+#else
+    return fontMetrics.width( ch );
+#endif
+}
+
+
+/*!
+   Adjust the DPI value of font according to the DPI value of the paint device
+
+   \param font Unscaled font
+   \param paintDevice Paint device providing a DPI value. If paintDevice == null
+                     the DPI value of the primary screen will be used
+
+   \return Font being adjusted to the DPI value of the paint device
+ */
+QFont QwtPainter::scaledFont( const QFont& font, const QPaintDevice* paintDevice )
+{
+    if ( paintDevice == nullptr )
+    {
+#if QT_VERSION < 0x060000
+        paintDevice = QApplication::desktop();
+#else
+        class PaintDevice : public QPaintDevice
+                {
+            virtual QPaintEngine* paintEngine() const QWT_OVERRIDE
+            {
+                return nullptr;
+            }
+
+            virtual int metric( PaintDeviceMetric metric ) const QWT_OVERRIDE
+            {
+                if ( metric == PdmDpiY )
+                {
+                    QScreen* screen = QGuiApplication::primaryScreen();
+                    if ( screen )
+                    {
+                        return screen->logicalDotsPerInchY();
+                    }
+                }
+
+                return QPaintDevice::metric( metric );
+            }
+                };
+
+        static PaintDevice dummyPaintDevice;
+        paintDevice = &dummyPaintDevice;
+#endif
+    }
+
+    return QFont( font, const_cast< QPaintDevice* >( paintDevice ) );
+}

@@ -611,16 +611,14 @@ QList<QwtLegendData> QwtPlotItem::legendData() const
     QwtText label = title();
     label.setRenderFlags( label.renderFlags() & Qt::AlignLeft );
             
-    QVariant titleValue;
-    qVariantSetValue( titleValue, label );
-    data.setValue( QwtLegendData::TitleRole, titleValue );
+    data.setValue( QwtLegendData::TitleRole,
+                   QVariant::fromValue( label ) );
         
     const QwtGraphic graphic = legendIcon( 0, legendIconSize() );
     if ( !graphic.isNull() )
     {   
-        QVariant iconValue;
-        qVariantSetValue( iconValue, graphic );
-        data.setValue( QwtLegendData::IconRole, iconValue );
+        data.setValue( QwtLegendData::IconRole,
+                       QVariant::fromValue( graphic ) );
     }   
         
     QList<QwtLegendData> list;

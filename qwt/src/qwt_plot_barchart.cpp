@@ -393,17 +393,13 @@ QList<QwtLegendData> QwtPlotBarChart::legendData() const
         {
             QwtLegendData data;
 
-            QVariant titleValue;
-            qVariantSetValue( titleValue, barTitle( i ) );
-            data.setValue( QwtLegendData::TitleRole, titleValue );
+            data.setValue( QwtLegendData::TitleRole,
+                           QVariant::fromValue( barTitle( i ) ) );
 
             if ( !legendIconSize().isEmpty() )
             {
-                QVariant iconValue;
-                qVariantSetValue( iconValue,
-                    legendIcon( i, legendIconSize() ) );
-
-                data.setValue( QwtLegendData::IconRole, iconValue );
+                data.setValue( QwtLegendData::IconRole,
+                               QVariant::fromValue( legendIcon( i, legendIconSize() ) ) );
             }
 
             list += data;

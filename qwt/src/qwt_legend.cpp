@@ -229,7 +229,8 @@ public:
 
         const QSize visibleSize = viewport()->contentsRect().size();
 
-        const int minW = int( tl->maxItemWidth() ) + 2 * tl->margin();
+        const QMargins m = tl->contentsMargins();
+        const int minW = tl->maxItemWidth() + m.left() + m.right();
 
         int w = qMax( visibleSize.width(), minW );
         int h = qMax( tl->heightForWidth( w ), visibleSize.height() );
@@ -658,14 +659,13 @@ void QwtLegend::renderLegend( QPainter *painter,
     if ( legendLayout == NULL )
         return;
 
-    int left, right, top, bottom;
-    getContentsMargins( &left, &top, &right, &bottom );
+    const QMargins m = contentsMargins();
 
-    QRect layoutRect; 
-    layoutRect.setLeft( qCeil( rect.left() ) + left );
-    layoutRect.setTop( qCeil( rect.top() ) + top );
-    layoutRect.setRight( qFloor( rect.right() ) - right );
-    layoutRect.setBottom( qFloor( rect.bottom() ) - bottom );
+    QRect layoutRect;
+    layoutRect.setLeft( qwtCeil( rect.left() ) + m.left() );
+    layoutRect.setTop( qwtCeil( rect.top() ) + m.top() );
+    layoutRect.setRight( qwtFloor( rect.right() ) - m.right() );
+    layoutRect.setBottom( qwtFloor( rect.bottom() ) - m.bottom() );
 
     uint numCols = legendLayout->columnsForWidth( layoutRect.width() );
     QList<QRect> itemRects =

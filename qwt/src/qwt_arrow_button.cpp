@@ -9,6 +9,7 @@
 
 #include "qwt_arrow_button.h"
 #include "qwt_math.h"
+#include "qwt.h"
 #include <qpainter.h>
 #include <qstyle.h>
 #include <qstyleoption.h>
@@ -29,7 +30,7 @@ public:
 static QStyleOptionButton styleOpt( const QwtArrowButton* btn )
 {
     QStyleOptionButton option;
-    option.init( btn );
+    option.initFrom( btn );
     option.features = QStyleOptionButton::None;
     if ( btn->isFlat() )
         option.features |= QStyleOptionButton::Flat;
@@ -198,7 +199,7 @@ void QwtArrowButton::drawButtonLabel( QPainter *painter )
     if ( hasFocus() )
     {
         QStyleOptionFocusRect option;
-        option.init( this );
+        option.initFrom( this );
         option.backgroundColor = palette().color( QPalette::Window );
 
         style()->drawPrimitive( QStyle::PE_FrameFocusRect,
@@ -260,7 +261,7 @@ void QwtArrowButton::drawArrow( QPainter *painter,
 QSize QwtArrowButton::sizeHint() const
 {
     const QSize hint = minimumSizeHint();
-    return hint.expandedTo( QApplication::globalStrut() );
+    return qwtExpandedToGlobalStrut( hint );
 }
 
 /*!
@@ -279,7 +280,7 @@ QSize QwtArrowButton::minimumSizeHint() const
         sz.transpose();
 
     QStyleOption styleOption;
-    styleOption.init( this );
+    styleOption.initFrom( this );
 
     sz = style()->sizeFromContents( QStyle::CT_PushButton,
         &styleOption, sz, this );

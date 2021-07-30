@@ -307,6 +307,14 @@ void QwtAbstractSlider::wheelEvent( QWheelEvent *event )
     if ( !d_data->isValid || d_data->isScrolling )
         return;
 
+    #if QT_VERSION < 0x050000
+    const int wheelDelta = event->delta();
+#else
+    const QPoint delta = event->angleDelta();
+    const int wheelDelta = ( qAbs( delta.x() ) > qAbs( delta.y() ) )
+            ? delta.x() : delta.y();
+#endif
+
     int numSteps = 0;
 
     if ( ( event->modifiers() & Qt::ControlModifier) ||
@@ -314,12 +322,12 @@ void QwtAbstractSlider::wheelEvent( QWheelEvent *event )
     {
         // one page regardless of delta
         numSteps = d_data->pageSteps;
-        if ( event->delta() < 0 )
+        if ( wheelDelta < 0 )
             numSteps = -numSteps;
     }
     else
     {
-        const int numTurns = ( event->delta() / 120 );
+        const int numTurns = ( wheelDelta / 120 );
         numSteps = numTurns * d_data->singleSteps;
     }
 

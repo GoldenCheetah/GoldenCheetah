@@ -123,11 +123,12 @@ public:
     {
         void init( const QWidget *canvas )
         {
-            canvas->getContentsMargins(
-                &contentsMargins[ QwtAxis::yLeft ],
-                &contentsMargins[ QwtAxis::xTop ],
-                &contentsMargins[ QwtAxis::yRight ],
-                &contentsMargins[ QwtAxis::xBottom ] );
+            const QMargins m = canvas->contentsMargins();
+
+            contentsMargins[ QwtAxis::yLeft ] = m.left();
+            contentsMargins[ QwtAxis::xTop ] = m.top();
+            contentsMargins[ QwtAxis::yRight ] = m.right();
+            contentsMargins[ QwtAxis::xBottom ] = m.bottom();
         }
 
         int contentsMargins[ QwtAxis::PosCount ];
@@ -310,11 +311,12 @@ QwtPlotLayoutHintData::QwtPlotLayoutHintData( const QwtPlot *plot )
 {
     int contentsMargins[ 4 ];
 
-    plot->canvas()->getContentsMargins(
-        &contentsMargins[ QwtAxis::yLeft ],
-        &contentsMargins[ QwtAxis::xTop ],
-        &contentsMargins[ QwtAxis::yRight ],
-        &contentsMargins[ QwtAxis::xBottom ] );
+    QMargins m = plot->canvas()->contentsMargins();
+
+    contentsMargins[ QwtAxis::yLeft ] = m.left();
+    contentsMargins[ QwtAxis::xTop ] = m.top();
+    contentsMargins[ QwtAxis::yRight ] = m.right();
+    contentsMargins[ QwtAxis::xBottom ] = m.bottom();
 
     for ( int axisPos = 0; axisPos < QwtAxis::PosCount; axisPos++ )
     {
@@ -1501,17 +1503,15 @@ QSize QwtPlotLayout::minimumSizeHint( const QwtPlot *plot ) const
 
     const QWidget *canvas = plot->canvas();
 
-    int left, top, right, bottom;
-    canvas->getContentsMargins( &left, &top, &right, &bottom );
-
+    const QMargins m = canvas->contentsMargins();
     const QSize minCanvasSize = canvas->minimumSize();
 
     int w = hintData.yAxesWidth();
-    int cw = xAxesWidth + left + 1 + right + 1;
+    int cw = xAxesWidth + m.left() + 1 + m.right() + 1;
     w += qMax( cw, minCanvasSize.width() );
 
     int h = hintData.xAxesHeight();
-    int ch = yAxesHeight + top + 1 + bottom + 1;
+    int ch = yAxesHeight + m.top() + 1 + m.bottom() + 1;
     h += qMax( ch, minCanvasSize.height() );
 
     const QwtTextLabel *labels[2];

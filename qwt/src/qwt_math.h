@@ -146,4 +146,22 @@ inline double qwtDegrees( double degrees )
     return degrees * 180.0 / M_PI;
 }
 
+/*!
+    The same as qCeil, but avoids including qmath.h
+    \return Ceiling of value.
+ */
+inline int qwtCeil( qreal value )
+{
+    using std::ceil;
+    return int( ceil( value ) );
+}
+/*!
+    The same as qFloor, but avoids including qmath.h
+    \return Floor of value.
+ */
+inline int qwtFloor( qreal value )
+{
+    using std::floor;
+    return int( floor( value ) );
+}
 #endif

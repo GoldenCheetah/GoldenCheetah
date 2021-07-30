@@ -690,17 +690,13 @@ QList<QwtLegendData> QwtPlotMultiBarChart::legendData() const
     {
         QwtLegendData data;
 
-        QVariant titleValue;
-        qVariantSetValue( titleValue, d_data->barTitles[i] );
-        data.setValue( QwtLegendData::TitleRole, titleValue );
+        data.setValue( QwtLegendData::TitleRole,
+                       QVariant::fromValue( d_data->barTitles[i] ) );
 
         if ( !legendIconSize().isEmpty() )
         {
-            QVariant iconValue;
-            qVariantSetValue( iconValue, 
-                legendIcon( i, legendIconSize() ) );
-
-            data.setValue( QwtLegendData::IconRole, iconValue );
+            data.setValue( QwtLegendData::IconRole,
+                           QVariant::fromValue( legendIcon( i, legendIconSize() ) ) );
         }
 
         list += data;

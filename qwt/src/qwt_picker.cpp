@@ -506,13 +506,13 @@ QwtText QwtPicker::trackerText( const QPoint &pos ) const
     switch ( rubberBand() )
     {
         case HLineRubberBand:
-            label.sprintf( "%d", pos.y() );
+            label = QString::number( pos.y() );
             break;
-        case VLineRubberBand:
-            label.sprintf( "%d", pos.x() );
-            break;
-        default:
-            label.sprintf( "%d, %d", pos.x(), pos.y() );
+            case VLineRubberBand:
+                label = QString::number( pos.x() );
+                break;
+                default:
+                    label = QString::number( pos.x() ) + ", " + QString::number( pos.y() );
     }
     return label;
 }
@@ -1064,8 +1064,13 @@ void QwtPicker::widgetMouseDoubleClickEvent( QMouseEvent *mouseEvent )
 */
 void QwtPicker::widgetWheelEvent( QWheelEvent *wheelEvent )
 {
-    if ( pickArea().contains( wheelEvent->pos() ) )
-        d_data->trackerPosition = wheelEvent->pos();
+#if QT_VERSION < 0x050e00
+    const QPoint wheelPos = wheelEvent->pos();
+#else
+    const QPoint wheelPos = wheelEvent->position().toPoint();
+#endif
+    if ( pickArea().contains( wheelPos ) )
+        d_data->trackerPosition = wheelPos;
     else
         d_data->trackerPosition = QPoint( -1, -1 );
 

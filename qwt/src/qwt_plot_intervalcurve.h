@@ -76,7 +76,7 @@ public:
     //! Paint attributes
     typedef QFlags<PaintAttribute> PaintAttributes;
 
-    explicit QwtPlotIntervalCurve( const QString &title = QString::null );
+    explicit QwtPlotIntervalCurve( const QString &title = QString() );
     explicit QwtPlotIntervalCurve( const QwtText &title );
 
     virtual ~QwtPlotIntervalCurve();

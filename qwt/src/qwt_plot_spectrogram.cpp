@@ -280,7 +280,7 @@ bool QwtPlotSpectrogram::testConrecFlag(
 void QwtPlotSpectrogram::setContourLevels( const QList<double> &levels )
 {
     d_data->contourLevels = levels;
-    qSort( d_data->contourLevels );
+    std::sort( d_data->contourLevels.begin(), d_data->contourLevels.end() );
 
     legendChanged();
     itemChanged();
@@ -416,7 +416,12 @@ QImage QwtPlotSpectrogram::renderImage(
 
     d_data->data->initRaster( area, image.size() );
 
-#if QT_VERSION >= 0x040400 && !defined(QT_NO_QFUTURE)
+#if DEBUG_RENDER
+    QElapsedTimer time;
+    time.start();
+#endif
+
+#if !defined( QT_NO_QFUTURE )
     uint numThreads = renderThreadCount();
 
     if ( numThreads <= 0 )
@@ -427,7 +432,9 @@ QImage QwtPlotSpectrogram::renderImage(
 
     const int numRows = imageSize.height() / numThreads;
 
-    QList< QFuture<void> > futures;
+    QVector< QFuture< void > > futures;
+    futures.reserve( numThreads - 1 );
+
     for ( uint i = 0; i < numThreads; i++ )
     {
         QRect tile( 0, i * numRows, image.width(), numRows );
@@ -439,16 +446,26 @@ QImage QwtPlotSpectrogram::renderImage(
         else
         {
             futures += QtConcurrent::run(
-                this, &QwtPlotSpectrogram::renderTile,
-                xMap, yMap, tile, &image );
+#if QT_VERSION >= 0x060000
+        &QwtPlotSpectrogram::renderTile, this,
+#else
+        this, &QwtPlotSpectrogram::renderTile,
+#endif
+        xMap, yMap, tile, &image );
         }
     }
+
     for ( int i = 0; i < futures.size(); i++ )
         futures[i].waitForFinished();
 
-#else // QT_VERSION < 0x040400
+#else
     const QRect tile( 0, 0, image.width(), image.height() );
     renderTile( xMap, yMap, tile, &image );
+#endif
+
+#if DEBUG_RENDER
+    const qint64 elapsed = time.elapsed();
+    qDebug() << "renderImage" << imageSize << elapsed;
 #endif
 
     d_data->data->discardRaster();

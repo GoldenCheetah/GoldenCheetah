@@ -161,6 +161,19 @@ private:
     QPointF d_origin;
 };
 
+static void qwtFillRegion( QPainter* painter, const QRegion& region )
+{
+#if QT_VERSION >= 0x050800
+    for ( QRegion::const_iterator it = region.cbegin();
+    it != region.cend(); ++it )
+    {
+        painter->drawRect( *it );
+    }
+#else
+    painter->drawRects( region.rects() );
+#endif
+}
+
 static void qwtDrawBackground( QPainter *painter, QwtPlotCanvas *canvas )
 {
     painter->save();
@@ -180,76 +193,22 @@ static void qwtDrawBackground( QPainter *painter, QwtPlotCanvas *canvas )
     }
     else if ( brush.gradient() )
     {
-        QVector<QRect> rects;
+        const bool fillClipRegion =
+                brush.gradient()->coordinateMode() != QGradient::ObjectBoundingMode;
 
-        if ( brush.gradient()->coordinateMode() == QGradient::ObjectBoundingMode )
-        {
-            rects += canvas->rect();
-        } 
-        else 
-        {
-            rects = painter->clipRegion().rects();
-        }
+        painter->setPen( Qt::NoPen );
+        painter->setBrush( brush );
 
-#if 1
-        bool useRaster = false;
-
-        if ( painter->paintEngine()->type() == QPaintEngine::X11 )
-        {
-            // Qt 4.7.1: gradients on X11 are broken ( subrects + 
-            // QGradient::StretchToDeviceMode ) and horrible slow.
-            // As workaround we have to use the raster paintengine.
-            // Even if the QImage -> QPixmap translation is slow
-            // it is three times faster, than using X11 directly
-
-            useRaster = true;
-        }
-#endif
-        if ( useRaster )
-        {
-            QImage::Format format = QImage::Format_RGB32;
-
-            const QGradientStops stops = brush.gradient()->stops();
-            for ( int i = 0; i < stops.size(); i++ )
-            {
-                if ( stops[i].second.alpha() != 255 )
-                {
-                    // don't use Format_ARGB32_Premultiplied. It's
-                    // recommended by the Qt docs, but QPainter::drawImage()
-                    // is horrible slow on X11.
-
-                    format = QImage::Format_ARGB32;
-                    break;
-                }
-            }
-            
-            QImage image( canvas->size(), format );
-
-            QPainter p( &image );
-            p.setPen( Qt::NoPen );
-            p.setBrush( brush );
-
-            p.drawRects( rects );
-
-            p.end();
-
-            painter->drawImage( 0, 0, image );
-        }
+        if ( fillClipRegion )
+            qwtFillRegion( painter, painter->clipRegion() );
         else
-        {
-            painter->setPen( Qt::NoPen );
-            painter->setBrush( brush );
-
-            painter->drawRects( rects );
-        }
+            painter->drawRect( canvas->rect() );
     }
     else
     {
         painter->setPen( Qt::NoPen );
         painter->setBrush( brush );
-
-        painter->drawRects( painter->clipRegion().rects() );
-
+        qwtFillRegion( painter, painter->clipRegion() );
     }
 
     painter->restore();
@@ -929,26 +888,25 @@ void QwtPlotCanvas::drawBorder( QPainter *painter )
     {
         if ( frameWidth() > 0 )
         {
-            QwtPainter::drawRoundedFrame( painter, QRectF( frameRect() ), 
+            QwtPainter::drawRoundedFrame( painter, QRectF( frameRect() ),
                 d_data->borderRadius, d_data->borderRadius,
                 palette(), frameWidth(), frameStyle() );
         }
     }
     else
     {
-#if QT_VERSION >= 0x040500
-        QStyleOptionFrameV3 opt;
-        opt.init(this);
-
         int frameShape  = frameStyle() & QFrame::Shape_Mask;
         int frameShadow = frameStyle() & QFrame::Shadow_Mask;
+#if QT_VERSION < 0x050000
+        QStyleOptionFrameV3 opt;
+#else
+        QStyleOptionFrame opt;
+#endif
+        opt.initFrom( this );
 
         opt.frameShape = QFrame::Shape( int( opt.frameShape ) | frameShape );
-#if 0
-        opt.rect = frameRect();
-#endif
 
-        switch (frameShape) 
+        switch (frameShape)
         {
             case QFrame::Box:
             case QFrame::HLine:
@@ -958,24 +916,21 @@ void QwtPlotCanvas::drawBorder( QPainter *painter )
             {
                 opt.lineWidth = lineWidth();
                 opt.midLineWidth = midLineWidth();
-                break; 
+                break;
             }
-            default: 
+            default:
             {
                 opt.lineWidth = frameWidth();
                 break;
             }
         }
-    
+
         if ( frameShadow == Sunken )
             opt.state |= QStyle::State_Sunken;
         else if ( frameShadow == Raised )
             opt.state |= QStyle::State_Raised;
 
         style()->drawControl(QStyle::CE_ShapedFrame, &opt, painter, this);
-#else
-        drawFrame( painter );
-#endif
     }
 }
 

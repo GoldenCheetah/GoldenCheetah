@@ -102,7 +102,8 @@ private:
         static const QColor white( Qt::white );
 
         const QFontMetrics fm( font );
-        QPixmap pm( fm.width( dummy ), fm.height() );
+
+        QPixmap pm( QwtPainter::horizontalAdvance( fm, dummy ), fm.height() );
         pm.fill( white );
 
         QPainter p( &pm );
