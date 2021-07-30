@@ -71,12 +71,16 @@ class OverviewItemConfig : public QWidget
         // program editor
         void setErrors(QStringList &errors);
 
+        // legacy data table selector (connected to legacySelector below)
+        void setProgram(int n);
+
     private:
 
         // the widget we are configuring
         ChartSpaceItem *item;
 
         // editor for program
+        QComboBox *legacySelector; // used for configuring the data table widget
         DataFilterEdit *editor;
         SearchFilterBox *filterEditor;
         QLabel *errors;
@@ -141,6 +145,10 @@ class DataOverviewItem : public ChartSpaceItem
 
         // create and config
         static ChartSpaceItem *create(ChartSpace *parent);
+
+        // transition support, get a program to mimic
+        // the look and feel of the old ride summary
+        static QString getLegacyProgram(int, DataFilterRuntime &);
 
         // settings
         QString program;

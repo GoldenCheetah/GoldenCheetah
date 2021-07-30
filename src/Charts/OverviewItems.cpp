@@ -138,13 +138,25 @@ DataOverviewItem::~DataOverviewItem()
 {
 }
 
-ChartSpaceItem *
-DataOverviewItem::create(ChartSpace *parent) {
+#define DATA_TABLE_TOTALS      1
+#define DATA_TABLE_AVERAGES    2
+#define DATA_TABLE_MAXIMUMS    3
+#define DATA_TABLE_METRICS     4
+#define DATA_TABLE_ZONES       5
+#define DATA_TABLE_TRENDS      9
 
-//
-// Trends view default program
-//
-QString trends =
+// this is the old metric configuration, now deprecated, we will look it up
+// when setting the legacy metrics, as a convenience for users
+#define GC_SETTINGS_SUMMARY_METRICS     "<global-general>rideSummaryWindow/summaryMetrics"
+
+QString DataOverviewItem::getLegacyProgram(int type, DataFilterRuntime &rt)
+{
+    QString program;
+
+    switch(type) {
+
+    case DATA_TABLE_TRENDS:
+            program =
             "{\n"
             "\n"
             "# column names, if using metrics then best\n"
@@ -188,11 +200,180 @@ QString trends =
             "} \n"
             "\n"
             "}";
+    break;
 
-    //
-    // Activity view default program
-    //
-    QString totals =
+    case DATA_TABLE_AVERAGES:
+    program =
+            "{\n"
+            "\n"
+            "# column names, if using metrics then best\n"
+            "# to use name() to get correct name for locale\n"
+            "# otherwise it won't translate to other languages\n"
+            "names { \n"
+            "    metricname(Athlete_Weight,\n"
+            "         Average_Speed,\n"
+            "         Average_Power,\n"
+            "         Average_Heart_Rate,\n"
+            "         Average_Cadence);\n"
+            "}\n"
+            "\n"
+            "# column units, if using metrics then best\n"
+            "# to use unit() function to get correct string\n"
+            "# for locale and metric/imperial\n"
+            "units { \n"
+            "    metricunit(Athlete_Weight,\n"
+            "         Average_Speed,\n"
+            "         Average_Power,\n"
+            "         Average_Heart_Rate,\n"
+            "         Average_Cadence);\n"
+            "}\n"
+            "\n"
+            "# values to display as doubles or strings\n"
+            "# if using metrics always best to use asstring()\n"
+            "# to convert correctly with dp, metric/imperial\n"
+            "# or specific formats eg. rowing pace xx/500m\n"
+            "values { \n"
+            "    asstring(Athlete_Weight,\n"
+            "         Average_Speed,\n"
+            "         Average_Power,\n"
+            "         Average_Heart_Rate,\n"
+            "         Average_Cadence); \n"
+            "} \n"
+            "\n"
+            "}\n";
+    break;
+
+    case DATA_TABLE_MAXIMUMS:
+    program =
+            "{\n"
+            "\n"
+            "# column names, if using metrics then best\n"
+            "# to use name() to get correct name for locale\n"
+            "# otherwise it won't translate to other languages\n"
+            "names { \n"
+            "    metricname(Max_Speed,\n"
+            "         Max_Power,\n"
+            "         Max_Heartrate,\n"
+            "         Max_Cadence,\n"
+            "         Max_W'_Expended);\n"
+            "}\n"
+            "\n"
+            "# column units, if using metrics then best\n"
+            "# to use unit() function to get correct string\n"
+            "# for locale and metric/imperial\n"
+            "units { \n"
+            "    metricunit(Max_Speed,\n"
+            "         Max_Power,\n"
+            "         Max_Heartrate,\n"
+            "         Max_Cadence,\n"
+            "         Max_W'_Expended);\n"
+            "}\n"
+            "\n"
+            "# values to display as doubles or strings\n"
+            "# if using metrics always best to use asstring()\n"
+            "# to convert correctly with dp, metric/imperial\n"
+            "# or specific formats eg. rowing pace xx/500m\n"
+            "values { \n"
+            "    asstring(Max_Speed,\n"
+            "         Max_Power,\n"
+            "         Max_Heartrate,\n"
+            "         Max_Cadence,\n"
+            "         Max_W'_Expended); \n"
+            "} \n"
+            "\n"
+            "}\n";
+    break;
+
+    case DATA_TABLE_METRICS:
+    {
+        // get a string list of the metrics to show
+        QString s;
+        if (appsettings->contains(GC_SETTINGS_SUMMARY_METRICS)) s = appsettings->value(NULL, GC_SETTINGS_SUMMARY_METRICS).toString();
+        else s = GC_SETTINGS_FAVOURITE_METRICS_DEFAULT;
+        QStringList symbols = s.split(",");
+
+        // convert metric symbols to names we can use in the program
+        QStringList list;
+        QMapIterator<QString, QString> i(rt.lookupMap);
+        while (i.hasNext()) {
+            i.next();
+            if (symbols.contains(i.value())) list << i.key();
+        }
+
+        // generate a program
+        QString metrics = list.join(",\n              ");
+
+        program =
+            "{\n"
+            "\n"
+            "# column names, if using metrics then best\n"
+            "# to use name() to get correct name for locale\n"
+            "# otherwise it won't translate to other languages\n"
+            "names { \n"
+            "    metricname(" + metrics + ");\n"
+            "}\n"
+            "\n"
+            "# column units, if using metrics then best\n"
+            "# to use unit() function to get correct string\n"
+            "# for locale and metric/imperial\n"
+            "units { \n"
+            "    metricunit(" + metrics +  ");\n"
+            "}\n"
+            "\n"
+            "# values to display as doubles or strings\n"
+            "# if using metrics always best to use asstring()\n"
+            "# to convert correctly with dp, metric/imperial\n"
+            "# or specific formats eg. rowing pace xx/500m\n"
+            "values { \n"
+            "    asstring(" + metrics + ");\n"
+            "} \n"
+            "\n"
+            "}\n";
+    }
+    break;
+
+    case DATA_TABLE_ZONES:
+    program =
+            "{\n"
+            "\n"
+            "# column names, if using metrics then best\n"
+            "# to use name() to get correct name for locale\n"
+            "# otherwise it won't translate to other languages\n"
+            "names { \n"
+            "    c(\"Name\",\"Description\",\"Low\",\"High\",\"Time\",\"%\");\n"
+            "}\n"
+            "\n"
+            "# column units, if using metrics then best\n"
+            "# to use unit() function to get correct string\n"
+            "# for locale and metric/imperial\n"
+            "units {\n"
+            "\n"
+            "    c(\"\",\n"
+            "      \"\",\n"
+            "      zones(bike,power,units),\n"
+            "      zones(bike,power,units), \"\", \"\");\n"
+            "}\n"
+            "\n"
+            "# values to display as doubles or strings\n"
+            "# if using metrics always best to use asstring()\n"
+            "# to convert correctly with dp, metric/imperial\n"
+            "# or specific formats eg. rowing pace xx/500m\n"
+            "values { \n"
+            "\n"
+            "   c( zones(bike,power,name),\n"
+            "      zones(bike,power,description),\n"
+            "      zones(bike,power,low),\n"
+            "      zones(bike,power,high),\n"
+            "      zones(bike,power,time),\n"
+            "      zones(bike,power,percent));\n"
+            "} \n"
+            "\n"
+            "}\n";
+    break;
+
+    default:
+    case DATA_TABLE_TOTALS:
+    program =
             "{\n"
             "\n"
             "# column names, if using metrics then best\n"
@@ -233,9 +414,20 @@ QString trends =
             "} \n"
             "\n"
             "}\n";
+    break;
 
-    if (parent->scope == ANALYSIS) return new DataOverviewItem(parent, "Totals", totals);
-    else return new DataOverviewItem(parent, "Activities", trends);
+    }
+    return program;
+}
+
+ChartSpaceItem *
+DataOverviewItem::create(ChartSpace *parent) {
+
+    // temporary - bit expensive, but creation is expensive anyway
+    DataFilter df(parent, parent->context);
+
+    if (parent->scope == ANALYSIS) return new DataOverviewItem(parent, "Totals", getLegacyProgram(DATA_TABLE_TOTALS, df.rt));
+    else return new DataOverviewItem(parent, "Activities", getLegacyProgram(DATA_TABLE_TRENDS, df.rt));
 }
 
 RouteOverviewItem::RouteOverviewItem(ChartSpace *parent, QString name) : ChartSpaceItem(parent, name)
@@ -2757,6 +2949,7 @@ OverviewItemConfig::OverviewItemConfig(ChartSpaceItem *item) : QWidget(NULL), it
     QVBoxLayout *main = new QVBoxLayout(this);
     QFormLayout *layout = new QFormLayout();
     main->addLayout(layout);
+
     if (item->type != OverviewItemType::KPI && item->type != OverviewItemType::DATATABLE) main->addStretch();
 
     // everyone except PMC
@@ -2764,6 +2957,19 @@ OverviewItemConfig::OverviewItemConfig(ChartSpaceItem *item) : QWidget(NULL), it
         name = new QLineEdit(this);
         connect(name, SIGNAL(textChanged(QString)), this, SLOT(dataChanged()));
         layout->addRow(tr("Name"), name);
+    }
+
+    if (item->parent->scope & OverviewScope::ANALYSIS && item->type == OverviewItemType::DATATABLE) {
+        legacySelector = new QComboBox(this);
+        legacySelector->addItem("User defined", 0);
+        legacySelector->addItem("Totals", DATA_TABLE_TOTALS);
+        legacySelector->addItem("Averages", DATA_TABLE_AVERAGES);
+        legacySelector->addItem("Maximums", DATA_TABLE_MAXIMUMS);
+        legacySelector->addItem("Metrics", DATA_TABLE_METRICS);
+        legacySelector->addItem("Zones", DATA_TABLE_ZONES);
+
+        layout->addRow(tr("Legacy"), legacySelector);
+        connect(legacySelector, SIGNAL(currentIndexChanged(int)), this, SLOT(setProgram(int)));
     }
 
     // trends view always has a filter
@@ -2944,6 +3150,16 @@ OverviewItemConfig::OverviewItemConfig(ChartSpaceItem *item) : QWidget(NULL), it
 
     // reflect current config
     setWidgets();
+}
+
+void
+OverviewItemConfig::setProgram(int index)
+{
+    if (index > 0) {
+        // for metric lookup
+        DataFilter df(item->parent, item->parent->context);
+        editor->setText(DataOverviewItem::getLegacyProgram(index, df.rt));
+    }
 }
 
 void
