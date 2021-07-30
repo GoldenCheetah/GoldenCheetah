@@ -1307,7 +1307,7 @@ FieldDefinition::fingerprint(QList<FieldDefinition> list)
         ba.append(def.values.join(""));
     }
 
-    return qChecksum(ba);
+    return qChecksum(ba, ba.length());
 }
 
 QCompleter *
@@ -1368,7 +1368,7 @@ KeywordDefinition::fingerprint(QList<KeywordDefinition> list)
         ba.append(def.tokens.join(""));
     }
 
-    return qChecksum(ba);
+    return qChecksum(ba, ba.length());
 }
 
 /*----------------------------------------------------------------------

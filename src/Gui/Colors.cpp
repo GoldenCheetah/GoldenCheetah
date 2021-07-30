@@ -100,7 +100,7 @@ unsigned long Colors::fingerprint(const Colors *set)
         ba.append(set->color.name());
         set++;
     }
-    return qChecksum(ba);
+    return qChecksum(ba, ba.length());
 }
 
 #ifdef Q_OS_WIN

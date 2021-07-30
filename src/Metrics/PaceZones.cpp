@@ -998,7 +998,7 @@ PaceZones::getFingerprint() const
     }
     QByteArray ba = QByteArray::number(x);
 
-    return qChecksum(ba);
+    return qChecksum(ba, ba.length()); 
 }
 
 quint16
@@ -1022,7 +1022,7 @@ PaceZones::getFingerprint(QDate forDate) const
     }
     QByteArray ba = QByteArray::number(x);
 
-    return qChecksum(ba);
+    return qChecksum(ba, ba.length()); 
 }
 
 double

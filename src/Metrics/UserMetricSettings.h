@@ -61,7 +61,7 @@ class UserMetricSettings {
                                     QString::number(this->conversionSum) +
                                     this->program).toUtf8();
 
-            return qChecksum(ba);
+            return qChecksum(ba, ba.length());
         }
 
         QString symbol,

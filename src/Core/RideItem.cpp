@@ -167,7 +167,7 @@ RideItem::metaCRC()
         ba.append(i.key());
         ba.append(i.value());
     }
-    return qChecksum(ba);
+    return qChecksum(ba, ba.length());
 }
 
 RideFile *RideItem::ride(bool open)
