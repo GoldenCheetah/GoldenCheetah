@@ -46,7 +46,8 @@ class ProgressBar;
 #define ROUTEPOINTS 250
 
 // types we use start from 100 to avoid clashing with main chart types
-enum OverviewItemType { RPE=100, METRIC, META, ZONE, INTERVAL, PMC, ROUTE, KPI, TOPN, DONUT, ACTIVITIES, ATHLETE, DATATABLE };
+enum OverviewItemType { RPE=100, METRIC, META, ZONE, INTERVAL, PMC, ROUTE, KPI,
+                        TOPN, DONUT, ACTIVITIES, ATHLETE, DATATABLE, USERCHART };
 
 //
 // Configuration widget for ALL Overview Items
@@ -110,7 +111,8 @@ class KPIOverviewItem : public ChartSpaceItem
         void itemGeometryChanged();
         void setData(RideItem *item);
         void setDateRange(DateRange);
-        QWidget *config() { return new OverviewItemConfig(this); }
+
+        QWidget *config() { return configwidget ; }
 
         // create and config
         static ChartSpaceItem *create(ChartSpace *parent) { return new KPIOverviewItem(parent, "CP Estimate", 0, 360, "{ round(estimate(cp3,cp)); }", "watts", false); }
@@ -125,6 +127,7 @@ class KPIOverviewItem : public ChartSpaceItem
 
         // progress bar viz
         ProgressBar *progressbar;
+        OverviewItemConfig *configwidget;
 };
 
 class DataOverviewItem : public ChartSpaceItem
@@ -141,7 +144,8 @@ class DataOverviewItem : public ChartSpaceItem
         void setData(RideItem *item);
         void setDateRange(DateRange);
         void postProcess(); // work with data returned from program
-        QWidget *config() { return new OverviewItemConfig(this); }
+
+        QWidget *config() { return configwidget; }
 
         // create and config
         static ChartSpaceItem *create(ChartSpace *parent);
@@ -160,6 +164,7 @@ class DataOverviewItem : public ChartSpaceItem
         // display control
         bool multirow;
         QList<double> columnWidths;
+        OverviewItemConfig *configwidget;
 };
 
 class RPEOverviewItem : public ChartSpaceItem
@@ -175,7 +180,8 @@ class RPEOverviewItem : public ChartSpaceItem
         void itemGeometryChanged();
         void setData(RideItem *item);
         void setDateRange(DateRange) {} // doesn't support trends view
-        QWidget *config() { return new OverviewItemConfig(this); }
+
+        QWidget *config() { return configwidget; }
 
         // create and config
         static ChartSpaceItem *create(ChartSpace *parent) { return new RPEOverviewItem(parent, "RPE"); }
@@ -187,6 +193,7 @@ class RPEOverviewItem : public ChartSpaceItem
         // for setting sparkline & painting
         bool up, showrange;
         QString value, upper, lower, mean;
+        OverviewItemConfig *configwidget;
 };
 
 class MetricOverviewItem : public ChartSpaceItem
@@ -202,7 +209,8 @@ class MetricOverviewItem : public ChartSpaceItem
         void itemGeometryChanged();
         void setData(RideItem *item);
         void setDateRange(DateRange);
-        QWidget *config() { return new OverviewItemConfig(this); }
+
+        QWidget *config() { return configwidget; }
 
         // create and config
         static ChartSpaceItem *create(ChartSpace *parent) { return new MetricOverviewItem(parent, "PowerIndex", "power_index"); }
@@ -219,6 +227,8 @@ class MetricOverviewItem : public ChartSpaceItem
         int rank; // rank 1,2 or 3
         QString beststring;
         QPixmap gold, silver, bronze; // medals
+
+        OverviewItemConfig *configwidget;
 };
 
 // top N uses this to hold details for date range
@@ -259,7 +269,8 @@ class TopNOverviewItem : public ChartSpaceItem
         void setData(RideItem *) {} // doesn't support analysis view
         void setDateRange(DateRange);
         QRectF hotspot();
-        QWidget *config() { return new OverviewItemConfig(this); }
+
+        QWidget *config() { return configwidget; }
 
         // create and config
         static ChartSpaceItem *create(ChartSpace *parent) { return new TopNOverviewItem(parent, "PowerIndex", "power_index"); }
@@ -280,6 +291,8 @@ class TopNOverviewItem : public ChartSpaceItem
 
         // interaction
         bool click;
+
+        OverviewItemConfig *configwidget;
 };
 
 class MetaOverviewItem : public ChartSpaceItem
@@ -295,7 +308,8 @@ class MetaOverviewItem : public ChartSpaceItem
         void itemGeometryChanged();
         void setData(RideItem *item);
         void setDateRange(DateRange) {} // doesn't support trends view
-        QWidget *config() { return new OverviewItemConfig(this); }
+
+        QWidget *config() { return configwidget; }
 
         // create and config
         static ChartSpaceItem *create(ChartSpace *parent) { return new MetaOverviewItem(parent, tr("Workout Code"), "Workout Code"); }
@@ -308,6 +322,8 @@ class MetaOverviewItem : public ChartSpaceItem
         QString value, upper, lower, mean;
 
         Sparkline *sparkline;
+
+        OverviewItemConfig *configwidget;
 };
 
 class PMCOverviewItem : public ChartSpaceItem
@@ -323,7 +339,8 @@ class PMCOverviewItem : public ChartSpaceItem
         void itemGeometryChanged();
         void setData(RideItem *item);
         void setDateRange(DateRange) {} // doesn't support trends view
-        QWidget *config() { return new OverviewItemConfig(this); }
+
+        QWidget *config() { return configwidget ; }
 
         // create and config
         static ChartSpaceItem *create(ChartSpace *parent) { return new PMCOverviewItem(parent, "coggan_tss"); }
@@ -331,6 +348,8 @@ class PMCOverviewItem : public ChartSpaceItem
         QString symbol;
 
         double sts, lts, sb, rr, stress;
+
+        OverviewItemConfig *configwidget;
 };
 
 class ZoneOverviewItem : public ChartSpaceItem
@@ -347,7 +366,8 @@ class ZoneOverviewItem : public ChartSpaceItem
         void setData(RideItem *item);
         void setDateRange(DateRange);
         void dragChanged(bool x);
-        QWidget *config() { return new OverviewItemConfig(this); }
+
+        QWidget *config() { return configwidget; }
 
         // create and config
         static ChartSpaceItem *create(ChartSpace *parent) { return new ZoneOverviewItem(parent, tr("Power Zones"), RideFile::watts, false); }
@@ -360,6 +380,8 @@ class ZoneOverviewItem : public ChartSpaceItem
         QBarSeries *barseries;
         QStringList categories;
         QBarCategoryAxis *barcategoryaxis;
+
+        OverviewItemConfig *configwidget;
 };
 
 struct aggmeta {
@@ -384,7 +406,8 @@ class DonutOverviewItem : public ChartSpaceItem
         void setData(RideItem *) {} // trends view only
         void setDateRange(DateRange);
         void dragChanged(bool x);
-        QWidget *config() { return new OverviewItemConfig(this); }
+
+        QWidget *config() { return configwidget ; }
 
         // create and config
         static ChartSpaceItem *create(ChartSpace *parent) { return new DonutOverviewItem(parent, tr("Sport"), "ride_count", "Sport"); }
@@ -403,6 +426,8 @@ class DonutOverviewItem : public ChartSpaceItem
         QBarSeries *barseries;
         QBarCategoryAxis *barcategoryaxis;
 
+        OverviewItemConfig *configwidget;
+
     public slots:
         void hoverSlice(QPieSlice *slice, bool state);
 };
@@ -420,12 +445,15 @@ class RouteOverviewItem : public ChartSpaceItem
         void itemGeometryChanged();
         void setData(RideItem *item);
         void setDateRange(DateRange) {} // doesn't support trends view
-        QWidget *config() { return new OverviewItemConfig(this); }
+
+        QWidget *config() { return configwidget; }
 
         // create and config
         static ChartSpaceItem *create(ChartSpace *parent) { return new RouteOverviewItem(parent, tr("Route")); }
 
         Routeline *routeline;
+
+        OverviewItemConfig *configwidget;
 };
 
 class IntervalOverviewItem : public ChartSpaceItem
@@ -441,7 +469,8 @@ class IntervalOverviewItem : public ChartSpaceItem
         void itemGeometryChanged();
         void setData(RideItem *item);
         void setDateRange(DateRange);
-        QWidget *config() { return new OverviewItemConfig(this); }
+
+        QWidget *config() { return configwidget; }
 
         // create and config
         static ChartSpaceItem *createInterval(ChartSpace *parent) { return new IntervalOverviewItem(parent, tr("Intervals"), "elapsed_time", "average_power", "workout_time"); }
@@ -450,6 +479,8 @@ class IntervalOverviewItem : public ChartSpaceItem
         QString xsymbol, ysymbol, zsymbol;
         int xdp, ydp;
         BubbleViz *bubble;
+
+        OverviewItemConfig *configwidget;
 };
 
 

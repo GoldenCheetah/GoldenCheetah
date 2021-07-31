@@ -72,6 +72,7 @@ class OverviewConfigDialog : public QDialog
 
     public:
         OverviewConfigDialog(ChartSpaceItem*);
+        ~OverviewConfigDialog();
 
 
     public slots:

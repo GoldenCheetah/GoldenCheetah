@@ -34,7 +34,8 @@
 //
 
 // Main wizard - if passed a service name we are in edit mode, not add mode.
-AddChartWizard::AddChartWizard(Context *context, ChartSpace *space, int scope) : QWizard(context->mainWindow), context(context), scope(scope), space(space)
+AddChartWizard::AddChartWizard(Context *context, ChartSpace *space, int scope, ChartSpaceItem * &added)
+    : QWizard(context->mainWindow), context(context), scope(scope), space(space), added(added)
 {
     HelpWhatsThis *help = new HelpWhatsThis(this);
     if (scope & OverviewScope::ANALYSIS) this->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::ChartRides_Overview));
@@ -155,6 +156,18 @@ AddChartConfig::initializePage()
     main->addWidget(wizard->config);
     main->addStretch();
     wizard->config->show();
+}
+
+AddChartConfig::~AddChartConfig()
+{
+    // spare the config widget being destroyed
+    if (wizard->config) {
+        wizard->config->hide();
+        main->removeWidget(wizard->config);
+        wizard->config->setParent(NULL);
+        wizard->config = NULL;
+        wizard->added = wizard->item;
+    }
 }
 
 bool

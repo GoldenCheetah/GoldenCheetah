@@ -19,6 +19,7 @@
 #include "Overview.h"
 #include "ChartSpace.h"
 #include "OverviewItems.h"
+#include "UserChartOverviewItem.h"
 #include "AddChartWizard.h"
 #include "Utils.h"
 #include "HelpWhatsThis.h"
@@ -73,8 +74,19 @@ OverviewWindow::OverviewWindow(Context *context, int scope) : GcChartWindow(cont
 void
 OverviewWindow::addTile()
 {
-    AddChartWizard *p = new AddChartWizard(context, space, scope);
+    ChartSpaceItem *added = NULL; // tell us what you added...
+
+    AddChartWizard *p = new AddChartWizard(context, space, scope, added);
     p->exec(); // no mem leak delete on close dialog
+
+    // set ride / date range if we added one.....
+    if (added) {
+
+        // update after config changed
+        if (added->parent->scope & OverviewScope::ANALYSIS && added->parent->currentRideItem) added->setData(added->parent->currentRideItem);
+        if (added->parent->scope & OverviewScope::TRENDS ) added->setDateRange(added->parent->currentDateRange);
+
+    }
 }
 
 void
@@ -175,6 +187,12 @@ OverviewWindow::getConfiguration() const
                 config += "\"istime\":" + QString("%1").arg(kpi->istime) + ",";
                 config += "\"start\":" + QString("%1").arg(kpi->start) + ",";
                 config += "\"stop\":" + QString("%1").arg(kpi->stop) + ",";
+            }
+            break;
+        case OverviewItemType::USERCHART:
+            {
+                UserChartOverviewItem *uc = reinterpret_cast<UserChartOverviewItem*>(item);
+                config += "\"settings\":\"" + QString("%1").arg(Utils::jsonprotect(uc->getConfig())) + "\",";
             }
             break;
         }
@@ -513,6 +531,15 @@ OverviewWindow::setConfiguration(QString config)
                     space->addItem(order,column,span,deep, add);
                 }
                 break;
+
+            case OverviewItemType::USERCHART :
+                {
+                    QString settings=Utils::jsonunprotect(obj["settings"].toString());
+                    add = new UserChartOverviewItem(space, name, settings);
+                    add->datafilter = datafilter;
+                    space->addItem(order,column,span,deep, add);
+                }
+                break;
             }
         }
     }
@@ -533,6 +560,7 @@ OverviewConfigDialog::OverviewConfigDialog(ChartSpaceItem*item) : QDialog(NULL),
 
     main = new QVBoxLayout(this);
     main->addWidget(item->config());
+    item->config()->show();
 
     // buttons
     QHBoxLayout *buttons = new QHBoxLayout();
@@ -550,13 +578,25 @@ OverviewConfigDialog::OverviewConfigDialog(ChartSpaceItem*item) : QDialog(NULL),
     connect(remove, SIGNAL(clicked()), this, SLOT(removeItem()));
 }
 
+OverviewConfigDialog::~OverviewConfigDialog()
+{
+    if (item) {
+
+        main->removeWidget(item->config());
+        item->config()->setParent(NULL);
+        item->config()->hide();
+    }
+}
+
 void
 OverviewConfigDialog::close()
 {
     // remove from the layout- unless we just deleted it !
     if (item) {
 
-        main->removeWidget(item->config()); // doesn't work xxx todo !
+        main->removeWidget(item->config());
+        item->config()->setParent(NULL);
+        item->config()->hide();
 
         // update geometry to show hide elements
         item->itemGeometryChanged();
@@ -565,6 +605,7 @@ OverviewConfigDialog::close()
         if (item->parent->scope & OverviewScope::ANALYSIS && item->parent->currentRideItem) item->setData(item->parent->currentRideItem);
         if (item->parent->scope & OverviewScope::TRENDS ) item->setDateRange(item->parent->currentDateRange);
 
+        item=NULL;
     }
 
     accept();

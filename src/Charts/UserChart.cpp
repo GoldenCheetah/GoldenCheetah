@@ -35,18 +35,19 @@
 #include <QScrollArea>
 #include <QDialog>
 
-UserChart::UserChart(Context *context, bool rangemode) : GcChartWindow(context), context(context), rangemode(rangemode), stale(true), last(NULL)
+UserChart::UserChart(QWidget *parent, Context *context, bool rangemode)
+    : QWidget(parent), context(context), rangemode(rangemode), stale(true), last(NULL), ride(NULL)
 {
     HelpWhatsThis *helpContents = new HelpWhatsThis(this);
     this->setWhatsThis(helpContents->getWhatsThisText(HelpWhatsThis::Chart_User));
 
     // the config
-    settingsTool = new UserChartSettings(context, rangemode, chartinfo, seriesinfo, axisinfo);
-    setControls(settingsTool);
+    settingsTool_ = new UserChartSettings(context, rangemode, chartinfo, seriesinfo, axisinfo);
+    settingsTool_->hide();
 
     // layout
     QVBoxLayout *main=new QVBoxLayout();
-    setChartLayout(main); // we're a gcchartwindow
+    setLayout(main);
     main->setSpacing(0);
     main->setContentsMargins(0,0,0,0);
 
@@ -54,20 +55,12 @@ UserChart::UserChart(Context *context, bool rangemode) : GcChartWindow(context),
     chart = new GenericChart(this, context);
     main->addWidget(chart);
 
-    // when a ride is selected
-    if (!rangemode) {
-        connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(setRide(RideItem*)));
-    } else {
-        connect(this, SIGNAL(dateRangeChanged(DateRange)), SLOT(setDateRange(DateRange)));
-        connect(context, SIGNAL(homeFilterChanged()), this, SLOT(refresh()));
-        connect(context, SIGNAL(filterChanged()), this, SLOT(refresh()));
-        connect(this, SIGNAL(perspectiveFilterChanged(QString)), this, SLOT(refresh()));
-    }
+    // when a ride is selected, etc we get notified by our parent
+    // which is a UserChartWindow or a UserChartOverviewItem
 
-    // need to refresh when chart settings change
-    connect(settingsTool, SIGNAL(chartConfigChanged()), this, SLOT(chartConfigChanged()));
+    // but we do need to refresh when chart settings change
+    connect(settingsTool_, SIGNAL(chartConfigChanged()), this, SLOT(chartConfigChanged()));
     connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
-    connect(this, SIGNAL(perspectiveChanged(Perspective*)), this, SLOT(refresh()));
 
     configChanged(0);
 }
@@ -97,25 +90,25 @@ UserChart::configChanged(qint32)
 void
 UserChart::chartConfigChanged()
 {
-    if (!myRideItem) return;
+    if (!ride) return;
 
     stale = true;
 
     if (rangemode) setDateRange(context->currentDateRange());
-    else setRide(myRideItem);
+    else setRide(ride);
 }
 
 //
 // Ride selected
 //
 void
-UserChart::setRide(RideItem *item)
+UserChart::setRide(const RideItem *item)
 {
     // not being shown so just ignore
-    if (!amVisible()) { stale=true; return; }
+    if (!isVisible()) { stale=true; return; }
 
     // make sure its not NULL etc
-    if (item == NULL || item->ride() == NULL) return;
+    if (item == NULL || const_cast<RideItem*>(item)->ride() == NULL) return;
 
     // have we already seen it?
     if (last == item && !stale) return;
@@ -126,7 +119,7 @@ UserChart::setRide(RideItem *item)
     ride = last = item;
     stale = false;
 
-    dr=DateRange(); // always set to no range
+    //dr=DateRange(); // always set to no range
 
     refresh();
  }
@@ -134,13 +127,13 @@ UserChart::setRide(RideItem *item)
  void
  UserChart::setDateRange(DateRange d)
  {
-    if (!amVisible()) return;
+    if (!isVisible()) return;
 
     // we don't really need to worry too much
     // about not refreshing as it doesn't get
     // called so often in trends view.
     dr = d;
-    ride = myRideItem; // always current
+    ride = context->currentRideItem(); // always current
 
     refresh();
  }
@@ -148,7 +141,7 @@ UserChart::setRide(RideItem *item)
  void
  UserChart::refresh()
  {
-    if (!amVisible()) { stale=true; return; }
+    if (!isVisible()) { stale=true; return; }
 
     // ok, we've run out of excuses, looks like we need to plot
     chart->initialiseChart(chartinfo.title, chartinfo.type, chartinfo.animate, chartinfo.legendpos, chartinfo.stack, chartinfo.orientation);
@@ -169,7 +162,7 @@ UserChart::setRide(RideItem *item)
 
         // cast so we can work with it
         UserChartData *ucd = static_cast<UserChartData*>(series.user1);
-        ucd->compute(ride, Specification(), dr);
+        ucd->compute(const_cast<RideItem*>(ride), Specification(), dr);
         series.xseries = ucd->x.asNumeric();
         series.yseries = ucd->y.asNumeric();
         series.fseries = ucd->f.asString();
@@ -464,9 +457,9 @@ UserChart::applySettings(QString x)
     }
 
     // update configuration widgets to reflect new settings loaded
-    settingsTool->refreshChartInfo();
-    settingsTool->refreshSeriesTab();
-    settingsTool->refreshAxesTab();
+    settingsTool_->refreshChartInfo();
+    settingsTool_->refreshSeriesTab();
+    settingsTool_->refreshAxesTab();
 
     // config changed...
     chartConfigChanged();
@@ -476,12 +469,15 @@ UserChart::applySettings(QString x)
 // core user chart settings
 //
 UserChartSettings::UserChartSettings(Context *context, bool rangemode, GenericChartInfo &chart, QList<GenericSeriesInfo> &series, QList<GenericAxisInfo> &axes) :
-  context(context), rangemode(rangemode), chartinfo(chart), seriesinfo(series), axisinfo(axes), updating(false)
+  QWidget(NULL), context(context), rangemode(rangemode), chartinfo(chart), seriesinfo(series), axisinfo(axes), updating(false)
 {
     HelpWhatsThis *helpConfig = new HelpWhatsThis(this);
     this->setWhatsThis(helpConfig->getWhatsThisText(HelpWhatsThis::Chart_User));
 
-    QVBoxLayout *layout = new QVBoxLayout(this);
+    setMinimumHeight(350*dpiYFactor);
+    setMinimumWidth(450*dpiXFactor);
+
+    layout = new QVBoxLayout(this);
     tabs = new QTabWidget(this);
     layout->addWidget(tabs);
 
@@ -662,6 +658,14 @@ UserChartSettings::UserChartSettings(Context *context, bool rangemode, GenericCh
     connect(legpos, SIGNAL(currentIndexChanged(QString)), this, SLOT(updateChartInfo()));
     connect(stack, SIGNAL(stateChanged(int)), this, SLOT(updateChartInfo()));
     connect(orientation, SIGNAL(currentIndexChanged(int)), this, SLOT(updateChartInfo()));
+}
+
+void
+UserChartSettings::insertLayout(QLayout *p)
+{
+    // e.g. UserChartOverviewItem adds a layout for editing
+    //      the chart name
+    layout->insertLayout(0, p);
 }
 
 void

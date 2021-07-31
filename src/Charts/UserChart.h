@@ -36,19 +36,18 @@
 // the chart
 class UserChartSettings;
 class DataFilterEdit;
-class UserChart : public GcChartWindow {
+class UserChart : public QWidget {
 
     Q_OBJECT
-
-    // settings are saved as a json document and parsed using qt5 json support
-    // we can rely on JSON support since we also need Qt Charts which is qt5 also
-    Q_PROPERTY(QString settings READ settings WRITE applySettings USER true)
 
     friend class ::Leaf; // data filter eval accessing our curve data
 
     public:
 
-        UserChart(Context *context, bool rangemode);
+        UserChart(QWidget *parent, Context *context, bool rangemode);
+
+        // config widget, for user to configure the chart
+        UserChartSettings *settingsTool() { return settingsTool_; }
 
         // for read and write of settings via chart properties
         QString settings() const;
@@ -57,7 +56,7 @@ class UserChart : public GcChartWindow {
     public slots:
 
         // runtime - ride item changed
-        void setRide(RideItem*);
+        void setRide(const RideItem*);
 
         // runtime - date range was selected
         void setDateRange(DateRange);
@@ -89,13 +88,13 @@ class UserChart : public GcChartWindow {
         Context *context;
         bool rangemode;
         bool stale;
-        RideItem *last; // the last ride we plotted
 
-        RideItem *ride;
+        const RideItem *last; // the last ride we plotted
+        const RideItem *ride;
         DateRange dr;
 
         GenericChart *chart;
-        UserChartSettings *settingsTool;
+        UserChartSettings *settingsTool_;
 };
 
 class UserChartSettings : public QWidget {
@@ -105,6 +104,9 @@ class UserChartSettings : public QWidget {
     public:
         UserChartSettings(Context *, bool rangemode, GenericChartInfo &, QList<GenericSeriesInfo> &, QList<GenericAxisInfo> &);
 
+        // we want some additional config?
+        void insertLayout(QLayout *);
+
     private:
         Context *context;
         bool rangemode;
@@ -113,6 +115,9 @@ class UserChartSettings : public QWidget {
         GenericChartInfo &chartinfo;
         QList<GenericSeriesInfo> &seriesinfo;
         QList<GenericAxisInfo> &axisinfo;
+
+        // layout widget, can have other stuff inserted...
+        QVBoxLayout *layout;
 
         // tabs
         QTabWidget *tabs;

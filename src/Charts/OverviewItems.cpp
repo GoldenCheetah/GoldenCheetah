@@ -37,6 +37,8 @@
 #include "LTMTool.h"
 #include "RideNavigator.h"
 
+#include "UserChartOverviewItem.h"
+
 #include <cmath>
 #include <QGraphicsSceneMouseEvent>
 #include <QGLWidget>
@@ -52,6 +54,7 @@ static bool _registerItems()
     ChartSpaceItemRegistry &registry = ChartSpaceItemRegistry::instance();
 
     // Register      TYPE                          SHORT                      DESCRIPTION                                        SCOPE            CREATOR
+    registry.addItem(OverviewItemType::USERCHART,  QObject::tr("User Chart"), QObject::tr("User defined interactive chart"),     OverviewScope::ANALYSIS|OverviewScope::TRENDS, UserChartOverviewItem::create);
     registry.addItem(OverviewItemType::METRIC,     QObject::tr("Metric"),     QObject::tr("Metric and Sparkline"),               OverviewScope::ANALYSIS|OverviewScope::TRENDS, MetricOverviewItem::create);
     registry.addItem(OverviewItemType::KPI,        QObject::tr("KPI"),        QObject::tr("KPI calculation and progress bar"),   OverviewScope::ANALYSIS|OverviewScope::TRENDS, KPIOverviewItem::create);
     registry.addItem(OverviewItemType::DATATABLE,  QObject::tr("Table"),      QObject::tr("Table of data"),                      OverviewScope::ANALYSIS|OverviewScope::TRENDS, DataOverviewItem::create);
@@ -93,12 +96,15 @@ static void setFilter(ChartSpaceItem *item, Specification &spec)
 
 RPEOverviewItem::RPEOverviewItem(ChartSpace *parent, QString name) : ChartSpaceItem(parent, name)
 {
-
     // a META widget, "RPE" using the FOSTER modified 0-10 scale
     this->type = OverviewItemType::RPE;
 
     sparkline = new Sparkline(this, name);
     rperating = new RPErating(this, name);
+
+    configwidget = new OverviewItemConfig(this);
+    configwidget->hide();
+
 }
 
 RPEOverviewItem::~RPEOverviewItem()
@@ -109,7 +115,6 @@ RPEOverviewItem::~RPEOverviewItem()
 
 KPIOverviewItem::KPIOverviewItem(ChartSpace *parent, QString name, double start, double stop, QString program, QString units, bool istime) : ChartSpaceItem(parent, name)
 {
-
     this->type = OverviewItemType::KPI;
     this->start = start;
     this->stop = stop;
@@ -119,6 +124,9 @@ KPIOverviewItem::KPIOverviewItem(ChartSpace *parent, QString name, double start,
 
     value ="";
     progressbar = new ProgressBar(this, start, stop, value.toDouble());
+
+    configwidget = new OverviewItemConfig(this);
+    configwidget->hide();
 }
 
 KPIOverviewItem::~KPIOverviewItem()
@@ -129,9 +137,11 @@ KPIOverviewItem::~KPIOverviewItem()
 
 DataOverviewItem::DataOverviewItem(ChartSpace *parent, QString name, QString program) : ChartSpaceItem(parent, name)
 {
-
     this->type = OverviewItemType::DATATABLE;
     this->program = program;
+
+    configwidget = new OverviewItemConfig(this);
+    configwidget->hide();
 }
 
 DataOverviewItem::~DataOverviewItem()
@@ -434,6 +444,9 @@ RouteOverviewItem::RouteOverviewItem(ChartSpace *parent, QString name) : ChartSp
 {
     this->type = OverviewItemType::ROUTE;
     routeline = new Routeline(this, name);
+
+    configwidget = new OverviewItemConfig(this);
+    configwidget->hide();
 }
 
 RouteOverviewItem::~RouteOverviewItem()
@@ -500,7 +513,6 @@ static const QStringList timeInZonesWBAL = QStringList()
 
 ZoneOverviewItem::ZoneOverviewItem(ChartSpace *parent, QString name, RideFile::seriestype series, bool polarized) : ChartSpaceItem(parent, name)
 {
-
     this->type = OverviewItemType::ZONE;
     this->series = series;
     this->polarized = polarized;
@@ -610,6 +622,10 @@ ZoneOverviewItem::ZoneOverviewItem(ChartSpace *parent, QString name, RideFile::s
     chart->axisY(barseries)->setLabelsVisible(false);
     chart->axisY(barseries)->setRange(0,100);
     chart->axisY(barseries)->setGridLineVisible(false);
+
+    configwidget = new OverviewItemConfig(this);
+    configwidget->hide();
+
 }
 
 ZoneOverviewItem::~ZoneOverviewItem()
@@ -619,7 +635,6 @@ ZoneOverviewItem::~ZoneOverviewItem()
 
 DonutOverviewItem::DonutOverviewItem(ChartSpace *parent, QString name, QString symbol, QString meta) : ChartSpaceItem(parent, name)
 {
-
     this->type = OverviewItemType::DONUT;
     this->symbol = symbol;
     this->meta = meta;
@@ -637,6 +652,10 @@ DonutOverviewItem::DonutOverviewItem(ChartSpace *parent, QString name, QString s
 
     // we have a mid sized font for chart labels etc
     chart->setFont(parent->midfont);
+
+    configwidget = new OverviewItemConfig(this);
+    configwidget->hide();
+
 }
 
 DonutOverviewItem::~DonutOverviewItem()
@@ -663,6 +682,8 @@ MetricOverviewItem::MetricOverviewItem(ChartSpace *parent, QString name, QString
     bool bigdot = parent->scope == ANALYSIS ? true : false;
     sparkline = new Sparkline(this, name, bigdot);
 
+    configwidget = new OverviewItemConfig(this);
+    configwidget->hide();
 }
 
 MetricOverviewItem::~MetricOverviewItem()
@@ -681,6 +702,9 @@ TopNOverviewItem::TopNOverviewItem(ChartSpace *parent, QString name, QString sym
     if (metric) units = metric->units(GlobalContext::context()->useMetricUnits);
 
     animator=new QPropertyAnimation(this, "transition");
+
+    configwidget = new OverviewItemConfig(this);
+    configwidget->hide();
 }
 
 TopNOverviewItem::~TopNOverviewItem()
@@ -696,6 +720,8 @@ PMCOverviewItem::PMCOverviewItem(ChartSpace *parent, QString symbol) : ChartSpac
     this->type = OverviewItemType::PMC;
     this->symbol = symbol;
 
+    configwidget = new OverviewItemConfig(this);
+    configwidget->hide();
 }
 
 PMCOverviewItem::~PMCOverviewItem()
@@ -704,7 +730,6 @@ PMCOverviewItem::~PMCOverviewItem()
 
 MetaOverviewItem::MetaOverviewItem(ChartSpace *parent, QString name, QString symbol) : ChartSpaceItem(parent, name)
 {
-
     // metric or meta or pmc
     this->type = OverviewItemType::META;
     this->symbol = symbol;
@@ -724,6 +749,10 @@ MetaOverviewItem::MetaOverviewItem(ChartSpace *parent, QString name, QString sym
     } else {
         sparkline = NULL;
     }
+
+    configwidget = new OverviewItemConfig(this);
+    configwidget->hide();
+
 }
 
 MetaOverviewItem::~MetaOverviewItem()
@@ -742,6 +771,9 @@ IntervalOverviewItem::IntervalOverviewItem(ChartSpace *parent, QString name, QSt
 
     // we may plot the metric sparkline if the tile is big enough
     bubble = new BubbleViz(this, "intervals");
+
+    configwidget = new OverviewItemConfig(this);
+    configwidget->hide();
 }
 
 IntervalOverviewItem::~IntervalOverviewItem()

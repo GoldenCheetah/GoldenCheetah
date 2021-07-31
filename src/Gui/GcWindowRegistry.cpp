@@ -59,7 +59,7 @@
 #ifdef GC_HAVE_OVERVIEW
 #include "Overview.h"
 #endif
-#include "UserChart.h"
+#include "UserChartWindow.h"
 // Not until v4.0
 //#include "RouteWindow.h"
 
@@ -240,8 +240,8 @@ GcWindowRegistry::newGcWindow(GcWinID id, Context *context)
     case GcWindowTypes::DateRangeSummary: // deprecated so now replace with overview
     case GcWindowTypes::OverviewTrends: returning = new OverviewWindow(context, TRENDS); break;
     case GcWindowTypes::SeasonPlan: returning = new PlanningWindow(context); break;
-    case GcWindowTypes::UserAnalysis: returning = new UserChart(context, false); break;
-    case GcWindowTypes::UserTrends: returning = new UserChart(context, true); break;
+    case GcWindowTypes::UserAnalysis: returning = new UserChartWindow(context, false); break;
+    case GcWindowTypes::UserTrends: returning = new UserChartWindow(context, true); break;
     default: return NULL; break;
     }
     if (returning) returning->setProperty("type", QVariant::fromValue<GcWinID>(id));

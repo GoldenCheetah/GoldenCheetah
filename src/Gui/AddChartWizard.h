@@ -31,7 +31,7 @@ class AddChartWizard : public QWizard
 
 public:
 
-    AddChartWizard(Context *context, ChartSpace *space, int scope);
+    AddChartWizard(Context *context, ChartSpace *space, int scope, ChartSpaceItem * &added);
     QSize sizeHint() const { return QSize(600,650); }
 
     Context *context;
@@ -48,6 +48,9 @@ public:
     // creating
     ChartSpaceItem *item;
     QWidget *config;
+
+    // tell overview what we did
+    ChartSpaceItem * &added;
 
 };
 
@@ -80,6 +83,7 @@ class AddChartConfig : public QWizardPage
 
     public:
         AddChartConfig(AddChartWizard *);
+        ~AddChartConfig(); // spare the item's config widget when we die
         void initializePage();
         bool validate() const { return true; }
         bool isComplete() const { return true; }
@@ -92,6 +96,7 @@ class AddChartConfig : public QWizardPage
         AddChartWizard *wizard;
         QVBoxLayout *main;
 };
+
 
 class AddChartFinal : public QWizardPage
 {

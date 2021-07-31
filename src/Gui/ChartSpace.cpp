@@ -886,6 +886,11 @@ ChartSpace::eventFilter(QObject *, QEvent *event)
                     // work out the offset so we can move
                     // it around when we start dragging
                     state = DRAG;
+
+                    // warn items we are dragging, they may temporarily
+                    // hide widgets to make things faster
+                    foreach(ChartSpaceItem *item, items) item->dragging(true);
+
                     item->invisible = true;
                     item->setDrag(true);
                     item->setZValue(100);
@@ -923,6 +928,12 @@ ChartSpace::eventFilter(QObject *, QEvent *event)
                 stateData.drag.item->invisible = false;
                 stateData.drag.item->setZValue(10);
                 stateData.drag.item->placing = true;
+            }
+
+            if (state == DRAG) {
+                // tell items we are done dragging, they may temporarily
+                // hide widgets to make things faster, we need to show them again
+                foreach(ChartSpaceItem *item, items) item->dragging(false);
             }
 
             // end state;
@@ -971,24 +982,24 @@ ChartSpace::eventFilter(QObject *, QEvent *event)
                 if (yresizecursor == false && item->geometry().height()-offy < 10) {
 
                     yresizecursor = true;
-                    setCursor(QCursor(Qt::SizeVerCursor));
+                    view->viewport()->setCursor(QCursor(Qt::SizeVerCursor));
 
                 } else if (yresizecursor == true && item->geometry().height()-offy > 10) {
 
                     yresizecursor = false;
-                    setCursor(QCursor(Qt::ArrowCursor));
+                    view->viewport()->setCursor(QCursor(Qt::ArrowCursor));
 
                 }
 
                 if (xresizecursor == false && item->geometry().width()-offx < 10) {
 
                     xresizecursor = true;
-                    setCursor(QCursor(Qt::SizeHorCursor));
+                    view->viewport()->setCursor(QCursor(Qt::SizeHorCursor));
 
                 } else if (xresizecursor == true && item->geometry().width()-offx > 10) {
 
                     xresizecursor = false;
-                    setCursor(QCursor(Qt::ArrowCursor));
+                    view->viewport()->setCursor(QCursor(Qt::ArrowCursor));
 
                 }
 
@@ -998,7 +1009,7 @@ ChartSpace::eventFilter(QObject *, QEvent *event)
                 // set it back to the normal arrow pointer
                 if (yresizecursor || xresizecursor || cursor().shape() != Qt::ArrowCursor) {
                     xresizecursor = yresizecursor = false;
-                    setCursor(QCursor(Qt::ArrowCursor));
+                    view->viewport()->setCursor(QCursor(Qt::ArrowCursor));
                 }
             }
 

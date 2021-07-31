@@ -72,6 +72,13 @@ class ChartSpaceItem : public QGraphicsWidget
         void setShowConfig(bool x) { showconfig=x; update(); }
         bool showConfig() const { return showconfig; }
 
+        // let item know that dragging is in process
+        // for some widgets (e.g. UserChart) this means
+        // its best to hide the widgets as rendering into
+        // the scene can be really slow. For other widgets
+        // it can be safely ignored.
+        virtual void dragging(bool) { }
+
         // what type am I- managed by user
         int type;
 
@@ -157,6 +164,7 @@ class ChartSpace : public QWidget
     public:
 
         ChartSpace(Context *context, int scope, GcWindow *window);
+        QGraphicsScene *getScene() { return scene; }
 
         // current state for event processing
         enum { NONE, DRAG, SPAN, XRESIZE, YRESIZE } state;
