@@ -39,6 +39,8 @@
 #include "GenericChart.h"
 #include "Perspective.h"
 
+#pragma GCC diagnostic ignored "-Wcast-function-type" // shut gcc up
+
 // Structure used to register routines has changed in v3.4 of R
 //
 // there is no way to support older versions without declaring our
