@@ -3563,14 +3563,6 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
             // if m is null all bets are off
             if (m == NULL) return Result(0);
 
-            // units are easy, we can do that without zoneinfo
-            if (field == "units") {
-                if (series == "power") return Result(tr("watts"));
-                else if (series == "hr") return Result(tr("bpm"));
-                else if (series == "pace") return Result(tr("%CV"));
-                else if (series == "fatigue") return Result(tr("W'bal (%)"));
-            }
-
             // we want to minimise duplicated code
             // so get the zones and ranges setup
             // then loop through the zones in a single
@@ -3584,6 +3576,9 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
 
             // metric prefix
             QString metricprefix;
+
+            // metric/imperial pace setting for runs and swims
+            bool metricpace;
 
             // setup
             if (series == "power") {
@@ -3605,10 +3600,11 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
             } else if (series == "pace") {
 
                 // pace zones are for run or swim
-                pacezones = m->context->athlete->paceZones(sport == "run" ? "Run" : "Swim");
+                pacezones = m->context->athlete->paceZones(sport == "swim");
                 range= pacezones->whichRange(m->dateTime.date());
                 if (range >= 0) nzones = pacezones->numZones(range);
                 metricprefix = "time_in_zone_P";
+                metricpace = appsettings->value(nullptr, pacezones->paceSetting(), GlobalContext::context()->useMetricUnits).toBool();
 
             } else if (series == "fatigue") {
 
@@ -3623,7 +3619,15 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
 
             }
 
-            if (field == "time" ) {
+            if (field == "units") {
+
+                // Units are fixed, except for pace where they depend on sport
+                if (series == "power") return Result(tr("watts"));
+                else if (series == "hr") return Result(tr("bpm"));
+                else if (series == "pace") return Result(pacezones->paceUnits(metricpace));
+                else if (series == "fatigue") return Result(tr("W'bal (%)"));
+
+            } else if (field == "time" ) {
 
                 // time in zones and percent in zones use metrics
                 for(int n=0; n<nzones; n++) {
@@ -3660,11 +3664,19 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
 
                     // so now we can do our thing - use the scheme for the names...
                     if (field == "name")  strings << name;
+
                     else if (field == "description") strings << desc;
-                    else if (field == "low") strings << QString("%1").arg(low);
-                    else if (field == "high") {
+
+                    else if (field == "low") {
+                        if (series != "pace") strings << QString("%1").arg(low);
+			else strings << pacezones->kphToPaceString(low, metricpace);
+
+		    } else if (field == "high") {
                         if (n==nzones-1) strings << ""; // infinite, so make blank
-                        else strings << QString("%1").arg(high);
+                        else {
+                            if (series != "pace") strings << QString("%1").arg(high);
+			    else strings << pacezones->kphToPaceString(high, metricpace);
+                        }
                     }
                 }
 
