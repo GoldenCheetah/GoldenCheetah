@@ -100,9 +100,10 @@ GenericLegendItem::eventFilter(QObject *obj, QEvent *e)
                 emit clicked(name, enabled);
             }
         }
-        // fall through
-    default:
-        //fprintf(stderr, "event %d on %s\n", e->type(), name.toStdString().c_str()); fflush(stderr);
+
+    case QEvent::Enter:
+    case QEvent::Leave:
+        // hover indicator show/hide as mouse hovers over the item
         update();
         break;
     }
