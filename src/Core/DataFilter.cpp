@@ -345,8 +345,8 @@ static struct {
                             // returning a vector of numbers, the values are converted to strings as
                             // appropriate for the metric (e.g. rowing pace xxx/500m).
 
-    { "zones", 3 },   // zones(run|swim|bike, power|hr|pace, name|description|low|high|unit|time|percent) - returns a vector of the zone
-                      // details, but not the time in zone metric which is available via tiz.
+    { "zones", 2 },   // zones(power|hr|pace|fatigue, name|description|low|high|unit|time|percent) - returns a vector
+                      // of the zone details and the time in zone and percentage metric.
 
     { "string", 1 }, // string(a) will convert the passed entries to a string if they are numeric.
 
@@ -587,7 +587,7 @@ DataFilter::builtins(Context *context)
 
         } else if (i== 118) {
             // zone details
-            returning << "zones(run|bike|swim, hr|power|pace|fatigue, name|description|units|low|high|time|percent)";
+            returning << "zones(hr|power|pace|fatigue, name|description|units|low|high|time|percent)";
 
         } else {
 
@@ -1666,38 +1666,27 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
 
                 } else if (leaf->function == "zones") {
 
-                    // need exactly 3 symbols
-                    if (leaf->fparms.count() != 3 ||
+                    // need exactly 2 symbols
+                    if (leaf->fparms.count() != 2 ||
                         leaf->fparms[0]->type != Leaf::Symbol ||
-                        leaf->fparms[1]->type != Leaf::Symbol ||
-                        leaf->fparms[2]->type != Leaf::Symbol) {
+                        leaf->fparms[1]->type != Leaf::Symbol) {
                         leaf->inerror = true;
 
                     } else {
 
-                        // each sport has slightly different zones that can be configured
-                        // note the fatigue zones are hard coded but should still be returned
-                        // as need to get language specific translations of name, description
-                        QRegExp resport("^(run|bike|swim)$", Qt::CaseInsensitive);
-                        QRegExp reswimseries("^pace$", Qt::CaseInsensitive);
-                        QRegExp rerunseries("^(hr|power|pace|fatigue)$", Qt::CaseInsensitive);
-                        QRegExp rebikeseries("^(hr|power|fatigue)$", Qt::CaseInsensitive);
+                        QRegExp reseries("^(hr|power|pace|fatigue)$", Qt::CaseInsensitive);
                         QRegExp refield("^(name|description|units|low|high|time|percent)$", Qt::CaseInsensitive);
 
                         // lets check the combinations
-                        QString sport = *leaf->fparms[0]->lvalue.n;
-                        QString series = *leaf->fparms[1]->lvalue.n;
-                        QString field = *leaf->fparms[2]->lvalue.n;
+                        QString series = *leaf->fparms[0]->lvalue.n;
+                        QString field = *leaf->fparms[1]->lvalue.n;
 
-                        if (!resport.exactMatch(sport)) inerror=true;
+                        if (!reseries.exactMatch(series)) inerror=true;
                         if (!refield.exactMatch(field)) inerror=true;
-                        if (sport == "run" && !rerunseries.exactMatch(series)) inerror=true;
-                        if (sport == "bike" && !rebikeseries.exactMatch(series)) inerror=true;
-                        if (sport == "swim" && !reswimseries.exactMatch(series)) inerror=true;
                     }
 
                     // same error for any badly formed function call
-                    if (leaf->inerror) DataFiltererrors << QString(tr("zones(run|bike|swim, hr|power|pace|fatigue, name|description|low|high|units|time|percent) needs 3 specific parameters"));
+                    if (leaf->inerror) DataFiltererrors << QString(tr("zones(hr|power|pace|fatigue, name|description|low|high|units|time|percent) needs 2 specific parameters"));
 
                 } else if (leaf->function == "exists") {
 
@@ -3553,9 +3542,8 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
         if (leaf->function == "zones") {
 
             // parms
-            QString sport = *leaf->fparms[0]->lvalue.n;
-            QString series = *leaf->fparms[1]->lvalue.n;
-            QString field = *leaf->fparms[2]->lvalue.n;
+            QString series = *leaf->fparms[0]->lvalue.n;
+            QString field = *leaf->fparms[1]->lvalue.n;
 
             // what we will ultimately return
             QVector<QString> strings;
@@ -3584,7 +3572,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
             if (series == "power") {
 
                 // power zones are for Run or Bike, but not Swim
-                powerzones = m->context->athlete->zones(sport == "run" ? "Run" : "Bike");
+                powerzones = m->context->athlete->zones(m->sport);
                 range= powerzones->whichRange(m->dateTime.date());
                 if (range >= 0) nzones = powerzones->numZones(range);
                 metricprefix = "time_in_zone_L";
@@ -3592,7 +3580,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
             } else if (series == "hr") {
 
                 // hr zones are also for run or bike, but not Swim
-                hrzones = m->context->athlete->hrZones(sport == "run" ? "Run" : "Bike");
+                hrzones = m->context->athlete->hrZones(m->sport);
                 range= hrzones->whichRange(m->dateTime.date());
                 if (range >= 0) nzones = hrzones->numZones(range);
                 metricprefix = "time_in_zone_H";
@@ -3600,7 +3588,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
             } else if (series == "pace") {
 
                 // pace zones are for run or swim
-                pacezones = m->context->athlete->paceZones(sport == "swim");
+                pacezones = m->context->athlete->paceZones(m->sport == "Swim");
                 range= pacezones->whichRange(m->dateTime.date());
                 if (range >= 0) nzones = pacezones->numZones(range);
                 metricprefix = "time_in_zone_P";
