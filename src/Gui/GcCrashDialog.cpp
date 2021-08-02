@@ -162,30 +162,7 @@ GcCrashDialog::~GcCrashDialog()
 QString GcCrashDialog::versionHTML()
 {
     // -- OS ----
-    QString os = "";
-
-    #ifdef Q_OS_LINUX
-    os = "Linux";
-    #endif
-
-    #ifdef WIN32
-    os = "Win";
-    #endif
-
-    #ifdef Q_OS_MAC
-    os = QString("Mac OS X 10.%1").arg(QSysInfo::MacintoshVersion - 2);
-    if (QSysInfo::MacintoshVersion == QSysInfo::MV_SNOWLEOPARD)
-        os += " Snow Leopard";
-    else if (QSysInfo::MacintoshVersion == QSysInfo::MV_LION)
-        os += " Lion";
-    else if (QSysInfo::MacintoshVersion == 10)
-        os += " Mountain Lion";
-    else if (QSysInfo::MacintoshVersion == 11)
-        os += " Mavericks";
-    else if (QSysInfo::MacintoshVersion == 12)
-        os += " Yosemite";
-
-    #endif
+    QString os = QSysInfo::prettyProductName();
 
     // -- SCHEMA VERSION ----
     QString schemaVersion = QString("%1").arg(DBSchemaVersion);
