@@ -62,6 +62,11 @@ UserChart::UserChart(QWidget *parent, Context *context, bool rangemode)
     connect(settingsTool_, SIGNAL(chartConfigChanged()), this, SLOT(chartConfigChanged()));
     connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
 
+    // defaults, can be overriden via setBackgroundColor()
+    if (rangemode) bgcolor = GColor(CTRENDPLOTBACKGROUND);
+    else bgcolor = GColor(CPLOTBACKGROUND);
+
+    // set default background color
     configChanged(0);
 }
 
@@ -70,21 +75,30 @@ UserChart::configChanged(qint32)
 {
     setUpdatesEnabled(false);
 
-    if (rangemode) setProperty("color", GColor(CTRENDPLOTBACKGROUND));
-    else setProperty("color", GColor(CPLOTBACKGROUND));
-
     // tinted palette for headings etc
     QPalette palette;
-    palette.setBrush(QPalette::Window, QBrush(GColor(CPLOTBACKGROUND)));
+    palette.setBrush(QPalette::Window, bgcolor);
+    palette.setBrush(QPalette::Background, bgcolor);
     palette.setColor(QPalette::WindowText, GColor(CPLOTMARKER));
     palette.setColor(QPalette::Text, GColor(CPLOTMARKER));
-    palette.setColor(QPalette::Base, GCColor::alternateColor(GColor(CPLOTBACKGROUND)));
+    palette.setColor(QPalette::Base, bgcolor /*GCColor::alternateColor(bgcolor)*/);
     setPalette(palette);
+
+    setAutoFillBackground(true);
 
     // redraw
     chartConfigChanged();
 
     setUpdatesEnabled(true);
+}
+
+void
+UserChart::setBackgroundColor(QColor bgcolor)
+{
+    if (this->bgcolor != bgcolor) {
+        this->bgcolor = bgcolor;
+        configChanged(0);
+    }
 }
 
 void
@@ -144,7 +158,8 @@ UserChart::setRide(const RideItem *item)
     if (!isVisible()) { stale=true; return; }
 
     // ok, we've run out of excuses, looks like we need to plot
-    chart->initialiseChart(chartinfo.title, chartinfo.type, chartinfo.animate, chartinfo.legendpos, chartinfo.stack, chartinfo.orientation);
+    chart->setBackgroundColor(bgcolor);
+    chart->initialiseChart(chartinfo.title, chartinfo.type, chartinfo.animate, chartinfo.legendpos, chartinfo.stack, chartinfo.orientation, chartinfo.scale);
 
     // now generate the series data
     for (int ii=0; ii<seriesinfo.count(); ii++) {
@@ -308,7 +323,9 @@ UserChart::settings() const
     out << "\"animate\": "       << (chartinfo.animate ? "true" : "false") << ",\n";
     out << "\"legendpos\": "     << chartinfo.legendpos << ",\n";
     out << "\"stack\": "         << (chartinfo.stack ? "true" : "false") << ",\n";
-    out << "\"orientation\": "   << chartinfo.orientation; // note no trailing comma
+    out << "\"orientation\": "   << chartinfo.orientation << ",\n";
+    out << "\"scale\": "         << QString("%1").arg(chartinfo.scale); // note no trailing comma
+    // bgcolor not saved, it is set based upon context
 
     // seriesinfos
     if (seriesinfo.count()) out << ",\n\"SERIES\": [\n"; // that trailing comma
@@ -394,6 +411,8 @@ UserChart::applySettings(QString x)
     chartinfo.legendpos = obj["legendpos"].toInt();
     chartinfo.stack = obj["stack"].toBool();
     chartinfo.orientation = obj["orientation"].toInt();
+    if (obj.contains("scale")) chartinfo.scale = obj["scale"].toDouble();
+    else chartinfo.scale = 1.0f;
 
     // array of series, but userchartdata needs to be deleted
     foreach(GenericSeriesInfo series, seriesinfo)
@@ -531,6 +550,15 @@ UserChartSettings::UserChartSettings(Context *context, bool rangemode, GenericCh
     zz->addStretch();
     cf->addRow(tr("Legend"), zz);
 
+    scale = new QSlider(Qt::Horizontal, this);
+    scale->setTickInterval(1);
+    scale->setMinimum(1);
+    scale->setMaximum(9);
+    scale->setSingleStep(1);
+    scale->setValue(1 + ((chart.scale-1)*2)); // 1-5 mapped to 1-7, where scale is 1,1.5,2,2.5,3,3.5,4,4.5,5
+    cf->addRow(tr("Scale"), scale);
+
+
     cf->addRow("  ", (QWidget*)NULL);
     animate = new QCheckBox(tr("Animate"));
     cf->addRow(" ", animate);
@@ -658,6 +686,7 @@ UserChartSettings::UserChartSettings(Context *context, bool rangemode, GenericCh
     connect(legpos, SIGNAL(currentIndexChanged(QString)), this, SLOT(updateChartInfo()));
     connect(stack, SIGNAL(stateChanged(int)), this, SLOT(updateChartInfo()));
     connect(orientation, SIGNAL(currentIndexChanged(int)), this, SLOT(updateChartInfo()));
+    connect(scale, SIGNAL(valueChanged(int)), this, SLOT(updateChartInfo()));
 }
 
 void
@@ -686,7 +715,7 @@ UserChartSettings::refreshChartInfo()
     index=orientation->findData(chartinfo.orientation);
     if (index >= 0) orientation->setCurrentIndex(index);
     else orientation->setCurrentIndex(0);
-
+    scale->setValue(1 + ((chartinfo.scale-1)*2)); // 1-5 mapped to 1-7, where scale is 1,1.5,2,2.5,3,3.5,4,4.5,5
     updating=false;
 }
 
@@ -707,6 +736,7 @@ UserChartSettings::updateChartInfo()
     chartinfo.legendpos = legpos->itemData(legpos->currentIndex()).toInt();
     chartinfo.stack = stack->isChecked();
     chartinfo.orientation = orientation->itemData(orientation->currentIndex()).toInt();
+    chartinfo.scale = 1 + ((scale->value() - 1) * 0.5);
 
     // we need to refresh whenever stuff changes....
     if (refresh) emit chartConfigChanged();

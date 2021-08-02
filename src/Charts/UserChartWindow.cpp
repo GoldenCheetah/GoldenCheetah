@@ -65,6 +65,18 @@ UserChartWindow::UserChartWindow(Context *context, bool rangemode) : GcChartWind
 
     // need to refresh when perspective selected
     connect(this, SIGNAL(perspectiveChanged(Perspective*)), this, SLOT(refresh()));
+    connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged()));
+}
+
+void
+UserChartWindow::configChanged()
+{
+    QColor bgcolor = rangemode ? GColor(CTRENDPLOTBACKGROUND) : GColor(CPLOTBACKGROUND);
+
+    setProperty("color", bgcolor);
+    chart->setBackgroundColor(bgcolor);
+
+    update();
 }
 
 //

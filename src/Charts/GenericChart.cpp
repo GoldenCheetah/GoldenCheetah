@@ -83,6 +83,8 @@ GenericChart::GenericChart(QWidget *parent, Context *context) : QWidget(parent),
     // watch for color/themes change
     connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
 
+    // default bgcolor
+    bgcolor = GColor(CPLOTBACKGROUND);
     configChanged(0);
 }
 
@@ -91,9 +93,9 @@ GenericChart::configChanged(qint32)
 {
     setUpdatesEnabled(false);
 
-    setProperty("color", GColor(CPLOTBACKGROUND));
+    setProperty("color", bgcolor);
     QPalette palette;
-    palette.setBrush(QPalette::Background, QBrush(GColor(CRIDEPLOTBACKGROUND)));
+    palette.setBrush(QPalette::Background, QBrush(bgcolor));
     setPalette(palette); // propagates to children
 
     // set style sheets
@@ -103,9 +105,18 @@ GenericChart::configChanged(qint32)
     setUpdatesEnabled(true);
 }
 
+void
+GenericChart::setBackgroundColor(QColor bgcolor)
+{
+    if (bgcolor != this->bgcolor) {
+        this->bgcolor = bgcolor;
+        configChanged(0);
+    }
+}
+
 // set chart settings
 bool
-GenericChart::initialiseChart(QString title, int type, bool animate, int legendpos, bool stack, int orientation)
+GenericChart::initialiseChart(QString title, int type, bool animate, int legendpos, bool stack, int orientation, double scale)
 {
     // Remember the settings, we use them for every new plot
     this->title = title;
@@ -114,6 +125,7 @@ GenericChart::initialiseChart(QString title, int type, bool animate, int legendp
     this->legendpos = legendpos;
     this->stack = stack;
     this->orientation = orientation;
+    this->scale = scale;
 
     // store info as its passed to us
     newSeries.clear();
@@ -370,7 +382,8 @@ GenericChart::finaliseChart()
     for(int i=0; i<newPlots.count(); i++) {
 
         // set initial parameters
-        newPlots[i].plot->initialiseChart(title, type, animate, legendpos);
+        newPlots[i].plot->setBackgroundColor(bgcolor);
+        newPlots[i].plot->initialiseChart(title, type, animate, legendpos, scale);
 
         // add curves
         QListIterator<GenericSeriesInfo>s(newPlots[i].series);

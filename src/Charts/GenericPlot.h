@@ -82,12 +82,18 @@ class GenericPlot : public QWidget {
                           };
         typedef enum annotationType AnnotationType;
 
+        double scale() const { return scale_; }
+
     public slots:
 
         void configChanged(qint32);
 
+        // background color
+        QColor backgroundColor() { return bgcolor_; }
+        void setBackgroundColor(QColor bgcolor);
+
         // set chart settings
-        bool initialiseChart(QString title, int type, bool animate, int legendpos);
+        bool initialiseChart(QString title, int type, bool animate, int legendpos, double scale=1.0f);
 
         // add a curve, associating an axis
         bool addCurve(QString name, QVector<double> xseries, QVector<double> yseries, QVector<QString> fseries, QString xname, QString yname,
@@ -166,5 +172,7 @@ class GenericPlot : public QWidget {
         // axis placement (before user interacts)
         // alternates as axis added
         bool left, bottom;
+        double scale_;
+        QColor bgcolor_;
 };
 #endif

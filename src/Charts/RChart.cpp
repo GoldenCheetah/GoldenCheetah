@@ -467,8 +467,10 @@ RChart::eventFilter(QObject *, QEvent *e)
 void
 RChart::configChanged(qint32)
 {
-    if (!ridesummary) setProperty("color", GColor(CTRENDPLOTBACKGROUND));
-    else setProperty("color", GColor(CPLOTBACKGROUND));
+    QColor bgcolor = !ridesummary ? GColor(CTRENDPLOTBACKGROUND) : GColor(CPLOTBACKGROUND);
+    setProperty("color", bgcolor);
+    chart->setBackgroundColor(bgcolor);
+
 
     // tinted palette for headings etc
     QPalette palette;
@@ -477,6 +479,8 @@ RChart::configChanged(qint32)
     palette.setColor(QPalette::Text, GColor(CPLOTMARKER));
     palette.setColor(QPalette::Base, GCColor::alternateColor(GColor(CPLOTBACKGROUND)));
     setPalette(palette);
+
+    runScript(); // to update
 }
 
 void

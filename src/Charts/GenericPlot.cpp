@@ -33,6 +33,7 @@ QString GenericPlot::gl_timeformat = QString("hh:mm:ss");
 
 GenericPlot::GenericPlot(QWidget *parent, Context *context) : QWidget(parent), context(context)
 {
+    setAutoFillBackground(true);
 
     // set a minimum height
     setMinimumHeight(gl_minheight *dpiXFactor);
@@ -201,16 +202,23 @@ GenericPlot::configChanged(qint32)
 {
     // tinted palette for headings etc
     QPalette palette;
-    palette.setBrush(QPalette::Window, QBrush(GColor(CPLOTBACKGROUND)));
+    palette.setBrush(QPalette::Window, QBrush(bgcolor_));
     palette.setColor(QPalette::WindowText, GColor(CPLOTMARKER));
     palette.setColor(QPalette::Text, GColor(CPLOTMARKER));
-    palette.setColor(QPalette::Base, GCColor::alternateColor(GColor(CPLOTBACKGROUND)));
+    palette.setColor(QPalette::Base, GCColor::alternateColor(bgcolor_));
     setPalette(palette);
 
     // chart colors
-    chartview->setBackgroundBrush(QBrush(GColor(CPLOTBACKGROUND)));
-    qchart->setBackgroundBrush(QBrush(GColor(CPLOTBACKGROUND)));
+    chartview->setBackgroundBrush(QBrush(bgcolor_));
+    qchart->setBackgroundBrush(QBrush(bgcolor_));
     qchart->setBackgroundPen(QPen(GColor(CPLOTMARKER)));
+}
+
+void
+GenericPlot::setBackgroundColor(QColor bgcolor)
+{
+    this->bgcolor_ = bgcolor;
+    configChanged(0);
 }
 
 void
@@ -380,7 +388,7 @@ GenericPlot::plotAreaChanged()
 }
 
 bool
-GenericPlot::initialiseChart(QString title, int type, bool animate, int legpos)
+GenericPlot::initialiseChart(QString title, int type, bool animate, int legpos, double scale)
 {
     // if we changed the type, all series must go
     if (charttype != type) {
@@ -403,6 +411,7 @@ GenericPlot::initialiseChart(QString title, int type, bool animate, int legpos)
     bottom=true;
     barsets.clear();
     havelegend.clear();
+    this->scale_ = scale;
 
     // reset selections etc
     selector->reset();
@@ -469,8 +478,7 @@ GenericPlot::addCurve(QString name, QVector<double> xseries, QVector<double> yse
     QString dname = QString("d_%1").arg(name);
 
     // standard colors are encoded 1,1,x - where x is the index into the colorset
-    QColor applyColor = QColor(color);
-    if (applyColor.red() == 1 && applyColor.green() == 1) applyColor = GColor(applyColor.blue());
+    QColor applyColor = RGBColor(QColor(color));
 
     // if curve already exists, remove it
     if (charttype==GC_CHART_LINE || charttype==GC_CHART_SCATTER || charttype==GC_CHART_PIE) {
@@ -518,7 +526,7 @@ GenericPlot::addCurve(QString name, QVector<double> xseries, QVector<double> yse
         left = !left;
 
         // yaxis color matches, but not done for xaxis above
-        yaxis->labelcolor = yaxis->axiscolor = QColor(applyColor);
+        yaxis->labelcolor = yaxis->axiscolor = applyColor;
 
         // add to list
         axisinfos.insert(yname, yaxis);
@@ -541,7 +549,7 @@ GenericPlot::addCurve(QString name, QVector<double> xseries, QVector<double> yse
             add->setBrush(Qt::NoBrush);
             QPen pen(applyColor);
             pen.setStyle(static_cast<Qt::PenStyle>(linestyle));
-            pen.setWidth(size);
+            pen.setWidth(size * scale_);
             add->setPen(pen);
             add->setOpacity(double(opacity) / 100.0); // 0-100% to 0.0-1.0 values
 
@@ -564,7 +572,7 @@ GenericPlot::addCurve(QString name, QVector<double> xseries, QVector<double> yse
             else {
                 if (datalabels) {
                     add->setPointLabelsVisible(true);    // is false by default
-                    add->setPointLabelsColor(QColor(applyColor));
+                    add->setPointLabelsColor(applyColor);
                     add->setPointLabelsFormat("@yPoint");
                 }
                 // fill curve?
@@ -616,15 +624,15 @@ GenericPlot::addCurve(QString name, QVector<double> xseries, QVector<double> yse
                 // for our data points
                 if (linestyle == 0 && datalabels) {
                     dec->setPointLabelsVisible(true);    // is false by default
-                    dec->setPointLabelsColor(QColor(applyColor));
+                    dec->setPointLabelsColor(applyColor);
                     dec->setPointLabelsFormat("@yPoint");
                 }
 
                 // aesthetics
                 if (symbol == 1) dec->setMarkerShape(QScatterSeries::MarkerShapeCircle);
                 else if (symbol == 2)  dec->setMarkerShape(QScatterSeries::MarkerShapeRectangle);
-                dec->setMarkerSize(size*6);
-                QColor col=QColor(applyColor);
+                dec->setMarkerSize(size*6*scale_);
+                QColor col=applyColor;
                 dec->setBrush(QBrush(col));
                 dec->setPen(Qt::NoPen);
                 dec->setOpacity(double(opacity) / 100.0); // 0-100% to 0.0-1.0 values
@@ -659,8 +667,8 @@ GenericPlot::addCurve(QString name, QVector<double> xseries, QVector<double> yse
             if (symbol == 0) add->setVisible(false); // no marker !
             else if (symbol == 1) add->setMarkerShape(QScatterSeries::MarkerShapeCircle);
             else if (symbol == 2)  add->setMarkerShape(QScatterSeries::MarkerShapeRectangle);
-            add->setMarkerSize(size);
-            QColor col=QColor(applyColor);
+            add->setMarkerSize(size*scale_);
+            QColor col=applyColor;
             add->setBrush(QBrush(col));
             add->setPen(Qt::NoPen);
             add->setOpacity(double(opacity) / 100.0); // 0-100% to 0.0-1.0 values
@@ -681,7 +689,7 @@ GenericPlot::addCurve(QString name, QVector<double> xseries, QVector<double> yse
 
             if (datalabels) {
                 add->setPointLabelsVisible(true);    // is false by default
-                add->setPointLabelsColor(QColor(applyColor));
+                add->setPointLabelsColor(applyColor);
                 add->setPointLabelsFormat("@yPoint");
             }
 
@@ -715,7 +723,7 @@ GenericPlot::addCurve(QString name, QVector<double> xseries, QVector<double> yse
                 dec->setBrush(Qt::NoBrush);
                 QPen pen(applyColor);
                 pen.setStyle(static_cast<Qt::PenStyle>(linestyle));
-                pen.setWidth(size);
+                pen.setWidth(size*scale_);
                 dec->setPen(pen);
                 dec->setOpacity(double(opacity) / 100.0); // 0-100% to 0.0-1.0 values
 
@@ -745,7 +753,7 @@ GenericPlot::addCurve(QString name, QVector<double> xseries, QVector<double> yse
             QBarSet *add= new QBarSet(name);
 
             // aesthetics
-            add->setBrush(QBrush(QColor(applyColor)));
+            add->setBrush(QBrush(applyColor));
             add->setPen(Qt::NoPen);
 
             // data and min/max values
@@ -938,7 +946,7 @@ GenericPlot::finaliseChart()
                 // once we've done the basics, lets do the aesthetics
                 QFont stGiles; // hoho - Chart Font St. Giles ... ok you have to be British to get this joke
                 stGiles.fromString(appsettings->value(this, GC_FONT_CHARTLABELS, QFont().toString()).toString());
-                stGiles.setPointSize(appsettings->value(NULL, GC_FONT_CHARTLABELS_SIZE, 8).toInt());
+                stGiles.setPointSizeF(appsettings->value(NULL, GC_FONT_CHARTLABELS_SIZE, 8).toInt() * scale_);
                 add->setTitleFont(stGiles);
                 add->setLabelsFont(stGiles);
 

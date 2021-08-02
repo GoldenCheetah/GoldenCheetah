@@ -140,7 +140,7 @@ class GenericChartInfo {
     public:
 
         // default values, better here than spread across the codebase.
-        GenericChartInfo() : localinfo(NULL), type(GC_CHART_LINE), animate(false), legendpos(2), stack(false), orientation(Qt::Vertical) {}
+        GenericChartInfo() : localinfo(NULL), type(GC_CHART_LINE), animate(false), legendpos(2), stack(false), orientation(Qt::Vertical), scale(1.0) {}
 
         // available for use (e.g. UserChartSettings)
         void *localinfo;
@@ -153,6 +153,8 @@ class GenericChartInfo {
         int legendpos;
         bool stack; // stack series instead of on same chart
         int orientation; // layout horizontal or vertical
+        double scale; // scale font sizes
+        QColor bgcolor; // background color of plots and legends
 };
 
 
@@ -258,7 +260,7 @@ class GenericChart : public QWidget {
     public slots:
 
         // set chart settings
-        bool initialiseChart(QString title, int type, bool animate, int legendpos, bool stack, int orientation);
+        bool initialiseChart(QString title, int type, bool animate, int legendpos, bool stack, int orientation, double scale=1.0f);
 
         // add a curve, associating an axis
         bool addCurve(QString name, QVector<double> xseries, QVector<double> yseries, QVector<QString> fseries, QString xname, QString yname,
@@ -276,6 +278,9 @@ class GenericChart : public QWidget {
 
         // annotations
         bool annotateLabel(QString name, QStringList strings); // add a label alongside a series
+
+        // plot background
+        void setBackgroundColor(QColor);
 
         // post processing clean up / add decorations / helpers etc
         void finaliseChart();
@@ -296,6 +301,8 @@ class GenericChart : public QWidget {
         int legendpos;
         bool stack; // stack series instead of on same chart
         int orientation; // layout horizontal or vertical
+        double scale;
+        QColor bgcolor;
 
         // once series, axis etc have all been
         // cached, we need to pre-process the data

@@ -43,12 +43,13 @@
 #include "RCanvas.h"
 
 class GenericPlot;
+class GenericLegend;
 class GenericLegendItem : public QWidget {
 
     Q_OBJECT
 
     public:
-        GenericLegendItem(Context *context, QWidget *parent, QString name, QColor color);
+        GenericLegendItem(Context *context, GenericLegend *parent, QString name, QColor color);
 
     Q_SIGNALS:
         void clicked(QString name, bool enabled); // someone clicked on a legend and enabled/disabled it
@@ -69,6 +70,7 @@ class GenericLegendItem : public QWidget {
         Context *context;
         QString name;
         QColor color;
+        GenericLegend *legend;
 
         bool hasvalue;
         bool enabled;
@@ -94,6 +96,9 @@ class GenericLegend : public QWidget {
         void addLabel(QLabel *label);
         void removeSeries(QString name);
         void removeAllSeries();
+        void setScale(double);
+
+        GenericPlot *plot() { return plot_; }
 
     Q_SIGNALS:
         void clicked(QString name, bool enabled); // someone clicked on a legend and enabled/disabled it
@@ -111,7 +116,7 @@ class GenericLegend : public QWidget {
         // a label has a unique name, not directly tide to
         // a series or axis value, it depends...
         Context *context;
-        GenericPlot *plot;
+        GenericPlot *plot_;
         QBoxLayout *layout;
         QMap<QString,GenericLegendItem*> items;
         QString xname;

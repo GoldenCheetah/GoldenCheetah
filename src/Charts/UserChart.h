@@ -53,6 +53,9 @@ class UserChart : public QWidget {
         QString settings() const;
         void applySettings(QString);
 
+        // set background for all charts, legends etc
+        void setBackgroundColor(QColor bgcolor);
+
     public slots:
 
         // runtime - ride item changed
@@ -88,6 +91,7 @@ class UserChart : public QWidget {
         Context *context;
         bool rangemode;
         bool stale;
+        QColor bgcolor;
 
         const RideItem *last; // the last ride we plotted
         const RideItem *ride;
@@ -174,6 +178,7 @@ class UserChartSettings : public QWidget {
         QComboBox *legpos;
         QCheckBox *stack;
         QComboBox *orientation;
+        QSlider *scale;
 };
 
 class EditUserSeriesDialog : public QDialog

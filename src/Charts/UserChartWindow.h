@@ -48,6 +48,9 @@ class UserChartWindow : public GcChartWindow {
         // runtime - date range was selected
         void setDateRange(DateRange);
 
+        // watch color changes
+        void configChanged();
+
         // redraw
         void refresh();
 

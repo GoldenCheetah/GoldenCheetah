@@ -509,8 +509,9 @@ PythonChart::eventFilter(QObject *, QEvent *e)
 void
 PythonChart::configChanged(qint32)
 {
-    if (!ridesummary) setProperty("color", GColor(CTRENDPLOTBACKGROUND));
-    else setProperty("color", GColor(CPLOTBACKGROUND));
+    QColor bgcolor = !ridesummary ? GColor(CTRENDPLOTBACKGROUND) : GColor(CPLOTBACKGROUND);
+    setProperty("color", bgcolor);
+    if (plot) plot->setBackgroundColor(bgcolor);
 
     // tinted palette for headings etc
     QPalette palette;
@@ -520,6 +521,8 @@ PythonChart::configChanged(qint32)
     palette.setColor(QPalette::Base, GCColor::alternateColor(GColor(CPLOTBACKGROUND)));
     setPalette(palette);
 
+    // refresh
+    runScript();
 }
 
 void

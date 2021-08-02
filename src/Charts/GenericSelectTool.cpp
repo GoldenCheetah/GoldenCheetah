@@ -49,7 +49,7 @@ void GenericSelectTool::paint(QPainter*painter, const QStyleOptionGraphicsItem *
     // min max texts
     QFont stGiles; // hoho - Chart Font St. Giles ... ok you have to be British to get this joke
     stGiles.fromString(appsettings->value(NULL, GC_FONT_CHARTLABELS, QFont().toString()).toString());
-    stGiles.setPointSize(appsettings->value(NULL, GC_FONT_CHARTLABELS_SIZE, 8).toInt());
+    stGiles.setPointSizeF(appsettings->value(NULL, GC_FONT_CHARTLABELS_SIZE, 8).toInt()*host->scale_);
     QFontMetrics fm(stGiles); // adjust position to align centre
 
     //
@@ -88,7 +88,7 @@ void GenericSelectTool::paint(QPainter*painter, const QStyleOptionGraphicsItem *
                 QColor invert = GCColor::invertColor(GColor(CPLOTBACKGROUND));
                 painter->setBrush(invert);
                 painter->setPen(invert);
-                QRectF circle(0,0,gl_linemarker*dpiXFactor,gl_linemarker*dpiYFactor);
+                QRectF circle(0,0,gl_linemarker*dpiXFactor*host->scale_,gl_linemarker*dpiYFactor*host->scale_);
                 circle.moveCenter(pos);
                 painter->drawEllipse(circle);
                 painter->setBrush(Qt::NoBrush);
@@ -116,7 +116,7 @@ void GenericSelectTool::paint(QPainter*painter, const QStyleOptionGraphicsItem *
                         QColor invert = GCColor::invertColor(GColor(CPLOTBACKGROUND));
                         painter->setBrush(invert);
                         painter->setPen(invert);
-                        QRectF circle(0,0,gl_scattermarker*dpiXFactor,gl_scattermarker*dpiYFactor);
+                        QRectF circle(0,0,gl_scattermarker*dpiXFactor*host->scale_,gl_scattermarker*dpiYFactor*host->scale_);
                         circle.moveCenter(hoverpoint);
                         painter->drawEllipse(circle);
                         painter->setBrush(Qt::NoBrush);
@@ -264,7 +264,7 @@ void GenericSelectTool::paint(QPainter*painter, const QStyleOptionGraphicsItem *
                             col.setAlphaF(1);
                             QPen line(col);
                             line.setStyle(Qt::SolidLine);
-                            line.setWidthF(0.5 * dpiXFactor);
+                            line.setWidthF(0.5 * dpiXFactor*host->scale_);
                             painter->setPen(line);
                             if (host->charttype == GC_CHART_LINE) painter->setClipRect(r); // too jarring on a line plot
                             else painter->setClipRect(mapRectFromScene(host->qchart->plotArea())); // need context for a scatter plot
@@ -300,7 +300,7 @@ void GenericSelectTool::paint(QPainter*painter, const QStyleOptionGraphicsItem *
                         // min max texts
                         QFont stGiles; // hoho - Chart Font St. Giles ... ok you have to be British to get this joke
                         stGiles.fromString(appsettings->value(NULL, GC_FONT_CHARTLABELS, QFont().toString()).toString());
-                        stGiles.setPointSize(appsettings->value(NULL, GC_FONT_CHARTLABELS_SIZE, 8).toInt());
+                        stGiles.setPointSizeF(appsettings->value(NULL, GC_FONT_CHARTLABELS_SIZE, 8).toInt()*host->scale_);
                         painter->setFont(stGiles);
 
                         QPen markerpen(GColor(CPLOTMARKER));

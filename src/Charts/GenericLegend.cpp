@@ -26,8 +26,8 @@
 
 #include <limits>
 
-GenericLegendItem::GenericLegendItem(Context *context, QWidget *parent, QString name, QColor color) :
-    QWidget(parent), context(context), name(name), color(color), datetime(false)
+GenericLegendItem::GenericLegendItem(Context *context, GenericLegend *parent, QString name, QColor color) :
+    QWidget(parent), context(context), name(name), color(color), legend(parent), datetime(false)
 {
 
     value=0;
@@ -51,13 +51,15 @@ GenericLegendItem::GenericLegendItem(Context *context, QWidget *parent, QString 
 void
 GenericLegendItem::configChanged(qint32)
 {
-    static const double gl_margin = 5 * dpiXFactor;
-    static const double gl_spacer = 2 * dpiXFactor;
-    static const double gl_block = 7 * dpiXFactor;
-    static const double gl_linewidth = 1 * dpiXFactor;
+    static const double gl_margin = 5 * dpiXFactor*legend->plot()->scale();
+    static const double gl_spacer = 2 * dpiXFactor*legend->plot()->scale();
+    static const double gl_block = 7 * dpiXFactor*legend->plot()->scale();
+    static const double gl_linewidth = 1 * dpiXFactor*legend->plot()->scale();
 
     // we just set geometry for now.
     QFont f; // based on what just got set in prefs
+    // we need to scale...
+    f.setPointSizeF(f.pointSizeF() * legend->plot()->scale());
     QFontMetricsF fm(f);
 
     // so now the string we would display
@@ -117,7 +119,7 @@ GenericLegendItem::paintEvent(QPaintEvent *)
     painter.save();
 
     // fill background first
-    painter.setBrush(QBrush(GColor(CPLOTBACKGROUND)));
+    painter.setBrush(QBrush(legend->plot()->backgroundColor()));
     painter.setPen(Qt::NoPen);
     painter.drawRect(0,0,geometry().width()-1, geometry().height()-1);
 
@@ -148,9 +150,12 @@ GenericLegendItem::paintEvent(QPaintEvent *)
     string = Utils::removeDP(string);
 
     // set pen to series color for now
-    if (enabled)  painter.setPen(GCColor::invertColor(GColor(CPLOTBACKGROUND))); // use invert - usually black or white
+    if (enabled)  painter.setPen(GCColor::invertColor(legend->plot()->backgroundColor())); // use invert - usually black or white
     else painter.setPen(Qt::gray);
-    painter.setFont(QFont());
+
+    QFont f;
+    f.setPointSizeF(f.pointSize() * legend->plot()->scale());
+    painter.setFont(f);
 
     // series
     painter.drawText(namerect, Qt::TextSingleLine, name);
@@ -159,7 +164,7 @@ GenericLegendItem::paintEvent(QPaintEvent *)
 
 }
 
-GenericLegend::GenericLegend(Context *context, GenericPlot *plot) : context(context), plot(plot)
+GenericLegend::GenericLegend(Context *context, GenericPlot *plot) : context(context), plot_(plot)
 {
     layout = new QHBoxLayout(this);
     layout->addStretch();
@@ -167,7 +172,7 @@ GenericLegend::GenericLegend(Context *context, GenericPlot *plot) : context(cont
     orientation=Qt::Horizontal;
     xname="";
     clickable=true;
-    setAutoFillBackground(true);
+    setAutoFillBackground(false);
 
     connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
 
@@ -179,7 +184,7 @@ void
 GenericLegend::configChanged(qint32)
 {
     QPalette pal;
-    pal.setBrush(backgroundRole(), GColor(CPLOTBACKGROUND));
+    pal.setBrush(backgroundRole(), plot()->backgroundColor());
     setPalette(pal);
     repaint();
 }

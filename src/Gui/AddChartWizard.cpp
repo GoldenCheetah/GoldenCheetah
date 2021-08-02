@@ -26,6 +26,8 @@
 #include <QPixmap>
 #include <QRegExp>
 
+#include "OverviewItems.h"
+
 // WIZARD FLOW
 //
 // 01. select chart type
@@ -195,7 +197,15 @@ AddChartFinal::validatePage()
 {
     // add to the top left
     if (wizard->item) {
-        wizard->item->parent->addItem(0,0,1,7, wizard->item);
+        if (wizard->item->type == OverviewItemType::USERCHART) {
+
+            // we add user charts but make them a bit bigger
+            wizard->item->parent->addItem(0,0,2,21, wizard->item);
+        } else {
+
+            // everthing else is a bit smaller
+            wizard->item->parent->addItem(0,0,1,7, wizard->item);
+        }
         wizard->item->parent->updateGeometry();
     }
     return true;
