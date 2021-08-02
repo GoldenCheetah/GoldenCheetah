@@ -873,9 +873,9 @@ DataOverviewItem::postProcess()
         if (units[i] == tr("seconds"))
             units[i] = "";
 
-    // if we have more values than columns then show as rows
+    // if we have some columns and more values than columns then show as rows
     // otherwise its a simple 3 column table; name value unit
-    multirow = (values.count() > names.count());
+    multirow = (names.count() > 0 && values.count() > names.count());
 
     // what are the max column sizes
     QFontMetrics fm(parent->midfont);
