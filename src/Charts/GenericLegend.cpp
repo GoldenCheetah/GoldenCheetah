@@ -94,7 +94,11 @@ GenericLegendItem::eventFilter(QObject *obj, QEvent *e)
     if (obj != this) return false;
 
     switch (e->type()) {
-    case QEvent::MouseButtonRelease: // for now just one event, but may do more later
+
+    // release is not propagated when embedded in chartspace
+    // so we respond to press not release events, see:
+    // https://github.com/GoldenCheetah/GoldenCheetah/issues/3992
+    case QEvent::MouseButtonPress:
         {
             if (clickable && underMouse()) {
                 enabled=!enabled;
