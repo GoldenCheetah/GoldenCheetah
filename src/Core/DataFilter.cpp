@@ -3596,24 +3596,30 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
 
             } else if (series == "fatigue") {
 
+                int WPRIME = 0;
+                powerzones = m->context->athlete->zones(m->sport);
+                range = powerzones->whichRange(m->dateTime.date());
+                if (range >= 0) WPRIME = powerzones->getWprime(range);
                 // easy for us, they are hardcoded
-                if (field == "name") strings << "W1" << "W2" << "W3" << "W4";
-                else if (field == "description") strings << "Low" << "Medium" << "High" << "Extreme";
-                else if (field == "low") strings << "75" << "50" << "25" << "0";
-                else if (field == "high") strings << "100" << "75" << "50" << "25";
+                for (int i=0; i<WPrime::zoneCount(); i++) {
+                    if (field == "name") strings << WPrime::zoneName(i);
+                    else if (field == "description") strings << WPrime::zoneDesc(i);
+                    else if (field == "low") strings << QString("%1").arg(WPrime::zoneLo(i, WPRIME));
+                    else if (field == "high") strings << QString("%1").arg(WPrime::zoneHi(i, WPRIME));
+                }
                 metricprefix = "wtime_in_zone_L";
                 range=-1;
-                nzones=4; // for metric lookup
+                nzones=WPrime::zoneCount(); // for metric lookup
 
             }
 
             if (field == "units") {
 
                 // Units are fixed, except for pace where they depend on sport
-                if (series == "power") return Result(tr("watts"));
-                else if (series == "hr") return Result(tr("bpm"));
+                if (series == "power") return Result(RideFile::unitName(RideFile::watts, nullptr));
+                else if (series == "hr") return Result(RideFile::unitName(RideFile::hr, nullptr));
                 else if (series == "pace") return Result(pacezones->paceUnits(metricpace));
-                else if (series == "fatigue") return Result(tr("W'bal (%)"));
+                else if (series == "fatigue") return Result(RideFile::unitName(RideFile::wprime, nullptr));
 
             } else if (field == "time" ) {
 
