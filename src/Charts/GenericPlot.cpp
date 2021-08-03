@@ -1119,8 +1119,8 @@ GenericPlot::configureAxis(QString name, bool visible, int align, double min, do
     }
 
     // color
-    if (labelcolor != "") axis->labelcolor=QColor(labelcolor);
-    if (color != "") axis->axiscolor=QColor(color);
+    if (labelcolor != "") axis->labelcolor=RGBColor(QColor(labelcolor));
+    if (color != "") axis->axiscolor=RGBColor(QColor(color));
 
     // log ..
     axis->log = log;
