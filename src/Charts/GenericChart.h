@@ -246,6 +246,7 @@ class GenericAxisInfo {
 };
 
 // the chart
+class ChartSpace;
 class GenericChart : public QWidget {
 
     Q_OBJECT
@@ -281,6 +282,7 @@ class GenericChart : public QWidget {
 
         // plot background
         void setBackgroundColor(QColor);
+        void setGraphicsItem(QGraphicsItem *item);
 
         // post processing clean up / add decorations / helpers etc
         void finaliseChart();
@@ -324,5 +326,6 @@ class GenericChart : public QWidget {
     private:
         Context *context;
         QScrollArea *stackFrame;
+        QGraphicsItem *item;
 };
 #endif

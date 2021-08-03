@@ -48,6 +48,9 @@ class UserChartOverviewItem : public ChartSpaceItem
         static ChartSpaceItem *create(ChartSpace *parent) { return new UserChartOverviewItem(parent, "User Chart",
                                                                         "{ \"title\": \" \",\n\"description\": \"A description of the chart, mostly useful when the chart is uploaded to the cloud to let others know what this chart is useful for etc. \",\n\"type\": 2,\n\"animate\": false,\n\"legendpos\": 2,\n\"stack\": false,\n\"orientation\": 1,\"scale\": 2.5, \n\"SERIES\": [\n{ \"name\": \"Power \", \"group\": \" \", \"xname\": \"Cadence \", \"yname\": \"watts \", \"program\": \"{\\n    finalise {\\n        # we just fetch samples at end\\n        xx <- samples(CADENCE);\\n        yy <- samples(POWER);\\n    }\\n\\n    x { xx; }\\n    y { yy; }\\n}\\n \", \"line\": 0, \"symbol\": 1, \"size\": 14, \"color\": \"#010112\", \"opacity\": 100, \"legend\": true, \"opengl\": false, \"datalabels\": false, \"fill\": false},\n{ \"name\": \"LR \", \"group\": \" \", \"xname\": \"Cadence \", \"yname\": \"watts \", \"program\": \"{\\n    finalise {\\n        # we just fetch samples at end\\n        xx <- samples(CADENCE);\\n        yy <- samples(POWER);\\n        fit <- lr(xx,yy);\\n        ex <- c(10,120);\\n        wy <- c((ex[0]*fit[0])+fit[1],\\n                (ex[1]*fit[0])+fit[1]);\\n                \\n    }\\n\\n    x { ex; }\\n    y { wy; }\\n}\\n \", \"line\": 2, \"symbol\": 1, \"size\": 3, \"color\": \"#01010b\", \"opacity\": 100, \"legend\": false, \"opengl\": false, \"datalabels\": false, \"fill\": false} ]\n,\n\"AXES\": [\n{ \"name\": \"Cadence \", \"type\": 0, \"orientation\": 1, \"align\": 1, \"minx\": 0, \"maxx\": 160, \"miny\": 0, \"maxy\": 0, \"visible\": true, \"fixed\": true, \"log\": false, \"minorgrid\": false, \"majorgrid\": true, \"labelcolor\": \"#6569a5\", \"axiscolor\": \"#6569a5\"},\n{ \"name\": \"watts \", \"type\": 0, \"orientation\": 2, \"align\": 1, \"minx\": 0, \"maxx\": 0, \"miny\": 0, \"maxy\": 1000, \"visible\": true, \"fixed\": false, \"log\": false, \"minorgrid\": false, \"majorgrid\": true, \"labelcolor\": \"#010112\", \"axiscolor\": \"#010112\"} ]\n} "); }
 
+        // chartspace
+        ChartSpace *chartspace() const { return space_; }
+
         // settings get and set
         QString getConfig() const { return chart->settings(); }
         void setConfig(QString config) { chart->applySettings(config); }
@@ -61,6 +64,7 @@ class UserChartOverviewItem : public ChartSpaceItem
         // embedding
         QGraphicsProxyWidget *proxy;
         UserChart *chart;
+        ChartSpace *space_;
 
         // we need to edit the tile name since we use a
         // custom config tool, it gets inserted into the

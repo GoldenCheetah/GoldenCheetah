@@ -34,6 +34,7 @@
 #include "DataFilter.h"
 
 // the chart
+class ChartSpace;
 class UserChartSettings;
 class DataFilterEdit;
 class UserChart : public QWidget {
@@ -55,6 +56,7 @@ class UserChart : public QWidget {
 
         // set background for all charts, legends etc
         void setBackgroundColor(QColor bgcolor);
+        void setGraphicsItem(QGraphicsItem *);
 
     public slots:
 
@@ -98,6 +100,7 @@ class UserChart : public QWidget {
         DateRange dr;
 
         GenericChart *chart;
+        QGraphicsItem *item;
         UserChartSettings *settingsTool_;
 };
 

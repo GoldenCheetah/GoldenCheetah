@@ -19,7 +19,7 @@
 #include "UserChartOverviewItem.h"
 #include "UserChart.h"
 
-UserChartOverviewItem::UserChartOverviewItem(ChartSpace *parent, QString name, QString settings) : ChartSpaceItem(parent, name)
+UserChartOverviewItem::UserChartOverviewItem(ChartSpace *parent, QString name, QString settings) : ChartSpaceItem(parent, name), space_(parent)
 {
 
     // a META widget, "RPE" using the FOSTER modified 0-10 scale
@@ -36,6 +36,7 @@ UserChartOverviewItem::UserChartOverviewItem(ChartSpace *parent, QString name, Q
     proxy = parent->getScene()->addWidget(chart);
     proxy->setParent(this);
     proxy->setZValue(20); // tile is 10, dragging is 100
+    chart->setGraphicsItem(proxy);// only watch the smallest space
 
     // name editor
     QFormLayout *form = new QFormLayout();

@@ -42,7 +42,7 @@
 // honoured too, since multiple series stacked can get
 // cramped, so these are placed into a scroll area
 //
-GenericChart::GenericChart(QWidget *parent, Context *context) : QWidget(parent), context(context)
+GenericChart::GenericChart(QWidget *parent, Context *context) : QWidget(parent), context(context), item(NULL)
 {
     // for scrollarea, since we see a little of it.
     QPalette palette;
@@ -112,6 +112,12 @@ GenericChart::setBackgroundColor(QColor bgcolor)
         this->bgcolor = bgcolor;
         configChanged(0);
     }
+}
+
+void
+GenericChart::setGraphicsItem(QGraphicsItem *item)
+{
+    this->item = item;
 }
 
 // set chart settings
@@ -349,7 +355,7 @@ GenericChart::finaliseChart()
 
         if (index <0) {
             // new one required
-            newPlots[i].plot = new GenericPlot(this, context);
+            newPlots[i].plot = new GenericPlot(this, context, item);
 
             target->addWidget(newPlots[i].plot);
             target->setStretchFactor(newPlots[i].plot, 10);// make them all the same

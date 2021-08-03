@@ -57,6 +57,7 @@ class GenericSelectTool;
 class GenericAxisInfo;
 
 // the chart
+class ChartSpace;
 class GenericPlot : public QWidget {
 
     Q_OBJECT
@@ -70,7 +71,7 @@ class GenericPlot : public QWidget {
         friend class GenericSelectTool;
         friend class GenericLegend;
 
-        GenericPlot(QWidget *parent, Context *context);
+        GenericPlot(QWidget *parent, Context *context, QGraphicsItem *item);
 
         // some helper functions
         static QColor seriesColor(QAbstractSeries* series);
@@ -151,6 +152,7 @@ class GenericPlot : public QWidget {
 
     private:
         Context *context;
+        QGraphicsItem *item;
         int charttype;
 
         // curves

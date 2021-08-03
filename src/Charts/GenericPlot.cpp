@@ -25,13 +25,16 @@
 #include "RideCache.h"
 #include "Utils.h"
 
+#include "ChartSpace.h"
+#include "UserChartOverviewItem.h"
+
 #include <limits>
 
 // used to format dates/times on axes
 QString GenericPlot::gl_dateformat = QString("dd MMM yy");
 QString GenericPlot::gl_timeformat = QString("hh:mm:ss");
 
-GenericPlot::GenericPlot(QWidget *parent, Context *context) : QWidget(parent), context(context)
+GenericPlot::GenericPlot(QWidget *parent, Context *context, QGraphicsItem *item) : QWidget(parent), context(context), item(item)
 {
     setAutoFillBackground(true);
 
@@ -64,8 +67,17 @@ GenericPlot::GenericPlot(QWidget *parent, Context *context) : QWidget(parent), c
     chartview->setRenderHint(QPainter::Antialiasing);
 
     // watch mouse hover etc on the chartview and scene
-    chartview->setMouseTracking(true);
-    chartview->scene()->installEventFilter(this);
+    if (item == NULL) {
+        chartview->setMouseTracking(true);
+        chartview->scene()->installEventFilter(this);
+        installEventFilter(this);
+    } else {
+
+        // we get events from the chartspace becuase
+        // when we are embedded via QGraphicsProxyWidget
+        // mouse events go missing.
+        item->scene()->installEventFilter(this);
+    }
 
     // add selector
     selector = new GenericSelectTool(this);
@@ -73,9 +85,6 @@ GenericPlot::GenericPlot(QWidget *parent, Context *context) : QWidget(parent), c
 
     // the legend at the top for now
     legend = new GenericLegend(context, this);
-
-    // filter ESC so we can stop scripts
-    installEventFilter(this);
 
     // add all widgets to the view
     mainLayout->addWidget(legend);
@@ -109,11 +118,37 @@ GenericPlot::seriesClicked(QAbstractSeries*series, GPointF point)
         if (item) context->notifyRideSelected(item);
     }
 }
-bool GenericPlot::eventFilter(QObject *obj, QEvent *e) { return eventHandler(1, obj, e); }
 
-// source 0=scene, 1=widget
+// we can intercept events from the QT Chart's chartview or a chartspace
+bool GenericPlot::eventFilter(QObject *obj, QEvent *e)
+{
+
+    if (item == NULL)  return eventHandler(0, obj, e);
+
+    // space is non null and not busy dragging and resizing etc
+    if ((e->type() == QEvent::GraphicsSceneMousePress ||
+         e->type() == QEvent::GraphicsSceneMouseRelease ||
+         e->type() == QEvent::GraphicsSceneMouseMove) &&
+
+        // the line below is naughty- it assumes we are embedded via a userchartoverview item- if we
+        // embed R or Python charts on the overview in the future this line will cause a SEGV- I took the
+        // decision that the performance improvement on screen when dragging and moving
+        // overview items was worth the filthy code. if you just delete it (or comment it out)
+        // the code will still be fine, its just here to optimise out unneccessary event processing.
+        static_cast<UserChartOverviewItem*>(static_cast<QGraphicsProxyWidget*>(item)->parent())->chartspace()->state == ChartSpace::NONE &&
+
+        item->sceneBoundingRect().contains(static_cast<QGraphicsSceneMouseEvent*>(e)->scenePos())) {
+
+        // send, as-is, they will have to map co-ordinates
+        return eventHandler(1, obj, e);
+    }
+
+    return false;
+}
+
+// source 0=chart scene, 1= chart space scene
 bool
-GenericPlot::eventHandler(int, void *, QEvent *e)
+GenericPlot::eventHandler(int source, void *, QEvent *e)
 {
     static bool block=false;
 
@@ -122,7 +157,23 @@ GenericPlot::eventHandler(int, void *, QEvent *e)
     else block=true;
 
     // where is the cursor?
-    QPointF spos=QPointF();
+    QPointF spos;
+    if ((e->type() == QEvent::GraphicsSceneMousePress ||
+         e->type() == QEvent::GraphicsSceneMouseRelease ||
+         e->type() == QEvent::GraphicsSceneMouseMove)) {
+
+        // map to the proxy coordinates
+        if (source == 0) { // chartview coordinates already
+            spos = static_cast<QGraphicsSceneMouseEvent*>(e)->scenePos();
+        } else {
+
+            // map to proxy
+            spos = item->mapFromScene(static_cast<QGraphicsSceneMouseEvent*>(e)->scenePos());
+
+            // now add in our relative coordinates wthin the item (our topleft is relative to the proxy topleft)
+            spos -= chartview->geometry().topLeft();
+        }
+    }
 
     // so we want to trigger a scene update?
     bool updatescene = false;
@@ -135,7 +186,6 @@ GenericPlot::eventHandler(int, void *, QEvent *e)
     // mouse clicked
     case QEvent::GraphicsSceneMousePress:
     {
-        spos = static_cast<QGraphicsSceneMouseEvent*>(e)->scenePos();
         updatescene = selector->clicked(spos);
     }
     break;
@@ -143,7 +193,6 @@ GenericPlot::eventHandler(int, void *, QEvent *e)
     // mouse released
     case QEvent::GraphicsSceneMouseRelease:
     {
-        spos = static_cast<QGraphicsSceneMouseEvent*>(e)->scenePos();
         updatescene = selector->released(spos);
     }
     break;
@@ -151,7 +200,6 @@ GenericPlot::eventHandler(int, void *, QEvent *e)
     // mouse move
     case QEvent::GraphicsSceneMouseMove:
     {
-        spos = static_cast<QGraphicsSceneMouseEvent*>(e)->scenePos();
         updatescene = selector->moved(spos);
     }
     break;

@@ -36,7 +36,7 @@
 #include <QDialog>
 
 UserChart::UserChart(QWidget *parent, Context *context, bool rangemode)
-    : QWidget(parent), context(context), rangemode(rangemode), stale(true), last(NULL), ride(NULL)
+    : QWidget(parent), context(context), rangemode(rangemode), stale(true), last(NULL), ride(NULL), item(NULL)
 {
     HelpWhatsThis *helpContents = new HelpWhatsThis(this);
     this->setWhatsThis(helpContents->getWhatsThisText(HelpWhatsThis::Chart_User));
@@ -99,6 +99,13 @@ UserChart::setBackgroundColor(QColor bgcolor)
         this->bgcolor = bgcolor;
         configChanged(0);
     }
+}
+
+void
+UserChart::setGraphicsItem(QGraphicsItem *item)
+{
+    this->item = item;
+    chart->setGraphicsItem(item);
 }
 
 void
