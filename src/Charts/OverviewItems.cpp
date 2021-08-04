@@ -2431,6 +2431,9 @@ DataOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *,
         QRectF dataarea = paintarea;
         dataarea.setY(dataarea.y() + (lineheight*2) + (lineheight*0.25f)); // 0.2 is the line spacing
 
+        // single row just highlight the first data point
+        if (!multirow) dataarea.setY(dataarea.y() - (lineheight*2));
+
         // set value based upon the location of the mouse
         QPoint vpos = parent->view->mapFromGlobal(QCursor::pos());
         QPointF pos = parent->view->mapToScene(vpos);
