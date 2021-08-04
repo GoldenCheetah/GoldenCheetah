@@ -296,6 +296,7 @@ class TopNOverviewItem : public ChartSpaceItem
 
         // interaction
         bool click;
+        RideItem *clickthru;
 
         OverviewItemConfig *configwidget;
 };
@@ -563,6 +564,7 @@ class BubbleViz : public QObject, public QGraphicsItem
         // where is the cursor?
         bool hover;
         bool click;
+        RideItem *clickthru;
         QPointF plotpos;
 
         // for animated transition

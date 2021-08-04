@@ -700,7 +700,7 @@ MetricOverviewItem::~MetricOverviewItem()
     delete sparkline;
 }
 
-TopNOverviewItem::TopNOverviewItem(ChartSpace *parent, QString name, QString symbol) : ChartSpaceItem(parent, name), click(false)
+TopNOverviewItem::TopNOverviewItem(ChartSpace *parent, QString name, QString symbol) : ChartSpaceItem(parent, name), click(false), clickthru(NULL)
 {
     // metric
     this->type = OverviewItemType::TOPN;
@@ -2735,9 +2735,18 @@ TopNOverviewItem::sceneEvent(QEvent *event)
         if (paintarea.contains(cpos)) {
             event->accept();
             click = true;
+            clickthru = NULL;
             update();
             return true;
         }
+
+    } else if (event->type() == QEvent::GraphicsSceneMouseRelease) {
+
+        if (clickthru) {
+            parent->context->notifyRideSelected(clickthru);
+            clickthru = NULL;
+        }
+        return true;
 
     } else if (event->type() == QEvent::GraphicsSceneHoverEnter) {
 
@@ -2809,7 +2818,7 @@ TopNOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *,
             painter->setBrush(darkgray);
             painter->drawRect(itemarea);
 
-            if (click && ranked[i].item) parent->context->notifyRideSelected(ranked[i].item);
+            clickthru = ranked[i].item;
         }
 
         // rank
@@ -3802,6 +3811,7 @@ BubbleViz::BubbleViz(IntervalOverviewItem *parent, QString name) : QGraphicsItem
     setZValue(11);
     setAcceptHoverEvents(true);
 
+    clickthru = NULL;
     group = new QSequentialAnimationGroup(this);
 
     QParallelAnimationGroup *par = new QParallelAnimationGroup(this);
@@ -3867,6 +3877,15 @@ BubbleViz::sceneEvent(QEvent *event)
 
     if (event->type() == QEvent::GraphicsSceneMousePress) {
         click = true;
+        clickthru=NULL;
+        update();
+    }
+
+    if (event->type() == QEvent::GraphicsSceneMouseRelease) {
+        if (clickthru) {
+            parent->parent->context->notifyRideSelected(clickthru);
+            clickthru = NULL;
+        }
     }
     return false;
 }
@@ -4255,7 +4274,7 @@ BubbleViz::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
     }
 
     if (click && nearvalue >= 0 && nearest.item != NULL) {
-        parent->parent->context->notifyRideSelected(nearest.item);
+        clickthru = nearest.item;
     }
     click = false;
 
