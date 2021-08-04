@@ -2427,7 +2427,7 @@ DataOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *,
     QRectF paintarea = QRectF(20,ROWHEIGHT*2, geometry().width()-40, geometry().height()-20-(ROWHEIGHT*2));
 
     // paint the hover background
-    if (underMouse() and files.count()) {
+    if (underMouse() && files.count()) {
         QRectF dataarea = paintarea;
         dataarea.setY(dataarea.y() + (lineheight*2) + (lineheight*0.25f)); // 0.2 is the line spacing
 
