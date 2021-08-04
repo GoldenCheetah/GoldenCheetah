@@ -3540,7 +3540,6 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
 
         // zone descriptions and high / lows, but not cp/cv, w'/d' et al
         if (leaf->function == "zones") {
-
             // parms
             QString series = *leaf->fparms[0]->lvalue.n;
             QString field = *leaf->fparms[1]->lvalue.n;
@@ -3555,9 +3554,23 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
             // so get the zones and ranges setup
             // then loop through the zones in a single
             // loop, so lets get the control variables here
+            QString sport;
+            QDate date;
             const Zones *powerzones;
             const HrZones *hrzones;
             const PaceZones *pacezones;
+
+            // which sport and date?
+            if (d == DateRange()) {
+                // Actvities view: activity sport and date
+                sport = m->sport;
+                date = m->dateTime.date();
+            } else {
+                // Trends view: sport from included activities and range end date
+                int nActivities, nRides, nRuns, nSwims;
+		m->context->athlete->rideCache->getRideTypeCounts(s, nActivities, nRides, nRuns, nSwims, sport);
+                date = d.to;
+            }
 
             // which range and how many zones are there
             int range=-1, nzones = 0;
@@ -3572,24 +3585,24 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
             if (series == "power") {
 
                 // power zones are for Run or Bike, but not Swim
-                powerzones = m->context->athlete->zones(m->sport);
-                range= powerzones->whichRange(m->dateTime.date());
+                powerzones = m->context->athlete->zones(sport);
+                range= powerzones->whichRange(date);
                 if (range >= 0) nzones = powerzones->numZones(range);
                 metricprefix = "time_in_zone_L";
 
             } else if (series == "hr") {
 
                 // hr zones are also for run or bike, but not Swim
-                hrzones = m->context->athlete->hrZones(m->sport);
-                range= hrzones->whichRange(m->dateTime.date());
+                hrzones = m->context->athlete->hrZones(sport);
+                range= hrzones->whichRange(date);
                 if (range >= 0) nzones = hrzones->numZones(range);
                 metricprefix = "time_in_zone_H";
 
             } else if (series == "pace") {
 
                 // pace zones are for run or swim
-                pacezones = m->context->athlete->paceZones(m->sport == "Swim");
-                range= pacezones->whichRange(m->dateTime.date());
+                pacezones = m->context->athlete->paceZones(sport == "Swim");
+                range= pacezones->whichRange(date);
                 if (range >= 0) nzones = pacezones->numZones(range);
                 metricprefix = "time_in_zone_P";
                 metricpace = appsettings->value(nullptr, pacezones->paceSetting(), GlobalContext::context()->useMetricUnits).toBool();
@@ -3597,8 +3610,8 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
             } else if (series == "fatigue") {
 
                 int WPRIME = 0;
-                powerzones = m->context->athlete->zones(m->sport);
-                range = powerzones->whichRange(m->dateTime.date());
+                powerzones = m->context->athlete->zones(sport);
+                range = powerzones->whichRange(date);
                 if (range >= 0) WPRIME = powerzones->getWprime(range);
                 // easy for us, they are hardcoded
                 for (int i=0; i<WPrime::zoneCount(); i++) {
@@ -3626,16 +3639,20 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
                 // time in zones and percent in zones use metrics
                 for(int n=0; n<nzones; n++) {
                     QString name = QString("%1%2").arg(metricprefix).arg(n+1);
-                    strings << m->getStringForSymbol(name, GlobalContext::context()->useMetricUnits);
+                    double value = (d==DateRange()) ? m->getForSymbol(name, true)
+                                                    : m->context->athlete->rideCache->getAggregate(name, s, true, true).toDouble();
+                    strings << time_to_string(value);
                 }
 
             } else if (field == "percent") {
 
-                double duration = m->getForSymbol("workout_time", false);
+                double total = (d==DateRange()) ? m->getForSymbol("time_recording", true)
+                                                : m->context->athlete->rideCache->getAggregate("time_recording", s, true, true).toDouble();
                 for(int n=0; n<nzones; n++) {
                     QString name = QString("%1%2").arg(metricprefix).arg(n+1);
-                    double value = m->getForSymbol(name, false);
-                    double percent = round(value/duration * 100.0);
+                    double value = (d==DateRange()) ? m->getForSymbol(name, true)
+                                                    : m->context->athlete->rideCache->getAggregate(name, s, true, true).toDouble();
+                    double percent = round(value/total * 100.0);
                     strings << QString("%1").arg(percent);
                 }
 
