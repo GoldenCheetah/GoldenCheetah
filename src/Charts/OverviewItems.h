@@ -139,7 +139,9 @@ class DataOverviewItem : public ChartSpaceItem
         DataOverviewItem(ChartSpace *parent, QString name, QString program);
         ~DataOverviewItem();
 
+        bool sceneEvent(QEvent *event); // click thru
         void itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *);
+        QRectF hotspot();
         void itemGeometryChanged();
         void setData(RideItem *item);
         void setDateRange(DateRange);
@@ -156,15 +158,18 @@ class DataOverviewItem : public ChartSpaceItem
 
         // settings
         QString program;
-        Leaf *fnames, *funits, *fvalues;
+        Leaf *fnames, *funits, *fvalues, *ffiles;
 
         // the data
-        QVector<QString> names, units, values;
+        QVector<QString> names, units, values, files;
 
         // display control
         bool multirow;
         QList<double> columnWidths;
         OverviewItemConfig *configwidget;
+
+        bool click; // for clickthru
+        RideItem *clickthru;
 };
 
 class RPEOverviewItem : public ChartSpaceItem

@@ -140,6 +140,9 @@ DataOverviewItem::DataOverviewItem(ChartSpace *parent, QString name, QString pro
     this->type = OverviewItemType::DATATABLE;
     this->program = program;
 
+    click = false;
+    clickthru = NULL;
+
     configwidget = new OverviewItemConfig(this);
     configwidget->hide();
 }
@@ -208,6 +211,12 @@ QString DataOverviewItem::getLegacyProgram(int type, DataFilterRuntime &rt)
             "      metricstrings(W'_Work),\n"
             "      metricstrings(30_min_Peak_Power)); \n"
             "} \n"
+            "\n"
+            "# Click thru for the row, we can set the file\n"
+            "# this row represents. In the same way as a user chart.\n"
+            "f { \n"
+            "    filename();\n"
+            "}\n"
             "\n"
             "}";
     break;
@@ -836,6 +845,7 @@ DataOverviewItem::setData(RideItem *item)
     names.clear();
     units.clear();
     values.clear();
+    files.clear();
 
     if (item == NULL || item->ride() == NULL) return;
 
@@ -852,11 +862,13 @@ DataOverviewItem::setData(RideItem *item)
         fnames = parser.rt.functions.contains("names") ? parser.rt.functions.value("names") : NULL;
         funits = parser.rt.functions.contains("units") ? parser.rt.functions.value("units") : NULL;
         fvalues = parser.rt.functions.contains("values") ? parser.rt.functions.value("values") : NULL;
+        ffiles = parser.rt.functions.contains("f") ? parser.rt.functions.value("f") : NULL;
 
         // fetch the data
         if (fnames) names = parser.root()->eval(&parser.rt, fnames, Result(0), 0, const_cast<RideItem*>(item), NULL, NULL, spec, dr).asString();
         if (funits) units = parser.root()->eval(&parser.rt, funits, Result(0), 0, const_cast<RideItem*>(item), NULL, NULL, spec, dr).asString();
         if (fvalues) values = parser.root()->eval(&parser.rt, fvalues, Result(0), 0, const_cast<RideItem*>(item), NULL, NULL, spec, dr).asString();
+        if (ffiles) files = parser.root()->eval(&parser.rt, ffiles, Result(0), 0, const_cast<RideItem*>(item), NULL, NULL, spec, dr).asString();
 
         postProcess();
     }
@@ -947,6 +959,7 @@ DataOverviewItem::setDateRange(DateRange dr)
     names.clear();
     units.clear();
     values.clear();
+    files.clear();
 
     // calculate the value...
     DataFilter parser(this, parent->context, program);
@@ -962,11 +975,13 @@ DataOverviewItem::setDateRange(DateRange dr)
         fnames = parser.rt.functions.contains("names") ? parser.rt.functions.value("names") : NULL;
         funits = parser.rt.functions.contains("units") ? parser.rt.functions.value("units") : NULL;
         fvalues = parser.rt.functions.contains("values") ? parser.rt.functions.value("values") : NULL;
+        ffiles = parser.rt.functions.contains("f") ? parser.rt.functions.value("f") : NULL;
 
         // fetch the data
         if (fnames) names = parser.root()->eval(&parser.rt, fnames, Result(0), 0, const_cast<RideItem*>(parent->context->currentRideItem()), NULL, NULL, spec, dr).asString();
         if (funits) units = parser.root()->eval(&parser.rt, funits, Result(0), 0, const_cast<RideItem*>(parent->context->currentRideItem()), NULL, NULL, spec, dr).asString();
         if (fvalues) values = parser.root()->eval(&parser.rt, fvalues, Result(0), 0, const_cast<RideItem*>(parent->context->currentRideItem()), NULL, NULL, spec, dr).asString();
+        if (ffiles) files = parser.root()->eval(&parser.rt, ffiles, Result(0), 0, const_cast<RideItem*>(parent->context->currentRideItem()), NULL, NULL, spec, dr).asString();
 
         postProcess();
     }
@@ -2340,6 +2355,64 @@ KPIOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, 
     }
 }
 
+bool
+DataOverviewItem::sceneEvent(QEvent *event)
+{
+    click = false;
+
+    if (event->type() == QEvent::GraphicsSceneHoverMove) {
+
+        // mouse moved so hover paint anyway
+        update();
+
+    }  else if (event->type() == QEvent::GraphicsSceneHoverLeave) {
+
+        update();
+
+    } else if (event->type() == QEvent::GraphicsSceneMousePress) {
+
+        QRectF paintarea = QRectF(20,ROWHEIGHT*2, geometry().width()-40, geometry().height()-20-(ROWHEIGHT*2));
+
+        QPoint vpos = parent->view->mapFromGlobal(QCursor::pos());
+        QPointF pos = parent->view->mapToScene(vpos);
+        QPointF cpos = pos - geometry().topLeft();
+
+        // grab this before its interpreted as initiate drag
+        if (paintarea.contains(cpos)) {
+            event->accept();
+
+            // pain will work out if we have something to select
+            click = true;
+            clickthru = NULL;
+            update();
+
+            return true;
+        }
+
+    } else if (event->type() == QEvent::GraphicsSceneMouseRelease) {
+
+        if (clickthru) {
+            // do we need to select?
+            parent->context->notifyRideSelected(clickthru);
+            clickthru = NULL;
+        }
+        event->accept();
+        return true;
+
+    } else if (event->type() == QEvent::GraphicsSceneHoverEnter) {
+
+        update();
+    }
+    return false;
+}
+
+QRectF
+DataOverviewItem::hotspot()
+{
+    // use the paint area, regardless of rows as too expensive to compute
+    return QRectF(20,ROWHEIGHT*2, geometry().width()-40, geometry().height()-20-(ROWHEIGHT*2));
+}
+
 void
 DataOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
 
@@ -2350,18 +2423,46 @@ DataOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *,
     QFontMetrics fm(multirow ? parent->smallfont : parent->midfont, parent->device());
     double lineheight = fm.boundingRect("XXX").height() * 1.2f;
 
-    // fonts and colors
-    painter->setFont(multirow ? parent->smallfont : parent->midfont);
-    if (GCColor::luminance(GColor(CCARDBACKGROUND)) < 127) painter->setPen(QColor(200,200,200));
-    else painter->setPen(QColor(70,70,70));
-
     // our bounding rectangle
     QRectF paintarea = QRectF(20,ROWHEIGHT*2, geometry().width()-40, geometry().height()-20-(ROWHEIGHT*2));
+
+    // paint the hover background
+    if (underMouse() and files.count()) {
+        QRectF dataarea = paintarea;
+        dataarea.setY(dataarea.y() + (lineheight*2) + (lineheight*0.25f)); // 0.2 is the line spacing
+
+        // set value based upon the location of the mouse
+        QPoint vpos = parent->view->mapFromGlobal(QCursor::pos());
+        QPointF pos = parent->view->mapToScene(vpos);
+        QPointF cpos = pos - geometry().topLeft();
+
+        // what row would we be on?
+        int row = (cpos.y()-dataarea.topLeft().y())/lineheight;
+        QRectF itemarea(dataarea.left(), dataarea.top()+(row*lineheight), dataarea.width(), lineheight);
+
+        if (row < files.count() && itemarea.contains(cpos)) {
+            painter->setPen(Qt::NoPen);
+            QColor darkgray(120,120,120,120);
+            painter->setBrush(darkgray);
+            painter->drawRect(itemarea);
+
+            if (click) {
+                clickthru = parent->context->athlete->rideCache->getRide(files[row]);
+                click = false;
+            }
+        }
+    }
 
     // default horizontal spacing, no flex here, is what it is
     double hmargin=ROWHEIGHT;
 
+    // fonts and colors for data
+    painter->setFont(multirow ? parent->smallfont : parent->midfont);
+    if (GCColor::luminance(GColor(CCARDBACKGROUND)) < 127) painter->setPen(QColor(200,200,200));
+    else painter->setPen(QColor(70,70,70));
+
     if (multirow) {
+
 
         // rows of data with column headings- will make paged and interactive in v3.7
         //
