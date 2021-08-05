@@ -2054,7 +2054,6 @@ IntervalOverviewItem::setDateRange(DateRange dr)
         first = false;
     }
 
-
     // set scale
     double ydiff = (maxy-miny) / 10.0f;
     if (miny >= 0 && ydiff > miny) miny = ydiff;
@@ -3826,6 +3825,8 @@ BubbleViz::BubbleViz(IntervalOverviewItem *parent, QString name) : QGraphicsItem
 
     transitionAnimation=new QPropertyAnimation(this, "transition");
     group->addAnimation(transitionAnimation);
+
+    minx=maxx=miny=maxy=-1; // initial values
 }
 
 BubbleViz::~BubbleViz()
@@ -3906,6 +3907,14 @@ bool scoresBiggerThan(const BubbleVizTuple i1, const BubbleVizTuple i2)
 void
 BubbleViz::setPoints(QList<BPointF> p, double minx, double maxx, double miny, double maxy)
 {
+    // initial conditions?
+    if (this->miny == -1 && this->maxy == -1 && this->minx == -1 && this->maxx == -1)  {
+        this->minx=minx;
+        this->miny=miny;
+        this->maxy=maxy;
+        this->maxx=maxx;
+    }
+
     xaxisAnimation->setStartValue(QPointF(this->minx,this->maxx));
     xaxisAnimation->setEndValue(QPointF(minx,maxx));
     yaxisAnimation->setStartValue(QPointF(this->miny,this->maxy));
@@ -4124,6 +4133,7 @@ BubbleViz::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
         }
 
     } else {
+
         // when transition is -1 we are rescaling the axes first
         int index=0;
         foreach(BPointF point, oldpoints) {
