@@ -220,6 +220,7 @@ class DataFilter : public QObject
 
         // runtime passed by datafilter
         DataFilterRuntime rt;
+        QObject *parent() { return parent_; }
 
         // compile time errors
         QStringList &errorList() { return errors; }
@@ -272,6 +273,8 @@ class DataFilter : public QObject
         QStringList filenames;
         QStringList *list;
         QString sig;
+
+        QObject *parent_;
 };
 
 // general purpose model fitting to x/y data

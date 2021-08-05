@@ -350,6 +350,10 @@ static struct {
 
     { "string", 1 }, // string(a) will convert the passed entries to a string if they are numeric.
 
+    { "activities", 2 }, // activities("expression", expr) - provides a closure for expr using the filter in expression
+                         // for example filter("Workout_Code = \"FTP\"", metrics(BikeStress)) will return a vector of
+                         // BikeStress values for activities that have the metadata "Workout_Code"
+
 
     // add new ones above this line
     { "", -1 }
@@ -1625,7 +1629,14 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
 
                 bool found=false;
 
-                if (leaf->function == "daterange") {
+                if (leaf->function == "activities") {
+
+                    if (leaf->fparms.count() != 2 || leaf->fparms[0]->type != Leaf::String) {
+                        inerror=true;
+                        DataFiltererrors << tr("activities(\"fexpr\", expr) - where fexpr is a filter expression");
+                    }
+
+                } else if (leaf->function == "daterange") {
 
                     if (leaf->fparms.count()==1) {
 
@@ -2774,7 +2785,7 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
     }
 }
 
-DataFilter::DataFilter(QObject *parent, Context *context) : QObject(parent), context(context), treeRoot(NULL)
+DataFilter::DataFilter(QObject *parent, Context *context) : QObject(parent), context(context), treeRoot(NULL), parent_(parent)
 {
     // let folks know who owns this rumtime for signalling
     rt.owner = this;
@@ -2802,7 +2813,7 @@ DataFilter::DataFilter(QObject *parent, Context *context) : QObject(parent), con
     //connect(context, SIGNAL(rideSelected(RideItem*)), this, SLOT(dynamicParse()));
 }
 
-DataFilter::DataFilter(QObject *parent, Context *context, QString formula) : QObject(parent), context(context), treeRoot(NULL)
+DataFilter::DataFilter(QObject *parent, Context *context, QString formula) : QObject(parent), context(context), treeRoot(NULL), parent_(parent)
 {
     // let folks know who owns this rumtime for signalling
     rt.owner = this;
@@ -3381,6 +3392,37 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
             // return a single value, or a list
             if (list.count() == 1) return Result(list[0]);
             else return Result(list);
+        }
+
+        if (leaf->function == "activities") {
+
+            // filters activities using an expression, in the same way the
+            // daterange function filters on date, in fact the daterange
+            // closure could be implemented using activities and an expression
+
+            // the user will have ecaped quotes to embed in a string
+            QString prog = *(leaf->fparms[0]->lvalue.s);
+
+            // now compile it
+            DataFilter filter(df->owner->parent(), df->owner->context, prog);
+
+            // failed to parse
+            if (filter.root() == NULL) {
+                return Result(0);
+            }
+
+            // get a filter list
+            QStringList filters;
+            foreach(RideItem *ride, m->context->athlete->rideCache->rides()) {
+
+                Result r = filter.evaluate(ride, NULL);
+                if (r.number()) filters << ride->fileName;
+            }
+            Specification spec = s;
+            spec.addMatches(filters);
+
+            // now evaluate- but using an updated specification
+            return  eval(df, leaf->fparms[1],x, it, m, p, c, spec, d);
         }
 
         if (leaf->function == "daterange") {
