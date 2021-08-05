@@ -158,6 +158,17 @@ QString xmlprotect(const QString &string)
     return s;
 }
 
+QString unescape(const QString &string)
+{
+    // just unescape common \ characters
+    QString s = string;
+    s.replace("\\\"","\"");
+    s.replace( "\\n", "\n" );
+    s.replace( "\\r", "\r" );
+
+    return s;
+}
+
 // BEWARE: this function is tied closely to RideFile parsing
 //           DO NOT CHANGE IT UNLESS YOU KNOW WHAT YOU ARE DOING
 QString unprotect(const QString &buffer)

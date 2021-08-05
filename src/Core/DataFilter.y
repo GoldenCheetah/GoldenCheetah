@@ -490,7 +490,7 @@ literal:
 
         DF_STRING                               { $$ = new Leaf(@1.first_column, @1.last_column);
                                                   $$->type = Leaf::String;
-                                                  QString s2(DataFiltertext);
+                                                  QString s2 = Utils::unescape(DataFiltertext); // user can escape chars in string
                                                   $$->lvalue.s = new QString(s2.mid(1,s2.length()-2));
                                                 }
         | DF_FLOAT                              { $$ = new Leaf(@1.first_column, @1.last_column);

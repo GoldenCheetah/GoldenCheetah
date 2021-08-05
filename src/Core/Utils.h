@@ -39,6 +39,7 @@ namespace Utils
 {
     QString xmlprotect(const QString &string);
     QString unprotect(const QString &buffer);
+    QString unescape(const QString &string); // simple string unescaping, used in datafilters
     QString jsonprotect(const QString &buffer);
     QString jsonunprotect(const QString &buffer);
     QStringList searchPath(QString path, QString binary, bool isexec=true);
