@@ -42,6 +42,8 @@ namespace Utils
     QString unescape(const QString &string); // simple string unescaping, used in datafilters
     QString jsonprotect(const QString &buffer);
     QString jsonunprotect(const QString &buffer);
+    QString jsonprotect2(const QString &buffer); // internal use- encodes / and " as :sl: :qu:
+    QString jsonunprotect2(const QString &buffer); // internal use- encodes / and " as :sl: :qu:
     QStringList searchPath(QString path, QString binary, bool isexec=true);
     QString removeDP(QString);
     double number(QString);

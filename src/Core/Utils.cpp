@@ -236,6 +236,47 @@ QString jsonunprotect(const QString &string)
     return s;
 }
 
+// json protection with special handling for " and \
+// used when embedding in xml
+QString jsonprotect2(const QString &string)
+{
+    QString s = string;
+    s.replace("\t", "\\t");  // tab
+    s.replace("\n", "\\n");  // newline
+    s.replace("\r", "\\r");  // carriage-return
+    s.replace("\b", "\\b");  // backspace
+    s.replace("\f", "\\f");  // formfeed
+    s.replace("/", "\\/");   // solidus
+    s.replace("\\", ":sl:"); // backslash
+    s.replace("\"", ":qu:"); // quote
+
+    // add a trailing space to avoid conflicting with GC special tokens
+    s += " ";
+
+    return s;
+}
+
+QString jsonunprotect2(const QString &string)
+{
+    QString s = string;
+    // legacy- these should never be present
+    //         but included to read older files
+    s.replace("\\\"", "\""); // quote
+    s.replace("\\\\", "\\"); // backslash
+
+    s.replace(":qu:", "\""); // quote
+    s.replace(":sl:", "\\"); // backslash
+    s.replace("\\t", "\t");  // tab
+    s.replace("\\n", "\n");  // newline
+    s.replace("\\r", "\r");  // carriage-return
+    s.replace("\\b", "\b");  // backspace
+    s.replace("\\f", "\f");  // formfeed
+    s.replace("\\/", "/");   // solidus
+
+    // those trailing spaces.
+    while (s.endsWith(" ")) s = s.mid(0,s.length()-1);
+    return s;
+}
 QStringList
 searchPath(QString path, QString binary, bool isexec)
 {
@@ -540,4 +581,3 @@ double myisinf(double x) { return isinf(x); } // math.h
 double myisnan(double x) { return isnan(x); } // math.h
 
 };
-

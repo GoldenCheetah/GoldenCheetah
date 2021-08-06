@@ -324,8 +324,8 @@ UserChart::settings() const
     out << "{ ";
 
     // chartinfo
-    out << "\"title\": \""       << Utils::jsonprotect(chartinfo.title) << "\",\n";
-    out << "\"description\": \"" << Utils::jsonprotect(chartinfo.description) << "\",\n";
+    out << "\"title\": \""       << Utils::jsonprotect2(chartinfo.title) << "\",\n";
+    out << "\"description\": \"" << Utils::jsonprotect2(chartinfo.description) << "\",\n";
     out << "\"type\": "          << chartinfo.type << ",\n";
     out << "\"animate\": "       << (chartinfo.animate ? "true" : "false") << ",\n";
     out << "\"legendpos\": "     << chartinfo.legendpos << ",\n";
@@ -346,11 +346,11 @@ UserChart::settings() const
 
         // out as a json object in the "SERIES" array
         out << "{ ";
-        out << "\"name\": \""    << Utils::jsonprotect(series.name) << "\", ";
-        out << "\"group\": \""   << Utils::jsonprotect(series.group) << "\", ";
-        out << "\"xname\": \""   << Utils::jsonprotect(series.xname) << "\", ";
-        out << "\"yname\": \""   << Utils::jsonprotect(series.yname) << "\", ";
-        out << "\"program\": \"" << Utils::jsonprotect(series.string1) << "\", ";
+        out << "\"name\": \""    << Utils::jsonprotect2(series.name) << "\", ";
+        out << "\"group\": \""   << Utils::jsonprotect2(series.group) << "\", ";
+        out << "\"xname\": \""   << Utils::jsonprotect2(series.xname) << "\", ";
+        out << "\"yname\": \""   << Utils::jsonprotect2(series.yname) << "\", ";
+        out << "\"program\": \"" << Utils::jsonprotect2(series.string1) << "\", ";
         out << "\"line\": "      << series.line << ", ";
         out << "\"symbol\": "    << series.symbol << ", ";
         out << "\"size\": "      << series.size << ", ";
@@ -377,7 +377,7 @@ UserChart::settings() const
         // out as a json object in the AXES array
         out << "{ ";
 
-        out << "\"name\": \""       << Utils::jsonprotect(axis.name) << "\", ";
+        out << "\"name\": \""       << Utils::jsonprotect2(axis.name) << "\", ";
         out << "\"type\": "         << axis.type << ", ";
         out << "\"orientation\": "  << axis.orientation << ", ";
         out << "\"align\": "        << axis.align << ", ";
@@ -411,8 +411,8 @@ UserChart::applySettings(QString x)
     QJsonObject obj = doc.object();
 
     // chartinfo
-    chartinfo.title = Utils::jsonunprotect(obj["title"].toString());
-    chartinfo.description = Utils::jsonunprotect(obj["description"].toString());
+    chartinfo.title = Utils::jsonunprotect2(obj["title"].toString());
+    chartinfo.description = Utils::jsonunprotect2(obj["description"].toString());
     chartinfo.type = obj["type"].toInt();
     chartinfo.animate = obj["animate"].toBool();
     chartinfo.legendpos = obj["legendpos"].toInt();
@@ -433,11 +433,11 @@ UserChart::applySettings(QString x)
         QJsonObject series=it.toObject();
 
         GenericSeriesInfo add;
-        add.name = Utils::jsonunprotect(series["name"].toString());
-        add.group = Utils::jsonunprotect(series["group"].toString());
-        add.xname = Utils::jsonunprotect(series["xname"].toString());
-        add.yname = Utils::jsonunprotect(series["yname"].toString());
-        add.string1 = Utils::jsonunprotect(series["program"].toString());
+        add.name = Utils::jsonunprotect2(series["name"].toString());
+        add.group = Utils::jsonunprotect2(series["group"].toString());
+        add.xname = Utils::jsonunprotect2(series["xname"].toString());
+        add.yname = Utils::jsonunprotect2(series["yname"].toString());
+        add.string1 = Utils::jsonunprotect2(series["program"].toString());
         add.line = series["line"].toInt();
         add.symbol = series["symbol"].toInt();
         add.size = series["size"].toDouble();
@@ -463,7 +463,7 @@ UserChart::applySettings(QString x)
         QJsonObject axis=it.toObject();
 
         GenericAxisInfo add;
-        add.name = Utils::jsonunprotect(axis["name"].toString());
+        add.name = Utils::jsonunprotect2(axis["name"].toString());
         add.type = static_cast<GenericAxisInfo::AxisInfoType>(axis["type"].toInt());
         add.orientation = static_cast<Qt::Orientation>(axis["orientation"].toInt());
         add.align = static_cast<Qt::AlignmentFlag>(axis["align"].toInt());
