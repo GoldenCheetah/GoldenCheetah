@@ -302,6 +302,7 @@ void
 GenericPlot::addAnnotation(AnnotationType, QString string, QColor color)
 {
     QFont std;
+    std.setPointSizeF(std.pointSizeF() * scale_);
     QFontMetrics fm(std);
 
     QLabel *add = new QLabel(this);
@@ -528,6 +529,10 @@ GenericPlot::addCurve(QString name, QVector<double> xseries, QVector<double> yse
     // standard colors are encoded 1,1,x - where x is the index into the colorset
     QColor applyColor = RGBColor(QColor(color));
 
+    // labels font
+    QFont labelsfont;
+    labelsfont.setPointSizeF(labelsfont.pointSize() * scale_);
+
     // if curve already exists, remove it
     if (charttype==GC_CHART_LINE || charttype==GC_CHART_SCATTER || charttype==GC_CHART_PIE) {
         QAbstractSeries *existing = curves.value(name);
@@ -619,6 +624,7 @@ GenericPlot::addCurve(QString name, QVector<double> xseries, QVector<double> yse
             if (linestyle == 0) add->setVisible(false);
             else {
                 if (datalabels) {
+                    add->setPointLabelsFont(labelsfont);
                     add->setPointLabelsVisible(true);    // is false by default
                     add->setPointLabelsColor(applyColor);
                     add->setPointLabelsFormat("@yPoint");
@@ -671,6 +677,7 @@ GenericPlot::addCurve(QString name, QVector<double> xseries, QVector<double> yse
                 // if no line, but we still want labels then show
                 // for our data points
                 if (linestyle == 0 && datalabels) {
+                    add->setPointLabelsFont(labelsfont);
                     dec->setPointLabelsVisible(true);    // is false by default
                     dec->setPointLabelsColor(applyColor);
                     dec->setPointLabelsFormat("@yPoint");
@@ -736,6 +743,7 @@ GenericPlot::addCurve(QString name, QVector<double> xseries, QVector<double> yse
             }
 
             if (datalabels) {
+                add->setPointLabelsFont(labelsfont);
                 add->setPointLabelsVisible(true);    // is false by default
                 add->setPointLabelsColor(applyColor);
                 add->setPointLabelsFormat("@yPoint");
