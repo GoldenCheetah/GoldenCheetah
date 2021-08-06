@@ -3610,7 +3610,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
             } else {
                 // Trends view: sport from included activities and range end date
                 int nActivities, nRides, nRuns, nSwims;
-		m->context->athlete->rideCache->getRideTypeCounts(s, nActivities, nRides, nRuns, nSwims, sport);
+                m->context->athlete->rideCache->getRideTypeCounts(s, nActivities, nRides, nRuns, nSwims, sport);
                 date = d.to;
             }
 
@@ -3722,13 +3722,13 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
 
                     else if (field == "low") {
                         if (series != "pace") strings << QString("%1").arg(low);
-			else strings << pacezones->kphToPaceString(low, metricpace);
+                        else strings << pacezones->kphToPaceString(low, metricpace);
 
-		    } else if (field == "high") {
+                    } else if (field == "high") {
                         if (n==nzones-1) strings << ""; // infinite, so make blank
                         else {
                             if (series != "pace") strings << QString("%1").arg(high);
-			    else strings << pacezones->kphToPaceString(high, metricpace);
+                            else strings << pacezones->kphToPaceString(high, metricpace);
                         }
                     }
                 }
