@@ -354,6 +354,15 @@ static struct {
                          // for example filter("Workout_Code = \"FTP\"", metrics(BikeStress)) will return a vector of
                          // BikeStress values for activities that have the metadata "Workout_Code"
 
+    { "intervals", 0 }, // intervals(symbol|name|start|stop|type|test|color|route|selected|date|filename [,start [,stop]])
+                        // - returns a vector of values for the metric or field specified for each interval
+                        // if no start/stop is supplied it uses the currently selected date range or activity.
+
+    { "intervalstrings", 0 }, // intervalstring(symbol|name|start|stop|type|test|color|route|selected|date|filename [,start [,stop]])
+                              //  - same as intervals above but instead of returning a vector of numbers, the values
+                              //  are converted to strings as appropriate for the metric (e.g. Pace_Rowing mm:ss/500m).
+
+
 
     // add new ones above this line
     { "", -1 }
@@ -1973,13 +1982,14 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
                     } else {
 
                         // check they are all valid metrics
+                        QRegExp symbols("^(name|start|stop|type|test|color|route|selected|date|filename)$");
                         for(int i=0; i<leaf->fparms.count(); i++) {
                             if (leaf->fparms[i]->type != Leaf::Symbol) {
                                 leaf->inerror = true;
                                 DataFiltererrors << QString(tr("only metric names are supported")).arg(leaf->function);
                             } else {
                                 QString symbol=*(leaf->fparms[0]->lvalue.n);
-                                if (symbol != "date" && df->lookupMap.value(symbol,"") == "") {
+                                if (!symbols.exactMatch(symbol) && df->lookupMap.value(symbol,"") == "") {
                                     inerror = true;
                                     DataFiltererrors << QString(tr("unknown metric %1")).arg(symbol);
                                 }
@@ -2014,6 +2024,38 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
 
                        leaf->inerror = true;
                        DataFiltererrors << QString(tr("too many parameters: metrics(symbol|date, start, stop)"));
+                    }
+
+                } else if (leaf->function == "intervals" || leaf->function == "intervalstrings") {
+
+                    // is the param a symbol and either a metric name or 'date'
+                    if (leaf->fparms.count() < 1 || leaf->fparms[0]->type != Leaf::Symbol) {
+                       leaf->inerror = true;
+                       DataFiltererrors << QString(tr("%1(symbol|name|start|stop|type|test|color|route|selected|date|filename), symbol should be a metric name").arg(leaf->function));
+
+                    } else if (leaf->fparms.count() >= 1) {
+
+                        QRegExp symbols("^(name|start|stop|type|test|color|route|selected|date|filename)$");
+                        QString symbol=*(leaf->fparms[0]->lvalue.n);
+                        if (!symbols.exactMatch(symbol) && df->lookupMap.value(symbol,"") == "") {
+                            leaf->inerror = true;
+                            DataFiltererrors << QString(tr("invalid symbol '%1', should be either a metric name or 'name|start|stop|type|test|color|route|selected|date|filename''").arg(symbol));
+
+                        }
+                    } else if (leaf->fparms.count() >= 2) {
+
+                        // validate what was passed as second value - can be number or datestring
+                        validateFilter(context, df, leaf->fparms[1]);
+
+                    } else if (leaf->fparms.count() == 3) {
+
+                        // validate what was passed as second value - can be number or datestring
+                        validateFilter(context, df, leaf->fparms[2]);
+
+                    } else if (leaf->fparms.count() > 3) {
+
+                       leaf->inerror = true;
+                       DataFiltererrors << QString(tr("too many parameters: %1(symbol, start, stop)").arg(leaf->function));
                     }
 
                 } else if (leaf->function == "bests") {
@@ -3361,6 +3403,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
 
             QVector<QString> list;
 
+            QRegExp symbols("^(name|start|stop|type|test|color|route|selected|date|filename)$");
             for(int i=0; i<leaf->fparms.count(); i++) {
 
                 // symbol dereference
@@ -3369,8 +3412,18 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
                 RideMetricFactory &factory = RideMetricFactory::instance();
                 const RideMetric *e = factory.rideMetric(o_symbol);
 
-                if (wantname && symbol == "date") list << tr("Date");
-                else if (wantunit && symbol == "date") list << "";
+                if (wantname  && symbol == "date") list << tr("Date");
+                else if (wantname  && symbol == "name") list << tr("Name");
+                else if (wantname  && symbol == "start") list << tr("Start");
+                else if (wantname  && symbol == "stop") list << tr("Stop");
+                else if (wantname  && symbol == "type") list << tr("Type");
+                else if (wantname  && symbol == "test") list << tr("Test");
+                else if (wantname  && symbol == "color") list << tr("Color");
+                else if (wantname  && symbol == "route") list << tr("Route");
+                else if (wantname  && symbol == "selected") list << tr("Selected");
+                else if (wantname  && symbol == "filename") list << tr("File Name");
+                else if (wantunit && symbols.exactMatch(symbol))
+                    list << "";
                 else {
                     if (e) {
                         if (wantname) list << e->name();
@@ -4368,6 +4421,123 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
                     returning.number() += value;
                     returning.asNumeric().append(value);
                 }
+            }
+            return returning;
+        }
+
+        if (leaf->function == "intervals" || leaf->function == "intervalstrings") {
+
+            bool currentride = false;
+            bool wantstrings = (leaf->function == "intervalstrings");
+            QDate earliest(1900,01,01);
+            QString symbol = *(leaf->fparms[0]->lvalue.n);
+
+            // find the metric
+            QString o_symbol = df->lookupMap.value(symbol,"");
+            RideMetricFactory &factory = RideMetricFactory::instance();
+            const RideMetric *e = factory.rideMetric(o_symbol);
+
+            // returning numbers or strings
+            Result returning(0);
+            if (wantstrings) returning.isNumber=false;
+
+            FilterSet fs;
+            fs.addFilter(m->context->isfiltered, m->context->filters);
+            fs.addFilter(m->context->ishomefiltered, m->context->homeFilters);
+            Specification spec;
+            spec.setFilterSet(fs);
+
+            // date range can be controlled, if no date range is set then we just
+            // use the currently selected date range if valid, otherwise current activity
+            if (leaf->fparms.count() == 3 && Leaf::isNumber(df, leaf->fparms[1]) && Leaf::isNumber(df, leaf->fparms[2])) {
+
+                // start to stop
+                Result b = eval(df, leaf->fparms[1],x, it, m, p, c, s, d);
+                QDate start = earliest.addDays(b.number());
+
+                Result e = eval(df, leaf->fparms[2],x, it, m, p, c, s, d);
+                QDate stop = earliest.addDays(e.number());
+
+                spec.setDateRange(DateRange(start,stop));
+
+            } else if (leaf->fparms.count() == 2 && Leaf::isNumber(df, leaf->fparms[1])) {
+
+                // start to today
+                Result b = eval(df, leaf->fparms[1],x, it, m, p, c, s, d);
+                QDate start = earliest.addDays(b.number());
+                QDate stop = QDate::currentDate();
+
+                spec.setDateRange(DateRange(start,stop));
+
+            } else if (d != DateRange()) {
+                spec.setDateRange(d); // fallback to daterange selected, if provided
+            } else {
+                currentride = true;
+            }
+
+            // loop through rides for daterange or currentride
+            foreach(RideItem *ride, m->context->athlete->rideCache->rides()) {
+
+                // when current ride is requested we loop one time to avoid code duplication,
+                // otherwise filters are honored and only passing rides are processed
+                if (currentride) ride = m;
+                else if (!s.pass(ride)) continue;
+                else if (!spec.pass(ride)) continue;
+
+                foreach(IntervalItem *ii, ride->intervals()) {
+
+                    double value=0;
+                    QString asstring;
+                    if(symbol == "date") {
+                        value= QDate(1900,01,01).daysTo(ride->dateTime.date());
+                        if (wantstrings) asstring = ride->dateTime.date().toString("dd MMM yyyy");
+                    } else if(symbol == "filename") {
+                        asstring = ride->fileName;
+                    } else if(symbol == "name") {
+                        asstring = ii->name;
+                    } else if(symbol == "start") {
+                        value = ii->start;
+                        asstring = time_to_string(ii->start);
+                    } else if(symbol == "stop") {
+                        value = ii->start;
+                        asstring = time_to_string(ii->stop);
+                    } else if(symbol == "type") {
+                        asstring = RideFileInterval::typeDescription(ii->type);
+                    } else if(symbol == "test") {
+                        value = ii->test;
+                        asstring = QString("%1").arg(ii->test);
+                    } else if(symbol == "color") {
+                        // apply item color, remembering that 1,1,1 means use default (reverse in this case)
+                        if (ii->color == QColor(1,1,1,1)) {
+                            // use the inverted color, not plot marker as that hideous
+                            QColor col =GCColor::invertColor(GColor(CPLOTBACKGROUND));
+                            // white is jarring on a dark background!
+                            if (col==QColor(Qt::white)) col=QColor(127,127,127);
+                            asstring = col.name();
+                        } else {
+                            asstring = ii->color.name();
+                        }
+                    } else if(symbol == "route") {
+                        asstring = ii->route.toString();
+                    } else if(symbol == "selected") {
+                        value = ii->selected;
+                        asstring = QString("%1").arg(ii->selected);
+                    } else {
+                        value = ii->getForSymbol(df->lookupMap.value(symbol,""));
+                        if (wantstrings) e ? asstring = e->toString(value) : "(null)";
+                    }
+
+                    if (wantstrings) {
+                        returning.asString().append(asstring);
+                    } else {
+                        returning.number() += value;
+                        returning.asNumeric().append(value);
+                    }
+
+                }
+
+                // when current ride is requested we are done
+                if (currentride) break;
             }
             return returning;
         }
