@@ -156,6 +156,7 @@ DataOverviewItem::~DataOverviewItem()
 #define DATA_TABLE_MAXIMUMS    3
 #define DATA_TABLE_METRICS     4
 #define DATA_TABLE_ZONES       5
+#define DATA_TABLE_INTERVALS   6
 #define DATA_TABLE_TRENDS      9
 
 // this is the old metric configuration, now deprecated, we will look it up
@@ -348,6 +349,64 @@ QString DataOverviewItem::getLegacyProgram(int type, DataFilterRuntime &rt)
             "} \n"
             "\n"
             "}\n";
+    }
+    break;
+
+    case DATA_TABLE_INTERVALS:
+    {
+        // get a string list of the metrics to show
+        QString s;
+        if (appsettings->contains(GC_SETTINGS_FAVOURITE_METRICS)) s = appsettings->value(NULL, GC_SETTINGS_FAVOURITE_METRICS).toString();
+        else s = GC_SETTINGS_FAVOURITE_METRICS_DEFAULT;
+        QStringList symbols = s.split(",");
+
+        // convert metric symbols to names we can use in the program
+        QStringList list;
+        list << "name";
+        QMapIterator<QString, QString> i(rt.lookupMap);
+        while (i.hasNext()) {
+            i.next();
+            if (symbols.contains(i.value())) list << i.key();
+        }
+
+        // generate a program
+        QString metrics = list.join(",\n              ");
+
+        program =
+            "{\n"
+            "\n"
+            "# column names, if using metrics then best\n"
+            "# to use metricname() to get correct name for locale\n"
+            "# otherwise it won't translate to other languages\n"
+            "names { \n"
+            "    metricname(" + metrics + ");\n"
+            "}\n"
+            "\n"
+            "# column units, if using metrics then best\n"
+            "# to use metricunit() function to get correct string\n"
+            "# for locale and metric/imperial\n"
+            "units { \n"
+            "    metricunit(" + metrics +  ");\n"
+            "}\n"
+            "\n"
+            "# values to display as doubles or strings\n"
+            "# if using metrics always best to use asstring()\n"
+            "# to convert correctly with dp, metric/imperial\n"
+            "# or specific formats eg. rowing pace xx/500m\n"
+            "values { \n"
+            "    c(";
+
+            bool first=true;
+            foreach(QString metric, list) {
+
+                // commas
+                if (first) first = false;
+                else program += ",\n      ";
+
+                program += "intervalstrings(" + metric + ")";
+            }
+
+            program += ");\n}\n\n}\n";
     }
     break;
 
@@ -2425,8 +2484,10 @@ DataOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *,
     // our bounding rectangle
     QRectF paintarea = QRectF(20,ROWHEIGHT*2, geometry().width()-40, geometry().height()-20-(ROWHEIGHT*2));
 
+    int hoverrow = -1; // remember if the mouse is over a particular row.
+
     // paint the hover background
-    if (underMouse() && files.count()) {
+    if (underMouse()) {
         QRectF dataarea = paintarea;
         dataarea.setY(dataarea.y() + (lineheight*2) + (lineheight*0.25f)); // 0.2 is the line spacing
 
@@ -2442,15 +2503,20 @@ DataOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *,
         int row = (cpos.y()-dataarea.topLeft().y())/lineheight;
         QRectF itemarea(dataarea.left(), dataarea.top()+(row*lineheight), dataarea.width(), lineheight);
 
-        if (row < files.count() && itemarea.contains(cpos)) {
-            painter->setPen(Qt::NoPen);
-            QColor darkgray(120,120,120,120);
-            painter->setBrush(darkgray);
-            painter->drawRect(itemarea);
+        if (itemarea.contains(cpos)) {
+            if (files.count() && row < files.count()) {
+                painter->setPen(Qt::NoPen);
+                QColor darkgray(120,120,120,120);
+                painter->setBrush(darkgray);
+                painter->drawRect(itemarea);
 
-            if (click) {
-                clickthru = parent->context->athlete->rideCache->getRide(files[row]);
-                click = false;
+                if (click) {
+                    clickthru = parent->context->athlete->rideCache->getRide(files[row]);
+                    click = false;
+                }
+            } else {
+                // clicktru is not available bit lets at least make the
+                if (multirow) hoverrow = row;
             }
         }
     }
@@ -2459,9 +2525,15 @@ DataOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *,
     double hmargin=ROWHEIGHT;
 
     // fonts and colors for data
-    painter->setFont(multirow ? parent->smallfont : parent->midfont);
-    if (GCColor::luminance(GColor(CCARDBACKGROUND)) < 127) painter->setPen(QColor(200,200,200));
-    else painter->setPen(QColor(70,70,70));
+    QFont normal = multirow ? parent->smallfont : parent->midfont;
+    QFont bold = normal;
+    bold.setBold(true);
+
+    painter->setFont(normal);
+
+    // normal just grey, we highlight with plot marker
+    QColor cnormal = (GCColor::luminance(GColor(CCARDBACKGROUND)) < 127) ? QColor(200,200,200) : QColor(70,70,70);
+    painter->setPen(cnormal);
 
     if (multirow) {
 
@@ -2508,6 +2580,16 @@ DataOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *,
             int offset = rows * i;
             for (int j=0; j<rows && offset+j < values.count(); j++) {
                 QString value = values[offset+j];
+
+                // highlight rows when hovering and click thru not available
+                if (j == hoverrow) {
+                    painter->setFont(bold);
+                    painter->setPen(GColor(CPLOTMARKER));
+                } else {
+                    painter->setFont(normal);
+                    painter->setPen(cnormal);
+                }
+
                 painter->drawText(xoffset, yoffset, value);
                 yoffset += lineheight;
             }
@@ -3111,6 +3193,7 @@ OverviewItemConfig::OverviewItemConfig(ChartSpaceItem *item) : QWidget(NULL), it
         legacySelector->addItem("Maximums", DATA_TABLE_MAXIMUMS);
         legacySelector->addItem("Metrics", DATA_TABLE_METRICS);
         legacySelector->addItem("Zones", DATA_TABLE_ZONES);
+        legacySelector->addItem("Intervals", DATA_TABLE_INTERVALS);
 
         layout->addRow(tr("Legacy"), legacySelector);
         connect(legacySelector, SIGNAL(currentIndexChanged(int)), this, SLOT(setProgram(int)));
