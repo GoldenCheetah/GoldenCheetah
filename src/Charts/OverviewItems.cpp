@@ -1011,6 +1011,9 @@ DataOverviewItem::postProcess()
             columnWidths << maxwidth;
         }
     }
+
+    // keep the same sorting...
+    if (lastsort != -1) sort(lastsort, lastorder);
 }
 
 void
@@ -2716,6 +2719,11 @@ DataOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *,
             painter->drawText(xoffset, yoffset, units[i]); // todo: centering
             xoffset += columnWidths[i] + hspace;
         }
+
+        // separator for heading from data
+        painter->setPen(QPen(cnormal, 1, Qt::SolidLine, Qt::RoundCap));
+        painter->drawLine(paintarea.topLeft() + QPointF(0, lineheight * 2.2),
+                          paintarea.topRight() + QPointF(0, lineheight * 2.2));
 
         // data values
         xoffset = hmargin;
