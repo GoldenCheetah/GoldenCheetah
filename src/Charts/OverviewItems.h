@@ -156,6 +156,9 @@ class DataOverviewItem : public ChartSpaceItem
         // the look and feel of the old ride summary
         static QString getLegacyProgram(int, DataFilterRuntime &);
 
+        // sort the datatable
+        void sort(int column, Qt::SortOrder order);
+
         // settings
         QString program;
         Leaf *fnames, *funits, *fvalues, *ffiles;
@@ -170,6 +173,10 @@ class DataOverviewItem : public ChartSpaceItem
 
         bool click; // for clickthru
         RideItem *clickthru;
+        int sortcolumn; // for sorting a column
+
+        int lastsort; // the column we last sorted on
+        Qt::SortOrder lastorder; // the order we last sorted on
 };
 
 class RPEOverviewItem : public ChartSpaceItem

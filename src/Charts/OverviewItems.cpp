@@ -141,6 +141,8 @@ DataOverviewItem::DataOverviewItem(ChartSpace *parent, QString name, QString pro
     this->program = program;
 
     click = false;
+    lastsort = sortcolumn = -1;
+    lastorder = Qt::AscendingOrder;
     clickthru = NULL;
 
     configwidget = new OverviewItemConfig(this);
@@ -1009,6 +1011,82 @@ DataOverviewItem::postProcess()
             columnWidths << maxwidth;
         }
     }
+}
+
+void
+DataOverviewItem::sort(int column, Qt::SortOrder order)
+{
+    if (column >= names.count()) return; // out of bounds
+
+    // step 1: infer the type for column
+    int isdate=0, istime=0, isnumber=0, isstring=0;
+
+    int rows = values.count() / names.count();
+
+    QRegExp redate("^[0-9][0-9] [A-z][A-z][A-z] [0-9][0-9]*$");
+    QRegExp retime("^[0-9:]*$");
+    QRegExp renumber("^[0-9.]*$");
+
+    for(int i= rows * column; i<values.count() && i< rows * (column+1) ; i++) {
+        QString &val = values[i];
+
+        // check, the order here is important
+        if (renumber.exactMatch(val)) isnumber++; // numbers + .
+        else if (retime.exactMatch(val)) istime++; // numbers + :
+        else if (redate.exactMatch(val)) isdate++; // numbers + date
+        else isstring++; // all bets are off
+    }
+
+    // step 2: generate an argsort index as strings or numbers
+    QVector<int> argsortindex;
+    if (isstring) {
+
+        QVector<QString> in;
+        for(int i= rows * column; i<values.count() && i< rows * (column+1) ; i++) in<<values[i];
+        argsortindex = Utils::argsort(in, order==Qt::AscendingOrder);
+
+    } else {
+
+        const QDate epoch(1970,1,1);
+        QVector<double> in;
+        for(int i= rows * column; i<values.count() && i< rows * (column+1) ; i++) {
+
+            QString &val = values[i];
+
+            // convert to double based upon type
+            if (renumber.exactMatch(val)) in << val.toDouble();
+            else if (retime.exactMatch(val)) {
+
+                // time formats are painful- these are formats we use in the code...
+                QStringList formats = { "h:mm:ss", "hh:mm:ss", "mm:ss", "s" };
+                QTime attempt;
+
+                foreach(QString format, formats) {
+                    attempt = QTime::fromString(val, format);
+                    if (attempt.isValid()) break;
+                }
+
+                in << QTime(0,0,0).secsTo(attempt);
+            }
+            else if (redate.exactMatch(val)) in << epoch.daysTo(QDate::fromString(val, "dd MMM yyyy"));
+            else in << 0;
+        }
+        argsortindex = Utils::argsort(in, order==Qt::AscendingOrder);
+    }
+
+    // step 3: reorder values by the argsort index
+    QVector<QString> ordered = values;
+    for(int i=0; i<names.count(); i++) {
+        // resequence column i
+        for(int k=0; k<argsortindex.count() && (i*rows)+k < ordered.count(); k++)
+            ordered[(i*rows)+k] = values[(i*rows)+argsortindex[k]];
+    }
+
+    // phew!
+    values = ordered;
+
+    lastsort = column;
+    lastorder = order;
 }
 
 void
@@ -2441,6 +2519,7 @@ DataOverviewItem::sceneEvent(QEvent *event)
 
             // pain will work out if we have something to select
             click = true;
+            sortcolumn = -1;
             clickthru = NULL;
             update();
 
@@ -2454,6 +2533,15 @@ DataOverviewItem::sceneEvent(QEvent *event)
             parent->context->notifyRideSelected(clickthru);
             clickthru = NULL;
         }
+
+        if (sortcolumn != -1) {
+            // sort !!
+            click=false;
+            if (lastsort == sortcolumn) sort(sortcolumn, lastorder == Qt::DescendingOrder ? Qt::AscendingOrder : Qt::DescendingOrder);
+            else sort(sortcolumn, Qt::DescendingOrder);
+            update();
+        }
+
         event->accept();
         return true;
 
@@ -2477,19 +2565,52 @@ DataOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *,
     // paint nothing if no values - or a mismatch
     if (values.count() < names.count()) return;
 
+    // step 1: calculate paint metrics, colors, fonts, margins etc etc ...
+
     // we use the mid font, so lets get some font metrics
     QFontMetrics fm(multirow ? parent->smallfont : parent->midfont, parent->device());
     double lineheight = fm.boundingRect("XXX").height() * 1.2f;
 
+    // default horizontal spacing, no flex here, is what it is
+    double hmargin=ROWHEIGHT;
+
     // our bounding rectangle
     QRectF paintarea = QRectF(20,ROWHEIGHT*2, geometry().width()-40, geometry().height()-20-(ROWHEIGHT*2));
 
+    // rows of data with column headings- will make paged and interactive in v3.7
+    //
+    // layout like this:  |hvvvsvvvsvvvsvvvsvvvh|
+    // where:
+    //     h is hmargin
+    //     vvv is metric value
+    //     s is hspace
+    //
+    double content = 0;
+    foreach(double width, columnWidths) content += width;
+    double hspace = geometry().width() - (content + hmargin + hmargin);
+    hspace = (hspace > 0) ? hspace / (columnWidths.count()-1) : hmargin; // minimum space
+
+    // fonts and colors for data
+    QFont normal = multirow ? parent->smallfont : parent->midfont;
+    QFont bold = normal;
+    bold.setBold(true);
+
+    // normal just grey, we highlight with plot marker
+    QColor cnormal = (GCColor::luminance(GColor(CCARDBACKGROUND)) < 127) ? QColor(200,200,200) : QColor(70,70,70);
+
+
+    // step 2: where is the mouse hovering, paint a background etc ....
+
     int hoverrow = -1; // remember if the mouse is over a particular row.
 
-    // paint the hover background
-    if (underMouse()) {
+    // paint the hover background, only matters when have multiple rows
+    if (multirow && underMouse()) {
+
         QRectF dataarea = paintarea;
         dataarea.setY(dataarea.y() + (lineheight*2) + (lineheight*0.25f)); // 0.2 is the line spacing
+
+        QRectF headingarea = paintarea;
+        headingarea.setHeight(lineheight*2);
 
         // single row just highlight the first data point
         if (!multirow) dataarea.setY(dataarea.y() - (lineheight*2));
@@ -2503,7 +2624,39 @@ DataOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *,
         int row = (cpos.y()-dataarea.topLeft().y())/lineheight;
         QRectF itemarea(dataarea.left(), dataarea.top()+(row*lineheight), dataarea.width(), lineheight);
 
-        if (itemarea.contains(cpos)) {
+        // in header or data area?
+        if (headingarea.contains(cpos)) {
+
+            // column number and rectangle
+            int column = -1, cn=0;
+            double xoffset = 0;
+            QRectF crect;
+            foreach(double width, columnWidths) {
+
+                // bound for column cn heading
+                QRectF prect = QRectF(headingarea.x()+xoffset, headingarea.y(), width+hspace, lineheight*2.25f);
+                if (prect.contains(cpos)) {
+                    column = cn;
+                    crect=prect;
+                }
+
+                // and on to the next column
+                cn++;
+                xoffset += width + hspace;
+            }
+
+            // lets paint the hover background for the column
+            if (column != -1) {
+                painter->setPen(Qt::NoPen);
+                QColor darkgray(120,120,120,120);
+                painter->setBrush(darkgray);
+                painter->drawRect(crect);
+
+                if (click) sortcolumn = column;
+            }
+
+        } else if (itemarea.contains(cpos)) {
+
             if (files.count() && row < files.count()) {
                 painter->setPen(Qt::NoPen);
                 QColor darkgray(120,120,120,120);
@@ -2521,41 +2674,38 @@ DataOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *,
         }
     }
 
-    // default horizontal spacing, no flex here, is what it is
-    double hmargin=ROWHEIGHT;
 
-    // fonts and colors for data
-    QFont normal = multirow ? parent->smallfont : parent->midfont;
-    QFont bold = normal;
-    bold.setBold(true);
-
+    // step 3: paint the table from here ....
     painter->setFont(normal);
-
-    // normal just grey, we highlight with plot marker
-    QColor cnormal = (GCColor::luminance(GColor(CCARDBACKGROUND)) < 127) ? QColor(200,200,200) : QColor(70,70,70);
-    painter->setPen(cnormal);
+    painter->setRenderHint(QPainter::Antialiasing);
+    painter->setPen(QPen(cnormal, 4, Qt::SolidLine, Qt::RoundCap));
 
     if (multirow) {
-
-
-        // rows of data with column headings- will make paged and interactive in v3.7
-        //
-        // layout like this:  |hvvvsvvvsvvvsvvvsvvvh|
-        // where:
-        //     h is hmargin
-        //     vvv is metric value
-        //     s is hspace
-        //
-        double content = 0;
-        foreach(double width, columnWidths) content += width;
-        double hspace = geometry().width() - (content + hmargin + hmargin);
-        hspace = (hspace > 0) ? hspace / (columnWidths.count()-1) : hmargin; // minimum space
 
         // heading row
         double xoffset = hmargin;
         double yoffset = paintarea.topLeft().y()+lineheight;
         for(int i=0; i<names.count(); i++) {
+
+            // column name
             painter->drawText(xoffset, yoffset, names[i]); // todo: centering
+
+            // if we are the sort column we need an indicator
+            if (lastsort == i) {
+
+                QFontMetrics fm(normal);
+                QRectF tb = fm.boundingRect(names[i]);
+                QRectF cb = fm.boundingRect("X");
+
+                double direction = lastorder == Qt::AscendingOrder ? +1 : -1;
+
+                // tick
+                QPointF start(xoffset+tb.width()+(cb.width()*1.8), yoffset-(cb.height()/5));
+                painter->drawLine(start, start-QPointF(cb.width()/2, direction * cb.height()/5));
+                painter->drawLine(start-QPointF(cb.width()/2, direction * cb.height()/5), start-QPointF(cb.width(), 0));
+
+                //painter->setPen(cnormal);
+            }
             xoffset += columnWidths[i] + hspace;
         }
         yoffset += lineheight;
