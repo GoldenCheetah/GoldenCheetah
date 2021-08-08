@@ -1,4 +1,5 @@
-<layout name="train" style="2">
+<layouts>
+<layout name="General" style="2" type="1"  expression="">
 	<chart id="22" name="" title="Power" >
 		<property name="title" type="QString" value="Power" />
 		<property name="subtitle" type="QString" value="" />
@@ -189,3 +190,4 @@
 		<property name="style" type="int" value="2" />
 	</chart>
 </layout>
+</layouts>

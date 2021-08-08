@@ -1,4 +1,5 @@
-<layout name="diary" style="2">
+<layouts>
+<layout name="General" style="2" type="4"  expression="">
 	<chart id="7" name="" title="Time and Distance" >
 		<property name="title" type="QString" value="Time and Distance" />
 		<property name="subtitle" type="QString" value="" />
@@ -133,3 +134,4 @@
 		<property name="useSelected" type="int" value="4" />
 	</chart>
 </layout>
+</layouts>

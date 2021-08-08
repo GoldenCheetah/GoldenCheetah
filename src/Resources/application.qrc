@@ -107,11 +107,11 @@
         <file>translations/gc_sv.qm</file>
         <file>xml/charts.xml</file>
         <file>xml/metadata.xml</file>
-        <file>xml/train-layout.xml</file>
+        <file>xml/train-perspectives.xml</file>
         <file>xml/video-layout.xml</file>
-        <file>xml/diary-layout.xml</file>
-        <file>xml/analysis-layout.xml</file>
-        <file>xml/home-layout.xml</file>
+        <file>xml/diary-perspectives.xml</file>
+        <file>xml/analysis-perspectives.xml</file>
+        <file>xml/home-perspectives.xml</file>
         <file>ini/measures.ini</file>
         <file>html/ltm-summary.html</file>
         <file>images/oxygen/power-off.png</file>
