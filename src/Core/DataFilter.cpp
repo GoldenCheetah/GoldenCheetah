@@ -3480,6 +3480,9 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
 
         if (leaf->function == "daterange") {
 
+            // cannot get a context via ride as none selected or available
+            if (m == NULL) return Result(0);
+
             // sets the daterange for the expression, a bit like a closure
             // so we don't have to add parameters to functions that do things
             // differently when working in trends view. e.g. measures, metrics etc
@@ -4365,8 +4368,10 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
             if (wantstrings) returning.isNumber=false;
 
             FilterSet fs;
-            fs.addFilter(m->context->isfiltered, m->context->filters);
-            fs.addFilter(m->context->ishomefiltered, m->context->homeFilters);
+            if (m) {
+                fs.addFilter(m->context->isfiltered, m->context->filters);
+                fs.addFilter(m->context->ishomefiltered, m->context->homeFilters);
+            }
             Specification spec;
             spec.setFilterSet(fs);
 
@@ -4395,6 +4400,9 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
             } else {
                 spec.setDateRange(d); // fallback to daterange selected
             }
+
+            // no ride selected, or none available
+            if (m == NULL) return Result(0);
 
             // loop through rides for daterange
             int count=0;
@@ -4474,6 +4482,9 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
             } else {
                 currentride = true;
             }
+
+            // no rides available or selected
+            if (m == NULL) return Result(0);
 
             // loop through rides for daterange or currentride
             foreach(RideItem *ride, m->context->athlete->rideCache->rides()) {
@@ -6262,6 +6273,8 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
                     } else {
 
                         Result returning(0);
+
+                        if (m == NULL) return returning; // no ride
 
                         // date range, returning a vector
                         foreach(PDEstimate pde, m->context->athlete->getPDEstimates()) {

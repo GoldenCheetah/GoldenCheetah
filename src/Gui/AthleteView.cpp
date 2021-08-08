@@ -209,8 +209,8 @@ AthleteCard::configAthlete()
 void
 AthleteCard::clicked()
 {
-    if (loadprogress==100) parent->context->mainWindow->closeTab(path);
-    else parent->context->mainWindow->openTab(path);
+    if (loadprogress==100) parent->context->mainWindow->closeAthleteTab(path);
+    else parent->context->mainWindow->openAthleteTab(path);
 }
 
 void

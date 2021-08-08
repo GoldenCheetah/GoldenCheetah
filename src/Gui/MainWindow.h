@@ -94,7 +94,7 @@ class MainWindow : public QMainWindow
         int loading;
 
         // currently selected tab
-        AthleteTab *athleteTab() { return currentTab; }
+        AthleteTab *athleteTab() { return currentAthleteTab; }
         NewSideBar *newSidebar() { return sidebar; }
 
         // tab view keeps this up to date
@@ -109,8 +109,8 @@ class MainWindow : public QMainWindow
         // have already been opened
         friend class ::ChooseCyclistDialog;
         friend class ::AthleteLoader;
-        QMap<QString,AthleteTab*> tabs;
-        AthleteTab *currentTab;
+        QMap<QString,AthleteTab*> athletetabs;
+        AthleteTab *currentAthleteTab;
         QList<AthleteTab*> tabList;
 
         virtual void resizeEvent(QResizeEvent*);
@@ -147,6 +147,7 @@ class MainWindow : public QMainWindow
         // perspective selected
         void perspectiveSelected(int index);
         void perspectivesChanged(); // when the list of perspectives is updated in PerspectivesDialog
+        void resetPerspective(int view); // reset when view changes
 
         // import and export perspectives
         void exportPerspective();
@@ -160,14 +161,14 @@ class MainWindow : public QMainWindow
 
         void setOpenTabMenu(); // set the Open Tab menu
         void newCyclistTab();  // create a new Cyclist
-        void openTab(QString name);
+        void openAthleteTab(QString name);
         void loadCompleted(QString name, Context *context);
         void closeTabClicked(int index); // user clicked to close tab
-        bool closeTab(QString name); // close named athlete
-        bool closeTab();       // close current, might not if the user
+        bool closeAthleteTab(QString name); // close named athlete
+        bool closeAthleteTab();       // close current, might not if the user
                                // changes mind if there are unsaved changes.
-        void removeTab(AthleteTab*);  // remove without question
-        void switchTab(int index); // for switching between one tab and another
+        void removeAthleteTab(AthleteTab*);  // remove without question
+        void switchAthleteTab(int index); // for switching between one tab and another
 
         // sidebar selecting views and actions
         void sidebarClicked(int id);
@@ -190,7 +191,6 @@ class MainWindow : public QMainWindow
         void selectDiary();
         void selectAnalysis();
         void selectTrain();
-        void selectInterval();
 
         void setChartMenu();
         void setSubChartMenu();

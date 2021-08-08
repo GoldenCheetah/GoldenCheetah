@@ -174,6 +174,8 @@ AthleteTab::view(int index)
 void
 AthleteTab::selectView(int index)
 {
+    if (views->currentIndex() == index) return; // not changing
+
     emit viewChanged(index);
 
     // first we deselect the current
@@ -184,6 +186,7 @@ AthleteTab::selectView(int index)
     view(index)->setSelected(true);
     masterControls->setCurrentIndex(index);
     context->setIndex(index);
+    context->mainWindow->resetPerspective(index); // set perspective for this view
 }
 
 void
