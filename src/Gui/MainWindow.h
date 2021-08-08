@@ -69,7 +69,7 @@ class MainWindow;
 class Athlete;
 class AthleteLoader;
 class Context;
-class Tab;
+class AthleteTab;
 
 
 extern QList<MainWindow *> mainwindows; // keep track of all the MainWindows we have open
@@ -94,7 +94,7 @@ class MainWindow : public QMainWindow
         int loading;
 
         // currently selected tab
-        Tab *athleteTab() { return currentTab; }
+        AthleteTab *athleteTab() { return currentTab; }
         NewSideBar *newSidebar() { return sidebar; }
 
         // tab view keeps this up to date
@@ -109,9 +109,9 @@ class MainWindow : public QMainWindow
         // have already been opened
         friend class ::ChooseCyclistDialog;
         friend class ::AthleteLoader;
-        QMap<QString,Tab*> tabs;
-        Tab *currentTab;
-        QList<Tab*> tabList;
+        QMap<QString,AthleteTab*> tabs;
+        AthleteTab *currentTab;
+        QList<AthleteTab*> tabList;
 
         virtual void resizeEvent(QResizeEvent*);
         virtual void moveEvent(QMoveEvent*);
@@ -166,7 +166,7 @@ class MainWindow : public QMainWindow
         bool closeTab(QString name); // close named athlete
         bool closeTab();       // close current, might not if the user
                                // changes mind if there are unsaved changes.
-        void removeTab(Tab*);  // remove without question
+        void removeTab(AthleteTab*);  // remove without question
         void switchTab(int index); // for switching between one tab and another
 
         // sidebar selecting views and actions

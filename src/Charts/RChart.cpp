@@ -21,7 +21,7 @@
 #include "RSyntax.h"
 
 #include "Colors.h"
-#include "TabView.h"
+#include "AbstractView.h"
 #include "GenericChart.h"
 #include "HelpWhatsThis.h"
 
@@ -60,7 +60,7 @@ RConsole::configChanged(qint32)
     p.setColor(QPalette::Base, GColor(CPLOTBACKGROUND));
     p.setColor(QPalette::Text, GCColor::invertColor(GColor(CPLOTBACKGROUND)));
     setPalette(p);
-    setStyleSheet(TabView::ourStyleSheet());
+    setStyleSheet(AbstractView::ourStyleSheet());
 
     // set default colors
     if (rtool) rtool->configChanged();
@@ -326,7 +326,7 @@ RChart::RChart(Context *context, bool ridesummary) : GcChartWindow(context), con
         p.setColor(QPalette::Base, GColor(CPLOTBACKGROUND));
         p.setColor(QPalette::Text, GCColor::invertColor(GColor(CPLOTBACKGROUND)));
         script->setPalette(p);
-        script->setStyleSheet(TabView::ourStyleSheet());
+        script->setStyleSheet(AbstractView::ourStyleSheet());
 
         // syntax highlighter
         setScript("## R script will run on selection.\n"

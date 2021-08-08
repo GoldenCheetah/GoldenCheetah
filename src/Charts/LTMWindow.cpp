@@ -21,7 +21,7 @@
 #include "LTMPlot.h"
 #include "LTMSettings.h"
 #include "LTMChartParser.h"
-#include "TabView.h"
+#include "AbstractView.h"
 #include "Context.h"
 #include "Context.h"
 #include "Athlete.h"
@@ -553,11 +553,11 @@ LTMWindow::configChanged(qint32)
     RMSElabel->setPalette(whitepalette);
 
 #ifndef Q_OS_MAC
-    banT1->setStyleSheet(TabView::ourStyleSheet());
-    banT2->setStyleSheet(TabView::ourStyleSheet());
-    banCombo->setStyleSheet(TabView::ourStyleSheet());
-    plotArea->setStyleSheet(TabView::ourStyleSheet());
-    compareplotArea->setStyleSheet(TabView::ourStyleSheet());
+    banT1->setStyleSheet(AbstractView::ourStyleSheet());
+    banT2->setStyleSheet(AbstractView::ourStyleSheet());
+    banCombo->setStyleSheet(AbstractView::ourStyleSheet());
+    plotArea->setStyleSheet(AbstractView::ourStyleSheet());
+    compareplotArea->setStyleSheet(AbstractView::ourStyleSheet());
 #endif
     refresh();
 }

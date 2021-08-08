@@ -19,7 +19,7 @@
 #ifndef _GC_Views_h
 #define _GC_Views_h 1
 
-#include "TabView.h"
+#include "AbstractView.h"
 class TrainSidebar;
 class AnalysisSidebar;
 class IntervalSidebar;
@@ -27,7 +27,7 @@ class QDialog;
 class RideNavigator;
 class TrainBottom;
 
-class AnalysisView : public TabView
+class AnalysisView : public AbstractView
 {
     Q_OBJECT
 
@@ -53,7 +53,7 @@ class AnalysisView : public TabView
 };
 
 class DiarySidebar;
-class DiaryView : public TabView
+class DiaryView : public AbstractView
 {
     Q_OBJECT
 
@@ -74,7 +74,7 @@ class DiaryView : public TabView
 
 };
 
-class TrainView : public TabView
+class TrainView : public AbstractView
 {
     Q_OBJECT
 
@@ -100,7 +100,7 @@ private slots:
 };
 
 class LTMSidebar;
-class TrendsView : public TabView
+class TrendsView : public AbstractView
 {
     Q_OBJECT
 

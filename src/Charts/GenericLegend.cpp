@@ -20,7 +20,7 @@
 #include "GenericPlot.h"
 
 #include "Colors.h"
-#include "TabView.h"
+#include "AbstractView.h"
 #include "RideFileCommand.h"
 #include "Utils.h"
 

@@ -31,13 +31,13 @@
 #include "GcSideBarItem.h"
 #include "GcWindowRegistry.h"
 
-class Tab;
+class AthleteTab;
 class ViewSplitter;
 class Context;
 class BlankStatePage;
 class PerspectiveDialog;
 
-class TabView : public QWidget
+class AbstractView : public QWidget
 {
     Q_OBJECT
 
@@ -50,8 +50,8 @@ class TabView : public QWidget
 
     public:
 
-        TabView(Context *context, int type);
-        virtual ~TabView();
+        AbstractView(Context *context, int type);
+        virtual ~AbstractView();
         virtual void close() {};
 
         // add the widgets to the view
@@ -212,7 +212,7 @@ class ViewSplitter : public QSplitter
     Q_OBJECT
 
 public:
-    ViewSplitter(Qt::Orientation orientation, QString name, TabView *parent=0) :
+    ViewSplitter(Qt::Orientation orientation, QString name, AbstractView *parent=0) :
         QSplitter(orientation, parent), orientation(orientation), name(name), tabView(parent), showForDrag(false) {
         setAcceptDrops(true);
         qRegisterMetaType<ViewSplitter*>("hpos");
@@ -341,7 +341,7 @@ public slots:
 private:
     Qt::Orientation orientation;
     QString name;
-    TabView *tabView;
+    AbstractView *tabView;
     bool showForDrag;
     QPushButton *toggle, *clearbutton;
 };

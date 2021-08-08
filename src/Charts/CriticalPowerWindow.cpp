@@ -31,7 +31,7 @@
 #include "GcOverlayWidget.h"
 #include "MUWidget.h"
 #include "HelpWhatsThis.h"
-#include "TabView.h" // stylesheet
+#include "AbstractView.h" // stylesheet
 #include "RideCache.h"
 #include <qwt_picker.h>
 #include <qwt_picker_machine.h>

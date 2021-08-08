@@ -31,7 +31,7 @@
 #include <QDesktopWidget>
 extern QDesktopWidget *desktop;
 
-AnalysisView::AnalysisView(Context *context, QStackedWidget *controls) : TabView(context, VIEW_ANALYSIS)
+AnalysisView::AnalysisView(Context *context, QStackedWidget *controls) : AbstractView(context, VIEW_ANALYSIS)
 {
     analSidebar = new AnalysisSidebar(context);
     BlankStateAnalysisPage *b = new BlankStateAnalysisPage(context);
@@ -127,7 +127,7 @@ AnalysisView::isBlank()
     else return true;
 }
 
-DiaryView::DiaryView(Context *context, QStackedWidget *controls) : TabView(context, VIEW_DIARY)
+DiaryView::DiaryView(Context *context, QStackedWidget *controls) : AbstractView(context, VIEW_DIARY)
 {
     diarySidebar = new DiarySidebar(context);
     BlankStateDiaryPage *b = new BlankStateDiaryPage(context);
@@ -177,7 +177,7 @@ DiaryView::isBlank()
     else return true;
 }
 
-TrendsView::TrendsView(Context *context, QStackedWidget *controls) : TabView(context, VIEW_TRENDS)
+TrendsView::TrendsView(Context *context, QStackedWidget *controls) : AbstractView(context, VIEW_TRENDS)
 {
     sidebar = new LTMSidebar(context);
     BlankStateHomePage *b = new BlankStateHomePage(context);
@@ -283,7 +283,7 @@ TrendsView::justSelected()
     }
 }
 
-TrainView::TrainView(Context *context, QStackedWidget *controls) : TabView(context, VIEW_TRAIN)
+TrainView::TrainView(Context *context, QStackedWidget *controls) : AbstractView(context, VIEW_TRAIN)
 {
     trainTool = new TrainSidebar(context);
     trainTool->hide();

@@ -19,7 +19,7 @@
 #include "GenericChart.h"
 
 #include "Colors.h"
-#include "TabView.h"
+#include "AbstractView.h"
 #include "RideFileCommand.h"
 #include "Utils.h"
 
@@ -100,7 +100,7 @@ GenericChart::configChanged(qint32)
 
     // set style sheets
 #ifndef Q_OS_MAC
-    stackFrame->setStyleSheet(TabView::ourStyleSheet());
+    stackFrame->setStyleSheet(AbstractView::ourStyleSheet());
 #endif
     setUpdatesEnabled(true);
 }

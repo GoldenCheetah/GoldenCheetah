@@ -21,7 +21,7 @@
 #include "Context.h"
 #include "AerolabWindow.h"
 #include "Aerolab.h"
-#include "TabView.h"
+#include "AbstractView.h"
 #include "IntervalItem.h"
 #include "RideItem.h"
 #include "Colors.h"
@@ -362,7 +362,7 @@ AerolabWindow::configChanged(qint32)
   commentEdit->setPalette(palette);
 
 #ifndef Q_OS_MAC
-    aerolab->setStyleSheet(TabView::ourStyleSheet());
+    aerolab->setStyleSheet(AbstractView::ourStyleSheet());
 #endif
 }
 

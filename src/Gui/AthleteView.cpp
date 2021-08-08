@@ -1,6 +1,6 @@
 #include "AthleteView.h"
 #include "AthleteConfigDialog.h"
-#include "TabView.h"
+#include "AbstractView.h"
 #include "JsonRideFile.h" // for DATETIME_FORMAT
 #include "HelpWhatsThis.h"
 
@@ -88,7 +88,7 @@ void
 AthleteView::configChanged(qint32)
 {
     // appearances
-    setStyleSheet(TabView::ourStyleSheet());
+    setStyleSheet(AbstractView::ourStyleSheet());
 
 }
 

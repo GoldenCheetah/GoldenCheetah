@@ -17,7 +17,7 @@
  */
 
 #include "PerspectiveDialog.h"
-#include "TabView.h"
+#include "AbstractView.h"
 #include "Perspective.h"
 
 #include <QFormLayout>
@@ -28,7 +28,7 @@
 ///
 /// PerspectiveDialog
 ///
-PerspectiveDialog::PerspectiveDialog(QWidget *parent, TabView *tabView) : QDialog(parent), tabView(tabView), active(false)
+PerspectiveDialog::PerspectiveDialog(QWidget *parent, AbstractView *tabView) : QDialog(parent), tabView(tabView), active(false)
 {
 
     setWindowTitle("Manage Perspectives");

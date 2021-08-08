@@ -39,7 +39,7 @@
 //#include <QWebEngineProfile>
 
 // overlay helper
-#include "TabView.h"
+#include "AbstractView.h"
 #include "GcOverlayWidget.h"
 #include "IntervalSummaryWindow.h"
 #include "HelpWhatsThis.h"

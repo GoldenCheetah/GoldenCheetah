@@ -17,7 +17,7 @@
  */
 
 
-#include "Tab.h"
+#include "AthleteTab.h"
 #include "Views.h"
 #include "Athlete.h"
 #include "RideCache.h"
@@ -30,7 +30,7 @@
 
 #include <QPaintEvent>
 
-Tab::Tab(Context *context) : QWidget(context->mainWindow), context(context), noswitch(true)
+AthleteTab::AthleteTab(Context *context) : QWidget(context->mainWindow), context(context), noswitch(true)
 {
     context->tab = this;
     init = false;
@@ -110,7 +110,7 @@ Tab::Tab(Context *context) : QWidget(context->mainWindow), context(context), nos
     init = true;
 }
 
-Tab::~Tab()
+AthleteTab::~AthleteTab()
 {
     delete analysisView;
     delete homeView;
@@ -121,7 +121,7 @@ Tab::~Tab()
 }
 
 void
-Tab::close()
+AthleteTab::close()
 {
     analysisView->saveState();
     homeView->saveState();
@@ -138,20 +138,20 @@ Tab::close()
  * MainWindow integration with Tab / TabView (mostly pass through)
  *****************************************************************************/
 
-bool Tab::hasBottom() { return view(currentView())->hasBottom(); }
-bool Tab::isBottomRequested() { return view(currentView())->isBottomRequested(); }
-void Tab::setBottomRequested(bool x) { view(currentView())->setBottomRequested(x); }
-void Tab::setSidebarEnabled(bool x) { view(currentView())->setSidebarEnabled(x); }
-bool Tab::isSidebarEnabled() { return view(currentView())->sidebarEnabled(); }
-void Tab::toggleSidebar() { view(currentView())->setSidebarEnabled(!view(currentView())->sidebarEnabled()); }
-void Tab::setTiled(bool x) { view(currentView())->setTiled(x); }
-bool Tab::isTiled() { return view(currentView())->isTiled(); }
-void Tab::toggleTile() { view(currentView())->setTiled(!view(currentView())->isTiled()); }
-void Tab::resetLayout() { view(currentView())->resetLayout(); }
-void Tab::addChart(GcWinID i) { view(currentView())->addChart(i); }
-void Tab::addIntervals() { analysisView->addIntervals(); }
+bool AthleteTab::hasBottom() { return view(currentView())->hasBottom(); }
+bool AthleteTab::isBottomRequested() { return view(currentView())->isBottomRequested(); }
+void AthleteTab::setBottomRequested(bool x) { view(currentView())->setBottomRequested(x); }
+void AthleteTab::setSidebarEnabled(bool x) { view(currentView())->setSidebarEnabled(x); }
+bool AthleteTab::isSidebarEnabled() { return view(currentView())->sidebarEnabled(); }
+void AthleteTab::toggleSidebar() { view(currentView())->setSidebarEnabled(!view(currentView())->sidebarEnabled()); }
+void AthleteTab::setTiled(bool x) { view(currentView())->setTiled(x); }
+bool AthleteTab::isTiled() { return view(currentView())->isTiled(); }
+void AthleteTab::toggleTile() { view(currentView())->setTiled(!view(currentView())->isTiled()); }
+void AthleteTab::resetLayout() { view(currentView())->resetLayout(); }
+void AthleteTab::addChart(GcWinID i) { view(currentView())->addChart(i); }
+void AthleteTab::addIntervals() { analysisView->addIntervals(); }
 
-void Tab::setRide(RideItem*ride) 
+void AthleteTab::setRide(RideItem*ride)
 {
     analysisView->setRide(ride);
     homeView->setRide(ride);
@@ -159,8 +159,8 @@ void Tab::setRide(RideItem*ride)
     diaryView->setRide(ride);
 }
 
-TabView *
-Tab::view(int index)
+AbstractView *
+AthleteTab::view(int index)
 {
     switch(index) {
         case 0 : return homeView;
@@ -172,7 +172,7 @@ Tab::view(int index)
 }
 
 void
-Tab::selectView(int index)
+AthleteTab::selectView(int index)
 {
     emit viewChanged(index);
 
@@ -187,7 +187,7 @@ Tab::selectView(int index)
 }
 
 void
-Tab::rideSelected(RideItem*)
+AthleteTab::rideSelected(RideItem*)
 {
     emit rideItemSelected(context->ride);
 

@@ -30,7 +30,7 @@
 #include "ErgFilePlot.h"
 #include "GcSideBarItem.h"
 #include "RemoteControl.h"
-#include "Tab.h"
+#include "AthleteTab.h"
 #include "PhysicsUtility.h"
 
 // standard stuff

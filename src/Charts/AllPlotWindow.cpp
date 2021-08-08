@@ -21,7 +21,7 @@
 #include "Context.h"
 #include "Context.h"
 #include "Athlete.h"
-#include "TabView.h"
+#include "AbstractView.h"
 #include "AllPlotInterval.h"
 #include "AllPlotWindow.h"
 #include "AllPlot.h"
@@ -851,11 +851,11 @@ AllPlotWindow::configChanged(qint32 state)
 
     // set style sheets
 #ifndef Q_OS_MAC
-    allPlotFrame->setStyleSheet(TabView::ourStyleSheet());
-    comparePlotFrame->setStyleSheet(TabView::ourStyleSheet());
-    seriesstackFrame->setStyleSheet(TabView::ourStyleSheet());
-    stackFrame->setStyleSheet(TabView::ourStyleSheet());
-    overlayIntervals->setStyleSheet(TabView::ourStyleSheet());
+    allPlotFrame->setStyleSheet(AbstractView::ourStyleSheet());
+    comparePlotFrame->setStyleSheet(AbstractView::ourStyleSheet());
+    seriesstackFrame->setStyleSheet(AbstractView::ourStyleSheet());
+    stackFrame->setStyleSheet(AbstractView::ourStyleSheet());
+    overlayIntervals->setStyleSheet(AbstractView::ourStyleSheet());
 #endif
 
     // set palettes

@@ -19,7 +19,7 @@
 #ifndef _GC_Tab_h
 #define _GC_Tab_h 1
 
-#include "TabView.h"
+#include "AbstractView.h"
 #include "Views.h"
 
 class RideNavigator;
@@ -29,7 +29,7 @@ class ProgressLine;
 class QPaintEvent;
 class NavigationModel;
 
-class Tab: public QWidget
+class AthleteTab: public QWidget
 {
     Q_OBJECT
 
@@ -37,13 +37,13 @@ class Tab: public QWidget
 
         bool init; // am I ready yet?
 
-        Tab(Context *context);
-        ~Tab();
+        AthleteTab(Context *context);
+        ~AthleteTab();
         void close();
 
         ChartSettings *chartsettings() { return chartSettings; } // by HomeWindow
         int currentView() { return views->currentIndex(); }
-        TabView *view(int index);
+        AbstractView *view(int index);
 
         NavigationModel *nav; // back/forward for this tab
 

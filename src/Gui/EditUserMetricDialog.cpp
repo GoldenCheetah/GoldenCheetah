@@ -22,7 +22,7 @@
 #include "Context.h"
 #include "Athlete.h"
 #include "MainWindow.h"
-#include "Tab.h"
+#include "AthleteTab.h"
 #include "RideNavigator.h"
 #include "DataFilter.h"
 #include "Zones.h"

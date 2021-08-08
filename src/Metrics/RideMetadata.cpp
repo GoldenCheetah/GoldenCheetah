@@ -27,7 +27,7 @@
 #include "Settings.h"
 #include "Colors.h"
 #include "Units.h"
-#include "TabView.h"
+#include "AbstractView.h"
 #include "HelpWhatsThis.h"
 #include "Utils.h"
 #include "RideEditor.h"

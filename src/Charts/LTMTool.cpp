@@ -22,7 +22,7 @@
 #include "Athlete.h"
 #include "Settings.h"
 #include "Units.h"
-#include "Tab.h"
+#include "AthleteTab.h"
 #include "RideNavigator.h"
 #include "HelpWhatsThis.h"
 #include "Utils.h"

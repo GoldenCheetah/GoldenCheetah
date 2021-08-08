@@ -18,7 +18,7 @@
 
 #include "SearchBox.h"
 #include "Context.h"
-#include "Tab.h"
+#include "AthleteTab.h"
 #include "Athlete.h"
 #include "NamedSearch.h"
 #include "RideNavigator.h"

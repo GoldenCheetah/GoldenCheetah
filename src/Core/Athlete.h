@@ -59,7 +59,7 @@ class IntervalCache;
 class Context;
 class ColorEngine;
 class AnalysisSidebar;
-class Tab;
+class AthleteTab;
 class Leaf;
 class DataFilterRuntime;
 class CloudServiceAutoDownload;

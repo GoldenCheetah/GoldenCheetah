@@ -18,8 +18,8 @@
 
 #include "Athlete.h"
 #include "Context.h"
-#include "Tab.h"
-#include "TabView.h"
+#include "AthleteTab.h"
+#include "AbstractView.h"
 #include "Perspective.h"
 #include "LTMTool.h"
 #include "LTMSettings.h"
@@ -293,7 +293,7 @@ Perspective::configChanged(qint32)
 {
     // update scroll bar
 //#ifndef Q_OS_MAC
-    tileArea->verticalScrollBar()->setStyleSheet(TabView::ourStyleSheet());
+    tileArea->verticalScrollBar()->setStyleSheet(AbstractView::ourStyleSheet());
 //#endif
     QPalette palette;
     palette.setBrush(backgroundRole(), type() == VIEW_TRAIN ? GColor(CTRAINPLOTBACKGROUND) : GColor(CPLOTBACKGROUND));

@@ -16,8 +16,8 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#include "TabView.h"
-#include "Tab.h"
+#include "AbstractView.h"
+#include "AthleteTab.h"
 #include "Context.h"
 #include "Athlete.h"
 #include "RideItem.h"
@@ -33,7 +33,7 @@
 #include "GcUpgrade.h"
 #include "LTMWindow.h"
 
-TabView::TabView(Context *context, int type) : 
+AbstractView::AbstractView(Context *context, int type) : 
     QWidget(context->tab), context(context), type(type),
     _sidebar(true), _tiled(false), _selected(false), lastHeight(130*dpiYFactor), sidewidth(0),
     active(false), bottomRequested(false), bottomHideOnIdle(false), perspectiveactive(false),
@@ -83,7 +83,7 @@ TabView::TabView(Context *context, int type) :
     connect(&IdleTimer::getInstance(), SIGNAL(userActive()), this, SLOT(onActive()));
 }
 
-TabView::~TabView()
+AbstractView::~AbstractView()
 {
     saveState(); // writes xxx-perspectives.xml
 
@@ -95,7 +95,7 @@ TabView::~TabView()
 // has its own version of this method that switches perspective to match
 // the type of activity based upon the perspective's associated "switch expression".
 void
-TabView::setRide(RideItem*ride)
+AbstractView::setRide(RideItem*ride)
 {
     if (loaded) {
         page()->setProperty("ride", QVariant::fromValue<RideItem*>(dynamic_cast<RideItem*>(ride)));
@@ -103,7 +103,7 @@ TabView::setRide(RideItem*ride)
 }
 
 void
-TabView::splitterMoved(int pos,int)
+AbstractView::splitterMoved(int pos,int)
 {
     if (sidebar_ == NULL) return; // we haven't set sidebar yet.
 
@@ -126,7 +126,7 @@ TabView::splitterMoved(int pos,int)
 }
 
 void
-TabView::resizeEvent(QResizeEvent *)
+AbstractView::resizeEvent(QResizeEvent *)
 {
     active = true; // we're mucking about, so ignore in splitterMoved ...
 
@@ -156,7 +156,7 @@ TabView::resizeEvent(QResizeEvent *)
 }
 
 void
-TabView::setSidebar(QWidget *sidebar)
+AbstractView::setSidebar(QWidget *sidebar)
 {
     sidebar_ = sidebar;
     splitter->insertWidget(0, sidebar);
@@ -165,7 +165,7 @@ TabView::setSidebar(QWidget *sidebar)
 }
 
 QString
-TabView::ourStyleSheet()
+AbstractView::ourStyleSheet()
 {
     return QString::fromUtf8("QScrollBar { background-color: %1; border: 0px; }"
 #ifndef Q_OS_MAC
@@ -249,7 +249,7 @@ TabView::ourStyleSheet()
 }
 
 void
-TabView::configChanged(qint32)
+AbstractView::configChanged(qint32)
 {
 #if (defined Q_OS_LINUX) || (defined Q_OS_WIN)
     // style that sucker
@@ -260,7 +260,7 @@ TabView::configChanged(qint32)
 }
 
 void
-TabView::saveState()
+AbstractView::saveState()
 {
     // if its not loaded, don't save a blank file !
     if (!loaded) return;
@@ -307,7 +307,7 @@ TabView::saveState()
 }
 
 void
-TabView::restoreState(bool useDefault)
+AbstractView::restoreState(bool useDefault)
 {
     QString view = "none";
     switch(type) {
@@ -438,7 +438,7 @@ TabView::restoreState(bool useDefault)
 }
 
 void
-TabView::appendPerspective(Perspective *page)
+AbstractView::appendPerspective(Perspective *page)
 {
     perspectives_ << page;
     pstack->addWidget(page);
@@ -447,7 +447,7 @@ TabView::appendPerspective(Perspective *page)
 }
 
 bool
-TabView::importPerspective(QString filename)
+AbstractView::importPerspective(QString filename)
 {
     Perspective *newone = Perspective::fromFile(context, filename, type);
     if (newone) {
@@ -461,14 +461,14 @@ TabView::importPerspective(QString filename)
 }
 
 void
-TabView::exportPerspective(Perspective *p, QString filename)
+AbstractView::exportPerspective(Perspective *p, QString filename)
 {
     // write to file
     p->toFile(filename);
 }
 
 Perspective *
-TabView::addPerspective(QString name)
+AbstractView::addPerspective(QString name)
 {
     Perspective *page = new Perspective(context, name, type);
 
@@ -482,7 +482,7 @@ TabView::addPerspective(QString name)
 }
 
 void
-TabView::removePerspective(Perspective *p)
+AbstractView::removePerspective(Perspective *p)
 {
     if (perspectives_.count() == 1) return; // not allowed to have zero perspectives mate
 
@@ -513,7 +513,7 @@ TabView::removePerspective(Perspective *p)
 }
 
 void
-TabView::swapPerspective(int from, int to) // is actually swapping as only move 1 position at a time
+AbstractView::swapPerspective(int from, int to) // is actually swapping as only move 1 position at a time
 {
     if (from == to) return; // nowt to do in this case.
 
@@ -548,7 +548,7 @@ TabView::swapPerspective(int from, int to) // is actually swapping as only move 
 }
 
 void
-TabView::setPages(QStackedWidget *pages)
+AbstractView::setPages(QStackedWidget *pages)
 {
     pstack = pages;
 
@@ -588,7 +588,7 @@ TabView::setPages(QStackedWidget *pages)
 }
 
 void
-TabView::setBottom(QWidget *widget)
+AbstractView::setBottom(QWidget *widget)
 {
     bottom_ = widget;
     bottom_->hide();
@@ -598,7 +598,7 @@ TabView::setBottom(QWidget *widget)
 }
 
 void 
-TabView::dragEvent(bool x)
+AbstractView::dragEvent(bool x)
 {
     setBottomRequested(x);
     context->mainWindow->setToolButtons(); // toolbuttons reflect show/hide status
@@ -606,7 +606,7 @@ TabView::dragEvent(bool x)
 
 // hide and show bottom - but with a little animation ...
 void
-TabView::setShowBottom(bool x) 
+AbstractView::setShowBottom(bool x) 
 {
     if (x == isShowBottom())
     {
@@ -647,7 +647,7 @@ TabView::setShowBottom(bool x)
 }
 
 void
-TabView::setBlank(BlankStatePage *blank)
+AbstractView::setBlank(BlankStatePage *blank)
 {
     blank_ = blank;
     blank->hide();
@@ -664,7 +664,7 @@ TabView::setBlank(BlankStatePage *blank)
 
 
 void
-TabView::sidebarChanged()
+AbstractView::sidebarChanged()
 {
     // wait for main window to catch up
     if (sidebar_ == NULL) return;
@@ -710,7 +710,7 @@ TabView::sidebarChanged()
 }
 
 void
-TabView::setPerspectives(QComboBox *perspectiveSelector)
+AbstractView::setPerspectives(QComboBox *perspectiveSelector)
 {
     perspectiveactive=true;
 
@@ -745,7 +745,7 @@ TabView::setPerspectives(QComboBox *perspectiveSelector)
 
 
 void
-TabView::perspectiveSelected(int index)
+AbstractView::perspectiveSelected(int index)
 {
     if (perspectiveactive || index <0) return;
 
@@ -776,13 +776,13 @@ TabView::perspectiveSelected(int index)
 
 
 void
-TabView::tileModeChanged()
+AbstractView::tileModeChanged()
 {
     if (perspective_) perspective_->setStyle(isTiled() ? 2 : 0);
 }
 
 void
-TabView::selectionChanged()
+AbstractView::selectionChanged()
 {
     // we got selected..
     if (isSelected()) {
@@ -816,7 +816,7 @@ TabView::selectionChanged()
 }
 
 void
-TabView::resetLayout()
+AbstractView::resetLayout()
 {
     // delete all current perspectives
     // XXX TODO
@@ -826,32 +826,32 @@ TabView::resetLayout()
 }
 
 void
-TabView::addChart(GcWinID id)
+AbstractView::addChart(GcWinID id)
 {
     if (perspective_) perspective_->appendChart(id);
 }
 
 void
-TabView::checkBlank()
+AbstractView::checkBlank()
 {
     selectionChanged(); // run through the code again
 }
 
 void
-TabView::setBottomRequested(bool x)
+AbstractView::setBottomRequested(bool x)
 {
     bottomRequested = x;
     setShowBottom(x);
 }
 
 void
-TabView::setHideBottomOnIdle(bool x)
+AbstractView::setHideBottomOnIdle(bool x)
 {
     bottomHideOnIdle = x;
 }
 
 void
-TabView::onIdle()
+AbstractView::onIdle()
 {
     if (bottomHideOnIdle)
     {
@@ -860,7 +860,7 @@ TabView::onIdle()
 }
 
 void
-TabView::onActive()
+AbstractView::onActive()
 {
     if (bottomRequested)
     {

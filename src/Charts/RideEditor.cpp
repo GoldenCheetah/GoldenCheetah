@@ -24,7 +24,7 @@
 #include "Context.h"
 #include "Settings.h"
 #include "Colors.h"
-#include "TabView.h"
+#include "AbstractView.h"
 #include "HelpWhatsThis.h"
 #include "HrZones.h"
 #include "XDataDialog.h"
@@ -289,8 +289,8 @@ RideEditor::configChanged(qint32)
                     .arg(GCColor::invertColor(GColor(CPLOTBACKGROUND)).name()));
     table->horizontalHeader()->setDefaultAlignment(Qt::AlignLeft | Qt::AlignVCenter);
 #ifndef Q_OS_MAC
-    table->verticalScrollBar()->setStyleSheet(TabView::ourStyleSheet());
-    table->horizontalScrollBar()->setStyleSheet(TabView::ourStyleSheet());
+    table->verticalScrollBar()->setStyleSheet(AbstractView::ourStyleSheet());
+    table->horizontalScrollBar()->setStyleSheet(AbstractView::ourStyleSheet());
 #endif
     toolbar->setStyleSheet(QString("::enabled { background: %1; color: %2; border: 0px; } ").arg(GColor(CPLOTBACKGROUND).name())
                     .arg(GCColor::invertColor(GColor(CPLOTBACKGROUND)).name()));
@@ -3065,8 +3065,8 @@ void XDataEditor::configChanged()
                     .arg(GColor(CPLOTBACKGROUND).name())
                     .arg(GCColor::invertColor(GColor(CPLOTBACKGROUND)).name()));
 #ifndef Q_OS_MAC
-    verticalScrollBar()->setStyleSheet(TabView::ourStyleSheet());
-    horizontalScrollBar()->setStyleSheet(TabView::ourStyleSheet());
+    verticalScrollBar()->setStyleSheet(AbstractView::ourStyleSheet());
+    horizontalScrollBar()->setStyleSheet(AbstractView::ourStyleSheet());
 #endif
 }
 

@@ -18,7 +18,7 @@
 
 #include "OverviewItems.h"
 
-#include "TabView.h"
+#include "AbstractView.h"
 #include "Athlete.h"
 #include "RideCache.h"
 #include "IntervalItem.h"
@@ -33,7 +33,7 @@
 #include "DataFilter.h"
 #include "Utils.h"
 #include "TimeUtils.h"
-#include "Tab.h"
+#include "AthleteTab.h"
 #include "LTMTool.h"
 #include "RideNavigator.h"
 

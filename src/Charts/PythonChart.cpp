@@ -21,7 +21,7 @@
 #include "PythonSyntax.h"
 
 #include "Colors.h"
-#include "TabView.h"
+#include "AbstractView.h"
 #include "RideFileCommand.h"
 #include "HelpWhatsThis.h"
 
@@ -70,7 +70,7 @@ PythonConsole::configChanged(qint32)
     p.setColor(QPalette::Base, GColor(CPLOTBACKGROUND));
     p.setColor(QPalette::Text, GCColor::invertColor(GColor(CPLOTBACKGROUND)));
     setPalette(p);
-    setStyleSheet(TabView::ourStyleSheet());
+    setStyleSheet(AbstractView::ourStyleSheet());
 }
 
 void
@@ -339,7 +339,7 @@ PythonChart::PythonChart(Context *context, bool ridesummary) : GcChartWindow(con
         p.setColor(QPalette::Base, GColor(CPLOTBACKGROUND));
         p.setColor(QPalette::Text, GCColor::invertColor(GColor(CPLOTBACKGROUND)));
         script->setPalette(p);
-        script->setStyleSheet(TabView::ourStyleSheet());
+        script->setStyleSheet(AbstractView::ourStyleSheet());
 
         // syntax highlighter
         setScript("##\n## Python program will run on selection.\n##\n");

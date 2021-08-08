@@ -41,7 +41,7 @@
 #include <QWebEngineSettings>
 
 // overlay helper
-#include "TabView.h"
+#include "AbstractView.h"
 #include "GcOverlayWidget.h"
 #include "IntervalSummaryWindow.h"
 #include <QDebug>
@@ -317,7 +317,7 @@ RideMapWindow::configChanged(qint32)
 {
     setProperty("color", GColor(CPLOTBACKGROUND));
 #ifndef Q_OS_MAC
-    overlayIntervals->setStyleSheet(TabView::ourStyleSheet());
+    overlayIntervals->setStyleSheet(AbstractView::ourStyleSheet());
 #endif
 }
 

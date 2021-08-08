@@ -19,10 +19,10 @@
 #include "UserChartWindow.h"
 
 #include "Colors.h"
-#include "TabView.h"
+#include "AbstractView.h"
 #include "RideFileCommand.h"
 #include "Utils.h"
-#include "Tab.h"
+#include "AthleteTab.h"
 #include "LTMTool.h"
 #include "RideNavigator.h"
 #include "ColorButton.h"

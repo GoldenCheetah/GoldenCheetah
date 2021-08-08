@@ -18,7 +18,7 @@
 
 #include "ChartSpace.h"
 
-#include "TabView.h"
+#include "AbstractView.h"
 #include "Athlete.h"
 #include "RideCache.h"
 
@@ -555,7 +555,7 @@ ChartSpace::configChanged(qint32)
     setProperty("color", GColor(COVERVIEWBACKGROUND));
     view->setBackgroundBrush(QBrush(GColor(COVERVIEWBACKGROUND)));
     scene->setBackgroundBrush(QBrush(GColor(COVERVIEWBACKGROUND)));
-    scrollbar->setStyleSheet(TabView::ourStyleSheet());
+    scrollbar->setStyleSheet(AbstractView::ourStyleSheet());
 
     // text edit colors
     QPalette palette;

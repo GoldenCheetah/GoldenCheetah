@@ -84,7 +84,7 @@
 #endif
 
 // GUI Widgets
-#include "Tab.h"
+#include "AthleteTab.h"
 #include "GcToolBar.h"
 #include "NewSideBar.h"
 #include "HelpWindow.h"
@@ -154,7 +154,7 @@ MainWindow::MainWindow(const QDir &home)
     // bootstrap
     Context *context = new Context(this);
     context->athlete = new Athlete(context, home);
-    currentTab = new Tab(context);
+    currentTab = new AthleteTab(context);
 
     // get rid of splash when currentTab is shown
     clearSplash();
@@ -952,7 +952,7 @@ void
 MainWindow::exportPerspective()
 {
     int view = currentTab->currentView();
-    TabView *current = NULL;
+    AbstractView *current = NULL;
 
     QString typedesc;
 
@@ -980,7 +980,7 @@ void
 MainWindow::importPerspective()
 {
     int view = currentTab->currentView();
-    TabView *current = NULL;
+    AbstractView *current = NULL;
 
     switch (view) {
     case 0:  current = currentTab->homeView; break;
@@ -1125,13 +1125,13 @@ MainWindow::moveEvent(QMoveEvent*)
 void
 MainWindow::closeEvent(QCloseEvent* event)
 {
-    QList<Tab*> closing = tabList;
+    QList<AthleteTab*> closing = tabList;
     bool needtosave = false;
     bool importrunning = false;
 
     // close all the tabs .. if any refuse we need to ignore
     //                       the close event
-    foreach(Tab *tab, closing) {
+    foreach(AthleteTab *tab, closing) {
 
         // check for if RideImport is is process and let it finalize / or be stopped by the user
         if (tab->context->athlete->autoImport) {
@@ -1443,7 +1443,7 @@ MainWindow::perspectiveSelected(int index)
 
     // set the perspective for the current view
     int view = currentTab->currentView();
-    TabView *current = NULL;
+    AbstractView *current = NULL;
     switch (view) {
     case 0:  current = currentTab->homeView; break;
     case 1:  current = currentTab->analysisView; break;
@@ -1510,7 +1510,7 @@ void
 MainWindow::perspectivesChanged()
 {
     int view = currentTab->currentView();
-    TabView *current = NULL;
+    AbstractView *current = NULL;
 
     switch (view) {
     case 0:  current = currentTab->homeView; break;
@@ -1959,7 +1959,7 @@ void
 MainWindow::loadCompleted(QString name, Context *context)
 {
     // athlete loaded
-    currentTab = new Tab(context);
+    currentTab = new AthleteTab(context);
 
     // clear splash - progress whilst loading tab
     //clearSplash();
@@ -1990,7 +1990,7 @@ void
 MainWindow::closeTabClicked(int index)
 {
 
-    Tab *tab = tabList[index];
+    AthleteTab *tab = tabList[index];
 
     // check for autoimport and let it finalize
     if (tab->context->athlete->autoImport) {
@@ -2045,7 +2045,7 @@ MainWindow::closeTab()
 
 // no questions asked just wipe away the current tab
 void
-MainWindow::removeTab(Tab *tab)
+MainWindow::removeTab(AthleteTab *tab)
 {
     setUpdatesEnabled(false);
 
@@ -2119,7 +2119,7 @@ MainWindow::setOpenTabMenu()
 
         // only allow selection of cyclists which are not already open
         foreach (MainWindow *x, mainwindows) {
-            QMapIterator<QString, Tab*> t(x->tabs);
+            QMapIterator<QString, AthleteTab*> t(x->tabs);
             while (t.hasNext()) {
                 t.next();
                 if (t.key() == name)
@@ -2198,7 +2198,7 @@ MainWindow::setDeleteAthleteMenu()
 
         // only allow selection of cyclists which are not already open
         foreach (MainWindow *x, mainwindows) {
-            QMapIterator<QString, Tab*> t(x->tabs);
+            QMapIterator<QString, AthleteTab*> t(x->tabs);
             while (t.hasNext()) {
                 t.next();
                 if (t.key() == name)

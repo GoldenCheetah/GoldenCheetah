@@ -41,7 +41,7 @@
 #include <QWebEngineDownloadItem>
 
 // overlay helper
-#include "TabView.h"
+#include "AbstractView.h"
 #include "GcOverlayWidget.h"
 #include "IntervalSummaryWindow.h"
 #include <QDebug>
