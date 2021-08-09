@@ -1234,7 +1234,7 @@ void MainWindow::resetWindowLayout()
     msgBox.exec();
 
     if(msgBox.clickedButton() == msgBox.button(QMessageBox::Ok))
-        currentAthleteTab->resetLayout();
+        currentAthleteTab->resetLayout(perspectiveSelector);
 }
 
 void MainWindow::manualProcess(QString name)

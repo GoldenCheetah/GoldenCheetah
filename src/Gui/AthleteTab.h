@@ -84,7 +84,7 @@ class AthleteTab: public QWidget
         void setBottomRequested(bool x);
 
         // layout
-        void resetLayout();
+        void resetLayout(QComboBox *perspectiveSelector);
         void addChart(GcWinID);
 
         // switch views

@@ -365,8 +365,9 @@ AbstractView::restoreState(bool useDefault)
     if (content == "") {
 
         // if no local perspectives file fall back to old
-        // layout file (pre-version 3.6) - will get a single perspective
-        if (!finfo.exists()) {
+        // layout file (pre-version 3.6) - will get a single perspective,
+        // except when useDefault is requested
+        if (!finfo.exists() && !useDefault) {
             filename = context->athlete->home->config().canonicalPath() + "/" + view + "-layout.xml";
             finfo.setFile(filename);
             useDefault = false;
@@ -710,7 +711,7 @@ AbstractView::sidebarChanged()
 }
 
 void
-AbstractView::setPerspectives(QComboBox *perspectiveSelector)
+AbstractView::setPerspectives(QComboBox *perspectiveSelector, bool selectChart)
 {
     perspectiveactive=true;
 
@@ -728,7 +729,7 @@ AbstractView::setPerspectives(QComboBox *perspectiveSelector)
 
     // if we only just loaded the charts and views, we need to select
     // one to get the ride item and date range selected
-    if (!loaded) {
+    if (!loaded || selectChart) {
         loaded = true;
 
         // generally we just go to the first perspective
@@ -816,13 +817,17 @@ AbstractView::selectionChanged()
 }
 
 void
-AbstractView::resetLayout()
+AbstractView::resetLayout( QComboBox *perspectiveSelector)
 {
     // delete all current perspectives
-    // XXX TODO
+    foreach(Perspective *p, perspectives_) delete p;
+    perspectives_.clear();
 
     // reload from default (website / baked in)
-    // XXX TODO
+    restoreState(true);
+
+    // set the new perspectives and do initial selections
+    setPerspectives(perspectiveSelector, true);
 }
 
 void

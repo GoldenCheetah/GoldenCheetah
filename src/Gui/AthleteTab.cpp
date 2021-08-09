@@ -147,7 +147,7 @@ void AthleteTab::toggleSidebar() { view(currentView())->setSidebarEnabled(!view(
 void AthleteTab::setTiled(bool x) { view(currentView())->setTiled(x); }
 bool AthleteTab::isTiled() { return view(currentView())->isTiled(); }
 void AthleteTab::toggleTile() { view(currentView())->setTiled(!view(currentView())->isTiled()); }
-void AthleteTab::resetLayout() { view(currentView())->resetLayout(); }
+void AthleteTab::resetLayout(QComboBox *perspectiveSelector) { view(currentView())->resetLayout(perspectiveSelector); }
 void AthleteTab::addChart(GcWinID i) { view(currentView())->addChart(i); }
 void AthleteTab::addIntervals() { analysisView->addIntervals(); }
 

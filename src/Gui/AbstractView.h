@@ -78,7 +78,7 @@ class AbstractView : public QWidget
         void saveState();
         void appendPerspective(Perspective *page);
 
-        void setPerspectives(QComboBox *perspectiveSelector); // set the combobox when view selected
+        void setPerspectives(QComboBox *perspectiveSelector, bool selectChart=false); // set the combobox when view selected
         void perspectiveSelected(int index); // combobox selections changed because the user selected a perspective
 
         // add a new perspective
@@ -124,7 +124,7 @@ class AbstractView : public QWidget
         virtual void sidebarChanged();
         virtual void tileModeChanged();
         virtual void selectionChanged();
-        virtual void resetLayout();
+        virtual void resetLayout(QComboBox *perspectiveSelector);
 
         virtual void addChart(GcWinID id);
 
