@@ -21,6 +21,7 @@
 
 // Common shared utility functions
 #include <QVector>
+#include <QDate>
 #include <math.h>
 
 #ifdef WIN32

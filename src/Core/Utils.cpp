@@ -26,6 +26,9 @@
 #include <QVector>
 #include <QRegularExpression>
 
+#include "GenericChart.h"
+#include "RideMetric.h"
+
 namespace Utils
 {
 
@@ -579,5 +582,6 @@ bool qstringascend(const QString &s1, const QString &s2) { return s1 < s2; }
 
 double myisinf(double x) { return isinf(x); } // math.h
 double myisnan(double x) { return isnan(x); } // math.h
+
 
 };

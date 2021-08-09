@@ -521,6 +521,7 @@ GenericPlot::addCurve(QString name, QVector<double> xseries, QVector<double> yse
                       QStringList labels, QStringList colors,
                       int linestyle, int symbol, int size, QString color, int opacity, bool opengl, bool legend, bool datalabels, bool fill)
 {
+
     // a curve can have a decoration associated with it
     // on a line chart the decoration is the symbols
     // on a scatter chart the decoration is the line
@@ -1185,6 +1186,7 @@ GenericPlot::configureAxis(QString name, bool visible, int align, double min, do
 
     // categories
     if (categories.count()) axis->categories = categories;
+
     return true;
 }
 

@@ -143,8 +143,8 @@ GenericChart::initialiseChart(QString title, int type, bool animate, int legendp
 // add a curve, associating an axis
 bool
 GenericChart::addCurve(QString name, QVector<double> xseries, QVector<double> yseries, QVector<QString> fseries, QString xname, QString yname,
-                      QStringList labels, QStringList colors,
-                      int line, int symbol, int size, QString color, int opacity, bool opengl, bool legend, bool datalabels, bool fill)
+                      QStringList labels, QStringList colors, int line, int symbol, int size, QString color, int opacity, bool opengl,
+                      bool legend, bool datalabels, bool fill)
 {
 
     newSeries << GenericSeriesInfo(name, xseries, yseries, fseries, xname, yname, labels, colors, line, symbol, size, color, opacity, opengl, legend, datalabels, fill);
@@ -154,8 +154,8 @@ GenericChart::addCurve(QString name, QVector<double> xseries, QVector<double> ys
 // helper for python
 bool
 GenericChart::addCurve(QString name, QVector<double> xseries, QVector<double> yseries, QStringList fseries, QString xname, QString yname,
-                      QStringList labels, QStringList colors,
-                      int line, int symbol, int size, QString color, int opacity, bool opengl, bool legend, bool datalabels, bool fill)
+                      QStringList labels, QStringList colors, int line, int symbol, int size, QString color, int opacity, bool opengl,
+                      bool legend, bool datalabels, bool fill)
 {
     QVector<QString> flist;
     for(int i=0; i<fseries.count(); i++) flist << fseries.at(i);
@@ -394,8 +394,12 @@ GenericChart::finaliseChart()
         // add curves
         QListIterator<GenericSeriesInfo>s(newPlots[i].series);
         while(s.hasNext()) {
+
             GenericSeriesInfo p=s.next();
-            newPlots[i].plot->addCurve(p.name, p.xseries, p.yseries, p.fseries, p.xname, p.yname, p.labels, p.colors, p.line, p.symbol, p.size, p.color, p.opacity, p.opengl, p.legend, p.datalabels, p.fill);
+
+            // add curve-- with additional axis info in advance since it finally is added to an actual chart
+            newPlots[i].plot->addCurve(p.name, p.xseries, p.yseries, p.fseries, p.xname, p.yname, p.labels, p.colors, p.line,
+                                       p.symbol, p.size, p.color, p.opacity, p.opengl, p.legend, p.datalabels, p.fill);
 
             // did we get some labels associated with the curve?
             QListIterator<QStringList>l(p.annotateLabels);

@@ -189,6 +189,43 @@ UserChart::setRide(const RideItem *item)
         series.yseries = ucd->y.asNumeric();
         series.fseries = ucd->f.asString();
 
+        // lookup axis info to get groupby or smoothing
+        // we need to preprocess data as axis management
+        // resolves for the series data
+        //
+        // this means group and smooth applies to user data
+        // charts but not R and Python where it will need
+        // to be managed within the script by the user
+        int ay=GenericAxisInfo::findAxis(axisinfo, series.yname);
+        int ax=GenericAxisInfo::findAxis(axisinfo, series.xname);
+
+        // TIME smoothing (applies to y axis)
+        double xsmooth=0, ysmooth=0;
+        if (ax != -1 && axisinfo[ax].smooth != 0 && axisinfo[ax].type == GenericAxisInfo::TIME) ysmooth=axisinfo[ax].smooth;
+        if (ay != -1 && axisinfo[ay].smooth != 0 && axisinfo[ay].type == GenericAxisInfo::TIME) xsmooth=axisinfo[ay].smooth;
+
+        // lets pre-process the data
+        if (xsmooth >= 2) series.xseries = Utils::smooth_sma(series.xseries, GC_SMOOTH_CENTERED, xsmooth);
+        if (ysmooth >= 2) series.yseries = Utils::smooth_sma(series.yseries, GC_SMOOTH_CENTERED, ysmooth);
+
+        // DATE groupby (applies to date axis)
+        int xgroupby=0, ygroupby=0;
+        if (ax != -1 && axisinfo[ax].groupby != 0 && axisinfo[ax].type == GenericAxisInfo::DATERANGE) xgroupby=axisinfo[ax].groupby;
+        if (ay != -1 && axisinfo[ay].groupby != 0 && axisinfo[ay].type == GenericAxisInfo::DATERANGE) ygroupby=axisinfo[ay].groupby;
+
+
+        // groupBy uses pass by reference and will update what is passed
+        // we update the ucd result as its used elsewhere
+        if (xgroupby > 0) groupBy(xgroupby, series.aggregateby, series.xseries, series.yseries);
+        if (ygroupby > 0) groupBy(ygroupby, series.aggregateby, series.yseries, series.xseries);
+
+        // this is a bit of a hack, but later processing references ucd->x and y, so we
+        // update them since they have been smoothed/aggregated.
+        if (xsmooth >= 2 || ysmooth >= 2 || ygroupby > 0 || xgroupby > 0) {
+            ucd->x.asNumeric() = series.xseries;
+            ucd->y.asNumeric() = series.yseries;
+        }
+
         // pie charts need labels
         if (chartinfo.type == GC_CHART_PIE) {
             series.labels.clear();
@@ -224,8 +261,8 @@ UserChart::setRide(const RideItem *item)
 
         // data now generated so can add curve
         chart->addCurve(series.name, series.xseries, series.yseries, series.fseries, series.xname, series.yname,
-                        series.labels, series.colors,
-                        series.line, series.symbol, series.size, series.color, series.opacity, series.opengl, series.legend, series.datalabels, series.fill);
+                        series.labels, series.colors, series.line, series.symbol, series.size, series.color, series.opacity,
+                        series.opengl, series.legend, series.datalabels, series.fill);
 
         // add series annotations
         foreach(QStringList list, annotations) chart->annotateLabel(series.name, list);
@@ -268,7 +305,7 @@ UserChart::setRide(const RideItem *item)
                             for(int i=0; i<ucd->x.asString().count(); i++) axis.categories << ucd->x.asString()[i];
                             break;
                     }
-                    axis.type =  GenericAxisInfo::CATEGORY;
+                    axis.type =  GenericAxisInfo::CATEGORY; // xxx ack ack ack - groupby dates and bar charts....
                     break;
                 }
             }
@@ -303,6 +340,126 @@ UserChart::setRide(const RideItem *item)
 
     // all done
     chart->finaliseChart();
+}
+
+
+// dates are always days since 1900,1,1 at this point as they
+// were returned by the datafilter. later on (notably after the
+// genericchart has intervened) they are converted to MSsincetheEpoch
+// but at this point, we have days since Jan 1 1900
+void
+UserChart::groupBy(int groupby, int aggregateby, QVector<double> &xseries, QVector<double> &yseries)
+{
+    // used to aggregate
+    double aggregate=0;
+    long lastgroup=0;
+    long groupcount=0;
+
+    QVector<double> newx, newy;
+
+    QDate epoch(1900,1,1);
+
+    for(int i=0; i<xseries.count() && i <yseries.count(); i++) {
+
+        // value
+        double value = yseries[i];
+
+        // date
+        QDate date = epoch.addDays(xseries[i]);
+        long group=groupForDate(groupby, date);
+
+        // first entry needs to set group
+        if (lastgroup == 0) lastgroup = group;
+
+        // when the group changes we save last seen value
+        // assumes in date order, we could sort first (?)
+        if (group != lastgroup && groupcount > 0) {
+
+            newx << epoch.daysTo(dateForGroup(groupby, lastgroup));
+            newy << aggregate;
+            aggregate = 0;
+            lastgroup = group;
+            groupcount = 0;
+        }
+
+        // lets aggregate for this group
+        switch (aggregateby) {
+        case RideMetric::Total:
+        case RideMetric::RunningTotal:
+            aggregate += value;
+            break;
+        case RideMetric::Average:
+            {
+            // simple mean, no accounting for duration of ride etc
+            aggregate = ((aggregate * groupcount) + value) / (groupcount+1);
+            break;
+            }
+        case RideMetric::Low:
+            if (value < aggregate) aggregate = value;
+            break;
+        case RideMetric::Peak:
+            if (value > aggregate) aggregate = value;
+            break;
+        case RideMetric::MeanSquareRoot:
+            if (value) aggregate = sqrt((pow(aggregate,2)*groupcount + pow(value,2)*value)/(groupcount+1));
+            break;
+        }
+
+        groupcount++;
+    }
+
+    if (groupcount >0) {
+
+        // pick up on last one
+        newx << epoch.daysTo(dateForGroup(groupby, lastgroup));
+        newy << aggregate;
+    }
+
+    // replace
+    xseries = newx;
+    yseries = newy;
+}
+
+long
+UserChart::groupForDate(int groupby, QDate date)
+{
+    switch(groupby) {
+    case GenericAxisInfo::WEEK:
+        {
+        // must start from 1 not zero!
+        return date.toJulianDay() / 7;
+        }
+    case GenericAxisInfo::MONTH: return (date.year()*12) + (date.month()-1);
+    case GenericAxisInfo::YEAR:  return date.year();
+    case GenericAxisInfo::DAY:
+    default:
+        return date.toJulianDay();
+    }
+}
+
+QDate
+UserChart::dateForGroup(int groupby, long group)
+{
+    switch(groupby) {
+    case GenericAxisInfo::WEEK:
+        {
+        // must start from 1 not zero!
+        return QDate::fromJulianDay(group*7);
+        }
+    case GenericAxisInfo::MONTH:
+        {
+            int year = group/12;
+            int month = group - (year*12);
+            return QDate(year, month+1, 1);
+        }
+    case GenericAxisInfo::YEAR:
+        {
+            return QDate(group, 1, 1);
+        }
+    case GenericAxisInfo::DAY:
+    default:
+        return QDate::fromJulianDay(group);
+    }
 }
 
 void
@@ -359,6 +516,7 @@ UserChart::settings() const
         out << "\"legend\": "    << (series.legend ? "true" : "false") << ", ";
         out << "\"opengl\": "    << (series.opengl ? "true" : "false") << ", ";
         out << "\"datalabels\": "    << (series.datalabels ? "true" : "false") << ", ";
+        out << "\"aggregate\": " << static_cast<int>(series.aggregateby) << ", ";
         out << "\"fill\": "    << (series.fill ? "true" : "false"); // NOTE: no trailing comma- when adding something new
         out << "}"; // note no trailing comman
     }
@@ -385,6 +543,8 @@ UserChart::settings() const
         out << "\"maxx\": "         << axis.maxx << ", ";
         out << "\"miny\": "         << axis.miny << ", ";
         out << "\"maxy\": "         << axis.maxy << ", ";
+        out << "\"smooth\": "       << axis.smooth << ", ";
+        out << "\"groupby\": "      << static_cast<int>(axis.groupby) << ", ";
         out << "\"visible\": "      << (axis.visible ? "true" : "false") << ", ";
         out << "\"fixed\": "        << (axis.fixed ? "true" : "false") << ", ";
         out << "\"log\": "          << (axis.log ? "true" : "false") << ", ";
@@ -445,6 +605,8 @@ UserChart::applySettings(QString x)
         add.opacity = series["opacity"].toDouble();
         add.legend = series["legend"].toBool();
         add.opengl = series["opengl"].toBool();
+        if (series.contains("aggregate")) add.aggregateby = static_cast<RideMetric::MetricType>(series["aggregate"].toInt());
+        else add.aggregateby = RideMetric::Average;
 
         // added later, may be null, if so, unset
         if (!series["datalabels"].isNull())  add.datalabels = series["datalabels"].toBool();
@@ -478,6 +640,10 @@ UserChart::applySettings(QString x)
         add.majorgrid = axis["majorgrid"].toBool();
         add.labelcolor = QColor(axis["labelcolor"].toString());
         add.axiscolor = QColor(axis["axiscolor"].toString());
+        if (axis.contains("smooth")) add.smooth = axis["smooth"].toDouble();
+        else add.smooth = 0;
+        if (axis.contains("groupby")) add.groupby = static_cast<GenericAxisInfo::AxisGroupBy>(axis["groupby"].toInt());
+        else add.groupby = GenericAxisInfo::NONE;
 
         axisinfo.append(add);
     }
@@ -1243,6 +1409,18 @@ EditUserSeriesDialog::EditUserSeriesDialog(Context *context, bool rangemode, Gen
     cf->addRow("X units", zz);
 
     cf->addRow(" ", (QWidget *)NULL);
+    aggregate = new QComboBox(this);
+    aggregate->addItem("Sum");
+    aggregate->addItem("Average");
+    aggregate->addItem("Peak");
+    aggregate->addItem("Low");
+    aggregate->addItem("Running Total");
+    aggregate->addItem("Mean Square Root");
+    aggregate->addItem("Std Deviation");
+    aggregate->setCurrentIndex(info.aggregateby);
+    aggregate->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    cf->addRow("Aggregate", aggregate);
+    cf->addRow(" ", (QWidget *)NULL);
 
     line = new QComboBox(this);
     line->addItem(tr("None"), static_cast<int>(Qt::PenStyle::NoPen));
@@ -1428,6 +1606,7 @@ EditUserSeriesDialog::okClicked()
     original.legend = legend->isChecked();
     original.datalabels = datalabels->isChecked();
     original.fill = fill->isChecked();
+    original.aggregateby = static_cast<RideMetric::MetricType>(aggregate->currentIndex());
     // update the source
 
     accept();
@@ -1486,6 +1665,26 @@ EditUserAxisDialog::EditUserAxisDialog(Context *context, GenericAxisInfo &info)
     zz->addWidget(max);
     zz->addStretch();
     cf->addRow(tr("Range"),zz);
+    cf->addRow(tr(" "), new QWidget(this));
+
+    // smoothing of series with a time axis - otherwise not shown
+    smooth = new QSlider(this);
+    smooth->setRange(0,60); // 0-60s smoothing
+    smooth->setSingleStep(1);
+    smooth->setOrientation(Qt::Horizontal);
+    smoothlabel = new QLabel("Smoothing", this);
+    cf->addRow(smoothlabel, smooth);
+
+    // group by of series with a date axis - otherwise not shown
+    groupby = new QComboBox(this);
+    groupby->addItem("None");
+    groupby->addItem("Day");
+    groupby->addItem("Week");
+    groupby->addItem("Month");
+    groupby->addItem("Year");
+    groupby->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    groupbylabel = new QLabel("Group By", this);
+    cf->addRow(groupbylabel, groupby);
 
     // make it wide enough
     setMinimumWidth(350 *dpiXFactor);
@@ -1500,12 +1699,53 @@ EditUserAxisDialog::EditUserAxisDialog(Context *context, GenericAxisInfo &info)
     fixed->setChecked(original.fixed);
     min->setValue(original.min());
     max->setValue(original.max());
+    smooth->setValue(original.smooth);
+    groupby->setCurrentIndex(original.groupby);
+
+    // connect axis type selection to widget selector
+    connect(axistype, SIGNAL(currentIndexChanged(int)), this, SLOT(setWidgets()));
 
     // connect up slots
     connect(okButton, SIGNAL(clicked()), this, SLOT(okClicked()));
     connect(cancelButton, SIGNAL(clicked()), this, SLOT(cancelClicked()));
+
+    // show / hide widgets on current config
+    setWidgets();
 }
 
+void
+EditUserAxisDialog::setWidgets()
+{
+    // set widgets shown/hidden on the basis of controlling config
+
+    // first- axistype determines the use of smoothing or groupby
+    switch(axistype->currentIndex()) {
+        case GenericAxisInfo::DATERANGE:
+            groupby->show();
+            groupbylabel->show();
+            smooth->setValue(0);
+            smooth->hide();
+            smoothlabel->hide();
+            break;
+
+        case GenericAxisInfo::TIME:
+            smooth->show();
+            smoothlabel->show();
+            groupby->setCurrentIndex(0);
+            groupby->hide();
+            groupbylabel->hide();
+            break;
+
+        default:
+            groupby->setCurrentIndex(0);
+            smooth->setValue(0);
+            smooth->hide();
+            smoothlabel->hide();
+            groupby->hide();
+            groupbylabel->hide();
+            break; // do nothing
+    }
+}
 
 void
 EditUserAxisDialog::cancelClicked()
@@ -1527,6 +1767,8 @@ EditUserAxisDialog::okClicked()
         original.miny= min->value();
         original.maxy= max->value();
     }
+    original.smooth = smooth->value();
+    original.groupby = static_cast<GenericAxisInfo::AxisGroupBy>(groupby->currentIndex());
 
     accept();
 }

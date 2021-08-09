@@ -58,6 +58,11 @@ class UserChart : public QWidget {
         void setBackgroundColor(QColor bgcolor);
         void setGraphicsItem(QGraphicsItem *);
 
+        // groupBy day, week, month etc where x is dates and y is values
+        void groupBy(int groupby, int aggregateby, QVector<double> &xseries, QVector<double> &yseries);
+        long groupForDate(int groupby, QDate date);
+        QDate dateForGroup(int groupby, long);
+
     public slots:
 
         // runtime - ride item changed
@@ -206,6 +211,7 @@ class EditUserSeriesDialog : public QDialog
         DataFilterEdit *program;
         QLabel *errors;
 
+        QComboBox *aggregate;
         QComboBox *line, *symbol;
         QDoubleSpinBox *size;
         ColorButton *color;
@@ -225,6 +231,9 @@ class EditUserAxisDialog : public QDialog
         EditUserAxisDialog(Context *,GenericAxisInfo &);
 
     public slots:
+
+        void setWidgets();
+
         void okClicked();
         void cancelClicked();
 
@@ -240,6 +249,9 @@ class EditUserAxisDialog : public QDialog
         QDoubleSpinBox *min, *max;
         ColorButton *axiscolor;
         QLineEdit *categories;
+        QComboBox *groupby;
+        QSlider *smooth;
+        QLabel *smoothlabel, *groupbylabel;
 
         QPushButton *okButton, *cancelButton;
 };

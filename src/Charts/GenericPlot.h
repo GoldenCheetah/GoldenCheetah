@@ -44,6 +44,7 @@
 
 #include "GenericSelectTool.h"
 #include "GenericLegend.h"
+#include "GenericChart.h"
 
 // keep aligned to library.py
 #define GC_CHART_LINE      1
