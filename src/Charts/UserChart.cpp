@@ -292,20 +292,53 @@ UserChart::setRide(const RideItem *item)
             // find the first series for axis.name
             foreach(GenericSeriesInfo s, seriesinfo) {
                 if (s.xname == axis.name && s.user1) {
+
                     axis.categories.clear();
+
+
                     UserChartData *ucd = static_cast<UserChartData*>(s.user1);
                     switch (axis.type) {
                         case GenericAxisInfo::TIME:
                             for(int i=0; i<ucd->x.asNumeric().count(); i++) axis.categories << time_to_string(ucd->x.asNumeric()[i], true);
                             break;
-                        case GenericAxisInfo::DATERANGE:
-                            for(int i=0; i<ucd->x.asNumeric().count(); i++) axis.categories << earliest.addDays(ucd->x.asNumeric()[i]).toString("dd MMM yy");
+                        case GenericAxisInfo::DATERANGE: {
+
+                                // date labels, date, week #, month name, year
+                                QString dateformat= "dd MMM yy";
+                                int ax=GenericAxisInfo::findAxis(axisinfo, s.xname); // lookup axisinfo
+                                if (ax != -1 && axisinfo[ax].groupby != 0 && axisinfo[ax].type == GenericAxisInfo::DATERANGE)  {
+
+                                    // date format depends on how data was grouped
+                                    switch(axisinfo[ax].groupby) {
+                                    default:
+                                    case GenericAxisInfo::NONE:
+                                    case GenericAxisInfo::DAY:
+                                        dateformat= "dd MMM yy";
+                                        break;
+
+                                    case GenericAxisInfo::WEEK:
+                                        dateformat = "d/M"; // week commencing
+
+                                        break;
+                                    case GenericAxisInfo::MONTH:
+                                        dateformat = "MMM yy";
+                                        break;
+
+                                    case GenericAxisInfo::YEAR:
+                                        dateformat = "yyyy";
+                                        break;
+                                    }
+                                }
+                                // create the labels
+                                for(int i=0; i<ucd->x.asNumeric().count(); i++)
+                                    axis.categories << earliest.addDays(ucd->x.asNumeric()[i]).toString(dateformat);
+                            }
                             break;
                         default:
                             for(int i=0; i<ucd->x.asString().count(); i++) axis.categories << ucd->x.asString()[i];
                             break;
                     }
-                    axis.type =  GenericAxisInfo::CATEGORY; // xxx ack ack ack - groupby dates and bar charts....
+                    axis.type =  GenericAxisInfo::CATEGORY;
                     break;
                 }
             }
