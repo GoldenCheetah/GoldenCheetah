@@ -109,3 +109,7 @@
 #define GC_SPORTTRACKS_CLIENT_SECRET "__GC_SPORTTRACKS_CLIENT_SECRET__"
 #endif
 #endif
+
+#ifndef GC_RWGPS_API_KEY
+#define GC_RWGPS_API_KEY "__GC_RWGPS_API_KEY__"
+#endif

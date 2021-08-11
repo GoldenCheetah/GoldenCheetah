@@ -188,6 +188,8 @@ OAuthDialog::OAuthDialog(Context *context, OAuthSite site, CloudService *service
 
     } else if (site == XERT) {
         urlChanged(QUrl("http://www.goldencheetah.org/?code=0"));
+    } else if (site == RIDEWITHGPS) {
+        urlChanged(QUrl("http://www.goldencheetah.org/?code=0"));
     }
 
     //
@@ -232,7 +234,7 @@ OAuthDialog::urlChanged(const QUrl &url)
     QString authheader;
 
     // sites that use this scheme
-    if (site == DROPBOX || site == STRAVA || site == CYCLING_ANALYTICS || site == TODAYSPLAN || site == POLAR || site == SPORTTRACKS || site == XERT || site == WITHINGS) {
+    if (site == DROPBOX || site == STRAVA || site == CYCLING_ANALYTICS || site == TODAYSPLAN || site == POLAR || site == SPORTTRACKS || site == XERT || site == RIDEWITHGPS || site == WITHINGS) {
 
         if (url.toString().startsWith("http://www.goldencheetah.org/?state=&code=") ||
                 url.toString().contains("blank.html?code=") ||
@@ -318,8 +320,9 @@ OAuthDialog::urlChanged(const QUrl &url)
 
                 authheader = QString("%1:%1").arg("xert_public");
             } else if (site == RIDEWITHGPS) {
-
-                urlstr = QString("https://www.ridewithgps.com/users/current.json");
+                urlstr = QString("https://ridewithgps.com/users/current.json");
+                params.addQueryItem("apikey", GC_RWGPS_API_KEY);
+                params.addQueryItem("version", "2");
                 params.addQueryItem("email", service->getSetting(GC_RWGPSUSER, "").toString());
                 params.addQueryItem("password", service->getSetting(GC_RWGPSPASS, "").toString());
 
@@ -341,17 +344,24 @@ OAuthDialog::urlChanged(const QUrl &url)
             // trade-in the temporary access code retrieved by the Call-Back URL for the finale token
             QUrl url = QUrl(urlstr);
 
-            QNetworkRequest request = QNetworkRequest(url);
-            request.setHeader(QNetworkRequest::ContentTypeHeader,"application/x-www-form-urlencoded");
-
-            // client id and secret are encoded and sent in the header for POLAR and XERT
-            if (site == POLAR || site == XERT)  request.setRawHeader("Authorization", "Basic " +  authheader.toLatin1().toBase64());
-
             // now get the final token - but ignore errors
             manager = new QNetworkAccessManager(this);
             connect(manager, SIGNAL(sslErrors(QNetworkReply*, const QList<QSslError> & )), this, SLOT(onSslErrors(QNetworkReply*, const QList<QSslError> & )));
             connect(manager, SIGNAL(finished(QNetworkReply*)), this, SLOT(networkRequestFinished(QNetworkReply*)));
-            manager->post(request, data);
+
+            if (site == RIDEWITHGPS) {
+                url.setQuery(data);
+                QNetworkRequest request = QNetworkRequest(url);
+                manager->get(request);
+            } else {
+                QNetworkRequest request = QNetworkRequest(url);
+                request.setHeader(QNetworkRequest::ContentTypeHeader,"application/x-www-form-urlencoded");
+
+                // client id and secret are encoded and sent in the header for POLAR and XERT
+                if (site == POLAR || site == XERT)  request.setRawHeader("Authorization", "Basic " +  authheader.toLatin1().toBase64());
+
+                manager->post(request, data);
+            }
 
         }
     }
@@ -431,6 +441,7 @@ OAuthDialog::networkRequestFinished(QNetworkReply *reply)
         QByteArray payload = reply->readAll(); // JSON
         QString refresh_token;
         QString access_token;
+        QString auth_token;
         double polar_userid=0;
 
         // parse the response and extract the tokens, pretty much the same for all services
@@ -441,11 +452,13 @@ OAuthDialog::networkRequestFinished(QNetworkReply *reply)
             refresh_token = document.object()["refresh_token"].toString();
             access_token = document.object()["access_token"].toString();
             if (site == POLAR)  polar_userid = document.object()["x_user_id"].toDouble();
+            if (site == RIDEWITHGPS) access_token = document.object()["user"].toObject()["auth_token"].toString();
         }
 
         // if we failed to extract then we have a big problem
         // google uses a refresh token so trap for them only
-        if (((site == GOOGLE_CALENDAR || site == GOOGLE_DRIVE || site == KENTUNI) && refresh_token == "") || access_token == "") {
+        if (((site == GOOGLE_CALENDAR || site == GOOGLE_DRIVE || site == KENTUNI) && refresh_token == "") ||
+             access_token == "" ) {
 
             // Something failed.
             // Only Google uses both refresh and access tokens.
@@ -572,6 +585,12 @@ OAuthDialog::networkRequestFinished(QNetworkReply *reply)
             //information.exec();
 
             service->message = "Xert authorization was successful.";
+
+        } else if (site == RIDEWITHGPS) {
+
+            service->setSetting(GC_RWGPS_AUTH_TOKEN, access_token);
+
+            service->message = "Ride With GPS authorization was successful.";
 
         } else if (site == WITHINGS) {
 
