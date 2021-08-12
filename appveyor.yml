@@ -33,6 +33,8 @@ environment:
     secure: h2JdlC1i4QOmwpkz+Xxbrw==
   GC_SPORTTRACKS_CLIENT_SECRET:
     secure: n6a8nJgqMyg+VsVeoIIR8TFzxyDFVi2w/ggetQk5agY=
+  GC_RWGPS_API_KEY:
+    secure: uUtCyF5ByZ1VYJOztUngIA==
 
 init:
 # Setup QT 5.14 - 64Bit
@@ -142,6 +144,7 @@ before_build:
 - ps: (Get-Content src\Core\Secrets.h) -replace '__GC_CLOUD_DB_APP_NAME__', $env:GC_CLOUD_DB_APP_NAME | Set-Content src\Core\Secrets.h
 - ps: (Get-Content src\Core\Secrets.h) -replace '__GC_POLARFLOW_CLIENT_SECRET__', $env:GC_POLARFLOW_CLIENT_SECRET | Set-Content src\Core\Secrets.h
 - ps: (Get-Content src\Core\Secrets.h) -replace '__GC_SPORTTRACKS_CLIENT_SECRET__', $env:GC_SPORTTRACKS_CLIENT_SECRET | Set-Content src\Core\Secrets.h
+- ps: (Get-Content src\Core\Secrets.h) -replace '__GC_RWGPS_API_KEY__', $env:GC_RWGPS_API_KEY | Set-Content src\Core\Secrets.h
 
 build_script:
 - qmake.exe build.pro -r -spec win32-msvc
