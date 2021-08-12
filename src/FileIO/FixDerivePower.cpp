@@ -147,7 +147,11 @@ class FixDerivePowerConfig : public DataProcessorConfig
                               "Note: when the file already contains wind data, "
                               "it will be overridden if wind speed is set\n\n"
                               "The activity has to be a Ride with Speed and "
-                              "Altitude.")));
+                              "Altitude.\n\n"
+                              "Warning: the accuracy of power estimation can be "
+                              "too low to be of practical use for power analysis "
+                              "of general outdoor rides using typical GPS data. "
+                              "A power meter is recommended.")));
         }
 
         void readConfig() {
