@@ -1028,7 +1028,7 @@ DataOverviewItem::sort(int column, Qt::SortOrder order)
 
     QRegExp redate("^[0-9][0-9] [A-z][A-z][A-z] [0-9][0-9]*$");
     QRegExp retime("^[0-9:]*$");
-    QRegExp renumber("^[0-9.]*$");
+    QRegExp renumber("^[0-9.-]*$");
 
     for(int i= rows * column; i<values.count() && i< rows * (column+1) ; i++) {
         QString &val = values[i];
