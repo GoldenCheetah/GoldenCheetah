@@ -75,6 +75,11 @@ class OverviewItemConfig : public QWidget
         // legacy data table selector (connected to legacySelector below)
         void setProgram(int n);
 
+    protected:
+
+        // before show, lets make sure the widgets are set correctly
+        void showEvent(QShowEvent *) override { setWidgets(); }
+
     private:
 
         // the widget we are configuring
