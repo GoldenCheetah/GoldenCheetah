@@ -1039,7 +1039,6 @@ DataOverviewItem::sort(int column, Qt::SortOrder order)
         else if (redate.exactMatch(val)) isdate++; // numbers + date
         else isstring++; // all bets are off
     }
-
     // step 2: generate an argsort index as strings or numbers
     QVector<int> argsortindex;
     if (isstring) {
@@ -1070,9 +1069,20 @@ DataOverviewItem::sort(int column, Qt::SortOrder order)
                 }
 
                 in << QTime(0,0,0).secsTo(attempt);
-            }
-            else if (redate.exactMatch(val)) in << epoch.daysTo(QDate::fromString(val, "dd MMM yyyy"));
-            else in << 0;
+
+            } else if (redate.exactMatch(val)) {
+
+                // common formats
+                QStringList formats = { "dd MMM yyyy", "dd MMM yy", "dd/mm/yy", "mm/dd/yy" };
+                QDate attempt;
+
+                foreach(QString format, formats) {
+                    attempt = QDate::fromString(val, format);
+                    if (attempt.isValid()) break;
+                }
+                in <<  epoch.daysTo(attempt);
+
+            } else in << 0; // nope, don't understand
         }
         argsortindex = Utils::argsort(in, order==Qt::AscendingOrder);
     }
