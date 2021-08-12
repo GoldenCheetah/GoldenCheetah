@@ -3383,14 +3383,14 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
             if (r.isVector()) {
                 QVector<QString> list;
                 foreach(double n, r.asNumeric()) {
-                    if (wantdate) list << earliest.addDays(n).toString("dd MMM yy");
+                    if (wantdate) list << earliest.addDays(n).toString("dd MMM yyyy");
                     else list << time_to_string(n);
                 }
                 returning = Result(list);
             } else {
 
                 float n = r.number();
-                if (wantdate) returning = Result(earliest.addDays(n).toString("dd MMM yy"));
+                if (wantdate) returning = Result(earliest.addDays(n).toString("dd MMM yyyy"));
                 else returning = Result(time_to_string(n));
             }
             return returning;
