@@ -428,6 +428,7 @@ struct FitFileReaderState
                 case 3289: case 3290: case 3514: case 3515: return "Garmin Fenix 6";
                 case 3291: case 3516: return "Garmin Fenix 6x";
                 case 3299: return "Garmin HRM-Dual";
+                case 3300: return "Garmin HRM-Pro";
                 case 3405: case 3639: return "Garmin Swim 2";
                 case 3558: return "Garmin Edge 130 Plus";
                 case 3570: return "Garmin Edge 1030 Plus";
