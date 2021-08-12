@@ -1437,12 +1437,12 @@ MainWindow::switchPerspective(int index)
 }
 
 void
-MainWindow::resetPerspective(int view)
+MainWindow::resetPerspective(int view, bool force)
 {
     static AthleteTab *lastathlete=NULL;
     static int lastview=-1;
 
-    if (lastview == view && lastathlete == currentAthleteTab) return;
+    if (!force && lastview == view && lastathlete == currentAthleteTab) return;
 
     // remember who last updated it.
     lastathlete = currentAthleteTab;
@@ -1549,8 +1549,10 @@ MainWindow::perspectivesChanged()
     // which perspective is currently being selected (before we go setting the combobox)
     Perspective *prior = current->perspective_;
 
-    // ok, so reset the combobox
-    resetPerspective(view);
+    // ok, so reset the combobox and force, since whilst it may have already
+    // been set for this athlete+view combination the config was just changed
+    // so it needs to be redone.
+    resetPerspective(view, true);
     //current->setPerspectives(perspectiveSelector);
 
     // is the old selected perspective still available?
