@@ -147,7 +147,7 @@ class MainWindow : public QMainWindow
         // perspective selected
         void perspectiveSelected(int index);
         void perspectivesChanged(); // when the list of perspectives is updated in PerspectivesDialog
-        void resetPerspective(int view); // reset when view changes
+        void resetPerspective(int view, bool force=false); // reset when view changes
 
         // import and export perspectives
         void exportPerspective();
