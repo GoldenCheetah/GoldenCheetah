@@ -38,6 +38,7 @@ class Sparkline;
 class BubbleViz;
 class Routeline;
 class ProgressBar;
+class VScrollBar;
 
 // sparklines number of points - look back 6 weeks
 #define SPARKDAYS 42
@@ -151,6 +152,7 @@ class DataOverviewItem : public ChartSpaceItem
         void setData(RideItem *item);
         void setDateRange(DateRange);
         void postProcess(); // work with data returned from program
+        void dragChanged(bool x);
 
         QWidget *config() { return configwidget; }
 
@@ -182,6 +184,8 @@ class DataOverviewItem : public ChartSpaceItem
 
         int lastsort; // the column we last sorted on
         Qt::SortOrder lastorder; // the order we last sorted on
+
+        VScrollBar *scrollbar;
 };
 
 class RPEOverviewItem : public ChartSpaceItem
@@ -665,6 +669,56 @@ class Sparkline : public QGraphicsItem
         bool bigdot;
         bool fill;
         QList<QPointF> points;
+};
+
+// vertical scrollbar
+class VScrollBar : public QGraphicsItem
+{
+    public:
+        VScrollBar(QGraphicsWidget *parent, ChartSpace *space); // create empty, geometry and boundary gets changed all the time
+
+        // we monkey around with this *A LOT*
+        void setGeometry(double x, double y, double width, double height);
+        QRectF geometry() { return geom; }
+
+        // the size of the scroll area
+        void setAreaHeight(double n);
+
+        // pos - this is the position in the area being scrolled
+        //       that should be painted in the viewable area
+        //       since its a vertical scrollbar its the y position
+        //       it can be set by parent when e.g. catch key events
+        void setPos(double x);
+        double pos() const;
+
+        bool isDragging() { return state == DRAG; }
+
+        // needed as pure virtual in QGraphicsItem
+        QRectF boundingRect() const override { return geom; }
+        QVariant itemChange(GraphicsItemChange change, const QVariant &value) override
+        {
+            if (change == ItemPositionChange && parent->scene())  prepareGeometryChange();
+            return QGraphicsItem::itemChange(change, value);
+        }
+
+        // the usual
+        void paint(QPainter*, const QStyleOptionGraphicsItem *, QWidget*) override;
+
+        // spotting mouse events hover, click move and wheel (but only in small area of scrollbar)
+        bool sceneEvent(QEvent *event) override;
+
+    private:
+
+        QGraphicsWidget *parent;
+        ChartSpace *space;
+        QRectF geom;
+        double height;
+        bool hover; // is mouse in our rect?
+        bool barhover; // is mouse over the scrollbar itself?
+
+        QPointF origin;
+        enum { NONE, DRAG } state;
+        double barpos, obarpos;
 };
 
 // visualisation of a GPS route as a shape

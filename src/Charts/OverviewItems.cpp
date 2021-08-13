@@ -147,6 +147,8 @@ DataOverviewItem::DataOverviewItem(ChartSpace *parent, QString name, QString pro
 
     configwidget = new OverviewItemConfig(this);
     configwidget->hide();
+
+    scrollbar = new VScrollBar(this, parent);
 }
 
 DataOverviewItem::~DataOverviewItem()
@@ -508,6 +510,13 @@ DataOverviewItem::create(ChartSpace *parent) {
 
     if (parent->scope == ANALYSIS) return new DataOverviewItem(parent, "Totals", getLegacyProgram(DATA_TABLE_TOTALS, df.rt));
     else return new DataOverviewItem(parent, "Activities", getLegacyProgram(DATA_TABLE_TRENDS, df.rt));
+}
+
+void
+DataOverviewItem::dragChanged(bool x)
+{
+    if (x) scrollbar->hide();
+    else scrollbar->show();
 }
 
 RouteOverviewItem::RouteOverviewItem(ChartSpace *parent, QString name) : ChartSpaceItem(parent, name)
@@ -933,9 +942,6 @@ DataOverviewItem::setData(RideItem *item)
 
         postProcess();
     }
-
-    // show/hide widgets on the basis of geometry
-    itemGeometryChanged();
 }
 
 void
@@ -987,6 +993,9 @@ DataOverviewItem::postProcess()
         }
         columnWidths << maxwidth;
 
+        // tell the scrollbar we don't need scrolling
+        scrollbar->setAreaHeight(0);
+
     } else {
 
         // One column per series - name1  name2  name3  name4
@@ -1010,10 +1019,18 @@ DataOverviewItem::postProcess()
 
             columnWidths << maxwidth;
         }
+
+        // tell scrollbar how big the scroll area is
+        QFontMetrics fm(multirow ? parent->smallfont : parent->midfont, parent->device());
+        double lineheight = fm.boundingRect("XXX").height() * 1.2f;
+        scrollbar->setAreaHeight(rows * lineheight); // no scrolling
     }
 
     // keep the same sorting...
     if (lastsort != -1) sort(lastsort, lastorder);
+
+    // show/hide widgets on the basis of geometry
+    itemGeometryChanged();
 }
 
 void
@@ -1135,9 +1152,6 @@ DataOverviewItem::setDateRange(DateRange dr)
 
         postProcess();
     }
-
-    // show/hide widgets on the basis of geometry
-    itemGeometryChanged();
 }
 
 void
@@ -2318,7 +2332,38 @@ KPIOverviewItem::itemGeometryChanged() {
 }
 
 void
-DataOverviewItem::itemGeometryChanged() {  } // only a data table and we crop when painting
+DataOverviewItem::itemGeometryChanged()
+{
+    if (names.count() > 0) {
+
+        // if we are multirow we need to set the scrollbar
+        int rows = values.count() / names.count();
+
+        if (rows > 2) {
+
+            // lets work out the dataarea, bit of a faff and need to keep aligned with paint
+            // method - todo: refactor out duplicated code
+            QFontMetrics fm(multirow ? parent->smallfont : parent->midfont, parent->device());
+            double lineheight = fm.boundingRect("XXX").height() * 1.2f;
+            double scrollwidth = fm.boundingRect("X").width();
+            QRectF paintarea = QRectF(20,ROWHEIGHT*2, geometry().width()-40, geometry().height()-20-(ROWHEIGHT*2));
+            QRectF dataarea = paintarea;
+            dataarea.setY(dataarea.y() + (lineheight*2) + (lineheight*0.25f)); // 0.2 is the line spacing
+
+            // set geometry to rhs
+            scrollbar->setGeometry(dataarea.right() - scrollwidth, dataarea.top(), scrollwidth, dataarea.height());
+
+        } else {
+            // not needed
+            scrollbar->setGeometry(0,0,0,0);
+        }
+
+    } else {
+
+        // not needed- optimising out just adds another calc
+        scrollbar->setGeometry(0,0,0,0);
+    }
+}
 
 void
 MetricOverviewItem::itemGeometryChanged() {
@@ -2616,6 +2661,11 @@ DataOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *,
 
     int hoverrow = -1; // remember if the mouse is over a particular row.
 
+    // scroll position, only really relevant for multirow
+    double scrollareapos = scrollbar->pos();
+    int startrow = 0;
+    if (scrollareapos) startrow = scrollareapos/lineheight + 1;
+
     // paint the hover background, only matters when have multiple rows
     if (multirow && underMouse()) {
 
@@ -2668,21 +2718,21 @@ DataOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *,
                 if (click) sortcolumn = column;
             }
 
-        } else if (itemarea.contains(cpos)) {
+        } else if (!scrollbar->isDragging() && itemarea.contains(cpos)) {
 
-            if (files.count() && row < files.count()) {
+            if (files.count() && row+startrow < files.count()) {
                 painter->setPen(Qt::NoPen);
                 QColor darkgray(120,120,120,120);
                 painter->setBrush(darkgray);
                 painter->drawRect(itemarea);
 
                 if (click) {
-                    clickthru = parent->context->athlete->rideCache->getRide(files[row]);
+                    clickthru = parent->context->athlete->rideCache->getRide(files[row+startrow]);
                     click = false;
                 }
             } else {
                 // clicktru is not available bit lets at least make the
-                if (multirow) hoverrow = row;
+                if (multirow) hoverrow = row+startrow;
             }
         }
     }
@@ -2746,11 +2796,11 @@ DataOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *,
 
             // paint values in columns
             int offset = rows * i;
-            for (int j=0; j<rows && offset+j < values.count(); j++) {
+            for (int j=startrow; j<rows && offset+j < values.count(); j++) {
                 QString value = values[offset+j];
 
                 // highlight rows when hovering and click thru not available
-                if (j == hoverrow) {
+                if (j == hoverrow && !scrollbar->isDragging()) {
                     painter->setFont(bold);
                     painter->setPen(GColor(CPLOTMARKER));
                 } else {
@@ -4990,6 +5040,128 @@ Button::sceneEvent(QEvent *event)
     } else if (event->type() == QEvent::GraphicsSceneHoverEnter) {
 
         update();
+    }
+    return false;
+}
+
+VScrollBar::VScrollBar(QGraphicsWidget *parent, ChartSpace *space) : QGraphicsItem(parent), parent(parent), space(space), height(0)
+{
+    setZValue(11); // slightly higher than host
+
+    // hovering and dragging state set to initial conditions
+    origin = QPointF(0,0);
+    barhover=hover=false;
+    obarpos=barpos=0;
+    state=NONE;
+
+    // we need to watch events...
+    setAcceptHoverEvents(true);
+}
+
+double
+VScrollBar::pos() const
+{
+    if (geom.height() == 0) return 0;
+
+    // return pos as point in scrollarea thats at the top
+    return height * (barpos / geom.height());
+}
+void
+VScrollBar::setGeometry(double x, double y, double width, double height)
+{
+    geom = QRectF(x,y,width,height);
+    barpos = 0;
+}
+
+void
+VScrollBar::setAreaHeight(double n)
+{
+    height = n;
+    barpos = 0;
+}
+
+void
+VScrollBar::setPos(double x)
+{
+    // xxx todo
+}
+
+// the usual
+void
+VScrollBar::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
+{
+    if (isVisible() && geom.height() && geom.height() < height) {
+
+        double barheight = geom.height() * (geom.height() / height);
+        QColor barcolor(127,127,127,64);
+        if (state == DRAG) {
+            barcolor = GColor(CPLOTMARKER);
+        } else if (hover) {
+            if (barhover) barcolor = QColor(127,127,127,255);
+            else barcolor = QColor(127,127,127,127);
+        }
+
+        painter->setBrush(barcolor);
+        painter->setPen(Qt::NoPen);
+        painter->drawRect(geom.x(), geom.y()+barpos, geom.width(), barheight);
+    }
+}
+
+// spotting mouse events hover, click move and wheel (but only in small area of scrollbar)
+bool
+VScrollBar::sceneEvent(QEvent *event)
+{
+    // we are not needed as scrollable area fits anyway
+    if (height == 0 || geom.height() >= height) return false;
+
+    // set value based upon the location of the mouse
+    QPoint vpos = space->mapFromGlobal(QCursor::pos());
+    QPointF spos = space->view->mapToScene(vpos);
+    QPointF cpos = spos - parent->geometry().topLeft();
+
+    // remember what it was....
+    bool oldhover = hover;
+    bool oldbarhover = barhover;
+
+    // scrollbar space
+    if (geom.contains(cpos)) hover = true;
+    else hover=false;
+
+    // the actual bar
+    double barheight = geom.height() * (geom.height() / height);
+    QRectF barrect = QRectF(geom.x(), geom.y()+barpos, geom.width(), barheight);
+    if (barrect.contains(cpos)) barhover = true;
+    else barhover = false;
+
+    // plain old mouse move
+    if (oldhover != hover || oldbarhover != barhover) update();
+
+    if (event->type() == QEvent::GraphicsSceneMouseMove && state == DRAG) {
+
+        // mouse moved so hover paint anyway
+        barpos = obarpos + cpos.y() - origin.y();
+        if (barpos < 0) barpos = 0;
+        if (barpos + barheight > geom.height()) barpos = geom.height() - barheight;
+        update();
+
+        return true;
+
+    } else if (barhover && event->type() == QEvent::GraphicsSceneMousePress) {
+
+        state = DRAG;
+        origin = cpos;
+        obarpos = barpos;
+        update();
+
+        return true;
+
+    } else if (event->type() == QEvent::GraphicsSceneMouseRelease) {
+
+        // remember what it was
+        state = NONE;
+        update();
+
+        return true;
     }
     return false;
 }
