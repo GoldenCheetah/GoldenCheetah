@@ -225,322 +225,208 @@ OverviewWindow::setConfiguration(QString config)
     // default column widths - max 10 columns;
     // note the sizing is such that each card is the equivalent of a full screen
     // so we can embed charts etc without compromising what they can display
+    //
+    // we drop back here is the config is an old and unsupported format from pre v3.5
 
- defaultsetup: // I know, but its easier than lots of nested if clauses above
+defaultsetup:
 
     if (config == "") {
 
-        if (scope == OverviewScope::ANALYSIS) {
-
-            // column 0
-            ChartSpaceItem *add;
-            add = new PMCOverviewItem(space, "coggan_tss");
-            space->addItem(1,0,1,9, add);
-
-            add = new MetaOverviewItem(space, tr("Sport"), "Sport");
-            space->addItem(2,0,1,5, add);
-
-            add = new MetaOverviewItem(space, tr("Workout Code"), "Workout Code");
-            space->addItem(3,0,1,5, add);
-
-            add = new MetricOverviewItem(space, tr("Duration"), "workout_time");
-            space->addItem(4,0,1,9, add);
-
-            add = new MetaOverviewItem(space, tr("Notes"), "Notes");
-            space->addItem(5,0,1,13, add);
-
-            // column 1
-            add = new MetricOverviewItem(space, tr("HRV rMSSD"), "rMSSD");
-            space->addItem(1,1,1,9, add);
-
-            add = new MetricOverviewItem(space, tr("Heartrate"), "average_hr");
-            space->addItem(2,1,1,5, add);
-
-            add = new ZoneOverviewItem(space, tr("Heartrate Zones"), RideFile::hr, false);
-            space->addItem(3,1,1,11, add);
-
-            add = new MetricOverviewItem(space, tr("Climbing"), "elevation_gain");
-            space->addItem(4,1,1,5, add);
-
-            add = new MetricOverviewItem(space, tr("Cadence"), "average_cad");
-            space->addItem(5,1,1,5, add);
-
-            add = new MetricOverviewItem(space, tr("Work"), "total_work");
-            space->addItem(6,1,1,5, add);
-
-            // column 2
-            add = new RPEOverviewItem(space, tr("RPE"));
-            space->addItem(1,2,1,9, add);
-
-            add = new MetricOverviewItem(space, tr("Stress"), "coggan_tss");
-            space->addItem(2,2,1,5, add);
-
-            add = new ZoneOverviewItem(space, tr("Fatigue Zones"), RideFile::wbal, false);
-            space->addItem(3,2,1,11, add);
-
-            add = new IntervalOverviewItem(space, tr("Intervals"), "elapsed_time", "average_power", "workout_time");
-            space->addItem(4,2,1,17, add);
-
-            // column 3
-            add = new MetricOverviewItem(space, tr("Power"), "average_power");
-            space->addItem(1,3,1,9, add);
-
-            add = new MetricOverviewItem(space, tr("IsoPower"), "coggan_np");
-            space->addItem(2,3,1,5, add);
-
-            add = new ZoneOverviewItem(space, tr("Power Zones"), RideFile::watts, false);
-            space->addItem(3,3,1,11, add);
-
-            add = new MetricOverviewItem(space, tr("Peak Power Index"), "peak_power_index");
-            space->addItem(4,3,1,8, add);
-
-            add = new MetricOverviewItem(space, tr("Variability"), "coggam_variability_index");
-            space->addItem(5,3,1,8, add);
-
-            // column 4
-            add = new MetricOverviewItem(space, tr("Distance"), "total_distance");
-            space->addItem(1,4,1,9, add);
-
-            add = new MetricOverviewItem(space, tr("Speed"), "average_speed");
-            space->addItem(2,4,1,5, add);
-
-            add = new ZoneOverviewItem(space, tr("Pace Zones"), RideFile::kph, false);
-            space->addItem(3,4,1,11, add);
-
-            add = new RouteOverviewItem(space, tr("Route"));
-            space->addItem(4,4,1,17, add);
-
-        }
-
-        if (scope == OverviewScope::TRENDS) {
-
-            ChartSpaceItem *add;
-
-            // column 0
-            add = new KPIOverviewItem(space, tr("Distance"), 0, 10000, "{ round(sum(metrics(Distance))); }", "km", false);
-            space->addItem(0,0,1,8, add);
-
-            add = new TopNOverviewItem(space, tr("Going Long"), "total_distance");
-            space->addItem(1,0,1,25, add);
-
-            add = new KPIOverviewItem(space, tr("Weekly Hours"), 0, 15*3600, "{ weeks <- (daterange(stop)-daterange(start))/7; sum(metrics(Duration))/weeks; }", tr("hh:mm:ss"), true);
-            space->addItem(2,0,1,7, add);
-
-            // column 1
-            add = new KPIOverviewItem(space, tr("Peak Power Index"), 0, 150, "{ round(sort(descend, metrics(Power_Index))[0]); }", "%", false);
-            space->addItem(0,1,1,8, add);
-
-            add = new MetricOverviewItem(space, tr("Max Power"), "max_power");
-            space->addItem(1,1,1,7, add);
-
-            add = new MetricOverviewItem(space, tr("Average Power"), "average_power");
-            space->addItem(2,1,1,7, add);
-
-            add = new ZoneOverviewItem(space, tr("Power Zones"), RideFile::watts, false);
-            space->addItem(3,1,1,9, add);
-
-            add = new MetricOverviewItem(space, tr("Total TSS"), "coggan_tss");
-            space->addItem(4,1,1,7, add);
-
-            // column 2
-            add = new KPIOverviewItem(space, tr("Total Hours"), 0, 0, "{ sum(metrics(Duration)); }", "hh:mm:ss", true);
-            space->addItem(0,2,1,8, add);
-
-            add = new TopNOverviewItem(space, tr("Going Hard"), "skiba_wprime_exp");
-            space->addItem(1,2,1,25, add);
-
-            add = new MetricOverviewItem(space, tr("Total W' Work"), "skiba_wprime_exp");
-            space->addItem(2,2,1,7, add);
-
-            // column 3
-            add = new KPIOverviewItem(space, tr("W' Ratio"), 0, 100, "{ round((sum(metrics(W'_Work)) / sum(metrics(Work))) * 100); }", "%", false);
-            space->addItem(0,3,1,8, add);
-
-            add = new KPIOverviewItem(space, tr("Peak CP Estimate "), 0, 360, "{ round(max(estimates(cp3,cp))); }", "watts", false);
-            space->addItem(1,3,1,7, add);
-
-            add = new KPIOverviewItem(space, tr("Peak W' Estimate "), 0, 25, "{ round(max(estimates(cp3,w')/1000)*10)/10; }", "kJ", false);
-            space->addItem(2,3,1,7, add);
-
-
-            add = new ZoneOverviewItem(space, tr("Fatigue Zones"), RideFile::wbal, false);
-            space->addItem(3,3,1,9, add);
-
-            add = new MetricOverviewItem(space, tr("Total Work"), "total_work");
-            space->addItem(4,3,1,7, add);
-
-            // column 4
-            add = new MetricOverviewItem(space, tr("Intensity Factor"), "coggan_if");
-            space->addItem(0,4,1,8, add);
-
-            add = new TopNOverviewItem(space, tr("Going Deep"), "skiba_wprime_low");
-            space->addItem(1,4,1,25, add);
-
-            add = new KPIOverviewItem(space, tr("IF > 0.85"), 0, 0, "{ count(metrics(IF)[x>0.85]); }", "activities", false);
-            space->addItem(2,4,1,7, add);
-
-        }
-
-    } else {
-
+        // to make life simpler we place a .gchart export into the resources
+        // this is so we can design them and export rather than doing anything
+        // special with the contents.
         //
-        // But by default we parse and apply (dropping back to default setup on error)
+        // so we open the json doc and extract the config element
         //
-        // parse
-        QJsonDocument doc = QJsonDocument::fromJson(config.toUtf8());
-        if (doc.isEmpty() || doc.isNull()) {
-            config="";
-            goto defaultsetup;
+        QString source;
+        if (scope == OverviewScope::ANALYSIS) source = ":charts/overview-analysis.gchart";
+        if (scope == OverviewScope::TRENDS) source = ":charts/overview-trends.gchart";
+
+        QFile file(source);
+        if (file.open(QIODevice::ReadOnly)) {
+            config = file.readAll();
+            file.close();
         }
 
-        // parsed so lets work through it and setup the overview
-        QJsonObject root = doc.object();
+        QJsonDocument chart = QJsonDocument::fromJson(config.toUtf8());
+        if (chart.isEmpty() || chart.isNull()) {
 
-        // check version
-        QString version = root["version"].toString();
-        if (version != "2.0") {
-            config="";
-            goto defaultsetup;
+badconfig:
+            fprintf(stderr, "bad config: %s\n", source.toStdString().c_str());
+            return;
         }
 
-        // cards
-        QJsonArray CHARTS = root["CHARTS"].toArray();
-        foreach(const QJsonValue val, CHARTS) {
+        // root is "CHART"
+        QJsonObject gchartroot = chart.object();
+        if (!gchartroot.contains("CHART")) goto badconfig;
+        QJsonObject ochart = gchartroot["CHART"].toObject();
 
-            // convert so we can inspect
-            QJsonObject obj = val.toObject();
+        // CHART PROPERTIES
+        if (!ochart.contains("PROPERTIES")) goto badconfig;
+        QJsonObject properties = ochart["PROPERTIES"].toObject();
 
-            // get the basics
-            QString name = obj["name"].toString();
-            QString datafilter = Utils::jsonunprotect(obj["datafilter"].toString());
-            int column = obj["column"].toInt();
-            int order = obj["order"].toInt();
-            int span = obj.contains("span") ? obj["span"].toInt() : 1;
-            int deep = obj["deep"].toInt();
-            int type = obj["type"].toInt();
+        // set from the config property
+        if (!properties.contains("config")) goto badconfig;
+        config = properties["config"].toString();
+    }
+
+    //
+    // But by default we parse and apply (dropping back to default setup on error)
+    //
+    // parse
+    QJsonDocument doc = QJsonDocument::fromJson(config.toUtf8());
+    if (doc.isEmpty() || doc.isNull()) {
+        config="";
+        return;
+    }
+
+    // parsed so lets work through it and setup the overview
+    QJsonObject root = doc.object();
+
+    // check version
+    QString version = root["version"].toString();
+    if (version != "2.0") {
+        config="";
+        goto defaultsetup;
+    }
+
+    // cards
+    QJsonArray CHARTS = root["CHARTS"].toArray();
+    foreach(const QJsonValue val, CHARTS) {
+
+        // convert so we can inspect
+        QJsonObject obj = val.toObject();
+
+        // get the basics
+        QString name = obj["name"].toString();
+        QString datafilter = Utils::jsonunprotect(obj["datafilter"].toString());
+        int column = obj["column"].toInt();
+        int order = obj["order"].toInt();
+        int span = obj.contains("span") ? obj["span"].toInt() : 1;
+        int deep = obj["deep"].toInt();
+        int type = obj["type"].toInt();
 
 
-            // lets create the cards
-            ChartSpaceItem *add=NULL;
-            switch(type) {
+        // lets create the cards
+        ChartSpaceItem *add=NULL;
+        switch(type) {
 
-            case OverviewItemType::RPE :
-                {
-                    add = new RPEOverviewItem(space, name);
-                    add->datafilter = datafilter;
-                    space->addItem(order,column,span,deep, add);
-                }
-                break;
-
-            case OverviewItemType::TOPN :
-                {
-                    QString symbol=obj["symbol"].toString();
-                    add = new TopNOverviewItem(space, name,symbol);
-                    add->datafilter = datafilter;
-                    space->addItem(order,column,span,deep, add);
-                }
-                break;
-
-            case OverviewItemType::DONUT :
-                {
-                    QString symbol=obj["symbol"].toString();
-                    QString meta=obj["meta"].toString();
-                    add = new DonutOverviewItem(space, name,symbol,meta);
-                    add->datafilter = datafilter;
-                    space->addItem(order,column,span,deep, add);
-                }
-                break;
-
-            case OverviewItemType::METRIC :
-                {
-                    QString symbol=obj["symbol"].toString();
-                    add = new MetricOverviewItem(space, name,symbol);
-                    add->datafilter = datafilter;
-                    space->addItem(order,column,span,deep, add);
-                }
-                break;
-
-            case OverviewItemType::META :
-                {
-                    QString symbol=obj["symbol"].toString();
-                    add = new MetaOverviewItem(space, name,symbol);
-                    add->datafilter = datafilter;
-                    space->addItem(order,column,span,deep, add);
-                }
-                break;
-
-            case OverviewItemType::PMC :
-                {
-                    QString symbol=obj["symbol"].toString();
-                    add = new PMCOverviewItem(space, symbol); // doesn't have a title
-                    add->datafilter = datafilter;
-                    space->addItem(order,column,span,deep, add);
-                }
-                break;
-
-            case OverviewItemType::ZONE :
-                {
-                    RideFile::SeriesType series = static_cast<RideFile::SeriesType>(obj["series"].toInt());
-                    bool polarized = obj["polarized"].toInt();
-                    add = new ZoneOverviewItem(space, name, series, polarized);
-                    add->datafilter = datafilter;
-                    space->addItem(order,column,span,deep, add);
-
-                }
-                break;
-
-            case OverviewItemType::ROUTE :
-                {
-                    add = new RouteOverviewItem(space, name); // doesn't have a title
-                    add->datafilter = datafilter;
-                    space->addItem(order,column,span,deep, add);
-                }
-                break;
-
-            case OverviewItemType::INTERVAL :
-            case OverviewItemType::ACTIVITIES:
-                {
-                    QString xsymbol=obj["xsymbol"].toString();
-                    QString ysymbol=obj["ysymbol"].toString();
-                    QString zsymbol=obj["zsymbol"].toString();
-
-                    add = new IntervalOverviewItem(space, name, xsymbol, ysymbol, zsymbol); // doesn't have a title
-                    add->datafilter = datafilter;
-                    space->addItem(order,column,span,deep, add);
-                }
-                break;
-
-            case OverviewItemType::DATATABLE:
-                {
-                    QString program=Utils::jsonunprotect(obj["program"].toString());
-                    add = new DataOverviewItem(space, name, program);
-                    add->datafilter = datafilter;
-                    space->addItem(order,column,span,deep, add);
-                }
-                break;
-
-            case OverviewItemType::KPI :
-                {
-                    QString program=Utils::jsonunprotect(obj["program"].toString());
-                    double start=obj["start"].toDouble();
-                    double stop =obj["stop"].toDouble();
-                    QString units =obj["units"].toString();
-                    bool istime =obj["istime"].toInt();
-                    add = new KPIOverviewItem(space, name, start, stop, program, units, istime);
-                    add->datafilter = datafilter;
-                    space->addItem(order,column,span,deep, add);
-                }
-                break;
-
-            case OverviewItemType::USERCHART :
-                {
-                    QString settings=Utils::jsonunprotect(obj["settings"].toString());
-                    add = new UserChartOverviewItem(space, name, settings);
-                    add->datafilter = datafilter;
-                    space->addItem(order,column,span,deep, add);
-                }
-                break;
+        case OverviewItemType::RPE :
+            {
+                add = new RPEOverviewItem(space, name);
+                add->datafilter = datafilter;
+                space->addItem(order,column,span,deep, add);
             }
+            break;
+
+        case OverviewItemType::TOPN :
+            {
+                QString symbol=obj["symbol"].toString();
+                add = new TopNOverviewItem(space, name,symbol);
+                add->datafilter = datafilter;
+                space->addItem(order,column,span,deep, add);
+            }
+            break;
+
+        case OverviewItemType::DONUT :
+            {
+                QString symbol=obj["symbol"].toString();
+                QString meta=obj["meta"].toString();
+                add = new DonutOverviewItem(space, name,symbol,meta);
+                add->datafilter = datafilter;
+                space->addItem(order,column,span,deep, add);
+            }
+            break;
+
+        case OverviewItemType::METRIC :
+            {
+                QString symbol=obj["symbol"].toString();
+                add = new MetricOverviewItem(space, name,symbol);
+                add->datafilter = datafilter;
+                space->addItem(order,column,span,deep, add);
+            }
+            break;
+
+        case OverviewItemType::META :
+            {
+                QString symbol=obj["symbol"].toString();
+                add = new MetaOverviewItem(space, name,symbol);
+                add->datafilter = datafilter;
+                space->addItem(order,column,span,deep, add);
+            }
+            break;
+
+        case OverviewItemType::PMC :
+            {
+                QString symbol=obj["symbol"].toString();
+                add = new PMCOverviewItem(space, symbol); // doesn't have a title
+                add->datafilter = datafilter;
+                space->addItem(order,column,span,deep, add);
+            }
+            break;
+
+        case OverviewItemType::ZONE :
+            {
+                RideFile::SeriesType series = static_cast<RideFile::SeriesType>(obj["series"].toInt());
+                bool polarized = obj["polarized"].toInt();
+                add = new ZoneOverviewItem(space, name, series, polarized);
+                add->datafilter = datafilter;
+                space->addItem(order,column,span,deep, add);
+
+            }
+            break;
+
+        case OverviewItemType::ROUTE :
+            {
+                add = new RouteOverviewItem(space, name); // doesn't have a title
+                add->datafilter = datafilter;
+                space->addItem(order,column,span,deep, add);
+            }
+            break;
+
+        case OverviewItemType::INTERVAL :
+        case OverviewItemType::ACTIVITIES:
+            {
+                QString xsymbol=obj["xsymbol"].toString();
+                QString ysymbol=obj["ysymbol"].toString();
+                QString zsymbol=obj["zsymbol"].toString();
+
+                add = new IntervalOverviewItem(space, name, xsymbol, ysymbol, zsymbol); // doesn't have a title
+                add->datafilter = datafilter;
+                space->addItem(order,column,span,deep, add);
+            }
+            break;
+
+        case OverviewItemType::DATATABLE:
+            {
+                QString program=Utils::jsonunprotect(obj["program"].toString());
+                add = new DataOverviewItem(space, name, program);
+                add->datafilter = datafilter;
+                space->addItem(order,column,span,deep, add);
+            }
+            break;
+
+        case OverviewItemType::KPI :
+            {
+                QString program=Utils::jsonunprotect(obj["program"].toString());
+                double start=obj["start"].toDouble();
+                double stop =obj["stop"].toDouble();
+                QString units =obj["units"].toString();
+                bool istime =obj["istime"].toInt();
+                add = new KPIOverviewItem(space, name, start, stop, program, units, istime);
+                add->datafilter = datafilter;
+                space->addItem(order,column,span,deep, add);
+            }
+            break;
+
+        case OverviewItemType::USERCHART :
+            {
+                QString settings=Utils::jsonunprotect(obj["settings"].toString());
+                add = new UserChartOverviewItem(space, name, settings);
+                add->datafilter = datafilter;
+                space->addItem(order,column,span,deep, add);
+            }
+            break;
         }
     }
 
