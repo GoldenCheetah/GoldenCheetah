@@ -974,7 +974,7 @@ GcChartWindow::serializeChartToQTextStream(QTextStream& out) {
 
     // a last unused property, just to make it well formed json
     // regardless of how many properties we ever have
-    out <<"\t\t\t\"__LAST__\":\"1\",\n";
+    out <<"\t\t\t\"__LAST__\":\"1\"\n";
 
     // end here, only one chart
     out<<"\t\t}\n\t}\n}";
