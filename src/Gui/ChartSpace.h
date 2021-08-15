@@ -197,6 +197,10 @@ class ChartSpace : public QWidget
         void dateRangeChanged(DateRange);
         void filterChanged();
 
+        // column sizing
+        QVector<int> columnWidths() { return columns; }
+        void setColumnWidths(QVector<int> x) { columns =x; updateGeometry(); }
+
         // for smooth scrolling
         void setViewY(int x) { if (_viewY != x) {_viewY =x; updateView();} }
         int getViewY() const { return _viewY; }

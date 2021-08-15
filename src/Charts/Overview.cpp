@@ -104,6 +104,20 @@ OverviewWindow::getConfiguration() const
 
     // setup
     config = "{\n  \"version\":\"2.0\",\n";
+    config += "  \"widths\":[";
+
+    // column widths
+    bool first=true;
+    foreach(int n, space->columnWidths()) {
+
+        // last one doesn't have a comma
+        if (!first) config += ",";
+        else first=false;
+
+        config += QString(" %1").arg(n);
+    }
+    config += " ],\n";
+
     config += "  \"CHARTS\":[\n";
 
     // do cards
@@ -288,6 +302,15 @@ badconfig:
     if (version != "2.0") {
         config="";
         goto defaultsetup;
+    }
+
+    // does it contain widths (we added this later)
+    if (root.contains("widths")) {
+
+        QVector<int> widths;
+        QJsonArray w = root["widths"].toArray();
+        foreach(const QJsonValue width, w) widths << width.toInt();
+        space->setColumnWidths(widths);
     }
 
     // cards
