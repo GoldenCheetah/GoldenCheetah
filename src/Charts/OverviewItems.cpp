@@ -5103,7 +5103,7 @@ VScrollBar::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
 
         painter->setBrush(barcolor);
         painter->setPen(Qt::NoPen);
-        painter->drawRect(geom.x(), geom.y()+barpos, geom.width(), barheight);
+        painter->drawRoundedRect(QRectF(geom.x(), geom.y()+barpos, geom.width(), barheight), geom.width()/2, geom.width()/2);
     }
 }
 

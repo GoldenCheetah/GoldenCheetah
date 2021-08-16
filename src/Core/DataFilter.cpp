@@ -3432,7 +3432,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
                             // get metric value then convert to string
                             double value = 0;
                             if (c) value = RideMetric::getForSymbol(o_symbol, c);
-                            else value = m->getForSymbol(o_symbol);
+                            else value = m->getForSymbol(o_symbol, GlobalContext::context()->useMetricUnits);
 
                             // use metric converter to get as string with correct dp etc
                             list << e->toString(value);
@@ -4419,7 +4419,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
                     value= QDate(1900,01,01).daysTo(ride->dateTime.date());
                     if (wantstrings) asstring = ride->dateTime.date().toString("dd MMM yyyy");
                 } else {
-                    value =  ride->getForSymbol(df->lookupMap.value(symbol,""));
+                    value =  ride->getForSymbol(df->lookupMap.value(symbol,""), GlobalContext::context()->useMetricUnits);
                     if (wantstrings) e ? asstring = e->toString(value) : "(null)";
                 }
 
@@ -4534,7 +4534,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
                         value = ii->selected;
                         asstring = QString("%1").arg(ii->selected);
                     } else {
-                        value = ii->getForSymbol(df->lookupMap.value(symbol,""));
+                        value = ii->getForSymbol(df->lookupMap.value(symbol,""), GlobalContext::context()->useMetricUnits);
                         if (wantstrings) e ? asstring = e->toString(value) : "(null)";
                     }
 
