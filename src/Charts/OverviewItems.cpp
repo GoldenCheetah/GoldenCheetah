@@ -812,7 +812,17 @@ MetaOverviewItem::MetaOverviewItem(ChartSpace *parent, QString name, QString sym
     // metric or meta or pmc
     this->type = OverviewItemType::META;
     this->symbol = symbol;
+    sparkline = NULL;
 
+    configwidget = new OverviewItemConfig(this);
+    configwidget->hide();
+
+    configChanged(0);
+}
+
+void
+MetaOverviewItem::configChanged(qint32)
+{
     //  Get the field type
     fieldtype = -1;
     foreach(FieldDefinition p, GlobalContext::context()->rideMetadata->getFields()) {
@@ -824,14 +834,13 @@ MetaOverviewItem::MetaOverviewItem(ChartSpace *parent, QString name, QString sym
 
     // sparkline if are we numeric?
     if (fieldtype == FIELD_INTEGER || fieldtype == FIELD_DOUBLE) {
-        sparkline = new Sparkline(this, name);
+        if (sparkline == NULL) sparkline = new Sparkline(this, name);
     } else {
-        sparkline = NULL;
+        if (sparkline) {
+            delete sparkline;
+            sparkline = NULL;
+        }
     }
-
-    configwidget = new OverviewItemConfig(this);
-    configwidget->hide();
-
 }
 
 MetaOverviewItem::~MetaOverviewItem()

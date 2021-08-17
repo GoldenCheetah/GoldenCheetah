@@ -507,6 +507,9 @@ OverviewConfigDialog::close()
         item->config()->setParent(NULL);
         item->config()->hide();
 
+        // tell item its config changed
+        item->configChanged(0);
+
         // update geometry to show hide elements
         item->itemGeometryChanged();
 

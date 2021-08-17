@@ -539,7 +539,7 @@ repeat:
 }
 
 void
-ChartSpace::configChanged(qint32)
+ChartSpace::configChanged(qint32 why)
 {
     grayConfig = colouredIconFromPNG(":images/configure.png", GColor(COVERVIEWBACKGROUND).lighter(75));
     whiteConfig = colouredIconFromPNG(":images/configure.png", QColor(100,100,100));
@@ -580,6 +580,9 @@ ChartSpace::configChanged(qint32)
     palette.setColor(QPalette::WindowText, GCColor::invertColor(GColor(COVERVIEWBACKGROUND)));
     palette.setColor(QPalette::Text, GCColor::invertColor(GColor(COVERVIEWBACKGROUND)));
     //code->setPalette(palette);
+
+    foreach(ChartSpaceItem *item, items) item->configChanged(why);
+
     repaint();
 }
 

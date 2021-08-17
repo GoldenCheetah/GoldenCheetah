@@ -326,15 +326,17 @@ class MetaOverviewItem : public ChartSpaceItem
         MetaOverviewItem(ChartSpace *parent, QString name, QString symbol);
         ~MetaOverviewItem();
 
-        void itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *);
-        void itemGeometryChanged();
-        void setData(RideItem *item);
-        void setDateRange(DateRange) {} // doesn't support trends view
+        void itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) override;
+        void itemGeometryChanged() override;
+        void setData(RideItem *item) override;
+        void setDateRange(DateRange) override {} // doesn't support trends view
 
-        QWidget *config() { return configwidget; }
+        QWidget *config() override { return configwidget; }
 
         // create and config
         static ChartSpaceItem *create(ChartSpace *parent) { return new MetaOverviewItem(parent, tr("Workout Code"), "Workout Code"); }
+
+        void configChanged(qint32) override;
 
         QString symbol;
         int fieldtype;
