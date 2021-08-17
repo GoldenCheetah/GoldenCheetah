@@ -606,10 +606,29 @@ ZoneOverviewItem::ZoneOverviewItem(ChartSpace *parent, QString name, RideFile::s
     // we have a mid sized font for chart labels etc
     chart->setFont(parent->midfont);
 
+    configwidget = new OverviewItemConfig(this);
+    configwidget->hide();
+
+    barset = NULL;
+    barseries = NULL;
+    barcategoryaxis = NULL;
+
+    // setup
+    configChanged(0);
+}
+
+void
+ZoneOverviewItem::configChanged(qint32)
+{
+    if (barcategoryaxis) delete barcategoryaxis;
+    if (barset) delete barset;
+    if (barseries) delete barseries;
+
     // needs a set of bars
     barset = new QBarSet(tr("Time In Zone"), this);
     barset->setLabelFont(parent->midfont);
 
+    // config changed...
     if (series == RideFile::hr) {
         barset->setLabelColor(GColor(CHEARTRATE));
         barset->setBorderColor(GColor(CHEARTRATE));
@@ -628,6 +647,7 @@ ZoneOverviewItem::ZoneOverviewItem(ChartSpace *parent, QString name, RideFile::s
         barset->setBrush(GColor(CSPEED));
     }
 
+    categories.clear();
 
     //
     // HEARTRATE
@@ -701,9 +721,6 @@ ZoneOverviewItem::ZoneOverviewItem(ChartSpace *parent, QString name, RideFile::s
     chart->axisY(barseries)->setLabelsVisible(false);
     chart->axisY(barseries)->setRange(0,100);
     chart->axisY(barseries)->setGridLineVisible(false);
-
-    configwidget = new OverviewItemConfig(this);
-    configwidget->hide();
 
 }
 

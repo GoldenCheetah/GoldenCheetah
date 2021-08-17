@@ -385,16 +385,17 @@ class ZoneOverviewItem : public ChartSpaceItem
         ZoneOverviewItem(ChartSpace *parent, QString name, RideFile::seriestype, bool polarized);
         ~ZoneOverviewItem();
 
-        void itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *);
-        void itemGeometryChanged();
-        void setData(RideItem *item);
-        void setDateRange(DateRange);
-        void dragChanged(bool x);
+        void itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) override;
+        void itemGeometryChanged() override;
+        void setData(RideItem *item) override;
+        void setDateRange(DateRange) override;
+        void dragChanged(bool x) override;
 
-        QWidget *config() { return configwidget; }
+        QWidget *config() override { return configwidget; }
 
         // create and config
         static ChartSpaceItem *create(ChartSpace *parent) { return new ZoneOverviewItem(parent, tr("Power Zones"), RideFile::watts, false); }
+        void configChanged(qint32) override;
 
         RideFile::seriestype series;
         bool polarized;
