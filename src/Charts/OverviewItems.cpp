@@ -1147,6 +1147,17 @@ DataOverviewItem::sort(int column, Qt::SortOrder order)
     // phew!
     values = ordered;
 
+    // don't forget the filenames used in clickthru
+    if (files.count()) {
+        QVector<QString> newfiles = files;
+
+        // resequence
+        for(int k=0; k<argsortindex.count() && k < newfiles.count(); k++)
+            newfiles[k] = files[argsortindex[k]];
+
+        files = newfiles;
+    }
+
     lastsort = column;
     lastorder = order;
 }
