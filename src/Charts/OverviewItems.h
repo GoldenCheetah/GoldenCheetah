@@ -284,17 +284,18 @@ class TopNOverviewItem : public ChartSpaceItem
         int getTransition() const {return transition;}
         void setTransition(int x) { if (transition !=x) {transition=x; update();}}
 
-        bool sceneEvent(QEvent *event);
-        void itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *);
-        void itemGeometryChanged();
-        void setData(RideItem *) {} // doesn't support analysis view
-        void setDateRange(DateRange);
-        QRectF hotspot();
+        bool sceneEvent(QEvent *event) override;
+        void itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) override;
+        void itemGeometryChanged() override;
+        void setData(RideItem *) override {} // doesn't support analysis view
+        void setDateRange(DateRange) override;
+        QRectF hotspot() override;
 
-        QWidget *config() { return configwidget; }
+        QWidget *config() override { return configwidget; }
 
         // create and config
         static ChartSpaceItem *create(ChartSpace *parent) { return new TopNOverviewItem(parent, "PowerIndex", "power_index"); }
+        void configChanged(qint32) override;
 
         QString symbol;
         RideMetric *metric;

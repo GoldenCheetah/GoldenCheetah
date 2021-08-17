@@ -793,14 +793,20 @@ TopNOverviewItem::TopNOverviewItem(ChartSpace *parent, QString name, QString sym
     this->type = OverviewItemType::TOPN;
     this->symbol = symbol;
 
-    RideMetricFactory &factory = RideMetricFactory::instance();
-    this->metric = const_cast<RideMetric*>(factory.rideMetric(symbol));
-    if (metric) units = metric->units(GlobalContext::context()->useMetricUnits);
-
     animator=new QPropertyAnimation(this, "transition");
 
     configwidget = new OverviewItemConfig(this);
     configwidget->hide();
+
+    configChanged(0);
+}
+
+void
+TopNOverviewItem::configChanged(qint32)
+{
+    RideMetricFactory &factory = RideMetricFactory::instance();
+    this->metric = const_cast<RideMetric*>(factory.rideMetric(symbol));
+    if (metric) units = metric->units(GlobalContext::context()->useMetricUnits);
 }
 
 TopNOverviewItem::~TopNOverviewItem()
