@@ -181,18 +181,17 @@ AbstractView::ourStyleSheet()
            "    width: %4px;    "
            "    margin: 0px 0px 0px 0px;"
            "}"
-           "QScrollBar::handle:vertical:enabled:hover {"
+           "QScrollBar::handle:vertical:hover {"
            "    background: lightGray; "
-           "    min-height: %4px;"
            ""
            "}"
-           "QScrollBar::handle:vertical:enabled {"
-           "    background: darkGray; "
-           "    min-height: %4px;"
+           "QScrollBar::handle:vertical:pressed {"
+           "    background: %6; "
            ""
            "}"
            "QScrollBar::handle:vertical {"
-           "    background: %1; "
+           "    background: darkGray; "
+           "    border-radius: %5px; "
            "    min-height: %4px;"
            ""
            "}"
@@ -244,7 +243,9 @@ AbstractView::ourStyleSheet()
            "").arg(GColor(CPLOTBACKGROUND).name())
             .arg(GColor(CPLOTGRID).name())
             .arg(GCColor::alternateColor(GColor(CPLOTBACKGROUND)).name())
-            .arg(8 * dpiXFactor)
+            .arg(8 * dpiXFactor) // width
+            .arg(4 * dpiXFactor) // border radius
+            .arg(GColor(CPLOTMARKER).name())
             ;
 }
 
