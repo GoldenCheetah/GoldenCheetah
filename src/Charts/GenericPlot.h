@@ -173,6 +173,7 @@ class GenericPlot : public QWidget {
         QList<QBarSet*> barsets;
         QBarSeries *barseries;
         QStackedBarSeries *stackbarseries;
+        QList<QString> categories;
 
         // axis placement (before user interacts)
         // alternates as axis added

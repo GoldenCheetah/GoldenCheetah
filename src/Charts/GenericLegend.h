@@ -60,8 +60,9 @@ class GenericLegendItem : public QWidget {
     public slots:
 
         void paintEvent(QPaintEvent *event);
-        void setValue(double p) { if (enabled) { hasvalue=true; value=p; update(); } } // set value to display
-        void noValue() { if (enabled) { hasvalue=false; update(); } } // no value to display
+        void setValue(double p) { if (enabled) { hasvalue=true;hasstring=false; value=p; update(); } } // set value to display
+        void setValue(QString s) { if (enabled) { hasvalue=false;hasstring=true; string=s; update(); } } // set value to display
+        void noValue() { if (enabled) { hasstring=false;hasvalue=false; update(); } } // no value to display
         void setClickable(bool x) { clickable=x; }
         void setDateTime(bool x, QString xf) { datetime=x; datetimeformat=xf; }
         void configChanged(qint32); // context changed
@@ -73,11 +74,13 @@ class GenericLegendItem : public QWidget {
         GenericLegend *legend;
 
         bool hasvalue;
+        bool hasstring;
         bool enabled;
         bool clickable;
         bool datetime;
         QString datetimeformat;
         double value;
+        QString string;
 
         // geometry for painting fast / updated on config changes
         QRectF blockrect, namerect, valuerect, linerect, hoverrect;
@@ -105,7 +108,7 @@ class GenericLegend : public QWidget {
 
     public slots:
 
-        void setValue(GPointF value, QString name);
+        void setValue(GPointF value, QString name, QString xcategory="(null)");
         void unhover(QString name);
         void unhoverx();
         void setClickable(bool x);

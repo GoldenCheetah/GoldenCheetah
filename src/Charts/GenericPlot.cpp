@@ -325,9 +325,15 @@ GenericPlot::pieHover(QPieSlice *slice, bool state)
 // handle hover on barset
 void GenericPlot::barsetHover(bool status, int index, QBarSet *)
 {
+    QString category;
+    if (categories.count() > index) category = categories[index];
+
     foreach(QBarSet *barset, barsets) {
-        if (status)  legend->setValue(GPointF(0, barset->at(index), -1), barset->label());
-        else legend->unhover(barset->label());
+        if (status)  legend->setValue(GPointF(0, barset->at(index), -1), barset->label(), category);
+        else {
+            legend->unhover(barset->label());
+            legend->unhoverx();
+        }
     }
 }
 
@@ -1054,6 +1060,7 @@ GenericPlot::finaliseChart()
                         for(int i=0; i<axisinfo->categories.count(); i++)
                             if (axisinfo->categories.at(i) == "") axisinfo->categories[i]="(blank)";
                         caxis->setCategories(axisinfo->categories);
+                        categories = axisinfo->categories;
                     }
                 }
                 break;
@@ -1091,7 +1098,7 @@ GenericPlot::finaliseChart()
         }
     }
 
-    if (charttype == GC_CHART_SCATTER || charttype == GC_CHART_LINE) {
+    if (charttype == GC_CHART_SCATTER || charttype == GC_CHART_LINE || charttype == GC_CHART_BAR || charttype == GC_CHART_STACK) {
 
         bool havexaxis=false;
         foreach(QAbstractSeries *series, qchart->series()) {
@@ -1135,6 +1142,12 @@ GenericPlot::finaliseChart()
         foreach(QAbstractAxis *axis, qchart->axes(Qt::Vertical))
             barseries->attachAxis(axis);
 
+        // add first X axis we find
+        foreach(QAbstractAxis *axis, qchart->axes(Qt::Horizontal)) {
+            legend->addX(static_cast<QCategoryAxis*>(axis)->titleText(), false, "");
+            break;
+        }
+
         // and legend
         foreach(QBarSet *set, barsets)
             legend->addSeries(set->label(), set->color());
@@ -1143,6 +1156,12 @@ GenericPlot::finaliseChart()
     }
     // stacked bar uses stackbarseries, but otherwise very similar
     if (charttype==GC_CHART_STACK && stackbarseries) {
+
+        // add first X axis we find
+        foreach(QAbstractAxis *axis, qchart->axes(Qt::Horizontal)) {
+            legend->addX(static_cast<QCategoryAxis*>(axis)->titleText(), false, "");
+            break;
+        }
 
         // need to attach stackbarseries to the value axes
         foreach(QAbstractAxis *axis, qchart->axes(Qt::Vertical))

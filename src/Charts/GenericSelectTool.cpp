@@ -665,8 +665,11 @@ GenericSelectTool::moved(QPointF pos)
             }
 
             // we need to clear x-axis if we aren't hovering on anything at all
+            // but bar and stack charts already get status in hover signals
+            // so don't do this for those chart types.
             if (hoverv == GPointF()) {
-                emit unhoverx();
+                if (host->charttype != GC_CHART_BAR && host->charttype != GC_CHART_STACK)
+                    emit unhoverx();
             }
 
             // for mouse moves..

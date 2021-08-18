@@ -34,6 +34,7 @@ GenericLegendItem::GenericLegendItem(Context *context, GenericLegend *parent, QS
     enabled=true;
     clickable=true;
     hasvalue=false;
+    hasstring=false;
 
     // set height and width, gets reset when configchanges
     configChanged(0);
@@ -147,11 +148,13 @@ GenericLegendItem::paintEvent(QPaintEvent *)
     QString string;
     if (hasvalue) {
         if (datetime) string=QDateTime::fromMSecsSinceEpoch(value).toString(datetimeformat);
-        else string=QString("%1").arg(value, 0, 'f', 2);
+        else {
+            string=QString("%1").arg(value, 0, 'f', 2);
+            string = Utils::removeDP(string);
+        }
     } else string="   ";
 
-    // remove redundat dps (e.g. trailing zeroes)
-    string = Utils::removeDP(string);
+    if (hasstring)  string=this->string;
 
     // set pen to series color for now
     if (enabled)  painter.setPen(GCColor::invertColor(legend->plot()->backgroundColor())); // use invert - usually black or white
@@ -289,14 +292,17 @@ GenericLegend::removeAllSeries()
 }
 
 void
-GenericLegend::setValue(GPointF value, QString name)
+GenericLegend::setValue(GPointF value, QString name, QString label)
 {
     GenericLegendItem *call = items.value(name, NULL);
     if (call) call->setValue(value.y());
 
     // xaxis
     GenericLegendItem *xaxis = items.value(xname, NULL);
-    if (xaxis) xaxis->setValue(value.x());
+    if (xaxis) {
+        if (label != "(null)") xaxis->setValue(label);
+        else xaxis->setValue(value.x());
+    }
 }
 
 void
