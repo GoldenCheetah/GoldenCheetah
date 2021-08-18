@@ -216,8 +216,8 @@ UserChart::setRide(const RideItem *item)
 
         // groupBy uses pass by reference and will update what is passed
         // we update the ucd result as its used elsewhere
-        if (xgroupby > 0) groupBy(xgroupby, series.aggregateby, series.xseries, series.yseries);
-        if (ygroupby > 0) groupBy(ygroupby, series.aggregateby, series.yseries, series.xseries);
+        if (xgroupby > 0) groupBy(xgroupby, series.aggregateby, series.xseries, series.yseries, chartinfo.type == GC_CHART_BAR);
+        if (ygroupby > 0) groupBy(ygroupby, series.aggregateby, series.yseries, series.xseries, chartinfo.type == GC_CHART_BAR);
 
         // this is a bit of a hack, but later processing references ucd->x and y, so we
         // update them since they have been smoothed/aggregated.
@@ -381,7 +381,7 @@ UserChart::setRide(const RideItem *item)
 // genericchart has intervened) they are converted to MSsincetheEpoch
 // but at this point, we have days since Jan 1 1900
 void
-UserChart::groupBy(int groupby, int aggregateby, QVector<double> &xseries, QVector<double> &yseries)
+UserChart::groupBy(int groupby, int aggregateby, QVector<double> &xseries, QVector<double> &yseries, bool fillzero)
 {
     // used to aggregate
     double aggregate=0;
@@ -410,6 +410,17 @@ UserChart::groupBy(int groupby, int aggregateby, QVector<double> &xseries, QVect
 
             newx << epoch.daysTo(dateForGroup(groupby, lastgroup));
             newy << aggregate;
+
+            if (fillzero) {
+
+                // we fill gaps with zero for some chart types
+                // notably category based charts e.g. bar chart
+                for(int j=lastgroup+1; j<group;j++) {
+                    newx << epoch.daysTo(dateForGroup(groupby, j));
+                    newy << 0;
+                }
+            }
+
             aggregate = 0;
             lastgroup = group;
             groupcount = 0;

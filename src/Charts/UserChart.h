@@ -59,7 +59,7 @@ class UserChart : public QWidget {
         void setGraphicsItem(QGraphicsItem *);
 
         // groupBy day, week, month etc where x is dates and y is values
-        void groupBy(int groupby, int aggregateby, QVector<double> &xseries, QVector<double> &yseries);
+        void groupBy(int groupby, int aggregateby, QVector<double> &xseries, QVector<double> &yseries, bool fillzero);
         long groupForDate(int groupby, QDate date);
         QDate dateForGroup(int groupby, long);
 
