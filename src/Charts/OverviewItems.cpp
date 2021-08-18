@@ -2664,7 +2664,7 @@ void
 DataOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
 
     // paint nothing if no values - or a mismatch
-    if (values.count() < names.count()) return;
+    if (names.count() == 0 || values.count() == 0 || values.count() < names.count()) return;
 
     // step 1: calculate paint metrics, colors, fonts, margins etc etc ...
 
