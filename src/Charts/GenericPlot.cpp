@@ -45,6 +45,7 @@ GenericPlot::GenericPlot(QWidget *parent, Context *context, QGraphicsItem *item)
     charttype=0;
     chartview=NULL;
     barseries=NULL;
+    stackbarseries=NULL;
     bottom=left=true;
 
     mainLayout = new QVBoxLayout(this);
@@ -445,6 +446,7 @@ GenericPlot::initialiseChart(QString title, int type, bool animate, int legpos, 
         curves.clear();
         filenames.clear();
         barseries=NULL;
+        stackbarseries=NULL;
     }
 
     foreach(QLabel *label, labels) delete label;
@@ -805,19 +807,31 @@ GenericPlot::addCurve(QString name, QVector<double> xseries, QVector<double> yse
         break;
 
     case GC_CHART_BAR:
+    case GC_CHART_STACK:
         {
             // set up the barsets
             QBarSet *add= new QBarSet(name);
 
             // aesthetics
             add->setBrush(QBrush(applyColor));
-            add->setPen(Qt::NoPen);
+            if (charttype == GC_CHART_STACK) {
+                QPen outline(bgcolor_);
+                outline.setWidth(4 * scale_); // space between blocks
+                add->setPen(outline);
+            } else {
+                add->setPen(Qt::NoPen);
+            }
 
-            // data and min/max values
+            // data and min/max values- works fine for bar chart
+            // but for stacked bar we need to get max of sum so
+            // we do that in the finaliseChart section
             for (int i=0; i<yseries.size(); i++) {
                 double value = yseries.at(i);
                 *add << value;
-                yaxis->point(i,value);
+
+                // don't try and calculate here in a stack chart- we need
+                // all the barsets to have been defined first
+                if (charttype != GC_CHART_STACK) yaxis->point(i,value);
                 xaxis->point(i,value);
             }
 
@@ -907,6 +921,25 @@ GenericPlot::finaliseChart()
     // no more than 1 category axis since barsets are all assigned.
     bool donecategory=false;
 
+    // only now can we calculate the max height for a stack chart
+    double maxystack=0;
+    if (charttype == GC_CHART_STACK && barsets.count()) {
+
+        bool havemore=true;
+        for(int index=0; havemore; index++) {
+            double maxcalc=0;
+            // calculate height of stack from constituent parts
+            foreach(QBarSet *bs, barsets) {
+                if (bs->count() > index) maxcalc += bs->at(index);
+                else {
+                    havemore=false;
+                    break;
+                }
+            }
+            if (maxcalc > maxystack) maxystack = maxcalc;
+        }
+    }
+
     // Create axes - for everyone except pie charts that don't have any
     if (charttype != GC_CHART_PIE) {
         // create desired axis
@@ -948,8 +981,13 @@ GenericPlot::finaliseChart()
                     if (axisinfo->log) vaxis= new QLogValueAxis(qchart);
                     else vaxis= new QValueAxis(qchart);
                     add=vaxis; // gets added later
+
+                    // we finally get to set the max value for stacked charts
+                    // but only of not already passed by user
+                    if (charttype == GC_CHART_STACK && axisinfo->max() <maxystack) vaxis->setMax(maxystack);
+                    else vaxis->setMax(axisinfo->max());
+
                     vaxis->setMin(axisinfo->min());
-                    vaxis->setMax(axisinfo->max());
 
                     // attach to the chart
                     qchart->addAxis(add, axisinfo->locate());
@@ -965,24 +1003,49 @@ GenericPlot::finaliseChart()
                         add=caxis;
 
                         // add the bar series
-                        if (!barseries) {
-                            barseries = new QBarSeries();
-                            qchart->addSeries(barseries);
+                        if (charttype == GC_CHART_STACK) {
 
-                            // connect hover events
-                            connect(barseries, SIGNAL(hovered(bool,int,QBarSet*)), this, SLOT(barsetHover(bool,int,QBarSet*)));
+                            if (!stackbarseries) {
+                                stackbarseries = new QStackedBarSeries();
+                                qchart->addSeries(stackbarseries);
 
-                        } else barseries->clear();
+                                // connect hover events
+                                connect(stackbarseries, SIGNAL(hovered(bool,int,QBarSet*)), this, SLOT(barsetHover(bool,int,QBarSet*)));
 
-                        // add the new barsets
-                        foreach (QBarSet *bs, barsets)
-                            barseries->append(bs);
+                            } else stackbarseries->clear();
 
-                        // attach before addig barseries
-                        qchart->addAxis(add, axisinfo->locate());
+                            // add the new barsets
+                            foreach (QBarSet *bs, barsets)
+                                stackbarseries->append(bs);
 
-                        // attach to category axis
-                        barseries->attachAxis(caxis);
+                            // attach before addig barseries
+                            qchart->addAxis(add, axisinfo->locate());
+
+                            // attach to category axis
+                            stackbarseries->attachAxis(caxis);
+
+                        } else {
+
+                            // Bar and Pie
+                            if (!barseries) {
+                                barseries = new QBarSeries();
+                                qchart->addSeries(barseries);
+
+                                // connect hover events
+                                connect(barseries, SIGNAL(hovered(bool,int,QBarSet*)), this, SLOT(barsetHover(bool,int,QBarSet*)));
+
+                            } else barseries->clear();
+
+                            // add the new barsets
+                            foreach (QBarSet *bs, barsets)
+                                barseries->append(bs);
+
+                            // attach before addig barseries
+                            qchart->addAxis(add, axisinfo->locate());
+
+                            // attach to category axis
+                            barseries->attachAxis(caxis);
+                        }
 
                         // category labels
                         for(int i=axisinfo->categories.count(); i<=axisinfo->maxx; i++)
@@ -1065,7 +1128,7 @@ GenericPlot::finaliseChart()
     }
 
 
-    // barseries special case
+    // barseries special case - Bar chart
     if (charttype==GC_CHART_BAR && barseries) {
 
         // need to attach barseries to the value axes
@@ -1078,11 +1141,24 @@ GenericPlot::finaliseChart()
 
         legend->setClickable(false);
     }
+    // stacked bar uses stackbarseries, but otherwise very similar
+    if (charttype==GC_CHART_STACK && stackbarseries) {
+
+        // need to attach stackbarseries to the value axes
+        foreach(QAbstractAxis *axis, qchart->axes(Qt::Vertical))
+            stackbarseries->attachAxis(axis);
+
+        // and legend
+        foreach(QBarSet *set, barsets)
+            legend->addSeries(set->label(), set->color());
+
+        legend->setClickable(false);
+    }
 
     // install event filters on thes scene objects for Pie and Bar
     // charts only, since for line/scatter we select and interact via
     // collision detection (and don't want the double number of events).
-    if (charttype == GC_CHART_BAR || charttype == GC_CHART_PIE) {
+    if (charttype == GC_CHART_STACK || charttype == GC_CHART_BAR || charttype == GC_CHART_PIE) {
 
         // largely we just want the hover events coz they're handy
         foreach(QGraphicsItem *item, chartview->scene()->items())
@@ -1146,18 +1222,22 @@ GenericPlot::configureAxis(QString name, bool visible, int align, double min, do
         bool usey = axis->orientation == Qt::Vertical;
         max=0;
         bool setmax=false;
-        // min should be minimum value for all attached series
-        foreach(QAbstractSeries *series, axis->series) {
-            if (series->type() == QAbstractSeries::SeriesType::SeriesTypeScatter ||
-                series->type() == QAbstractSeries::SeriesType::SeriesTypeBar ||
-                series->type() == QAbstractSeries::SeriesType::SeriesTypeLine) {
-                foreach(QPointF point, static_cast<QXYSeries*>(series)->pointsVector()) {
-                    if (usey) {
-                        if (setmax && point.y() > max) max=point.y();
-                        else if (!setmax) { max=point.y(); setmax=true; }
-                    } else {
-                        if (setmax && point.x() > max) max=point.x();
-                        else if (!setmax) { max=point.x(); setmax=true; }
+
+        if (charttype != GC_CHART_STACK) { // we insist on stacked being oriented this way
+
+            // min should be minimum value for all attached series
+            foreach(QAbstractSeries *series, axis->series) {
+                if (series->type() == QAbstractSeries::SeriesType::SeriesTypeScatter ||
+                    series->type() == QAbstractSeries::SeriesType::SeriesTypeBar ||
+                    series->type() == QAbstractSeries::SeriesType::SeriesTypeLine) {
+                    foreach(QPointF point, static_cast<QXYSeries*>(series)->pointsVector()) {
+                        if (usey) {
+                            if (setmax && point.y() > max) max=point.y();
+                            else if (!setmax) { max=point.y(); setmax=true; }
+                        } else {
+                            if (setmax && point.x() > max) max=point.x();
+                            else if (!setmax) { max=point.x(); setmax=true; }
+                        }
                     }
                 }
             }

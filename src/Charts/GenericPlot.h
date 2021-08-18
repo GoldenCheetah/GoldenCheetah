@@ -51,6 +51,7 @@
 #define GC_CHART_SCATTER   2
 #define GC_CHART_BAR       3
 #define GC_CHART_PIE       4
+#define GC_CHART_STACK     5 // stacked bar
 
 class GenericPlot;
 class GenericLegend;
@@ -171,6 +172,7 @@ class GenericPlot : public QWidget {
         // barsets
         QList<QBarSet*> barsets;
         QBarSeries *barseries;
+        QStackedBarSeries *stackbarseries;
 
         // axis placement (before user interacts)
         // alternates as axis added
