@@ -3101,8 +3101,7 @@ void DataFilter::configChanged(qint32)
     const RideMetricFactory &factory = RideMetricFactory::instance();
     for (int i=0; i<factory.metricCount(); i++) {
         QString symbol = factory.metricName(i);
-        QString name = GlobalContext::context()->specialFields.internalName(factory.rideMetric(symbol)->name());
-
+        QString name = factory.rideMetric(symbol)->internalName();
         rt.lookupMap.insert(name.replace(" ","_"), symbol);
         rt.lookupType.insert(name.replace(" ","_"), true);
     }
