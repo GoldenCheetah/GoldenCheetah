@@ -477,9 +477,12 @@ repeat:
         int add = 0; //XXX PERFORMANCE ISSSE XXX (state == DRAG) ? (ROWHEIGHT/2) : 0;
 
         // check we don't overlap with any spanning items in earlier columns etc
-        foreach(QRectF spanner, spanners) {
-            if (spanner.intersects(QRect(tx,ty,twidth,theight+SPACING)))
-                ty = spanner.bottomLeft().y() + SPACING;
+again:
+        for(int j=0; j< spanners.count(); j++) {
+            if (spanners[j].intersects(QRect(tx,ty,twidth,theight+SPACING))) {
+                ty = spanners[j].bottomLeft().y() + SPACING;
+                goto again;
+            }
         }
 
         // for setting the scene rectangle - but ignore a ChartSpaceItem if we are dragging it
