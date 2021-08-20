@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Copyright (c) 2020 Mark Liversedge (liversedge@gmail.com)
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -50,14 +50,21 @@ ChartSpace::ChartSpace(Context *context, int scope, GcWindow *window) :
     scene = new QGraphicsScene(this);
     view = new QGraphicsView(this);
 
-#ifdef Q_OS_LINUX
+    // hardware acceleration is important for this widget
+#if defined(Q_OS_LINUX)
     // if we have OpenGL and its 2.0 or higher, lets use it.
     // this is pretty much any GPU since 2004 and keeps Qt happy.
-    // we only do this on Linux since Windows and MacOS have issues
-    // on Windows AMD Radeon drivers are dreadful and on MacOS
-    // OpenGL support is deprecated and users have reported rendering
-    // issues when this is enabled.
-    if (gl_major >= 2.0)  view->setViewport(new QGLWidget(QGLFormat(QGL::SampleBuffers | QGL::DirectRendering)));
+    // we only do this on Linux
+    //if (gl_major >= 2.0)  view->setViewport(new QGLWidget(QGLFormat(QGL::SampleBuffers | QGL::DirectRendering)));
+    if (gl_major >= 2.0)  view->setViewport(new QGLWidget());
+#endif
+#if defined(Q_OS_WIN)
+    // on windows we always use OpenGL since we have forced
+    // ANGLE in main.cpp to implement opengl on top of directx
+    view->setViewport(new QGLWidget());
+#endif
+#if defined (Q_OS_MACOS)
+    // we have no options right now, it sucks
 #endif
 
     view->viewport()->setAttribute(Qt::WA_AcceptTouchEvents, false); // stops it stealing focus on mouseover

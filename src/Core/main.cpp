@@ -414,6 +414,12 @@ main(int argc, char *argv[])
     // what to do. We may add our own error handler later.
     gsl_set_error_handler_off();
 
+#ifdef Q_OS_WIN
+    // windows we use ANGLE for opengl on top of DirectX
+    // it avoids issues with bad graphics drivers
+    QCoreApplication::setAttribute(Qt::AA_UseOpenGLES);
+#endif
+
     // create the application -- only ever ONE regardless of restarts
     application = new QApplication(argc, argv);
     //XXXIdleEventFilter idleFilter;
