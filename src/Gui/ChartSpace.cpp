@@ -479,7 +479,7 @@ repeat:
         // check we don't overlap with any spanning items in earlier columns etc
 again:
         for(int j=0; j< spanners.count(); j++) {
-            if (spanners[j].intersects(QRect(tx,ty,twidth,theight+SPACING))) {
+            if (spanners[j].intersects(QRect(tx,ty,twidth,theight + (SPACING/2)))) {
                 ty = spanners[j].bottomLeft().y() + SPACING;
                 goto again;
             }
