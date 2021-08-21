@@ -5185,6 +5185,7 @@ VScrollBar::sceneEvent(QEvent *event)
         barpos = obarpos + cpos.y() - origin.y();
         if (barpos < 0) barpos = 0;
         if (barpos + barheight > geom.height()) barpos = geom.height() - barheight;
+        parent->update();
         update();
 
         return true;
