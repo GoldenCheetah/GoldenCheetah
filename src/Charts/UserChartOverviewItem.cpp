@@ -49,13 +49,12 @@ UserChartOverviewItem::UserChartOverviewItem(ChartSpace *parent, QString name, Q
     setConfig(settings);
 
     connect(nameEdit, SIGNAL(textEdited(QString)), this, SLOT(nameChanged()));
-    connect(parent->context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged()));
 }
 
 UserChartOverviewItem::~UserChartOverviewItem() { }
 
 void
-UserChartOverviewItem::configChanged()
+UserChartOverviewItem::configChanged(qint32)
 {
     chart->setBackgroundColor(GColor(CCARDBACKGROUND));
 }

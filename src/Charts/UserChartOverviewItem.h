@@ -37,12 +37,12 @@ class UserChartOverviewItem : public ChartSpaceItem
         UserChartOverviewItem(ChartSpace *parent, QString name, QString config);
         ~UserChartOverviewItem();
 
-        void dragging(bool);
-        void itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *);
-        void itemGeometryChanged();
-        void setData(RideItem *item);
-        void setDateRange(DateRange);
-        QWidget *config() { return chart->settingsTool(); }
+        void dragging(bool) override;
+        void itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) override;
+        void itemGeometryChanged() override;
+        void setData(RideItem *item) override;
+        void setDateRange(DateRange) override;
+        QWidget *config()  override { return chart->settingsTool(); }
 
         // create a blank one
         static ChartSpaceItem *create(ChartSpace *parent) { return new UserChartOverviewItem(parent, "User Chart",
@@ -55,10 +55,13 @@ class UserChartOverviewItem : public ChartSpaceItem
         QString getConfig() const { return chart->settings(); }
         void setConfig(QString config) { chart->applySettings(config); }
 
+    protected:
+        bool sceneEvent(QEvent *) override { return false; } // override the default one
+
     public slots:
 
         void nameChanged();
-        void configChanged();
+        void configChanged(qint32) override;
 
     private:
         // embedding
