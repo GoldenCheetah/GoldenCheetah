@@ -32,6 +32,8 @@
 #include <QJsonValue>
 
 double gl_major;
+static double gl_wheelscale = 6; // rate we scroll for wheel events
+
 static QIcon grayConfig, whiteConfig, accentConfig;
 ChartSpaceItemRegistry *ChartSpaceItemRegistry::_instance;
 
@@ -825,7 +827,7 @@ ChartSpace::eventFilter(QObject *, QEvent *event)
 
         // take it as applied
         QGraphicsSceneWheelEvent *w = static_cast<QGraphicsSceneWheelEvent*>(event);
-        scrollTo(_viewY - (w->delta()*2));
+        scrollTo(_viewY - (w->delta()*gl_wheelscale));
         event->accept();
         returning = true;
 
