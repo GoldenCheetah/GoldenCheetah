@@ -168,12 +168,10 @@ QString
 AbstractView::ourStyleSheet()
 {
     return QString::fromUtf8("QScrollBar { background-color: %1; border: 0px; }"
-#ifndef Q_OS_MAC
            "QTabWidget { background: %1; }"
            "QTabWidget::pane { border: 1px solid %2; } "
            "QTextEdit { background: %1; }"
            "QTextEdit#metadata { background: %3; }"
-#endif
            "QTreeView { background: %1; }"
            "QScrollBar:vertical {"
            "    border: 0px solid darkGray; "
