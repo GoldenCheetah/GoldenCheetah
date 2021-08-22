@@ -5019,11 +5019,18 @@ Button::setGeometry(double x, double y, double width, double height)
 void
 Button::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
 {
+    static const int gl_border = 2;
+    static const int gl_radius = 24;
+
+    // anti aliasing please- none of that sketchy lines
+    painter->setRenderHint(QPainter::Antialiasing);
 
     // button background
     QColor pc = GCColor::invertColor(GColor(CCARDBACKGROUND));
-    pc.setAlpha(128);
-    painter->setPen(QPen(pc));
+    pc.setAlpha(64);
+    QPen line(pc,gl_border, Qt::SolidLine);
+    line.setJoinStyle(Qt::RoundJoin);
+    painter->setPen(line);
     QPointF pos=mapToParent(geom.x(), geom.y());
     if (isUnderMouse()) {
         QColor hover=GColor(CPLOTMARKER);
@@ -5031,7 +5038,7 @@ Button::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
         else hover.setAlpha(100);
         painter->setBrush(QBrush(hover));
     } else painter->setBrush(QBrush(GColor(CCARDBACKGROUND)));
-    painter->drawRoundedRect(pos.x(), pos.y(), geom.width(), geom.height(), 20, 20);
+    painter->drawRoundedRect(pos.x()+gl_border, pos.y()+gl_border, geom.width()-(gl_border*2), geom.height()-(gl_border*2), gl_radius, gl_radius);
 
     // text using large font clipped
     if (isUnderMouse()) {
