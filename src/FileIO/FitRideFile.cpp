@@ -647,7 +647,9 @@ struct FitFileReaderState
         switch (device_type) {
             case 4: return "Headunit"; // bike_power
             case 11: return "Powermeter"; // bike_power
+            case 12: return "Sensor Hub";
             case 17: return "Biketrainer"; // fitness equipment
+            case 30: return "Running Dynamics";
             case 35: case 36: return "Bikelight"; // bike_light_main/shared
             case 40: return "Bikeradar"; // bike_radar
             case 120: return "HR"; // heart_rate
