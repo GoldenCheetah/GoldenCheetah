@@ -552,6 +552,14 @@ struct FitFileReaderState
         } else if (manu == 76) {
             // Moxy
             return "Moxy Monitor";
+        } else if (manu == 83) {
+            // Scosche
+            if (prod == -1)
+                return "Scosche";
+            switch (prod) {
+                case 3: return "Scosche Rythm+";
+                default: return QString("Scosche %1").arg(prod);
+            }
         } else if (manu == 89) {
             // Tacx
             switch (prod) {
@@ -576,6 +584,15 @@ struct FitFileReaderState
 
             switch(prod) {
                   default: return QString("Magene %1").arg(prod);
+            }
+        } else if (manu == 108) {
+            // Giant
+            if (prod == -1)
+                return "Giant";
+
+            switch(prod) {
+                case 21845 : return "Giant Power Pro";
+                default: return QString("Giant %1").arg(prod);
             }
         } else if (manu == 115) {
             // igpsport
