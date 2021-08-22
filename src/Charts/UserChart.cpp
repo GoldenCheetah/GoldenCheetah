@@ -204,9 +204,15 @@ UserChart::setRide(const RideItem *item)
         if (ax != -1 && axisinfo[ax].smooth != 0 && axisinfo[ax].type == GenericAxisInfo::TIME) ysmooth=axisinfo[ax].smooth;
         if (ay != -1 && axisinfo[ay].smooth != 0 && axisinfo[ay].type == GenericAxisInfo::TIME) xsmooth=axisinfo[ay].smooth;
 
-        // lets pre-process the data
-        if (xsmooth >= 2) series.xseries = Utils::smooth_sma(series.xseries, GC_SMOOTH_CENTERED, xsmooth);
-        if (ysmooth >= 2) series.yseries = Utils::smooth_sma(series.yseries, GC_SMOOTH_CENTERED, ysmooth);
+        // lets pre-process the data- and might as well use sampling if losing resolution- some performance benefits here
+        if (xsmooth >= 2) {
+            series.xseries = Utils::smooth_sma(series.xseries, GC_SMOOTH_CENTERED, xsmooth, 3);
+            series.yseries = Utils::sample(series.yseries, 3);
+        }
+        if (ysmooth >= 2) {
+            series.yseries = Utils::smooth_sma(series.yseries, GC_SMOOTH_CENTERED, ysmooth, 3);
+            series.xseries = Utils::sample(series.xseries, 3);
+        }
 
         // DATE groupby (applies to date axis)
         int xgroupby=0, ygroupby=0;
@@ -1736,11 +1742,15 @@ EditUserAxisDialog::EditUserAxisDialog(Context *context, GenericAxisInfo &info)
     setMinimumHeight(250 *dpiXFactor);
 
     // update gui items from Axis info
-    axisname->setText(original.name);
-    log->setChecked(original.log);
     int index=axistype->findData(original.type);
     if (index >=0) axistype->setCurrentIndex(index);
     else axistype->setCurrentIndex(0);
+
+    // show / hide widgets on current config, setting defaults
+    setWidgets();
+
+    axisname->setText(original.name);
+    log->setChecked(original.log);
     fixed->setChecked(original.fixed);
     min->setValue(original.min());
     max->setValue(original.max());
@@ -1754,8 +1764,6 @@ EditUserAxisDialog::EditUserAxisDialog(Context *context, GenericAxisInfo &info)
     connect(okButton, SIGNAL(clicked()), this, SLOT(okClicked()));
     connect(cancelButton, SIGNAL(clicked()), this, SLOT(cancelClicked()));
 
-    // show / hide widgets on current config
-    setWidgets();
 }
 
 void
@@ -1774,6 +1782,7 @@ EditUserAxisDialog::setWidgets()
             break;
 
         case GenericAxisInfo::TIME:
+            smooth->setValue(5); // default to 5 seconds smoothing user can override
             smooth->show();
             smoothlabel->show();
             groupby->setCurrentIndex(0);

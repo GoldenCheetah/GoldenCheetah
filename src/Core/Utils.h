@@ -53,7 +53,8 @@ namespace Utils
     QVector<int> argsort(QVector<QString>&v, bool ascending=false);
     QVector<int> arguniq(QVector<double> &v);
     QVector<int> arguniq(QVector<QString> &v);
-    QVector<double> smooth_sma(QVector<double>&, int pos, int window);
+    QVector<double> smooth_sma(QVector<double>&, int pos, int window, int sample=1);
+    QVector<double> sample(QVector<double>&, int sample); // plain sampling nth sample
     QVector<double> smooth_ewma(QVector<double>&, double alpha);
 
     // used std::sort, std::lower_bound et al

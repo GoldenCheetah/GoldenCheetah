@@ -488,8 +488,11 @@ static double mean(QVector<double>&data, int start, int end)
     return sum/count;
 }
 
+// return vector of smoothed values using mean average of window n samples
+// samples is usually 1 to return every sample, but can be higher in which
+// case sampling is performed before returning results (aka every nth sample)
 QVector<double>
-smooth_sma(QVector<double>&data, int pos, int window)
+smooth_sma(QVector<double>&data, int pos, int window, int samples)
 {
     QVector<double> returning;
 
@@ -516,15 +519,25 @@ smooth_sma(QVector<double>&data, int pos, int window)
 
     while (index < data.count()) {
 
-        returning << mean(data, window_start, window_end);
-
+        if (samples == 1 || index%samples == 0) // sampling
+            returning << mean(data, window_start, window_end);
         index ++;
         window_start++;
         window_end++;
     }
-
     return returning;
 
+}
+
+// nth sampling to match sma above (usually for sampling x where sma has smoothed y
+QVector<double>
+sample(QVector<double>&data, int samples)
+{
+    QVector<double>returning;
+    for (int index=0; index< data.count(); index++)
+        if (samples == 1 || index%samples==0)
+            returning << data.at(index);
+    return returning;
 }
 
 QVector<double>
