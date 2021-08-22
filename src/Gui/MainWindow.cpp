@@ -2499,8 +2499,6 @@ MainWindow::syncCloud(QAction *action)
 void
 MainWindow::configChanged(qint32)
 {
-
-#if defined (WIN32) || defined (Q_OS_LINUX)
     // Windows and Linux menu bar should match chrome
     QColor textCol(Qt::black);
     if (GCColor::luminance(GColor(CTOOLBAR)) < 127)  textCol = QColor(Qt::white);
@@ -2519,7 +2517,6 @@ MainWindow::configChanged(qint32)
                                                "QComboBox::item { background: %1; color: %2; }"
                                                "QComboBox::item::selected { background: %3; color: %1; }").arg(GColor(CTOOLBAR).name()).arg(GCColor::invertColor(GColor(CTOOLBAR)).name()).arg(selected.name()));
 
-#endif
     QString buttonstyle = QString("QPushButton { border: none; background-color: %1; }").arg(CTOOLBAR);
     back->setStyleSheet(buttonstyle);
     forward->setStyleSheet(buttonstyle);
