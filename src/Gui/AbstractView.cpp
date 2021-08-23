@@ -721,8 +721,8 @@ AbstractView::setPerspectives(QComboBox *perspectiveSelector, bool selectChart)
     foreach(Perspective *page, perspectives_) {
         perspectiveSelector->addItem(page->title_);
     }
-    perspectiveSelector->addItem("Add New Perspective...");
-    perspectiveSelector->addItem("Manage Perspectives...");
+    perspectiveSelector->addItem(tr("Add New Perspective..."));
+    perspectiveSelector->addItem(tr("Manage Perspectives..."));
     perspectiveSelector->insertSeparator(perspectives_.count());
     perspectiveactive=false;
 

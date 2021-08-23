@@ -31,7 +31,7 @@
 PerspectiveDialog::PerspectiveDialog(QWidget *parent, AbstractView *tabView) : QDialog(parent), tabView(tabView), active(false)
 {
 
-    setWindowTitle("Manage Perspectives");
+    setWindowTitle(tr("Manage Perspectives"));
     setMinimumWidth(450*dpiXFactor);
     setMinimumHeight(450*dpiXFactor);
 
