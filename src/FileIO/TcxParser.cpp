@@ -130,6 +130,15 @@ TcxParser::endElement( const QString&, const QString&, const QString& qName)
 {
     if (qName == "Time") {
         time = convertToLocalTime(buffer);
+        if (start_time == QDateTime()) {
+
+            // redo initizlization on first trackpoint when Lap start time is missing
+            start_time = time;
+            rideFile->setStartTime(start_time);
+
+            last_distance = 0.0;
+            last_time = start_time;
+        }
         secs = double(start_time.msecsTo(time)) / 1000.00f;
 
     } else if (qName == "DistanceMeters") { distance = buffer.toDouble() / 1000; }
