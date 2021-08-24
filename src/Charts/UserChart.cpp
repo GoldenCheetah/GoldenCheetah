@@ -777,9 +777,9 @@ UserChartSettings::UserChartSettings(Context *context, bool rangemode, GenericCh
     scale = new QSlider(Qt::Horizontal, this);
     scale->setTickInterval(1);
     scale->setMinimum(1);
-    scale->setMaximum(9);
+    scale->setMaximum(18);
     scale->setSingleStep(1);
-    scale->setValue(1 + ((chart.scale-1)*2)); // 1-5 mapped to 1-7, where scale is 1,1.5,2,2.5,3,3.5,4,4.5,5
+    scale->setValue(1 + ((chart.scale-1)*2)); // scale is in increments of 0.5
     cf->addRow(tr("Scale"), scale);
 
 
