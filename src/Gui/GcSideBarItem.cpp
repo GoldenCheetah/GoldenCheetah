@@ -26,33 +26,17 @@
 static int bigHandle = 23;
 static int smallHandle = 18;
 
-// creates an icon in the apple style of gray emboss
-QIcon iconFromPNG(QString filename, bool emboss)
+// creates an icon with a modern style
+QIcon iconFromPNG(QString filename, bool )
 {
     QImage pngImage;
     pngImage.load(filename);
 
     // use muted dark gray color
     QImage gray8 = pngImage.convertToFormat(QImage::Format_Indexed8);
-    gray8.setColor(0, QColor(80,80,80, 170).rgb());
+    gray8.setColor(0, QColor(127,127,127,127).rgb());
 
-    if (GCColor::isFlat()) return QIcon(QPixmap::fromImage(gray8));
-
-    QImage white8 = pngImage.convertToFormat(QImage::Format_Indexed8);
-    white8.setColor(0, QColor(255,255,255, 255).rgb());
-
-    // now convert to a format we can paint with!
-    QImage white = white8.convertToFormat(QImage::Format_ARGB32_Premultiplied);
-    QImage gray = gray8.convertToFormat(QImage::Format_ARGB32_Premultiplied);
-
-    QPainter painter;
-    painter.begin(&white);
-    painter.setBackgroundMode(Qt::TransparentMode);
-    if (emboss) painter.drawImage(0,-1, gray);
-    else painter.drawImage(0,0, gray);
-    painter.end();
-
-    return QIcon(QPixmap::fromImage(white));
+    return QIcon(QPixmap::fromImage(gray8));
 }
 
 QIcon iconFromPNG(QString filename, QSize size)

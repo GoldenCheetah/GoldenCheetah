@@ -183,10 +183,6 @@ macx {
     SOURCES += Train/VideoWindow.cpp
 }
 
-#### these are no longer non-mac only
-HEADERS += ../contrib/qtsolutions/segmentcontrol/qtsegmentcontrol.h
-SOURCES += ../contrib/qtsolutions/segmentcontrol/qtsegmentcontrol.cpp
-
 # X11
 if (defined(GC_WANT_X11)) {
     LIBS += -lX11

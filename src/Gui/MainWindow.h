@@ -213,7 +213,6 @@ class MainWindow : public QMainWindow
         void resetWindowLayout();
         void toggleStyle();
         void setToolButtons(); // set toolbar buttons to match tabview
-        void setStyleFromSegment(int); // special case for linux/win qtsegmentcontrol toggline
         void toggleLowbar();
         void showLowbar(bool want);
         void enterWhatsThisMode();
@@ -303,13 +302,12 @@ class MainWindow : public QMainWindow
         SearchFilterBox *searchBox;
 
         // Not on Mac so use other types
-        QPushButton *sidelist, *lowbar, *whatsthis;
+        QPushButton *sidelist, *lowbar, *tabtile, *whatsthis;
         QPushButton *back, *forward;
-        QtSegmentControl *styleSelector;
         GcToolBar *head;
 
         // the icons
-        QIcon backIcon, forwardIcon, sidebarIcon, lowbarIcon, tabbedIcon, tiledIcon;
+        QIcon backIcon, forwardIcon, sidebarIcon, lowbarIcon, tiledIcon, whatIcon;
 
         // tab bar (that supports swtitching on drag and drop)
         DragBar *tabbar;

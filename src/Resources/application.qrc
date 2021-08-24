@@ -17,6 +17,10 @@
         <file>images/devices/kickr.png</file>
         <file>images/devices/fortius.png</file>
         <file>images/devices/quarqd.png</file>
+        <file>images/titlebar/sidebar.png</file>
+        <file>images/titlebar/bottombar.png</file>
+        <file>images/titlebar/whatsthis.png</file>
+        <file>images/titlebar/tile.png</file>
         <file>images/toolbar/main/togglefull.png</file>
         <file>images/toolbar/main/hideside.png</file>
         <file>images/toolbar/main/hiderside.png</file>

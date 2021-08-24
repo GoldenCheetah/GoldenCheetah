@@ -94,7 +94,6 @@
 #if !defined(Q_OS_MAC)
 #include "QTFullScreen.h" // not mac!
 #endif
-#include "../qtsolutions/segmentcontrol/qtsegmentcontrol.h"
 
 // SEARCH / FILTER
 #include "NamedSearch.h"
@@ -127,6 +126,9 @@ extern QDesktopWidget *desktop;
 extern ConfigDialog *configdialog_ptr;
 extern QString gl_version;
 extern double gl_major; // 1.x 2.x 3.x - we insist on 2.x or higher to enable OpenGL
+
+// constants for gui
+static int gl_toolheight=28;
 
 MainWindow::MainWindow(const QDir &home)
 {
@@ -170,14 +172,6 @@ MainWindow::MainWindow(const QDir &home)
     if (listOfProxies.count() > 0) {
         QNetworkProxy::setApplicationProxy(listOfProxies.first());
     }
-
-    static const QIcon hideIcon(":images/toolbar/main/hideside.png");
-    static const QIcon rhideIcon(":images/toolbar/main/hiderside.png");
-    static const QIcon showIcon(":images/toolbar/main/showside.png");
-    static const QIcon rshowIcon(":images/toolbar/main/showrside.png");
-    static const QIcon tabIcon(":images/toolbar/main/tab.png");
-    static const QIcon tileIcon(":images/toolbar/main/tile.png");
-    static const QIcon fullIcon(":images/toolbar/main/togglefull.png");
 
 #ifndef Q_OS_MAC
     fullScreen = new QTFullScreen(this);
@@ -271,102 +265,85 @@ MainWindow::MainWindow(const QDir &home)
     head = new GcToolBar(this);
 
     QStyle *toolStyle = QStyleFactory::create("fusion");
-    QPalette metal;
-    metal.setColor(QPalette::Button, QColor(215,215,215));
 
     // get those icons
-    sidebarIcon = iconFromPNG(":images/mac/sidebar.png", QSize(16*dpiXFactor,16*dpiXFactor));
-    lowbarIcon = iconFromPNG(":images/mac/lowbar.png", QSize(16*dpiXFactor,16*dpiXFactor));
-    tabbedIcon = iconFromPNG(":images/mac/tabbed.png", QSize(20*dpiXFactor,20*dpiXFactor));
-    tiledIcon = iconFromPNG(":images/mac/tiled.png", QSize(20*dpiXFactor,20*dpiXFactor));
+    sidebarIcon = iconFromPNG(":images/titlebar/sidebar.png");
+    lowbarIcon = iconFromPNG(":images/titlebar/bottombar.png");
+    tiledIcon = iconFromPNG(":images/titlebar/tile.png");
     backIcon = iconFromPNG(":images/mac/back.png");
+    whatIcon = iconFromPNG(":images/titlebar/whatsthis.png");
     forwardIcon = iconFromPNG(":images/mac/forward.png");
-    QSize isize(20 *dpiXFactor,20 *dpiYFactor);
+    QSize isize(16 *dpiXFactor,16 *dpiYFactor);
 
     back = new QPushButton(this);
     back->setIcon(backIcon);
-    back->setFixedHeight(24 *dpiYFactor);
-    back->setFixedWidth(24 *dpiYFactor);
+    back->setFixedHeight(gl_toolheight *dpiYFactor);
+    back->setFixedWidth(gl_toolheight *dpiYFactor);
     back->setIconSize(isize);
     back->setStyle(toolStyle);
     connect(back, SIGNAL(clicked(bool)), this, SIGNAL(backClicked()));
 
     forward = new QPushButton(this);
     forward->setIcon(forwardIcon);
-    forward->setFixedHeight(24 *dpiYFactor);
-    forward->setFixedWidth(24 *dpiYFactor);
+    forward->setFixedHeight(gl_toolheight *dpiYFactor);
+    forward->setFixedWidth(gl_toolheight *dpiYFactor);
     forward->setIconSize(isize);
     forward->setStyle(toolStyle);
     connect(forward, SIGNAL(clicked(bool)), this, SIGNAL(forwardClicked()));
 
     lowbar = new QPushButton(this);
     lowbar->setIcon(lowbarIcon);
-    lowbar->setFixedHeight(24 *dpiYFactor);
+    lowbar->setFixedHeight(gl_toolheight *dpiYFactor);
+    lowbar->setFixedWidth(gl_toolheight *dpiYFactor);
     lowbar->setIconSize(isize);
     lowbar->setStyle(toolStyle);
     lowbar->setToolTip(tr("Toggle Compare Pane"));
-    lowbar->setPalette(metal);
     connect(lowbar, SIGNAL(clicked(bool)), this, SLOT(toggleLowbar()));
     HelpWhatsThis *helpLowBar = new HelpWhatsThis(lowbar);
     lowbar->setWhatsThis(helpLowBar->getWhatsThisText(HelpWhatsThis::ToolBar_ToggleComparePane));
 
     sidelist = new QPushButton(this);
     sidelist->setIcon(sidebarIcon);
-    sidelist->setFixedHeight(24 * dpiYFactor);
+    sidelist->setFixedHeight(gl_toolheight * dpiYFactor);
+    sidelist->setFixedWidth(gl_toolheight *dpiYFactor);
     sidelist->setIconSize(isize);
     sidelist->setStyle(toolStyle);
     sidelist->setToolTip(tr("Toggle Sidebar"));
-    sidelist->setPalette(metal);
     connect(sidelist, SIGNAL(clicked(bool)), this, SLOT(toggleSidebar()));
     HelpWhatsThis *helpSideBar = new HelpWhatsThis(sidelist);
     sidelist->setWhatsThis(helpSideBar->getWhatsThisText(HelpWhatsThis::ToolBar_ToggleSidebar));
 
-    styleSelector = new QtSegmentControl(this);
-    styleSelector->setStyle(toolStyle);
-    styleSelector->setCount(2);
-    styleSelector->setSegmentIcon(0, tabbedIcon);
-    styleSelector->setSegmentIcon(1, tiledIcon);
-    styleSelector->setSegmentToolTip(0, tr("Tabbed View"));
-    styleSelector->setSegmentToolTip(1, tr("Tiled View"));
-    styleSelector->setSelectionBehavior(QtSegmentControl::SelectOne); //wince. spelling. ugh
-    styleSelector->setFixedHeight(24 * dpiYFactor);
-    styleSelector->setIconSize(isize);
-    styleSelector->setPalette(metal);
-    connect(styleSelector, SIGNAL(segmentSelected(int)), this, SLOT(setStyleFromSegment(int))); //avoid toggle infinitely
+    tabtile = new QPushButton(this);
+    tabtile->setIcon(tiledIcon);
+    tabtile->setFixedHeight(gl_toolheight *dpiYFactor);
+    tabtile->setFixedWidth(gl_toolheight *dpiYFactor);
+    tabtile->setIconSize(isize);
+    lowbar->setStyle(toolStyle);
+    tabtile->setToolTip(tr("Toggle Tab/Tile"));
+    connect(tabtile, SIGNAL(clicked(bool)), this, SLOT(toggleStyle()));
 
     // What's this button
     whatsthis = new QPushButton(this);
-    whatsthis->setIcon(myHelper->icon());
-    whatsthis->setFixedHeight(24 * dpiYFactor);
+    whatsthis->setIcon(whatIcon);
+    whatsthis->setFixedHeight(gl_toolheight * dpiYFactor);
+    whatsthis->setFixedWidth(gl_toolheight * dpiYFactor);
     whatsthis->setIconSize(isize);
     whatsthis->setStyle(toolStyle);
     whatsthis->setToolTip(tr("What's This?"));
-    whatsthis->setPalette(metal);
     connect(whatsthis, SIGNAL(clicked(bool)), this, SLOT(enterWhatsThisMode()));
-
- #if defined(WIN32) || defined (Q_OS_LINUX)
-    // are we in hidpi mode? if so undo global defaults for toolbar pushbuttons
-    if (dpiXFactor > 1) {
-        QString nopad = QString("QPushButton { padding-left: 0px; padding-right: 0px; "
-                                "              padding-top:  0px; padding-bottom: 0px; }");
-        sidelist->setStyleSheet(nopad);
-        lowbar->setStyleSheet(nopad);
-        whatsthis->setStyleSheet(nopad);
-    }
-#endif
 
     // add a search box on far right, but with a little space too
     perspectiveSelector = new QComboBox(this);
     perspectiveSelector->setStyle(toolStyle);
     perspectiveSelector->setFixedWidth(200 * dpiXFactor);
-    perspectiveSelector->setFixedHeight(28 * dpiYFactor);
+    perspectiveSelector->setFixedHeight(gl_toolheight * dpiYFactor);
     connect(perspectiveSelector, SIGNAL(currentIndexChanged(int)), this, SLOT(perspectiveSelected(int)));
 
     searchBox = new SearchFilterBox(this,context,false);
 
     searchBox->setStyle(toolStyle);
     searchBox->setFixedWidth(400 * dpiXFactor);
-    searchBox->setFixedHeight(28 * dpiYFactor);
+    searchBox->setFixedHeight(gl_toolheight * dpiYFactor);
 
     QWidget *space = new QWidget(this);
     space->setAutoFillBackground(false);
@@ -379,8 +356,7 @@ MainWindow::MainWindow(const QDir &home)
     head->addStretch();
     head->addWidget(sidelist);
     head->addWidget(lowbar);
-    head->addWidget(styleSelector);
-    head->addWidget(whatsthis);
+    head->addWidget(tabtile);
 #ifdef Q_OS_MAC // no menu on mac, so lets have some breathing space
     head->setFixedHeight(searchBox->height() + (20 *dpiXFactor * 2));
 #else
@@ -396,6 +372,10 @@ MainWindow::MainWindow(const QDir &home)
     space->setFixedWidth(5 *dpiYFactor);
     head->addWidget(space);
     head->addWidget(searchBox);
+    space = new Spacer(this);
+    space->setFixedWidth(5 *dpiYFactor);
+    head->addWidget(space);
+    head->addWidget(whatsthis);
     space = new Spacer(this);
     space->setFixedWidth(5 *dpiYFactor);
     head->addWidget(space);
@@ -1062,13 +1042,6 @@ MainWindow::addChartFromCloudDB()
 #endif
 
 void
-MainWindow::setStyleFromSegment(int segment)
-{
-    currentAthleteTab->setTiled(segment);
-    styleAction->setChecked(!segment);
-}
-
-void
 MainWindow::toggleStyle()
 {
     currentAthleteTab->toggleTile();
@@ -1395,8 +1368,8 @@ MainWindow::setToolButtons()
     styleAction->setChecked(select);
     showhideLowbar->setChecked(lowselected);
 
-    if (styleSelector->isSegmentSelected(select) == false)
-        styleSelector->setSegmentSelected(select, true);
+    //if (styleSelector->isSegmentSelected(select) == false)
+        //styleSelector->setSegmentSelected(select, true);
 
     int index = currentAthleteTab->currentView();
 
@@ -2521,9 +2494,19 @@ MainWindow::configChanged(qint32)
                                                "QComboBox::item { background: %1; color: %2; }"
                                                "QComboBox::item::selected { background: %3; color: %1; }").arg(GColor(CTOOLBAR).name()).arg(GCColor::invertColor(GColor(CTOOLBAR)).name()).arg(selected.name()));
 
-    QString buttonstyle = QString("QPushButton { border: none; background-color: %1; }").arg(CTOOLBAR);
+    QString buttonstyle = QString("QPushButton { border: none; border-radius: %2px; background-color: %1; "
+                                                "padding-left: 0px; padding-right: 0px; "
+                                                "padding-top:  0px; padding-bottom: 0px; }"
+                                  "QPushButton:hover { background-color: rgba(127,127,127,180); }"
+                                  "QPushButton:hover:pressed { background-color: rgba(127,127,127,127); }"
+                                ).arg(GColor(CTOOLBAR).name()).arg(3 * dpiXFactor);
+
     back->setStyleSheet(buttonstyle);
     forward->setStyleSheet(buttonstyle);
+    sidelist->setStyleSheet(buttonstyle);
+    tabtile->setStyleSheet(buttonstyle);
+    lowbar->setStyleSheet(buttonstyle);
+    whatsthis->setStyleSheet(buttonstyle);
 
     // All platforms
     QPalette tabbarPalette;
