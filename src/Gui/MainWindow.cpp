@@ -381,7 +381,11 @@ MainWindow::MainWindow(const QDir &home)
     head->addWidget(lowbar);
     head->addWidget(styleSelector);
     head->addWidget(whatsthis);
+#ifdef Q_OS_MAC // no menu on mac, so lets have some breathing space
+    head->setFixedHeight(searchBox->height() + (20 *dpiXFactor * 2));
+#else
     head->setFixedHeight(searchBox->height() + (16 *dpiXFactor));
+#endif
 
     connect(searchBox, SIGNAL(searchResults(QStringList)), this, SLOT(setFilter(QStringList)));
     connect(searchBox, SIGNAL(searchClear()), this, SLOT(clearFilter()));
