@@ -264,6 +264,11 @@ GenericChart::preprocessData()
 void
 GenericChart::finaliseChart()
 {
+    static bool blocked = false;
+    if (blocked) return;
+
+    blocked = true; // absolutely not reentrant or thread-safe
+
     setUpdatesEnabled(false); // lets not open our kimono here
 
     // now we know the axis/series and relationships we can
@@ -430,4 +435,7 @@ GenericChart::finaliseChart()
 
     // and display
     setUpdatesEnabled(true);
+
+    // happy to do again now
+    blocked=false;
 }
