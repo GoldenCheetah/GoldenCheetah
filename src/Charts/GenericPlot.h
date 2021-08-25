@@ -52,6 +52,7 @@
 #define GC_CHART_BAR       3
 #define GC_CHART_PIE       4
 #define GC_CHART_STACK     5 // stacked bar
+#define GC_CHART_PERCENT   6 // stacked percentage
 
 class GenericPlot;
 class GenericLegend;
@@ -173,6 +174,7 @@ class GenericPlot : public QWidget {
         QList<QBarSet*> barsets;
         QBarSeries *barseries;
         QStackedBarSeries *stackbarseries;
+        QPercentBarSeries *percentbarseries;
         QList<QString> categories;
 
         // axis placement (before user interacts)

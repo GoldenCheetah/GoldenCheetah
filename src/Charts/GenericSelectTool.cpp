@@ -668,7 +668,7 @@ GenericSelectTool::moved(QPointF pos)
             // but bar and stack charts already get status in hover signals
             // so don't do this for those chart types.
             if (hoverv == GPointF()) {
-                if (host->charttype != GC_CHART_BAR && host->charttype != GC_CHART_STACK)
+                if (host->charttype != GC_CHART_BAR && host->charttype != GC_CHART_STACK && host->charttype != GC_CHART_PERCENT)
                     emit unhoverx();
             }
 

@@ -351,7 +351,7 @@ GenericChart::finaliseChart()
         int index = GenericPlotInfo::findPlot(currentPlots, newPlots[i]);
 
         // don't reuse bar/pie charts, easier to rebuild
-        if (type == GC_CHART_PIE || type == GC_CHART_BAR || type == GC_CHART_STACK) index = -1;
+        if (type == GC_CHART_PIE || type == GC_CHART_BAR || type == GC_CHART_STACK || type == GC_CHART_PERCENT) index = -1;
 
         if (index <0) {
             // new one required

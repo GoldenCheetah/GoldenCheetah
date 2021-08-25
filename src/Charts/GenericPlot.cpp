@@ -46,6 +46,7 @@ GenericPlot::GenericPlot(QWidget *parent, Context *context, QGraphicsItem *item)
     chartview=NULL;
     barseries=NULL;
     stackbarseries=NULL;
+    percentbarseries=NULL;
     bottom=left=true;
 
     mainLayout = new QVBoxLayout(this);
@@ -453,6 +454,7 @@ GenericPlot::initialiseChart(QString title, int type, bool animate, int legpos, 
         filenames.clear();
         barseries=NULL;
         stackbarseries=NULL;
+        percentbarseries=NULL;
     }
 
     foreach(QLabel *label, labels) delete label;
@@ -814,6 +816,7 @@ GenericPlot::addCurve(QString name, QVector<double> xseries, QVector<double> yse
 
     case GC_CHART_BAR:
     case GC_CHART_STACK:
+    case GC_CHART_PERCENT:
         {
             // set up the barsets
             QBarSet *add= new QBarSet(name);
@@ -837,7 +840,7 @@ GenericPlot::addCurve(QString name, QVector<double> xseries, QVector<double> yse
 
                 // don't try and calculate here in a stack chart- we need
                 // all the barsets to have been defined first
-                if (charttype != GC_CHART_STACK) yaxis->point(i,value);
+                if (charttype != GC_CHART_STACK && charttype != GC_CHART_PERCENT) yaxis->point(i,value);
                 xaxis->point(i,value);
             }
 
@@ -992,8 +995,12 @@ GenericPlot::finaliseChart()
                     // but only of not already passed by user
                     if (charttype == GC_CHART_STACK && axisinfo->max() <maxystack) vaxis->setMax(maxystack);
                     else vaxis->setMax(axisinfo->max());
-
                     vaxis->setMin(axisinfo->min());
+
+                    if (charttype == GC_CHART_PERCENT) {
+                        vaxis->setMax(100);
+                        vaxis->setMin(0);
+                    }
 
                     // attach to the chart
                     qchart->addAxis(add, axisinfo->locate());
@@ -1029,6 +1036,27 @@ GenericPlot::finaliseChart()
 
                             // attach to category axis
                             stackbarseries->attachAxis(caxis);
+
+                        } else if (charttype == GC_CHART_PERCENT) {
+
+                            if (!percentbarseries) {
+                                percentbarseries = new QPercentBarSeries();
+                                qchart->addSeries(percentbarseries);
+
+                                // connect hover events
+                                connect(percentbarseries, SIGNAL(hovered(bool,int,QBarSet*)), this, SLOT(barsetHover(bool,int,QBarSet*)));
+
+                            } else percentbarseries->clear();
+
+                            // add the new barsets
+                            foreach (QBarSet *bs, barsets)
+                                percentbarseries->append(bs);
+
+                            // attach before addig barseries
+                            qchart->addAxis(add, axisinfo->locate());
+
+                            // attach to category axis
+                            percentbarseries->attachAxis(caxis);
 
                         } else {
 
@@ -1098,7 +1126,8 @@ GenericPlot::finaliseChart()
         }
     }
 
-    if (charttype == GC_CHART_SCATTER || charttype == GC_CHART_LINE || charttype == GC_CHART_BAR || charttype == GC_CHART_STACK) {
+    if (charttype == GC_CHART_SCATTER || charttype == GC_CHART_LINE
+        || charttype == GC_CHART_BAR || charttype == GC_CHART_STACK || charttype == GC_CHART_PERCENT) {
 
         bool havexaxis=false;
         foreach(QAbstractSeries *series, qchart->series()) {
@@ -1174,10 +1203,30 @@ GenericPlot::finaliseChart()
         legend->setClickable(false);
     }
 
+    // percent bar uses stackbarseries, but otherwise very similar
+    if (charttype==GC_CHART_PERCENT && percentbarseries) {
+
+        // add first X axis we find
+        foreach(QAbstractAxis *axis, qchart->axes(Qt::Horizontal)) {
+            legend->addX(static_cast<QCategoryAxis*>(axis)->titleText(), false, "");
+            break;
+        }
+
+        // need to attach stackbarseries to the value axes
+        foreach(QAbstractAxis *axis, qchart->axes(Qt::Vertical))
+            percentbarseries->attachAxis(axis);
+
+        // and legend
+        foreach(QBarSet *set, barsets)
+            legend->addSeries(set->label(), set->color());
+
+        legend->setClickable(false);
+    }
+
     // install event filters on thes scene objects for Pie and Bar
     // charts only, since for line/scatter we select and interact via
     // collision detection (and don't want the double number of events).
-    if (charttype == GC_CHART_STACK || charttype == GC_CHART_BAR || charttype == GC_CHART_PIE) {
+    if (charttype == GC_CHART_STACK || charttype == GC_CHART_STACK || charttype == GC_CHART_BAR || charttype == GC_CHART_PIE) {
 
         // largely we just want the hover events coz they're handy
         foreach(QGraphicsItem *item, chartview->scene()->items())
@@ -1242,7 +1291,7 @@ GenericPlot::configureAxis(QString name, bool visible, int align, double min, do
         max=0;
         bool setmax=false;
 
-        if (charttype != GC_CHART_STACK) { // we insist on stacked being oriented this way
+        if (charttype != GC_CHART_STACK && charttype != GC_CHART_PERCENT) { // we insist on stacked being oriented this way
 
             // min should be minimum value for all attached series
             foreach(QAbstractSeries *series, axis->series) {

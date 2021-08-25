@@ -222,8 +222,8 @@ UserChart::setRide(const RideItem *item)
 
         // groupBy uses pass by reference and will update what is passed
         // we update the ucd result as its used elsewhere
-        if (xgroupby > 0) groupBy(xgroupby, series.aggregateby, series.xseries, series.yseries, chartinfo.type == GC_CHART_BAR || chartinfo.type == GC_CHART_STACK);
-        if (ygroupby > 0) groupBy(ygroupby, series.aggregateby, series.yseries, series.xseries, chartinfo.type == GC_CHART_BAR || chartinfo.type == GC_CHART_STACK);
+        if (xgroupby > 0) groupBy(xgroupby, series.aggregateby, series.xseries, series.yseries, chartinfo.type == GC_CHART_BAR || chartinfo.type == GC_CHART_STACK || chartinfo.type == GC_CHART_PERCENT);
+        if (ygroupby > 0) groupBy(ygroupby, series.aggregateby, series.yseries, series.xseries, chartinfo.type == GC_CHART_BAR || chartinfo.type == GC_CHART_STACK || chartinfo.type == GC_CHART_PERCENT);
 
         // this is a bit of a hack, but later processing references ucd->x and y, so we
         // update them since they have been smoothed/aggregated.
@@ -291,7 +291,7 @@ UserChart::setRide(const RideItem *item)
         // on a user chart the series sets the categories for a bar chart
         // find the first series for this axis and set the categories
         // to the x series values.
-        if ((chartinfo.type == GC_CHART_BAR || chartinfo.type == GC_CHART_STACK) && axis.orientation == Qt::Horizontal) {
+        if ((chartinfo.type == GC_CHART_BAR || chartinfo.type == GC_CHART_STACK || chartinfo.type == GC_CHART_PERCENT) && axis.orientation == Qt::Horizontal) {
             // DATERANGE values are days from 01-01-1900
             QDateTime earliest(QDate(1900,01,01), QTime(0,0,0), Qt::LocalTime);
 
@@ -352,7 +352,7 @@ UserChart::setRide(const RideItem *item)
 
         // we need to set max and min based upon the barsets for bar charts since
         // the generic plot only looks are series associated with an axis and we have 0 of those
-        if (min==-1 && max==-1 && (chartinfo.type == GC_CHART_BAR || chartinfo.type == GC_CHART_STACK) && axis.orientation == Qt::Vertical) {
+        if (min==-1 && max==-1 && (chartinfo.type == GC_CHART_BAR || chartinfo.type == GC_CHART_STACK || chartinfo.type == GC_CHART_PERCENT) && axis.orientation == Qt::Vertical) {
 
             // loop through all the series and look at max and min y values
             bool first=true;
@@ -748,6 +748,7 @@ UserChartSettings::UserChartSettings(Context *context, bool rangemode, GenericCh
     type->addItem(tr("Scatter Chart"), GC_CHART_SCATTER);
     type->addItem(tr("Bar Chart"), GC_CHART_BAR);
     type->addItem(tr("Stacked Bar Chart"), GC_CHART_STACK);
+    type->addItem(tr("Stacked Percent Chart"), GC_CHART_PERCENT);
     type->addItem(tr("Pie Chart"), GC_CHART_PIE);
     type->setSizePolicy(QSizePolicy::Minimum,QSizePolicy::Preferred);
     zz->addWidget(type);
