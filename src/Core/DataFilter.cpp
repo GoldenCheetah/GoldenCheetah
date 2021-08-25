@@ -5936,10 +5936,8 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
                 QVector<double> powerindexes;
                 for(int i=0; i<power.asNumeric().count() && i<duration.asNumeric().count(); i++)
                     powerindexes << powerIndex(power.asNumeric().at(i), duration.asNumeric().at(i), false);
-fprintf(stderr, "returning an array of %d\n", powerindexes.count()); fflush(stderr);
                 returning = Result(powerindexes);
             } else {
-fprintf(stderr, "returning a value\n"); fflush(stderr);
                 // return a value
                 returning = Result(powerIndex(power.number(), duration.number(), false));
             }
