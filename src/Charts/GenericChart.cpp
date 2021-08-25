@@ -42,7 +42,7 @@
 // honoured too, since multiple series stacked can get
 // cramped, so these are placed into a scroll area
 //
-GenericChart::GenericChart(QWidget *parent, Context *context) : QWidget(parent), context(context), item(NULL)
+GenericChart::GenericChart(QWidget *parent, Context *context) : QWidget(parent), context(context), item(NULL), blocked(false)
 {
     // for scrollarea, since we see a little of it.
     QPalette palette;
@@ -264,7 +264,6 @@ GenericChart::preprocessData()
 void
 GenericChart::finaliseChart()
 {
-    static bool blocked = false;
     if (blocked) return;
 
     blocked = true; // absolutely not reentrant or thread-safe

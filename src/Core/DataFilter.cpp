@@ -362,6 +362,10 @@ static struct {
                               //  - same as intervals above but instead of returning a vector of numbers, the values
                               //  are converted to strings as appropriate for the metric (e.g. Pace_Rowing mm:ss/500m).
 
+    { "powerindex", 2 }, // powerindex(power, secs) - returns an array or value representing the power and duration
+                         //                           represented as a power index
+
+
 
 
     // add new ones above this line
@@ -5917,6 +5921,28 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
                 returning.number() = earliest.daysTo(QDate(dd.year(), dd.month(), 1));
             }
 
+            return returning;
+        }
+
+        // powerindex(power,duration) - return value or vector of values translating to powerindex
+        if (leaf->function == "powerindex") {
+
+            Result returning(0);
+            Result power = eval(df, leaf->fparms[0],x, it, m, p, c, s, d);
+            Result duration = eval(df, leaf->fparms[1],x, it, m, p, c, s, d);
+
+            if (power.isVector() && duration.isVector()) {
+                // return a vector
+                QVector<double> powerindexes;
+                for(int i=0; i<power.asNumeric().count() && i<duration.asNumeric().count(); i++)
+                    powerindexes << powerIndex(power.asNumeric().at(i), duration.asNumeric().at(i), false);
+fprintf(stderr, "returning an array of %d\n", powerindexes.count()); fflush(stderr);
+                returning = Result(powerindexes);
+            } else {
+fprintf(stderr, "returning a value\n"); fflush(stderr);
+                // return a value
+                returning = Result(powerIndex(power.number(), duration.number(), false));
+            }
             return returning;
         }
 

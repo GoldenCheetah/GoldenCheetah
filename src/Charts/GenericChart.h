@@ -349,5 +349,6 @@ class GenericChart : public QWidget {
         Context *context;
         QScrollArea *stackFrame;
         QGraphicsItem *item;
+        bool blocked;
 };
 #endif

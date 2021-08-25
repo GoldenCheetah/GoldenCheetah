@@ -187,6 +187,8 @@ class UserChartSettings : public QWidget {
         QCheckBox *stack;
         QComboBox *orientation;
         QSlider *scale;
+
+        bool blocked;
 };
 
 class EditUserSeriesDialog : public QDialog

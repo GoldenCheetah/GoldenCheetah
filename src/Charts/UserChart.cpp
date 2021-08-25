@@ -711,7 +711,7 @@ UserChart::applySettings(QString x)
 // core user chart settings
 //
 UserChartSettings::UserChartSettings(Context *context, bool rangemode, GenericChartInfo &chart, QList<GenericSeriesInfo> &series, QList<GenericAxisInfo> &axes) :
-  QWidget(NULL), context(context), rangemode(rangemode), chartinfo(chart), seriesinfo(series), axisinfo(axes), updating(false)
+  QWidget(NULL), context(context), rangemode(rangemode), chartinfo(chart), seriesinfo(series), axisinfo(axes), updating(false), blocked(false)
 {
     HelpWhatsThis *helpConfig = new HelpWhatsThis(this);
     this->setWhatsThis(helpConfig->getWhatsThisText(HelpWhatsThis::Chart_User));
@@ -947,8 +947,6 @@ UserChartSettings::refreshChartInfo()
 void
 UserChartSettings::updateChartInfo()
 {
-    static bool blocked=false;
-
     // if refresh chart info is updating, just ignore for now...
     if (blocked || updating) return;
 
