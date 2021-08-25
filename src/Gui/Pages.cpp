@@ -856,7 +856,7 @@ RemotePage::RemotePage(QWidget *parent, Context *context) : QWidget(parent), con
     foreach (RemoteCmd nativeCmd, nativeCmds) {
 
         QComboBox *comboBox = new QComboBox(this);
-        comboBox->addItem("<unset>");
+        comboBox->addItem(tr("<unset>"));
 
         // populate the combo box with all possible ANT commands
         foreach(RemoteCmd antCmd, antCmds) {
@@ -1271,7 +1271,7 @@ ColorsPage::ColorsPage(QWidget *parent) : QWidget(parent)
     QFont font=baseFont;
     font.setPointSizeF(baseFont.pointSizeF() * scale);
     fonttext = new QLabel(this);
-    fonttext->setText("The quick brown fox jumped over the lazy dog");
+    fonttext->setText(tr("The quick brown fox jumped over the lazy dog"));
     fonttext->setFont(font);
     fonttext->setFixedHeight(30 * dpiYFactor);
     fonttext->setFixedWidth(330 * dpiXFactor);
@@ -3294,7 +3294,7 @@ MeasuresConfigPage::removeMeasuresFieldClicked()
 ///
 MeasuresSettingsDialog::MeasuresSettingsDialog(QWidget *parent, QString &symbol, QString &name) : QDialog(parent), symbol(symbol), name(name)
 {
-    setWindowTitle("Measures Group");
+    setWindowTitle(tr("Measures Group"));
     setAttribute(Qt::WA_DeleteOnClose);
     setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint | Qt::Tool);
 
@@ -3349,7 +3349,7 @@ void MeasuresSettingsDialog::okClicked()
 ///
 MeasuresFieldSettingsDialog::MeasuresFieldSettingsDialog(QWidget *parent, MeasuresField &field) : QDialog(parent), field(field)
 {
-    setWindowTitle("Measures Field");
+    setWindowTitle(tr("Measures Field"));
     setAttribute(Qt::WA_DeleteOnClose);
     setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint | Qt::Tool);
 

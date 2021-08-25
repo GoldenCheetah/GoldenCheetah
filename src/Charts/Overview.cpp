@@ -473,8 +473,8 @@ OverviewConfigDialog::OverviewConfigDialog(ChartSpaceItem*item) : QDialog(NULL),
 
     // buttons
     QHBoxLayout *buttons = new QHBoxLayout();
-    remove = new QPushButton("Remove", this);
-    ok = new QPushButton("Close", this);
+    remove = new QPushButton(tr("Remove"), this);
+    ok = new QPushButton(tr("Close"), this);
     ok->setDefault(true);
 
     buttons->addWidget(remove);
