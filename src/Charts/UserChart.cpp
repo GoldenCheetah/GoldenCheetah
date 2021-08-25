@@ -947,8 +947,13 @@ UserChartSettings::refreshChartInfo()
 void
 UserChartSettings::updateChartInfo()
 {
+    static bool blocked=false;
+
     // if refresh chart info is updating, just ignore for now...
-    if (updating) return;
+    if (blocked || updating) return;
+
+    // don't interrupt as charts get zapped too soon...
+    blocked = true;
 
     bool refresh=true;
 
@@ -965,6 +970,8 @@ UserChartSettings::updateChartInfo()
 
     // we need to refresh whenever stuff changes....
     if (refresh) emit chartConfigChanged();
+
+    blocked = false; // now we can process another...
 }
 
 void
