@@ -51,6 +51,9 @@ UserChart::UserChart(QWidget *parent, Context *context, bool rangemode)
     main->setSpacing(0);
     main->setContentsMargins(0,0,0,0);
 
+    // we don't know our perspective yet...
+    setPerspective(NULL);
+
     // the chart
     chart = new GenericChart(this, context);
     main->addWidget(chart);
@@ -184,6 +187,7 @@ UserChart::setRide(const RideItem *item)
 
         // cast so we can work with it
         UserChartData *ucd = static_cast<UserChartData*>(series.user1);
+        // NOTE: specification is blank so doesn't honor perspective or filters, use activity {} in program for that (!!)
         ucd->compute(const_cast<RideItem*>(ride), Specification(), dr);
         series.xseries = ucd->x.asNumeric();
         series.yseries = ucd->y.asNumeric();

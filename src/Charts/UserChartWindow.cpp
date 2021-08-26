@@ -74,6 +74,7 @@ UserChartWindow::configChanged()
     QColor bgcolor = rangemode ? GColor(CTRENDPLOTBACKGROUND) : GColor(CPLOTBACKGROUND);
 
     setProperty("color", bgcolor);
+    chart->setProperty("perspective", QVariant::fromValue<Perspective*>(myPerspective));
     chart->setBackgroundColor(bgcolor);
 
     update();
@@ -85,18 +86,23 @@ UserChartWindow::configChanged()
 void
 UserChartWindow::setRide(RideItem *item)
 {
+    chart->setProperty("perspective", QVariant::fromValue<Perspective*>(myPerspective));
     chart->setRide(item);
 }
 
  void
  UserChartWindow::setDateRange(DateRange d)
  {
+    chart->setProperty("perspective", QVariant::fromValue<Perspective*>(myPerspective));
     chart->setDateRange(d);
  }
 
  void
  UserChartWindow::refresh()
  {
+    // we get called when filters and perspectives change so lets set the property
+    chart->setProperty("perspective", QVariant::fromValue<Perspective*>(myPerspective));
+
     if (!amVisible()) { stale=true; return; }
 
     chart->refresh();

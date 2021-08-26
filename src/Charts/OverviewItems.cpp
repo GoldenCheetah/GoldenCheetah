@@ -84,7 +84,7 @@ static void setFilter(ChartSpaceItem *item, Specification &spec)
 
         // property gets set after chartspace is initialised, so when we start up its not
         // available, but comes later...
-        if (item->parent->window->property("perspective").isValid())
+        if (item->parent->window->myPerspective != NULL)
             fs.addFilter(item->parent->window->myPerspective->isFiltered(), item->parent->window->myPerspective->filterlist(item->parent->myDateRange));
 
         // local filter

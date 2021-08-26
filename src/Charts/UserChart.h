@@ -41,6 +41,8 @@ class UserChart : public QWidget {
 
     Q_OBJECT
 
+    Q_PROPERTY (Perspective* perspective READ getPerspective WRITE setPerspective USER false)
+
     friend class ::Leaf; // data filter eval accessing our curve data
 
     public:
@@ -53,6 +55,9 @@ class UserChart : public QWidget {
         // for read and write of settings via chart properties
         QString settings() const;
         void applySettings(QString);
+
+        Perspective *getPerspective() const { return perspective_; }
+        void setPerspective(Perspective *x) { perspective_ = x; }
 
         // set background for all charts, legends etc
         void setBackgroundColor(QColor bgcolor);
@@ -95,6 +100,7 @@ class UserChart : public QWidget {
 
     private:
 
+        Perspective *perspective_;
         Context *context;
         bool rangemode;
         bool stale;

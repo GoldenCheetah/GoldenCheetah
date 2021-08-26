@@ -22,7 +22,6 @@
 UserChartOverviewItem::UserChartOverviewItem(ChartSpace *parent, QString name, QString settings) : ChartSpaceItem(parent, name), space_(parent)
 {
 
-    // a META widget, "RPE" using the FOSTER modified 0-10 scale
     this->type = OverviewItemType::USERCHART;
 
     // default is a bit bigger
