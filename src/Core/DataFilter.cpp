@@ -365,7 +365,9 @@ static struct {
     { "powerindex", 2 }, // powerindex(power, secs) - returns an array or value representing the power and duration
                          //                           represented as a power index
 
-
+    { "aggmetrics", 0 },        // aggregate metrics before returning a single value, see metrics above
+    { "aggmetricstrings", 0 },  // aggregate metrics and return as a string value, see metricstringsabove
+    { "asaggstring", 0 },       // asaggstring(metric1, metricn) - aggregates for metrics listed
 
 
     // add new ones above this line
@@ -1975,7 +1977,7 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
                         }
                     }
 
-                } else if (leaf->function == "metricname" || leaf->function == "metricunit" || leaf->function == "asstring") {
+                } else if (leaf->function == "metricname" || leaf->function == "metricunit" || leaf->function == "asstring" || leaf->function == "asaggstring") {
 
                     // check the parameters are all valid metric names
                     if (leaf->fparms.count() < 1) {
@@ -2000,12 +2002,13 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
                             }
                         }
                     }
-                } else if (leaf->function == "metrics" || leaf->function == "metricstrings") {
+                } else if (leaf->function == "metrics" || leaf->function == "metricstrings" ||
+                           leaf->function == "aggmetrics" || leaf->function == "aggmetricstrings") {
 
                     // is the param a symbol and either a metric name or 'date'
                     if (leaf->fparms.count() < 1 || leaf->fparms[0]->type != Leaf::Symbol) {
                        leaf->inerror = true;
-                       DataFiltererrors << QString(tr("metrics(symbol|date), symbol should be a metric name"));
+                       DataFiltererrors << QString(tr("%1(symbol|date), symbol should be a metric name")).arg(leaf->function);
 
                     } else if (leaf->fparms.count() >= 1) {
 
@@ -2027,7 +2030,7 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
                     } else if (leaf->fparms.count() > 3) {
 
                        leaf->inerror = true;
-                       DataFiltererrors << QString(tr("too many parameters: metrics(symbol|date, start, stop)"));
+                       DataFiltererrors << QString(tr("too many parameters: %1(symbol|date, start, stop)")).arg(leaf->function);
                     }
 
                 } else if (leaf->function == "intervals" || leaf->function == "intervalstrings") {
@@ -3399,6 +3402,94 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
             return returning;
         }
 
+        // aggregate strings is easier to separate
+        if (leaf->function == "asaggstring") {
+
+            Result returning(0);
+            returning.isNumber = false;
+
+            // loop through rides and aggregate
+            FilterSet fs;
+            if (m) {
+                fs.addFilter(m->context->isfiltered, m->context->filters);
+                fs.addFilter(m->context->ishomefiltered, m->context->homeFilters);
+            }
+            Specification spec;
+            spec.setFilterSet(fs);
+            spec.setDateRange(d);  // current date range selected
+
+            // we get passed a list of metrics that we need to aggregate and return
+            // one value for each parameter passed
+            for(int i=0; i<leaf->fparms.count(); i++) {
+
+                // symbol dereference
+                QString symbol=*(leaf->fparms[i]->lvalue.n);
+                QString o_symbol = df->lookupMap.value(symbol,"");
+                RideMetricFactory &factory = RideMetricFactory::instance();
+                const RideMetric *e = factory.rideMetric(o_symbol);
+
+                // loop through
+                double withduration=0;
+                double totalduration=0;
+                double runningtotal=0;
+                double minimum=0;
+                double maximum=0;
+                double count=0;
+
+                // loop through rides for daterange
+                foreach(RideItem *ride, m->context->athlete->rideCache->rides()) {
+
+                    if (!s.pass(ride)) continue; // relies upon the daterange being passed to eval...
+                    if (!spec.pass(ride)) continue; // relies upon the daterange being passed to eval...
+
+
+                    double value=0;
+                    QString asstring;
+                    value =  ride->getForSymbol(df->lookupMap.value(symbol,""), GlobalContext::context()->useMetricUnits);
+
+                    // keep count of time for ride, useful when averaging
+                    count++;
+                    double duration = ride->getForSymbol("workout_time");
+                    totalduration += duration;
+                    withduration += value * duration;
+                    runningtotal += value;
+                    if (count==1) {
+                        minimum = maximum = value;
+                    } else {
+                        if (value <minimum) minimum=value;
+                        if (value >maximum) maximum=value;
+                    }
+                }
+
+                // aggregate results
+                double aggregate=0;
+                switch(e->type()) {
+                case RideMetric::Total:
+                case RideMetric::RunningTotal:
+                    aggregate = runningtotal;
+                    break;
+                default:
+                case RideMetric::Average:
+                    {
+                    // aggregate taking into account duration
+                    aggregate = withduration / totalduration;
+                    break;
+                    }
+                case RideMetric::Low:
+                    aggregate = minimum;
+                    break;
+                case RideMetric::Peak:
+                    aggregate = maximum;
+                    break;
+                }
+
+                // format and return
+                returning.asString() << e->toString(aggregate);
+            }
+
+            return returning;
+        }
+
         if (leaf->function == "metricname" || leaf->function == "metricunit" || leaf->function == "asstring") {
 
             bool wantname = (leaf->function == "metricname");
@@ -4353,9 +4444,10 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
             return returning;
         }
 
-        if (leaf->function == "metrics" || leaf->function == "metricstrings") {
+        if (leaf->function == "metrics" || leaf->function == "metricstrings" ||
+            leaf->function == "aggmetrics" || leaf->function == "aggmetricstrings") {
 
-            bool wantstrings = (leaf->function == "metricstrings");
+            bool wantstrings = (leaf->function.endsWith("strings"));
             QDate earliest(1900,01,01);
             bool wantdate=false;
             QString symbol = *(leaf->fparms[0]->lvalue.n);
@@ -4366,8 +4458,12 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
             RideMetricFactory &factory = RideMetricFactory::instance();
             const RideMetric *e = factory.rideMetric(o_symbol);
 
+            // only aggregate if its a metric!
+            bool wantaggregate = e != NULL && (leaf->function.startsWith("agg"));
+
             // returning numbers or strings
             Result returning(0);
+            Result durations(0); // for aggregating
             if (wantstrings) returning.isNumber=false;
 
             FilterSet fs;
@@ -4407,14 +4503,20 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
             // no ride selected, or none available
             if (m == NULL) return Result(0);
 
+            // for aggregating
+            double withduration=0;
+            double totalduration=0;
+            double runningtotal=0;
+            double minimum=0;
+            double maximum=0;
+            double count=0;
+
             // loop through rides for daterange
-            int count=0;
             foreach(RideItem *ride, m->context->athlete->rideCache->rides()) {
 
                 if (!s.pass(ride)) continue; // relies upon the daterange being passed to eval...
                 if (!spec.pass(ride)) continue; // relies upon the daterange being passed to eval...
 
-                count++;
 
                 double value=0;
                 QString asstring;
@@ -4426,13 +4528,55 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
                     if (wantstrings) e ? asstring = e->toString(value) : "(null)";
                 }
 
-                if (wantstrings) {
+                // keep count of time for ride, useful when averaging
+                count++;
+                double duration = ride->getForSymbol("workout_time");
+                totalduration += duration;
+                withduration += value * duration;
+                runningtotal += value;
+                if (count==1) {
+                    minimum = maximum = value;
+                } else {
+                    if (value <minimum) minimum=value;
+                    if (value >maximum) maximum=value;
+                }
+
+                if (wantstrings) { // capture strings as we go, only if we don't aggregate
                     returning.asString().append(asstring);
                 } else {
                     returning.number() += value;
                     returning.asNumeric().append(value);
                 }
             }
+
+            // return an aggregate?
+            if (wantaggregate) {
+                double aggregate=0;
+                switch(e->type()) {
+                case RideMetric::Total:
+                case RideMetric::RunningTotal:
+                    aggregate = runningtotal;
+                    break;
+                default:
+                case RideMetric::Average:
+                    {
+                    // aggregate taking into account duration
+                    aggregate = withduration / totalduration;
+                    break;
+                    }
+                case RideMetric::Low:
+                    aggregate = minimum;
+                    break;
+                case RideMetric::Peak:
+                    aggregate = maximum;
+                    break;
+                }
+
+                // format and return
+                if (wantstrings) returning = Result(e->toString(aggregate));
+                else returning = Result(aggregate);
+            }
+
             return returning;
         }
 
