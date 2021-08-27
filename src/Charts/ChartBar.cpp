@@ -72,10 +72,9 @@ ChartBar::ChartBar(Context *context) : QWidget(context->mainWindow), context(con
     anim = new QPropertyAnimation(buttonBar, "pos", this);
 
     // scroller buttons
-    left = new QToolButton(this);
-    left->setStyleSheet("QToolButton { border: none; padding: 0px; }");
+    left = new QPushButton(this);
     left->setAutoFillBackground(false);
-    left->setFixedSize(20*dpiXFactor,20*dpiYFactor);
+    left->setFixedSize(24*dpiXFactor,24*dpiYFactor);
     left->setIcon(leftIcon);
     left->setIconSize(QSize(20*dpiXFactor,20*dpiYFactor));
     left->setFocusPolicy(Qt::NoFocus);
@@ -85,10 +84,9 @@ ChartBar::ChartBar(Context *context) : QWidget(context->mainWindow), context(con
     // menu bar in the middle of the buttons
     mlayout->addWidget(scrollArea);
 
-    right = new QToolButton(this);
-    right->setStyleSheet("QToolButton { border: none; padding: 0px; }");
+    right = new QPushButton(this);
     right->setAutoFillBackground(false);
-    right->setFixedSize(20*dpiXFactor,20*dpiYFactor);
+    right->setFixedSize(24*dpiXFactor,24*dpiYFactor);
     right->setIcon(rightIcon);
     right->setIconSize(QSize(20*dpiXFactor,20*dpiYFactor));
     right->setFocusPolicy(Qt::NoFocus);
@@ -102,12 +100,11 @@ ChartBar::ChartBar(Context *context) : QWidget(context->mainWindow), context(con
     spacer->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
     mlayout->addWidget(spacer);
 
-    menuButton = new QToolButton(this);
-    menuButton->setStyleSheet("QToolButton { border: none; padding: 0px; }");
+    menuButton = new QPushButton(this);
     menuButton->setAutoFillBackground(false);
-    menuButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
-    menuButton->setIcon(iconFromPNG(":images/sidebar/plus.png"));
-    menuButton->setIconSize(QSize(10*dpiXFactor,10*dpiYFactor));
+    menuButton->setFixedSize(24*dpiXFactor,24*dpiYFactor);
+    menuButton->setIcon(iconFromPNG(":images/sidebar/plus.png", QSize(12*dpiXFactor, 12*dpiXFactor)));
+    menuButton->setIconSize(QSize(20*dpiXFactor,20*dpiYFactor));
     menuButton->setFocusPolicy(Qt::NoFocus);
     mlayout->addWidget(menuButton);
     //connect(p, SIGNAL(clicked()), action, SLOT(trigger()));
@@ -162,6 +159,16 @@ ChartBar::configChanged(qint32)
         b->setFixedWidth(width);
         b->setFixedHeight(height);
     }
+
+    QString buttonstyle = QString("QPushButton { border: none; border-radius: %2px; background-color: %1; "
+                                                "padding-left: 0px; padding-right: 0px; "
+                                                "padding-top:  0px; padding-bottom: 0px; }"
+                                  "QPushButton:hover { background-color: rgba(127,127,127,180); }"
+                                  "QPushButton:hover:pressed { background-color: rgba(127,127,127,127); }"
+                                ).arg(GColor(CTOOLBAR).name()).arg(3 * dpiXFactor);
+    menuButton->setStyleSheet(buttonstyle);
+    left->setStyleSheet(buttonstyle);
+    right->setStyleSheet(buttonstyle);
 }
 
 void

@@ -46,7 +46,7 @@ QIcon iconFromPNG(QString filename, QSize size)
 
     // use muted dark gray color
     QImage gray8 = pngImage.convertToFormat(QImage::Format_Indexed8);
-    gray8.setColor(0, QColor(80,80,80, 170).rgb());
+    gray8.setColor(0, QColor(127,127,127, 127).rgb());
 
     return QIcon(QPixmap::fromImage(gray8,Qt::ColorOnly|Qt::PreferDither|Qt::DiffuseAlphaDither).scaled(size, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
 
