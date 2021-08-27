@@ -1075,7 +1075,10 @@ DataOverviewItem::sort(int column, Qt::SortOrder order)
 
     int rows = values.count() / names.count();
 
-    QRegExp redate("^[0-9][0-9] [A-z][A-z][A-z] [0-9][0-9]*$");
+    // dates in German are weird, a month is "Mai", "Juli" or even "Jan."
+    // even when requesting a date in format dd MMM yyyy
+    // remember: a dot (.) inside brackets ([]) does NOT need to be escaped
+    QRegExp redate("^[0-9][0-9] [.A-Za-zÀ-ž\u0370-\u03FF\u0400-\u04FF]+ [0-9][0-9]*$");
     QRegExp retime("^[0-9:]*$");
     QRegExp renumber("^[0-9.-]*$");
 
@@ -1122,7 +1125,7 @@ DataOverviewItem::sort(int column, Qt::SortOrder order)
             } else if (redate.exactMatch(val)) {
 
                 // common formats
-                QStringList formats = { "dd MMM yyyy", "dd MMM yy", "dd/mm/yy", "mm/dd/yy" };
+                QStringList formats = { "dd MMM yyyy", "dd MMM yy" };
                 QDate attempt;
 
                 foreach(QString format, formats) {
