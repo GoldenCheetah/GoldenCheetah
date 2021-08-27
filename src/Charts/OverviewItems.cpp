@@ -2677,6 +2677,10 @@ DataOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *,
     // paint nothing if no values - or a mismatch
     if (names.count() == 0 || values.count() == 0 || values.count() < names.count()) return;
 
+    // don't paint on the edges
+    QRectF geom = geometry();
+    painter->setClipRect(40,40,geom.width()-80,geom.height()-80);
+
     // step 1: calculate paint metrics, colors, fonts, margins etc etc ...
 
     // we use the mid font, so lets get some font metrics
