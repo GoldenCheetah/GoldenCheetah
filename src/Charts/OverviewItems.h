@@ -161,7 +161,7 @@ class DataOverviewItem : public ChartSpaceItem
 
         // transition support, get a program to mimic
         // the look and feel of the old ride summary
-        static QString getLegacyProgram(int, DataFilterRuntime &);
+        static QString getLegacyProgram(int, DataFilterRuntime &, bool trends);
 
         // sort the datatable
         void sort(int column, Qt::SortOrder order);

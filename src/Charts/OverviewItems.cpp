@@ -167,9 +167,13 @@ DataOverviewItem::~DataOverviewItem()
 // when setting the legacy metrics, as a convenience for users
 #define GC_SETTINGS_SUMMARY_METRICS     "<global-general>rideSummaryWindow/summaryMetrics"
 
-QString DataOverviewItem::getLegacyProgram(int type, DataFilterRuntime &rt)
+QString DataOverviewItem::getLegacyProgram(int type, DataFilterRuntime &rt, bool trends)
 {
     QString program;
+
+    // we need to aggregate on trends view
+    QString prefix = trends ? "agg" : "";
+    bool replace=false;
 
     switch(type) {
 
@@ -257,7 +261,7 @@ QString DataOverviewItem::getLegacyProgram(int type, DataFilterRuntime &rt)
             "# to convert correctly with dp, metric/imperial\n"
             "# or specific formats eg. rowing pace xx/500m\n"
             "values { \n"
-            "    asstring(Athlete_Weight,\n"
+            "    as%1string(Athlete_Weight,\n"
             "         Average_Speed,\n"
             "         Average_Power,\n"
             "         Average_Heart_Rate,\n"
@@ -265,6 +269,7 @@ QString DataOverviewItem::getLegacyProgram(int type, DataFilterRuntime &rt)
             "} \n"
             "\n"
             "}\n";
+    replace = true;
     break;
 
     case DATA_TABLE_MAXIMUMS:
@@ -298,7 +303,7 @@ QString DataOverviewItem::getLegacyProgram(int type, DataFilterRuntime &rt)
             "# to convert correctly with dp, metric/imperial\n"
             "# or specific formats eg. rowing pace xx/500m\n"
             "values { \n"
-            "    asstring(Max_Speed,\n"
+            "    as%1string(Max_Speed,\n"
             "         Max_Power,\n"
             "         Max_Heartrate,\n"
             "         Max_Cadence,\n"
@@ -306,6 +311,7 @@ QString DataOverviewItem::getLegacyProgram(int type, DataFilterRuntime &rt)
             "} \n"
             "\n"
             "}\n";
+        replace=true;
     break;
 
     case DATA_TABLE_METRICS:
@@ -349,10 +355,11 @@ QString DataOverviewItem::getLegacyProgram(int type, DataFilterRuntime &rt)
             "# to convert correctly with dp, metric/imperial\n"
             "# or specific formats eg. rowing pace xx/500m\n"
             "values { \n"
-            "    asstring(" + metrics + ");\n"
+            "    as%1string(" + metrics + ");\n"
             "} \n"
             "\n"
             "}\n";
+            replace = true;
     }
     break;
 
@@ -487,7 +494,7 @@ QString DataOverviewItem::getLegacyProgram(int type, DataFilterRuntime &rt)
             "# to convert correctly with dp, metric/imperial\n"
             "# or specific formats eg. rowing pace xx/500m\n"
             "values { \n"
-            "    asstring(Duration,\n"
+            "    as%1string(Duration,\n"
             "             Time_Moving,\n"
             "             Distance,\n"
             "             Work,\n"
@@ -496,10 +503,11 @@ QString DataOverviewItem::getLegacyProgram(int type, DataFilterRuntime &rt)
             "} \n"
             "\n"
             "}\n";
+            replace = true;
     break;
 
     }
-    return program;
+    return replace ? QString(program).arg(prefix) : program;
 }
 
 ChartSpaceItem *
@@ -508,8 +516,8 @@ DataOverviewItem::create(ChartSpace *parent) {
     // temporary - bit expensive, but creation is expensive anyway
     DataFilter df(parent, parent->context);
 
-    if (parent->scope == ANALYSIS) return new DataOverviewItem(parent, "Totals", getLegacyProgram(DATA_TABLE_TOTALS, df.rt));
-    else return new DataOverviewItem(parent, "Activities", getLegacyProgram(DATA_TABLE_TRENDS, df.rt));
+    if (parent->scope == ANALYSIS) return new DataOverviewItem(parent, "Totals", getLegacyProgram(DATA_TABLE_TOTALS, df.rt, false));
+    else return new DataOverviewItem(parent, "Activities", getLegacyProgram(DATA_TABLE_TRENDS, df.rt, true));
 }
 
 void
@@ -3449,19 +3457,19 @@ OverviewItemConfig::OverviewItemConfig(ChartSpaceItem *item) : QWidget(NULL), it
         layout->addRow(tr("Name"), name);
     }
 
+    legacySelector = new QComboBox(this);
+    legacySelector->addItem("User defined", 0);
+    legacySelector->addItem("Totals", DATA_TABLE_TOTALS);
+    legacySelector->addItem("Averages", DATA_TABLE_AVERAGES);
+    legacySelector->addItem("Maximums", DATA_TABLE_MAXIMUMS);
+    legacySelector->addItem("Metrics", DATA_TABLE_METRICS);
+    legacySelector->addItem("Zones", DATA_TABLE_ZONES);
     if (item->parent->scope & OverviewScope::ANALYSIS && item->type == OverviewItemType::DATATABLE) {
-        legacySelector = new QComboBox(this);
-        legacySelector->addItem("User defined", 0);
-        legacySelector->addItem("Totals", DATA_TABLE_TOTALS);
-        legacySelector->addItem("Averages", DATA_TABLE_AVERAGES);
-        legacySelector->addItem("Maximums", DATA_TABLE_MAXIMUMS);
-        legacySelector->addItem("Metrics", DATA_TABLE_METRICS);
-        legacySelector->addItem("Zones", DATA_TABLE_ZONES);
         legacySelector->addItem("Intervals", DATA_TABLE_INTERVALS);
-
-        layout->addRow(tr("Legacy"), legacySelector);
-        connect(legacySelector, SIGNAL(currentIndexChanged(int)), this, SLOT(setProgram(int)));
     }
+
+    layout->addRow(tr("Legacy"), legacySelector);
+    connect(legacySelector, SIGNAL(currentIndexChanged(int)), this, SLOT(setProgram(int)));
 
     // trends view always has a filter
     if (item->parent->scope & OverviewScope::TRENDS) {
@@ -3649,7 +3657,7 @@ OverviewItemConfig::setProgram(int index)
     if (index > 0) {
         // for metric lookup
         DataFilter df(item->parent, item->parent->context);
-        editor->setText(DataOverviewItem::getLegacyProgram(index, df.rt));
+        editor->setText(DataOverviewItem::getLegacyProgram(index, df.rt, item->parent->scope == OverviewScope::TRENDS));
     }
 }
 
