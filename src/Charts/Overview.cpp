@@ -191,6 +191,11 @@ OverviewWindow::getConfiguration() const
             {
                 DataOverviewItem *data = reinterpret_cast<DataOverviewItem*>(item);
                 config += "\"program\":\"" + QString("%1").arg(Utils::jsonprotect(data->program)) + "\",";
+
+                // although they aren't config we remember the last sort order
+                // so it is retained over restarts, config of dynamic data is too hard
+                config += "\"sortcolumn\":" + QString("%1").arg(data->lastsort) + ",";
+                config += "\"sortorder\":" + QString("%1").arg(data->lastorder) + ",";
             }
             break;
         case OverviewItemType::KPI:
@@ -425,6 +430,15 @@ badconfig:
                 QString program=Utils::jsonunprotect(obj["program"].toString());
                 add = new DataOverviewItem(space, name, program);
                 add->datafilter = datafilter;
+
+                // added later, so not guaranteed to be there
+                // we remember the sorting so we can reinstate after restart
+                if (obj.contains("sortorder")) {
+                    int column = obj["sortcolumn"].toInt();
+                    int order = obj["sortorder"].toInt();
+                    static_cast<DataOverviewItem*>(add)->lastsort = column;
+                    static_cast<DataOverviewItem*>(add)->lastorder = static_cast<Qt::SortOrder>(order);
+                }
                 space->addItem(order,column,span,deep, add);
             }
             break;
