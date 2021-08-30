@@ -71,6 +71,8 @@ RideMapWindow::RideMapWindow(Context *context, int mapType) : GcChartWindow(cont
     hideShadedZonesCk->setChecked(false);
     hideYellowLineCk = new QCheckBox();
     hideYellowLineCk->setChecked(false);
+    hideRouteLineOpacityCk = new QCheckBox();
+    hideRouteLineOpacityCk->setChecked(false);
     showInt = new QCheckBox();
     showInt->setChecked(true);
 
@@ -79,6 +81,7 @@ RideMapWindow::RideMapWindow(Context *context, int mapType) : GcChartWindow(cont
     commonLayout->addRow(new QLabel(tr("Show Full Plot")), showFullPlotCk);
     commonLayout->addRow(new QLabel(tr("Hide Shaded Zones")), hideShadedZonesCk);
     commonLayout->addRow(new QLabel(tr("Hide Yellow Line")), hideYellowLineCk);
+    commonLayout->addRow(new QLabel(tr("Hide Out & Back Route Opacity")), hideRouteLineOpacityCk);
     commonLayout->addRow(new QLabel(tr("Show Intervals Overlay")), showInt);
     commonLayout->addRow(new QLabel(""));
 
@@ -115,6 +118,7 @@ RideMapWindow::RideMapWindow(Context *context, int mapType) : GcChartWindow(cont
     connect(showFullPlotCk, SIGNAL(stateChanged(int)), this, SLOT(showFullPlotChanged(int)));
     connect(hideShadedZonesCk, SIGNAL(stateChanged(int)), this, SLOT(hideShadedZonesChanged(int)));
     connect(hideYellowLineCk, SIGNAL(stateChanged(int)), this, SLOT(hideYellowLineChanged(int)));
+    connect(hideRouteLineOpacityCk, SIGNAL(stateChanged(int)), this, SLOT(hideRouteLineOpacityChanged(int)));
     connect(osmTSUrl, SIGNAL(editingFinished()), this, SLOT(osmCustomTSURLEditingFinished()));
     connect(tileCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(tileTypeSelected(int)));
 
@@ -288,6 +292,14 @@ RideMapWindow::hideYellowLineChanged(int value)
     Q_UNUSED(value);
     forceReplot();
 }
+
+void
+RideMapWindow::hideRouteLineOpacityChanged(int value)
+{
+    Q_UNUSED(value);
+    forceReplot();
+}
+
 void
 RideMapWindow::osmCustomTSURLEditingFinished()
 {
@@ -313,12 +325,14 @@ RideMapWindow::osmCustomTSURLEditingFinished()
 }
 
 void
-RideMapWindow::configChanged(qint32)
+RideMapWindow::configChanged(qint32 value)
 {
     setProperty("color", GColor(CPLOTBACKGROUND));
 #ifndef Q_OS_MAC
     overlayIntervals->setStyleSheet(AbstractView::ourStyleSheet());
 #endif
+
+    if (value & CONFIG_APPEARANCE) forceReplot();
 }
 
 void
@@ -749,7 +763,7 @@ void RideMapWindow::createHtml()
 
 QColor RideMapWindow::GetColor(int watts)
 {
-    if (range < 0 || hideShadedZones()) return Qt::red;
+    if (range < 0 || hideShadedZones()) return GColor(MAPROUTELINE);
     else return zoneColor(context->athlete->zones(myRideItem ? myRideItem->sport : "Bike")->whichZone(range, watts), 7);
 }
 
@@ -829,7 +843,7 @@ RideMapWindow::drawShadedRoute()
                                 "polyline.on('mouseover', function(event) { webBridge.hoverPath(event.latlng.lat, event.latlng.lng); });\n"
                                 "path = polyline.getLatLngs();\n"
                                 "}\n").arg(color.name())
-                                      .arg(0.5);
+                                      .arg(hideRouteLineOpacity() ? 1.0 : 0.5f);
             } else if (mapCombo->currentIndex() == GOOGLE) {
                 // color the polyline
                 code += QString("var polyOptions = {\n"
@@ -840,7 +854,7 @@ RideMapWindow::drawShadedRoute()
                                 "}\n"
                                 "polyline.setOptions(polyOptions);\n"
                                 "}\n").arg(color.name())
-                                      .arg(0.5f);
+                                      .arg(hideRouteLineOpacity() ? 1.0 : 0.5f);
 
             }
             view->page()->runJavaScript(code);
