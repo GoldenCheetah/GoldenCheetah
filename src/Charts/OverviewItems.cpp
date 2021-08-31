@@ -3461,19 +3461,22 @@ OverviewItemConfig::OverviewItemConfig(ChartSpaceItem *item) : QWidget(NULL), it
         layout->addRow(tr("Name"), name);
     }
 
-    legacySelector = new QComboBox(this);
-    legacySelector->addItem("User defined", 0);
-    legacySelector->addItem("Totals", DATA_TABLE_TOTALS);
-    legacySelector->addItem("Averages", DATA_TABLE_AVERAGES);
-    legacySelector->addItem("Maximums", DATA_TABLE_MAXIMUMS);
-    legacySelector->addItem("Metrics", DATA_TABLE_METRICS);
-    legacySelector->addItem("Zones", DATA_TABLE_ZONES);
-    if (item->parent->scope & OverviewScope::ANALYSIS && item->type == OverviewItemType::DATATABLE) {
-        legacySelector->addItem("Intervals", DATA_TABLE_INTERVALS);
-    }
+    if (item->type == OverviewItemType::DATATABLE) {
+        legacySelector = new QComboBox(this);
+        legacySelector->addItem("User defined", 0);
+        legacySelector->addItem("Totals", DATA_TABLE_TOTALS);
+        legacySelector->addItem("Averages", DATA_TABLE_AVERAGES);
+        legacySelector->addItem("Maximums", DATA_TABLE_MAXIMUMS);
+        legacySelector->addItem("Metrics", DATA_TABLE_METRICS);
+        legacySelector->addItem("Zones", DATA_TABLE_ZONES);
+        if (item->parent->scope & OverviewScope::ANALYSIS) {
+            legacySelector->addItem("Intervals", DATA_TABLE_INTERVALS);
+        }
 
-    layout->addRow(tr("Legacy"), legacySelector);
-    connect(legacySelector, SIGNAL(currentIndexChanged(int)), this, SLOT(setProgram(int)));
+        layout->addRow(tr("Legacy"), legacySelector);
+        connect(legacySelector, SIGNAL(currentIndexChanged(int)), this, SLOT(setProgram(int)));
+
+    }
 
     // trends view always has a filter
     if (item->parent->scope & OverviewScope::TRENDS) {
