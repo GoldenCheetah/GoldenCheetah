@@ -386,7 +386,17 @@ GenericChart::finaliseChart()
     // stack mode. I would expect this to make things
     // worse but for some reason, it solves the problem.
     // do not remove !!!
-    QApplication::processEvents();
+    //
+    // **REMOVED 31/08/2021** as it is dangerous to do
+    // whilst charts are being destroyed and also
+    // led to a problem with events being ignored
+    // commented out to fix:
+    // https://github.com/GoldenCheetah/GoldenCheetah/issues/4029
+    // Could not recreate the original issue with axis
+    // being painted/repainted in different locations
+    // that this originally "resolved" so seemed save to
+    // remove for now.
+    //QApplication::processEvents();
 
     // now initialise all the newPlots
     for(int i=0; i<newPlots.count(); i++) {
