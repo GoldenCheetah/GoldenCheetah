@@ -72,7 +72,7 @@ extern Leaf *DataFilterroot; // root node for parsed statement
 
 %locations
 
-%type <leaf> symbol array select literal lexpr cexpr expr parms block statement expression;
+%type <leaf> symbol array select literal lexpr cexpr expr parms block statement expression parameter;
 %type <leaf> simple_statement if_clause while_clause function_def;
 %type <leaf> python_script;
 %type <comp> statements
@@ -233,17 +233,23 @@ function_def:
                                                 }
         ;
 
+parameter:
+
+        lexpr                                   { $$ = $1; }
+        | block                                 { $$ = $1; }
+        ;
+
 /*
  * A parameter list, as passed to a function
  */
 parms: 
 
-        lexpr                                   { $$ = new Leaf(@1.first_column, @1.last_column);
+        parameter                               { $$ = new Leaf(@1.first_column, @1.last_column);
                                                   $$->type = Leaf::Function;
                                                   $$->series = NULL; // not tiz/best
                                                   $$->fparms << $1;
                                                 }
-        | parms ',' lexpr                       { $1->fparms << $3;
+        | parms ',' parameter                   { $1->fparms << $3;
                                                   $1->leng = @3.last_column; }
         ;
 

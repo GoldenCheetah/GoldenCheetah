@@ -1651,6 +1651,9 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
                         DataFiltererrors << tr("activities(\"fexpr\", expr) - where fexpr is a filter expression");
                     }
 
+                    // validate the expression
+                    if (leaf->fparms.count() == 2) validateFilter(context,df,leaf->fparms[1]);
+
                 } else if (leaf->function == "daterange") {
 
                     if (leaf->fparms.count()==1) {
