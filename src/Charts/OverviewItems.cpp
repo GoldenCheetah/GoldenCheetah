@@ -2839,7 +2839,7 @@ DataOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *,
         }
 
         // separator for heading from data
-        painter->setPen(QPen(cnormal, 1, Qt::SolidLine, Qt::RoundCap));
+        painter->setPen(QPen(cnormal, 4, Qt::SolidLine, Qt::RoundCap));
         painter->drawLine(paintarea.topLeft() + QPointF(0, lineheight * 2.2),
                           paintarea.topRight() + QPointF(0, lineheight * 2.2));
 
