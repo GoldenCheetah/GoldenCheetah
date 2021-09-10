@@ -221,6 +221,17 @@ QString DataOverviewItem::getLegacyProgram(int type, DataFilterRuntime &rt, bool
             "      metricstrings(30_min_Peak_Power)); \n"
             "} \n"
             "\n"
+            "# heat values for coloring the cell\n"
+            "h { \n"
+            "    c(heat(0,0,metrics(date)),\n"
+            "      heat(0,0,metrics(Duration)),\n"
+            "      heat(0,0,metrics(Time_Moving)),\n"
+            "      heat(0,0,metrics(Distance)),\n"
+            "      heat(0,0,metrics(Work)),\n"
+            "      heat(0,0,metrics(W'_Work)),\n"
+            "      heat(0,300,metrics(30_min_Peak_Power))); \n"
+            "} \n"
+            "\n"
             "# Click thru for the row, we can set the file\n"
             "# this row represents. In the same way as a user chart.\n"
             "f { \n"
@@ -1214,6 +1225,7 @@ DataOverviewItem::setDateRange(DateRange dr)
     units.clear();
     values.clear();
     files.clear();
+    heat.clear();
 
     // calculate the value...
     DataFilter parser(this, parent->context, program);
@@ -1230,12 +1242,14 @@ DataOverviewItem::setDateRange(DateRange dr)
         funits = parser.rt.functions.contains("units") ? parser.rt.functions.value("units") : NULL;
         fvalues = parser.rt.functions.contains("values") ? parser.rt.functions.value("values") : NULL;
         ffiles = parser.rt.functions.contains("f") ? parser.rt.functions.value("f") : NULL;
+        fheat = parser.rt.functions.contains("h") ? parser.rt.functions.value("h") : NULL;
 
         // fetch the data
         if (fnames) names = parser.root()->eval(&parser.rt, fnames, Result(0), 0, const_cast<RideItem*>(parent->context->currentRideItem()), NULL, NULL, spec, dr).asString();
         if (funits) units = parser.root()->eval(&parser.rt, funits, Result(0), 0, const_cast<RideItem*>(parent->context->currentRideItem()), NULL, NULL, spec, dr).asString();
         if (fvalues) values = parser.root()->eval(&parser.rt, fvalues, Result(0), 0, const_cast<RideItem*>(parent->context->currentRideItem()), NULL, NULL, spec, dr).asString();
         if (ffiles) files = parser.root()->eval(&parser.rt, ffiles, Result(0), 0, const_cast<RideItem*>(parent->context->currentRideItem()), NULL, NULL, spec, dr).asString();
+        if (fheat) heat = parser.root()->eval(&parser.rt, fheat, Result(0), 0, const_cast<RideItem*>(parent->context->currentRideItem()), NULL, NULL, spec, dr).asNumeric();
 
         postProcess();
     }
@@ -3514,6 +3528,8 @@ OverviewItemConfig::OverviewItemConfig(ChartSpaceItem *item) : QWidget(NULL), it
         legacySelector->addItem("Zones", DATA_TABLE_ZONES);
         if (item->parent->scope & OverviewScope::ANALYSIS) {
             legacySelector->addItem("Intervals", DATA_TABLE_INTERVALS);
+        } else {
+            legacySelector->addItem("Activities", DATA_TABLE_TRENDS);
         }
 
         layout->addRow(tr("Legacy"), legacySelector);
@@ -3704,7 +3720,8 @@ OverviewItemConfig::OverviewItemConfig(ChartSpaceItem *item) : QWidget(NULL), it
 void
 OverviewItemConfig::setProgram(int index)
 {
-    if (index > 0) {
+    if (index >= 0) {
+        index = legacySelector->itemData(index).toInt();
         // for metric lookup
         DataFilter df(item->parent, item->parent->context);
         editor->setText(DataOverviewItem::getLegacyProgram(index, df.rt, item->parent->scope == OverviewScope::TRENDS));
