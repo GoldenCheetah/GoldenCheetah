@@ -239,7 +239,7 @@ QString jsonunprotect(const QString &string)
     return s;
 }
 
-// json protection with special handling for " and \
+// json protection with special handling for quote (") and backslash (\)
 // used when embedding in xml
 QString jsonprotect2(const QString &string)
 {
@@ -583,6 +583,26 @@ number(QString x)
         } else if (innumber) break;
     }
     return extract.toDouble();
+}
+
+// calculate a heat value - pretty simple stuff
+double
+heat(double min, double max, double value)
+{
+    if (min == max) return 0;
+    if (value < min) return 0;
+    if (value > max) return 1;
+    return((value-min) / (max-min));
+}
+
+// return a heatmap color for value 0=cold 1=hot
+QColor
+heatcolor(double value)
+{
+    QColor returning;
+    returning.setHslF(1-value, 1, 0.5f);
+
+    return returning;
 }
 
 // used std::sort, std::lower_bound et al

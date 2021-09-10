@@ -417,6 +417,27 @@ QString DataOverviewItem::getLegacyProgram(int type, DataFilterRuntime &rt, bool
                 program += "intervalstrings(" + metric + ")";
             }
 
+            program += ");\n}\n\n";
+
+            program +=
+            "# heatmap values are from 0-1 so we use the\n"
+            "# heat() function to calculate it for the metrics\n"
+            "# in question. When we use heat(0,0,metric) we\n"
+            "# will always get no heat, you can edit the min\n"
+            "# max values to set the range to set the heat color\n"
+            "h { \n"
+            "    c(";
+
+            first=true;
+            foreach(QString metric, list) {
+
+                // commas
+                if (first) first = false;
+                else program += ",\n      ";
+
+                program += "heat(0, 0, intervals(" + metric + "))";
+            }
+
             program += ");\n}\n\n}\n";
     }
     break;
@@ -956,6 +977,7 @@ DataOverviewItem::setData(RideItem *item)
     units.clear();
     values.clear();
     files.clear();
+    heat.clear();
 
     if (item == NULL || item->ride() == NULL) return;
 
@@ -973,12 +995,14 @@ DataOverviewItem::setData(RideItem *item)
         funits = parser.rt.functions.contains("units") ? parser.rt.functions.value("units") : NULL;
         fvalues = parser.rt.functions.contains("values") ? parser.rt.functions.value("values") : NULL;
         ffiles = parser.rt.functions.contains("f") ? parser.rt.functions.value("f") : NULL;
+        fheat = parser.rt.functions.contains("h") ? parser.rt.functions.value("h") : NULL;
 
         // fetch the data
         if (fnames) names = parser.root()->eval(&parser.rt, fnames, Result(0), 0, const_cast<RideItem*>(item), NULL, NULL, spec, dr).asString();
         if (funits) units = parser.root()->eval(&parser.rt, funits, Result(0), 0, const_cast<RideItem*>(item), NULL, NULL, spec, dr).asString();
         if (fvalues) values = parser.root()->eval(&parser.rt, fvalues, Result(0), 0, const_cast<RideItem*>(item), NULL, NULL, spec, dr).asString();
         if (ffiles) files = parser.root()->eval(&parser.rt, ffiles, Result(0), 0, const_cast<RideItem*>(item), NULL, NULL, spec, dr).asString();
+        if (fheat) heat = parser.root()->eval(&parser.rt, fheat, Result(0), 0, const_cast<RideItem*>(item), NULL, NULL, spec, dr).asNumeric();
 
         postProcess();
     }
@@ -1157,6 +1181,15 @@ DataOverviewItem::sort(int column, Qt::SortOrder order)
 
     // phew!
     values = ordered;
+
+    QVector<double> heatordered = heat;
+    for(int i=0; i<names.count(); i++) {
+        // resequence column i
+        for(int k=0; k<argsortindex.count() && (i*rows)+k < heatordered.count(); k++)
+            heatordered[(i*rows)+k] = heat[(i*rows)+argsortindex[k]];
+    }
+
+    heat = heatordered;
 
     // don't forget the filenames used in clickthru
     if (files.count()) {
@@ -2856,6 +2889,16 @@ DataOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *,
             int offset = rows * i;
             for (int j=startrow; j<rows && offset+j < values.count(); j++) {
                 QString value = values[offset+j];
+                double heatvalue = heat.count() > (offset+j) ? heat[offset+j] : 0;
+
+                // if no heat then no brush
+                if (heatvalue == 0) painter->setBrush(Qt::NoBrush);
+                else {
+                    // lets use the heat color, but with a little translucency
+                    QColor brushcolor = Utils::heatcolor(heatvalue);
+                    brushcolor.setAlpha(127);
+                    painter->fillRect(xoffset,yoffset-(lineheight*0.8), columnWidths[i]+(hspace/2), lineheight, QBrush(brushcolor));
+                }
 
                 // highlight rows when hovering and click thru not available
                 if (j == hoverrow && !scrollbar->isDragging()) {

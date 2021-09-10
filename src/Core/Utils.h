@@ -30,6 +30,7 @@
 #define PATHSEP ":"
 #endif
 class QString;
+class QColor;
 class QStringList;
 
 #define GC_SMOOTH_FORWARD 0
@@ -56,6 +57,10 @@ namespace Utils
     QVector<double> smooth_sma(QVector<double>&, int pos, int window, int sample=1);
     QVector<double> sample(QVector<double>&, int sample); // plain sampling nth sample
     QVector<double> smooth_ewma(QVector<double>&, double alpha);
+
+    // heatmaps
+    double heat(double min, double max, double value); // return value normalised between 0-1 for min/max
+    QColor heatcolor(double value);                    // return color hear for value between 0 and 1
 
     // used std::sort, std::lower_bound et al
     struct comparedouble { bool operator()(const double p1, const double p2) { return p1 < p2; } };

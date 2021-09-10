@@ -168,10 +168,11 @@ class DataOverviewItem : public ChartSpaceItem
 
         // settings
         QString program;
-        Leaf *fnames, *funits, *fvalues, *ffiles;
+        Leaf *fnames, *funits, *fvalues, *ffiles, *fheat;
 
         // the data
         QVector<QString> names, units, values, files;
+        QVector<double> heat;
 
         // display control
         bool multirow;
