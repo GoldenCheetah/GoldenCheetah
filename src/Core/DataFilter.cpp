@@ -4013,12 +4013,12 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
             double count= eval(df, leaf->fparms[1],x, it, m, p, c, s, d).number();
 
             if (count <= 0) return returning;
-
             while (count >0) {
                 if (value.isNumber) {
                     returning.asNumeric().append(value.number());
                     returning.number() += value.number();
                 } else {
+                    returning.isNumber = false;
                     returning.asString().append(value.string());
                 }
                 count--;
@@ -7230,37 +7230,55 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
                     if (df->symbols.contains(symbol)) {
                         Result sym = df->symbols.value(symbol);
 
+                        // assigning number to strings, need to coerce rhs to string
+                        if (rhs.isNumber && !sym.isNumber) {
+                            rhs.string();
+                            rhs.isNumber = false;
+                        }
+
+                        // assigning a string to a numeric vector - need to convert sym to strings
+                        if (sym.isNumber && !rhs.isNumber) {
+                            sym.asString(); // will coerce
+                            sym.isNumber = false;
+                        }
+
                         // is it a single value e.g. a[10] or a range e.g. a[x>2]
                         QVector<double> selected;
                         if (indexes.asNumeric().count()) selected=indexes.asNumeric();
                         else selected << indexes.number();
 
+                        int rindex=0;
                         for(int i=0; i< selected.count(); i++) {
 
                             int index=static_cast<int>(selected[i]);
 
+                            // get the next value to apply - needs to work with vectors
+                            // and vectors will be repeated if they are too short
+                            double number;
+                            QString string;
+                            if (rhs.isVector()) {
+                                if (rhs.isNumber) {
+                                    if (rindex > rhs.asNumeric().count()) rindex=0;
+                                    number = rhs.asNumeric()[rindex++];
+                                } else {
+                                    if (rindex > rhs.asString().count()) rindex=0;
+                                    string = rhs.asString()[rindex++];
+                                }
+                            } else {
+                                if (rhs.isNumber) number = rhs.number();
+                                else string = rhs.string();
+                            }
+
                             // working with numbers on both sides
                             if (rhs.isNumber && sym.isNumber) {
                                 if (sym.asNumeric().count() <= index) { sym.asNumeric().resize(index+1); }
-                                sym.asNumeric()[index] = rhs.number();
-                            }
-
-                            // assigning number to strings, need to coerce rhs to string
-                            if (rhs.isNumber && !sym.isNumber) {
-                                rhs.string();
-                                rhs.isNumber = false;
-                            }
-
-                            // assigning a string to a numeric vector - need to convert sym to strings
-                            if (sym.isNumber && !rhs.isNumber) {
-                                sym.asString(); // will coerce
-                                sym.isNumber = false;
+                                sym.asNumeric()[index] = number;
                             }
 
                             // working with strings on both sides
                             if (!sym.isNumber && !rhs.isNumber) {
                                 if (sym.asString().count() <= index) { sym.asString().resize(index+1); }
-                                sym.asString()[index] = rhs.string();
+                                sym.asString()[index] = string;
                             }
                         }
 

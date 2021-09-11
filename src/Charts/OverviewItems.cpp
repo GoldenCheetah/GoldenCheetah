@@ -2826,7 +2826,7 @@ DataOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *,
 
         } else if (!scrollbar->isDragging() && itemarea.contains(cpos)) {
 
-            if (files.count() && row+startrow < files.count()) {
+            if (files.count() && row+startrow < files.count() && files[row+startrow] != "") {
                 painter->setPen(Qt::NoPen);
                 QColor darkgray(120,120,120,120);
                 painter->setBrush(darkgray);
