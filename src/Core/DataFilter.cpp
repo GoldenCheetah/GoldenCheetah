@@ -368,9 +368,9 @@ static struct {
     { "aggmetrics", 0 },        // aggregate metrics before returning a single value, see metrics above
     { "aggmetricstrings", 0 },  // aggregate metrics and return as a string value, see metricstringsabove
     { "asaggstring", 0 },       // asaggstring(metric1, metricn) - aggregates for metrics listed
-    { "heat", 3 },      // heat(vector, min, max) - calculate a heat index (0-1) for the vector or value
-                        // based upon the min and max values. anything below min will be mapped to 0 and anything
-                        // above max will be mapped to 1
+    { "normalize", 3 },      // normalize(vector, min, max) - unity based normalize to values between 0 and 1 for the vector or value
+                             // based upon the min and max values. anything below min will be mapped to 0 and anything
+                             // above max will be mapped to 1
 
 
     // add new ones above this line
@@ -614,7 +614,7 @@ DataFilter::builtins(Context *context)
         } else if (i  == 127) {
 
             // heat
-           returning << "heat(min, max, v)";
+           returning << "normalize(min, max, v)";
 
         } else {
 
@@ -4423,10 +4423,10 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
             return returning;
         }
 
-        // generate a heatmap value between 0 and 1 to
+        // normalize values to between 0 and 1
         // use when generating a heatmap in a data overview table
         // but potentially for other things in the future
-        if (leaf->function == "heat") {
+        if (leaf->function == "normalize") {
 
             Result min =  eval(df, leaf->fparms[0],x, it, m, p, c, s, d);
             Result max =  eval(df, leaf->fparms[1],x, it, m, p, c, s, d);

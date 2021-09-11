@@ -222,14 +222,15 @@ QString DataOverviewItem::getLegacyProgram(int type, DataFilterRuntime &rt, bool
             "} \n"
             "\n"
             "# heat values for coloring the cell\n"
-            "h { \n"
-            "    c(heat(0,0,metrics(date)),\n"
-            "      heat(0,0,metrics(Duration)),\n"
-            "      heat(0,0,metrics(Time_Moving)),\n"
-            "      heat(0,0,metrics(Distance)),\n"
-            "      heat(0,0,metrics(Work)),\n"
-            "      heat(0,0,metrics(W'_Work)),\n"
-            "      heat(0,300,metrics(30_min_Peak_Power))); \n"
+            "# must be between 0 and 1 where the\n"
+            "heat { \n"
+            "    c(normalize(0,0,metrics(date)),\n"
+            "      normalize(0,0,metrics(Duration)),\n"
+            "      normalize(0,0,metrics(Time_Moving)),\n"
+            "      normalize(0,0,metrics(Distance)),\n"
+            "      normalize(0,0,metrics(Work)),\n"
+            "      normalize(0,0,metrics(W'_Work)),\n"
+            "      normalize(0,300,metrics(30_min_Peak_Power))); \n"
             "} \n"
             "\n"
             "# Click thru for the row, we can set the file\n"
@@ -432,11 +433,11 @@ QString DataOverviewItem::getLegacyProgram(int type, DataFilterRuntime &rt, bool
 
             program +=
             "# heatmap values are from 0-1 so we use the\n"
-            "# heat() function to calculate it for the metrics\n"
-            "# in question. When we use heat(0,0,metric) we\n"
+            "# normalize() function to calculate it for the metrics\n"
+            "# in question. When we use normalize(0,0,metric) we\n"
             "# will always get no heat, you can edit the min\n"
             "# max values to set the range to set the heat color\n"
-            "h { \n"
+            "heat { \n"
             "    c(";
 
             first=true;
@@ -446,7 +447,7 @@ QString DataOverviewItem::getLegacyProgram(int type, DataFilterRuntime &rt, bool
                 if (first) first = false;
                 else program += ",\n      ";
 
-                program += "heat(0, 0, intervals(" + metric + "))";
+                program += "normalize(0, 0, intervals(" + metric + "))";
             }
 
             program += ");\n}\n\n}\n";
@@ -1006,7 +1007,7 @@ DataOverviewItem::setData(RideItem *item)
         funits = parser.rt.functions.contains("units") ? parser.rt.functions.value("units") : NULL;
         fvalues = parser.rt.functions.contains("values") ? parser.rt.functions.value("values") : NULL;
         ffiles = parser.rt.functions.contains("f") ? parser.rt.functions.value("f") : NULL;
-        fheat = parser.rt.functions.contains("h") ? parser.rt.functions.value("h") : NULL;
+        fheat = parser.rt.functions.contains("heat") ? parser.rt.functions.value("heat") : NULL;
 
         // fetch the data
         if (fnames) names = parser.root()->eval(&parser.rt, fnames, Result(0), 0, const_cast<RideItem*>(item), NULL, NULL, spec, dr).asString();
@@ -1242,7 +1243,7 @@ DataOverviewItem::setDateRange(DateRange dr)
         funits = parser.rt.functions.contains("units") ? parser.rt.functions.value("units") : NULL;
         fvalues = parser.rt.functions.contains("values") ? parser.rt.functions.value("values") : NULL;
         ffiles = parser.rt.functions.contains("f") ? parser.rt.functions.value("f") : NULL;
-        fheat = parser.rt.functions.contains("h") ? parser.rt.functions.value("h") : NULL;
+        fheat = parser.rt.functions.contains("heat") ? parser.rt.functions.value("heat") : NULL;
 
         // fetch the data
         if (fnames) names = parser.root()->eval(&parser.rt, fnames, Result(0), 0, const_cast<RideItem*>(parent->context->currentRideItem()), NULL, NULL, spec, dr).asString();
