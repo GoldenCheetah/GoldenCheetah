@@ -30,6 +30,7 @@
 #include <QBarSet>
 #include <QBarSeries>
 #include <QLineSeries>
+#include <QCursor>
 
 // subwidgets for viz inside each overview item
 class RPErating;
@@ -146,6 +147,8 @@ class DataOverviewItem : public ChartSpaceItem
         ~DataOverviewItem();
 
         bool sceneEvent(QEvent *event); // click thru
+        void wheelEvent(QGraphicsSceneWheelEvent *event);
+
         void itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *);
         QRectF hotspot();
         void itemGeometryChanged();
@@ -182,6 +185,9 @@ class DataOverviewItem : public ChartSpaceItem
         bool click; // for clickthru
         RideItem *clickthru;
         int sortcolumn; // for sorting a column
+
+        // watching cursor moves when scrolling
+        QPoint globalpos;
 
         int lastsort; // the column we last sorted on
         Qt::SortOrder lastorder; // the order we last sorted on
@@ -694,6 +700,7 @@ class VScrollBar : public QGraphicsItem
         //       since its a vertical scrollbar its the y position
         //       it can be set by parent when e.g. catch key events
         void setPos(double x);
+        void movePos(int x);
         double pos() const;
 
         bool isDragging() { return state == DRAG; }
@@ -711,6 +718,8 @@ class VScrollBar : public QGraphicsItem
 
         // spotting mouse events hover, click move and wheel (but only in small area of scrollbar)
         bool sceneEvent(QEvent *event) override;
+
+        bool canscroll; // can we do scrolling?
 
     private:
 

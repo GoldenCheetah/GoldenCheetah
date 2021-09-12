@@ -827,9 +827,21 @@ ChartSpace::eventFilter(QObject *, QEvent *event)
 
         // take it as applied
         QGraphicsSceneWheelEvent *w = static_cast<QGraphicsSceneWheelEvent*>(event);
-        scrollTo(_viewY - (w->delta()*gl_wheelscale));
-        event->accept();
-        returning = true;
+
+        // give child a chance to process this
+        QPointF pos = static_cast<QGraphicsSceneMouseEvent*>(event)->scenePos();
+        QGraphicsItem *gritem = scene->itemAt(pos, view->transform());
+        ChartSpaceItem *item = static_cast<ChartSpaceItem*>(gritem);
+
+        // give item a chance to process before we snag it
+        if (item) item->wheelEvent(w);
+
+        // we still get to process it if they didn't accept it
+        if (!w->isAccepted()) {
+            scrollTo(_viewY - (w->delta()*gl_wheelscale));
+            event->accept();
+            returning = true;
+        }
 
     } else  if (event->type() == QEvent::GraphicsSceneMousePress) {
 

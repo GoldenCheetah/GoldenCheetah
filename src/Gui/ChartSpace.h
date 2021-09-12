@@ -57,6 +57,8 @@ class ChartSpaceItem : public QGraphicsWidget
 {
     Q_OBJECT
 
+    friend class ::ChartSpace;
+
     public:
 
         // When subclassing you must reimplement these

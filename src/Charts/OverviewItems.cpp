@@ -2651,6 +2651,17 @@ KPIOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, 
     }
 }
 
+void
+DataOverviewItem::wheelEvent(QGraphicsSceneWheelEvent *w)
+{
+    if (globalpos != QCursor::pos() && scrollbar->canscroll) {
+        scrollbar->movePos(w->delta());
+        w->accept();
+    }
+
+    return;
+}
+
 bool
 DataOverviewItem::sceneEvent(QEvent *event)
 {
@@ -2707,7 +2718,10 @@ DataOverviewItem::sceneEvent(QEvent *event)
 
     } else if (event->type() == QEvent::GraphicsSceneHoverEnter) {
 
+        // lets remember to cursor global position
+        globalpos = QCursor::pos();
         update();
+
     }
     return false;
 }
@@ -5215,12 +5229,30 @@ VScrollBar::setPos(double x)
     // xxx todo
 }
 
+void
+VScrollBar::movePos(int x)
+{
+    // just normalise to plus or minus but not natural scrolling
+    // which is how the chart space works too
+    x = x < 0 ? +1 : -1;
+
+    // move at least .8 of a page down
+    double barheight = geom.height() * (geom.height() / height);
+    barpos += barheight * 0.8 * x;
+    if (barpos < 0) barpos = 0;
+    if (barpos + barheight > geom.height()) barpos = geom.height() - barheight;
+
+    parent->update();
+    update();
+}
+
 // the usual
 void
 VScrollBar::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
 {
     if (isVisible() && geom.height() && geom.height() < height) {
 
+        canscroll=true;
         double barheight = geom.height() * (geom.height() / height);
         QColor barcolor(127,127,127,64);
         if (state == DRAG) {
@@ -5233,6 +5265,8 @@ VScrollBar::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
         painter->setBrush(barcolor);
         painter->setPen(Qt::NoPen);
         painter->drawRoundedRect(QRectF(geom.x(), geom.y()+barpos, geom.width(), barheight), geom.width()/2, geom.width()/2);
+    } else {
+        canscroll=false;
     }
 }
 
