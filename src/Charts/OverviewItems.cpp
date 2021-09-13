@@ -1082,8 +1082,8 @@ DataOverviewItem::postProcess()
         int rows = values.count() / names.count();
         for(int i=0; i<names.count(); i++) {
 
-            double maxwidth = fm.boundingRect(names[i]).width(); // heading row
-            double width = fm.boundingRect(units[i]).width();    // units row
+            double maxwidth = names.count() > i ? fm.boundingRect(names[i]).width() : 0; // heading row
+            double width = units.count() > i ? fm.boundingRect(units[i]).width() : 0;    // units row
             if (width > maxwidth) maxwidth = width;
 
             // now see if there are any values that are wider
@@ -2896,7 +2896,7 @@ DataOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *,
         // units row
         xoffset = hmargin;
         for(int i=0; i<names.count(); i++) {
-            painter->drawText(xoffset, yoffset, units[i]); // todo: centering
+            if (units.count() > i) painter->drawText(xoffset, yoffset, units[i]); // todo: centering
             xoffset += columnWidths[i] + hspace;
         }
 

@@ -2002,7 +2002,7 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
                     } else {
 
                         // check they are all valid metrics
-                        QRegExp symbols("^(name|start|stop|type|test|color|route|selected|date|filename)$");
+                        QRegExp symbols("^(name|start|stop|type|test|color|route|selected|date|time|filename)$");
                         for(int i=0; i<leaf->fparms.count(); i++) {
                             if (leaf->fparms[i]->type != Leaf::Symbol) {
                                 leaf->inerror = true;
@@ -2027,9 +2027,9 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
                     } else if (leaf->fparms.count() >= 1) {
 
                         QString symbol=*(leaf->fparms[0]->lvalue.n);
-                        if (symbol != "date" && df->lookupMap.value(symbol,"") == "") {
+                        if (symbol != "date" && symbol != "time" && df->lookupMap.value(symbol,"") == "") {
                             leaf->inerror = true;
-                            DataFiltererrors << QString(tr("invalid symbol '%1', should be either a metric name or 'date'").arg(symbol));
+                            DataFiltererrors << QString(tr("invalid symbol '%1', should be either a metric name or 'time' or 'date'").arg(symbol));
                         }
                     } else if (leaf->fparms.count() >= 2) {
 
@@ -3512,7 +3512,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
 
             QVector<QString> list;
 
-            QRegExp symbols("^(name|start|stop|type|test|color|route|selected|date|filename)$");
+            QRegExp symbols("^(name|start|stop|type|test|color|route|selected|date|time|filename)$");
             for(int i=0; i<leaf->fparms.count(); i++) {
 
                 // symbol dereference
@@ -3522,6 +3522,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
                 const RideMetric *e = factory.rideMetric(o_symbol);
 
                 if (wantname  && symbol == "date") list << tr("Date");
+                else if (wantname  && symbol == "time") list << tr("Time");
                 else if (wantname  && symbol == "name") list << tr("Name");
                 else if (wantname  && symbol == "start") list << tr("Start");
                 else if (wantname  && symbol == "stop") list << tr("Stop");
@@ -4487,8 +4488,10 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
             bool wantstrings = (leaf->function.endsWith("strings"));
             QDate earliest(1900,01,01);
             bool wantdate=false;
+            bool wanttime=false;
             QString symbol = *(leaf->fparms[0]->lvalue.n);
             if (symbol == "date") wantdate=true;
+            if (symbol == "time") wanttime=true;
 
             // find the metric
             QString o_symbol = df->lookupMap.value(symbol,"");
@@ -4560,6 +4563,9 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
                 if(wantdate) {
                     value= QDate(1900,01,01).daysTo(ride->dateTime.date());
                     if (wantstrings) asstring = ride->dateTime.date().toString("dd MMM yyyy");
+                } else if (wanttime) {
+                    value= QTime(0,0,0).secsTo(ride->dateTime.time());
+                    if (wantstrings) asstring = ride->dateTime.toString("hh:mm:ss");
                 } else {
                     value =  ride->getForSymbol(df->lookupMap.value(symbol,""), GlobalContext::context()->useMetricUnits);
                     if (wantstrings) e ? asstring = e->toString(value) : "(null)";
