@@ -2056,11 +2056,11 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
 
                     } else if (leaf->fparms.count() >= 1) {
 
-                        QRegExp symbols("^(name|start|stop|type|test|color|route|selected|date|filename)$");
+                        QRegExp symbols("^(name|start|stop|type|test|color|route|selected|date|time|filename)$");
                         QString symbol=*(leaf->fparms[0]->lvalue.n);
                         if (!symbols.exactMatch(symbol) && df->lookupMap.value(symbol,"") == "") {
                             leaf->inerror = true;
-                            DataFiltererrors << QString(tr("invalid symbol '%1', should be either a metric name or 'name|start|stop|type|test|color|route|selected|date|filename''").arg(symbol));
+                            DataFiltererrors << QString(tr("invalid symbol '%1', should be either a metric name or 'name|start|stop|type|test|color|route|selected|date|time|filename''").arg(symbol));
 
                         }
                     } else if (leaf->fparms.count() >= 2) {
@@ -4692,6 +4692,9 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
                     if(symbol == "date") {
                         value= QDate(1900,01,01).daysTo(ride->dateTime.date());
                         if (wantstrings) asstring = ride->dateTime.date().toString("dd MMM yyyy");
+		    } else if(symbol == "time") {
+                        value= QTime(0,0,0).secsTo(ride->dateTime.time().addSecs(ii->start));
+                        if (wantstrings) asstring = time_to_string(value);
                     } else if(symbol == "filename") {
                         asstring = ride->fileName;
                     } else if(symbol == "name") {
