@@ -600,7 +600,7 @@ QColor
 heatcolor(double value)
 {
     QColor returning;
-    returning.setHslF(1-value, 1, 0.5f);
+    returning.setHslF((1-value)/2, 1, 0.5f); // hue goes red-yellow-green-cyan then blue-magenta-purple-red - we want the first half
 
     return returning;
 }
