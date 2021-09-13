@@ -5704,6 +5704,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
                         if (v2.asNumeric()[i2] == find) {
                             returning.number() += i2;
                             returning.asNumeric() << i2;
+                            break;
                         }
                     }
                 }
@@ -5713,6 +5714,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
                     for(int i2=0; i2<v2.asString().count(); i2++) {
                         if (v2.asString()[i2] == find) {
                             returning.asNumeric() << i2;
+                            break;
                         }
                     }
                 }
