@@ -4692,9 +4692,9 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
                     if(symbol == "date") {
                         value= QDate(1900,01,01).daysTo(ride->dateTime.date());
                         if (wantstrings) asstring = ride->dateTime.date().toString("dd MMM yyyy");
-		    } else if(symbol == "time") {
+                    } else if(symbol == "time") {
                         value= QTime(0,0,0).secsTo(ride->dateTime.time().addSecs(ii->start));
-                        if (wantstrings) asstring = time_to_string(value);
+                        if (wantstrings) asstring = ride->dateTime.time().addSecs(ii->start).toString("hh:mm:ss");
                     } else if(symbol == "filename") {
                         asstring = ride->fileName;
                     } else if(symbol == "name") {
