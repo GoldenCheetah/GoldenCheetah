@@ -141,6 +141,9 @@ class DataOverviewItem : public ChartSpaceItem
 {
     Q_OBJECT
 
+    public slots:
+        void intervalHover(IntervalItem *); // watching intervals being hovered
+
     public:
 
         DataOverviewItem(ChartSpace *parent, QString name, QString program);
@@ -171,10 +174,10 @@ class DataOverviewItem : public ChartSpaceItem
 
         // settings
         QString program;
-        Leaf *fnames, *funits, *fvalues, *ffiles, *fheat;
+        Leaf *fnames, *funits, *fvalues, *ffiles, *fintervals, *fheat;
 
         // the data
-        QVector<QString> names, units, values, files;
+        QVector<QString> names, units, values, files, intervals;
         QVector<double> heat;
 
         // display control
@@ -184,6 +187,9 @@ class DataOverviewItem : public ChartSpaceItem
 
         bool click; // for clickthru
         RideItem *clickthru;
+        QString hovered;       // we got told it was hovered
+        QString hoverinterval; // last interval we hovered on in paint
+        QString hoversignal;   // last interval we signalled for hover
         int sortcolumn; // for sorting a column
 
         // watching cursor moves when scrolling
@@ -193,6 +199,7 @@ class DataOverviewItem : public ChartSpaceItem
         Qt::SortOrder lastorder; // the order we last sorted on
 
         VScrollBar *scrollbar;
+
 };
 
 class RPEOverviewItem : public ChartSpaceItem
@@ -501,6 +508,7 @@ class IntervalOverviewItem : public ChartSpaceItem
         void itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *);
         void itemGeometryChanged();
         void setData(RideItem *item);
+        void setData(RideItem *item, bool animate);
         void setDateRange(DateRange);
 
         QWidget *config() { return configwidget; }
@@ -513,7 +521,15 @@ class IntervalOverviewItem : public ChartSpaceItem
         int xdp, ydp;
         BubbleViz *bubble;
 
+        bool block; // block when signals occur too quickly
+        RideItem *item;  // remember what we are showing
+        IntervalItem *hover; // currently being hovered
+
         OverviewItemConfig *configwidget;
+
+    public slots:
+        void intervalSelectRefresh();
+        void intervalHover(IntervalItem *);
 };
 
 
@@ -557,6 +573,9 @@ class BubbleViz : public QObject, public QGraphicsItem
         void setGeometry(double x, double y, double width, double height);
         QRectF geometry() { return geom; }
 
+        // set hover signal for intervals
+        void setIntervalHoverSignal(bool x) { intervalsignal=x; }
+
         // transition animation 0-255
         int getTransition() const {return transition;}
         void setTransition(int x) { if (transition !=x) {transition=x; update();}}
@@ -568,7 +587,7 @@ class BubbleViz : public QObject, public QGraphicsItem
         void setXAxis(QPointF x) { minx=x.x(); maxx=x.y(); update(); }
 
         // null members for now just get hooked up
-        void setPoints(QList<BPointF>points, double minx, double maxx, double miny, double maxy);
+        void setPoints(QList<BPointF>points, double minx, double maxx, double miny, double maxy, bool animate=true);
 
         void setAxisNames(QString xlabel, QString ylabel) { this->xlabel=xlabel; this->ylabel=ylabel; update(); }
 
@@ -593,6 +612,10 @@ class BubbleViz : public QObject, public QGraphicsItem
         bool click;
         RideItem *clickthru;
         QPointF plotpos;
+
+        // we should signal interval hovers?
+        bool intervalsignal;
+        QString intervalhover, lastintervalsignal;
 
         // for animated transition
         QList <BPointF> oldpoints; // for animation

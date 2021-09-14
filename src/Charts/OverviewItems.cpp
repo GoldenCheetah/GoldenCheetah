@@ -149,6 +149,16 @@ DataOverviewItem::DataOverviewItem(ChartSpace *parent, QString name, QString pro
     configwidget->hide();
 
     scrollbar = new VScrollBar(this, parent);
+
+    // refresh when interval events happen (only on analysis view)
+    if (parent->scope == OverviewScope::ANALYSIS) {
+        //connect(parent->context, SIGNAL(intervalSelected()), this, SLOT(intervalSelectRefresh()));
+        //connect(parent->context, SIGNAL(intervalsChanged()), this, SLOT(intervalSelectRefresh()));
+        //connect(parent->context, SIGNAL(intervalsUpdate(RideItem*)), this, SLOT(intervalSelectRefresh()));
+        connect(parent->context, SIGNAL(intervalHover(IntervalItem*)), this, SLOT(intervalHover(IntervalItem*)));
+        //connect(parent->context, SIGNAL(intervalZoom(IntervalItem*)), this, SLOT(intervalSelectRefresh()));
+        //connect(parent->context, SIGNAL(intervalItemSelectionChanged(IntervalItem*)), this, SLOT(intervalSelectRefresh()));
+    }
 }
 
 DataOverviewItem::~DataOverviewItem()
@@ -430,6 +440,14 @@ QString DataOverviewItem::getLegacyProgram(int type, DataFilterRuntime &rt, bool
             }
 
             program += ");\n}\n\n";
+
+            program +=
+            "# interval names indicate which interval\n"
+            "# the row represents so we can select\n"
+            "# and hover over them\n"
+            "i {\n"
+            "    intervalstrings(name);\n"
+            "}\n\n";
 
             program +=
             "# heatmap values are from 0-1 so we use the\n"
@@ -920,12 +938,25 @@ IntervalOverviewItem::IntervalOverviewItem(ChartSpace *parent, QString name, QSt
     this->xsymbol = xsymbol;
     this->ysymbol = ysymbol;
     this->zsymbol = zsymbol;
+    this->item = NULL;
+    block=false;
 
     // we may plot the metric sparkline if the tile is big enough
     bubble = new BubbleViz(this, "intervals");
+    bubble->setIntervalHoverSignal(true);
 
     configwidget = new OverviewItemConfig(this);
     configwidget->hide();
+
+    // refresh when interval events happen (only on analysis view)
+    if (parent->scope == OverviewScope::ANALYSIS) {
+        connect(parent->context, SIGNAL(intervalSelected()), this, SLOT(intervalSelectRefresh()));
+        //connect(parent->context, SIGNAL(intervalsChanged()), this, SLOT(intervalSelectRefresh()));
+        connect(parent->context, SIGNAL(intervalsUpdate(RideItem*)), this, SLOT(intervalSelectRefresh()));
+        connect(parent->context, SIGNAL(intervalHover(IntervalItem*)), this, SLOT(intervalHover(IntervalItem*)));
+        //connect(parent->context, SIGNAL(intervalZoom(IntervalItem*)), this, SLOT(intervalSelectRefresh()));
+        //connect(parent->context, SIGNAL(intervalItemSelectionChanged(IntervalItem*)), this, SLOT(intervalSelectRefresh()));
+    }
 }
 
 IntervalOverviewItem::~IntervalOverviewItem()
@@ -984,11 +1015,15 @@ KPIOverviewItem::setDateRange(DateRange dr)
 void
 DataOverviewItem::setData(RideItem *item)
 {
+    // reset interval hovering
+    hovered = hoverinterval = hoversignal = "";
+
     // remove old values
     names.clear();
     units.clear();
     values.clear();
     files.clear();
+    intervals.clear();
     heat.clear();
 
     if (item == NULL || item->ride() == NULL) return;
@@ -1007,6 +1042,7 @@ DataOverviewItem::setData(RideItem *item)
         funits = parser.rt.functions.contains("units") ? parser.rt.functions.value("units") : NULL;
         fvalues = parser.rt.functions.contains("values") ? parser.rt.functions.value("values") : NULL;
         ffiles = parser.rt.functions.contains("f") ? parser.rt.functions.value("f") : NULL;
+        fintervals = parser.rt.functions.contains("i") ? parser.rt.functions.value("i") : NULL;
         fheat = parser.rt.functions.contains("heat") ? parser.rt.functions.value("heat") : NULL;
 
         // fetch the data
@@ -1014,10 +1050,25 @@ DataOverviewItem::setData(RideItem *item)
         if (funits) units = parser.root()->eval(&parser.rt, funits, Result(0), 0, const_cast<RideItem*>(item), NULL, NULL, spec, dr).asString();
         if (fvalues) values = parser.root()->eval(&parser.rt, fvalues, Result(0), 0, const_cast<RideItem*>(item), NULL, NULL, spec, dr).asString();
         if (ffiles) files = parser.root()->eval(&parser.rt, ffiles, Result(0), 0, const_cast<RideItem*>(item), NULL, NULL, spec, dr).asString();
+        if (fintervals) intervals = parser.root()->eval(&parser.rt, fintervals, Result(0), 0, const_cast<RideItem*>(item), NULL, NULL, spec, dr).asString();
         if (fheat) heat = parser.root()->eval(&parser.rt, fheat, Result(0), 0, const_cast<RideItem*>(item), NULL, NULL, spec, dr).asNumeric();
 
         postProcess();
     }
+}
+
+void
+IntervalOverviewItem::intervalHover(IntervalItem *hover)
+{
+    this->hover = hover;
+    intervalSelectRefresh();
+}
+
+void
+IntervalOverviewItem::intervalSelectRefresh()
+{
+    // reset but don't animate
+    if (item) setData(item, false);
 }
 
 void
@@ -1214,8 +1265,28 @@ DataOverviewItem::sort(int column, Qt::SortOrder order)
         files = newfiles;
     }
 
+    // don't forget the intervals used in hover
+    if (intervals.count()) {
+        QVector<QString> newintervals = intervals;
+
+        // resequence
+        for(int k=0; k<argsortindex.count() && k < newintervals.count(); k++)
+            newintervals[k] = intervals[argsortindex[k]];
+
+        intervals = newintervals;
+    }
+
     lastsort = column;
     lastorder = order;
+}
+
+void
+DataOverviewItem::intervalHover(IntervalItem *item)
+{
+    if (item) hovered = item->name;
+    else hovered = "";
+
+    if (intervals.count()) update();
 }
 
 void
@@ -2329,13 +2400,25 @@ IntervalOverviewItem::setDateRange(DateRange dr)
     maxy=ceil(maxy); miny=floor(miny);
 
     // set range before points to filter
-    bubble->setPoints(points, minx,maxx,miny,maxy);
+    bubble->setPoints(points, minx,maxx,miny,maxy, true);
 }
 
 void
 IntervalOverviewItem::setData(RideItem *item)
 {
+    this->item = item;
+
     if (item == NULL || item->ride() == NULL) return;
+
+    setData(item, true);
+}
+
+void
+IntervalOverviewItem::setData(RideItem *item, bool animate)
+{
+
+    if (block) return;
+    block = true;
 
     RideMetricFactory &factory = RideMetricFactory::instance();
     const RideMetric *xm = factory.rideMetric(xsymbol);
@@ -2362,7 +2445,9 @@ IntervalOverviewItem::setData(RideItem *item)
         add.x = x;
         add.y = y;
         add.z = z;
-        add.fill = interval->color;
+
+        if (interval == this->hover || interval->selected) add.fill = GColor(CPLOTMARKER);
+        else add.fill = interval->color;
         add.label = interval->name;
         points << add;
 
@@ -2374,15 +2459,21 @@ IntervalOverviewItem::setData(RideItem *item)
 
 
     // set scale
+#if 0 // not clear why this is here or what it is supposed to do
+      // but it results in items being filtered out.
     double ydiff = (maxy-miny) / 10.0f;
     if (miny >= 0 && ydiff > miny) miny = ydiff;
     double xdiff = (maxx-minx) / 10.0f;
     if (minx >= 0 && xdiff > minx) minx = xdiff;
+#endif
     maxx=round(maxx); minx=round(minx);
     maxy=round(maxy); miny=round(miny);
 
     // set range before points to filter
-    bubble->setPoints(points, minx,maxx,miny,maxy);
+    bubble->setPoints(points, minx,maxx,miny,maxy, animate);
+
+    // avoid reentrancy
+    block=false;
 }
 
 
@@ -2667,10 +2758,22 @@ DataOverviewItem::sceneEvent(QEvent *event)
 {
     click = false;
 
+    // do we need to signal hover?
+    if (parent->context->currentRideItem() && hoverinterval != "" && hoverinterval != hoversignal) {
+        hoversignal = hoverinterval;
+        foreach(IntervalItem *it, const_cast<RideItem*>(parent->context->currentRideItem())->intervals()) {
+            if (it->name == hoverinterval) {
+                parent->context->notifyIntervalHover(it);
+                break;
+            }
+        }
+    }
+
     if (event->type() == QEvent::GraphicsSceneHoverMove) {
 
         // mouse moved so hover paint anyway
         update();
+
 
     }  else if (event->type() == QEvent::GraphicsSceneHoverLeave) {
 
@@ -2854,6 +2957,12 @@ DataOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *,
                 // clicktru is not available bit lets at least make the
                 if (multirow) hoverrow = row+startrow;
             }
+
+            // if its an interval we should signal hovering
+            if (intervals.count() && hoverrow >=0 && hoverrow < intervals.count()) {
+                // signal hover!
+                hoverinterval = intervals[hoverrow];
+            }
         }
     }
 
@@ -2908,6 +3017,10 @@ DataOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *,
         // data values
         xoffset = hmargin;
 
+        // lets see if there is a hoverrow signalled from another widget
+        int hoveredrow=-1;
+        if (parent->scope == OverviewScope::ANALYSIS && hovered != "" && intervals.count())  hoveredrow = intervals.indexOf(hovered);
+
         int rows = values.count() / names.count();
         for(int i=0; i<names.count(); i++) {
 
@@ -2930,7 +3043,7 @@ DataOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *,
                 }
 
                 // highlight rows when hovering and click thru not available
-                if (j == hoverrow && !scrollbar->isDragging()) {
+                if ((j == hoverrow || j == hoveredrow) && !scrollbar->isDragging()) {
                     painter->setFont(bold);
                     painter->setPen(GColor(CPLOTMARKER));
                 } else {
@@ -4251,6 +4364,7 @@ BubbleViz::BubbleViz(IntervalOverviewItem *parent, QString name) : QGraphicsItem
     setAcceptHoverEvents(true);
 
     clickthru = NULL;
+    intervalsignal=false;
     group = new QSequentialAnimationGroup(this);
 
     QParallelAnimationGroup *par = new QParallelAnimationGroup(this);
@@ -4328,6 +4442,19 @@ BubbleViz::sceneEvent(QEvent *event)
             clickthru = NULL;
         }
     }
+
+    // hoversignal?
+    if (intervalsignal && intervalhover != "" && intervalhover != lastintervalsignal) {
+        lastintervalsignal = intervalhover;
+        // lets signal that hover todo
+        foreach(IntervalItem *it, const_cast<RideItem*>(parent->parent->context->currentRideItem())->intervals()) {
+            if (it->name == intervalhover) {
+                parent->parent->context->notifyIntervalHover(it);
+                break;
+            }
+        }
+    }
+
     return false;
 }
 
@@ -4342,7 +4469,7 @@ bool scoresBiggerThan(const BubbleVizTuple i1, const BubbleVizTuple i2)
     return i1.score > i2.score;
 }
 void
-BubbleViz::setPoints(QList<BPointF> p, double minx, double maxx, double miny, double maxy)
+BubbleViz::setPoints(QList<BPointF> p, double minx, double maxx, double miny, double maxy, bool animate)
 {
     // initial conditions?
     if (this->miny == -1 && this->maxy == -1 && this->minx == -1 && this->maxx == -1)  {
@@ -4420,11 +4547,16 @@ BubbleViz::setPoints(QList<BPointF> p, double minx, double maxx, double miny, do
 
     // stop any transition animation currently running
     group->stop();
-    transitionAnimation->setStartValue(0);
-    transitionAnimation->setEndValue(256);
-    transitionAnimation->setEasingCurve(QEasingCurve::OutQuad);
-    transitionAnimation->setDuration(400);
-    group->start();
+    if (animate) {
+        transitionAnimation->setStartValue(0);
+        transitionAnimation->setEndValue(256);
+        transitionAnimation->setEasingCurve(QEasingCurve::OutQuad);
+        transitionAnimation->setDuration(400);
+        group->start();
+    } else {
+        transition=256;
+        update();
+    }
 }
 
 static double pointDistance(QPointF a, QPointF b)
@@ -4584,8 +4716,7 @@ BubbleViz::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
 
             // resize if transitioning
             QPointF center(plotarea.left() + (xratio * point.x), plotarea.bottom() - (yratio * point.y));
-            int alpha = 200;
-            if (parent->parent->scope == OverviewScope::TRENDS) alpha /= 2;
+            int alpha = 100;
 
             double size = (point.z / mean) * area;
             if (size > area * 6) size=area*6;
@@ -4722,6 +4853,9 @@ BubbleViz::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
         painter->drawText(canvas.center().x()-(bminx.width()/2.0f),
                           canvas.top()+bminx.height()-10, nearest.label);
     }
+
+    // we hovering...
+    if (intervalsignal) intervalhover = nearest.label;
 
     if (click && nearvalue >= 0 && nearest.item != NULL) {
         clickthru = nearest.item;
