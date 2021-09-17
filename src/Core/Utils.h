@@ -46,6 +46,7 @@ namespace Utils
     QString jsonunprotect(const QString &buffer);
     QString jsonprotect2(const QString &buffer); // internal use- encodes / and " as :sl: :qu:
     QString jsonunprotect2(const QString &buffer); // internal use- encodes / and " as :sl: :qu:
+    QString csvprotect(const QString &buffer, QChar sep);
     QStringList searchPath(QString path, QString binary, bool isexec=true);
     QString removeDP(QString);
     double number(QString);

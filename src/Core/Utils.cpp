@@ -280,6 +280,23 @@ QString jsonunprotect2(const QString &string)
     while (s.endsWith(" ")) s = s.mid(0,s.length()-1);
     return s;
 }
+
+QString csvprotect(const QString &buffer, QChar sep)
+{
+
+    // if the string contains the sep we quote it
+    if (buffer.contains(sep) || buffer.contains("\"")) {
+
+        // first lets escape any quotes
+        QString rep = buffer;
+        rep.replace("\"", "\\\"");
+        rep = QString("\"%1\"").arg(rep);
+        return rep;
+    }
+
+    return buffer;
+}
+
 QStringList
 searchPath(QString path, QString binary, bool isexec)
 {

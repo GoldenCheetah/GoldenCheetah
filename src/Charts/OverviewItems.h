@@ -87,6 +87,9 @@ class OverviewItemConfig : public QWidget
         // the widget we are configuring
         ChartSpaceItem *item;
 
+        // export data button (data table)
+        QPushButton *exp;
+
         // editor for program
         QComboBox *legacySelector; // used for configuring the data table widget
         DataFilterEdit *editor;
@@ -143,6 +146,7 @@ class DataOverviewItem : public ChartSpaceItem
 
     public slots:
         void intervalHover(IntervalItem *); // watching intervals being hovered
+        void exportData();                  // export table to a csv file
 
     public:
 

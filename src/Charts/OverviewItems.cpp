@@ -2836,6 +2836,63 @@ DataOverviewItem::hotspot()
     return QRectF(20,ROWHEIGHT*2, geometry().width()-40, geometry().height()-20-(ROWHEIGHT*2));
 }
 
+// export the data to a CSV file
+void
+DataOverviewItem::exportData()
+{
+    // badly formed or no data to export
+    if (names.count() == 0 || values.count() == 0 || values.count() < names.count()) {
+        QMessageBox::critical(parent, tr("Export Table Data"), tr("Data malformed or not available."));
+        return;
+    }
+
+    QString basename = name == "" ? "data" : name;
+    QString suffix="csv";
+
+    // get a filename to open
+    QString fileName = QFileDialog::getSaveFileName(parent, tr("Export Table Data to CSV"),
+                       QDir::homePath()+"/" + basename + ".csv",
+                       ("*.csv;;"), &suffix, QFileDialog::DontUseNativeDialog); // native dialog hangs
+
+    if (fileName.isEmpty()) return;
+
+    // open and truncate
+    QFile file(fileName);
+    if (!file.open(QIODevice::WriteOnly)) return;
+    file.resize(0);
+
+    // stream, output without a BOM, unlikely to be expected (?)
+    QTextStream out(&file);
+    // unified codepage and BOM for identification on all platforms
+    out.setCodec("UTF-8");
+    //out.setGenerateByteOrderMark(true);
+
+    // headers- taking care to protect for csv output
+    for (int col=0; col<names.count(); col++) {
+        out << Utils::csvprotect(names[col], QChar(','));
+        if ((col+1) < names.count()) out << ",";
+    }
+    out << "\n";
+
+    // line items
+    int rows = values.count() / names.count();
+    for (int row=0; row<rows; row++) {
+
+        // output a row
+        for(int j=0; j<names.count(); j++) {
+            int offset = (rows * j) + row;
+            out << (values.count() > offset ? Utils::csvprotect(values[offset], QChar(',')) : "");
+            if ((j+1) < names.count()) out << ",";
+        }
+        out << "\n";
+    }
+
+    // close
+    out.flush();
+    file.close();
+
+}
+
 void
 DataOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
 
@@ -3647,6 +3704,8 @@ OverviewItemConfig::OverviewItemConfig(ChartSpaceItem *item) : QWidget(NULL), it
     }
 
     if (item->type == OverviewItemType::DATATABLE) {
+        exp = new QPushButton(tr("Export Data"));
+        exp->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
         legacySelector = new QComboBox(this);
         legacySelector->addItem("User defined", 0);
         legacySelector->addItem("Totals", DATA_TABLE_TOTALS);
@@ -3662,6 +3721,7 @@ OverviewItemConfig::OverviewItemConfig(ChartSpaceItem *item) : QWidget(NULL), it
 
         layout->addRow(tr("Legacy"), legacySelector);
         connect(legacySelector, SIGNAL(currentIndexChanged(int)), this, SLOT(setProgram(int)));
+        connect(exp, SIGNAL(clicked()), item, SLOT(exportData()));
 
     }
 
@@ -3839,6 +3899,16 @@ OverviewItemConfig::OverviewItemConfig(ChartSpaceItem *item) : QWidget(NULL), it
         layout->addRow(tr("Units"), string1);
         connect(string1, SIGNAL(textChanged(QString)), this, SLOT(dataChanged()));
 
+    }
+
+    // last item to export the data, note in main layout, aligned with bottom buttons
+    if (item->type == OverviewItemType::DATATABLE)  {
+        main->addWidget(exp);
+
+        // need to align with botton buttons
+        QMargins mm = main->contentsMargins();
+        mm.setLeft(0);
+        main->setContentsMargins(mm);
     }
 
     // reflect current config
