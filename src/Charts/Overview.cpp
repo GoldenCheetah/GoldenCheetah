@@ -553,12 +553,20 @@ OverviewConfigDialog::OverviewConfigDialog(ChartSpaceItem*item) : QDialog(NULL),
 
     buttons->addWidget(remove);
     buttons->addStretch();
+
+    if (item->type == OverviewItemType::USERCHART) {
+        exp = new QPushButton(tr("Export"), this);
+        buttons->addWidget(exp);
+        buttons->addStretch();
+        connect(exp, SIGNAL(clicked()), this, SLOT(exportChart()));
+    }
     buttons->addWidget(ok);
 
     main->addLayout(buttons);
 
     connect(ok, SIGNAL(clicked()), this, SLOT(close()));
     connect(remove, SIGNAL(clicked()), this, SLOT(removeItem()));
+
 }
 
 OverviewConfigDialog::~OverviewConfigDialog()
@@ -617,4 +625,62 @@ OverviewConfigDialog::removeItem()
 
     // and we're done
     close();
+}
+
+void
+OverviewConfigDialog::exportChart()
+{
+    // Overview tiles that contain user charts can be exported
+    // as .gchart files, but bear in mind these tiles are not
+    // chart windows, so we need to emulate the normal property
+    // export.
+
+    UserChartOverviewItem *chart = static_cast<UserChartOverviewItem*>(item);
+
+    // get the filename
+    QString basename = chart->name;
+    QString suffix=".gchart";
+
+    // get a filename to open
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Export User Chart"),
+                       QDir::homePath()+"/" + basename + ".gchart",
+                       ("*.gchart;;"), &suffix, QFileDialog::DontUseNativeDialog); // native dialog hangs
+
+    if (fileName.isEmpty()) return;
+
+    // open, truncate and setup a text stream to output via
+    QFile outfile(fileName);
+    if (!outfile.open(QFile::WriteOnly)) {
+        // couldn't open
+        QMessageBox::critical(this, tr("Export User Chart"), tr("Open file for export failed."));
+        return;
+    }
+
+    // truncate and start a stream
+    outfile.resize(0);
+    QTextStream out(&outfile);
+    out.setCodec ("UTF-8");
+
+    // serialise (mimicing real exporter in GoldenCheetah.cpp
+    out <<"{\n\t\"CHART\":{\n";
+    out <<"\t\t\"VERSION\":\"1\",\n";
+    out <<"\t\t\"VIEW\":\"" << (item->parent->scope == OverviewScope::ANALYSIS ? "analysis" : "home") << "\",\n";
+    out <<"\t\t\"TYPE\":\"" << (item->parent->scope == OverviewScope::ANALYSIS ? "46" : "45") << "\",\n";
+
+    // PROPERTIES
+    out <<"\t\t\"PROPERTIES\":{\n";
+
+    // title and settings are the only two we can create basically
+    out<<"\t\t\t\""<<"title"<<"\":\""<<Utils::jsonprotect(chart->name)<<" \",\n";
+    out<<"\t\t\t\""<<"settings"<<"\":\""<<Utils::jsonprotect(chart->getConfig())<<" \",\n";
+
+    out <<"\t\t\t\"__LAST__\":\"1\"\n";
+
+    // end here, only one chart
+    out<<"\t\t}\n\t}\n}";
+
+    // all done
+    outfile.close();
+
+
 }

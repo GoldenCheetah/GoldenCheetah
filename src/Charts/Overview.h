@@ -79,12 +79,13 @@ class OverviewConfigDialog : public QDialog
     public slots:
 
         void removeItem();
+        void exportChart();
         void close();
 
     private:
         ChartSpaceItem *item;
         QVBoxLayout *main;
-        QPushButton *remove, *ok;
+        QPushButton *remove, *ok, *exp;
 };
 
 #endif // _GC_OverviewWindow_h
