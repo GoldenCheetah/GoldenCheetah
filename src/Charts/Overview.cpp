@@ -35,6 +35,10 @@ OverviewWindow::OverviewWindow(Context *context, int scope) : GcChartWindow(cont
     // actions...
     QAction *addTile= new QAction(tr("Add Tile..."));
     addAction(addTile);
+
+    QAction *importChart= new QAction(tr("Import Chart..."));
+    addAction(importChart);
+
     setControls(NULL);
 
     QHBoxLayout *main = new QHBoxLayout;
@@ -68,6 +72,7 @@ OverviewWindow::OverviewWindow(Context *context, int scope) : GcChartWindow(cont
 
     // menu items
     connect(addTile, SIGNAL(triggered(bool)), this, SLOT(addTile()));
+    connect(importChart, SIGNAL(triggered(bool)), this, SLOT(importChart()));
     connect(space, SIGNAL(itemConfigRequested(ChartSpaceItem*)), this, SLOT(configItem(ChartSpaceItem*)));
 }
 
@@ -87,6 +92,61 @@ OverviewWindow::addTile()
         if (added->parent->scope & OverviewScope::TRENDS ) added->setDateRange(added->parent->currentDateRange);
 
     }
+}
+
+void
+OverviewWindow::importChart()
+{
+    // first lets choose a .gchartfile
+    QString suffix="csv";
+
+    // get a filename to open
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Import user chart from file"),
+                       QDir::homePath()+"/",
+                       ("*.gchart;;"), &suffix, QFileDialog::DontUseNativeDialog); // native dialog hangs
+
+    if (fileName.isEmpty()) return;
+
+    // read the file and parse into properties
+    QList<QMap<QString,QString> > props = GcChartWindow::chartPropertiesFromFile(fileName);
+
+    // we only support user charts, and they must be relevant to the current view
+    QString want = QString("%1").arg(scope == OverviewScope::ANALYSIS ? GcWindowTypes::UserAnalysis : GcWindowTypes::UserTrends);
+
+    // we look through all charts, but only import the first relevant one
+    for (int i=0; i<props.count(); i++) {
+
+        // make sure its one we want...
+        if (props[i].value("TYPE", "") == want) {
+
+            // get the chart settings (user chart has one main property)
+            QString name = Utils::jsonunprotect(props[i].value("title","User Chart"));
+            QString settings = Utils::jsonunprotect(props[i].value("settings",""));
+            if (settings == "") goto nodice;
+
+            // create new tile
+            UserChartOverviewItem *add = new UserChartOverviewItem(space, name, settings);
+            add->datafilter = "";
+            space->addItem(0,0,3,25, add);
+
+            // and update
+            space->updateGeometry();
+
+            // initialise to current selected daterange / activity as appropriate
+            // need to do after geometry as it won't be visible till added to space
+            if (scope == OverviewScope::ANALYSIS && space->currentRideItem) add->setData(space->currentRideItem);
+            if (scope == OverviewScope::TRENDS ) add->setDateRange(space->currentDateRange);
+
+            // and update- sometimes a little wonky
+            space->updateGeometry();
+
+            return;
+        }
+    }
+
+nodice:
+    QMessageBox::critical(this, tr("Not imported"), tr("We only support importing valid User Charts built for this view at present."));
+    return;
 }
 
 void

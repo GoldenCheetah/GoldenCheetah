@@ -54,6 +54,7 @@ class OverviewWindow : public GcChartWindow
 
         // add a tile to the window
         void addTile();
+        void importChart();
 
         // config item requested
         void configItem(ChartSpaceItem *);
