@@ -53,6 +53,7 @@ QMutex pythonMutex;
 #include <gsl/gsl_statistics.h>
 #include <gsl/gsl_interp.h>
 #include <gsl/gsl_randist.h>
+#include <gsl/gsl_sf.h>
 
 #include "Zones.h"
 #include "PaceZones.h"
@@ -371,6 +372,8 @@ static struct {
     { "normalize", 3 },      // normalize(vector, min, max) - unity based normalize to values between 0 and 1 for the vector or value
                              // based upon the min and max values. anything below min will be mapped to 0 and anything
                              // above max will be mapped to 1
+    { "pdf", 1 },           // pdf(x) returns the probability density function for value x
+    { "cdf", 1 },           // cdf(x) returns the cumulative density function for value x
 
 
     // add new ones above this line
@@ -3976,6 +3979,44 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
                 }
                 if (!asstring) returning.number() += v.number();
             }
+            return returning;
+        }
+
+        if (leaf->function == "cdf") {
+
+            Result returning(0);
+            Result v= eval(df, leaf->fparms[0],x, it, m, p, c, s, d);
+
+            if (v.isVector() && v.isNumber) {
+
+                // vector
+                foreach(double val, v.asNumeric()) {
+                    double f = gsl_sf_erf_Q(val);
+                    returning.asNumeric() << f;
+                    returning.number() += f;
+                }
+
+            } else if (v.isNumber) returning.number() = gsl_sf_erf_Q(v.number());
+
+            return returning;
+        }
+
+        if (leaf->function == "pdf") {
+
+            Result returning(0);
+            Result v= eval(df, leaf->fparms[0],x, it, m, p, c, s, d);
+
+            if (v.isVector() && v.isNumber) {
+
+                // vector
+                foreach(double val, v.asNumeric()) {
+                    double f = gsl_sf_erf_Z(val);
+                    returning.asNumeric() << f;
+                    returning.number() += f;
+                }
+
+            } else if (v.isNumber) returning.number() = gsl_sf_erf_Z(v.number());
+
             return returning;
         }
 
