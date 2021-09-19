@@ -3991,12 +3991,12 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
 
                 // vector
                 foreach(double val, v.asNumeric()) {
-                    double f = gsl_sf_erf_Q(val);
+                    double f = 1-gsl_sf_erf_Q(val);
                     returning.asNumeric() << f;
                     returning.number() += f;
                 }
 
-            } else if (v.isNumber) returning.number() = gsl_sf_erf_Q(v.number());
+            } else if (v.isNumber) returning.number() = 1-gsl_sf_erf_Q(v.number());
 
             return returning;
         }
