@@ -53,7 +53,7 @@ QMutex pythonMutex;
 #include <gsl/gsl_statistics.h>
 #include <gsl/gsl_interp.h>
 #include <gsl/gsl_randist.h>
-#include <gsl/gsl_sf.h>
+#include <gsl/gsl_cdf.h>
 
 #include "Zones.h"
 #include "PaceZones.h"
@@ -372,8 +372,10 @@ static struct {
     { "normalize", 3 },      // normalize(vector, min, max) - unity based normalize to values between 0 and 1 for the vector or value
                              // based upon the min and max values. anything below min will be mapped to 0 and anything
                              // above max will be mapped to 1
-    { "pdf", 1 },           // pdf(x) returns the probability density function for value x
-    { "cdf", 1 },           // cdf(x) returns the cumulative density function for value x
+    { "pdfnormal", 2 },           // pdfnormal(sigma, x) returns the probability density function for value x
+    { "cdfnormal", 2 },           // cdfnormal(sigma, x) returns the cumulative density function for value x
+    { "pdfbeta", 3 },           // pdfbeta(a,b, x) as above for the beta distribution
+    { "cdfbeta", 3 },           // cdfbeta(a,b, x) as above for the beta distribution
 
 
     // add new ones above this line
@@ -3982,40 +3984,84 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
             return returning;
         }
 
-        if (leaf->function == "cdf") {
+        if (leaf->function == "pdfbeta") {
 
             Result returning(0);
-            Result v= eval(df, leaf->fparms[0],x, it, m, p, c, s, d);
+            double a= eval(df, leaf->fparms[0],x, it, m, p, c, s, d).number();
+            double b= eval(df, leaf->fparms[1],x, it, m, p, c, s, d).number();
+            Result v= eval(df, leaf->fparms[2],x, it, m, p, c, s, d);
 
             if (v.isVector() && v.isNumber) {
 
                 // vector
                 foreach(double val, v.asNumeric()) {
-                    double f = 1-gsl_sf_erf_Q(val);
+                    double f = gsl_ran_beta_pdf(val, a, b);
                     returning.asNumeric() << f;
                     returning.number() += f;
                 }
 
-            } else if (v.isNumber) returning.number() = 1-gsl_sf_erf_Q(v.number());
+            } else if (v.isNumber) returning.number() = gsl_ran_beta_pdf(v.number(), a,b);
 
             return returning;
         }
 
-        if (leaf->function == "pdf") {
+        if (leaf->function == "cdfbeta") {
 
             Result returning(0);
-            Result v= eval(df, leaf->fparms[0],x, it, m, p, c, s, d);
+            double a= eval(df, leaf->fparms[0],x, it, m, p, c, s, d).number();
+            double b= eval(df, leaf->fparms[1],x, it, m, p, c, s, d).number();
+            Result v= eval(df, leaf->fparms[2],x, it, m, p, c, s, d);
 
             if (v.isVector() && v.isNumber) {
 
                 // vector
                 foreach(double val, v.asNumeric()) {
-                    double f = gsl_sf_erf_Z(val);
+                    double f = gsl_cdf_beta_P(val, a, b);
                     returning.asNumeric() << f;
                     returning.number() += f;
                 }
 
-            } else if (v.isNumber) returning.number() = gsl_sf_erf_Z(v.number());
+            } else if (v.isNumber) returning.number() = gsl_cdf_beta_P(v.number(), a,b);
+
+            return returning;
+        }
+
+        if (leaf->function == "cdfnormal") {
+
+            Result returning(0);
+            double sigma= eval(df, leaf->fparms[0],x, it, m, p, c, s, d).number();
+            Result v= eval(df, leaf->fparms[1],x, it, m, p, c, s, d);
+
+            if (v.isVector() && v.isNumber) {
+
+                // vector
+                foreach(double val, v.asNumeric()) {
+                    double f = gsl_cdf_gaussian_P(val, sigma);
+                    returning.asNumeric() << f;
+                    returning.number() += f;
+                }
+
+            } else if (v.isNumber) returning.number() = gsl_cdf_gaussian_P(v.number(), sigma);
+
+            return returning;
+        }
+
+        if (leaf->function == "pdfnormal") {
+
+            Result returning(0);
+            double sigma= eval(df, leaf->fparms[0],x, it, m, p, c, s, d).number();
+            Result v= eval(df, leaf->fparms[1],x, it, m, p, c, s, d);
+
+            if (v.isVector() && v.isNumber) {
+
+                // vector
+                foreach(double val, v.asNumeric()) {
+                    double f = gsl_ran_gaussian_pdf(val, sigma);
+                    returning.asNumeric() << f;
+                    returning.number() += f;
+                }
+
+            } else if (v.isNumber) returning.number() = gsl_ran_gaussian_pdf(v.number(), sigma);
 
             return returning;
         }

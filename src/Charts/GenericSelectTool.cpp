@@ -165,7 +165,7 @@ void GenericSelectTool::paint(QPainter*painter, const QStyleOptionGraphicsItem *
                         painter->setPen(QPen(axisColor));
 
                         // y value
-                        QString label=QString("%1").arg(v.y(),0,'f',0); // no decimal places XXX fixup on series info
+                        QString label=QString("%1").arg(v.y(),0,'f',2); // no decimal places XXX fixup on series info
                         label = Utils::removeDP(label); // remove unneccessary decimal places
                         painter->drawText(posyp+QPointF(0,fm.tightBoundingRect(label).height()/2.0), label);
 
@@ -191,7 +191,7 @@ void GenericSelectTool::paint(QPainter*painter, const QStyleOptionGraphicsItem *
                         if (xaxis && xaxis->type() == QAbstractAxis::AxisTypeDateTime)
                             label=QDateTime::fromMSecsSinceEpoch(v.x()).toString(static_cast<QDateTimeAxis*>(xaxis)->format());
                         else
-                            label=QString("%1").arg(v.x(),0,'f',0); // no decimal places XXX fixup on series info
+                            label=QString("%1").arg(v.x(),0,'f',2); // no decimal places XXX fixup on series info
                         label = Utils::removeDP(label); // remove unneccessary decimal places
                         painter->setClipRect(mapRectFromScene(host->qchart->plotArea()));
                         painter->drawText(posxp-(QPointF(fm.tightBoundingRect(label).width()/2.0,4)), label);
