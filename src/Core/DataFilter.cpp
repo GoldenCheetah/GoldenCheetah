@@ -376,6 +376,8 @@ static struct {
     { "cdfnormal", 2 },           // cdfnormal(sigma, x) returns the cumulative density function for value x
     { "pdfbeta", 3 },           // pdfbeta(a,b, x) as above for the beta distribution
     { "cdfbeta", 3 },           // cdfbeta(a,b, x) as above for the beta distribution
+    { "pdfgamma", 3 },           // pdfgamma(a,b, x) as above for the gamma distribution
+    { "cdfgamma", 3 },           // cdfgamma(a,b, x) as above for the gamma distribution
 
 
     // add new ones above this line
@@ -4022,6 +4024,48 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
                 }
 
             } else if (v.isNumber) returning.number() = gsl_cdf_beta_P(v.number(), a,b);
+
+            return returning;
+        }
+
+        if (leaf->function == "pdfgamma") {
+
+            Result returning(0);
+            double a= eval(df, leaf->fparms[0],x, it, m, p, c, s, d).number();
+            double b= eval(df, leaf->fparms[1],x, it, m, p, c, s, d).number();
+            Result v= eval(df, leaf->fparms[2],x, it, m, p, c, s, d);
+
+            if (v.isVector() && v.isNumber) {
+
+                // vector
+                foreach(double val, v.asNumeric()) {
+                    double f = gsl_ran_gamma_pdf(val, a, b);
+                    returning.asNumeric() << f;
+                    returning.number() += f;
+                }
+
+            } else if (v.isNumber) returning.number() = gsl_ran_gamma_pdf(v.number(), a,b);
+
+            return returning;
+        }
+
+        if (leaf->function == "cdfgamma") {
+
+            Result returning(0);
+            double a= eval(df, leaf->fparms[0],x, it, m, p, c, s, d).number();
+            double b= eval(df, leaf->fparms[1],x, it, m, p, c, s, d).number();
+            Result v= eval(df, leaf->fparms[2],x, it, m, p, c, s, d);
+
+            if (v.isVector() && v.isNumber) {
+
+                // vector
+                foreach(double val, v.asNumeric()) {
+                    double f = gsl_cdf_gamma_P(val, a, b);
+                    returning.asNumeric() << f;
+                    returning.number() += f;
+                }
+
+            } else if (v.isNumber) returning.number() = gsl_cdf_gamma_P(v.number(), a,b);
 
             return returning;
         }
