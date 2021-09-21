@@ -520,10 +520,11 @@ AnomalyDialog::check()
     QVector<double> power;
     QVector<double> cad;
     QVector<double> secs;
-    double lastdistance=9;
+    double lastdistance=0;
     double lastpower=0;
     double lastcad=0;
     int count = 0;
+    int nSpeedDist = 0;
 
     foreach (RideFilePoint *point, rideEditor->ride->ride()->dataPoints()) {
         power.append(point->watts);
@@ -558,6 +559,13 @@ AnomalyDialog::check()
                                        tr("Cadence/Power duplicated when freewheeling."));
                 }
             }
+        }
+
+        // check for the first 10 speed/distance inconsistencies
+        if (nSpeedDist < 10 && abs(lastdistance + point->kph*rideEditor->ride->ride()->recIntSecs()/3600.0 - point->km) > 0.001) {
+            nSpeedDist++;
+            rideEditor->data->anomalies.insert(xsstring(count, RideFile::kph),
+                                   tr("Speed Inconsistent with Distance/Time, stopping at 10 examples"));
         }
 
         // so we can look back one quickly
