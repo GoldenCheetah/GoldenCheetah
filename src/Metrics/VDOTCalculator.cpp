@@ -70,6 +70,7 @@ VDOTCalculator::eqvTime(double VDOT, double dist)
 VDOTCalculator::VDOTCalculator(QWidget *parent) : QDialog(parent)
 {
     bool metricRnPace = appsettings->value(this, GC_PACE, GlobalContext::context()->useMetricUnits).toBool();
+    setWindowIcon(QIcon(":/images/gc.png"));
     setWindowTitle(tr("VDOT and T-Pace Calculator"));
 
     HelpWhatsThis *help = new HelpWhatsThis(this);

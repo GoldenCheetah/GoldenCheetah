@@ -381,7 +381,8 @@ CloudServiceUploadDialog::CloudServiceUploadDialog(QWidget *parent, Context *con
 
         // didn't work dude
         QMessageBox msgBox;
-        msgBox.setWindowTitle(tr("Upload Failed") + store->uiName());
+        msgBox.setWindowIcon(QIcon(":/images/gc.png"));
+        msgBox.setWindowTitle(tr("Upload Failed ") + store->uiName());
         msgBox.setText(tr("Unable to upload, check your configuration in preferences."));
 
         msgBox.setIcon(QMessageBox::Critical);
@@ -704,6 +705,7 @@ CloudServiceSyncDialog::CloudServiceSyncDialog(Context *context, CloudService *s
         QWidget::hide(); // meh
 
         QMessageBox msgBox;
+        msgBox.setWindowIcon(QIcon(":/images/gc.png"));
         msgBox.setWindowTitle(tr("Sync with ") + store->uiName());
         msgBox.setText(tr("Unable to connect, check your configuration in preferences."));
         msgBox.setDetailedText(errors.join("\n"));

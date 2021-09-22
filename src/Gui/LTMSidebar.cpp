@@ -1694,6 +1694,8 @@ LTMSidebar::resetPreset()
 {
     // confirm user is committed to this !
     QMessageBox msgBox;
+    msgBox.setWindowIcon(QIcon(":/images/gc.png"));
+    msgBox.setWindowTitle(tr("Reset to default"));
     msgBox.setText(tr("You are about to reset the chart sidebar to the default setup"));
     msgBox.setInformativeText(tr("Do you want to continue?"));
     msgBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);

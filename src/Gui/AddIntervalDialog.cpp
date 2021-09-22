@@ -36,6 +36,7 @@ static void clearResultsTable(QTableWidget *);
 AddIntervalDialog::AddIntervalDialog(Context *context) :
     context(context)
 {
+    setWindowIcon(QIcon(":/images/gc.png"));
     setAttribute(Qt::WA_DeleteOnClose);
     setWindowTitle(tr("Find Intervals"));
     setMinimumWidth(400 *dpiXFactor);

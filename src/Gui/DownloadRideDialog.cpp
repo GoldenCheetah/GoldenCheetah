@@ -35,6 +35,7 @@ DownloadRideDialog::DownloadRideDialog(Context *context, bool embedded) :
     context(context), cancelled(false),
     action(actionIdle), embedded(embedded)
 {
+    setWindowIcon(QIcon(":/images/gc.png"));
     setAttribute(Qt::WA_DeleteOnClose);
     setWindowTitle(tr("Download Data"));
 

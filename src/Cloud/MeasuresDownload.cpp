@@ -33,6 +33,7 @@ MeasuresDownload::MeasuresDownload(Context *context, MeasuresGroup *measuresGrou
 
     if (measuresGroup == nullptr) return; // avoid crashes, it should not happen
 
+    setWindowIcon(QIcon(":/images/gc.png"));
     setWindowTitle(tr("%1 Measures download").arg(measuresGroup->getName()));
 
     HelpWhatsThis *help = new HelpWhatsThis(this);

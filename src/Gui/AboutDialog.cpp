@@ -22,6 +22,7 @@
 
 AboutDialog::AboutDialog(Context *context) : context(context)
 {
+    setWindowIcon(QIcon(":/images/gc.png"));
     setWindowTitle(tr("About GoldenCheetah"));
 
     aboutPage = new AboutPage(context);
