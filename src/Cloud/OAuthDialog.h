@@ -51,6 +51,7 @@ public:
         CYCLING_ANALYTICS,
         GOOGLE_CALENDAR,
         GOOGLE_DRIVE,
+        NOLIO,
         SPORTTRACKS,
         TODAYSPLAN,
         WITHINGS,

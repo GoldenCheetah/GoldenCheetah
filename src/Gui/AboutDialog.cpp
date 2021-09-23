@@ -23,7 +23,6 @@
 AboutDialog::AboutDialog(Context *context) : context(context)
 {
     setWindowTitle(tr("About GoldenCheetah"));
-
     aboutPage = new AboutPage(context);
     versionPage = new VersionPage(context);
     contributorsPage = new ContributorsPage(context);
