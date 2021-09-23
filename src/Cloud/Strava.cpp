@@ -1002,4 +1002,3 @@ static bool addStrava() {
 }
 
 static bool add = addStrava();
-
