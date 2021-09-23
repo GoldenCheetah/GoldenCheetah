@@ -426,6 +426,9 @@
 #define GC_XERT_TOKEN                  "<athlete-private>xert/xert_token"
 #define GC_XERT_REFRESH_TOKEN          "<athlete-private>xert/refresh_token"
 #define GC_XERT_LAST_REFRESH           "<athlete-private>xert/last_refresh"
+//Nolio
+#define GC_NOLIO_TOKEN                  "<athlete-private>nolio_token"
+#define GC_NOLIO_REFRESH_TOKEN          "<athlete-private>nolio_refresh_token"
 // --------------------------------------------------------------------------------
 #include <QSettings>
 #include <QFileInfo>

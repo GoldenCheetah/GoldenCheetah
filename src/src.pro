@@ -19,8 +19,10 @@ greaterThan(QT_MAJOR_VERSION, 5) {
 include(gcconfig.pri)
 
 # You can also define your own local source to add to build
-HEADERS += $${LOCALHEADERS}
-SOURCES += $${LOCALSOURCES}
+HEADERS += $${LOCALHEADERS} \
+    Cloud/Nolio.h
+SOURCES += $${LOCALSOURCES} \
+    Cloud/Nolio.cpp
 
 ###=====================
 ### GOLDENCHEETAH TARGET
