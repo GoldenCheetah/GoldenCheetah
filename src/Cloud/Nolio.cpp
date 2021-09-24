@@ -51,7 +51,6 @@
 
 
 Nolio::Nolio(Context *context) : CloudService(context), context(context), root_(NULL) {
-
     if (context) {
         nam = new QNetworkAccessManager(this);
         connect(nam, SIGNAL(sslErrors(QNetworkReply*, const QList<QSslError> & )), this, SLOT(onSslErrors(QNetworkReply*, const QList<QSslError> & )));
@@ -63,8 +62,8 @@ Nolio::Nolio(Context *context) : CloudService(context), context(context), root_(
 
     // config
     settings.insert(OAuthToken, GC_NOLIO_TOKEN);
-    //settings.insert(URL, GC_NOLIO_URL);
-    //settings.insert(DefaultURL, "https://www.nolio.io");
+    settings.insert(URL, GC_NOLIO_URL);
+    settings.insert(DefaultURL, "https://nolio.io");
     //settings.insert(Key, GC_NOLIO_USERKEY);
     //settings.insert(AthleteID, GC_NOLIO_ATHLETE_ID);
     //settings.insert(Local1, GC_NOLIO_ATHLETE_NAME);
@@ -88,6 +87,9 @@ bool Nolio::open(QStringList &errors){
         errors << "No authorization token found for Nolio";
         return false;
     }
+
+    // OAuth stuff
+
     return 0;
 }
 
@@ -103,7 +105,6 @@ QString Nolio::home(){
 
 static bool addNolio() {
     CloudServiceFactory::instance().addService(new Nolio(NULL));
-    printd("aaaaaaaaaaaaaaaaaaaa");
     return true;
 }
 

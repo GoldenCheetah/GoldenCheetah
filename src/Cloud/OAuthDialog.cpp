@@ -46,6 +46,7 @@ OAuthDialog::OAuthDialog(Context *context, OAuthSite site, CloudService *service
         if (service->id() == "Cycling Analytics") site = this->site = CYCLING_ANALYTICS;
         if (service->id() == "Google Calendar") site = this->site = GOOGLE_CALENDAR;
         if (service->id() == "Google Drive") site = this->site = GOOGLE_DRIVE;
+        if (service->id() == "Nolio") site = this->site = NOLIO;
         if (service->id() == "University of Kent") site = this->site = KENTUNI;
         if (service->id() == "Today's Plan") site = this->site = TODAYSPLAN;
         if (service->id() == "Withings") site = this->site = WITHINGS;
@@ -234,7 +235,7 @@ OAuthDialog::urlChanged(const QUrl &url)
     QString authheader;
 
     // sites that use this scheme
-    if (site == DROPBOX || site == STRAVA || site == CYCLING_ANALYTICS || site == TODAYSPLAN || site == POLAR || site == SPORTTRACKS || site == XERT || site == RIDEWITHGPS || site == WITHINGS) {
+    if (site == NOLIO || site == DROPBOX || site == STRAVA || site == CYCLING_ANALYTICS || site == TODAYSPLAN || site == POLAR || site == SPORTTRACKS || site == XERT || site == RIDEWITHGPS || site == WITHINGS) {
 
         if (url.toString().startsWith("http://www.goldencheetah.org/?state=&code=") ||
                 url.toString().contains("blank.html?code=") ||
@@ -283,6 +284,14 @@ OAuthDialog::urlChanged(const QUrl &url)
                 params.addQueryItem("client_id", GC_STRAVA_CLIENT_ID);
 #ifdef GC_STRAVA_CLIENT_SECRET
                 params.addQueryItem("client_secret", GC_STRAVA_CLIENT_SECRET);
+#endif
+
+            } else if (site == NOLIO) {
+
+                urlstr = QString("https://www.nolio.io/api/token?");
+                params.addQueryItem("client_id", GC_NOLIO_CLIENT_ID);
+#ifdef GC_NOLIO_CLIENT_SECRET
+                params.addQueryItem("client_secret", GC_NOLIO_CLIENT_SECRET);
 #endif
 
             }  else if (site == CYCLING_ANALYTICS) {
