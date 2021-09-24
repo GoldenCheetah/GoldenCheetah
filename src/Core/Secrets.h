@@ -113,3 +113,12 @@
 #ifndef GC_RWGPS_API_KEY
 #define GC_RWGPS_API_KEY "__GC_RWGPS_API_KEY__"
 #endif
+
+//Nolio
+#ifndef GC_NOLIO_CLIENT_ID
+#define GC_NOLIO_CLIENT_ID    "83" // client id
+#endif
+
+#ifndef GC_NOLIO_CLIENT_SECRET
+#define GC_NOLIO_CLIENT_SECRET "__GC_NOLIO_CLIENT_SECRET__"
+#endif

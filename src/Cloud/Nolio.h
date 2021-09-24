@@ -37,7 +37,7 @@ class Nolio : public CloudService {
         QString id() const { return "Nolio"; }
         QString uiName() const { return tr("Nolio"); }
         QString description() const { return (tr("Sync with your favorite training partner.")); }
-        QImage logo() const { return QImage(":images/services/todaysplan.png"); }
+        QImage logo() const { return QImage(":images/services/nolio.png"); }
 
         // open/connect and close/disconnect
         bool open(QStringList &errors);
@@ -63,7 +63,7 @@ class Nolio : public CloudService {
         //bool selectAthlete(CloudServiceAthlete);
 
         // dirent style api
-        //CloudServiceEntry *root() { return root_; }
+        CloudServiceEntry *root() { return root_; }
         //QList<CloudServiceEntry*> readdir(QString path, QStringList &errors, QDateTime from, QDateTime to);
 
     public slots:
