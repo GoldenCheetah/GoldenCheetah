@@ -105,9 +105,6 @@ extern float xmin, xmax, ymin, ymax ;
 extern Site * sites ;
 extern Freelist sfl ;
 
-/* getopt.c */
-extern int getopt(int, char *const *, const char *);
-
 /* memory.c */
 void freeinit(Freelist *, int) ;
 char *getfree(Freelist *) ;
