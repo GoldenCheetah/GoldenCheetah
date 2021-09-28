@@ -7,6 +7,7 @@
 #include "hamerly_kmeans.h"
 #include "kmeans_general_functions.h"
 #include <cmath>
+#include <algorithm>
 
 /* Hamerly's algorithm that is a 'simplification' of Elkan's, in that it keeps
  * the following bounds:

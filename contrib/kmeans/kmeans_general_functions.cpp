@@ -13,7 +13,6 @@
 #include <numeric>
 #include <cstring>
 #include <cstdio>
-#include <unistd.h>
 
 void addVectors(double *a, double const *b, int d) {
     double const *end = a + d;
