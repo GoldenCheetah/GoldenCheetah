@@ -238,32 +238,6 @@ Dataset *init_centers_kmeanspp_v2(Dataset const &x, unsigned short k) {
 }
 
 
-/**
- * in MB
- */
-double getMemoryUsage() {
-    char buf[30];
-    snprintf(buf, 30, "/proc/%u/statm", (unsigned)getpid());
-    FILE* pf = fopen(buf, "r");
-    unsigned int totalProgramSizeInPages = 0;
-    unsigned int residentSetSizeInPages = 0;
-    if (pf) {
-        int numScanned = fscanf(pf, "%u %u" /* %u %u %u %u %u"*/, &totalProgramSizeInPages, &residentSetSizeInPages);
-        if (numScanned != 2) {
-            return 0.0;
-        }
-    }
-    
-    fclose(pf);
-    pf = NULL;
-    
-    double sizeInKilobytes = residentSetSizeInPages * 4.0; // assumes 4096 byte page
-    // getconf PAGESIZE
-    
-    return sizeInKilobytes;
-}
-
-
 void assign(Dataset const &x, Dataset const &c, unsigned short *assignment) {
     for (int i = 0; i < x.n; ++i) {
         double shortestDist2 = std::numeric_limits<double>::max();
@@ -280,51 +254,4 @@ void assign(Dataset const &x, Dataset const &c, unsigned short *assignment) {
         }
         assignment[i] = closest;
     }
-}
-
-rusage get_time() {
-    rusage now;
-    getrusage(RUSAGE_SELF, &now);
-    return now;
-}
-
-
-double get_wall_time(){
-    struct timeval time;
-    if (gettimeofday(&time,NULL)){
-        //  Handle error
-        return 0;
-    }
-    return (double)time.tv_sec + (double)time.tv_usec * .000001;
-}
-
-int timeval_subtract(timeval *result, timeval *x, timeval *y) {
-    /* Perform the carry for the later subtraction by updating y. */
-    if (x->tv_usec < y->tv_usec) {
-        int nsec = (y->tv_usec - x->tv_usec) / 1000000 + 1;
-        y->tv_usec -= 1000000 * nsec;
-        y->tv_sec += nsec;
-    }
-    if (x->tv_usec - y->tv_usec > 1000000) {
-        int nsec = (x->tv_usec - y->tv_usec) / 1000000;
-        y->tv_usec += 1000000 * nsec;
-        y->tv_sec -= nsec;
-    }
-
-    /* Compute the time remaining to wait.  tv_usec is certainly positive. */
-    result->tv_sec = x->tv_sec - y->tv_sec;
-    result->tv_usec = x->tv_usec - y->tv_usec;
-
-    /* Return 1 if result
-     * is negative. */
-    return x->tv_sec < y->tv_sec;
-}
-
-double elapsed_time(rusage *start) {
-    rusage now;
-    timeval diff;
-    getrusage(RUSAGE_SELF, &now);
-    timeval_subtract(&diff, &now.ru_utime, &start->ru_utime);
-
-    return (double)diff.tv_sec + (double)diff.tv_usec / 1e6;
 }
