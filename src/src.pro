@@ -62,7 +62,8 @@ INCLUDEPATH +=  ../qwt/src \
                 ../contrib/qtsolutions/qwtcurve \
                 ../contrib/lmfit \
                 ../contrib/levmar \
-                ../contrib/boost 
+                ../contrib/boost \
+                ../contrib/kmeans
 
 DEFINES += QXT_STATIC
 
@@ -752,7 +753,10 @@ HEADERS += ../contrib/qtsolutions/codeeditor/codeeditor.h ../contrib/qtsolutions
            ../contrib/qzip/zipwriter.h ../contrib/lmfit/lmcurve.h  ../contrib/lmfit/lmcurve_tyd.h \
            ../contrib/lmfit/lmmin.h  ../contrib/lmfit/lmstruct.h \
            ../contrib/levmar/compiler.h  ../contrib/levmar/levmar.h  ../contrib/levmar/lm.h  ../contrib/levmar/misc.h \
-           ../contrib/boost/GeometricTools_BSplineCurve.h
+           ../contrib/boost/GeometricTools_BSplineCurve.h \
+           ../contrib/kmeans/kmeans_dataset.h ../contrib/kmeans/kmeans_general_functions.h ../contrib/kmeans/hamerly_kmeans.h \
+           ../contrib/kmeans/kmeans.h ../contrib/kmeans/original_space_kmeans.h ../contrib/kmeans/triangle_inequality_base_kmeans.h
+
 
 # Train View
 HEADERS += Train/AddDeviceWizard.h Train/CalibrationData.h Train/ComputrainerController.h Train/Computrainer.h Train/DeviceConfiguration.h \
@@ -859,7 +863,10 @@ SOURCES += ../contrib/qtsolutions/codeeditor/codeeditor.cpp ../contrib/qtsolutio
            ../contrib/levmar/Axb.c ../contrib/levmar/lm_core.c ../contrib/levmar/lmbc_core.c \
            ../contrib/levmar/lmblec_core.c ../contrib/levmar/lmbleic_core.c ../contrib/levmar/lmlec.c ../contrib/levmar/misc.c \
            ../contrib/levmar/Axb_core.c ../contrib/levmar/lm.c ../contrib/levmar/lmbc.c ../contrib/levmar/lmblec.c ../contrib/levmar/lmbleic.c \
-           ../contrib/levmar/lmlec_core.c ../contrib/levmar/misc_core.c
+           ../contrib/levmar/lmlec_core.c ../contrib/levmar/misc_core.c \
+           ../contrib/kmeans/kmeans_dataset.cpp ../contrib/kmeans/kmeans_general_functions.cpp ../contrib/kmeans/hamerly_kmeans.cpp \
+           ../contrib/kmeans/kmeans.cpp ../contrib/kmeans/original_space_kmeans.cpp ../contrib/kmeans/triangle_inequality_base_kmeans.cpp
+
 
 ## Train View Components
 SOURCES += Train/AddDeviceWizard.cpp Train/CalibrationData.cpp Train/ComputrainerController.cpp Train/Computrainer.cpp Train/DeviceConfiguration.cpp \
