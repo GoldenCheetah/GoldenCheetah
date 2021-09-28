@@ -116,7 +116,7 @@
 
 //Nolio
 #ifndef GC_NOLIO_CLIENT_ID
-#define GC_NOLIO_CLIENT_ID    "83" // client id
+#define GC_NOLIO_CLIENT_ID "__GC_NOLIO_CLIENT_ID__"
 #endif
 
 #ifndef GC_NOLIO_CLIENT_SECRET

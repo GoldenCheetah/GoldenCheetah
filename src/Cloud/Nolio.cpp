@@ -28,7 +28,7 @@
  #include <QJsonValue>
 
 #ifndef NOLIO_DEBUG
-#define NOLIO_DEBUG false
+#define NOLIO_DEBUG true
 #endif
 #ifdef Q_CC_MSVC
 #define printd(fmt, ...) do {                                                \
@@ -61,9 +61,9 @@ Nolio::Nolio(Context *context) : CloudService(context), context(context), root_(
     //useMetric = true; // distance and duration metadata
 
     // config
-    settings.insert(OAuthToken, GC_NOLIO_TOKEN);
+    settings.insert(OAuthToken, GC_NOLIO_ACCESS_TOKEN);
     settings.insert(URL, GC_NOLIO_URL);
-    settings.insert(DefaultURL, "https://nolio.io");
+    settings.insert(DefaultURL, "https://www.nolio.io");
     //settings.insert(Key, GC_NOLIO_USERKEY);
     //settings.insert(AthleteID, GC_NOLIO_ATHLETE_ID);
     //settings.insert(Local1, GC_NOLIO_ATHLETE_NAME);
@@ -82,7 +82,7 @@ bool Nolio::open(QStringList &errors){
     printd("Nolio::open\n");
 
     // Check if we have a token
-    QString token = getSetting(GC_NOLIO_TOKEN, "").toString();
+    QString token = getSetting(GC_NOLIO_ACCESS_TOKEN, "").toString();
     if (token == "") {
         errors << "No authorization token found for Nolio";
         return false;
