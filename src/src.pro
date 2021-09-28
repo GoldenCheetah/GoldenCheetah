@@ -756,6 +756,7 @@ HEADERS += ../contrib/qtsolutions/codeeditor/codeeditor.h ../contrib/qtsolutions
            ../contrib/boost/GeometricTools_BSplineCurve.h \
            ../contrib/kmeans/kmeans_dataset.h ../contrib/kmeans/kmeans_general_functions.h ../contrib/kmeans/hamerly_kmeans.h \
            ../contrib/kmeans/kmeans.h ../contrib/kmeans/original_space_kmeans.h ../contrib/kmeans/triangle_inequality_base_kmeans.h
+           ../contrib/voronoi/vdefs.h
 
 
 # Train View
@@ -865,7 +866,9 @@ SOURCES += ../contrib/qtsolutions/codeeditor/codeeditor.cpp ../contrib/qtsolutio
            ../contrib/levmar/Axb_core.c ../contrib/levmar/lm.c ../contrib/levmar/lmbc.c ../contrib/levmar/lmblec.c ../contrib/levmar/lmbleic.c \
            ../contrib/levmar/lmlec_core.c ../contrib/levmar/misc_core.c \
            ../contrib/kmeans/kmeans_dataset.cpp ../contrib/kmeans/kmeans_general_functions.cpp ../contrib/kmeans/hamerly_kmeans.cpp \
-           ../contrib/kmeans/kmeans.cpp ../contrib/kmeans/original_space_kmeans.cpp ../contrib/kmeans/triangle_inequality_base_kmeans.cpp
+           ../contrib/kmeans/kmeans.cpp ../contrib/kmeans/original_space_kmeans.cpp ../contrib/kmeans/triangle_inequality_base_kmeans.cpp \
+           ../contrib/voronoi/edgelist.c ../contrib/voronoi/geometry.c ../contrib/voronoi/heap.c \
+           ../contrib/voronoi/memory.c ../contrib/voronoi/output.c ../contrib/voronoi/voronoi.c
 
 
 ## Train View Components
