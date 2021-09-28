@@ -37,6 +37,7 @@
 #include "lmcurve.h"
 #include "LTMTrend.h" // for LR when copying CP chart filtering mechanism
 #include "WPrime.h" // for LR when copying CP chart filtering mechanism
+#include "FastKmeans.h" // for kmeans(...)
 
 #ifdef GC_HAVE_SAMPLERATE
 // we have libsamplerate
@@ -378,6 +379,9 @@ static struct {
     { "cdfbeta", 3 },           // cdfbeta(a,b, x) as above for the beta distribution
     { "pdfgamma", 3 },           // pdfgamma(a,b, x) as above for the gamma distribution
     { "cdfgamma", 3 },           // cdfgamma(a,b, x) as above for the gamma distribution
+
+    { "kmeans", 0 },        // kmeans(centers|assignments, k, dim1, dim2, dim3 .. dimn) - return the centers or cluster assignment
+                            // from a k means cluser of the data with n dimensions (but commonly just 2- x and y)
 
 
     // add new ones above this line
@@ -2023,6 +2027,21 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
                             }
                         }
                     }
+                } else if (leaf->function == "kmeans") {
+
+                    if (leaf->fparms.count() < 4 || leaf->fparms[0]->type != Leaf::Symbol) {
+                        leaf->inerror = true;
+                        DataFiltererrors << QString(tr("kmeans(centers|assignments, k, dim1, dim2, dimn)"));
+                    } else {
+                        QString symbol=*(leaf->fparms[0]->lvalue.n);
+                        if (symbol != "centers" && symbol != "assignments") {
+                            leaf->inerror = true;
+                            DataFiltererrors << QString(tr("kmeans(centers|assignments, k, dim1, dim2, dimn) - %s unknown")).arg(symbol);
+                        } else {
+                            for(int i=1; i<leaf->fparms.count(); i++) validateFilter(context, df, leaf->fparms[i]);
+                        }
+                    }
+
                 } else if (leaf->function == "metrics" || leaf->function == "metricstrings" ||
                            leaf->function == "aggmetrics" || leaf->function == "aggmetricstrings") {
 
@@ -4610,6 +4629,33 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
                     returning.asString() << ride->fileName;
                 }
             }
+            return returning;
+        }
+
+        if (leaf->function == "kmeans") {
+            // kmeans(centers|assignments, k, dim1, dim2, dim3)
+
+            Result returning(0);
+
+            QString symbol = *(leaf->fparms[0]->lvalue.n);
+            bool wantcenters=false;
+            if (symbol == "centers") wantcenters=true;
+
+            // get k
+            int k = eval(df, leaf->fparms[1],x, it, m, p, c, s, d).number();
+
+            FastKmeans *kmeans = new FastKmeans();
+
+            // loop through the dimensions
+            for(int i=2; i<leaf->fparms.count(); i++)
+                kmeans->addDimension(eval(df, leaf->fparms[i],x, it, m, p, c, s, d).asNumeric());
+
+            // calculate
+            if (kmeans->run(k)) {
+                if (wantcenters) returning = kmeans->centers();
+                else returning = kmeans->assignments();
+            }
+
             return returning;
         }
 

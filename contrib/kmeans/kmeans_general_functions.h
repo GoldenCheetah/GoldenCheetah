@@ -78,6 +78,6 @@ void printArray(T const *arr, int length, std::string separator) {
 
 void centerDataset(Dataset *x);
 
-void assign(Dataset const &x, Dataset const &c, unsigned short *assignment);
+void kmeans_assign(Dataset const &x, Dataset const &c, unsigned short *assignment);
 
 #endif

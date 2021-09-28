@@ -237,7 +237,7 @@ Dataset *init_centers_kmeanspp_v2(Dataset const &x, unsigned short k) {
 }
 
 
-void assign(Dataset const &x, Dataset const &c, unsigned short *assignment) {
+void kmeans_assign(Dataset const &x, Dataset const &c, unsigned short *assignment) {
     for (int i = 0; i < x.n; ++i) {
         double shortestDist2 = std::numeric_limits<double>::max();
         int closest = 0;

@@ -741,7 +741,7 @@ HEADERS += Gui/AboutDialog.h Gui/AddIntervalDialog.h Gui/AnalysisSidebar.h Gui/C
 HEADERS += Metrics/Banister.h Metrics/CPSolver.h Metrics/Estimator.h Metrics/ExtendedCriticalPower.h Metrics/HrZones.h Metrics/PaceZones.h \
            Metrics/PDModel.h Metrics/PMCData.h Metrics/PowerProfile.h Metrics/RideMetadata.h Metrics/RideMetric.h Metrics/SpecialFields.h \
            Metrics/Statistic.h Metrics/UserMetricParser.h Metrics/UserMetricSettings.h Metrics/VDOTCalculator.h Metrics/WPrime.h Metrics/Zones.h \
-           Metrics/BlinnSolver.h
+           Metrics/BlinnSolver.h Metrics/FastKmeans.h
 
 ## Planning and Compliance
 HEADERS += Planning/PlanningWindow.h
@@ -850,7 +850,7 @@ SOURCES += Metrics/aBikeScore.cpp Metrics/aCoggan.cpp Metrics/AerobicDecoupling.
            Metrics/SwimMetrics.cpp Metrics/SpecialFields.cpp Metrics/Statistic.cpp Metrics/SustainMetric.cpp Metrics/SwimScore.cpp \
            Metrics/TimeInZone.cpp Metrics/TRIMPPoints.cpp Metrics/UserMetric.cpp Metrics/UserMetricParser.cpp Metrics/VDOTCalculator.cpp \
            Metrics/VDOT.cpp Metrics/WattsPerKilogram.cpp Metrics/WPrime.cpp Metrics/Zones.cpp Metrics/HrvMetrics.cpp Metrics/BlinnSolver.cpp \
-           Metrics/RowMetrics.cpp
+           Metrics/RowMetrics.cpp Metrics/FastKmeans.cpp
 
 ## Planning and Compliance
 SOURCES += Planning/PlanningWindow.cpp
