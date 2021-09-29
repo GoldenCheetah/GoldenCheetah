@@ -205,8 +205,6 @@ OAuthDialog::OAuthDialog(Context *context, OAuthSite site, CloudService *service
     // STEP 1: LOGIN AND AUTHORISE THE APPLICATION
     //
     if (site == NOLIO || site == DROPBOX || site == STRAVA || site == CYCLING_ANALYTICS || site == POLAR || site == SPORTTRACKS || site == GOOGLE_CALENDAR || site == GOOGLE_DRIVE || site == KENTUNI || site == TODAYSPLAN || site == WITHINGS) {
-
-        qDebug() << "URL : " << urlstr;
         url = QUrl(urlstr);
         view->setUrl(url);
 
@@ -241,7 +239,6 @@ OAuthDialog::onSslErrors(QNetworkReply *reply, const QList<QSslError>&)
 void
 OAuthDialog::urlChanged(const QUrl &url)
 {
-    qDebug() << "urlchanged : " << url.toString();
     QString authheader;
 
     // sites that use this scheme
@@ -467,9 +464,7 @@ OAuthDialog::networkRequestFinished(QNetworkReply *reply)
         // although polar choose to also pass a user id, which is needed for future calls
         QJsonParseError parseError;
         QJsonDocument document = QJsonDocument::fromJson(payload, &parseError);
-        qDebug() << "first if passed" << payload << document.object()["access_token"].toString() << parseError.error;
         if (parseError.error == QJsonParseError::NoError) {
-            qDebug() << "second if passed";
             refresh_token = document.object()["refresh_token"].toString();
             access_token = document.object()["access_token"].toString();
             if (site == POLAR)  polar_userid = document.object()["x_user_id"].toDouble();
@@ -480,7 +475,6 @@ OAuthDialog::networkRequestFinished(QNetworkReply *reply)
         // google uses a refresh token so trap for them only
         if (((site == GOOGLE_CALENDAR || site == GOOGLE_DRIVE || site == KENTUNI) && refresh_token == "") ||
              access_token == "" ) {
-            qDebug() << "third if passed" << access_token;
             // Something failed.
             // Only Google uses both refresh and access tokens.
             QString error = QString(tr("Error retrieving authoriation credentials"));
@@ -627,10 +621,9 @@ OAuthDialog::networkRequestFinished(QNetworkReply *reply)
             information.exec();
 
         } else if (site == NOLIO) {
-            qDebug() << "found site == Nolio";
             service->setSetting(GC_NOLIO_ACCESS_TOKEN, access_token);
             service->setSetting(GC_NOLIO_REFRESH_TOKEN, refresh_token);
-            qDebug() << "access : " << access_token << "\n refresh" << refresh_token;
+            service->setSetting(GC_NOLIO_LAST_REFRESH, QDateTime::currentDateTime());
             QString info = QString(tr("Nolio authorization was successful."));
             QMessageBox information(QMessageBox::Information, tr("Information"), info);
             information.exec();

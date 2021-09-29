@@ -64,6 +64,8 @@ Nolio::Nolio(Context *context) : CloudService(context), context(context), root_(
     settings.insert(OAuthToken, GC_NOLIO_ACCESS_TOKEN);
     settings.insert(URL, GC_NOLIO_URL);
     settings.insert(DefaultURL, "https://www.nolio.io");
+    settings.insert(Local1, GC_NOLIO_REFRESH_TOKEN);
+    settings.insert(Local2, GC_NOLIO_LAST_REFRESH);
     //settings.insert(Key, GC_NOLIO_USERKEY);
     //settings.insert(AthleteID, GC_NOLIO_ATHLETE_ID);
     //settings.insert(Local1, GC_NOLIO_ATHLETE_NAME);
@@ -81,16 +83,62 @@ void Nolio::onSslErrors(QNetworkReply *reply, const QList<QSslError>&){
 bool Nolio::open(QStringList &errors){
     printd("Nolio::open\n");
 
-    // Check if we have a token
-    QString token = getSetting(GC_NOLIO_ACCESS_TOKEN, "").toString();
-    if (token == "") {
-        errors << "No authorization token found for Nolio";
+    QString refresh_token = getSetting(GC_NOLIO_REFRESH_TOKEN, "").toString();
+    if (refresh_token == "") {
         return false;
     }
 
-    // OAuth stuff
+    QString last_refresh_str = getSetting(GC_NOLIO_LAST_REFRESH, "0").toString();
+    QDateTime last_refresh = QDateTime::fromString(last_refresh_str);
+    last_refresh = last_refresh.addSecs(86400); // nolio tokens are valid for one day
+    QDateTime now = QDateTime::currentDateTime();
+    // check if we need to refresh the access token
+    if (now <= last_refresh) { // credentials are still valid
+        printd("tokens still valid\n");
+        return true;
+    }
 
-    return 0;
+    // get new credentials using refresh_token
+    QNetworkRequest request(QUrl("https://www.nolio.io/api/token/"));
+    request.setRawHeader("Content-Type", "application/x-www-form-urlencoded");
+
+    QString authheader = QString("%1:%2").arg(GC_NOLIO_CLIENT_ID).arg(GC_NOLIO_CLIENT_SECRET);
+    request.setRawHeader("Authorization", "Basic " + authheader.toLatin1().toBase64());
+
+    QString data = QString("grant_type=refresh_token&refresh_token=").append(refresh_token);
+
+    QNetworkReply* reply = nam->post(request, data.toLatin1());
+
+    // blocking request
+    QEventLoop loop;
+    connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
+    loop.exec();
+
+    int statusCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
+    printd("HTTP response code: %d\n", statusCode);
+
+    if (reply->error() != 0) {
+        printd("Got error %d\n", reply->error());
+        return false;
+    }
+    QByteArray r = reply->readAll();
+    printd("Got response: %s\n", r.data());
+
+    QJsonParseError parseError;
+    QJsonDocument document = QJsonDocument::fromJson(r, &parseError);
+
+    if (parseError.error != QJsonParseError::NoError) {
+        printd("Parse error!\n");
+        return false;
+    }
+
+    QString new_access_token = document.object()["access_token"].toString();
+    QString new_refresh_token = document.object()["refresh_token"].toString();
+    if (new_access_token != "") setSetting(GC_NOLIO_ACCESS_TOKEN, new_access_token);
+    if (new_refresh_token != "") setSetting(GC_NOLIO_REFRESH_TOKEN, new_refresh_token);
+    setSetting(GC_NOLIO_LAST_REFRESH, now.toString());
+    CloudServiceFactory::instance().saveSettings(this, context);
+    return true;
 }
 
 
