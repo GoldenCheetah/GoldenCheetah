@@ -76,15 +76,6 @@ QDesktopWidget *desktop = NULL;
 HttpListener *listener = NULL;
 #endif
 
-// future's algorithm (needs to be refactored into a class)
-extern "C" {
-#include "../contrib/voronoi/vdefs.h"
-int sorted, triangulate, plot, debug, nsites, siteidx ;
-float xmin, xmax, ymin, ymax ;
-Site * sites ;
-Freelist sfl ;
-}
-
 // R is not multithreaded, has a single instance that we setup at startup.
 #ifdef GC_WANT_R
 #include <RTool.h>
