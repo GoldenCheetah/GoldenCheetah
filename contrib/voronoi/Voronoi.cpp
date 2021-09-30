@@ -3,7 +3,7 @@
 #include "Voronoi.h"
 #include <math.h>
 #include <stdio.h>
-#include <malloc.h>
+#include <stdlib.h>
 
 Voronoi::Voronoi()
 {
