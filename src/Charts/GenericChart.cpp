@@ -439,7 +439,7 @@ GenericChart::finaliseChart()
             }
 
             // did we have a voronoi diagram?
-            if (p.voronoix.count() >= 2) newPlots[i].plot->addVoronoi(p.voronoix, p.voronoiy);
+            if (p.voronoix.count() >= 2) newPlots[i].plot->addVoronoi(p.name, p.voronoix, p.voronoiy);
         }
 
         // set axis

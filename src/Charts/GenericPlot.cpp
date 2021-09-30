@@ -28,6 +28,9 @@
 #include "ChartSpace.h"
 #include "UserChartOverviewItem.h"
 
+#include "Voronoi.h"
+#include "GenericLines.h"
+
 #include <limits>
 
 // used to format dates/times on axes
@@ -47,6 +50,7 @@ GenericPlot::GenericPlot(QWidget *parent, Context *context, QGraphicsItem *item)
     barseries=NULL;
     stackbarseries=NULL;
     percentbarseries=NULL;
+    voronoidiagram=NULL;
     bottom=left=true;
 
     mainLayout = new QVBoxLayout(this);
@@ -316,12 +320,11 @@ GenericPlot::addAnnotation(AnnotationType, QString string, QColor color)
 }
 
 void
-GenericPlot::addVoronoi(QVector<double>x, QVector<double>y)
+GenericPlot::addVoronoi(QString name, QVector<double>x, QVector<double>y)
 {
+    vname = name;
     vx = x;
     vy = y;
-
-    fprintf(stderr, "generic plot: add voronoi diagram\n"); fflush(stderr);
 }
 
 void
@@ -456,6 +459,8 @@ GenericPlot::plotAreaChanged()
 bool
 GenericPlot::initialiseChart(QString title, int type, bool animate, int legpos, double scale)
 {
+    clearVoronoi();
+
     // if we changed the type, all series must go
     if (charttype != type) {
         qchart->removeAllSeries();
@@ -465,6 +470,7 @@ GenericPlot::initialiseChart(QString title, int type, bool animate, int legpos, 
         stackbarseries=NULL;
         percentbarseries=NULL;
     }
+
 
     foreach(QLabel *label, labels) delete label;
     labels.clear();
@@ -919,6 +925,9 @@ GenericPlot::finaliseChart()
 {
     if (!qchart) return;
 
+    // remove voronoix if present
+    clearVoronoi();
+
     // clear ALL axes
     foreach(QAbstractAxis *axis, qchart->axes(Qt::Vertical)) {
         qchart->removeAxis(axis);
@@ -1246,6 +1255,9 @@ GenericPlot::finaliseChart()
     // add labels after legend items
     foreach(QLabel *label, labels) legend->addLabel(label);
 
+    // add voronoi if need to
+    plotVoronoi();
+
     plotAreaChanged(); // make sure get updated before paint
 }
 
@@ -1355,5 +1367,48 @@ GenericPlot::seriesColor(QAbstractSeries* series)
     case QAbstractSeries::SeriesTypeLine: return static_cast<QLineSeries*>(series)->color(); break;
     case QAbstractSeries::SeriesTypeArea: return static_cast<QAreaSeries*>(series)->color(); break;
     default: return GColor(CPLOTMARKER);
+    }
+}
+
+void
+GenericPlot::plotVoronoi()
+{
+    // if there is one there already, lets remove it
+    clearVoronoi();
+
+    if (vx.count() < 2) return;
+
+    Voronoi v;
+    for(int i=0; i<vx.count(); i++)  v.addSite(QPointF(vx[i],vy[i]));
+    v.run(QRectF());
+
+#if 0
+    // how many lines?
+    fprintf(stderr, "voronoi diagram curve '%s' has %d lines\n", vname.toStdString().c_str(),v.lines().count()); fflush(stderr);
+
+    foreach(QLineF line, v.lines()) {
+        fprintf(stderr, "from %f,%f to %f,%f\n", line.p1().x(), line.p1().y(), line.p2().x(), line.p2().y());
+    }
+#endif
+
+    // create a new diagram
+    voronoidiagram = new GenericLines(this);
+    voronoidiagram->setCurve(curves.value(vname,NULL));
+    voronoidiagram->setLines(v.lines());
+
+    chartview->scene()->addItem(voronoidiagram);
+    voronoidiagram->update();
+}
+
+void
+GenericPlot::clearVoronoi()
+{
+    if (voronoidiagram) {
+        voronoidiagram->setCurve(NULL);
+        voronoidiagram->setLines(QList<QLineF>());
+        voronoidiagram->prepare();
+        chartview->scene()->removeItem(voronoidiagram);
+        //delete voronoidiagram; // CRASH!
+        voronoidiagram = NULL;
     }
 }

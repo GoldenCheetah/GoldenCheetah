@@ -3,6 +3,7 @@
 #include <QList>
 #include <QRectF>
 #include <QPointF>
+#include <QLineF>
 
 #ifndef __VDEFS_H
 #define __VDEFS_H 1
@@ -76,6 +77,9 @@ class Voronoi {
         void addSite(QPointF point);
         void run(QRectF boundingRect);
 
+        // the output is a vector of lines to draw
+        QList<QLineF> &lines() { return output; }
+
     private:
 
         // original global variables
@@ -99,6 +103,7 @@ class Voronoi {
         // refactoring to Qt containers
         QList<void *> malloclist; // keep tabs on all the malloc'ed memory
         QList<Site*> sites;
+        QList<QLineF> output;
 
         /*** implicit parameters: nsites, sqrt_nsites, xmin, xmax, ymin, ymax,
          : deltax, deltay (can all be estimates).

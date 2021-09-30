@@ -8,9 +8,21 @@
 Voronoi::Voronoi()
 {
     // old controls essentially in main.c
-    triangulate = 0;
-    plot = 0;
-    debug = 0;
+    //
+    // the original source was written in such a way that you could
+    // update the "plotting functions" (line, circle etc) with your
+    // own code to implement a plot.
+    //
+    // we have adapted the "line" function to record lines in the
+    // output vector, so we can draw them on a plot
+    //
+    // testing has suggested that these kinds of diagrams only work
+    // well when there are lots of cells ie, running kmeans with
+    // 30 or even 100 clusters.
+    //
+    triangulate = 0; // tesselate (we don't support this)
+    plot = 1; // call "plotting functions" - we use this
+    debug = 0; // set to 1 to get lots of debug
 
     // malloc lists are maintained and zapped in constructors
     freeinit(&sfl, sizeof(Site));
@@ -98,6 +110,7 @@ Voronoi::run(QRectF /* boundingRect */)
 
     // was done in main.c previously
     geominit();
+    plotinit();
 
     // now into the original sources
     Site *newsite, * bot, * top, * temp, * p, * v ;
@@ -755,11 +768,13 @@ Voronoi::myalloc(unsigned n)
 void
 Voronoi::openpl(void)
     {
+        output.clear();
     }
 
 void
 Voronoi::line(float ax, float ay, float bx, float by)
     {
+        output << QLineF(QPointF(ax,ay), QPointF(bx,by));
     }
 
 void

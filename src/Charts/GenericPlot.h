@@ -58,6 +58,7 @@ class GenericPlot;
 class GenericLegend;
 class GenericSelectTool;
 class GenericAxisInfo;
+class GenericLines; // draw lines
 
 // the chart
 class ChartSpace;
@@ -72,6 +73,7 @@ class GenericPlot : public QWidget {
         static QString gl_timeformat;
 
         friend class GenericSelectTool;
+        friend class GenericLines;
         friend class GenericLegend;
 
         GenericPlot(QWidget *parent, Context *context, QGraphicsItem *item);
@@ -107,7 +109,7 @@ class GenericPlot : public QWidget {
         // adding annotations
         void addAnnotation(AnnotationType, QAbstractSeries*, double yvalue); // LINE
         void addAnnotation(AnnotationType, QString, QColor=QColor(Qt::gray)); // LABEL
-        void addVoronoi(QVector<double>, QVector<double>); // VORONOI
+        void addVoronoi(QString name, QVector<double>, QVector<double>); // VORONOI
 
         // configure axis, after curves added
         bool configureAxis(QString name, bool visible, int align, double min, double max,
@@ -119,12 +121,19 @@ class GenericPlot : public QWidget {
         // do we want to see this series?
         void setSeriesVisible(QString name, bool visible);
 
+        // adding and clearing a voronoi diagram from the chart
+        void clearVoronoi();
+        void plotVoronoi();
+
         // watching scene events and managing interaction
         void seriesClicked(QAbstractSeries*series, GPointF point);
         bool eventHandler(int eventsource, void *obj, QEvent *event);
         void barsetHover(bool status, int index, QBarSet *barset);
         void plotAreaChanged();
         void pieHover(QPieSlice *slice, bool state);
+
+        // access structures
+        QAbstractSeries *curve(QString name) { return curves.value(name, NULL); }
 
     protected:
 
@@ -153,7 +162,10 @@ class GenericPlot : public QWidget {
 
         // annotations
         QList<QLabel *> labels;
+
+        QString vname;
         QVector<double> vx, vy; //voronoi digram
+        GenericLines *voronoidiagram; // draws the lines on the chart
 
     private:
         Context *context;

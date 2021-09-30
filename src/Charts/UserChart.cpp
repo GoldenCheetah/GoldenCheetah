@@ -180,6 +180,10 @@ UserChart::setRide(const RideItem *item)
         // clear old annotations for this series
         annotations.clear();
 
+        // any old voronoi diagram centers
+        series.voronoix.clear();
+        series.voronoiy.clear();
+
         // re-create program (may be edited)
         if (series.user1 != NULL) delete static_cast<UserChartData*>(series.user1);
         series.user1 = new UserChartData(context, this, series.string1, rangemode);
@@ -534,7 +538,7 @@ UserChart::annotateVoronoi(QVector<double>x, QVector<double>y)
             UserChartData *ucd = static_cast<UserChartData*>(seriesinfo[i].user1);
             if (ucd->program == from) {
                 seriesinfo[i].voronoix = x;
-                seriesinfo[i].voronoiy = x;
+                seriesinfo[i].voronoiy = y;
             }
         }
     }
