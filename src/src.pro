@@ -63,7 +63,8 @@ INCLUDEPATH +=  ../qwt/src \
                 ../contrib/lmfit \
                 ../contrib/levmar \
                 ../contrib/boost \
-                ../contrib/kmeans
+                ../contrib/kmeans \
+                ../contrib/voronoi
 
 DEFINES += QXT_STATIC
 

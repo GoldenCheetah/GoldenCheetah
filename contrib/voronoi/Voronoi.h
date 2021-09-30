@@ -1,5 +1,9 @@
 /* refactor of Steven Future's algorithm from original C to C++ class */
 
+#include <QList>
+#include <QRectF>
+#include <QPointF>
+
 #ifndef __VDEFS_H
 #define __VDEFS_H 1
 
@@ -45,8 +49,9 @@ typedef struct tagEdge
     int edgenbr ;
     } Edge ;
 
-#define le 0
-#define re 1
+// renamed from original re and le as they clash
+#define voronoi_le 0
+#define voronoi_re 1
 
 typedef struct tagHalfedge
     {
@@ -65,9 +70,17 @@ class Voronoi {
 
     public:
 
-        int sorted, triangulate, plot, debug, nsites, siteidx ;
+        Voronoi();
+        ~Voronoi();
+
+        void addSite(QPointF point);
+        void run(QRectF boundingRect);
+
+    private:
+
+        // original global variables
+        int triangulate, plot, debug, nsites, siteidx ;
         float xmin, xmax, ymin, ymax ;
-        Site * sites ;
 
         int ELhashsize ;
         Site * bottomsite ;
@@ -83,15 +96,15 @@ class Voronoi {
         int total_alloc ;
         float pxmin, pxmax, pymin, pymax, cradius;
 
+        // refactoring to Qt containers
+        QList<void *> malloclist; // keep tabs on all the malloc'ed memory
+        QList<Site*> sites;
 
         /*** implicit parameters: nsites, sqrt_nsites, xmin, xmax, ymin, ymax,
          : deltax, deltay (can all be estimates).
          : Performance suffers if they are wrong; better to make nsites,
          : deltax, and deltay too big than too small.  (?)
          ***/
-
-        // main entry point
-        void voronoi(Site *(*nextsite)(void));
 
         // DCEL routines
         void ELinitialize(void);

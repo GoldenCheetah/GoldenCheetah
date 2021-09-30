@@ -5,6 +5,206 @@
 #include <stdio.h>
 #include <malloc.h>
 
+Voronoi::Voronoi()
+{
+    // old controls essentially in main.c
+    triangulate = 0;
+    plot = 0;
+    debug = 0;
+
+    // malloc lists are maintained and zapped in constructors
+    freeinit(&sfl, sizeof(Site));
+}
+
+Voronoi::~Voronoi()
+{
+    // wipe out the malloc list
+    foreach(void *m, malloclist) free(m);
+}
+
+// add a site to the list, refactoring what used to be in main.c
+void
+Voronoi::addSite(QPointF point)
+{
+    // as originally in main.c
+    Site *p = (Site*)getfree(&sfl);
+
+    // initialise the site details
+    p->coord.x = point.x();
+    p->coord.y = point.y();
+    p->refcnt=0;
+    p->sitenbr=sites.count();
+    sites.append(p);
+
+    // keep tabs on xmin, xmax etc
+    if (sites.count() == 1) {
+        // first
+        xmin = point.x();
+        xmax = point.x();
+        ymin = point.y();
+        ymax = point.y();
+    } else {
+        // update
+        if (point.x() < xmin) xmin = point.x();
+        if (point.y() < ymin) ymin = point.y();
+        if (point.x() > xmax) xmax = point.x();
+        if (point.y() > ymax) ymax = point.y();
+    }
+}
+
+// sites need to be sorted, originally in main.c
+static bool mySiteSort(const void * vs1, const void * vs2)
+    {
+    Point * s1 = (Point *)vs1 ;
+    Point * s2 = (Point *)vs2 ;
+
+    if (s1->y < s2->y)
+        {
+        return (true) ;
+        }
+    if (s1->y > s2->y)
+        {
+        return (false) ;
+        }
+    if (s1->x < s2->x)
+        {
+        return (true) ;
+        }
+    if (s1->x > s2->x)
+        {
+        return (false) ;
+        }
+    return (false) ;
+    }
+
+/*** implicit parameters: nsites, sqrt_nsites, xmin, xmax, ymin, ymax,
+ : deltax, deltay (can all be estimates).
+ : Performance suffers if they are wrong; better to make nsites,
+ : deltax, and deltay too big than too small.  (?)
+ ***/
+
+// main entry point, originally voronoi()
+void
+Voronoi::run(QRectF /* boundingRect */)
+    {
+    // need at least 2 sites to make any sense
+    if (sites.count() < 2) return;
+
+    // sort the sites
+    std::sort(sites.begin(), sites.end(), mySiteSort);
+
+    // and set the working variables used by the original sources
+    nsites=sites.count();
+
+    // was done in main.c previously
+    geominit();
+
+    // now into the original sources
+    Site *newsite, * bot, * top, * temp, * p, * v ;
+    Point newintstar ;
+    int pm ;
+    Halfedge * lbnd, * rbnd, * llbnd, * rrbnd, * bisector ;
+    Edge * e ;
+
+    int siteindex = 0; // start at first
+
+    PQinitialize() ;
+    bottomsite = this->sites[siteindex++];
+    out_site(bottomsite) ;
+    ELinitialize() ;
+    newsite = this->sites[siteindex++];
+    while (1)
+        {
+        if(!PQempty())
+            {
+            newintstar = PQ_min() ;
+            }
+        if (newsite != (Site *)NULL && (PQempty()
+            || newsite -> coord.y < newintstar.y
+            || (newsite->coord.y == newintstar.y
+            && newsite->coord.x < newintstar.x))) {/* new site is
+smallest */
+            {
+            out_site(newsite) ;
+            }
+        lbnd = ELleftbnd(&(newsite->coord)) ;
+        rbnd = ELright(lbnd) ;
+        bot = rightreg(lbnd) ;
+        e = bisect(bot, newsite) ;
+        bisector = HEcreate(e, voronoi_le) ;
+        ELinsert(lbnd, bisector) ;
+        p = intersect(lbnd, bisector) ;
+        if (p != (Site *)NULL)
+            {
+            PQdelete(lbnd) ;
+            PQinsert(lbnd, p, dist(p,newsite)) ;
+            }
+        lbnd = bisector ;
+        bisector = HEcreate(e, voronoi_re) ;
+        ELinsert(lbnd, bisector) ;
+        p = intersect(bisector, rbnd) ;
+        if (p != (Site *)NULL)
+            {
+            PQinsert(bisector, p, dist(p,newsite)) ;
+            }
+        newsite = siteindex < sites.count() ? sites[siteindex++] : NULL;
+        }
+    else if (!PQempty())   /* intersection is smallest */
+            {
+            lbnd = PQextractmin() ;
+            llbnd = ELleft(lbnd) ;
+            rbnd = ELright(lbnd) ;
+            rrbnd = ELright(rbnd) ;
+            bot = leftreg(lbnd) ;
+            top = rightreg(rbnd) ;
+            out_triple(bot, top, rightreg(lbnd)) ;
+            v = lbnd->vertex ;
+            makevertex(v) ;
+            endpoint(lbnd->ELedge, lbnd->ELpm, v);
+            endpoint(rbnd->ELedge, rbnd->ELpm, v) ;
+            ELdelete(lbnd) ;
+            PQdelete(rbnd) ;
+            ELdelete(rbnd) ;
+            pm = voronoi_le ;
+            if (bot->coord.y > top->coord.y)
+                {
+                temp = bot ;
+                bot = top ;
+                top = temp ;
+                pm = voronoi_re ;
+                }
+            e = bisect(bot, top) ;
+            bisector = HEcreate(e, pm) ;
+            ELinsert(llbnd, bisector) ;
+            endpoint(e, voronoi_re-pm, v) ;
+            deref(v) ;
+            p = intersect(llbnd, bisector) ;
+            if (p  != (Site *) NULL)
+                {
+                PQdelete(llbnd) ;
+                PQinsert(llbnd, p, dist(p,bot)) ;
+                }
+            p = intersect(bisector, rrbnd) ;
+            if (p != (Site *) NULL)
+                {
+                PQinsert(bisector, p, dist(p,bot)) ;
+                }
+            }
+        else
+            {
+            break ;
+            }
+        }
+
+    for( lbnd = ELright(ELleftend) ;
+         lbnd != ELrightend ;
+         lbnd = ELright(lbnd))
+        {
+        e = lbnd->ELedge ;
+        out_ep(e) ;
+        }
+    }
+
 void
 Voronoi::ELinitialize(void)
     {
@@ -166,8 +366,8 @@ Voronoi::leftreg(Halfedge * he)
         {
         return(bottomsite) ;
         }
-    return (he->ELpm == le ? he->ELedge->reg[le] :
-        he->ELedge->reg[re]) ;
+    return (he->ELpm == voronoi_le ? he->ELedge->reg[voronoi_le] :
+        he->ELedge->reg[voronoi_re]) ;
     }
 
 Site *
@@ -177,8 +377,8 @@ Voronoi::rightreg(Halfedge * he)
         {
         return(bottomsite) ;
         }
-    return (he->ELpm == le ? he->ELedge->reg[re] :
-        he->ELedge->reg[le]) ;
+    return (he->ELpm == voronoi_le ? he->ELedge->reg[voronoi_re] :
+        he->ELedge->reg[voronoi_le]) ;
     }
 
 void
@@ -266,8 +466,8 @@ Voronoi::intersect(Halfedge * el1, Halfedge * el2)
         e = e2 ;
         }
     right_of_site = (xint >= e->reg[1]->coord.x) ;
-    if ((right_of_site && (el->ELpm == le)) ||
-       (!right_of_site && (el->ELpm == re)))
+    if ((right_of_site && (el->ELpm == voronoi_le)) ||
+       (!right_of_site && (el->ELpm == voronoi_re)))
         {
         return ((Site *)NULL) ;
         }
@@ -291,11 +491,11 @@ Voronoi::right_of(Halfedge * el, Point * p)
     e = el->ELedge ;
     topsite = e->reg[1] ;
     right_of_site = (p->x > topsite->coord.x) ;
-    if (right_of_site && (el->ELpm == le))
+    if (right_of_site && (el->ELpm == voronoi_le))
         {
         return (1) ;
         }
-    if(!right_of_site && (el->ELpm == re))
+    if(!right_of_site && (el->ELpm == voronoi_re))
         {
         return (0) ;
         }
@@ -342,7 +542,7 @@ Voronoi::right_of(Halfedge * el, Point * p)
         t3 = yl - topsite->coord.y ;
         above = ((t1*t1) > ((t2 * t2) + (t3 * t3))) ;
         }
-    return (el->ELpm == le ? above : !above) ;
+    return (el->ELpm == voronoi_le ? above : !above) ;
     }
 
 void
@@ -350,13 +550,13 @@ Voronoi::endpoint(Edge * e, int lr, Site * s)
     {
     e->ep[lr] = s ;
     ref(s) ;
-    if (e->ep[re-lr] == (Site *)NULL)
+    if (e->ep[voronoi_re-lr] == (Site *)NULL)
         {
         return ;
         }
     out_ep(e) ;
-    deref(e->reg[le]) ;
-    deref(e->reg[re]) ;
+    deref(e->reg[voronoi_le]) ;
+    deref(e->reg[voronoi_re]) ;
     makefree((Freenode *)e, (Freelist *) &efl) ;
     }
 
@@ -535,8 +735,6 @@ Voronoi::makefree(Freenode * curr, Freelist * fl)
     fl->head = curr ;
     }
 
-int total_alloc ;
-
 char *
 Voronoi::myalloc(unsigned n)
     {
@@ -548,6 +746,9 @@ Voronoi::myalloc(unsigned n)
         return(0) ; // was exit(0) in original source, we aint having that here !!!
         }
     total_alloc += n ;
+
+    // keep tabs so we can zap in destructor
+    malloclist << t;
     return (t) ;
     }
 
@@ -586,7 +787,7 @@ Voronoi::out_bisector(Edge * e)
     if (debug)
         {
         printf("line(%d) %gx+%gy=%g, bisecting %d %d\n", e->edgenbr,
-        e->a, e->b, e->c, e->reg[le]->sitenbr, e->reg[re]->sitenbr) ;
+        e->a, e->b, e->c, e->reg[voronoi_le]->sitenbr, e->reg[voronoi_re]->sitenbr) ;
         }
     }
 
@@ -600,8 +801,8 @@ Voronoi::out_ep(Edge * e)
     if (!triangulate && !plot)
         {
         printf("e %d", e->edgenbr);
-        printf(" %d ", e->ep[le] != (Site *)NULL ? e->ep[le]->sitenbr : -1) ;
-        printf("%d\n", e->ep[re] != (Site *)NULL ? e->ep[re]->sitenbr : -1) ;
+        printf(" %d ", e->ep[voronoi_le] != (Site *)NULL ? e->ep[voronoi_le]->sitenbr : -1) ;
+        printf("%d\n", e->ep[voronoi_re] != (Site *)NULL ? e->ep[voronoi_re]->sitenbr : -1) ;
         }
     }
 
@@ -778,117 +979,3 @@ Voronoi::clip_line(Edge * e)
         }
     line(x1,y1,x2,y2);
     }
-
-
-/*** implicit parameters: nsites, sqrt_nsites, xmin, xmax, ymin, ymax,
- : deltax, deltay (can all be estimates).
- : Performance suffers if they are wrong; better to make nsites,
- : deltax, and deltay too big than too small.  (?)
- ***/
-
-void
-Voronoi::voronoi(Site *(*nextsite)(void))
-    {
-    Site * newsite, * bot, * top, * temp, * p, * v ;
-    Point newintstar ;
-    int pm ;
-    Halfedge * lbnd, * rbnd, * llbnd, * rrbnd, * bisector ;
-    Edge * e ;
-
-    PQinitialize() ;
-    bottomsite = (*nextsite)() ;
-    out_site(bottomsite) ;
-    ELinitialize() ;
-    newsite = (*nextsite)() ;
-    while (1)
-        {
-        if(!PQempty())
-            {
-            newintstar = PQ_min() ;
-            }
-        if (newsite != (Site *)NULL && (PQempty()
-            || newsite -> coord.y < newintstar.y
-            || (newsite->coord.y == newintstar.y
-            && newsite->coord.x < newintstar.x))) {/* new site is
-smallest */
-            {
-            out_site(newsite) ;
-            }
-        lbnd = ELleftbnd(&(newsite->coord)) ;
-        rbnd = ELright(lbnd) ;
-        bot = rightreg(lbnd) ;
-        e = bisect(bot, newsite) ;
-        bisector = HEcreate(e, le) ;
-        ELinsert(lbnd, bisector) ;
-        p = intersect(lbnd, bisector) ;
-        if (p != (Site *)NULL)
-            {
-            PQdelete(lbnd) ;
-            PQinsert(lbnd, p, dist(p,newsite)) ;
-            }
-        lbnd = bisector ;
-        bisector = HEcreate(e, re) ;
-        ELinsert(lbnd, bisector) ;
-        p = intersect(bisector, rbnd) ;
-        if (p != (Site *)NULL)
-            {
-            PQinsert(bisector, p, dist(p,newsite)) ;
-            }
-        newsite = (*nextsite)() ;
-        }
-    else if (!PQempty())   /* intersection is smallest */
-            {
-            lbnd = PQextractmin() ;
-            llbnd = ELleft(lbnd) ;
-            rbnd = ELright(lbnd) ;
-            rrbnd = ELright(rbnd) ;
-            bot = leftreg(lbnd) ;
-            top = rightreg(rbnd) ;
-            out_triple(bot, top, rightreg(lbnd)) ;
-            v = lbnd->vertex ;
-            makevertex(v) ;
-            endpoint(lbnd->ELedge, lbnd->ELpm, v);
-            endpoint(rbnd->ELedge, rbnd->ELpm, v) ;
-            ELdelete(lbnd) ;
-            PQdelete(rbnd) ;
-            ELdelete(rbnd) ;
-            pm = le ;
-            if (bot->coord.y > top->coord.y)
-                {
-                temp = bot ;
-                bot = top ;
-                top = temp ;
-                pm = re ;
-                }
-            e = bisect(bot, top) ;
-            bisector = HEcreate(e, pm) ;
-            ELinsert(llbnd, bisector) ;
-            endpoint(e, re-pm, v) ;
-            deref(v) ;
-            p = intersect(llbnd, bisector) ;
-            if (p  != (Site *) NULL)
-                {
-                PQdelete(llbnd) ;
-                PQinsert(llbnd, p, dist(p,bot)) ;
-                }
-            p = intersect(bisector, rrbnd) ;
-            if (p != (Site *) NULL)
-                {
-                PQinsert(bisector, p, dist(p,bot)) ;
-                }
-            }
-        else
-            {
-            break ;
-            }
-        }
-
-    for( lbnd = ELright(ELleftend) ;
-         lbnd != ELrightend ;
-         lbnd = ELright(lbnd))
-        {
-        e = lbnd->ELedge ;
-        out_ep(e) ;
-        }
-    }
-
