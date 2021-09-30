@@ -184,6 +184,7 @@ UserChart::setRide(const RideItem *item)
         if (series.user1 != NULL) delete static_cast<UserChartData*>(series.user1);
         series.user1 = new UserChartData(context, this, series.string1, rangemode);
         connect(static_cast<UserChartData*>(series.user1)->program, SIGNAL(annotateLabel(QStringList&)), this, SLOT(annotateLabel(QStringList&)));
+        connect(static_cast<UserChartData*>(series.user1)->program, SIGNAL(annotateVoronoi(QVector<double>,QVector<double>)), this, SLOT(annotateVoronoi(QVector<double>,QVector<double>)));
 
         // cast so we can work with it
         UserChartData *ucd = static_cast<UserChartData*>(series.user1);
@@ -276,6 +277,7 @@ UserChart::setRide(const RideItem *item)
 
         // add series annotations
         foreach(QStringList list, annotations) chart->annotateLabel(series.name, list);
+        chart->annotateVoronoi(series.name, series.voronoix, series.voronoiy);
 
     }
 
@@ -520,6 +522,22 @@ void
 UserChart::annotateLabel(QStringList &list)
 {
     annotations << list;
+}
+
+void
+UserChart::annotateVoronoi(QVector<double>x, QVector<double>y)
+{
+    QObject *from = sender();
+
+    for(int i=0; i<seriesinfo.count(); i++) {
+        if (seriesinfo[i].user1) {
+            UserChartData *ucd = static_cast<UserChartData*>(seriesinfo[i].user1);
+            if (ucd->program == from) {
+                seriesinfo[i].voronoix = x;
+                seriesinfo[i].voronoiy = x;
+            }
+        }
+    }
 }
 
 //

@@ -79,7 +79,8 @@ class GenericSeriesInfo {
         bool fill;
         RideMetric::MetricType aggregateby;
 
-        QList <QStringList> annotateLabels;
+        QList <QStringList> annotateLabels; // label annotation
+        QVector<double> voronoix, voronoiy; // voronoi diagram annotation
 };
 
 
@@ -299,6 +300,7 @@ class GenericChart : public QWidget {
 
         // annotations
         bool annotateLabel(QString name, QStringList strings); // add a label alongside a series
+        bool annotateVoronoi(QString name, QVector<double>x, QVector<double>y); // add a voronoi diagram
 
         // plot background
         void setBackgroundColor(QColor);

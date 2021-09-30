@@ -263,6 +263,7 @@ class DataFilter : public QObject
         void results(QStringList);
 
         void annotateLabel(QStringList&);
+        void annotateVoronoi(QVector<double>,QVector<double>);
 
     private:
         void setSignature(QString &query);

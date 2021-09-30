@@ -107,6 +107,7 @@ class GenericPlot : public QWidget {
         // adding annotations
         void addAnnotation(AnnotationType, QAbstractSeries*, double yvalue); // LINE
         void addAnnotation(AnnotationType, QString, QColor=QColor(Qt::gray)); // LABEL
+        void addVoronoi(QVector<double>, QVector<double>); // VORONOI
 
         // configure axis, after curves added
         bool configureAxis(QString name, bool visible, int align, double min, double max,
@@ -150,8 +151,9 @@ class GenericPlot : public QWidget {
         // quadtrees
         QMap<QAbstractSeries*, Quadtree*> quadtrees;
 
-        // annotation labels
+        // annotations
         QList<QLabel *> labels;
+        QVector<double> vx, vy; //voronoi digram
 
     private:
         Context *context;

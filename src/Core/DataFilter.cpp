@@ -213,10 +213,10 @@ static struct {
                    // grammar does not support (a*x>1), instead we can use a*bool(x>1). All non
                    // zero expressions will evaluate to 1.
 
-    { "annotate", 0 }, // annotate(type, parms) - add an annotation to the chart, will no doubt
-                       // extend over time to cover lots of different types, but for now
-                       // supports 'label', which has n texts and numbers which are concatenated
-                       // together to make a label; eg. annotate(label, "CP ", cpval, " watts");
+    { "annotate", 0 }, // annotate(type, parms) - add an annotation to the chart
+                       // current supported annotations:
+                       // annotate(label, string1, string2 .. stringn) - adds label at top of a chart
+                       // annotate(voronoi, centers) - associated with a series on a user chart
 
     { "arguniq", 1 },  // returns an index of the uniq values in a vector, in the same way
                        // argsort returns an index, can then be used to select from samples
@@ -1619,7 +1619,7 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
             QRegExp dateRangeValidSymbols("^(start|stop)$", Qt::CaseInsensitive); // date range
             QRegExp pmcValidSymbols("^(stress|lts|sts|sb|rr|date)$", Qt::CaseInsensitive);
             QRegExp smoothAlgos("^(sma|ewma)$", Qt::CaseInsensitive);
-            QRegExp annotateTypes("^(label)$", Qt::CaseInsensitive);
+            QRegExp annotateTypes("^(label|voronoi)$", Qt::CaseInsensitive);
             QRegExp curveData("^(x|y|z|d|t)$", Qt::CaseInsensitive);
             QRegExp aggregateFunc("^(mean|sum|max|min|count)$", Qt::CaseInsensitive);
             QRegExp interpolateAlgorithms("^(linear|cubic|akima|steffen)$", Qt::CaseInsensitive);
@@ -2407,7 +2407,7 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
                     if (leaf->fparms.count() < 2 || leaf->fparms[0]->type != Leaf::Symbol) {
 
                        leaf->inerror = true;
-                       DataFiltererrors << QString(tr("annotate(label, list of strings, numbers) need at least 2 parameters."));
+                       DataFiltererrors << QString(tr("annotate(label|voronoi, ...) need at least 2 parameters."));
 
                     } else {
 
@@ -2416,7 +2416,12 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
                             leaf->inerror = true;
                             DataFiltererrors << QString(tr("annotation type '%1' not available").arg(type));
                         } else {
+                            if (type == "voronoi" && leaf->fparms.count() != 2) {
+                                    leaf->inerror = true;
+                                    DataFiltererrors << QString(tr("annotate(voronoi, centers)"));
+                            } else {
                             for(int i=1; i<leaf->fparms.count(); i++) validateFilter(context, df, leaf->fparms[i]);
+                            }
                         }
                     }
 
@@ -5923,8 +5928,9 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
         // annotate
         if (leaf->function == "annotate") {
 
+            QString type = *(leaf->fparms[0]->lvalue.n);
 
-            if (*(leaf->fparms[0]->lvalue.n) == "label") {
+            if (type == "label") {
 
                 QStringList list;
 
@@ -5959,6 +5965,22 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
 
                 // send the signal.
                 if (list.count())  df->owner->annotateLabel(list);
+            }
+
+            if (type == "voronoi") {
+                Result centers = eval(df,leaf->fparms[1],x, it, m, p, c, s, d);
+
+                if (centers.isVector() && centers.isNumber && centers.asNumeric().count() >=2 && centers.asNumeric().count()%2 == 0) {
+                    QVector<double>x, y;
+                    int n=centers.asNumeric().count()/2;
+                    for(int i=0; i<n; i++) {
+                        x << centers.asNumeric()[i];
+                        y << centers.asNumeric()[i+n];
+                    }
+
+                    // send signal
+                    df->owner->annotateVoronoi(x,y);
+                }
             }
         }
 

@@ -175,6 +175,22 @@ GenericChart::annotateLabel(QString name, QStringList list)
     return true;
 }
 
+// add a voronoi to a series
+bool
+GenericChart::annotateVoronoi(QString name, QVector<double>x, QVector<double>y)
+{
+    if (x.count() < 2) return false;
+
+    // add to the curve
+    for(int i=0; i<newSeries.count(); i++)
+        if (newSeries[i].name == name) {
+            newSeries[i].voronoix =x;
+            newSeries[i].voronoiy =y;
+        }
+
+    return true;
+}
+
 // configure axis, after curves added
 bool
 GenericChart::configureAxis(QString name, bool visible, int align, double min, double max,
@@ -422,6 +438,8 @@ GenericChart::finaliseChart()
                 newPlots[i].plot->addAnnotation(GenericPlot::LABEL, list.join(" "), RGBColor(QColor(p.color)));
             }
 
+            // did we have a voronoi diagram?
+            if (p.voronoix.count() >= 2) newPlots[i].plot->addVoronoi(p.voronoix, p.voronoiy);
         }
 
         // set axis

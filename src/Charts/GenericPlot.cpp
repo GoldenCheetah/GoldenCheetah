@@ -316,6 +316,15 @@ GenericPlot::addAnnotation(AnnotationType, QString string, QColor color)
 }
 
 void
+GenericPlot::addVoronoi(QVector<double>x, QVector<double>y)
+{
+    vx = x;
+    vy = y;
+
+    fprintf(stderr, "generic plot: add voronoi diagram\n"); fflush(stderr);
+}
+
+void
 GenericPlot::pieHover(QPieSlice *slice, bool state)
 {
     if (havelegend.count() == 0) return;
