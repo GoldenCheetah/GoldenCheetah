@@ -33,6 +33,7 @@
 
 double gl_major;
 static double gl_wheelscale = 6; // rate we scroll for wheel events
+static double gl_near = 20; // close to boundary in pixels (will be factored by dpiXFactor)
 
 static QIcon grayConfig, whiteConfig, accentConfig;
 ChartSpaceItemRegistry *ChartSpaceItemRegistry::_instance;
@@ -879,7 +880,7 @@ ChartSpace::eventFilter(QObject *, QEvent *event)
                double offy = pos.y()-item->geometry().y();
 
 
-               if (item->geometry().height()-offy < 10) {
+               if (item->geometry().height()-offy < (gl_near*dpiXFactor)) {
 
                     // We can span resize a specific chartspaceitem
                     // by pressing SHIFT when we click
@@ -893,7 +894,7 @@ ChartSpace::eventFilter(QObject *, QEvent *event)
                     event->accept();
                     returning = true;
 
-               } else if (item->geometry().width()-offx < 10) {
+               } else if (item->geometry().width()-offx < (gl_near*dpiXFactor)) {
 
                     if (QGuiApplication::queryKeyboardModifiers() & Qt::ShiftModifier)  state = SPAN;
                     else state = XRESIZE;
@@ -1006,24 +1007,24 @@ ChartSpace::eventFilter(QObject *, QEvent *event)
                 double offx = pos.x()-item->geometry().x();
                 double offy = pos.y()-item->geometry().y();
 
-                if (yresizecursor == false && item->geometry().height()-offy < 10) {
+                if (yresizecursor == false && item->geometry().height()-offy < (gl_near*dpiXFactor)) {
 
                     yresizecursor = true;
                     view->viewport()->setCursor(QCursor(Qt::SizeVerCursor));
 
-                } else if (yresizecursor == true && item->geometry().height()-offy > 10) {
+                } else if (yresizecursor == true && item->geometry().height()-offy > (gl_near*dpiXFactor)) {
 
                     yresizecursor = false;
                     view->viewport()->setCursor(QCursor(Qt::ArrowCursor));
 
                 }
 
-                if (xresizecursor == false && item->geometry().width()-offx < 10) {
+                if (xresizecursor == false && item->geometry().width()-offx < (gl_near*dpiXFactor)) {
 
                     xresizecursor = true;
                     view->viewport()->setCursor(QCursor(Qt::SizeHorCursor));
 
-                } else if (xresizecursor == true && item->geometry().width()-offx > 10) {
+                } else if (xresizecursor == true && item->geometry().width()-offx > (gl_near*dpiXFactor)) {
 
                     xresizecursor = false;
                     view->viewport()->setCursor(QCursor(Qt::ArrowCursor));
