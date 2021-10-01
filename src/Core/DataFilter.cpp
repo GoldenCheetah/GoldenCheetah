@@ -801,6 +801,7 @@ DataFilter::colorSyntax(QTextDocument *document, int pos)
     int symbolstart=0;
     int brace=0;
     int brack=0;
+    int sbrack=0;
 
     for(int i=0; i<string.length(); i++) {
 
@@ -1031,6 +1032,78 @@ DataFilter::colorSyntax(QTextDocument *document, int pos)
             }
         }
 
+        // are the brackets balanced  [ ] ?
+        if (!instring && !incomment && string[i]=='[') {
+            sbrack++;
+
+            // match close/open if over cursor
+            if (i==pos-1) {
+                cursor.setPosition(i, QTextCursor::MoveAnchor);
+                cursor.selectionStart();
+                cursor.setPosition(i+1, QTextCursor::KeepAnchor);
+                cursor.selectionEnd();
+                cursor.mergeCharFormat(cyanbg);
+
+                // run forward looking for match
+                int bb=0;
+                for(int j=i; j<string.length(); j++) {
+                    if (string[j]=='[') bb++;
+                    if (string[j]==']') {
+                        bb--;
+                        if (bb == 0) {
+                            bpos = j; // matched brack here, don't change color!
+
+                            cursor.setPosition(j, QTextCursor::MoveAnchor);
+                            cursor.selectionStart();
+                            cursor.setPosition(j+1, QTextCursor::KeepAnchor);
+                            cursor.selectionEnd();
+                            cursor.mergeCharFormat(cyanbg);
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        if (!instring && !incomment && string[i]==']') {
+            sbrack--;
+
+            if (i==pos-1) {
+
+                cursor.setPosition(i, QTextCursor::MoveAnchor);
+                cursor.selectionStart();
+                cursor.setPosition(i+1, QTextCursor::KeepAnchor);
+                cursor.selectionEnd();
+                cursor.mergeCharFormat(cyanbg);
+
+                // run backward looking for match
+                int bb=0;
+                for(int j=i; j>=0; j--) {
+                    if (string[j]==']') bb++;
+                    if (string[j]=='[') {
+                        bb--;
+                        if (bb == 0) {
+                            bpos = j; // matched brack here, don't change color!
+
+                            cursor.setPosition(j, QTextCursor::MoveAnchor);
+                            cursor.selectionStart();
+                            cursor.setPosition(j+1, QTextCursor::KeepAnchor);
+                            cursor.selectionEnd();
+                            cursor.mergeCharFormat(cyanbg);
+                            break;
+                        }
+                    }
+                }
+
+            } else if (sbrack < 0 && i != bpos-1) {
+
+                cursor.setPosition(i, QTextCursor::MoveAnchor);
+                cursor.selectionStart();
+                cursor.setPosition(i+1, QTextCursor::KeepAnchor);
+                cursor.selectionEnd();
+                cursor.mergeCharFormat(redbg);
+            }
+        }
+
         // are the braces balanced  ( ) ?
         if (!instring && !incomment && string[i]=='{') {
             brace++;
@@ -1127,10 +1200,27 @@ DataFilter::colorSyntax(QTextDocument *document, int pos)
         brack = 0;
         for(int i=string.length(); i>=0; i--) {
 
-            if (string[i] == ')') brace++;
-            if (string[i] == '(') brace--;
+            if (string[i] == ')') brack++;
+            if (string[i] == '(') brack--;
 
             if (brack < 0 && string[i] == '(' && i != pos-1 && i != bpos-1) {
+                cursor.setPosition(i, QTextCursor::MoveAnchor);
+                cursor.selectionStart();
+                cursor.setPosition(i+1, QTextCursor::KeepAnchor);
+                cursor.selectionEnd();
+                cursor.mergeCharFormat(redbg);
+            }
+        }
+    }
+
+    if (sbrack > 0) {
+        sbrack = 0;
+        for(int i=string.length(); i>=0; i--) {
+
+            if (string[i] == ']') sbrack++;
+            if (string[i] == '[') sbrack--;
+
+            if (sbrack < 0 && string[i] == '[' && i != pos-1 && i != bpos-1) {
                 cursor.setPosition(i, QTextCursor::MoveAnchor);
                 cursor.selectionStart();
                 cursor.setPosition(i+1, QTextCursor::KeepAnchor);
