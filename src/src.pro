@@ -655,9 +655,9 @@ greaterThan(QT_MAJOR_VERSION, 4) {
         # generic chart
         DEFINES += GC_HAVE_GENERIC
         HEADERS += Charts/UserChartWindow.h Charts/UserChartOverviewItem.h Charts/UserChart.h Charts/UserChartData.h \
-                   Charts/GenericChart.h Charts/GenericPlot.h Charts/GenericSelectTool.h Charts/GenericLegend.h Charts/GenericLines.h
+                   Charts/GenericChart.h Charts/GenericPlot.h Charts/GenericSelectTool.h Charts/GenericLegend.h Charts/GenericAnnotations.h
         SOURCES += Charts/UserChartWindow.cpp Charts/UserChartOverviewItem.cpp Charts/UserChart.cpp Charts/UserChartData.cpp \
-                   Charts/GenericChart.cpp Charts/GenericPlot.cpp Charts/GenericSelectTool.cpp Charts/GenericLegend.cpp Charts/GenericLines.cpp
+                   Charts/GenericChart.cpp Charts/GenericPlot.cpp Charts/GenericSelectTool.cpp Charts/GenericLegend.cpp Charts/GenericAnnotations.cpp
 
     }
 }

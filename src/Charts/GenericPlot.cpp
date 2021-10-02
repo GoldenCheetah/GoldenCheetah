@@ -29,7 +29,7 @@
 #include "UserChartOverviewItem.h"
 
 #include "Voronoi.h"
-#include "GenericLines.h"
+#include "GenericAnnotations.h"
 
 #include <limits>
 
@@ -88,6 +88,9 @@ GenericPlot::GenericPlot(QWidget *parent, Context *context, QGraphicsItem *item)
     // add selector
     selector = new GenericSelectTool(this);
     chartview->scene()->addItem(selector);
+
+    // add annotations controller (which attaches to the plot)
+    annotationController = new GenericAnnotationController(this);
 
     // the legend at the top for now
     legend = new GenericLegend(context, this);
@@ -1392,23 +1395,18 @@ GenericPlot::plotVoronoi()
 #endif
 
     // create a new diagram
-    voronoidiagram = new GenericLines(this);
+    voronoidiagram = new GenericLines(this->annotationController);
+    annotationController->addAnnotation(voronoidiagram);
     voronoidiagram->setCurve(curves.value(vname,NULL));
     voronoidiagram->setLines(v.lines());
-
-    chartview->scene()->addItem(voronoidiagram);
-    voronoidiagram->update();
 }
 
 void
 GenericPlot::clearVoronoi()
 {
     if (voronoidiagram) {
-        voronoidiagram->setCurve(NULL);
-        voronoidiagram->setLines(QList<QLineF>());
-        voronoidiagram->prepare();
-        chartview->scene()->removeItem(voronoidiagram);
-        //delete voronoidiagram; // CRASH!
+        annotationController->removeAnnotation(voronoidiagram);
+        delete voronoidiagram;
         voronoidiagram = NULL;
     }
 }

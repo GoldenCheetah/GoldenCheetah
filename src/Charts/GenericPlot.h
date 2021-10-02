@@ -44,6 +44,7 @@
 
 #include "GenericSelectTool.h"
 #include "GenericLegend.h"
+#include "GenericAnnotations.h"
 #include "GenericChart.h"
 
 // keep aligned to library.py
@@ -58,7 +59,6 @@ class GenericPlot;
 class GenericLegend;
 class GenericSelectTool;
 class GenericAxisInfo;
-class GenericLines; // draw lines
 
 // the chart
 class ChartSpace;
@@ -73,6 +73,7 @@ class GenericPlot : public QWidget {
         static QString gl_timeformat;
 
         friend class GenericSelectTool;
+        friend class GenericAnnotationController;
         friend class GenericLines;
         friend class GenericLegend;
 
@@ -161,6 +162,8 @@ class GenericPlot : public QWidget {
         QMap<QAbstractSeries*, Quadtree*> quadtrees;
 
         // annotations
+        GenericAnnotationController *annotationController;
+
         QList<QLabel *> labels;
 
         QString vname;
