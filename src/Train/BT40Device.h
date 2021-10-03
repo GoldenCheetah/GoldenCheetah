@@ -25,6 +25,7 @@
 #include <QQueue>
 
 #include "CalibrationData.h"
+#include "Ftms.h"
 
 typedef struct btle_sensor_type {
     const char *descriptive_name;
@@ -100,11 +101,14 @@ private:
     CalibrationData calibrationData;
 
     // Service and Characteristic to set load
-    enum {Load_None, Tacx_UART, Wahoo_Kickr, Kurt_InRide, Kurt_SmartControl} loadType;
+    enum {Load_None, Tacx_UART, Wahoo_Kickr, Kurt_InRide, Kurt_SmartControl, FTMS_Device} loadType;
     QLowEnergyCharacteristic loadCharacteristic;
     QLowEnergyService* loadService;
     QQueue<QByteArray> commandQueue;
     int commandRetry;
+
+    // FTMS Device Configuration
+    FtmsDeviceInformation ftmsDeviceInfo;
 
     bool connected;
     void getCadence(QDataStream& ds);
@@ -113,6 +117,7 @@ private:
     void setLoadIntensity(double);
     void setLoadLevel(int);
     void setRiderCharacteristics(double weight, double rollingResistance, double windResistance);
+    void sendSimulationParameters();
     void commandSend(QByteArray &command);
     void commandWrite(QByteArray &command);
     void commandWriteFailed();

@@ -639,6 +639,8 @@ greaterThan(QT_MAJOR_VERSION, 4) {
         SOURCES += Train/BT40Controller.cpp Train/BT40Device.cpp
         HEADERS += Train/VMProConfigurator.h Train/VMProWidget.h
         SOURCES += Train/VMProConfigurator.cpp Train/VMProWidget.cpp
+        SOURCES += Train/Ftms.cpp
+        HEADERS += Train/Ftms.h
     }
 
     # qt charts is officially supported from QT5.8 or higher
