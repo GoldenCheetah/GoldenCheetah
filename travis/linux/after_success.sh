@@ -52,7 +52,7 @@ chmod +x python3.7.12-cp37-cp37m-manylinux1_x86_64.AppImage
 rm -f python3.7.12-cp37-cp37m-manylinux1_x86_64.AppImage
 export PATH="$(pwd)/squashfs-root/usr/bin:$PATH"
 pip install --upgrade pip
-pip install -r Python/requirements.txt
+pip install -q -r Python/requirements.txt
 mv squashfs-root/usr appdir/usr
 mv squashfs-root/opt appdir/opt
 rm -rf squashfs-root
