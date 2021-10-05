@@ -36,6 +36,8 @@ plugins/
 resources/
 src/debug/
 src/release/
+doc/doxygen/latex
+doc/doxygen/html
 
 qwt/src/debug/
 qwt/src/release/
