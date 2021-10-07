@@ -42,12 +42,12 @@
 
 QMap<QBluetoothUuid, btle_sensor_type_t> BT40Device::supportedServices = {
     { QBluetoothUuid(QBluetoothUuid::HeartRate),                { "Heartrate", ":images/IconHR.png" }},
-    { QBluetoothUuid(QBluetoothUuid::CyclingPower),             { "Power", ":images/IconPower.png" }},
+    /*{ QBluetoothUuid(QBluetoothUuid::CyclingPower),             { "Power", ":images/IconPower.png" }},*/
     { QBluetoothUuid(QBluetoothUuid::CyclingSpeedAndCadence),   { "Speed + Cadence", ":images/IconCadence.png" }},
     { QBluetoothUuid(QString(VO2MASTERPRO_SERVICE_UUID)),       { "VM Pro", ":images/IconCadence.png" }},
-    { QBluetoothUuid(QString(BLE_TACX_UART_UUID)),              { "Tacx FE-C over BLE", ":images/IconPower.png" }},
-    { s_KurtInRideService_UUID,                                 { "Kurt Kinetic Inride over BLE", ":images/IconPower.png" }},
-    { s_KurtSmartControlService_UUID,                           { "Kurt Kinetic Smart Control over BLE", ":images/IconPower.png" }},
+    /*{ QBluetoothUuid(QString(BLE_TACX_UART_UUID)),              { "Tacx FE-C over BLE", ":images/IconPower.png" }},*/
+    /*{ s_KurtInRideService_UUID,                                 { "Kurt Kinetic Inride over BLE", ":images/IconPower.png" }},*/
+    /*{ s_KurtSmartControlService_UUID,                           { "Kurt Kinetic Smart Control over BLE", ":images/IconPower.png" }},*/
     { QBluetoothUuid((quint16)FTMSDEVICE_FTMS_UUID),            {"FTMS", ":images/IconPower.png"}},
 
     // This will be needed if we decide to query DeviceInfo for SystemID
