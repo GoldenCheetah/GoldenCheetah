@@ -11,16 +11,37 @@ brew unlink python@2 # to avoid conflicts with qt/libical dependence on python
 #brew upgrade qt5 # to get 5.15.x
 /usr/local/opt/qt5/bin/qmake --version
 
-brew install gsl
 brew install libical
 brew upgrade libusb
-brew install srmio
-brew install libsamplerate
+#brew install libsamplerate
 rm -rf '/usr/local/include/c++'
-brew install r
 ## Disable KML for now
 ## brew install --HEAD travis/libkml.rb
 sudo chmod -R +w /usr/local
+
+# GSL - install from source due to homebrew issues
+curl -k -O https://ftp.gnu.org/gnu/gsl/gsl-2.6.tar.gz
+tar xf gsl-2.6.tar.gz
+cd gsl-2.6
+sudo chown -R $USER .
+./configure && make -j3 --silent
+sudo make install
+cd ..
+
+# R 4.1.1
+curl -L -O https://cran.r-project.org/bin/macosx/base/R-4.1.1.pkg
+sudo installer -pkg R-4.1.1.pkg -target /
+R --version
+
+# SRMIO
+curl -L -O https://github.com/rclasen/srmio/archive/v0.1.1git1.tar.gz
+tar xf v0.1.1git1.tar.gz
+cd srmio-0.1.1git1
+sh genautomake.sh
+./configure --disable-shared --enable-static
+make -j3 --silent
+sudo make install
+cd ..
 
 # D2XX - refresh cache if folder is empty
 if [ -z "$(ls -A D2XX)" ]; then
@@ -43,7 +64,8 @@ fi
 sudo cp VLC/lib/libvlc*.dylib /usr/local/lib
 
 # AWS client to upload binaries to S3 bucket
-brew install awscli
+curl -O https://awscli.amazonaws.com/AWSCLIV2.pkg
+sudo installer -pkg AWSCLIV2.pkg -target /
 aws --version
 
 exit
