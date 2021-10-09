@@ -100,6 +100,7 @@
 // 4004 - V3.6 DEVELOPMENT 2106 (JUN 2021)
 // 4006 - V3.6 DEVELOPMENT 2107 (JUL 2021)
 // 4007 - V3.6 DEVELOPMENT 2108 (AUG 2021)
+// 4008 - V3.6 DEVELOPMENT 2110 (OCT 2021)
 
 
 #define VERSION3_BUILD    3010 // released
@@ -111,13 +112,13 @@
 #define VERSION33_BUILD   3933 // development release
 #define VERSION34_BUILD   3955 // released
 #define VERSION35_BUILD   3990 // released
-#define VERSION36_BUILD   4007 // testing upgrade processing
+#define VERSION36_BUILD   4008 // testing upgrade processing
 
 // will keep changing during testing and before final release
 #define VERSION31_BUILD VERSION31_UPG
 
 // the next two will with each build/release
-#define VERSION_LATEST 4007
+#define VERSION_LATEST 4008
 #define VERSION_STRING "V3.6-DEVELOPMENT"
 
 // default config for this release cycle
