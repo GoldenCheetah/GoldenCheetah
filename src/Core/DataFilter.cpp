@@ -3599,7 +3599,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
 
                 // aggregate results
                 double aggregate=0;
-                switch(e->type()) {
+                switch(e ? e->type() : RideMetric::Average) {
                 case RideMetric::Total:
                 case RideMetric::RunningTotal:
                     aggregate = runningtotal;
@@ -3620,7 +3620,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
                 }
 
                 // format and return
-                returning.asString() << e->toString(aggregate);
+                returning.asString() << (e ? e->toString(aggregate) : "(null)");
             }
 
             return returning;
