@@ -182,6 +182,9 @@ class MainWindow : public QMainWindow
         void setDeleteAthleteMenu();
         void deleteAthlete(QString name);
 
+        // Athlete Settings
+        void athleteSettings();
+
         // Search / Filter
         void setFilter(QStringList);
         void clearFilter();

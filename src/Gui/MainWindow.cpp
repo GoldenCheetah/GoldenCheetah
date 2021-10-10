@@ -55,6 +55,7 @@
 #include "AboutDialog.h"
 #include "ChooseCyclistDialog.h"
 #include "ConfigDialog.h"
+#include "AthleteConfigDialog.h"
 #include "DownloadRideDialog.h"
 #include "ManualRideDialog.h"
 #include "RideImportWizard.h"
@@ -482,6 +483,7 @@ MainWindow::MainWindow(const QDir &home)
 
     fileMenu->addSeparator();
     fileMenu->addAction(tr("Save all modified activities"), this, SLOT(saveAllUnsavedRides()));
+    fileMenu->addAction(tr("Settings"), this, SLOT(athleteSettings()));
     fileMenu->addSeparator();
     fileMenu->addAction(tr("Close Window"), this, SLOT(closeWindow()));
     //fileMenu->addAction(tr("&Close Tab"), this, SLOT(closeTab())); use athlete view
@@ -1825,6 +1827,13 @@ MainWindow::saveRide()
     if (currentAthleteTab->context->ride) {
         saveRideSingleDialog(currentAthleteTab->context, currentAthleteTab->context->ride); // will signal save to everyone
     }
+}
+
+void
+MainWindow::athleteSettings()
+{
+    AthleteConfigDialog *dialog = new AthleteConfigDialog(currentAthleteTab->context->athlete->home->root(), currentAthleteTab->context);
+    dialog->exec();
 }
 
 void
