@@ -58,6 +58,7 @@
 class GenericPlot;
 class GenericLegend;
 class GenericSelectTool;
+class GenericSeriesInfo;
 class GenericAxisInfo;
 class GenericAnnotationInfo;
 
@@ -76,6 +77,7 @@ class GenericPlot : public QWidget {
         friend class GenericSelectTool;
         friend class GenericAnnotationController;
         friend class GenericLines;
+        friend class StraightLine;
         friend class GenericLegend;
 
         GenericPlot(QWidget *parent, Context *context, QGraphicsItem *item);
@@ -106,12 +108,7 @@ class GenericPlot : public QWidget {
         // add a curve, associating an axis
         bool addCurve(QString name, QVector<double> xseries, QVector<double> yseries, QVector<QString> fseries, QString xname, QString yname,
                       QStringList labels, QStringList colors,
-                      int line, int symbol, int size, QString color, int opacity, bool opengl, bool legend, bool datalabels, bool fill);
-
-        // adding annotations
-        void addAnnotation(AnnotationType, QAbstractSeries*, double yvalue); // LINE
-        void addAnnotation(AnnotationType, QString, QColor=QColor(Qt::gray)); // LABEL
-        void addVoronoi(QString name, QVector<double>, QVector<double>); // VORONOI
+                      int line, int symbol, int size, QString color, int opacity, bool opengl, bool legend, bool datalabels, bool fill, QList<GenericAnnotationInfo>annotations);
 
         // configure axis, after curves added
         bool configureAxis(QString name, bool visible, int align, double min, double max,
@@ -120,12 +117,12 @@ class GenericPlot : public QWidget {
         // post processing clean up / add decorations / helpers etc
         void finaliseChart();
 
+        // add and remove annotations (annotations are always associated with a curve)
+        void clearAnnotations();
+        void plotAnnotations(GenericSeriesInfo &info);
+
         // do we want to see this series?
         void setSeriesVisible(QString name, bool visible);
-
-        // adding and clearing a voronoi diagram from the chart
-        void clearVoronoi();
-        void plotVoronoi();
 
         // watching scene events and managing interaction
         void seriesClicked(QAbstractSeries*series, GPointF point);
@@ -165,11 +162,10 @@ class GenericPlot : public QWidget {
         // annotations
         GenericAnnotationController *annotationController;
 
+        // labels and other annotations
         QList<QLabel *> labels;
-
-        QString vname;
-        QVector<double> vx, vy; //voronoi digram
-        GenericLines *voronoidiagram; // draws the lines on the chart
+        QList<GenericAnnotation*> annotations;
+        QList<GenericSeriesInfo> annotationinfos;
 
     private:
         Context *context;

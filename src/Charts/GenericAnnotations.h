@@ -82,4 +82,32 @@ class GenericLines : public GenericAnnotation
         GenericAnnotationController *controller;
 };
 
+// horizontal or vertical line with a text label
+class StraightLine : public GenericAnnotation
+{
+    public:
+
+        StraightLine(GenericAnnotationController *);
+        ~StraightLine();
+
+        void setCurve(QAbstractSeries *curve) { this->curve=curve; }
+        void setValue(double value) { this->value = value; controller->update(); }
+        void setText(QString text) { this->text = text; controller->update(); }
+        void setStyle(Qt::PenStyle style) { this->style = style; controller->update(); }
+        void setOrientation(int orientation) { this->orientation = orientation; controller->update(); }
+
+        void paint(QPainter*, const QStyleOptionGraphicsItem *, QWidget*);
+
+    private:
+
+        // lines to draw
+        QAbstractSeries *curve;
+        double value;
+        QString text;
+        int orientation;
+        Qt::PenStyle style;
+
+        GenericAnnotationController *controller;
+};
+
 #endif

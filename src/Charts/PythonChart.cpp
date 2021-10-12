@@ -470,7 +470,7 @@ PythonChart::setWeb(bool x)
                 plot,   SLOT( addCurve(QString,QVector<double>,QVector<double>,QStringList,QString,QString,QStringList,QStringList,int,int,int,QString,int,bool,bool,bool,bool)));
         connect(this, SIGNAL(emitAxis(QString,bool,int,double,double,int,QString,QString,bool,QStringList)),
                 plot,   SLOT(configureAxis(QString,bool,int,double,double,int,QString,QString,bool,QStringList)));
-        connect(this,SIGNAL(emitAnnotation(QString,QStringList)), plot,  SLOT(annotateLabel(QString,QStringList)));
+        //connect(this,SIGNAL(emitAnnotation(QString,QStringList)), plot,  SLOT(annotateLabel(QString,QStringList))); // XXX fixme
 
     }
 

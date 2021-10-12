@@ -6100,26 +6100,39 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
                 }
 
                 // send the signal.
-                if (list.count())  df->owner->annotateLabel(list);
+                if (list.count())  {
+                    GenericAnnotationInfo label(GenericAnnotationInfo::Label);
+                    label.labels = list;
+                    df->owner->annotate(label);
+                }
             }
 
             if (type == "voronoi") {
                 Result centers = eval(df,leaf->fparms[1],x, it, m, p, c, s, d);
 
                 if (centers.isVector() && centers.isNumber && centers.asNumeric().count() >=2 && centers.asNumeric().count()%2 == 0) {
-                    QVector<double>x, y;
+
+                    GenericAnnotationInfo voronoi(GenericAnnotationInfo::Voronoi);
                     int n=centers.asNumeric().count()/2;
                     for(int i=0; i<n; i++) {
-                        x << centers.asNumeric()[i];
-                        y << centers.asNumeric()[i+n];
+                        voronoi.vx << centers.asNumeric()[i];
+                        voronoi.vy << centers.asNumeric()[i+n];
                     }
 
                     // send signal
-                    df->owner->annotateVoronoi(x,y);
+                    df->owner->annotate(voronoi);
                 }
             }
 
             if (type == "hline" || type == "vline") {
+
+                GenericAnnotationInfo line(type == "vline" ? GenericAnnotationInfo::VLine : GenericAnnotationInfo::HLine);
+                line.text =  eval(df,leaf->fparms[1],x, it, m, p, c, s, d).string();
+                line.linestyle = linestyle(*(leaf->fparms[2]->lvalue.n));
+                line.value = eval(df,leaf->fparms[3],x, it, m, p, c, s, d).number();
+
+                // send signal
+                df->owner->annotate(line);
             }
 
         }

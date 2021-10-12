@@ -35,17 +35,16 @@
 // a chart annotation
 class GenericAnnotationInfo {
 
-    enum annotationType { None, Label, VLine, HLine, Voronoi };
-    typedef annotationType AnnotationType;
-
     public:
 
-        GenericAnnotationInfo(AnnotationType);
-
+        enum annotationType { None, Label, VLine, HLine, Voronoi };
+        typedef annotationType AnnotationType;
         AnnotationType type;
 
+        GenericAnnotationInfo(AnnotationType type) : type(type) {}
+
         // labels
-        QList<QLabel *> labels;
+        QStringList labels;
 
         // voronoi
         QString vname;
@@ -64,12 +63,12 @@ class GenericSeriesInfo {
 
         GenericSeriesInfo(QString name, QVector<double> xseries, QVector<double> yseries, QVector<QString> fseries, QString xname, QString yname,
                       QStringList labels, QStringList colors, int line, int symbol, int size, QString color, int opacity, bool opengl,
-                      bool legend, bool datalabels, bool fill, RideMetric::MetricType aggregateby = RideMetric::Average) :
+                      bool legend, bool datalabels, bool fill, RideMetric::MetricType aggregateby, QList<GenericAnnotationInfo> annotations) :
                       user1(NULL), user2(NULL), user3(NULL), user4(NULL),
                       name(name), xseries(xseries), yseries(yseries), fseries(fseries), xname(xname), yname(yname),
                       labels(labels), colors(colors),
                       line(line), symbol(symbol), size(size), color(color), opacity(opacity), opengl(opengl), legend(legend), datalabels(datalabels), fill(fill),
-                      aggregateby(aggregateby)
+                      aggregateby(aggregateby), annotations(annotations)
                       {}
 
         GenericSeriesInfo() :
@@ -105,9 +104,6 @@ class GenericSeriesInfo {
         RideMetric::MetricType aggregateby;
 
         QList<GenericAnnotationInfo> annotations;
-
-        QList <QStringList> annotateLabels; // label annotation
-        QVector<double> voronoix, voronoiy; // voronoi diagram annotation
 };
 
 
@@ -314,9 +310,10 @@ class GenericChart : public QWidget {
         // add a curve, associating an axis
         bool addCurve(QString name, QVector<double> xseries, QVector<double> yseries, QVector<QString> fseries, QString xname, QString yname,
                       QStringList labels, QStringList colors,
-                      int line, int symbol, int size, QString color, int opacity, bool opengl, bool legend, bool datalabels, bool fill);
+                      int line, int symbol, int size, QString color, int opacity, bool opengl, bool legend, bool datalabels,
+                      bool fill, RideMetric::MetricType mtype, QList<GenericAnnotationInfo>annotations);
 
-        // helper for Python charts fseries is a stringlist
+        // helper for Python and R charts fseries is a stringlist
         bool addCurve(QString name, QVector<double> xseries, QVector<double> yseries, QStringList fseries, QString xname, QString yname,
                       QStringList labels, QStringList colors,
                       int line, int symbol, int size, QString color, int opacity, bool opengl, bool legend, bool datalabels, bool fill);
@@ -324,10 +321,6 @@ class GenericChart : public QWidget {
         // configure axis, after curves added
         bool configureAxis(QString name, bool visible, int align, double min, double max,
                       int type, QString labelcolor, QString color, bool log, QStringList categories);
-
-        // annotations
-        bool annotateLabel(QString name, QStringList strings); // add a label alongside a series
-        bool annotateVoronoi(QString name, QVector<double>x, QVector<double>y); // add a voronoi diagram
 
         // plot background
         void setBackgroundColor(QColor);

@@ -506,7 +506,8 @@ GenericSelectTool::released(QPointF pos)
                 QPointF v = host->qchart->mapToValue(pos,yseries);
 
                 // add to chart
-                host->addAnnotation(GenericPlot::LINE, yseries, v.y());
+                // not implemented yet, need to decide how they persist, will do in 3.7
+                // host->addAnnotation(GenericPlot::LINE, yseries, v.y());
             }
 
             return true; // don't drop through into selection logic

@@ -50,7 +50,6 @@ GenericPlot::GenericPlot(QWidget *parent, Context *context, QGraphicsItem *item)
     barseries=NULL;
     stackbarseries=NULL;
     percentbarseries=NULL;
-    voronoidiagram=NULL;
     bottom=left=true;
 
     mainLayout = new QVBoxLayout(this);
@@ -299,36 +298,6 @@ GenericPlot::setSeriesVisible(QString name, bool visible)
 
 // annotations
 
-// line by user
-void
-GenericPlot::addAnnotation(AnnotationType , QAbstractSeries*series, double value)
-{
-    fprintf(stderr, "add annotation line: for %s at value %f\n", series->name().toStdString().c_str(), value);
-    fflush(stderr);
-}
-
-void
-GenericPlot::addAnnotation(AnnotationType, QString string, QColor color)
-{
-    QFont std;
-    std.setPointSizeF(std.pointSizeF() * scale_);
-    QFontMetrics fm(std);
-
-    QLabel *add = new QLabel(this);
-    add->setText(string);
-    add->setStyleSheet(QString("color: %1").arg(color.name()));
-    add->setFixedWidth(fm.boundingRect(string).width() + (25*dpiXFactor));
-    add->setAlignment(Qt::AlignCenter);
-    labels << add;
-}
-
-void
-GenericPlot::addVoronoi(QString name, QVector<double>x, QVector<double>y)
-{
-    vname = name;
-    vx = x;
-    vy = y;
-}
 
 void
 GenericPlot::pieHover(QPieSlice *slice, bool state)
@@ -462,7 +431,7 @@ GenericPlot::plotAreaChanged()
 bool
 GenericPlot::initialiseChart(QString title, int type, bool animate, int legpos, double scale)
 {
-    clearVoronoi();
+    clearAnnotations();
 
     // if we changed the type, all series must go
     if (charttype != type) {
@@ -547,7 +516,8 @@ GenericPlot::initialiseChart(QString title, int type, bool animate, int legpos, 
 bool
 GenericPlot::addCurve(QString name, QVector<double> xseries, QVector<double> yseries, QVector<QString> fseries, QString xname, QString yname,
                       QStringList labels, QStringList colors,
-                      int linestyle, int symbol, int size, QString color, int opacity, bool opengl, bool legend, bool datalabels, bool fill)
+                      int linestyle, int symbol, int size, QString color, int opacity, bool opengl, bool legend, bool datalabels, bool fill,
+                      QList<GenericAnnotationInfo> annotations)
 {
 
     // a curve can have a decoration associated with it
@@ -919,6 +889,18 @@ GenericPlot::addCurve(QString name, QVector<double> xseries, QVector<double> yse
         break;
 
     }
+
+    // add all the annotations via a genericseriesinfo structure, which is a bit crap since we get
+    // passed the individual parts from one of these, they we create one down here. Its because
+    // the R and Python charts don't have this and we want to isolate annotations right at the top
+    // in UserChart and then pass them all the way down to here
+    if (annotations.count()) {
+
+        // we keep a record of them, they get added in finalise (after the axes are all resolved)
+        annotationinfos << GenericSeriesInfo(name, xseries, yseries, fseries, xname, yname, labels, colors,
+                          linestyle, symbol, size, color, opacity, opengl, legend, datalabels, fill, RideMetric::Average, annotations);
+    }
+
     return true;
 }
 
@@ -927,9 +909,6 @@ void
 GenericPlot::finaliseChart()
 {
     if (!qchart) return;
-
-    // remove voronoix if present
-    clearVoronoi();
 
     // clear ALL axes
     foreach(QAbstractAxis *axis, qchart->axes(Qt::Vertical)) {
@@ -1255,11 +1234,8 @@ GenericPlot::finaliseChart()
 
     }
 
-    // add labels after legend items
-    foreach(QLabel *label, labels) legend->addLabel(label);
-
-    // add voronoi if need to
-    plotVoronoi();
+    // now finally we can add annotations to the top
+    foreach(GenericSeriesInfo series, annotationinfos) plotAnnotations(series);
 
     plotAreaChanged(); // make sure get updated before paint
 }
@@ -1373,40 +1349,97 @@ GenericPlot::seriesColor(QAbstractSeries* series)
     }
 }
 
+// when we plot annotations we need the curve context, so we get that as a genericseriesinfo...
 void
-GenericPlot::plotVoronoi()
+GenericPlot::plotAnnotations(GenericSeriesInfo &seriesinfo)
 {
-    // if there is one there already, lets remove it
-    clearVoronoi();
 
-    if (vx.count() < 2) return;
+    foreach(GenericAnnotationInfo annotation, seriesinfo.annotations) {
 
-    Voronoi v;
-    for(int i=0; i<vx.count(); i++)  v.addSite(QPointF(vx[i],vy[i]));
-    v.run(QRectF());
+        switch(annotation.type) {
 
+        case GenericAnnotationInfo::Label:
+        {
+            QFont std;
+            std.setPointSizeF(std.pointSizeF() * scale_);
+            QFontMetrics fm(std);
+
+            QLabel *add = new QLabel(this);
+            QString string = annotation.labels.join(" ");
+            add->setText(string);
+            add->setStyleSheet(QString("color: %1").arg(seriesinfo.color));
+            add->setFixedWidth(fm.boundingRect(string).width() + (25*dpiXFactor));
+            add->setAlignment(Qt::AlignCenter);
+            legend->addLabel(add);
+            labels << add;
+        }
+        break;
+
+        case GenericAnnotationInfo::Voronoi:
+        {
+            if (annotation.vx.count() < 2) return;
+
+            Voronoi v;
+            for(int i=0; i<annotation.vx.count(); i++)  {
+                QPointF point(annotation.vx[i],annotation.vy[i]);
+                v.addSite(point);
+            }
+            v.run(QRectF());
 #if 0
     // how many lines?
-    fprintf(stderr, "voronoi diagram curve '%s' has %d lines\n", vname.toStdString().c_str(),v.lines().count()); fflush(stderr);
+    fprintf(stderr, "voronoi diagram curve '%s' has %d lines\n", annotation.vname.toStdString().c_str(),v.lines().count()); fflush(stderr);
 
     foreach(QLineF line, v.lines()) {
         fprintf(stderr, "from %f,%f to %f,%f\n", line.p1().x(), line.p1().y(), line.p2().x(), line.p2().y());
     }
 #endif
 
-    // create a new diagram
-    voronoidiagram = new GenericLines(this->annotationController);
-    annotationController->addAnnotation(voronoidiagram);
-    voronoidiagram->setCurve(curves.value(vname,NULL));
-    voronoidiagram->setLines(v.lines());
+            // create a new diagram
+            GenericLines *voronoidiagram = new GenericLines(this->annotationController);
+            annotationController->addAnnotation(voronoidiagram);
+            voronoidiagram->setCurve(curves.value(seriesinfo.name,NULL));
+            voronoidiagram->setLines(v.lines());
+
+            annotations << voronoidiagram;
+        }
+        break;
+
+
+        case GenericAnnotationInfo::VLine:
+        case GenericAnnotationInfo::HLine:
+        {
+            StraightLine *line = new StraightLine(this->annotationController);
+            annotationController->addAnnotation(line);
+            line->setCurve(curves.value(seriesinfo.name,NULL));
+            line->setValue(annotation.value);
+            line->setText(annotation.text);
+            line->setOrientation(annotation.type == GenericAnnotationInfo::VLine ? Qt::Vertical : Qt::Horizontal);
+            line->setStyle(annotation.linestyle);
+
+            annotations << line;
+        }
+        break;
+        }
+    }
 }
 
 void
-GenericPlot::clearVoronoi()
+GenericPlot::clearAnnotations()
 {
-    if (voronoidiagram) {
-        annotationController->removeAnnotation(voronoidiagram);
-        delete voronoidiagram;
-        voronoidiagram = NULL;
+    // labels are a form of annotation, but are placed in the
+    // legend not drawn on the plot
+    foreach(QLabel *label, labels) {
+        legend->removeLabel(label);
+        delete label;
     }
+    labels.clear();
+
+    // annotations are painted onto the chart scene
+    // we zap all here
+    foreach(GenericAnnotation *annotation, annotations) {
+        annotationController->removeAnnotation(annotation);
+        delete annotation;
+    }
+    annotations.clear();
+    annotationinfos.clear();
 }

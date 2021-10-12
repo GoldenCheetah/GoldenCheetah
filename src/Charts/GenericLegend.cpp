@@ -272,6 +272,13 @@ GenericLegend::addLabel(QLabel *label)
     layout->addWidget(label);
 }
 
+// removes from layout but does not delete it.
+void
+GenericLegend::removeLabel(QLabel *label)
+{
+    layout->removeWidget(label);
+}
+
 void
 GenericLegend::removeSeries(QString name)
 {

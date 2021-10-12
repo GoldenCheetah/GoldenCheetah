@@ -178,17 +178,12 @@ UserChart::setRide(const RideItem *item)
         GenericSeriesInfo &series = seriesinfo[ii];
 
         // clear old annotations for this series
-        annotations.clear();
-
-        // any old voronoi diagram centers
-        series.voronoix.clear();
-        series.voronoiy.clear();
+        series.annotations.clear();
 
         // re-create program (may be edited)
         if (series.user1 != NULL) delete static_cast<UserChartData*>(series.user1);
         series.user1 = new UserChartData(context, this, series.string1, rangemode);
-        connect(static_cast<UserChartData*>(series.user1)->program, SIGNAL(annotateLabel(QStringList&)), this, SLOT(annotateLabel(QStringList&)));
-        connect(static_cast<UserChartData*>(series.user1)->program, SIGNAL(annotateVoronoi(QVector<double>,QVector<double>)), this, SLOT(annotateVoronoi(QVector<double>,QVector<double>)));
+        connect(static_cast<UserChartData*>(series.user1)->program, SIGNAL(annotate(GenericAnnotationInfo&)), this, SLOT(annotate(GenericAnnotationInfo&)));
 
         // cast so we can work with it
         UserChartData *ucd = static_cast<UserChartData*>(series.user1);
@@ -277,11 +272,7 @@ UserChart::setRide(const RideItem *item)
         // data now generated so can add curve
         chart->addCurve(series.name, series.xseries, series.yseries, series.fseries, series.xname, series.yname,
                         series.labels, series.colors, series.line, series.symbol, series.size, series.color, series.opacity,
-                        series.opengl, series.legend, series.datalabels, series.fill);
-
-        // add series annotations
-        foreach(QStringList list, annotations) chart->annotateLabel(series.name, list);
-        chart->annotateVoronoi(series.name, series.voronoix, series.voronoiy);
+                        series.opengl, series.legend, series.datalabels, series.fill, series.aggregateby, series.annotations);
 
     }
 
@@ -523,13 +514,7 @@ UserChart::dateForGroup(int groupby, long group)
 }
 
 void
-UserChart::annotateLabel(QStringList &list)
-{
-    annotations << list;
-}
-
-void
-UserChart::annotateVoronoi(QVector<double>x, QVector<double>y)
+UserChart::annotate(GenericAnnotationInfo &annotation)
 {
     QObject *from = sender();
 
@@ -537,8 +522,7 @@ UserChart::annotateVoronoi(QVector<double>x, QVector<double>y)
         if (seriesinfo[i].user1) {
             UserChartData *ucd = static_cast<UserChartData*>(seriesinfo[i].user1);
             if (ucd->program == from) {
-                seriesinfo[i].voronoix = x;
-                seriesinfo[i].voronoiy = y;
+                seriesinfo[i].annotations << annotation;
             }
         }
     }

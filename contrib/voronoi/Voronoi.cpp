@@ -730,8 +730,8 @@ Voronoi::getfree(Freelist * fl)
     Freenode * t ;
     if (fl->head == (Freenode *)NULL)
         {
-        t =  (Freenode *) myalloc(sqrt_nsites * fl->nodesize) ;
-        for(i = 0 ; i < sqrt_nsites ; i++)
+        t =  (Freenode *) myalloc(100 * fl->nodesize) ;
+        for(i = 0 ; i < 100 ; i++)
             {
             makefree((Freenode *)((char *)t+i*fl->nodesize), fl) ;
             }

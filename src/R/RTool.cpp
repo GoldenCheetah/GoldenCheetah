@@ -4177,7 +4177,8 @@ RTool::addCurve(SEXP name, SEXP xseries, SEXP yseries, SEXP fseries, SEXP xname,
     info.fill = LOGICAL(fill)[0];
 
     // add to chart
-    rtool->chart->chart->addCurve(info.name, info.xseries, info.yseries, info.fseries, info.xname, info.yname, info.labels, info.colors, info.line, info.symbol, info.size, info.color, info.opacity, info.opengl, info.legend, info.datalabels, info.fill);
+    rtool->chart->chart->addCurve(info.name, info.xseries, info.yseries, info.fseries, info.xname, info.yname, info.labels, info.colors, info.line,
+                                  info.symbol, info.size, info.color, info.opacity, info.opengl, info.legend, info.datalabels, info.fill, info.aggregateby, info.annotations);
 
     // return 0
     return Rf_allocVector(INTSXP,0);
@@ -4273,7 +4274,7 @@ RTool::annotate(SEXP type, SEXP p1, SEXP p2, SEXP p3)
         }
         UNPROTECT(1);
 
-        if (list.count() > 0) rtool->chart->chart->annotateLabel(series, list);
+        // XXX todo fix up or deprecate ???? if (list.count() > 0) rtool->chart->chart->annotateLabel(series, list);
     }
 
     // return 0

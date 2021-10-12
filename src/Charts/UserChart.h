@@ -86,8 +86,7 @@ class UserChart : public QWidget {
         void chartConfigChanged();
 
         // catch annotations from program
-        void annotateLabel(QStringList&);
-        void annotateVoronoi(QVector<double>,QVector<double>);
+        void annotate(GenericAnnotationInfo&);
 
     protected:
 

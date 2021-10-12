@@ -144,14 +144,14 @@ GenericChart::initialiseChart(QString title, int type, bool animate, int legendp
 bool
 GenericChart::addCurve(QString name, QVector<double> xseries, QVector<double> yseries, QVector<QString> fseries, QString xname, QString yname,
                       QStringList labels, QStringList colors, int line, int symbol, int size, QString color, int opacity, bool opengl,
-                      bool legend, bool datalabels, bool fill)
+                      bool legend, bool datalabels, bool fill, RideMetric::MetricType mtype, QList<GenericAnnotationInfo> annotations)
 {
 
-    newSeries << GenericSeriesInfo(name, xseries, yseries, fseries, xname, yname, labels, colors, line, symbol, size, color, opacity, opengl, legend, datalabels, fill);
+    newSeries << GenericSeriesInfo(name, xseries, yseries, fseries, xname, yname, labels, colors, line, symbol, size, color, opacity, opengl, legend, datalabels, fill, mtype, annotations);
     return true;
 }
 
-// helper for python
+// helper for python - no aggregateby, no annotations
 bool
 GenericChart::addCurve(QString name, QVector<double> xseries, QVector<double> yseries, QStringList fseries, QString xname, QString yname,
                       QStringList labels, QStringList colors, int line, int symbol, int size, QString color, int opacity, bool opengl,
@@ -159,35 +159,8 @@ GenericChart::addCurve(QString name, QVector<double> xseries, QVector<double> ys
 {
     QVector<QString> flist;
     for(int i=0; i<fseries.count(); i++) flist << fseries.at(i);
-    newSeries << GenericSeriesInfo(name, xseries, yseries, flist, xname, yname, labels, colors, line, symbol, size, color, opacity, opengl, legend, datalabels, fill);
-    return true;
-}
-
-// add a label to a series
-bool
-GenericChart::annotateLabel(QString name, QStringList list)
-{
-    // add to the curve
-    for(int i=0; i<newSeries.count(); i++)
-        if (newSeries[i].name == name)
-            newSeries[i].annotateLabels << list;
-
-    return true;
-}
-
-// add a voronoi to a series
-bool
-GenericChart::annotateVoronoi(QString name, QVector<double>x, QVector<double>y)
-{
-    if (x.count() < 2) return false;
-
-    // add to the curve
-    for(int i=0; i<newSeries.count(); i++)
-        if (newSeries[i].name == name) {
-            newSeries[i].voronoix =x;
-            newSeries[i].voronoiy =y;
-        }
-
+    newSeries << GenericSeriesInfo(name, xseries, yseries, flist, xname, yname, labels, colors, line, symbol, size, color, opacity,
+                                   opengl, legend, datalabels, fill, RideMetric::Average, QList<GenericAnnotationInfo>());
     return true;
 }
 
@@ -381,6 +354,7 @@ GenericChart::finaliseChart()
             target->setStretchFactor(newPlots[i].plot, 10);// make them all the same
         } else {
             newPlots[i].plot = currentPlots[index].plot; // reuse
+            newPlots[i].plot->clearAnnotations(); // zap annottions left behind
             currentPlots[index].state = GenericPlotInfo::matched; // don't deleteme !
 
             // make sure its in the right layout (might remove and add back to the same layout!)
@@ -429,17 +403,8 @@ GenericChart::finaliseChart()
 
             // add curve-- with additional axis info in advance since it finally is added to an actual chart
             newPlots[i].plot->addCurve(p.name, p.xseries, p.yseries, p.fseries, p.xname, p.yname, p.labels, p.colors, p.line,
-                                       p.symbol, p.size, p.color, p.opacity, p.opengl, p.legend, p.datalabels, p.fill);
+                                       p.symbol, p.size, p.color, p.opacity, p.opengl, p.legend, p.datalabels, p.fill, p.annotations);
 
-            // did we get some labels associated with the curve?
-            QListIterator<QStringList>l(p.annotateLabels);
-            while(l.hasNext()) {
-                QStringList list=l.next();
-                newPlots[i].plot->addAnnotation(GenericPlot::LABEL, list.join(" "), RGBColor(QColor(p.color)));
-            }
-
-            // did we have a voronoi diagram?
-            if (p.voronoix.count() >= 2) newPlots[i].plot->addVoronoi(p.name, p.voronoix, p.voronoiy);
         }
 
         // set axis

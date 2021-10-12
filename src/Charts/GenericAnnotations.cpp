@@ -19,6 +19,34 @@
 #include "GenericAnnotations.h"
 #include "GenericPlot.h"
 
+// utils for mucking about with qbastractaxis
+static double qtchartaxismin(QAbstractAxis *axis)
+{
+    double returning;
+
+    switch (axis->type()) {
+    case QAbstractAxis::AxisTypeValue: returning = static_cast<QValueAxis*>(axis)->min(); break;
+    case QAbstractAxis::AxisTypeDateTime: returning = static_cast<QDateTimeAxis*>(axis)->min().toMSecsSinceEpoch(); break;
+    case QAbstractAxis::AxisTypeLogValue: returning = static_cast<QLogValueAxis*>(axis)->min(); break;
+    default: returning=-9999;
+    }
+
+    return returning;
+}
+
+static double qtchartaxismax(QAbstractAxis *axis)
+{
+    double returning;
+
+    switch (axis->type()) {
+    case QAbstractAxis::AxisTypeValue: returning = static_cast<QValueAxis*>(axis)->max(); break;
+    case QAbstractAxis::AxisTypeDateTime: returning = static_cast<QDateTimeAxis*>(axis)->max().toMSecsSinceEpoch(); break;
+    case QAbstractAxis::AxisTypeLogValue: returning = static_cast<QLogValueAxis*>(axis)->max(); break;
+    default: returning=9999;
+    }
+
+    return returning;
+}
 //
 // Controller (its the thing attached to the chart's scene
 //
@@ -39,7 +67,7 @@ void GenericAnnotationController::removeAnnotation(GenericAnnotation *item) { an
 QRectF GenericAnnotationController::boundingRect() const { return plot->qchart->plotArea(); }
 
 //
-// line painter
+// lines painter
 //
 GenericLines::GenericLines(GenericAnnotationController *controller) : curve(NULL), controller(controller) {}
 GenericLines::~GenericLines() {}
@@ -60,4 +88,58 @@ GenericLines::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*
 
         painter->drawLine(from, to);
     }
+}
+
+
+//
+// straight line with text painter
+//
+StraightLine::StraightLine(GenericAnnotationController *controller) : curve(NULL), controller(controller) {}
+StraightLine::~StraightLine() {}
+
+void
+StraightLine::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
+{
+    if (curve == NULL) return;
+
+    QPen pen(Qt::lightGray);
+    pen.setStyle(style);
+    painter->setPen(pen);
+
+    painter->setClipRect(controller->plot->qchart->plotArea());
+
+    double min=0, max=0;
+    // get min/max from the other axis
+    foreach(QAbstractAxis *axis, curve->attachedAxes()) {
+        if (axis->orientation() == orientation) {
+            // set min and max
+            min = qtchartaxismin(axis);
+            max = qtchartaxismax(axis);
+        }
+    }
+
+    // draw a line from min to max at value on our axis
+    QPointF p1, p2;
+    if (orientation == Qt::Vertical) {
+        p1 = QPointF(value,min);
+        p2 = QPointF(value,max);
+    } else {
+        p1 = QPointF(min, value);
+        p2 = QPointF(max, value);
+    }
+
+    QPointF from = controller->plot->qchart->mapToPosition(p1, curve);
+    QPointF to = controller->plot->qchart->mapToPosition(p2, curve);
+
+
+    QFont font; // default font size
+    painter->setFont(font);
+    QFontMetrics fm(font);
+    double height = fm.boundingRect(text).height() + 4;
+
+    painter->drawText(orientation == Qt::Horizontal ? from + QPointF(4,-4) : to + QPointF(4, height), text);
+
+    pen.setColor(GColor(CPLOTMARKER));
+    painter->setPen(pen);
+    painter->drawLine(from, to);
 }

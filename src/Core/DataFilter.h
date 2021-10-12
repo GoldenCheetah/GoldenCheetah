@@ -166,6 +166,7 @@ class Leaf {
 };
 
 class UserChart;
+class GenericAnnotationInfo;
 class DataFilterRuntime {
 
     // allocated for each thread to avoid race
@@ -262,8 +263,7 @@ class DataFilter : public QObject
         void parseBad(QStringList erorrs);
         void results(QStringList);
 
-        void annotateLabel(QStringList&);
-        void annotateVoronoi(QVector<double>,QVector<double>);
+        void annotate(GenericAnnotationInfo&);
 
     private:
         void setSignature(QString &query);
