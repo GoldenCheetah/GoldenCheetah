@@ -3116,6 +3116,8 @@ Result DataFilter::evaluate(RideItem *item, RideFilePoint *p)
 
 Result DataFilter::evaluate(Specification spec, DateRange dr)
 {
+    if (!treeRoot || DataFiltererrors.count()) return Result(0);
+
     Result res(0);
 
     // if we are a set of functions..
