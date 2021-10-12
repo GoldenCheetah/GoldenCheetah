@@ -59,6 +59,7 @@ class GenericPlot;
 class GenericLegend;
 class GenericSelectTool;
 class GenericAxisInfo;
+class GenericAnnotationInfo;
 
 // the chart
 class ChartSpace;

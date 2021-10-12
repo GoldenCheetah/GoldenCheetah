@@ -32,6 +32,31 @@
 
 #include <QScrollArea>
 
+// a chart annotation
+class GenericAnnotationInfo {
+
+    enum annotationType { None, Label, VLine, HLine, Voronoi };
+    typedef annotationType AnnotationType;
+
+    public:
+
+        GenericAnnotationInfo(AnnotationType);
+
+        AnnotationType type;
+
+        // labels
+        QList<QLabel *> labels;
+
+        // voronoi
+        QString vname;
+        QVector<double> vx, vy; //voronoi digram
+
+        // vline and hline
+        Qt::PenStyle linestyle;
+        double value;
+        QString text;
+};
+
 // keeping track of the series info
 class GenericSeriesInfo {
 
@@ -78,6 +103,8 @@ class GenericSeriesInfo {
         bool datalabels;
         bool fill;
         RideMetric::MetricType aggregateby;
+
+        QList<GenericAnnotationInfo> annotations;
 
         QList <QStringList> annotateLabels; // label annotation
         QVector<double> voronoix, voronoiy; // voronoi diagram annotation

@@ -213,10 +213,11 @@ static struct {
                    // grammar does not support (a*x>1), instead we can use a*bool(x>1). All non
                    // zero expressions will evaluate to 1.
 
-    { "annotate", 0 }, // annotate(type, parms) - add an annotation to the chart
-                       // current supported annotations:
+    { "annotate", 0 }, // current supported annotations:
                        // annotate(label, string1, string2 .. stringn) - adds label at top of a chart
                        // annotate(voronoi, centers) - associated with a series on a user chart
+                       // annotate(hline, label, style, value) - associated with a series on a user chart
+                       // annotate(vline, label, style, value) - associated with a series on a user chart (see linestyle for vals below)
 
     { "arguniq", 1 },  // returns an index of the uniq values in a vector, in the same way
                        // argsort returns an index, can then be used to select from samples
@@ -400,6 +401,30 @@ static QStringList pdmodels(Context *context)
     return returning;
 }
 
+// whenever we use a line style
+static struct {
+    const char *name;
+    Qt::PenStyle type;
+} linestyles_[] = {
+    { "solid", Qt::SolidLine },
+    { "dash", Qt::DashLine },
+    { "dot", Qt::DotLine },
+    { "dashdot", Qt::DashDotLine },
+    { "dashdotdot", Qt::DashDotDotLine },
+    { "", Qt::NoPen },
+};
+
+static Qt::PenStyle linestyle(QString name)
+{
+    int index=0;
+    while (linestyles_[index].type != Qt::NoPen) {
+        if (name == linestyles_[index].name)
+            return linestyles_[index].type;
+        index++;
+    }
+    return Qt::NoPen; // not known
+}
+
 QStringList
 DataFilter::builtins(Context *context)
 {
@@ -525,7 +550,7 @@ DataFilter::builtins(Context *context)
 
         } else if (i == 66) {
 
-            returning << "annotate(label, ...)";
+            returning << "annotate(label|hline|vline|voronoi, ...)";
 
         } else if (i == 67) {
 
@@ -1709,7 +1734,7 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
             QRegExp dateRangeValidSymbols("^(start|stop)$", Qt::CaseInsensitive); // date range
             QRegExp pmcValidSymbols("^(stress|lts|sts|sb|rr|date)$", Qt::CaseInsensitive);
             QRegExp smoothAlgos("^(sma|ewma)$", Qt::CaseInsensitive);
-            QRegExp annotateTypes("^(label|voronoi)$", Qt::CaseInsensitive);
+            QRegExp annotateTypes("^(label|hline|vline|voronoi)$", Qt::CaseInsensitive);
             QRegExp curveData("^(x|y|z|d|t)$", Qt::CaseInsensitive);
             QRegExp aggregateFunc("^(mean|sum|max|min|count)$", Qt::CaseInsensitive);
             QRegExp interpolateAlgorithms("^(linear|cubic|akima|steffen)$", Qt::CaseInsensitive);
@@ -2497,20 +2522,41 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
                     if (leaf->fparms.count() < 2 || leaf->fparms[0]->type != Leaf::Symbol) {
 
                        leaf->inerror = true;
-                       DataFiltererrors << QString(tr("annotate(label|voronoi, ...) need at least 2 parameters."));
+                       DataFiltererrors << QString(tr("annotate(label|hline|vline|voronoi, ...) need at least 2 parameters."));
 
                     } else {
 
                         QString type = *(leaf->fparms[0]->lvalue.n);
+
+                        // is the type of annotation supported?
                         if (!annotateTypes.exactMatch(type)) {
                             leaf->inerror = true;
                             DataFiltererrors << QString(tr("annotation type '%1' not available").arg(type));
                         } else {
-                            if (type == "voronoi" && leaf->fparms.count() != 2) {
+
+                            // its valid type, but what about the parameters?
+                            if (type == "voronoi" && leaf->fparms.count() != 2) { // VORONOI
+
+                                leaf->inerror = true;
+                                DataFiltererrors << QString(tr("annotate(voronoi, centers)"));
+
+                            } else if (type == "hline" || type == "vline") { // HLINE and VLINE
+
+                                // just make sure the type of line is supported, the other parameters
+                                // can be coerced from whatever the user passed anyway
+                                if (leaf->fparms.count() != 4 || leaf->fparms[2]->type != Leaf::Symbol
+                                                                  || linestyle(*(leaf->fparms[2]->lvalue.n)) == Qt::NoPen) {
                                     leaf->inerror = true;
-                                    DataFiltererrors << QString(tr("annotate(voronoi, centers)"));
-                            } else {
-                            for(int i=1; i<leaf->fparms.count(); i++) validateFilter(context, df, leaf->fparms[i]);
+                                    DataFiltererrors << QString(tr("annotate(hline|vline, 'label', solid|dash|dot|dashdot|dashdotdot, value)"));
+                                } else {
+                                    // make sure the parms are well formed
+                                    validateFilter(context, df, leaf->fparms[1]);
+                                    validateFilter(context, df, leaf->fparms[3]);
+                                }
+
+                            } else { // Any other types, e.g LABEL
+
+                                for(int i=1; i<leaf->fparms.count(); i++) validateFilter(context, df, leaf->fparms[i]);
                             }
                         }
                     }
@@ -3312,7 +3358,7 @@ static int monthsTo(QDate from, QDate to)
     return months;
 }
 
-Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, RideItem *m, RideFilePoint *p, const QHash<QString,RideMetric*> *c, Specification s, DateRange d)
+Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, RideItem *m, RideFilePoint *p, const QHash<QString,RideMetric*> *c, const  Specification &s, const DateRange &d)
 {
     // if error state all bets are off
     //if (inerror) return Result(0);
@@ -6072,6 +6118,10 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
                     df->owner->annotateVoronoi(x,y);
                 }
             }
+
+            if (type == "hline" || type == "vline") {
+            }
+
         }
 
         // smooth
