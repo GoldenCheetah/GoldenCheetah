@@ -75,7 +75,7 @@ GenericLines::~GenericLines() {}
 void
 GenericLines::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
 {
-    if (curve == NULL) return;
+    if (curve == NULL || !curve->isVisible()) return;
 
     QPen pen(Qt::lightGray);
     painter->setPen(pen);
@@ -100,16 +100,26 @@ StraightLine::~StraightLine() {}
 void
 StraightLine::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
 {
-    if (curve == NULL) return;
+    if (curve == NULL || !curve->isVisible()) return;
+
+    double scale = controller->plot->scale();
 
     QPen pen(Qt::lightGray);
+    pen.setColor(GColor(CPLOTMARKER));
     pen.setStyle(style);
+    pen.setWidth(pen.width() * scale);
     painter->setPen(pen);
+
+    QFont font; // default font size
+    font.setPointSize(font.pointSize() * scale);
+    painter->setFont(font);
+    QFontMetrics fm(font);
+    double height = fm.boundingRect(text).height() + (4*scale);
 
     painter->setClipRect(controller->plot->qchart->plotArea());
 
-    double min=0, max=0;
     // get min/max from the other axis
+    double min=0, max=0;
     foreach(QAbstractAxis *axis, curve->attachedAxes()) {
         if (axis->orientation() == orientation) {
             // set min and max
@@ -131,15 +141,7 @@ StraightLine::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*
     QPointF from = controller->plot->qchart->mapToPosition(p1, curve);
     QPointF to = controller->plot->qchart->mapToPosition(p2, curve);
 
-
-    QFont font; // default font size
-    painter->setFont(font);
-    QFontMetrics fm(font);
-    double height = fm.boundingRect(text).height() + 4;
-
-    painter->drawText(orientation == Qt::Horizontal ? from + QPointF(4,-4) : to + QPointF(4, height), text);
-
-    pen.setColor(GColor(CPLOTMARKER));
-    painter->setPen(pen);
+    // now we get to do some painting !
+    painter->drawText(orientation == Qt::Horizontal ? from + QPointF(4*scale,-4*scale) : to + QPointF(4*scale, height), text);
     painter->drawLine(from, to);
 }
