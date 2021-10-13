@@ -1032,7 +1032,7 @@ DataOverviewItem::setData(RideItem *item)
     DataFilter parser(this, item->context, program);
 
     // so long as it evaluated correctly we can call the functions
-    if (parser.root() && parser.errorList().isEmpty()) {
+    if (parser.root() && parser.errorList().isEmpty() && parent->context->currentRideItem()) {
 
         Specification spec;
         DateRange dr;
@@ -1303,7 +1303,7 @@ DataOverviewItem::setDateRange(DateRange dr)
     DataFilter parser(this, parent->context, program);
 
     // so long as it evaluated correctly we can call the functions
-    if (parser.root() && parser.errorList().isEmpty()) {
+    if (parser.root() && parser.errorList().isEmpty() && parent->context->currentRideItem()) {
 
         Specification spec;
         spec.setDateRange(dr);

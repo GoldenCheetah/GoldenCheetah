@@ -3116,7 +3116,10 @@ Result DataFilter::evaluate(RideItem *item, RideFilePoint *p)
 
 Result DataFilter::evaluate(Specification spec, DateRange dr)
 {
-    if (!treeRoot || DataFiltererrors.count()) return Result(0);
+    // if there is no current ride item then there is no data
+    // so it really is ok to baulk at no current ride item here
+    // we must always have a ride since context is used
+    if (context->currentRideItem() == NULL || !treeRoot || DataFiltererrors.count()) return Result(0);
 
     Result res(0);
 
@@ -3138,11 +3141,6 @@ Result DataFilter::evaluate(Specification spec, DateRange dr)
 
 Result DataFilter::evaluate(DateRange dr, QString filter)
 {
-    // if there is no current ride item then there is no data
-    // so it really is ok to baulk at no current ride item here
-    // we must always have a ride since context is used
-    if (context->currentRideItem() == NULL || !treeRoot || DataFiltererrors.count()) return Result(0);
-
     // reset stack
     rt.stack = 0;
 
