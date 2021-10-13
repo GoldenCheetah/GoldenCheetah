@@ -78,6 +78,7 @@ class GenericPlot : public QWidget {
         friend class GenericAnnotationController;
         friend class GenericLines;
         friend class StraightLine;
+        friend class GenericLR;
         friend class GenericLegend;
 
         GenericPlot(QWidget *parent, Context *context, QGraphicsItem *item);

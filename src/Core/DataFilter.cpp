@@ -218,6 +218,7 @@ static struct {
                        // annotate(voronoi, centers) - associated with a series on a user chart
                        // annotate(hline, label, style, value) - associated with a series on a user chart
                        // annotate(vline, label, style, value) - associated with a series on a user chart (see linestyle for vals below)
+                       // annotate(lr, style, "colorname") - plot a linear regression for the series
 
     { "arguniq", 1 },  // returns an index of the uniq values in a vector, in the same way
                        // argsort returns an index, can then be used to select from samples
@@ -550,7 +551,7 @@ DataFilter::builtins(Context *context)
 
         } else if (i == 66) {
 
-            returning << "annotate(label|hline|vline|voronoi, ...)";
+            returning << "annotate(label|lr|hline|vline|voronoi, ...)";
 
         } else if (i == 67) {
 
@@ -1734,7 +1735,7 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
             QRegExp dateRangeValidSymbols("^(start|stop)$", Qt::CaseInsensitive); // date range
             QRegExp pmcValidSymbols("^(stress|lts|sts|sb|rr|date)$", Qt::CaseInsensitive);
             QRegExp smoothAlgos("^(sma|ewma)$", Qt::CaseInsensitive);
-            QRegExp annotateTypes("^(label|hline|vline|voronoi)$", Qt::CaseInsensitive);
+            QRegExp annotateTypes("^(label|lr|hline|vline|voronoi)$", Qt::CaseInsensitive);
             QRegExp curveData("^(x|y|z|d|t)$", Qt::CaseInsensitive);
             QRegExp aggregateFunc("^(mean|sum|max|min|count)$", Qt::CaseInsensitive);
             QRegExp interpolateAlgorithms("^(linear|cubic|akima|steffen)$", Qt::CaseInsensitive);
@@ -2539,6 +2540,15 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
 
                                 leaf->inerror = true;
                                 DataFiltererrors << QString(tr("annotate(voronoi, centers)"));
+
+                            } else if (type == "lr") { // LINEAR REGRESSION LINE
+
+                                if (leaf->fparms.count() != 3 || linestyle(*(leaf->fparms[1]->lvalue.n)) == Qt::NoPen) {
+
+                                    leaf->inerror = true;
+                                    DataFiltererrors << QString(tr("annotate(lr, solid|dash|dot|dashdot|dashdotdot, \"colorname\")"));
+
+                                }
 
                             } else if (type == "hline" || type == "vline") { // HLINE and VLINE
 
@@ -6133,6 +6143,15 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
 
                 // send signal
                 df->owner->annotate(line);
+            }
+
+            if (type == "lr") {
+                GenericAnnotationInfo lr(GenericAnnotationInfo::LR);
+                lr.linestyle = linestyle(*(leaf->fparms[1]->lvalue.n));
+                lr.color = eval(df,leaf->fparms[2],x, it, m, p, c, s, d).string();
+
+                // send signal
+                df->owner->annotate(lr);
             }
 
         }

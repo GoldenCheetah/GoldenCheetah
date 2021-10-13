@@ -24,6 +24,7 @@
 #include "Utils.h"
 
 #include <limits>
+#include <cmath> // for isinf() isnan()
 
 GenericSelectTool::GenericSelectTool(GenericPlot *host) : QObject(host), QGraphicsItem(NULL), host(host)
 {
@@ -846,6 +847,7 @@ GenericCalculator::initialise()
     x.max = x.min = x.sum = x.mean =
     y.max = y.min = y.sum = y.mean = 0;
     xaxis=yaxis=NULL;
+    actual.clear();
     midnight=QDateTime(QDate::currentDate(), QTime(0,0,0));
 
 }
@@ -858,6 +860,9 @@ GenericCalculator::addPoint(QPointF point)
     // we need original values for linear regress, all other calcs are fine
     // at this point
     QPointF lr=point;
+
+    // if nan/inf ignore it
+    if (std::isinf(point.x()) || std::isnan(point.x()) || std::isinf(point.y()) || std::isnan(point.y())) return;
 
     // X
     if (xaxis && xaxis->type() == QAbstractAxis::AxisTypeDateTime &&

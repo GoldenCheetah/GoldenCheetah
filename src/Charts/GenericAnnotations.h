@@ -25,6 +25,10 @@
 
 class GenericPlot;
 
+// handy
+extern double qtchartaxismin(QAbstractAxis *axis);
+extern double qtchartaxismax(QAbstractAxis *axis);
+
 // base class for a chart annotation- you have one job
 class GenericAnnotation
 {
@@ -110,4 +114,32 @@ class StraightLine : public GenericAnnotation
         GenericAnnotationController *controller;
 };
 
+// linear regression line
+class GenericLR : public GenericAnnotation
+{
+    public:
+
+        GenericLR(GenericAnnotationController *);
+        ~GenericLR();
+
+        void setCurve(QAbstractSeries *curve) { this->curve=curve; }
+        void setText(QString text) { this->text_ = text; controller->update(); }
+        QString text() const { return this->text_; }
+        void setColor(QColor color) { this->color = color; controller->update(); }
+        void setStyle(Qt::PenStyle style) { this->style = style; controller->update(); }
+        void setParms(double slope, double intercept) { this->slope= slope; this->intercept=intercept; controller->update(); }
+
+        void paint(QPainter*, const QStyleOptionGraphicsItem *, QWidget*);
+
+    private:
+
+        QAbstractSeries *curve;
+        QString text_;
+        QColor color;
+        Qt::PenStyle style;
+
+        double slope, intercept;
+
+        GenericAnnotationController *controller;
+};
 #endif

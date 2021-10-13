@@ -20,7 +20,7 @@
 #include "GenericPlot.h"
 
 // utils for mucking about with qbastractaxis
-static double qtchartaxismin(QAbstractAxis *axis)
+double qtchartaxismin(QAbstractAxis *axis)
 {
     double returning;
 
@@ -34,7 +34,7 @@ static double qtchartaxismin(QAbstractAxis *axis)
     return returning;
 }
 
-static double qtchartaxismax(QAbstractAxis *axis)
+double qtchartaxismax(QAbstractAxis *axis)
 {
     double returning;
 
@@ -110,8 +110,10 @@ StraightLine::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*
     pen.setWidth(pen.width() * scale);
     painter->setPen(pen);
 
-    QFont font; // default font size
-    font.setPointSize(font.pointSize() * scale);
+    // use the same font as the axis font, don't want it too large.
+    QFont font;
+    font.fromString(appsettings->value(NULL, GC_FONT_CHARTLABELS, QFont().toString()).toString());
+    font.setPointSizeF(appsettings->value(NULL, GC_FONT_CHARTLABELS_SIZE, 8).toInt() * scale);
     painter->setFont(font);
     QFontMetrics fm(font);
     double height = fm.boundingRect(text).height() + (4*scale);
@@ -143,5 +145,49 @@ StraightLine::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*
 
     // now we get to do some painting !
     painter->drawText(orientation == Qt::Horizontal ? from + QPointF(4*scale,-4*scale) : to + QPointF(4*scale, height), text);
+    painter->drawLine(from, to);
+}
+
+
+//
+// linear regress
+//
+GenericLR::GenericLR(GenericAnnotationController *controller) : curve(NULL), controller(controller) {}
+GenericLR::~GenericLR() {}
+
+void
+GenericLR::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
+{
+    if (curve == NULL || !curve->isVisible()) return;
+
+    double scale = controller->plot->scale();
+
+    QPen pen(color);
+    pen.setStyle(style);
+    pen.setWidth(pen.width() * 5 * scale); // needs to be relatively thick
+    painter->setPen(pen);
+
+    painter->setClipRect(controller->plot->qchart->plotArea());
+
+    // get min/max from the other axis
+    double min=0, max=0;
+    foreach(QAbstractAxis *axis, curve->attachedAxes()) {
+        if (axis->orientation() == Qt::Horizontal) {
+            // set min and max
+            min = qtchartaxismin(axis);
+            max = qtchartaxismax(axis);
+            break;
+        }
+    }
+
+    // draw a line from min to max at value on our axis
+    QPointF p1, p2;
+    p1 = QPointF(min,intercept + (slope *min));
+    p2 = QPointF(max, intercept + (slope *max));
+
+    QPointF from = controller->plot->qchart->mapToPosition(p1, curve);
+    QPointF to = controller->plot->qchart->mapToPosition(p2, curve);
+
+    // now we get to do some painting !
     painter->drawLine(from, to);
 }

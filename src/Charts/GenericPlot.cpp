@@ -31,6 +31,7 @@
 #include "Voronoi.h"
 #include "GenericAnnotations.h"
 
+#include "gsl/gsl_fit.h"
 #include <limits>
 
 // used to format dates/times on axes
@@ -1369,6 +1370,80 @@ GenericPlot::plotAnnotations(GenericSeriesInfo &seriesinfo)
             add->setText(string);
             add->setStyleSheet(QString("color: %1").arg(seriesinfo.color));
             add->setFixedWidth(fm.boundingRect(string).width() + (25*dpiXFactor));
+            add->setAlignment(Qt::AlignCenter);
+            legend->addLabel(add);
+            labels << add;
+        }
+        break;
+
+        case GenericAnnotationInfo::LR:
+        {
+            QAbstractSeries *curve=curves.value(seriesinfo.name,NULL);
+
+            if (curve == NULL) return; // big nope
+
+            // what can we see?
+            double minx=0, maxx=0, miny=0,maxy=0;
+            if (curve) {
+                foreach(QAbstractAxis *axis, curve->attachedAxes()) {
+                    if (axis->orientation() == Qt::Horizontal) { minx = qtchartaxismin(axis); maxx = qtchartaxismax(axis); }
+                    else { miny = qtchartaxismin(axis); maxy = qtchartaxismax(axis); }
+                }
+            }
+
+            // fit
+            GenericCalculator calc;
+            calc.initialise();
+
+            // pass all the points- as they are on the plot
+            for (int i=0; i< seriesinfo.xseries.count() && i < seriesinfo.yseries.count(); i++) {
+                QPointF p(seriesinfo.xseries.at(i), seriesinfo.yseries.at(i));
+                if (p.x() < minx || p.x() > maxx || p.y() < miny || p.y() > maxy) continue;
+                calc.addPoint(p);
+            }
+            calc.finalise();
+
+            double slope = calc.m;
+            double intercept = calc.b;
+
+            // now again, but converting from the chart "units"
+            // calc is smart and can work back from the axis type
+            calc.initialise();
+            if (curve) {
+                foreach(QAbstractAxis *axis, curve->attachedAxes()) {
+                    if (axis->orientation() == Qt::Horizontal) calc.xaxis=axis;
+                    else calc.yaxis=axis;
+                }
+            }
+
+            // pass all the points- but now they are converted according to axis
+            for (int i=0; i< seriesinfo.xseries.count() && i < seriesinfo.yseries.count(); i++) {
+                QPointF p(seriesinfo.xseries.at(i), seriesinfo.yseries.at(i));
+                if (p.x() < minx || p.x() > maxx || p.y() < miny || p.y() > maxy) continue;
+                calc.addPoint(p);
+            }
+            calc.finalise();
+
+            // find the x-axis
+            GenericLR *lr = new GenericLR(this->annotationController);
+            annotationController->addAnnotation(lr);
+            lr->setColor(QColor(annotation.color));
+            lr->setStyle(annotation.linestyle);
+            lr->setParms(slope, intercept); // in chart "units" from first pass
+            lr->setText(QString("y= %2x + %1 R2= %3").arg(calc.b, 0, 'f', 3).arg(calc.m, 0, 'f', 3).arg(calc.r2, 0, 'f', 3));
+            lr->setCurve(curves.value(seriesinfo.name,NULL));
+
+            annotations << lr;
+
+            // add a label for the stats
+            QFont std;
+            std.setPointSizeF(std.pointSizeF() * scale_);
+            QFontMetrics fm(std);
+
+            QLabel *add = new QLabel(this);
+            add->setText(lr->text());
+            add->setStyleSheet(QString("color: %1").arg(annotation.color));
+            add->setFixedWidth(fm.boundingRect(lr->text()).width() + (25*dpiXFactor));
             add->setAlignment(Qt::AlignCenter);
             legend->addLabel(add);
             labels << add;

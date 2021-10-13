@@ -37,7 +37,7 @@ class GenericAnnotationInfo {
 
     public:
 
-        enum annotationType { None, Label, VLine, HLine, Voronoi };
+        enum annotationType { None, Label, VLine, HLine, LR, Voronoi };
         typedef annotationType AnnotationType;
         AnnotationType type;
 
@@ -51,9 +51,14 @@ class GenericAnnotationInfo {
         QVector<double> vx, vy; //voronoi digram
 
         // vline and hline
-        Qt::PenStyle linestyle;
+        Qt::PenStyle linestyle; // also used by LR
         double value;
         QString text;
+
+        QString color; // color name eg. red or #fefefe
+
+        // linear regression
+        double slope, intercept, r2;
 };
 
 // keeping track of the series info
