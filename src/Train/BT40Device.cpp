@@ -154,6 +154,11 @@ BT40Device::deviceDisconnected()
             controller->setWatts(0.0);
             controller->setWheelRpm(0.0);
             controller->setCadence(0.0);
+        } else if (service->serviceUuid() == QBluetoothUuid((quint16)FTMSDEVICE_FTMS_UUID)) {
+            BT40Controller* controller = dynamic_cast<BT40Controller*>(parent);
+            controller->setWatts(0.0);
+            controller->setWheelRpm(0.0);
+            controller->setCadence(0.0);
         }
     }
 
