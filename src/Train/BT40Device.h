@@ -98,6 +98,7 @@ private:
     double windResistance;
     double wheelSize;
     bool has_power;
+    bool has_controllable_service;
     CalibrationData calibrationData;
 
     // Service and Characteristic to set load

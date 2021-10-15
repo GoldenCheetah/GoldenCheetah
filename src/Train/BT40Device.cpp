@@ -82,6 +82,7 @@ BT40Device::BT40Device(QObject *parent, QBluetoothDeviceInfo devinfo) : parent(p
     windResistance = 0.6;
     wheelSize = 2100;
     has_power = false;
+    has_controllable_service = false;
 }
 
 BT40Device::~BT40Device()
@@ -189,6 +190,56 @@ BT40Device::serviceScanDone()
     has_power = false;
     bool has_csc = false;
     QLowEnergyService* csc_service=NULL;
+
+
+    // Filter out so that only one controllable service is kept
+    // The idea is that in order to avoid using multiple service to control
+    // a device, we make a prioritization list and use that to only keep
+    // one controllable service.
+
+    // Prepare a list of service which we only want one of, and set their
+    // priorities. Higher number means it will be used over lower numbers.
+    QListIterator<QLowEnergyService *> iter(m_services);
+    QMap<QBluetoothUuid, int> prioMap {
+        { QBluetoothUuid(QString(BLE_TACX_UART_UUID)),              4},
+        { s_KurtInRideService_UUID,                                 3},
+        { s_KurtSmartControlService_UUID,                           2},
+        { QBluetoothUuid((quint16)FTMSDEVICE_FTMS_UUID),            1},
+    };
+
+    // Populate list of lower priority service which will be removed from
+    // m_services
+    QLowEnergyService * prio = nullptr;
+    QList<QLowEnergyService*> toRemove;
+    while (iter.hasNext())
+    {
+        auto curr = iter.next();
+        if (prioMap.contains(curr->serviceUuid()))
+        {
+            if (prio) // If there's a controllable service, check if this one has higher prio
+            {
+                if (prioMap[prio->serviceUuid()] < prioMap[curr->serviceUuid()])
+                {
+                    toRemove.append(prio); // Don't use the lower prio service
+                    prio = curr;
+                }
+            } else { // No previous controllable service found, so store this one
+                prio = curr;
+            }
+        }
+    }
+
+    if (prio)
+    {
+        has_controllable_service = true;
+    }
+
+    foreach (QLowEnergyService* const &service, toRemove) {
+        qDebug() << "Removing service with UUID " << service->serviceUuid() << " from services since a higher priority controllable service was found.";
+        m_services.removeAll(service);
+    }
+
+
     foreach (QLowEnergyService* const &service, m_services) {
 
         qDebug() << "Discovering details for service" << service->serviceUuid() << "for device" << m_currentDevice.name() << " " << m_currentDevice.deviceUuid();
@@ -256,8 +307,13 @@ BT40Device::serviceStateChanged(QLowEnergyService::ServiceState s)
                                 " / CyclingPower", 4);
                     characteristics.append(service->characteristic(
                     QBluetoothUuid(QBluetoothUuid::CyclingPowerMeasurement)));
-                    characteristics.append(service->characteristic(
-                                QBluetoothUuid(QString(WAHOO_BRAKE_CONTROL_UUID))));
+
+                    // Don't try to use Wahoo Brake Control if the device already is controllable via another service
+                    if (!has_controllable_service)
+                    {
+                        characteristics.append(service->characteristic(
+                                    QBluetoothUuid(QString(WAHOO_BRAKE_CONTROL_UUID))));
+                    }
 
                 } else if (service->serviceUuid() == QBluetoothUuid(QBluetoothUuid::CyclingSpeedAndCadence)) {
 
