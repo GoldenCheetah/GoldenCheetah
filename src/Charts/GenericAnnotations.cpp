@@ -164,7 +164,7 @@ GenericLR::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
 
     QPen pen(color);
     pen.setStyle(style);
-    pen.setWidth(pen.width() * 5 * scale); // needs to be relatively thick
+    pen.setWidth(pen.width() * 2 *dpiXFactor * scale); // needs to be relatively thick, but scale and take into account dpi
     painter->setPen(pen);
 
     painter->setClipRect(controller->plot->qchart->plotArea());

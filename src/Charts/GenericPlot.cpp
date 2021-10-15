@@ -1380,7 +1380,7 @@ GenericPlot::plotAnnotations(GenericSeriesInfo &seriesinfo)
         {
             QAbstractSeries *curve=curves.value(seriesinfo.name,NULL);
 
-            if (curve == NULL) return; // big nope
+            if (curve == NULL || !curve->isVisible()) return; // big nope
 
             // what can we see?
             double minx=0, maxx=0, miny=0,maxy=0;
