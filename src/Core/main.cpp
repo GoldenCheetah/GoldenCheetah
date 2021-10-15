@@ -220,6 +220,7 @@ main(int argc, char *argv[])
         freopen("CONOUT$", "w", stderr);
         freopen("CONOUT$", "w", stdout);
     }
+    bool angle=true;
 #endif
 
     //
@@ -295,6 +296,9 @@ main(int argc, char *argv[])
 #ifdef GC_WANT_R
             fprintf(stderr, "--no-r              to disable R startup\n");
 #endif
+#ifdef Q_OS_WIN
+            fprintf(stderr, "--no-angle          to disable ANGLE rendering\n");
+#endif
             fprintf (stderr, "\nSpecify the folder and/or athlete to open on startup\n");
             fprintf(stderr, "If no parameters are passed it will reopen the last athlete.\n\n");
 
@@ -349,6 +353,10 @@ main(int argc, char *argv[])
 #else
             fprintf(stderr, "CloudDB support not compiled in, exiting.\n");
             exit(1);
+#endif
+#ifdef Q_OS_WIN
+        } else if (arg == "--no-angle") {
+            angle = false;
 #endif
         } else {
 
@@ -415,9 +423,11 @@ main(int argc, char *argv[])
     gsl_set_error_handler_off();
 
 #ifdef Q_OS_WIN
-    // windows we use ANGLE for opengl on top of DirectX
-    // it avoids issues with bad graphics drivers
-    QCoreApplication::setAttribute(Qt::AA_UseOpenGLES);
+    if (angle) {
+        // windows we use ANGLE for opengl on top of DirectX/Direct3D
+        // it avoids issues with bad graphics drivers
+        QCoreApplication::setAttribute(Qt::AA_UseOpenGLES);
+    }
 #endif
 
     // create the application -- only ever ONE regardless of restarts
