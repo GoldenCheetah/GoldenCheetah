@@ -201,10 +201,10 @@ BT40Device::serviceScanDone()
     // priorities. Higher number means it will be used over lower numbers.
     QListIterator<QLowEnergyService *> iter(m_services);
     QMap<QBluetoothUuid, int> prioMap {
-        { QBluetoothUuid(QString(BLE_TACX_UART_UUID)),              4},
-        { s_KurtInRideService_UUID,                                 3},
-        { s_KurtSmartControlService_UUID,                           2},
-        { QBluetoothUuid((quint16)FTMSDEVICE_FTMS_UUID),            1},
+        { QBluetoothUuid(QString(BLE_TACX_UART_UUID)),              1},
+        { s_KurtInRideService_UUID,                                 2},
+        { s_KurtSmartControlService_UUID,                           3},
+        { QBluetoothUuid((quint16)FTMSDEVICE_FTMS_UUID),            4},
     };
 
     // Populate list of lower priority service which will be removed from
@@ -232,6 +232,10 @@ BT40Device::serviceScanDone()
     if (prio)
     {
         has_controllable_service = true;
+        if (prioMap[prio->serviceUuid()] >= 2) // Kurt or FTMS
+        {
+            has_power = true;
+        }
     }
 
     foreach (QLowEnergyService* const &service, toRemove) {
@@ -241,7 +245,6 @@ BT40Device::serviceScanDone()
 
 
     foreach (QLowEnergyService* const &service, m_services) {
-
         qDebug() << "Discovering details for service" << service->serviceUuid() << "for device" << m_currentDevice.name() << " " << m_currentDevice.deviceUuid();
 
         connect(service, SIGNAL(stateChanged(QLowEnergyService::ServiceState)), this, SLOT(serviceStateChanged(QLowEnergyService::ServiceState)));
@@ -252,10 +255,12 @@ BT40Device::serviceScanDone()
         connect(service, SIGNAL(error(QLowEnergyService::ServiceError)), this, SLOT(serviceError(QLowEnergyService::ServiceError)));
 
         if (service->serviceUuid() == QBluetoothUuid(QBluetoothUuid::CyclingPower)) {
-
-            has_power = true;
-            service->discoverDetails();
-
+            // Don't connect Cycling Power Service if there's already a controllable source that provides power.
+            if (!has_power)
+            {
+                has_power = true;
+                service->discoverDetails();
+            }
         } else if (service->serviceUuid() == QBluetoothUuid(QBluetoothUuid::CyclingSpeedAndCadence)) {
 
             has_csc = true;
