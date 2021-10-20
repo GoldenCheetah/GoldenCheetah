@@ -79,8 +79,8 @@ class GenericSeriesInfo {
         GenericSeriesInfo() :
             user1(NULL), user2(NULL), user3(NULL), user4(NULL),
             line(static_cast<int>(Qt::PenStyle::SolidLine)),
-            symbol(0), //XXX todo
-            color("red"), opacity(1.0), opengl(true), legend(true), datalabels(false), fill(false)
+            symbol(0), size(2.00), //XXX todo
+            color("red"), opacity(100.0), opengl(true), legend(true), datalabels(false), fill(false)
         {}
 
         // available for use (e.g. UserChartSettings)
