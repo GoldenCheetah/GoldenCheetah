@@ -76,6 +76,9 @@ class UserChart : public QWidget {
         // runtime - date range was selected
         void setDateRange(DateRange);
 
+        // intervals changed, maybe we refresh
+        void intervalRefresh();
+
         // redraw
         void refresh();
 
@@ -109,6 +112,7 @@ class UserChart : public QWidget {
         const RideItem *last; // the last ride we plotted
         const RideItem *ride;
         DateRange dr;
+        int intervals; // remember how many intervals were selected when we last refreshed
 
         GenericChart *chart;
         QGraphicsItem *item;
@@ -193,6 +197,7 @@ class UserChartSettings : public QWidget {
         QCheckBox *stack;
         QComboBox *orientation;
         QSlider *scale;
+        QCheckBox *intervalrefresh;
 
         bool blocked;
 };

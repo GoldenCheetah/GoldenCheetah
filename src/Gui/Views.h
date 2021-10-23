@@ -40,6 +40,7 @@ class AnalysisView : public AbstractView
         void addIntervals();
 
         RideNavigator *rideNavigator();
+        AnalysisSidebar *analSidebar;
 
     public slots:
 
@@ -47,7 +48,6 @@ class AnalysisView : public AbstractView
         void compareChanged(bool);
 
     private:
-        AnalysisSidebar *analSidebar;
         Perspective *hw;
 
 };

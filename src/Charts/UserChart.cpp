@@ -23,6 +23,8 @@
 #include "RideFileCommand.h"
 #include "Utils.h"
 #include "AthleteTab.h"
+#include "Views.h"
+#include "AnalysisSidebar.h"
 #include "LTMTool.h"
 #include "RideNavigator.h"
 #include "ColorButton.h"
@@ -30,13 +32,14 @@
 #include "UserChartData.h"
 #include "TimeUtils.h"
 #include "HelpWhatsThis.h"
+#include "RideItem.h"
 
 #include <limits>
 #include <QScrollArea>
 #include <QDialog>
 
 UserChart::UserChart(QWidget *parent, Context *context, bool rangemode)
-    : QWidget(parent), context(context), rangemode(rangemode), stale(true), last(NULL), ride(NULL), item(NULL)
+    : QWidget(parent), context(context), rangemode(rangemode), stale(true), last(NULL), ride(NULL), intervals(0), item(NULL)
 {
     HelpWhatsThis *helpContents = new HelpWhatsThis(this);
     this->setWhatsThis(helpContents->getWhatsThisText(HelpWhatsThis::Chart_User));
@@ -64,6 +67,8 @@ UserChart::UserChart(QWidget *parent, Context *context, bool rangemode)
     // but we do need to refresh when chart settings change
     connect(settingsTool_, SIGNAL(chartConfigChanged()), this, SLOT(chartConfigChanged()));
     connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
+    connect(context, SIGNAL(intervalSelected()), this, SLOT(intervalRefresh()));
+    connect(context, SIGNAL(intervalsChanged()), this, SLOT(intervalRefresh()));
 
     // defaults, can be overriden via setBackgroundColor()
     if (rangemode) bgcolor = GColor(CTRENDPLOTBACKGROUND);
@@ -119,7 +124,7 @@ UserChart::chartConfigChanged()
     stale = true;
 
     if (rangemode) setDateRange(context->currentDateRange());
-    else setRide(ride);
+    else  setRide(ride);
 }
 
 //
@@ -162,10 +167,40 @@ UserChart::setRide(const RideItem *item)
     refresh();
  }
 
- void
- UserChart::refresh()
- {
+void
+UserChart::intervalRefresh()
+{
+    // refresh on intervals change is user configurable
+    if (!rangemode && chartinfo.intervalrefresh && context->currentRideItem()) {
+
+        // are there any intervals selected?
+        int ints = 0;
+        foreach (IntervalItem*p, const_cast<RideItem*>(context->currentRideItem())->intervals()) {
+            if (p != NULL && p->selected == true) ints++;
+        }
+
+        // if the number of intervals is selected is 0 and
+        // when we last refreshed it was also 0 then just ignore
+        // this signal (on ride change the ride changed signal
+        // will trigger a refresh, lets not duplicate it)
+        if (ints !=0 || intervals !=0) {
+            refresh();
+        }
+    }
+}
+
+void
+UserChart::refresh()
+{
+    if (context->currentRideItem() == NULL) return;
+
     if (!isVisible()) { stale=true; return; }
+
+    // remember how many interval were selected when we refreshed
+    intervals = 0;
+    foreach (IntervalItem*p, const_cast<RideItem*>(context->currentRideItem())->intervals()) {
+        if (p != NULL && p->selected == true) intervals++;
+    }
 
     // ok, we've run out of excuses, looks like we need to plot
     chart->setBackgroundColor(bgcolor);
@@ -545,6 +580,7 @@ UserChart::settings() const
     out << "\"description\": \"" << Utils::jsonprotect2(chartinfo.description) << "\",\n";
     out << "\"type\": "          << chartinfo.type << ",\n";
     out << "\"animate\": "       << (chartinfo.animate ? "true" : "false") << ",\n";
+    out << "\"intervalrefresh\": "  << (chartinfo.intervalrefresh ? "true" : "false") << ",\n";
     out << "\"legendpos\": "     << chartinfo.legendpos << ",\n";
     out << "\"stack\": "         << (chartinfo.stack ? "true" : "false") << ",\n";
     out << "\"orientation\": "   << chartinfo.orientation << ",\n";
@@ -640,6 +676,8 @@ UserChart::applySettings(QString x)
     chartinfo.orientation = obj["orientation"].toInt();
     if (obj.contains("scale")) chartinfo.scale = obj["scale"].toDouble();
     else chartinfo.scale = 1.0f;
+    if (obj.contains("intervalrefresh")) chartinfo.intervalrefresh = obj["intervalrefresh"].toBool();
+    else chartinfo.intervalrefresh = false;
 
     // array of series, but userchartdata needs to be deleted
     foreach(GenericSeriesInfo series, seriesinfo)
@@ -726,7 +764,7 @@ UserChartSettings::UserChartSettings(Context *context, bool rangemode, GenericCh
     HelpWhatsThis *helpConfig = new HelpWhatsThis(this);
     this->setWhatsThis(helpConfig->getWhatsThisText(HelpWhatsThis::Chart_User));
 
-    setMinimumHeight(350*dpiYFactor);
+    setMinimumHeight(400*dpiYFactor);
     setMinimumWidth(450*dpiXFactor);
 
     layout = new QVBoxLayout(this);
@@ -793,12 +831,15 @@ UserChartSettings::UserChartSettings(Context *context, bool rangemode, GenericCh
     scale->setValue(1 + ((chart.scale-1)*2)); // scale is in increments of 0.5
     cf->addRow(tr("Scale"), scale);
 
-
     cf->addRow("  ", (QWidget*)NULL);
     animate = new QCheckBox(tr("Animate"));
     cf->addRow(" ", animate);
     stack = new QCheckBox(tr("Single series per plot"));
     cf->addRow(" ", stack);
+
+    intervalrefresh = new QCheckBox(tr("Refresh for intervals"), this);
+    intervalrefresh->setChecked(chart.intervalrefresh);
+    cf->addRow(" ", intervalrefresh);
 
     // Series tab
     QWidget *seriesWidget = new QWidget(this);
@@ -920,6 +961,7 @@ UserChartSettings::UserChartSettings(Context *context, bool rangemode, GenericCh
     connect(animate, SIGNAL(stateChanged(int)), this, SLOT(updateChartInfo()));
     connect(legpos, SIGNAL(currentIndexChanged(QString)), this, SLOT(updateChartInfo()));
     connect(stack, SIGNAL(stateChanged(int)), this, SLOT(updateChartInfo()));
+    connect(intervalrefresh, SIGNAL(stateChanged(int)), this, SLOT(updateChartInfo()));
     connect(orientation, SIGNAL(currentIndexChanged(int)), this, SLOT(updateChartInfo()));
     connect(scale, SIGNAL(valueChanged(int)), this, SLOT(updateChartInfo()));
 }
@@ -951,6 +993,7 @@ UserChartSettings::refreshChartInfo()
     if (index >= 0) orientation->setCurrentIndex(index);
     else orientation->setCurrentIndex(0);
     scale->setValue(1 + ((chartinfo.scale-1)*2)); // 1-5 mapped to 1-7, where scale is 1,1.5,2,2.5,3,3.5,4,4.5,5
+    intervalrefresh->setChecked(chartinfo.intervalrefresh);
     updating=false;
 }
 
@@ -975,6 +1018,7 @@ UserChartSettings::updateChartInfo()
     chartinfo.stack = stack->isChecked();
     chartinfo.orientation = orientation->itemData(orientation->currentIndex()).toInt();
     chartinfo.scale = 1 + ((scale->value() - 1) * 0.5);
+    chartinfo.intervalrefresh = intervalrefresh->isChecked();
 
     // we need to refresh whenever stuff changes....
     if (refresh) emit chartConfigChanged();

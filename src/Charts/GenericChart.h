@@ -122,7 +122,7 @@ class GenericChartInfo {
     public:
 
         // default values, better here than spread across the codebase.
-        GenericChartInfo() : localinfo(NULL), type(1), animate(false), legendpos(2), stack(false), orientation(Qt::Vertical), scale(1.0) {}
+        GenericChartInfo() : localinfo(NULL), type(1), animate(false), legendpos(2), stack(false), orientation(Qt::Vertical), scale(1.0), intervalrefresh(false) {}
 
         // available for use (e.g. UserChartSettings)
         void *localinfo;
@@ -137,6 +137,7 @@ class GenericChartInfo {
         int orientation; // layout horizontal or vertical
         double scale; // scale font sizes
         QColor bgcolor; // background color of plots and legends
+        bool intervalrefresh; // connect to interval refresh signals
 };
 
 // general axis info
