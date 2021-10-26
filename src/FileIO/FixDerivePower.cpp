@@ -313,8 +313,8 @@ FixDerivePower::postProcess(RideFile *ride, DataProcessorConfig *config=0, QStri
                     CdA = CwaRider + CwaBike;
                 }
                 Ka = 176.5 * exp(-p->alt * .0001253) * CdA * DraftM / (273 + T);
-                //qDebug()<<"acc="<<p->kphd<<" , V="<<V<<" , m="<<M<<" , Pa="<<(p->kphd > 1 ? 1 : p->kphd*V*M);
-                double watts = (afCm * V * (Ka * (vw * vw) + Frg + V * CrDyn))+(p->kphd > 1 ? 1 : p->kphd*V*M);
+                //qDebug()<<"acc="<<p->kphd<<" , V="<<V<<" , m="<<M<<" , Pa="<<(p->kphd > 1 ? 1 : p->kphd)*V*M;
+                double watts = (afCm * V * (Ka * (vw * vw) + Frg + V * CrDyn)) + (p->kphd > 1 ? 1 : p->kphd)*V*M;
                 ride->command->setPointValue(i, RideFile::watts, watts > 0 ? (watts > 1000 ? 1000 : watts) : 0);
                 // qDebug() << "watts = "<<p->watts;
                 // qDebug() << "  " << afCm * V * Ka * (vw * vw) << " = afCm(=" << afCm << ") * V(=" << V << ") * Ka(="<<Ka<<") * (vw^2(=" << V+W << "^2))";
