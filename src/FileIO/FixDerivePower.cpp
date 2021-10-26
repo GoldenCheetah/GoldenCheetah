@@ -230,6 +230,7 @@ FixDerivePower::postProcess(RideFile *ride, DataProcessorConfig *config=0, QStri
         windSpeed = ((FixDerivePowerConfig*)(config))->windSpeed->value();                // kph
         windHeading = ((FixDerivePowerConfig*)(config))->windHeading->value() / 180 * MATHCONST_PI; // rad
     }
+    bool CdANotSet = (CdA == 0.0);
 
     // Do nothing for swims and runs
     if (ride->isSwim() || ride->isRun()) return false;
@@ -307,7 +308,7 @@ FixDerivePower::postProcess(RideFile *ride, DataProcessorConfig *config=0, QStri
 
                 double vw=V+W; // Wind speed against cyclist = cyclist speed + wind speed
 
-                if (CdA == 0) {
+                if (CdANotSet) {
                     double CwaRider = (1 + cad * cCad) * afCd * adipos * (((hRider - adipos) * afSin) + adipos);
                     CdA = CwaRider + CwaBike;
                 }
