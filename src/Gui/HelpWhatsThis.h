@@ -116,6 +116,7 @@ Q_OBJECT
                  ChartDiary_Navigator,
 
                  ChartRides_Overview,
+                 ChartRides_Overview_Config,
                  ChartRides_Summary,
                  ChartRides_Details,
                  ChartRides_Editor,
@@ -137,6 +138,7 @@ Q_OBJECT
                  Chart_Summary,
                  Chart_Summary_Config,
                  Chart_Overview,
+                 Chart_Overview_Config,
                  Chart_R,
                  Chart_Python,
                  Chart_User,

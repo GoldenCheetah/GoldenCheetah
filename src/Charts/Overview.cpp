@@ -541,6 +541,17 @@ OverviewConfigDialog::OverviewConfigDialog(ChartSpaceItem*item) : QDialog(NULL),
     setWindowFlags(windowFlags() | Qt::WindowCloseButtonHint);
     setModal(true);
 
+    // get the factory and set what's this string according to type
+    ChartSpaceItemRegistry &registry = ChartSpaceItemRegistry::instance();
+    ChartSpaceItemDetail itemDetail = registry.detailForType(item->type);
+    itemDetail.quick.replace(" ", "-"); // Blanks are replaced by - in Wiki URLs
+    HelpWhatsThis *help = new HelpWhatsThis(this);
+    if (item->parent->scope & OverviewScope::ANALYSIS) {
+        this->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::ChartRides_Overview_Config).arg(itemDetail.quick, itemDetail.description));
+    } else {
+        this->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::Chart_Overview_Config).arg(itemDetail.quick, itemDetail.description));
+    }
+
     main = new QVBoxLayout(this);
     main->addWidget(item->config());
     item->config()->show();
