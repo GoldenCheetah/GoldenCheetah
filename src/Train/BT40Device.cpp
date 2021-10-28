@@ -202,9 +202,9 @@ BT40Device::serviceScanDone()
     QListIterator<QLowEnergyService *> iter(m_services);
     QMap<QBluetoothUuid, int> prioMap {
         { QBluetoothUuid(QString(BLE_TACX_UART_UUID)),              1},
-        { s_KurtInRideService_UUID,                                 2},
-        { s_KurtSmartControlService_UUID,                           3},
-        { s_FtmsService_UUID,                                       4},
+        { s_FtmsService_UUID,                                       2},
+        { s_KurtInRideService_UUID,                                 3},
+        { s_KurtSmartControlService_UUID,                           4},
     };
 
     // Populate list of lower priority service which will be removed from
