@@ -1,6 +1,7 @@
 #ifndef FTMS_H
 #define FTMS_H
 #include <QDataStream>
+#include <QBluetoothUuid>
 
 // FTMS service assigned numbers
 #define FTMSDEVICE_FTMS_UUID 0x1826
@@ -9,6 +10,13 @@
 #define FTMSDEVICE_RESISTANCE_RANGE_CHAR_UUID 0x2AD6
 #define FTMSDEVICE_FTMS_FEATURE_CHAR_UUID 0x2ACC
 #define FTMSDEVICE_FTMS_CONTROL_POINT_CHAR_UUID 0x2AD9
+
+static const QBluetoothUuid s_FtmsService_UUID = QBluetoothUuid((quint16)FTMSDEVICE_FTMS_UUID);
+static const QBluetoothUuid s_FtmsIndoorBikeChar_UUID = QBluetoothUuid((quint16)FTMSDEVICE_INDOOR_BIKE_CHAR_UUID);
+static const QBluetoothUuid s_FtmsPowerRangeChar_UUID = QBluetoothUuid((quint16)FTMSDEVICE_POWER_RANGE_CHAR_UUID);
+static const QBluetoothUuid s_FtmsResistanceRangeChar_UUID = QBluetoothUuid((quint16)FTMSDEVICE_RESISTANCE_RANGE_CHAR_UUID);
+static const QBluetoothUuid s_FtmsFeatureChar_UUID = QBluetoothUuid((quint16)FTMSDEVICE_FTMS_FEATURE_CHAR_UUID);
+static const QBluetoothUuid s_FtmsControlPointChar_UUID = QBluetoothUuid((quint16)FTMSDEVICE_FTMS_CONTROL_POINT_CHAR_UUID);
 
 enum FtmsControlPointCommand {
     FTMS_REQUEST_CONTROL = 0x00,

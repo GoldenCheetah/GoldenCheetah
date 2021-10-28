@@ -48,7 +48,7 @@ QMap<QBluetoothUuid, btle_sensor_type_t> BT40Device::supportedServices = {
     { QBluetoothUuid(QString(BLE_TACX_UART_UUID)),              { "Tacx FE-C over BLE", ":images/IconPower.png" }},
     { s_KurtInRideService_UUID,                                 { "Kurt Kinetic Inride over BLE", ":images/IconPower.png" }},
     { s_KurtSmartControlService_UUID,                           { "Kurt Kinetic Smart Control over BLE", ":images/IconPower.png" }},
-    { QBluetoothUuid((quint16)FTMSDEVICE_FTMS_UUID),            {"FTMS", ":images/IconPower.png"}},
+    { s_FtmsService_UUID,                                       { "FTMS", ":images/IconPower.png"}},
 
     // This will be needed if we decide to query DeviceInfo for SystemID
     //{ QBluetoothUuid(QBluetoothUuid::DeviceInformation),        { "DeviceInformation", ":images / IconPower.png"}},
@@ -155,7 +155,7 @@ BT40Device::deviceDisconnected()
             controller->setWatts(0.0);
             controller->setWheelRpm(0.0);
             controller->setCadence(0.0);
-        } else if (service->serviceUuid() == QBluetoothUuid((quint16)FTMSDEVICE_FTMS_UUID)) {
+        } else if (service->serviceUuid() == s_FtmsService_UUID) {
             BT40Controller* controller = dynamic_cast<BT40Controller*>(parent);
             controller->setWatts(0.0);
             controller->setWheelRpm(0.0);
@@ -204,7 +204,7 @@ BT40Device::serviceScanDone()
         { QBluetoothUuid(QString(BLE_TACX_UART_UUID)),              1},
         { s_KurtInRideService_UUID,                                 2},
         { s_KurtSmartControlService_UUID,                           3},
-        { QBluetoothUuid((quint16)FTMSDEVICE_FTMS_UUID),            4},
+        { s_FtmsService_UUID,                                       4},
     };
 
     // Populate list of lower priority service which will be removed from
@@ -368,16 +368,13 @@ BT40Device::serviceStateChanged(QLowEnergyService::ServiceState s)
                     characteristics.append(service->characteristic(s_KurtSmartControlService_Power_UUID));
                     characteristics.append(service->characteristic(s_KurtSmartControlService_Config_UUID));
                     characteristics.append(service->characteristic(s_KurtSmartControlService_Control_UUID));
-                } else if (service->serviceUuid() == QBluetoothUuid((quint16)FTMSDEVICE_FTMS_UUID)) {
+                } else if (service->serviceUuid() == s_FtmsService_UUID) {
                     qDebug() << "------------------------------ FTMS FOUND ------------------------";
-                    characteristics.append(service->characteristic(
-                                QBluetoothUuid((quint16)FTMSDEVICE_FTMS_CONTROL_POINT_CHAR_UUID)));
-                    characteristics.append(service->characteristic(
-                                QBluetoothUuid((quint16)FTMSDEVICE_INDOOR_BIKE_CHAR_UUID)));
+                    characteristics.append(service->characteristic(s_FtmsControlPointChar_UUID));
+                    characteristics.append(service->characteristic(s_FtmsIndoorBikeChar_UUID));
 
                     // Read FTMS Feature flags to find out what's supported and not.
-                    service->readCharacteristic(
-                        service->characteristic(QBluetoothUuid((quint16)FTMSDEVICE_FTMS_FEATURE_CHAR_UUID)));
+                    service->readCharacteristic(service->characteristic(s_FtmsFeatureChar_UUID));
                 }
 
                 foreach(QLowEnergyCharacteristic characteristic, characteristics)
@@ -456,7 +453,7 @@ BT40Device::serviceStateChanged(QLowEnergyService::ServiceState s)
                                     QLowEnergyService::WriteWithResponse);
                                 break;
                             }
-                        } else if (characteristic.uuid() == QBluetoothUuid((quint16)FTMSDEVICE_FTMS_CONTROL_POINT_CHAR_UUID)) {
+                        } else if (characteristic.uuid() == s_FtmsControlPointChar_UUID) {
                             // Request control
                             loadService = service;
                             loadCharacteristic = characteristic;
@@ -474,7 +471,7 @@ BT40Device::serviceStateChanged(QLowEnergyService::ServiceState s)
                             }
                             qDebug() << "Found FTMS ------------------------------------------------------";
                             loadService->writeCharacteristic(characteristic, command);
-                        } else if (characteristic.uuid() == QBluetoothUuid((quint16)FTMSDEVICE_FTMS_FEATURE_CHAR_UUID)) {
+                        } else if (characteristic.uuid() == s_FtmsFeatureChar_UUID) {
                             // Read out the different flags to find out what's supported and not.
                             loadService->readCharacteristic(characteristic);
                         } else {
@@ -740,7 +737,7 @@ BT40Device::updateValue(const QLowEnergyCharacteristic &c, const QByteArray &val
 
             emit setNotification(notifyString, 4);
         }
-    } else if(c.uuid() == QBluetoothUuid((quint16)FTMSDEVICE_FTMS_CONTROL_POINT_CHAR_UUID)) {
+    } else if(c.uuid() == s_FtmsControlPointChar_UUID) {
         quint8 type, cmd, status;
         ds >> type;
         if (type == FtmsControlPointCommand::FTMS_RESPONSE_CODE)
@@ -755,7 +752,7 @@ BT40Device::updateValue(const QLowEnergyCharacteristic &c, const QByteArray &val
                 qDebug() << "FTMS Set Target Power result: " << status;
             }
         }
-    } else if (c.uuid() == QBluetoothUuid((quint16)FTMSDEVICE_INDOOR_BIKE_CHAR_UUID)) {
+    } else if (c.uuid() == s_FtmsIndoorBikeChar_UUID) {
         FtmsIndoorBikeData bd;
         ftms_parse_indoor_bike_data(ds, bd);
 
@@ -775,7 +772,7 @@ BT40Device::updateValue(const QLowEnergyCharacteristic &c, const QByteArray &val
             // If "more data" is false, inst speed is present. Convert to km/h by dividing with 100.
             dynamic_cast<BT40Controller*>(parent)->setSpeed(bd.inst_speed/100.0f);
         }
-    } else if (c.uuid() == QBluetoothUuid((quint16)FTMSDEVICE_FTMS_FEATURE_CHAR_UUID)) {
+    } else if (c.uuid() == s_FtmsFeatureChar_UUID) {
         quint32 features, target_settings;
         ds >> features >> target_settings;
 
@@ -783,23 +780,21 @@ BT40Device::updateValue(const QLowEnergyCharacteristic &c, const QByteArray &val
         {
             ftmsDeviceInfo.supports_power_target = true;
             // Read in order to get max/min/increment for power target
-            loadService->readCharacteristic(loadService->characteristic(
-                QBluetoothUuid((quint16)FTMSDEVICE_POWER_RANGE_CHAR_UUID)));
+            loadService->readCharacteristic(loadService->characteristic(s_FtmsPowerRangeChar_UUID));
         }
 
         if (target_settings & FtmsTargetSetting::FTMS_RESISTANCE_TARGET_SUPPORTED)
         {
             ftmsDeviceInfo.supports_resistance_target = true;
             // Read in order to get max/min/increment for resistance target
-            loadService->readCharacteristic(loadService->characteristic(
-                QBluetoothUuid((quint16)FTMSDEVICE_RESISTANCE_RANGE_CHAR_UUID)));
+            loadService->readCharacteristic(loadService->characteristic(s_FtmsResistanceRangeChar_UUID));
         }
 
         if (target_settings & FtmsTargetSetting::FTMS_INDOOR_BIKE_SIMULATION_SUPPORTED)
         {
             ftmsDeviceInfo.supports_simulation_target = true;
         }
-    } else if (c.uuid() == QBluetoothUuid((quint16)FTMSDEVICE_POWER_RANGE_CHAR_UUID)) {
+    } else if (c.uuid() == s_FtmsPowerRangeChar_UUID) {
         qint16 max, min;
         quint16 increment;
         ds >> min >> max >> increment;
@@ -809,7 +804,7 @@ BT40Device::updateValue(const QLowEnergyCharacteristic &c, const QByteArray &val
         ftmsDeviceInfo.minimal_power = min;
         ftmsDeviceInfo.power_increment = increment;
         qDebug() << "FTMS POWER INCREMENT" << max << " " << min << " " << increment;
-    } else if (c.uuid() == QBluetoothUuid((quint16)FTMSDEVICE_RESISTANCE_RANGE_CHAR_UUID)) {
+    } else if (c.uuid() == s_FtmsResistanceRangeChar_UUID) {
         qint16 max, min;
         quint16 increment;
         ds >> min >> max >> increment;
