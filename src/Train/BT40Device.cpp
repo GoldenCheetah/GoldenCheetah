@@ -369,7 +369,7 @@ BT40Device::serviceStateChanged(QLowEnergyService::ServiceState s)
                     characteristics.append(service->characteristic(s_KurtSmartControlService_Config_UUID));
                     characteristics.append(service->characteristic(s_KurtSmartControlService_Control_UUID));
                 } else if (service->serviceUuid() == s_FtmsService_UUID) {
-                    qDebug() << "------------------------------ FTMS FOUND ------------------------";
+                    qDebug() << "FTMS Capable device found";
                     characteristics.append(service->characteristic(s_FtmsControlPointChar_UUID));
                     characteristics.append(service->characteristic(s_FtmsIndoorBikeChar_UUID));
 
@@ -469,7 +469,7 @@ BT40Device::serviceStateChanged(QLowEnergyService::ServiceState s)
                             if (notificationDesc.isValid()) {
                                 service->writeDescriptor(notificationDesc, QByteArray::fromHex("0100"));
                             }
-                            qDebug() << "Found FTMS ------------------------------------------------------";
+
                             loadService->writeCharacteristic(characteristic, command);
                         } else if (characteristic.uuid() == s_FtmsFeatureChar_UUID) {
                             // Read out the different flags to find out what's supported and not.
@@ -750,6 +750,8 @@ BT40Device::updateValue(const QLowEnergyCharacteristic &c, const QByteArray &val
                 qDebug() << "FTMS Request Control result: " << status;
             } else if (cmd == FtmsControlPointCommand::FTMS_SET_TARGET_POWER) {
                 qDebug() << "FTMS Set Target Power result: " << status;
+            } else if (cmd == FtmsControlPointCommand::FTMS_SET_TARGET_RESISTANCE_LEVEL) {
+                qDebug() << "FTMS Set Target Resistance result: " << status;
             }
         }
     } else if (c.uuid() == s_FtmsIndoorBikeChar_UUID) {
@@ -803,11 +805,12 @@ BT40Device::updateValue(const QLowEnergyCharacteristic &c, const QByteArray &val
         ftmsDeviceInfo.maximal_power = max;
         ftmsDeviceInfo.minimal_power = min;
         ftmsDeviceInfo.power_increment = increment;
-        qDebug() << "FTMS POWER INCREMENT" << max << " " << min << " " << increment;
+        qDebug() << "FTMS Reported Power Capabilities - Max: " << max << " Min: " << min << " Increment: " << increment;
     } else if (c.uuid() == s_FtmsResistanceRangeChar_UUID) {
         qint16 max, min;
         quint16 increment;
         ds >> min >> max >> increment;
+        qDebug() << "FTMS Reported Resistance Capabilities - Max: " << max << " Min: " << min << " Increment: " << increment;
 
         // Unitless in 0.1 of unit
         ftmsDeviceInfo.maximal_resistance = max;
