@@ -157,28 +157,6 @@ class ChartSpaceItem : public QGraphicsWidget
         void geometryChanged();
 };
 
-// we copy the current items and manage their layout (which is an iterative process)
-// and once the layout is done we create an animation to move from the current positions
-// to the new positions using this class to temporarily store new co-ordinates
-class LayoutChartSpaceItem {
-
-    public:
-        LayoutChartSpaceItem(ChartSpaceItem *from) :
-            column(from->column), span(from->span), order (from->order ), deep(from->deep), onscene(from->onscene),
-            placing(from->placing), drag(from->drag), incorner(from->incorner), invisible(from->invisible),
-            item(from), geometry(from->geometry()) {}
-
-        static bool LayoutChartSpaceItemSort(const LayoutChartSpaceItem left, const LayoutChartSpaceItem right);
-
-        int column, span, order, deep;
-        bool onscene, placing, drag;
-        bool incorner;
-        bool invisible;
-
-        ChartSpaceItem *item;
-        QRectF geometry;
-};
-
 class ChartSpace : public QWidget
 {
     Q_OBJECT
@@ -250,7 +228,6 @@ class ChartSpace : public QWidget
 
         // set geometry on the widgets (size and pos)
         void updateGeometry();
-        QList<LayoutChartSpaceItem> layoutItems(); // moves geom and lays out items
 
         // set scale, zoom etc appropriately
         void updateView();
