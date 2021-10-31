@@ -373,39 +373,41 @@ ChartSpaceItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *opt, QW
 
 }
 
-static bool ChartSpaceItemSort(const ChartSpaceItem* left, const ChartSpaceItem* right)
-{
-    return (left->column < right->column ? true : (left->column == right->column && left->order < right->order ? true : false));
-}
-
 // convenient way to check if an item spans across a particular column
 // this is distinct from it being in that column, it must span it to the right
-static bool spanned(int column, ChartSpaceItem *item)
+static bool spanned(int column, LayoutChartSpaceItem item)
 {
-    if (item->column+1 <= column && (item->column + item->span -1) >= column) return true;
+    if (item.column+1 <= column && (item.column + item.span -1) >= column) return true;
     return false;
 }
 
-void
-ChartSpace::updateGeometry()
+bool LayoutChartSpaceItem::LayoutChartSpaceItemSort(const LayoutChartSpaceItem left, const LayoutChartSpaceItem right) {
+    return (left.column < right.column ? true : (left.column == right.column && left.order < right.order ? true : false));
+}
+
+// Layout items, refactored out of old updateGeometry code
+// to isolate the before and after positioning of items from
+// the animations.
+QList<LayoutChartSpaceItem> ChartSpace::layoutItems()
 {
-    // can't update geom if nothing to see.
-    if (items.count() == 0) return;
-
-    bool animated=false;
-
-    // keep a temporary list of spanning items
-    // so we can check overlapping as we go
+    // remembering items that span columns
     QList<QRectF> spanners;
 
-    // prevent a memory leak
-    group->stop();
-    delete group;
-    group = new QParallelAnimationGroup(this);
+    // make a list of items to layout
+    QList<LayoutChartSpaceItem> items;
+    foreach(ChartSpaceItem *item, this->items)  items << LayoutChartSpaceItem(item);
+
+    // we iterate when a spanner moves, its the simplest way
+    // to redo layout code without lots of looping code
+repeatlayout:
 
     // order the items to their positions
-    std::sort(items.begin(), items.end(), ChartSpaceItemSort);
+    std::sort(items.begin(), items.end(), LayoutChartSpaceItem::LayoutChartSpaceItemSort);
 
+    // whatever we had, we need to start again
+    spanners.clear();
+
+    // starting from the top
     int y=SPACING;
     int maxy = y;
     int column=-1;
@@ -416,25 +418,23 @@ ChartSpace::updateGeometry()
     // can get out of whack when last entry
     // from column 0 is dragged across to the right
     // bit of a hack but easier to fix here
-    if (items.count() > 0 && items[0]->column == 1) {
-        for(int i=0; i<items.count(); i++) items[i]->column--;
+    if (items.count() > 0 && items[0].column == 1) {
+        for(int i=0; i<items.count(); i++) items[i].column--;
         for(int i=0; i<columns.count()-1; i++) columns[i]=columns[i+1];
     }
 
     // just set their geometry for now, no interaction
     for(int i=0; i<items.count(); i++) {
 
-        if (!items[i]->isVisible()) continue; // not clear if this does anything
-
 repeat:
         // move on to next column, check if first item too
-        if (items[i]->column > column) {
+        if (items[i].column > column) {
 
             // once past the first column we need to update x
             if (column >= 0) {
 
                 // the next column is contiguous so just move on
-                if (items[i]->column == column+1) x+= columns[column] + SPACING; // onto next column then
+                if (items[i].column == column+1) x+= columns[column] + SPACING; // onto next column then
                 else {
 
                     // there are some empty columns, are they really empty
@@ -459,17 +459,17 @@ repeat:
                     }
 
                     // we missed some columns, there is a gap
-                    int diff = items[i]->column - column - 1;
+                    int diff = items[i].column - column - 1;
                     if (diff > 0) {
                         // there are empty columns so shift the cols to the right
                         // to the left to fill  the gap left and all  the column
                         // widths also need to move down too
-                        for(int j=items[i]->column-1; j < 8; j++) columns[j]=columns[j+1];
-                        for(int j=i; j<items.count();j++) items[j]->column -= diff;
+                        for(int j=items[i].column-1; j < 8; j++) columns[j]=columns[j+1];
+                        for(int j=i; j<items.count();j++) items[j].column -= diff;
                     }
                 }
             }
-            y=SPACING; column = items[i]->column;
+            y=SPACING; column = items[i].column;
 
         }
 
@@ -479,9 +479,9 @@ repeat:
 
         // tile width is for the column, or for the columns it spans
         int twidth = columns[column];
-        for(int c=1; c<items[i]->span && (c+column)<columns.count(); c++) twidth += columns[column+c] + SPACING;
+        for(int c=1; c<items[i].span && (c+column)<columns.count(); c++) twidth += columns[column+c] + SPACING;
 
-        int theight = items[i]->deep * ROWHEIGHT;
+        int theight = items[i].deep * ROWHEIGHT;
 
         // make em smaller when configuring visual cue stolen from Windows Start Menu
         int add = 0; //XXX PERFORMANCE ISSSE XXX (state == DRAG) ? (ROWHEIGHT/2) : 0;
@@ -499,39 +499,24 @@ again:
         if (maxy < ty+theight+SPACING) maxy = ty+theight+SPACING;
 
         // add to scene if new
-        if (!items[i]->onscene) {
-            scene->addItem(items[i]);
-            items[i]->setGeometry(tx, ty, twidth, theight);
-            items[i]->onscene = true;
+        if (!items[i].onscene) items[i].geometry = QRectF(tx, ty, twidth, theight);
+        else if ((items[i].geometry.x() != tx+add ||
+                    items[i].geometry.y() != ty+add ||
+                    items[i].geometry.width() != twidth-(add*2) ||
+                    items[i].geometry.height() != theight-(add*2))) {
 
-        } else if (items[i]->invisible == false &&
-                   (items[i]->geometry().x() != tx+add ||
-                    items[i]->geometry().y() != ty+add ||
-                    items[i]->geometry().width() != twidth-(add*2) ||
-                    items[i]->geometry().height() != theight-(add*2))) {
+            items[i].geometry = QRect(tx+add,ty+add,twidth-(add*2),theight-(add*2));
 
-            // we've got an animation to perform -- because we are moving an item
-            animated = true;
-
-            // add an animation for this movement
-            QPropertyAnimation *animation = new QPropertyAnimation(items[i], "geometry");
-            animation->setDuration(300);
-            animation->setStartValue(items[i]->geometry());
-            animation->setEndValue(QRect(tx+add,ty+add,twidth-(add*2),theight-(add*2))); // moving to here
-
-            // when placing a little feedback helps
-            if (items[i]->placing) {
-                animation->setEasingCurve(QEasingCurve(QEasingCurve::OutBack));
-                items[i]->placing = false;
-            } else animation->setEasingCurve(QEasingCurve(QEasingCurve::OutQuint));
-
-            group->addAnimation(animation);
+            // when we move a spanner the impact needs to be
+            // addressed against all items, so sadly we need
+            // to start from scratch.
+            if (items[i].span > 1) goto repeatlayout;
         }
 
         // add us to spanners, so next tiles interaction
-        if (items[i]->span > 1) {
-            if (items[i]->drag)  spanners << QRectF(tx,ty,twidth-1,theight-1);
-            else spanners << items[i]->geometry();
+        if (items[i].span > 1) {
+            if (items[i].drag)  spanners << QRectF(tx,ty,twidth-1,theight-1);
+            else spanners << items[i].geometry;
         }
 
         // set spot for next tile
@@ -547,6 +532,51 @@ again:
         if (spanner.topRight().x() > x) x = spanner.topRight().x();
     }
     sceneRect = QRectF(0, 0, x + SPACING, maxy);
+
+    return items;
+}
+
+void
+ChartSpace::updateGeometry()
+{
+    // can't update geom if nothing to see.
+    if (items.count() == 0) return;
+
+    bool animated=false;
+
+    // prevent a memory leak
+    group->stop();
+    delete group;
+    group = new QParallelAnimationGroup(this);
+
+    foreach(LayoutChartSpaceItem item, layoutItems()) {
+
+        // add to scene if new
+        if (!item.onscene) {
+            scene->addItem(item.item);
+            item.item->setGeometry(item.geometry);
+            item.item->onscene = true;
+
+        } else if (item.invisible == false && item.geometry != item.item->geometry()) {
+
+            // we've got an animation to perform -- because we are moving an item
+            animated = true;
+
+            // add an animation for this movement
+            QPropertyAnimation *animation = new QPropertyAnimation(item.item, "geometry");
+            animation->setDuration(300);
+            animation->setStartValue(item.item->geometry());
+            animation->setEndValue(item.geometry); // moving to here
+
+            // when placing a little feedback helps
+            if (item.item->placing) {
+                animation->setEasingCurve(QEasingCurve(QEasingCurve::OutBack));
+                item.item->placing = false;
+            } else animation->setEasingCurve(QEasingCurve(QEasingCurve::OutQuint));
+
+            group->addAnimation(animation);
+        }
+    }
 
     if (animated) group->start();
 }
