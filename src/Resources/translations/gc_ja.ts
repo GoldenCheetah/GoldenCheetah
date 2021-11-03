@@ -70,22 +70,22 @@ It might be necessary to manually disable it.</source>
     <message>
         <location filename="../../Gui/AboutDialog.cpp" line="25"/>
         <source>About GoldenCheetah</source>
-        <translation type="unfinished">GoldenCheetah について</translation>
+        <translation>GoldenCheetahについて</translation>
     </message>
     <message>
         <location filename="../../Gui/AboutDialog.cpp" line="33"/>
         <source>About</source>
-        <translation type="unfinished"></translation>
+        <translation>概要</translation>
     </message>
     <message>
         <location filename="../../Gui/AboutDialog.cpp" line="34"/>
         <source>Version</source>
-        <translation type="unfinished"></translation>
+        <translation>バージョン</translation>
     </message>
     <message>
         <location filename="../../Gui/AboutDialog.cpp" line="35"/>
         <source>Contributors</source>
-        <translation type="unfinished"></translation>
+        <translation>貢献者</translation>
     </message>
 </context>
 <context>
