@@ -190,7 +190,8 @@ SportTracks::readdir(QString path, QStringList &errors, QDateTime, QDateTime)
 
         // if successful, lets unpack
         int statusCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
-        printd("fetch response: %d: %s\n", reply->error(), reply->errorString().toStdString().c_str());
+        printd("HTTP response code: %d\n", statusCode);
+        if (reply->error() != 0) printd("fetch response: %d: %s\n", reply->error(), reply->errorString().toStdString().c_str());
 
         if (reply->error() == 0) {
 
@@ -449,7 +450,7 @@ SportTracks::readFileCompleted()
 
             // We stop when all tracks have been accomodated
             bool stop=true;
-            foreach(st_track track, data)  if (track.index < track.samples.count()) stop=false;
+            foreach(st_track track, data) if (track.index < track.samples.count() && track.samples.at(track.samples.count()-2).toInt() >= index) stop=false;
             if (stop) break;
 
             // add new point for the point in time we are at
