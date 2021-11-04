@@ -258,9 +258,9 @@ macx {
 # if you have your own MAPQUEST KEY
 #DEFINES += GC_MAPQUESTAPI_KEY=\\\"xxxxxxxxxxxxxxxxxxxxxx\\\"
 
-# USING THE WITHINGS API (http://oauth.withings.com/api)
-#DEFINES += GC_WITHINGS_CONSUMER_KEY=\\\"xxxxxxxxxxxxxxx\\\"
-#DEFINES += GC_WITHINGS_CONSUMER_SECRET=\\\"xxxxxxxxxxxxxxx\\\"
+# USING THE WITHINGS API (http://oauth.withings.com/api, use http://www.goldencheetah.org as CALLBACK URL)
+#DEFINES += GC_NOKIA_CLIENT_ID=\\\"xxxxxxxxxxxxxxx\\\"
+#DEFINES += GC_NOKIA_CLIENT_SECRET=\\\"xxxxxxxxxxxxxxx\\\"
 
 # What video playback do you want?
 DEFINES += GC_VIDEO_NONE             # dont add any video playback support
