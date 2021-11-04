@@ -397,6 +397,9 @@ QList<LayoutChartSpaceItem> ChartSpace::layoutItems()
     QList<LayoutChartSpaceItem> items;
     foreach(ChartSpaceItem *item, this->items)  items << LayoutChartSpaceItem(item);
 
+    // nothing to layout
+    if (items.count() == 0) return items;
+
     //fprintf(stderr, "BEFORE: ");
     //foreach(LayoutChartSpaceItem item, items)  fprintf(stderr, "%d:%d ", item.column, item.order);
     //fprintf(stderr, "\n"); fflush(stderr);
@@ -422,13 +425,8 @@ repeatlayout:
     // can get out of whack when last entry
     // from column 0 is dragged across to the right
     // bit of a hack but easier to fix here
-    int nextcol=-1;
-    int lastcol=-99;
-    for(int i=0; i<items.count(); i++) {
-        if (items[i].column != lastcol) nextcol++;
-        lastcol=items[i].column;
-        items[i].column = nextcol;
-    }
+    int diff=items[0].column;
+    for(int i=0; i<items.count(); i++)  items[i].column -= diff;
 
     //fprintf(stderr, "RENUMBER: ");
     //foreach(LayoutChartSpaceItem item, items)  fprintf(stderr, "%d:%d ", item.column, item.order);
