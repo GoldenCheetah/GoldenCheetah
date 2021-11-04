@@ -1367,6 +1367,7 @@ GenericPlot::plotAnnotations(GenericSeriesInfo &seriesinfo)
 
             QLabel *add = new QLabel(this);
             QString string = annotation.labels.join(" ");
+            add->setFont(std);
             add->setText(string);
             add->setStyleSheet(QString("color: %1").arg(seriesinfo.color));
             add->setFixedWidth(fm.boundingRect(string).width() + (25*dpiXFactor));
@@ -1441,6 +1442,7 @@ GenericPlot::plotAnnotations(GenericSeriesInfo &seriesinfo)
             QFontMetrics fm(std);
 
             QLabel *add = new QLabel(this);
+            add->setFont(std);
             add->setText(lr->text());
             add->setStyleSheet(QString("color: %1").arg(annotation.color));
             add->setFixedWidth(fm.boundingRect(lr->text()).width() + (25*dpiXFactor));
