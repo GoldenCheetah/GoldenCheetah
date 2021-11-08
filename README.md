@@ -29,3 +29,8 @@ Windows: [![Build status](https://ci.appveyor.com/api/projects/status/i6dwn4m8oy
 [![Coverity Status](https://scan.coverity.com/projects/7503/badge.svg)](https://scan.coverity.com/projects/goldencheetah-goldencheetah)
 
 Official release builds, snapshots and development builds are all available from http://www.goldencheetah.org
+
+## NOTIO Fork
+
+If you are looking for the NOTIO fork of GoldenCheetah it can be found here: https://github.com/notio-technologies/GCNotio
+
