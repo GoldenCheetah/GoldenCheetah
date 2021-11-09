@@ -180,7 +180,7 @@ OAuthDialog::OAuthDialog(Context *context, OAuthSite site, CloudService *service
     } else if (site == WITHINGS) {
 
         urlstr = QString("https://account.withings.com/oauth2_user/authorize2?");
-        urlstr.append("redirect_uri=http://www.goldencheetah.org&");
+        urlstr.append("redirect_uri=https://www.goldencheetah.org&");
         urlstr.append("scope=user.info,user.metrics&");
         urlstr.append("response_type=code&");
         urlstr.append("state=xyzzy&");
@@ -238,6 +238,7 @@ OAuthDialog::urlChanged(const QUrl &url)
 
         if (url.toString().startsWith("http://www.goldencheetah.org/?state=&code=") ||
                 url.toString().contains("blank.html?code=") ||
+                url.toString().startsWith("https://www.goldencheetah.org/?code=") ||
                 url.toString().startsWith("http://www.goldencheetah.org/?code=")) {
 
             QUrlQuery parse(url);
@@ -331,7 +332,7 @@ OAuthDialog::urlChanged(const QUrl &url)
                 urlstr = QString("https://account.withings.com/oauth2/token?");
                 params.addQueryItem("client_id", GC_NOKIA_CLIENT_ID);
                 params.addQueryItem("client_secret", GC_NOKIA_CLIENT_SECRET);
-                params.addQueryItem("redirect_uri","http://www.goldencheetah.org");
+                params.addQueryItem("redirect_uri","https://www.goldencheetah.org");
                 params.addQueryItem("grant_type", "authorization_code");
 
             }
