@@ -136,7 +136,7 @@ bool PythonEmbed::pythonInstalled(QString &pybin, QString &pypath, QString PYTHO
     }
 
     // wait for output, should be rapid
-    if (py.waitForReadyRead(2000)==false) {
+    if (py.waitForReadyRead(4000)==false) {
         fprintf(stderr, "Didn't get output: %s\n", pythonbinary.toStdString().c_str());
         py.terminate();
         return false;
