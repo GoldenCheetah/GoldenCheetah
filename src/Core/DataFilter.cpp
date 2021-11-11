@@ -4031,8 +4031,10 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
 
             } else if (field == "percent") {
 
-                double total = (d==DateRange()) ? m->getForSymbol("time_recording", true)
-                                                : m->context->athlete->rideCache->getAggregate("time_recording", s, true, true).toDouble();
+                QString totalMetric = (series == "fatigue") ? "workout_time" : "time_recording";
+
+                double total = (d==DateRange()) ? m->getForSymbol(totalMetric, true)
+                                                : m->context->athlete->rideCache->getAggregate(totalMetric, s, true, true).toDouble();
                 for(int n=0; n<nzones; n++) {
                     QString name = QString("%1%2").arg(metricprefix).arg(n+1);
                     double value = (d==DateRange()) ? m->getForSymbol(name, true)
