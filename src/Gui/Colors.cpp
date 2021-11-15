@@ -237,6 +237,7 @@ void GCColor::setupColors()
         { tr("Tidal Volume"), "CTIDALVOLUME", Qt::yellow },
         { tr("Respiratory Frequency"), "CRESPFREQUENCY", Qt::yellow },
         { tr("FeO2"), "CFEO2", Qt::yellow },
+        { tr("Toolbar Hover"), "CHOVER", Qt::lightGray },
         { "", "", QColor(0,0,0) },
     };
 
@@ -935,6 +936,10 @@ GCColor::applyTheme(int index)
         case CCHROME:
         case CTOOLBAR: // we always keep them the same, but user can make different
             color = theme.colors[1];
+            break;
+
+        case CHOVER:
+            color = theme.dark ? QColor(50,50,50) : QColor(200,200,200);
             break;
 
         case CPLOTSYMBOL:

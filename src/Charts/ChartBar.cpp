@@ -163,9 +163,9 @@ ChartBar::configChanged(qint32)
     QString buttonstyle = QString("QPushButton { border: none; border-radius: %2px; background-color: %1; "
                                                 "padding-left: 0px; padding-right: 0px; "
                                                 "padding-top:  0px; padding-bottom: 0px; }"
-                                  "QPushButton:hover { background-color: rgba(127,127,127,180); }"
-                                  "QPushButton:hover:pressed { background-color: rgba(127,127,127,127); }"
-                                ).arg(GColor(CTOOLBAR).name()).arg(3 * dpiXFactor);
+                                  "QPushButton:hover { background-color: %3; }"
+                                  "QPushButton:hover:pressed { background-color: %3; }"
+                                ).arg(GColor(CTOOLBAR).name()).arg(3 * dpiXFactor).arg(GColor(CHOVER).name());
     menuButton->setStyleSheet(buttonstyle);
     left->setStyleSheet(buttonstyle);
     right->setStyleSheet(buttonstyle);
@@ -461,7 +461,7 @@ ChartBarItem::paintEvent(QPaintEvent *)
 
     // background - chrome or slected colour
     QBrush brush(GColor(CTOOLBAR));
-    if (underMouse() && !checked) brush = QBrush(Qt::darkGray);
+    if (underMouse() && !checked) brush = GColor(CHOVER);
     if (checked) brush = color;
     painter.fillRect(body, brush);
 
@@ -482,13 +482,13 @@ ChartBarItem::paintEvent(QPaintEvent *)
         if (checked) {
 
             // different color if under mouse
-            QBrush brush(Qt::darkGray);
+            QBrush brush(GColor(CHOVER));
             if (hotspot.contains(mouse)) brush.setColor(GColor(CPLOTMARKER));
             painter.fillPath (triangle, brush);
         } else {
 
             // visual clue there is a menu option when tab selected
-            QBrush brush(Qt::lightGray);
+            QBrush brush(GColor(CHOVER));
             painter.fillPath (triangle, brush);
         }
     }

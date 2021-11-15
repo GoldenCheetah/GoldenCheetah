@@ -1448,6 +1448,10 @@ ColorsPage::applyThemeClicked()
                 color = theme.colors[1];
                 break;
 
+            case CHOVER:
+                color = theme.dark ? QColor(50,50,50) : QColor(200,200,200);
+                break;
+
             case CPLOTSYMBOL:
             case CRIDEPLOTXAXIS:
             case CRIDEPLOTYAXIS:

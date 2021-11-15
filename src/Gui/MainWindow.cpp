@@ -2506,9 +2506,9 @@ MainWindow::configChanged(qint32)
     QString buttonstyle = QString("QPushButton { border: none; border-radius: %2px; background-color: %1; "
                                                 "padding-left: 0px; padding-right: 0px; "
                                                 "padding-top:  0px; padding-bottom: 0px; }"
-                                  "QPushButton:hover { background-color: rgba(127,127,127,180); }"
-                                  "QPushButton:hover:pressed { background-color: rgba(127,127,127,127); }"
-                                ).arg(GColor(CTOOLBAR).name()).arg(3 * dpiXFactor);
+                                  "QPushButton:hover { background-color: %3; }"
+                                  "QPushButton:hover:pressed { background-color: %3; }"
+                                ).arg(GColor(CTOOLBAR).name()).arg(3 * dpiXFactor).arg(GColor(CHOVER).name());
 
     back->setStyleSheet(buttonstyle);
     forward->setStyleSheet(buttonstyle);
