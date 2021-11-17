@@ -752,6 +752,18 @@ BT40Device::updateValue(const QLowEnergyCharacteristic &c, const QByteArray &val
                 qDebug() << "FTMS Set Target Power result: " << status;
             } else if (cmd == FtmsControlPointCommand::FTMS_SET_TARGET_RESISTANCE_LEVEL) {
                 qDebug() << "FTMS Set Target Resistance result: " << status;
+            } else if (cmd == FtmsControlPointCommand::FTMS_SPIN_DOWN_CONTROL) {
+                qDebug() << "FTMS Spin Down result: " << status;
+                if (status == FtmsResultCode::FTMS_SUCCESS )
+                {
+                    quint16 targetSpeedLow, targetSpeedHigh;
+                    ds >> targetSpeedLow >> targetSpeedHigh; // resolution is 0.01 of km/h
+                    int targetSpeed = targetSpeedLow + (targetSpeedHigh-targetSpeedLow)/2;
+                    calibrationData.setTargetSpeed(targetSpeed/100.0f);
+                    calibrationData.setState(CALIBRATION_STATE_STARTED);
+                    QString notifyString = QString("Spin Down: Hold between %1 and %2 km/h.").arg(targetSpeedLow/100).arg(targetSpeedHigh/100);
+                    emit setNotification(notifyString, 4);
+                }
             }
         }
     } else if (c.uuid() == s_FtmsIndoorBikeChar_UUID) {
@@ -796,6 +808,19 @@ BT40Device::updateValue(const QLowEnergyCharacteristic &c, const QByteArray &val
         {
             ftmsDeviceInfo.supports_simulation_target = true;
         }
+
+        if (target_settings & FtmsTargetSetting::FTMS_SPIN_DOWN_CONTROL_SUPPORTED)
+        {
+            calibrationData.setType(0, CALIBRATION_TYPE_SPINDOWN);
+            calibrationData.setState(CALIBRATION_STATE_IDLE);
+            calibrationData.setZeroOffset(0);
+            calibrationData.setSpindownTime(0);
+            calibrationData.setTargetSpeed(0);
+            calibrationData.setSlope(0);
+
+            ftmsDeviceInfo.supports_spin_down_calibration = true;
+        }
+
     } else if (c.uuid() == s_FtmsPowerRangeChar_UUID) {
         qint16 max, min;
         quint16 increment;
@@ -816,6 +841,28 @@ BT40Device::updateValue(const QLowEnergyCharacteristic &c, const QByteArray &val
         ftmsDeviceInfo.maximal_resistance = max;
         ftmsDeviceInfo.minimal_resistance = min;
         ftmsDeviceInfo.resistance_increment = increment;
+    } else if (c.uuid() == s_FtmsStatusChar_UUID) {
+        quint8 opcode;
+        ds >> opcode;
+        if (opcode == FtmsStatusOpCode::FTMS_STATUS_SPIN_DOWN_STATUS)
+        {
+            quint8 status;
+            ds >> status;
+            if (status == FtmsSpinDownStatus::FTMS_SPIN_DOWN_STATUS_STOP_PEDALING) {
+                qDebug() << "FTMS: Spin Down Stop Pedalling";
+                calibrationData.setState(CALIBRATION_STATE_COAST);
+                emit setNotification("Spin Down: Stop Pedalling", 4);
+            } else if (status == FtmsSpinDownStatus::FTMS_SPIN_DOWN_STATUS_SUCCESS) {
+                qDebug() << "FTMS: Spin Down Success";
+                calibrationData.setState(CALIBRATION_STATE_SUCCESS);
+                emit setNotification("Spin Down Calibration Succeeded", 4);
+
+            } else if (status == FtmsSpinDownStatus::FTMS_SPIN_DOWN_STATUS_ERROR) {
+                qDebug() << "FTMS: Spin Down Failed";
+                calibrationData.setState(CALIBRATION_STATE_FAILURE);
+                emit setNotification("Spin Down Calibration Failed", 4);
+            }
+        }
     }
 }
 
@@ -1018,6 +1065,26 @@ BT40Device::setMode(int m)
                     QLowEnergyService::WriteWithResponse);
                 break;
             }
+        case FTMS_Device:
+        {
+            if (ftmsDeviceInfo.supports_spin_down_calibration)
+            {
+                // Initiate a Spin Down calibration
+                // If the device responds with SUCCESS it should pass the
+                // target_speed_high and target_speed_low as parameters.
+                // When the speed is reached and the device is ready
+                // it will send another message telling us to start coasting.
+                quint8 opcode = FtmsSpinDown::FTMS_SPIN_DOWN_START;
+                QByteArray command;
+                QDataStream commandDs(&command, QIODevice::ReadWrite);
+                commandDs.setByteOrder(QDataStream::LittleEndian);
+                commandDs << (quint8)FtmsControlPointCommand::FTMS_SPIN_DOWN_CONTROL << opcode;
+                loadService->writeCharacteristic(loadCharacteristic, command);
+            } else {
+                qDebug() << "Enter calibration requested for FTMS device which doesn't support spin down calibration";
+            }
+            break;
+        }
         default:
             qDebug()<<QString("Enter calibration requested for unsupported device type: %1").arg(loadType);
             break;

@@ -10,6 +10,7 @@
 #define FTMSDEVICE_RESISTANCE_RANGE_CHAR_UUID 0x2AD6
 #define FTMSDEVICE_FTMS_FEATURE_CHAR_UUID 0x2ACC
 #define FTMSDEVICE_FTMS_CONTROL_POINT_CHAR_UUID 0x2AD9
+#define FTMSDEVICE_FTMS_STATUS_CHAR_UUID 0x2ADA
 
 static const QBluetoothUuid s_FtmsService_UUID = QBluetoothUuid((quint16)FTMSDEVICE_FTMS_UUID);
 static const QBluetoothUuid s_FtmsIndoorBikeChar_UUID = QBluetoothUuid((quint16)FTMSDEVICE_INDOOR_BIKE_CHAR_UUID);
@@ -17,6 +18,7 @@ static const QBluetoothUuid s_FtmsPowerRangeChar_UUID = QBluetoothUuid((quint16)
 static const QBluetoothUuid s_FtmsResistanceRangeChar_UUID = QBluetoothUuid((quint16)FTMSDEVICE_RESISTANCE_RANGE_CHAR_UUID);
 static const QBluetoothUuid s_FtmsFeatureChar_UUID = QBluetoothUuid((quint16)FTMSDEVICE_FTMS_FEATURE_CHAR_UUID);
 static const QBluetoothUuid s_FtmsControlPointChar_UUID = QBluetoothUuid((quint16)FTMSDEVICE_FTMS_CONTROL_POINT_CHAR_UUID);
+static const QBluetoothUuid s_FtmsStatusChar_UUID = QBluetoothUuid((quint16)FTMSDEVICE_FTMS_STATUS_CHAR_UUID);
 
 enum FtmsControlPointCommand {
     FTMS_REQUEST_CONTROL = 0x00,
@@ -107,6 +109,43 @@ enum FtmsIndoorBikeFlags {
     FTMS_REMAINING_TIME_PRESENT                         = 1 << 12
 };
 
+enum FtmsSpinDown {
+    FTMS_SPIN_DOWN_START                                = 1,
+    FTMS_SPIN_DOWN_IGNORE                               = 2
+};
+
+enum FtmsStatusOpCode {
+    FTMS_STATUS_RESET                                   = 1,
+    FTMS_STATUS_STOP_OR_PAUSE                           = 2,
+    FTMS_STATUS_STOP_SAFETY_KEY                         = 3,
+    FTMS_STATUS_START_OR_RESUME                         = 4,
+    FTMS_STATUS_TARGET_SPEED_CHANGED                    = 5,
+    FTMS_STATUS_TARGET_INCLINE_CHANGED                  = 6,
+    FTMS_STATUS_TARGET_RESISTANCE_CHANGED               = 7,
+    FTMS_STATUS_TARGET_POWER_CHANGED                    = 8,
+    FTMS_STATUS_TARGET_HEART_RATE_CHANGED               = 9,
+    FTMS_STATUS_TARGETED_EXPENDED_ENERGY_CHANGED        = 10,
+    FTMS_STATUS_TARGETED_STEPS_CHANGED                  = 11,
+    FTMS_STATUS_TARGETED_STRIDES_CHANGED                = 12,
+    FTMS_STATUS_TARGETED_DISTANCE_CHANGED               = 13,
+    FTMS_STATUS_TARGETED_TRAINING_TIME_CHANGED          = 14,
+    FTMS_STATUS_TARGETED_TIME_IN_2_HR_ZONES_CHANGED     = 15,
+    FTMS_STATUS_TARGETED_TIME_IN_3_HR_ZONES_CHANGED     = 16,
+    FTMS_STATUS_TARGETED_TIME_IN_5_HR_ZONES_CHANGED     = 17,
+    FTMS_STATUS_SIMULATION_PARAMS_CHANGED               = 18,
+    FTMS_STATUS_WHEEL_CIRUMFERENCE_CHANGED              = 19,
+    FTMS_STATUS_SPIN_DOWN_STATUS                        = 20,
+    FTMS_STATUS_TARGETED_CADENCE_CHANGED                = 21,
+    FTMS_STATUS_CONTROL_PERMISSION_LOST                 = 0xFF,
+};
+
+enum FtmsSpinDownStatus {
+    FTMS_SPIN_DOWN_STATUS_REQUESTED                     = 1,
+    FTMS_SPIN_DOWN_STATUS_SUCCESS                       = 2,
+    FTMS_SPIN_DOWN_STATUS_ERROR                         = 3,
+    FTMS_SPIN_DOWN_STATUS_STOP_PEDALING                 = 4,
+};
+
 struct FtmsIndoorBikeData {
     quint16 flags, inst_speed, avg_speed, inst_cadence, avg_cadence, tot_energy, energy_per_hour, elapsed_time, remaining_time;
     qint16 resistence_level, inst_power, avg_power;
@@ -117,6 +156,7 @@ struct FtmsDeviceInformation {
     bool supports_power_target = false;
     bool supports_resistance_target = false;
     bool supports_simulation_target = false;
+    bool supports_spin_down_calibration = false;
 
     qint16 minimal_resistance = 0;
     qint16 maximal_resistance = 0;
