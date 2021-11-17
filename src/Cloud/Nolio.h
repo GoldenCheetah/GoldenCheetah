@@ -23,6 +23,7 @@
 #include <QNetworkAccessManager>
 #include <QNetworkRequest>
 #include <QImage>
+#include <QDebug>
 
 class Nolio : public CloudService {
 
@@ -46,17 +47,16 @@ class Nolio : public CloudService {
         // home directory
         QString home();
 
+        QList<CloudServiceEntry*> readdir(QString path, QStringList &errors, QDateTime from, QDateTime to);
+
         // write a file
         //bool writeFile(QByteArray &data, QString remotename, RideFile *ride);
 
         // read a file
-        //bool readFile(QByteArray *data, QString remotename, QString remoteid);
-
-        // todays plan needs the response to be adjusted before being returned
-        //QByteArray* prepareResponse(QByteArray* data, QString &name);
+        bool readFile(QByteArray *data, QString remotename, QString remoteid);
 
         // create a folder
-        //bool createFolder(QString);
+        bool createFolder(QString);
 
         // athlete selection
         //QList<CloudServiceAthlete> listAthletes();
@@ -64,13 +64,12 @@ class Nolio : public CloudService {
 
         // dirent style api
         CloudServiceEntry *root() { return root_; }
-        //QList<CloudServiceEntry*> readdir(QString path, QStringList &errors, QDateTime from, QDateTime to);
 
     public slots:
 
         // getting data
-        //void readyRead(); // a readFile operation has work to do
-        //void readFileCompleted();
+        void readyRead(); // a readFile operation has work to do
+        void readFileCompleted();
 
         // sending data
         //void writeFileCompleted();
