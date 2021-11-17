@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright (c) 2020 Mark Liversedge (liversedge@gmail.com)
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -609,10 +609,15 @@ ChartSpace::configChanged(qint32 why)
 
     // set fonts
     bigfont.setPixelSize(pixelSizeForFont(bigfont, ROWHEIGHT *2.5f));
+    bigfont.setHintingPreference(QFont::HintingPreference::PreferNoHinting);
     titlefont.setPixelSize(pixelSizeForFont(titlefont, ROWHEIGHT)); // need a bit of space
+    titlefont.setHintingPreference(QFont::HintingPreference::PreferNoHinting);
     midfont.setPixelSize(pixelSizeForFont(midfont, ROWHEIGHT *0.8f));
+    midfont.setHintingPreference(QFont::HintingPreference::PreferNoHinting);
     smallfont.setPixelSize(pixelSizeForFont(smallfont, ROWHEIGHT*0.7f));
+    smallfont.setHintingPreference(QFont::HintingPreference::PreferNoHinting);
     tinyfont.setPixelSize(pixelSizeForFont(smallfont, ROWHEIGHT*0.5f));
+    tinyfont.setHintingPreference(QFont::HintingPreference::PreferNoHinting);
 
     setProperty("color", GColor(COVERVIEWBACKGROUND));
     view->setBackgroundBrush(QBrush(GColor(COVERVIEWBACKGROUND)));
