@@ -49,7 +49,6 @@
     } while(0)
 #endif
 
-
 Nolio::Nolio(Context *context) : CloudService(context), context(context), root_(NULL) {
     if (context) {
         nam = new QNetworkAccessManager(this);
@@ -58,6 +57,7 @@ Nolio::Nolio(Context *context) : CloudService(context), context(context), root_(
 
     //uploadCompression = gzip; // gzip
     //downloadCompression = none;
+    filetype = uploadType::JSON;
     //useMetric = true; // distance and duration metadata
 
     // config
@@ -70,7 +70,6 @@ Nolio::Nolio(Context *context) : CloudService(context), context(context), root_(
     //settings.insert(AthleteID, GC_NOLIO_ATHLETE_ID);
     //settings.insert(Local1, GC_NOLIO_ATHLETE_NAME);
 }
-
 
 Nolio::~Nolio() {
     if (context) delete nam;
@@ -141,9 +140,115 @@ bool Nolio::open(QStringList &errors){
     return true;
 }
 
+QList<CloudServiceEntry*> Nolio::readdir(QString path, QStringList &errors, QDateTime from, QDateTime to){
+    printd("Nolio::readdir(%s)\n", path.toStdString().c_str());
+    qDebug() << path << from << to;
+    QList<CloudServiceEntry*> returning;
+
+    // do we have a token
+    QString access_token = getSetting(GC_NOLIO_ACCESS_TOKEN, "").toString();
+    if (access_token == "") {
+        errors << "You must authorise with Nolio first";
+        return returning;
+    }
+
+    QString urlstr = "https://www.nolio.io/api/get/training/";
+    QUrl url = QUrl(urlstr);
+    QNetworkRequest request(url);
+    //printd("URL used: %s\n", url.url().toStdString().c_str());
+    // request using the bearer token
+    request.setRawHeader("Authorization", (QString("Bearer %1").arg(access_token)).toLatin1());
+    QNetworkReply *reply = nam->get(request);
+
+    // blocking request
+    QEventLoop loop;
+    connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
+    loop.exec();
+
+    if (reply->error() != QNetworkReply::NoError) {
+        qDebug() << "error" << reply->errorString();
+        errors << "Network Problem reading Nolio data";
+        //return returning;
+    }
+    // did we get a good response ?
+    QByteArray r = reply->readAll();
+
+    QJsonParseError parseError;
+    QJsonDocument document = QJsonDocument::fromJson(r, &parseError);
+
+    // if path was returned all is good, lets set root
+    if (parseError.error == QJsonParseError::NoError) {
+        QJsonArray results = document.array();
+
+        if (results.size() > 0) {
+            for (int i = 0; i < results.size(); i++) {
+                QJsonObject each = results.at(i).toObject();
+                CloudServiceEntry *add = newCloudServiceEntry();
+
+                add->label = QFileInfo(each["name"].toString()).fileName();
+                add->id = QString("%1").arg(each["nolio_id"].toVariant().toULongLong());
+                add->isDir = false;
+                add->distance = each["distance"].toDouble();
+                add->duration = each["duration"].toInt();
+                add->name = QDateTime::fromString(each["date_start"].toString(), Qt::ISODate).toString("yyyy_MM_dd_HH_mm_ss")+".json";
+
+                // printd("direntry: %s %s\n", add->id.toStdString().c_str(), add->name.toStdString().c_str());
+                qDebug() << add->label << add->name;
+                returning << add;
+            }
+        }
+    }
+    return returning;
+}
+
+bool Nolio::readFile(QByteArray *data, QString remotename, QString remoteid){
+    printd("Nolio::readFile\n");
+    qDebug() << "AAAAAAAAAAAAAAAAAAAAAa" << remoteid << remotename;
+
+    // do we have a token
+    QString access_token = getSetting(GC_NOLIO_ACCESS_TOKEN, "").toString();
+    if (access_token == "") {
+        qDebug() << "You must authorise with Nolio first";
+        return false;
+    }
+
+    qDebug() << access_token;
+
+    QString urlstr = "https://www.nolio.io/api/get/training/";
+    QUrl url = QUrl(urlstr);
+    QNetworkRequest request(url);
+    request.setRawHeader("Authorization", (QString("Bearer %1").arg(access_token)).toLatin1());
+    QNetworkReply *reply = nam->get(request);
+    return false;
+}
+
+bool Nolio::createFolder(QString){
+    printd("Nolio::createFolder\n");
+    return false;
+}
+
+void Nolio::readyRead(){
+    printd("Nolio::readyRead");
+}
+void Nolio::readFileCompleted(){
+    printd("Nolio::readCompleted");
+    /*
+    QNetworkReply *reply = static_cast<QNetworkReply*>(QObject::sender());
+
+    // even in debug mode we don't want the whole thing...
+    printd("reply:%s\n", buffers.value(reply)->mid(0,500).toStdString().c_str());
+
+    // prepateResponse will rename the file if it converts to JSON
+    // to add RPE data, so we need to spot name changes to notify
+    // upstream that it did (e.g. FIT => JSON)
+    QString rename = replyName(reply);
+    QByteArray* data = prepareResponse(buffers.value(reply), rename);
+
+    // notify complete with a rename
+    notifyReadComplete(data, rename, tr("Completed."));*/
+}
 
 bool Nolio::close(){
-    printd("Nolio::close\n");
     return true;
 }
 
