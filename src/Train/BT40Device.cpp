@@ -372,6 +372,7 @@ BT40Device::serviceStateChanged(QLowEnergyService::ServiceState s)
                     qDebug() << "FTMS Capable device found";
                     characteristics.append(service->characteristic(s_FtmsControlPointChar_UUID));
                     characteristics.append(service->characteristic(s_FtmsIndoorBikeChar_UUID));
+                    characteristics.append(service->characteristic(s_FtmsStatusChar_UUID));
 
                     // Read FTMS Feature flags to find out what's supported and not.
                     service->readCharacteristic(service->characteristic(s_FtmsFeatureChar_UUID));
