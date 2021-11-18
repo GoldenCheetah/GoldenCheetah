@@ -626,6 +626,9 @@ MainWindow::MainWindow(const QDir &home)
 #else
     viewMenu->addAction(tr("Toggle Full Screen"), this, SLOT(toggleFullScreen()));
 #endif
+    showhideViewbar = viewMenu->addAction(tr("Show View Sidebar"), this, SLOT(showViewbar(bool)));
+    showhideViewbar->setCheckable(true);
+    showhideViewbar->setChecked(true);
     showhideSidebar = viewMenu->addAction(tr("Show Left Sidebar"), this, SLOT(showSidebar(bool)));
     showhideSidebar->setCheckable(true);
     showhideSidebar->setChecked(true);
@@ -793,7 +796,13 @@ MainWindow::toggleSidebar()
     currentAthleteTab->toggleSidebar();
     setToolButtons();
 }
-
+void
+MainWindow::showViewbar(bool want)
+{
+    want ? sidebar->show() : sidebar->hide();
+    showhideViewbar->setChecked(want);
+    setToolButtons();
+}
 void
 MainWindow::showSidebar(bool want)
 {
@@ -1071,7 +1080,14 @@ bool
 MainWindow::eventFilter(QObject *o, QEvent *e)
 {
     if (o == this) {
-        if (e->type() == QEvent::WindowStateChange) resizeEvent(NULL); // see below
+        if (e->type() == QEvent::WindowStateChange) {
+
+            // if we are entering full screen mode we hide the sidebar
+            if (windowState()&Qt::WindowFullScreen) showViewbar(false);
+            else showViewbar(true);
+
+            resizeEvent(NULL); // see below
+        }
     }
     return false;
 }
@@ -1081,6 +1097,7 @@ MainWindow::resizeEvent(QResizeEvent*)
 {
     //appsettings->setValue(GC_SETTINGS_MAIN_GEOM, saveGeometry());
     //appsettings->setValue(GC_SETTINGS_MAIN_STATE, saveState());
+
 }
 
 void

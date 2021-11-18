@@ -210,6 +210,7 @@ class MainWindow : public QMainWindow
         void showOptions();
 
         void toggleSidebar();
+        void showViewbar(bool want);
         void showSidebar(bool want);
         void showToolbar(bool want);
         void showTabbar(bool want);
@@ -337,6 +338,7 @@ class MainWindow : public QMainWindow
 
         // Toolbar state checkables in View menu / context
         QAction *styleAction;
+        QAction *showhideViewbar;
         QAction *showhideLowbar;
         QAction *showhideToolbar;
         QAction *showhideTabbar;
