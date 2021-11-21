@@ -26,6 +26,7 @@
 #include "RideItem.h"
 #include "Colors.h"
 #include "HelpWhatsThis.h"
+#include "Units.h"
 #include <QtGui>
 #include <qwt_plot_zoomer.h>
 
@@ -647,8 +648,8 @@ AerolabWindow::zoomInterval(IntervalItem *which) {
     rect.setLeft(which->start/60);
     rect.setRight(which->stop/60);
   } else {
-    rect.setLeft(which->startKM);
-    rect.setRight(which->stopKM);
+    rect.setLeft(which->startKM * (GlobalContext::context()->useMetricUnits ? 1 : MILES_PER_KM));
+    rect.setRight(which->stopKM * (GlobalContext::context()->useMetricUnits ? 1 : MILES_PER_KM));
   }
   rect.setTop(aerolab->veCurve->maxYValue()*1.1);
   rect.setBottom(aerolab->veCurve->minYValue()-10);
