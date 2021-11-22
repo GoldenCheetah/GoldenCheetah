@@ -4514,6 +4514,8 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
             // do it...
             if (append.isVector()) {
 
+                current.number() += append.number();
+
                 if (pos==-1) {
                     if (current.isNumber) current.asNumeric().append(append.asNumeric());
                     else current.asString().append(append.asString());
@@ -4530,6 +4532,9 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
                 }
 
             } else {
+
+                current.number() += append.number();
+
                 if (current.isNumber) {
                     if (pos == -1) current.asNumeric().append(append.number()); // just a single number
                     else current.asNumeric().insert(pos, append.number()); // just a single number
