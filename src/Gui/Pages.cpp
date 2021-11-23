@@ -731,7 +731,7 @@ TrainOptionsPage::TrainOptionsPage(QWidget *parent, Context *context) : QWidget(
     connect(workoutBrowseButton, SIGNAL(clicked()), this, SLOT(browseWorkoutDir()));
 
     useSimulatedSpeed = new QCheckBox(tr("Simulate Speed From Power"), this);
-    useSimulatedSpeed->setChecked(appsettings->value(this, TRAIN_USESIMULATEDSPEED, false).toBool());
+    useSimulatedSpeed->setChecked(appsettings->value(this, TRAIN_USESIMULATEDSPEED, true).toBool());
     useSimulatedSpeed->setToolTip(tr("Simulation physics uses current athlete parameters and settings\n"
                                      "from the virtual bicycle specifications tab. For Erg Mode workouts\n"
                                      "the slope is assumed to be zero."));
