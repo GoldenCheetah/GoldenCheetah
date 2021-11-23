@@ -78,7 +78,7 @@ class FixFreewheeling : public DataProcessor {
 
         // Localized Name
         QString name() {
-            return tr("Fix freewheeling power/cadence.");
+            return tr("Fix freewheeling power/cadence");
         }
 };
 

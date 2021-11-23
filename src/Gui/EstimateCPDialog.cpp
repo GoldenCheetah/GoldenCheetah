@@ -59,6 +59,7 @@ EstimateCPDialog::setupMinsSecs(QDoubleSpinBoxPtr &minsSpinBox,
 
 EstimateCPDialog::EstimateCPDialog(QWidget *parent) : QDialog(parent)
 {
+    setWindowIcon(QIcon(":/images/gc.png"));
     setWindowTitle(tr("Critical Power Estimator"));
 
     HelpWhatsThis *help = new HelpWhatsThis(this);

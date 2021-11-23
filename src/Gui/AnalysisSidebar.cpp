@@ -806,6 +806,8 @@ AnalysisSidebar::deleteIntervalSelected()
     if (userIntervals) {
         // Are you sure ?
         QMessageBox msgBox;
+        msgBox.setWindowIcon(QIcon(":/images/gc.png"));
+        msgBox.setWindowTitle(tr("Delete interval"));
         msgBox.setText(tr("Are you sure you want to delete selected interval?"));
         QPushButton *deleteButton = msgBox.addButton(tr("Remove"),QMessageBox::YesRole);
         msgBox.setStandardButtons(QMessageBox::Cancel);
@@ -855,6 +857,8 @@ AnalysisSidebar::deleteRoute()
 
         // Are you sure ?
         QMessageBox msgBox;
+        msgBox.setWindowIcon(QIcon(":/images/gc.png"));
+        msgBox.setWindowTitle(tr("Stop tracking segment"));
         msgBox.setText(tr("Are you sure you want to stop tracking this segment?"));
         QPushButton *deleteButton = msgBox.addButton(tr("Remove"),QMessageBox::YesRole);
         msgBox.setStandardButtons(QMessageBox::Cancel);

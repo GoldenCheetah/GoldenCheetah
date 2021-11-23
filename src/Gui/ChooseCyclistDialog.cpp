@@ -50,6 +50,7 @@ static void recursiveDelete(QDir dir)
 
 ChooseCyclistDialog::ChooseCyclistDialog(const QDir &home, bool allowNew) : home(home)
 {
+    setWindowIcon(QIcon(":/images/gc.png"));
     setWindowTitle(tr("Choose an Athlete"));
     setMinimumHeight(300 * dpiYFactor);
     setMinimumWidth(350 * dpiXFactor);

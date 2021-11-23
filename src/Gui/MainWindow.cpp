@@ -1222,6 +1222,8 @@ void MainWindow::showWorkoutWizard()
 void MainWindow::resetWindowLayout()
 {
     QMessageBox msgBox;
+    msgBox.setWindowIcon(QIcon(":/images/gc.png"));
+    msgBox.setWindowTitle(tr("Reset Layout"));
     msgBox.setText(tr("You are about to reset all charts to the default setup"));
     msgBox.setInformativeText(tr("Do you want to continue?"));
     msgBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
@@ -1917,6 +1919,8 @@ MainWindow::deleteRide()
 
     RideItem *item = static_cast<RideItem*>(_item);
     QMessageBox msgBox;
+    msgBox.setWindowIcon(QIcon(":/images/gc.png"));
+    msgBox.setWindowTitle(tr("Delete ctivity"));
     msgBox.setText(tr("Are you sure you want to delete the activity:"));
     msgBox.setInformativeText(item->fileName);
     QPushButton *deleteButton = msgBox.addButton(tr("Delete"),QMessageBox::YesRole);

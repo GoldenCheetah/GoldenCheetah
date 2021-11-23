@@ -117,6 +117,7 @@ ManualRideDialog::deriveFactors()
 
 ManualRideDialog::ManualRideDialog(Context *context) : context(context)
 {
+    setWindowIcon(QIcon(":/images/gc.png"));
     setAttribute(Qt::WA_DeleteOnClose);
     setWindowTitle(tr("Manual Entry"));
     HelpWhatsThis *help = new HelpWhatsThis(this);

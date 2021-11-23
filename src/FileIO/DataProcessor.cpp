@@ -111,6 +111,7 @@ DataProcessorFactory::autoProcess(RideFile *ride, QString mode, QString op)
 
 ManualDataProcessorDialog::ManualDataProcessorDialog(Context *context, QString name, RideItem *ride) : context(context), ride(ride)
 {
+    setWindowIcon(QIcon(":/images/gc.png"));
     setAttribute(Qt::WA_DeleteOnClose);
     setWindowTitle(name);
     QVBoxLayout *mainLayout = new QVBoxLayout(this);

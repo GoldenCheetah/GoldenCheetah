@@ -293,6 +293,7 @@ RideImportWizard::init(QList<QString> original, Context * /*mainWindow*/)
     // connect(overFiles, SIGNAL(clicked()), this, SLOT(overClicked()));  // deprecate for this release... XXX
 
     // title & headings
+    setWindowIcon(QIcon(":/images/gc.png"));
     setWindowTitle(tr("Import Files"));
     QTableWidgetItem *filenameHeading = new QTableWidgetItem;
     filenameHeading->setText(tr("Filename"));

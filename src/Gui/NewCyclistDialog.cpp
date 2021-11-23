@@ -25,6 +25,8 @@
 
 NewCyclistDialog::NewCyclistDialog(QDir home) : QDialog(NULL, Qt::Dialog), home(home)
 {
+    setWindowIcon(QIcon(":/images/gc.png"));
+    setWindowTitle(tr("New Athlete"));
     setAttribute(Qt::WA_DeleteOnClose, false); // caller must delete me, once they've extracted the name
     useMetricUnits = true; // default
 

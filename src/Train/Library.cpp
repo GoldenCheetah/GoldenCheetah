@@ -254,6 +254,7 @@ Library::removeRef(Context *context, QString ref)
 LibrarySearchDialog::LibrarySearchDialog(Context *context) : context(context)
 {
     setAttribute(Qt::WA_DeleteOnClose);
+    setWindowIcon(QIcon(":/images/gc.png"));
     setWindowTitle(tr("Search for Workouts, Syncs and Media"));
     HelpWhatsThis *help = new HelpWhatsThis(this);
     this->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::MenuBar_Tools_ScanDisk_WorkoutVideo));

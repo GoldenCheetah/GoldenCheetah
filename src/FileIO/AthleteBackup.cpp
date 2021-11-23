@@ -87,6 +87,7 @@ AthleteBackup::backupImmediate()
     // do the backup
     backupFolder = dir;
     QMessageBox msgBox;
+    msgBox.setWindowIcon(QIcon(":/images/gc.png"));
     msgBox.setWindowTitle(tr("Athlete Backup"));
     msgBox.setText( tr("Any unsaved data will not be included into the backup .zip file."));
     msgBox.setInformativeText(tr("Do you want to proceed?"));

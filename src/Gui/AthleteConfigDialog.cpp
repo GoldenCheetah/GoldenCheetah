@@ -57,6 +57,7 @@ AthleteConfigDialog::AthleteConfigDialog(QDir _home, Context *context) :
 
     // We go fixed width to ensure a consistent layout for
     // tabs, sub-tabs and internal widgets and lists
+    setWindowIcon(QIcon(":/images/gc.png"));
     setWindowTitle(tr("Athlete Settings"));
 
     connect(closeButton, SIGNAL(clicked()), this, SLOT(closeClicked()));

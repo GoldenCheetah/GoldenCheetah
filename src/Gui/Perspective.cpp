@@ -784,6 +784,8 @@ Perspective::removeChart(int num, bool confirm, bool keep)
     if(confirm == true)
     {
         QMessageBox msgBox;
+        msgBox.setWindowIcon(QIcon(":/images/gc.png"));
+        msgBox.setWindowTitle(tr("Remove Chart"));
         msgBox.setText(tr("Are you sure you want to remove the chart?"));
         QPushButton *deleteButton = msgBox.addButton(tr("Remove"),QMessageBox::YesRole);
         msgBox.setStandardButtons(QMessageBox::Cancel);
@@ -1196,6 +1198,7 @@ Perspective::drawCursor()
 
 GcWindowDialog::GcWindowDialog(GcWinID type, Context *context, GcChartWindow **here, bool sidebar, LTMSettings *use) : context(context), type(type), here(here), sidebar(sidebar)
 {
+    setWindowIcon(QIcon(":/images/gc.png"));
     //setAttribute(Qt::WA_DeleteOnClose);
     setWindowFlags(windowFlags());
     setWindowTitle(tr("Chart Setup"));

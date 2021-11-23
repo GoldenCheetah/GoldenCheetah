@@ -34,6 +34,7 @@ typedef QDoubleSpinBox* QDoubleSpinBoxPtr;
 
 ToolsRhoEstimator::ToolsRhoEstimator(Context *context, QWidget *parent) : QDialog(parent), context(context) {
 
+  setWindowIcon(QIcon(":/images/gc.png"));
   // Set the main window title.
   setWindowTitle(tr("Air Density (Rho) Estimator"));
   HelpWhatsThis *help = new HelpWhatsThis(this);

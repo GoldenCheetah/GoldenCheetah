@@ -36,6 +36,7 @@ ConfigDialog *configdialog_ptr = NULL;
 ConfigDialog::ConfigDialog(QDir _home, Context *context) :
     home(_home), context(context)
 {
+    setWindowIcon(QIcon(":/images/gc.png"));
     setAttribute(Qt::WA_DeleteOnClose);
     configdialog_ptr = this;
 
