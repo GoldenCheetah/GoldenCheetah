@@ -75,7 +75,8 @@ class Colors
 {
 public:
         static unsigned long fingerprint(const Colors*set);
-        QString name,
+        QString group,
+                name,
                 setting;
         QColor  color;
 };

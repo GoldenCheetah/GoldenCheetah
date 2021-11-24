@@ -129,6 +129,8 @@ GColorDialog::GColorDialog(QColor selected, QWidget *parent) : QDialog(parent), 
     colorSet = GCColor::colorSet();
     for (int i=0; colorSet[i].name != ""; i++) {
 
+        if (colorSet[i].group != tr("Data")) continue;
+
         QTreeWidgetItem *add;
         ColorButton *colorButton = new ColorButton(this, colorSet[i].name, colorSet[i].color, false, true);
         // we can click the button to choose the color directly
