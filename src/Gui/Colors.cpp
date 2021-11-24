@@ -238,6 +238,7 @@ void GCColor::setupColors()
         { tr("Respiratory Frequency"), "CRESPFREQUENCY", Qt::yellow },
         { tr("FeO2"), "CFEO2", Qt::yellow },
         { tr("Toolbar Hover"), "CHOVER", Qt::lightGray },
+        { tr("Chartbar background"), "CCHARTBAR", Qt::lightGray },
         { "", "", QColor(0,0,0) },
     };
 
@@ -457,10 +458,13 @@ GCColor::readConfig()
                                         rgb[2].toInt());
         } else {
 
-            // set sensible defaults for any not set...
+            // set sensible defaults for any not set (as new colors are added)
             if (ColorList[i].name == "CTOOLBAR") {
                 QPalette def;
                 ColorList[i].color = def.color(QPalette::Window);
+            }
+            if (ColorList[i].name == "CCHARTBAR") {
+                ColorList[i].color = ColorList[CTOOLBAR].color;
             }
             if (ColorList[i].name == "CCALCURRENT") {
                 QPalette def;
@@ -934,6 +938,7 @@ GCColor::applyTheme(int index)
             break;
 
         case CCHROME:
+        case CCHARTBAR:
         case CTOOLBAR: // we always keep them the same, but user can make different
             color = theme.colors[1];
             break;

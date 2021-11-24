@@ -1443,6 +1443,7 @@ ColorsPage::applyThemeClicked()
                 break;
 
             case CCHROME:
+            case CCHARTBAR:
             case CTOOLBAR: // we always keep them the same, but user can make different
                 //  set to black for dark themese and grey for light themes
                 color = theme.colors[1];

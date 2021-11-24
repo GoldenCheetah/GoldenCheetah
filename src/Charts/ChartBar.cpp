@@ -149,7 +149,7 @@ ChartBar::configChanged(qint32)
     scrollArea->setFixedHeight(height);
     buttonBar->setFixedHeight(height);
 
-    QColor col=GColor(CTOOLBAR);
+    QColor col=GColor(CCHARTBAR);
     scrollArea->setStyleSheet(QString("QScrollArea { background: rgb(%1,%2,%3); }").arg(col.red()).arg(col.green()).arg(col.blue()));
 
     foreach(ChartBarItem *b, buttons) {
@@ -165,7 +165,7 @@ ChartBar::configChanged(qint32)
                                                 "padding-top:  0px; padding-bottom: 0px; }"
                                   "QPushButton:hover { background-color: %3; }"
                                   "QPushButton:hover:pressed { background-color: %3; }"
-                                ).arg(GColor(CTOOLBAR).name()).arg(3 * dpiXFactor).arg(GColor(CHOVER).name());
+                                ).arg(GColor(CCHARTBAR).name()).arg(3 * dpiXFactor).arg(GColor(CHOVER).name());
     menuButton->setStyleSheet(buttonstyle);
     left->setStyleSheet(buttonstyle);
     right->setStyleSheet(buttonstyle);
@@ -393,7 +393,7 @@ ChartBar::paintBackground(QPaintEvent *)
     painter.save();
     QRect all(0,0,width(),height());
 
-    painter.fillRect(all, GColor(CTOOLBAR));
+    painter.fillRect(all, GColor(CCHARTBAR));
 
     painter.restore();
 }
@@ -419,7 +419,7 @@ ButtonBar::paintBackground(QPaintEvent *)
     // fill with a linear gradient
     painter.setPen(Qt::NoPen);
     painter.fillRect(all, QColor(Qt::white));
-    painter.fillRect(all, GColor(CTOOLBAR));
+    painter.fillRect(all, GColor(CCHARTBAR));
 
     if (!GCColor::isFlat()) {
         QPen black(QColor(100,100,100,200));
@@ -460,7 +460,7 @@ ChartBarItem::paintEvent(QPaintEvent *)
     painter.setPen(Qt::NoPen);
 
     // background - chrome or slected colour
-    QBrush brush(GColor(CTOOLBAR));
+    QBrush brush(GColor(CCHARTBAR));
     if (underMouse() && !checked) brush = GColor(CHOVER);
     if (checked) brush = color;
     painter.fillRect(body, brush);
