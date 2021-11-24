@@ -829,7 +829,7 @@ UserChartSettings::UserChartSettings(Context *context, bool rangemode, GenericCh
     scale->setMaximum(18);
     scale->setSingleStep(1);
     scale->setValue(1 + ((chart.scale-1)*2)); // scale is in increments of 0.5
-    cf->addRow(tr("Scale"), scale);
+    cf->addRow(tr("Font scaling"), scale);
 
     cf->addRow("  ", (QWidget*)NULL);
     animate = new QCheckBox(tr("Animate"));
