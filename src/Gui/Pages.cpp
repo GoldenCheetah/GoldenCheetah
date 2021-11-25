@@ -1213,10 +1213,12 @@ ColorsPage::ColorsPage(QWidget *parent) : QWidget(parent)
     searchLayout->addWidget(searchEdit);
 
     colors = new QTreeWidget;
-    colors->headerItem()->setText(0, tr("Color"));
-    colors->headerItem()->setText(1, tr("Select"));
-    colors->setColumnCount(2);
-    colors->setColumnWidth(0,350 *dpiXFactor);
+    colors->headerItem()->setText(0, tr("Group"));
+    colors->headerItem()->setText(1, tr("Color"));
+    colors->headerItem()->setText(2, tr("Select"));
+    colors->setColumnCount(3);
+    colors->setColumnWidth(0,70 *dpiXFactor);
+    colors->setColumnWidth(1,350 *dpiXFactor);
     colors->setSelectionMode(QAbstractItemView::NoSelection);
     //colors->setEditTriggers(QAbstractItemView::SelectedClicked); // allow edit
     colors->setUniformRowHeights(true); // causes height problems when adding - in case of non-text fields
@@ -1323,10 +1325,15 @@ ColorsPage::ColorsPage(QWidget *parent) : QWidget(parent)
         QTreeWidgetItem *add;
         ColorButton *colorButton = new ColorButton(this, colorSet[i].name, colorSet[i].color);
         add = new QTreeWidgetItem(colors->invisibleRootItem());
-        add->setText(0, colorSet[i].name);
-        colors->setItemWidget(add, 1, colorButton);
+        add->setData(0, Qt::UserRole, i); // remember which index it is for since gets sorted
+        add->setText(0, colorSet[i].group);
+        add->setText(1, colorSet[i].name);
+        colors->setItemWidget(add, 2, colorButton);
 
     }
+    colors->setSortingEnabled(true);
+    colors->sortByColumn(0, Qt::AscendingOrder);
+
     connect(applyTheme, SIGNAL(clicked()), this, SLOT(applyThemeClicked()));
 
     foreach(ColorTheme theme, GCColor::themes().themes) {
@@ -1365,7 +1372,7 @@ ColorsPage::searchFilter(QString text)
     for(int i=0; i<colors->invisibleRootItem()->childCount(); i++) {
         if (empty) colors->setRowHidden(i, colors->rootIndex(), false);
         else {
-            QString text = colors->invisibleRootItem()->child(i)->text(0);
+            QString text = colors->invisibleRootItem()->child(i)->text(1);
             bool found=false;
             foreach(QString tok, toks) {
                 if (text.contains(tok, Qt::CaseInsensitive)) {
@@ -1411,6 +1418,8 @@ ColorsPage::applyThemeClicked()
 
         // reset the color selection tools
         colors->clear();
+        colors->setSortingEnabled(false);
+
         for (int i=0; colorSet[i].name != ""; i++) {
 
             QColor color;
@@ -1509,10 +1518,14 @@ ColorsPage::applyThemeClicked()
             QTreeWidgetItem *add;
             ColorButton *colorButton = new ColorButton(this, colorSet[i].name, color);
             add = new QTreeWidgetItem(colors->invisibleRootItem());
-            add->setText(0, colorSet[i].name);
-            colors->setItemWidget(add, 1, colorButton);
+            add->setData(0, Qt::UserRole, i); // remember which index it is for since gets sorted
+            add->setText(0, colorSet[i].group);
+            add->setText(1, colorSet[i].name);
+            colors->setItemWidget(add, 2, colorButton);
 
         }
+        colors->setSortingEnabled(true);
+        colors->sortByColumn(0, Qt::AscendingOrder);
     }
 }
 
@@ -1531,11 +1544,12 @@ ColorsPage::saveClicked()
     // run down and get the current colors and save
     for (int i=0; colorSet[i].name != ""; i++) {
         QTreeWidgetItem *current = colors->invisibleRootItem()->child(i);
-        QColor newColor = ((ColorButton*)colors->itemWidget(current, 1))->getColor();
+        QColor newColor = ((ColorButton*)colors->itemWidget(current, 2))->getColor();
         QString colorstring = QString("%1:%2:%3").arg(newColor.red())
                                                  .arg(newColor.green())
                                                  .arg(newColor.blue());
-        appsettings->setValue(colorSet[i].setting, colorstring);
+        int colornum = current->data(0, Qt::UserRole).toInt();
+        appsettings->setValue(colorSet[colornum].setting, colorstring);
     }
 
     // update basefont family
