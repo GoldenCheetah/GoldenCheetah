@@ -1332,7 +1332,8 @@ ColorsPage::ColorsPage(QWidget *parent) : QWidget(parent)
 
     }
     colors->setSortingEnabled(true);
-    colors->sortByColumn(0, Qt::AscendingOrder);
+    colors->sortByColumn(1, Qt::AscendingOrder); // first sort by name
+    colors->sortByColumn(0, Qt::AscendingOrder); // now by group
 
     connect(applyTheme, SIGNAL(clicked()), this, SLOT(applyThemeClicked()));
 
@@ -1525,6 +1526,7 @@ ColorsPage::applyThemeClicked()
 
         }
         colors->setSortingEnabled(true);
+        colors->sortByColumn(1, Qt::AscendingOrder); // first sort by name
         colors->sortByColumn(0, Qt::AscendingOrder);
     }
 }
