@@ -5038,7 +5038,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
                         value = ii->start;
                         asstring = time_to_string(ii->start);
                     } else if(symbol == "stop") {
-                        value = ii->start;
+                        value = ii->stop;
                         asstring = time_to_string(ii->stop);
                     } else if(symbol == "type") {
                         asstring = RideFileInterval::typeDescription(ii->type);
