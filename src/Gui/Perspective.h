@@ -109,11 +109,12 @@ class Perspective : public GcWindow
         virtual void dragEnterEvent(QDragEnterEvent *);
         virtual void dropEvent(QDropEvent *);
         void resizeEvent(QResizeEvent *);
+        void resize();
         void showEvent(QShowEvent *);
         bool eventFilter(QObject *object, QEvent *e);
 
         // My widget signals and events
-        void styleChanged(int);
+        void styleChanged(int, bool force=false);
         void addChart(GcChartWindow* newone);
         void addChartFromMenu(QAction*action); // called with an action
         void appendChart(GcWinID id); // called from Context *to inset chart
@@ -145,6 +146,7 @@ class Perspective : public GcWindow
     protected:
         Context *context;
         bool active; // ignore gui signals when changing views
+        bool resizing; // when resizing elements, don't double dip
         GcChartWindow *clicked; // keep track of selected charts
         bool dropPending;
 

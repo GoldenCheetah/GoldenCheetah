@@ -279,7 +279,7 @@ GcWindow::paintEvent(QPaintEvent * /*event*/)
         // heading
         QFont font;
         // font too large on hidpi scaling
-        int pixelsize =pixelSizeForFont(font, ((contentsMargins().top()/2)+2));
+        int pixelsize =pixelSizeForFont(font, contentsMargins().top());
         font.setPixelSize(pixelsize);
         font.setWeight(QFont::Bold);
         painter.setFont(font);

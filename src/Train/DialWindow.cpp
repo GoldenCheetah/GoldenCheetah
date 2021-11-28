@@ -546,19 +546,12 @@ void DialWindow::resizeEvent(QResizeEvent * )
 {
     QFont font;
 
-    // hidpi is a bit more complex
-    if (dpiXFactor > 1) {
+    // set point size within reasonable limits for low dpi screens
+    int size = (geometry().height() - 24) * 72 / logicalDpiY();
+    if (size <= 0) size = 4;
+    if (size >= 64) size = 64;
 
-        font.setPixelSize(pixelSizeForFont(font, geometry().height()-(24*dpiYFactor)));
-
-    } else {
-        // set point size within reasonable limits for low dpi screens
-        int size = (geometry().height() - 24) * 72 / logicalDpiY();
-        if (size <= 0) size = 4;
-        if (size >= 64) size = 64;
-
-        font.setPointSize(size);
-    }
+    font.setPointSize(size);
 
     font.setWeight(QFont::Bold);
     valueLabel->setFont(font);
