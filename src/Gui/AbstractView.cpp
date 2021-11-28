@@ -765,6 +765,9 @@ AbstractView::perspectiveSelected(int index)
         pstack->show();
         cstack->show();
 
+        // set tiled status for this view so MainWindow::toggleStyle works appropriately
+        _tiled = perspective_->currentStyle == 2 ? true : false;
+
         // set properties on the perspective as they propagate to charts
         RideItem *notconst = (RideItem*)context->currentRideItem();
         perspective_->setProperty("ride", QVariant::fromValue<RideItem*>(notconst));
