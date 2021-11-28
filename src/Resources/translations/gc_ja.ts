@@ -19693,7 +19693,7 @@ Skipping file...</source>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="464"/>
         <source>&amp;Athlete</source>
-        <translation type="unfinished"></translation>
+        <translation>アスリート(&amp;A)</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="486"/>
@@ -19703,7 +19703,7 @@ Skipping file...</source>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="495"/>
         <source>A&amp;ctivity</source>
-        <translation type="unfinished"></translation>
+        <translation>アクティビティ(&amp;C)</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="496"/>
@@ -19728,7 +19728,7 @@ Skipping file...</source>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="515"/>
         <source>Sha&amp;re</source>
-        <translation type="unfinished"></translation>
+        <translation>シェア(&amp;R)</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="526"/>
@@ -20211,7 +20211,7 @@ Please check your preference settings.</source>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="222"/>
         <source>athletes</source>
-        <translation type="unfinished"></translation>
+        <translation>アスリート</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="225"/>
@@ -20228,7 +20228,7 @@ Please check your preference settings.</source>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="228"/>
         <source>trends</source>
-        <translation type="unfinished"></translation>
+        <translation>トレンド</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="229"/>
@@ -20253,12 +20253,12 @@ Please check your preference settings.</source>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="243"/>
         <source>sync</source>
-        <translation type="unfinished"></translation>
+        <translation>同期</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="245"/>
         <source>options</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">オプション</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="323"/>
@@ -20338,7 +20338,7 @@ Please check your preference settings.</source>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="590"/>
         <source>&amp;Edit</source>
-        <translation type="unfinished"></translation>
+        <translation>編集(&amp;E)</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="638"/>
