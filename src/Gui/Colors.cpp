@@ -42,12 +42,20 @@ QFont baseFont;                 // base font scaled to display (before user scal
 // find the right pixelSize for font and height
 int pixelSizeForFont(QFont &font, int height)
 {
+    static QMap<int,int> maps; // cache as expensive to calculate
+
+    int pixelsize = maps.value(height, 0);
+    if (pixelsize) return pixelsize;
+
     QFont with = font;
-    int pixelsize=6;
+    pixelsize=6;
     do {
         with.setPixelSize(pixelsize+1);
         QFontMetrics fm(with);
-        if (fm.tightBoundingRect("Fy").height() > height) return pixelsize;
+        if (fm.tightBoundingRect("Fy").height() > height) {
+            maps.insert(height, pixelsize);
+            return pixelsize;
+        }
         else pixelsize++;
 
     } while (pixelsize<200); // should never loop that much
