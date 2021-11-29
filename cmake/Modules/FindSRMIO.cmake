@@ -1,0 +1,42 @@
+
+# Copyright (c) 2018 Fredik Lingvall (fredrik.lingvall@protonmail.com)
+
+# LIBSRMIO_INCLUDE_DIR = srmio.h
+# LIBSRMIO_LIBRARIES = libsrmio.so
+# LIBSRMIO_FOUND = true if LIBSRMIO is found
+
+if (WIN32)
+  set(CMAKE_PREFIX_PATH "C:/LIBSRMIO")
+endif(WIN32)
+
+find_path (LIBSRMIO_INCLUDE_DIR srmio.h PATH_SUFFIXES srmio)
+if (NOT LIBSRMIO_INCLUDE_DIR)
+  message (STATUS "Could not find srmio.h")
+endif (NOT LIBSRMIO_INCLUDE_DIR)
+
+find_library (LIBSRMIO_LIBRARIES NAMES libsrmio srmio PATH_SUFFIXES lib)
+if (NOT LIBSRMIO_LIBRARIES)
+  message (STATUS "Could not find LIBSRMIO library")
+endif (NOT LIBSRMIO_LIBRARIES)
+
+if (LIBSRMIO_INCLUDE_DIR AND LIBSRMIO_LIBRARIES)
+  set (LIBSRMIO_FOUND TRUE)
+endif (LIBSRMIO_INCLUDE_DIR AND LIBSRMIO_LIBRARIES)
+
+if (LIBSRMIO_FOUND)
+
+  if (NOT LIBSRMIO_FIND_QUIETLY)
+    message (STATUS "Found srmio.h: ${LIBSRMIO_INCLUDE_DIR}")
+  endif (NOT LIBSRMIO_FIND_QUIETLY)
+
+  if (NOT LIBSRMIO_FIND_QUIETLY)
+    message (STATUS "Found LIBSRMIO: ${LIBSRMIO_LIBRARIES}")
+  endif (NOT LIBSRMIO_FIND_QUIETLY)
+
+else (LIBSRMIO_FOUND)
+  if (LIBSRMIO_FIND_REQUIRED)
+    message (FATAL_ERROR "Could not find LIBSRMIO")
+  endif (LIBSRMIO_FIND_REQUIRED)
+endif (LIBSRMIO_FOUND)
+
+mark_as_advanced (LIBSRMIO_INCLUDE_DIR LIBSRMIO_LIBRARIES LIBSRMIO_FOUND)

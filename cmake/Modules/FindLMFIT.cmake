@@ -1,0 +1,42 @@
+
+# Copyright (c) 2018 Fredik Lingvall (fredrik.lingvall@protonmail.com)
+
+# LIBLMFIT_INCLUDE_DIR = lmcurve.h
+# LIBLMFIT_LIBRARIES = liblmfit.so
+# LIBLMFIT_FOUND = true if LIBLMFIT is found
+
+if (WIN32)
+  set(CMAKE_PREFIX_PATH "C:/LIBLMFIT")
+endif(WIN32)
+
+find_path (LIBLMFIT_INCLUDE_DIR lmcurve.h PATH_SUFFIXES lmfit)
+if (NOT LIBLMFIT_INCLUDE_DIR)
+  message (STATUS "Could not find lmcurve.h")
+endif (NOT LIBLMFIT_INCLUDE_DIR)
+
+find_library (LIBLMFIT_LIBRARIES NAMES liblmfit lmfit PATH_SUFFIXES lib)
+if (NOT LIBLMFIT_LIBRARIES)
+  message (STATUS "Could not find LIBLMFIT library")
+endif (NOT LIBLMFIT_LIBRARIES)
+
+if (LIBLMFIT_INCLUDE_DIR AND LIBLMFIT_LIBRARIES)
+  set (LIBLMFIT_FOUND TRUE)
+endif (LIBLMFIT_INCLUDE_DIR AND LIBLMFIT_LIBRARIES)
+
+if (LIBLMFIT_FOUND)
+
+  if (NOT LIBLMFIT_FIND_QUIETLY)
+    message (STATUS "Found lmcurve.h: ${LIBLMFIT_INCLUDE_DIR}")
+  endif (NOT LIBLMFIT_FIND_QUIETLY)
+
+  if (NOT LIBLMFIT_FIND_QUIETLY)
+    message (STATUS "Found LIBLMFIT: ${LIBLMFIT_LIBRARIES}")
+  endif (NOT LIBLMFIT_FIND_QUIETLY)
+
+else (LIBLMFIT_FOUND)
+  if (LIBLMFIT_FIND_REQUIRED)
+    message (FATAL_ERROR "Could not find LIBLMFIT")
+  endif (LIBLMFIT_FIND_REQUIRED)
+endif (LIBLMFIT_FOUND)
+
+mark_as_advanced (LIBLMFIT_INCLUDE_DIR LIBLMFIT_LIBRARIES LIBLMFIT_FOUND)
