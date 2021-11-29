@@ -49,38 +49,38 @@ void WorkoutWidget::adjustLayout()
     if (height() > MINTOOLHEIGHT) {
 
         // big, can edit and all widgets shown
-        IHEIGHT = 10 *dpiYFactor;
-        THEIGHT = 35 *dpiYFactor;
-        BHEIGHT = 35 *dpiYFactor;
-        LWIDTH = 65 *dpiXFactor;
-        RWIDTH = 35 *dpiXFactor;
-        XTICLENGTH = 3 *dpiYFactor;
-        YTICLENGTH = 0;
-        XTICS = 20;
-        YTICS = 10;
-        SPACING = 2 *dpiYFactor; // between labels and tics (if there are tics)
-        XMOVE = 5; // how many to move X when cursoring
-        YMOVE = 1; // how many to move Y when cursoring
-        GRIDLINES = true;
-        LOG = false;
+        m_iheight = 10 *dpiYFactor;
+        m_theight = 35 *dpiYFactor;
+        m_bheight = 35 *dpiYFactor;
+        m_lwidth = 65 *dpiXFactor;
+        m_rwidth = 35 *dpiXFactor;
+        m_xticlength = 3 *dpiYFactor;
+        m_yticlength = 0;
+        m_xtics = 20;
+        m_ytics = 10;
+        m_spacing = 2 *dpiYFactor; // between labels and tics (if there are tics)
+        m_xmove = 5; // how many to move X when cursoring
+        m_ymove = 1; // how many to move Y when cursoring
+        m_gridlines = true;
+        m_log = false;
 
     } else {
 
         // mini mode
-        IHEIGHT = 0;
-        THEIGHT = 0;
-        BHEIGHT = 20 *dpiYFactor;
-        LWIDTH = 10 *dpiXFactor;
-        RWIDTH = 10 *dpiXFactor;
-        XTICLENGTH = 3 *dpiYFactor;
-        YTICLENGTH = 0;
-        XTICS = 20;
-        YTICS = 5;
-        SPACING = 2 * dpiXFactor; // between labels and tics (if there are tics)
-        XMOVE = 5; // how many to move X when cursoring
-        YMOVE = 1; // how many to move Y when cursoring
-        GRIDLINES = false;
-        LOG = false;
+        m_iheight = 0;
+        m_theight = 0;
+        m_bheight = 20 *dpiYFactor;
+        m_lwidth = 10 *dpiXFactor;
+        m_rwidth = 10 *dpiXFactor;
+        m_xticlength = 3 *dpiYFactor;
+        m_yticlength = 0;
+        m_xtics = 20;
+        m_ytics = 5;
+        m_spacing = 2 * dpiXFactor; // between labels and tics (if there are tics)
+        m_xmove = 5; // how many to move X when cursoring
+        m_ymove = 1; // how many to move Y when cursoring
+        m_gridlines = false;
+        m_log = false;
     }
 }
 
@@ -939,10 +939,10 @@ WorkoutWidget::movePoints(int key, Qt::KeyboardModifiers kmod)
             WWPoint *prev = index ? points_[index-1] : NULL;
 
             // hit the start of the workout
-            if (p->selected && (p->x-XMOVE) < 0) { constrained=true; break; }
+            if (p->selected && (p->x-m_xmove) < 0) { constrained=true; break; }
 
             // hit the previous unselected
-            if (p->selected && prev && !prev->selected && prev->x > (p->x-XMOVE)) {
+            if (p->selected && prev && !prev->selected && prev->x > (p->x-m_xmove)) {
                 constrained=true; break;
             }
         }
@@ -954,10 +954,10 @@ WorkoutWidget::movePoints(int key, Qt::KeyboardModifiers kmod)
             WWPoint *next = index+1 < points_.count() ? points_[index+1] : NULL;
 
             // hit the end of the workout
-            if (p->selected && (p->x+XMOVE) > maxWX()) { constrained=true; break; }
+            if (p->selected && (p->x+m_xmove) > maxWX()) { constrained=true; break; }
 
             // hit the next unselected
-            if (p->selected && next && !next->selected && next->x < (p->x+XMOVE)) {
+            if (p->selected && next && !next->selected && next->x < (p->x+m_xmove)) {
                 constrained=true; break;
             }
         }
@@ -966,7 +966,7 @@ WorkoutWidget::movePoints(int key, Qt::KeyboardModifiers kmod)
         if (key == Qt::Key_Down) {
 
             // hit zero
-            if (p->selected && (p->y-YMOVE) < 0) { constrained=true; break; }
+            if (p->selected && (p->y-m_ymove) < 0) { constrained=true; break; }
         }
     }
 
@@ -990,19 +990,19 @@ WorkoutWidget::movePoints(int key, Qt::KeyboardModifiers kmod)
         switch(key) {
 
         case Qt::Key_Up:
-            p->y += YMOVE;
+            p->y += m_ymove;
             break;
 
         case Qt::Key_Down:
-            p->y -= YMOVE;
+            p->y -= m_ymove;
             break;
 
         case Qt::Key_Left:
-            p->x -= XMOVE;
+            p->x -= m_xmove;
             break;
 
         case Qt::Key_Right:
-            p->x += XMOVE;
+            p->x += m_xmove;
             break;
         }
 
@@ -2310,13 +2310,13 @@ WorkoutWidget::paintEvent(QPaintEvent*)
     QFontMetrics fontMetrics(markerFont);
 
     // backbone
-    if (YTICLENGTH) painter.drawLine(left().topRight(), left().bottomRight()); //Y
-    if (XTICLENGTH) painter.drawLine(bottom().topLeft(), bottom().topRight()); //X
+    if (m_yticlength) painter.drawLine(left().topRight(), left().bottomRight()); //Y
+    if (m_xticlength) painter.drawLine(bottom().topLeft(), bottom().topRight()); //X
 
     // start with 5 min tics and get longer and longer
     int tsecs = 1 * 60; // 1 minute tics
     int xrange = maxVX() - minVX();
-    while (double(xrange) / double(tsecs) > XTICS && tsecs < xrange) {
+    while (double(xrange) / double(tsecs) > m_xtics && tsecs < xrange) {
         if (tsecs==120) tsecs = 300;
         else tsecs *= 2;
     }
@@ -2329,17 +2329,17 @@ WorkoutWidget::paintEvent(QPaintEvent*)
         // paint a tic
         int x= transform(i, 0).x();
 
-        if (XTICLENGTH) { // we can make the tics disappear
+        if (m_xticlength) { // we can make the tics disappear
 
             painter.drawLine(QPoint(x, bottom().topLeft().y()),
-                             QPoint(x, bottom().topLeft().y()+XTICLENGTH));
+                             QPoint(x, bottom().topLeft().y()+m_xticlength));
         }
 
         // always paint the label
         QString label = time_to_string(i);
         QRect bound = fontMetrics.boundingRect(label);
         painter.drawText(QPoint(x - (bound.width() / 2),
-                                bottom().topLeft().y()+fontMetrics.ascent()+XTICLENGTH+(XTICLENGTH ? SPACING : 0)),
+                                bottom().topLeft().y()+fontMetrics.ascent()+m_xticlength+(m_xticlength ? m_spacing : 0)),
                                 label);
 
     }
@@ -2356,7 +2356,7 @@ WorkoutWidget::paintEvent(QPaintEvent*)
     // start with 50w tics and get longer and longer
     int twatts = 50; // 50w tics
     int yrange = maxY() - minY();
-    while (double(yrange) / double(twatts) > YTICS) twatts *= 2;
+    while (double(yrange) / double(twatts) > m_ytics) twatts *= 2;
 
     // now paint them
     for(int i=minY(); i<=maxY(); i += twatts) {
@@ -2366,25 +2366,25 @@ WorkoutWidget::paintEvent(QPaintEvent*)
         // paint a tic
         int y= transform(0, i).y();
 
-        if (YTICLENGTH) { // we can make the tics disappear
+        if (m_yticlength) { // we can make the tics disappear
 
         painter.drawLine(QPoint(left().topRight().x(), y),
-                         QPoint(left().topRight().x()-YTICLENGTH, y));
+                         QPoint(left().topRight().x()-m_yticlength, y));
 
         }
 
         // always paint the watts as a reference
-        if (GRIDLINES && i>0) {
+        if (m_gridlines && i>0) {
             painter.setPen(markerPen);
 
             QString label = QString("%1w").arg(i);
-            painter.drawText(QPoint(canvas().left()+SPACING,
+            painter.drawText(QPoint(canvas().left()+m_spacing,
                                     y+(fontMetrics.ascent()/2)), // we use ascent not height to line up numbers
                                     label);
 
-#if 0       // ONLY SHOW GRIDLINES FROM POWERSCALE
-            // GRIDLINES - but not on top and bottom border of canvas
-            if (y > canvas().y() && y < canvas().height() && GRIDLINES == true) {
+#if 0       // ONLY SHOW m_gridlines FROM POWERSCALE
+            // m_gridlines - but not on top and bottom border of canvas
+            if (y > canvas().y() && y < canvas().height() && m_gridlines == true) {
                 painter.setPen(gridPen);
                 painter.drawLine(QPoint(canvas().x(), y), QPoint(canvas().x()+canvas().width(), y));
             }
@@ -2399,7 +2399,7 @@ WorkoutWidget::paintEvent(QPaintEvent*)
     foreach(WorkoutWidgetItem*x, points_) x->paint(&painter);
 
     // MMP uses a log scale
-    if (LOG) {
+    if (m_log) {
 
         // paint tics for log scale on the canvas
         QPen power(GColor(CPOWER));
@@ -2408,12 +2408,12 @@ WorkoutWidget::paintEvent(QPaintEvent*)
         // typical durations
         for(int i=0; tick_info[i].x > 0 && tick_info[i].x < maxVX(); i++) {
             int x=logX(tick_info[i].x);
-            painter.drawLine(QPoint(x,c.top()), QPoint(x,c.top()+XTICLENGTH));
+            painter.drawLine(QPoint(x,c.top()), QPoint(x,c.top()+m_xticlength));
 
             QString label = tick_info[i].label;
             QRect bound = fontMetrics.boundingRect(label);
             painter.drawText(QPoint(x - (bound.width() / 2),
-                                    c.top()+fontMetrics.ascent()+XTICLENGTH+(XTICLENGTH ? SPACING : 0)),
+                                    c.top()+fontMetrics.ascent()+m_xticlength+(m_xticlength ? m_spacing : 0)),
                                     label);
         }
     }
@@ -2425,42 +2425,42 @@ QRectF
 WorkoutWidget::left()
 {
     QRect all = geometry();
-    return QRectF(0,THEIGHT, LWIDTH, all.height() - IHEIGHT - THEIGHT - BHEIGHT);
+    return QRectF(0,m_theight, m_lwidth, all.height() - m_iheight - m_theight - m_bheight);
 }
 
 QRectF
 WorkoutWidget::right()
 {
     QRect all = geometry();
-    return QRectF(all.width()-RWIDTH,THEIGHT, RWIDTH, all.height() - IHEIGHT - THEIGHT - BHEIGHT);
+    return QRectF(all.width()-m_rwidth,m_theight, m_rwidth, all.height() - m_iheight - m_theight - m_bheight);
 }
 
 QRectF
 WorkoutWidget::bottom()
 {
     QRect all = geometry();
-    return QRectF(LWIDTH, all.height() - BHEIGHT, all.width() - LWIDTH - RWIDTH, BHEIGHT);
+    return QRectF(m_lwidth, all.height() - m_bheight, all.width() - m_lwidth - m_rwidth, m_bheight);
 }
 
 QRectF
 WorkoutWidget::bottomgap()
 {
     QRect all = geometry();
-    return QRectF(LWIDTH, all.height() - (IHEIGHT+BHEIGHT), all.width() - LWIDTH - RWIDTH, IHEIGHT);
+    return QRectF(m_lwidth, all.height() - (m_iheight+m_bheight), all.width() - m_lwidth - m_rwidth, m_iheight);
 }
 
 QRectF
 WorkoutWidget::top()
 {
     QRect all = geometry();
-    return QRectF(LWIDTH, 0, all.width() - LWIDTH - RWIDTH, THEIGHT);
+    return QRectF(m_lwidth, 0, all.width() - m_lwidth - m_rwidth, m_theight);
 }
 
 QRectF
 WorkoutWidget::canvas()
 {
     QRect all = geometry();
-    return QRectF(LWIDTH, THEIGHT, all.width() - LWIDTH - RWIDTH, all.height() - IHEIGHT - THEIGHT - BHEIGHT);
+    return QRectF(m_lwidth, m_theight, all.width() - m_lwidth - m_rwidth, all.height() - m_iheight - m_theight - m_bheight);
 }
 
 WorkoutWidgetItem::WorkoutWidgetItem(WorkoutWidget *w) : w(w)

@@ -278,8 +278,8 @@ ChartSpaceItem::inCorner()
     QPointF spos = parent->view->mapToScene(vpos);
 
     if (geometry().contains(spos.x(), spos.y())) {
-        if (spos.y() - geometry().top() < (ROWHEIGHT+40) &&
-            geometry().width() - (spos.x() - geometry().x()) < (ROWHEIGHT+40))
+        if (spos.y() - geometry().top() < ( chart_geometry::rowheight+40) &&
+            geometry().width() - (spos.x() - geometry().x()) < ( chart_geometry::rowheight+40))
             return true;
     }
     return false;
@@ -304,19 +304,19 @@ ChartSpaceItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *opt, QW
     else painter->setBrush(GColor(CCARDBACKGROUND));
 
     QPainterPath path;
-    path.addRoundedRect(QRectF(0,0,geometry().width(),geometry().height()), ROWHEIGHT/5, ROWHEIGHT/5);
+    path.addRoundedRect(QRectF(0,0,geometry().width(),geometry().height()),  chart_geometry::rowheight/5,  chart_geometry::rowheight/5);
     painter->setPen(Qt::NoPen);
     //painter->fillPath(path, brush.color());
     painter->drawPath(path);
     painter->setPen(GColor(CPLOTGRID));
-    //XXXpainter->drawLine(QLineF(0,ROWHEIGHT*2,geometry().width(),ROWHEIGHT*2));
+    //XXXpainter->drawLine(QLineF(0, chart_geometry::rowheight*2,geometry().width(), chart_geometry::rowheight*2));
     //painter->fillRect(QRectF(0,0,geometry().width()+1,geometry().height()+1), brush);
     //titlefont.setWeight(QFont::Bold);
     if (GCColor::luminance(GColor(CCARDBACKGROUND)) < 127) painter->setPen(QColor(200,200,200));
     else painter->setPen(QColor(70,70,70));
 
     painter->setFont(parent->titlefont);
-    painter->drawText(QPointF(ROWHEIGHT /2.0f, QFontMetrics(parent->titlefont, parent->device()).height()), name);
+    painter->drawText(QPointF( chart_geometry::rowheight /2.0f, QFontMetrics(parent->titlefont, parent->device()).height()), name);
 
     // only paint contents if not dragging
     if (drag) return;
@@ -332,32 +332,32 @@ ChartSpaceItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *opt, QW
                 // if hovering over the button show a background to indicate
                 // that pressing a button is good
                 QPainterPath path;
-                path.addRoundedRect(QRectF(geometry().width()-40-ROWHEIGHT,0,
-                                    ROWHEIGHT+40, ROWHEIGHT+40), ROWHEIGHT/5, ROWHEIGHT/5);
+                path.addRoundedRect(QRectF(geometry().width()-40- chart_geometry::rowheight,0,
+                                     chart_geometry::rowheight+40,  chart_geometry::rowheight+40),  chart_geometry::rowheight/5,  chart_geometry::rowheight/5);
                 painter->setPen(Qt::NoPen);
                 QColor darkgray(GColor(CCARDBACKGROUND).lighter(200));
                 painter->setBrush(darkgray);
                 painter->drawPath(path);
-                painter->fillRect(QRectF(geometry().width()-40-ROWHEIGHT, 0, ROWHEIGHT+40-(ROWHEIGHT/5), ROWHEIGHT+40), QBrush(darkgray));
-                painter->fillRect(QRectF(geometry().width()-40-ROWHEIGHT, ROWHEIGHT/5, ROWHEIGHT+40, ROWHEIGHT+40-(ROWHEIGHT/5)), QBrush(darkgray));
+                painter->fillRect(QRectF(geometry().width()-40- chart_geometry::rowheight, 0,  chart_geometry::rowheight+40-( chart_geometry::rowheight/5),  chart_geometry::rowheight+40), QBrush(darkgray));
+                painter->fillRect(QRectF(geometry().width()-40- chart_geometry::rowheight,  chart_geometry::rowheight/5,  chart_geometry::rowheight+40,  chart_geometry::rowheight+40-( chart_geometry::rowheight/5)), QBrush(darkgray));
 
                 // draw the config button and make it more obvious
                 // when hovering over the card
-                painter->drawPixmap(geometry().width()-20-(ROWHEIGHT*1), 20, ROWHEIGHT*1, ROWHEIGHT*1, accentConfig.pixmap(QSize(ROWHEIGHT*1, ROWHEIGHT*1)));
+                painter->drawPixmap(geometry().width()-20-( chart_geometry::rowheight*1), 20,  chart_geometry::rowheight*1,  chart_geometry::rowheight*1, accentConfig.pixmap(QSize( chart_geometry::rowheight*1,  chart_geometry::rowheight*1)));
 
             } else {
 
                 // hover on card - make it more obvious there is a config button
-                painter->drawPixmap(geometry().width()-20-(ROWHEIGHT*1), 20, ROWHEIGHT*1, ROWHEIGHT*1, whiteConfig.pixmap(QSize(ROWHEIGHT*1, ROWHEIGHT*1)));
+                painter->drawPixmap(geometry().width()-20-( chart_geometry::rowheight*1), 20,  chart_geometry::rowheight*1,  chart_geometry::rowheight*1, whiteConfig.pixmap(QSize( chart_geometry::rowheight*1,  chart_geometry::rowheight*1)));
             }
 
-        } else painter->drawPixmap(geometry().width()-20-(ROWHEIGHT*1), 20, ROWHEIGHT*1, ROWHEIGHT*1, grayConfig.pixmap(QSize(ROWHEIGHT*1, ROWHEIGHT*1)));
+        } else painter->drawPixmap(geometry().width()-20-( chart_geometry::rowheight*1), 20,  chart_geometry::rowheight*1,  chart_geometry::rowheight*1, grayConfig.pixmap(QSize( chart_geometry::rowheight*1,  chart_geometry::rowheight*1)));
     }
 
     // thin border
     if (!drag) {
         QPainterPath path;
-        path.addRoundedRect(QRectF(1*dpiXFactor,1*dpiXFactor,geometry().width()-(2*dpiXFactor),geometry().height()-(2*dpiXFactor)), ROWHEIGHT/5, ROWHEIGHT/5);
+        path.addRoundedRect(QRectF(1*dpiXFactor,1*dpiXFactor,geometry().width()-(2*dpiXFactor),geometry().height()-(2*dpiXFactor)),  chart_geometry::rowheight/5,  chart_geometry::rowheight/5);
         QColor edge(GColor(CCARDBACKGROUND));
         edge = edge.darker(105);
         QPen pen(edge);
@@ -415,11 +415,11 @@ repeatlayout:
     spanners.clear();
 
     // starting from the top
-    int y=SPACING;
+    int y= chart_geometry::spacing;
     int maxy = y;
     int column=-1;
 
-    int x=SPACING;
+    int x= chart_geometry::spacing;
 
     // ensure columns always start from 0
     // can get out of whack when last entry
@@ -443,7 +443,7 @@ repeat:
             if (column >= 0) {
 
                 // the next column is contiguous so just move on
-                if (items[i].column == column+1) x+= columns[column] + SPACING; // onto next column then
+                if (items[i].column == column+1) x+= columns[column] +  chart_geometry::spacing; // onto next column then
                 else {
 
                     // there are some empty columns, are they really empty
@@ -456,8 +456,8 @@ repeat:
                     // the column is spanned, so its ok to move on
                     if (isspanned) {
                         // update x and try again
-                        x += columns[column] + SPACING;
-                        y = SPACING;
+                        x += columns[column] +  chart_geometry::spacing;
+                        y =  chart_geometry::spacing;
                         column++;
 
                         // we only checked if the first column is empty
@@ -478,7 +478,7 @@ repeat:
                     }
                 }
             }
-            y=SPACING; column = items[i].column;
+            y= chart_geometry::spacing; column = items[i].column;
 
         }
 
@@ -488,24 +488,24 @@ repeat:
 
         // tile width is for the column, or for the columns it spans
         int twidth = columns[column];
-        for(int c=1; c<items[i].span && (c+column)<columns.count(); c++) twidth += columns[column+c] + SPACING;
+        for(int c=1; c<items[i].span && (c+column)<columns.count(); c++) twidth += columns[column+c] +  chart_geometry::spacing;
 
-        int theight = items[i].deep * ROWHEIGHT;
+        int theight = items[i].deep *  chart_geometry::rowheight;
 
         // make em smaller when configuring visual cue stolen from Windows Start Menu
-        int add = 0; //XXX PERFORMANCE ISSSE XXX (state == DRAG) ? (ROWHEIGHT/2) : 0;
+        int add = 0; //XXX PERFORMANCE ISSSE XXX (state == DRAG) ? ( chart_geometry::rowheight/2) : 0;
 
         // check we don't overlap with any spanning items in earlier columns etc
 again:
         for(int j=0; j< spanners.count(); j++) {
-            if (spanners[j].intersects(QRect(tx,ty,twidth,theight + (SPACING/2)))) {
-                ty = spanners[j].bottomLeft().y() + SPACING;
+            if (spanners[j].intersects(QRect(tx,ty,twidth,theight + ( chart_geometry::spacing/2)))) {
+                ty = spanners[j].bottomLeft().y() +  chart_geometry::spacing;
                 goto again;
             }
         }
 
         // for setting the scene rectangle - but ignore a ChartSpaceItem if we are dragging it
-        if (maxy < ty+theight+SPACING) maxy = ty+theight+SPACING;
+        if (maxy < ty+theight+ chart_geometry::spacing) maxy = ty+theight+ chart_geometry::spacing;
 
         // add to scene if new
         if (!items[i].onscene) items[i].geometry = QRectF(tx, ty, twidth, theight);
@@ -529,7 +529,7 @@ again:
         }
 
         // set spot for next tile
-        y = ty + theight + SPACING;
+        y = ty + theight +  chart_geometry::spacing;
 
     }
 
@@ -544,7 +544,7 @@ again:
     foreach(QRectF spanner, spanners) {
         if (spanner.topRight().x() > x) x = spanner.topRight().x();
     }
-    sceneRect = QRectF(0, 0, x + SPACING, maxy);
+    sceneRect = QRectF(0, 0, x +  chart_geometry::spacing, maxy);
 
     return items;
 }
@@ -608,15 +608,15 @@ ChartSpace::configChanged(qint32 why)
     accentConfig = colouredIconFromPNG(":images/configure.png", QColor(150,150,150));
 
     // set fonts
-    bigfont.setPixelSize(pixelSizeForFont(bigfont, ROWHEIGHT *2.5f));
+    bigfont.setPixelSize(pixelSizeForFont(bigfont,  chart_geometry::rowheight *2.5f));
     bigfont.setHintingPreference(QFont::HintingPreference::PreferNoHinting);
-    titlefont.setPixelSize(pixelSizeForFont(titlefont, ROWHEIGHT)); // need a bit of space
+    titlefont.setPixelSize(pixelSizeForFont(titlefont,  chart_geometry::rowheight)); // need a bit of space
     titlefont.setHintingPreference(QFont::HintingPreference::PreferNoHinting);
-    midfont.setPixelSize(pixelSizeForFont(midfont, ROWHEIGHT *0.8f));
+    midfont.setPixelSize(pixelSizeForFont(midfont,  chart_geometry::rowheight *0.8f));
     midfont.setHintingPreference(QFont::HintingPreference::PreferNoHinting);
-    smallfont.setPixelSize(pixelSizeForFont(smallfont, ROWHEIGHT*0.7f));
+    smallfont.setPixelSize(pixelSizeForFont(smallfont,  chart_geometry::rowheight*0.7f));
     smallfont.setHintingPreference(QFont::HintingPreference::PreferNoHinting);
-    tinyfont.setPixelSize(pixelSizeForFont(smallfont, ROWHEIGHT*0.5f));
+    tinyfont.setPixelSize(pixelSizeForFont(smallfont,  chart_geometry::rowheight*0.5f));
     tinyfont.setHintingPreference(QFont::HintingPreference::PreferNoHinting);
 
     setProperty("color", GColor(COVERVIEWBACKGROUND));
@@ -870,11 +870,11 @@ ChartSpace::eventFilter(QObject *, QEvent *event)
             break;
 
         case Qt::Key_Down:
-            scrollTo(_viewY + ROWHEIGHT);
+            scrollTo(_viewY +  chart_geometry::rowheight);
             break;
 
         case Qt::Key_Up:
-            scrollTo(_viewY - ROWHEIGHT);
+            scrollTo(_viewY -  chart_geometry::rowheight);
             break;
         }
 
@@ -1142,14 +1142,14 @@ ChartSpace::eventFilter(QObject *, QEvent *event)
 
                 // columns are now variable width
                 // create a new column to the right?
-                int x=SPACING;
+                int x= chart_geometry::spacing;
                 int targetcol = -1;
                 for(int i=0; i<10; i++) {
-                    if (pos.x() > x && pos.x() < (x+columns[i]+SPACING)) {
+                    if (pos.x() > x && pos.x() < (x+columns[i]+ chart_geometry::spacing)) {
                         targetcol = i;
                         break;
                     }
-                    x += columns[i]+SPACING;
+                    x += columns[i]+ chart_geometry::spacing;
                 }
 
                 if (items.last()->column < 9 && targetcol < 0) {
@@ -1219,7 +1219,7 @@ ChartSpace::eventFilter(QObject *, QEvent *event)
         } else if (state == YRESIZE) {
 
             // resize in rows, so in 75px units
-            int addrows = (pos.y() - stateData.yresize.posy) / ROWHEIGHT;
+            int addrows = (pos.y() - stateData.yresize.posy) /  chart_geometry::rowheight;
             int setdeep = stateData.yresize.deep + addrows;
 
             //min height
@@ -1274,10 +1274,10 @@ int
 ChartSpace::columnForX(int x)
 {
     int returning = 0;
-    int offset = SPACING;
+    int offset =  chart_geometry::spacing;
     for(int i=0; i<columns.count(); i++) {
         if (x > offset) returning = i;
-        offset += columns[i] + SPACING;
+        offset += columns[i] +  chart_geometry::spacing;
     }
 
     return returning;

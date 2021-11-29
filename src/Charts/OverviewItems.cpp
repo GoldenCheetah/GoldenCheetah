@@ -829,9 +829,9 @@ MetricOverviewItem::MetricOverviewItem(ChartSpace *parent, QString name, QString
     if (metric) units = metric->units(GlobalContext::context()->useMetricUnits);
 
     // prepare the gold, silver and bronze medal
-    gold = colouredPixmapFromPNG(":/images/medal.png", QColor(249,166,2)).scaledToWidth(ROWHEIGHT*2);
-    silver = colouredPixmapFromPNG(":/images/medal.png", QColor(192,192,192)).scaledToWidth(ROWHEIGHT*2);
-    bronze = colouredPixmapFromPNG(":/images/medal.png", QColor(184,115,51)).scaledToWidth(ROWHEIGHT*2);
+    gold = colouredPixmapFromPNG(":/images/medal.png", QColor(249,166,2)).scaledToWidth( chart_geometry::rowheight*2);
+    silver = colouredPixmapFromPNG(":/images/medal.png", QColor(192,192,192)).scaledToWidth( chart_geometry::rowheight*2);
+    bronze = colouredPixmapFromPNG(":/images/medal.png", QColor(184,115,51)).scaledToWidth( chart_geometry::rowheight*2);
 
     // we may plot the metric sparkline if the tile is big enough
     bool bigdot = parent->scope == ANALYSIS ? true : false;
@@ -2486,18 +2486,18 @@ RPEOverviewItem::itemGeometryChanged() {
 
         // make space for the rpe rating widget if needed
         int minh=6;
-        if (!drag && geom.height() > (ROWHEIGHT*5)+20) {
+        if (!drag && geom.height() > ( chart_geometry::rowheight*5)+20) {
             rperating->show();
-            rperating->setGeometry(20+(ROWHEIGHT*2), ROWHEIGHT*3, geom.width()-40-(ROWHEIGHT*4), ROWHEIGHT*2);
+            rperating->setGeometry(20+( chart_geometry::rowheight*2),  chart_geometry::rowheight*3, geom.width()-40-( chart_geometry::rowheight*4),  chart_geometry::rowheight*2);
         } else { // not set for meta or metric
             rperating->hide();
         }
         minh=7;
 
         // space enough?
-        if (!drag && geom.height() > (ROWHEIGHT*minh)) {
+        if (!drag && geom.height() > ( chart_geometry::rowheight*minh)) {
             sparkline->show();
-            sparkline->setGeometry(20, ROWHEIGHT*(minh-2), geom.width()-40, geom.height()-20-(ROWHEIGHT*(minh-2)));
+            sparkline->setGeometry(20,  chart_geometry::rowheight*(minh-2), geom.width()-40, geom.height()-20-( chart_geometry::rowheight*(minh-2)));
         } else {
             sparkline->hide();
         }
@@ -2515,8 +2515,8 @@ KPIOverviewItem::itemGeometryChanged() {
         int minh=6;
 
         // space enough?
-        if (!drag && geom.height() > (ROWHEIGHT*minh) && (start != 0 || stop != 0)) {
-            progressbar->setGeometry(20, ROWHEIGHT*(minh-2), geom.width()-40, geom.height()-20-(ROWHEIGHT*(minh-2)));
+        if (!drag && geom.height() > ( chart_geometry::rowheight*minh) && (start != 0 || stop != 0)) {
+            progressbar->setGeometry(20,  chart_geometry::rowheight*(minh-2), geom.width()-40, geom.height()-20-( chart_geometry::rowheight*(minh-2)));
             progressbar->show();
         } else {
             progressbar->hide();
@@ -2539,7 +2539,7 @@ DataOverviewItem::itemGeometryChanged()
             QFontMetrics fm(multirow ? parent->smallfont : parent->midfont, parent->device());
             double lineheight = fm.boundingRect("XXX").height() * 1.2f;
             double scrollwidth = fm.boundingRect("X").width();
-            QRectF paintarea = QRectF(20,ROWHEIGHT*2, geometry().width()-40, geometry().height()-20-(ROWHEIGHT*2));
+            QRectF paintarea = QRectF(20, chart_geometry::rowheight*2, geometry().width()-40, geometry().height()-20-( chart_geometry::rowheight*2));
             QRectF dataarea = paintarea;
             dataarea.setY(dataarea.y() + (lineheight*2) + (lineheight*0.25f)); // 0.2 is the line spacing
 
@@ -2569,9 +2569,9 @@ MetricOverviewItem::itemGeometryChanged() {
         int minh=6;
 
         // space enough?
-        if (!drag && geom.height() > (ROWHEIGHT*minh)) {
+        if (!drag && geom.height() > ( chart_geometry::rowheight*minh)) {
             sparkline->show();
-            sparkline->setGeometry(20, ROWHEIGHT*(minh-2), geom.width()-40, geom.height()-20-(ROWHEIGHT*(minh-2)));
+            sparkline->setGeometry(20,  chart_geometry::rowheight*(minh-2), geom.width()-40, geom.height()-20-( chart_geometry::rowheight*(minh-2)));
         } else {
             sparkline->hide();
         }
@@ -2592,9 +2592,9 @@ MetaOverviewItem::itemGeometryChanged() {
         int minh=6;
 
         // space enough?
-        if (!drag && geom.height() > (ROWHEIGHT*minh)) {
+        if (!drag && geom.height() > ( chart_geometry::rowheight*minh)) {
             sparkline->show();
-            sparkline->setGeometry(20, ROWHEIGHT*(minh-2), geom.width()-40, geom.height()-20-(ROWHEIGHT*(minh-2)));
+            sparkline->setGeometry(20,  chart_geometry::rowheight*(minh-2), geom.width()-40, geom.height()-20-( chart_geometry::rowheight*(minh-2)));
         } else {
             sparkline->hide();
         }
@@ -2612,7 +2612,7 @@ RouteOverviewItem::itemGeometryChanged() {
     // route map needs adding to scene etc
     if (!drag) {
         if (myRideItem && myRideItem->ride() && myRideItem->ride()->areDataPresent()->lat) routeline->show();
-        routeline->setGeometry(20,ROWHEIGHT+40, geom.width()-40, geom.height()-(60+ROWHEIGHT));
+        routeline->setGeometry(20, chart_geometry::rowheight+40, geom.width()-40, geom.height()-(60+ chart_geometry::rowheight));
 
     } else routeline->hide();
 }
@@ -2625,7 +2625,7 @@ IntervalOverviewItem::itemGeometryChanged() {
     if (!drag) bubble->show();
 
     // disable animation when changing geometry
-    bubble->setGeometry(20,20+(ROWHEIGHT*2), geom.width()-40, geom.height()-(40+(ROWHEIGHT*2)));
+    bubble->setGeometry(20,20+( chart_geometry::rowheight*2), geom.width()-40, geom.height()-(40+( chart_geometry::rowheight*2)));
 }
 
 
@@ -2647,7 +2647,7 @@ ZoneOverviewItem::itemGeometryChanged() {
 
     // disable animation when changing geometry
     chart->setAnimationOptions(QChart::NoAnimation);
-    chart->setGeometry(20,20+(ROWHEIGHT*2), geom.width()-40, geom.height()-(40+(ROWHEIGHT*2)));
+    chart->setGeometry(20,20+( chart_geometry::rowheight*2), geom.width()-40, geom.height()-(40+( chart_geometry::rowheight*2)));
 }
 
 void
@@ -2669,7 +2669,7 @@ DonutOverviewItem::itemGeometryChanged() {
 
     // disable animation when changing geometry
     chart->setAnimationOptions(QChart::NoAnimation);
-    chart->setGeometry(20,20+(ROWHEIGHT*2), geom.width()-40, geom.height()-(40+(ROWHEIGHT*2)));
+    chart->setGeometry(20,20+( chart_geometry::rowheight*2), geom.width()-40, geom.height()-(40+( chart_geometry::rowheight*2)));
 }
 
 void
@@ -2679,10 +2679,10 @@ KPIOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, 
     if (units != "") addy = QFontMetrics(parent->smallfont).height();
 
     // mid is slightly higher to account for space around title, move mid up
-    double mid = (ROWHEIGHT*1.5f) + ((geometry().height() - (ROWHEIGHT*2)) / 2.0f) - (addy/2);
+    double mid = ( chart_geometry::rowheight*1.5f) + ((geometry().height() - ( chart_geometry::rowheight*2)) / 2.0f) - (addy/2);
 
     // if we're deep enough to show the sparkline then stop
-    if (geometry().height() > (ROWHEIGHT*6)) mid=((ROWHEIGHT*1.5f) + (ROWHEIGHT*3) / 2.0f) - (addy/2);
+    if (geometry().height() > ( chart_geometry::rowheight*6)) mid=(( chart_geometry::rowheight*1.5f) + ( chart_geometry::rowheight*3) / 2.0f) - (addy/2);
 
     // we align centre and mid
     QFontMetrics fm(parent->bigfont);
@@ -2708,9 +2708,9 @@ KPIOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, 
         //sparkline->paint(painter, option, widget);
 
         // in small font max min at top bottom right of chart
-        double bottom = progressbar->geometry().top() + (ROWHEIGHT*2.5);
-        double left = ROWHEIGHT*2;
-        double right = geometry().width()-(ROWHEIGHT*2);
+        double bottom = progressbar->geometry().top() + ( chart_geometry::rowheight*2.5);
+        double left =  chart_geometry::rowheight*2;
+        double right = geometry().width()-( chart_geometry::rowheight*2);
 
         painter->setPen(QColor(100,100,100));
         painter->setFont(parent->smallfont);
@@ -2721,7 +2721,7 @@ KPIOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, 
         painter->drawText(QPointF(left, bottom), starttext);
 
         // percentage in mid font...
-        if (geometry().height() >= (ROWHEIGHT*8)) {
+        if (geometry().height() >= ( chart_geometry::rowheight*8)) {
 
             double percent = round((progressbar->getCurrentValue()-start)/(stop-start) * 100.0);
             QString percenttext = Utils::removeDP(QString("%1%").arg(percent));
@@ -2736,7 +2736,7 @@ KPIOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, 
                 else painter->setPen(QColor(70,70,70));
 
                 painter->setFont(parent->midfont);
-                painter->drawText(QPointF((geometry().width() - mrect.width()) / 2.0f, (ROWHEIGHT * 4.5) + mid + (mfm.ascent() / 3.0f)), percenttext); // divided by 3 to account for "gap" at top of font
+                painter->drawText(QPointF((geometry().width() - mrect.width()) / 2.0f, ( chart_geometry::rowheight * 4.5) + mid + (mfm.ascent() / 3.0f)), percenttext); // divided by 3 to account for "gap" at top of font
             }
         }
     }
@@ -2781,7 +2781,7 @@ DataOverviewItem::sceneEvent(QEvent *event)
 
     } else if (event->type() == QEvent::GraphicsSceneMousePress) {
 
-        QRectF paintarea = QRectF(20,ROWHEIGHT*2, geometry().width()-40, geometry().height()-20-(ROWHEIGHT*2));
+        QRectF paintarea = QRectF(20, chart_geometry::rowheight*2, geometry().width()-40, geometry().height()-20-( chart_geometry::rowheight*2));
 
         QPoint vpos = parent->view->mapFromGlobal(QCursor::pos());
         QPointF pos = parent->view->mapToScene(vpos);
@@ -2833,7 +2833,7 @@ QRectF
 DataOverviewItem::hotspot()
 {
     // use the paint area, regardless of rows as too expensive to compute
-    return QRectF(20,ROWHEIGHT*2, geometry().width()-40, geometry().height()-20-(ROWHEIGHT*2));
+    return QRectF(20, chart_geometry::rowheight*2, geometry().width()-40, geometry().height()-20-( chart_geometry::rowheight*2));
 }
 
 // export the data to a CSV file
@@ -2910,10 +2910,10 @@ DataOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *,
     double lineheight = fm.boundingRect("XXX").height() * 1.2f;
 
     // default horizontal spacing, no flex here, is what it is
-    double hmargin=ROWHEIGHT;
+    double hmargin= chart_geometry::rowheight;
 
     // our bounding rectangle
-    QRectF paintarea = QRectF(20,ROWHEIGHT*2, geometry().width()-40, geometry().height()-20-(ROWHEIGHT*2));
+    QRectF paintarea = QRectF(20, chart_geometry::rowheight*2, geometry().width()-40, geometry().height()-20-( chart_geometry::rowheight*2));
 
     // rows of data with column headings- will make paged and interactive in v3.7
     //
@@ -3148,13 +3148,13 @@ RPEOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, 
 
     // we need the metric units
     double addy = 0;
-    if (rperating->isVisible()) addy=ROWHEIGHT*2; // shift up for rperating
+    if (rperating->isVisible()) addy= chart_geometry::rowheight*2; // shift up for rperating
 
     // mid is slightly higher to account for space around title, move mid up
-    double mid = (ROWHEIGHT*1.5f) + ((geometry().height() - (ROWHEIGHT*2)) / 2.0f) - (addy/2);
+    double mid = ( chart_geometry::rowheight*1.5f) + ((geometry().height() - ( chart_geometry::rowheight*2)) / 2.0f) - (addy/2);
 
     // if we're deep enough to show the sparkline then stop
-    if (geometry().height() > (ROWHEIGHT*6)) mid=((ROWHEIGHT*1.5f) + (ROWHEIGHT*3) / 2.0f) - (addy/2);
+    if (geometry().height() > ( chart_geometry::rowheight*6)) mid=(( chart_geometry::rowheight*1.5f) + ( chart_geometry::rowheight*3) / 2.0f) - (addy/2);
 
     // we align centre and mid
     QFontMetrics fm(parent->bigfont);
@@ -3189,7 +3189,7 @@ RPEOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, 
     // regardless we always show up/down/same
     QPointF bl = QPointF((geometry().width() - rect.width()) / 2.0f, mid + (fm.ascent() / 3.0f));
     QRectF trect = fm.tightBoundingRect(value);
-    QRectF trirect(bl.x() + trect.width() + ROWHEIGHT,
+    QRectF trirect(bl.x() + trect.width() +  chart_geometry::rowheight,
                    bl.y() - trect.height(), trect.height()*0.66f, trect.height());
 
     // trend triangle
@@ -3222,23 +3222,23 @@ MetricOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem 
 
         // draw unscaled
         painter->setClipRect(0,0,geometry().width(),geometry().height());
-        painter->drawPixmap(QPointF(ROWHEIGHT, ROWHEIGHT*2), *medal);
+        painter->drawPixmap(QPointF( chart_geometry::rowheight,  chart_geometry::rowheight*2), *medal);
 
         // rank
         if (beststring == tr("Career"))  painter->setPen(GColor(CPLOTMARKER));
         else painter->setPen(QPen(QColor(150,150,150)));
         painter->setFont(parent->midfont);
-        painter->drawText(QRectF(0, (ROWHEIGHT*2)+medal->height()+10, medal->width()+(ROWHEIGHT*2), ROWHEIGHT*2), beststring, Qt::AlignTop|Qt::AlignHCenter);
+        painter->drawText(QRectF(0, ( chart_geometry::rowheight*2)+medal->height()+10, medal->width()+( chart_geometry::rowheight*2),  chart_geometry::rowheight*2), beststring, Qt::AlignTop|Qt::AlignHCenter);
     }
 
     double addy = 0;
     if (units != "" && units != tr("seconds")) addy = QFontMetrics(parent->smallfont).height();
 
     // mid is slightly higher to account for space around title, move mid up
-    double mid = (ROWHEIGHT*1.5f) + ((geometry().height() - (ROWHEIGHT*2)) / 2.0f) - (addy/2);
+    double mid = ( chart_geometry::rowheight*1.5f) + ((geometry().height() - ( chart_geometry::rowheight*2)) / 2.0f) - (addy/2);
 
     // if we're deep enough to show the sparkline then stop
-    if (geometry().height() > (ROWHEIGHT*6)) mid=((ROWHEIGHT*1.5f) + (ROWHEIGHT*3) / 2.0f) - (addy/2);
+    if (geometry().height() > ( chart_geometry::rowheight*6)) mid=(( chart_geometry::rowheight*1.5f) + ( chart_geometry::rowheight*3) / 2.0f) - (addy/2);
 
     // we align centre and mid
     QFontMetrics fm(parent->bigfont);
@@ -3285,7 +3285,7 @@ MetricOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem 
     // regardless we always show up/down/same
     QPointF bl = QPointF((geometry().width() - rect.width()) / 2.0f, mid + (fm.ascent() / 3.0f));
     QRectF trect = fm.tightBoundingRect(value);
-    QRectF trirect(bl.x() + trect.width() + ROWHEIGHT,
+    QRectF trirect(bl.x() + trect.width() +  chart_geometry::rowheight,
                    bl.y() - trect.height(), trect.height()*0.66f, trect.height());
 
     // activity show if current one is up or down on trend for last 30 days..
@@ -3309,7 +3309,7 @@ MetricOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem 
 QRectF
 TopNOverviewItem::hotspot()
 {
-    return QRectF(20,ROWHEIGHT*2, geometry().width()-40, geometry().height()-20-(ROWHEIGHT*2));
+    return QRectF(20, chart_geometry::rowheight*2, geometry().width()-40, geometry().height()-20-( chart_geometry::rowheight*2));
 }
 
 bool
@@ -3327,7 +3327,7 @@ TopNOverviewItem::sceneEvent(QEvent *event)
 
     } else if (event->type() == QEvent::GraphicsSceneMousePress) {
 
-        QRectF paintarea = QRectF(20,ROWHEIGHT*2, geometry().width()-40, geometry().height()-20-(ROWHEIGHT*2));
+        QRectF paintarea = QRectF(20, chart_geometry::rowheight*2, geometry().width()-40, geometry().height()-20-( chart_geometry::rowheight*2));
 
         QPoint vpos = parent->view->mapFromGlobal(QCursor::pos());
         QPointF pos = parent->view->mapToScene(vpos);
@@ -3365,7 +3365,7 @@ TopNOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *,
     painter->setFont(parent->smallfont);
 
     // we paint the table, so lets work out the geometry and count etc
-    QRectF paintarea = QRectF(20,ROWHEIGHT*2, geometry().width()-40, geometry().height()-20-(ROWHEIGHT*2));
+    QRectF paintarea = QRectF(20, chart_geometry::rowheight*2, geometry().width()-40, geometry().height()-20-( chart_geometry::rowheight*2));
 
     // max rows
     double margins = 30;
@@ -3466,7 +3466,7 @@ MetaOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *,
     if (!sparkline && fieldtype >= 0) { // textual metadata field
 
         // mid is slightly higher to account for space around title, move mid up
-        double mid = (ROWHEIGHT*1.5f) + ((geometry().height() - (ROWHEIGHT*2)) / 2.0f);
+        double mid = ( chart_geometry::rowheight*1.5f) + ((geometry().height() - ( chart_geometry::rowheight*2)) / 2.0f);
 
         // we align centre and mid
         QFontMetrics fm(parent->bigfont);
@@ -3478,8 +3478,8 @@ MetaOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *,
             painter->setFont(parent->smallfont);
 
             // draw text and wrap / truncate to bounding rectangle
-            painter->drawText(QRectF(ROWHEIGHT, ROWHEIGHT*2.5, geometry().width()-(ROWHEIGHT*2),
-                                                   geometry().height()-(ROWHEIGHT*4)), value);
+            painter->drawText(QRectF( chart_geometry::rowheight,  chart_geometry::rowheight*2.5, geometry().width()-( chart_geometry::rowheight*2),
+                                                   geometry().height()-( chart_geometry::rowheight*4)), value);
         } else {
 
             // any other kind of metadata just paint it
@@ -3497,10 +3497,10 @@ MetaOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *,
         double addy = 0;
 
         // mid is slightly higher to account for space around title, move mid up
-        double mid = (ROWHEIGHT*1.5f) + ((geometry().height() - (ROWHEIGHT*2)) / 2.0f) - (addy/2);
+        double mid = ( chart_geometry::rowheight*1.5f) + ((geometry().height() - ( chart_geometry::rowheight*2)) / 2.0f) - (addy/2);
 
         // if we're deep enough to show the sparkline then stop
-        if (geometry().height() > (ROWHEIGHT*6)) mid=((ROWHEIGHT*1.5f) + (ROWHEIGHT*3) / 2.0f) - (addy/2);
+        if (geometry().height() > ( chart_geometry::rowheight*6)) mid=(( chart_geometry::rowheight*1.5f) + ( chart_geometry::rowheight*3) / 2.0f) - (addy/2);
 
         // we align centre and mid
         QFontMetrics fm(parent->bigfont);
@@ -3541,7 +3541,7 @@ MetaOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *,
             // regardless we always show up/down/same
             QPointF bl = QPointF((geometry().width() - rect.width()) / 2.0f, mid + (fm.ascent() / 3.0f));
             QRectF trect = fm.tightBoundingRect(value);
-            QRectF trirect(bl.x() + trect.width() + ROWHEIGHT,
+            QRectF trirect(bl.x() + trect.width() +  chart_geometry::rowheight,
                            bl.y() - trect.height(), trect.height()*0.66f, trect.height());
 
 
@@ -3574,7 +3574,7 @@ PMCOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, 
     // 4 measures to show, depending upon how much space
     // so prioritise - SB then LTS, STS, RR
 
-    double nexty = ROWHEIGHT;
+    double nexty =  chart_geometry::rowheight;
     //
     // Stress Balance
     //
@@ -3582,7 +3582,7 @@ PMCOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, 
     painter->setFont(parent->titlefont);
     QString string = QString(tr("Form"));
     QRectF rect = tfm.boundingRect(string);
-    painter->drawText(QPointF(ROWHEIGHT / 2.0f,
+    painter->drawText(QPointF( chart_geometry::rowheight / 2.0f,
                               nexty + (tfm.ascent() / 3.0f)), string); // divided by 3 to account for "gap" at top of font
     nexty += rect.height() + 30;
 
@@ -3592,7 +3592,7 @@ PMCOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, 
     rect = bfm.boundingRect(string);
     painter->drawText(QPointF((geometry().width() - rect.width()) / 2.0f,
                               nexty + (bfm.ascent() / 3.0f)), string); // divided by 3 to account for "gap" at top of font
-    nexty += ROWHEIGHT*2;
+    nexty +=  chart_geometry::rowheight*2;
 
     //
     // Long term Stress
@@ -3603,7 +3603,7 @@ PMCOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, 
         painter->setFont(parent->titlefont);
         QString string = QString(tr("Fitness"));
         QRectF rect = tfm.boundingRect(string);
-        painter->drawText(QPointF(ROWHEIGHT / 2.0f,
+        painter->drawText(QPointF( chart_geometry::rowheight / 2.0f,
                                       nexty + (tfm.ascent() / 3.0f)), string); // divided by 3 to account for "gap" at top of font
         nexty += rect.height() + 30;
 
@@ -3613,7 +3613,7 @@ PMCOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, 
         rect = bfm.boundingRect(string);
         painter->drawText(QPointF((geometry().width() - rect.width()) / 2.0f,
                                   nexty + (bfm.ascent() / 3.0f)), string); // divided by 3 to account for "gap" at top of font
-        nexty += ROWHEIGHT*2;
+        nexty +=  chart_geometry::rowheight*2;
 
     }
 
@@ -3626,7 +3626,7 @@ PMCOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, 
         painter->setFont(parent->titlefont);
         QString string = QString(tr("Fatigue"));
         QRectF rect = tfm.boundingRect(string);
-        painter->drawText(QPointF(ROWHEIGHT / 2.0f,
+        painter->drawText(QPointF( chart_geometry::rowheight / 2.0f,
                                   nexty + (tfm.ascent() / 3.0f)), string); // divided by 3 to account for "gap" at top of font
         nexty += rect.height() + 30;
 
@@ -3636,7 +3636,7 @@ PMCOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, 
         rect = bfm.boundingRect(string);
         painter->drawText(QPointF((geometry().width() - rect.width()) / 2.0f,
                                   nexty + (bfm.ascent() / 3.0f)), string); // divided by 3 to account for "gap" at top of font
-        nexty += ROWHEIGHT*2;
+        nexty +=  chart_geometry::rowheight*2;
 
     }
 
@@ -3649,7 +3649,7 @@ PMCOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, 
         painter->setFont(parent->titlefont);
         QString string = QString(tr("Risk"));
         QRectF rect = tfm.boundingRect(string);
-        painter->drawText(QPointF(ROWHEIGHT / 2.0f,
+        painter->drawText(QPointF( chart_geometry::rowheight / 2.0f,
                                   nexty + (tfm.ascent() / 3.0f)), string); // divided by 3 to account for "gap" at top of font
         nexty += rect.height() + 30;
 
@@ -3659,7 +3659,7 @@ PMCOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, 
         rect = bfm.boundingRect(string);
         painter->drawText(QPointF((geometry().width() - rect.width()) / 2.0f,
                                   nexty + (bfm.ascent() / 3.0f)), string); // divided by 3 to account for "gap" at top of font
-        nexty += ROWHEIGHT*2;
+        nexty +=  chart_geometry::rowheight*2;
 
     }
 }
@@ -3677,7 +3677,7 @@ void DonutOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsI
     painter->setPen(QColor(100,100,100));
     QFontMetrics fm(parent->midfont);
     painter->setFont(parent->midfont);
-    painter->drawText(QRectF(0,ROWHEIGHT*2, geometry().width(), fm.ascent()+(ROWHEIGHT*2)), Qt::AlignHCenter | Qt::AlignTop, valuename);
+    painter->drawText(QRectF(0, chart_geometry::rowheight*2, geometry().width(), fm.ascent()+( chart_geometry::rowheight*2)), Qt::AlignHCenter | Qt::AlignTop, valuename);
 }
 
 
@@ -4377,7 +4377,7 @@ RPErating::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
     QRectF rect = tfm.boundingRect(description);
     painter->setFont(parent->parent->titlefont);
     painter->drawText(QPointF(parent->x()+geom.x()+((geometry().width() - rect.width()) / 2.0f),
-                              parent->y()+geom.y()+geom.height()-ROWHEIGHT), description); // divided by 3 to account for "gap" at top of font
+                              parent->y()+geom.y()+geom.height()- chart_geometry::rowheight), description); // divided by 3 to account for "gap" at top of font
 
 
     // paint the blocks
@@ -4387,14 +4387,14 @@ RPErating::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
 
         // draw a rectangle with a 5px gap
         painter->setPen(Qt::NoPen);
-        painter->fillRect(geom.x()+parent->x()+(width *(i+1)), parent->y()+geom.y()+ROWHEIGHT*1.5f, width-5, ROWHEIGHT*0.25f, QBrush(FosterColors[i]));
+        painter->fillRect(geom.x()+parent->x()+(width *(i+1)), parent->y()+geom.y()+ chart_geometry::rowheight*1.5f, width-5,  chart_geometry::rowheight*0.25f, QBrush(FosterColors[i]));
     }
 
     for(; i<= 10; i++) {
 
         // draw a rectangle with a 5px gap
         painter->setPen(Qt::NoPen);
-        painter->fillRect(geom.x()+parent->x()+(width *(i+1)), parent->y()+geom.y()+ROWHEIGHT*1.5f, width-5, ROWHEIGHT*0.25f, QBrush(GColor(CCARDBACKGROUND).darker(200)));
+        painter->fillRect(geom.x()+parent->x()+(width *(i+1)), parent->y()+geom.y()+ chart_geometry::rowheight*1.5f, width-5,  chart_geometry::rowheight*0.25f, QBrush(GColor(CCARDBACKGROUND).darker(200)));
     }
 }
 
@@ -4487,9 +4487,9 @@ BubbleViz::sceneEvent(QEvent *event)
        QPointF pos = parent->parent->view->mapToScene(vpos);
 
         QRectF canvas= QRectF(parent->x()+geom.x(), parent->y()+geom.y(), geom.width(),geom.height());
-        QRectF plotarea = QRectF(canvas.x() + ROWHEIGHT * 2 + 20, canvas.y()+ROWHEIGHT,
-                             canvas.width() - ROWHEIGHT * 2 - 20 - ROWHEIGHT,
-                             canvas.height() - ROWHEIGHT * 2 - 20 - ROWHEIGHT);
+        QRectF plotarea = QRectF(canvas.x() +  chart_geometry::rowheight * 2 + 20, canvas.y()+ chart_geometry::rowheight,
+                             canvas.width() -  chart_geometry::rowheight * 2 - 20 -  chart_geometry::rowheight,
+                             canvas.height() -  chart_geometry::rowheight * 2 - 20 -  chart_geometry::rowheight);
        if (plotarea.contains(pos)) {
             plotpos = QPointF(pos.x()-plotarea.x(), pos.y()-plotarea.y());
             hover=true;
@@ -4649,9 +4649,9 @@ BubbleViz::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
     //DIAG painter->drawRect(canvas);
 
     // plotting space
-    QRectF plotarea = QRectF(canvas.x() + ROWHEIGHT * 2 + 20, canvas.y()+ROWHEIGHT,
-                             canvas.width() - ROWHEIGHT * 2 - 20 - ROWHEIGHT,
-                             canvas.height() - ROWHEIGHT * 2 - 20 - ROWHEIGHT);
+    QRectF plotarea = QRectF(canvas.x() +  chart_geometry::rowheight * 2 + 20, canvas.y()+ chart_geometry::rowheight,
+                             canvas.width() -  chart_geometry::rowheight * 2 - 20 -  chart_geometry::rowheight,
+                             canvas.height() -  chart_geometry::rowheight * 2 - 20 -  chart_geometry::rowheight);
     //DIAG painter->drawRect(plotarea);
 
     // clip to canvas -- draw points first so all axis etc are overlayed
@@ -4811,17 +4811,17 @@ BubbleViz::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
     painter->setClipRect(canvas);
 
     // x-axis labels
-    QRectF xlabelspace = QRectF(plotarea.x(), plotarea.bottom() + 20, plotarea.width(), ROWHEIGHT);
+    QRectF xlabelspace = QRectF(plotarea.x(), plotarea.bottom() + 20, plotarea.width(),  chart_geometry::rowheight);
     painter->setPen(Qt::red);
     //DIAG painter->drawRect(xlabelspace);
 
     // y-axis labels
-    QRectF ylabelspace = QRectF(plotarea.x()-20-ROWHEIGHT, plotarea.y(), ROWHEIGHT, plotarea.height());
+    QRectF ylabelspace = QRectF(plotarea.x()-20- chart_geometry::rowheight, plotarea.y(),  chart_geometry::rowheight, plotarea.height());
     painter->setPen(Qt::red);
     //DIAG painter->drawRect(ylabelspace);
 
     // y-axis title
-    //DIAGQRectF ytitlespace = QRectF(plotarea.x()-20-(ROWHEIGHT*2), plotarea.y(), ROWHEIGHT, plotarea.height());
+    //DIAGQRectF ytitlespace = QRectF(plotarea.x()-20-( chart_geometry::rowheight*2), plotarea.y(),  chart_geometry::rowheight, plotarea.height());
     //DIAGpainter->setPen(Qt::yellow);
     //DIAGpainter->drawRect(ytitlespace);
 
@@ -4857,7 +4857,7 @@ BubbleViz::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
     painter->drawText(xlabelspace.left() + (maxx*xratio) - (bmaxx.width()/2),  xlabelspace.bottom(), smax);
 
     // x-axis title - offset from minx
-    QRectF xtitlespace = QRectF(plotarea.x() + (minx*xratio), xlabelspace.bottom(), plotarea.width() - (minx*xratio), ROWHEIGHT);
+    QRectF xtitlespace = QRectF(plotarea.x() + (minx*xratio), xlabelspace.bottom(), plotarea.width() - (minx*xratio),  chart_geometry::rowheight);
     painter->setPen(QColor(150,150,150));
     painter->setFont(parent->parent->smallfont);
     painter->drawText(xtitlespace, xlabel, Qt::AlignCenter|Qt::AlignVCenter);
@@ -4981,10 +4981,10 @@ Sparkline::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
     if (points.isEmpty() || (max-min)==0) return;
 
     // so draw a line connecting the points
-    double xfactor = (geom.width() - (ROWHEIGHT*6)) / sparkdays;
-    double xoffset = boundingRect().left()+(ROWHEIGHT*3);
-    double yfactor = (geom.height()-(ROWHEIGHT)) / (max-min);
-    double bottom = boundingRect().bottom()-ROWHEIGHT/2;
+    double xfactor = (geom.width() - ( chart_geometry::rowheight*6)) / sparkdays;
+    double xoffset = boundingRect().left()+( chart_geometry::rowheight*3);
+    double yfactor = (geom.height()-( chart_geometry::rowheight)) / (max-min);
+    double bottom = boundingRect().bottom()- chart_geometry::rowheight/2;
 
     // draw a sparkline -- need more than 1 point !
     if (points.count() > 1) {
@@ -5010,7 +5010,7 @@ Sparkline::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
         // xaxis
         QPainterPath line;
         line.moveTo(xoffset, bottom);
-        line.lineTo(xoffset+geom.width()-(ROWHEIGHT*6), bottom);
+        line.lineTo(xoffset+geom.width()-( chart_geometry::rowheight*6), bottom);
         QPen lpen(QColor(100,100,100,75));
         lpen.setWidth(4);
         painter->setPen(lpen);
@@ -5285,7 +5285,7 @@ void
 ProgressBar::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
 {
 
-    QRectF box(boundingRect().left() + (ROWHEIGHT*2), boundingRect().top() + ROWHEIGHT, geom.width()-(ROWHEIGHT*4), ROWHEIGHT/3.0);
+    QRectF box(boundingRect().left() + ( chart_geometry::rowheight*2), boundingRect().top() +  chart_geometry::rowheight, geom.width()-( chart_geometry::rowheight*4),  chart_geometry::rowheight/3.0);
     painter->fillRect(box, QBrush(QColor(100,100,100,100)));
 
     // width of bar
@@ -5295,7 +5295,7 @@ ProgressBar::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
     if (factor > 1) factor = 1;
     if (factor < 0) factor = 0;
 
-    QRectF bar(box.left(), box.top(), box.width() * factor, ROWHEIGHT/3.0);
+    QRectF bar(box.left(), box.top(), box.width() * factor,  chart_geometry::rowheight/3.0);
     painter->fillRect(bar, QBrush(GColor(CPLOTMARKER)));
 
 }

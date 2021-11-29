@@ -97,7 +97,7 @@ void
 UserChartOverviewItem::itemGeometryChanged() {
 
     QRectF geom = geometry();
-    proxy->setGeometry(QRectF(geom.x()+20,geom.y()+(ROWHEIGHT*2),geom.width()-40, geom.height()-((ROWHEIGHT*2)+20)));
+    proxy->setGeometry(QRectF(geom.x()+20,geom.y()+( chart_geometry::rowheight*2),geom.width()-40, geom.height()-(( chart_geometry::rowheight*2)+20)));
 
     if (drag) chart->hide();
     else /*if (parent->state != ChartSpace::DRAG)*/ chart->show();

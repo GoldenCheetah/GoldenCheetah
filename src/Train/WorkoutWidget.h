@@ -194,8 +194,8 @@ class WorkoutWidget : public QWidget
 
         // setting/getting view via properties when animating zoom
         QPointF getVWidth() const { return QPointF(minVX_, maxVX_); }
-        void setVWidth(QPointF f) { 
-            minVX_=f.x(); maxVX_=f.y(); 
+        void setVWidth(QPointF f) {
+            minVX_=f.x(); maxVX_=f.y();
             setBlockCursor();
             repaint();
         }
@@ -205,7 +205,7 @@ class WorkoutWidget : public QWidget
 
         // for log(x) scale
         int logX(double t);
-        bool logScale() { return LOG; }
+        bool logScale() { return m_log; }
 
         // transform from painter to plot co-ordinate
         QPointF reverseTransform(int, int);
@@ -390,20 +390,20 @@ class WorkoutWidget : public QWidget
         WPrime wpBal;
 
         // sizing
-        double IHEIGHT;         // interval gap at bottom (used for TTE warning)
-        double THEIGHT;         // top section height (lap markers)
-        double BHEIGHT;         // height of bottom (x-axis)
-        double LWIDTH;          // width of left (Watts y-axis)
-        double RWIDTH;          // width of right (W'bal y-axis)
-        int XTICLENGTH;         // ticlength of x-axis
-        int YTICLENGTH;         // ticlength of y-axis (0 = no tics)
-        int XTICS;              // max number of tics
-        int YTICS;              // max number of tics
-        int SPACING;            // space between axis and labels
-        int XMOVE;              // how far to move X with cursor keys
-        int YMOVE;              // how far to move Y with cursor keys
-        bool GRIDLINES;         // show gridlines ? (e.g. hide in minimode)
-        bool LOG;               // use log x scale (always false, for now)
+        double m_iheight;       // interval gap at bottom (used for TTE warning)
+        double m_theight;       // top section height (lap markers)
+        double m_bheight;       // height of bottom (x-axis)
+        double m_lwidth;        // width of left (Watts y-axis)
+        double m_rwidth;        // width of right (W'bal y-axis)
+        int m_xticlength;       // ticlength of x-axis
+        int m_yticlength;       // ticlength of y-axis (0 = no tics)
+        int m_xtics;            // max number of tics
+        int m_ytics;            // max number of tics
+        int m_spacing;          // space between axis and labels
+        int m_xmove;            // how far to move X with cursor keys
+        int m_ymove;            // how far to move Y with cursor keys
+        bool m_gridlines;       // show gridlines ? (e.g. hide in minimode)
+        bool m_log;             // use log x scale (always false, for now)
 
         bool recording_;
 

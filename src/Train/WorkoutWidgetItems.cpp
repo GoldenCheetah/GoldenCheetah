@@ -24,11 +24,7 @@
 
 #include <QDebug>
 
-#define POWERSCALEWIDTH (5 *dpiXFactor)
-#define WBALSCALEWIDTH (5 *dpiXFactor)
 static bool GRIDLINES = true;
-#define SPACING (4 *dpiXFactor)
-
 static int MINTOOLHEIGHT = 350; // don't do lots of decoration on "mini" view
 
 WWPowerScale::WWPowerScale(WorkoutWidget *w, Context *c) : WorkoutWidgetItem(w), context(c)
@@ -39,6 +35,9 @@ WWPowerScale::WWPowerScale(WorkoutWidget *w, Context *c) : WorkoutWidgetItem(w),
 void
 WWPowerScale::paint(QPainter *painter)
 {
+    int spacing = 4*dpiXFactor;
+    int powerscalewidth = 5*dpiXFactor;
+
     // if too small paint nothing
     if (workoutWidget()->height() < MINTOOLHEIGHT) return;
 
@@ -80,7 +79,7 @@ WWPowerScale::paint(QPainter *painter)
         int ymid = (yhigh + ylow) / 2;
 
         // bounding rect for zone color
-        QRect bound(QPoint(workoutWidget()->left().topRight().x()-POWERSCALEWIDTH, yhigh),
+        QRect bound(QPoint(workoutWidget()->left().topRight().x()-powerscalewidth, yhigh),
                     QPoint(workoutWidget()->left().topRight().x(), ylow));
 
         // draw rect
@@ -95,7 +94,7 @@ WWPowerScale::paint(QPainter *painter)
             painter->setFont(workoutWidget()->markerFont);
             painter->setPen(workoutWidget()->markerPen);
 
-            painter->drawText(QPoint(workoutWidget()->left().right()-SPACING-textBound.width()-POWERSCALEWIDTH,
+            painter->drawText(QPoint(workoutWidget()->left().right()-spacing-textBound.width()-powerscalewidth,
                                         yhigh+(fontMetrics.ascent()/2)), // we use ascent not height to line up numbers
                                         label);
         }
@@ -142,6 +141,10 @@ WWWBalScale::WWWBalScale(WorkoutWidget *w, Context *c) : WorkoutWidgetItem(w), c
 void
 WWWBalScale::paint(QPainter *painter)
 {
+    int spacing = 4*dpiXFactor;
+    int powerscalewidth = 5*dpiXFactor;
+    int wbalscalewidth = 5*dpiXFactor;
+
     // if too small paint nothing
     if (workoutWidget()->height() < MINTOOLHEIGHT) return;
 
@@ -171,7 +174,7 @@ WWWBalScale::paint(QPainter *painter)
         // bounding rect for zone color
         QPointF tl = workoutWidget()->right().topLeft();
         QRect bound(QPoint(tl.x(), tl.y() + (i * (height/4))),
-                    QPoint(tl.x()+WBALSCALEWIDTH, tl.y() + ((i+1) * (height/4))));
+                    QPoint(tl.x()+wbalscalewidth, tl.y() + ((i+1) * (height/4))));
 
         // draw rect
         QColor wbal = GColor(CWBAL);
@@ -186,7 +189,7 @@ WWWBalScale::paint(QPainter *painter)
         painter->setFont(workoutWidget()->markerFont);
         painter->setPen(workoutWidget()->markerPen);
 
-        painter->drawText(QPoint(tl.x()+SPACING+POWERSCALEWIDTH,
+        painter->drawText(QPoint(tl.x()+spacing+powerscalewidth,
                                  tl.y() + (i * (height/4)) +(fontMetrics.ascent()/2)),
                                  label);
 
@@ -194,7 +197,7 @@ WWWBalScale::paint(QPainter *painter)
         label = QString("%1 kJ").arg(double((WPRIME - (i*(WPRIME/4)))/1000.00f), 0, 'f', 1);
         textBound = fontMetrics.boundingRect(label);
 
-        painter->drawText(QPoint(tl.x()-SPACING-textBound.width(),
+        painter->drawText(QPoint(tl.x()-spacing-textBound.width(),
                                  tl.y() + (i * (height/4)) +(fontMetrics.ascent()/2)),
                                  label);
 
@@ -260,8 +263,8 @@ WWLap::paint(QPainter *painter)
         // red rectangle for selected intervals
         if (workoutWidget()->laps()[i].selected) {
             QColor color(255,0,0,64); // lighten whatever it is
-            painter->fillRect(QRectF(here.x(), top.top(), endx - here.x(), 
-                                    top.height()+workoutWidget()->canvas().height()), 
+            painter->fillRect(QRectF(here.x(), top.top(), endx - here.x(),
+                                    top.height()+workoutWidget()->canvas().height()),
                                     QBrush(color));
         }
 
@@ -618,6 +621,8 @@ WWWBLine::paint(QPainter *painter)
 void
 WWMMPCurve::paint(QPainter *painter)
 {
+    int spacing = 4*dpiXFactor;
+
     // don't show when recording
     if (workoutWidget()->recording()) return;
 
@@ -654,6 +659,8 @@ WWMMPCurve::paint(QPainter *painter)
 void
 WWSmartGuide::paint(QPainter *painter)
 {
+    int spacing = 4*dpiXFactor;
+
     // don't show when recording
     if (workoutWidget()->recording()) return;
 
@@ -840,13 +847,13 @@ WWSmartGuide::paint(QPainter *painter)
         // paint the bottom value
         QString text = QString("%1w").arg(double(tl.y()), 0, 'f', 0);
         QRect bound = fontMetrics.boundingRect(text);
-        painter->drawText(workoutWidget()->left().left(), boundary.top()-SPACING, text);
+        painter->drawText(workoutWidget()->left().left(), boundary.top()-spacing, text);
         if (br.y() < tl.y()) {
 
             // paint the bottom value UNDERNEATH the line, just in case they are really close!
             text = QString("%1w").arg(double(br.y()), 0, 'f', 0);
             bound = fontMetrics.boundingRect(text);
-            painter->drawText(workoutWidget()->left().left(), boundary.bottom()+SPACING+fontMetrics.ascent(), text);
+            painter->drawText(workoutWidget()->left().left(), boundary.bottom()+spacing+fontMetrics.ascent(), text);
         }
     }
 }
@@ -866,7 +873,7 @@ WWNow::paint(QPainter *painter)
 
     // horizontal bar
     painter->drawLine(px, workoutWidget()->canvas().top(), px, workoutWidget()->canvas().bottom());
-                      
+
 }
 
 //

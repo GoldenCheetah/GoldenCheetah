@@ -40,10 +40,6 @@
 #include <QIcon>
 #include <QTimer>
 
-// geometry basics
-#define SPACING 80
-#define ROWHEIGHT 80
-
 extern double gl_major;
 
 class ChartSpace;
@@ -51,6 +47,13 @@ class ChartSpaceItemFactory;
 
 // we need a scope for a chart space, one or more of
 enum OverviewScope { ANALYSIS=0x01, TRENDS=0x02, ATHLETES=0x04 };
+
+// geometry basics
+class chart_geometry {
+public:
+    static const int spacing=80;
+    static const int rowheight=80;
+};
 
 // must be subclassed to add items to a ChartSpace
 class ChartSpaceItem : public QGraphicsWidget
