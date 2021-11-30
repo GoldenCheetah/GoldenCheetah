@@ -433,8 +433,11 @@ RideMetadata::configChanged(qint32)
                               .arg(4*dpiYFactor)                                          // 3 selected bar width
                               .arg(2*dpiXFactor)                                          // 4 padding
                               .arg(75*dpiXFactor)                                         // 5 tab minimum width
-                              .arg(GCColor::invertColor(GColor(CPLOTBACKGROUND)).name())  // 6 tab text color
-                              .arg( GCColor::alternateColor(GColor(CPLOTBACKGROUND)).name()); // 7 lineedit background
+                              .arg(GCColor::invertColor(GColor(CPLOTBACKGROUND)).name())     // 6 tab text color
+#ifdef Q_OS_MAC
+                              .arg( GCColor::alternateColor(GColor(CPLOTBACKGROUND)).name()) // 7 lineedit background
+#endif
+                            ;
         tabs->setStyleSheet(styling);
 
         metadataChanged(); // re-read the values!
