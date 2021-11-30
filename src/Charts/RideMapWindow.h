@@ -32,6 +32,8 @@
 #include "RideFile.h"
 #include "IntervalItem.h"
 #include "Context.h"
+#include "Colors.h"
+#include "ColorButton.h"
 
 #include <QDialog>
 
@@ -110,7 +112,8 @@ class RideMapWindow : public GcChartWindow
     Q_PROPERTY(bool showfullplot READ showFullPlot WRITE setFullPlot USER true)
     Q_PROPERTY(bool showintervals READ showIntervals WRITE setShowIntervals USER true)
     Q_PROPERTY(bool hideShadedZones READ hideShadedZones WRITE setHideShadedZones USER true)
-    Q_PROPERTY(bool hideYellowLine READ hideYellowLine WRITE setHideYellowLine USER true)
+    Q_PROPERTY(bool hideBgLine READ hideBgLine WRITE setHideBgLine USER true)
+    Q_PROPERTY(unsigned int bgLineColor READ getBgLineColor WRITE setBgLineColor USER true)
     Q_PROPERTY(int osmts READ osmTS WRITE setOsmTS USER true)
     Q_PROPERTY(QString googleKey READ googleKey WRITE setGoogleKey USER true)
 
@@ -135,8 +138,13 @@ class RideMapWindow : public GcChartWindow
         bool hideShadedZones() const { return hideShadedZonesCk->isChecked(); }
         void setHideShadedZones(bool x) { hideShadedZonesCk->setChecked(x); }
 
-        bool hideYellowLine() const { return hideYellowLineCk->isChecked(); }
-        void setHideYellowLine(bool x) { hideYellowLineCk->setChecked(x); }
+        bool hideBgLine() const { return hideBgLineCk->isChecked(); }
+        void setHideBgLine(bool x) { hideBgLineCk->setChecked(x); }
+
+        unsigned int getBgLineColor() const { qDebug() << "getBgLineColor() " << hex <<  track_bg_color->getColor().rgb() << endl;
+           return (unsigned int) track_bg_color->getColor().rgb(); }
+        void setBgLineColor(unsigned int c_rgb) { qDebug() << "setBgLineColor() " << hex << c_rgb << endl;
+            track_bg_color->setColor(QColor(c_rgb)); } // QRgb = unsigned int
 
         bool showMarkers() const { return ( showMarkersCk->checkState() == Qt::Checked); }
         void setShowMarkers(bool x) { if (x) showMarkersCk->setCheckState(Qt::Checked); else showMarkersCk->setCheckState(Qt::Unchecked) ;}
@@ -153,14 +161,14 @@ class RideMapWindow : public GcChartWindow
         QString googleKey() const { return gkey->text(); }
         void setGoogleKey(QString x) { gkey->setText(x); }
 
-
     public slots:
         void mapTypeSelected(int x);
         void tileTypeSelected(int x);
         void showMarkersChanged(int value);
         void showFullPlotChanged(int value);
         void hideShadedZonesChanged(int value);
-        void hideYellowLineChanged(int value);
+        void hideBgLineChanged(int value);
+        void bgLineColorChanged(QColor value);
         void showIntervalsChanged(int value);
         void osmCustomTSURLEditingFinished();
 
@@ -181,7 +189,8 @@ class RideMapWindow : public GcChartWindow
 
         QComboBox *mapCombo, *tileCombo;
         QCheckBox *showMarkersCk, *showFullPlotCk, *showInt;
-        QCheckBox* hideShadedZonesCk, * hideYellowLineCk;
+        QCheckBox* hideShadedZonesCk, * hideBgLineCk;
+        ColorButton *track_bg_color;
         QLabel *osmTSTitle, *osmTSLabel, *osmTSUrlLabel;
         QLineEdit *osmTSUrl;
 

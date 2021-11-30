@@ -69,16 +69,20 @@ RideMapWindow::RideMapWindow(Context *context, int mapType) : GcChartWindow(cont
     showFullPlotCk = new QCheckBox();
     hideShadedZonesCk = new QCheckBox();
     hideShadedZonesCk->setChecked(false);
-    hideYellowLineCk = new QCheckBox();
-    hideYellowLineCk->setChecked(false);
+    hideBgLineCk = new QCheckBox();
+    hideBgLineCk->setChecked(false);
     showInt = new QCheckBox();
     showInt->setChecked(true);
+
+    // Track background colors
+    track_bg_color = new ColorButton(this, "Color", QColor(1,1,CPOWER), true, false);
 
     commonLayout->addRow(new QLabel(tr("Map")), mapCombo);
     commonLayout->addRow(new QLabel(tr("Show Markers")), showMarkersCk);
     commonLayout->addRow(new QLabel(tr("Show Full Plot")), showFullPlotCk);
     commonLayout->addRow(new QLabel(tr("Hide Shaded Zones")), hideShadedZonesCk);
-    commonLayout->addRow(new QLabel(tr("Hide Yellow Line")), hideYellowLineCk);
+    commonLayout->addRow(new QLabel(tr("Hide Backgroud Track Line")), hideBgLineCk);
+    commonLayout->addRow(new QLabel(tr("Track Background Color")), track_bg_color);
     commonLayout->addRow(new QLabel(tr("Show Intervals Overlay")), showInt);
     commonLayout->addRow(new QLabel(""));
 
@@ -114,7 +118,8 @@ RideMapWindow::RideMapWindow(Context *context, int mapType) : GcChartWindow(cont
     connect(showInt, SIGNAL(stateChanged(int)), this, SLOT(showIntervalsChanged(int)));
     connect(showFullPlotCk, SIGNAL(stateChanged(int)), this, SLOT(showFullPlotChanged(int)));
     connect(hideShadedZonesCk, SIGNAL(stateChanged(int)), this, SLOT(hideShadedZonesChanged(int)));
-    connect(hideYellowLineCk, SIGNAL(stateChanged(int)), this, SLOT(hideYellowLineChanged(int)));
+    connect(hideBgLineCk, SIGNAL(stateChanged(int)), this, SLOT(hideBgLineChanged(int)));
+    connect(track_bg_color, SIGNAL(colorChosen(QColor)), this, SLOT( bgLineColorChanged(QColor)));
     connect(osmTSUrl, SIGNAL(editingFinished()), this, SLOT(osmCustomTSURLEditingFinished()));
     connect(tileCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(tileTypeSelected(int)));
 
@@ -283,11 +288,20 @@ RideMapWindow::hideShadedZonesChanged(int value)
 }
 
 void
-RideMapWindow::hideYellowLineChanged(int value)
+RideMapWindow::hideBgLineChanged(int value)
 {
     Q_UNUSED(value);
     forceReplot();
 }
+
+void
+RideMapWindow::bgLineColorChanged(QColor value)
+{
+    qDebug()  << "Track background color: 0x" << hex << value.rgb() << Qt::endl;
+    Q_UNUSED(value);
+    forceReplot();
+}
+
 void
 RideMapWindow::osmCustomTSURLEditingFinished()
 {
@@ -476,12 +490,18 @@ void RideMapWindow::createHtml()
 
         currentPage += QString("function drawRouteForLatLons(latlons) {\n"
 
-
             // route will be drawn with these options
             "    var routeOptionsYellow = {\n"
             "        stroke : true,\n"
-            "        color: '#FFFF00',\n"
-            "        opacity: %1,\n"
+            "        color: '#");
+        //currentPage += QString("FFFF00"); // Default yellow
+        QString bg_color_rgb_hex = QString( "%1" ).arg(getBgLineColor(), 1, 16 );
+        qDebug() << bg_color_rgb_hex.mid(2,6) << endl;
+        currentPage += bg_color_rgb_hex.mid(2,6); // Use last 6 digits.
+        currentPage += QString("',\n");
+            //"        color: '#FFFF00',\n");
+
+        currentPage += QString("opacity: %1,\n"
             "        weight: 10,\n"
             "        zIndex: -2\n"
             "    };\n"
@@ -502,7 +522,7 @@ void RideMapWindow::createHtml()
             "routeYellow.on('mouseover', function(event) { webBridge.hoverPath(event.latlng.lat, event.latlng.lng); });\n"
             "routeYellow.on('mousemove', function(event) { webBridge.hoverPath(event.latlng.lat, event.latlng.lng); });\n"
 
-            "}\n").arg(hideYellowLine() ? 0.0 : 0.4f);
+            "}\n").arg(hideBgLine() ? 0.0 : 0.4f);
     }
     else if (mapCombo->currentIndex() == GOOGLE) {
 
@@ -533,7 +553,7 @@ void RideMapWindow::createHtml()
            "    google.maps.event.addListener(routeYellow, 'mouseup',   function(event) { map.setOptions({draggable: true, zoomControl: true, scrollwheel: true, disableDoubleClickZoom: false}); webBridge.mouseup(); });\n"
            "    google.maps.event.addListener(routeYellow, 'mouseover', function(event) { webBridge.hoverPath(event.latLng.lat(), event.latLng.lng()); });\n"
 
-           "}\n").arg(hideYellowLine() ? 0.0 : 0.4f);
+           "}\n").arg(hideBgLine() ? 0.0 : 0.4f);
     }
 
     currentPage += QString("function drawIntervals() { \n"
@@ -757,7 +777,7 @@ QColor RideMapWindow::GetColor(int watts)
 void
 RideMapWindow::drawShadedRoute()
 {
-    int intervalTime = 60;  // 60 seconds
+    int intervalTime = 5;  // 5 seconds
     double rtime=0; // running total for accumulated data
     int count=0;  // how many samples ?
     int rwatts=0; // running total of watts
