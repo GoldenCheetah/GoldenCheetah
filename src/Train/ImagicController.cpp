@@ -217,3 +217,10 @@ ImagicController::setMode(int mode)
 
     myImagic->setMode(mode);
 }
+
+void
+ImagicController::setWeight(double weight)
+{
+    myImagic->setWeight(weight);
+}
+

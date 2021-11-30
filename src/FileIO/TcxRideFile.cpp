@@ -37,6 +37,12 @@ static int tcxFileReaderRegistered =
 RideFile *TcxFileReader::openRideFile(QFile &file, QStringList &errors, QList<RideFile*>*list) const
 {
     (void) errors;
+
+    if(!file.open(QIODevice::ReadOnly))
+        return NULL;
+    QByteArray tcx = file.readAll();
+    file.close();
+
     RideFile *rideFile = new RideFile();
     rideFile->setRecIntSecs(1.0);
     rideFile->setDeviceType("Garmin");
@@ -44,7 +50,9 @@ RideFile *TcxFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
 
     TcxParser handler(rideFile, list);
 
-    QXmlInputSource source (&file);
+    QXmlInputSource source = QXmlInputSource();
+    source.setData(tcx.trimmed());
+
     QXmlSimpleReader reader;
     reader.setContentHandler (&handler);
     reader.parse (source);
@@ -105,7 +113,7 @@ TcxFileReader::toByteArray(Context *context, const RideFile *ride, bool withAlt,
     if (ride->deviceType().toLower().contains("zwift") ) {
         text = doc.createTextNode("Zwift");
     } else {
-        text = doc.createTextNode("Garmin TCX");
+        text = doc.createTextNode("Garmin TCX with Barometer");
     }
     creatorName.appendChild(text);
     creator.appendChild(creatorName);

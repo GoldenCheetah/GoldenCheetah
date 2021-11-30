@@ -627,7 +627,8 @@ JsonFileReader::toByteArray(Context *, const RideFile *ride, bool withAlt, bool 
             if (ride->areDataPresent()->cad && withCad) out += ", \"CAD\":" + QString("%1").arg(p->cad);
             if (ride->areDataPresent()->kph) out += ", \"KPH\":" + QString("%1").arg(p->kph);
             if (ride->areDataPresent()->hr && withHr) out += ", \"HR\":"  + QString("%1").arg(p->hr);
-            if (ride->areDataPresent()->alt && withAlt) out += ", \"ALT\":" + QString("%1").arg(p->alt);
+            if (ride->areDataPresent()->alt && withAlt)
+			    out += ", \"ALT\":" + QString("%1").arg(p->alt, 0, 'g', 11);
             if (ride->areDataPresent()->lat)
                 out += ", \"LAT\":" + QString("%1").arg(p->lat, 0, 'g', 11);
             if (ride->areDataPresent()->lon)

@@ -20,6 +20,8 @@
 #include "PhysicsUtility.h"
 #include "BlinnSolver.h"
 
+#define MATHCONST_PI 		    3.141592653589793238462643383279502884L /* pi */
+
 // These Zone 0 Pressure/Density Constants and equations are from wikipedia
 double AirPressure(double altitudeInMeters)
 {
@@ -33,6 +35,16 @@ double AirDensity(double altitudeInMeters, double temperatureInKelvin)
     double Rho = AirPressure(altitudeInMeters) / (s_Rspecific*temperatureInKelvin);
 
     return Rho; // kg/(m^3)
+}
+
+double KmhToMs(double kmh)
+{
+    return kmh * (1000.0 / (60.0 * 60.0));
+}
+
+double MsToKmh(double ms)
+{
+    return ms * ((60.0 * 60.0) / 1000.0);
 }
 
 // Function to compute the sustainable speed in KM/H from input params and a
@@ -62,9 +74,10 @@ double computeInstantSpeed(double weightKG,
     double m = weightKG;
 
     double Rho = AirDensity(Hnn, T);
-    double Beta = atan(sl);
-    double cosBeta = cos(Beta);
-    double sinBeta = sin(Beta);
+
+    double cosBeta = 1 / std::sqrt(sl*sl + 1); // cos(atan(sl))
+    double sinBeta = sl * cosBeta;             // sin(atan(sl))
+
     double Frg = s_g0 * m * (crr * cosBeta + sinBeta);
 
     // Home Rolled cubic solver:

@@ -43,31 +43,54 @@ struct elevationGPSPoint {
     double lat;
 };
 
-QStringList FetchElevationDataFromMapQuest(QString latLngCollection);
-
 // Config widget used by the Preferences/Options config panes
 class FixElevation;
 class FixElevationConfig : public DataProcessorConfig
 {
     Q_DECLARE_TR_FUNCTIONS(FixElevationConfig)
+
     friend class ::FixElevation;
+
     protected:
+        QHBoxLayout *layout;
+        QLabel *akLabel;
+        QLineEdit *ak;
+
     public:
         // there is no config
         FixElevationConfig(QWidget *parent) : DataProcessorConfig(parent) {
 
             HelpWhatsThis *help = new HelpWhatsThis(parent);
             parent->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::MenuBar_Edit_FixElevationErrors));
+
+            layout = new QHBoxLayout(this);
+
+            layout->setContentsMargins(0,0,0,0);
+            setContentsMargins(0,0,0,0);
+
+            akLabel = new QLabel(tr("MapQuest API Key"));
+
+            ak = new QLineEdit();
+            layout->addWidget(akLabel);
+            layout->addWidget(ak);
+            layout->addStretch();
         }
 
         QString explain() {
             return(QString(tr("Fix or add elevation data. If elevation data is "
                            "present it will be removed and overwritten."
+                           "\n\nMapQuest API Key is optional, you can get a free one from "
+                           "https::/developer/mapquest.com/ to have your own transaction limits."
                            "\n\nINTERNET CONNECTION REQUIRED.")));
         }
 
-        void readConfig() {}
-        void saveConfig() {}
+        void readConfig() {
+            ak->setText(appsettings->value(NULL, GC_DPFE_AK, "").toString());
+        }
+
+        void saveConfig() {
+            appsettings->setValue(GC_DPFE_AK, ak->text());
+        }
 
 };
 
@@ -87,7 +110,8 @@ class FixElevation : public DataProcessor {
         bool postProcess(RideFile *, DataProcessorConfig* config, QString op);
 
         // the config widget
-        DataProcessorConfig* processorConfig(QWidget *parent) {
+        DataProcessorConfig* processorConfig(QWidget *parent, const RideFile * ride = NULL) {
+            Q_UNUSED(ride);
             return new FixElevationConfig(parent);
         }
 
@@ -95,6 +119,12 @@ class FixElevation : public DataProcessor {
         QString name() {
             return (tr("Fix Elevation errors"));
         }
+
+    private:
+        QString apiKey;
+
+        QStringList FetchElevationDataFromMapQuest(QString latLngCollection);
+
 };
 
 static bool fixElevationAdded = DataProcessorFactory::instance().registerProcessor(QString("Fix Elevation errors"), new FixElevation());
@@ -102,8 +132,14 @@ static bool fixElevationAdded = DataProcessorFactory::instance().registerProcess
 bool
 FixElevation::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString op="")
 {
-    Q_UNUSED(config)
     Q_UNUSED(op)
+
+    // get settings
+    if (config == NULL) { // being called automatically
+        apiKey = appsettings->value(NULL, GC_DPFE_AK, "").toString();
+    } else { // being called manually
+        apiKey = ((FixElevationConfig*)(config))->ak->text();
+    }
 
     // Cannot process without without GPS data
     if (!ride || ride->areDataPresent()->lat == false || ride->areDataPresent()->lon == false)
@@ -146,9 +182,10 @@ FixElevation::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString
             if (latLngCollection.length() != 0) {
                 latLngCollection.append(',');
             }
-            latLngCollection.append(QString::number(point->lat));
+            // these values need extended precision or place marker jumps around.
+            latLngCollection.append(QString::number(point->lat,'g',10));
             latLngCollection.append(',');
-            latLngCollection.append(QString::number(point->lon));
+            latLngCollection.append(QString::number(point->lon,'g',10));
             if (pointCount == 400) {
                 elevationPoints = elevationPoints + FetchElevationDataFromMapQuest(latLngCollection);
                 latLngCollection = "";
@@ -259,14 +296,15 @@ FixElevation::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString
 }
 
 QStringList
-FetchElevationDataFromMapQuest(QString latLngCollection)
+FixElevation::FetchElevationDataFromMapQuest(QString latLngCollection)
 {
     // http://open.mapquestapi.com/elevation/v1/profile?key=Fmjtd%7Cluur20uznu%2Ca2%3Do5-9ayshw&shapeFormat=raw&latLngCollection=52.677,0.94589,52.6769,0.94565,52.6767,0.94545,52.6765,0.94529,52.6764,0.94511,52.6762,0.94488,52.6761,0.94466,52.6759,0.94453,52.6758,0.9447,52.6756,0.94497,52.6756,0.94527,52.6758,0.94553,52.6759,0.94572,52.6761,0.94594,52.6763,0.94611,52.6765,0.94627,52.6766,0.94635,52.6768,0.94639,52.6771,0.9464,52.6772,0.94639,52.6775,0.94637,52.6777,0.94638,52.6779,0.9464,52.6781,0.94645,52.6783,0.94652,52.6784,0.9466,52.6786,0.94672,52.6788,0.94686,52.679,0.94701,52.6792,0.94713,52.6794,0.94721,52.6796,0.94724
     QStringList elevationPoints;
     QNetworkAccessManager *networkMgr = new QNetworkAccessManager();
     QNetworkReply *reply = networkMgr->get( QNetworkRequest(
-            QUrl( "http://open.mapquestapi.com/elevation/v1/profile?key=" GC_MAPQUESTAPI_KEY
-                          "&shapeFormat=raw&useFilter=true&latLngCollection=" + latLngCollection ) ) );
+            QUrl( QString("http://open.mapquestapi.com/elevation/v1/profile?key=%1"
+                          "&shapeFormat=raw&useFilter=true&latLngCollection=" + latLngCollection )
+                              .arg(apiKey.isEmpty() ? GC_MAPQUESTAPI_KEY : apiKey) ) ) );
 
     QEventLoop loop;
     QObject::connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));

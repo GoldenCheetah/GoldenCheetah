@@ -16,10 +16,11 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-
 #include "ErgFilePlot.h"
 #include "WPrime.h"
 #include "Context.h"
+
+#include <unordered_map>
 
 // Bridge between QwtPlot and ErgFile to avoid having to
 // create a separate array for the ergfile data, we plot
@@ -276,9 +277,9 @@ ErgFilePlot::configChanged(qint32)
 
     // set CP Marker
     double CP = 0; // default
-    if (context->athlete->zones(false)) {
-        int zoneRange = context->athlete->zones(false)->whichRange(QDate::currentDate());
-        if (zoneRange >= 0) CP = context->athlete->zones(false)->getCP(zoneRange);
+    if (context->athlete->zones("Bike")) {
+        int zoneRange = context->athlete->zones("Bike")->whichRange(QDate::currentDate());
+        if (zoneRange >= 0) CP = context->athlete->zones("Bike")->getCP(zoneRange);
     }
     if (CP) {
         CPMarker->setYValue(CP);
@@ -287,6 +288,125 @@ ErgFilePlot::configChanged(qint32)
 
     replot();
 }
+
+
+// Distribute segments into rows for non-overlapped display.
+//
+// This is currently based strictly on segment start and end and ignores
+// text length. Ideally text length would be used to raise segment
+// size for purposes of display packing, which would allow cause lap
+// markers to be shown without their names stomping all over their
+// adjacent bretheren.
+class LapRowDistributor {
+
+    const QList<ErgFileLap>& laps;
+    std::unordered_map<int, std::tuple<int, int>> lapRangeIdMap;
+    std::vector<int> segmentRowMap;
+
+public:
+
+    enum ResultEnum { Failed = 0, StartOfRange, EndOfRange, InternalRange, SimpleLap };
+
+    ResultEnum GetInfo(int i, int& row) {
+
+        if (i < 0 || i > laps.count())
+            return Failed;
+
+        int lapRangeId = laps.at(i).lapRangeId;
+
+        row = segmentRowMap[std::get<0>(lapRangeIdMap[lapRangeId])];
+
+        if (lapRangeId) {
+            auto range = lapRangeIdMap.find(lapRangeId);
+            if (range != lapRangeIdMap.end()) {
+                if (std::get<0>(range->second) == i) return StartOfRange;
+                if (std::get<1>(range->second) == i) return EndOfRange;
+            }
+            return InternalRange;
+        }
+
+        return SimpleLap;
+    }
+
+    LapRowDistributor(const QList<ErgFileLap> &laps) : laps(laps), segmentRowMap(laps.count(), -1) {
+
+        // Part 1:
+        //
+        // Build mapping from lapRangeId to index of first/last lap markers in the
+        // group.
+        // 
+        // Map provides instant access to start and end of rangeid.
+        int lapCount = laps.count();
+
+        for (int i = 0; i < lapCount; i++) {
+            const ErgFileLap& lap = laps.at(i);
+
+            int startIdx = i, endIdx = i;
+
+            auto e = lapRangeIdMap.find(lap.lapRangeId);
+            if (e != lapRangeIdMap.end()) {
+                std::tie(startIdx, endIdx) = e->second;
+                if (lap.x < laps.at(startIdx).x)
+                    startIdx = i;
+
+                if (lap.x > laps.at(endIdx).x)
+                    endIdx = i;
+            }
+
+            lapRangeIdMap[lap.lapRangeId] = std::make_tuple(startIdx, endIdx);
+        }
+
+        // Part 2: Generate segmentRowMap, this is a map from lap to what row
+        // that lap should be printed upon.
+
+        // Tracks what segments are live at what row during search
+        // Grows when a segment is found that can't fit into an existing
+        // row.
+        //
+        // Note: This is a greedy packing, not optimal, but seems to look good
+        // because adjacent segments tend to appear adjacent on the same row.
+        std::vector<int> segmentRowLiveMap;
+        for (int i = 0; i < lapCount; i++) {
+            const ErgFileLap& lap = laps.at(i);
+
+            // Space is only computed for first lap in range group.
+            if (std::get<0>(lapRangeIdMap[lap.lapRangeId]) != i) {
+                continue;
+            }
+
+            double startM = lap.x;
+
+            // Age-out all rows of segments that end at or before startKM
+            // Assign first available that is available
+            int row = -1;
+            for (int r = 0; r < segmentRowLiveMap.size(); r++) {
+                int v = segmentRowLiveMap[r];
+                if (v >= 0) {
+                    double endM = laps.at(std::get<1>(lapRangeIdMap[laps.at(v).lapRangeId])).x;
+                    if (endM <= startM) {
+                        v = -1;
+                        segmentRowLiveMap[r] = v;
+                    }
+                }
+
+                // Take first free row we encounter.
+                if (row < 0 && v < 0) {
+                    segmentRowLiveMap[r] = i;
+                    row = r;
+                }
+            }
+
+            // If no free rows then push a new one on the end
+            if (row < 0) {
+                segmentRowLiveMap.push_back(i);
+                row = (int)(segmentRowLiveMap.size() - 1);
+            }
+
+            // Record the row that this segment was assigned
+            segmentRowMap[i] = row;
+        }
+    }
+};
 
 void
 ErgFilePlot::setData(ErgFile *ergfile)
@@ -310,7 +430,7 @@ ErgFilePlot::setData(ErgFile *ergfile)
     if (ergfile) {
 
         // is this by distance or time?
-        bydist = (ergfile->format == CRS || ergfile->format == CRS_LOC) ? true : false;
+        bydist = (ergfile->format == CRS) ? true : false;
 
         if (bydist == true) {
 
@@ -346,11 +466,46 @@ ErgFilePlot::setData(ErgFile *ergfile)
 
         }
 
+        LapRowDistributor lapRowDistributor(ergFile->Laps);
+
         // set up again
         for(int i=0; i < ergFile->Laps.count(); i++) {
 
             // Show Lap Number
-            QwtText text(ergFile->Laps.at(i).name != "" ? ergFile->Laps.at(i).name : QString::number(ergFile->Laps.at(i).LapNum));
+            const ErgFileLap& lap = ergFile->Laps.at(i);
+
+            int row = 0;
+            LapRowDistributor::ResultEnum distributionResult = lapRowDistributor.GetInfo(i, row);
+
+            // Danger: ASCII ART. Somebody please replace this with graphics?
+            QString decoratedName;
+            Qt::Alignment labelAlignment = Qt::AlignRight | Qt::AlignTop;
+
+            switch(distributionResult) {
+            case LapRowDistributor::StartOfRange:
+                decoratedName = "<" + lap.name;
+                break;
+            case LapRowDistributor::EndOfRange:
+                decoratedName = ">";
+                labelAlignment = Qt::AlignLeft | Qt::AlignTop;
+                break;
+            case LapRowDistributor::SimpleLap:
+                decoratedName = QString::number(lap.LapNum) + ":" + lap.name;
+                break;
+            case LapRowDistributor::InternalRange:
+                decoratedName = "o";
+                labelAlignment = Qt::AlignHCenter | Qt::AlignTop;
+                break;
+            case LapRowDistributor::Failed:
+            default:
+                // Nothing to do.
+                break;
+            };
+
+            // Literal row translation. We loves ascii art...
+            QString prefix = (row > 0) ? QString("\n").repeated(row) : "";
+            QwtText text(prefix + decoratedName);
+                
             text.setFont(QFont("Helvetica", 10, QFont::Bold));
             text.setColor(GColor(CPLOTMARKER));
 
@@ -358,8 +513,8 @@ ErgFilePlot::setData(ErgFile *ergfile)
             QwtPlotMarker *add = new QwtPlotMarker();
             add->setLineStyle(QwtPlotMarker::VLine);
             add->setLinePen(QPen(GColor(CPLOTMARKER), 0, Qt::DashDotLine));
-            add->setLabelAlignment(Qt::AlignRight | Qt::AlignTop);
-            add->setValue(ergFile->Laps.at(i).x, 0.0);
+            add->setLabelAlignment(labelAlignment);
+            add->setValue(lap.x, 0);
             add->setLabel(text);
             add->attach(this);
 
@@ -545,7 +700,7 @@ ErgFilePlot::reset()
     wattsCurve->setSamples(wattsData->x(), wattsData->y(), wattsData->count());
     wbalData->clear();
     wbalCurve->setSamples(wbalData->x(), wbalData->y(), wbalData->count());
-    wbalData->clear();
+    cadData->clear();
     cadCurve->setSamples(cadData->x(), cadData->y(), cadData->count());
     hrData->clear();
     hrCurve->setSamples(hrData->x(), hrData->y(), hrData->count());

@@ -8,8 +8,16 @@
 #CONFIG += debug
 #CONFIG += release
 
-# Uncomment when WebKit is not available (e.g. QT >= 5.6)
-#DEFINES += NOWEBKIT
+# uncomment below and configure the location of the GNU scientific library,
+# this is a mandatory dependency.
+#
+# Linux/Mac - use apt/homebrew to install and edit to your install location
+#GSL_INCLUDES = /usr/include
+#GSL_LIBS = -lgsl -lgslcblas -lm
+#
+# Windows - use vcpkg to install and edit to your install location
+#GSL_INCLUDES = c:\vcpkg\installed\x64-windows\include
+#GSL_LIBS = -LC:\vcpkg\installed\x64-windows\lib -lgsl -lgslcblas
 
 # Uncomment below if you want an R chart
 # You will need R installed along with the Rcpp and RInside
@@ -162,10 +170,11 @@
 #LIBUSB_INSTALL = /usr/local
 #LIBUSB_INCLUDE = 
 #LIBUSB_LIBS    = 
+#LIBUSB_USE_V_1 = true # don't use on Windows
 
 # if you want video playback on training mode then
 # download and install vlc (videolan) from
-# ftp.videolan.org/pub/vlc/1.1.8 or http://download.videolan.org/vlc/ for 
+# ftp.videolan.org/pub/vlc/3.0.8 or http://download.videolan.org/vlc/ for
 # your platform there are sdks for Mac and Windows. On Linux you
 # will need to use the latest distro (e.g. Meerkat
 # on Ubuntu) to be sure apt-get installs the latest
@@ -173,23 +182,17 @@
 # Set path to the root of the VLC installation
 # If the are installed in /usr/local/vlc then set
 # VLC_INSTALL = /usr/local/vlc
-# This will automatically set (Windows and Unix):
+# This will automatically set (Windows, Unix and macOS):
 # VLC_INCLUDE = $${VLC_INSTALL}/include 
 # For Windows
 # VLC_LIBS    = $${VLC_INSTALL}/lib/libvlc.dll.a
-# For Unix
+# For Unix and macOS
 # VLC_LIBS    = -lvlc
 # You may override the INCLUDE and LIB files if you like.
 # You *must* define VLC_INSTALL to use this feature.
 #VLC_INSTALL = 
 #VLC_INCLUDE = 
 #VLC_LIBS    = 
-
-# *** Mac users NOTE ***
-# On MAC you don't need libvlc since we use the
-# native QTKit (OSX framework) for video playback
-# using Quicktime and on 10.6 or higher Quicktime X
-#
 
 # if you want to resample with high fidelity we can use the
 # libsamplerate libraries, this is used in RideFile::resample()
@@ -255,16 +258,16 @@ macx {
 # if you have your own MAPQUEST KEY
 #DEFINES += GC_MAPQUESTAPI_KEY=\\\"xxxxxxxxxxxxxxxxxxxxxx\\\"
 
-# USING THE WITHINGS API (http://oauth.withings.com/api)
-#DEFINES += GC_WITHINGS_CONSUMER_KEY=\\\"xxxxxxxxxxxxxxx\\\"
-#DEFINES += GC_WITHINGS_CONSUMER_SECRET=\\\"xxxxxxxxxxxxxxx\\\"
+# USING THE WITHINGS API (http://oauth.withings.com/api, use https://www.goldencheetah.org as CALLBACK URL)
+#DEFINES += GC_NOKIA_CLIENT_ID=\\\"xxxxxxxxxxxxxxx\\\"
+#DEFINES += GC_NOKIA_CLIENT_SECRET=\\\"xxxxxxxxxxxxxxx\\\"
 
 # What video playback do you want?
 DEFINES += GC_VIDEO_NONE             # dont add any video playback support
-#DEFINES += GC_VIDEO_QUICKTIME        # mac only and the default
-#DEFINES += GC_VIDEO_QT5              # use QT5 qvideowidget if QT > 5.2.1
-#DEFINES += GC_VIDEO_VLC               # use VideoLan library needs VLC_INSTALL defined above
-#DEFINES += GC_VIDEO_AV                 # use AV Foundation on Mac now QTKit is deprecated
+#DEFINES += GC_VIDEO_QUICKTIME       # mac only and the default
+#DEFINES += GC_VIDEO_QT5             # use QT5 qvideowidget if QT > 5.2.1
+#DEFINES += GC_VIDEO_VLC             # use VideoLan library needs VLC_INSTALL defined above
+#DEFINES += GC_VIDEO_AV              # use AV Foundation on Mac now QTKit is deprecated
 
 
 # Using the GoldenCheetah/CloudDB feature (with a private CloudDB instance)

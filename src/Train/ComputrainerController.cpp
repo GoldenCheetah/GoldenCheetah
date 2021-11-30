@@ -20,11 +20,11 @@
 #include "Computrainer.h"
 #include "RealtimeData.h"
 
-#include <QMessageBox>
-
 ComputrainerController::ComputrainerController(TrainSidebar *parent,  DeviceConfiguration *dc) : RealtimeController(parent, dc)
 {
     myComputrainer = new Computrainer (parent, dc ? dc->portSpec : ""); // we may get NULL passed when configuring
+    f1Depressed = false;
+    f2Depressed = false;
     f3Depressed = false;
 }
 
@@ -84,10 +84,7 @@ ComputrainerController::getRealtimeData(RealtimeData &rtData)
 
     if(!myComputrainer->isRunning())
     {
-        QMessageBox msgBox;
-        msgBox.setText(tr("Cannot Connect to Computrainer"));
-        msgBox.setIcon(QMessageBox::Critical);
-        msgBox.exec();
+        emit setNotification(tr("Cannot Connect to Computrainer"), 2);
         parent->Stop(1);
         return;
     }
@@ -136,31 +133,35 @@ ComputrainerController::getRealtimeData(RealtimeData &rtData)
     Load = myComputrainer->getLoad();
     Gradient = myComputrainer->getGradient();
 	// the calls to the parent will determine which mode we are on (ERG/SPIN) and adjust load/slop appropriately
-    if ((Buttons&CT_PLUS) && !(Buttons&CT_F3)) {
-            parent->Higher();
+    if (Buttons&CT_PLUS) {
+        parent->Higher();
     }
-    if ((Buttons&CT_MINUS) && !(Buttons&CT_F3)) {
-            parent->Lower();
+    if (Buttons&CT_MINUS) {
+        parent->Lower();
     }
     rtData.setLoad(Load);
 	rtData.setSlope(Gradient);
 
-#if 0 // F3 now toggles calibration
-    // FFWD/REWIND
-    if ((Buttons&CT_PLUS) && (Buttons&CT_F3)) {
-           parent->FFwd();
+    // Start/Pause
+    if (Buttons&CT_F1) {
+        // We're only interested in the act of pressing the button, not it being held down
+        if (f1Depressed == false) {
+            f1Depressed = true;
+            parent->Start();
+        }
+    } else {
+        f1Depressed = false; // It has been released
     }
-    if ((Buttons&CT_MINUS) && (Buttons&CT_F3)) {
-           parent->Rewind();
-    }
-#endif
 
     // LAP/INTERVAL
-    if (Buttons&CT_F1 && !(Buttons&CT_F3)) {
-        parent->newLap();
-    }
-    if ((Buttons&CT_F1) && (Buttons&CT_F3)) {
-           parent->FFwdLap();
+    if (Buttons&CT_F2) {
+        // We're only interested in the act of pressing the button, not it being held down
+        if (f2Depressed == false) {
+            f2Depressed = true;
+            parent->newLap();
+        }
+    } else {
+        f2Depressed = false; // It has been released
     }
 
     // if Buttons == 0 we just pressed stop!
@@ -168,10 +169,6 @@ ComputrainerController::getRealtimeData(RealtimeData &rtData)
         parent->Stop(0);
     }
 
-    // displaymode
-    if (Buttons&CT_F2) {
-        parent->nextDisplayMode();
-    }
 }
 
 void ComputrainerController::pushRealtimeData(RealtimeData &) { } // update realtime data with current values

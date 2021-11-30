@@ -22,14 +22,16 @@
 #include "Context.h"
 #include "Athlete.h"
 #include "MainWindow.h"
-#include "Tab.h"
+#include "AthleteTab.h"
 #include "RideNavigator.h"
 #include "DataFilter.h"
 #include "Zones.h"
 #include "HrZones.h"
+#include "RideMetric.h"
 
 #include <QFont>
 #include <QFontMetrics>
+#include <QMessageBox>
 
 static bool insensitiveLessThan(const QString &a, const QString &b)
 {
@@ -112,10 +114,10 @@ EditUserMetricDialog::EditUserMetricDialog(QWidget *parent, Context *context, Us
     SpecialFields sp;
 
     // get sorted list
-    QStringList names = context->tab->rideNavigator()->logicalHeadings;
+    QStringList names = context->rideNavigator->logicalHeadings;
 
     // start with just a list of functions
-    list = DataFilter::builtins();
+    list = DataFilter::builtins(context);
 
     // ridefile data series symbols
     list += RideFile::symbols();
@@ -123,14 +125,18 @@ EditUserMetricDialog::EditUserMetricDialog(QWidget *parent, Context *context, Us
     // add special functions (older code needs fixing !)
     list << "config(cranklength)";
     list << "config(cp)";
+    list << "config(aetp)";
     list << "config(ftp)";
     list << "config(w')";
     list << "config(pmax)";
     list << "config(cv)";
-    list << "config(scv)";
+    list << "config(aetv)";
+    list << "config(sex)";
+    list << "config(dob)";
     list << "config(height)";
     list << "config(weight)";
     list << "config(lthr)";
+    list << "config(aethr)";
     list << "config(maxhr)";
     list << "config(rhr)";
     list << "config(units)";
@@ -157,7 +163,7 @@ EditUserMetricDialog::EditUserMetricDialog(QWidget *parent, Context *context, Us
     list << "best(vam, 3600)";
     list << "best(wpk, 3600)";
 
-    qSort(names.begin(), names.end(), insensitiveLessThan);
+    std::sort(names.begin(), names.end(), insensitiveLessThan);
 
     foreach(QString name, names) {
 
@@ -180,6 +186,9 @@ EditUserMetricDialog::EditUserMetricDialog(QWidget *parent, Context *context, Us
     // create an empty completer, configchanged will fix it
     DataFilterCompleter *completer = new DataFilterCompleter(list, this);
     formulaEdit->setCompleter(completer);
+    errors= new QLabel(this);
+    errors->setStyleSheet("color: red");
+    connect(formulaEdit, SIGNAL(syntaxErrors(QStringList&)), this, SLOT(setErrors(QStringList&)));
 
     QLabel *eval = new QLabel(tr("Evaluates"), this);
     QLabel *metric = new QLabel(tr("Metric"), this);
@@ -232,7 +241,8 @@ EditUserMetricDialog::EditUserMetricDialog(QWidget *parent, Context *context, Us
     head->addWidget(formulaEditLabel, 6,0);
 
     // 8 - 16 row; program editor
-    head->addWidget(formulaEdit, 7,0, 8, 5);
+    head->addWidget(formulaEdit, 7,0, 7, 5);
+    head->addWidget(errors, 15,0,1,5);
 
     // 17th row; labels for estimates
     head->addWidget(test, 16, 0);
@@ -255,10 +265,42 @@ EditUserMetricDialog::EditUserMetricDialog(QWidget *parent, Context *context, Us
 
     mainLayout->addLayout(head);
 
+    connect(symbol, SIGNAL(textChanged(const QString &)), SLOT(enableOk()));
+    connect(name, SIGNAL(textChanged(const QString &)), SLOT(enableOk()));
+
     connect(test, SIGNAL(clicked()), this, SLOT(refreshStats()));
     connect(context, SIGNAL(rideSelected(RideItem*)), this, SLOT(refreshStats()));
     connect (cancelButton, SIGNAL(clicked()), this, SLOT(reject()));
     connect (okButton, SIGNAL(clicked()), this, SLOT(okClicked()));
+
+    // initialize button state
+    enableOk();
+}
+
+void
+EditUserMetricDialog::setErrors(QStringList &list)
+{
+    errors->setText(list.join(";"));
+}
+
+void
+EditUserMetricDialog::enableOk()
+{
+    // Check symbol and name are non-empty, and "_" is not used in name.
+    okButton->setEnabled(!symbol->text().isEmpty() && !name->text().isEmpty() && !name->text().contains("_"));
+}
+
+bool
+EditUserMetricDialog::validSettings()
+{
+    // user metrics are silently discarded if the symbol is already in use
+    const RideMetric* metric = RideMetricFactory::instance().rideMetric(symbol->text());
+    if (metric && !metric->isUser()) {
+        QMessageBox::critical(this, tr("User Metric"), tr("Symbol already in use by a Builtin metric"));
+        return false;
+    }
+
+    return true;
 }
 
 void
@@ -284,6 +326,9 @@ EditUserMetricDialog::setSettings(UserMetricSettings &here)
 void
 EditUserMetricDialog::okClicked()
 {
+    // validate input
+    if (!validSettings()) return;
+
     // fetch current state
     setSettings(settings);
 

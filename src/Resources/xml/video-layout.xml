@@ -1,7 +1,8 @@
-<layout name="preset_1">
+<layouts>
+<layout name="Graphical Meters">
    <meter name="Speedometer" container="Video" source="Speed" type="NeedleMeter">
-       <RelativeSize Width="20.0" Height="15.0" />
-       <RelativePosition X="20.0" Y="77.0" />
+       <RelativeSize Width="15.0" Height="15.0" />
+       <RelativePosition X="12.0" Y="77.0" />
        <Range Min="0.0" Max="60.0" />
        <Angle>220.0</Angle>
        <SubRange>6</SubRange>
@@ -15,8 +16,8 @@
        <MainFont Name="Consolas" Size="64" />
    </meter>
    <meter name="Wattmeter" container="Video" source="Watt" type="CircularMeter">
-       <RelativeSize Width="20.0" Height="15.0" />
-       <RelativePosition X="80.0" Y="77.0" />
+       <RelativeSize Width="15.0" Height="13.0" />
+       <RelativePosition X="88.0" Y="77.0" />
        <Range Min="0.0" Max="350.0" />
        <Angle>280.0</Angle>
    </meter>
@@ -29,18 +30,18 @@
        <RelativeSize Width="50.0" Height="20.0" />
        <RelativePosition X="50.0" Y="85.0" />
        <MainColor R="255" G="100" B="100" A="180" />
-       <Text>Watts</Text>
+       <Text>watts</Text>
    </meter>
    <meter name="Cadencemeter" container="Video" source="Cadence" type="CircularBargraph">
-       <RelativeSize Width="20.0" Height="13.0" />
-       <RelativePosition X="50.0" Y="73.0" />
+       <RelativeSize Width="15.0" Height="15.0" />
+       <RelativePosition X="50.0" Y="77.0" />
        <Range Min="0.0" Max="200.0" />
        <MainColor R="5" G="0" B="255" A="180" />
        <Angle>280.0</Angle>
        <SubRange>30</SubRange>
    </meter>
    <meter name="Cadencemeter-text" container="Cadencemeter" source="Cadence" type="Text">
-       <RelativeSize Width="40.0" Height="30.0" />
+       <RelativeSize Width="35.0" Height="27.0" />
        <RelativePosition X="50.0" Y="50.0" />
        <MainColor R="255" G="100" B="100" A="180" />
    </meter>
@@ -55,8 +56,213 @@
        <RelativePosition X="50.0" Y="90.0" />
        <MainColor R="255" G="0" B="0" A="180" />
    </meter>
+   <meter name="HRM-unit" container="Video" source="None" type="Text">
+       <RelativeSize Width="15.0" Height="4.0" />
+       <RelativePosition X="50.0" Y="95.0" />
+       <MainColor R="255" G="0" B="0" A="180"/>
+       <Text>bpm</Text>
+   </meter>
    <meter name="status" container="Video" source="TrainerStatus" type="Text">
        <RelativeSize Width="15.0" Height="5.0" />
-       <RelativePosition X="1.0" Y="10.0" />
+       <RelativePosition X="10.0" Y="10.0" />
+   </meter>
+   <meter name="elapsed" container="Video" source="Time" type="Text">
+       <RelativeSize Width="10.0" Height="5.0" />
+       <RelativePosition X="88.0" Y="3.0" />
+   </meter>
+   <meter name="distance" container="Video" source="Distance" type="Text">
+       <RelativeSize Width="10.0" Height="5.0" />
+       <RelativePosition X="88.0" Y="10.0" />
+   </meter>
+   <meter name="load" container="Video" source="Load" type="Text">
+       <RelativeSize Width="10.0" Height="5.0" />
+       <RelativePosition X="88.0" Y="90.0" />
+   </meter>
+   <meter name="load-text" container="Video" source="None" type="Text">
+       <RelativeSize Width="10.0" Height="4.0" />
+       <RelativePosition X="88.0" Y="95.0" />
+       <MainColor R="255" G="0" B="0" A="180" />
+       <Text>load</Text>
+   </meter>
+   <meter name="elevation" container="Video" source="Elevation" type="Elevation">
+       <RelativeSize Width="40.0" Height="15.0" />
+       <RelativePosition X="20.0" Y="92.0" />
+       <BackgroundColor R="200" G="200" B="200" A="125" />
+       <OutlineColor R="255" G="255" B="255" A="250" />
+       <MainColor R="255" G="0" B="0" A="250" />
    </meter>
 </layout>
+
+<layout name="Graphical Meters with Map">
+   <meter name="Speedometer" container="Video" source="Speed" type="NeedleMeter">
+       <RelativeSize Width="15.0" Height="15.0" />
+       <RelativePosition X="12.0" Y="77.0" />
+       <Range Min="0.0" Max="60.0" />
+       <Angle>220.0</Angle>
+       <SubRange>6</SubRange>
+       <MainColor R="0" G="255" B="0" A="180" />
+       <BackgroundColor R="100" G="100" B="100" A="100" />
+   </meter>
+   <meter name="Speedometer-text" container="Speedometer" source="Speed" type="Text">
+       <RelativeSize Width="70.0" Height="40.0" />
+       <RelativePosition X="50.0" Y="75.0" />
+       <MainColor R="0" G="255" B="0" A="180" />
+       <MainFont Name="Consolas" Size="64" />
+   </meter>
+   <meter name="Wattmeter" container="Video" source="Watt" type="CircularMeter">
+       <RelativeSize Width="15.0" Height="13.0" />
+       <RelativePosition X="88.0" Y="77.0" />
+       <Range Min="0.0" Max="350.0" />
+       <Angle>280.0</Angle>
+   </meter>
+   <meter name="Wattmeter-text" container="Wattmeter" source="Watt" type="Text">
+       <RelativeSize Width="50.0" Height="40.0" />
+       <RelativePosition X="50.0" Y="50.0" />
+       <MainColor R="255" G="100" B="100" A="180" />
+   </meter>
+   <meter name="Wattmeter-unit" container="Wattmeter" source="None" type="Text">
+       <RelativeSize Width="50.0" Height="20.0" />
+       <RelativePosition X="50.0" Y="85.0" />
+       <MainColor R="255" G="100" B="100" A="180" />
+       <Text>watts</Text>
+   </meter>
+   <meter name="Cadencemeter" container="Video" source="Cadence" type="CircularBargraph">
+       <RelativeSize Width="15.0" Height="15.0" />
+       <RelativePosition X="50.0" Y="77.0" />
+       <Range Min="0.0" Max="200.0" />
+       <MainColor R="5" G="0" B="255" A="180" />
+       <Angle>280.0</Angle>
+       <SubRange>30</SubRange>
+   </meter>
+   <meter name="Cadencemeter-text" container="Cadencemeter" source="Cadence" type="Text">
+       <RelativeSize Width="35.0" Height="27.0" />
+       <RelativePosition X="50.0" Y="50.0" />
+       <MainColor R="255" G="100" B="100" A="180" />
+   </meter>
+   <meter name="Cadencemeter-unit" container="Cadencemeter" source="None" type="Text">
+       <RelativeSize Width="50.0" Height="20.0" />
+       <RelativePosition X="50.0" Y="85.0" />
+       <MainColor R="255" G="100" B="100" A="180" />
+       <Text>rpm</Text>
+   </meter>
+   <meter name="HRM-text" container="Video" source="HRM" type="Text">
+       <RelativeSize Width="15.0" Height="5.0" />
+       <RelativePosition X="50.0" Y="90.0" />
+       <MainColor R="255" G="0" B="0" A="180" />
+   </meter>
+   <meter name="HRM-unit" container="Video" source="None" type="Text">
+       <RelativeSize Width="15.0" Height="4.0" />
+       <RelativePosition X="50.0" Y="95.0" />
+       <MainColor R="255" G="0" B="0" A="180"/>
+       <Text>bpm</Text>
+   </meter>
+   <meter name="status" container="Video" source="TrainerStatus" type="Text">
+       <RelativeSize Width="15.0" Height="5.0" />
+       <RelativePosition X="50.0" Y="10.0" />
+   </meter>
+   <meter name="elapsed" container="Video" source="Time" type="Text">
+       <RelativeSize Width="10.0" Height="5.0" />
+       <RelativePosition X="88.0" Y="3.0" />
+   </meter>
+   <meter name="distance" container="Video" source="Distance" type="Text">
+       <RelativeSize Width="10.0" Height="5.0" />
+       <RelativePosition X="88.0" Y="10.0" />
+   </meter>
+   <meter name="load" container="Video" source="Load" type="Text">
+       <RelativeSize Width="10.0" Height="5.0" />
+       <RelativePosition X="88.0" Y="90.0" />
+   </meter>
+   <meter name="load-text" container="Video" source="None" type="Text">
+       <RelativeSize Width="10.0" Height="4.0" />
+       <RelativePosition X="88.0" Y="95.0" />
+       <MainColor R="255" G="0" B="0" A="180" />
+       <Text>load</Text>
+   </meter>
+   <meter name="elevation" container="Video" source="Elevation" type="Elevation">
+       <RelativeSize Width="40.0" Height="15.0" />
+       <RelativePosition X="20.0" Y="92.0" />
+       <BackgroundColor R="200" G="200" B="200" A="125" />
+       <OutlineColor R="255" G="255" B="255" A="250" />
+       <MainColor R="255" G="0" B="0" A="250" />
+   </meter>
+   <meter name="livemap" container="Video" source="LiveMap" type="LiveMap">
+       <RelativeSize Width="25.0" Height="45.0" />
+       <RelativePosition X="12.0" Y="20.0" />
+       <Zoom>16</Zoom>
+       <osmURL>http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png</osmURL>
+   </meter>
+</layout>
+
+<layout name="Text Meters">
+   <meter name="MeterPanel" container="Video" source="None" type="Text" Background="true">
+       <RelativeSize Width="15.0" Height="50.0" />
+       <RelativePosition X="10.0" Y="25.0" />
+       <MainColor R="250" G="250" B="250" A="200" />
+       <MainFont Name="Consolas" Size="64" />
+       <AltFont Name="Consolas" Size="64" />
+       <BackgroundColor R="50" G="50" B="50" A="100" />
+       <Text></Text>
+   </meter>
+   <meter name="Slope" container="MeterPanel" source="Load" type="Text" alignment="AlignLeft" textWidth="5">
+       <RelativeSize Width="100.0" Height="10.0" />
+       <RelativePosition X="50.0" Y="8.0" />
+       <MainColor R="250" G="250" B="250" A="200" />
+       <MainFont Name="Consolas" Size="64" />
+       <AltFont Name="Consolas" Size="64" />
+   </meter>
+   <meter name="Speed" container="MeterPanel" source="Speed" type="Text" alignment="AlignLeft" textWidth="5">
+       <RelativeSize Width="100.0" Height="10.0" />
+       <RelativePosition X="50.0" Y="20.0" />
+       <MainColor R="250" G="250" B="250" A="200" />
+       <MainFont Name="Consolas" Size="64" />
+       <AltFont Name="Consolas" Size="64" />
+   </meter>
+   <meter name="Distance" container="MeterPanel" source="Distance" type="Text" alignment="AlignLeft" textWidth="5">
+       <RelativeSize Width="100.0" Height="10.0" />
+       <RelativePosition X="50.0" Y="32.0" />
+       <MainColor R="250" G="250" B="250" A="200" />
+       <MainFont Name="Consolas" Size="64" />
+       <AltFont Name="Consolas" Size="64" />
+   </meter>
+   <meter name="Wattmeter" container="MeterPanel" source="Watt" type="Text" alignment="AlignLeft" textWidth="5">
+       <RelativeSize Width="100.0" Height="10.0" />
+       <RelativePosition X="50.0" Y="44.0" />
+       <MainColor R="250" G="250" B="250" A="200" />
+       <MainFont Name="Consolas" Size="64" />
+       <AltFont Name="Consolas" Size="64" />
+       <AltText> Watts</AltText>
+   </meter>
+   <meter name="Altitude" container="MeterPanel" source="Altitude" type="Text" alignment="AlignLeft" textWidth="5">
+       <RelativeSize Width="100.0" Height="10.0" />
+       <RelativePosition X="50.0" Y="56.0" />
+       <MainColor R="250" G="250" B="250" A="200" />
+       <MainFont Name="Consolas" Size="64" />
+       <AltFont Name="Consolas" Size="64" />
+   </meter>
+   <meter name="Cadencemeter" container="MeterPanel" source="Cadence" type="Text" alignment="AlignLeft" textWidth="5">
+       <RelativeSize Width="100.0" Height="10.0" />
+       <RelativePosition X="50.0" Y="68.0" />
+       <MainColor R="250" G="250" B="250" A="200" />
+       <MainFont Name="Consolas" Size="64" />
+       <AltFont Name="Consolas" Size="64" />
+       <AltText> RPM</AltText>
+   </meter>
+   <meter name="Elapsed" container="MeterPanel" source="Time" type="Text">
+       <RelativeSize Width="100.0" Height="10.0" />
+       <RelativePosition X="50.0" Y="80.0" />
+       <MainColor R="250" G="250" B="250" A="200" />
+       <MainFont Name="Consolas" Size="64" />
+       <AltFont Name="Consolas" Size="64" />
+   </meter>
+   <meter name="elevation" container="Video" source="Elevation" type="Elevation">
+       <RelativeSize Width="40.0" Height="15.0" />
+       <RelativePosition X="20.0" Y="92.0" />
+       <BackgroundColor R="200" G="200" B="200" A="125" />
+       <OutlineColor R="255" G="255" B="255" A="250" />
+       <MainColor R="255" G="0" B="0" A="250" />
+   </meter>
+</layout>
+
+<layout name="No Meters">
+</layout>
+</layouts>

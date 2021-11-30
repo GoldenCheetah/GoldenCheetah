@@ -25,12 +25,10 @@
 #include "Colors.h"
 #include "TimeUtils.h"
 
-#if QT_VERSION > 0x050000
 #include "GoogleDrive.h"
 #include "PolarFlow.h"
 
 #include <QJsonParseError>
-#endif
 
 OAuthDialog::OAuthDialog(Context *context, OAuthSite site, CloudService *service, QString baseURL, QString clientsecret) :
     context(context), site(site), service(service), baseURL(baseURL), clientsecret(clientsecret)
@@ -54,6 +52,7 @@ OAuthDialog::OAuthDialog(Context *context, OAuthSite site, CloudService *service
         if (service->id() == "PolarFlow") site = this->site = POLAR;
         if (service->id() == "SportTracks.mobi") site = this->site = SPORTTRACKS;
         if (service->id() == "Xert") site = this->site = XERT;
+        if (service->id() == "RideWithGPS") site = this->site = RIDEWITHGPS;
     }
 
     // check if SSL is available - if not - message and end
@@ -77,15 +76,10 @@ OAuthDialog::OAuthDialog(Context *context, OAuthSite site, CloudService *service
     setLayout(layout);
 
 
-    #if defined(NOWEBKIT) || (QT_VERSION > 0x050000 && defined(Q_OS_MAC))
     view = new QWebEngineView();
     view->setZoomFactor(dpiXFactor);
-    #if (QT_VERSION >= 0x050600)
     view->page()->profile()->cookieStore()->deleteAllCookies();
-    #endif
-    #else
-    view = new QWebView();
-    #endif
+    view->page()->profile()->setHttpUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.79 Safari/537.36 Edge/14.14393");
 
     view->setContentsMargins(0,0,0,0);
     view->page()->view()->setContentsMargins(0,0,0,0);
@@ -104,7 +98,7 @@ OAuthDialog::OAuthDialog(Context *context, OAuthSite site, CloudService *service
 
         urlstr = QString("https://www.strava.com/oauth/authorize?");
         urlstr.append("client_id=").append(GC_STRAVA_CLIENT_ID).append("&");
-        urlstr.append("scope=view_private,write&");
+        urlstr.append("scope=activity:read_all,activity:write&");
         urlstr.append("redirect_uri=http://www.goldencheetah.org/&");
         urlstr.append("response_type=code&");
         urlstr.append("approval_prompt=force");
@@ -127,8 +121,6 @@ OAuthDialog::OAuthDialog(Context *context, OAuthSite site, CloudService *service
         urlstr.append("redirect_uri=http://www.goldencheetah.org/&");
         urlstr.append("response_type=code&");
         urlstr.append("approval_prompt=force");
-
-#if QT_VERSION >= 0x050000
 
     } else if (site == GOOGLE_CALENDAR) {
         // OAUTH 2.0 - Google flow for installed applications
@@ -161,8 +153,6 @@ OAuthDialog::OAuthDialog(Context *context, OAuthSite site, CloudService *service
         urlstr.append("response_type=code&");
         urlstr.append("client_id=").append(GC_GOOGLE_DRIVE_CLIENT_ID);
 
-#endif
-
     } else if (site == TODAYSPLAN) {
 
         //urlstr = QString("https://whats.todaysplan.com.au/en/authorize/"); //XXX fixup below when pages.cpp goes
@@ -190,13 +180,15 @@ OAuthDialog::OAuthDialog(Context *context, OAuthSite site, CloudService *service
     } else if (site == WITHINGS) {
 
         urlstr = QString("https://account.withings.com/oauth2_user/authorize2?");
-        urlstr.append("redirect_uri=http://www.goldencheetah.org&");
+        urlstr.append("redirect_uri=https://www.goldencheetah.org&");
         urlstr.append("scope=user.info,user.metrics&");
         urlstr.append("response_type=code&");
         urlstr.append("state=xyzzy&");
         urlstr.append("client_id=").append(GC_NOKIA_CLIENT_ID);
 
     } else if (site == XERT) {
+        urlChanged(QUrl("http://www.goldencheetah.org/?code=0"));
+    } else if (site == RIDEWITHGPS) {
         urlChanged(QUrl("http://www.goldencheetah.org/?code=0"));
     }
 
@@ -212,6 +204,12 @@ OAuthDialog::OAuthDialog(Context *context, OAuthSite site, CloudService *service
         connect(view, SIGNAL(urlChanged(const QUrl&)), this, SLOT(urlChanged(const QUrl&)));
         connect(view, SIGNAL(loadFinished(bool)), this, SLOT(loadFinished(bool)));
     }
+}
+
+OAuthDialog::~OAuthDialog()
+{
+  if (view) delete view->page();
+  delete view;  // view was constructed without a parent to delete it
 }
 
 // just ignore SSL handshake errors at all times
@@ -236,21 +234,18 @@ OAuthDialog::urlChanged(const QUrl &url)
     QString authheader;
 
     // sites that use this scheme
-    if (site == DROPBOX || site == STRAVA || site == CYCLING_ANALYTICS || site == TODAYSPLAN || site == POLAR || site == SPORTTRACKS || site == XERT || site == WITHINGS) {
+    if (site == DROPBOX || site == STRAVA || site == CYCLING_ANALYTICS || site == TODAYSPLAN || site == POLAR || site == SPORTTRACKS || site == XERT || site == RIDEWITHGPS || site == WITHINGS) {
 
         if (url.toString().startsWith("http://www.goldencheetah.org/?state=&code=") ||
                 url.toString().contains("blank.html?code=") ||
+                url.toString().startsWith("https://www.goldencheetah.org/?code=") ||
                 url.toString().startsWith("http://www.goldencheetah.org/?code=")) {
 
             QUrlQuery parse(url);
             QString code=parse.queryItemValue("code");
 
             QByteArray data;
-#if QT_VERSION > 0x050000
             QUrlQuery params;
-#else
-            QUrl params;
-#endif
             QString urlstr = "";
 
             // now get the final token to store
@@ -317,7 +312,7 @@ OAuthDialog::urlChanged(const QUrl &url)
                 params.addQueryItem("grant_type", "authorization_code");
                 params.addQueryItem("redirect_uri", "https://goldencheetah.github.io/blank.html");
 
-            }  else if (site == XERT) {
+            } else if (site == XERT) {
 
                 urlstr = QString("https://www.xertonline.com/oauth/token");
                 params.addQueryItem("username", service->getSetting(GC_XERTUSER, "").toString());
@@ -325,12 +320,19 @@ OAuthDialog::urlChanged(const QUrl &url)
                 params.addQueryItem("grant_type", "password");
 
                 authheader = QString("%1:%1").arg("xert_public");
+            } else if (site == RIDEWITHGPS) {
+                urlstr = QString("https://ridewithgps.com/users/current.json");
+                params.addQueryItem("apikey", GC_RWGPS_API_KEY);
+                params.addQueryItem("version", "2");
+                params.addQueryItem("email", service->getSetting(GC_RWGPSUSER, "").toString());
+                params.addQueryItem("password", service->getSetting(GC_RWGPSPASS, "").toString());
+
             } else if (site == WITHINGS) {
 
                 urlstr = QString("https://account.withings.com/oauth2/token?");
                 params.addQueryItem("client_id", GC_NOKIA_CLIENT_ID);
                 params.addQueryItem("client_secret", GC_NOKIA_CLIENT_SECRET);
-                params.addQueryItem("redirect_uri","http://www.goldencheetah.org");
+                params.addQueryItem("redirect_uri","https://www.goldencheetah.org");
                 params.addQueryItem("grant_type", "authorization_code");
 
             }
@@ -338,26 +340,29 @@ OAuthDialog::urlChanged(const QUrl &url)
             // all services will need us to send the temporary code received
             params.addQueryItem("code", code);
 
-#if QT_VERSION > 0x050000
             data.append(params.query(QUrl::FullyEncoded));
-#else
-            data=params.encodedQuery();
-#endif
 
             // trade-in the temporary access code retrieved by the Call-Back URL for the finale token
             QUrl url = QUrl(urlstr);
-
-            QNetworkRequest request = QNetworkRequest(url);
-            request.setHeader(QNetworkRequest::ContentTypeHeader,"application/x-www-form-urlencoded");
-
-            // client id and secret are encoded and sent in the header for POLAR and XERT
-            if (site == POLAR || site == XERT)  request.setRawHeader("Authorization", "Basic " +  authheader.toLatin1().toBase64());
 
             // now get the final token - but ignore errors
             manager = new QNetworkAccessManager(this);
             connect(manager, SIGNAL(sslErrors(QNetworkReply*, const QList<QSslError> & )), this, SLOT(onSslErrors(QNetworkReply*, const QList<QSslError> & )));
             connect(manager, SIGNAL(finished(QNetworkReply*)), this, SLOT(networkRequestFinished(QNetworkReply*)));
-            manager->post(request, data);
+
+            if (site == RIDEWITHGPS) {
+                url.setQuery(data);
+                QNetworkRequest request = QNetworkRequest(url);
+                manager->get(request);
+            } else {
+                QNetworkRequest request = QNetworkRequest(url);
+                request.setHeader(QNetworkRequest::ContentTypeHeader,"application/x-www-form-urlencoded");
+
+                // client id and secret are encoded and sent in the header for POLAR and XERT
+                if (site == POLAR || site == XERT)  request.setRawHeader("Authorization", "Basic " +  authheader.toLatin1().toBase64());
+
+                manager->post(request, data);
+            }
 
         }
     }
@@ -381,11 +386,7 @@ OAuthDialog::loadFinished(bool ok)
 
                 QString code = title.right(title.length()-title.indexOf("code=")-5);
                 QByteArray data;
-#if QT_VERSION > 0x050000
                 QUrlQuery params;
-#else
-                QUrl params;
-#endif
                 QString urlstr = "https://www.googleapis.com/oauth2/v3/token?";
                 if (site == GOOGLE_CALENDAR) {
                     params.addQueryItem("client_id", GC_GOOGLE_CALENDAR_CLIENT_ID);
@@ -403,11 +404,7 @@ OAuthDialog::loadFinished(bool ok)
                 params.addQueryItem("redirect_uri", "urn:ietf:wg:oauth:2.0:oob");
                 params.addQueryItem("grant_type", "authorization_code");
 
-#if QT_VERSION > 0x050000
                 data.append(params.query(QUrl::FullyEncoded));
-#else
-                data=params.encodedQuery();
-#endif
 
                 // trade-in the temporary access code retrieved by the
                 // Call-Back URL for the finale token
@@ -424,36 +421,6 @@ OAuthDialog::loadFinished(bool ok)
         }
     }
 }
-
-#if QT_VERSION < 0x050000
-static QString RawJsonStringGrab(const QByteArray& payload,
-                                 const QString& needle) {
-    // A RegExp based JSON string parser. Not the best, but it does the job.
-    QString regex =
-        // This matches the key.
-        "(" + needle + "|\"" + needle + "\"|'" + needle + "')"
-        // Matches the separator.
-        "[\\s]*:[\\s]*"
-        // matches the value.
-        "(\"\\S+\"|'\\S+')";
-    QRegExp q(regex);
-    if (!q.isValid()) {
-        // Somehow failed to build the regex.
-        return "";
-    }
-    int start = q.indexIn(payload);
-    int pos = q.pos(2);
-    if (start == -1 || pos == -1) {
-        // Failed to find the key or the value.
-        return "";
-    }
-    QString ret = payload.mid(pos, q.matchedLength() + start - pos);
-    // Remove " or ' from the value.
-    ret.remove(0, 1);
-    ret.remove(ret.size() - 1, 1);
-    return ret;
-}
-#endif
 
 //
 // STEP 3: REFRESH AND ACCESS TOKEN RECEIVED
@@ -475,26 +442,24 @@ OAuthDialog::networkRequestFinished(QNetworkReply *reply)
         QByteArray payload = reply->readAll(); // JSON
         QString refresh_token;
         QString access_token;
+        QString auth_token;
         double polar_userid=0;
 
         // parse the response and extract the tokens, pretty much the same for all services
         // although polar choose to also pass a user id, which is needed for future calls
-#if QT_VERSION > 0x050000
         QJsonParseError parseError;
         QJsonDocument document = QJsonDocument::fromJson(payload, &parseError);
         if (parseError.error == QJsonParseError::NoError) {
             refresh_token = document.object()["refresh_token"].toString();
             access_token = document.object()["access_token"].toString();
             if (site == POLAR)  polar_userid = document.object()["x_user_id"].toDouble();
+            if (site == RIDEWITHGPS) access_token = document.object()["user"].toObject()["auth_token"].toString();
         }
-#else
-        refresh_token = RawJsonStringGrab(payload, "refresh_token");
-        access_token = RawJsonStringGrab(payload, "access_token");
-#endif
 
         // if we failed to extract then we have a big problem
         // google uses a refresh token so trap for them only
-        if (((site == GOOGLE_CALENDAR || site == GOOGLE_DRIVE || site == KENTUNI) && refresh_token == "") || access_token == "") {
+        if (((site == GOOGLE_CALENDAR || site == GOOGLE_DRIVE || site == KENTUNI) && refresh_token == "") ||
+             access_token == "" ) {
 
             // Something failed.
             // Only Google uses both refresh and access tokens.
@@ -556,13 +521,15 @@ OAuthDialog::networkRequestFinished(QNetworkReply *reply)
             QByteArray r = bind->readAll();
             //qDebug()<<bind->errorString()<< "bind response="<<r;
 
-            QString info = QString(tr("PolarFlow authorization was successful."));
+            QString info = QString(tr("Polar Flow authorization was successful."));
             QMessageBox information(QMessageBox::Information, tr("Information"), info);
             information.exec();
 
         } else if (site == STRAVA) {
 
             service->setSetting(GC_STRAVA_TOKEN, access_token);
+            service->setSetting(GC_STRAVA_REFRESH_TOKEN, refresh_token);
+            service->setSetting(GC_STRAVA_LAST_REFRESH, QDateTime::currentDateTime());
             QString info = QString(tr("Strava authorization was successful."));
             QMessageBox information(QMessageBox::Information, tr("Information"), info);
             information.exec();
@@ -619,6 +586,12 @@ OAuthDialog::networkRequestFinished(QNetworkReply *reply)
             //information.exec();
 
             service->message = "Xert authorization was successful.";
+
+        } else if (site == RIDEWITHGPS) {
+
+            service->setSetting(GC_RWGPS_AUTH_TOKEN, access_token);
+
+            service->message = "Ride With GPS authorization was successful.";
 
         } else if (site == WITHINGS) {
 

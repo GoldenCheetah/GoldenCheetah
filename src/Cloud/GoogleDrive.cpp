@@ -90,7 +90,10 @@ GoogleDrive::GoogleDrive(Context *context)
     root_ = NULL;
 
     // config
-    settings.insert(Combo1, QString("%1::Scope::drive::drive.appdata::drive.file").arg(GC_GOOGLE_DRIVE_AUTH_SCOPE));
+    // Scope was "%1::Scope::drive::drive.appdata::drive.file", but drive access
+    // was revoked by Google and drive.appdata doesn't seem to work.
+    // drive.file is enough for our purposes.
+    settings.insert(Combo1, QString("%1::Scope::drive.file").arg(GC_GOOGLE_DRIVE_AUTH_SCOPE));
     settings.insert(OAuthToken, GC_GOOGLE_DRIVE_ACCESS_TOKEN);
     settings.insert(Folder, GC_GOOGLE_DRIVE_FOLDER);
     settings.insert(Local1, GC_GOOGLE_DRIVE_FOLDER_ID); // derived during config, no user action

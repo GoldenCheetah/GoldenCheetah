@@ -55,6 +55,7 @@ class LTMSidebar : public QWidget
     public slots:
 
         // date range selection and editing
+        void selectDateRange(DateRange);
         void dateRangeTreeWidgetSelectionChanged();
         void dateRangePopup(QPoint);
         void dateRangePopup();

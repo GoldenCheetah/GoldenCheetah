@@ -31,6 +31,7 @@
 #include "Units.h"
 #include "Zones.h"
 #include "Utils.h"
+#include "HelpWhatsThis.h"
 
 #include <QCheckBox>
 #include <QFormLayout>
@@ -115,6 +116,9 @@ class CTableWidgetItem : public QTableWidgetItem
 
 ComparePane::ComparePane(Context *context, QWidget *parent, CompareMode mode) : QWidget(parent), context(context), mode_(mode)
 {
+    HelpWhatsThis *help = new HelpWhatsThis(this);
+    this->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::ComparePane));
+
     QVBoxLayout *layout = new QVBoxLayout(this);
     layout->setContentsMargins(0,0,0,0);
     layout->setSpacing(0);
@@ -181,8 +185,8 @@ ComparePane::refreshTable()
         // metric summary
         QStringList always;
         always << "workout_time" << "total_distance";
-        QString s = appsettings->value(this, GC_SETTINGS_INTERVAL_METRICS, GC_SETTINGS_INTERVAL_METRICS_DEFAULT).toString();
-        if (s == "") s = GC_SETTINGS_INTERVAL_METRICS_DEFAULT;
+        QString s = appsettings->value(this, GC_SETTINGS_FAVOURITE_METRICS, GC_SETTINGS_FAVOURITE_METRICS_DEFAULT).toString();
+        if (s == "") s = GC_SETTINGS_FAVOURITE_METRICS_DEFAULT;
         QStringList metricColumns = always + s.split(","); // always showm metrics plus user defined summary metrics
         metricColumns.removeDuplicates(); // where user has already added workout_time, total_distance
 
@@ -212,8 +216,8 @@ ComparePane::refreshTable()
                 worklist << metric;
                 QString units;
                 // check for both original and translated
-                if (!(m->units(context->athlete->useMetricUnits) == "seconds" || m->units(context->athlete->useMetricUnits) == tr("seconds")))
-                    units = m->units(context->athlete->useMetricUnits);
+                if (!(m->units(GlobalContext::context()->useMetricUnits) == "seconds" || m->units(GlobalContext::context()->useMetricUnits) == tr("seconds")))
+                    units = m->units(GlobalContext::context()->useMetricUnits);
 
                 QString name( Utils::unprotect(m->name()));
                 if (units != "") list << QString("%1 (%2)").arg(name).arg(units);
@@ -289,7 +293,7 @@ ComparePane::refreshTable()
                 if (m) {
                     // get the formated value
                     strValue = metrics.getStringForSymbol(worklist[i],
-                                          context->athlete->useMetricUnits);
+                                          GlobalContext::context()->useMetricUnits);
                 }
 
                 // add to the table
@@ -324,7 +328,6 @@ ComparePane::refreshTable()
         table->resizeColumnsToContents(); // set columns to fit
         table->setVisible(true);
 
-#if QT_VERSION > 0x050000 // fix the first two if we can
         for (int i=0; i<list.count(); i++) {
             if (i < 2) {
                 table->horizontalHeader()->setSectionResizeMode(i, QHeaderView::Fixed);
@@ -332,9 +335,6 @@ ComparePane::refreshTable()
                 table->horizontalHeader()->setSectionResizeMode(i, QHeaderView::Interactive);
             }
         }
-#else
-        table->horizontalHeader()->setResizeMode(QHeaderView::Interactive);
-#endif
         table->horizontalHeader()->setStretchLastSection(true);
 
     } else { //SEASONS
@@ -350,8 +350,8 @@ ComparePane::refreshTable()
         // metric summary
         QStringList always;
         always << "workout_time" << "total_distance";
-        QString s = appsettings->value(this, GC_SETTINGS_SUMMARY_METRICS, GC_SETTINGS_SUMMARY_METRICS_DEFAULT).toString();
-        if (s == "") s = GC_SETTINGS_SUMMARY_METRICS_DEFAULT;
+        QString s = appsettings->value(this, GC_SETTINGS_FAVOURITE_METRICS, GC_SETTINGS_FAVOURITE_METRICS_DEFAULT).toString();
+        if (s == "") s = GC_SETTINGS_FAVOURITE_METRICS_DEFAULT;
         QStringList metricColumns = always + s.split(","); // always showm metrics plus user defined summary metrics
         metricColumns.removeDuplicates(); // where user has already added workout_time, total_distance
 
@@ -383,8 +383,8 @@ ComparePane::refreshTable()
 
                 worklist << metric;
                 QString units;
-                if (!(m->units(context->athlete->useMetricUnits) == "seconds" || m->units(context->athlete->useMetricUnits) == tr("seconds")))
-                    units = m->units(context->athlete->useMetricUnits);
+                if (!(m->units(GlobalContext::context()->useMetricUnits) == "seconds" || m->units(GlobalContext::context()->useMetricUnits) == tr("seconds")))
+                    units = m->units(GlobalContext::context()->useMetricUnits);
                 QString name( Utils::unprotect(m->name()));
                 if (units != "") list << QString("%1 (%2)").arg(name).arg(units);
                 else list << QString("%1").arg(name);
@@ -446,7 +446,7 @@ ComparePane::refreshTable()
             // metrics
             for(int i = 0; i < worklist.count(); i++) {
 
-                QString value = x.sourceContext->athlete->rideCache->getAggregate(worklist[i], x.specification, context->athlete->useMetricUnits);
+                QString value = x.sourceContext->athlete->rideCache->getAggregate(worklist[i], x.specification, GlobalContext::context()->useMetricUnits);
 
                 // add to the table
                 t = new CTableWidgetItem;
@@ -480,7 +480,6 @@ ComparePane::refreshTable()
         table->setVisible(false);
         table->resizeColumnsToContents(); // set columns to fit
         table->setVisible(true);
-#if QT_VERSION > 0x050000 // fix the first two if we can
         for (int i=0; i<list.count(); i++) {
             if (i < 2) {
                 table->horizontalHeader()->setSectionResizeMode(i, QHeaderView::Fixed);
@@ -488,9 +487,6 @@ ComparePane::refreshTable()
                 table->horizontalHeader()->setSectionResizeMode(i, QHeaderView::Interactive);
             }
         }
-#else
-        table->horizontalHeader()->setResizeMode(QHeaderView::Interactive);
-#endif
         table->horizontalHeader()->setStretchLastSection(true);
     }
     // sorting has to be disabled as long as table content is updated
@@ -855,7 +851,7 @@ ComparePane::dropEvent(QDropEvent *event)
             if (matches.count() > 1 ) {
 
                 // sort matches so most recent first
-                qSort(matches.begin(), matches.end(), dateRecentFirst);
+                std::sort(matches.begin(), matches.end(), dateRecentFirst);
 
                 // ok, lets crank up a dialog to ask
                 // one only, or the season to use
@@ -1006,7 +1002,6 @@ ComparePane::dropEvent(QDropEvent *event)
             stream >> add.name;
             stream >> add.start;
             stream >> add.end;
-            stream >> add.days;
 
             // The specification is a date range
             add.specification.setDateRange(DateRange(add.start,add.end));

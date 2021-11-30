@@ -609,11 +609,7 @@ CalDAV::requestGoogleAccessTokenToExecute() {
 
     // get a valid access token
     QByteArray data;
-#if QT_VERSION > 0x050000
     QUrlQuery params;
-#else
-    QUrl params;
-#endif
     QString urlstr = "https://www.googleapis.com/oauth2/v3/token?";
     params.addQueryItem("client_id", GC_GOOGLE_CALENDAR_CLIENT_ID);
 #ifdef GC_GOOGLE_CALENDAR_CLIENT_SECRET
@@ -622,11 +618,7 @@ CalDAV::requestGoogleAccessTokenToExecute() {
     params.addQueryItem("refresh_token", refresh_token);
     params.addQueryItem("grant_type", "refresh_token");
 
-#if QT_VERSION > 0x050000
     data.append(params.query(QUrl::FullyEncoded));
-#else
-    data=params.encodedQuery();
-#endif
 
     // get a new Access Token (since they are just temporarily valid)
     QUrl url = QUrl(urlstr);

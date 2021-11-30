@@ -164,6 +164,14 @@ UserMetric::value(bool metric) const
     else return (value() * conversion()) + conversionSum();
 }
 
+// Apply conversion if needed to the supplied value
+double
+UserMetric::value(double v, bool metric) const
+{
+    if (metric) return v;
+    else return (v * conversion()) + conversionSum();
+}
+
 // for averages the count of items included in the average
 double
 UserMetric::count() const
@@ -184,8 +192,8 @@ UserMetric::isRelevantForRide(const RideItem *item) const
 {
     if (item->context && root) {
         if (frelevant) {
-            Result res = root->eval(rt, frelevant, 0, const_cast<RideItem*>(item), NULL, NULL);
-            return res.number;
+            Result res = root->eval(rt, frelevant, Result(0), 0, const_cast<RideItem*>(item), NULL, NULL);
+            return res.number();
         } else
             return true;
     }
@@ -216,7 +224,7 @@ UserMetric::compute(RideItem *item, Specification spec, const QHash<QString,Ride
 
     //qDebug()<<"INIT";
     // always init first
-    if (finit) root->eval(rt, finit, 0, const_cast<RideItem*>(item), NULL, c, spec);
+    if (finit) root->eval(rt, finit, Result(0), 0, const_cast<RideItem*>(item), NULL, c, spec);
 
     //qDebug()<<"CHECK";
     // can it provide a value and is it relevant ?
@@ -232,7 +240,7 @@ UserMetric::compute(RideItem *item, Specification spec, const QHash<QString,Ride
 
         while(it.hasNext()) {
             struct RideFilePoint *point = it.next();
-            root->eval(rt, fbefore, 0, const_cast<RideItem*>(item), point, c, spec);
+            root->eval(rt, fbefore, Result(0), 0, const_cast<RideItem*>(item), point, c, spec);
         }
     }
 
@@ -243,7 +251,7 @@ UserMetric::compute(RideItem *item, Specification spec, const QHash<QString,Ride
 
         while(it.hasNext()) {
             struct RideFilePoint *point = it.next();
-            root->eval(rt, fsample, 0, const_cast<RideItem*>(item), point, c, spec);
+            root->eval(rt, fsample, Result(0), 0, const_cast<RideItem*>(item), point, c, spec);
         }
     }
 
@@ -253,7 +261,7 @@ UserMetric::compute(RideItem *item, Specification spec, const QHash<QString,Ride
 
         while(it.hasNext()) {
             struct RideFilePoint *point = it.next();
-            root->eval(rt, fafter, 0, const_cast<RideItem*>(item), point, c, spec);
+            root->eval(rt, fafter, Result(0), 0, const_cast<RideItem*>(item), point, c, spec);
         }
     }
 
@@ -261,15 +269,15 @@ UserMetric::compute(RideItem *item, Specification spec, const QHash<QString,Ride
     //qDebug()<<"VALUE";
     // value ?
     if (fvalue) {
-        Result v = root->eval(rt, fvalue, 0, const_cast<RideItem*>(item), NULL, c, spec);
-        setValue(v.number);
+        Result v = root->eval(rt, fvalue, Result(0), 0, const_cast<RideItem*>(item), NULL, c, spec);
+        setValue(v.number());
     }
 
     //qDebug()<<"COUNT";
     // count?
     if (fcount) {
-        Result n = root->eval(rt, fcount, 0, const_cast<RideItem*>(item), NULL, c, spec);
-        setCount(n.number);
+        Result n = root->eval(rt, fcount, Result(0), 0, const_cast<RideItem*>(item), NULL, c, spec);
+        setCount(n.number());
     }
 
     //qDebug()<<symbol()<<index_<<value_<<"ELAPSED="<<timer.elapsed()<<"ms";

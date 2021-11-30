@@ -47,6 +47,12 @@ extern "C" {
 extern PyObject *PyInit_goldencheetah(void);
 };
 
+QString
+PythonEmbed::buildVersion()
+{
+    return QString("%1.%2.%3").arg(PY_MAJOR_VERSION).arg(PY_MINOR_VERSION).arg(PY_MICRO_VERSION);
+}
+
 PythonEmbed::~PythonEmbed()
 {
 }
@@ -91,6 +97,8 @@ bool PythonEmbed::pythonInstalled(QString &pybin, QString &pypath, QString PYTHO
             QString filename = PYTHONHOME + QDir::separator() + name + ext;
             if (QFileInfo(filename).exists() && QFileInfo(filename).isExecutable()) {
                 pythonbinary=filename;
+                pybin=pythonbinary;
+                printd("Binary found");
                 break;
             }
         }
@@ -122,14 +130,14 @@ bool PythonEmbed::pythonInstalled(QString &pybin, QString &pypath, QString PYTHO
 
     // failed to start python
     if (py.waitForStarted(500) == false) {
-        printd("Failed to start: %s\n", pythonbinary.toStdString().c_str());
+        fprintf(stderr, "Failed to start: %s\n", pythonbinary.toStdString().c_str());
         py.terminate();
         return false;
     }
 
     // wait for output, should be rapid
-    if (py.waitForReadyRead(2000)==false) {
-        printd("Didn't get output: %s\n", pythonbinary.toStdString().c_str());
+    if (py.waitForReadyRead(4000)==false) {
+        fprintf(stderr, "Didn't get output: %s\n", pythonbinary.toStdString().c_str());
         py.terminate();
         return false;
     }
@@ -139,7 +147,7 @@ bool PythonEmbed::pythonInstalled(QString &pybin, QString &pypath, QString PYTHO
 
     // close if it didn't already
     if (py.waitForFinished(500)==false) {
-        printd("forced terminate of %s\n", pythonbinary.toStdString().c_str());
+        fprintf(stderr, "forced terminate of %s\n", pythonbinary.toStdString().c_str());
         py.terminate();
     }
 
@@ -162,6 +170,7 @@ bool PythonEmbed::pythonInstalled(QString &pybin, QString &pypath, QString PYTHO
 #else
         pypath = path;
 #endif
+        printd("Python path: %s\n", pypath.toStdString().c_str());
         return true;
 
     } else {
@@ -177,13 +186,34 @@ bool PythonEmbed::pythonInstalled(QString &pybin, QString &pypath, QString PYTHO
 PythonEmbed::PythonEmbed(const bool verbose, const bool interactive) : verbose(verbose), interactive(interactive)
 {
     loaded = false;
+    chart = NULL;
+    perspective = NULL;
     threadid=-1;
     name = QString("GoldenCheetah");
 
-    // config or environment variable
-    QString PYTHONHOME = appsettings->value(NULL, GC_PYTHON_HOME, "").toString();
-    if (PYTHONHOME == "") PYTHONHOME = QProcessEnvironment::systemEnvironment().value("PYTHONHOME", "");
-    else {
+    // register metatypes used to pass between threads
+    qRegisterMetaType<QVector<double> >();
+    qRegisterMetaType<QStringList>();
+
+
+    // Deployed Python location
+    QString deployedPython = QCoreApplication::applicationDirPath();
+#if defined(Q_OS_MAC)
+    deployedPython += "/../Frameworks/Python.framework/Versions/Current";
+#elif defined(Q_OS_LINUX)
+    deployedPython += QString("/opt/python3.%1").arg(PYTHON3_VERSION);
+#endif
+
+    // config, deployed or environment variable
+    QString PYTHONHOME = appsettings->value(NULL, GC_PYTHON_HOME, "").toString().trimmed();
+    if (PYTHONHOME == "") {
+        if (pythonInstalled(pybin, pypath, deployedPython)) {
+            PYTHONHOME = deployedPython;
+            qputenv("PYTHONHOME",PYTHONHOME.toUtf8());
+        } else {
+            PYTHONHOME = QProcessEnvironment::systemEnvironment().value("PYTHONHOME", "");
+        }
+    } else {
         qputenv("PYTHONHOME",PYTHONHOME.toUtf8());
     }
     if (PYTHONHOME !="") printd("PYTHONHOME setting used: %s\n", PYTHONHOME.toStdString().c_str());
@@ -242,6 +272,8 @@ PythonEmbed::PythonEmbed(const bool verbose, const bool interactive) : verbose(v
                                      "        self.value = ''\n"
                                      "    def write(self, txt):\n"
                                      "        self.value += txt\n"
+                                     "    def flush(self):\n"
+                                     "        pass\n"
                                      "catchOutErr = CatchOutErr()\n"
                                      "sys.stdout = catchOutErr\n"
                                      "sys.stderr = catchOutErr\n"

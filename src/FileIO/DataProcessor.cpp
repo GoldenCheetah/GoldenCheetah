@@ -23,6 +23,10 @@
 #include "Settings.h"
 #include "Units.h"
 #include "Colors.h"
+#ifdef GC_WANT_PYTHON
+#include "PythonEmbed.h"
+#include "FixPySettings.h"
+#endif
 
 DataProcessorFactory *DataProcessorFactory::instance_;
 DataProcessorFactory &DataProcessorFactory::instance()
@@ -33,12 +37,46 @@ DataProcessorFactory &DataProcessorFactory::instance()
 
 bool DataProcessorFactory::autoprocess = true;
 
+DataProcessorFactory::~DataProcessorFactory()
+{
+    qDeleteAll(processors);
+}
+
 bool
 DataProcessorFactory::registerProcessor(QString name, DataProcessor *processor)
 {
     if (processors.contains(name)) return false; // don't register twice!
     processors.insert(name, processor);
     return true;
+}
+
+void
+DataProcessorFactory::unregisterProcessor(QString name)
+{
+    if (!processors.contains(name)) return;
+    DataProcessor *processor = processors.value(name);
+    processors.remove(name);
+    delete processor;
+}
+
+QMap<QString, DataProcessor *>
+DataProcessorFactory::getProcessors(bool coreProcessorsOnly) const
+{
+#ifdef GC_WANT_PYTHON
+    fixPySettings->initialize();
+#endif
+
+    if (!coreProcessorsOnly) return processors;
+
+    QMap<QString, DataProcessor *> coreProcessors;
+    QMapIterator<QString, DataProcessor*> i(processors);
+    i.toFront();
+    while (i.hasNext()) {
+        i.next();
+        if (i.value()->isCoreProcessor()) coreProcessors.insert(i.key(), i.value());
+    }
+
+    return coreProcessors;
 }
 
 bool
@@ -49,6 +87,10 @@ DataProcessorFactory::autoProcess(RideFile *ride, QString mode, QString op)
 
     // check if autoProcess is allow at all
     if (!autoprocess) return false;
+
+#ifdef GC_WANT_PYTHON
+    fixPySettings->initialize();
+#endif
 
     bool changed = false;
 
@@ -92,7 +134,7 @@ ManualDataProcessorDialog::ManualDataProcessorDialog(Context *context, QString n
     QLabel *explainLabel = new QLabel(tr("Description"), this);
     explainLabel->setFont(font);
 
-    config = processor->processorConfig(this);
+    config = processor->processorConfig(this, ride->ride());
     config->readConfig();
     explain = new QTextEdit(this);
     explain->setText(config->explain());

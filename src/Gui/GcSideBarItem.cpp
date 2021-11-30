@@ -26,33 +26,30 @@
 static int bigHandle = 23;
 static int smallHandle = 18;
 
-// creates an icon in the apple style of gray emboss
-QIcon iconFromPNG(QString filename, bool emboss)
+// creates an icon with a modern style
+QIcon iconFromPNG(QString filename, bool )
 {
     QImage pngImage;
     pngImage.load(filename);
 
     // use muted dark gray color
     QImage gray8 = pngImage.convertToFormat(QImage::Format_Indexed8);
-    gray8.setColor(0, QColor(80,80,80, 170).rgb());
+    gray8.setColor(0, QColor(127,127,127,127).rgb());
 
-    if (GCColor::isFlat()) return QIcon(QPixmap::fromImage(gray8));
+    return QIcon(QPixmap::fromImage(gray8));
+}
 
-    QImage white8 = pngImage.convertToFormat(QImage::Format_Indexed8);
-    white8.setColor(0, QColor(255,255,255, 255).rgb());
+QIcon iconFromPNG(QString filename, QSize size)
+{
+    QImage pngImage;
+    pngImage.load(filename);
 
-    // now convert to a format we can paint with!
-    QImage white = white8.convertToFormat(QImage::Format_ARGB32_Premultiplied);
-    QImage gray = gray8.convertToFormat(QImage::Format_ARGB32_Premultiplied);
+    // use muted dark gray color
+    QImage gray8 = pngImage.convertToFormat(QImage::Format_Indexed8);
+    gray8.setColor(0, QColor(127,127,127, 127).rgb());
 
-    QPainter painter;
-    painter.begin(&white);
-    painter.setBackgroundMode(Qt::TransparentMode);
-    if (emboss) painter.drawImage(0,-1, gray);
-    else painter.drawImage(0,0, gray);
-    painter.end();
+    return QIcon(QPixmap::fromImage(gray8,Qt::ColorOnly|Qt::PreferDither|Qt::DiffuseAlphaDither).scaled(size, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
 
-    return QIcon(QPixmap::fromImage(white));
 }
 
 //
@@ -290,8 +287,8 @@ GcSplitterHandle::init(QString title, Qt::Orientation orientation,
     // set handle size according to font metric
     QFont font;
     QFontMetrics fm(font);
-    bigHandle = fm.height() + 5;
-    smallHandle = fm.height() + 2;
+    bigHandle = fm.height() + 16;
+    smallHandle = fm.height() + 5;
 
     // use the sizes as set
     if (metal) setFixedHeight(bigHandle);
@@ -347,7 +344,7 @@ GcSplitterHandle::addActions(QList<QAction*> actions)
         QToolButton *p = new QToolButton(this);
         p->setStyleSheet("QToolButton { border: none; padding: 0px; }");
         p->setAutoFillBackground(false);
-        p->setFixedSize(20*dpiXFactor,20*dpiYFactor);
+        p->setFixedSize(22*dpiXFactor,22*dpiYFactor);
         p->setIcon(action->icon());
         p->setIconSize(QSize(10*dpiXFactor,10*dpiYFactor));
         p->setFocusPolicy(Qt::NoFocus);
@@ -402,8 +399,8 @@ GcSplitterHandle::paintBackground(QPaintEvent *)
 GcSplitterControl::GcSplitterControl(QWidget *parent) : QToolBar(parent)
 {
     setContentsMargins(0,0,0,0);
-    setFixedHeight(20 *dpiYFactor);
-    setIconSize(QSize(14 *dpiXFactor,14 *dpiYFactor));
+    setFixedHeight(22 *dpiYFactor);
+    setIconSize(QSize(18 *dpiXFactor,18 *dpiYFactor));
     setToolButtonStyle(Qt::ToolButtonIconOnly);
     setAutoFillBackground(false);
 
@@ -429,8 +426,8 @@ GcSplitterControl::paintBackground(QPaintEvent *)
     // setup a painter and the area to paint
     QPainter painter(this);
 
-    QLinearGradient active = GCColor::linearGradient(20 *dpiYFactor, true);
-    QLinearGradient inactive = GCColor::linearGradient(20 *dpiYFactor, false);
+    QLinearGradient active = GCColor::linearGradient(22 *dpiYFactor, true);
+    QLinearGradient inactive = GCColor::linearGradient(22 *dpiYFactor, false);
 
     // fill with a linear gradient
     painter.setPen(Qt::NoPen);

@@ -168,7 +168,7 @@ void
 AllPlotInterval::sortIntervals(QList<IntervalItem*> &intervals, QList< QList<IntervalItem*> > &intervalsGroups)
 {
     // Sort by duration
-    qSort(intervals.begin(), intervals.end(), intervalBiggerThan);
+    std::sort(intervals.begin(), intervals.end(), intervalBiggerThan);
 
     QList<IntervalItem*> matchesGroup;
 
@@ -340,7 +340,7 @@ double
 AllPlotIntervalData::x(size_t i) const
 {
     //if (interval == NULL) return 0; // out of bounds !?
-    double multiplier = context->athlete->useMetricUnits ? 1 : MILES_PER_KM;
+    double multiplier = GlobalContext::context()->useMetricUnits ? 1 : MILES_PER_KM;
 
     // which point are we returning?
     switch (i%4) {

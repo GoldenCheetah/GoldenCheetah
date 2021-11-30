@@ -183,6 +183,7 @@ DateRange::DateRange(const DateRange &other) : QObject()
     to=other.to;
     name=other.name;
     color=other.color;
+    id = other.id;
     valid = from.isValid() && to.isValid();
 }
 

@@ -81,6 +81,8 @@ class WPrime {
         static int zoneCount() { return 4; }
         static QString zoneName(int i);
         static QString zoneDesc(int i);
+        static int zoneLo(int i, int WPRIME);
+        static int zoneHi(int i, int WPRIME);
 
     private:
 

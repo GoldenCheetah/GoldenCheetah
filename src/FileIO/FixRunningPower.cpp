@@ -21,6 +21,7 @@
 #include "Settings.h"
 #include "Units.h"
 #include "HelpWhatsThis.h"
+#include "LocationInterpolation.h"
 #include <algorithm>
 #include <QVector>
 
@@ -62,7 +63,7 @@ class FixRunningPowerConfig : public DataProcessorConfig
             equipWeightLabel = new QLabel(tr("Equipment Weight (kg)"));
             draftMLabel = new QLabel(tr("Draft mult."));
             windSpeedLabel = new QLabel(tr("Wind (kph)"));
-            windHeadingLabel = new QLabel(tr(", heading"));
+            windHeadingLabel = new QLabel(tr(", direction"));
 
             equipWeight = new QDoubleSpinBox();
             equipWeight->setMaximum(9.9);
@@ -117,8 +118,10 @@ class FixRunningPowerConfig : public DataProcessorConfig
                               "wind speed shall be indicated in kph\n"
                               "wind direction (origin) unit is degrees "
                               "from -179 to +180 (-90=W, 0=N, 90=E, 180=S)\n"
-                              "Note: if the file already contain wind data "
-                              "it will be overridden if wind is entered")));
+                              "Note: when the file already contains wind data, "
+                              "it will be overridden if wind speed is set\n\n"
+                              "The activity has to be a Run with Speed and "
+                              "Altitude.")));
         }
 
         void readConfig() {
@@ -151,7 +154,8 @@ class FixRunningPower : public DataProcessor {
         bool postProcess(RideFile *, DataProcessorConfig* config, QString op);
 
         // the config widget
-        DataProcessorConfig* processorConfig(QWidget *parent) {
+        DataProcessorConfig* processorConfig(QWidget *parent, const RideFile * ride = NULL) {
+            Q_UNUSED(ride);
             return new FixRunningPowerConfig(parent);
         }
 
@@ -166,7 +170,6 @@ static bool FixRunningPowerAdded = DataProcessorFactory::instance().registerProc
 bool
 FixRunningPower::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString op="")
 {
-    Q_UNUSED(config)
     Q_UNUSED(op)
 
     // get settings
@@ -186,8 +189,11 @@ FixRunningPower::postProcess(RideFile *ride, DataProcessorConfig *config=0, QStr
         windHeading = ((FixRunningPowerConfig*)(config))->windHeading->value() / 180 * MATHCONST_PI; // rad
     }
 
-    // if not a run or its already there do nothing !
-    if (!ride->isRun() || ride->areDataPresent()->watts) return false;
+    // if not a run do nothing !
+    if (!ride->isRun()) return false;
+
+    // if called automatically and power already present, do nothing !
+    if (!config && ride->areDataPresent()->watts) return false;
 
     // no dice if we don't have alt and speed
     if (!ride->areDataPresent()->alt || !ride->areDataPresent()->kph) return false;
@@ -196,7 +202,7 @@ FixRunningPower::postProcess(RideFile *ride, DataProcessorConfig *config=0, QStr
     double H = ride->getHeight(); //Height in m
     double M = ride->getWeight(); //Weight kg
     double Mtotal = M + MEquip;
-    double T = 15; //Temp degC in not in ride data
+    double T = 15; // Temp degC if not in ride data
     double W = 0;  // headwind (from records or based on wind parameters entered manually)
     double bearing = 0.0; //runner direction used to compute headwind
     double Cx = 0.9; // Axial force coefficient
@@ -207,8 +213,7 @@ FixRunningPower::postProcess(RideFile *ride, DataProcessorConfig *config=0, QStr
     // apply the change
     ride->command->startLUW("Estimate Running Power");
 
-    if (ride->areDataPresent()->slope && ride->areDataPresent()->alt
-     && ride->areDataPresent()->km) {
+    if (ride->areDataPresent()->slope) {
         for (int i=0; i<ride->dataPoints().count(); i++) {
             RideFilePoint *p = ride->dataPoints()[i];
 
@@ -218,11 +223,16 @@ FixRunningPower::postProcess(RideFile *ride, DataProcessorConfig *config=0, QStr
                 RideFilePoint *prevPoint = ride->dataPoints()[i-1];
 
                 // ensure a movement occurred and valid lat/lon in order to compute cyclist direction
-                if (  (prevPoint->lat != p->lat || prevPoint->lon != p->lon )
-                   && (prevPoint->lat != 0 || prevPoint->lon != 0 )
-                   && (p->lat != 0 || p->lon != 0 ) )
-                            bearing = atan2(cos(p->lat)*sin(p->lon - prevPoint->lon),
-                                            cos(prevPoint->lat)*sin(p->lat)-sin(prevPoint->lat)*cos(p->lat)*cos(p->lon - prevPoint->lon));
+                if (prevPoint->lat != p->lat || prevPoint->lon != p->lon)
+                {
+                    geolocation prevLoc(prevPoint->lat, prevPoint->lon, prevPoint->alt);
+                    geolocation loc(p->lat, p->lon, p->alt);
+
+                    if (prevLoc.IsReasonableGeoLocation() && loc.IsReasonableGeoLocation())
+                    {
+                        bearing = prevLoc.BearingTo(loc);
+                    }
+                }
             }
             // else keep previous bearing (or 0 at the beginning)
 
@@ -244,7 +254,7 @@ FixRunningPower::postProcess(RideFile *ride, DataProcessorConfig *config=0, QStr
             double forw = Cr * Mtotal * eff * V;
             double aero = 0.5 * rho * Cx * FA * DraftM * (vw*vw) * V;
             double grav = 9.81 * Mtotal * sin(Slope) * V;
-            double chgV = p->kphd > 1 ? 1 : p->kphd * Mtotal * V;
+            double chgV = (p->kphd > 1 ? 1 : p->kphd) * Mtotal * V;
 
             // Power = moving forward + aerodynamic + gravity + change of speed
             double watts = forw + aero + grav + chgV;

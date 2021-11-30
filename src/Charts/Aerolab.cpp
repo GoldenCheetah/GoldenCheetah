@@ -138,7 +138,7 @@ double IntervalAerolabData::x
 
     if ( current != NULL )
     {
-        double multiplier = context->athlete->useMetricUnits ? 1 : MILES_PER_KM;
+        double multiplier = GlobalContext::context()->useMetricUnits ? 1 : MILES_PER_KM;
         // which point are we returning?
 //qDebug() << "number = " << number << endl;
         switch ( number % 4 )
@@ -349,7 +349,7 @@ Aerolab::setData(RideItem *_rideItem, bool new_zoom) {
               if ( constantAlt && !dataPresent->alt)
                   altArray[arrayLength] = 0;
               else
-                altArray[arrayLength] = (context->athlete->useMetricUnits
+                altArray[arrayLength] = (GlobalContext::context()->useMetricUnits
                    ? p1->alt
                    : p1->alt * FEET_PER_METER);
           }
@@ -369,7 +369,7 @@ Aerolab::setData(RideItem *_rideItem, bool new_zoom) {
       //d += v * dt;
       //distanceArray[arrayLength] = d/1000;
 
-      distanceArray[arrayLength] = p1->km;
+      distanceArray[arrayLength] = p1->km * (GlobalContext::context()->useMetricUnits ? 1 : MILES_PER_KM);
 
 
 
@@ -382,7 +382,7 @@ Aerolab::setData(RideItem *_rideItem, bool new_zoom) {
 
       f *= eta; // adjust for drivetrain efficiency if using a crank-based meter
       double s   = slope( f, a, m, crr, cda, rho, headwind );
-      double de  = s * v * dt * (context->athlete->useMetricUnits ? 1 : FEET_PER_METER);
+      double de  = s * v * dt * (GlobalContext::context()->useMetricUnits ? 1 : FEET_PER_METER);
 
       e += de;
       t += dt;
@@ -499,7 +499,7 @@ Aerolab::setYMax(bool new_zoom)
           if (veCurve->isVisible())
           {
 
-             if ( context->athlete->useMetricUnits )
+             if ( GlobalContext::context()->useMetricUnits )
 
              {
 
@@ -576,7 +576,7 @@ void
 Aerolab::setXTitle() {
 
   if (bydist)
-    setAxisTitle(xBottom, tr("Distance ")+QString(context->athlete->useMetricUnits?"(km)":"(miles)"));
+    setAxisTitle(xBottom, tr("Distance ")+QString(GlobalContext::context()->useMetricUnits?"(km)":"(miles)"));
   else
     setAxisTitle(xBottom, tr("Time (minutes)"));
 }
@@ -753,7 +753,7 @@ void Aerolab::refreshIntervalMarkers()
             if (!bydist)
                 mrk->setValue(interval->start / 60.0, 0.0);
             else
-                mrk->setValue((context->athlete->useMetricUnits ? 1 : MILES_PER_KM) *
+                mrk->setValue((GlobalContext::context()->useMetricUnits ? 1 : MILES_PER_KM) *
                                 interval->startKM, 0.0);
             mrk->setLabel(text);
         }

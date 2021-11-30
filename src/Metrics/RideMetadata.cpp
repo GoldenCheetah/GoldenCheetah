@@ -24,13 +24,13 @@
 #include "RideItem.h"
 #include "Context.h"
 #include "Athlete.h"
-#include "RideSummaryWindow.h"
 #include "Settings.h"
 #include "Colors.h"
 #include "Units.h"
-#include "TabView.h"
+#include "AbstractView.h"
 #include "HelpWhatsThis.h"
 #include "Utils.h"
+#include "RideEditor.h"
 
 #include <QXmlDefaultHandler>
 #include <QtGui>
@@ -43,46 +43,55 @@
 #define ourRideItem meta->property("ride").value<RideItem*>()
 
 /*----------------------------------------------------------------------
- * Master widget for Metadata Entry "on" RideSummaryWindow
+ * Master widget for Metadata Entry
  *--------------------------------------------------------------------*/
 RideMetadata::RideMetadata(Context *context, bool singlecolumn) :
-    QWidget(context->mainWindow), singlecolumn(singlecolumn), context(context)
+    QWidget(context != NULL ? context->mainWindow : NULL), singlecolumn(singlecolumn), context(context)
 {
 
-    _ride = _connected = NULL;
+    if (context) {
+        _ride = _connected = NULL;
 
-    QVBoxLayout *mainLayout = new QVBoxLayout(this);
-    mainLayout->setSpacing(0);
-    mainLayout->setContentsMargins(0,0,0,0);
+        QVBoxLayout *mainLayout = new QVBoxLayout(this);
+        mainLayout->setSpacing(0);
+        mainLayout->setContentsMargins(0,0,0,0);
 
-    HelpWhatsThis *help = new HelpWhatsThis(this);
-    this->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::ChartRides_Details));
+        HelpWhatsThis *help = new HelpWhatsThis(this);
+        this->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::ChartRides_Details));
 
-    // setup the tabs widget
-    tabs = new QTabWidget(this);
-    tabs->setMovable(true);
+        // setup the tabs widget
+        tabs = new QTabWidget(this);
+        tabs->setMovable(false);
+        tabs->setContentsMargins(0,0,0,0);
 
-    // better styling on Linux with fusion controls
+        // better styling on Linux with fusion controls
 #ifndef Q_OS_MAC
-    QStyle *fusion = QStyleFactory::create(OS_STYLE);
-    tabs->setStyle(fusion);
+        QStyle *fusion = QStyleFactory::create(OS_STYLE);
+        tabs->setStyle(fusion);
 #endif
-    mainLayout->addWidget(tabs);
+        mainLayout->addWidget(tabs);
 
-    // read in metadata.xml and setup the tabs etc
-    qRegisterMetaType<RideItem*>("ride");
+        // read in metadata.xml and setup the tabs etc
+        qRegisterMetaType<RideItem*>("ride");
 
-    extraForm = new Form(this);
+        extraForm = new Form(this);
+        editor = new RideEditor(context);
 
+        // Extra tab is expensive to update so we only update if it
+        // is visible. In this case we need to trigger refresh when the
+        // tab is selected -or- when the ride changes. Below is for tab.
+        connect(tabs, SIGNAL(currentChanged(int)), this, SLOT(setExtraTab()));
+        connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
+
+    } else {
+
+        // we are not a real widget
+        hide();
+    }
+
+    // read config in
     configChanged(CONFIG_FIELDS | CONFIG_APPEARANCE);
 
-    // watch for config changes
-    connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
-
-    // Extra tab is expensive to update so we only update if it
-    // is visible. In this case we need to trigger refresh when the
-    // tab is selected -or- when the ride changes. Below is for tab.
-    connect(tabs, SIGNAL(currentChanged(int)), this, SLOT(setExtraTab()));
 }
 
 void
@@ -99,6 +108,7 @@ RideMetadata::setRideItem(RideItem *ride)
         setExtraTab();
         metadataChanged();
     }
+    editor->rideSelected(ride);
 }
 
 void
@@ -226,84 +236,209 @@ RideMetadata::metadataChanged()
 void
 RideMetadata::configChanged(qint32)
 {
-    setProperty("color", GColor(CPLOTBACKGROUND));
+    // read global metadata.xml
+    QString filename = QDir(gcroot).absolutePath()+"/metadata.xml";
 
-    palette = QPalette();
+    // no global metadata.xml, so construct from old athlete specific ones
+    // if none of those exist, then drop back to the built in one
+    if (QFile(filename).exists()) {
 
-    palette.setColor(QPalette::Window, GColor(CPLOTBACKGROUND));
-    palette.setColor(QPalette::Background, GColor(CPLOTBACKGROUND));
+        // read in existing file
+        readXML(filename, keywordDefinitions, fieldDefinitions, colorfield, defaultDefinitions);
 
-    // only change base if moved away from white plots
-    // which is a Mac thing
-#ifndef Q_OS_MAC
-    if (GColor(CPLOTBACKGROUND) != Qt::white)
-#endif
-    {
-        palette.setColor(QPalette::Base, GCColor::alternateColor(GColor(CPLOTBACKGROUND)));
-        palette.setColor(QPalette::Window,  GColor(CPLOTBACKGROUND));
-    }
+    } else {
 
-    palette.setColor(QPalette::WindowText, GCColor::invertColor(GColor(CPLOTBACKGROUND)));
-    palette.setColor(QPalette::Text, GCColor::invertColor(GColor(CPLOTBACKGROUND)));
-    setPalette(palette);
-    tabs->setPalette(palette);
+        // prior to v3.6 the metadata configuration was athlete specific
+        // this was changed to be global configuration since other global
+        // settings are dependant on them, notably user metrics
+        bool first=true;
+        QStringListIterator i(QDir(gcroot).entryList(QDir::Dirs | QDir::NoDotAndDotDot));
+        while (i.hasNext()) {
 
-    // use default font
-    setFont(QFont());
+            QString name = i.next();
 
-    // read metadata.xml
-    QString filename = context->athlete->home->config().absolutePath()+"/metadata.xml";
-    if (!QFile(filename).exists()) filename = ":/xml/metadata.xml";
-    readXML(filename, keywordDefinitions, fieldDefinitions, colorfield, defaultDefinitions);
+            // if there is no metadata.xml it is not an athlete folder
+            // or it is one still using default metadata.xml, so skip it
+            // since there is no custom configuration to preserve.
+            QString filename = gcroot + "/" + name + "/config/metadata.xml";
+            if (!QFile(filename).exists()) continue;
 
-    // wipe existing tabs
-    QMapIterator<QString, Form*> d(tabList);
-    d.toFront();
-    while (d.hasNext()) {
-           d.next();
-           tabs->removeTab(tabs->indexOf(d.value()));
-           delete d.value();
-    }
-    tabList.clear();
-    formFields.empty();
+            // athlete specific configuration
+            QList<KeywordDefinition> a_keywordDefinitions;
+            QList<FieldDefinition>   a_fieldDefinitions;
+            QList<DefaultDefinition>   a_defaultDefinitions;
+            QString a_colorfield;
 
+            // read in athlete specific
+            readXML(filename, a_keywordDefinitions, a_fieldDefinitions, a_colorfield, a_defaultDefinitions);
 
-    // create forms and populate with fields
-    for(int i=0; i<fieldDefinitions.count(); i++) {
+            // first one, just use them all
+            if (first) {
 
-        if (fieldDefinitions[i].tab == "") continue; // not to be shown!
+                // just adopt all the config for the first athlete found
+                keywordDefinitions = a_keywordDefinitions;
+                fieldDefinitions = a_fieldDefinitions;
+                defaultDefinitions = a_defaultDefinitions;
+                colorfield = a_colorfield;
 
-        Form *form;
-        QString tabName = specialTabs.displayName(fieldDefinitions[i].tab);
-        if ((form = tabList.value(tabName, NULL)) == NULL) {
-            form = new Form(this);
-            tabs->addTab(form, tabName);
-            tabList.insert(tabName, form);
+                first = false;
+
+            } else {
+
+                // now we just append any that we don't already have
+                // might be a bit awks but at least nothing is lost
+                // user can always go an edit them in settings anyway
+                foreach(KeywordDefinition x, a_keywordDefinitions) {
+
+                    bool found=false;
+                    foreach(KeywordDefinition e, keywordDefinitions) {
+                        if (e.name == x.name) found=true;
+                    }
+                    if (!found) {
+                        keywordDefinitions.append(x);
+                    }
+                }
+
+                foreach(FieldDefinition x, a_fieldDefinitions) {
+
+                    bool found=false;
+                    foreach(FieldDefinition e, fieldDefinitions) {
+                        if (e.tab == x.tab && e.name == x.name) found=true;
+                    }
+                    if (!found) {
+                        fieldDefinitions.append(x);
+                    }
+                }
+
+                foreach(DefaultDefinition x, a_defaultDefinitions) {
+
+                    bool found=false;
+                    foreach(DefaultDefinition e, defaultDefinitions) {
+                        if (e.field == x.field && e.value == x.value) found=true;
+                    }
+                    if (!found) {
+                        defaultDefinitions.append(x);
+                    }
+                }
+            }
         }
-        form->addField(fieldDefinitions[i]);
+
+        // eek, we didn't find anything - new install with no athletes yet
+        if (first == true) {
+
+            // use the default setup
+            filename = ":/xml/metadata.xml";
+            readXML(filename, keywordDefinitions, fieldDefinitions, colorfield, defaultDefinitions);
+        }
+
+        // write out global file now, so we don't keep doing this
+        // "upgrade" process every time we open an athlete etc
+        filename = QDir(gcroot).absolutePath()+"/metadata.xml";
+        serialize(filename, keywordDefinitions, fieldDefinitions, colorfield, defaultDefinitions);
     }
 
-    // get forms arranged
-    QMapIterator<QString, Form*> i(tabList);
-    i.toFront();
-    while (i.hasNext()) {
-           i.next();
-           i.value()->arrange();
-    }
+    if (context) { // global doesn't have all the widgets etc
+        setProperty("color", GColor(CPLOTBACKGROUND));
 
-    // add extra back
-    tabs->addTab(extraForm, "Extra");
+        palette = QPalette();
 
-    // set Extra tab for current ride
-    setExtraTab();
+        palette.setColor(QPalette::Window, GColor(CPLOTBACKGROUND));
+        palette.setColor(QPalette::Background, GColor(CPLOTBACKGROUND));
 
-    // when constructing we have not registered
-    // the properties nor selected a ride
+        // only change base if moved away from white plots
+        // which is a Mac thing
 #ifndef Q_OS_MAC
-    tabs->setStyleSheet(TabView::ourStyleSheet());
+        if (GColor(CPLOTBACKGROUND) != Qt::white)
 #endif
+        {
+            palette.setColor(QPalette::Base, GCColor::alternateColor(GColor(CPLOTBACKGROUND)));
+            palette.setColor(QPalette::Window,  GColor(CPLOTBACKGROUND));
+        }
 
-    metadataChanged(); // re-read the values!
+        palette.setColor(QPalette::WindowText, GCColor::invertColor(GColor(CPLOTBACKGROUND)));
+        palette.setColor(QPalette::Text, GCColor::invertColor(GColor(CPLOTBACKGROUND)));
+        setPalette(palette);
+        tabs->setPalette(palette);
+
+        // use default font
+        setFont(QFont());
+
+        // wipe existing tabs
+        QMapIterator<QString, Form*> d(tabList);
+        d.toFront();
+        while (d.hasNext()) {
+               d.next();
+               tabs->removeTab(tabs->indexOf(d.value()));
+               delete d.value();
+        }
+        tabList.clear();
+        formFields.empty();
+
+        // remove editor if it exists
+        if (tabs->count() > 0) tabs->removeTab(tabs->count()-1);
+
+        // create forms and populate with fields
+        for(int i=0; i<fieldDefinitions.count(); i++) {
+
+            if (fieldDefinitions[i].tab == "") continue; // not to be shown!
+
+            Form *form;
+            QString tabName = specialTabs.displayName(fieldDefinitions[i].tab);
+            if ((form = tabList.value(tabName, NULL)) == NULL) {
+                form = new Form(this);
+                tabs->addTab(form, tabName);
+                tabList.insert(tabName, form);
+            }
+            form->addField(fieldDefinitions[i]);
+        }
+
+        // get forms arranged
+        QMapIterator<QString, Form*> i(tabList);
+        i.toFront();
+        while (i.hasNext()) {
+               i.next();
+               i.value()->arrange();
+        }
+
+        // add extra back
+        tabs->addTab(extraForm, "Extra");
+
+        // set Extra tab for current ride
+        setExtraTab();
+
+        // add editor
+        tabs->addTab(editor, "Raw Data");
+
+        // tab bar look reasonably modern
+        QString styling = QString("QTabWidget { background: %1; }"
+                              "QTabWidget::pane { border: 0px; }"
+#ifdef Q_OS_MAC
+                              "QLineEdit { border: 0px; background-color: %7; color: %6; }"
+                              "QDateEdit { border: 0px; background-color: %7; color: %6; }"
+                              "QTimeEdit { border: 0px; background-color: %7; color: %6; }"
+                              "QSpinBox { border: 0px; background-color: %7; color: %6; }"
+                              "QDoubleSpinBox { border: 0px; background-color: %7; color: %6; }"
+#endif
+                              "QTabBar::tab { background: %1; "
+                              "               color: %6; "
+                              "               min-width: %5px; "
+                              "               padding: %4px; "
+                              "               border-top: 0px;"
+                              "               border-left: 0px;"
+                              "               border-right: 0px;"
+                              "               border-bottom: %3px solid %1; } "
+                              "QTabBar::tab:selected { border-bottom-right-radius: 0px; border-bottom-left-radius: 0px; border-bottom-color: %2; }"
+                             ).arg(GColor(CPLOTBACKGROUND).name())                        // 1 tab background color
+                              .arg(GColor(CPLOTMARKER).name())                            // 2 selected bar color
+                              .arg(4*dpiYFactor)                                          // 3 selected bar width
+                              .arg(2*dpiXFactor)                                          // 4 padding
+                              .arg(75*dpiXFactor)                                         // 5 tab minimum width
+                              .arg(GCColor::invertColor(GColor(CPLOTBACKGROUND)).name())  // 6 tab text color
+                              .arg( GCColor::alternateColor(GColor(CPLOTBACKGROUND)).name()); // 7 lineedit background
+        tabs->setStyleSheet(styling);
+
+        metadataChanged(); // re-read the values!
+    }
 }
 
 void
@@ -317,6 +452,16 @@ QVector<FormField *> RideMetadata::getFormFields()
     return formFields;
 }
 
+// Are there fields enabled for CalendarText?
+bool
+RideMetadata::hasCalendarText()
+{
+    foreach (FieldDefinition field, getFields()) {
+        if (field.diary) return true;
+    }
+    return false;
+}
+
 // Construct the summary text used on the calendar
 QString
 RideMetadata::calendarText(RideItem *rideItem)
@@ -328,8 +473,8 @@ RideMetadata::calendarText(RideItem *rideItem)
         QString fieldName = (field.name == "Weight") ? "Athlete Weight" :
                                                        field.name;
         QString value;
-        if (context->specialFields.isMetric(fieldName)) {
-            value = rideItem->getStringForSymbol(context->specialFields.rideMetric(fieldName)->symbol(), context->athlete->useMetricUnits);
+        if (GlobalContext::context()->specialFields.isMetric(fieldName)) {
+            value = rideItem->getStringForSymbol(GlobalContext::context()->specialFields.rideMetric(fieldName)->symbol(), GlobalContext::context()->useMetricUnits);
         } else {
             value = rideItem->getText(fieldName, "");
         }
@@ -337,6 +482,28 @@ RideMetadata::calendarText(RideItem *rideItem)
     }
 
     return calendarText;
+}
+
+// Sports, as displayed to users
+QStringList
+RideMetadata::sports()
+{
+    QStringList sportList;
+    foreach (FieldDefinition field, getFields()) {
+        if (field.name == "Sport") {
+            sportList = field.values;
+	    break;
+        }
+    }
+
+    // Ensure default sport
+    bool hasBike = false;
+    foreach (QString sport, sportList) {
+        if (RideFile::sportTag(sport) == "Bike") hasBike = true;
+    }
+    if (!hasBike) sportList.prepend(tr("Bike"));
+
+    return sportList;
 }
 
 /*----------------------------------------------------------------------
@@ -380,6 +547,7 @@ Form::initialise()
 {
     setPalette(meta->palette);
     contents = new QWidget;
+    contents->setContentsMargins(5*dpiXFactor, 20*dpiXFactor,5*dpiXFactor,5*dpiXFactor); // padding between tabbar and fields
     contents->setPalette(meta->palette);
 
     QVBoxLayout *mainLayout = new QVBoxLayout(contents);
@@ -452,7 +620,7 @@ Form::arrange()
 
         here->addWidget(fields[i]->label, y, 0, labelalignment);
 
-        if (meta->context->specialFields.isMetric(fields[i]->definition.name)) {
+        if (GlobalContext::context()->specialFields.isMetric(fields[i]->definition.name)) {
             QHBoxLayout *override = new QHBoxLayout;
             overrides.append(override);
 
@@ -480,9 +648,9 @@ FormField::FormField(FieldDefinition field, RideMetadata *meta) : definition(fie
     enabled = NULL;
     isTime = false;
 
-    if (meta->context->specialFields.isMetric(field.name)) {
+    if (GlobalContext::context()->specialFields.isMetric(field.name)) {
         field.type = FIELD_DOUBLE; // whatever they say, we want a double!
-        units = meta->context->specialFields.rideMetric(field.name)->units(meta->context->athlete->useMetricUnits);
+        units = GlobalContext::context()->specialFields.rideMetric(field.name)->units(GlobalContext::context()->useMetricUnits);
         // remove "seconds", since the field will be a QTimeEdit field
         if (units == "seconds" || units == tr("seconds")) units = "";
         // layout units name for screen
@@ -491,10 +659,10 @@ FormField::FormField(FieldDefinition field, RideMetadata *meta) : definition(fie
 
     // we need to show what units we use for weight...
     if (field.name == "Weight" && field.type == FIELD_DOUBLE) {
-        units = meta->context->athlete->useMetricUnits ? tr(" (kg)") : tr (" (lbs)");
+        units = GlobalContext::context()->useMetricUnits ? tr(" (kg)") : tr (" (lbs)");
     }
 
-    label = new QLabel(QString("%1%2").arg(meta->context->specialFields.displayName(field.name)).arg(units), this);
+    label = new QLabel(QString("%1%2").arg(GlobalContext::context()->specialFields.displayName(field.name)).arg(units), this);
     label->setPalette(meta->palette);
     //label->setFont(font);
     //label->setFixedHeight(18);
@@ -535,9 +703,7 @@ FormField::FormField(FieldDefinition field, RideMetadata *meta) : definition(fie
     case FIELD_INTEGER : // integer
         widget = new QSpinBox(this);
         //widget->setFixedHeight(18);
-        ((QSpinBox*)widget)->setSingleStep(1);
-        ((QSpinBox*)widget)->setMinimum(-99999999);
-        ((QSpinBox*)widget)->setMaximum(99999999);
+        ((QSpinBox*)widget)->setButtonSymbols(QAbstractSpinBox::NoButtons);
         connect (widget, SIGNAL(valueChanged(int)), this, SLOT(dataChanged()));
         connect (widget, SIGNAL(editingFinished()), this, SLOT(editFinished()));
         break;
@@ -545,14 +711,12 @@ FormField::FormField(FieldDefinition field, RideMetadata *meta) : definition(fie
     case FIELD_DOUBLE : // double
         widget = new QDoubleSpinBox(this);
         //widget->setFixedHeight(18);
-        ((QDoubleSpinBox*)widget)->setSingleStep(0.01);
-        ((QDoubleSpinBox*)widget)->setMinimum(-999999.99);
-        ((QDoubleSpinBox*)widget)->setMaximum(999999.99);
-        if (meta->context->specialFields.isMetric(field.name)) {
+        ((QDoubleSpinBox*)widget)->setButtonSymbols(QAbstractSpinBox::NoButtons);
+        if (GlobalContext::context()->specialFields.isMetric(field.name)) {
 
             enabled = new QCheckBox(this);
             connect(enabled, SIGNAL(stateChanged(int)), this, SLOT(stateChanged(int)));
-            units = meta->context->specialFields.rideMetric(field.name)->units(meta->context->athlete->useMetricUnits);
+            units = GlobalContext::context()->specialFields.rideMetric(field.name)->units(GlobalContext::context()->useMetricUnits);
 
             if (units == "seconds" || units == tr("seconds")) {
                 // we need to use a TimeEdit instead
@@ -572,6 +736,7 @@ FormField::FormField(FieldDefinition field, RideMetadata *meta) : definition(fie
 
     case FIELD_DATE : // date
         widget = new QDateEdit(this);
+        ((QDateEdit*)widget)->setButtonSymbols(QAbstractSpinBox::NoButtons);
         //widget->setFixedHeight(18);
         connect (widget, SIGNAL(dateChanged(const QDate)), this, SLOT(dataChanged()));
         connect (widget, SIGNAL(editingFinished()), this, SLOT(editFinished()));
@@ -579,6 +744,7 @@ FormField::FormField(FieldDefinition field, RideMetadata *meta) : definition(fie
 
     case FIELD_TIME : // time
         widget = new QTimeEdit(this);
+        ((QTimeEdit*)widget)->setButtonSymbols(QAbstractSpinBox::NoButtons);
         //widget->setFixedHeight(18);
         ((QTimeEdit*)widget)->setDisplayFormat("hh:mm:ss");
         connect (widget, SIGNAL(timeChanged(const QTime)), this, SLOT(dataChanged()));
@@ -614,11 +780,7 @@ FormField::~FormField()
             if (completer)
                 delete completer;
             break;
-        case FIELD_TEXTBOX : if (definition.name == "Summary")
-                                 delete ((RideSummaryWindow *)widget);
-                             else
-                                 delete ((GTextEdit*)widget);
-                             break;
+        case FIELD_TEXTBOX : delete ((GTextEdit*)widget); break;
         case FIELD_INTEGER : delete ((QSpinBox*)widget); break;
         case FIELD_DOUBLE : {
                                 if (!isTime) delete ((QDoubleSpinBox*)widget);
@@ -721,12 +883,12 @@ FormField::metadataFlush()
         ourRideItem->setStartTime(update);
 
     } else if (definition.name != "Summary") {
-        if (meta->context->specialFields.isMetric(definition.name) && enabled->isChecked()) {
+        if (GlobalContext::context()->specialFields.isMetric(definition.name) && enabled->isChecked()) {
 
             // convert from imperial to metric if needed
-            if (!meta->context->athlete->useMetricUnits) {
-                double value = text.toDouble() * (1/ meta->context->specialFields.rideMetric(definition.name)->conversion());
-                value -= meta->context->specialFields.rideMetric(definition.name)->conversionSum();
+            if (!GlobalContext::context()->useMetricUnits) {
+                double value = text.toDouble() * (1/ GlobalContext::context()->specialFields.rideMetric(definition.name)->conversion());
+                value -= GlobalContext::context()->specialFields.rideMetric(definition.name)->conversionSum();
                 text = QString("%1").arg(value);
             }
 
@@ -735,7 +897,7 @@ FormField::metadataFlush()
             override.insert("value", text);
 
             // check for compatability metrics
-            QString symbol = meta->context->specialFields.metricSymbol(definition.name);
+            QString symbol = GlobalContext::context()->specialFields.metricSymbol(definition.name);
             if (definition.name == "TSS") symbol = "coggan_tss";
             if (definition.name == "NP") symbol = "coggan_np";
             if (definition.name == "IF") symbol = "coggan_if";
@@ -745,7 +907,7 @@ FormField::metadataFlush()
 
             // we need to convert from display value to
             // stored value for the Weight field:
-            if (definition.type == FIELD_DOUBLE && definition.name == "Weight" && meta->context->athlete->useMetricUnits == false) {
+            if (definition.type == FIELD_DOUBLE && definition.name == "Weight" && GlobalContext::context()->useMetricUnits == false) {
                 double kg = text.toDouble() / LB_PER_KG;
                 text = QString("%1").arg(kg);
             }
@@ -876,17 +1038,17 @@ FormField::editFinished()
         }
 
     } else if (definition.name != "Summary") {
-        if (meta->context->specialFields.isMetric(definition.name) && enabled->isChecked()) {
+        if (GlobalContext::context()->specialFields.isMetric(definition.name) && enabled->isChecked()) {
 
             // convert from imperial to metric if needed
-            if (!meta->context->athlete->useMetricUnits) {
-                double value = text.toDouble() * (1/ meta->context->specialFields.rideMetric(definition.name)->conversion());
-                value -= meta->context->specialFields.rideMetric(definition.name)->conversionSum();
+            if (!GlobalContext::context()->useMetricUnits) {
+                double value = text.toDouble() * (1/ GlobalContext::context()->specialFields.rideMetric(definition.name)->conversion());
+                value -= GlobalContext::context()->specialFields.rideMetric(definition.name)->conversionSum();
                 text = QString("%1").arg(value);
             }
 
             QMap<QString, QString> empty;
-            QMap<QString,QString> current = ourRideItem->ride()->metricOverrides.value(meta->context->specialFields.metricSymbol(definition.name), empty);
+            QMap<QString,QString> current = ourRideItem->ride()->metricOverrides.value(GlobalContext::context()->specialFields.metricSymbol(definition.name), empty);
             QString currentvalue = current.value("value", "");
 
             if (currentvalue != text) {
@@ -894,14 +1056,14 @@ FormField::editFinished()
                 changed = true;
                 QMap<QString,QString> override;
                 override.insert("value", text);
-                ourRideItem->ride()->metricOverrides.insert(meta->context->specialFields.metricSymbol(definition.name), override);
+                ourRideItem->ride()->metricOverrides.insert(GlobalContext::context()->specialFields.metricSymbol(definition.name), override);
             }
 
         } else {
 
             // we need to convert from display value to
             // stored value for the Weight field:
-            if (definition.type == FIELD_DOUBLE && definition.name == "Weight" && meta->context->athlete->useMetricUnits == false) {
+            if (definition.type == FIELD_DOUBLE && definition.name == "Weight" && GlobalContext::context()->useMetricUnits == false) {
                 double kg = text.toDouble() / LB_PER_KG;
                 text = QString("%1").arg(kg);
             }
@@ -988,7 +1150,7 @@ FormField::stateChanged(int state)
     // remove from overrides if neccessary
     if (ourRideItem && ourRideItem->ride()) {
 
-        QString symbol = meta->context->specialFields.metricSymbol(definition.name);
+        QString symbol = GlobalContext::context()->specialFields.metricSymbol(definition.name);
         if (definition.name == "TSS") symbol = "coggan_tss";
         if (definition.name == "NP") symbol = "coggan_np";
         if (definition.name == "IF") symbol = "coggan_if";
@@ -1036,9 +1198,9 @@ FormField::metadataChanged()
         else if (definition.name == "Start Time") value = ourRideItem->ride()->startTime().time().toString("hh:mm:ss.zzz");
         else if (definition.name == "Identifier") value = ourRideItem->ride()->id();
         else {
-            if (meta->context->specialFields.isMetric(definition.name)) {
+            if (GlobalContext::context()->specialFields.isMetric(definition.name)) {
 
-                QString symbol = meta->context->specialFields.metricSymbol(definition.name);
+                QString symbol = GlobalContext::context()->specialFields.metricSymbol(definition.name);
                 if (definition.name == "TSS") symbol = "coggan_tss";
                 if (definition.name == "NP") symbol = "coggan_np";
                 if (definition.name == "IF") symbol = "coggan_if";
@@ -1053,11 +1215,11 @@ FormField::metadataChanged()
                     value = override.value("value");
 
                     // does it need conversion from metric?
-                    if (meta->context->specialFields.rideMetric(definition.name)->conversion() != 1.0) {
+                    if (GlobalContext::context()->specialFields.rideMetric(definition.name)->conversion() != 1.0) {
                         // do we want imperial?
-                        if (!meta->context->athlete->useMetricUnits) {
-                            double newvalue = value.toDouble() * meta->context->specialFields.rideMetric(definition.name)->conversion();
-                            newvalue -= meta->context->specialFields.rideMetric(definition.name)->conversionSum();
+                        if (!GlobalContext::context()->useMetricUnits) {
+                            double newvalue = value.toDouble() * GlobalContext::context()->specialFields.rideMetric(definition.name)->conversion();
+                            newvalue -= GlobalContext::context()->specialFields.rideMetric(definition.name)->conversionSum();
                             value = QString("%1").arg(newvalue);
                         }
                     }
@@ -1098,7 +1260,7 @@ FormField::metadataChanged()
         case FIELD_DOUBLE : // double
             if (isTime) ((QTimeEdit*)widget)->setTime(QTime(0,0,0,0).addSecs(value.toDouble()));
             else {
-                if (definition.name == "Weight" && meta->context->athlete->useMetricUnits == false) {
+                if (definition.name == "Weight" && GlobalContext::context()->useMetricUnits == false) {
                     double lbs = value.toDouble() * LB_PER_KG;
                     value = QString("%1").arg(lbs);
                 }

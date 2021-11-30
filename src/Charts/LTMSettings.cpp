@@ -19,6 +19,7 @@
 #include "LTMSettings.h"
 #include "MainWindow.h"
 #include "LTMTool.h"
+#include "Colors.h" //dpixfactor
 #include "Context.h"
 #include "LTMChartParser.h"
 #include "Utils.h"
@@ -56,7 +57,7 @@ EditChartDialog::EditChartDialog(Context *context, LTMSettings *settings, QList<
     mainLayout->addLayout(buttonLayout);
 
     // make it wide enough
-    setMinimumWidth(250);
+    setMinimumWidth(250 *dpiXFactor);
 
     // connect up slots
     connect(okButton, SIGNAL(clicked()), this, SLOT(okClicked()));
@@ -233,6 +234,7 @@ QDataStream &operator<<(QDataStream &out, const LTMSettings &settings)
         out<<metric.tests;
         out<<metric.perfs;
         out<<metric.submax;
+        out<<metric.perfSymbol;
     }
     out<<settings.showData;
     out<<settings.stack;
@@ -370,6 +372,7 @@ while(counter-- && !in.atEnd()) {
             in >> m.perfs;
         }
         if (version >= 19) in >> m.submax;
+        if (version >= 21) in >> m.perfSymbol;
 
         bool keep=true;
         // check for deprecated things and set keep=false if

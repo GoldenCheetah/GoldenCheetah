@@ -86,5 +86,5 @@ LTMOutliers::LTMOutliers(double *xdata, double *ydata, int count, int windowsize
     stdDeviation = allSum / (double)points;
 
     // create a ranked list
-    qSort(rank);
+    std::sort(rank.begin(), rank.end());
 }

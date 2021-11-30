@@ -18,7 +18,6 @@
 
 #ifndef GC_CloudService_h
 #define GC_CloudService_h
-
 #include <QList>
 #include <QMap>
 #include <QString>
@@ -94,6 +93,9 @@ class CloudService : public QObject {
 
         // need a logo, we may resize but will keep aspect ratio
         virtual QImage logo() const = 0;
+
+        // an icon to put on the authorize button (mandated by strava guidelines)
+        virtual QString authiconpath() const { return QString(""); }
 
         // register with capabilities of the service - emerging standard
         // is a service that allows oauth, query and upload as well as download
@@ -510,7 +512,7 @@ class CloudServiceFactory {
 
     // sorted list of service names
     const QStringList serviceNames() const { QStringList returning = names_;
-                                              qSort(returning);
+                                              std::sort(returning.begin(), returning.end(), Utils::qstringascend);
                                               return returning; }
 
     const CloudService *service(QString name) const { return services_.value(name, NULL); }

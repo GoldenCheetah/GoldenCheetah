@@ -22,6 +22,14 @@
 #include "Units.h"
 #include <cmath>
 
+#ifdef Q_OS_WIN
+#include <io.h>
+#define DUP(fd) _dup(fd)
+#else
+#include <unistd.h>
+#define DUP(fd) dup(fd)
+#endif
+
 static int rawFileReaderRegistered =
     RideFileFactory::instance().registerReader(
         "raw", "GoldenCheetah Raw PowerTap Format", new RawFileReader());
@@ -230,7 +238,8 @@ RideFile *RawFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
         delete rideFile;
         return NULL;
     }
-    FILE *f = fdopen(file.handle(), "r");
+    // DUP added to avoid ocational crashs due to fclose on closed fd
+    FILE *f = fdopen(DUP(file.handle()), "r");
 
     // failed to associate a stream!
     if (f==NULL) {

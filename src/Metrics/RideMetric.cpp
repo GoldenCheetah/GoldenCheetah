@@ -160,7 +160,13 @@
 // 150 28  Mar 2019 Ale Martinez       Additional Running Dynamics metrics
 // 151 14  May 2019 Ale Martinez       Added Time Recording and use it in Time in Zone Percentage
 // 152 20  May 2019 Ale Martinez       Fixed Time in Zone Percentages to aggregate properly
-int DBSchemaVersion = 152;
+// 153  8  Dec 2019 Mark Liversedge    Regenerate after v3.5 RC2/RC2X re-issue
+// 154 18  Apr 2020 Mark Liversedge    Added PeakPowerIndex (only for full rides)
+// 155 27  Jun 2020 Mark Liversedge    Added Ride Date as days since 1900,01,01
+// 156 18  Mar 2021 Ale Martinez       Added Time and % in Zones I, II and III
+// 157 27  May 2021 Ale Martinez       Added Pace Row
+
+int DBSchemaVersion = 157;
 
 RideMetricFactory *RideMetricFactory::_instance;
 QVector<QString> RideMetricFactory::noDeps;
@@ -307,13 +313,15 @@ RideMetric::getForSymbol(QString symbol, const QHash<QString,RideMetric*> *p)
 QString 
 RideMetric::toString(bool useMetricUnits) const
 {
+    if (isDate()) { QDate date(1900,01,01); date = date.addDays(this->value(useMetricUnits)); return date.toString("dd MMM yy"); }
     if (isTime()) return time_to_string(value(useMetricUnits));
     return QString("%1").arg(value(useMetricUnits), 0, 'f', this->precision());
 }
 
 QString
-RideMetric::toString(bool useMetricUnits, double v) const
+RideMetric::toString(double v) const
 {
-    if (isTime()) return time_to_string(value(useMetricUnits));
-    return QString("%1").arg(value(v, useMetricUnits), 0, 'f', this->precision());
+    if (isDate()) { QDate date(1900,01,01); date = date.addDays(v); return date.toString("dd MMM yy"); }
+    if (isTime()) return time_to_string(v);
+    return QString("%1").arg(v, 0, 'f', this->precision());
 }

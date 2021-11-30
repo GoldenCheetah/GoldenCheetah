@@ -1,11 +1,26 @@
 <RCC>
     <qresource prefix="/">
+        <file>charts/overview-analysis.gchart</file>
+        <file>charts/overview-trends.gchart</file>
         <file>webservice/httpserver.ini</file>
+        <file>sidebar/apps.png</file>
+        <file>sidebar/assess.png</file>
+        <file>sidebar/athlete.png</file>
+        <file>sidebar/plan.png</file>
+        <file>sidebar/prefs.png</file>
+        <file>sidebar/reflect.png</file>
+        <file>sidebar/sync.png</file>
+        <file>sidebar/train.png</file>
+        <file>sidebar/trends.png</file>
         <file>images/devices/garminusb.png</file>
         <file>images/devices/computrainer.png</file>
         <file>images/devices/kickr.png</file>
         <file>images/devices/fortius.png</file>
         <file>images/devices/quarqd.png</file>
+        <file>images/titlebar/sidebar.png</file>
+        <file>images/titlebar/bottombar.png</file>
+        <file>images/titlebar/whatsthis.png</file>
+        <file>images/titlebar/tile.png</file>
         <file>images/toolbar/main/togglefull.png</file>
         <file>images/toolbar/main/hideside.png</file>
         <file>images/toolbar/main/hiderside.png</file>
@@ -66,6 +81,7 @@
         <file>images/twitter.png</file>
         <file>images/cyclist.png</file>
         <file>images/imetrics.png</file>
+        <file>images/medal.png</file>
         <file>images/power.png</file>
         <file>images/arduino.png</file>
         <file>images/query.png</file>
@@ -78,6 +94,7 @@
         <file>images/activity.png</file>
         <file>images/metadata.png</file>
         <file>images/stopwatch.png</file>
+        <file>images/toolbar/main/measures.png</file>
         <file>images/settings.png</file>
         <file>images/addchart.png</file>
         <file>images/library.png</file>
@@ -96,10 +113,12 @@
         <file>translations/gc_sv.qm</file>
         <file>xml/charts.xml</file>
         <file>xml/metadata.xml</file>
-        <file>xml/train-layout.xml</file>
-        <file>xml/diary-layout.xml</file>
-        <file>xml/analysis-layout.xml</file>
-        <file>xml/home-layout.xml</file>
+        <file>xml/train-perspectives.xml</file>
+        <file>xml/video-layout.xml</file>
+        <file>xml/diary-perspectives.xml</file>
+        <file>xml/analysis-perspectives.xml</file>
+        <file>xml/home-perspectives.xml</file>
+        <file>ini/measures.ini</file>
         <file>html/ltm-summary.html</file>
         <file>images/oxygen/power-off.png</file>
         <file>images/oxygen/power-on.png</file>
@@ -109,6 +128,8 @@
         <file>images/oxygen/ffwd.png</file>
         <file>images/oxygen/rewind.png</file>
         <file>images/oxygen/lap.png</file>
+        <file>images/oxygen/fwd.png</file>
+        <file>images/oxygen/back.png</file>
         <file>images/oxygen/save.png</file>
         <file>images/oxygen/open.png</file>
         <file>images/oxygen/cal.png</file>
@@ -128,6 +149,8 @@
         <file>images/toolbar/popbutton.png</file>
         <file>images/toolbar/flipbutton.png</file>
         <file>images/splashscreen.png</file>
+        <file>images/mac/back.png</file>
+        <file>images/mac/forward.png</file>
         <file>images/mac/compose.png</file>
         <file>images/mac/download.png</file>
         <file>images/mac/share.png</file>
@@ -163,8 +186,9 @@
         <file>images/oxygen/down.png</file>
         <file>audio/lap.wav</file>
         <file>images/configure.png</file>
-        <file>web/googlemap/dark.css</file>
         <file>images/toolbar/cloud.png</file>
+        <file>images/services/strava_compatible.png</file>
+        <file>images/services/strava_connect.png</file>
         <file>images/services/cyclinganalytics.png</file>
         <file>images/services/dropbox.png</file>
         <file>images/services/googledrive.png</file>

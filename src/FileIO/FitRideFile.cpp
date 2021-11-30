@@ -22,6 +22,7 @@
 #include "Units.h"
 #include "RideItem.h"
 #include "Specification.h"
+#include "DataProcessor.h"
 #include <QSharedPointer>
 #include <QMap>
 #include <QSet>
@@ -30,6 +31,7 @@
 #include <QTime>
 #include <cstdio>
 #include <stdint.h>
+#include <sstream>
 #include <time.h>
 #include <limits>
 #include <cmath>
@@ -88,11 +90,22 @@ struct FitDeveField {
     fit_string_value unit;
 };
 
+struct FitDeveApp {
+    fit_string_value dev_id; // Developer Data Index
+    fit_string_value app_id; // application_id
+    int man_id; // manufacturer_id
+    int dev_data_id; // developer_data_index
+    qint64 app_version; // application_version
+
+    QList<FitDeveField> fields;
+};
+
 struct FitDefinition {
     int global_msg_num;
     bool is_big_endian;
     std::vector<FitField> fields;
 };
+
 
 enum fitValueType { SingleValue, ListValue, FloatValue, StringValue };
 typedef enum fitValueType FitValueType;
@@ -120,6 +133,7 @@ struct FitFileReaderState
     double last_distance;
     QMap<int, FitDefinition> local_msg_types;
     QMap<QString, FitDeveField>  local_deve_fields; // All developer fields
+    QMap<int, FitDeveApp> local_deve_fields_app; // All developper apps
     QMap<int, int> record_extra_fields;
     QMap<QString, int> record_deve_fields; // Developer fields in DEVELOPER XDATA or STANDARD DATA
     QMap<QString, int> record_deve_native_fields; // Developer fields with native values
@@ -130,11 +144,10 @@ struct FitFileReaderState
     int devices;
     bool stopped;
     bool isLapSwim;
-    double pool_length;
+    double last_length;
     int last_event_type;
     int last_event;
     int last_msg_type;
-    double frac_time; // to carry sub-second length time in pool swimming
     double last_altitude; // to avoid problems when records lacks altitude
     QVariant isGarminSmartRecording;
     QVariant GarminHWM;
@@ -144,14 +157,21 @@ struct FitFileReaderState
     XDataSeries *deveXdata;
     XDataSeries *extraXdata;
     XDataSeries *hrvXdata;
-    QMap<int, QString> deviceInfos;
-    QList<QString> dataInfos;
+    QMap<int, QString> deviceInfos, session_device_info_;
+    QList<QString> dataInfos, session_data_info_;
+
+    // cache tags for each session
+    using SessionTagMap = QMap<QString, QVariant>;
+    SessionTagMap active_session_;
+    QList<SessionTagMap> session_tags_;
+    QList<QMap<int, QString>> session_device_info_list_;
+    QList<QList<QString>> session_data_info_list_;
 
     FitFileReaderState(QFile &file, QStringList &errors) :
         file(file), errors(errors), rideFile(NULL), start_time(0),
         last_time(0), last_distance(0.00f), interval(0), calibration(0),
-        devices(0), stopped(true), isLapSwim(false), pool_length(0.0),
-        last_event_type(-1), last_event(-1), last_msg_type(-1), frac_time(0.0),
+        devices(0), stopped(true), isLapSwim(false), last_length(0.0),
+        last_event_type(-1), last_event(-1), last_msg_type(-1),
         last_altitude(0.0)
     {}
 
@@ -197,6 +217,16 @@ struct FitFileReaderState
             (*count) += 1;
 
         return i == 0xff ? NA_VALUE : i;
+    }
+
+    fit_value_t read_byte(int *count = NULL) {
+        quint8 i;
+        if (file.read(reinterpret_cast<char*>( &i), 1) != 1)
+            throw TruncatedRead();
+        if (count)
+            (*count) += 1;
+
+        return i;
     }
 
     fit_value_t read_uint8z(int *count = NULL) {
@@ -293,12 +323,16 @@ struct FitFileReaderState
         return i == 0x00000000 ? NA_VALUE : i;
     }
 
-    fit_float_value read_float32(int *count = NULL) {
+    fit_float_value read_float32(bool is_big_endian, int *count = NULL) {
         float f;
         if (file.read(reinterpret_cast<char*>(&f), 4) != 4)
             throw TruncatedRead();
         if (count)
             (*count) += 4;
+
+        if (is_big_endian) {
+            f = qbswap(f);
+        }
 
         return f;
     }
@@ -307,26 +341,25 @@ struct FitFileReaderState
         printf("type: %d %llx %s\n", v.type, v.v, v.s.c_str());
     }
 
-    void convert2Run() {
-        if (rideFile->areDataPresent()->cad) {
-            foreach(RideFilePoint *pt, rideFile->dataPoints()) {
+    void convert2Run( RideFile *rf) {
+        if (rf->areDataPresent()->cad) {
+            foreach(RideFilePoint *pt, rf->dataPoints()) {
                 pt->rcad = pt->cad;
                 pt->cad = 0;
             }
-            rideFile->setDataPresent(RideFile::rcad, true);
-            rideFile->setDataPresent(RideFile::cad, false);
+            rf->setDataPresent(RideFile::rcad, true);
+            rf->setDataPresent(RideFile::cad, false);
         }
     }
 
     QString getManuProd(int manu, int prod) {
         if (manu == 1) {
             // Garmin
-            if (prod == -1)
-                return "Garmin";
-
             // Product IDs can be found in c/fit_example.h in the FIT SDK.
             // Multiple product IDs refer to different regions e.g. China, Japan etc. 
             switch (prod) {
+                case -1: return "Garmin";
+                case 16: case 20: return "Garmin Cadence Sensor 2";
                 case 473: case 474: case 475: case 494: return "Garmin FR301";
                 case 717: case 987: return "Garmin FR405";
                 case 782: return "Garmin FR50";
@@ -348,6 +381,8 @@ struct FitFileReaderState
                 case 1567: return "Garmin Edge 810";
                 case 1623: case 2173: return "Garmin FR620";
                 case 1632: case 2174: return "Garmin FR220";
+                case 1743: return "Garmin HRM-Tri";
+                case 1752: return "Garmin HRM-Run";
                 case 1765: case 2130: case 2131: case 2132: return "Garmin FR920XT";
                 case 1836: case 2052: case 2053: case 2070: case 2100: return "Garmin Edge 1000";
                 case 1903: return "Garmin FR15";
@@ -362,6 +397,7 @@ struct FitFileReaderState
                 case 2157: return "Garmin FR230";
                 case 2158: return "Garmin FR735XT";
                 case 2204: return "Garmin Edge 1000 Explore";
+                case 2327: return "Garmin HRM4 Run";
                 case 2238: return "Garmin Edge 20";
                 case 2337: return "Garmin Vivoactive HR";
                 case 2347: return "Garmin Vivosmart HR+";
@@ -374,12 +410,30 @@ struct FitFileReaderState
                 case 2604: return "Garmin Fenix 5x";
                 case 2691: return "Garmin FR935";
                 case 2697: return "Garmin Fenix 5";
+                case 2713: return "Garmin Edge 1030";
+                case 2787: return "Garmin Vector 3";
                 case 2886: case 2888: return "Garmin FR645";
                 case 2900: return "Garmin Fenix 5s +";
+                case 2909: case 3092: return "Garmin Edge 130";
+                case 3028: return "Garmin GPSMap 66";
                 case 3110: return "Garmin Fenix 5 +";
                 case 3111: return "Garmin Fenix 5x +";
                 case 3112: return "Garmin Edge 520 +";
                 case 3113: return "Garmin FR945";
+                case 3121: return "Garmin Edge 530";
+                case 3122: return "Garmin Edge 830";
+                case 3126: return "Garmin Instinct";
+                case 3192: return "Garmin Speed Sensor 2";
+                case 3287: case 3288: case 3512: case 3513: return "Garmin Fenix 6s";
+                case 3289: case 3290: case 3514: case 3515: return "Garmin Fenix 6";
+                case 3291: case 3516: return "Garmin Fenix 6x";
+                case 3299: return "Garmin HRM-Dual";
+                case 3300: return "Garmin HRM-Pro";
+                case 3405: case 3639: return "Garmin Swim 2";
+                case 3558: return "Garmin Edge 130 Plus";
+                case 3570: return "Garmin Edge 1030 Plus";
+                case 3589: return "Garmin FR745";
+                case 3592: return "Garmin Varia RTL515";
                 case 20119: return "Garmin Training Center";
                 case 65532: return "Android ANT+ Plugin";
                 case 65534: return "Garmin Connect Website";
@@ -387,11 +441,9 @@ struct FitFileReaderState
             }
         } else if (manu == 6 ) {
             // SRM
-            if (prod == -1)
-                return "SRM";
-
             // powercontrol now uses FIT files from PC8
             switch (prod) {
+                case -1: return "SRM";
                 case 6: return "SRM PC6";
                 case 7: return "SRM PC7";
                 case 8: return "SRM PC8";
@@ -399,32 +451,23 @@ struct FitFileReaderState
             }
         } else if (manu == 7 ) {
             // Quarq
-            if (prod == -1)
-                return "Quarq";
-
             switch (prod) {
+                case -1: return "Quarq";
                 case 1: return "Quarq Cinqo";
-
                 case 9479: return "Quarq DZERO";
-
                 default: return QString("Quarq %1").arg(prod);
             }
         } else if (manu == 8 ) {
             // iBike
-            if (prod == -1)
-                return "iBike";
-
             switch (prod) {
+                case -1: return "iBike";
                 case 2054: return "iBike AeroPod";
-
                 default: return QString("iBike %1").arg(prod);
             }
         } else if (manu == 9 ) {
             // Powertap
-            if (prod == -1)
-                return "Powertap";
-
             switch (prod) {
+                case -1: return "Powertap";
                 case 14: return "Joule 2.0";
                 case 18: return "Joule";
                 case 19: return "Joule GPS";
@@ -432,32 +475,27 @@ struct FitFileReaderState
                 case 272: return "Powertap C1";
                 case 288: return "Powertap P1";
                 case 4096: return "Powertap G3";
+                case 4353: return "Powercal";
 
                 default: return QString("Powertap Device %1").arg(prod);
             }
         } else if (manu == 13 ) {
             // dynastream_oem
-            if (prod == -1)
-                return "Dynastream";
-
             switch (prod) {
+                case -1: return "Dynastream";
                 default: return QString("Dynastream %1").arg(prod);
             }
         } else if (manu == 29 ) {
             // saxonar
-            if (prod == -1)
-                return "Power2max";
-
             switch (prod) {
+                case -1: return "Power2max";
                 case 1031: return "Power2max S";
                 default: return QString("Power2max %1").arg(prod);
             }
         } else if (manu == 32) {
             // wahoo
-            if (prod == -1)
-                return "Wahoo";
-
             switch (prod) {
+                case -1: return "Wahoo";
                 case 0: return "Wahoo fitness";
                 case 28: return "Wahoo ELEMNT";
                 case 31: return "Wahoo ELEMNT BOLT";
@@ -465,53 +503,120 @@ struct FitFileReaderState
             }
         } else if (manu == 38) {
              // o_synce
-            if (prod == -1)
-                return "o_synce";
-
             switch (prod) {
+                case -1: return "o_synce";
                 case 1: return "o_synce navi2coach";
                 default: return QString("o_synce %1").arg(prod);
             }
         } else if (manu == 48) {
-            if (prod == -1)
-                return "Pioneer";
-
             // Pioneer
             switch (prod) {
+                case -1:  return "Pioneer";
                 case 2: return "Pioneer SGX-CA500";
                 default: return QString("Pioneer %1").arg(prod);
             }
+        } else if (manu == 54) {
+            // ifor_powell
+            switch (prod) {
+                case -1:  return "Ifor powell";
+                case 1: return "IpBike";
+                default: return QString("Ifor powell %1").arg(prod);
+            }
+        }
+        else if (manu == 69) {
+            // Stages Cycling
+            switch (prod) {
+                case -1:  return "Stages Cycling";
+                case 1: return "Stages Power Gen 1";
+                case 2: return "Stages Power Gen 2";
+                case 3: return "Stages Power Gen 3";
+                default: return QString("Stages Cycling %1").arg(prod);
+            }
         } else if (manu == 70) {
-            // does not set product at this point
-           return "Sigmasport ROX";
+            // SIGMA SPORT Germany
+            switch (prod) {
+                case 15: return "SIGMA ROX 10.0";
+                case 18: return "SIGMA ROX 7.0";
+                case 41: return "SIGMA ROX 11.0";
+                case 42: return "SIGMA iD.RUN";
+                case 43: return "SIGMA iD.RUN HR";
+                case 44: return "SIGMA ROX 12.0";
+                case 45: return "SIGMA iD.FREE";
+                case 46: return "SIGMA iD.TRI";
+                case 47: return "SIGMA PURE GPS";
+                case 49: return "SIGMA ROX 11.1";
+                case 51: return "SIGMA ROX 2.0";
+                case 52: return "SIGMA ROX 4.0";
+                default: return QString("SIGMA SPORT %1").arg(prod);
+            }
         } else if (manu == 76) {
             // Moxy
             return "Moxy Monitor";
+        } else if (manu == 83) {
+            // Scosche
+            if (prod == -1)
+                return "Scosche";
+            switch (prod) {
+                case 3: return "Scosche Rythm+";
+                default: return QString("Scosche %1").arg(prod);
+            }
+        } else if (manu == 89) {
+            // Tacx
+            switch (prod) {
+                case 2800: return "Tacx Neo";
+                case 2850: return "Tacx Neo 2 Smart";
+                default: return QString("Tacx %1").arg(prod);
+            }
         } else if (manu == 95) {
             // Stryd
             return "Stryd";
         } else if (manu == 98) {
             // BSX
+            switch(prod) {
+                case -1: return "BSX";
+                case 2: return "BSX Insight 2";
+                default: return QString("BSX %1").arg(prod);
+            }
+        } else if (manu == 107) {
+            // Magene
             if (prod == -1)
-                return "BSX";
+                return "Magene";
 
             switch(prod) {
-                  case 2: return "BSX Insight 2";
-                  default: return QString("BSX %1").arg(prod);
+                  default: return QString("Magene %1").arg(prod);
+            }
+        } else if (manu == 108) {
+            // Giant
+            if (prod == -1)
+                return "Giant";
+
+            switch(prod) {
+                case 21845 : return "Giant Power Pro";
+                default: return QString("Giant %1").arg(prod);
             }
         } else if (manu == 115) {
             // igpsport
-            if (prod == -1)
-                return "igpsport";
-
             switch(prod) {
-                  case 2: return "BSX Insight 2";
-                  default: return QString("igpsport %1").arg(prod);
+                case -1: return "iGPSPORT";
+                default: return QString("iGPSPORT %1").arg(prod);
+            }
+        } else if (manu == 116) {
+            // thinkrider
+            switch(prod) {
+                case -1: return "Thinkrider";
+                default: return QString("Thinkrider %1").arg(prod);
+            }
+        } else if (manu == 132) {
+            // cycplus
+            switch(prod) {
+                case -1: return "Cycplus";
+                default: return QString("Cycplus %1").arg(prod);
             }
         } else if (manu == 258) {
             // Lezyne
             switch (prod) {
                 case -1: return "Lezyne";
+                case 4: return "Lezyne Super GPS";
                 case 6: return "Lezyne Micro-GPS";
                 case 11: return "Lezyne MegaXL";
                 default: return QString("Lezyne %1").arg(prod);
@@ -519,6 +624,13 @@ struct FitFileReaderState
         } else if (manu == 260) {
             // Zwift
             return "Zwift";
+        } else if (manu == 263) {
+            // Favero
+            switch (prod) {
+                case -1: return "Favero";
+                case 12: return "Favero Assioma Duo";
+                default: return QString("Favero %1").arg(prod);
+            }
         } else if (manu == 267) {
             // Bryton
             return "Bryton";
@@ -528,6 +640,20 @@ struct FitFileReaderState
         } else if (manu == 284) {
             // Rouvy
             return "Rouvy";
+        } else if (manu == 289) {
+            // Hammerhead
+            // currently not setting product ids
+            switch (prod) {
+                case -1: return "Hammerhead";
+                default: return QString("Hammerhead %1").arg(prod);
+            }
+        } else if (manu == 255) {
+            // Development
+            switch (prod) {
+                case -1: return "Development";
+                case 0: return "Development";
+                default: return QString("Development %1").arg(prod);
+            }
         } else {
             QString name = "Unknown FIT Device";
             return name + QString(" %1:%2").arg(manu).arg(prod);
@@ -538,6 +664,11 @@ struct FitFileReaderState
         switch (device_type) {
             case 4: return "Headunit"; // bike_power
             case 11: return "Powermeter"; // bike_power
+            case 12: return "Sensor Hub";
+            case 17: return "Biketrainer"; // fitness equipment
+            case 30: return "Running Dynamics";
+            case 35: case 36: return "Bikelight"; // bike_light_main/shared
+            case 40: return "Bikeradar"; // bike_radar
             case 120: return "HR"; // heart_rate
             case 121: return "Speed-Cadence"; // bike_speed_cadence
             case 122: return "Cadence"; // bike_speed
@@ -545,6 +676,18 @@ struct FitFileReaderState
             case 124: return "Stride"; // stride_speed_distance
 
             default: return QString("Type %1").arg(device_type);
+        }
+    }
+
+    QString getBatteryStatus(quint8 battery_status) {
+        switch (battery_status) {
+            case  1: return "new";
+            case  2: return "good";
+            case  3: return "ok";
+            case  4: return "low";
+            case  5: return "critical";
+            case  6: return "charging";
+            default: return "unknown";
         }
     }
 
@@ -598,6 +741,9 @@ struct FitFileReaderState
     QString getNameForExtraNative(int native_num) {
         switch (native_num) {
 
+            case 32: // VERTICAL_SPEED
+                    return "VERTICALSPEED"; // Vertical Speed
+
             case 40: // STANCE_TIME_PERCENT
                     return "STANCETIMEPERCENT"; // Stance Time Percent
 
@@ -622,6 +768,12 @@ struct FitFileReaderState
             case 108: // to confirm : RESPIRATIONRATE
                 return "RESPIRATIONRATE"; // Performance Contition
 
+            case 114: // MTB Dynamics - Grit
+                return "GRIT";
+
+            case 115: // MTB Dynamics - Flow
+                return "FLOW";
+
             default:
                     return QString("FIELD_%1").arg(native_num);
         }
@@ -629,6 +781,9 @@ struct FitFileReaderState
 
     float getScaleForExtraNative(int native_num) {
         switch (native_num) {
+
+            case 32: // VERTICAL_SPEED
+                    return 1000.0;
 
             case 40: // STANCE_TIME_PERCENT
             case 83: // VERTICAL_RATIO
@@ -684,13 +839,19 @@ struct FitFileReaderState
                 name = nativeName;
             }
 
-
-            if (xdata && dataInfos.contains(QString("CIQ '%1' -> %2 %3").arg(deveField.name.c_str()).arg("STANDARD").arg(nativeName))) {
+            const QString contain_info = QString("CIQ '%1' -> %2 %3").arg(deveField.name.c_str()).arg("STANDARD").arg(nativeName);
+            if (xdata && dataInfos.contains(contain_info)) {
                 int secs = last_time-start_time;
-                int idx = dataInfos.indexOf(QString("CIQ '%1' -> %2 %3").arg(deveField.name.c_str()).arg("STANDARD").arg(nativeName));
-                dataInfos.replace(idx, QString("CIQ '%1' -> %2 %3 (STANDARD until %4 secs)").arg(deveField.name.c_str()).arg(typeName).arg(name).arg(secs));
-            } else
-                dataInfos.append(QString("CIQ '%1' -> %2 %3").arg(deveField.name.c_str()).arg(typeName).arg(name));
+                int idx = dataInfos.indexOf(contain_info);
+                const QString info_replacement = QString("CIQ '%1' -> %2 %3 (STANDARD until %4 secs)").arg(deveField.name.c_str()).arg(typeName).arg(name).arg(secs);
+                dataInfos.replace(idx, info_replacement);
+                if (session_data_info_.contains(contain_info))
+                    session_data_info_.replace(session_data_info_.indexOf(contain_info), info_replacement);
+            } else {
+                const QString the_info = QString("CIQ '%1' -> %2 %3").arg(deveField.name.c_str()).arg(typeName).arg(name);
+                dataInfos.append(the_info);
+                session_data_info_.append(the_info);
+            }
         }
 
         if (xdata) {
@@ -700,6 +861,11 @@ struct FitFileReaderState
             record_deve_fields.insert(key, deveXdata->valuename.count()-1);
         } else
             record_deve_fields.insert(key, -1);
+
+        // Add field for app
+        if (local_deve_fields_app.contains(deveField.dev_id)) {
+            local_deve_fields_app[deveField.dev_id].fields.append(deveField);
+        }
     }
 
     void decodeFileId(const FitDefinition &def, int,
@@ -728,6 +894,7 @@ struct FitFileReaderState
                 default: ; // do nothing
             }
         }
+        active_session_["_devicetype"] = getManuProd(manu, prod);
         rideFile->setDeviceType(getManuProd(manu, prod));
     }
 
@@ -745,39 +912,44 @@ struct FitFileReaderState
 
             switch (field.num) {
                 case 7:   // METmax: 1 METmax = VO2max * 3.5, scale 65536
+                    active_session_["VO2max detected"] = QString::number(round(value / 65536.0 * 3.5 * 10.0) / 10.0);
                     rideFile->setTag("VO2max detected", QString::number(round(value / 65536.0 * 3.5 * 10.0) / 10.0));
                     break;
 
                 case 4:   // Aerobic Training Effect, scale 10
+                    active_session_["Aerobic Training Effect"] = QString::number(value/10.0);
                     rideFile->setTag("Aerobic Training Effect", QString::number(value/10.0));
                     break;
 
                 case 20:   // Anaerobic Training Effect, scale 10
+                    active_session_["Anaerobic Training Effect"] = QString::number(value/10.0);
                     rideFile->setTag("Anaerobic Training Effect", QString::number(value/10.0));
                     break;
 
                 case 9:   // Recovery Time, minutes
+                    active_session_["Recovery Time"] = QString::number(round(value/60.0));
                     rideFile->setTag("Recovery Time", QString::number(round(value/60.0)));
                     break;
 
                 case 17:   // Performance Condition
+                    active_session_["Performance Condition"] = QString::number(value);
                     rideFile->setTag("Performance Condition", QString::number(value));
                     break;
 
                 case 14:   // If watch detected Running Lactate Threshold Heart Rate, bpm
                     if(rideFile->isRun() && value > 0){
+                        active_session_["LTHR detected"] = QString::number(value);
                         rideFile->setTag("LTHR detected", QString::number(value));
                     }
                     break;
 
                 case 15:   // If watch detected Running Lactate Threshold Speed, m/s
                     if(rideFile->isRun() && value > 0){
+                        active_session_["LTS detected"] = QString::number(value/100.0);
                         rideFile->setTag("LTS detected", QString::number(value/100.0));
                     }
                     break;
-
-
-                default: ; // do nothing
+                default: break; // do nothing
             }
 
 
@@ -787,10 +959,20 @@ struct FitFileReaderState
         }
     }
 
-    void decodeSession(const FitDefinition &def, int,
+    void decodeSession(const FitDefinition &def, int time_offset,
                        const std::vector<FitValue>& values) {
+        time_t iniTime;
+        if (time_offset > 0)
+            iniTime = last_time + time_offset;
+        else
+            iniTime = last_time;
+
         int i = 0;
-	QString WorkOutCode = NULL;
+        time_t this_timestamp = 0, this_start_time = 0, this_elapsed_time = 0;
+        QString sport, subsport;
+        bool sport_found = false, subsport_found = false;
+        QString prevSport = rideFile->getTag("Sport", "");
+        double pool_length = 0.0;
 
         foreach(const FitField &field, def.fields) {
             fit_value_t value = values[i++].v;
@@ -800,223 +982,240 @@ struct FitFileReaderState
 
             switch (field.num) {
                 case 5: // sport field
+                  if (sport_found == false) {
+                    sport_found = true;
                     switch (value) {
                         case 0: // Generic
-			    rideFile->setTag("Sport","");
-			    break;
+                          sport = "";
+                          break;
                         case 1: // running:
-                            rideFile->setTag("Sport","Run");
-                            if (rideFile->dataPoints().count()>0)
-                                convert2Run();
-                            break;
+                          sport = "Run";
+                          break;
                         case 2: // cycling
-                            rideFile->setTag("Sport","Bike");
-                            break;
+                          sport = "Bike";
+                          break;
                         case 3: // transition:
-                            rideFile->setTag("Sport","Transition");
-                            break;
+                          sport = "Transition";
+                          break;
                         case 4: // running:
-                            rideFile->setTag("Sport","Fitness equipment");
+                            sport = "Fitness equipment";
                             break;
                         case 5: // swimming
-                            rideFile->setTag("Sport","Swim");
+                            sport = "Swim";
                             break;
                         case 6: // Basketball:
-                            rideFile->setTag("Sport","Basketball");
+                            sport = "Basketball";
                             break;
                         case 7: //
-                            rideFile->setTag("Sport","Soccer");
+                            sport = "Soccer";
                             break;
                         case 8: // running:
-                            rideFile->setTag("Sport","Tennis");
+                            sport = "Tennis";
                             break;
                         case 9: // running:
-                            rideFile->setTag("Sport","American fotball");
+                            sport = "American fotball";
                             break;
                         case 10: // running:
-                            rideFile->setTag("Sport","Training");
+                            sport = "Training";
                             break;
                         case 11: // running:
-                            rideFile->setTag("Sport","Walking");
+                            sport = "Walking";
                             break;
                         case 12: // running:
-                            rideFile->setTag("Sport","Cross country skiing");
+                            sport = "Cross country skiing";
                             break;
                         case 13: // running:
-                            rideFile->setTag("Sport","Alpine skiing");
+                            sport = "Alpine skiing";
                             break;
                         case 14: // running:
-                            rideFile->setTag("Sport","Snowboarding");
+                            sport = "Snowboarding";
                             break;
                         case 15: // running:
-                            rideFile->setTag("Sport","Rowing");
+                            sport = "Rowing";
                             break;
                         case 16: // running:
-                            rideFile->setTag("Sport","Mountaineering");
+                            sport = "Mountaineering";
                             break;
                         case 17: // running:
-                            rideFile->setTag("Sport","Hiking");
+                            sport = "Hiking";
                             break;
                         case 18: // running:
-                            rideFile->setTag("Sport","Multisport");
+                            sport = "Multisport";
                             break;
                         case 19: // running:
-                            rideFile->setTag("Sport","Paddling");
+                            sport = "Paddling";
                             break;
-                        default: // if we can't work it out, assume bike
-                            // but only if not already set to another sport,
-                            // Garmin Swim send 2 tags for example
-                            if (rideFile->getTag("Sport", "Bike") != "Bike") break;
+                        default: // if we can't work it out, treat as Generic
+                            sport = ""; break;
+                      }
                     }
                     break;
                 case 6: // sub sport (ignored at present)
-                    switch (value) {
+                    if (subsport_found == false) {
+                      subsport_found = true;
+                      switch (value) {
                         case 0:    // generic
-			  rideFile->setTag("SubSport","");
-			  break;
+                            subsport = "";
+                            break;
                         case 1:    // treadmill
-			  rideFile->setTag("SubSport","treadmill");
-			  break;
+                            subsport = "treadmill";
+                            break;
                         case 2:    // street
-			  rideFile->setTag("SubSport","street");
-			  break;
+                            subsport = "street";
+                            break;
                         case 3:    // trail
-			  rideFile->setTag("SubSport","trail");
-			  break;
+                            subsport = "trail";
+                            break;
                         case 4:    // track
-			  rideFile->setTag("SubSport","track");
-			  break;
+                            subsport = "track";
+                            break;
                         case 5:    // spin
-			  rideFile->setTag("SubSport","spinning");
-			  break;
+                            subsport = "spinning";
+                            break;
                         case 6:    // home trainer
-			  rideFile->setTag("SubSport","home trainer");
-			  break;
+                            subsport = "home trainer";
+                            break;
                         case 7:    // route
-			  rideFile->setTag("SubSport","route");
-			  break;
+                            subsport = "route";
+                            break;
                         case 8:    // mountain
-			  rideFile->setTag("SubSport","mountain");
-			  break;
+                            subsport = "mountain";
+                            break;
                         case 9:    // downhill
-			  rideFile->setTag("SubSport","downhill");
-			  break;
+                            subsport = "downhill";
+                            break;
                         case 10:    // recumbent
-			  rideFile->setTag("SubSport","recumbent");
-			  break;
+                            subsport = "recumbent";
+                            break;
                         case 11:    // cyclocross
-			  rideFile->setTag("SubSport","cyclocross");
-			  break;
+                            subsport = "cyclocross";
+                            break;
                         case 12:    // hand_cycling
-			  rideFile->setTag("SubSport","hand cycling");
-			  break;
+                            subsport = "hand cycling";
+                            break;
                         case 13:    // piste
-			  rideFile->setTag("SubSport","piste");
-			  break;
+                            subsport = "piste";
+                            break;
                         case 14:    // indoor_rowing
-			  rideFile->setTag("SubSport","indoor rowing");
-			  break;
+                        subsport = "indoor rowing";
+                        break;
                         case 15:    // elliptical
-			  rideFile->setTag("SubSport","elliptical");
-			  break;
-		        case 16: // stair climbing
-			  rideFile->setTag("SubSport","stair climbing");
-			  break;
-		        case 17: // lap swimming
-			  rideFile->setTag("SubSport","lap swimming");
-			  break;
-		        case 18: // open water
-			  rideFile->setTag("SubSport","open water");
-			  break;
-		        case 19: // flexibility training
-			  rideFile->setTag("SubSport","flexibility training");
-			  break;
-   		        case 20: // strength_training
-			  rideFile->setTag("SubSport","strength_training");
-			  break;
-		        case 21: // warm_up
-			  rideFile->setTag("SubSport","warm_up");
-			  break;
-		        case 22: // match
-			  rideFile->setTag("SubSport","match");
-			  break;
-		        case 23: // exercise
-			  rideFile->setTag("SubSport","exercise");
-			  break;
-		        case 24: // challenge
-			  rideFile->setTag("SubSport","challenge");
-			  break;
-		        case 25: // indoor_skiing
-			  rideFile->setTag("SubSport","indoor_skiing");
-			  break;
-		        case 26: // cardio_training
-			  rideFile->setTag("SubSport","cardio_training");
-			  break;
-		        case 27: // indoor_walking
-			  rideFile->setTag("SubSport","indoor_walking");
-			  break;
-		        case 28: // e_bike_fitness
-			  rideFile->setTag("SubSport","e_bike_fitness");
-			  break;
-		        case 29: // bmx
-			  rideFile->setTag("SubSport","bmx");
-			  break;
-		        case 30: // casual_walking
-			  rideFile->setTag("SubSport","casual_walking");
-			  break;
-		        case 31: // speed_walking
-			  rideFile->setTag("SubSport","speed_walking");
-			  break;
-		        case 32: // bike_to_run_transition
-			  rideFile->setTag("SubSport","bike_to_run_transition");
-			  break;
-		        case 33: // run_to_bike_transition
-			  rideFile->setTag("SubSport","run_to_bike_transition");
-			  break;
-		        case 34: // swim_to_bike_transition
-			  rideFile->setTag("SubSport","swim_to_bike_transition");
-			  break;
-		        case 35: // atv
-			  rideFile->setTag("SubSport","atv");
-			  break;
-		        case 36: // motocross
-			  rideFile->setTag("SubSport","motocross");
-			  break;
-		        case 37: // backcountry
-			  rideFile->setTag("SubSport","backcountry");
-			  break;
-		        case 38: // resort
-			  rideFile->setTag("SubSport","resort");
-			  break;
-		        case 39: // rc_drone
-			  rideFile->setTag("SubSport","rc_drone");
-			  break;
-		        case 40: // wingsuit
-			  rideFile->setTag("SubSport","wingsuit");
-			  break;
-		        case 41: // whitewater
-			  rideFile->setTag("SubSport","whitewater");
-			  break;
-  		        case 254: // all
-		        default:
-			  break;
+                        subsport = "elliptical";
+                        break;
+                      case 16: // stair climbing
+                        subsport = "stair climbing";
+                        break;
+                      case 17: // lap swimming
+                        subsport = "lap swimming";
+                        break;
+                      case 18: // open water
+                        subsport = "open water";
+                        break;
+                      case 19: // flexibility training
+                        subsport = "flexibility training";
+                        break;
+                      case 20: // strength_training
+                        subsport = "strength_training";
+                        break;
+                      case 21: // warm_up
+                        subsport = "warm_up";
+                        break;
+                      case 22: // match
+                        subsport = "match";
+                        break;
+                      case 23: // exercise
+                        subsport = "exercise";
+                        break;
+                      case 24: // challenge
+                        subsport = "challenge";
+                        break;
+                      case 25: // indoor_skiing
+                        subsport = "indoor_skiing";
+                        break;
+                      case 26: // cardio_training
+                        subsport = "cardio_training";
+                        break;
+                      case 27: // indoor_walking
+                        subsport = "indoor_walking";
+                        break;
+                      case 28: // e_bike_fitness
+                        subsport = "e_bike_fitness";
+                        break;
+                      case 29: // bmx
+                        subsport = "bmx";
+                        break;
+                      case 30: // casual_walking
+                        subsport = "casual_walking";
+                        break;
+                      case 31: // speed_walking
+                        subsport = "speed_walking";
+                        break;
+                      case 32: // bike_to_run_transition
+                        subsport = "bike_to_run_transition";
+                        break;
+                      case 33: // run_to_bike_transition
+                        subsport = "run_to_bike_transition";
+                        break;
+                      case 34: // swim_to_bike_transition
+                        subsport = "swim_to_bike_transition";
+                        break;
+                      case 35: // atv
+                        subsport = "atv";
+                        break;
+                      case 36: // motocross
+                        subsport = "motocross";
+                        break;
+                      case 37: // backcountry
+                        subsport = "backcountry";
+                        break;
+                      case 38: // resort
+                        subsport = "resort";
+                        break;
+                      case 39: // rc_drone
+                        subsport = "rc_drone";
+                        break;
+                      case 40: // wingsuit
+                        subsport = "wingsuit";
+                        break;
+                      case 41: // whitewater
+                        subsport = "whitewater";
+                        break;
+                      case 254: // all
+                      default:    // default, treat as Generic
+                        subsport = "";
+                        break;
+                      }
                     }
                     break;
                 case 44: // pool_length
                     pool_length = value / 100000.0;
+                    active_session_["Pool Length"] = QString("%1").arg(pool_length*1000.0);
                     rideFile->setTag("Pool Length", // in meters
                                       QString("%1").arg(pool_length*1000.0));
                     break;
 
                 // other fields are ignored at present
                 case 253: //timestamp
+                    this_timestamp = value + qbase_time.toTime_t();
+                    active_session_["_timestamp"] = static_cast<quint32>(this_timestamp);
+                    break;
+                case 168:   /* undocumented: Firstbeat EPOC based Exercise Load */
+                    active_session_["EPOC"] = QString::number(round(value / 65536.0 ));
+                    rideFile->setTag("EPOC", QString::number(round(value / 65536.0 )));
+                    break;
                 case 254: //index
                 case 0:   //event
                 case 1:    /* event_type */
                 case 2:    /* start_time */
+                    this_start_time = value + qbase_time.toTime_t();
+                    active_session_["_start_time"] = static_cast<quint32>(this_start_time);
+                    break;
                 case 3:    /* start_position_lat */
                 case 4:    /* start_position_long */
                 case 7:    /* total elapsed time */
+                    this_elapsed_time = value + qbase_time.toTime_t();
+                    active_session_["_total_elapsed_time"] = static_cast<quint32>(this_elapsed_time);
+                    break;
                 case 8:    /* total timer time */
                 case 9:    /* total distance */
                 case 10:    /* total_cycles */
@@ -1060,14 +1259,47 @@ struct FitFileReaderState
                 case 71:    /* min altitude */
                 case 92:    /* fractional avg cadence (rpm) */
                 case 93:    /* fractional max cadence */
-                default: ; // do nothing
+                default: break; // do nothing
             }
 
             if (FIT_DEBUG && FIT_DEBUG_LEVEL>1) {
                 printf("decodeSession  field %d: %d bytes, num %d, type %d\n", i, field.size, field.num, field.type );
             }
         }
-	rideFile->setTag("Workout Code",WorkOutCode);
+
+        if (sport_found) {
+            active_session_["Sport"] = sport;
+            rideFile->setTag("Sport", sport);
+        }
+        if (subsport_found) {
+            active_session_["SubSport"] = subsport;
+            rideFile->setTag("SubSport", subsport);
+        }
+
+        // same procedure as for laps, code is c/p until a better solution is found
+        if (this_timestamp == 0 && this_elapsed_time > 0) {
+            this_timestamp = iniTime + this_elapsed_time - 1;
+            active_session_["_timestamp"] = static_cast<quint32>(this_timestamp);
+        }
+
+        if (this_start_time == 0 || this_start_time-start_time < 0) {
+            //errors << QString("lap %1 has invalid start time").arg(interval);
+            this_start_time = start_time; // time was corrected after lap start
+            active_session_["_start_time"] = static_cast<quint32>(this_start_time);
+
+            if (this_timestamp == 0 || this_timestamp-start_time < 0) {
+                active_session_.remove("_timestamp");
+                errors << QString("lap %1 is ignored (invalid end time)").arg(interval);
+                return;
+            }
+        }
+
+        session_tags_.append(active_session_);
+        session_device_info_list_.append(session_device_info_);
+        session_data_info_list_.append(session_data_info_);
+        active_session_.clear();
+        session_device_info_.clear();
+        session_data_info_.clear();
     }
 
     void decodeDeviceInfo(const FitDefinition &def, int,
@@ -1075,7 +1307,9 @@ struct FitFileReaderState
         int i = 0;
 
         int index=-1;
-        int manu = -1, prod = -1, version = -1, type = -1, serial = -1;
+        int manu = -1, prod = -1, version = -1, type = -1;
+        quint32 serial = 0;
+        quint8 battery_status = 0;
         fit_string_value name;
 
         QString deviceInfo;
@@ -1092,11 +1326,10 @@ struct FitFileReaderState
                 case 1:   // ANT+ device type
                      type = value.v;
                      break;
-                      // details: 0x78 = HRM, 0x79 = Spd&Cad, 0x7A = Cad, 0x7B = Speed
                 case 2:   // manufacturer
                      manu = value.v;
                      break;
-                case 3:   // serial number (can be ANT id)
+                case 3:   // serial number
                      serial = value.v;
                      break;
                 case 4:   // product
@@ -1105,15 +1338,17 @@ struct FitFileReaderState
                 case 5:   // software version
                      version = value.v;
                      break;
+                case 11:  // battery status
+                     battery_status = value.v;
+                     break;
                 case 27:   // product name
                      name = value.s;
-                 break;
+                     break;
 
                 // all other fields are ignored at present
                 case 253: //timestamp
                 case 10:  // battery voltage
                 case 6:   // hardware version
-                case 11:  // battery status
                 case 22:  // ANT network
                 case 25:  // source type
                 case 24:  // equipment ID
@@ -1134,14 +1369,17 @@ struct FitFileReaderState
             deviceInfo += QString(" %1").arg(name.c_str());
         if (version>0)
             deviceInfo += QString(" (v%1)").arg(version/100.0);
-        if (serial>0 && serial < 100000)
+        if (serial > 0 && serial < std::numeric_limits<quint32>::max())
             deviceInfo += QString(" ID:%1").arg(serial);
+        if (battery_status > 0 && battery_status < 8)
+            deviceInfo += QString(" BAT:%1").arg(getBatteryStatus(battery_status));
 
         // What is 7 and 0 ?
         // 3 for Moxy ?
-        if (type>-1 && type != 0 && type != 7 && type != 3)
+        if (type>-1 && type != 0 && type != 7 && type != 3) {
             deviceInfos.insert(index, deviceInfo);
-
+            session_device_info_.insert(index, deviceInfo);
+        }
     }
 
     void decodeActivity(const FitDefinition &def, int,
@@ -1353,32 +1591,41 @@ struct FitFileReaderState
 
     void decodeHRV(const FitDefinition &def,
                    const std::vector<FitValue>& values) {
-      int rrvalue;
-      int i=0;
-      double hrv_time=0.0;
-      int n=hrvXdata->datapoints.count();
+        int rrvalue;
+        int i=0;
+        double hrv_time=0.0;
+        int n=hrvXdata->datapoints.count();
 
-      if (n>0)
-	hrv_time = hrvXdata->datapoints[n-1]->secs;
+        if (n>0)
+            hrv_time = hrvXdata->datapoints[n-1]->secs;
 
-      foreach(const FitField &field, def.fields) {
-	FitValue value = values[i++];
-	if ( value.type == ListValue && field.num == 0){
-	  for (int j=0; j<value.list.size(); j++)
-	    {
-	      rrvalue = int(value.list.at(j));
-	      hrv_time += rrvalue/1000.0;
+        foreach(const FitField &field, def.fields) {
+            FitValue value = values[i++];
+            if ( value.type == ListValue && field.num == 0){
+                for (int j=0; j<value.list.size(); j++)
+                {
+                    rrvalue = int(value.list.at(j));
+                    hrv_time += rrvalue/1000.0;
 
-	      if (rrvalue == -1){
-		break;
-	      }
-	      XDataPoint *p = new XDataPoint();
-	      p->secs = hrv_time;
-	      p->number[0] = rrvalue;
-	      hrvXdata->datapoints.append(p);
-	    }
-	}
-      }
+                    if (rrvalue == -1){
+                        break;
+                    }
+                    XDataPoint *p = new XDataPoint();
+                    p->secs = hrv_time;
+                    p->number[0] = rrvalue;
+                    hrvXdata->datapoints.append(p);
+                }
+            } else if (value.type == SingleValue)
+            {
+                rrvalue = int(value.v);
+                hrv_time += rrvalue/1000.0;
+
+                XDataPoint *p = new XDataPoint();
+                p->secs = hrv_time;
+                p->number[0] = rrvalue;
+                hrvXdata->datapoints.append(p);
+            }
+        }
     }
 
     void decodeLap(const FitDefinition &def, int time_offset,
@@ -1476,28 +1723,20 @@ struct FitFileReaderState
         } 
 
         if (isLapSwim) {
-            // Fill empty laps due to false starts or pauses in some devices
-            // s.t. Garmin 910xt - cap to avoid crashes on bad data
+            // Fill empty lengths due to false starts or pauses in some devices
+            // s.t. Garmin 910xt
             double secs = time - start_time;
-            if ((total_distance == 0.0) && (secs > last_time + 1) &&
-                (secs - last_time < 100*GarminHWM.toInt())) {
-                double deltaSecs = secs - last_time;
-                for (int i = 1; i <= deltaSecs; i++) {
-                    rideFile->appendPoint(
-                        last_time+i, 0.0, 0.0,
-                        last_distance,
-                        0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-                        0.0, 0.0, RideFile::NA, RideFile::NA,
-                        0.0, 0.0,
-                        0.0, 0.0,
-                        0.0, 0.0,
-                        0.0, 0.0,
-                        0.0, 0.0,
-                        0.0, 0.0,
-                        0.0, 0.0,
-                        0.0, 0.0, 0.0, 0.0, 0.0, 0.0, interval);
-                }
-                last_time += deltaSecs;
+            if ((total_distance == 0.0) && (secs > last_length + 1)) {
+
+                XDataPoint *p = new XDataPoint();
+                p->secs = secs;
+                p->km = last_distance;
+                p->number[0] = 0;
+                p->number[1] = secs-last_length;
+                p->number[2] = 0;
+                swimXdata->datapoints.append(p);
+
+                last_length = secs;
             }
             ++interval;
         } else if (rideFile->dataPoints().count()) { // no samples means no laps
@@ -1514,8 +1753,6 @@ struct FitFileReaderState
 
     void decodeRecord(const FitDefinition &def, int time_offset,
                       const std::vector<FitValue>& values) {
-        if (isLapSwim) return; // We use the length message for Lap Swimming
-
         time_t time = 0;
         if (time_offset == 0) // Damien : I have to confirm this...
             last_reference_time = last_time;
@@ -1553,7 +1790,7 @@ struct FitFileReaderState
 
             double deve_value = 0.0;
 
-            if( value == NA_VALUE )
+            if( _values.type == SingleValue && value == NA_VALUE )
                 continue;
 
             int native_num = field.num;
@@ -1616,6 +1853,7 @@ struct FitFileReaderState
                             lngi = value;
                             break;
                     case 2: // ALTITUDE
+                    case 78:// ENHANCED ALTITUDE
                             if (!native_profile && field.deve_idx>-1)
                                 alt = deve_value;
                             else
@@ -1635,6 +1873,7 @@ struct FitFileReaderState
                             km = value / 100000.0;
                             break;
                     case 6: // SPEED
+                    case 73:// ENHANCED SPEED
                             kph = value * 3.6 / 1000.0;
                             break;
                     case 7: // POWER
@@ -1655,9 +1894,18 @@ struct FitFileReaderState
                     case 29: // ACCUMULATED_POWER
                              break;
                     case 30: //LEFT_RIGHT_BALANCE
-                             lrbalance = (value & 0x80 ? 100 - (value & 0x7F) : value & 0x7F);
+                             // When bit 7 is 1 value are right power contribution
+                             // not '1' the location of the contribution is undefined
+                             if (value & 0x80)
+                                lrbalance = 100 - (value & 0x7F);
+                             else
+                                lrbalance = RideFile::NA;
                              break;
                     case 31: // GPS Accuracy
+                             break;
+
+                    case 32: // VERTICAL_SPEED
+                             native_num = -1;
                              break;
 
                     case 39: // VERTICAL OSCILLATION
@@ -1732,18 +1980,49 @@ struct FitFileReaderState
                     case 69: // ? Left Power Phase ?
                              leftTopDeathCenter = round(valueList.at(0) * 360.0/256);
                              leftBottomDeathCenter = round(valueList.at(1) * 360.0/256);
+
+                             if (leftTopDeathCenter>360) {
+                                 leftTopDeathCenter = 0;
+                             }
+                             if (leftBottomDeathCenter>360) {
+                                 leftBottomDeathCenter = 0;
+                             }
                              break;
                     case 70: // ? Left Peak Phase  ?
                              leftTopPeakPowerPhase = round(valueList.at(0) * 360.0/256);
                              leftBottomPeakPowerPhase = round(valueList.at(1) * 360.0/256);
+
+                             if (leftTopPeakPowerPhase>360) {
+                                 leftTopPeakPowerPhase = 0;
+                             }
+                             if (leftBottomPeakPowerPhase>360) {
+                                 leftBottomPeakPowerPhase = 0;
+                             }
                              break;
                     case 71: // ? Right Power Phase ?
                              rightTopDeathCenter = round(valueList.at(0) * 360.0/256);
                              rightBottomDeathCenter = round(valueList.at(1) * 360.0/256);
+
+                             if (rightTopDeathCenter>360) {
+                                 rightTopDeathCenter = 0;
+                             }
+                             if (rightBottomDeathCenter>360) {
+                                 rightBottomDeathCenter = 0;
+                             }
                              break;
                     case 72: // ? Right Peak Phase  ?
                              rightTopPeakPowerPhase = round(valueList.at(0) * 360.0/256);
                              rightBottomPeakPowerPhase = round(valueList.at(1) * 360.0/256);
+
+                             if (rightTopPeakPowerPhase>360) {
+                                 rightTopPeakPowerPhase = 0;
+                             }
+                             if (rightBottomPeakPowerPhase>360) {
+                                 rightBottomPeakPowerPhase = 0;
+                             }
+                             break;
+                    case 81: // BATTERY_SOC
+                             native_num = -1;
                              break;
                     case 83: // VERTICAL_RATIO
                              native_num = -1;
@@ -1754,14 +2033,20 @@ struct FitFileReaderState
                     case 85: // STEP_LENGTH
                              native_num = -1;
                              break;
-
                     case 87: // ???
                              break;
-
                     case 90: // PERFORMANCE_CONDITION
                              native_num = -1;
                              break;
-
+                    case 108: // to confirm : RESPIRATIONRATE
+                             native_num = -1;
+                             break;
+                    case 114: // MTB Dynamics - Grit
+                             native_num = -1;
+                             break;
+                    case 115: // MTB Dynamics - Flow
+                             native_num = -1;
+                             break;
                     default:
                             unknown_record_fields.insert(native_num);
                             native_num = -1;
@@ -1924,7 +2209,7 @@ struct FitFileReaderState
             double deltaLat = lat - prevPoint->lat;
             // double deltaHeadwind = headwind - prevPoint->headwind;
             double deltaSlope = slope - prevPoint->slope;
-            double deltaLeftRightBalance = lrbalance - prevPoint->lrbalance;
+            double deltaLeftRightBalance = (lrbalance>=0?lrbalance:50.0) - (prevPoint->lrbalance?prevPoint->lrbalance:50.0);
             double deltaLeftTE = leftTorqueEff - prevPoint->lte;
             double deltaRightTE = rightTorqueEff - prevPoint->rte;
             double deltaLeftPS = leftPedalSmooth - prevPoint->lps;
@@ -2017,25 +2302,12 @@ struct FitFileReaderState
                       const std::vector<FitValue>& values) {
         if (!isLapSwim) {
             isLapSwim = true;
-            // reset rideFile if not empty
-            if (!rideFile->dataPoints().empty()) {
-                start_time = 0;
-                last_time = 0;
-                last_distance = 0.00f;
-                interval = 1;
-                QString deviceType = rideFile->deviceType();
-                QString fileFormat = rideFile->fileFormat();
-                delete rideFile;
-                rideFile = new RideFile;
-                rideFile->setDeviceType(deviceType);
-                rideFile->setFileFormat(fileFormat);
-                rideFile->setRecIntSecs(1.0);
-             }
+            last_length = 0.0;
         }
         time_t time = 0;
         if (time_offset > 0)
             time = last_time + time_offset;
-        double cad = 0, km = 0, kph = 0;
+        double km = 0;
 
         int length_type = 0;
         int swim_stroke = 0;
@@ -2061,27 +2333,27 @@ struct FitFileReaderState
                         // Time MUST NOT go backwards
                         // You canny break the laws of physics, Jim
 
-                        if (time < last_time)
-                            time = last_time; // Not true for Bryton
+                        if (time < last_length)
+                            time = last_length;
                         break;
                 case 3: // total elapsed time
-                        length_duration = value / 1000.0;
+                        if (FIT_DEBUG && FIT_DEBUG_LEVEL>1) qDebug() << " total_elapsed_time:" << value;
                         break;
                 case 4: // total timer time
-                        if (FIT_DEBUG && FIT_DEBUG_LEVEL>1) qDebug() << " total_timer_time:" << value;
+                        length_duration = value / 1000.0;
                         break;
                 case 5: // total strokes
                         total_strokes = value;
                         break;
                 case 6: // avg speed
-                        kph = value * 3.6 / 1000.0;
+                        // kph = value * 3.6 / 1000.0;
                         break;
                 case 7: // swim stroke: 0-free, 1-back, 2-breast, 3-fly,
                         //              4-drill, 5-mixed, 6-IM
                         swim_stroke = value;
                         break;
                 case 9: // cadence
-                        cad = value;
+                        // cad = value;
                         break;
                 case 11: // total_calories
                         if (FIT_DEBUG && FIT_DEBUG_LEVEL>1) qDebug() << " total_calories:" << value;
@@ -2097,23 +2369,18 @@ struct FitFileReaderState
             }
         }
 
-        XDataPoint *p = new XDataPoint();
-        p->secs = last_time;
-        p->km = last_distance;
-        p->number[0] = length_type + swim_stroke;
-        p->number[1] = length_duration;
-        p->number[2] = total_strokes;
+        if (length_duration > 0) {
+            XDataPoint *p = new XDataPoint();
+            p->secs = last_length;
+            p->km = last_distance;
+            p->number[0] = length_type + swim_stroke;
+            p->number[1] = length_duration;
+            p->number[2] = total_strokes;
 
-        swimXdata->datapoints.append(p);
-
-        // Rest interval
-        if (!length_type) {
-            kph = 0.0;
-            cad = 0.0;
+            swimXdata->datapoints.append(p);
         }
-        if (time == last_time)
-            return; // Sketchy, but some FIT files do this.
-        if (start_time == 0) {
+
+        if (last_length == 0) {
             start_time = time - 1; // recording interval?
             last_reference_time = start_time;
             QDateTime t;
@@ -2122,50 +2389,8 @@ struct FitFileReaderState
             interval = 1;
         }
 
-        // Normalize distance for the most common pool lengths,
-        // this is a hack to avoid the need for a double pass when
-        // pool_length comes in Session message at the end of the file.
-        if (pool_length == 0.0) {
-            pool_length = kph*length_duration/3600;
-            if (fabs(pool_length - 0.050) < 0.004) pool_length = 0.050;
-            else if (fabs(pool_length - 0.033) < 0.003) pool_length = 0.033;
-            else if (fabs(pool_length - 0.025) < 0.002) pool_length = 0.025;
-            else if (fabs(pool_length - 0.025*METERS_PER_YARD) < 0.002) pool_length = 0.025*METERS_PER_YARD;
-            else if (fabs(pool_length - 0.020) < 0.002) pool_length = 0.020;
-        }
+        last_length += length_duration;
 
-        // another pool length or pause
-        km = last_distance + (length_type ? pool_length : 0.0);
-
-        // Adjust length duration using fractional carry
-        length_duration += frac_time;
-        frac_time = modf(length_duration, &length_duration);
-
-        // only fill 100x the maximal smart recording gap defined
-        // in preferences - we don't want to crash / stall on bad
-        // or corrupt files
-        if (length_duration > 0 && length_duration < 100*GarminHWM.toInt()) {
-            double deltaSecs = length_duration;
-            double deltaDist = km - last_distance;
-            kph = 3600.0 * deltaDist / deltaSecs;
-            for (int i = 1; i <= deltaSecs; i++) {
-                rideFile->appendPoint(
-                    last_time + i, cad, 0.0,
-                    last_distance + (deltaDist * i/deltaSecs),
-                    kph, 0.0, 0.0, 0.0, 0.0, 0.0,
-                    0.0, 0.0,
-                    RideFile::NA,RideFile::NA,
-                    0.0, 0.0,0.0, 0.0,
-                    0.0, 0.0,
-                    0.0, 0.0,0.0, 0.0,
-                    0.0, 0.0,0.0, 0.0,
-                    0.0, 0.0,
-                    0.0, 0.0, 0.0, 0.0,
-                    interval);
-            }
-            last_time += deltaSecs;
-            last_distance += deltaDist;
-        }
     }
 
     /* weather broadcast as observed at weather station (undocumented) */
@@ -2268,7 +2493,8 @@ struct FitFileReaderState
 
                 case 9:   // event_timestamp
                           last_event_timestamp = value.v;
-                          start_timestamp = time-last_event_timestamp/1024.0;
+                          // update start_timestamp only if Timestamp (253) included for resyncs
+                          if (time > 0) start_timestamp = time-last_event_timestamp/1024.0;
                           timestamps.append(last_event_timestamp/1024.0);
                           break;
                 case 10:  // event_timestamp_12
@@ -2358,7 +2584,6 @@ struct FitFileReaderState
         int i = 0;
         time_t this_start_time = 0;
         ++interval;
-        double total_elapsed_time = 0.0;
 
         QString segment_name;
         bool fail = false;
@@ -2396,8 +2621,8 @@ struct FitFileReaderState
                 case 7:  // personal best (ms) ? segment elapsed time from this activity (ms) ?
                          // => depends on file / device / version ?
                          // FIXME: to be investigated/confirmed.
-                    total_elapsed_time = round(value.v / 1000.0);
-                    break;
+                         // total_elapsed_time = round(value.v / 1000.0);
+                        break;
                 case 8:  // challenger best (ms) ? segment total timer time from this activity (ms) ?
                          // => depends on file / device / version ?
                          // FIXME: to be investigated/confirmed.
@@ -2498,18 +2723,102 @@ struct FitFileReaderState
             }
         }
         if (rideFile->dataPoints().count()) { // no samples means no laps..
-            if (segment_name == "") {
-                segment_name = QObject::tr("Lap %1").arg(interval);
-            }
-            if (isLapSwim && total_elapsed_time > 0.0) {
-                rideFile->addInterval(RideFileInterval::DEVICE, this_start_time - start_time,
-                                      this_start_time - start_time + total_elapsed_time, segment_name);
-            } else {
-                rideFile->addInterval(RideFileInterval::DEVICE, this_start_time - start_time, time - start_time,
-                                      segment_name);
+            if (segment_name == "") segment_name = QObject::tr("Lap %1").arg(interval);
+            rideFile->addInterval(RideFileInterval::DEVICE, this_start_time - start_time, time - start_time, segment_name);
+        }
+
+    }
+
+
+    void decodeDeveloperID(const FitDefinition &def, int time_offset,
+                          const std::vector<FitValue>& values) {
+        Q_UNUSED(time_offset);
+
+        FitDeveApp deve;
+
+        // 0	developer_id	byte
+        // 1	application_id	byte
+        // 2	manufacturer_id	manufacturer
+        // 3	developer_data_index	uint8
+        // 4	application_version	uint32
+
+        int i = 0;
+        foreach(const FitField &field, def.fields) {
+            FitValue value = values[i++];
+
+            if (FIT_DEBUG && FIT_DEBUG_LEVEL>1)
+                qDebug() << "deveID : num" << field.num  << value.v << value.s.c_str();
+
+            fit_string_value dev_id = "";
+
+            switch (field.num) {
+                case 0:  // developer_id
+                        dev_id = "";
+
+                        foreach(fit_value_t val, value.list) {
+
+                            if (val != NA_VALUE) {
+                                std::stringstream sstream;
+                                sstream << std::hex << val;
+                                if (val<16)
+                                    dev_id += "0";
+                                dev_id += sstream.str();
+                            }
+                        }
+                        if (dev_id.length()>=20) {
+                            dev_id.insert(8, "-");
+                            dev_id.insert(13, "-");
+                            dev_id.insert(18, "-");
+                            dev_id.insert(23, "-");
+                        }
+                        if (FIT_DEBUG && FIT_DEBUG_LEVEL>1)
+                            qDebug() << "developer_id" << dev_id.c_str();
+                        deve.dev_id = dev_id;
+                        break;
+                case 1:  // application_id
+                        dev_id = "";
+
+                        foreach(fit_value_t val, value.list) {
+
+                            if (val != NA_VALUE) {
+                                std::stringstream sstream;
+                                sstream << std::hex << val;
+                                if (val<16)
+                                    dev_id += "0";
+                                dev_id += sstream.str();
+                            }
+                        }
+                        if (dev_id.length()>=20) {
+                            dev_id.insert(8, "-");
+                            dev_id.insert(13, "-");
+                            dev_id.insert(18, "-");
+                            dev_id.insert(23, "-");
+                        }
+
+                        if (FIT_DEBUG && FIT_DEBUG_LEVEL>1)
+                            qDebug() << "application_id" << dev_id.c_str();
+                        deve.app_id = dev_id;
+                        break;
+                case 2:  // manufacturer_id
+                        deve.man_id = value.v;
+                        break;
+                case 3:  // developer_data_index
+                        deve.dev_data_id = value.v;
+                        break;
+                case 4: deve.app_version = value.v;
+                        break;
+                default:
+                        // ignore it
+                        break;
             }
         }
 
+        if (FIT_DEBUG && FIT_DEBUG_LEVEL>1)
+            qDebug() << "DEVE ID" << deve.dev_id.c_str() << "app_id" << deve.app_id.c_str() << "man_id" << deve.man_id << "dev_data_id" << deve.dev_data_id << "app_version" << deve.app_version;
+
+        if (!local_deve_fields_app.contains(deve.dev_data_id)) {
+            local_deve_fields_app.insert(deve.dev_data_id, deve);
+        }
     }
 
     void decodeDeveloperFieldDescription(const FitDefinition &def, int time_offset,
@@ -2765,6 +3074,14 @@ struct FitFileReaderState
                     case 6: size = 4;
                             if (field.size==size) {
                                 value.type = SingleValue; value.v = read_uint32(def.is_big_endian, &count);
+                            } else if (field.size<size) {
+                                // Some device (eg Coros Pace 2) seems to declare uint32 with size 1
+                                value.type = SingleValue;
+                                if (field.size == 1)
+                                    value.v = read_uint8(&count);
+                                if (field.size == 2)
+                                    value.v = read_uint16(def.is_big_endian, &count);
+                                size = field.size;
                             } else { // Multi-values
                                 value.type = ListValue;
                                 value.list.clear();
@@ -2782,11 +3099,19 @@ struct FitFileReaderState
 
                     case 8: // FLOAT32
                         size = 4;
-                        value.type = FloatValue;
-                        value.f = read_float32(&count);
-                        if (value.f != value.f) // No NAN
-                            value.f = 0;
-                        size = field.size;
+                        if (field.size==size) {
+                            value.type = FloatValue;
+                            value.f = read_float32(def.is_big_endian, &count);
+                            if (value.f != value.f) // No NAN
+                                value.f = 0;
+                        } else { // Multi-values
+                            value.type = ListValue;
+                            value.list.clear();
+                            for (int i=0;i<field.size/size;i++) {
+                                value.list.append(read_float32(def.is_big_endian, &count));
+                            }
+                            size = field.size;
+                        }
                         break;
 
                     //case 9: // FLOAT64
@@ -2809,7 +3134,7 @@ struct FitFileReaderState
                              value.type = ListValue;
                              value.list.clear();
                              for (int i=0;i<field.size;i++) {
-                                value.list.append(read_uint8(&count));
+                                value.list.append(read_byte(&count));
                              }
                              size = value.list.size();
                              break;
@@ -2822,7 +3147,7 @@ struct FitFileReaderState
                                    field.size);
 
                         }
-                        read_unknown( field.size, &count );
+                        if (field.size > 0) read_unknown( field.size, &count );
                         value.type = SingleValue;
                         value.v = NA_VALUE;
                         unknown_base_type.insert(field.type);
@@ -2865,7 +3190,7 @@ struct FitFileReaderState
                     else if (value.type == ListValue) {
                         printf( "values=");
                         for (int i=0;i<value.list.count();i++) {
-                            if (value.v == NA_VALUE)
+                            if (value.list.at(i) == NA_VALUE)
                                 printf( "NA,");
                             else
                                 printf( "%lld,", value.list.at(i) );
@@ -2917,6 +3242,10 @@ struct FitFileReaderState
 
                 case 140: /* undocumented Garmin/Firstbeat specific metrics */
                     decodePhysiologicalMetrics(def, time_offset, values);
+                    break;
+
+                case 207: /* Developer ID */
+                    decodeDeveloperID(def, time_offset, values);
                     break;
 
                 case 1: /* capabilities, device settings and timezone */ break;
@@ -2979,8 +3308,7 @@ struct FitFileReaderState
                            / #3: ID of source garmin connect activity (uint32) ? OR ? timestamp ? / #4: time to finish (ms) / #254: message counter idx */
                 case 150: /* segment trackpoint (undocumented) ; see details below: */
                           /* #1: latitude / #2: longitude / #3: distance from start point / #4: elevation / #5: timer since start (ms) / #6: message counter index */
-                case 207: /* Developer ID */
-                    break;
+
                 default:
                     unknown_global_msg_nums.insert(def.global_msg_num);
             }
@@ -3129,60 +3457,238 @@ struct FitFileReaderState
             foreach(int num, unknown_base_type)
                 qDebug() << QString("FitRideFile: unknown base type %1; skipped").arg(num);
 
-            QStringList uniqueDevices(deviceInfos.values());
-            uniqueDevices.removeDuplicates();
-            QString deviceInfo = uniqueDevices.join("\n");
-            if (! deviceInfo.isEmpty())
-                rideFile->setTag("Device Info", deviceInfo);
+            setRideFileDeviceInfo(rideFile, deviceInfos);
+            setRideFileDataInfo(rideFile, dataInfos);
 
-            QString dataInfo;
-            foreach(QString info, dataInfos) {
-                dataInfo += info + "\n";
+            // CIQINFO
+            if (local_deve_fields_app.count()>0) {
+                QString ciqInfo = "[";
+                int i=0;
+                foreach(FitDeveApp deve_app, local_deve_fields_app) {
+                    ciqInfo += QString("{\n\t\"application_id\": %1,\n\t\"developer_data_index\": %2,\n\t").arg(deve_app.app_id.c_str() ).arg(deve_app.dev_data_id);
+                    ciqInfo += QString("\"fields\": [\n\t\t");
+                    int j=0;
+                    foreach(FitDeveField deve_field, deve_app.fields) {
+                        ciqInfo += QString("{\n\t\t\"dev_id\": %1,\n\t\t\"name\": \"%2\"}").arg(deve_field.dev_id).arg(deve_field.name.c_str());
+                        if (++j<deve_app.fields.count())
+                            ciqInfo += ",\n\t\t";
+                    }
+                    ciqInfo += QString("\n\t]\n}");
+                    if (++i<local_deve_fields_app.count())
+                        ciqInfo += ",\n";
+                }
+                ciqInfo += "]";
+
+                //if (ciqInfo.length()>2)
+                //    rideFile->setTag("CIQ", ciqInfo);
             }
-            if (dataInfo.length()>0)
-                rideFile->setTag("Data Info", dataInfo);
 
             file.close();
 
-            if (weatherXdata->datapoints.count()>0)
-                rideFile->addXData("WEATHER", weatherXdata);
-            else
-                delete weatherXdata;
+            appendXData(rideFile);
 
-            if (swimXdata->datapoints.count()>0)
-                rideFile->addXData("SWIM", swimXdata);
-            else
-                delete swimXdata;
-
-            if (hrvXdata->datapoints.count()>0)
-                rideFile->addXData("HRV", hrvXdata);
-            else
-                delete hrvXdata;
-
-            if (gearsXdata->datapoints.count()>0)
-                rideFile->addXData("GEARS", gearsXdata);
-            else
-                delete gearsXdata;
-
-            if (deveXdata->datapoints.count()>0)
-                rideFile->addXData("DEVELOPER", deveXdata);
-            else
-                delete deveXdata;
-
-            if (extraXdata->datapoints.count()>0)
-                rideFile->addXData("EXTRA", extraXdata);
-            else
-                delete extraXdata;
+            if (rideFile->xdata("SWIM")) {
+                // Build synthetic kph, km and cad sample data for Lap Swims
+                DataProcessor* fixLapDP = DataProcessorFactory::instance().getProcessors(true).value("Fix Lap Swim");
+                if (fixLapDP) fixLapDP->postProcess(rideFile, NULL, "NEW");
+                else qDebug()<<"Fix Lap Swim Data Processor not found.";
+            }
 
             return rideFile;
         }
     }
+
+    void setRideFileDeviceInfo(RideFile *rf, QMap<int, QString> const& device_infos) {
+        QStringList uniqueDevices(device_infos.values());
+        uniqueDevices.removeDuplicates();
+        QString deviceInfo = uniqueDevices.join("\n");
+        if (! deviceInfo.isEmpty()) {
+            rf->setTag("Device Info", deviceInfo);
+        }
+    }
+
+    void setRideFileDataInfo(RideFile *rf, QList<QString> const& data_infos) {
+        QString dataInfo;
+        foreach(QString info, data_infos) {
+            dataInfo += info + "\n";
+        }
+        if (dataInfo.length()>0) {
+            rf->setTag("Data Info", dataInfo);
+        }
+    }
+
+    void appendXData(RideFile *rf) {
+        if (rf == nullptr) { return; }
+
+        if (!weatherXdata->datapoints.empty())
+            rf->addXData("WEATHER", weatherXdata);
+        else
+            delete weatherXdata;
+
+        if (!swimXdata->datapoints.empty())
+            rf->addXData("SWIM", swimXdata);
+        else
+            delete swimXdata;
+
+        if (!hrvXdata->datapoints.empty())
+            rf->addXData("HRV", hrvXdata);
+        else
+            delete hrvXdata;
+
+        if (!gearsXdata->datapoints.empty())
+            rf->addXData("GEARS", gearsXdata);
+        else
+            delete gearsXdata;
+
+        if (!deveXdata->datapoints.empty())
+            rf->addXData("DEVELOPER", deveXdata);
+        else
+            delete deveXdata;
+
+        if (!extraXdata->datapoints.empty())
+            rf->addXData("EXTRA", extraXdata);
+        else
+            delete extraXdata;
+    }
+
+    RideFile *splitSessions(QList<RideFile*> *rides) {
+        // NOTES:
+        // - start altitude of first transition not correct (zero), leads to too high climb figure
+        //   i think this is not really a big deal yet
+
+        if (session_tags_.size() < 2) {
+            // just check if it was a run activity and adjust values, like it was done
+            // in decoding the session before.
+            if (rideFile->isRun()) {
+                convert2Run(rideFile);
+            }
+            return rideFile;
+        }
+
+        // If there is more than one session parsed we
+        // split the ride file just created into multiple
+        // ones, each representing a single session.
+        // BUT, we do not touch the original file.
+
+        quint32 start = 0, start_time = 0;
+        const QString deviceType = rideFile->deviceType();
+        const QString fileFormat = rideFile->fileFormat();
+        const double recIntSecs = rideFile->recIntSecs();
+        // start date of an activity in ISO format is guaranteed to be unique in GC, see discussion in MR.
+        const QString uniqueSessionCookie = rideFile->startTime().toUTC().toString(Qt::ISODate);
+        QString sport_before;
+
+        int session_idx = 0;
+        for(auto s = session_tags_.begin(); s != session_tags_.end(); ++s, ++session_idx) {
+            RideFile *rf = new RideFile;
+            rf->setDeviceType(deviceType);
+            rf->setFileFormat(fileFormat);
+            rf->setRecIntSecs(recIntSecs);
+
+            // each ride gets a unique cookie to allow filtering/grouping all sessions that belong together
+            rf->setTag("Multisport", uniqueSessionCookie);
+
+            // set tags and filter out session meta data
+            quint32 stop = 0;
+            for(auto sle = s->begin(); sle != s->end(); ++sle) {
+                QString const& key = sle.key();
+                // meta data is prefixed w/ '_', otherwise its a ride file tag
+                if (key.startsWith('_')) {
+                    if (0 == QString::compare(key, "_timestamp", Qt::CaseInsensitive)) {
+                        stop = sle->toUInt();
+                    } else if (start == 0 && 0 == QString::compare(key, "_start_time", Qt::CaseInsensitive)) {
+                        // only do once
+                        start = sle->toUInt();
+                        start_time = start;
+                    }
+                } else {
+                    rf->setTag(key, sle->toString());
+                }
+            }
+
+            // adjust the start time
+            rf->setStartTime(QDateTime::fromSecsSinceEpoch(start, Qt::UTC));
+
+            int idx_start = rideFile->timeIndex(start - start_time);
+            int idx_stop = rideFile->timeIndex(stop - start_time);
+            // add data points to the new file created.
+            const QVector<RideFilePoint*> points_from_file = rideFile->dataPoints().mid(idx_start, idx_stop - idx_start);
+            foreach(RideFilePoint *p, points_from_file) {
+                rf->appendPoint(*p);
+            }
+
+            // fix subsport tag of transitions
+            if (0 == QString::compare(rf->getTag("Sport", ""), "Transition", Qt::CaseInsensitive)) {
+                QString sport_after;
+                auto s_cpy = s + 1;
+                if (s_cpy != session_tags_.end() && s_cpy->contains("Sport") && s_cpy->value("SubSport").toString().isEmpty()) {
+                    sport_after = s_cpy->value("Sport").toString();
+                }
+                if (!sport_before.isEmpty() && !sport_after.isEmpty()) {
+                     rf->setTag("SubSport", (QString("%1_to_%2_transition").arg(sport_before.toLower(), sport_after.toLower())));
+                }
+            }
+
+            // add intervals
+            //   Only intervals that fit in the range of the file we are recently creating
+            //   are transferred.
+            auto ride_intervals = rideFile->intervals();
+            int int_ctr = 1;
+            foreach (RideFileInterval *rfi, ride_intervals) {
+                // is the recent interval in the range of our new file?
+                if (rfi->start >= idx_start && rfi->start <= idx_stop && rfi->stop <= idx_stop) {   // is it possible that the a start is beyond stop and stop fits?
+                    rf->addInterval(rfi->type, rfi->start, rfi->stop, QString("Lap %1").arg(int_ctr));
+                    int_ctr++;
+                }
+            }
+
+            // add XData
+            const auto file_xdata = rideFile->xdata();
+            for (auto it = file_xdata.begin(); it != file_xdata.end(); ++it) {
+                XDataSeries *s = new XDataSeries(*(it.value()));
+                s->datapoints.erase(std::remove_if(s->datapoints.begin(), s->datapoints.end(), [start_time, start, stop](XDataPoint *xdp){
+                    return xdp && (xdp->secs >= (stop - start_time) || xdp->secs < (start - start_time));
+                }), s->datapoints.end());
+                // adjust their timing
+                if (!s->datapoints.empty()) {
+                    auto first_time = s->datapoints.first()->secs;
+                    foreach (XDataPoint *p, s->datapoints) {
+                        p->secs -= first_time;
+                    }
+                    // and append
+                    rf->addXData(it.key(), s);
+                }
+            }
+
+            // convert if necessary (run and transition)
+            if (rf->isRun() || 0 == QString::compare(rf->getTag("Sport", ""), "Transition", Qt::CaseInsensitive)) {
+                convert2Run(rf);
+            }
+
+            setRideFileDataInfo(rf, session_data_info_list_.at(session_idx));
+            setRideFileDeviceInfo(rf, session_device_info_list_.at(session_idx));
+
+            rides->append(rf);
+
+            // remember sport tag
+            sport_before = rf->getTag("Sport", "");
+
+            // adjust timing and go on
+            start = stop;
+        }
+
+        // return original file
+        return rideFile;
+    }
 };
 
-RideFile *FitFileReader::openRideFile(QFile &file, QStringList &errors, QList<RideFile*>*) const
+RideFile *FitFileReader::openRideFile(QFile &file, QStringList &errors, QList<RideFile*> *rides) const
 {
     QSharedPointer<FitFileReaderState> state(new FitFileReaderState(file, errors));
-    return state->run();
+    RideFile* ret = state->run();
+    // Split sessions, only if we have a valid RideFile
+    if (ret) ret = state->splitSessions(rides);
+    return ret;
 }
 
 
@@ -3671,7 +4177,8 @@ void write_record(QByteArray *array, const RideFile *ride, bool withAlt, bool wi
             write_int8(ridePoint, point->temp);
         }
         if ( (type&2)==2 ) {
-            write_int8(ridePoint, point->lrbalance);
+            // write right power contribution
+            write_int8(ridePoint, 0x80 + (100-point->lrbalance));
         }
 
         array->append(ridePoint->data(), ridePoint->size());

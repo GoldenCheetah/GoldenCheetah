@@ -21,11 +21,12 @@
 #include "Context.h"
 #include "AerolabWindow.h"
 #include "Aerolab.h"
-#include "TabView.h"
+#include "AbstractView.h"
 #include "IntervalItem.h"
 #include "RideItem.h"
 #include "Colors.h"
 #include "HelpWhatsThis.h"
+#include "Units.h"
 #include <QtGui>
 #include <qwt_plot_zoomer.h>
 
@@ -64,7 +65,7 @@ AerolabWindow::AerolabWindow(Context *context) :
   crrSlider->setTickPosition(QSlider::TicksBelow);
   crrSlider->setTickInterval(1000);
   crrSlider->setMinimum(1000);
-  crrSlider->setMaximum(15000);
+  crrSlider->setMaximum(25000);
   crrSlider->setValue(aerolab->intCrr());
   crrLayout->addWidget( crrLabel );
   crrLayout->addWidget( crrLineEdit );
@@ -362,7 +363,7 @@ AerolabWindow::configChanged(qint32)
   commentEdit->setPalette(palette);
 
 #ifndef Q_OS_MAC
-    aerolab->setStyleSheet(TabView::ourStyleSheet());
+    aerolab->setStyleSheet(AbstractView::ourStyleSheet());
 #endif
 }
 
@@ -647,8 +648,8 @@ AerolabWindow::zoomInterval(IntervalItem *which) {
     rect.setLeft(which->start/60);
     rect.setRight(which->stop/60);
   } else {
-    rect.setLeft(which->startKM);
-    rect.setRight(which->stopKM);
+    rect.setLeft(which->startKM * (GlobalContext::context()->useMetricUnits ? 1 : MILES_PER_KM));
+    rect.setRight(which->stopKM * (GlobalContext::context()->useMetricUnits ? 1 : MILES_PER_KM));
   }
   rect.setTop(aerolab->veCurve->maxYValue()*1.1);
   rect.setBottom(aerolab->veCurve->minYValue()-10);

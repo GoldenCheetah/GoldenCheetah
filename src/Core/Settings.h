@@ -31,9 +31,7 @@
 #ifndef GC_SETTINGS_APP
 #define GC_SETTINGS_APP                       "GoldenCheetah"
 #endif
-#define GC_SETTINGS_BESTS_METRICS_DEFAULT "5s_critical_power,1m_critical_power,5m_critical_power,20m_critical_power,60m_critical_power,3m_critical_pace,20m_critical_pace,3m_critical_pace_swim,20m_critical_pace_swim"
-#define GC_SETTINGS_SUMMARY_METRICS_DEFAULT "triscore,skiba_xpower,skiba_relative_intensity,xPace,swimscore_xpace,trimp_points,aerobic_decoupling"
-#define GC_SETTINGS_INTERVAL_METRICS_DEFAULT "workout_time,total_distance,total_work,average_power,average_hr,average_cad,average_speed,pace,pace_swim,distance_swim"
+#define GC_SETTINGS_FAVOURITE_METRICS_DEFAULT "workout_time,total_distance,total_work,average_power,average_hr,average_cad,average_speed,pace,pace_swim,distance_swim"
 #define GC_UNIT_METRIC                       "Metric"
 #define GC_UNIT_IMPERIAL                     "Imperial"
 
@@ -110,6 +108,7 @@
 #define GC_SETTINGS_LAST                "<system>mainwindow/lastOpened"
 #define GC_SETTINGS_MAIN_GEOM           "<system>mainwindow/geometry"
 #define GC_SETTINGS_MAIN_STATE          "<system>mainwindow/state"
+#define GC_SETTINGS_MAIN_SIDEBAR        "<system>mainwindow/sidebar/"
 #define GC_SETTINGS_LAST_IMPORT_PATH    "<system>mainwindow/lastImportPath"
 #define GC_SETTINGS_LAST_WORKOUT_PATH   "<system>mainwindow/lastWorkoutPath"
 #define GC_LAST_DOWNLOAD_DEVICE         "<system>mainwindow/lastDownloadDevice"
@@ -139,15 +138,14 @@
 // --------------------------------------------------------------------
 
 
-#define GC_SETTINGS_SUMMARY_METRICS     "<global-general>rideSummaryWindow/summaryMetrics"
-#define GC_SETTINGS_BESTS_METRICS       "<global-general>rideSummaryWindow/bestsMetrics"
-#define GC_SETTINGS_INTERVAL_METRICS    "<global-general>rideSummaryWindow/intervalMetrics"
+#define GC_SETTINGS_FAVOURITE_METRICS    "<global-general>rideSummaryWindow/intervalMetrics"
 #define GC_TABBAR                       "<global-general>show/tabbar"                        // show tabbar
 #define GC_WBALFORM                     "<global-general>wbal/formula"                       // wbal formula to use
 #define GC_BIKESCOREDAYS                    "<global-general>bikeScoreDays"
 #define GC_BIKESCOREMODE                    "<global-general>bikeScoreMode"
 #define GC_WARNCONVERT                  "<global-general>warnconvert"
 #define GC_WARNEXIT                     "<global-general>warnexit"
+#define GC_OPENLASTATHLETE              "<global-general>openlastathlete"
 #define GC_HIST_BIN_WIDTH               "<global-general>histogamWindow/binWidth"
 #define GC_WORKOUTDIR                   "<global-general>workoutDir"                         // used for Workouts and Videosyn files
 #define GC_LINEWIDTH                    "<global-general>linewidth"
@@ -179,10 +177,13 @@
 #define GC_DPFG_STOP                    "<global-general>dataprocess/fixgaps/stop"
 #define GC_DPFS_MAX                     "<global-general>dataprocess/fixspikes/max"
 #define GC_DPFS_VARIANCE                "<global-general>dataprocess/fixspikes/variance"
+#define GC_DPFS_MEDWINSIZ               "<global-general>dataprocess/fixspikes/medwinsiz"
+#define GC_DPFS_MEDALGO                 "<global-general>dataprocess/fixspikes/medalgo"
 #define GC_DPTA                         "<global-general>dataprocess/torqueadjust/adjustment"
 #define GC_DPPA                         "<global-general>dataprocess/poweradjust/adjustment"
 #define GC_DPPA_ABS                     "<global-general>dataprocess/poweradjust/adjustment_abs"
 #define GC_DPFHRS_MAX                   "<global-general>dataprocess/fixhrspikes/max"
+#define GC_DPDD_UCS                     "<global-general>dataprocess/fixderivedistance/usecubicsplines"
 #define GC_DPDP_BIKEWEIGHT              "<global-general>dataprocess/fixderivepower/bikewheight"
 #define GC_DPDP_CRR                     "<global-general>dataprocess/fixderivepower/crr"
 #define GC_DPDP_CDA                     "<global-general>dataprocess/fixderivepower/cda"
@@ -190,6 +191,7 @@
 #define GC_DPRP_EQUIPWEIGHT             "<global-general>dataprocess/fixrunningpower/equipwheight"
 #define GC_DPDR_DRAFTM                  "<global-general>dataprocess/fixrunningpower/draftm"
 #define GC_DPFV_MA                      "<global-general>dataprocess/fixspeed/ma"
+#define GC_DPFE_AK                      "<global-general>dataprocess/fixelevation/ak"
 #define GC_CAD2SMO2                     "<global-general>dataprocess/fixmoxy/cad2smo2"
 #define GC_SPD2THB		            	"<global-general>dataprocess/fixmoxy/spd2thb"
 #define GC_DPFLS_PL                     "<global-general>dataprocess/fixlapswim/pool_length"
@@ -201,7 +203,14 @@
 #define GC_MOXY_FIX_SMO2                "<global-general>dataprocess/fixmoxydata/fix_smo2"
 #define GC_MOXY_FIX_THB                 "<global-general>dataprocess/fixmoxydata/fix_thb"
 #define GC_MOXY_FIX_THB_MAX             "<global-general>dataprocess/fixmoxydata/fix_thb_max"
-
+#define GC_FIXGPS_ALTITUDE_FIX_DEGREE   "<global-general>dataprocess/fixgps/altitude_degree"
+#define GC_FIXGPS_ALTITUDE_FIX_DEGREE1  "<global-general>dataprocess/fixgps/altitude_degree1"
+#define GC_FIXGPS_ALTITUDE_FIX_DOAPPLY  "<global-general>dataprocess/fixgps/altitude_doapply"
+#define GC_FIXGPS_ALTITUDE_OUTLIER_PERCENT "<global-general>dataprocess/fixgps/altitude_outlier_percent"
+#define GC_FIXGPS_ROUTE_FIX_DEGREE      "<global-general>dataprocess/fixgps/route_degree"
+#define GC_FIXGPS_ROUTE_FIX_DEGREE1     "<global-general>dataprocess/fixgps/route_degree1"
+#define GC_FIXGPS_ROUTE_FIX_DOAPPLY     "<global-general>dataprocess/fixgps/route_doapply"
+#define GC_FIXGPS_ROUTE_OUTLIER_PERCENT "<global-general>dataprocess/fixgps/route_outlier_percent"
 
 // device Configurations NAME/SPEC/TYPE/DEFI/DEFR all get a number appended
 // to them to specify which configured device i.e. devices1 ... devicesn where
@@ -212,15 +221,20 @@
 #define GC_DEV_PROF                     "<global-trainmode>deviceprof"
 #define GC_DEV_TYPE                     "<global-trainmode>devicetype"
 #define GC_DEV_STRIDE                   "<global-trainmode>devicestride"
-#define GC_DEV_DEF                      "<global-trainmode>devicedef"
 #define GC_DEV_WHEEL                    "<global-trainmode>devicewheel"
 #define GC_DEV_VIRTUAL                  "<global-trainmode>devicepostProcess"
+#define GC_DEV_VIRTUALPOWER             "<global-trainmode>devicevirtualPower"
 #define FORTIUS_FIRMWARE                "<global-trainmode>fortius/firmware"
+#define FORTIUS_CALIBRATION             "<global-trainmode>fortius/calibration"
 #define IMAGIC_FIRMWARE                 "<global-trainmode>imagic/firmware"
+#define SRM_OFFSET                      "<global-trainmode>srm/offset"
 #define TRAIN_MULTI                     "<global-trainmode>train/multi"
 #define TRAIN_AUTOCONNECT               "<global-trainmode>train/autoconnect"
+#define TRAIN_STARTDELAY                "<global-trainmode>train/startdelay"
 #define TRAIN_AUTOHIDE                  "<global-trainmode>train/autohide"
 #define TRAIN_LAPALERT                  "<global-trainmode>train/lapalert"
+#define TRAIN_USESIMULATEDSPEED         "<global-trainmode>train/usesimulatedspeed"
+#define TRAIN_USESIMULATEDHYPOXIA       "<global-trainmode>train/usesimulatedhypoxia"
 #define GC_REMOTE_START                 "<global-trainmode>remote/start"
 #define GC_REMOTE_STOP                  "<global-trainmode>remote/stop"
 #define GC_REMOTE_LAP                   "<global-trainmode>remote/lap"
@@ -270,7 +284,6 @@
 #define GC_CRANKLENGTH                  "<athlete-preferences>crankLength"
 #define GC_WHEELSIZE                    "<athlete-preferences>wheelsize"
 #define GC_USE_CP_FOR_FTP               "<athlete-preferences>cp/useforftp"                       // use CP for FTP
-#define GC_USE_CP_FOR_FTP_RUN           "<athlete-preferences>cp/useforftprun"                    // use CP for FTP
 #define GC_NETWORKFILESTORE_FOLDER      "<athlete-preferences>networkfilestore/folder"            // folder to sync with
 #define GC_AUTOBACKUP_FOLDER            "<athlete-preferences>autobackup/folder"
 #define GC_AUTOBACKUP_PERIOD            "<athlete-preferences>autobackup/period"                  // how often is the Athlete Folder backuped up / 0 == never
@@ -301,9 +314,39 @@
 #define GC_BM_LAST_TYPE                 "<athlete-preferences>bm/last_type"
 #define GC_BM_LAST_TIMEFRAME            "<athlete-preferences>bm/last_timeframe"
 
+// Sim Bicycle
+#define GC_SIM_BICYCLE_MASSWITHOUTWHEELSG     "<athlete-preferences>sim_bicycle/MassWithoutWheelsG"
+#define GC_SIM_BICYCLE_FRONTWHEELG            "<athlete-preferences>sim_bicycle/FrontWheelG"
+#define GC_SIM_BICYCLE_FRONTSPOKECOUNT        "<athlete-preferences>sim_bicycle/FrontSpokeCount"
+#define GC_SIM_BICYCLE_FRONTSPOKENIPPLEG      "<athlete-preferences>sim_bicycle/FrontSpokeNippleG"
+#define GC_SIM_BICYCLE_FRONTRIMG              "<athlete-preferences>sim_bicycle/FrontRimG"
+#define GC_SIM_BICYCLE_FRONTROTORG            "<athlete-preferences>sim_bicycle/FrontRotorG"
+#define GC_SIM_BICYCLE_FRONTSKEWERG           "<athlete-preferences>sim_bicycle/FrontSkewerG"
+#define GC_SIM_BICYCLE_FRONTTIREG             "<athlete-preferences>sim_bicycle/FrontTireG"
+#define GC_SIM_BICYCLE_FRONTTUBESEALANTG      "<athlete-preferences>sim_bicycle/FrontTubeSealantG"
+#define GC_SIM_BICYCLE_FRONTOUTERRADIUSM      "<athlete-preferences>sim_bicycle/FrontOuterRadiusM"
+#define GC_SIM_BICYCLE_FRONTRIMINNERRADIUSM   "<athlete-preferences>sim_bicycle/FrontRimInnerRadiusM"
+#define GC_SIM_BICYCLE_REARWHEELG             "<athlete-preferences>sim_bicycle/RearWheelG"
+#define GC_SIM_BICYCLE_REARSPOKECOUNT         "<athlete-preferences>sim_bicycle/RearSpokeCount"
+#define GC_SIM_BICYCLE_REARSPOKENIPPLEG       "<athlete-preferences>sim_bicycle/RearSpokeNippleG"
+#define GC_SIM_BICYCLE_REARRIMG               "<athlete-preferences>sim_bicycle/RearRimG"
+#define GC_SIM_BICYCLE_REARROTORG             "<athlete-preferences>sim_bicycle/RearRotor"
+#define GC_SIM_BICYCLE_REARSKEWERG            "<athlete-preferences>sim_bicycle/RearSkewerG"
+#define GC_SIM_BICYCLE_REARTIREG              "<athlete-preferences>sim_bicycle/RearTireG"
+#define GC_SIM_BICYCLE_REARTUBESEALANTG       "<athlete-preferences>sim_bicycle/RearTubeSealantG"
+#define GC_SIM_BICYCLE_REAROUTERRADIUSM       "<athlete-preferences>sim_bicycle/RearOuterRadiusM"
+#define GC_SIM_BICYCLE_REARRIMINNERRADIUSM    "<athlete-preferences>sim_bicycle/RearRimInnerRadiusM"
+#define GC_SIM_BICYCLE_CASSETTEG              "<athlete-preferences>sim_bicycle/CassetteG"
+#define GC_SIM_BICYCLE_CRR                    "<athlete-preferences>sim_bicycle/CRR"
+#define GC_SIM_BICYCLE_Cm                     "<athlete-preferences>sim_bicycle/Cm"
+#define GC_SIM_BICYCLE_Cd                     "<athlete-preferences>sim_bicycle/Cd"
+#define GC_SIM_BICYCLE_Am2                    "<athlete-preferences>sim_bicycle/Am2"
+#define GC_SIM_BICYCLE_Tk                     "<athlete-preferences>sim_bicycle/Tk"
+#define GC_SIM_BICYCLE_ACTUALTRAINERALTITUDEM "<athlete-preferences>sim_bicycle/ActualTrainerAltitudeM"
 
 #define GC_RWGPSUSER                    "<athlete-private>rwgps/user"
 #define GC_RWGPSPASS                    "<athlete-private>rwgps/pass"
+#define GC_RWGPS_AUTH_TOKEN             "<athlete-private>rwgps/auth_token"
 #define GC_TTBUSER                      "<athlete-private>ttb/user"
 #define GC_TTBPASS                      "<athlete-private>ttb/pass"
 #define GC_VELOHEROUSER                 "<athlete-private>velohero/user"
@@ -354,6 +397,8 @@
 #define GC_GOOGLE_CALENDAR_REFRESH_TOKEN  "<athlete-private>google_cal_refresh_token"
 //Strava
 #define GC_STRAVA_TOKEN                 "<athlete-private>strava_token"
+#define GC_STRAVA_REFRESH_TOKEN         "<athlete-private>strava_refresh_token"
+#define GC_STRAVA_LAST_REFRESH          "<athlete-private>strava_last_refresh"
 #define GC_STRAVA_ACTIVITY_NAME         "<athlete-private>strava_metaname"
 //Cycling Analytics
 #define GC_CYCLINGANALYTICS_TOKEN       "<athlete-private>cyclinganalytics_token"
@@ -472,9 +517,5 @@ extern int OperatingSystem;
 #define OSX     3
 #define OPENBSD 4
 
-#if QT_VERSION > 0x050000
 #define OS_STYLE "Fusion"
-#else
-#define OS_STYLE "Plastique"
-#endif
 #endif // _GC_Settings_h

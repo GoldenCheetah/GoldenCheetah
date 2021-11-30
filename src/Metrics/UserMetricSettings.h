@@ -45,24 +45,23 @@ class UserMetricSettings {
 
     public:
 
-        bool operator!= (UserMetricSettings right) const {
+        qint16 getCRC() const {
 
             // mostly used to see if it changed when editing
-            if (this->symbol != right.symbol ||
-                this->name != right.name ||
-                this->description != right.description ||
-                this->unitsMetric != right.unitsMetric ||
-                this->unitsImperial != right.unitsImperial ||
-                this->conversion != right.conversion ||
-                this->conversionSum != right.conversionSum ||
-                this->program != right.program ||
-                this->precision != right.precision ||
-                this->istime != right.istime ||
-                this->aggzero != right.aggzero ||
-                this->fingerprint != right.fingerprint)
-                return true;
-            else
-                return false;
+            QByteArray ba = QString(this->symbol +
+                                    this->name +
+                                    this->description +
+                                    this->unitsMetric +
+                                    this->unitsImperial +
+                                    this->type +
+                                    this->precision +
+                                    this->aggzero +
+                                    this->istime +
+                                    this->conversion +
+                                    this->conversionSum +
+                                    this->program).toUtf8();
+
+            return qChecksum(ba, ba.length());
         }
 
         QString symbol,
@@ -97,9 +96,13 @@ class EditUserMetricDialog : public QDialog {
         // the current ride, time to compute all rides)
         void refreshStats();
         void okClicked();
+        void enableOk();
+
+        void setErrors(QStringList&);
 
     private:
 
+        bool validSettings();
         void setSettings(UserMetricSettings &);
 
         Context *context;
@@ -120,6 +123,7 @@ class EditUserMetricDialog : public QDialog {
                        *precision;
 
         DataFilterEdit *formulaEdit; // edit your formula
+        QLabel *errors; // for highlighting errors
 
         QLabel *mValue, *iValue, *elapsed;
 

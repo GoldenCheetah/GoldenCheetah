@@ -81,6 +81,8 @@ static struct WPRIMEZONES {
 
 QString WPrime::zoneName(int i) { return wbal_zones[i].name; }
 QString WPrime::zoneDesc(int i) { return qApp->translate("wbalzone", wbal_zones[i].desc); }
+int WPrime::zoneLo(int i, int WPRIME) { return WPRIME - (WPRIME / 100.0f * wbal_zones[i].lo); }
+int WPrime::zoneHi(int i, int WPRIME) { return WPRIME - (WPRIME / 100.0f * wbal_zones[i].hi); }
 
 WPrime::WPrime()
 {
@@ -127,7 +129,7 @@ WPrime::setRide(RideFile *input)
     // create a raw time series in the format QwtSpline wants
     QVector<QPointF> points;
     QVector<QPointF> pointsd;
-    double convert = input->context->athlete->useMetricUnits ? 1.00f : MILES_PER_KM;
+    double convert = GlobalContext::context()->useMetricUnits ? 1.00f : MILES_PER_KM;
 
     last=0;
     double offset = 0; // always start from zero seconds (e.g. intervals start at and offset in ride)
@@ -173,10 +175,10 @@ WPrime::setRide(RideFile *input)
     // Get CP
     CP = 250; // default
     WPRIME = 20000;
-    if (input->context->athlete->zones(input->isRun())) {
-        int zoneRange = input->context->athlete->zones(input->isRun())->whichRange(input->startTime().date());
-        CP = zoneRange >= 0 ? input->context->athlete->zones(input->isRun())->getCP(zoneRange) : 0;
-        WPRIME = zoneRange >= 0 ? input->context->athlete->zones(input->isRun())->getWprime(zoneRange) : 0;
+    if (input->context->athlete->zones(input->sport())) {
+        int zoneRange = input->context->athlete->zones(input->sport())->whichRange(input->startTime().date());
+        CP = zoneRange >= 0 ? input->context->athlete->zones(input->sport())->getCP(zoneRange) : 0;
+        WPRIME = zoneRange >= 0 ? input->context->athlete->zones(input->sport())->getWprime(zoneRange) : 0;
 
         // did we override CP in metadata / metrics ?
         int oCP = input->getTag("CP","0").toInt();
@@ -484,23 +486,25 @@ WPrime::setErg(ErgFile *input)
     CP = 250; // defaults
     WPRIME = 20000;
 
-    if (input->context->athlete->zones(false)) {
-        int zoneRange = input->context->athlete->zones(false)->whichRange(QDate::currentDate());
-        CP = zoneRange >= 0 ? input->context->athlete->zones(false)->getCP(zoneRange) : 250;
-        WPRIME = zoneRange >= 0 ? input->context->athlete->zones(false)->getWprime(zoneRange) : 20000;
+    if (input->context->athlete->zones("Bike")) {
+        int zoneRange = input->context->athlete->zones("Bike")->whichRange(QDate::currentDate());
+        CP = zoneRange >= 0 ? input->context->athlete->zones("Bike")->getCP(zoneRange) : 250;
+        WPRIME = zoneRange >= 0 ? input->context->athlete->zones("Bike")->getWprime(zoneRange) : 20000;
     }
 
     // no data or no power data then forget it.
-    bool bydist = (input->format == CRS || input->format == CRS_LOC) ? true : false;
+    bool bydist = (input->format == CRS) ? true : false;
     if (!input->isValid() || bydist) {
         return; // needs to be a valid erg file...
     }
+
+    ErgFileQueryAdapter ergFileQueryAdapter(input);
 
     minY = maxY = WPRIME;
 
     if (integral) {
 
-        last = input->Duration / 1000; 
+        last = ergFileQueryAdapter.Duration() / 1000; 
         values.resize(last);
         xvalues.resize(last);
 
@@ -514,7 +518,7 @@ WPrime::setErg(ErgFile *input)
 
             // get watts at point in time
             int lap;
-            int value = input->wattsAt(i*1000, lap);
+            int value = ergFileQueryAdapter.wattsAt(i*1000, lap);
 
             powerValues[i] = value > CP ? value-CP : 0;
 
@@ -555,7 +559,7 @@ WPrime::setErg(ErgFile *input)
     } else {
 
         // how many points ?
-        last = input->Duration / 1000; 
+        last = ergFileQueryAdapter.Duration() / 1000; 
         values.resize(last);
         xvalues.resize(last);
 
@@ -563,10 +567,11 @@ WPrime::setErg(ErgFile *input)
         // and will also contain non-zero values
         double W = WPRIME;
         int lap; // passed by reference
+
         for (int i=0; i<last; i++) {
 
             // get watts at point in time
-            int value = input->wattsAt(i*1000, lap);
+            int value = ergFileQueryAdapter.wattsAt(i*1000, lap);
 
             if(value < CP) {
                 W  = W + (CP-value)*(WPRIME-W)/WPRIME;
@@ -920,8 +925,8 @@ class WPrimeExp : public RideMetric {
     void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &) {
 
         int cp = item->getText("CP","0").toInt();
-        if (!cp && item->context->athlete->zones(item->isRun) && item->zoneRange >=0) 
-            cp = item->context->athlete->zones(item->isRun)->getCP(item->zoneRange);
+        if (!cp && item->context->athlete->zones(item->sport) && item->zoneRange >=0) 
+            cp = item->context->athlete->zones(item->sport)->getCP(item->zoneRange);
 
         double total = 0;
         double secs = 0;
@@ -966,8 +971,8 @@ class WPrimeWatts : public RideMetric {
     void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &) {
 
         int cp = item->getText("CP","0").toInt();
-        if (!cp && item->context->athlete->zones(item->isRun) && item->zoneRange >=0) 
-            cp = item->context->athlete->zones(item->isRun)->getCP(item->zoneRange);
+        if (!cp && item->context->athlete->zones(item->sport) && item->zoneRange >=0) 
+            cp = item->context->athlete->zones(item->sport)->getCP(item->zoneRange);
 
         double total = 0;
         double secs = 0;
@@ -1019,8 +1024,8 @@ class CPExp : public RideMetric {
         }
 
         int cp = item->getText("CP","0").toInt();
-        if (!cp && item->context->athlete->zones(item->isRun) && item->zoneRange >=0)
-            cp = item->context->athlete->zones(item->isRun)->getCP(item->zoneRange);
+        if (!cp && item->context->athlete->zones(item->sport) && item->zoneRange >=0)
+            cp = item->context->athlete->zones(item->sport)->getCP(item->zoneRange);
 
         double total = 0;
         double secs = 0;
@@ -1066,7 +1071,7 @@ class WZoneTime : public RideMetric {
 
     void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &) {
 
-        double WPRIME = item->zoneRange >= 0 ? item->context->athlete->zones(item->isRun)->getWprime(item->zoneRange) : 20000;
+        double WPRIME = item->zoneRange >= 0 ? item->context->athlete->zones(item->sport)->getWprime(item->zoneRange) : 20000;
 
         // 4 zones
         QVector<double> tiz(4);
@@ -1205,8 +1210,8 @@ class WCPZoneTime : public RideMetric {
     void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &) {
 
         double WPRIME = 20000;
-        if (item->context->athlete->zones(item->isRun) && item->zoneRange > 0) {
-            WPRIME = item->context->athlete->zones(item->isRun)->getWprime(item->zoneRange);
+        if (item->context->athlete->zones(item->sport) && item->zoneRange > 0) {
+            WPRIME = item->context->athlete->zones(item->sport)->getWprime(item->zoneRange);
         }
 
         // did we override CP in metadata / metrics ?
@@ -1354,7 +1359,7 @@ class WZoneWork : public RideMetric {
 
     void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &) {
 
-        double WPRIME = item->zoneRange >= 0 ? item->context->athlete->zones(item->isRun)->getWprime(item->zoneRange) : 20000;
+        double WPRIME = item->zoneRange >= 0 ? item->context->athlete->zones(item->sport)->getWprime(item->zoneRange) : 20000;
 
         // 4 zones
         QVector<double> tiz(4);

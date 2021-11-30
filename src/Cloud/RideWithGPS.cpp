@@ -18,6 +18,7 @@
 
 #include "RideWithGPS.h"
 #include "Athlete.h"
+#include "Secrets.h"
 #include "Settings.h"
 #include "Units.h"
 #include "mvjson.h"
@@ -63,6 +64,7 @@ RideWithGPS::RideWithGPS(Context *context) : CloudService(context), context(cont
     // config
     settings.insert(Username, GC_RWGPSUSER);
     settings.insert(Password, GC_RWGPSPASS);
+    settings.insert(OAuthToken, GC_RWGPS_AUTH_TOKEN);
 }
 
 RideWithGPS::~RideWithGPS() {
@@ -79,9 +81,15 @@ bool
 RideWithGPS::open(QStringList &errors)
 {
     printd("RideWithGPS::open\n");
-    QString username = getSetting(GC_RWGPSUSER).toString();
+    /*QString username = getSetting(GC_RWGPSUSER).toString();
     if (username == "") {
         errors << tr("RideWithGPS account not configured.");
+        return false;
+    }*/
+    // do we have a token
+    QString token = getSetting(GC_RWGPS_AUTH_TOKEN, "").toString();
+    if (token == "") {
+        errors << tr("You must authorise with RideWithGPS first");
         return false;
     }
     return true;
@@ -114,38 +122,64 @@ RideWithGPS::writeFile(QByteArray &, QString remotename, RideFile *ride)
 
     QString username = getSetting(GC_RWGPSUSER).toString();
     QString password = getSetting(GC_RWGPSPASS).toString();
+    QString auth_token = getSetting(GC_RWGPS_AUTH_TOKEN).toString();
 
     // application/json
-    out += "{\"apikey\": \"p24n3a9e\", ";
-    out += "\"email\": \""+username+"\", ";
-    out += "\"password\": \""+password+"\", ";
-    out += "\"track_points\": \"";
+    out += "{\"apikey\": \""+QString(GC_RWGPS_API_KEY)+"\", ";
+    //out += "\"email\": \""+username+"\", ";
+    //out += "\"password\": \""+password+"\", ";
+    out += "\"auth_token\": \""+auth_token+"\", ";
+    out += "\"version\": \"2\", ";
+
+    out += "\"trip\": {\"track_points\": \"";
 
     data += "\[";
     foreach (const RideFilePoint *point, ride->dataPoints()) {
         size++;
 
-        if (point->secs == 0.0)
-            continue;
+        if (point->secs > 0.0) {
+            diffSecs = point->secs - prevSecs;
+            prevSecs = point->secs;
+            rideDateTime = rideDateTime.addSecs(diffSecs);
+        }
+        /*
+         x: -122.0, //longitude
+          y: 45.0, //latitude
+          e: 100.0, //elevation in meters
+          t: 1368018754, //time in seconds since epoch. **Note** NOT in milliseconds!
+          c: 90, //cadence
+          h: 150, //heartrate
+          p: 250, //power in watts
+          s: 4.5, //speed, meters/second.  Don't provide unless from wheel sensor
+          d: 45, //distance from start in meters. Only provide if from wheel sensor
+          T: 20 //temperature in celcius
+        */
 
-        diffSecs = point->secs - prevSecs;
-        prevSecs = point->secs;
-        rideDateTime = rideDateTime.addSecs(diffSecs);
-
-        data += "{\"x\": ";
+        data += "{\"x\":";
         data += QString("%1").arg(point->lon,0,'f',GPS_COORD_TO_STRING);
-        data += ", \"y\": ";
+        data += ",\"y\":";
         data += QString("%1").arg(point->lat,0,'f',GPS_COORD_TO_STRING);
-        data += ", \"t\": ";
+        data += ",\"t\":";
         data += QString("%1").arg(rideDateTime.toTime_t());
-        data += ", \"e\": ";
+        data += ",\"e\":";
         data += QString("%1").arg(point->alt);
-        data += ", \"p\": ";
+        data += ",\"p\":";
         data += QString("%1").arg(point->watts);
-        data += ", \"c\": ";
+        data += ",\"c\":";
         data += QString("%1").arg(point->cad);
-        data += ", \"h\": ";
+        data += ",\"h\":";
         data += QString("%1").arg(point->hr);
+
+        // We should verify if there is a wheel sensor
+        //data += ",\"s\":";
+        //data += QString("%1").arg(point->kph);
+        //data += ",\"d\":";
+        //data += QString("%1").arg(point->km);
+
+        if ( ride->areDataPresent()->temp && point->temp != RideFile::NA) {
+            data += ",\"T\":";
+            data += QString("%1").arg(point->temp);
+        }
 
         data += "}";
 
@@ -156,7 +190,9 @@ RideWithGPS::writeFile(QByteArray &, QString remotename, RideFile *ride)
     out += data.replace("\"","\\\"");
     out += "\"}";
 
-    QUrl url = QUrl("http://ridewithgps.com/trips.json");
+    printd("out:%s\n", out.toLatin1().toStdString().c_str());
+
+    QUrl url = QUrl("https://ridewithgps.com/trips.json");
     QNetworkRequest request = QNetworkRequest(url);
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
 
@@ -192,7 +228,8 @@ RideWithGPS::writeFileCompleted()
         MVJSONReader jsonResponse(string(response.toLatin1()));
 
         // get values
-        uploadError = jsonResponse.root->getFieldString("error").c_str();
+        if (jsonResponse.root != NULL)
+            uploadError = jsonResponse.root->getFieldString("error").c_str();
         //XXXif (jsonResponse.root->hasField("trip")) {
         //XXX    tripid = jsonResponse.root->getField("trip")->getFieldInt("id");
         //XXX}

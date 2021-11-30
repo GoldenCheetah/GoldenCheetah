@@ -8,8 +8,10 @@
 	<string>@ICON@</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
-	<key>CFBundleGetInfoString</key>
-	<string>4.0.0 (developer)</string>
+	<key>CFBundleShortVersionString</key>
+	<string>3.6.0</string>
+	<key>CFBundleVersion</key>
+	<string>3.6.0</string>
 	<key>CFBundleSignature</key>
 	<string>@TYPEINFO@</string>
 	<key>CFBundleExecutable</key>
@@ -18,7 +20,5 @@
 	<string>@BUNDLEIDENTIFIER@</string>
 	<key>NSSupportsAutomaticGraphicsSwitching</key>
 	<true/>
-	<key>NOTE</key>
-	<string>4.0.0 pre-release</string>
 </dict>
 </plist>

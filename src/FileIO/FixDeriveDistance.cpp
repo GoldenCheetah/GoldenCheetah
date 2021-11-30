@@ -35,13 +35,7 @@ class FixDeriveDistanceConfig : public DataProcessorConfig
     friend class ::FixDeriveDistance;
     protected:
         QHBoxLayout *layout;
-
         QCheckBox *useCubicSplines;
-
-        QLabel *bikeWeightLabel;
-        QDoubleSpinBox *bikeWeight;
-        QLabel *crrLabel;
-        QDoubleSpinBox *crr;
 
     public:
         FixDeriveDistanceConfig(QWidget *parent) : DataProcessorConfig(parent) {
@@ -52,7 +46,7 @@ class FixDeriveDistanceConfig : public DataProcessorConfig
             layout = new QHBoxLayout(this);
 
             useCubicSplines = new QCheckBox(tr("Use Cubic Splines"), this);
-            useCubicSplines->setCheckState(Qt::Checked);
+            useCubicSplines->setCheckState(Qt::Unchecked);
             layout->addWidget(useCubicSplines);
 
             layout->setContentsMargins(0,0,0,0);
@@ -65,9 +59,11 @@ class FixDeriveDistanceConfig : public DataProcessorConfig
                               // the widget and its children when the config pane is deleted
 
         void readConfig() {
+            useCubicSplines->setCheckState(appsettings->value(NULL, GC_DPDD_UCS, Qt::Unchecked).toBool() ? Qt::Checked : Qt::Unchecked);
         }
 
         void saveConfig() {
+            appsettings->setValue(GC_DPDD_UCS, useCubicSplines->checkState());
         }
 
         QString explain() {
@@ -95,7 +91,8 @@ class FixDeriveDistance : public DataProcessor {
         bool postProcess(RideFile *, DataProcessorConfig* config, QString op);
 
         // the config widget
-        DataProcessorConfig* processorConfig(QWidget *parent) {
+        DataProcessorConfig* processorConfig(QWidget *parent, const RideFile * ride = NULL) {
+            Q_UNUSED(ride);
             return new FixDeriveDistanceConfig(parent);
         }
 
@@ -114,14 +111,20 @@ double _deg2rad(double deg) {
 bool
 FixDeriveDistance::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString op="")
 {
-    Q_UNUSED(config)
     Q_UNUSED(op)
 
-    bool fUseCubicSplines = ((FixDeriveDistanceConfig*)(config))->useCubicSplines->isChecked();
+    bool fUseCubicSplines = false;
     bool fUseSpeedAndTime = false;
 
+    if (config == NULL) { // being called automatically
+        fUseCubicSplines = appsettings->value(NULL, GC_DPDD_UCS, Qt::Unchecked).toBool();
+    } else { // being called manually
+        fUseCubicSplines = ((FixDeriveDistanceConfig*)(config))->useCubicSplines->isChecked();
+    }
+
     GeoPointInterpolator gpi;
-    int ii = 0; // interpolator index
+    int ii = 0;      // interpolator index
+    int goodii = 0;  // last reasonable geolocation
     double cubicDistanceKM = 0.0;
 
     double distanceFromSpeedTime = 0.0;
@@ -148,6 +151,7 @@ FixDeriveDistance::postProcess(RideFile *ride, DataProcessorConfig *config=0, QS
         double lastLat = 0;
         double lastLon = 0;
 
+
         for (int i=0; i<ride->dataPoints().count(); i++) {
 
             RideFilePoint *p = ride->dataPoints()[i];
@@ -164,21 +168,19 @@ FixDeriveDistance::postProcess(RideFile *ride, DataProcessorConfig *config=0, QS
                 }
 
                 if (ii >= ride->dataPoints().count()) {
-                    // Past end of ride points, continue pushing final point.
-                    RideFilePoint *pii = ride->dataPoints()[ii-1];
+                    RideFilePoint *pii = ride->dataPoints()[goodii];
                     geolocation geo(pii->lat, pii->lon, fHasAlt ? pii->alt : 0.0);
-                    if (geo.IsReasonableGeoLocation()) {
-                        gpi.Push(ii, geo);
-                        //gpi.NotifyInputComplete();
-                    }
+                    gpi.Push(ii, geo);
+                    ii++;
                 } else {
                     // Use index for distance, since we just use it as an enumeration
                     RideFilePoint *pii = ride->dataPoints()[ii];
                     geolocation geo(pii->lat, pii->lon, fHasAlt ? pii->alt : 0.0);
                     if (geo.IsReasonableGeoLocation()) {
+                        goodii = ii;
                         gpi.Push(ii, geo);
-                        ii++;
                     }
+                    ii++;
                 }
             }
 

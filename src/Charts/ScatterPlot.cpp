@@ -322,8 +322,8 @@ void ScatterPlot::setData (ScatterSettings *settings)
 
             foreach(const RideFilePoint *point, settings->ride->ride()->dataPoints()) {
 
-                double xv = pointType(point, settings->x, side, context->athlete->useMetricUnits, cranklength);
-                double yv = pointType(point, settings->y, side, context->athlete->useMetricUnits, cranklength);
+                double xv = pointType(point, settings->x, side, GlobalContext::context()->useMetricUnits, cranklength);
+                double yv = pointType(point, settings->y, side, GlobalContext::context()->useMetricUnits, cranklength);
 
                 // skip values ? Like zeroes...
                 if (skipValues(xv, yv, settings))
@@ -353,8 +353,8 @@ void ScatterPlot::setData (ScatterSettings *settings)
                 // extract interval data
                 foreach(const RideFilePoint *point, settings->ride->ride()->dataPoints()) {
 
-                    double x = pointType(point, settings->x, side, context->athlete->useMetricUnits, cranklength);
-                    double y = pointType(point, settings->y, side, context->athlete->useMetricUnits, cranklength);
+                    double x = pointType(point, settings->x, side, GlobalContext::context()->useMetricUnits, cranklength);
+                    double y = pointType(point, settings->y, side, GlobalContext::context()->useMetricUnits, cranklength);
 
                     if (!(settings->ignore && (x == 0 && y ==0))) {
 
@@ -487,17 +487,17 @@ void ScatterPlot::setData (ScatterSettings *settings)
                         double y;
                         if (settings->compareMode == 1) {
                             const RideFilePoint *refPoint = context->compareIntervals.at(0).data->dataPoints().at(context->compareIntervals.at(0).data->timeIndex(point->secs));
-                            x = pointType(refPoint, settings->x, side, context->athlete->useMetricUnits, cranklength);
-                            y = pointType(point, settings->y, side, context->athlete->useMetricUnits, cranklength);
+                            x = pointType(refPoint, settings->x, side, GlobalContext::context()->useMetricUnits, cranklength);
+                            y = pointType(point, settings->y, side, GlobalContext::context()->useMetricUnits, cranklength);
                         }
                         else if (settings->compareMode == 2) {
                             const RideFilePoint *refPoint = context->compareIntervals.at(0).data->dataPoints().at(context->compareIntervals.at(0).data->timeIndex(point->secs));
-                            x = pointType(point, settings->x, side, context->athlete->useMetricUnits, cranklength);
-                            y = pointType(refPoint, settings->y, side, context->athlete->useMetricUnits, cranklength);
+                            x = pointType(point, settings->x, side, GlobalContext::context()->useMetricUnits, cranklength);
+                            y = pointType(refPoint, settings->y, side, GlobalContext::context()->useMetricUnits, cranklength);
                         }
                         else {
-                            x = pointType(point, settings->x, side, context->athlete->useMetricUnits, cranklength);
-                            y = pointType(point, settings->y, side, context->athlete->useMetricUnits, cranklength);
+                            x = pointType(point, settings->x, side, GlobalContext::context()->useMetricUnits, cranklength);
+                            y = pointType(point, settings->y, side, GlobalContext::context()->useMetricUnits, cranklength);
                         }
 
 
@@ -565,8 +565,8 @@ void ScatterPlot::setData (ScatterSettings *settings)
     }
 
     // axis titles
-    setAxisTitle(yLeft, describeType(settings->y, true, context->athlete->useMetricUnits));
-    setAxisTitle(xBottom, describeType(settings->x, true, context->athlete->useMetricUnits));
+    setAxisTitle(yLeft, describeType(settings->y, true, GlobalContext::context()->useMetricUnits));
+    setAxisTitle(xBottom, describeType(settings->x, true, GlobalContext::context()->useMetricUnits));
 
     // axis scale
     if (settings->y == MODEL_AEPF) setAxisScale(yLeft, 0, 600);
@@ -654,8 +654,8 @@ ScatterPlot::intervalHover(IntervalItem *ri)
         QVector<double> xArray, yArray;
         foreach(const RideFilePoint *p1, ride->ride()->dataPoints()) {
 
-            double y = pointType(p1, xseries, side, context->athlete->useMetricUnits, cranklength);
-            double x = pointType(p1, yseries, side, context->athlete->useMetricUnits, cranklength);
+            double y = pointType(p1, xseries, side, GlobalContext::context()->useMetricUnits, cranklength);
+            double x = pointType(p1, yseries, side, GlobalContext::context()->useMetricUnits, cranklength);
 
             if (p1->secs < ri->start || p1->secs > ri->stop) continue;
 
@@ -732,10 +732,10 @@ ScatterPlot::refreshIntervalMarkers(ScatterSettings *settings)
 
         foreach (RideFilePoint *point, settings->ride->ride()->dataPoints()) {
 
-            double x0 = pointType(point, settings->x, 0, context->athlete->useMetricUnits, cranklength);
-            double y0 = pointType(point, settings->y, 0, context->athlete->useMetricUnits, cranklength);
-            double x1 = pointType(point, settings->x, 1, context->athlete->useMetricUnits, cranklength);
-            double y1 = pointType(point, settings->y, 1, context->athlete->useMetricUnits, cranklength);
+            double x0 = pointType(point, settings->x, 0, GlobalContext::context()->useMetricUnits, cranklength);
+            double y0 = pointType(point, settings->y, 0, GlobalContext::context()->useMetricUnits, cranklength);
+            double x1 = pointType(point, settings->x, 1, GlobalContext::context()->useMetricUnits, cranklength);
+            double y1 = pointType(point, settings->y, 1, GlobalContext::context()->useMetricUnits, cranklength);
 
             // average of left and right (even if both the same)
             double x = (x0 + x1) / 2.00f;

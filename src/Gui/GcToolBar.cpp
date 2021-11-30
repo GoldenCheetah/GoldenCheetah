@@ -24,7 +24,7 @@ GcToolBar::GcToolBar(QWidget *parent) : QWidget(parent)
     //Height will be set when widget is added in MainWindow
     setContentsMargins(0,0,0,0);
     layout = new QHBoxLayout(this);
-    layout->setSpacing(10 *dpiXFactor);
+    layout->setSpacing(5 *dpiXFactor);
     layout->setContentsMargins(0,0,0,0);
     installEventFilter(this);
 }
@@ -57,11 +57,8 @@ GcToolBar::paintBackground(QPaintEvent *)
     // get the widget area
     QRect all(0,0,width(),height());
 
-    // fill with a linear gradient
-    QLinearGradient linearGradient = GCColor::linearGradient(23, isActiveWindow());
-    
     painter.setPen(Qt::NoPen);
-    painter.fillRect(all, linearGradient);
+    painter.fillRect(all, GColor(CTOOLBAR));
 
     if (!GCColor::isFlat()) {
         // paint the bottom lines

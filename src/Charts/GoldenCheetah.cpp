@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Copyright (c) 2010 Mark Liversedge (liversedge@gmail.com)
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -25,6 +25,7 @@
 #include "Utils.h"
 #include "mvjson.h"
 #include "LTMSettings.h"
+#include "Perspective.h"
 
 #ifdef GC_HAS_CLOUD_DB
 #include "CloudDBChart.h"
@@ -41,6 +42,7 @@
 #include <QMouseEvent>
 #include <QFileDialog>
 #include <QGraphicsDropShadowEffect>
+#include <QSvgGenerator>
 
 Q_DECLARE_METATYPE(QWidget*)
 
@@ -55,8 +57,6 @@ void GcWindow::setControls(QWidget *x)
     emit controlsChanged(_controls);
 
     if (x != NULL) {
-        menu->addAction(tr("Chart Settings..."), this, SIGNAL(showControls()));
-        menu->addSeparator();
 
         // add any other actions
         if (actions.count()) {
@@ -66,7 +66,13 @@ void GcWindow::setControls(QWidget *x)
                 menu->addAction(act->text(), act, SIGNAL(triggered()));
             }
 
-            if (actions.count() > 1) menu->addSeparator();
+            menu->addSeparator();
+
+        } else {
+
+            menu->addAction(tr("Chart Settings..."), this, SIGNAL(showControls()));
+            menu->addSeparator();
+
         }
 
         menu->addAction(tr("Remove Chart"), this, SLOT(_closeWindow()));
@@ -190,18 +196,19 @@ GcWindow::GcWindow(Context *context) : QFrame(context->mainWindow), dragState(No
     qRegisterMetaType<GcWinID>("type");
     qRegisterMetaType<QColor>("color");
     qRegisterMetaType<DateRange>("dateRange");
-    qRegisterMetaType<bool>("nomenu");
+    qRegisterMetaType<Perspective*>("perspective");
+    nomenu = false;
     revealed = false;
     setParent(context->mainWindow);
     setControls(NULL);
     setRideItem(NULL);
+    setPerspective(NULL);
     setTitle("");
     showtitle=true;
     setContentsMargins(0,0,0,0);
     setResizable(false);
     setMouseTracking(true);
     setProperty("color", GColor(CPLOTBACKGROUND));
-    setProperty("nomenu", false);
     menu = NULL;
 
     // make sure its underneath the toggle button
@@ -272,7 +279,7 @@ GcWindow::paintEvent(QPaintEvent * /*event*/)
         // heading
         QFont font;
         // font too large on hidpi scaling
-        int pixelsize =pixelSizeForFont(font, ((contentsMargins().top()/2)+2));
+        int pixelsize =pixelSizeForFont(font, contentsMargins().top());
         font.setPixelSize(pixelsize);
         font.setWeight(QFont::Bold);
         painter.setFont(font);
@@ -451,11 +458,7 @@ GcWindow::mouseMoveEvent(QMouseEvent *e)
 
     default:
     case Move :
-#if QT_VERSION < 0x040700
-        setCursor(Qt::ClosedHandCursor);
-#else
         setCursor(Qt::DragMoveCursor);
-#endif
         emit moving(this);
         break;
 
@@ -648,7 +651,7 @@ GcWindow::enterEvent(QEvent *)
 {
     if (_noevents) return;
 
-    if (property("nomenu") == false && property("isManager").toBool() == false) {
+    if (nomenu == false) {
         if (contentsMargins().top() > (20*dpiYFactor)) menuButton->setFixedSize(80*dpiXFactor,30*dpiYFactor);
         else menuButton->setFixedSize(80*dpiXFactor, 15*dpiYFactor);
         menuButton->raise();
@@ -806,19 +809,23 @@ GcChartWindow::setControls(QWidget *x)
     GcWindow::setControls(x);
 
     menu->clear();
-    // if x == NULL only edit the name
-    menu->addAction(tr("Chart Settings..."), this, SIGNAL(showControls()));
-    menu->addSeparator();
 
-    // add any other actions
+    // add actions, these replace chart settings
     if (actions.count()) {
+
         if (actions.count() > 1) menu->addSeparator();
 
         foreach(QAction *act, actions) {
             menu->addAction(act->text(), act, SIGNAL(triggered()));
         }
 
-        if (actions.count() > 1) menu->addSeparator();
+        menu->addSeparator();
+
+    } else {
+
+        // if no actions, then just add chart settings dialog
+        menu->addAction(tr("Chart Settings..."), this, SIGNAL(showControls()));
+        menu->addSeparator();
     }
 
     menu->addAction(tr("Export Chart ..."), this, SLOT(saveChart()));
@@ -874,18 +881,32 @@ GcChartWindow::addHelper(QString name, QWidget *widget)
 void GcChartWindow:: saveImage()
 {
     QString fileName = title()+".png";
-    fileName = QFileDialog::getSaveFileName(this, tr("Save Chart Image"),  QString(), title()+".png (*.png)");
+    QString suffix; // what was selected?
+    fileName = QFileDialog::getSaveFileName(this, tr("Save Chart Image"),
+               fileName, title()+".png (*.png)"+";;"+title()+".svg (*.svg)",
+               &suffix, QFileDialog::DontUseNativeDialog); // native dialog hangs when threads in use (!)
 
-    if (!fileName.isEmpty()) {
+    if (fileName.isEmpty()) return; // no filename selected, abort
+
+    if (!fileName.isEmpty() && fileName.endsWith(".svg")) {
+
+        QSvgGenerator generator;
+        generator.setFileName(fileName);
+        generator.setSize(size());
+        generator.setViewBox(rect());
+        generator.setTitle(title());
+        render(&generator);
+
+    } else {
+
+        // default, export to png adding extension if missing
+        if (!fileName.endsWith(".png")) fileName += ".png";
 
         QPixmap picture;
         menuButton->hide();
-#if QT_VERSION > 0x050000
-        picture = grab(geometry());
-#else
-        picture = QPixmap::grabWidget (this);
-#endif
+        picture = grab(rect());
         picture.save(fileName);
+
     }
 }
 
@@ -900,7 +921,7 @@ GcChartWindow::saveChart()
     QString suffix; // what was selected?
     QString filename = QFileDialog::getSaveFileName(this, tr("Export Chart"),
                        QDir::homePath()+"/"+ property("title").toString() + ".gchart",
-                       ("*.gchart;;"), &suffix);
+                       ("*.gchart;;"), &suffix, QFileDialog::DontUseNativeDialog); // native dialog hangs when threads in use (!)
 
     if (filename.length() == 0) return;
 
@@ -956,7 +977,7 @@ GcChartWindow::serializeChartToQTextStream(QTextStream& out) {
 
     // a last unused property, just to make it well formed json
     // regardless of how many properties we ever have
-    out <<"\t\t\t\"__LAST__\":\"1\",\n";
+    out <<"\t\t\t\"__LAST__\":\"1\"\n";
 
     // end here, only one chart
     out<<"\t\t}\n\t}\n}";
@@ -1106,6 +1127,15 @@ GcChartWindow::exportChartToCloudDB()
     QPixmap picture;
     menuButton->hide();
     picture = grab(geometry());
+
+    // limit size of picture to not go beyong GAE datastore_V3 request call size
+    // these size limits provide images below 1000k which is expected to work for all known cases
+    if ( picture.size().width()> 1024 ) {
+        picture = picture.scaledToWidth(1024, Qt::SmoothTransformation);
+    }
+    if (picture.size().height() > 768) {
+        picture = picture.scaledToHeight(768, Qt::SmoothTransformation);
+    }
 
     QBuffer buffer(&chart.Image);
     buffer.open(QIODevice::WriteOnly);

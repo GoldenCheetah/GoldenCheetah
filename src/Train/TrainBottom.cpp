@@ -18,6 +18,7 @@
 
 #include "TrainBottom.h"
 #include "TrainSidebar.h"
+#include "HelpWhatsThis.h"
 
 #include <QHBoxLayout>
 #include <QPushButton>
@@ -30,6 +31,9 @@ TrainBottom::TrainBottom(TrainSidebar *trainSidebar, QWidget *parent) :
     QWidget(parent),
     m_trainSidebar(trainSidebar)
 {
+    HelpWhatsThis *help = new HelpWhatsThis(this);
+    this->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::WorkoutControl));
+
     // Control buttons
     QHBoxLayout *toolbuttons = new QHBoxLayout;
     toolbuttons->setSpacing(0);
@@ -45,9 +49,7 @@ TrainBottom::TrainBottom(TrainSidebar *trainSidebar, QWidget *parent) :
     m_connectButton->setStyleSheet("background-color: rgba( 255, 255, 255, 0% ); border: 0px;");
     m_connectButton->setAutoRepeat(true);
     m_connectButton->setAutoRepeatDelay(200);
-#if QT_VERSION > 0x050400
     m_connectButton->setShortcut(Qt::Key_MediaPrevious);
-#endif
     toolbuttons->addWidget(m_connectButton);
 
     QIcon rewIcon(":images/oxygen/rewind.png");
@@ -60,9 +62,7 @@ TrainBottom::TrainBottom(TrainSidebar *trainSidebar, QWidget *parent) :
     m_rewindButton->setStyleSheet("background-color: rgba( 255, 255, 255, 0% ); border: 0px;");
     m_rewindButton->setAutoRepeat(true);
     m_rewindButton->setAutoRepeatDelay(200);
-#if QT_VERSION > 0x050400
     m_rewindButton->setShortcut(Qt::Key_MediaPrevious);
-#endif
     toolbuttons->addWidget(m_rewindButton);
 
     QIcon stopIcon(":images/oxygen/stop.png");
@@ -73,9 +73,7 @@ TrainBottom::TrainBottom(TrainSidebar *trainSidebar, QWidget *parent) :
     m_stopButton->setAutoDefault(false);
     m_stopButton->setFlat(true);
     m_stopButton->setStyleSheet("background-color: rgba( 255, 255, 255, 0% ); border: 0px;");
-#if QT_VERSION > 0x050400
     m_stopButton->setShortcut(Qt::Key_MediaStop);
-#endif
     toolbuttons->addWidget(m_stopButton);
 
     QIcon playIcon(":images/oxygen/play.png");
@@ -99,10 +97,20 @@ TrainBottom::TrainBottom(TrainSidebar *trainSidebar, QWidget *parent) :
     m_forwardButton->setStyleSheet("background-color: rgba( 255, 255, 255, 0% ); border: 0px;");
     m_forwardButton->setAutoRepeat(true);
     m_forwardButton->setAutoRepeatDelay(200);
-#if QT_VERSION > 0x050400
     m_forwardButton->setShortcut(Qt::Key_MediaNext);
-#endif
     toolbuttons->addWidget(m_forwardButton);
+
+    QIcon backLapIcon(":images/oxygen/back.png");
+    backLap = new QPushButton(backLapIcon, "", this);
+    backLap->setFocusPolicy(Qt::NoFocus);
+    backLap->setIconSize(QSize(64,64));
+    backLap->setAutoFillBackground(false);
+    backLap->setAutoDefault(false);
+    backLap->setFlat(true);
+    backLap->setStyleSheet("background-color: rgba( 255, 255, 255, 0% ); border: 0px;");
+    backLap->setAutoRepeat(true);
+    backLap->setAutoRepeatDelay(200);
+    toolbuttons->addWidget(backLap);
 
     QIcon lapIcon(":images/oxygen/lap.png");
     m_lapButton = new QPushButton(lapIcon, "", this);
@@ -112,10 +120,21 @@ TrainBottom::TrainBottom(TrainSidebar *trainSidebar, QWidget *parent) :
     m_lapButton->setAutoDefault(false);
     m_lapButton->setFlat(true);
     m_lapButton->setStyleSheet("background-color: rgba( 255, 255, 255, 0% ); border: 0px;");
-#if QT_VERSION > 0x050400
     m_lapButton->setShortcut(Qt::Key_0);
-#endif
     toolbuttons->addWidget(m_lapButton);
+
+    QIcon fwdLapIcon(":images/oxygen/fwd.png");
+    fwdLap = new QPushButton(fwdLapIcon, "", this);
+    fwdLap->setFocusPolicy(Qt::NoFocus);
+    fwdLap->setIconSize(QSize(64,64));
+    fwdLap->setAutoFillBackground(false);
+    fwdLap->setAutoDefault(false);
+    fwdLap->setFlat(true);
+    fwdLap->setStyleSheet("background-color: rgba( 255, 255, 255, 0% ); border: 0px;");
+    fwdLap->setAutoRepeat(true);
+    fwdLap->setAutoRepeatDelay(200);
+    fwdLap->setShortcut(Qt::Key_MediaLast);
+    toolbuttons->addWidget(fwdLap);
 
     QIcon calIcon(":images/oxygen/cal.png");
     cal = new QPushButton(calIcon, "", this);
@@ -125,9 +144,7 @@ TrainBottom::TrainBottom(TrainSidebar *trainSidebar, QWidget *parent) :
     cal->setAutoDefault(false);
     cal->setFlat(true);
     cal->setStyleSheet("background-color: rgba( 255, 255, 255, 0% ); border: 0px;");
-    #if QT_VERSION > 0x050400
-        cal->setShortcut(Qt::Key_C);
-    #endif
+    cal->setShortcut(Qt::Key_C);
     toolbuttons->addWidget(cal);
 
     QIcon upIcon(":images/oxygen/up.png");
@@ -140,9 +157,7 @@ TrainBottom::TrainBottom(TrainSidebar *trainSidebar, QWidget *parent) :
     loadUp->setAutoRepeat(true);
     loadUp->setAutoRepeatInterval(50);
     loadUp->setStyleSheet("background-color: rgba( 255, 255, 255, 0% ); border: 0px;");
-#if QT_VERSION > 0x050400
     loadUp->setShortcut(Qt::Key_Plus);
-#endif
     toolbuttons->addWidget(loadUp);
 
     QIcon downIcon(":images/oxygen/down.png");
@@ -155,9 +170,7 @@ TrainBottom::TrainBottom(TrainSidebar *trainSidebar, QWidget *parent) :
     loadDown->setAutoRepeat(true);
     loadDown->setAutoRepeatInterval(50);
     loadDown->setStyleSheet("background-color: rgba( 255, 255, 255, 0% ); border: 0px;");
-#if QT_VERSION > 0x050400
     loadDown->setShortcut(Qt::Key_Minus);
-#endif
     toolbuttons->addWidget(loadDown);
 
     intensitySlider = new QSlider(Qt::Vertical, this);
@@ -198,7 +211,9 @@ TrainBottom::TrainBottom(TrainSidebar *trainSidebar, QWidget *parent) :
     connect(m_playButton, SIGNAL(clicked()), m_trainSidebar, SLOT(Start()));
     connect(m_rewindButton, SIGNAL(clicked()), m_trainSidebar, SLOT(Rewind()));
     connect(m_forwardButton, SIGNAL(clicked()), m_trainSidebar, SLOT(FFwd()));
+    connect(backLap, SIGNAL(clicked()), m_trainSidebar, SLOT(RewindLap()));
     connect(m_lapButton, SIGNAL(clicked()), m_trainSidebar, SLOT(newLap()));
+    connect(fwdLap, SIGNAL(clicked()), m_trainSidebar, SLOT(FFwdLap()));
     connect(m_stopButton, SIGNAL(clicked()), m_trainSidebar, SLOT(Stop()));
     connect(m_trainSidebar->context, SIGNAL(start()), this, SLOT(updatePlayButtonIcon()));
     connect(m_trainSidebar->context, SIGNAL(pause()), this, SLOT(updatePlayButtonIcon()));
@@ -290,7 +305,9 @@ void TrainBottom::statusChanged(int status)
         m_stopButton->setEnabled(false);
         m_forwardButton->setEnabled(false);
         m_rewindButton->setEnabled(false);
+        backLap->setEnabled(false);
         m_lapButton->setEnabled(false);
+        fwdLap->setEnabled(false);
         cal->setEnabled(false);
         loadUp->setEnabled(false);
         loadDown->setEnabled(false);
@@ -306,7 +323,9 @@ void TrainBottom::statusChanged(int status)
         m_stopButton->setEnabled(false);
         m_forwardButton->setEnabled(false);
         m_rewindButton->setEnabled(false);
+        backLap->setEnabled(false);
         m_lapButton->setEnabled(false);
+        fwdLap->setEnabled(false);
         cal->setEnabled(false);
         loadUp->setEnabled(false);
         loadDown->setEnabled(false);
@@ -322,7 +341,9 @@ void TrainBottom::statusChanged(int status)
         m_stopButton->setEnabled(true);
         m_forwardButton->setEnabled(false);
         m_rewindButton->setEnabled(false);
+        backLap->setEnabled(false);
         m_lapButton->setEnabled(false);
+        fwdLap->setEnabled(false);
         cal->setEnabled(false);
         loadUp->setEnabled(false);
         loadDown->setEnabled(false);
@@ -338,7 +359,9 @@ void TrainBottom::statusChanged(int status)
         m_stopButton->setEnabled(true);
         m_forwardButton->setEnabled(false);
         m_rewindButton->setEnabled(false);
+        backLap->setEnabled(false);
         m_lapButton->setEnabled(false);
+        fwdLap->setEnabled(false);
         cal->setEnabled(true);
         loadUp->setEnabled(false);
         loadDown->setEnabled(false);
@@ -354,7 +377,9 @@ void TrainBottom::statusChanged(int status)
         m_stopButton->setEnabled(true);
         m_forwardButton->setEnabled(true);
         m_rewindButton->setEnabled(true);
+        backLap->setEnabled(true);
         m_lapButton->setEnabled(true);
+        fwdLap->setEnabled(true);
         cal->setEnabled(true);
         loadUp->setEnabled(true);
         loadDown->setEnabled(true);

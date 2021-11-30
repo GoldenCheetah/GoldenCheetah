@@ -20,7 +20,7 @@
 #define GC_TodaysPlanBodyMeasures_h
 
 #include "Context.h"
-#include "BodyMeasures.h"
+#include "Measures.h"
 
 #include <QNetworkAccessManager>
 #include <QNetworkRequest>
@@ -35,7 +35,7 @@ class TodaysPlanBodyMeasures : public QObject {
         ~TodaysPlanBodyMeasures();
 
         // get the data
-        bool getBodyMeasures(QString &error, QDateTime from, QDateTime to, QList<BodyMeasure> &data);
+        bool getBodyMeasures(QString &error, QDateTime from, QDateTime to, QList<Measure> &data);
 
     signals:
         void downloadStarted(int);

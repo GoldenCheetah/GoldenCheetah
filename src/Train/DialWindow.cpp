@@ -20,15 +20,21 @@
 #include "DialWindow.h"
 #include "Athlete.h"
 #include "Context.h"
+#include "HelpWhatsThis.h"
 
 DialWindow::DialWindow(Context *context) :
     GcChartWindow(context), context(context), average(1), isNewLap(false)
 {
+    HelpWhatsThis *helpContents = new HelpWhatsThis(this);
+    this->setWhatsThis(helpContents->getWhatsThisText(HelpWhatsThis::ChartTrain_Telemetry));
+
     rolling.resize(150); // enough for 30 seconds at 5hz
 
     setContentsMargins(0,0,0,0);
 
     QWidget *c = new QWidget;
+    HelpWhatsThis *helpConfig = new HelpWhatsThis(c);
+    c->setWhatsThis(helpConfig->getWhatsThisText(HelpWhatsThis::ChartTrain_Telemetry));
     QVBoxLayout *cl = new QVBoxLayout(c);
     setControls(c);
 
@@ -238,7 +244,7 @@ DialWindow::telemetryUpdate(const RealtimeData &rtData)
 
     case RealtimeData::Speed:
     case RealtimeData::VirtualSpeed:
-        if (!context->athlete->useMetricUnits) value *= MILES_PER_KM;
+        if (!GlobalContext::context()->useMetricUnits) value *= MILES_PER_KM;
         valueLabel->setText(QString("%1").arg(value, 0, 'f', 1));
         break;
 
@@ -253,7 +259,12 @@ DialWindow::telemetryUpdate(const RealtimeData &rtData)
 
     case RealtimeData::Distance:
     case RealtimeData::LapDistance:
-        if (!context->athlete->useMetricUnits) value *= MILES_PER_KM;
+    case RealtimeData::RouteDistance:
+    case RealtimeData::DistanceRemaining:
+        if (!GlobalContext::context()->useMetricUnits) value *= MILES_PER_KM;
+        // Default floating point rounds to nearest. For distance we'd like to not see the
+        // next biggest number until we're actually there... Truncate to meter.
+        value = ((double)((unsigned)(value * 1000.))) / 1000.;
         valueLabel->setText(QString("%1").arg(value, 0, 'f', 3));
         break;
 
@@ -270,7 +281,7 @@ DialWindow::telemetryUpdate(const RealtimeData &rtData)
         sum += rtData.value(RealtimeData::Speed);
         count++;
         value = sum / count;
-        if (!context->athlete->useMetricUnits) value *= MILES_PER_KM;
+        if (!GlobalContext::context()->useMetricUnits) value *= MILES_PER_KM;
         valueLabel->setText(QString("%1").arg(value, 0, 'f', 1));
         break;
 
@@ -330,11 +341,11 @@ DialWindow::telemetryUpdate(const RealtimeData &rtData)
 
             double rif, cp;
             // carry on and calculate IF
-            if (context->athlete->zones(false)) {
+            if (context->athlete->zones("Bike")) {
 
                 // get cp for today
-                int zonerange = context->athlete->zones(false)->whichRange(QDateTime::currentDateTime().date());
-                if (zonerange >= 0) cp = context->athlete->zones(false)->getCP(zonerange);
+                int zonerange = context->athlete->zones("Bike")->whichRange(QDateTime::currentDateTime().date());
+                if (zonerange >= 0) cp = context->athlete->zones("Bike")->getCP(zonerange);
                 else cp = 0;
 
             } else {
@@ -416,11 +427,11 @@ DialWindow::telemetryUpdate(const RealtimeData &rtData)
 
             double rif, cp;
             // carry on and calculate IF
-            if (context->athlete->zones(false)) {
+            if (context->athlete->zones("Bike")) {
 
                 // get cp for today
-                int zonerange = context->athlete->zones(false)->whichRange(QDateTime::currentDateTime().date());
-                if (zonerange >= 0) cp = context->athlete->zones(false)->getCP(zonerange);
+                int zonerange = context->athlete->zones("Bike")->whichRange(QDateTime::currentDateTime().date());
+                if (zonerange >= 0) cp = context->athlete->zones("Bike")->getCP(zonerange);
                 else cp = 0;
 
             } else {
@@ -508,6 +519,22 @@ DialWindow::telemetryUpdate(const RealtimeData &rtData)
         valueLabel->setText(QString("%1").arg(value, 0, 'f', 1));
         break;
 
+    case RealtimeData::VO2:
+    case RealtimeData::VCO2:
+    case RealtimeData::Rf:
+    case RealtimeData::RMV:
+        valueLabel->setText(QString("%1").arg(value, 0, 'f', 0));
+        break;
+
+    case RealtimeData::TidalVolume:
+        valueLabel->setText(QString("%1").arg(value, 0, 'f', 1));
+        break;
+
+    case RealtimeData::FeO2:
+    case RealtimeData::RER:
+        valueLabel->setText(QString("%1").arg(value, 0, 'f', 2));
+        break;
+
     default:
         valueLabel->setText(QString("%1").arg(round(displayValue)));
         break;
@@ -519,19 +546,12 @@ void DialWindow::resizeEvent(QResizeEvent * )
 {
     QFont font;
 
-    // hidpi is a bit more complex
-    if (dpiXFactor > 1) {
+    // set point size within reasonable limits for low dpi screens
+    int size = (geometry().height() - 24) * 72 / logicalDpiY();
+    if (size <= 0) size = 4;
+    if (size >= 64) size = 64;
 
-        font.setPixelSize(pixelSizeForFont(font, geometry().height()-(24*dpiYFactor)));
-
-    } else {
-        // set point size within reasonable limits for low dpi screens
-        int size = geometry().height()-24;
-        if (size <= 0) size = 4;
-        if (size >= 64) size = 64;
-
-        font.setPointSize(size);
-    }
+    font.setPointSize(size);
 
     font.setWeight(QFont::Bold);
     valueLabel->setFont(font);
@@ -563,23 +583,55 @@ void DialWindow::seriesChanged()
     case RealtimeData::LapTime:
     case RealtimeData::LapTimeRemaining:
     case RealtimeData::ErgTimeRemaining:
-    case RealtimeData::Distance:
-    case RealtimeData::LapDistance:
-    case RealtimeData::LapDistanceRemaining:
     case RealtimeData::LRBalance:
     case RealtimeData::Lap:
     case RealtimeData::RI:
     case RealtimeData::IF:
     case RealtimeData::VI:
     case RealtimeData::SkibaVI:
-    case RealtimeData::Slope:
+    case RealtimeData::FeO2:
+        foreground = GColor(CFEO2);
+        break;
+            
+    case RealtimeData::Distance:
+    case RealtimeData::RouteDistance:
+    case RealtimeData::DistanceRemaining:
+    case RealtimeData::Latitude:
+    case RealtimeData::Longitude:
+    case RealtimeData::LapDistance:
+    case RealtimeData::LapDistanceRemaining:
+    case RealtimeData::RER:
     case RealtimeData::None:
             foreground = GColor(CDIAL);
             break;
 
+    case RealtimeData::Rf:
+        foreground = GColor(CRESPFREQUENCY);
+        break;
+
+    case RealtimeData::RMV:
+        foreground = GColor(CVENTILATION);
+        break;
+
+    case RealtimeData::VO2:
+        foreground = GColor(CVO2);
+        break;
+
+    case RealtimeData::VCO2:
+        foreground = GColor(CVCO2);
+        break;
+
+    case RealtimeData::TidalVolume:
+        foreground = GColor(CTIDALVOLUME);
+        break;
+
+    case RealtimeData::Slope:  
+        foreground = GColor(CSLOPE);
+        break;
+            
     case RealtimeData::Load:
-            foreground = GColor(CLOAD);
-            break;
+        foreground = GColor(CLOAD);
+        break;
 
     case RealtimeData::BikeScore:
             foreground = GColor(CBIKESCORE);

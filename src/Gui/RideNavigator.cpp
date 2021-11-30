@@ -25,7 +25,7 @@
 #include "RideNavigator.h"
 #include "RideNavigatorProxy.h"
 #include "SearchFilterBox.h"
-#include "TabView.h"
+#include "AbstractView.h"
 #include "HelpWhatsThis.h"
 
 #include <QtGui>
@@ -47,16 +47,16 @@ RideNavigator::RideNavigator(Context *context, bool mainwindow) : GcChartWindow(
     this->mainwindow = mainwindow;
     _groupBy = -1;
     fontHeight = QFontMetrics(QFont()).height();
-    ColorEngine ce(context);
-    reverseColor = ce.reverseColor;
+    reverseColor = GlobalContext::context()->colorEngine->reverseColor;
     currentItem = NULL;
+    hasCalendarText = false;
 
     init = false;
 
     mainLayout = new QVBoxLayout;
     setChartLayout(mainLayout);
     mainLayout->setSpacing(0);
-    if (mainwindow) mainLayout->setContentsMargins(0,0,0,0);
+    if (mainwindow) mainLayout->setContentsMargins(5*dpiXFactor,0,0,0);
     else mainLayout->setContentsMargins(2,2,2,2); // so we can resize!
 
     searchFilter = new SearchFilter(this);
@@ -167,13 +167,13 @@ RideNavigator::~RideNavigator()
 void
 RideNavigator::configChanged(qint32 state)
 {
-    ColorEngine ce(context);
     fontHeight = QFontMetrics(QFont()).height();
-    reverseColor = ce.reverseColor;
+    reverseColor = GlobalContext::context()->colorEngine->reverseColor;
+    hasCalendarText = GlobalContext::context()->rideMetadata->hasCalendarText();
 
     // hide ride list scroll bar ?
 #ifndef Q_OS_MAC
-    tableView->setStyleSheet(TabView::ourStyleSheet());
+    tableView->setStyleSheet(AbstractView::ourStyleSheet());
     if (mainwindow) {
         if (appsettings->value(this, GC_RIDESCROLL, true).toBool() == false)
             tableView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -282,7 +282,7 @@ RideNavigator::resetView()
 
     // add metadata fields...
     SpecialFields sp; // all the special fields are in here...
-    foreach(FieldDefinition field, context->athlete->rideMetadata()->getFields()) {
+    foreach(FieldDefinition field, GlobalContext::context()->rideMetadata->getFields()) {
         if (!sp.isMetric(field.name) && (field.type < 5 || field.type == 7)) {
             nameMap.insert(QString("%1").arg(sp.makeTechName(field.name)), sp.displayName(field.name));
             internalNameMap.insert(field.name, sp.displayName(field.name));
@@ -626,7 +626,7 @@ RideNavigator::setColumnWidth(int x, bool resized, int logicalIndex, int oldWidt
 
     active = true;
 
-#if !defined (Q_OS_MAC) || (defined (Q_OS_MAC) && (QT_VERSION < 0x050000)) // on QT5 the scrollbars have no width
+#if !defined (Q_OS_MAC) // on QT5 the scrollbars have no width
     if (tableView->verticalScrollBar()->isVisible())
         x -= tableView->verticalScrollBar()->width()
                 + 0 ; // !! no longer account for content margins of 3,3,3,3 was + 6
@@ -1076,8 +1076,8 @@ QSize NavigatorCellDelegate::sizeHint(const QStyleOptionViewItem & /*option*/, c
     QSize s;
 
     if (rideNavigator->groupByModel->mapToSource(rideNavigator->sortModel->mapToSource(index)) != QModelIndex() &&
-        rideNavigator->groupByModel->data(rideNavigator->sortModel->mapToSource(index), Qt::UserRole).toString() != "") {
-        s.setHeight((rideNavigator->fontHeight+2) * 3);
+        rideNavigator->hasCalendarText) {
+        s.setHeight((rideNavigator->fontHeight+2) * 4);
     } else s.setHeight(rideNavigator->fontHeight + 2);
     return s;
 }
@@ -1110,11 +1110,14 @@ void NavigatorCellDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
 
     if ((m=rideNavigator->columnMetrics.value(columnName, NULL)) != NULL) {
 
-        // get double from sqlmodel
-        value = index.model()->data(index, Qt::DisplayRole).toString();
+        // get double from model, special case QTime to avoid default .000 msecs
+        if ((QMetaType::Type)index.model()->data(index, Qt::DisplayRole).type() == QMetaType::QTime)
+            value = index.model()->data(index, Qt::DisplayRole).toTime().toString("hh:mm:ss");
+        else
+            value = index.model()->data(index, Qt::DisplayRole).toString();
 
         // get rid of 0 its ugly
-        if (value =="nan" || value == "0" || value == "0.0" || value == "0.00") value="";
+        if (value =="nan" || value == "0" || value == "0.0" || value == "0.00" || value == "00:00:00") value="";
 
     } else {
         // is this the ride date/time ?
@@ -1210,13 +1213,13 @@ void NavigatorCellDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
         painter->setFont(isFont);
 
         // now get the calendar text to appear ...
-        if (calendarText != "") {
-            QRect high(myOption.rect.x()+myOption.rect.width() - (7*dpiXFactor), myOption.rect.y(), (7*dpiXFactor), (rideNavigator->fontHeight+2) * 3);
+        if (rideNavigator->hasCalendarText) {
+            QRect high(myOption.rect.x()+myOption.rect.width() - (7*dpiXFactor), myOption.rect.y(), (7*dpiXFactor), (rideNavigator->fontHeight+2) * 4);
 
             myOption.rect.setX(0);
             myOption.rect.setY(myOption.rect.y() + rideNavigator->fontHeight + 2);//was +23
             myOption.rect.setWidth(rideNavigator->pwidth);
-            myOption.rect.setHeight(rideNavigator->fontHeight * 2); //was 36
+            myOption.rect.setHeight(rideNavigator->fontHeight * 3); //was 36
             //myOption.font.setPointSize(myOption.font.pointSize());
             myOption.font.setWeight(QFont::Normal);
 
@@ -1236,7 +1239,7 @@ void NavigatorCellDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
             painter->drawText(myOption.rect, Qt::AlignLeft | Qt::TextWordWrap, calendarText);
             painter->setPen(isColor);
 
-#if (defined (Q_OS_MAC) && (QT_VERSION >= 0x050000)) // on QT5 the scrollbars have no width
+#if defined (Q_OS_MAC) // on QT5 the scrollbars have no width
             if (!selected && !rideBG && high.x()+12 > rideNavigator->geometry().width() && !isnormal) {
 #else
             if (!selected && !rideBG && high.x()+32 > rideNavigator->geometry().width() && !isnormal) {
@@ -1304,7 +1307,7 @@ ColumnChooser::ColumnChooser(QList<QString>&logicalHeadings)
     smallFont.setPointSizeF(baseFont.pointSizeF() *0.8f);
 
     QList<QString> buttonNames = logicalHeadings;
-    qSort(buttonNames.begin(), buttonNames.end(), insensitiveLessThan);
+    std::sort(buttonNames.begin(), buttonNames.end(), insensitiveLessThan);
 
     QString last;
     foreach (QString column, buttonNames) {
@@ -1373,14 +1376,10 @@ RideNavigator::showTreeContextMenuPopup(const QPoint &pos)
 
 RideTreeView::RideTreeView(QWidget *parent) : QTreeView(parent)
 {
-#if (defined WIN32) && (QT_VERSION > 0x050000) && (QT_VERSION < 0x050301) 
-    // don't allow ride drop on Windows with QT5 until 5.3.1 when they fixed the bug
-#else
     setDragDropMode(QAbstractItemView::InternalMove);
     setDragEnabled(true);
     setDragDropOverwriteMode(false);
     setDropIndicatorShown(true);
-#endif
 #ifdef Q_OS_MAC
     setAttribute(Qt::WA_MacShowFocusRect, 0);
 #endif

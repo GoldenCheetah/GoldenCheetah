@@ -17,7 +17,6 @@
  */
 
 #include "ChartBar.h"
-#include "GcScopeBar.h"
 #include "DiaryWindow.h"
 #include "DiarySidebar.h"
 #include "Context.h"
@@ -25,9 +24,9 @@
 #include <QFontMetrics>
 
 #ifdef Q_OS_MAC
-static int spacing_=4;
+static int spacing_=12;
 #else
-static int spacing_=4;
+static int spacing_=8;
 #endif
 ChartBar::ChartBar(Context *context) : QWidget(context->mainWindow), context(context)
 {
@@ -58,28 +57,24 @@ ChartBar::ChartBar(Context *context) : QWidget(context->mainWindow), context(con
 
     // scrollarea
     scrollArea = new QScrollArea(this);
-    scrollArea->setAutoFillBackground(false);
-    scrollArea->setWidgetResizable(true);
+    scrollArea->setAutoFillBackground(true);
+    scrollArea->setWidgetResizable(false);
     scrollArea->setFrameStyle(QFrame::NoFrame);
     scrollArea->setContentsMargins(0,0,0,0);
     scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-
-    QFontMetrics fs(buttonFont);
-    setFixedHeight(fs.height()+(spacing_*dpiXFactor));
-    scrollArea->setFixedHeight(fs.height()+(spacing_*dpiXFactor));
-    buttonBar->setFixedHeight(fs.height()+(spacing_*dpiXFactor));
-
     scrollArea->setWidget(buttonBar);
 
     // scroll area turns it on .. we turn it off!
     buttonBar->setAutoFillBackground(false);
 
+    // for scrolling buttonbar
+    anim = new QPropertyAnimation(buttonBar, "pos", this);
+
     // scroller buttons
-    left = new QToolButton(this);
-    left->setStyleSheet("QToolButton { border: none; padding: 0px; }");
+    left = new QPushButton(this);
     left->setAutoFillBackground(false);
-    left->setFixedSize(20*dpiXFactor,20*dpiYFactor);
+    left->setFixedSize(24*dpiXFactor,24*dpiYFactor);
     left->setIcon(leftIcon);
     left->setIconSize(QSize(20*dpiXFactor,20*dpiYFactor));
     left->setFocusPolicy(Qt::NoFocus);
@@ -89,10 +84,9 @@ ChartBar::ChartBar(Context *context) : QWidget(context->mainWindow), context(con
     // menu bar in the middle of the buttons
     mlayout->addWidget(scrollArea);
 
-    right = new QToolButton(this);
-    right->setStyleSheet("QToolButton { border: none; padding: 0px; }");
+    right = new QPushButton(this);
     right->setAutoFillBackground(false);
-    right->setFixedSize(20*dpiXFactor,20*dpiYFactor);
+    right->setFixedSize(24*dpiXFactor,24*dpiYFactor);
     right->setIcon(rightIcon);
     right->setIconSize(QSize(20*dpiXFactor,20*dpiYFactor));
     right->setFocusPolicy(Qt::NoFocus);
@@ -106,12 +100,11 @@ ChartBar::ChartBar(Context *context) : QWidget(context->mainWindow), context(con
     spacer->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
     mlayout->addWidget(spacer);
 
-    menuButton = new QToolButton(this);
-    menuButton->setStyleSheet("QToolButton { border: none; padding: 0px; }");
+    menuButton = new QPushButton(this);
     menuButton->setAutoFillBackground(false);
-    menuButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
-    menuButton->setIcon(iconFromPNG(":images/sidebar/extra.png"));
-    menuButton->setIconSize(QSize(10*dpiXFactor,10*dpiYFactor));
+    menuButton->setFixedSize(24*dpiXFactor,24*dpiYFactor);
+    menuButton->setIcon(iconFromPNG(":images/sidebar/plus.png", QSize(12*dpiXFactor, 12*dpiXFactor)));
+    menuButton->setIconSize(QSize(20*dpiXFactor,20*dpiYFactor));
     menuButton->setFocusPolicy(Qt::NoFocus);
     mlayout->addWidget(menuButton);
     //connect(p, SIGNAL(clicked()), action, SLOT(trigger()));
@@ -119,13 +112,18 @@ ChartBar::ChartBar(Context *context) : QWidget(context->mainWindow), context(con
     signalMapper = new QSignalMapper(this); // maps each option
     connect(signalMapper, SIGNAL(mapped(int)), this, SLOT(clicked(int)));
 
+    menuMapper = new QSignalMapper(this); // maps each option
+    connect(menuMapper, SIGNAL(mapped(int)), this, SLOT(triggerContextMenu(int)));
+
     barMenu = new QMenu("Add");
-    chartMenu = barMenu->addMenu(tr("Add Chart"));
+    chartMenu = barMenu->addMenu(tr("New Chart"));
+
+    barMenu->addAction(tr("Import Chart ..."), context->mainWindow, SLOT(importChart()));
 
 #ifdef GC_HAS_CLOUD_DB
-    barMenu->addAction(tr("Upload Chart..."), context->mainWindow, SLOT(exportChartToCloudDB()));
     barMenu->addAction(tr("Download Chart..."), context->mainWindow, SLOT(addChartFromCloudDB()));
 #endif
+
     // menu
     connect(menuButton, SIGNAL(clicked()), this, SLOT(menuPopup()));
     connect(chartMenu, SIGNAL(aboutToShow()), this, SLOT(setChartMenu()));
@@ -136,6 +134,8 @@ ChartBar::ChartBar(Context *context) : QWidget(context->mainWindow), context(con
 
     // appearance update
     connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
+
+    configChanged(0);
 }
 
 void
@@ -143,29 +143,48 @@ ChartBar::configChanged(qint32)
 {
     buttonFont = QFont();
     QFontMetrics fs(buttonFont);
-    setFixedHeight(fs.height()+(spacing_*dpiXFactor));
-    scrollArea->setFixedHeight(fs.height()+(spacing_*dpiXFactor));
-    buttonBar->setFixedHeight(fs.height()+(spacing_*dpiXFactor));
-    foreach(GcScopeButton *b, buttons) {
-    	int width = fs.width(b->text);
+    int height = (fs.height()+(spacing_*dpiXFactor));
+
+    setFixedHeight(height);
+    scrollArea->setFixedHeight(height);
+    buttonBar->setFixedHeight(height);
+
+    QColor col=GColor(CCHARTBAR);
+    scrollArea->setStyleSheet(QString("QScrollArea { background: rgb(%1,%2,%3); }").arg(col.red()).arg(col.green()).arg(col.blue()));
+
+    foreach(ChartBarItem *b, buttons) {
+        int width = fs.width(b->text) + (60 * dpiXFactor);
+        if (width < (90*dpiXFactor)) width=90*dpiXFactor;
     	b->setFont(buttonFont);
-        b->setFixedWidth(width+(20*dpiXFactor));
-        b->setFixedHeight(fs.height()+(2*dpiYFactor));
+        b->setFixedWidth(width);
+        b->setFixedHeight(height);
     }
+
+    QString buttonstyle = QString("QPushButton { border: none; border-radius: %2px; background-color: %1; "
+                                                "padding-left: 0px; padding-right: 0px; "
+                                                "padding-top:  0px; padding-bottom: 0px; }"
+                                  "QPushButton:hover { background-color: %3; }"
+                                  "QPushButton:hover:pressed { background-color: %3; }"
+                                ).arg(GColor(CCHARTBAR).name()).arg(3 * dpiXFactor).arg(GColor(CHOVER).name());
+    menuButton->setStyleSheet(buttonstyle);
+    left->setStyleSheet(buttonstyle);
+    right->setStyleSheet(buttonstyle);
 }
 
 void
 ChartBar::addWidget(QString title)
 {
-    GcScopeButton *newbutton = new GcScopeButton(this);
+    ChartBarItem *newbutton = new ChartBarItem(this);
     newbutton->setText(title);
     newbutton->setFont(buttonFont);
 
     // make the right size
     QFontMetrics fontMetric(buttonFont);
-    int width = fontMetric.width(title);
-    newbutton->setFixedWidth(width+(20*dpiXFactor));
-    newbutton->setFixedHeight(fontMetric.height()+(2*dpiYFactor));
+    int width = fontMetric.width(title) + (60 * dpiXFactor);
+    int height = (fontMetric.height()+(spacing_*dpiXFactor));
+    if (width < (90*dpiXFactor)) width=90*dpiXFactor;
+    newbutton->setFixedWidth(width);
+    newbutton->setFixedHeight(height);
 
     // add to layout
     layout->addWidget(newbutton);
@@ -173,18 +192,28 @@ ChartBar::addWidget(QString title)
 
     // map signals
     connect(newbutton, SIGNAL(clicked(bool)), signalMapper, SLOT(map()));
+    connect(newbutton, SIGNAL(contextMenu()), menuMapper, SLOT(map()));
     signalMapper->setMapping(newbutton, buttons.count()-1);
+    menuMapper->setMapping(newbutton, buttons.count()-1);
 
     newbutton->installEventFilter(this);
 
     // tidy up scrollers etc
-    tidy();
+    tidy(true);
 }
 
 void
 ChartBar::setChartMenu()
 {
     context->mainWindow->setChartMenu(chartMenu);
+}
+
+void
+ChartBar::triggerContextMenu(int index)
+{
+    QPoint tl = buttons[index]->geometry().topLeft();
+    int x = scrollArea->widget()->mapToGlobal(tl).x();
+    emit contextMenu(index, x);
 }
 
 void
@@ -199,22 +228,32 @@ ChartBar::setText(int index, QString text)
 {
     buttons[index]->setText(text);
     QFontMetrics fontMetric(buttonFont);
-    int width = fontMetric.width(text);
-    buttons[index]->setWidth(width+(20*dpiXFactor));
+    int width = fontMetric.width(text) + (60*dpiXFactor);
+    buttons[index]->setWidth(width < (90*dpiXFactor) ? (90*dpiXFactor) : width);
+    buttons[index]->update();
 
-    tidy(); // still fit ?
+    tidy(true); // still fit ?
 }
+
+void
+ChartBar::setColor(int index, QColor color)
+{
+    buttons[index]->setColor(color);
+}
+
 
 // tidy up the scrollers on first show...
 void
-ChartBar::tidy()
+ChartBar::tidy(bool setwidth)
 {
     // resize to button widths + 2px spacing
-    int width = 2*dpiXFactor;
-    foreach (GcScopeButton *button, buttons) {
-        width += button->geometry().width() + (2*dpiXFactor);
+    if (setwidth) {
+        int width = 2*dpiXFactor;
+        foreach (ChartBarItem *button, buttons) {
+            width += button->geometry().width() + (2*dpiXFactor);
+        }
+        buttonBar->setFixedWidth(width);
     }
-    buttonBar->setMinimumWidth(width);
 
     if (buttonBar->width() > scrollArea->width()) {
         left->show(); right->show();
@@ -231,22 +270,18 @@ ChartBar::eventFilter(QObject *object, QEvent *e)
 
         // we do NOT move the position, we just show/hide
         // the left and right scrollers
-        tidy();
+        tidy(false);
     }
 
     // showing us - tidy up
     if (object == this && e->type() == QEvent::Show) {
-        tidy();
+        tidy(false);
     }
 
     // enter/leave we can track approximate mouse position and decide 
     // if we want to 'autoscroll'
     if (e->type() == QEvent::Leave || e->type() == QEvent::Enter) {
-        tidy(); // tidy up anyway
-
-        // XXX for later, perhaps when drag/dropping
-        //     we should try and be a little more fluid / animate ...
-        //     which will probably mean using QScrollArea::ScrollContentsBy
+        tidy(false); // tidy up anyway
     }
 
     return false;
@@ -255,22 +290,49 @@ ChartBar::eventFilter(QObject *object, QEvent *e)
 void
 ChartBar::scrollRight()
 {
-    // scroll to the right...
-    int w = buttonBar->width();
-    scrollArea->ensureVisible(w-(10*dpiXFactor),0,10*dpiXFactor,10*dpiYFactor);
+
+    // old position and pos we want
+    QPoint opos = buttonBar->pos();
+    QPoint pos = opos;
+
+    // just do a 3rd at a time, so we can see it move
+    pos.setX(pos.x() - (scrollArea->geometry().width()/3));
+
+    // constrain to just fit
+    if (pos.x() + buttonBar->geometry().width() < scrollArea->geometry().width())
+        pos.setX(scrollArea->geometry().width() - buttonBar->geometry().width());
+
+    // animated scroll
+    anim->setDuration(400);
+    anim->setEasingCurve(QEasingCurve::InOutQuad);
+    anim->setStartValue(opos);
+    anim->setEndValue(pos);
+    anim->start();
 }
 
 void
 ChartBar::scrollLeft()
 {
-    // scroll to the left
-    scrollArea->ensureVisible(0,0,10*dpiXFactor,10*dpiYFactor);
+    // old and new position
+    QPoint opos = buttonBar->pos();
+    QPoint pos = opos;
+
+    // a 3rd at a time
+    pos.setX(pos.x() + (scrollArea->geometry().width()/3));
+    if (pos.x() > 0) pos.setX(0);
+
+    // animated scroll
+    anim->setDuration(400);
+    anim->setEasingCurve(QEasingCurve::InOutQuad);
+    anim->setStartValue(opos);
+    anim->setEndValue(pos);
+    anim->start();
 }
 
 void
 ChartBar::clear()
 {
-    foreach(GcScopeButton *button, buttons) {
+    foreach(ChartBarItem *button, buttons) {
         layout->removeWidget(button);
         delete button;
     }
@@ -282,12 +344,14 @@ ChartBar::removeWidget(int index)
 {
     layout->removeWidget(buttons[index]);
     delete buttons[index];
-    buttons.remove(index);
+    buttons.takeAt(index);
 
     // reset mappings
-    for (int i=0; i<buttons.count(); i++)
+    for (int i=0; i<buttons.count(); i++) {
         signalMapper->setMapping(buttons[i], i);
-
+        menuMapper->setMapping(buttons[i], i);
+    }
+    tidy(true);
 }
 
 void
@@ -309,36 +373,7 @@ ChartBar::clicked(int index)
 }
 
 
-#if 0
-ChartBar::setHighlighted()
-{
-    if (context->isfiltered) {
-        searchLabel->setHighlighted(true);
-        searchLabel->show();
-#ifndef Q_OS_MAC
-        home->setHighlighted(true);
-        anal->setHighlighted(true);
-#ifdef GC_HAVE_ICAL
-        diary->setHighlighted(true);
-#endif
-#endif
-    } else {
-        searchLabel->setHighlighted(false);
-        searchLabel->hide();
-#ifndef Q_OS_MAC
-        home->setHighlighted(false);
-        anal->setHighlighted(false);
-#ifdef GC_HAVE_ICAL
-        diary->setHighlighted(false);
-#endif
-#endif
-    }
-}
-#endif
-
-ChartBar::~ChartBar()
-{
-}
+ChartBar::~ChartBar() { }
 
 void
 ChartBar::paintEvent (QPaintEvent *event)
@@ -358,24 +393,7 @@ ChartBar::paintBackground(QPaintEvent *)
     painter.save();
     QRect all(0,0,width(),height());
 
-    // linear gradients
-    QLinearGradient active = GCColor::linearGradient(23*dpiYFactor, true);
-    QLinearGradient inactive = GCColor::linearGradient(23*dpiYFactor, false);
-
-    // fill with a linear gradient
-    painter.setPen(Qt::NoPen);
-    painter.fillRect(all, QColor(Qt::white));
-    painter.fillRect(all, isActiveWindow() ? active : inactive);
-
-    if (!GCColor::isFlat()) {
-        QPen black(QColor(100,100,100,200));
-        painter.setPen(black);
-        painter.drawLine(0,height()-1, width()-1, height()-1);
-
-        QPen gray(QColor(230,230,230));
-        painter.setPen(gray);
-        painter.drawLine(0,0, width()-1, 0);
-    }
+    painter.fillRect(all, GColor(CCHARTBAR));
 
     painter.restore();
 }
@@ -398,14 +416,10 @@ ButtonBar::paintBackground(QPaintEvent *)
     painter.save();
     QRect all(0,0,width(),height());
 
-    // linear gradients
-    QLinearGradient active = GCColor::linearGradient(23*dpiYFactor, true);
-    QLinearGradient inactive = GCColor::linearGradient(23*dpiYFactor, false);
-
     // fill with a linear gradient
     painter.setPen(Qt::NoPen);
     painter.fillRect(all, QColor(Qt::white));
-    painter.fillRect(all, isActiveWindow() ? active : inactive);
+    painter.fillRect(all, GColor(CCHARTBAR));
 
     if (!GCColor::isFlat()) {
         QPen black(QColor(100,100,100,200));
@@ -420,51 +434,205 @@ ButtonBar::paintBackground(QPaintEvent *)
     painter.restore();
 }
 
-#if 0
-int
-ChartBar::selected()
+ChartBarItem::ChartBarItem(ChartBar *chartbar) : QWidget(chartbar), chartbar(chartbar)
 {
-    if (home->isChecked()) return 0;
-#ifdef GC_HAVE_ICAL
-    if (diary->isChecked()) return 1;
-    if (anal->isChecked()) return 2;
-    if (train->isChecked()) return 3;
-#else
-    if (anal->isChecked()) return 1;
-    if (train->isChecked()) return 2;
-#endif
-
-    // never gets here - shutup compiler
-    return 0;
+    red = highlighted = checked = false;
+    state = Idle;
+    QFont font;
+    font.setPointSize(10);
+    setFont(font);
+    setMouseTracking(true);
 }
 
 void
-ChartBar::setSelected(int index)
+ChartBarItem::paintEvent(QPaintEvent *)
 {
-    // we're already there
-    if (index == selected()) return;
+    if (state == Drag) return; // invisible when dragging
 
-    // mainwindow wants to tell us to switch to a selection
-    home->setChecked(false);
-#ifdef GC_HAVE_ICAL
-    diary->setChecked(false);
-#endif
-    anal->setChecked(false);
-    train->setChecked(false);
+    QPainter painter(this);
+    painter.save();
+    painter.setRenderHints(QPainter::Antialiasing|QPainter::TextAntialiasing, true);
 
-#ifdef GC_HAVE_ICAL
-    switch (index) {
-        case 0 : home->setChecked(true); break;
-        case 1 : diary->setChecked(true); break;
-        case 2 : anal->setChecked(true); break;
-        case 3 : train->setChecked(true); break;
+    // widget rectangle
+    QRectF body(0,0,width(), height());
+
+    painter.setClipRect(body);
+    painter.setPen(Qt::NoPen);
+
+    // background - chrome or slected colour
+    QBrush brush(GColor(CCHARTBAR));
+    if (underMouse() && !checked) brush = GColor(CHOVER);
+    if (checked) brush = color;
+    painter.fillRect(body, brush);
+
+    // now paint the text
+    QPen pen(GCColor::invertColor(brush.color()));
+    painter.setPen(pen);
+    painter.drawText(body, text, Qt::AlignHCenter | Qt::AlignVCenter);
+
+    // draw the bar
+    if (checked) painter.fillRect(QRect(0,0,geometry().width(), 3*dpiXFactor), QBrush(GColor(CPLOTMARKER)));
+
+    // draw the menu indicator
+    if (underMouse()) {
+
+        QPoint mouse = mapFromGlobal(QCursor::pos());
+        painter.setPen (Qt :: NoPen);
+
+        if (checked) {
+
+            // different color if under mouse
+            QBrush brush(GColor(CHOVER));
+            if (hotspot.contains(mouse)) brush.setColor(GColor(CPLOTMARKER));
+            painter.fillPath (triangle, brush);
+        } else {
+
+            // visual clue there is a menu option when tab selected
+            QBrush brush(GColor(CHOVER));
+            painter.fillPath (triangle, brush);
+        }
     }
-#else
-    switch (index) {
-        case 0 : home->setChecked(true); break;
-        case 1 : anal->setChecked(true); break;
-        case 2 : train->setChecked(true); break;
-    }
-#endif
+    painter.restore();
 }
-#endif
+
+int
+ChartBarItem::indexPos(int x)
+{
+    // map via global coord
+    QPoint global = mapToGlobal(QPoint(x,0));
+
+    // where in the scrollarea's widget are we now?
+    // this is equivalent to chartbar->buttonbar->mapFromGlobal(..)
+    int cpos = chartbar->scrollArea->widget()->mapFromGlobal(global).x();
+
+    // work through the layout items to find which widgets
+    for(int i=0; i<chartbar->layout->count(); i++) {
+        QPoint center = chartbar->layout->itemAt(i)->geometry().center();
+        if (center.x() > cpos) return i;
+    }
+    return -1;
+}
+
+bool
+ChartBarItem::event(QEvent *e)
+{
+    // resize?
+    if (e->type() == QEvent::Resize) {
+        int startx = width() - (20*dpiXFactor);
+        int depth = height() / 4;
+        int starty = (height() / 2.0) - (depth/2) + 3*dpiXFactor; // middle, taking into account bar at top
+        int hs = 3 * dpiXFactor;
+
+        // set the triangle
+        hotspot.clear();
+        hotspot.moveTo (startx-hs, starty-hs);
+        hotspot.lineTo (startx+(hs*2)+(8*dpiXFactor), starty-hs);
+        hotspot.lineTo (startx+(hs*2)+(8*dpiXFactor), starty+depth+hs);
+        hotspot.lineTo (startx-hs, starty+depth+hs);
+        hotspot.lineTo (startx, starty);
+
+        triangle.clear();
+        triangle.moveTo (startx, starty);
+        triangle.lineTo (startx+(8*dpiXFactor), starty);
+        triangle.lineTo (startx+(4*dpiXFactor),   starty+depth);
+        triangle.lineTo (startx, starty);
+    }
+
+    // entry / exit event repaint for hover color
+    if (e->type() == QEvent::Leave || e->type() == QEvent::Enter) {
+        update();
+    }
+
+    if (e->type() == QEvent::MouseButtonPress && underMouse()) {
+
+        // menu?
+        if (checked && hotspot.contains(mapFromGlobal(QCursor::pos()))) {
+
+            // menu activated
+            state = Idle;
+            emit contextMenu();
+            return true; // no more processing of this event please - lots of stuff happens off that menu !
+
+        } else {
+
+            // selected with a click (not release)
+            state = Click;
+            clickpos.setX(static_cast<QMouseEvent*>(e)->x());
+            clickpos.setY(static_cast<QMouseEvent*>(e)->y());
+            emit clicked(checked);
+        }
+    }
+
+    if (e->type() == QEvent::MouseButtonRelease) {
+
+        if (state == Drag) {
+
+            // finish dragging, so drop into where we moved it
+            delete dragging;
+            int index =  chartbar->layout->indexOf(this);
+
+            if (index != originalindex) {
+
+                // even the button array is used to index by ChartBar::setText(..)
+                // and then signal mapped to the index being selected. oh my.
+                // bit naughty modding from child here, but no easy way around it.
+                ChartBarItem *me = chartbar->buttons.takeAt(originalindex);
+                chartbar->buttons.insert(index, me);
+                for (int i=0; i<chartbar->buttons.count(); i++) {
+                    chartbar->signalMapper->setMapping(chartbar->buttons[i], i);
+                    chartbar->menuMapper->setMapping(chartbar->buttons[i], i);
+                }
+
+                // tell homewindow
+                chartbar->itemMoved(index, originalindex);
+            }
+            update();
+        }
+        state = Idle;
+    }
+
+    if (e->type() == QEvent::MouseMove) {
+
+        if (state == Click) {
+
+            // enter drag state - moved mouse before releasing the button click
+            state = Drag;
+            originalindex = chartbar->layout->indexOf(this);
+            repaint();
+
+            dragging = new ChartBarItem(chartbar);
+            dragging->setColor(color);
+            dragging->state = Clone;
+            dragging->text = text;
+            dragging->checked = checked;
+            dragging->setFixedWidth(geometry().width());
+            dragging->setFixedHeight(geometry().height());
+            QPoint newpos = chartbar->mapFromGlobal(static_cast<QMouseEvent*>(e)->globalPos());
+            dragging->move(QPoint(newpos.x()-clickpos.x(),0));
+            dragging->show();
+
+        } else if (state == Drag) {
+
+            // move the clone tab for visual feedback
+            QPoint newpos = chartbar->mapFromGlobal(static_cast<QMouseEvent*>(e)->globalPos());
+            dragging->move(QPoint(newpos.x()-clickpos.x(),0));
+
+            // where are we currently?
+            int cindex = chartbar->layout->indexOf(this);
+
+            // work out where we should have dragged to
+            int indexpos = indexPos(static_cast<QMouseEvent*>(e)->x());
+
+            // if moving left, just do it...
+            if (cindex > indexpos) {
+                QLayoutItem *me = chartbar->layout->takeAt(cindex);
+                chartbar->layout->insertItem(indexpos, me);
+            } else if (indexpos > (cindex+1)) {
+                QLayoutItem *me = chartbar->layout->takeAt(cindex);
+                chartbar->layout->insertItem(indexpos-1, me); // indexpos-1 because we just got removed
+            }
+        }
+        update(); // in case hovering over stuff
+    }
+    return QWidget::event(e);
+}

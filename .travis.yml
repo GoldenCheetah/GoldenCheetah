@@ -1,10 +1,20 @@
+if: commit_message =~ /\[publish binaries\]/
+
 branches:
-- master
-os:
-- osx
-- linux
-dist: xenial
-language: c++
+  only:
+  - master
+  - /^[vV]\d+\.\d+(\.\d+)?(-\S*)?$/
+
+language: cpp
+
+cache:
+  directories:
+  - $HOME/Library/Caches/Homebrew
+  - qwt
+  - D2XX
+  - site-packages
+  - VLC
+
 env:
   global:
   - BRANCH=master
@@ -26,33 +36,28 @@ env:
   - secure: cc0pAJjkmFNw2bO3zVACmtyHTwINAHALrtUxi+nRD+FhOO9KxuxuuwvcKCZKfp9EUOjz5PrYWKV1ZH/zt/jMix8A4Gyue2mWX8WYih7aTmJBcJWsFNTCybnClreKBCh18kHdWWhkmhk8EMINDvlqxzJZGpcNO04gxhL9wuLLrNQ=
   - secure: em0xXIm69rMHsHXYQiizeJB7dEFBkX33PsWDHwBNrX6lFBued23eL96KJC4RVbk6A+AHFtXFATrreZ14D5JH/E/37CXhe3X2R93WqiPUSH0s7NI4fFA1BroKUNAlqO4bMqDBidtNmwMPaLTXjaOnOZyvbAG7z+QV3TKC8tOeZDU=
   - secure: VFaSERlgsjzjiDQhKw8XFvQrjdvFzHHL7V3NQg+RfELHoT6I1pAGFdl/+lRBIVOiVkbQ6XnpBA28nlf0QydPHElRZdqmh0azQV/bkUXD4ffPE8q0iSqeqhAZ+5L05K5K+Gby/y8TZE4FX6e/7trFL7oq+h9x0gq5RQO8rAcTV84=
-  matrix:
-    include:
-      - os: osx
-        osx_image: xcode10.1
-        compiler: clang
-      - os: linux
-        compiler: gcc
+  - secure: eTSJmS38EsTkI22yvDJLUrBxSyLDwd3pDRsyLQfZ3ThN0UJ9cQN2uB7aLy3OzNYadpi+Axlr46MgG0G5qGV1hHXkf+C4orGkURQWxHA7L5R/oE98TuYMO1bisZu9dJEVbmEM4cehCjbB7DExzxK4m6+oTJsWhVbIwlNh5Poq/v4=
+
+jobs:
+  include:
+  - os: osx
+    osx_image: xcode11.3
+    compiler: clang
+  - os: linux
+    dist: bionic
+    compiler: gcc
+
 before_install:
 - travis/$TRAVIS_OS_NAME/before_install.sh
+
 before_script:
 - travis/$TRAVIS_OS_NAME/before_script.sh
+
 script:
 - travis/$TRAVIS_OS_NAME/script.sh
-after_success:
-- if [[ $TRAVIS_OS_NAME == "osx" ]]; then
-    export FINAL_NAME=dev-prerelease-branch-master-build-${TRAVIS_BUILD_NUMBER}.dmg;
-  else
-    export FINAL_NAME=dev-prerelease-branch-master-build-${TRAVIS_BUILD_NUMBER}.AppImage;
-  fi
-- travis/$TRAVIS_OS_NAME/after_success.sh
-deploy:
-  provider: releases
-  api_key:
-    secure: KlfkRM8oGP02y5LhbdxetnhqUG3YzVylvyhT8BTYjdoJtkJr7YXYpdhj9byZ9aiy1gSWI/g7A1X6/P8/McqRtgt4dEYr4Zg8QO7Y7QdTpgNQEwu8ZrkyyG/7b/rSkfFHDjrOAHslLVXuBNwWgi8YW1aTn0rY2AqDbOri7u6tt9Q=
-  file: src/$FINAL_NAME
-  skip_cleanup: true
-  on:
-    tags: true
-    repo: GoldenCheetah/GoldenCheetah
 
+before_cache:
+- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew cleanup; fi
+
+after_success:
+- travis/$TRAVIS_OS_NAME/after_success.sh

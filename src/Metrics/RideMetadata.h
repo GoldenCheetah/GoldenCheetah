@@ -43,6 +43,7 @@
 #define FIELD_CHECKBOX  7
 
 class RideMetadata;
+class RideEditor;
 
 class KeywordDefinition
 {
@@ -158,7 +159,10 @@ class RideMetadata : public QWidget
         QList<KeywordDefinition> getKeywords() { return keywordDefinitions; }
         QList<FieldDefinition> getFields() { return fieldDefinitions; }
         QList<DefaultDefinition> getDefaults() { return defaultDefinitions; }
+        bool hasCalendarText();
         QString calendarText(RideItem *rideItem);
+
+        QStringList sports();
 
         QString getColorField() const { return colorfield; }
         void setColorField(QString x) { colorfield = x; }
@@ -201,6 +205,8 @@ class RideMetadata : public QWidget
     QVector<FormField*>   formFields;
 
     QString colorfield;
+
+    RideEditor *editor;
 };
 
 class MetadataXMLParser : public QXmlDefaultHandler

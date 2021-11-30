@@ -86,11 +86,7 @@ class CurveColors : public QObject
             // BUG in QMacStyle and painting of spanSlider
             // so we use a plain style to avoid it, but only
             // on a MAC, since win and linux are fine
-#if QT_VERSION > 0x5000
             QStyle *style = QStyleFactory::create("fusion");
-#else
-            QStyle *style = QStyleFactory::create("Cleanlooks");
-#endif
             slider->setStyle(style);
 #endif
             slider->hide();
@@ -405,7 +401,6 @@ class AllPlotObject : public QObject
     QwtPlotCurve *xpCurve;
     QwtPlotCurve *apCurve;
     QwtPlotCurve *hrCurve;
-    QwtPlotCurve *hrvCurve;
     QwtPlotCurve *tcoreCurve;
     QwtPlotCurve *speedCurve;
     QwtPlotCurve *accelCurve;
@@ -443,7 +438,6 @@ class AllPlotObject : public QObject
     QVector<double> wprimeDist;
 
     QVector<double> hrArray;
-  //    QVector<double> hrvArray;
     QVector<double> tcoreArray;
     QVector<double> wattsArray;
     QVector<double> atissArray;
@@ -505,8 +499,6 @@ class AllPlotObject : public QObject
     QVector<double> smoothAP;
     QVector<double> smoothXP;
     QVector<double> smoothHr;
-    QVector<double> smoothHrv;
-    QVector<double> smoothHrv_time;
     QVector<double> smoothTcore;
     QVector<double> smoothSpeed;
     QVector<double> smoothAccel;
@@ -632,7 +624,6 @@ class AllPlot : public QwtPlot
         void setShowXP(bool show);
         void setShowAP(bool show);
         void setShowHr(bool show);
-        void setShowHRV(bool show);
         void setShowTcore(bool show);
         void setShowSpeed(bool show);
         void setShowCad(bool show);
@@ -655,6 +646,7 @@ class AllPlot : public QwtPlot
         void setShowPCO(bool show);
         void setShowDC(bool show);
         void setShowPPP(bool show);
+        void setShowMarkers(bool show);
         void setShowGrid(bool show);
         void setPaintBrush(int state);
         void setShadeZones(bool x) { shade_zones=x; }
@@ -694,7 +686,6 @@ class AllPlot : public QwtPlot
         bool showXP;
         bool showAP;
         bool showHr;
-        bool showHRV;
         bool showTcore;
         bool showSpeed;
         bool showAccel;
@@ -723,6 +714,7 @@ class AllPlot : public QwtPlot
         bool showO2Hb;
         bool showHHb;
         bool showGear;
+        bool showMarkers;
 
         // plot objects
         AllPlotObject *standard;

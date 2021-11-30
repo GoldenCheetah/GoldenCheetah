@@ -21,7 +21,7 @@
 #include "Context.h"
 #include "Context.h"
 #include "Athlete.h"
-#include "TabView.h"
+#include "AbstractView.h"
 #include "AllPlotInterval.h"
 #include "AllPlotWindow.h"
 #include "AllPlot.h"
@@ -249,9 +249,13 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     showFull->setCheckState(Qt::Checked);
     guiControls->addRow(new QLabel(""), showFull);
 
-    showInterval = new QCheckBox(tr("Interval Navigator"), this);
-    showInterval->setCheckState(Qt::Checked);
-    guiControls->addRow(new QLabel(""), showInterval);
+    showIntervalMarkers = new QCheckBox(tr("Show Interval Markers"), this);
+    showIntervalMarkers->setCheckState(Qt::Checked);
+    guiControls->addRow(new QLabel(""), showIntervalMarkers);
+
+    showIntervalNavigator = new QCheckBox(tr("Interval Navigator"), this);
+    showIntervalNavigator->setCheckState(Qt::Checked);
+    guiControls->addRow(new QLabel(""), showIntervalNavigator);
 
     showHover = new QCheckBox(tr("Hover intervals"), this);
     showHover->setCheckState(Qt::Checked);
@@ -314,7 +318,6 @@ AllPlotWindow::AllPlotWindow(Context *context) :
 
     // running !
     seriesRight->addRow(new QLabel(""), new QLabel(""));
-    seriesRight->addRow(new QLabel(""), new QLabel(""));
 
     showRV = new QCheckBox(tr("Vertical Oscillation"), this);
     showRV->setCheckState(Qt::Checked);
@@ -352,10 +355,6 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     showHr = new QCheckBox(tr("Heart Rate"), this);
     showHr->setCheckState(Qt::Checked);
     seriesLeft->addRow(new QLabel(tr("Data series")), showHr);
-
-    showHRV= new QCheckBox(tr("R-R Rate"), this);
-    showHRV->setCheckState(Qt::Unchecked);
-    seriesLeft->addRow(new QLabel(), showHRV);
 
     showTcore = new QCheckBox(tr("Core Temperature"), this);
     showTcore->setCheckState(Qt::Unchecked); // don't show unless user insists
@@ -655,11 +654,7 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     // BUG in QMacStyle and painting of spanSlider
     // so we use a plain style to avoid it, but only
     // on a MAC, since win and linux are fine
-#if QT_VERSION > 0x5000
     QStyle *style = QStyleFactory::create("fusion");
-#else
-    QStyle *style = QStyleFactory::create("Cleanlooks");
-#endif
     spanSlider->setStyle(style);
     scrollLeft->setStyle(style);
     scrollRight->setStyle(style);
@@ -759,7 +754,6 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     connect(showCad, SIGNAL(stateChanged(int)), this, SLOT(setShowCad(int)));
     connect(showTorque, SIGNAL(stateChanged(int)), this, SLOT(setShowTorque(int)));
     connect(showHr, SIGNAL(stateChanged(int)), this, SLOT(setShowHr(int)));
-    connect(showHRV, SIGNAL(stateChanged(int)), this, SLOT(setShowHRV(int)));
     connect(showTcore, SIGNAL(stateChanged(int)), this, SLOT(setShowTcore(int)));
     connect(showPowerD, SIGNAL(stateChanged(int)), this, SLOT(setShowPowerD(int)));
     connect(showCadD, SIGNAL(stateChanged(int)), this, SLOT(setShowCadD(int)));
@@ -795,7 +789,8 @@ AllPlotWindow::AllPlotWindow(Context *context) :
 
     connect(showGrid, SIGNAL(stateChanged(int)), this, SLOT(setShowGrid(int)));
     connect(showFull, SIGNAL(stateChanged(int)), this, SLOT(setShowFull(int)));
-    connect(showInterval, SIGNAL(stateChanged(int)), this, SLOT(setShowInterval(int)));
+    connect(showIntervalNavigator, SIGNAL(stateChanged(int)), this, SLOT(setShowIntervalNavigator(int)));
+    connect(showIntervalMarkers, SIGNAL(stateChanged(int)), this, SLOT(setShowIntervalMarkers(int)));
     connect(showHelp, SIGNAL(stateChanged(int)), this, SLOT(setShowHelp(int)));
     connect(showStack, SIGNAL(stateChanged(int)), this, SLOT(showStackChanged(int)));
     connect(rStack, SIGNAL(stateChanged(int)), this, SLOT(showStackChanged(int)));
@@ -856,11 +851,11 @@ AllPlotWindow::configChanged(qint32 state)
 
     // set style sheets
 #ifndef Q_OS_MAC
-    allPlotFrame->setStyleSheet(TabView::ourStyleSheet());
-    comparePlotFrame->setStyleSheet(TabView::ourStyleSheet());
-    seriesstackFrame->setStyleSheet(TabView::ourStyleSheet());
-    stackFrame->setStyleSheet(TabView::ourStyleSheet());
-    overlayIntervals->setStyleSheet(TabView::ourStyleSheet());
+    allPlotFrame->setStyleSheet(AbstractView::ourStyleSheet());
+    comparePlotFrame->setStyleSheet(AbstractView::ourStyleSheet());
+    seriesstackFrame->setStyleSheet(AbstractView::ourStyleSheet());
+    stackFrame->setStyleSheet(AbstractView::ourStyleSheet());
+    overlayIntervals->setStyleSheet(AbstractView::ourStyleSheet());
 #endif
 
     // set palettes
@@ -1230,7 +1225,7 @@ AllPlotWindow::event(QEvent *event)
         }
 
         // if off the screen move on screen
-        if (helperWidget()->geometry().x() > geometry().width()) {
+        if (helperWidget()->geometry().x() > geometry().width() || helperWidget()->geometry().x() < geometry().x()) {
             helperWidget()->move(mainWidget()->geometry().width()-(275*dpiXFactor), 50*dpiYFactor);
         }
     }
@@ -1420,7 +1415,6 @@ AllPlotWindow::compareChanged()
         if (showW->isChecked()) { s.one = RideFile::wprime; s.two = RideFile::none; wanted << s;};
         if (showPowerD->isChecked()) { s.one = RideFile::wattsd; s.two = RideFile::none; wanted << s;};
         if (showHr->isChecked()) { s.one = RideFile::hr; s.two = RideFile::none; wanted << s;};
-        if (showHRV->isChecked()) { s.one = RideFile::hrv; s.two = RideFile::none; wanted << s;};
         if (showTcore->isChecked()) { s.one = RideFile::tcore; s.two = RideFile::none; wanted << s;};
         if (showHrD->isChecked()) { s.one = RideFile::hrd; s.two = RideFile::none; wanted << s;};
         if (showSpeed->isChecked()) { s.one = RideFile::kph; s.two = RideFile::none; wanted << s;};
@@ -1590,7 +1584,7 @@ AllPlotWindow::compareChanged()
 
     } else {
 
-        if (showInterval->isChecked())
+        if (showIntervalNavigator->isChecked())
             intervalPlot->show();
 
         // reset to normal view?
@@ -1666,8 +1660,8 @@ AllPlotWindow::redrawFullPlot()
     // use the ride to decide
     if (fullPlot->bydist)
         fullPlot->setAxisScale(QwtPlot::xBottom,
-        ride->ride()->dataPoints().first()->km * (context->athlete->useMetricUnits ? 1 : MILES_PER_KM),
-        ride->ride()->dataPoints().last()->km * (context->athlete->useMetricUnits ? 1 : MILES_PER_KM));
+        ride->ride()->dataPoints().first()->km * (GlobalContext::context()->useMetricUnits ? 1 : MILES_PER_KM),
+        ride->ride()->dataPoints().last()->km * (GlobalContext::context()->useMetricUnits ? 1 : MILES_PER_KM));
     else
         fullPlot->setAxisScale(QwtPlot::xBottom, ride->ride()->dataPoints().first()->secs/60,
                                                  ride->ride()->dataPoints().last()->secs/60);
@@ -1690,8 +1684,8 @@ AllPlotWindow::redrawIntervalPlot()
     // use the ride to decide
     if (intervalPlot->bydist)
         intervalPlot->setAxisScale(QwtPlot::xBottom,
-        ride->ride()->dataPoints().first()->km * (context->athlete->useMetricUnits ? 1 : MILES_PER_KM),
-        ride->ride()->dataPoints().last()->km * (context->athlete->useMetricUnits ? 1 : MILES_PER_KM));
+        ride->ride()->dataPoints().first()->km * (GlobalContext::context()->useMetricUnits ? 1 : MILES_PER_KM),
+        ride->ride()->dataPoints().last()->km * (GlobalContext::context()->useMetricUnits ? 1 : MILES_PER_KM));
     else
         intervalPlot->setAxisScale(QwtPlot::xBottom, ride->ride()->dataPoints().first()->secs/60,
                                                 ride->ride()->dataPoints().last()->secs/60);
@@ -1819,8 +1813,10 @@ AllPlotWindow::rideSelected()
         return;
     }
 
-    // ignore if null, or manual / empty
-    if (!ride || !ride->ride() || !ride->ride()->dataPoints().count()) {
+    // ignore if null, or manual / empty, or x-axis series is not present
+    if (!ride || !ride->ride() || !ride->ride()->dataPoints().count() ||
+        (comboDistance->currentIndex() == 1 && !ride->ride()->isDataPresent(RideFile::km)) ||
+        (comboDistance->currentIndex() != 1 && !ride->ride()->isDataPresent(RideFile::secs))) {
         current = NULL;
         setIsBlank(true);
         return;
@@ -2080,7 +2076,6 @@ AllPlotWindow::setAllPlotWidgets(RideItem *ride)
             showCad->setEnabled(dataPresent->cad);
             showTorque->setEnabled(dataPresent->nm);
             showHr->setEnabled(dataPresent->hr);
-            showHRV->setEnabled(dataPresent->hrv);
             showTcore->setEnabled(dataPresent->hr);
             showSpeed->setEnabled(dataPresent->kph);
             showAccel->setEnabled(dataPresent->kph);
@@ -2098,7 +2093,6 @@ AllPlotWindow::setAllPlotWidgets(RideItem *ride)
             showHrD->setEnabled(false);
             showPower->setEnabled(false);
             showHr->setEnabled(false);
-            showHRV->setEnabled(false);
             showTcore->setEnabled(false);
             showSpeed->setEnabled(false);
             showCad->setEnabled(false);
@@ -2379,7 +2373,7 @@ AllPlotWindow::setEndSelection(AllPlot* plot, double xValue, bool newInterval, Q
         // code.
         if (plot->bydist) {
 
-            if (context->athlete->useMetricUnits == false) {
+            if (GlobalContext::context()->useMetricUnits == false) {
                 // convert to metric
                 x1 *= KM_PER_MILE;
                 x2 *=  KM_PER_MILE;
@@ -2549,27 +2543,6 @@ AllPlotWindow::setShowTcore(int value)
     // and the series stacks too
     forceSetupSeriesStackPlots(); // scope changed so force redraw
 }
-
-void
-AllPlotWindow::setShowHRV(int value)
-{
-    showHRV->setChecked(value);
-
-    // compare mode selfcontained update
-    if (isCompare()) {
-        compareChanged();
-        return;
-    }
-
-    bool checked = ( ( value == Qt::Checked ) && showHRV->isEnabled()) ? true : false;
-
-    allPlot->setShowHRV(checked);
-    foreach (AllPlot *plot, allPlots)
-        plot->setShowHRV(checked);
-    // and the series stacks too
-    forceSetupSeriesStackPlots(); // scope changed so force redraw
-}
-
 
 void
 AllPlotWindow::setShowNP(int value)
@@ -3297,10 +3270,23 @@ AllPlotWindow::setShowFull(int value)
 }
 
 void
-AllPlotWindow::setShowInterval(int value)
+AllPlotWindow::setShowIntervalMarkers(int value)
 {
-    showInterval->setChecked(value);
-    if (showInterval->isChecked()) {
+    showIntervalMarkers->setChecked(value);
+
+    allPlot->setShowMarkers(value);
+    foreach (AllPlot *plot, allPlots)
+        plot->setShowMarkers(value);
+    // and the series stacks too
+    forceSetupSeriesStackPlots(); // scope changed so force redraw
+    fullPlot->setShowMarkers(value);
+}
+
+void
+AllPlotWindow::setShowIntervalNavigator(int value)
+{
+    showIntervalNavigator->setChecked(value);
+    if (showIntervalNavigator->isChecked()) {
         intervalPlot->show();
         //allPlotLayout->setStretch(1,20);
     }
@@ -3374,16 +3360,8 @@ AllPlotWindow::setByDistance(int value)
     intervalPlot->setByDistance(value);
     allPlot->setByDistance(value);
 
-    // refresh controls, specifically spanSlider
-    setAllPlotWidgets(fullPlot->rideItem);
-
-    // refresh
-    setupSeriesStack = setupStack = false;
-    redrawFullPlot();
-    redrawAllPlot();
-    setupStackPlots();
-    setupSeriesStackPlots();
-    redrawIntervalPlot();
+    // replot
+    forceReplot();
 
     active = false;
 }
@@ -3463,9 +3441,9 @@ AllPlotWindow::resetStackedDatas()
         int startIndex, stopIndex;
         if (plot->bydist) {
             startIndex = allPlot->rideItem->ride()->distanceIndex(
-                        (context->athlete->useMetricUnits ? 1 : KM_PER_MILE) * _stackWidth*i);
+                        (GlobalContext::context()->useMetricUnits ? 1 : KM_PER_MILE) * _stackWidth*i);
             stopIndex  = allPlot->rideItem->ride()->distanceIndex(
-                        (context->athlete->useMetricUnits ? 1 : KM_PER_MILE) * _stackWidth*(i+1));
+                        (GlobalContext::context()->useMetricUnits ? 1 : KM_PER_MILE) * _stackWidth*(i+1));
         } else {
             startIndex = allPlot->rideItem->ride()->timeIndex(60*_stackWidth*i);
             stopIndex  = allPlot->rideItem->ride()->timeIndex(60*_stackWidth*(i+1));
@@ -3662,7 +3640,6 @@ AllPlotWindow::setupSeriesStackPlots()
     if (showW->isChecked() && rideItem->ride()->areDataPresent()->watts) { s.one = RideFile::wprime; s.two = RideFile::none; serieslist << s; }
     if (showPowerD->isChecked() && rideItem->ride()->areDataPresent()->watts) { s.one = RideFile::wattsd;s.two = RideFile::none; serieslist << s; }
     if (showHr->isChecked() && rideItem->ride()->areDataPresent()->hr) { s.one = RideFile::hr; s.two = RideFile::none; serieslist << s; }
-    if (showHRV->isChecked() && rideItem->ride()->areDataPresent()->hrv) { s.one = RideFile::hrv; s.two = RideFile::none; serieslist << s; }
     if (showTcore->isChecked() && rideItem->ride()->areDataPresent()->hr) { s.one = RideFile::tcore; s.two = RideFile::none; serieslist << s; }
     if (showHrD->isChecked() && rideItem->ride()->areDataPresent()->hr) { s.one = RideFile::hrd; s.two = RideFile::none; serieslist << s; }
     if (showSmO2->isChecked() && rideItem->ride()->areDataPresent()->smo2) { s.one = RideFile::smo2; s.two = RideFile::none; serieslist << s; }
@@ -3721,6 +3698,7 @@ AllPlotWindow::setupSeriesStackPlots()
 
         if (x.one == RideFile::watts) _allPlot->setShadeZones(showPower->currentIndex() == 0);
         else _allPlot->setShadeZones(false);
+        _allPlot->setShowMarkers(allPlot->showMarkers);
         first = false;
 
         // add to the list
@@ -3814,7 +3792,7 @@ AllPlotWindow::setupStackPlots()
     if (!rideItem || !rideItem->ride() || rideItem->ride()->dataPoints().isEmpty()) return;
 
     double duration = rideItem->ride()->dataPoints().last()->secs;
-    double distance =  (context->athlete->useMetricUnits ? 1 : MILES_PER_KM) * rideItem->ride()->dataPoints().last()->km;
+    double distance =  (GlobalContext::context()->useMetricUnits ? 1 : MILES_PER_KM) * rideItem->ride()->dataPoints().last()->km;
     int nbplot;
 
     if (fullPlot->bydist)
@@ -3830,9 +3808,9 @@ AllPlotWindow::setupStackPlots()
         // calculate the segment of ride this stack plot contains
         int startIndex, stopIndex;
         if (fullPlot->bydist) {
-            startIndex = fullPlot->rideItem->ride()->distanceIndex((context->athlete->useMetricUnits ?
+            startIndex = fullPlot->rideItem->ride()->distanceIndex((GlobalContext::context()->useMetricUnits ?
                             1 : KM_PER_MILE) * _stackWidth*i);
-            stopIndex  = fullPlot->rideItem->ride()->distanceIndex((context->athlete->useMetricUnits ?
+            stopIndex  = fullPlot->rideItem->ride()->distanceIndex((GlobalContext::context()->useMetricUnits ?
                             1 : KM_PER_MILE) * _stackWidth*(i+1));
         } else {
             startIndex = fullPlot->rideItem->ride()->timeIndex(60*_stackWidth*i);
@@ -3874,7 +3852,6 @@ AllPlotWindow::setupStackPlots()
         _allPlot->setShadeZones(showPower->currentIndex() == 0);
         _allPlot->setShowPower(showPower->currentIndex());
         _allPlot->setShowHr( (showHr->isEnabled()) ? ( showHr->checkState() == Qt::Checked ) : false );
-        _allPlot->setShowHRV( (showHRV->isEnabled()) ? ( showHRV->checkState() == Qt::Checked ) : false );
         _allPlot->setShowTcore( (showTcore->isEnabled()) ? ( showTcore->checkState() == Qt::Checked ) : false );
         _allPlot->setShowSpeed((showSpeed->isEnabled()) ? ( showSpeed->checkState() == Qt::Checked ) : false );
         _allPlot->setShowAccel((showAccel->isEnabled()) ? ( showAccel->checkState() == Qt::Checked ) : false );

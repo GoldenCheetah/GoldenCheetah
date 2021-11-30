@@ -20,12 +20,14 @@
 #define _GC_GoldenCheetah_h
 class GcWindow;
 class Context;
+class Perspective;
 
 #define G_OBJECT
 //#define G_OBJECT Q_PROPERTY(QString instanceName READ instanceName WRITE setInstanceName)
 //#define setInstanceName(x) setProperty("instanceName", x)
 #define myRideItem property("ride").value<RideItem*>()
 #define myDateRange property("dateRange").value<DateRange>()
+#define myPerspective property("perspective").value<Perspective*>()
 
 #include <QString>
 #include <QMenu>
@@ -45,6 +47,7 @@ class Context;
 
 class RideItem;
 class GcOverlayWidget;
+class Perspective;
 
 
 class GcWindow : public QFrame
@@ -54,6 +57,7 @@ private:
 
     // what kind of window is this?
     Q_PROPERTY(GcWinID type READ type WRITE setType) // not a user modifiable property
+    Q_PROPERTY(Perspective *perspective READ getPerspective WRITE setPerspective USER false)
 
     // each window has an instance name - default set
     // by the widget constructor but overide from layou manager
@@ -101,6 +105,7 @@ private:
     bool _gripped;
     int _style;
     bool _noevents; // don't work with events
+    Perspective *_perspective;
 
     enum drag { None, Close, Flip, Move, Left, Right, Top, Bottom, TLCorner, TRCorner, BLCorner, BRCorner };
     typedef enum drag DragState;
@@ -122,6 +127,8 @@ signals:
     void widthFactorChanged(double);
     void colorChanged(QColor);
     void dateRangeChanged(DateRange);
+    void perspectiveFilterChanged(QString);
+    void perspectiveChanged(Perspective*);
     void resizing(GcWindow*);
     void moving(GcWindow*);
     void resized(GcWindow*); // finished resizing
@@ -142,6 +149,9 @@ public:
     void addAction(QAction *act) { actions << act; }
     void setNoEvents(bool x) { _noevents = x; }
 
+    void setPerspective(Perspective *x) { _perspective=x; }
+    Perspective *getPerspective() const { return _perspective; }
+
     void virtual setControls(QWidget *x);
     QWidget *controls() const;
 
@@ -158,6 +168,9 @@ public:
 
     void setDateRange(DateRange);
     DateRange dateRange() const;
+
+    void notifyPerspectiveFilterChanged(QString x) { emit perspectiveFilterChanged(x); }
+    void notifyPerspectiveChanged(Perspective *x) { emit perspectiveChanged(x); }
 
     void setWidthFactor(double);
     double widthFactor() const;
@@ -181,6 +194,7 @@ public:
     GcWinID type() const { return _type; }
     void setType(GcWinID x) { _type = x; } // only really used by the window registry
 
+    void showMore(bool x) { nomenu=!x; }
     virtual bool amVisible();
 
     // popover controls
@@ -216,6 +230,7 @@ public:
     QPushButton *settingsButton, *closeButton;
     QPushButton *menuButton;
     QMenu *menu;
+    bool nomenu;
     QList<QAction*>actions;
 };
 

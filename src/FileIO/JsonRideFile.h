@@ -29,6 +29,9 @@
 #include <QDebug>
 #define DATETIME_FORMAT "yyyy/MM/dd hh:mm:ss' UTC'"
 
+namespace Utils {
+    QString RidefileUnEscape(QStringRef);
+};
 
 struct JsonFileReader : public RideFileReader {
     virtual RideFile *openRideFile(QFile &file, QStringList &errors, QList<RideFile*>* = 0) const; 

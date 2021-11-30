@@ -44,27 +44,124 @@ static QList<QString> _setSeasonTypes()
 
 QList<QString> Season::types = _setSeasonTypes();
 
+SeasonOffset::SeasonOffset()
+{
+    years = 1;
+    months = 1;
+    weeks = 1;
+}
+
+SeasonOffset::SeasonOffset(int _years, int _months, qint64 _weeks)
+{
+    years = _years;
+    months = _months;
+    weeks = _weeks;
+}
+
+QDate SeasonOffset::getStart(QDate reference) const
+{
+    if (years<=0) {
+        return QDate(reference.year(), 1,1).addYears(years);
+    } else if (months<=0) {
+        return QDate(reference.year(), reference.month(),1).addMonths(months);
+    } else if (weeks<=0) {
+        // from Mon-Sun
+        return reference.addDays((Qt::Monday - reference.dayOfWeek()) + 7*weeks);
+    } else {
+        return QDate();
+    }
+}
+
+SeasonLength::SeasonLength()
+{
+    years = 0;
+    months = 0;
+    days = 0;
+}
+
+SeasonLength::SeasonLength(int _years, int _months, qint64 _days)
+{
+    years = _years;
+    months = _months;
+    days = _days;
+}
+
+bool SeasonLength::operator==(const SeasonLength& length)
+{
+    return years==length.years && months==length.months && days==length.days;
+}
+
+QDate SeasonLength::addTo(QDate start) const
+{
+    return start.addYears(years).addMonths(months).addDays(days-1);
+}
+
+QDate SeasonLength::substractFrom(QDate end) const
+{
+    return end.addYears(-years).addMonths(-months).addDays(1-days);
+}
+
 Season::Season()
 {
     type = season;  // by default seasons are of type season
     _id = QUuid::createUuid(); // in case it isn't set yet
     _seed = 0;
     _low = -50;
+    _offset = SeasonOffset();
+    _length = SeasonLength();
+    _start = QDate();
+    _end = QDate();
 }
 
-QString Season::getName() {
-
+QString Season::getName()
+{
     return name;
 }
 
-QDate Season::getStart()
+QDate Season::getStart(QDate reference) const
 {
-    return start;
+    QDate start = _offset.getStart(reference);
+
+    if (start==QDate()) {
+        if (getLength()==SeasonLength()) {
+            // fixed season
+            return _start;
+        } else {
+            // relative season with a specified end
+            return _length.substractFrom(reference);
+        }
+    } else {
+        // relative season with a specified start
+        return start;
+    }
 }
 
-QDate Season::getEnd()
+QDate Season::getEnd(QDate reference) const
 {
-    return end;
+    QDate start = _offset.getStart(reference);
+
+    if (start==QDate()) {
+        if (getLength()==SeasonLength()) {
+            // fixed season
+            return _end;
+        } else {
+            // relative season with a specified end
+            return reference;
+        }
+    } else {
+        // relative season with a specified start
+        return _length.addTo(start);
+    }
+}
+
+QDate Season::getStart() const
+{
+    return getStart(QDate::currentDate());
+}
+
+QDate Season::getEnd() const
+{
+    return getEnd(QDate::currentDate());
 }
 
 int Season::getType()
@@ -72,32 +169,36 @@ int Season::getType()
     return type;
 }
 
-// how many days prior does this season represent
-// if value is 0 then its not a Last x days kind of season
-int Season::prior()
+void Season::setEnd(QDate end)
 {
-    //  Last x days, Last x months turn into number of days prior
-    if (id() == QUuid("{00000000-0000-0000-0000-000000000005}")) return -7;
-    if (id() == QUuid("{00000000-0000-0000-0000-000000000006}")) return -14;
-    if (id() == QUuid("{00000000-0000-0000-0000-000000000011}")) return -21;
-    if (id() == QUuid("{00000000-0000-0000-0000-000000000007}")) return -28;
-    if (id() == QUuid("{00000000-0000-0000-0000-000000000008}")) return -60;
-    if (id() == QUuid("{00000000-0000-0000-0000-000000000012}")) return -90;
-    if (id() == QUuid("{00000000-0000-0000-0000-000000000009}")) return -180;
-    if (id() == QUuid("{00000000-0000-0000-0000-000000000010}")) return -365;
-    if (id() == QUuid("{00000000-0000-0000-0000-000000000015}")) return -42;
-    if (id() == QUuid("{00000000-0000-0000-0000-000000000016}")) return -1;
-    return 0;
+    _offset = SeasonOffset();
+    _length = SeasonLength();
+    _end = end;
 }
 
-void Season::setEnd(QDate _end)
+void Season::setStart(QDate start)
 {
-    end = _end;
+    _offset = SeasonOffset();
+    _length = SeasonLength();
+    _start = start;
 }
 
-void Season::setStart(QDate _start)
+void Season::setOffsetAndLength(int offetYears, int offsetMonths, qint64 offsetWeeks, int years, int months, qint64 days)
 {
-    start = _start;
+    type = temporary;
+    _offset = SeasonOffset(offetYears, offsetMonths, offsetWeeks);
+    _length = SeasonLength(years, months, days);
+    _start = QDate();
+    _end = QDate();
+}
+
+void Season::setLength(int years, int months, qint64 days)
+{
+    type = temporary;
+    _offset = SeasonOffset();
+    _length = SeasonLength(years, months, days);
+    _start = QDate();
+    _end = QDate();
 }
 
 void Season::setName(QString _name)
@@ -112,7 +213,7 @@ void Season::setType(int _type)
 
 bool Season::LessThanForStarts(const Season &a, const Season &b)
 {
-    return a.start.toJulianDay() < b.start.toJulianDay();
+    return a.getStart().toJulianDay() < b.getStart().toJulianDay();
 }
 
 /*----------------------------------------------------------------------
@@ -321,124 +422,85 @@ Seasons::readSeasons()
     seasons = handler.getSeasons();
 
     Season season;
-    QDate today = QDate::currentDate();
-    QDate eom = QDate(today.year(), today.month(), today.daysInMonth());
 
     // add Default Date Ranges
     season.setName(tr("All Dates"));
-    season.setType(Season::temporary);
-    season.setStart(QDate::currentDate().addYears(-50));
-    season.setEnd(QDate::currentDate().addYears(50));
+    season.setOffsetAndLength(-50, 1, 1, 100, 0, 0);
     season.setId(QUuid("{00000000-0000-0000-0000-000000000001}"));
     seasons.append(season);
 
     season.setName(tr("This Year"));
-    season.setType(Season::temporary);
-    season.setStart(QDate(today.year(), 1,1));
-    season.setEnd(QDate(today.year(), 12, 31));
+    season.setOffsetAndLength(0, 1, 1, 1, 0, 0);
     season.setId(QUuid("{00000000-0000-0000-0000-000000000002}"));
     seasons.append(season);
 
     season.setName(tr("This Month"));
-    season.setType(Season::temporary);
-    season.setStart(QDate(today.year(), today.month(),1));
-    season.setEnd(eom);
+    season.setOffsetAndLength(1, 0, 1, 0, 1, 0);
     season.setId(QUuid("{00000000-0000-0000-0000-000000000003}"));
     seasons.append(season);
 
     season.setName(tr("Last Month"));
-    season.setType(Season::temporary);
-    season.setStart(QDate(today.year(), today.month(),1).addMonths(-1));
-    season.setEnd(QDate(today.year(), today.month(),1).addDays(-1));
+    season.setOffsetAndLength(1, -1, 1, 0, 1, 0);
     season.setId(QUuid("{00000000-0000-0000-0000-000000000013}"));
     seasons.append(season);
 
     season.setName(tr("This Week"));
-    season.setType(Season::temporary);
-    // from Mon-Sun
-    QDate wstart = QDate::currentDate();
-    wstart = wstart.addDays(Qt::Monday - wstart.dayOfWeek());
-    QDate wend = wstart.addDays(6); // first day + 6 more
-    season.setStart(wstart);
-    season.setEnd(wend);
+    season.setOffsetAndLength(1, 1, 0, 0, 0, 7);
     season.setId(QUuid("{00000000-0000-0000-0000-000000000004}"));
     seasons.append(season);
 
     season.setName(tr("Last Week"));
-    season.setType(Season::temporary);
-    // from Mon-Sun
-    season.setStart(wstart.addDays(-7));
-    season.setEnd(wend.addDays(-7));
+    season.setOffsetAndLength(1, 1, -1, 0, 0, 7);
     season.setId(QUuid("{00000000-0000-0000-0000-000000000014}"));
     seasons.append(season);
 
     season.setName(tr("Last 24 hours"));
-    season.setType(Season::temporary);
-    season.setStart(today.addDays(-1)); // today plus previous 6
-    season.setEnd(today);
+    season.setLength(0, 0, 2);
     season.setId(QUuid("{00000000-0000-0000-0000-000000000016}"));
     seasons.append(season);
 
     season.setName(tr("Last 7 days"));
-    season.setType(Season::temporary);
-    season.setStart(today.addDays(-6)); // today plus previous 6
-    season.setEnd(today);
+    season.setLength(0, 0, 7);
     season.setId(QUuid("{00000000-0000-0000-0000-000000000005}"));
     seasons.append(season);
 
     season.setName(tr("Last 14 days"));
-    season.setType(Season::temporary);
-    season.setStart(today.addDays(-13));
-    season.setEnd(today);
+    season.setLength(0, 0, 14);
     season.setId(QUuid("{00000000-0000-0000-0000-000000000006}"));
     seasons.append(season);
 
     season.setName(tr("Last 21 days"));
-    season.setType(Season::temporary);
-    season.setStart(today.addDays(-20));
-    season.setEnd(today);
+    season.setLength(0, 0, 21);
     season.setId(QUuid("{00000000-0000-0000-0000-000000000011}"));
     seasons.append(season);
 
     season.setName(tr("Last 28 days"));
-    season.setType(Season::temporary);
-    season.setStart(today.addDays(-27));
-    season.setEnd(today);
+    season.setLength(0, 0, 28);
     season.setId(QUuid("{00000000-0000-0000-0000-000000000007}"));
     seasons.append(season);
 
     season.setName(tr("Last 6 weeks"));
-    season.setType(Season::temporary);
-    season.setEnd(today);
-    season.setStart(today.addDays(-41));
+    season.setLength(0, 0, 42);
     season.setId(QUuid("{00000000-0000-0000-0000-000000000015}"));
     seasons.append(season);
 
     season.setName(tr("Last 2 months"));
-    season.setType(Season::temporary);
-    season.setEnd(today);
-    season.setStart(today.addMonths(-2));
+    season.setLength(0, 2, 0);
     season.setId(QUuid("{00000000-0000-0000-0000-000000000008}"));
     seasons.append(season);
 
     season.setName(tr("Last 3 months"));
-    season.setType(Season::temporary);
-    season.setEnd(today);
-    season.setStart(today.addMonths(-3));
+    season.setLength(0, 3, 0);
     season.setId(QUuid("{00000000-0000-0000-0000-000000000012}"));
     seasons.append(season);
 
     season.setName(tr("Last 6 months"));
-    season.setType(Season::temporary);
-    season.setEnd(today);
-    season.setStart(today.addMonths(-6));
+    season.setLength(0, 6, 0);
     season.setId(QUuid("{00000000-0000-0000-0000-000000000009}"));
     seasons.append(season);
 
     season.setName(tr("Last 12 months"));
-    season.setType(Season::temporary);
-    season.setEnd(today);
-    season.setStart(today.addMonths(-12));
+    season.setLength(1, 0, 0);
     season.setId(QUuid("{00000000-0000-0000-0000-000000000010}"));
     seasons.append(season);
 
@@ -490,24 +552,6 @@ Seasons::writeSeasons()
     SeasonParser::serialize(file, seasons);
 
     seasonsChanged(); // signal!
-}
-
-Season
-Seasons::seasonFor(QDate date)
-{
-    foreach(Season season, seasons)
-        if (date >= season.start && date <= season.end)
-            return season;
-
-    // if not found just return an all dates season
-    Season returning; // just retun an all dates
-    returning.setName(tr("All Dates"));
-    returning.setType(Season::temporary);
-    returning.setStart(QDate::currentDate().addYears(-50));
-    returning.setEnd(QDate::currentDate().addYears(50));
-    returning.setId(QUuid("{00000000-0000-0000-0000-000000000001}"));
-
-    return returning;
 }
 
 SeasonTreeView::SeasonTreeView(Context *context) : context(context)
@@ -585,14 +629,12 @@ SeasonTreeView::mimeData (const QList<QTreeWidgetItem *> items) const
         // season[index] ...
         if (phaseIdx > -1) {
             stream << context->athlete->seasons->seasons[seasonIdx].name + "/" + context->athlete->seasons->seasons[seasonIdx].phases[phaseIdx].name; // name
-            stream << context->athlete->seasons->seasons[seasonIdx].phases[phaseIdx].start;
-            stream << context->athlete->seasons->seasons[seasonIdx].phases[phaseIdx].end;
-            stream << (quint64)context->athlete->seasons->seasons[seasonIdx].phases[phaseIdx].days();
+            stream << context->athlete->seasons->seasons[seasonIdx].phases[phaseIdx].getStart();
+            stream << context->athlete->seasons->seasons[seasonIdx].phases[phaseIdx].getEnd();
         } else {
             stream << context->athlete->seasons->seasons[seasonIdx].name; // name
-            stream << context->athlete->seasons->seasons[seasonIdx].start;
-            stream << context->athlete->seasons->seasons[seasonIdx].end;
-            stream << (quint64)context->athlete->seasons->seasons[seasonIdx].days();
+            stream << context->athlete->seasons->seasons[seasonIdx].getStart();
+            stream << context->athlete->seasons->seasons[seasonIdx].getEnd();
         }
 
     }
@@ -624,12 +666,12 @@ Phase::Phase() : Season()
     _low = -50;
 }
 
-Phase::Phase(QString _name, QDate _start, QDate _end) : Season()
+Phase::Phase(QString _name, QDate start, QDate end) : Season()
 {
     type = phase;  // by default phase are of type phase
     name = _name;
-    start = _start;
-    end = _end;
+    _start = start;
+    _end = end;
     _id = QUuid::createUuid(); // in case it isn't set yet
     _seed = 0;
     _low = -50;

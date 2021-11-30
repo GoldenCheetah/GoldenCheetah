@@ -33,15 +33,8 @@
 
 #include <QDialog>
 #include <QSslSocket>
-#ifdef NOWEBKIT
 #include <QWebEnginePage>
 #include <QWebEngineView>
-#else
-#include <QtWebKit>
-#include <QWebPage>
-#include <QWebView>
-#include <QWebFrame>
-#endif
 
 class QMouseEvent;
 class RideItem;
@@ -55,21 +48,10 @@ class SmallPlot;
 
 // trick the maps api into ignoring gestures by
 // pretending to be chrome. see: http://developer.qt.nokia.com/forums/viewthread/1643/P15
-#ifdef NOWEBKIT
 class QWebEngineDownloadItem;
 class simpleWebPage : public QWebEnginePage
 {
 };
-#else
-class simpleWebPage : public QWebPage
-{
-#if 0
-    virtual QString userAgentForUrl(const QUrl&) const {
-        return "Mozilla/5.0";
-    }
-#endif
-};
-#endif
 
 class WebPageWindow : public GcChartWindow
 {
@@ -98,18 +80,10 @@ class WebPageWindow : public GcChartWindow
         void forceReplot();
         void configChanged(qint32);
 
-#ifdef NOWEBKIT
         void downloadProgress(qint64, qint64);
         void downloadFinished();
         void downloadRequested(QWebEngineDownloadItem*);
         void linkHovered(QString);
-#else
-        // getting data
-        void readyRead(); // a readFile operation has work to do
-        void readFileCompleted();
-        void download(const QNetworkRequest &request);
-        void unsupportedContent(QNetworkReply * reply);
-#endif
 
     private:
         Context *context;
@@ -127,12 +101,7 @@ class WebPageWindow : public GcChartWindow
         QLineEdit *rCustomUrl;
         QPushButton *rButton;
 
-#ifdef NOWEBKIT
         QWebEngineView *view;
-#else
-        QWebView *view;
-#endif
-
         WebPageWindow();  // default ctor
         bool firstShow;
 

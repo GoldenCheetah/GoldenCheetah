@@ -53,6 +53,7 @@
 #include "LTMCanvasPicker.h"
 #include "TimeUtils.h"
 #include "Units.h"
+#include "Perspective.h"
 
 #include "LTMTrend.h"
 
@@ -63,11 +64,12 @@ CPPlot::CPPlot(CriticalPowerWindow *parent, Context *context, bool rangemode) : 
     model(0), modelVariant(0), fit(0), fitdata(0), modelDecay(false),
 
     // state
-    context(context), bestsCache(NULL), dateCV(0.0), isRun(false), isSwim(false),
+    context(context), bestsCache(NULL), dateCV(0.0), sport(""),
     rideSeries(RideFile::watts),
     isFiltered(false), shadeMode(2),
     shadeIntervals(true), rangemode(rangemode), 
-    showTest(true), showBest(true), filterBest(false), showPowerIndex(false), showPercent(false), showHeat(false), showPP(false), showHeatByDate(false), showDelta(false), showDeltaPercent(false),
+    showTest(true), showBest(true), filterBest(false), showPowerIndex(false), showPercent(false), showHeat(false),
+    showEffort(false), showPP(false), showHeatByDate(false), showDelta(false), showDeltaPercent(false),
     plotType(0),
     xAxisLinearOnSpeed(true),
 
@@ -278,7 +280,7 @@ CPPlot::setSeries(CriticalPowerWindow::CriticalSeriesType criticalSeries)
         break;
 
     case CriticalPowerWindow::wattsKg:
-        if (context->athlete->useMetricUnits) {
+        if (GlobalContext::context()->useMetricUnits) {
             series = tr("Watts per kilogram");
             units = tr("w/kg");
         } else {
@@ -288,7 +290,7 @@ CPPlot::setSeries(CriticalPowerWindow::CriticalSeriesType criticalSeries)
         break;
 
     case CriticalPowerWindow::aPowerKg:
-        if (context->athlete->useMetricUnits) {
+        if (GlobalContext::context()->useMetricUnits) {
             series = tr("Altitude Power per kilogram");
             units = tr("w/kg");
         } else {
@@ -809,18 +811,18 @@ CPPlot::updateModelHelper()
 
     } else if (rideSeries == RideFile::kph) {
 
-        const PaceZones *zones = (isRun || isSwim) ? context->athlete->paceZones(isSwim) : NULL;
+        const PaceZones *zones = (sport == "Run" || sport == "Swim") ? context->athlete->paceZones(sport=="Swim") : NULL;
         // Rank field is reused for pace according to sport
-        bool metricPace = zones ? appsettings->value(this, zones->paceSetting(), true).toBool() : true;
-        cpw->titleRank->setText(zones ? zones->paceUnits(metricPace) : "n/a");
+        bool metricPace = zones ? appsettings->value(this, zones->paceSetting(), GlobalContext::context()->useMetricUnits).toBool() : GlobalContext::context()->useMetricUnits;
+        cpw->titleRank->setText(zones ? zones->paceUnits(metricPace) : (sport=="Row" ? "min/500m" : "n/a"));
 
         //DPrime
         cpw->wprimeTitle->setText(tr("D'"));
         if (pdModel->hasWPrime()) {
             cpw->wprimeValue->setText(kmToString(pdModel->WPrime()/1000.0));
             cpw->wprimeRank->setText(QString(tr("%1 %2"))
-                            .arg(pdModel->WPrime()/(metricPace ? 1.0 : METERS_PER_YARD), 0, 'f', 0)
-                            .arg(metricPace ? tr("m") : tr("yd")));
+                            .arg(pdModel->WPrime()/((metricPace || sport=="Row") ? 1.0 : METERS_PER_YARD), 0, 'f', 0)
+                            .arg((metricPace  || sport=="Row") ? tr("m") : tr("yd")));
         } else {
             cpw->wprimeValue->setText(tr("n/a"));
             cpw->wprimeRank->setText(tr("n/a"));
@@ -830,13 +832,15 @@ CPPlot::updateModelHelper()
         cpw->cpTitle->setText(tr("CV"));
         // TODO: Should metric instead depend on the swim/run/default unit settings?
         cpw->cpValue->setText(kphToString(pdModel->CP()));
-        cpw->cpRank->setText(zones ? zones->kphToPaceString(pdModel->CP(), metricPace) : "n/a");
+        cpw->cpRank->setText(zones ? zones->kphToPaceString(pdModel->CP(), metricPace)
+                                   : (sport=="Row" ? kphToPace(pdModel->CP()*2, true, false) : "n/a"));
 
         // V-MAX
         cpw->pmaxTitle->setText(tr("Vmax"));
         if (pdModel->hasPMax()) {
             cpw->pmaxValue->setText(kphToString(pdModel->PMax()));
-            cpw->pmaxRank->setText(zones ? zones->kphToPaceString(pdModel->PMax(), metricPace) : "n/a");
+            cpw->pmaxRank->setText(zones ? zones->kphToPaceString(pdModel->PMax(), metricPace)
+                                         : (sport=="Row" ? kphToPace(pdModel->PMax()*2, true, false) : "n/a"));
 
         } else  {
             cpw->pmaxValue->setText(tr("n/a"));
@@ -1071,13 +1075,14 @@ CPPlot::plotTests(RideItem *rideitem)
         fs.addFilter(parent->searchBox->isFiltered(), SearchFilterBox::matches(context, parent->searchBox->filter())); // chart settings
         fs.addFilter(context->isfiltered, context->filters);
         fs.addFilter(context->ishomefiltered, context->homeFilters);
+        fs.addFilter(parent->myPerspective->isFiltered(), parent->myPerspective->filterlist(DateRange(startDate,endDate)));
         Specification spec;
         spec.setFilterSet(fs);
         spec.setDateRange(DateRange(startDate, endDate));
 
         foreach(RideItem *r, context->athlete->rideCache->rides()) {
             // does it match ?
-            if ((r->isSwim == isSwim) && (r->isRun == isRun) && spec.pass(r))
+            if ((r->sport == sport) && spec.pass(r))
                 rides << r;
         }
 
@@ -1086,7 +1091,7 @@ CPPlot::plotTests(RideItem *rideitem)
                 if (interval->istest()) {
 
                     double duration = (interval->stop - interval->start) + 1; // add offset used on log axis
-                    double watts = interval->getForSymbol("average_power",  context->athlete->useMetricUnits);
+                    double watts = interval->getForSymbol("average_power",  GlobalContext::context()->useMetricUnits);
 
 
                     // ignore where no power present
@@ -1138,7 +1143,7 @@ CPPlot::plotTests(RideItem *rideitem)
         }
 
         // now sort the points on x so we can feed to model fit
-        qSort(points.begin(), points.end(), qpointflessthan);
+        std::sort(points.begin(), points.end(), qpointflessthan);
         foreach(QPointF point, points) {
             testtime << point.x() / 60.0f;
             testpower << point.y();
@@ -1168,10 +1173,10 @@ CPPlot::plotPowerProfile()
         if (percentile > 95 || percentile < 5) color = GColor(CPLOTGRID);
         else if (percentile < 51 && percentile > 49) {
             color = GColor(CPLOTGRID);
-            color.setRed(color.red() + 30);
+            color.setRed(150);
         } else {
             color = GColor(CPLOTGRID);
-            color.setBlue(color.blue() + 50);
+            color.setBlue(150);
         }
 
         QPen gridpen(color);
@@ -1195,7 +1200,18 @@ CPPlot::plotBests(RideItem *rideItem)
 
     // do we need to get the cache ?
     if (bestsCache == NULL) {
-        bestsCache = new RideFileCache(context, startDate, endDate, isFiltered, files, rangemode, rideItem);
+        // isFiltered and files are filters from CriticalPowerWindow's filter setting
+        // we also need to take into account the perspective filter if on trends so
+        // its easier to just aggregate the filter list here (bit hacky but works ok)
+        // but only if rangemode (aka on trends)
+        if (rangemode) {
+            bestsCache = new RideFileCache(context, startDate, endDate,
+                            isFiltered||parent->myPerspective->isFiltered(),
+                            files + (parent->myPerspective->isFiltered() ? parent->myPerspective->filterlist(DateRange(startDate,endDate)) : QStringList()),
+                            rangemode, rideItem);
+        } else {
+            bestsCache = new RideFileCache(context, startDate, endDate, isFiltered, files, rangemode, rideItem);
+        }
     }
 
     // how much we got ?
@@ -1474,7 +1490,7 @@ CPPlot::plotBests(RideItem *rideItem)
 
             // set zones from shading CP
             QList <int> power_zone;
-            int n_zones = context->athlete->zones(isRun)->lowsFromCP(&power_zone, (int) int(shadingCP));
+            int n_zones = context->athlete->zones(sport)->lowsFromCP(&power_zone, (int) int(shadingCP));
 
             // now run through each zone and create a curve
             int high = maxNonZero - 1;
@@ -1529,7 +1545,7 @@ CPPlot::plotBests(RideItem *rideItem)
                 // now the labels
                 if (shadeMode && (criticalSeries != CriticalPowerWindow::work || work[high] > 100.0)) {
 
-                    QwtText text(context->athlete->zones(isRun)->getDefaultZoneName(zone));
+                    QwtText text(context->athlete->zones(sport)->getDefaultZoneName(zone));
                     text.setFont(QFont("Helvetica", 20, QFont::Bold));
                     color.setAlpha(255);
                     text.setColor(color);
@@ -1568,7 +1584,7 @@ CPPlot::plotBests(RideItem *rideItem)
 
             // set zones from shading CV
             QList <double> pace_zone;
-            int n_zones = context->athlete->paceZones(isSwim)->lowsFromCV(&pace_zone, shadingCV);
+            int n_zones = context->athlete->paceZones(sport=="Swim")->lowsFromCV(&pace_zone, shadingCV);
 
             // now run through each zone and create a curve
             int high = maxNonZero - 1;
@@ -1617,7 +1633,7 @@ CPPlot::plotBests(RideItem *rideItem)
                 // now the labels
                 if (shadeMode) {
 
-                    QwtText text(context->athlete->paceZones(isSwim)->getDefaultZoneName(zone));
+                    QwtText text(context->athlete->paceZones(sport=="Swim")->getDefaultZoneName(zone));
                     text.setFont(QFont("Helvetica", 20, QFont::Bold));
                     color.setAlpha(255);
                     text.setColor(color);
@@ -1755,6 +1771,7 @@ CPPlot::plotEfforts()
         FilterSet fs; // apply filters when selecting intervals
         fs.addFilter(context->isfiltered, context->filters);
         fs.addFilter(context->ishomefiltered, context->homeFilters);
+        fs.addFilter(parent->myPerspective->isFiltered(), parent->myPerspective->filterlist(DateRange(startDate,endDate)));
         Specification spec;
         spec.setFilterSet(fs);
         spec.setDateRange(DateRange(startDate, endDate));
@@ -2012,7 +2029,7 @@ CPPlot::setRide(RideItem *rideItem)
     // if plotting in percentage mode, so get data and plot it now
     // delete if sport changed
     if (!rangemode) {
-        setSport(rideItem->isRun, rideItem->isSwim);
+        setSport(rideItem->sport);
         delete bestsCache;
         bestsCache = NULL;
         clearCurves();
@@ -2113,9 +2130,9 @@ CPPlot::pointHover(QwtPlotCurve *curve, int index)
 
         // use the right pace config
         bool metricPace = true;
-        if (isSwim) metricPace = appsettings->value(this, GC_SWIMPACE, true).toBool();
-        else if (isRun)  metricPace = appsettings->value(this, GC_PACE, true).toBool();
-        else  metricPace = context->athlete->useMetricUnits;
+        if (sport == "Swim") metricPace = appsettings->value(this, GC_SWIMPACE, GlobalContext::context()->useMetricUnits).toBool();
+        else if (sport == "Run")  metricPace = appsettings->value(this, GC_PACE, GlobalContext::context()->useMetricUnits).toBool();
+        else  metricPace = GlobalContext::context()->useMetricUnits;
 
 
         if (criticalSeries == CriticalPowerWindow::veloclinicplot) {
@@ -2141,6 +2158,11 @@ CPPlot::pointHover(QwtPlotCurve *curve, int index)
             units2 = tr("%1 %2").arg(yvalue, 0, 'f', RideFile::decimalsFor(rideSeries))
                                 .arg(tr("J")); // Joule
 
+        } else if (criticalSeries == CriticalPowerWindow::work) {
+
+            units2 = tr("%1 %2").arg(yvalue, 0, 'f', 1)
+                                .arg(tr("kJ")); // kJoule
+
         } else if (criticalSeries == CriticalPowerWindow::kph) {
 
             if (metricPace)  units2 = tr("%1 kph").arg(yvalue, 0, 'f', RideFile::decimalsFor(rideSeries));
@@ -2149,7 +2171,7 @@ CPPlot::pointHover(QwtPlotCurve *curve, int index)
         } else {
 
             // eg: "### watts"
-            if (showPercent) units2 = tr("%1 Percent").arg(yvalue, 0, 'f', RideFile::decimalsFor(rideSeries));
+            if (showPercent && curve == rideCurve) units2 = tr("%1 Percent").arg(yvalue, 0, 'f', RideFile::decimalsFor(rideSeries));
             else if (showPowerIndex) units2 = tr("%1 Power Index").arg(yvalue, 0, 'f', RideFile::decimalsFor(rideSeries));
             else units2 = tr("%1 %2").arg(yvalue, 0, 'f', RideFile::decimalsFor(rideSeries))
                                 .arg(RideFile::unitName(rideSeries, context));
@@ -2174,16 +2196,19 @@ CPPlot::pointHover(QwtPlotCurve *curve, int index)
         // for speed series add pace with units according to settings
         if (criticalSeries == CriticalPowerWindow::kph) {
 
-            if (isRun || isSwim) {
+            if (sport == "Run" || sport == "Swim") {
 
-                const PaceZones *zones = context->athlete->paceZones(isSwim);
+                const PaceZones *zones = context->athlete->paceZones(sport=="Swim");
                 if (zones) paceStr = QString("\n%1 %2").arg(zones->kphToPaceString(yvalue, metricPace))
                                                        .arg(zones->paceUnits(metricPace));
 
+            } else if (sport == "Row") {
+
+                paceStr = QString("\n%1 %2").arg(kphToPace(yvalue*2, true, false)).arg(tr("min/500m"));
             }
             
             const double km = yvalue*xvalue/60.0; // distance in km
-            if (isSwim) {
+            if (sport == "Swim") {
 
                 if (metricPace) paceStr += tr("\n%1 m").arg(1000*km, 0, 'f', 0);
                 else paceStr += tr("\n%1 yd").arg(1000*km/METERS_PER_YARD, 0, 'f', 0);
@@ -2245,13 +2270,24 @@ CPPlot::exportBests(QString filename)
             }
 
             // values
-            if (expmodel) stream << int(xvalue * 60.00f) << "," << yvalue << "," << modelvalue << "," << date.toString() << endl;
-            else stream << int(xvalue * 60.00f) << "," << yvalue << "," << date.toString() << endl;
+            if (expmodel) stream << int(xvalue * 60.00f) << "," << yvalue << "," << modelvalue << "," << date.toString(Qt::ISODate) << endl;
+            else stream << int(xvalue * 60.00f) << "," << yvalue << "," << date.toString(Qt::ISODate) << endl;
         }
     }
 
     // and we're done
     f.close();
+}
+
+// perspective filter changed, we need to replot with new bests
+void
+CPPlot::perspectiveFilterChanged()
+{
+    if (bestsCache) {
+        delete bestsCache;
+        bestsCache = NULL;
+    }
+    clearCurves();
 }
 
 // no filter
@@ -2534,8 +2570,7 @@ CPPlot::plotCentile(RideItem *rideItem)
             }
 
         }
-        //qSort(sums.begin(), sums.end());
-        qSort(sums);
+        std::sort(sums.begin(), sums.end());
 
         qDebug() << "sums (" << slice << ") : " << sums.size() << " max " << sums[sums.size()-1];
 
@@ -2613,8 +2648,7 @@ CPPlot::plotCentile(RideItem *rideItem)
                 sums[index++] = sum / windowsize;
 
         }
-        //qSort(sums.begin(), sums.end());
-        qSort(sums);
+        std::sort(sums.begin(), sums.end());
 
         qDebug() << "sums (" << slice << ") : " << sums.size() << " max " << sums[sums.size()-1];
 
@@ -3151,7 +3185,7 @@ CPPlot::plotCache(QVector<double> vector, QColor intervalColor)
 QString
 CPPlot::kphToString(double kph)
 {
-    if (context->athlete->useMetricUnits) {
+    if (GlobalContext::context()->useMetricUnits) {
         return tr("%1 kph").arg(kph, 0, 'f', 1);
     } else {
         return tr("%1 mph").arg(kph*MILES_PER_KM, 0, 'f', 1);
@@ -3161,7 +3195,7 @@ CPPlot::kphToString(double kph)
 QString
 CPPlot::kmToString(double km)
 {
-    if (context->athlete->useMetricUnits) {
+    if (GlobalContext::context()->useMetricUnits) {
         return tr("%1 km").arg(km, 0, 'f', 3);
     } else {
         return tr("%1 mi").arg(km*MILES_PER_KM, 0, 'f', 3);

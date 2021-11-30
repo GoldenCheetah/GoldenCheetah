@@ -25,6 +25,7 @@
 #include <QStringList>
 
 #include "RideItem.h"
+#include "Specification.h"
 
 class Context;
 class PythonChart;
@@ -35,15 +36,31 @@ extern PythonEmbed *python;
 // Context for Python Scripts
 class ScriptContext {
     public:
+        // read-only ctor
+        ScriptContext(Context *context, RideItem *item=NULL, const QHash<QString,RideMetric*> *metrics=NULL,
+                      Specification spec=Specification(), bool interactiveShell=false)
+            : context(context), item(item), rideFile(NULL), metrics(metrics), spec(spec),
+              interactiveShell(interactiveShell), readOnly(true), editedRideFiles(NULL) {}
 
-        ScriptContext(Context *context=NULL, RideItem *item=NULL, const QHash<QString,RideMetric*> *metrics=NULL, Specification spec=Specification(), bool interactiveShell=false)
-            : context(context), item(item), metrics(metrics), spec(spec), interactiveShell(interactiveShell) {}
+        // read/write ctor
+        ScriptContext(Context *context, RideFile *rideFile, bool interactiveShell,
+                      bool readOnly, QList<RideFile *> *editedRideFiles)
+            : context(context), item(NULL), rideFile(rideFile), metrics(NULL), spec(),
+              interactiveShell(interactiveShell), readOnly(readOnly), editedRideFiles(editedRideFiles) {}
+
+        // default ctor
+        ScriptContext() : context(NULL), item(NULL), rideFile(NULL), metrics(NULL), spec(),
+            interactiveShell(false), readOnly(true), editedRideFiles(NULL) {}
 
         Context *context;
         RideItem *item;
+        RideFile *rideFile;
         const QHash<QString,RideMetric*> *metrics;
         Specification spec;
         bool interactiveShell;
+
+        bool readOnly;
+        QList<RideFile *> *editedRideFiles;
 };
 
 // a plain C++ class, no QObject stuff
@@ -54,6 +71,7 @@ class PythonEmbed {
     PythonEmbed(const bool verbose=false, const bool interactive=false);
     ~PythonEmbed();
 
+    static QString buildVersion(); // Python version used at build time
     // find installed binary and check version and module path
     static bool pythonInstalled(QString &pybin, QString &pypath, QString PYTHONHOME=QString(""));
     QString pybin, pypath;
@@ -77,6 +95,7 @@ class PythonEmbed {
 
     // context for caller - can be called in a thread
     QMap<long, ScriptContext> contexts;
+    Perspective *perspective;
     PythonChart *chart;
     QWidget *canvas;
 

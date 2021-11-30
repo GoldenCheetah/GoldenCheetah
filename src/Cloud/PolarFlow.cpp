@@ -84,7 +84,7 @@ PolarFlow::open(QStringList &errors)
     // do we have a token
     QString token = getSetting(GC_POLARFLOW_TOKEN, "").toString();
     if (token == "") {
-        errors << "You must authorise with PolarFlow first";
+        errors << tr("You must authorise with Polar Flow first");
         return false;
     }
 
@@ -107,7 +107,7 @@ PolarFlow::open(QStringList &errors)
 
     if (reply->error() != QNetworkReply::NoError) {
         qDebug() << "error" << reply->errorString();
-        errors << tr("Network Problem reading PolarFlow data");
+        errors << tr("Network Problem reading Polar Flow data");
         return false;
     }
     // did we get a good response ?
@@ -129,7 +129,7 @@ PolarFlow::open(QStringList &errors)
         root_->isDir = true;
         root_->size = 0;
     } else {
-        errors << tr("problem parsing PolarFlow data");
+        errors << tr("problem parsing Polar Flow data");
     }
 
     // ok so far ?
@@ -155,7 +155,7 @@ PolarFlow::readdir(QString path, QStringList &errors, QDateTime, QDateTime)
     // do we have a token
     QString token = getSetting(GC_POLARFLOW_TOKEN, "").toString();
     if (token == "") {
-        errors << tr("You must authorise with Today's Plan first");
+        errors << tr("You must authorise with Polar Flow first");
         return returning;
     }
 

@@ -100,7 +100,7 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
     enum temperature { degF, degC, degNone };
     typedef enum temperature Temperature;
     static Temperature tempType = degNone;
-    QDateTime startTime;
+    QDateTime startTime, iBikeTime;
 
     // Minutes,Torq (N-m),Km/h,Watts,Km,Cadence,Hrate,ID
     // Minutes, Torq (N-m),Km/h,Watts,Km,Cadence,Hrate,ID
@@ -129,6 +129,8 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
     XDataSeries *trainSeries=NULL;
     XDataSeries *rrSeries=NULL;
     XDataSeries *ibikeSeries=NULL;
+    XDataSeries *xdataSeries=NULL;
+    XDataSeries *vo2Series=NULL;
 
     /* Joule 1.0
     Version,Date/Time,Km,Minutes,RPE,Tags,"Weight, kg","Work, kJ",FTP,"Sample Rate, s",Device Type,Firmware Version,Last Updated,Category 1,Category 2
@@ -163,6 +165,7 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
     QRegExp rowproCSV("Date,Comment,Password,ID,Version,RowfileId,Rowfile_Id", Qt::CaseInsensitive);
     QRegExp wahooMACSV("GroundContactTime,MotionCount,MotionPowerZ,Cadence,MotionPowerX,WorkoutActive,Timestamp,Smoothness,MotionPowerY,_ID,VerticalOscillation,", Qt::CaseInsensitive);
     QRegExp rp3CSV ("\"id\",\"workout_interval_id\",\"ref\",\"stroke_number\",\"power\",\"avg_power\",\"stroke_rate\",\"time\",\"stroke_length\",\"distance\",\"distance_per_stroke\",\"estimated_500m_time\",\"energy_per_stroke\",\"energy_sum\",\"pulse\",\"work_per_pulse\",\"peak_force\",\"peak_force_pos\",\"rel_peak_force_pos\",\"drive_time\",\"recover_time\",\"k\",\"curve_data\",\"stroke_number_in_interval\",\"avg_calculated_power\"", Qt::CaseSensitive);
+    QRegExp xdataCSV ("XDATA: (\\w+)", Qt::CaseSensitive);
 
 
     // X-trainer format
@@ -192,7 +195,7 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
     bool dfpmExists   = false;
     int iBikeVersion  = 0;
 
-    int xTrainVersion  = 0;
+    //UNUSED int xTrainVersion  = 0;
 
     //UNUSED int timestampIndex=-1;
     int secsIndex=-1;
@@ -270,7 +273,7 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                     rideFile->setDeviceType("xtrainCSV");
                     rideFile->setFileFormat("xtrainCSV");
                     unitsHeader = 2;
-                    xTrainVersion = line.section( ',', 1, 1 ).toInt();
+                    //UNUSED xTrainVersion = line.section( ',', 1, 1 ).toInt();
 
                     ++lineno;
                     continue;
@@ -422,6 +425,19 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
 
                     rideFile->addXData("ROW", rowSeries);
 
+               } else if (xdataCSV.indexIn(line) != -1) {
+
+                   csvType = xdata;
+                   rideFile->setDeviceType("GoldenCheetah XData");
+                   rideFile->setFileFormat("GoldenCheetah XData CSV (csv)");
+                   unitsHeader = -1;
+                   recInterval = 1; // may be variable
+
+                   // add XDATA
+                   xdataSeries = new XDataSeries();
+                   xdataSeries->name = xdataCSV.cap(1);
+                   ++lineno;
+                   continue;
 
                } else if (line == "secs,km,power,hr,cad,alt") {
                     // OpenData CSV
@@ -439,6 +455,7 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                 if (lineno == 2) {
                     QStringList f = line.split(",");
                     if (f.size() == 6) {
+                        // iBike line 2 is a local time.
                         startTime = QDateTime(
                             QDate(f[0].toInt(), f[1].toInt(), f[2].toInt()),
                             QTime(f[3].toInt(), f[4].toInt(), f[5].toInt()));
@@ -482,10 +499,11 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                 // when merged with external GPS data.
                 else if (lineno == 6)
                 {
-                   QString timestamp = line.section( ',', 14, 14);
-                     if (timestamp.length()>0){
-                         startTime = QDateTime::fromString(timestamp, Qt::ISODate);
-                     }
+                    // iBike line 6 is a UTC time.
+                    QString timestamp = line.section( ',', 14, 14);
+                    if (timestamp.length()>0){
+                        iBikeTime = QDateTime::fromString(timestamp, Qt::ISODate);
+                    }
                 }
             }
 
@@ -766,7 +784,7 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                      minutes = (recInterval * lineno - unitsHeader)/60.0;
                      QString timestamp = line.section( ',', 14, 14);
                      if (timestamp.length()>0){
-                         minutes = startTime.secsTo(QDateTime::fromString(timestamp, Qt::ISODate))/60.0;
+                         minutes = iBikeTime.secsTo(QDateTime::fromString(timestamp, Qt::ISODate))/60.0;
                      }
                      nm = 0; //no torque
                      kph = line.section(',', 0, 0).toDouble();
@@ -1137,6 +1155,57 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                         rowSeries->datapoints.append(p);
                     }
 
+               } else if (csvType == xdata) {
+
+                   // GoldenCheetah XDATA format with N series and M rows
+                   // XDATA: Name
+                   // SECS, KM, serie1[:units1], ..., seriesN[:unitsN]
+                   // secs1, km1, value11, ..., value1N
+                   // ...
+                   // secsM, kmM, valueM1, ..., valueMN
+
+                   if (lineno == 2) {
+
+                       QStringList hds = line.split(",");
+                       if (hds.count()>2 && hds[0]=="SECS" && hds[1]=="KM") {
+
+                           QRegExp hd("(\\w+)(?::(\\w+))?");
+                           for (int i=2; i<hds.count() && i<XDATA_MAXVALUES+2; i++) {
+                               if (hd.indexIn(hds[i]) == -1) break;
+                               xdataSeries->valuename << hd.cap(1);
+                               xdataSeries->unitname << hd.cap(2);
+                           }
+                           rideFile->addXData(xdataSeries->name, xdataSeries);
+
+                       } else {
+
+                           delete xdataSeries;
+                           xdataSeries = NULL;
+
+                       }
+                   } else if (xdataSeries != NULL) {
+
+                       QStringList els = line.split(",", QString::KeepEmptyParts);
+                       if (els.count() != xdataSeries->valuename.count()+2) continue;
+                       // add ALL data series to XDATA
+                       XDataPoint *p = new XDataPoint();
+                       p->secs = els[0].toDouble();
+                       p->km = els[1].toDouble();
+                       for(int i=2; i<els.count(); i++) p->number[i-2] = els[i].toDouble();
+                       xdataSeries->datapoints.append(p);
+
+                       // only time and distance as standard series
+                       rideFile->appendPoint(p->secs, // time in seconds
+                                             0, 0,    // cad, hr
+                                             p->km,   // distance (km)
+                                             0, 0, 0, 0, 0, 0, 0, 0,
+                                             -255,    // temp
+                                             0, 0, 0, 0, 0, 0.0, 0.0,
+                                             0.0, 0.0, 0.0, 0.0,
+                                             0.0, 0.0, 0.0, 0.0,
+                                             0, 0, 0, 0, 0, 0.0, 0);
+                   }
+
                } else if (csvType == opendata) {
 
                     // secs,km,power,hr,cad,alt
@@ -1220,8 +1289,10 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
         return NULL;
     }
 
+    // GC naming convention, with optional workout name for Train View
+    // yyyy_MM_dd_hh_mm_ss[_workoutname].csv
     QRegExp rideTime("^.*/(\\d\\d\\d\\d)_(\\d\\d)_(\\d\\d)_"
-                     "(\\d\\d)_(\\d\\d)_(\\d\\d)\\.csv$");
+                     "(\\d\\d)_(\\d\\d)_(\\d\\d)(_[^\\.]*)?\\.csv$");
     rideTime.setCaseSensitivity(Qt::CaseInsensitive);
 
     if (startTime != QDateTime()) {
@@ -1239,6 +1310,9 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                                  rideTime.cap(5).toInt(),
                                  rideTime.cap(6).toInt()));
         rideFile->setStartTime(datetime);
+
+        // Optional workout name saved as Route metadata if present
+        if (!rideTime.cap(7).isEmpty()) rideFile->setTag("Route", rideTime.cap(7).mid(1));
 
     } else {
 
@@ -1314,6 +1388,74 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
         delete rideFile;
         return NULL;
     }
+
+    // Is there an associated .vo2 file?
+    QFile vo2file(file.fileName().replace(".csv",".vo2"));
+    if (vo2file.open(QFile::ReadOnly))
+    {
+        // create the XDATA series
+        vo2Series = new XDataSeries();
+        vo2Series->name = "VO2 Measurements";
+        vo2Series->valuename << "Rf" << "RMV" << "VO2" << "VCO2" << "Tv" << "FeO2";
+        vo2Series->unitname << "bpm" << "l/min" << "ml/min" << "ml/min" << "l" << "%";
+
+        // attempt to read and add the data
+        lineno=1;
+        QTextStream rs(&vo2file);
+
+        // loop through lines and truncate etc
+        while (!rs.atEnd()) {
+            // the readLine() method doesn't handle old Macintosh CR line endings
+            // this workaround will load the the entire file if it has CR endings
+            // then split and loop through each line
+            // otherwise, there will be nothing to split and it will read each line as expected.
+            QString linesIn = rs.readLine();
+            QStringList lines = linesIn.split('\r');
+            // workaround for empty lines
+            if(lines.isEmpty()) {
+                lineno++;
+                continue;
+            }
+            for (int li = 0; li < lines.size(); ++li) {
+                QString line = lines[li];
+
+                if (line.length()==0) {
+                    continue;
+                }
+
+                // first line is a header line
+                if (lineno > 1) {
+
+                    // split comma separated secs, hr, msecs
+                    QStringList values = line.split(",", QString::KeepEmptyParts);
+
+                    // and add
+                    XDataPoint *p = new XDataPoint();
+                    p->secs = values.at(0).toDouble();
+                    p->km = 0;
+                    p->number[0] = values.at(1).toDouble();
+                    p->number[1] = values.at(2).toDouble();
+                    p->number[2] = values.at(3).toDouble();
+                    p->number[3] = values.at(4).toDouble();
+                    p->number[4] = values.at(5).toDouble();
+                    p->number[5] = values.at(6).toDouble();
+                    vo2Series->datapoints.append(p);
+                }
+
+                // onto next line
+                ++lineno;
+            }
+        }
+        // free handle
+        vo2file.close();
+
+        // add if we got any ....
+        if (vo2Series->datapoints.count() > 0)
+        {
+            rideFile->addXData("VO2", vo2Series);
+        }
+    }
+
 
     // last, is there an associated rr file?
     //
@@ -1398,8 +1540,6 @@ CsvFileReader::writeRideFile(Context *, const RideFile *ride, QFile &file, CsvTy
         out << "secs,cad,hr,km,kph,nm,watts,alt,lon,lat,headwind,slope,temp,interval,lrbalance,lte,rte,lps,rps,smo2,thb,o2hb,hhb\n";
 
         foreach (const RideFilePoint *point, ride->dataPoints()) {
-            if (point->secs == 0.0)
-                continue;
             out << point->secs;
             out << ",";
             out << point->cad;

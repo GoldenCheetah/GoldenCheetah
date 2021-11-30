@@ -63,7 +63,7 @@ extern const QChar deltaChar;
 struct RideFileDataPresent
 {
     // basic (te = torqueeffectiveness, ps = pedal smoothness)
-    bool secs, cad, hr, hrv, km, kph, nm, watts, alt, lon, lat, headwind, slope, temp;
+    bool secs, cad, hr, km, kph, nm, watts, alt, lon, lat, headwind, slope, temp;
     bool lrbalance, lte, rte, lps, rps, lpco, rpco, lppb, rppb, lppe, rppe, lpppb, rpppb, lpppe, rpppe;
     bool smo2, thb, interval;
 
@@ -75,7 +75,7 @@ struct RideFileDataPresent
 
     // whether non-zero data of each field is present
     RideFileDataPresent():
-        secs(false), cad(false), hr(false), hrv(false), km(false),
+        secs(false), cad(false), hr(false), km(false),
         kph(false), nm(false), watts(false), alt(false), lon(false), lat(false),
         headwind(false), slope(false), temp(false), 
         lrbalance(false), lte(false), rte(false), lps(false), rps(false),
@@ -180,6 +180,7 @@ class RideFile : public QObject // QObject to emit signals
         friend class ManualRideDialog;
         friend class PolarFileReader;
         friend class Strava;
+        friend class ErgFile; // access to intervals
         // split and mergers
         friend class MergeActivityWizard;
         friend class SplitActivityWizard;
@@ -188,6 +189,7 @@ class RideFile : public QObject // QObject to emit signals
         // fix tools
         friend class FixLapSwim;
         friend class Snippets;
+        friend struct FitFileReaderState;
 
         // utility
         static unsigned int computeFileCRC(QString); 
@@ -211,7 +213,7 @@ class RideFile : public QObject // QObject to emit signals
                           aPower, wprime, aTISS, anTISS, smo2, thb, 
                           rvert, rcad, rcontact, gear, o2hb, hhb,
                           lpco, rpco, lppb, rppb, lppe, rppe, lpppb, rpppb, lpppe, rpppe,
-                          wbal, tcore, clength, aPowerKg, index, hrv,
+                          wbal, tcore, clength, aPowerKg, index,
                           none }; // none must ALWAYS be last
         typedef enum seriestype SeriesType;
 
@@ -240,8 +242,13 @@ class RideFile : public QObject // QObject to emit signals
         static double minimumFor(SeriesType series);
         static QColor colorFor(SeriesType series);
         static bool parseRideFileName(const QString &name, QDateTime *dt);
+
+        static QString sportTag(QString sport);
+        QString sport() const;
+        bool isBike() const;
         bool isRun() const;
         bool isSwim() const;
+        bool isXtrain() const;
 
         // Working with DATAPOINTS -- ***use command to modify***
         RideFileCommand *command;
@@ -304,8 +311,8 @@ class RideFile : public QObject // QObject to emit signals
     
         double recIntSecs() const { return recIntSecs_; }
         void setRecIntSecs(double value) { recIntSecs_ = value; }
-        const QString &deviceType() const { return deviceType_; }
-        void setDeviceType(const QString &value) { deviceType_ = value; }
+        const QString deviceType() const { return getTag("Device", "unknown"); }
+        void setDeviceType(const QString &value) { setTag("Device", value); }
         const QString &fileFormat() const { return fileFormat_; }
         void setFileFormat(const QString &value) { fileFormat_ = value; }
         const QString id() const { return id_; }
@@ -422,7 +429,6 @@ class RideFile : public QObject // QObject to emit signals
         RideFilePoint* avgPoint;
         RideFilePoint* totalPoint;
         RideFileDataPresent dataPresent;
-        QString deviceType_;
         QString fileFormat_;
         QList<RideFileInterval*> intervals_;
         QList<RideFileCalibration*> calibrations_;
@@ -578,7 +584,11 @@ public:
         valuename = other.valuename;
         unitname = other.unitname;
         valuetype = other.valuetype;
-        datapoints = other.datapoints;
+        // we need to create new objects since we are holding pointers to objects
+        // otherwise we would end up w/ multiple frees or dangling ptrs!
+        foreach (XDataPoint *p, other.datapoints) {
+            datapoints.push_back(new XDataPoint(*p));
+        }
     }
 
     ~XDataSeries() { foreach(XDataPoint *p, datapoints) delete p; }
@@ -602,6 +612,7 @@ struct RideFileReader {
 };
 
 class MetricAggregator;
+class AthleteCard;
 class RideFileFactory {
 
     private:
@@ -616,6 +627,7 @@ class RideFileFactory {
 
         friend class ::MetricAggregator;
         friend class ::RideCache;
+        friend class ::AthleteCard;
 
         // will become private as code should work with
         // in memory representation not on disk .. but as we

@@ -78,7 +78,6 @@ int DataFiltercolumn = 1;
 [Bb][Ee][Ss][Tt]                            strcpy(DataFilterlval.function, "best"); return BEST;
 [Tt][Ii][Zz]                                strcpy(DataFilterlval.function, "tiz"); return TIZ;
 [Cc][Oo][Nn][Ff][Ii][Gg]                    strcpy(DataFilterlval.function, "config"); return CONFIG;
-[Dd][Aa][Tt][Ee][Rr][Aa][Nn][Gg][Ee]        strcpy(DataFilterlval.function, "daterange"); return DATERANGE;
 [Cc][Oo][Nn][Ss][Tt]                        strcpy(DataFilterlval.function, "const"); return CONST_;
 
 "&&"                                        DataFilterlval.op = AND; return AND;
@@ -86,22 +85,31 @@ int DataFiltercolumn = 1;
 "||"                                        DataFilterlval.op = OR; return OR;
 [Oo][Rr]                                    DataFilterlval.op = OR; return OR;
 
-"[["                                        return LSB; /* start date range */
-"]]"                                        return RSB; /* end date range */
-
 [0-9]+                                      return DF_INTEGER;
 [0-9]+e-[0-9]+                              return DF_FLOAT;
 [0-9]+\.[-e0-9]*                            return DF_FLOAT;
 \"([^\"]|\\\")*\"                           return DF_STRING;  /* contains non-quotes or escaped-quotes */
-
-
 "TRIMP(100)_Points"                         return SYMBOL; /* special case */
 "Left/Right_Balance"                        return SYMBOL; /* special case */
 "Minimum_W'bal"                             return SYMBOL; /* special case */
-"Maximum_W'bal_Match"                       return SYMBOL; /* special case */
 "Max_W'_Expended"                           return SYMBOL; /* special case */
-"W'_Work"                                   return SYMBOL; /* special case */
+"Maximum_W'bal_Match"                       return SYMBOL; /* special case */
+"W'bal_Matches_>_2KJ"                       return SYMBOL; /* special case */
 "W'bal_TAU"                                 return SYMBOL; /* special case */
+"W'_Work"                                   return SYMBOL; /* special case */
+"W'_Watts"                                  return SYMBOL; /* special case */
+"W1_W'bal_Low_Fatigue"                      return SYMBOL; /* special case */
+"W2_W'bal_Moderate_Fatigue"                 return SYMBOL; /* special case */
+"W3_W'bal_Heavy_Fatigue"                    return SYMBOL; /* special case */
+"W4_W'bal_Severe_Fatigue"                   return SYMBOL; /* special case */
+"W1_Above_CP_W'bal_Low_Fatigue"             return SYMBOL; /* special case */
+"W2_Above_CP_W'bal_Moderate_Fatigue"        return SYMBOL; /* special case */
+"W3_Above_CP_W'bal_Heavy_Fatigue"           return SYMBOL; /* special case */
+"W4_Above_CP_W'bal_Severe_Fatigue"          return SYMBOL; /* special case */
+"W1_W'bal_Work_Low_Fatigue"                 return SYMBOL; /* special case */
+"W2_W'bal_Work_Moderate_Fatigue"            return SYMBOL; /* special case */
+"W3_W'bal_Work_Heavy_Fatigue"               return SYMBOL; /* special case */
+"W4_W'bal_Work_Severe_Fatigue"              return SYMBOL; /* special case */
 [Ww]\'                                      return SYMBOL; /* special case */
 [Dd]\'                                      return SYMBOL; /* special case */
 [Ss][Dd]\'                                  return SYMBOL; /* special case */

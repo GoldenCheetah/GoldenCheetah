@@ -67,6 +67,7 @@ public:
     static bool unmarshallAPIHeaderV1(QByteArray , QList<CommonAPIHeaderV1>* );
     static void unmarshallAPIHeaderV1Object(QJsonObject* , CommonAPIHeaderV1* chart);
     static void marshallAPIHeaderV1Object(QJsonObject&, CommonAPIHeaderV1 &header);
+    static QString encodeHTML ( const QString& );
 
     static bool addCuratorFeatures;
 

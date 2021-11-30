@@ -177,11 +177,7 @@ Xert::readdir(QString path, QStringList &errors, QDateTime from, QDateTime to)
 
     QString urlstr("https://www.xertonline.com/oauth/activity?");
 
-#if QT_VERSION > 0x050000
     QUrlQuery params;
-#else
-    QUrl params;
-#endif
 
     // use toMSecsSinceEpoch for compatibility with QT4
     params.addQueryItem("to", QString::number(to.addDays(1).toMSecsSinceEpoch()/1000.0f, 'f', 0));
@@ -442,10 +438,10 @@ Xert::readFileCompleted()
                 add.hr = data["hr"].toInt();
 
             if (!data["alt"].isNull())
-                add.alt = data["alt"].toInt();
+                add.alt = data["alt"].toDouble();
 
             if (!data["spd"].isNull())
-                add.kph = data["spd"].toInt() / 1000.0;
+                add.kph = data["spd"].toDouble() / 1000.0;
 
             if (!data["dist"].isNull())
                 add.km = data["dist"].toDouble() / 1000.0;

@@ -376,6 +376,16 @@ GcUpgrade::upgrade(const QDir &home)
         CloudServiceFactory::instance().upgrade(home.dirName());
     }
 
+    //----------------------------------------------------------------------
+    // 3.6 upgrade processing
+    //----------------------------------------------------------------------
+    if (last < VERSION36_BUILD) {
+
+        // reset themes on basis of plot background (first 2 themes are default dark and light themes
+        if (GCColor::luminance(GColor(CPLOTBACKGROUND)) < 127)  GCColor::applyTheme(0);
+        else GCColor::applyTheme(1);
+
+    }
 
     //----------------------------------------------------------------------
     // ... here any further Release Number dependent Upgrade Process is to be added ...
@@ -943,7 +953,6 @@ GcUpgradeLogDialog::GcUpgradeLogDialog(QDir homeDir) : QDialog(NULL, Qt::Dialog)
 
     QFont defaultFont;
 
-#ifdef NOWEBKIT
     report = new QWebEngineView(this);
     report->setContentsMargins(0,0,0,0);
     report->page()->view()->setContentsMargins(0,0,0,0);
@@ -953,17 +962,6 @@ GcUpgradeLogDialog::GcUpgradeLogDialog(QDir homeDir) : QDialog(NULL, Qt::Dialog)
     report->setAcceptDrops(false);
     report->settings()->setFontSize(QWebEngineSettings::DefaultFontSize, defaultFont.pointSize()+1);
     report->settings()->setFontFamily(QWebEngineSettings::StandardFont, defaultFont.family());
-#else
-    report = new QWebView(this);
-    report->setContentsMargins(0,0,0,0);
-    report->page()->view()->setContentsMargins(0,0,0,0);
-    report->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    report->page()->setLinkDelegationPolicy(QWebPage::DelegateAllLinks);
-    report->setContextMenuPolicy(Qt::NoContextMenu);
-    report->setAcceptDrops(false);
-    report->settings()->setFontSize(QWebSettings::DefaultFontSize, defaultFont.pointSize()+1);
-    report->settings()->setFontFamily(QWebSettings::StandardFont, defaultFont.family());
-#endif
 
     connect(report, SIGNAL(linkClicked(QUrl)), this, SLOT(linkClickedSlot(QUrl)));
 
@@ -990,13 +988,12 @@ GcUpgradeLogDialog::GcUpgradeLogDialog(QDir homeDir) : QDialog(NULL, Qt::Dialog)
 
     // the cyclist...
     reportText += QString("<center><h1>Cyclist: \"%1\"</h1></center><br>").arg(home.root().dirName());
-
-#ifdef NOWEBKIT
     report->page()->setHtml(reportText);
-#else
-    report->page()->mainFrame()->setHtml(reportText);
-#endif
+}
 
+GcUpgradeLogDialog::~GcUpgradeLogDialog()
+{
+    if (report) delete report->page();
 }
 
 void
@@ -1044,13 +1041,8 @@ GcUpgradeLogDialog::append(QString text, int level) {
             reportText += QString("%1 <br>").arg(text);
         }
 
-#ifdef NOWEBKIT
         report->page()->setHtml(reportText);
         //XXX WEBENGINE report->page()->setScrollBarValue(Qt::Vertical, report->page()->mainFrame()->scrollBarMaximum(Qt::Vertical));
-#else
-        report->page()->mainFrame()->setHtml(reportText);
-        report->page()->mainFrame()->setScrollBarValue(Qt::Vertical, report->page()->mainFrame()->scrollBarMaximum(Qt::Vertical));
-#endif
         this->repaint();
         QApplication::processEvents();
 

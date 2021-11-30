@@ -49,6 +49,18 @@
 bool rideCacheGreaterThan(const RideItem *a, const RideItem *b) { return a->dateTime > b->dateTime; }
 bool rideCacheLessThan(const RideItem *a, const RideItem *b) { return a->dateTime < b->dateTime; }
 
+class RideCacheLoader : public QThread
+{
+public:
+
+    RideCacheLoader(RideCache *cache) : cache(cache) {}
+    void run() { cache->load(); }
+
+private:
+
+        RideCache *cache;
+};
+
 RideCache::RideCache(Context *context) : context(context)
 {
     directory = context->athlete->home->activities();
@@ -88,7 +100,7 @@ RideCache::RideCache(Context *context) : context(context)
         }
 
         // reset special fields to take into account user metrics
-        context->specialFields = SpecialFields();
+        GlobalContext::context()->specialFields = SpecialFields();
     }
 
     // set the list
@@ -124,12 +136,19 @@ RideCache::RideCache(Context *context) : context(context)
         }
     }
 
+    // now sort it - we need to use find on it
+    std::sort(rides_.begin(), rides_.end(), rideCacheLessThan);
+
     // load the store - will unstale once cache restored
-    load();
+    RideCacheLoader *rideCacheLoader = new RideCacheLoader(this);
+    connect(rideCacheLoader, SIGNAL(finished()), this, SLOT(postLoad()));
+    connect(rideCacheLoader, SIGNAL(finished()), this, SIGNAL(loadComplete()));
+    rideCacheLoader->start();
+}
 
-    // now sort it
-    qSort(rides_.begin(), rides_.end(), rideCacheLessThan);
-
+void
+RideCache::postLoad()
+{
     // set model once we have the basics
     model_ = new RideCacheModel(context, this);
 
@@ -150,6 +169,20 @@ RideCache::RideCache(Context *context) : context(context)
     connect(&watcher, SIGNAL(finished()), context, SLOT(notifyRefreshEnd()));
     connect(&watcher, SIGNAL(started()), context, SLOT(notifyRefreshStart()));
     connect(&watcher, SIGNAL(progressValueChanged(int)), this, SLOT(progressing(int)));
+}
+
+struct comparerideitem { bool operator()(const RideItem *p1, const RideItem *p2) { return p1->dateTime < p2->dateTime; } };
+
+int
+RideCache::find(RideItem *dt)
+{
+    // use lower_bound to binary search
+    QVector<RideItem*>::const_iterator i = std::lower_bound(rides_.begin(), rides_.end(), dt, comparerideitem());
+    int index = i - rides_.begin();
+
+    // did it find the right value?
+    if (index < 0 || index >= rides_.count() || rides_.at(index)->dateTime != dt->dateTime) return -1;
+    return index;
 }
 
 RideCache::~RideCache()
@@ -185,6 +218,7 @@ RideCache::initEstimates()
 void
 RideCache::configChanged(qint32 what)
 {
+
     // if the wbal formula changed invalidate all cached values
     if (what & CONFIG_WBAL) {
         foreach(RideItem *item, rides()) {
@@ -195,7 +229,7 @@ RideCache::configChanged(qint32 what)
     // if metadata changed then recompute diary text
     if (what & CONFIG_FIELDS) {
         foreach(RideItem *item, rides()) {
-            item->metadata_.insert("Calendar Text", context->athlete->rideMetadata()->calendarText(item));
+            item->metadata_.insert("Calendar Text", GlobalContext::context()->rideMetadata->calendarText(item));
         }
     }
 
@@ -265,7 +299,7 @@ RideCache::addRide(QString name, bool dosignal, bool select, bool useTempActivit
     if (!added) {
         model_->beginReset();
         rides_ << last;
-        qSort(rides_.begin(), rides_.end(), rideCacheLessThan);
+        std::sort(rides_.begin(), rides_.end(), rideCacheLessThan);
         model_->endReset();
     }
 
@@ -415,6 +449,7 @@ RideCache::writeAsCSV(QString filename)
     };
     file.resize(0);
     QTextStream out(&file);
+    out.setCodec("UTF-8"); // Metric names can be translated
 
     // write headings
     out<<"date, time, filename";
@@ -430,7 +465,7 @@ RideCache::writeAsCSV(QString filename)
     foreach(RideItem *item, rides()) {
 
         // date, time, filename
-        out << item->dateTime.date().toString("MM/dd/yy");
+        out << item->dateTime.date().toString(Qt::ISODate);
         out << "," << item->dateTime.time().toString("hh:mm:ss");
         out << "," << item->fileName;
 
@@ -447,6 +482,9 @@ RideCache::writeAsCSV(QString filename)
 void
 itemRefresh(RideItem *&item)
 {
+    // debugging below to watch refreshing take place
+    //fprintf(stderr, "%s %s refresh\n", item->context->athlete->cyclist.toStdString().c_str(), item->dateTime.toString().toStdString().c_str()); fflush(stderr);
+
     // need parser to be reentrant !item->refresh();
     if (item->isstale) {
         item->refresh();
@@ -503,7 +541,7 @@ RideCache::refresh()
     // and future watcher can notify of updates
     if (staleCount)  {
         reverse_ = rides_;
-        qSort(reverse_.begin(), reverse_.end(), rideCacheGreaterThan);
+        std::sort(reverse_.begin(), reverse_.end(), rideCacheGreaterThan);
         future = QtConcurrent::map(reverse_, itemRefresh);
         watcher.setFuture(future);
 
@@ -735,7 +773,7 @@ RideCache::getDistinctValues(QString field)
     }
 
     // sort from big to small
-    qSort(ranked.begin(), ranked.end(), rideCacheOrderListGreaterThan);
+    std::sort(ranked.begin(), ranked.end(), rideCacheOrderListGreaterThan);
 
     // extract ordered values
     foreach(OrderedList x, ranked)
@@ -746,9 +784,10 @@ RideCache::getDistinctValues(QString field)
 
 void
 RideCache::getRideTypeCounts(Specification specification, int& nActivities,
-                             int& nRides, int& nRuns, int& nSwims)
+                             int& nRides, int& nRuns, int& nSwims, QString& sport)
 {
     nActivities = nRides = nRuns = nSwims = 0;
+    sport = "";
 
     // loop through and aggregate
     foreach (RideItem *ride, rides_) {
@@ -756,10 +795,14 @@ RideCache::getRideTypeCounts(Specification specification, int& nActivities,
         // skip filtered rides
         if (!specification.pass(ride)) continue;
 
+        // sport is not empty only when all activities are from the same sport
+        if (nActivities == 0) sport = ride->sport;
+        else if (sport != ride-> sport) sport = "";
+
         nActivities++;
         if (ride->isSwim) nSwims++;
         else if (ride->isRun) nRuns++;
-        else nRides++;
+        else if (ride->isBike) nRides++;
     }
 }
 
@@ -775,9 +818,10 @@ RideCache::isMetricRelevantForRides(Specification specification,
         if (!specification.pass(ride)) continue;
 
         // skip non selected sports when restriction supplied
-        if ((sport == OnlyRides) && (ride->isSwim || ride->isRun)) continue;
+        if ((sport == OnlyRides) && !ride->isBike) continue;
         if ((sport == OnlyRuns) && !ride->isRun) continue;
         if ((sport == OnlySwims) && !ride->isSwim) continue;
+        if ((sport == OnlyXtrains) && !ride->isXtrain) continue;
 
         if (metric->isRelevantForRide(ride)) return true;
     }

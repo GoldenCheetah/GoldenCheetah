@@ -22,8 +22,7 @@
 #include "GoldenCheetah.h"
 
 #include "RideMetric.h"
-#include "BodyMeasures.h"
-#include "HrvMeasures.h"
+#include "Measures.h"
 
 #include <QString>
 #include <QMap>
@@ -38,8 +37,6 @@ class IntervalSummaryWindow;
 class Context;
 class UserData;
 class ComparePane;
-
-Q_DECLARE_METATYPE(RideItem*)
 
 class RideItem : public QObject
 {
@@ -97,6 +94,8 @@ class RideItem : public QObject
 
     public:
 
+        bool operator==(RideItem &other) { return other.dateTime == dateTime; }
+
         Context *context; // to notify widgets when date/time changes
         bool isdirty;     // ride data has changed and needs saving
         bool isstale;     // metric data is out of date and needs recomputing
@@ -131,7 +130,7 @@ class RideItem : public QObject
         QString getStringForSymbol(QString name, bool useMetricUnits=true);
 
         // access the metadata
-        QString getText(QString name, QString fallback) { return metadata_.value(name, fallback); }
+        QString getText(QString name, QString fallback) const { return metadata_.value(name, fallback); }
         bool hasText(QString name) { return metadata_.contains(name); }
 
         // get at the first class data
@@ -141,7 +140,8 @@ class RideItem : public QObject
         QString present;
         QColor color;
         bool planned;
-        bool isRun,isSwim;
+        QString sport;
+        bool isBike,isRun,isSwim,isXtrain;
         bool samples; // has samples data
 
         // which range to use?
@@ -155,7 +155,6 @@ class RideItem : public QObject
         double weight; // what weight was used ?
 
         // access to the cached data !
-        BodyMeasure weightData;
         RideFile *ride(bool open=true);
         RideFileCache *fileCache();
         QVector<double> &metrics() { return metrics_; }
@@ -164,7 +163,7 @@ class RideItem : public QObject
         QMap <int, double>&stdvariances() { return stdvariance_; }
         const QStringList errors() { return errors_; }
         double getWeight(int type=0);
-        double getHrvMeasure(int type=HrvMeasure::RMSSD);
+        double getHrvMeasure(QString fieldSymbol);
         unsigned short getHrvFingerprint();
 
         // when retrieving interval lists we can provide criteria too
@@ -220,5 +219,8 @@ class RideItem : public QObject
     private:
         void updateIntervals();
 };
+
+Q_DECLARE_OPAQUE_POINTER(RideItem*);
+Q_DECLARE_METATYPE(RideItem*)
 
 #endif // _GC_RideItem_h

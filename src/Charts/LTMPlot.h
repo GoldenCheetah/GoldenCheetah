@@ -97,7 +97,7 @@ class LTMPlot : public QwtPlot
         QwtPlotCurve *highlighter;
 
         // keeping track of axes
-        QHash<QString, QwtPlotCurve*> curves; // metric symbol with curve object
+        QMultiHash<QString, QwtPlotCurve*> curves; // metric symbol with curve object
         QHash<QString, QwtAxisId> axes;             // units and associated axis
         QList<QObject*> axesObject;
         QList<QwtAxisId> axesId;

@@ -128,8 +128,8 @@ PDModel::setIntervals(double sanI1, double sanI2, double anI1, double anI2,
 
 // used to wrap a function call when deriving parameters
 QMutex calllmfit;
-static PDModel *calllmfitmodel = NULL;
-static double calllmfitf(double t, const double *p) {
+PDModel *calllmfitmodel = NULL;
+double calllmfitf(double t, const double *p) {
     return static_cast<PDModel*>(calllmfitmodel)->f(t, p);
 }
 
@@ -179,8 +179,10 @@ PDModel::deriveCPParameters(int model)
         double errtot=0;
         double sse=0;
         double meany=0;
+        double MEAN=0;
         for(int i=0; i<t.size(); i++){
             double py = y(t[i]/60.0f);  // predicted y
+            MEAN += py;
             meany += p[i];              // calculatng mean divided at end
             double err = p[i] - py;     // error for this point
             errtot += err;              // for mean errors divided at end
@@ -190,6 +192,7 @@ PDModel::deriveCPParameters(int model)
 
         // lets use to calc R2
         meany /= double(t.size());
+        MEAN /= double(t.size());
         double sv=0;
         for(int i=0; i<t.size(); i++) {
             sv += (p[i]-meany) * (p[i]-meany);
@@ -197,7 +200,7 @@ PDModel::deriveCPParameters(int model)
         double R2=1-(sse/sv);
 
         // carry on with RMSE
-        double mean = errtot/double(t.size());
+        double mean = errtot/double(t.size()); // mean of residuals MEAN is mean of variable
         errtot = 0;
 
         // mean of residuals^2
@@ -206,7 +209,11 @@ PDModel::deriveCPParameters(int model)
 
         // RMSE
         double RMSE=sqrt(mean);
-        fitsummary = QString("RMSE %1 watts R<sup>2</sup>=%3 [LR] %2 points").arg(RMSE, 0, 'f', 2).arg(t.size()).arg(R2, 0, 'f', 3);
+        double CV=(RMSE/MEAN) * 100;
+        fitsummary = QString("RMSE %1w CV %4% R<sup>2</sup>=%3 [LR] %2 points").arg(RMSE, 0, 'f', 0)
+                                                                                       .arg(t.size())
+                                                                                       .arg(R2, 0, 'f', 3)
+                                                                                       .arg(CV, 0, 'f', 1);
 
     } else if (fit == LeastSquares && this->nparms() > 0) {
     // only try lmfit if the model supports that
@@ -309,22 +316,22 @@ PDModel::deriveCPParameters(int model)
 
         // get vector of residuals
         QVector<double> residuals(p.size());
+        double MEAN=0;
         double errtot=0;
         for(int i=0; i<p.size(); i++){
-            double err = p[i] - y(t[i]/60.0f);
-            errtot += err; // for mean
-            residuals[i]=err;
+            double err = y(t[i]/60.0f) - p[i];  // error
+            errtot += err * err; // accumulate squar of errors
+            MEAN += y(t[i]/60.0f); // for average error divided at end
         }
-        double mean = errtot/double(p.size());
-        errtot = 0;
+        MEAN /= double(p.size()); // average error
+        double mean = errtot/double(p.size()); // average square of error
 
-        // mean of residuals^2
-        for(int i=0; i<p.size(); i++) errtot += pow(residuals[i]-mean, 2);
-        mean = errtot / double(p.size());
-
-        // RMSE
+        // RMSE and CV
         double RMSE=sqrt(mean);
-        fitsummary = QString("RMSE %1 watts [LM] %2 points").arg(RMSE, 0, 'f', 2).arg(p.size());
+        double CV=(RMSE/MEAN) * 100;
+        fitsummary = QString("RMSE %1w CV %3% [LM] %2 points").arg(RMSE, 0, 'f', 0)
+                                                                      .arg(p.size())
+                                                                      .arg(CV, 0, 'f', 1);
 
     } else {
 
@@ -451,12 +458,15 @@ PDModel::calcSummary()
     // get vector of residuals
     QVector<double> residuals(data.size());
     double errtot=0;
+    double MEAN=0;
     for(int i=0; i<data.size(); i++){
         double err = data[i] - y((i+1)/60.0f);
+        MEAN +=  y((i+1)/60.0f);
         errtot += err; // for mean
         residuals[i]=err;
     }
     double mean = errtot/double(data.size());
+    MEAN/=double(data.size());
     errtot = 0;
 
     // mean of residuals^2
@@ -465,7 +475,8 @@ PDModel::calcSummary()
 
     // RMSE
     double RMSE=sqrt(mean);
-    fitsummary = QString("RMSE %1 watts [envelope] %2 points").arg(RMSE, 0, 'f', 2).arg(data.size());
+    double CV=(RMSE/MEAN) *100;
+    fitsummary = QString("RMSE %1w CV %3% [envelope] %2 points").arg(RMSE, 0, 'f', 0).arg(data.size()).arg(CV,0,'f',1);
 }
 
 //
@@ -978,16 +989,6 @@ ExtendedModel::onIntervalsChanged()
 void
 ExtendedModel::deriveExtCPParameters()
 {
-    // initial estimates
-    paa = 1000;
-    etau = 1.2;
-    ecp = 300;
-    paa_dec = -2;
-    ecp_del = -0.9;
-    tau_del = -4.8;
-    ecp_dec = -0.6;
-    ecp_dec_del = -180;
-
 #if 0
     // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     // LEAST SQUARES FIT WITH ECP MODEL REQUIRES
@@ -1103,6 +1104,15 @@ ExtendedModel::deriveExtCPParameters()
                 break;
 
 
+        // initial estimates
+        paa = 1000;
+        etau = 1.2;
+        ecp = 300;
+        paa_dec = -2;
+        ecp_del = -0.9;
+        tau_del = -4.8;
+        ecp_dec = -0.6;
+        ecp_dec_del = -180;
 
         // previous loop values
         double etau_prev;
@@ -1289,12 +1299,15 @@ ExtendedModel::deriveExtCPParameters()
         // get vector of residuals
         QVector<double> residuals(data.size());
         double errtot=0;
+        double MEAN=0;
         for(int i=0; i<data.size(); i++){
             double err = data[i] - y((i+1)/60.0f);
+            MEAN +=  y((i+1)/60.0f);
             errtot += err; // for mean
             residuals[i]=err;
         }
         double mean = errtot/double(data.size());
+        MEAN/=double(data.size());
         errtot = 0;
 
         // mean of residuals^2
@@ -1303,7 +1316,8 @@ ExtendedModel::deriveExtCPParameters()
 
         // RMSE
         double RMSE=sqrt(mean);
-        fitsummary = QString("RMSE %1 watts [envelope] %2 points").arg(RMSE, 0, 'f', 2).arg(data.size());
+        double CV=(RMSE/MEAN)*100;
+        fitsummary = QString("RMSE %1w CV %3% [envelope] %2 points").arg(RMSE, 0, 'f', 0).arg(data.size()).arg(CV,0,'f',1);
 }
 
 QList<QPointF> 

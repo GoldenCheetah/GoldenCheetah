@@ -233,7 +233,7 @@ SplitActivityWizard::setIntervalsList(SplitSelect *selector)
     segments.append(rideItem->ride()->intervals());
 
     // now lets sort the segments in start order
-    qSort(segments.begin(), segments.end());
+    std::sort(segments.begin(), segments.end());
 
     // first just add all the current ride intervals
     counter = 0;
@@ -296,8 +296,8 @@ SplitActivityWizard::setIntervalsList(SplitSelect *selector)
         double distance = rideItem->ride()->timeToDistance(interval->stop) - 
                           rideItem->ride()->timeToDistance(interval->start);
         add->setText(5, QString("%1 %2")
-                        .arg(distance * (context->athlete->useMetricUnits ? 1 : MILES_PER_KM), 0, 'f', 2)
-                        .arg(context->athlete->useMetricUnits ? "km" : "mi"));
+                        .arg(distance * (GlobalContext::context()->useMetricUnits ? 1 : MILES_PER_KM), 0, 'f', 2)
+                        .arg(GlobalContext::context()->useMetricUnits ? "km" : "mi"));
 
         // interval name
         add->setText(6, interval->name);
@@ -343,7 +343,7 @@ SplitActivityWizard::setFilesList()
         add->setText(3, time);
 
         // set distance
-        QString dist = context->athlete->useMetricUnits
+        QString dist = GlobalContext::context()->useMetricUnits
             ? QString ("%1 km").arg(km, 0, 'f', 1)
             : QString ("%1 mi").arg(km * MILES_PER_KM, 0, 'f', 1);
         add->setText(4, dist);
@@ -390,7 +390,7 @@ SplitActivityWizard::setFilesList()
         add->setText(3, time);
 
         // set distance
-        QString dist = context->athlete->useMetricUnits
+        QString dist = GlobalContext::context()->useMetricUnits
             ? QString ("%1 km").arg(km, 0, 'f', 1)
             : QString ("%1 mi").arg(km * MILES_PER_KM, 0, 'f', 1);
         add->setText(4, dist);
@@ -691,7 +691,7 @@ SplitConfirm::initializePage()
     // not guaranteed to be ordered
     QList<long> points;
     foreach(long mark, wizard->marks) points.append(mark); // marks are indexes to ensure absolute accuracy
-    qSort(points.begin(), points.end());
+    std::sort(points.begin(), points.end());
 
     // Create a new ride for each marked segment
     long lastmark = -1;

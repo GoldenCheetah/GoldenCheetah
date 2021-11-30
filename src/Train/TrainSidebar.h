@@ -30,7 +30,8 @@
 #include "ErgFilePlot.h"
 #include "GcSideBarItem.h"
 #include "RemoteControl.h"
-#include "Tab.h"
+#include "AthleteTab.h"
+#include "PhysicsUtility.h"
 
 // standard stuff
 #include <QDir>
@@ -46,6 +47,10 @@
 
 #include "cmath" // for round()
 #include "Units.h" // for MILES_PER_KM
+
+#include "PhysicsUtility.h"
+#include "BicycleSim.h"
+
 
 // Status settings
 #define RT_MODE_ERGO        0x0001        // load generation modes
@@ -80,6 +85,7 @@ class RealtimePlot;
 class RealtimeData;
 class MultiDeviceDialog;
 class TrainBottom;
+class DeviceTreeView;
 
 class TrainSidebar : public GcWindow
 {
@@ -107,7 +113,6 @@ class TrainSidebar : public GcWindow
         // was realtimewindow,merged into tool
         // update charts/dials and manage controller
         void updateData(RealtimeData &);      // to update telemetry by push devices
-        void nextDisplayMode();     // show next display mode
         void setStreamController();     // based upon selected device
 
         // this
@@ -143,6 +148,7 @@ class TrainSidebar : public GcWindow
 
         void deviceTreeMenuPopup(const QPoint &);
         void deleteDevice();
+        void moveDevices(int, int);
 
         void devicePopup();
         void workoutPopup();
@@ -179,10 +185,12 @@ class TrainSidebar : public GcWindow
         void FFwd();        // jump forward when in a workout
         void Rewind();      // jump backwards when in a workout
         void FFwdLap();     // jump forward to next Lap marker
+        void RewindLap();   // jump backwards to previous Lap marker
         void Higher();      // set load/gradient higher
         void Lower();       // set load/gradient higher
         void newLap();      // start new Lap!
         void resetLapTimer(); //reset the lap timer
+        void resetTextAudioEmitTracking();
         void steerScroll(int scrollAmount);   // Scroll the train display
 
         void toggleCalibration();
@@ -205,6 +213,9 @@ class TrainSidebar : public GcWindow
         // HRV R-R data being saved away
         void rrData(uint16_t  rrtime, uint8_t heartrateBeats, uint8_t instantHeartrate);
 
+        // VO2 measurement data to save
+        void vo2Data(double rf, double rmv, double vo2, double vco2, double tv, double feo2);
+
     protected:
 
         friend class ::MultiDeviceDialog;
@@ -222,7 +233,7 @@ class TrainSidebar : public GcWindow
         QSqlTableModel *videosyncModel;
         QSqlTableModel *workoutModel;
 
-        QTreeWidget *deviceTree;
+        DeviceTreeView *deviceTree;
         QTreeView *workoutTree;
         QTreeView *videosyncTree;
         QTreeView *mediaTree;
@@ -254,13 +265,13 @@ class TrainSidebar : public GcWindow
         double displayLatitude, displayLongitude, displayAltitude; // geolocation
         long load;
         double slope;
-        int displayLap;            // user increment for Lap
         int displayWorkoutLap;     // which Lap in the workout are we at?
         bool lapAudioEnabled;
         bool lapAudioThisLap;
+        double textPositionEmitted;
+        bool useSimulatedSpeed;
 
-        void updateMetricLapDistance();
-        void updateMetricLapDistanceRemaining();
+        void maintainLapDistanceState();
 
         // for non-zero average calcs
         int pwrcount, cadcount, hrcount, spdcount, lodcount, grdcount; // for NZ average calc
@@ -268,9 +279,14 @@ class TrainSidebar : public GcWindow
         int displaymode;
 
         QFile *recordFile;      // where we record!
+        int lastRecordSecs;     // to avoid duplicates
         QFile *rrFile;          // r-r records, if any received.
-        ErgFile *ergFile;       // workout file
-        VideoSyncFile *videosyncFile;       // videosync file
+        QFile *vo2File;         // vo2 records, if any received.
+
+        // ErgFile wrapper to support stateful location queries.
+        ErgFileQueryAdapter        ergFileQueryAdapter;
+
+        VideoSyncFile             *videosyncFile;     // videosync file
 
         bool     startCalibration, restartCalibration, finishCalibration;
         int      calibrationDeviceIndex;
@@ -284,15 +300,18 @@ class TrainSidebar : public GcWindow
              load_msecs;
         QTime load_period;
 
-        uint session_elapsed_msec, lap_elapsed_msec;
+        uint session_elapsed_msec, lap_elapsed_msec, secs_to_start;
         QTime session_time, lap_time;
 
         QTimer      *gui_timer,     // refresh the gui
                     *load_timer,    // change the load on the device
+                    *start_timer,   // delayed start
                     *disk_timer;    // write to .CSV file
 
         bool autoConnect;
         bool pendingConfigChange;
+
+        Bicycle bicycle;
 
     public:
         int mode;
@@ -326,5 +345,18 @@ class MultiDeviceDialog : public QDialog
 
         QPushButton *applyButton, *cancelButton;
 };
-#endif // _GC_TrainSidebar_h
 
+class DeviceTreeView : public QTreeWidget
+{
+    Q_OBJECT
+
+    public:
+        DeviceTreeView();
+
+    signals:
+        void itemMoved(int previous, int actual);
+
+    protected:
+        void dropEvent(QDropEvent* event);
+};
+#endif // _GC_TrainSidebar_h

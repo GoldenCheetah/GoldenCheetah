@@ -36,14 +36,12 @@
 #include "TimeUtils.h"
 #include "HelpWhatsThis.h"
 
-#ifdef NOWEBKIT
 #include <QtWebChannel>
 #include <QWebEngineView>
 #include <QWebEngineSettings>
-#endif
 
 // overlay helper
-#include "TabView.h"
+#include "AbstractView.h"
 #include "GcOverlayWidget.h"
 #include "IntervalSummaryWindow.h"
 #include <QDebug>
@@ -57,8 +55,6 @@ RideMapWindow::RideMapWindow(Context *context, int mapType) : GcChartWindow(cont
 
     QWidget *settingsWidget = new QWidget(this);
     settingsWidget->setContentsMargins(0,0,0,0);
-    //HelpWhatsThis *helpSettings = new HelpWhatsThis(settingsWidget);
-    //settingsWidget->setWhatsThis(helpSettings->getWhatsThisText(HelpWhatsThis::ChartRides_Critical_MM_Config_Settings));
 
     QFormLayout *commonLayout = new QFormLayout(settingsWidget);
 
@@ -71,12 +67,18 @@ RideMapWindow::RideMapWindow(Context *context, int mapType) : GcChartWindow(cont
 
     showMarkersCk = new QCheckBox();
     showFullPlotCk = new QCheckBox();
+    hideShadedZonesCk = new QCheckBox();
+    hideShadedZonesCk->setChecked(false);
+    hideYellowLineCk = new QCheckBox();
+    hideYellowLineCk->setChecked(false);
     showInt = new QCheckBox();
     showInt->setChecked(true);
 
     commonLayout->addRow(new QLabel(tr("Map")), mapCombo);
     commonLayout->addRow(new QLabel(tr("Show Markers")), showMarkersCk);
     commonLayout->addRow(new QLabel(tr("Show Full Plot")), showFullPlotCk);
+    commonLayout->addRow(new QLabel(tr("Hide Shaded Zones")), hideShadedZonesCk);
+    commonLayout->addRow(new QLabel(tr("Hide Yellow Line")), hideYellowLineCk);
     commonLayout->addRow(new QLabel(tr("Show Intervals Overlay")), showInt);
     commonLayout->addRow(new QLabel(""));
 
@@ -111,6 +113,8 @@ RideMapWindow::RideMapWindow(Context *context, int mapType) : GcChartWindow(cont
     connect(showMarkersCk, SIGNAL(stateChanged(int)), this, SLOT(showMarkersChanged(int)));
     connect(showInt, SIGNAL(stateChanged(int)), this, SLOT(showIntervalsChanged(int)));
     connect(showFullPlotCk, SIGNAL(stateChanged(int)), this, SLOT(showFullPlotChanged(int)));
+    connect(hideShadedZonesCk, SIGNAL(stateChanged(int)), this, SLOT(hideShadedZonesChanged(int)));
+    connect(hideYellowLineCk, SIGNAL(stateChanged(int)), this, SLOT(hideYellowLineChanged(int)));
     connect(osmTSUrl, SIGNAL(editingFinished()), this, SLOT(osmCustomTSURLEditingFinished()));
     connect(tileCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(tileTypeSelected(int)));
 
@@ -122,15 +126,9 @@ RideMapWindow::RideMapWindow(Context *context, int mapType) : GcChartWindow(cont
     layout->setContentsMargins(2,0,2,2);
     setChartLayout(layout);
 
-#ifdef NOWEBKIT
     view = new QWebEngineView(this);
-#if QT_VERSION >= 0x050800
     // stop stealing focus!
     view->settings()->setAttribute(QWebEngineSettings::FocusOnNavigationEnabled, false);
-#endif
-#else
-    view = new QWebView();
-#endif
     view->setPage(new mapWebPage());
     view->setContentsMargins(0,0,0,0);
     view->page()->view()->setContentsMargins(0,0,0,0);
@@ -142,7 +140,6 @@ RideMapWindow::RideMapWindow(Context *context, int mapType) : GcChartWindow(cont
     view->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::ChartRides_Map));
 
     webBridge = new MapWebBridge(context, this);
-#ifdef NOWEBKIT
     // file: MyWebEngineView.cpp, MyWebEngineView extends QWebEngineView
     QWebChannel *channel = new QWebChannel(view->page());
 
@@ -152,7 +149,6 @@ RideMapWindow::RideMapWindow(Context *context, int mapType) : GcChartWindow(cont
 
     // register QObjects to be exposed to JavaScript
     channel->registerObject(QStringLiteral("webBridge"), webBridge);
-#endif
 
     // put a helper on the screen for mouse over intervals...
     overlayIntervals = new IntervalSummaryWindow(context);
@@ -162,9 +158,6 @@ RideMapWindow::RideMapWindow(Context *context, int mapType) : GcChartWindow(cont
     // connects
     //
     connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideSelected()));
-#ifndef NOWEBKIT
-    connect(view->page()->mainFrame(), SIGNAL(javaScriptWindowObjectCleared()), this, SLOT(updateFrame()));
-#endif
 
     connect(context, SIGNAL(rideChanged(RideItem*)), this, SLOT(forceReplot()));
     connect(context, SIGNAL(intervalsChanged()), webBridge, SLOT(intervalsChanged()));
@@ -186,6 +179,7 @@ RideMapWindow::RideMapWindow(Context *context, int mapType) : GcChartWindow(cont
 RideMapWindow::~RideMapWindow()
 {
     delete webBridge;
+    if (view) delete view->page();
 }
 
 void
@@ -222,18 +216,33 @@ RideMapWindow::setTileServerUrlForTileType(int x)
         ts = appsettings->cvalue(context->athlete->cyclist, GC_OSM_TS_DEFAULT, "").toString();
         // set/save the default if necessary
         if (ts.isEmpty()) {
-           ts = "http://tile.openstreetmap.org";
+           ts = "http://{s}.tile.openstreetmap.org";
            appsettings->setCValue(context->athlete->cyclist, GC_OSM_TS_DEFAULT, ts);
         }
         break;
     case 10:
         ts = appsettings->cvalue(context->athlete->cyclist, GC_OSM_TS_A, "").toString();
+        // set/save some useful default if empty
+        if (ts.isEmpty()) {
+           ts = "http://{s}.tile.openstreetmap.de";
+           appsettings->setCValue(context->athlete->cyclist, GC_OSM_TS_A, ts);
+        }
         break;
     case 20:
         ts = appsettings->cvalue(context->athlete->cyclist, GC_OSM_TS_B, "").toString();
+        // set/save some useful default if empty
+        if (ts.isEmpty()) {
+           ts = "http://{s}.tile.openstreetmap.fr/osmfr";
+           appsettings->setCValue(context->athlete->cyclist, GC_OSM_TS_B, ts);
+        }
         break;
     case 30:
         ts = appsettings->cvalue(context->athlete->cyclist, GC_OSM_TS_C, "").toString();
+        // set/save some useful default if empty
+        if (ts.isEmpty()) {
+           ts = "https://{s}.tile.opentopomap.org";
+           appsettings->setCValue(context->athlete->cyclist, GC_OSM_TS_C, ts);
+        }
         break;
     }
     osmTSUrl->setText(ts);
@@ -266,7 +275,19 @@ RideMapWindow::showFullPlotChanged(int value)
     smallPlot->setVisible(value != 0);
 }
 
+void
+RideMapWindow::hideShadedZonesChanged(int value)
+{
+    Q_UNUSED(value);
+    forceReplot();
+}
 
+void
+RideMapWindow::hideYellowLineChanged(int value)
+{
+    Q_UNUSED(value);
+    forceReplot();
+}
 void
 RideMapWindow::osmCustomTSURLEditingFinished()
 {
@@ -296,7 +317,7 @@ RideMapWindow::configChanged(qint32)
 {
     setProperty("color", GColor(CPLOTBACKGROUND));
 #ifndef Q_OS_MAC
-    overlayIntervals->setStyleSheet(TabView::ourStyleSheet());
+    overlayIntervals->setStyleSheet(AbstractView::ourStyleSheet());
 #endif
 }
 
@@ -334,9 +355,9 @@ RideMapWindow::rideSelected()
     rideCP = 300;
     stale = false;
 
-    if (context->athlete->zones(ride->isRun)) {
-        range = context->athlete->zones(ride->isRun)->whichRange(ride->dateTime.date());
-        if (range >= 0) rideCP = context->athlete->zones(ride->isRun)->getCP(range);
+    if (context->athlete->zones(ride->sport)) {
+        range = context->athlete->zones(ride->sport)->whichRange(ride->dateTime.date());
+        if (range >= 0) rideCP = context->athlete->zones(ride->sport)->getCP(range);
     }
 
     loadRide();
@@ -347,11 +368,7 @@ void RideMapWindow::loadRide()
 {
     createHtml();
 
-#ifdef NOWEBKIT
     view->page()->setHtml(currentPage);
-#else
-    view->page()->mainFrame()->setHtml(currentPage);
-#endif
 }
 
 void RideMapWindow::updateFrame()
@@ -362,11 +379,6 @@ void RideMapWindow::updateFrame()
     webBridge = new MapWebBridge(context, this);
     connect(context, SIGNAL(intervalsChanged()), webBridge, SLOT(intervalsChanged()));
     connect(context, SIGNAL(intervalSelected()), webBridge, SLOT(intervalsChanged()));
-
-#ifndef NOWEBKIT
-    view->page()->mainFrame()->addToJavaScriptWindowObject("webBridge", webBridge);
-#endif
-
 }
 
 void RideMapWindow::createHtml()
@@ -421,22 +433,16 @@ void RideMapWindow::createHtml()
         currentPage += QString("<script type=\"text/javascript\" src=\"http://maps.googleapis.com/maps/api/js?key=%1\"></script> \n").arg(gkey->text());
     }
 
-#ifdef NOWEBKIT
     currentPage += QString("<script type=\"text/javascript\" src=\"qrc:///qtwebchannel/qwebchannel.js\"></script>\n");
-#endif
 
     currentPage += QString("<script type=\"text/javascript\"> \n"
     "var webBridge; \n"
     "window.onload = function () { \n"
-#ifdef NOWEBKIT
     "<!-- it's a good idea to initialize webchannel after DOM ready, if the code is going to manipulate the DOM -->\n"
     "   new QWebChannel(qt.webChannelTransport, function (channel) { \n"
     "       webBridge = channel.objects.webBridge; \n"
     "       initialize(); \n"
     "   }); \n"
-#else
-    "   initialize(); \n"
-#endif
     "}; \n"
     "</script>");
 
@@ -461,29 +467,21 @@ void RideMapWindow::createHtml()
     // b) allow local manipulation. This makes the UI
     // considerably more 'snappy'
     "function drawRoute() {\n"
-#ifdef NOWEBKIT
     // load the GPS co-ordinates
     "   webBridge.getLatLons(0, drawRouteForLatLons);\n"
-#else
-    // load the GPS co-ordinates
-    "    var latlons = webBridge.getLatLons(0);\n" // interval "0" is the entire route
-    "   drawRouteForLatLons(latlons);\n"
-#endif
     "}\n"
     "\n");
 
     if (mapCombo->currentIndex() == OSM) {
-        // when we have style options we draw the route in cplotmarker colors
-        // and no opacity since its just a stylised map used for dashboards or
-        // small thumbnails.
+
         currentPage += QString("function drawRouteForLatLons(latlons) {\n"
 
 
             // route will be drawn with these options
             "    var routeOptionsYellow = {\n"
             "        stroke : true,\n"
-            "        color: '%1',\n"
-            "        opacity: %2,\n"
+            "        color: '#FFFF00',\n"
+            "        opacity: %1,\n"
             "        weight: 10,\n"
             "        zIndex: -2\n"
             "    };\n"
@@ -504,20 +502,16 @@ void RideMapWindow::createHtml()
             "routeYellow.on('mouseover', function(event) { webBridge.hoverPath(event.latlng.lat, event.latlng.lng); });\n"
             "routeYellow.on('mousemove', function(event) { webBridge.hoverPath(event.latlng.lat, event.latlng.lng); });\n"
 
-            "}\n").arg(styleoptions == "" ? "#FFFF00" : GColor(CPLOTMARKER).name())
-                  .arg(styleoptions == "" ? 0.4 : 1.0);
+            "}\n").arg(hideYellowLine() ? 0.0 : 0.4f);
     }
     else if (mapCombo->currentIndex() == GOOGLE) {
 
-       // when we have style options we draw the route in cplotmarker colors
-       // and no opacity since its just a stylised map used for dashboards or
-       // small thumbnails.
        currentPage += QString("function drawRouteForLatLons(latlons) {\n"
 
            // route will be drawn with these options
            "    var routeOptionsYellow = {\n"
-           "        strokeColor: '%1',\n"
-           "        strokeOpacity: %2,\n"
+           "        strokeColor: '#FFFF00',\n"
+           "        strokeOpacity: %1,\n"
            "        strokeWeight: 10,\n"
            "        zIndex: -2\n"
            "    };\n"
@@ -539,17 +533,12 @@ void RideMapWindow::createHtml()
            "    google.maps.event.addListener(routeYellow, 'mouseup',   function(event) { map.setOptions({draggable: true, zoomControl: true, scrollwheel: true, disableDoubleClickZoom: false}); webBridge.mouseup(); });\n"
            "    google.maps.event.addListener(routeYellow, 'mouseover', function(event) { webBridge.hoverPath(event.latLng.lat(), event.latLng.lng()); });\n"
 
-           "}\n").arg(styleoptions == "" ? "#FFFF00" : GColor(CPLOTMARKER).name())
-                 .arg(styleoptions == "" ? 0.4f : 1.0f);
+           "}\n").arg(hideYellowLine() ? 0.0 : 0.4f);
     }
 
     currentPage += QString("function drawIntervals() { \n"
     // how many to draw?
-#ifdef NOWEBKIT
     "   webBridge.intervalCount(drawIntervalsCount);\n"
-#else
-    "   drawIntervalsCount(webBridge.intervalCount());\n"
-#endif
     "}\n"
 
     "function drawIntervalsCount(intervals) { \n"
@@ -572,11 +561,7 @@ void RideMapWindow::createHtml()
     "    }\n"
 
     "   while (intervals > 0) {\n"
-#ifdef NOWEBKIT
     "       webBridge.getLatLons(intervals, drawInterval);\n"
-#else
-    "       drawInterval(webBridge.getLatLons(intervals));\n"
-#endif
     "       intervals--;\n"
     "   }\n"
     "}\n");
@@ -630,11 +615,15 @@ void RideMapWindow::createHtml()
                                arg(maxLat,0,'g',GPS_COORD_TO_STRING).
                                arg(maxLon,0,'g',GPS_COORD_TO_STRING);
 
+        // If provided URL doesn't contain the required part, we add it,
+        // otherwise it is used without changes to allow inclusion of apikey.
+        QString tsReq = "/{z}/{x}/{y}.png";
+        QString tsUrl = osmTSUrl->text().contains(tsReq) ? osmTSUrl->text() : osmTSUrl->text() + tsReq;
         currentPage += QString(""
-                               "    L.tileLayer('%1/{z}/{x}/{y}.png', {"
+                               "    L.tileLayer('%1', {"
                                "                 attribution: '&copy; <a href=\"http://openstreetmap.org\">OpenStreetMap</a> contributors',"
                                "                 maxZoom: 18"
-                               "              }).addTo(map);\n").arg(osmTSUrl->text());
+                               "              }).addTo(map);\n").arg(tsUrl);
 
         currentPage += QString(""
                                // initialise local variables
@@ -682,8 +671,6 @@ void RideMapWindow::createHtml()
             // initialise function called when map loaded
             "function initialize() {\n");
 
-        if (styleoptions == "") {
-
             // TERRAIN style map please and make it draggable
             // note that because QT webkit offers touch/gesture
             // support the Google API only supports dragging
@@ -694,14 +681,6 @@ void RideMapWindow::createHtml()
             "      style: google.maps.MapTypeControlStyle.DEFAULT\n"
             "    };\n");
 
-        } else {
-
-            // USER DEFINED STYLE OPTIONS
-            currentPage += QString(""
-            "var styledMapType = new google.maps.StyledMapType( %1 "
-            " , {name: 'Styled Map'} );\n" ).arg(styleoptions);
-        }
-
         currentPage += QString(
             "    var myOptions = {\n"
             "      draggable: true,\n"
@@ -710,8 +689,8 @@ void RideMapWindow::createHtml()
             "      disableDefaultUI: %2,\n"
             "      tilt: 45,\n"
             "      streetViewControl: false,\n"
-            "    };\n").arg(styleoptions != "" ? "'styled_map'" : "google.maps.MapTypeId.TERRAIN")
-                       .arg(styleoptions != "" ? "true" : "false");
+            "    };\n").arg("google.maps.MapTypeId.TERRAIN")
+                       .arg("false");
 
 
 
@@ -726,12 +705,6 @@ void RideMapWindow::createHtml()
                 arg(maxLat,0,'g',GPS_COORD_TO_STRING).
                 arg(maxLon,0,'g',GPS_COORD_TO_STRING);
 
-
-        if (styleoptions != "") {
-            currentPage += QString(""
-            "   map.mapTypes.set('styled_map', styledMapType);\n"
-            "   map.setMapTypeId('styled_map');\n");
-        }
 
         currentPage += QString(""
             // add the bike layer, useful in some areas, but coverage
@@ -776,8 +749,8 @@ void RideMapWindow::createHtml()
 
 QColor RideMapWindow::GetColor(int watts)
 {
-    if (range < 0) return Qt::red;
-    else return zoneColor(context->athlete->zones(myRideItem ? myRideItem->isRun : false)->whichZone(range, watts), 7);
+    if (range < 0 || hideShadedZones()) return Qt::red;
+    else return zoneColor(context->athlete->zones(myRideItem ? myRideItem->sport : "Bike")->whichZone(range, watts), 7);
 }
 
 // create the ride line
@@ -789,6 +762,7 @@ RideMapWindow::drawShadedRoute()
     int count=0;  // how many samples ?
     int rwatts=0; // running total of watts
     double prevtime=0; // time for previous point
+    double endRideItemtime = myRideItem->ride()->dataPoints().last()->secs;
 
     QString code;
 
@@ -825,8 +799,8 @@ RideMapWindow::drawShadedRoute()
         prevtime = rfp->secs;
         count++;
 
-        // end of segment
-        if (rtime >= intervalTime) {
+        // end of segment or the segment is truncated by finding the last data point
+        if ((rtime >= intervalTime) || (rfp->secs >= endRideItemtime)) {
             if (mapCombo->currentIndex() == OSM) {
                 // Finalize variable "latLons" for the segment.
                 if (code.endsWith(", "))
@@ -854,8 +828,8 @@ RideMapWindow::drawShadedRoute()
                                 "polyline.on('mouseup',   function(event) { map.dragging.enable();L.DomEvent.stopPropagation(event);webBridge.mouseup(); });\n" // setOptions ?
                                 "polyline.on('mouseover', function(event) { webBridge.hoverPath(event.latlng.lat, event.latlng.lng); });\n"
                                 "path = polyline.getLatLngs();\n"
-                                "}\n").arg(styleoptions == "" ? color.name() : GColor(CPLOTMARKER).name())
-                                .arg(styleoptions == "" ? 0.5 : 1.0);
+                                "}\n").arg(color.name())
+                                      .arg(0.5);
             } else if (mapCombo->currentIndex() == GOOGLE) {
                 // color the polyline
                 code += QString("var polyOptions = {\n"
@@ -865,15 +839,11 @@ RideMapWindow::drawShadedRoute()
                                 "    zIndex: 0,\n"
                                 "}\n"
                                 "polyline.setOptions(polyOptions);\n"
-                                "}\n").arg(styleoptions == "" ? color.name() : GColor(CPLOTMARKER).name())
-                                      .arg(styleoptions == "" ? 0.5f : 1.0f);
+                                "}\n").arg(color.name())
+                                      .arg(0.5f);
 
             }
-#ifdef NOWEBKIT
             view->page()->runJavaScript(code);
-#else
-            view->page()->mainFrame()->evaluateJavaScript(code);
-#endif
         }
     }
 
@@ -893,11 +863,7 @@ RideMapWindow::clearTempInterval() {
                             "}\n" );
     }
 
-#ifdef NOWEBKIT
     view->page()->runJavaScript(code);
-#else
-    view->page()->mainFrame()->evaluateJavaScript(code);
-#endif
 }
 
 void
@@ -967,12 +933,7 @@ RideMapWindow::drawTempInterval(IntervalItem *current) {
     } else if (mapCombo->currentIndex() == GOOGLE) {
         code += QString("}\n" );
     }
-#ifdef NOWEBKIT
     view->page()->runJavaScript(code);
-#else
-    view->page()->mainFrame()->evaluateJavaScript(code);
-#endif
-
     overlayIntervals->intervalSelected();
 }
 
@@ -1020,7 +981,7 @@ RideMapWindow::createMarkers()
     if (loop) {
         if (mapCombo->currentIndex() == OSM) {
             code = QString("{ var latlng = new L.LatLng(%1,%2);"
-                           "var image = new L.icon({iconUrl:'qrc:images/maps/loop.png'});"
+                           "var image = new L.icon({iconUrl:'qrc:images/maps/loop.png',iconAnchor:[16,37]});"
                            "var marker = new L.marker(latlng, { icon: image });"
                            "marker.addTo(map); }").arg(points[0]->lat,0,'g',GPS_COORD_TO_STRING).arg(points[0]->lon,0,'g',GPS_COORD_TO_STRING);
         } else if (mapCombo->currentIndex() == GOOGLE) {
@@ -1029,11 +990,7 @@ RideMapWindow::createMarkers()
                            "var marker = new google.maps.Marker({ icon: image, animation: google.maps.Animation.DROP, position: latlng });"
                            "marker.setMap(map); }").arg(points[0]->lat,0,'g',GPS_COORD_TO_STRING).arg(points[0]->lon,0,'g',GPS_COORD_TO_STRING);
         }
-    #ifdef NOWEBKIT
         view->page()->runJavaScript(code);
-    #else
-        view->page()->mainFrame()->evaluateJavaScript(code);
-    #endif
     } else {
         // start / finish markers
         QString marker = "qrc:images/maps/cycling.png";
@@ -1042,7 +999,7 @@ RideMapWindow::createMarkers()
 
         if (mapCombo->currentIndex() == OSM) {
             code = QString("{ var latlng = new L.LatLng(%1,%2);"
-                           "var image = new L.icon({iconUrl:'%3'});"
+                           "var image = new L.icon({iconUrl:'%3',iconAnchor:[16,37]});"
                            "var marker = new L.marker(latlng, { icon: image });"
                            "marker.addTo(map); }").arg(points[0]->lat,0,'g',GPS_COORD_TO_STRING).arg(points[0]->lon,0,'g',GPS_COORD_TO_STRING).arg(marker);
         } else if (mapCombo->currentIndex() == GOOGLE) {
@@ -1051,14 +1008,10 @@ RideMapWindow::createMarkers()
                        "var marker = new google.maps.Marker({ icon: image, animation: google.maps.Animation.DROP, position: latlng });"
                        "marker.setMap(map); }").arg(points[0]->lat,0,'g',GPS_COORD_TO_STRING).arg(points[0]->lon,0,'g',GPS_COORD_TO_STRING).arg(marker);
         }
-    #ifdef NOWEBKIT
         view->page()->runJavaScript(code);
-    #else
-        view->page()->mainFrame()->evaluateJavaScript(code);
-    #endif
         if (mapCombo->currentIndex() == OSM) {
             code = QString("{ var latlng = new L.LatLng(%1,%2);"
-                           "var image = new L.icon({iconUrl:'qrc:images/maps/finish.png'});"
+                           "var image = new L.icon({iconUrl:'qrc:images/maps/finish.png',iconAnchor:[16,37]});"
                            "var marker = new L.marker(latlng, { icon: image });"
                            "marker.addTo(map); }").arg(points[points.count()-1]->lat,0,'g',GPS_COORD_TO_STRING).arg(points[points.count()-1]->lon,0,'g',GPS_COORD_TO_STRING);
         } else if (mapCombo->currentIndex() == GOOGLE) {
@@ -1067,11 +1020,7 @@ RideMapWindow::createMarkers()
                        "var marker = new google.maps.Marker({ icon: image, animation: google.maps.Animation.DROP, position: latlng });"
                        "marker.setMap(map); }").arg(points[points.count()-1]->lat,0,'g',GPS_COORD_TO_STRING).arg(points[points.count()-1]->lon,0,'g',GPS_COORD_TO_STRING);
         }
-    #ifdef NOWEBKIT
         view->page()->runJavaScript(code);
-    #else
-        view->page()->mainFrame()->evaluateJavaScript(code);
-    #endif
     }
 
     //
@@ -1118,7 +1067,7 @@ RideMapWindow::createMarkers()
 
                 if (mapCombo->currentIndex() == OSM) {
                     code = QString("{ var latlng = new L.LatLng(%1,%2);"
-                                   "var image = new L.icon({iconUrl:'%3'});"
+                                   "var image = new L.icon({iconUrl:'%3',iconAnchor:[16,37]});"
                                    "var marker = new L.marker(latlng, { icon: image });"
                                    "marker.addTo(map); }").arg(rfp->lat,0,'g',GPS_COORD_TO_STRING).arg(rfp->lon,0,'g',GPS_COORD_TO_STRING).arg(marker);
                 } else if (mapCombo->currentIndex() == GOOGLE) {
@@ -1129,12 +1078,7 @@ RideMapWindow::createMarkers()
                         "marker.setMap(map);"
                     "}").arg(rfp->lat,0,'g',GPS_COORD_TO_STRING).arg(rfp->lon,0,'g',GPS_COORD_TO_STRING).arg(marker);
                 }
-            #ifdef NOWEBKIT
                 view->page()->runJavaScript(code);
-            #else
-                view->page()->mainFrame()->evaluateJavaScript(code);
-            #endif
-
             }
             stoplat=stoplon=stoptime=0;
         }
@@ -1181,12 +1125,7 @@ RideMapWindow::createMarkers()
                                         .arg(interval)
                                         ;
         }
-    #ifdef NOWEBKIT
         view->page()->runJavaScript(code);
-    #else
-        view->page()->mainFrame()->evaluateJavaScript(code);
-    #endif
-
         interval++;
     }
 
@@ -1237,11 +1176,7 @@ void RideMapWindow::zoomInterval(IntervalItem *which)
                         .arg(maxLon,0,'g',GPS_COORD_TO_STRING);
     }
 
-#ifdef NOWEBKIT
     view->page()->runJavaScript(code);
-#else
-    view->page()->mainFrame()->evaluateJavaScript(code);
-#endif
 }
 
 // quick diag, used to debug code only
@@ -1306,7 +1241,7 @@ MapWebBridge::drawOverlays()
     mw->createMarkers();
 
     // overlay a shaded route
-    if (mw->getStyleOptions() == "") mw->drawShadedRoute();
+    mw->drawShadedRoute();
 
     // Get the latest new selection lap number.
     RideItem *rideItem = mw->property("ride").value<RideItem*>();
@@ -1511,7 +1446,7 @@ RideMapWindow::event(QEvent *event)
         }
 
         // if off the screen move on screen
-        if (helperWidget()->geometry().x() > geometry().width()) {
+        if (helperWidget()->geometry().x() > geometry().width() || helperWidget()->geometry().x() < geometry().x()) {
             helperWidget()->move(mainWidget()->geometry().width()-(275*dpiXFactor), 50*dpiYFactor);
         }
     }

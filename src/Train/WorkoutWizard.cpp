@@ -76,11 +76,7 @@ WorkoutEditorBase::WorkoutEditorBase(QStringList &colms, QWidget *parent) :QFram
 
     table->setColumnCount(colms.count());
     table->setHorizontalHeaderLabels(colms);
-#if QT_VERSION > 0x050000
     table->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
-#else
-    table->horizontalHeader()->setResizeMode(QHeaderView::ResizeToContents);
-#endif
     table->setShowGrid(true);
     table->setAlternatingRowColors(true);
     table->resizeColumnsToContents();
@@ -355,7 +351,7 @@ void AbsWattagePage::updateMetrics()
 #if 0 //XXX REFACTOR METRICS
     const RideMetricFactory &factory = RideMetricFactory::instance();
     const RideMetric *rm = factory.rideMetric("skiba_xpower");
-    QHash<QString,RideMetricPtr> results = rm->computeMetrics(NULL,&*workout,hackContext->athlete->zones(false),hackContext->athlete->hrZones(),metrics);
+    QHash<QString,RideMetricPtr> results = rm->computeMetrics(NULL,&*workout,hackContext->athlete->zones("Bike"),hackContext->athlete->hrZones(),metrics);
     metricsSummary->updateMetrics(metrics,results);
 #endif
 }
@@ -409,8 +405,12 @@ RelWattagePage::RelWattagePage(QWidget *parent) : WorkoutPage(parent) {}
 
 void RelWattagePage::initializePage()
 {
-    int zoneRange = hackContext->athlete->zones(false)->whichRange(QDate::currentDate());
-    ftp = hackContext->athlete->zones(false)->getCP(zoneRange);
+    if (hackContext->athlete->zones("Bike") && hackContext->athlete->zones("Bike")->whichRange(QDate::currentDate()) >= 0) {
+        int zoneRange = hackContext->athlete->zones("Bike")->whichRange(QDate::currentDate());
+        ftp = hackContext->athlete->zones("Bike")->getCP(zoneRange);
+    } else {
+        ftp = 100; // if zones are not available let's make absolute watts match percentajes
+    }
 
     setTitle(tr("Workout Wizard"));
     QString subTitle = tr("Relative Wattage Workout Wizard, current CP60 = ") + QString::number(ftp);
@@ -490,7 +490,7 @@ void RelWattagePage::updateMetrics()
 #if 0 //XXX REFACTOR METRICS
     const RideMetricFactory &factory = RideMetricFactory::instance();
     const RideMetric *rm = factory.rideMetric("skiba_xpower");
-    QHash<QString,RideMetricPtr> results = rm->computeMetrics(NULL,&*workout,hackContext->athlete->zones(false),hackContext->athlete->hrZones(),metrics);
+    QHash<QString,RideMetricPtr> results = rm->computeMetrics(NULL,&*workout,hackContext->athlete->zones("Bike"),hackContext->athlete->hrZones(),metrics);
     metricsSummary->updateMetrics(metrics,results);
 #endif
 }
@@ -543,9 +543,7 @@ GradientPage::GradientPage(QWidget *parent) : WorkoutPage(parent) {}
 
 void GradientPage::initializePage()
 {
-    int zoneRange = hackContext->athlete->zones(false)->whichRange(QDate::currentDate());
-    ftp = hackContext->athlete->zones(false)->getCP(zoneRange);
-    metricUnits = hackContext->athlete->useMetricUnits;
+    metricUnits = GlobalContext::context()->useMetricUnits;
     setTitle(tr("Workout Wizard"));
 
     setSubTitle(tr("Manually create a workout based on gradient (slope) and distance, maximum grade is +-40."));
@@ -615,13 +613,20 @@ void GradientPage::SaveWorkout()
     SaveWorkoutHeader(stream,f.fileName(),QString("golden cheetah"),QString("DISTANCE GRADE WIND"));
     QVector<QPair<QString, QString> > rawData;
     we->rawData(rawData);
-    double currentX = 0;
     stream << "[COURSE DATA]" << endl;
     QPair<QString, QString > p;
     foreach (p,rawData)
     {
-        currentX += p.first.toDouble();
-        stream << currentX << " " << p.second << " 0" << endl;
+        if(p.first == "LAP")
+        {
+            stream << "LAP" << endl;
+        }
+        else
+        {
+            // header indicates metric units, so convert accordingly
+            double currentX = p.first.toDouble()*(metricUnits ? 1.0 : KM_PER_MILE);
+            stream << currentX << " " << p.second << " 0" << endl;
+        }
     }
     stream << "[END COURSE DATA]" << endl;
     f.close();
@@ -646,7 +651,7 @@ void ImportPage::initializePage()
         setSubTitle(tr("Import current activity as a Gradient ride (slope based)"));
         setFinalPage(true);
         plot = new WorkoutPlot();
-        metricUnits = hackContext->athlete->useMetricUnits;
+        metricUnits = GlobalContext::context()->useMetricUnits;
         QString s = (metricUnits ? tr("KM") : tr("Miles"));
         QString distance = QString(tr("Distance (")) + s + QString(")");
         plot->setXAxisTitle(distance);
@@ -768,8 +773,10 @@ void ImportPage::SaveWorkout()
     double prevDistance = 0;
     foreach (p,rideProfile)
     {
-        stream << p.first - prevDistance << " " << p.second <<" 0" << endl;
-        prevDistance = p.first;
+        // header indicates metric units, so convert accordingly
+        double curDistance = p.first * (metricUnits ? 1.0 : KM_PER_MILE);
+        stream << curDistance - prevDistance << " " << p.second <<" 0" << endl;
+        prevDistance = curDistance;
     }
     stream << "[END COURSE DATA]" << endl;
     f.close();

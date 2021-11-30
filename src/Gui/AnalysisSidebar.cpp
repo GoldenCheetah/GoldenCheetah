@@ -61,8 +61,8 @@ AnalysisSidebar::AnalysisSidebar(Context *context) : QWidget(context->mainWindow
     calendarWidget->setWhatsThis(helpCalendar->getWhatsThisText(HelpWhatsThis::SideBarRidesView_Calendar));
 
     // Activity History
-    rideNavigator = new RideNavigator(context, true);
-    rideNavigator->setProperty("nomenu", true);
+    context->rideNavigator = rideNavigator = new RideNavigator(context, true);
+    rideNavigator->showMore(false);
     groupByMapper = NULL;
 
     // retrieve settings (properties are saved when we close the window)
@@ -74,7 +74,7 @@ AnalysisSidebar::AnalysisSidebar(Context *context) : QWidget(context->mainWindow
         rideNavigator->setWidths(appsettings->cvalue(context->athlete->cyclist, GC_NAVHEADINGWIDTHS).toString());
     }
 
-    QWidget *activityHistory = new QWidget(this);
+    activityHistory = new QWidget(this);
     activityHistory->setContentsMargins(0,0,0,0);
 #ifndef Q_OS_MAC // not on mac thanks
     activityHistory->setStyleSheet("padding: 0px; border: 0px; margin: 0px;");
@@ -261,9 +261,7 @@ AnalysisSidebar::setRide(RideItem*ride)
             add->setData(0, Qt::UserRole+1, QVariant(interval->color));
             add->setData(0, Qt::UserRole+2, QVariant(interval->test));
             add->setFlags(Qt::ItemIsEnabled
-#if QT_VERSION >= 0x50101
                           | Qt::ItemNeverHasChildren
-#endif
                           | Qt::ItemIsSelectable 
                           | Qt::ItemIsDragEnabled 
                           | Qt::ItemIsEditable);
@@ -327,6 +325,8 @@ AnalysisSidebar::configChanged(qint32)
     //intervalSummaryWindow->setPalette(GCColor::palette());
     //intervalSummaryWindow->setStyleSheet(GCColor::stylesheet());
 
+    splitter->setPalette(GCColor::palette());
+    activityHistory->setStyleSheet(QString("background: %1;").arg(GColor(CPLOTBACKGROUND).name()));
     rideNavigator->tableView->viewport()->setPalette(GCColor::palette());
     rideNavigator->tableView->viewport()->setStyleSheet(QString("background: %1;").arg(GColor(CPLOTBACKGROUND).name()));
 
@@ -382,7 +382,7 @@ AnalysisSidebar::showActivityMenu(const QPoint &pos)
     RideItem *rideItem = context->ride;
 
     if (rideItem != NULL) { 
-        QMenu menu(rideNavigator);
+        QMenu menu(this);
 
 
         QAction *actSaveRide = new QAction(tr("Save Changes"), rideNavigator);
@@ -470,7 +470,7 @@ AnalysisSidebar::intervalPopup()
     // to manipulate the interval tree
 
     // always show the 'find best' 'find peaks' options
-    QMenu menu(intervalItem);
+    QMenu menu(this);
 
     RideItem *rideItem = context->ride;
 
@@ -549,7 +549,7 @@ AnalysisSidebar::showIntervalMenu(const QPoint &pos)
         //bool isUser = interval->rideInterval != NULL;
 
         activeInterval = interval;
-        QMenu menu(intervalTree);
+        QMenu menu(this);
 
         // ZOOM IN AND OUT FOR ALL
         QAction *actZoomOut = new QAction(tr("Zoom Out"), intervalTree);

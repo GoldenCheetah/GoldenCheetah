@@ -74,6 +74,7 @@ class Estimator : public QThread {
 
         // get a performance for a given day
         Performance getPerformanceForDate(QDate date, bool wantrun);
+        QList<Performance> &allPerformances() { return performances; }
 
     protected:
 

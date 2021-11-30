@@ -235,6 +235,8 @@ CloudDBCommon::processReplyStatusCodes(QNetworkReply *reply) {
         CloudDBStatusClient::displayCloudDBStatus();
         break;
     default:
+        QByteArray body = reply->readAll();
+        qDebug()<<"CloudDB error reply:"<<body;
         QMessageBox::warning(0, tr("CloudDB"), QString(tr("Technical problem with CloudDB - response code: %1 - please try again later."))
                              .arg(QString::number(code, 10)));
     }
@@ -335,6 +337,44 @@ CloudDBCommon::marshallAPIHeaderV1Object(QJsonObject& json_header, CommonAPIHead
 
 }
 
+
+QString
+CloudDBCommon::encodeHTML ( const QString& encodeMe )
+{
+    QString temp;
+
+    for (int index(0); index < encodeMe.size(); index++)
+    {
+        QChar character(encodeMe.at(index));
+
+        switch (character.unicode())
+        {
+        case '&':
+            temp += "&amp;"; break;
+
+        case '\'':
+            temp += "&apos;"; break;
+
+        case '"':
+            temp += "&quot;"; break;
+
+        case '<':
+            temp += "&lt;"; break;
+
+        case '>':
+            temp += "&gt;"; break;
+
+        case '\n':
+            temp += "<br>"; break;
+
+        default:
+            temp += character;
+            break;
+        }
+    }
+
+    return temp;
+}
 
 
 

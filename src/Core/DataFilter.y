@@ -54,7 +54,7 @@ extern Leaf *DataFilterroot; // root node for parsed statement
 
 // Constants can be a string or a number
 %token <leaf> DF_STRING DF_INTEGER DF_FLOAT
-%token <function> BEST TIZ CONFIG CONST_ DATERANGE
+%token <function> BEST TIZ CONFIG CONST_
 
 // comparative operators
 %token <op> IF_ ELSE_ WHILE
@@ -62,9 +62,6 @@ extern Leaf *DataFilterroot; // root node for parsed statement
 %token <op> ADD SUBTRACT DIVIDE MULTIPLY POW
 %token <op> MATCHES ENDSWITH BEGINSWITH CONTAINS
 %type <op> AND OR;
-
-// Date Range markers for vector expressions
-%token <op> LSB RSB
 
 %union {
    Leaf *leaf;
@@ -75,19 +72,18 @@ extern Leaf *DataFilterroot; // root node for parsed statement
 
 %locations
 
-%type <leaf> symbol array literal lexpr cexpr expr parms block statement expression;
+%type <leaf> symbol array select literal lexpr cexpr expr parms block statement expression parameter;
 %type <leaf> simple_statement if_clause while_clause function_def;
 %type <leaf> python_script;
 %type <comp> statements
 
 %right '?' ':'
-%right '[' ']'
-%right LSB RSB
 %right AND OR
 %right EQ NEQ LT LTE GT GTE MATCHES ENDSWITH CONTAINS
 %left ADD SUBTRACT
 %left MULTIPLY DIVIDE
 %right POW
+%right '[' ']'
 
 %start filter;
 %%
@@ -237,17 +233,23 @@ function_def:
                                                 }
         ;
 
+parameter:
+
+        lexpr                                   { $$ = $1; }
+        | block                                 { $$ = $1; }
+        ;
+
 /*
  * A parameter list, as passed to a function
  */
 parms: 
 
-        lexpr                                   { $$ = new Leaf(@1.first_column, @1.last_column);
+        parameter                               { $$ = new Leaf(@1.first_column, @1.last_column);
                                                   $$->type = Leaf::Function;
                                                   $$->series = NULL; // not tiz/best
                                                   $$->fparms << $1;
                                                 }
-        | parms ',' lexpr                       { $1->fparms << $3;
+        | parms ',' parameter                   { $1->fparms << $3;
                                                   $1->leng = @3.last_column; }
         ;
 
@@ -270,13 +272,6 @@ lexpr:
                                                   $$->rvalue.l = $5;
                                                   $$->cond.l = $1;
                                                 }
-        | lexpr LSB lexpr ':' lexpr RSB { $$ = new Leaf(@1.first_column, @6.last_column);
-                                                  $$->type = Leaf::Vector;
-                                                  $$->lvalue.l = $1;
-                                                  $$->fparms << $3;
-                                                  $$->fparms << $5;
-                                                  $$->op = 0;
-                                                }
         | '!' lexpr %prec OR                    { $$ = new Leaf(@1.first_column, @2.last_column);
                                                   $$->type = Leaf::UnaryOperation;
                                                   $$->lvalue.l = $2;
@@ -297,13 +292,23 @@ lexpr:
                                                 }
         ;
 
-array:  symbol '[' expr ']'                    {
+array:
+         expr '[' expr ']'                    {
                                                   $$ = new Leaf(@1.first_column, @4.last_column);
                                                   $$->type = Leaf::Index;
                                                   $$->lvalue.l = $1;
                                                   $$->fparms << $3;
                                                   $$->op = 0;
                                                 }
+        ;
+
+select: expr '[' lexpr ']'                   {
+                                                  $$ = new Leaf(@1.first_column, @4.last_column);
+                                                  $$->type = Leaf::Select;
+                                                  $$->lvalue.l = $1;
+                                                  $$->fparms << $3;
+                                                  $$->op = 0;
+                                             }
         ;
 
 /*
@@ -442,11 +447,6 @@ expr:
                                                   $$->series = $3;
                                                   $$->lvalue.l = NULL;
                                                 }
-        | DATERANGE '(' symbol ')'              { $$ = new Leaf(@1.first_column, @4.last_column); $$->type = Leaf::Function;
-                                                  $$->function = QString($1);
-                                                  $$->series = $3;
-                                                  $$->lvalue.l = NULL;
-                                                }
                                                   /* functions all have zero or more parameters */
         | symbol '(' parms ')'                  { /* need to convert params to a function */
                                                   $3->loc = @1.first_column;
@@ -466,6 +466,7 @@ expr:
                                                   $$->op = 0;
                                                 }
         | array                                 { $$ = $1; }
+        | select                                { $$ = $1; }
         | literal                               { $$ = $1; }
         | symbol                                { $$ = $1; }
         | python_script                         { $$ = $1; }
@@ -495,7 +496,7 @@ literal:
 
         DF_STRING                               { $$ = new Leaf(@1.first_column, @1.last_column);
                                                   $$->type = Leaf::String;
-                                                  QString s2(DataFiltertext);
+                                                  QString s2 = Utils::unescape(DataFiltertext); // user can escape chars in string
                                                   $$->lvalue.s = new QString(s2.mid(1,s2.length()-2));
                                                 }
         | DF_FLOAT                              { $$ = new Leaf(@1.first_column, @1.last_column);

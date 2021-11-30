@@ -19,15 +19,21 @@
 
 #include "SpinScanPlotWindow.h"
 #include "Context.h"
+#include "HelpWhatsThis.h"
 
 SpinScanPlotWindow::SpinScanPlotWindow(Context *context) :
     GcChartWindow(context), context(context), active(false)
 {
+    HelpWhatsThis *helpContents = new HelpWhatsThis(this);
+    this->setWhatsThis(helpContents->getWhatsThisText(HelpWhatsThis::ChartTrain_PedalStroke));
+
     setContentsMargins(0,0,0,0);
     setProperty("color", GColor(CTRAINPLOTBACKGROUND));
 
     // setup controls
     QWidget *c = new QWidget;
+    HelpWhatsThis *helpConfig = new HelpWhatsThis(c);
+    c->setWhatsThis(helpConfig->getWhatsThisText(HelpWhatsThis::ChartTrain_PedalStroke));
     QVBoxLayout *cl = new QVBoxLayout(c);
     QHBoxLayout *style = new QHBoxLayout();
     cl->addLayout(style);

@@ -21,7 +21,6 @@
  */
 
 #include "GcOverlayWidget.h"
-#include "GcScopeBar.h"
 #include "DiaryWindow.h"
 #include "DiarySidebar.h"
 #include "Context.h"
@@ -39,7 +38,7 @@ GcOverlayWidget::GcOverlayWidget(Context *context, QWidget *parent) : QWidget(pa
     setMouseTracking(true);
     setFocusPolicy(Qt::ClickFocus);
 #ifdef GC_HAVE_MUMODEL
-    setMinimumSize(40(dpiXFactor,200*dpiYFactor); //XX temp for MU model...
+    setMinimumSize(40(dpiXFactor,200*dpiYFactor)); //XX temp for MU model...
 #else
     setMinimumSize(250*dpiXFactor,200*dpiYFactor);
 #endif
