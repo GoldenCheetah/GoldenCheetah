@@ -3402,6 +3402,8 @@ TopNOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *,
     int width = paintarea.width() - (numrect.width() + daterect.width() + valuerect.width() + (margins * 6));
     QRectF barrect = QRectF(0,10, width, 30);
 
+    // text color
+    QColor cnormal = (GCColor::luminance(GColor(CCARDBACKGROUND)) < 127) ? QColor(200,200,200) : QColor(70,70,70);
 
     // PAINT
     for (int i=0; i<maxrows && i<ranked.count(); i++) {
@@ -3424,7 +3426,7 @@ TopNOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *,
         }
 
         // rank
-        painter->setPen(QColor(100,100,100));
+        painter->setPen(cnormal);
         painter->drawText(paintarea.topLeft()+QPointF(margins, margins+(i*rowheight)+fm.ascent()), QString("%1.").arg(i+1));
 
         // date
@@ -3452,7 +3454,6 @@ TopNOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *,
         painter->fillRect(bar, markerbrush);
 
         // value
-        painter->setPen(QColor(100,100,100));
         painter->drawText(paintarea.topLeft()+QPointF(numrect.width()+daterect.width()+fullbar.width()+(margins*4),0)+QPointF(margins, margins+(i*rowheight)+fm.ascent()), ranked[i].value);
 
     }
