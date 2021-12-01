@@ -113,6 +113,7 @@ class RideMapWindow : public GcChartWindow
     Q_PROPERTY(bool showintervals READ showIntervals WRITE setShowIntervals USER true)
     Q_PROPERTY(bool hideShadedZones READ hideShadedZones WRITE setHideShadedZones USER true)
     Q_PROPERTY(bool hideBgLine READ hideBgLine WRITE setHideBgLine USER true)
+    Q_PROPERTY(double bgLineOpacity READ bgLineOpacity WRITE setBgLineOpacity USER true)
     //Q_PROPERTY(QRgb bgLineColor READ bgLineColor WRITE setBgLineColor USER true) // QRgb/unsigned int:s do now work!
     Q_PROPERTY(int bgLineColor READ bgLineColor WRITE setBgLineColor USER true)
     Q_PROPERTY(int osmts READ osmTS WRITE setOsmTS USER true)
@@ -142,6 +143,9 @@ class RideMapWindow : public GcChartWindow
         bool hideBgLine() const { return hideBgLineCk->isChecked(); }
         void setHideBgLine(bool x) { hideBgLineCk->setChecked(x); }
 
+        double bgLineOpacity() const { return bgTrackLineOpacity->value(); }
+        void setBgLineOpacity(double x) { bgTrackLineOpacity->setValue(x); }
+
         int bgLineColor() const { return (int) track_bg_color->getColor().rgb(); }
         void setBgLineColor(int c_rgb) { track_bg_color->setColor(QColor((QRgb) c_rgb)); } // QRgb = unsigned int
 
@@ -167,6 +171,7 @@ class RideMapWindow : public GcChartWindow
         void showFullPlotChanged(int value);
         void hideShadedZonesChanged(int value);
         void hideBgLineChanged(int value);
+        void bgLineOpacityChanged(double value);
         void bgLineColorChanged(QColor value);
         void showIntervalsChanged(int value);
         void osmCustomTSURLEditingFinished();
@@ -188,6 +193,7 @@ class RideMapWindow : public GcChartWindow
         QComboBox *mapCombo, *tileCombo;
         QCheckBox *showMarkersCk, *showFullPlotCk, *showInt;
         QCheckBox *hideShadedZonesCk, *hideBgLineCk;
+        QDoubleSpinBox *bgTrackLineOpacity;
         ColorButton *track_bg_color;
         QLabel *osmTSTitle, *osmTSLabel, *osmTSUrlLabel;
         QLineEdit *osmTSUrl;

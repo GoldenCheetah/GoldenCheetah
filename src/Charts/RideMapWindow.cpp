@@ -71,6 +71,13 @@ RideMapWindow::RideMapWindow(Context *context, int mapType) : GcChartWindow(cont
     hideShadedZonesCk->setChecked(false);
     hideBgLineCk = new QCheckBox();
     hideBgLineCk->setChecked(false);
+
+    bgTrackLineOpacity = new QDoubleSpinBox;
+    bgTrackLineOpacity->setMinimum(0.0);
+    bgTrackLineOpacity->setMaximum(1.0);
+    bgTrackLineOpacity->setValue(0.4);
+    bgTrackLineOpacity->setSingleStep(0.05);
+
     track_bg_color = new ColorButton(this, "Color",  QColor(Qt::blue));
     showInt = new QCheckBox();
     showInt->setChecked(true);
@@ -79,7 +86,8 @@ RideMapWindow::RideMapWindow(Context *context, int mapType) : GcChartWindow(cont
     commonLayout->addRow(new QLabel(tr("Show Markers")), showMarkersCk);
     commonLayout->addRow(new QLabel(tr("Show Full Plot")), showFullPlotCk);
     commonLayout->addRow(new QLabel(tr("Hide Shaded Zones")), hideShadedZonesCk);
-    commonLayout->addRow(new QLabel(tr("Hide Backgroud Track Line")), hideBgLineCk);
+    commonLayout->addRow(new QLabel(tr("Hide Background Track Line")), hideBgLineCk);
+    commonLayout->addRow(new QLabel(tr("Background Track Line Opacity")), bgTrackLineOpacity);
     commonLayout->addRow(new QLabel(tr("Track Background Color")), track_bg_color);
     commonLayout->addRow(new QLabel(tr("Show Intervals Overlay")), showInt);
     commonLayout->addRow(new QLabel(""));
@@ -117,6 +125,7 @@ RideMapWindow::RideMapWindow(Context *context, int mapType) : GcChartWindow(cont
     connect(showFullPlotCk, SIGNAL(stateChanged(int)), this, SLOT(showFullPlotChanged(int)));
     connect(hideShadedZonesCk, SIGNAL(stateChanged(int)), this, SLOT(hideShadedZonesChanged(int)));
     connect(hideBgLineCk, SIGNAL(stateChanged(int)), this, SLOT(hideBgLineChanged(int)));
+    connect(bgTrackLineOpacity, SIGNAL(valueChanged(double)), this, SLOT(bgLineOpacityChanged(double)));
     connect(track_bg_color, SIGNAL(colorChosen(QColor)), this, SLOT(bgLineColorChanged(QColor)));
     connect(osmTSUrl, SIGNAL(editingFinished()), this, SLOT(osmCustomTSURLEditingFinished()));
     connect(tileCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(tileTypeSelected(int)));
@@ -160,8 +169,8 @@ RideMapWindow::RideMapWindow(Context *context, int mapType) : GcChartWindow(cont
     //
     // connects
     //
-    connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideSelected()));
 
+    connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideSelected()));
     connect(context, SIGNAL(rideChanged(RideItem*)), this, SLOT(forceReplot()));
     connect(context, SIGNAL(intervalsChanged()), webBridge, SLOT(intervalsChanged()));
     connect(context, SIGNAL(intervalSelected()), webBridge, SLOT(intervalsChanged()));
@@ -287,6 +296,13 @@ RideMapWindow::hideShadedZonesChanged(int value)
 
 void
 RideMapWindow::hideBgLineChanged(int value)
+{
+    Q_UNUSED(value);
+    forceReplot();
+}
+
+void
+RideMapWindow::bgLineOpacityChanged(double value)
 {
     Q_UNUSED(value);
     forceReplot();
@@ -493,7 +509,6 @@ void RideMapWindow::createHtml()
             "        color: '#");
         //currentPage += QString("FFFF00"); // Default yellow
         QString bg_color_rgb_hex = QString( "%1" ).arg( (QRgb) bgLineColor(), 1, 16 ); // Hex format
-        qDebug() << bg_color_rgb_hex.mid(2,6) << endl;
         currentPage += bg_color_rgb_hex.mid(2,6); // Use last 6 digits.
         currentPage += QString("',\n");
             //"        color: '#FFFF00',\n");
@@ -519,7 +534,7 @@ void RideMapWindow::createHtml()
             "routeYellow.on('mouseover', function(event) { webBridge.hoverPath(event.latlng.lat, event.latlng.lng); });\n"
             "routeYellow.on('mousemove', function(event) { webBridge.hoverPath(event.latlng.lat, event.latlng.lng); });\n"
 
-            "}\n").arg(hideBgLine() ? 0.0 : 0.4f);
+            "}\n").arg(hideBgLine() ? 0.0 : (float) bgLineOpacity());
     }
     else if (mapCombo->currentIndex() == GOOGLE) {
 
