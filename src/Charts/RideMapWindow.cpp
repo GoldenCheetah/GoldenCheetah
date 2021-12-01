@@ -558,8 +558,12 @@ void RideMapWindow::createHtml()
 
            // route will be drawn with these options
            "    var routeOptionsYellow = {\n"
-           "        strokeColor: '#FFFF00',\n"
-           "        strokeOpacity: %1,\n"
+           "        strokeColor: '#");
+           //"        strokeColor: '#FFFF00',\n"
+           QString bg_color_rgb_hex = QString( "%1" ).arg( (QRgb) bgLineColor(), 1, 16 ); // Hex format
+           currentPage += bg_color_rgb_hex.mid(2,6); // Use last 6 digits.
+           currentPage += QString("',\n");
+           currentPage += QString("strokeOpacity: %1,\n"
            "        strokeWeight: 10,\n"
            "        zIndex: -2\n"
            "    };\n"
@@ -581,7 +585,7 @@ void RideMapWindow::createHtml()
            "    google.maps.event.addListener(routeYellow, 'mouseup',   function(event) { map.setOptions({draggable: true, zoomControl: true, scrollwheel: true, disableDoubleClickZoom: false}); webBridge.mouseup(); });\n"
            "    google.maps.event.addListener(routeYellow, 'mouseover', function(event) { webBridge.hoverPath(event.latLng.lat(), event.latLng.lng()); });\n"
 
-           "}\n").arg(hideBgLine() ? 0.0 : 0.4f);
+           "}\n").arg(hideBgLine() ? 0.0 : (float) bgLineOpacity());
     }
 
     currentPage += QString("function drawIntervals() { \n"
@@ -888,8 +892,7 @@ RideMapWindow::drawShadedRoute()
                                 "}\n"
                                 "polyline.setOptions(polyOptions);\n"
                                 "}\n").arg(color.name())
-                    .arg((float) segmentOpacity());
-
+                                      .arg((float) segmentOpacity());
             }
             view->page()->runJavaScript(code);
         }
@@ -942,7 +945,7 @@ RideMapWindow::drawTempInterval(IntervalItem *current) {
                     // interval will be drawn with these options
                     "    var polyOptions = {\n"
                     "        strokeColor: '#00FFFF',\n"
-                    "        strokeOpacity: 0.6,\n"
+                    "        strokeOpacity: %1,\n"
                     "        strokeWeight: 10,\n"
                     "        zIndex: -1\n"  // put at the bottom
                     "    }\n"
@@ -954,7 +957,7 @@ RideMapWindow::drawTempInterval(IntervalItem *current) {
                     "    } \n"
 
                     "    var path = tmpIntervalHighlighter.getPath();\n"
-                    "    path.clear();\n");
+                    "    path.clear();\n").arg((float) segmentOpacity());
     }
 
     foreach(RideFilePoint *rfp, myRideItem->ride()->dataPoints()) {
