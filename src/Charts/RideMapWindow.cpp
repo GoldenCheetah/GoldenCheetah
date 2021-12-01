@@ -71,11 +71,9 @@ RideMapWindow::RideMapWindow(Context *context, int mapType) : GcChartWindow(cont
     hideShadedZonesCk->setChecked(false);
     hideBgLineCk = new QCheckBox();
     hideBgLineCk->setChecked(false);
+    track_bg_color = new ColorButton(this, "Color",  QColor(Qt::blue));
     showInt = new QCheckBox();
     showInt->setChecked(true);
-
-    // Track background colors
-    track_bg_color = new ColorButton(this, "Color", QColor(1,1,CPOWER), true, false);
 
     commonLayout->addRow(new QLabel(tr("Map")), mapCombo);
     commonLayout->addRow(new QLabel(tr("Show Markers")), showMarkersCk);
@@ -119,7 +117,7 @@ RideMapWindow::RideMapWindow(Context *context, int mapType) : GcChartWindow(cont
     connect(showFullPlotCk, SIGNAL(stateChanged(int)), this, SLOT(showFullPlotChanged(int)));
     connect(hideShadedZonesCk, SIGNAL(stateChanged(int)), this, SLOT(hideShadedZonesChanged(int)));
     connect(hideBgLineCk, SIGNAL(stateChanged(int)), this, SLOT(hideBgLineChanged(int)));
-    connect(track_bg_color, SIGNAL(colorChosen(QColor)), this, SLOT( bgLineColorChanged(QColor)));
+    connect(track_bg_color, SIGNAL(colorChosen(QColor)), this, SLOT(bgLineColorChanged(QColor)));
     connect(osmTSUrl, SIGNAL(editingFinished()), this, SLOT(osmCustomTSURLEditingFinished()));
     connect(tileCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(tileTypeSelected(int)));
 
@@ -297,7 +295,6 @@ RideMapWindow::hideBgLineChanged(int value)
 void
 RideMapWindow::bgLineColorChanged(QColor value)
 {
-    qDebug()  << "Track background color: 0x" << hex << value.rgb() << Qt::endl;
     Q_UNUSED(value);
     forceReplot();
 }
@@ -495,7 +492,7 @@ void RideMapWindow::createHtml()
             "        stroke : true,\n"
             "        color: '#");
         //currentPage += QString("FFFF00"); // Default yellow
-        QString bg_color_rgb_hex = QString( "%1" ).arg(getBgLineColor(), 1, 16 );
+        QString bg_color_rgb_hex = QString( "%1" ).arg( (QRgb) bgLineColor(), 1, 16 ); // Hex format
         qDebug() << bg_color_rgb_hex.mid(2,6) << endl;
         currentPage += bg_color_rgb_hex.mid(2,6); // Use last 6 digits.
         currentPage += QString("',\n");
@@ -592,7 +589,7 @@ void RideMapWindow::createHtml()
                                "   var polyOptions = {\n"
                                "       stroke : true,\n"
                                "       color: '#0000FF',\n"
-                               "       opacity: 0.6,\n"
+                               "       opacity: 1.0,\n"
                                "       weight: 10,\n"
                                "       zIndex: -1\n"  // put at the bottom
                                "   }\n"

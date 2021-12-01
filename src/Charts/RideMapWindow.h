@@ -113,7 +113,8 @@ class RideMapWindow : public GcChartWindow
     Q_PROPERTY(bool showintervals READ showIntervals WRITE setShowIntervals USER true)
     Q_PROPERTY(bool hideShadedZones READ hideShadedZones WRITE setHideShadedZones USER true)
     Q_PROPERTY(bool hideBgLine READ hideBgLine WRITE setHideBgLine USER true)
-    Q_PROPERTY(unsigned int bgLineColor READ getBgLineColor WRITE setBgLineColor USER true)
+    //Q_PROPERTY(QRgb bgLineColor READ bgLineColor WRITE setBgLineColor USER true) // QRgb/unsigned int:s do now work!
+    Q_PROPERTY(int bgLineColor READ bgLineColor WRITE setBgLineColor USER true)
     Q_PROPERTY(int osmts READ osmTS WRITE setOsmTS USER true)
     Q_PROPERTY(QString googleKey READ googleKey WRITE setGoogleKey USER true)
 
@@ -141,10 +142,8 @@ class RideMapWindow : public GcChartWindow
         bool hideBgLine() const { return hideBgLineCk->isChecked(); }
         void setHideBgLine(bool x) { hideBgLineCk->setChecked(x); }
 
-        unsigned int getBgLineColor() const { qDebug() << "getBgLineColor() " << hex <<  track_bg_color->getColor().rgb() << endl;
-           return (unsigned int) track_bg_color->getColor().rgb(); }
-        void setBgLineColor(unsigned int c_rgb) { qDebug() << "setBgLineColor() " << hex << c_rgb << endl;
-            track_bg_color->setColor(QColor(c_rgb)); } // QRgb = unsigned int
+        int bgLineColor() const { return (int) track_bg_color->getColor().rgb(); }
+        void setBgLineColor(int c_rgb) { track_bg_color->setColor(QColor((QRgb) c_rgb)); } // QRgb = unsigned int
 
         bool showMarkers() const { return ( showMarkersCk->checkState() == Qt::Checked); }
         void setShowMarkers(bool x) { if (x) showMarkersCk->setCheckState(Qt::Checked); else showMarkersCk->setCheckState(Qt::Unchecked) ;}
@@ -172,7 +171,6 @@ class RideMapWindow : public GcChartWindow
         void showIntervalsChanged(int value);
         void osmCustomTSURLEditingFinished();
 
-
         void forceReplot();
         void rideSelected();
         void createMarkers();
@@ -189,7 +187,7 @@ class RideMapWindow : public GcChartWindow
 
         QComboBox *mapCombo, *tileCombo;
         QCheckBox *showMarkersCk, *showFullPlotCk, *showInt;
-        QCheckBox* hideShadedZonesCk, * hideBgLineCk;
+        QCheckBox *hideShadedZonesCk, *hideBgLineCk;
         ColorButton *track_bg_color;
         QLabel *osmTSTitle, *osmTSLabel, *osmTSUrlLabel;
         QLineEdit *osmTSUrl;
