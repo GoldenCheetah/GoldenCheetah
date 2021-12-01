@@ -82,6 +82,12 @@ RideMapWindow::RideMapWindow(Context *context, int mapType) : GcChartWindow(cont
     showInt = new QCheckBox();
     showInt->setChecked(true);
 
+    segmentTrackOpacity = new QDoubleSpinBox;
+    segmentTrackOpacity->setMinimum(0.0);
+    segmentTrackOpacity->setMaximum(1.0);
+    segmentTrackOpacity->setValue(0.6);
+    segmentTrackOpacity->setSingleStep(0.05);
+
     commonLayout->addRow(new QLabel(tr("Map")), mapCombo);
     commonLayout->addRow(new QLabel(tr("Show Markers")), showMarkersCk);
     commonLayout->addRow(new QLabel(tr("Show Full Plot")), showFullPlotCk);
@@ -89,6 +95,8 @@ RideMapWindow::RideMapWindow(Context *context, int mapType) : GcChartWindow(cont
     commonLayout->addRow(new QLabel(tr("Hide Background Track Line")), hideBgLineCk);
     commonLayout->addRow(new QLabel(tr("Background Track Line Opacity")), bgTrackLineOpacity);
     commonLayout->addRow(new QLabel(tr("Track Background Color")), track_bg_color);
+    commonLayout->addRow(new QLabel(tr("Track Segment Opacity")), segmentTrackOpacity);
+
     commonLayout->addRow(new QLabel(tr("Show Intervals Overlay")), showInt);
     commonLayout->addRow(new QLabel(""));
 
@@ -127,6 +135,7 @@ RideMapWindow::RideMapWindow(Context *context, int mapType) : GcChartWindow(cont
     connect(hideBgLineCk, SIGNAL(stateChanged(int)), this, SLOT(hideBgLineChanged(int)));
     connect(bgTrackLineOpacity, SIGNAL(valueChanged(double)), this, SLOT(bgLineOpacityChanged(double)));
     connect(track_bg_color, SIGNAL(colorChosen(QColor)), this, SLOT(bgLineColorChanged(QColor)));
+    connect(segmentTrackOpacity, SIGNAL(valueChanged(double)), this, SLOT(segmentOpacityChanged(double)));
     connect(osmTSUrl, SIGNAL(editingFinished()), this, SLOT(osmCustomTSURLEditingFinished()));
     connect(tileCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(tileTypeSelected(int)));
 
@@ -310,6 +319,13 @@ RideMapWindow::bgLineOpacityChanged(double value)
 
 void
 RideMapWindow::bgLineColorChanged(QColor value)
+{
+    Q_UNUSED(value);
+    forceReplot();
+}
+
+void
+RideMapWindow::segmentOpacityChanged(double value)
 {
     Q_UNUSED(value);
     forceReplot();
@@ -861,7 +877,7 @@ RideMapWindow::drawShadedRoute()
                                 "polyline.on('mouseover', function(event) { webBridge.hoverPath(event.latlng.lat, event.latlng.lng); });\n"
                                 "path = polyline.getLatLngs();\n"
                                 "}\n").arg(color.name())
-                                      .arg(0.5);
+                                      .arg((float) segmentOpacity());
             } else if (mapCombo->currentIndex() == GOOGLE) {
                 // color the polyline
                 code += QString("var polyOptions = {\n"
@@ -872,7 +888,7 @@ RideMapWindow::drawShadedRoute()
                                 "}\n"
                                 "polyline.setOptions(polyOptions);\n"
                                 "}\n").arg(color.name())
-                                      .arg(0.5f);
+                    .arg((float) segmentOpacity());
 
             }
             view->page()->runJavaScript(code);
@@ -908,7 +924,7 @@ RideMapWindow::drawTempInterval(IntervalItem *current) {
                     "    var polyOptions = {\n"
                     "        stroke: true,\n"
                     "        color: '#00FFFF',\n"
-                    "        opacity: 0.6,\n"
+                    "        opacity: %1,\n"
                     "        weight: 10,\n"
                     "        zIndex: -1\n"  // put at the bottom
                     "    };\n"
@@ -920,7 +936,7 @@ RideMapWindow::drawTempInterval(IntervalItem *current) {
                     "    } \n"
                     "    tmpIntervalHighlighter.setLatLngs([]);\n"
                     "    var latLons = ["
-                    "\n");
+                        "\n").arg((float) segmentOpacity());
     } else if (mapCombo->currentIndex() == GOOGLE) {
         code = QString( "{ \n"
                     // interval will be drawn with these options
