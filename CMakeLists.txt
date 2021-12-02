@@ -42,7 +42,9 @@ find_package(LMFIT REQUIRED)
 ### QT5.14.2 officially supported which mandates c++11 support in toolchain
 ###========================================================================
 
-find_package (Qt5Widgets 5.8 REQUIRED)
+set (CMAKE_CXX_STANDARD 11)
+
+find_package (Qt5Widgets 5.13 REQUIRED)
 find_package (Qt5Core REQUIRED)
 find_package (Qt5Xml REQUIRED)
 find_package (Qt5Sql REQUIRED)
@@ -53,17 +55,16 @@ find_package (Qt5SerialPort REQUIRED)
 find_package (Qt5MultimediaWidgets REQUIRED)
 find_package (Qt5PrintSupport REQUIRED)
 
-if (Qt5Widgets_VERSION VERSION_GREATER_EQUAL 5.6) # We require Qt >= 5.8 so we could skip the 2nd test here (?).
-  set (CMAKE_CXX_STANDARD 11)
-  find_package (Qt5WebEngine REQUIRED)
-  find_package (Qt5WebEngineCore REQUIRED)
-  find_package (Qt5WebEngineWidgets REQUIRED)
-  find_package (Qt5WebChannel REQUIRED)
-  find_package (Qt5Positioning REQUIRED)
-else (Qt5Widgets_VERSION VERSION_GREATER_EQUAL 5.6)
-  # On 5.5 or earlier we can still use WebKit
-  find_package (Qt5WebKitWidgets)
-endif (Qt5Widgets_VERSION VERSION_GREATER_EQUAL 5.6)
+# We require 5.13 and 6.x is not supported
+if ( NOT (Qt5Widgets_VERSION VERSION_GREATER_EQUAL 5.13 AND Qt5Widgets_VERSION VERSION_LESS 6.0) )
+  message(FATAL_ERROR "The installed Qt version is not supported!")
+endif ( NOT (Qt5Widgets_VERSION VERSION_GREATER_EQUAL 5.13 AND Qt5Widgets_VERSION VERSION_LESS 6.0) )
+
+find_package (Qt5WebEngine REQUIRED)
+find_package (Qt5WebEngineCore REQUIRED)
+find_package (Qt5WebEngineWidgets REQUIRED)
+find_package (Qt5WebChannel REQUIRED)
+find_package (Qt5Positioning REQUIRED)
 
 set(CMAKE_AUTOMOC ON)
 #set(CMAKE_AUTOUIC ON)
@@ -96,7 +97,6 @@ set (GC_INCLUDE_DIRS
 ###=======================================================================
 
 set (GC_INCLUDE_DIRS  ${GC_INCLUDE_DIRS} "qwt/src")
-
 set (GC_INCLUDE_DIRS  ${GC_INCLUDE_DIRS} "contrib/qxt/src")
 set (GC_INCLUDE_DIRS  ${GC_INCLUDE_DIRS} "contrib/qtsolutions/json")
 set (GC_INCLUDE_DIRS  ${GC_INCLUDE_DIRS} "contrib/qtsolutions/qwtcurve")
@@ -125,8 +125,8 @@ file (GLOB_RECURSE QWT_SOURCE_FILES RELATIVE ${CMAKE_SOURCE_DIR} qwt/src/*.cpp)
 
 # Only some of (the now unmaintained?) Qxt files is used by GC, see "Contributed solutions" further down.
 # Hence, do not include all Qxt sources (which don't build with Qt 5?)
-#file (GLOB_RECURSE QXT_HEADER_FILES RELATIVE ${CMAKE_SOURCE_DIR} qxt/src/*.h)
-#file (GLOB_RECURSE QXT_SOURCE_FILES RELATIVE ${CMAKE_SOURCE_DIR} qxt/src/*.cpp)
+#file (GLOB_RECURSE QXT_HEADER_FILES RELATIVE ${CMAKE_SOURCE_DIR} contrib/qxt/src/*.h)
+#file (GLOB_RECURSE QXT_SOURCE_FILES RELATIVE ${CMAKE_SOURCE_DIR} contrib/qxt/src/*.cpp)
 add_definitions( -DQXT_STATIC )
 
 # Compress and math libs must be defined in gcconfig.pri
@@ -1074,8 +1074,9 @@ set (GC_HEADER_FILES ${GC_HEADER_FILES}
 set (GC_HEADER_FILES ${GC_HEADER_FILES}
   contrib/qtsolutions/codeeditor/codeeditor.h contrib/qtsolutions/json/mvjson.h
   contrib/qtsolutions/qwtcurve/qwt_plot_gapped_curve.h  contrib/qxt/src/qxtspanslider.h
-  contrib/qxt/src/qxtspanslider_p.h contrib/qxt/src/qxtstringspinbox.h contrib/qzip/zipreader.h
-  contrib/qzip/zipwriter.h contrib/lmfit/lmcurve.h  contrib/lmfit/lmcurve_tyd.h
+  contrib/qxt/src/qxtspanslider_p.h contrib/qxt/src/qxtstringspinbox.h
+  contrib/qzip/zipreader.h contrib/qzip/zipwriter.h
+  contrib/lmfit/lmcurve.h contrib/lmfit/lmcurve_tyd.h
   contrib/lmfit/lmmin.h  contrib/lmfit/lmstruct.h
   contrib/levmar/compiler.h  contrib/levmar/levmar.h  contrib/levmar/lm.h  contrib/levmar/misc.h
   contrib/boost/GeometricTools_BSplineCurve.h
@@ -1206,22 +1207,21 @@ set (GC_SOURCE_FILES ${GC_SOURCE_FILES}
 set (GC_SOURCE_FILES ${GC_SOURCE_FILES}
   contrib/qtsolutions/codeeditor/codeeditor.cpp contrib/qtsolutions/json/mvjson.cpp
   contrib/qtsolutions/qwtcurve/qwt_plot_gapped_curve.cpp
-  contrib/qxt/src/qxtspanslider.cpp contrib/qxt/src/qxtstringspinbox.cpp contrib/qzip/zip.cpp
+  contrib/qxt/src/qxtspanslider.cpp contrib/qxt/src/qxtstringspinbox.cpp
+  contrib/qzip/zip.cpp
   contrib/lmfit/lmcurve.c contrib/lmfit/lmmin.c
-  #contrib/levmar/Axb.c contrib/levmar/lm_core.c contrib/levmar/lmbc_core.c
-  #contrib/levmar/lmblec_core.c contrib/levmar/lmbleic_core.c contrib/levmar/lmlec.c contrib/levmar/misc.c
-  #contrib/levmar/Axb_core.c contrib/levmar/lm.c contrib/levmar/lmbc.c contrib/levmar/lmblec.c contrib/levmar/lmbleic.c
+  contrib/levmar/Axb.c
+  #contrib/levmar/lm_core.c contrib/levmar/lmbc_core.c
+  #contrib/levmar/lmblec_core.c contrib/levmar/lmbleic_core.c
+  contrib/levmar/lmlec.c contrib/levmar/misc.c
+  #contrib/levmar/Axb_core.c
+  contrib/levmar/lm.c contrib/levmar/lmbc.c contrib/levmar/lmblec.c contrib/levmar/lmbleic.c
   #contrib/levmar/lmlec_core.c contrib/levmar/misc_core.c
   contrib/kmeans/kmeans_dataset.cpp contrib/kmeans/kmeans_general_functions.cpp contrib/kmeans/hamerly_kmeans.cpp
   contrib/kmeans/kmeans.cpp contrib/kmeans/original_space_kmeans.cpp contrib/kmeans/triangle_inequality_base_kmeans.cpp
   contrib/voronoi/Voronoi.cpp
-
-  #levmar/lm_core.c levmar/lmbc_core.c #
-  #levmar/lmblec_core.c levmar/lmbleic_core.c
-  #levmar/Axb_core.c
-  #levmar/lmlec_core.c levmar/misc_core.c
   )
-# NB. The _core,c files are not used in levmar's CMakeLists.txt file.
+# NB. The _core,c files are not used in levmar's CMakeLists.txt file!
 
 ## Train View Components
 set (GC_SOURCE_FILES ${GC_SOURCE_FILES}
