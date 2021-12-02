@@ -147,8 +147,8 @@ class RideMapWindow : public GcChartWindow
         double bgLineOpacity() const { return bgTrackLineOpacity->value(); }
         void setBgLineOpacity(double x) { bgTrackLineOpacity->setValue(x); }
 
-        int bgLineColor() const { return (int) track_bg_color->getColor().rgb(); }
-        void setBgLineColor(int c_rgb) { track_bg_color->setColor(QColor((QRgb) c_rgb)); } // QRgb = unsigned int
+        int bgLineColor() const { return (int) bgTrackLineColor->getColor().rgb(); }
+        void setBgLineColor(int c_rgb) { bgTrackLineColor->setColor(QColor((QRgb) c_rgb)); } // QRgb = unsigned int
 
         double segmentOpacity() const { return segmentTrackOpacity->value(); }
         void setSegmentOpacity(double x) { segmentTrackOpacity->setValue(x); }
@@ -198,8 +198,8 @@ class RideMapWindow : public GcChartWindow
         QComboBox *mapCombo, *tileCombo;
         QCheckBox *showMarkersCk, *showFullPlotCk, *showInt;
         QCheckBox *hideShadedZonesCk, *hideBgLineCk;
-    QDoubleSpinBox *bgTrackLineOpacity, *segmentTrackOpacity;
-        ColorButton *track_bg_color;
+        QDoubleSpinBox *bgTrackLineOpacity, *segmentTrackOpacity;
+        ColorButton *bgTrackLineColor;
         QLabel *osmTSTitle, *osmTSLabel, *osmTSUrlLabel;
         QLineEdit *osmTSUrl;
 

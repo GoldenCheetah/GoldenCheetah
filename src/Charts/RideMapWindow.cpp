@@ -78,7 +78,7 @@ RideMapWindow::RideMapWindow(Context *context, int mapType) : GcChartWindow(cont
     bgTrackLineOpacity->setValue(0.4);
     bgTrackLineOpacity->setSingleStep(0.05);
 
-    track_bg_color = new ColorButton(this, "Color",  QColor(Qt::blue));
+    bgTrackLineColor = new ColorButton(this, "Color",  QColor(Qt::blue));
     showInt = new QCheckBox();
     showInt->setChecked(true);
 
@@ -94,7 +94,7 @@ RideMapWindow::RideMapWindow(Context *context, int mapType) : GcChartWindow(cont
     commonLayout->addRow(new QLabel(tr("Hide Shaded Zones")), hideShadedZonesCk);
     commonLayout->addRow(new QLabel(tr("Hide Background Track Line")), hideBgLineCk);
     commonLayout->addRow(new QLabel(tr("Background Track Line Opacity")), bgTrackLineOpacity);
-    commonLayout->addRow(new QLabel(tr("Track Background Color")), track_bg_color);
+    commonLayout->addRow(new QLabel(tr("Track Background Color")), bgTrackLineColor);
     commonLayout->addRow(new QLabel(tr("Track Segment Opacity")), segmentTrackOpacity);
 
     commonLayout->addRow(new QLabel(tr("Show Intervals Overlay")), showInt);
@@ -134,7 +134,7 @@ RideMapWindow::RideMapWindow(Context *context, int mapType) : GcChartWindow(cont
     connect(hideShadedZonesCk, SIGNAL(stateChanged(int)), this, SLOT(hideShadedZonesChanged(int)));
     connect(hideBgLineCk, SIGNAL(stateChanged(int)), this, SLOT(hideBgLineChanged(int)));
     connect(bgTrackLineOpacity, SIGNAL(valueChanged(double)), this, SLOT(bgLineOpacityChanged(double)));
-    connect(track_bg_color, SIGNAL(colorChosen(QColor)), this, SLOT(bgLineColorChanged(QColor)));
+    connect(bgTrackLineColor, SIGNAL(colorChosen(QColor)), this, SLOT(bgLineColorChanged(QColor)));
     connect(segmentTrackOpacity, SIGNAL(valueChanged(double)), this, SLOT(segmentOpacityChanged(double)));
     connect(osmTSUrl, SIGNAL(editingFinished()), this, SLOT(osmCustomTSURLEditingFinished()));
     connect(tileCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(tileTypeSelected(int)));
@@ -520,7 +520,7 @@ void RideMapWindow::createHtml()
         currentPage += QString("function drawRouteForLatLons(latlons) {\n"
 
             // route will be drawn with these options
-            "    var routeOptionsYellow = {\n"
+            "    var routeOptionsBgLine = {\n"
             "        stroke : true,\n"
             "        color: '#");
         //currentPage += QString("FFFF00"); // Default yellow
@@ -542,13 +542,13 @@ void RideMapWindow::createHtml()
             "        j += 2;\n"
             "    };\n"
 
-            "    var routeYellow = new L.Polyline(path, routeOptionsYellow).addTo(map);\n"
+            "    var routeBgLine = new L.Polyline(path, routeOptionsBgLine).addTo(map);\n"
 
             // Listen mouse events
-            "routeYellow.on('mousedown', function(event) { map.dragging.disable();L.DomEvent.stopPropagation(event);webBridge.clickPath(event.latlng.lat, event.latlng.lng); });\n" // map.setOptions({draggable: false, zoomControl: false, scrollwheel: false, disableDoubleClickZoom: true});
-            "routeYellow.on('mouseup',   function(event) { map.dragging.enable();L.DomEvent.stopPropagation(event);webBridge.mouseup(); });\n" // setOptions ?
-            "routeYellow.on('mouseover', function(event) { webBridge.hoverPath(event.latlng.lat, event.latlng.lng); });\n"
-            "routeYellow.on('mousemove', function(event) { webBridge.hoverPath(event.latlng.lat, event.latlng.lng); });\n"
+            "routeBgLine.on('mousedown', function(event) { map.dragging.disable();L.DomEvent.stopPropagation(event);webBridge.clickPath(event.latlng.lat, event.latlng.lng); });\n" // map.setOptions({draggable: false, zoomControl: false, scrollwheel: false, disableDoubleClickZoom: true});
+            "routeBgLine.on('mouseup',   function(event) { map.dragging.enable();L.DomEvent.stopPropagation(event);webBridge.mouseup(); });\n" // setOptions ?
+            "routeBgLine.on('mouseover', function(event) { webBridge.hoverPath(event.latlng.lat, event.latlng.lng); });\n"
+            "routeBgLine.on('mousemove', function(event) { webBridge.hoverPath(event.latlng.lat, event.latlng.lng); });\n"
 
             "}\n").arg(hideBgLine() ? 0.0 : (float) bgLineOpacity());
     }
@@ -557,7 +557,7 @@ void RideMapWindow::createHtml()
        currentPage += QString("function drawRouteForLatLons(latlons) {\n"
 
            // route will be drawn with these options
-           "    var routeOptionsYellow = {\n"
+           "    var routeOptionsBgLine = {\n"
            "        strokeColor: '#");
            //"        strokeColor: '#FFFF00',\n"
            QString bg_color_rgb_hex = QString( "%1" ).arg( (QRgb) bgLineColor(), 1, 16 ); // Hex format
@@ -569,11 +569,11 @@ void RideMapWindow::createHtml()
            "    };\n"
 
            // create the route Polyline
-           "    var routeYellow = new google.maps.Polyline(routeOptionsYellow);\n"
-           "    routeYellow.setMap(map);\n"
+           "    var routeBgLine = new google.maps.Polyline(routeOptionsBgLine);\n"
+           "    routeBgLine.setMap(map);\n"
 
            // lastly, populate the route path
-           "    var path = routeYellow.getPath();\n"
+           "    var path = routeBgLine.getPath();\n"
            "    var j=0;\n"
            "    while (j < latlons.length) { \n"
            "        path.push(new google.maps.LatLng(latlons[j], latlons[j+1]));\n"
@@ -581,9 +581,9 @@ void RideMapWindow::createHtml()
            "    }\n"
 
            // Listen mouse events
-           "    google.maps.event.addListener(routeYellow, 'mousedown', function(event) { map.setOptions({draggable: false, zoomControl: false, scrollwheel: false, disableDoubleClickZoom: true}); webBridge.clickPath(event.latLng.lat(), event.latLng.lng()); });\n"
-           "    google.maps.event.addListener(routeYellow, 'mouseup',   function(event) { map.setOptions({draggable: true, zoomControl: true, scrollwheel: true, disableDoubleClickZoom: false}); webBridge.mouseup(); });\n"
-           "    google.maps.event.addListener(routeYellow, 'mouseover', function(event) { webBridge.hoverPath(event.latLng.lat(), event.latLng.lng()); });\n"
+           "    google.maps.event.addListener(routeBgLine, 'mousedown', function(event) { map.setOptions({draggable: false, zoomControl: false, scrollwheel: false, disableDoubleClickZoom: true}); webBridge.clickPath(event.latLng.lat(), event.latLng.lng()); });\n"
+           "    google.maps.event.addListener(routeBgLine, 'mouseup',   function(event) { map.setOptions({draggable: true, zoomControl: true, scrollwheel: true, disableDoubleClickZoom: false}); webBridge.mouseup(); });\n"
+           "    google.maps.event.addListener(routeBgLine, 'mouseover', function(event) { webBridge.hoverPath(event.latLng.lat(), event.latLng.lng()); });\n"
 
            "}\n").arg(hideBgLine() ? 0.0 : (float) bgLineOpacity());
     }
