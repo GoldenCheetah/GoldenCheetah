@@ -23,8 +23,21 @@ bool FixPyDataProcessor::postProcess(RideFile *rideFile, DataProcessorConfig *se
 
     QString errText;
     bool useNewThread = op != "PYTHON";
-    FixPyRunner pyRunner(nullptr, rideFile, useNewThread);
-    return pyRunner.run(pyScript->source, pyScript->iniKey, errText) == 0;
+
+
+    // Creating a RideItem object from rideFile, to substitute the current one in context object,
+    // so that activityMetrics() can access its data
+
+    QDateTime dt = rideFile->startTime();
+    RideItem *ride = new RideItem(rideFile, dt, rideFile->context);
+    RideItem *prior = rideFile->context->ride;
+    // It must be refreshed to have metadata, etc updated and accesible from within python code
+    ride->refresh();
+    rideFile->context->ride = ride;
+    FixPyRunner pyRunner(rideFile->context, rideFile, useNewThread);
+    bool result = pyRunner.run(pyScript->source, pyScript->iniKey, errText) == 0;
+    rideFile->context->ride = prior;
+    return result;
 }
 
 DataProcessorConfig *FixPyDataProcessor::processorConfig(QWidget *parent, const RideFile* ride)
