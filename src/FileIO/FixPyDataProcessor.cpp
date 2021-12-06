@@ -37,6 +37,9 @@ bool FixPyDataProcessor::postProcess(RideFile *rideFile, DataProcessorConfig *se
     FixPyRunner pyRunner(rideFile->context, rideFile, useNewThread);
     bool result = pyRunner.run(pyScript->source, pyScript->iniKey, errText) == 0;
     rideFile->context->ride = prior;
+    ride->context = NULL;
+    ride->setRide((RideFile*)NULL);
+    delete ride;
     return result;
 }
 
