@@ -804,10 +804,13 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
                    lastMessageTimestamp = parent->getElapsedTime();
                } else {
                    qint64 ms = parent->getElapsedTime() - lastMessageTimestamp;
-                   rpm = qMin((float)(1000.0*60.0*1.0) / ms, parent->getCadence());
+                   float estimatedRpm = (float)(1000.0*60.0*1.0) / ms;
                    // If we received a message but timestamp remain unchanged then we know that sensor have not detected magnet thus we deduct that rpm cannot be higher than this
-                   if (rpm < last_measured_rpm / 2.0)
+                   if (estimatedRpm < last_measured_rpm / 2.0)
                        rpm = 0.0; // if rpm is less than half previous cadence we consider that we are stopped
+                    else {
+                        rpm = parent->getCadence();
+                    }
                }
                parent->setCadence(rpm);
                value2 = value = rpm;
