@@ -431,6 +431,8 @@
 #define GC_NOLIO_REFRESH_TOKEN         "<athlete-private>nolio_refresh_token"
 #define GC_NOLIO_LAST_REFRESH          "<athlete-private>nolio_last_refresh"
 #define GC_NOLIO_URL                   "<athlete-private>nolio_url"
+#define GC_NOLIO_ATHLETE_ID            "<athlete-private>nolio_athlete_id"
+#define GC_NOLIO_ATHLETE_NAME          "<athlete-private>nolio_athlete_name"
 // --------------------------------------------------------------------------------
 #include <QSettings>
 #include <QFileInfo>

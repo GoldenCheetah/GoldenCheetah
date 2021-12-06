@@ -54,13 +54,14 @@ class Nolio : public CloudService {
 
         // read a file
         bool readFile(QByteArray *data, QString remotename, QString remoteid);
+        QByteArray* prepareResponse(QByteArray* data);
 
         // create a folder
         bool createFolder(QString);
 
         // athlete selection
-        //QList<CloudServiceAthlete> listAthletes();
-        //bool selectAthlete(CloudServiceAthlete);
+        QList<CloudServiceAthlete> listAthletes();
+        bool selectAthlete(CloudServiceAthlete);
 
         // dirent style api
         CloudServiceEntry *root() { return root_; }
@@ -79,7 +80,8 @@ class Nolio : public CloudService {
         QNetworkAccessManager *nam;
         CloudServiceEntry *root_;
 
-        //QMap<QNetworkReply*, QByteArray*> buffers;
+
+        QMap<QNetworkReply*, QByteArray*> buffers;
 
         //QString userId;
 
