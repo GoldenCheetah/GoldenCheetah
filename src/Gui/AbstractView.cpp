@@ -841,7 +841,7 @@ AbstractView::addChart(GcWinID id)
 void
 AbstractView::checkBlank()
 {
-    selectionChanged(); // run through the code again
+    if (loaded) selectionChanged(); // run through the code again
 }
 
 void

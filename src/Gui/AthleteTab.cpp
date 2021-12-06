@@ -208,8 +208,17 @@ AthleteTab::rideSelected(RideItem*)
     // going back we need to stay on the target view
     // so noswitch is set by the nav model whilst it is working
     if (!noswitch && views->currentIndex() != 1) {
-        context->mainWindow->newSidebar()->setItemSelected(3, true);
-        selectView(1);
+
+        // but we should not switch if the view has not been
+        // loaded yet, since a ride may have been imported
+        // ahead of selecting a view. We could incorporate this
+        // check in the clause above, but want to call it out
+        // as important to be aware that perspectives are loaded
+        // when the view is selected by the user and no earlier
+        if (analysisView->page() != NULL) {
+            context->mainWindow->newSidebar()->setItemSelected(3, true);
+            selectView(1);
+        }
     }
 }
 
