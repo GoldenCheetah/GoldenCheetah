@@ -250,12 +250,8 @@ AbstractView::ourStyleSheet()
 void
 AbstractView::configChanged(qint32)
 {
-#if (defined Q_OS_LINUX) || (defined Q_OS_WIN)
     // style that sucker
-    if (sidebar_) {
-        sidebar_->setStyleSheet(ourStyleSheet());
-    }
-#endif
+    if (sidebar_)  sidebar_->setStyleSheet(ourStyleSheet());
 }
 
 void
