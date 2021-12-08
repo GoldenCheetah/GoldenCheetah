@@ -89,6 +89,7 @@ class ColorTheme
         // all public
         QString name;
         bool dark;
+        bool stealth;
         QList<QColor> colors;
 };
 

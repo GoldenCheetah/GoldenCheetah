@@ -743,6 +743,7 @@ Themes::Themes()
     // MODERN DARK (Sublime Editor inspired)
     add.name = tr("Modern Dark");
     add.dark = true;
+    add.stealth = false;
     colors << QColor(19,19,19) // Plot Background
            << QColor(32,32,32) // Toolbar and Sidebar Chrome
            << QColor(85,170,255) // Accent color (markers)
@@ -763,6 +764,7 @@ Themes::Themes()
     // MODERN LIGHT (SAP Fiori Belize inspired)
     add.name = tr("Modern Light");
     add.dark = false;
+    add.stealth = false;
     colors << QColor(Qt::white)  // Plot Background
            << QColor(0xef,0xf4,0xf9) // Toolbar and Sidebar Chrome
            << QColor(0x26,0x84,0xf6) // Accent color (markers)
@@ -779,8 +781,49 @@ Themes::Themes()
     themes << add;
     colors.clear();
 
+    // STEALTH DARK (tab placement and mostly black)
+    add.name = tr("Modern Stealth Dark");
+    add.dark = true;
+    add.stealth = true;
+    colors << QColor(19,19,19) // Plot Background
+           << QColor(19,19,19) // Toolbar and Sidebar Chrome
+           << QColor(85,170,255) // Accent color (markers)
+           << QColor(194,194,194) // Selection color
+           << QColor(Qt::yellow) // Critical Power and W'Bal
+           << QColor(Qt::red) // Heartrate
+           << QColor(Qt::green) // Speed
+           << QColor(255,170,0) // Power
+           << QColor(0,204,204) // Cadence
+           << QColor(Qt::magenta) // Torque
+           << QColor(19,19,19) // Overview Background
+           << QColor(30,30,30);// Overview Card Background
+    add.colors = colors;
+    themes << add;
+    colors.clear();
+
+    // STEALTH LIGHT (tab placement and mostly white)
+    add.name = tr("Modern Stealth Light");
+    add.dark = false;
+    add.stealth = true;
+    colors << QColor(255,255,255) // Plot Background
+           << QColor(255,255,255) // Toolbar and Sidebar Chrome
+           << QColor(52,99,255) // Accent color (markers)
+           << QColor(Qt::blue) // Selection color
+           << QColor(Qt::darkMagenta) // Critical Power and W'Bal
+           << QColor(Qt::red) // Heartrate
+           << QColor(85,170,0) // Speed
+           << QColor(255,170,0) // Power
+           << QColor(0,204,204) // Cadence
+           << QColor(Qt::magenta) // Torque
+           << QColor(255,255,255) // Overview Background
+           << QColor(245,245,245);// Overview Card Background
+    add.colors = colors;
+    themes << add;
+    colors.clear();
+
     add.name = tr("Gnome Adwaita Dark");
     add.dark = true;
+    add.stealth = false;
     colors << QColor(19,19,19)  // Plot Background
            << QColor(44,49,51) // Toolbar and Sidebar Chrome
            << QColor(85,170,255) // Accent color (markers)
@@ -799,6 +842,7 @@ Themes::Themes()
 
     add.name = tr("Team Colours (light)");
     add.dark = false;
+    add.stealth = false;
     colors << QColor(Qt::white)  // Plot Background
            << QColor(0x36,0x37,0x4b) // Toolbar and Sidebar Chrome
            << QColor(0x65,0x69,0xa5) // Accent color (markers)
@@ -817,6 +861,7 @@ Themes::Themes()
 
     add.name = tr("Ollie's Oatmeal (light)");
     add.dark = false;
+    add.stealth = false;
     colors << QColor(0xdd,0xef,0xe6)  // Plot Background
            << QColor(0x31,0x25,0x0b) // Toolbar and Sidebar Chrome
            << QColor(0x8d,0x57,0x30) // Accent color (markers)
@@ -835,6 +880,7 @@ Themes::Themes()
 
     add.name = tr("Mustang (dark)"); // ** DARK **
     add.dark = true;
+    add.stealth = false;
     colors << QColor(0,0,0)  // Plot Background
            << QColor(35,35,35) // Toolbar and Sidebar Chrome
            << QColor(255,152,0) // Accent color (markers)
@@ -853,6 +899,7 @@ Themes::Themes()
 
     add.name = tr("Mono (dark)"); // New v3.1 default colors // ** DARK **
     add.dark = true;
+    add.stealth = false;
     colors << QColor(Qt::black)  // Plot Background
            << QColor(Qt::black) // Toolbar and Sidebar Chrome
            << QColor(Qt::white) // Accent color (markers)
@@ -871,6 +918,7 @@ Themes::Themes()
 
     add.name = tr("Mono (light)"); // New v3.1 default colors // ** LIGHT **
     add.dark = false;
+    add.stealth = false;
     colors  << QColor(Qt::white)  // Plot Background
            << QColor(Qt::white) // Toolbar and Sidebar Chrome
            << QColor(Qt::black) // Accent color (markers)
@@ -890,6 +938,7 @@ Themes::Themes()
     // we can add more later ....
     add.name = tr("Schoberer (light)"); // Old GoldenCheetah colors // ** LIGHT **
     add.dark = false;
+    add.stealth = false;
     colors << QColor(Qt::white)  // Plot Background
            << QColor(0xec,0xec,0xec) // Toolbar and Sidebar Chrome
            << QColor(Qt::black) // Accent color (markers)
@@ -952,7 +1001,9 @@ GCColor::applyTheme(int index)
             break;
 
         case CHOVER:
-            color = theme.dark ? QColor(50,50,50) : QColor(200,200,200);
+            // stealthy themes use overview card background for hover color since they are close
+            // all other themes get a boring default
+            color = theme.stealth ? ColorList[96].color : (theme.dark ? QColor(50,50,50) : QColor(200,200,200));
             break;
 
         case CPLOTSYMBOL:

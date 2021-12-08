@@ -471,7 +471,16 @@ ChartBarItem::paintEvent(QPaintEvent *)
     painter.drawText(body, text, Qt::AlignHCenter | Qt::AlignVCenter);
 
     // draw the bar
-    if (checked) painter.fillRect(QRect(0,0,geometry().width(), 3*dpiXFactor), QBrush(GColor(CPLOTMARKER)));
+    if (checked) {
+        // at the top if the chartbar background is different to the plot background
+        if (GColor(CCHARTBAR) != color) painter.fillRect(QRect(0,0,geometry().width(), 3*dpiXFactor), QBrush(GColor(CPLOTMARKER)));
+        else {
+            // only underline the text with a little extra (why adding "XXX" below)
+            QFontMetrics fm(font());
+            double width = fm.boundingRect(text+"XXX").width();
+            painter.fillRect(QRect((geometry().width()-width)/2.0,geometry().height()-(3*dpiXFactor),width, 3*dpiXFactor), QBrush(GColor(CPLOTMARKER)));
+        }
+    }
 
     // draw the menu indicator
     if (underMouse()) {
