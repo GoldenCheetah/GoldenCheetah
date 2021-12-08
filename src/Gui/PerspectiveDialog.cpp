@@ -369,12 +369,12 @@ PerspectiveDialog::perspectiveNameChanged(QTableWidgetItem *item)
 void
 PerspectiveTableWidget::dragEnterEvent(QDragEnterEvent *event)
 {
-    bool accept = true;
+    bool accept = false;
 
     // must be a chartref (from dragging charts below) anything else we ignore
     // just in case someone tries to drag a file etc
     foreach (QString format, event->mimeData()->formats()) {
-        if (format != "application/x-gc-chartref") accept = false;
+        if (format == "application/x-gc-chartref") accept = true;
     }
 
     if (accept) {
