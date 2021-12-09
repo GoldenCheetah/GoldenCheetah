@@ -39,6 +39,9 @@ OverviewWindow::OverviewWindow(Context *context, int scope) : GcChartWindow(cont
     QAction *importChart= new QAction(tr("Import Chart..."));
     addAction(importChart);
 
+    QAction *renameChart= new QAction(tr("Rename..."));
+    addAction(renameChart);
+
     setControls(NULL);
 
     QHBoxLayout *main = new QHBoxLayout;
@@ -73,6 +76,7 @@ OverviewWindow::OverviewWindow(Context *context, int scope) : GcChartWindow(cont
     // menu items
     connect(addTile, SIGNAL(triggered(bool)), this, SLOT(addTile()));
     connect(importChart, SIGNAL(triggered(bool)), this, SLOT(importChart()));
+    connect(renameChart, SIGNAL(triggered(bool)), this, SLOT(renameChart()));
     connect(space, SIGNAL(itemConfigRequested(ChartSpaceItem*)), this, SLOT(configItem(ChartSpaceItem*)));
 }
 
@@ -92,6 +96,12 @@ OverviewWindow::addTile()
         if (added->parent->scope & OverviewScope::TRENDS ) added->setDateRange(added->parent->currentDateRange);
 
     }
+}
+
+void
+OverviewWindow::renameChart()
+{
+    emit showControls();
 }
 
 void
