@@ -491,7 +491,7 @@ ChartBarItem::paintEvent(QPaintEvent *)
         if (checked) {
 
             // different color if under mouse
-            QBrush brush(GColor(CHOVER));
+            QBrush brush(GCColor::invertColor(color));
             if (hotspot.contains(mouse)) brush.setColor(GColor(CPLOTMARKER));
             painter.fillPath (triangle, brush);
         } else {
@@ -527,9 +527,9 @@ ChartBarItem::event(QEvent *e)
 {
     // resize?
     if (e->type() == QEvent::Resize) {
-        int startx = width() - (20*dpiXFactor);
+        int startx = width() - (25*dpiXFactor);
         int depth = height() / 4;
-        int starty = (height() / 2.0) - (depth/2) + 3*dpiXFactor; // middle, taking into account bar at top
+        int starty = (height() / 2.0) - (depth/2) + 1*dpiXFactor; // middle, taking into account bar at top
         int hs = 3 * dpiXFactor;
 
         // set the triangle
