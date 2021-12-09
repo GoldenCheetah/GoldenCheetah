@@ -74,6 +74,11 @@ class Perspective : public GcWindow
         QString expression() const;
         void setExpression(QString);
 
+        // trainswitch
+        enum switchenum { None=0, Erg=1, Slope=2, Video=3 };
+        int trainSwitch() const { return trainswitch; }
+        void setTrainSwitch(int x) { trainswitch = (switchenum)x; }
+
         // import and export
         static Perspective *fromFile(Context *context, QString filename, int type);
         bool toFile(QString filename);
@@ -182,6 +187,9 @@ class Perspective : public GcWindow
         DataFilter *df;
         QString expression_;
 
+        // train view switching
+        switchenum trainswitch;
+
         static void translateChartTitles(QList<GcChartWindow*> charts);
 };
 
@@ -244,12 +252,13 @@ class AddPerspectiveDialog : public QDialog
     Q_OBJECT
 
     public:
-        AddPerspectiveDialog(QWidget *parent, Context *context, QString &name, QString &expression, int type, bool edit=false);
+        AddPerspectiveDialog(QWidget *parent, Context *context, QString &name, QString &expression, int type, Perspective::switchenum &trainswitch, bool edit=false);
 
     protected:
         QLineEdit *nameEdit;
         SearchBox *filterEdit;
         QPushButton *add, *cancel;
+        QComboBox *trainSwitch;
 
     public slots:
         void addClicked();
@@ -259,6 +268,7 @@ class AddPerspectiveDialog : public QDialog
         Context *context;
         QString &name;
         QString &expression;
+        Perspective::switchenum &trainswitch;
         int type;
 };
 #endif // _GC_HomeWindow_h

@@ -233,7 +233,7 @@ PerspectiveDialog::editPerspectiveClicked()
 
         Perspective *editing = tabView->perspectives_[index];
         QString expression=editing->expression();
-        AddPerspectiveDialog *dialog= new AddPerspectiveDialog(this, tabView->context, editing->title_, expression, tabView->type, true);
+        AddPerspectiveDialog *dialog= new AddPerspectiveDialog(this, tabView->context, editing->title_, expression, tabView->type, editing->trainswitch, true);
         int ret= dialog->exec();
         delete dialog;
         if (ret == QDialog::Accepted) {
@@ -249,7 +249,8 @@ PerspectiveDialog::addPerspectiveClicked()
 {
     QString name;
     QString expression;
-    AddPerspectiveDialog *dialog= new AddPerspectiveDialog(this, tabView->context, name, expression, tabView->type);
+    Perspective::switchenum trainswitch = Perspective::None;
+    AddPerspectiveDialog *dialog= new AddPerspectiveDialog(this, tabView->context, name, expression, tabView->type, trainswitch);
     int ret= dialog->exec();
     delete dialog;
     if (ret == QDialog::Accepted && name != "") {

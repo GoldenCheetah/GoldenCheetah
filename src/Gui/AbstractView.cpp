@@ -930,6 +930,7 @@ bool ViewParser::startElement( const QString&, const QString&, const QString &na
 
         QString name="General";
         int typetouse=type;
+        int trainswitch=0;
         QString expression;
         for(int i=0; i<attrs.count(); i++) {
             if (attrs.qName(i) == "style") {
@@ -944,11 +945,15 @@ bool ViewParser::startElement( const QString&, const QString&, const QString &na
             if (attrs.qName(i) == "type") {
                 typetouse = Utils::unprotect(attrs.value(i)).toInt();
             }
+            if (attrs.qName(i) == "trainswitch") {
+                trainswitch = attrs.value(i).toInt();
+            }
         }
 
         // we need a new perspective for this view type
         page = new Perspective(context, name, typetouse);
         page->setExpression(expression);
+        page->setTrainSwitch(trainswitch);
         perspectives.append(page);
     }
     else if (name == "chart") {

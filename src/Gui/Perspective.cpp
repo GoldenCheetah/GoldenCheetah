@@ -77,7 +77,7 @@ static const int tileSpacing = 10;
 
 Perspective::Perspective(Context *context, QString title, int type) :
     GcWindow(context), context(context), active(false),  resizing(false), clicked(NULL), dropPending(false),
-    type_(type), title_(title), chartCursor(-2), df(NULL), expression_("")
+    type_(type), title_(title), chartCursor(-2), df(NULL), expression_(""), trainswitch(None)
 {
     SSS;
     // setup control area
@@ -1581,8 +1581,12 @@ void
 Perspective::toXml(QTextStream &out)
 {
     SSS;
-    out<<"<layout name=\""<< title_ <<"\" style=\"" << currentStyle
-       <<"\" type=\"" << type_<<"\" expression=\"" << Utils::xmlprotect(expression_) << "\">\n";
+    out<<"<layout name=\""<< title_
+       <<"\" style=\"" << currentStyle
+       <<"\" type=\"" << type_
+       <<"\" expression=\"" << Utils::xmlprotect(expression_)
+       <<"\" trainswitch=\"" << (int)trainswitch
+       << "\">\n";
 
     // iterate over charts
     foreach (GcChartWindow *chart, charts) {
@@ -1842,8 +1846,8 @@ ImportChartDialog::cancelClicked()
     accept();
 }
 
-AddPerspectiveDialog::AddPerspectiveDialog(QWidget *parent, Context *context, QString &name, QString &expression, int type, bool edit) :
-    QDialog(parent), context(context), name(name), expression(expression), type(type)
+AddPerspectiveDialog::AddPerspectiveDialog(QWidget *parent, Context *context, QString &name, QString &expression, int type, Perspective::switchenum &trainswitch, bool edit) :
+    QDialog(parent), context(context), name(name), expression(expression), trainswitch(trainswitch), type(type)
 {
     SSS;
     setWindowFlags(windowFlags());
@@ -1869,6 +1873,16 @@ AddPerspectiveDialog::AddPerspectiveDialog(QWidget *parent, Context *context, QS
         if (type == VIEW_TRENDS) form->addRow(new QLabel(tr("Activities filter")), filterEdit);
     }
 
+    if (type == VIEW_TRAIN) {
+        trainSwitch = new QComboBox(this);
+        trainSwitch->addItem(tr("Don't switch"), Perspective::None);
+        trainSwitch->addItem(tr("Erg Workout"), Perspective::Erg);
+        trainSwitch->addItem(tr("Slope Workout"), Perspective::Slope);
+        trainSwitch->addItem(tr("Video Workout"), Perspective::Video);
+        trainSwitch->setCurrentIndex(trainswitch);
+        form->addRow(new QLabel(tr("Switch for")), trainSwitch);
+    }
+
     QHBoxLayout *buttons = new QHBoxLayout();
     if (edit) add = new QPushButton(tr("OK"), this);
     else add = new QPushButton(tr("Add"), this);
@@ -1888,6 +1902,7 @@ AddPerspectiveDialog::addClicked()
     SSS;
     name = nameEdit->text();
     if (type == VIEW_ANALYSIS || type == VIEW_TRENDS) expression = filterEdit->text();
+    if (type == VIEW_TRAIN) trainswitch=(Perspective::switchenum)trainSwitch->itemData(trainSwitch->currentIndex(), Qt::UserRole).toInt();
     accept();
 }
 

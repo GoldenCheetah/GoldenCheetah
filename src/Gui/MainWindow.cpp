@@ -1501,7 +1501,8 @@ MainWindow::perspectiveSelected(int index)
             {
                 QString name;
                 QString expression;
-                AddPerspectiveDialog *dialog= new AddPerspectiveDialog(this, currentAthleteTab->context, name, expression, current->type);
+                Perspective::switchenum trainswitch=Perspective::None;
+                AddPerspectiveDialog *dialog= new AddPerspectiveDialog(this, currentAthleteTab->context, name, expression, current->type, trainswitch);
                 int ret= dialog->exec();
                 delete dialog;
                 if (ret == QDialog::Accepted && name != "") {
@@ -1509,6 +1510,7 @@ MainWindow::perspectiveSelected(int index)
                     // add...
                     Perspective *newone = current->addPerspective(name);
                     newone->setExpression(expression);
+                    newone->setTrainSwitch(trainswitch);
                     current->setPerspectives(perspectiveSelector);
 
                     // and select remember pactive is true, so we do the heavy lifting here
