@@ -96,14 +96,11 @@ class TrainSidebar : public GcWindow
 
         TrainSidebar(Context *context);
         Context *context;
+        void setTrainView(TrainView*x) { trainView=x; }
 
         QStringList listWorkoutFiles(const QDir &) const;
 
         QList<int> devices(); // convenience function for iterating over active devices
-
-        const QTreeWidgetItem *currentWorkout() { return workout; }
-        const QTreeWidgetItem *currentMedia() { return media; }
-        const QTreeWidgetItem *workoutItems() { return allWorkouts; }
 
         int selectedDeviceNumber();
 
@@ -241,11 +238,6 @@ class TrainSidebar : public GcWindow
         QSortFilterProxyModel *vsortModel; // sorting video list
         QSortFilterProxyModel *vssortModel; // sorting videosync list
 
-        QTreeWidgetItem *allWorkouts;
-        QTreeWidgetItem *workout;
-        QTreeWidgetItem *videosync;
-        QTreeWidgetItem *media;
-
         int lastAppliedIntensity;// remember how we scaled last time
 
         int FTP; // current FTP / CP
@@ -315,7 +307,9 @@ class TrainSidebar : public GcWindow
 
     public:
         int mode;
+        QString mediafile, workoutfile;
         // everyone else wants this
+        TrainView *trainView;
         QCheckBox   *recordSelector;
         QSharedPointer<QFileSystemWatcher> watcher;
         bool calibrating;

@@ -35,6 +35,7 @@ class AthleteTab;
 class ViewSplitter;
 class Context;
 class BlankStatePage;
+class TrainSidebar;
 class PerspectiveDialog;
 
 class AbstractView : public QWidget
@@ -46,6 +47,7 @@ class AbstractView : public QWidget
     Q_PROPERTY(bool selected READ isSelected WRITE setSelected USER true) // make this last always
 
     friend class ::MainWindow;
+    friend class ::TrainSidebar;
     friend class ::PerspectiveDialog;
 
     public:

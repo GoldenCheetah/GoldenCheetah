@@ -86,6 +86,7 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
     QVBoxLayout *cl = new QVBoxLayout(c);
     setControls(c);
     autoConnect = false;
+    trainView=NULL;
     useSimulatedSpeed = false;
 
     cl->setSpacing(0);
@@ -763,6 +764,7 @@ TrainSidebar::workoutTreeWidgetSelectionChanged()
     // wipe away the current selected workout once we've told everyone
     // since they might be editing it and want to save changes first (!!)
     ErgFile *prior = const_cast<ErgFile*>(ergFileQueryAdapter.getErgFile());
+    workoutfile = filename;
 
     if (filename == "") {
 
@@ -1084,10 +1086,13 @@ TrainSidebar::mediaTreeWidgetSelectionChanged()
     QModelIndex current = mediaTree->currentIndex();
     QModelIndex target = vsortModel->mapToSource(current);
     QString filename = videoModel->data(videoModel->index(target.row(), 0), Qt::DisplayRole).toString();
-    if (filename == context->videoFilename)
+    if (filename == context->videoFilename) {
+        mediafile = "";
         context->notifyMediaSelected(""); // CTRL+Click to clear selection
-    else
+    } else {
+        mediafile = filename;
         context->notifyMediaSelected(filename);
+    }
 }
 
 void
@@ -1571,6 +1576,30 @@ void TrainSidebar::Connect()
     gui_timer->start(REFRESHRATE);
 
     emit setNotification(tr("Connected.."), 2);
+
+    // lets SWITCH PERSPECTIVE as we are connected, but only
+    // if everything has been initialised properly (aka lazy load)
+    // given the connect widget is on the train view it is unlikely
+    // below will ever be false, but no harm in checking
+    if (trainView && trainView->page()) {
+
+        Perspective::switchenum want=Perspective::None;
+        if (mediafile != "") want=Perspective::Video; // if media file selected
+        else want = (mode == ERG || mode == MRC) ? Perspective::Erg : Perspective::Slope; // mode always known
+
+        // so we want a view type and the current page isn't what
+        // we want then lets go find one to switch to and switch
+        // to the first one that matches
+        if (want != Perspective::None && trainView->page()->trainSwitch() != want) {
+
+            for(int i=0; i<trainView->perspectives_.count(); i++) {
+                if (trainView->perspectives_[i]->trainSwitch() == want) {
+                    context->mainWindow->switchPerspective(i);
+                    break;
+                }
+            }
+        }
+    }
 }
 
 void TrainSidebar::Disconnect()

@@ -288,6 +288,7 @@ TrendsView::justSelected()
 TrainView::TrainView(Context *context, QStackedWidget *controls) : AbstractView(context, VIEW_TRAIN)
 {
     trainTool = new TrainSidebar(context);
+    trainTool->setTrainView(this);
     trainTool->hide();
     BlankStateTrainPage *b = new BlankStateTrainPage(context);
 
