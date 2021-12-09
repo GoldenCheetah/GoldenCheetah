@@ -886,6 +886,16 @@ void
 Perspective::showEvent(QShowEvent *)
 {
     SSS;
+
+    // just before we show lets make sure it all looks good
+    // bear in mind the perspective may have been loaded but
+    // the formatting of contents doesn't happen till we have
+    // a style and we are shown.
+    for(int index=0; index<charts.count(); index++) {
+        if (currentStyle == 0) charts[index]->setContentsMargins(0,0,0,0);
+        else charts[index]->setContentsMargins(0,15*dpiXFactor,0,0);
+    }
+
     resize();
 }
 
