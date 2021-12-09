@@ -252,7 +252,7 @@ void Nolio::readFileCompleted(){
 
 QByteArray* Nolio::prepareResponse(QByteArray* data){
     printd("Nolio::prepareResponse()\n");
-    qDebug() << *data;
+    //qDebug() << *data;
     QJsonParseError parseError;
     QJsonDocument document = QJsonDocument::fromJson(data->constData(), &parseError);
 
@@ -283,7 +283,7 @@ QByteArray* Nolio::prepareResponse(QByteArray* data){
         if (!activity["description"].isNull()) {
             ride->setTag("Notes", activity["description"].toString());
         }
-
+        /*
         if (activity["distance"].toDouble()>0) {
             QMap<QString,QString> map;
             map.insert("value", QString("%1").arg(activity["distance"].toDouble()));
@@ -299,39 +299,34 @@ QByteArray* Nolio::prepareResponse(QByteArray* data){
             map.insert("value", QString("%1").arg(activity["elevation_gain"].toDouble()));
             ride->metricOverrides.insert("elevation_gain", map);
         }
-
+        */
         QString athlete_name = getSetting(GC_NOLIO_ATHLETE_NAME, "").toString();
         if (athlete_name.length() > 0) ride->setTag("Athlete", athlete_name);
 
         // Streams
-        static struct {
-            RideFile::seriestype type;
-            const char *nolioname;
-            double factor;                  // to convert from Strava units to GC units
-        } seriesnames[] = {
-                // seriestype          nolio name           conversion factor
-                { RideFile::secs,      "stream_time",                  1.0f   },
-                { RideFile::alt,       "stream_altitude",              1.0f   },
-                { RideFile::km,        "stream_distance" ,             0.001f },
-                { RideFile::kph,       "stream_pace",                  3.6f   },
-                { RideFile::hr,        "stream_heartrate",             1.0f   },
-                { RideFile::cad,       "stream_cadence",               1.0f   },
-                { RideFile::watts,     "stream_watts",                 1.0f   },
-                { RideFile::none,      "",                             0.0f   }
 
-        };
+        QJsonArray streams = activity["streams"].toArray();
+        if (streams.size() > 0) {
+            for (int i = 0; i < streams.size(); i++) {
+                QJsonObject sample = streams.at(i).toObject();
 
-        // data to combine into a new ride
-        class nolio_stream {
-        public:
-            double factor; // for converting
-            RideFile::seriestype type;
-            QJsonArray samples;
-        };
-
-        // create a list of all the data we will work with
-        QList<nolio_stream> stream_data;
-        QJsonObject streams = activity["streams"].toObject();
+                RideFilePoint add;
+                add.setValue(RideFile::secs, sample["time"].toDouble());
+                add.setValue(RideFile::km, sample["distance"].toDouble() * 0.001f);
+                add.setValue(RideFile::kph, sample["pace"].toDouble() * 3.6f);
+                add.setValue(RideFile::alt, sample["altitude"].toDouble());
+                add.setValue(RideFile::watts, sample["watts"].toDouble());
+                add.setValue(RideFile::cad, sample["cadence"].toDouble());
+                add.setValue(RideFile::hr, sample["heartrate"].toDouble());
+                if (sample.contains("torque")) add.setValue(RideFile::nm, sample["torque"].toDouble());
+                if (sample.contains("gps")){
+                    QJsonArray gps_points = sample["gps"].toArray();
+                    add.setValue(RideFile::lat, gps_points[0].toDouble());
+                    add.setValue(RideFile::lon, gps_points[1].toDouble());
+                }
+                ride->appendPoint(add);
+            }
+        }
 
         JsonFileReader reader;
         data->clear();
@@ -340,7 +335,7 @@ QByteArray* Nolio::prepareResponse(QByteArray* data){
         delete ride; // delete useless temp ride
     }
     printd("Nolio::prepareResponse() finished\n");
-    qDebug() << *data;
+    //qDebug() << *data;
     return data;
 }
 
