@@ -4642,6 +4642,11 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
                 int index=0;
                 if (km || secs || (index=xds->valuename.indexOf(series)) != -1) {
                     foreach(XDataPoint *p, xds->datapoints) {
+
+                        // honor interval boundaries when limits are set
+                        if (p->secs < s.secsStart()) continue;
+                        if (s.secsEnd() > -1 && p->secs > s.secsEnd()) break;
+
                         double value=0;
                         if (km) value = p->km;
                         else if (secs) value = p->secs;
