@@ -483,8 +483,15 @@ void ErgFile::parseComputrainer(QString p)
     QRegExp lapmarker("^[ \\t]*([0-9\\.]+)[ \\t]*LAP[ \\t\\n]*(.*)$", Qt::CaseInsensitive);
     QRegExp crslapmarker("^[ \\t]*LAP[ \\t\\n]*(.*)$", Qt::CaseInsensitive);
 
-    // text cue records
-    QRegExp textCue("^([0-9\\.]+)[ \\t]*([^\\t]+)[\\t]+([0-9]+)[ \\t\\n]*$", Qt::CaseInsensitive);
+    // text cue records - try and be flexible about formatting:
+    // sol <number> <whitespace> <text including whitespace and numbers> <whitespace> <number> <optional whitespace> eol
+    //
+    // there is no standard, so we need to try our best to accomodate different formats and trim
+    // the text to remove any whitespace before and after it when displaying to the user
+    //
+    // since we only match with this expression when in text section there is no need to worry
+    // about it clashing with any other rows which helps.
+    QRegExp textCue("^([0-9\\.]+)[ \\t]*(.*)[ \\t]([0-9]+)[ \\t\\n]*$", Qt::CaseInsensitive);
 
     // ok. opened ok lets parse.
     QTextStream inputStream(&ergFile);
@@ -645,7 +652,7 @@ void ErgFile::parseComputrainer(QString p)
                 // x, text cue, duration
                 double x = textCue.cap(1).toDouble() * 1000.; // convert to msecs or m
                 int duration = textCue.cap(3).toInt(); // duration in secs
-                Texts<<ErgFileText(x, duration, textCue.cap(2));
+                Texts<<ErgFileText(x, duration, textCue.cap(2).trimmed());
             } else {
               // ignore bad lines for now. just bark.
               //qDebug()<<"huh?" << line;
