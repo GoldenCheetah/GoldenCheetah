@@ -28,6 +28,7 @@
 #include "IdleTimer.h"
 #include "PowerProfile.h"
 #include "GcCrashDialog.h" // for versionHTML
+#include "OverviewItems.h"
 
 #include <QApplication>
 #include <QDesktopWidget>
@@ -637,11 +638,17 @@ main(int argc, char *argv[])
             gcTranslator.load(":translations" + translation_file);
         application->installTranslator(&gcTranslator);
 
+        // Now the translator is installed, set default colors with translated names
+        GCColor::setupColors();
+
         // Initialize metrics once the translator is installed
         RideMetricFactory::instance().initialize();
 
         // Initialize global registry once the translator is installed
         GcWindowRegistry::initialize();
+
+        // initialize Overview Items once the translator is installed
+        OverviewItemConfig::registerItems();
 
         // initialise the trainDB
         trainDB = new TrainDB(home);

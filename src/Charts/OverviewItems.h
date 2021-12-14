@@ -63,6 +63,8 @@ class OverviewItemConfig : public QWidget
         OverviewItemConfig(ChartSpaceItem *);
         ~OverviewItemConfig();
 
+        static bool registerItems();
+
     public slots:
 
         // retrieve values when user edits them (if they're valid)

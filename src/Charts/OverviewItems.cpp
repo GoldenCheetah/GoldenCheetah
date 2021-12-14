@@ -48,7 +48,8 @@
 #include <QJsonArray>
 #include <QJsonValue>
 
-static bool _registerItems()
+bool
+OverviewItemConfig::registerItems()
 {
     // get the factory
     ChartSpaceItemRegistry &registry = ChartSpaceItemRegistry::instance();
@@ -70,7 +71,6 @@ static bool _registerItems()
 
     return true;
 }
-static bool registered = _registerItems();
 
 static void setFilter(ChartSpaceItem *item, Specification &spec)
 {
