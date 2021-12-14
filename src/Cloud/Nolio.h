@@ -49,9 +49,6 @@ class Nolio : public CloudService {
 
         QList<CloudServiceEntry*> readdir(QString path, QStringList &errors, QDateTime from, QDateTime to);
 
-        // write a file
-        //bool writeFile(QByteArray &data, QString remotename, RideFile *ride);
-
         // read a file
         bool readFile(QByteArray *data, QString remotename, QString remoteid);
         QByteArray* prepareResponse(QByteArray* data);
@@ -67,25 +64,16 @@ class Nolio : public CloudService {
         CloudServiceEntry *root() { return root_; }
 
     public slots:
-
         // getting data
         void readyRead(); // a readFile operation has work to do
         void readFileCompleted();
-
-        // sending data
-        //void writeFileCompleted();
 
     private:
         Context *context;
         QNetworkAccessManager *nam;
         CloudServiceEntry *root_;
 
-
         QMap<QNetworkReply*, QByteArray*> buffers;
-
-        //QString userId;
-
-        //QMap<QString, QJsonObject> replyActivity;
 
 
     private slots:
