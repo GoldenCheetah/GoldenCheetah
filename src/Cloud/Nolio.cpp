@@ -55,10 +55,8 @@ Nolio::Nolio(Context *context) : CloudService(context), context(context), root_(
         connect(nam, SIGNAL(sslErrors(QNetworkReply*, const QList<QSslError> & )), this, SLOT(onSslErrors(QNetworkReply*, const QList<QSslError> & )));
     }
 
-    //uploadCompression = gzip; // gzip
     downloadCompression = none;
     filetype = uploadType::JSON;
-    //useMetric = true; // distance and duration metadata
 
     // config
     settings.insert(OAuthToken, GC_NOLIO_ACCESS_TOKEN);
@@ -66,7 +64,6 @@ Nolio::Nolio(Context *context) : CloudService(context), context(context), root_(
     settings.insert(DefaultURL, "https://www.nolio.io");
     settings.insert(Local1, GC_NOLIO_REFRESH_TOKEN);
     settings.insert(Local2, GC_NOLIO_LAST_REFRESH);
-    //settings.insert(Key, GC_NOLIO_USERKEY);
     settings.insert(AthleteID, GC_NOLIO_ATHLETE_ID);
     settings.insert(Local3, GC_NOLIO_ATHLETE_NAME);
 }
@@ -151,14 +148,13 @@ QList<CloudServiceEntry*> Nolio::readdir(QString path, QStringList &errors, QDat
         return returning;
     }
 
-
-    QString userId = getSetting(GC_NOLIO_ATHLETE_ID, "").toString();
+    QString user_id = getSetting(GC_NOLIO_ATHLETE_ID, "").toString();
 
     QString urlstr = "https://nolio2.eu.ngrok.io/api/get/training/?";
     QUrlQuery params;
     params.addQueryItem("from", from.toString("yyyy-MM-dd"));
     params.addQueryItem("to", to.toString("yyyy-MM-dd"));
-    if(userId.length() > 0) params.addQueryItem("athlete_id", userId);
+    if(user_id.length() > 0) params.addQueryItem("athlete_id", user_id);
     QUrl url = QUrl(urlstr + params.toString());
     QNetworkRequest request(url);
     // request using the bearer token
@@ -171,9 +167,8 @@ QList<CloudServiceEntry*> Nolio::readdir(QString path, QStringList &errors, QDat
     loop.exec();
 
     if (reply->error() != QNetworkReply::NoError) {
-        qDebug() << "error" << reply->errorString();
         errors << "Network Problem reading Nolio data";
-        //return returning;
+        return returning;
     }
     // did we get a good response ?
     QByteArray r = reply->readAll();
@@ -196,8 +191,6 @@ QList<CloudServiceEntry*> Nolio::readdir(QString path, QStringList &errors, QDat
                 add->distance = each["distance"].toDouble();
                 add->duration = each["duration"].toInt();
                 add->name = QDateTime::fromString(each["date_start"].toString(), Qt::ISODate).toString("yyyy_MM_dd_HH_mm_ss")+".json";
-
-                //qDebug() << add->label << add->name;
                 returning << add;
             }
         }
@@ -207,12 +200,10 @@ QList<CloudServiceEntry*> Nolio::readdir(QString path, QStringList &errors, QDat
 
 bool Nolio::readFile(QByteArray *data, QString remotename, QString remoteid){
     printd("Nolio::readFile\n");
-    qDebug() << remoteid << remotename;
 
     // do we have a token
     QString access_token = getSetting(GC_NOLIO_ACCESS_TOKEN, "").toString();
     if (access_token == "") {
-        qDebug() << "You must authorise with Nolio first";
         return false;
     }
 
@@ -245,26 +236,22 @@ void Nolio::readyRead(){
 void Nolio::readFileCompleted(){
     printd("Nolio::readCompleted");
     QNetworkReply *reply = static_cast<QNetworkReply*>(QObject::sender());
-    //printd("reply:%s\n", buffers.value(reply)->toStdString().c_str());
     QByteArray* data = prepareResponse(buffers.value(reply));
     notifyReadComplete(data, replyName(reply), tr("Completed."));
 }
 
 QByteArray* Nolio::prepareResponse(QByteArray* data){
     printd("Nolio::prepareResponse()\n");
-    //qDebug() << *data;
     QJsonParseError parseError;
     QJsonDocument document = QJsonDocument::fromJson(data->constData(), &parseError);
 
-    // if path was returned all is good, lets set root
     if (parseError.error == QJsonParseError::NoError) {
         QJsonObject activity = document.object();
-        QDateTime starttime = QDateTime::fromString(activity["date_start"].toString(), Qt::ISODate);
-        // 1s samples with start time
-        RideFile *ride = new RideFile(starttime.toUTC(), 1.0f);
+        QDateTime start_time = QDateTime::fromString(activity["date_start"].toString(), Qt::ISODate);
+        RideFile *ride = new RideFile(start_time.toUTC(), 1.0f);
         // set nolio id in metadata
         if (!activity["nolio_id"].isNull()) ride->setTag("NolioID",  QString("%1").arg(activity["id"].toVariant().toULongLong()));
-        // what sport?
+        // set sport and subsport
         if (!activity["sport_id"].isNull()) {
             double sport_id = activity["sport_id"].toDouble();
             if (sport_id == 14 or sport_id == 15 or sport_id == 18 or sport_id == 28 or sport_id == 35 or sport_id == 36) ride->setTag("Sport", "Bike");
@@ -273,44 +260,30 @@ QByteArray* Nolio::prepareResponse(QByteArray* data){
             else if (sport_id == 33 or sport_id == 69) ride->setTag("Sport", "Row");
             else if (sport_id == 3 or sport_id == 4) ride->setTag("Sport", "Ski");
             else ride->setTag("Sport", activity["sport"].toString());
+            ride->setTag("SubSport", activity["sport"].toString());
         }
+
+        // do we have a rpe?
         if (!activity["rpe"].isNull()) {
             QString rpe = QString("%1").arg(activity["rpe"].toDouble());
             ride->setTag("RPE", rpe);
         }
 
+        if (!activity["name"].isNull()) ride->setTag("Title", activity["name"].toString());
+
         // description saved to Notes
-        if (!activity["description"].isNull()) {
-            ride->setTag("Notes", activity["description"].toString());
-        }
-        /*
-        if (activity["distance"].toDouble()>0) {
-            QMap<QString,QString> map;
-            map.insert("value", QString("%1").arg(activity["distance"].toDouble()));
-            ride->metricOverrides.insert("total_distance", map);
-        }
-        if (activity["duration"].toDouble()>0) {
-            QMap<QString,QString> map;
-            map.insert("value", QString("%1").arg(activity["duration"].toDouble()));
-            ride->metricOverrides.insert("time_riding", map);
-        }
-        if (activity["elevation_gain"].toDouble()>0) {
-            QMap<QString,QString> map;
-            map.insert("value", QString("%1").arg(activity["elevation_gain"].toDouble()));
-            ride->metricOverrides.insert("elevation_gain", map);
-        }
-        */
+        if (!activity["description"].isNull()) ride->setTag("Notes", activity["description"].toString());
+
         QString athlete_name = getSetting(GC_NOLIO_ATHLETE_NAME, "").toString();
         if (athlete_name.length() > 0) ride->setTag("Athlete", athlete_name);
 
         // Streams
-
         QJsonArray streams = activity["streams"].toArray();
         if (streams.size() > 0) {
             for (int i = 0; i < streams.size(); i++) {
                 QJsonObject sample = streams.at(i).toObject();
-
                 RideFilePoint add;
+
                 add.setValue(RideFile::secs, sample["time"].toDouble());
                 add.setValue(RideFile::km, sample["distance"].toDouble() * 0.001f);
                 add.setValue(RideFile::kph, sample["pace"].toDouble() * 3.6f);
@@ -324,7 +297,34 @@ QByteArray* Nolio::prepareResponse(QByteArray* data){
                     add.setValue(RideFile::lat, gps_points[0].toDouble());
                     add.setValue(RideFile::lon, gps_points[1].toDouble());
                 }
+                if (sample.contains("lrbalance")) add.setValue(RideFile::lrbalance, sample["lrbalance"].toDouble());
+                if (sample.contains("left_power_phase_start")) add.setValue(RideFile::lppb, sample["left_power_phase_start"].toDouble());
+                if (sample.contains("left_power_phase_end")) add.setValue(RideFile::lppe, sample["left_power_phase_end"].toDouble());
+                if (sample.contains("left_power_phase_peak_start")) add.setValue(RideFile::lpppb, sample["left_power_phase_peak_start"].toDouble());
+                if (sample.contains("left_power_phase_peak_end")) add.setValue(RideFile::lpppe, sample["left_power_phase_peak_end"].toDouble());
+                if (sample.contains("right_power_phase_start")) add.setValue(RideFile::rppb, sample["right_power_phase_start"].toDouble());
+                if (sample.contains("right_power_phase_end")) add.setValue(RideFile::rppe, sample["right_power_phase_end"].toDouble());
+                if (sample.contains("right_power_phase_peak_start")) add.setValue(RideFile::rpppb, sample["right_power_phase_peak_start"].toDouble());
+                if (sample.contains("right_power_phase_peak_end")) add.setValue(RideFile::rpppe, sample["right_power_phase_peak_end"].toDouble());
                 ride->appendPoint(add);
+            }
+        }
+        // if stream is empty --> manual workout
+        else{
+            if (activity["distance"].toDouble()>0) {
+                QMap<QString,QString> map;
+                map.insert("value", QString("%1").arg(activity["distance"].toDouble()));
+                ride->metricOverrides.insert("total_distance", map);
+            }
+            if (activity["duration"].toDouble()>0) {
+                QMap<QString,QString> map;
+                map.insert("value", QString("%1").arg(activity["duration"].toDouble()));
+                ride->metricOverrides.insert("time_riding", map);
+            }
+            if (activity["elevation_gain"].toDouble()>0) {
+                QMap<QString,QString> map;
+                map.insert("value", QString("%1").arg(activity["elevation_gain"].toDouble()));
+                ride->metricOverrides.insert("elevation_gain", map);
             }
         }
 
@@ -334,8 +334,6 @@ QByteArray* Nolio::prepareResponse(QByteArray* data){
 
         delete ride; // delete useless temp ride
     }
-    printd("Nolio::prepareResponse() finished\n");
-    //qDebug() << *data;
     return data;
 }
 
@@ -366,7 +364,6 @@ QList<CloudServiceAthlete> Nolio::listAthletes(){
 
     if (parseError.error == QJsonParseError::NoError) {
         QJsonArray results = document.array();
-        qDebug() << results;
         if (results.size() > 0) {
             for (int i = 0; i < results.size(); i++) {
                 QJsonObject each = results.at(i).toObject();
@@ -374,7 +371,6 @@ QList<CloudServiceAthlete> Nolio::listAthletes(){
 
                 add.id = QString("%1").arg(each["nolio_id"].toInt());
                 add.name = each["name"].toString();
-                add.desc = QString("relationship: athlete");
                 returning << add;
             }
         }
@@ -384,7 +380,6 @@ QList<CloudServiceAthlete> Nolio::listAthletes(){
 
 bool Nolio::selectAthlete(CloudServiceAthlete athlete){
     printd("Nolio::selectAthlete\n");
-    qDebug() << athlete.name << athlete.id;
     // extract athlete name and identifier from the selected athlete
     // TODO
     setSetting(GC_NOLIO_ATHLETE_ID, athlete.id.toInt());
