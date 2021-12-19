@@ -97,7 +97,7 @@ static struct {
 
     { "ceil", 1 },
     { "floor", 1 },
-    { "round", 1 },
+    { "round", 0 }, // round(x) or round(x, dp)
 
     { "fabs", 1 },
     { "isinf", 1 },
@@ -1942,6 +1942,22 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
                                 leaf->inerror = true;
                                 DataFiltererrors << QString(tr("unknown function '%1', must be one of mean|sum|max|min|count.").arg(symbol));
                             }
+                        }
+                    }
+
+                } else if (leaf->function == "round") {
+
+                    // can  be either round(expr) or round(expr, dp)
+                    // where expr evaluates to numeric and dp is a number
+                    if (leaf->fparms.count() != 1 && leaf->fparms.count() != 2) {
+
+                        leaf->inerror = true;
+                        DataFiltererrors << QString(tr("round(v) or round(v, dp)"));
+
+                    } else {
+                        // validate the parameters
+                        for(int i=0; i<leaf->fparms.count(); i++) {
+                            validateFilter(context, df, leaf->fparms[i]);
                         }
                     }
 
@@ -6571,6 +6587,29 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
                 return Result(RideFileCache::tiz(m->context, m->fileName, leaf->seriesType, duration));
         }
 
+        if (leaf->function == "round") {
+            // round(expr) or round(expr, dp)
+            Result returning(0);
+
+            double factor = 1; // 0 decimal places
+            if (leaf->fparms.count() == 2) {
+                Result dpv = eval(df, leaf->fparms[1],x, it, m, p, c, s, d);
+                factor=pow(10, dpv.number()); // multiply by then divide
+            }
+
+            Result v = eval(df, leaf->fparms[0],x, it, m, p, c, s, d);
+            if (v.asNumeric().count()) {
+                for(int i=0; i<v.asNumeric().count(); i++) {
+                    double r = round(v.asNumeric()[i]*factor)/factor;
+                    returning.asNumeric() << r;
+                    returning.number() += r;
+                }
+            } else {
+                returning.number() =  round(v.number()*factor)/factor;
+            }
+            return returning;
+        }
+
         // if we get here its general function handling
         // what function is being called?
         int fnum=-1;
@@ -6592,9 +6631,10 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
 
         switch (fnum) {
             case 0 : case 1 : case 2: case 3: case 4: case 5: case 6: case 7: case 8: case 9: case 10:
-            case 11 : case 12: case 13: case 14: case 15: case 16: case 17: case 18: case 19: case 20:
+            case 11 : case 12: case 13: case 14: case 15: case 16: case 18: case 19: case 20:
             {
                 Result returning(0);
+
 
                 // TRIG FUNCTIONS
 
@@ -6622,7 +6662,6 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
 
                 case 15 : func = ceil; break;
                 case 16 : func = floor; break;
-                case 17 : func = round; break;
 
                 case 18 : func = fabs; break;
                 case 19 : func = Utils::myisinf; break;
