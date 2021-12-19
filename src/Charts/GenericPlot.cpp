@@ -1369,7 +1369,7 @@ GenericPlot::plotAnnotations(GenericSeriesInfo &seriesinfo)
             QString string = annotation.labels.join(" ");
             add->setFont(std);
             add->setText(string);
-            add->setStyleSheet(QString("color: %1").arg(seriesinfo.color));
+            add->setStyleSheet(QString("color: %1").arg(RGBColor(QColor(seriesinfo.color)).name()));
             add->setFixedWidth(fm.boundingRect(string).width() + (25*dpiXFactor));
             add->setAlignment(Qt::AlignCenter);
             legend->addLabel(add);
@@ -1444,7 +1444,7 @@ GenericPlot::plotAnnotations(GenericSeriesInfo &seriesinfo)
             QLabel *add = new QLabel(this);
             add->setFont(std);
             add->setText(lr->text());
-            add->setStyleSheet(QString("color: %1").arg(annotation.color));
+            add->setStyleSheet(QString("color: %1").arg(RGBColor(QColor(seriesinfo.color)).name()));
             add->setFixedWidth(fm.boundingRect(lr->text()).width() + (25*dpiXFactor));
             add->setAlignment(Qt::AlignCenter);
             legend->addLabel(add);
