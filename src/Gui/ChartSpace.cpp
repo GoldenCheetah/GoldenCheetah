@@ -39,7 +39,7 @@ static QIcon grayConfig, whiteConfig, accentConfig;
 ChartSpaceItemRegistry *ChartSpaceItemRegistry::_instance;
 
 ChartSpace::ChartSpace(Context *context, int scope, GcWindow *window) :
-    state(NONE), context(context), scope(scope), window(window), group(NULL), fixedZoom(0), _viewY(0),
+    state(NONE), context(context), scope(scope), mincols(5), window(window), group(NULL), fixedZoom(0), _viewY(0),
     yresizecursor(false), xresizecursor(false), block(false), scrolling(false),
     setscrollbar(false), lasty(-1)
 {
@@ -544,6 +544,14 @@ again:
     foreach(QRectF spanner, spanners) {
         if (spanner.topRight().x() > x) x = spanner.topRight().x();
     }
+
+    // lets see if we need to increase the scene rectangle
+    // to show the minimum number of columns?
+    int minwidth=SPACING;
+    for(int i=0; i<mincols && i<columns.count(); i++)  minwidth += columns[i] + SPACING;
+    if (x < minwidth) x= minwidth;
+
+    // now set the scene rectangle
     sceneRect = QRectF(0, 0, x + SPACING, maxy);
 
     return items;

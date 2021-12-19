@@ -26,7 +26,7 @@
 
 static QIcon grayConfig, whiteConfig, accentConfig;
 
-OverviewWindow::OverviewWindow(Context *context, int scope) : GcChartWindow(context), context(context), configured(false), scope(scope)
+OverviewWindow::OverviewWindow(Context *context, int scope, bool blank) : GcChartWindow(context), context(context), configured(false), scope(scope), blank(blank), mincols(5)
 {
     setContentsMargins(0,0,0,0);
     setProperty("color", GColor(COVERVIEWBACKGROUND));
@@ -49,6 +49,7 @@ OverviewWindow::OverviewWindow(Context *context, int scope) : GcChartWindow(cont
     main->setContentsMargins(0,0,0,0);
 
     space = new ChartSpace(context, scope, this);
+    space->setMinimumColumns(mincols);
     main->addWidget(space);
 
     HelpWhatsThis *help = new HelpWhatsThis(space);
@@ -94,6 +95,10 @@ OverviewWindow::addTile()
         // update after config changed
         if (added->parent->scope & OverviewScope::ANALYSIS && added->parent->currentRideItem) added->setData(added->parent->currentRideItem);
         if (added->parent->scope & OverviewScope::TRENDS ) added->setDateRange(added->parent->currentDateRange);
+
+        // update geometry
+        space->updateGeometry();
+        space->updateView();
 
     }
 }
@@ -306,7 +311,7 @@ OverviewWindow::setConfiguration(QString config)
 {
     // XXX hack because we're not in the default layout and don't want to
     // XXX this is just to handle setup for the very first time its run !
-    if (configured == true) return;
+    if (blank == true || configured == true) return;
     configured = true;
 
     // DEFAULT CONFIG (FOR NOW WHEN NOT IN THE DEFAULT LAYOUT)

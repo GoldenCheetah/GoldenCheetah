@@ -194,9 +194,14 @@ class ChartSpace : public QWidget
         // current state for event processing
         enum { NONE, DRAG, SPAN, XRESIZE, YRESIZE } state;
 
+        void setMinimumColumns(int x) { mincols=x; updateGeometry(); }
+        int minimumColumns() const { return mincols; }
+
         // used by children
         Context *context;
         int scope;
+        int mincols;
+
         QGraphicsView *view;
         QFont titlefont, bigfont, midfont, smallfont, tinyfont;
 

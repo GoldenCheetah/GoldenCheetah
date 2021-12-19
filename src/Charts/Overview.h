@@ -38,10 +38,11 @@ class OverviewWindow : public GcChartWindow
     Q_OBJECT
 
     Q_PROPERTY(QString config READ getConfiguration WRITE setConfiguration USER true)
+    Q_PROPERTY(int minimumColumns READ minimumColumns WRITE setMinimumColumns USER true)
 
     public:
 
-        OverviewWindow(Context *context, int scope=OverviewScope::ANALYSIS);
+        OverviewWindow(Context *context, int scope=OverviewScope::ANALYSIS, bool blank=false);
 
         // used by children
         Context *context;
@@ -51,6 +52,9 @@ class OverviewWindow : public GcChartWindow
         // get/set config
         QString getConfiguration() const;
         void setConfiguration(QString x);
+
+        int minimumColumns() const { return mincols; }
+        void setMinimumColumns(int x) { mincols=x; space->setMinimumColumns(mincols); }
 
         // add a tile to the window
         void addTile();
@@ -66,6 +70,8 @@ class OverviewWindow : public GcChartWindow
         ChartSpace *space;
         bool configured;
         int scope;
+        bool blank;
+        int mincols;
 };
 
 class OverviewConfigDialog : public QDialog
