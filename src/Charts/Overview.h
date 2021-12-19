@@ -29,6 +29,7 @@
 #include "RideItem.h"
 #include "RideMetric.h"
 #include "HrZones.h"
+#include <QSpinBox>
 
 #include "ChartSpace.h"
 #include "OverviewItems.h"
@@ -53,13 +54,13 @@ class OverviewWindow : public GcChartWindow
         QString getConfiguration() const;
         void setConfiguration(QString x);
 
-        int minimumColumns() const { return mincols; }
-        void setMinimumColumns(int x) { mincols=x; space->setMinimumColumns(mincols); }
+        int minimumColumns() const { return mincolsEdit->value(); }
+        void setMinimumColumns(int x) { if (x>0 && x< 11) {mincolsEdit->setValue(x); space->setMinimumColumns(x); }}
 
         // add a tile to the window
         void addTile();
         void importChart();
-        void renameChart();
+        void settings();
 
         // config item requested
         void configItem(ChartSpaceItem *);
@@ -71,7 +72,8 @@ class OverviewWindow : public GcChartWindow
         bool configured;
         int scope;
         bool blank;
-        int mincols;
+
+        QSpinBox *mincolsEdit;
 };
 
 class OverviewConfigDialog : public QDialog

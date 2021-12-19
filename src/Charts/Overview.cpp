@@ -26,7 +26,7 @@
 
 static QIcon grayConfig, whiteConfig, accentConfig;
 
-OverviewWindow::OverviewWindow(Context *context, int scope, bool blank) : GcChartWindow(context), context(context), configured(false), scope(scope), blank(blank), mincols(5)
+OverviewWindow::OverviewWindow(Context *context, int scope, bool blank) : GcChartWindow(context), context(context), configured(false), scope(scope), blank(blank)
 {
     setContentsMargins(0,0,0,0);
     setProperty("color", GColor(COVERVIEWBACKGROUND));
@@ -39,17 +39,27 @@ OverviewWindow::OverviewWindow(Context *context, int scope, bool blank) : GcChar
     QAction *importChart= new QAction(tr("Import Chart..."));
     addAction(importChart);
 
-    QAction *renameChart= new QAction(tr("Rename..."));
-    addAction(renameChart);
+    QAction *settings= new QAction(tr("Settings..."));
+    addAction(settings);
 
-    setControls(NULL);
+    // settings
+    QWidget *controls=new QWidget(this);
+    QFormLayout *formlayout = new QFormLayout(controls);
+    mincolsEdit= new QSpinBox(this);
+    mincolsEdit->setMinimum(1);
+    mincolsEdit->setMaximum(10);
+    mincolsEdit->setValue(5);
+    mincolsEdit->setButtonSymbols(QAbstractSpinBox::NoButtons);
+    formlayout->addRow(new QLabel(tr("Minimum Columns")), mincolsEdit);
+
+    setControls(controls);
 
     QHBoxLayout *main = new QHBoxLayout;
     main->setSpacing(0);
     main->setContentsMargins(0,0,0,0);
 
     space = new ChartSpace(context, scope, this);
-    space->setMinimumColumns(mincols);
+    space->setMinimumColumns(minimumColumns());
     main->addWidget(space);
 
     HelpWhatsThis *help = new HelpWhatsThis(space);
@@ -77,7 +87,8 @@ OverviewWindow::OverviewWindow(Context *context, int scope, bool blank) : GcChar
     // menu items
     connect(addTile, SIGNAL(triggered(bool)), this, SLOT(addTile()));
     connect(importChart, SIGNAL(triggered(bool)), this, SLOT(importChart()));
-    connect(renameChart, SIGNAL(triggered(bool)), this, SLOT(renameChart()));
+    connect(settings, SIGNAL(triggered(bool)), this, SLOT(settings()));
+    connect(mincolsEdit, SIGNAL(valueChanged(int)), this, SLOT(setMinimumColumns(int)));
     connect(space, SIGNAL(itemConfigRequested(ChartSpaceItem*)), this, SLOT(configItem(ChartSpaceItem*)));
 }
 
@@ -104,7 +115,7 @@ OverviewWindow::addTile()
 }
 
 void
-OverviewWindow::renameChart()
+OverviewWindow::settings()
 {
     emit showControls();
 }
