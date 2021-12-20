@@ -632,6 +632,9 @@ struct FitFileReaderState
 
             case 115: // MTB Dynamics - Flow
                 return "FLOW";
+	  
+	    case 139: //CoreTemp
+		return "CORETEMP";
 
             case 139: //CoreTemp
                 return "CORETEMP";
@@ -4431,6 +4434,10 @@ void write_record_definition(QByteArray *array, const RideFile *ride, QMap<int, 
         num_fields ++;
         write_field_definition(fields, 30, 1, 2); // left_right_balance (30)
     }
+    if ( (type&4)==4 ) {
+        num_fields ++;
+        write_field_definition(fields, 139, 4, 8); // tcore
+    }
 
     int local_msg_type = local_msg_type_for_record_type->values().count()+1;
     write_message_definition(array, RECORD_MSG_NUM, local_msg_type + 32, num_fields); // global_msg_num, local_msg_type, num_fields
@@ -4562,6 +4569,9 @@ void write_record(QByteArray *array, const RideFile *ride, bool withAlt, bool wi
         if ( (type&2)==2 ) {
             // write right power contribution
             write_int8(ridePoint, 80 + (100-point->lrbalance));
+        }
+        if ( (type&4)==4 ) {
+            write_float32(ridePoint, point->tcore, true);
         }
         if ( (type&4)==4 ) {
             write_float32(ridePoint, point->tcore, true);
