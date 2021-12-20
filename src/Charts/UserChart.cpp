@@ -764,7 +764,7 @@ UserChartSettings::UserChartSettings(Context *context, bool rangemode, GenericCh
     HelpWhatsThis *helpConfig = new HelpWhatsThis(this);
     this->setWhatsThis(helpConfig->getWhatsThisText(HelpWhatsThis::Chart_User));
 
-    setMinimumHeight(400*dpiYFactor);
+    setMinimumHeight(500*dpiYFactor);
     setMinimumWidth(450*dpiXFactor);
 
     layout = new QVBoxLayout(this);

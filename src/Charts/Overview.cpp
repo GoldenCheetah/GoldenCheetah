@@ -562,7 +562,9 @@ badconfig:
 //
 OverviewConfigDialog::OverviewConfigDialog(ChartSpaceItem*item) : QDialog(NULL), item(item)
 {
-    setWindowTitle(tr("Chart Settings"));
+    if (item->type == OverviewItemType::USERCHART) setWindowTitle(tr("Chart Settings"));
+    else setWindowTitle(tr("Tile Settings"));
+
     setAttribute(Qt::WA_DeleteOnClose);
     setWindowFlags(windowFlags() | Qt::WindowCloseButtonHint);
     setModal(true);
