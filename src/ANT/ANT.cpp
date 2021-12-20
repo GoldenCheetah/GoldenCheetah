@@ -72,6 +72,8 @@ const ant_sensor_type_t ANT::ant_sensor_types[] = {
                 ANT_TACX_VORTEX_FREQUENCY, DEFAULT_NETWORK_NUMBER, "Tacx Vortex Smart", 'v', ":images/IconPower.png" },
   { true, ANTChannel::CHANNEL_TYPE_FITNESS_EQUIPMENT, ANT_SPORT_FITNESS_EQUIPMENT_PERIOD, ANT_SPORT_FITNESS_EQUIPMENT_TYPE,
                 ANT_FITNESS_EQUIPMENT_FREQUENCY, ANT_SPORT_NETWORK_NUMBER, "Fitness Equipment Control (FE-C)", 'f', ":images/IconPower.png" },
+  { true, ANTChannel::CHANNEL_TYPE_CORETEMP, ANT_SPORT_CORETEMP_PERIOD, ANT_SPORT_CORETEMP_TYPE,
+                ANT_SPORT_FREQUENCY, ANT_SPORT_NETWORK_NUMBER, "CoreTemp", 't', ":images/IconCore.png" },
   { false, ANTChannel::CHANNEL_TYPE_GUARD, 0, 0, 0, 0, "", '\0', "" }
 };
 
@@ -226,6 +228,11 @@ void ANT::setWheelRpm(float x) {
 void ANT::setHb(double smo2, double thb)
 {
     telemetry.setHb(smo2, thb);
+}
+
+void ANT::setCoreTemp(double core, double skin)
+{
+    telemetry.setTemp(core,skin);
 }
 
 /*======================================================================

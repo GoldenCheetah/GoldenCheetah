@@ -589,6 +589,8 @@ struct FitFileReaderState
 
             case 253: // SECS
                 return RideFile::secs;
+	    case 139: // CoreTemp
+		return RideFile::tcore;
             default:
                 return RideFile::none;
         }
@@ -629,6 +631,9 @@ struct FitFileReaderState
 
             case 115: // MTB Dynamics - Flow
                 return "FLOW";
+	  
+	    case 139: //CoreTemp
+		return "CORETEMP";
 
             case 116: // Stress
                 return "STRESS";
@@ -1457,6 +1462,7 @@ struct FitFileReaderState
 
         double rvert = 0, rcad = 0, rcontact = 0;
         double smO2 = 0, tHb = 0;
+        double tcore = 0;
         //bool run=false;
 
         XDataPoint *p_deve = NULL;
@@ -1731,6 +1737,9 @@ struct FitFileReaderState
                     case 116: // Stress
                              native_num = -1;
                              break;
+		    case 139: // Core Temp
+                             tcore = value;
+			     break;
                     default:
                             unknown_record_fields.insert(native_num);
                             native_num = -1;
@@ -1954,7 +1963,7 @@ struct FitFileReaderState
                         prevPoint->rvert + (deltarvert * weight),
                         prevPoint->rcad + (deltarcad * weight),
                         prevPoint->rcontact + (deltarcontact * weight),
-                        0.0, // tcore
+                        tcore, // tcore
                         interval);
                 }
             }
@@ -1966,7 +1975,7 @@ struct FitFileReaderState
                      leftPedalCenterOffset, rightPedalCenterOffset,
                      leftTopDeathCenter, rightTopDeathCenter, leftBottomDeathCenter, rightBottomDeathCenter,
                      leftTopPeakPowerPhase, rightTopPeakPowerPhase, leftBottomPeakPowerPhase, rightBottomPeakPowerPhase,
-                     smO2, tHb, rvert, rcad, rcontact, 0.0, interval, false);
+                     smO2, tHb, rvert, rcad, rcontact, tcore, interval, false);
 
         last_time = time;
         last_distance = km;
@@ -4004,13 +4013,21 @@ void write_int32(QByteArray *array, fit_value_t value,  bool is_big_endian) {
         ? qFromBigEndian<qint32>( value )
         : qFromLittleEndian<qint32>( value );
 
-
-
     for (int i=0; i<32; i=i+8) {
         array->append(value >> i);
     }
 }
 
+void write_float32(QByteArray *array, float f, bool is_big_endian) {
+    if (is_big_endian) {
+        f = qbswap(f);
+    }
+
+    uint32_t *p=(uint32_t *)&f;
+    for (int i=0; i<32; i=i+8) {
+        array->append((*p) >> i);
+    }
+}
 
 uint16_t crc16(char *buf, int len)
 {
@@ -4400,6 +4417,10 @@ void write_record_definition(QByteArray *array, const RideFile *ride, QMap<int, 
         num_fields ++;
         write_field_definition(fields, 30, 1, 2); // left_right_balance (30)
     }
+    if ( (type&4)==4 ) {
+        num_fields ++;
+        write_field_definition(fields, 139, 4, 8); // tcore
+    }
 
     int local_msg_type = local_msg_type_for_record_type->values().count()+1;
 
@@ -4421,6 +4442,9 @@ void write_record(QByteArray *array, const RideFile *ride, bool withAlt, bool wi
         }
         if ( ride->areDataPresent()->lrbalance && point->lrbalance != RideFile::NA) {
             type += 2;
+        }
+        if ( ride->areDataPresent()->tcore && point->tcore != RideFile::NA) {
+            type += 4;
         }
 
         // Add record definition for this type of record
@@ -4469,6 +4493,9 @@ void write_record(QByteArray *array, const RideFile *ride, bool withAlt, bool wi
         if ( (type&2)==2 ) {
             // write right power contribution
             write_int8(ridePoint, 0x80 + (100-point->lrbalance));
+        }
+        if ( (type&4)==4 ) {
+            write_float32(ridePoint, point->tcore, true);
         }
 
         array->append(ridePoint->data(), ridePoint->size());

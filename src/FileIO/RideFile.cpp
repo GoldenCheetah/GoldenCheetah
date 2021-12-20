@@ -2703,7 +2703,7 @@ RideFile::recalculateDerivedSeries(bool force)
     // in between
 
     // we need HR data for this
-    if (dataPresent.hr) {
+    if (dataPresent.hr && !dataPresent.tcore) {
 
         // resample the data into 60s samples
         static const int SAMPLERATE=60000; // milliseconds in a minute

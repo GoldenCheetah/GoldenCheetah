@@ -47,7 +47,7 @@ public:
                       LeftPedalSmoothness, RightPedalSmoothness, Slope, 
                       LapDistance, LapDistanceRemaining, ErgTimeRemaining,
                       Latitude, Longitude, Altitude, RouteDistance,
-                      DistanceRemaining };
+                      DistanceRemaining, CoreTemp };
 
     typedef enum dataseries DataSeries;
 
@@ -93,7 +93,7 @@ public:
     void setLatitude(double);
     void setLongitude(double);
     void setAltitude(double);
-
+    void setTemp(double,double);
     const char *getName() const;
 
     // new muscle oxygen stuff
@@ -116,6 +116,7 @@ public:
     double getRER() const;
     double getTv() const;
     double getFeO2() const;
+    double getCoreTemp() const;
 
     double getWatts() const;
     double getAltWatts() const;
@@ -174,6 +175,7 @@ private:
     double torque; // raw torque data for calibration display
     double latitude, longitude, altitude;
     double vo2, vco2, rf, rmv, tv, feo2;
+    double coreTemp, skinTemp;
 
     std::chrono::high_resolution_clock::time_point wheelRpmSampleTime;
 

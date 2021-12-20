@@ -544,6 +544,15 @@ ANTMessage::ANTMessage(ANT *parent, const unsigned char *message) {
                 newsmo2 = 0.1f * double (((message[10] & 0xc0)>>6) + (message[11]<<2));
                 break;
 
+	    case ANTChannel::CHANNEL_TYPE_CORETEMP:
+		switch (data_page)
+		{
+		case 1:
+		    skinTemp = (message[7]+((message[8] & 0xf0)<<4))/20.0;
+		    coreTemp = (message[10]+(message[11]<<8))/100.0;
+		}
+		break;
+
             case ANTChannel::CHANNEL_TYPE_FITNESS_EQUIPMENT:
                 switch (data_page)
                 {

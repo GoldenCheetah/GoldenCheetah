@@ -31,6 +31,7 @@ RealtimeData::RealtimeData()
     thb = smo2 = o2hb = hhb = 0.0;
     lrbalance = RideFile::NA;
     rte = lte = lps = rps = 0.0;
+    coreTemp = skinTemp = 0.0;
     latitude = longitude = altitude = 0.0;
     rf = rmv = vo2 = vco2 = tv = feo2 = 0.0;
     routeDistance = distanceRemaining = 0.0;
@@ -62,6 +63,12 @@ void RealtimeData::setWatts(double watts)
 void RealtimeData::setAltDistance(double x)
 {
     this->altDistance = x;
+}
+
+void RealtimeData::setTemp(double core, double skin)
+{
+    this->coreTemp=core;
+    this->skinTemp=skin;
 }
 
 void RealtimeData::setHr(double hr)
@@ -450,6 +457,9 @@ double RealtimeData::value(DataSeries series) const
     case FeO2: return feo2;
         break;
 
+    case CoreTemp: return coreTemp;
+	       break;
+
     case None:
     default:
         return 0;
@@ -522,6 +532,7 @@ const QList<RealtimeData::DataSeries> &RealtimeData::listDataSeries()
         seriesList << Altitude;
         seriesList << RouteDistance;
         seriesList << DistanceRemaining;
+	seriesList << CoreTemp;
     }
     return seriesList;
 }
@@ -698,6 +709,9 @@ QString RealtimeData::seriesName(DataSeries series)
 
     case FeO2: return tr("Fraction O2 Expired");
         break;
+
+    case CoreTemp: return tr("CoreTemp");
+	break;
     }
 }
 
@@ -762,3 +776,5 @@ double RealtimeData::getVCO2() const { return vco2; }
 double RealtimeData::getRER() const { return rer; }
 double RealtimeData::getTv() const { return tv; }
 double RealtimeData::getFeO2() const { return feo2; }
+double RealtimeData::getCoreTemp() const { return coreTemp;}
+

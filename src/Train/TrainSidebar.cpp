@@ -369,6 +369,7 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
     displayLRBalance = RideFile::NA;
     displayLTE = displayRTE = displayLPS = displayRPS = 0;
     displayLatitude = displayLongitude = displayAltitude = 0.0;
+    displayCoreTemp = 0.0;
 
     connect(gui_timer, SIGNAL(timeout()), this, SLOT(guiUpdate()));
     connect(disk_timer, SIGNAL(timeout()), this, SLOT(diskUpdate()));
@@ -1346,7 +1347,7 @@ void TrainSidebar::Start()       // when start button is pressed
                 // CSV File header
 
                 QTextStream recordFileStream(recordFile);
-                recordFileStream << "secs, cad, hr, km, kph, nm, watts, alt, lon, lat, headwind, slope, temp, interval, lrbalance, lte, rte, lps, rps, smo2, thb, o2hb, hhb, target\n";
+                recordFileStream << "secs, cad, hr, km, kph, nm, watts, alt, lon, lat, headwind, slope, temp, interval, lrbalance, lte, rte, lps, rps, smo2, thb, o2hb, hhb,tcore, target\n";
 
                 disk_timer->start(SAMPLERATE);  // start screen
             }
@@ -1567,6 +1568,7 @@ void TrainSidebar::updateData(RealtimeData &rtData)
     displayLatitude = rtData.getLatitude();
     displayLongitude = rtData.getLongitude();
     displayAltitude = rtData.getAltitude();
+    displayCoreTemp = rtData.getCoreTemp();
     // Gradient not supported
     return;
 }
@@ -1770,6 +1772,8 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
                     rtData.setFeO2(local.getFeO2());
                 }
 
+                rtData.setTemp(local.getCoreTemp(),0);
+                
                 // what are we getting from this one?
                 if (dev == bpmTelemetry) rtData.setHr(local.getHr());
                 if (dev == rpmTelemetry) rtData.setCadence(local.getCadence());
@@ -1989,6 +1993,7 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
             displayLatitude = rtData.getLatitude();
             displayLongitude = rtData.getLongitude();
             displayAltitude = rtData.getAltitude();
+	    displayCoreTemp = rtData.getCoreTemp();
 
             double weightKG = context->athlete->getWeight(QDate::currentDate()) + 10; // 10kg bike
             double vs = computeInstantSpeed(weightKG, rtData.getSlope(), rtData.getAltitude(), rtData.getWatts());
@@ -2114,7 +2119,7 @@ void TrainSidebar::diskUpdate()
     if (secs <= lastRecordSecs) return; // Avoid duplicates
     lastRecordSecs = secs;
 
-    // GoldenCheetah CVS Format "secs, cad, hr, km, kph, nm, watts, alt, lon, lat, headwind, slope, temp, interval, lrbalance, lte, rte, lps, rps, smo2, thb, o2hb, hhb\n";
+    // GoldenCheetah CVS Format "secs, cad, hr, km, kph, nm, watts, alt, lon, lat, headwind, slope, temp, interval, lrbalance, lte, rte, lps, rps, smo2, thb, o2hb, hhb,tcore\n";
 
     recordFileStream    << secs
                         << "," << displayCadence
@@ -2137,7 +2142,7 @@ void TrainSidebar::diskUpdate()
 
     recordFileStream    << "," // headwind
                         << "," // slope
-                        << "," // temp
+                        << "," // << displayCoreTemp // temp
                         << "," << displayWorkoutLap
                         << "," << displayLRBalance
                         << "," << displayLTE
@@ -2148,6 +2153,7 @@ void TrainSidebar::diskUpdate()
                         << "," << displayTHB
                         << "," << displayO2HB
                         << "," << displayHHB
+                        << "," << displayCoreTemp
                         << "," << load
                         << "," << "\n";
 }
