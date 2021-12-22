@@ -217,6 +217,10 @@ OverviewWindow::getConfiguration() const
         config += "\"column\":" + QString("%1").arg(item->column) + ",";
         config += "\"order\":" + QString("%1").arg(item->order) + ",";
 
+        if (item->type != OverviewItemType::USERCHART) {
+            config += "\"color\":\"" + item->bgcolor + "\",";
+        }
+
         // now the actual card settings
         switch(item->type) {
         case OverviewItemType::RPE:
@@ -421,8 +425,10 @@ badconfig:
         int type = obj["type"].toInt();
 
 
+
         // lets create the cards
         ChartSpaceItem *add=NULL;
+
         switch(type) {
 
         case OverviewItemType::RPE :
@@ -550,6 +556,12 @@ badconfig:
                 space->addItem(order,column,span,deep, add);
             }
             break;
+        }
+
+        // color is common- if we actuall added one...
+        if (add) {
+            if (obj.contains("color") && type != OverviewItemType::USERCHART)  add->bgcolor = obj["color"].toString();
+            else add->bgcolor = StandardColor(CCARDBACKGROUND).name();
         }
     }
 

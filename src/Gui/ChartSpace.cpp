@@ -21,6 +21,7 @@
 #include "AbstractView.h"
 #include "Athlete.h"
 #include "RideCache.h"
+#include "Colors.h"
 
 #include <cmath>
 #include <QGraphicsSceneMouseEvent>
@@ -207,6 +208,12 @@ ChartSpace::dateRangeChanged(DateRange dr)
     stale=false;
 }
 
+QColor
+ChartSpaceItem::color()
+{
+    return QColor(bgcolor);
+}
+
 void
 ChartSpaceItem::setData(RideItem *item)
 {
@@ -301,7 +308,7 @@ void
 ChartSpaceItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *opt, QWidget *widget) {
 
     if (drag) painter->setBrush(QBrush(GColor(CPLOTMARKER)));
-    else painter->setBrush(GColor(CCARDBACKGROUND));
+    else painter->setBrush(RGBColor(color()));
 
     QPainterPath path;
     path.addRoundedRect(QRectF(0,0,geometry().width(),geometry().height()), ROWHEIGHT/5, ROWHEIGHT/5);
@@ -312,7 +319,7 @@ ChartSpaceItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *opt, QW
     //XXXpainter->drawLine(QLineF(0,ROWHEIGHT*2,geometry().width(),ROWHEIGHT*2));
     //painter->fillRect(QRectF(0,0,geometry().width()+1,geometry().height()+1), brush);
     //titlefont.setWeight(QFont::Bold);
-    if (GCColor::luminance(GColor(CCARDBACKGROUND)) < 127) painter->setPen(QColor(200,200,200));
+    if (GCColor::luminance(RGBColor(color())) < 127) painter->setPen(QColor(200,200,200));
     else painter->setPen(QColor(70,70,70));
 
     painter->setFont(parent->titlefont);
@@ -335,7 +342,7 @@ ChartSpaceItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *opt, QW
                 path.addRoundedRect(QRectF(geometry().width()-40-ROWHEIGHT,0,
                                     ROWHEIGHT+40, ROWHEIGHT+40), ROWHEIGHT/5, ROWHEIGHT/5);
                 painter->setPen(Qt::NoPen);
-                QColor darkgray(GColor(CCARDBACKGROUND).lighter(200));
+                QColor darkgray(RGBColor(color()).lighter(200));
                 painter->setBrush(darkgray);
                 painter->drawPath(path);
                 painter->fillRect(QRectF(geometry().width()-40-ROWHEIGHT, 0, ROWHEIGHT+40-(ROWHEIGHT/5), ROWHEIGHT+40), QBrush(darkgray));
@@ -358,7 +365,7 @@ ChartSpaceItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *opt, QW
     if (!drag) {
         QPainterPath path;
         path.addRoundedRect(QRectF(1*dpiXFactor,1*dpiXFactor,geometry().width()-(2*dpiXFactor),geometry().height()-(2*dpiXFactor)), ROWHEIGHT/5, ROWHEIGHT/5);
-        QColor edge(GColor(CCARDBACKGROUND));
+        QColor edge(RGBColor(color()));
         edge = edge.darker(105);
         QPen pen(edge);
         pen.setWidth(3*dpiXFactor);

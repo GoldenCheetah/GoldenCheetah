@@ -38,7 +38,7 @@
 #include <QScrollArea>
 #include <QDialog>
 
-UserChart::UserChart(QWidget *parent, Context *context, bool rangemode)
+UserChart::UserChart(QWidget *parent, Context *context, bool rangemode, QString bg)
     : QWidget(parent), context(context), rangemode(rangemode), stale(true), last(NULL), ride(NULL), intervals(0), item(NULL)
 {
     HelpWhatsThis *helpContents = new HelpWhatsThis(this);
@@ -71,8 +71,9 @@ UserChart::UserChart(QWidget *parent, Context *context, bool rangemode)
     connect(context, SIGNAL(intervalsChanged()), this, SLOT(intervalRefresh()));
 
     // defaults, can be overriden via setBackgroundColor()
-    if (rangemode) bgcolor = GColor(CTRENDPLOTBACKGROUND);
-    else bgcolor = GColor(CPLOTBACKGROUND);
+    if (bg != "") chartinfo.bgcolor = bg;
+    else if (rangemode) chartinfo.bgcolor = StandardColor(CTRENDPLOTBACKGROUND).name();
+    else chartinfo.bgcolor = StandardColor(CPLOTBACKGROUND).name();
 
     // set default background color
     configChanged(0);
@@ -85,11 +86,11 @@ UserChart::configChanged(qint32)
 
     // tinted palette for headings etc
     QPalette palette;
-    palette.setBrush(QPalette::Window, bgcolor);
-    palette.setBrush(QPalette::Background, bgcolor);
+    palette.setBrush(QPalette::Window, RGBColor(chartinfo.bgcolor));
+    palette.setBrush(QPalette::Background, RGBColor(chartinfo.bgcolor));
     palette.setColor(QPalette::WindowText, GColor(CPLOTMARKER));
     palette.setColor(QPalette::Text, GColor(CPLOTMARKER));
-    palette.setColor(QPalette::Base, bgcolor /*GCColor::alternateColor(bgcolor)*/);
+    palette.setColor(QPalette::Base, RGBColor(chartinfo.bgcolor) /*GCColor::alternateColor(bgcolor)*/);
     setPalette(palette);
 
     setAutoFillBackground(true);
@@ -98,15 +99,6 @@ UserChart::configChanged(qint32)
     chartConfigChanged();
 
     setUpdatesEnabled(true);
-}
-
-void
-UserChart::setBackgroundColor(QColor bgcolor)
-{
-    if (this->bgcolor != bgcolor) {
-        this->bgcolor = bgcolor;
-        configChanged(0);
-    }
 }
 
 void
@@ -119,6 +111,8 @@ UserChart::setGraphicsItem(QGraphicsItem *item)
 void
 UserChart::chartConfigChanged()
 {
+    emit userChartConfigChanged();
+
     if (!ride) return;
 
     stale = true;
@@ -203,7 +197,7 @@ UserChart::refresh()
     }
 
     // ok, we've run out of excuses, looks like we need to plot
-    chart->setBackgroundColor(bgcolor);
+    chart->setBackgroundColor(RGBColor(chartinfo.bgcolor));
     chart->initialiseChart(chartinfo.title, chartinfo.type, chartinfo.animate, chartinfo.legendpos, chartinfo.stack, chartinfo.orientation, chartinfo.scale);
 
     // now generate the series data
@@ -584,8 +578,8 @@ UserChart::settings() const
     out << "\"legendpos\": "     << chartinfo.legendpos << ",\n";
     out << "\"stack\": "         << (chartinfo.stack ? "true" : "false") << ",\n";
     out << "\"orientation\": "   << chartinfo.orientation << ",\n";
+    out << "\"bgcolor\": \""       << chartinfo.bgcolor.name() << "\", \n";
     out << "\"scale\": "         << QString("%1").arg(chartinfo.scale); // note no trailing comma
-    // bgcolor not saved, it is set based upon context
 
     // seriesinfos
     if (seriesinfo.count()) out << ",\n\"SERIES\": [\n"; // that trailing comma
@@ -674,6 +668,7 @@ UserChart::applySettings(QString x)
     chartinfo.legendpos = obj["legendpos"].toInt();
     chartinfo.stack = obj["stack"].toBool();
     chartinfo.orientation = obj["orientation"].toInt();
+    if (obj.contains("bgcolor")) chartinfo.bgcolor = obj["bgcolor"].toString();
     if (obj.contains("scale")) chartinfo.scale = obj["scale"].toDouble();
     else chartinfo.scale = 1.0f;
     if (obj.contains("intervalrefresh")) chartinfo.intervalrefresh = obj["intervalrefresh"].toBool();
@@ -829,9 +824,14 @@ UserChartSettings::UserChartSettings(Context *context, bool rangemode, GenericCh
     scale->setMaximum(18);
     scale->setSingleStep(1);
     scale->setValue(1 + ((chart.scale-1)*2)); // scale is in increments of 0.5
+    cf->addRow("  ", (QWidget*)NULL);
     cf->addRow(tr("Font scaling"), scale);
 
+    bgcolor = new ColorButton(this, tr("Background"), QColor(chartinfo.bgcolor), true);
+    bgcolor->setSelectAll(true);
+    cf->addRow("Background", bgcolor);
     cf->addRow("  ", (QWidget*)NULL);
+
     animate = new QCheckBox(tr("Animate"));
     cf->addRow(" ", animate);
     stack = new QCheckBox(tr("Single series per plot"));
@@ -964,6 +964,7 @@ UserChartSettings::UserChartSettings(Context *context, bool rangemode, GenericCh
     connect(intervalrefresh, SIGNAL(stateChanged(int)), this, SLOT(updateChartInfo()));
     connect(orientation, SIGNAL(currentIndexChanged(int)), this, SLOT(updateChartInfo()));
     connect(scale, SIGNAL(valueChanged(int)), this, SLOT(updateChartInfo()));
+    connect(bgcolor, SIGNAL(colorChosen(QColor)), this, SLOT(updateChartInfo()));
 }
 
 void
@@ -994,6 +995,7 @@ UserChartSettings::refreshChartInfo()
     else orientation->setCurrentIndex(0);
     scale->setValue(1 + ((chartinfo.scale-1)*2)); // 1-5 mapped to 1-7, where scale is 1,1.5,2,2.5,3,3.5,4,4.5,5
     intervalrefresh->setChecked(chartinfo.intervalrefresh);
+    bgcolor->setColor(QColor(chartinfo.bgcolor));
     updating=false;
 }
 
@@ -1019,6 +1021,7 @@ UserChartSettings::updateChartInfo()
     chartinfo.orientation = orientation->itemData(orientation->currentIndex()).toInt();
     chartinfo.scale = 1 + ((scale->value() - 1) * 0.5);
     chartinfo.intervalrefresh = intervalrefresh->isChecked();
+    chartinfo.bgcolor = bgcolor->getColor().name();
 
     // we need to refresh whenever stuff changes....
     if (refresh) emit chartConfigChanged();

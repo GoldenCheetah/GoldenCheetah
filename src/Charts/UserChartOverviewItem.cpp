@@ -29,8 +29,7 @@ UserChartOverviewItem::UserChartOverviewItem(ChartSpace *parent, QString name, Q
     deep = 30;
 
     // create the chart and place on scene
-    chart = new UserChart(NULL, parent->context, parent->scope == OverviewScope::TRENDS ? true : false);
-    chart->setBackgroundColor(GColor(CCARDBACKGROUND));
+    chart = new UserChart(NULL, parent->context, parent->scope == OverviewScope::TRENDS ? true : false, StandardColor(CCARDBACKGROUND).name());
     chart->hide();
     proxy = parent->getScene()->addWidget(chart);
     proxy->setParent(this);
@@ -52,10 +51,16 @@ UserChartOverviewItem::UserChartOverviewItem(ChartSpace *parent, QString name, Q
 
 UserChartOverviewItem::~UserChartOverviewItem() { }
 
+QColor
+UserChartOverviewItem::color()
+{
+    return QColor(chart->chartinfo.bgcolor);
+}
+
 void
 UserChartOverviewItem::configChanged(qint32)
 {
-    chart->setBackgroundColor(GColor(CCARDBACKGROUND));
+    //chart->setBackgroundColor(GColor(CCARDBACKGROUND));
 }
 
 void

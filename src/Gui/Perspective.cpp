@@ -339,6 +339,7 @@ Perspective::configChanged(qint32)
     for (int i=0; i<charts.count(); i++) {
         if (currentStyle == 0) {
             if (charts[i]->type() == GcWindowTypes::Overview || charts[i]->type() == GcWindowTypes::OverviewTrends) chartbar->setColor(i, GColor(COVERVIEWBACKGROUND));
+            else if (charts[i]->type() == GcWindowTypes::UserAnalysis || charts[i]->type() == GcWindowTypes::UserTrends) chartbar->setColor(i, RGBColor(QColor(charts[i]->property("color").toString())));
             else {
                 if (type() == VIEW_TRAIN)chartbar->setColor(i, GColor(CTRAINPLOTBACKGROUND));
                 else chartbar->setColor(i, GColor(CPLOTBACKGROUND));
@@ -384,6 +385,21 @@ Perspective::titleChanged()
 
         // repaint to reflect
         charts[controlStack->currentIndex()]->repaint();
+    }
+}
+
+// we have a user chart and its just changed its config
+void
+Perspective::userChartConfigChanged(UserChartWindow *chart)
+{
+    if (!currentStyle) {
+        // let chartbar know...
+        for(int index=0; index < charts.count(); index++) {
+            if (charts[index] == (GcChartWindow*)(chart)) {
+                chartbar->setColor(index, RGBColor(QColor(charts[index]->property("color").toString())));
+                return;
+            }
+        }
     }
 }
 

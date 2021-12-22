@@ -47,6 +47,7 @@ class QTextStream;
 class DataFilter;
 class SearchBox;
 class TrendsView;
+class UserChartWindow;
 
 class Perspective : public GcWindow
 {
@@ -130,6 +131,8 @@ class Perspective : public GcWindow
         // window wants to close...
         void closeWindow(GcWindow*);
         void showControls();
+
+        void userChartConfigChanged(UserChartWindow *);
 
         //notifiction that been made visible
         void selected();

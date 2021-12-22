@@ -25,7 +25,7 @@
 #include <QLineEdit>
 #include <QLabel>
 
-ColorButton::ColorButton(QWidget *parent, QString name, QColor color, bool gc, bool ignore) : QPushButton("", parent), gc(gc), color(color), name(name)
+ColorButton::ColorButton(QWidget *parent, QString name, QColor color, bool gc, bool ignore) : QPushButton("", parent), gc(gc), all(false), color(color), name(name)
 {
 #if defined(WIN32) || defined (Q_OS_LINUX)
     // are we in hidpi mode? if so undo global defaults for toolbar pushbuttons
@@ -71,7 +71,7 @@ void
 ColorButton::clicked()
 {
     // Color picker dialog - gc uses color palettes, otherwise not
-    QColor rcolor = (gc == true) ? GColorDialog::getColor(color.name())
+    QColor rcolor = (gc == true) ? GColorDialog::getColor(color.name(), all)
                                  : QColorDialog::getColor(color, this, tr("Choose Color"), QColorDialog::DontUseNativeDialog);
 
     // if we got a good color use it and notify others
@@ -82,7 +82,7 @@ ColorButton::clicked()
 }
 
 
-GColorDialog::GColorDialog(QColor selected, QWidget *parent) : QDialog(parent), original(selected)
+GColorDialog::GColorDialog(QColor selected, QWidget *parent, bool all) : QDialog(parent), original(selected), all(all)
 {
     // set some flags
     setWindowTitle(tr("Choose a Color"));
@@ -129,7 +129,7 @@ GColorDialog::GColorDialog(QColor selected, QWidget *parent) : QDialog(parent), 
     colorSet = GCColor::colorSet();
     for (int i=0; colorSet[i].name != ""; i++) {
 
-        if (colorSet[i].group != tr("Data")) continue;
+        if (!all && colorSet[i].group != tr("Data")) continue;
 
         QTreeWidgetItem *add;
         ColorButton *colorButton = new ColorButton(this, colorSet[i].name, colorSet[i].color, false, true);
@@ -202,9 +202,9 @@ GColorDialog::searchFilter(QString text)
     }
 }
 
-QColor GColorDialog::getColor(QColor color)
+QColor GColorDialog::getColor(QColor color, bool all)
 {
-    GColorDialog *dialog = new GColorDialog(color, NULL);
+    GColorDialog *dialog = new GColorDialog(color, NULL, all);
     dialog->exec();
     color = dialog->returned();
     delete dialog;

@@ -247,6 +247,8 @@ void GCColor::setupColors()
         { tr("Data"), tr("FeO2"), "CFEO2", Qt::yellow },
         { tr("Gui"), tr("Toolbar Hover"), "CHOVER", Qt::lightGray },
         { tr("Gui"), tr("Chartbar background"), "CCHARTBAR", Qt::lightGray },
+        { tr("Gui"), tr("Overview Card Background Alternate"), "CCARDBACKGROUND2", QColor(0,0,0) },
+        { tr("Gui"), tr("Overview Card Background Vibrant"), "CCARDBACKGROUND3", QColor(52,52,52) },
         { "", "", "", QColor(0,0,0) },
     };
 
@@ -374,6 +376,8 @@ void GCColor::setupColors()
     LightDefaultColorList[101].color = QColor(101,44,45); // 101:Tidal Volume
     LightDefaultColorList[102].color = QColor(134,74,255); // 102:Respiratory Frequency
     LightDefaultColorList[103].color = QColor(255,46,46); // 103:FeO2
+    LightDefaultColorList[106].color = QColor(180,180,180); // 106:Card Alternate
+    LightDefaultColorList[107].color = QColor(0xee,0xf8,0xff); // 107:Card Vibrant
 }
 
 // default settings for fonts etc

@@ -36,6 +36,8 @@
 // the chart
 class ChartSpace;
 class UserChartSettings;
+class UserChartOverviewItem;
+class UserChartWindow;
 class DataFilterEdit;
 class UserChart : public QWidget {
 
@@ -44,10 +46,12 @@ class UserChart : public QWidget {
     Q_PROPERTY (Perspective* perspective READ getPerspective WRITE setPerspective USER false)
 
     friend class ::Leaf; // data filter eval accessing our curve data
+    friend class ::UserChartOverviewItem; // get chartinfo.bgcolor
+    friend class ::UserChartWindow; // get chartinfo.bgcolor
 
     public:
 
-        UserChart(QWidget *parent, Context *context, bool rangemode);
+        UserChart(QWidget *parent, Context *context, bool rangemode, QString bg="");
 
         // config widget, for user to configure the chart
         UserChartSettings *settingsTool() { return settingsTool_; }
@@ -67,6 +71,9 @@ class UserChart : public QWidget {
         void groupBy(int groupby, int aggregateby, QVector<double> &xseries, QVector<double> &yseries, bool fillzero);
         long groupForDate(int groupby, QDate date);
         QDate dateForGroup(int groupby, long);
+
+    signals:
+        void userChartConfigChanged();
 
     public slots:
 
@@ -107,7 +114,6 @@ class UserChart : public QWidget {
         Context *context;
         bool rangemode;
         bool stale;
-        QColor bgcolor;
 
         const RideItem *last; // the last ride we plotted
         const RideItem *ride;
@@ -197,6 +203,7 @@ class UserChartSettings : public QWidget {
         QCheckBox *stack;
         QComboBox *orientation;
         QSlider *scale;
+        ColorButton *bgcolor;
         QCheckBox *intervalrefresh;
 
         bool blocked;

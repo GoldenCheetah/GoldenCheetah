@@ -186,7 +186,7 @@ class ColorEngine : public QObject
 #define GColor(x) GCColor::getColor(x)
 
 // Define how many cconfigurable metric colors are available
-#define CNUMOFCFGCOLORS       106
+#define CNUMOFCFGCOLORS       108
 
 #define CPLOTBACKGROUND       0
 #define CRIDEPLOTBACKGROUND   1
@@ -294,4 +294,6 @@ class ColorEngine : public QObject
 #define CFEO2                 103
 #define CHOVER                104
 #define CCHARTBAR             105
+#define CCARDBACKGROUND2      106
+#define CCARDBACKGROUND3      107
 #endif

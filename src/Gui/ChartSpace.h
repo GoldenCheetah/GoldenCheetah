@@ -66,6 +66,7 @@ class ChartSpaceItem : public QGraphicsWidget
         virtual void itemGeometryChanged() =0;
         virtual void setData(RideItem *item)=0;
         virtual void setDateRange(DateRange )=0;
+        virtual QColor color();
         virtual QRectF hotspot() { return QRectF(0,0,0,0); } // don't steal events from this area of the item
 
         virtual QWidget *config()=0; // must supply a widget to configure
@@ -111,6 +112,8 @@ class ChartSpaceItem : public QGraphicsWidget
             this->setGraphicsEffect(effect);
 #endif
 
+            bgcolor = StandardColor(CCARDBACKGROUND).name();
+
             // watch geom changes
             connect(this, SIGNAL(geometryChanged()), SLOT(geometryChanged()));
         }
@@ -147,6 +150,7 @@ class ChartSpaceItem : public QGraphicsWidget
         bool incorner;
         bool invisible;
         bool showconfig;
+        QString bgcolor;
         QGraphicsDropShadowEffect *effect;
 
         // base paint

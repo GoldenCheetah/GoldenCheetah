@@ -3902,6 +3902,14 @@ OverviewItemConfig::OverviewItemConfig(ChartSpaceItem *item) : QWidget(NULL), it
 
     }
 
+    if (item->type != OverviewItemType::USERCHART) {
+        // bg color
+        bgcolor = new ColorButton(this, tr("Background"), QColor(item->color()), true);
+        bgcolor->setSelectAll(true);
+        layout->addRow(tr("Color"), bgcolor);
+        connect(bgcolor, SIGNAL(colorChosen(QColor)), this, SLOT(dataChanged()));
+    }
+
     // last item to export the data, note in main layout, aligned with bottom buttons
     if (item->type == OverviewItemType::DATATABLE)  {
         main->addWidget(exp);
@@ -4106,6 +4114,7 @@ OverviewItemConfig::dataChanged()
         {
             RPEOverviewItem *mi = dynamic_cast<RPEOverviewItem*>(item);
             mi->name = name->text();
+            mi->bgcolor = bgcolor->getColor().name();
         }
         break;
 
@@ -4117,6 +4126,7 @@ OverviewItemConfig::dataChanged()
                 mi->symbol = metric1->rideMetric()->symbol();
                 mi->units = metric1->rideMetric()->units(GlobalContext::context()->useMetricUnits);
             }
+            mi->bgcolor = bgcolor->getColor().name();
         }
         break;
 
@@ -4126,6 +4136,7 @@ OverviewItemConfig::dataChanged()
             mi->name = name->text();
             if (metric1->isValid())  mi->symbol = metric1->rideMetric()->symbol();
             if (meta1->isValid())  mi->meta = meta1->metaname();
+            mi->bgcolor = bgcolor->getColor().name();
         }
         break;
 
@@ -4137,6 +4148,7 @@ OverviewItemConfig::dataChanged()
                 mi->symbol = metric1->rideMetric()->symbol();
                 mi->units = metric1->rideMetric()->units(GlobalContext::context()->useMetricUnits);
             }
+            mi->bgcolor = bgcolor->getColor().name();
         }
         break;
 
@@ -4145,6 +4157,7 @@ OverviewItemConfig::dataChanged()
             MetaOverviewItem *mi = dynamic_cast<MetaOverviewItem*>(item);
             mi->name = name->text();
             if (meta1->isValid()) mi->symbol = meta1->metaname();
+            mi->bgcolor = bgcolor->getColor().name();
         }
         break;
 
@@ -4154,6 +4167,7 @@ OverviewItemConfig::dataChanged()
             mi->name = name->text();
             if (series1->currentIndex() >= 0) mi->series = static_cast<RideFile::SeriesType>(series1->itemData(series1->currentIndex(), Qt::UserRole).toInt());
             mi->polarized = cb1->isChecked();
+            mi->bgcolor = bgcolor->getColor().name();
         }
         break;
 
@@ -4165,6 +4179,7 @@ OverviewItemConfig::dataChanged()
             if (metric1->isValid()) mi->xsymbol = metric1->rideMetric()->symbol();
             if (metric2->isValid()) mi->ysymbol = metric2->rideMetric()->symbol();
             if (metric3->isValid()) mi->zsymbol = metric3->rideMetric()->symbol();
+            mi->bgcolor = bgcolor->getColor().name();
         }
         break;
 
@@ -4172,6 +4187,7 @@ OverviewItemConfig::dataChanged()
         {
             RouteOverviewItem *mi = dynamic_cast<RouteOverviewItem*>(item);
             mi->name = name->text();
+            mi->bgcolor = bgcolor->getColor().name();
         }
         break;
 
@@ -4187,6 +4203,7 @@ OverviewItemConfig::dataChanged()
             DataOverviewItem *mi = dynamic_cast<DataOverviewItem*>(item);
             mi->name = name->text();
             mi->program = editor->toPlainText();
+            mi->bgcolor = bgcolor->getColor().name();
         }
         break;
 
@@ -4199,6 +4216,7 @@ OverviewItemConfig::dataChanged()
             mi->program = editor->toPlainText();
             mi->start = double1->value();
             mi->stop = double2->value();
+            mi->bgcolor = bgcolor->getColor().name();
         }
     }
 }

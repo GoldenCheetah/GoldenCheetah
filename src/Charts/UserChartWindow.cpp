@@ -66,17 +66,18 @@ UserChartWindow::UserChartWindow(Context *context, bool rangemode) : GcChartWind
     // need to refresh when perspective selected
     connect(this, SIGNAL(perspectiveChanged(Perspective*)), this, SLOT(refresh()));
     connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged()));
+
+    connect(chart, SIGNAL(userChartConfigChanged()), this, SLOT(configChanged()));
 }
 
 void
 UserChartWindow::configChanged()
 {
-    QColor bgcolor = rangemode ? GColor(CTRENDPLOTBACKGROUND) : GColor(CPLOTBACKGROUND);
-
-    setProperty("color", bgcolor);
     chart->setProperty("perspective", QVariant::fromValue<Perspective*>(myPerspective));
-    chart->setBackgroundColor(bgcolor);
 
+    // tell perspective that we changed, bgcolor might need tabbar updating?
+    // but only if we have been placed onto the perspective (after initial create)
+    if (myPerspective) myPerspective->userChartConfigChanged(this);
     update();
 }
 
