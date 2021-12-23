@@ -759,7 +759,9 @@ Themes::Themes()
            << QColor(0,204,204) // Cadence
            << QColor(Qt::magenta) // Torque
            << QColor(19,19,19) // Overview Background
-           << QColor(42,42,42);// Overview Card Background
+           << QColor(39,39,39) // Overview Card Background
+           << QColor(60,60,60) // Overview Card Background 2
+           << QColor(84,84,84);// Overview Card Background 3
     add.colors = colors;
     themes << add;
     colors.clear();
@@ -780,7 +782,9 @@ Themes::Themes()
            << QColor(0,204,204) // Cadence
            << QColor(Qt::magenta) // Torque
            << QColor(0xcb,0xdc,0xea) // Overview Background
-           << QColor(255,255,255);// Overview Card Background
+           << QColor(255,255,255) // Overview Card Background
+           << QColor(247,252,255) // Overview Card Background 2
+           << QColor(231,241,250);// Overview Card Background 3
     add.colors = colors;
     themes << add;
     colors.clear();
@@ -800,7 +804,9 @@ Themes::Themes()
            << QColor(0,204,204) // Cadence
            << QColor(Qt::magenta) // Torque
            << QColor(19,19,19) // Overview Background
-           << QColor(30,30,30);// Overview Card Background
+           << QColor(30,30,30) // Overview Card Background
+           << QColor(38,38,38) // Overview Card Background 2
+           << QColor(88,88,88);// Overview Card Background 3
     add.colors = colors;
     themes << add;
     colors.clear();
@@ -820,7 +826,9 @@ Themes::Themes()
            << QColor(0,204,204) // Cadence
            << QColor(Qt::magenta) // Torque
            << QColor(255,255,255) // Overview Background
-           << QColor(245,245,245);// Overview Card Background
+           << QColor(245,245,245) // Overview Card Background
+           << QColor(227,227,227) // Overview Card Background 2
+           << QColor(202,202,202);// Overview Card Background 3
     add.colors = colors;
     themes << add;
     colors.clear();
@@ -839,7 +847,9 @@ Themes::Themes()
            << QColor(0,204,204) // Cadence
            << QColor(Qt::magenta) // Torque
            << QColor(19,19,19) // Overview Background
-           << QColor(44,49,51);// Overview Card Background
+           << QColor(44,49,51) // Overview Card Background
+           << QColor(57,63,66) // Overview Card Background 2
+           << QColor(73,81,91);// Overview Card Background 3
     add.colors = colors;
     themes  << add;
     colors.clear();
@@ -858,7 +868,9 @@ Themes::Themes()
            << QColor(0,204,204) // Cadence
            << QColor(Qt::magenta) // Torque
            << QColor(0xe3,0xe0,0xe8) // Overview Background
-           << QColor(Qt::white);// Overview Card Background
+           << QColor(Qt::white) // Overview Card Background
+           << QColor(252,249,255) // Overview Card Background 2
+           << QColor(235,235,250);// Overview Card Background 3
     add.colors = colors;
     themes  << add;
     colors.clear();
@@ -866,8 +878,8 @@ Themes::Themes()
     add.name = tr("Ollie's Oatmeal (light)");
     add.dark = false;
     add.stealth = false;
-    colors << QColor(0xdd,0xef,0xe6)  // Plot Background
-           << QColor(0x31,0x25,0x0b) // Toolbar and Sidebar Chrome
+    colors << QColor(255,255,255)  // Plot Background
+           << QColor(63,69,58) // Toolbar and Sidebar Chrome
            << QColor(0x8d,0x57,0x30) // Accent color (markers)
            << QColor(194,194,194) // Selection color
            << QColor(Qt::darkMagenta) // Critical Power and W'Bal
@@ -876,8 +888,10 @@ Themes::Themes()
            << QColor(255,170,0) // Power
            << QColor(0,204,204) // Cadence
            << QColor(Qt::magenta) // Torque
-           << QColor(0xdd,0xef,0xe6) // Overview Background
-           << QColor(0xce,0xd6,0xc6);// Overview Card Background
+           << QColor(192,201,197) // Overview Background
+           << QColor(235,241,234) // Overview Card Background
+           << QColor(250,255,247) // Overview Card Background 2
+           << QColor(83,93,82);// Overview Card Background 3
     add.colors = colors;
     themes  << add;
     colors.clear();
@@ -896,7 +910,9 @@ Themes::Themes()
            << QColor(0,204,204) // Cadence
            << QColor(Qt::magenta) // Torque
            << QColor(0,0,0) // Overview Background
-           << QColor(42,42,42);// Overview Card Background
+           << QColor(42,42,42) // Overview Card Background
+           << QColor(30,30,30) // Overview Card Background 2
+           << QColor(80,80,80);// Overview Card Background 3
     add.colors = colors;
     themes  << add;
     colors.clear();
@@ -915,7 +931,9 @@ Themes::Themes()
            << QColor(0,204,204) // Cadence
            << QColor(Qt::magenta) // Torque
            << QColor(0,0,0) // Overview Background
-           << QColor(42,42,42);// Overview Card Background
+           << QColor(42,42,42) // Overview Card Background
+           << QColor(42,42,42) // Overview Card Background 2
+           << QColor(42,42,42);// Overview Card Background 3
     add.colors = colors;
     themes  << add;
     colors.clear();
@@ -934,7 +952,9 @@ Themes::Themes()
            << QColor(0,204,204) // Cadence
            << QColor(Qt::magenta) // Torque
            << QColor(255,255,255) // Overview Background
-           << QColor(245,245,245);// Overview Card Background
+           << QColor(245,245,245) // Overview Card Background
+           << QColor(245,245,245) // Overview Card Background 2
+           << QColor(245,245,245);// Overview Card Background 3
     add.colors = colors;
     themes  << add;
     colors.clear();
@@ -954,14 +974,16 @@ Themes::Themes()
            << QColor(Qt::blue) // Cadence
            << QColor(Qt::darkGreen) // Torque
            << QColor(255,255,255) // Overview Background
-           << QColor(245,245,245);// Overview Card Background
+           << QColor(245,245,245) // Overview Card Background
+           << QColor(245,245,245) // Overview Card Background 2
+           << QColor(245,245,245);// Overview Card Background 3
     add.colors = colors;
     themes  << add;
     colors.clear();
 
 }
 
-// NOTE: this is duplicated in Pages.cpp:1565:ColorsPage::applyThemeClicked()
+// NOTE: this is duplicated in Pages.cpp:1407:ColorsPage::applyThemeClicked()
 //       you need to change there too. Sorry.
 void
 GCColor::applyTheme(int index) 
@@ -992,6 +1014,18 @@ GCColor::applyTheme(int index)
             // set back to light black for dark themes
             // and gray for light themes
             color = theme.colors[11];
+            break;
+
+        case CCARDBACKGROUND2:
+            // set back to light black for dark themes
+            // and gray for light themes
+            color = theme.colors[12];
+            break;
+
+        case CCARDBACKGROUND3:
+            // set back to light black for dark themes
+            // and gray for light themes
+            color = theme.colors[13];
             break;
 
         case COVERVIEWBACKGROUND:

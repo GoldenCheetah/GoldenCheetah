@@ -1452,6 +1452,18 @@ ColorsPage::applyThemeClicked()
                 color = theme.colors[11];
                 break;
 
+            case CCARDBACKGROUND2:
+                // set back to light black for dark themes
+                // and gray for light themes
+                color = theme.colors[12];
+                break;
+
+            case CCARDBACKGROUND3:
+                // set back to light black for dark themes
+                // and gray for light themes
+                color = theme.colors[13];
+                break;
+
             case CCHROME:
             case CCHARTBAR:
             case CTOOLBAR: // we always keep them the same, but user can make different
