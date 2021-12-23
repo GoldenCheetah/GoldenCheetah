@@ -1772,7 +1772,7 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
                     rtData.setFeO2(local.getFeO2());
                 }
 
-                rtData.setTemp(local.getCoreTemp(),0);
+                rtData.setTemp(local.getCoreTemp());
                 
                 // what are we getting from this one?
                 if (dev == bpmTelemetry) rtData.setHr(local.getHr());

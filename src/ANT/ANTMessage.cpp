@@ -547,9 +547,13 @@ ANTMessage::ANTMessage(ANT *parent, const unsigned char *message) {
 	    case ANTChannel::CHANNEL_TYPE_CORETEMP:
 		switch (data_page)
 		{
+        case 0:
+            tempQual = (message[6]&0x3);
+            break;
 		case 1:
 		    skinTemp = (message[7]+((message[8] & 0xf0)<<4))/20.0;
 		    coreTemp = (message[10]+(message[11]<<8))/100.0;
+            break;
 		}
 		break;
 

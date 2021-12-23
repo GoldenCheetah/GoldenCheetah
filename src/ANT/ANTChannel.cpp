@@ -791,18 +791,19 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
            }
            break;
 
-	   case CHANNEL_TYPE_CORETEMP:
-	   {
-		float core = antMessage.coreTemp;
-		float skin = antMessage.skinTemp;
+        case CHANNEL_TYPE_CORETEMP:
+        {
+            float core = antMessage.coreTemp;
+            float skin = antMessage.skinTemp;
+            int   qual = antMessage.tempQual;
 
-                value = antMessage.coreTemp;
-                value2 = antMessage.skinTemp;
-                parent->setCoreTemp(value, value2);
-	   }
-	   break;
+            value = antMessage.coreTemp;
+            value2 = antMessage.skinTemp;
+            parent->setCoreTemp(core, skin, qual);
+        }
+        break;
 
-	   // Cadence
+        // Cadence
            case CHANNEL_TYPE_CADENCE:
            {
                float rpm;

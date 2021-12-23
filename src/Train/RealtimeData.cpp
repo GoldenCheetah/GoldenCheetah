@@ -65,10 +65,9 @@ void RealtimeData::setAltDistance(double x)
     this->altDistance = x;
 }
 
-void RealtimeData::setTemp(double core, double skin)
+void RealtimeData::setTemp(double core)
 {
     this->coreTemp=core;
-    this->skinTemp=skin;
 }
 
 void RealtimeData::setHr(double hr)
@@ -458,7 +457,7 @@ double RealtimeData::value(DataSeries series) const
         break;
 
     case CoreTemp: return coreTemp;
-	       break;
+        break;
 
     case None:
     default:
