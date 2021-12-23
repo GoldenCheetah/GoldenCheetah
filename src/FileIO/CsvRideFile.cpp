@@ -1538,7 +1538,7 @@ CsvFileReader::writeRideFile(Context *, const RideFile *ride, QFile &file, CsvTy
 
     if (format == gc) {
         // CSV File header
-        out << "secs,cad,hr,km,kph,nm,watts,alt,lon,lat,headwind,slope,temp,interval,lrbalance,lte,rte,lps,rps,smo2,thb,o2hb,hhb\n";
+        out << "secs,cad,hr,km,kph,nm,watts,alt,lon,lat,headwind,slope,temp,interval,lrbalance,lte,rte,lps,rps,smo2,thb,o2hb,hhb,tcore\n";
 
         foreach (const RideFilePoint *point, ride->dataPoints()) {
             out << point->secs;
