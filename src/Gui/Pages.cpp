@@ -1937,7 +1937,8 @@ CustomMetricsPage::addClicked()
     here.name = "My Average Power";
     here.type = 1;
     here.precision = 0;
-    here.description = "Average Power computed using Joules to account for variable recording.";
+    here.istime = false;
+    here.description = "Average Power";
     here.unitsMetric = "watts";
     here.unitsImperial = "watts";
     here.conversion = 1.00;
@@ -1947,17 +1948,12 @@ CustomMetricsPage::addClicked()
     relevant { Data contains \"P\"; }\n\
 \n\
     # initialise aggregating variables\n\
-    init { joules <- 0; seconds <- 0; }\n\
-\n\
-    # joules = power x time, for each sample\n\
-    sample { \n\
-        joules <- joules + (POWER * RECINTSECS);\n\
-        seconds <- seconds + RECINTSECS;\n\
-    }\n\
+    # does nothing, update as needed\n\
+    init { 0; }\n\
 \n\
     # calculate metric value at end\n\
-    value { joules / seconds; }\n\
-    count { seconds; }\n\
+    value { mean(samples(POWER)); }\n\
+    count { count(samples(POWER)); }\n\
 }";
 
     EditUserMetricDialog editor(this, context, here);
