@@ -562,6 +562,7 @@ ANTMessage::ANTMessage(ANT *parent, const unsigned char *message) {
             }
             break;
 
+
             case ANTChannel::CHANNEL_TYPE_FITNESS_EQUIPMENT:
                 switch (data_page)
                 {

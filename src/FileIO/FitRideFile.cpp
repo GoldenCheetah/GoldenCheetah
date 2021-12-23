@@ -1738,23 +1738,12 @@ struct FitFileReaderState
                     case 115: // MTB Dynamics - Flow
                              native_num = -1;
                              break;
-<<<<<<< HEAD
                     case 116: // Stress
                              native_num = -1;
                              break;
                     case 139: // Core Temp
-                            // For now take value out of devel field until in for real
-                            if (!native_profile && field.deve_idx > -1) {
-                                tcore = deve_value;
-                            } else {
-                                tcore = value;
-                            }
-                            break;
-=======
-                    case 139: // Core Temp
                              tcore = value;
                              break;
->>>>>>> 5cc497a0a (Store coretemp in FIT developer field)
                     default:
                             unknown_record_fields.insert(native_num);
                             native_num = -1;
@@ -4571,12 +4560,6 @@ void write_record(QByteArray *array, const RideFile *ride, bool withAlt, bool wi
         if ( (type&2)==2 ) {
             // write right power contribution
             write_int8(ridePoint, 80 + (100-point->lrbalance));
-<<<<<<< HEAD
-        }
-        if ( (type&4)==4 ) {
-            write_float32(ridePoint, point->tcore, true);
-=======
->>>>>>> 5cc497a0a (Store coretemp in FIT developer field)
         }
         if ( (type&4)==4 ) {
             write_float32(ridePoint, point->tcore, true);

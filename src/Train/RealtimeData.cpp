@@ -22,25 +22,25 @@
 
 #include <QtDebug>
 
-RealtimeData::RealtimeData() {
-  name[0] = '\0';
-  hr = watts = altWatts = speed = wheelRpm = load = slope = torque = 0.0;
-  cadence = distance = altDistance = virtualSpeed = wbal = 0.0;
-  lap = msecs = lapMsecs = lapMsecsRemaining = ergMsecsRemaining = 0;
-  thb = smo2 = o2hb = hhb = 0.0;
-  lrbalance = RideFile::NA;
-  rte = lte = lps = rps = 0.0;
-  coreTemp = skinTemp = 0.0;
-  latitude = longitude = altitude = 0.0;
-  rf = rmv = vo2 = vco2 = tv = feo2 = 0.0;
-  routeDistance = distanceRemaining = 0.0;
-  trainerStatusAvailable = false;
-  trainerReady = true;
-  trainerRunning = true;
-  trainerCalibRequired = false;
-  trainerConfigRequired = false;
-  trainerBrakeFault = false;
-  memset(spinScan, 0, 24);
+RealtimeData::RealtimeData()
+{
+    name[0] = '\0';
+    hr= watts= altWatts= speed= wheelRpm= load= slope= torque= 0.0;
+    cadence = distance = altDistance = virtualSpeed = wbal = 0.0;
+    lap = msecs = lapMsecs = lapMsecsRemaining = ergMsecsRemaining = 0;
+    thb = smo2 = o2hb = hhb = 0.0;
+    coreTemp = skinTemp = 0.0;
+    lrbalance = rte = lte = lps = rps = 0.0;
+    latitude = longitude = altitude = 0.0;
+    rf = rmv = vo2 = vco2 = tv = feo2 = 0.0;
+    routeDistance = distanceRemaining = 0.0;
+    trainerStatusAvailable = false;
+    trainerReady = true;
+    trainerRunning = true;
+    trainerCalibRequired = false;
+    trainerConfigRequired = false;
+    trainerBrakeFault = false;
+    memset(spinScan, 0, 24);
 }
 
 void RealtimeData::setName(char *name) { strcpy(this->name, name); }
@@ -85,7 +85,6 @@ void RealtimeData::setRouteDistance(double x) { this->routeDistance = x; }
 
 void RealtimeData::setDistanceRemaining(double x) {
   this->distanceRemaining = x;
-}
 
 void RealtimeData::setLapDistance(double x) { this->lapDistance = x; }
 

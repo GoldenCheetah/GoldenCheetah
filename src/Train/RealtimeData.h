@@ -93,7 +93,7 @@ public:
     void setLatitude(double);
     void setLongitude(double);
     void setAltitude(double);
-    void setTemp(double,double);
+    void setTemp(double);
     const char *getName() const;
 
     // new muscle oxygen stuff
@@ -175,7 +175,7 @@ private:
     double torque; // raw torque data for calibration display
     double latitude, longitude, altitude;
     double vo2, vco2, rf, rmv, tv, feo2;
-    double coreTemp, skinTemp;
+    double coreTemp;
 
     std::chrono::high_resolution_clock::time_point wheelRpmSampleTime;
 
