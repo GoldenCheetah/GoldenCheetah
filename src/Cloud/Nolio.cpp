@@ -79,12 +79,12 @@ void Nolio::onSslErrors(QNetworkReply *reply, const QList<QSslError>&){
 bool Nolio::open(QStringList &errors){
     printd("Nolio::open\n");
 
-    QString refresh_token = getSetting(GC_NOLIO_REFRESH_TOKEN, "").toString();
+    QString refresh_token = appsettings->value(NULL, GC_NOLIO_REFRESH_TOKEN, "").toString();
     if (refresh_token == "") {
         return false;
     }
 
-    QString last_refresh_str = getSetting(GC_NOLIO_LAST_REFRESH, "0").toString();
+    QString last_refresh_str = appsettings->value(NULL, GC_NOLIO_LAST_REFRESH, "0").toString();
     QDateTime last_refresh = QDateTime::fromString(last_refresh_str);
     last_refresh = last_refresh.addSecs(86400); // nolio tokens are valid for one day
     QDateTime now = QDateTime::currentDateTime();
@@ -95,7 +95,7 @@ bool Nolio::open(QStringList &errors){
     }
 
     // get new credentials using refresh_token
-    QNetworkRequest request(QUrl("https://nolio2.eu.ngrok.io/api/token/"));
+    QNetworkRequest request(QUrl("https://www.nolio.io/api/token/"));
     request.setRawHeader("Content-Type", "application/x-www-form-urlencoded");
 
     QString authheader = QString("%1:%2").arg(GC_NOLIO_CLIENT_ID).arg(GC_NOLIO_CLIENT_SECRET);
@@ -130,9 +130,9 @@ bool Nolio::open(QStringList &errors){
 
     QString new_access_token = document.object()["access_token"].toString();
     QString new_refresh_token = document.object()["refresh_token"].toString();
-    if (new_access_token != "") setSetting(GC_NOLIO_ACCESS_TOKEN, new_access_token);
-    if (new_refresh_token != "") setSetting(GC_NOLIO_REFRESH_TOKEN, new_refresh_token);
-    setSetting(GC_NOLIO_LAST_REFRESH, now.toString());
+    if (new_access_token != "") appsettings->setValue(GC_NOLIO_ACCESS_TOKEN, new_access_token);
+    if (new_refresh_token != "") appsettings->setValue(GC_NOLIO_REFRESH_TOKEN, new_refresh_token);
+    appsettings->setValue(GC_NOLIO_LAST_REFRESH, now.toString());
     CloudServiceFactory::instance().saveSettings(this, context);
     return true;
 }
@@ -142,15 +142,15 @@ QList<CloudServiceEntry*> Nolio::readdir(QString path, QStringList &errors, QDat
     QList<CloudServiceEntry*> returning;
 
     // do we have a token
-    QString access_token = getSetting(GC_NOLIO_ACCESS_TOKEN, "").toString();
+    QString access_token = appsettings->value(NULL, GC_NOLIO_ACCESS_TOKEN, "").toString();
     if (access_token == "") {
         errors << "You must authorise with Nolio first";
         return returning;
     }
 
     QString user_id = getSetting(GC_NOLIO_ATHLETE_ID, "").toString();
-
-    QString urlstr = "https://nolio2.eu.ngrok.io/api/get/training/?";
+    // prepare the request
+    QString urlstr = "https://www.nolio.io/api/get/training/?";
     QUrlQuery params;
     params.addQueryItem("from", from.toString("yyyy-MM-dd"));
     params.addQueryItem("to", to.toString("yyyy-MM-dd"));
@@ -190,7 +190,11 @@ QList<CloudServiceEntry*> Nolio::readdir(QString path, QStringList &errors, QDat
                 add->isDir = false;
                 add->distance = each["distance"].toDouble();
                 add->duration = each["duration"].toInt();
-                add->name = QDateTime::fromString(each["date_start"].toString(), Qt::ISODate).toString("yyyy_MM_dd_HH_mm_ss")+".json";
+                if(each["hour_start"].toString().size() > 0){
+                    QString full_date = QString("%1T%2Z").arg(each["date_start"].toString(), each["hour_start"].toString());
+                    add->name = QDateTime::fromString(full_date, Qt::ISODate).toString("yyyy_MM_dd_HH_mm_ss")+".json";
+                }
+                else add->name = QDateTime::fromString(each["date_start"].toString(), Qt::ISODate).toString("yyyy_MM_dd_HH_mm_ss")+".json";
                 returning << add;
             }
         }
@@ -202,12 +206,13 @@ bool Nolio::readFile(QByteArray *data, QString remotename, QString remoteid){
     printd("Nolio::readFile\n");
 
     // do we have a token
-    QString access_token = getSetting(GC_NOLIO_ACCESS_TOKEN, "").toString();
+    QString access_token = appsettings->value(NULL, GC_NOLIO_ACCESS_TOKEN, "").toString();
     if (access_token == "") {
         return false;
     }
 
-    QString urlstr = "https://nolio2.eu.ngrok.io/api/get/training/info/?";
+    // prepare the request
+    QString urlstr = "https://www.nolio.io/api/get/training/info/?";
     QUrlQuery params;
     params.addQueryItem("id", remoteid);
     QUrl url = QUrl(urlstr + params.toString());
@@ -341,12 +346,14 @@ QList<CloudServiceAthlete> Nolio::listAthletes(){
     printd("Nolio::listAthletes\n");
     QList<CloudServiceAthlete> returning;
 
-    QString access_token = getSetting(GC_NOLIO_ACCESS_TOKEN, "").toString();
+    QString access_token = appsettings->value(NULL, GC_NOLIO_ACCESS_TOKEN, "").toString();
     if (access_token == "") {
         return returning;
     }
-    QString urlstr = "https://nolio2.eu.ngrok.io/api/get/athletes/";
-    QUrl url = QUrl(urlstr);
+    QString urlstr = "https://www.nolio.io/api/get/athletes/?";
+    QUrlQuery params;
+    params.addQueryItem("wants_coach", "true");
+    QUrl url = QUrl(urlstr + params.toString());
     QNetworkRequest request(url);
     request.setRawHeader("Authorization", (QString("Bearer %1").arg(access_token)).toLatin1());
     QNetworkReply *reply = nam->get(request);
