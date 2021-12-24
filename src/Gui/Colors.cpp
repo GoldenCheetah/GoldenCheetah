@@ -238,7 +238,7 @@ void GCColor::setupColors()
 #endif
 #endif
         { tr("Gui"), tr("Overview Background"), "COVERVIEWBACKGROUND", QColor(0,0,0) },
-        { tr("Gui"), tr("Overview Card Background"), "CCARDBACKGROUND", QColor(52,52,52) },
+        { tr("Gui"), tr("Overview Tile Background"), "CCARDBACKGROUND", QColor(52,52,52) },
         { tr("Data"), tr("VO2"), "CVO2", Qt::magenta },
         { tr("Data"), tr("Ventilation"), "CVENTILATION", Qt::cyan },
         { tr("Data"), tr("VCO2"), "CVCO2", Qt::green },
@@ -247,8 +247,8 @@ void GCColor::setupColors()
         { tr("Data"), tr("FeO2"), "CFEO2", Qt::yellow },
         { tr("Gui"), tr("Toolbar Hover"), "CHOVER", Qt::lightGray },
         { tr("Gui"), tr("Chartbar background"), "CCHARTBAR", Qt::lightGray },
-        { tr("Gui"), tr("Overview Card Background Alternate"), "CCARDBACKGROUND2", QColor(0,0,0) },
-        { tr("Gui"), tr("Overview Card Background Vibrant"), "CCARDBACKGROUND3", QColor(52,52,52) },
+        { tr("Gui"), tr("Overview Tile Background Alternate"), "CCARDBACKGROUND2", QColor(0,0,0) },
+        { tr("Gui"), tr("Overview Tile Background Vibrant"), "CCARDBACKGROUND3", QColor(52,52,52) },
         { "", "", "", QColor(0,0,0) },
     };
 
@@ -369,15 +369,15 @@ void GCColor::setupColors()
     LightDefaultColorList[94].color = QColor(117,0,117); // 94:Right Pedal Smoothness
     LightDefaultColorList[95].color = QColor(54,55,75); // 95:Toolbar and Sidebar
     LightDefaultColorList[96].color = QColor(227,224,232); // 96:Overview Background
-    LightDefaultColorList[97].color = QColor(255,255,255); // 97:Overview Card Background
+    LightDefaultColorList[97].color = QColor(255,255,255); // 97:Overview Tile Background
     LightDefaultColorList[98].color = QColor(255,25,167); // 98:VO2
     LightDefaultColorList[99].color = QColor(27,203,177); // 99:Ventilation
     LightDefaultColorList[100].color = QColor(0,121,0); // 100:VCO2
     LightDefaultColorList[101].color = QColor(101,44,45); // 101:Tidal Volume
     LightDefaultColorList[102].color = QColor(134,74,255); // 102:Respiratory Frequency
     LightDefaultColorList[103].color = QColor(255,46,46); // 103:FeO2
-    LightDefaultColorList[106].color = QColor(180,180,180); // 106:Card Alternate
-    LightDefaultColorList[107].color = QColor(0xee,0xf8,0xff); // 107:Card Vibrant
+    LightDefaultColorList[106].color = QColor(180,180,180); // 106:Tile Alternate
+    LightDefaultColorList[107].color = QColor(0xee,0xf8,0xff); // 107:Tile Vibrant
 }
 
 // default settings for fonts etc
@@ -759,9 +759,9 @@ Themes::Themes()
            << QColor(0,204,204) // Cadence
            << QColor(Qt::magenta) // Torque
            << QColor(19,19,19) // Overview Background
-           << QColor(39,39,39) // Overview Card Background
-           << QColor(60,60,60) // Overview Card Background 2
-           << QColor(84,84,84);// Overview Card Background 3
+           << QColor(39,39,39) // Overview Tile Background
+           << QColor(60,60,60) // Overview Tile Background 2
+           << QColor(84,84,84);// Overview Tile Background 3
     add.colors = colors;
     themes << add;
     colors.clear();
@@ -782,9 +782,9 @@ Themes::Themes()
            << QColor(0,204,204) // Cadence
            << QColor(Qt::magenta) // Torque
            << QColor(0xcb,0xdc,0xea) // Overview Background
-           << QColor(255,255,255) // Overview Card Background
-           << QColor(247,252,255) // Overview Card Background 2
-           << QColor(231,241,250);// Overview Card Background 3
+           << QColor(255,255,255) // Overview Tile Background
+           << QColor(247,252,255) // Overview Tile Background 2
+           << QColor(231,241,250);// Overview Tile Background 3
     add.colors = colors;
     themes << add;
     colors.clear();
@@ -804,9 +804,9 @@ Themes::Themes()
            << QColor(0,204,204) // Cadence
            << QColor(Qt::magenta) // Torque
            << QColor(19,19,19) // Overview Background
-           << QColor(30,30,30) // Overview Card Background
-           << QColor(38,38,38) // Overview Card Background 2
-           << QColor(88,88,88);// Overview Card Background 3
+           << QColor(30,30,30) // Overview Tile Background
+           << QColor(38,38,38) // Overview Tile Background 2
+           << QColor(88,88,88);// Overview Tile Background 3
     add.colors = colors;
     themes << add;
     colors.clear();
@@ -826,9 +826,9 @@ Themes::Themes()
            << QColor(0,204,204) // Cadence
            << QColor(Qt::magenta) // Torque
            << QColor(255,255,255) // Overview Background
-           << QColor(245,245,245) // Overview Card Background
-           << QColor(227,227,227) // Overview Card Background 2
-           << QColor(202,202,202);// Overview Card Background 3
+           << QColor(245,245,245) // Overview Tile Background
+           << QColor(227,227,227) // Overview Tile Background 2
+           << QColor(202,202,202);// Overview Tile Background 3
     add.colors = colors;
     themes << add;
     colors.clear();
@@ -847,9 +847,9 @@ Themes::Themes()
            << QColor(0,204,204) // Cadence
            << QColor(Qt::magenta) // Torque
            << QColor(19,19,19) // Overview Background
-           << QColor(44,49,51) // Overview Card Background
-           << QColor(57,63,66) // Overview Card Background 2
-           << QColor(73,81,91);// Overview Card Background 3
+           << QColor(44,49,51) // Overview Tile Background
+           << QColor(57,63,66) // Overview Tile Background 2
+           << QColor(73,81,91);// Overview Tile Background 3
     add.colors = colors;
     themes  << add;
     colors.clear();
@@ -868,9 +868,9 @@ Themes::Themes()
            << QColor(0,204,204) // Cadence
            << QColor(Qt::magenta) // Torque
            << QColor(0xe3,0xe0,0xe8) // Overview Background
-           << QColor(Qt::white) // Overview Card Background
-           << QColor(252,249,255) // Overview Card Background 2
-           << QColor(235,235,250);// Overview Card Background 3
+           << QColor(Qt::white) // Overview Tile Background
+           << QColor(252,249,255) // Overview Tile Background 2
+           << QColor(235,235,250);// Overview Tile Background 3
     add.colors = colors;
     themes  << add;
     colors.clear();
@@ -889,9 +889,9 @@ Themes::Themes()
            << QColor(0,204,204) // Cadence
            << QColor(Qt::magenta) // Torque
            << QColor(192,201,197) // Overview Background
-           << QColor(235,241,234) // Overview Card Background
-           << QColor(250,255,247) // Overview Card Background 2
-           << QColor(83,93,82);// Overview Card Background 3
+           << QColor(235,241,234) // Overview Tile Background
+           << QColor(250,255,247) // Overview Tile Background 2
+           << QColor(83,93,82);// Overview Tile Background 3
     add.colors = colors;
     themes  << add;
     colors.clear();
@@ -910,9 +910,9 @@ Themes::Themes()
            << QColor(0,204,204) // Cadence
            << QColor(Qt::magenta) // Torque
            << QColor(0,0,0) // Overview Background
-           << QColor(42,42,42) // Overview Card Background
-           << QColor(30,30,30) // Overview Card Background 2
-           << QColor(80,80,80);// Overview Card Background 3
+           << QColor(42,42,42) // Overview Tile Background
+           << QColor(30,30,30) // Overview Tile Background 2
+           << QColor(80,80,80);// Overview Tile Background 3
     add.colors = colors;
     themes  << add;
     colors.clear();
@@ -931,9 +931,9 @@ Themes::Themes()
            << QColor(0,204,204) // Cadence
            << QColor(Qt::magenta) // Torque
            << QColor(0,0,0) // Overview Background
-           << QColor(42,42,42) // Overview Card Background
-           << QColor(42,42,42) // Overview Card Background 2
-           << QColor(42,42,42);// Overview Card Background 3
+           << QColor(42,42,42) // Overview Tile Background
+           << QColor(42,42,42) // Overview Tile Background 2
+           << QColor(42,42,42);// Overview Tile Background 3
     add.colors = colors;
     themes  << add;
     colors.clear();
@@ -952,9 +952,9 @@ Themes::Themes()
            << QColor(0,204,204) // Cadence
            << QColor(Qt::magenta) // Torque
            << QColor(255,255,255) // Overview Background
-           << QColor(245,245,245) // Overview Card Background
-           << QColor(245,245,245) // Overview Card Background 2
-           << QColor(245,245,245);// Overview Card Background 3
+           << QColor(245,245,245) // Overview Tile Background
+           << QColor(245,245,245) // Overview Tile Background 2
+           << QColor(245,245,245);// Overview Tile Background 3
     add.colors = colors;
     themes  << add;
     colors.clear();
@@ -974,9 +974,9 @@ Themes::Themes()
            << QColor(Qt::blue) // Cadence
            << QColor(Qt::darkGreen) // Torque
            << QColor(255,255,255) // Overview Background
-           << QColor(245,245,245) // Overview Card Background
-           << QColor(245,245,245) // Overview Card Background 2
-           << QColor(245,245,245);// Overview Card Background 3
+           << QColor(245,245,245) // Overview Tile Background
+           << QColor(245,245,245) // Overview Tile Background 2
+           << QColor(245,245,245);// Overview Tile Background 3
     add.colors = colors;
     themes  << add;
     colors.clear();

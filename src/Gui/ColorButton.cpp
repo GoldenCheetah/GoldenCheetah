@@ -116,7 +116,7 @@ GColorDialog::GColorDialog(QColor selected, QWidget *parent, bool all) : QDialog
     colorlist->headerItem()->setText(0, tr("Color"));
     colorlist->headerItem()->setText(1, tr("Select"));
     colorlist->setColumnCount(2);
-    colorlist->setColumnWidth(0,200 *dpiXFactor);
+    colorlist->setColumnWidth(0,250 *dpiXFactor);
     colorlist->setSelectionMode(QAbstractItemView::SingleSelection);
     colorlist->setUniformRowHeights(true); // causes height problems when adding - in case of non-text fields
     colorlist->setIndentation(0);
