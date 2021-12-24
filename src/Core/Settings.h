@@ -426,10 +426,10 @@
 #define GC_XERT_TOKEN                  "<athlete-private>xert/xert_token"
 #define GC_XERT_REFRESH_TOKEN          "<athlete-private>xert/refresh_token"
 #define GC_XERT_LAST_REFRESH           "<athlete-private>xert/last_refresh"
-//Nolio
-#define GC_NOLIO_ACCESS_TOKEN          "<athlete-private>nolio_access_token"
-#define GC_NOLIO_REFRESH_TOKEN         "<athlete-private>nolio_refresh_token"
-#define GC_NOLIO_LAST_REFRESH          "<athlete-private>nolio_last_refresh"
+// Nolio
+#define GC_NOLIO_ACCESS_TOKEN          "<global-general>nolio_access_token"
+#define GC_NOLIO_REFRESH_TOKEN         "<global-general>nolio_refresh_token"
+#define GC_NOLIO_LAST_REFRESH          "<global-general>nolio_last_refresh"
 #define GC_NOLIO_URL                   "<athlete-private>nolio_url"
 #define GC_NOLIO_ATHLETE_ID            "<athlete-private>nolio_athlete_id"
 #define GC_NOLIO_ATHLETE_NAME          "<athlete-private>nolio_athlete_name"

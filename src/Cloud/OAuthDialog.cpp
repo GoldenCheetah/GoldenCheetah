@@ -106,7 +106,7 @@ OAuthDialog::OAuthDialog(Context *context, OAuthSite site, CloudService *service
 
     } else if(site == NOLIO) {
 
-        urlstr = QString("https://nolio2.eu.ngrok.io/api/authorize?");
+        urlstr = QString("https://www.nolio.io/api/authorize/?");
         urlstr.append("client_id=").append(GC_NOLIO_CLIENT_ID).append("&");
         urlstr.append("redirect_uri=http://www.goldencheetah.org/&");
         urlstr.append("response_type=code");
@@ -295,7 +295,7 @@ OAuthDialog::urlChanged(const QUrl &url)
 
             } else if (site == NOLIO) {
 
-                urlstr = QString("https://nolio2.eu.ngrok.io/api/token/?");
+                urlstr = QString("https://www.nolio.io/api/token/?");
                 params.addQueryItem("grant_type", "authorization_code");
                 params.addQueryItem("redirect_uri", "http://www.goldencheetah.org/");
 #if (defined GC_NOLIO_CLIENT_ID) && (defined GC_NOLIO_CLIENT_SECRET)
@@ -626,9 +626,9 @@ OAuthDialog::networkRequestFinished(QNetworkReply *reply)
             information.exec();
 
         } else if (site == NOLIO) {
-            service->setSetting(GC_NOLIO_ACCESS_TOKEN, access_token);
-            service->setSetting(GC_NOLIO_REFRESH_TOKEN, refresh_token);
-            service->setSetting(GC_NOLIO_LAST_REFRESH, QDateTime::currentDateTime());
+            appsettings->setValue(GC_NOLIO_ACCESS_TOKEN, access_token);
+            appsettings->setValue(GC_NOLIO_REFRESH_TOKEN, refresh_token);
+            appsettings->setValue(GC_NOLIO_LAST_REFRESH, QDateTime::currentDateTime());
             QString info = QString(tr("Nolio authorization was successful."));
             QMessageBox information(QMessageBox::Information, tr("Information"), info);
             information.exec();
