@@ -20,7 +20,7 @@
 #include "ChartSpace.h"
 #include "OverviewItems.h"
 #include "UserChartOverviewItem.h"
-#include "AddChartWizard.h"
+#include "AddTileWizard.h"
 #include "Utils.h"
 #include "HelpWhatsThis.h"
 
@@ -97,7 +97,7 @@ OverviewWindow::addTile()
 {
     ChartSpaceItem *added = NULL; // tell us what you added...
 
-    AddChartWizard *p = new AddChartWizard(context, space, scope, added);
+    AddTileWizard *p = new AddTileWizard(context, space, scope, added);
     p->exec(); // no mem leak delete on close dialog
 
     // set ride / date range if we added one.....

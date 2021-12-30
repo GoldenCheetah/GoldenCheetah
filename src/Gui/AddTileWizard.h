@@ -16,8 +16,8 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#ifndef _AddChartWizard_h
-#define _AddChartWizard_h
+#ifndef _AddTileWizard_h
+#define _AddTileWizard_h
 
 #include "GoldenCheetah.h"
 #include "Context.h"
@@ -25,13 +25,13 @@
 
 #include <QWizard>
 
-class AddChartWizard : public QWizard
+class AddTileWizard : public QWizard
 {
     Q_OBJECT
 
 public:
 
-    AddChartWizard(Context *context, ChartSpace *space, int scope, ChartSpaceItem * &added);
+    AddTileWizard(Context *context, ChartSpace *space, int scope, ChartSpaceItem * &added);
     QSize sizeHint() const { return QSize(600,650); }
 
     Context *context;
@@ -54,12 +54,12 @@ public:
 
 };
 
-class AddChartType : public QWizardPage
+class AddTileType : public QWizardPage
 {
     Q_OBJECT
 
     public:
-        AddChartType(AddChartWizard *);
+        AddTileType(AddTileWizard *);
         void initializePage();
         bool validate() const { return false; }
         bool isComplete() const { return false; }
@@ -69,7 +69,7 @@ class AddChartType : public QWizardPage
         void clicked(int);
 
     private:
-        AddChartWizard *wizard;
+        AddTileWizard *wizard;
         QSignalMapper *mapper;
         QWidget *buttons;
         QVBoxLayout *buttonlayout;
@@ -77,13 +77,13 @@ class AddChartType : public QWizardPage
 };
 
 
-class AddChartConfig : public QWizardPage
+class AddTileConfig : public QWizardPage
 {
     Q_OBJECT
 
     public:
-        AddChartConfig(AddChartWizard *);
-        ~AddChartConfig(); // spare the item's config widget when we die
+        AddTileConfig(AddTileWizard *);
+        ~AddTileConfig(); // spare the item's config widget when we die
         void initializePage();
         bool validate() const { return true; }
         bool isComplete() const { return true; }
@@ -93,24 +93,24 @@ class AddChartConfig : public QWizardPage
     public slots:
 
     private:
-        AddChartWizard *wizard;
+        AddTileWizard *wizard;
         QVBoxLayout *main;
 };
 
 
-class AddChartFinal : public QWizardPage
+class AddTileFinal : public QWizardPage
 {
     Q_OBJECT
 
     public:
-        AddChartFinal(AddChartWizard *);
+        AddTileFinal(AddTileWizard *);
         void initializePage();
         bool validatePage();
         bool isCommitPage() { return true; }
 
     private:
-        AddChartWizard *wizard;
+        AddTileWizard *wizard;
 
 };
 
-#endif // _AddChartWizard_h
+#endif // _AddTileWizard_h
