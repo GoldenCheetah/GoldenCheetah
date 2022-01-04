@@ -432,6 +432,7 @@ struct FitFileReaderState
                 case 3405: case 3639: return "Garmin Swim 2";
                 case 3558: return "Garmin Edge 130 Plus";
                 case 3570: return "Garmin Edge 1030 Plus";
+                case 3578: return "Garmin Rally 100/200";
                 case 3589: return "Garmin FR745";
                 case 3592: return "Garmin Varia RTL515";
                 case 20119: return "Garmin Training Center";
