@@ -79,7 +79,6 @@ OAuthDialog::OAuthDialog(Context *context, OAuthSite site, CloudService *service
     view = new QWebEngineView();
     view->setZoomFactor(dpiXFactor);
     view->page()->profile()->cookieStore()->deleteAllCookies();
-    view->page()->profile()->setHttpUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.79 Safari/537.36 Edge/14.14393");
 
     view->setContentsMargins(0,0,0,0);
     view->page()->view()->setContentsMargins(0,0,0,0);
