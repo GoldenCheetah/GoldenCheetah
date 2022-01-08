@@ -705,7 +705,7 @@ FormField::FormField(FieldDefinition field, RideMetadata *meta) : definition(fie
 
     case FIELD_INTEGER : // integer
         widget = new QSpinBox(this);
-        //widget->setFixedHeight(18);
+        ((QSpinBox*)widget)->setMaximum(100);
         ((QSpinBox*)widget)->setButtonSymbols(QAbstractSpinBox::NoButtons);
         connect (widget, SIGNAL(valueChanged(int)), this, SLOT(dataChanged()));
         connect (widget, SIGNAL(editingFinished()), this, SLOT(editFinished()));

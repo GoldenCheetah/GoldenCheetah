@@ -1204,6 +1204,14 @@ struct FitFileReaderState
                     active_session_["EPOC"] = QString::number(round(value / 65536.0 ));
                     rideFile->setTag("EPOC", QString::number(round(value / 65536.0 )));
                     break;
+                case 192:   /* undocumented: Feel manually entered after activity (0-25-50-75-100) */
+                    active_session_["Feel"] = QString::number(round(value));
+                    rideFile->setTag("Feel", QString::number(round(value)));
+                    break;
+                case 193:   /* undocumented: RPE manually entered after activity (0-10) */
+                    active_session_["RPE"] = QString::number(value / 10.0 );
+                    rideFile->setTag("RPE", QString::number(value / 10.0 ));
+                    break;
                 case 254: //index
                 case 0:   //event
                 case 1:    /* event_type */
