@@ -705,7 +705,8 @@ FormField::FormField(FieldDefinition field, RideMetadata *meta) : definition(fie
 
     case FIELD_INTEGER : // integer
         widget = new QSpinBox(this);
-        ((QSpinBox*)widget)->setMaximum(100);
+        ((QSpinBox*)widget)->setMinimum(-9999999);
+        ((QSpinBox*)widget)->setMaximum(9999999);
         ((QSpinBox*)widget)->setButtonSymbols(QAbstractSpinBox::NoButtons);
         connect (widget, SIGNAL(valueChanged(int)), this, SLOT(dataChanged()));
         connect (widget, SIGNAL(editingFinished()), this, SLOT(editFinished()));
@@ -715,6 +716,8 @@ FormField::FormField(FieldDefinition field, RideMetadata *meta) : definition(fie
         widget = new QDoubleSpinBox(this);
         //widget->setFixedHeight(18);
         ((QDoubleSpinBox*)widget)->setButtonSymbols(QAbstractSpinBox::NoButtons);
+        ((QDoubleSpinBox*)widget)->setMinimum(-9999999.99);
+        ((QDoubleSpinBox*)widget)->setMaximum(9999999.99);
         if (GlobalContext::context()->specialFields.isMetric(field.name)) {
 
             enabled = new QCheckBox(this);
