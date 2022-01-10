@@ -241,8 +241,8 @@ void ErgFile::parseErg2(QString p)
             // set ErgFile duration
             Duration = Points.last().x;      // last is the end point in msecs
 
-            calculateMetrics();
             valid = true;
+            calculateMetrics();
         }
     }
 }
@@ -1795,7 +1795,7 @@ ErgFile::calculateMetrics()
                 first = false;
             } else {
                 minY = std::min(minY, p.y);
-                maxY = std::min(maxY, p.y);
+                maxY = std::max(maxY, p.y);
             }
 
             while (nextSecs < p.x) {
