@@ -501,7 +501,6 @@ TrainSidebar::eventFilter(QObject *, QEvent *event)
 
     // only when we are recording !
     if (status & RT_RECORDING) {
-#if 0
         if (event->type() == QEvent::KeyPress) {
 
             // we care about cmd / ctrl
@@ -527,15 +526,20 @@ TrainSidebar::eventFilter(QObject *, QEvent *event)
             //
             switch(key) {
 
-                //XXX TODO
+                case Qt::Key_Space:
+                    Start();
+                    break;
+
+                case Qt::Key_Escape:
+                    Stop();
+                    break;
 
                 default:
-                break;
+                    break;
 
             }
             return true; // we listen to 'em all
         }
-#endif
     }
     return false;
 }
