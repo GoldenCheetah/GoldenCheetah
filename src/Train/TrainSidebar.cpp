@@ -1218,6 +1218,8 @@ void TrainSidebar::Start()       // when start button is pressed
         SetThreadExecutionState(ES_DISPLAY_REQUIRED | ES_CONTINUOUS);
 #endif
 
+        context->mainWindow->showSidebar(false);
+
         // Stop users from selecting different devices
         // media or workouts whilst a workout is in progress
 #if !defined GC_VIDEO_NONE
