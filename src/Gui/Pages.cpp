@@ -751,9 +751,6 @@ TrainOptionsPage::TrainOptionsPage(QWidget *parent, Context *context) : QWidget(
     autoHide = new QCheckBox(tr("Auto-hide bottom bar in Train View"), this);
     autoHide->setChecked(appsettings->value(this, TRAIN_AUTOHIDE, false).toBool());
 
-    // Disabled until ported across from the existing bottom bar checkbox
-    autoHide->setDisabled(true);
-
     lapAlert = new QCheckBox(tr("Play sound before new lap"), this);
     lapAlert->setChecked(appsettings->value(this, TRAIN_LAPALERT, false).toBool());
 
