@@ -6917,9 +6917,7 @@ Esto puede conducir a inconsistencias entre sus activides locales en GoldenCheet
     <message>
         <location filename="../../Gui/Pages.cpp" line="1276"/>
         <source>The quick brown fox jumped over the lazy dog</source>
-        <translation>El veloz murciélago hindú comía feliz cardillo 
-y kiwi. La cigüeña tocaba el saxofón detrás 
-del palenque de paja</translation>
+        <translation>Canta, oh Diosa, la cólera del pelida Aquileo</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="1311"/>
@@ -10290,10 +10288,11 @@ le sugerirá los posibles nombres
   - &quot;Set Rest HRV&quot; if checked the computed HRV metrics are set as Rest HRV Measures
 </source>
         <translation>Filtrar R-R atípicos (ver &quot;R-R flag&quot; en HRV XData, donde los datos válidos se marcan con &quot;1&quot;).
+
   - &quot;R-R mínimo y máximo&quot;: excluye muestras fuera del rango (flag -1). Also excluded when filtering range.
   - &quot;Rango de filtrado&quot;: respecto al promedio de la ventana de filtrado (flag 0)
   - &quot;Tamaño de ventana de filtrado&quot;: distancia A CADA LADO del intervalo actual
-  - &quot;Establecer HRV en reposo&quot;: indica que las métricas HRV calculadas se almacenen como medidas de VFC (HRV) en reposo
+  - &quot;Establecer HRV en reposo&quot;: indica que las métricas HRV calculadas se almacenen como medidas de HRV en reposo
 </translation>
     </message>
 </context>
@@ -10471,7 +10470,7 @@ La aproximación mediante splines cúbicos estima la distancia utilizando curvas
     <message>
         <location filename="../../FileIO/FixDerivePower.cpp" line="67"/>
         <source>Bike Weight (kg)</source>
-        <translation>Peso de la bicicleta (kg)</translation>
+        <translation>Masa de la bicicleta (kg)</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixDerivePower.cpp" line="68"/>
@@ -10514,21 +10513,18 @@ The activity has to be a Ride with Speed and Altitude.
 Warning: the accuracy of power estimation can be too low to be of practical use for power analysis of general outdoor rides using typical GPS data. A power meter is recommended.</source>
         <translation>Estima la potencia en base a velocidad/elevación/peso etc.
 
-El Peso de la bicicleta se agrega al peso del atleta (que debería incluir ropa, calzado, etc.) para conformar la masa total.
+  - La masa de la bicicleta se agrega al peso del atleta (que debería incluir ropa, calzado, etc.) para conformar la masa total.
+  - Crr es el coeficiente de resistencia a la rodadura, que depende de los neumáticos, la presión a la que estén hinchadas, la temperatura y la superficie del terreno. Pueden consultarse valores para diferentes neumáticos en https://www.bicyclerollingresistance.com/
+  - CdA es el producto del coeficiente aerodinámico y el área frontal efectiva en m^2, que depende de la posición sobre la bicicleta y el equipamiento. Si vale 0 se estima de las medidas del atleta.
+  - El coeficiente de draft (rebufo) es un factor multiplicativo para ajustar por drafting (rebufo, ir a rueda); 1 es no drafting  y 0.7 un valor razonable para ir en pelotón.
+  - La velocidad del viento debe indicarse en km/h.
+  - La dirección del viento (de dónde viene) en grados desde -179 a +180 (-90=O, 0=N, 90=E, 180=S).
 
-Crr es el coeficiente de resistencia a la rodadura, que depende de las cubiertas, la presión a la que estén hinchadas, la temperatura y la superficie del terreno.
-
-CdA es el área frontal efectiva en m^2, que depende de la posición sobre la bicicleta y el equipamiento. Si vale 0 se estima de las medidas del atleta.
-
-El coeficiente de draft (rebufo) es un factor multiplicativo para ajustar por drafting (rebufo, ir a rueda); 1 es no drafting  y 0.7 un valor razonable para ir en pelotón.
-
-La velocidad del viento debe indicarse en km/h.
-La dirección del viento (de dónde viene) en grados desde -179 a +180 (-90=O, 0=N, 90=E, 180=S).
 Nota: si se especifica la velocidad del viento se reemplazarán los datos existentes en el archivo.
 
 El deporte tiene que ser ciclismo y contener velocidad y altitud para habilitar el cálculo.
 
-Aviso: la precisión de la estimación puede ser demasiado pobre para ser de uso práctico en condiciones generales de ciclismo usando velocidad y altitud provenientes de GPS. Se recomienda el uso de un medidor de potencia.</translation>
+Aviso: la precisión de la estimación puede ser demasiado pobre para ser de uso práctico en condiciones generales de ciclismo usando velocidad y altitud provenientes de posicionamiento GNSS. Se recomienda el uso de un medidor de potencia.</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixDerivePower.cpp" line="72"/>
@@ -10596,7 +10592,7 @@ Se requiere conexión a internet.</translation>
     <message>
         <location filename="../../FileIO/FixFreewheeling.cpp" line="81"/>
         <source>Fix freewheeling power/cadence.</source>
-        <translation>Corregir potencia/cadencia sin pedaleo.</translation>
+        <translation>Corregir potencia/cadencia sin pedaleo</translation>
     </message>
 </context>
 <context>
@@ -10612,7 +10608,7 @@ Se requiere conexión a internet.</translation>
     <message>
         <location filename="../../FileIO/FixGPS.cpp" line="692"/>
         <source>Fix GPS errors</source>
-        <translation>Corregir GPS</translation>
+        <translation>Corregir posicionamiento GNSS</translation>
     </message>
 </context>
 <context>
@@ -10621,26 +10617,26 @@ Se requiere conexión a internet.</translation>
         <location filename="../../FileIO/FixGPS.cpp" line="255"/>
         <location filename="../../FileIO/FixGPS.cpp" line="504"/>
         <source>Min Slope:</source>
-        <translation>Pendiente mínima:</translation>
+        <translation>Pendiente mínima: </translation>
     </message>
     <message>
         <location filename="../../FileIO/FixGPS.cpp" line="256"/>
         <location filename="../../FileIO/FixGPS.cpp" line="505"/>
         <source>Max Slope:</source>
-        <translation>Pendiente máxima:</translation>
+        <translation>Pendiente máxima: </translation>
     </message>
     <message>
         <location filename="../../FileIO/FixGPS.cpp" line="257"/>
         <location filename="../../FileIO/FixGPS.cpp" line="506"/>
         <source>Avg Slope:</source>
-        <translation>Pendiente media:</translation>
+        <translation>Pendiente media: </translation>
     </message>
     <message>
         <location filename="../../FileIO/FixGPS.cpp" line="258"/>
         <location filename="../../FileIO/FixGPS.cpp" line="279"/>
         <location filename="../../FileIO/FixGPS.cpp" line="507"/>
         <source>Outliers:</source>
-        <translation>Datos erróneos:</translation>
+        <translation>Datos erróneos: </translation>
     </message>
     <message>
         <location filename="../../FileIO/FixGPS.cpp" line="266"/>
@@ -10666,13 +10662,13 @@ Se requiere conexión a internet.</translation>
         <location filename="../../FileIO/FixGPS.cpp" line="277"/>
         <location filename="../../FileIO/FixGPS.cpp" line="529"/>
         <source>P1 Route Deviation:</source>
-        <translation>Desviación de la ruta P1:</translation>
+        <translation>Desviación de la ruta tras la primera pasada: </translation>
     </message>
     <message>
         <location filename="../../FileIO/FixGPS.cpp" line="278"/>
         <location filename="../../FileIO/FixGPS.cpp" line="530"/>
         <source>P2 Route Deviation:</source>
-        <translation>Desviación de la ruta P2:</translation>
+        <translation>Desviación de la ruta tras la segunda pasada: </translation>
     </message>
     <message>
         <location filename="../../FileIO/FixGPS.cpp" line="289"/>
@@ -10702,13 +10698,13 @@ Se requiere conexión a internet.</translation>
     <message>
         <location filename="../../FileIO/FixGPS.cpp" line="359"/>
         <source>Apply B-Spline based altitude smoothing after running the GPS outlier pass.</source>
-        <translation>Aplicar suavizado b-spline a la altitud después de ejecutar la detección de errores GPS.</translation>
+        <translation>Aplicar suavizado b-spline a la altitud después de ejecutar la detección de errores GNSS.</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixGPS.cpp" line="364"/>
         <location filename="../../FileIO/FixGPS.cpp" line="416"/>
         <source>P1 Deg</source>
-        <translation>Grado para P1</translation>
+        <translation>Grado para la primera pasada</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixGPS.cpp" line="364"/>
@@ -10738,7 +10734,7 @@ spline, antes de la eliminación de datos erróneos.
         <location filename="../../FileIO/FixGPS.cpp" line="379"/>
         <location filename="../../FileIO/FixGPS.cpp" line="429"/>
         <source>P2 Deg</source>
-        <translation>Grado para P2</translation>
+        <translation>Grado para la segunda pasada</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixGPS.cpp" line="379"/>
@@ -10879,7 +10875,7 @@ aquí seleccionado en (cm) se refiere a la distancia medida desde el spline.
     <message>
         <location filename="../../FileIO/FixGPS.cpp" line="508"/>
         <source>Step Deviation:</source>
-        <translation>Desviación del paso:</translation>
+        <translation>Desviación del paso: </translation>
     </message>
     <message>
         <location filename="../../FileIO/FixGPS.cpp" line="517"/>
@@ -10909,7 +10905,7 @@ aquí seleccionado en (cm) se refiere a la distancia medida desde el spline.
     <message>
         <location filename="../../FileIO/FixGPS.cpp" line="531"/>
         <source>Route Outliers:</source>
-        <translation>Datos erróneos de la ruta:</translation>
+        <translation>Datos erróneos de la ruta: </translation>
     </message>
     <message>
         <location filename="../../FileIO/FixGPS.cpp" line="538"/>
@@ -10957,7 +10953,10 @@ Generally altitude data is noisiest and requires highest degree for
 reasonable smoothness. Route gps data gnerally requires a much
 lighter touch.
 </source>
-        <translation></translation>
+        <translation>Si se aplica suavizado a la altitud, en primer lugar se construye un b-spline del grado indicado con los datos originales y se descartan todas las muestras que caigan fuera del criterio de detección de datos erróneos (distancia del dato original al spline). En un segundo paso se construye un nuevo b-spline del grado indicado para la segunda pasada sin tener en cuenta los posibles datos descartados. Hay que tener en cuenta que la mayoría de los relojes y dispositivos para ciclismo  obtienen los datos de altimetría a través de mediciones barométricas, por lo que el suavizado no será necesario (sin perjuicio de que la altitud absoluta no sea correcta, cosa que no se puede corregir aquí). Si los datos provienen de posicionamiento GNSS absoluto (lo que no es habitual en los dispositivos para deporte corrientes) sí puede ser necesario el suavizado, en cuyo caso se requerirán con toda seguridad altos grados para los b-splines.
+
+El suavizado de la ruta funciona igual que el de la altimetría. Los grados de los b-splines no es necesario que sean muy altos.
+</translation>
     </message>
 </context>
 <context>
@@ -10991,15 +10990,10 @@ This function performs this task, taking two parameters;
 tolerance - this defines the minimum size of a recording gap (in seconds) that will be processed. any gap shorter than this will not be affected.
 
 stop - this defines the maximum size of gap (in seconds) that will have a smoothing algorithm applied. Where a gap is shorter than this value it will be filled with values interpolated from the values recorded before and after the gap. If it is longer than this value, it will be filled with zero values.</source>
-        <translation>Muchos dispositivos, especialmente los inalámbricos, pueden perder la conexión a la computadora. Esto provoca la pérdida de datos que se manifiesta con saltos en la grabación.
+        <translation>Muchos dispositivos, especialmente los inalámbricos, pueden perder la conexión a la computadora. Esto provoca la pérdida de datos que se manifiesta con saltos en la grabación. Para calcular los valores máximos y medios reales de potencia es útil eliminar estos vacíos y reemplazarlos con datos interpolados (suavizado) o directamente con ceros. Esta función realiza esa tarea tomando dos parámetros:
 
-Para calcular los valores máximos y medios reales de potencia es útil eliminar estos vacíos y reemplazarlos con datos interpolados (suavizado) o directamente con ceros.
-
-Esta función realiza esa tarea tomando dos parámetros:
-
-Tolerancia: define el tamaño mínimo de un salto de grabación (en segundos) que será tratado, cualquier salto más corto no será afectado.
-
-Parada: define el tamaño máximo de un salto (en segundos) al que se le aplicará el algoritmo de suavizado. Cuando un salto es más corto que este valor será completado con valores interpolados a partir de los valores anteriores y posteriores al salto. Si es mas largo que este valor será completado con ceros.</translation>
+  - &quot;Tolerancia&quot;: define el tamaño mínimo de un salto de grabación (en segundos) que será tratado, cualquier salto más corto no será afectado.
+  - &quot;Parada&quot;: define el tamaño máximo de un salto (en segundos) al que se le aplicará el algoritmo de suavizado. Cuando un salto es más corto que este valor será completado con valores interpolados a partir de los valores anteriores y posteriores al salto. Si es mas largo que este valor será completado con ceros.</translation>
     </message>
 </context>
 <context>
@@ -11024,11 +11018,9 @@ Parada: define el tamaño máximo de un salto (en segundos) al que se le aplicar
 It takes the following parameter:
 
 Absolute Max - this defines an absolute value for heart rates, and will smooth any values above this absolute value that have been identified as being anomalies (i.e. at odds with the data surrounding it).</source>
-        <translation>En ocasiones, los sensores de frecuencia cardíaca reportan valores anormalmente altos o ceros. Esta función busca estos picos y ceros de pulso y los reemplaza por datos interpolados en base a los datos adyacentes.
+        <translation>En ocasiones, los sensores de frecuencia cardíaca reportan valores anormalmente altos o ceros. Esta función busca estos picos y ceros de pulso y los reemplaza por datos interpolados en base a los datos adyacentes. Utiliza el siguiente parámetro:
 
-Utiliza el siguiente parámetro:
-
-Máximo: define un valor máximo para la frecuencia cardíaca; cualquier valor superior será interpolado en base a los datos adyacentes.</translation>
+  - &quot;Máximo&quot;: define un valor máximo para la frecuencia cardíaca; cualquier valor superior será interpolado en base a los datos adyacentes.</translation>
     </message>
 </context>
 <context>
@@ -11044,7 +11036,7 @@ Máximo: define un valor máximo para la frecuencia cardíaca; cualquier valor s
     <message>
         <location filename="../../FileIO/FixLapSwim.cpp" line="53"/>
         <source>Pool Length (m)</source>
-        <translation>Largo de piscina (m)</translation>
+        <translation>Longitud de la piscina (m)</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixLapSwim.cpp" line="69"/>
@@ -11054,12 +11046,11 @@ This tool recompute accumulated time, distance and sample Speed/Cadence from the
 Laps are recreated using pause lengths as markers
 
 Pool Length (in meters) allows to re-define the field if value is &gt; 0</source>
-        <translation>A veces el tiempo o la distancia de los entrenamientos de natación en piscina es incorrecto.
-La información largo-por-largo (TYPE, DURATION y STROKES) se puede corregir utilizando la pestaña SWIM del Editor.
-Esta herramienta permite recalcular tiempo y distancia acumulados más la información segundo a segundo a partir de la información actulizada para cada largo.
-Los intervalos (laps) se recrean utilizando las pausas (largos con TYPE=0) como separadores
+        <translation>A veces el tiempo o la distancia de los entrenamientos de natación en piscina es incorrecto. La información largo-por-largo (TYPE, DURATION y STROKES) se puede corregir utilizando la pestaña SWIM del Editor.
 
-Longitud de Piscina (m) permite redefinir este parámetro si el valor es &gt;0</translation>
+Esta herramienta permite recalcular tiempo y distancia acumulados más la información segundo a segundo a partir de la información actulizada para cada largo. Los intervalos (laps) se recrean utilizando las pausas (largos con TYPE=0) como separadores
+
+El argumento &quot;Longitud de la piscina&quot; permite redefinir este parámetro si el valor es &gt;0</translation>
     </message>
 </context>
 <context>
@@ -11132,13 +11123,12 @@ Percent Adjustment - this defines percentage  to modify values by. Negative valu
 Fix Adjustment - this defines an fix amount  to modify values by. Negative values are supported.
 
 If both parameters are given, first the relative adjustment takes place, then the fix value adjustment is applied on the result.</source>
-        <translation>Ajustar valores de potencia permite aumentar o disminuir los valores de potencia en un porcentaje y/o un valor fijo. Utiliza dos parámetros:
+        <translation>Esta utilidad permite aumentar o disminuir los valores de potencia en un porcentaje y/o un valor fijo. Utiliza dos parámetros:
 
-Ajuste de potencia: define el porcentaje de modificación. Admite valores negativos.
+  - &quot;Porcentaje de ajuste&quot;: define el porcentaje de modificación. Admite valores negativos.
+  - &quot;Ajuste fijo&quot;: define un valor fijo que se suma a la potencia existente. Admite valores negativos.
 
-Ajuste fijo: define un valor fijo que se suma a la potencia existente. Admite valores negativos.
-
-Si ambos parámetros son distintos de cero primero se aplica el ajuste de potencia y luego el ajuste fijo se suma al resultado anterior.</translation>
+Si ambos parámetros son distintos de cero primero se aplica el porcentaje de ajuste y luego el ajuste fijo se suma al resultado anterior.</translation>
     </message>
 </context>
 <context>
@@ -11204,12 +11194,11 @@ Note: when the file already contains wind data, it will be overridden if wind sp
 The activity has to be a Run with Speed and Altitude.</source>
         <translation>Estima la potencia de carrera a partir de datos de velocidad/altitud/peso, etc. usando los coeficientes de di Prampero
 
-El parámetro peso adicional se suma al peso del atleta para conformar la masa total, debería incluir ropa, zapatillas, etc.
+  - El parámetro peso adicional se suma al peso del atleta para conformar la masa total, debería incluir ropa, zapatillas, etc.
+  - El parámetro coeficiente de draft es un multiplicador para ajustar la resistencia aerodinámica por rebufo, 1 es no drafting y 0.9 un valor razonable cuando se corre en grupo
+  - La velocidad del viento se expresa en km/h
+  - La dirección del viento (origen) en grados, de -179 a +180 (-90=O, 0=N, 90=E, 180=S)
 
-El parámetro coeficiente de draft es un multiplicador para ajustar la resistencia aerodinámica por rebufo, 1 es no drafting y 0.9 un valor razonable cuando se corre en grupo
-
-La velocidad del viento se expresa en km/h
-La dirección del viento (origen) en grados, de -179 a +180 (-90=O, 0=N, 90=E, 180=S)
 Nota: estos valores reemplazarán los datos de viento en contra presentes en la actividad
 
 La actividad tiene que ser una carrera a pie e incluir velocidad y altimetría.</translation>
@@ -11250,13 +11239,11 @@ Fix SmO2 - check to fix anomalies in SmO2 data
 Fix tHb - check to fix anomalies in tHb data
 Max. tHb - any tHb above is considered an outlier
 </source>
-        <translation>En ocasiones se registran valores erróneos de SmO2 (%) y/o tHB (%) (SmO2: 0% o &gt;100% / tHb: 0% o &gt; tHb máximo)
+        <translation>En ocasiones se registran valores erróneos de SmO2 (%) y/o tHB (%) (SmO2: 0% o &gt;100% / tHb: 0% o &gt; tHb máximo). Esta función busca picos/anomalías en los datos SmO2 y tHb y, dependiendo de la configuración, los reemplaza por valores suavizados/interpolados desde ambos lados de los 3 puntos involucrados. Utiliza los siguientes parámetros:
 
-Esta función busca picos/anomalías en los datos SmO2 y tHb y, dependiendo de la configuración, los reemplaza por valores suavizados/interpolados desde ambos lados de los 3 puntos involucrados. Utiliza los siguientes parámetros:
-
-Corregir SmO2: indica corregir anomalías en datos SmO2
-Corregir tHb: indica corregir anomalías en datos tHB
-tHb máximo: cualquier valor de tHb mayor es condiderado anómalo
+  - &quot;Corregir SmO2&quot;: indica corregir anomalías en datos SmO2
+  - &quot;Corregir tHb&quot;: indica corregir anomalías en datos tHB
+  - &quot;tHb máximo&quot;: cualquier valor de tHb mayor es condiderado anómalo
 </translation>
     </message>
 </context>
@@ -11284,7 +11271,7 @@ Moving Average Seconds parameter allows to set the seconds of the MA filter to s
         <translation>Algunos dispositivos registran muestras con datos de velocidad que no coinciden con el cambio de distancia en la unidad de tiempo, por ejemplo cuando se utiliza un sensor de pie para la velocidad y posicionamiento satelital para la distancia.
 Esta herramienta reemplaza el canal de velocidad, o crea uno nuevo sino existe, en base a la distancia recorrida por unidad de tiempo
 
-El parámetro &apos;tamaño de la ventana de filtrado&apos; permite definir los segundos durante los cuales se promedia la velocidad para suavizar los picos que puedan ocurrir</translation>
+El parámetro &quot;Tamaño de la ventana de filtrado&quot; permite definir los segundos durante los cuales se promedia la velocidad para suavizar los picos que puedan ocurrir</translation>
     </message>
 </context>
 <context>
@@ -11305,12 +11292,12 @@ El parámetro &apos;tamaño de la ventana de filtrado&apos; permite definir los 
     <message>
         <location filename="../../FileIO/FixSpikes.cpp" line="58"/>
         <source>Max</source>
-        <translation>Máximo</translation>
+        <translation>Máximo (W)</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixSpikes.cpp" line="59"/>
         <source>Variance</source>
-        <translation>Variación</translation>
+        <translation>Variación (W)</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixSpikes.cpp" line="71"/>
@@ -11340,17 +11327,15 @@ Variance (Watts) - Determines the threshold beyond which a data point will be fi
 
 Esta función ofrece dos algoritmos para tratar los picos y anomalías en los datos de potencia, reemplazandolos por:
 
-a) Un suavizado que se realiza interpolando a partir de los datos adyacentes y utiliza los siguientes parámetros:
+  - a) Un suavizado que se realiza interpolando a partir de los datos adyacentes y utiliza los siguientes parámetros:
 
-Máximo absoluto (W): define un valor máximo absoluto para los vatios y suavizará los valores por encima de este valor que hayan sido identificados como anómalos (por ej. que no guarden relación con los datos adyacentes)
+     - &quot;Máximo&quot;: define un valor máximo absoluto para los vatios y suavizará los valores por encima de este valor que hayan sido identificados como anómalos (por ej. que no guarden relación con los datos adyacentes)
+     - &quot;Variación&quot;: los valores que superen este valor de variación respecto a la media móvil de los anteriores 30 segundos serán suavizados.
 
-Variación: (W): los valores que superen este valor de variación respecto a la media móvil de los anteriores 30 segundos serán suavizados.
+  - b) La mediana de una ventana centrada alrededor del dato erróneo. Este esquema preserva los cambios abruptos y utiliza los siguientes parámetros:
 
-b) La mediana de una ventana centrada alrededor del dato erróneo. Este esquema preserva los cambios abruptos y utiliza los siguientes parámetros:
-
-Tamaño de ventana: define la anchura de la ventana (en puntos) que se utilizará para el cálculo. Su valor debe ser impar para que se pueda centrar en el dato erróneo.
-
-Variación (W): determina el umbral a partir del cual un valor debe ser corregido (cuando la diferencia del valor con la mediana excede este parámetro).
+     - &quot;Ventana&quot;: define la anchura de la ventana (en puntos) que se utilizará para el cálculo. Su valor debe ser impar para que se pueda centrar en el dato erróneo.
+     - &quot;Variación&quot;: determina el umbral a partir del cual un valor debe ser corregido (cuando la diferencia del valor con la mediana excede este parámetro).
 
 </translation>
     </message>
@@ -11377,7 +11362,7 @@ Variación (W): determina el umbral a partir del cual un valor debe ser corregid
 Torque Adjust - this defines an absolute value in poinds per square inch or newton meters to modify values by. Negative values are supported. (e.g. enter &quot;1.2 nm&quot; or &quot;-0.5 pi&quot;).</source>
         <translation>El ajuste de par permite corregir los valores de par cuando la calibración (puesta a cero) del medidor de potencia fue incorrecta. Utiliza un solo parámetro:
 
-Ajuste de par: define un valor fijo en lb·inch o N·m para modificar los valores de par. Se pueden usar valores negativos.</translation>
+  - &quot;Ajuste de par&quot;: define un valor fijo en lb·inch o N·m para aumar a los valores de par. Se pueden usar valores negativos.</translation>
     </message>
 </context>
 <context>
@@ -11834,52 +11819,52 @@ Ajuste de par: define un valor fijo en lb·inch o N·m para modificar los valore
     <message>
         <location filename="../../Gui/Colors.cpp" line="192"/>
         <source>HR Zone 1 Shading</source>
-        <translation>Sombreado cona de FC 1</translation>
+        <translation>Sombreado zona de FC 1</translation>
     </message>
     <message>
         <location filename="../../Gui/Colors.cpp" line="193"/>
         <source>HR Zone 2 Shading</source>
-        <translation>Sombreado cona de FC 2</translation>
+        <translation>Sombreado zona de FC 2</translation>
     </message>
     <message>
         <location filename="../../Gui/Colors.cpp" line="194"/>
         <source>HR Zone 3 Shading</source>
-        <translation>Sombreado cona de FC 3</translation>
+        <translation>Sombreado zona de FC 3</translation>
     </message>
     <message>
         <location filename="../../Gui/Colors.cpp" line="195"/>
         <source>HR Zone 4 Shading</source>
-        <translation>Sombreado cona de FC 4</translation>
+        <translation>Sombreado zona de FC 4</translation>
     </message>
     <message>
         <location filename="../../Gui/Colors.cpp" line="196"/>
         <source>HR Zone 5 Shading</source>
-        <translation>Sombreado cona de FC 5</translation>
+        <translation>Sombreado zona de FC 5</translation>
     </message>
     <message>
         <location filename="../../Gui/Colors.cpp" line="197"/>
         <source>HR Zone 6 Shading</source>
-        <translation>Sombreado cona de FC 6</translation>
+        <translation>Sombreado zona de FC 6</translation>
     </message>
     <message>
         <location filename="../../Gui/Colors.cpp" line="198"/>
         <source>HR Zone 7 Shading</source>
-        <translation>Sombreado cona de FC 7</translation>
+        <translation>Sombreado zona de FC 7</translation>
     </message>
     <message>
         <location filename="../../Gui/Colors.cpp" line="199"/>
         <source>HR Zone 8 Shading</source>
-        <translation>Sombreado cona de FC 8</translation>
+        <translation>Sombreado zona de FC 8</translation>
     </message>
     <message>
         <location filename="../../Gui/Colors.cpp" line="200"/>
         <source>HR Zone 9 Shading</source>
-        <translation>Sombreado cona de FC 9</translation>
+        <translation>Sombreado zona de FC 9</translation>
     </message>
     <message>
         <location filename="../../Gui/Colors.cpp" line="201"/>
         <source>HR Zone 10 Shading</source>
-        <translation>Sombreado cona de FC 10</translation>
+        <translation>Sombreado zona de FC 10</translation>
     </message>
     <message>
         <location filename="../../Gui/Colors.cpp" line="202"/>
@@ -11919,12 +11904,12 @@ Ajuste de par: define un valor fijo en lb·inch o N·m para modificar los valore
     <message>
         <location filename="../../Gui/Colors.cpp" line="210"/>
         <source>Pop Up Windows Background</source>
-        <translation>Fondo ventana emergente</translation>
+        <translation>Fondo de ventana emergente</translation>
     </message>
     <message>
         <location filename="../../Gui/Colors.cpp" line="211"/>
         <source>Pop Up Windows Foreground</source>
-        <translation>Frente ventana emergente</translation>
+        <translation>Frente de ventana emergente</translation>
     </message>
     <message>
         <location filename="../../Gui/Colors.cpp" line="212"/>
@@ -12020,22 +12005,22 @@ Ajuste de par: define un valor fijo en lb·inch o N·m para modificar los valore
     <message>
         <location filename="../../Gui/Colors.cpp" line="227"/>
         <source>Left Torque Effectiveness</source>
-        <translation>Eficiencia de par izquierda</translation>
+        <translation>Efectividad de la pedalada izquierda</translation>
     </message>
     <message>
         <location filename="../../Gui/Colors.cpp" line="228"/>
         <source>Right Torque Effectiveness</source>
-        <translation>Efectividad de par derecha</translation>
+        <translation>Efectividad de la pedalada derecha</translation>
     </message>
     <message>
         <location filename="../../Gui/Colors.cpp" line="229"/>
         <source>Left Pedal Smoothness</source>
-        <translation>Fluidez pedalada izquierda</translation>
+        <translation>Fluidez de la pedalada izquierda</translation>
     </message>
     <message>
         <location filename="../../Gui/Colors.cpp" line="230"/>
         <source>Right Pedal Smoothness</source>
-        <translation>Fluidez pedalada derecha</translation>
+        <translation>Fluidez de la pedalada derecha</translation>
     </message>
     <message>
         <location filename="../../Gui/Colors.cpp" line="232"/>
@@ -12090,12 +12075,12 @@ Ajuste de par: define un valor fijo en lb·inch o N·m para modificar los valore
     <message>
         <location filename="../../Gui/Colors.cpp" line="221"/>
         <source>Left Balance</source>
-        <translation>Balance izquierda</translation>
+        <translation>Balance de pedaleo (pierna izquierda)</translation>
     </message>
     <message>
         <location filename="../../Gui/Colors.cpp" line="222"/>
         <source>Right Balance</source>
-        <translation>Balance derecha</translation>
+        <translation>Balance de pedaleo (pierna derecha)</translation>
     </message>
     <message>
         <location filename="../../Gui/Colors.cpp" line="203"/>
@@ -27083,7 +27068,7 @@ Do you want to continue?</source>
     <message>
         <location filename="../../FileIO/RideFile.cpp" line="619"/>
         <source>Ascents for hills and mountains</source>
-        <translation>Escaladas en montaña</translation>
+        <translation>Escaladas (colinas y montañas)</translation>
     </message>
     <message>
         <location filename="../../FileIO/RideFile.cpp" line="620"/>
@@ -29034,22 +29019,22 @@ formato GoldenCheetah. ¿Quiere hacerlo?
     <message>
         <location filename="../../Gui/Pages.cpp" line="933"/>
         <source>Bicycle Mass Without Wheels (g)</source>
-        <translation>Peso de la bicicleta sin ruedas (g)</translation>
+        <translation>Masa de la bicicleta sin ruedas (g)</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="933"/>
         <source>Mass of everything that isn&apos;t wheels, tires, skewers...</source>
-        <translation>Peso de todo aquello que no sean ruedas, neumáticos, cierres, fondo de llanta...</translation>
+        <translation>Masa de todo aquello que no sean ruedas ni sus componentes asociados</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="934"/>
         <source>Front Wheel Mass (g)</source>
-        <translation>Peso de la rueda delantera (g)</translation>
+        <translation>Masa de la rueda delantera sin neumático, cámara, disco ni cierre (g)</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="934"/>
         <source>Mass of front wheel excluding tires and skewers...</source>
-        <translation>Pero de la rueda delantera excluyendo neumático, cierre y fondo de llanta...</translation>
+        <translation>Masa de la rueda delantera excluyendo neumático, cámara, disco y cierre</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="935"/>
@@ -29059,61 +29044,61 @@ formato GoldenCheetah. ¿Quiere hacerlo?
     <message>
         <location filename="../../Gui/Pages.cpp" line="936"/>
         <source>Front Spoke &amp; Nipple Mass - Each (g)</source>
-        <translation>Peso de cada radio y cabecilla de la rueda delantera (g)</translation>
+        <translation>Masa de cada radio (cabecilla incluida) de la rueda delantera (g)</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="936"/>
         <location filename="../../Gui/Pages.cpp" line="946"/>
         <source>Mass of a single spoke and nipple, washers, etc.</source>
-        <translation>Peso de un radio y su cabecilla.</translation>
+        <translation>Masa de un radio y su cabecilla.</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="937"/>
         <source>Front Rim Mass (g)</source>
-        <translation>Peso de la llanta (aro) delantera (g)</translation>
+        <translation>Masa de la llanta (aro) delantera (g)</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="938"/>
         <source>Front Rotor Mass (g)</source>
-        <translation>Peso del buje delantero (g)</translation>
+        <translation>Masa del disco, si hay, de la rueda delantera (g)</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="938"/>
         <location filename="../../Gui/Pages.cpp" line="948"/>
         <source>Mass of rotor including bolts</source>
-        <translation>Peso del buje</translation>
+        <translation>Masa del disco, incluidos tornillos y soporte</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="939"/>
         <source>Front Skewer Mass (g)</source>
-        <translation>Peso del cierre de la rueda delantera (g)</translation>
+        <translation>Masa del cierre de la rueda delantera (g)</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="940"/>
         <source>Front Tire Mass (g)</source>
-        <translation>Peso del neumático delantero (g)</translation>
+        <translation>Masa del neumático delantero (g)</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="941"/>
         <source>Front Tube or Sealant Mass (g)</source>
-        <translation>Pero del líquido antipinchazos de la rueda delantera (g)</translation>
+        <translation>Masa del líquido antipinchazos o cámara de la rueda delantera (g)</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="941"/>
         <location filename="../../Gui/Pages.cpp" line="951"/>
         <source>Mass of anything inside the tire: sealant, tube...</source>
-        <translation>Pero de cualquier cosa que vaya dentro del neumático (líquido, cámara)...</translation>
+        <translation>Masa de cualquier cosa que vaya dentro del neumático (líquido, cámara)...</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="942"/>
         <source>Front Rim Outer Radius (m)</source>
-        <translation>Radio externo de la llanta (aro) delantera (m)</translation>
+        <translation>Radio externo de la rueda delantera, neumático incluido (m)</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="942"/>
         <location filename="../../Gui/Pages.cpp" line="952"/>
         <source>Functional outer radius of wheel, used for computing wheel circumference</source>
-        <translation>Radio externo de la rueda, neumático incluido (el valor usado para calcular el perímetro) (m)</translation>
+        <translation>Radio externo de la rueda, neumático hinchado incluido (m)</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="943"/>
@@ -29124,17 +29109,17 @@ formato GoldenCheetah. ¿Quiere hacerlo?
         <location filename="../../Gui/Pages.cpp" line="943"/>
         <location filename="../../Gui/Pages.cpp" line="953"/>
         <source>Inner radius of rim, for computing wheel inertia</source>
-        <translation>Radio interno de la llanta (aro) para el cálculo del momento de inercia</translation>
+        <translation>Radio interno de la llanta (aro), donde entran los radios</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="944"/>
         <source>Rear Wheel Mass (g)</source>
-        <translation>Peso de la rueda trasera (g)</translation>
+        <translation>Masa de la rueda trasera sin neumático, cámara, disco, cassette ni cierre (g)</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="944"/>
         <source>Mass of rear wheel excluding tires and skewers...</source>
-        <translation>Pero de la rueda trasera excluyendo neumático, cierre, fondo de llanta, disco, tornillos...</translation>
+        <translation>Masa de la rueda trasera excluyendo neumático, cámara, disco, cassette y cierre</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="945"/>
@@ -29144,47 +29129,47 @@ formato GoldenCheetah. ¿Quiere hacerlo?
     <message>
         <location filename="../../Gui/Pages.cpp" line="946"/>
         <source>Rear Spoke &amp; Nipple Mass - Each (g)</source>
-        <translation>Peso de cada radio y cabecilla de la rueda trasera (g)</translation>
+        <translation>Masa de cada radio (cabecilla incluida) de la rueda trasera (g)</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="947"/>
         <source>Rear Rim Mass (g)</source>
-        <translation>Peso de la llanta (aro) trasera (g)</translation>
+        <translation>Masa de la llanta (aro) trasera (g)</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="948"/>
         <source>Rear Rotor Mass (g)</source>
-        <translation>Peso del buje trasero (g)</translation>
+        <translation>Masa del disco, si hay, de la rueda trasera (g)</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="949"/>
         <source>Rear Skewer Mass (g)</source>
-        <translation>Peso del cierre de la ruada trasera (g)</translation>
+        <translation>Masa del cierre de la ruada trasera (g)</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="949"/>
         <source>Mass of skewer/axle/funbolts, etc...</source>
-        <translation>Peso del cierre de la rueda...</translation>
+        <translation>Masa del cierre de la rueda</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="950"/>
         <source>Rear Tire Mass (g)</source>
-        <translation>Peso del neumático trasero (g)</translation>
+        <translation>Masa del neumático trasero (g)</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="950"/>
         <source>Mass of tire not including tube or sealant</source>
-        <translation>Peso del neumático trasero (g)</translation>
+        <translation>Masa del neumático trasero</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="951"/>
         <source>Rear Tube or Sealant Mass (g)</source>
-        <translation>Peso del líquido antipinchazos o cámara trasera (g)</translation>
+        <translation>Masa del líquido antipinchazos o cámara de la rueda trasera (g)</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="952"/>
         <source>Rear Rim Outer Radius (m)</source>
-        <translation>Radio externo de la llanta (aro) trasera (m)</translation>
+        <translation>Radio externo de la rueda trasera, neumático incluido (m)</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="953"/>
@@ -29194,22 +29179,22 @@ formato GoldenCheetah. ¿Quiere hacerlo?
     <message>
         <location filename="../../Gui/Pages.cpp" line="954"/>
         <source>Rear Cassette Mass(g)</source>
-        <translation>Peso del cassette (g)</translation>
+        <translation>Masa del cassette (g)</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="954"/>
         <source>Mass of rear cassette, including lockring</source>
-        <translation>Peso del cassette, incluida la arandela de cierre (g)</translation>
+        <translation>Masa del cassette, incluida la arandela de cierre</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="955"/>
         <source>Coefficient of rolling resistance</source>
-        <translation>Resistenaia a la rodadura (Crr)</translation>
+        <translation>Coeficiente de resistencia a la rodadura (Crr)</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="955"/>
         <source>Total coefficient of rolling resistance for bicycle</source>
-        <translation>Coeficiente de resistenaia a la rodadura (Crr)</translation>
+        <translation>Coeficiente de resistenaia a la rodadura (Crr). Muchos datos en https://www.bicyclerollingresistance.com/</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="956"/>
@@ -29224,12 +29209,12 @@ formato GoldenCheetah. ¿Quiere hacerlo?
     <message>
         <location filename="../../Gui/Pages.cpp" line="957"/>
         <source>Coefficient of drag</source>
-        <translation>Coeficiente aerodinámico (CdA)</translation>
+        <translation>Coeficiente aerodinámico (Cd)</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="957"/>
         <source>Coefficient of drag of rider and bicycle</source>
-        <translation>Coeficiente aerodinámico (CdA) del conjunto ciclista+bicicleta</translation>
+        <translation>Coeficiente aerodinámico (Cd) del conjunto ciclista+bicicleta</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="958"/>
@@ -29254,65 +29239,62 @@ formato GoldenCheetah. ¿Quiere hacerlo?
     <message>
         <location filename="../../Gui/Pages.cpp" line="960"/>
         <source>ActualTrainerAltitude (m)</source>
-        <translation>AltitudLugarRodillo (m)</translation>
+        <translation>Altitud (m)</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="960"/>
         <source>Actual altitude of indoor trainer, in meters</source>
-        <translation>Altitud del lugar donde está el rodillo (m)</translation>
+        <translation>Altitud del lugar donde está el usuario (m)</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="1054"/>
         <source>------ Derived Statistics -------</source>
-        <translation>------ Estadísticas derivadas -------</translation>
+        <translation>---------- Estadísticas derivadas ----------</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="1055"/>
         <source>Total KEMass:         	%1g</source>
-        <translatorcomment>No sé qué será eso de KE</translatorcomment>
-        <translation>KEMass total:         	%1 g</translation>
+        <translation>Masa total de la bicicleta, incluyendo la energía cinética de rotación de las ruedas como masa:  %1 kg</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="1056"/>
         <source>FrontWheel KEMass:    	%1g</source>
-        <translatorcomment>No sé qué será eso de KE</translatorcomment>
-        <translation>KEMass de la rueda delantera:    	%1 g</translation>
+        <translation>Masa de la rueda delantera más energía cinética de rotación como masa:  %1 g</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="1057"/>
         <source>FrontWheel Mass:      	%1g</source>
-        <translation>Peso de la rueda delantera:      	%1 g</translation>
+        <translation>Masa de la rueda delantera:  %1 g</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="1058"/>
         <source>FrontWheel EquivMass: 	%1g</source>
-        <translation>Peso equivalente de la rueda delantera: 	%1 g</translation>
+        <translation>Energía cinética de rotación de la rueda delantera expresada como masa:  %1 g</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="1059"/>
         <source>FrontWheel I:         	%1</source>
-        <translation>Rueda delantera I:         	%1</translation>
+        <translation>Momento de inercia (sin tener en cuenta el buje) de la rueda delantera (kg·m^2):  %1</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="1060"/>
         <source>Rear Wheel KEMass:    	%1g</source>
-        <translatorcomment>No sé qué será eso de KE</translatorcomment>
-        <translation>KEMass de la rueda trasera:    	%1 g</translation>
+        <translation>Masa de la rueda trasera más energía cinética de rotación como masa:  %1 g</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="1061"/>
         <source>Rear Wheel Mass:      	%1g</source>
-        <translation>Peso de la rueda trasera:      	%1 g</translation>
+        <translation>Masa de la rueda trasera:  %1 g</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="1062"/>
         <source>Rear Wheel EquivMass: 	%1g</source>
-        <translation>Peso equivalente de la rueda trasera: 	%1 g</translation>
+        <translation>Energía cinética de rotación de la rueda trasera expresada como masa:  %1 g</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="1063"/>
         <source>Rear Wheel I:         	%1</source>
-        <translation>Rueda trasera I:         	%1</translation>
+        <translation>Momento de inercia (sin tener en cuenta buje ni cassette) de la rueda trasera (kg·m^2):  %1</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="1099"/>
@@ -29325,7 +29307,7 @@ Power&apos; option in the training preferences tab.</source>
 el modelado de la bicicleta para calcular valores de
 velocidad en el modo rodillo. Estos valores se usan
 por los rodillos inteligentes y por el modo de simulación
-de GoldenCheetah cuando se acyiva la opción de simular
+de GoldenCheetah cuando se activa la opción de simular
 velocidad a partir de datos de potencia en el panel de
 preferencias de entrenamiento.</translation>
     </message>
