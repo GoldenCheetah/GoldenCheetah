@@ -173,7 +173,7 @@ BicycleWheel::BicycleWheel(double outerR,         // outer radius in meters (for
     double totalSpokeMassKG = spokeMassKG * spokeCount;
     double rimTireSealantMassKG = massKG - (centerMassKG + totalSpokeMassKG);
 
-    m_I = 0.5 * rimTireSealantMassKG * (innerR * innerR + outerR * outerR) + totalSpokeI;
+    m_I = 0.5 * rimTireSealantMassKG * (outerR * outerR - innerR * innerR) + totalSpokeI;
 
     m_equivalentMassKG = m_I / (outerR * outerR);
 }
@@ -332,7 +332,7 @@ struct MotionStatePair
         return BicycleSimState::Interpolate(m_s0, m_s1, m_t0, m_t1, t);
     }
 
-    double CalcV(double v, double t) const 
+    double CalcV(double v, double t) const
     {
         // Linear interpolate the state info before sampling at t.
         BicycleSimState st = this->Interpolate(t);
@@ -402,7 +402,7 @@ double Bicycle::DV(const BicycleSimState &simState,  // current sim state
                    double v) const                   // current speed
 {
     double newV = V(simState, v, 1.);    // new speed with 1s impulse.
-                                         
+
     return (newV - v);                   // implicit divide by 1s.
 }
 
@@ -443,7 +443,7 @@ double Bicycle::FilterWattIncrease(double watts, double altitudeMeters)
     // adjust power due to altitude
     if (m_useSimulatedHypoxia) {
         double adjustmentFactor = GetAltitudeAdjustmentFactor(altitudeMeters / 1000.);
-        
+
         double newWatts = watts * adjustmentFactor * m_constants.m_AltitudeCorrectionFactor;
 
         watts = newWatts;
