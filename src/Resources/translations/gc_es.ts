@@ -1209,7 +1209,7 @@ Presione siguiente para continuar
         <location filename="../../Gui/AddTileWizard.cpp" line="136"/>
         <location filename="../../Gui/AddTileWizard.cpp" line="144"/>
         <source>Tile Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Configuración de la ficha</translation>
     </message>
 </context>
 <context>
@@ -1217,12 +1217,12 @@ Presione siguiente para continuar
     <message>
         <location filename="../../Gui/AddTileWizard.cpp" line="184"/>
         <source>Done</source>
-        <translation type="unfinished">Listo</translation>
+        <translation>Listo</translation>
     </message>
     <message>
         <location filename="../../Gui/AddTileWizard.cpp" line="185"/>
         <source>Add Tile</source>
-        <translation type="unfinished"></translation>
+        <translation>Agregar ficha</translation>
     </message>
 </context>
 <context>
@@ -1230,12 +1230,12 @@ Presione siguiente para continuar
     <message>
         <location filename="../../Gui/AddTileWizard.cpp" line="72"/>
         <source>Tile Type</source>
-        <translation type="unfinished"></translation>
+        <translation>Tipo de ficha</translation>
     </message>
     <message>
         <location filename="../../Gui/AddTileWizard.cpp" line="73"/>
         <source>Select the type of tile</source>
-        <translation type="unfinished"></translation>
+        <translation>Seleccionar tipo de ficha</translation>
     </message>
 </context>
 <context>
@@ -1243,7 +1243,7 @@ Presione siguiente para continuar
     <message>
         <location filename="../../Gui/AddTileWizard.cpp" line="55"/>
         <source>Add Tile Wizard</source>
-        <translation type="unfinished"></translation>
+        <translation>Agregar ficha</translation>
     </message>
 </context>
 <context>
@@ -3151,7 +3151,8 @@ Presione siguiente para continuar
         <location filename="../../FileIO/AthleteBackup.cpp" line="105"/>
         <source>Backup successfully stored in 
 %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Copia de seguridad almacenada en 
+%1</translation>
     </message>
     <message>
         <source>Backup successfully stored in
@@ -6710,7 +6711,9 @@ Are you sure?</source>
         <source>Changes in activities which are not saved, will not be synchronized. 
 
 This may lead to inconsistencies between your local GoldenCheetah activities and the uploaded activities. We recommend to save the changed activities before proceeding.</source>
-        <translation type="unfinished"></translation>
+        <translation>Los cambios en actividades que no fueron guardadas no pueden ser sincronizados. 
+
+Esto puede conducir a inconsistencias entre sus actividades locales en GoldenCheetah y las actividades cargadas en línea. Recomendamos guardar las actividades modificadas antes de continuar.</translation>
     </message>
     <message>
         <source>Changes in activities which are not saved, will not be synchronized.
@@ -6866,7 +6869,9 @@ Esto puede conducir a inconsistencias entre sus actividades locales en GoldenChe
         <source>Unsaved changes in activities will be uploaded as well. 
 
 This may lead to inconsistencies between your local activities and the uploaded activities if you do not save the activity in GoldenCheetah. We recommend to save the changed activity before proceeding.</source>
-        <translation type="unfinished"></translation>
+        <translation>Los cambios en actividades no guardadas también seran cargados. 
+
+Esto puede conducir a inconsistencias entre sus activides locales en GoldenCheetah y las actividades cargadas en línea. Recomendamos guardar la actividad modificada antes de continuar.</translation>
     </message>
     <message>
         <source>Unsaved changes in activities will be uploaded as well.
@@ -10645,7 +10650,7 @@ Se requiere conexión a internet.</translation>
     <message>
         <location filename="../../FileIO/FixFreewheeling.cpp" line="81"/>
         <source>Fix freewheeling power/cadence.</source>
-        <translation>Corregir potencia/cadencia sin pedaleo</translation>
+        <translation>Corregir potencia/cadencia sin pedaleo.</translation>
     </message>
 </context>
 <context>
@@ -11292,7 +11297,14 @@ Fix SmO2 - check to fix anomalies in SmO2 data
 Fix tHb - check to fix anomalies in tHb data 
 Max. tHb - any tHb above is considered an outlier 
 </source>
-        <translation type="unfinished"></translation>
+        <translation>En ocasiones se registran valores erróneos de SmO2 (%) y/o tHB (%) (SmO2: 0% o &gt;100% / tHb: 0% o &gt; tHb máximo). 
+
+Esta función busca picos/anomalías en los datos SmO2 y tHb y, dependiendo de la configuración, los reemplaza por valores suavizados/interpolados desde ambos lados de los 3 puntos involucrados. Utiliza los siguientes parámetros:
+
+  - &quot;Corregir SmO2&quot;: indica corregir anomalías en datos SmO2 
+  - &quot;Corregir tHb&quot;: indica corregir anomalías en datos tHB 
+  - &quot;tHb máximo&quot;: cualquier valor de tHb mayor es condiderado anómalo 
+</translation>
     </message>
     <message>
         <source>Occasionally SmO2 (%) and/or tHb (%) will erroneously report missing or high values (SmO2: 0% or &gt;100% / tHb: 0% or &gt; max. tHb parameter).
@@ -11387,7 +11399,21 @@ Window Size - this defines the number of neighbouring points used to determine a
 Variance (Watts) - Determines the threshold beyond which a data point will be fixed, if the difference between the data point value and the median value exceeds this parameter.
 
 </source>
-        <translation type="unfinished"></translation>
+        <translation>En ocasiones los medidores de potencia registran valores excesivamente altos. En los medidores ubicados en la estrella/araña, como SRM, Quarq y otros, esto puede ser causado por una lectura errónea de la cadencia debido a un falso disparo del sensor.
+
+Esta función ofrece dos algoritmos para tratar los picos y anomalías en los datos de potencia, reemplazandolos por:
+
+  - a) Un suavizado que se realiza interpolando a partir de los datos adyacentes y utiliza los siguientes parámetros:
+
+     - &quot;Máximo&quot;: define un valor máximo absoluto para los vatios y suavizará los valores por encima de este valor que hayan sido identificados como anómalos (por ej. que no guarden relación con los datos adyacentes)
+     - &quot;Variación&quot;: los valores que superen este valor de variación respecto a la media móvil de los anteriores 30 segundos serán suavizados.
+
+  - b) La mediana de una ventana centrada alrededor del dato erróneo. Este esquema preserva los cambios abruptos y utiliza los siguientes parámetros:
+
+     - &quot;Ventana&quot;: define la anchura de la ventana (en puntos) que se utilizará para el cálculo. Su valor debe ser impar para que se pueda centrar en el dato erróneo.
+     - &quot;Variación&quot;: determina el umbral a partir del cual un valor debe ser corregido (cuando la diferencia del valor con la mediana excede este parámetro).
+
+</translation>
     </message>
     <message>
         <source>Power meters will occasionally report erroneously high values for power. For crank based power meters such as SRM and Quarq this is caused by an erroneous cadence reading as a result of triggering a reed switch whilst pushing off.
@@ -12021,22 +12047,22 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Gui/Colors.cpp" line="240"/>
         <source>Overview Background</source>
-        <translation>Fondo resumen</translation>
+        <translation>Fondo de resumen</translation>
     </message>
     <message>
         <location filename="../../Gui/Colors.cpp" line="241"/>
         <source>Overview Tile Background</source>
-        <translation type="unfinished"></translation>
+        <translation>Fondo de ficha</translation>
     </message>
     <message>
         <location filename="../../Gui/Colors.cpp" line="250"/>
         <source>Overview Tile Background Alternate</source>
-        <translation type="unfinished"></translation>
+        <translation>Fondo alternativo de ficha</translation>
     </message>
     <message>
         <location filename="../../Gui/Colors.cpp" line="251"/>
         <source>Overview Tile Background Vibrant</source>
-        <translation type="unfinished"></translation>
+        <translation>Fondo brillante de ficha</translation>
     </message>
     <message>
         <source>Overview Card Background</source>
@@ -12785,12 +12811,12 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Gui/GcWindowRegistry.cpp" line="83"/>
         <source>Activity Overview</source>
-        <translation type="unfinished"></translation>
+        <translation>Resumen de actividad</translation>
     </message>
     <message>
         <location filename="../../Gui/GcWindowRegistry.cpp" line="84"/>
         <source>Blank Overview</source>
-        <translation type="unfinished"></translation>
+        <translation>Gráfico de resumen vacío</translation>
     </message>
     <message>
         <location filename="../../Gui/GcWindowRegistry.cpp" line="85"/>
@@ -12845,12 +12871,12 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Gui/GcWindowRegistry.cpp" line="74"/>
         <source>Season Overview</source>
-        <translation type="unfinished"></translation>
+        <translation>Resumen de temporada</translation>
     </message>
     <message>
         <location filename="../../Gui/GcWindowRegistry.cpp" line="75"/>
         <source>Blank Overview </source>
-        <translation type="unfinished"></translation>
+        <translation>Gráfico de resumen vacío </translation>
     </message>
     <message>
         <location filename="../../Gui/GcWindowRegistry.cpp" line="97"/>
@@ -17824,7 +17850,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Core/DataFilter.cpp" line="1955"/>
         <source>round(v) or round(v, dp)</source>
-        <translation type="unfinished"></translation>
+        <translation>round(v) o round(v, dp)</translation>
     </message>
     <message>
         <location filename="../../Core/DataFilter.cpp" line="1969"/>
@@ -21015,27 +21041,33 @@ No se encontraron actividades para importar.
         <location filename="../../FileIO/MoxyDevice.cpp" line="96"/>
         <source>Connecting ... 
 </source>
-        <translation type="unfinished"></translation>
+        <translation>Conectando ... 
+</translation>
     </message>
     <message>
         <location filename="../../FileIO/MoxyDevice.cpp" line="199"/>
         <source>Downloading ... 
 </source>
-        <translation type="unfinished"></translation>
+        <translation>Descargando ... 
+</translation>
     </message>
     <message>
         <location filename="../../FileIO/MoxyDevice.cpp" line="348"/>
         <source>
 Importing %1 Ride(s)... 
 </source>
-        <translation type="unfinished"></translation>
+        <translation>
+Importando %1 actividad(es)... 
+</translation>
     </message>
     <message>
         <location filename="../../FileIO/MoxyDevice.cpp" line="350"/>
         <source>
 No rides found to import. 
 </source>
-        <translation type="unfinished"></translation>
+        <translation>
+No se han encontrado actividades para importar. 
+</translation>
     </message>
     <message>
         <location filename="../../FileIO/MoxyDevice.cpp" line="363"/>
@@ -21602,7 +21634,7 @@ No rides found to import.
     <message>
         <location filename="../../Charts/Overview.cpp" line="578"/>
         <source>Tile Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Configuración de ficha</translation>
     </message>
     <message>
         <location filename="../../Charts/Overview.cpp" line="601"/>
@@ -21716,12 +21748,12 @@ No rides found to import.
     <message>
         <location filename="../../Charts/OverviewItems.cpp" line="3907"/>
         <source>Background</source>
-        <translation type="unfinished"></translation>
+        <translation>Fondo</translation>
     </message>
     <message>
         <location filename="../../Charts/OverviewItems.cpp" line="3909"/>
         <source>Color</source>
-        <translation type="unfinished">Color</translation>
+        <translation>Color</translation>
     </message>
 </context>
 <context>
@@ -21729,7 +21761,7 @@ No rides found to import.
     <message>
         <location filename="../../Charts/Overview.cpp" line="36"/>
         <source>Add Tile...</source>
-        <translation>Agregar cuadro...</translation>
+        <translation>Agregar ficha...</translation>
     </message>
     <message>
         <location filename="../../Charts/Overview.cpp" line="39"/>
@@ -21743,12 +21775,12 @@ No rides found to import.
     <message>
         <location filename="../../Charts/Overview.cpp" line="42"/>
         <source>Settings...</source>
-        <translation type="unfinished">Configuración...</translation>
+        <translation>Configuración...</translation>
     </message>
     <message>
         <location filename="../../Charts/Overview.cpp" line="53"/>
         <source>Minimum Columns</source>
-        <translation type="unfinished"></translation>
+        <translation>Número mínimo de columnas</translation>
     </message>
     <message>
         <location filename="../../Charts/Overview.cpp" line="130"/>
@@ -29698,7 +29730,7 @@ preferencias de entrenamiento.</translation>
     <message>
         <location filename="../../Metrics/SpecialFields.cpp" line="36"/>
         <source>SubSport</source>
-        <translation type="unfinished"></translation>
+        <translation>Especialidad</translation>
     </message>
     <message>
         <location filename="../../Metrics/SpecialFields.cpp" line="37"/>
@@ -29981,7 +30013,13 @@ You can define the minimum length, in time, a gap in recording should be in orde
 In addition, you can set a minimum segment size. Any segment smaller than this limit will be ignored.
 
 </source>
-        <translation type="unfinished"></translation>
+        <translation>Este asistente buscará segmentos de la actividad para separar en base a los saltos de datos en la grabación.
+
+Usted puede definir la longitud mínima en tiempo que un vacío debe durar para marcar el fin de un segmento y el comienzo de otro.
+
+Adicionalmente, usted puede elegir una duración mínima de segmento. Cualquier segmento de menor duración será ignorado.
+
+</translation>
     </message>
     <message>
         <source>This wizard will find segments of the activity to save by looking for gaps in recording.
@@ -31824,7 +31862,7 @@ Presionar F3 en el controlador al finalizar.</translation>
     <message>
         <location filename="../../Charts/UserChart.cpp" line="830"/>
         <source>Background</source>
-        <translation type="unfinished"></translation>
+        <translation>Fondo</translation>
     </message>
     <message>
         <location filename="../../Charts/UserChart.cpp" line="835"/>
