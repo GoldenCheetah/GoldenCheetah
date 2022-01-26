@@ -482,8 +482,9 @@ MainWindow::MainWindow(const QDir &home)
     connect(deleteMapper, SIGNAL(mapped(const QString &)), this, SLOT(deleteAthlete(const QString &)));
 
     fileMenu->addSeparator();
-    fileMenu->addAction(tr("Save all modified activities"), this, SLOT(saveAllUnsavedRides()));
     fileMenu->addAction(tr("Settings..."), this, SLOT(athleteSettings()));
+    fileMenu->addSeparator();
+    fileMenu->addAction(tr("Save all modified activities"), this, SLOT(saveAllUnsavedRides()));
     fileMenu->addSeparator();
     fileMenu->addAction(tr("Close Window"), this, SLOT(closeWindow()));
     //fileMenu->addAction(tr("&Close Tab"), this, SLOT(closeTab())); use athlete view
