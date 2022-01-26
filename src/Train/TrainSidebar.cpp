@@ -1403,6 +1403,7 @@ void TrainSidebar::Stop(int deviceStatus)        // when stop button is pressed
     workoutTree->setEnabled(true);
     deviceTree->setEnabled(true);
 
+    context->mainWindow->showSidebar(true);
     if (appsettings->value(this, TRAIN_AUTOHIDE, false).toBool()) context->mainWindow->showLowbar(true);
 
     //reset all calibration data
