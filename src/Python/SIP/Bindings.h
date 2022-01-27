@@ -105,6 +105,7 @@ class Bindings {
         PyObject* seasonPeaks(QString series, int duration, bool all=false, QString filter=QString(), bool compare=false) const;
 
         // working with intervals
+        QString intervalType(int type) const;
         PyObject* seasonIntervals(QString type=QString(), bool compare=false) const;
         PyObject* activityIntervals(QString type=QString(), PyObject* activity=NULL) const;
 

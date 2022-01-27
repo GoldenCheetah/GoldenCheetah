@@ -27199,7 +27199,7 @@ Do you want to continue?</source>
     <message>
         <location filename="../../FileIO/RideFile.cpp" line="599"/>
         <source>ALL</source>
-        <translation>TODOS</translation>
+        <translation>TODO</translation>
     </message>
     <message>
         <location filename="../../FileIO/RideFile.cpp" line="600"/>
