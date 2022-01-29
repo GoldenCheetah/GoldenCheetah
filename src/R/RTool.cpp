@@ -123,6 +123,7 @@ RTool::RTool()
             { "GC.size", (DL_FUNC) &RTool::windowSize, 0,0 },
             { "GC.athlete", (DL_FUNC) &RTool::athlete, 0,0 },
             { "GC.athlete.zones", (DL_FUNC) &RTool::zones, 0,0 },
+            { "GC.intervalType", (DL_FUNC) &RTool::intervalType, 0,0 },
             { "GC.activities", (DL_FUNC) &RTool::activities, 0,0 },
             { "GC.activity", (DL_FUNC) &RTool::activity, 0,0 },
             { "GC.activity.metrics", (DL_FUNC) &RTool::activityMetrics, 0,0 },
@@ -151,6 +152,7 @@ RTool::RTool()
             { "GC.size", (DL_FUNC) &RTool::windowSize, 0,0,0 },
             { "GC.athlete", (DL_FUNC) &RTool::athlete, 0,0,0 },
             { "GC.athlete.zones", (DL_FUNC) &RTool::zones, 0,0,0 },
+            { "GC.intervalType", (DL_FUNC) &RTool::intervalType, 0,0,0 },
             { "GC.activities", (DL_FUNC) &RTool::activities, 0,0,0 },
             { "GC.activity", (DL_FUNC) &RTool::activity, 0,0,0 },
             { "GC.activity.metrics", (DL_FUNC) &RTool::activityMetrics, 0,0,0 },
@@ -180,6 +182,9 @@ RTool::RTool()
             // athlete
             { "GC.athlete", (DL_FUNC) &RTool::athlete, 0 },
             { "GC.athlete.zones", (DL_FUNC) &RTool::zones, 2 },
+
+            // intervals
+            { "GC.intervalType", (DL_FUNC) &RTool::intervalType, 1 },
 
             // if activity is passed compare=TRUE it returns a list of rides
             // currently in the compare pane if compare is enabled or
@@ -279,6 +284,9 @@ RTool::RTool()
                                // athlete
                                "GC.athlete <- function() { .Call(\"GC.athlete\") }\n"
                                "GC.athlete.zones <- function(date=0, sport=\"\") { .Call(\"GC.athlete.zones\", date, sport) }\n"
+
+                               // intervals
+                               "GC.intervalType <- function(type=1) { .Call(\"GC.intervalType\", type) }\n"
 
                                // activity
                                "GC.activities <- function(filter=\"\") { .Call(\"GC.activities\", filter) }\n"
@@ -1888,6 +1896,21 @@ RTool::seasonIntervals(SEXP pTypes, SEXP pCompare)
 
     // fail
     return Rf_allocVector(INTSXP, 0);
+}
+
+SEXP
+RTool::intervalType(SEXP type)
+{
+    type = Rf_coerceVector(type, INTSXP);
+    QString typeDesc = RideFileInterval::typeDescription(static_cast<RideFileInterval::IntervalType>(INTEGER(type)[0]));
+
+    SEXP ans;
+
+    PROTECT(ans=Rf_allocVector(STRSXP, 1));
+    SET_STRING_ELT(ans, 0, Rf_mkChar(typeDesc.toLatin1().constData()));
+    UNPROTECT(1);
+
+    return ans;
 }
 
 SEXP

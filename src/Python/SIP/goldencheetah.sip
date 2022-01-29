@@ -378,6 +378,7 @@ public:
     PyObject* seasonPeaks(QString series, int duration, bool all=false, QString filter=QString(), bool compare=false) /TransferBack/;
 
     // working with intervals
+    QString intervalType(int type=1) const;
     PyObject* seasonIntervals(QString type=QString(), bool compare=false) /TransferBack/;
     PyObject* activityIntervals(QString type=QString(), PyObject* activity=NULL) /TransferBAck/;
 

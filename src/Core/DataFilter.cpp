@@ -5057,15 +5057,16 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
                         asstring = ii->name;
                     } else if(symbol == "start") {
                         value = ii->start;
-                        asstring = time_to_string(ii->start);
+                        if (wantstrings) asstring = time_to_string(ii->start);
                     } else if(symbol == "stop") {
                         value = ii->stop;
-                        asstring = time_to_string(ii->stop);
+                        if (wantstrings) asstring = time_to_string(ii->stop);
                     } else if(symbol == "type") {
-                        asstring = RideFileInterval::typeDescription(ii->type);
+                        value = ii->type;
+                        if (wantstrings) asstring = RideFileInterval::typeDescription(ii->type);
                     } else if(symbol == "test") {
                         value = ii->test;
-                        asstring = QString("%1").arg(ii->test);
+                        if (wantstrings) asstring = QString("%1").arg(ii->test);
                     } else if(symbol == "color") {
                         // apply item color, remembering that 1,1,1 means use default (reverse in this case)
                         if (ii->color == QColor(1,1,1,1)) {
