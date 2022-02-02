@@ -328,10 +328,11 @@ OAuthDialog::urlChanged(const QUrl &url)
 
             } else if (site == WITHINGS) {
 
-                urlstr = QString("https://account.withings.com/oauth2/token?");
+                urlstr = QString("https://wbsapi.withings.net/v2/oauth2");
                 params.addQueryItem("client_id", GC_NOKIA_CLIENT_ID);
                 params.addQueryItem("client_secret", GC_NOKIA_CLIENT_SECRET);
                 params.addQueryItem("redirect_uri","https://www.goldencheetah.org");
+                params.addQueryItem("action", "requesttoken");
                 params.addQueryItem("grant_type", "authorization_code");
 
             }
@@ -453,6 +454,10 @@ OAuthDialog::networkRequestFinished(QNetworkReply *reply)
             access_token = document.object()["access_token"].toString();
             if (site == POLAR)  polar_userid = document.object()["x_user_id"].toDouble();
             if (site == RIDEWITHGPS) access_token = document.object()["user"].toObject()["auth_token"].toString();
+            if (site == WITHINGS) {
+                refresh_token = document.object()["body"].toObject()["refresh_token"].toString();
+                access_token = document.object()["body"].toObject()["access_token"].toString();
+            }
         }
 
         // if we failed to extract then we have a big problem
