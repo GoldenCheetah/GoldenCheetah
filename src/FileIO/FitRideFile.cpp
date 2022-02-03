@@ -775,6 +775,9 @@ struct FitFileReaderState
             case 115: // MTB Dynamics - Flow
                 return "FLOW";
 
+            case 116: // Stress
+                return "STRESS";
+
             default:
                     return QString("FIELD_%1").arg(native_num);
         }
@@ -798,6 +801,7 @@ struct FitFileReaderState
                     return 2.0;
 
             case 108: // RESPIRATIONRATE
+            case 116: // Stress
                 return 100.0;
 
             default:
@@ -2054,6 +2058,9 @@ struct FitFileReaderState
                              native_num = -1;
                              break;
                     case 115: // MTB Dynamics - Flow
+                             native_num = -1;
+                             break;
+                    case 116: // Stress
                              native_num = -1;
                              break;
                     default:
