@@ -37,6 +37,7 @@
 #include <QEvent>
 #include <QInputEvent>
 #include <QKeyEvent>
+#include <QMutexLocker>
 
 #include <QSound>
 
@@ -1383,6 +1384,8 @@ void TrainSidebar::Pause()        // pause capture to recalibrate
 
 void TrainSidebar::Stop(int deviceStatus)        // when stop button is pressed
 {
+    QMutexLocker locker(&recordMutex);
+
     if ((status&RT_RUNNING) == 0) return;
 
     // re-enable the screen saver on Windows
@@ -3114,6 +3117,9 @@ TrainSidebar::remoteControl(uint16_t command)
 void TrainSidebar::rrData(uint16_t  rrtime, uint8_t count, uint8_t bpm)
 {
     Q_UNUSED(count)
+
+    QMutexLocker locker(&recordMutex);
+
     if (status&RT_RECORDING && rrFile == NULL && recordFile != NULL) {
         QString rrfile = recordFile->fileName().replace("csv", "rr");
         //fprintf(stderr, "First r-r, need to open file %s\n", rrfile.toStdString().c_str()); fflush(stderr);
@@ -3147,6 +3153,8 @@ void TrainSidebar::rrData(uint16_t  rrtime, uint8_t count, uint8_t bpm)
 // VO2 Measurement data received
 void TrainSidebar::vo2Data(double rf, double rmv, double vo2, double vco2, double tv, double feo2)
 {
+    QMutexLocker locker(&recordMutex);
+
     if (status&RT_RECORDING && vo2File == NULL && recordFile != NULL) {
         QString vo2filename = recordFile->fileName().replace("csv", "vo2");
 

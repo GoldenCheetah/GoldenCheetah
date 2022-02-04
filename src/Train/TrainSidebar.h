@@ -44,6 +44,7 @@
 #include <QHeaderView>
 #include <QFormLayout>
 #include <QSqlTableModel>
+#include <QMutex>
 
 #include "cmath" // for round()
 #include "Units.h" // for MILES_PER_KM
@@ -272,6 +273,7 @@ class TrainSidebar : public GcWindow
 
         QFile *recordFile;      // where we record!
         int lastRecordSecs;     // to avoid duplicates
+        QMutex recordMutex;     // to coordinate async recording from ANT+/BTLE threads
         QFile *rrFile;          // r-r records, if any received.
         QFile *vo2File;         // vo2 records, if any received.
 
