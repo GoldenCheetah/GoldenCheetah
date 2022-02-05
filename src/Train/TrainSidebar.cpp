@@ -1384,7 +1384,9 @@ void TrainSidebar::Pause()        // pause capture to recalibrate
 
 void TrainSidebar::Stop(int deviceStatus)        // when stop button is pressed
 {
-    QMutexLocker locker(&recordMutex);
+    // Mutual exclusion with ANT+/BTLE threads to close the rr/vo2 files
+    QMutexLocker rrlocker(&rrMutex);
+    QMutexLocker vo2locker(&vo2Mutex);
 
     if ((status&RT_RUNNING) == 0) return;
 
@@ -3118,7 +3120,7 @@ void TrainSidebar::rrData(uint16_t  rrtime, uint8_t count, uint8_t bpm)
 {
     Q_UNUSED(count)
 
-    QMutexLocker locker(&recordMutex);
+    QMutexLocker locker(&rrMutex);
 
     if (status&RT_RECORDING && rrFile == NULL && recordFile != NULL) {
         QString rrfile = recordFile->fileName().replace("csv", "rr");
@@ -3153,7 +3155,7 @@ void TrainSidebar::rrData(uint16_t  rrtime, uint8_t count, uint8_t bpm)
 // VO2 Measurement data received
 void TrainSidebar::vo2Data(double rf, double rmv, double vo2, double vco2, double tv, double feo2)
 {
-    QMutexLocker locker(&recordMutex);
+    QMutexLocker locker(&vo2Mutex);
 
     if (status&RT_RECORDING && vo2File == NULL && recordFile != NULL) {
         QString vo2filename = recordFile->fileName().replace("csv", "vo2");

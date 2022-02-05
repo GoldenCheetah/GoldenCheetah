@@ -273,8 +273,9 @@ class TrainSidebar : public GcWindow
 
         QFile *recordFile;      // where we record!
         int lastRecordSecs;     // to avoid duplicates
-        QMutex recordMutex;     // to coordinate async recording from ANT+/BTLE threads
+        QMutex rrMutex;         // to coordinate async recording from ANT+ thread
         QFile *rrFile;          // r-r records, if any received.
+        QMutex vo2Mutex;         // to coordinate async recording from ANT+ thread
         QFile *vo2File;         // vo2 records, if any received.
 
         // ErgFile wrapper to support stateful location queries.
