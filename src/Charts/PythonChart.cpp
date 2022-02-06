@@ -448,6 +448,7 @@ PythonChart::setWeb(bool x)
         canvas->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
         // stop stealing focus!
         canvas->settings()->setAttribute(QWebEngineSettings::FocusOnNavigationEnabled, false);
+        canvas->settings()->setAttribute(QWebEngineSettings::LocalContentCanAccessRemoteUrls, true);
         renderlayout->insertWidget(0, canvas);
     }
 

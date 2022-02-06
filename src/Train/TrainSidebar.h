@@ -44,6 +44,7 @@
 #include <QHeaderView>
 #include <QFormLayout>
 #include <QSqlTableModel>
+#include <QMutex>
 
 #include "cmath" // for round()
 #include "Units.h" // for MILES_PER_KM
@@ -272,7 +273,9 @@ class TrainSidebar : public GcWindow
 
         QFile *recordFile;      // where we record!
         int lastRecordSecs;     // to avoid duplicates
+        QMutex rrMutex;         // to coordinate async recording from ANT+ thread
         QFile *rrFile;          // r-r records, if any received.
+        QMutex vo2Mutex;         // to coordinate async recording from ANT+ thread
         QFile *vo2File;         // vo2 records, if any received.
 
         // ErgFile wrapper to support stateful location queries.
