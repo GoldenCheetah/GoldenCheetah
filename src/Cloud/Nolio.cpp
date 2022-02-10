@@ -333,6 +333,23 @@ QByteArray* Nolio::prepareResponse(QByteArray* data){
             }
         }
 
+        // laps
+        QJsonArray laps = activity["laps"].toArray();
+        if (laps.size() > 0){
+            double start = 0.0;
+            double end = 0.0;
+            foreach (QJsonValue value, laps) {
+                QJsonObject lap = value.toObject();
+                double duration = lap["duration"].toDouble();
+                if (start > 0.0){
+                    start = end;
+                }
+                end = start + duration;
+                ride->addInterval(RideFileInterval::USER, start, end, lap["name"].toString());
+            }
+
+        }
+
         JsonFileReader reader;
         data->clear();
         data->append(reader.toByteArray(context, ride, true, true, true, true));
