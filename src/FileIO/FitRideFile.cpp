@@ -607,6 +607,14 @@ struct FitFileReaderState
                 case -1: return "Thinkrider";
                 default: return QString("Thinkrider %1").arg(prod);
             }
+        } else if (manu == 123) {
+            // Polar
+            switch(prod) {
+                case 2: return "Polar H10";
+                case 3: return "Polar H9";
+                case -1: return "Polar";
+                default: return QString("Polar %1").arg(prod);
+            }
         } else if (manu == 132) {
             // cycplus
             switch(prod) {
