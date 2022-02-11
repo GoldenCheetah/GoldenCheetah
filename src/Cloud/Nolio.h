@@ -23,6 +23,7 @@
 #include <QNetworkAccessManager>
 #include <QNetworkRequest>
 #include <QImage>
+#include <QDebug>
 
 class Nolio : public CloudService {
 
@@ -37,7 +38,7 @@ class Nolio : public CloudService {
         QString id() const { return "Nolio"; }
         QString uiName() const { return tr("Nolio"); }
         QString description() const { return (tr("Sync with your favorite training partner.")); }
-        QImage logo() const { return QImage(":images/services/todaysplan.png"); }
+        QImage logo() const { return QImage(":images/services/nolio.png"); }
 
         // open/connect and close/disconnect
         bool open(QStringList &errors);
@@ -46,45 +47,33 @@ class Nolio : public CloudService {
         // home directory
         QString home();
 
-        // write a file
-        //bool writeFile(QByteArray &data, QString remotename, RideFile *ride);
+        QList<CloudServiceEntry*> readdir(QString path, QStringList &errors, QDateTime from, QDateTime to);
 
         // read a file
-        //bool readFile(QByteArray *data, QString remotename, QString remoteid);
-
-        // todays plan needs the response to be adjusted before being returned
-        //QByteArray* prepareResponse(QByteArray* data, QString &name);
+        bool readFile(QByteArray *data, QString remotename, QString remoteid);
+        QByteArray* prepareResponse(QByteArray* data);
 
         // create a folder
-        //bool createFolder(QString);
+        bool createFolder(QString);
 
         // athlete selection
-        //QList<CloudServiceAthlete> listAthletes();
-        //bool selectAthlete(CloudServiceAthlete);
+        QList<CloudServiceAthlete> listAthletes();
+        bool selectAthlete(CloudServiceAthlete);
 
         // dirent style api
-        //CloudServiceEntry *root() { return root_; }
-        //QList<CloudServiceEntry*> readdir(QString path, QStringList &errors, QDateTime from, QDateTime to);
+        CloudServiceEntry *root() { return root_; }
 
     public slots:
-
         // getting data
-        //void readyRead(); // a readFile operation has work to do
-        //void readFileCompleted();
-
-        // sending data
-        //void writeFileCompleted();
+        void readyRead(); // a readFile operation has work to do
+        void readFileCompleted();
 
     private:
         Context *context;
         QNetworkAccessManager *nam;
         CloudServiceEntry *root_;
 
-        //QMap<QNetworkReply*, QByteArray*> buffers;
-
-        //QString userId;
-
-        //QMap<QString, QJsonObject> replyActivity;
+        QMap<QNetworkReply*, QByteArray*> buffers;
 
 
     private slots:
