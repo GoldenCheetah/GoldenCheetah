@@ -29,7 +29,6 @@
 #include "PolarFlow.h"
 
 #include <QJsonParseError>
-#include <QDebug>
 
 OAuthDialog::OAuthDialog(Context *context, OAuthSite site, CloudService *service, QString baseURL, QString clientsecret) :
     context(context), site(site), service(service), baseURL(baseURL), clientsecret(clientsecret)
@@ -113,13 +112,13 @@ OAuthDialog::OAuthDialog(Context *context, OAuthSite site, CloudService *service
 
     } else if (site == DROPBOX) {
 
-            urlstr = QString("https://www.dropbox.com/oauth2/authorize?");
+        urlstr = QString("https://www.dropbox.com/oauth2/authorize?");
 #ifdef GC_DROPBOX_CLIENT_ID
-            urlstr.append("client_id=").append(GC_DROPBOX_CLIENT_ID).append("&");
+        urlstr.append("client_id=").append(GC_DROPBOX_CLIENT_ID).append("&");
 #endif
-            urlstr.append("redirect_uri=https://goldencheetah.github.io/blank.html&");
-            urlstr.append("response_type=code&");
-            urlstr.append("force_reapprove=true");
+        urlstr.append("redirect_uri=https://goldencheetah.github.io/blank.html&");
+        urlstr.append("response_type=code&");
+        urlstr.append("force_reapprove=true");
 
     } else if (site == CYCLING_ANALYTICS) {
 
@@ -451,7 +450,6 @@ OAuthDialog::networkRequestFinished(QNetworkReply *reply)
 
     // we've been told to ignore responses (used by POLAR, maybe others in future)
     if (ignore) return;
-    bool is_nolio = site == NOLIO;
     // we can handle SSL handshake errors, if we got here then some kind of protocol was agreed
     if (reply->error() == QNetworkReply::NoError || reply->error() == QNetworkReply::SslHandshakeFailedError) {
 
@@ -635,7 +633,6 @@ OAuthDialog::networkRequestFinished(QNetworkReply *reply)
         }
 
     } else {
-            qDebug() << "error  111";
             // general error getting response
             QString error = QString(tr("Error retrieving access token, %1 (%2)")).arg(reply->errorString()).arg(reply->error());
             QMessageBox oautherr(QMessageBox::Critical, tr("SSL Token Refresh Error"), error);
