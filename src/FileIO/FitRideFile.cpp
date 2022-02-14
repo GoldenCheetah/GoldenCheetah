@@ -432,6 +432,7 @@ struct FitFileReaderState
                 case 3405: case 3639: return "Garmin Swim 2";
                 case 3558: return "Garmin Edge 130 Plus";
                 case 3570: return "Garmin Edge 1030 Plus";
+                case 3578: return "Garmin Rally 100/200";
                 case 3589: return "Garmin FR745";
                 case 3592: return "Garmin Varia RTL515";
                 case 20119: return "Garmin Training Center";
@@ -606,6 +607,14 @@ struct FitFileReaderState
                 case -1: return "Thinkrider";
                 default: return QString("Thinkrider %1").arg(prod);
             }
+        } else if (manu == 123) {
+            // Polar
+            switch(prod) {
+                case 2: return "Polar H10";
+                case 3: return "Polar H9";
+                case -1: return "Polar";
+                default: return QString("Polar %1").arg(prod);
+            }
         } else if (manu == 132) {
             // cycplus
             switch(prod) {
@@ -774,6 +783,9 @@ struct FitFileReaderState
             case 115: // MTB Dynamics - Flow
                 return "FLOW";
 
+            case 116: // Stress
+                return "STRESS";
+
             default:
                     return QString("FIELD_%1").arg(native_num);
         }
@@ -797,6 +809,7 @@ struct FitFileReaderState
                     return 2.0;
 
             case 108: // RESPIRATIONRATE
+            case 116: // Stress
                 return 100.0;
 
             default:
@@ -1202,6 +1215,14 @@ struct FitFileReaderState
                 case 168:   /* undocumented: Firstbeat EPOC based Exercise Load */
                     active_session_["EPOC"] = QString::number(round(value / 65536.0 ));
                     rideFile->setTag("EPOC", QString::number(round(value / 65536.0 )));
+                    break;
+                case 192:   /* undocumented: Feel manually entered after activity (0-25-50-75-100) */
+                    active_session_["Feel"] = QString::number(round(value));
+                    rideFile->setTag("Feel", QString::number(round(value)));
+                    break;
+                case 193:   /* undocumented: RPE manually entered after activity (0-10) */
+                    active_session_["RPE"] = QString::number(value / 10.0 );
+                    rideFile->setTag("RPE", QString::number(value / 10.0 ));
                     break;
                 case 254: //index
                 case 0:   //event
@@ -2045,6 +2066,9 @@ struct FitFileReaderState
                              native_num = -1;
                              break;
                     case 115: // MTB Dynamics - Flow
+                             native_num = -1;
+                             break;
+                    case 116: // Stress
                              native_num = -1;
                              break;
                     default:

@@ -66,6 +66,7 @@ class ChartSpaceItem : public QGraphicsWidget
         virtual void itemGeometryChanged() =0;
         virtual void setData(RideItem *item)=0;
         virtual void setDateRange(DateRange )=0;
+        virtual QColor color();
         virtual QRectF hotspot() { return QRectF(0,0,0,0); } // don't steal events from this area of the item
 
         virtual QWidget *config()=0; // must supply a widget to configure
@@ -111,6 +112,8 @@ class ChartSpaceItem : public QGraphicsWidget
             this->setGraphicsEffect(effect);
 #endif
 
+            bgcolor = StandardColor(CCARDBACKGROUND).name();
+
             // watch geom changes
             connect(this, SIGNAL(geometryChanged()), SLOT(geometryChanged()));
         }
@@ -147,6 +150,7 @@ class ChartSpaceItem : public QGraphicsWidget
         bool incorner;
         bool invisible;
         bool showconfig;
+        QString bgcolor;
         QGraphicsDropShadowEffect *effect;
 
         // base paint
@@ -155,6 +159,28 @@ class ChartSpaceItem : public QGraphicsWidget
     public slots:
 
         void geometryChanged();
+};
+
+// we copy the current items and manage their layout (which is an iterative process)
+// and once the layout is done we create an animation to move from the current positions
+// to the new positions using this class to temporarily store new co-ordinates
+class LayoutChartSpaceItem {
+
+    public:
+        LayoutChartSpaceItem(ChartSpaceItem *from) :
+            column(from->column), span(from->span), order (from->order ), deep(from->deep), onscene(from->onscene),
+            placing(from->placing), drag(from->drag), incorner(from->incorner), invisible(from->invisible),
+            item(from), geometry(from->geometry()) {}
+
+        static bool LayoutChartSpaceItemSort(const LayoutChartSpaceItem left, const LayoutChartSpaceItem right);
+
+        int column, span, order, deep;
+        bool onscene, placing, drag;
+        bool incorner;
+        bool invisible;
+
+        ChartSpaceItem *item;
+        QRectF geometry;
 };
 
 class ChartSpace : public QWidget
@@ -172,9 +198,14 @@ class ChartSpace : public QWidget
         // current state for event processing
         enum { NONE, DRAG, SPAN, XRESIZE, YRESIZE } state;
 
+        void setMinimumColumns(int x) { mincols=x; updateGeometry(); updateView(); }
+        int minimumColumns() const { return mincols; }
+
         // used by children
         Context *context;
         int scope;
+        int mincols;
+
         QGraphicsView *view;
         QFont titlefont, bigfont, midfont, smallfont, tinyfont;
 
@@ -228,6 +259,7 @@ class ChartSpace : public QWidget
 
         // set geometry on the widgets (size and pos)
         void updateGeometry();
+        QList<LayoutChartSpaceItem> layoutItems(); // moves geom and lays out items
 
         // set scale, zoom etc appropriately
         void updateView();

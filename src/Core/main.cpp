@@ -28,6 +28,7 @@
 #include "IdleTimer.h"
 #include "PowerProfile.h"
 #include "GcCrashDialog.h" // for versionHTML
+#include "OverviewItems.h"
 
 #include <QApplication>
 #include <QDesktopWidget>
@@ -220,6 +221,7 @@ main(int argc, char *argv[])
         freopen("CONOUT$", "w", stderr);
         freopen("CONOUT$", "w", stdout);
     }
+    bool angle=true;
 #endif
 
     //
@@ -295,6 +297,9 @@ main(int argc, char *argv[])
 #ifdef GC_WANT_R
             fprintf(stderr, "--no-r              to disable R startup\n");
 #endif
+#ifdef Q_OS_WIN
+            fprintf(stderr, "--no-angle          to disable ANGLE rendering\n");
+#endif
             fprintf (stderr, "\nSpecify the folder and/or athlete to open on startup\n");
             fprintf(stderr, "If no parameters are passed it will reopen the last athlete.\n\n");
 
@@ -349,6 +354,10 @@ main(int argc, char *argv[])
 #else
             fprintf(stderr, "CloudDB support not compiled in, exiting.\n");
             exit(1);
+#endif
+#ifdef Q_OS_WIN
+        } else if (arg == "--no-angle") {
+            angle = false;
 #endif
         } else {
 
@@ -415,9 +424,11 @@ main(int argc, char *argv[])
     gsl_set_error_handler_off();
 
 #ifdef Q_OS_WIN
-    // windows we use ANGLE for opengl on top of DirectX
-    // it avoids issues with bad graphics drivers
-    QCoreApplication::setAttribute(Qt::AA_UseOpenGLES);
+    if (angle) {
+        // windows we use ANGLE for opengl on top of DirectX/Direct3D
+        // it avoids issues with bad graphics drivers
+        QCoreApplication::setAttribute(Qt::AA_UseOpenGLES);
+    }
 #endif
 
     // create the application -- only ever ONE regardless of restarts
@@ -427,11 +438,6 @@ main(int argc, char *argv[])
 
     // read defaults
     initPowerProfile();
-
-    // set default colors
-    GCColor::setupColors();
-    appsettings->migrateQSettingsSystem(); // colors must be setup before migration can take place, but reading has to be from the migrated ones
-    GCColor::readConfig();
 
     // output colors as configured so we can cut and paste into Colors.cpp
     // uncomment when developers working on theme colors
@@ -627,11 +633,21 @@ main(int argc, char *argv[])
             gcTranslator.load(":translations" + translation_file);
         application->installTranslator(&gcTranslator);
 
+        // Now the translator is installed, set default colors with translated names
+        GCColor::setupColors();
+
+        // migration
+        appsettings->migrateQSettingsSystem(); // colors must be setup before migration can take place, but reading has to be from the migrated ones
+        GCColor::readConfig();
+
         // Initialize metrics once the translator is installed
         RideMetricFactory::instance().initialize();
 
         // Initialize global registry once the translator is installed
         GcWindowRegistry::initialize();
+
+        // initialize Overview Items once the translator is installed
+        OverviewItemConfig::registerItems();
 
         // initialise the trainDB
         trainDB = new TrainDB(home);

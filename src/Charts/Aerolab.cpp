@@ -369,7 +369,7 @@ Aerolab::setData(RideItem *_rideItem, bool new_zoom) {
       //d += v * dt;
       //distanceArray[arrayLength] = d/1000;
 
-      distanceArray[arrayLength] = p1->km;
+      distanceArray[arrayLength] = p1->km * (GlobalContext::context()->useMetricUnits ? 1 : MILES_PER_KM);
 
 
 

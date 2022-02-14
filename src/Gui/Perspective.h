@@ -47,6 +47,7 @@ class QTextStream;
 class DataFilter;
 class SearchBox;
 class TrendsView;
+class UserChartWindow;
 
 class Perspective : public GcWindow
 {
@@ -73,6 +74,11 @@ class Perspective : public GcWindow
         // get/set the expression (will compile df)
         QString expression() const;
         void setExpression(QString);
+
+        // trainswitch
+        enum switchenum { None=0, Erg=1, Slope=2, Video=3 };
+        int trainSwitch() const { return trainswitch; }
+        void setTrainSwitch(int x) { trainswitch = (switchenum)x; }
 
         // import and export
         static Perspective *fromFile(Context *context, QString filename, int type);
@@ -109,11 +115,12 @@ class Perspective : public GcWindow
         virtual void dragEnterEvent(QDragEnterEvent *);
         virtual void dropEvent(QDropEvent *);
         void resizeEvent(QResizeEvent *);
+        void resize();
         void showEvent(QShowEvent *);
         bool eventFilter(QObject *object, QEvent *e);
 
         // My widget signals and events
-        void styleChanged(int);
+        void styleChanged(int, bool force=false);
         void addChart(GcChartWindow* newone);
         void addChartFromMenu(QAction*action); // called with an action
         void appendChart(GcWinID id); // called from Context *to inset chart
@@ -124,6 +131,8 @@ class Perspective : public GcWindow
         // window wants to close...
         void closeWindow(GcWindow*);
         void showControls();
+
+        void userChartConfigChanged(UserChartWindow *);
 
         //notifiction that been made visible
         void selected();
@@ -145,6 +154,7 @@ class Perspective : public GcWindow
     protected:
         Context *context;
         bool active; // ignore gui signals when changing views
+        bool resizing; // when resizing elements, don't double dip
         GcChartWindow *clicked; // keep track of selected charts
         bool dropPending;
 
@@ -179,6 +189,9 @@ class Perspective : public GcWindow
         // expression
         DataFilter *df;
         QString expression_;
+
+        // train view switching
+        switchenum trainswitch;
 
         static void translateChartTitles(QList<GcChartWindow*> charts);
 };
@@ -242,12 +255,13 @@ class AddPerspectiveDialog : public QDialog
     Q_OBJECT
 
     public:
-        AddPerspectiveDialog(QWidget *parent, Context *context, QString &name, QString &expression, int type, bool edit=false);
+        AddPerspectiveDialog(QWidget *parent, Context *context, QString &name, QString &expression, int type, Perspective::switchenum &trainswitch, bool edit=false);
 
     protected:
         QLineEdit *nameEdit;
         SearchBox *filterEdit;
         QPushButton *add, *cancel;
+        QComboBox *trainSwitch;
 
     public slots:
         void addClicked();
@@ -257,6 +271,7 @@ class AddPerspectiveDialog : public QDialog
         Context *context;
         QString &name;
         QString &expression;
+        Perspective::switchenum &trainswitch;
         int type;
 };
 #endif // _GC_HomeWindow_h

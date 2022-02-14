@@ -8,6 +8,7 @@ pandas == 1.2.3
 scipy
 lmfit
 plotly
+importlib_metadata
 #
 # Nice to have
 #

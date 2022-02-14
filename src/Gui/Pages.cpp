@@ -731,7 +731,7 @@ TrainOptionsPage::TrainOptionsPage(QWidget *parent, Context *context) : QWidget(
     connect(workoutBrowseButton, SIGNAL(clicked()), this, SLOT(browseWorkoutDir()));
 
     useSimulatedSpeed = new QCheckBox(tr("Simulate Speed From Power"), this);
-    useSimulatedSpeed->setChecked(appsettings->value(this, TRAIN_USESIMULATEDSPEED, false).toBool());
+    useSimulatedSpeed->setChecked(appsettings->value(this, TRAIN_USESIMULATEDSPEED, true).toBool());
     useSimulatedSpeed->setToolTip(tr("Simulation physics uses current athlete parameters and settings\n"
                                      "from the virtual bicycle specifications tab. For Erg Mode workouts\n"
                                      "the slope is assumed to be zero."));
@@ -750,9 +750,6 @@ TrainOptionsPage::TrainOptionsPage(QWidget *parent, Context *context) : QWidget(
 
     autoHide = new QCheckBox(tr("Auto-hide bottom bar in Train View"), this);
     autoHide->setChecked(appsettings->value(this, TRAIN_AUTOHIDE, false).toBool());
-
-    // Disabled until ported across from the existing bottom bar checkbox
-    autoHide->setDisabled(true);
 
     lapAlert = new QCheckBox(tr("Play sound before new lap"), this);
     lapAlert->setChecked(appsettings->value(this, TRAIN_LAPALERT, false).toBool());
@@ -1213,10 +1210,12 @@ ColorsPage::ColorsPage(QWidget *parent) : QWidget(parent)
     searchLayout->addWidget(searchEdit);
 
     colors = new QTreeWidget;
-    colors->headerItem()->setText(0, tr("Color"));
-    colors->headerItem()->setText(1, tr("Select"));
-    colors->setColumnCount(2);
-    colors->setColumnWidth(0,350 *dpiXFactor);
+    colors->headerItem()->setText(0, tr("Group"));
+    colors->headerItem()->setText(1, tr("Color"));
+    colors->headerItem()->setText(2, tr("Select"));
+    colors->setColumnCount(3);
+    colors->setColumnWidth(0,70 *dpiXFactor);
+    colors->setColumnWidth(1,350 *dpiXFactor);
     colors->setSelectionMode(QAbstractItemView::NoSelection);
     //colors->setEditTriggers(QAbstractItemView::SelectedClicked); // allow edit
     colors->setUniformRowHeights(true); // causes height problems when adding - in case of non-text fields
@@ -1323,10 +1322,16 @@ ColorsPage::ColorsPage(QWidget *parent) : QWidget(parent)
         QTreeWidgetItem *add;
         ColorButton *colorButton = new ColorButton(this, colorSet[i].name, colorSet[i].color);
         add = new QTreeWidgetItem(colors->invisibleRootItem());
-        add->setText(0, colorSet[i].name);
-        colors->setItemWidget(add, 1, colorButton);
+        add->setData(0, Qt::UserRole, i); // remember which index it is for since gets sorted
+        add->setText(0, colorSet[i].group);
+        add->setText(1, colorSet[i].name);
+        colors->setItemWidget(add, 2, colorButton);
 
     }
+    colors->setSortingEnabled(true);
+    colors->sortByColumn(1, Qt::AscendingOrder); // first sort by name
+    colors->sortByColumn(0, Qt::AscendingOrder); // now by group
+
     connect(applyTheme, SIGNAL(clicked()), this, SLOT(applyThemeClicked()));
 
     foreach(ColorTheme theme, GCColor::themes().themes) {
@@ -1365,7 +1370,7 @@ ColorsPage::searchFilter(QString text)
     for(int i=0; i<colors->invisibleRootItem()->childCount(); i++) {
         if (empty) colors->setRowHidden(i, colors->rootIndex(), false);
         else {
-            QString text = colors->invisibleRootItem()->child(i)->text(0);
+            QString text = colors->invisibleRootItem()->child(i)->text(1);
             bool found=false;
             foreach(QString tok, toks) {
                 if (text.contains(tok, Qt::CaseInsensitive)) {
@@ -1411,6 +1416,8 @@ ColorsPage::applyThemeClicked()
 
         // reset the color selection tools
         colors->clear();
+        colors->setSortingEnabled(false);
+
         for (int i=0; colorSet[i].name != ""; i++) {
 
             QColor color;
@@ -1442,10 +1449,27 @@ ColorsPage::applyThemeClicked()
                 color = theme.colors[11];
                 break;
 
+            case CCARDBACKGROUND2:
+                // set back to light black for dark themes
+                // and gray for light themes
+                color = theme.colors[12];
+                break;
+
+            case CCARDBACKGROUND3:
+                // set back to light black for dark themes
+                // and gray for light themes
+                color = theme.colors[13];
+                break;
+
             case CCHROME:
+            case CCHARTBAR:
             case CTOOLBAR: // we always keep them the same, but user can make different
                 //  set to black for dark themese and grey for light themes
                 color = theme.colors[1];
+                break;
+
+            case CHOVER:
+                color = theme.stealth ? theme.colors[11] : (theme.dark ? QColor(50,50,50) : QColor(200,200,200));
                 break;
 
             case CPLOTSYMBOL:
@@ -1504,10 +1528,15 @@ ColorsPage::applyThemeClicked()
             QTreeWidgetItem *add;
             ColorButton *colorButton = new ColorButton(this, colorSet[i].name, color);
             add = new QTreeWidgetItem(colors->invisibleRootItem());
-            add->setText(0, colorSet[i].name);
-            colors->setItemWidget(add, 1, colorButton);
+            add->setData(0, Qt::UserRole, i); // remember which index it is for since gets sorted
+            add->setText(0, colorSet[i].group);
+            add->setText(1, colorSet[i].name);
+            colors->setItemWidget(add, 2, colorButton);
 
         }
+        colors->setSortingEnabled(true);
+        colors->sortByColumn(1, Qt::AscendingOrder); // first sort by name
+        colors->sortByColumn(0, Qt::AscendingOrder);
     }
 }
 
@@ -1526,11 +1555,12 @@ ColorsPage::saveClicked()
     // run down and get the current colors and save
     for (int i=0; colorSet[i].name != ""; i++) {
         QTreeWidgetItem *current = colors->invisibleRootItem()->child(i);
-        QColor newColor = ((ColorButton*)colors->itemWidget(current, 1))->getColor();
+        QColor newColor = ((ColorButton*)colors->itemWidget(current, 2))->getColor();
         QString colorstring = QString("%1:%2:%3").arg(newColor.red())
                                                  .arg(newColor.green())
                                                  .arg(newColor.blue());
-        appsettings->setValue(colorSet[i].setting, colorstring);
+        int colornum = current->data(0, Qt::UserRole).toInt();
+        appsettings->setValue(colorSet[colornum].setting, colorstring);
     }
 
     // update basefont family
@@ -1904,7 +1934,8 @@ CustomMetricsPage::addClicked()
     here.name = "My Average Power";
     here.type = 1;
     here.precision = 0;
-    here.description = "Average Power computed using Joules to account for variable recording.";
+    here.istime = false;
+    here.description = "Average Power";
     here.unitsMetric = "watts";
     here.unitsImperial = "watts";
     here.conversion = 1.00;
@@ -1914,17 +1945,12 @@ CustomMetricsPage::addClicked()
     relevant { Data contains \"P\"; }\n\
 \n\
     # initialise aggregating variables\n\
-    init { joules <- 0; seconds <- 0; }\n\
-\n\
-    # joules = power x time, for each sample\n\
-    sample { \n\
-        joules <- joules + (POWER * RECINTSECS);\n\
-        seconds <- seconds + RECINTSECS;\n\
-    }\n\
+    # does nothing, update as needed\n\
+    init { 0; }\n\
 \n\
     # calculate metric value at end\n\
-    value { joules / seconds; }\n\
-    count { seconds; }\n\
+    value { mean(samples(POWER)); }\n\
+    count { count(samples(POWER)); }\n\
 }";
 
     EditUserMetricDialog editor(this, context, here);

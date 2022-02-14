@@ -52,11 +52,6 @@ GenericLegendItem::GenericLegendItem(Context *context, GenericLegend *parent, QS
 void
 GenericLegendItem::configChanged(qint32)
 {
-    static const double gl_margin = 5 * dpiXFactor*legend->plot()->scale();
-    static const double gl_spacer = 2 * dpiXFactor*legend->plot()->scale();
-    static const double gl_block = 7 * dpiXFactor*legend->plot()->scale();
-    static const double gl_linewidth = 1 * dpiXFactor*legend->plot()->scale();
-
     // we just set geometry for now.
     QFont f; // based on what just got set in prefs
     // we need to scale...
@@ -65,13 +60,21 @@ GenericLegendItem::configChanged(qint32)
 
     // so now the string we would display
     QString valuelabel = QString ("%1").arg("9999999.999"); // xxx later we might have scale/dp
+    double textheight = fm.boundingRect(valuelabel).height();
+
+    double gl_linefactor = 0.1; // width is proportional to text height
+    double gl_spacefactor = 0.05; // spacing is proportional to text height
+    double gl_margin = 4 * dpiXFactor*legend->plot()->scale();
+    double gl_block = 4 * dpiXFactor*legend->plot()->scale();
+    double gl_spacer = gl_spacefactor * textheight;
+    double gl_linewidth = gl_linefactor * textheight;
 
     // maximum width of widget = margin + block + space + name + space + value + margin
     double width = gl_margin + gl_block + gl_spacer + fm.boundingRect(name).width()
                               + gl_spacer + fm.boundingRect(valuelabel).width() + gl_margin;
 
     // maximum height of widget = margin + textheight + spacer + line
-    double height = (gl_margin*2) + fm.boundingRect(valuelabel).height() + gl_spacer + gl_linewidth;
+    double height = (gl_margin*3) + fm.boundingRect(valuelabel).height() + gl_spacer + gl_linewidth;
 
     // now set geometry of widget
     setFixedWidth(width);
@@ -267,6 +270,13 @@ void
 GenericLegend::addLabel(QLabel *label)
 {
     layout->addWidget(label);
+}
+
+// removes from layout but does not delete it.
+void
+GenericLegend::removeLabel(QLabel *label)
+{
+    layout->removeWidget(label);
 }
 
 void

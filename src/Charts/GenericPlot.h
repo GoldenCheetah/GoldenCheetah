@@ -44,6 +44,7 @@
 
 #include "GenericSelectTool.h"
 #include "GenericLegend.h"
+#include "GenericAnnotations.h"
 #include "GenericChart.h"
 
 // keep aligned to library.py
@@ -57,7 +58,9 @@
 class GenericPlot;
 class GenericLegend;
 class GenericSelectTool;
+class GenericSeriesInfo;
 class GenericAxisInfo;
+class GenericAnnotationInfo;
 
 // the chart
 class ChartSpace;
@@ -72,6 +75,10 @@ class GenericPlot : public QWidget {
         static QString gl_timeformat;
 
         friend class GenericSelectTool;
+        friend class GenericAnnotationController;
+        friend class GenericLines;
+        friend class StraightLine;
+        friend class GenericLR;
         friend class GenericLegend;
 
         GenericPlot(QWidget *parent, Context *context, QGraphicsItem *item);
@@ -102,11 +109,7 @@ class GenericPlot : public QWidget {
         // add a curve, associating an axis
         bool addCurve(QString name, QVector<double> xseries, QVector<double> yseries, QVector<QString> fseries, QString xname, QString yname,
                       QStringList labels, QStringList colors,
-                      int line, int symbol, int size, QString color, int opacity, bool opengl, bool legend, bool datalabels, bool fill);
-
-        // adding annotations
-        void addAnnotation(AnnotationType, QAbstractSeries*, double yvalue); // LINE
-        void addAnnotation(AnnotationType, QString, QColor=QColor(Qt::gray)); // LABEL
+                      int line, int symbol, int size, QString color, int opacity, bool opengl, bool legend, bool datalabels, bool fill, QList<GenericAnnotationInfo>annotations);
 
         // configure axis, after curves added
         bool configureAxis(QString name, bool visible, int align, double min, double max,
@@ -114,6 +117,10 @@ class GenericPlot : public QWidget {
 
         // post processing clean up / add decorations / helpers etc
         void finaliseChart();
+
+        // add and remove annotations (annotations are always associated with a curve)
+        void clearAnnotations();
+        void plotAnnotations(GenericSeriesInfo &info);
 
         // do we want to see this series?
         void setSeriesVisible(QString name, bool visible);
@@ -124,6 +131,9 @@ class GenericPlot : public QWidget {
         void barsetHover(bool status, int index, QBarSet *barset);
         void plotAreaChanged();
         void pieHover(QPieSlice *slice, bool state);
+
+        // access structures
+        QAbstractSeries *curve(QString name) { return curves.value(name, NULL); }
 
     protected:
 
@@ -150,8 +160,13 @@ class GenericPlot : public QWidget {
         // quadtrees
         QMap<QAbstractSeries*, Quadtree*> quadtrees;
 
-        // annotation labels
+        // annotations
+        GenericAnnotationController *annotationController;
+
+        // labels and other annotations
         QList<QLabel *> labels;
+        QList<GenericAnnotation*> annotations;
+        QList<GenericSeriesInfo> annotationinfos;
 
     private:
         Context *context;

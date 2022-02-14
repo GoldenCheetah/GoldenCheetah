@@ -66,6 +66,9 @@ public:
 	telemetry.setWatts(watts);
     }
     void setWheelRpm(double wrpm);
+    void setSpeed(double speed) {
+        telemetry.setSpeed(speed);
+    }
     void setCadence(double cadence) {
 	telemetry.setCadence(cadence);
     }

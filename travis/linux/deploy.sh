@@ -29,7 +29,7 @@ cp /usr/lib/x86_64-linux-gnu/libssl.so appdir/lib
 cp /usr/lib/x86_64-linux-gnu/libcrypto.so appdir/lib
 
 ### Download current version of linuxdeployqt
-wget -c https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage
+wget --no-verbose -c https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage
 chmod a+x linuxdeployqt-continuous-x86_64.AppImage
 
 ### Deploy to appdir and generate AppImage

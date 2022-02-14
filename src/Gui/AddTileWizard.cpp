@@ -16,7 +16,7 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#include "AddChartWizard.h"
+#include "AddTileWizard.h"
 #include "Context.h"
 #include "MainWindow.h"
 #include "HelpWhatsThis.h"
@@ -36,7 +36,7 @@
 //
 
 // Main wizard - if passed a service name we are in edit mode, not add mode.
-AddChartWizard::AddChartWizard(Context *context, ChartSpace *space, int scope, ChartSpaceItem * &added)
+AddTileWizard::AddTileWizard(Context *context, ChartSpace *space, int scope, ChartSpaceItem * &added)
     : QWizard(context->mainWindow), context(context), scope(scope), space(space), added(added)
 {
     HelpWhatsThis *help = new HelpWhatsThis(this);
@@ -52,10 +52,10 @@ AddChartWizard::AddChartWizard(Context *context, ChartSpace *space, int scope, C
     setMinimumWidth(600 *dpiXFactor);
     setMinimumHeight(500 *dpiYFactor);
 
-    setWindowTitle(tr("Add Chart Wizard"));
-    setPage(01, new AddChartType(this));
-    setPage(02, new AddChartConfig(this));
-    setPage(03, new AddChartFinal(this));
+    setWindowTitle(tr("Add Tile Wizard"));
+    setPage(01, new AddTileType(this));
+    setPage(02, new AddTileConfig(this));
+    setPage(03, new AddTileFinal(this));
 
     done = false;
     config = NULL;
@@ -67,10 +67,10 @@ AddChartWizard::AddChartWizard(Context *context, ChartSpace *space, int scope, C
  *--------------------------------------------------------------------*/
 
 //Select Cloud type
-AddChartType::AddChartType(AddChartWizard *parent) : QWizardPage(parent), wizard(parent)
+AddTileType::AddTileType(AddTileWizard *parent) : QWizardPage(parent), wizard(parent)
 {
-    setTitle(tr("Chart Type"));
-    setSubTitle(tr("Select the chart type"));
+    setTitle(tr("Tile Type"));
+    setSubTitle(tr("Select the type of tile"));
 
     QVBoxLayout *layout = new QVBoxLayout;
     setLayout(layout);
@@ -91,7 +91,7 @@ AddChartType::AddChartType(AddChartWizard *parent) : QWizardPage(parent), wizard
 }
 
 void
-AddChartType::initializePage()
+AddTileType::initializePage()
 {
     // clear whatever we have, if anything
     QLayoutItem *item = NULL;
@@ -122,7 +122,7 @@ AddChartType::initializePage()
 }
 
 void
-AddChartType::clicked(int p)
+AddTileType::clicked(int p)
 {
     wizard->type = p;
     wizard->detail = ChartSpaceItemRegistry::instance().detailForType(p);
@@ -131,17 +131,17 @@ AddChartType::clicked(int p)
 }
 
 // Scan for Cloud port / usb etc
-AddChartConfig::AddChartConfig(AddChartWizard *parent) : QWizardPage(parent), wizard(parent)
+AddTileConfig::AddTileConfig(AddTileWizard *parent) : QWizardPage(parent), wizard(parent)
 {
-    setSubTitle(tr("Chart Settings"));
+    setSubTitle(tr("Tile Settings"));
 
     main = new QVBoxLayout(this);
 }
 
 void
-AddChartConfig::initializePage()
+AddTileConfig::initializePage()
 {
-    setTitle(QString(tr("Chart Settings")));
+    setTitle(QString(tr("Tile Settings")));
 
     if (wizard->config) {
         wizard->config->hide();
@@ -160,7 +160,7 @@ AddChartConfig::initializePage()
     wizard->config->show();
 }
 
-AddChartConfig::~AddChartConfig()
+AddTileConfig::~AddTileConfig()
 {
     // spare the config widget being destroyed
     if (wizard->config) {
@@ -173,27 +173,27 @@ AddChartConfig::~AddChartConfig()
 }
 
 bool
-AddChartConfig::validatePage()
+AddTileConfig::validatePage()
 {
     return true;
 }
 
 // Final confirmation
-AddChartFinal::AddChartFinal(AddChartWizard *parent) : QWizardPage(parent), wizard(parent)
+AddTileFinal::AddTileFinal(AddTileWizard *parent) : QWizardPage(parent), wizard(parent)
 {
     setTitle(tr("Done"));
-    setSubTitle(tr("Add Chart"));
+    setSubTitle(tr("Add Tile"));
     QVBoxLayout *blank = new QVBoxLayout(this); // just blank .. for now
     blank->addWidget(new QWidget(this));
 }
 
 void
-AddChartFinal::initializePage()
+AddTileFinal::initializePage()
 {
 }
 
 bool
-AddChartFinal::validatePage()
+AddTileFinal::validatePage()
 {
     // add to the top left
     if (wizard->item) {

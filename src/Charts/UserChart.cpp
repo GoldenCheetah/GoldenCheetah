@@ -23,6 +23,8 @@
 #include "RideFileCommand.h"
 #include "Utils.h"
 #include "AthleteTab.h"
+#include "Views.h"
+#include "AnalysisSidebar.h"
 #include "LTMTool.h"
 #include "RideNavigator.h"
 #include "ColorButton.h"
@@ -30,13 +32,14 @@
 #include "UserChartData.h"
 #include "TimeUtils.h"
 #include "HelpWhatsThis.h"
+#include "RideItem.h"
 
 #include <limits>
 #include <QScrollArea>
 #include <QDialog>
 
-UserChart::UserChart(QWidget *parent, Context *context, bool rangemode)
-    : QWidget(parent), context(context), rangemode(rangemode), stale(true), last(NULL), ride(NULL), item(NULL)
+UserChart::UserChart(QWidget *parent, Context *context, bool rangemode, QString bg)
+    : QWidget(parent), context(context), rangemode(rangemode), stale(true), last(NULL), ride(NULL), intervals(0), item(NULL)
 {
     HelpWhatsThis *helpContents = new HelpWhatsThis(this);
     this->setWhatsThis(helpContents->getWhatsThisText(HelpWhatsThis::Chart_User));
@@ -64,10 +67,13 @@ UserChart::UserChart(QWidget *parent, Context *context, bool rangemode)
     // but we do need to refresh when chart settings change
     connect(settingsTool_, SIGNAL(chartConfigChanged()), this, SLOT(chartConfigChanged()));
     connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
+    connect(context, SIGNAL(intervalSelected()), this, SLOT(intervalRefresh()));
+    connect(context, SIGNAL(intervalsChanged()), this, SLOT(intervalRefresh()));
 
     // defaults, can be overriden via setBackgroundColor()
-    if (rangemode) bgcolor = GColor(CTRENDPLOTBACKGROUND);
-    else bgcolor = GColor(CPLOTBACKGROUND);
+    if (bg != "") chartinfo.bgcolor = bg;
+    else if (rangemode) chartinfo.bgcolor = StandardColor(CTRENDPLOTBACKGROUND).name();
+    else chartinfo.bgcolor = StandardColor(CPLOTBACKGROUND).name();
 
     // set default background color
     configChanged(0);
@@ -80,11 +86,11 @@ UserChart::configChanged(qint32)
 
     // tinted palette for headings etc
     QPalette palette;
-    palette.setBrush(QPalette::Window, bgcolor);
-    palette.setBrush(QPalette::Background, bgcolor);
+    palette.setBrush(QPalette::Window, RGBColor(chartinfo.bgcolor));
+    palette.setBrush(QPalette::Background, RGBColor(chartinfo.bgcolor));
     palette.setColor(QPalette::WindowText, GColor(CPLOTMARKER));
     palette.setColor(QPalette::Text, GColor(CPLOTMARKER));
-    palette.setColor(QPalette::Base, bgcolor /*GCColor::alternateColor(bgcolor)*/);
+    palette.setColor(QPalette::Base, RGBColor(chartinfo.bgcolor) /*GCColor::alternateColor(bgcolor)*/);
     setPalette(palette);
 
     setAutoFillBackground(true);
@@ -93,15 +99,6 @@ UserChart::configChanged(qint32)
     chartConfigChanged();
 
     setUpdatesEnabled(true);
-}
-
-void
-UserChart::setBackgroundColor(QColor bgcolor)
-{
-    if (this->bgcolor != bgcolor) {
-        this->bgcolor = bgcolor;
-        configChanged(0);
-    }
 }
 
 void
@@ -114,12 +111,14 @@ UserChart::setGraphicsItem(QGraphicsItem *item)
 void
 UserChart::chartConfigChanged()
 {
+    emit userChartConfigChanged();
+
     if (!ride) return;
 
     stale = true;
 
     if (rangemode) setDateRange(context->currentDateRange());
-    else setRide(ride);
+    else  setRide(ride);
 }
 
 //
@@ -162,13 +161,43 @@ UserChart::setRide(const RideItem *item)
     refresh();
  }
 
- void
- UserChart::refresh()
- {
+void
+UserChart::intervalRefresh()
+{
+    // refresh on intervals change is user configurable
+    if (!rangemode && chartinfo.intervalrefresh && context->currentRideItem()) {
+
+        // are there any intervals selected?
+        int ints = 0;
+        foreach (IntervalItem*p, const_cast<RideItem*>(context->currentRideItem())->intervals()) {
+            if (p != NULL && p->selected == true) ints++;
+        }
+
+        // if the number of intervals is selected is 0 and
+        // when we last refreshed it was also 0 then just ignore
+        // this signal (on ride change the ride changed signal
+        // will trigger a refresh, lets not duplicate it)
+        if (ints !=0 || intervals !=0) {
+            refresh();
+        }
+    }
+}
+
+void
+UserChart::refresh()
+{
+    if (context->currentRideItem() == NULL) return;
+
     if (!isVisible()) { stale=true; return; }
 
+    // remember how many interval were selected when we refreshed
+    intervals = 0;
+    foreach (IntervalItem*p, const_cast<RideItem*>(context->currentRideItem())->intervals()) {
+        if (p != NULL && p->selected == true) intervals++;
+    }
+
     // ok, we've run out of excuses, looks like we need to plot
-    chart->setBackgroundColor(bgcolor);
+    chart->setBackgroundColor(RGBColor(chartinfo.bgcolor));
     chart->initialiseChart(chartinfo.title, chartinfo.type, chartinfo.animate, chartinfo.legendpos, chartinfo.stack, chartinfo.orientation, chartinfo.scale);
 
     // now generate the series data
@@ -178,12 +207,12 @@ UserChart::setRide(const RideItem *item)
         GenericSeriesInfo &series = seriesinfo[ii];
 
         // clear old annotations for this series
-        annotations.clear();
+        series.annotations.clear();
 
         // re-create program (may be edited)
         if (series.user1 != NULL) delete static_cast<UserChartData*>(series.user1);
         series.user1 = new UserChartData(context, this, series.string1, rangemode);
-        connect(static_cast<UserChartData*>(series.user1)->program, SIGNAL(annotateLabel(QStringList&)), this, SLOT(annotateLabel(QStringList&)));
+        connect(static_cast<UserChartData*>(series.user1)->program, SIGNAL(annotate(GenericAnnotationInfo&)), this, SLOT(annotate(GenericAnnotationInfo&)));
 
         // cast so we can work with it
         UserChartData *ucd = static_cast<UserChartData*>(series.user1);
@@ -272,10 +301,7 @@ UserChart::setRide(const RideItem *item)
         // data now generated so can add curve
         chart->addCurve(series.name, series.xseries, series.yseries, series.fseries, series.xname, series.yname,
                         series.labels, series.colors, series.line, series.symbol, series.size, series.color, series.opacity,
-                        series.opengl, series.legend, series.datalabels, series.fill);
-
-        // add series annotations
-        foreach(QStringList list, annotations) chart->annotateLabel(series.name, list);
+                        series.opengl, series.legend, series.datalabels, series.fill, series.aggregateby, series.annotations);
 
     }
 
@@ -517,9 +543,18 @@ UserChart::dateForGroup(int groupby, long group)
 }
 
 void
-UserChart::annotateLabel(QStringList &list)
+UserChart::annotate(GenericAnnotationInfo &annotation)
 {
-    annotations << list;
+    QObject *from = sender();
+
+    for(int i=0; i<seriesinfo.count(); i++) {
+        if (seriesinfo[i].user1) {
+            UserChartData *ucd = static_cast<UserChartData*>(seriesinfo[i].user1);
+            if (ucd->program == from) {
+                seriesinfo[i].annotations << annotation;
+            }
+        }
+    }
 }
 
 //
@@ -539,11 +574,12 @@ UserChart::settings() const
     out << "\"description\": \"" << Utils::jsonprotect2(chartinfo.description) << "\",\n";
     out << "\"type\": "          << chartinfo.type << ",\n";
     out << "\"animate\": "       << (chartinfo.animate ? "true" : "false") << ",\n";
+    out << "\"intervalrefresh\": "  << (chartinfo.intervalrefresh ? "true" : "false") << ",\n";
     out << "\"legendpos\": "     << chartinfo.legendpos << ",\n";
     out << "\"stack\": "         << (chartinfo.stack ? "true" : "false") << ",\n";
     out << "\"orientation\": "   << chartinfo.orientation << ",\n";
+    out << "\"bgcolor\": \""       << chartinfo.bgcolor.name() << "\", \n";
     out << "\"scale\": "         << QString("%1").arg(chartinfo.scale); // note no trailing comma
-    // bgcolor not saved, it is set based upon context
 
     // seriesinfos
     if (seriesinfo.count()) out << ",\n\"SERIES\": [\n"; // that trailing comma
@@ -632,8 +668,11 @@ UserChart::applySettings(QString x)
     chartinfo.legendpos = obj["legendpos"].toInt();
     chartinfo.stack = obj["stack"].toBool();
     chartinfo.orientation = obj["orientation"].toInt();
+    if (obj.contains("bgcolor")) chartinfo.bgcolor = obj["bgcolor"].toString();
     if (obj.contains("scale")) chartinfo.scale = obj["scale"].toDouble();
     else chartinfo.scale = 1.0f;
+    if (obj.contains("intervalrefresh")) chartinfo.intervalrefresh = obj["intervalrefresh"].toBool();
+    else chartinfo.intervalrefresh = false;
 
     // array of series, but userchartdata needs to be deleted
     foreach(GenericSeriesInfo series, seriesinfo)
@@ -720,7 +759,7 @@ UserChartSettings::UserChartSettings(Context *context, bool rangemode, GenericCh
     HelpWhatsThis *helpConfig = new HelpWhatsThis(this);
     this->setWhatsThis(helpConfig->getWhatsThisText(HelpWhatsThis::Chart_User));
 
-    setMinimumHeight(350*dpiYFactor);
+    setMinimumHeight(500*dpiYFactor);
     setMinimumWidth(450*dpiXFactor);
 
     layout = new QVBoxLayout(this);
@@ -785,14 +824,22 @@ UserChartSettings::UserChartSettings(Context *context, bool rangemode, GenericCh
     scale->setMaximum(18);
     scale->setSingleStep(1);
     scale->setValue(1 + ((chart.scale-1)*2)); // scale is in increments of 0.5
-    cf->addRow(tr("Scale"), scale);
-
-
     cf->addRow("  ", (QWidget*)NULL);
+    cf->addRow(tr("Font scaling"), scale);
+
+    bgcolor = new ColorButton(this, tr("Background"), QColor(chartinfo.bgcolor), true);
+    bgcolor->setSelectAll(true);
+    cf->addRow("Background", bgcolor);
+    cf->addRow("  ", (QWidget*)NULL);
+
     animate = new QCheckBox(tr("Animate"));
     cf->addRow(" ", animate);
     stack = new QCheckBox(tr("Single series per plot"));
     cf->addRow(" ", stack);
+
+    intervalrefresh = new QCheckBox(tr("Refresh for intervals"), this);
+    intervalrefresh->setChecked(chart.intervalrefresh);
+    cf->addRow(" ", intervalrefresh);
 
     // Series tab
     QWidget *seriesWidget = new QWidget(this);
@@ -914,8 +961,10 @@ UserChartSettings::UserChartSettings(Context *context, bool rangemode, GenericCh
     connect(animate, SIGNAL(stateChanged(int)), this, SLOT(updateChartInfo()));
     connect(legpos, SIGNAL(currentIndexChanged(QString)), this, SLOT(updateChartInfo()));
     connect(stack, SIGNAL(stateChanged(int)), this, SLOT(updateChartInfo()));
+    connect(intervalrefresh, SIGNAL(stateChanged(int)), this, SLOT(updateChartInfo()));
     connect(orientation, SIGNAL(currentIndexChanged(int)), this, SLOT(updateChartInfo()));
     connect(scale, SIGNAL(valueChanged(int)), this, SLOT(updateChartInfo()));
+    connect(bgcolor, SIGNAL(colorChosen(QColor)), this, SLOT(updateChartInfo()));
 }
 
 void
@@ -945,6 +994,8 @@ UserChartSettings::refreshChartInfo()
     if (index >= 0) orientation->setCurrentIndex(index);
     else orientation->setCurrentIndex(0);
     scale->setValue(1 + ((chartinfo.scale-1)*2)); // 1-5 mapped to 1-7, where scale is 1,1.5,2,2.5,3,3.5,4,4.5,5
+    intervalrefresh->setChecked(chartinfo.intervalrefresh);
+    bgcolor->setColor(QColor(chartinfo.bgcolor));
     updating=false;
 }
 
@@ -969,6 +1020,8 @@ UserChartSettings::updateChartInfo()
     chartinfo.stack = stack->isChecked();
     chartinfo.orientation = orientation->itemData(orientation->currentIndex()).toInt();
     chartinfo.scale = 1 + ((scale->value() - 1) * 0.5);
+    chartinfo.intervalrefresh = intervalrefresh->isChecked();
+    chartinfo.bgcolor = bgcolor->getColor().name();
 
     // we need to refresh whenever stuff changes....
     if (refresh) emit chartConfigChanged();
@@ -1585,11 +1638,6 @@ EditUserSeriesDialog::EditUserSeriesDialog(Context *context, bool rangemode, Gen
             "\n"
             "    relevant {\n"
             "        Data contains \"P\";\n"
-            "    }\n"
-            "\n"
-            "    sample {\n"
-            "        # as we iterate over activity data points\n"
-            "        count <- count + 1;\n"
             "    }\n"
             "\n"
             "    finalise {\n"

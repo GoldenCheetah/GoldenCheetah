@@ -44,6 +44,7 @@
 #include <QHeaderView>
 #include <QFormLayout>
 #include <QSqlTableModel>
+#include <QMutex>
 
 #include "cmath" // for round()
 #include "Units.h" // for MILES_PER_KM
@@ -96,14 +97,11 @@ class TrainSidebar : public GcWindow
 
         TrainSidebar(Context *context);
         Context *context;
+        void setTrainView(TrainView*x) { trainView=x; }
 
         QStringList listWorkoutFiles(const QDir &) const;
 
         QList<int> devices(); // convenience function for iterating over active devices
-
-        const QTreeWidgetItem *currentWorkout() { return workout; }
-        const QTreeWidgetItem *currentMedia() { return media; }
-        const QTreeWidgetItem *workoutItems() { return allWorkouts; }
 
         int selectedDeviceNumber();
 
@@ -241,11 +239,6 @@ class TrainSidebar : public GcWindow
         QSortFilterProxyModel *vsortModel; // sorting video list
         QSortFilterProxyModel *vssortModel; // sorting videosync list
 
-        QTreeWidgetItem *allWorkouts;
-        QTreeWidgetItem *workout;
-        QTreeWidgetItem *videosync;
-        QTreeWidgetItem *media;
-
         int lastAppliedIntensity;// remember how we scaled last time
 
         int FTP; // current FTP / CP
@@ -280,7 +273,9 @@ class TrainSidebar : public GcWindow
 
         QFile *recordFile;      // where we record!
         int lastRecordSecs;     // to avoid duplicates
+        QMutex rrMutex;         // to coordinate async recording from ANT+ thread
         QFile *rrFile;          // r-r records, if any received.
+        QMutex vo2Mutex;         // to coordinate async recording from ANT+ thread
         QFile *vo2File;         // vo2 records, if any received.
 
         // ErgFile wrapper to support stateful location queries.
@@ -315,7 +310,9 @@ class TrainSidebar : public GcWindow
 
     public:
         int mode;
+        QString mediafile, workoutfile;
         // everyone else wants this
+        TrainView *trainView;
         QCheckBox   *recordSelector;
         QSharedPointer<QFileSystemWatcher> watcher;
         bool calibrating;

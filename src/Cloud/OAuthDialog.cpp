@@ -81,7 +81,6 @@ OAuthDialog::OAuthDialog(Context *context, OAuthSite site, CloudService *service
     view = new QWebEngineView();
     view->setZoomFactor(dpiXFactor);
     view->page()->profile()->cookieStore()->deleteAllCookies();
-    view->page()->profile()->setHttpUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.79 Safari/537.36 Edge/14.14393");
 
     view->setContentsMargins(0,0,0,0);
     view->page()->view()->setContentsMargins(0,0,0,0);
@@ -189,7 +188,7 @@ OAuthDialog::OAuthDialog(Context *context, OAuthSite site, CloudService *service
     } else if (site == WITHINGS) {
 
         urlstr = QString("https://account.withings.com/oauth2_user/authorize2?");
-        urlstr.append("redirect_uri=http://www.goldencheetah.org&");
+        urlstr.append("redirect_uri=https://www.goldencheetah.org&");
         urlstr.append("scope=user.info,user.metrics&");
         urlstr.append("response_type=code&");
         urlstr.append("state=xyzzy&");
@@ -246,6 +245,7 @@ OAuthDialog::urlChanged(const QUrl &url)
 
         if (url.toString().startsWith("http://www.goldencheetah.org/?state=&code=") ||
                 url.toString().contains("blank.html?code=") ||
+                url.toString().startsWith("https://www.goldencheetah.org/?code=") ||
                 url.toString().startsWith("http://www.goldencheetah.org/?code=")) {
 
             QUrlQuery parse(url);
@@ -345,10 +345,11 @@ OAuthDialog::urlChanged(const QUrl &url)
 
             } else if (site == WITHINGS) {
 
-                urlstr = QString("https://account.withings.com/oauth2/token?");
+                urlstr = QString("https://wbsapi.withings.net/v2/oauth2");
                 params.addQueryItem("client_id", GC_NOKIA_CLIENT_ID);
                 params.addQueryItem("client_secret", GC_NOKIA_CLIENT_SECRET);
-                params.addQueryItem("redirect_uri","http://www.goldencheetah.org");
+                params.addQueryItem("redirect_uri","https://www.goldencheetah.org");
+                params.addQueryItem("action", "requesttoken");
                 params.addQueryItem("grant_type", "authorization_code");
 
             }
@@ -469,6 +470,10 @@ OAuthDialog::networkRequestFinished(QNetworkReply *reply)
             access_token = document.object()["access_token"].toString();
             if (site == POLAR)  polar_userid = document.object()["x_user_id"].toDouble();
             if (site == RIDEWITHGPS) access_token = document.object()["user"].toObject()["auth_token"].toString();
+            if (site == WITHINGS) {
+                refresh_token = document.object()["body"].toObject()["refresh_token"].toString();
+                access_token = document.object()["body"].toObject()["access_token"].toString();
+            }
         }
 
         // if we failed to extract then we have a big problem

@@ -55,6 +55,7 @@
 #include "AboutDialog.h"
 #include "ChooseCyclistDialog.h"
 #include "ConfigDialog.h"
+#include "AthleteConfigDialog.h"
 #include "DownloadRideDialog.h"
 #include "ManualRideDialog.h"
 #include "RideImportWizard.h"
@@ -481,6 +482,8 @@ MainWindow::MainWindow(const QDir &home)
     connect(deleteMapper, SIGNAL(mapped(const QString &)), this, SLOT(deleteAthlete(const QString &)));
 
     fileMenu->addSeparator();
+    fileMenu->addAction(tr("Settings..."), this, SLOT(athleteSettings()));
+    fileMenu->addSeparator();
     fileMenu->addAction(tr("Save all modified activities"), this, SLOT(saveAllUnsavedRides()));
     fileMenu->addSeparator();
     fileMenu->addAction(tr("Close Window"), this, SLOT(closeWindow()));
@@ -624,6 +627,9 @@ MainWindow::MainWindow(const QDir &home)
 #else
     viewMenu->addAction(tr("Toggle Full Screen"), this, SLOT(toggleFullScreen()));
 #endif
+    showhideViewbar = viewMenu->addAction(tr("Show View Sidebar"), this, SLOT(showViewbar(bool)));
+    showhideViewbar->setCheckable(true);
+    showhideViewbar->setChecked(true);
     showhideSidebar = viewMenu->addAction(tr("Show Left Sidebar"), this, SLOT(showSidebar(bool)));
     showhideSidebar->setCheckable(true);
     showhideSidebar->setChecked(true);
@@ -791,7 +797,13 @@ MainWindow::toggleSidebar()
     currentAthleteTab->toggleSidebar();
     setToolButtons();
 }
-
+void
+MainWindow::showViewbar(bool want)
+{
+    want ? sidebar->show() : sidebar->hide();
+    showhideViewbar->setChecked(want);
+    setToolButtons();
+}
 void
 MainWindow::showSidebar(bool want)
 {
@@ -1069,7 +1081,14 @@ bool
 MainWindow::eventFilter(QObject *o, QEvent *e)
 {
     if (o == this) {
-        if (e->type() == QEvent::WindowStateChange) resizeEvent(NULL); // see below
+        if (e->type() == QEvent::WindowStateChange) {
+
+            // if we are entering full screen mode we hide the sidebar
+            if (windowState()&Qt::WindowFullScreen) showViewbar(false);
+            else showViewbar(true);
+
+            resizeEvent(NULL); // see below
+        }
     }
     return false;
 }
@@ -1079,6 +1098,7 @@ MainWindow::resizeEvent(QResizeEvent*)
 {
     //appsettings->setValue(GC_SETTINGS_MAIN_GEOM, saveGeometry());
     //appsettings->setValue(GC_SETTINGS_MAIN_STATE, saveState());
+
 }
 
 void
@@ -1482,7 +1502,8 @@ MainWindow::perspectiveSelected(int index)
             {
                 QString name;
                 QString expression;
-                AddPerspectiveDialog *dialog= new AddPerspectiveDialog(this, currentAthleteTab->context, name, expression, current->type);
+                Perspective::switchenum trainswitch=Perspective::None;
+                AddPerspectiveDialog *dialog= new AddPerspectiveDialog(this, currentAthleteTab->context, name, expression, current->type, trainswitch);
                 int ret= dialog->exec();
                 delete dialog;
                 if (ret == QDialog::Accepted && name != "") {
@@ -1490,6 +1511,7 @@ MainWindow::perspectiveSelected(int index)
                     // add...
                     Perspective *newone = current->addPerspective(name);
                     newone->setExpression(expression);
+                    newone->setTrainSwitch(trainswitch);
                     current->setPerspectives(perspectiveSelector);
 
                     // and select remember pactive is true, so we do the heavy lifting here
@@ -1825,6 +1847,13 @@ MainWindow::saveRide()
     if (currentAthleteTab->context->ride) {
         saveRideSingleDialog(currentAthleteTab->context, currentAthleteTab->context->ride); // will signal save to everyone
     }
+}
+
+void
+MainWindow::athleteSettings()
+{
+    AthleteConfigDialog *dialog = new AthleteConfigDialog(currentAthleteTab->context->athlete->home->root(), currentAthleteTab->context);
+    dialog->exec();
 }
 
 void
@@ -2447,7 +2476,7 @@ MainWindow::uploadCloud(QAction *action)
         if (actionText == "University of Kent") {
             CloudService *db = CloudServiceFactory::instance().newService(action->data().toString(), currentAthleteTab->context);
             KentUniversityUploadDialog uploader(this, db, currentAthleteTab->context->ride);
-            int ret = uploader.exec();
+            uploader.exec();
         } else {
             CloudService *db = CloudServiceFactory::instance().newService(action->data().toString(), currentAthleteTab->context);
             CloudService::upload(this, currentAthleteTab->context, db, currentAthleteTab->context->ride);
@@ -2497,9 +2526,9 @@ MainWindow::configChanged(qint32)
     QString buttonstyle = QString("QPushButton { border: none; border-radius: %2px; background-color: %1; "
                                                 "padding-left: 0px; padding-right: 0px; "
                                                 "padding-top:  0px; padding-bottom: 0px; }"
-                                  "QPushButton:hover { background-color: rgba(127,127,127,180); }"
-                                  "QPushButton:hover:pressed { background-color: rgba(127,127,127,127); }"
-                                ).arg(GColor(CTOOLBAR).name()).arg(3 * dpiXFactor);
+                                  "QPushButton:hover { background-color: %3; }"
+                                  "QPushButton:hover:pressed { background-color: %3; }"
+                                ).arg(GColor(CTOOLBAR).name()).arg(3 * dpiXFactor).arg(GColor(CHOVER).name());
 
     back->setStyleSheet(buttonstyle);
     forward->setStyleSheet(buttonstyle);

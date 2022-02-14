@@ -233,7 +233,7 @@ PerspectiveDialog::editPerspectiveClicked()
 
         Perspective *editing = tabView->perspectives_[index];
         QString expression=editing->expression();
-        AddPerspectiveDialog *dialog= new AddPerspectiveDialog(this, tabView->context, editing->title_, expression, tabView->type, true);
+        AddPerspectiveDialog *dialog= new AddPerspectiveDialog(this, tabView->context, editing->title_, expression, tabView->type, editing->trainswitch, true);
         int ret= dialog->exec();
         delete dialog;
         if (ret == QDialog::Accepted) {
@@ -249,7 +249,8 @@ PerspectiveDialog::addPerspectiveClicked()
 {
     QString name;
     QString expression;
-    AddPerspectiveDialog *dialog= new AddPerspectiveDialog(this, tabView->context, name, expression, tabView->type);
+    Perspective::switchenum trainswitch = Perspective::None;
+    AddPerspectiveDialog *dialog= new AddPerspectiveDialog(this, tabView->context, name, expression, tabView->type, trainswitch);
     int ret= dialog->exec();
     delete dialog;
     if (ret == QDialog::Accepted && name != "") {
@@ -369,12 +370,12 @@ PerspectiveDialog::perspectiveNameChanged(QTableWidgetItem *item)
 void
 PerspectiveTableWidget::dragEnterEvent(QDragEnterEvent *event)
 {
-    bool accept = true;
+    bool accept = false;
 
     // must be a chartref (from dragging charts below) anything else we ignore
     // just in case someone tries to drag a file etc
     foreach (QString format, event->mimeData()->formats()) {
-        if (format != "application/x-gc-chartref") accept = false;
+        if (format == "application/x-gc-chartref") accept = true;
     }
 
     if (accept) {

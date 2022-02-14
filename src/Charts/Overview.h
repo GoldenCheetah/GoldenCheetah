@@ -29,6 +29,7 @@
 #include "RideItem.h"
 #include "RideMetric.h"
 #include "HrZones.h"
+#include <QSpinBox>
 
 #include "ChartSpace.h"
 #include "OverviewItems.h"
@@ -38,10 +39,11 @@ class OverviewWindow : public GcChartWindow
     Q_OBJECT
 
     Q_PROPERTY(QString config READ getConfiguration WRITE setConfiguration USER true)
+    Q_PROPERTY(int minimumColumns READ minimumColumns WRITE setMinimumColumns USER true)
 
     public:
 
-        OverviewWindow(Context *context, int scope=OverviewScope::ANALYSIS);
+        OverviewWindow(Context *context, int scope=OverviewScope::ANALYSIS, bool blank=false);
 
         // used by children
         Context *context;
@@ -52,8 +54,13 @@ class OverviewWindow : public GcChartWindow
         QString getConfiguration() const;
         void setConfiguration(QString x);
 
+        int minimumColumns() const { return mincolsEdit->value(); }
+        void setMinimumColumns(int x) { if (x>0 && x< 11) {mincolsEdit->setValue(x); space->setMinimumColumns(x); }}
+
         // add a tile to the window
         void addTile();
+        void importChart();
+        void settings();
 
         // config item requested
         void configItem(ChartSpaceItem *);
@@ -64,6 +71,9 @@ class OverviewWindow : public GcChartWindow
         ChartSpace *space;
         bool configured;
         int scope;
+        bool blank;
+
+        QSpinBox *mincolsEdit;
 };
 
 class OverviewConfigDialog : public QDialog
@@ -78,12 +88,13 @@ class OverviewConfigDialog : public QDialog
     public slots:
 
         void removeItem();
+        void exportChart();
         void close();
 
     private:
         ChartSpaceItem *item;
         QVBoxLayout *main;
-        QPushButton *remove, *ok;
+        QPushButton *remove, *ok, *exp;
 };
 
 #endif // _GC_OverviewWindow_h

@@ -130,14 +130,14 @@ bool PythonEmbed::pythonInstalled(QString &pybin, QString &pypath, QString PYTHO
 
     // failed to start python
     if (py.waitForStarted(500) == false) {
-        printd("Failed to start: %s\n", pythonbinary.toStdString().c_str());
+        fprintf(stderr, "Failed to start: %s\n", pythonbinary.toStdString().c_str());
         py.terminate();
         return false;
     }
 
     // wait for output, should be rapid
-    if (py.waitForReadyRead(2000)==false) {
-        printd("Didn't get output: %s\n", pythonbinary.toStdString().c_str());
+    if (py.waitForReadyRead(4000)==false) {
+        fprintf(stderr, "Didn't get output: %s\n", pythonbinary.toStdString().c_str());
         py.terminate();
         return false;
     }
@@ -147,7 +147,7 @@ bool PythonEmbed::pythonInstalled(QString &pybin, QString &pypath, QString PYTHO
 
     // close if it didn't already
     if (py.waitForFinished(500)==false) {
-        printd("forced terminate of %s\n", pythonbinary.toStdString().c_str());
+        fprintf(stderr, "forced terminate of %s\n", pythonbinary.toStdString().c_str());
         py.terminate();
     }
 

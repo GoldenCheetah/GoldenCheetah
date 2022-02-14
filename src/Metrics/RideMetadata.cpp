@@ -412,6 +412,13 @@ RideMetadata::configChanged(qint32)
         // tab bar look reasonably modern
         QString styling = QString("QTabWidget { background: %1; }"
                               "QTabWidget::pane { border: 0px; }"
+#ifdef Q_OS_MAC
+                              "QLineEdit { border: 0px; background-color: %7; color: %6; }"
+                              "QDateEdit { border: 0px; background-color: %7; color: %6; }"
+                              "QTimeEdit { border: 0px; background-color: %7; color: %6; }"
+                              "QSpinBox { border: 0px; background-color: %7; color: %6; }"
+                              "QDoubleSpinBox { border: 0px; background-color: %7; color: %6; }"
+#endif
                               "QTabBar::tab { background: %1; "
                               "               color: %6; "
                               "               min-width: %5px; "
@@ -426,7 +433,11 @@ RideMetadata::configChanged(qint32)
                               .arg(4*dpiYFactor)                                          // 3 selected bar width
                               .arg(2*dpiXFactor)                                          // 4 padding
                               .arg(75*dpiXFactor)                                         // 5 tab minimum width
-                              .arg(GCColor::invertColor(GColor(CPLOTBACKGROUND)).name()); // 6 tab text color
+                              .arg(GCColor::invertColor(GColor(CPLOTBACKGROUND)).name())     // 6 tab text color
+#ifdef Q_OS_MAC
+                              .arg( GCColor::alternateColor(GColor(CPLOTBACKGROUND)).name()) // 7 lineedit background
+#endif
+                            ;
         tabs->setStyleSheet(styling);
 
         metadataChanged(); // re-read the values!
@@ -694,10 +705,9 @@ FormField::FormField(FieldDefinition field, RideMetadata *meta) : definition(fie
 
     case FIELD_INTEGER : // integer
         widget = new QSpinBox(this);
-        //widget->setFixedHeight(18);
-        ((QSpinBox*)widget)->setSingleStep(1);
-        ((QSpinBox*)widget)->setMinimum(-99999999);
-        ((QSpinBox*)widget)->setMaximum(99999999);
+        ((QSpinBox*)widget)->setMinimum(-9999999);
+        ((QSpinBox*)widget)->setMaximum(9999999);
+        ((QSpinBox*)widget)->setButtonSymbols(QAbstractSpinBox::NoButtons);
         connect (widget, SIGNAL(valueChanged(int)), this, SLOT(dataChanged()));
         connect (widget, SIGNAL(editingFinished()), this, SLOT(editFinished()));
         break;
@@ -705,9 +715,9 @@ FormField::FormField(FieldDefinition field, RideMetadata *meta) : definition(fie
     case FIELD_DOUBLE : // double
         widget = new QDoubleSpinBox(this);
         //widget->setFixedHeight(18);
-        ((QDoubleSpinBox*)widget)->setSingleStep(0.01);
-        ((QDoubleSpinBox*)widget)->setMinimum(-999999.99);
-        ((QDoubleSpinBox*)widget)->setMaximum(999999.99);
+        ((QDoubleSpinBox*)widget)->setButtonSymbols(QAbstractSpinBox::NoButtons);
+        ((QDoubleSpinBox*)widget)->setMinimum(-9999999.99);
+        ((QDoubleSpinBox*)widget)->setMaximum(9999999.99);
         if (GlobalContext::context()->specialFields.isMetric(field.name)) {
 
             enabled = new QCheckBox(this);
@@ -732,6 +742,7 @@ FormField::FormField(FieldDefinition field, RideMetadata *meta) : definition(fie
 
     case FIELD_DATE : // date
         widget = new QDateEdit(this);
+        ((QDateEdit*)widget)->setButtonSymbols(QAbstractSpinBox::NoButtons);
         //widget->setFixedHeight(18);
         connect (widget, SIGNAL(dateChanged(const QDate)), this, SLOT(dataChanged()));
         connect (widget, SIGNAL(editingFinished()), this, SLOT(editFinished()));
@@ -739,6 +750,7 @@ FormField::FormField(FieldDefinition field, RideMetadata *meta) : definition(fie
 
     case FIELD_TIME : // time
         widget = new QTimeEdit(this);
+        ((QTimeEdit*)widget)->setButtonSymbols(QAbstractSpinBox::NoButtons);
         //widget->setFixedHeight(18);
         ((QTimeEdit*)widget)->setDisplayFormat("hh:mm:ss");
         connect (widget, SIGNAL(timeChanged(const QTime)), this, SLOT(dataChanged()));

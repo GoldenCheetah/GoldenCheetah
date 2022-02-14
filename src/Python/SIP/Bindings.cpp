@@ -1493,6 +1493,12 @@ Bindings::seasonIntervals(DateRange range, QString type) const
     return dict;
 }
 
+QString
+Bindings::intervalType(int type) const
+{
+    return RideFileInterval::typeDescription(static_cast<RideFileInterval::IntervalType>(type));
+}
+
 PyObject*
 Bindings::activityIntervals(QString type, PyObject* activity) const
 {

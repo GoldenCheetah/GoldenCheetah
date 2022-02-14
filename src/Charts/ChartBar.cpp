@@ -149,7 +149,7 @@ ChartBar::configChanged(qint32)
     scrollArea->setFixedHeight(height);
     buttonBar->setFixedHeight(height);
 
-    QColor col=GColor(CTOOLBAR);
+    QColor col=GColor(CCHARTBAR);
     scrollArea->setStyleSheet(QString("QScrollArea { background: rgb(%1,%2,%3); }").arg(col.red()).arg(col.green()).arg(col.blue()));
 
     foreach(ChartBarItem *b, buttons) {
@@ -163,9 +163,9 @@ ChartBar::configChanged(qint32)
     QString buttonstyle = QString("QPushButton { border: none; border-radius: %2px; background-color: %1; "
                                                 "padding-left: 0px; padding-right: 0px; "
                                                 "padding-top:  0px; padding-bottom: 0px; }"
-                                  "QPushButton:hover { background-color: rgba(127,127,127,180); }"
-                                  "QPushButton:hover:pressed { background-color: rgba(127,127,127,127); }"
-                                ).arg(GColor(CTOOLBAR).name()).arg(3 * dpiXFactor);
+                                  "QPushButton:hover { background-color: %3; }"
+                                  "QPushButton:hover:pressed { background-color: %3; }"
+                                ).arg(GColor(CCHARTBAR).name()).arg(3 * dpiXFactor).arg(GColor(CHOVER).name());
     menuButton->setStyleSheet(buttonstyle);
     left->setStyleSheet(buttonstyle);
     right->setStyleSheet(buttonstyle);
@@ -393,7 +393,7 @@ ChartBar::paintBackground(QPaintEvent *)
     painter.save();
     QRect all(0,0,width(),height());
 
-    painter.fillRect(all, GColor(CTOOLBAR));
+    painter.fillRect(all, GColor(CCHARTBAR));
 
     painter.restore();
 }
@@ -419,7 +419,7 @@ ButtonBar::paintBackground(QPaintEvent *)
     // fill with a linear gradient
     painter.setPen(Qt::NoPen);
     painter.fillRect(all, QColor(Qt::white));
-    painter.fillRect(all, GColor(CTOOLBAR));
+    painter.fillRect(all, GColor(CCHARTBAR));
 
     if (!GCColor::isFlat()) {
         QPen black(QColor(100,100,100,200));
@@ -460,8 +460,8 @@ ChartBarItem::paintEvent(QPaintEvent *)
     painter.setPen(Qt::NoPen);
 
     // background - chrome or slected colour
-    QBrush brush(GColor(CTOOLBAR));
-    if (underMouse() && !checked) brush = QBrush(Qt::darkGray);
+    QBrush brush(GColor(CCHARTBAR));
+    if (underMouse() && !checked) brush = GColor(CHOVER);
     if (checked) brush = color;
     painter.fillRect(body, brush);
 
@@ -471,7 +471,16 @@ ChartBarItem::paintEvent(QPaintEvent *)
     painter.drawText(body, text, Qt::AlignHCenter | Qt::AlignVCenter);
 
     // draw the bar
-    if (checked) painter.fillRect(QRect(0,0,geometry().width(), 3*dpiXFactor), QBrush(GColor(CPLOTMARKER)));
+    if (checked) {
+        // at the top if the chartbar background is different to the plot background
+        if (GColor(CCHARTBAR) != color) painter.fillRect(QRect(0,0,geometry().width(), 3*dpiXFactor), QBrush(GColor(CPLOTMARKER)));
+        else {
+            // only underline the text with a little extra (why adding "XXX" below)
+            QFontMetrics fm(font());
+            double width = fm.boundingRect(text+"XXX").width();
+            painter.fillRect(QRect((geometry().width()-width)/2.0,geometry().height()-(3*dpiXFactor),width, 3*dpiXFactor), QBrush(GColor(CPLOTMARKER)));
+        }
+    }
 
     // draw the menu indicator
     if (underMouse()) {
@@ -482,13 +491,13 @@ ChartBarItem::paintEvent(QPaintEvent *)
         if (checked) {
 
             // different color if under mouse
-            QBrush brush(Qt::darkGray);
+            QBrush brush(GCColor::invertColor(color));
             if (hotspot.contains(mouse)) brush.setColor(GColor(CPLOTMARKER));
             painter.fillPath (triangle, brush);
         } else {
 
             // visual clue there is a menu option when tab selected
-            QBrush brush(Qt::lightGray);
+            QBrush brush(GColor(CHOVER));
             painter.fillPath (triangle, brush);
         }
     }
@@ -518,9 +527,9 @@ ChartBarItem::event(QEvent *e)
 {
     // resize?
     if (e->type() == QEvent::Resize) {
-        int startx = width() - (20*dpiXFactor);
+        int startx = width() - (25*dpiXFactor);
         int depth = height() / 4;
-        int starty = (height() / 2.0) - (depth/2) + 3*dpiXFactor; // middle, taking into account bar at top
+        int starty = (height() / 2.0) - (depth/2) + 1*dpiXFactor; // middle, taking into account bar at top
         int hs = 3 * dpiXFactor;
 
         // set the triangle

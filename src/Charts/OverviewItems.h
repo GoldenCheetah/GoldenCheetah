@@ -40,6 +40,7 @@ class BubbleViz;
 class Routeline;
 class ProgressBar;
 class VScrollBar;
+class ColorButton;
 
 // sparklines number of points - look back 6 weeks
 #define SPARKDAYS 42
@@ -62,6 +63,8 @@ class OverviewItemConfig : public QWidget
 
         OverviewItemConfig(ChartSpaceItem *);
         ~OverviewItemConfig();
+
+        static bool registerItems();
 
     public slots:
 
@@ -87,6 +90,9 @@ class OverviewItemConfig : public QWidget
         // the widget we are configuring
         ChartSpaceItem *item;
 
+        // export data button (data table)
+        QPushButton *exp;
+
         // editor for program
         QComboBox *legacySelector; // used for configuring the data table widget
         DataFilterEdit *editor;
@@ -102,6 +108,9 @@ class OverviewItemConfig : public QWidget
         MetricSelect *metric1, *metric2, *metric3; // Metric/Interval/PMC
         MetricSelect *meta1; // Meta
         SeriesSelect *series1; // Zone Histogram
+
+        // background color
+        ColorButton *bgcolor;
 
 };
 
@@ -143,6 +152,7 @@ class DataOverviewItem : public ChartSpaceItem
 
     public slots:
         void intervalHover(IntervalItem *); // watching intervals being hovered
+        void exportData();                  // export table to a csv file
 
     public:
 

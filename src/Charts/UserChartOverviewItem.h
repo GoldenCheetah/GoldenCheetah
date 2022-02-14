@@ -42,6 +42,7 @@ class UserChartOverviewItem : public ChartSpaceItem
         void itemGeometryChanged() override;
         void setData(RideItem *item) override;
         void setDateRange(DateRange) override;
+        QColor color() override;
         QWidget *config()  override { return chart->settingsTool(); }
 
         // create a blank one

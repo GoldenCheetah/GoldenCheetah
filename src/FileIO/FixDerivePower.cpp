@@ -230,6 +230,7 @@ FixDerivePower::postProcess(RideFile *ride, DataProcessorConfig *config=0, QStri
         windSpeed = ((FixDerivePowerConfig*)(config))->windSpeed->value();                // kph
         windHeading = ((FixDerivePowerConfig*)(config))->windHeading->value() / 180 * MATHCONST_PI; // rad
     }
+    bool CdANotSet = (CdA == 0.0);
 
     // Do nothing for swims and runs
     if (ride->isSwim() || ride->isRun()) return false;
@@ -307,13 +308,13 @@ FixDerivePower::postProcess(RideFile *ride, DataProcessorConfig *config=0, QStri
 
                 double vw=V+W; // Wind speed against cyclist = cyclist speed + wind speed
 
-                if (CdA == 0) {
+                if (CdANotSet) {
                     double CwaRider = (1 + cad * cCad) * afCd * adipos * (((hRider - adipos) * afSin) + adipos);
                     CdA = CwaRider + CwaBike;
                 }
                 Ka = 176.5 * exp(-p->alt * .0001253) * CdA * DraftM / (273 + T);
-                //qDebug()<<"acc="<<p->kphd<<" , V="<<V<<" , m="<<M<<" , Pa="<<(p->kphd > 1 ? 1 : p->kphd*V*M);
-                double watts = (afCm * V * (Ka * (vw * vw) + Frg + V * CrDyn))+(p->kphd > 1 ? 1 : p->kphd*V*M);
+                //qDebug()<<"acc="<<p->kphd<<" , V="<<V<<" , m="<<M<<" , Pa="<<(p->kphd > 1 ? 1 : p->kphd)*V*M;
+                double watts = (afCm * V * (Ka * (vw * vw) + Frg + V * CrDyn)) + (p->kphd > 1 ? 1 : p->kphd)*V*M;
                 ride->command->setPointValue(i, RideFile::watts, watts > 0 ? (watts > 1000 ? 1000 : watts) : 0);
                 // qDebug() << "watts = "<<p->watts;
                 // qDebug() << "  " << afCm * V * Ka * (vw * vw) << " = afCm(=" << afCm << ") * V(=" << V << ") * Ka(="<<Ka<<") * (vw^2(=" << V+W << "^2))";

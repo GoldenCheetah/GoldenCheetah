@@ -213,6 +213,8 @@ HelpWhatsThis::getText(GCHelp chapter) {
         return text.arg("ChartTypes_Diary#navigator").arg(tr("Configurable activity log - with build in search capabilities"));
     case ChartRides_Overview:
         return text.arg("ChartTypes_Activities#Overview").arg(tr("Dashboard for a single activity - the tiles shown here are configurable"));
+    case ChartRides_Overview_Config:
+        return text.arg("ChartTypes_Activities#Overview-%1");
     case ChartRides_Summary:
         return text.arg("ChartTypes_Activities#activity-summary").arg(tr("Detailed information of a single activity - the metrics shown here are configurable"));
     case ChartRides_Details:
@@ -255,6 +257,8 @@ HelpWhatsThis::getText(GCHelp chapter) {
         return text.arg("ChartTypes_Trends#summary").arg(tr("Chart specific filter/search and date range settings"));
     case Chart_Overview:
         return text.arg("ChartTypes_Trends#Overview").arg(tr("Dashboard for the selected data range - the tiles shown are configurable"));
+    case Chart_Overview_Config:
+        return text.arg("ChartTypes_Trends#Overview-%1");
     case Chart_R:
         return text.arg("Special-Topics_Working-with-R").arg(tr("Embedded R Chart"));
     case Chart_Python:

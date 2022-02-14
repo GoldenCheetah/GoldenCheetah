@@ -33,6 +33,7 @@ SpecialFields::SpecialFields()
     namesmap.insert("Source Filename", tr("Source Filename"));       // set by openRideFile
     namesmap.insert("Route", tr("Route"));                           // GPS map Route tag
     namesmap.insert("Sport", tr("Sport"));                           // Sport Code
+    namesmap.insert("SubSport", tr("SubSport"));                     // SubSport Code
     namesmap.insert("Workout Code", tr("Workout Code"));             // Workout Code
     namesmap.insert("Workout Title", tr("Workout Title"));           // Workout Title
     namesmap.insert("Weight", tr("Weight"));                         // Weight tag

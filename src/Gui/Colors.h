@@ -75,7 +75,8 @@ class Colors
 {
 public:
         static unsigned long fingerprint(const Colors*set);
-        QString name,
+        QString group,
+                name,
                 setting;
         QColor  color;
 };
@@ -88,6 +89,7 @@ class ColorTheme
         // all public
         QString name;
         bool dark;
+        bool stealth;
         QList<QColor> colors;
 };
 
@@ -184,7 +186,7 @@ class ColorEngine : public QObject
 #define GColor(x) GCColor::getColor(x)
 
 // Define how many cconfigurable metric colors are available
-#define CNUMOFCFGCOLORS       104
+#define CNUMOFCFGCOLORS       108
 
 #define CPLOTBACKGROUND       0
 #define CRIDEPLOTBACKGROUND   1
@@ -290,4 +292,8 @@ class ColorEngine : public QObject
 #define CTIDALVOLUME          101
 #define CRESPFREQUENCY        102
 #define CFEO2                 103
+#define CHOVER                104
+#define CCHARTBAR             105
+#define CCARDBACKGROUND2      106
+#define CCARDBACKGROUND3      107
 #endif

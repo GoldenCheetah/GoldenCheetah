@@ -32,6 +32,32 @@
 #include "Utils.h"
 #include "SearchBox.h"
 
+#define PERSPECTIVE_DEBUG false
+
+#ifndef PERSPECTIVE_DEBUG
+#define PERSPECTIVE_DEBUG false
+#endif
+#ifdef Q_CC_MSVC
+#define printd(fmt, ...) do {                                                \
+    if (PERSPECTIVE_DEBUG) {                                 \
+        printf("[%s:%d %s] " fmt , __FILE__, __LINE__,        \
+               __FUNCTION__, __VA_ARGS__);                    \
+        fflush(stdout);                                       \
+    }                                                         \
+} while(0)
+#else
+#define printd(fmt, args...)                                            \
+    do {                                                                \
+        if (PERSPECTIVE_DEBUG) {                                       \
+            fprintf(stderr, "[%s:%d %s] " fmt , __FILE__, __LINE__,              \
+                   __FUNCTION__, ##args);                               \
+            fflush(stderr);                                             \
+        }                                                               \
+    } while(0)
+#endif
+
+#define SSS printd("\n")
+
 // When ESC pressed during R processing we cancel it
 #ifdef GC_WANT_R
 #include "RTool.h"
@@ -50,9 +76,10 @@ static const int tileMargin = 20;
 static const int tileSpacing = 10;
 
 Perspective::Perspective(Context *context, QString title, int type) :
-    GcWindow(context), context(context), active(false),  clicked(NULL), dropPending(false),
-    type_(type), title_(title), chartCursor(-2), df(NULL), expression_("")
+    GcWindow(context), context(context), active(false),  resizing(false), clicked(NULL), dropPending(false),
+    type_(type), title_(title), chartCursor(-2), df(NULL), expression_(""), trainswitch(None)
 {
+    SSS;
     // setup control area
     QWidget *cw = new QWidget(this);
     cw->setContentsMargins(0,0,0,0);
@@ -162,7 +189,7 @@ Perspective::Perspective(Context *context, QString title, int type) :
     connect(tabArea,SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(rightClick(const QPoint &)));
 
     currentStyle=-1;
-    styleChanged(2);
+    styleChanged(2, true);
 
     connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideSelected()));
     connect(this, SIGNAL(dateRangeChanged(DateRange)), this, SLOT(dateRangeChanged(DateRange)));
@@ -186,18 +213,21 @@ Perspective::Perspective(Context *context, QString title, int type) :
 
 Perspective::~Perspective()
 {
+    SSS;
     qApp->removeEventFilter(this);
 }
 
 void
 Perspective::rightClick(const QPoint & /*pos*/)
 {
+    SSS;
     return; //deprecated right click on homewindow -- bad UX
 }
 
 void
 Perspective::addChartFromMenu(QAction*action)
 {
+    SSS;
     // & removed to avoid issues with kde AutoCheckAccelerators
     QString actionText = QString(action->text()).replace("&", "");
     GcWinID id = GcWindowTypes::None;
@@ -216,6 +246,7 @@ Perspective::addChartFromMenu(QAction*action)
 void
 Perspective::importChart(QMap<QString,QString>properties, bool select)
 {
+    SSS;
     // turn off updates whilst we do this...
     setUpdatesEnabled(false);
 
@@ -291,6 +322,7 @@ Perspective::importChart(QMap<QString,QString>properties, bool select)
 void
 Perspective::configChanged(qint32)
 {
+    SSS;
     // update scroll bar
 //#ifndef Q_OS_MAC
     tileArea->verticalScrollBar()->setStyleSheet(AbstractView::ourStyleSheet());
@@ -303,34 +335,42 @@ Perspective::configChanged(qint32)
     winWidget->setPalette(palette);
     winArea->setPalette(palette);
 
-    // tab colors
-    if (currentStyle == 0) {
-        for (int i=0; i<charts.count(); i++) {
+    // basic chart setup
+    for (int i=0; i<charts.count(); i++) {
+        if (currentStyle == 0) {
             if (charts[i]->type() == GcWindowTypes::Overview || charts[i]->type() == GcWindowTypes::OverviewTrends) chartbar->setColor(i, GColor(COVERVIEWBACKGROUND));
+            else if (charts[i]->type() == GcWindowTypes::UserAnalysis || charts[i]->type() == GcWindowTypes::UserTrends) chartbar->setColor(i, RGBColor(QColor(charts[i]->property("color").toString())));
             else {
                 if (type() == VIEW_TRAIN)chartbar->setColor(i, GColor(CTRAINPLOTBACKGROUND));
                 else chartbar->setColor(i, GColor(CPLOTBACKGROUND));
             }
         }
+
+        // set top margin
+        charts[i]->setContentsMargins(0,
+                                      (currentStyle==0 ? 0 : 15) * dpiXFactor,
+                                      0, 0);
+
     }
 }
 
 void
 Perspective::selected()
 {
+    SSS;
     setUpdatesEnabled(false);
 
-    resizeEvent(NULL); // force a relayout
+    resize();
     rideSelected();
     dateRangeChanged(DateRange());
     setUpdatesEnabled(true);
-    update();
-
+    //update();
 }
 
 void
 Perspective::titleChanged()
 {
+    SSS;
     if (charts.count() == 0) return;
 
     if (titleEdit->text() != charts[controlStack->currentIndex()]->property("title").toString()) {
@@ -348,9 +388,25 @@ Perspective::titleChanged()
     }
 }
 
+// we have a user chart and its just changed its config
+void
+Perspective::userChartConfigChanged(UserChartWindow *chart)
+{
+    if (!currentStyle) {
+        // let chartbar know...
+        for(int index=0; index < charts.count(); index++) {
+            if (charts[index] == (GcChartWindow*)(chart)) {
+                chartbar->setColor(index, RGBColor(QColor(charts[index]->property("color").toString())));
+                return;
+            }
+        }
+    }
+}
+
 void
 Perspective::rideSelected()
 {
+    SSS;
     // we need to notify of null rides immediately
     if (!myRideItem || isVisible()) {
 
@@ -373,6 +429,7 @@ Perspective::rideSelected()
 void
 Perspective::tabMenu(int index, int x)
 {
+    SSS;
     // activate this tab's menu
     QPoint pos = QPoint(x, mapToGlobal(chartbar->geometry().bottomLeft()).y()+(2*dpiXFactor));
     charts[index]->menu->exec(pos);
@@ -381,6 +438,7 @@ Perspective::tabMenu(int index, int x)
 void
 Perspective::dateRangeChanged(DateRange dr)
 { Q_UNUSED( dr )
+    SSS;
     if (isVisible()) {
 
         for (int i=0; i < charts.count(); i++) {
@@ -402,6 +460,7 @@ Perspective::dateRangeChanged(DateRange dr)
 void
 Perspective::tabSelected(int index)
 {
+    SSS;
     // user switched tabs -- tell tabe to redraw!
     if (active || currentStyle != 0) return;
 
@@ -409,12 +468,7 @@ Perspective::tabSelected(int index)
 
     if (index >= 0) {
 
-        // HACK XXX Fixup contents margins that are being wiped out "somewhere" but
-        //          only manifested when QT_SCALE_FACTOR > 1 and a tabbed view.
-        if (currentStyle == 0) {
-            if(charts[index]->showTitle() == true) charts[index]->setContentsMargins(0,25*dpiYFactor,0,0);
-            else charts[index]->setContentsMargins(0,0,0,0);
-        }
+        if (currentStyle == 0) charts[index]->setContentsMargins(0,0,0,0);
 
         // show
         charts[index]->show();
@@ -434,6 +488,7 @@ Perspective::tabSelected(int index)
 void
 Perspective::tabSelected(int index, bool forride)
 {
+    SSS;
     if (active || currentStyle != 0) return;
 
     active = true;
@@ -452,6 +507,7 @@ Perspective::tabSelected(int index, bool forride)
 void
 Perspective::tabMoved(int to, int from)
 {
+    SSS;
      GcChartWindow *me = charts.takeAt(from);
      charts.insert(to, me);
 
@@ -473,10 +529,11 @@ Perspective::tabMoved(int to, int from)
 }
 
 void
-Perspective::styleChanged(int id)
+Perspective::styleChanged(int id, bool force)
 {
+    SSS;
     // ignore if out of bounds or we're already using that style
-    if (id > 2 || id < 0 || id == currentStyle) return;
+    if (id > 2 || id < 0 || (id == currentStyle && !force)) return;
     active = true;
 
     // block updates as it is butt ugly
@@ -519,9 +576,7 @@ Perspective::styleChanged(int id)
             charts[i]->showMore(false);
             charts[i]->menuButton->hide(); // we use tab button
             charts[i]->hide(); // we need to show on tab selection!
-            // weird bug- set margins *after* tabbed->addwidget since it resets margins (!!)
-            if(charts[i]->showTitle() == true) charts[i]->setContentsMargins(0,25*dpiYFactor,0,0);
-            else charts[i]->setContentsMargins(0,0,0,0);
+            charts[i]->setContentsMargins(0,0,0,0);
             break;
         case 1 : // they are lists in a GridLayout
             tileGrid->addWidget(charts[i], i,0);
@@ -550,21 +605,27 @@ Perspective::styleChanged(int id)
     currentStyle = id;
     style->setCurrentIndex(currentStyle);
 
-    active = false;
-
     if (currentStyle == 0 && charts.count()) tabSelected(0);
-    resizeEvent(NULL); // watch out in case resize event uses this!!
+
+    resize();
+
+    if (currentStyle == 0) {
+        tabbed->show(); // QTabWidget setUpdatesEnabled bug
+        chartbar->show(); // and resize artefact too.. tread carefully.
+    }
+
+    active = false;
 
     // now refresh as we are done
     setUpdatesEnabled(true);
-    tabbed->show(); // QTabWidget setUpdatesEnabled bug
-    chartbar->show(); // and resize artefact too.. tread carefully.
-    update();
+    //update();
+
 }
 
 void
 Perspective::dragEnterEvent(QDragEnterEvent *)
 {
+    SSS;
 #if 0 // draw and drop chart no longer part of the UX
     if (event->mimeData()->formats().contains("application/x-qabstractitemmodeldatalist")) {
         event->accept();
@@ -576,6 +637,7 @@ Perspective::dragEnterEvent(QDragEnterEvent *)
 void
 Perspective::appendChart(GcWinID id)
 {
+    SSS;
     GcChartWindow *newone = NULL;
 
     // GcWindowDialog is delete on close, so no need to delete
@@ -600,6 +662,7 @@ Perspective::appendChart(GcWinID id)
 void
 Perspective::dropEvent(QDropEvent *)
 {
+    SSS;
 #if 0 // drah and drop chart no longer part of the UX
     QStandardItemModel model;
     model.dropMimeData(event->mimeData(), Qt::CopyAction, -1,-1, QModelIndex());
@@ -631,6 +694,7 @@ Perspective::dropEvent(QDropEvent *)
 void
 Perspective::showControls()
 {
+    SSS;
     context->tab->chartsettings()->adjustSize();
     context->tab->chartsettings()->show();
 }
@@ -638,6 +702,7 @@ Perspective::showControls()
 void
 Perspective::addChart(GcChartWindow* newone)
 {
+    SSS;
     int chartnum = charts.count();
 
     active = true;
@@ -684,9 +749,8 @@ Perspective::addChart(GcChartWindow* newone)
                 else chartbar->setColor(chartnum, GColor(CPLOTBACKGROUND));
             }
 
-            // weird bug- set margins *after* tabbed->addwidget since it resets margins (!!)
-            if (newone->showTitle())  newone->setContentsMargins(0,25*dpiYFactor,0,0);
-            else newone->setContentsMargins(0,0,0,0);
+            // lets not bother with a title in tab view- its in the name of the tab already!
+            newone->setContentsMargins(0,0,0,0);
             break;
         case 1 :
             {
@@ -761,6 +825,7 @@ Perspective::addChart(GcChartWindow* newone)
 GcChartWindow *
 Perspective::takeChart(GcChartWindow *chart)
 {
+    SSS;
     // lets find it...
     int index = charts.indexOf(chart);
 
@@ -776,6 +841,7 @@ Perspective::takeChart(GcChartWindow *chart)
 bool
 Perspective::removeChart(int num, bool confirm, bool keep)
 {
+    SSS;
     if (num >= charts.count()) return false; // out of bounds (!)
 
     // better let the user confirm since this
@@ -835,12 +901,34 @@ Perspective::removeChart(int num, bool confirm, bool keep)
 void
 Perspective::showEvent(QShowEvent *)
 {
-    resizeEvent(NULL);
+    SSS;
+
+    // just before we show lets make sure it all looks good
+    // bear in mind the perspective may have been loaded but
+    // the formatting of contents doesn't happen till we have
+    // a style and we are shown.
+    for(int index=0; index<charts.count(); index++) {
+        if (currentStyle == 0) charts[index]->setContentsMargins(0,0,0,0);
+        else charts[index]->setContentsMargins(0,15*dpiXFactor,0,0);
+    }
+
+    resize();
 }
 
 void
 Perspective::resizeEvent(QResizeEvent * /* e */)
 {
+    SSS;
+    resize();
+}
+
+void Perspective::resize()
+{
+    SSS;
+    if (resizing) return;
+
+    resizing=true;
+
     foreach (GcChartWindow *x, charts) {
 
         switch (currentStyle) {
@@ -884,12 +972,14 @@ Perspective::resizeEvent(QResizeEvent * /* e */)
             break;
         }
     }
+
+    resizing=false;
 }
 
 bool
 Perspective::eventFilter(QObject *object, QEvent *e)
 {
-    if (!isVisible()) return false; // ignore when we aren't visible
+    if (active || resizing || !isVisible()) return false; // ignore when we aren't visible or busy doing shit
 
 #ifdef GC_WANT_R
     if (e->type() == QEvent::KeyPress && static_cast<QKeyEvent*>(e)->key()==Qt::Key_Escape) {
@@ -1028,6 +1118,7 @@ Perspective::eventFilter(QObject *object, QEvent *e)
 int
 Perspective::pointTile(QPoint pos)
 {
+    SSS;
     // find the window that is to the right of
     // the drop point
 
@@ -1095,6 +1186,9 @@ Perspective::pointTile(QPoint pos)
 void
 Perspective::windowMoved(GcWindow*w)
 {
+    SSS;
+    if (active || resizing) return;
+
     // fix single click error
     if (chartCursor == -2) return; // no it didn't!
 
@@ -1133,11 +1227,16 @@ Perspective::windowMoved(GcWindow*w)
 void
 Perspective::windowResized(GcWindow* /*w*/)
 {
+    SSS;
+    if (active || resizing) return;
 }
 
 void
 Perspective::windowMoving(GcWindow* /*w*/)
 {
+    SSS;
+    if (active || resizing) return;
+
     // ensure the mouse pointer is visible, scrolls
     // as we get near to the margins...
     QPoint pos = winWidget->mapFromGlobal(QCursor::pos());
@@ -1151,6 +1250,9 @@ Perspective::windowMoving(GcWindow* /*w*/)
 void
 Perspective::windowResizing(GcWindow* /*w*/)
 {
+    SSS;
+    if (active || resizing) return;
+
     QPoint pos = winWidget->mapFromGlobal(QCursor::pos());
     winArea->ensureVisible(pos.x(), pos.y(), 20, 20);
 }
@@ -1158,6 +1260,7 @@ Perspective::windowResizing(GcWindow* /*w*/)
 void
 Perspective::drawCursor()
 {
+    SSS;
     if (chartCursor == -2) return;
 
     QPainter painter(winWidget);
@@ -1196,6 +1299,7 @@ Perspective::drawCursor()
 
 GcWindowDialog::GcWindowDialog(GcWinID type, Context *context, GcChartWindow **here, bool sidebar, LTMSettings *use) : context(context), type(type), here(here), sidebar(sidebar)
 {
+    SSS;
     //setAttribute(Qt::WA_DeleteOnClose);
     setWindowFlags(windowFlags());
     setWindowTitle(tr("Chart Setup"));
@@ -1274,6 +1378,7 @@ GcWindowDialog::GcWindowDialog(GcWinID type, Context *context, GcChartWindow **h
 
 void GcWindowDialog::okClicked()
 {
+    SSS;
     // give back to owner so we can re-use
     // note that in reject they are not and will
     // get deleted (this has been verified with
@@ -1291,6 +1396,7 @@ void GcWindowDialog::cancelClicked() { reject(); }
 int
 GcWindowDialog::exec()
 {
+    SSS;
     if (QDialog::exec()) {
         *here = win;
 
@@ -1339,12 +1445,14 @@ void Perspective::steerScroll(int scrollAmount) {
 
 void Perspective::closeWindow(GcWindow*thisone)
 {
+    SSS;
     if (charts.contains(static_cast<GcChartWindow*>(thisone)))
         removeChart(charts.indexOf(static_cast<GcChartWindow*>(thisone)));
 }
 
 void Perspective::translateChartTitles(QList<GcChartWindow*> charts)
 {
+    SSS;
     // Map default (english) title to external (Localized) name, new default
     // charts in *layout.xml need to be added to this list to be translated
     QMap<QString, QString> titleMap;
@@ -1396,6 +1504,7 @@ void Perspective::translateChartTitles(QList<GcChartWindow*> charts)
 void
 Perspective::presetSelected(int n)
 {
+    SSS;
     if (n > 0) {
 
         // if we are in tabbed mode and we are not on a 'library' LTM chart
@@ -1430,6 +1539,7 @@ Perspective::presetSelected(int n)
  * -----------------------------------------------------------------------------*/
 Perspective *Perspective::fromFile(Context *context, QString filename, int type)
 {
+    SSS;
     Perspective *returning = NULL;
 
     QFileInfo finfo(filename);
@@ -1475,6 +1585,7 @@ Perspective *Perspective::fromFile(Context *context, QString filename, int type)
 bool
 Perspective::toFile(QString filename)
 {
+    SSS;
     QFile file(filename);
     if (!file.open(QFile::WriteOnly)) return false;
 
@@ -1495,8 +1606,13 @@ Perspective::toFile(QString filename)
 void
 Perspective::toXml(QTextStream &out)
 {
-    out<<"<layout name=\""<< title_ <<"\" style=\"" << currentStyle
-       <<"\" type=\"" << type_<<"\" expression=\"" << Utils::xmlprotect(expression_) << "\">\n";
+    SSS;
+    out<<"<layout name=\""<< title_
+       <<"\" style=\"" << currentStyle
+       <<"\" type=\"" << type_
+       <<"\" expression=\"" << Utils::xmlprotect(expression_)
+       <<"\" trainswitch=\"" << (int)trainswitch
+       << "\">\n";
 
     // iterate over charts
     foreach (GcChartWindow *chart, charts) {
@@ -1543,12 +1659,14 @@ Perspective::toXml(QTextStream &out)
 QString
 Perspective::expression() const
 {
+    SSS;
     return expression_;
 }
 
 void
 Perspective::setExpression(QString expr)
 {
+    SSS;
     if (expression_ == expr) return;
 
     if (df) {
@@ -1571,6 +1689,7 @@ Perspective::setExpression(QString expr)
 bool
 Perspective::relevant(RideItem *item)
 {
+    SSS;
     if (type_ != VIEW_ANALYSIS) return true;
     else if (df == NULL) return false;
     else if (df == NULL || item == NULL) return false;
@@ -1584,6 +1703,7 @@ Perspective::relevant(RideItem *item)
 QStringList
 Perspective::filterlist(DateRange dr)
 {
+    SSS;
     QStringList returning;
 
     Specification spec;
@@ -1605,6 +1725,7 @@ Perspective::filterlist(DateRange dr)
  * -----------------------------------------------------------------------------*/
 ImportChartDialog::ImportChartDialog(Context *context, QList<QMap<QString,QString> >list, QWidget *parent) : QDialog(parent), context(context), list(list)
 {
+    SSS;
     setWindowFlags(windowFlags());
     setWindowTitle(tr("Import Charts"));
     setWindowModality(Qt::ApplicationModal);
@@ -1707,6 +1828,7 @@ ImportChartDialog::ImportChartDialog(Context *context, QList<QMap<QString,QStrin
 void
 ImportChartDialog::importClicked()
 {
+    SSS;
     // do stuff
     for(int i=0; i<list.count(); i++) {
 
@@ -1746,12 +1868,14 @@ ImportChartDialog::importClicked()
 void
 ImportChartDialog::cancelClicked()
 {
+    SSS;
     accept();
 }
 
-AddPerspectiveDialog::AddPerspectiveDialog(QWidget *parent, Context *context, QString &name, QString &expression, int type, bool edit) :
-    QDialog(parent), context(context), name(name), expression(expression), type(type)
+AddPerspectiveDialog::AddPerspectiveDialog(QWidget *parent, Context *context, QString &name, QString &expression, int type, Perspective::switchenum &trainswitch, bool edit) :
+    QDialog(parent), context(context), name(name), expression(expression), trainswitch(trainswitch), type(type)
 {
+    SSS;
     setWindowFlags(windowFlags());
     if (edit) setWindowTitle(tr("Edit Perspective"));
     else setWindowTitle(tr("Add Perspective"));
@@ -1775,6 +1899,16 @@ AddPerspectiveDialog::AddPerspectiveDialog(QWidget *parent, Context *context, QS
         if (type == VIEW_TRENDS) form->addRow(new QLabel(tr("Activities filter")), filterEdit);
     }
 
+    if (type == VIEW_TRAIN) {
+        trainSwitch = new QComboBox(this);
+        trainSwitch->addItem(tr("Don't switch"), Perspective::None);
+        trainSwitch->addItem(tr("Erg Workout"), Perspective::Erg);
+        trainSwitch->addItem(tr("Slope Workout"), Perspective::Slope);
+        trainSwitch->addItem(tr("Video Workout"), Perspective::Video);
+        trainSwitch->setCurrentIndex(trainswitch);
+        form->addRow(new QLabel(tr("Switch for")), trainSwitch);
+    }
+
     QHBoxLayout *buttons = new QHBoxLayout();
     if (edit) add = new QPushButton(tr("OK"), this);
     else add = new QPushButton(tr("Add"), this);
@@ -1791,13 +1925,16 @@ AddPerspectiveDialog::AddPerspectiveDialog(QWidget *parent, Context *context, QS
 void
 AddPerspectiveDialog::addClicked()
 {
+    SSS;
     name = nameEdit->text();
     if (type == VIEW_ANALYSIS || type == VIEW_TRENDS) expression = filterEdit->text();
+    if (type == VIEW_TRAIN) trainswitch=(Perspective::switchenum)trainSwitch->itemData(trainSwitch->currentIndex(), Qt::UserRole).toInt();
     accept();
 }
 
 void
 AddPerspectiveDialog::cancelClicked()
 {
+    SSS;
     reject();
 }

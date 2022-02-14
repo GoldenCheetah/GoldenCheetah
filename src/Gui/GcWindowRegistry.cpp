@@ -71,7 +71,8 @@ GcWindowRegistry::initialize()
 {
   static GcWindowRegistry GcWindowsInit[34] = {
     // name                     GcWinID
-    { VIEW_TRENDS|VIEW_DIARY, tr("Overview "),GcWindowTypes::OverviewTrends },
+    { VIEW_TRENDS|VIEW_DIARY, tr("Season Overview"),GcWindowTypes::OverviewTrends },
+    { VIEW_TRENDS|VIEW_DIARY, tr("Blank Overview "),GcWindowTypes::OverviewTrendsBlank },
     { VIEW_TRENDS|VIEW_DIARY, tr("User Chart"),GcWindowTypes::UserTrends },
     { VIEW_TRENDS|VIEW_DIARY, tr("Trends"),GcWindowTypes::LTM },
     { VIEW_TRENDS|VIEW_DIARY, tr("TreeMap"),GcWindowTypes::TreeMap },
@@ -79,8 +80,9 @@ GcWindowRegistry::initialize()
     { VIEW_TRENDS|VIEW_DIARY,  tr("Power Duration "),GcWindowTypes::CriticalPowerSummary },
     //{ VIEW_TRENDS,  tr("Training Plan"),GcWindowTypes::SeasonPlan },
     //{ VIEW_TRENDS|VIEW_DIARY,  tr("Performance Manager"),GcWindowTypes::PerformanceManager },
+    { VIEW_ANALYSIS, tr("Activity Overview"),GcWindowTypes::Overview },
+    { VIEW_ANALYSIS, tr("Blank Overview"),GcWindowTypes::OverviewAnalysisBlank },
     { VIEW_ANALYSIS, tr("User Chart "),GcWindowTypes::UserAnalysis },
-    { VIEW_ANALYSIS, tr("Overview"),GcWindowTypes::Overview },
     //{ VIEW_ANALYSIS, tr("Summary"),GcWindowTypes::RideSummary }, // DEPRECATED IN V3.6
     { VIEW_ANALYSIS, tr("Data"),GcWindowTypes::MetadataWindow },
     //{ VIEW_ANALYSIS, tr("Summary and Details"),GcWindowTypes::Summary },
@@ -201,7 +203,6 @@ GcWindowRegistry::newGcWindow(GcWinID id, Context *context)
     case GcWindowTypes::PfPv: returning = new PfPvWindow(context); break;
     case GcWindowTypes::HrPw: returning = new HrPwWindow(context); break;
     case GcWindowTypes::RideEditor: returning = NULL; break;
-    case GcWindowTypes::RideSummary: returning = NULL; break;
     case GcWindowTypes::Scatter: returning = new ScatterWindow(context); break;
     case GcWindowTypes::TreeMap: returning = new TreeMapWindow(context); break;
     case GcWindowTypes::WeeklySummary: returning = NULL; break; // deprecated
@@ -235,10 +236,22 @@ GcWindowRegistry::newGcWindow(GcWinID id, Context *context)
 #else
     case GcWindowTypes::RouteSegment: returning = new GcChartWindow(context); break;
 #endif
-    case GcWindowTypes::Summary: // deprecated so now replace with overview
-    case GcWindowTypes::Overview: returning = new OverviewWindow(context, ANALYSIS); break;
+
+    // summary and old ride summary charts now replaced with an Overview - note id gets reset
+    case GcWindowTypes::Summary:
+    case GcWindowTypes::RideSummary:
+    case GcWindowTypes::Overview: returning = new OverviewWindow(context, ANALYSIS); id=GcWindowTypes::Overview; break;
+
+    // blank analysis overview - note id gets reset
+    case GcWindowTypes::OverviewAnalysisBlank: returning = new OverviewWindow(context, ANALYSIS, true); id=GcWindowTypes::Overview; break;
+
+    // old summary now gets a trends overview - note id gets reset
     case GcWindowTypes::DateRangeSummary: // deprecated so now replace with overview
-    case GcWindowTypes::OverviewTrends: returning = new OverviewWindow(context, TRENDS); break;
+    case GcWindowTypes::OverviewTrends: returning = new OverviewWindow(context, TRENDS); id=GcWindowTypes::OverviewTrends; break;
+
+    // blank trends overview - note id gets reset
+    case GcWindowTypes::OverviewTrendsBlank: returning = new OverviewWindow(context, TRENDS, true); id=GcWindowTypes::OverviewTrends; break;
+
     case GcWindowTypes::SeasonPlan: returning = new PlanningWindow(context); break;
     case GcWindowTypes::UserAnalysis: returning = new UserChartWindow(context, false); break;
     case GcWindowTypes::UserTrends: returning = new UserChartWindow(context, true); break;

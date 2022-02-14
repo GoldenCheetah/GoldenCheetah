@@ -36,6 +36,11 @@ plugins/
 resources/
 src/debug/
 src/release/
+doc/doxygen/latex
+doc/doxygen/html
+
+# qt creator builds
+build-src*
 
 qwt/src/debug/
 qwt/src/release/

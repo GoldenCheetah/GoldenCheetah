@@ -32,6 +32,35 @@
 
 #include <QScrollArea>
 
+// a chart annotation
+class GenericAnnotationInfo {
+
+    public:
+
+        enum annotationType { None, Label, VLine, HLine, LR, Voronoi };
+        typedef annotationType AnnotationType;
+        AnnotationType type;
+
+        GenericAnnotationInfo(AnnotationType type) : type(type) {}
+
+        // labels
+        QStringList labels;
+
+        // voronoi
+        QString vname;
+        QVector<double> vx, vy; //voronoi digram
+
+        // vline and hline
+        Qt::PenStyle linestyle; // also used by LR
+        double value;
+        QString text;
+
+        QString color; // color name eg. red or #fefefe
+
+        // linear regression
+        double slope, intercept, r2;
+};
+
 // keeping track of the series info
 class GenericSeriesInfo {
 
@@ -39,19 +68,19 @@ class GenericSeriesInfo {
 
         GenericSeriesInfo(QString name, QVector<double> xseries, QVector<double> yseries, QVector<QString> fseries, QString xname, QString yname,
                       QStringList labels, QStringList colors, int line, int symbol, int size, QString color, int opacity, bool opengl,
-                      bool legend, bool datalabels, bool fill, RideMetric::MetricType aggregateby = RideMetric::Average) :
+                      bool legend, bool datalabels, bool fill, RideMetric::MetricType aggregateby, QList<GenericAnnotationInfo> annotations) :
                       user1(NULL), user2(NULL), user3(NULL), user4(NULL),
                       name(name), xseries(xseries), yseries(yseries), fseries(fseries), xname(xname), yname(yname),
                       labels(labels), colors(colors),
                       line(line), symbol(symbol), size(size), color(color), opacity(opacity), opengl(opengl), legend(legend), datalabels(datalabels), fill(fill),
-                      aggregateby(aggregateby)
+                      aggregateby(aggregateby), annotations(annotations)
                       {}
 
         GenericSeriesInfo() :
             user1(NULL), user2(NULL), user3(NULL), user4(NULL),
             line(static_cast<int>(Qt::PenStyle::SolidLine)),
-            symbol(0), //XXX todo
-            color("red"), opacity(1.0), opengl(true), legend(true), datalabels(false), fill(false)
+            symbol(0), size(2.00), //XXX todo
+            color("red"), opacity(100.0), opengl(true), legend(true), datalabels(false), fill(false)
         {}
 
         // available for use (e.g. UserChartSettings)
@@ -79,7 +108,7 @@ class GenericSeriesInfo {
         bool fill;
         RideMetric::MetricType aggregateby;
 
-        QList <QStringList> annotateLabels;
+        QList<GenericAnnotationInfo> annotations;
 };
 
 
@@ -93,7 +122,7 @@ class GenericChartInfo {
     public:
 
         // default values, better here than spread across the codebase.
-        GenericChartInfo() : localinfo(NULL), type(1), animate(false), legendpos(2), stack(false), orientation(Qt::Vertical), scale(1.0) {}
+        GenericChartInfo() : localinfo(NULL), type(1), animate(false), legendpos(2), stack(false), orientation(Qt::Vertical), scale(1.0), intervalrefresh(false) {}
 
         // available for use (e.g. UserChartSettings)
         void *localinfo;
@@ -108,6 +137,7 @@ class GenericChartInfo {
         int orientation; // layout horizontal or vertical
         double scale; // scale font sizes
         QColor bgcolor; // background color of plots and legends
+        bool intervalrefresh; // connect to interval refresh signals
 };
 
 // general axis info
@@ -286,9 +316,10 @@ class GenericChart : public QWidget {
         // add a curve, associating an axis
         bool addCurve(QString name, QVector<double> xseries, QVector<double> yseries, QVector<QString> fseries, QString xname, QString yname,
                       QStringList labels, QStringList colors,
-                      int line, int symbol, int size, QString color, int opacity, bool opengl, bool legend, bool datalabels, bool fill);
+                      int line, int symbol, int size, QString color, int opacity, bool opengl, bool legend, bool datalabels,
+                      bool fill, RideMetric::MetricType mtype, QList<GenericAnnotationInfo>annotations);
 
-        // helper for Python charts fseries is a stringlist
+        // helper for Python and R charts fseries is a stringlist
         bool addCurve(QString name, QVector<double> xseries, QVector<double> yseries, QStringList fseries, QString xname, QString yname,
                       QStringList labels, QStringList colors,
                       int line, int symbol, int size, QString color, int opacity, bool opengl, bool legend, bool datalabels, bool fill);
@@ -296,9 +327,6 @@ class GenericChart : public QWidget {
         // configure axis, after curves added
         bool configureAxis(QString name, bool visible, int align, double min, double max,
                       int type, QString labelcolor, QString color, bool log, QStringList categories);
-
-        // annotations
-        bool annotateLabel(QString name, QStringList strings); // add a label alongside a series
 
         // plot background
         void setBackgroundColor(QColor);

@@ -28,12 +28,12 @@ R --version
 
 # D2XX - refresh cache if folder is empty
 if [ -z "$(ls -A D2XX)" ]; then
-    wget http://www.ftdichip.com/Drivers/D2XX/Linux/libftd2xx-x86_64-1.3.6.tgz
+    wget --no-verbose http://www.ftdichip.com/Drivers/D2XX/Linux/libftd2xx-x86_64-1.3.6.tgz
     tar xf libftd2xx-x86_64-1.3.6.tgz -C D2XX
 fi
 
 # SRMIO
-wget https://github.com/rclasen/srmio/archive/v0.1.1git1.tar.gz
+wget --no-verbose https://github.com/rclasen/srmio/archive/v0.1.1git1.tar.gz
 tar xf v0.1.1git1.tar.gz
 cd srmio-0.1.1git1
 sh genautomake.sh
@@ -50,7 +50,7 @@ sudo add-apt-repository -y ppa:deadsnakes/ppa
 sudo apt-get update -qq
 sudo apt-get install -qq python3.7-dev
 python3.7 --version
-wget https://sourceforge.net/projects/pyqt/files/sip/sip-4.19.8/sip-4.19.8.tar.gz
+wget --no-verbose https://sourceforge.net/projects/pyqt/files/sip/sip-4.19.8/sip-4.19.8.tar.gz
 tar xf sip-4.19.8.tar.gz
 cd sip-4.19.8
 python3.7 configure.py
@@ -63,7 +63,7 @@ sudo apt-get -qq install libgsl-dev
 
 # AWS S3 client to upload binaries
 curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-unzip awscliv2.zip
+unzip -qq awscliv2.zip
 sudo ./aws/install
 aws --version
 

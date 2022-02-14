@@ -28,6 +28,10 @@
 #include "ChartSpace.h"
 #include "UserChartOverviewItem.h"
 
+#include "Voronoi.h"
+#include "GenericAnnotations.h"
+
+#include "gsl/gsl_fit.h"
 #include <limits>
 
 // used to format dates/times on axes
@@ -84,6 +88,9 @@ GenericPlot::GenericPlot(QWidget *parent, Context *context, QGraphicsItem *item)
     // add selector
     selector = new GenericSelectTool(this);
     chartview->scene()->addItem(selector);
+
+    // add annotations controller (which attaches to the plot)
+    annotationController = new GenericAnnotationController(this);
 
     // the legend at the top for now
     legend = new GenericLegend(context, this);
@@ -292,28 +299,6 @@ GenericPlot::setSeriesVisible(QString name, bool visible)
 
 // annotations
 
-// line by user
-void
-GenericPlot::addAnnotation(AnnotationType , QAbstractSeries*series, double value)
-{
-    fprintf(stderr, "add annotation line: for %s at value %f\n", series->name().toStdString().c_str(), value);
-    fflush(stderr);
-}
-
-void
-GenericPlot::addAnnotation(AnnotationType, QString string, QColor color)
-{
-    QFont std;
-    std.setPointSizeF(std.pointSizeF() * scale_);
-    QFontMetrics fm(std);
-
-    QLabel *add = new QLabel(this);
-    add->setText(string);
-    add->setStyleSheet(QString("color: %1").arg(color.name()));
-    add->setFixedWidth(fm.boundingRect(string).width() + (25*dpiXFactor));
-    add->setAlignment(Qt::AlignCenter);
-    labels << add;
-}
 
 void
 GenericPlot::pieHover(QPieSlice *slice, bool state)
@@ -447,6 +432,8 @@ GenericPlot::plotAreaChanged()
 bool
 GenericPlot::initialiseChart(QString title, int type, bool animate, int legpos, double scale)
 {
+    clearAnnotations();
+
     // if we changed the type, all series must go
     if (charttype != type) {
         qchart->removeAllSeries();
@@ -456,6 +443,7 @@ GenericPlot::initialiseChart(QString title, int type, bool animate, int legpos, 
         stackbarseries=NULL;
         percentbarseries=NULL;
     }
+
 
     foreach(QLabel *label, labels) delete label;
     labels.clear();
@@ -529,7 +517,8 @@ GenericPlot::initialiseChart(QString title, int type, bool animate, int legpos, 
 bool
 GenericPlot::addCurve(QString name, QVector<double> xseries, QVector<double> yseries, QVector<QString> fseries, QString xname, QString yname,
                       QStringList labels, QStringList colors,
-                      int linestyle, int symbol, int size, QString color, int opacity, bool opengl, bool legend, bool datalabels, bool fill)
+                      int linestyle, int symbol, int size, QString color, int opacity, bool opengl, bool legend, bool datalabels, bool fill,
+                      QList<GenericAnnotationInfo> annotations)
 {
 
     // a curve can have a decoration associated with it
@@ -901,6 +890,18 @@ GenericPlot::addCurve(QString name, QVector<double> xseries, QVector<double> yse
         break;
 
     }
+
+    // add all the annotations via a genericseriesinfo structure, which is a bit crap since we get
+    // passed the individual parts from one of these, they we create one down here. Its because
+    // the R and Python charts don't have this and we want to isolate annotations right at the top
+    // in UserChart and then pass them all the way down to here
+    if (annotations.count()) {
+
+        // we keep a record of them, they get added in finalise (after the axes are all resolved)
+        annotationinfos << GenericSeriesInfo(name, xseries, yseries, fseries, xname, yname, labels, colors,
+                          linestyle, symbol, size, color, opacity, opengl, legend, datalabels, fill, RideMetric::Average, annotations);
+    }
+
     return true;
 }
 
@@ -1234,8 +1235,8 @@ GenericPlot::finaliseChart()
 
     }
 
-    // add labels after legend items
-    foreach(QLabel *label, labels) legend->addLabel(label);
+    // now finally we can add annotations to the top
+    foreach(GenericSeriesInfo series, annotationinfos) plotAnnotations(series);
 
     plotAreaChanged(); // make sure get updated before paint
 }
@@ -1347,4 +1348,175 @@ GenericPlot::seriesColor(QAbstractSeries* series)
     case QAbstractSeries::SeriesTypeArea: return static_cast<QAreaSeries*>(series)->color(); break;
     default: return GColor(CPLOTMARKER);
     }
+}
+
+// when we plot annotations we need the curve context, so we get that as a genericseriesinfo...
+void
+GenericPlot::plotAnnotations(GenericSeriesInfo &seriesinfo)
+{
+
+    foreach(GenericAnnotationInfo annotation, seriesinfo.annotations) {
+
+        switch(annotation.type) {
+
+        case GenericAnnotationInfo::Label:
+        {
+            QFont std;
+            std.setPointSizeF(std.pointSizeF() * scale_);
+            QFontMetrics fm(std);
+
+            QLabel *add = new QLabel(this);
+            QString string = annotation.labels.join(" ");
+            add->setFont(std);
+            add->setText(string);
+            add->setStyleSheet(QString("color: %1").arg(RGBColor(QColor(seriesinfo.color)).name()));
+            add->setFixedWidth(fm.boundingRect(string).width() + (25*dpiXFactor));
+            add->setAlignment(Qt::AlignCenter);
+            legend->addLabel(add);
+            labels << add;
+        }
+        break;
+
+        case GenericAnnotationInfo::LR:
+        {
+            QAbstractSeries *curve=curves.value(seriesinfo.name,NULL);
+
+            if (curve == NULL || !curve->isVisible()) return; // big nope
+
+            // what can we see?
+            double minx=0, maxx=0, miny=0,maxy=0;
+            if (curve) {
+                foreach(QAbstractAxis *axis, curve->attachedAxes()) {
+                    if (axis->orientation() == Qt::Horizontal) { minx = qtchartaxismin(axis); maxx = qtchartaxismax(axis); }
+                    else { miny = qtchartaxismin(axis); maxy = qtchartaxismax(axis); }
+                }
+            }
+
+            // fit
+            GenericCalculator calc;
+            calc.initialise();
+
+            // pass all the points- as they are on the plot
+            for (int i=0; i< seriesinfo.xseries.count() && i < seriesinfo.yseries.count(); i++) {
+                QPointF p(seriesinfo.xseries.at(i), seriesinfo.yseries.at(i));
+                if (p.x() < minx || p.x() > maxx || p.y() < miny || p.y() > maxy) continue;
+                calc.addPoint(p);
+            }
+            calc.finalise();
+
+            double slope = calc.m;
+            double intercept = calc.b;
+
+            // now again, but converting from the chart "units"
+            // calc is smart and can work back from the axis type
+            calc.initialise();
+            if (curve) {
+                foreach(QAbstractAxis *axis, curve->attachedAxes()) {
+                    if (axis->orientation() == Qt::Horizontal) calc.xaxis=axis;
+                    else calc.yaxis=axis;
+                }
+            }
+
+            // pass all the points- but now they are converted according to axis
+            for (int i=0; i< seriesinfo.xseries.count() && i < seriesinfo.yseries.count(); i++) {
+                QPointF p(seriesinfo.xseries.at(i), seriesinfo.yseries.at(i));
+                if (p.x() < minx || p.x() > maxx || p.y() < miny || p.y() > maxy) continue;
+                calc.addPoint(p);
+            }
+            calc.finalise();
+
+            // find the x-axis
+            GenericLR *lr = new GenericLR(this->annotationController);
+            annotationController->addAnnotation(lr);
+            lr->setColor(QColor(annotation.color));
+            lr->setStyle(annotation.linestyle);
+            lr->setParms(slope, intercept); // in chart "units" from first pass
+            lr->setText(QString("y= %2x + %1 R2= %3").arg(calc.b, 0, 'f', 3).arg(calc.m, 0, 'f', 3).arg(calc.r2, 0, 'f', 3));
+            lr->setCurve(curves.value(seriesinfo.name,NULL));
+
+            annotations << lr;
+
+            // add a label for the stats
+            QFont std;
+            std.setPointSizeF(std.pointSizeF() * scale_);
+            QFontMetrics fm(std);
+
+            QLabel *add = new QLabel(this);
+            add->setFont(std);
+            add->setText(lr->text());
+            add->setStyleSheet(QString("color: %1").arg(RGBColor(QColor(seriesinfo.color)).name()));
+            add->setFixedWidth(fm.boundingRect(lr->text()).width() + (25*dpiXFactor));
+            add->setAlignment(Qt::AlignCenter);
+            legend->addLabel(add);
+            labels << add;
+        }
+        break;
+
+        case GenericAnnotationInfo::Voronoi:
+        {
+            if (annotation.vx.count() < 2) return;
+
+            Voronoi v;
+            for(int i=0; i<annotation.vx.count(); i++)  {
+                QPointF point(annotation.vx[i],annotation.vy[i]);
+                v.addSite(point);
+            }
+            v.run(QRectF());
+#if 0
+    // how many lines?
+    fprintf(stderr, "voronoi diagram curve '%s' has %d lines\n", annotation.vname.toStdString().c_str(),v.lines().count()); fflush(stderr);
+
+    foreach(QLineF line, v.lines()) {
+        fprintf(stderr, "from %f,%f to %f,%f\n", line.p1().x(), line.p1().y(), line.p2().x(), line.p2().y());
+    }
+#endif
+
+            // create a new diagram
+            GenericLines *voronoidiagram = new GenericLines(this->annotationController);
+            annotationController->addAnnotation(voronoidiagram);
+            voronoidiagram->setCurve(curves.value(seriesinfo.name,NULL));
+            voronoidiagram->setLines(v.lines());
+
+            annotations << voronoidiagram;
+        }
+        break;
+
+
+        case GenericAnnotationInfo::VLine:
+        case GenericAnnotationInfo::HLine:
+        {
+            StraightLine *line = new StraightLine(this->annotationController);
+            annotationController->addAnnotation(line);
+            line->setCurve(curves.value(seriesinfo.name,NULL));
+            line->setValue(annotation.value);
+            line->setText(annotation.text);
+            line->setOrientation(annotation.type == GenericAnnotationInfo::VLine ? Qt::Vertical : Qt::Horizontal);
+            line->setStyle(annotation.linestyle);
+
+            annotations << line;
+        }
+        break;
+        }
+    }
+}
+
+void
+GenericPlot::clearAnnotations()
+{
+    // labels are a form of annotation, but are placed in the
+    // legend not drawn on the plot
+    foreach(QLabel *label, labels) {
+        legend->removeLabel(label);
+        delete label;
+    }
+    labels.clear();
+
+    // annotations are painted onto the chart scene
+    // we zap all here
+    foreach(GenericAnnotation *annotation, annotations) {
+        annotationController->removeAnnotation(annotation);
+        delete annotation;
+    }
+    annotations.clear();
+    annotationinfos.clear();
 }

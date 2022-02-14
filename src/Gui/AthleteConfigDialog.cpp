@@ -178,6 +178,7 @@ AthleteConfig::AthleteConfig(QDir home, Context *context) :
     QColor tabselect = std.color(QPalette::Text);
     if (GColor(CPLOTBACKGROUND) == std.color(QPalette::Base)) tabselect = GColor(CPLOTMARKER);
 
+#ifndef Q_OS_MAC
     QString styling = QString("QTabWidget { background: %1; }"
                           "QTabWidget::pane { border: 0px; }"
                           "QTabBar::tab { background: %1; "
@@ -197,6 +198,7 @@ AthleteConfig::AthleteConfig(QDir home, Context *context) :
                           .arg(std.color(QPalette::Text).name()); // 6 tab text color
     zonesTab->setStyleSheet(styling);
     measuresTab->setStyleSheet(styling);
+#endif
 
     QTabWidget *tabs = new QTabWidget(this);
     tabs->addTab(athletePage, tr("About"));

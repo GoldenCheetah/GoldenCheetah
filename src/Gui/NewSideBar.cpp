@@ -245,9 +245,7 @@ NewSideBarItem::configChanged(qint32)
     fg_select = GCColor::invertColor(bg_select);
 
     // on hover
-    bg_hover =GColor(CCHROME);
-    if (dark) bg_hover = QColor(Qt::darkGray);
-    else bg_hover = QColor(Qt::lightGray);
+    bg_hover =GColor(CHOVER);
 
     iconNormal = QPixmap::fromImage(imageRGB(icon, fg_normal), Qt::ColorOnly|Qt::PreferDither|Qt::DiffuseAlphaDither);
     iconNormal = iconNormal.scaled(24*dpiXFactor, 24*dpiXFactor, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);

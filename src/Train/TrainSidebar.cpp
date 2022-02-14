@@ -37,6 +37,7 @@
 #include <QEvent>
 #include <QInputEvent>
 #include <QKeyEvent>
+#include <QMutexLocker>
 
 #include <QSound>
 
@@ -86,6 +87,7 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
     QVBoxLayout *cl = new QVBoxLayout(c);
     setControls(c);
     autoConnect = false;
+    trainView=NULL;
     useSimulatedSpeed = false;
 
     cl->setSpacing(0);
@@ -500,7 +502,6 @@ TrainSidebar::eventFilter(QObject *, QEvent *event)
 
     // only when we are recording !
     if (status & RT_RECORDING) {
-#if 0
         if (event->type() == QEvent::KeyPress) {
 
             // we care about cmd / ctrl
@@ -526,15 +527,20 @@ TrainSidebar::eventFilter(QObject *, QEvent *event)
             //
             switch(key) {
 
-                //XXX TODO
+                case Qt::Key_Space:
+                    Start();
+                    break;
+
+                case Qt::Key_Escape:
+                    Stop();
+                    break;
 
                 default:
-                break;
+                    break;
 
             }
             return true; // we listen to 'em all
         }
-#endif
     }
     return false;
 }
@@ -763,6 +769,7 @@ TrainSidebar::workoutTreeWidgetSelectionChanged()
     // wipe away the current selected workout once we've told everyone
     // since they might be editing it and want to save changes first (!!)
     ErgFile *prior = const_cast<ErgFile*>(ergFileQueryAdapter.getErgFile());
+    workoutfile = filename;
 
     if (filename == "") {
 
@@ -1084,10 +1091,13 @@ TrainSidebar::mediaTreeWidgetSelectionChanged()
     QModelIndex current = mediaTree->currentIndex();
     QModelIndex target = vsortModel->mapToSource(current);
     QString filename = videoModel->data(videoModel->index(target.row(), 0), Qt::DisplayRole).toString();
-    if (filename == context->videoFilename)
+    if (filename == context->videoFilename) {
+        mediafile = "";
         context->notifyMediaSelected(""); // CTRL+Click to clear selection
-    else
+    } else {
+        mediafile = filename;
         context->notifyMediaSelected(filename);
+    }
 }
 
 void
@@ -1212,6 +1222,9 @@ void TrainSidebar::Start()       // when start button is pressed
         // disable the screen saver on Windows
         SetThreadExecutionState(ES_DISPLAY_REQUIRED | ES_CONTINUOUS);
 #endif
+
+        context->mainWindow->showSidebar(false);
+        if (appsettings->value(this, TRAIN_AUTOHIDE, false).toBool()) context->mainWindow->showLowbar(false);
 
         // Stop users from selecting different devices
         // media or workouts whilst a workout is in progress
@@ -1391,6 +1404,9 @@ void TrainSidebar::Stop(int deviceStatus)        // when stop button is pressed
     workoutTree->setEnabled(true);
     deviceTree->setEnabled(true);
 
+    context->mainWindow->showSidebar(true);
+    if (appsettings->value(this, TRAIN_AUTOHIDE, false).toBool()) context->mainWindow->showLowbar(true);
+
     //reset all calibration data
     calibrating = startCalibration = restartCalibration = finishCalibration = false;
     calibrationSpindownTime = calibrationZeroOffset = calibrationSlope = calibrationTargetSpeed = 0;
@@ -1414,6 +1430,13 @@ void TrainSidebar::Stop(int deviceStatus)        // when stop button is pressed
         // close and reset File
         recordFile->close();
 
+        // Request mutual exclusion with ANT+/BTLE threads to change status and close rr/vo2 files
+        rrMutex.lock();
+        vo2Mutex.lock();
+
+        // cancel recording
+        status &= ~RT_RECORDING;
+
         // close rrFile
         if (rrFile) {
             //fprintf(stderr, "Closing r-r file\n"); fflush(stderr);
@@ -1430,6 +1453,10 @@ void TrainSidebar::Stop(int deviceStatus)        // when stop button is pressed
             vo2File=NULL;
         }
 
+        // Release mutual exclusion with ANT+/BTLE threads before to open import dialog to avoid deadlocks
+        rrMutex.unlock();
+        vo2Mutex.unlock();
+
         if(deviceStatus == DEVICE_ERROR)
         {
             recordFile->remove();
@@ -1445,9 +1472,6 @@ void TrainSidebar::Stop(int deviceStatus)        // when stop button is pressed
             RideImportWizard *dialog = new RideImportWizard (list, context);
             dialog->process(); // do it!
         }
-
-        // cancel recording
-        status &= ~RT_RECORDING;
     }
 
     load_timer->stop();
@@ -1571,6 +1595,30 @@ void TrainSidebar::Connect()
     gui_timer->start(REFRESHRATE);
 
     emit setNotification(tr("Connected.."), 2);
+
+    // lets SWITCH PERSPECTIVE as we are connected, but only
+    // if everything has been initialised properly (aka lazy load)
+    // given the connect widget is on the train view it is unlikely
+    // below will ever be false, but no harm in checking
+    if (trainView && trainView->page()) {
+
+        Perspective::switchenum want=Perspective::None;
+        if (mediafile != "") want=Perspective::Video; // if media file selected
+        else want = (mode == ERG || mode == MRC) ? Perspective::Erg : Perspective::Slope; // mode always known
+
+        // so we want a view type and the current page isn't what
+        // we want then lets go find one to switch to and switch
+        // to the first one that matches
+        if (want != Perspective::None && trainView->page()->trainSwitch() != want) {
+
+            for(int i=0; i<trainView->perspectives_.count(); i++) {
+                if (trainView->perspectives_[i]->trainSwitch() == want) {
+                    context->mainWindow->switchPerspective(i);
+                    break;
+                }
+            }
+        }
+    }
 }
 
 void TrainSidebar::Disconnect()
@@ -3075,6 +3123,9 @@ TrainSidebar::remoteControl(uint16_t command)
 void TrainSidebar::rrData(uint16_t  rrtime, uint8_t count, uint8_t bpm)
 {
     Q_UNUSED(count)
+
+    QMutexLocker locker(&rrMutex);
+
     if (status&RT_RECORDING && rrFile == NULL && recordFile != NULL) {
         QString rrfile = recordFile->fileName().replace("csv", "rr");
         //fprintf(stderr, "First r-r, need to open file %s\n", rrfile.toStdString().c_str()); fflush(stderr);
@@ -3108,6 +3159,8 @@ void TrainSidebar::rrData(uint16_t  rrtime, uint8_t count, uint8_t bpm)
 // VO2 Measurement data received
 void TrainSidebar::vo2Data(double rf, double rmv, double vo2, double vco2, double tv, double feo2)
 {
+    QMutexLocker locker(&vo2Mutex);
+
     if (status&RT_RECORDING && vo2File == NULL && recordFile != NULL) {
         QString vo2filename = recordFile->fileName().replace("csv", "vo2");
 

@@ -126,7 +126,7 @@ class Leaf {
         // User Metric - using symbols from QHash<..> (RideItem + Interval) and
         // Spec to delimit samples in R/Python Scripts
         //
-        Result eval(DataFilterRuntime *df, Leaf *, const Result &x, long it, RideItem *m, RideFilePoint *p = NULL, const QHash<QString,RideMetric*> *metrics=NULL, Specification spec=Specification(), DateRange d=DateRange());
+        Result eval(DataFilterRuntime *df, Leaf *, const Result &x, long it, RideItem *m, RideFilePoint *p = NULL, const QHash<QString,RideMetric*> *metrics=NULL, const Specification &spec=Specification(), const  DateRange &d=DateRange());
 
         // tree traversal etc
         void print(int level, DataFilterRuntime*);  // print leaf and all children
@@ -166,6 +166,7 @@ class Leaf {
 };
 
 class UserChart;
+class GenericAnnotationInfo;
 class DataFilterRuntime {
 
     // allocated for each thread to avoid race
@@ -262,7 +263,7 @@ class DataFilter : public QObject
         void parseBad(QStringList erorrs);
         void results(QStringList);
 
-        void annotateLabel(QStringList&);
+        void annotate(GenericAnnotationInfo&);
 
     private:
         void setSignature(QString &query);

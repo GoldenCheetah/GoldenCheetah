@@ -31,6 +31,7 @@ class UserChartWindow : public GcChartWindow {
 
     // settings are maintained by the userchart widget, we are just a wrapper to include in a perspective.
     Q_PROPERTY(QString settings READ settings WRITE applySettings USER true)
+    Q_PROPERTY(QString color READ readColor USER false)
 
     public:
 
@@ -39,6 +40,7 @@ class UserChartWindow : public GcChartWindow {
         // for read and write of settings via chart properties
         QString settings() const { return chart->settings(); }
         void applySettings(QString x) { chart->applySettings(x); }
+        QString readColor() const { return chart->chartinfo.bgcolor.name(); }
 
     public slots:
 

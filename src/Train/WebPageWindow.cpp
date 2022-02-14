@@ -137,7 +137,7 @@ WebPageWindow::WebPageWindow(Context *context) : GcChartWindow(context), context
     view = new QWebEngineView(this);
     connect(view, SIGNAL(loadFinished(bool)), this, SLOT(loadFinished(bool)));
 
-    view->page()->profile()->setHttpUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.79 Safari/537.36 Edge/14.14393");
+    //view->page()->profile()->setHttpUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.79 Safari/537.36 Edge/14.14393");
 
     // add a download interceptor
     WebDownloadInterceptor *interceptor = new WebDownloadInterceptor;

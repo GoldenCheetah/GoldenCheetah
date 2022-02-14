@@ -71,6 +71,8 @@ AnalysisView::~AnalysisView()
 void
 AnalysisView::setRide(RideItem *ride)
 {
+    if (!loaded) return; // not loaded yet, all bets are off till then.
+
     // when ride selected, but not from the sidebar.
     static_cast<AnalysisSidebar*>(sidebar())->setRide(ride); // save settings
 
@@ -286,6 +288,7 @@ TrendsView::justSelected()
 TrainView::TrainView(Context *context, QStackedWidget *controls) : AbstractView(context, VIEW_TRAIN)
 {
     trainTool = new TrainSidebar(context);
+    trainTool->setTrainView(this);
     trainTool->hide();
     BlankStateTrainPage *b = new BlankStateTrainPage(context);
 

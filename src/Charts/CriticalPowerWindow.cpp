@@ -1794,7 +1794,7 @@ CriticalPowerWindow::dateRangeChanged(DateRange dateRange)
             cpPlot->setSport(sport);
         } else {
             cpPlot->setDateCV(0.0);
-            cpPlot->setSport("");
+            cpPlot->setSport(sport);
         }
 
         cpPlot->setDateRange(dateRange.from, dateRange.to, stale);
