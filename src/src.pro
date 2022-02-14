@@ -19,10 +19,8 @@ greaterThan(QT_MAJOR_VERSION, 5) {
 include(gcconfig.pri)
 
 # You can also define your own local source to add to build
-HEADERS += $${LOCALHEADERS} \
-    Cloud/Nolio.h
-SOURCES += $${LOCALSOURCES} \
-    Cloud/Nolio.cpp
+HEADERS += $${LOCALHEADERS}
+SOURCES += $${LOCALSOURCES}
 
 ###=====================
 ### GOLDENCHEETAH TARGET
@@ -617,6 +615,8 @@ greaterThan(QT_MAJOR_VERSION, 4) {
         HEADERS += Cloud/SportTracks.h
         SOURCES += Cloud/TodaysPlan.cpp
         HEADERS += Cloud/TodaysPlan.h
+        SOURCES += Cloud/Nolio.cpp
+        HEADERS += Cloud/Nolio.h
     }
 
     SOURCES += Train/MonarkController.cpp Train/MonarkConnection.cpp
