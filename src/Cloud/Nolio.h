@@ -23,7 +23,6 @@
 #include <QNetworkAccessManager>
 #include <QNetworkRequest>
 #include <QImage>
-#include <QDebug>
 
 class Nolio : public CloudService {
 

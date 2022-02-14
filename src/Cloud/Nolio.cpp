@@ -259,11 +259,11 @@ QByteArray* Nolio::prepareResponse(QByteArray* data){
         // set sport and subsport
         if (!activity["sport_id"].isNull()) {
             double sport_id = activity["sport_id"].toDouble();
-            if (sport_id == 14 or sport_id == 15 or sport_id == 18 or sport_id == 28 or sport_id == 35 or sport_id == 36) ride->setTag("Sport", "Bike");
+            if (sport_id == 14 || sport_id == 15 || sport_id == 18 || sport_id == 28 || sport_id == 35 || sport_id == 36) ride->setTag("Sport", "Bike");
             else if (sport_id == 23) ride->setTag("Sport", "Run");
             else if (sport_id == 19) ride->setTag("Sport", "Swim");
-            else if (sport_id == 33 or sport_id == 69) ride->setTag("Sport", "Row");
-            else if (sport_id == 3 or sport_id == 4) ride->setTag("Sport", "Ski");
+            else if (sport_id == 33 || sport_id == 69) ride->setTag("Sport", "Row");
+            else if (sport_id == 3 || sport_id == 4) ride->setTag("Sport", "Ski");
             else ride->setTag("Sport", activity["sport"].toString());
             ride->setTag("SubSport", activity["sport"].toString());
         }
