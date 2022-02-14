@@ -114,7 +114,7 @@ OAuthDialog::OAuthDialog(Context *context, OAuthSite site, CloudService *service
     } else if (site == DROPBOX) {
 
         urlstr = QString("https://www.dropbox.com/oauth2/authorize?");
-#ifdef GC_DROPBOX_CLIENT_ID \
+#ifdef GC_DROPBOX_CLIENT_ID
         urlstr.append("client_id=").append(GC_DROPBOX_CLIENT_ID).append("&");
 #endif
         urlstr.append("redirect_uri=https://goldencheetah.github.io/blank.html&");
