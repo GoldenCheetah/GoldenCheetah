@@ -10151,6 +10151,11 @@ le sugerirá los posibles nombres
         <source>Extended CP</source>
         <translation>PC extendida</translation>
     </message>
+    <message>
+        <location filename="../../Metrics/PDModel.cpp" line="1320"/>
+        <source>RMSE %1w CV %3% [envelope] %2 points</source>
+        <translation>RMSE %1w CV %3% [envolvente] %2 puntos</translation>
+    </message>
 </context>
 <context>
     <name>FatigueIndex</name>
@@ -21824,6 +21829,21 @@ No se han encontrado actividades para importar.
         <location filename="../../Metrics/PDModel.h" line="123"/>
         <source>Base Model</source>
         <translation>Modelo base</translation>
+    </message>
+    <message>
+        <location filename="../../Metrics/PDModel.cpp" line="213"/>
+        <source>RMSE %1w CV %4% R&lt;sup&gt;2&lt;/sup&gt;=%3 [LR] %2 points</source>
+        <translation>RMSE %1w CV %4% R&lt;sup&gt;2&lt;/sup&gt;=%3 [LR] %2 puntos</translation>
+    </message>
+    <message>
+        <location filename="../../Metrics/PDModel.cpp" line="332"/>
+        <source>RMSE %1w CV %3% [LM] %2 points</source>
+        <translation>RMSE %1w CV %3% [LM] %2 puntos</translation>
+    </message>
+    <message>
+        <location filename="../../Metrics/PDModel.cpp" line="479"/>
+        <source>RMSE %1w CV %3% [envelope] %2 points</source>
+        <translation>RMSE %1w CV %3% [envolvente] %2 puntos</translation>
     </message>
 </context>
 <context>
