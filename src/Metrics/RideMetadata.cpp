@@ -407,7 +407,7 @@ RideMetadata::configChanged(qint32)
         setExtraTab();
 
         // add editor
-        tabs->addTab(editor, "Raw Data");
+        tabs->addTab(editor, tr("Raw Data"));
 
         // tab bar look reasonably modern
         QString styling = QString("QTabWidget { background: %1; }"

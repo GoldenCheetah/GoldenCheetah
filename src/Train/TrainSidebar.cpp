@@ -1384,10 +1384,6 @@ void TrainSidebar::Pause()        // pause capture to recalibrate
 
 void TrainSidebar::Stop(int deviceStatus)        // when stop button is pressed
 {
-    // Mutual exclusion with ANT+/BTLE threads to close the rr/vo2 files
-    QMutexLocker rrlocker(&rrMutex);
-    QMutexLocker vo2locker(&vo2Mutex);
-
     if ((status&RT_RUNNING) == 0) return;
 
     // re-enable the screen saver on Windows
@@ -1434,6 +1430,13 @@ void TrainSidebar::Stop(int deviceStatus)        // when stop button is pressed
         // close and reset File
         recordFile->close();
 
+        // Request mutual exclusion with ANT+/BTLE threads to change status and close rr/vo2 files
+        rrMutex.lock();
+        vo2Mutex.lock();
+
+        // cancel recording
+        status &= ~RT_RECORDING;
+
         // close rrFile
         if (rrFile) {
             //fprintf(stderr, "Closing r-r file\n"); fflush(stderr);
@@ -1450,6 +1453,10 @@ void TrainSidebar::Stop(int deviceStatus)        // when stop button is pressed
             vo2File=NULL;
         }
 
+        // Release mutual exclusion with ANT+/BTLE threads before to open import dialog to avoid deadlocks
+        rrMutex.unlock();
+        vo2Mutex.unlock();
+
         if(deviceStatus == DEVICE_ERROR)
         {
             recordFile->remove();
@@ -1465,9 +1472,6 @@ void TrainSidebar::Stop(int deviceStatus)        // when stop button is pressed
             RideImportWizard *dialog = new RideImportWizard (list, context);
             dialog->process(); // do it!
         }
-
-        // cancel recording
-        status &= ~RT_RECORDING;
     }
 
     load_timer->stop();
