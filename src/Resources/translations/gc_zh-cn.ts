@@ -267,12 +267,12 @@ It might be necessary to manually disable it.</source>
     <message>
         <location filename="../../Train/WorkoutWizard.cpp" line="274"/>
         <source>Workout Wizard</source>
-        <translation>训练向导</translation>
+        <translation>训练课程向导</translation>
     </message>
     <message>
         <location filename="../../Train/WorkoutWizard.cpp" line="275"/>
         <source>Absolute Wattage Workout Creator</source>
-        <translation>绝对功率训练</translation>
+        <translation>绝对功率训练课程</translation>
     </message>
     <message>
         <location filename="../../Train/WorkoutWizard.cpp" line="279"/>
@@ -293,7 +293,7 @@ It might be necessary to manually disable it.</source>
     <message>
         <location filename="../../Train/WorkoutWizard.cpp" line="363"/>
         <source>Save Workout</source>
-        <translation>保存训练</translation>
+        <translation>保存训练课程</translation>
     </message>
     <message>
         <location filename="../../Train/WorkoutWizard.cpp" line="364"/>
@@ -306,7 +306,7 @@ It might be necessary to manually disable it.</source>
     <message>
         <location filename="../../Gui/AbstractView.cpp" line="67"/>
         <source>Compare Activities and Intervals</source>
-        <translation>比较活动和区段</translation>
+        <translation>比较活动和间歇</translation>
     </message>
     <message>
         <location filename="../../Gui/AbstractView.cpp" line="68"/>
@@ -482,7 +482,7 @@ It might be necessary to manually disable it.</source>
     <message>
         <location filename="../../Cloud/AddCloudWizard.cpp" line="114"/>
         <source>Sync planned workouts to WebDAV and CalDAV calendars like Google Calendar.</source>
-        <translation>同步计划训练至WebDAV和CalDAV日历(如Google日历).</translation>
+        <translation>同步计划训练课程至WebDAV和CalDAV日历(如Google日历).</translation>
     </message>
     <message>
         <location filename="../../Cloud/AddCloudWizard.cpp" line="107"/>
@@ -501,7 +501,7 @@ It might be necessary to manually disable it.</source>
     </message>
     <message>
         <source>Sync planned workouts to WebDAV and CalDAV calendars.</source>
-        <translation type="vanished">同步计划训练至WebDAV和CalDAV日历</translation>
+        <translation type="vanished">同步计划训练课程至WebDAV和CalDAV日历</translation>
     </message>
 </context>
 <context>
@@ -1097,7 +1097,7 @@ If you choose to copy to library the file will be copied into the GoldenCheetah 
     <message>
         <location filename="../../Gui/AddIntervalDialog.cpp" line="40"/>
         <source>Find Intervals</source>
-        <translation>寻找区段</translation>
+        <translation>寻找间歇</translation>
     </message>
     <message>
         <location filename="../../Gui/AddIntervalDialog.cpp" line="64"/>
@@ -1289,13 +1289,13 @@ If you choose to copy to library the file will be copied into the GoldenCheetah 
         <location filename="../../Gui/AddIntervalDialog.cpp" line="530"/>
         <location filename="../../Gui/AddIntervalDialog.cpp" line="555"/>
         <source>Bad Interval Length</source>
-        <translation>无效的区段长度</translation>
+        <translation>无效的间歇长度</translation>
     </message>
     <message>
         <location filename="../../Gui/AddIntervalDialog.cpp" line="530"/>
         <location filename="../../Gui/AddIntervalDialog.cpp" line="555"/>
         <source>Interval length must be greater than zero!</source>
-        <translation>区段长度应大于0！</translation>
+        <translation>间歇长度应大于0！</translation>
     </message>
 </context>
 <context>
@@ -1465,17 +1465,17 @@ If you choose to copy to library the file will be copied into the GoldenCheetah 
     <message>
         <location filename="../../Gui/Perspective.cpp" line="1905"/>
         <source>Erg Workout</source>
-        <translation>Erg训练</translation>
+        <translation>Erg训练课程</translation>
     </message>
     <message>
         <location filename="../../Gui/Perspective.cpp" line="1906"/>
         <source>Slope Workout</source>
-        <translation>坡度训练</translation>
+        <translation>坡度训练课程</translation>
     </message>
     <message>
         <location filename="../../Gui/Perspective.cpp" line="1907"/>
         <source>Video Workout</source>
-        <translation>视频训练</translation>
+        <translation>视频训练课程</translation>
     </message>
     <message>
         <location filename="../../Gui/Perspective.cpp" line="1909"/>
@@ -2729,17 +2729,17 @@ Press Next to Continue
     <message>
         <location filename="../../Charts/AllPlotWindow.cpp" line="252"/>
         <source>Show Interval Markers</source>
-        <translation>显示区段标记</translation>
+        <translation>显示间歇标记</translation>
     </message>
     <message>
         <location filename="../../Charts/AllPlotWindow.cpp" line="256"/>
         <source>Interval Navigator</source>
-        <translation>区段导航</translation>
+        <translation>间歇导航</translation>
     </message>
     <message>
         <location filename="../../Charts/AllPlotWindow.cpp" line="260"/>
         <source>Hover intervals</source>
-        <translation>鼠标悬停显示区段</translation>
+        <translation>鼠标悬停显示间歇</translation>
     </message>
     <message>
         <location filename="../../Charts/AllPlotWindow.cpp" line="268"/>
@@ -3031,7 +3031,7 @@ Press Next to Continue
     <message>
         <location filename="../../Charts/AllPlotWindow.cpp" line="743"/>
         <source>Intervals</source>
-        <translation>区段</translation>
+        <translation>间歇</translation>
     </message>
     <message>
         <location filename="../../Charts/AllPlotWindow.cpp" line="2255"/>
@@ -3095,7 +3095,7 @@ Press Next to Continue
     <message>
         <location filename="../../Gui/AnalysisSidebar.cpp" line="138"/>
         <source>Intervals</source>
-        <translation>区段</translation>
+        <translation>间歇</translation>
     </message>
     <message>
         <location filename="../../Gui/AnalysisSidebar.cpp" line="388"/>
@@ -3154,7 +3154,7 @@ Press Next to Continue
     <message>
         <location filename="../../Gui/AnalysisSidebar.cpp" line="484"/>
         <source>Sort User Intervals</source>
-        <translation>排序用户区段</translation>
+        <translation>排序用户间歇</translation>
     </message>
     <message>
         <location filename="../../Gui/AnalysisSidebar.cpp" line="571"/>
@@ -3199,7 +3199,7 @@ Press Next to Continue
     <message>
         <location filename="../../Gui/AnalysisSidebar.cpp" line="809"/>
         <source>Are you sure you want to delete selected interval?</source>
-        <translation>确认删除选中的区段?</translation>
+        <translation>确认删除选中的间歇?</translation>
     </message>
     <message>
         <location filename="../../Gui/AnalysisSidebar.cpp" line="810"/>
@@ -3210,12 +3210,12 @@ Press Next to Continue
     <message>
         <location filename="../../Gui/AnalysisSidebar.cpp" line="836"/>
         <source>Delete Interval</source>
-        <translation>删除区段</translation>
+        <translation>删除间歇</translation>
     </message>
     <message>
         <location filename="../../Gui/AnalysisSidebar.cpp" line="836"/>
         <source>Unable to delete interval</source>
-        <translation>无法删除区段</translation>
+        <translation>无法删除间歇</translation>
     </message>
     <message>
         <location filename="../../Gui/AnalysisSidebar.cpp" line="858"/>
@@ -3226,7 +3226,7 @@ Press Next to Continue
         <location filename="../../Gui/AnalysisSidebar.cpp" line="408"/>
         <location filename="../../Gui/AnalysisSidebar.cpp" line="478"/>
         <source>Find Intervals...</source>
-        <translation>寻找区段</translation>
+        <translation>寻找间歇</translation>
     </message>
     <message>
         <location filename="../../Gui/AnalysisSidebar.cpp" line="492"/>
@@ -3237,31 +3237,31 @@ Press Next to Continue
         <location filename="../../Gui/AnalysisSidebar.cpp" line="499"/>
         <location filename="../../Gui/AnalysisSidebar.cpp" line="556"/>
         <source>Zoom to interval</source>
-        <translation>放大至区段</translation>
+        <translation>放大至间歇</translation>
     </message>
     <message>
         <location filename="../../Gui/AnalysisSidebar.cpp" line="507"/>
         <location filename="../../Gui/AnalysisSidebar.cpp" line="565"/>
         <source>Edit interval</source>
-        <translation>编辑区段</translation>
+        <translation>编辑间歇</translation>
     </message>
     <message>
         <location filename="../../Gui/AnalysisSidebar.cpp" line="508"/>
         <location filename="../../Gui/AnalysisSidebar.cpp" line="576"/>
         <source>Delete interval</source>
-        <translation>删除区段</translation>
+        <translation>删除间歇</translation>
     </message>
     <message>
         <location filename="../../Gui/AnalysisSidebar.cpp" line="518"/>
         <location filename="../../Gui/AnalysisSidebar.cpp" line="584"/>
         <source>Rename selected intervals</source>
-        <translation>重命名选中区段</translation>
+        <translation>重命名选中间歇</translation>
     </message>
     <message>
         <location filename="../../Gui/AnalysisSidebar.cpp" line="520"/>
         <location filename="../../Gui/AnalysisSidebar.cpp" line="586"/>
         <source>Delete selected intervals</source>
-        <translation>删除选中的区段</translation>
+        <translation>删除选中的间歇</translation>
     </message>
     <message>
         <location filename="../../Gui/AnalysisSidebar.cpp" line="555"/>
@@ -3272,7 +3272,7 @@ Press Next to Continue
         <location filename="../../Gui/AnalysisSidebar.cpp" line="650"/>
         <location filename="../../Gui/AnalysisSidebar.cpp" line="652"/>
         <source>Find Intervals</source>
-        <translation>寻找区段</translation>
+        <translation>寻找间歇</translation>
     </message>
 </context>
 <context>
@@ -3615,7 +3615,7 @@ Press Next to Continue
     </message>
     <message>
         <location filename="../../FileIO/AthleteBackup.cpp" line="105"/>
-        <source>Backup successfully stored in 
+        <source>Backup successfully stored in
 %1</source>
         <translation>成功备份语
 %1</translation>
@@ -3695,7 +3695,7 @@ Press Next to Continue
     <message>
         <location filename="../../Gui/AthleteView.cpp" line="295"/>
         <source>Last workout %1 days ago</source>
-        <translation>最后训练在%1天前</translation>
+        <translation>最后训练课程在%1天前</translation>
     </message>
 </context>
 <context>
@@ -4906,7 +4906,7 @@ Press Next to Continue
     <name>BestIntervalDialog</name>
     <message>
         <source>Interval length: </source>
-        <translation type="vanished">区段长度: </translation>
+        <translation type="vanished">间歇长度: </translation>
     </message>
     <message>
         <source>How many to find: </source>
@@ -4918,7 +4918,7 @@ Press Next to Continue
     </message>
     <message>
         <source>&amp;Find Intervals</source>
-        <translation type="vanished">寻找区段(&amp;F)</translation>
+        <translation type="vanished">寻找间歇(&amp;F)</translation>
     </message>
     <message>
         <source>&amp;Done</source>
@@ -4926,7 +4926,7 @@ Press Next to Continue
     </message>
     <message>
         <source>&amp;Add to Intervals</source>
-        <translation type="vanished">添加至区段(&amp;A)</translation>
+        <translation type="vanished">添加至间歇(&amp;A)</translation>
     </message>
     <message>
         <source>Select Activity</source>
@@ -4938,11 +4938,11 @@ Press Next to Continue
     </message>
     <message>
         <source>Bad Interval Length</source>
-        <translation type="vanished">区段长度无效</translation>
+        <translation type="vanished">间歇长度无效</translation>
     </message>
     <message>
         <source>Interval length must be greater than zero!</source>
-        <translation type="vanished">区段长度应大于0</translation>
+        <translation type="vanished">间歇长度应大于0</translation>
     </message>
 </context>
 <context>
@@ -5491,7 +5491,7 @@ Let&apos;s start with some data.</source>
         <location filename="../../Charts/BlankState.cpp" line="243"/>
         <source>No devices or workouts ?
 Let&apos;s get you setup.</source>
-        <translation>沒有设备或训练?
+        <translation>沒有设备或训练课程?
 开始设定吧!</translation>
     </message>
     <message>
@@ -5507,7 +5507,7 @@ Let&apos;s get you setup.</source>
     <message>
         <location filename="../../Charts/BlankState.cpp" line="259"/>
         <source>Find and Import your videos and workouts.</source>
-        <translation>寻找并导入视频和训练</translation>
+        <translation>寻找并导入视频和训练课程</translation>
     </message>
     <message>
         <location filename="../../Charts/BlankState.cpp" line="260"/>
@@ -5517,12 +5517,12 @@ Let&apos;s get you setup.</source>
     <message>
         <location filename="../../Charts/BlankState.cpp" line="266"/>
         <source>Download workout files from the Erg DB.</source>
-        <translation>从ErgDB下载训练</translation>
+        <translation>从ErgDB下载训练课程</translation>
     </message>
     <message>
         <location filename="../../Charts/BlankState.cpp" line="267"/>
         <source>Download workouts</source>
-        <translation>下载训练</translation>
+        <translation>下载训练课程</translation>
     </message>
 </context>
 <context>
@@ -5880,7 +5880,7 @@ Let&apos;s get you setup.</source>
         <location filename="../../Charts/CPPlot.cpp" line="81"/>
         <location filename="../../Charts/CPPlot.cpp" line="330"/>
         <source>Interval Length</source>
-        <translation>区段长度</translation>
+        <translation>间歇长度</translation>
     </message>
     <message>
         <location filename="../../Charts/CPPlot.cpp" line="95"/>
@@ -6558,15 +6558,15 @@ yyyy年M月d日,ddd</translation>
     <message>
         <source>Form</source>
         <translatorcomment>TC</translatorcomment>
-        <translation type="vanished">竞技状态</translation>
+        <translation type="vanished">状态值</translation>
     </message>
     <message>
         <source>Fitness</source>
-        <translation type="vanished">健康状态</translation>
+        <translation type="vanished">健康度</translation>
     </message>
     <message>
         <source>Fatigue</source>
-        <translation type="vanished">疲劳</translation>
+        <translation type="vanished">疲劳度</translation>
     </message>
     <message>
         <source>Risk</source>
@@ -7598,7 +7598,7 @@ Are you sure?</source>
     <message>
         <location filename="../../Cloud/CloudService.cpp" line="765"/>
         <source>Workout Name</source>
-        <translation>活动名称</translation>
+        <translation>训练课程名称</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudService.cpp" line="766"/>
@@ -7631,7 +7631,7 @@ Are you sure?</source>
         <location filename="../../Cloud/CloudService.cpp" line="770"/>
         <location filename="../../Cloud/CloudService.cpp" line="838"/>
         <source>Workout Id</source>
-        <translation>训练Id</translation>
+        <translation>训练课程Id</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudService.cpp" line="792"/>
@@ -7697,7 +7697,7 @@ Are you sure?</source>
     </message>
     <message>
         <location filename="../../Cloud/CloudService.cpp" line="913"/>
-        <source>Changes in activities which are not saved, will not be synchronized. 
+        <source>Changes in activities which are not saved, will not be synchronized.
 
 This may lead to inconsistencies between your local GoldenCheetah activities and the uploaded activities. We recommend to save the changed activities before proceeding.</source>
         <translation>活动中未保存的修改将不会被同步.
@@ -7846,7 +7846,7 @@ This may lead to inconsistencies between your local GoldenCheetah activities and
     </message>
     <message>
         <location filename="../../Cloud/CloudService.cpp" line="344"/>
-        <source>Unsaved changes in activities will be uploaded as well. 
+        <source>Unsaved changes in activities will be uploaded as well.
 
 This may lead to inconsistencies between your local activities and the uploaded activities if you do not save the activity in GoldenCheetah. We recommend to save the changed activity before proceeding.</source>
         <translation>活动中未保存的修改也将会被上传.
@@ -8027,7 +8027,7 @@ This may lead to inconsistencies between your local activities and the uploaded 
     <message>
         <location filename="../../Gui/ComparePane.cpp" line="228"/>
         <source>Interval</source>
-        <translation>区段</translation>
+        <translation>间歇</translation>
     </message>
     <message>
         <location filename="../../Gui/ComparePane.cpp" line="363"/>
@@ -8082,7 +8082,7 @@ This may lead to inconsistencies between your local activities and the uploaded 
     <message>
         <location filename="../../Gui/ConfigDialog.cpp" line="99"/>
         <source>Intervals</source>
-        <translation>区段</translation>
+        <translation>间歇</translation>
     </message>
     <message>
         <location filename="../../Gui/ConfigDialog.cpp" line="103"/>
@@ -8508,7 +8508,7 @@ Do you want to apply and restart GoldenCheetah?</source>
     <message>
         <location filename="../../Charts/CriticalPowerWindow.cpp" line="266"/>
         <source>Shade Intervals</source>
-        <translation>区段阴影</translation>
+        <translation>间歇阴影</translation>
     </message>
     <message>
         <location filename="../../Charts/CriticalPowerWindow.cpp" line="271"/>
@@ -8589,7 +8589,7 @@ Do you want to apply and restart GoldenCheetah?</source>
     <message>
         <location filename="../../Charts/CriticalPowerWindow.cpp" line="317"/>
         <source>Search Interval</source>
-        <translation>搜索区段</translation>
+        <translation>搜索间歇</translation>
     </message>
     <message>
         <location filename="../../Charts/CriticalPowerWindow.cpp" line="318"/>
@@ -9886,7 +9886,7 @@ You may need to (re)install the FTDI or PL2303 drivers before downloading.</sour
     <message>
         <location filename="../../Core/IntervalItem.cpp" line="186"/>
         <source>Edit Interval</source>
-        <translation>编辑区段</translation>
+        <translation>编辑间歇</translation>
     </message>
     <message>
         <location filename="../../Core/IntervalItem.cpp" line="208"/>
@@ -10083,7 +10083,7 @@ You may need to (re)install the FTDI or PL2303 drivers before downloading.</sour
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="1943"/>
         <source>Stress Ramp Rate  (RR)</source>
-        <translation>压力缓变率(RR)</translation>
+        <translation>压力变化率(RR)</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="1951"/>
@@ -10954,7 +10954,7 @@ You may need to (re)install the FTDI or PL2303 drivers before downloading.</sour
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="144"/>
         <source>Only useful for intervals, time the interval started</source>
-        <translation>仅对区段有用, 区段开始的时间</translation>
+        <translation>仅对间歇有用, 间歇开始的时间</translation>
     </message>
 </context>
 <context>
@@ -11033,7 +11033,7 @@ You may need to (re)install the FTDI or PL2303 drivers before downloading.</sour
     <message>
         <location filename="../../Train/ErgDBDownloadDialog.cpp" line="28"/>
         <source>Download workouts from ErgDB</source>
-        <translation>从ErgDB下载训练</translation>
+        <translation>从ErgDB下载训练课程</translation>
     </message>
     <message>
         <location filename="../../Train/ErgDBDownloadDialog.cpp" line="46"/>
@@ -11080,7 +11080,7 @@ You may need to (re)install the FTDI or PL2303 drivers before downloading.</sour
     <message>
         <location filename="../../Train/ErgDBDownloadDialog.cpp" line="92"/>
         <source>Overwrite existing workouts</source>
-        <translation>覆盖已有训练</translation>
+        <translation>覆盖已有训练课程</translation>
     </message>
     <message>
         <location filename="../../Train/ErgDBDownloadDialog.cpp" line="93"/>
@@ -11101,7 +11101,7 @@ You may need to (re)install the FTDI or PL2303 drivers before downloading.</sour
     <message>
         <location filename="../../Train/ErgDBDownloadDialog.cpp" line="137"/>
         <source>%1 workouts downloaded, %2 failed or skipped.</source>
-        <translation>完成%1个训练下载,失败或跳过%2个.</translation>
+        <translation>完成%1个训练课程下载,失败或跳过%2个.</translation>
     </message>
     <message>
         <location filename="../../Train/ErgDBDownloadDialog.cpp" line="138"/>
@@ -11682,7 +11682,7 @@ You may need to (re)install the FTDI or PL2303 drivers before downloading.</sour
     </message>
     <message>
         <source>Workout Id</source>
-        <translation type="vanished">训练Id</translation>
+        <translation type="vanished">训练课程Id</translation>
     </message>
     <message>
         <source>Date</source>
@@ -11690,7 +11690,7 @@ You may need to (re)install the FTDI or PL2303 drivers before downloading.</sour
     </message>
     <message>
         <source>Workout Name</source>
-        <translation type="vanished">活动名称</translation>
+        <translation type="vanished">训练课程名称</translation>
     </message>
     <message>
         <source>Time</source>
@@ -11890,7 +11890,7 @@ You may need to (re)install the FTDI or PL2303 drivers before downloading.</sour
         <translation>过滤R-R逸出值 (参见HRV X数据中的&quot;R-R标志&quot;). 非逸出值记为&quot;1&quot;.
   - &quot;R-R最小值和最大值&quot; 排除最值之外的样本 (标志 -1). 与过滤范围同时有效.
   - &quot;过滤范围&quot; 平均值附近一定窗口内的范围 (标志 0).
-  - &quot;过滤窗口大小&quot; 目前区段两侧的距离.
+  - &quot;过滤窗口大小&quot; 目前间歇两侧的距离.
   - &quot;设置静息HRV&quot; 若选中, 计算得到的HRV指标将被设为静息HRV参数
 </translation>
     </message>
@@ -11903,7 +11903,7 @@ You may need to (re)install the FTDI or PL2303 drivers before downloading.</sour
         <translation type="vanished">过滤R-R逸出值 (参见HRV X数据中的&quot;R-R标志&quot;). 非逸出值记为&quot;1&quot;.
   - &quot;R-R最小值和最大值&quot; 排除最值之外的样本 (标志 1). 与过滤范围同时有效.
   - &quot;过滤范围&quot; 平均值附近一定窗口内的范围 (标志 0).
-  - &quot;过滤窗口大小&quot; 目前区段两侧的距离.
+  - &quot;过滤窗口大小&quot; 目前间歇两侧的距离.
 </translation>
     </message>
 </context>
@@ -12941,21 +12941,21 @@ This function will look for spikes/anomalies in SmO2 data and replace the errone
     </message>
     <message>
         <location filename="../../FileIO/FixSmO2.cpp" line="74"/>
-        <source>Occasionally SmO2 (%) and/or tHb (%) will erroneously report missing or high values (SmO2: 0% or &gt;100% / tHb: 0% or &gt; max. tHb parameter). 
+        <source>Occasionally SmO2 (%) and/or tHb (%) will erroneously report missing or high values (SmO2: 0% or &gt;100% / tHb: 0% or &gt; max. tHb parameter).
 
  This function will look for those anomalies in SmO2 and tHb data and depending on the configuration replace the erroneous data by smoothing/interpolating the data from either side of the 3 points in question. It takes the following parameters:
 
-Fix SmO2 - check to fix anomalies in SmO2 data 
-Fix tHb - check to fix anomalies in tHb data 
-Max. tHb - any tHb above is considered an outlier 
+Fix SmO2 - check to fix anomalies in SmO2 data
+Fix tHb - check to fix anomalies in tHb data
+Max. tHb - any tHb above is considered an outlier
 </source>
         <translation>偶尔,SmO2(%)和/或tHb(%)会报告错误的值(SmO2:0%或&gt;100%/tHb:0%或大于最大tHb).
 
 本功能将在SmO2和tHb数据中搜索这些异常,并使用异常数据一侧的3个数据点对其进行平滑/插值后替换.需要以下参数:
 
-修正SmO2 - 检查并修正SmO2数据的异常 
-修正 - 检查并修正tHb数据的异常 
-最大tHb - 任何大于此值的tHb将被视为异常 
+修正SmO2 - 检查并修正SmO2数据的异常
+修正 - 检查并修正tHb数据的异常
+最大tHb - 任何大于此值的tHb将被视为异常
 </translation>
     </message>
 </context>
@@ -13024,7 +13024,7 @@ Moving Average Seconds parameter allows to set the seconds of the MA filter to s
         <location filename="../../FileIO/FixSpikes.cpp" line="98"/>
         <source>Power meters will occasionally report erroneously high values for power. For crank based power meters such as SRM and Quarq this is caused by an erroneous cadence reading as a result of triggering a reed switch whilst pushing off.
 
-This function provides two algorithms that look for spikes/anomalies in power data and replace the erroneous data by: 
+This function provides two algorithms that look for spikes/anomalies in power data and replace the erroneous data by:
 
 i) Replacing the point in question with smoothed/interpolated data from either side of the point in question, it takes the following parameters:
 
@@ -13244,7 +13244,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Gui/Colors.cpp" line="149"/>
         <source>Interval Highlighter</source>
-        <translation>区段高亮</translation>
+        <translation>间歇高亮</translation>
     </message>
     <message>
         <location filename="../../Gui/Colors.cpp" line="150"/>
@@ -13658,12 +13658,12 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Gui/Colors.cpp" line="207"/>
         <source>Calendar Actual Workout</source>
-        <translation>日历 - 训练</translation>
+        <translation>日历 - 训练课程</translation>
     </message>
     <message>
         <location filename="../../Gui/Colors.cpp" line="208"/>
         <source>Calendar Planned Workout</source>
-        <translation>日历 - 计划训练</translation>
+        <translation>日历 - 计划训练课程</translation>
     </message>
     <message>
         <location filename="../../Gui/Colors.cpp" line="209"/>
@@ -14199,7 +14199,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Core/GcUpgrade.cpp" line="570"/>
         <source>%1 media and workout files moved to subdirectory: \%2 - %3 failed</source>
-        <translation>已移动%1个媒体和训练文件至子文件夹: \%2 - 失败%3个</translation>
+        <translation>已移动%1个媒体和训练课程文件至子文件夹: \%2 - 失败%3个</translation>
     </message>
     <message>
         <location filename="../../Core/GcUpgrade.cpp" line="776"/>
@@ -14264,7 +14264,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Core/GcUpgrade.cpp" line="555"/>
         <source>Start copying of: Media and Workout files... </source>
-        <translation>开始复制:媒体和训练文件...</translation>
+        <translation>开始复制:媒体和训练课程文件...</translation>
     </message>
     <message>
         <location filename="../../Core/GcUpgrade.cpp" line="626"/>
@@ -14616,7 +14616,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Gui/GcWindowRegistry.cpp" line="108"/>
         <source>Workout</source>
-        <translation>训练</translation>
+        <translation>训练课程</translation>
     </message>
     <message>
         <location filename="../../Gui/GcWindowRegistry.cpp" line="109"/>
@@ -14655,7 +14655,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Gui/GcWindowRegistry.cpp" line="112"/>
         <source>Workout Editor</source>
-        <translation>训练编辑器</translation>
+        <translation>训练课程编辑器</translation>
     </message>
 </context>
 <context>
@@ -14806,7 +14806,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     </message>
     <message>
         <source>Workout and VideoSync Library</source>
-        <translation type="vanished">训练和视频同步库</translation>
+        <translation type="vanished">训练课程和视频同步库</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="250"/>
@@ -14870,7 +14870,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     </message>
     <message>
         <source>Workout and VideoSync Library:</source>
-        <translation type="vanished">训练和视频同步文件夹:</translation>
+        <translation type="vanished">训练课程和视频同步文件夹:</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="438"/>
@@ -14899,7 +14899,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     </message>
     <message>
         <source>Select Workout Library</source>
-        <translation type="vanished">选择训练文件夹</translation>
+        <translation type="vanished">选择训练课程文件夹</translation>
     </message>
 </context>
 <context>
@@ -15063,7 +15063,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <name>GoogleMapControl</name>
     <message>
         <source>Intervals</source>
-        <translation type="vanished">区段</translation>
+        <translation type="vanished">间歇</translation>
     </message>
     <message>
         <source>Route</source>
@@ -15092,16 +15092,16 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Train/WorkoutWizard.cpp" line="547"/>
         <source>Workout Wizard</source>
-        <translation>训练向导</translation>
+        <translation>训练课程向导</translation>
     </message>
     <message>
         <source>Manually create a workout based on gradient (slope) and distance, maximum grade is 5.</source>
-        <translation type="vanished">根据坡度和距离手动创建训练,最大坡度为5.</translation>
+        <translation type="vanished">根据坡度和距离手动创建训练课程,最大坡度为5.</translation>
     </message>
     <message>
         <location filename="../../Train/WorkoutWizard.cpp" line="549"/>
         <source>Manually create a workout based on gradient (slope) and distance, maximum grade is +-40.</source>
-        <translation>根据坡度和距离手动创建训练,最大坡度为+-40.</translation>
+        <translation>根据坡度和距离手动创建训练课程,最大坡度为+-40.</translation>
     </message>
     <message>
         <location filename="../../Train/WorkoutWizard.cpp" line="555"/>
@@ -15133,7 +15133,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Train/WorkoutWizard.cpp" line="602"/>
         <source>Save Workout</source>
-        <translation>保存训练</translation>
+        <translation>保存训练课程</translation>
     </message>
     <message>
         <location filename="../../Train/WorkoutWizard.cpp" line="603"/>
@@ -15391,7 +15391,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="79"/>
         <source>Ride indoors, following pre-programmed workouts - with multi device and video playback support</source>
-        <translation>按照预定训练的室内骑行,支持多种设备和视频播放</translation>
+        <translation>按照预定训练课程的室内骑行,支持多种设备和视频播放</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="87"/>
@@ -15457,12 +15457,12 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="138"/>
         <source>Creation of a new Workout for Train - Indoor Riding</source>
-        <translation>创建室内训练</translation>
+        <translation>创建室内训练课程</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="140"/>
         <source>Search for Workout files and Video files in a configurable set of folders and add to the Train - Indoor Riding - Workout/Video library</source>
-        <translation>搜索并添加室内训练文件和视频文件至训练/视频库</translation>
+        <translation>搜索并添加室内训练课程文件和视频文件至训练课程/视频库</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="77"/>
@@ -15472,12 +15472,12 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="93"/>
         <source>Activate / De-activate the Compare Pane - which allows to compare activities, intervals or date ranges - also across athletes</source>
-        <translation>激活/关闭比较面板 - 可对比活动,区段或数据范围,并能在不同运动员之间比较</translation>
+        <translation>激活/关闭比较面板 - 可对比活动,间歇或数据范围,并能在不同运动员之间比较</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="108"/>
         <source>Laps Editor allows to enter a sequence of work-rest intervals series -defined by number of repetitions (reps), distance (dist, units according to preferences in Pace Zones) and duration (min and sec)- to generate the data points for the activity</source>
-        <translation>通过计圈编辑器可根据重复次数,距离和事件输入一系列区段,从而生成活动的数据点</translation>
+        <translation>通过计圈编辑器可根据重复次数,距离和事件输入一系列间歇,从而生成活动的数据点</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="121"/>
@@ -15576,7 +15576,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="185"/>
         <source>Full configurable chart type to track performance and trends for metrics, user-definable best durations and model estimates</source>
-        <translation>跟踪表现,指标趋势,用户定义最佳区段和模型预测的可完全自定义图表类型</translation>
+        <translation>跟踪表现,指标趋势,用户定义最佳间歇和模型预测的可完全自定义图表类型</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="187"/>
@@ -15682,7 +15682,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="274"/>
         <source>Display of the content of the currently selected workout</source>
-        <translation>显示目前选中活动的内容</translation>
+        <translation>显示目前选中训练课程的内容</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="276"/>
@@ -15702,12 +15702,12 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="282"/>
         <source>Edition and diplay of ergometer type workout files</source>
-        <translation>编辑和显示Ergometer训练文件</translation>
+        <translation>编辑和显示Ergometer训练课程文件</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="284"/>
         <source>Real time display of the route of simulation workouts in an Open Street Map</source>
-        <translation>在Open Street Map中实时显示模拟训练路线</translation>
+        <translation>在Open Street Map中实时显示模拟训练课程路线</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="288"/>
@@ -15732,7 +15732,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="311"/>
         <source>Configurable list of workout files</source>
-        <translation>可设置的训练文件列表</translation>
+        <translation>可设置的训练课程文件列表</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="313"/>
@@ -15752,17 +15752,17 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="321"/>
         <source>Adding intervals to an activity using simple query methods</source>
-        <translation>使用简单查询方式向活添加区段动</translation>
+        <translation>使用简单查询方式向活添加间歇动</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="323"/>
         <source>To compare Activities/Intervals in Activity View and Date Ranges in Trends View</source>
-        <translation>在活动视图内比较活动/区段,在趋势视图内比较日期范围</translation>
+        <translation>在活动视图内比较活动/间歇,在趋势视图内比较日期范围</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="325"/>
         <source>Workout Control, Intensity Adjustments and Notifications Display</source>
-        <translation>训练控制、强度调节和通知显示</translation>
+        <translation>训练课程控制、强度调节和通知显示</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="331"/>
@@ -15868,12 +15868,12 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="134"/>
         <source>Downloading of Workouts from the ERGDB (online workout DB) for Train - Indoor Riding</source>
-        <translation>从ErgDB(线上训练数据库)下载训练 - 室内骑行</translation>
+        <translation>从ErgDB(线上训练数据库)下载训练课程 - 室内骑行</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="136"/>
         <source>Downloading of Workouts from your Today&apos;s Plan account for Train - Indoor Riding</source>
-        <translation>从你的Today&apos;s Plan账户下载训练 - 室内骑行</translation>
+        <translation>从你的Today&apos;s Plan账户下载训练课程 - 室内骑行</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="170"/>
@@ -15978,7 +15978,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="302"/>
         <source>Display the available and add new intervals using simple query methods</source>
-        <translation>显示已有区段和使用简单查询方式添加新区段</translation>
+        <translation>显示已有间歇和使用简单查询方式添加新间歇</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="348"/>
@@ -16021,7 +16021,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="352"/>
         <source>Automatic Interval Detection</source>
-        <translation>区段自动检测</translation>
+        <translation>间歇自动检测</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="354"/>
@@ -16057,7 +16057,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="370"/>
         <source>Metrics shown in &apos;Intervals&apos;</source>
-        <translation>&quot;区段&quot;中显示的指标</translation>
+        <translation>&quot;间歇&quot;中显示的指标</translation>
     </message>
     <message>
         <source>Training</source>
@@ -16339,7 +16339,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     </message>
     <message>
         <source>Workout</source>
-        <translation type="vanished">训练</translation>
+        <translation type="vanished">训练课程</translation>
     </message>
     <message>
         <source>Stress</source>
@@ -17940,12 +17940,12 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Train/WorkoutWizard.cpp" line="650"/>
         <source>Workout Wizard</source>
-        <translation>训练向导</translation>
+        <translation>训练课程向导</translation>
     </message>
     <message>
         <location filename="../../Train/WorkoutWizard.cpp" line="651"/>
         <source>Import current activity as a Gradient ride (slope based)</source>
-        <translation>以坡度训练导入目前活动</translation>
+        <translation>以坡度训练课程导入目前活动</translation>
     </message>
     <message>
         <location filename="../../Train/WorkoutWizard.cpp" line="655"/>
@@ -18029,7 +18029,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Train/WorkoutWizard.cpp" line="759"/>
         <source>Save Workout</source>
-        <translation>保存训练</translation>
+        <translation>保存训练课程</translation>
     </message>
     <message>
         <location filename="../../Train/WorkoutWizard.cpp" line="760"/>
@@ -18085,7 +18085,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Charts/OverviewItems.h" line="527"/>
         <source>Intervals</source>
-        <translation>区段</translation>
+        <translation>间歇</translation>
     </message>
     <message>
         <location filename="../../Charts/OverviewItems.h" line="528"/>
@@ -18098,18 +18098,18 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Charts/IntervalSummaryWindow.cpp" line="36"/>
         <source>Interval Summary</source>
-        <translation>区段总结</translation>
+        <translation>间歇总结</translation>
     </message>
     <message>
         <location filename="../../Charts/IntervalSummaryWindow.cpp" line="87"/>
         <location filename="../../Charts/IntervalSummaryWindow.cpp" line="111"/>
         <source>select an interval for summary info</source>
-        <translation>选中区段显示总结信息</translation>
+        <translation>选中间歇显示总结信息</translation>
     </message>
     <message>
         <location filename="../../Charts/IntervalSummaryWindow.cpp" line="259"/>
         <source>%1 selected intervals</source>
-        <translation>选中%1个区段</translation>
+        <translation>选中%1个间歇</translation>
     </message>
     <message>
         <location filename="../../Charts/IntervalSummaryWindow.cpp" line="282"/>
@@ -18126,12 +18126,12 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <name>IntervalsPage</name>
     <message>
         <source>Enable interval auto-discovery:</source>
-        <translation type="vanished">启用区段自动发现:</translation>
+        <translation type="vanished">启用间歇自动发现:</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="2970"/>
         <source>Enable interval auto-discovery</source>
-        <translation>启用区段自动发现:</translation>
+        <translation>启用间歇自动发现:</translation>
     </message>
 </context>
 <context>
@@ -18341,7 +18341,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Cloud/KentUniversity.cpp" line="854"/>
         <source>Post Session Fatigue (ROF)</source>
-        <translation>活动后疲劳(ROF)</translation>
+        <translation>活动后疲劳度(ROF)</translation>
     </message>
     <message>
         <location filename="../../Cloud/KentUniversity.cpp" line="869"/>
@@ -18351,12 +18351,12 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Cloud/KentUniversity.cpp" line="877"/>
         <source>Missed workouts</source>
-        <translation>错过的训练</translation>
+        <translation>错过的训练课程</translation>
     </message>
     <message>
         <location filename="../../Cloud/KentUniversity.cpp" line="882"/>
         <source>Is a self administered test workout</source>
-        <translation>这是一个自主的测试训练</translation>
+        <translation>这是一个自主的测试训练课程</translation>
     </message>
     <message>
         <location filename="../../Cloud/KentUniversity.cpp" line="885"/>
@@ -18479,7 +18479,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Metrics/SustainMetric.cpp" line="306"/>
         <source>Sustained Time in Power Zone 10, based on (sustained) EFFORT intervals.</source>
-        <translation>在功率10区的持续时间,基于(持续的)EFFORT区段.</translation>
+        <translation>在功率10区的持续时间,基于(持续的)EFFORT间歇.</translation>
     </message>
 </context>
 <context>
@@ -18498,7 +18498,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Metrics/SustainMetric.cpp" line="52"/>
         <source>Sustained Time in Power Zone 1, based on (sustained) EFFORT intervals.</source>
-        <translation>在功率1区的持续时间,基于(持续的)EFFORT区段.</translation>
+        <translation>在功率1区的持续时间,基于(持续的)EFFORT间歇.</translation>
     </message>
 </context>
 <context>
@@ -18517,7 +18517,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Metrics/SustainMetric.cpp" line="82"/>
         <source>Sustained Time in Power Zone 2, based on (sustained) EFFORT intervals.</source>
-        <translation>在功率2区的持续时间,基于(持续的)EFFORT区段.</translation>
+        <translation>在功率2区的持续时间,基于(持续的)EFFORT间歇.</translation>
     </message>
 </context>
 <context>
@@ -18536,7 +18536,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Metrics/SustainMetric.cpp" line="110"/>
         <source>Sustained Time in Power Zone 3, based on (sustained) EFFORT intervals.</source>
-        <translation>在功率3区的持续时间,基于(持续的)EFFORT区段.</translation>
+        <translation>在功率3区的持续时间,基于(持续的)EFFORT间歇.</translation>
     </message>
 </context>
 <context>
@@ -18555,7 +18555,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Metrics/SustainMetric.cpp" line="138"/>
         <source>Sustained Time in Power Zone 4, based on (sustained) EFFORT intervals.</source>
-        <translation>在功率4区的持续时间,基于(持续的)EFFORT区段.</translation>
+        <translation>在功率4区的持续时间,基于(持续的)EFFORT间歇.</translation>
     </message>
 </context>
 <context>
@@ -18574,7 +18574,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Metrics/SustainMetric.cpp" line="166"/>
         <source>Sustained Time in Power Zone 5, based on (sustained) EFFORT intervals.</source>
-        <translation>在功率5区的持续时间,基于(持续的)EFFORT区段.</translation>
+        <translation>在功率5区的持续时间,基于(持续的)EFFORT间歇.</translation>
     </message>
 </context>
 <context>
@@ -18593,7 +18593,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Metrics/SustainMetric.cpp" line="194"/>
         <source>Sustained Time in Power Zone 6, based on (sustained) EFFORT intervals.</source>
-        <translation>在功率6区的持续时间,基于(持续的)EFFORT区段.</translation>
+        <translation>在功率6区的持续时间,基于(持续的)EFFORT间歇.</translation>
     </message>
 </context>
 <context>
@@ -18612,7 +18612,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Metrics/SustainMetric.cpp" line="222"/>
         <source>Sustained Time in Power Zone 7, based on (sustained) EFFORT intervals.</source>
-        <translation>在功率7区的持续时间,基于(持续的)EFFORT区段.</translation>
+        <translation>在功率7区的持续时间,基于(持续的)EFFORT间歇.</translation>
     </message>
 </context>
 <context>
@@ -18631,7 +18631,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Metrics/SustainMetric.cpp" line="250"/>
         <source>Sustained Time in Power Zone 8, based on (sustained) EFFORT intervals.</source>
-        <translation>在功率8区的持续时间,基于(持续的)EFFORT区段.</translation>
+        <translation>在功率8区的持续时间,基于(持续的)EFFORT间歇.</translation>
     </message>
 </context>
 <context>
@@ -18650,7 +18650,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Metrics/SustainMetric.cpp" line="278"/>
         <source>Sustained Time in Power Zone 9, based on (sustained) EFFORT intervals.</source>
-        <translation>在功率9区的持续时间,基于(持续的)EFFORT区段.</translation>
+        <translation>在功率9区的持续时间,基于(持续的)EFFORT间歇.</translation>
     </message>
 </context>
 <context>
@@ -18805,7 +18805,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
         <location filename="../../Charts/LTMPlot.cpp" line="3535"/>
         <location filename="../../Charts/LTMPlot.cpp" line="3636"/>
         <source>Ramp</source>
-        <translation>斜率</translation>
+        <translation>变化率</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMPlot.cpp" line="3895"/>
@@ -19313,7 +19313,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="403"/>
         <source>Skiba STS Ramp</source>
-        <translation>Skiba短期压力斜率</translation>
+        <translation>Skiba短期压力变化率</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="405"/>
@@ -19339,12 +19339,12 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
         <location filename="../../Charts/LTMTool.cpp" line="1208"/>
         <location filename="../../Charts/LTMTool.cpp" line="1223"/>
         <source>Ramp</source>
-        <translation>斜率</translation>
+        <translation>变化率</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="418"/>
         <source>Skiba LTS Ramp</source>
-        <translation>Skiba长期压力斜率</translation>
+        <translation>Skiba长期压力变化率</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="434"/>
@@ -19364,12 +19364,12 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="479"/>
         <source>Aerobic TISS STS Ramp</source>
-        <translation>有氧TISS短期压力斜率</translation>
+        <translation>有氧TISS短期压力变化率</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="494"/>
         <source>Aerobic TISS LTS Ramp</source>
-        <translation>有氧TISS长期压力斜率</translation>
+        <translation>有氧TISS长期压力变化率</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="510"/>
@@ -19389,12 +19389,12 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="555"/>
         <source>Anaerobic TISS STS Ramp</source>
-        <translation>无氧TISS短期压力斜率</translation>
+        <translation>无氧TISS短期压力变化率</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="570"/>
         <source>Anaerobic TISS LTS Ramp</source>
-        <translation>无氧TISS长期压力斜率</translation>
+        <translation>无氧TISS长期压力变化率</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="585"/>
@@ -19414,12 +19414,12 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="630"/>
         <source>Daniels STS Ramp</source>
-        <translation>Daniels短期压力斜率</translation>
+        <translation>Daniels短期压力变化率</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="645"/>
         <source>Daniels LTS Ramp</source>
-        <translation>Daniels长期压力斜率</translation>
+        <translation>Daniels长期压力变化率</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="889"/>
@@ -19445,12 +19445,12 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="934"/>
         <source>Distance (km|mi) STS Ramp</source>
-        <translation>距离(km|mi)短期压力斜率</translation>
+        <translation>距离(km|mi)短期压力变化率</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="949"/>
         <source>Distance (km|mi) LTS Ramp</source>
-        <translation>距离(km|mi)长期压力斜率</translation>
+        <translation>距离(km|mi)长期压力变化率</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="965"/>
@@ -19470,12 +19470,12 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="1010"/>
         <source>Coggan STS Ramp</source>
-        <translation>Coggan短期压力斜率</translation>
+        <translation>Coggan短期压力变化率</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="1025"/>
         <source>Coggan LTS Ramp</source>
-        <translation>Coggan长期压力斜率</translation>
+        <translation>Coggan长期压力变化率</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="1086"/>
@@ -19495,12 +19495,12 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="1130"/>
         <source>TRIMP STS Ramp</source>
-        <translation>TRIMP短期压力斜率</translation>
+        <translation>TRIMP短期压力变化率</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="1145"/>
         <source>TRIMP LTS Ramp</source>
-        <translation>TRIMP长期压力斜率</translation>
+        <translation>TRIMP长期压力变化率</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="275"/>
@@ -19625,12 +19625,12 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="706"/>
         <source>Work (Kj) STS Ramp</source>
-        <translation>做功(kJ)短期压力斜率</translation>
+        <translation>做功(kJ)短期压力变化率</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="721"/>
         <source>Work (Kj) LTS Ramp</source>
-        <translation>做功(kJ)长期压力斜率</translation>
+        <translation>做功(kJ)长期压力变化率</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="737"/>
@@ -19650,12 +19650,12 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="782"/>
         <source>W&apos; Work (Kj) STS Ramp</source>
-        <translation>W&apos;做功(kJ)短期压力斜率</translation>
+        <translation>W&apos;做功(kJ)短期压力变化率</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="797"/>
         <source>W&apos; Work (Kj) LTS Ramp</source>
-        <translation>W&apos;做功(kJ)长期压力斜率</translation>
+        <translation>W&apos;做功(kJ)长期压力变化率</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="813"/>
@@ -19675,12 +19675,12 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="858"/>
         <source>Below CP Work (Kj) STS Ramp</source>
-        <translation>阈值以下做功(kJ)短期压力斜率</translation>
+        <translation>阈值以下做功(kJ)短期压力变化率</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="873"/>
         <source>Below CP Work (Kj) LTS Ramp</source>
-        <translation>阈值以下做功(kJ)长期压力斜率</translation>
+        <translation>阈值以下做功(kJ)长期压力变化率</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="1040"/>
@@ -19715,12 +19715,12 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="1206"/>
         <source>TriScore STS Ramp</source>
-        <translation>TriScore短期压力斜率</translation>
+        <translation>TriScore短期压力变化率</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="1221"/>
         <source>TriScore LTS Ramp</source>
-        <translation>TriScore长期压力斜率</translation>
+        <translation>TriScore长期压力变化率</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="1299"/>
@@ -20774,12 +20774,12 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Train/Library.cpp" line="128"/>
         <source>Import Videos, VideoSyncs and Workouts</source>
-        <translation>导入视频,视频同步和训练</translation>
+        <translation>导入视频,视频同步和训练课程</translation>
     </message>
     <message>
         <location filename="../../Train/Library.cpp" line="129"/>
         <source>No supported videos, videoSyncs or workouts were found to import</source>
-        <translation>未找到支持的视频,视频同步或训练</translation>
+        <translation>未找到支持的视频,视频同步或训练课程</translation>
     </message>
     <message>
         <location filename="../../Train/Library.cpp" line="179"/>
@@ -20794,16 +20794,16 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Train/Library.cpp" line="211"/>
         <source>Copy Workout Failed</source>
-        <translation>复制训练失败</translation>
+        <translation>复制训练课程失败</translation>
     </message>
     <message>
         <location filename="../../Train/Library.cpp" line="212"/>
         <source>%1 cannot be written to workout library %2, check permissions and free space</source>
-        <translation>%1无法写入到库%2,请检查权限及可用空间</translation>
+        <translation>%1无法写入到训练课程库%2,请检查权限及可用空间</translation>
     </message>
     <message>
         <source>%1 already exists in workout library: %2</source>
-        <translation type="vanished">%1已在训练库中:%2</translation>
+        <translation type="vanished">%1已在训练课程库中:%2</translation>
     </message>
 </context>
 <context>
@@ -20811,12 +20811,12 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Train/Library.cpp" line="257"/>
         <source>Search for Workouts, Syncs and Media</source>
-        <translation>搜索训练,视频同步和媒体</translation>
+        <translation>搜索训练课程,视频同步和媒体</translation>
     </message>
     <message>
         <location filename="../../Train/Library.cpp" line="264"/>
         <source>Workout files (.erg, .mrc, .zwo etc)</source>
-        <translation>训练文件 (.erg, .mrc, .zwo等)</translation>
+        <translation>训练课程文件 (.erg, .mrc, .zwo等)</translation>
     </message>
     <message>
         <location filename="../../Train/Library.cpp" line="266"/>
@@ -20855,7 +20855,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Train/Library.cpp" line="323"/>
         <source>Workouts</source>
-        <translation>训练</translation>
+        <translation>训练课程</translation>
     </message>
     <message>
         <location filename="../../Train/Library.cpp" line="325"/>
@@ -21261,12 +21261,12 @@ on and that its display says, &quot;PC Link&quot;</source>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="557"/>
         <source>Import workouts, videos, videoSyncs...</source>
-        <translation>导入训练,视频和视频同步...</translation>
+        <translation>导入训练课程,视频和视频同步...</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="558"/>
         <source>Scan disk for workouts, videos, videoSyncs...</source>
-        <translation>在硬盘扫描训练,视频和视频同步...</translation>
+        <translation>在硬盘扫描训练课程,视频和视频同步...</translation>
     </message>
     <message>
         <source>CloudDB Status...</source>
@@ -21363,7 +21363,7 @@ on and that its display says, &quot;PC Link&quot;</source>
         <source>The workout directory is not configured, or the directory selected no longer exists.
 
 Please check your preference settings.</source>
-        <translation>未设置训练文件夹或选择的文件夹已不存在.
+        <translation>未设置训练课程文件夹或选择的文件夹已不存在.
 
 请检查设置.</translation>
     </message>
@@ -21410,12 +21410,12 @@ Please check your preference settings.</source>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="554"/>
         <source>Create a new workout...</source>
-        <translation>创建训练...</translation>
+        <translation>创建训练课程...</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="555"/>
         <source>Download workouts from ErgDB...</source>
-        <translation>从ErgDB下载训练...</translation>
+        <translation>从ErgDB下载训练课程...</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="550"/>
@@ -21541,7 +21541,7 @@ Please check your preference settings.</source>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="509"/>
         <source>Find intervals...</source>
-        <translation>寻找区段...</translation>
+        <translation>寻找间歇...</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="1729"/>
@@ -21754,7 +21754,7 @@ Please check your preference settings.</source>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="556"/>
         <source>Download workouts from Today&apos;s Plan...</source>
-        <translation>从Today&apos;s Plan下载训练...</translation>
+        <translation>从Today&apos;s Plan下载训练课程...</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="566"/>
@@ -21947,7 +21947,7 @@ Please check your preference settings.</source>
         <location filename="../../Gui/MainWindow.cpp" line="2400"/>
         <location filename="../../Gui/MainWindow.cpp" line="2421"/>
         <source>Workout Directory Invalid</source>
-        <translation>训练文件夹无效</translation>
+        <translation>训练课程文件夹无效</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="1924"/>
@@ -22036,7 +22036,7 @@ Please check your preference settings.</source>
     <message>
         <location filename="../../Gui/ManualRideDialog.cpp" line="154"/>
         <source>Pace intervals:</source>
-        <translation>配速区段:</translation>
+        <translation>配速间歇:</translation>
     </message>
     <message>
         <location filename="../../Gui/ManualRideDialog.cpp" line="155"/>
@@ -23366,7 +23366,7 @@ You will be able to import or download data before merging or joining the data a
     </message>
     <message>
         <source>Intervals</source>
-        <translation type="vanished">区段</translation>
+        <translation type="vanished">间歇</translation>
     </message>
 </context>
 <context>
@@ -23550,7 +23550,7 @@ You will be able to import or download data before merging or joining the data a
     </message>
     <message>
         <source>Interval Number</source>
-        <translation type="vanished">区段数</translation>
+        <translation type="vanished">间歇数</translation>
     </message>
     <message>
         <source>Latitude (degree x 1000)</source>
@@ -23646,7 +23646,7 @@ You will be able to import or download data before merging or joining the data a
     </message>
     <message>
         <source>Interval</source>
-        <translation type="vanished">区段</translation>
+        <translation type="vanished">间歇</translation>
     </message>
     <message>
         <source>Latitude</source>
@@ -23833,7 +23833,7 @@ You will be able to import or download data before merging or joining the data a
     </message>
     <message>
         <source>Power Fatigue</source>
-        <translation type="vanished">功率疲劳</translation>
+        <translation type="vanished">功率疲劳度</translation>
     </message>
     <message>
         <source>Impact of Altitude</source>
@@ -23873,7 +23873,7 @@ You will be able to import or download data before merging or joining the data a
     </message>
     <message>
         <source>Frame Intervals</source>
-        <translation type="vanished">显示区段</translation>
+        <translation type="vanished">显示间歇</translation>
     </message>
     <message>
         <source>Legend</source>
@@ -23892,7 +23892,7 @@ You will be able to import or download data before merging or joining the data a
     <name>MoxyDevice</name>
     <message>
         <location filename="../../FileIO/MoxyDevice.cpp" line="96"/>
-        <source>Connecting ... 
+        <source>Connecting ...
 </source>
         <translation>连接中...
 </translation>
@@ -23925,7 +23925,7 @@ You will be able to import or download data before merging or joining the data a
     </message>
     <message>
         <location filename="../../FileIO/MoxyDevice.cpp" line="199"/>
-        <source>Downloading ... 
+        <source>Downloading ...
 </source>
         <translation>下载中...
 </translation>
@@ -23961,7 +23961,7 @@ Parsing ... </source>
     <message>
         <location filename="../../FileIO/MoxyDevice.cpp" line="348"/>
         <source>
-Importing %1 Ride(s)... 
+Importing %1 Ride(s)...
 </source>
         <translation>
 导入%1个活动...
@@ -23970,7 +23970,7 @@ Importing %1 Ride(s)...
     <message>
         <location filename="../../FileIO/MoxyDevice.cpp" line="350"/>
         <source>
-No rides found to import. 
+No rides found to import.
 </source>
         <translation>
 未发现可导入的活动.
@@ -24788,11 +24788,11 @@ No rides found to import.
     </message>
     <message>
         <source>Fatigue Zones</source>
-        <translation type="vanished">疲劳区间</translation>
+        <translation type="vanished">疲劳度区间</translation>
     </message>
     <message>
         <source>Intervals</source>
-        <translation type="vanished">区段</translation>
+        <translation type="vanished">间歇</translation>
     </message>
     <message>
         <source>Intensity</source>
@@ -24864,12 +24864,12 @@ No rides found to import.
     <message>
         <location filename="../../Metrics/PMCData.cpp" line="639"/>
         <source>CTL/LTS : Chronic Training Load/Long Term Stress. The dose of training you accumulated over a longer period of time, computed as an exponentially weighted moving average of the selected Training Load metric typically from 4-8 weeks, 42 days by default. It is claimed to relate to your fitness.</source>
-        <translation>CTL/LTS : 长期训练负荷/长期压力.在较长时间内累积的训练量,默认情况下为4-8周(默认为42天)内的所选训练负荷指标的指数加权移动平均值.与健康状态有关.</translation>
+        <translation>CTL/LTS : 长期训练负荷/长期压力.在较长时间内累积的训练量,默认情况下为4-8周(默认为42天)内的所选训练负荷指标的指数加权移动平均值.与健康度有关.</translation>
     </message>
     <message>
         <location filename="../../Metrics/PMCData.cpp" line="644"/>
         <source>ATL/STS : Acute Training Load/Short Term Stress. The dose of training that you accumulated over a short period of time, computed as an exponentially weighted moving average of the selected Training Load metric from 3 to 10 days in general, 7 by default. It is claimed to relate to your fatigue.</source>
-        <translation>ATL/STS : 短期训练负荷/短期压力.在短时间内累积的训练量,通常计算为3至7天(默认为7天)内,所选训练负荷指标的指数加权移动平均值.与疲劳状态有关.</translation>
+        <translation>ATL/STS : 短期训练负荷/短期压力.在短时间内累积的训练量,通常计算为3至7天(默认为7天)内,所选训练负荷指标的指数加权移动平均值.与疲劳度有关.</translation>
     </message>
     <message>
         <location filename="../../Metrics/PMCData.cpp" line="649"/>
@@ -24879,7 +24879,7 @@ No rides found to import.
     <message>
         <location filename="../../Metrics/PMCData.cpp" line="654"/>
         <source>RR : Ramp Rate. The rate at which CTL/LTS increases over a given time period. Large values up and down indicate a risk of injury and aggressive taper respectively.</source>
-        <translation>RR : 斜率.给定时间段内CTL/LTS增长的速率.较大的数值增减分别预示了受伤的风险和过分的训练减少.</translation>
+        <translation>RR : 变化率.给定时间段内CTL/LTS增长的速率.较大的数值增减分别预示了受伤的风险和过分的训练减少.</translation>
     </message>
 </context>
 <context>
@@ -24887,17 +24887,17 @@ No rides found to import.
     <message>
         <location filename="../../Charts/OverviewItems.cpp" line="3584"/>
         <source>Form</source>
-        <translation>竞技状态</translation>
+        <translation>状态值</translation>
     </message>
     <message>
         <location filename="../../Charts/OverviewItems.cpp" line="3605"/>
         <source>Fitness</source>
-        <translation>健康状态</translation>
+        <translation>健康度</translation>
     </message>
     <message>
         <location filename="../../Charts/OverviewItems.cpp" line="3628"/>
         <source>Fatigue</source>
-        <translation>疲劳</translation>
+        <translation>疲劳度</translation>
     </message>
     <message>
         <location filename="../../Charts/OverviewItems.cpp" line="3651"/>
@@ -25842,7 +25842,7 @@ No rides found to import.
     <message>
         <location filename="../../Charts/RideEditor.cpp" line="2753"/>
         <source>Interval</source>
-        <translation>区段</translation>
+        <translation>间歇</translation>
     </message>
     <message>
         <location filename="../../Charts/RideEditor.cpp" line="2787"/>
@@ -26277,7 +26277,7 @@ Do you want to continue?</source>
     <message>
         <location filename="../../Metrics/PeakPace.cpp" line="1243"/>
         <source>Average Heart Rate for 10 min Peak Pace interval</source>
-        <translation>10分钟最大配速区段的平均心率</translation>
+        <translation>10分钟最大配速间歇的平均心率</translation>
     </message>
 </context>
 <context>
@@ -26296,7 +26296,7 @@ Do you want to continue?</source>
     <message>
         <location filename="../../Metrics/PeakPace.cpp" line="1201"/>
         <source>Average Heart Rate for 1 min Peak Pace interval</source>
-        <translation>1分钟最大配速区段的平均心率</translation>
+        <translation>1分钟最大配速间歇的平均心率</translation>
     </message>
 </context>
 <context>
@@ -26315,7 +26315,7 @@ Do you want to continue?</source>
     <message>
         <location filename="../../Metrics/PeakPace.cpp" line="1264"/>
         <source>Average Heart Rate for 20 min Peak Pace interval</source>
-        <translation>20分钟最大配速区段的平均心率</translation>
+        <translation>20分钟最大配速间歇的平均心率</translation>
     </message>
 </context>
 <context>
@@ -26336,7 +26336,7 @@ Do you want to continue?</source>
     <message>
         <location filename="../../Metrics/PeakPace.cpp" line="1285"/>
         <source>Average Heart Rate for 30 min Peak Pace interval</source>
-        <translation>30分钟最大配速区段的平均心率</translation>
+        <translation>30分钟最大配速间歇的平均心率</translation>
     </message>
     <message>
         <location filename="../../Metrics/PeakPace.cpp" line="1303"/>
@@ -26346,7 +26346,7 @@ Do you want to continue?</source>
     <message>
         <location filename="../../Metrics/PeakPace.cpp" line="1306"/>
         <source>Average Heart Rate for 60 min Peak Pace interval</source>
-        <translation>60分钟最大配速区段的平均心率</translation>
+        <translation>60分钟最大配速间歇的平均心率</translation>
     </message>
 </context>
 <context>
@@ -26365,7 +26365,7 @@ Do you want to continue?</source>
     <message>
         <location filename="../../Metrics/PeakPace.cpp" line="1222"/>
         <source>Average Heart Rate for 5 min Peak Pace interval</source>
-        <translation>5分钟最大配速区段的平均心率</translation>
+        <translation>5分钟最大配速间歇的平均心率</translation>
     </message>
 </context>
 <context>
@@ -26879,7 +26879,7 @@ Do you want to continue?</source>
     <message>
         <location filename="../../Metrics/PeakPower.cpp" line="722"/>
         <source>Average Heart Rate for 10 min Peak Power interval</source>
-        <translation>10分钟最大功率区段的平均心率</translation>
+        <translation>10分钟最大功率间歇的平均心率</translation>
     </message>
 </context>
 <context>
@@ -26898,7 +26898,7 @@ Do you want to continue?</source>
     <message>
         <location filename="../../Metrics/PeakPower.cpp" line="680"/>
         <source>Average Heart Rate for 1 min Peak Power interval</source>
-        <translation>1分钟最大功率区段的平均心率</translation>
+        <translation>1分钟最大功率间歇的平均心率</translation>
     </message>
 </context>
 <context>
@@ -26917,7 +26917,7 @@ Do you want to continue?</source>
     <message>
         <location filename="../../Metrics/PeakPower.cpp" line="743"/>
         <source>Average Heart Rate for 20 min Peak Power interval</source>
-        <translation>20分钟最大功率区段的平均心率</translation>
+        <translation>20分钟最大功率间歇的平均心率</translation>
     </message>
 </context>
 <context>
@@ -26936,7 +26936,7 @@ Do you want to continue?</source>
     <message>
         <location filename="../../Metrics/PeakPower.cpp" line="764"/>
         <source>Average Heart Rate for 30 min Peak Power interval</source>
-        <translation>30分钟最大功率区段的平均心率</translation>
+        <translation>30分钟最大功率间歇的平均心率</translation>
     </message>
 </context>
 <context>
@@ -26955,7 +26955,7 @@ Do you want to continue?</source>
     <message>
         <location filename="../../Metrics/PeakPower.cpp" line="701"/>
         <source>Average Heart Rate for 5 min Peak Power interval</source>
-        <translation>5分钟最大功率区段的平均心率</translation>
+        <translation>5分钟最大功率间歇的平均心率</translation>
     </message>
 </context>
 <context>
@@ -26974,7 +26974,7 @@ Do you want to continue?</source>
     <message>
         <location filename="../../Metrics/PeakPower.cpp" line="786"/>
         <source>Average Heart Rate for 60 min Peak Power interval</source>
-        <translation>60分钟最大功率区段的平均心率</translation>
+        <translation>60分钟最大功率间歇的平均心率</translation>
     </message>
 </context>
 <context>
@@ -27318,7 +27318,7 @@ Do you want to continue?</source>
     <message>
         <location filename="../../Gui/Perspective.cpp" line="1487"/>
         <source>Workout</source>
-        <translation>训练</translation>
+        <translation>训练课程</translation>
     </message>
     <message>
         <location filename="../../Gui/Perspective.cpp" line="1488"/>
@@ -27489,13 +27489,13 @@ Do you want to continue?</source>
         <location filename="../../Charts/PfPvWindow.cpp" line="98"/>
         <location filename="../../Charts/PfPvWindow.cpp" line="173"/>
         <source>Merge intervals</source>
-        <translation>合并区段</translation>
+        <translation>合并间歇</translation>
     </message>
     <message>
         <location filename="../../Charts/PfPvWindow.cpp" line="102"/>
         <location filename="../../Charts/PfPvWindow.cpp" line="178"/>
         <source>Frame intervals</source>
-        <translation>显示区段</translation>
+        <translation>显示间歇</translation>
     </message>
     <message>
         <location filename="../../Charts/PfPvWindow.cpp" line="155"/>
@@ -28119,7 +28119,7 @@ yyyy年</translation>
     <message>
         <location filename="../../Train/LibraryParser.cpp" line="79"/>
         <source>Problem Saving Workout Library</source>
-        <translation>保存训练库错误</translation>
+        <translation>保存训练课程库错误</translation>
     </message>
     <message>
         <location filename="../../Core/NamedSearch.cpp" line="194"/>
@@ -28325,12 +28325,12 @@ yyyy年</translation>
     <message>
         <location filename="../../Charts/OverviewItems.cpp" line="66"/>
         <source>Intervals</source>
-        <translation>区段</translation>
+        <translation>间歇</translation>
     </message>
     <message>
         <location filename="../../Charts/OverviewItems.cpp" line="66"/>
         <source>Interval Bubble Chart</source>
-        <translation>区段气泡图</translation>
+        <translation>间歇气泡图</translation>
     </message>
     <message>
         <location filename="../../Charts/OverviewItems.cpp" line="67"/>
@@ -28712,7 +28712,7 @@ Python disabled in preferences.</source>
     <message>
         <location filename="../../Metrics/HrvMetrics.cpp" line="42"/>
         <source>Fraction of normal RR intervals</source>
-        <translation>正常RR区段片段</translation>
+        <translation>正常RR间歇片段</translation>
     </message>
     <message>
         <location filename="../../Metrics/HrvMetrics.cpp" line="43"/>
@@ -29139,12 +29139,12 @@ Python disabled in preferences.</source>
     <message>
         <location filename="../../Train/WorkoutWizard.cpp" line="415"/>
         <source>Workout Wizard</source>
-        <translation>训练向导</translation>
+        <translation>训练课程向导</translation>
     </message>
     <message>
         <location filename="../../Train/WorkoutWizard.cpp" line="416"/>
         <source>Relative Wattage Workout Wizard, current CP60 = </source>
-        <translation>相对功率训练向导,目前CP60 = </translation>
+        <translation>相对功率训练课程向导,目前CP60 = </translation>
     </message>
     <message>
         <location filename="../../Train/WorkoutWizard.cpp" line="420"/>
@@ -29170,7 +29170,7 @@ Python disabled in preferences.</source>
     <message>
         <location filename="../../Train/WorkoutWizard.cpp" line="502"/>
         <source>Save Workout</source>
-        <translation>保存训练</translation>
+        <translation>保存训练课程</translation>
     </message>
     <message>
         <location filename="../../Train/WorkoutWizard.cpp" line="503"/>
@@ -29263,7 +29263,7 @@ Python disabled in preferences.</source>
     <message>
         <location filename="../../Core/IntervalItem.cpp" line="281"/>
         <source>Rename Intervals</source>
-        <translation>重命名区段</translation>
+        <translation>重命名间歇</translation>
     </message>
     <message>
         <location filename="../../Core/IntervalItem.cpp" line="299"/>
@@ -29633,7 +29633,7 @@ Python disabled in preferences.</source>
         <location filename="../../Charts/RideEditor.cpp" line="351"/>
         <location filename="../../Charts/RideEditor.cpp" line="989"/>
         <source>Interval</source>
-        <translation>区段</translation>
+        <translation>间歇</translation>
     </message>
     <message>
         <location filename="../../Charts/RideEditor.cpp" line="759"/>
@@ -29984,7 +29984,7 @@ Do you want to continue?</source>
         <location filename="../../FileIO/RideFile.cpp" line="390"/>
         <location filename="../../FileIO/RideFile.cpp" line="514"/>
         <source>Interval</source>
-        <translation>区段</translation>
+        <translation>间歇</translation>
     </message>
     <message>
         <location filename="../../FileIO/RideFile.cpp" line="391"/>
@@ -30323,12 +30323,12 @@ Skipping file...</source>
     <message>
         <location filename="../../FileIO/RideFile.cpp" line="614"/>
         <source>Device specific intervals</source>
-        <translation>设备特有的区段</translation>
+        <translation>设备特有的间歇</translation>
     </message>
     <message>
         <location filename="../../FileIO/RideFile.cpp" line="615"/>
         <source>User defined laps or marked intervals</source>
-        <translation>用户定义的计圈或标记的区段</translation>
+        <translation>用户定义的计圈或标记的间歇</translation>
     </message>
     <message>
         <location filename="../../FileIO/RideFile.cpp" line="616"/>
@@ -30551,7 +30551,7 @@ Skipping file...</source>
     <message>
         <location filename="../../FileIO/RideFileTableModel.cpp" line="205"/>
         <source>Interval</source>
-        <translation>区段</translation>
+        <translation>间歇</translation>
     </message>
 </context>
 <context>
@@ -31064,7 +31064,7 @@ Skipping file...</source>
     <message>
         <location filename="../../Charts/RideMapWindow.cpp" line="82"/>
         <source>Show Intervals Overlay</source>
-        <translation>显示区段叠加层</translation>
+        <translation>显示间歇叠加层</translation>
     </message>
     <message>
         <location filename="../../Charts/RideMapWindow.cpp" line="85"/>
@@ -31109,7 +31109,7 @@ Skipping file...</source>
     <message>
         <location filename="../../Charts/RideMapWindow.cpp" line="1098"/>
         <source>Interval</source>
-        <translation>区段</translation>
+        <translation>间歇</translation>
     </message>
     <message>
         <source>Custom</source>
@@ -31118,7 +31118,7 @@ Skipping file...</source>
     <message>
         <location filename="../../Charts/RideMapWindow.cpp" line="155"/>
         <source>Intervals</source>
-        <translation>区段</translation>
+        <translation>间歇</translation>
     </message>
     <message>
         <location filename="../../Charts/RideMapWindow.cpp" line="351"/>
@@ -31300,7 +31300,7 @@ Skipping file...</source>
     </message>
     <message>
         <source>Interval Name</source>
-        <translation type="vanished">区段名称</translation>
+        <translation type="vanished">间歇名称</translation>
     </message>
     <message>
         <source>%1 of %2</source>
@@ -31450,7 +31450,7 @@ Skipping file...</source>
     </message>
     <message>
         <source>Intervals</source>
-        <translation type="vanished">区段</translation>
+        <translation type="vanished">间歇</translation>
     </message>
     <message>
         <source>&lt;p&gt;&lt;h2&gt;Errors reading file:&lt;/h2&gt;&lt;ul&gt;</source>
@@ -31874,7 +31874,7 @@ native format. Should we do so?
     <message>
         <location filename="../../Charts/ScatterPlot.cpp" line="136"/>
         <source>Interval Number</source>
-        <translation>区段数</translation>
+        <translation>间歇数</translation>
     </message>
     <message>
         <location filename="../../Charts/ScatterPlot.cpp" line="137"/>
@@ -32028,7 +32028,7 @@ native format. Should we do so?
     <message>
         <location filename="../../Charts/ScatterPlot.cpp" line="173"/>
         <source>Interval</source>
-        <translation>区段</translation>
+        <translation>间歇</translation>
     </message>
     <message>
         <location filename="../../Charts/ScatterPlot.cpp" line="174"/>
@@ -32297,22 +32297,22 @@ native format. Should we do so?
     <message>
         <location filename="../../Charts/ScatterWindow.cpp" line="112"/>
         <source>Frame intervals</source>
-        <translation>显示区段</translation>
+        <translation>显示间歇</translation>
     </message>
     <message>
         <location filename="../../Charts/ScatterWindow.cpp" line="192"/>
         <source>All intervals/activities</source>
-        <translation>全部区段/活动</translation>
+        <translation>全部间歇/活动</translation>
     </message>
     <message>
         <location filename="../../Charts/ScatterWindow.cpp" line="193"/>
         <source>First intervals/activities on X-axis</source>
-        <translation>X轴第一个区段/活动</translation>
+        <translation>X轴第一个间歇/活动</translation>
     </message>
     <message>
         <location filename="../../Charts/ScatterWindow.cpp" line="194"/>
         <source>First intervals/activities on Y-axis</source>
-        <translation>Y轴第一个区段/活动</translation>
+        <translation>Y轴第一个间歇/活动</translation>
     </message>
     <message>
         <location filename="../../Charts/ScatterWindow.cpp" line="195"/>
@@ -32363,7 +32363,7 @@ native format. Should we do so?
     <message>
         <location filename="../../Charts/ScatterWindow.cpp" line="187"/>
         <source>Frame Intervals</source>
-        <translation>显示区段</translation>
+        <translation>显示间歇</translation>
     </message>
 </context>
 <context>
@@ -33468,7 +33468,7 @@ Power&apos; option in the training preferences tab.</source>
     <message>
         <location filename="../../Metrics/SpecialFields.cpp" line="130"/>
         <source>Workout</source>
-        <translation>训练</translation>
+        <translation>训练课程</translation>
     </message>
     <message>
         <location filename="../../Metrics/SpecialFields.cpp" line="131"/>
@@ -33528,7 +33528,7 @@ Power&apos; option in the training preferences tab.</source>
     <message>
         <location filename="../../Gui/SplitActivityWizard.cpp" line="70"/>
         <source>Interval Name</source>
-        <translation>区段名称</translation>
+        <translation>间歇名称</translation>
     </message>
     <message>
         <location filename="../../Gui/SplitActivityWizard.cpp" line="84"/>
@@ -33680,7 +33680,7 @@ If you do not choose to keep the original it will be backed up before removing i
     </message>
     <message>
         <location filename="../../Gui/SplitActivityWizard.cpp" line="522"/>
-        <source>This wizard will find segments of the activity to save by looking for gaps in recording. 
+        <source>This wizard will find segments of the activity to save by looking for gaps in recording.
 
 You can define the minimum length, in time, a gap in recording should be in order to mark the end of one segment and the beginning of another.
 
@@ -33740,7 +33740,7 @@ The wizard will identify segments of uninterrupted activity and allow you to sel
 If the newly created activity clashes with an existing activity (same date and time) then the wizard will adjust the start time by one or more seconds to avoid losing or overwriting any existing data.</source>
         <translation>该向导将帮助你把目前活动分割为多个活动
 
-该向导将识别连续活动中的分段并允许你选择其中某些保存为新活动.你也能够选择任何已定义的区段.
+该向导将识别连续活动中的分段并允许你选择其中某些保存为新活动.你也能够选择任何已定义的间歇.
 
 若新创建的活动与已有活动冲突(相同日期和时间),向导将稍微调整开始时间以避免丢失或覆盖已有数据.</translation>
     </message>
@@ -34512,7 +34512,7 @@ If the newly created activity clashes with an existing activity (same date and t
     <name>TabView</name>
     <message>
         <source>Compare Activities and Intervals</source>
-        <translation type="vanished">比较活动和区段</translation>
+        <translation type="vanished">比较活动和间歇</translation>
     </message>
     <message>
         <source>Compare Date Ranges</source>
@@ -34520,7 +34520,7 @@ If the newly created activity clashes with an existing activity (same date and t
     </message>
     <message>
         <source>Intensity Adjustments and Workout Control</source>
-        <translation type="vanished">强度调节和训练控制</translation>
+        <translation type="vanished">强度调节和训练课程控制</translation>
     </message>
     <message>
         <source>File: %1 cannot be opened for &apos;Writing&apos;. Please check file properties.</source>
@@ -34778,7 +34778,7 @@ If the newly created activity clashes with an existing activity (same date and t
     <message>
         <location filename="../../Train/TodaysPlanWorkoutDownload.cpp" line="33"/>
         <source>Download future workouts from Today&apos;s Plan</source>
-        <translation>从Today&apos;s Plan下载未来的训练</translation>
+        <translation>从Today&apos;s Plan下载未来的训练课程</translation>
     </message>
     <message>
         <location filename="../../Train/TodaysPlanWorkoutDownload.cpp" line="48"/>
@@ -34828,7 +34828,7 @@ If the newly created activity clashes with an existing activity (same date and t
     <message>
         <location filename="../../Train/TodaysPlanWorkoutDownload.cpp" line="100"/>
         <source>Overwrite existing workouts</source>
-        <translation>覆盖已有训练</translation>
+        <translation>覆盖已有训练课程</translation>
     </message>
     <message>
         <location filename="../../Train/TodaysPlanWorkoutDownload.cpp" line="101"/>
@@ -34857,19 +34857,19 @@ If the newly created activity clashes with an existing activity (same date and t
     <message>
         <location filename="../../Train/TodaysPlanWorkoutDownload.cpp" line="149"/>
         <source>%1 workouts downloaded, %2 failed or skipped.</source>
-        <translation>完成%1个训练下载, 失败或跳过%2个.</translation>
+        <translation>完成%1个训练课程下载, 失败或跳过%2个.</translation>
     </message>
     <message>
         <location filename="../../Train/TodaysPlanWorkoutDownload.cpp" line="183"/>
         <location filename="../../Train/TodaysPlanWorkoutDownload.cpp" line="187"/>
         <location filename="../../Train/TodaysPlanWorkoutDownload.cpp" line="193"/>
         <source>Today&apos;s Plan Workout Download</source>
-        <translation>已下载Today&apos;s Plan训练</translation>
+        <translation>已下载Today&apos;s Plan训练课程</translation>
     </message>
     <message>
         <location filename="../../Train/TodaysPlanWorkoutDownload.cpp" line="183"/>
         <source>You can only download future workouts, &apos;From&apos; will be adjusted to current date</source>
-        <translation>仅能下载未来的训练, 起始日期将被调整为当前日期</translation>
+        <translation>仅能下载未来的训练课程, 起始日期将被调整为当前日期</translation>
     </message>
     <message>
         <location filename="../../Train/TodaysPlanWorkoutDownload.cpp" line="187"/>
@@ -35148,7 +35148,7 @@ Click Cancel to exit.</source>
     <message>
         <location filename="../../Gui/Pages.cpp" line="727"/>
         <source>Workout and VideoSync Library</source>
-        <translation>训练和视频同步库</translation>
+        <translation>训练课程和视频同步库</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="730"/>
@@ -35165,7 +35165,7 @@ Click Cancel to exit.</source>
         <source>Simulation physics uses current athlete parameters and settings
 from the virtual bicycle specifications tab. For Erg Mode workouts
 the slope is assumed to be zero.</source>
-        <translation>模拟物理学使用目前的运动员参数和设置.对于Erg模式的训练坡度为0.</translation>
+        <translation>模拟物理学使用目前的运动员参数和设置.对于Erg模式的训练课程坡度为0.</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="739"/>
@@ -35212,12 +35212,12 @@ tab.</source>
     <message>
         <location filename="../../Gui/Pages.cpp" line="763"/>
         <source>Countdown for workout start</source>
-        <translation>训练开始前倒计时</translation>
+        <translation>训练课程开始前倒计时</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="811"/>
         <source>Select Workout Library</source>
-        <translation>选择训练文件夹</translation>
+        <translation>选择训练课程文件夹</translation>
     </message>
 </context>
 <context>
@@ -35225,7 +35225,7 @@ tab.</source>
     <message>
         <location filename="../../Train/TrainSidebar.cpp" line="243"/>
         <source>Save workout data</source>
-        <translation>保存训练数据</translation>
+        <translation>保存训练课程数据</translation>
     </message>
     <message>
         <location filename="../../Train/TrainSidebar.cpp" line="249"/>
@@ -35243,7 +35243,7 @@ tab.</source>
     <message>
         <location filename="../../Train/TrainSidebar.cpp" line="256"/>
         <source>Workouts</source>
-        <translation>训练</translation>
+        <translation>训练课程</translation>
     </message>
     <message>
         <location filename="../../Train/TrainSidebar.cpp" line="275"/>
@@ -35258,37 +35258,37 @@ tab.</source>
     <message>
         <location filename="../../Train/TrainSidebar.cpp" line="437"/>
         <source>Import Workout from File</source>
-        <translation>从文件导入训练</translation>
+        <translation>从文件导入训练课程</translation>
     </message>
     <message>
         <location filename="../../Train/TrainSidebar.cpp" line="438"/>
         <source>Get Workouts from ErgDB</source>
-        <translation>从ErgDB获取训练</translation>
+        <translation>从ErgDB获取训练课程</translation>
     </message>
     <message>
         <location filename="../../Train/TrainSidebar.cpp" line="439"/>
         <source>Get Workouts from Today&apos;s Plan</source>
-        <translation>从Today&apos;s Plan获取训练</translation>
+        <translation>从Today&apos;s Plan获取训练课程</translation>
     </message>
     <message>
         <location filename="../../Train/TrainSidebar.cpp" line="440"/>
         <source>Create Workout via Wizard</source>
-        <translation>通过向导创建训练</translation>
+        <translation>通过向导创建训练课程</translation>
     </message>
     <message>
         <location filename="../../Train/TrainSidebar.cpp" line="441"/>
         <source>Scan for Workouts</source>
-        <translation>扫描训练</translation>
+        <translation>扫描训练课程</translation>
     </message>
     <message>
         <location filename="../../Train/TrainSidebar.cpp" line="465"/>
         <source>Delete selected Workout</source>
-        <translation>删除选中的训练</translation>
+        <translation>删除选中的训练课程</translation>
     </message>
     <message>
         <location filename="../../Train/TrainSidebar.cpp" line="468"/>
         <source>Delete %1 selected Workouts</source>
-        <translation>删除选中的%1个训练</translation>
+        <translation>删除选中的%1个训练课程</translation>
     </message>
     <message>
         <location filename="../../Train/TrainSidebar.cpp" line="492"/>
@@ -35345,17 +35345,17 @@ tab.</source>
     <message>
         <location filename="../../Train/TrainSidebar.cpp" line="1027"/>
         <source>Are you sure you want to delete this Workout?</source>
-        <translation>确认删除此训练?</translation>
+        <translation>确认删除此训练课程?</translation>
     </message>
     <message>
         <location filename="../../Train/TrainSidebar.cpp" line="1030"/>
         <source>Are you sure you want to delete this %1 workouts?</source>
-        <translation>确认删除这%1个训练?</translation>
+        <translation>确认删除这%1个训练课程?</translation>
     </message>
     <message>
         <location filename="../../Train/TrainSidebar.cpp" line="1069"/>
         <source>The Workout file is either not valid or not existing and will be removed from the library.</source>
-        <translation>此训练文件无效或不存在,将被从库中删除.</translation>
+        <translation>此训练课程文件无效或不存在,将被从库中删除.</translation>
     </message>
     <message>
         <location filename="../../Train/TrainSidebar.cpp" line="1213"/>
@@ -36146,7 +36146,7 @@ Press F3 on Controller when done.</source>
     <message>
         <location filename="../../Charts/UserChart.cpp" line="840"/>
         <source>Refresh for intervals</source>
-        <translation>刷新区段</translation>
+        <translation>刷新间歇</translation>
     </message>
     <message>
         <location filename="../../Charts/UserChart.cpp" line="847"/>
@@ -37573,7 +37573,7 @@ Press F3 on Controller when done.</source>
         <source>Please note, that when importing or drag and dropping videos into the library we DO NOT copy the file into the GoldenCheetah library, instead we add a REFERENCE to it. We DO copy workout and videoSync files, since they are smaller.
 
 You can remove references when managing the library via the context menu options</source>
-        <translation>请注意,导入或拖入视频到库中时,不会将文件复制到库中,而只是将其引用.训练和视频同步文件将被复制.
+        <translation>请注意,导入或拖入视频到库中时,不会将文件复制到库中,而只是将其引用.训练课程和视频同步文件将被复制.
 
 可通过上下文菜单选项移除引用</translation>
     </message>
@@ -37603,7 +37603,7 @@ You can remove references when managing the library via the context menu options
     <message>
         <location filename="../../Train/WorkoutWizard.h" line="210"/>
         <source>Workout Metrics</source>
-        <translation>训练指标</translation>
+        <translation>训练课程指标</translation>
     </message>
 </context>
 <context>
@@ -37634,12 +37634,12 @@ You can remove references when managing the library via the context menu options
     <message>
         <location filename="../../Train/WorkoutWizard.cpp" line="226"/>
         <source>Workout Creator</source>
-        <translation>训练创建器</translation>
+        <translation>训练课程创建器</translation>
     </message>
     <message>
         <location filename="../../Train/WorkoutWizard.cpp" line="227"/>
         <source>Select the workout type to be created</source>
-        <translation>选择要创建的训练类型</translation>
+        <translation>选择要创建的训练课程类型</translation>
     </message>
     <message>
         <location filename="../../Train/WorkoutWizard.cpp" line="229"/>
@@ -37795,7 +37795,7 @@ You can remove references when managing the library via the context menu options
     <message>
         <location filename="../../Train/WorkoutWindow.cpp" line="505"/>
         <source>You have unsaved changes to a workout.</source>
-        <translation>训练有未保存的修改.</translation>
+        <translation>训练课程有未保存的修改.</translation>
     </message>
     <message>
         <location filename="../../Train/WorkoutWindow.cpp" line="506"/>
@@ -37805,7 +37805,7 @@ You can remove references when managing the library via the context menu options
     <message>
         <location filename="../../Train/WorkoutWindow.cpp" line="538"/>
         <source>Save Workout File</source>
-        <translation>保存训练文件</translation>
+        <translation>保存训练课程文件</translation>
     </message>
 </context>
 <context>
@@ -38899,7 +38899,7 @@ You can remove references when managing the library via the context menu options
         <location filename="../../Metrics/HrvMetrics.cpp" line="105"/>
         <location filename="../../Metrics/HrvMetrics.cpp" line="109"/>
         <source>Average of all NN intervals</source>
-        <translation>全部NN区段平均</translation>
+        <translation>全部NN间歇平均</translation>
     </message>
     <message>
         <location filename="../../Metrics/HrvMetrics.cpp" line="106"/>
@@ -38979,7 +38979,7 @@ You can remove references when managing the library via the context menu options
     <message>
         <location filename="../../Metrics/HrvMetrics.cpp" line="524"/>
         <source>Percentage of differences between adjacent NN intervals that are greater than %1 ms</source>
-        <translation>相邻NN区段间差值大于 %1 ms的百分比</translation>
+        <translation>相邻NN间歇间差值大于 %1 ms的百分比</translation>
     </message>
 </context>
 <context>
@@ -38998,7 +38998,7 @@ You can remove references when managing the library via the context menu options
     <message>
         <location filename="../../Metrics/HrvMetrics.cpp" line="597"/>
         <source>Average of all NN intervals measured at rest</source>
-        <translation>静息测量的全部NN区段的平均值</translation>
+        <translation>静息测量的全部NN间歇的平均值</translation>
     </message>
 </context>
 <context>
@@ -39074,7 +39074,7 @@ You can remove references when managing the library via the context menu options
     <message>
         <location filename="../../Metrics/HrvMetrics.cpp" line="708"/>
         <source>Percentage of differences between adjacent NN intervals that are greater than 50 ms, measured at rest</source>
-        <translation>静息时, 相邻NN区段间差值大于50ms的百分比</translation>
+        <translation>静息时, 相邻NN间歇间差值大于50ms的百分比</translation>
     </message>
 </context>
 <context>
@@ -39093,7 +39093,7 @@ You can remove references when managing the library via the context menu options
     <message>
         <location filename="../../Metrics/HrvMetrics.cpp" line="671"/>
         <source>Square root of the mean of the squares of differences between adjacent NN intervals, measured at rest</source>
-        <translation>静息时, 相邻NN区段差值平方均值的平方根</translation>
+        <translation>静息时, 相邻NN间歇差值平方均值的平方根</translation>
     </message>
 </context>
 <context>
@@ -39112,7 +39112,7 @@ You can remove references when managing the library via the context menu options
     <message>
         <location filename="../../Metrics/HrvMetrics.cpp" line="634"/>
         <source>Standard deviation of all NN intervals measured at rest</source>
-        <translation>静息时, 全部NN区段的标准差</translation>
+        <translation>静息时, 全部NN间歇的标准差</translation>
     </message>
 </context>
 <context>
@@ -39131,7 +39131,7 @@ You can remove references when managing the library via the context menu options
     <message>
         <location filename="../../Metrics/HrvMetrics.cpp" line="430"/>
         <source>Square root of the mean of the squares of differences between adjacent NN intervals</source>
-        <translation>相邻NN区段差值平方均值的平方根</translation>
+        <translation>相邻NN间歇差值平方均值的平方根</translation>
     </message>
 </context>
 <context>
@@ -39150,7 +39150,7 @@ You can remove references when managing the library via the context menu options
     <message>
         <location filename="../../Metrics/HrvMetrics.cpp" line="254"/>
         <source>Standard deviation of all NN intervals in all 5-minute segments of a 24-hour recording</source>
-        <translation>24小时记录的全部5分钟区间中,全部NN区段的标准差</translation>
+        <translation>24小时记录的全部5分钟区间中,全部NN间歇的标准差</translation>
     </message>
 </context>
 <context>
@@ -39169,7 +39169,7 @@ You can remove references when managing the library via the context menu options
     <message>
         <location filename="../../Metrics/HrvMetrics.cpp" line="176"/>
         <source>Standard deviation of all NN intervals</source>
-        <translation>全部NN区段的标准差</translation>
+        <translation>全部NN间歇的标准差</translation>
     </message>
 </context>
 <context>
@@ -39188,7 +39188,7 @@ You can remove references when managing the library via the context menu options
     <message>
         <location filename="../../Metrics/HrvMetrics.cpp" line="348"/>
         <source>Average of the standard deviations of NN intervals in all 5-minute segments of a 24-hour recording</source>
-        <translation>24小时记录的全部5分钟区间中,全部NN区段的标准差平均值</translation>
+        <translation>24小时记录的全部5分钟区间中,全部NN间歇的标准差平均值</translation>
     </message>
 </context>
 <context>
