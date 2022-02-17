@@ -8045,7 +8045,7 @@ Etes-vous sûr?</translation>
     <message>
         <location filename="../../Cloud/CloudDBUserMetric.cpp" line="1166"/>
         <source>Do you want to upload this usermetric definition ?</source>
-        <translation type="unfinished">Voulez-vous téléverser cette définition métrique utilisateur ?</translation>
+        <translation>Voulez-vous téléverser cette définition de métrique utilisateur ?</translation>
     </message>
 </context>
 <context>
@@ -8299,7 +8299,7 @@ Etes-vous sûr?</translation>
         <source>Changes in activities which are not saved, will not be synchronized. 
 
 This may lead to inconsistencies between your local GoldenCheetah activities and the uploaded activities. We recommend to save the changed activities before proceeding.</source>
-        <translation type="unfinished">Les modifications des activités qui ne sont pas enregistrées ne seront pas synchronisées.
+        <translation>Les modifications des activités qui ne sont pas enregistrées ne seront pas synchronisées.
 
 Cela peut conduire à des incohérences entre vos activités GoldenCheetah locales et les activités téléversées. Nous recommandons d&apos;enregistrer les activités modifiées avant de continuer.</translation>
     </message>
@@ -8436,19 +8436,19 @@ Cela peut conduire à des incohérences entre vos activités GoldenCheetah local
     <message>
         <location filename="../../Cloud/CloudService.cpp" line="342"/>
         <source>Upload to </source>
-        <translation type="unfinished">Téléverser vers </translation>
+        <translation>Téléverser vers </translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudService.cpp" line="343"/>
         <source>The activity you want to upload has unsaved changes.</source>
-        <translation type="unfinished">L&apos;activité que vous souhaitez téléverser comporte des modifications non enregistrées.</translation>
+        <translation>L&apos;activité que vous souhaitez téléverser comporte des modifications non enregistrées.</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudService.cpp" line="344"/>
         <source>Unsaved changes in activities will be uploaded as well. 
 
 This may lead to inconsistencies between your local activities and the uploaded activities if you do not save the activity in GoldenCheetah. We recommend to save the changed activity before proceeding.</source>
-        <translation type="unfinished">Les changements non enregistrés dans les activités seront également téléchargés.
+        <translation>Les changements non enregistrés dans les activités seront également téléchargés.
 
 Cela peut entraîner des incohérences entre vos activités locales et les activités téléversées si vous n&apos;enregistrez pas l&apos;activité dans GoldenCheetah. Nous recommandons d&apos;enregistrer l&apos;activité modifiée avant de continuer.</translation>
     </message>
@@ -13394,7 +13394,23 @@ Note: when the file already contains wind data, it will be overridden if wind sp
 The activity has to be a Ride with Speed and Altitude.
 
 Warning: the accuracy of power estimation can be too low to be of practical use for power analysis of general outdoor rides using typical GPS data. A power meter is recommended.</source>
-        <translation type="unfinished"></translation>
+        <translation>Dériver les données de puissance estimées en fonction de la vitesse/de l&apos;altitude/du poids, etc.
+
+Le paramètre de poids du vélo est ajouté au poids de l&apos;athlète pour composer la masse totale, il doit inclure les vêtements, les chaussures, etc.
+
+Le paramètre CRR est le coefficient de résistance au roulement, il dépend des pneus et de la surface
+
+Le paramètre CdA est la surface frontale effective en m^2, il dépend de la position et de l&apos;équipement. Si 0 estimé à partir de données anthropométriques
+
+Projet Mult. le paramètre est le multiplicateur à ajuster pour la rédaction, 1 signifie qu&apos;il n&apos;y a pas de rédaction et 0,7 semble légitime pour la rédaction dans un groupe
+
+la vitesse du vent doit être indiquée en km/h
+l&apos;unité de direction (origine) du vent est en degrés de -179 à +180 (-90=W, 0=N, 90=E, 180=S)
+Remarque : lorsque le fichier contient déjà des données de vent, il sera remplacé si la vitesse du vent est définie
+
+L&apos;activité doit être une balade avec vitesse et altitude.
+
+Avertissement&#xa0;: la précision de l&apos;estimation de la puissance peut être trop faible pour être utile à l&apos;analyse de la puissance des sorties générales en extérieur à l&apos;aide de données GPS typiques. Un wattmètre est recommandé.</translation>
     </message>
     <message>
         <source>Derive estimated power data based on speed/elevation/weight etc
@@ -13612,13 +13628,13 @@ CONNECTION INTERNET REQUISE.</translation>
         <location filename="../../FileIO/FixGPS.cpp" line="277"/>
         <location filename="../../FileIO/FixGPS.cpp" line="529"/>
         <source>P1 Route Deviation:</source>
-        <translation type="unfinished"></translation>
+        <translation>Déviation de l&apos;itinéraire P1:</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixGPS.cpp" line="278"/>
         <location filename="../../FileIO/FixGPS.cpp" line="530"/>
         <source>P2 Route Deviation:</source>
-        <translation type="unfinished"></translation>
+        <translation>Déviation de l&apos;itinéraire P2:</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixGPS.cpp" line="289"/>
@@ -13654,7 +13670,7 @@ CONNECTION INTERNET REQUISE.</translation>
         <location filename="../../FileIO/FixGPS.cpp" line="364"/>
         <location filename="../../FileIO/FixGPS.cpp" line="416"/>
         <source>P1 Deg</source>
-        <translation type="unfinished"></translation>
+        <translation>P1 Deg</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixGPS.cpp" line="364"/>
@@ -13683,7 +13699,7 @@ des valeurs aberrantes.
         <location filename="../../FileIO/FixGPS.cpp" line="379"/>
         <location filename="../../FileIO/FixGPS.cpp" line="429"/>
         <source>P2 Deg</source>
-        <translation type="unfinished"></translation>
+        <translation>P2 DEg</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixGPS.cpp" line="379"/>
@@ -13717,7 +13733,7 @@ après la suppression des valeurs aberrantes.
     <message>
         <location filename="../../FileIO/FixGPS.cpp" line="394"/>
         <source>Altitude Outlier Criteria - Centimeters:</source>
-        <translation type="unfinished">Altitude Outlier Criteria - Centimetres:</translation>
+        <translation>Critères d&apos;altitude aberrante - Centimètres:</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixGPS.cpp" line="400"/>
@@ -13727,8 +13743,11 @@ build the smoothing spline. A clear example consider a point at the north pole t
 is part of a route in Seattle. This outlier criteria is distance in centimeters from
 spline.
 </source>
-        <translation type="unfinished">ALTITUDE OUTLIER CRITERIA - CENTIMETRES:
-Un point aberrant est un point tellement hors de portée qu&apos;il ne doit pas être utilisé pour construire la spline de lissage. Un exemple clair est un point au pôle nord qui fait partie d&apos;un itinéraire à Seattle. Ce critère de valeur aberrante est la distance en centimètres à partir de la spline.</translation>
+        <translation>ALTITUDE OUTLIER CRITERIA - CENTIMETRES:
+Un point aberrant est un point tellement hors de portée qu&apos;il ne doit pas être utilisé pour construire la spline de lissage.
+Un exemple clair est un point au pôle nord qui fait partie d&apos;un itinéraire à Seattle.
+Ce critère de valeur aberrante est la distance en centimètres à partir de la spline.
+</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixGPS.cpp" line="410"/>
@@ -13804,7 +13823,13 @@ is part of a route in Seattle. This outlier criteria is the distance from spline
 centimeters past which a value will be considered an outlier and not used to compute the
 final smoothing spline.
 </source>
-        <translation type="unfinished"></translation>
+        <translation>CRITÈRES DE ROUTE OUTLIER - CENTIMÈTRES:
+Un point aberrant est un point tellement hors plage qu&apos;il ne doit pas être utilisé pour
+construire la spline de lissage. Un exemple clair considère un point au pôle nord qui
+fait partie d&apos;un itinéraire à Seattle. Ce critère de valeur aberrante est la distance de la spline dans
+centimètres au-delà desquels une valeur sera considérée comme une valeur aberrante et non utilisée pour calculer le
+spline de lissage final.
+</translation>
     </message>
     <message>
         <source>ROUTE OUTLIER CRITERIA - CENTIMETERS An outlier point is one so eggregiously out of range that it should not be used to
@@ -13819,7 +13844,7 @@ Ce critère de valeur aberrante est la distance de la spline en centimètres au-
     <message>
         <location filename="../../FileIO/FixGPS.cpp" line="508"/>
         <source>Step Deviation:</source>
-        <translation type="unfinished"></translation>
+        <translation>Déviation de pas:</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixGPS.cpp" line="517"/>
@@ -13897,12 +13922,13 @@ Generally altitude data is noisiest and requires highest degree for
 reasonable smoothness. Route gps data gnerally requires a much
 lighter touch.
 </source>
-        <translation type="unfinished">Réparation GPS à plusieurs passes:
-0 - Toujours: supprimez les erreurs GPS et interpolez les données de position là où l&quot;appareil GPS n&quot;a enregistré aucune donnée, ou les données qui ont été enregistrées sont invalides.
-1 - Facultatif : le lissage d&quot;altitude B-Spline sera appliqué si la case est cochée. Il s&quot;agit potentiellement d&quot;un lissage en deux passes. Spline est construit avec Pass 1 Degré, tous les échantillons originaux qui échouent aux critères aberrants sont rejetés, puis un lissage final est exécuté avec Pass 2 degré.
-2 - Facultatif : le lissage de l&quot;itinéraire B-Spline sera appliqué si la case est cochée. Encore une fois, il s&quot;agit d&quot;un lissage à deux passes où les valeurs aberrantes sont déterminées par le stddev de la distance euclidienne par rapport à la spline de lissage. Encore une fois, une passe finale est exécutée sans valeurs aberrantes en utilisant le degré Pass 2.
+        <translation>Réparation GPS à plusieurs passes:
+0 - Toujours: supprimez les erreurs GPS et interpolez les données de position là où l&apos;appareil GPS n&apos;a enregistré aucune donnée, ou les données qui ont été enregistrées sont invalides.
+1 - Facultatif : le lissage d&apos;altitude B-Spline sera appliqué si la case est cochée. Il s&apos;agit potentiellement d&apos;un lissage en deux passes. Spline est construit avec Pass 1 Degré, tous les échantillons originaux qui échouent aux critères aberrants sont rejetés, puis un lissage final est exécuté avec Pass 2 degré.
+2 - Facultatif : le lissage de l&apos;itinéraire B-Spline sera appliqué si la case est cochée. Encore une fois, il s&apos;agit d&apos;un lissage à deux passes où les valeurs aberrantes sont déterminées par le stddev de la distance euclidienne par rapport à la spline de lissage. Encore une fois, une passe finale est exécutée sans valeurs aberrantes en utilisant le degré Pass 2.
 
-En général, les données d&quot;altitude sont les plus fortes et nécessitent le degré le plus élevé pour une douceur raisonnable. Les données GPS d&quot;itinéraire nécessitent généralement une touche beaucoup plus légère.</translation>
+En général, les données d&quot;altitude sont les plus fortes et nécessitent le degré le plus élevé pour une douceur raisonnable. Les données GPS d&apos;itinéraire nécessitent généralement une touche beaucoup plus légère.
+</translation>
     </message>
 </context>
 <context>
@@ -22168,159 +22194,159 @@ La correction de couple - cette valeur définie une valeur absolue en newton mè
     <message>
         <location filename="../../Core/DataFilter.cpp" line="1789"/>
         <source>activities(&quot;fexpr&quot;, expr) - where fexpr is a filter expression</source>
-        <translation type="unfinished"></translation>
+        <translation>activities(&quot;fexpr&quot;, expr) - où fexpr est une expression de filtre</translation>
     </message>
     <message>
         <location filename="../../Core/DataFilter.cpp" line="1801"/>
         <source>daterange(start|stop)</source>
-        <translation type="unfinished"></translation>
+        <translation>daterange(start|stop)</translation>
     </message>
     <message>
         <location filename="../../Core/DataFilter.cpp" line="1806"/>
         <source>daterange(start|stop) - unknown symbol &apos;%1&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>daterange(start|stop) - symbole inconnu &apos;%1&apos;</translation>
     </message>
     <message>
         <location filename="../../Core/DataFilter.cpp" line="1817"/>
         <source>daterange(start|stop) or daterange(datefrom, dateto, expression)</source>
-        <translation type="unfinished"></translation>
+        <translation>daterange(start|stop) ou daterange(datefrom, dateto, expression)</translation>
     </message>
     <message>
         <location filename="../../Core/DataFilter.cpp" line="1824"/>
         <source>%1 needs a single parameter</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 nécessite un seul paramètre</translation>
     </message>
     <message>
         <location filename="../../Core/DataFilter.cpp" line="1831"/>
         <source>filename() has no parameters</source>
-        <translation type="unfinished"></translation>
+        <translation>filename() n&apos;a pas de paramètre</translation>
     </message>
     <message>
         <location filename="../../Core/DataFilter.cpp" line="1856"/>
         <source>zones(hr|power|pace|fatigue, name|description|low|high|units|time|percent) needs 2 specific parameters</source>
-        <translation type="unfinished"></translation>
+        <translation>zones(hr|power|pace|fatigue, name|description|low|high|units|time|percent) nécessite 2 paramètres spécifiques</translation>
     </message>
     <message>
         <location filename="../../Core/DataFilter.cpp" line="1863"/>
         <source>exists(&quot;symbol&quot;) supports only 1 parameter.</source>
-        <translation type="unfinished"></translation>
+        <translation>exists(&quot;symbol&quot;) ne prend en charge qu&apos;un seul paramètre.</translation>
     </message>
     <message>
         <location filename="../../Core/DataFilter.cpp" line="1867"/>
         <source>exists(&quot;symbol&quot;) parameter must be a constant string.</source>
-        <translation type="unfinished">exists(&quot;symbol&quot;) paramètre doit être une chaîne constante.</translation>
+        <translation>exists(&quot;symbol&quot;) paramètre doit être une chaîne constante.</translation>
     </message>
     <message>
         <location filename="../../Core/DataFilter.cpp" line="1890"/>
         <source>should be rep(value, n)</source>
-        <translation type="unfinished"></translation>
+        <translation>devrait être rep(valeur, n)</translation>
     </message>
     <message>
         <location filename="../../Core/DataFilter.cpp" line="1900"/>
         <source>should be seq(start, stop, step)</source>
-        <translation type="unfinished"></translation>
+        <translation>devrait être seq(start, stop, step)</translation>
     </message>
     <message>
         <location filename="../../Core/DataFilter.cpp" line="1910"/>
         <source>should be length(expr)</source>
-        <translation type="unfinished"></translation>
+        <translation>devrait être length(expr)</translation>
     </message>
     <message>
         <location filename="../../Core/DataFilter.cpp" line="1920"/>
         <source>should be cumsum(vector)</source>
-        <translation type="unfinished"></translation>
+        <translation>devrait être cumsum(vector)</translation>
     </message>
     <message>
         <location filename="../../Core/DataFilter.cpp" line="1928"/>
         <source>should be aggregate(vector, byvector, mean|sum|max|min|count)</source>
-        <translation type="unfinished"></translation>
+        <translation>devrait être aggregate(vector, byvector, mean|sum|max|min|count)</translation>
     </message>
     <message>
         <location filename="../../Core/DataFilter.cpp" line="1938"/>
         <source>aggregate(vector, by, func) func must be one of mean|sum|max|min|count.</source>
-        <translation type="unfinished"></translation>
+        <translation>agregat(vector, by, func) func doit être l&apos;un de mean|sum|max|min|count.</translation>
     </message>
     <message>
         <location filename="../../Core/DataFilter.cpp" line="1943"/>
         <source>unknown function &apos;%1&apos;, must be one of mean|sum|max|min|count.</source>
-        <translation type="unfinished"></translation>
+        <translation>fonction inconnue &apos;%1&apos;, doit être l&apos;une des mean|sum|max|min|count.</translation>
     </message>
     <message>
         <location filename="../../Core/DataFilter.cpp" line="1955"/>
         <source>round(v) or round(v, dp)</source>
-        <translation type="unfinished"></translation>
+        <translation>round(v) ou round(v, dp)</translation>
     </message>
     <message>
         <location filename="../../Core/DataFilter.cpp" line="1969"/>
         <source>interpolate(algorithm, xvector, yvector, xvalues)</source>
-        <translation type="unfinished"></translation>
+        <translation>interpolate(algorithm, xvector, yvector, xvalues)</translation>
     </message>
     <message>
         <location filename="../../Core/DataFilter.cpp" line="1974"/>
         <source>interpolate(algorithm, xvector, yvector, xvalues) - must specify and algorithm</source>
-        <translation type="unfinished"></translation>
+        <translation>interpolate(algorithm, xvector, yvector, xvalues) - doit spécifier un algorithme</translation>
     </message>
     <message>
         <location filename="../../Core/DataFilter.cpp" line="1982"/>
         <source>unknown algorithm &apos;%1&apos;, must be one of linear, cubic, akima or steffen.</source>
-        <translation type="unfinished"></translation>
+        <translation>algorithme inconnu &apos;%1&apos;, doit être :  linear, cubic, akima or steffen.</translation>
     </message>
     <message>
         <location filename="../../Core/DataFilter.cpp" line="1996"/>
         <source>should be append(a,b,[pos])</source>
-        <translation type="unfinished"></translation>
+        <translation>devrait être append(a,b,[pos])</translation>
     </message>
     <message>
         <location filename="../../Core/DataFilter.cpp" line="2005"/>
         <source>append(a,b,[pos]) but &apos;a&apos; must be a symbol</source>
-        <translation type="unfinished"></translation>
+        <translation>append(a,b,[pos]) mais &apos;a&apos; doit être un symbole</translation>
     </message>
     <message>
         <location filename="../../Core/DataFilter.cpp" line="2009"/>
         <source>append(a,b,[pos]) but &apos;a&apos; must be a user symbol</source>
-        <translation type="unfinished"></translation>
+        <translation>append(a,b,[pos]) mais &apos;a&apos; doit être un symbole utilisateur</translation>
     </message>
     <message>
         <location filename="../../Core/DataFilter.cpp" line="2019"/>
         <source>should be remove(a,pos,count)</source>
-        <translation type="unfinished"></translation>
+        <translation>doit être remove(a,pos,count)</translation>
     </message>
     <message>
         <location filename="../../Core/DataFilter.cpp" line="2027"/>
         <source>remove(a,pos,count) but &apos;a&apos; must be a symbol</source>
-        <translation type="unfinished"></translation>
+        <translation>remove(a,pos,count) mais &apos;a&apos; doit être un symbole</translation>
     </message>
     <message>
         <location filename="../../Core/DataFilter.cpp" line="2031"/>
         <source>remove(a,pos, count) but &apos;a&apos; must be a user symbol</source>
-        <translation type="unfinished"></translation>
+        <translation>remove(a,pos,count) mais &apos;a&apos; doit être un symbole utilisateur</translation>
     </message>
     <message>
         <location filename="../../Core/DataFilter.cpp" line="2043"/>
         <source>should be mid(a,pos,count)</source>
-        <translation type="unfinished"></translation>
+        <translation>devrait être mid(a,pos,count)</translation>
     </message>
     <message>
         <location filename="../../Core/DataFilter.cpp" line="2050"/>
         <source>XDATA expects two parameters</source>
-        <translation type="unfinished"></translation>
+        <translation>XDATA attend deux paramètres</translation>
     </message>
     <message>
         <location filename="../../Core/DataFilter.cpp" line="2060"/>
         <source>XDATA expects a string for the first parameters</source>
-        <translation type="unfinished"></translation>
+        <translation>XDATA attend une chaîne pour les premiers paramètres</translation>
     </message>
     <message>
         <location filename="../../Core/DataFilter.cpp" line="2068"/>
         <location filename="../../Core/DataFilter.cpp" line="2074"/>
         <source>xdata expects a string, &apos;km&apos; or &apos;secs&apos; for second parameters</source>
-        <translation type="unfinished"></translation>
+        <translation>xdata attend une chaîne, &apos;km&apos; ou &apos;secs&apos; pour les seconds paramètres</translation>
     </message>
     <message>
         <location filename="../../Core/DataFilter.cpp" line="2083"/>
         <location filename="../../Core/DataFilter.cpp" line="2087"/>
         <source>samples(SERIES), SERIES should be POWER, SECS, HEARTRATE etc.</source>
-        <translation type="unfinished"></translation>
+        <translation>samples(SERIES), SERIES doit être POWER, SECS, HEARTRATE etc.</translation>
     </message>
     <message>
         <location filename="../../Core/DataFilter.cpp" line="2096"/>
@@ -22328,139 +22354,139 @@ La correction de couple - cette valeur définie une valeur absolue en newton mè
         <location filename="../../Core/DataFilter.cpp" line="2483"/>
         <location filename="../../Core/DataFilter.cpp" line="2518"/>
         <source>invalid series name &apos;%1&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>nom de série non valide &apos;%1&apos;</translation>
     </message>
     <message>
         <location filename="../../Core/DataFilter.cpp" line="2105"/>
         <source>tests(user|bests, duration|power)</source>
-        <translation type="unfinished"></translation>
+        <translation>tests(user|bests, duration|power)</translation>
     </message>
     <message>
         <location filename="../../Core/DataFilter.cpp" line="2111"/>
         <location filename="../../Core/DataFilter.cpp" line="2118"/>
         <source>tests() first parameter must be &apos;user&apos; or &apos;bests&apos;.</source>
-        <translation type="unfinished"></translation>
+        <translation>tests() le premier paramètre doit être &apos;user&apos; ou &apos;bests&apos;.</translation>
     </message>
     <message>
         <location filename="../../Core/DataFilter.cpp" line="2125"/>
         <location filename="../../Core/DataFilter.cpp" line="2132"/>
         <source>tests() second parameter must be &apos;duration&apos; or &apos;power&apos;.</source>
-        <translation type="unfinished"></translation>
+        <translation>tests() deuxième paramètre doit être &apos;duration&apos; ou &apos;power&apos;.</translation>
     </message>
     <message>
         <location filename="../../Core/DataFilter.cpp" line="2143"/>
         <source>no metric specified, %1(symbol) symbol should be a metric name</source>
-        <translation type="unfinished"></translation>
+        <translation>aucune métrique spécifiée, le symbole %1 doit être un nom de métrique</translation>
     </message>
     <message>
         <location filename="../../Core/DataFilter.cpp" line="2152"/>
         <source>only metric names are supported</source>
-        <translation type="unfinished"></translation>
+        <translation>seuls les noms de métriques sont pris en charge</translation>
     </message>
     <message>
         <location filename="../../Core/DataFilter.cpp" line="2157"/>
         <source>unknown metric %1</source>
-        <translation type="unfinished"></translation>
+        <translation>métrique inconnue %1</translation>
     </message>
     <message>
         <location filename="../../Core/DataFilter.cpp" line="2166"/>
         <source>kmeans(centers|assignments, k, dim1, dim2, dimn)</source>
-        <translation type="unfinished"></translation>
+        <translation>kmeans(centers|assignments, k, dim1, dim2, dimn)</translation>
     </message>
     <message>
         <location filename="../../Core/DataFilter.cpp" line="2171"/>
         <source>kmeans(centers|assignments, k, dim1, dim2, dimn) - %s unknown</source>
-        <translation type="unfinished"></translation>
+        <translation>kmeans(centres|assignments, k, dim1, dim2, dimn) - %s inconnu</translation>
     </message>
     <message>
         <location filename="../../Core/DataFilter.cpp" line="2183"/>
         <source>%1(symbol|date), symbol should be a metric name</source>
-        <translation type="unfinished"></translation>
+        <translation>%1(symbol|date), le symbole doit être un nom de métrique</translation>
     </message>
     <message>
         <location filename="../../Core/DataFilter.cpp" line="2190"/>
         <source>invalid symbol &apos;%1&apos;, should be either a metric name or &apos;time&apos; or &apos;date&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>symbole non valide &apos;%1&apos;, doit être soit un nom de métrique, soit &apos;time&apos; or &apos;date&apos;</translation>
     </message>
     <message>
         <location filename="../../Core/DataFilter.cpp" line="2205"/>
         <source>too many parameters: %1(symbol|date, start, stop)</source>
-        <translation type="unfinished"></translation>
+        <translation>trop de paramètres: %1(symbol|date, start, stop)</translation>
     </message>
     <message>
         <location filename="../../Core/DataFilter.cpp" line="2213"/>
         <source>%1(symbol|name|start|stop|type|test|color|route|selected|date|filename), symbol should be a metric name</source>
-        <translation type="unfinished"></translation>
+        <translation>%1(symbol|name|start|stop|type|test|color|route|selected|date|filename), le symbole doit être un nom de métrique</translation>
     </message>
     <message>
         <location filename="../../Core/DataFilter.cpp" line="2221"/>
         <source>invalid symbol &apos;%1&apos;, should be either a metric name or &apos;name|start|stop|type|test|color|route|selected|date|time|filename&apos;&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>symbole non valide &apos;%1&apos;, doit être soit un nom de métrique soit &apos;name|start|stop|type|test|color|route|selected|date|time|filename&apos;&apos;</translation>
     </message>
     <message>
         <location filename="../../Core/DataFilter.cpp" line="2237"/>
         <source>too many parameters: %1(symbol, start, stop)</source>
-        <translation type="unfinished"></translation>
+        <translation>trop de paramètres: %1(symbol, start, stop)</translation>
     </message>
     <message>
         <location filename="../../Core/DataFilter.cpp" line="2542"/>
         <source>annotate(label|hline|vline|voronoi, ...) need at least 2 parameters.</source>
-        <translation type="unfinished"></translation>
+        <translation>annotate(label|hline|vline|voronoi, ...) nécessite au moins 2 paramètres.</translation>
     </message>
     <message>
         <location filename="../../Core/DataFilter.cpp" line="3717"/>
         <source>Date</source>
-        <translation type="unfinished">Date</translation>
+        <translation>Date</translation>
     </message>
     <message>
         <location filename="../../Core/DataFilter.cpp" line="3718"/>
         <source>Time</source>
-        <translation type="unfinished"></translation>
+        <translation>Temps</translation>
     </message>
     <message>
         <location filename="../../Core/DataFilter.cpp" line="3719"/>
         <source>Name</source>
-        <translation type="unfinished">Nom</translation>
+        <translation>Nom</translation>
     </message>
     <message>
         <location filename="../../Core/DataFilter.cpp" line="3720"/>
         <source>Start</source>
-        <translation type="unfinished"></translation>
+        <translation>Début</translation>
     </message>
     <message>
         <location filename="../../Core/DataFilter.cpp" line="3721"/>
         <source>Stop</source>
-        <translation type="unfinished"></translation>
+        <translation>Stop</translation>
     </message>
     <message>
         <location filename="../../Core/DataFilter.cpp" line="3722"/>
         <source>Type</source>
-        <translation type="unfinished">Type</translation>
+        <translation>Type</translation>
     </message>
     <message>
         <location filename="../../Core/DataFilter.cpp" line="3723"/>
         <source>Test</source>
-        <translation type="unfinished">Test</translation>
+        <translation>Test</translation>
     </message>
     <message>
         <location filename="../../Core/DataFilter.cpp" line="3724"/>
         <source>Color</source>
-        <translation type="unfinished">Couleur</translation>
+        <translation>Couleur</translation>
     </message>
     <message>
         <location filename="../../Core/DataFilter.cpp" line="3725"/>
         <source>Route</source>
-        <translation type="unfinished"></translation>
+        <translation>Route</translation>
     </message>
     <message>
         <location filename="../../Core/DataFilter.cpp" line="3726"/>
         <source>Selected</source>
-        <translation type="unfinished"></translation>
+        <translation>Sélectionner</translation>
     </message>
     <message>
         <location filename="../../Core/DataFilter.cpp" line="3727"/>
         <source>File Name</source>
-        <translation type="unfinished"></translation>
+        <translation>Nom du fichier</translation>
     </message>
     <message>
         <source>metrics(symbol|date), symbol should be a metric name</source>
@@ -22477,7 +22503,7 @@ La correction de couple - cette valeur définie une valeur absolue en newton mè
     <message>
         <location filename="../../Core/DataFilter.cpp" line="2247"/>
         <source>bests() - first parameters is a symbol should be a series name or &apos;date&apos;</source>
-        <translation type="unfinished">bests() - le premier paramètre est un symbole qui doit être un nom de série ou une &apos;date&apos;</translation>
+        <translation>bests() - le premier paramètre est un symbole qui doit être un nom de série ou une &apos;date&apos;</translation>
     </message>
     <message>
         <location filename="../../Core/DataFilter.cpp" line="2288"/>
@@ -22512,178 +22538,179 @@ La correction de couple - cette valeur définie une valeur absolue en newton mè
     <message>
         <location filename="../../Core/DataFilter.cpp" line="2334"/>
         <source>quantil(vector, quantiles)</source>
-        <translation type="unfinished"></translation>
+        <translation>quantil(vector, quantiles)</translation>
     </message>
     <message>
         <location filename="../../Core/DataFilter.cpp" line="2344"/>
         <source>multisort(ascend|descend, list [, .. list n])</source>
-        <translation type="unfinished"></translation>
+        <translation>multisort(ascend|descend, list [, .. list n])</translation>
     </message>
     <message>
         <location filename="../../Core/DataFilter.cpp" line="2350"/>
         <source>multisort(ascend|descend, list [, .. list n]), need to specify ascend or descend</source>
-        <translation type="unfinished"></translation>
+        <translation>multisort(ascend|descend, list [, .. list n]), besoin de spécifier ascend ou down</translation>
     </message>
     <message>
         <location filename="../../Core/DataFilter.cpp" line="2362"/>
         <source>multisort: list arguments must be a symbol</source>
-        <translation type="unfinished"></translation>
+        <translation>multisort: les arguments de la liste doivent être un symbole</translation>
     </message>
     <message>
         <location filename="../../Core/DataFilter.cpp" line="2366"/>
         <location filename="../../Core/DataFilter.cpp" line="2428"/>
         <location filename="../../Core/DataFilter.cpp" line="2444"/>
         <source>&apos;%1&apos; is not a user symbol</source>
-        <translation type="unfinished"></translation>
+        <translation>&apos;%1&apos; n&apos;est pas un symbole utilisateur</translation>
     </message>
     <message>
         <location filename="../../Core/DataFilter.cpp" line="2378"/>
         <source>sort(ascend|descend, list), need to specify ascend or descend</source>
-        <translation type="unfinished"></translation>
+        <translation>sort(ascend|descend, list), doit spécifier ascend ou descend</translation>
     </message>
     <message>
         <location filename="../../Core/DataFilter.cpp" line="2391"/>
         <source>rank(ascend|descend, list), need to specify ascend or descend</source>
-        <translation type="unfinished"></translation>
+        <translation>rank(ascend|descend, list), doit spécifier ascend ou descend</translation>
     </message>
     <message>
         <location filename="../../Core/DataFilter.cpp" line="2404"/>
         <location filename="../../Core/DataFilter.cpp" line="2440"/>
         <source>argsort(ascend|descend, list), need to specify ascend or descend</source>
-        <translation type="unfinished"></translation>
+        <translation>argsort(ascend|descend, list), doit spécifier ascend ou descend</translation>
     </message>
     <message>
         <location filename="../../Core/DataFilter.cpp" line="2415"/>
         <source>multiuniq(list [, .. list n])</source>
-        <translation type="unfinished"></translation>
+        <translation>multiuniq(list [, .. list n])</translation>
     </message>
     <message>
         <location filename="../../Core/DataFilter.cpp" line="2424"/>
         <source>multiuniq: list arguments must be a symbol</source>
-        <translation type="unfinished"></translation>
+        <translation>multiuniq: les arguments de la liste doivent être un symbole</translation>
     </message>
     <message>
         <location filename="../../Core/DataFilter.cpp" line="2455"/>
         <source>curve(seriesname, x|y|z|d|t), need to specify series name and data.</source>
-        <translation type="unfinished"></translation>
+        <translation>curve(seriesname, x|y|z|d|t), doit spécifier le nom et les données de la série.</translation>
     </message>
     <message>
         <location filename="../../Core/DataFilter.cpp" line="2460"/>
         <source>&apos;%1&apos; is not a valid, x, y, z, d or t expected</source>
-        <translation type="unfinished"></translation>
+        <translation>&apos;%1&apos; n&apos;est pas valide, x, y, z, d ou t attendu</translation>
     </message>
     <message>
         <location filename="../../Core/DataFilter.cpp" line="2470"/>
         <source>meanmax(SERIES|data [,start, stop]) or meanmax(xvector,yvector)</source>
-        <translation type="unfinished"></translation>
+        <translation>meanmax(SERIES|data [,start, stop]) ou meanmax(xvecteur,yvecteur)</translation>
     </message>
     <message>
         <location filename="../../Core/DataFilter.cpp" line="2477"/>
         <source>meanmax(SERIES), SERIES should be POWER, HEARTRATE etc.</source>
-        <translation type="unfinished"></translation>
+        <translation>meanmax(SERIES), SERIES devrait être POWER, HEARTRATE etc.</translation>
     </message>
     <message>
         <location filename="../../Core/DataFilter.cpp" line="2503"/>
         <source>dist(series, data|bins), both parameters are required.</source>
-        <translation type="unfinished"></translation>
+        <translation>dist(series, data|bins), les deux paramètres sont obligatoires.</translation>
     </message>
     <message>
         <location filename="../../Core/DataFilter.cpp" line="2510"/>
         <source>dist(series, data|bins), series should be one ofPOWER, HEARTRATE etc.</source>
-        <translation type="unfinished"></translation>
+        <translation>dist(series, data|bins), les séries doivent être parmi POWER, HEARTRATE etc.</translation>
     </message>
     <message>
         <location filename="../../Core/DataFilter.cpp" line="2525"/>
         <location filename="../../Core/DataFilter.cpp" line="2531"/>
         <source>dist(series, data|bins), second parameter must be ether &apos;data&apos; or &apos;bins&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>dist(series, data|bins), le deuxième paramètre doit être &apos;data&apos; ou &apos;bins&apos;</translation>
     </message>
     <message>
         <location filename="../../Core/DataFilter.cpp" line="2551"/>
         <source>annotation type &apos;%1&apos; not available</source>
-        <translation type="unfinished"></translation>
+        <translation>le type d&apos;annotation &apos;%1&apos; n&apos;est pas disponible</translation>
     </message>
     <message>
         <location filename="../../Core/DataFilter.cpp" line="2558"/>
         <source>annotate(voronoi, centers)</source>
-        <translation type="unfinished"></translation>
+        <translation>annotate(voronoi, centers)</translation>
     </message>
     <message>
         <location filename="../../Core/DataFilter.cpp" line="2565"/>
         <source>annotate(lr, solid|dash|dot|dashdot|dashdotdot, &quot;colorname&quot;)</source>
-        <translation type="unfinished"></translation>
+        <translation>annotate(lr, solid|dash|dot|dashdot|dashdotdot, &quot;colorname&quot;)</translation>
     </message>
     <message>
         <location filename="../../Core/DataFilter.cpp" line="2576"/>
         <source>annotate(hline|vline, &apos;label&apos;, solid|dash|dot|dashdot|dashdotdot, value)</source>
-        <translation type="unfinished"></translation>
+        <translation>annotate(hline|vline, &apos;label&apos;, solid|dash|dot|dashdot|dashdotdot, value)</translation>
     </message>
     <message>
         <location filename="../../Core/DataFilter.cpp" line="2595"/>
         <source>smooth(list, algorithm [,parameters]) need at least 2 parameters.</source>
-        <translation type="unfinished"></translation>
+        <translation>smooth(list, algorithm [,parameters]) nécessite au moins 2 paramètres.</translation>
     </message>
     <message>
         <location filename="../../Core/DataFilter.cpp" line="2602"/>
         <source>smoothing algorithm &apos;%1&apos; not available</source>
-        <translation type="unfinished"></translation>
+        <translation>l&apos;algorithme de lissage &apos;%1&apos; n&apos;est pas disponible</translation>
     </message>
     <message>
         <location filename="../../Core/DataFilter.cpp" line="2609"/>
         <location filename="../../Core/DataFilter.cpp" line="2617"/>
         <source>smooth(list, sma, forward|centered|backward, windowsize</source>
-        <translation type="unfinished"></translation>
+        <translation>smooth(list, sma, forward|centered|backward, windowsize</translation>
     </message>
     <message>
         <location filename="../../Core/DataFilter.cpp" line="2630"/>
         <source>smooth(list, ewma, alpha (between 0 and 1)</source>
-        <translation type="unfinished"></translation>
+        <translation>smooth(list, ewma, alpha (entre 0 et 1)</translation>
     </message>
     <message>
         <location filename="../../Core/DataFilter.cpp" line="2644"/>
         <source>lowerbound(list, value), need list and value to find</source>
-        <translation type="unfinished"></translation>
+        <translation>lowerbound(list, value), nécessite une liste et une valeur à trouver</translation>
     </message>
     <message>
         <location filename="../../Core/DataFilter.cpp" line="2655"/>
         <source>lr(x, y), need x and y vectors.</source>
-        <translation type="unfinished"></translation>
+        <translation>lr(x, y), nécessite des vecteurs x et y.</translation>
     </message>
     <message>
         <location filename="../../Core/DataFilter.cpp" line="2667"/>
         <source>mlr(yvector, xvector1 .. xvectorn), need at least 1 xvector and y vectors.</source>
-        <translation type="unfinished"></translation>
+        <translation>mlr(yvector, xvector1 .. xvectorn), nécessite au moins 1 vecteur x et y vecteurs.</translation>
     </message>
     <message>
         <location filename="../../Core/DataFilter.cpp" line="2678"/>
         <source>lm(expr, xlist, ylist), need formula, x and y data to fit to.</source>
-        <translation type="unfinished"></translation>
+        <translation>lm(expr, xlist, ylist), nécessite une formule, des listes de données x et y pour s&apos;adapter.</translation>
     </message>
     <message>
         <location filename="../../Core/DataFilter.cpp" line="2698"/>
         <source>lm(expr, xlist, ylist), formula must have at least one parameter to estimate.
 </source>
-        <translation type="unfinished"></translation>
+        <translation>lm(expr, xlist, ylist), la formule doit avoir au moins un paramètre à estimer.
+</translation>
     </message>
     <message>
         <location filename="../../Core/DataFilter.cpp" line="2706"/>
         <source>sapply(list, expr), need 2 parameters.</source>
-        <translation type="unfinished"></translation>
+        <translation>sapply(list, expr), nécessite 2 paramètres.</translation>
     </message>
     <message>
         <location filename="../../Core/DataFilter.cpp" line="2717"/>
         <source>pmc(metric, stress|lts|sts|sb|rr|date), need to specify a metric and series.</source>
-        <translation type="unfinished"></translation>
+        <translation>pmc(metric, stress|lts|sts|sb|rr|date), doit spécifier une métrique et une série.</translation>
     </message>
     <message>
         <location filename="../../Core/DataFilter.cpp" line="2727"/>
         <source>invalid PMC series &apos;%1&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>Série PMC invalide &apos;%1&apos;</translation>
     </message>
     <message>
         <location filename="../../Core/DataFilter.cpp" line="2736"/>
         <source>should be banister(load_metric, perf_metric, nte|pte|perf|cp|date)</source>
-        <translation type="unfinished"></translation>
+        <translation>devrait être banister(load_metric, perf_metric, nte|pte|perf|cp|date)</translation>
     </message>
     <message>
         <location filename="../../Core/DataFilter.cpp" line="2774"/>
@@ -23597,27 +23624,27 @@ Fichier ignoré...</translation>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="238"/>
         <source>apps</source>
-        <translation type="unfinished"></translation>
+        <translation>apps</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="243"/>
         <source>sync</source>
-        <translation type="unfinished"></translation>
+        <translation>synx</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="245"/>
         <source>options</source>
-        <translation type="unfinished"></translation>
+        <translation>options</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="323"/>
         <source>Toggle Tab/Tile</source>
-        <translation type="unfinished"></translation>
+        <translation>Basculer onglet/mosaïque</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="333"/>
         <source>What&apos;s This?</source>
-        <translation type="unfinished"></translation>
+        <translation>Qu&apos;est-ce que c&apos;est ça?</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="466"/>
@@ -25447,7 +25474,7 @@ CP du cycliste fixée à %3 watts</translation>
     <message>
         <location filename="../../Gui/Pages.cpp" line="3378"/>
         <source>Measures Field</source>
-        <translation type="unfinished"></translation>
+        <translation>Champ de Mesures</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="3387"/>
@@ -27491,12 +27518,12 @@ Pas d&apos;activité trouvée à importer.
         <location filename="../../Charts/Overview.cpp" line="696"/>
         <location filename="../../Charts/Overview.cpp" line="706"/>
         <source>Export User Chart</source>
-        <translation type="unfinished"></translation>
+        <translation>Exporter le graphique utilisateur</translation>
     </message>
     <message>
         <location filename="../../Charts/Overview.cpp" line="706"/>
         <source>Open file for export failed.</source>
-        <translation type="unfinished"></translation>
+        <translation>L&apos;ouverture du fichier pour l&apos;exportation a échoué.</translation>
     </message>
 </context>
 <context>
@@ -27504,92 +27531,92 @@ Pas d&apos;activité trouvée à importer.
     <message>
         <location filename="../../Charts/OverviewItems.cpp" line="3704"/>
         <source>Name</source>
-        <translation type="unfinished">Nom</translation>
+        <translation>Nom</translation>
     </message>
     <message>
         <location filename="../../Charts/OverviewItems.cpp" line="3708"/>
         <source>Export Data</source>
-        <translation type="unfinished"></translation>
+        <translation>Exporter des données</translation>
     </message>
     <message>
         <location filename="../../Charts/OverviewItems.cpp" line="3723"/>
         <source>Legacy</source>
-        <translation type="unfinished"></translation>
+        <translation>Héritage</translation>
     </message>
     <message>
         <location filename="../../Charts/OverviewItems.cpp" line="3732"/>
         <source>Filter</source>
-        <translation type="unfinished">Filtre</translation>
+        <translation>Filtre</translation>
     </message>
     <message>
         <location filename="../../Charts/OverviewItems.cpp" line="3741"/>
         <source>Metric</source>
-        <translation type="unfinished"></translation>
+        <translation>Métrique</translation>
     </message>
     <message>
         <location filename="../../Charts/OverviewItems.cpp" line="3749"/>
         <source>X Axis Metric</source>
-        <translation type="unfinished"></translation>
+        <translation>Axe X Métrique</translation>
     </message>
     <message>
         <location filename="../../Charts/OverviewItems.cpp" line="3753"/>
         <source>Y Axis Metric</source>
-        <translation type="unfinished"></translation>
+        <translation>Axe Y Métrique</translation>
     </message>
     <message>
         <location filename="../../Charts/OverviewItems.cpp" line="3757"/>
         <source>Bubble Size Metric</source>
-        <translation type="unfinished"></translation>
+        <translation>Mesure de la taille des bulles</translation>
     </message>
     <message>
         <location filename="../../Charts/OverviewItems.cpp" line="3763"/>
         <source>Field Name</source>
-        <translation type="unfinished"></translation>
+        <translation>Nom du champs</translation>
     </message>
     <message>
         <location filename="../../Charts/OverviewItems.cpp" line="3769"/>
         <source>Zone Series</source>
-        <translation type="unfinished"></translation>
+        <translation>Zone de série</translation>
     </message>
     <message>
         <location filename="../../Charts/OverviewItems.cpp" line="3773"/>
         <source>Polarized</source>
-        <translation type="unfinished">Polarisé</translation>
+        <translation>Polarisé</translation>
     </message>
     <message>
         <location filename="../../Charts/OverviewItems.cpp" line="3785"/>
         <source>Start</source>
-        <translation type="unfinished">Démarrer</translation>
+        <translation>Démarrer</translation>
     </message>
     <message>
         <location filename="../../Charts/OverviewItems.cpp" line="3786"/>
         <source>Stop</source>
-        <translation type="unfinished">Stop</translation>
+        <translation>Stop</translation>
     </message>
     <message>
         <location filename="../../Charts/OverviewItems.cpp" line="3883"/>
         <source>Program</source>
-        <translation type="unfinished">Programme</translation>
+        <translation>Programme</translation>
     </message>
     <message>
         <location filename="../../Charts/OverviewItems.cpp" line="3895"/>
         <source>Time</source>
-        <translation type="unfinished">Temps</translation>
+        <translation>Temps</translation>
     </message>
     <message>
         <location filename="../../Charts/OverviewItems.cpp" line="3900"/>
         <source>Units</source>
-        <translation type="unfinished">Unités</translation>
+        <translation>Unités</translation>
     </message>
     <message>
         <location filename="../../Charts/OverviewItems.cpp" line="3907"/>
         <source>Background</source>
-        <translation type="unfinished">Fond</translation>
+        <translation>Fond</translation>
     </message>
     <message>
         <location filename="../../Charts/OverviewItems.cpp" line="3909"/>
         <source>Color</source>
-        <translation type="unfinished">Couleur</translation>
+        <translation>Couleur</translation>
     </message>
 </context>
 <context>
@@ -27621,37 +27648,37 @@ Pas d&apos;activité trouvée à importer.
     <message>
         <location filename="../../Charts/Overview.cpp" line="36"/>
         <source>Add Tile...</source>
-        <translation type="unfinished"></translation>
+        <translation>Ajouter une tuile...</translation>
     </message>
     <message>
         <location filename="../../Charts/Overview.cpp" line="39"/>
         <source>Import Chart...</source>
-        <translation type="unfinished">Importer un graphique...</translation>
+        <translation>Importer un graphique...</translation>
     </message>
     <message>
         <location filename="../../Charts/Overview.cpp" line="42"/>
         <source>Settings...</source>
-        <translation type="unfinished"></translation>
+        <translation>Réglages...</translation>
     </message>
     <message>
         <location filename="../../Charts/Overview.cpp" line="53"/>
         <source>Minimum Columns</source>
-        <translation type="unfinished"></translation>
+        <translation>Colonnes minimales</translation>
     </message>
     <message>
         <location filename="../../Charts/Overview.cpp" line="130"/>
         <source>Import user chart from file</source>
-        <translation type="unfinished"></translation>
+        <translation>Importer un graphique utilisateur à partir d&apos;un fichier</translation>
     </message>
     <message>
         <location filename="../../Charts/Overview.cpp" line="174"/>
         <source>Not imported</source>
-        <translation type="unfinished"></translation>
+        <translation>Non importé</translation>
     </message>
     <message>
         <location filename="../../Charts/Overview.cpp" line="174"/>
         <source>We only support importing valid User Charts built for this view at present.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nous ne prenons en charge que l&apos;importation de graphiques utilisateur valides créés pour cette vue pour le moment.</translation>
     </message>
     <message>
         <source>HRV rMSSD</source>
@@ -31466,42 +31493,42 @@ yyyy</translation>
     <message>
         <location filename="../../Charts/OverviewItems.cpp" line="66"/>
         <source>Interval Bubble Chart</source>
-        <translation type="unfinished"></translation>
+        <translation>Graphique à bulles d&apos;intervalles</translation>
     </message>
     <message>
         <location filename="../../Charts/OverviewItems.cpp" line="67"/>
         <source>Activities Bubble Chart</source>
-        <translation type="unfinished"></translation>
+        <translation>Graphique à bulles d&apos;activités</translation>
     </message>
     <message>
         <location filename="../../Charts/OverviewItems.cpp" line="68"/>
         <source>PMC</source>
-        <translation type="unfinished"></translation>
+        <translation>PMC</translation>
     </message>
     <message>
         <location filename="../../Charts/OverviewItems.cpp" line="68"/>
         <source>PMC Status Summary</source>
-        <translation type="unfinished"></translation>
+        <translation>Résumé de l&apos;état du PMC</translation>
     </message>
     <message>
         <location filename="../../Charts/OverviewItems.cpp" line="69"/>
         <source>Route</source>
-        <translation type="unfinished"></translation>
+        <translation>Route</translation>
     </message>
     <message>
         <location filename="../../Charts/OverviewItems.cpp" line="69"/>
         <source>Route Summary</source>
-        <translation type="unfinished"></translation>
+        <translation>Résumé de l&apos;itinéraire</translation>
     </message>
     <message>
         <location filename="../../Charts/OverviewItems.cpp" line="70"/>
         <source>Donut</source>
-        <translation type="unfinished"></translation>
+        <translation>Donut</translation>
     </message>
     <message>
         <location filename="../../Charts/OverviewItems.cpp" line="70"/>
         <source>Metric breakdown by category</source>
-        <translation type="unfinished"></translation>
+        <translation>Répartition des métriques par catégorie</translation>
     </message>
     <message>
         <location filename="../../Charts/OverviewItems.cpp" line="4235"/>
@@ -31764,32 +31791,32 @@ Python désactivé dans les préférences.</translation>
     <message>
         <location filename="../../Charts/GenericChart.h" line="168"/>
         <source>Continuous</source>
-        <translation type="unfinished">Continu</translation>
+        <translation>Continu</translation>
     </message>
     <message>
         <location filename="../../Charts/GenericChart.h" line="169"/>
         <source>Date</source>
-        <translation type="unfinished">Date</translation>
+        <translation>Date</translation>
     </message>
     <message>
         <location filename="../../Charts/GenericChart.h" line="170"/>
         <source>Time</source>
-        <translation type="unfinished">Temps</translation>
+        <translation>Temps</translation>
     </message>
     <message>
         <location filename="../../Charts/GenericChart.h" line="171"/>
         <source>Category</source>
-        <translation type="unfinished">Catégorie</translation>
+        <translation>Catégorie</translation>
     </message>
     <message>
         <location filename="../../Gui/AthleteView.cpp" line="12"/>
         <source>Athlete</source>
-        <translation type="unfinished">Athlète</translation>
+        <translation>Athlète</translation>
     </message>
     <message>
         <location filename="../../Gui/AthleteView.cpp" line="12"/>
         <source>Athlete Card</source>
-        <translation type="unfinished">Carte Athlète</translation>
+        <translation>Carte Athlète</translation>
     </message>
 </context>
 <context>
@@ -31816,7 +31843,7 @@ Python désactivé dans les préférences.</translation>
     <message>
         <location filename="../../Charts/RChart.cpp" line="284"/>
         <source>Use GC charts</source>
-        <translation type="unfinished">Utiliser les graphiques GC</translation>
+        <translation>Utiliser les graphiques GC</translation>
     </message>
     <message>
         <location filename="../../Charts/RChart.cpp" line="305"/>
@@ -41311,42 +41338,42 @@ Appuyer sur F3 sur les controlleur une fois effectué.</translation>
     <message>
         <location filename="../../Train/VMProWidget.cpp" line="74"/>
         <source>Idle Timeout</source>
-        <translation type="unfinished">Délai d&apos;inactivité</translation>
+        <translation>Délai d&apos;inactivité</translation>
     </message>
     <message>
         <location filename="../../Train/VMProWidget.cpp" line="78"/>
         <source>Calibration Status:</source>
-        <translation type="unfinished"></translation>
+        <translation>Statut d&apos;étalonnage:</translation>
     </message>
     <message>
         <location filename="../../Train/VMProWidget.cpp" line="79"/>
         <source>Unknown</source>
-        <translation type="unfinished">Inconnu</translation>
+        <translation>Inconnu</translation>
     </message>
     <message>
         <location filename="../../Train/VMProWidget.cpp" line="85"/>
         <source>Calibration Status</source>
-        <translation type="unfinished"></translation>
+        <translation>Statut d&apos;étalonnage</translation>
     </message>
     <message>
         <location filename="../../Train/VMProWidget.cpp" line="89"/>
         <source>Start Calibration</source>
-        <translation type="unfinished">Démarrer la calibration</translation>
+        <translation>Démarrer la calibration</translation>
     </message>
     <message>
         <location filename="../../Train/VMProWidget.cpp" line="102"/>
         <source>Status Information</source>
-        <translation type="unfinished"></translation>
+        <translation>Information sur l&apos;état</translation>
     </message>
     <message>
         <location filename="../../Train/VMProWidget.cpp" line="105"/>
         <source>Save log to file</source>
-        <translation type="unfinished"></translation>
+        <translation>Enregistrer le journal dans un fichier</translation>
     </message>
     <message>
         <location filename="../../Train/VMProWidget.cpp" line="217"/>
         <source>Save File</source>
-        <translation type="unfinished">Enregistrer le fichier</translation>
+        <translation>Enregistrer le fichier</translation>
     </message>
 </context>
 <context>
