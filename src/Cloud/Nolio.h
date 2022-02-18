@@ -43,6 +43,7 @@ class Nolio : public CloudService {
         bool open(QStringList &errors);
         bool close();
 
+        virtual int capabilities() const { return OAuth | Download | Query; }
         // home directory
         QString home();
 
