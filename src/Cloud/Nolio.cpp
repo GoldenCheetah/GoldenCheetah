@@ -28,7 +28,7 @@
 #include <QJsonValue>
 
 #ifndef NOLIO_DEBUG
-#define NOLIO_DEBUG true
+#define NOLIO_DEBUG false
 #endif
 #ifdef Q_CC_MSVC
 #define printd(fmt, ...) do {                                                \
@@ -115,6 +115,7 @@ bool Nolio::open(QStringList &errors){
 
     if (reply->error() != 0) {
         printd("Got error %d\n", reply->error());
+        errors << reply->errorString();
         return false;
     }
     QByteArray r = reply->readAll();
@@ -254,6 +255,8 @@ QByteArray* Nolio::prepareResponse(QByteArray* data){
         QJsonObject activity = document.object();
         QDateTime start_time = QDateTime::fromString(activity["date_start"].toString(), Qt::ISODate);
         RideFile *ride = new RideFile(start_time.toUTC(), 1.0f);
+        // The device type is unknown
+        ride->setDeviceType("Nolio");
         // set nolio id in metadata
         if (!activity["nolio_id"].isNull()) ride->setTag("NolioID",  QString("%1").arg(activity["id"].toVariant().toULongLong()));
         // set sport and subsport
