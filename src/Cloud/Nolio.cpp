@@ -19,6 +19,7 @@
 #include "MainWindow.h"
 #include "JsonRideFile.h"
 #include "Athlete.h"
+#include "Secrets.h"
 #include "Settings.h"
 #include <QByteArray>
 #include <QHttpMultiPart>
