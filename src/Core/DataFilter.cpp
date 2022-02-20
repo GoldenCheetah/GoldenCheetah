@@ -439,7 +439,7 @@ DataFilter::builtins(Context *context)
         if (i == 30 || i == 95) { // special case 'estimate' and 'estimates' we describe it
 
             if (i==30) { foreach(QString model, pdmodels(context)) returning << "estimate(" + model + ", cp|ftp|w'|pmax|x)"; }
-            if (i==95) { foreach(QString model, pdmodels(context)) returning << "estimates(" + model + ", cp|ftp|w'|pmax|x|date)"; }
+            if (i==95) { foreach(QString model, pdmodels(context)) returning << "estimates(" + model + ", cp|ftp|w'|pmax|x|date|isrun)"; }
 
         } else if (i == 31) { // which example
             returning << "which(x>0, ...)";
@@ -2905,7 +2905,7 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
 
                             // check symbol name if it is a symbol
                             if (leaf->fparms[1]->type == Leaf::Symbol) {
-                                QRegExp estimateValidSymbols(name == "estimate" ? "^(cp|ftp|pmax|w')$" : "^(cp|ftp|pmax|w'|date)", Qt::CaseInsensitive);
+                                QRegExp estimateValidSymbols(name == "estimate" ? "^(cp|ftp|pmax|w')$" : "^(cp|ftp|pmax|w'|date|isrun)", Qt::CaseInsensitive);
                                 if (!estimateValidSymbols.exactMatch(*(leaf->fparms[1]->lvalue.n))) {
                                     leaf->inerror = leaf->fparms[1]->inerror = true;
                                     DataFiltererrors << QString(tr("%1 function expects parameter or duration as second parameter")).arg(name);
@@ -6867,6 +6867,8 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
 
                     if (fnum == 30) {
 
+                        if (m == NULL) return Result(0); // no ride
+
                         // get the PD Estimate for this date - note we always work with the absolulte
                         // power estimates in formulas, since the user can just divide by config(weight)
                         // or Athlete_Weight (which takes into account values stored in ride files.
@@ -6912,13 +6914,11 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
 
                         Result returning(0);
 
-                        if (m == NULL) return returning; // no ride
-
                         // date range, returning a vector
                         foreach(PDEstimate pde, m->context->athlete->getPDEstimates()) {
 
                             // does it match our criteria?
-                            if (pde.model == model && pde.parameters.count() != 0 && pde.from <= d.to && pde.to >= d.from && pde.run==m->isRun && pde.wpk==false) {
+                            if (pde.model == model && pde.parameters.count() != 0 && pde.from <= d.to && pde.to >= d.from && pde.wpk==false) {
 
                                 // overlaps, but truncate the dates we return
                                 int dfrom, dto;
@@ -6954,6 +6954,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
                                     if (parm == "ftp") v1=v2=pde.FTP;
                                     if (parm == "pmax") v1=v2=pde.PMax;
                                     if (parm == "date") { v1=dfrom; v2=dto; }
+                                    if (parm == "isrun") { v1=v2=pde.run; }
                                 }
 
                                 returning.number() += v1+v2;
