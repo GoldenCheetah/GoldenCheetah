@@ -203,6 +203,7 @@
         <file>images/services/velohero.png</file>
         <file>images/services/polarflow.png</file>
         <file>images/services/sporttracks.png</file>
+        <file>images/services/nolio.png</file>
         <file>python/library.py</file>
         <file>images/devices/imagic.png</file>
         <file>data/powerprofile.csv</file>

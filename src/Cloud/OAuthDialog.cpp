@@ -46,6 +46,7 @@ OAuthDialog::OAuthDialog(Context *context, OAuthSite site, CloudService *service
         if (service->id() == "Cycling Analytics") site = this->site = CYCLING_ANALYTICS;
         if (service->id() == "Google Calendar") site = this->site = GOOGLE_CALENDAR;
         if (service->id() == "Google Drive") site = this->site = GOOGLE_DRIVE;
+        if (service->id() == "Nolio") site = this->site = NOLIO;
         if (service->id() == "University of Kent") site = this->site = KENTUNI;
         if (service->id() == "Today's Plan") site = this->site = TODAYSPLAN;
         if (service->id() == "Withings") site = this->site = WITHINGS;
@@ -101,6 +102,13 @@ OAuthDialog::OAuthDialog(Context *context, OAuthSite site, CloudService *service
         urlstr.append("redirect_uri=http://www.goldencheetah.org/&");
         urlstr.append("response_type=code&");
         urlstr.append("approval_prompt=force");
+
+    } else if(site == NOLIO) {
+
+        urlstr = QString("https://www.nolio.io/api/authorize/?");
+        urlstr.append("client_id=").append(GC_NOLIO_CLIENT_ID).append("&");
+        urlstr.append("redirect_uri=http://www.goldencheetah.org/&");
+        urlstr.append("response_type=code");
 
     } else if (site == DROPBOX) {
 
@@ -194,8 +202,7 @@ OAuthDialog::OAuthDialog(Context *context, OAuthSite site, CloudService *service
     //
     // STEP 1: LOGIN AND AUTHORISE THE APPLICATION
     //
-    if (site == DROPBOX || site == STRAVA || site == CYCLING_ANALYTICS || site == POLAR || site == SPORTTRACKS || site == GOOGLE_CALENDAR || site == GOOGLE_DRIVE || site == KENTUNI || site == TODAYSPLAN || site == WITHINGS) {
-
+    if (site == NOLIO || site == DROPBOX || site == STRAVA || site == CYCLING_ANALYTICS || site == POLAR || site == SPORTTRACKS || site == GOOGLE_CALENDAR || site == GOOGLE_DRIVE || site == KENTUNI || site == TODAYSPLAN || site == WITHINGS) {
         url = QUrl(urlstr);
         view->setUrl(url);
 
@@ -233,7 +240,7 @@ OAuthDialog::urlChanged(const QUrl &url)
     QString authheader;
 
     // sites that use this scheme
-    if (site == DROPBOX || site == STRAVA || site == CYCLING_ANALYTICS || site == TODAYSPLAN || site == POLAR || site == SPORTTRACKS || site == XERT || site == RIDEWITHGPS || site == WITHINGS) {
+    if (site == NOLIO || site == DROPBOX || site == STRAVA || site == CYCLING_ANALYTICS || site == TODAYSPLAN || site == POLAR || site == SPORTTRACKS || site == XERT || site == RIDEWITHGPS || site == WITHINGS) {
 
         if (url.toString().startsWith("http://www.goldencheetah.org/?state=&code=") ||
                 url.toString().contains("blank.html?code=") ||
@@ -283,6 +290,15 @@ OAuthDialog::urlChanged(const QUrl &url)
                 params.addQueryItem("client_id", GC_STRAVA_CLIENT_ID);
 #ifdef GC_STRAVA_CLIENT_SECRET
                 params.addQueryItem("client_secret", GC_STRAVA_CLIENT_SECRET);
+#endif
+
+            } else if (site == NOLIO) {
+
+                urlstr = QString("https://www.nolio.io/api/token/?");
+                params.addQueryItem("grant_type", "authorization_code");
+                params.addQueryItem("redirect_uri", "http://www.goldencheetah.org/");
+#if (defined GC_NOLIO_CLIENT_ID) && (defined GC_NOLIO_CLIENT_SECRET)
+                authheader = QString("%1:%2").arg(GC_NOLIO_CLIENT_ID).arg(GC_NOLIO_CLIENT_SECRET);
 #endif
 
             }  else if (site == CYCLING_ANALYTICS) {
@@ -358,9 +374,8 @@ OAuthDialog::urlChanged(const QUrl &url)
                 QNetworkRequest request = QNetworkRequest(url);
                 request.setHeader(QNetworkRequest::ContentTypeHeader,"application/x-www-form-urlencoded");
 
-                // client id and secret are encoded and sent in the header for POLAR and XERT
-                if (site == POLAR || site == XERT)  request.setRawHeader("Authorization", "Basic " +  authheader.toLatin1().toBase64());
-
+                // client id and secret are encoded and sent in the header for NOLIO, POLAR and XERT
+                if (site == NOLIO || site == POLAR || site == XERT)  request.setRawHeader("Authorization", "Basic " +  authheader.toLatin1().toBase64());
                 manager->post(request, data);
             }
 
@@ -435,7 +450,6 @@ OAuthDialog::networkRequestFinished(QNetworkReply *reply)
 
     // we've been told to ignore responses (used by POLAR, maybe others in future)
     if (ignore) return;
-
     // we can handle SSL handshake errors, if we got here then some kind of protocol was agreed
     if (reply->error() == QNetworkReply::NoError || reply->error() == QNetworkReply::SslHandshakeFailedError) {
 
@@ -464,7 +478,6 @@ OAuthDialog::networkRequestFinished(QNetworkReply *reply)
         // google uses a refresh token so trap for them only
         if (((site == GOOGLE_CALENDAR || site == GOOGLE_DRIVE || site == KENTUNI) && refresh_token == "") ||
              access_token == "" ) {
-
             // Something failed.
             // Only Google uses both refresh and access tokens.
             QString error = QString(tr("Error retrieving authoriation credentials"));
@@ -610,10 +623,16 @@ OAuthDialog::networkRequestFinished(QNetworkReply *reply)
             QMessageBox information(QMessageBox::Information, tr("Information"), info);
             information.exec();
 
+        } else if (site == NOLIO) {
+            appsettings->setValue(GC_NOLIO_ACCESS_TOKEN, access_token);
+            appsettings->setValue(GC_NOLIO_REFRESH_TOKEN, refresh_token);
+            appsettings->setValue(GC_NOLIO_LAST_REFRESH, QDateTime::currentDateTime());
+            QString info = QString(tr("Nolio authorization was successful."));
+            QMessageBox information(QMessageBox::Information, tr("Information"), info);
+            information.exec();
         }
 
     } else {
-
             // general error getting response
             QString error = QString(tr("Error retrieving access token, %1 (%2)")).arg(reply->errorString()).arg(reply->error());
             QMessageBox oautherr(QMessageBox::Critical, tr("SSL Token Refresh Error"), error);
