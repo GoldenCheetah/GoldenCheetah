@@ -77,17 +77,17 @@ Může být nezbytné ji vypnout ručně.</translation>
         <translation>O aplikaci GoldenCheetah</translation>
     </message>
     <message>
-        <location filename="../../Gui/AboutDialog.cpp" line="33"/>
+        <location filename="../../Gui/AboutDialog.cpp" line="32"/>
         <source>About</source>
         <translation>O</translation>
     </message>
     <message>
-        <location filename="../../Gui/AboutDialog.cpp" line="34"/>
+        <location filename="../../Gui/AboutDialog.cpp" line="33"/>
         <source>Version</source>
         <translation>Verze</translation>
     </message>
     <message>
-        <location filename="../../Gui/AboutDialog.cpp" line="35"/>
+        <location filename="../../Gui/AboutDialog.cpp" line="34"/>
         <source>Contributors</source>
         <translation>Přispěvatelé</translation>
     </message>
@@ -122,7 +122,7 @@ Může být nezbytné ji vypnout ručně.</translation>
         <translation type="vanished">&lt;center&gt;&lt;img src=&quot;:images/gc.png&quot; height=80&gt;&lt;h2&gt;GoldenCheetah&lt;/h2&gt;Cyklistický software na analýzu výkonu&lt;br&gt;pro Linux, Mac, a Windows&lt;p&gt;GoldenCheetah je licencován pod&lt;br&gt;&lt;a href=&quot;http://www.gnu.org/copyleft/gpl.html&quot;&gt;GNU General Public License&lt;/a&gt;.&lt;p&gt;Zdrojový kód je přistupný na&lt;br&gt;&lt;a href=&quot;http://goldencheetah.org/&quot;&gt;http://goldencheetah.org/&lt;/a&gt;.&lt;br&gt;&lt;p&gt;Soubory aktivit a jiná data jsou uložena v&lt;br&gt;&lt;a href=&quot;%1&quot;&gt;%2&lt;/a&gt;&lt;p&gt;ID sportovce %3&lt;br&gt;&lt;p&gt;Obchodní známky použité se svolením&lt;br&gt;BikeScore, xPower, SwimScore se svolením &lt;a href=&quot;http://www.physfarm.com&quot;&gt;Physfarm Training Systems&lt;/a&gt;.&lt;br&gt;Virtual Speed se svolením Toma Comptona &lt;a href=&quot;http://www.analyticcycling.com&quot;&gt;AnalyticCycling&lt;/a&gt;.&lt;br&gt;&lt;br&gt;Modul teploty těla byl vyvinut &lt;br&gt;&lt;a href=&quot;http://www.usariem.army.mil/&quot;&gt;U.S. Army Research Institute of Environmental Medicine&lt;/a&gt;&lt;br&gt;a patent je v řízení&lt;br&gt;&lt;/center&gt;</translation>
     </message>
     <message>
-        <location filename="../../Gui/AboutDialog.cpp" line="57"/>
+        <location filename="../../Gui/AboutDialog.cpp" line="56"/>
         <source>&lt;center&gt;&lt;img src=&quot;:images/gc.png&quot; height=80&gt;&lt;h2&gt;GoldenCheetah&lt;/h2&gt;Cycling Power Analysis Software&lt;br&gt;for Linux, Mac, and Windows&lt;p&gt;GoldenCheetah is licensed under the&lt;br&gt;&lt;a href=&quot;https://opensource.org/licenses/GPL-2.0&quot;&gt;GNU General Public License 2.0&lt;/a&gt;.&lt;p&gt;Source code can be obtained from&lt;br&gt;&lt;a href=&quot;https://www.goldencheetah.org/&quot;&gt;https://www.goldencheetah.org/&lt;/a&gt;.&lt;br&gt;&lt;p&gt;Activity files and other data are stored in&lt;br&gt;&lt;a href=&quot;%1&quot;&gt;%2&lt;/a&gt;&lt;p&gt;Athlete ID %3&lt;br&gt;&lt;p&gt;Trademarks used with permission&lt;br&gt;BikeScore, xPower, SwimScore courtesy of &lt;a href=&quot;http://www.physfarm.com&quot;&gt;Physfarm Training Systems&lt;/a&gt;.&lt;br&gt;Virtual Speed courtesy of Tom Compton &lt;a href=&quot;http://www.analyticcycling.com&quot;&gt;AnalyticCycling&lt;/a&gt;.&lt;br&gt;&lt;br&gt;The core body temperature module was developed by the &lt;br&gt;&lt;a href=&quot;http://www.usariem.army.mil/&quot;&gt;U.S. Army Research Institute of Environmental Medicine&lt;/a&gt;&lt;br&gt; and is patent pending&lt;br&gt;&lt;br&gt;&lt;img src=&quot;:images/services/strava_compatible.png&quot;/&gt;&lt;br&gt;&lt;/center&gt;</source>
         <translation type="unfinished"></translation>
     </message>
@@ -10622,6 +10622,41 @@ Možná budete muset (re) instalovat ovladač FTDI nebo PL2303 než zahájíte s
         <source>Range</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <location filename="../../Charts/UserChart.cpp" line="1784"/>
+        <source>Smoothing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Charts/UserChart.cpp" line="1789"/>
+        <source>None</source>
+        <translation type="unfinished">Žádný</translation>
+    </message>
+    <message>
+        <location filename="../../Charts/UserChart.cpp" line="1790"/>
+        <source>Day</source>
+        <translation type="unfinished">Den</translation>
+    </message>
+    <message>
+        <location filename="../../Charts/UserChart.cpp" line="1791"/>
+        <source>Week</source>
+        <translation type="unfinished">Týden</translation>
+    </message>
+    <message>
+        <location filename="../../Charts/UserChart.cpp" line="1792"/>
+        <source>Month</source>
+        <translation type="unfinished">Měsíc</translation>
+    </message>
+    <message>
+        <location filename="../../Charts/UserChart.cpp" line="1793"/>
+        <source>Year</source>
+        <translation type="unfinished">Rok</translation>
+    </message>
+    <message>
+        <location filename="../../Charts/UserChart.cpp" line="1795"/>
+        <source>Group By</source>
+        <translation type="unfinished">Seskupit podle</translation>
+    </message>
 </context>
 <context>
     <name>EditUserDataDialog</name>
@@ -10830,8 +10865,63 @@ Možná budete muset (re) instalovat ovladač FTDI nebo PL2303 než zahájíte s
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../../Charts/UserChart.cpp" line="1421"/>
+        <source>Group</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../../Charts/UserChart.cpp" line="1429"/>
         <source>Series Name</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Charts/UserChart.cpp" line="1518"/>
+        <source>Y units</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Charts/UserChart.cpp" line="1523"/>
+        <source>X units</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Charts/UserChart.cpp" line="1527"/>
+        <source>Sum</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Charts/UserChart.cpp" line="1528"/>
+        <source>Average</source>
+        <translation type="unfinished">Průměr</translation>
+    </message>
+    <message>
+        <location filename="../../Charts/UserChart.cpp" line="1529"/>
+        <source>Peak</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Charts/UserChart.cpp" line="1530"/>
+        <source>Low</source>
+        <translation type="unfinished">Nízký</translation>
+    </message>
+    <message>
+        <location filename="../../Charts/UserChart.cpp" line="1531"/>
+        <source>Running Total</source>
+        <translation type="unfinished">Celkově pro běh</translation>
+    </message>
+    <message>
+        <location filename="../../Charts/UserChart.cpp" line="1532"/>
+        <source>Mean Square Root</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Charts/UserChart.cpp" line="1533"/>
+        <source>Std Deviation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Charts/UserChart.cpp" line="1536"/>
+        <source>Aggregate</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -11439,6 +11529,11 @@ Možná budete muset (re) instalovat ovladač FTDI nebo PL2303 než zahájíte s
         <location filename="../../Metrics/PDModel.h" line="473"/>
         <source>Extended CP</source>
         <translation type="unfinished">Rozšířený CP</translation>
+    </message>
+    <message>
+        <location filename="../../Metrics/PDModel.cpp" line="1320"/>
+        <source>RMSE %1w CV %3% [envelope] %2 points</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -15167,6 +15262,11 @@ Nastavení kroutivého momentu - definuje absolutní hodnotu v psi nebo Nm, o kt
         <location filename="../../Gui/HelpWhatsThis.cpp" line="113"/>
         <source>Wizard to split an activity into multiple activities based on configurable criteria</source>
         <translation>Průvodce rozdělením aktivity do více aktivit podle nastavitelných kritérií</translation>
+    </message>
+    <message>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="67"/>
+        <source>Table of Contents</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="71"/>
@@ -19691,6 +19791,26 @@ NEJASNE</translation>
         <translation>Negativní úpadek</translation>
     </message>
     <message>
+        <location filename="../../Charts/LTMWindow.cpp" line="272"/>
+        <source>RMSE 2.9 for 22 tests.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Charts/LTMWindow.cpp" line="491"/>
+        <source>%1 watts on %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Charts/LTMWindow.cpp" line="492"/>
+        <source>%1 on %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Charts/LTMWindow.cpp" line="498"/>
+        <source>RMSE %1 for %2 tests.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../../Charts/LTMWindow.cpp" line="1311"/>
         <source> grouped by </source>
         <translation> seskupeno podle </translation>
@@ -21072,7 +21192,7 @@ Přeskakuji soubor...</translation>
         <translation type="obsolete">&amp;Nový...</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="2173"/>
+        <location filename="../../Gui/MainWindow.cpp" line="2174"/>
         <source>Ctrl+N</source>
         <translation>Ctrl+N</translation>
     </message>
@@ -21097,12 +21217,12 @@ Přeskakuji soubor...</translation>
         <translation type="obsolete">&amp;Jízda</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="504"/>
+        <location filename="../../Gui/MainWindow.cpp" line="505"/>
         <source>Ctrl+S</source>
         <translation>Ctrl+S</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="496"/>
+        <location filename="../../Gui/MainWindow.cpp" line="497"/>
         <source>&amp;Download from device...</source>
         <translation>&amp;Stáhnout z přístroje...</translation>
     </message>
@@ -21111,12 +21231,12 @@ Přeskakuji soubor...</translation>
         <translation type="vanished">Deník</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="648"/>
+        <location filename="../../Gui/MainWindow.cpp" line="649"/>
         <source>Train</source>
         <translation>Trénink</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="653"/>
+        <location filename="../../Gui/MainWindow.cpp" line="654"/>
         <source>Add Chart</source>
         <translation>Přidat diagram</translation>
     </message>
@@ -21126,7 +21246,7 @@ Přeskakuji soubor...</translation>
         <translation>Zobrazit postranní lištu</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1916"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1917"/>
         <source>Delete Activity</source>
         <translation>Smazat aktivitu</translation>
     </message>
@@ -21144,22 +21264,22 @@ Přeskakuji soubor...</translation>
         <translation type="vanished">&amp;Zavřít všechna okna</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="495"/>
+        <location filename="../../Gui/MainWindow.cpp" line="496"/>
         <source>A&amp;ctivity</source>
         <translation>&amp;Aktivita</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="496"/>
+        <location filename="../../Gui/MainWindow.cpp" line="497"/>
         <source>Ctrl+D</source>
         <translation>Ctrl+D</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="498"/>
+        <location filename="../../Gui/MainWindow.cpp" line="499"/>
         <source>&amp;Manual entry...</source>
         <translation>&amp;Ruční zadání...</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="500"/>
+        <location filename="../../Gui/MainWindow.cpp" line="501"/>
         <source>&amp;Export...</source>
         <translation>&amp;Export...</translation>
     </message>
@@ -21168,207 +21288,207 @@ Přeskakuji soubor...</translation>
         <translation type="vanished">Zálohovat data sportovce</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="501"/>
+        <location filename="../../Gui/MainWindow.cpp" line="502"/>
         <source>&amp;Batch export...</source>
         <translation>&amp;Hromadný export...</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="515"/>
+        <location filename="../../Gui/MainWindow.cpp" line="516"/>
         <source>Sha&amp;re</source>
         <translation>S&amp;dílet</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="526"/>
+        <location filename="../../Gui/MainWindow.cpp" line="527"/>
         <source>Get Measures...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="549"/>
+        <location filename="../../Gui/MainWindow.cpp" line="550"/>
         <source>CP and W&apos; Solver...</source>
         <translation>Řešič CP a W&apos;...</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="551"/>
+        <location filename="../../Gui/MainWindow.cpp" line="552"/>
         <source>VDOT and T-Pace Calculator...</source>
         <translation>VDOT a T-Tempo kalkulátor...</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="556"/>
+        <location filename="../../Gui/MainWindow.cpp" line="557"/>
         <source>Download workouts from Today&apos;s Plan...</source>
         <translation>Stáhnout cvičení z Today&apos;s Plan...</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="557"/>
+        <location filename="../../Gui/MainWindow.cpp" line="558"/>
         <source>Import workouts, videos, videoSyncs...</source>
         <translation>Importovat cvičení, videa, videoSyncy...</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="558"/>
+        <location filename="../../Gui/MainWindow.cpp" line="559"/>
         <source>Scan disk for workouts, videos, videoSyncs...</source>
         <translation>Najít cvičení, videa, videoSyncy na disku...</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="569"/>
+        <location filename="../../Gui/MainWindow.cpp" line="570"/>
         <source>Maintain charts</source>
         <translation>Udžovat diagramy</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="570"/>
+        <location filename="../../Gui/MainWindow.cpp" line="571"/>
         <source>Maintain user metrics</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="574"/>
+        <location filename="../../Gui/MainWindow.cpp" line="575"/>
         <source>Curate charts</source>
         <translation>Hodnotit diagramy</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="575"/>
+        <location filename="../../Gui/MainWindow.cpp" line="576"/>
         <source>Curate user metrics</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="614"/>
+        <location filename="../../Gui/MainWindow.cpp" line="615"/>
         <source>Python fixes</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="629"/>
+        <location filename="../../Gui/MainWindow.cpp" line="630"/>
         <source>Show View Sidebar</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="650"/>
+        <location filename="../../Gui/MainWindow.cpp" line="651"/>
         <source>Import Perspective...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="651"/>
+        <location filename="../../Gui/MainWindow.cpp" line="652"/>
         <source>Export Perspective...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="654"/>
+        <location filename="../../Gui/MainWindow.cpp" line="655"/>
         <source>Import Chart...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="937"/>
+        <location filename="../../Gui/MainWindow.cpp" line="938"/>
         <source>Select Chart file to import</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="937"/>
+        <location filename="../../Gui/MainWindow.cpp" line="938"/>
         <source>GoldenCheetah Chart Files (*.gchart)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="940"/>
+        <location filename="../../Gui/MainWindow.cpp" line="941"/>
         <source>Import Chart</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="940"/>
+        <location filename="../../Gui/MainWindow.cpp" line="941"/>
         <source>No chart file selected!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="963"/>
+        <location filename="../../Gui/MainWindow.cpp" line="964"/>
         <source>Export Persepctive</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="968"/>
+        <location filename="../../Gui/MainWindow.cpp" line="969"/>
         <source>Export Perspective</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="968"/>
-        <location filename="../../Gui/MainWindow.cpp" line="990"/>
+        <location filename="../../Gui/MainWindow.cpp" line="969"/>
+        <location filename="../../Gui/MainWindow.cpp" line="991"/>
         <source>No perspective file selected!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="988"/>
+        <location filename="../../Gui/MainWindow.cpp" line="989"/>
         <source>Select Perspective file to export</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="988"/>
+        <location filename="../../Gui/MainWindow.cpp" line="989"/>
         <source>GoldenCheetah Perspective Files (*.gchartset)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="990"/>
+        <location filename="../../Gui/MainWindow.cpp" line="991"/>
         <source>Import Perspective</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1137"/>
-        <location filename="../../Gui/MainWindow.cpp" line="2033"/>
-        <location filename="../../Gui/MainWindow.cpp" line="2062"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1138"/>
+        <location filename="../../Gui/MainWindow.cpp" line="2034"/>
+        <location filename="../../Gui/MainWindow.cpp" line="2063"/>
         <source>Activity Import</source>
         <translation>Import aktivity</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1137"/>
-        <location filename="../../Gui/MainWindow.cpp" line="2033"/>
-        <location filename="../../Gui/MainWindow.cpp" line="2062"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1138"/>
+        <location filename="../../Gui/MainWindow.cpp" line="2034"/>
+        <location filename="../../Gui/MainWindow.cpp" line="2063"/>
         <source>Closing of athlete window not possible while background activity import is in progress...</source>
         <translation>Nelze zavřít okno sportovce, když na pozadí probíhá import aktivit...</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1652"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1653"/>
         <source>Chart Import</source>
         <translation>Import diagramu</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1796"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1797"/>
         <source>Failed to export activity, please check permissions</source>
         <translation>Export aktivity selhal, prosím zkontrolujte oprávnění</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1832"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1833"/>
         <source>No Activity To Save</source>
         <translation>Žádná aktivita k uložení</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1833"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1834"/>
         <source>There is no currently selected activity to save.</source>
         <translation>Není zvolena žádná aktivita k uložení.</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1892"/>
-        <location filename="../../Gui/MainWindow.cpp" line="1894"/>
-        <location filename="../../Gui/MainWindow.cpp" line="1904"/>
-        <location filename="../../Gui/MainWindow.cpp" line="1906"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1893"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1895"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1905"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1907"/>
         <source>Split Activity</source>
         <translation>Rozdělit aktivitu</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1892"/>
-        <location filename="../../Gui/MainWindow.cpp" line="1904"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1893"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1905"/>
         <source>No activity selected</source>
         <translation>Není zvolena aktivita</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1894"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1895"/>
         <source>Current activity contains no data to split</source>
         <translation>Aktuální aktivita neobsahuje žádná data k rozdělení</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1906"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1907"/>
         <source>Current activity contains no data to merge</source>
         <translation>Aktuální aktivita neobsahuje žádná data ke spojení</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1922"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1923"/>
         <source>Are you sure you want to delete the activity:</source>
         <translation>Opravdu chcete smazat tuto aktivitu:</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="2401"/>
-        <location filename="../../Gui/MainWindow.cpp" line="2422"/>
+        <location filename="../../Gui/MainWindow.cpp" line="2402"/>
+        <location filename="../../Gui/MainWindow.cpp" line="2423"/>
         <source>The workout directory is not configured, or the directory selected no longer exists.
 
 Please check your preference settings.</source>
@@ -21377,49 +21497,49 @@ Please check your preference settings.</source>
 Prosím zkontrolujte vaše nastavení.</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="2638"/>
+        <location filename="../../Gui/MainWindow.cpp" line="2639"/>
         <source>New Python Fix...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="2639"/>
+        <location filename="../../Gui/MainWindow.cpp" line="2640"/>
         <source>Manage Python Fixes...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="2712"/>
-        <location filename="../../Gui/MainWindow.cpp" line="2733"/>
+        <location filename="../../Gui/MainWindow.cpp" line="2713"/>
+        <location filename="../../Gui/MainWindow.cpp" line="2734"/>
         <source>CloudDB</source>
         <translation>CloudDB</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="2712"/>
-        <location filename="../../Gui/MainWindow.cpp" line="2733"/>
+        <location filename="../../Gui/MainWindow.cpp" line="2713"/>
+        <location filename="../../Gui/MainWindow.cpp" line="2734"/>
         <source>Current athlete is not registered as curator - please contact the GoldenCheetah team</source>
         <translation>Aktuální sportovec není registrovaný kurátor - prosím kontaktujte GoldenCheetah tým</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="560"/>
+        <location filename="../../Gui/MainWindow.cpp" line="561"/>
         <source>Create Heat Map...</source>
         <translation>Vytvořit mapu výskytu...</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="561"/>
+        <location filename="../../Gui/MainWindow.cpp" line="562"/>
         <source>Export Metrics as CSV...</source>
         <translation>Exportovat metriky jako CSV...</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="554"/>
+        <location filename="../../Gui/MainWindow.cpp" line="555"/>
         <source>Create a new workout...</source>
         <translation>Vytvořit nové cvičení...</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="555"/>
+        <location filename="../../Gui/MainWindow.cpp" line="556"/>
         <source>Download workouts from ErgDB...</source>
         <translation>Stáhnout cvičení z ErgDB...</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="550"/>
+        <location filename="../../Gui/MainWindow.cpp" line="551"/>
         <source>Air Density (Rho) Estimator...</source>
         <translation>Odhadce hustoty vzduchu (Rho)...</translation>
     </message>
@@ -21437,7 +21557,7 @@ Prosím zkontrolujte vaše nastavení.</translation>
         <translation type="vanished">Otevřít &amp;záložku</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="488"/>
+        <location filename="../../Gui/MainWindow.cpp" line="489"/>
         <source>Close Window</source>
         <translation>Zavřít okno</translation>
     </message>
@@ -21446,83 +21566,83 @@ Prosím zkontrolujte vaše nastavení.</translation>
         <translation type="vanished">Z&amp;avřít záložku</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="504"/>
+        <location filename="../../Gui/MainWindow.cpp" line="505"/>
         <source>&amp;Save activity</source>
         <translation>&amp;Uložit aktivitu</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="505"/>
+        <location filename="../../Gui/MainWindow.cpp" line="506"/>
         <source>D&amp;elete activity...</source>
         <translation>&amp;Smazat aktivitu...</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="506"/>
+        <location filename="../../Gui/MainWindow.cpp" line="507"/>
         <source>Split &amp;activity...</source>
         <translation>&amp;Rozdělit aktivitu...</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="507"/>
+        <location filename="../../Gui/MainWindow.cpp" line="508"/>
         <source>Combine activities...</source>
         <translation>Zkombinovat aktivity...</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="548"/>
+        <location filename="../../Gui/MainWindow.cpp" line="549"/>
         <source>CP and W&apos; Estimator...</source>
         <translation>Odhadce CP a W&apos;...</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="646"/>
+        <location filename="../../Gui/MainWindow.cpp" line="647"/>
         <source>Activities</source>
         <translation>Aktivity</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="661"/>
+        <location filename="../../Gui/MainWindow.cpp" line="662"/>
         <source>Tabbed not Tiled</source>
         <translation>Záložky, ne dlaždice</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1225"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1226"/>
         <source>You are about to reset all charts to the default setup</source>
         <translation>Chystáte se obnovit výchozí nastavení všech diagramů</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1226"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1227"/>
         <source>Do you want to continue?</source>
         <translation>Chcete pokračovat?</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1652"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1653"/>
         <source>Imported %1 metric charts</source>
         <translation>Importováno %1 diagramů metrik</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="2173"/>
+        <location filename="../../Gui/MainWindow.cpp" line="2174"/>
         <source>&amp;New Athlete...</source>
         <translation>&amp;Nový sportovec...</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="509"/>
+        <location filename="../../Gui/MainWindow.cpp" line="510"/>
         <source>Find intervals...</source>
         <translation>Najít intervaly...</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1729"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1730"/>
         <source>Select Activity</source>
         <translation>Zvolit aktivitu</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1729"/>
-        <location filename="../../Gui/MainWindow.cpp" line="1916"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1730"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1917"/>
         <source>No activity selected!</source>
         <translation>Nebyla zvolena aktivita!</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1742"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1743"/>
         <source>Export Activity</source>
         <translation>Exportovat aktivitu</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1795"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1796"/>
         <source>Export Failed</source>
         <translation>Export selhal</translation>
     </message>
@@ -21531,12 +21651,12 @@ Prosím zkontrolujte vaše nastavení.</translation>
         <translation type="obsolete">&amp;Exportovat to CSV...</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="500"/>
+        <location filename="../../Gui/MainWindow.cpp" line="501"/>
         <source>Ctrl+E</source>
         <translation>Ctrl+E</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="497"/>
+        <location filename="../../Gui/MainWindow.cpp" line="498"/>
         <source>Ctrl+I</source>
         <translation>Ctrl+I</translation>
     </message>
@@ -21545,7 +21665,7 @@ Prosím zkontrolujte vaše nastavení.</translation>
         <translation type="obsolete">Nalézt &amp;nejlepší intervaly...</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="501"/>
+        <location filename="../../Gui/MainWindow.cpp" line="502"/>
         <source>Ctrl+B</source>
         <translation>Ctrl+B</translation>
     </message>
@@ -21614,12 +21734,12 @@ Prosím zkontrolujte vaše nastavení.</translation>
         <translation type="obsolete">Editor</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="497"/>
+        <location filename="../../Gui/MainWindow.cpp" line="498"/>
         <source>&amp;Import from file...</source>
         <translation>&amp;Import ze souboru...</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="498"/>
+        <location filename="../../Gui/MainWindow.cpp" line="499"/>
         <source>Ctrl+M</source>
         <translation>Ctrl+M</translation>
     </message>
@@ -21640,12 +21760,12 @@ Prosím zkontrolujte vaše nastavení.</translation>
         <translation type="obsolete">&amp;Uložit záznam</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="547"/>
+        <location filename="../../Gui/MainWindow.cpp" line="548"/>
         <source>&amp;Tools</source>
         <translation>&amp;Nástroje</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="583"/>
+        <location filename="../../Gui/MainWindow.cpp" line="584"/>
         <source>&amp;Options...</source>
         <translation>&amp;Možnosti...</translation>
     </message>
@@ -21654,28 +21774,28 @@ Prosím zkontrolujte vaše nastavení.</translation>
         <translation type="obsolete">Výpočet kritického výkonu</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="623"/>
+        <location filename="../../Gui/MainWindow.cpp" line="624"/>
         <source>&amp;View</source>
         <translation>&amp;Pohled</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="625"/>
-        <location filename="../../Gui/MainWindow.cpp" line="627"/>
+        <location filename="../../Gui/MainWindow.cpp" line="626"/>
+        <location filename="../../Gui/MainWindow.cpp" line="628"/>
         <source>Toggle Full Screen</source>
         <translation>Zobrazit na celé obrazovce</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="632"/>
+        <location filename="../../Gui/MainWindow.cpp" line="633"/>
         <source>Show Left Sidebar</source>
         <translation>Zobrazit levou postranní lištu</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="635"/>
+        <location filename="../../Gui/MainWindow.cpp" line="636"/>
         <source>Show Compare Pane</source>
         <translation>Zobrazit porovnávací panel</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="638"/>
+        <location filename="../../Gui/MainWindow.cpp" line="639"/>
         <source>Show Toolbar</source>
         <translation>Zobrazit lištu nástrojů</translation>
     </message>
@@ -21761,32 +21881,32 @@ Prosím zkontrolujte vaše nastavení.</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="485"/>
+        <location filename="../../Gui/MainWindow.cpp" line="487"/>
         <source>Save all modified activities</source>
         <translation>Uložit všechny upravené aktivity</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="486"/>
+        <location filename="../../Gui/MainWindow.cpp" line="485"/>
         <source>Settings...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="518"/>
+        <location filename="../../Gui/MainWindow.cpp" line="519"/>
         <source>Add Cloud Account...</source>
         <translation>Přidat účet v cloudu...</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="519"/>
+        <location filename="../../Gui/MainWindow.cpp" line="520"/>
         <source>Ctrl+A</source>
         <translation>Ctrl+A</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="524"/>
+        <location filename="../../Gui/MainWindow.cpp" line="525"/>
         <source>Upload Activity...</source>
         <translation>Nahrát aktivitu...</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="525"/>
+        <location filename="../../Gui/MainWindow.cpp" line="526"/>
         <source>Synchronise Activities...</source>
         <translation>Synchronizovat aktivity...</translation>
     </message>
@@ -21799,87 +21919,87 @@ Prosím zkontrolujte vaše nastavení.</translation>
         <translation type="vanished">Získat &amp;HRV měření...</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="528"/>
+        <location filename="../../Gui/MainWindow.cpp" line="529"/>
         <source>Check For New Activities</source>
         <translation>Zkontrolovat nové aktivity</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="529"/>
+        <location filename="../../Gui/MainWindow.cpp" line="530"/>
         <source>Ctrl-C</source>
         <translation>Ctrl-C</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="566"/>
+        <location filename="../../Gui/MainWindow.cpp" line="567"/>
         <source>Cloud Status...</source>
         <translation>Status cloudu...</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="568"/>
+        <location filename="../../Gui/MainWindow.cpp" line="569"/>
         <source>Cloud Contributions</source>
         <translation>Příspěvky do cloudu</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="573"/>
+        <location filename="../../Gui/MainWindow.cpp" line="574"/>
         <source>Cloud Curator</source>
         <translation>Cloudový kurátor</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="590"/>
+        <location filename="../../Gui/MainWindow.cpp" line="591"/>
         <source>&amp;Edit</source>
         <translation>&amp;Upravit</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="641"/>
+        <location filename="../../Gui/MainWindow.cpp" line="642"/>
         <source>Show Athlete Tabs</source>
         <translation>Zobrazit záložky sportovce</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="647"/>
+        <location filename="../../Gui/MainWindow.cpp" line="648"/>
         <source>Trends</source>
         <translation>Trendy</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="656"/>
+        <location filename="../../Gui/MainWindow.cpp" line="657"/>
         <source>Upload Chart...</source>
         <translation>Nahrát diagram...</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="657"/>
+        <location filename="../../Gui/MainWindow.cpp" line="658"/>
         <source>Download Chart...</source>
         <translation>Stáhnout diagram...</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="660"/>
+        <location filename="../../Gui/MainWindow.cpp" line="661"/>
         <source>Reset Layout</source>
         <translation>Obnovit rozložení</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="673"/>
+        <location filename="../../Gui/MainWindow.cpp" line="674"/>
         <source>&amp;Help</source>
         <translation>&amp;Nápověda</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="674"/>
+        <location filename="../../Gui/MainWindow.cpp" line="675"/>
         <source>&amp;Help Overview</source>
         <translation>&amp;Přehled nápovědy</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="677"/>
+        <location filename="../../Gui/MainWindow.cpp" line="678"/>
         <source>&amp;User Guide</source>
         <translation>U&amp;živatelský průvodce</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="678"/>
+        <location filename="../../Gui/MainWindow.cpp" line="679"/>
         <source>&amp;Log a bug or feature request</source>
         <translation>&amp;Ohlásit chybu nebo požádat o funkcionalitu programu</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="679"/>
+        <location filename="../../Gui/MainWindow.cpp" line="680"/>
         <source>&amp;Discussion and Support Forum</source>
         <translation>&amp;Diskuzní a podpůrné fórum</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="681"/>
+        <location filename="../../Gui/MainWindow.cpp" line="682"/>
         <source>&amp;About GoldenCheetah</source>
         <translation>O aplikaci &amp;GoldenCheetah</translation>
     </message>
@@ -21952,29 +22072,29 @@ Prosím zkontrolujte vaše nastavení.</translation>
         <translation type="obsolete">Soubor %1 nelze otevřít pro zápis</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1817"/>
-        <location filename="../../Gui/MainWindow.cpp" line="2370"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1818"/>
+        <location filename="../../Gui/MainWindow.cpp" line="2371"/>
         <source>Import from File</source>
         <translation>Importovat ze souboru</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="2343"/>
+        <location filename="../../Gui/MainWindow.cpp" line="2344"/>
         <source>Refresh in Progress</source>
         <translation>Obnovení probíhá</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="2349"/>
+        <location filename="../../Gui/MainWindow.cpp" line="2350"/>
         <source>Export Metrics</source>
         <translation>Exportovat metriky</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="2349"/>
+        <location filename="../../Gui/MainWindow.cpp" line="2350"/>
         <source>Comma Separated Variables (*.csv)</source>
         <translation>Formát CSV (*.csv)</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="2400"/>
-        <location filename="../../Gui/MainWindow.cpp" line="2421"/>
+        <location filename="../../Gui/MainWindow.cpp" line="2401"/>
+        <location filename="../../Gui/MainWindow.cpp" line="2422"/>
         <source>Workout Directory Invalid</source>
         <translation>Adresář pro cvičení není validní</translation>
     </message>
@@ -22079,7 +22199,7 @@ CP závodníka nastaven na %3 wattů</translation>
         <translation type="obsolete">Opravdu chceš smazat záznam?:</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1924"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1925"/>
         <source>Delete</source>
         <translation>Smazat</translation>
     </message>
@@ -24135,17 +24255,17 @@ Nebyly nalezeny žádné jízdy k importu.
 <context>
     <name>MultiDeviceDialog</name>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="2866"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2876"/>
         <source>Multiple Device Configuration</source>
         <translation>Konfigurace s více zařízeními</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="2921"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2931"/>
         <source>Cancel</source>
         <translation type="unfinished">Zrušit</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="2924"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2934"/>
         <source>Apply</source>
         <translation type="unfinished">Použít</translation>
     </message>
@@ -24451,6 +24571,24 @@ Nebyly nalezeny žádné jízdy k importu.
     </message>
 </context>
 <context>
+    <name>Nolio</name>
+    <message>
+        <location filename="../../Cloud/Nolio.cpp" line="247"/>
+        <source>Completed.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Cloud/Nolio.h" line="38"/>
+        <source>Nolio</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Cloud/Nolio.h" line="39"/>
+        <source>Sync with your favorite training partner.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>NonZeroPower</name>
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="1316"/>
@@ -24477,92 +24615,98 @@ Nebyly nalezeny žádné jízdy k importu.
         <translation>OAuth</translation>
     </message>
     <message>
-        <location filename="../../Cloud/OAuthDialog.cpp" line="60"/>
+        <location filename="../../Cloud/OAuthDialog.cpp" line="61"/>
         <source>SSL Security Libraries required for &apos;Authorise&apos; are missing in this installation.</source>
         <translation>SSL bezpečnostní knihovny nutné k autorizaci nejsou součástí této instalace.</translation>
     </message>
     <message>
-        <location filename="../../Cloud/OAuthDialog.cpp" line="61"/>
-        <location filename="../../Cloud/OAuthDialog.cpp" line="466"/>
+        <location filename="../../Cloud/OAuthDialog.cpp" line="62"/>
+        <location filename="../../Cloud/OAuthDialog.cpp" line="484"/>
         <source>Authorization Error</source>
         <translation>Chyba autorizace</translation>
     </message>
     <message>
-        <location filename="../../Cloud/OAuthDialog.cpp" line="604"/>
+        <location filename="../../Cloud/OAuthDialog.cpp" line="622"/>
         <source>Withings authorization was successful.</source>
         <translation>Autorizace Withings byla úspěšná.</translation>
     </message>
     <message>
-        <location filename="../../Cloud/OAuthDialog.cpp" line="478"/>
-        <location filename="../../Cloud/OAuthDialog.cpp" line="487"/>
-        <location filename="../../Cloud/OAuthDialog.cpp" line="524"/>
-        <location filename="../../Cloud/OAuthDialog.cpp" line="533"/>
-        <location filename="../../Cloud/OAuthDialog.cpp" line="540"/>
-        <location filename="../../Cloud/OAuthDialog.cpp" line="550"/>
-        <location filename="../../Cloud/OAuthDialog.cpp" line="559"/>
+        <location filename="../../Cloud/OAuthDialog.cpp" line="496"/>
+        <location filename="../../Cloud/OAuthDialog.cpp" line="505"/>
+        <location filename="../../Cloud/OAuthDialog.cpp" line="542"/>
+        <location filename="../../Cloud/OAuthDialog.cpp" line="551"/>
+        <location filename="../../Cloud/OAuthDialog.cpp" line="558"/>
         <location filename="../../Cloud/OAuthDialog.cpp" line="568"/>
-        <location filename="../../Cloud/OAuthDialog.cpp" line="574"/>
-        <location filename="../../Cloud/OAuthDialog.cpp" line="605"/>
+        <location filename="../../Cloud/OAuthDialog.cpp" line="577"/>
+        <location filename="../../Cloud/OAuthDialog.cpp" line="586"/>
+        <location filename="../../Cloud/OAuthDialog.cpp" line="592"/>
+        <location filename="../../Cloud/OAuthDialog.cpp" line="623"/>
+        <location filename="../../Cloud/OAuthDialog.cpp" line="631"/>
         <source>Information</source>
         <translation>Informace</translation>
     </message>
     <message>
-        <location filename="../../Cloud/OAuthDialog.cpp" line="477"/>
+        <location filename="../../Cloud/OAuthDialog.cpp" line="495"/>
         <source>Dropbox authorization was successful.</source>
         <translation>Autorizace Dropbox byla úspěšná.</translation>
     </message>
     <message>
-        <location filename="../../Cloud/OAuthDialog.cpp" line="486"/>
+        <location filename="../../Cloud/OAuthDialog.cpp" line="504"/>
         <source>SportTracks authorization was successful.</source>
         <translation>Autorizace SportTracks byla úspěšná.</translation>
     </message>
     <message>
-        <location filename="../../Cloud/OAuthDialog.cpp" line="523"/>
+        <location filename="../../Cloud/OAuthDialog.cpp" line="541"/>
         <source>Polar Flow authorization was successful.</source>
         <translation>Autorizace Polar Flow byla úspěšná.</translation>
     </message>
     <message>
-        <location filename="../../Cloud/OAuthDialog.cpp" line="532"/>
+        <location filename="../../Cloud/OAuthDialog.cpp" line="550"/>
         <source>Strava authorization was successful.</source>
         <translation>Autorizace Strava byla úspěšná.</translation>
     </message>
     <message>
-        <location filename="../../Cloud/OAuthDialog.cpp" line="539"/>
+        <location filename="../../Cloud/OAuthDialog.cpp" line="557"/>
         <source>Cycling Analytics authorization was successful.</source>
         <translation>Autorizace Cycling Analytics byla úspěšná.</translation>
     </message>
     <message>
-        <location filename="../../Cloud/OAuthDialog.cpp" line="548"/>
+        <location filename="../../Cloud/OAuthDialog.cpp" line="566"/>
         <source>Google Calendar authorization was successful.</source>
         <translation>Autorizace Google kalendáře byla úspěšná.</translation>
     </message>
     <message>
-        <location filename="../../Cloud/OAuthDialog.cpp" line="558"/>
+        <location filename="../../Cloud/OAuthDialog.cpp" line="576"/>
         <source>Kent University Google Drive authorization was successful.</source>
         <translation>Autorizace Google Drive Kentské univerzity byla úspěšná.</translation>
     </message>
     <message>
-        <location filename="../../Cloud/OAuthDialog.cpp" line="567"/>
+        <location filename="../../Cloud/OAuthDialog.cpp" line="585"/>
         <source>Google Drive authorization was successful.</source>
         <translation>Autorizace Google Drive byla úspěšná.</translation>
     </message>
     <message>
-        <location filename="../../Cloud/OAuthDialog.cpp" line="573"/>
+        <location filename="../../Cloud/OAuthDialog.cpp" line="591"/>
         <source>Today&apos;s Plan authorization was successful.</source>
         <translation>Autorizace Today&apos;s Plan byla úspěšná.</translation>
     </message>
     <message>
-        <location filename="../../Cloud/OAuthDialog.cpp" line="613"/>
+        <location filename="../../Cloud/OAuthDialog.cpp" line="630"/>
+        <source>Nolio authorization was successful.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Cloud/OAuthDialog.cpp" line="637"/>
         <source>Error retrieving access token, %1 (%2)</source>
         <translation>Chyba při získávání přístupového tokenu, %1 (%2)</translation>
     </message>
     <message>
-        <location filename="../../Cloud/OAuthDialog.cpp" line="614"/>
+        <location filename="../../Cloud/OAuthDialog.cpp" line="638"/>
         <source>SSL Token Refresh Error</source>
         <translation>Chyba obnovení SSL Tokenu</translation>
     </message>
     <message>
-        <location filename="../../Cloud/OAuthDialog.cpp" line="465"/>
+        <location filename="../../Cloud/OAuthDialog.cpp" line="483"/>
         <source>Error retrieving authoriation credentials</source>
         <translation>Chyba při získánání důvěrných informací autorizace</translation>
     </message>
@@ -24959,6 +25103,21 @@ Nebyly nalezeny žádné jízdy k importu.
     <message>
         <location filename="../../Metrics/PDModel.h" line="123"/>
         <source>Base Model</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Metrics/PDModel.cpp" line="213"/>
+        <source>RMSE %1w CV %4% R&lt;sup&gt;2&lt;/sup&gt;=%3 [LR] %2 points</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Metrics/PDModel.cpp" line="332"/>
+        <source>RMSE %1w CV %3% [LM] %2 points</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Metrics/PDModel.cpp" line="479"/>
+        <source>RMSE %1w CV %3% [envelope] %2 points</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -28140,8 +28299,8 @@ zapnutá a display ukazuje &quot;Host&quot;</translation>
         <translation>Bajk</translation>
     </message>
     <message>
-        <location filename="../../FileIO/FitRideFile.cpp" line="1754"/>
-        <location filename="../../FileIO/FitRideFile.cpp" line="2735"/>
+        <location filename="../../FileIO/FitRideFile.cpp" line="1766"/>
+        <location filename="../../FileIO/FitRideFile.cpp" line="2750"/>
         <location filename="../../FileIO/TcxParser.cpp" line="420"/>
         <source>Lap %1</source>
         <translation>Úsek %1</translation>
@@ -28782,14 +28941,14 @@ Python disabled in preferences.</source>
 Python vypnutý v nastavení.</translation>
     </message>
     <message>
-        <location filename="../../R/RTool.cpp" line="239"/>
+        <location filename="../../R/RTool.cpp" line="244"/>
         <source>The version of R installed is too old. You must have R version 3.4 or higher.
 </source>
         <translation>Nainstalovaná verze R je příliš stará. Musíte mít R verze 3.4 nebo vyšší.
 </translation>
     </message>
     <message>
-        <location filename="../../R/RTool.cpp" line="248"/>
+        <location filename="../../R/RTool.cpp" line="253"/>
         <source>The version of R installed is too new. You must have R version 3.3 or older.
 </source>
         <translation>Nainstalovaná verze R je příliš nová. Musíte mít R verze 3.3 nebo nižší.
@@ -31542,6 +31701,11 @@ Přeskakuji soubor...</translation>
 <context>
     <name>RideMetadata</name>
     <message>
+        <location filename="../../Metrics/RideMetadata.cpp" line="410"/>
+        <source>Raw Data</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../../Metrics/RideMetadata.cpp" line="507"/>
         <source>Bike</source>
         <translation type="unfinished"></translation>
@@ -33625,63 +33789,143 @@ Power&apos; option in the training preferences tab.</source>
     </message>
     <message>
         <location filename="../../Metrics/SpecialFields.cpp" line="35"/>
+        <source>Data</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Metrics/SpecialFields.cpp" line="36"/>
+        <source>File Format</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Metrics/SpecialFields.cpp" line="38"/>
+        <source>Month</source>
+        <translation type="unfinished">Měsíc</translation>
+    </message>
+    <message>
+        <location filename="../../Metrics/SpecialFields.cpp" line="39"/>
+        <source>Weekday</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Metrics/SpecialFields.cpp" line="40"/>
+        <source>Year</source>
+        <translation type="unfinished">Rok</translation>
+    </message>
+    <message>
+        <location filename="../../Metrics/SpecialFields.cpp" line="43"/>
         <source>Sport</source>
         <translation>Sport</translation>
     </message>
     <message>
-        <location filename="../../Metrics/SpecialFields.cpp" line="36"/>
+        <location filename="../../Metrics/SpecialFields.cpp" line="44"/>
         <source>SubSport</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Metrics/SpecialFields.cpp" line="37"/>
+        <location filename="../../Metrics/SpecialFields.cpp" line="45"/>
         <source>Workout Code</source>
         <translation>Kód cvičení</translation>
     </message>
     <message>
-        <location filename="../../Metrics/SpecialFields.cpp" line="38"/>
+        <location filename="../../Metrics/SpecialFields.cpp" line="46"/>
         <source>Workout Title</source>
         <translation>Název cvičení</translation>
     </message>
     <message>
-        <location filename="../../Metrics/SpecialFields.cpp" line="39"/>
+        <location filename="../../Metrics/SpecialFields.cpp" line="47"/>
         <source>Weight</source>
         <translation>Hmotnost</translation>
     </message>
     <message>
-        <location filename="../../Metrics/SpecialFields.cpp" line="40"/>
+        <location filename="../../Metrics/SpecialFields.cpp" line="48"/>
         <source>RPE</source>
         <translation>RPE</translation>
     </message>
     <message>
-        <location filename="../../Metrics/SpecialFields.cpp" line="41"/>
+        <location filename="../../Metrics/SpecialFields.cpp" line="49"/>
+        <source>Commute</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Metrics/SpecialFields.cpp" line="50"/>
+        <source>Trainer</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Metrics/SpecialFields.cpp" line="51"/>
+        <source>Feel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Metrics/SpecialFields.cpp" line="52"/>
         <source>Objective</source>
         <translation>Cíl</translation>
     </message>
     <message>
-        <location filename="../../Metrics/SpecialFields.cpp" line="42"/>
+        <location filename="../../Metrics/SpecialFields.cpp" line="53"/>
         <source>Keywords</source>
         <translation>Klíčová slova</translation>
     </message>
     <message>
-        <location filename="../../Metrics/SpecialFields.cpp" line="43"/>
+        <location filename="../../Metrics/SpecialFields.cpp" line="54"/>
         <source>Equipment</source>
         <translation>Vybavení</translation>
     </message>
     <message>
-        <location filename="../../Metrics/SpecialFields.cpp" line="44"/>
+        <location filename="../../Metrics/SpecialFields.cpp" line="55"/>
         <source>Device</source>
         <translation>Zařízení</translation>
     </message>
     <message>
-        <location filename="../../Metrics/SpecialFields.cpp" line="45"/>
+        <location filename="../../Metrics/SpecialFields.cpp" line="56"/>
         <source>Device Info</source>
         <translation>Info o zařízení</translation>
     </message>
     <message>
-        <location filename="../../Metrics/SpecialFields.cpp" line="46"/>
+        <location filename="../../Metrics/SpecialFields.cpp" line="57"/>
         <source>Pool Length</source>
         <translation>Délka bazénu</translation>
+    </message>
+    <message>
+        <location filename="../../Metrics/SpecialFields.cpp" line="59"/>
+        <source>VO2max detected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Metrics/SpecialFields.cpp" line="60"/>
+        <source>Aerobic Training Effect</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Metrics/SpecialFields.cpp" line="61"/>
+        <source>Anaerobic Training Effect</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Metrics/SpecialFields.cpp" line="62"/>
+        <source>EPOC</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Metrics/SpecialFields.cpp" line="63"/>
+        <source>Recovery Time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Metrics/SpecialFields.cpp" line="64"/>
+        <source>Performance Condition</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Metrics/SpecialFields.cpp" line="65"/>
+        <source>LTHR detected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Metrics/SpecialFields.cpp" line="66"/>
+        <source>LTS detected</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Notes</source>
@@ -33697,8 +33941,9 @@ Power&apos; option in the training preferences tab.</source>
         <translation type="obsolete">Nastavení kroutícího momentu</translation>
     </message>
     <message>
+        <location filename="../../Metrics/SpecialFields.cpp" line="37"/>
         <source>Filename</source>
-        <translation type="obsolete">Název souboru</translation>
+        <translation type="unfinished">Název souboru</translation>
     </message>
     <message>
         <location filename="../../Metrics/SpecialFields.cpp" line="31"/>
@@ -33711,44 +33956,50 @@ Power&apos; option in the training preferences tab.</source>
         <translation>Název zdrojového souboru</translation>
     </message>
     <message>
-        <location filename="../../Metrics/SpecialFields.cpp" line="34"/>
+        <location filename="../../Metrics/SpecialFields.cpp" line="42"/>
         <source>Route</source>
         <translation>Trasa</translation>
     </message>
     <message>
+        <location filename="../../Metrics/SpecialFields.cpp" line="34"/>
         <source>Athlete</source>
-        <translation type="obsolete">Sportovec</translation>
+        <translation type="unfinished">Sportovec</translation>
     </message>
 </context>
 <context>
     <name>SpecialTabs</name>
     <message>
-        <location filename="../../Metrics/SpecialFields.cpp" line="130"/>
+        <location filename="../../Metrics/SpecialFields.cpp" line="150"/>
         <source>Workout</source>
         <translation>Cvičení</translation>
     </message>
     <message>
-        <location filename="../../Metrics/SpecialFields.cpp" line="131"/>
+        <location filename="../../Metrics/SpecialFields.cpp" line="151"/>
         <source>Notes</source>
         <translation>Poznámky</translation>
     </message>
     <message>
-        <location filename="../../Metrics/SpecialFields.cpp" line="132"/>
+        <location filename="../../Metrics/SpecialFields.cpp" line="152"/>
         <source>Metric</source>
         <translation>Metrika</translation>
     </message>
     <message>
-        <location filename="../../Metrics/SpecialFields.cpp" line="133"/>
+        <location filename="../../Metrics/SpecialFields.cpp" line="153"/>
         <source>Extra</source>
         <translation>Extra</translation>
     </message>
     <message>
-        <location filename="../../Metrics/SpecialFields.cpp" line="134"/>
+        <location filename="../../Metrics/SpecialFields.cpp" line="154"/>
+        <source>Raw Data</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Metrics/SpecialFields.cpp" line="155"/>
         <source>Device</source>
         <translation>Zařízení</translation>
     </message>
     <message>
-        <location filename="../../Metrics/SpecialFields.cpp" line="135"/>
+        <location filename="../../Metrics/SpecialFields.cpp" line="156"/>
         <source>Athlete</source>
         <translation>Sportovec</translation>
     </message>
@@ -35378,166 +35629,166 @@ tab.</source>
 <context>
     <name>TrainSidebar</name>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="243"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="244"/>
         <source>Save workout data</source>
         <translation>Uložit data cvičení</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="249"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="250"/>
         <source>Devices</source>
         <translation>Zařízení</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="252"/>
-        <location filename="../../Train/TrainSidebar.cpp" line="257"/>
-        <location filename="../../Train/TrainSidebar.cpp" line="276"/>
-        <location filename="../../Train/TrainSidebar.cpp" line="286"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="253"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="258"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="277"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="287"/>
         <source>Menu</source>
         <translation>Menu</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="256"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="257"/>
         <source>Workouts</source>
         <translation>Cvičení</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="275"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="276"/>
         <source>Media</source>
         <translation>Média</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="285"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="286"/>
         <source>VideoSync</source>
         <translation>VideoSync</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="437"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="438"/>
         <source>Import Workout from File</source>
         <translation>Importovat cvičení ze souboru</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="438"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="439"/>
         <source>Get Workouts from ErgDB</source>
         <translation>Stáhnout cvičení z ErgDB</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="439"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="440"/>
         <source>Get Workouts from Today&apos;s Plan</source>
         <translation>Stáhnout cvičení z Today&apos;s Plan</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="440"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="441"/>
         <source>Create Workout via Wizard</source>
         <translation>Vytvořit cvičení pomocí průvodce</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="441"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="442"/>
         <source>Scan for Workouts</source>
         <translation>Vyhledat cvičení</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="465"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="466"/>
         <source>Delete selected Workout</source>
         <translation>Odstranit zvolené cvičení</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="468"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="469"/>
         <source>Delete %1 selected Workouts</source>
         <translation>Odstranit %1 zvolených cvičení</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="492"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="493"/>
         <source>Train mode active</source>
         <translation>Tréninkový mód aktivní</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="492"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="493"/>
         <source>Please stop the train mode before closing the window or application.</source>
         <translation>Prosím zastavte tréninkový mód než zavřete okno nebo ukončíte aplikaci.</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="566"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="567"/>
         <source>Remove reference to selected video</source>
         <translation>Odstranit referenci pro zvolené video</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="581"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="582"/>
         <source>Import VideoSync from File</source>
         <translation>Importovat VideoSync ze souboru</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="582"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="583"/>
         <source>Scan for VideoSyncs</source>
         <translation>Vyhledat VideoSyncy</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="595"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="596"/>
         <source>Delete selected VideoSync</source>
         <translation>Odstranit vybraný VideoSync</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="931"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="932"/>
         <source>Are you sure you want to remove the reference to this video?</source>
         <translation>Jste si jistí, že chcete odstranit referenci k tomuto videu?</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="933"/>
-        <location filename="../../Train/TrainSidebar.cpp" line="995"/>
-        <location filename="../../Train/TrainSidebar.cpp" line="1071"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="934"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="996"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="1072"/>
         <source>Remove</source>
         <translation>Odstranit</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="966"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="967"/>
         <source>Are you sure you want to delete this VideoSync?</source>
         <translation>Jste si jistí, že chcete smazat tento VideoSync?</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="993"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="994"/>
         <source>The VideoSync file is either not valid or not existing and will be removed from the library.</source>
         <translation>Tento VideoSync soubor buď není validní nebo neexistuje a bude odstraněn z knihovny.</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="1027"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="1028"/>
         <source>Are you sure you want to delete this Workout?</source>
         <translation>Jste si jistí, že chcete smazat toto cvičení?</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="1030"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="1031"/>
         <source>Are you sure you want to delete this %1 workouts?</source>
         <translation>Jste si jistí, že chcete smazat těchto %1 cvičení?</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="1069"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="1070"/>
         <source>The Workout file is either not valid or not existing and will be removed from the library.</source>
         <translation>Soubor tohoto cvičení buď není validní nebo neexistuje a bude odstraněn z knihovny.</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="1213"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="1214"/>
         <source>Starting in %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="2057"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2067"/>
         <source>Recalibrating steering..</source>
         <translation>Probíhá rekalibrace řízení..</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="2342"/>
-        <location filename="../../Train/TrainSidebar.cpp" line="2346"/>
-        <location filename="../../Train/TrainSidebar.cpp" line="2415"/>
-        <location filename="../../Train/TrainSidebar.cpp" line="2466"/>
-        <location filename="../../Train/TrainSidebar.cpp" line="2470"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2352"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2356"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2425"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2476"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2480"/>
         <source>Requesting calibration..</source>
         <translation>Žádám o kalibraci..</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="2353"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2363"/>
         <source>Calibrating...</source>
         <translation>Kalibrování...</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="2357"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2367"/>
         <source>Calibrating...
 Current speed %1 kph
 Increase speed to %2 kph</source>
@@ -35546,14 +35797,14 @@ Aktuální rychlost %1 km/h
 Zvyšte rychlost na %2 km/h</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="2361"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2371"/>
         <source>Calibrating...
 Stop pedalling until speed drops to 0</source>
         <translation>Kalibrování...
 Přestaňte šlapat, než se rychlost sníží na 0</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="2366"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2376"/>
         <source>Calibration completed successfully!
 Spindown %1 ms
 Zero Offset %2</source>
@@ -35562,30 +35813,30 @@ Setrvačník zastavený po %1 ms
 Ofset od nuly %2</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="2374"/>
-        <location filename="../../Train/TrainSidebar.cpp" line="2441"/>
-        <location filename="../../Train/TrainSidebar.cpp" line="2493"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2384"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2451"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2503"/>
         <source>Calibration failed!</source>
         <translation>Kalibrace selhala!</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="2382"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2392"/>
         <source>Calibration Failed: Loosen Roller</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="2390"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2400"/>
         <source>Calibration Failed: Tighten Roller</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="2409"/>
-        <location filename="../../Train/TrainSidebar.cpp" line="2460"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2419"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2470"/>
         <source>Unclip or stop pedalling to begin calibration..</source>
         <translation>Vycvakněte nebo přestaňte šlapat pro začátek kalibrace..</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="2428"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2438"/>
         <source>Calibrating...
 Unclip or stop pedalling until process is completed..
 Torque %1</source>
@@ -35594,7 +35845,7 @@ Vycvakněte nebo přestaňte šlapat než bude proces dokončen..
 Točivý moment %1</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="2433"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2443"/>
         <source>Calibration completed successfully!
 Zero Offset %1
 Torque %2</source>
@@ -35603,7 +35854,7 @@ Ofset od nuly %1
 Točivý moment %2</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="2480"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2490"/>
         <source>Calibrating...
 Unclip or stop pedalling until process is completed..
 Zero Offset %1</source>
@@ -35612,7 +35863,7 @@ Vycvakněte nebo přestaňte šlapat než bude proces dokončen..
 Ofset od nuly %1</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="2485"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2495"/>
         <source>Calibration completed successfully!
 Zero Offset %1
 Slope %2</source>
@@ -35621,145 +35872,145 @@ Ofset od nuly %1
 Sklon %2</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="2514"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2524"/>
         <source>Give the pedal a kick to start calibration...
 The motor will run until calibration is complete.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="2516"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2526"/>
         <source>Allow wheel speed to settle, DO NOT PEDAL...
 The motor will run until calibration is complete.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="2521"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2531"/>
         <source>Calibrating... DO NOT PEDAL, remain seated...
 Gathering enough samples to calculate average: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="2528"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2538"/>
         <source>Calibrating... DO NOT PEDAL, remain seated...
 Waiting for value to stabilize (max %1s): %2 (%3W @ %4kph)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="2543"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2553"/>
         <source>Calibration completed successfully!
 Final calibration value %1 (%2W @ %3kph)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="2555"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2565"/>
         <source>Calibration failed! Do not pedal while calibration is taking place.
 Allow wheel to run freely.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="2601"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2611"/>
         <source>Fast forward..</source>
         <translation>Rychle dopředu..</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="2634"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2644"/>
         <source>Rewind..</source>
         <translation>Přetočit..</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="2664"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2674"/>
         <source>Next Lap..</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="2697"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2707"/>
         <source>Back Lap..</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="2723"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2733"/>
         <source>Increasing intensity..</source>
         <translation>Zvyšování intenzity..</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="2749"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2759"/>
         <source>Decreasing intensity..</source>
         <translation>Sniřování intenzity..</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="552"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="553"/>
         <source>Import Video from File</source>
         <translation>Importovat video ze souboru</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="553"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="554"/>
         <source>Scan for Videos</source>
         <translation>Vyhledat videa</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="968"/>
-        <location filename="../../Train/TrainSidebar.cpp" line="1040"/>
-        <location filename="../../Train/TrainSidebar.cpp" line="3001"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="969"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="1041"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="3011"/>
         <source>Delete</source>
         <translation>Smazat</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="1175"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="1176"/>
         <source>Resuming..</source>
         <translation>Obnovování..</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="1202"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="1203"/>
         <source>Paused..</source>
         <translation>Pozastaveno..</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="1329"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="1330"/>
         <source>Starting..</source>
         <translation>Žačínání..</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="1508"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="1518"/>
         <source>Stopped..</source>
         <translation>Zastaveno..</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="1587"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="1597"/>
         <source>Connected..</source>
         <translation>Připojeno..</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="1638"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="1648"/>
         <source>Disconnected..</source>
         <translation>Odpojeno..</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="2034"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2044"/>
         <source>New lap..</source>
         <translation>Nový úsek..</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="2064"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2074"/>
         <source>No Devices Configured</source>
         <translation>Není nakonfigurováno žádné zařízení</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="2064"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2074"/>
         <source>Please configure a device in Preferences.</source>
         <translation>Prosím nakonfigurujte zařízení v preferencích.</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="2304"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2314"/>
         <source>Exiting calibration..</source>
         <translation>Ukončení kalibrace..</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="2319"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2329"/>
         <source>Calibration not supported for this device.</source>
         <translation>Kalibrace na tomto zařízení není podporována.</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="2326"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2336"/>
         <source>Calibrating...
 Press F3 on Controller when done.</source>
         <translation>Kalibrování...
@@ -35770,19 +36021,19 @@ Stiskněte F3 na ovladači, jakmile bude dokončena.</translation>
         <translation type="obsolete">Hotovo</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="2953"/>
-        <location filename="../../Train/TrainSidebar.cpp" line="2971"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2963"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2981"/>
         <source>Add Device</source>
         <translation>Přidat zařízení</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="2958"/>
-        <location filename="../../Train/TrainSidebar.cpp" line="2976"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2968"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="2986"/>
         <source>Delete Device</source>
         <translation>Odstranit zařízení</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="2999"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="3009"/>
         <source>Are you sure you want to delete this device?</source>
         <translation>Jste si jistí, že chcete smazat toto zařízení?</translation>
     </message>
@@ -36214,6 +36465,7 @@ Tento vygenerovaný PIN vlož do políčka. K dokončení stiskni tlačítko Ulo
     </message>
     <message>
         <location filename="../../Charts/UserChart.cpp" line="830"/>
+        <location filename="../../Charts/UserChart.cpp" line="832"/>
         <source>Background</source>
         <translation type="unfinished"></translation>
     </message>
@@ -37522,18 +37774,18 @@ Tento vygenerovaný PIN vlož do políčka. K dokončení stiskni tlačítko Ulo
         <translation>Chyba v OAuth ověření</translation>
     </message>
     <message>
-        <location filename="../../Cloud/WithingsDownload.cpp" line="169"/>
+        <location filename="../../Cloud/WithingsDownload.cpp" line="170"/>
         <source>Error parsing Withings API response. Please check the error description.</source>
         <translation>Chyba překladu odpovědi Withings API. Prosím zkontrolujte popis chyby.</translation>
     </message>
     <message>
-        <location filename="../../Cloud/WithingsDownload.cpp" line="159"/>
-        <location filename="../../Cloud/WithingsDownload.cpp" line="168"/>
+        <location filename="../../Cloud/WithingsDownload.cpp" line="160"/>
+        <location filename="../../Cloud/WithingsDownload.cpp" line="169"/>
         <source>Error</source>
         <translation>Chyba</translation>
     </message>
     <message>
-        <location filename="../../Cloud/WithingsDownload.cpp" line="160"/>
+        <location filename="../../Cloud/WithingsDownload.cpp" line="161"/>
         <source>There was an error during fetching. Please check the error description.</source>
         <translation>Nastala chyba během načítání. Prosím zkontrolujte popis chyby.</translation>
     </message>

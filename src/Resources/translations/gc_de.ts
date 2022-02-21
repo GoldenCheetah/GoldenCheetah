@@ -9277,6 +9277,41 @@ an den Computer anschließen und
         <source>Range</source>
         <translation>Bereich</translation>
     </message>
+    <message>
+        <location filename="../../Charts/UserChart.cpp" line="1784"/>
+        <source>Smoothing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Charts/UserChart.cpp" line="1789"/>
+        <source>None</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Charts/UserChart.cpp" line="1790"/>
+        <source>Day</source>
+        <translation type="unfinished">Tag</translation>
+    </message>
+    <message>
+        <location filename="../../Charts/UserChart.cpp" line="1791"/>
+        <source>Week</source>
+        <translation type="unfinished">Woche</translation>
+    </message>
+    <message>
+        <location filename="../../Charts/UserChart.cpp" line="1792"/>
+        <source>Month</source>
+        <translation type="unfinished">Monat</translation>
+    </message>
+    <message>
+        <location filename="../../Charts/UserChart.cpp" line="1793"/>
+        <source>Year</source>
+        <translation type="unfinished">Jahr</translation>
+    </message>
+    <message>
+        <location filename="../../Charts/UserChart.cpp" line="1795"/>
+        <source>Group By</source>
+        <translation type="unfinished">Gruppieren nach</translation>
+    </message>
 </context>
 <context>
     <name>EditUserDataDialog</name>
@@ -9487,9 +9522,64 @@ an den Computer anschließen und
         <translation>Abbre&amp;chen</translation>
     </message>
     <message>
+        <location filename="../../Charts/UserChart.cpp" line="1421"/>
+        <source>Group</source>
+        <translation type="unfinished">Gruppe</translation>
+    </message>
+    <message>
         <location filename="../../Charts/UserChart.cpp" line="1429"/>
         <source>Series Name</source>
         <translation>Name der Datenreihe</translation>
+    </message>
+    <message>
+        <location filename="../../Charts/UserChart.cpp" line="1518"/>
+        <source>Y units</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Charts/UserChart.cpp" line="1523"/>
+        <source>X units</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Charts/UserChart.cpp" line="1527"/>
+        <source>Sum</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Charts/UserChart.cpp" line="1528"/>
+        <source>Average</source>
+        <translation type="unfinished">Durchschnitt</translation>
+    </message>
+    <message>
+        <location filename="../../Charts/UserChart.cpp" line="1529"/>
+        <source>Peak</source>
+        <translation type="unfinished">Spitze</translation>
+    </message>
+    <message>
+        <location filename="../../Charts/UserChart.cpp" line="1530"/>
+        <source>Low</source>
+        <translation type="unfinished">Niedrigster</translation>
+    </message>
+    <message>
+        <location filename="../../Charts/UserChart.cpp" line="1531"/>
+        <source>Running Total</source>
+        <translation type="unfinished">Summe Laufen</translation>
+    </message>
+    <message>
+        <location filename="../../Charts/UserChart.cpp" line="1532"/>
+        <source>Mean Square Root</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Charts/UserChart.cpp" line="1533"/>
+        <source>Std Deviation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Charts/UserChart.cpp" line="1536"/>
+        <source>Aggregate</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../Charts/UserChart.cpp" line="1540"/>
@@ -13537,6 +13627,11 @@ Drehmomentkorrektur - Der absolute Korrekturwert in Nm (oder Pfund pro Quadratin
         <translation>Assistent zur Aufteilung einer Aktivität in mehrere Aktivitäten auf der Grundlage konfigurierbarer Kriterien</translation>
     </message>
     <message>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="67"/>
+        <source>Table of Contents</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="71"/>
         <source>Quick access to main Views and common actions</source>
         <translation>Schneller Zugriff auf die wichtigsten Ansichten und allgemeinen Aktionen</translation>
@@ -17435,6 +17530,26 @@ Drehmomentkorrektur - Der absolute Korrekturwert in Nm (oder Pfund pro Quadratin
         <location filename="../../Charts/LTMWindow.cpp" line="269"/>
         <source>Negative decay</source>
         <translation>Erholt von Erschöpfung in</translation>
+    </message>
+    <message>
+        <location filename="../../Charts/LTMWindow.cpp" line="272"/>
+        <source>RMSE 2.9 for 22 tests.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Charts/LTMWindow.cpp" line="491"/>
+        <source>%1 watts on %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Charts/LTMWindow.cpp" line="492"/>
+        <source>%1 on %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Charts/LTMWindow.cpp" line="498"/>
+        <source>RMSE %1 for %2 tests.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../Charts/LTMWindow.cpp" line="1311"/>
@@ -21361,7 +21476,7 @@ Keine Aktivitäten zum Importieren gefunden.
 <context>
     <name>Nolio</name>
     <message>
-        <location filename="../../Cloud/Nolio.cpp" line="246"/>
+        <location filename="../../Cloud/Nolio.cpp" line="247"/>
         <source>Completed.</source>
         <translation>Abgeschlossen.</translation>
     </message>
@@ -31909,6 +32024,7 @@ F3 drücken, wenn fertig.</translation>
     </message>
     <message>
         <location filename="../../Charts/UserChart.cpp" line="830"/>
+        <location filename="../../Charts/UserChart.cpp" line="832"/>
         <source>Background</source>
         <translation>Hintergrund</translation>
     </message>
