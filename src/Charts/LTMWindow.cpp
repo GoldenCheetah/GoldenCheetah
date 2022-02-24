@@ -269,7 +269,7 @@ LTMWindow::LTMWindow(Context *context) :
     t2label1 = new QLabel(tr("Negative decay"), this);
     t2label2 = new QLabel(tr("days"), this);
     RMSElabel = new QLabel(this);
-    RMSElabel->setText("RMSE 2.9 for 22 tests.");
+    RMSElabel->setText(tr("RMSE 2.9 for 22 tests."));
 
     // add to layout
     bang->addWidget(ilabel,0,0);
@@ -488,14 +488,14 @@ LTMWindow::refreshBanister()
         QDate when = banister->getPeakPerf(settings.start.date(), settings.end.date(), perf, CP);
 
         // set peak label
-        if (CP >0 && when != QDate()) peaklabel ->setText(QString("%1 watts on %2").arg(CP).arg(when.toString("d MMM yyyy")));
-        else if (perf >0.0 && when != QDate()) peaklabel ->setText(QString("%1 on %2").arg(perf, 0, 'f', 1).arg(when.toString("d MMM yyyy")));
+        if (CP >0 && when != QDate()) peaklabel ->setText(tr("%1 watts on %2").arg(CP).arg(when.toString("d MMM yyyy")));
+        else if (perf >0.0 && when != QDate()) peaklabel ->setText(tr("%1 on %2").arg(perf, 0, 'f', 1).arg(when.toString("d MMM yyyy")));
         else peaklabel->setText("");
 
         // set RMSE for current view
         int count;
         double RMSE = banister->RMSE(settings.start.date(), settings.end.date(), count);
-        if (count && RMSE >0) RMSElabel->setText(QString("RMSE %1 for %2 tests.").arg(RMSE, 0, 'f', 2).arg(count));
+        if (count && RMSE >0) RMSElabel->setText(tr("RMSE %1 for %2 tests.").arg(RMSE, 0, 'f', 2).arg(count));
         else RMSElabel->setText("");
 
     } else {

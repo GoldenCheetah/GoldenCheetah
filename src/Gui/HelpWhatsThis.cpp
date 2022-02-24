@@ -64,7 +64,7 @@ HelpWhatsThis::getText(GCHelp chapter) {
 
     default:
     case Default:
-        return text.arg("Main-Page_Table-of-contents").arg("Table of Contents");
+        return text.arg("Main-Page_Table-of-contents").arg(tr("Table of Contents"));
 
     // Scope Bar
     case ScopeBar:

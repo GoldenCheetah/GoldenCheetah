@@ -3708,16 +3708,16 @@ OverviewItemConfig::OverviewItemConfig(ChartSpaceItem *item) : QWidget(NULL), it
         exp = new QPushButton(tr("Export Data"));
         exp->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
         legacySelector = new QComboBox(this);
-        legacySelector->addItem("User defined", 0);
-        legacySelector->addItem("Totals", DATA_TABLE_TOTALS);
-        legacySelector->addItem("Averages", DATA_TABLE_AVERAGES);
-        legacySelector->addItem("Maximums", DATA_TABLE_MAXIMUMS);
-        legacySelector->addItem("Metrics", DATA_TABLE_METRICS);
-        legacySelector->addItem("Zones", DATA_TABLE_ZONES);
+        legacySelector->addItem(tr("User defined"), 0);
+        legacySelector->addItem(tr("Totals"), DATA_TABLE_TOTALS);
+        legacySelector->addItem(tr("Averages"), DATA_TABLE_AVERAGES);
+        legacySelector->addItem(tr("Maximums"), DATA_TABLE_MAXIMUMS);
+        legacySelector->addItem(tr("Metrics"), DATA_TABLE_METRICS);
+        legacySelector->addItem(tr("Zones"), DATA_TABLE_ZONES);
         if (item->parent->scope & OverviewScope::ANALYSIS) {
-            legacySelector->addItem("Intervals", DATA_TABLE_INTERVALS);
+            legacySelector->addItem(tr("Intervals"), DATA_TABLE_INTERVALS);
         } else {
-            legacySelector->addItem("Activities", DATA_TABLE_TRENDS);
+            legacySelector->addItem(tr("Activities"), DATA_TABLE_TRENDS);
         }
 
         layout->addRow(tr("Legacy"), legacySelector);

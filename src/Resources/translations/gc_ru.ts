@@ -77,12 +77,12 @@ It might be necessary to manually disable it.</source>
         <translation>О GoldenCheetah</translation>
     </message>
     <message>
-        <location filename="../../Gui/AboutDialog.cpp" line="33"/>
+        <location filename="../../Gui/AboutDialog.cpp" line="32"/>
         <source>About</source>
         <translation>О программе</translation>
     </message>
     <message>
-        <location filename="../../Gui/AboutDialog.cpp" line="34"/>
+        <location filename="../../Gui/AboutDialog.cpp" line="33"/>
         <source>Version</source>
         <translation>Версия</translation>
     </message>
@@ -91,7 +91,7 @@ It might be necessary to manually disable it.</source>
         <translation type="vanished">Настройка сборки</translation>
     </message>
     <message>
-        <location filename="../../Gui/AboutDialog.cpp" line="35"/>
+        <location filename="../../Gui/AboutDialog.cpp" line="34"/>
         <source>Contributors</source>
         <translation>Участники проекта</translation>
     </message>
@@ -138,7 +138,7 @@ It might be necessary to manually disable it.</source>
         <translation type="vanished">&lt;center&gt;&lt;img src=&quot;:images/gc.png&quot; height=80&gt;&lt;h2&gt;GoldenCheetah&lt;/h2&gt;ПО анализа показателей мощности для велосипедистов&lt;br&gt;для Linux, Mac и Windows&lt;p&gt;GoldenCheetah разрабатывается под лицензией&lt;br&gt;&lt;a href=&quot;https://opensource.org/licenses/GPL-2.0&quot;&gt;GNU General Public License&lt;/a&gt;.&lt;p&gt;Исходный код доступен по адресу &lt;br&gt;&lt;a href=&quot;http://goldencheetah.org/&quot;&gt;http://goldencheetah.org/&lt;/a&gt;.&lt;p&gt;Файлы тренировок и прочие данные сохраняются в &lt;br&gt;&lt;a href=&quot;%1&quot;&gt;%2&lt;/a&gt;&lt;p&gt;ID спортсмена: %3&lt;br&gt;&lt;p&gt;Товарные знаки &lt;br&gt;BikeScore, xPower, SwimScore courtesy of &lt;br&gt; используются с разрешения &lt;a href=&quot;http://www.physfarm.com&quot;&gt;Physfarm Training Systems&lt;/a&gt;.&lt;br&gt;Virtual Speed courtesy of Tom Compton &lt;a href=&quot;http://www.analyticcycling.com&quot;&gt;AnalyticCycling&lt;/a&gt;.&lt;br&gt;&lt;br&gt;Модуль температуры тела разработан &lt;br&gt;&lt;a href=&quot;http://www.usariem.army.mil/&quot;&gt;U.S. Army Research Institute of Environmental Medicine&lt;/a&gt;&lt;br&gt; и находится в стадтии патентования.&lt;br&gt;&lt;br&gt;&lt;img src=&quot;:images/services/strava_compatible.png&quot;/&gt;&lt;br&gt;&lt;/center&gt;</translation>
     </message>
     <message>
-        <location filename="../../Gui/AboutDialog.cpp" line="57"/>
+        <location filename="../../Gui/AboutDialog.cpp" line="56"/>
         <source>&lt;center&gt;&lt;img src=&quot;:images/gc.png&quot; height=80&gt;&lt;h2&gt;GoldenCheetah&lt;/h2&gt;Cycling Power Analysis Software&lt;br&gt;for Linux, Mac, and Windows&lt;p&gt;GoldenCheetah is licensed under the&lt;br&gt;&lt;a href=&quot;https://opensource.org/licenses/GPL-2.0&quot;&gt;GNU General Public License 2.0&lt;/a&gt;.&lt;p&gt;Source code can be obtained from&lt;br&gt;&lt;a href=&quot;https://www.goldencheetah.org/&quot;&gt;https://www.goldencheetah.org/&lt;/a&gt;.&lt;br&gt;&lt;p&gt;Activity files and other data are stored in&lt;br&gt;&lt;a href=&quot;%1&quot;&gt;%2&lt;/a&gt;&lt;p&gt;Athlete ID %3&lt;br&gt;&lt;p&gt;Trademarks used with permission&lt;br&gt;BikeScore, xPower, SwimScore courtesy of &lt;a href=&quot;http://www.physfarm.com&quot;&gt;Physfarm Training Systems&lt;/a&gt;.&lt;br&gt;Virtual Speed courtesy of Tom Compton &lt;a href=&quot;http://www.analyticcycling.com&quot;&gt;AnalyticCycling&lt;/a&gt;.&lt;br&gt;&lt;br&gt;The core body temperature module was developed by the &lt;br&gt;&lt;a href=&quot;http://www.usariem.army.mil/&quot;&gt;U.S. Army Research Institute of Environmental Medicine&lt;/a&gt;&lt;br&gt; and is patent pending&lt;br&gt;&lt;br&gt;&lt;img src=&quot;:images/services/strava_compatible.png&quot;/&gt;&lt;br&gt;&lt;/center&gt;</source>
         <translation>&lt;center&gt;&lt;img src=&quot;:images/gc.png&quot; height=80&gt;&lt;h2&gt;GoldenCheetah&lt;/h2&gt;ПО анализа показателей мощности для велосипедистов&lt;br&gt;для Linux, Mac и Windows&lt;p&gt;GoldenCheetah разрабатывается под лицензией&lt;br&gt;&lt;a href=&quot;https://opensource.org/licenses/GPL-2.0&quot;&gt;GNU General Public License&lt;/a&gt;.&lt;p&gt;Исходный код доступен по адресу &lt;br&gt;&lt;a href=&quot;https://www.goldencheetah.org/&quot;&gt;https://www.goldencheetah.org/&lt;/a&gt;.&lt;p&gt;Файлы тренировок и прочие данные сохраняются в &lt;br&gt;&lt;a href=&quot;%1&quot;&gt;%2&lt;/a&gt;&lt;p&gt;ID спортсмена: %3&lt;br&gt;&lt;p&gt;Товарные знаки &lt;br&gt;BikeScore, xPower, SwimScore courtesy of &lt;br&gt; используются с разрешения &lt;a href=&quot;http://www.physfarm.com&quot;&gt;Physfarm Training Systems&lt;/a&gt;.&lt;br&gt;Virtual Speed courtesy of Tom Compton &lt;a href=&quot;http://www.analyticcycling.com&quot;&gt;AnalyticCycling&lt;/a&gt;.&lt;br&gt;&lt;br&gt;Модуль температуры тела разработан &lt;br&gt;&lt;a href=&quot;http://www.usariem.army.mil/&quot;&gt;U.S. Army Research Institute of Environmental Medicine&lt;/a&gt;&lt;br&gt; и находится в стадтии патентования.&lt;br&gt;&lt;br&gt;&lt;img src=&quot;:images/services/strava_compatible.png&quot;/&gt;&lt;br&gt;&lt;/center&gt;</translation>
     </message>
@@ -10688,6 +10688,41 @@ You may need to (re)install the FTDI or PL2303 drivers before downloading.</sour
         <source>Range</source>
         <translation>Диапазон</translation>
     </message>
+    <message>
+        <location filename="../../Charts/UserChart.cpp" line="1784"/>
+        <source>Smoothing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Charts/UserChart.cpp" line="1789"/>
+        <source>None</source>
+        <translation type="unfinished">Нет</translation>
+    </message>
+    <message>
+        <location filename="../../Charts/UserChart.cpp" line="1790"/>
+        <source>Day</source>
+        <translation type="unfinished">День</translation>
+    </message>
+    <message>
+        <location filename="../../Charts/UserChart.cpp" line="1791"/>
+        <source>Week</source>
+        <translation type="unfinished">Неделя</translation>
+    </message>
+    <message>
+        <location filename="../../Charts/UserChart.cpp" line="1792"/>
+        <source>Month</source>
+        <translation type="unfinished">Месяц</translation>
+    </message>
+    <message>
+        <location filename="../../Charts/UserChart.cpp" line="1793"/>
+        <source>Year</source>
+        <translation type="unfinished">Год</translation>
+    </message>
+    <message>
+        <location filename="../../Charts/UserChart.cpp" line="1795"/>
+        <source>Group By</source>
+        <translation type="unfinished">Сгруппировать по</translation>
+    </message>
 </context>
 <context>
     <name>EditUserDataDialog</name>
@@ -10896,9 +10931,64 @@ You may need to (re)install the FTDI or PL2303 drivers before downloading.</sour
         <translation>О&amp;тмена</translation>
     </message>
     <message>
+        <location filename="../../Charts/UserChart.cpp" line="1421"/>
+        <source>Group</source>
+        <translation type="unfinished">Группа</translation>
+    </message>
+    <message>
         <location filename="../../Charts/UserChart.cpp" line="1429"/>
         <source>Series Name</source>
         <translation>Название серии данных</translation>
+    </message>
+    <message>
+        <location filename="../../Charts/UserChart.cpp" line="1518"/>
+        <source>Y units</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Charts/UserChart.cpp" line="1523"/>
+        <source>X units</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Charts/UserChart.cpp" line="1527"/>
+        <source>Sum</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Charts/UserChart.cpp" line="1528"/>
+        <source>Average</source>
+        <translation type="unfinished">Среднее</translation>
+    </message>
+    <message>
+        <location filename="../../Charts/UserChart.cpp" line="1529"/>
+        <source>Peak</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Charts/UserChart.cpp" line="1530"/>
+        <source>Low</source>
+        <translation type="unfinished">Минимальное</translation>
+    </message>
+    <message>
+        <location filename="../../Charts/UserChart.cpp" line="1531"/>
+        <source>Running Total</source>
+        <translation type="unfinished">Нарастающий итог</translation>
+    </message>
+    <message>
+        <location filename="../../Charts/UserChart.cpp" line="1532"/>
+        <source>Mean Square Root</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Charts/UserChart.cpp" line="1533"/>
+        <source>Std Deviation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Charts/UserChart.cpp" line="1536"/>
+        <source>Aggregate</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../Charts/UserChart.cpp" line="1540"/>
@@ -15520,6 +15610,11 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="67"/>
+        <source>Table of Contents</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="71"/>
         <source>Quick access to main Views and common actions</source>
         <translation type="unfinished"></translation>
@@ -19981,6 +20076,26 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
         <translation>Негативный спад</translation>
     </message>
     <message>
+        <location filename="../../Charts/LTMWindow.cpp" line="272"/>
+        <source>RMSE 2.9 for 22 tests.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Charts/LTMWindow.cpp" line="491"/>
+        <source>%1 watts on %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Charts/LTMWindow.cpp" line="492"/>
+        <source>%1 on %2</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Charts/LTMWindow.cpp" line="498"/>
+        <source>RMSE %1 for %2 tests.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <location filename="../../Charts/LTMWindow.cpp" line="1425"/>
         <source>Time of Day</source>
         <translation type="unfinished">Время дня</translation>
@@ -24434,6 +24549,24 @@ No rides found to import.
     </message>
 </context>
 <context>
+    <name>Nolio</name>
+    <message>
+        <location filename="../../Cloud/Nolio.cpp" line="247"/>
+        <source>Completed.</source>
+        <translation type="unfinished">Завершено.</translation>
+    </message>
+    <message>
+        <location filename="../../Cloud/Nolio.h" line="38"/>
+        <source>Nolio</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Cloud/Nolio.h" line="39"/>
+        <source>Sync with your favorite training partner.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>NonZeroPower</name>
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="1316"/>
@@ -24460,13 +24593,13 @@ No rides found to import.
         <translation>OAuth</translation>
     </message>
     <message>
-        <location filename="../../Cloud/OAuthDialog.cpp" line="60"/>
+        <location filename="../../Cloud/OAuthDialog.cpp" line="61"/>
         <source>SSL Security Libraries required for &apos;Authorise&apos; are missing in this installation.</source>
         <translation>Отсутствует библиотека SSL Security Libraries, необходимая для авторизации.</translation>
     </message>
     <message>
-        <location filename="../../Cloud/OAuthDialog.cpp" line="61"/>
-        <location filename="../../Cloud/OAuthDialog.cpp" line="471"/>
+        <location filename="../../Cloud/OAuthDialog.cpp" line="62"/>
+        <location filename="../../Cloud/OAuthDialog.cpp" line="484"/>
         <source>Authorization Error</source>
         <translation>Ошибка авторизации</translation>
     </message>
@@ -24479,21 +24612,22 @@ No rides found to import.
         <translation type="vanished">Авторизация в Twitter прошла успешно.</translation>
     </message>
     <message>
-        <location filename="../../Cloud/OAuthDialog.cpp" line="609"/>
+        <location filename="../../Cloud/OAuthDialog.cpp" line="622"/>
         <source>Withings authorization was successful.</source>
         <translation>Авторизация в Withings прошла успешно.</translation>
     </message>
     <message>
-        <location filename="../../Cloud/OAuthDialog.cpp" line="483"/>
-        <location filename="../../Cloud/OAuthDialog.cpp" line="492"/>
-        <location filename="../../Cloud/OAuthDialog.cpp" line="529"/>
-        <location filename="../../Cloud/OAuthDialog.cpp" line="538"/>
-        <location filename="../../Cloud/OAuthDialog.cpp" line="545"/>
-        <location filename="../../Cloud/OAuthDialog.cpp" line="555"/>
-        <location filename="../../Cloud/OAuthDialog.cpp" line="564"/>
-        <location filename="../../Cloud/OAuthDialog.cpp" line="573"/>
-        <location filename="../../Cloud/OAuthDialog.cpp" line="579"/>
-        <location filename="../../Cloud/OAuthDialog.cpp" line="610"/>
+        <location filename="../../Cloud/OAuthDialog.cpp" line="496"/>
+        <location filename="../../Cloud/OAuthDialog.cpp" line="505"/>
+        <location filename="../../Cloud/OAuthDialog.cpp" line="542"/>
+        <location filename="../../Cloud/OAuthDialog.cpp" line="551"/>
+        <location filename="../../Cloud/OAuthDialog.cpp" line="558"/>
+        <location filename="../../Cloud/OAuthDialog.cpp" line="568"/>
+        <location filename="../../Cloud/OAuthDialog.cpp" line="577"/>
+        <location filename="../../Cloud/OAuthDialog.cpp" line="586"/>
+        <location filename="../../Cloud/OAuthDialog.cpp" line="592"/>
+        <location filename="../../Cloud/OAuthDialog.cpp" line="623"/>
+        <location filename="../../Cloud/OAuthDialog.cpp" line="631"/>
         <source>Information</source>
         <translation>Информация</translation>
     </message>
@@ -24506,52 +24640,57 @@ No rides found to import.
         <translation type="vanished">В ходе авторизации произошла ошибка. Прочитайте описание ошибки.</translation>
     </message>
     <message>
-        <location filename="../../Cloud/OAuthDialog.cpp" line="482"/>
+        <location filename="../../Cloud/OAuthDialog.cpp" line="495"/>
         <source>Dropbox authorization was successful.</source>
         <translation>Авторизация в Dropbox прошла успешно.</translation>
     </message>
     <message>
-        <location filename="../../Cloud/OAuthDialog.cpp" line="491"/>
+        <location filename="../../Cloud/OAuthDialog.cpp" line="504"/>
         <source>SportTracks authorization was successful.</source>
         <translation>Авторизация в SportTracks прошла успешно.</translation>
     </message>
     <message>
-        <location filename="../../Cloud/OAuthDialog.cpp" line="528"/>
+        <location filename="../../Cloud/OAuthDialog.cpp" line="541"/>
         <source>Polar Flow authorization was successful.</source>
         <translation>Авторизация в Polar Flow прошла успешно.</translation>
     </message>
     <message>
-        <location filename="../../Cloud/OAuthDialog.cpp" line="537"/>
+        <location filename="../../Cloud/OAuthDialog.cpp" line="550"/>
         <source>Strava authorization was successful.</source>
         <translation>Авторизация в Strava прошла успешно.</translation>
     </message>
     <message>
-        <location filename="../../Cloud/OAuthDialog.cpp" line="544"/>
+        <location filename="../../Cloud/OAuthDialog.cpp" line="557"/>
         <source>Cycling Analytics authorization was successful.</source>
         <translation>Авторизация в Cycling Analytics прошла успешно.</translation>
     </message>
     <message>
-        <location filename="../../Cloud/OAuthDialog.cpp" line="553"/>
+        <location filename="../../Cloud/OAuthDialog.cpp" line="566"/>
         <source>Google Calendar authorization was successful.</source>
         <translation>Авторизация в Google Calendar прошла успешно.</translation>
     </message>
     <message>
-        <location filename="../../Cloud/OAuthDialog.cpp" line="563"/>
+        <location filename="../../Cloud/OAuthDialog.cpp" line="576"/>
         <source>Kent University Google Drive authorization was successful.</source>
         <translation>Авторизация в Kent University на Google Drive прошла успешно.</translation>
     </message>
     <message>
-        <location filename="../../Cloud/OAuthDialog.cpp" line="572"/>
+        <location filename="../../Cloud/OAuthDialog.cpp" line="585"/>
         <source>Google Drive authorization was successful.</source>
         <translation>Авторизация в Google Drive прошла успешно.</translation>
     </message>
     <message>
-        <location filename="../../Cloud/OAuthDialog.cpp" line="618"/>
+        <location filename="../../Cloud/OAuthDialog.cpp" line="630"/>
+        <source>Nolio authorization was successful.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Cloud/OAuthDialog.cpp" line="637"/>
         <source>Error retrieving access token, %1 (%2)</source>
         <translation>Ошибка получения токена доступа, %1 (%2)</translation>
     </message>
     <message>
-        <location filename="../../Cloud/OAuthDialog.cpp" line="619"/>
+        <location filename="../../Cloud/OAuthDialog.cpp" line="638"/>
         <source>SSL Token Refresh Error</source>
         <translation>Ошибка обновления SSL токена</translation>
     </message>
@@ -24560,12 +24699,12 @@ No rides found to import.
         <translation type="obsolete">Выбор</translation>
     </message>
     <message>
-        <location filename="../../Cloud/OAuthDialog.cpp" line="578"/>
+        <location filename="../../Cloud/OAuthDialog.cpp" line="591"/>
         <source>Today&apos;s Plan authorization was successful.</source>
         <translation>Авторизация в Today&apos;s Plan прошла успешно.</translation>
     </message>
     <message>
-        <location filename="../../Cloud/OAuthDialog.cpp" line="470"/>
+        <location filename="../../Cloud/OAuthDialog.cpp" line="483"/>
         <source>Error retrieving authoriation credentials</source>
         <translation>Ошибка получения данных авторизации</translation>
     </message>
@@ -24701,6 +24840,46 @@ No rides found to import.
         <location filename="../../Charts/OverviewItems.cpp" line="3708"/>
         <source>Export Data</source>
         <translation>Экспортировать данные</translation>
+    </message>
+    <message>
+        <location filename="../../Charts/OverviewItems.cpp" line="3711"/>
+        <source>User defined</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Charts/OverviewItems.cpp" line="3712"/>
+        <source>Totals</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Charts/OverviewItems.cpp" line="3713"/>
+        <source>Averages</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Charts/OverviewItems.cpp" line="3714"/>
+        <source>Maximums</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Charts/OverviewItems.cpp" line="3715"/>
+        <source>Metrics</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Charts/OverviewItems.cpp" line="3716"/>
+        <source>Zones</source>
+        <translation type="unfinished">Зоны</translation>
+    </message>
+    <message>
+        <location filename="../../Charts/OverviewItems.cpp" line="3718"/>
+        <source>Intervals</source>
+        <translation type="unfinished">Интервалы</translation>
+    </message>
+    <message>
+        <location filename="../../Charts/OverviewItems.cpp" line="3720"/>
+        <source>Activities</source>
+        <translation type="unfinished">Тренировки</translation>
     </message>
     <message>
         <location filename="../../Charts/OverviewItems.cpp" line="3723"/>
@@ -36581,6 +36760,7 @@ Press F3 on Controller when done.</source>
     </message>
     <message>
         <location filename="../../Charts/UserChart.cpp" line="830"/>
+        <location filename="../../Charts/UserChart.cpp" line="832"/>
         <source>Background</source>
         <translation>Фон</translation>
     </message>

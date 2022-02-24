@@ -77,17 +77,17 @@ Puede que sea necesario deshabilitarlo de forma manual.</translation>
         <translation>Acerca de GoldenCheetah</translation>
     </message>
     <message>
-        <location filename="../../Gui/AboutDialog.cpp" line="33"/>
+        <location filename="../../Gui/AboutDialog.cpp" line="32"/>
         <source>About</source>
         <translation>Acerca de</translation>
     </message>
     <message>
-        <location filename="../../Gui/AboutDialog.cpp" line="34"/>
+        <location filename="../../Gui/AboutDialog.cpp" line="33"/>
         <source>Version</source>
         <translation>Versión</translation>
     </message>
     <message>
-        <location filename="../../Gui/AboutDialog.cpp" line="35"/>
+        <location filename="../../Gui/AboutDialog.cpp" line="34"/>
         <source>Contributors</source>
         <translation>Desarrolladores</translation>
     </message>
@@ -118,7 +118,7 @@ Puede que sea necesario deshabilitarlo de forma manual.</translation>
 <context>
     <name>AboutPage</name>
     <message>
-        <location filename="../../Gui/AboutDialog.cpp" line="57"/>
+        <location filename="../../Gui/AboutDialog.cpp" line="56"/>
         <source>&lt;center&gt;&lt;img src=&quot;:images/gc.png&quot; height=80&gt;&lt;h2&gt;GoldenCheetah&lt;/h2&gt;Cycling Power Analysis Software&lt;br&gt;for Linux, Mac, and Windows&lt;p&gt;GoldenCheetah is licensed under the&lt;br&gt;&lt;a href=&quot;https://opensource.org/licenses/GPL-2.0&quot;&gt;GNU General Public License 2.0&lt;/a&gt;.&lt;p&gt;Source code can be obtained from&lt;br&gt;&lt;a href=&quot;https://www.goldencheetah.org/&quot;&gt;https://www.goldencheetah.org/&lt;/a&gt;.&lt;br&gt;&lt;p&gt;Activity files and other data are stored in&lt;br&gt;&lt;a href=&quot;%1&quot;&gt;%2&lt;/a&gt;&lt;p&gt;Athlete ID %3&lt;br&gt;&lt;p&gt;Trademarks used with permission&lt;br&gt;BikeScore, xPower, SwimScore courtesy of &lt;a href=&quot;http://www.physfarm.com&quot;&gt;Physfarm Training Systems&lt;/a&gt;.&lt;br&gt;Virtual Speed courtesy of Tom Compton &lt;a href=&quot;http://www.analyticcycling.com&quot;&gt;AnalyticCycling&lt;/a&gt;.&lt;br&gt;&lt;br&gt;The core body temperature module was developed by the &lt;br&gt;&lt;a href=&quot;http://www.usariem.army.mil/&quot;&gt;U.S. Army Research Institute of Environmental Medicine&lt;/a&gt;&lt;br&gt; and is patent pending&lt;br&gt;&lt;br&gt;&lt;img src=&quot;:images/services/strava_compatible.png&quot;/&gt;&lt;br&gt;&lt;/center&gt;</source>
         <translation></translation>
     </message>
@@ -9331,6 +9331,41 @@ le sugerirá los posibles nombres
         <source>Range</source>
         <translation>Rango</translation>
     </message>
+    <message>
+        <location filename="../../Charts/UserChart.cpp" line="1784"/>
+        <source>Smoothing</source>
+        <translation>Suavizado</translation>
+    </message>
+    <message>
+        <location filename="../../Charts/UserChart.cpp" line="1789"/>
+        <source>None</source>
+        <translation>Ninguno</translation>
+    </message>
+    <message>
+        <location filename="../../Charts/UserChart.cpp" line="1790"/>
+        <source>Day</source>
+        <translation>Día</translation>
+    </message>
+    <message>
+        <location filename="../../Charts/UserChart.cpp" line="1791"/>
+        <source>Week</source>
+        <translation>Semana</translation>
+    </message>
+    <message>
+        <location filename="../../Charts/UserChart.cpp" line="1792"/>
+        <source>Month</source>
+        <translation>Mes</translation>
+    </message>
+    <message>
+        <location filename="../../Charts/UserChart.cpp" line="1793"/>
+        <source>Year</source>
+        <translation>Año</translation>
+    </message>
+    <message>
+        <location filename="../../Charts/UserChart.cpp" line="1795"/>
+        <source>Group By</source>
+        <translation>Agrupar por</translation>
+    </message>
 </context>
 <context>
     <name>EditUserDataDialog</name>
@@ -9540,9 +9575,64 @@ le sugerirá los posibles nombres
         <translation>&amp;Cancelar</translation>
     </message>
     <message>
+        <location filename="../../Charts/UserChart.cpp" line="1421"/>
+        <source>Group</source>
+        <translation>Grupo</translation>
+    </message>
+    <message>
         <location filename="../../Charts/UserChart.cpp" line="1429"/>
         <source>Series Name</source>
         <translation>Nombre de la serie</translation>
+    </message>
+    <message>
+        <location filename="../../Charts/UserChart.cpp" line="1518"/>
+        <source>Y units</source>
+        <translation>Unidades Y</translation>
+    </message>
+    <message>
+        <location filename="../../Charts/UserChart.cpp" line="1523"/>
+        <source>X units</source>
+        <translation>Unidades X</translation>
+    </message>
+    <message>
+        <location filename="../../Charts/UserChart.cpp" line="1527"/>
+        <source>Sum</source>
+        <translation>Suma</translation>
+    </message>
+    <message>
+        <location filename="../../Charts/UserChart.cpp" line="1528"/>
+        <source>Average</source>
+        <translation>Promedio</translation>
+    </message>
+    <message>
+        <location filename="../../Charts/UserChart.cpp" line="1529"/>
+        <source>Peak</source>
+        <translation>Máximo</translation>
+    </message>
+    <message>
+        <location filename="../../Charts/UserChart.cpp" line="1530"/>
+        <source>Low</source>
+        <translation>Mínimo</translation>
+    </message>
+    <message>
+        <location filename="../../Charts/UserChart.cpp" line="1531"/>
+        <source>Running Total</source>
+        <translation>Total acumulado</translation>
+    </message>
+    <message>
+        <location filename="../../Charts/UserChart.cpp" line="1532"/>
+        <source>Mean Square Root</source>
+        <translation>Raíz de la media cuadrática</translation>
+    </message>
+    <message>
+        <location filename="../../Charts/UserChart.cpp" line="1533"/>
+        <source>Std Deviation</source>
+        <translation>Desviación estándar</translation>
+    </message>
+    <message>
+        <location filename="../../Charts/UserChart.cpp" line="1536"/>
+        <source>Aggregate</source>
+        <translation>Agregar</translation>
     </message>
     <message>
         <location filename="../../Charts/UserChart.cpp" line="1540"/>
@@ -13670,6 +13760,11 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
         <translation>Asistente para dividir una actividad en múltiples actividades basado en criterios configurables</translation>
     </message>
     <message>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="67"/>
+        <source>Table of Contents</source>
+        <translation>Tabla de contenido</translation>
+    </message>
+    <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="71"/>
         <source>Quick access to main Views and common actions</source>
         <translation>Acceso rápido a las vistas principales y acciones frecuentes</translation>
@@ -17475,6 +17570,26 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
         <location filename="../../Charts/LTMWindow.cpp" line="269"/>
         <source>Negative decay</source>
         <translation>Decaimiento negativo</translation>
+    </message>
+    <message>
+        <location filename="../../Charts/LTMWindow.cpp" line="272"/>
+        <source>RMSE 2.9 for 22 tests.</source>
+        <translation>RMSE 2.9 con 22 pruebas.</translation>
+    </message>
+    <message>
+        <location filename="../../Charts/LTMWindow.cpp" line="491"/>
+        <source>%1 watts on %2</source>
+        <translation>%1 vatios el %2</translation>
+    </message>
+    <message>
+        <location filename="../../Charts/LTMWindow.cpp" line="492"/>
+        <source>%1 on %2</source>
+        <translation>%1 el %2</translation>
+    </message>
+    <message>
+        <location filename="../../Charts/LTMWindow.cpp" line="498"/>
+        <source>RMSE %1 for %2 tests.</source>
+        <translation>RMSE %1 con %2 pruebas.</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMWindow.cpp" line="1311"/>
@@ -21432,6 +21547,24 @@ No se han encontrado actividades para importar.
     </message>
 </context>
 <context>
+    <name>Nolio</name>
+    <message>
+        <location filename="../../Cloud/Nolio.cpp" line="247"/>
+        <source>Completed.</source>
+        <translation>Finalizado.</translation>
+    </message>
+    <message>
+        <location filename="../../Cloud/Nolio.h" line="38"/>
+        <source>Nolio</source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../../Cloud/Nolio.h" line="39"/>
+        <source>Sync with your favorite training partner.</source>
+        <translation>Sincronizar con tu compañero de entrenamientos favorito.</translation>
+    </message>
+</context>
+<context>
     <name>NonZeroPower</name>
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="1316"/>
@@ -21458,92 +21591,98 @@ No se han encontrado actividades para importar.
         <translation>OAuth</translation>
     </message>
     <message>
-        <location filename="../../Cloud/OAuthDialog.cpp" line="61"/>
-        <location filename="../../Cloud/OAuthDialog.cpp" line="471"/>
+        <location filename="../../Cloud/OAuthDialog.cpp" line="62"/>
+        <location filename="../../Cloud/OAuthDialog.cpp" line="484"/>
         <source>Authorization Error</source>
         <translation>Error de autorización</translation>
     </message>
     <message>
-        <location filename="../../Cloud/OAuthDialog.cpp" line="60"/>
+        <location filename="../../Cloud/OAuthDialog.cpp" line="61"/>
         <source>SSL Security Libraries required for &apos;Authorise&apos; are missing in this installation.</source>
         <translation>Las librerías de seguridad SSL que se requieren para la autorización no están disponibles en esta instalación.</translation>
     </message>
     <message>
-        <location filename="../../Cloud/OAuthDialog.cpp" line="609"/>
+        <location filename="../../Cloud/OAuthDialog.cpp" line="622"/>
         <source>Withings authorization was successful.</source>
         <translation>La autorización de Withings fue exitosa.</translation>
     </message>
     <message>
-        <location filename="../../Cloud/OAuthDialog.cpp" line="483"/>
-        <location filename="../../Cloud/OAuthDialog.cpp" line="492"/>
-        <location filename="../../Cloud/OAuthDialog.cpp" line="529"/>
-        <location filename="../../Cloud/OAuthDialog.cpp" line="538"/>
-        <location filename="../../Cloud/OAuthDialog.cpp" line="545"/>
-        <location filename="../../Cloud/OAuthDialog.cpp" line="555"/>
-        <location filename="../../Cloud/OAuthDialog.cpp" line="564"/>
-        <location filename="../../Cloud/OAuthDialog.cpp" line="573"/>
-        <location filename="../../Cloud/OAuthDialog.cpp" line="579"/>
-        <location filename="../../Cloud/OAuthDialog.cpp" line="610"/>
+        <location filename="../../Cloud/OAuthDialog.cpp" line="496"/>
+        <location filename="../../Cloud/OAuthDialog.cpp" line="505"/>
+        <location filename="../../Cloud/OAuthDialog.cpp" line="542"/>
+        <location filename="../../Cloud/OAuthDialog.cpp" line="551"/>
+        <location filename="../../Cloud/OAuthDialog.cpp" line="558"/>
+        <location filename="../../Cloud/OAuthDialog.cpp" line="568"/>
+        <location filename="../../Cloud/OAuthDialog.cpp" line="577"/>
+        <location filename="../../Cloud/OAuthDialog.cpp" line="586"/>
+        <location filename="../../Cloud/OAuthDialog.cpp" line="592"/>
+        <location filename="../../Cloud/OAuthDialog.cpp" line="623"/>
+        <location filename="../../Cloud/OAuthDialog.cpp" line="631"/>
         <source>Information</source>
         <translation>Información</translation>
     </message>
     <message>
-        <location filename="../../Cloud/OAuthDialog.cpp" line="482"/>
+        <location filename="../../Cloud/OAuthDialog.cpp" line="495"/>
         <source>Dropbox authorization was successful.</source>
         <translation>La autorización con Dropbox fue exitosa.</translation>
     </message>
     <message>
-        <location filename="../../Cloud/OAuthDialog.cpp" line="491"/>
+        <location filename="../../Cloud/OAuthDialog.cpp" line="504"/>
         <source>SportTracks authorization was successful.</source>
         <translation>La autorización de SportTracks fue exitosa.</translation>
     </message>
     <message>
-        <location filename="../../Cloud/OAuthDialog.cpp" line="528"/>
+        <location filename="../../Cloud/OAuthDialog.cpp" line="541"/>
         <source>Polar Flow authorization was successful.</source>
         <translation>La autorización de Polar Flow fue exitosa.</translation>
     </message>
     <message>
-        <location filename="../../Cloud/OAuthDialog.cpp" line="537"/>
+        <location filename="../../Cloud/OAuthDialog.cpp" line="550"/>
         <source>Strava authorization was successful.</source>
         <translation>La autorización de Strava fue exitosa.</translation>
     </message>
     <message>
-        <location filename="../../Cloud/OAuthDialog.cpp" line="544"/>
+        <location filename="../../Cloud/OAuthDialog.cpp" line="557"/>
         <source>Cycling Analytics authorization was successful.</source>
         <translation>La autorización de Cycling Analytics fue exitosa.</translation>
     </message>
     <message>
-        <location filename="../../Cloud/OAuthDialog.cpp" line="553"/>
+        <location filename="../../Cloud/OAuthDialog.cpp" line="566"/>
         <source>Google Calendar authorization was successful.</source>
         <translation>La autorización del Calendaro de Google fue exitosa.</translation>
     </message>
     <message>
-        <location filename="../../Cloud/OAuthDialog.cpp" line="563"/>
+        <location filename="../../Cloud/OAuthDialog.cpp" line="576"/>
         <source>Kent University Google Drive authorization was successful.</source>
         <translation>La autorización de Google Drive para la Universidad de Kent fue exitosa.</translation>
     </message>
     <message>
-        <location filename="../../Cloud/OAuthDialog.cpp" line="572"/>
+        <location filename="../../Cloud/OAuthDialog.cpp" line="585"/>
         <source>Google Drive authorization was successful.</source>
         <translation>La autorización de Google Drive fue exitosa.</translation>
     </message>
     <message>
-        <location filename="../../Cloud/OAuthDialog.cpp" line="578"/>
+        <location filename="../../Cloud/OAuthDialog.cpp" line="591"/>
         <source>Today&apos;s Plan authorization was successful.</source>
         <translation>La autorización de Today&apos;s Plan fue exitosa.</translation>
     </message>
     <message>
-        <location filename="../../Cloud/OAuthDialog.cpp" line="618"/>
+        <location filename="../../Cloud/OAuthDialog.cpp" line="630"/>
+        <source>Nolio authorization was successful.</source>
+        <translation>La autorización con Nolio fue exitosa.</translation>
+    </message>
+    <message>
+        <location filename="../../Cloud/OAuthDialog.cpp" line="637"/>
         <source>Error retrieving access token, %1 (%2)</source>
         <translation>Error recuperando el token de acceso, %1 (%2)</translation>
     </message>
     <message>
-        <location filename="../../Cloud/OAuthDialog.cpp" line="619"/>
+        <location filename="../../Cloud/OAuthDialog.cpp" line="638"/>
         <source>SSL Token Refresh Error</source>
         <translation>Error al refrescar el token SSL</translation>
     </message>
     <message>
-        <location filename="../../Cloud/OAuthDialog.cpp" line="470"/>
+        <location filename="../../Cloud/OAuthDialog.cpp" line="483"/>
         <source>Error retrieving authoriation credentials</source>
         <translation>Error recuperando credenciales de autorización</translation>
     </message>
@@ -21679,6 +21818,46 @@ No se han encontrado actividades para importar.
         <location filename="../../Charts/OverviewItems.cpp" line="3708"/>
         <source>Export Data</source>
         <translation>Exportar datos</translation>
+    </message>
+    <message>
+        <location filename="../../Charts/OverviewItems.cpp" line="3711"/>
+        <source>User defined</source>
+        <translation>Definido por el usuario</translation>
+    </message>
+    <message>
+        <location filename="../../Charts/OverviewItems.cpp" line="3712"/>
+        <source>Totals</source>
+        <translation>Totales</translation>
+    </message>
+    <message>
+        <location filename="../../Charts/OverviewItems.cpp" line="3713"/>
+        <source>Averages</source>
+        <translation>Promedios</translation>
+    </message>
+    <message>
+        <location filename="../../Charts/OverviewItems.cpp" line="3714"/>
+        <source>Maximums</source>
+        <translation>Máximos</translation>
+    </message>
+    <message>
+        <location filename="../../Charts/OverviewItems.cpp" line="3715"/>
+        <source>Metrics</source>
+        <translation>Métricas</translation>
+    </message>
+    <message>
+        <location filename="../../Charts/OverviewItems.cpp" line="3716"/>
+        <source>Zones</source>
+        <translation>Zonas</translation>
+    </message>
+    <message>
+        <location filename="../../Charts/OverviewItems.cpp" line="3718"/>
+        <source>Intervals</source>
+        <translation>Intervalos</translation>
+    </message>
+    <message>
+        <location filename="../../Charts/OverviewItems.cpp" line="3720"/>
+        <source>Activities</source>
+        <translation>Actividades</translation>
     </message>
     <message>
         <location filename="../../Charts/OverviewItems.cpp" line="3723"/>
@@ -28011,12 +28190,12 @@ Do you want to continue?</source>
     <message>
         <location filename="../../Charts/RideMapWindow.cpp" line="87"/>
         <source>Tile server</source>
-        <translation>Servidor de mosaico</translation>
+        <translation>Servidor de mapas</translation>
     </message>
     <message>
         <location filename="../../Charts/RideMapWindow.cpp" line="88"/>
         <source>Tile server URL</source>
-        <translation>URL del servidor de mosaico</translation>
+        <translation>URL del servidor de mapas</translation>
     </message>
     <message>
         <location filename="../../Charts/RideMapWindow.cpp" line="92"/>
@@ -28026,17 +28205,17 @@ Do you want to continue?</source>
     <message>
         <location filename="../../Charts/RideMapWindow.cpp" line="93"/>
         <source>Custom Tile Server A</source>
-        <translation>Servidor de mosaico personalizado A</translation>
+        <translation>Servidor de mapas personalizado A</translation>
     </message>
     <message>
         <location filename="../../Charts/RideMapWindow.cpp" line="94"/>
         <source>Custom Tile Server B</source>
-        <translation>Servidor de mosaico personalizado B</translation>
+        <translation>Servidor de mapas personalizado B</translation>
     </message>
     <message>
         <location filename="../../Charts/RideMapWindow.cpp" line="95"/>
         <source>Custom Tile Server C</source>
-        <translation>Servidor de mosaico personalizado C</translation>
+        <translation>Servidor de mapas personalizado C</translation>
     </message>
     <message>
         <location filename="../../Charts/RideMapWindow.cpp" line="101"/>
@@ -31981,6 +32160,7 @@ Presionar F3 en el controlador al finalizar.</translation>
     </message>
     <message>
         <location filename="../../Charts/UserChart.cpp" line="830"/>
+        <location filename="../../Charts/UserChart.cpp" line="832"/>
         <source>Background</source>
         <translation>Fondo</translation>
     </message>

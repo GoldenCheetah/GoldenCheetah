@@ -829,7 +829,7 @@ UserChartSettings::UserChartSettings(Context *context, bool rangemode, GenericCh
 
     bgcolor = new ColorButton(this, tr("Background"), QColor(chartinfo.bgcolor), true);
     bgcolor->setSelectAll(true);
-    cf->addRow("Background", bgcolor);
+    cf->addRow(tr("Background"), bgcolor);
     cf->addRow("  ", (QWidget*)NULL);
 
     animate = new QCheckBox(tr("Animate"));
@@ -1418,7 +1418,7 @@ EditUserSeriesDialog::EditUserSeriesDialog(Context *context, bool rangemode, Gen
 
     cf->addRow(" ", (QWidget *)NULL);
     name = new QLineEdit(this);
-    QLabel *glabel=new QLabel("Group");
+    QLabel *glabel=new QLabel(tr("Group"));
     groupname = new QLineEdit(this);
     QHBoxLayout *zz = new QHBoxLayout();
     zz->addWidget(name);
@@ -1515,25 +1515,25 @@ EditUserSeriesDialog::EditUserSeriesDialog(Context *context, bool rangemode, Gen
     zz = new QHBoxLayout();
     zz->addWidget(yname);
     zz->addStretch();
-    cf->addRow("Y units", zz);
+    cf->addRow(tr("Y units"), zz);
     xname = new QLineEdit(this);
     zz = new QHBoxLayout();
     zz->addWidget(xname);
     zz->addStretch();
-    cf->addRow("X units", zz);
+    cf->addRow(tr("X units"), zz);
 
     cf->addRow(" ", (QWidget *)NULL);
     aggregate = new QComboBox(this);
-    aggregate->addItem("Sum");
-    aggregate->addItem("Average");
-    aggregate->addItem("Peak");
-    aggregate->addItem("Low");
-    aggregate->addItem("Running Total");
-    aggregate->addItem("Mean Square Root");
-    aggregate->addItem("Std Deviation");
+    aggregate->addItem(tr("Sum"));
+    aggregate->addItem(tr("Average"));
+    aggregate->addItem(tr("Peak"));
+    aggregate->addItem(tr("Low"));
+    aggregate->addItem(tr("Running Total"));
+    aggregate->addItem(tr("Mean Square Root"));
+    aggregate->addItem(tr("Std Deviation"));
     aggregate->setCurrentIndex(info.aggregateby);
     aggregate->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-    cf->addRow("Aggregate", aggregate);
+    cf->addRow(tr("Aggregate"), aggregate);
     cf->addRow(" ", (QWidget *)NULL);
 
     line = new QComboBox(this);
@@ -1781,18 +1781,18 @@ EditUserAxisDialog::EditUserAxisDialog(Context *context, GenericAxisInfo &info)
     smooth->setRange(0,60); // 0-60s smoothing
     smooth->setSingleStep(1);
     smooth->setOrientation(Qt::Horizontal);
-    smoothlabel = new QLabel("Smoothing", this);
+    smoothlabel = new QLabel(tr("Smoothing"), this);
     cf->addRow(smoothlabel, smooth);
 
     // group by of series with a date axis - otherwise not shown
     groupby = new QComboBox(this);
-    groupby->addItem("None");
-    groupby->addItem("Day");
-    groupby->addItem("Week");
-    groupby->addItem("Month");
-    groupby->addItem("Year");
+    groupby->addItem(tr("None"));
+    groupby->addItem(tr("Day"));
+    groupby->addItem(tr("Week"));
+    groupby->addItem(tr("Month"));
+    groupby->addItem(tr("Year"));
     groupby->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-    groupbylabel = new QLabel("Group By", this);
+    groupbylabel = new QLabel(tr("Group By"), this);
     cf->addRow(groupbylabel, groupby);
 
     // make it wide enough
