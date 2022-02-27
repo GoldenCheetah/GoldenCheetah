@@ -9260,7 +9260,7 @@ an den Computer anschließen und
     <message>
         <location filename="../../Charts/UserChart.cpp" line="1760"/>
         <source>Fixed</source>
-        <translation>Fix</translation>
+        <translation>Festgelegt</translation>
     </message>
     <message>
         <location filename="../../Charts/UserChart.cpp" line="1771"/>
@@ -9280,37 +9280,37 @@ an den Computer anschließen und
     <message>
         <location filename="../../Charts/UserChart.cpp" line="1784"/>
         <source>Smoothing</source>
-        <translation type="unfinished"></translation>
+        <translation>Glättung</translation>
     </message>
     <message>
         <location filename="../../Charts/UserChart.cpp" line="1789"/>
         <source>None</source>
-        <translation type="unfinished"></translation>
+        <translation>Keine</translation>
     </message>
     <message>
         <location filename="../../Charts/UserChart.cpp" line="1790"/>
         <source>Day</source>
-        <translation type="unfinished">Tag</translation>
+        <translation>Tag</translation>
     </message>
     <message>
         <location filename="../../Charts/UserChart.cpp" line="1791"/>
         <source>Week</source>
-        <translation type="unfinished">Woche</translation>
+        <translation>Woche</translation>
     </message>
     <message>
         <location filename="../../Charts/UserChart.cpp" line="1792"/>
         <source>Month</source>
-        <translation type="unfinished">Monat</translation>
+        <translation>Monat</translation>
     </message>
     <message>
         <location filename="../../Charts/UserChart.cpp" line="1793"/>
         <source>Year</source>
-        <translation type="unfinished">Jahr</translation>
+        <translation>Jahr</translation>
     </message>
     <message>
         <location filename="../../Charts/UserChart.cpp" line="1795"/>
         <source>Group By</source>
-        <translation type="unfinished">Gruppieren nach</translation>
+        <translation>Gruppieren nach</translation>
     </message>
 </context>
 <context>
@@ -9524,7 +9524,7 @@ an den Computer anschließen und
     <message>
         <location filename="../../Charts/UserChart.cpp" line="1421"/>
         <source>Group</source>
-        <translation type="unfinished">Gruppe</translation>
+        <translation>Gruppe</translation>
     </message>
     <message>
         <location filename="../../Charts/UserChart.cpp" line="1429"/>
@@ -9534,52 +9534,52 @@ an den Computer anschließen und
     <message>
         <location filename="../../Charts/UserChart.cpp" line="1518"/>
         <source>Y units</source>
-        <translation type="unfinished"></translation>
+        <translation>Y Einheiten</translation>
     </message>
     <message>
         <location filename="../../Charts/UserChart.cpp" line="1523"/>
         <source>X units</source>
-        <translation type="unfinished"></translation>
+        <translation>X Einheiten</translation>
     </message>
     <message>
         <location filename="../../Charts/UserChart.cpp" line="1527"/>
         <source>Sum</source>
-        <translation type="unfinished"></translation>
+        <translation>Summe</translation>
     </message>
     <message>
         <location filename="../../Charts/UserChart.cpp" line="1528"/>
         <source>Average</source>
-        <translation type="unfinished">Durchschnitt</translation>
+        <translation>Durchschnitt</translation>
     </message>
     <message>
         <location filename="../../Charts/UserChart.cpp" line="1529"/>
         <source>Peak</source>
-        <translation type="unfinished">Spitze</translation>
+        <translation>Spitze</translation>
     </message>
     <message>
         <location filename="../../Charts/UserChart.cpp" line="1530"/>
         <source>Low</source>
-        <translation type="unfinished">Niedrigster</translation>
+        <translation>Niedrigster</translation>
     </message>
     <message>
         <location filename="../../Charts/UserChart.cpp" line="1531"/>
         <source>Running Total</source>
-        <translation type="unfinished">Summe Laufen</translation>
+        <translation>Summe Laufen</translation>
     </message>
     <message>
         <location filename="../../Charts/UserChart.cpp" line="1532"/>
         <source>Mean Square Root</source>
-        <translation type="unfinished"></translation>
+        <translation>Quadratisches Mittel</translation>
     </message>
     <message>
         <location filename="../../Charts/UserChart.cpp" line="1533"/>
         <source>Std Deviation</source>
-        <translation type="unfinished"></translation>
+        <translation>Standardabweichung</translation>
     </message>
     <message>
         <location filename="../../Charts/UserChart.cpp" line="1536"/>
         <source>Aggregate</source>
-        <translation type="unfinished"></translation>
+        <translation>Aggregiere</translation>
     </message>
     <message>
         <location filename="../../Charts/UserChart.cpp" line="1540"/>
@@ -13629,7 +13629,7 @@ Drehmomentkorrektur - Der absolute Korrekturwert in Nm (oder Pfund pro Quadratin
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="67"/>
         <source>Table of Contents</source>
-        <translation type="unfinished"></translation>
+        <translation>Inhaltsverzeichnis</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="71"/>
@@ -17534,22 +17534,22 @@ Drehmomentkorrektur - Der absolute Korrekturwert in Nm (oder Pfund pro Quadratin
     <message>
         <location filename="../../Charts/LTMWindow.cpp" line="272"/>
         <source>RMSE 2.9 for 22 tests.</source>
-        <translation type="unfinished"></translation>
+        <translation>RMSE 2,9 aus 22 Tests.</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMWindow.cpp" line="491"/>
         <source>%1 watts on %2</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 Watt am %2</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMWindow.cpp" line="492"/>
         <source>%1 on %2</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 am %2</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMWindow.cpp" line="498"/>
         <source>RMSE %1 for %2 tests.</source>
-        <translation type="unfinished"></translation>
+        <translation>RMSE %1 aus %2 Tests.</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMWindow.cpp" line="1311"/>
@@ -21751,42 +21751,42 @@ Keine Aktivitäten zum Importieren gefunden.
     <message>
         <location filename="../../Charts/OverviewItems.cpp" line="3711"/>
         <source>User defined</source>
-        <translation type="unfinished"></translation>
+        <translation>Benutzerdefinierte</translation>
     </message>
     <message>
         <location filename="../../Charts/OverviewItems.cpp" line="3712"/>
         <source>Totals</source>
-        <translation type="unfinished">Summen</translation>
+        <translation>Summen</translation>
     </message>
     <message>
         <location filename="../../Charts/OverviewItems.cpp" line="3713"/>
         <source>Averages</source>
-        <translation type="unfinished">Durchschnittswerte</translation>
+        <translation>Durchschnittswerte</translation>
     </message>
     <message>
         <location filename="../../Charts/OverviewItems.cpp" line="3714"/>
         <source>Maximums</source>
-        <translation type="unfinished">Maxima</translation>
+        <translation>Maximalwerte</translation>
     </message>
     <message>
         <location filename="../../Charts/OverviewItems.cpp" line="3715"/>
         <source>Metrics</source>
-        <translation type="unfinished">Metriken</translation>
+        <translation>Metriken</translation>
     </message>
     <message>
         <location filename="../../Charts/OverviewItems.cpp" line="3716"/>
         <source>Zones</source>
-        <translation type="unfinished">Zonen</translation>
+        <translation>Zonen</translation>
     </message>
     <message>
         <location filename="../../Charts/OverviewItems.cpp" line="3718"/>
         <source>Intervals</source>
-        <translation type="unfinished">Intervalle</translation>
+        <translation>Intervalle</translation>
     </message>
     <message>
         <location filename="../../Charts/OverviewItems.cpp" line="3720"/>
         <source>Activities</source>
-        <translation type="unfinished">Aktivitäten</translation>
+        <translation>Aktivitäten</translation>
     </message>
     <message>
         <location filename="../../Charts/OverviewItems.cpp" line="3723"/>
@@ -30193,7 +30193,7 @@ Weiter?</translation>
     <message>
         <location filename="../../Gui/SplitActivityWizard.cpp" line="481"/>
         <source>Do you want to keep the original?</source>
-        <translation>Wollen Sie das Original behalten ?</translation>
+        <translation>Wollen Sie das Original behalten?</translation>
     </message>
     <message>
         <location filename="../../Gui/SplitActivityWizard.cpp" line="486"/>
