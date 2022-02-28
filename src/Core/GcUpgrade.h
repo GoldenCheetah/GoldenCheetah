@@ -124,7 +124,7 @@
 #define VERSION_STRING "V3.6-RC1"
 
 // default config for this release cycle
-#define VERSION_CONFIG_PREFIX "http://www.goldencheetah.org/defaults/3.5"
+#define VERSION_CONFIG_PREFIX "http://www.goldencheetah.org/defaults/3.6"
 
 class GcUpgradeLogDialog : public QDialog
 {
