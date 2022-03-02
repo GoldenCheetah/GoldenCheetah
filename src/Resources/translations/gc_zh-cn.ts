@@ -2693,7 +2693,7 @@ Press Next to Continue
     <message>
         <location filename="../../Charts/AllPlotWindow.cpp" line="200"/>
         <source>Fullplot</source>
-        <translation>全局图</translation>
+        <translation>全图</translation>
     </message>
     <message>
         <location filename="../../Charts/AllPlotWindow.cpp" line="201"/>
@@ -2724,7 +2724,7 @@ Press Next to Continue
     <message>
         <location filename="../../Charts/AllPlotWindow.cpp" line="248"/>
         <source>Full plot</source>
-        <translation>全局图</translation>
+        <translation>全图</translation>
     </message>
     <message>
         <location filename="../../Charts/AllPlotWindow.cpp" line="252"/>
@@ -3615,9 +3615,9 @@ Press Next to Continue
     </message>
     <message>
         <location filename="../../FileIO/AthleteBackup.cpp" line="105"/>
-        <source>Backup successfully stored in 
+        <source>Backup successfully stored in
 %1</source>
-        <translation type="unfinished"></translation>
+        <translation>备份成功保存在 %1</translation>
     </message>
     <message>
         <source>Backup successfully stored in
@@ -5724,7 +5724,7 @@ Let&apos;s get you setup.</source>
     <message>
         <location filename="../../Metrics/PDModel.h" line="292"/>
         <source>Morton 3 Parameter</source>
-        <translation>Morton3参数</translation>
+        <translation>按照Morton 3参数</translation>
     </message>
 </context>
 <context>
@@ -5787,7 +5787,7 @@ Let&apos;s get you setup.</source>
         <location filename="../../Gui/AthletePages.cpp" line="1169"/>
         <location filename="../../Gui/AthletePages.cpp" line="1298"/>
         <source>From Date</source>
-        <translation>起始日期</translation>
+        <translation>开始日期</translation>
     </message>
     <message>
         <location filename="../../Gui/AthletePages.cpp" line="1170"/>
@@ -6283,13 +6283,13 @@ Let&apos;s get you setup.</source>
         <location filename="../../Charts/CPPlot.cpp" line="673"/>
         <location filename="../../Charts/CPPlot.cpp" line="1939"/>
         <source>Percent of Best / Heat Activities</source>
-        <translation>最佳百分比/热度活动</translation>
+        <translation>最佳百分比/热力活动</translation>
     </message>
     <message>
         <location filename="../../Charts/CPPlot.cpp" line="674"/>
         <location filename="../../Charts/CPPlot.cpp" line="1974"/>
         <source>Heat Activities</source>
-        <translation>热度活动</translation>
+        <translation>热力活动</translation>
     </message>
     <message>
         <location filename="../../Charts/CPPlot.cpp" line="2148"/>
@@ -6385,7 +6385,7 @@ yyyy年M月d日,ddd</translation>
         <location filename="../../Gui/AthletePages.cpp" line="2774"/>
         <location filename="../../Gui/AthletePages.cpp" line="2812"/>
         <source>From Date</source>
-        <translation>起始日期</translation>
+        <translation>开始日期</translation>
     </message>
     <message>
         <location filename="../../Gui/AthletePages.cpp" line="2775"/>
@@ -7702,10 +7702,12 @@ Are you sure?</source>
     </message>
     <message>
         <location filename="../../Cloud/CloudService.cpp" line="913"/>
-        <source>Changes in activities which are not saved, will not be synchronized. 
+        <source>Changes in activities which are not saved, will not be synchronized.
 
 This may lead to inconsistencies between your local GoldenCheetah activities and the uploaded activities. We recommend to save the changed activities before proceeding.</source>
-        <translation type="unfinished"></translation>
+        <translation>活动中有未保存的修改，将不会被同步.
+
+这可能导致本地活动和上传的活动不一致.建议在继续前保存修改的活动.</translation>
     </message>
     <message>
         <source>Changes in activities which are not saved, will not be synchronized.
@@ -7857,10 +7859,12 @@ This may lead to inconsistencies between your local GoldenCheetah activities and
     </message>
     <message>
         <location filename="../../Cloud/CloudService.cpp" line="344"/>
-        <source>Unsaved changes in activities will be uploaded as well. 
+        <source>Unsaved changes in activities will be uploaded as well.
 
 This may lead to inconsistencies between your local activities and the uploaded activities if you do not save the activity in GoldenCheetah. We recommend to save the changed activity before proceeding.</source>
-        <translation type="unfinished"></translation>
+        <translation>活动中未保存的修改也将会被上传.
+
+若未在本地保存修改,这可能导致本地活动和上传的活动不一致.建议在继续前保存修改的活动.</translation>
     </message>
     <message>
         <source>Unsaved changes in activities will be uploaded as well.
@@ -8382,7 +8386,7 @@ Do you want to apply and restart GoldenCheetah?</source>
     <message>
         <location filename="../../Charts/CriticalPowerWindow.cpp" line="68"/>
         <source>Show Heat</source>
-        <translation>显示热度</translation>
+        <translation>显示热力图</translation>
     </message>
     <message>
         <location filename="../../Charts/CriticalPowerWindow.cpp" line="70"/>
@@ -8515,12 +8519,12 @@ Do you want to apply and restart GoldenCheetah?</source>
     <message>
         <location filename="../../Charts/CriticalPowerWindow.cpp" line="256"/>
         <source>Show curve heat</source>
-        <translation>显示曲线热度</translation>
+        <translation>显示曲线热力图</translation>
     </message>
     <message>
         <location filename="../../Charts/CriticalPowerWindow.cpp" line="261"/>
         <source>Show curve heat by date</source>
-        <translation>按日期显示曲线热度</translation>
+        <translation>按日期显示曲线热力图</translation>
     </message>
     <message>
         <location filename="../../Charts/CriticalPowerWindow.cpp" line="266"/>
@@ -10641,37 +10645,37 @@ You may need to (re)install the FTDI or PL2303 drivers before downloading.</sour
     <message>
         <location filename="../../Charts/UserChart.cpp" line="1784"/>
         <source>Smoothing</source>
-        <translation type="unfinished"></translation>
+        <translation>平滑处理</translation>
     </message>
     <message>
         <location filename="../../Charts/UserChart.cpp" line="1789"/>
         <source>None</source>
-        <translation type="unfinished">无</translation>
+        <translation>无</translation>
     </message>
     <message>
         <location filename="../../Charts/UserChart.cpp" line="1790"/>
         <source>Day</source>
-        <translation type="unfinished">天</translation>
+        <translation>天</translation>
     </message>
     <message>
         <location filename="../../Charts/UserChart.cpp" line="1791"/>
         <source>Week</source>
-        <translation type="unfinished">周</translation>
+        <translation>周</translation>
     </message>
     <message>
         <location filename="../../Charts/UserChart.cpp" line="1792"/>
         <source>Month</source>
-        <translation type="unfinished"></translation>
+        <translation>月</translation>
     </message>
     <message>
         <location filename="../../Charts/UserChart.cpp" line="1793"/>
         <source>Year</source>
-        <translation type="unfinished"></translation>
+        <translation>年</translation>
     </message>
     <message>
         <location filename="../../Charts/UserChart.cpp" line="1795"/>
         <source>Group By</source>
-        <translation type="unfinished">  分组类型:</translation>
+        <translation>  分组类型:</translation>
     </message>
 </context>
 <context>
@@ -10881,7 +10885,7 @@ You may need to (re)install the FTDI or PL2303 drivers before downloading.</sour
     <message>
         <location filename="../../Charts/UserChart.cpp" line="1421"/>
         <source>Group</source>
-        <translation type="unfinished">分组</translation>
+        <translation>分组</translation>
     </message>
     <message>
         <location filename="../../Charts/UserChart.cpp" line="1429"/>
@@ -10891,52 +10895,52 @@ You may need to (re)install the FTDI or PL2303 drivers before downloading.</sour
     <message>
         <location filename="../../Charts/UserChart.cpp" line="1518"/>
         <source>Y units</source>
-        <translation type="unfinished"></translation>
+        <translation>Y轴单位</translation>
     </message>
     <message>
         <location filename="../../Charts/UserChart.cpp" line="1523"/>
         <source>X units</source>
-        <translation type="unfinished"></translation>
+        <translation>X轴单位</translation>
     </message>
     <message>
         <location filename="../../Charts/UserChart.cpp" line="1527"/>
         <source>Sum</source>
-        <translation type="unfinished"></translation>
+        <translation>合计</translation>
     </message>
     <message>
         <location filename="../../Charts/UserChart.cpp" line="1528"/>
         <source>Average</source>
-        <translation type="unfinished">平均</translation>
+        <translation>平均</translation>
     </message>
     <message>
         <location filename="../../Charts/UserChart.cpp" line="1529"/>
         <source>Peak</source>
-        <translation type="unfinished">峰值</translation>
+        <translation>峰值</translation>
     </message>
     <message>
         <location filename="../../Charts/UserChart.cpp" line="1530"/>
         <source>Low</source>
-        <translation type="unfinished">最小值</translation>
+        <translation>最小值</translation>
     </message>
     <message>
         <location filename="../../Charts/UserChart.cpp" line="1531"/>
         <source>Running Total</source>
-        <translation type="unfinished">跑步全部</translation>
+        <translation>跑步合计</translation>
     </message>
     <message>
         <location filename="../../Charts/UserChart.cpp" line="1532"/>
         <source>Mean Square Root</source>
-        <translation type="unfinished"></translation>
+        <translation>均方根</translation>
     </message>
     <message>
         <location filename="../../Charts/UserChart.cpp" line="1533"/>
         <source>Std Deviation</source>
-        <translation type="unfinished"></translation>
+        <translation>标准差</translation>
     </message>
     <message>
         <location filename="../../Charts/UserChart.cpp" line="1536"/>
         <source>Aggregate</source>
-        <translation type="unfinished"></translation>
+        <translation>集合</translation>
     </message>
     <message>
         <location filename="../../Charts/UserChart.cpp" line="1540"/>
@@ -11547,7 +11551,7 @@ You may need to (re)install the FTDI or PL2303 drivers before downloading.</sour
     <message>
         <location filename="../../Metrics/PDModel.cpp" line="1320"/>
         <source>RMSE %1w CV %3% [envelope] %2 points</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -13053,15 +13057,22 @@ This function will look for spikes/anomalies in SmO2 data and replace the errone
     </message>
     <message>
         <location filename="../../FileIO/FixSmO2.cpp" line="74"/>
-        <source>Occasionally SmO2 (%) and/or tHb (%) will erroneously report missing or high values (SmO2: 0% or &gt;100% / tHb: 0% or &gt; max. tHb parameter). 
+        <source>Occasionally SmO2 (%) and/or tHb (%) will erroneously report missing or high values (SmO2: 0% or &gt;100% / tHb: 0% or &gt; max. tHb parameter).
 
  This function will look for those anomalies in SmO2 and tHb data and depending on the configuration replace the erroneous data by smoothing/interpolating the data from either side of the 3 points in question. It takes the following parameters:
 
-Fix SmO2 - check to fix anomalies in SmO2 data 
-Fix tHb - check to fix anomalies in tHb data 
-Max. tHb - any tHb above is considered an outlier 
+Fix SmO2 - check to fix anomalies in SmO2 data
+Fix tHb - check to fix anomalies in tHb data
+Max. tHb - any tHb above is considered an outlier
 </source>
-        <translation type="unfinished"></translation>
+        <translation>偶尔,SmO2(%)和/或tHb(%)会报告错误的值(SmO2:0%或&gt;100%/tHb:0%或大于最大tHb).
+
+本功能将在SmO2和tHb数据中搜索这些异常,并使用异常数据一侧的3个数据点对其进行平滑/插值后替换.需要以下参数:
+
+修正SmO2 - 检查并修正SmO2数据的异常
+修正 - 检查并修正tHb数据的异常
+最大tHb - 任何大于此值的tHb将被视为异常
+</translation>
     </message>
     <message>
         <source>Occasionally SmO2 (%) and/or tHb (%) will erroneously report missing or high values (SmO2: 0% or &gt;100% / tHb: 0% or &gt; max. tHb parameter).
@@ -13147,7 +13158,7 @@ Moving Average Seconds parameter allows to set the seconds of the MA filter to s
         <location filename="../../FileIO/FixSpikes.cpp" line="98"/>
         <source>Power meters will occasionally report erroneously high values for power. For crank based power meters such as SRM and Quarq this is caused by an erroneous cadence reading as a result of triggering a reed switch whilst pushing off.
 
-This function provides two algorithms that look for spikes/anomalies in power data and replace the erroneous data by: 
+This function provides two algorithms that look for spikes/anomalies in power data and replace the erroneous data by:
 
 i) Replacing the point in question with smoothed/interpolated data from either side of the point in question, it takes the following parameters:
 
@@ -13162,7 +13173,22 @@ Window Size - this defines the number of neighbouring points used to determine a
 Variance (Watts) - Determines the threshold beyond which a data point will be fixed, if the difference between the data point value and the median value exceeds this parameter.
 
 </source>
-        <translation type="unfinished"></translation>
+        <translation>功率计偶尔会错误地出现高功率值.对于牙盘功率计,如SRM和Quarq,这是由启动时出发簧片开关而导致的错误踏频读数引起的.
+
+该功能提供了两种算法来寻找功率数据中的尖峰和异常,并根据下列方法替换错误数据:
+
+i) 根据错误数据旁边的数据替换,需要两个参数:
+
+绝对最大值 (W) - 定义功率最大值,超过该值的所有数据将被视为异常.
+
+偏差 (W) - 超过尖峰之前30秒移动平均功率值某一百分比的任何数据将被平滑.
+
+ii) 使用以错误数据为中心的一个窗口内功率数据的中位数代替错误值. 该办法适用于局部逸出值并保存了功率突变.这种办法需要两个参数:
+
+窗口大小 (W) - 确定用来计算中位数的相邻数据点个数,应为奇数.
+
+偏差 (W) - 确定需要修正点的偏差阈值,如果与中位数偏差超过该值将进行修正.
+</translation>
     </message>
     <message>
         <source>Power meters will occasionally report erroneously high values for power. For crank based power meters such as SRM and Quarq this is caused by an erroneous cadence reading as a result of triggering a reed switch whilst pushing off.
@@ -15981,7 +16007,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="67"/>
         <source>Table of Contents</source>
-        <translation type="unfinished"></translation>
+        <translation>目录</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="71"/>
@@ -16592,7 +16618,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Charts/HrPwWindow.cpp" line="177"/>
         <source>Show Full Plot</source>
-        <translation>显示全局图</translation>
+        <translation>显示全图</translation>
     </message>
 </context>
 <context>
@@ -19940,7 +19966,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Charts/LTMWindow.cpp" line="1311"/>
         <source> grouped by </source>
-        <translation>分组</translation>
+        <translation>分组类型:</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMWindow.cpp" line="1315"/>
@@ -20022,22 +20048,22 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Charts/LTMWindow.cpp" line="272"/>
         <source>RMSE 2.9 for 22 tests.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../Charts/LTMWindow.cpp" line="491"/>
         <source>%1 watts on %2</source>
-        <translation type="unfinished"></translation>
+        <translation>%2, %1W</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMWindow.cpp" line="492"/>
         <source>%1 on %2</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../Charts/LTMWindow.cpp" line="498"/>
         <source>RMSE %1 for %2 tests.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../Charts/LTMWindow.cpp" line="1425"/>
@@ -20062,7 +20088,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Charts/LTMWindow.cpp" line="1535"/>
         <source>hours</source>
-        <translation>时</translation>
+        <translation>h</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMWindow.cpp" line="1646"/>
@@ -20126,7 +20152,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
         <location filename="../../Gui/AthletePages.cpp" line="2019"/>
         <location filename="../../Gui/AthletePages.cpp" line="2074"/>
         <source>From Date</source>
-        <translation>起始日期</translation>
+        <translation>开始日期</translation>
     </message>
     <message>
         <location filename="../../Gui/AthletePages.cpp" line="2029"/>
@@ -24142,29 +24168,35 @@ No rides found to import.
     </message>
     <message>
         <location filename="../../FileIO/MoxyDevice.cpp" line="96"/>
-        <source>Connecting ... 
+        <source>Connecting ...
 </source>
-        <translation type="unfinished"></translation>
+        <translation>连接中...
+</translation>
     </message>
     <message>
         <location filename="../../FileIO/MoxyDevice.cpp" line="199"/>
-        <source>Downloading ... 
+        <source>Downloading ...
 </source>
-        <translation type="unfinished"></translation>
+        <translation>下载中...
+</translation>
     </message>
     <message>
         <location filename="../../FileIO/MoxyDevice.cpp" line="348"/>
         <source>
-Importing %1 Ride(s)... 
+Importing %1 Ride(s)...
 </source>
-        <translation type="unfinished"></translation>
+        <translation>
+导入%1个活动...
+</translation>
     </message>
     <message>
         <location filename="../../FileIO/MoxyDevice.cpp" line="350"/>
         <source>
-No rides found to import. 
+No rides found to import.
 </source>
-        <translation type="unfinished"></translation>
+        <translation>
+未发现可导入的活动.
+</translation>
     </message>
     <message>
         <location filename="../../FileIO/MoxyDevice.cpp" line="363"/>
@@ -24526,17 +24558,17 @@ No rides found to import.
     <message>
         <location filename="../../Cloud/Nolio.cpp" line="247"/>
         <source>Completed.</source>
-        <translation type="unfinished">完成.</translation>
+        <translation>完成.</translation>
     </message>
     <message>
         <location filename="../../Cloud/Nolio.h" line="38"/>
         <source>Nolio</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../Cloud/Nolio.h" line="39"/>
         <source>Sync with your favorite training partner.</source>
-        <translation type="unfinished"></translation>
+        <translation>与你最爱的训练网站同步.</translation>
     </message>
 </context>
 <context>
@@ -24655,7 +24687,7 @@ No rides found to import.
     <message>
         <location filename="../../Cloud/OAuthDialog.cpp" line="630"/>
         <source>Nolio authorization was successful.</source>
-        <translation type="unfinished"></translation>
+        <translation>Nolio授权成功.</translation>
     </message>
     <message>
         <location filename="../../Cloud/OAuthDialog.cpp" line="637"/>
@@ -24821,42 +24853,42 @@ No rides found to import.
     <message>
         <location filename="../../Charts/OverviewItems.cpp" line="3711"/>
         <source>User defined</source>
-        <translation type="unfinished"></translation>
+        <translation>用户自定义</translation>
     </message>
     <message>
         <location filename="../../Charts/OverviewItems.cpp" line="3712"/>
         <source>Totals</source>
-        <translation type="unfinished">全部</translation>
+        <translation>合计</translation>
     </message>
     <message>
         <location filename="../../Charts/OverviewItems.cpp" line="3713"/>
         <source>Averages</source>
-        <translation type="unfinished">平均</translation>
+        <translation>平均</translation>
     </message>
     <message>
         <location filename="../../Charts/OverviewItems.cpp" line="3714"/>
         <source>Maximums</source>
-        <translation type="unfinished">最大值</translation>
+        <translation>最大值</translation>
     </message>
     <message>
         <location filename="../../Charts/OverviewItems.cpp" line="3715"/>
         <source>Metrics</source>
-        <translation type="unfinished">指标</translation>
+        <translation>指标</translation>
     </message>
     <message>
         <location filename="../../Charts/OverviewItems.cpp" line="3716"/>
         <source>Zones</source>
-        <translation type="unfinished">区间</translation>
+        <translation>区间</translation>
     </message>
     <message>
         <location filename="../../Charts/OverviewItems.cpp" line="3718"/>
         <source>Intervals</source>
-        <translation type="unfinished">间歇</translation>
+        <translation>间歇</translation>
     </message>
     <message>
         <location filename="../../Charts/OverviewItems.cpp" line="3720"/>
         <source>Activities</source>
-        <translation type="unfinished">活动</translation>
+        <translation>活动</translation>
     </message>
     <message>
         <location filename="../../Charts/OverviewItems.cpp" line="3723"/>
@@ -25115,17 +25147,17 @@ No rides found to import.
     <message>
         <location filename="../../Metrics/PDModel.cpp" line="213"/>
         <source>RMSE %1w CV %4% R&lt;sup&gt;2&lt;/sup&gt;=%3 [LR] %2 points</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../Metrics/PDModel.cpp" line="332"/>
         <source>RMSE %1w CV %3% [LM] %2 points</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../Metrics/PDModel.cpp" line="479"/>
         <source>RMSE %1w CV %3% [envelope] %2 points</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -31318,7 +31350,7 @@ Skipping file...</source>
     <message>
         <location filename="../../Charts/RideMapWindow.cpp" line="79"/>
         <source>Show Full Plot</source>
-        <translation>显示全局图</translation>
+        <translation>显示全图</translation>
     </message>
     <message>
         <location filename="../../Charts/RideMapWindow.cpp" line="80"/>
@@ -31405,7 +31437,7 @@ Skipping file...</source>
     <message>
         <location filename="../../Metrics/RideMetadata.cpp" line="410"/>
         <source>Raw Data</source>
-        <translation type="unfinished"></translation>
+        <translation>原始数据</translation>
     </message>
     <message>
         <location filename="../../Metrics/RideMetadata.cpp" line="507"/>
@@ -31842,7 +31874,7 @@ Skipping file...</source>
     </message>
     <message>
         <source>From Date</source>
-        <translation type="obsolete">起始日期</translation>
+        <translation type="obsolete">开始日期</translation>
     </message>
     <message>
         <source>Default Weight</source>
@@ -32034,7 +32066,7 @@ have not been saved. They are listed below.</source>
     <message>
         <location filename="../../Gui/SaveDialogs.cpp" line="334"/>
         <source>&amp;Cancel Exit</source>
-        <translation>取消并退出(&amp;C)</translation>
+        <translation>取消(&amp;C)</translation>
     </message>
     <message>
         <location filename="../../Gui/SaveDialogs.cpp" line="339"/>
@@ -33572,7 +33604,7 @@ Power&apos; option in the training preferences tab.</source>
     <message>
         <location filename="../../Metrics/SpecialFields.cpp" line="27"/>
         <source>Start Date</source>
-        <translation>起始日期</translation>
+        <translation>开始日期</translation>
     </message>
     <message>
         <location filename="../../Metrics/SpecialFields.cpp" line="28"/>
@@ -33620,7 +33652,7 @@ Power&apos; option in the training preferences tab.</source>
     <message>
         <location filename="../../Metrics/SpecialFields.cpp" line="44"/>
         <source>SubSport</source>
-        <translation>细分运动</translation>
+        <translation>运动子类</translation>
     </message>
     <message>
         <location filename="../../Metrics/SpecialFields.cpp" line="46"/>
@@ -33640,17 +33672,17 @@ Power&apos; option in the training preferences tab.</source>
     <message>
         <location filename="../../Metrics/SpecialFields.cpp" line="49"/>
         <source>Commute</source>
-        <translation type="unfinished">通勤</translation>
+        <translation>通勤</translation>
     </message>
     <message>
         <location filename="../../Metrics/SpecialFields.cpp" line="50"/>
         <source>Trainer</source>
-        <translation type="unfinished">骑行台</translation>
+        <translation>骑行台</translation>
     </message>
     <message>
         <location filename="../../Metrics/SpecialFields.cpp" line="51"/>
         <source>Feel</source>
-        <translation type="unfinished"></translation>
+        <translation>感觉</translation>
     </message>
     <message>
         <location filename="../../Metrics/SpecialFields.cpp" line="54"/>
@@ -33675,42 +33707,42 @@ Power&apos; option in the training preferences tab.</source>
     <message>
         <location filename="../../Metrics/SpecialFields.cpp" line="59"/>
         <source>VO2max detected</source>
-        <translation type="unfinished"></translation>
+        <translation>检测到VO2max</translation>
     </message>
     <message>
         <location filename="../../Metrics/SpecialFields.cpp" line="60"/>
         <source>Aerobic Training Effect</source>
-        <translation type="unfinished"></translation>
+        <translation>有氧训练效果</translation>
     </message>
     <message>
         <location filename="../../Metrics/SpecialFields.cpp" line="61"/>
         <source>Anaerobic Training Effect</source>
-        <translation type="unfinished"></translation>
+        <translation>无氧训练效果</translation>
     </message>
     <message>
         <location filename="../../Metrics/SpecialFields.cpp" line="62"/>
         <source>EPOC</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../Metrics/SpecialFields.cpp" line="63"/>
         <source>Recovery Time</source>
-        <translation type="unfinished"></translation>
+        <translation>恢复时间</translation>
     </message>
     <message>
         <location filename="../../Metrics/SpecialFields.cpp" line="64"/>
         <source>Performance Condition</source>
-        <translation type="unfinished"></translation>
+        <translation>效益指标</translation>
     </message>
     <message>
         <location filename="../../Metrics/SpecialFields.cpp" line="65"/>
         <source>LTHR detected</source>
-        <translation type="unfinished"></translation>
+        <translation>检测到LTHR</translation>
     </message>
     <message>
         <location filename="../../Metrics/SpecialFields.cpp" line="66"/>
         <source>LTS detected</source>
-        <translation type="unfinished"></translation>
+        <translation>检测到LTS</translation>
     </message>
     <message>
         <source>Dropouts</source>
@@ -33824,7 +33856,7 @@ Power&apos; option in the training preferences tab.</source>
     <message>
         <location filename="../../Metrics/SpecialFields.cpp" line="154"/>
         <source>Raw Data</source>
-        <translation type="unfinished"></translation>
+        <translation>原始数据</translation>
     </message>
     <message>
         <location filename="../../Metrics/SpecialFields.cpp" line="155"/>
@@ -34021,14 +34053,20 @@ If you do not choose to keep the original it will be backed up before removing i
     </message>
     <message>
         <location filename="../../Gui/SplitActivityWizard.cpp" line="522"/>
-        <source>This wizard will find segments of the activity to save by looking for gaps in recording. 
+        <source>This wizard will find segments of the activity to save by looking for gaps in recording.
 
 You can define the minimum length, in time, a gap in recording should be in order to mark the end of one segment and the beginning of another.
 
 In addition, you can set a minimum segment size. Any segment smaller than this limit will be ignored.
 
 </source>
-        <translation type="unfinished"></translation>
+        <translation>该向导将通过搜索记录间断找出活动分段.
+
+可定义记录间断的最小时间长度,从而标记前一分段的结束和后一分段的开始.
+
+此外,可设置最小分段长度,任何小于此长度的分段将被忽略.
+
+</translation>
     </message>
     <message>
         <source>This wizard will find segments of the activity to save by looking for gaps in recording.
