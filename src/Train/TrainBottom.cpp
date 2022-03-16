@@ -47,8 +47,6 @@ TrainBottom::TrainBottom(TrainSidebar *trainSidebar, QWidget *parent) :
     m_connectButton->setAutoDefault(false);
     m_connectButton->setFlat(true);
     m_connectButton->setStyleSheet("background-color: rgba( 255, 255, 255, 0% ); border: 0px;");
-    m_connectButton->setAutoRepeat(true);
-    m_connectButton->setAutoRepeatDelay(200);
     m_connectButton->setShortcut(Qt::Key_MediaPrevious);
     toolbuttons->addWidget(m_connectButton);
 
