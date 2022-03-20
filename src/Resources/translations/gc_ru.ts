@@ -140,7 +140,7 @@ It might be necessary to manually disable it.</source>
     <message>
         <location filename="../../Gui/AboutDialog.cpp" line="56"/>
         <source>&lt;center&gt;&lt;img src=&quot;:images/gc.png&quot; height=80&gt;&lt;h2&gt;GoldenCheetah&lt;/h2&gt;Cycling Power Analysis Software&lt;br&gt;for Linux, Mac, and Windows&lt;p&gt;GoldenCheetah is licensed under the&lt;br&gt;&lt;a href=&quot;https://opensource.org/licenses/GPL-2.0&quot;&gt;GNU General Public License 2.0&lt;/a&gt;.&lt;p&gt;Source code can be obtained from&lt;br&gt;&lt;a href=&quot;https://www.goldencheetah.org/&quot;&gt;https://www.goldencheetah.org/&lt;/a&gt;.&lt;br&gt;&lt;p&gt;Activity files and other data are stored in&lt;br&gt;&lt;a href=&quot;%1&quot;&gt;%2&lt;/a&gt;&lt;p&gt;Athlete ID %3&lt;br&gt;&lt;p&gt;Trademarks used with permission&lt;br&gt;BikeScore, xPower, SwimScore courtesy of &lt;a href=&quot;http://www.physfarm.com&quot;&gt;Physfarm Training Systems&lt;/a&gt;.&lt;br&gt;Virtual Speed courtesy of Tom Compton &lt;a href=&quot;http://www.analyticcycling.com&quot;&gt;AnalyticCycling&lt;/a&gt;.&lt;br&gt;&lt;br&gt;The core body temperature module was developed by the &lt;br&gt;&lt;a href=&quot;http://www.usariem.army.mil/&quot;&gt;U.S. Army Research Institute of Environmental Medicine&lt;/a&gt;&lt;br&gt; and is patent pending&lt;br&gt;&lt;br&gt;&lt;img src=&quot;:images/services/strava_compatible.png&quot;/&gt;&lt;br&gt;&lt;/center&gt;</source>
-        <translation>&lt;center&gt;&lt;img src=&quot;:images/gc.png&quot; height=80&gt;&lt;h2&gt;GoldenCheetah&lt;/h2&gt;ПО анализа показателей мощности для велосипедистов&lt;br&gt;для Linux, Mac и Windows&lt;p&gt;GoldenCheetah разрабатывается под лицензией&lt;br&gt;&lt;a href=&quot;https://opensource.org/licenses/GPL-2.0&quot;&gt;GNU General Public License&lt;/a&gt;.&lt;p&gt;Исходный код доступен по адресу &lt;br&gt;&lt;a href=&quot;https://www.goldencheetah.org/&quot;&gt;https://www.goldencheetah.org/&lt;/a&gt;.&lt;p&gt;Файлы тренировок и прочие данные сохраняются в &lt;br&gt;&lt;a href=&quot;%1&quot;&gt;%2&lt;/a&gt;&lt;p&gt;ID спортсмена: %3&lt;br&gt;&lt;p&gt;Товарные знаки &lt;br&gt;BikeScore, xPower, SwimScore courtesy of &lt;br&gt; используются с разрешения &lt;a href=&quot;http://www.physfarm.com&quot;&gt;Physfarm Training Systems&lt;/a&gt;.&lt;br&gt;Virtual Speed courtesy of Tom Compton &lt;a href=&quot;http://www.analyticcycling.com&quot;&gt;AnalyticCycling&lt;/a&gt;.&lt;br&gt;&lt;br&gt;Модуль температуры тела разработан &lt;br&gt;&lt;a href=&quot;http://www.usariem.army.mil/&quot;&gt;U.S. Army Research Institute of Environmental Medicine&lt;/a&gt;&lt;br&gt; и находится в стадтии патентования.&lt;br&gt;&lt;br&gt;&lt;img src=&quot;:images/services/strava_compatible.png&quot;/&gt;&lt;br&gt;&lt;/center&gt;</translation>
+        <translation>&lt;center&gt;&lt;img src=&quot;:images/gc.png&quot; height=80&gt;&lt;h2&gt;GoldenCheetah&lt;/h2&gt;ПО анализа показателей мощности для велосипедистов&lt;br&gt;для Linux, Mac и Windows&lt;p&gt;GoldenCheetah разрабатывается под лицензией&lt;br&gt;&lt;a href=&quot;https://opensource.org/licenses/GPL-2.0&quot;&gt;GNU General Public License&lt;/a&gt;.&lt;p&gt;Исходный код доступен по адресу &lt;br&gt;&lt;a href=&quot;https://www.goldencheetah.org/&quot;&gt;https://www.goldencheetah.org/&lt;/a&gt;.&lt;p&gt;Файлы тренировок и прочие данные сохраняются в &lt;br&gt;&lt;a href=&quot;%1&quot;&gt;%2&lt;/a&gt;&lt;p&gt;ID спортсмена: %3&lt;br&gt;&lt;p&gt;Товарные знаки &lt;br&gt;BikeScore, xPower, SwimScore courtesy of &lt;br&gt; используются с разрешения &lt;a href=&quot;http://www.physfarm.com&quot;&gt;Physfarm Training Systems&lt;/a&gt;.&lt;br&gt;Virtual Speed courtesy of Tom Compton &lt;a href=&quot;http://www.analyticcycling.com&quot;&gt;AnalyticCycling&lt;/a&gt;.&lt;br&gt;&lt;br&gt;Модуль температуры тела разработан &lt;br&gt;&lt;a href=&quot;http://www.usariem.army.mil/&quot;&gt;U.S. Army Research Institute of Environmental Medicine&lt;/a&gt;&lt;br&gt; и находится в стадтии патентования.&lt;br&gt;&lt;br&gt;&lt;/center&gt;</translation>
     </message>
 </context>
 <context>
@@ -1512,27 +1512,27 @@ If you choose to copy to library the file will be copied into the GoldenCheetah 
     <message>
         <location filename="../../Gui/Perspective.cpp" line="1904"/>
         <source>Don&apos;t switch</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">не переключать</translation>
     </message>
     <message>
         <location filename="../../Gui/Perspective.cpp" line="1905"/>
         <source>Erg Workout</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">симуляция реальности</translation>
     </message>
     <message>
         <location filename="../../Gui/Perspective.cpp" line="1906"/>
         <source>Slope Workout</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">симуляция наклона</translation>
     </message>
     <message>
         <location filename="../../Gui/Perspective.cpp" line="1907"/>
         <source>Video Workout</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">тренировка с видео</translation>
     </message>
     <message>
         <location filename="../../Gui/Perspective.cpp" line="1909"/>
         <source>Switch for</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">переключить на</translation>
     </message>
     <message>
         <location filename="../../Gui/Perspective.cpp" line="1913"/>
@@ -24471,7 +24471,7 @@ No rides found to import.
     <message>
         <location filename="../../Gui/NewCyclistDialog.cpp" line="146"/>
         <source>Use template Athlete</source>
-        <translation type="unfinished">Использовать шаблон спортсмена</translation>
+        <translation>Использовать шаблон спортсмена</translation>
     </message>
     <message>
         <location filename="../../Gui/NewCyclistDialog.cpp" line="148"/>
@@ -24526,7 +24526,7 @@ No rides found to import.
     <message>
         <location filename="../../Gui/NewMainWindow.cpp" line="72"/>
         <source>                                      Search or type a command </source>
-        <translation type="unfinished"></translation>
+        <translation>                Поиск или начните набирать команду </translation>
     </message>
 </context>
 <context>
@@ -24545,7 +24545,7 @@ No rides found to import.
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="2512"/>
         <source>Heart Rate for which 95% of activity samples has lower HR values</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Частота сердечных сокращений, для которой 95% измерений имеют более низкие значения ЧСС</translation>
     </message>
 </context>
 <context>
@@ -24657,7 +24657,7 @@ No rides found to import.
     <message>
         <location filename="../../Cloud/OAuthDialog.cpp" line="550"/>
         <source>Strava authorization was successful.</source>
-        <translation>Авторизация в Strava прошла успешно.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../Cloud/OAuthDialog.cpp" line="557"/>
@@ -24800,33 +24800,33 @@ No rides found to import.
     <message>
         <location filename="../../Charts/Overview.cpp" line="578"/>
         <source>Tile Settings</source>
-        <translation type="unfinished">Свойства виджета</translation>
+        <translation>Свойства виджета</translation>
     </message>
     <message>
         <location filename="../../Charts/Overview.cpp" line="601"/>
         <source>Remove</source>
-        <translation type="unfinished">Удалить</translation>
+        <translation>Удалить</translation>
     </message>
     <message>
         <location filename="../../Charts/Overview.cpp" line="602"/>
         <source>Close</source>
-        <translation type="unfinished">Закрыть</translation>
+        <translation>Закрыть</translation>
     </message>
     <message>
         <location filename="../../Charts/Overview.cpp" line="609"/>
         <source>Export</source>
-        <translation type="unfinished"></translation>
+        <translation>Экспорт</translation>
     </message>
     <message>
         <location filename="../../Charts/Overview.cpp" line="696"/>
         <location filename="../../Charts/Overview.cpp" line="706"/>
         <source>Export User Chart</source>
-        <translation type="unfinished"></translation>
+        <translation>Экспорт пользовательского графика</translation>
     </message>
     <message>
         <location filename="../../Charts/Overview.cpp" line="706"/>
         <source>Open file for export failed.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ошибка открытия файла для экспорта.</translation>
     </message>
 </context>
 <context>
@@ -24844,42 +24844,42 @@ No rides found to import.
     <message>
         <location filename="../../Charts/OverviewItems.cpp" line="3711"/>
         <source>User defined</source>
-        <translation type="unfinished"></translation>
+        <translation>Указано пользователем</translation>
     </message>
     <message>
         <location filename="../../Charts/OverviewItems.cpp" line="3712"/>
         <source>Totals</source>
-        <translation type="unfinished"></translation>
+        <translation>Всего</translation>
     </message>
     <message>
         <location filename="../../Charts/OverviewItems.cpp" line="3713"/>
         <source>Averages</source>
-        <translation type="unfinished"></translation>
+        <translation>В среднем</translation>
     </message>
     <message>
         <location filename="../../Charts/OverviewItems.cpp" line="3714"/>
         <source>Maximums</source>
-        <translation type="unfinished"></translation>
+        <translation>Максимум</translation>
     </message>
     <message>
         <location filename="../../Charts/OverviewItems.cpp" line="3715"/>
         <source>Metrics</source>
-        <translation type="unfinished"></translation>
+        <translation>Показатели</translation>
     </message>
     <message>
         <location filename="../../Charts/OverviewItems.cpp" line="3716"/>
         <source>Zones</source>
-        <translation type="unfinished">Зоны</translation>
+        <translation>Зоны</translation>
     </message>
     <message>
         <location filename="../../Charts/OverviewItems.cpp" line="3718"/>
         <source>Intervals</source>
-        <translation type="unfinished">Интервалы</translation>
+        <translation>Интервалы</translation>
     </message>
     <message>
         <location filename="../../Charts/OverviewItems.cpp" line="3720"/>
         <source>Activities</source>
-        <translation type="unfinished">Тренировки</translation>
+        <translation>Тренировки</translation>
     </message>
     <message>
         <location filename="../../Charts/OverviewItems.cpp" line="3723"/>
@@ -25243,22 +25243,22 @@ No rides found to import.
     <message>
         <location filename="../../Charts/OverviewItems.cpp" line="3584"/>
         <source>Form</source>
-        <translation type="unfinished">Форма</translation>
+        <translation>Форма</translation>
     </message>
     <message>
         <location filename="../../Charts/OverviewItems.cpp" line="3605"/>
         <source>Fitness</source>
-        <translation type="unfinished">Тренированность (объём работы)</translation>
+        <translation>Тренированность (объём работы)</translation>
     </message>
     <message>
         <location filename="../../Charts/OverviewItems.cpp" line="3628"/>
         <source>Fatigue</source>
-        <translation type="unfinished">Усталость</translation>
+        <translation>Усталость</translation>
     </message>
     <message>
         <location filename="../../Charts/OverviewItems.cpp" line="3651"/>
         <source>Risk</source>
-        <translation type="unfinished">Риск</translation>
+        <translation>Риск</translation>
     </message>
 </context>
 <context>
@@ -25295,12 +25295,12 @@ No rides found to import.
         <location filename="../../Metrics/RowMetrics.cpp" line="60"/>
         <location filename="../../Metrics/RowMetrics.cpp" line="61"/>
         <source>min/500m</source>
-        <translation type="unfinished">мин/100м {500m?}</translation>
+        <translation type="unfinished">мин/500м</translation>
     </message>
     <message>
         <location filename="../../Metrics/RowMetrics.cpp" line="64"/>
         <source>Average Speed expressed in min/500m</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Средняя скорость, выраженная в минутах на 500 м</translation>
     </message>
 </context>
 <context>
@@ -27556,52 +27556,52 @@ Do you want to continue?</source>
     <message>
         <location filename="../../Gui/Perspective.cpp" line="91"/>
         <source>Title</source>
-        <translation type="unfinished">Название</translation>
+        <translation>Название</translation>
     </message>
     <message>
         <location filename="../../Gui/Perspective.cpp" line="264"/>
         <source>Unable to process chart file</source>
-        <translation type="unfinished">Невозможно обработать файл графика</translation>
+        <translation>Невозможно обработать файл графика</translation>
     </message>
     <message>
         <location filename="../../Gui/Perspective.cpp" line="265"/>
         <source>Bad chart type (%1).</source>
-        <translation type="unfinished">Не правильный тип графика (%1).</translation>
+        <translation>Не правильный тип графика (%1).</translation>
     </message>
     <message>
         <location filename="../../Gui/Perspective.cpp" line="853"/>
         <source>Are you sure you want to remove the chart?</source>
-        <translation type="unfinished">Вы действительно хотите удалить график?</translation>
+        <translation>Вы действительно хотите удалить график?</translation>
     </message>
     <message>
         <location filename="../../Gui/Perspective.cpp" line="854"/>
         <source>Remove</source>
-        <translation type="unfinished">Удалить</translation>
+        <translation>Удалить</translation>
     </message>
     <message>
         <location filename="../../Gui/Perspective.cpp" line="1459"/>
         <source>Ride Log</source>
-        <translation type="unfinished">Журнал тренировок</translation>
+        <translation>Журнал тренировок</translation>
     </message>
     <message>
         <location filename="../../Gui/Perspective.cpp" line="1460"/>
         <source>Aerobic Power</source>
-        <translation type="unfinished">Аэробная мощность</translation>
+        <translation>Аэробная мощность</translation>
     </message>
     <message>
         <location filename="../../Gui/Perspective.cpp" line="1461"/>
         <source>Anaerobic Power</source>
-        <translation type="unfinished">Анаэробная мощность</translation>
+        <translation>Анаэробная мощность</translation>
     </message>
     <message>
         <location filename="../../Gui/Perspective.cpp" line="1462"/>
         <source>Cadence</source>
-        <translation type="unfinished">Каденс</translation>
+        <translation>Каденс</translation>
     </message>
     <message>
         <location filename="../../Gui/Perspective.cpp" line="1463"/>
         <source>Calendar</source>
-        <translation type="unfinished">Календарь</translation>
+        <translation>Календарь</translation>
     </message>
     <message>
         <location filename="../../Gui/Perspective.cpp" line="1464"/>
@@ -27611,42 +27611,42 @@ Do you want to continue?</source>
     <message>
         <location filename="../../Gui/Perspective.cpp" line="1465"/>
         <source>Details</source>
-        <translation type="unfinished">Подробности</translation>
+        <translation>Подробности</translation>
     </message>
     <message>
         <location filename="../../Gui/Perspective.cpp" line="1466"/>
         <source>Distance</source>
-        <translation type="unfinished">Дистанция</translation>
+        <translation>Дистанция</translation>
     </message>
     <message>
         <location filename="../../Gui/Perspective.cpp" line="1467"/>
         <source>Edit</source>
-        <translation type="unfinished">Правка</translation>
+        <translation>Правка</translation>
     </message>
     <message>
         <location filename="../../Gui/Perspective.cpp" line="1468"/>
         <source>Elapsed Time</source>
-        <translation type="unfinished">Прошло времени</translation>
+        <translation>Прошло времени</translation>
     </message>
     <message>
         <location filename="../../Gui/Perspective.cpp" line="1469"/>
         <source>Heartrate</source>
-        <translation type="unfinished">ЧСС</translation>
+        <translation>ЧСС</translation>
     </message>
     <message>
         <location filename="../../Gui/Perspective.cpp" line="1470"/>
         <source>Lap</source>
-        <translation type="unfinished">Круг</translation>
+        <translation>Круг</translation>
     </message>
     <message>
         <location filename="../../Gui/Perspective.cpp" line="1471"/>
         <source>Map</source>
-        <translation type="unfinished">Карта</translation>
+        <translation>Карта</translation>
     </message>
     <message>
         <location filename="../../Gui/Perspective.cpp" line="1472"/>
         <source>Performance</source>
-        <translation type="unfinished">Результативность</translation>
+        <translation>Результативность</translation>
     </message>
     <message>
         <location filename="../../Gui/Perspective.cpp" line="1473"/>
@@ -27656,7 +27656,7 @@ Do you want to continue?</source>
     <message>
         <location filename="../../Gui/Perspective.cpp" line="1474"/>
         <source>Power</source>
-        <translation type="unfinished">Мощность</translation>
+        <translation>Мощность</translation>
     </message>
     <message>
         <location filename="../../Gui/Perspective.cpp" line="1475"/>
@@ -27666,37 +27666,37 @@ Do you want to continue?</source>
     <message>
         <location filename="../../Gui/Perspective.cpp" line="1476"/>
         <source>Ride</source>
-        <translation type="unfinished">Тренировка</translation>
+        <translation>Тренировка</translation>
     </message>
     <message>
         <location filename="../../Gui/Perspective.cpp" line="1477"/>
         <source>Speed</source>
-        <translation type="unfinished">Скорость</translation>
+        <translation>Скорость</translation>
     </message>
     <message>
         <location filename="../../Gui/Perspective.cpp" line="1478"/>
         <source>Summary</source>
-        <translation type="unfinished">Сводка</translation>
+        <translation>Сводка</translation>
     </message>
     <message>
         <location filename="../../Gui/Perspective.cpp" line="1479"/>
         <source>Target Power</source>
-        <translation type="unfinished">Целевая мощность</translation>
+        <translation>Целевая мощность</translation>
     </message>
     <message>
         <location filename="../../Gui/Perspective.cpp" line="1480"/>
         <source>Time and Distance</source>
-        <translation type="unfinished">Время и дистанция</translation>
+        <translation>Время и дистанция</translation>
     </message>
     <message>
         <location filename="../../Gui/Perspective.cpp" line="1481"/>
         <source>Time In Zone</source>
-        <translation type="unfinished">Время в зоне</translation>
+        <translation>Время в зоне</translation>
     </message>
     <message>
         <location filename="../../Gui/Perspective.cpp" line="1482"/>
         <source>W&apos; In Zone</source>
-        <translation type="unfinished">W&apos; в зоне</translation>
+        <translation>W&apos; в зоне</translation>
     </message>
     <message>
         <location filename="../../Gui/Perspective.cpp" line="1483"/>
@@ -27706,48 +27706,48 @@ Do you want to continue?</source>
     <message>
         <location filename="../../Gui/Perspective.cpp" line="1484"/>
         <source>Training Mix</source>
-        <translation type="unfinished">Тренировочный микс</translation>
+        <translation>Тренировочный микс</translation>
     </message>
     <message>
         <location filename="../../Gui/Perspective.cpp" line="1485"/>
         <source>Navigator</source>
-        <translation type="unfinished">Навигатор</translation>
+        <translation>Навигатор</translation>
     </message>
     <message>
         <location filename="../../Gui/Perspective.cpp" line="1486"/>
         <source>W/kg</source>
-        <translation type="unfinished">Вт/кг</translation>
+        <translation>Вт/кг</translation>
     </message>
     <message>
         <location filename="../../Gui/Perspective.cpp" line="1487"/>
         <source>Workout</source>
-        <translation type="unfinished">Тренировка</translation>
+        <translation>Тренировка</translation>
     </message>
     <message>
         <location filename="../../Gui/Perspective.cpp" line="1488"/>
         <source>Stress</source>
-        <translation type="unfinished"></translation>
+        <translation>Нагрузка</translation>
     </message>
     <message>
         <location filename="../../Gui/Perspective.cpp" line="1489"/>
         <source>Scatter</source>
-        <translation type="unfinished">Разброс</translation>
+        <translation>Разброс</translation>
     </message>
     <message>
         <location filename="../../Gui/Perspective.cpp" line="1490"/>
         <location filename="../../Gui/Perspective.cpp" line="1492"/>
         <source>HrPw</source>
-        <translation type="unfinished">ЧСС-Мощность</translation>
+        <translation>ЧСС-Мощность</translation>
     </message>
     <message>
         <location filename="../../Gui/Perspective.cpp" line="1491"/>
         <source>Activity Log</source>
-        <translation type="unfinished">Журнал тренировок</translation>
+        <translation>Журнал тренировок</translation>
     </message>
     <message>
         <location filename="../../Gui/Perspective.cpp" line="1493"/>
         <source>Tracker</source>
-        <translation type="unfinished">Контроль</translation>
+        <translation>Контроль</translation>
     </message>
     <message>
         <location filename="../../Gui/Perspective.cpp" line="1494"/>
@@ -27757,7 +27757,7 @@ Do you want to continue?</source>
     <message>
         <location filename="../../Gui/Perspective.cpp" line="1495"/>
         <source>Library</source>
-        <translation type="unfinished">Библиотека</translation>
+        <translation>Библиотека</translation>
     </message>
     <message>
         <location filename="../../Gui/Perspective.cpp" line="1496"/>
@@ -28498,12 +28498,12 @@ yyyy</translation>
     <message>
         <location filename="../../Core/Measures.cpp" line="160"/>
         <source>Problem Saving Measures</source>
-        <translation type="unfinished">Ошибка сохранения метрики</translation>
+        <translation>Ошибка сохранения метрики</translation>
     </message>
     <message>
         <location filename="../../Core/Measures.cpp" line="209"/>
         <source>Problem Reading Measures</source>
-        <translation type="unfinished">Ошибка чтения метрики</translation>
+        <translation>Ошибка чтения метрики</translation>
     </message>
     <message>
         <location filename="../../Core/Measures.cpp" line="210"/>
@@ -28513,7 +28513,7 @@ yyyy</translation>
     <message>
         <location filename="../../Core/Measures.cpp" line="223"/>
         <source>Problem Parsing Measures</source>
-        <translation type="unfinished">Ошибка обработки метрики</translation>
+        <translation>Ошибка обработки метрики</translation>
     </message>
     <message>
         <location filename="../../Core/Measures.cpp" line="224"/>
@@ -28649,7 +28649,7 @@ yyyy</translation>
     <message>
         <location filename="../../Charts/OverviewItems.cpp" line="58"/>
         <source>User Chart</source>
-        <translation type="unfinished">Пользовательский график</translation>
+        <translation>Пользовательский график</translation>
     </message>
     <message>
         <location filename="../../Charts/OverviewItems.cpp" line="58"/>
@@ -28679,12 +28679,12 @@ yyyy</translation>
     <message>
         <location filename="../../Charts/OverviewItems.cpp" line="61"/>
         <source>Table</source>
-        <translation type="unfinished">Таблица</translation>
+        <translation>Таблица</translation>
     </message>
     <message>
         <location filename="../../Charts/OverviewItems.cpp" line="61"/>
         <source>Table of data</source>
-        <translation type="unfinished">Таблица данных</translation>
+        <translation>Таблица данных</translation>
     </message>
     <message>
         <location filename="../../Charts/OverviewItems.cpp" line="62"/>
@@ -28744,7 +28744,7 @@ yyyy</translation>
     <message>
         <location filename="../../Charts/OverviewItems.cpp" line="68"/>
         <source>PMC</source>
-        <translation>PMC</translation>
+        <translation type="unfinished">PMC</translation>
     </message>
     <message>
         <location filename="../../Charts/OverviewItems.cpp" line="68"/>
@@ -28966,12 +28966,12 @@ yyyy</translation>
     <message>
         <location filename="../../FileIO/FixElevation.cpp" line="328"/>
         <source>Bad request</source>
-        <translation type="unfinished">Ошибка запроса</translation>
+        <translation>Ошибка запроса</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixElevation.cpp" line="330"/>
         <source>Gateway Timeout</source>
-        <translation type="unfinished">Превышено время ожидания</translation>
+        <translation>Превышено время ожидания</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixElevation.cpp" line="332"/>
@@ -29052,12 +29052,12 @@ Python disabled in preferences.</source>
     <message>
         <location filename="../../Gui/AthleteView.cpp" line="12"/>
         <source>Athlete</source>
-        <translation type="unfinished">Спортсмен</translation>
+        <translation>Спортсмен</translation>
     </message>
     <message>
         <location filename="../../Gui/AthleteView.cpp" line="12"/>
         <source>Athlete Card</source>
-        <translation type="unfinished"></translation>
+        <translation>Карточка спортсмена</translation>
     </message>
 </context>
 <context>
@@ -29667,32 +29667,32 @@ Python disabled in preferences.</source>
     <message>
         <location filename="../../Train/RemoteControl.cpp" line="89"/>
         <source>Start</source>
-        <translation type="unfinished"></translation>
+        <translation>Старт</translation>
     </message>
     <message>
         <location filename="../../Train/RemoteControl.cpp" line="94"/>
         <source>Stop</source>
-        <translation type="unfinished"></translation>
+        <translation>Стоп</translation>
     </message>
     <message>
         <location filename="../../Train/RemoteControl.cpp" line="99"/>
         <source>Lap</source>
-        <translation type="unfinished">Круг</translation>
+        <translation>Круг</translation>
     </message>
     <message>
         <location filename="../../Train/RemoteControl.cpp" line="104"/>
         <source>Higher</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Выше</translation>
     </message>
     <message>
         <location filename="../../Train/RemoteControl.cpp" line="109"/>
         <source>Lower</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Ниже</translation>
     </message>
     <message>
         <location filename="../../Train/RemoteControl.cpp" line="114"/>
         <source>Calibrate</source>
-        <translation type="unfinished"></translation>
+        <translation>Калибровать</translation>
     </message>
 </context>
 <context>
@@ -29710,7 +29710,7 @@ Python disabled in preferences.</source>
     <message>
         <location filename="../../Gui/Pages.cpp" line="856"/>
         <source>&lt;unset&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">&lt;нет&gt;</translation>
     </message>
 </context>
 <context>
@@ -29718,7 +29718,7 @@ Python disabled in preferences.</source>
     <message>
         <location filename="../../FileIO/RideFileCommand.cpp" line="489"/>
         <source>Remove XData</source>
-        <translation type="unfinished"></translation>
+        <translation>Удалить XData</translation>
     </message>
 </context>
 <context>
@@ -29726,7 +29726,7 @@ Python disabled in preferences.</source>
     <message>
         <location filename="../../FileIO/RideFileCommand.cpp" line="529"/>
         <source>Remove XData Series</source>
-        <translation type="unfinished"></translation>
+        <translation>Удалить серию XData</translation>
     </message>
 </context>
 <context>
@@ -29865,7 +29865,7 @@ Python disabled in preferences.</source>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="45"/>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="49"/>
         <source>Activity Date</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Дата тренировки</translation>
     </message>
 </context>
 <context>
@@ -31306,12 +31306,12 @@ Skipping file...</source>
     <message>
         <location filename="../../Gui/RideImportWizard.cpp" line="148"/>
         <source>No import</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Не импортировать</translation>
     </message>
     <message>
         <location filename="../../Gui/RideImportWizard.cpp" line="155"/>
         <source>No directory</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Нет директории</translation>
     </message>
     <message>
         <location filename="../../Gui/RideImportWizard.cpp" line="160"/>
@@ -31573,12 +31573,12 @@ Skipping file...</source>
     <message>
         <location filename="../../Charts/RideMapWindow.cpp" line="80"/>
         <source>Hide Shaded Zones</source>
-        <translation type="unfinished">Скрыть затенённые зоны</translation>
+        <translation>Скрыть затенённые зоны</translation>
     </message>
     <message>
         <location filename="../../Charts/RideMapWindow.cpp" line="81"/>
         <source>Hide Yellow Line</source>
-        <translation type="unfinished">Скрыть жёлтую линию трека</translation>
+        <translation>Скрыть жёлтую линию трека</translation>
     </message>
     <message>
         <location filename="../../Charts/RideMapWindow.cpp" line="82"/>
@@ -31663,12 +31663,12 @@ Skipping file...</source>
     <message>
         <location filename="../../Metrics/RideMetadata.cpp" line="410"/>
         <source>Raw Data</source>
-        <translation type="unfinished">Исходные данные</translation>
+        <translation>Исходные данные</translation>
     </message>
     <message>
         <location filename="../../Metrics/RideMetadata.cpp" line="507"/>
         <source>Bike</source>
-        <translation type="unfinished">Велосипед</translation>
+        <translation>Велосипед</translation>
     </message>
     <message>
         <location filename="../../Metrics/RideMetadata.cpp" line="1398"/>
@@ -32409,7 +32409,7 @@ native format. Should we do so?
     <message>
         <location filename="../../Charts/ScatterPlot.cpp" line="139"/>
         <source>Circumferential Pedal Velocity (m/s)</source>
-        <translation type="unfinished">Периферическая скорость педалирования (см/с)</translation>
+        <translation>Периферическая скорость педалирования (м/с)</translation>
     </message>
     <message>
         <location filename="../../Charts/ScatterPlot.cpp" line="140"/>
@@ -33566,17 +33566,17 @@ native format. Should we do so?
     <message>
         <location filename="../../Gui/Pages.cpp" line="957"/>
         <source>ActualTrainerAltitude (m)</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Фактическая высота тренировки (м)</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="957"/>
         <source>Actual altitude of indoor trainer, in meters</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Фактическая высота тренажёра (м)</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="1051"/>
         <source>------ Derived Statistics -------</source>
-        <translation type="unfinished"></translation>
+        <translation>------ Результирующая статистика -------</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="1096"/>
@@ -33604,7 +33604,7 @@ Power&apos; option in the training preferences tab.</source>
     <message>
         <location filename="../../Gui/Pages.cpp" line="1054"/>
         <source>FrontWheel Mass:      	%1g</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Масса переднего колеса:      	%1 г</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="1055"/>
@@ -33624,7 +33624,7 @@ Power&apos; option in the training preferences tab.</source>
     <message>
         <location filename="../../Gui/Pages.cpp" line="1058"/>
         <source>Rear Wheel Mass:      	%1g</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Масса заднего колеса      	%1 г</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="1059"/>
@@ -34586,43 +34586,43 @@ If the newly created activity clashes with an existing activity (same date and t
     <message>
         <location filename="../../Cloud/Strava.cpp" line="95"/>
         <source>No authorisation token configured.</source>
-        <translation>Не сконфигурирован токен авторизации.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../Cloud/Strava.cpp" line="140"/>
         <source>JSON parser error</source>
-        <translation>Ошибка обработки JSON</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../Cloud/Strava.cpp" line="175"/>
         <source>You must authorise with Strava first</source>
-        <translation>Вы должны вначале авторизоваться в Strava</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../Cloud/Strava.cpp" line="211"/>
         <source>Network Problem reading Strava data</source>
-        <translation>Проблемы с сетью при чтении данных Strava</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../Cloud/Strava.cpp" line="484"/>
         <source>invalid response or parser exception.</source>
-        <translation>Некорректный ответ или ошибка обработки.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../Cloud/Strava.cpp" line="502"/>
         <location filename="../../Cloud/Strava.cpp" line="526"/>
         <source>Completed.</source>
-        <translation>Завершено.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../Cloud/Strava.h" line="34"/>
         <source>Strava</source>
-        <translation>Strava</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../Cloud/Strava.h" line="35"/>
         <source>Sync with the social network for cyclists and runners.</source>
-        <translation>Синхронизировать с социальной сетью Strava для велосипедистов и бегунов.</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Upload to the social network for cyclists and runners.</source>
@@ -35893,7 +35893,9 @@ Click Cancel to exit.</source>
         <source>Simulation physics uses current athlete parameters and settings
 from the virtual bicycle specifications tab. For Erg Mode workouts
 the slope is assumed to be zero.</source>
-        <translation type="unfinished"></translation>
+        <translation>Физика моделирования использует текущие параметры и настройки спортсмена
+на вкладке &quot;Характеристики виртуального велосипеда&quot;. Для тренировок в режиме Erg
+предполагается, что наклон равен нулю.</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="739"/>
@@ -35905,7 +35907,9 @@ the slope is assumed to be zero.</source>
         <source>Power used by simulation is adjusted for hypoxia relative to
 ActualTrainingAltitude value in virtual bicycle specifications
 tab.</source>
-        <translation type="unfinished"></translation>
+        <translation>Мощность, используемая при моделировании, корректируется с учетом
+гипоксии относительно значения фактической высоты на вкладке
+&quot;Характеристики виртуального велосипеда&quot;.</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="745"/>
@@ -36179,12 +36183,12 @@ Zero Offset %2</source>
     <message>
         <location filename="../../Train/TrainSidebar.cpp" line="2392"/>
         <source>Calibration Failed: Loosen Roller</source>
-        <translation type="unfinished"></translation>
+        <translation>Ошибка калибровки: ослабьте ролик</translation>
     </message>
     <message>
         <location filename="../../Train/TrainSidebar.cpp" line="2400"/>
         <source>Calibration Failed: Tighten Roller</source>
-        <translation type="unfinished"></translation>
+        <translation>Ошибка калибровки: затяните ролик</translation>
     </message>
     <message>
         <location filename="../../Train/TrainSidebar.cpp" line="2419"/>
@@ -36232,37 +36236,43 @@ Slope %2</source>
         <location filename="../../Train/TrainSidebar.cpp" line="2524"/>
         <source>Give the pedal a kick to start calibration...
 The motor will run until calibration is complete.</source>
-        <translation type="unfinished"></translation>
+        <translation>Нажмите на педаль, чтобы начать калибровку...
+Двигатель будет работать до завершения калибровки.</translation>
     </message>
     <message>
         <location filename="../../Train/TrainSidebar.cpp" line="2526"/>
         <source>Allow wheel speed to settle, DO NOT PEDAL...
 The motor will run until calibration is complete.</source>
-        <translation type="unfinished"></translation>
+        <translation>Позвольте скорости вращения колеса установиться, НЕ КРУТИТЕ ПЕДАЛИ...
+Двигатель будет работать до завершения калибровки.</translation>
     </message>
     <message>
         <location filename="../../Train/TrainSidebar.cpp" line="2531"/>
         <source>Calibrating... DO NOT PEDAL, remain seated...
 Gathering enough samples to calculate average: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Калибровка... НЕ КРУТИ ПЕДАЛИ, оставайтесь на месте...
+Сбор достаточного количества измерений для расчета среднего значения:%1</translation>
     </message>
     <message>
         <location filename="../../Train/TrainSidebar.cpp" line="2538"/>
         <source>Calibrating... DO NOT PEDAL, remain seated...
 Waiting for value to stabilize (max %1s): %2 (%3W @ %4kph)</source>
-        <translation type="unfinished"></translation>
+        <translation>Калибровка... НЕ КРУТИ ПЕДАЛИ, оставайтесь на месте...
+Ожидание стабилизации значения (макс %1 с): %2 (%3 Вт @ %4 км/ч)</translation>
     </message>
     <message>
         <location filename="../../Train/TrainSidebar.cpp" line="2553"/>
         <source>Calibration completed successfully!
 Final calibration value %1 (%2W @ %3kph)</source>
-        <translation type="unfinished"></translation>
+        <translation>Калибровка успешно завершена!
+Итоговое значение калибровки %1 (%2 Вт @ %3 км/ч)</translation>
     </message>
     <message>
         <location filename="../../Train/TrainSidebar.cpp" line="2565"/>
         <source>Calibration failed! Do not pedal while calibration is taking place.
 Allow wheel to run freely.</source>
-        <translation type="unfinished"></translation>
+        <translation>Ошибка калибровки! Не нажимайте на педали во время калибровки.
+Позвольте колесу свободно вращаться.</translation>
     </message>
     <message>
         <location filename="../../Train/TrainSidebar.cpp" line="2611"/>
@@ -38758,13 +38768,13 @@ You can remove references when managing the library via the context menu options
         <translation>Вы должны вначале авторизоваться в Xert</translation>
     </message>
     <message>
-        <location filename="../../Cloud/Xert.cpp" line="474"/>
-        <location filename="../../Cloud/Xert.cpp" line="565"/>
+        <location filename="../../Cloud/Xert.cpp" line="477"/>
+        <location filename="../../Cloud/Xert.cpp" line="568"/>
         <source>Completed.</source>
         <translation>Завершено.</translation>
     </message>
     <message>
-        <location filename="../../Cloud/Xert.cpp" line="567"/>
+        <location filename="../../Cloud/Xert.cpp" line="570"/>
         <source>Network Error - Upload failed.</source>
         <translation>Ошибка сети — выгрузка файла не удалась.</translation>
     </message>
@@ -39556,7 +39566,7 @@ You can remove references when managing the library via the context menu options
     <message>
         <location filename="../../FileIO/RideFileCommand.cpp" line="510"/>
         <source>Add XData</source>
-        <translation type="unfinished"></translation>
+        <translation>Добавить XData</translation>
     </message>
 </context>
 <context>
@@ -39565,13 +39575,13 @@ You can remove references when managing the library via the context menu options
         <location filename="../../Metrics/HrvMetrics.cpp" line="105"/>
         <location filename="../../Metrics/HrvMetrics.cpp" line="109"/>
         <source>Average of all NN intervals</source>
-        <translation type="unfinished"></translation>
+        <translation>Среднее значение всех интервалов NN</translation>
     </message>
     <message>
         <location filename="../../Metrics/HrvMetrics.cpp" line="106"/>
         <location filename="../../Metrics/HrvMetrics.cpp" line="107"/>
         <source>msec</source>
-        <translation type="unfinished">мс</translation>
+        <translation>мс</translation>
     </message>
 </context>
 <context>
@@ -39620,12 +39630,12 @@ You can remove references when managing the library via the context menu options
     <message>
         <location filename="../../Metrics/HrvMetrics.cpp" line="817"/>
         <source>HRV Recovery Points</source>
-        <translation type="unfinished"></translation>
+        <translation>Баллы восстановления вариабельности ЧСС</translation>
     </message>
     <message>
         <location filename="../../Metrics/HrvMetrics.cpp" line="822"/>
         <source>Natural Log transform of rMSSD, measured at rest</source>
-        <translation type="unfinished"></translation>
+        <translation>Натуральное логарифмическое преобразование rMSSD, измеренное в состоянии покоя</translation>
     </message>
 </context>
 <context>
@@ -39633,18 +39643,18 @@ You can remove references when managing the library via the context menu options
     <message>
         <location filename="../../Metrics/HrvMetrics.cpp" line="520"/>
         <source>pNN</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">pNN</translation>
     </message>
     <message>
         <location filename="../../Metrics/HrvMetrics.cpp" line="521"/>
         <location filename="../../Metrics/HrvMetrics.cpp" line="522"/>
         <source>pct</source>
-        <translation type="unfinished">%</translation>
+        <translation>%</translation>
     </message>
     <message>
         <location filename="../../Metrics/HrvMetrics.cpp" line="524"/>
         <source>Percentage of differences between adjacent NN intervals that are greater than %1 ms</source>
-        <translation type="unfinished"></translation>
+        <translation>Процент различий между соседними интервалами NN, превышающими %1 мс</translation>
     </message>
 </context>
 <context>
@@ -39652,18 +39662,18 @@ You can remove references when managing the library via the context menu options
     <message>
         <location filename="../../Metrics/HrvMetrics.cpp" line="593"/>
         <source>Rest AVNN</source>
-        <translation type="unfinished"></translation>
+        <translation>AVNN покоя</translation>
     </message>
     <message>
         <location filename="../../Metrics/HrvMetrics.cpp" line="594"/>
         <location filename="../../Metrics/HrvMetrics.cpp" line="595"/>
         <source>msec</source>
-        <translation type="unfinished">мс</translation>
+        <translation>мс</translation>
     </message>
     <message>
         <location filename="../../Metrics/HrvMetrics.cpp" line="597"/>
         <source>Average of all NN intervals measured at rest</source>
-        <translation type="unfinished"></translation>
+        <translation>Среднее значение всех интервалов NN, измеренных в состоянии покоя</translation>
     </message>
 </context>
 <context>
@@ -39671,18 +39681,18 @@ You can remove references when managing the library via the context menu options
     <message>
         <location filename="../../Metrics/HrvMetrics.cpp" line="779"/>
         <source>Rest HF</source>
-        <translation type="unfinished"></translation>
+        <translation>HF покоя</translation>
     </message>
     <message>
         <location filename="../../Metrics/HrvMetrics.cpp" line="780"/>
         <location filename="../../Metrics/HrvMetrics.cpp" line="781"/>
         <source>msec^2</source>
-        <translation type="unfinished">мс²</translation>
+        <translation>мс²</translation>
     </message>
     <message>
         <location filename="../../Metrics/HrvMetrics.cpp" line="784"/>
         <source>High Frequency Power HRV, measured at rest</source>
-        <translation type="unfinished"></translation>
+        <translation>Высокочастотная мощность вариабельности ЧСС, измеренная в состоянии покоя</translation>
     </message>
 </context>
 <context>
@@ -39690,18 +39700,18 @@ You can remove references when managing the library via the context menu options
     <message>
         <location filename="../../Metrics/HrvMetrics.cpp" line="557"/>
         <source>Rest HR</source>
-        <translation type="unfinished">ЧСС в покое</translation>
+        <translation>ЧСС в покое</translation>
     </message>
     <message>
         <location filename="../../Metrics/HrvMetrics.cpp" line="558"/>
         <location filename="../../Metrics/HrvMetrics.cpp" line="559"/>
         <source>bpm</source>
-        <translation type="unfinished">уд/мин</translation>
+        <translation>уд/мин</translation>
     </message>
     <message>
         <location filename="../../Metrics/HrvMetrics.cpp" line="561"/>
         <source>Average HR measured at rest</source>
-        <translation type="unfinished"></translation>
+        <translation>Средняя ЧСС измеренная в покое</translation>
     </message>
 </context>
 <context>
@@ -39709,18 +39719,18 @@ You can remove references when managing the library via the context menu options
     <message>
         <location filename="../../Metrics/HrvMetrics.cpp" line="741"/>
         <source>Rest LF</source>
-        <translation type="unfinished"></translation>
+        <translation>LF покоя</translation>
     </message>
     <message>
         <location filename="../../Metrics/HrvMetrics.cpp" line="742"/>
         <location filename="../../Metrics/HrvMetrics.cpp" line="743"/>
         <source>msec^2</source>
-        <translation type="unfinished">мс²</translation>
+        <translation>мс²</translation>
     </message>
     <message>
         <location filename="../../Metrics/HrvMetrics.cpp" line="746"/>
         <source>Low Frequency Power HRV, measured at rest</source>
-        <translation type="unfinished"></translation>
+        <translation>Низкочастотная мощность вариабельности ЧСС, измеренная в состоянии покоя</translation>
     </message>
 </context>
 <context>
@@ -39728,18 +39738,18 @@ You can remove references when managing the library via the context menu options
     <message>
         <location filename="../../Metrics/HrvMetrics.cpp" line="704"/>
         <source>Rest PNN50</source>
-        <translation type="unfinished"></translation>
+        <translation>PNN50 покоя</translation>
     </message>
     <message>
         <location filename="../../Metrics/HrvMetrics.cpp" line="705"/>
         <location filename="../../Metrics/HrvMetrics.cpp" line="706"/>
         <source>pct</source>
-        <translation type="unfinished">%</translation>
+        <translation>%</translation>
     </message>
     <message>
         <location filename="../../Metrics/HrvMetrics.cpp" line="708"/>
         <source>Percentage of differences between adjacent NN intervals that are greater than 50 ms, measured at rest</source>
-        <translation type="unfinished"></translation>
+        <translation>Процент различий между соседними интервалами NN, превышающими 50 мс, измеренный в состоянии покоя</translation>
     </message>
 </context>
 <context>
@@ -39747,18 +39757,18 @@ You can remove references when managing the library via the context menu options
     <message>
         <location filename="../../Metrics/HrvMetrics.cpp" line="667"/>
         <source>Rest rMSSD</source>
-        <translation type="unfinished"></translation>
+        <translation>rMSSD покоя</translation>
     </message>
     <message>
         <location filename="../../Metrics/HrvMetrics.cpp" line="668"/>
         <location filename="../../Metrics/HrvMetrics.cpp" line="669"/>
         <source>msec</source>
-        <translation type="unfinished">мс</translation>
+        <translation>мс</translation>
     </message>
     <message>
         <location filename="../../Metrics/HrvMetrics.cpp" line="671"/>
         <source>Square root of the mean of the squares of differences between adjacent NN intervals, measured at rest</source>
-        <translation type="unfinished"></translation>
+        <translation>Квадратный корень из среднего значения квадратов разностей между соседними интервалами NN, измеренных в состоянии покоя</translation>
     </message>
 </context>
 <context>
@@ -39766,18 +39776,18 @@ You can remove references when managing the library via the context menu options
     <message>
         <location filename="../../Metrics/HrvMetrics.cpp" line="630"/>
         <source>Rest SDNN</source>
-        <translation type="unfinished"></translation>
+        <translation>SDNN покоя</translation>
     </message>
     <message>
         <location filename="../../Metrics/HrvMetrics.cpp" line="631"/>
         <location filename="../../Metrics/HrvMetrics.cpp" line="632"/>
         <source>msec</source>
-        <translation type="unfinished">мс</translation>
+        <translation>мс</translation>
     </message>
     <message>
         <location filename="../../Metrics/HrvMetrics.cpp" line="634"/>
         <source>Standard deviation of all NN intervals measured at rest</source>
-        <translation type="unfinished"></translation>
+        <translation>Стандартное отклонение всех интервалов NN, измеренных в состоянии покоя</translation>
     </message>
 </context>
 <context>
@@ -39785,18 +39795,18 @@ You can remove references when managing the library via the context menu options
     <message>
         <location filename="../../Metrics/HrvMetrics.cpp" line="426"/>
         <source>rMSSD</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">rMSSD</translation>
     </message>
     <message>
         <location filename="../../Metrics/HrvMetrics.cpp" line="427"/>
         <location filename="../../Metrics/HrvMetrics.cpp" line="428"/>
         <source>msec</source>
-        <translation type="unfinished">мс</translation>
+        <translation>мс</translation>
     </message>
     <message>
         <location filename="../../Metrics/HrvMetrics.cpp" line="430"/>
         <source>Square root of the mean of the squares of differences between adjacent NN intervals</source>
-        <translation type="unfinished"></translation>
+        <translation>Квадратный корень из среднего значения квадратов разностей между соседними интервалами NN</translation>
     </message>
 </context>
 <context>
@@ -39804,18 +39814,18 @@ You can remove references when managing the library via the context menu options
     <message>
         <location filename="../../Metrics/HrvMetrics.cpp" line="250"/>
         <source>SDANN</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">SDANN</translation>
     </message>
     <message>
         <location filename="../../Metrics/HrvMetrics.cpp" line="251"/>
         <location filename="../../Metrics/HrvMetrics.cpp" line="252"/>
         <source>msec</source>
-        <translation type="unfinished">мс</translation>
+        <translation>мс</translation>
     </message>
     <message>
         <location filename="../../Metrics/HrvMetrics.cpp" line="254"/>
         <source>Standard deviation of all NN intervals in all 5-minute segments of a 24-hour recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Стандартное отклонение всех интервалов NN во всех 5-минутных сегментах 24-часовой записи</translation>
     </message>
 </context>
 <context>
@@ -39823,18 +39833,18 @@ You can remove references when managing the library via the context menu options
     <message>
         <location filename="../../Metrics/HrvMetrics.cpp" line="172"/>
         <source>Standard deviation of NN</source>
-        <translation type="unfinished"></translation>
+        <translation>Стандартное отклонение для NN</translation>
     </message>
     <message>
         <location filename="../../Metrics/HrvMetrics.cpp" line="173"/>
         <location filename="../../Metrics/HrvMetrics.cpp" line="174"/>
         <source>msec</source>
-        <translation type="unfinished">мс</translation>
+        <translation>мс</translation>
     </message>
     <message>
         <location filename="../../Metrics/HrvMetrics.cpp" line="176"/>
         <source>Standard deviation of all NN intervals</source>
-        <translation type="unfinished"></translation>
+        <translation>Стандартное отклонение для всех интервалов NN</translation>
     </message>
 </context>
 <context>
@@ -39842,18 +39852,18 @@ You can remove references when managing the library via the context menu options
     <message>
         <location filename="../../Metrics/HrvMetrics.cpp" line="344"/>
         <source>SDNNIDX</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">SDNNIDX</translation>
     </message>
     <message>
         <location filename="../../Metrics/HrvMetrics.cpp" line="345"/>
         <location filename="../../Metrics/HrvMetrics.cpp" line="346"/>
         <source>msec</source>
-        <translation type="unfinished">мс</translation>
+        <translation>мс</translation>
     </message>
     <message>
         <location filename="../../Metrics/HrvMetrics.cpp" line="348"/>
         <source>Average of the standard deviations of NN intervals in all 5-minute segments of a 24-hour recording</source>
-        <translation type="unfinished"></translation>
+        <translation>Среднее значение стандартных отклонений интервалов NN во всех 5-минутных сегментах 24-часовой записи</translation>
     </message>
 </context>
 <context>
@@ -39861,7 +39871,7 @@ You can remove references when managing the library via the context menu options
     <message>
         <location filename="../../Metrics/WPrime.cpp" line="75"/>
         <source>Recovered</source>
-        <translation>Восстановленность</translation>
+        <translation>Восстановление</translation>
     </message>
     <message>
         <location filename="../../Metrics/WPrime.cpp" line="76"/>
