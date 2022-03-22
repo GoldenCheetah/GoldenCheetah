@@ -3203,7 +3203,7 @@ Press Next to Continue
     </message>
     <message>
         <location filename="../../FileIO/AthleteBackup.cpp" line="105"/>
-        <source>Backup successfully stored in 
+        <source>Backup successfully stored in
 %1</source>
         <translation type="unfinished"></translation>
     </message>
@@ -7020,7 +7020,7 @@ Are you sure?</source>
     </message>
     <message>
         <location filename="../../Cloud/CloudService.cpp" line="913"/>
-        <source>Changes in activities which are not saved, will not be synchronized. 
+        <source>Changes in activities which are not saved, will not be synchronized.
 
 This may lead to inconsistencies between your local GoldenCheetah activities and the uploaded activities. We recommend to save the changed activities before proceeding.</source>
         <translation type="unfinished"></translation>
@@ -7167,7 +7167,7 @@ This may lead to inconsistencies between your local GoldenCheetah activities and
     </message>
     <message>
         <location filename="../../Cloud/CloudService.cpp" line="344"/>
-        <source>Unsaved changes in activities will be uploaded as well. 
+        <source>Unsaved changes in activities will be uploaded as well.
 
 This may lead to inconsistencies between your local activities and the uploaded activities if you do not save the activity in GoldenCheetah. We recommend to save the changed activity before proceeding.</source>
         <translation type="unfinished"></translation>
@@ -12078,13 +12078,13 @@ The activity has to be a Run with Speed and Altitude.</source>
     </message>
     <message>
         <location filename="../../FileIO/FixSmO2.cpp" line="74"/>
-        <source>Occasionally SmO2 (%) and/or tHb (%) will erroneously report missing or high values (SmO2: 0% or &gt;100% / tHb: 0% or &gt; max. tHb parameter). 
+        <source>Occasionally SmO2 (%) and/or tHb (%) will erroneously report missing or high values (SmO2: 0% or &gt;100% / tHb: 0% or &gt; max. tHb parameter).
 
  This function will look for those anomalies in SmO2 and tHb data and depending on the configuration replace the erroneous data by smoothing/interpolating the data from either side of the 3 points in question. It takes the following parameters:
 
-Fix SmO2 - check to fix anomalies in SmO2 data 
-Fix tHb - check to fix anomalies in tHb data 
-Max. tHb - any tHb above is considered an outlier 
+Fix SmO2 - check to fix anomalies in SmO2 data
+Fix tHb - check to fix anomalies in tHb data
+Max. tHb - any tHb above is considered an outlier
 </source>
         <translation type="unfinished"></translation>
     </message>
@@ -12147,7 +12147,7 @@ Moving Average Seconds parameter allows to set the seconds of the MA filter to s
         <location filename="../../FileIO/FixSpikes.cpp" line="98"/>
         <source>Power meters will occasionally report erroneously high values for power. For crank based power meters such as SRM and Quarq this is caused by an erroneous cadence reading as a result of triggering a reed switch whilst pushing off.
 
-This function provides two algorithms that look for spikes/anomalies in power data and replace the erroneous data by: 
+This function provides two algorithms that look for spikes/anomalies in power data and replace the erroneous data by:
 
 i) Replacing the point in question with smoothed/interpolated data from either side of the point in question, it takes the following parameters:
 
@@ -21262,7 +21262,7 @@ CP値%3ワットに設定されました</translation>
     <message>
         <source>The values you&apos;ve entered in:
  </source>
-        <translation type="obsolete">入力された値: 
+        <translation type="obsolete">入力された値:
 </translation>
     </message>
     <message>
@@ -22921,7 +22921,7 @@ You will be able to import or download data before merging or joining the data a
     <name>MoxyDevice</name>
     <message>
         <location filename="../../FileIO/MoxyDevice.cpp" line="96"/>
-        <source>Connecting ... 
+        <source>Connecting ...
 </source>
         <translation type="unfinished"></translation>
     </message>
@@ -22952,7 +22952,7 @@ You will be able to import or download data before merging or joining the data a
     </message>
     <message>
         <location filename="../../FileIO/MoxyDevice.cpp" line="199"/>
-        <source>Downloading ... 
+        <source>Downloading ...
 </source>
         <translation type="unfinished"></translation>
     </message>
@@ -22986,14 +22986,14 @@ Parsing ... </source>
     <message>
         <location filename="../../FileIO/MoxyDevice.cpp" line="348"/>
         <source>
-Importing %1 Ride(s)... 
+Importing %1 Ride(s)...
 </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../FileIO/MoxyDevice.cpp" line="350"/>
         <source>
-No rides found to import. 
+No rides found to import.
 </source>
         <translation type="unfinished"></translation>
     </message>
@@ -31601,7 +31601,7 @@ native format. Should we do so?
     <message>
         <location filename="../../Core/Season.cpp" line="442"/>
         <source>Last Month</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">先月</translation>
     </message>
     <message>
         <location filename="../../Core/Season.cpp" line="447"/>
@@ -31611,12 +31611,12 @@ native format. Should we do so?
     <message>
         <location filename="../../Core/Season.cpp" line="452"/>
         <source>Last Week</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">先週</translation>
     </message>
     <message>
         <location filename="../../Core/Season.cpp" line="457"/>
         <source>Last 24 hours</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">直近の24時間</translation>
     </message>
     <message>
         <location filename="../../Core/Season.cpp" line="462"/>
@@ -31631,7 +31631,7 @@ native format. Should we do so?
     <message>
         <location filename="../../Core/Season.cpp" line="472"/>
         <source>Last 21 days</source>
-        <translation type="unfinished">直近の28日 {21 ?}</translation>
+        <translation type="unfinished">直近の21日</translation>
     </message>
     <message>
         <location filename="../../Core/Season.cpp" line="477"/>
@@ -31641,12 +31641,12 @@ native format. Should we do so?
     <message>
         <location filename="../../Core/Season.cpp" line="482"/>
         <source>Last 6 weeks</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">直近の6週間</translation>
     </message>
     <message>
         <location filename="../../Core/Season.cpp" line="487"/>
         <source>Last 2 months</source>
-        <translation type="unfinished">直近の12ヶ月 {2 ?}</translation>
+        <translation type="unfinished">直近の2ヶ月</translation>
     </message>
     <message>
         <location filename="../../Core/Season.cpp" line="492"/>
@@ -32730,7 +32730,7 @@ If you do not choose to keep the original it will be backed up before removing i
     </message>
     <message>
         <location filename="../../Gui/SplitActivityWizard.cpp" line="522"/>
-        <source>This wizard will find segments of the activity to save by looking for gaps in recording. 
+        <source>This wizard will find segments of the activity to save by looking for gaps in recording.
 
 You can define the minimum length, in time, a gap in recording should be in order to mark the end of one segment and the beginning of another.
 
