@@ -1,7 +1,7 @@
 #!/bin/bash
 set -ev
-export PATH=/opt/qt515/bin:$PATH
-export LD_LIBRARY_PATH=/opt/qt515/lib/x86_64-linux-gnu:/opt/qt515/lib:$LD_LIBRARY_PATH
+export PATH=/opt/qt514/bin:$PATH
+export LD_LIBRARY_PATH=/opt/qt514/lib/x86_64-linux-gnu:/opt/qt514/lib:$LD_LIBRARY_PATH
 
 ### This script should be run from GoldenCheetah src directory after build
 cd src
@@ -46,10 +46,10 @@ chmod a+x linuxdeployqt-7-x86_64.AppImage
 ./linuxdeployqt-7-x86_64.AppImage appdir/GoldenCheetah -verbose=2 -bundle-non-qt-libs -exclude-libs=libqsqlmysql,libqsqlpsql,libnss3,libnssutil3,libxcb-dri3.so.0 -unsupported-allow-new-glibc
 
 # Add Python and core modules
-wget --no-verbose https://github.com/niess/python-appimage/releases/download/python3.7/python3.7.13-cp37-cp37m-manylinux1_x86_64.AppImage
-chmod +x python3.7.13-cp37-cp37m-manylinux1_x86_64.AppImage
-./python3.7.13-cp37-cp37m-manylinux1_x86_64.AppImage --appimage-extract
-rm -f python3.7.13-cp37-cp37m-manylinux1_x86_64.AppImage
+wget --no-verbose https://github.com/niess/python-appimage/releases/download/python3.7/python3.7.12-cp37-cp37m-manylinux1_x86_64.AppImage
+chmod +x python3.7.12-cp37-cp37m-manylinux1_x86_64.AppImage
+./python3.7.12-cp37-cp37m-manylinux1_x86_64.AppImage --appimage-extract
+rm -f python3.7.12-cp37-cp37m-manylinux1_x86_64.AppImage
 export PATH="$(pwd)/squashfs-root/usr/bin:$PATH"
 pip install --upgrade pip
 pip install -q -r Python/requirements.txt

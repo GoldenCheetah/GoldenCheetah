@@ -2,11 +2,11 @@
 set -ev
 
 # Add recent Qt dependency ppa, update on a newer qt version.
-sudo add-apt-repository -y ppa:beineri/opt-qt-5.15.2-bionic
+sudo add-apt-repository -y ppa:beineri/opt-qt-5.14.2-bionic
 sudo apt-get update -qq
-sudo apt-get install -qq qt5-default qt515base qt515tools qt515serialport\
- qt515svg qt515multimedia qt515connectivity qt515webengine qt515charts-no-lgpl\
- qt515networkauth-no-lgpl qt515translations
+sudo apt-get install -qq qt5-default qt514base qt514tools qt514serialport\
+ qt514svg qt514multimedia qt514connectivity qt514webengine qt514charts-no-lgpl\
+ qt514networkauth-no-lgpl qt514translations
 
 sudo apt-get install -qq libglu1-mesa-dev
 sudo apt-get install -qq libsamplerate0-dev

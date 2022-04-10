@@ -1,6 +1,6 @@
 #!/bin/bash
 set -ev
-export PATH=/opt/qt515/bin:$PATH
+export PATH=/opt/qt514/bin:$PATH
 
 cp qwt/qwtconfig.pri.in qwt/qwtconfig.pri
 cp src/gcconfig.pri.in src/gcconfig.pri
