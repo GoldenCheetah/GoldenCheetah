@@ -1,5 +1,5 @@
 version: ci.{build}
-image: Visual Studio 2019
+image: Previous Visual Studio 2019
 clone_depth: 1
 
 environment:
