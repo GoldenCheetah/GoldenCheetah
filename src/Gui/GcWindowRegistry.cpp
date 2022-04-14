@@ -49,6 +49,8 @@
 #include "WorkoutWindow.h"
 #include "WebPageWindow.h"
 #include "LiveMapWebPageWindow.h"
+#include "SimulatedRidersNestStats.h"
+
 #ifdef GC_WANT_R
 #include "RChart.h"
 #endif
@@ -69,7 +71,7 @@ GcWindowRegistry* GcWindows;
 void
 GcWindowRegistry::initialize()
 {
-  static GcWindowRegistry GcWindowsInit[34] = {
+  static GcWindowRegistry GcWindowsInit[37] = {
     // name                     GcWinID
     { VIEW_TRENDS|VIEW_DIARY, tr("Season Overview"),GcWindowTypes::OverviewTrends },
     { VIEW_TRENDS|VIEW_DIARY, tr("Blank Overview "),GcWindowTypes::OverviewTrendsBlank },
@@ -111,7 +113,8 @@ GcWindowRegistry::initialize()
     { VIEW_TRAIN, tr("Video Player"),GcWindowTypes::VideoPlayer },
     { VIEW_TRAIN, tr("Workout Editor"),GcWindowTypes::WorkoutWindow },
     { VIEW_TRAIN, tr("Live Map"),GcWindowTypes::LiveMapWebPageWindow },
-    { VIEW_ANALYSIS|VIEW_TRENDS|VIEW_TRAIN, tr("Web page"),GcWindowTypes::WebPageWindow },
+    { VIEW_TRAIN, tr("Simulated Riders"),GcWindowTypes::SimulatedRidersNestStats },
+    { VIEW_ANALYSIS| VIEW_TRENDS |VIEW_TRAIN, tr("Web page"),GcWindowTypes::WebPageWindow },
     { 0, "", GcWindowTypes::None }};
   // initialize the global registry
   GcWindows = GcWindowsInit;
@@ -231,6 +234,7 @@ GcWindowRegistry::newGcWindow(GcWinID id, Context *context)
 
     case GcWindowTypes::WebPageWindow: returning = new WebPageWindow(context); break;
     case GcWindowTypes::LiveMapWebPageWindow: returning = new LiveMapWebPageWindow(context); break;
+    case GcWindowTypes::SimulatedRidersNestStats: returning = new SimulatedRidersNestStats(context); break;
 #if 0 // not till v4.0
     case GcWindowTypes::RouteSegment: returning = new RouteWindow(context); break;
 #else

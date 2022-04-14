@@ -51,6 +51,7 @@
 #include "DaumController.h"
 #include "ANTlocalController.h"
 #include "NullController.h"
+
 #ifdef QT_BLUETOOTH_LIB
 #include "BT40Controller.h"
 #endif
@@ -80,7 +81,7 @@
 #include "Library.h"
 
 TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(context),
-    bicycle(context)
+    bicycle(context), simRiderEngine(context) 
 {
     QWidget *c = new QWidget;
     //c->setContentsMargins(0,0,0,0); // bit of space is useful
@@ -1265,6 +1266,9 @@ void TrainSidebar::Start()       // when start button is pressed
         // tell the world
         context->notifyStart();
 
+        // SimRider Engines will initialize only if SImRider is enabled
+        simRiderEngine.initEngines(context);
+
         load_period.restart();
         session_time.start();
         session_elapsed_msec = 0;
@@ -1482,7 +1486,6 @@ void TrainSidebar::Stop(int deviceStatus)        // when stop button is pressed
     adjustIntensity(100);
     if (context->currentErgFile()) context->currentErgFile()->reload();
     context->notifySetNow(load_msecs);
-
 
     // tell the world
     context->notifyStop();
@@ -1810,6 +1813,8 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
 
                 displaySpeed = ret.v;
                 distanceTick = ret.d;
+
+
             } else {
                 distanceTick = displaySpeed / (5 * 3600); // assumes 200ms refreshrate
             }
@@ -1821,6 +1826,9 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
                 displayLapDistance += distanceTick;
                 displayLapDistanceRemaining -= distanceTick;
                 displayWorkoutDistance += distanceTick;
+
+                // Send data to the SimRider engine. If enabled it will calculate SimRider position and send notify.
+                simRiderEngine.runEngines(context, displayWorkoutDistance, rtData.getWatts(), (session_elapsed_msec + session_time.elapsed()));
 
                 if (!(status&RT_MODE_ERGO) && (context->currentVideoSyncFile()))
                 {
@@ -2602,6 +2610,9 @@ void TrainSidebar::FFwd()
             context->notifySeek(stepSize); // in case of video with RLV file synchronisation just ask to go forward
         }
         displayWorkoutDistance += stepSize;
+        // Position SimRider based on route distance when skiping
+        simRiderEngine.setDistForAllSimRiders(stepSize);
+
     }
 
     resetTextAudioEmitTracking();
@@ -2635,6 +2646,8 @@ void TrainSidebar::Rewind()
         }
 
         displayWorkoutDistance += stepSize;
+        // Position SimRider based on route distance when skiping
+        simRiderEngine.setDistForAllSimRiders(stepSize);
     }
 
     resetTextAudioEmitTracking();

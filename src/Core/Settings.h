@@ -310,6 +310,18 @@
 #define GC_OSM_TS_B                     "<athlete-preferences>osmts/b"
 #define GC_OSM_TS_C                     "<athlete-preferences>osmts/c"
 
+// Simulated Rider options
+#define GC_SIMRIDER_ISENABLED                           "<athlete-preferences>simrider/isenabled"
+#define GC_SIMRIDER_ENGINETYPE                          "<athlete-preferences>simrider/engine_type"
+#define GC_SIMRIDER_INTERVALS_AI_TOTALATTACKS           "<athlete-preferences>simrider/intervalsai_total_attacks"
+#define GC_SIMRIDER_INTERVALS_AI_ATTACKDURATION         "<athlete-preferences>simrider/intervalsai_attack_duration"
+#define GC_SIMRIDER_INTERVALS_AI_WARMUPSTARTSPERCENT    "<athlete-preferences>simrider/intervalsai_warmup_starts_percent"
+#define GC_SIMRIDER_INTERVALS_AI_COOLDOWNSTARTSPERCENT  "<athlete-preferences>simrider/intervalsai_cooldown_starts_percent"
+#define GC_SIMRIDER_INTERVALS_AI_ATTACKPOWERINCREASE    "<athlete-preferences>simrider/intervalsai_attack_power_increase"
+#define GC_SIMRIDER_ERG_FILENAME                        "<athlete-preferences>simrider/erg_filename"
+#define GC_SIMRIDER_PREVIOUSRIDE_FILENAME               "<athlete-preferences>simrider/previous_ride_filename"
+#define GC_SIMRIDER_INTERVALS_AI_MAXSEPARATION          "<athlete-preferences>simrider/max_separation"
+
 // BodyMeasures Download
 #define GC_BM_LAST_TYPE                 "<athlete-preferences>bm/last_type"
 #define GC_BM_LAST_TIMEFRAME            "<athlete-preferences>bm/last_timeframe"

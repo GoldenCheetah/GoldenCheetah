@@ -479,3 +479,50 @@ Bicycle::SampleSpeed(BicycleSimState &nowState)
     // Return new velocity (in kmh) and distance tick (in km)
     return { MsToKmh(out.endPoint()), out.sum() / 1000 };
 }
+
+// Simulated Rider 
+// Update state of rider along ergfile.
+void SimulatedRider::UpdateSelf(const ErgFile* ergFile) {
+
+    if (m_ergFileAdapter.getErgFile() != ergFile) {
+        m_ergFileAdapter.setErgFile(ergFile);
+    }
+
+    m_hasLocation = false;
+    bool altitudeSet = false;
+
+    if (ergFile && ergFile->hasGradient()) {
+        if (!ergFile->StrictGradient) {
+            int lap;
+            geolocation geoloc;
+            if (m_ergFileAdapter.locationAt(m_distance * 1000, lap, geoloc, m_slope)) {
+                m_altitude = geoloc.Alt();
+                m_latitude = geoloc.Lat();
+                m_longitude = geoloc.Long();
+                m_hasLocation = true;
+                altitudeSet = true;
+            }
+        }
+
+        if (ergFile->StrictGradient || !altitudeSet) {
+            int lap;
+            m_slope = m_ergFileAdapter.gradientAt(m_distance * 1000, lap);
+        }
+    }
+
+    BicycleSimState newState(m_watts, m_slope, m_altitude);
+    SpeedDistance ret = m_bicycle.SampleSpeed(newState);
+
+    if (!altitudeSet && ergFile->hasGradient()) {
+        // For classic rlv with no location data:
+        // Estimate vertical change based upon time passed and slope.
+        // Note this isn't exactly right but is very close - we should use the previous slope for the time passed.
+        double altitudeDeltaMeters = m_slope * (10 * ret.d); // ((slope / 100) * distanceTick) * 1000
+
+        m_altitude += altitudeDeltaMeters;
+    }
+
+    m_speed = ret.v;
+    m_distance += ret.d;
+}
+//Simulated Rider

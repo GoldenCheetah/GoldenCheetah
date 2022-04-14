@@ -31,7 +31,7 @@
 #include "RideFile.h"
 #include "IntervalItem.h"
 #include "Context.h"
-
+#include "LocationInterpolation.h"
 #include <QDialog>
 #include <QSslSocket>
 #include <QWebEnginePage>
@@ -66,7 +66,6 @@ class LiveMapWebPageWindow : public GcChartWindow
         bool markerIsVisible;
         double plotLon = 0;
         double plotLat = 0;
-        QString currentPage;
         QString routeLatLngs;
 
         // set/get properties
@@ -83,8 +82,11 @@ class LiveMapWebPageWindow : public GcChartWindow
         QVBoxLayout *layout;
         QComboBox* mapCombo;
 
+        QDir configDir;
+        QString vp1IconPath = "";
+
         QWebEngineView *view;
-        QWebEnginePage* webPage;
+        QWebEnginePage *webPage;
         LiveMapWebPageWindow();  // default ctor
         // setting dialog
         QLabel* customUrlLabel;
@@ -100,12 +102,15 @@ class LiveMapWebPageWindow : public GcChartWindow
         QPushButton* rButton;
         QPushButton* applyButton;
 
-        void createHtml(QString sBaseUrl, QString autoRunJS);
+        QString createHtml(QString sBaseUrl, QString autoRunJS);
         void drawRoute(ErgFile* f);
+        SimRiderStateData localSrData;
+        bool markerVisable[5];
 
     private slots:
         void telemetryUpdate(RealtimeData rtd);
         void stop();
+        void SimRiderStateUpdate(SimRiderStateData srData);
 
     protected:
 

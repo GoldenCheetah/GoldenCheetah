@@ -26,29 +26,29 @@ class Context;
 
 // all the windows we have defined
 namespace GcWindowTypes {
-enum gcwinid {
+    enum gcwinid {
         None = 0,
         Aerolab = 1,
         AllPlot = 2,
-        CriticalPower =3,
-        Diary =4,
-        GoogleMap =5,
-        Histogram =6,
-        LTM =7,
-        Model =8, // deprecated
-        PerformanceManager =9,
-        PfPv =10,
-        Race =11, // deprecated
-        RideEditor =13, // deprecated - include in MetadataWindow (23)
-        RideSummary =14,
-        Scatter =15,
-        Summary =16,
-        Train =17,
-        TreeMap =18,
-        WeeklySummary =19,
-        HrPw =20,
-        VideoPlayer =21,
-        DialWindow =22,
+        CriticalPower = 3,
+        Diary = 4,
+        GoogleMap = 5,
+        Histogram = 6,
+        LTM = 7,
+        Model = 8, // deprecated
+        PerformanceManager = 9,
+        PfPv = 10,
+        Race = 11, // deprecated
+        RideEditor = 13, // deprecated - include in MetadataWindow (23)
+        RideSummary = 14,
+        Scatter = 15,
+        Summary = 16,
+        Train = 17,
+        TreeMap = 18,
+        WeeklySummary = 19,
+        HrPw = 20,
+        VideoPlayer = 21,
+        DialWindow = 22,
         MetadataWindow = 23,
         RealtimePlot = 24,
         WorkoutPlot = 25,
@@ -71,15 +71,15 @@ enum gcwinid {
         Overview = 42,
         Python = 43,
         PythonSeason = 44,
-        UserTrends=45,
-        UserAnalysis=46,
-        OverviewTrends=47,
+        UserTrends = 45,
+        UserAnalysis = 46,
+        OverviewTrends = 47,
         LiveMapWebPageWindow = 48,
-        OverviewAnalysisBlank=49,
-        OverviewTrendsBlank=50
-
-};
-};
+        OverviewAnalysisBlank = 49,
+        OverviewTrendsBlank = 50,
+        SimulatedRidersNestStats = 51
+    };
+}
 typedef enum GcWindowTypes::gcwinid GcWinID;
 Q_DECLARE_METATYPE(GcWinID)
 

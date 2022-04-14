@@ -51,6 +51,7 @@
 
 #include "PhysicsUtility.h"
 #include "BicycleSim.h"
+#include "SimRiderEngines.h"
 
 
 // Status settings
@@ -124,6 +125,8 @@ class TrainSidebar : public GcWindow
         int wattsTelemetry; // Power (and AltPower)
         int rpmTelemetry;   // Cadence
         int kphTelemetry;   // Speed (and Distance)
+
+        SimRiderEngines simRiderEngine; // Simulated Riders engine
 
         RemoteControl *remote;      // remote control settings
         int currentStatus() {return status;}
@@ -317,6 +320,7 @@ class TrainSidebar : public GcWindow
         QSharedPointer<QFileSystemWatcher> watcher;
         bool calibrating;
         double wbalr, wbal;
+
 };
 
 class MultiDeviceDialog : public QDialog

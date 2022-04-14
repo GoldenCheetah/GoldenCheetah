@@ -25,6 +25,7 @@
 #include "CompareInterval.h" // what intervals are being compared?
 #include "CompareDateRange.h" // what intervals are being compared?
 #include "RideFile.h"
+#include "SimRiderStateData.h"  // SimRider Data 
 
 #ifdef GC_HAS_CLOUD_DB
 #include "CloudDBChart.h"
@@ -209,6 +210,9 @@ class Context : public QObject
         void notifyStop() { emit stop(); }
         void notifySeek(long x) { emit seek(x); }
 
+        //SimRider data
+        void notifySimRiderStateUpdate(SimRiderStateData &srData) { emit SimRiderStateUpdate(srData); }
+
         // date range selection
         void notifyDateRangeChanged(DateRange x) { dr_=x; emit dateRangeSelected(x); }
         void notifyWorkoutsChanged() { emit workoutsChanged(); }
@@ -325,6 +329,9 @@ class Context : public QObject
         void unpause();
         void pause();
         void stop();
+
+        // SimRider
+        void SimRiderStateUpdate(SimRiderStateData srData);
 
         // R messages
         void rMessage(QString);
