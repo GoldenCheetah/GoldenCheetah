@@ -793,15 +793,18 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
 
         case CHANNEL_TYPE_CORETEMP:
         {
-            value = antMessage.coreTemp;
-            value2 = antMessage.skinTemp;
+            // Quality alternates messages so will need to remember last quality message
+            // only use core temp if data is 'good' or better (just use >0 for now)
+            if ( antMessage.coreTemp > 0 )
+            {
+                value = antMessage.coreTemp;
+                value2 = antMessage.skinTemp;
 
-            // Store in XDATA
-            emit tcoreData(antMessage.coreTemp, antMessage.skinTemp, antMessage.tempQual);
-
-            //Forward to telemetry, only show core temp if data is 'good'
-            //if (antMessage.tempQual>=2) //Quality is a separate page so need to merge to use
-            parent->setCoreTemp(antMessage.coreTemp);
+                // Store in XDATA
+                emit tcoreData(antMessage.coreTemp, antMessage.skinTemp, antMessage.tempQual);
+                // and forward to telemetry
+                parent->setCoreTemp(antMessage.coreTemp);
+            }
         }
         break;
 
