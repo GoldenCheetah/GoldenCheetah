@@ -1350,6 +1350,7 @@ void RideFile::updateAvg(RideFilePoint* point)
     totalPoint->rcad += point->rcad;
     totalPoint->rcontact += point->rcontact;
     totalPoint->gear += point->gear;
+    totalPoint->tcore += point->tcore;
 
     ++totalCount;
     if (point->temp != NA) ++totalTemp;
@@ -1391,6 +1392,7 @@ void RideFile::updateAvg(RideFilePoint* point)
     avgPoint->rcad = totalPoint->rcad/totalCount;
     avgPoint->rcontact = totalPoint->rcontact/totalCount;
     avgPoint->gear = totalPoint->gear/totalCount;
+    avgPoint->tcore = totalPoint->tcore/totalCount;
 }
 
 void RideFile::appendPoint(double secs, double cad, double hr, double km,
