@@ -65,7 +65,7 @@ void RealtimeData::setAltDistance(double x)
     this->altDistance = x;
 }
 
-void RealtimeData::setTemp(double core)
+void RealtimeData::setCoreTemp(double core)
 {
     this->coreTemp=core;
 }

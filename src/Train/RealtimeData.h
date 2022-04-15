@@ -93,7 +93,7 @@ public:
     void setLatitude(double);
     void setLongitude(double);
     void setAltitude(double);
-    void setTemp(double);
+    void setCoreTemp(double);
     const char *getName() const;
 
     // new muscle oxygen stuff

@@ -1349,7 +1349,7 @@ void TrainSidebar::Start()       // when start button is pressed
                 // CSV File header
 
                 QTextStream recordFileStream(recordFile);
-                recordFileStream << "secs, cad, hr, km, kph, nm, watts, alt, lon, lat, headwind, slope, temp, interval, lrbalance, lte, rte, lps, rps, smo2, thb, o2hb, hhb,tcore, target\n";
+                recordFileStream << "secs, cad, hr, km, kph, nm, watts, alt, lon, lat, headwind, slope, temp, interval, lrbalance, lte, rte, lps, rps, smo2, thb, o2hb, hhb, target\n";
 
                 disk_timer->start(SAMPLERATE);  // start screen
             }
@@ -1781,8 +1781,8 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
                     rtData.setTv(local.getTv());
                     rtData.setFeO2(local.getFeO2());
                 }
-
-                rtData.setTemp(local.getCoreTemp());
+                
+                rtData.setCoreTemp(local.getCoreTemp());
                 
                 // what are we getting from this one?
                 if (dev == bpmTelemetry) rtData.setHr(local.getHr());
@@ -2003,7 +2003,7 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
             displayLatitude = rtData.getLatitude();
             displayLongitude = rtData.getLongitude();
             displayAltitude = rtData.getAltitude();
-	        displayCoreTemp = rtData.getCoreTemp();
+                displayCoreTemp = rtData.getCoreTemp();
 
             double weightKG = context->athlete->getWeight(QDate::currentDate()) + 10; // 10kg bike
             double vs = computeInstantSpeed(weightKG, rtData.getSlope(), rtData.getAltitude(), rtData.getWatts());
@@ -2129,7 +2129,7 @@ void TrainSidebar::diskUpdate()
     if (secs <= lastRecordSecs) return; // Avoid duplicates
     lastRecordSecs = secs;
 
-    // GoldenCheetah CVS Format "secs, cad, hr, km, kph, nm, watts, alt, lon, lat, headwind, slope, temp, interval, lrbalance, lte, rte, lps, rps, smo2, thb, o2hb, hhb,tcore\n";
+    // GoldenCheetah CVS Format "secs, cad, hr, km, kph, nm, watts, alt, lon, lat, headwind, slope, temp, interval, lrbalance, lte, rte, lps, rps, smo2, thb, o2hb, hhb\n";
 
     recordFileStream    << secs
                         << "," << displayCadence
@@ -2152,7 +2152,7 @@ void TrainSidebar::diskUpdate()
 
     recordFileStream    << "," // headwind
                         << "," // slope
-                        << "," // << displayCoreTemp // temp
+                        << "," // temp
                         << "," << displayWorkoutLap
                         << "," << displayLRBalance
                         << "," << displayLTE
