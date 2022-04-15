@@ -233,11 +233,9 @@ void ANT::setHb(double smo2, double thb)
     telemetry.setHb(smo2, thb);
 }
 
-void ANT::setCoreTemp(double core, double skin, int quality)
+void ANT::setCoreTemp(double core)
 {
-    //Only keep and store core temp, only interested if data is 'good'
-    if (quality>=2)
-        telemetry.setTemp(core);
+    telemetry.setTemp(core);
 }
 
 /*======================================================================

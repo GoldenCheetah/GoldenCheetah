@@ -1486,7 +1486,7 @@ void TrainSidebar::Stop(int deviceStatus)        // when stop button is pressed
         rrMutex.unlock();
         vo2Mutex.unlock();
 
-	// close tcoreFile
+        // close tcoreFile
         if (tcoreFile) {
             fprintf(stderr, "Closing tcore file\n"); fflush(stderr);
             tcoreFile->close();

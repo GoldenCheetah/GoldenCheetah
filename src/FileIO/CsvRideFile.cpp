@@ -700,6 +700,7 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                     //UNUSED hhb = line.section(',', 22, 22).toDouble();
                     tcore = line.section(',', 23, 23).toDouble();
                     target = line.section(',', 24, 24).toInt();
+
                 } else if (csvType == peripedal) {
 
                     //mm-dd,hh:mm:ss,SmO2 Live,SmO2 Averaged,THb,Target Power,Heart Rate,Speed,Power,Cadence
