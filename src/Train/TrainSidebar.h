@@ -211,6 +211,8 @@ class TrainSidebar : public GcWindow
         // HRV R-R data being saved away
         void rrData(uint16_t  rrtime, uint8_t heartrateBeats, uint8_t instantHeartrate);
 
+        void tcoreData(float  core, float skin, int qual);
+
         // VO2 measurement data to save
         void vo2Data(double rf, double rmv, double vo2, double vco2, double tv, double feo2);
 
@@ -278,6 +280,7 @@ class TrainSidebar : public GcWindow
         QFile *rrFile;          // r-r records, if any received.
         QMutex vo2Mutex;         // to coordinate async recording from ANT+ thread
         QFile *vo2File;         // vo2 records, if any received.
+        QFile *tcoreFile;       // body temp records
 
         // ErgFile wrapper to support stateful location queries.
         ErgFileQueryAdapter        ergFileQueryAdapter;

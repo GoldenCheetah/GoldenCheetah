@@ -426,6 +426,8 @@ signals:
     // made a special case to support HRV tool without complication
     void rrData(uint16_t  rrtime, uint8_t heartrateBeats, uint8_t instantHeartrate);
 
+    void tcoreData(float core, float skin, int qual);
+    
     // signal for passing remote control commands
     void antRemoteControl(uint16_t command);
 
@@ -634,7 +636,7 @@ public:
     }
     void setHb(double smo2, double thb);
 
-    void setCoreTemp(double core, double skin, int quality);
+    void setCoreTemp(double core);
 
     void setLRBalance (double lrbalance) {
         telemetry.setLRBalance(lrbalance);

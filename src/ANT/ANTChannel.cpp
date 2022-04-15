@@ -793,13 +793,15 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
 
         case CHANNEL_TYPE_CORETEMP:
         {
-            float core = antMessage.coreTemp;
-            float skin = antMessage.skinTemp;
-            int   qual = antMessage.tempQual;
-
             value = antMessage.coreTemp;
             value2 = antMessage.skinTemp;
-            parent->setCoreTemp(core, skin, qual);
+
+            // Store in XDATA
+            emit tcoreData(antMessage.coreTemp, antMessage.skinTemp, antMessage.tempQual);
+
+            //Forward to telemetry, only show core temp if data is 'good'
+            //if (antMessage.tempQual>=2) //Quality is a separate page so need to merge to use
+            parent->setCoreTemp(antMessage.coreTemp);
         }
         break;
 
