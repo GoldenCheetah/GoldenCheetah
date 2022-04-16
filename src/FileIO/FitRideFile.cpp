@@ -3998,11 +3998,12 @@ RideFile *FitFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
 
 // ******************************
 
-void write_string(QByteArray *array, char *str, int len)
+//Zero pad string to length of field (len)
+void write_string(QByteArray *array, const char *str, int len)
 {
     char buffer[len];
     memset(buffer,0,len);
-    strcpy(buffer,str);
+    strncpy(buffer,str,len);
     array->append(buffer,len);
 }
 
@@ -4559,7 +4560,7 @@ void write_record(QByteArray *array, const RideFile *ride, bool withAlt, bool wi
         }
         if ( (type&2)==2 ) {
             // write right power contribution
-            write_int8(ridePoint, 80 + (100-point->lrbalance));
+            write_int8(ridePoint, 0x80 + (100-point->lrbalance));
         }
         if ( (type&4)==4 ) {
             write_float32(ridePoint, point->tcore, true);
