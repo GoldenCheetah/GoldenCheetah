@@ -4001,10 +4001,9 @@ RideFile *FitFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
 //Zero pad string to length of field (len)
 void write_string(QByteArray *array, const char *str, int len)
 {
-    char buffer[len];
-    memset(buffer,0,len);
-    strncpy(buffer,str,len);
-    array->append(buffer,len);
+    int slen = strlen(str);
+    array->append(str, slen);
+    array->append(len-slen, 0);
 }
 
 void write_int8(QByteArray *array, fit_value_t value) {
