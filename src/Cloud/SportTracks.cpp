@@ -338,7 +338,7 @@ SportTracks::readFileCompleted()
         }
 
         // location => route
-        if (!ride["name"].isNull()) ret->setTag("Objectives", ride["name"].toString());
+        if (!ride["name"].isNull()) ret->setTag("Objective", ride["name"].toString());
         if (!ride["notes"].isNull()) ret->setTag("Notes", ride["notes"].toString());
         if (!ride["location_name"].isNull()) ret->setTag("Route", ride["location_name"].toString());
 
