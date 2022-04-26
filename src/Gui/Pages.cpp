@@ -2753,17 +2753,20 @@ ProcessorPage::ProcessorPage(Context *context) : context(context)
         // Auto or Manual run?
         QComboBox *comboButton = new QComboBox(this);
         comboButton->addItem(tr("Manual"));
-        comboButton->addItem(tr("Import"));
-        comboButton->addItem(tr("Save"));
+        comboButton->addItem(tr("Save")); 
+        // The Python data processors only work correctly on manual & save.
+        // Save is executed at the end of auto import process, so has equivalent functionality as "Import"
+        if (i.value()->isCoreProcessor()) comboButton->addItem(tr("Import"));
+
         processorTree->setItemWidget(add, 1, comboButton);
 
         QString configsetting = QString("dp/%1/apply").arg(i.key());
         if (appsettings->value(NULL, GC_QSETTINGS_GLOBAL_GENERAL+configsetting, "Manual").toString() == "Manual")
             comboButton->setCurrentIndex(0);
         else if (appsettings->value(NULL, GC_QSETTINGS_GLOBAL_GENERAL+configsetting, "Save").toString() == "Save")
-            comboButton->setCurrentIndex(2);
-        else
             comboButton->setCurrentIndex(1);
+        else
+            comboButton->setCurrentIndex(2); // auto import
 
         // Get and Set the Config Widget
         DataProcessorConfig *config = i.value()->processorConfig(this);
@@ -2791,8 +2794,8 @@ ProcessorPage::saveClicked()
         switch(((QComboBox*)(processorTree->itemWidget(processorTree->invisibleRootItem()->child(i), 1)))->currentIndex())  {
             default:
             case 0: apply = "Manual"; break;
-            case 1: apply = "Auto"; break;
-            case 2: apply = "Save"; break;
+            case 1: apply = "Save"; break;
+            case 2: apply = "Auto"; break;
         }
 
         appsettings->setValue(GC_QSETTINGS_GLOBAL_GENERAL+configsetting, apply);
