@@ -23,7 +23,7 @@ bool FixPyDataProcessor::postProcess(RideFile *rideFile, DataProcessorConfig *se
 
     QString errText;
     bool useNewThread = op != "PYTHON";
-    Context* context = (op != "DELETE" && rideFile) ? rideFile->context : nullptr;
+    Context* context = (rideFile) ? rideFile->context : nullptr;
     FixPyRunner pyRunner(context, rideFile, useNewThread);
     return pyRunner.run(pyScript->source, pyScript->iniKey, errText) == 0;
 }
