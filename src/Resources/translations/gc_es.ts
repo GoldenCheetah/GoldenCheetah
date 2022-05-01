@@ -10581,7 +10581,7 @@ le sugerirá los posibles nombres
 This process will populate distance information (and override existing distance information if present.)The cubic splines processing estimates distance across polynomial curve, otherwise this feature will compute geometric arc distance between ride points.
 
 </source>
-        <translation>Derivar distancia en base a datos de posicionamiento GNSS
+        <translation>Deriva distancia en base a datos de posicionamiento GNSS
 
 Este proceso creará la serie distancia reemplazando la información si ya existe
 La aproximación mediante splines cúbicos estima la distancia utilizando curvas polinomiales. En caso contrario, el cálculo se realiza utilizando la línea poligonal entre puntos sucesivos.
@@ -10607,7 +10607,7 @@ La aproximación mediante splines cúbicos estima la distancia utilizando curvas
     <message>
         <location filename="../../FileIO/FixDeriveHeadwind.cpp" line="60"/>
         <source>Use weather broadcasted data in FIT file to derive Headwind.</source>
-        <translation>Usar datos climáticos en el archivo FIT para derivar viento en contra.</translation>
+        <translation>Usa datos climáticos en el archivo FIT para derivar viento en contra.</translation>
     </message>
 </context>
 <context>
@@ -10667,7 +10667,7 @@ Warning: the accuracy of power estimation can be too low to be of practical use 
         <translation>Estima la potencia en base a velocidad/elevación/peso etc.
 
   - El peso de la bicicleta se agrega al peso del atleta (que debería incluir ropa, calzado, etc.) para conformar la masa total.
-  - Crr es el coeficiente de resistencia a la rodadura, que depende de los neumáticos, la presión a la que estén hinchadas, la temperatura y la superficie del terreno. Pueden consultarse valores para diferentes neumáticos en https://www.bicyclerollingresistance.com/
+  - Crr es el coeficiente de resistencia a la rodadura, que depende de los neumáticos, la presión a la que estén hinchados, la temperatura y la superficie del terreno. Pueden consultarse valores para diferentes neumáticos en https://www.bicyclerollingresistance.com/.
   - CdA es el producto del coeficiente aerodinámico y el área frontal efectiva en m^2, que depende de la posición sobre la bicicleta y el equipamiento. Si vale 0 se estima de las medidas del atleta.
   - El coeficiente de draft (rebufo) es un factor multiplicativo para ajustar por drafting (rebufo, ir a rueda); 1 es no drafting  y 0.7 un valor razonable para ir en pelotón.
   - La velocidad del viento debe indicarse en km/h.
@@ -11347,7 +11347,7 @@ Note: when the file already contains wind data, it will be overridden if wind sp
 The activity has to be a Run with Speed and Altitude.</source>
         <translation>Estima la potencia de carrera a partir de datos de velocidad/altitud/peso, etc. usando los coeficientes de di Prampero
 
-  - El parámetro peso adicional se suma al peso del atleta para conformar la masa total, debería incluir ropa, zapatillas, etc.
+  - El parámetro de peso adicional se suma al peso del atleta para conformar la masa total y debería incluir ropa, zapatillas, etc.
   - El parámetro coeficiente de draft es un multiplicador para ajustar la resistencia aerodinámica por rebufo, 1 es no drafting y 0.9 un valor razonable cuando se corre en grupo
   - La velocidad del viento se expresa en km/h
   - La dirección del viento (origen) en grados, de -179 a +180 (-90=O, 0=N, 90=E, 180=S)
@@ -11567,7 +11567,7 @@ Esta función ofrece dos algoritmos para tratar los picos y anomalías en los da
 Torque Adjust - this defines an absolute value in poinds per square inch or newton meters to modify values by. Negative values are supported. (e.g. enter &quot;1.2 nm&quot; or &quot;-0.5 pi&quot;).</source>
         <translation>El ajuste de par permite corregir los valores de par cuando la calibración (puesta a cero) del medidor de potencia fue incorrecta. Utiliza un solo parámetro:
 
-  - &quot;Ajuste de par&quot;: define un valor fijo en lb·inch o N·m para aumar a los valores de par. Se pueden usar valores negativos.</translation>
+  - &quot;Ajuste de par&quot;: define un valor fijo en lb·in o N·m para sumar a los valores de par. Se pueden usar valores negativos.</translation>
     </message>
 </context>
 <context>
@@ -18949,12 +18949,12 @@ encendido y muestra &quot;PC-Link&quot;</translation>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="222"/>
         <source>athletes</source>
-        <translation>atletas</translation>
+        <translation>Atletas</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="225"/>
         <source>plan</source>
-        <translation>plan</translation>
+        <translation>Plan</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="225"/>
@@ -18966,37 +18966,37 @@ encendido y muestra &quot;PC-Link&quot;</translation>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="228"/>
         <source>trends</source>
-        <translation>tendencias</translation>
+        <translation>Tendencias</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="229"/>
         <source>activities</source>
-        <translation>actividades</translation>
+        <translation>Actividades</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="232"/>
         <source>reflect</source>
-        <translation>reflejar</translation>
+        <translation>Reflejar</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="235"/>
         <source>train</source>
-        <translation>entrenar</translation>
+        <translation>Entrenar</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="238"/>
         <source>apps</source>
-        <translation>apps</translation>
+        <translation>Apps</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="243"/>
         <source>sync</source>
-        <translation>sync</translation>
+        <translation>Sincronizar</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="245"/>
         <source>options</source>
-        <translation>opciones</translation>
+        <translation>Opciones</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="323"/>
@@ -29914,7 +29914,7 @@ preferencias de entrenamiento.</translation>
     <message>
         <location filename="../../Metrics/SpecialFields.cpp" line="30"/>
         <source>Recording Interval</source>
-        <translation>Intervalo de grabación</translation>
+        <translation>Intervalo de grabación (s)</translation>
     </message>
     <message>
         <location filename="../../Metrics/SpecialFields.cpp" line="31"/>
@@ -30029,7 +30029,7 @@ preferencias de entrenamiento.</translation>
     <message>
         <location filename="../../Metrics/SpecialFields.cpp" line="56"/>
         <source>Device Info</source>
-        <translation>Info de dispositivo</translation>
+        <translation>Detalles del dispositivo</translation>
     </message>
     <message>
         <location filename="../../Metrics/SpecialFields.cpp" line="57"/>
