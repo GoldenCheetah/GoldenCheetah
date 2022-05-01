@@ -580,7 +580,12 @@ PythonChart::setState(QString)
 void
 PythonChart::execScript(PythonChart *chart)
 {
-    python->runline(ScriptContext(chart->context), chart->script->toPlainText());
+    QString line = chart->script->toPlainText();
+
+    // replace $$ with chart identifier (to avoid shared data)
+    line = line.replace("$$", chart->console->chartid);
+
+    python->runline(ScriptContext(chart->context), line);
 }
 
 void
@@ -611,12 +616,7 @@ PythonChart::runScript()
         // set to defaults with gc applied
         python->cancelled = false;
 
-        QString line = script->toPlainText();
-
         try {
-
-            // replace $$ with chart identifier (to avoid shared data)
-            line = line.replace("$$", console->chartid);
 
             // run it
             QFutureWatcher<void>watcher;

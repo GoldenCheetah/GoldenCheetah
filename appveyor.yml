@@ -1,5 +1,5 @@
 version: ci.{build}
-image: Visual Studio 2019
+image: Previous Visual Studio 2019
 clone_depth: 1
 
 environment:
@@ -35,6 +35,10 @@ environment:
     secure: n6a8nJgqMyg+VsVeoIIR8TFzxyDFVi2w/ggetQk5agY=
   GC_RWGPS_API_KEY:
     secure: uUtCyF5ByZ1VYJOztUngIA==
+  GC_NOLIO_CLIENT_ID:
+    secure: /OFVjEBwU7o3SItIQVf/YlJ8XErxneXIT2N0JyPMSXR1tCbdZVWixMHpqKNWoNk4
+  GC_NOLIO_SECRET:
+    secure: mmMksvVnfBiXufBDn2gAhQY53n0J9BokSCtDY51uU918QJ/LL4XOojtJp5tMFn8T7ugyDhNASpqZXiK55vxSD53vm+tjufpfzppKEeh93Babvc/VrndLB1X/RZCRUQTR6rka05fYl4e0eBzP1H091A==
 
 init:
 # Setup QT 5.14 - 64Bit

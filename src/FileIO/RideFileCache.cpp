@@ -1807,7 +1807,7 @@ RideFileCache::RideFileCache(Context *context, QDate start, QDate end, bool filt
             if (context->isfiltered && !context->filters.contains(item->fileName)) continue;
             if (onhome && context->ishomefiltered && !context->homeFilters.contains(item->fileName)) continue;
             // skip other sports if rideItem is given
-            if (rideItem && ((rideItem->isRun != item->isRun) || (rideItem->isSwim != item->isSwim))) continue;
+            if (rideItem && (rideItem->sport != item->sport)) continue;
 
             // get its cached values (will NOT! refresh if needed...)
             // the true means it will check only

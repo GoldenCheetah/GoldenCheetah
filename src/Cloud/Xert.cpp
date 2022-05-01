@@ -437,6 +437,9 @@ Xert::readFileCompleted()
             if (!data["hr"].isNull())
                 add.hr = data["hr"].toInt();
 
+            if (!data["cad"].isNull())
+                add.cad = data["cad"].toDouble();
+
             if (!data["alt"].isNull())
                 add.alt = data["alt"].toDouble();
 

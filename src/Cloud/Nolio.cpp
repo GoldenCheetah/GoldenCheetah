@@ -99,7 +99,7 @@ bool Nolio::open(QStringList &errors){
     QNetworkRequest request(QUrl("https://www.nolio.io/api/token/"));
     request.setRawHeader("Content-Type", "application/x-www-form-urlencoded");
 
-    QString authheader = QString("%1:%2").arg(GC_NOLIO_CLIENT_ID).arg(GC_NOLIO_CLIENT_SECRET);
+    QString authheader = QString("%1:%2").arg(GC_NOLIO_CLIENT_ID).arg(GC_NOLIO_SECRET);
     request.setRawHeader("Authorization", "Basic " + authheader.toLatin1().toBase64());
 
     QString data = QString("grant_type=refresh_token&refresh_token=").append(refresh_token);
