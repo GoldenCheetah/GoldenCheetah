@@ -537,7 +537,7 @@ ErgFilePlot::setData(ErgFile *ergfile)
                 setAxisScale(xBottom, (double)0, maxX, step);
                 QwtText title;
                 title.setFont(stGiles);
-                title.setText("Distance " + ((GlobalContext::context()->useMetricUnits) ? tr("(Km)") : tr(" Mi")));
+                title.setText("Distance " + ((GlobalContext::context()->useMetricUnits) ? tr("(km)") : tr("(mi)")));
                 QwtPlot::setAxisFont(xBottom, stGiles);
                 QwtPlot::setAxisTitle(xBottom, title);
 
