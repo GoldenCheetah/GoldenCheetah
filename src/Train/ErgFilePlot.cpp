@@ -524,12 +524,11 @@ ErgFilePlot::setData(ErgFile *ergfile)
 
         // set the axis so we use all the screen estate
         if (context->currentErgFile() && context->currentErgFile()->Points.count()) {
-            double maxX = -1;
+            double maxX = (double)context->currentErgFile()->Points.last().x;
 
             if (bydist) {
                 double step = 5000;
-                if (GlobalContext::context()->useMetricUnits) maxX = (double)context->currentErgFile()->Points.last().x;
-                else maxX = (double)context->currentErgFile()->Points.last().x * MILES_PER_KM;
+                if (!GlobalContext::context()->useMetricUnits) maxX = (double)context->currentErgFile()->Points.last().x * MILES_PER_KM;
                 // tics every 5 kilometers/miles, if workout shorter tics every 1000m
                 if (maxX <= 1000) step = 100;
                 else if (maxX < 5000) step = 1000;
