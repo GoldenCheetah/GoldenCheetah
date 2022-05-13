@@ -19,6 +19,7 @@
 #include "ErgFilePlot.h"
 #include "WPrime.h"
 #include "Context.h"
+#include "Units.h"
 
 #include <unordered_map>
 
@@ -523,21 +524,21 @@ ErgFilePlot::setData(ErgFile *ergfile)
 
         // set the axis so we use all the screen estate
         if (context->currentErgFile() && context->currentErgFile()->Points.count()) {
-            double maxX = (double)context->currentErgFile()->Points.last().x;
+            double maxX = -1;
 
             if (bydist) {
-
-                // tics every 5 kilometer, if workout shorter tics every 1000m
                 double step = 5000;
+                if (GlobalContext::context()->useMetricUnits) maxX = (double)context->currentErgFile()->Points.last().x;
+                else maxX = (double)context->currentErgFile()->Points.last().x * MILES_PER_KM;
+                // tics every 5 kilometers/miles, if workout shorter tics every 1000m
                 if (maxX <= 1000) step = 100;
                 else if (maxX < 5000) step = 1000;
 
                 // axis setup for distance
                 setAxisScale(xBottom, (double)0, maxX, step);
-
                 QwtText title;
                 title.setFont(stGiles);
-                title.setText("Distance (km)");
+                title.setText("Distance " + ((GlobalContext::context()->useMetricUnits) ? tr("(Km)") : tr(" Mi")));
                 QwtPlot::setAxisFont(xBottom, stGiles);
                 QwtPlot::setAxisTitle(xBottom, title);
 
@@ -619,8 +620,9 @@ ErgFilePlot::performancePlot(RealtimeData rtdata)
     if ((!context->isRunning) || (context->isPaused)) return;
 
     // we got some data
-    // x is plotted in meters or micro-seconds
-    double x = bydist ? (rtdata.getDistance() * 1000) : rtdata.getMsecs();
+    double feetOrMeters = (GlobalContext::context()->useMetricUnits) ? rtdata.getDistance() * 1000 : rtdata.getDistance() * 1000 * FEET_PER_METER;
+    // x is plotted in meters/feet or micro-seconds
+    double x = bydist ? feetOrMeters : rtdata.getMsecs();
 
     // when not using a workout we need to extend the axis when we
     // go out of bounds -- we do not use autoscale for x, because we
