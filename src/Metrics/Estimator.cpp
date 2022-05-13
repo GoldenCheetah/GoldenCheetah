@@ -232,7 +232,7 @@ Estimator::run()
     // from has first ride with Power data / looking at the next 7 days of data with Power
     // calculate Estimates for all data per week including the week of the last Power recording
     QDate date = from;
-    while (date < to) {
+    while (date <= to) {
 
         // check if we've been asked to stop
         if (abort == true) {
