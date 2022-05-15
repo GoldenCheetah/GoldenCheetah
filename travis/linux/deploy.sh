@@ -1,6 +1,9 @@
 #!/bin/sh
 
 ### This script should be run from GoldenCheetah root directory after build
+
+export PATH=/opt/qt514/bin:$PATH
+
 if [ ! -x src/GoldenCheetah ]
 then echo "Build GoldenCheetah and execute from distribution root"; exit 1
 fi
@@ -41,9 +44,13 @@ chmod a+x linuxdeployqt-continuous-x86_64.AppImage
 rm linuxdeployqt-continuous-x86_64.AppImage
 rm -rf appdir
 
+
+export FINAL_NAME=GoldenCheetah_v3.6-DEV_x64.AppImage
+mv GoldenCheetah*.AppImage $FINAL_NAME
+
 ### Minimum Test - Result is ./GoldenCheetah-x86_64.AppImage
-if [ ! -x ./GoldenCheetah-x86_64.AppImage ]
+if [ ! -x ./$FINAL_NAME ]
 then echo "AppImage not generated, check the errors"; exit 1
 fi
-./GoldenCheetah-x86_64.AppImage --version
+./$FINAL_NAME --version
 exit
