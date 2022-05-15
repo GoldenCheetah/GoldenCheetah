@@ -180,10 +180,10 @@ after_build:
 - copy ..\Resources\win32\gc.ico
 
 # Installer script
-- copy ..\Resources\win32\GC3.6-Dev-Master-W64-QT5.14.2.nsi
+- copy ..\Resources\win32\GC3.6-Dev-Master-W64-QT5.nsi
 
 # Build the installer
-- makensis GC3.6-Dev-Master-W64-QT5.14.2.nsi
+- makensis GC3.6-Dev-Master-W64-QT5.nsi
 - move GoldenCheetah_v3.6-DEV_64bit_Windows.exe ..\..\GoldenCheetah_v3.6-DEV_x64.exe
 - cd ..\..
 - ps: Set-AppveyorBuildVariable -Name 'PUBLISH_BINARIES' -Value false
