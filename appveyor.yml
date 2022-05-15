@@ -1,5 +1,5 @@
 version: ci.{build}
-image: Previous Visual Studio 2019
+image: Visual Studio 2019
 clone_depth: 1
 
 environment:
@@ -41,8 +41,8 @@ environment:
     secure: mmMksvVnfBiXufBDn2gAhQY53n0J9BokSCtDY51uU918QJ/LL4XOojtJp5tMFn8T7ugyDhNASpqZXiK55vxSD53vm+tjufpfzppKEeh93Babvc/VrndLB1X/RZCRUQTR6rka05fYl4e0eBzP1H091A==
 
 init:
-# Setup QT 5.14 - 64Bit
-- set QTDIR=C:\Qt\5.14\msvc2017_64
+# Setup QT 5.15 - 64Bit
+- set QTDIR=C:\Qt\5.15\msvc2019_64
 - set PATH=%QTDIR%\bin;%PATH%
 - qmake --version
 
@@ -80,7 +80,9 @@ install:
 # Get R and add to config
 - ps: >-
     if (-not (Test-Path 'C:\R')) {
-      $rurl = $(ConvertFrom-JSON $(Invoke-WebRequest https://rversions.r-pkg.org/r-release-win).Content).URL
+      # Lets use 4.1 until 4.2 issues are fixed
+      #$rurl = $(ConvertFrom-JSON $(Invoke-WebRequest https://rversions.r-pkg.org/r-release-win).Content).URL
+      $rurl = "https://cran.r-project.org/bin/windows/base/old/4.1.3/R-4.1.3-win.exe"
       Start-FileDownload $rurl "R-win.exe"
       Start-Process -FilePath .\R-win.exe -ArgumentList "/VERYSILENT /DIR=C:\R" -NoNewWindow -Wait
     }
