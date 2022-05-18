@@ -17,7 +17,7 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#include "BatchExportDialog.h"
+#include "BatchDialog.h"
 #include "MainWindow.h"
 #include "Context.h"
 #include "Athlete.h"
@@ -26,13 +26,13 @@
 #include "HelpWhatsThis.h"
 #include "CsvRideFile.h"
 
-BatchExportDialog::BatchExportDialog(Context *context) : QDialog(context->mainWindow), context(context)
+BatchProcessingDialog::BatchProcessingDialog(Context *context) : QDialog(context->mainWindow), context(context)
 {
     setAttribute(Qt::WA_DeleteOnClose);
     //setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint); // must stop using this flag!
     setWindowTitle(tr("Activity Batch Export"));
     HelpWhatsThis *help = new HelpWhatsThis(this);
-    this->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::MenuBar_Activity_BatchExport));
+    this->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::MenuBar_Activity_BatchProcessing));
 
     // make the dialog a resonable size
     setMinimumWidth(550 *dpiXFactor);
@@ -144,7 +144,7 @@ BatchExportDialog::BatchExportDialog(Context *context) : QDialog(context->mainWi
 }
 
 void
-BatchExportDialog::selectClicked()
+BatchProcessingDialog::selectClicked()
 {
     QString before = dirName->text();
     QString dir = QFileDialog::getExistingDirectory(this, tr("Select Target Directory"),
@@ -158,7 +158,7 @@ BatchExportDialog::selectClicked()
 }
 
 void
-BatchExportDialog::allClicked()
+BatchProcessingDialog::allClicked()
 {
     // set/uncheck all rides according to the "all"
     bool checked = all->isChecked();
@@ -170,7 +170,7 @@ BatchExportDialog::allClicked()
 }
 
 void
-BatchExportDialog::okClicked()
+BatchProcessingDialog::okClicked()
 {
     if (ok->text() == "Export" || ok->text() == tr("Export")) {
         aborted = false;
@@ -194,13 +194,13 @@ BatchExportDialog::okClicked()
 }
 
 void
-BatchExportDialog::cancelClicked()
+BatchProcessingDialog::cancelClicked()
 {
     reject();
 }
 
 void
-BatchExportDialog::exportFiles()
+BatchProcessingDialog::exportFiles()
 {
     // what format to export as?
     QString type = format->currentIndex() > 0 ? RideFileFactory::instance().writeSuffixes().at(format->currentIndex()-1) : "csv";

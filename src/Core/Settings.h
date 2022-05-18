@@ -117,8 +117,8 @@
 #define GC_LAST_DOWNLOAD_PORT           "<system>mainwindow/lastDownloadPort"
 
 // batch export last options
-#define GC_BE_LASTDIR                   "<system>batchexport/lastdir"
-#define GC_BE_LASTFMT                   "<system>batchexport/lastfmt"
+#define GC_BE_LASTDIR                   "<system>batchprocessing/lastdir"
+#define GC_BE_LASTFMT                   "<system>batchprocessing/lastfmt"
 // Fonts
 #define GC_FONT_DEFAULT                 "<system>font/default"
 #define GC_FONT_CHARTLABELS             "<system>font/chartlabels"

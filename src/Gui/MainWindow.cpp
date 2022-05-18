@@ -66,7 +66,7 @@
 #include "SplitActivityWizard.h"
 #include "MergeActivityWizard.h"
 #include "GenerateHeatMapDialog.h"
-#include "BatchExportDialog.h"
+#include "BatchProcessingDialog.h"
 #include "TodaysPlan.h"
 #include "MeasuresDownload.h"
 #include "WorkoutWizard.h"
@@ -505,7 +505,7 @@ MainWindow::MainWindow(const QDir &home)
     rideMenu->addAction(tr("&Manual entry..."), this, SLOT(manualRide()), tr("Ctrl+M"));
     rideMenu->addSeparator ();
     rideMenu->addAction(tr("&Export..."), this, SLOT(exportRide()), tr("Ctrl+E"));
-    rideMenu->addAction(tr("&Batch export..."), this, SLOT(exportBatch()), tr("Ctrl+B"));
+    rideMenu->addAction(tr("&Batch Processing..."), this, SLOT(batchProcessing()), tr("Ctrl+B"));
 
     rideMenu->addSeparator ();
     rideMenu->addAction(tr("&Save activity"), this, SLOT(saveRide()), tr("Ctrl+S"));
@@ -1718,9 +1718,9 @@ MainWindow::manualRide()
 }
 
 void
-MainWindow::exportBatch()
+MainWindow::batchProcessing()
 {
-    BatchExportDialog *d = new BatchExportDialog(currentAthleteTab->context);
+    BatchProcessingDialog *d = new BatchProcessingDialog(currentAthleteTab->context);
     d->exec();
 }
 

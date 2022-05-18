@@ -17,8 +17,8 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#ifndef _BatchExportDialog_h
-#define _BatchExportDialog_h
+#ifndef _BatchProcessingDialog_h
+#define _BatchProcessingDialog_h
 #include "GoldenCheetah.h"
 #include "Context.h"
 #include "Settings.h"
@@ -40,14 +40,14 @@
 // Dialog class to show filenames, import progress and to capture user input
 // of ride date and time
 
-class BatchExportDialog : public QDialog
+class BatchProcessingDialog : public QDialog
 {
     Q_OBJECT
     G_OBJECT
 
 
 public:
-    BatchExportDialog(Context *context);
+    BatchProcessingDialog(Context *context);
 
     QTreeWidget *files; // choose files to export
 
@@ -78,5 +78,5 @@ private:
     int exports, fails;
     QLabel *status;
 };
-#endif // _BatchExportDialog_h
+#endif // _BatchProcessingDialog_h
 
