@@ -171,7 +171,7 @@ Estimator::run()
     printd("%s Estimates start.\n", isRun ? "Run" : "Bike");
 
     // this needs to be done once all the other metrics
-    // Calculate a *monthly* estimate of CP, W' etc using
+    // Calculate a *weekly* estimate of CP, W' etc using
     // bests data from the previous 6 weeks
     RollingBests bests(6);
     RollingBests bestsWPK(6);
@@ -181,8 +181,8 @@ Estimator::run()
     QList<Performance> perfs;
 
     // we do this by aggregating power data into bests
-    // for each month, and having a rolling set of 3 aggregates
-    // then aggregating those up into a rolling 3 month 'bests'
+    // for each week, and having a rolling set of 6 aggregates
+    // then aggregating those up into a rolling 6 weeks 'bests'
     // which we feed to the models to get the estimates for that
     // point in time based upon the available data
     QDate from, to;
@@ -229,9 +229,9 @@ Estimator::run()
     models << &wsmodel;
 #endif
 
-    // from has first ride with Power data / looking at the next 7 days of data with Power
+    // from starts a week having first ride with Power data / looking at the next 7 days of data with Power
     // calculate Estimates for all data per week including the week of the last Power recording
-    QDate date = from;
+    QDate date = from.addDays((1-from.dayOfWeek())); // Weeks start on monday in GC
     while (date <= to) {
 
         // check if we've been asked to stop
@@ -244,9 +244,9 @@ Estimator::run()
         QDate begin = date;
         QDate end = date.addDays(6);
 
-        printd("Model progress %d/%d\n", date.year(), date.month());
+        printd("Model progress %d/%d/%d\n", date.year(), date.month(), date.day());
 
-        // months is a rolling 3 months sets of bests
+        // bests is a rolling 6 weeks sets of bests
         QVector<float> wpk; // for getting the wpk values
 
         // include only rides or runs .............................................................vvvvv
