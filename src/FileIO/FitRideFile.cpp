@@ -555,9 +555,8 @@ struct FitFileReaderState
             return "Moxy Monitor";
         } else if (manu == 83) {
             // Scosche
-            if (prod == -1)
-                return "Scosche";
             switch (prod) {
+                case -1: return "Scosche";
                 case 3: return "Scosche Rythm+";
                 default: return QString("Scosche %1").arg(prod);
             }
@@ -580,18 +579,14 @@ struct FitFileReaderState
             }
         } else if (manu == 107) {
             // Magene
-            if (prod == -1)
-                return "Magene";
-
             switch(prod) {
-                  default: return QString("Magene %1").arg(prod);
+                case -1: return "Magene";
+                default: return QString("Magene %1").arg(prod);
             }
         } else if (manu == 108) {
             // Giant
-            if (prod == -1)
-                return "Giant";
-
             switch(prod) {
+                case -1: return "Giant";
                 case 21845 : return "Giant Power Pro";
                 default: return QString("Giant %1").arg(prod);
             }
@@ -743,7 +738,7 @@ struct FitFileReaderState
             case 253: // SECS
                 return RideFile::secs;
             default:
-                    return RideFile::none;
+                return RideFile::none;
         }
     }
 
@@ -787,7 +782,7 @@ struct FitFileReaderState
                 return "STRESS";
 
             default:
-                    return QString("FIELD_%1").arg(native_num);
+                return QString("FIELD_%1").arg(native_num);
         }
     }
 
@@ -813,15 +808,16 @@ struct FitFileReaderState
                 return 100.0;
 
             default:
-                    return 1.0;
+                return 1.0;
         }
     }
 
     int getOffsetForExtraNative(int native_num) {
         switch (native_num) {
-
+            case 0:
+                return 0;
             default:
-                    return 0;
+                return 0;
         }
     }
 
@@ -2331,7 +2327,6 @@ struct FitFileReaderState
         time_t time = 0;
         if (time_offset > 0)
             time = last_time + time_offset;
-        double km = 0;
 
         int length_type = 0;
         int swim_stroke = 0;
@@ -2753,6 +2748,26 @@ struct FitFileReaderState
 
     }
 
+    void decodeUserProfile(const FitDefinition &def, int time_offset,
+                      const std::vector<FitValue>& values) {
+        Q_UNUSED(time_offset);
+        int i = 0;
+        foreach(const FitField &field, def.fields) {
+            fit_value_t value = values[i++].v;
+
+            if( value == NA_VALUE )
+                continue;
+
+            switch (field.num) {
+                case 4:  // Weight
+                    active_session_["Weight"] = QString::number(value / 10.0 );
+                    rideFile->setTag("Weight", QString::number(value / 10.0 ));
+                    break;
+                default: ; // ignore it
+            }
+        }
+    }
+
 
     void decodeDeveloperID(const FitDefinition &def, int time_offset,
                           const std::vector<FitValue>& values) {
@@ -2953,6 +2968,7 @@ struct FitFileReaderState
             // read the rest of the header
             if (header_size == 14) read_uint16(false);
         } catch (TruncatedRead &e) {
+            Q_UNUSED(e)
             errors << "truncated file header";
             stop = true;
         }
@@ -3275,6 +3291,8 @@ struct FitFileReaderState
                 case 1: /* capabilities, device settings and timezone */ break;
                 case 2: decodeDeviceSettings(def, time_offset, values); break;
                 case 3: /* USER_PROFILE */
+                    decodeUserProfile(def, time_offset, values);
+                    break;
                 case 4: /* hrm profile */
                 case 5: /* sdm profile */
                 case 6: /* bike profile */
@@ -3417,6 +3435,7 @@ struct FitFileReaderState
                 }
             }
             catch (TruncatedRead &e) {
+                Q_UNUSED(e)
                 errors << "truncated file body";
                 //file.close();
                 //delete rideFile;
@@ -3436,6 +3455,7 @@ struct FitFileReaderState
                     (void) crc;
                 }
                 catch (TruncatedRead &e) {
+                    Q_UNUSED(e)
                     errors << "truncated file body";
                     return NULL;
                 }
@@ -3454,6 +3474,7 @@ struct FitFileReaderState
                                 }
                             }
                             catch (TruncatedRead &e) {
+                                Q_UNUSED(e)
                                 errors << "truncated second file body";
                             }
                         }
@@ -3463,6 +3484,7 @@ struct FitFileReaderState
                                 (void) crc;
                             }
                             catch (TruncatedRead &e) {
+                                Q_UNUSED(e)
                                 errors << "truncated file body";
                                 return NULL;
                             }
@@ -3470,6 +3492,7 @@ struct FitFileReaderState
                     }
                 }
                 catch (TruncatedRead &e) {
+                    Q_UNUSED(e)
                 }
 
             }
