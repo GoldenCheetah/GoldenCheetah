@@ -2722,7 +2722,7 @@ ProcessorPage::ProcessorPage(Context *context) : context(context)
     processorTree = new QTreeWidget;
     processorTree->headerItem()->setText(0, tr("Processor"));
     processorTree->headerItem()->setText(1, tr("Apply"));
-    processorTree->headerItem()->setText(2, tr("Settings"));
+    processorTree->headerItem()->setText(2, tr("Default Settings"));
     processorTree->headerItem()->setText(3, "Technical Name of Processor"); // add invisible Column with technical name
     processorTree->setColumnCount(4);
     processorTree->setSelectionMode(QAbstractItemView::NoSelection);
@@ -2739,41 +2739,56 @@ ProcessorPage::ProcessorPage(Context *context) : context(context)
     while (i.hasNext()) {
         i.next();
 
-        QTreeWidgetItem *add;
-
-        add = new QTreeWidgetItem(processorTree->invisibleRootItem());
-        add->setFlags(add->flags() & ~Qt::ItemIsEditable);
-
-        // Processor Name: it shows the localized name
-        add->setText(0, i.value()->name());
-        // Processer Key - for Settings
-        add->setText(3, i.key());
-
-        // Auto or Manual run?
-        QComboBox *comboButton = new QComboBox(this);
-        comboButton->addItem(tr("Manual"));
-        comboButton->addItem(tr("Import"));
-        comboButton->addItem(tr("Save"));
-        processorTree->setItemWidget(add, 1, comboButton);
-
-        QString configsetting = QString("dp/%1/apply").arg(i.key());
-        if (appsettings->value(NULL, GC_QSETTINGS_GLOBAL_GENERAL+configsetting, "Manual").toString() == "Manual")
-            comboButton->setCurrentIndex(0);
-        else if (appsettings->value(NULL, GC_QSETTINGS_GLOBAL_GENERAL+configsetting, "Save").toString() == "Save")
-            comboButton->setCurrentIndex(2);
-        else
-            comboButton->setCurrentIndex(1);
-
-        // Get and Set the Config Widget
-        DataProcessorConfig *config = i.value()->processorConfig(this);
-        config->readConfig();
-
-        processorTree->setItemWidget(add, 2, config);
-
+        // Place all the core data processors at the top of the list
+        if (i.value()->isCoreProcessor()) createProcessorEntry(i);
     }
+    i.toFront();
+    while (i.hasNext()) {
+        i.next();
+
+        // Place all the python data processors at the bottom of the list
+        // as they don't have any parameters to configure.
+        if (!i.value()->isCoreProcessor()) createProcessorEntry(i);
+    }
+
     processorTree->setColumnHidden(3, true);
 
     mainLayout->addWidget(processorTree, 0,0);
+}
+
+void
+ProcessorPage::createProcessorEntry(QMapIterator<QString, DataProcessor*>& i) {
+
+    QTreeWidgetItem* add;
+
+    add = new QTreeWidgetItem(processorTree->invisibleRootItem());
+    add->setFlags(add->flags() & ~Qt::ItemIsEditable);
+
+    // Processor Name: it shows the localized name
+    add->setText(0, i.value()->name());
+    // Processer Key - for Settings
+    add->setText(3, i.key());
+
+    // Auto or Manual run?
+    QComboBox* comboButton = new QComboBox(this);
+    comboButton->addItem(tr("Manual"));
+    comboButton->addItem(tr("Import"));
+    comboButton->addItem(tr("Save"));
+    processorTree->setItemWidget(add, 1, comboButton);
+
+    QString configsetting = QString("dp/%1/apply").arg(i.key());
+    if (appsettings->value(NULL, GC_QSETTINGS_GLOBAL_GENERAL + configsetting, "Manual").toString() == "Manual")
+        comboButton->setCurrentIndex(0);
+    else if (appsettings->value(NULL, GC_QSETTINGS_GLOBAL_GENERAL + configsetting, "Save").toString() == "Save")
+        comboButton->setCurrentIndex(2);
+    else
+        comboButton->setCurrentIndex(1);
+
+    // Get and Set the Config Widget
+    DataProcessorConfig* config = i.value()->processorConfig(this);
+    config->readConfig();
+
+    processorTree->setItemWidget(add, 2, config);
 }
 
 qint32
