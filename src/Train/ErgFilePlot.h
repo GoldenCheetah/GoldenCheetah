@@ -46,6 +46,7 @@
 #include <qwt_point_data.h>
 
 #define DEFAULT_TAU 450
+#define FEET_PER_MILE 5280
 
 class ErgFileData : public QwtPointArrayData
 {

@@ -19,6 +19,7 @@
 #include "ErgFilePlot.h"
 #include "WPrime.h"
 #include "Context.h"
+#include "Units.h"
 
 #include <unordered_map>
 
@@ -64,7 +65,11 @@ QRectF ErgFileData::boundingRect() const
 
 
 // Now bar
-double NowData::x(size_t) const { return context->getNow(); }
+double NowData::x(size_t) const { 
+    // convert 5280 (feet/mile) to a number between 0 and 1000 to be plotted correctly  
+    if (!GlobalContext::context()->useMetricUnits) return (context->getNow() * FEET_PER_METER * 1000) / FEET_PER_MILE;
+    else return context->getNow();
+}
 double NowData::y(size_t i) const {
     if (i) {
         if (context->currentErgFile()) return context->currentErgFile()->maxY;
@@ -514,7 +519,9 @@ ErgFilePlot::setData(ErgFile *ergfile)
             add->setLineStyle(QwtPlotMarker::VLine);
             add->setLinePen(QPen(GColor(CPLOTMARKER), 0, Qt::DashDotLine));
             add->setLabelAlignment(labelAlignment);
-            add->setValue(lap.x, 0);
+            // convert 5280 (feet/mile) to a number between 0 and 1000 to be plotted correctly 
+            double plotFeetOrMeters = (GlobalContext::context()->useMetricUnits) ? lap.x : (lap.x * FEET_PER_METER * 1000) / FEET_PER_MILE;
+            add->setValue(plotFeetOrMeters, 0);
             add->setLabel(text);
             add->attach(this);
 
@@ -526,18 +533,17 @@ ErgFilePlot::setData(ErgFile *ergfile)
             double maxX = (double)context->currentErgFile()->Points.last().x;
 
             if (bydist) {
-
-                // tics every 5 kilometer, if workout shorter tics every 1000m
+                if (!GlobalContext::context()->useMetricUnits) maxX = (double)context->currentErgFile()->Points.last().x * MILES_PER_KM;
                 double step = 5000;
+                // tics every 5 kilometers/miles, if workout shorter tics every 1000m
                 if (maxX <= 1000) step = 100;
                 else if (maxX < 5000) step = 1000;
 
                 // axis setup for distance
                 setAxisScale(xBottom, (double)0, maxX, step);
-
                 QwtText title;
                 title.setFont(stGiles);
-                title.setText("Distance (km)");
+                title.setText("Distance " + ((GlobalContext::context()->useMetricUnits) ? tr("(km)") : tr("(mi)")));
                 QwtPlot::setAxisFont(xBottom, stGiles);
                 QwtPlot::setAxisTitle(xBottom, title);
 
@@ -619,8 +625,10 @@ ErgFilePlot::performancePlot(RealtimeData rtdata)
     if ((!context->isRunning) || (context->isPaused)) return;
 
     // we got some data
-    // x is plotted in meters or micro-seconds
-    double x = bydist ? (rtdata.getDistance() * 1000) : rtdata.getMsecs();
+    // convert 5280 (feet/mile) to a number between 0 and 1000 to be plotted correctly 
+    double plotFeetOrMeters = (GlobalContext::context()->useMetricUnits) ? rtdata.getDistance() * 1000 : (rtdata.getDistance() * 1000 * FEET_PER_METER * 1000) / FEET_PER_MILE;
+    // x is plotted in meters/feet or micro-seconds
+    double x = bydist ? plotFeetOrMeters : rtdata.getMsecs();
 
     // when not using a workout we need to extend the axis when we
     // go out of bounds -- we do not use autoscale for x, because we
@@ -663,6 +671,7 @@ ErgFilePlot::performancePlot(RealtimeData rtdata)
 
     if (!hrData->count()) hrData->append(&zero, &hr, 1);
     hrData->append(&x, &hr, 1);
+    //qDebug() << "HR: " << x << ", " << hr << ", " << hrData->count();
     hrCurve->setSamples(hrData->x(), hrData->y(), hrData->count());
 
     if (!speedData->count()) speedData->append(&zero, &speed, 1);
