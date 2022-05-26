@@ -496,6 +496,7 @@ ErgFilePlot::setData(ErgFile *ergfile)
                 break;
             case LapRowDistributor::SimpleLap:
                 decoratedName = QString::number(lap.LapNum) + ":" + lap.name;
+                //qDebug() << "SimpleLap: " << decoratedName << " , x: " << lap.x/1000;
                 break;
             case LapRowDistributor::InternalRange:
                 decoratedName = "o";
@@ -519,9 +520,12 @@ ErgFilePlot::setData(ErgFile *ergfile)
             add->setLineStyle(QwtPlotMarker::VLine);
             add->setLinePen(QPen(GColor(CPLOTMARKER), 0, Qt::DashDotLine));
             add->setLabelAlignment(labelAlignment);
+            if (bydist == true) {
             // convert 5280 (feet/mile) to a number between 0 and 1000 to be plotted correctly 
-            double plotFeetOrMeters = (GlobalContext::context()->useMetricUnits) ? lap.x : (lap.x * FEET_PER_METER * 1000) / FEET_PER_MILE;
-            add->setValue(plotFeetOrMeters, 0);
+                double plotFeetOrMeters = (GlobalContext::context()->useMetricUnits) ? lap.x : (lap.x * FEET_PER_METER * 1000) / FEET_PER_MILE;
+                add->setValue(plotFeetOrMeters, 0);
+            }
+            else add->setValue(lap.x, 0);
             add->setLabel(text);
             add->attach(this);
 
