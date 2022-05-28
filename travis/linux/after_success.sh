@@ -82,6 +82,7 @@ fi
 
 echo "Renaming AppImage file to branch and build number ready for deploy"
 export FINAL_NAME=GoldenCheetah_v3.6-DEV_x64.AppImage
+[[ -f ./$FINAL_NAME ]] && rm $FINAL_NAME
 mv GoldenCheetah*.AppImage $FINAL_NAME
 ls -l $FINAL_NAME
 
