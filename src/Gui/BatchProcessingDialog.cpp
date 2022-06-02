@@ -82,9 +82,12 @@ CoreDpOptionsDialog::cancelDpEdits() {
     dialog->done(0);
 }
 
+#define bpABORT "Abort"
+#define bpFINISH "Finish"
+#define bpEXECUTE "Execute"
 
 BatchProcessingDialog::BatchProcessingDialog(Context* context) : QDialog(context->mainWindow), context(context),
-processed(0), fails(0), processedFiles(0) {
+processed(0), fails(0), numFilesToProcess(0) {
     setAttribute(Qt::WA_DeleteOnClose);
     setWindowTitle(tr("Activity Batch Processing"));
 
@@ -148,7 +151,7 @@ processed(0), fails(0), processedFiles(0) {
         add->setText(3, rideItem->dateTime.toString("hh:mm:ss"));
         add->setText(4, tr(""));
 
-        processedFiles++;
+        numFilesToProcess++;
     }
 
     //  --------------- Export menu items -----------------------
@@ -156,7 +159,7 @@ processed(0), fails(0), processedFiles(0) {
     QHBoxLayout* exportGrid1 = new QHBoxLayout;
     QHBoxLayout* exportGrid2 = new QHBoxLayout;
 
-    QCheckBox* exportRadioBox = new QCheckBox(tr("Export "), this);
+    QRadioButton* exportRadioBox = new QRadioButton(tr("Export "), this);
     radioGroup->addButton(exportRadioBox, int(BatchProcessingDialog::exportB));
 
     fileFormat = new QComboBox(this);
@@ -194,8 +197,8 @@ processed(0), fails(0), processedFiles(0) {
     QHBoxLayout* dpGrid = new QHBoxLayout;
     dpGrid->setContentsMargins(0, 0, 0, 0);
 
-    QCheckBox* dpRadioBox = new QCheckBox(tr("Run Core Data Processor "), this);
-    radioGroup->addButton(dpRadioBox, int(BatchProcessingDialog::dataB));
+    QRadioButton* dpRadioBox = new QRadioButton(tr("Run Core Data Processor "), this);
+    radioGroup->addButton(dpRadioBox, int(BatchProcessingDialog::dataProcessorB));
 
     dataProcessorToRun = new QComboBox(this);
 
@@ -213,9 +216,9 @@ processed(0), fails(0), processedFiles(0) {
 
     // If one or more Python Fixes Data Processors are available then provide
     // quick access to the python scripts editing window.
-    QPushButton* dpButton = new QPushButton(tr("Configure"), this);
+    QPushButton* dpEditParametersButton = new QPushButton(tr("Configure"), this);
     dpGrid->addSpacing(5);
-    dpGrid->addWidget(dpButton);
+    dpGrid->addWidget(dpEditParametersButton);
     dpGrid->addStretch();
 
     //  --------------- Python Data Processing menu items -----------------------
@@ -242,23 +245,23 @@ processed(0), fails(0), processedFiles(0) {
     QHBoxLayout* pyGrid = new QHBoxLayout;
     pyGrid->setContentsMargins(0, 0, 0, 0);
 
-    QCheckBox* pyRadioBox = new QCheckBox(tr("Run Python Data Processor "), this);
-    radioGroup->addButton(pyRadioBox, int(BatchProcessingDialog::pythonB));
+    QRadioButton* pyRadioBox = new QRadioButton(tr("Run Python Data Processor "), this);
+    radioGroup->addButton(pyRadioBox, int(BatchProcessingDialog::pythonProcessorB));
 
     pyGrid->addWidget(pyRadioBox);
     pyGrid->addWidget(pythonProcessorToRun);
 
     // If one or more Python Fixes Data Processors are available then provide
     // quick access to the python scripts editing window.
-    QPushButton* pyButton = new QPushButton(tr("Edit"), this);
+    QPushButton* pyEditParametersButton = new QPushButton(tr("Edit"), this);
     pyGrid->addSpacing(5);
-    pyGrid->addWidget(pyButton);
+    pyGrid->addWidget(pyEditParametersButton);
     pyGrid->addStretch();
 
     // If there are no Python Fixes defined then default the menu item
     if (!pythonFixesDefined) {
         pythonProcessorToRun->addItem(tr("None Defined"));
-        pyButton->setVisible(false);
+        pyEditParametersButton->setVisible(false);
         pyRadioBox->setCheckable(false);
         radioGroup->removeButton(pyRadioBox);
     }
@@ -267,53 +270,96 @@ processed(0), fails(0), processedFiles(0) {
     if (!embedPython) {
         pythonProcessorToRun->setVisible(false);
         pyRadioBox->setVisible(false);
-        pyButton->setVisible(false);
+        pyEditParametersButton->setVisible(false);
     }
 
 #endif
 
-    //  --------------- Meta Data Processing menu items -----------------------
+    //  --------------- Set Meta Data Processing menu items -----------------------
 
-    QHBoxLayout* metaGrid = new QHBoxLayout;
-    metaGrid->setContentsMargins(0, 0, 0, 0);
+    QHBoxLayout* setMetadataGrid = new QHBoxLayout;
+    setMetadataGrid->setContentsMargins(0, 0, 0, 0);
 
-    QCheckBox* metaRadioBox = new QCheckBox(tr("Run Metadata Processor"), this);
-    radioGroup->addButton(metaRadioBox, int(BatchProcessingDialog::metaB));
+    QRadioButton* setMetadataRadioBox = new QRadioButton(tr("Update Metadata"), this);
+    radioGroup->addButton(setMetadataRadioBox, int(BatchProcessingDialog::metadataSetB));
 
-    metaDataFieldToUpdate = new QComboBox(this);
-    metaDataProcessing = new QComboBox(this);
+    metadataFieldToSet = new QComboBox(this);
+    metadataEditField =  new QLineEdit(this);
 
     // now add the ride metadata fields -- should be the same generally
     foreach(FieldDefinition field, GlobalContext::context()->rideMetadata->getFields()) {
-        QString underscored = field.name;
-        if (!GlobalContext::context()->specialFields.isMetric(underscored)) {
 
-            // translate to internal name if name has non Latin1 characters
-            //underscored = GlobalContext::context()->specialFields.internalName(underscored);
-            //field.name = GlobalContext::context()->specialFields.internalName((field.name));
+        // Remove fundamental key fields from the editing capability, as batch editing these could be very destructive
+        if (field.name != "Start Time" && field.name != "Start Date" && field.name != "Data") {
 
-            metaDataFieldToUpdate->addItem(field.name);
-            metaDataProcessing->addItem(underscored);
-
-            //rt.lookupMap.insert(underscored.replace(" ", "_"), field.name);
-            //rt.lookupType.insert(underscored.replace(" ", "_"), (field.type > 2)); // true if is number
+            if (displayNametoRideMetric(field.name) == NULL) metadataFieldToSet->addItem(field.name);
         }
     }
 
-    QLabel* metaLabel = new QLabel(tr(" to "), this);
+    // Setup the type field to match the selected metadata field
+    updateMetadataTypeField();
 
-    metaGrid->addWidget(metaRadioBox);
-    metaGrid->addWidget(metaDataFieldToUpdate);
-    metaGrid->addWidget(metaLabel);
-    metaGrid->addWidget(metaDataProcessing);
-    metaGrid->addStretch();
+    setMetadataGrid->addWidget(setMetadataRadioBox);
+    setMetadataGrid->addWidget(metadataFieldToSet);
+    setMetadataGrid->addSpacing(5);
+    setMetadataGrid->addWidget(metadataEditField);
+    setMetadataGrid->addSpacing(5);
+
+    //  --------------- Set Metric Override menu items -----------------------
+
+    QHBoxLayout* setMetricOverrideGrid = new QHBoxLayout;
+    setMetricOverrideGrid->setContentsMargins(0, 0, 0, 0);
+
+    QRadioButton* setMetricRadioBox = new QRadioButton(tr("Set Metric Override"), this);
+    radioGroup->addButton(setMetricRadioBox, int(BatchProcessingDialog::metricSetB));
+
+    metricFieldToSet = new QComboBox(this);
+    metricDataEditField = new QLineEdit(this);
+
+    // now add the ride metadata fields -- should be the same generally
+    foreach(FieldDefinition field, GlobalContext::context()->rideMetadata->getFields()) {
+        if (displayNametoRideMetric(field.name)) metricFieldToSet->addItem(field.name);
+    }
+
+    metricUnitsLabel = new QLabel(tr(""), this);
+
+    // Setup the type field to match the selected metadata field
+    updateMetricDataTypeField();
+
+    setMetricOverrideGrid->addWidget(setMetricRadioBox);
+    setMetricOverrideGrid->addWidget(metricFieldToSet);
+    setMetricOverrideGrid->addSpacing(5);
+    setMetricOverrideGrid->addWidget(metricDataEditField);
+    setMetricOverrideGrid->addSpacing(5);
+    setMetricOverrideGrid->addWidget(metricUnitsLabel);
+    setMetricOverrideGrid->addStretch();
+
+    //  --------------- Clear Metric Override menu items -----------------------
+
+    QHBoxLayout* clearMetricOverrideGrid = new QHBoxLayout;
+    clearMetricOverrideGrid->setContentsMargins(0, 0, 0, 0);
+
+    QRadioButton* clearMetricOverrideRadioBox = new QRadioButton(tr("Clear Metric Override"), this);
+    radioGroup->addButton(clearMetricOverrideRadioBox, int(BatchProcessingDialog::metricClearB));
+
+    metricFieldToClear = new QComboBox(this);
+
+    // now add the ride metric fields
+    foreach(FieldDefinition field, GlobalContext::context()->rideMetadata->getFields()) {
+        if (displayNametoRideMetric(field.name)) metricFieldToClear->addItem(field.name);
+    }
+
+    clearMetricOverrideGrid->addWidget(clearMetricOverrideRadioBox);
+    clearMetricOverrideGrid->addWidget(metricFieldToClear);
+    clearMetricOverrideGrid->addStretch();
+    
 
     //  --------------- Delete menu items -----------------------
 
     QHBoxLayout* deleteGrid = new QHBoxLayout;
     deleteGrid->setContentsMargins(0, 0, 0, 0);
 
-    QCheckBox* deleteRadioBox = new QCheckBox(tr("Delete All Selected "), this);
+    QRadioButton* deleteRadioBox = new QRadioButton(tr("Delete All Selected Activities "), this);
     radioGroup->addButton(deleteRadioBox, int(BatchProcessingDialog::deleteB));
 
     deleteGrid->addWidget(deleteRadioBox);
@@ -328,7 +374,7 @@ processed(0), fails(0), processedFiles(0) {
     status = new QLabel("", this);
     //status->hide();
     cancel = new QPushButton(tr("Cancel"), this);
-    ok = new QPushButton(tr("Execute"), this);
+    ok = new QPushButton(tr(bpEXECUTE), this);
 
     buttons->addWidget(all);
     buttons->addWidget(status);
@@ -348,7 +394,9 @@ processed(0), fails(0), processedFiles(0) {
     if (embedPython) layout1->addRow(pyGrid);
 #endif
 
-    layout1->addRow(metaGrid); 
+    layout1->addRow(setMetadataGrid); 
+    layout1->addRow(setMetricOverrideGrid);
+    layout1->addRow(clearMetricOverrideGrid);
     layout1->addRow(deleteGrid);
     layout->addRow(files);
     layout->addRow(buttons);
@@ -375,18 +423,23 @@ processed(0), fails(0), processedFiles(0) {
     // If Python is enabled and Python Fixes are defined then connect up the relevant signals
     if ((embedPython) && (pythonFixesDefined)) {
         connect(pythonProcessorToRun, SIGNAL(currentIndexChanged(int)), this, SLOT(comboSelected()));
-        connect(pyButton, SIGNAL(clicked()), this, SLOT(dpPyButtonSelected()));
+        connect(pyEditParametersButton, SIGNAL(clicked()), this, SLOT(pyEditParametersButtonSelected()));
     }
 #endif
 
     // Core data processor signals
-    connect(dpButton, SIGNAL(clicked()), this, SLOT(dpButtonSelected()));
+    connect(dpEditParametersButton, SIGNAL(clicked()), this, SLOT(dpEditParametersButtonSelected()));
     connect(dataProcessorToRun, SIGNAL(currentIndexChanged(int)), this, SLOT(comboSelected()));
 
     // export file format signals
     connect(fileFormat, SIGNAL(currentIndexChanged(int)), this, SLOT(comboSelected()));
     connect(selectDir, SIGNAL(clicked()), this, SLOT(selectClicked()));
 
+    // metadata signals
+    connect(metadataFieldToSet, SIGNAL(currentIndexChanged(int)), this, SLOT(comboSelected()));
+    connect(metricFieldToSet, SIGNAL(currentIndexChanged(int)), this, SLOT(comboSelected()));
+    connect(metricFieldToClear, SIGNAL(currentIndexChanged(int)), this, SLOT(comboSelected()));
+        
     // radio buttons
     connect(radioGroup, SIGNAL(buttonClicked(int)), this, SLOT(radioClicked(int)));
 
@@ -398,12 +451,12 @@ processed(0), fails(0), processedFiles(0) {
     exportRadioBox->setChecked(true);
     outputMode = BatchProcessingDialog::exportB;
     updateActionColumn();
-    updateNumSelected();
+    updateNumberSelected();
 }
 
 void
-BatchProcessingDialog::updateNumSelected() {
-    status->setText(QString(tr("           %1 files selected")).arg(processedFiles));
+BatchProcessingDialog::updateNumberSelected() {
+    status->setText(QString(tr("           %1 files selected")).arg(numFilesToProcess));
 }
 
 void
@@ -421,14 +474,14 @@ BatchProcessingDialog::selectClicked()
 }
 
 void
-BatchProcessingDialog::dpButtonSelected() {
+BatchProcessingDialog::dpEditParametersButtonSelected() {
 
     CoreDpOptionsDialog dpOptionsDialog(context);
 }
 
 #ifdef GC_WANT_PYTHON
 void
-BatchProcessingDialog::dpPyButtonSelected() {
+BatchProcessingDialog::pyEditParametersButtonSelected() {
 
     FixPyScript* pyScript = fixPySettings->getScript(pythonProcessorToRun->currentText());
     if (pyScript) {
@@ -443,13 +496,16 @@ BatchProcessingDialog::comboSelected() {
 
     // ensures the Action column matches the Combobox selections
     updateActionColumn();
+
+    updateMetadataTypeField();
+    updateMetricDataTypeField();
 }
 
 void
 BatchProcessingDialog::radioClicked(int buttonId) {
 
     // ensures the Action info column matches the processing option selected
-    outputMode = bpRadioButtonsType(buttonId);
+    outputMode = batchRadioBType(buttonId);
     updateActionColumn();
 }
 
@@ -472,13 +528,172 @@ BatchProcessingDialog::fileSelected(QTreeWidgetItem* current) {
     // ensures individual Action info columns match whether the file is to be processed or not
     if (static_cast<QCheckBox*>(files->itemWidget(current, 0))->isChecked()) {
         current->setText(4, getActionColumnText());
-        processedFiles++;
+        numFilesToProcess++;
     }
     else {
         current->setText(4, tr("--"));
-        processedFiles--;
+        numFilesToProcess--;
     }
-    updateNumSelected();
+    updateNumberSelected();
+}
+
+void
+BatchProcessingDialog::okClicked()
+{
+    if (ok->text() == bpEXECUTE || ok->text() == tr(bpEXECUTE)) {
+        aborted = false;
+
+        // hide or disable editing in widgets
+        all->hide();
+        cancel->hide();
+        disableContainer->setEnabled(false);
+        for (int i = 0; i < files->invisibleRootItem()->childCount(); i++) {
+            QTreeWidgetItem* current = files->invisibleRootItem()->child(i);
+            static_cast<QCheckBox*>(files->itemWidget(current, 0))->setEnabled(false);
+        }
+
+        status->setText(tr("Processing..."));
+        ok->setText(tr(bpABORT));
+        bpFailureType result = BatchProcessingDialog::unknownF;
+
+        QString summaryType("Processed ");
+
+        // call the selected type of batch processing
+        switch (outputMode) {
+            case BatchProcessingDialog::exportB: {
+                result = exportFiles();
+                summaryType = "Exported ";
+            } break;
+
+            case BatchProcessingDialog::dataProcessorB: {
+                result = runDataProcessorOnActivities(dataProcessorToRun->currentText());
+            } break;
+
+#ifdef GC_WANT_PYTHON
+            case BatchProcessingDialog::pythonProcessorB: {
+                result = runDataProcessorOnActivities(pythonProcessorToRun->currentText());
+            } break;
+#endif
+
+            case BatchProcessingDialog::metadataSetB: {
+                result = setMetadataForActivities(metadataFieldToSet->currentText(), metadataEditField->text());
+            } break;
+
+            case BatchProcessingDialog::metricSetB: {
+                result = setMetricFieldForActivities(metricFieldToSet->currentText(), metricDataEditField->text());
+            } break;
+
+            case BatchProcessingDialog::metricClearB: {
+                result = clearMetricFieldForActivities(metricFieldToClear->currentText());
+            } break;
+
+            case BatchProcessingDialog::deleteB: {
+                result = deleteFiles();
+                summaryType = "Deleted ";
+            } break;
+        }
+    
+        switch (result) {
+
+            case BatchProcessingDialog::dateFormatF: {
+                status->setText(tr("Processing failed due date format error..."));
+                break;
+            }
+            case BatchProcessingDialog::timeFormatF: {
+                status->setText(tr("Processing failed due time format error..."));
+                break;
+            }
+            case BatchProcessingDialog::noRideMFoundF: {
+                status->setText(tr("Processing failed as the ride metric cannot be found..."));
+                break;
+            }
+            case BatchProcessingDialog::userF: {
+                status->setText(tr("Processing aborted by the user..."));
+                break;
+            }
+            case BatchProcessingDialog::noDataProcessorF: {
+                status->setText(tr("Processing failed as the data processor cannot be found..."));
+                break;
+            }
+            case BatchProcessingDialog::finishedF: {
+                status->setText(summaryType + QString(tr("%1 activities successfully, %2 failed or skipped.")).arg(processed).arg(fails));
+                ok->setText(tr(bpFINISH));
+                break;
+            }
+            default: {
+                status->setText(tr("Processing failed for an unknown reason..."));
+                break;
+            }
+        }
+    } else if (ok->text() == bpABORT || ok->text() == tr(bpABORT)) {
+        aborted = true;
+        ok->setText(tr(bpFINISH));
+    } else if (ok->text() == bpFINISH || ok->text() == tr(bpFINISH)) {
+        accept(); // our work is done!
+    }
+}
+
+void
+BatchProcessingDialog::cancelClicked()
+{
+    reject();
+}
+
+void
+BatchProcessingDialog::updateMetadataTypeField() {
+
+    // find the selected metadata field and update the display with its type
+    foreach(FieldDefinition field, GlobalContext::context()->rideMetadata->getFields()) {
+        if (metadataFieldToSet->currentText() == field.name) {
+            switch (field.type) {
+                case FIELD_INTEGER: {
+                    metadataEditField->setText("0");
+                    return;
+                }
+                case FIELD_DOUBLE: {
+                    metadataEditField->setText("0.00");
+                    return;
+                }
+                case FIELD_DATE: {
+                    metadataEditField->setText("dd/mm/yyyy");
+                    return;
+                }
+                case FIELD_TIME: {
+                    metadataEditField->setText("hh:mm:ss");
+                    return;
+                }
+                case FIELD_CHECKBOX: {
+                    metadataEditField->setText("1|0");
+                    return;
+                }
+                case FIELD_TEXT:
+                case FIELD_TEXTBOX:
+                case FIELD_SHORTTEXT:
+                default: {
+                    metadataEditField->setText("");
+                    return;
+                }
+            }
+        }
+    }
+}
+
+void
+BatchProcessingDialog::updateMetricDataTypeField() {
+
+    RideMetric* rideM = displayNametoRideMetric(metricFieldToSet->currentText());
+
+    // Display metric fields format and units
+    if(rideM->isTime()) {
+        metricDataEditField->setText("hh:mm:ss");
+        metricUnitsLabel->setText("");
+    } else if (rideM->isDate()) {
+        metricDataEditField->setText("dd/mm/yyyy");
+        metricUnitsLabel->setText("");
+    } else {
+        metricDataEditField->setText("0.00");
+        metricUnitsLabel->setText((rideM) ? rideM->units(GlobalContext::context()->useMetricUnits) : "");
+    }
 }
 
 void
@@ -506,93 +721,58 @@ BatchProcessingDialog::getActionColumnText() {
 
     // provides the Action info text for the various processing options
     switch (outputMode) {
-        case BatchProcessingDialog::exportB: {
-            return "Export as " + fileFormat->currentText();
-        }
+    case BatchProcessingDialog::exportB: {
+        return "Export as " + fileFormat->currentText();
+    }
 
-        case BatchProcessingDialog::dataB:
-        {
-            return dataProcessorToRun->currentText();
-        }
+    case BatchProcessingDialog::dataProcessorB: {
+        return dataProcessorToRun->currentText();
+    }
 
 #ifdef GC_WANT_PYTHON
-        case BatchProcessingDialog::pythonB: {
-            return pythonProcessorToRun->currentText();
-        }
+    case BatchProcessingDialog::pythonProcessorB: {
+        return pythonProcessorToRun->currentText();
+    }
 #endif
 
-        case BatchProcessingDialog::metaB:
-        {
-            return metaDataFieldToUpdate->currentText();
-        }
+    case BatchProcessingDialog::metadataSetB: {
+        return "Update Metadata field - " + metadataFieldToSet->currentText();
+    }
 
-        case BatchProcessingDialog::deleteB: {
-            return "Delete";
-        }
+    case BatchProcessingDialog::metricSetB: {
+        return "Set Metric Override - " + metricFieldToSet->currentText();
+    }
+
+    case BatchProcessingDialog::metricClearB: {
+        return "Clear Metric Override - " + metricFieldToClear->currentText();
+    }
+
+    case BatchProcessingDialog::deleteB: {
+        return "Delete";
+    }
     }
     return QString("Undefined");
 }
 
-void
-BatchProcessingDialog::okClicked()
-{
-    if (ok->text() == "Execute" || ok->text() == tr("Execute")) {
-        aborted = false;
+RideMetric*
+BatchProcessingDialog::displayNametoRideMetric(const QString& fieldDisplayName) {
 
-        // hide or disable editing in widgets
-        all->hide();
-        cancel->hide();
-        disableContainer->setEnabled(false);
-        for (int i = 0; i < files->invisibleRootItem()->childCount(); i++) {
-            QTreeWidgetItem* current = files->invisibleRootItem()->child(i);
-            static_cast<QCheckBox*>(files->itemWidget(current, 0))->setEnabled(false);
+    // lookup metrics (we override them)
+    RideMetricFactory& factory = RideMetricFactory::instance();
+    QHash<QString, RideMetric*> metrics = factory.metricHash();
+
+    // find the metric from the display name
+    QHashIterator<QString, RideMetric*> itr(metrics);
+    while (itr.hasNext()) {
+        itr.next();
+        if (itr.value()->name() == fieldDisplayName) {
+            return itr.value();
         }
-
-        status->setText(tr("Processing..."));
-        ok->setText(tr("Abort"));
-
-        // call the selected type of batch processing
-        switch (outputMode) {
-            case BatchProcessingDialog::exportB: {
-                exportFiles();
-            } break;
-
-            case BatchProcessingDialog::dataB: {
-                applyDPtoActivities(dataProcessorToRun->currentText());
-            } break;
-
-#ifdef GC_WANT_PYTHON
-            case BatchProcessingDialog::pythonB: {
-                applyDPtoActivities(pythonProcessorToRun->currentText());
-            } break;
-#endif
-
-            case BatchProcessingDialog::metaB: {
-                applyMPtoActivities(metaDataFieldToUpdate->currentText());
-            } break;
-
-            case BatchProcessingDialog::deleteB: {
-                deleteFiles();
-            } break;
-
-            default: {
-                aborted = true;
-            }
-        }
-    } else if (ok->text() == "Abort" || ok->text() == tr("Abort")) {
-        aborted = true;
-    } else if (ok->text() == "Finish" || ok->text() == tr("Finish")) {
-        accept(); // our work is done!
     }
+    return NULL;
 }
 
-void
-BatchProcessingDialog::cancelClicked()
-{
-    reject();
-}
-
-void
+BatchProcessingDialog::bpFailureType
 BatchProcessingDialog::exportFiles()
 {
     appsettings->setValue(GC_BE_LASTDIR, dirName->text());
@@ -608,7 +788,7 @@ BatchProcessingDialog::exportFiles()
         QApplication::processEvents();
 
         // did they?
-        if (aborted == true) return; // user aborted!
+        if (aborted == true) return BatchProcessingDialog::userF; // user aborted!
 
         QTreeWidgetItem *current = files->invisibleRootItem()->child(i);
 
@@ -632,7 +812,6 @@ BatchProcessingDialog::exportFiles()
                     QFile(filename).remove();
                     current->setText(4, tr("Removing...")); QApplication::processEvents();
                 }
-
             }
             // this one then
             current->setText(4, tr("Reading...")); QApplication::processEvents();
@@ -641,20 +820,20 @@ BatchProcessingDialog::exportFiles()
             QStringList errors;
             QList<RideFile*> rides;
             QFile thisfile(QString(context->athlete->home->activities().absolutePath()+"/"+current->text(1)));
-            RideFile *ride = RideFileFactory::instance().openRideFile(context, thisfile, errors, &rides);
+            RideFile *rideF = RideFileFactory::instance().openRideFile(context, thisfile, errors, &rides);
 
             // open success?
-            if (ride) {
+            if (rideF) {
 
                 current->setText(4, tr("Writing...")); QApplication::processEvents();
                 QFile out(filename);
 
                 bool success = false;
                 if (fileFormat->currentIndex() > 0)
-                    success = RideFileFactory::instance().writeRideFile(context, ride, out, type);
+                    success = RideFileFactory::instance().writeRideFile(context, rideF, out, type);
                 else {
                     CsvFileReader writer;
-                    success = writer.writeRideFile(context, ride, out, CsvFileReader::gc);
+                    success = writer.writeRideFile(context, rideF, out, CsvFileReader::gc);
                 }
 
                 // update the Action info column
@@ -666,7 +845,7 @@ BatchProcessingDialog::exportFiles()
                     current->setText(4, tr("Write failed")); QApplication::processEvents();
                 }
 
-                delete ride; // free memory!
+                delete rideF; // free memory!
 
             // open failed
             } else {
@@ -677,12 +856,10 @@ BatchProcessingDialog::exportFiles()
         }
     }
 
-    // provide summary of export processing
-    status->setText(QString(tr("%1 activities exported, %2 failed or skipped.")).arg(processed).arg(fails));
-    ok->setText(tr("Finish"));
+    return BatchProcessingDialog::finishedF;
 }
 
-void
+BatchProcessingDialog::bpFailureType
 BatchProcessingDialog::deleteFiles() {
 
     // loop through the table and delete all selected
@@ -692,7 +869,7 @@ BatchProcessingDialog::deleteFiles() {
         QApplication::processEvents();
 
         // did they?
-        if (aborted == true) return; // user aborted!
+        if (aborted == true) return BatchProcessingDialog::userF; // user aborted!
 
         QTreeWidgetItem* current = files->invisibleRootItem()->child(i);
 
@@ -705,34 +882,28 @@ BatchProcessingDialog::deleteFiles() {
                 current->setText(4, tr("Deleted"));
                 processed++;
             } else {
-                current->setText(4, tr("Failed to deleted"));
-                fails++;
+                failedToProcessEntry(current);
             }
 
             QApplication::processEvents();
         }
     }
 
-    // provide summary of delete processing
-    status->setText(QString(tr("%1 activities deleted, %2 failed or skipped.")).arg(processed).arg(fails));
-    ok->setText(tr("Finish"));
+    return BatchProcessingDialog::finishedF;
 }
 
-void
-BatchProcessingDialog::applyDPtoActivities(const QString& processorName) {
+BatchProcessingDialog::bpFailureType
+BatchProcessingDialog::runDataProcessorOnActivities(const QString& processorName) {
 
     // lookup processor
     DataProcessor* dp = DataProcessorFactory::instance().getProcessors().value(processorName, NULL);
 
-    if (!dp) return; // No such data processor
+    if (!dp) return BatchProcessingDialog::noDataProcessorF; // No such data processor
 
     // Save the currently selected ride.
     // To achieve batch processing we are going to need to change this in the context temporarily
     // because the python processing is structured that the currently selected RideItem is the one
-    // that gets processed with its associated RideFile. If they are not related the processing fails
-    // and this is the reason why "import" python processors don't work correctly as the RideItem is that
-    // should be associated with the RideFile is not created until after the "import", whilst in the "save"
-    // they are both created and associated.
+    // that gets processed with its associated RideFile. See #4095 for consequences on "import".
     RideItem* rideISafe = context->ride;
 
     // loop through the table and run the data processor on each selected activity
@@ -742,7 +913,7 @@ BatchProcessingDialog::applyDPtoActivities(const QString& processorName) {
         QApplication::processEvents();
 
         // did they?
-        if (aborted == true) return; // user aborted!
+        if (aborted == true) return BatchProcessingDialog::userF; // user aborted!
 
         QTreeWidgetItem* current = files->invisibleRootItem()->child(i);
 
@@ -751,7 +922,7 @@ BatchProcessingDialog::applyDPtoActivities(const QString& processorName) {
 
             RideItem *rideI = context->athlete->rideCache->getRide(current->text(1));
 
-            if (!rideI) continue; // eek!
+            if (!rideI) { failedToProcessEntry(current); continue; } // eek!
 
             // Set the current ride to the one being processed for the duration of the processing.
             context->ride = rideI;
@@ -759,7 +930,7 @@ BatchProcessingDialog::applyDPtoActivities(const QString& processorName) {
             // ack ! we need to autoprocess, so open the ride
             RideFile* rideF = rideI->ride();
 
-            if (!rideF) continue; // eek!
+            if (!rideF) { failedToProcessEntry(current); continue; } // eek!
 
             files->setCurrentItem(current);
 
@@ -770,8 +941,7 @@ BatchProcessingDialog::applyDPtoActivities(const QString& processorName) {
                 current->setText(4, tr("Processed"));
                 processed++;
             } else {
-                current->setText(4, tr("Failed to process"));
-                fails++;
+                failedToProcessEntry(current);
             }
 
             QApplication::processEvents();
@@ -781,68 +951,202 @@ BatchProcessingDialog::applyDPtoActivities(const QString& processorName) {
     // Restore the selected ride before the batch processing
     context->ride = rideISafe;
 
-    // provide summary of data processing
-    status->setText(QString(tr("%1 activities processed, %2 failed or skipped.")).arg(processed).arg(fails));
-    ok->setText(tr("Finish"));
-
+    return BatchProcessingDialog::finishedF;
 }
 
-void
-BatchProcessingDialog::applyMPtoActivities(const QString& processorName) {
+BatchProcessingDialog::bpFailureType
+BatchProcessingDialog::setMetadataForActivities(const QString& metadataFieldName,
+                                                QString metadataValue) {
 
- /*
-    // lookup processor
-    DataProcessor* dp = DataProcessorFactory::instance().getProcessors().value(processorName, NULL);
+    // find the selected metadata field and update the display with its type
+    foreach(FieldDefinition field, GlobalContext::context()->rideMetadata->getFields()) {
+        if (metadataFieldName == field.name) {
 
-    if (!dp) return; // No such data processor
+            if (field.type == FIELD_TIME) {
+                metadataValue.simplified().remove(' ');
+                QRegularExpression re("([0-1]?[0-9]|2[0-3]):([0-5]?[0-9]):([0-5]?[0-9])");
+                if (!re.match(metadataValue).hasMatch()) return BatchProcessingDialog::timeFormatF;
+            }
 
-    // loop through the table and run the data processor on each selected activity
+            if (field.type == FIELD_DATE) {
+                metadataValue.simplified().remove(' ');
+                QRegularExpression re("([0]?[1-9]|[1][0-9]|3[0-1])/([0]?[1-9]|[1][0-2])/([0-9]{4})");
+                if (!re.match(metadataValue).hasMatch()) return BatchProcessingDialog::dateFormatF;
+            }
+            break;
+        }
+    }
+
+    // loop through the table and set the metdata on each selected activity
     for (int i = 0; i < files->invisibleRootItem()->childCount(); i++) {
 
         // give user a chance to abort..
         QApplication::processEvents();
 
         // did they?
-        if (aborted == true) return; // user aborted!
+        if (aborted == true) return BatchProcessingDialog::userF; // user aborted!
 
         QTreeWidgetItem* current = files->invisibleRootItem()->child(i);
 
-        // is it selected for delete ?
+        // is it selected for metadata update ?
         if (static_cast<QCheckBox*>(files->itemWidget(current, 0))->isChecked()) {
 
             RideItem* rideI = context->athlete->rideCache->getRide(current->text(1));
 
-            if (!rideI) continue; // eek!
+            if (!rideI) { failedToProcessEntry(current); continue; } // eek!
 
             // ack ! we need to autoprocess, so open the ride
             RideFile* rideF = rideI->ride();
 
-            if (!rideF) continue; // eek!
+            if (!rideF) { failedToProcessEntry(current); continue; } // eek!
 
-            files->setCurrentItem(current);
+            rideF->setTag(metadataFieldName, metadataValue);
 
-            // now run the data processor
-            if (dp->postProcess(rideF, NULL, "PYTHON")) {
-                // rideFile is now dirty!
-                rideI->setDirty(true);
-                current->setText(4, tr("Processed"));
-                processed++;
-            }
-            else {
-                current->setText(4, tr("Failed to process"));
-                fails++;
-            }
+            // rideFile is now dirty!
+            rideI->setDirty(true);
 
-            QApplication::processEvents();
+            // get refresh done, coz overrides state has changed
+            rideI->notifyRideMetadataChanged();
+
+            // Update the files entry
+            current->setText(4, tr("Metadata Tag Set"));
+            processed++;
         }
     }
 
- */
-
-    // provide summary of data processing
-    status->setText(QString(tr("%1 activities processed, %2 failed or skipped.")).arg(processed).arg(fails));
-    ok->setText(tr("Finish"));
-
+    return BatchProcessingDialog::finishedF;
 }
 
+BatchProcessingDialog::bpFailureType
+BatchProcessingDialog::setMetricFieldForActivities(const QString& metricDataFieldName,
+                                                    QString metricDataValue) {
+
+    RideMetric* rideM = displayNametoRideMetric(metricDataFieldName);
+
+    if (!rideM) return BatchProcessingDialog::noRideMFoundF; // eek!
+
+    // check time format and calculate number of seconds to simplify the data input for the user.
+    if (rideM->isTime()) {
+
+        metricDataValue.simplified().remove(' ');
+        QRegularExpression re("([0-1]?[0-9]|2[0-3]):([0-5]?[0-9]):([0-5]?[0-9])");
+        QRegularExpressionMatch rem = re.match(metricDataValue);
+
+        if (rem.hasMatch()) {
+            int hours = rem.captured(1).toInt();
+            int mins = rem.captured(2).toInt();
+            int secs = rem.captured(3).toInt();
+
+            metricDataValue = QString("%1").arg((hours * 3600) + (mins * 60) + secs);
+
+        } else {
+            return BatchProcessingDialog::timeFormatF;
+        }
+    }
+
+    // No metric date fields are available for batch processing so this shouldn't occur
+    if (rideM->isDate()) return BatchProcessingDialog::dateFormatF;
+
+    // loop through the table and set the metric override on each selected activity
+    for (int i = 0; i < files->invisibleRootItem()->childCount(); i++) {
+
+        // give user a chance to abort..
+        QApplication::processEvents();
+
+        // did they?
+        if (aborted == true) return BatchProcessingDialog::userF; // user aborted!
+
+        QTreeWidgetItem* current = files->invisibleRootItem()->child(i);
+
+        // is it selected for metric override ?
+        if (static_cast<QCheckBox*>(files->itemWidget(current, 0))->isChecked()) {
+
+            RideItem* rideI = context->athlete->rideCache->getRide(current->text(1));
+
+            if (!rideI) { failedToProcessEntry(current); continue; } // eek!
+
+            // ack ! we need to autoprocess, so open the ride
+            RideFile* rideF = rideI->ride();
+
+            if (!rideF) { failedToProcessEntry(current); continue; } // eek!
+
+            // set metric override
+            QMap<QString, QString> override;
+            override.insert("value", QString("%1").arg(metricDataValue.toDouble() / rideM->conversion()));
+            rideF->metricOverrides.insert(rideM->symbol(), override);
+
+            // rideFile is now dirty!
+            rideI->setDirty(true);
+
+            // get refresh done, coz overrides state has changed
+            rideI->notifyRideMetadataChanged();
+
+            // Update the files entry
+            current->setText(4, tr("Metric Override Set"));
+            processed++;
+        }
+    }
+
+    return BatchProcessingDialog::finishedF;
+}
+
+BatchProcessingDialog::bpFailureType
+BatchProcessingDialog::clearMetricFieldForActivities(const QString& metricDataFieldName) {
+
+    RideMetric* rideM = displayNametoRideMetric(metricDataFieldName);
+
+    if (!rideM) return BatchProcessingDialog::noRideMFoundF; // eek!
+
+    // loop through the table and clear the metdata on each selected activity
+    for (int i = 0; i < files->invisibleRootItem()->childCount(); i++) {
+
+        // give user a chance to abort..
+        QApplication::processEvents();
+
+        // did they?
+        if (aborted == true) return BatchProcessingDialog::userF; // user aborted!
+
+        QTreeWidgetItem* current = files->invisibleRootItem()->child(i);
+
+        // is it selected for metadata clearing ?
+        if (static_cast<QCheckBox*>(files->itemWidget(current, 0))->isChecked()) {
+
+            RideItem* rideI = context->athlete->rideCache->getRide(current->text(1));
+
+            if (!rideI) { failedToProcessEntry(current); continue; } // eek!
+
+            // ack ! we need to autoprocess, so open the ride
+            RideFile* rideF = rideI->ride();
+
+            if (!rideF) { failedToProcessEntry(current); continue; } // eek!
+
+            // now clear the override 
+            if (rideM) {
+
+                rideF->metricOverrides.remove(rideM->symbol());
+
+                // rideFile is now dirty!
+                rideI->setDirty(true);
+
+                // get refresh done, coz overrides state has changed
+                rideI->notifyRideMetadataChanged();
+
+                // Update the files entry
+                current->setText(4, tr("Metric Override Removed"));
+                processed++;
+
+            } else {
+                failedToProcessEntry(current);
+            }
+        }
+    }
+
+    return BatchProcessingDialog::finishedF;
+}
+
+void
+BatchProcessingDialog::failedToProcessEntry(QTreeWidgetItem* current) {
+    current->setText(4, tr("Failed to process activity"));
+    fails++;
+}
 

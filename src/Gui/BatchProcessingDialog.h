@@ -1,6 +1,6 @@
 
 /*
- * Copyright (c) 2011 Mark Liversedge (liversedge@gmail.com)
+ * Batch Export Copyright (c) 2011 Mark Liversedge (liversedge@gmail.com)
  * Batch Processing Copyright (c) 2022 Paul Johnson (paulj49457@gmail.com)
  *
  * This program is free software; you can redistribute it and/or modify it
@@ -20,6 +20,7 @@
 
 #ifndef _BatchProcessingDialog_h
 #define _BatchProcessingDialog_h
+
 #include "GoldenCheetah.h"
 #include "Context.h"
 #include "Settings.h"
@@ -59,6 +60,7 @@ private slots:
     void cancelDpEdits();
 };
 
+
 // Dialog class to allow batch processing of activities
 class BatchProcessingDialog : public QDialog
 {
@@ -79,27 +81,40 @@ private slots:
     void allClicked();
     void radioClicked(int);
     void comboSelected();
-    void dpButtonSelected();
+    void dpEditParametersButtonSelected();
 
 #ifdef GC_WANT_PYTHON
-    void dpPyButtonSelected();
+    void pyEditParametersButtonSelected();
 #endif
 
 private:
+
+    typedef enum {
+        unknownF,
+        finishedF,
+        userF,
+        dateFormatF,
+        timeFormatF,
+        noRideMFoundF,
+        noDataProcessorF
+    } bpFailureType;
+
     typedef enum {
         exportB,
-        dataB,
+        dataProcessorB,
 #ifdef GC_WANT_PYTHON
-        pythonB,
+        pythonProcessorB,
 #endif
-        metaB,
-        deleteB } bpRadioButtonsType;
+        metadataSetB,
+        metricSetB,
+        metricClearB,
+        deleteB } batchRadioBType;
 
     Context *context;
     bool aborted;
 
-    int processed, fails, processedFiles;
-    bpRadioButtonsType outputMode;
+    int processed, fails, numFilesToProcess;
+    batchRadioBType outputMode;
 
     QTreeWidget* files; // choose files to export
 
@@ -110,7 +125,9 @@ private:
 #endif
 
     QComboBox* fileFormat, *dataProcessorToRun;
-    QComboBox* metaDataFieldToUpdate, *metaDataProcessing;
+    QComboBox* metadataFieldToSet, *metricFieldToSet, *metricFieldToClear;
+    QLineEdit* metadataEditField, * metricDataEditField;
+    QLabel* metricUnitsLabel;
 
     QLabel *dirName, *status;
     QCheckBox *overwrite, *all;
@@ -118,13 +135,22 @@ private:
 
     void updateActionColumn();
     QString getActionColumnText();
-    void fileSelected(QTreeWidgetItem*);
-    void updateNumSelected();
+    void fileSelected(QTreeWidgetItem* current);
+    void updateNumberSelected();
+    void updateMetadataTypeField();
+    void updateMetricDataTypeField();
 
-    void exportFiles();
-    void deleteFiles();
-    void applyDPtoActivities(const QString& processorName);
-    void applyMPtoActivities(const QString& processorName);
+    bpFailureType exportFiles();
+    bpFailureType deleteFiles();
+    bpFailureType runDataProcessorOnActivities(const QString& processorName);
+    bpFailureType setMetadataForActivities(const QString& metaDataFieldName,
+                                     QString metaDataValue);
+    bpFailureType setMetricFieldForActivities(const QString& metricDataFieldName,
+                                     QString metricDataValue);
+    bpFailureType clearMetricFieldForActivities(const QString& metricDataFieldName);
+
+    RideMetric* displayNametoRideMetric(const QString& fieldDisplayName);
+    void failedToProcessEntry(QTreeWidgetItem* current);
     
 };
 #endif // _BatchProcessingDialog_h
