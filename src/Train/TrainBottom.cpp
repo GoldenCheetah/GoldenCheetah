@@ -59,7 +59,7 @@ TrainBottom::TrainBottom(TrainSidebar *trainSidebar, QWidget *parent) :
     m_rewindButton->setFlat(true);
     m_rewindButton->setStyleSheet("background-color: rgba( 255, 255, 255, 0% ); border: 0px;");
     m_rewindButton->setAutoRepeat(true);
-    m_rewindButton->setAutoRepeatDelay(200);
+    m_rewindButton->setAutoRepeatDelay(400);
     m_rewindButton->setShortcut(Qt::Key_MediaPrevious);
     toolbuttons->addWidget(m_rewindButton);
 
@@ -94,7 +94,7 @@ TrainBottom::TrainBottom(TrainSidebar *trainSidebar, QWidget *parent) :
     m_forwardButton->setFlat(true);
     m_forwardButton->setStyleSheet("background-color: rgba( 255, 255, 255, 0% ); border: 0px;");
     m_forwardButton->setAutoRepeat(true);
-    m_forwardButton->setAutoRepeatDelay(200);
+    m_forwardButton->setAutoRepeatDelay(400);
     m_forwardButton->setShortcut(Qt::Key_MediaNext);
     toolbuttons->addWidget(m_forwardButton);
 
@@ -107,7 +107,7 @@ TrainBottom::TrainBottom(TrainSidebar *trainSidebar, QWidget *parent) :
     backLap->setFlat(true);
     backLap->setStyleSheet("background-color: rgba( 255, 255, 255, 0% ); border: 0px;");
     backLap->setAutoRepeat(true);
-    backLap->setAutoRepeatDelay(200);
+    backLap->setAutoRepeatDelay(400);
     toolbuttons->addWidget(backLap);
 
     QIcon lapIcon(":images/oxygen/lap.png");
@@ -130,7 +130,7 @@ TrainBottom::TrainBottom(TrainSidebar *trainSidebar, QWidget *parent) :
     fwdLap->setFlat(true);
     fwdLap->setStyleSheet("background-color: rgba( 255, 255, 255, 0% ); border: 0px;");
     fwdLap->setAutoRepeat(true);
-    fwdLap->setAutoRepeatDelay(200);
+    fwdLap->setAutoRepeatDelay(400);
     fwdLap->setShortcut(Qt::Key_MediaLast);
     toolbuttons->addWidget(fwdLap);
 
