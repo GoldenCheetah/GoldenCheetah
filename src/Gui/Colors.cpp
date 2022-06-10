@@ -249,7 +249,7 @@ void GCColor::setupColors()
         { tr("Gui"), tr("Chartbar background"), "CCHARTBAR", Qt::lightGray },
         { tr("Gui"), tr("Overview Tile Background Alternate"), "CCARDBACKGROUND2", QColor(0,0,0) },
         { tr("Gui"), tr("Overview Tile Background Vibrant"), "CCARDBACKGROUND3", QColor(52,52,52) },
-        { tr("Map Route Line"), "MAPROUTECOLOR", Qt::red },
+        { tr("Gui"), tr("Map Route Line"), "MAPROUTELINE", Qt::red },
         { "", "", "", QColor(0,0,0) },
     };
 
@@ -377,11 +377,9 @@ void GCColor::setupColors()
     LightDefaultColorList[101].color = QColor(101,44,45); // 101:Tidal Volume
     LightDefaultColorList[102].color = QColor(134,74,255); // 102:Respiratory Frequency
     LightDefaultColorList[103].color = QColor(255,46,46); // 103:FeO2
-    LightDefaultColorList[104].color = QColor(180, 180, 180); // 104:CHOVER
-    LightDefaultColorList[105].color = QColor(0xee, 0xf8, 0xff); // 105:CCHARTBAR
     LightDefaultColorList[106].color = QColor(180,180,180); // 106:Tile Alternate
-    LightDefaultColorList[107].color = QColor(0xee,0xf8,0xff); // 107:Tile Vibrant
-    LightDefaultColorList[104].color = QColor(255, 0, 0); // 104:MapRouteLine
+    LightDefaultColorList[107].color = QColor(238,248,255); // 107:Tile Vibrant
+    LightDefaultColorList[108].color = QColor(255, 0, 0); // 105:MapRouteLine
 }
 
 // default settings for fonts etc
