@@ -256,14 +256,14 @@ RideCache::itemChanged()
 }
 
 // add a new ride
-void
+RideItem*
 RideCache::addRide(QString name, bool dosignal, bool select, bool useTempActivities, bool planned)
 {
     RideItem *prior = context->ride;
 
     // ignore malformed names
     QDateTime dt;
-    if (!RideFile::parseRideFileName(name, &dt)) return;
+    if (!RideFile::parseRideFileName(name, &dt)) return NULL;
 
     // new ride item
     RideItem *last;
@@ -316,6 +316,8 @@ RideCache::addRide(QString name, bool dosignal, bool select, bool useTempActivit
 
     // model estimates (lazy refresh)
     estimator->refresh();
+
+    return last;
 }
 
 void

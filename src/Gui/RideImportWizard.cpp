@@ -1072,61 +1072,84 @@ RideImportWizard::abortClicked()
         // serialize the file to .JSON
         QStringList errors;
         QFile thisfile(filenames[i]);
-        RideFile *ride(RideFileFactory::instance().openRideFile(context, thisfile, errors));
+        RideFile *tempRideF(RideFileFactory::instance().openRideFile(context, thisfile, errors));
 
         // did the input file parse ok ? (should be fine here - since it was alrady checked before - but just in case)
-        if (ride) {
+        if (tempRideF) {
 
             // update ridedatetime and set the Source File name
-            ride->setStartTime(ridedatetime);
-            ride->setTag("Source Filename", importsTarget);
-            ride->setTag("Filename", activitiesTarget);
+            tempRideF->setStartTime(ridedatetime);
+            tempRideF->setTag("Source Filename", importsTarget);
+            tempRideF->setTag("Filename", activitiesTarget);
             if (errors.count() > 0)
-                ride->setTag("Import errors", errors.join("\n"));
+                tempRideF->setTag("Import errors", errors.join("\n"));
 
             // process linked defaults
-            GlobalContext::context()->rideMetadata->setLinkedDefaults(ride);
+            GlobalContext::context()->rideMetadata->setLinkedDefaults(tempRideF);
 
             // run the processor first... import
             tableWidget->item(i,STATUS_COLUMN)->setText(tr("Processing..."));
-            DataProcessorFactory::instance().autoProcess(ride, "Auto", "Import");
-            ride->recalculateDerivedSeries();
 
-            tableWidget->item(i,STATUS_COLUMN)->setText(tr("Saving file..."));
-
-            // serialize
+            // write converted ride file to disk
             JsonFileReader reader;
             QFile target(tmpActivitiesFulltarget);
-            if (reader.writeRideFile(context, ride, target)) {
+            if (reader.writeRideFile(context, tempRideF, target)) {
 
-                // now try adding the Ride to the RideCache - since this may fail due to various reason, the activity file
-                // is stored in tmpActivities during this process to understand which file has create the problem when restarting GC
-                // - only after the step was successful the file is moved
-                // to the "clean" activities folder
-                context->athlete->addRide(QFileInfo(tmpActivitiesFulltarget).fileName(),
-                                          tableWidget->rowCount() < 20 ? true : false, // don't signal if mass importing
-                                          true, true);                                       // file is available only in /tmpActivities, so use this one please
-                // rideCache is successfully updated, let's move the file to the real /activities
-                if (moveFile(tmpActivitiesFulltarget, finalActivitiesFulltarget)) {
-                    tableWidget->item(i,STATUS_COLUMN)->setText(tr("File Saved"));
-                    // and correct the path locally stored in Ride Item
-                    context->ride->setFileName(homeActivities.canonicalPath(), activitiesTarget);
-                }  else {
-                    tableWidget->item(i,STATUS_COLUMN)->setText(tr("Error - Moving %1 to activities folder").arg(activitiesTarget));
+                // now try adding the Ride to the RideCache - since this may fail due to various reasons, the activity file
+                // is stored in tmpActivities during this process to understand which file has created the problem when restarting GC
+                // - only after the step was successful the file is moved to the "clean" activities folder
+                RideItem* rideI = context->athlete->rideCache->addRide(QFileInfo(tmpActivitiesFulltarget).fileName(),
+                    tableWidget->rowCount() < 20 ? true : false, // don't signal if mass importing
+                    true,    // select ride
+                    true,    // file is available only in /tmpActivities, so use this one please 
+                    false);  // set planned to false
+
+                if (rideI) {
+
+                    // opens the ride item's associated ride file if it isn't already open
+                    RideFile* processingRideF = rideI->ride();
+
+                    if (processingRideF) {
+
+                        // The Python processors need the ride item (rideI) setup in the context as well as the processingRideF, because the python processors can manipulate the
+                        // raw data sets and the metadata tags, while the builtin core processors only need the ride file (processingRideF) to be setup.
+                        context->ride = rideI;
+
+                        // run the data processors on the ride file
+                        DataProcessorFactory::instance().autoProcess(processingRideF, "Auto", "Import");
+                        processingRideF->recalculateDerivedSeries();
+                        rideI->refresh();
+
+                        // write processed ride file to disk
+                        if (reader.writeRideFile(context, processingRideF, target)) {
+
+                            // rideCache is successfully updated, the ride file has been processed, let's move the file to the real /activities
+                            if (moveFile(tmpActivitiesFulltarget, finalActivitiesFulltarget)) {
+
+                                tableWidget->item(i, STATUS_COLUMN)->setText(tr("File Saved"));
+
+                                // and correct the path locally stored in Ride Item
+                                rideI->setFileName(homeActivities.canonicalPath(), activitiesTarget);
+
+                            } else {
+                                tableWidget->item(i, STATUS_COLUMN)->setText(tr("Error - Moving %1 to activities folder").arg(activitiesTarget));
+                            }
+                        } else {
+                            tableWidget->item(i, STATUS_COLUMN)->setText(tr("Error - .JSON processed file creation failed"));
+                        }
+                    } else {
+                        tableWidget->item(i, STATUS_COLUMN)->setText(tr("Error - %1 cannot open ride file to process ride items!").arg(activitiesTarget));
+                    }
+                } else {
+                    tableWidget->item(i, STATUS_COLUMN)->setText(tr("Error - %1 cannot be found in RideCache!").arg(activitiesTarget));
                 }
-
-            }  else {
-                tableWidget->item(i,STATUS_COLUMN)->setText(tr("Error - .JSON creation failed"));
+            } else {
+                tableWidget->item(i, STATUS_COLUMN)->setText(tr("Error - .JSON file creation failed"));
             }
-        } else {
-            tableWidget->item(i,STATUS_COLUMN)->setText(tr("Error - Import of activitiy file failed"));
+            delete tempRideF;
+        }  else {
+            tableWidget->item(i, STATUS_COLUMN)->setText(tr("Error - Import of activitiy file failed"));
         }
-
-        // now metrics have been calculated
-        DataProcessorFactory::instance().autoProcess(ride, "Save", "ADD");
-
-        // clear
-        delete ride;
 
         QApplication::processEvents();
         if (aborted) { done(0); return; }
@@ -1136,10 +1159,11 @@ RideImportWizard::abortClicked()
 
     // how did we get on in the end then ...
     int completed = 0;
-    for (int i=0; i< filenames.count(); i++)
-        if (!tableWidget->item(i,STATUS_COLUMN)->text().startsWith(tr("Error"))) {
+    for (int i = 0; i < filenames.count(); i++) {
+        if (!tableWidget->item(i, STATUS_COLUMN)->text().startsWith(tr("Error"))) {
             completed++;
         }
+    }
 
     tableWidget->setSortingEnabled(true); // so you can browse through errors etc
     QString donemessage = QString(tr("Import Complete. %1 of %2 successful."))
