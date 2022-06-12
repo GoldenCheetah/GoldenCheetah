@@ -189,7 +189,6 @@ class RideCacheRefreshThread : public QThread
 
     private:
         RideCache *cache;
-        QVector<RideItem*>rides;
 };
 
 #endif // _GC_RideCache_h
