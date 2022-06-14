@@ -2,7 +2,7 @@
 set -ev
 
 date
-# Don't update to use included Qt version instead of Qt 5.15.x
+# Don't update to use included Qt version
 export HOMEBREW_NO_AUTO_UPDATE=1
 export HOMEBREW_NO_INSTALL_CLEANUP=1
 
