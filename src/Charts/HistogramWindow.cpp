@@ -995,13 +995,13 @@ HistogramWindow::updateChart()
 
     // If no data present show the blank state page
     if (!rangemode) {
-        if (rideItem() != NULL)
-            setIsBlank(false);
-        else
-            setIsBlank(true);
-    } else {
-        setIsBlank(false);
-    }
+        RideItem* ride = myRideItem;
+        if (ride != NULL) {
+            RideFile* rideF = ride->ride();
+            if (rideF != NULL && rideF->isDataPresent(series)) setIsBlank(false);
+            else setIsBlank(true);
+        } else setIsBlank(true);
+    } else setIsBlank(false);
 
     // Lets get the data then
     if (stale) {
