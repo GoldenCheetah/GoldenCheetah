@@ -381,6 +381,16 @@ GcUpgrade::upgrade(const QDir &home)
     //----------------------------------------------------------------------
     if (last < VERSION36_BUILD) {
 
+        // Warn the user about upgrading layouts and data, giving the option to cancel when running
+        // a previous version, this is not necessary for new users.
+        if (last && QMessageBox::warning(NULL,
+                                         tr("Upgrade to v3.6"),
+                                         tr("We are about to upgrade your data and layouts to v3.6, please note Ride Summary chart was deprecated, and to use v3.5 again you will need to restore a backup"),
+                                         QMessageBox::Cancel|QMessageBox::Ok,
+                                         QMessageBox::Ok) != QMessageBox::Ok) {
+            return -1;
+        }
+
         // reset themes on basis of plot background (first 2 themes are default dark and light themes
         if (GCColor::luminance(GColor(CPLOTBACKGROUND)) < 127)  GCColor::applyTheme(0);
         else GCColor::applyTheme(1);
