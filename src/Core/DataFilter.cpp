@@ -6198,9 +6198,9 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
                 Result data = eval(df,leaf->fparms[0],x, it, m, p, c, s, d);
                 int pos=2; // fallback
 
-                if (type=="backward") pos=0;
-                if (type=="forward") pos=1;
-                if (type=="centered") pos=2;
+                if (type=="backward") pos=GC_SMOOTH_BACKWARD;
+                if (type=="forward") pos=GC_SMOOTH_FORWARD;
+                if (type=="centered") pos=GC_SMOOTH_CENTERED;
 
                 returning.asNumeric() = Utils::smooth_sma(data.asNumeric(), pos, window);
 
