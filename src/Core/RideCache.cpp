@@ -508,7 +508,9 @@ RideCache::progressing(int value)
 {
     // we're working away, notfy everyone where we got
     progress_ = 100.0f * (double(value) / double(reverse_.count()));
-    if (value % 100 == 1) { // Avoid GUI event queue overflow sending 1/100 updates
+
+    // Avoid GUI event queue overflow- update every for every decile
+    if (reverse_.count() && (value == reverse_.count() || value % (reverse_.count()/10) == 1)) {
         QDate here = reverse_.at(value-1)->dateTime.date();
         context->notifyRefreshUpdate(here);
     }
