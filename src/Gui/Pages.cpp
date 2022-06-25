@@ -1950,7 +1950,7 @@ CustomMetricsPage::addClicked()
 \n\
     # calculate metric value at end\n\
     value { mean(samples(POWER)); }\n\
-    count { count(samples(POWER)); }\n\
+    count { Duration; }\n\
 }";
 
     EditUserMetricDialog editor(this, context, here);
