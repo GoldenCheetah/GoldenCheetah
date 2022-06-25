@@ -3430,8 +3430,9 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
     {
         double duration;
 
-        // calling a user defined function
-        if (df->functions.contains(leaf->function)) {
+        // calling a user defined function (but don't call user defined count in user metrics)
+        // terrible design mistake using "count" as a user defined function for user metrics. Sorry.
+        if (leaf->function != "count" && df->functions.contains(leaf->function)) {
 
             // going down
             df->stack += 1;
