@@ -396,9 +396,9 @@ static QStringList pdmodels(Context *context)
 
     returning << CP2Model(context).code();
     returning << CP3Model(context).code();
-    returning << MultiModel(context).code();
+    //returning << MultiModel(context).code(); disabled in v3.6
     returning << ExtendedModel(context).code();
-    returning << WSModel(context).code();
+    //returning << WSModel(context).code(); disabled in v3.6
     return returning;
 }
 
