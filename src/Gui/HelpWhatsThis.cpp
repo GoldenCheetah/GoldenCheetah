@@ -83,14 +83,18 @@ HelpWhatsThis::getText(GCHelp chapter) {
         return text.arg("ScopeBar_Views#options").arg(tr("Application level Options/Preferences for all athletes"));
 
     // Tool Bar
-    case ToolBar_Download:
-        return text.arg("First-Steps_Download-or-import#downloading-a-activity-from-device").arg(tr("Direct download from Powertap, SRM, Joule, Joule GPS, Moxy Monitor or Macro-X device"));
-    case ToolBar_Manual:
-        return text.arg("Menu%20Bar_Activity").arg(tr("Import any activity file - supported by Golden Cheetah - mass import is supported here"));
+    case ToolBar_Back:
+        return text.arg("Tool%20Bar_Functions#back").arg(tr("Navigate backward"));
+    case ToolBar_Forward:
+        return text.arg("Tool%20Bar_Functions#forward").arg(tr("Navigate forward"));
+    case ToolBar_PerspectiveSelector:
+        return text.arg("Tool%20Bar_Functions#perspective-selector").arg(tr("Select active perspective for the current view, create new perspectives and manage existing ones"));
     case ToolBar_ToggleSidebar:
-        return text.arg("Menu%20Bar_View").arg(tr("Activate / De-activate the Sidebar - which provides different sub-sections to select data shown in the main view"));
+        return text.arg("Tool%20Bar_Functions#side-bar").arg(tr("Activate / De-activate the Sidebar - which provides different sub-sections to select data shown in the main view"));
     case ToolBar_ToggleComparePane:
-        return text.arg("Compare-Pane_General").arg(tr("Activate / De-activate the Compare Pane - which allows to compare activities, intervals or date ranges - also across athletes"));
+        return text.arg("Tool%20Bar_Functions#bottom-bar").arg(tr("Activate / De-activate the Compare Pane - which allows to compare activities and intervals in Activities View or date ranges in Trends View - also across athletes. In Train View it shows/hide the Intensity Adjustments and Workout Control Pane."));
+    case ToolBar_TabTile:
+        return text.arg("Tool%20Bar_Functions#tabtile").arg(tr("Changes the current view layout between Tabbed and Tiled"));
 
     // Menus
     case MenuBar_Athlete:

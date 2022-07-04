@@ -283,6 +283,8 @@ MainWindow::MainWindow(const QDir &home)
     back->setIconSize(isize);
     back->setStyle(toolStyle);
     connect(back, SIGNAL(clicked(bool)), this, SIGNAL(backClicked()));
+    HelpWhatsThis *helpBack = new HelpWhatsThis(back);
+    back->setWhatsThis(helpBack->getWhatsThisText(HelpWhatsThis::ToolBar_Back));
 
     forward = new QPushButton(this);
     forward->setIcon(forwardIcon);
@@ -291,6 +293,8 @@ MainWindow::MainWindow(const QDir &home)
     forward->setIconSize(isize);
     forward->setStyle(toolStyle);
     connect(forward, SIGNAL(clicked(bool)), this, SIGNAL(forwardClicked()));
+    HelpWhatsThis *helpForward = new HelpWhatsThis(forward);
+    forward->setWhatsThis(helpForward->getWhatsThisText(HelpWhatsThis::ToolBar_Forward));
 
     lowbar = new QPushButton(this);
     lowbar->setIcon(lowbarIcon);
@@ -322,6 +326,8 @@ MainWindow::MainWindow(const QDir &home)
     lowbar->setStyle(toolStyle);
     tabtile->setToolTip(tr("Toggle Tab/Tile"));
     connect(tabtile, SIGNAL(clicked(bool)), this, SLOT(toggleStyle()));
+    HelpWhatsThis *helpTabtile = new HelpWhatsThis(tabtile);
+    tabtile->setWhatsThis(helpTabtile->getWhatsThisText(HelpWhatsThis::ToolBar_TabTile));
 
     // What's this button
     whatsthis = new QPushButton(this);
@@ -339,6 +345,8 @@ MainWindow::MainWindow(const QDir &home)
     perspectiveSelector->setFixedWidth(200 * dpiXFactor);
     perspectiveSelector->setFixedHeight(gl_toolheight * dpiYFactor);
     connect(perspectiveSelector, SIGNAL(currentIndexChanged(int)), this, SLOT(perspectiveSelected(int)));
+    HelpWhatsThis *helpPerspectiveSelector = new HelpWhatsThis(perspectiveSelector);
+    perspectiveSelector->setWhatsThis(helpPerspectiveSelector->getWhatsThisText(HelpWhatsThis::ToolBar_PerspectiveSelector));
 
     searchBox = new SearchFilterBox(this,context,false);
 

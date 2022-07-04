@@ -41,10 +41,12 @@ Q_OBJECT
                  ScopeBar_Sync,
                  ScopeBar_Options,
 
-                 ToolBar_Download,
-                 ToolBar_Manual,
+                 ToolBar_Back,
+                 ToolBar_Forward,
+                 ToolBar_PerspectiveSelector,
                  ToolBar_ToggleSidebar,
                  ToolBar_ToggleComparePane,
+                 ToolBar_TabTile,
 
                  MenuBar_Athlete,
 
