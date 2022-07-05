@@ -26,7 +26,8 @@
 #include <QLabel>
 #include <QGradient>
 #include <QLinearGradient>
-
+#include <QXmlDefaultHandler>
+#include <QTextStream>
 
 // A selection of distinct colours, user can adjust also
 extern QList<QColor> standardColors;
@@ -75,6 +76,9 @@ class Colors
 {
 public:
         static unsigned long fingerprint(const Colors*set);
+
+        // all public
+        unsigned int index;
         QString group,
                 name,
                 setting;
@@ -84,6 +88,7 @@ public:
 class ColorTheme
 {
     public:
+        ColorTheme() : name(""), dark(false), stealth(false) {};
         ColorTheme(QString name, bool dark, QList<QColor>colors) : name(name), dark(dark), colors(colors) {}
 
         // all public
@@ -99,9 +104,61 @@ class Themes
     Q_DECLARE_TR_FUNCTIONS(Themes);
 
     public:
-        Themes(); // will init the array of themes
+       
+        Themes(Themes const&) = delete;
+        Themes& operator=(Themes const&) = delete;
 
         QList<ColorTheme> themes;
+
+        static Themes* instance() {
+            static Themes* s{ new Themes };
+            return s;
+        }
+
+    private:
+        Themes();
+ };
+
+// reads in themes
+class ThemeParser : public QXmlDefaultHandler {
+
+public:
+    ThemeParser() {};
+
+    // the themes!
+    ColorTheme theme;
+    QList<ColorTheme> themes;
+
+    // unmarshall
+    bool startDocument();
+    bool endDocument();
+    bool endElement(const QString&, const QString&, const QString& qName);
+    bool startElement(const QString&, const QString&, const QString& name, const QXmlAttributes& attrs);
+    bool characters(const QString& str);
+
+protected:
+
+};
+
+// reads in backup colors
+class ColorBackupParser : public QXmlDefaultHandler {
+
+public:
+    ColorBackupParser() {};
+
+    // the themes!
+    Colors color;
+    QList<Colors> colors;
+
+    // unmarshall
+    bool startDocument();
+    bool endDocument();
+    bool endElement(const QString&, const QString&, const QString& qName);
+    bool startElement(const QString&, const QString&, const QString& name, const QXmlAttributes& attrs);
+    bool characters(const QString& str);
+
+protected:
+
 };
 
 class ColorLabel : public QLabel

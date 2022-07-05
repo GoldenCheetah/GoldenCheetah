@@ -454,6 +454,9 @@ class ColorsPage : public QWidget
         void scaleFont();
         void searchFilter(QString);
 
+        void backupColorsToXML();
+        void restoreColorsFromXML();
+
     private:
 
         // General stuff

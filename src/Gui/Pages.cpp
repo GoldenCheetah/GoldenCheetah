@@ -1195,7 +1195,7 @@ ColorsPage::ColorsPage(QWidget *parent) : QWidget(parent)
     themes->headerItem()->setText(0, tr("Swatch"));
     themes->headerItem()->setText(1, tr("Name"));
     themes->setColumnCount(2);
-    themes->setColumnWidth(0,240 *dpiXFactor);
+    themes->setColumnWidth(0,440 *dpiXFactor);
     themes->setSelectionMode(QAbstractItemView::SingleSelection);
     //colors->setEditTriggers(QAbstractItemView::SelectedClicked); // allow edit
     themes->setUniformRowHeights(true); // causes height problems when adding - in case of non-text fields
@@ -1306,10 +1306,17 @@ ColorsPage::ColorsPage(QWidget *parent) : QWidget(parent)
     colorTab = new QTabWidget(this);
     colorTab->addTab(themes, tr("Theme"));
 
+    QHBoxLayout* backupGrid = new QHBoxLayout();
+    QPushButton* backupButton = new QPushButton("Backup colors to file");
+    QPushButton* restoreButton = new QPushButton("Restore colors from backup file");
+    backupGrid->addWidget(backupButton);
+    backupGrid->addWidget(restoreButton);
+
     QWidget *colortab= new QWidget(this);
     QVBoxLayout *colorLayout = new QVBoxLayout(colortab);
     colorLayout->addLayout(searchLayout);
     colorLayout->addWidget(colors);
+    colorLayout->addLayout(backupGrid);
     colorTab->addTab(colortab, tr("Colors"));
     colorTab->setCornerWidget(applyTheme);
 
@@ -1347,6 +1354,9 @@ ColorsPage::ColorsPage(QWidget *parent) : QWidget(parent)
     connect(def, SIGNAL(currentFontChanged(QFont)), this, SLOT(scaleFont()));
     connect(fontscale, SIGNAL(valueChanged(int)), this, SLOT(scaleFont()));
     connect(searchEdit, SIGNAL(textChanged(QString)), this, SLOT(searchFilter(QString)));
+
+    connect(backupButton, SIGNAL(clicked()), this, SLOT(backupColorsToXML()));
+    connect(restoreButton, SIGNAL(clicked()), this, SLOT(restoreColorsFromXML()));
 
     // save initial values
     b4.alias = antiAliased->isChecked();
@@ -1591,6 +1601,126 @@ ColorsPage::saveClicked()
         return CONFIG_APPEARANCE;
     else
         return 0;
+}
+
+
+
+void
+ColorsPage::restoreColorsFromXML() {
+
+    // load themes from config file
+    QString content = "";
+    QString filename = QDir(gcroot).canonicalPath() + "/colors-backup.xml";
+    QFile file(filename);
+    if (file.open(QIODevice::ReadOnly)) {
+        content = file.readAll();
+        file.close();
+    }
+    else {
+        QMessageBox msgBox;
+        msgBox.setIcon(QMessageBox::Critical);
+        msgBox.setText(tr("Problem loading the colors-backup.xml GUI backup configuration file."));
+        msgBox.setInformativeText(tr("File: %1 cannot be located or opened for 'Reading'.").arg(filename));
+        msgBox.exec();
+        return;
+    }
+
+    if (content != "") {
+
+        // setup the handler
+        QXmlInputSource source;
+        source.setData(content);
+        QXmlSimpleReader xmlReader;
+        ColorBackupParser handler;
+        xmlReader.setContentHandler(&handler);
+        xmlReader.setErrorHandler(&handler);
+
+        // parse and instantiate the charts
+        xmlReader.parse(source);
+
+        // restore colours into the colorList (aka colorSet)
+        for (unsigned int i = 0; colorSet[i].name != ""; i++) {
+
+            QString colorstring = QString("%1:%2:%3").arg(handler.colors[i].color.red())
+                                                    .arg(handler.colors[i].color.green())
+                                                    .arg(handler.colors[i].color.blue());
+
+            // Iterate through the color tree widget to find the color to update
+            for (unsigned int j = 0; colorSet[j].name != ""; j++) {
+
+                QTreeWidgetItem* current = colors->invisibleRootItem()->child(j);
+                int colornum = current->data(0, Qt::UserRole).toInt();
+
+                if (handler.colors[i].index == colornum) {
+                    ((ColorButton*)colors->itemWidget(current, 2))->setColor(handler.colors[i].color);
+                }
+            }
+        }
+
+        // global context changed, will be cascaded to each athlete context
+        // not sure this needed ->  GlobalContext::context()->notifyConfigChanged(CONFIG_APPEARANCE);
+    }
+    else {
+        QMessageBox msgBox;
+        msgBox.setIcon(QMessageBox::Critical);
+        msgBox.setText(tr("File: %1 is empty !").arg(filename));
+        msgBox.exec();
+        return;
+    }
+}
+
+void
+ColorsPage::backupColorsToXML() {
+
+    QString filename = QDir(gcroot).canonicalPath() + "/colors-backup.xml";
+    QFile file(filename);
+    if (file.open(QFile::WriteOnly)) {
+
+        file.resize(0);
+        QTextStream out(&file);
+        out.setCodec("UTF-8");
+
+        out << "<colors>\n\n";
+
+        out << "\t<!-- This file contains a backup of the colors set by the User. --> \n";
+        out << "\t<!-- Note: Only rgb values in decimal are acceptable should you wish to modify this file --> \n\n";
+
+        // iterate through the colors
+        for (unsigned int i = 0; colorSet[i].name != ""; i++) {
+
+            // Iterate through the color tree widget to find the color to backup
+            for (unsigned int j = 0; colorSet[j].name != ""; j++) {
+
+                QTreeWidgetItem* current = colors->invisibleRootItem()->child(j);
+                int colornum = current->data(0, Qt::UserRole).toInt();
+                QColor newColor = ((ColorButton*)colors->itemWidget(current, 2))->getColor();
+
+                if (colorSet[i].index == colornum) {
+
+                    out << "\t<color "
+                        << "index=\"" << colorSet[i].index << "\" "
+                        << "group=\"" << colorSet[i].group << "\" "
+                        << "name=\"" << colorSet[i].name << "\" "
+                        << "setting=\"" << colorSet[i].setting << "\" "
+                        << "rgb=\"" << newColor.red() << ","
+                                    << newColor.green() << ","
+                                    << newColor.blue()
+                        << "\" />\n";
+                }
+            }
+        }
+        out << "</colors>\n";
+        file.close();
+
+    } else {
+
+        QMessageBox msgBox;
+        msgBox.setIcon(QMessageBox::Critical);
+        msgBox.setText(tr("Problem Saving User Color Backup configuration file."));
+        msgBox.setInformativeText(tr("File: %1 cannot be opened for 'Writing'. Please check file properties.").arg(filename));
+        msgBox.exec();
+        return;
+    }
 }
 
 FavouriteMetricsPage::FavouriteMetricsPage(QWidget *parent) :
