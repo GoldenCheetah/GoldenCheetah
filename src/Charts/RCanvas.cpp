@@ -84,7 +84,7 @@ RCanvas::configChanged(qint32)
     // set background etc to the prevailing defaults
     QPalette p = palette();
     p.setColor(QPalette::Base, GColor(CPLOTBACKGROUND));
-    p.setColor(QPalette::Text, GCColor::invertColor(GColor(CPLOTBACKGROUND)));
+    p.setColor(QPalette::Text, GInvertColor(CPLOTBACKGROUND));
     setPalette(p);
     setStyleSheet(AbstractView::ourStyleSheet());
 }

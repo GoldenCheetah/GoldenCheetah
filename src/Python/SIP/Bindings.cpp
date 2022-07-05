@@ -1012,7 +1012,7 @@ Bindings::activityMetrics(RideItem* item) const
     if (item->color == QColor(1,1,1,1)) {
 
         // use the inverted color, not plot marker as that hideous
-        QColor col =GCColor::invertColor(GColor(CPLOTBACKGROUND));
+        QColor col =GInvertColor(CPLOTBACKGROUND);
 
         // white is jarring on a dark background!
         if (col==QColor(Qt::white)) col=QColor(127,127,127);
@@ -1149,7 +1149,7 @@ Bindings::seasonMetrics(bool all, DateRange range, QString filter) const
             if (ride->color == QColor(1,1,1,1)) {
 
                 // use the inverted color, not plot marker as that hideous
-                QColor col =GCColor::invertColor(GColor(CPLOTBACKGROUND));
+                QColor col =GInvertColor(CPLOTBACKGROUND);
 
                 // white is jarring on a dark background!
                 if (col==QColor(Qt::white)) col=QColor(127,127,127);
@@ -1354,7 +1354,7 @@ Bindings::seasonIntervals(DateRange range, QString type) const
                     QString color;
                     if (item->color == QColor(1,1,1,1)) {
                         // use the inverted color, not plot marker as that hideous
-                        QColor col =GCColor::invertColor(GColor(CPLOTBACKGROUND));
+                        QColor col =GInvertColor(CPLOTBACKGROUND);
                         // white is jarring on a dark background!
                         if (col==QColor(Qt::white)) col=QColor(127,127,127);
                         color = col.name();
@@ -1470,7 +1470,7 @@ Bindings::activityIntervals(QString type, PyObject* activity) const
             QString color;
             if (item->color == QColor(1,1,1,1)) {
                 // use the inverted color, not plot marker as that hideous
-                QColor col =GCColor::invertColor(GColor(CPLOTBACKGROUND));
+                QColor col =GInvertColor(CPLOTBACKGROUND);
                 // white is jarring on a dark background!
                 if (col==QColor(Qt::white)) col=QColor(127,127,127);
                 color = col.name();

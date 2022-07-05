@@ -919,7 +919,7 @@ ModelPlot::configChanged(qint32)
     setBackgroundColor(bg);
 
     // labels
-    QColor irgba = GCColor::invertColor(GColor(CPLOTBACKGROUND));
+    QColor irgba = GInvertColor(CPLOTBACKGROUND;
     RGBA fg(irgba.red()/255.0, irgba.green()/255.0, irgba.blue()/255.0, 0);
     coordinates()->setLabelColor(fg);
     coordinates()->setNumberColor(fg);
@@ -1310,7 +1310,7 @@ void Bar::draw(Qwt3D::Triple const& pos)
 
     } else {
         // first bars use max and are see-through
-        QColor irgba = GCColor::invertColor(GColor(CPLOTBACKGROUND));
+        QColor irgba = GInvertColor(CPLOTBACKGROUND;
         RGBA t(irgba.red()/255.0, irgba.green()/255.0, irgba.blue()/255.0, 1);
         RGBA b(irgba.red()/255.0, irgba.green()/255.0, irgba.blue()/255.0, 0);
         rgbat = t;
@@ -1366,7 +1366,7 @@ void Bar::draw(Qwt3D::Triple const& pos)
     }
 
     if (model->intervals_ == 0 || model->intervals_&SHOW_FRAME) {
-        QColor irgba = GCColor::invertColor(GColor(CPLOTBACKGROUND));
+        QColor irgba = GInvertColor(CPLOTBACKGROUND;
         glColor3d(irgba.red()/255.0, irgba.green()/255.0,irgba.blue()/255);
         glBegin(GL_LINES);
         glVertex3d(pos.x-model->diag_,pos.y-model->diag_,gminz); glVertex3d(pos.x+model->diag_,pos.y-model->diag_,gminz);

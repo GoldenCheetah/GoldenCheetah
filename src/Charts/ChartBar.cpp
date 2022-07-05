@@ -421,7 +421,7 @@ ButtonBar::paintBackground(QPaintEvent *)
     painter.fillRect(all, QColor(Qt::white));
     painter.fillRect(all, GColor(CCHARTBAR));
 
-    if (!GCColor::isFlat()) {
+    if (!GCColor::instance()->isFlat()) {
         QPen black(QColor(100,100,100,200));
         painter.setPen(black);
         painter.drawLine(0,height()-1, width()-1, height()-1);
@@ -466,7 +466,7 @@ ChartBarItem::paintEvent(QPaintEvent *)
     painter.fillRect(body, brush);
 
     // now paint the text
-    QPen pen(GCColor::invertColor(brush.color()));
+    QPen pen(GInvertColor(brush.color()));
     painter.setPen(pen);
     painter.drawText(body, text, Qt::AlignHCenter | Qt::AlignVCenter);
 
@@ -491,7 +491,7 @@ ChartBarItem::paintEvent(QPaintEvent *)
         if (checked) {
 
             // different color if under mouse
-            QBrush brush(GCColor::invertColor(color));
+            QBrush brush(GInvertColor(color));
             if (hotspot.contains(mouse)) brush.setColor(GColor(CPLOTMARKER));
             painter.fillPath (triangle, brush);
         } else {

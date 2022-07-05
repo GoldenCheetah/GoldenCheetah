@@ -107,8 +107,8 @@ GcOverlayWidget::GcOverlayWidget(Context *context, QWidget *parent) : QWidget(pa
 void
 GcOverlayWidget::configChanged(qint32)
 {
-    if (GCColor::isFlat()) {
-        titleLabel->setStyleSheet(QString("color: %1;").arg(GCColor::invertColor(GColor(CCHROME)).name()));
+    if (GCColor::instance()->isFlat()) {
+        titleLabel->setStyleSheet(QString("color: %1;").arg(GInvertColor(CCHROME).name()));
     } else {
         titleLabel->setStyleSheet("color: black;");
     }
@@ -216,15 +216,15 @@ GcOverlayWidget::paintBackground(QPaintEvent *)
     painter.drawRect(boundary);
 
     // linear gradients
-    QLinearGradient active = GCColor::linearGradient(23*dpiXFactor, true);
-    QLinearGradient inactive = GCColor::linearGradient(23*dpiYFactor, false);
+    QLinearGradient active = GCColor::instance()->linearGradient(23*dpiXFactor, true);
+    QLinearGradient inactive = GCColor::instance()->linearGradient(23*dpiYFactor, false);
 
     // title
     QRect title(1*dpiXFactor,1*dpiYFactor,width()-(2*dpiXFactor),22*dpiYFactor);
     painter.fillRect(title, QColor(Qt::white));
     painter.fillRect(title, isActiveWindow() ? active : inactive);
 
-    if (!GCColor::isFlat()) {
+    if (!GCColor::instance()->isFlat()) {
         QPen black(QColor(100,100,100,200));
         painter.setPen(black);
         painter.drawLine(0,22*dpiYFactor, width()-(1*dpiXFactor), 22*dpiYFactor);

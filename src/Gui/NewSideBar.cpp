@@ -223,7 +223,7 @@ NewSideBarItem::configChanged(qint32)
     setStyleSheet(style);
 
     // set foreground colors
-    fg_normal = GCColor::invertColor(GColor(CCHROME));
+    fg_normal = GInvertColor(CCHROME);
 
     // if foreground is white then we're "dark" if its
     // black the we're "light" so this controls palette
@@ -242,7 +242,7 @@ NewSideBarItem::configChanged(qint32)
     if (dark) bg_select = bg_select.lighter(200);
     else bg_select = bg_select.darker(200);
     if (isblack) bg_select = QColor(30,30,30);
-    fg_select = GCColor::invertColor(bg_select);
+    fg_select = GInvertColor(bg_select);
 
     // on hover
     bg_hover =GColor(CHOVER);

@@ -138,7 +138,7 @@ EditFixPyScriptDialog::EditFixPyScriptDialog(Context *context, FixPyScript *fix,
     script->setFont(courier);
     QPalette p = palette();
     p.setColor(QPalette::Base, GColor(CPLOTBACKGROUND));
-    p.setColor(QPalette::Text, GCColor::invertColor(GColor(CPLOTBACKGROUND)));
+    p.setColor(QPalette::Text, GInvertColor(CPLOTBACKGROUND));
     script->setPalette(p);
     script->setStyleSheet(AbstractView::ourStyleSheet());
     scriptLayout->addWidget(script);

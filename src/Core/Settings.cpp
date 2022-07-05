@@ -550,7 +550,7 @@ GSettings::upgradeSystem() {
     //DEPRECATED IN V3.5 migrateValue(GC_FONT_CHARTMARKERS_SIZE);
     //DEPRECATED IN V3.5 migrateValue(GC_FONT_CALENDAR_SIZE);
 
-    QStringList colorProperties = GCColor::getConfigKeys();
+    QStringList colorProperties = GCColor::instance()->getConfigKeys();
     QStringListIterator colorIterator(colorProperties);
     while (colorIterator.hasNext()) {
         QString key = QString(colorIterator.next().data());

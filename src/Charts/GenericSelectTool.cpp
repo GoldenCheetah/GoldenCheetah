@@ -86,7 +86,7 @@ void GenericSelectTool::paint(QPainter*painter, const QStyleOptionGraphicsItem *
             //
             foreach(SeriesPoint p, hoverpoints) {
                 QPointF pos = mapFromScene(host->qchart->mapToPosition(p.xy,p.series));
-                QColor invert = GCColor::invertColor(GColor(CPLOTBACKGROUND));
+                QColor invert = GInvertColor(CPLOTBACKGROUND);
                 painter->setBrush(invert);
                 painter->setPen(invert);
                 QRectF circle(0,0,gl_linemarker*dpiXFactor*host->scale_,gl_linemarker*dpiYFactor*host->scale_);
@@ -114,7 +114,7 @@ void GenericSelectTool::paint(QPainter*painter, const QStyleOptionGraphicsItem *
                     //
                     if (hoverpoint != GPointF()) {
                         // draw a circle using marker color
-                        QColor invert = GCColor::invertColor(GColor(CPLOTBACKGROUND));
+                        QColor invert = GInvertColor(CPLOTBACKGROUND);
                         painter->setBrush(invert);
                         painter->setPen(invert);
                         QRectF circle(0,0,gl_scattermarker*dpiXFactor*host->scale_,gl_scattermarker*dpiYFactor*host->scale_);

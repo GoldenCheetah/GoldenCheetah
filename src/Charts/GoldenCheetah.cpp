@@ -290,7 +290,7 @@ GcWindow::paintEvent(QPaintEvent * /*event*/)
         if (showtitle) {
             // pen color needs to contrast to background color
             QColor bgColor = property("color").value<QColor>();
-            QColor fgColor = GCColor::invertColor(bgColor); // return the contrasting color
+            QColor fgColor = GInvertColor(bgColor); // return the contrasting color
 
             painter.setPen(fgColor);
             painter.drawText(bar, heading, Qt::AlignVCenter | Qt::AlignCenter);
@@ -765,7 +765,7 @@ GcChartWindow::GcChartWindow(Context *context) : GcWindow(context), context(cont
 void
 GcChartWindow::colorChanged(QColor z)
 {
-    QColor fgColor = GCColor::invertColor(z);
+    QColor fgColor = GInvertColor(z);
 
     // so z is color for bg and fgColor is for fg
     QString stylesheet = QString("color: rgb(%1, %2, %3); background-color: rgba(%4, %5, %6, 80%)")

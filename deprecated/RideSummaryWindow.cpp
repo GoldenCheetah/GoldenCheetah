@@ -341,7 +341,7 @@ RideSummaryWindow::refresh()
         // if we're summarising a ride but have no ride to summarise
         if (ridesummary && !myRideItem) {
             setSubTitle(tr("Summary"));
-            rideSummary->page()->setHtml(GCColor::css(ridesummary));
+            rideSummary->page()->setHtml(GCColor::instance()->css(ridesummary));
             return;
         }
 
@@ -408,8 +408,8 @@ RideSummaryWindow::htmlSummary()
 
     QString summary("");
     QColor bgColor = ridesummary ? GColor(CPLOTBACKGROUND) : GColor(CTRENDPLOTBACKGROUND);
-    //QColor fgColor = GCColor::invertColor(bgColor);
-    QColor altColor = GCColor::alternateColor(bgColor);
+    //QColor fgColor = GInvertColor(bgColor);
+    QColor altColor = GCColor::instance()->alternateColor(bgColor);
 
     RideItem *rideItem = myRideItem;
     RideFile *ride;
@@ -437,7 +437,7 @@ RideSummaryWindow::htmlSummary()
     context->athlete->rideCache->getRideTypeCounts(specification, nActivities, nRides, nRuns, nSwims, sport);
 
     // set those colors
-    summary = GCColor::css(ridesummary);
+    summary = GCColor::instance()->css(ridesummary);
     summary += "<center>";
 
     // device summary for ride summary, otherwise how many activities?
@@ -629,8 +629,8 @@ RideSummaryWindow::htmlSummary()
             if (ridesummary) {
 
                 // for rag reporting
-                QColor defaultColor = ridesummary ? GCColor::invertColor(GColor(CPLOTBACKGROUND)) :
-                                                    GCColor::invertColor(GColor(CTRENDPLOTBACKGROUND));
+                QColor defaultColor = ridesummary ? GInvertColor(CPLOTBACKGROUND :
+                                                    GInvertColor(CTRENDPLOTBACKGROUND);
 
                 // get the Coggan PMC and add values for date of ride
                 summary += QString(tr("<tr><td>%3</td><td align=\"right\"><font color=\"%2\">%1</font></td></tr>")
@@ -1714,8 +1714,8 @@ RideSummaryWindow::htmlCompareSummary() const
     QString summary;
 
     QColor bgColor = ridesummary ? GColor(CPLOTBACKGROUND) : GColor(CTRENDPLOTBACKGROUND);
-    //QColor fgColor = GCColor::invertColor(bgColor);
-    QColor altColor = GCColor::alternateColor(bgColor);
+    //QColor fgColor = GInvertColor(bgColor);
+    QColor altColor = GCColor::instance()->alternateColor(bgColor);
 
     // SETUP ALL THE METRICS WE WILL SHOW
 
@@ -1837,7 +1837,7 @@ RideSummaryWindow::htmlCompareSummary() const
             intervalMetrics << context->compareIntervals.at(j).rideItem;
 
         // LETS FORMAT THE HTML
-        summary = GCColor::css(ridesummary);
+        summary = GCColor::instance()->css(ridesummary);
         summary += "<center>";
 
         //
@@ -2200,7 +2200,7 @@ RideSummaryWindow::htmlCompareSummary() const
     } else { // DATE RANGE COMPARE
 
         // LETS FORMAT THE HTML
-        summary = GCColor::css(ridesummary);
+        summary = GCColor::instance()->css(ridesummary);
         summary += "<center>";
 
         //

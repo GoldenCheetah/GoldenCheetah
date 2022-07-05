@@ -60,7 +60,7 @@ GcToolBar::paintBackground(QPaintEvent *)
     painter.setPen(Qt::NoPen);
     painter.fillRect(all, GColor(CTOOLBAR));
 
-    if (!GCColor::isFlat()) {
+    if (!GCColor::instance()->isFlat()) {
         // paint the bottom lines
         QPen black(QColor(100,100,100));
         painter.setPen(black);

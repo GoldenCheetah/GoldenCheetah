@@ -64,7 +64,7 @@ void GProgressDialog::paintEvent(QPaintEvent *)
     translucentGray.setAlpha(240);
     QColor translucentWhite = GColor(CPLOTBACKGROUND);
     translucentWhite.setAlpha(240);
-    QColor black = GCColor::invertColor(translucentWhite);
+    QColor black = GInvertColor(translucentWhite);
 
     // setup a painter and the area to paint
     QPainter painter(this);
@@ -84,7 +84,7 @@ void GProgressDialog::paintEvent(QPaintEvent *)
 
     // heading background and text
     QRectF titlebox(0,0,width(),25);
-    QLinearGradient active = GCColor::linearGradient(25, true, false);
+    QLinearGradient active = GCColor::instance()->linearGradient(25, true, false);
     painter.fillRect(titlebox, QBrush(Qt::white));
     painter.fillRect(titlebox, active);
 

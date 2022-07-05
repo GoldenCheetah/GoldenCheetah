@@ -157,7 +157,7 @@ GcLabel::paintEvent(QPaintEvent *)
     if (text() != "<" && text() != ">") {
         painter.setFont(this->font());
 
-        if (!GCColor::isFlat() && (xoff || yoff)) {
+        if (!GCColor::instance()->isFlat() && (xoff || yoff)) {
 
             // draw text in white behind...
             QRectF off(xoff,yoff,width(),height());
@@ -168,9 +168,9 @@ GcLabel::paintEvent(QPaintEvent *)
         if (filtered && !selected && !underMouse()) painter.setPen(GColor(CCALCURRENT));
         else {
 
-            if (isChrome && GCColor::isFlat()) {
+            if (isChrome && GCColor::instance()->isFlat()) {
 
-                if (GCColor::luminance(GColor(CCHROME)) < 127)
+                if (GCColor::instance()->luminance(GColor(CCHROME)) < 127)
                     painter.setPen(QColor(Qt::white));
                 else
                     painter.setPen(QColor(30,30,30,200));
@@ -388,7 +388,7 @@ void
 GcMiniCalendar::configChanged(qint32)
 {
     QColor bgColor = GColor(CPLOTBACKGROUND);
-    QColor fgColor = GCColor::invertColor(bgColor);
+    QColor fgColor = GInvertColor(bgColor);
     //XXX setStyleSheet(QString("color: %1; background: %2;").arg(fgColor.name()).arg(bgColor.name())); // clear any shit left behind from parents (Larkin ?)
     tint.setColor(QPalette::Window, bgColor);
     tint.setColor(QPalette::WindowText, GColor(CPLOTMARKER));
@@ -706,7 +706,7 @@ void
 GcMultiCalendar::configChanged(qint32)
 {
     QColor bgColor = GColor(CPLOTBACKGROUND);
-    QColor fgColor = GCColor::invertColor(bgColor);
+    QColor fgColor = GInvertColor(bgColor);
 
     QPalette pal;
     pal.setColor(QPalette::Window, bgColor);

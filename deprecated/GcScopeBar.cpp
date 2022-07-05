@@ -190,7 +190,7 @@ GcScopeBar::paintBackground(QPaintEvent *)
     QRect all(0,0,width(),height());
 
     // fill with a linear gradient
-    QLinearGradient linearGradient = GCColor::linearGradient(23*dpiYFactor, isActiveWindow());
+    QLinearGradient linearGradient = GCColor::instance()->linearGradient(23*dpiYFactor, isActiveWindow());
     painter.setPen(Qt::NoPen);
     painter.fillRect(all, linearGradient);
 
@@ -380,7 +380,7 @@ GcScopeButton::paintEvent(QPaintEvent *)
     // don't do all that offset nonsense for flat style
     // set fg checked and unchecked colors
     QColor checkedCol(240,240,240), uncheckedCol(30,30,30,200);
-    if (!GCColor::isFlat()) {
+    if (!GCColor::instance()->isFlat()) {
 
         // metal style
         painter.setPen((underMouse() || checked) ? QColor(50,50,50) : Qt::white);
@@ -389,7 +389,7 @@ GcScopeButton::paintEvent(QPaintEvent *)
     } else {
 
         // adjust colors if flat and dark
-        if (GCColor::luminance(GColor(CCHROME)) < 127) {
+        if (GCColor::instance()->luminance(CCHROME) < 127) {
             // dark background so checked is white and unchecked is light gray
             checkedCol = QColor(Qt::white);
             uncheckedCol = QColor(Qt::lightGray);

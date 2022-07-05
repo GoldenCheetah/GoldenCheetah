@@ -1315,7 +1315,7 @@ ColorsPage::ColorsPage(QWidget *parent) : QWidget(parent)
 
     mainLayout->addWidget(colorTab);
 
-    colorSet = GCColor::colorSet();
+    colorSet = GCColor::instance()->colorSet();
     for (int i=0; colorSet[i].name != ""; i++) {
 
         QTreeWidgetItem *add;
@@ -1333,7 +1333,7 @@ ColorsPage::ColorsPage(QWidget *parent) : QWidget(parent)
 
     connect(applyTheme, SIGNAL(clicked()), this, SLOT(applyThemeClicked()));
 
-    foreach(ColorTheme theme, GCColor::themes().themes) {
+    foreach(ColorTheme theme, Themes::instance()->themes) {
 
         QTreeWidgetItem *add;
         ColorLabel *swatch = new ColorLabel(theme);
@@ -1408,10 +1408,10 @@ ColorsPage::applyThemeClicked()
     if (themes->currentItem() && (index=themes->invisibleRootItem()->indexOfChild(themes->currentItem())) >= 0) {
 
         // now get the theme selected
-        ColorTheme theme = GCColor::themes().themes[index];
+        ColorTheme theme = Themes::instance()->themes[index];
 
         // reset to base
-        colorSet = GCColor::defaultColorSet(theme.dark);
+        colorSet = GCColor::instance()->defaultColorSet(theme.dark);
 
         // reset the color selection tools
         colors->clear();
@@ -1577,7 +1577,7 @@ ColorsPage::saveClicked()
     appsettings->setValue(GC_FONT_CHARTLABELS_SIZE, font.pointSizeF() * 0.8);
 
     // reread into colorset so we can check for changes
-    GCColor::readConfig();
+    GCColor::instance()->readConfig();
 
     // did we change anything ?
     if(b4.alias != antiAliased->isChecked() ||

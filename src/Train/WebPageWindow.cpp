@@ -193,7 +193,7 @@ WebPageWindow::configChanged(qint32)
     palette.setBrush(QPalette::Window, QBrush(GColor(CPLOTBACKGROUND)));
     palette.setColor(QPalette::WindowText, GColor(CPLOTMARKER));
     palette.setColor(QPalette::Text, GColor(CPLOTMARKER));
-    palette.setColor(QPalette::Base, GCColor::alternateColor(GColor(CPLOTBACKGROUND)));
+    palette.setColor(QPalette::Base, GCColor::instance()->alternateColor(CPLOTBACKGROUND));
     setPalette(palette);
 }
 

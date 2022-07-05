@@ -986,7 +986,7 @@ Card::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
     //XXXpainter->drawLine(QLineF(0,ROWHEIGHT*2,geometry().width(),ROWHEIGHT*2));
     //painter->fillRect(QRectF(0,0,geometry().width()+1,geometry().height()+1), brush);
     //titlefont.setWeight(QFont::Bold);
-    if (GCColor::luminance(GColor(CCARDBACKGROUND)) < 127) painter->setPen(QColor(200,200,200));
+    if (GCColor::instance()->luminance(CCARDBACKGROUND) < 127) painter->setPen(QColor(200,200,200));
     else painter->setPen(QColor(70,70,70));
 
     painter->setFont(parent->titlefont);
@@ -2231,7 +2231,7 @@ OverviewWindow::configChanged(qint32)
     if (GColor(COVERVIEWBACKGROUND) != Qt::white)
 #endif
     {
-        //palette.setColor(QPalette::Base, GCColor::alternateColor(GColor(CTRAINPLOTBACKGROUND)));
+        //palette.setColor(QPalette::Base, GCColor::instance()->alternateColor(CTRAINPLOTBACKGROUND));
         palette.setColor(QPalette::Base, GColor(COVERVIEWBACKGROUND));
         palette.setColor(QPalette::Window, GColor(COVERVIEWBACKGROUND));
     }
@@ -2240,8 +2240,8 @@ OverviewWindow::configChanged(qint32)
     //code->setStyleSheet(TabView::ourStyleSheet());
 #endif
 
-    palette.setColor(QPalette::WindowText, GCColor::invertColor(GColor(COVERVIEWBACKGROUND)));
-    palette.setColor(QPalette::Text, GCColor::invertColor(GColor(COVERVIEWBACKGROUND)));
+    palette.setColor(QPalette::WindowText, GInvertColor(COVERVIEWBACKGROUND));
+    palette.setColor(QPalette::Text, GInvertColor(COVERVIEWBACKGROUND));
     //code->setPalette(palette);
     repaint();
 }

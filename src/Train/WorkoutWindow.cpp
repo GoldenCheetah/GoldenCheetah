@@ -365,7 +365,7 @@ WorkoutWindow::configChanged(qint32)
     scroll->setStyleSheet(AbstractView::ourStyleSheet());
     toolbar->setStyleSheet(QString("::enabled { background: %1; color: %2; border: 0px; } ")
                            .arg(GColor(CTRAINPLOTBACKGROUND).name())
-                           .arg(GCColor::invertColor(GColor(CTRAINPLOTBACKGROUND)).name()));
+                           .arg(GInvertColor(CTRAINPLOTBACKGROUND).name()));
 
     xlabel->setStyleSheet("color: darkGray;");
     ylabel->setStyleSheet("color: darkGray;");
@@ -388,7 +388,7 @@ WorkoutWindow::configChanged(qint32)
     if (GColor(CTRAINPLOTBACKGROUND) != Qt::white)
 #endif
     {
-        //palette.setColor(QPalette::Base, GCColor::alternateColor(GColor(CTRAINPLOTBACKGROUND)));
+        //palette.setColor(QPalette::Base, GCColor::instance()->alternateColor(CTRAINPLOTBACKGROUND));
         palette.setColor(QPalette::Base, GColor(CTRAINPLOTBACKGROUND));
         palette.setColor(QPalette::Window, GColor(CTRAINPLOTBACKGROUND));
     }
@@ -397,8 +397,8 @@ WorkoutWindow::configChanged(qint32)
     code->setStyleSheet(AbstractView::ourStyleSheet());
 #endif
 
-    palette.setColor(QPalette::WindowText, GCColor::invertColor(GColor(CTRAINPLOTBACKGROUND)));
-    palette.setColor(QPalette::Text, GCColor::invertColor(GColor(CTRAINPLOTBACKGROUND)));
+    palette.setColor(QPalette::WindowText, GInvertColor(CTRAINPLOTBACKGROUND));
+    palette.setColor(QPalette::Text, GInvertColor(CTRAINPLOTBACKGROUND));
     code->setPalette(palette);
     repaint();
 }

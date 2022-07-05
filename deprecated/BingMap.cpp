@@ -170,7 +170,7 @@ void BingMap::createHtml()
     }
 
     QColor bgColor = GColor(CPLOTBACKGROUND);
-    QColor fgColor = GCColor::invertColor(bgColor);
+    QColor fgColor = GInvertColor(bgColor);
 
     // No GPS data, so sorry no map
     if(!ride || !ride->ride() || ride->ride()->areDataPresent()->lat == false || ride->ride()->areDataPresent()->lon == false) {

@@ -240,7 +240,7 @@ AbstractView::ourStyleSheet()
            "QTreeView::item:hover { color: black; background: lightGray; }"
            "").arg(GColor(CPLOTBACKGROUND).name())
             .arg(GColor(CPLOTGRID).name())
-            .arg(GCColor::alternateColor(GColor(CPLOTBACKGROUND)).name())
+            .arg(GCColor::instance()->alternateColor(CPLOTBACKGROUND).name())
             .arg(8 * dpiXFactor) // width
             .arg(4 * dpiXFactor) // border radius
             .arg(GColor(CPLOTMARKER).name())

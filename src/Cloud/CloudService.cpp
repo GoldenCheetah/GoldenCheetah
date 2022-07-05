@@ -2035,7 +2035,7 @@ CloudServiceAutoDownloadWidget::paintEvent(QPaintEvent*)
     QFont font;
     QFontMetrics fm(font);
     painter.setFont(font);
-    painter.setPen(GCColor::invertColor(GColor(CPLOTBACKGROUND)));
+    painter.setPen(GInvertColor(CPLOTBACKGROUND));
     QRectF textbox = QRectF(0,0, fm.width(statusstring), height() / 2.0f);
     painter.drawText(textbox, Qt::AlignVCenter | Qt::AlignCenter, statusstring);
 

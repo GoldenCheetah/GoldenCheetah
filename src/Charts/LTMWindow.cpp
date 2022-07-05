@@ -513,16 +513,16 @@ LTMWindow::configChanged(qint32)
     palette.setBrush(QPalette::Window, QBrush(GColor(CTRENDPLOTBACKGROUND)));
     palette.setColor(QPalette::WindowText, GColor(CPLOTMARKER));
     palette.setColor(QPalette::Text, GColor(CPLOTMARKER));
-    palette.setColor(QPalette::Base, GCColor::alternateColor(GColor(CPLOTBACKGROUND)));
+    palette.setColor(QPalette::Base, GCColor::instance()->alternateColor(CPLOTBACKGROUND));
     setPalette(palette);
 
     // inverted palette for data etc
     QPalette whitepalette;
     whitepalette.setBrush(QPalette::Window, QBrush(GColor(CTRENDPLOTBACKGROUND)));
     whitepalette.setBrush(QPalette::Background, QBrush(GColor(CTRENDPLOTBACKGROUND)));
-    whitepalette.setColor(QPalette::WindowText, GCColor::invertColor(GColor(CTRENDPLOTBACKGROUND)));
-    whitepalette.setColor(QPalette::Base, GCColor::alternateColor(GColor(CPLOTBACKGROUND)));
-    whitepalette.setColor(QPalette::Text, GCColor::invertColor(GColor(CTRENDPLOTBACKGROUND)));
+    whitepalette.setColor(QPalette::WindowText, GInvertColor(CTRENDPLOTBACKGROUND));
+    whitepalette.setColor(QPalette::Base, GCColor::instance()->alternateColor(CPLOTBACKGROUND));
+    whitepalette.setColor(QPalette::Text, GInvertColor(CTRENDPLOTBACKGROUND));
 
     QFont font;
     font.setPointSize(12); // reasonably big
@@ -1299,12 +1299,12 @@ LTMWindow::dataTable(bool html)
     QString summary;
 
     QColor bgColor = GColor(CTRENDPLOTBACKGROUND);
-    QColor altColor = GCColor::alternateColor(bgColor);
+    QColor altColor = GCColor::instance()->alternateColor(bgColor);
 
     // html page prettified with a title
     if (html) {
 
-        summary = GCColor::css();
+        summary = GCColor::instance()->css();
         summary += "<center>";
 
         // device summary for ride summary, otherwise how many activities?

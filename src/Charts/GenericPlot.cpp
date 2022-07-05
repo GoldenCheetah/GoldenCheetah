@@ -262,7 +262,7 @@ GenericPlot::configChanged(qint32)
     palette.setBrush(QPalette::Window, QBrush(bgcolor_));
     palette.setColor(QPalette::WindowText, GColor(CPLOTMARKER));
     palette.setColor(QPalette::Text, GColor(CPLOTMARKER));
-    palette.setColor(QPalette::Base, GCColor::alternateColor(bgcolor_));
+    palette.setColor(QPalette::Base, GCColor::instance()->alternateColor(bgcolor_));
     setPalette(palette);
 
     // chart colors

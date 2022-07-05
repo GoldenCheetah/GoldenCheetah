@@ -332,12 +332,12 @@ AerolabWindow::configChanged(qint32)
   if (GColor(CPLOTBACKGROUND) != Qt::white)
 #endif
   {
-      palette.setColor(QPalette::Base, GCColor::alternateColor(GColor(CPLOTBACKGROUND)));
+      palette.setColor(QPalette::Base, GCColor::instance()->alternateColor(CPLOTBACKGROUND));
       palette.setColor(QPalette::Window,  GColor(CPLOTBACKGROUND));
   }
 
-  palette.setColor(QPalette::WindowText, GCColor::invertColor(GColor(CPLOTBACKGROUND)));
-  palette.setColor(QPalette::Text, GCColor::invertColor(GColor(CPLOTBACKGROUND)));
+  palette.setColor(QPalette::WindowText, GInvertColor(CPLOTBACKGROUND));
+  palette.setColor(QPalette::Text, GInvertColor(CPLOTBACKGROUND));
   setPalette(palette);
   aerolab->setPalette(palette);
   crrLabel->setPalette(palette);

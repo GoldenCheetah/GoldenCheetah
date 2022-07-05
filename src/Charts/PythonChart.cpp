@@ -47,7 +47,7 @@ PythonConsole::PythonConsole(Context *context, PythonHost *pythonHost, QWidget *
     setAcceptRichText(false);
     document()->setMaximumBlockCount(512); // lets not get carried away!
     putData(GColor(CPLOTMARKER), QString(tr("Python Console (%1)").arg(python->version)));
-    putData(GCColor::invertColor(GColor(CPLOTBACKGROUND)), "\n>>> ");
+    putData(GInvertColor(CPLOTBACKGROUND), "\n>>> ");
 
     connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
     connect(context, SIGNAL(rMessage(QString)), this, SLOT(rMessage(QString)));
@@ -68,7 +68,7 @@ PythonConsole::configChanged(qint32)
     setFont(courier);
     QPalette p = palette();
     p.setColor(QPalette::Base, GColor(CPLOTBACKGROUND));
-    p.setColor(QPalette::Text, GCColor::invertColor(GColor(CPLOTBACKGROUND)));
+    p.setColor(QPalette::Text, GInvertColor(CPLOTBACKGROUND));
     setPalette(p);
     setStyleSheet(AbstractView::ourStyleSheet());
 }
@@ -157,7 +157,7 @@ void PythonConsole::keyPressEvent(QKeyEvent *e)
 
                 // new prompt
                 putData("\n");
-                putData(GCColor::invertColor(GColor(CPLOTBACKGROUND)), ">>> ");
+                putData(GInvertColor(CPLOTBACKGROUND), ">>> ");
 
             } else {
                 // normal C just do the usual
@@ -234,7 +234,7 @@ void PythonConsole::keyPressEvent(QKeyEvent *e)
         }
 
         // prompt ">"
-        putData(GCColor::invertColor(GColor(CPLOTBACKGROUND)), ">>> ");
+        putData(GInvertColor(CPLOTBACKGROUND), ">>> ");
     }
     break;
 
@@ -254,7 +254,7 @@ PythonConsole::setCurrentLine(QString p)
 
     select.select(QTextCursor::LineUnderCursor);
     select.removeSelectedText();
-    putData(GCColor::invertColor(GColor(CPLOTBACKGROUND)), ">>> ");
+    putData(GInvertColor(CPLOTBACKGROUND), ">>> ");
     putData(p);
 }
 
@@ -327,7 +327,7 @@ PythonChart::PythonChart(Context *context, bool ridesummary) : GcChartWindow(con
         script->setFont(courier);
         QPalette p = palette();
         p.setColor(QPalette::Base, GColor(CPLOTBACKGROUND));
-        p.setColor(QPalette::Text, GCColor::invertColor(GColor(CPLOTBACKGROUND)));
+        p.setColor(QPalette::Text, GInvertColor(CPLOTBACKGROUND));
         script->setPalette(p);
         script->setStyleSheet(AbstractView::ourStyleSheet());
 
@@ -513,7 +513,7 @@ PythonChart::configChanged(qint32)
     palette.setBrush(QPalette::Window, QBrush(GColor(CPLOTBACKGROUND)));
     palette.setColor(QPalette::WindowText, GColor(CPLOTMARKER));
     palette.setColor(QPalette::Text, GColor(CPLOTMARKER));
-    palette.setColor(QPalette::Base, GCColor::alternateColor(GColor(CPLOTBACKGROUND)));
+    palette.setColor(QPalette::Base, GCColor::instance()->alternateColor(CPLOTBACKGROUND));
     setPalette(palette);
 
     // refresh

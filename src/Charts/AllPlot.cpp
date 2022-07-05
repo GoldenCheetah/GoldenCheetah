@@ -1174,7 +1174,7 @@ AllPlot::configChanged(qint32 what)
         QColor brush_color = GColor(CALTITUDEBRUSH);
         brush_color.setAlpha(200);
         standard->altCurve->setBrush(brush_color);   // fill below the line
-        QPen altSlopePen(GCColor::invertColor(GColor(CPLOTBACKGROUND)));
+        QPen altSlopePen(GInvertColor(CPLOTBACKGROUND));
         altSlopePen.setWidth(width);
         standard->altSlopeCurve->setPen(altSlopePen);
         QPen tempPen = QPen(GColor(CTEMP));

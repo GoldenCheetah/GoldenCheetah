@@ -328,7 +328,7 @@ IntervalItem *
 RideItem::newInterval(QString name, double start, double stop, double startKM, double stopKM, QColor color, bool test)
 {
     // add a new interval to the end of the list
-    color = color == Qt::black ? standardColor(intervals(RideFileInterval::USER).count()) : color;
+    color = color == Qt::black ? GCColor::instance()->standardColor(intervals(RideFileInterval::USER).count()) : color;
 
     IntervalItem *add = new IntervalItem(this, name, start, stop, startKM, stopKM, 1,
                                          color, test, RideFileInterval::USER);
@@ -937,7 +937,7 @@ RideItem::updateIntervals()
                                                       f->timeToDistance(interval->start),
                                                       f->timeToDistance(interval->stop),
                                                       seq,
-                                                      (interval->color == Qt::black) ? standardColor(count) : interval->color,
+                                                      (interval->color == Qt::black) ? GCColor::instance()->standardColor(count) : interval->color,
                                                       interval->test,
                                                       RideFileInterval::USER);
 

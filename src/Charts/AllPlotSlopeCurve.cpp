@@ -271,7 +271,7 @@ void AllPlotSlopeCurve::drawCurve( QPainter *painter, int,
             } else {
                 text.setNum(mperh, 'f', 0);
             }
-            painter->setPen(GCColor::invertColor(GColor(CPLOTBACKGROUND)));
+            painter->setPen(GInvertColor(CPLOTBACKGROUND));
             painter->setFont(QFont("Helvetica",8));
             QwtPainter::drawText(painter, pText, text );
         }

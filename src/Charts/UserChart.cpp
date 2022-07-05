@@ -90,7 +90,7 @@ UserChart::configChanged(qint32)
     palette.setBrush(QPalette::Background, RGBColor(chartinfo.bgcolor));
     palette.setColor(QPalette::WindowText, GColor(CPLOTMARKER));
     palette.setColor(QPalette::Text, GColor(CPLOTMARKER));
-    palette.setColor(QPalette::Base, RGBColor(chartinfo.bgcolor) /*GCColor::alternateColor(bgcolor)*/);
+    palette.setColor(QPalette::Base, RGBColor(chartinfo.bgcolor) /*GCColor::instance()->alternateColor(bgcolor)*/);
     setPalette(palette);
 
     setAutoFillBackground(true);
@@ -288,7 +288,7 @@ UserChart::refresh()
             }
             series.colors.clear();
             QColor min=QColor(series.color);
-            QColor max=GCColor::invertColor(GColor(CPLOTBACKGROUND));
+            QColor max=GInvertColor(CPLOTBACKGROUND);
             for(int i=0; i<series.labels.count(); i++) {
                 QColor color = QColor(min.red() + (double(max.red()-min.red()) * (i/double(series.labels.count()))),
                               min.green() + (double(max.green()-min.green()) * (i/double(series.labels.count()))),

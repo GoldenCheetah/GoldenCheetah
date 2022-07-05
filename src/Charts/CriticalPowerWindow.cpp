@@ -661,7 +661,7 @@ CriticalPowerWindow::configChanged(qint32)
     else palette.setBrush(QPalette::Window, QBrush(GColor(CPLOTBACKGROUND)));
     palette.setColor(QPalette::WindowText, GColor(CPLOTMARKER));
     palette.setColor(QPalette::Text, GColor(CPLOTMARKER));
-    palette.setColor(QPalette::Base, GCColor::alternateColor(GColor(CPLOTBACKGROUND)));
+    palette.setColor(QPalette::Base, GCColor::instance()->alternateColor(CPLOTBACKGROUND));
     setPalette(palette);
 
     // inverted palette for data etc
@@ -669,15 +669,15 @@ CriticalPowerWindow::configChanged(qint32)
     if (rangemode) {
         whitepalette.setBrush(QPalette::Window, QBrush(GColor(CTRENDPLOTBACKGROUND)));
         whitepalette.setBrush(QPalette::Background, QBrush(GColor(CTRENDPLOTBACKGROUND)));
-        whitepalette.setColor(QPalette::WindowText, GCColor::invertColor(GColor(CTRENDPLOTBACKGROUND)));
-        whitepalette.setColor(QPalette::Base, GCColor::alternateColor(GColor(CPLOTBACKGROUND)));
-        whitepalette.setColor(QPalette::Text, GCColor::invertColor(GColor(CTRENDPLOTBACKGROUND)));
+        whitepalette.setColor(QPalette::WindowText, GInvertColor(CTRENDPLOTBACKGROUND));
+        whitepalette.setColor(QPalette::Base, GCColor::instance()->alternateColor(CPLOTBACKGROUND));
+        whitepalette.setColor(QPalette::Text, GInvertColor(CTRENDPLOTBACKGROUND));
     } else {
         whitepalette.setBrush(QPalette::Window, QBrush(GColor(CPLOTBACKGROUND)));
         whitepalette.setBrush(QPalette::Background, QBrush(GColor(CPLOTBACKGROUND)));
-        whitepalette.setColor(QPalette::WindowText, GCColor::invertColor(GColor(CPLOTBACKGROUND)));
-        whitepalette.setColor(QPalette::Base, GCColor::alternateColor(GColor(CPLOTBACKGROUND)));
-        whitepalette.setColor(QPalette::Text, GCColor::invertColor(GColor(CPLOTBACKGROUND)));
+        whitepalette.setColor(QPalette::WindowText, GInvertColor(CPLOTBACKGROUND));
+        whitepalette.setColor(QPalette::Base, GCColor::instance()->alternateColor(CPLOTBACKGROUND));
+        whitepalette.setColor(QPalette::Text, GInvertColor(CPLOTBACKGROUND));
     }
 
     QFont font;
@@ -720,7 +720,7 @@ CriticalPowerWindow::configChanged(qint32)
 
 
 #ifndef Q_OS_MAC
-    QString style = QString("QSpinBox { background: %1; }").arg(GCColor::alternateColor(GColor(CPLOTBACKGROUND)).name());
+    QString style = QString("QSpinBox { background: %1; }").arg(GCColor::instance()->alternateColor(CPLOTBACKGROUND).name());
     CPEdit->setStyleSheet(style);
     //CPLabel->setStyleSheet(style);
     //CPSlider->setStyleSheet(style);

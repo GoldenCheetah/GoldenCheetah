@@ -126,7 +126,7 @@ GColorDialog::GColorDialog(QColor selected, QWidget *parent, bool all) : QDialog
     connect(mapper, SIGNAL(mappedInt(int)), this, SLOT(gcClicked(int)));
 
     // now add all the colours to select
-    colorSet = GCColor::colorSet();
+    colorSet = GCColor::instance()->colorSet();
     for (int i=0; colorSet[i].name != ""; i++) {
 
         if (!all && colorSet[i].group != tr("Data")) continue;

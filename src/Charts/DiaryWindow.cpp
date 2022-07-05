@@ -113,20 +113,20 @@ DiaryWindow::configChanged(qint32)
     palette.setBrush(QPalette::Window, QBrush(GColor(CPLOTBACKGROUND)));
     palette.setBrush(QPalette::Background, QBrush(GColor(CPLOTBACKGROUND)));
     palette.setBrush(QPalette::Base, QBrush(GColor(CPLOTBACKGROUND)));
-    palette.setColor(QPalette::WindowText, GCColor::invertColor(GColor(CPLOTBACKGROUND)));
-    palette.setColor(QPalette::Text, GCColor::invertColor(GColor(CPLOTBACKGROUND)));
-    palette.setColor(QPalette::Normal, QPalette::Window, GCColor::invertColor(GColor(CPLOTBACKGROUND)));
+    palette.setColor(QPalette::WindowText, GInvertColor(CPLOTBACKGROUND));
+    palette.setColor(QPalette::Text, GInvertColor(CPLOTBACKGROUND));
+    palette.setColor(QPalette::Normal, QPalette::Window, GInvertColor(CPLOTBACKGROUND));
     setPalette(palette);
     monthlyView->setPalette(palette);
     monthlyView->setStyleSheet(QString("QTableView QTableCornerButton::section { background-color: %1; color: %2; border: %1 }")
                     .arg(GColor(CPLOTBACKGROUND).name())
-                    .arg(GCColor::invertColor(GColor(CPLOTBACKGROUND)).name()));
+                    .arg(GInvertColor(CPLOTBACKGROUND).name()));
     monthlyView->horizontalHeader()->setStyleSheet(QString("QHeaderView::section { background-color: %1; color: %2; border: 0px }")
                     .arg(GColor(CPLOTBACKGROUND).name())
-                    .arg(GCColor::invertColor(GColor(CPLOTBACKGROUND)).name()));
+                    .arg(GInvertColor(CPLOTBACKGROUND).name()));
     monthlyView->verticalHeader()->setStyleSheet(QString("QHeaderView::section { background-color: %1; color: %2; border: 0px }")
                     .arg(GColor(CPLOTBACKGROUND).name())
-                    .arg(GCColor::invertColor(GColor(CPLOTBACKGROUND)).name()));
+                    .arg(GInvertColor(CPLOTBACKGROUND).name()));
 #ifndef Q_OS_MAC
     monthlyView->verticalScrollBar()->setStyleSheet(AbstractView::ourStyleSheet());
     monthlyView->horizontalScrollBar()->setStyleSheet(AbstractView::ourStyleSheet());

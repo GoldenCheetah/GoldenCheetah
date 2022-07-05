@@ -158,7 +158,7 @@ MUWidget::configChanged(qint32)
     setPalette(palette);
 
     QColor bgColor = GColor(CPLOTBACKGROUND);
-    QColor fgColor = GCColor::invertColor(bgColor);
+    QColor fgColor = GInvertColor(bgColor);
     QColor border = bgColor;
     border = border.darker(300);
 

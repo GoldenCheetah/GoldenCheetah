@@ -38,11 +38,6 @@
 #include <QTextEdit>
 
 
-QColor standardColor(int num)
-{
-   return standardColors.at(num % standardColors.count());
-}
-
 // we need to fix the sort order! (fixed for time fields)
 class CTableWidgetItem : public QTableWidgetItem
 {
@@ -161,7 +156,7 @@ void
 ComparePane::configChanged(qint32)
 {
     // via standard style sheet
-    table->setStyleSheet(GCColor::stylesheet());
+    table->setStyleSheet(GCColor::instance()->stylesheet());
 
     // refresh table...
     refreshTable();
@@ -780,7 +775,7 @@ ComparePane::dropEvent(QDropEvent *event)
             // just use standard colors and cycle round
             // we will of course repeat, but the user can
             // just edit them using the button
-            add.color = standardColors.at((i + context->compareIntervals.count()) % standardColors.count());
+            add.color = GCColor::instance()->standardColor(i + context->compareIntervals.count());
 
             // construct a fake RideItem, slightly hacky need to fix this later XXX fixme
             //                            mostly cut and paste from RideItem::refresh
@@ -962,7 +957,7 @@ ComparePane::dropEvent(QDropEvent *event)
                             // just use standard colors and cycle round
                             // we will of course repeat, but the user can
                             // just edit them using the button
-                            add.color = standardColors.at((newOnes.count()) % standardColors.count());
+                            add.color = GCColor::instance()->standardColor(newOnes.count());
 
                             // now add but only if not empty
                             if (!add.data->dataPoints().empty()) newOnes << add;
@@ -1015,7 +1010,7 @@ ComparePane::dropEvent(QDropEvent *event)
             // just use standard colors and cycle round
             // we will of course repeat, but the user can
             // just edit them using the button
-            add.color = standardColors.at((i + context->compareDateRanges.count()) % standardColors.count());
+            add.color = GCColor::instance()->standardColor(i + context->compareDateRanges.count());
 
             // even empty date ranges are valid
             newOnes << add;

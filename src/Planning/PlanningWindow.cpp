@@ -58,7 +58,7 @@ PlanningWindow::configChanged(qint32)
     if (GColor(CTRENDPLOTBACKGROUND) != Qt::white)
 #endif
     {
-        //palette.setColor(QPalette::Base, GCColor::alternateColor(GColor(CTRAINPLOTBACKGROUND)));
+        //palette.setColor(QPalette::Base, GCColor::instance()->alternateColor(CTRAINPLOTBACKGROUND));
         palette.setColor(QPalette::Base, GColor(CTRAINPLOTBACKGROUND));
         palette.setColor(QPalette::Window, GColor(CTRAINPLOTBACKGROUND));
     }
@@ -67,8 +67,8 @@ PlanningWindow::configChanged(qint32)
     //code->setStyleSheet(TabView::ourStyleSheet());
 #endif
 
-    palette.setColor(QPalette::WindowText, GCColor::invertColor(GColor(CTRAINPLOTBACKGROUND)));
-    palette.setColor(QPalette::Text, GCColor::invertColor(GColor(CTRAINPLOTBACKGROUND)));
+    palette.setColor(QPalette::WindowText, GInvertColor(CTRAINPLOTBACKGROUND));
+    palette.setColor(QPalette::Text, GInvertColor(CTRAINPLOTBACKGROUND));
     //code->setPalette(palette);
     repaint();
 }

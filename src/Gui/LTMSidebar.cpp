@@ -301,10 +301,10 @@ LTMSidebar::presetSelectionChanged()
 void
 LTMSidebar::configChanged(qint32)
 {
-    seasonsWidget->setStyleSheet(GCColor::stylesheet());
-    eventsWidget->setStyleSheet(GCColor::stylesheet());
-    chartsWidget->setStyleSheet(GCColor::stylesheet());
-    filtersWidget->setStyleSheet(GCColor::stylesheet());
+    seasonsWidget->setStyleSheet(GCColor::instance()->stylesheet());
+    eventsWidget->setStyleSheet(GCColor::instance()->stylesheet());
+    chartsWidget->setStyleSheet(GCColor::instance()->stylesheet());
+    filtersWidget->setStyleSheet(GCColor::instance()->stylesheet());
     setAutoFilterMenu();
 
     // set or reset the autofilter widgets

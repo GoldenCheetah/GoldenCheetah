@@ -374,12 +374,12 @@ GcSplitterHandle::paintBackground(QPaintEvent *)
     painter.setPen(Qt::NoPen);
     painter.fillRect(all, QColor(Qt::white));
 
-    QLinearGradient active = GCColor::linearGradient(height(), true, !metal);
-    QLinearGradient inactive = GCColor::linearGradient(height(), false, !metal);
+    QLinearGradient active = GCColor::instance()->linearGradient(height(), true, !metal);
+    QLinearGradient inactive = GCColor::instance()->linearGradient(height(), false, !metal);
 
     painter.fillRect(all, isActiveWindow() ? active : inactive);
 
-    if (!GCColor::isFlat()) {
+    if (!GCColor::instance()->isFlat()) {
         QPen black(QColor(100,100,100,200));
         painter.setPen(black);
         painter.drawLine(0,height()-1, width()-1, height()-1);
@@ -426,14 +426,14 @@ GcSplitterControl::paintBackground(QPaintEvent *)
     // setup a painter and the area to paint
     QPainter painter(this);
 
-    QLinearGradient active = GCColor::linearGradient(22 *dpiYFactor, true);
-    QLinearGradient inactive = GCColor::linearGradient(22 *dpiYFactor, false);
+    QLinearGradient active = GCColor::instance()->linearGradient(22 *dpiYFactor, true);
+    QLinearGradient inactive = GCColor::instance()->linearGradient(22 *dpiYFactor, false);
 
     // fill with a linear gradient
     painter.setPen(Qt::NoPen);
     painter.fillRect(all, isActiveWindow() ? active : inactive);
 
-    if (!GCColor::isFlat()) {
+    if (!GCColor::instance()->isFlat()) {
         QPen gray(QColor(230,230,230));
         painter.setPen(gray);
         painter.drawLine(0,0, width()-1, 0);

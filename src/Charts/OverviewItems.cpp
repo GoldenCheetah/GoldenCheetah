@@ -1965,7 +1965,7 @@ DonutOverviewItem::setDateRange(DateRange dr)
     // now do the colors
     double i=1;
     QColor min=GColor(CPLOTMARKER);
-    QColor max=GCColor::invertColor(GColor(CCARDBACKGROUND));
+    QColor max=GInvertColor(CCARDBACKGROUND);
     bool exploded=false;
     foreach(QPieSlice *slice, add->slices()) {
 
@@ -2732,7 +2732,7 @@ KPIOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, 
             if (!percenttext.startsWith("nan") && !percenttext.startsWith("inf") && percenttext != "0%") {
 
                 // title color, copied code from chartspace.cpp, should really be a cleaner way to get these
-                if (GCColor::luminance(GColor(CCARDBACKGROUND)) < 127) painter->setPen(QColor(200,200,200));
+                if (GCColor::instance()->luminance(CCARDBACKGROUND) < 127) painter->setPen(QColor(200,200,200));
                 else painter->setPen(QColor(70,70,70));
 
                 painter->setFont(parent->midfont);
@@ -2934,7 +2934,7 @@ DataOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *,
     bold.setBold(true);
 
     // normal just grey, we highlight with plot marker
-    QColor cnormal = (GCColor::luminance(GColor(CCARDBACKGROUND)) < 127) ? QColor(200,200,200) : QColor(70,70,70);
+    QColor cnormal = (GCColor::instance()->luminance(CCARDBACKGROUND) < 127) ? QColor(200,200,200) : QColor(70,70,70);
 
 
     // step 2: where is the mouse hovering, paint a background etc ....
@@ -3403,7 +3403,7 @@ TopNOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *,
     QRectF barrect = QRectF(0,10, width, 30);
 
     // text color
-    QColor cnormal = (GCColor::luminance(GColor(CCARDBACKGROUND)) < 127) ? QColor(200,200,200) : QColor(70,70,70);
+    QColor cnormal = (GCColor::instance()->luminance(CCARDBACKGROUND) < 127) ? QColor(200,200,200) : QColor(70,70,70);
 
     // PAINT
     for (int i=0; i<maxrows && i<ranked.count(); i++) {
@@ -5347,7 +5347,7 @@ Button::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
     painter->setRenderHint(QPainter::Antialiasing);
 
     // button background
-    QColor pc = GCColor::invertColor(GColor(CCARDBACKGROUND));
+    QColor pc = GInvertColor(CCARDBACKGROUND);
     pc.setAlpha(64);
     QPen line(pc,gl_border, Qt::SolidLine);
     line.setJoinStyle(Qt::RoundJoin);
@@ -5363,11 +5363,11 @@ Button::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
 
     // text using large font clipped
     if (isUnderMouse()) {
-        QColor tc = GCColor::invertColor(CPLOTMARKER);
+        QColor tc = GInvertColor(CPLOTMARKER);
         tc.setAlpha(200);
         painter->setPen(tc);
     } else {
-        QColor tc = GCColor::invertColor(GColor(CCARDBACKGROUND));
+        QColor tc = GInvertColor(CCARDBACKGROUND);
         tc.setAlpha(200);
         painter->setPen(tc);
     }

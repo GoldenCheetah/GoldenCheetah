@@ -485,7 +485,7 @@ class GcCalendarDelegate : public QItemDelegate
         // date...
         QString datestring = index.data(GcCalendarModel::DateStringRole).toString();
         QTextOption textOption(Qt::AlignRight);
-        painter->setPen(GCColor::invertColor(hg));
+        painter->setPen(GInvertColor(hg));
         painter->drawText(hd, datestring, textOption);
 
         // text

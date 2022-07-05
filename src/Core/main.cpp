@@ -634,11 +634,11 @@ main(int argc, char *argv[])
         application->installTranslator(&gcTranslator);
 
         // Now the translator is installed, set default colors with translated names
-        GCColor::setupColors();
+        GCColor::instance()->setupColors();
 
         // migration
         appsettings->migrateQSettingsSystem(); // colors must be setup before migration can take place, but reading has to be from the migrated ones
-        GCColor::readConfig();
+        GCColor::instance()->readConfig();
 
         // Initialize metrics once the translator is installed
         RideMetricFactory::instance().initialize();

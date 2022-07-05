@@ -64,43 +64,6 @@ int pixelSizeForFont(QFont &font, int height)
     return pixelsize;
 }
 
-//
-// A selection of distinct colours, user can adjust also
-//
-QList<QColor> standardColors;
-static bool initStandardColors()
-{
-    standardColors << QColor(Qt::magenta);
-    standardColors << QColor(Qt::cyan);
-    standardColors << QColor(Qt::yellow);
-    standardColors << QColor(Qt::red);
-    standardColors << QColor(Qt::blue);
-    standardColors << QColor(Qt::gray);
-    standardColors << QColor(Qt::darkCyan);
-    standardColors << QColor(Qt::green);
-    standardColors << QColor(Qt::darkRed);
-    standardColors << QColor(Qt::darkGreen);
-    standardColors << QColor(Qt::darkBlue);
-    standardColors << QColor(Qt::darkMagenta);
-
-    return true;
-}
-static bool init = initStandardColors();
-
-// the standard themes, a global object
-static Themes allThemes;
-
-// Number of configurable metric colors + 1 for sentinel value
-static Colors ColorList[CNUMOFCFGCOLORS+1],
-              LightDefaultColorList[CNUMOFCFGCOLORS+1],
-              DarkDefaultColorList[CNUMOFCFGCOLORS+1];
-
-static void copyArray(Colors source[], Colors target[])
-{
-    for (int i=0; source[i].name != ""; i++)
-        target[i] = source[i];
-}
-
 unsigned long Colors::fingerprint(const Colors *set)
 {
     QByteArray ba;
@@ -127,12 +90,56 @@ float GCDPIScale = windowsDpiScale();
 float GCDPIScale = 1.0f;
 #endif
 
+
+GCColor::GCColor() {
+
+    // A selection of distinct colours, user can adjust also
+    standardColors << QColor(Qt::magenta);
+    standardColors << QColor(Qt::cyan);
+    standardColors << QColor(Qt::yellow);
+    standardColors << QColor(Qt::red);
+    standardColors << QColor(Qt::blue);
+    standardColors << QColor(Qt::gray);
+    standardColors << QColor(Qt::darkCyan);
+    standardColors << QColor(Qt::green);
+    standardColors << QColor(Qt::darkRed);
+    standardColors << QColor(Qt::darkGreen);
+    standardColors << QColor(Qt::darkBlue);
+    standardColors << QColor(Qt::darkMagenta);
+
+    // default settings for fonts etc
+    // we err on the side of caution -- smaller is better
+
+    // small screens include netbooks and old vga 800x600, 1024x768
+    defaultAppearance.push_back( { 1024, 768,  8,8,6,6,6,    800, 600 } );
+
+    // medium screen size includes typical 16:9 pc formats and TV screens
+    defaultAppearance.push_back( { 1280, 800,  8,8,6,6,6,    800, 600 });
+
+    // high resolution screens 
+    defaultAppearance.push_back( { 1650, 1080,  10,10,8,8,8,   1024,650 } );
+
+    // very big panels, incl. e.g.  mac 27"
+    defaultAppearance.push_back( { 9999, 9999,  10,10,8,8,8,   1280,700 } );
+
+}
+
+QColor GCColor::standardColor(int colornum) {
+
+    return standardColors[colornum % standardColors.size()];
+}
+
+void GCColor::copyArray(Colors source[], Colors target[]) {
+    for (int i = 0; source[i].name != ""; i++)
+        target[i] = source[i];
+}
+
 // initialization called from constructor to enable translation
 void GCColor::setupColors()
 {
     // consider removing when we can guarantee extended initialisation support in gcc
     // (c++0x not supported by Qt currently and not planned for 4.8 or 5.0)
-    Colors init[CNUMOFCFGCOLORS+1] = {
+    Colors initColorList[CNUMOFCFGCOLORS+1] = {
         { tr("Chart"), tr("Plot Background"), "COLORPLOTBACKGROUND", QColor(52,52,52) },
         { tr("Chart"), tr("Performance Plot Background"), "COLORRIDEPLOTBACKGROUND", QColor(52,52,52) },
         { tr("Chart"), tr("Trend Plot Background"), "COLORTRENDPLOTBACKGROUND", Qt::black },
@@ -255,22 +262,22 @@ void GCColor::setupColors()
     };
 
     // set the defaults to system defaults
-    init[CCALCURRENT].color = QPalette().color(QPalette::Highlight);
-    init[CTOOLBAR].color = QPalette().color(QPalette::Window);
+    initColorList[CCALCURRENT].color = QPalette().color(QPalette::Highlight);
+    initColorList[CTOOLBAR].color = QPalette().color(QPalette::Window);
 
 #ifdef Q_OS_MAC
     // if on yosemite set default chrome to #e5e5e5
     if (QSysInfo::MacintoshVersion == 12) {
-        init[CCHROME].color = QColor(0xe5,0xe5,0xe5);
+        initColorList[CCHROME].color = QColor(0xe5,0xe5,0xe5);
         appsettings->setValue(GC_CHROME, "Flat");
     }
 #endif
-    copyArray(init, DarkDefaultColorList);
-    copyArray(init, LightDefaultColorList);
-    copyArray(init, ColorList);
+    copyArray(initColorList, DarkDefaultColorList);
+    copyArray(initColorList, LightDefaultColorList);
+    copyArray(initColorList, ColorList);
 
     // lets update the Light colors to ones that are more
-    // appropriate on a light background, since the init versions
+    // appropriate on a light background, since the initColorList versions
     // were all selected on the basis of a dark background
     // note: we don't update them all so old standard charts
     // aren't affected to badly, but may do so in the future
@@ -378,35 +385,18 @@ void GCColor::setupColors()
     LightDefaultColorList[101].color = QColor(101,44,45); // 101:Tidal Volume
     LightDefaultColorList[102].color = QColor(134,74,255); // 102:Respiratory Frequency
     LightDefaultColorList[103].color = QColor(255,46,46); // 103:FeO2
+    // CHOVER (104) are missing definitions !
+    // CCHARTBAR (105) are missing definitions !
     LightDefaultColorList[106].color = QColor(180,180,180); // 106:Tile Alternate
     LightDefaultColorList[107].color = QColor(238,248,255); // 107:Tile Vibrant
     LightDefaultColorList[108].color = QColor(255, 0, 0); // 105:MapRouteLine
     LightDefaultColorList[109].color = QColor(0,102,0); // 109:Stress Ramp Rate
 }
 
-// default settings for fonts etc
-// we err on the side of caution -- smaller is better
-struct SizeSettings defaultAppearance[] ={
-
-    // small screens include netbooks and old vga 800x600, 1024x768
-    { 1024, 768,  8,8,6,6,6,    800, 600 },
-
-    // medium screen size includes typical 16:9 pc formats and TV screens
-    { 1280, 800,  8,8,6,6,6,    800, 600},
-
-    // high resolution screens 
-    { 1650, 1080,  10,10,8,8,8,   1024,650 },
-
-    // very big panels, incl. e.g.  mac 27"
-    { 9999, 9999,  10,10,8,8,8,   1280,700 },
-
-    { 0,0,0,0,0,0,0,0,0 },
-};
-
 struct SizeSettings
 GCColor::defaultSizes(int width, int height)
 {
-    for (int i=0; defaultAppearance[i].maxheight; i++) {
+    for (int i=0; i < defaultAppearance.size(); i++) {
 
         if (height > defaultAppearance[i].maxheight && width > defaultAppearance[i].maxwidth)
             continue;
@@ -417,6 +407,10 @@ GCColor::defaultSizes(int width, int height)
     return defaultAppearance[0]; // shouldn't get here
 }
 
+// returns a luminance for a color from 0 (dark) to 255 (very light) 127 is a half way house gray
+double GCColor::luminance(int colornum) {
+    return (colornum < CNUMOFCFGCOLORS) ? luminance(ColorList[colornum].color) : 127.0;
+}
 
 // returns a luminance for a color from 0 (dark) to 255 (very light) 127 is a half way house gray
 double GCColor::luminance(QColor color)
@@ -429,10 +423,18 @@ double GCColor::luminance(QColor color)
            (0.0722f * double(cRGB.blue()));
 }
 
+QColor GCColor::invertColor(int colornum) {
+    return (colornum < CNUMOFCFGCOLORS) ? invertColor(ColorList[colornum].color) : ColorList[OUTOFRANGECOLOR].color;
+}
+
 QColor GCColor::invertColor(QColor bgColor)
 {
     if (bgColor==QColor(Qt::darkGray)) return QColor(Qt::white); // darkGray is popular!
-    return GCColor::luminance(bgColor) < 127 ? QColor(Qt::white) : QColor(Qt::black);
+    return GCColor::instance()->luminance(bgColor) < 127 ? QColor(Qt::white) : QColor(Qt::black);
+}
+
+QColor GCColor::alternateColor(int colornum) {
+    return (colornum < CNUMOFCFGCOLORS) ? alternateColor(ColorList[colornum].color) : ColorList[OUTOFRANGECOLOR].color;
 }
 
 QColor GCColor::alternateColor(QColor bgColor)
@@ -500,19 +502,14 @@ GCColor::readConfig()
 QColor
 GCColor::getColor(int colornum)
 {
-    return ColorList[colornum].color;
+    return (colornum < CNUMOFCFGCOLORS) ? ColorList[colornum].color : ColorList[OUTOFRANGECOLOR].color;
 }
 
-void
+bool
 GCColor::setColor(int colornum, QColor color)
 {
-    ColorList[colornum].color = color;
-}
-
-Themes &
-GCColor::themes()
-{
-    return allThemes;
+    if (colornum < CNUMOFCFGCOLORS) ColorList[colornum].color = color;
+    return (colornum < CNUMOFCFGCOLORS);
 }
 
 ColorEngine::ColorEngine(GlobalContext *gc) : defaultColor(QColor(Qt::white)), gc(gc)
@@ -563,8 +560,8 @@ QString
 GCColor::css(bool ridesummary)
 {
     QColor bgColor = ridesummary ? GColor(CPLOTBACKGROUND) : GColor(CTRENDPLOTBACKGROUND);
-    QColor fgColor = GCColor::invertColor(bgColor);
-    //QColor altColor = GCColor::alternateColor(bgColor); // not yet ?
+    QColor fgColor = GInvertColor(bgColor);
+    //QColor altColor = GCColor::instance()->alternateColor(bgColor); // not yet ?
 
     return QString("<style> "
                    "html { overflow: auto; }"
@@ -606,9 +603,9 @@ GCColor::palette()
     palette.setBrush(QPalette::Window, QBrush(GColor(CPLOTBACKGROUND)));
     palette.setBrush(QPalette::Background, QBrush(GColor(CPLOTBACKGROUND)));
     palette.setBrush(QPalette::Base, QBrush(GColor(CPLOTBACKGROUND)));
-    palette.setColor(QPalette::WindowText, GCColor::invertColor(GColor(CPLOTBACKGROUND)));
-    palette.setColor(QPalette::Text, GCColor::invertColor(GColor(CPLOTBACKGROUND)));
-    palette.setColor(QPalette::Normal, QPalette::Window, GCColor::invertColor(GColor(CPLOTBACKGROUND)));
+    palette.setColor(QPalette::WindowText, GInvertColor(CPLOTBACKGROUND));
+    palette.setColor(QPalette::Text, GInvertColor(CPLOTBACKGROUND));
+    palette.setColor(QPalette::Normal, QPalette::Window, GInvertColor(CPLOTBACKGROUND));
 
     return palette;
 }
@@ -618,7 +615,7 @@ GCColor::stylesheet(bool train)
 {
     // make it to order to reflect current config
     QColor bgColor = train ? GColor(CTRAINPLOTBACKGROUND) : GColor(CPLOTBACKGROUND);
-    QColor fgColor = GCColor::invertColor(bgColor);
+    QColor fgColor = GInvertColor(bgColor);
     return QString("QTreeView { color: %2; background: %1; }"
                    "QTableWidget { color: %2; background: %1; }"
 #ifndef Q_OS_MAC
@@ -718,8 +715,11 @@ void
 GCColor::dumpColors()
 {
     for(unsigned int i=0; ColorList[i].name != ""; i++) {
-        fprintf(stderr, "ColorList[%d].color = QColor(%d,%d,%d); // %d:%s\n", i, ColorList[i].color.red(),ColorList[i].color.green(),ColorList[i].color.blue(),
-                                                            i, ColorList[i].name.toStdString().c_str());
+        fprintf(stderr, "ColorList[%d].color = QColor(%d,%d,%d); // %d:%s\n",
+                                        i, ColorList[i].color.red(),
+                                        ColorList[i].color.green(),
+                                        ColorList[i].color.blue(),
+                                        i, ColorList[i].name.toStdString().c_str());
     }
 }
 
@@ -993,7 +993,7 @@ void
 GCColor::applyTheme(int index) 
 {
     // now get the theme selected
-    ColorTheme theme = GCColor::themes().themes[index];
+    ColorTheme theme = Themes::instance()->themes[index];
 
     for (int i=0; ColorList[i].name != ""; i++) {
 

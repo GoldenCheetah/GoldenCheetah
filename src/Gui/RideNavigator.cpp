@@ -189,7 +189,7 @@ RideNavigator::configChanged(qint32 state)
                 "QHeaderView::section { background-color: %1; color: %2; "
                 " border: 0px ; }")
                 .arg(GColor(CPLOTBACKGROUND).name())
-                .arg(GCColor::invertColor(GColor(CPLOTBACKGROUND)).name()));
+                .arg(GInvertColor(CPLOTBACKGROUND).name()));
     }
 
 #endif
@@ -1234,7 +1234,7 @@ void NavigatorCellDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
             if (!selected) {
                 // not selected, so invert ride plot color
                 if (hover) painter->setPen(QPen(Qt::black));
-                else painter->setPen(rideBG ? rideNavigator->reverseColor : GCColor::invertColor(GColor(CPLOTBACKGROUND)));
+                else painter->setPen(rideBG ? rideNavigator->reverseColor : GInvertColor(CPLOTBACKGROUND));
             }
             painter->drawText(myOption.rect, Qt::AlignLeft | Qt::TextWordWrap, calendarText);
             painter->setPen(isColor);

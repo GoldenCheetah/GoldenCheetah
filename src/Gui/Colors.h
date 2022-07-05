@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2010 Mark Liversedge (liversedge@gmail.com)
+ * GCColor & Themes Singletons - Copyright (c) 2022 Paul Johnson (paul49457@gmail.com)
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
@@ -27,167 +28,7 @@
 #include <QGradient>
 #include <QLinearGradient>
 
-
-// A selection of distinct colours, user can adjust also
-extern QList<QColor> standardColors;
-extern QIcon colouredIconFromPNG(QString filename, QColor color);
-extern QPixmap colouredPixmapFromPNG(QString filename, QColor color);
-
-// dialog scaling
-extern double dpiXFactor, dpiYFactor;
-extern QFont baseFont;
-
-// turn color to rgb, checks if a named color
-#define StandardColor(x) (QColor(1,1,x))
-#define NamedColor(x) (x.red()==1 && x.green()==1)
-#define RGBColor(x) (NamedColor(x) ? GColor(x.blue()) : x)
-
-// get the pixel size for a font that is no taller
-// than height in pixels (let QT adapt for device ratios)
-int pixelSizeForFont(QFont &font, int height);
-
-class Context;
-
-// set appearace defaults based upon screen size
-struct SizeSettings {
-
-    // this applies up to the following geometry
-    int maxheight,
-        maxwidth;
-
-    // font size
-    int defaultFont,
-        titleFont,
-        markerFont,
-        labelFont,
-        calendarFont;
-
-    // screen dimension
-    int width,
-        height;
-};
-
-extern SizeSettings defaultAppearance[];
-extern float GCDPIScale; // font scaling for display
-extern QColor standardColor(int num);
-
-class Colors
-{
-public:
-        static unsigned long fingerprint(const Colors*set);
-        QString group,
-                name,
-                setting;
-        QColor  color;
-};
-
-class ColorTheme
-{
-    public:
-        ColorTheme(QString name, bool dark, QList<QColor>colors) : name(name), dark(dark), colors(colors) {}
-
-        // all public
-        QString name;
-        bool dark;
-        bool stealth;
-        QList<QColor> colors;
-};
-
-class Themes
-{
-
-    Q_DECLARE_TR_FUNCTIONS(Themes);
-
-    public:
-        Themes(); // will init the array of themes
-
-        QList<ColorTheme> themes;
-};
-
-class ColorLabel : public QLabel
-{
-    Q_OBJECT
-
-    public:
-        ColorLabel(ColorTheme theme) : theme(theme) {}
-
-        void paintEvent(QPaintEvent *);
-
-        ColorTheme theme;
-};
-
-class GCColor : public QObject
-{
-    Q_OBJECT
-
-    public:
-        static QColor getColor(int);
-        static void setColor(int,QColor);
-        static const Colors *colorSet();
-        static const Colors *defaultColorSet(bool dark);
-        static void resetColors();
-        static struct SizeSettings defaultSizes(int width, int height);
-        static double luminance(QColor color); // return the relative luminance
-        static QColor invertColor(QColor); // return the contrasting color
-        static QColor alternateColor(QColor); // return the alternate background
-        static QColor htmlCode(QColor x) { return x.name(); } // return the alternate background
-        static Themes &themes(); 
-        static void applyTheme(int index);
-
-        // for styling things with current preferences
-        static bool isFlat();
-        static QLinearGradient linearGradient(int size, bool active, bool alternate=false);
-        static QString css(bool ridesummary=true);
-        static QPalette palette();
-        static QString stylesheet(bool train=false);
-        static void readConfig();
-        static void setupColors();
-        static void dumpColors();
-
-        // for upgrade/migration of Config
-        static QStringList getConfigKeys();
-
-};
-
-// color chooser that also supports the standard colors (CPLOTMARKER, CPOWER)
-// and returns them as a QColor(1,1,1,<int>) where <int> is the color number
-// .e.g CPOWER is 18, see below for full list
-#if 0
-class GColorDialog : public QDialog
-{
-    GColorDialog(QWidget *parent);
-
-};
-#endif
-
-// return a color for a ride file
-class GlobalContext;
-class ColorEngine : public QObject
-{
-    Q_OBJECT
-    G_OBJECT
-
-    public:
-        ColorEngine(GlobalContext *);
-
-        QColor colorFor(QString);
-        QColor defaultColor, reverseColor;
-
-    public slots:
-        void configChanged(qint32);
-
-    private:
-        QMap<QString, QColor> workoutCodes;
-        GlobalContext *gc; // bootstrapping
-};
-
-
-// shorthand
-#define GColor(x) GCColor::getColor(x)
-
-// Define how many cconfigurable metric colors are available
-#define CNUMOFCFGCOLORS       110
-
+ // Define how many configurable metric colors are available
 #define CPLOTBACKGROUND       0
 #define CRIDEPLOTBACKGROUND   1
 #define CTRENDPLOTBACKGROUND  2
@@ -298,4 +139,182 @@ class ColorEngine : public QObject
 #define CCARDBACKGROUND3      107
 #define MAPROUTELINE          108
 #define COLORRR               109
+#define CNUMOFCFGCOLORS       110
+
+// The color returned when color functions are accessed with an out of range value
+#define OUTOFRANGECOLOR       CINTERVALHIGHLIGHTER
+
+// A selection of distinct colours, user can adjust also
+extern QIcon colouredIconFromPNG(QString filename, QColor color);
+extern QPixmap colouredPixmapFromPNG(QString filename, QColor color);
+
+// dialog scaling
+extern double dpiXFactor, dpiYFactor;
+extern QFont baseFont;
+
+// turn color to rgb, checks if a named color
+#define StandardColor(x) (QColor(1,1,x))
+#define NamedColor(x) (x.red()==1 && x.green()==1)
+#define RGBColor(x) (NamedColor(x) ? GColor(x.blue()) : x)
+
+// get the pixel size for a font that is no taller
+// than height in pixels (let QT adapt for device ratios)
+int pixelSizeForFont(QFont &font, int height);
+
+class Context;
+
+// set appearace defaults based upon screen size
+struct SizeSettings {
+
+    // this applies up to the following geometry
+    int maxheight,
+        maxwidth;
+
+    // font size
+    int defaultFont,
+        titleFont,
+        markerFont,
+        labelFont,
+        calendarFont;
+
+    // screen dimension
+    int width,
+        height;
+};
+
+class Colors
+{
+public:
+        static unsigned long fingerprint(const Colors*set);
+        QString group,
+                name,
+                setting;
+        QColor  color;
+};
+
+class ColorTheme
+{
+    public:
+        ColorTheme(QString name, bool dark, QList<QColor>colors) : name(name), dark(dark), colors(colors) {}
+
+        // all public
+        QString name;
+        bool dark;
+        bool stealth;
+        QList<QColor> colors;
+};
+
+class Themes
+{
+    Q_DECLARE_TR_FUNCTIONS(Themes);
+
+    public:
+
+        QList<ColorTheme> themes;
+
+        static Themes* instance() {
+            static Themes* s{ new Themes };
+            return s;
+        }
+
+    private:
+        Themes();
+ };
+
+class ColorLabel : public QLabel
+{
+    Q_OBJECT
+
+    public:
+        ColorLabel(ColorTheme theme) : theme(theme) {}
+
+        void paintEvent(QPaintEvent *);
+
+        ColorTheme theme;
+};
+
+class GCColor : public QObject
+{
+    Q_OBJECT
+
+    public:
+
+        GCColor(GCColor const&) = delete;
+        GCColor& operator=(GCColor const&) = delete;
+
+        static GCColor* instance() {
+            static GCColor* s{ new GCColor };
+            return s;
+        }
+
+        QColor getColor(int);
+        bool setColor(int, QColor);
+        void resetColors();
+        const Colors* colorSet();
+        const Colors* defaultColorSet(bool dark);
+        struct SizeSettings defaultSizes(int width, int height);
+        double luminance(int); // return the relative luminance
+        double luminance(QColor); // return the relative luminance
+        QColor invertColor(int); // return the contrasting color
+        QColor invertColor(QColor); // return the contrasting color
+        QColor alternateColor(int); // return the alternate background
+        QColor alternateColor(QColor); // return the alternate background
+        QColor htmlCode(QColor x) { return x.name(); } // return the alternate background
+        void applyTheme(int index);
+
+
+        // for styling things with current preferences
+        bool isFlat();
+        QLinearGradient linearGradient(int size, bool active, bool alternate = false);
+        QString css(bool ridesummary = true);
+        QPalette palette();
+        QString stylesheet(bool train = false);
+        QColor standardColor(int num);
+        void readConfig();
+        void setupColors();
+        void dumpColors();
+
+        // for upgrade/migration of Config
+        QStringList getConfigKeys();
+
+    private:
+        GCColor();
+
+        void copyArray(Colors source[], Colors target[]);
+
+        // Number of configurable metric colors + 1 for sentinel value
+        Colors ColorList[CNUMOFCFGCOLORS + 1];
+        Colors LightDefaultColorList[CNUMOFCFGCOLORS + 1];
+        Colors DarkDefaultColorList[CNUMOFCFGCOLORS + 1];
+
+        QList<QColor> standardColors;
+        QList<struct SizeSettings> defaultAppearance;
+
+};
+
+// return a color for a ride file
+class GlobalContext;
+class ColorEngine : public QObject
+{
+    Q_OBJECT
+    G_OBJECT
+
+    public:
+        ColorEngine(GlobalContext *);
+
+        QColor colorFor(QString);
+        QColor defaultColor, reverseColor;
+
+    public slots:
+        void configChanged(qint32);
+
+    private:
+        QMap<QString, QColor> workoutCodes;
+        GlobalContext *gc; // bootstrapping
+};
+
+// shorthand macros due to number of instances
+#define GColor(x) GCColor::instance()->getColor(x)              // 869 instances
+#define GInvertColor(x) GCColor::instance()->invertColor(x)     // 124 instances
+
 #endif

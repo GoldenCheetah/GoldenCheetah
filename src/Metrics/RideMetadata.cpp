@@ -350,12 +350,12 @@ RideMetadata::configChanged(qint32)
         if (GColor(CPLOTBACKGROUND) != Qt::white)
 #endif
         {
-            palette.setColor(QPalette::Base, GCColor::alternateColor(GColor(CPLOTBACKGROUND)));
+            palette.setColor(QPalette::Base, GCColor::instance()->alternateColor(CPLOTBACKGROUND));
             palette.setColor(QPalette::Window,  GColor(CPLOTBACKGROUND));
         }
 
-        palette.setColor(QPalette::WindowText, GCColor::invertColor(GColor(CPLOTBACKGROUND)));
-        palette.setColor(QPalette::Text, GCColor::invertColor(GColor(CPLOTBACKGROUND)));
+        palette.setColor(QPalette::WindowText, GInvertColor(CPLOTBACKGROUND));
+        palette.setColor(QPalette::Text, GInvertColor(CPLOTBACKGROUND));
         setPalette(palette);
         tabs->setPalette(palette);
 
@@ -432,9 +432,9 @@ RideMetadata::configChanged(qint32)
                               .arg(4*dpiYFactor)                                          // 3 selected bar width
                               .arg(2*dpiXFactor)                                          // 4 padding
                               .arg(75*dpiXFactor)                                         // 5 tab minimum width
-                              .arg(GCColor::invertColor(GColor(CPLOTBACKGROUND)).name())     // 6 tab text color
+                              .arg(GInvertColor(CPLOTBACKGROUND).name())     // 6 tab text color
 #ifdef Q_OS_MAC
-                              .arg( GCColor::alternateColor(GColor(CPLOTBACKGROUND)).name()) // 7 lineedit background
+                              .arg( GCColor::instance()->alternateColor(CPLOTBACKGROUND).name()) // 7 lineedit background
 #endif
                             ;
         tabs->setStyleSheet(styling);

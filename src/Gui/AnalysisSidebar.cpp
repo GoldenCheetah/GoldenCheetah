@@ -321,18 +321,18 @@ AnalysisSidebar::close()
 void
 AnalysisSidebar::configChanged(qint32)
 {
-    //calendarWidget->setPalette(GCColor::palette());
-    //intervalSummaryWindow->setPalette(GCColor::palette());
-    //intervalSummaryWindow->setStyleSheet(GCColor::stylesheet());
+    //calendarWidget->setPalette(GCColor::instance()->palette());
+    //intervalSummaryWindow->setPalette(GCColor::instance()->palette());
+    //intervalSummaryWindow->setStyleSheet(GCColor::instance()->stylesheet());
 
-    splitter->setPalette(GCColor::palette());
+    splitter->setPalette(GCColor::instance()->palette());
     activityHistory->setStyleSheet(QString("background: %1;").arg(GColor(CPLOTBACKGROUND).name()));
-    rideNavigator->tableView->viewport()->setPalette(GCColor::palette());
+    rideNavigator->tableView->viewport()->setPalette(GCColor::instance()->palette());
     rideNavigator->tableView->viewport()->setStyleSheet(QString("background: %1;").arg(GColor(CPLOTBACKGROUND).name()));
 
     // interval tree
-    intervalTree->setPalette(GCColor::palette());
-    intervalTree->setStyleSheet(GCColor::stylesheet());
+    intervalTree->setPalette(GCColor::instance()->palette());
+    intervalTree->setStyleSheet(GCColor::instance()->stylesheet());
     QMapIterator<RideFileInterval::intervaltype, QTreeWidgetItem*> i(trees);
     i.toFront();
     while(i.hasNext()) {

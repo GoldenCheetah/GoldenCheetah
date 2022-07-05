@@ -106,7 +106,7 @@ SearchBox::configChanged(qint32)
     QColor color = QPalette().color(QPalette::Highlight);
 
     // flat mode has square corners
-    if (GCColor::isFlat()) {
+    if (GCColor::instance()->isFlat()) {
 
         setStyleSheet(QString( //"QLineEdit { padding-right: %1px; } "
                           "QLineEdit#SearchBox {"

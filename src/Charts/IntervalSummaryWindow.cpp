@@ -50,7 +50,7 @@ IntervalSummaryWindow::IntervalSummaryWindow(Context *context) : context(context
     connect(context, SIGNAL(intervalHover(IntervalItem*)), this, SLOT(intervalHover(IntervalItem*)));
     connect(context, SIGNAL(configChanged(qint32)), this, SLOT(intervalSelected()));
 
-    setHtml(GCColor::css() + "<body></body>");
+    setHtml(GCColor::instance()->css() + "<body></body>");
 }
 
 IntervalSummaryWindow::~IntervalSummaryWindow() {
@@ -63,14 +63,14 @@ void IntervalSummaryWindow::intervalSelected()
 
     if (rideItem == NULL || rideItem->intervalsSelected().count() == 0 || rideItem->ride() == NULL) {
         // no ride just update the colors
-	    QString html = GCColor::css();
+	    QString html = GCColor::instance()->css();
         html += "<body></body>";
 	    setHtml(html);
 	    return;
     }
 
     // summary is html
-	QString html = GCColor::css();
+	QString html = GCColor::instance()->css();
     html += "<body>";
 
     // summarise all the intervals selected - this is painful!
@@ -84,7 +84,7 @@ void IntervalSummaryWindow::intervalSelected()
     // now add the excluding text
     html += notincluding;
 
-    if (html == GCColor::css()+"<body>") html += "<i>" + tr("select an interval for summary info") + "</i>";
+    if (html == GCColor::instance()->css()+"<body>") html += "<i>" + tr("select an interval for summary info") + "</i>";
 
     html += "</body>";
 	setHtml(html);
@@ -104,7 +104,7 @@ IntervalSummaryWindow::intervalHover(IntervalItem* x)
     RideItem *rideItem = const_cast<RideItem*>(context->currentRideItem());
     if (!x && rideItem && rideItem->intervalsSelected().count()) return;
 
-    QString html = GCColor::css();
+    QString html = GCColor::instance()->css();
     html += "<body>";
 
     if (x == NULL) {

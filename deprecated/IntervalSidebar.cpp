@@ -137,15 +137,15 @@ IntervalSidebar::close()
 void
 IntervalSidebar::configChanged(qint32)
 {
-    routeNavigator->tableView->viewport()->setPalette(GCColor::palette());
+    routeNavigator->tableView->viewport()->setPalette(GCColor::instance()->palette());
     routeNavigator->tableView->viewport()->setStyleSheet(QString("background: %1;").arg(GColor(CPLOTBACKGROUND).name()));
 
-    bestNavigator->tableView->viewport()->setPalette(GCColor::palette());
+    bestNavigator->tableView->viewport()->setPalette(GCColor::instance()->palette());
     bestNavigator->tableView->viewport()->setStyleSheet(QString("background: %1;").arg(GColor(CPLOTBACKGROUND).name()));
 
     // interval tree
-    context->athlete->intervalWidget->setPalette(GCColor::palette());
-    context->athlete->intervalWidget->setStyleSheet(GCColor::stylesheet());
+    context->athlete->intervalWidget->setPalette(GCColor::instance()->palette());
+    context->athlete->intervalWidget->setStyleSheet(GCColor::instance()->stylesheet());
 
     repaint();
 }

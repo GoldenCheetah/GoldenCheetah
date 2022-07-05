@@ -539,7 +539,7 @@ void RGraphicsDevice::setDeviceAttributes(pDevDesc pDev)
     pDev->startlty = 0;
 
     QColor bg=GColor(CPLOTBACKGROUND);
-    QColor fg=GCColor::invertColor(GColor(CPLOTBACKGROUND));
+    QColor fg=GInvertColor(CPLOTBACKGROUND);
 
     pDev->startfill = R_RGB(bg.red(),bg.green(),bg.blue());
     pDev->startcol = R_RGB(fg.red(),fg.green(),fg.blue());

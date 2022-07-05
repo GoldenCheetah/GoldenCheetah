@@ -160,7 +160,7 @@ GenericLegendItem::paintEvent(QPaintEvent *)
     if (hasstring)  string=this->string;
 
     // set pen to series color for now
-    if (enabled)  painter.setPen(GCColor::invertColor(legend->plot()->backgroundColor())); // use invert - usually black or white
+    if (enabled)  painter.setPen(GInvertColor(legend->plot()->backgroundColor())); // use invert - usually black or white
     else painter.setPen(Qt::gray);
 
     QFont f;
