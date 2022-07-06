@@ -569,7 +569,7 @@ void Banister::fit()
 // power index metric
 double powerIndex(double averagepower, double duration, bool isRun)
 {
-    Q_UNUSED(isRun); // TODO: different parameters for Running
+    if (isRun) return RideFile::NIL; // TODO: different parameters for Running
 
     // so now lets work out what the 3p model says the
     // typical athlete would do for the same duration
