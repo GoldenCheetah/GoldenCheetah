@@ -153,6 +153,8 @@ before_build:
 - ps: (Get-Content src\Core\Secrets.h) -replace '__GC_POLARFLOW_CLIENT_SECRET__', $env:GC_POLARFLOW_CLIENT_SECRET | Set-Content src\Core\Secrets.h
 - ps: (Get-Content src\Core\Secrets.h) -replace '__GC_SPORTTRACKS_CLIENT_SECRET__', $env:GC_SPORTTRACKS_CLIENT_SECRET | Set-Content src\Core\Secrets.h
 - ps: (Get-Content src\Core\Secrets.h) -replace '__GC_RWGPS_API_KEY__', $env:GC_RWGPS_API_KEY | Set-Content src\Core\Secrets.h
+- ps: (Get-Content src\Core\Secrets.h) -replace '__GC_NOLIO_CLIENT_ID__', $env:GC_NOLIO_CLIENT_ID | Set-Content src\Core\Secrets.h
+- ps: (Get-Content src\Core\Secrets.h) -replace '__GC_NOLIO_SECRET__', $env:GC_NOLIO_SECRET | Set-Content src\Core\Secrets.h
 - ps: (Get-Content src\Core\Secrets.h) -replace '__GC_XERT_CLIENT_SECRET__', $env:GC_XERT_CLIENT_SECRET | Set-Content src\Core\Secrets.h
 
 build_script:
