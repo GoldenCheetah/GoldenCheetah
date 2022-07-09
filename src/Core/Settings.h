@@ -64,6 +64,11 @@
 #define GC_POLARFLOW_CLIENT_ID "Not defined"
 #endif
 
+// Xert
+#ifndef GC_XERT_CLIENT_ID
+#define GC_XERT_CLIENT_ID "xert_goldencheetah"
+#endif
+
 /*
  *  GoldenCheetah Properties are stored in different locations, depending on the prefix defined in the property name. The following different prefixes are supported
  *  <system>

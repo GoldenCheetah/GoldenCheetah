@@ -100,7 +100,8 @@ Xert::open(QStringList &errors)
     QNetworkRequest request(QUrl("https://www.xertonline.com/oauth/token"));
     request.setRawHeader("Content-Type", "application/x-www-form-urlencoded");
 
-    QString authheader = QString("%1:%1").arg("xert_public");
+    QString authheader = QString("%1:%2").arg(GC_XERT_CLIENT_ID).arg(GC_XERT_CLIENT_SECRET);
+
     request.setRawHeader("Authorization", "Basic " +  authheader.toLatin1().toBase64());
 
     // set params

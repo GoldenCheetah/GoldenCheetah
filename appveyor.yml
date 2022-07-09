@@ -39,6 +39,8 @@ environment:
     secure: /OFVjEBwU7o3SItIQVf/YlJ8XErxneXIT2N0JyPMSXR1tCbdZVWixMHpqKNWoNk4
   GC_NOLIO_SECRET:
     secure: mmMksvVnfBiXufBDn2gAhQY53n0J9BokSCtDY51uU918QJ/LL4XOojtJp5tMFn8T7ugyDhNASpqZXiK55vxSD53vm+tjufpfzppKEeh93Babvc/VrndLB1X/RZCRUQTR6rka05fYl4e0eBzP1H091A==
+  GC_XERT_CLIENT_SECRET:
+    secure: /1rVLT8LyJCZ4xNJ5W+NtAcZ1rtKaUjW9SYm/T3gHoc=
 
 init:
 # Setup QT 5.15 - 64Bit
@@ -151,6 +153,7 @@ before_build:
 - ps: (Get-Content src\Core\Secrets.h) -replace '__GC_POLARFLOW_CLIENT_SECRET__', $env:GC_POLARFLOW_CLIENT_SECRET | Set-Content src\Core\Secrets.h
 - ps: (Get-Content src\Core\Secrets.h) -replace '__GC_SPORTTRACKS_CLIENT_SECRET__', $env:GC_SPORTTRACKS_CLIENT_SECRET | Set-Content src\Core\Secrets.h
 - ps: (Get-Content src\Core\Secrets.h) -replace '__GC_RWGPS_API_KEY__', $env:GC_RWGPS_API_KEY | Set-Content src\Core\Secrets.h
+- ps: (Get-Content src\Core\Secrets.h) -replace '__GC_XERT_CLIENT_SECRET__', $env:GC_XERT_CLIENT_SECRET | Set-Content src\Core\Secrets.h
 
 build_script:
 - qmake.exe build.pro -r -spec win32-msvc

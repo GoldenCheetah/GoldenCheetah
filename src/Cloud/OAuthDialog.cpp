@@ -334,7 +334,7 @@ OAuthDialog::urlChanged(const QUrl &url)
                 params.addQueryItem("password", service->getSetting(GC_XERTPASS, "").toString());
                 params.addQueryItem("grant_type", "password");
 
-                authheader = QString("%1:%1").arg("xert_public");
+                authheader = QString("%1:%2").arg(GC_XERT_CLIENT_ID).arg(GC_XERT_CLIENT_SECRET);
             } else if (site == RIDEWITHGPS) {
                 urlstr = QString("https://ridewithgps.com/users/current.json");
                 params.addQueryItem("apikey", GC_RWGPS_API_KEY);
