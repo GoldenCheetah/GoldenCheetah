@@ -6,7 +6,7 @@
                                      John Ehrlinger
                                      Ale Martinez
 
-                                        Mar 2021
+                                        Jul 2022
                                       Version 3.6
 
 A walkthrough of building GoldenCheetah from scratch on Ubuntu linux 18.04
@@ -48,7 +48,7 @@ Install Qt
 ----------
 Download and install the Qt SDK from http://qt-project.org/
 You can use a browser to download and run the interactive installer, be sure to
-select version 5.14.2 or higher Qt 5 version, including at least the following modules:
+select version 5.15.2 or higher Qt 5 version, including at least the following modules:
 - Desktop gcc 64-bit
 - Qt Charts
 - Qt WebEngine
