@@ -12163,7 +12163,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Gui/Colors.cpp" line="252"/>
         <source>Map Route Line</source>
-        <translation type="unfinished"></translation>
+        <translation>Línea de la ruta en el mapa</translation>
     </message>
     <message>
         <source>Overview Card Background</source>
@@ -12613,12 +12613,12 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Core/GcUpgrade.cpp" line="387"/>
         <source>Upgrade to v3.6</source>
-        <translation type="unfinished"></translation>
+        <translation>Actualizar a v3.6</translation>
     </message>
     <message>
         <location filename="../../Core/GcUpgrade.cpp" line="388"/>
         <source>We are about to upgrade your data and layouts to v3.6, please note Ride Summary chart was deprecated, and to use v3.5 again you will need to restore a backup</source>
-        <translation type="unfinished"></translation>
+        <translation>Vamos a actualizar a la versión 3.6. Tenga en cuenta que el panel de resumen de la actividad (ride summary) ha sido eliminado, por lo que para volver a usar la versión 3.5 ha de hacer una copia de seguridad</translation>
     </message>
     <message>
         <location filename="../../Core/GcUpgrade.cpp" line="488"/>
@@ -13800,27 +13800,27 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="87"/>
         <source>Navigate backward</source>
-        <translation type="unfinished"></translation>
+        <translation>Navega hacia atrás</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="89"/>
         <source>Navigate forward</source>
-        <translation type="unfinished"></translation>
+        <translation>Navega hacia delante</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="91"/>
         <source>Select active perspective for the current view, create new perspectives and manage existing ones</source>
-        <translation type="unfinished"></translation>
+        <translation>Selecciona la perpectiva activa para la vista actual, crea nuevas perspectivas y gestiona las existentes</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="95"/>
         <source>Activate / De-activate the Compare Pane - which allows to compare activities and intervals in Activities View or date ranges in Trends View - also across athletes. In Train View it shows/hide the Intensity Adjustments and Workout Control Pane.</source>
-        <translation type="unfinished"></translation>
+        <translation>Activa/desactiva el panel de comparación, que permite comparar (incluso entre atletas distintos) actividades e intervalos en la sección de Actividades e intervalos temporales en la sección de Tendencias. En el modo Entrenar muestra/oculta los ajustes de intensidad y el panel de control del entrenamiento</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="97"/>
         <source>Changes the current view layout between Tabbed and Tiled</source>
-        <translation type="unfinished"></translation>
+        <translation>Cambia la vista actual entre pestañas y mosaico</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="122"/>
@@ -14490,7 +14490,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="1731"/>
         <source>Iso Power to Average Heart Rate ratio in watts/bpm</source>
-        <translation>Relación entre la potencia normalizada y la frecuencia cardíaca media en W/ppm</translation>
+        <translation>Relación entre la potencia normalizada (IsoPower) y la frecuencia cardíaca media, en W/ppm</translation>
     </message>
 </context>
 <context>
@@ -15957,13 +15957,13 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Metrics/Coggan.cpp" line="45"/>
         <source>IsoPower</source>
-        <translation type="unfinished">IsoPower</translation>
+        <translation>IsoPower</translation>
     </message>
     <message>
         <location filename="../../Metrics/Coggan.cpp" line="47"/>
         <location filename="../../Metrics/Coggan.cpp" line="48"/>
         <source>watts</source>
-        <translation type="unfinished">W</translation>
+        <translation>W</translation>
     </message>
     <message>
         <location filename="../../Metrics/Coggan.cpp" line="50"/>
@@ -28229,7 +28229,7 @@ Do you want to continue?</source>
     <message>
         <location filename="../../Charts/RideMapWindow.cpp" line="84"/>
         <source>Hide Out &amp; Back Route Opacity</source>
-        <translation type="unfinished"></translation>
+        <translation>Oculta/muestra la opacidad de la ruta</translation>
     </message>
     <message>
         <location filename="../../Charts/RideMapWindow.cpp" line="85"/>
