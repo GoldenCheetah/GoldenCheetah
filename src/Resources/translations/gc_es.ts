@@ -2561,7 +2561,7 @@ Presione siguiente para continuar
     <message>
         <location filename="../../Charts/AllPlotWindow.cpp" line="419"/>
         <source>Skiba xPower</source>
-        <translation>Potencia normalizada Skiba (xPower)</translation>
+        <translation>Potencia normalizada de Skiba (xPower)</translation>
     </message>
     <message>
         <location filename="../../Charts/AllPlotWindow.cpp" line="423"/>
@@ -9726,7 +9726,7 @@ le sugerirá los posibles nombres
     <message>
         <location filename="../../Metrics/Coggan.cpp" line="343"/>
         <source>The ratio between IsoPower and Average HR for Cycling and xPace (in yd/min) and Average HR for Running</source>
-        <translation>El cociente entre la potencia normalizada y la frecuencia cardíaca media para ciclismo; entre xPace (en yd/min) y frecuencia cardíaca media para atletismo</translation>
+        <translation>El cociente entre la potencia normalizada (IsoPower) y la frecuencia cardíaca media para ciclismo; entre xPace (en yd/min) y frecuencia cardíaca media para atletismo</translation>
     </message>
 </context>
 <context>
@@ -9765,7 +9765,7 @@ le sugerirá los posibles nombres
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="847"/>
         <source>Elevation Gain</source>
-        <translation>Desn. positivo acum.</translation>
+        <translation>Desnivel positivo</translation>
     </message>
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="414"/>
@@ -9800,7 +9800,7 @@ le sugerirá los posibles nombres
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="914"/>
         <source>Elevation Loss</source>
-        <translation>Desn. negativo acum.</translation>
+        <translation>Desnivel negativo</translation>
     </message>
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="916"/>
@@ -15919,7 +15919,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Metrics/Coggan.cpp" line="50"/>
         <source>Iso Power is an estimate of the power that you could have maintained for the same physiological &apos;cost&apos; if your power output had been perfectly constant.</source>
-        <translation>La potencia normalizada IsoPower) es una estimación de la potencia que, sostenida de manera constante, hubiera tenido un mismo impacto fisiológico.</translation>
+        <translation>La potencia normalizada (IsoPower) es una estimación de la potencia que, sostenida de manera constante, hubiera tenido un mismo impacto fisiológico.</translation>
     </message>
 </context>
 <context>
