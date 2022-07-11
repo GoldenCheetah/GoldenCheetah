@@ -12551,6 +12551,7 @@ Koppelaanpassing - dit definieert een absolute waarde in ponden per vierkante in
         <location filename="../../Gui/Colors.cpp" line="249"/>
         <location filename="../../Gui/Colors.cpp" line="250"/>
         <location filename="../../Gui/Colors.cpp" line="251"/>
+        <location filename="../../Gui/Colors.cpp" line="252"/>
         <source>Gui</source>
         <translation type="unfinished"></translation>
     </message>
@@ -12682,6 +12683,11 @@ Koppelaanpassing - dit definieert een absolute waarde in ponden per vierkante in
     <message>
         <location filename="../../Gui/Colors.cpp" line="251"/>
         <source>Overview Tile Background Vibrant</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Gui/Colors.cpp" line="252"/>
+        <source>Map Route Line</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -13169,147 +13175,157 @@ Koppelaanpassing - dit definieert een absolute waarde in ponden per vierkante in
         <translation>TSS</translation>
     </message>
     <message>
-        <location filename="../../Core/GcUpgrade.cpp" line="421"/>
+        <location filename="../../Core/GcUpgrade.cpp" line="387"/>
+        <source>Upgrade to v3.6</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Core/GcUpgrade.cpp" line="388"/>
+        <source>We are about to upgrade your data and layouts to v3.6, please note Ride Summary chart was deprecated, and to use v3.5 again you will need to restore a backup</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Core/GcUpgrade.cpp" line="431"/>
         <source>Start creating of: Directories... </source>
         <translation>Start creëren van: Mappen... </translation>
     </message>
     <message>
-        <location filename="../../Core/GcUpgrade.cpp" line="429"/>
+        <location filename="../../Core/GcUpgrade.cpp" line="439"/>
         <source>Error: Creation of subdirectories failed</source>
         <translation>Fout: Creatie van sub-mappen mislukt</translation>
     </message>
     <message>
-        <location filename="../../Core/GcUpgrade.cpp" line="432"/>
+        <location filename="../../Core/GcUpgrade.cpp" line="442"/>
         <source>Creation of subdirectories successful</source>
         <translation>Creatie van sub-mappen succesvol</translation>
     </message>
     <message>
-        <location filename="../../Core/GcUpgrade.cpp" line="459"/>
+        <location filename="../../Core/GcUpgrade.cpp" line="469"/>
         <source>Start copying of: Configuration files... </source>
         <translation>Start kopiëren van: Configuratiebestanden... </translation>
     </message>
     <message>
-        <location filename="../../Core/GcUpgrade.cpp" line="472"/>
+        <location filename="../../Core/GcUpgrade.cpp" line="482"/>
         <source>%1 configuration files moved to subdirectory: %2 - %3 failed</source>
         <translation>%1 configuratiebestanden verplaatsen naar sub-map: %2 - %3 mislukt</translation>
     </message>
     <message>
-        <location filename="../../Core/GcUpgrade.cpp" line="478"/>
+        <location filename="../../Core/GcUpgrade.cpp" line="488"/>
         <source>Start copying of: Calendar files...</source>
         <translation>Start kopiëren van: Kalenderbestanden...</translation>
     </message>
     <message>
-        <location filename="../../Core/GcUpgrade.cpp" line="491"/>
+        <location filename="../../Core/GcUpgrade.cpp" line="501"/>
         <source>%1 calendar files moved to subdirectory: %2 - %3 failed</source>
         <translation>%1 Kalenderbestanden verplaatsen naar sub-map: %2 - %3 mislukt</translation>
     </message>
     <message>
-        <location filename="../../Core/GcUpgrade.cpp" line="497"/>
+        <location filename="../../Core/GcUpgrade.cpp" line="507"/>
         <source>Start copying of: Log files...</source>
         <translation>Start kopiëren van: Logbestanden...</translation>
     </message>
     <message>
-        <location filename="../../Core/GcUpgrade.cpp" line="510"/>
+        <location filename="../../Core/GcUpgrade.cpp" line="520"/>
         <source>%1 log files moved to subdirectory: %2 - %3 failed</source>
         <translation>%1 logbestanden verplaatsen naar sub-map: %2 - %3 mislukt</translation>
     </message>
     <message>
-        <location filename="../../Core/GcUpgrade.cpp" line="518"/>
+        <location filename="../../Core/GcUpgrade.cpp" line="528"/>
         <source>Start copying of: Activity files (.JSON / .GC)...</source>
         <translation>Start kopiëren van: Activiteit-bestanden (.JSON / .GC)...</translation>
     </message>
     <message>
-        <location filename="../../Core/GcUpgrade.cpp" line="530"/>
+        <location filename="../../Core/GcUpgrade.cpp" line="540"/>
         <source>%1 activity (.JSON, .GC) files moved to subdirectory: %2 - %3 failed</source>
         <translation>%1 activiteit (.JSON, .GC) bestanden verplaatsen naar sub-map : %2 - %3 mislukt</translation>
     </message>
     <message>
-        <location filename="../../Core/GcUpgrade.cpp" line="537"/>
+        <location filename="../../Core/GcUpgrade.cpp" line="547"/>
         <source>Start copying of: Activity files (.BAK)...</source>
         <translation>Start kopiëren van: Activiteit-bestanden (.BAK)...</translation>
     </message>
     <message>
-        <location filename="../../Core/GcUpgrade.cpp" line="549"/>
+        <location filename="../../Core/GcUpgrade.cpp" line="559"/>
         <source>%1 activity backup (.BAK) files moved to subdirectory: %2 - %3 failed</source>
         <translation>%1 activiteit-backup (.BAK) bestanden verplaatsen naar sub-map : %2 - %3 mislukt</translation>
     </message>
     <message>
-        <location filename="../../Core/GcUpgrade.cpp" line="555"/>
+        <location filename="../../Core/GcUpgrade.cpp" line="565"/>
         <source>Start copying of: Media and Workout files... </source>
         <translation>Start kopiëren van: Media en Training-bestanden... </translation>
     </message>
     <message>
-        <location filename="../../Core/GcUpgrade.cpp" line="570"/>
+        <location filename="../../Core/GcUpgrade.cpp" line="580"/>
         <source>%1 media and workout files moved to subdirectory: \%2 - %3 failed</source>
         <translation>%1 media en training-bestanden verplaatsen naar sub-map:\ %2 - %3 mislukt</translation>
     </message>
     <message>
-        <location filename="../../Core/GcUpgrade.cpp" line="626"/>
+        <location filename="../../Core/GcUpgrade.cpp" line="636"/>
         <source>Start conversion of native activity files to GoldenCheetah .JSON format...</source>
         <translation>Start conversie van eigen activiteit-bestanden naar GoldenCheetah .JSON formaat...</translation>
     </message>
     <message>
-        <location filename="../../Core/GcUpgrade.cpp" line="680"/>
+        <location filename="../../Core/GcUpgrade.cpp" line="690"/>
         <source>-&gt; Information: Activity %1 - Successfully converted to .JSON</source>
         <translation>-&gt; Informatie: Activiteit %1 - Succesvol geconverteerd naar .JSON</translation>
     </message>
     <message>
-        <location filename="../../Core/GcUpgrade.cpp" line="692"/>
+        <location filename="../../Core/GcUpgrade.cpp" line="702"/>
         <source>-&gt; Error: Activity %1 - Conversion errors: </source>
         <translation>-&gt; Fout: Activiteit %1 - Conversie fouten: </translation>
     </message>
     <message>
-        <location filename="../../Core/GcUpgrade.cpp" line="694"/>
+        <location filename="../../Core/GcUpgrade.cpp" line="704"/>
         <source>......... message(s) of .JSON conversion): </source>
         <translation>......... bericht(en) over .JSON conversie): </translation>
     </message>
     <message>
-        <location filename="../../Core/GcUpgrade.cpp" line="704"/>
+        <location filename="../../Core/GcUpgrade.cpp" line="714"/>
         <source>-&gt; Error: Activity %1 - Invalid File Name (expected format &apos;YYYY_MM_DD_HH_MM_SS.%2&apos;)</source>
         <translation>-&gt; Fout: Activiteit %1 - Ongeldige Bestandsnaam (verwacht formaat &apos;JJJJ_MM_DD_HH_MM_SS.%2&apos;)</translation>
     </message>
     <message>
-        <location filename="../../Core/GcUpgrade.cpp" line="710"/>
+        <location filename="../../Core/GcUpgrade.cpp" line="720"/>
         <source>-&gt; Error: Activity %1 - Problem reading file</source>
         <translation>-&gt; Fout: Activiteit %1 - Probleem met bestand lezen</translation>
     </message>
     <message>
-        <location filename="../../Core/GcUpgrade.cpp" line="717"/>
+        <location filename="../../Core/GcUpgrade.cpp" line="727"/>
         <source>%1 activity files converted to .JSON and stored in subdirectory: %2 - %3 failed</source>
         <translation>%1 activiteit bestanden geconverteerd naar .JSON en opslaan in sub-map: %2 - %3 mislukt</translation>
     </message>
     <message>
-        <location filename="../../Core/GcUpgrade.cpp" line="720"/>
+        <location filename="../../Core/GcUpgrade.cpp" line="730"/>
         <source>%1 converted activity source files moved to subdirectory: %2 - %3 failed</source>
         <translation>%1 geconverteerde activiteit bronbestanden verplaatsen naar sub-map: %2 - %3 mislukt</translation>
     </message>
     <message>
-        <location filename="../../Core/GcUpgrade.cpp" line="725"/>
+        <location filename="../../Core/GcUpgrade.cpp" line="735"/>
         <source>Summary: No errors detected - upgrade successful</source>
         <translation>Samenvatting: Geen fouten opgetreden - upgrade succesvol</translation>
     </message>
     <message>
-        <location filename="../../Core/GcUpgrade.cpp" line="728"/>
+        <location filename="../../Core/GcUpgrade.cpp" line="738"/>
         <source>Summary: %1 errors detected - please check log details before proceeding</source>
         <translation>Samenvatting: %1 fouten opgetreden - controleer de log-details voordat je verder gaat alsjeblieft</translation>
     </message>
     <message>
-        <location filename="../../Core/GcUpgrade.cpp" line="731"/>
+        <location filename="../../Core/GcUpgrade.cpp" line="741"/>
         <source>&lt;center&gt;&lt;br&gt;After choosing &apos;Proceed to Athlete&apos;, the system will open the athlete window using the converted data. Depending on the errors this might lead to follow-up errors and incomplete athlete data. You may either fix the error(s) in your directory directly, or go back to your last backup and correct the error(s) in the source data. &lt;br&gt;The upgrade process will be done again each time you open the athlete, until the conversion was successful - and had no more errors.&lt;/center&gt;</source>
         <translation>&lt;center&gt;&lt;br&gt;Nadat gekozen is voor &apos;Ga verder naar Athlete&apos;, zal het systeem het atleetscherm openen met de geconverteerde data. Afhankelijk van de fouten kan dit leiden naar toekomstige fouten en incomplete atleetdata. Je kunt de fout(en) oplossen direct in de gebruikte map, of teruggaan naar de je laatste backup en de fout(en) daarna corrigeren in de brondata. &lt;br&gt;Het upgrade proces zal opnieuw doorlopen worden iedere keer als de atleet geopend wordt, totdat de conversie succesvol is - en geen fouten meer heeft.&lt;/center&gt;</translation>
     </message>
     <message>
-        <location filename="../../Core/GcUpgrade.cpp" line="738"/>
+        <location filename="../../Core/GcUpgrade.cpp" line="748"/>
         <source>&lt;center&gt;&lt;br&gt;Latest information about possible upgrade problems and concepts to resolve them are available in the&lt;br&gt;&lt;a href= &quot;https://github.com/GoldenCheetah/GoldenCheetah/wiki/Upgrade_v3.2_Troubleshooting_Guide&quot; target=&quot;_blank&quot;&gt;Upgrade v3.2 Troubleshooting Guide&lt;a&gt;</source>
         <translation>&lt;center&gt;&lt;br&gt;De Laatste informatie over mogelijke upgrade problemen vind je in de &lt;br&gt;&lt;a href= &quot;https://github.com/GoldenCheetah/GoldenCheetah/wiki/Upgrade_v3.2_Troubleshooting_Guide&quot; target=&quot;_blank&quot;&gt;Upgrade v3.2 Troubleshooting Guide&lt;a&gt;</translation>
     </message>
     <message>
-        <location filename="../../Core/GcUpgrade.cpp" line="776"/>
+        <location filename="../../Core/GcUpgrade.cpp" line="786"/>
         <source>-&gt; Error: Deletion of copied file &apos;%1&apos; failed</source>
         <translation>-&gt; Fout: Verwijderen van het gekopieerde bestand &apos;%1&apos; mislukt</translation>
     </message>
     <message>
-        <location filename="../../Core/GcUpgrade.cpp" line="785"/>
+        <location filename="../../Core/GcUpgrade.cpp" line="795"/>
         <source>-&gt; Error moving file : </source>
         <translation>-&gt; Fouten gedurende verplaatsen van bestand : </translation>
     </message>
@@ -13317,32 +13333,32 @@ Koppelaanpassing - dit definieert een absolute waarde in ponden per vierkante in
 <context>
     <name>GcUpgradeExecuteDialog</name>
     <message>
-        <location filename="../../Core/GcUpgrade.cpp" line="833"/>
+        <location filename="../../Core/GcUpgrade.cpp" line="843"/>
         <source>Athlete %1</source>
         <translation>Atleet %1</translation>
     </message>
     <message>
-        <location filename="../../Core/GcUpgrade.cpp" line="850"/>
+        <location filename="../../Core/GcUpgrade.cpp" line="860"/>
         <source>&lt;center&gt;&lt;h2&gt;Upgrade of Athlete:&lt;br&gt;%1&lt;br&gt;&lt;/h2&gt;&lt;/center&gt;</source>
         <translation>&lt;center&gt;&lt;h2&gt;Upgrade van Atleet:&lt;br&gt;%1&lt;br&gt;&lt;/h2&gt;&lt;/center&gt;</translation>
     </message>
     <message>
-        <location filename="../../Core/GcUpgrade.cpp" line="855"/>
+        <location filename="../../Core/GcUpgrade.cpp" line="865"/>
         <source>&lt;center&gt;&lt;b&gt;Backup your &apos;Athlete&apos; data first!&lt;br&gt;&lt;b&gt;Please read carefully before proceeding!&lt;/b&gt;&lt;/center&gt; &lt;br&gt; &lt;br&gt;With Version 3.2 the &apos;Athlete&apos; directory has been refactored by adding a set of subdirectories which hold the different types of GoldenCheetah files.&lt;br&gt;&lt;br&gt;The new structure is:&lt;br&gt;-&gt; Activity files: &lt;samp&gt;/activities&lt;/samp&gt;&lt;br&gt;-&gt; Configuration files: &lt;samp&gt;/config&lt;/samp&gt;&lt;br&gt;-&gt; Download files: &lt;samp&gt;/downloads&lt;/samp&gt;&lt;br&gt;-&gt; Import files: &lt;samp&gt;/imports&lt;/samp&gt;&lt;br&gt;-&gt; Backups of Activity files: &lt;samp&gt;/bak&lt;/samp&gt;&lt;br&gt;-&gt; Workout related files: &lt;samp&gt;/workouts&lt;/samp&gt;&lt;br&gt;-&gt; Cache files: &lt;samp&gt;/cache&lt;/samp&gt;&lt;br&gt;-&gt; Calendar files: &lt;samp&gt;/calendar&lt;/samp&gt;&lt;br&gt;-&gt; Log files: &lt;samp&gt;/logs&lt;/samp&gt;&lt;br&gt;-&gt; Temp files: &lt;samp&gt;/temp&lt;/samp&gt;&lt;br&gt;-&gt; Temp for Activities: &lt;samp&gt;/tempActivities&lt;/samp&gt;&lt;br&gt;-&gt; Train View recordings: &lt;samp&gt;/recordings&lt;/samp&gt;&lt;br&gt;-&gt; Quarantined files: &lt;samp&gt;/quarantine&lt;/samp&gt;&lt;br&gt;&lt;br&gt;The upgrade process will create the new directory structure and move the existing files to the new directories as needed. During the upgrade all activity files will be converted to GoldenCheetah&apos;s native file format .JSON and moved to the &lt;br&gt;&lt;samp&gt;/activities&lt;/samp&gt; folder. The source files are moved to the &lt;samp&gt;/imports&lt;/samp&gt; folder.&lt;br&gt;&lt;br&gt;Starting with version 3.2 all downloads from devices or imported activity files will be converted to GoldenCheetah&apos;s file format during import/download. The original files will be stored - depending on the source - in &lt;samp&gt;/downloads&lt;/samp&gt; or &lt;br&gt;&lt;samp&gt;/imports&lt;/samp&gt; folder.&lt;br&gt;&lt;br&gt;&lt;center&gt;&lt;b&gt;Please make sure that you have done a backup of your athlete data before proceeding with the upgrade. We can&apos;t take responsibility for any loss of data during the process. &lt;/b&gt; &lt;/center&gt; &lt;br&gt;</source>
         <translation>&lt;center&gt;&lt;b&gt;Maak eerst een Backup van je &apos;Atleet&apos; data!&lt;br&gt;&lt;b&gt;Lees dit aandachtig alsjeblieft!&lt;/b&gt;&lt;/center&gt; &lt;br&gt; &lt;br&gt;Met ingang van Versie 3.2 is de &apos;Atleet&apos; map indeling veranderd doordat er een aantal sub-mappen zijn toegevoegd met daarin verschillende GoldenCheetah bestanden.&lt;br&gt;&lt;br&gt;De nieuwe structuur is:&lt;br&gt;-&gt; Activity files: &lt;samp&gt;/activities&lt;/samp&gt;&lt;br&gt;-&gt; Configuratie bestanden: &lt;samp&gt;/config&lt;/samp&gt;&lt;br&gt;-&gt; Download bestanden: &lt;samp&gt;/downloads&lt;/samp&gt;&lt;br&gt;-&gt; Import bestanden: &lt;samp&gt;/imports&lt;/samp&gt;&lt;br&gt;-&gt; Backups van Activiteiten bestanden: &lt;samp&gt;/bak&lt;/samp&gt;&lt;br&gt;-&gt; Training gerelateerde bestanden: &lt;samp&gt;/workouts&lt;/samp&gt;&lt;br&gt;-&gt; Cache bestanden: &lt;samp&gt;/cache&lt;/samp&gt;&lt;br&gt;-&gt; Kalender bestanden: &lt;samp&gt;/calendar&lt;/samp&gt;&lt;br&gt;-&gt; Log bestanden: &lt;samp&gt;/logs&lt;/samp&gt;&lt;br&gt;-&gt; Temp bestanden: &lt;samp&gt;/temp&lt;/samp&gt;&lt;br&gt;-&gt; Temp for Activities: &lt;samp&gt;/tempActivities&lt;/samp&gt;&lt;br&gt;-&gt; Train View recordings: &lt;samp&gt;/recordings&lt;/samp&gt;&lt;br&gt;-&gt; Quarantine bestanden: &lt;samp&gt;/quarantine&lt;/samp&gt;&lt;br&gt;&lt;br&gt;Het upgrade proces zal de nieuwe mappenstructuur creëren en alle bestaande files verplaatsen naar de nieuwe mappen waar nodig. Tijdens de upgrade zullen activiteiten bestanden geconverteerd worden naar GoldenCheetah native formaat JSON en verplaatst worden naar &lt;br&gt;&lt;samp&gt;/activities&lt;/samp&gt; map. De bronbestanden worden verplaatst naar de &lt;samp&gt;/imports&lt;/samp&gt; folder.&lt;br&gt;&lt;br&gt;Beginnend met versie 3.2 zullen alle downloads van apparaten of geïmporteerde activiteitenbestanden worden geconverteerd naar GoldenCheetah&apos;s bestandsformaat gedurende het importeren/downloaden. De originele bestanden zullen worden bewaard - afhankelijk van de bron in &lt;samp&gt;/downloads&lt;/samp&gt; of de &lt;br&gt;&lt;samp&gt;/imports&lt;/samp&gt; map.&lt;br&gt;&lt;br&gt;&lt;center&gt;&lt;b&gt;Wees er alsjeblieft zeker van dat je een backup hebt van je &apos;Atleet&apos; data voor je verder gaat met de upgrade. We kunnen geen verantwoordelijkheid nemen voor ieder verlies van data gedurende dit proces. &lt;/b&gt; &lt;/center&gt; &lt;br&gt;</translation>
     </message>
     <message>
-        <location filename="../../Core/GcUpgrade.cpp" line="894"/>
+        <location filename="../../Core/GcUpgrade.cpp" line="904"/>
         <source>&lt;center&gt;Please backup the athlete directory:&lt;/center&gt;</source>
         <translation>&lt;center&gt;Maak een backup van de atleet map alsjeblieft:&lt;/center&gt;</translation>
     </message>
     <message>
-        <location filename="../../Core/GcUpgrade.cpp" line="912"/>
+        <location filename="../../Core/GcUpgrade.cpp" line="922"/>
         <source>Accept conditions and proceed with Upgrade</source>
         <translation>Accepteer voorwaarden en ga verder met de upgrade</translation>
     </message>
     <message>
-        <location filename="../../Core/GcUpgrade.cpp" line="915"/>
+        <location filename="../../Core/GcUpgrade.cpp" line="925"/>
         <source>Abort Upgrade</source>
         <translation>Upgrade Afbreken</translation>
     </message>
@@ -13350,32 +13366,32 @@ Koppelaanpassing - dit definieert een absolute waarde in ponden per vierkante in
 <context>
     <name>GcUpgradeLogDialog</name>
     <message>
-        <location filename="../../Core/GcUpgrade.cpp" line="932"/>
+        <location filename="../../Core/GcUpgrade.cpp" line="942"/>
         <source>Athlete %1</source>
         <translation>Atleet %1</translation>
     </message>
     <message>
-        <location filename="../../Core/GcUpgrade.cpp" line="948"/>
+        <location filename="../../Core/GcUpgrade.cpp" line="958"/>
         <source>&lt;h1&gt;Upgrade log: GoldenCheetah v3.2&lt;/h1&gt;</source>
         <translation>&lt;h1&gt;Upgrade log: GoldenCheetah v3.2&lt;/h1&gt;</translation>
     </message>
     <message>
-        <location filename="../../Core/GcUpgrade.cpp" line="973"/>
+        <location filename="../../Core/GcUpgrade.cpp" line="983"/>
         <source>Proceed to Athlete</source>
         <translation>Ga verder naar Atleet</translation>
     </message>
     <message>
-        <location filename="../../Core/GcUpgrade.cpp" line="975"/>
+        <location filename="../../Core/GcUpgrade.cpp" line="985"/>
         <source>Save Upgrade Report...</source>
         <translation>Bewaar Upgrade Rapport...</translation>
     </message>
     <message>
-        <location filename="../../Core/GcUpgrade.cpp" line="1002"/>
+        <location filename="../../Core/GcUpgrade.cpp" line="1012"/>
         <source>Save Log</source>
         <translation>Bewaar Log</translation>
     </message>
     <message>
-        <location filename="../../Core/GcUpgrade.cpp" line="1002"/>
+        <location filename="../../Core/GcUpgrade.cpp" line="1012"/>
         <source>Text File (*.txt)</source>
         <translation>Tekstbestand (.txt)</translation>
     </message>
@@ -14337,94 +14353,91 @@ Koppelaanpassing - dit definieert een absolute waarde in ponden per vierkante in
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="87"/>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="102"/>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="106"/>
         <source>Direct download from Powertap, SRM, Joule, Joule GPS, Moxy Monitor or Macro-X device</source>
         <translation>Direct download van Powertap, SRM, Joule, Joule GPS, Moxy Monitor of Macro-X apparaat</translation>
     </message>
     <message>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="89"/>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="104"/>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="108"/>
         <source>Import any activity file - supported by Golden Cheetah - mass import is supported here</source>
         <translation>Importeer iedere activiteitenbestand - ondersteund door Golden Cheetah - massa import is ondersteund</translation>
     </message>
     <message>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="91"/>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="93"/>
         <source>Activate / De-activate the Sidebar - which provides different sub-sections to select data shown in the main view</source>
         <translation>Activeer / De-activeer de Zijbalk - welke verschillende sub-secties presenteert om data te selecteren om te bekijken in het hoofdscherm</translation>
     </message>
     <message>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="93"/>
         <source>Activate / De-activate the Compare Pane - which allows to compare activities, intervals or date ranges - also across athletes</source>
-        <translation>Activeer / De-activeer het Vergelijkingspaneel - welke vergelijken mogelijk maakt van activiteiten, intervallen of tijdsperiodes - ook over verschillende atleten</translation>
+        <translation type="vanished">Activeer / De-activeer het Vergelijkingspaneel - welke vergelijken mogelijk maakt van activiteiten, intervallen of tijdsperiodes - ook over verschillende atleten</translation>
     </message>
     <message>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="97"/>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="101"/>
         <source>Athlete Management to open/close an existing or create a new athlete - either in a Tab or in a new Window</source>
         <translation>Atleet Management om een bestaande atleet te openen/te sluiten en een nieuwe te creëren - of in een Tab of in een nieuw Venster</translation>
     </message>
     <message>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="100"/>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="104"/>
         <source>Main functions related to activities like Activity Creation, Sharing and Export, and Splitting or Combining Activities</source>
         <translation>Hoofdfuncties gerelateerd aan acties zoals Creatie, Delen, Exporteren, en Splitsen of Combineren van Activiteiten</translation>
     </message>
     <message>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="106"/>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="110"/>
         <source>Manual creation of an activity where the most relevant data can be added in this dialog</source>
         <translation>Handmatige creatie van een activiteit waar de meest relevante data kan worden toegevoegd via deze dialoog</translation>
     </message>
     <message>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="108"/>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="112"/>
         <source>Laps Editor allows to enter a sequence of work-rest intervals series -defined by number of repetitions (reps), distance (dist, units according to preferences in Pace Zones) and duration (min and sec)- to generate the data points for the activity</source>
         <translation>Ronde Editor geeft de mogelijkheid om in volgorde werk- rust interval series -gedefinieerd door de repetitie (reps), afstand (afstand, eenheden volgens voorkeursinstellingen in Tempo Zones) en tijdsduur (min en sec)- om de datapunten te genereren voor de activiteit</translation>
     </message>
     <message>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="111"/>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="115"/>
         <source>Exports a (selectable) set of activties in one of the supported export formats</source>
         <translation>Exporteert een (selecteerbare) set van activiteiten in een ondersteund exportformaat</translation>
     </message>
     <message>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="113"/>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="117"/>
         <source>Wizard to split an activity into multiple activities based on configurable criteria</source>
         <translation>Assistent om een activiteit te splitsen in meerdere gebaseerd op configureerbare criteria</translation>
     </message>
     <message>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="115"/>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="119"/>
         <source>Wizard to combine data with the currently selected activity in multiple ways</source>
         <translation>Assistent om geselecteerde activiteiten samen te voegen op meerdere manieren</translation>
     </message>
     <message>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="118"/>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="122"/>
         <source>All functions related to sharing of activities with cloud services</source>
         <translation>Alle functies gerelateerd aan delen van activiteiten met cloud services</translation>
     </message>
     <message>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="121"/>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="125"/>
         <source>Sharing an activity with other trainingsites - only sites for which the authorization has been configured can be seleted for sharing here</source>
         <translation>Delen van een activiteit met andere trainingssites - alleen sites voor welke de toegang is geconfigureerd kunnen hier worden geselecteerd</translation>
     </message>
     <message>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="124"/>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="128"/>
         <source>A set of functions related different features in GoldenCheetah - please check the details for more information</source>
         <translation>Een set van functies gerelateerd aan verschillende functies in GoldenCheetah - controleer de details voor meer informatie alsjeblieft</translation>
     </message>
     <message>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="126"/>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="130"/>
         <source>Estimation of critical power using the Monod/Scherrer power model</source>
         <translation>Schatting van Critical Power met gebruik van Monod/Scherrer vermogensmodel</translation>
     </message>
     <message>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="128"/>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="132"/>
         <source>Estimation of Air Density (Rho)</source>
         <translation>Schatting van de luchtdichtheid (Rho)</translation>
     </message>
     <message>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="130"/>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="134"/>
         <source>Downloading of Body Measures (e.g. weight) from multiple sources</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="132"/>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="136"/>
         <source>Calculation of VDOT and Threshold Pace according to Daniels&apos; Running Formula</source>
         <translation>Berekening van VDOT en Threshold Pace volgens Daniels&apos; Running Formule</translation>
     </message>
@@ -14433,469 +14446,469 @@ Koppelaanpassing - dit definieert een absolute waarde in ponden per vierkante in
         <translation type="vanished">Downloaden van lichaamsmetingen (b.v. gewicht) van verschillende bronnen</translation>
     </message>
     <message>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="134"/>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="138"/>
         <source>Downloading of Workouts from the ERGDB (online workout DB) for Train - Indoor Riding</source>
         <translation>Downloaden van Workouts van de ERGDB (online workout DB) voor Train - Indoor Fietsen</translation>
     </message>
     <message>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="136"/>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="140"/>
         <source>Downloading of Workouts from your Today&apos;s Plan account for Train - Indoor Riding</source>
         <translation>Downloaden van Workouts van jouw Today&apos;s Plan account voor Train - Indoor Fietsen</translation>
     </message>
     <message>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="138"/>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="142"/>
         <source>Creation of a new Workout for Train - Indoor Riding</source>
         <translation>Creatie van een nieuwe Training voor Train - Binnen rijden</translation>
     </message>
     <message>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="140"/>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="144"/>
         <source>Search for Workout files and Video files in a configurable set of folders and add to the Train - Indoor Riding - Workout/Video library</source>
         <translation>Zoek naar Trainingsbestanden en Videobestanden in een configureerbare set van mappen en het toevoegen aan de Train - Binnen rijden - Training/Video bibliotheek</translation>
     </message>
     <message>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="143"/>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="147"/>
         <source>Creates an activity heat map using the selected activities and stores it in the choosen folder - &quot;HeatMap.htm&quot;. Opened in a Web-Browser the map shows where most activity took place.</source>
         <translation>Creëert een activiteit heat map met gebruikmaking van de geselecteerde activiteiten en bewaart deze in de gekozen map - HeatMap.htm&quot;. Geopend in een Web-Browser laat deze map zien waar de meeste activiteit was.</translation>
     </message>
     <message>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="146"/>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="150"/>
         <source>Wizards which fix, adjust, add series data of the current activity</source>
         <translation>Assistent welke data repareert, aanpast en datareeksen toevoegt aan de huidige activiteit</translation>
     </message>
     <message>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="148"/>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="152"/>
         <source>Add Torque Values</source>
         <translation>Koppelwaarden Toevoegen</translation>
     </message>
     <message>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="150"/>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="154"/>
         <source>Adjust Power Values</source>
         <translation>Vermogenswaarde Aanpassen</translation>
     </message>
     <message>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="152"/>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="156"/>
         <source>Adjust Torque Values</source>
         <translation>Koppelwaarden Aanpassen</translation>
     </message>
     <message>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="154"/>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="158"/>
         <source>Estimate Power Values</source>
         <translation>Vermogenswaarden Schatten</translation>
     </message>
     <message>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="156"/>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="160"/>
         <source>Estimate Distance Values</source>
         <translation>Afstand Waarden Schatten</translation>
     </message>
     <message>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="158"/>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="162"/>
         <source>Fix Elevation Errors</source>
         <translation>Fix Hoogtefouten</translation>
     </message>
     <message>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="160"/>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="164"/>
         <source>Fix Gaps in Recording</source>
         <translation>Fix Gaten in de Opname</translation>
     </message>
     <message>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="162"/>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="166"/>
         <source>Fix GPS Errors</source>
         <translation>Fix GPS fouten</translation>
     </message>
     <message>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="164"/>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="168"/>
         <source>Fix HR Spikes</source>
         <translation>Fix HR Spikes</translation>
     </message>
     <message>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="166"/>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="170"/>
         <source>Fix Power Spikes</source>
         <translation>Fix Vermogensspikes</translation>
     </message>
     <message>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="168"/>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="172"/>
         <source>Fix Speed</source>
         <translation>Fix Snelheid</translation>
     </message>
     <message>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="170"/>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="174"/>
         <source>Fix Freewheeling from Power and Speed</source>
         <translation>Fix Freewheelen aan de hand van Vermogen en Snelheid</translation>
     </message>
     <message>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="172"/>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="176"/>
         <source>Fix Moxy data by moving the moxy values from speed and cadence into the Moxy series</source>
         <translation>Fix Moxy data door de moxy waarden te verplaatsen van snelheid en cadans naar de Moxy dataseries</translation>
     </message>
     <message>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="175"/>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="179"/>
         <source>Filter R-R outliers</source>
         <translation>Filter R-R afwijkingen</translation>
     </message>
     <message>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="177"/>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="181"/>
         <source>Fix SmO2/tHb outliers</source>
         <translation>Fix SmO2/tHb afwijkingen</translation>
     </message>
     <message>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="179"/>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="183"/>
         <source>Options to show/hide views (e.g. Sidebar) as well as adding charts and resetting chart layouts to factory settings</source>
         <translation>Opties voor het onderdelen tonen/verbergen (b.v. Zijbalk) en ook het toevoegen van inzichten en resetten van de inzicht-layout naar de fabrieksinstellingen</translation>
     </message>
     <message>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="181"/>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="185"/>
         <source>Help options of GoldenCheetah</source>
         <translation>Help Opties van GoldenCheetah</translation>
     </message>
     <message>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="185"/>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="189"/>
         <source>Full configurable chart type to track performance and trends for metrics, user-definable best durations and model estimates</source>
         <translation>Volledig configureerbaar diagram type om voortgang en trends te volgen in metrieken, gebruikers definieerbare beste periodes en model schattingen</translation>
     </message>
     <message>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="187"/>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="191"/>
         <source>Date range, data grouping settings which apply to a single chart</source>
         <translation>Periode, datagroepering-instellingen welke van toepassing zijn op een enkele inzicht</translation>
     </message>
     <message>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="189"/>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="193"/>
         <source>Predefined sets of curves which can be applied as chart definition, or as starting point for individual adjustments</source>
         <translation>Voorgedefinieerde set van curves welke kunnen worden toegepast als inzicht-definitie, of als startpunt voor individuele aanpassingen</translation>
     </message>
     <message>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="191"/>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="195"/>
         <source>Curves which are plotted for the specific chart - based on presets or individually added and modified here</source>
         <translation>Curves welke geplot worden op een specifieke inzicht - gebaseerd op voorinstellingen of individueel toegevoegde en hier aangepaste</translation>
     </message>
     <message>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="193"/>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="197"/>
         <source>Individual curve configuration</source>
         <translation>Individuele curve configuratie</translation>
     </message>
     <message>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="195"/>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="199"/>
         <source>User defined formulas</source>
         <translation>Gebruikers gedefinieerde formules</translation>
     </message>
     <message>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="198"/>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="202"/>
         <source>Tree map visulation of activity data by two selectable dimensions for a configurable metric</source>
         <translation>Tree map visualisatie van activiteitsdata met twee selecteerbare dimensies voor een configureerbare metriek</translation>
     </message>
     <message>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="201"/>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="233"/>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="205"/>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="237"/>
         <source>Critical Mean Maximal Power Curve</source>
         <translation>Kritisch Gemiddelde Maximaal Vermogenscurve</translation>
     </message>
     <message>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="203"/>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="235"/>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="207"/>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="239"/>
         <source>Basic configuration like date range, what series to use and how to plot</source>
         <translation>Basisconfiguratie zoals datum bereik, welke reeksen te gebruiken en hoe die te plotten</translation>
     </message>
     <message>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="205"/>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="237"/>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="209"/>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="241"/>
         <source>Configuration of the CP Model to be used to plot the curve</source>
         <translation>Configuratie van het te gebruiken CP Model om de curve te plotten</translation>
     </message>
     <message>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="207"/>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="240"/>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="211"/>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="244"/>
         <source>Distribution of activity data samples or metrics according time spent in a certain segment</source>
         <translation>Distributie van activiteitendata of metrieken overeenkomstig met de gespendeerde tijd in een segment</translation>
     </message>
     <message>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="209"/>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="213"/>
         <source>Definition which date range is used for this particular chart</source>
         <translation>Definitie welke periode gebruikt wordt in deze specifieke inzicht</translation>
     </message>
     <message>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="211"/>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="298"/>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="304"/>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="215"/>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="302"/>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="308"/>
         <source>Calendar</source>
         <translation>Kalender</translation>
     </message>
     <message>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="213"/>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="217"/>
         <source>Configurable activity log - with build in search capabilities</source>
         <translation>Configureerbare activiteiten log - met ingebouwde zoekmogelijkheden</translation>
     </message>
     <message>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="215"/>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="219"/>
         <source>Dashboard for a single activity - the tiles shown here are configurable</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="219"/>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="223"/>
         <source>Detailed information of a single activity - the metrics shown here are configurable</source>
         <translation>Gedetailleerde informatie uit een activiteit - de getoonde metrieken zijn configureerbaar</translation>
     </message>
     <message>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="223"/>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="227"/>
         <source>Editor for activity file data - allowing to change/correct data, find entries and find anomalies</source>
         <translation>Editor van activiteitendata - maakt wijzigingen/correcties mogelijk, zoekt ingevoerde en zoekt onregelmatigheden</translation>
     </message>
     <message>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="226"/>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="230"/>
         <source>Plot of all activity data series in various ways</source>
         <translation>Plot van alle activiteiten-datareeksen op verschillende manieren</translation>
     </message>
     <message>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="228"/>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="232"/>
         <source>Selection how the power data series is shown in the plot and general settings on the diagram structure</source>
         <translation>Selectie hoe de vermogens-datareeksen worden getoond in de plot en algemene instellingen van de diagram structuur</translation>
     </message>
     <message>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="230"/>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="234"/>
         <source>Selection of all additional curves to be shown in the diagram - plotted only in case data is available in the activity file</source>
         <translation>Selectie van alle additionele curves die getoond moeten worden in het diagram - alleen geplot als er data beschikbaar is in het activiteitenbestand</translation>
     </message>
     <message>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="242"/>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="246"/>
         <source>Quadrant analysis of pedal velocity vs. effective pedal force</source>
         <translation>Kwadrant analyse van pedaalsnelheid vs effectieve pedaalkracht</translation>
     </message>
     <message>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="244"/>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="248"/>
         <source>Analysis of heartrate vs. power along the activity data</source>
         <translation>Analyse van hartslag vs vermogen langs de activiteitendata</translation>
     </message>
     <message>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="246"/>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="250"/>
         <source>Map of activity</source>
         <translation>Kaart van de activiteit</translation>
     </message>
     <message>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="248"/>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="252"/>
         <source>Configurable 2D scatter plot of the current activity</source>
         <translation>Configureerbare 2D scatterplot van de huidige activiteit</translation>
     </message>
     <message>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="250"/>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="254"/>
         <source>Configurable 3D plot of the current activity</source>
         <translation>Configureerbare 3D plot van de huidige activiteit</translation>
     </message>
     <message>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="252"/>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="256"/>
         <source>Chung&apos;s Aerolab analysis</source>
         <translation>Chung&apos;s Aerolab analyse</translation>
     </message>
     <message>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="255"/>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="259"/>
         <source>Overview/summary of the selected data range - data shown in &apos;Athlete&apos;s Best&apos; are configurable</source>
         <translation>Overzicht/samenvatting van de geselecteerde datareeks - data in &apos;Atleet&apos;s Beste&apos; zijn configureerbaar</translation>
     </message>
     <message>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="257"/>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="261"/>
         <source>Chart specific filter/search and date range settings</source>
         <translation>Inzicht specifiek filter/zoek en periode instellingen</translation>
     </message>
     <message>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="259"/>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="263"/>
         <source>Dashboard for the selected data range - the tiles shown are configurable</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="263"/>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="267"/>
         <source>Embedded R Chart</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="265"/>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="269"/>
         <source>Embedded Python Chart</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="267"/>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="271"/>
         <source>Native chart programable using simple formulas with visualization control</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="269"/>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="273"/>
         <source>Configurable web page with file download intercept</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="272"/>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="276"/>
         <source>Real time data display</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="274"/>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="278"/>
         <source>Display of the content of the currently selected workout</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="276"/>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="280"/>
         <source>Real time graph over time of the selected metrics</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="278"/>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="282"/>
         <source>Computrainer SpinScan, displays the torque on each pedal as a function of the angle, over the past few rotations</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="280"/>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="284"/>
         <source>Reproduces the currently selected media file</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="282"/>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="286"/>
         <source>Edition and diplay of ergometer type workout files</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="284"/>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="288"/>
         <source>Real time display of the route of simulation workouts in an Open Street Map</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="288"/>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="292"/>
         <source>Predefined and configurable set of data ranges for selection of activities to be analysed</source>
         <translation>Vooringestelde en configureerbare set van datareeksen welke geselecteerd kunnen worden om geanalyseerd te worden</translation>
     </message>
     <message>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="290"/>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="294"/>
         <source>Definition of points in time &apos;Events&apos; which are marked explicitely on time related diagrams</source>
         <translation>Definitie van punten in de tijd &apos;Gebeurtenissen&apos; welke expliciet gemarkeerd zijn op tijd gerelateerde diagrammen</translation>
     </message>
     <message>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="292"/>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="306"/>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="296"/>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="310"/>
         <source>Simple summary view</source>
         <translation>Simpel overzicht</translation>
     </message>
     <message>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="294"/>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="298"/>
         <source>Powerful filter and search engine to determine the activities which are considered in diagram</source>
         <translation>Krachtig filter en zoek machine om te bepalen welke activiteiten in ogenschouw genomen worden in het diagram</translation>
     </message>
     <message>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="296"/>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="300"/>
         <source>Alternative access to the charts created for the main view</source>
         <translation>Alternatieve toegang to de inzichten gemaakt voor het hoofdvenster</translation>
     </message>
     <message>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="300"/>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="304"/>
         <source>Configurable list of activities</source>
         <translation>Configureerbare lijst van activiteiten</translation>
     </message>
     <message>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="302"/>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="306"/>
         <source>Display the available and add new intervals using simple query methods</source>
         <translation>Toon de beschikbare en voeg nieuwe intervallen toe met gebruik van simpele vraag methodes</translation>
     </message>
     <message>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="309"/>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="313"/>
         <source>Configurable list of training devices</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="311"/>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="315"/>
         <source>Configurable list of workout files</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="313"/>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="317"/>
         <source>Configurable list of video files</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="315"/>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="319"/>
         <source>Configurable list of video sync files</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="319"/>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="323"/>
         <source>Entry field for sophisticated Searching and Filtering of activities</source>
         <translation>Invoerveld voor geavanceerd Zoeken en Filteren van activiteiten</translation>
     </message>
     <message>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="321"/>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="325"/>
         <source>Adding intervals to an activity using simple query methods</source>
         <translation>Toevoegen van intervallen aan een activiteit met gebruik van simpele vraag methodes</translation>
     </message>
     <message>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="323"/>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="327"/>
         <source>To compare Activities/Intervals in Activity View and Date Ranges in Trends View</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="325"/>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="329"/>
         <source>Workout Control, Intensity Adjustments and Notifications Display</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="331"/>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="335"/>
         <source>Athlete Model</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="339"/>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="343"/>
         <source>Athlete Measures</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="341"/>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="345"/>
         <source>Auto Import</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="343"/>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="347"/>
         <source>Backup</source>
         <translation type="unfinished">Backup</translation>
     </message>
     <message>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="345"/>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="349"/>
         <source>Cloud Accounts</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="348"/>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="352"/>
         <source>General</source>
         <translation>Generiek</translation>
     </message>
     <message>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="372"/>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="376"/>
         <source>Measures</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="374"/>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="378"/>
         <source>Train View devices configuration and preferences</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="376"/>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="380"/>
         <source>Train View Preferences</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="378"/>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="382"/>
         <source>Remote Controls Configuration</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="380"/>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="384"/>
         <source>Add/Remove Train Devices</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="382"/>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="386"/>
         <source>Add Train Devices</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="384"/>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="388"/>
         <source>Virtual Bicycle configuration for simulation rides</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="329"/>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="333"/>
         <source>Athlete</source>
         <translation>Atleet</translation>
     </message>
@@ -14915,17 +14928,42 @@ Koppelaanpassing - dit definieert een absolute waarde in ponden per vierkante in
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="333"/>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="87"/>
+        <source>Navigate backward</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="89"/>
+        <source>Navigate forward</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="91"/>
+        <source>Select active perspective for the current view, create new perspectives and manage existing ones</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="95"/>
+        <source>Activate / De-activate the Compare Pane - which allows to compare activities and intervals in Activities View or date ranges in Trends View - also across athletes. In Train View it shows/hide the Intensity Adjustments and Workout Control Pane.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="97"/>
+        <source>Changes the current view layout between Tabbed and Tiled</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="337"/>
         <source>Training Zone definition for power</source>
         <translation>Trainingszonedefinitie voor vermogen</translation>
     </message>
     <message>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="335"/>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="339"/>
         <source>Training Zone definition for heartrate</source>
         <translation>Trainingszonedefinitie voor hartslag</translation>
     </message>
     <message>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="337"/>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="341"/>
         <source>Training Zone definition for Swim and Run</source>
         <translation>Trainingszonedefinitie voor Zwemmen en Hardlopen</translation>
     </message>
@@ -14938,53 +14976,53 @@ Koppelaanpassing - dit definieert een absolute waarde in ponden per vierkante in
         <translation type="vanished">Wachtwoorden</translation>
     </message>
     <message>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="350"/>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="354"/>
         <source>Appearance</source>
         <translation>Opmaak</translation>
     </message>
     <message>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="352"/>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="356"/>
         <source>Automatic Interval Detection</source>
         <translation>Automatische Intervaldetectie</translation>
     </message>
     <message>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="354"/>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="356"/>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="358"/>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="360"/>
         <source>Data Fields</source>
         <translation>Datavelden</translation>
     </message>
     <message>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="358"/>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="362"/>
         <source>Definition of coloring rules for activities</source>
         <translation>Definitie van kleurenregels van activiteiten</translation>
     </message>
     <message>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="360"/>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="364"/>
         <source>Definition of default value(s) for data fields</source>
         <translation>Definitie van standaard waarde(en) van datavelden</translation>
     </message>
     <message>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="362"/>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="366"/>
         <source>Definition of processing default parameters for the fix, adjust,... tools</source>
         <translation>Definitie van het verwerken van standaard parameters van de fix, aanpas,... tools</translation>
     </message>
     <message>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="364"/>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="368"/>
         <source>Metrics</source>
         <translation>Metrieken</translation>
     </message>
     <message>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="366"/>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="370"/>
         <source>Metrics shown in &apos;Bests&apos;</source>
         <translation>Metrieken getoond in &apos;Beste&apos;</translation>
     </message>
     <message>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="368"/>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="372"/>
         <source>Metrics shown in &apos;Summary&apos;</source>
         <translation>Metrieken getoond in &apos;Samenvatting&apos;</translation>
     </message>
     <message>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="370"/>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="374"/>
         <source>Metrics shown in &apos;Intervals&apos;</source>
         <translation>Metrieken getoond in &apos;Intervallen&apos;</translation>
     </message>
@@ -17054,6 +17092,17 @@ Koppelaanpassing - dit definieert een absolute waarde in ponden per vierkante in
 </context>
 <context>
     <name>IsoPower</name>
+    <message>
+        <location filename="../../Metrics/Coggan.cpp" line="45"/>
+        <source>IsoPower</source>
+        <translation type="unfinished">IsoPower</translation>
+    </message>
+    <message>
+        <location filename="../../Metrics/Coggan.cpp" line="47"/>
+        <location filename="../../Metrics/Coggan.cpp" line="48"/>
+        <source>watts</source>
+        <translation type="unfinished">watts</translation>
+    </message>
     <message>
         <location filename="../../Metrics/Coggan.cpp" line="50"/>
         <source>Iso Power is an estimate of the power that you could have maintained for the same physiological &apos;cost&apos; if your power output had been perfectly constant.</source>
@@ -19278,57 +19327,57 @@ Koppelaanpassing - dit definieert een absolute waarde in ponden per vierkante in
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="3717"/>
+        <location filename="../../Core/DataFilter.cpp" line="3718"/>
         <source>Date</source>
         <translation type="unfinished">Datum</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="3718"/>
+        <location filename="../../Core/DataFilter.cpp" line="3719"/>
         <source>Time</source>
         <translation type="unfinished">Tijd</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="3719"/>
+        <location filename="../../Core/DataFilter.cpp" line="3720"/>
         <source>Name</source>
         <translation type="unfinished">Naam</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="3720"/>
+        <location filename="../../Core/DataFilter.cpp" line="3721"/>
         <source>Start</source>
         <translation type="unfinished">Start</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="3721"/>
+        <location filename="../../Core/DataFilter.cpp" line="3722"/>
         <source>Stop</source>
         <translation type="unfinished">Stop</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="3722"/>
+        <location filename="../../Core/DataFilter.cpp" line="3723"/>
         <source>Type</source>
         <translation type="unfinished">Type</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="3723"/>
+        <location filename="../../Core/DataFilter.cpp" line="3724"/>
         <source>Test</source>
         <translation type="unfinished">Test</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="3724"/>
+        <location filename="../../Core/DataFilter.cpp" line="3725"/>
         <source>Color</source>
         <translation type="unfinished">Kleur</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="3725"/>
+        <location filename="../../Core/DataFilter.cpp" line="3726"/>
         <source>Route</source>
         <translation type="unfinished">Route</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="3726"/>
+        <location filename="../../Core/DataFilter.cpp" line="3727"/>
         <source>Selected</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="3727"/>
+        <location filename="../../Core/DataFilter.cpp" line="3728"/>
         <source>File Name</source>
         <translation type="unfinished"></translation>
     </message>
@@ -20027,12 +20076,12 @@ staat met op het display, &quot;PC Link&quot;</translation>
 <context>
     <name>MainWindow</name>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="654"/>
+        <location filename="../../Gui/MainWindow.cpp" line="662"/>
         <source>Add Chart</source>
         <translation>Inzicht Toevoegen</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="301"/>
+        <location filename="../../Gui/MainWindow.cpp" line="305"/>
         <source>Toggle Compare Pane</source>
         <translation>Wissel Vergelijkingspanel</translation>
     </message>
@@ -20089,7 +20138,7 @@ staat met op het display, &quot;PC Link&quot;</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="312"/>
+        <location filename="../../Gui/MainWindow.cpp" line="316"/>
         <source>Toggle Sidebar</source>
         <translation>Wissel Zijbalk</translation>
     </message>
@@ -20102,12 +20151,12 @@ staat met op het display, &quot;PC Link&quot;</translation>
         <translation type="vanished">Tegel Weergave</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="333"/>
+        <location filename="../../Gui/MainWindow.cpp" line="339"/>
         <source>What&apos;s This?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="464"/>
+        <location filename="../../Gui/MainWindow.cpp" line="472"/>
         <source>&amp;Athlete</source>
         <translation>&amp;Atleet</translation>
     </message>
@@ -20120,12 +20169,12 @@ staat met op het display, &quot;PC Link&quot;</translation>
         <translation type="vanished">Backup Atleet Data</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="487"/>
+        <location filename="../../Gui/MainWindow.cpp" line="495"/>
         <source>Save all modified activities</source>
         <translation>Bewaar alle gewijzigde activiteiten</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="489"/>
+        <location filename="../../Gui/MainWindow.cpp" line="497"/>
         <source>Close Window</source>
         <translation>Sluit Venster</translation>
     </message>
@@ -20138,167 +20187,167 @@ staat met op het display, &quot;PC Link&quot;</translation>
         <translation type="vanished">&amp;Stop Alle Vensters</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="496"/>
+        <location filename="../../Gui/MainWindow.cpp" line="504"/>
         <source>A&amp;ctivity</source>
         <translation>A&amp;ctiviteit</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="497"/>
+        <location filename="../../Gui/MainWindow.cpp" line="505"/>
         <source>&amp;Download from device...</source>
         <translation>&amp;Downloaden vanuit Apparaat...</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="497"/>
+        <location filename="../../Gui/MainWindow.cpp" line="505"/>
         <source>Ctrl+D</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="498"/>
+        <location filename="../../Gui/MainWindow.cpp" line="506"/>
         <source>&amp;Import from file...</source>
         <translation>&amp;Importeren vanuit Bestand...</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="498"/>
+        <location filename="../../Gui/MainWindow.cpp" line="506"/>
         <source>Ctrl+I</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="499"/>
+        <location filename="../../Gui/MainWindow.cpp" line="507"/>
         <source>&amp;Manual entry...</source>
         <translation>&amp;Manuele Invoer...</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="499"/>
+        <location filename="../../Gui/MainWindow.cpp" line="507"/>
         <source>Ctrl+M</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="501"/>
+        <location filename="../../Gui/MainWindow.cpp" line="509"/>
         <source>&amp;Export...</source>
         <translation>&amp;Export...</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="501"/>
+        <location filename="../../Gui/MainWindow.cpp" line="509"/>
         <source>Ctrl+E</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="502"/>
+        <location filename="../../Gui/MainWindow.cpp" line="510"/>
         <source>&amp;Batch export...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="502"/>
+        <location filename="../../Gui/MainWindow.cpp" line="510"/>
         <source>Ctrl+B</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="505"/>
+        <location filename="../../Gui/MainWindow.cpp" line="513"/>
         <source>&amp;Save activity</source>
         <translation>Activiteit &amp;Bewaren</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="505"/>
+        <location filename="../../Gui/MainWindow.cpp" line="513"/>
         <source>Ctrl+S</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="506"/>
+        <location filename="../../Gui/MainWindow.cpp" line="514"/>
         <source>D&amp;elete activity...</source>
         <translation>A&amp;ctiviteit Verwijderen...</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="507"/>
+        <location filename="../../Gui/MainWindow.cpp" line="515"/>
         <source>Split &amp;activity...</source>
         <translation>A&amp;ctiviteit Splitsen...</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="508"/>
+        <location filename="../../Gui/MainWindow.cpp" line="516"/>
         <source>Combine activities...</source>
         <translation>Activiteiten Combineren...</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="510"/>
+        <location filename="../../Gui/MainWindow.cpp" line="518"/>
         <source>Find intervals...</source>
         <translation>Intervallen Zoeken...</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="516"/>
+        <location filename="../../Gui/MainWindow.cpp" line="524"/>
         <source>Sha&amp;re</source>
         <translation>De&amp;el</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="527"/>
+        <location filename="../../Gui/MainWindow.cpp" line="535"/>
         <source>Get Measures...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="548"/>
+        <location filename="../../Gui/MainWindow.cpp" line="556"/>
         <source>&amp;Tools</source>
         <translation>&amp;Tools</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="549"/>
+        <location filename="../../Gui/MainWindow.cpp" line="557"/>
         <source>CP and W&apos; Estimator...</source>
         <translation>CP en W&apos; Schatten...</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="550"/>
+        <location filename="../../Gui/MainWindow.cpp" line="558"/>
         <source>CP and W&apos; Solver...</source>
         <translation>CP en W&apos; Oplosser...</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="551"/>
+        <location filename="../../Gui/MainWindow.cpp" line="559"/>
         <source>Air Density (Rho) Estimator...</source>
         <translation>Lucht Dichtheid (Rho) Schatting...</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="552"/>
+        <location filename="../../Gui/MainWindow.cpp" line="560"/>
         <source>VDOT and T-Pace Calculator...</source>
         <translation>VDOT en T-Pace Calculator...</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="519"/>
+        <location filename="../../Gui/MainWindow.cpp" line="527"/>
         <source>Add Cloud Account...</source>
         <translation>Cloud Account Toevoegen...</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="323"/>
+        <location filename="../../Gui/MainWindow.cpp" line="327"/>
         <source>Toggle Tab/Tile</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="466"/>
+        <location filename="../../Gui/MainWindow.cpp" line="474"/>
         <source>Open...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="473"/>
+        <location filename="../../Gui/MainWindow.cpp" line="481"/>
         <source>Backup...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="479"/>
+        <location filename="../../Gui/MainWindow.cpp" line="487"/>
         <source>Delete...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="485"/>
+        <location filename="../../Gui/MainWindow.cpp" line="493"/>
         <source>Settings...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="520"/>
+        <location filename="../../Gui/MainWindow.cpp" line="528"/>
         <source>Ctrl+A</source>
         <translation>Ctrl+A</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="525"/>
+        <location filename="../../Gui/MainWindow.cpp" line="533"/>
         <source>Upload Activity...</source>
         <translation>Upload Activiteit...</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="526"/>
+        <location filename="../../Gui/MainWindow.cpp" line="534"/>
         <source>Synchronise Activities...</source>
         <translation>Synchroniseer Activiteiten...</translation>
     </message>
@@ -20311,148 +20360,148 @@ staat met op het display, &quot;PC Link&quot;</translation>
         <translation type="vanished">Haal &amp;HRV Metingen...</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="529"/>
+        <location filename="../../Gui/MainWindow.cpp" line="537"/>
         <source>Check For New Activities</source>
         <translation>Zoek Naar Nieuwe Activiteiten</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="530"/>
+        <location filename="../../Gui/MainWindow.cpp" line="538"/>
         <source>Ctrl-C</source>
         <translation>Ctrl-C</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="555"/>
+        <location filename="../../Gui/MainWindow.cpp" line="563"/>
         <source>Create a new workout...</source>
         <translation>Training Creëeren...</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="556"/>
+        <location filename="../../Gui/MainWindow.cpp" line="564"/>
         <source>Download workouts from ErgDB...</source>
         <translation>Trainingen Downloaden vanuit de ErgDB...</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="557"/>
+        <location filename="../../Gui/MainWindow.cpp" line="565"/>
         <source>Download workouts from Today&apos;s Plan...</source>
         <translation>Workouts Downloaden van Today&apos;s Plan...</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="558"/>
+        <location filename="../../Gui/MainWindow.cpp" line="566"/>
         <source>Import workouts, videos, videoSyncs...</source>
         <translation>Trainingen, Videos, VideoSyncs Importeren...</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="559"/>
+        <location filename="../../Gui/MainWindow.cpp" line="567"/>
         <source>Scan disk for workouts, videos, videoSyncs...</source>
         <translation>Harddisk Scannen naar Trainingen, Videos, VideoSyncs...</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="561"/>
+        <location filename="../../Gui/MainWindow.cpp" line="569"/>
         <source>Create Heat Map...</source>
         <translation>Heat Map Creëeren...</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="562"/>
+        <location filename="../../Gui/MainWindow.cpp" line="570"/>
         <source>Export Metrics as CSV...</source>
         <translation>Metrieken Exporteren als CSV...</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="567"/>
+        <location filename="../../Gui/MainWindow.cpp" line="575"/>
         <source>Cloud Status...</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="569"/>
+        <location filename="../../Gui/MainWindow.cpp" line="577"/>
         <source>Cloud Contributions</source>
         <translation>Cloud Bijdrages</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="570"/>
+        <location filename="../../Gui/MainWindow.cpp" line="578"/>
         <source>Maintain charts</source>
         <translation>Inzichten Onderhoud</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="571"/>
+        <location filename="../../Gui/MainWindow.cpp" line="579"/>
         <source>Maintain user metrics</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="574"/>
+        <location filename="../../Gui/MainWindow.cpp" line="582"/>
         <source>Cloud Curator</source>
         <translation>Cloud Curator</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="575"/>
+        <location filename="../../Gui/MainWindow.cpp" line="583"/>
         <source>Curate charts</source>
         <translation>Inzichten Beter Maken</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="576"/>
+        <location filename="../../Gui/MainWindow.cpp" line="584"/>
         <source>Curate user metrics</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="584"/>
+        <location filename="../../Gui/MainWindow.cpp" line="592"/>
         <source>&amp;Options...</source>
         <translation>&amp;Opties...</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="591"/>
+        <location filename="../../Gui/MainWindow.cpp" line="599"/>
         <source>&amp;Edit</source>
         <translation>&amp;Bewerken</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="615"/>
+        <location filename="../../Gui/MainWindow.cpp" line="623"/>
         <source>Python fixes</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="624"/>
+        <location filename="../../Gui/MainWindow.cpp" line="632"/>
         <source>&amp;View</source>
         <translation>&amp;Overzicht</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="626"/>
-        <location filename="../../Gui/MainWindow.cpp" line="628"/>
+        <location filename="../../Gui/MainWindow.cpp" line="634"/>
+        <location filename="../../Gui/MainWindow.cpp" line="636"/>
         <source>Toggle Full Screen</source>
         <translation>Wissel Volledig Scherm</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="630"/>
+        <location filename="../../Gui/MainWindow.cpp" line="638"/>
         <source>Show View Sidebar</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="633"/>
+        <location filename="../../Gui/MainWindow.cpp" line="641"/>
         <source>Show Left Sidebar</source>
         <translation>Toon Linker Zijbalk</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="636"/>
+        <location filename="../../Gui/MainWindow.cpp" line="644"/>
         <source>Show Compare Pane</source>
         <translation>Toon Vergelijkingsspanel</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="639"/>
+        <location filename="../../Gui/MainWindow.cpp" line="647"/>
         <source>Show Toolbar</source>
         <translation>Toon Werkbalk</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="642"/>
+        <location filename="../../Gui/MainWindow.cpp" line="650"/>
         <source>Show Athlete Tabs</source>
         <translation>Toon Atleet Tabs</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="647"/>
+        <location filename="../../Gui/MainWindow.cpp" line="655"/>
         <source>Activities</source>
         <translation>Activiteiten</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="648"/>
+        <location filename="../../Gui/MainWindow.cpp" line="656"/>
         <source>Trends</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="649"/>
+        <location filename="../../Gui/MainWindow.cpp" line="657"/>
         <source>Train</source>
         <translation></translation>
     </message>
@@ -20461,270 +20510,270 @@ staat met op het display, &quot;PC Link&quot;</translation>
         <translation type="vanished">Kalender</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="651"/>
+        <location filename="../../Gui/MainWindow.cpp" line="659"/>
         <source>Import Perspective...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="652"/>
+        <location filename="../../Gui/MainWindow.cpp" line="660"/>
         <source>Export Perspective...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="655"/>
+        <location filename="../../Gui/MainWindow.cpp" line="663"/>
         <source>Import Chart...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="657"/>
+        <location filename="../../Gui/MainWindow.cpp" line="665"/>
         <source>Upload Chart...</source>
         <translation>Inzicht Uploaden...</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="658"/>
+        <location filename="../../Gui/MainWindow.cpp" line="666"/>
         <source>Download Chart...</source>
         <translation>Inzicht Downloaden...</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="661"/>
+        <location filename="../../Gui/MainWindow.cpp" line="669"/>
         <source>Reset Layout</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="662"/>
+        <location filename="../../Gui/MainWindow.cpp" line="670"/>
         <source>Tabbed not Tiled</source>
         <translation>Tabbladen geen Tegels</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="674"/>
+        <location filename="../../Gui/MainWindow.cpp" line="682"/>
         <source>&amp;Help</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="675"/>
+        <location filename="../../Gui/MainWindow.cpp" line="683"/>
         <source>&amp;Help Overview</source>
         <translation>&amp;Help Overzicht</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="678"/>
+        <location filename="../../Gui/MainWindow.cpp" line="686"/>
         <source>&amp;User Guide</source>
         <translation>&amp;Gebruikershandleiding</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="679"/>
+        <location filename="../../Gui/MainWindow.cpp" line="687"/>
         <source>&amp;Log a bug or feature request</source>
         <translation>&amp;Meld een bug of een functie verzoek</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="680"/>
+        <location filename="../../Gui/MainWindow.cpp" line="688"/>
         <source>&amp;Discussion and Support Forum</source>
         <translation>&amp;Discussie en Support Forum</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="682"/>
+        <location filename="../../Gui/MainWindow.cpp" line="690"/>
         <source>&amp;About GoldenCheetah</source>
         <translation>&amp;Over GoldenCheetah</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="938"/>
+        <location filename="../../Gui/MainWindow.cpp" line="946"/>
         <source>Select Chart file to import</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="938"/>
+        <location filename="../../Gui/MainWindow.cpp" line="946"/>
         <source>GoldenCheetah Chart Files (*.gchart)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="941"/>
+        <location filename="../../Gui/MainWindow.cpp" line="949"/>
         <source>Import Chart</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="941"/>
+        <location filename="../../Gui/MainWindow.cpp" line="949"/>
         <source>No chart file selected!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="964"/>
+        <location filename="../../Gui/MainWindow.cpp" line="972"/>
         <source>Export Persepctive</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="969"/>
+        <location filename="../../Gui/MainWindow.cpp" line="977"/>
         <source>Export Perspective</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="969"/>
-        <location filename="../../Gui/MainWindow.cpp" line="991"/>
+        <location filename="../../Gui/MainWindow.cpp" line="977"/>
+        <location filename="../../Gui/MainWindow.cpp" line="999"/>
         <source>No perspective file selected!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="989"/>
+        <location filename="../../Gui/MainWindow.cpp" line="997"/>
         <source>Select Perspective file to export</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="989"/>
+        <location filename="../../Gui/MainWindow.cpp" line="997"/>
         <source>GoldenCheetah Perspective Files (*.gchartset)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="991"/>
+        <location filename="../../Gui/MainWindow.cpp" line="999"/>
         <source>Import Perspective</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1138"/>
-        <location filename="../../Gui/MainWindow.cpp" line="2034"/>
-        <location filename="../../Gui/MainWindow.cpp" line="2063"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1146"/>
+        <location filename="../../Gui/MainWindow.cpp" line="2042"/>
+        <location filename="../../Gui/MainWindow.cpp" line="2071"/>
         <source>Activity Import</source>
         <translation>Activiteit Import</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1138"/>
-        <location filename="../../Gui/MainWindow.cpp" line="2034"/>
-        <location filename="../../Gui/MainWindow.cpp" line="2063"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1146"/>
+        <location filename="../../Gui/MainWindow.cpp" line="2042"/>
+        <location filename="../../Gui/MainWindow.cpp" line="2071"/>
         <source>Closing of athlete window not possible while background activity import is in progress...</source>
         <translation>Sluiten van het atleet venster is niet mogelijk terwijl een achtergrond import-activiteit bezig is...</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1226"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1234"/>
         <source>You are about to reset all charts to the default setup</source>
         <translation>Je gaat alle inzichten resetten naar de standaard setup</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1227"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1235"/>
         <source>Do you want to continue?</source>
         <translation>Wil je doorgaan?</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1653"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1661"/>
         <source>Chart Import</source>
         <translation>Inzicht Importeren</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1653"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1661"/>
         <source>Imported %1 metric charts</source>
         <translation>%1 metrieken overzichten geïmporteerd</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1730"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1738"/>
         <source>Select Activity</source>
         <translation>Selecteer Activiteit</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1730"/>
-        <location filename="../../Gui/MainWindow.cpp" line="1917"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1738"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1925"/>
         <source>No activity selected!</source>
         <translation>Geen activiteit geselecteerd!</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1743"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1751"/>
         <source>Export Activity</source>
         <translation>Exporteer Activiteit</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1796"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1804"/>
         <source>Export Failed</source>
         <translation>Exporteren Mislukt</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1797"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1805"/>
         <source>Failed to export activity, please check permissions</source>
         <translation>Exporteren van activiteit is mislukt, controleer de toegang permissie alsjeblieft</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1818"/>
-        <location filename="../../Gui/MainWindow.cpp" line="2371"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1826"/>
+        <location filename="../../Gui/MainWindow.cpp" line="2379"/>
         <source>Import from File</source>
         <translation>Importeer vanuit Bestand</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1833"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1841"/>
         <source>No Activity To Save</source>
         <translation>Geen Activiteit Om te Bewaren</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1834"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1842"/>
         <source>There is no currently selected activity to save.</source>
         <translation>Er is nu geen activiteit geselecteerd om te bewaren.</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1893"/>
-        <location filename="../../Gui/MainWindow.cpp" line="1895"/>
-        <location filename="../../Gui/MainWindow.cpp" line="1905"/>
-        <location filename="../../Gui/MainWindow.cpp" line="1907"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1901"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1903"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1913"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1915"/>
         <source>Split Activity</source>
         <translation>Splits Activiteit</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1893"/>
-        <location filename="../../Gui/MainWindow.cpp" line="1905"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1901"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1913"/>
         <source>No activity selected</source>
         <translation>Geen Activiteit geselecteerd</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1895"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1903"/>
         <source>Current activity contains no data to split</source>
         <translation>Huidige activiteit bevat geen data om te splitsen</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1907"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1915"/>
         <source>Current activity contains no data to merge</source>
         <translation>Huidige activiteit bevat geen data om samen te voegen</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1917"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1925"/>
         <source>Delete Activity</source>
         <translation>Activiteit Verwijderen</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1923"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1931"/>
         <source>Are you sure you want to delete the activity:</source>
         <translation>Ben je zeker van het verwijderen van activiteit:</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1925"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1933"/>
         <source>Delete</source>
         <translation>Verwijderen</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="2174"/>
+        <location filename="../../Gui/MainWindow.cpp" line="2182"/>
         <source>&amp;New Athlete...</source>
         <translation>&amp;Nieuwe Atleet...</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="2174"/>
+        <location filename="../../Gui/MainWindow.cpp" line="2182"/>
         <source>Ctrl+N</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="2344"/>
+        <location filename="../../Gui/MainWindow.cpp" line="2352"/>
         <source>Refresh in Progress</source>
         <translation>Bezig met Verversen</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="2350"/>
+        <location filename="../../Gui/MainWindow.cpp" line="2358"/>
         <source>Export Metrics</source>
         <translation>Exporteer Metrieken</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="2350"/>
+        <location filename="../../Gui/MainWindow.cpp" line="2358"/>
         <source>Comma Separated Variables (*.csv)</source>
         <translation>Komma-gescheiden Variabelen (*.csv)</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="2401"/>
-        <location filename="../../Gui/MainWindow.cpp" line="2422"/>
+        <location filename="../../Gui/MainWindow.cpp" line="2409"/>
+        <location filename="../../Gui/MainWindow.cpp" line="2430"/>
         <source>Workout Directory Invalid</source>
         <translation>Training Map Ongeldig</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="2402"/>
-        <location filename="../../Gui/MainWindow.cpp" line="2423"/>
+        <location filename="../../Gui/MainWindow.cpp" line="2410"/>
+        <location filename="../../Gui/MainWindow.cpp" line="2431"/>
         <source>The workout directory is not configured, or the directory selected no longer exists.
 
 Please check your preference settings.</source>
@@ -20733,24 +20782,24 @@ Please check your preference settings.</source>
 Controleer je voorkeur instellingen alsjeblieft.</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="2639"/>
+        <location filename="../../Gui/MainWindow.cpp" line="2647"/>
         <source>New Python Fix...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="2640"/>
+        <location filename="../../Gui/MainWindow.cpp" line="2648"/>
         <source>Manage Python Fixes...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="2713"/>
-        <location filename="../../Gui/MainWindow.cpp" line="2734"/>
+        <location filename="../../Gui/MainWindow.cpp" line="2721"/>
+        <location filename="../../Gui/MainWindow.cpp" line="2742"/>
         <source>CloudDB</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="2713"/>
-        <location filename="../../Gui/MainWindow.cpp" line="2734"/>
+        <location filename="../../Gui/MainWindow.cpp" line="2721"/>
+        <location filename="../../Gui/MainWindow.cpp" line="2742"/>
         <source>Current athlete is not registered as curator - please contact the GoldenCheetah team</source>
         <translation>Huidige atleet is niet geregistreerd as curator - neem contact op met het GoldenCheetah team alsjeblieft</translation>
     </message>
@@ -20967,12 +21016,12 @@ Controleer je voorkeur instellingen alsjeblieft.</translation>
 <context>
     <name>MapWebBridge</name>
     <message>
-        <location filename="../../Charts/RideMapWindow.cpp" line="1261"/>
+        <location filename="../../Charts/RideMapWindow.cpp" line="1275"/>
         <source>Selection #</source>
         <translation>Selectie #</translation>
     </message>
     <message>
-        <location filename="../../Charts/RideMapWindow.cpp" line="1335"/>
+        <location filename="../../Charts/RideMapWindow.cpp" line="1349"/>
         <source>Selection #%1 </source>
         <translation>Selectie #%1 </translation>
     </message>
@@ -26580,8 +26629,8 @@ yyyy</translation>
         <translation>Probleem bij het Bewaren van Seizoenen</translation>
     </message>
     <message>
-        <location filename="../../FileIO/FitRideFile.cpp" line="1766"/>
-        <location filename="../../FileIO/FitRideFile.cpp" line="2750"/>
+        <location filename="../../FileIO/FitRideFile.cpp" line="1762"/>
+        <location filename="../../FileIO/FitRideFile.cpp" line="2745"/>
         <location filename="../../FileIO/TcxParser.cpp" line="420"/>
         <source>Lap %1</source>
         <translation>Ronde %1</translation>
@@ -27801,22 +27850,22 @@ Python is uitgeschakeld in de voorkeursinstellingen.</translation>
 <context>
     <name>RideCache</name>
     <message>
-        <location filename="../../Core/RideCache.cpp" line="387"/>
+        <location filename="../../Core/RideCache.cpp" line="379"/>
         <source>Can&apos;t rename %1 to %2 in %3</source>
         <translation>Herbenoemen %1 naar %2 in %3 is mislukt</translation>
     </message>
     <message>
-        <location filename="../../Core/RideCache.cpp" line="445"/>
+        <location filename="../../Core/RideCache.cpp" line="437"/>
         <source>Problem Saving Ride Cache</source>
         <translation>Probleem bij het Bewaren van Rit Cache</translation>
     </message>
     <message>
-        <location filename="../../Core/RideCache.cpp" line="446"/>
+        <location filename="../../Core/RideCache.cpp" line="438"/>
         <source>File: %1 cannot be opened for &apos;Writing&apos;. Please check file properties.</source>
         <translation>Bestand: %1 kan niet geopend worden om te &apos;Schrijven&apos;. Controleer de bestandseigenschappen alsjeblieft.</translation>
     </message>
     <message>
-        <location filename="../../Core/RideCache.cpp" line="639"/>
+        <location filename="../../Core/RideCache.cpp" line="670"/>
         <source>seconds</source>
         <translation>seconden</translation>
     </message>
@@ -28722,7 +28771,7 @@ Wil je doorgaan?</translation>
         <translation>ratio</translation>
     </message>
     <message>
-        <location filename="../../FileIO/RideFile.cpp" line="2392"/>
+        <location filename="../../FileIO/RideFile.cpp" line="2394"/>
         <source>Wheelsize</source>
         <translation>Wielmaat</translation>
     </message>
@@ -28810,27 +28859,27 @@ Wil je doorgaan?</translation>
         <translation>Langdurige inspanningen en matches met gebruik van vermogen</translation>
     </message>
     <message>
-        <location filename="../../FileIO/RideFile.cpp" line="3220"/>
+        <location filename="../../FileIO/RideFile.cpp" line="3222"/>
         <source>Peak</source>
         <translation>Piek</translation>
     </message>
     <message>
-        <location filename="../../FileIO/RideFile.cpp" line="3220"/>
+        <location filename="../../FileIO/RideFile.cpp" line="3222"/>
         <source>Find</source>
         <translation>Zoek</translation>
     </message>
     <message>
-        <location filename="../../FileIO/RideFile.cpp" line="3227"/>
+        <location filename="../../FileIO/RideFile.cpp" line="3229"/>
         <source>Match</source>
         <translation>Match</translation>
     </message>
     <message>
-        <location filename="../../FileIO/RideFile.cpp" line="3233"/>
+        <location filename="../../FileIO/RideFile.cpp" line="3235"/>
         <source>Climb</source>
         <translation>Klim</translation>
     </message>
     <message>
-        <location filename="../../FileIO/RideFile.cpp" line="3239"/>
+        <location filename="../../FileIO/RideFile.cpp" line="3241"/>
         <source>Best</source>
         <translation>Beste</translation>
     </message>
@@ -29487,92 +29536,97 @@ Wil je doorgaan?</translation>
         <translation>Google</translation>
     </message>
     <message>
-        <location filename="../../Charts/RideMapWindow.cpp" line="77"/>
+        <location filename="../../Charts/RideMapWindow.cpp" line="79"/>
         <source>Map</source>
         <translation>Kaart</translation>
     </message>
     <message>
-        <location filename="../../Charts/RideMapWindow.cpp" line="78"/>
+        <location filename="../../Charts/RideMapWindow.cpp" line="80"/>
         <source>Show Markers</source>
         <translation>Toon Markeringen</translation>
     </message>
     <message>
-        <location filename="../../Charts/RideMapWindow.cpp" line="79"/>
+        <location filename="../../Charts/RideMapWindow.cpp" line="81"/>
         <source>Show Full Plot</source>
         <translation>Toon Volledig Overzicht</translation>
     </message>
     <message>
-        <location filename="../../Charts/RideMapWindow.cpp" line="80"/>
+        <location filename="../../Charts/RideMapWindow.cpp" line="82"/>
         <source>Hide Shaded Zones</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Charts/RideMapWindow.cpp" line="81"/>
+        <location filename="../../Charts/RideMapWindow.cpp" line="83"/>
         <source>Hide Yellow Line</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Charts/RideMapWindow.cpp" line="82"/>
+        <location filename="../../Charts/RideMapWindow.cpp" line="84"/>
+        <source>Hide Out &amp; Back Route Opacity</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Charts/RideMapWindow.cpp" line="85"/>
         <source>Show Intervals Overlay</source>
         <translation>Toon Intervallenvenster</translation>
     </message>
     <message>
-        <location filename="../../Charts/RideMapWindow.cpp" line="85"/>
+        <location filename="../../Charts/RideMapWindow.cpp" line="88"/>
         <source>Open Street Map - Custom Tile Server settings</source>
         <translation>Open Street Map - aangepaste Tile Server instellingen</translation>
     </message>
     <message>
-        <location filename="../../Charts/RideMapWindow.cpp" line="87"/>
+        <location filename="../../Charts/RideMapWindow.cpp" line="90"/>
         <source>Tile server</source>
         <translation>Tile server</translation>
     </message>
     <message>
-        <location filename="../../Charts/RideMapWindow.cpp" line="88"/>
+        <location filename="../../Charts/RideMapWindow.cpp" line="91"/>
         <source>Tile server URL</source>
         <translation>Tile server URL</translation>
     </message>
     <message>
-        <location filename="../../Charts/RideMapWindow.cpp" line="92"/>
+        <location filename="../../Charts/RideMapWindow.cpp" line="95"/>
         <source>OpenStreetMap (default)</source>
         <translation>OpenStreetMap (standaard)</translation>
     </message>
     <message>
-        <location filename="../../Charts/RideMapWindow.cpp" line="93"/>
+        <location filename="../../Charts/RideMapWindow.cpp" line="96"/>
         <source>Custom Tile Server A</source>
         <translation>Afwijkende Tegelserver A</translation>
     </message>
     <message>
-        <location filename="../../Charts/RideMapWindow.cpp" line="94"/>
+        <location filename="../../Charts/RideMapWindow.cpp" line="97"/>
         <source>Custom Tile Server B</source>
         <translation>Afwijkende Tegelserver B</translation>
     </message>
     <message>
-        <location filename="../../Charts/RideMapWindow.cpp" line="95"/>
+        <location filename="../../Charts/RideMapWindow.cpp" line="98"/>
         <source>Custom Tile Server C</source>
         <translation>Afwijkende Tegelserver C</translation>
     </message>
     <message>
-        <location filename="../../Charts/RideMapWindow.cpp" line="101"/>
+        <location filename="../../Charts/RideMapWindow.cpp" line="104"/>
         <source>Google API key</source>
         <translation>Google API sleutel</translation>
     </message>
     <message>
-        <location filename="../../Charts/RideMapWindow.cpp" line="1098"/>
+        <location filename="../../Charts/RideMapWindow.cpp" line="1112"/>
         <source>Interval</source>
         <translation>Interval</translation>
     </message>
     <message>
-        <location filename="../../Charts/RideMapWindow.cpp" line="155"/>
+        <location filename="../../Charts/RideMapWindow.cpp" line="159"/>
         <source>Intervals</source>
         <translation>Intervallen</translation>
     </message>
     <message>
-        <location filename="../../Charts/RideMapWindow.cpp" line="351"/>
+        <location filename="../../Charts/RideMapWindow.cpp" line="365"/>
         <source>Route</source>
         <translation>Route</translation>
     </message>
     <message>
-        <location filename="../../Charts/RideMapWindow.cpp" line="406"/>
+        <location filename="../../Charts/RideMapWindow.cpp" line="420"/>
         <source>No GPS Data Present</source>
         <translation>Geen GPS Data Aanwezig</translation>
     </message>
@@ -29942,22 +29996,22 @@ Wil je doorgaan?</translation>
 <context>
     <name>RouteDropDialog</name>
     <message>
-        <location filename="../../Gui/ComparePane.cpp" line="1044"/>
+        <location filename="../../Gui/ComparePane.cpp" line="1045"/>
         <source>&quot;%1&quot;</source>
         <translation>&quot;%1&quot;</translation>
     </message>
     <message>
-        <location filename="../../Gui/ComparePane.cpp" line="1049"/>
+        <location filename="../../Gui/ComparePane.cpp" line="1050"/>
         <source>Season</source>
         <translation>Seizoen</translation>
     </message>
     <message>
-        <location filename="../../Gui/ComparePane.cpp" line="1069"/>
+        <location filename="../../Gui/ComparePane.cpp" line="1070"/>
         <source>&amp;All Selected</source>
         <translation>&amp;Alle Geselecteerden</translation>
     </message>
     <message>
-        <location filename="../../Gui/ComparePane.cpp" line="1071"/>
+        <location filename="../../Gui/ComparePane.cpp" line="1072"/>
         <source>Just this &amp;One</source>
         <translation>Alleen &amp;Deze</translation>
     </message>
@@ -32527,57 +32581,57 @@ Als de nieuw gecreëerde activiteit botst met een bestaande activiteit (dezelfde
         <translation type="vanished">Zen and Tea</translation>
     </message>
     <message>
-        <location filename="../../Gui/Colors.cpp" line="748"/>
+        <location filename="../../Gui/Colors.cpp" line="750"/>
         <source>Modern Dark</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/Colors.cpp" line="771"/>
+        <location filename="../../Gui/Colors.cpp" line="773"/>
         <source>Modern Light</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/Colors.cpp" line="793"/>
+        <location filename="../../Gui/Colors.cpp" line="795"/>
         <source>Modern Stealth Dark</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/Colors.cpp" line="815"/>
+        <location filename="../../Gui/Colors.cpp" line="817"/>
         <source>Modern Stealth Light</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/Colors.cpp" line="836"/>
+        <location filename="../../Gui/Colors.cpp" line="838"/>
         <source>Gnome Adwaita Dark</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/Colors.cpp" line="857"/>
+        <location filename="../../Gui/Colors.cpp" line="859"/>
         <source>Team Colours (light)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/Colors.cpp" line="878"/>
+        <location filename="../../Gui/Colors.cpp" line="880"/>
         <source>Ollie&apos;s Oatmeal (light)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/Colors.cpp" line="899"/>
+        <location filename="../../Gui/Colors.cpp" line="901"/>
         <source>Mustang (dark)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/Colors.cpp" line="920"/>
+        <location filename="../../Gui/Colors.cpp" line="922"/>
         <source>Mono (dark)</source>
         <translation>Mono (dark)</translation>
     </message>
     <message>
-        <location filename="../../Gui/Colors.cpp" line="941"/>
+        <location filename="../../Gui/Colors.cpp" line="943"/>
         <source>Mono (light)</source>
         <translation>Mono (light)</translation>
     </message>
     <message>
-        <location filename="../../Gui/Colors.cpp" line="963"/>
+        <location filename="../../Gui/Colors.cpp" line="965"/>
         <source>Schoberer (light)</source>
         <translation type="unfinished"></translation>
     </message>
@@ -35645,23 +35699,23 @@ Je kunt referenties verwijderen als je de bibliotheek beheert via de contextmenu
 <context>
     <name>Xert</name>
     <message>
-        <location filename="../../Cloud/Xert.cpp" line="139"/>
+        <location filename="../../Cloud/Xert.cpp" line="141"/>
         <source>JSON parser error</source>
         <translation>JSON parser fout</translation>
     </message>
     <message>
-        <location filename="../../Cloud/Xert.cpp" line="174"/>
+        <location filename="../../Cloud/Xert.cpp" line="176"/>
         <source>You must authorise with Xert first</source>
         <translation>Je moet eerst authoriseren bij Xert</translation>
     </message>
     <message>
-        <location filename="../../Cloud/Xert.cpp" line="474"/>
-        <location filename="../../Cloud/Xert.cpp" line="565"/>
+        <location filename="../../Cloud/Xert.cpp" line="479"/>
+        <location filename="../../Cloud/Xert.cpp" line="570"/>
         <source>Completed.</source>
         <translation>Voltooid.</translation>
     </message>
     <message>
-        <location filename="../../Cloud/Xert.cpp" line="567"/>
+        <location filename="../../Cloud/Xert.cpp" line="572"/>
         <source>Network Error - Upload failed.</source>
         <translation>Netwerkfout - Upload mislukt.</translation>
     </message>
