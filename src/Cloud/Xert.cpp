@@ -18,6 +18,7 @@
 
 #include "Xert.h"
 #include "Athlete.h"
+#include "Secrets.h"
 #include "Settings.h"
 #include "Units.h"
 #include "JsonRideFile.h"
