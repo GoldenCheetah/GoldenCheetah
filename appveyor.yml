@@ -132,6 +132,9 @@ before_build:
 # Add Train Robot
 - echo DEFINES+=GC_WANT_ROBOT >> src\gcconfig.pri
 
+# Avoid macro redefinition warnings
+- echo DEFINES+=_MATH_DEFINES_DEFINED >> src\gcconfig.pri
+
 # Add debug console
 #- echo CONFIG+=console >> src\gcconfig.pri
 
