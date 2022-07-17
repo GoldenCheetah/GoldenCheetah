@@ -39,7 +39,9 @@
 #include "GenericChart.h"
 #include "Perspective.h"
 
+#ifdef __GNUC__
 #pragma GCC diagnostic ignored "-Wcast-function-type" // shut gcc up
+#endif
 
 // Structure used to register routines has changed in v3.4 of R
 //

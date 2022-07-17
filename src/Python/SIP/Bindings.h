@@ -9,7 +9,9 @@
 #undef slots
 #include <Python.h>
 
+#ifdef __GNUC__
 #pragma GCC diagnostic ignored "-Wcast-function-type" // shut gcc up
+#endif
 
 class PythonDataSeries {
 
