@@ -275,6 +275,7 @@ Perspective::importChart(QMap<QString,QString>properties, bool select)
 
     // set all the properties
     chart->setProperty("view", view);
+    chart->setProperty("perspective", QVariant::fromValue<Perspective*>(this));
 
     // each of the user properties
     QMapIterator<QString,QString> prop(properties);
