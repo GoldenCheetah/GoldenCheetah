@@ -1513,7 +1513,8 @@ void RideFile::appendOrUpdatePoint(double secs, double cad, double hr, double km
         if (idx != -1) {
             if (dataPoints_.at(idx)->secs == secs) {
                 updatePoint(point, dataPoints_.at(idx));
-                dataPoints_.replace(idx, point);
+                *dataPoints_.at(idx) = *point;
+                delete point;
             } else {
                 if (dataPoints_.at(idx)->secs > secs)
                     dataPoints_.insert(idx, point);
