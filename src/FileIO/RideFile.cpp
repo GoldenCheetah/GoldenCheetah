@@ -1506,7 +1506,9 @@ void RideFile::appendOrUpdatePoint(double secs, double cad, double hr, double km
                                              rvert, rcad, rcontact, tcore,
                                              interval);
 
+
     if (!forceAppend) {
+
         int idx = timeIndex(secs);
         if (idx != -1) {
             if (dataPoints_.at(idx)->secs == secs) {
@@ -1519,21 +1521,10 @@ void RideFile::appendOrUpdatePoint(double secs, double cad, double hr, double km
                     dataPoints_.insert(idx+1, point);
             }
         } else
-           forceAppend = true;
+           forceAppend = true; // note if clause below
     }
 
-    if (forceAppend) {
-        RideFilePoint* point = new RideFilePoint(secs, cad, hr, km, kph, nm, watts, alt, lon, lat,
-                                                 headwind, slope, temp,
-                                                 lrbalance,
-                                                 lte, rte, lps, rps,
-                                                 lpco, rpco,
-                                                 lppb, rppb, lppe, rppe,
-                                                 lpppb, rpppb, lpppe, rpppe,
-                                                 smo2, thb,
-                                                 rvert, rcad, rcontact, tcore,
-                                                 interval);
-
+    if (forceAppend) { // note forceAppend = true above do not convert to else clause
         dataPoints_.append(point);
     }
 
