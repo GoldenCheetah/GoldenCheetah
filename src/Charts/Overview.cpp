@@ -280,7 +280,7 @@ OverviewWindow::getConfiguration() const
         case OverviewItemType::DATATABLE:
             {
                 DataOverviewItem *data = reinterpret_cast<DataOverviewItem*>(item);
-                config += "\"program\":\"" + QString("%1").arg(Utils::jsonprotect(data->program)) + "\",";
+                config += "\"program\":\"" + QString("%1").arg(Utils::jsonprotect2(data->program)) + "\",";
 
                 // although they aren't config we remember the last sort order
                 // so it is retained over restarts, config of dynamic data is too hard
@@ -291,7 +291,7 @@ OverviewWindow::getConfiguration() const
         case OverviewItemType::KPI:
             {
                 KPIOverviewItem *kpi = reinterpret_cast<KPIOverviewItem*>(item);
-                config += "\"program\":\"" + QString("%1").arg(Utils::jsonprotect(kpi->program)) + "\",";
+                config += "\"program\":\"" + QString("%1").arg(Utils::jsonprotect2(kpi->program)) + "\",";
                 config += "\"units\":\"" + QString("%1").arg(kpi->units) + "\",";
                 config += "\"istime\":" + QString("%1").arg(kpi->istime) + ",";
                 config += "\"start\":" + QString("%1").arg(kpi->start) + ",";
@@ -519,7 +519,7 @@ badconfig:
 
         case OverviewItemType::DATATABLE:
             {
-                QString program=Utils::jsonunprotect(obj["program"].toString());
+                QString program=Utils::jsonunprotect2(obj["program"].toString());
                 add = new DataOverviewItem(space, name, program);
                 add->datafilter = datafilter;
 
@@ -537,7 +537,7 @@ badconfig:
 
         case OverviewItemType::KPI :
             {
-                QString program=Utils::jsonunprotect(obj["program"].toString());
+                QString program=Utils::jsonunprotect2(obj["program"].toString());
                 double start=obj["start"].toDouble();
                 double stop =obj["stop"].toDouble();
                 QString units =obj["units"].toString();
