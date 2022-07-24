@@ -1488,7 +1488,27 @@ GenericPlot::plotAnnotations(GenericSeriesInfo &seriesinfo)
             StraightLine *line = new StraightLine(this->annotationController);
             annotationController->addAnnotation(line);
             line->setCurve(curves.value(seriesinfo.name,NULL));
-            line->setValue(annotation.value);
+            // value may need unit conversion, lets check the corresponding axis
+            foreach (GenericAxisInfo *axis, axisinfos) {
+                if ((annotation.type == GenericAnnotationInfo::VLine && axis->name == seriesinfo.xname) ||
+                    (annotation.type == GenericAnnotationInfo::HLine && axis->name == seriesinfo.yname)) {
+                    // TIME values are seconds from midnight
+                    QDateTime midnight(QDate::currentDate(), QTime(0,0,0), Qt::LocalTime); // we always use LocalTime due to qt-bug 62285
+                    // DATERANGE values are days from 01-01-1900
+                    QDateTime earliest(QDate(1900,01,01), QTime(0,0,0), Qt::LocalTime);
+                    switch (axis->type) {
+                        case GenericAxisInfo::TIME:
+                            line->setValue(midnight.addSecs(annotation.value).toMSecsSinceEpoch());
+                            break;
+                        case GenericAxisInfo::DATERANGE:
+                            line->setValue(earliest.addDays(annotation.value).toMSecsSinceEpoch());
+                            break;
+                        default:
+                            line->setValue(annotation.value);
+                            break;
+                    }
+                }
+            }
             line->setText(annotation.text);
             line->setOrientation(annotation.type == GenericAnnotationInfo::VLine ? Qt::Vertical : Qt::Horizontal);
             line->setStyle(annotation.linestyle);
