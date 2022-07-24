@@ -1638,8 +1638,7 @@ bool Leaf::isNumber(DataFilterRuntime *df, Leaf *leaf)
 
 void Leaf::clear(Leaf *leaf)
 {
-Q_UNUSED(leaf);
-#if 0 // memory leak!!!
+
     switch(leaf->type) {
     case Leaf::String : delete leaf->lvalue.s; break;
     case Leaf::Symbol : delete leaf->lvalue.n; break;
@@ -1656,7 +1655,7 @@ Q_UNUSED(leaf);
     default:
         break;
     }
-#endif
+
 }
 
 void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
