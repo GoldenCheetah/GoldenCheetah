@@ -209,6 +209,7 @@ TcxParser::endElement( const QString&, const QString&, const QString& qName)
         // If sport was Other and we have distance but no GPS data
         // we assume it is a pool swimming activity and first
         // distance is pool length
+        if (swim == MayBeSwim && !badgps) swim = NotSwim; // not a pool swim if we have GPS data
         if (swim == MayBeSwim && badgps && distance > 0) {
             swim = Swim;
             rideFile->setTag("Sport", "Swim");
@@ -373,8 +374,8 @@ TcxParser::endElement( const QString&, const QString&, const QString& qName)
             if (swimXdata) swimXdata->datapoints.append(p);
             lastLength = secs + round(lapSecs);
         }
-        // expand even if Smart Recording is not enabled
-        if (swim == Swim && distance == 0) {
+        // expand only if Smart Recording is enabled
+        if (swim == Swim && distance == 0 && isGarminSmartRecording.toInt()) {
             // fill in the pause, partially if too long
             for(int i = 1; i <= round(lapSecs) && i <= 300*GarminHWM.toInt(); i++)
                 rideFile->appendPoint(secs + i,
