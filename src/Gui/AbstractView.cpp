@@ -818,7 +818,11 @@ void
 AbstractView::resetLayout( QComboBox *perspectiveSelector)
 {
     // delete all current perspectives
-    foreach(Perspective *p, perspectives_) delete p;
+    foreach(Perspective *p, perspectives_) {
+        pstack->removeWidget(p);
+        cstack->removeWidget(p->controls());
+        delete p;
+    }
     perspectives_.clear();
 
     // reload from default (website / baked in)
