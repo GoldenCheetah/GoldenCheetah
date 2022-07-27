@@ -435,6 +435,7 @@ struct FitFileReaderState
                 case 3578: return "Garmin Rally 100/200";
                 case 3589: return "Garmin FR745";
                 case 3592: return "Garmin Varia RTL515";
+                case 3843: return "Garmin Edge 1040 Solar";
                 case 20119: return "Garmin Training Center";
                 case 65532: return "Android ANT+ Plugin";
                 case 65534: return "Garmin Connect Website";
