@@ -38,6 +38,7 @@
 #include "LTMTrend.h" // for LR when copying CP chart filtering mechanism
 #include "WPrime.h" // for LR when copying CP chart filtering mechanism
 #include "FastKmeans.h" // for kmeans(...)
+#include "Season.h" // for events(...)
 
 #ifdef GC_HAVE_SAMPLERATE
 // we have libsamplerate
@@ -365,6 +366,9 @@ static struct {
     { "intervalstrings", 0 }, // intervalstring(symbol|name|start|stop|type|test|color|route|selected|date|filename [,start [,stop]])
                               //  - same as intervals above but instead of returning a vector of numbers, the values
                               //  are converted to strings as appropriate for the metric (e.g. Pace_Rowing mm:ss/500m).
+
+    { "events", 0 }, // events(name|date|priority|description)
+                     // - returns a vector of values for the field specified for each even in current date range
 
     { "powerindex", 2 }, // powerindex(power, secs) - returns an array or value representing the power and duration
                          //                           represented as a power index
@@ -2234,6 +2238,25 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
 
                        leaf->inerror = true;
                        DataFiltererrors << QString(tr("too many parameters: %1(symbol, start, stop)").arg(leaf->function));
+                    }
+
+                } else if (leaf->function == "events") {
+
+                    // is the param a symbol
+                    if (leaf->fparms.count() != 1 || leaf->fparms[0]->type != Leaf::Symbol) {
+                       leaf->inerror = true;
+                       DataFiltererrors << QString(tr("%1(name|date|priority|description)").arg(leaf->function));
+
+                    } else if (leaf->fparms.count() == 1) {
+
+                        QRegExp symbols("^(name|date|priority|description)$");
+                        QString symbol=*(leaf->fparms[0]->lvalue.n);
+                        if (!symbols.exactMatch(symbol) && df->lookupMap.value(symbol,"") == "") {
+                            leaf->inerror = true;
+                            DataFiltererrors << QString(tr("invalid symbol '%1', should be 'name|date|priority|description''").arg(symbol));
+
+                        }
+
                     }
 
                 } else if (leaf->function == "bests") {
@@ -5100,6 +5123,38 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
                 // when current ride is requested we are done
                 if (currentride) break;
             }
+            return returning;
+        }
+
+        if (leaf->function == "events") {
+
+            // symbol determines what to return
+            QString symbol = *(leaf->fparms[0]->lvalue.n);
+
+            // returning numbers or strings
+            Result returning(0);
+            if (symbol != "date") returning.isNumber = false;
+
+            QList<Season> tmpSeasons = m->context->athlete->seasons->seasons;
+            std::sort(tmpSeasons.begin(),tmpSeasons.end(),Season::LessThanForStarts);
+            foreach (Season s, tmpSeasons) {
+                foreach (SeasonEvent event, s.events) {
+                    if (event.date >= d.from && event.date <= d.to) {
+                        if (symbol == "date") {
+                            int value = QDate(1900,01,01).daysTo(event.date);
+                            returning.number() += value;
+                            returning.asNumeric().append(value);
+			} if (symbol == "name") {
+                            returning.asString().append(event.name);
+			} if (symbol == "priority") {
+                            returning.asString().append(SeasonEvent::priorityList().at(event.priority));
+			} if (symbol == "description") {
+                            returning.asString().append(event.description);
+                        }
+                    }
+                }
+            }
+
             return returning;
         }
 
