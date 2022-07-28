@@ -43,6 +43,7 @@ static bool setSupported()
     ::supported << ".gpx";
     ::supported << ".tts";
     ::supported << ".json";
+    ::supported << ".erg2";
 
     return true;
 }
