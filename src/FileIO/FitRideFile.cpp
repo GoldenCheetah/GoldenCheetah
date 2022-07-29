@@ -436,6 +436,11 @@ struct FitFileReaderState
                 case 3589: return "Garmin FR745";
                 case 3592: return "Garmin Varia RTL515";
                 case 3843: return "Garmin Edge 1040 Solar";
+                case 3905: case 3908: return "Garmin Fenix 7s";
+                case 3906: case 3909: return "Garmin Fenix 7";
+                case 3907: case 3910: return "Garmin Fenix 7x";
+                case 3990 : return "Garmin FR255";
+                case 4024 : return "Garmin FR955";
                 case 20119: return "Garmin Training Center";
                 case 65532: return "Android ANT+ Plugin";
                 case 65534: return "Garmin Connect Website";
@@ -639,6 +644,14 @@ struct FitFileReaderState
         } else if (manu == 267) {
             // Bryton
             return "Bryton";
+        } else if (manu == 268) {
+            // SRAM
+            switch (prod) {
+                case -1: return "SRAM";
+                case 1037: return "SRAM Rival eTap AXS";
+                case 1052: return "SRAM Rival AXS";
+                default: return QString("SRAM %1").arg(prod);
+            }
         } else if (manu == 282) {
             // Sufferfest
             return "The Sufferfest";
@@ -672,8 +685,11 @@ struct FitFileReaderState
             case 12: return "Sensor Hub";
             case 17: return "Biketrainer"; // fitness equipment
             case 30: return "Running Dynamics";
+            case 31: return "Muscle Oxygen";
+            case 34: return "Shifting";
             case 35: case 36: return "Bikelight"; // bike_light_main/shared
-            case 40: return "Bikeradar"; // bike_radar
+            case 40: return "Bike Radar"; // bike_radar
+            case 46: return "Bike Aero"; // bike_aero
             case 120: return "HR"; // heart_rate
             case 121: return "Speed-Cadence"; // bike_speed_cadence
             case 122: return "Cadence"; // bike_speed
