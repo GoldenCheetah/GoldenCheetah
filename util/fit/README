@@ -1,0 +1,18 @@
+
+FITmetadata.json generator
+
+For Garmin device updates:
+    Make sure you download the latest FIT SDK from thisisant.com and extract
+    the c/fit_example.h file and place it in this directory.
+
+For non-Garmin device updates:
+    Update the file nongarmin.json to add the manufacturer and product combination
+    and associated description. See existing values in there as examples. Note
+    that a product number of -1 is to set the default description for any device
+    from that manufacturer that is not defined
+
+Once the updates have been made you can regenerate FITmetadata.json with:
+    $ make
+
+A new FITmetadata.json file will be created in the current directory, 
+
