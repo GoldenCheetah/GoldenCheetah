@@ -24,6 +24,7 @@
 #include "Specification.h"
 #include "DataProcessor.h"
 #include "MainWindow.h" // for gcroot
+#include "GcUpgrade.h" // for VERSION_CONFIG_PREFIX
 #include <QSharedPointer>
 #include <QMap>
 #include <QSet>
@@ -71,19 +72,69 @@ static void loadMetadata()
     // only do it the first time
     if (loaded) return;
     loaded=true;
+    bool write=false;
+
+    // lets try and download from the goldencheetah website- it makes
+    // sense to do this here since we only get called when trying to
+    // import a FIT file- which is only going to be post-activity not
+    // every time the program is launched
+    QNetworkAccessManager nam;
+    QString content;
+    QString localfilename = QDir(gcroot).canonicalPath()+"/FITmetadata.json";
+    QString filename;
+
+    // fetch from the goldencheetah.org website
+    QString request = QString("%1/FITmetadata.json").arg(VERSION_CONFIG_PREFIX);
+
+    QNetworkReply *reply = nam.get(QNetworkRequest(QUrl(request)));
+
+    if (reply->error() == QNetworkReply::NoError) {
+
+        // lets wait for a response with an event loop
+        // it quits on a 5s timeout or reply coming back
+        QEventLoop loop;
+        QTimer timer;
+        timer.setSingleShot(true);
+        QObject::connect(&timer, SIGNAL(timeout()), &loop, SLOT(quit()));
+        QObject::connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
+
+        // 5 second timeout only hits hard for the very first FIT file
+        // that is opened, which is during an import dialog, so not the end
+        // of the world for folks who have disabled/slow internet connectivity
+        timer.start(5000);
+
+        // lets block until signal received
+        loop.exec(QEventLoop::WaitForMoreEvents);
+
+        // all good?
+        if (reply->error() == QNetworkReply::NoError) {
+            content = reply->readAll();
+            write=true;
+
+            // save away- will be read below as cached version
+            QFile file(localfilename);
+            if (file.open(QIODevice::Truncate|QIODevice::ReadWrite)) {
+                file.write(content.toUtf8().constData());
+                file.close();
+            }
+            //fprintf(stderr, "FITmetadata.json updated from online version\n"); fflush(stderr);
+        }
+    }
 
     // get locally cached version- or fall back to baked in version
-    // XXX todo retrieve from website (www.../defaults/3.6/FITmetadata.json)
-    QString filename = QDir(gcroot).canonicalPath()+"/FITmetadata.json";
-    if (!QFile(filename).exists()) filename = ":/json/FITmetadata.json";
+    // the baked in version will only be used by users that have
+    // slow or disabled or no internet connection
+    if (!QFile(localfilename).exists()) {
+        filename = ":/json/FITmetadata.json";
+        write=true;
+    } else filename = localfilename;
 
     // read the file
     QFile file(filename);
-    QString content;
     if (file.open(QIODevice::ReadOnly)) {
         content = file.readAll();
         file.close();
-    } else return;
+    } else return; // eek!
 
     // parse the content
     QJsonDocument metajson = QJsonDocument::fromJson(content.toUtf8());
@@ -132,7 +183,7 @@ static void loadMetadata()
     }
 
 badconfig:
-    fprintf(stderr, "FITRideFile: FITmetadata.json parse error\n");
+    fprintf(stderr, "FITRideFile: FITmetadata.json parse error\n"); fflush(stderr);
     return;
 }
 
