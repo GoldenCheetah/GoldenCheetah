@@ -56,12 +56,12 @@
 #define SEGMENT_MSG_NUM         142
 
 // Fit types metadata
-struct prod { int manu, prod; QString name; };
-struct manu { int manu; QString name; };
+struct FITproduct { int manu, prod; QString name; };
+struct FITmanufacturer { int manu; QString name; };
 
 // arrays of manu and prod
-QList<prod> FITproducts;
-QList<manu> FITmanufacturers;
+QList<FITproduct> FITproducts;
+QList<FITmanufacturer> FITmanufacturers;
 
 // load the FITmetadata file, called the first time a FIT file
 // is parsed, so may not ever be called by the user
@@ -101,7 +101,7 @@ static void loadMetadata()
             // convert so we can inspect
             QJsonObject obj = val.toObject();
 
-            prod add;
+            FITproduct add;
 
             add.name = obj["name"].toString();
             add.prod = obj["prod"].toInt();
@@ -119,7 +119,7 @@ static void loadMetadata()
             // convert so we can inspect
             QJsonObject obj = val.toObject();
 
-            manu add;
+            FITmanufacturer add;
 
             add.name = obj["name"].toString();
             add.manu = obj["manu"].toInt();
@@ -441,7 +441,7 @@ struct FitFileReaderState
         QString returning;
 
         // is it a known or defaulted product?
-        foreach(struct prod x, FITproducts) {
+        foreach(FITproduct x, FITproducts) {
 
             if (x.manu == manu && x.prod == prod) {
                 // garmin devices special case (could also fix in FITmetadata.json)
@@ -454,7 +454,7 @@ struct FitFileReaderState
         if (returning != "") return returning;
 
         // ok, then lets just return manufacturer and prod number
-        foreach(struct manu x, FITmanufacturers) {
+        foreach(FITmanufacturer x, FITmanufacturers) {
             if (x.manu == manu) return QString ("%1 Device (%2)").arg(x.name).arg(prod);
         }
 
