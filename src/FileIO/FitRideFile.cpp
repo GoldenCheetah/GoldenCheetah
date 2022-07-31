@@ -23,6 +23,7 @@
 #include "RideItem.h"
 #include "Specification.h"
 #include "DataProcessor.h"
+#include "MainWindow.h" // for gcroot
 #include <QSharedPointer>
 #include <QMap>
 #include <QSet>
@@ -53,6 +54,87 @@
 #define FILE_CREATOR_MSG_NUM    49
 #define HRV_MSG_NUM             78
 #define SEGMENT_MSG_NUM         142
+
+// Fit types metadata
+struct prod { int manu, prod; QString name; };
+struct manu { int manu; QString name; };
+
+// arrays of manu and prod
+QList<prod> FITproducts;
+QList<manu> FITmanufacturers;
+
+// load the FITmetadata file, called the first time a FIT file
+// is parsed, so may not ever be called by the user
+bool loaded=false;
+static void loadMetadata()
+{
+    // only do it the first time
+    if (loaded) return;
+    loaded=true;
+
+    // get locally cached version- or fall back to baked in version
+    // XXX todo retrieve from website (www.../defaults/3.6/FITmetadata.json)
+    QString filename = QDir(gcroot).canonicalPath()+"/FITmetadata.json";
+    if (!QFile(filename).exists()) filename = ":/json/FITmetadata.json";
+
+    // read the file
+    QFile file(filename);
+    QString content;
+    if (file.open(QIODevice::ReadOnly)) {
+        content = file.readAll();
+        file.close();
+    } else return;
+
+    // parse the content
+    QJsonDocument metajson = QJsonDocument::fromJson(content.toUtf8());
+    if (metajson.isEmpty() || metajson.isNull()) goto badconfig;
+    else {
+
+        // lets setup the structures
+        QJsonObject root = metajson.object();
+
+        if (!root.contains("PRODUCTS")) goto badconfig;
+        QJsonObject products = root["PRODUCTS"].toObject();
+        QJsonArray PRODUCTS = root["PRODUCTS"].toArray();
+        foreach(const QJsonValue val, PRODUCTS) {
+
+            // convert so we can inspect
+            QJsonObject obj = val.toObject();
+
+            prod add;
+
+            add.name = obj["name"].toString();
+            add.prod = obj["prod"].toInt();
+            add.manu = obj["manu"].toInt();
+
+            FITproducts << add;
+            //fprintf(stderr, "FITprod: %d:%d %s\n", add.manu, add.prod, add.name.toStdString().c_str()); fflush(stderr);
+        }
+
+        if (!root.contains("MANUFACTURERS")) goto badconfig;
+        QJsonObject manufacturers = root["MANUFACTURERS"].toObject();
+        QJsonArray MANUFACTURERS = root["MANUFACTURERS"].toArray();
+        foreach(const QJsonValue val, MANUFACTURERS) {
+
+            // convert so we can inspect
+            QJsonObject obj = val.toObject();
+
+            manu add;
+
+            add.name = obj["name"].toString();
+            add.manu = obj["manu"].toInt();
+
+            FITmanufacturers << add;
+            //fprintf(stderr, "FITmanu: %d %s\n", add.manu, add.name.toStdString().c_str()); fflush(stderr);
+        }
+
+        return;
+    }
+
+badconfig:
+    fprintf(stderr, "FITRideFile: FITmetadata.json parse error\n");
+    return;
+}
 
 static int fitFileReaderRegistered =
     RideFileFactory::instance().registerReader(
@@ -352,330 +434,32 @@ struct FitFileReaderState
         }
     }
 
+    // return a name for the manufacturer, product combintion
+    // uses the config from FITmetadata.json initialised above
     QString getManuProd(int manu, int prod) {
-        if (manu == 1) {
-            // Garmin
-            // Product IDs can be found in c/fit_example.h in the FIT SDK.
-            // Multiple product IDs refer to different regions e.g. China, Japan etc. 
-            switch (prod) {
-                case -1: return "Garmin";
-                case 16: case 20: return "Garmin Cadence Sensor 2";
-                case 473: case 474: case 475: case 494: return "Garmin FR301";
-                case 717: case 987: return "Garmin FR405";
-                case 782: return "Garmin FR50";
-                case 988: return "Garmin FR60";
-                case 1018: return "Garmin FR310XT";
-                case 1036: case 1199: case 1213: case 1387: return "Garmin Edge 500";
-                case 1124: case 1274: return "Garmin FR110";
-                case 1169: case 1333: case 1334: case 1386: return "Garmin Edge 800";
-                case 1325: return "Garmin Edge 200";
-                case 1328: return "Garmin FR910XT";
-                case 1345: case 1410: return "Garmin FR610";
-                case 1360: return "Garmin FR210";
-                case 1436: return "Garmin FR70";
-                case 1446: return "Garmin FR310XT 4T";
-                case 1482: case 1688: return "Garmin FR10";
-                case 1499: return "Garmin Swim";
-                case 1551: return "Garmin Fenix";
-                case 1561: case 1742: case 1821: return "Garmin Edge 510";
-                case 1567: return "Garmin Edge 810";
-                case 1623: case 2173: return "Garmin FR620";
-                case 1632: case 2174: return "Garmin FR220";
-                case 1743: return "Garmin HRM-Tri";
-                case 1752: return "Garmin HRM-Run";
-                case 1765: case 2130: case 2131: case 2132: return "Garmin FR920XT";
-                case 1836: case 2052: case 2053: case 2070: case 2100: return "Garmin Edge 1000";
-                case 1903: return "Garmin FR15";
-                case 1907: return "Garmin Vivoactive";
-                case 1967: return "Garmin Fenix 2";
-                case 2050: case 2188: case 2189: return "Garmin Fenix 3";
-                case 2067: case 2260: return "Garmin Edge 520";
-                case 2147: return "Garmin Edge 25";
-                case 2148: return "Garmin FR25";
-                case 2153: case 2219: return "Garmin FR225";
-                case 2156: return "Garmin FR630";
-                case 2157: return "Garmin FR230";
-                case 2158: return "Garmin FR735XT";
-                case 2204: return "Garmin Edge 1000 Explore";
-                case 2327: return "Garmin HRM4 Run";
-                case 2238: return "Garmin Edge 20";
-                case 2337: return "Garmin Vivoactive HR";
-                case 2347: return "Garmin Vivosmart HR+";
-                case 2348: return "Garmin Vivosmart HR";
-                case 2413: return "Garmin Fenix 3 HR";
-                case 2431: return "Garmin FR235";
-                case 2530: return "Garmin Edge 820";
-                case 2531: return "Garmin Edge 820 Explore";
-                case 2544: return "Garmin Fenix 5s";
-                case 2604: return "Garmin Fenix 5x";
-                case 2691: return "Garmin FR935";
-                case 2697: return "Garmin Fenix 5";
-                case 2713: return "Garmin Edge 1030";
-                case 2787: return "Garmin Vector 3";
-                case 2886: case 2888: return "Garmin FR645";
-                case 2900: return "Garmin Fenix 5s +";
-                case 2909: case 3092: return "Garmin Edge 130";
-                case 3028: return "Garmin GPSMap 66";
-                case 3110: return "Garmin Fenix 5 +";
-                case 3111: return "Garmin Fenix 5x +";
-                case 3112: return "Garmin Edge 520 +";
-                case 3113: return "Garmin FR945";
-                case 3121: return "Garmin Edge 530";
-                case 3122: return "Garmin Edge 830";
-                case 3126: return "Garmin Instinct";
-                case 3192: return "Garmin Speed Sensor 2";
-                case 3287: case 3288: case 3512: case 3513: return "Garmin Fenix 6s";
-                case 3289: case 3290: case 3514: case 3515: return "Garmin Fenix 6";
-                case 3291: case 3516: return "Garmin Fenix 6x";
-                case 3299: return "Garmin HRM-Dual";
-                case 3300: return "Garmin HRM-Pro";
-                case 3405: case 3639: return "Garmin Swim 2";
-                case 3558: return "Garmin Edge 130 Plus";
-                case 3570: return "Garmin Edge 1030 Plus";
-                case 3578: return "Garmin Rally 100/200";
-                case 3589: return "Garmin FR745";
-                case 3592: return "Garmin Varia RTL515";
-                case 3843: return "Garmin Edge 1040 Solar";
-                case 3905: case 3908: return "Garmin Fenix 7s";
-                case 3906: case 3909: return "Garmin Fenix 7";
-                case 3907: case 3910: return "Garmin Fenix 7x";
-                case 3990 : return "Garmin FR255";
-                case 4024 : return "Garmin FR955";
-                case 20119: return "Garmin Training Center";
-                case 65532: return "Android ANT+ Plugin";
-                case 65534: return "Garmin Connect Website";
-                default: return QString("Garmin %1").arg(prod);
-            }
-        } else if (manu == 6 ) {
-            // SRM
-            // powercontrol now uses FIT files from PC8
-            switch (prod) {
-                case -1: return "SRM";
-                case 6: return "SRM PC6";
-                case 7: return "SRM PC7";
-                case 8: return "SRM PC8";
-                default: return "SRM Powercontrol";
-            }
-        } else if (manu == 7 ) {
-            // Quarq
-            switch (prod) {
-                case -1: return "Quarq";
-                case 1: return "Quarq Cinqo";
-                case 9479: return "Quarq DZERO";
-                default: return QString("Quarq %1").arg(prod);
-            }
-        } else if (manu == 8 ) {
-            // iBike
-            switch (prod) {
-                case -1: return "iBike";
-                case 2054: return "iBike AeroPod";
-                default: return QString("iBike %1").arg(prod);
-            }
-        } else if (manu == 9 ) {
-            // Powertap
-            switch (prod) {
-                case -1: return "Powertap";
-                case 14: return "Joule 2.0";
-                case 18: return "Joule";
-                case 19: return "Joule GPS";
-                case 22: return "Joule GPS+";
-                case 272: return "Powertap C1";
-                case 288: return "Powertap P1";
-                case 4096: return "Powertap G3";
-                case 4353: return "Powercal";
 
-                default: return QString("Powertap Device %1").arg(prod);
+        QString returning;
+
+        // is it a known or defaulted product?
+        foreach(struct prod x, FITproducts) {
+
+            if (x.manu == manu && x.prod == prod) {
+                // garmin devices special case (could also fix in FITmetadata.json)
+                // we have been inconsistent on this in the past e.g. Powertap, not SARIS Powertap
+                if (manu == 1) return QString("Garmin %1").arg(x.name);
+                else return x.name;
             }
-        } else if (manu == 13 ) {
-            // dynastream_oem
-            switch (prod) {
-                case -1: return "Dynastream";
-                default: return QString("Dynastream %1").arg(prod);
-            }
-        } else if (manu == 29 ) {
-            // saxonar
-            switch (prod) {
-                case -1: return "Power2max";
-                case 1031: return "Power2max S";
-                default: return QString("Power2max %1").arg(prod);
-            }
-        } else if (manu == 32) {
-            // wahoo
-            switch (prod) {
-                case -1: return "Wahoo";
-                case 0: return "Wahoo fitness";
-                case 28: return "Wahoo ELEMNT";
-                case 31: return "Wahoo ELEMNT BOLT";
-                default: return QString("Wahoo fitness %1").arg(prod);
-            }
-        } else if (manu == 38) {
-             // o_synce
-            switch (prod) {
-                case -1: return "o_synce";
-                case 1: return "o_synce navi2coach";
-                default: return QString("o_synce %1").arg(prod);
-            }
-        } else if (manu == 48) {
-            // Pioneer
-            switch (prod) {
-                case -1:  return "Pioneer";
-                case 2: return "Pioneer SGX-CA500";
-                default: return QString("Pioneer %1").arg(prod);
-            }
-        } else if (manu == 54) {
-            // ifor_powell
-            switch (prod) {
-                case -1:  return "Ifor powell";
-                case 1: return "IpBike";
-                default: return QString("Ifor powell %1").arg(prod);
-            }
+            if (x.manu == manu && x.prod == -1) returning = x.name;
         }
-        else if (manu == 69) {
-            // Stages Cycling
-            switch (prod) {
-                case -1:  return "Stages Cycling";
-                case 1: return "Stages Power Gen 1";
-                case 2: return "Stages Power Gen 2";
-                case 3: return "Stages Power Gen 3";
-                default: return QString("Stages Cycling %1").arg(prod);
-            }
-        } else if (manu == 70) {
-            // SIGMA SPORT Germany
-            switch (prod) {
-                case 15: return "SIGMA ROX 10.0";
-                case 18: return "SIGMA ROX 7.0";
-                case 41: return "SIGMA ROX 11.0";
-                case 42: return "SIGMA iD.RUN";
-                case 43: return "SIGMA iD.RUN HR";
-                case 44: return "SIGMA ROX 12.0";
-                case 45: return "SIGMA iD.FREE";
-                case 46: return "SIGMA iD.TRI";
-                case 47: return "SIGMA PURE GPS";
-                case 49: return "SIGMA ROX 11.1";
-                case 51: return "SIGMA ROX 2.0";
-                case 52: return "SIGMA ROX 4.0";
-                default: return QString("SIGMA SPORT %1").arg(prod);
-            }
-        } else if (manu == 76) {
-            // Moxy
-            return "Moxy Monitor";
-        } else if (manu == 83) {
-            // Scosche
-            switch (prod) {
-                case -1: return "Scosche";
-                case 3: return "Scosche Rythm+";
-                default: return QString("Scosche %1").arg(prod);
-            }
-        } else if (manu == 89) {
-            // Tacx
-            switch (prod) {
-                case 2800: return "Tacx Neo";
-                case 2850: return "Tacx Neo 2 Smart";
-                default: return QString("Tacx %1").arg(prod);
-            }
-        } else if (manu == 95) {
-            // Stryd
-            return "Stryd";
-        } else if (manu == 98) {
-            // BSX
-            switch(prod) {
-                case -1: return "BSX";
-                case 2: return "BSX Insight 2";
-                default: return QString("BSX %1").arg(prod);
-            }
-        } else if (manu == 107) {
-            // Magene
-            switch(prod) {
-                case -1: return "Magene";
-                default: return QString("Magene %1").arg(prod);
-            }
-        } else if (manu == 108) {
-            // Giant
-            switch(prod) {
-                case -1: return "Giant";
-                case 21845 : return "Giant Power Pro";
-                default: return QString("Giant %1").arg(prod);
-            }
-        } else if (manu == 115) {
-            // igpsport
-            switch(prod) {
-                case -1: return "iGPSPORT";
-                default: return QString("iGPSPORT %1").arg(prod);
-            }
-        } else if (manu == 116) {
-            // thinkrider
-            switch(prod) {
-                case -1: return "Thinkrider";
-                default: return QString("Thinkrider %1").arg(prod);
-            }
-        } else if (manu == 123) {
-            // Polar
-            switch(prod) {
-                case 2: return "Polar H10";
-                case 3: return "Polar H9";
-                case -1: return "Polar";
-                default: return QString("Polar %1").arg(prod);
-            }
-        } else if (manu == 132) {
-            // cycplus
-            switch(prod) {
-                case -1: return "Cycplus";
-                default: return QString("Cycplus %1").arg(prod);
-            }
-        } else if (manu == 258) {
-            // Lezyne
-            switch (prod) {
-                case -1: return "Lezyne";
-                case 4: return "Lezyne Super GPS";
-                case 6: return "Lezyne Micro-GPS";
-                case 11: return "Lezyne MegaXL";
-                default: return QString("Lezyne %1").arg(prod);
-            }
-        } else if (manu == 260) {
-            // Zwift
-            return "Zwift";
-        } else if (manu == 263) {
-            // Favero
-            switch (prod) {
-                case -1: return "Favero";
-                case 12: return "Favero Assioma Duo";
-                default: return QString("Favero %1").arg(prod);
-            }
-        } else if (manu == 267) {
-            // Bryton
-            return "Bryton";
-        } else if (manu == 268) {
-            // SRAM
-            switch (prod) {
-                case -1: return "SRAM";
-                case 1037: return "SRAM Rival eTap AXS";
-                case 1052: return "SRAM Rival AXS";
-                default: return QString("SRAM %1").arg(prod);
-            }
-        } else if (manu == 282) {
-            // Sufferfest
-            return "The Sufferfest";
-        } else if (manu == 284) {
-            // Rouvy
-            return "Rouvy";
-        } else if (manu == 289) {
-            // Hammerhead
-            // currently not setting product ids
-            switch (prod) {
-                case -1: return "Hammerhead";
-                default: return QString("Hammerhead %1").arg(prod);
-            }
-        } else if (manu == 255) {
-            // Development
-            switch (prod) {
-                case -1: return "Development";
-                case 0: return "Development";
-                default: return QString("Development %1").arg(prod);
-            }
-        } else {
-            QString name = "Unknown FIT Device";
-            return name + QString(" %1:%2").arg(manu).arg(prod);
+        if (returning != "") return returning;
+
+        // ok, then lets just return manufacturer and prod number
+        foreach(struct manu x, FITmanufacturers) {
+            if (x.manu == manu) return QString ("%1 Device (%2)").arg(x.name).arg(prod);
         }
+
+        // don't even recognise the manufacturer!
+        return QString("Unknown FIT Device %1:%2").arg(manu).arg(prod);
     }
 
     QString getDeviceType(int device_type) {
@@ -3748,6 +3532,9 @@ struct FitFileReaderState
 
 RideFile *FitFileReader::openRideFile(QFile &file, QStringList &errors, QList<RideFile*> *rides) const
 {
+    // prepare the metadata first
+    loadMetadata();
+
     QSharedPointer<FitFileReaderState> state(new FitFileReaderState(file, errors));
     RideFile* ret = state->run();
     // Split sessions, only if we have a valid RideFile

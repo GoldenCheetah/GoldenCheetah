@@ -111,6 +111,7 @@
         <file>translations/gc_zh-tw.qm</file>
         <file>translations/gc_nl.qm</file>
         <file>translations/gc_sv.qm</file>
+        <file>json/FITmetadata.json</file>
         <file>xml/charts.xml</file>
         <file>xml/metadata.xml</file>
         <file>xml/train-perspectives.xml</file>
