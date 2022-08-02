@@ -72,7 +72,6 @@ static void loadMetadata()
     // only do it the first time
     if (loaded) return;
     loaded=true;
-    bool write=false;
 
     // lets try and download from the goldencheetah website- it makes
     // sense to do this here since we only get called when trying to
@@ -109,7 +108,6 @@ static void loadMetadata()
         // all good?
         if (reply->error() == QNetworkReply::NoError) {
             content = reply->readAll();
-            write=true;
 
             // save away- will be read below as cached version
             QFile file(localfilename);
@@ -124,10 +122,8 @@ static void loadMetadata()
     // get locally cached version- or fall back to baked in version
     // the baked in version will only be used by users that have
     // slow or disabled or no internet connection
-    if (!QFile(localfilename).exists()) {
-        filename = ":/json/FITmetadata.json";
-        write=true;
-    } else filename = localfilename;
+    if (!QFile(localfilename).exists()) filename = ":/json/FITmetadata.json";
+    else filename = localfilename;
 
     // read the file
     QFile file(filename);
