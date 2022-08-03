@@ -619,8 +619,8 @@ struct FitFileReaderState
             case 90: // PERFORMANCE_CONDITION
                     return "PERFORMANCECONDITION"; // Performance Contition
 
-            case 108: // to confirm : RESPIRATIONRATE
-                return "RESPIRATIONRATE"; // Performance Contition
+            case 108: // RESPIRATIONRATE
+                return "RESPIRATIONRATE";
 
             case 114: // MTB Dynamics - Grit
                 return "GRIT";
@@ -630,6 +630,12 @@ struct FitFileReaderState
 
             case 116: // Stress
                 return "STRESS";
+
+            case 137: // Potential Stamina
+                return "POTENTIALSTAMINA";
+
+            case 138: // Stamina
+                return "STAMINA";
 
             default:
                 return QString("FIELD_%1").arg(native_num);
