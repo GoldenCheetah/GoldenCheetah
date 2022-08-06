@@ -250,6 +250,7 @@ void GCColor::setupColors()
         { tr("Gui"), tr("Overview Tile Background Alternate"), "CCARDBACKGROUND2", QColor(0,0,0) },
         { tr("Gui"), tr("Overview Tile Background Vibrant"), "CCARDBACKGROUND3", QColor(52,52,52) },
         { tr("Gui"), tr("Map Route Line"), "MAPROUTELINE", Qt::red },
+        { tr("Data"), tr("Stress Ramp Rate"), "COLORRR", Qt::green },
         { "", "", "", QColor(0,0,0) },
     };
 
@@ -380,6 +381,7 @@ void GCColor::setupColors()
     LightDefaultColorList[106].color = QColor(180,180,180); // 106:Tile Alternate
     LightDefaultColorList[107].color = QColor(238,248,255); // 107:Tile Vibrant
     LightDefaultColorList[108].color = QColor(255, 0, 0); // 105:MapRouteLine
+    LightDefaultColorList[109].color = QColor(0,102,0); // 109:Stress Ramp Rate
 }
 
 // default settings for fonts etc
