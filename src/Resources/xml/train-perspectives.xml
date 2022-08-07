@@ -253,27 +253,6 @@
 		<property name="style" type="int" value="2" />
 	</chart>
 </layout>
-<layout name="Video Workout" style="0" type="1" expression="" trainswitch="3">
-	<chart id="21" name="" title="Video" >
-		<property name="title" type="QString" value="Video" />
-		<property name="subtitle" type="QString" value="" />
-		<property name="widthFactor" type="double" value="1" />
-		<property name="heightFactor" type="double" value="1" />
-		<property name="style" type="int" value="0" />
-		<property name="resizable" type="bool" value="0" />
-		<property name="videoLayout" type="int" value="0" />
-	</chart>
-</layout>
-<layout name="Workout Editor" style="0" type="1" expression="" trainswitch="0">
-	<chart id="36" name="" title="Workout Editor" >
-		<property name="title" type="QString" value="Workout Editor" />
-		<property name="subtitle" type="QString" value="" />
-		<property name="widthFactor" type="double" value="1" />
-		<property name="heightFactor" type="double" value="1" />
-		<property name="style" type="int" value="0" />
-		<property name="resizable" type="bool" value="0" />
-	</chart>
-</layout>
 <layout name="Map Workout" style="2" type="1" expression="" trainswitch="4">
 	<chart id="22" name="" title="Power" >
 		<property name="title" type="QString" value="Power" />
@@ -408,6 +387,27 @@
 		<property name="avgType" type="int" value="1083336304" />
 		<property name="dataSeries" type="int" value="4" />
 		<property name="style" type="int" value="2" />
+	</chart>
+</layout>
+<layout name="Video Workout" style="0" type="1" expression="" trainswitch="3">
+	<chart id="21" name="" title="Video" >
+		<property name="title" type="QString" value="Video" />
+		<property name="subtitle" type="QString" value="" />
+		<property name="widthFactor" type="double" value="1" />
+		<property name="heightFactor" type="double" value="1" />
+		<property name="style" type="int" value="0" />
+		<property name="resizable" type="bool" value="0" />
+		<property name="videoLayout" type="int" value="0" />
+	</chart>
+</layout>
+<layout name="Workout Editor" style="0" type="1" expression="" trainswitch="0">
+	<chart id="36" name="" title="Workout Editor" >
+		<property name="title" type="QString" value="Workout Editor" />
+		<property name="subtitle" type="QString" value="" />
+		<property name="widthFactor" type="double" value="1" />
+		<property name="heightFactor" type="double" value="1" />
+		<property name="style" type="int" value="0" />
+		<property name="resizable" type="bool" value="0" />
 	</chart>
 </layout>
 </layouts>

@@ -865,6 +865,30 @@ TrainSidebar::workoutTreeWidgetSelectionChanged()
 
     // clean last
     if (prior) delete prior;
+
+    // lets SWITCH PERSPECTIVE for the selected file, but only
+    // if everything has been initialised properly (aka lazy load)
+    if (trainView && trainView->page()) {
+
+        Perspective::switchenum want=Perspective::None;
+        if (mediafile != "") want=Perspective::Video; // if media file selected
+        else want = (mode == ERG || mode == MRC) ? Perspective::Erg : Perspective::Slope; // mode always known
+        if (want == Perspective::Slope && ergFileQueryAdapter.hasGPS()) want=Perspective::Map; // Map without Video
+
+        // if the current perspective allows automatic switching,
+        // we want a view type and the current page isn't what
+        // we want then lets go find one to switch to and switch
+        // to the first one that matches
+        if (trainView->page()->trainSwitch() != Perspective::None && want != Perspective::None && trainView->page()->trainSwitch() != want) {
+
+            for(int i=0; i<trainView->perspectives_.count(); i++) {
+                if (trainView->perspectives_[i]->trainSwitch() == want) {
+                    context->mainWindow->switchPerspective(i);
+                    break;
+                }
+            }
+        }
+    }
 }
 
 /*
@@ -1595,31 +1619,6 @@ void TrainSidebar::Connect()
     gui_timer->start(REFRESHRATE);
 
     emit setNotification(tr("Connected.."), 2);
-
-    // lets SWITCH PERSPECTIVE as we are connected, but only
-    // if everything has been initialised properly (aka lazy load)
-    // given the connect widget is on the train view it is unlikely
-    // below will ever be false, but no harm in checking
-    if (trainView && trainView->page()) {
-
-        Perspective::switchenum want=Perspective::None;
-        if (mediafile != "") want=Perspective::Video; // if media file selected
-        else want = (mode == ERG || mode == MRC) ? Perspective::Erg : Perspective::Slope; // mode always known
-        if (want == Perspective::Slope && ergFileQueryAdapter.hasGPS()) want=Perspective::Map; // Map without Video
-
-        // so we want a view type and the current page isn't what
-        // we want then lets go find one to switch to and switch
-        // to the first one that matches
-        if (want != Perspective::None && trainView->page()->trainSwitch() != want) {
-
-            for(int i=0; i<trainView->perspectives_.count(); i++) {
-                if (trainView->perspectives_[i]->trainSwitch() == want) {
-                    context->mainWindow->switchPerspective(i);
-                    break;
-                }
-            }
-        }
-    }
 }
 
 void TrainSidebar::Disconnect()
