@@ -1600,14 +1600,13 @@ void TrainSidebar::Connect()
     // if everything has been initialised properly (aka lazy load)
     // given the connect widget is on the train view it is unlikely
     // below will ever be false, but no harm in checking
-qDebug() << (trainView!=NULL) << (trainView->page()!=NULL);
     if (trainView && trainView->page()) {
 
         Perspective::switchenum want=Perspective::None;
         if (mediafile != "") want=Perspective::Video; // if media file selected
         else want = (mode == ERG || mode == MRC) ? Perspective::Erg : Perspective::Slope; // mode always known
         if (want == Perspective::Slope && ergFileQueryAdapter.hasGPS()) want=Perspective::Map; // Map without Video
-qDebug()<<want<<trainView->page()->trainSwitch();
+
         // so we want a view type and the current page isn't what
         // we want then lets go find one to switch to and switch
         // to the first one that matches
