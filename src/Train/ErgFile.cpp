@@ -57,7 +57,7 @@ bool ErgFile::isWorkout(QString name)
     return false;
 }
 ErgFile::ErgFile(QString filename, int mode, Context *context) :
-    filename(filename), mode(mode), StrictGradient(true), context(context)
+    filename(filename), mode(mode), StrictGradient(true), fHasGPS(false), context(context)
 {
     if (context->athlete->zones("Bike")) {
         int zonerange = context->athlete->zones("Bike")->whichRange(QDateTime::currentDateTime().date());
@@ -66,7 +66,7 @@ ErgFile::ErgFile(QString filename, int mode, Context *context) :
     reload();
 }
 
-ErgFile::ErgFile(Context *context) : mode(0), StrictGradient(true), context(context)
+ErgFile::ErgFile(Context *context) : mode(0), StrictGradient(true), fHasGPS(false), context(context)
 {
     if (context->athlete->zones("Bike")) {
         int zonerange = context->athlete->zones("Bike")->whichRange(QDateTime::currentDateTime().date());
@@ -757,9 +757,9 @@ void ErgFile::parseFromRideFileFactory()
     bool fHasKm    = ride->areDataPresent()->km;
     bool fHasLat   = ride->areDataPresent()->lat;
     bool fHasLon   = ride->areDataPresent()->lon;
-    bool fHasGPS   = fHasLat && fHasLon;
     bool fHasAlt   = ride->areDataPresent()->alt;
     bool fHasSlope = ride->areDataPresent()->slope;
+    fHasGPS   = fHasLat && fHasLon;
 
     if (fHasKm && fHasSlope) {}     // same as crs file
     else if (fHasKm && fHasAlt) {}  // derive slope from distance and alt
@@ -900,9 +900,9 @@ void ErgFile::parseTTS()
 
     // Enumerate the data types that are available.
     bool fHasKm    = ttsReader.hasKm();
-    bool fHasGPS   = ttsReader.hasGPS();
     bool fHasAlt   = ttsReader.hasElevation();
     bool fHasSlope = ttsReader.hasGradient();
+    fHasGPS   = ttsReader.hasGPS();
 
     if (fHasKm && fHasSlope) {}     // same as crs file
     else if (fHasKm && fHasAlt) {}  // derive slope from distance and alt
