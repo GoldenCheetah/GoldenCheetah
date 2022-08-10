@@ -1,5 +1,5 @@
 <layouts>
-<layout name="General" style="0" type="2" expression="">
+<layout name="General" style="0" type="2" expression="" trainswitch="0">
 	<chart id="42" name="" title="Overview" >
 		<property name="title" type="QString" value="Overview" />
 		<property name="subtitle" type="QString" value="" />
@@ -7,10 +7,11 @@
 		<property name="heightFactor" type="double" value="2" />
 		<property name="style" type="int" value="0" />
 		<property name="resizable" type="bool" value="0" />
-		<property name="config" type="QString" value="{\n  &quot;version&quot;:&quot;1.0&quot;,\n  &quot;columns&quot;:[1200,1200,1200,1200,1200,1200,1200,1200,1200,1200],\n  &quot;CARDS&quot;:[\n    { &quot;type&quot;:6,&quot;name&quot;:&quot;PMC&quot;,&quot;deep&quot;:9,&quot;column&quot;:0,&quot;order&quot;:0,&quot;series&quot;:4,&quot;symbol&quot;:&quot;coggan_tss&quot;,&quot;xsymbol&quot;:&quot;&quot;,&quot;ysymbol&quot;:&quot;&quot;,&quot;zsymbol&quot;:&quot;&quot; },\n    { &quot;type&quot;:4,&quot;name&quot;:&quot;Sport&quot;,&quot;deep&quot;:5,&quot;column&quot;:0,&quot;order&quot;:1,&quot;series&quot;:2,&quot;symbol&quot;:&quot;Sport&quot;,&quot;xsymbol&quot;:&quot;&quot;,&quot;ysymbol&quot;:&quot;&quot;,&quot;zsymbol&quot;:&quot;&quot; },\n    { &quot;type&quot;:4,&quot;name&quot;:&quot;Workout Code&quot;,&quot;deep&quot;:5,&quot;column&quot;:0,&quot;order&quot;:2,&quot;series&quot;:2,&quot;symbol&quot;:&quot;Workout Code&quot;,&quot;xsymbol&quot;:&quot;&quot;,&quot;ysymbol&quot;:&quot;&quot;,&quot;zsymbol&quot;:&quot;&quot; },\n    { &quot;type&quot;:3,&quot;name&quot;:&quot;Duration&quot;,&quot;deep&quot;:9,&quot;column&quot;:0,&quot;order&quot;:3,&quot;series&quot;:2,&quot;symbol&quot;:&quot;workout_time&quot;,&quot;xsymbol&quot;:&quot;&quot;,&quot;ysymbol&quot;:&quot;&quot;,&quot;zsymbol&quot;:&quot;&quot; },\n    { &quot;type&quot;:4,&quot;name&quot;:&quot;Notes&quot;,&quot;deep&quot;:13,&quot;column&quot;:0,&quot;order&quot;:4,&quot;series&quot;:637927936,&quot;symbol&quot;:&quot;Notes&quot;,&quot;xsymbol&quot;:&quot;&quot;,&quot;ysymbol&quot;:&quot;&quot;,&quot;zsymbol&quot;:&quot;&quot; },\n    { &quot;type&quot;:3,&quot;name&quot;:&quot;HRV rMSSD&quot;,&quot;deep&quot;:9,&quot;column&quot;:1,&quot;order&quot;:0,&quot;series&quot;:5,&quot;symbol&quot;:&quot;rMSSD&quot;,&quot;xsymbol&quot;:&quot;&quot;,&quot;ysymbol&quot;:&quot;&quot;,&quot;zsymbol&quot;:&quot;&quot; },\n    { &quot;type&quot;:3,&quot;name&quot;:&quot;Heartrate&quot;,&quot;deep&quot;:5,&quot;column&quot;:1,&quot;order&quot;:1,&quot;series&quot;:0,&quot;symbol&quot;:&quot;average_hr&quot;,&quot;xsymbol&quot;:&quot;&quot;,&quot;ysymbol&quot;:&quot;&quot;,&quot;zsymbol&quot;:&quot;&quot; },\n    { &quot;type&quot;:9,&quot;name&quot;:&quot;Heartrate Zones&quot;,&quot;deep&quot;:11,&quot;column&quot;:1,&quot;order&quot;:2,&quot;series&quot;:3,&quot;symbol&quot;:&quot;&quot;,&quot;xsymbol&quot;:&quot;&quot;,&quot;ysymbol&quot;:&quot;&quot;,&quot;zsymbol&quot;:&quot;&quot; },\n    { &quot;type&quot;:3,&quot;name&quot;:&quot;Climbing&quot;,&quot;deep&quot;:5,&quot;column&quot;:1,&quot;order&quot;:3,&quot;series&quot;:47,&quot;symbol&quot;:&quot;elevation_gain&quot;,&quot;xsymbol&quot;:&quot;&quot;,&quot;ysymbol&quot;:&quot;&quot;,&quot;zsymbol&quot;:&quot;&quot; },\n    { &quot;type&quot;:3,&quot;name&quot;:&quot;Cadence&quot;,&quot;deep&quot;:5,&quot;column&quot;:1,&quot;order&quot;:4,&quot;series&quot;:0,&quot;symbol&quot;:&quot;average_cad&quot;,&quot;xsymbol&quot;:&quot;&quot;,&quot;ysymbol&quot;:&quot;&quot;,&quot;zsymbol&quot;:&quot;&quot; },\n    { &quot;type&quot;:3,&quot;name&quot;:&quot;Equivalent Power&quot;,&quot;deep&quot;:5,&quot;column&quot;:1,&quot;order&quot;:5,&quot;series&quot;:0,&quot;symbol&quot;:&quot;coggan_np&quot;,&quot;xsymbol&quot;:&quot;&quot;,&quot;ysymbol&quot;:&quot;&quot;,&quot;zsymbol&quot;:&quot;&quot; },\n    { &quot;type&quot;:1,&quot;name&quot;:&quot;RPE&quot;,&quot;deep&quot;:9,&quot;column&quot;:2,&quot;order&quot;:0,&quot;series&quot;:0,&quot;symbol&quot;:&quot;RPE&quot;,&quot;xsymbol&quot;:&quot;&quot;,&quot;ysymbol&quot;:&quot;&quot;,&quot;zsymbol&quot;:&quot;&quot; },\n    { &quot;type&quot;:3,&quot;name&quot;:&quot;Stress&quot;,&quot;deep&quot;:5,&quot;column&quot;:2,&quot;order&quot;:1,&quot;series&quot;:0,&quot;symbol&quot;:&quot;coggan_tss&quot;,&quot;xsymbol&quot;:&quot;&quot;,&quot;ysymbol&quot;:&quot;&quot;,&quot;zsymbol&quot;:&quot;&quot; },\n    { &quot;type&quot;:9,&quot;name&quot;:&quot;Fatigue Zones&quot;,&quot;deep&quot;:11,&quot;column&quot;:2,&quot;order&quot;:2,&quot;series&quot;:50,&quot;symbol&quot;:&quot;&quot;,&quot;xsymbol&quot;:&quot;&quot;,&quot;ysymbol&quot;:&quot;&quot;,&quot;zsymbol&quot;:&quot;&quot; },\n    { &quot;type&quot;:8,&quot;name&quot;:&quot;Intervals&quot;,&quot;deep&quot;:17,&quot;column&quot;:2,&quot;order&quot;:3,&quot;series&quot;:0,&quot;symbol&quot;:&quot;&quot;,&quot;xsymbol&quot;:&quot;elapsed_time&quot;,&quot;ysymbol&quot;:&quot;average_power&quot;,&quot;zsymbol&quot;:&quot;workout_time&quot; },\n    { &quot;type&quot;:3,&quot;name&quot;:&quot;Intensity&quot;,&quot;deep&quot;:9,&quot;column&quot;:3,&quot;order&quot;:0,&quot;series&quot;:-16777216,&quot;symbol&quot;:&quot;coggan_if&quot;,&quot;xsymbol&quot;:&quot;&quot;,&quot;ysymbol&quot;:&quot;&quot;,&quot;zsymbol&quot;:&quot;&quot; },\n    { &quot;type&quot;:3,&quot;name&quot;:&quot;Power&quot;,&quot;deep&quot;:5,&quot;column&quot;:3,&quot;order&quot;:1,&quot;series&quot;:0,&quot;symbol&quot;:&quot;average_power&quot;,&quot;xsymbol&quot;:&quot;&quot;,&quot;ysymbol&quot;:&quot;&quot;,&quot;zsymbol&quot;:&quot;&quot; },\n    { &quot;type&quot;:9,&quot;name&quot;:&quot;Power Zones&quot;,&quot;deep&quot;:11,&quot;column&quot;:3,&quot;order&quot;:2,&quot;series&quot;:10,&quot;symbol&quot;:&quot;&quot;,&quot;xsymbol&quot;:&quot;&quot;,&quot;ysymbol&quot;:&quot;&quot;,&quot;zsymbol&quot;:&quot;&quot; },\n    { &quot;type&quot;:0,&quot;name&quot;:&quot;Power Model&quot;,&quot;deep&quot;:17,&quot;column&quot;:3,&quot;order&quot;:3,&quot;series&quot;:-16777216,&quot;symbol&quot;:&quot;&quot;,&quot;xsymbol&quot;:&quot;&quot;,&quot;ysymbol&quot;:&quot;&quot;,&quot;zsymbol&quot;:&quot;&quot; },\n    { &quot;type&quot;:3,&quot;name&quot;:&quot;Distance&quot;,&quot;deep&quot;:9,&quot;column&quot;:4,&quot;order&quot;:0,&quot;series&quot;:-16777216,&quot;symbol&quot;:&quot;total_distance&quot;,&quot;xsymbol&quot;:&quot;&quot;,&quot;ysymbol&quot;:&quot;&quot;,&quot;zsymbol&quot;:&quot;&quot; },\n    { &quot;type&quot;:3,&quot;name&quot;:&quot;Speed&quot;,&quot;deep&quot;:5,&quot;column&quot;:4,&quot;order&quot;:1,&quot;series&quot;:-16777216,&quot;symbol&quot;:&quot;average_speed&quot;,&quot;xsymbol&quot;:&quot;&quot;,&quot;ysymbol&quot;:&quot;&quot;,&quot;zsymbol&quot;:&quot;&quot; },\n    { &quot;type&quot;:9,&quot;name&quot;:&quot;Pace Zones&quot;,&quot;deep&quot;:11,&quot;column&quot;:4,&quot;order&quot;:2,&quot;series&quot;:6,&quot;symbol&quot;:&quot;&quot;,&quot;xsymbol&quot;:&quot;&quot;,&quot;ysymbol&quot;:&quot;&quot;,&quot;zsymbol&quot;:&quot;&quot; },\n    { &quot;type&quot;:2,&quot;name&quot;:&quot;Route&quot;,&quot;deep&quot;:17,&quot;column&quot;:4,&quot;order&quot;:3,&quot;series&quot;:0,&quot;symbol&quot;:&quot;&quot;,&quot;xsymbol&quot;:&quot;&quot;,&quot;ysymbol&quot;:&quot;&quot;,&quot;zsymbol&quot;:&quot;&quot; }\n  ]\n}\n" />
+		<property name="config" type="QString" value="{\n  &quot;version&quot;:&quot;2.0&quot;,\n  &quot;widths&quot;:[ 1200, 1200, 1200, 1200, 1200, 1200, 1200, 1200, 1200, 1200 ],\n  &quot;CHARTS&quot;:[\n    { &quot;type&quot;:101,&quot;span&quot;:1,&quot;deep&quot;:5,&quot;column&quot;:0,&quot;order&quot;:3,&quot;color&quot;:&quot;#010161&quot;,&quot;symbol&quot;:&quot;activity_date&quot;,&quot;datafilter&quot;:&quot; &quot;,&quot;name&quot;:&quot;Date&quot; },\n    { &quot;type&quot;:102,&quot;span&quot;:1,&quot;deep&quot;:5,&quot;column&quot;:0,&quot;order&quot;:8,&quot;color&quot;:&quot;#010161&quot;,&quot;symbol&quot;:&quot;Sport&quot;,&quot;datafilter&quot;:&quot; &quot;,&quot;name&quot;:&quot;Sport&quot; },\n    { &quot;type&quot;:102,&quot;span&quot;:1,&quot;deep&quot;:5,&quot;column&quot;:0,&quot;order&quot;:13,&quot;color&quot;:&quot;#010161&quot;,&quot;symbol&quot;:&quot;Workout Code&quot;,&quot;datafilter&quot;:&quot; &quot;,&quot;name&quot;:&quot;Workout Code&quot; },\n    { &quot;type&quot;:102,&quot;span&quot;:1,&quot;deep&quot;:32,&quot;column&quot;:0,&quot;order&quot;:35,&quot;color&quot;:&quot;#010161&quot;,&quot;symbol&quot;:&quot;Notes&quot;,&quot;datafilter&quot;:&quot; &quot;,&quot;name&quot;:&quot;Notes&quot; },\n    { &quot;type&quot;:104,&quot;span&quot;:2,&quot;deep&quot;:25,&quot;column&quot;:0,&quot;order&quot;:68,&quot;color&quot;:&quot;#010161&quot;,&quot;xsymbol&quot;:&quot;elapsed_time&quot;,&quot;ysymbol&quot;:&quot;average_power&quot;,&quot;zsymbol&quot;:&quot;workout_time&quot;,&quot;datafilter&quot;:&quot; &quot;,&quot;name&quot;:&quot;Intervals Average Power&quot; },\n    { &quot;type&quot;:104,&quot;span&quot;:2,&quot;deep&quot;:24,&quot;column&quot;:0,&quot;order&quot;:70,&quot;color&quot;:&quot;#010161&quot;,&quot;xsymbol&quot;:&quot;elapsed_time&quot;,&quot;ysymbol&quot;:&quot;power_index&quot;,&quot;zsymbol&quot;:&quot;workout_time&quot;,&quot;datafilter&quot;:&quot; &quot;,&quot;name&quot;:&quot;Intervals Power Index&quot; },\n    { &quot;type&quot;:112,&quot;span&quot;:1,&quot;deep&quot;:12,&quot;column&quot;:1,&quot;order&quot;:29,&quot;color&quot;:&quot;#010161&quot;,&quot;program&quot;:&quot;{:sl:n:sl:n# column names, if using metrics then best:sl:n# to use name() to get correct name for locale:sl:n# otherwise it won&apos;t translate to other languages:sl:nnames { :sl:n    metricname(Duration,:sl:n         Time_Moving,:sl:n         Distance,:sl:n         Work,:sl:n         W&apos;_Work,:sl:n         Elevation_Gain);:sl:n}:sl:n:sl:n# column units, if using metrics then best:sl:n# to use unit() function to get correct string:sl:n# for locale and metric:sl:/imperial:sl:nunits { :sl:n    metricunit(Duration,:sl:n         Time_Moving,:sl:n         Distance,:sl:n         Work,:sl:n         W&apos;_Work,:sl:n         Elevation_Gain);:sl:n}:sl:n:sl:n# values to display as doubles or strings:sl:n# if using metrics always best to use asstring():sl:n# to convert correctly with dp, metric:sl:/imperial:sl:n# or specific formats eg. rowing pace xx:sl:/500m:sl:nvalues { :sl:n    asstring(Duration,:sl:n             Time_Moving,:sl:n             Distance,:sl:n             Work,:sl:n             W&apos;_Work,:sl:n             Elevation_Gain); :sl:n} :sl:n:sl:n}:sl:n &quot;,&quot;sortcolumn&quot;:-1,&quot;sortorder&quot;:0,&quot;datafilter&quot;:&quot; &quot;,&quot;name&quot;:&quot;Totals&quot; },\n    { &quot;type&quot;:112,&quot;span&quot;:1,&quot;deep&quot;:12,&quot;column&quot;:1,&quot;order&quot;:54,&quot;color&quot;:&quot;#010161&quot;,&quot;program&quot;:&quot;{:sl:n:sl:n# column names, if using metrics then best:sl:n# to use name() to get correct name for locale:sl:n# otherwise it won&apos;t translate to other languages:sl:nnames { :sl:n    metricname(Athlete_Weight,:sl:n         Average_Speed,:sl:n         Average_Power,:sl:n         Average_Heart_Rate,:sl:n         Average_Cadence);:sl:n}:sl:n:sl:n# column units, if using metrics then best:sl:n# to use unit() function to get correct string:sl:n# for locale and metric:sl:/imperial:sl:nunits { :sl:n    metricunit(Athlete_Weight,:sl:n         Average_Speed,:sl:n         Average_Power,:sl:n         Average_Heart_Rate,:sl:n         Average_Cadence);:sl:n}:sl:n:sl:n# values to display as doubles or strings:sl:n# if using metrics always best to use asstring():sl:n# to convert correctly with dp, metric:sl:/imperial:sl:n# or specific formats eg. rowing pace xx:sl:/500m:sl:nvalues { :sl:n    asstring(Athlete_Weight,:sl:n         Average_Speed,:sl:n         Average_Power,:sl:n         Average_Heart_Rate,:sl:n         Average_Cadence); :sl:n} :sl:n:sl:n}:sl:n &quot;,&quot;sortcolumn&quot;:-1,&quot;sortorder&quot;:0,&quot;datafilter&quot;:&quot; &quot;,&quot;name&quot;:&quot;Averages&quot; },\n    { &quot;type&quot;:112,&quot;span&quot;:1,&quot;deep&quot;:11,&quot;column&quot;:1,&quot;order&quot;:55,&quot;color&quot;:&quot;#010161&quot;,&quot;program&quot;:&quot;{:sl:n:sl:n# column names, if using metrics then best:sl:n# to use name() to get correct name for locale:sl:n# otherwise it won&apos;t translate to other languages:sl:nnames { :sl:n    metricname(Max_Speed,:sl:n         Max_Power,:sl:n         Max_Heartrate,:sl:n         Max_Cadence,:sl:n         Max_W&apos;_Expended);:sl:n}:sl:n:sl:n# column units, if using metrics then best:sl:n# to use unit() function to get correct string:sl:n# for locale and metric:sl:/imperial:sl:nunits { :sl:n    metricunit(Max_Speed,:sl:n         Max_Power,:sl:n         Max_Heartrate,:sl:n         Max_Cadence,:sl:n         Max_W&apos;_Expended);:sl:n}:sl:n:sl:n# values to display as doubles or strings:sl:n# if using metrics always best to use asstring():sl:n# to convert correctly with dp, metric:sl:/imperial:sl:n# or specific formats eg. rowing pace xx:sl:/500m:sl:nvalues { :sl:n    asstring(Max_Speed,:sl:n         Max_Power,:sl:n         Max_Heartrate,:sl:n         Max_Cadence,:sl:n         Max_W&apos;_Expended); :sl:n} :sl:n:sl:n}:sl:n &quot;,&quot;sortcolumn&quot;:-1,&quot;sortorder&quot;:0,&quot;datafilter&quot;:&quot; &quot;,&quot;name&quot;:&quot;Maximum&quot; },\n    { &quot;type&quot;:112,&quot;span&quot;:1,&quot;deep&quot;:12,&quot;column&quot;:1,&quot;order&quot;:125,&quot;color&quot;:&quot;#010161&quot;,&quot;program&quot;:&quot;{:sl:n:sl:n# column names, if using metrics then best:sl:n# to use name() to get correct name for locale:sl:n# otherwise it won&apos;t translate to other languages:sl:nnames { :sl:n    metricname(IsoPower,:sl:n              BikeIntensity,:sl:n              VI,:sl:n              Efficiency_Factor,:sl:n              Aerobic_Decoupling,:sl:n              Power_Index);:sl:n}:sl:n:sl:n# column units, if using metrics then best:sl:n# to use unit() function to get correct string:sl:n# for locale and metric:sl:/imperial:sl:nunits { :sl:n    metricunit(IsoPower,:sl:n              BikeIntensity,:sl:n              VI,:sl:n              Efficiency_Factor,:sl:n              Aerobic_Decoupling,:sl:n              Power_Index);:sl:n}:sl:n:sl:n# values to display as doubles or strings:sl:n# if using metrics always best to use asstring():sl:n# to convert correctly with dp, metric:sl:/imperial:sl:n# or specific formats eg. rowing pace xx:sl:/500m:sl:nvalues { :sl:n    asstring(IsoPower,:sl:n              BikeIntensity,:sl:n              VI,:sl:n              Efficiency_Factor,:sl:n              Aerobic_Decoupling,:sl:n              Power_Index);:sl:n} :sl:n:sl:n}:sl:n &quot;,&quot;sortcolumn&quot;:-1,&quot;sortorder&quot;:0,&quot;datafilter&quot;:&quot; &quot;,&quot;name&quot;:&quot;Metrics&quot; },\n    { &quot;type&quot;:100,&quot;span&quot;:1,&quot;deep&quot;:7,&quot;column&quot;:2,&quot;order&quot;:201,&quot;color&quot;:&quot;#010161&quot;,&quot;datafilter&quot;:&quot; &quot;,&quot;name&quot;:&quot;RPE&quot; },\n    { &quot;type&quot;:113,&quot;span&quot;:4,&quot;deep&quot;:17,&quot;column&quot;:2,&quot;order&quot;:213,&quot;settings&quot;:&quot;{ \&quot;title\&quot;: \&quot; \&quot;,\n\&quot;description\&quot;: \&quot;A description of the chart, mostly useful when the chart is uploaded to the cloud to let others know what this chart is useful for etc. \&quot;,\n\&quot;type\&quot;: 1,\n\&quot;animate\&quot;: false,\n\&quot;intervalrefresh\&quot;: false,\n\&quot;legendpos\&quot;: 2,\n\&quot;stack\&quot;: false,\n\&quot;orientation\&quot;: 2,\n\&quot;bgcolor\&quot;: \&quot;#010161\&quot;, \n\&quot;scale\&quot;: 2.5,\n\&quot;SERIES\&quot;: [\n{ \&quot;name\&quot;: \&quot;Power \&quot;, \&quot;group\&quot;: \&quot; \&quot;, \&quot;xname\&quot;: \&quot;Elapsed Time \&quot;, \&quot;yname\&quot;: \&quot;watts \&quot;, \&quot;program\&quot;: \&quot;{:sl:n    finalise {:sl:n        # we just fetch samples at end:sl:n        xx &lt;- samples(SECS);:sl:n        yy &lt;- samples(POWER);:sl:n    }:sl:n:sl:n    x { xx; }:sl:n    y { yy; }:sl:n}:sl:n \&quot;, \&quot;line\&quot;: 1, \&quot;symbol\&quot;: 0, \&quot;size\&quot;: 3, \&quot;color\&quot;: \&quot;#010112\&quot;, \&quot;opacity\&quot;: 100, \&quot;legend\&quot;: true, \&quot;opengl\&quot;: true, \&quot;datalabels\&quot;: false, \&quot;aggregate\&quot;: 0, \&quot;fill\&quot;: true},\n{ \&quot;name\&quot;: \&quot;W&apos;balance \&quot;, \&quot;group\&quot;: \&quot; \&quot;, \&quot;xname\&quot;: \&quot;Elapsed Time \&quot;, \&quot;yname\&quot;: \&quot;kJ \&quot;, \&quot;program\&quot;: \&quot;{:sl:n    finalise {:sl:n        # we just fetch samples at end:sl:n        xx &lt;- samples(SECS);:sl:n        yy &lt;- samples(WBAL):sl:\/1000;:sl:n:sl:n                :sl:n    }:sl:n:sl:n    x { xx; }:sl:n    y { yy; }:sl:n}:sl:n \&quot;, \&quot;line\&quot;: 1, \&quot;symbol\&quot;: 0, \&quot;size\&quot;: 3, \&quot;color\&quot;: \&quot;#010157\&quot;, \&quot;opacity\&quot;: 75, \&quot;legend\&quot;: true, \&quot;opengl\&quot;: true, \&quot;datalabels\&quot;: false, \&quot;aggregate\&quot;: 0, \&quot;fill\&quot;: false} ]\n,\n\&quot;AXES\&quot;: [\n{ \&quot;name\&quot;: \&quot;Elapsed Time \&quot;, \&quot;type\&quot;: 2, \&quot;orientation\&quot;: 1, \&quot;align\&quot;: 1, \&quot;minx\&quot;: 0, \&quot;maxx\&quot;: 0, \&quot;miny\&quot;: 0, \&quot;maxy\&quot;: 0, \&quot;smooth\&quot;: 7, \&quot;groupby\&quot;: 0, \&quot;visible\&quot;: true, \&quot;fixed\&quot;: false, \&quot;log\&quot;: false, \&quot;minorgrid\&quot;: false, \&quot;majorgrid\&quot;: true, \&quot;labelcolor\&quot;: \&quot;#2684f6\&quot;, \&quot;axiscolor\&quot;: \&quot;#2684f6\&quot;},\n{ \&quot;name\&quot;: \&quot;watts \&quot;, \&quot;type\&quot;: 0, \&quot;orientation\&quot;: 2, \&quot;align\&quot;: 1, \&quot;minx\&quot;: 0, \&quot;maxx\&quot;: 0, \&quot;miny\&quot;: 0, \&quot;maxy\&quot;: 1000, \&quot;smooth\&quot;: 0, \&quot;groupby\&quot;: 0, \&quot;visible\&quot;: true, \&quot;fixed\&quot;: false, \&quot;log\&quot;: false, \&quot;minorgrid\&quot;: false, \&quot;majorgrid\&quot;: true, \&quot;labelcolor\&quot;: \&quot;#010112\&quot;, \&quot;axiscolor\&quot;: \&quot;#010112\&quot;},\n{ \&quot;name\&quot;: \&quot;kJ \&quot;, \&quot;type\&quot;: 0, \&quot;orientation\&quot;: 2, \&quot;align\&quot;: 1, \&quot;minx\&quot;: 0, \&quot;maxx\&quot;: 0, \&quot;miny\&quot;: 0, \&quot;maxy\&quot;: 18, \&quot;smooth\&quot;: 0, \&quot;groupby\&quot;: 0, \&quot;visible\&quot;: true, \&quot;fixed\&quot;: false, \&quot;log\&quot;: false, \&quot;minorgrid\&quot;: false, \&quot;majorgrid\&quot;: true, \&quot;labelcolor\&quot;: \&quot;#010157\&quot;, \&quot;axiscolor\&quot;: \&quot;#010157\&quot;} ]\n} &quot;,&quot;datafilter&quot;:&quot; &quot;,&quot;name&quot;:&quot;Power and W&apos;balance&quot; },\n    { &quot;type&quot;:112,&quot;span&quot;:2,&quot;deep&quot;:12,&quot;column&quot;:2,&quot;order&quot;:214,&quot;color&quot;:&quot;#010161&quot;,&quot;program&quot;:&quot;{:sl:n:sl:n# column names, if using metrics then best:sl:n# to use metricname() to get correct name for locale:sl:n# otherwise it won&apos;t translate to other languages:sl:nnames { :sl:n    c(:qu:Name:qu:,:qu:Description:qu:,:qu:Low:qu:,:qu:High:qu:,:qu:Time:qu:,:qu:%:qu:);:sl:n}:sl:n:sl:n# column units, if using metrics then best:sl:n# to use metricunit() function to get correct string:sl:n# for locale and metric:sl:/imperial:sl:nunits {:sl:n:sl:n    c(:qu::qu:,:sl:n      :qu::qu:,:sl:n      zones(power,units),:sl:n      zones(power,units), :qu::qu:, :qu::qu:);:sl:n}:sl:n:sl:n# values to display as doubles or strings:sl:n# if using metrics always best to use asstring():sl:n# to convert correctly with dp, metric:sl:/imperial:sl:n# or specific formats eg. rowing pace xx:sl:/500m:sl:nvalues { :sl:n:sl:n   c( zones(power,name),:sl:n      zones(power,description),:sl:n      zones(power,low),:sl:n      zones(power,high),:sl:n      zones(power,time),:sl:n      zones(power,percent));:sl:n} :sl:n:sl:n}:sl:n &quot;,&quot;sortcolumn&quot;:-1,&quot;sortorder&quot;:0,&quot;datafilter&quot;:&quot; &quot;,&quot;name&quot;:&quot;Power Zones&quot; },\n    { &quot;type&quot;:103,&quot;span&quot;:1,&quot;deep&quot;:11,&quot;column&quot;:2,&quot;order&quot;:1720,&quot;color&quot;:&quot;#010161&quot;,&quot;series&quot;:50,&quot;polarized&quot;:0,&quot;datafilter&quot;:&quot; &quot;,&quot;name&quot;:&quot;Fatigue Zones&quot; },\n    { &quot;type&quot;:112,&quot;span&quot;:4,&quot;deep&quot;:50,&quot;column&quot;:2,&quot;order&quot;:1760,&quot;color&quot;:&quot;#010161&quot;,&quot;program&quot;:&quot;{:sl:n:sl:n# column names, if using metrics then best:sl:n# to use metricname() to get correct name for locale:sl:n# otherwise it won&apos;t translate to other languages:sl:nnames { :sl:n    metricname(type, name,:sl:n              Average_Power,:sl:n              Distance,:sl:n              Duration,:sl:n              Fatigue_Index,:sl:n              Power_Index,:sl:n              W&apos;_Work,:sl:n              Work);:sl:n}:sl:n:sl:n# column units, if using metrics then best:sl:n# to use metricunit() function to get correct string:sl:n# for locale and metric:sl:/imperial:sl:nunits { :sl:n    metricunit(type, name,:sl:n              Average_Power,:sl:n              Distance,:sl:n              Duration,:sl:n              Fatigue_Index,:sl:n              Power_Index,:sl:n              W&apos;_Work,:sl:n              Work);:sl:n}:sl:n:sl:n# values to display as doubles or strings:sl:n# if using metrics always best to use asstring():sl:n# to convert correctly with dp, metric:sl:/imperial:sl:n# or specific formats eg. rowing pace xx:sl:/500m:sl:nvalues { :sl:n    c(intervalstrings(type),:sl:n      intervalstrings(name),:sl:n      intervalstrings(Average_Power),:sl:n      intervalstrings(Distance),:sl:n      intervalstrings(Duration),:sl:n      intervalstrings(Fatigue_Index),:sl:n      intervalstrings(Power_Index),:sl:n      intervalstrings(W&apos;_Work),:sl:n      intervalstrings(Work));:sl:n}:sl:n:sl:n}:sl:n &quot;,&quot;sortcolumn&quot;:-1,&quot;sortorder&quot;:0,&quot;datafilter&quot;:&quot; &quot;,&quot;name&quot;:&quot;Intervals&quot; },\n    { &quot;type&quot;:107,&quot;span&quot;:1,&quot;deep&quot;:7,&quot;column&quot;:3,&quot;order&quot;:453,&quot;color&quot;:&quot;#010161&quot;,&quot;program&quot;:&quot;{ round(config(weight)*10):sl:/10; } &quot;,&quot;units&quot;:&quot;kg&quot;,&quot;istime&quot;:0,&quot;start&quot;:99.3,&quot;stop&quot;:85,&quot;datafilter&quot;:&quot; &quot;,&quot;name&quot;:&quot;Weight&quot; },\n    { &quot;type&quot;:112,&quot;span&quot;:2,&quot;deep&quot;:11,&quot;column&quot;:3,&quot;order&quot;:457,&quot;color&quot;:&quot;#010161&quot;,&quot;program&quot;:&quot;{:sl:n:sl:n# column names, if using metrics then best:sl:n# to use name() to get correct name for locale:sl:n# otherwise it won&apos;t translate to other languages:sl:nnames { :sl:n    c(:qu:Name:qu:,:qu:Description:qu:,:qu:Low:qu:,:sl:n      :qu:High:qu:, :qu:Time:qu:, :qu:%:qu:);:sl:n}:sl:n:sl:n# column units, if using metrics then best:sl:n# to use unit() function to get correct string:sl:n# for locale and metric:sl:/imperial:sl:nunits {:sl:n:sl:n    c(:qu::qu:,:sl:n      :qu::qu:,:sl:n      zones(fatigue,units),:sl:n      zones(fatigue,units),:qu::qu:, :qu::qu:);:sl:n}:sl:n:sl:n# values to display as doubles or strings:sl:n# if using metrics always best to use asstring():sl:n# to convert correctly with dp, metric:sl:/imperial:sl:n# or specific formats eg. rowing pace xx:sl:/500m:sl:nvalues { :sl:n:sl:n   c( zones(fatigue,name),:sl:n      zones(fatigue,description),:sl:n      zones(fatigue,low),:sl:n      zones(fatigue,high),:sl:n      zones(fatigue,time),:sl:n      zones(fatigue,percent));:sl:n} :sl:n:sl:n}:sl:n &quot;,&quot;sortcolumn&quot;:-1,&quot;sortorder&quot;:0,&quot;datafilter&quot;:&quot; &quot;,&quot;name&quot;:&quot;Fatigue Zones&quot; },\n    { &quot;type&quot;:107,&quot;span&quot;:1,&quot;deep&quot;:7,&quot;column&quot;:4,&quot;order&quot;:17,&quot;color&quot;:&quot;#010161&quot;,&quot;program&quot;:&quot;{ cp&lt;-config(cp);:sl:n  tabove &lt;- count(samples(POWER)[x&gt;cp]);:sl:n  round((tabove :sl:/ Duration) * 100.0);:sl:n} &quot;,&quot;units&quot;:&quot;%&quot;,&quot;istime&quot;:0,&quot;start&quot;:0,&quot;stop&quot;:100,&quot;datafilter&quot;:&quot; &quot;,&quot;name&quot;:&quot;Time above CP&quot; },\n    { &quot;type&quot;:103,&quot;span&quot;:1,&quot;deep&quot;:12,&quot;column&quot;:4,&quot;order&quot;:18,&quot;color&quot;:&quot;#010161&quot;,&quot;series&quot;:10,&quot;polarized&quot;:0,&quot;datafilter&quot;:&quot; &quot;,&quot;name&quot;:&quot;Power Zones&quot; },\n    { &quot;type&quot;:107,&quot;span&quot;:1,&quot;deep&quot;:7,&quot;column&quot;:5,&quot;order&quot;:1487,&quot;color&quot;:&quot;#010161&quot;,&quot;program&quot;:&quot;{:sl:n est &lt;- round((estimate(cp3,cp) +:sl:n              estimate(cp2,cp) +:sl:n              estimate(ext,cp)):sl:/3);:sl:n} &quot;,&quot;units&quot;:&quot;watts&quot;,&quot;istime&quot;:0,&quot;start&quot;:0,&quot;stop&quot;:360,&quot;datafilter&quot;:&quot; &quot;,&quot;name&quot;:&quot;CP Estimate&quot; },\n    { &quot;type&quot;:107,&quot;span&quot;:1,&quot;deep&quot;:9,&quot;column&quot;:5,&quot;order&quot;:1497,&quot;color&quot;:&quot;#010161&quot;,&quot;program&quot;:&quot;{:sl:n est &lt;- round((estimate(cp3,w&apos;) +:sl:n              estimate(cp2,w&apos;) +:sl:n              estimate(ext,w&apos;)):sl:/3000);:sl:n} &quot;,&quot;units&quot;:&quot;kJ&quot;,&quot;istime&quot;:0,&quot;start&quot;:5,&quot;stop&quot;:45,&quot;datafilter&quot;:&quot; &quot;,&quot;name&quot;:&quot;W&apos; Estimate&quot; },\n    { &quot;type&quot;:101,&quot;span&quot;:1,&quot;deep&quot;:7,&quot;column&quot;:5,&quot;order&quot;:1498,&quot;color&quot;:&quot;#010161&quot;,&quot;symbol&quot;:&quot;coggan_tss&quot;,&quot;datafilter&quot;:&quot; &quot;,&quot;name&quot;:&quot;TSS&quot; },\n    { &quot;type&quot;:101,&quot;span&quot;:1,&quot;deep&quot;:6,&quot;column&quot;:5,&quot;order&quot;:1522,&quot;color&quot;:&quot;#010161&quot;,&quot;symbol&quot;:&quot;coggan_np&quot;,&quot;datafilter&quot;:&quot; &quot;,&quot;name&quot;:&quot;NP&quot; }\n  ]\n}\n" />
+		<property name="minimumColumns" type="int" value="5" />
 	</chart>
-	<chart id="23" name="" title="Details" >
-		<property name="title" type="QString" value="Details" />
+	<chart id="23" name="" title="Data" >
+		<property name="title" type="QString" value="Data" />
 		<property name="subtitle" type="QString" value="" />
 		<property name="widthFactor" type="double" value="2" />
 		<property name="heightFactor" type="double" value="2" />
@@ -29,7 +30,8 @@
 		<property name="stackWidth" type="int" value="5" />
 		<property name="showGrid" type="int" value="0" />
 		<property name="showFull" type="int" value="0" />
-		<property name="showInterval" type="int" value="2" />
+		<property name="showIntervalMarkers" type="int" value="2" />
+		<property name="showIntervalNavigator" type="int" value="2" />
 		<property name="hovering" type="int" value="1" />
 		<property name="showHelp" type="int" value="0" />
 		<property name="showATISS" type="int" value="0" />
@@ -117,54 +119,9 @@
 		<property name="ridePlotMode" type="int" value="0" />
 		<property name="useSelected" type="int" value="0" />
 	</chart>
-	<chart id="3" name="" title="CV" >
-		<property name="title" type="QString" value="CV" />
-		<property name="subtitle" type="QString" value="" />
-		<property name="widthFactor" type="double" value="2" />
-		<property name="heightFactor" type="double" value="2" />
-		<property name="style" type="int" value="0" />
-		<property name="resizable" type="bool" value="0" />
-		<property name="filter" type="QString" value="search:" />
-		<property name="mode" type="int" value="5" />
-		<property name="showBest" type="bool" value="1" />
-		<property name="showTest" type="bool" value="1" />
-		<property name="filterBest" type="bool" value="0" />
-		<property name="showPercent" type="bool" value="0" />
-		<property name="showPowerIndex" type="bool" value="0" />
-		<property name="showGrid" type="bool" value="1" />
-		<property name="season" type="QString" value="Last 2 months" />
-		<property name="cpmodel" type="int" value="-1" />
-		<property name="fit" type="int" value="1" />
-		<property name="fitdata" type="int" value="1" />
-		<property name="variant" type="int" value="0" />
-		<property name="modelDecay" type="bool" value="0" />
-		<property name="ani1" type="int" value="100" />
-		<property name="ani2" type="int" value="120" />
-		<property name="aei1" type="int" value="1000" />
-		<property name="aei2" type="int" value="1200" />
-		<property name="sani1" type="int" value="20" />
-		<property name="sani2" type="int" value="90" />
-		<property name="laei1" type="int" value="3000" />
-		<property name="laei2" type="int" value="30000" />
-		<property name="showPP" type="bool" value="0" />
-		<property name="fromDate" type="QDate" value="Sat Jan 1 2000" />
-		<property name="toDate" type="QDate" value="Sat Jan 1 2000" />
-		<property name="startDate" type="QDate" value="Thu Oct 10 2019" />
-		<property name="lastN" type="int" value="7" />
-		<property name="lastNX" type="int" value="0" />
-		<property name="prevN" type="int" value="0" />
-		<property name="shading" type="int" value="1" />
-		<property name="showEffort" type="bool" value="0" />
-		<property name="showHeat" type="bool" value="0" />
-		<property name="showHeatByDate" type="bool" value="0" />
-		<property name="showCSLinear" type="bool" value="1" />
-		<property name="shadeIntervals" type="int" value="1" />
-		<property name="ridePlotMode" type="int" value="0" />
-		<property name="useSelected" type="int" value="0" />
-	</chart>
 	<chart id="37" name="" title="Map" >
 		<property name="title" type="QString" value="Map" />
-		<property name="subtitle" type="QString" value="Billingshurst Loop" />
+		<property name="subtitle" type="QString" value="Route" />
 		<property name="widthFactor" type="double" value="2" />
 		<property name="heightFactor" type="double" value="2" />
 		<property name="style" type="int" value="0" />
@@ -173,6 +130,9 @@
 		<property name="showmarkers" type="bool" value="0" />
 		<property name="showfullplot" type="bool" value="0" />
 		<property name="showintervals" type="bool" value="1" />
+		<property name="hideShadedZones" type="bool" value="0" />
+		<property name="hideYellowLine" type="bool" value="0" />
+		<property name="hideRouteLineOpacity" type="bool" value="0" />
 		<property name="osmts" type="int" value="0" />
 		<property name="googleKey" type="QString" value="" />
 	</chart>
@@ -188,7 +148,8 @@
 		<property name="stackWidth" type="int" value="5" />
 		<property name="showGrid" type="int" value="0" />
 		<property name="showFull" type="int" value="0" />
-		<property name="showInterval" type="int" value="2" />
+		<property name="showIntervalMarkers" type="int" value="2" />
+		<property name="showIntervalNavigator" type="int" value="2" />
 		<property name="hovering" type="int" value="1" />
 		<property name="showHelp" type="int" value="0" />
 		<property name="showATISS" type="int" value="0" />
@@ -238,8 +199,8 @@
 		<property name="heightFactor" type="double" value="2.38095" />
 		<property name="style" type="int" value="0" />
 		<property name="resizable" type="bool" value="0" />
-		<property name="watts" type="QString" value="210" />
-		<property name="rpm" type="QString" value="76" />
+		<property name="watts" type="QString" value="238" />
+		<property name="rpm" type="QString" value="68" />
 		<property name="crank" type="QString" value="0.1725" />
 		<property name="shade" type="bool" value="0" />
 		<property name="merge" type="bool" value="0" />
@@ -260,6 +221,7 @@
 		<property name="shade" type="bool" value="1" />
 		<property name="zoned" type="bool" value="0" />
 		<property name="cpZoned" type="bool" value="0" />
+		<property name="zoneLimited" type="bool" value="0" />
 		<property name="filter" type="QString" value="search:" />
 		<property name="fromDate" type="QDate" value="Sat Jan 1 2000" />
 		<property name="toDate" type="QDate" value="Sat Jan 1 2000" />
@@ -274,6 +236,120 @@
 		<property name="bin" type="double" value="3" />
 		<property name="useSelected" type="int" value="0" />
 	</chart>
+	<chart id="6" name="" title="Heartrate" >
+		<property name="title" type="QString" value="Heartrate" />
+		<property name="subtitle" type="QString" value="" />
+		<property name="widthFactor" type="double" value="3.33333" />
+		<property name="heightFactor" type="double" value="3.33333" />
+		<property name="style" type="int" value="0" />
+		<property name="resizable" type="bool" value="0" />
+		<property name="series" type="int" value="2" />
+		<property name="percent" type="int" value="0" />
+		<property name="logY" type="bool" value="0" />
+		<property name="zeroes" type="bool" value="0" />
+		<property name="shade" type="bool" value="0" />
+		<property name="zoned" type="bool" value="0" />
+		<property name="cpZoned" type="bool" value="0" />
+		<property name="zoneLimited" type="bool" value="0" />
+		<property name="filter" type="QString" value="search:" />
+		<property name="fromDate" type="QDate" value="Sat Jan 1 2000" />
+		<property name="toDate" type="QDate" value="Sat Jan 1 2000" />
+		<property name="startDate" type="QDate" value="Thu Aug 15 2013" />
+		<property name="lastN" type="int" value="7" />
+		<property name="lastNX" type="int" value="0" />
+		<property name="prevN" type="int" value="0" />
+		<property name="plotColor" type="QString" value="#0000ff" />
+		<property name="distmetric" type="QString" value="workout_time" />
+		<property name="totalmetric" type="QString" value="ride_count" />
+		<property name="dataMode" type="bool" value="1" />
+		<property name="bin" type="double" value="1" />
+		<property name="useSelected" type="int" value="0" />
+	</chart>
+	<chart id="6" name="" title="Speed" >
+		<property name="title" type="QString" value="Speed" />
+		<property name="subtitle" type="QString" value="" />
+		<property name="widthFactor" type="double" value="2.94118" />
+		<property name="heightFactor" type="double" value="3.33333" />
+		<property name="style" type="int" value="0" />
+		<property name="resizable" type="bool" value="0" />
+		<property name="series" type="int" value="3" />
+		<property name="percent" type="int" value="0" />
+		<property name="logY" type="bool" value="0" />
+		<property name="zeroes" type="bool" value="0" />
+		<property name="shade" type="bool" value="1" />
+		<property name="zoned" type="bool" value="0" />
+		<property name="cpZoned" type="bool" value="0" />
+		<property name="zoneLimited" type="bool" value="0" />
+		<property name="filter" type="QString" value="search:" />
+		<property name="fromDate" type="QDate" value="Sat Jan 1 2000" />
+		<property name="toDate" type="QDate" value="Sat Jan 1 2000" />
+		<property name="startDate" type="QDate" value="Thu Aug 15 2013" />
+		<property name="lastN" type="int" value="7" />
+		<property name="lastNX" type="int" value="0" />
+		<property name="prevN" type="int" value="0" />
+		<property name="plotColor" type="QString" value="#0000ff" />
+		<property name="distmetric" type="QString" value="workout_time" />
+		<property name="totalmetric" type="QString" value="ride_count" />
+		<property name="dataMode" type="bool" value="1" />
+		<property name="bin" type="double" value="0.1" />
+		<property name="useSelected" type="int" value="0" />
+	</chart>
+	<chart id="6" name="" title="Cadence" >
+		<property name="title" type="QString" value="Cadence" />
+		<property name="subtitle" type="QString" value="" />
+		<property name="widthFactor" type="double" value="2.77778" />
+		<property name="heightFactor" type="double" value="3.33333" />
+		<property name="style" type="int" value="0" />
+		<property name="resizable" type="bool" value="0" />
+		<property name="series" type="int" value="4" />
+		<property name="percent" type="int" value="0" />
+		<property name="logY" type="bool" value="0" />
+		<property name="zeroes" type="bool" value="0" />
+		<property name="shade" type="bool" value="0" />
+		<property name="zoned" type="bool" value="0" />
+		<property name="cpZoned" type="bool" value="0" />
+		<property name="zoneLimited" type="bool" value="0" />
+		<property name="filter" type="QString" value="search:" />
+		<property name="fromDate" type="QDate" value="Sat Jan 1 2000" />
+		<property name="toDate" type="QDate" value="Sat Jan 1 2000" />
+		<property name="startDate" type="QDate" value="Thu Aug 15 2013" />
+		<property name="lastN" type="int" value="7" />
+		<property name="lastNX" type="int" value="0" />
+		<property name="prevN" type="int" value="0" />
+		<property name="plotColor" type="QString" value="#0000ff" />
+		<property name="distmetric" type="QString" value="workout_time" />
+		<property name="totalmetric" type="QString" value="ride_count" />
+		<property name="dataMode" type="bool" value="1" />
+		<property name="bin" type="double" value="1" />
+		<property name="useSelected" type="int" value="0" />
+	</chart>
+	<chart id="15" name="" title="Scatter" >
+		<property name="title" type="QString" value="Scatter" />
+		<property name="subtitle" type="QString" value="" />
+		<property name="widthFactor" type="double" value="2" />
+		<property name="heightFactor" type="double" value="2.77778" />
+		<property name="style" type="int" value="0" />
+		<property name="resizable" type="bool" value="0" />
+		<property name="xseries" type="int" value="19" />
+		<property name="yseries" type="int" value="11" />
+		<property name="ignore" type="bool" value="0" />
+		<property name="grid" type="bool" value="1" />
+		<property name="frame" type="bool" value="0" />
+		<property name="compareMode" type="int" value="0" />
+		<property name="trendLine" type="int" value="0" />
+		<property name="smoothing" type="int" value="1" />
+	</chart>
+	<chart id="20" name="" title="HrPw" >
+		<property name="title" type="QString" value="HrPw" />
+		<property name="subtitle" type="QString" value="" />
+		<property name="widthFactor" type="double" value="2" />
+		<property name="heightFactor" type="double" value="2.77778" />
+		<property name="style" type="int" value="0" />
+		<property name="resizable" type="bool" value="0" />
+		<property name="shadeZones" type="int" value="0" />
+		<property name="joinLine" type="int" value="0" />
+		<property name="fullplot" type="int" value="0" />
+	</chart>
 	<chart id="2" name="" title="Oxy" >
 		<property name="title" type="QString" value="Oxy" />
 		<property name="subtitle" type="QString" value="" />
@@ -286,7 +362,8 @@
 		<property name="stackWidth" type="int" value="20" />
 		<property name="showGrid" type="int" value="2" />
 		<property name="showFull" type="int" value="0" />
-		<property name="showInterval" type="int" value="2" />
+		<property name="showIntervalMarkers" type="int" value="2" />
+		<property name="showIntervalNavigator" type="int" value="2" />
 		<property name="hovering" type="int" value="1" />
 		<property name="showHelp" type="int" value="0" />
 		<property name="showATISS" type="int" value="0" />
@@ -329,52 +406,208 @@
 		<property name="paintBrush" type="int" value="0" />
 		<property name="userData" type="QString" value="" />
 	</chart>
-	<chart id="6" name="" title="Heartrate" >
-		<property name="title" type="QString" value="Heartrate" />
+</layout>
+<layout name="Run" style="0" type="2" expression="isRun" trainswitch="0">
+	<chart id="42" name="" title="Overview" >
+		<property name="title" type="QString" value="Overview" />
 		<property name="subtitle" type="QString" value="" />
-		<property name="widthFactor" type="double" value="3.33333" />
-		<property name="heightFactor" type="double" value="3.33333" />
+		<property name="widthFactor" type="double" value="2" />
+		<property name="heightFactor" type="double" value="2" />
 		<property name="style" type="int" value="0" />
 		<property name="resizable" type="bool" value="0" />
-		<property name="series" type="int" value="2" />
-		<property name="percent" type="int" value="0" />
-		<property name="logY" type="bool" value="0" />
-		<property name="zeroes" type="bool" value="0" />
-		<property name="shade" type="bool" value="0" />
-		<property name="zoned" type="bool" value="0" />
-		<property name="cpZoned" type="bool" value="0" />
+		<property name="config" type="QString" value="{\n  &quot;version&quot;:&quot;2.0&quot;,\n  &quot;widths&quot;:[ 1200, 1200, 1200, 1200, 1200, 1200, 1200, 1200, 1200, 1200 ],\n  &quot;CHARTS&quot;:[\n    { &quot;type&quot;:101,&quot;span&quot;:1,&quot;deep&quot;:6,&quot;column&quot;:0,&quot;order&quot;:13,&quot;color&quot;:&quot;#010161&quot;,&quot;symbol&quot;:&quot;activity_date&quot;,&quot;datafilter&quot;:&quot; &quot;,&quot;name&quot;:&quot;Date&quot; },\n    { &quot;type&quot;:112,&quot;span&quot;:1,&quot;deep&quot;:12,&quot;column&quot;:0,&quot;order&quot;:69,&quot;color&quot;:&quot;#010161&quot;,&quot;program&quot;:&quot;{:sl:n:sl:n# column names, if using metrics then best:sl:n# to use name() to get correct name for locale:sl:n# otherwise it won&apos;t translate to other languages:sl:nnames { :sl:n    metricname(:sl:n        Duration,:sl:n        Time_Recording,:sl:n        Time_Moving,:sl:n        Distance,:sl:n        Work,:sl:n        Calories,:sl:n        Elevation_Gain:sl:n    );:sl:n}:sl:n:sl:n# column units, if using metrics then best:sl:n# to use unit() function to get correct string:sl:n# for locale and metric:sl:/imperial:sl:nunits { :sl:n    metricunit(:sl:n        Duration,:sl:n        Time_Recording,:sl:n        Time_Moving,:sl:n        Distance,:sl:n        Work,:sl:n        Calories,:sl:n        Elevation_Gain:sl:n    );:sl:n}:sl:n:sl:n# values to display as doubles or strings:sl:n# if using metrics always best to use asstring():sl:n# to convert correctly with dp, metric:sl:/imperial:sl:n# or specific formats eg. rowing pace xx:sl:/500m:sl:nvalues { :sl:n    asstring(:sl:n        Duration,:sl:n        Time_Recording,:sl:n        Time_Moving,:sl:n        Distance,:sl:n        Work,:sl:n        Calories,:sl:n        Elevation_Gain:sl:n    ); :sl:n} :sl:n:sl:n} &quot;,&quot;sortcolumn&quot;:-1,&quot;sortorder&quot;:0,&quot;datafilter&quot;:&quot; &quot;,&quot;name&quot;:&quot;Totals&quot; },\n    { &quot;type&quot;:112,&quot;span&quot;:2,&quot;deep&quot;:12,&quot;column&quot;:0,&quot;order&quot;:127,&quot;color&quot;:&quot;#010161&quot;,&quot;program&quot;:&quot;{:sl:n:sl:n# column names, if using metrics then best:sl:n# to use metricname() to get correct name for locale:sl:n# otherwise it won&apos;t translate to other languages:sl:nnames {:sl:n:sl:n    c(:sl:n        :qu:Name:qu:,:sl:n        :qu:Description:qu:,:sl:n        :qu:Low:qu:,:sl:n        :qu:High:qu:,:sl:n        :qu:Time:qu:,:sl:n        :qu::qu::sl:n    );:sl:n}:sl:n:sl:n# column units, if using metrics then best:sl:n# to use metricunit() function to get correct string:sl:n# for locale and metric:sl:/imperial:sl:nunits {:sl:n:sl:n    c(:sl:n        :qu::qu:,:sl:n        :qu::qu:,:sl:n        zones(pace,units),:sl:n        zones(pace,units),:sl:n        :qu::qu:,:sl:n        :qu:%:qu::sl:n    );:sl:n}:sl:n:sl:n# values to display as doubles or strings:sl:n# if using metrics always best to use asstring():sl:n# to convert correctly with dp, metric:sl:/imperial:sl:n# or specific formats eg. rowing pace xx:sl:/500m:sl:nvalues { :sl:n:sl:n   c(:sl:n        zones(pace,name),:sl:n        zones(pace,description),:sl:n        zones(pace,low),:sl:n        zones(pace,high),:sl:n        zones(pace,time),:sl:n        zones(pace,percent):sl:n    );:sl:n} :sl:n:sl:n} &quot;,&quot;sortcolumn&quot;:-1,&quot;sortorder&quot;:0,&quot;datafilter&quot;:&quot; &quot;,&quot;name&quot;:&quot;Pace Zones&quot; },\n    { &quot;type&quot;:112,&quot;span&quot;:2,&quot;deep&quot;:11,&quot;column&quot;:0,&quot;order&quot;:208,&quot;color&quot;:&quot;#010161&quot;,&quot;program&quot;:&quot;{:sl:n:sl:n# column names, if using metrics then best:sl:n# to use metricname() to get correct name for locale:sl:n# otherwise it won&apos;t translate to other languages:sl:nnames {:sl:n:sl:n    c(:sl:n        :qu:Name:qu:,:sl:n        :qu:Description:qu:,:sl:n        :qu:Low:qu:,:sl:n        :qu:High:qu:,:sl:n        :qu:Time:qu:,:sl:n        :qu::qu::sl:n    );:sl:n}:sl:n:sl:n# column units, if using metrics then best:sl:n# to use metricunit() function to get correct string:sl:n# for locale and metric:sl:/imperial:sl:nunits {:sl:n:sl:n    c(:sl:n        :qu::qu:,:sl:n        :qu::qu:,:sl:n        zones(hr,units),:sl:n        zones(hr,units),:sl:n        :qu::qu:,:sl:n        :qu:%:qu::sl:n    );:sl:n}:sl:n:sl:n# values to display as doubles or strings:sl:n# if using metrics always best to use asstring():sl:n# to convert correctly with dp, metric:sl:/imperial:sl:n# or specific formats eg. rowing pace xx:sl:/500m:sl:nvalues { :sl:n:sl:n   c(:sl:n        zones(hr,name),:sl:n        zones(hr,description),:sl:n        zones(hr,low),:sl:n        zones(hr,high),:sl:n        zones(hr,time),:sl:n        zones(hr,percent):sl:n    );:sl:n} :sl:n:sl:n} &quot;,&quot;sortcolumn&quot;:0,&quot;sortorder&quot;:0,&quot;datafilter&quot;:&quot; &quot;,&quot;name&quot;:&quot;Heartrate Zones&quot; },\n    { &quot;type&quot;:112,&quot;span&quot;:2,&quot;deep&quot;:13,&quot;column&quot;:0,&quot;order&quot;:247,&quot;color&quot;:&quot;#010161&quot;,&quot;program&quot;:&quot;{:sl:n:sl:n# column names, if using metrics then best:sl:n# to use metricname() to get correct name for locale:sl:n# otherwise it won&apos;t translate to other languages:sl:nnames { :sl:n    c(:qu:Name:qu:,:qu:Description:qu:,:qu:Low:qu:,:qu:High:qu:,:qu:Time:qu:,:qu:%:qu:);:sl:n}:sl:n:sl:n# column units, if using metrics then best:sl:n# to use metricunit() function to get correct string:sl:n# for locale and metric:sl:/imperial:sl:nunits {:sl:n:sl:n    c(:qu::qu:,:sl:n      :qu::qu:,:sl:n      zones(power,units),:sl:n      zones(power,units), :qu::qu:, :qu::qu:);:sl:n}:sl:n:sl:n# values to display as doubles or strings:sl:n# if using metrics always best to use asstring():sl:n# to convert correctly with dp, metric:sl:/imperial:sl:n# or specific formats eg. rowing pace xx:sl:/500m:sl:nvalues { :sl:n:sl:n   c( zones(power,name),:sl:n      zones(power,description),:sl:n      zones(power,low),:sl:n      zones(power,high),:sl:n      zones(power,time),:sl:n      zones(power,percent));:sl:n} :sl:n:sl:n}:sl:n &quot;,&quot;sortcolumn&quot;:-1,&quot;sortorder&quot;:0,&quot;datafilter&quot;:&quot; &quot;,&quot;name&quot;:&quot;Power Zones&quot; },\n    { &quot;type&quot;:112,&quot;span&quot;:4,&quot;deep&quot;:25,&quot;column&quot;:1,&quot;order&quot;:50,&quot;color&quot;:&quot;#010161&quot;,&quot;program&quot;:&quot;{:sl:n:sl:n# column names, if using metrics then best:sl:n# to use metricname() to get correct name for locale:sl:n# otherwise it won&apos;t translate to other languages:sl:nnames {:sl:n:sl:n    metricname(:sl:n        name,:sl:n        Pace,:sl:n        Average_Power,:sl:n        Average_Heart_Rate,:sl:n        Average_Running_Cadence,:sl:n        Distance,:sl:n        Duration,:sl:n        Fatigue_Index,:sl:n        1_min_Peak_Hr,:sl:n        Elevation_Gain:sl:n    );:sl:n}:sl:n:sl:n# column units, if using metrics then best:sl:n# to use metricunit() function to get correct string:sl:n# for locale and metric:sl:/imperial:sl:nunits {:sl:n:sl:n    metricunit(:sl:n        name,:sl:n        Pace,:sl:n        Average_Power,:sl:n        Average_Heart_Rate,:sl:n        Average_Running_Cadence,:sl:n        Distance,:sl:n        Duration,:sl:n        Fatigue_Index,:sl:n        1_min_Peak_Hr,:sl:n        Elevation_Gain:sl:n    );:sl:n}:sl:n:sl:n# values to display as doubles or strings:sl:n# if using metrics always best to use asstring():sl:n# to convert correctly with dp, metric:sl:/imperial:sl:n# or specific formats eg. rowing pace xx:sl:/500m:sl:nvalues {:sl:n:sl:n    c(:sl:n        intervalstrings(name),:sl:n        intervalstrings(Pace),:sl:n        intervalstrings(Average_Power),:sl:n        intervalstrings(Average_Heart_Rate),:sl:n        intervalstrings(Average_Running_Cadence),:sl:n        intervalstrings(Distance),:sl:n        intervalstrings(Duration),:sl:n        intervalstrings(Fatigue_Index),:sl:n        intervalstrings(1_min_Peak_Hr),:sl:n        intervalstrings(Elevation_Gain):sl:n    );:sl:n}:sl:n:sl:n# interval names indicate which interval:sl:n# the row represents so we can select:sl:n# and hover over them:sl:ni {:sl:n    intervalstrings(name);:sl:n}:sl:n:sl:n# heatmap values are from 0-1 so we use the:sl:n# normalize() function to calculate it for the metrics:sl:n# in question. When we use normalize(0,0,metric) we:sl:n# will always get no heat, you can edit the min:sl:n# max values to set the range to set the heat color:sl:nheat {:sl:n:sl:n    c(:sl:n        normalize(0, 0, intervals(name)),:sl:n        1-normalize(0, config(cv) ,intervals(Pace)),:sl:n        normalize(0, config(cp) ,intervals(Average_Power)),:sl:n        normalize(0, config(lthr) , intervals(Average_Heart_Rate)),:sl:n        normalize(0, 0, intervals(Average_Running_Cadence)),:sl:n        normalize(0, 0, intervals(Distance)),:sl:n        normalize(0, 0, intervals(Duration)),:sl:n        normalize(0, 0, intervals(Fatigue_Index)),:sl:n        normalize(0, 0, intervals(1_min_Peak_Hr)),:sl:n        normalize(0, 0, intervals(Elevation_Gain)):sl:n  );:sl:n}:sl:n:sl:n} &quot;,&quot;sortcolumn&quot;:-1,&quot;sortorder&quot;:0,&quot;datafilter&quot;:&quot; &quot;,&quot;name&quot;:&quot;Intervals Data&quot; },\n    { &quot;type&quot;:102,&quot;span&quot;:1,&quot;deep&quot;:6,&quot;column&quot;:1,&quot;order&quot;:0,&quot;color&quot;:&quot;#010161&quot;,&quot;symbol&quot;:&quot;Sport&quot;,&quot;datafilter&quot;:&quot; &quot;,&quot;name&quot;:&quot;Sport&quot; },\n    { &quot;type&quot;:112,&quot;span&quot;:1,&quot;deep&quot;:12,&quot;column&quot;:1,&quot;order&quot;:6,&quot;color&quot;:&quot;#010161&quot;,&quot;program&quot;:&quot;{:sl:n:sl:n# column names, if using metrics then best:sl:n# to use metricname() to get correct name for locale:sl:n# otherwise it won&apos;t translate to other languages:sl:nnames { :sl:n    metricname(:sl:n        Athlete_Weight,:sl:n        Average_Power,:sl:n        Pace,:sl:n        Average_Heart_Rate,:sl:n        Average_Core_Temperature,:sl:n        Average_Running_Cadence,:sl:n        Average_Temp:sl:n    );:sl:n}:sl:n:sl:n# column units, if using metrics then best:sl:n# to use metricunit() function to get correct string:sl:n# for locale and metric:sl:/imperial:sl:nunits { :sl:n    metricunit(:sl:n        Athlete_Weight,:sl:n        Average_Power,:sl:n        Pace,:sl:n        Average_Heart_Rate,:sl:n        Average_Core_Temperature,:sl:n        Average_Running_Cadence,:sl:n        Average_Temp:sl:n    );:sl:n}:sl:n:sl:n# values to display as doubles or strings:sl:n# if using metrics always best to use asstring():sl:n# to convert correctly with dp, metric:sl:/imperial:sl:n# or specific formats eg. rowing pace xx:sl:/500m:sl:nvalues {:sl:n:sl:n    avgTemp &lt;- mean(samples(TEMPERATURE));:sl:n    :sl:n    if (avgTemp = -255) {:sl:n       avgTemp &lt;- c( :qu:none:qu: );:sl:n    } else {:sl:n       avgTemp &lt;- round(avgTemp, 1);:sl:n    }:sl:n        :sl:n    c(:sl:n        asstring(:sl:n        Athlete_Weight,:sl:n        Average_Power,:sl:n        Pace,:sl:n        Average_Heart_Rate,:sl:n        Average_Core_Temperature,:sl:n        Average_Running_Cadence:sl:n        ),:sl:n        avgTemp:sl:n    );:sl:n}:sl:n:sl:n} &quot;,&quot;sortcolumn&quot;:-1,&quot;sortorder&quot;:0,&quot;datafilter&quot;:&quot; &quot;,&quot;name&quot;:&quot;Averages&quot; },\n    { &quot;type&quot;:102,&quot;span&quot;:1,&quot;deep&quot;:6,&quot;column&quot;:2,&quot;order&quot;:219,&quot;color&quot;:&quot;#010161&quot;,&quot;symbol&quot;:&quot;Workout Code&quot;,&quot;datafilter&quot;:&quot; &quot;,&quot;name&quot;:&quot;Workout Code&quot; },\n    { &quot;type&quot;:112,&quot;span&quot;:1,&quot;deep&quot;:12,&quot;column&quot;:2,&quot;order&quot;:239,&quot;color&quot;:&quot;#010161&quot;,&quot;program&quot;:&quot;{:sl:n:sl:n# column names, if using metrics then best:sl:n# to use name() to get correct name for locale:sl:n# otherwise it won&apos;t translate to other languages:sl:nnames {:sl:n    c(:sl:n        metricname(:sl:n            Max_Power,:sl:n            10_sec_Peak_Pace,    :sl:n            Max_Heartrate,:sl:n            Max_Core_Temperature,:sl:n            Max_Running_Cadence,:sl:n            5_min_Peak_Pace,:sl:n            Max_Temp:sl:n        ):sl:n    );:sl:n}:sl:n:sl:n# column units, if using metrics then best:sl:n# to use unit() function to get correct string:sl:n# for locale and metric:sl:/imperial:sl:nunits { :sl:n    metricunit(:sl:n        Max_Power,:sl:n        10_sec_Peak_Pace,    :sl:n        Max_Heartrate,:sl:n        Max_Core_Temperature,:sl:n        Max_Running_Cadence,:sl:n        5_min_Peak_Pace,:sl:n        Max_Temp:sl:n    );:sl:n}:sl:n:sl:n# values to display as doubles or strings:sl:n# if using metrics always best to use asstring():sl:n# to convert correctly with dp, metric:sl:/imperial:sl:n# or specific formats eg. rowing pace xx:sl:/500m:sl:nvalues {:sl:n:sl:n    maxTemp &lt;- max(samples(TEMPERATURE));:sl:n    :sl:n    if (maxTemp = -255) {:sl:n       maxTemp &lt;- c( :qu:none:qu: );:sl:n    } else {:sl:n       maxTemp &lt;- round(maxTemp, 1);:sl:n    }:sl:n:sl:n    c(:sl:n        asstring(        :sl:n            Max_Power,:sl:n            10_sec_Peak_Pace,    :sl:n            Max_Heartrate,:sl:n            Max_Core_Temperature,:sl:n            Max_Running_Cadence,:sl:n            5_min_Peak_Pace:sl:n        ),:sl:n        maxTemp:sl:n    );:sl:n}:sl:n:sl:n} &quot;,&quot;sortcolumn&quot;:-1,&quot;sortorder&quot;:0,&quot;datafilter&quot;:&quot; &quot;,&quot;name&quot;:&quot;Maximum&quot; },\n    { &quot;type&quot;:103,&quot;span&quot;:1,&quot;deep&quot;:12,&quot;column&quot;:2,&quot;order&quot;:1872,&quot;color&quot;:&quot;#010161&quot;,&quot;series&quot;:6,&quot;polarized&quot;:0,&quot;datafilter&quot;:&quot; &quot;,&quot;name&quot;:&quot;Pace Zones&quot; },\n    { &quot;type&quot;:103,&quot;span&quot;:1,&quot;deep&quot;:11,&quot;column&quot;:2,&quot;order&quot;:1902,&quot;color&quot;:&quot;#010161&quot;,&quot;series&quot;:3,&quot;polarized&quot;:0,&quot;datafilter&quot;:&quot; &quot;,&quot;name&quot;:&quot;Heartrate Zones&quot; },\n    { &quot;type&quot;:103,&quot;span&quot;:1,&quot;deep&quot;:13,&quot;column&quot;:2,&quot;order&quot;:1903,&quot;color&quot;:&quot;#010161&quot;,&quot;series&quot;:10,&quot;polarized&quot;:0,&quot;datafilter&quot;:&quot; &quot;,&quot;name&quot;:&quot;Power Zones&quot; },\n    { &quot;type&quot;:100,&quot;span&quot;:1,&quot;deep&quot;:6,&quot;column&quot;:3,&quot;order&quot;:516,&quot;color&quot;:&quot;#010161&quot;,&quot;datafilter&quot;:&quot; &quot;,&quot;name&quot;:&quot;RPE&quot; },\n    { &quot;type&quot;:112,&quot;span&quot;:1,&quot;deep&quot;:12,&quot;column&quot;:3,&quot;order&quot;:527,&quot;color&quot;:&quot;#010161&quot;,&quot;program&quot;:&quot;{:sl:n:sl:n# column names, if using metrics then best:sl:n# to use name() to get correct name for locale:sl:n# otherwise it won&apos;t translate to other languages:sl:nnames { :sl:n    metricname(:sl:n        Aerobic_Decoupling,:sl:n        Efficiency_Factor,:sl:n        Relative_Intensity,:sl:n        IsoPower,:sl:n        VDOT,:sl:n        IWF,:sl:n        xPace:sl:n    );:sl:n}:sl:n:sl:n# column units, if using metrics then best:sl:n# to use unit() function to get correct string:sl:n# for locale and metric:sl:/imperial:sl:nunits { :sl:n    metricunit(:sl:n        Aerobic_Decoupling,:sl:n        Efficiency_Factor,:sl:n        Relative_Intensity,:sl:n        IsoPower,:sl:n        VDOT,:sl:n        IWF,:sl:n        xPace:sl:n    );:sl:n}:sl:n:sl:n# values to display as doubles or strings:sl:n# if using metrics always best to use asstring():sl:n# to convert correctly with dp, metric:sl:/imperial:sl:n# or specific formats eg. rowing pace xx:sl:/500m:sl:nvalues {:sl:n    asstring(:sl:n        Aerobic_Decoupling,:sl:n        Efficiency_Factor,:sl:n        Relative_Intensity,:sl:n        IsoPower,:sl:n        VDOT,:sl:n        IWF,:sl:n        xPace:sl:n    );:sl:n}:sl:n:sl:n} &quot;,&quot;sortcolumn&quot;:-1,&quot;sortorder&quot;:0,&quot;datafilter&quot;:&quot; &quot;,&quot;name&quot;:&quot;Metrics&quot; },\n    { &quot;type&quot;:105,&quot;span&quot;:1,&quot;deep&quot;:25,&quot;column&quot;:4,&quot;order&quot;:3,&quot;color&quot;:&quot;#010161&quot;,&quot;symbol&quot;:&quot;govss&quot;,&quot;datafilter&quot;:&quot; &quot;,&quot;name&quot;:&quot;&quot; },\n    { &quot;type&quot;:101,&quot;span&quot;:1,&quot;deep&quot;:6,&quot;column&quot;:4,&quot;order&quot;:0,&quot;color&quot;:&quot;#010161&quot;,&quot;symbol&quot;:&quot;triscore&quot;,&quot;datafilter&quot;:&quot; &quot;,&quot;name&quot;:&quot;TriScore&quot; },\n    { &quot;type&quot;:102,&quot;span&quot;:1,&quot;deep&quot;:12,&quot;column&quot;:3,&quot;order&quot;:528,&quot;color&quot;:&quot;#010161&quot;,&quot;symbol&quot;:&quot;Notes&quot;,&quot;datafilter&quot;:&quot; &quot;,&quot;name&quot;:&quot;Notes&quot; },\n    { &quot;type&quot;:106,&quot;span&quot;:2,&quot;deep&quot;:25,&quot;column&quot;:3,&quot;order&quot;:529,&quot;color&quot;:&quot;#010161&quot;,&quot;datafilter&quot;:&quot; &quot;,&quot;name&quot;:&quot;Route&quot; },\n    { &quot;type&quot;:104,&quot;span&quot;:1,&quot;deep&quot;:25,&quot;column&quot;:0,&quot;order&quot;:442,&quot;color&quot;:&quot;#010161&quot;,&quot;xsymbol&quot;:&quot;elapsed_time&quot;,&quot;ysymbol&quot;:&quot;average_speed&quot;,&quot;zsymbol&quot;:&quot;workout_time&quot;,&quot;datafilter&quot;:&quot; &quot;,&quot;name&quot;:&quot;Intervals&quot; }\n  ]\n}\n" />
+		<property name="minimumColumns" type="int" value="5" />
+	</chart>
+	<chart id="23" name="" title="Data" >
+		<property name="title" type="QString" value="Data" />
+		<property name="subtitle" type="QString" value="" />
+		<property name="widthFactor" type="double" value="2" />
+		<property name="heightFactor" type="double" value="2" />
+		<property name="style" type="int" value="0" />
+		<property name="resizable" type="bool" value="0" />
+	</chart>
+	<chart id="2" name="" title="Performance" >
+		<property name="title" type="QString" value="Performance" />
+		<property name="subtitle" type="QString" value="" />
+		<property name="widthFactor" type="double" value="2" />
+		<property name="heightFactor" type="double" value="2" />
+		<property name="style" type="int" value="0" />
+		<property name="resizable" type="bool" value="0" />
+		<property name="stacked" type="bool" value="1" />
+		<property name="byseries" type="bool" value="1" />
+		<property name="stackWidth" type="int" value="20" />
+		<property name="showGrid" type="int" value="2" />
+		<property name="showFull" type="int" value="2" />
+		<property name="showIntervalMarkers" type="int" value="2" />
+		<property name="showIntervalNavigator" type="int" value="2" />
+		<property name="hovering" type="int" value="1" />
+		<property name="showHelp" type="int" value="0" />
+		<property name="showATISS" type="int" value="0" />
+		<property name="showANTISS" type="int" value="0" />
+		<property name="showNP" type="int" value="0" />
+		<property name="showXP" type="int" value="0" />
+		<property name="showAP" type="int" value="0" />
+		<property name="showSpeed" type="int" value="2" />
+		<property name="showAccel" type="int" value="2" />
+		<property name="showCad" type="int" value="2" />
+		<property name="showTorque" type="int" value="2" />
+		<property name="showPower" type="int" value="0" />
+		<property name="showSlope" type="int" value="2" />
+		<property name="showAltSlope" type="int" value="0" />
+		<property name="showHr" type="int" value="2" />
+		<property name="showTcore" type="int" value="0" />
+		<property name="showCadD" type="int" value="0" />
+		<property name="showTorqueD" type="int" value="0" />
+		<property name="showPowerD" type="int" value="0" />
+		<property name="showHrD" type="int" value="0" />
+		<property name="showAlt" type="int" value="2" />
+		<property name="showBalance" type="int" value="2" />
+		<property name="showTE" type="int" value="0" />
+		<property name="showPS" type="int" value="0" />
+		<property name="showPCO" type="int" value="0" />
+		<property name="showDC" type="int" value="0" />
+		<property name="showPPP" type="int" value="0" />
+		<property name="showTemp" type="int" value="2" />
+		<property name="showW" type="int" value="0" />
+		<property name="showRV" type="int" value="2" />
+		<property name="showRCad" type="int" value="2" />
+		<property name="showRGCT" type="int" value="2" />
+		<property name="showSmO2" type="int" value="2" />
+		<property name="showtHb" type="int" value="2" />
+		<property name="showO2Hb" type="int" value="2" />
+		<property name="showHHb" type="int" value="2" />
+		<property name="showGear" type="int" value="2" />
+		<property name="byDistance" type="int" value="0" />
+		<property name="smoothing" type="int" value="1" />
+		<property name="paintBrush" type="int" value="1" />
+		<property name="userData" type="QString" value="" />
+	</chart>
+	<chart id="37" name="" title="Map" >
+		<property name="title" type="QString" value="Map" />
+		<property name="subtitle" type="QString" value="" />
+		<property name="widthFactor" type="double" value="2" />
+		<property name="heightFactor" type="double" value="2" />
+		<property name="style" type="int" value="0" />
+		<property name="resizable" type="bool" value="0" />
+		<property name="maptype" type="int" value="0" />
+		<property name="showmarkers" type="bool" value="1" />
+		<property name="showfullplot" type="bool" value="1" />
+		<property name="showintervals" type="bool" value="0" />
+		<property name="hideShadedZones" type="bool" value="1" />
+		<property name="hideYellowLine" type="bool" value="1" />
+		<property name="hideRouteLineOpacity" type="bool" value="1" />
+		<property name="osmts" type="int" value="10" />
+		<property name="googleKey" type="QString" value="" />
+	</chart>
+	<chart id="3" name="" title="CV" >
+		<property name="title" type="QString" value="CV" />
+		<property name="subtitle" type="QString" value="" />
+		<property name="widthFactor" type="double" value="2" />
+		<property name="heightFactor" type="double" value="2" />
+		<property name="style" type="int" value="0" />
+		<property name="resizable" type="bool" value="0" />
 		<property name="filter" type="QString" value="search:" />
+		<property name="mode" type="int" value="5" />
+		<property name="showBest" type="bool" value="1" />
+		<property name="showTest" type="bool" value="1" />
+		<property name="filterBest" type="bool" value="0" />
+		<property name="showPercent" type="bool" value="0" />
+		<property name="showPowerIndex" type="bool" value="0" />
+		<property name="showGrid" type="bool" value="1" />
+		<property name="season" type="QString" value="Last 3 months" />
+		<property name="cpmodel" type="int" value="1" />
+		<property name="fit" type="int" value="1" />
+		<property name="fitdata" type="int" value="1" />
+		<property name="variant" type="int" value="0" />
+		<property name="modelDecay" type="bool" value="0" />
+		<property name="ani1" type="int" value="120" />
+		<property name="ani2" type="int" value="200" />
+		<property name="aei1" type="int" value="720" />
+		<property name="aei2" type="int" value="1200" />
+		<property name="sani1" type="int" value="30" />
+		<property name="sani2" type="int" value="60" />
+		<property name="laei1" type="int" value="3000" />
+		<property name="laei2" type="int" value="30000" />
+		<property name="showPP" type="bool" value="0" />
 		<property name="fromDate" type="QDate" value="Sat Jan 1 2000" />
 		<property name="toDate" type="QDate" value="Sat Jan 1 2000" />
-		<property name="startDate" type="QDate" value="Thu Aug 15 2013" />
+		<property name="startDate" type="QDate" value="Sun May 8 2022" />
 		<property name="lastN" type="int" value="7" />
 		<property name="lastNX" type="int" value="0" />
 		<property name="prevN" type="int" value="0" />
-		<property name="plotColor" type="QString" value="#0000ff" />
-		<property name="distmetric" type="QString" value="workout_time" />
-		<property name="totalmetric" type="QString" value="ride_count" />
-		<property name="dataMode" type="bool" value="1" />
-		<property name="bin" type="double" value="1" />
+		<property name="shading" type="int" value="1" />
+		<property name="showEffort" type="bool" value="0" />
+		<property name="showHeat" type="bool" value="0" />
+		<property name="showHeatByDate" type="bool" value="0" />
+		<property name="showCSLinear" type="bool" value="1" />
+		<property name="shadeIntervals" type="int" value="1" />
+		<property name="ridePlotMode" type="int" value="0" />
 		<property name="useSelected" type="int" value="0" />
 	</chart>
-	<chart id="6" name="" title="Speed" >
-		<property name="title" type="QString" value="Speed" />
+	<chart id="3" name="" title="CP" >
+		<property name="title" type="QString" value="CP" />
 		<property name="subtitle" type="QString" value="" />
-		<property name="widthFactor" type="double" value="2.94118" />
-		<property name="heightFactor" type="double" value="3.33333" />
+		<property name="widthFactor" type="double" value="2" />
+		<property name="heightFactor" type="double" value="2" />
+		<property name="style" type="int" value="0" />
+		<property name="resizable" type="bool" value="0" />
+		<property name="filter" type="QString" value="search:" />
+		<property name="mode" type="int" value="0" />
+		<property name="showBest" type="bool" value="1" />
+		<property name="showTest" type="bool" value="1" />
+		<property name="filterBest" type="bool" value="0" />
+		<property name="showPercent" type="bool" value="0" />
+		<property name="showPowerIndex" type="bool" value="0" />
+		<property name="showGrid" type="bool" value="1" />
+		<property name="season" type="QString" value="Last 3 months" />
+		<property name="cpmodel" type="int" value="1" />
+		<property name="fit" type="int" value="1" />
+		<property name="fitdata" type="int" value="1" />
+		<property name="variant" type="int" value="0" />
+		<property name="modelDecay" type="bool" value="0" />
+		<property name="ani1" type="int" value="120" />
+		<property name="ani2" type="int" value="200" />
+		<property name="aei1" type="int" value="720" />
+		<property name="aei2" type="int" value="1200" />
+		<property name="sani1" type="int" value="30" />
+		<property name="sani2" type="int" value="60" />
+		<property name="laei1" type="int" value="3000" />
+		<property name="laei2" type="int" value="30000" />
+		<property name="showPP" type="bool" value="0" />
+		<property name="fromDate" type="QDate" value="Sat Jan 1 2000" />
+		<property name="toDate" type="QDate" value="Sat Jan 1 2000" />
+		<property name="startDate" type="QDate" value="Mon May 9 2022" />
+		<property name="lastN" type="int" value="7" />
+		<property name="lastNX" type="int" value="0" />
+		<property name="prevN" type="int" value="0" />
+		<property name="shading" type="int" value="1" />
+		<property name="showEffort" type="bool" value="0" />
+		<property name="showHeat" type="bool" value="0" />
+		<property name="showHeatByDate" type="bool" value="0" />
+		<property name="showCSLinear" type="bool" value="1" />
+		<property name="shadeIntervals" type="int" value="1" />
+		<property name="ridePlotMode" type="int" value="0" />
+		<property name="useSelected" type="int" value="0" />
+	</chart>
+	<chart id="6" name="" title="Pace" >
+		<property name="title" type="QString" value="Pace" />
+		<property name="subtitle" type="QString" value="" />
+		<property name="widthFactor" type="double" value="2" />
+		<property name="heightFactor" type="double" value="2" />
 		<property name="style" type="int" value="0" />
 		<property name="resizable" type="bool" value="0" />
 		<property name="series" type="int" value="3" />
 		<property name="percent" type="int" value="0" />
 		<property name="logY" type="bool" value="0" />
-		<property name="zeroes" type="bool" value="0" />
+		<property name="zeroes" type="bool" value="1" />
 		<property name="shade" type="bool" value="1" />
 		<property name="zoned" type="bool" value="0" />
 		<property name="cpZoned" type="bool" value="0" />
+		<property name="zoneLimited" type="bool" value="0" />
 		<property name="filter" type="QString" value="search:" />
 		<property name="fromDate" type="QDate" value="Sat Jan 1 2000" />
 		<property name="toDate" type="QDate" value="Sat Jan 1 2000" />
-		<property name="startDate" type="QDate" value="Thu Aug 15 2013" />
+		<property name="startDate" type="QDate" value="Mon May 9 2022" />
 		<property name="lastN" type="int" value="7" />
 		<property name="lastNX" type="int" value="0" />
 		<property name="prevN" type="int" value="0" />
@@ -385,24 +618,25 @@
 		<property name="bin" type="double" value="0.1" />
 		<property name="useSelected" type="int" value="0" />
 	</chart>
-	<chart id="6" name="" title="Cadence" >
-		<property name="title" type="QString" value="Cadence" />
+	<chart id="6" name="" title="Heart Rate" >
+		<property name="title" type="QString" value="Heart Rate" />
 		<property name="subtitle" type="QString" value="" />
-		<property name="widthFactor" type="double" value="2.77778" />
-		<property name="heightFactor" type="double" value="3.33333" />
+		<property name="widthFactor" type="double" value="2" />
+		<property name="heightFactor" type="double" value="2" />
 		<property name="style" type="int" value="0" />
 		<property name="resizable" type="bool" value="0" />
-		<property name="series" type="int" value="4" />
+		<property name="series" type="int" value="2" />
 		<property name="percent" type="int" value="0" />
 		<property name="logY" type="bool" value="0" />
-		<property name="zeroes" type="bool" value="0" />
-		<property name="shade" type="bool" value="0" />
+		<property name="zeroes" type="bool" value="1" />
+		<property name="shade" type="bool" value="1" />
 		<property name="zoned" type="bool" value="0" />
 		<property name="cpZoned" type="bool" value="0" />
+		<property name="zoneLimited" type="bool" value="0" />
 		<property name="filter" type="QString" value="search:" />
 		<property name="fromDate" type="QDate" value="Sat Jan 1 2000" />
 		<property name="toDate" type="QDate" value="Sat Jan 1 2000" />
-		<property name="startDate" type="QDate" value="Thu Aug 15 2013" />
+		<property name="startDate" type="QDate" value="Mon May 9 2022" />
 		<property name="lastN" type="int" value="7" />
 		<property name="lastNX" type="int" value="0" />
 		<property name="prevN" type="int" value="0" />
@@ -413,40 +647,317 @@
 		<property name="bin" type="double" value="1" />
 		<property name="useSelected" type="int" value="0" />
 	</chart>
-	<chart id="15" name="" title="Scatter" >
-		<property name="title" type="QString" value="Scatter" />
+	<chart id="6" name="" title="Power" >
+		<property name="title" type="QString" value="Power" />
 		<property name="subtitle" type="QString" value="" />
 		<property name="widthFactor" type="double" value="2" />
-		<property name="heightFactor" type="double" value="2.77778" />
+		<property name="heightFactor" type="double" value="2" />
 		<property name="style" type="int" value="0" />
 		<property name="resizable" type="bool" value="0" />
-		<property name="xseries" type="int" value="19" />
-		<property name="yseries" type="int" value="11" />
-		<property name="ignore" type="bool" value="0" />
-		<property name="grid" type="bool" value="1" />
-		<property name="frame" type="bool" value="0" />
-		<property name="compareMode" type="int" value="0" />
-		<property name="trendLine" type="int" value="0" />
+		<property name="series" type="int" value="0" />
+		<property name="percent" type="int" value="0" />
+		<property name="logY" type="bool" value="0" />
+		<property name="zeroes" type="bool" value="1" />
+		<property name="shade" type="bool" value="1" />
+		<property name="zoned" type="bool" value="0" />
+		<property name="cpZoned" type="bool" value="0" />
+		<property name="zoneLimited" type="bool" value="0" />
+		<property name="filter" type="QString" value="search:" />
+		<property name="fromDate" type="QDate" value="Sat Jan 1 2000" />
+		<property name="toDate" type="QDate" value="Sat Jan 1 2000" />
+		<property name="startDate" type="QDate" value="Mon May 9 2022" />
+		<property name="lastN" type="int" value="7" />
+		<property name="lastNX" type="int" value="0" />
+		<property name="prevN" type="int" value="0" />
+		<property name="plotColor" type="QString" value="#0000ff" />
+		<property name="distmetric" type="QString" value="workout_time" />
+		<property name="totalmetric" type="QString" value="ride_count" />
+		<property name="dataMode" type="bool" value="1" />
+		<property name="bin" type="double" value="1" />
+		<property name="useSelected" type="int" value="0" />
+	</chart>
+</layout>
+<layout name="Swim" style="0" type="2" expression="isSwim" trainswitch="0">
+	<chart id="42" name="" title="Overview" >
+		<property name="title" type="QString" value="Overview" />
+		<property name="subtitle" type="QString" value="" />
+		<property name="widthFactor" type="double" value="2" />
+		<property name="heightFactor" type="double" value="2" />
+		<property name="style" type="int" value="0" />
+		<property name="resizable" type="bool" value="0" />
+		<property name="config" type="QString" value="{\n  &quot;version&quot;:&quot;2.0&quot;,\n  &quot;widths&quot;:[ 1100, 1100, 1100, 1100, 1100, 1100, 1100, 1100, 1100, 1100 ],\n  &quot;CHARTS&quot;:[\n    { &quot;type&quot;:101,&quot;span&quot;:1,&quot;deep&quot;:6,&quot;column&quot;:0,&quot;order&quot;:12,&quot;color&quot;:&quot;#010161&quot;,&quot;symbol&quot;:&quot;activity_date&quot;,&quot;datafilter&quot;:&quot; &quot;,&quot;name&quot;:&quot;Date&quot; },\n    { &quot;type&quot;:112,&quot;span&quot;:1,&quot;deep&quot;:9,&quot;column&quot;:0,&quot;order&quot;:70,&quot;color&quot;:&quot;#010161&quot;,&quot;program&quot;:&quot;{:sl:n:sl:n# column names, if using metrics then best:sl:n# to use name() to get correct name for locale:sl:n# otherwise it won&apos;t translate to other languages:sl:nnames { :sl:n    metricname(:sl:n        Duration,:sl:n        Time_Recording,:sl:n        Time_Moving,:sl:n        Distance_Swim:sl:n    );:sl:n}:sl:n:sl:n# column units, if using metrics then best:sl:n# to use unit() function to get correct string:sl:n# for locale and metric:sl:/imperial:sl:nunits { :sl:n    metricunit(:sl:n        Duration,:sl:n        Time_Recording,:sl:n        Time_Moving,:sl:n        Distance_Swim:sl:n    );:sl:n}:sl:n:sl:n# values to display as doubles or strings:sl:n# if using metrics always best to use asstring():sl:n# to convert correctly with dp, metric:sl:/imperial:sl:n# or specific formats eg. rowing pace xx:sl:/500m:sl:nvalues { :sl:n    asstring(:sl:n        Duration,:sl:n        Time_Recording,:sl:n        Time_Moving,:sl:n        Distance_Swim:sl:n    ); :sl:n} :sl:n:sl:n} &quot;,&quot;sortcolumn&quot;:-1,&quot;sortorder&quot;:0,&quot;datafilter&quot;:&quot; &quot;,&quot;name&quot;:&quot;Totals&quot; },\n    { &quot;type&quot;:112,&quot;span&quot;:2,&quot;deep&quot;:12,&quot;column&quot;:0,&quot;order&quot;:122,&quot;color&quot;:&quot;#010161&quot;,&quot;program&quot;:&quot;{:sl:n:sl:n# column names, if using metrics then best:sl:n# to use metricname() to get correct name for locale:sl:n# otherwise it won&apos;t translate to other languages:sl:nnames {:sl:n:sl:n    c(:sl:n        :qu:Name:qu:,:sl:n        :qu:Description:qu:,:sl:n        :qu:Low:qu:,:sl:n        :qu:High:qu:,:sl:n        :qu:Time:qu:,:sl:n        :qu::qu::sl:n    );:sl:n}:sl:n:sl:n# column units, if using metrics then best:sl:n# to use metricunit() function to get correct string:sl:n# for locale and metric:sl:/imperial:sl:nunits {:sl:n:sl:n    c(:sl:n        :qu::qu:,:sl:n        :qu::qu:,:sl:n        zones(pace,units),:sl:n        zones(pace,units),:sl:n        :qu::qu:,:sl:n        :qu:%:qu::sl:n    );:sl:n}:sl:n:sl:n# values to display as doubles or strings:sl:n# if using metrics always best to use asstring():sl:n# to convert correctly with dp, metric:sl:/imperial:sl:n# or specific formats eg. rowing pace xx:sl:/500m:sl:nvalues { :sl:n:sl:n   c(:sl:n        zones(pace,name),:sl:n        zones(pace,description),:sl:n        zones(pace,low),:sl:n        zones(pace,high),:sl:n        zones(pace,time),:sl:n        zones(pace,percent):sl:n    );:sl:n} :sl:n:sl:n} &quot;,&quot;sortcolumn&quot;:-1,&quot;sortorder&quot;:0,&quot;datafilter&quot;:&quot; &quot;,&quot;name&quot;:&quot;Pace Zones&quot; },\n    { &quot;type&quot;:112,&quot;span&quot;:2,&quot;deep&quot;:11,&quot;column&quot;:0,&quot;order&quot;:226,&quot;color&quot;:&quot;#010161&quot;,&quot;program&quot;:&quot;{:sl:n:sl:n# column names, if using metrics then best:sl:n# to use metricname() to get correct name for locale:sl:n# otherwise it won&apos;t translate to other languages:sl:nnames {:sl:n:sl:n    c(:sl:n        :qu:Name:qu:,:sl:n        :qu:Description:qu:,:sl:n        :qu:Low:qu:,:sl:n        :qu:High:qu:,:sl:n        :qu:Time:qu:,:sl:n        :qu::qu::sl:n    );:sl:n}:sl:n:sl:n# column units, if using metrics then best:sl:n# to use metricunit() function to get correct string:sl:n# for locale and metric:sl:/imperial:sl:nunits {:sl:n:sl:n    c(:sl:n        :qu::qu:,:sl:n        :qu::qu:,:sl:n        zones(hr,units),:sl:n        zones(hr,units),:sl:n        :qu::qu:,:sl:n        :qu:%:qu::sl:n    );:sl:n}:sl:n:sl:n# values to display as doubles or strings:sl:n# if using metrics always best to use asstring():sl:n# to convert correctly with dp, metric:sl:/imperial:sl:n# or specific formats eg. rowing pace xx:sl:/500m:sl:nvalues { :sl:n:sl:n   c(:sl:n        zones(hr,name),:sl:n        zones(hr,description),:sl:n        zones(hr,low),:sl:n        zones(hr,high),:sl:n        zones(hr,time),:sl:n        zones(hr,percent):sl:n    );:sl:n} :sl:n:sl:n} &quot;,&quot;sortcolumn&quot;:0,&quot;sortorder&quot;:0,&quot;datafilter&quot;:&quot; &quot;,&quot;name&quot;:&quot;Heartrate Zones&quot; },\n    { &quot;type&quot;:112,&quot;span&quot;:4,&quot;deep&quot;:25,&quot;column&quot;:1,&quot;order&quot;:27,&quot;color&quot;:&quot;#010161&quot;,&quot;program&quot;:&quot;{:sl:n:sl:n# column names, if using metrics then best:sl:n# to use metricname() to get correct name for locale:sl:n# otherwise it won&apos;t translate to other languages:sl:nnames {:sl:n:sl:n    metricname(:sl:n        name,:sl:n        Distance_Swim,:sl:n        Duration,:sl:n        Pace_Swim,:sl:n        Average_Cadence,:sl:n        Stroke_Rate,:sl:n        Strokes_Per_Length,:sl:n        SWolf,:sl:n        1_min_Peak_Hr,:sl:n        Average_Heart_Rate:sl:n    );:sl:n}:sl:n:sl:n# column units, if using metrics then best:sl:n# to use metricunit() function to get correct string:sl:n# for locale and metric:sl:/imperial:sl:nunits {:sl:n:sl:n    metricunit(:sl:n        name,:sl:n        Distance_Swim,:sl:n        Duration,:sl:n        Pace_Swim,:sl:n        Average_Cadence,:sl:n        Stroke_Rate,:sl:n        Strokes_Per_Length,:sl:n        SWolf,:sl:n        1_min_Peak_Hr,:sl:n        Average_Heart_Rate:sl:n    );:sl:n}:sl:n:sl:n# values to display as doubles or strings:sl:n# if using metrics always best to use asstring():sl:n# to convert correctly with dp, metric:sl:/imperial:sl:n# or specific formats eg. rowing pace xx:sl:/500m:sl:nvalues {:sl:n:sl:n    c(:sl:n        intervalstrings(name),:sl:n        intervalstrings(Distance_Swim),:sl:n        intervalstrings(Duration),:sl:n        intervalstrings(Pace_Swim),:sl:n        intervalstrings(Average_Cadence),:sl:n        intervalstrings(Stroke_Rate),:sl:n        intervalstrings(Strokes_Per_Length),:sl:n        intervalstrings(SWolf),:sl:n        intervalstrings(1_min_Peak_Hr),:sl:n        intervalstrings(Average_Heart_Rate):sl:n    );:sl:n}:sl:n:sl:n# interval names indicate which interval:sl:n# the row represents so we can select:sl:n# and hover over them:sl:ni {:sl:n    intervalstrings(name);:sl:n}:sl:n:sl:n} &quot;,&quot;sortcolumn&quot;:-1,&quot;sortorder&quot;:0,&quot;datafilter&quot;:&quot; &quot;,&quot;name&quot;:&quot;Intervals Data&quot; },\n    { &quot;type&quot;:102,&quot;span&quot;:1,&quot;deep&quot;:6,&quot;column&quot;:1,&quot;order&quot;:0,&quot;color&quot;:&quot;#010161&quot;,&quot;symbol&quot;:&quot;Sport&quot;,&quot;datafilter&quot;:&quot; &quot;,&quot;name&quot;:&quot;Sport&quot; },\n    { &quot;type&quot;:112,&quot;span&quot;:1,&quot;deep&quot;:9,&quot;column&quot;:1,&quot;order&quot;:0,&quot;color&quot;:&quot;#010161&quot;,&quot;program&quot;:&quot;{:sl:n:sl:n# column names, if using metrics then best:sl:n# to use metricname() to get correct name for locale:sl:n# otherwise it won&apos;t translate to other languages:sl:nnames { :sl:n    metricname(:sl:n        Pace_Swim,:sl:n        Average_Cadence,:sl:n        Average_Heart_Rate,:sl:n        Average_Temp:sl:n    );:sl:n}:sl:n:sl:n# column units, if using metrics then best:sl:n# to use metricunit() function to get correct string:sl:n# for locale and metric:sl:/imperial:sl:nunits { :sl:n    metricunit(:sl:n        Pace_Swim,:sl:n        Average_Cadence,:sl:n        Average_Heart_Rate,:sl:n        Average_Temp:sl:n    );:sl:n}:sl:n:sl:n# values to display as doubles or strings:sl:n# if using metrics always best to use asstring():sl:n# to convert correctly with dp, metric:sl:/imperial:sl:n# or specific formats eg. rowing pace xx:sl:/500m:sl:nvalues {:sl:n:sl:n    avgTemp &lt;- mean(samples(TEMPERATURE));:sl:n    :sl:n    if (avgTemp = -255) {:sl:n       avgTemp &lt;- c( :qu:none:qu: );:sl:n    } else {:sl:n       avgTemp &lt;- round(avgTemp, 1);:sl:n    }:sl:n        :sl:n    c(:sl:n        asstring(:sl:n        Pace_Swim,:sl:n        Average_Cadence,:sl:n        Average_Heart_Rate:sl:n        ),:sl:n        avgTemp:sl:n    );:sl:n}:sl:n:sl:n} &quot;,&quot;sortcolumn&quot;:-1,&quot;sortorder&quot;:0,&quot;datafilter&quot;:&quot; &quot;,&quot;name&quot;:&quot;Averages&quot; },\n    { &quot;type&quot;:102,&quot;span&quot;:1,&quot;deep&quot;:6,&quot;column&quot;:2,&quot;order&quot;:219,&quot;color&quot;:&quot;#010161&quot;,&quot;symbol&quot;:&quot;Workout Code&quot;,&quot;datafilter&quot;:&quot; &quot;,&quot;name&quot;:&quot;Workout Code&quot; },\n    { &quot;type&quot;:112,&quot;span&quot;:1,&quot;deep&quot;:9,&quot;column&quot;:2,&quot;order&quot;:244,&quot;color&quot;:&quot;#010161&quot;,&quot;program&quot;:&quot;{:sl:n:sl:n# column names, if using metrics then best:sl:n# to use name() to get correct name for locale:sl:n# otherwise it won&apos;t translate to other languages:sl:nnames {:sl:n    c(:qu:Max Pace:qu:,:sl:n    metricname(:sl:n        Max_Cadence,:sl:n        Max_Heartrate,:sl:n        Max_Temp:sl:n    ));:sl:n}:sl:n:sl:n# column units, if using metrics then best:sl:n# to use unit() function to get correct string:sl:n# for locale and metric:sl:/imperial:sl:nunits { :sl:n    metricunit(:sl:n        10_sec_Peak_Pace_Swim,    :sl:n        Max_Cadence,:sl:n        Max_Heartrate,:sl:n        Max_Temp:sl:n    );:sl:n}:sl:n:sl:n# values to display as doubles or strings:sl:n# if using metrics always best to use asstring():sl:n# to convert correctly with dp, metric:sl:/imperial:sl:n# or specific formats eg. rowing pace xx:sl:/500m:sl:nvalues {:sl:n:sl:n    maxTemp &lt;- max(samples(TEMPERATURE));:sl:n    :sl:n    if (maxTemp = -255) {:sl:n       maxTemp &lt;- c( :qu:none:qu: );:sl:n    } else {:sl:n       maxTemp &lt;- round(maxTemp, 1);:sl:n    }:sl:n:sl:n    c(:sl:n        asstring(        :sl:n            10_sec_Peak_Pace_Swim,    :sl:n            Max_Cadence,:sl:n            Max_Heartrate:sl:n        ),:sl:n        maxTemp:sl:n    );:sl:n}:sl:n:sl:n} &quot;,&quot;sortcolumn&quot;:-1,&quot;sortorder&quot;:0,&quot;datafilter&quot;:&quot; &quot;,&quot;name&quot;:&quot;Maximum&quot; },\n    { &quot;type&quot;:103,&quot;span&quot;:1,&quot;deep&quot;:12,&quot;column&quot;:2,&quot;order&quot;:1890,&quot;color&quot;:&quot;#010161&quot;,&quot;series&quot;:6,&quot;polarized&quot;:0,&quot;datafilter&quot;:&quot; &quot;,&quot;name&quot;:&quot;Pace Zones&quot; },\n    { &quot;type&quot;:103,&quot;span&quot;:1,&quot;deep&quot;:11,&quot;column&quot;:2,&quot;order&quot;:1961,&quot;color&quot;:&quot;#010161&quot;,&quot;series&quot;:3,&quot;polarized&quot;:0,&quot;datafilter&quot;:&quot; &quot;,&quot;name&quot;:&quot;Heartrate Zones&quot; },\n    { &quot;type&quot;:100,&quot;span&quot;:1,&quot;deep&quot;:6,&quot;column&quot;:3,&quot;order&quot;:517,&quot;color&quot;:&quot;#010161&quot;,&quot;datafilter&quot;:&quot; &quot;,&quot;name&quot;:&quot;RPE&quot; },\n    { &quot;type&quot;:112,&quot;span&quot;:1,&quot;deep&quot;:9,&quot;column&quot;:3,&quot;order&quot;:544,&quot;color&quot;:&quot;#010161&quot;,&quot;program&quot;:&quot;{:sl:n:sl:n# column names, if using metrics then best:sl:n# to use name() to get correct name for locale:sl:n# otherwise it won&apos;t translate to other languages:sl:nnames { :sl:n    metricname(:sl:n        xPace_Swim,:sl:n        Strokes_Per_Length ,:sl:n        Stroke_Rate,:sl:n        SWolf:sl:n    );:sl:n}:sl:n:sl:n# column units, if using metrics then best:sl:n# to use unit() function to get correct string:sl:n# for locale and metric:sl:/imperial:sl:nunits { :sl:n    metricunit(:sl:n        xPace_Swim,:sl:n        Strokes_Per_Length ,:sl:n        Stroke_Rate,:sl:n        SWolf:sl:n    );:sl:n}:sl:n:sl:n# values to display as doubles or strings:sl:n# if using metrics always best to use asstring():sl:n# to convert correctly with dp, metric:sl:/imperial:sl:n# or specific formats eg. rowing pace xx:sl:/500m:sl:nvalues {:sl:n    asstring(:sl:n        xPace_Swim,:sl:n        Strokes_Per_Length ,:sl:n        Stroke_Rate,:sl:n        SWolf:sl:n    );:sl:n}:sl:n:sl:n} &quot;,&quot;sortcolumn&quot;:-1,&quot;sortorder&quot;:0,&quot;datafilter&quot;:&quot; &quot;,&quot;name&quot;:&quot;Metrics&quot; },\n    { &quot;type&quot;:105,&quot;span&quot;:1,&quot;deep&quot;:19,&quot;column&quot;:4,&quot;order&quot;:22,&quot;color&quot;:&quot;#010161&quot;,&quot;symbol&quot;:&quot;swimscore&quot;,&quot;datafilter&quot;:&quot; &quot;,&quot;name&quot;:&quot;&quot; },\n    { &quot;type&quot;:101,&quot;span&quot;:1,&quot;deep&quot;:6,&quot;column&quot;:4,&quot;order&quot;:21,&quot;color&quot;:&quot;#010161&quot;,&quot;symbol&quot;:&quot;triscore&quot;,&quot;datafilter&quot;:&quot; &quot;,&quot;name&quot;:&quot;TriScore&quot; },\n    { &quot;type&quot;:102,&quot;span&quot;:1,&quot;deep&quot;:24,&quot;column&quot;:3,&quot;order&quot;:554,&quot;color&quot;:&quot;#010161&quot;,&quot;symbol&quot;:&quot;Notes&quot;,&quot;datafilter&quot;:&quot; &quot;,&quot;name&quot;:&quot;Notes&quot; },\n    { &quot;type&quot;:106,&quot;span&quot;:1,&quot;deep&quot;:14,&quot;column&quot;:4,&quot;order&quot;:32,&quot;color&quot;:&quot;#010161&quot;,&quot;datafilter&quot;:&quot; &quot;,&quot;name&quot;:&quot;Route&quot; },\n    { &quot;type&quot;:104,&quot;span&quot;:1,&quot;deep&quot;:25,&quot;column&quot;:0,&quot;order&quot;:300,&quot;color&quot;:&quot;#010161&quot;,&quot;xsymbol&quot;:&quot;elapsed_time&quot;,&quot;ysymbol&quot;:&quot;average_speed&quot;,&quot;zsymbol&quot;:&quot;workout_time&quot;,&quot;datafilter&quot;:&quot; &quot;,&quot;name&quot;:&quot;Intervals&quot; }\n  ]\n}\n" />
+		<property name="minimumColumns" type="int" value="5" />
+	</chart>
+	<chart id="23" name="" title="Data" >
+		<property name="title" type="QString" value="Data" />
+		<property name="subtitle" type="QString" value="" />
+		<property name="widthFactor" type="double" value="2" />
+		<property name="heightFactor" type="double" value="2" />
+		<property name="style" type="int" value="0" />
+		<property name="resizable" type="bool" value="0" />
+	</chart>
+	<chart id="2" name="" title="Performance" >
+		<property name="title" type="QString" value="Performance" />
+		<property name="subtitle" type="QString" value="" />
+		<property name="widthFactor" type="double" value="2" />
+		<property name="heightFactor" type="double" value="2" />
+		<property name="style" type="int" value="0" />
+		<property name="resizable" type="bool" value="0" />
+		<property name="stacked" type="bool" value="1" />
+		<property name="byseries" type="bool" value="1" />
+		<property name="stackWidth" type="int" value="20" />
+		<property name="showGrid" type="int" value="2" />
+		<property name="showFull" type="int" value="0" />
+		<property name="showIntervalMarkers" type="int" value="2" />
+		<property name="showIntervalNavigator" type="int" value="2" />
+		<property name="hovering" type="int" value="1" />
+		<property name="showHelp" type="int" value="0" />
+		<property name="showATISS" type="int" value="0" />
+		<property name="showANTISS" type="int" value="0" />
+		<property name="showNP" type="int" value="0" />
+		<property name="showXP" type="int" value="0" />
+		<property name="showAP" type="int" value="0" />
+		<property name="showSpeed" type="int" value="2" />
+		<property name="showAccel" type="int" value="0" />
+		<property name="showCad" type="int" value="2" />
+		<property name="showTorque" type="int" value="2" />
+		<property name="showPower" type="int" value="0" />
+		<property name="showSlope" type="int" value="2" />
+		<property name="showAltSlope" type="int" value="0" />
+		<property name="showHr" type="int" value="2" />
+		<property name="showTcore" type="int" value="0" />
+		<property name="showCadD" type="int" value="0" />
+		<property name="showTorqueD" type="int" value="0" />
+		<property name="showPowerD" type="int" value="0" />
+		<property name="showHrD" type="int" value="0" />
+		<property name="showAlt" type="int" value="2" />
+		<property name="showBalance" type="int" value="0" />
+		<property name="showTE" type="int" value="0" />
+		<property name="showPS" type="int" value="0" />
+		<property name="showPCO" type="int" value="0" />
+		<property name="showDC" type="int" value="0" />
+		<property name="showPPP" type="int" value="0" />
+		<property name="showTemp" type="int" value="2" />
+		<property name="showW" type="int" value="0" />
+		<property name="showRV" type="int" value="0" />
+		<property name="showRCad" type="int" value="0" />
+		<property name="showRGCT" type="int" value="0" />
+		<property name="showSmO2" type="int" value="0" />
+		<property name="showtHb" type="int" value="0" />
+		<property name="showO2Hb" type="int" value="0" />
+		<property name="showHHb" type="int" value="0" />
+		<property name="showGear" type="int" value="2" />
+		<property name="byDistance" type="int" value="0" />
 		<property name="smoothing" type="int" value="1" />
+		<property name="paintBrush" type="int" value="1" />
+		<property name="userData" type="QString" value="&lt;userdata name=&quot;Strokes&quot; units=&quot;SPL&quot; color=&quot;#cccc00&quot; zstring=&quot;&quot;&gt;XDATA(&amp;quot;SWIM&amp;quot;, &amp;quot;STROKES&amp;quot;, repeat)&lt;/userdata&gt;&lt;userdata name=&quot;SWOLF&quot; units=&quot;SWOLF&quot; color=&quot;#ffaa7f&quot; zstring=&quot;&quot;&gt;XDATA(&amp;quot;SWIM&amp;quot;, &amp;quot;TYPE&amp;quot;, repeat)&amp;gt;0 ? XDATA(&amp;quot;SWIM&amp;quot;, &amp;quot;DURATION&amp;quot;, repeat)+XDATA(&amp;quot;SWIM&amp;quot;, &amp;quot;STROKES&amp;quot;, repeat) : 0&lt;/userdata&gt;" />
 	</chart>
-	<chart id="20" name="" title="HrPw" >
-		<property name="title" type="QString" value="HrPw" />
+	<chart id="3" name="" title="CV" >
+		<property name="title" type="QString" value="CV" />
 		<property name="subtitle" type="QString" value="" />
 		<property name="widthFactor" type="double" value="2" />
-		<property name="heightFactor" type="double" value="2.77778" />
+		<property name="heightFactor" type="double" value="2" />
 		<property name="style" type="int" value="0" />
 		<property name="resizable" type="bool" value="0" />
-		<property name="shadeZones" type="int" value="0" />
-		<property name="joinLine" type="int" value="0" />
-		<property name="fullplot" type="int" value="0" />
+		<property name="filter" type="QString" value="search:" />
+		<property name="mode" type="int" value="5" />
+		<property name="showBest" type="bool" value="1" />
+		<property name="showTest" type="bool" value="1" />
+		<property name="filterBest" type="bool" value="0" />
+		<property name="showPercent" type="bool" value="0" />
+		<property name="showPowerIndex" type="bool" value="0" />
+		<property name="showGrid" type="bool" value="1" />
+		<property name="season" type="QString" value="Last 3 months" />
+		<property name="cpmodel" type="int" value="1" />
+		<property name="fit" type="int" value="1" />
+		<property name="fitdata" type="int" value="1" />
+		<property name="variant" type="int" value="0" />
+		<property name="modelDecay" type="bool" value="0" />
+		<property name="ani1" type="int" value="120" />
+		<property name="ani2" type="int" value="200" />
+		<property name="aei1" type="int" value="720" />
+		<property name="aei2" type="int" value="1200" />
+		<property name="sani1" type="int" value="30" />
+		<property name="sani2" type="int" value="60" />
+		<property name="laei1" type="int" value="3000" />
+		<property name="laei2" type="int" value="30000" />
+		<property name="showPP" type="bool" value="0" />
+		<property name="fromDate" type="QDate" value="Sat Jan 1 2000" />
+		<property name="toDate" type="QDate" value="Sat Jan 1 2000" />
+		<property name="startDate" type="QDate" value="Sun May 8 2022" />
+		<property name="lastN" type="int" value="7" />
+		<property name="lastNX" type="int" value="0" />
+		<property name="prevN" type="int" value="0" />
+		<property name="shading" type="int" value="1" />
+		<property name="showEffort" type="bool" value="0" />
+		<property name="showHeat" type="bool" value="0" />
+		<property name="showHeatByDate" type="bool" value="0" />
+		<property name="showCSLinear" type="bool" value="1" />
+		<property name="shadeIntervals" type="int" value="1" />
+		<property name="ridePlotMode" type="int" value="0" />
+		<property name="useSelected" type="int" value="0" />
 	</chart>
-	<chart id="13" name="" title="Edit" >
-		<property name="title" type="QString" value="Edit" />
+	<chart id="6" name="" title="Pace" >
+		<property name="title" type="QString" value="Pace" />
+		<property name="subtitle" type="QString" value="" />
+		<property name="widthFactor" type="double" value="2" />
+		<property name="heightFactor" type="double" value="2" />
+		<property name="style" type="int" value="0" />
+		<property name="resizable" type="bool" value="0" />
+		<property name="series" type="int" value="3" />
+		<property name="percent" type="int" value="0" />
+		<property name="logY" type="bool" value="0" />
+		<property name="zeroes" type="bool" value="1" />
+		<property name="shade" type="bool" value="1" />
+		<property name="zoned" type="bool" value="0" />
+		<property name="cpZoned" type="bool" value="0" />
+		<property name="zoneLimited" type="bool" value="0" />
+		<property name="filter" type="QString" value="search:" />
+		<property name="fromDate" type="QDate" value="Sat Jan 1 2000" />
+		<property name="toDate" type="QDate" value="Sat Jan 1 2000" />
+		<property name="startDate" type="QDate" value="Mon May 9 2022" />
+		<property name="lastN" type="int" value="7" />
+		<property name="lastNX" type="int" value="0" />
+		<property name="prevN" type="int" value="0" />
+		<property name="plotColor" type="QString" value="#0000ff" />
+		<property name="distmetric" type="QString" value="workout_time" />
+		<property name="totalmetric" type="QString" value="ride_count" />
+		<property name="dataMode" type="bool" value="1" />
+		<property name="bin" type="double" value="0.1" />
+		<property name="useSelected" type="int" value="0" />
+	</chart>
+	<chart id="6" name="" title="HR" >
+		<property name="title" type="QString" value="HR" />
+		<property name="subtitle" type="QString" value="" />
+		<property name="widthFactor" type="double" value="2" />
+		<property name="heightFactor" type="double" value="2" />
+		<property name="style" type="int" value="0" />
+		<property name="resizable" type="bool" value="0" />
+		<property name="series" type="int" value="2" />
+		<property name="percent" type="int" value="0" />
+		<property name="logY" type="bool" value="0" />
+		<property name="zeroes" type="bool" value="1" />
+		<property name="shade" type="bool" value="1" />
+		<property name="zoned" type="bool" value="0" />
+		<property name="cpZoned" type="bool" value="0" />
+		<property name="zoneLimited" type="bool" value="0" />
+		<property name="filter" type="QString" value="search:" />
+		<property name="fromDate" type="QDate" value="Sat Jan 1 2000" />
+		<property name="toDate" type="QDate" value="Sat Jan 1 2000" />
+		<property name="startDate" type="QDate" value="Mon May 9 2022" />
+		<property name="lastN" type="int" value="7" />
+		<property name="lastNX" type="int" value="0" />
+		<property name="prevN" type="int" value="0" />
+		<property name="plotColor" type="QString" value="#0000ff" />
+		<property name="distmetric" type="QString" value="workout_time" />
+		<property name="totalmetric" type="QString" value="ride_count" />
+		<property name="dataMode" type="bool" value="1" />
+		<property name="bin" type="double" value="1" />
+		<property name="useSelected" type="int" value="0" />
+	</chart>
+	<chart id="38" name="" title="SS-SR (Requires R)" >
+		<property name="title" type="QString" value="SS-SR (Requires R)" />
+		<property name="subtitle" type="QString" value="" />
+		<property name="widthFactor" type="double" value="2" />
+		<property name="heightFactor" type="double" value="2" />
+		<property name="style" type="int" value="0" />
+		<property name="resizable" type="bool" value="0" />
+		<property name="script" type="QString" value="## R-chart script.\n## For use with GoldenCheetah.\n## tested on GC.version() is &quot;DEV-V3.5 1705&quot;\n##\nxtext&lt;-&quot;Pace/100m (min:sec)&quot;\nytext&lt;-&quot;Stroke Rate/min (srm)&quot;\n\npushoff&lt;-3 ## push-off compensation (m)\nstrokestyle&lt;-1## 1=freestyle, 2=backstroke, 3=breaststroke, 4=butterfly\n## plot colors\nregionlowfill&lt;-adjustcolor(&quot;#5076a3&quot;,alpha.f=.6)\nregionlowborder&lt;-&quot;#5076a3&quot;\nregionhighfill&lt;-adjustcolor(&quot;#a34b49&quot;,alpha.f=.6)\nregionhighborder&lt;-&quot;#a34b49&quot;\nsb_size_min&lt;-1\nsb_size_max&lt;-15\nsb_alpha&lt;-0.5\n## plot symbols\npl25&lt;-21\npl50&lt;-22\nplx&lt;-23\n#plot limits\nxmin&lt;-130\nxmax&lt;-60\nymin&lt;-30\nymax&lt;-100\n\ndarken &lt;- function(color, factor=1.4){\n    col &lt;- col2rgb(color)\n    col &lt;- col/factor\n    col &lt;- rgb(t(col), maxColorValue=255)\n}\n\nstroketext&lt;-list(&quot;Freestyle&quot;, &quot;Backstroke&quot;, &quot;Breaststroke&quot;, &quot;Butterfly&quot;)\nheader&lt;-paste(stroketext[strokestyle],&quot; stroke rate chart&quot;)\n\n## plot\npar(mar=c(6,6,3,0))\nplot(NULL,NULL, xlim=c(xmin,xmax),ylim=c(ymin,ymax),  type=&quot;n&quot;,xlab=&quot;&quot;,ylab=&quot;&quot;, xaxt=&quot;n&quot;, yaxt=&quot;n&quot;)\n## ticks\nat=seq(xmin,xmax,-10)\naxis(1, at=at, tcl=-0.8, labels=sprintf(&quot;%d:%02d&quot;,at%/%60,at%%60))##major x-axis\naxis(1, at=seq(xmin,xmax,-1), labels=NA)##minor x-axis\naxis(2, at=seq(ymin,ymax,10), tcl=-0.8, las=2)##major y-axis\naxis(2, at=seq(ymin,ymax,1), labels=NA)##minor y-axis\n\n## region low\n##lines(x_region1,region_low,type=&quot;l&quot;, col=&quot;blue&quot;)\nx_region1&lt;- c(130 ,120 ,110 ,100 ,90  ,80  ,70  ,60)\nregion_low&lt;-c(50.0,50.8,51.6,53.0,54.5,57.0,61.0,67.0)\npolygon(c(xmin,x_region1,xmax),c(ymin,region_low,ymin),col=regionlowfill,border=regionlowborder)\n##text(127,31,&quot;Low Stroke rate&quot;, col=&quot;#0000FF&quot;, cex=1)\nmtext(&quot;Low Stroke rate&quot;,1, line=-3.5, col=&quot;#0000FF&quot;, cex=1)\n\n## region high\n##lines(x_region2,region_high,type=&quot;l&quot;, col=&quot;red&quot;)\nx_region2&lt;-  c(130 ,120 ,110 ,100 ,95.5,90  ,80  ,70  ,67)\nregion_high&lt;-c(61.8,63.4,65.2,68.0,70.0,73.1,83.1,96.0,100.0)\npolygon(c(xmin,x_region2),c(ymax,region_high),col=regionhighfill,border=regionhighborder)\n##text(126.9,99,&quot;High Stroke rate&quot;, col=&quot;#ff0000&quot;, cex=1)\nmtext(&quot;High Stroke rate&quot;,3, line=-3.5, col=&quot;#ff0000&quot;, cex=1)\n\n## region OK\n##polygon(c(x_region1,rev(c(x_region2,xmax))),c(region_low,rev(c(region_high,ymax))),col=&quot;gray&quot;,border=&quot;gray&quot;)\n\n## title\ntitle(main=header,cex.main=2.0,xlab=xtext,ylab=ytext)\n\n## grid lines\ngrid(col=&quot;#606060&quot;, lty=&quot;solid&quot;, lwd=0.5)\n\n## plot values, use available swim data(XDATA)\nmetrics&lt;-GC.activity.metrics(compare=TRUE)\nactivities&lt;-GC.activity(compare=TRUE)\nfor(a in 1:length(activities)){\n	if (&quot;SWIM_TYPE&quot; %in% names(activities[[a]]$activity))##swim activity?\n	{\n	swim&lt;-activities[[a]]$activity[which(as.numeric(activities[[a]]$activity$SWIM_TYPE)==strokestyle),]\n	if (&quot;Pool_Length&quot; %in% names(metrics[[a]]$metrics)){Pool_Length&lt;-as.numeric(metrics[[a]]$metrics$Pool_Length)}else{Pool_Length&lt;-0}\n	pointfill&lt;-activities[[a]]$color\n	pointfill&lt;-adjustcolor(activities[[a]]$color,alpha.f=sb_alpha)\n	pointborder&lt;-darken(activities[[a]]$color)\n\n	if (Pool_Length==25){sb1&lt;-pl25}\n	else {if (Pool_Length==50){sb1&lt;-pl50}\n	else {sb1&lt;-plx}}\n\n	pace&lt;-swim$SWIM_DURATION*100/Pool_Length\n	sr&lt;-(60*2*swim$SWIM_STROKES/swim$SWIM_DURATION)/(1-pushoff/Pool_Length)## 2arms per minute, incl pushoff compensation\n	##lines(pace, sr, type=&quot;p&quot;, col=pointborder, bg=pointfill, pch=sb1, cex=pointsize)\n	pl&lt;-lowess(round(pace),sr)\n	xn&lt;-table(pl$x)\n	f&lt;-xn/max(xn)\n	lines(pl$x[!duplicated(pl$x)],pl$y[!duplicated(pl$x)], type=&quot;o&quot;, col=pointborder, bg=pointfill, pch=sb1, cex=sb_size_min+(sb_size_max-sb_size_min)*f)\n	}\n}\nlegend(&quot;top&quot;, legend=c(&quot;25m&quot;,&quot;50m&quot;,&quot;custom&quot;), pch=c(pl25,pl50,plx),  horiz=TRUE, bty=&quot;n&quot;, xpd=TRUE, inset=c(0), pt.cex=2)\n" />
+		<property name="state" type="QString" value="" />
+		<property name="plotOnChart" type="bool" value="0" />
+		<property name="showConsole" type="bool" value="0" />
+	</chart>
+	<chart id="37" name="" title="Map" >
+		<property name="title" type="QString" value="Map" />
+		<property name="subtitle" type="QString" value="Route" />
+		<property name="widthFactor" type="double" value="2" />
+		<property name="heightFactor" type="double" value="2" />
+		<property name="style" type="int" value="0" />
+		<property name="resizable" type="bool" value="0" />
+		<property name="maptype" type="int" value="0" />
+		<property name="showmarkers" type="bool" value="0" />
+		<property name="showfullplot" type="bool" value="0" />
+		<property name="showintervals" type="bool" value="1" />
+		<property name="hideShadedZones" type="bool" value="0" />
+		<property name="hideYellowLine" type="bool" value="0" />
+		<property name="hideRouteLineOpacity" type="bool" value="0" />
+		<property name="osmts" type="int" value="10" />
+		<property name="googleKey" type="QString" value="" />
+	</chart>
+</layout>
+<layout name="Map" style="2" type="2" expression="" trainswitch="0">
+	<chart id="37" name="" title="Map" >
+		<property name="title" type="QString" value="Map" />
+		<property name="subtitle" type="QString" value="Route" />
+		<property name="widthFactor" type="double" value="1" />
+		<property name="heightFactor" type="double" value="1.6129" />
+		<property name="style" type="int" value="2" />
+		<property name="resizable" type="bool" value="1" />
+		<property name="maptype" type="int" value="0" />
+		<property name="showmarkers" type="bool" value="1" />
+		<property name="showfullplot" type="bool" value="0" />
+		<property name="showintervals" type="bool" value="0" />
+		<property name="hideShadedZones" type="bool" value="0" />
+		<property name="hideYellowLine" type="bool" value="0" />
+		<property name="hideRouteLineOpacity" type="bool" value="0" />
+		<property name="osmts" type="int" value="0" />
+		<property name="googleKey" type="QString" value="" />
+	</chart>
+	<chart id="2" name="" title="Performance" >
+		<property name="title" type="QString" value="Performance" />
 		<property name="subtitle" type="QString" value="" />
 		<property name="widthFactor" type="double" value="1" />
-		<property name="heightFactor" type="double" value="1" />
-		<property name="style" type="int" value="0" />
-		<property name="resizable" type="bool" value="0" />
+		<property name="heightFactor" type="double" value="2.77778" />
+		<property name="style" type="int" value="2" />
+		<property name="resizable" type="bool" value="1" />
+		<property name="stacked" type="bool" value="0" />
+		<property name="byseries" type="bool" value="0" />
+		<property name="stackWidth" type="int" value="20" />
+		<property name="showGrid" type="int" value="2" />
+		<property name="showFull" type="int" value="0" />
+		<property name="showIntervalMarkers" type="int" value="2" />
+		<property name="showIntervalNavigator" type="int" value="0" />
+		<property name="hovering" type="int" value="1" />
+		<property name="showHelp" type="int" value="0" />
+		<property name="showATISS" type="int" value="0" />
+		<property name="showANTISS" type="int" value="0" />
+		<property name="showNP" type="int" value="0" />
+		<property name="showXP" type="int" value="0" />
+		<property name="showAP" type="int" value="0" />
+		<property name="showSpeed" type="int" value="2" />
+		<property name="showAccel" type="int" value="0" />
+		<property name="showCad" type="int" value="2" />
+		<property name="showTorque" type="int" value="2" />
+		<property name="showPower" type="int" value="1" />
+		<property name="showSlope" type="int" value="0" />
+		<property name="showAltSlope" type="int" value="0" />
+		<property name="showHr" type="int" value="2" />
+		<property name="showTcore" type="int" value="0" />
+		<property name="showCadD" type="int" value="0" />
+		<property name="showTorqueD" type="int" value="0" />
+		<property name="showPowerD" type="int" value="0" />
+		<property name="showHrD" type="int" value="0" />
+		<property name="showAlt" type="int" value="2" />
+		<property name="showBalance" type="int" value="0" />
+		<property name="showTE" type="int" value="0" />
+		<property name="showPS" type="int" value="0" />
+		<property name="showPCO" type="int" value="0" />
+		<property name="showDC" type="int" value="0" />
+		<property name="showPPP" type="int" value="0" />
+		<property name="showTemp" type="int" value="0" />
+		<property name="showW" type="int" value="0" />
+		<property name="showRV" type="int" value="0" />
+		<property name="showRCad" type="int" value="2" />
+		<property name="showRGCT" type="int" value="0" />
+		<property name="showSmO2" type="int" value="0" />
+		<property name="showtHb" type="int" value="0" />
+		<property name="showO2Hb" type="int" value="0" />
+		<property name="showHHb" type="int" value="0" />
+		<property name="showGear" type="int" value="0" />
+		<property name="byDistance" type="int" value="0" />
+		<property name="smoothing" type="int" value="1" />
+		<property name="paintBrush" type="int" value="0" />
+		<property name="userData" type="QString" value="" />
 	</chart>
 </layout>
 </layouts>
