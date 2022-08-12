@@ -252,15 +252,22 @@ RideMetadata::configChanged(qint32)
         // this was changed to be global configuration since other global
         // settings are dependant on them, notably user metrics
         bool first=true;
+        bool addDefault=true;
         QStringListIterator i(QDir(gcroot).entryList(QDir::Dirs | QDir::NoDotAndDotDot));
-        while (i.hasNext()) {
+        while (i.hasNext() || addDefault) {
 
-            QString name = i.next();
-
+            QString filename;
+            if (i.hasNext()) {
+                // add athlete setup
+                filename = gcroot + "/" + i.next() + "/config/metadata.xml";
+            } else {
+                // add the default setup
+                filename = ":/xml/metadata.xml";
+                addDefault = false;
+            }
             // if there is no metadata.xml it is not an athlete folder
             // or it is one still using default metadata.xml, so skip it
             // since there is no custom configuration to preserve.
-            QString filename = gcroot + "/" + name + "/config/metadata.xml";
             if (!QFile(filename).exists()) continue;
 
             // athlete specific configuration
@@ -321,14 +328,6 @@ RideMetadata::configChanged(qint32)
                     }
                 }
             }
-        }
-
-        // eek, we didn't find anything - new install with no athletes yet
-        if (first == true) {
-
-            // use the default setup
-            filename = ":/xml/metadata.xml";
-            readXML(filename, keywordDefinitions, fieldDefinitions, colorfield, defaultDefinitions);
         }
 
         // write out global file now, so we don't keep doing this
