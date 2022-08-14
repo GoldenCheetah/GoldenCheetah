@@ -290,14 +290,11 @@ PythonChart::PythonChart(Context *context, bool ridesummary) : GcChartWindow(con
     HelpWhatsThis *helpConfig = new HelpWhatsThis(c);
     c->setWhatsThis(helpConfig->getWhatsThisText(HelpWhatsThis::Chart_Python));
     setControls(c);
-    //HelpWhatsThis *helpConfig = new HelpWhatsThis(c);
-    //c->setWhatsThis(helpConfig->getWhatsThisText(HelpWhatsThis::ChartRides_Performance));
 
     // settings
     QVBoxLayout *clv = new QVBoxLayout(c);
     web = new QCheckBox(tr("Web charting"), this);
     clv->addWidget(web);
-    clv->addStretch();
 
     // sert no render widget
     canvas=NULL;
@@ -312,17 +309,10 @@ PythonChart::PythonChart(Context *context, bool ridesummary) : GcChartWindow(con
     // then disable the PythonConsole altogether.
     if (python) {
 
-        // reveal controls
-        QHBoxLayout *rev = new QHBoxLayout();
         showCon = new QCheckBox(tr("Show Console"), this);
         showCon->setChecked(true);
-
-
-        rev->addStretch();
-        rev->addWidget(showCon);
-        rev->addStretch();
-
-        setRevealLayout(rev);
+        clv->addWidget(showCon);
+        clv->addStretch();
 
         leftsplitter = new QSplitter(Qt::Vertical, this);
         leftsplitter->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
@@ -408,6 +398,10 @@ PythonChart::PythonChart(Context *context, bool ridesummary) : GcChartWindow(con
     } else {
 
         // not starting
+        noPython = new QLabel(tr("Warning: Python is disabled"), this);
+        clv->addWidget(noPython);
+        clv->addStretch();
+
         script = NULL;
         splitter = NULL;
         console = NULL;

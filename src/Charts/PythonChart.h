@@ -103,9 +103,8 @@ class PythonChart : public GcChartWindow, public PythonHost {
         PythonChart(Context *context, bool ridesummary);
         ~PythonChart();
 
-        // reveal
-        bool hasReveal() { return true; }
         QCheckBox *showCon, *web;
+        QLabel *noPython;
 
         // receives all the events
         QTextEdit *script;

@@ -989,6 +989,7 @@ Perspective::eventFilter(QObject *object, QEvent *e)
     }
 #endif
 
+#if 0   // Reveal controls disabled in v3.6 TODO: remove reveal code
     // mouse moved and tabbed -- should we show/hide chart popup controls?
     if (e->type() == QEvent::MouseMove && currentStyle == 0 && tabbed->currentIndex() >= 0) {
 
@@ -1022,6 +1023,7 @@ Perspective::eventFilter(QObject *object, QEvent *e)
             }
         }
     }
+#endif
 
     // useful for tracking events across the charts
     //qDebug()<<QTime::currentTime()<<name<<"filter event"<<object<<e->type();

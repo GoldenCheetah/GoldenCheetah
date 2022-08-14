@@ -288,7 +288,6 @@ RChart::RChart(Context *context, bool ridesummary) : GcChartWindow(context), con
     c->setWhatsThis(helpConfig->getWhatsThisText(HelpWhatsThis::Chart_R));
     QVBoxLayout *cl = new QVBoxLayout(c);
     cl->addWidget(plotOnChartSetting);
-    cl->addStretch();
     setControls(c);
 
     QVBoxLayout *mainLayout = new QVBoxLayout;
@@ -300,16 +299,10 @@ RChart::RChart(Context *context, bool ridesummary) : GcChartWindow(context), con
     // then disable the RConsole altogether.
     if (rtool) {
 
-        // reveal controls
-        QHBoxLayout *rev = new QHBoxLayout();
         showCon = new QCheckBox(tr("Show Console"), this);
         showCon->setChecked(true);
-
-        rev->addStretch();
-        rev->addWidget(showCon);
-        rev->addStretch();
-
-        setRevealLayout(rev);
+        cl->addWidget(showCon);
+        cl->addStretch();
 
         leftsplitter = new QSplitter(Qt::Vertical, this);
         leftsplitter->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
@@ -413,6 +406,10 @@ RChart::RChart(Context *context, bool ridesummary) : GcChartWindow(context), con
     } else {
 
         // not starting
+        noR = new QLabel(tr("Warning: R is disabled"), this);
+        cl->addWidget(noR);
+        cl->addStretch();
+
         script = NULL;
         splitter = NULL;
         console = NULL;
