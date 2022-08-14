@@ -11851,7 +11851,7 @@ Drehmomentkorrektur - Der absolute Korrekturwert in Nm (oder Pfund pro Quadratin
         <location filename="../../Gui/Colors.cpp" line="251"/>
         <location filename="../../Gui/Colors.cpp" line="252"/>
         <source>Gui</source>
-        <translation>Grafikschnittstelle (Gui)</translation>
+        <translation>GUI</translation>
     </message>
     <message>
         <location filename="../../Gui/Colors.cpp" line="182"/>
@@ -11987,7 +11987,7 @@ Drehmomentkorrektur - Der absolute Korrekturwert in Nm (oder Pfund pro Quadratin
     <message>
         <location filename="../../Gui/Colors.cpp" line="252"/>
         <source>Map Route Line</source>
-        <translation type="unfinished"></translation>
+        <translation>Karte: Streckenlinie</translation>
     </message>
     <message>
         <location filename="../../Gui/Colors.cpp" line="203"/>
@@ -12489,12 +12489,12 @@ Drehmomentkorrektur - Der absolute Korrekturwert in Nm (oder Pfund pro Quadratin
     <message>
         <location filename="../../Core/GcUpgrade.cpp" line="387"/>
         <source>Upgrade to v3.6</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktualisieren auf v3.6</translation>
     </message>
     <message>
         <location filename="../../Core/GcUpgrade.cpp" line="388"/>
         <source>We are about to upgrade your data and layouts to v3.6, please note Ride Summary chart was deprecated, and to use v3.5 again you will need to restore a backup</source>
-        <translation type="unfinished"></translation>
+        <translation>Wir sind dabei, Ihre Daten und Layouts auf v3.6 zu aktualisieren. Bitte beachten Sie, dass das Diagramm &quot;Zusammenfassung&quot; veraltet ist und wenn sie v3.5 wieder verwenden wollen, müssen sie eine Sicherungsdatei aus v3.5 benützen</translation>
     </message>
     <message>
         <location filename="../../Core/GcUpgrade.cpp" line="488"/>
@@ -13667,27 +13667,27 @@ Drehmomentkorrektur - Der absolute Korrekturwert in Nm (oder Pfund pro Quadratin
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="87"/>
         <source>Navigate backward</source>
-        <translation type="unfinished"></translation>
+        <translation>Rückwärts navigieren</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="89"/>
         <source>Navigate forward</source>
-        <translation type="unfinished"></translation>
+        <translation>Vorwärts navigieren</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="91"/>
         <source>Select active perspective for the current view, create new perspectives and manage existing ones</source>
-        <translation type="unfinished"></translation>
+        <translation>Auswahl der aktiven Perspektive für die aktuelle Ansicht. Erstellen neuer Perspektiven und Verwalten bestehender Perspektiven</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="95"/>
         <source>Activate / De-activate the Compare Pane - which allows to compare activities and intervals in Activities View or date ranges in Trends View - also across athletes. In Train View it shows/hide the Intensity Adjustments and Workout Control Pane.</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktivieren/ Deaktivieren Sie den Vergleichsbereich, mit dem Sie Aktivitäten und Intervalle in der Ansicht &quot;Aktivitäten&quot; oder Datumsbereiche in der Ansicht &quot;Trends&quot; vergleichen können - auch zwischen verschiedenen Athleten. In der Ansicht &quot;Trainieren&quot; können Sie damit die &quot;Intensitätsanpassung und Workout Kontrolle&quot; ein- und ausblenden.</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="97"/>
         <source>Changes the current view layout between Tabbed and Tiled</source>
-        <translation type="unfinished"></translation>
+        <translation>Ändert das aktuelle Ansichtslayout zwischen Reiter und Kacheln</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="122"/>
@@ -15922,13 +15922,13 @@ Drehmomentkorrektur - Der absolute Korrekturwert in Nm (oder Pfund pro Quadratin
     <message>
         <location filename="../../Metrics/Coggan.cpp" line="45"/>
         <source>IsoPower</source>
-        <translation type="unfinished">IsoPower</translation>
+        <translation>IsoPower</translation>
     </message>
     <message>
         <location filename="../../Metrics/Coggan.cpp" line="47"/>
         <location filename="../../Metrics/Coggan.cpp" line="48"/>
         <source>watts</source>
-        <translation type="unfinished">Watt</translation>
+        <translation>Watt</translation>
     </message>
     <message>
         <location filename="../../Metrics/Coggan.cpp" line="50"/>
@@ -28153,7 +28153,7 @@ Wollen Sie fortfahren ?</translation>
     <message>
         <location filename="../../Charts/RideMapWindow.cpp" line="84"/>
         <source>Hide Out &amp; Back Route Opacity</source>
-        <translation type="unfinished"></translation>
+        <translation>Transparenz ausschalten</translation>
     </message>
     <message>
         <location filename="../../Charts/RideMapWindow.cpp" line="85"/>
