@@ -136,7 +136,7 @@ FixElevation::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString
 
     // get settings
     if (config == NULL) { // being called automatically
-        apiKey = appsettings->value(NULL, GC_DPFE_AK, "").toString();
+        apiKey = appsettings->value(NULL, GC_DPFE_AK, "").toInt();
     } else { // being called manually
         apiKey = ((FixElevationConfig*)(config))->ak->text();
     }
