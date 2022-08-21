@@ -1750,11 +1750,13 @@ EditUserAxisDialog::EditUserAxisDialog(Context *context, GenericAxisInfo &info)
     axistype = new QComboBox();
     for(int i=0; i< GenericAxisInfo::LAST; i++)
         axistype->addItem(GenericAxisInfo::axisTypeDescription(static_cast<GenericAxisInfo::AxisInfoType>(i)), i);
-    log = new QCheckBox(tr("Logarithmic Scale"));
     QHBoxLayout *zz=new QHBoxLayout();
     zz->addWidget(axistype);
     zz->addStretch();
     cf->addRow(tr("Type"), zz);
+
+    // log scale with a continous axis - otherwise not shown
+    log = new QCheckBox(tr("Logarithmic Scale"));
     cf->addRow(tr(" "), log);
 
     fixed = new QCheckBox(tr("Fixed"));
@@ -1832,6 +1834,7 @@ EditUserAxisDialog::setWidgets()
     // first- axistype determines the use of smoothing or groupby
     switch(axistype->currentIndex()) {
         case GenericAxisInfo::DATERANGE:
+            log->hide();
             groupby->show();
             groupbylabel->show();
             smooth->setValue(0);
@@ -1840,6 +1843,7 @@ EditUserAxisDialog::setWidgets()
             break;
 
         case GenericAxisInfo::TIME:
+            log->hide();
             smooth->setValue(5); // default to 5 seconds smoothing user can override
             smooth->show();
             smoothlabel->show();
@@ -1849,6 +1853,7 @@ EditUserAxisDialog::setWidgets()
             break;
 
         default:
+            log->show();
             groupby->setCurrentIndex(0);
             smooth->setValue(0);
             smooth->hide();
