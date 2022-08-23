@@ -2085,7 +2085,7 @@ struct FitFileReaderState
             double deltaLat = lat - prevPoint->lat;
             // double deltaHeadwind = headwind - prevPoint->headwind;
             double deltaSlope = slope - prevPoint->slope;
-            double deltaLeftRightBalance = (lrbalance>=0?lrbalance:50.0) - (prevPoint->lrbalance?prevPoint->lrbalance:50.0);
+            double deltaLeftRightBalance = lrbalance - prevPoint->lrbalance;
             double deltaLeftTE = leftTorqueEff - prevPoint->lte;
             double deltaRightTE = rightTorqueEff - prevPoint->rte;
             double deltaLeftPS = leftPedalSmooth - prevPoint->lps;
@@ -2126,7 +2126,7 @@ struct FitFileReaderState
                         0.0, // headwind
                         prevPoint->slope + (deltaSlope * weight),
                         temperature,
-                        prevPoint->lrbalance + (deltaLeftRightBalance * weight),
+                        (lrbalance!=RideFile::NA && prevPoint->lrbalance!=RideFile::NA) ? prevPoint->lrbalance + (deltaLeftRightBalance * weight) : RideFile::NA, // interpolate between valid values only
                         prevPoint->lte + (deltaLeftTE * weight),
                         prevPoint->rte + (deltaRightTE * weight),
                         prevPoint->lps + (deltaLeftPS * weight),
