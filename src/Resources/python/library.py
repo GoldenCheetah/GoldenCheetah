@@ -39,7 +39,7 @@ def __GCsetCurve(name="",x=list(),y=list(),f=list(),xaxis="x",yaxis="y", labels=
     GC.setCurve(name,list(x),list(y),list(f),xaxis,yaxis,list(labels),list(colors),line,symbol,size,color,opacity,opengl,legend,datalabels,fill)
 
 # setting the axis
-def __GCconfigAxis(name,visible=True,align=-1,min=-1,max=-1,type=-1,labelcolor="",color="",log=False,categories=list()):
+def __GCconfigAxis(name,visible=True,align=-1,min=-1,max=-1,type=0,labelcolor="",color="",log=False,categories=list()):
     if (name == ""):
         raise ValueError("axis 'name' must be passed.")
     GC.configAxis(name, visible, align, min, max, type, labelcolor, color, log, categories)
@@ -66,6 +66,11 @@ GC_LINE_SOLID=1
 GC_LINE_DASH=2
 GC_LINE_DOT=3
 GC_LINE_DASHDOT=4
+
+# symbol type
+GC_SYMBOL_NONE=0
+GC_SYMBOL_CIRCLE=1
+GC_SYMBOL_RECTANGLE=2
 
 # constants
 GC_ALIGN_BOTTOM=0
