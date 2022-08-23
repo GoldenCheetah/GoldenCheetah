@@ -934,6 +934,10 @@ Strava::prepareResponse(QByteArray* data)
             }
         }
 
+        if (!each["perceived_exertion"].isNull()) {
+            ride->setTag("RPE", QString("%1").arg(each["perceived_exertion"].toDouble()));
+        }
+
         if (each["manual"].toBool()) {
             if (each["distance"].toDouble()>0) {
                 QMap<QString,QString> map;
