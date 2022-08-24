@@ -35,9 +35,6 @@
 #define GC_UNIT_METRIC                       "Metric"
 #define GC_UNIT_IMPERIAL                     "Imperial"
 
-//Google Calendar-CALDAV oauthkeys / see also Athlete parameter
-#define GC_GOOGLE_CALENDAR_CLIENT_ID      "426009671216-c588t1u6hafep30tfs7g0g1nuo72s8ko.apps.googleusercontent.com"
-
 //Today's Plan
 #define GC_TODAYSPLAN_CLIENT_ID    "GoldenCheetah" // app id
 
@@ -366,46 +363,28 @@
 #define GC_DVUSER                       "<athlete-private>dv/user"
 #define GC_DVPASS                       "<athlete-private>dv/pass"
 #define GC_DVCALDAVTYPE                 "<athlete-private>dv/type"
-#define GC_DVGOOGLE_CALID               "<athlete-private>dv/googlecalid"
-#define GC_DVGOOGLE_DRIVE               "<athlete-private>dv/googledrive"
+
 //Dropbox oauth keys
 #define GC_DROPBOX_TOKEN                "<athlete-private>dropbox/token"
 #define GC_DROPBOX_FOLDER               "<athlete-private>dropbox/folder"
 
-//Google oauth keys
-#define GC_GOOGLE_DRIVE_AUTH_SCOPE      "<athlete-private>google-drive/auth_scope"
-#define GC_GOOGLE_DRIVE_ACCESS_TOKEN   "<athlete-private>google-drive/access_token"
-#define GC_GOOGLE_DRIVE_REFRESH_TOKEN   "<athlete-private>google-drive/refresh_token"
-#define GC_GOOGLE_DRIVE_LAST_ACCESS_TOKEN_REFRESH "<athlete-private>google-drive/last_access_token_refresh"
-
-#define GC_GOOGLE_DRIVE_FOLDER          "<athlete-private>google-drive/folder"
-#define GC_GOOGLE_DRIVE_FOLDER_ID       "<athlete-private>google-drive/folder_id"
-
-//University of Kent (same as google drive)
-#define GC_UOK_CONSENT                      "<athlete-private>uok-google-drive/consent"
-#define GC_UOK_GOOGLE_DRIVE_AUTH_SCOPE      "<athlete-private>uok-google-drive/auth_scope"
-#define GC_UOK_GOOGLE_DRIVE_ACCESS_TOKEN   "<athlete-private>uok-google-drive/access_token"
-#define GC_UOK_GOOGLE_DRIVE_REFRESH_TOKEN   "<athlete-private>uok-google-drive/refresh_token"
-#define GC_UOK_GOOGLE_DRIVE_LAST_ACCESS_TOKEN_REFRESH "<athlete-private>uok-google-drive/last_access_token_refresh"
-
-#define GC_UOK_GOOGLE_DRIVE_FOLDER          "<athlete-private>uok-google-drive/folder"
-#define GC_UOK_GOOGLE_DRIVE_FOLDER_ID       "<athlete-private>uok-google-drive/folder_id"
-
 //Withings
 #define GC_WITHINGS_TOKEN               "<athlete-private>withings_token"
 #define GC_WITHINGS_SECRET              "<athlete-private>withings_secret"
+
 //Nokia
 #define GC_NOKIA_TOKEN                  "<athlete-private>nokia_token"
 #define GC_NOKIA_REFRESH_TOKEN          "<athlete-private>nokia_refresh_token"
-//Google Calendar-CALDAV oauthkeys
-#define GC_GOOGLE_CALENDAR_REFRESH_TOKEN  "<athlete-private>google_cal_refresh_token"
+
 //Strava
 #define GC_STRAVA_TOKEN                 "<athlete-private>strava_token"
 #define GC_STRAVA_REFRESH_TOKEN         "<athlete-private>strava_refresh_token"
 #define GC_STRAVA_LAST_REFRESH          "<athlete-private>strava_last_refresh"
 #define GC_STRAVA_ACTIVITY_NAME         "<athlete-private>strava_metaname"
+
 //Cycling Analytics
 #define GC_CYCLINGANALYTICS_TOKEN       "<athlete-private>cyclinganalytics_token"
+
 //Today's Plan
 #define GC_TODAYSPLAN_TOKEN             "<athlete-private>todaysplan_token"
 #define GC_TODAYSPLAN_URL               "<athlete-private>todaysplan_url"
@@ -417,19 +396,23 @@
 #define GC_SIXCYCLE_USER                "<athlete-private>sixcycle_user"
 #define GC_SIXCYCLE_PASS                "<athlete-private>sixcycle_pass"
 #define GC_SIXCYCLE_URL                 "<athlete-private>sixcycle_url"
+
 // Polar Flow
 #define GC_POLARFLOW_TOKEN             "<athlete-private>polarflow_token"
 #define GC_POLARFLOW_USER_ID           "<athlete-private>polarflow_user_id"
+
 // SportTracks
 #define GC_SPORTTRACKS_TOKEN           "<athlete-private>sporttracks/sporttracks_token"
 #define GC_SPORTTRACKS_REFRESH_TOKEN   "<athlete-private>sporttracks/refresh_token"
 #define GC_SPORTTRACKS_LAST_REFRESH    "<athlete-private>sporttracks/last_refresh"
+
 // Xert
 #define GC_XERTUSER                    "<athlete-private>xert/user"
 #define GC_XERTPASS                    "<athlete-private>xert/pass"
 #define GC_XERT_TOKEN                  "<athlete-private>xert/xert_token"
 #define GC_XERT_REFRESH_TOKEN          "<athlete-private>xert/refresh_token"
 #define GC_XERT_LAST_REFRESH           "<athlete-private>xert/last_refresh"
+
 // Nolio
 #define GC_NOLIO_ACCESS_TOKEN          "<global-general>nolio_access_token"
 #define GC_NOLIO_REFRESH_TOKEN         "<global-general>nolio_refresh_token"
@@ -437,6 +420,7 @@
 #define GC_NOLIO_URL                   "<athlete-private>nolio_url"
 #define GC_NOLIO_ATHLETE_ID            "<athlete-private>nolio_athlete_id"
 #define GC_NOLIO_ATHLETE_NAME          "<athlete-private>nolio_athlete_name"
+
 // --------------------------------------------------------------------------------
 #include <QSettings>
 #include <QFileInfo>

@@ -25,7 +25,6 @@
 #include "Colors.h"
 #include "TimeUtils.h"
 
-#include "GoogleDrive.h"
 #include "PolarFlow.h"
 
 #include <QJsonParseError>
@@ -44,10 +43,7 @@ OAuthDialog::OAuthDialog(Context *context, OAuthSite site, CloudService *service
         if (service->id() == "Strava") site = this->site = STRAVA;
         if (service->id() == "Dropbox") site = this->site = DROPBOX;
         if (service->id() == "Cycling Analytics") site = this->site = CYCLING_ANALYTICS;
-        if (service->id() == "Google Calendar") site = this->site = GOOGLE_CALENDAR;
-        if (service->id() == "Google Drive") site = this->site = GOOGLE_DRIVE;
         if (service->id() == "Nolio") site = this->site = NOLIO;
-        if (service->id() == "University of Kent") site = this->site = KENTUNI;
         if (service->id() == "Today's Plan") site = this->site = TODAYSPLAN;
         if (service->id() == "Withings") site = this->site = WITHINGS;
         if (service->id() == "PolarFlow") site = this->site = POLAR;
@@ -129,37 +125,6 @@ OAuthDialog::OAuthDialog(Context *context, OAuthSite site, CloudService *service
         urlstr.append("response_type=code&");
         urlstr.append("approval_prompt=force");
 
-    } else if (site == GOOGLE_CALENDAR) {
-        // OAUTH 2.0 - Google flow for installed applications
-        urlstr = QString("https://accounts.google.com/o/oauth2/auth?");
-        urlstr.append("scope=https://www.googleapis.com/auth/calendar&");
-        urlstr.append("redirect_uri=urn:ietf:wg:oauth:2.0:oob&");
-        urlstr.append("response_type=code&");
-        urlstr.append("client_id=").append(GC_GOOGLE_CALENDAR_CLIENT_ID);
-
-    } else if (site == GOOGLE_DRIVE) {
-
-        const QString scope =  service->getSetting(GC_GOOGLE_DRIVE_AUTH_SCOPE, "drive.appdata").toString();
-        // OAUTH 2.0 - Google flow for installed applications
-        urlstr = QString("https://accounts.google.com/o/oauth2/auth?");
-        // We only request access to the application data folder, not all files.
-        urlstr.append("scope=https://www.googleapis.com/auth/" + scope + "&");
-        urlstr.append("redirect_uri=urn:ietf:wg:oauth:2.0:oob&");
-        urlstr.append("response_type=code&");
-        urlstr.append("client_id=").append(GC_GOOGLE_DRIVE_CLIENT_ID);
-
-    } else if (site == KENTUNI) {
-
-        const QString scope =  service->getSetting(GC_UOK_GOOGLE_DRIVE_AUTH_SCOPE, "drive.appdata").toString();
-
-        // OAUTH 2.0 - Google flow for installed applications
-        urlstr = QString("https://accounts.google.com/o/oauth2/auth?");
-        // We only request access to the application data folder, not all files.
-        urlstr.append("scope=https://www.googleapis.com/auth/" + scope + "&");
-        urlstr.append("redirect_uri=urn:ietf:wg:oauth:2.0:oob&");
-        urlstr.append("response_type=code&");
-        urlstr.append("client_id=").append(GC_GOOGLE_DRIVE_CLIENT_ID);
-
     } else if (site == TODAYSPLAN) {
 
         //urlstr = QString("https://whats.todaysplan.com.au/en/authorize/"); //XXX fixup below when pages.cpp goes
@@ -169,7 +134,7 @@ OAuthDialog::OAuthDialog(Context *context, OAuthSite site, CloudService *service
 
     } else if (site == POLAR) {
 
-        // OAUTH 2.0 - Google flow for installed applications
+        // OAUTH 2.0 - Polar flow for installed applications
         urlstr = QString("%1?").arg(GC_POLARFLOW_OAUTH_URL);
         // We only request access to the application data folder, not all files.
         urlstr.append("response_type=code&");
@@ -202,13 +167,12 @@ OAuthDialog::OAuthDialog(Context *context, OAuthSite site, CloudService *service
     //
     // STEP 1: LOGIN AND AUTHORISE THE APPLICATION
     //
-    if (site == NOLIO || site == DROPBOX || site == STRAVA || site == CYCLING_ANALYTICS || site == POLAR || site == SPORTTRACKS || site == GOOGLE_CALENDAR || site == GOOGLE_DRIVE || site == KENTUNI || site == TODAYSPLAN || site == WITHINGS) {
+    if (site == NOLIO || site == DROPBOX || site == STRAVA || site == CYCLING_ANALYTICS || site == POLAR || site == SPORTTRACKS || site == TODAYSPLAN || site == WITHINGS) {
         url = QUrl(urlstr);
         view->setUrl(url);
 
         // connects
         connect(view, SIGNAL(urlChanged(const QUrl&)), this, SLOT(urlChanged(const QUrl&)));
-        connect(view, SIGNAL(loadFinished(bool)), this, SLOT(loadFinished(bool)));
     }
 }
 
@@ -384,60 +348,6 @@ OAuthDialog::urlChanged(const QUrl &url)
 }
 
 //
-// GOOGLE DRIVE gets the code in the HTML title field (different to other services)
-//
-void
-OAuthDialog::loadFinished(bool ok)
-{
-
-    if (site == GOOGLE_CALENDAR || site == GOOGLE_DRIVE || site == KENTUNI) {
-
-        if (ok && url.toString().startsWith("https://accounts.google.com/o/oauth2/auth")) {
-
-            // retrieve the code from the HTML page title
-            QString title = view->title();
-
-            if (title.contains("code")) {
-
-                QString code = title.right(title.length()-title.indexOf("code=")-5);
-                QByteArray data;
-                QUrlQuery params;
-                QString urlstr = "https://www.googleapis.com/oauth2/v3/token?";
-                if (site == GOOGLE_CALENDAR) {
-                    params.addQueryItem("client_id", GC_GOOGLE_CALENDAR_CLIENT_ID);
-                } else if (site == GOOGLE_DRIVE || site == KENTUNI) {
-                    params.addQueryItem("client_id", GC_GOOGLE_DRIVE_CLIENT_ID);
-                }
-
-                if (site == GOOGLE_CALENDAR) {
-                    params.addQueryItem("client_secret", GC_GOOGLE_CALENDAR_CLIENT_SECRET);
-                } else if (site == GOOGLE_DRIVE || site == KENTUNI) {
-                    params.addQueryItem("client_secret", GC_GOOGLE_DRIVE_CLIENT_SECRET);
-                }
-
-                params.addQueryItem("code", code);
-                params.addQueryItem("redirect_uri", "urn:ietf:wg:oauth:2.0:oob");
-                params.addQueryItem("grant_type", "authorization_code");
-
-                data.append(params.query(QUrl::FullyEncoded));
-
-                // trade-in the temporary access code retrieved by the
-                // Call-Back URL for the finale token
-                QUrl url = QUrl(urlstr);
-                QNetworkRequest request = QNetworkRequest(url);
-                request.setHeader(QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded");
-
-                // not get the final token - ignoring errors
-                manager = new QNetworkAccessManager(this);
-                connect(manager, SIGNAL(sslErrors(QNetworkReply*, const QList<QSslError> & )), this, SLOT(onSslErrors(QNetworkReply*, const QList<QSslError> & )));
-                connect(manager, SIGNAL(finished(QNetworkReply*)), this, SLOT(networkRequestFinished(QNetworkReply*)));
-                manager->post(request, data);
-            }
-        }
-    }
-}
-
-//
 // STEP 3: REFRESH AND ACCESS TOKEN RECEIVED
 //
 // this is when we get the refresh or access tokens after a redirect has been loaded
@@ -472,20 +382,6 @@ OAuthDialog::networkRequestFinished(QNetworkReply *reply)
                 refresh_token = document.object()["body"].toObject()["refresh_token"].toString();
                 access_token = document.object()["body"].toObject()["access_token"].toString();
             }
-        }
-
-        // if we failed to extract then we have a big problem
-        // google uses a refresh token so trap for them only
-        if (((site == GOOGLE_CALENDAR || site == GOOGLE_DRIVE || site == KENTUNI) && refresh_token == "") ||
-             access_token == "" ) {
-            // Something failed.
-            // Only Google uses both refresh and access tokens.
-            QString error = QString(tr("Error retrieving authoriation credentials"));
-            QMessageBox oautherr(QMessageBox::Critical, tr("Authorization Error"), error);
-            oautherr.setDetailedText(error);
-            oautherr.exec();
-
-            return;
         }
 
         // now set the tokens etc
@@ -558,39 +454,13 @@ OAuthDialog::networkRequestFinished(QNetworkReply *reply)
             QMessageBox information(QMessageBox::Information, tr("Information"), info);
             information.exec();
 
-        } else if (site == GOOGLE_CALENDAR) {
-            // remove the Google Page first
-            url = QUrl("http://www.goldencheetah.org");
-            view->setUrl(url);
-            appsettings->setCValue(context->athlete->cyclist, GC_GOOGLE_CALENDAR_REFRESH_TOKEN, refresh_token);
-            QString info = QString(tr("Google Calendar authorization was successful."));
-            QMessageBox information(QMessageBox::Information,
-                                    tr("Information"), info);
-            information.exec();
-
-        } else if (site == KENTUNI) {
-
-            service->setSetting(GC_UOK_GOOGLE_DRIVE_REFRESH_TOKEN, refresh_token);
-            service->setSetting(GC_UOK_GOOGLE_DRIVE_ACCESS_TOKEN, access_token);
-            service->setSetting(GC_UOK_GOOGLE_DRIVE_LAST_ACCESS_TOKEN_REFRESH, QDateTime::currentDateTime());
-            QString info = QString(tr("Kent University Google Drive authorization was successful."));
-            QMessageBox information(QMessageBox::Information, tr("Information"), info);
-            information.exec();
-
-        } else if (site == GOOGLE_DRIVE) {
-
-            service->setSetting(GC_GOOGLE_DRIVE_REFRESH_TOKEN, refresh_token);
-            service->setSetting(GC_GOOGLE_DRIVE_ACCESS_TOKEN, access_token);
-            service->setSetting(GC_GOOGLE_DRIVE_LAST_ACCESS_TOKEN_REFRESH, QDateTime::currentDateTime());
-            QString info = QString(tr("Google Drive authorization was successful."));
-            QMessageBox information(QMessageBox::Information, tr("Information"), info);
-            information.exec();
-
         } else if (site == TODAYSPLAN) {
+
             service->setSetting(GC_TODAYSPLAN_TOKEN, access_token);
             QString info = QString(tr("Today's Plan authorization was successful."));
             QMessageBox information(QMessageBox::Information, tr("Information"), info);
             information.exec();
+
         } else if (site == XERT) {
 
             service->setSetting(GC_XERT_TOKEN, access_token);

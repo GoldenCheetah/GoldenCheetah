@@ -73,8 +73,6 @@
 #include "ErgDBDownloadDialog.h"
 #include "AddDeviceWizard.h"
 #include "Dropbox.h"
-#include "GoogleDrive.h"
-#include "KentUniversity.h"
 #include "SixCycle.h"
 #include "OpenData.h"
 #include "AddCloudWizard.h"
@@ -2481,14 +2479,8 @@ MainWindow::uploadCloud(QAction *action)
         // & removed to avoid issues with kde AutoCheckAccelerators
         QString actionText = QString(action->text()).replace("&", "");
 
-        if (actionText == "University of Kent") {
-            CloudService *db = CloudServiceFactory::instance().newService(action->data().toString(), currentAthleteTab->context);
-            KentUniversityUploadDialog uploader(this, db, currentAthleteTab->context->ride);
-            uploader.exec();
-        } else {
-            CloudService *db = CloudServiceFactory::instance().newService(action->data().toString(), currentAthleteTab->context);
-            CloudService::upload(this, currentAthleteTab->context, db, currentAthleteTab->context->ride);
-        }
+        CloudService *db = CloudServiceFactory::instance().newService(action->data().toString(), currentAthleteTab->context);
+        CloudService::upload(this, currentAthleteTab->context, db, currentAthleteTab->context->ride);
     }
 }
 
@@ -2768,9 +2760,6 @@ MainWindow::setUploadMenu()
             QAction *service = new QAction(NULL);
             service->setText(s->uiName());
             service->setData(name);
-
-            // Kent doesn't use the standard uploader, we trap for that
-            // in the upload action method
             uploadMenu->addAction(service);
         }
     }
@@ -2786,9 +2775,6 @@ MainWindow::setSyncMenu()
         if (!s || appsettings->cvalue(currentAthleteTab->context->athlete->cyclist, s->activeSettingName(), "false").toString() != "true") continue;
 
         if (s->capabilities() & CloudService::Query)  {
-
-            // We don't sync with Kent
-            if (s->id() == "University of Kent") continue;
 
             // we need the technical name to identify the service to be called
             QAction *service = new QAction(NULL);
