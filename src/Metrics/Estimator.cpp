@@ -26,26 +26,13 @@
 
 #include "Banister.h"
 
-#ifndef ESTIMATOR_DEBUG
-#define ESTIMATOR_DEBUG false
-#endif
+Q_DECLARE_LOGGING_CATEGORY(gcEstimator)
+Q_LOGGING_CATEGORY(gcEstimator, "gc.estimator")
+
 #ifdef Q_CC_MSVC
-#define printd(fmt, ...) do {                                                \
-    if (ESTIMATOR_DEBUG) {                                 \
-        printf("[%s:%d %s] " fmt , __FILE__, __LINE__,        \
-               __FUNCTION__, __VA_ARGS__);                    \
-        fflush(stdout);                                       \
-    }                                                         \
-} while(0)
+#define printd(fmt, ...) qCDebug(gcEstimator, fmt, __VA_ARGS__);
 #else
-#define printd(fmt, args...)                                            \
-    do {                                                                \
-        if (ESTIMATOR_DEBUG) {                                       \
-            printf("[%s:%d %s] " fmt , __FILE__, __LINE__,              \
-                   __FUNCTION__, ##args);                               \
-            fflush(stdout);                                             \
-        }                                                               \
-    } while(0)
+#define printd(fmt, args...) qCDebug(gcEstimator, fmt, ##args);
 #endif
 
 class RollingBests {
