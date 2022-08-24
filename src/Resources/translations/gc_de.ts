@@ -962,67 +962,72 @@ Wenn Sie sich für das Kopieren in die Bibliothek entscheiden, wird die Datei in
 <context>
     <name>AddPerspectiveDialog</name>
     <message>
-        <location filename="../../Gui/Perspective.cpp" line="1880"/>
+        <location filename="../../Gui/Perspective.cpp" line="1883"/>
         <source>Edit Perspective</source>
         <translation>Perspektive bearbeiten</translation>
     </message>
     <message>
-        <location filename="../../Gui/Perspective.cpp" line="1881"/>
+        <location filename="../../Gui/Perspective.cpp" line="1884"/>
         <source>Add Perspective</source>
         <translation>Perspektive hinzufügen</translation>
     </message>
     <message>
-        <location filename="../../Gui/Perspective.cpp" line="1890"/>
+        <location filename="../../Gui/Perspective.cpp" line="1893"/>
         <source>Perspective Name</source>
         <translation>Name für die Perspektive</translation>
     </message>
     <message>
-        <location filename="../../Gui/Perspective.cpp" line="1898"/>
+        <location filename="../../Gui/Perspective.cpp" line="1901"/>
         <source>Switch expression</source>
         <translation>Ausdruck wechseln</translation>
     </message>
     <message>
-        <location filename="../../Gui/Perspective.cpp" line="1899"/>
+        <location filename="../../Gui/Perspective.cpp" line="1902"/>
         <source>Activities filter</source>
         <translation>Filter für Aktivitäten</translation>
     </message>
     <message>
-        <location filename="../../Gui/Perspective.cpp" line="1904"/>
+        <location filename="../../Gui/Perspective.cpp" line="1907"/>
         <source>Don&apos;t switch</source>
         <translation>Nicht wechseln</translation>
     </message>
     <message>
-        <location filename="../../Gui/Perspective.cpp" line="1905"/>
+        <location filename="../../Gui/Perspective.cpp" line="1908"/>
         <source>Erg Workout</source>
         <translation>Workout Erg</translation>
     </message>
     <message>
-        <location filename="../../Gui/Perspective.cpp" line="1906"/>
+        <location filename="../../Gui/Perspective.cpp" line="1909"/>
         <source>Slope Workout</source>
         <translation>Workout Steigung</translation>
     </message>
     <message>
-        <location filename="../../Gui/Perspective.cpp" line="1907"/>
+        <location filename="../../Gui/Perspective.cpp" line="1910"/>
         <source>Video Workout</source>
         <translation>Workout Video</translation>
     </message>
     <message>
-        <location filename="../../Gui/Perspective.cpp" line="1909"/>
+        <location filename="../../Gui/Perspective.cpp" line="1911"/>
+        <source>Map Workout</source>
+        <translation>Karte Workout</translation>
+    </message>
+    <message>
+        <location filename="../../Gui/Perspective.cpp" line="1913"/>
         <source>Switch for</source>
         <translation>Schalter für</translation>
     </message>
     <message>
-        <location filename="../../Gui/Perspective.cpp" line="1913"/>
+        <location filename="../../Gui/Perspective.cpp" line="1917"/>
         <source>OK</source>
         <translation>OK</translation>
     </message>
     <message>
-        <location filename="../../Gui/Perspective.cpp" line="1914"/>
+        <location filename="../../Gui/Perspective.cpp" line="1918"/>
         <source>Add</source>
         <translation>Hinzufügen</translation>
     </message>
     <message>
-        <location filename="../../Gui/Perspective.cpp" line="1915"/>
+        <location filename="../../Gui/Perspective.cpp" line="1919"/>
         <source>Cancel</source>
         <translation>Abbrechen</translation>
     </message>
@@ -6603,7 +6608,7 @@ Sind sie sicher?</translation>
         <location filename="../../Cloud/CloudService.cpp" line="770"/>
         <location filename="../../Cloud/CloudService.cpp" line="838"/>
         <source>Workout Id</source>
-        <translation>AktivitätsID</translation>
+        <translation>Aktivitäts ID</translation>
     </message>
     <message>
         <location filename="../../Cloud/CloudService.cpp" line="792"/>
@@ -7795,8 +7800,8 @@ Wollen Sie die Änderung durchführen und GoldenCheetah neu starten?</translatio
 <context>
     <name>DataFilter</name>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="3204"/>
-        <location filename="../../Core/DataFilter.cpp" line="3243"/>
+        <location filename="../../Core/DataFilter.cpp" line="3226"/>
+        <location filename="../../Core/DataFilter.cpp" line="3265"/>
         <source>malformed expression.</source>
         <translation>falsch gebildeter Ausdruck.</translation>
     </message>
@@ -9242,73 +9247,73 @@ an den Computer anschließen und
         <translation>Einheiten</translation>
     </message>
     <message>
-        <location filename="../../Charts/UserChart.cpp" line="1753"/>
+        <location filename="../../Charts/UserChart.cpp" line="1759"/>
         <source>Logarithmic Scale</source>
         <translation>Logarithmische Skala</translation>
     </message>
     <message>
-        <location filename="../../Charts/UserChart.cpp" line="1757"/>
+        <location filename="../../Charts/UserChart.cpp" line="1756"/>
         <source>Type</source>
         <translation>Typ</translation>
     </message>
     <message>
-        <location filename="../../Charts/UserChart.cpp" line="1758"/>
-        <location filename="../../Charts/UserChart.cpp" line="1777"/>
+        <location filename="../../Charts/UserChart.cpp" line="1760"/>
+        <location filename="../../Charts/UserChart.cpp" line="1779"/>
         <source> </source>
         <translation> </translation>
     </message>
     <message>
-        <location filename="../../Charts/UserChart.cpp" line="1760"/>
+        <location filename="../../Charts/UserChart.cpp" line="1762"/>
         <source>Fixed</source>
         <translation>Festgelegt</translation>
     </message>
     <message>
-        <location filename="../../Charts/UserChart.cpp" line="1771"/>
+        <location filename="../../Charts/UserChart.cpp" line="1773"/>
         <source> from </source>
         <translation> von </translation>
     </message>
     <message>
-        <location filename="../../Charts/UserChart.cpp" line="1773"/>
+        <location filename="../../Charts/UserChart.cpp" line="1775"/>
         <source> to </source>
         <translation> bis </translation>
     </message>
     <message>
-        <location filename="../../Charts/UserChart.cpp" line="1776"/>
+        <location filename="../../Charts/UserChart.cpp" line="1778"/>
         <source>Range</source>
         <translation>Bereich</translation>
     </message>
     <message>
-        <location filename="../../Charts/UserChart.cpp" line="1784"/>
+        <location filename="../../Charts/UserChart.cpp" line="1786"/>
         <source>Smoothing</source>
         <translation>Glättung</translation>
     </message>
     <message>
-        <location filename="../../Charts/UserChart.cpp" line="1789"/>
+        <location filename="../../Charts/UserChart.cpp" line="1791"/>
         <source>None</source>
         <translation>Keine</translation>
     </message>
     <message>
-        <location filename="../../Charts/UserChart.cpp" line="1790"/>
+        <location filename="../../Charts/UserChart.cpp" line="1792"/>
         <source>Day</source>
         <translation>Tag</translation>
     </message>
     <message>
-        <location filename="../../Charts/UserChart.cpp" line="1791"/>
+        <location filename="../../Charts/UserChart.cpp" line="1793"/>
         <source>Week</source>
         <translation>Woche</translation>
     </message>
     <message>
-        <location filename="../../Charts/UserChart.cpp" line="1792"/>
+        <location filename="../../Charts/UserChart.cpp" line="1794"/>
         <source>Month</source>
         <translation>Monat</translation>
     </message>
     <message>
-        <location filename="../../Charts/UserChart.cpp" line="1793"/>
+        <location filename="../../Charts/UserChart.cpp" line="1795"/>
         <source>Year</source>
         <translation>Jahr</translation>
     </message>
     <message>
-        <location filename="../../Charts/UserChart.cpp" line="1795"/>
+        <location filename="../../Charts/UserChart.cpp" line="1797"/>
         <source>Group By</source>
         <translation>Gruppieren nach</translation>
     </message>
@@ -10652,38 +10657,51 @@ Warnung: Die Genauigkeit der Leistungsschätzung kann zu gering sein, um für di
 <context>
     <name>FixElevation</name>
     <message>
-        <location filename="../../FileIO/FixElevation.cpp" line="120"/>
+        <location filename="../../FileIO/FixElevation.cpp" line="92"/>
         <source>Fix Elevation errors</source>
         <translation>Korrigiere Höhenfehler</translation>
     </message>
     <message>
-        <location filename="../../FileIO/FixElevation.cpp" line="202"/>
+        <location filename="../../FileIO/FixElevation.cpp" line="165"/>
         <source>Fix Elevation Data not possible</source>
         <translation>Korrektur der Höhendaten nicht möglich</translation>
     </message>
     <message>
-        <location filename="../../FileIO/FixElevation.cpp" line="203"/>
+        <location filename="../../FileIO/FixElevation.cpp" line="166"/>
         <source>The following problem occured: %1</source>
         <translation>Das folgende Problem ist aufgetreten: %1</translation>
+    </message>
+    <message>
+        <location filename="../../FileIO/FixElevation.cpp" line="285"/>
+        <source>Connection to remote server timed out</source>
+        <translation>Zeitüberschreitung bei der Verbindung zum Remote-Server</translation>
+    </message>
+    <message>
+        <location filename="../../FileIO/FixElevation.cpp" line="287"/>
+        <source>Network error: %1</source>
+        <translation>Netzwerkfehler: %1</translation>
+    </message>
+    <message>
+        <location filename="../../FileIO/FixElevation.cpp" line="306"/>
+        <source>Unexpected response from server: %1</source>
+        <translation>Unerwartete Antwort vom Server: %1</translation>
+    </message>
+    <message>
+        <location filename="../../FileIO/FixElevation.cpp" line="311"/>
+        <source>Parse response error: %1</source>
+        <translation>Parse Antwortfehler: %1</translation>
     </message>
 </context>
 <context>
     <name>FixElevationConfig</name>
     <message>
-        <location filename="../../FileIO/FixElevation.cpp" line="71"/>
-        <source>MapQuest API Key</source>
-        <translation>MapQuest API Schlüssel</translation>
-    </message>
-    <message>
-        <location filename="../../FileIO/FixElevation.cpp" line="80"/>
+        <location filename="../../FileIO/FixElevation.cpp" line="57"/>
         <source>Fix or add elevation data. If elevation data is present it will be removed and overwritten.
-
-MapQuest API Key is optional, you can get a free one from https::/developer/mapquest.com/ to have your own transaction limits.
+Elevation data is provided by Open-Elevation.com public API, consider a donation if you find it useful.
 
 INTERNET CONNECTION REQUIRED.</source>
         <translation>Korrektur oder Hinzufügen von Höhendaten. Wenn Höhendaten vorhanden sind, werden sie entfernt und überschrieben.
-
-MapQuest-API-Schlüssel ist optional, Sie können einen kostenlosen Schlüssel von https::/developer/mapquest.com/ erhalten, um Ihre eigenen Transaktionsgrenzen zu haben.
+Die Höhendaten werden von der öffentlichen API von Open-Elevation.com zur Verfügung gestellt. Wenn Sie sie nützlich finden, sollten Sie eine Spende in betracht ziehen.
 
 INTERNETVERBINDUNG ERFORDERLICH.</translation>
     </message>
@@ -11469,23 +11487,23 @@ Drehmomentkorrektur - Der absolute Korrekturwert in Nm (oder Pfund pro Quadratin
 <context>
     <name>FormField</name>
     <message>
-        <location filename="../../Metrics/RideMetadata.cpp" line="665"/>
+        <location filename="../../Metrics/RideMetadata.cpp" line="664"/>
         <source> (kg)</source>
         <translation> (kg)</translation>
     </message>
     <message>
-        <location filename="../../Metrics/RideMetadata.cpp" line="665"/>
+        <location filename="../../Metrics/RideMetadata.cpp" line="664"/>
         <source> (lbs)</source>
         <translation> (lbs)</translation>
     </message>
     <message>
-        <location filename="../../Metrics/RideMetadata.cpp" line="658"/>
-        <location filename="../../Metrics/RideMetadata.cpp" line="727"/>
+        <location filename="../../Metrics/RideMetadata.cpp" line="657"/>
+        <location filename="../../Metrics/RideMetadata.cpp" line="726"/>
         <source>seconds</source>
         <translation>Sekunden</translation>
     </message>
     <message>
-        <location filename="../../Metrics/RideMetadata.cpp" line="969"/>
+        <location filename="../../Metrics/RideMetadata.cpp" line="968"/>
         <source>You entered &apos;%1&apos; which is not an expected value.</source>
         <translation>Der Eingabewert &apos;%1&apos; ist kein erwarteter Wert.</translation>
     </message>
@@ -11673,6 +11691,7 @@ Drehmomentkorrektur - Der absolute Korrekturwert in Nm (oder Pfund pro Quadratin
         <location filename="../../Gui/Colors.cpp" line="245"/>
         <location filename="../../Gui/Colors.cpp" line="246"/>
         <location filename="../../Gui/Colors.cpp" line="247"/>
+        <location filename="../../Gui/Colors.cpp" line="253"/>
         <source>Data</source>
         <translation>Datum</translation>
     </message>
@@ -11988,6 +12007,11 @@ Drehmomentkorrektur - Der absolute Korrekturwert in Nm (oder Pfund pro Quadratin
         <location filename="../../Gui/Colors.cpp" line="252"/>
         <source>Map Route Line</source>
         <translation>Karte: Streckenlinie</translation>
+    </message>
+    <message>
+        <location filename="../../Gui/Colors.cpp" line="253"/>
+        <source>Stress Ramp Rate</source>
+        <translation>Belastungssteigerungsrate (RR)</translation>
     </message>
     <message>
         <location filename="../../Gui/Colors.cpp" line="203"/>
@@ -12690,17 +12714,17 @@ Drehmomentkorrektur - Der absolute Korrekturwert in Nm (oder Pfund pro Quadratin
 <context>
     <name>GcWindowDialog</name>
     <message>
-        <location filename="../../Gui/Perspective.cpp" line="1305"/>
+        <location filename="../../Gui/Perspective.cpp" line="1308"/>
         <source>Chart Setup</source>
         <translation>Diagrammeinstellungen</translation>
     </message>
     <message>
-        <location filename="../../Gui/Perspective.cpp" line="1364"/>
+        <location filename="../../Gui/Perspective.cpp" line="1367"/>
         <source>Cancel</source>
         <translation>Abbrechen</translation>
     </message>
     <message>
-        <location filename="../../Gui/Perspective.cpp" line="1365"/>
+        <location filename="../../Gui/Perspective.cpp" line="1368"/>
         <source>OK</source>
         <translation>OK</translation>
     </message>
@@ -13621,10 +13645,6 @@ Drehmomentkorrektur - Der absolute Korrekturwert in Nm (oder Pfund pro Quadratin
         <translation>Analyse einer einzelnen Aktivität mit Diagrammen wie Aktivitätsdiagramm, W&apos;bal, ... und Chung&apos;s Aerolab</translation>
     </message>
     <message>
-        <source>Activate / De-activate the Compare Pane - which allows to compare activities, intervals or date ranges - also across athletes</source>
-        <translation type="vanished">Aktivieren/ Deaktivieren Sie den Vergleichsbereich, der es ermöglicht, Aktivitäten, Intervalle oder Datumsbereiche zu vergleichen - auch verschiedenen Athleten</translation>
-    </message>
-    <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="112"/>
         <source>Laps Editor allows to enter a sequence of work-rest intervals series -defined by number of repetitions (reps), distance (dist, units according to preferences in Pace Zones) and duration (min and sec)- to generate the data points for the activity</source>
         <translation>Der Rundeneditor erlaubt die Eingabe einer Abfolge von Belastungs- und Erholens-Intervallen - definiert durch die Anzahl der Wiederholungen (Wdh.), die Distanz (Dist. , Einheiten entsprechend den Einstellungen in den Pace Zonen) und die Dauer (min und sec) - um die Datenpunkte für die Aktivität zu generieren</translation>
@@ -14384,7 +14404,7 @@ Drehmomentkorrektur - Der absolute Korrekturwert in Nm (oder Pfund pro Quadratin
         <translation>Herzfrequenz (1/min)</translation>
     </message>
     <message>
-        <location filename="../../Charts/HrPwPlot.cpp" line="470"/>
+        <location filename="../../Charts/HrPwPlot.cpp" line="469"/>
         <source>Power (Watts)</source>
         <translation>Leistung (Watt)</translation>
     </message>
@@ -15687,60 +15707,60 @@ Drehmomentkorrektur - Der absolute Korrekturwert in Nm (oder Pfund pro Quadratin
 <context>
     <name>ImportChartDialog</name>
     <message>
-        <location filename="../../Gui/Perspective.cpp" line="1730"/>
+        <location filename="../../Gui/Perspective.cpp" line="1733"/>
         <source>Import Charts</source>
         <translation>Diagramm importieren</translation>
     </message>
     <message>
-        <location filename="../../Gui/Perspective.cpp" line="1736"/>
+        <location filename="../../Gui/Perspective.cpp" line="1739"/>
         <source>Cancel</source>
         <translation>Abbrechen</translation>
     </message>
     <message>
-        <location filename="../../Gui/Perspective.cpp" line="1737"/>
+        <location filename="../../Gui/Perspective.cpp" line="1740"/>
         <source>Import</source>
         <translation>Importieren</translation>
     </message>
     <message>
-        <location filename="../../Gui/Perspective.cpp" line="1748"/>
+        <location filename="../../Gui/Perspective.cpp" line="1751"/>
         <source>View</source>
         <translation>Ansicht</translation>
     </message>
     <message>
-        <location filename="../../Gui/Perspective.cpp" line="1749"/>
+        <location filename="../../Gui/Perspective.cpp" line="1752"/>
         <source>Title</source>
         <translation>Titel</translation>
     </message>
     <message>
-        <location filename="../../Gui/Perspective.cpp" line="1771"/>
-        <location filename="../../Gui/Perspective.cpp" line="1779"/>
-        <location filename="../../Gui/Perspective.cpp" line="1788"/>
+        <location filename="../../Gui/Perspective.cpp" line="1774"/>
+        <location filename="../../Gui/Perspective.cpp" line="1782"/>
         <location filename="../../Gui/Perspective.cpp" line="1791"/>
         <location filename="../../Gui/Perspective.cpp" line="1794"/>
-        <location filename="../../Gui/Perspective.cpp" line="1846"/>
-        <location filename="../../Gui/Perspective.cpp" line="1858"/>
+        <location filename="../../Gui/Perspective.cpp" line="1797"/>
+        <location filename="../../Gui/Perspective.cpp" line="1849"/>
+        <location filename="../../Gui/Perspective.cpp" line="1861"/>
         <source>Diary</source>
         <translation>Tagebuch</translation>
     </message>
     <message>
-        <location filename="../../Gui/Perspective.cpp" line="1772"/>
-        <location filename="../../Gui/Perspective.cpp" line="1779"/>
-        <location filename="../../Gui/Perspective.cpp" line="1788"/>
-        <location filename="../../Gui/Perspective.cpp" line="1792"/>
-        <location filename="../../Gui/Perspective.cpp" line="1849"/>
-        <location filename="../../Gui/Perspective.cpp" line="1856"/>
+        <location filename="../../Gui/Perspective.cpp" line="1775"/>
+        <location filename="../../Gui/Perspective.cpp" line="1782"/>
+        <location filename="../../Gui/Perspective.cpp" line="1791"/>
+        <location filename="../../Gui/Perspective.cpp" line="1795"/>
+        <location filename="../../Gui/Perspective.cpp" line="1852"/>
+        <location filename="../../Gui/Perspective.cpp" line="1859"/>
         <source>Trends</source>
         <translation>Trends</translation>
     </message>
     <message>
-        <location filename="../../Gui/Perspective.cpp" line="1773"/>
-        <location filename="../../Gui/Perspective.cpp" line="1857"/>
+        <location filename="../../Gui/Perspective.cpp" line="1776"/>
+        <location filename="../../Gui/Perspective.cpp" line="1860"/>
         <source>Activities</source>
         <translation>Aktivitäten</translation>
     </message>
     <message>
-        <location filename="../../Gui/Perspective.cpp" line="1774"/>
-        <location filename="../../Gui/Perspective.cpp" line="1859"/>
+        <location filename="../../Gui/Perspective.cpp" line="1777"/>
+        <location filename="../../Gui/Perspective.cpp" line="1862"/>
         <source>Train</source>
         <translation>Trainieren</translation>
     </message>
@@ -17861,647 +17881,657 @@ Drehmomentkorrektur - Der absolute Korrekturwert in Nm (oder Pfund pro Quadratin
 <context>
     <name>Leaf</name>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1722"/>
+        <location filename="../../Core/DataFilter.cpp" line="1725"/>
         <source>Index must be numeric.</source>
         <translation>Index muss numerisch sein.</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1748"/>
+        <location filename="../../Core/DataFilter.cpp" line="1751"/>
         <source>invalid data series for best(): %1</source>
         <translation>ungültige Datenserie für &quot;best()&quot;: %1</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1753"/>
+        <location filename="../../Core/DataFilter.cpp" line="1756"/>
         <source>invalid data series for tiz(): %1</source>
         <translation>ungültige Datenserie für &quot;tiz()&quot;: %1</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1758"/>
+        <location filename="../../Core/DataFilter.cpp" line="1761"/>
         <source>invalid literal for config(): %1</source>
         <translation>ungültiges Schlüsselwort für &quot;config()&quot;: %1</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1764"/>
+        <location filename="../../Core/DataFilter.cpp" line="1767"/>
         <source>invalid literal for const(): %1</source>
         <translation>ungültiges Schlüsselwort für &quot;const()&quot;: %1</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1874"/>
+        <location filename="../../Core/DataFilter.cpp" line="1877"/>
         <source>which function has at least 2 parameters.</source>
         <translation>die Funktion hat mindestens 2 Parameter.</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1697"/>
+        <location filename="../../Core/DataFilter.cpp" line="1700"/>
         <source>%1 is an unknown symbol</source>
         <translation>%1 ist ein unbekanntes Symbol</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1789"/>
+        <location filename="../../Core/DataFilter.cpp" line="1792"/>
         <source>activities(&quot;fexpr&quot;, expr) - where fexpr is a filter expression</source>
         <translation>activities(&quot;fexpr&quot;, expr) - wobei fexpr ein Filterausdruck ist</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1801"/>
+        <location filename="../../Core/DataFilter.cpp" line="1804"/>
         <source>daterange(start|stop)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1806"/>
+        <location filename="../../Core/DataFilter.cpp" line="1809"/>
         <source>daterange(start|stop) - unknown symbol &apos;%1&apos;</source>
         <translation>daterange(start|stop) - unbekanntes Symbol &apos;%1&apos;</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1817"/>
+        <location filename="../../Core/DataFilter.cpp" line="1820"/>
         <source>daterange(start|stop) or daterange(datefrom, dateto, expression)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1824"/>
+        <location filename="../../Core/DataFilter.cpp" line="1827"/>
         <source>%1 needs a single parameter</source>
         <translation>%1 benötigt einen einzigen Parameter</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1831"/>
+        <location filename="../../Core/DataFilter.cpp" line="1834"/>
         <source>filename() has no parameters</source>
         <translation>filename() hat keine Parameter</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1856"/>
+        <location filename="../../Core/DataFilter.cpp" line="1859"/>
         <source>zones(hr|power|pace|fatigue, name|description|low|high|units|time|percent) needs 2 specific parameters</source>
         <translation>zones(hr|power|pace|fatigue, name|description|low|high|units|time|percent) benötigt 2 spezifische Parameter</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1863"/>
+        <location filename="../../Core/DataFilter.cpp" line="1866"/>
         <source>exists(&quot;symbol&quot;) supports only 1 parameter.</source>
         <translation>exists(&quot;symbol&quot;) unterstützt nur 1 Parameter.</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1867"/>
+        <location filename="../../Core/DataFilter.cpp" line="1870"/>
         <source>exists(&quot;symbol&quot;) parameter must be a constant string.</source>
         <translation>exists(&quot;symbol&quot;) Parameter muss eine konstante Zeichenfolge(string) sein.</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1890"/>
+        <location filename="../../Core/DataFilter.cpp" line="1893"/>
         <source>should be rep(value, n)</source>
         <translation>sollte sein rep(value, n)</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1900"/>
+        <location filename="../../Core/DataFilter.cpp" line="1903"/>
         <source>should be seq(start, stop, step)</source>
         <translation>sollte sein seq(start, stop, step)</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1910"/>
+        <location filename="../../Core/DataFilter.cpp" line="1913"/>
         <source>should be length(expr)</source>
         <translation>sollte sein length(expr)</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1920"/>
+        <location filename="../../Core/DataFilter.cpp" line="1923"/>
         <source>should be cumsum(vector)</source>
         <translation>sollte sein cumsum(vector)</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1928"/>
+        <location filename="../../Core/DataFilter.cpp" line="1931"/>
         <source>should be aggregate(vector, byvector, mean|sum|max|min|count)</source>
         <translation>sollte sein aggregate(vector, byvector, mean|sum|max|min|count)</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1938"/>
+        <location filename="../../Core/DataFilter.cpp" line="1941"/>
         <source>aggregate(vector, by, func) func must be one of mean|sum|max|min|count.</source>
         <translation>aggregate(vector, by, func) func muss einer der folgenden Werte sein mean|sum|max|min|count.</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1943"/>
+        <location filename="../../Core/DataFilter.cpp" line="1946"/>
         <source>unknown function &apos;%1&apos;, must be one of mean|sum|max|min|count.</source>
         <translation>unbekannte Funktion &apos;%1&apos;, muss eine der folgenden sein mean|sum|max|min|count.</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1955"/>
+        <location filename="../../Core/DataFilter.cpp" line="1958"/>
         <source>round(v) or round(v, dp)</source>
         <translation>round(v) oder round(v, dp)</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1969"/>
+        <location filename="../../Core/DataFilter.cpp" line="1972"/>
         <source>interpolate(algorithm, xvector, yvector, xvalues)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1974"/>
+        <location filename="../../Core/DataFilter.cpp" line="1977"/>
         <source>interpolate(algorithm, xvector, yvector, xvalues) - must specify and algorithm</source>
         <translation>interpolate(algorithm, xvector, yvector, xvalues) - müssen angeben und Algorithmus</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1982"/>
+        <location filename="../../Core/DataFilter.cpp" line="1985"/>
         <source>unknown algorithm &apos;%1&apos;, must be one of linear, cubic, akima or steffen.</source>
         <translation>unbekannter Algorithmus &apos;%1&apos;, muss einer der folgenden sein  linear, cubic, akima or steffen.</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1996"/>
+        <location filename="../../Core/DataFilter.cpp" line="1999"/>
         <source>should be append(a,b,[pos])</source>
         <translation>sollte sein append(a,b,[pos])</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2005"/>
+        <location filename="../../Core/DataFilter.cpp" line="2008"/>
         <source>append(a,b,[pos]) but &apos;a&apos; must be a symbol</source>
         <translation>append(a,b,[pos]) aber &apos;a&apos; muss ein Symbol sein</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2009"/>
+        <location filename="../../Core/DataFilter.cpp" line="2012"/>
         <source>append(a,b,[pos]) but &apos;a&apos; must be a user symbol</source>
         <translation>append(a,b,[pos]) aber &apos;a&apos; muss ein Benutzersymbol sein</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2019"/>
+        <location filename="../../Core/DataFilter.cpp" line="2022"/>
         <source>should be remove(a,pos,count)</source>
         <translation>sollte sein remove(a,pos,count)</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2027"/>
+        <location filename="../../Core/DataFilter.cpp" line="2030"/>
         <source>remove(a,pos,count) but &apos;a&apos; must be a symbol</source>
         <translation>remove(a,pos,count) aber &apos;a&apos; muss ein Symbol sein</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2031"/>
+        <location filename="../../Core/DataFilter.cpp" line="2034"/>
         <source>remove(a,pos, count) but &apos;a&apos; must be a user symbol</source>
         <translation>remove(a,pos, count) aber &apos;a&apos; muss ein Benutzersymbol sein</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2043"/>
+        <location filename="../../Core/DataFilter.cpp" line="2046"/>
         <source>should be mid(a,pos,count)</source>
         <translation>sollte sein mid(a,pos,count)</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2050"/>
+        <location filename="../../Core/DataFilter.cpp" line="2053"/>
         <source>XDATA expects two parameters</source>
         <translation>XDATA erwartet zwei Parameter</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2060"/>
+        <location filename="../../Core/DataFilter.cpp" line="2063"/>
         <source>XDATA expects a string for the first parameters</source>
         <translation>XDATA erwartet eine Zeichenkette (string) für den ersten Parameter</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2068"/>
-        <location filename="../../Core/DataFilter.cpp" line="2074"/>
+        <location filename="../../Core/DataFilter.cpp" line="2071"/>
+        <location filename="../../Core/DataFilter.cpp" line="2077"/>
         <source>xdata expects a string, &apos;km&apos; or &apos;secs&apos; for second parameters</source>
         <translation>xdata erwartet einen String, &apos;km&apos; oder &apos;secs&apos; als zweiten Parameter</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2083"/>
-        <location filename="../../Core/DataFilter.cpp" line="2087"/>
+        <location filename="../../Core/DataFilter.cpp" line="2086"/>
+        <location filename="../../Core/DataFilter.cpp" line="2090"/>
         <source>samples(SERIES), SERIES should be POWER, SECS, HEARTRATE etc.</source>
         <translation>samples(SERIES), SERIES sollte sein POWER, SECS, HEARTRATE etc.</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2096"/>
-        <location filename="../../Core/DataFilter.cpp" line="2261"/>
-        <location filename="../../Core/DataFilter.cpp" line="2483"/>
-        <location filename="../../Core/DataFilter.cpp" line="2518"/>
+        <location filename="../../Core/DataFilter.cpp" line="2099"/>
+        <location filename="../../Core/DataFilter.cpp" line="2283"/>
+        <location filename="../../Core/DataFilter.cpp" line="2505"/>
+        <location filename="../../Core/DataFilter.cpp" line="2540"/>
         <source>invalid series name &apos;%1&apos;</source>
         <translation>ungültiger Serienname &apos;%1&apos;</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2105"/>
+        <location filename="../../Core/DataFilter.cpp" line="2108"/>
         <source>tests(user|bests, duration|power)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2111"/>
-        <location filename="../../Core/DataFilter.cpp" line="2118"/>
+        <location filename="../../Core/DataFilter.cpp" line="2114"/>
+        <location filename="../../Core/DataFilter.cpp" line="2121"/>
         <source>tests() first parameter must be &apos;user&apos; or &apos;bests&apos;.</source>
         <translation>tests() muss der erste Parameter &quot;user&quot; oder &quot;bests&quot; sein.</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2125"/>
-        <location filename="../../Core/DataFilter.cpp" line="2132"/>
+        <location filename="../../Core/DataFilter.cpp" line="2128"/>
+        <location filename="../../Core/DataFilter.cpp" line="2135"/>
         <source>tests() second parameter must be &apos;duration&apos; or &apos;power&apos;.</source>
         <translation>tests() muss der zweite Parameter &quot;duration&quot; oder &quot;power&quot; sein.</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2143"/>
+        <location filename="../../Core/DataFilter.cpp" line="2146"/>
         <source>no metric specified, %1(symbol) symbol should be a metric name</source>
         <translation>keine Metrik angegeben, %1(Symbol) Symbol sollte ein Metrikname sein</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2152"/>
+        <location filename="../../Core/DataFilter.cpp" line="2155"/>
         <source>only metric names are supported</source>
         <translation>nur metrische Namen werden unterstützt</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2157"/>
+        <location filename="../../Core/DataFilter.cpp" line="2160"/>
         <source>unknown metric %1</source>
         <translation>unbekannte Metrik %1</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2166"/>
+        <location filename="../../Core/DataFilter.cpp" line="2169"/>
         <source>kmeans(centers|assignments, k, dim1, dim2, dimn)</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2171"/>
+        <location filename="../../Core/DataFilter.cpp" line="2174"/>
         <source>kmeans(centers|assignments, k, dim1, dim2, dimn) - %s unknown</source>
         <translation>kmeans(centers|assignments, k, dim1, dim2, dimn) - %s unbekannt</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2183"/>
+        <location filename="../../Core/DataFilter.cpp" line="2186"/>
         <source>%1(symbol|date), symbol should be a metric name</source>
         <translation>%1(symbol|date), Symbol sollte ein metrischer Name sein</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2190"/>
+        <location filename="../../Core/DataFilter.cpp" line="2193"/>
         <source>invalid symbol &apos;%1&apos;, should be either a metric name or &apos;time&apos; or &apos;date&apos;</source>
         <translation>ungültiges Symbol &apos;%1&apos;, sollte entweder ein metrischer Name oder &apos;time&apos; oder &apos;date&apos; sein</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2205"/>
+        <location filename="../../Core/DataFilter.cpp" line="2208"/>
         <source>too many parameters: %1(symbol|date, start, stop)</source>
         <translation>zu viele Parameter: %1(symbol|date, start, stop)</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2213"/>
+        <location filename="../../Core/DataFilter.cpp" line="2216"/>
         <source>%1(symbol|name|start|stop|type|test|color|route|selected|date|filename), symbol should be a metric name</source>
         <translation>%1(symbol|name|start|stop|type|test|color|route|selected|date|filename), Symbol sollte ein metrischer Name sein</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2221"/>
+        <location filename="../../Core/DataFilter.cpp" line="2224"/>
         <source>invalid symbol &apos;%1&apos;, should be either a metric name or &apos;name|start|stop|type|test|color|route|selected|date|time|filename&apos;&apos;</source>
         <translation>ungültiges Symbol &apos;%1&apos;, sollte entweder ein Metrikname oder &apos;name|start|stop|type|test|color|route|selected|date|time|filename&apos;&apos;</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2237"/>
+        <location filename="../../Core/DataFilter.cpp" line="2240"/>
         <source>too many parameters: %1(symbol, start, stop)</source>
         <translation>zu viele Parameter: %1(symbol, start, stop)</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2542"/>
+        <location filename="../../Core/DataFilter.cpp" line="2248"/>
+        <source>%1(name|date|priority|description)</source>
+        <translation>%1(name|date|priority|description)</translation>
+    </message>
+    <message>
+        <location filename="../../Core/DataFilter.cpp" line="2256"/>
+        <source>invalid symbol &apos;%1&apos;, should be &apos;name|date|priority|description&apos;&apos;</source>
+        <translation>ungültiges Symbol &apos;%1&apos;, sollte &apos;name|date|priority|description sein&apos;&apos;</translation>
+    </message>
+    <message>
+        <location filename="../../Core/DataFilter.cpp" line="2564"/>
         <source>annotate(label|hline|vline|voronoi, ...) need at least 2 parameters.</source>
         <translation>annotate(label|hline|vline|voronoi, ...) benötigt mindestens 2 Parameter.</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="3718"/>
+        <location filename="../../Core/DataFilter.cpp" line="3740"/>
         <source>Date</source>
         <translation>Datum</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="3719"/>
+        <location filename="../../Core/DataFilter.cpp" line="3741"/>
         <source>Time</source>
         <translation>Zeit</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="3720"/>
+        <location filename="../../Core/DataFilter.cpp" line="3742"/>
         <source>Name</source>
         <translation>Name</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="3721"/>
+        <location filename="../../Core/DataFilter.cpp" line="3743"/>
         <source>Start</source>
         <translation>Start</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="3722"/>
+        <location filename="../../Core/DataFilter.cpp" line="3744"/>
         <source>Stop</source>
         <translation>Stopp</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="3723"/>
+        <location filename="../../Core/DataFilter.cpp" line="3745"/>
         <source>Type</source>
         <translation>Typ</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="3724"/>
+        <location filename="../../Core/DataFilter.cpp" line="3746"/>
         <source>Test</source>
         <translation>Test</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="3725"/>
+        <location filename="../../Core/DataFilter.cpp" line="3747"/>
         <source>Color</source>
         <translation>Farbe</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="3726"/>
+        <location filename="../../Core/DataFilter.cpp" line="3748"/>
         <source>Route</source>
         <translation>Route</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="3727"/>
+        <location filename="../../Core/DataFilter.cpp" line="3749"/>
         <source>Selected</source>
         <translation>Ausgewählte</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="3728"/>
+        <location filename="../../Core/DataFilter.cpp" line="3750"/>
         <source>File Name</source>
         <translation>Datei Name</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2247"/>
+        <location filename="../../Core/DataFilter.cpp" line="2269"/>
         <source>bests() - first parameters is a symbol should be a series name or &apos;date&apos;</source>
         <translation>bests() - der erste Parameter ist ein Symbol und sollte ein Serienname oder ein &apos;date&apos; sein</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2288"/>
+        <location filename="../../Core/DataFilter.cpp" line="2310"/>
         <source>too many parameters</source>
         <translation>zu viele Parameter</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2295"/>
+        <location filename="../../Core/DataFilter.cpp" line="2317"/>
         <source>measures(group, field) - must have group and field parameters.</source>
         <translation>measures(group, field) -muss Gruppen- und Feld-Parameter haben.</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2304"/>
+        <location filename="../../Core/DataFilter.cpp" line="2326"/>
         <source>measures group must be a string.</source>
         <translation>&quot;measures&quot; muss eine Zeichenkette (string) sein.</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2310"/>
+        <location filename="../../Core/DataFilter.cpp" line="2332"/>
         <source>invalid measures group &apos;%1&apos;.</source>
         <translation>Ungültige measures group &apos;%1&apos;.</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2317"/>
+        <location filename="../../Core/DataFilter.cpp" line="2339"/>
         <source>measures field must be a string.</source>
         <translation>Das Feld measures muss eine Zeichenkette (string)sein.</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2323"/>
+        <location filename="../../Core/DataFilter.cpp" line="2345"/>
         <source>invalid measures field &apos;%1&apos; for group &apos;%2&apos;, should be one of: %3.</source>
         <translation>Ungültiges Messwertfeld &apos;%1&apos; für Gruppe &apos;%2&apos; sollte eines der folgenden sein: %3.</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2334"/>
+        <location filename="../../Core/DataFilter.cpp" line="2356"/>
         <source>quantil(vector, quantiles)</source>
         <translation>quantil(vector, quantiles)</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2344"/>
+        <location filename="../../Core/DataFilter.cpp" line="2366"/>
         <source>multisort(ascend|descend, list [, .. list n])</source>
         <translation>multisort(ascend|descend, list [, .. list n])</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2350"/>
+        <location filename="../../Core/DataFilter.cpp" line="2372"/>
         <source>multisort(ascend|descend, list [, .. list n]), need to specify ascend or descend</source>
         <translation>multisort(ascend|descend, list [, .. list n]), muss festgelegt werden, ob aufsteigend oder absteigend</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2362"/>
+        <location filename="../../Core/DataFilter.cpp" line="2384"/>
         <source>multisort: list arguments must be a symbol</source>
         <translation>multisort: Listenargumente müssen ein Symbol sein</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2366"/>
-        <location filename="../../Core/DataFilter.cpp" line="2428"/>
-        <location filename="../../Core/DataFilter.cpp" line="2444"/>
+        <location filename="../../Core/DataFilter.cpp" line="2388"/>
+        <location filename="../../Core/DataFilter.cpp" line="2450"/>
+        <location filename="../../Core/DataFilter.cpp" line="2466"/>
         <source>&apos;%1&apos; is not a user symbol</source>
         <translation>&apos;%1&apos; ist kein Benutzersymbol</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2378"/>
+        <location filename="../../Core/DataFilter.cpp" line="2400"/>
         <source>sort(ascend|descend, list), need to specify ascend or descend</source>
         <translation>sort(ascend|descend, list), muss festgelegt werden, ob aufsteigend oder absteigend</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2391"/>
+        <location filename="../../Core/DataFilter.cpp" line="2413"/>
         <source>rank(ascend|descend, list), need to specify ascend or descend</source>
         <translation>rank(ascend|descend, list), muss festgelegt werden, ob aufsteigend oder absteigend</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2404"/>
-        <location filename="../../Core/DataFilter.cpp" line="2440"/>
+        <location filename="../../Core/DataFilter.cpp" line="2426"/>
+        <location filename="../../Core/DataFilter.cpp" line="2462"/>
         <source>argsort(ascend|descend, list), need to specify ascend or descend</source>
         <translation>argsort(ascend|descend, list), muss festgelegt werden, ob aufsteigend oder absteigend</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2415"/>
+        <location filename="../../Core/DataFilter.cpp" line="2437"/>
         <source>multiuniq(list [, .. list n])</source>
         <translation>multiuniq(list [, .. list n])</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2424"/>
+        <location filename="../../Core/DataFilter.cpp" line="2446"/>
         <source>multiuniq: list arguments must be a symbol</source>
         <translation>multiuniq: Listenargumente müssen ein Symbol sein</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2455"/>
+        <location filename="../../Core/DataFilter.cpp" line="2477"/>
         <source>curve(seriesname, x|y|z|d|t), need to specify series name and data.</source>
         <translation>curve(seriesname, x|y|z|d|t), Serienname und Daten müssen festgelegt werden.</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2460"/>
+        <location filename="../../Core/DataFilter.cpp" line="2482"/>
         <source>&apos;%1&apos; is not a valid, x, y, z, d or t expected</source>
         <translation>&apos;%1&apos; ist nicht gültig, x, y, z, d oder t erwartete</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2470"/>
+        <location filename="../../Core/DataFilter.cpp" line="2492"/>
         <source>meanmax(SERIES|data [,start, stop]) or meanmax(xvector,yvector)</source>
         <translation>meanmax(SERIES|data [,start, stop]) oder meanmax(xvector,yvector)</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2477"/>
+        <location filename="../../Core/DataFilter.cpp" line="2499"/>
         <source>meanmax(SERIES), SERIES should be POWER, HEARTRATE etc.</source>
         <translation>meanmax(SERIES), SERIES sollte POWER, HEARTRATE etc. sein.</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2503"/>
+        <location filename="../../Core/DataFilter.cpp" line="2525"/>
         <source>dist(series, data|bins), both parameters are required.</source>
         <translation>dist(series, data|bins), beide Parameter werden benötigt.</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2510"/>
+        <location filename="../../Core/DataFilter.cpp" line="2532"/>
         <source>dist(series, data|bins), series should be one ofPOWER, HEARTRATE etc.</source>
         <translatorcomment>dist(series, data|bins), series sollte aus einen der folgenden bestehen POWER, HEARTRATE etc.</translatorcomment>
         <translation>dist(series, data|bins), series sollte einer von POWER, HEARTRATE etc. sein.</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2525"/>
-        <location filename="../../Core/DataFilter.cpp" line="2531"/>
+        <location filename="../../Core/DataFilter.cpp" line="2547"/>
+        <location filename="../../Core/DataFilter.cpp" line="2553"/>
         <source>dist(series, data|bins), second parameter must be ether &apos;data&apos; or &apos;bins&apos;</source>
         <translation>dist(series, data|bins), der zweite Parameter muss entweder &quot;data&quot; oder &quot;bins&quot; sein</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2551"/>
+        <location filename="../../Core/DataFilter.cpp" line="2573"/>
         <source>annotation type &apos;%1&apos; not available</source>
         <translation>annotation Ttyp &apos;%1&apos; nicht verfügbar</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2558"/>
+        <location filename="../../Core/DataFilter.cpp" line="2580"/>
         <source>annotate(voronoi, centers)</source>
         <translation>annotate(voronoi, centers)</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2565"/>
+        <location filename="../../Core/DataFilter.cpp" line="2587"/>
         <source>annotate(lr, solid|dash|dot|dashdot|dashdotdot, &quot;colorname&quot;)</source>
         <translation>annotate(lr, solid|dash|dot|dashdot|dashdotdot, &quot;colorname&quot;)</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2576"/>
+        <location filename="../../Core/DataFilter.cpp" line="2598"/>
         <source>annotate(hline|vline, &apos;label&apos;, solid|dash|dot|dashdot|dashdotdot, value)</source>
         <translation>annotate(hline|vline, &apos;label&apos;, solid|dash|dot|dashdot|dashdotdot, value)</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2595"/>
+        <location filename="../../Core/DataFilter.cpp" line="2617"/>
         <source>smooth(list, algorithm [,parameters]) need at least 2 parameters.</source>
         <translation>smooth(list, algorithm [,parameters]) benötigen mindestens 2 Parameter.</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2602"/>
+        <location filename="../../Core/DataFilter.cpp" line="2624"/>
         <source>smoothing algorithm &apos;%1&apos; not available</source>
         <translation>Glättungsalgorithmus &apos;%1&apos; nicht verfügbar</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2609"/>
-        <location filename="../../Core/DataFilter.cpp" line="2617"/>
+        <location filename="../../Core/DataFilter.cpp" line="2631"/>
+        <location filename="../../Core/DataFilter.cpp" line="2639"/>
         <source>smooth(list, sma, forward|centered|backward, windowsize</source>
         <translation>smooth(list, sma, forward|centered|backward, windowsize</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2630"/>
+        <location filename="../../Core/DataFilter.cpp" line="2652"/>
         <source>smooth(list, ewma, alpha (between 0 and 1)</source>
         <translation>smooth(list, ewma, alpha (zwischen 0 und 1)</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2644"/>
+        <location filename="../../Core/DataFilter.cpp" line="2666"/>
         <source>lowerbound(list, value), need list and value to find</source>
         <translation>lowerbound(list, value), zum Suchen wird list und value benötigt</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2655"/>
+        <location filename="../../Core/DataFilter.cpp" line="2677"/>
         <source>lr(x, y), need x and y vectors.</source>
         <translation>lr(x, y), braucht x und y Vektoren.</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2667"/>
+        <location filename="../../Core/DataFilter.cpp" line="2689"/>
         <source>mlr(yvector, xvector1 .. xvectorn), need at least 1 xvector and y vectors.</source>
         <translation>mlr(yvector, xvector1 .. xvectorn), benötigen mindestens 1 x-Vektor und y-Vektoren.</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2678"/>
+        <location filename="../../Core/DataFilter.cpp" line="2700"/>
         <source>lm(expr, xlist, ylist), need formula, x and y data to fit to.</source>
         <translation>lm(expr, xlist, ylist), brauchet Formel, x und y um Daten anzupassen.</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2698"/>
+        <location filename="../../Core/DataFilter.cpp" line="2720"/>
         <source>lm(expr, xlist, ylist), formula must have at least one parameter to estimate.
 </source>
         <translation>lm(expr, xlist, ylist), Formel muss mindestens einen zu schätzenden Parameter haben.
 </translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2706"/>
+        <location filename="../../Core/DataFilter.cpp" line="2728"/>
         <source>sapply(list, expr), need 2 parameters.</source>
         <translation>sapply(list, expr), benötigt 2 Parameter.</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2717"/>
+        <location filename="../../Core/DataFilter.cpp" line="2739"/>
         <source>pmc(metric, stress|lts|sts|sb|rr|date), need to specify a metric and series.</source>
         <translation>pmc(metric, stress|lts|sts|sb|rr|date), Metrik und Serie müssen festgelegt werden.</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2727"/>
+        <location filename="../../Core/DataFilter.cpp" line="2749"/>
         <source>invalid PMC series &apos;%1&apos;</source>
         <translation>Ungültige PMC Serie &apos;%1&apos;</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2736"/>
+        <location filename="../../Core/DataFilter.cpp" line="2758"/>
         <source>should be banister(load_metric, perf_metric, nte|pte|perf|cp|date)</source>
         <translation>sollte sein banister(load_metric, perf_metric, nte|pte|perf|cp|date)</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2774"/>
+        <location filename="../../Core/DataFilter.cpp" line="2796"/>
         <source>XDATA needs 3 parameters.</source>
         <translation>XDATA benötigt 3 Parameter.</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2781"/>
+        <location filename="../../Core/DataFilter.cpp" line="2803"/>
         <source>XDATA expects a string for first two parameters</source>
         <translation>XDATA erwartet für die ersten beiden Parameter einen String</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2788"/>
+        <location filename="../../Core/DataFilter.cpp" line="2810"/>
         <source>XDATA expects a symbol, one of sparse, repeat, interpolate or resample for third parameter.</source>
         <translation>XDATA erwartet ein Symbol aus der Liste &apos;sparse&apos;, &apos;repeat&apos;, &apos;interpolate&apos; oder &apos;resample&apos; als dritten Paramter.</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2795"/>
+        <location filename="../../Core/DataFilter.cpp" line="2817"/>
         <source>XDATA expects one of sparse, repeat, interpolate or resample for third parameter. (%1)</source>
         <translation>XDATA erwartet ein Symbol aus der Liste &apos;sparse&apos;, &apos;repeat&apos;, &apos;interpolate&apos; oder &apos;resample&apos; als dritten Paramter. (%1)</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2818"/>
+        <location filename="../../Core/DataFilter.cpp" line="2840"/>
         <source>XDATA_UNITS needs 2 parameters.</source>
         <translation>XDATA_UNITS benötigt 2 Parameter.</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2825"/>
+        <location filename="../../Core/DataFilter.cpp" line="2847"/>
         <source>XDATA_UNITS expects a string for first two parameters</source>
         <translation>XDATA_UNITS erwartet für die ersten beiden Parameter einen String</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2840"/>
+        <location filename="../../Core/DataFilter.cpp" line="2862"/>
         <source>isset/set/unset function first parameter is field/metric to set.</source>
         <translation>&quot;isset&quot;/&quot;set&quot;/&quot;unset&quot; Funktionen - der erste Parameter muss ein Feld oder eine Metrik sein.</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2857"/>
+        <location filename="../../Core/DataFilter.cpp" line="2879"/>
         <source>%1 is not supported in isset/set/unset operations</source>
         <translation>%1 wird bei &quot;isset&quot;/&quot;set&quot;/&quot;unset&quot; Operationen nicht unterstützt</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2867"/>
+        <location filename="../../Core/DataFilter.cpp" line="2889"/>
         <source>isset has one parameter, a symbol to check.</source>
         <translation>&quot;isset&quot; hat einen Parameter - das zu prüfenden Symbol.</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2874"/>
+        <location filename="../../Core/DataFilter.cpp" line="2896"/>
         <source>set function needs 3 paramaters; symbol, value and expression.</source>
         <translation>&quot;set&quot; Funktion benötigt 3 Parameter - Symbol, Wert und Ausdruck.</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2875"/>
+        <location filename="../../Core/DataFilter.cpp" line="2897"/>
         <source>unset function needs 2 paramaters; symbol and expression.</source>
         <translation>&quot;unset&quot; Funktion benötigt 2 Parameter - Symbol und Ausdruck.</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2894"/>
+        <location filename="../../Core/DataFilter.cpp" line="2916"/>
         <source>%1 function expects model name as first parameter.</source>
         <translation>%1 Funktion erwartet den Modellnamen als ersten Parameter.</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2900"/>
+        <location filename="../../Core/DataFilter.cpp" line="2922"/>
         <source>%1 function expects model name as first parameter</source>
         <translation>%1 Funktion erwartet den Modellnamen als ersten Parameter</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2911"/>
+        <location filename="../../Core/DataFilter.cpp" line="2933"/>
         <source>%1 function expects parameter or duration as second parameter</source>
         <translation>%1 Funktion erwartet Parameter oder Dauer als zweiten Parameter</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2977"/>
+        <location filename="../../Core/DataFilter.cpp" line="2999"/>
         <source>array assignment must be to symbol.</source>
         <translation>Array-Zuweisung muss ein Symbol sein.</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2985"/>
+        <location filename="../../Core/DataFilter.cpp" line="3007"/>
         <source>&apos;%1&apos; unknown variable</source>
         <translation>&apos;%1&apos; unbekannte Variable</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2991"/>
+        <location filename="../../Core/DataFilter.cpp" line="3013"/>
         <source>assign to selection not supported at present. sorry.</source>
         <translation>Die Zuordnung zur Auswahl wird derzeit nicht unterstützt. Tut mir leid.</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2931"/>
+        <location filename="../../Core/DataFilter.cpp" line="2953"/>
         <source>function &apos;%1&apos; expects %2 parameter(s) not %3</source>
         <translation>Funktion &apos;%1&apos; erwartet %2 Parameter, nicht %3</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2943"/>
+        <location filename="../../Core/DataFilter.cpp" line="2965"/>
         <source>unknown function %1</source>
         <translation>Funktion %1 nicht bekannt</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2953"/>
+        <location filename="../../Core/DataFilter.cpp" line="2975"/>
         <source>unary negation on a string!</source>
         <translation>unäre &apos;-&apos; Operation bei einem Text!</translation>
     </message>
@@ -18539,6 +18569,7 @@ Drehmomentkorrektur - Der absolute Korrekturwert in Nm (oder Pfund pro Quadratin
     </message>
     <message>
         <location filename="../../Train/Library.cpp" line="179"/>
+        <location filename="../../Train/Library.cpp" line="183"/>
         <source>Copy VideoSync Failed</source>
         <translation>VideoSync kopieren fehlgeschlagen</translation>
     </message>
@@ -18548,12 +18579,23 @@ Drehmomentkorrektur - Der absolute Korrekturwert in Nm (oder Pfund pro Quadratin
         <translation>%1 ist bereits in der VideoSync Bibliothek: %2 vorhanden</translation>
     </message>
     <message>
-        <location filename="../../Train/Library.cpp" line="211"/>
+        <location filename="../../Train/Library.cpp" line="184"/>
+        <source>%1 cannot be written to videoSync library %2, check permissions and free space</source>
+        <translation>%1 kann nicht in die VideoSync-Bibliothek %2 geschrieben werden, überprüfen Sie die Berechtigungen und auf ausreichenden freien Speicherplatz</translation>
+    </message>
+    <message>
+        <location filename="../../Train/Library.cpp" line="217"/>
+        <location filename="../../Train/Library.cpp" line="221"/>
         <source>Copy Workout Failed</source>
         <translation>Workout kopieren fehlgeschlagen</translation>
     </message>
     <message>
-        <location filename="../../Train/Library.cpp" line="212"/>
+        <location filename="../../Train/Library.cpp" line="218"/>
+        <source>%1 already exists in workout library: %2</source>
+        <translation>%1 existiert bereits in der Workout-Bibliothek: %2</translation>
+    </message>
+    <message>
+        <location filename="../../Train/Library.cpp" line="222"/>
         <source>%1 cannot be written to workout library %2, check permissions and free space</source>
         <translation>%1 kann nicht in die Workout Bibliothek %2 gespeichert werden. Prüfe die Zugriffsrechte und den freien Platz</translation>
     </message>
@@ -18561,89 +18603,89 @@ Drehmomentkorrektur - Der absolute Korrekturwert in Nm (oder Pfund pro Quadratin
 <context>
     <name>LibrarySearchDialog</name>
     <message>
-        <location filename="../../Train/Library.cpp" line="257"/>
+        <location filename="../../Train/Library.cpp" line="267"/>
         <source>Search for Workouts, Syncs and Media</source>
         <translation>Nach Workouts, VideoSyncs und Medien suchen</translation>
     </message>
     <message>
-        <location filename="../../Train/Library.cpp" line="264"/>
+        <location filename="../../Train/Library.cpp" line="274"/>
         <source>Workout files (.erg, .mrc, .zwo etc)</source>
         <translation>Workout-Dateien (.erg, .mrc, .zwo usw.)</translation>
     </message>
     <message>
-        <location filename="../../Train/Library.cpp" line="266"/>
+        <location filename="../../Train/Library.cpp" line="276"/>
         <source>Video files (.mp4, .avi etc)</source>
         <translation>Videodateien (.mp4, .avi usw.)</translation>
     </message>
     <message>
-        <location filename="../../Train/Library.cpp" line="268"/>
+        <location filename="../../Train/Library.cpp" line="278"/>
         <source>VideoSync files (.rlv, .tts etc)</source>
         <translation>VideoSync Dateien (.rlv, .tts etc)</translation>
     </message>
     <message>
-        <location filename="../../Train/Library.cpp" line="286"/>
+        <location filename="../../Train/Library.cpp" line="296"/>
         <source>Search Path</source>
         <translation>Dateipfad durchsuchen</translation>
     </message>
     <message>
-        <location filename="../../Train/Library.cpp" line="306"/>
+        <location filename="../../Train/Library.cpp" line="316"/>
         <source>Video references</source>
         <translation>Video Referenzen</translation>
     </message>
     <message>
-        <location filename="../../Train/Library.cpp" line="318"/>
+        <location filename="../../Train/Library.cpp" line="328"/>
         <source>Searching...</source>
         <translation>Suche...</translation>
     </message>
     <message>
-        <location filename="../../Train/Library.cpp" line="321"/>
+        <location filename="../../Train/Library.cpp" line="331"/>
         <source>Videos</source>
         <translation>Videos</translation>
     </message>
     <message>
-        <location filename="../../Train/Library.cpp" line="323"/>
+        <location filename="../../Train/Library.cpp" line="333"/>
         <source>Workouts</source>
         <translation>Workouts</translation>
     </message>
     <message>
-        <location filename="../../Train/Library.cpp" line="325"/>
+        <location filename="../../Train/Library.cpp" line="335"/>
         <source>VideoSyncs</source>
         <translation>VideoSyncs</translation>
     </message>
     <message>
-        <location filename="../../Train/Library.cpp" line="334"/>
-        <location filename="../../Train/Library.cpp" line="421"/>
+        <location filename="../../Train/Library.cpp" line="344"/>
+        <location filename="../../Train/Library.cpp" line="431"/>
         <source>Cancel</source>
         <translation>Abbrechen</translation>
     </message>
     <message>
-        <location filename="../../Train/Library.cpp" line="336"/>
+        <location filename="../../Train/Library.cpp" line="346"/>
         <source>Search</source>
         <translation>Suchen</translation>
     </message>
     <message>
-        <location filename="../../Train/Library.cpp" line="339"/>
+        <location filename="../../Train/Library.cpp" line="349"/>
         <source>Files to search for:</source>
         <translation>Nach welchen Dateien suchen:</translation>
     </message>
     <message>
-        <location filename="../../Train/Library.cpp" line="402"/>
+        <location filename="../../Train/Library.cpp" line="412"/>
         <source>Abort Search</source>
         <translation>Suche abbrechen</translation>
     </message>
     <message>
-        <location filename="../../Train/Library.cpp" line="442"/>
-        <location filename="../../Train/Library.cpp" line="486"/>
+        <location filename="../../Train/Library.cpp" line="452"/>
+        <location filename="../../Train/Library.cpp" line="496"/>
         <source>Save</source>
         <translation>Speichern</translation>
     </message>
     <message>
-        <location filename="../../Train/Library.cpp" line="484"/>
+        <location filename="../../Train/Library.cpp" line="494"/>
         <source>Search completed.</source>
         <translation>Suche abgeschlossen.</translation>
     </message>
     <message>
-        <location filename="../../Train/Library.cpp" line="570"/>
+        <location filename="../../Train/Library.cpp" line="580"/>
         <source>Select Directory</source>
         <translation>Verzeichnis auswählen</translation>
     </message>
@@ -19588,22 +19630,22 @@ Please check your preference settings.</source>
 <context>
     <name>ManualDataProcessorDialog</name>
     <message>
-        <location filename="../../FileIO/DataProcessor.cpp" line="132"/>
+        <location filename="../../FileIO/DataProcessor.cpp" line="135"/>
         <source>Settings</source>
         <translation>Einstellungen</translation>
     </message>
     <message>
-        <location filename="../../FileIO/DataProcessor.cpp" line="134"/>
+        <location filename="../../FileIO/DataProcessor.cpp" line="137"/>
         <source>Description</source>
         <translation>Beschreibung</translation>
     </message>
     <message>
-        <location filename="../../FileIO/DataProcessor.cpp" line="148"/>
+        <location filename="../../FileIO/DataProcessor.cpp" line="151"/>
         <source>OK</source>
         <translation>OK</translation>
     </message>
     <message>
-        <location filename="../../FileIO/DataProcessor.cpp" line="149"/>
+        <location filename="../../FileIO/DataProcessor.cpp" line="152"/>
         <source>Cancel</source>
         <translation>Abbrechen</translation>
     </message>
@@ -24306,198 +24348,198 @@ Möchten Sie fortfahren?</translation>
         <translation>Fehlerhafter Diagrammtyp (%1).</translation>
     </message>
     <message>
-        <location filename="../../Gui/Perspective.cpp" line="853"/>
+        <location filename="../../Gui/Perspective.cpp" line="854"/>
         <source>Are you sure you want to remove the chart?</source>
         <translation>Diagramm wirklich entfernen?</translation>
     </message>
     <message>
-        <location filename="../../Gui/Perspective.cpp" line="854"/>
+        <location filename="../../Gui/Perspective.cpp" line="855"/>
         <source>Remove</source>
         <translation>Entfernen</translation>
     </message>
     <message>
-        <location filename="../../Gui/Perspective.cpp" line="1459"/>
+        <location filename="../../Gui/Perspective.cpp" line="1462"/>
         <source>Ride Log</source>
         <translation>Aktivitätenliste</translation>
     </message>
     <message>
-        <location filename="../../Gui/Perspective.cpp" line="1460"/>
+        <location filename="../../Gui/Perspective.cpp" line="1463"/>
         <source>Aerobic Power</source>
         <translation>Aerobe Leistung</translation>
     </message>
     <message>
-        <location filename="../../Gui/Perspective.cpp" line="1461"/>
+        <location filename="../../Gui/Perspective.cpp" line="1464"/>
         <source>Anaerobic Power</source>
         <translation>Anaerobe Leistung</translation>
     </message>
     <message>
-        <location filename="../../Gui/Perspective.cpp" line="1462"/>
+        <location filename="../../Gui/Perspective.cpp" line="1465"/>
         <source>Cadence</source>
         <translation>Trittfrequenz</translation>
     </message>
     <message>
-        <location filename="../../Gui/Perspective.cpp" line="1463"/>
+        <location filename="../../Gui/Perspective.cpp" line="1466"/>
         <source>Calendar</source>
         <translation>Kalender</translation>
     </message>
     <message>
-        <location filename="../../Gui/Perspective.cpp" line="1464"/>
+        <location filename="../../Gui/Perspective.cpp" line="1467"/>
         <source>CP</source>
         <translation>CP</translation>
     </message>
     <message>
-        <location filename="../../Gui/Perspective.cpp" line="1465"/>
+        <location filename="../../Gui/Perspective.cpp" line="1468"/>
         <source>Details</source>
         <translation>Details</translation>
     </message>
     <message>
-        <location filename="../../Gui/Perspective.cpp" line="1466"/>
+        <location filename="../../Gui/Perspective.cpp" line="1469"/>
         <source>Distance</source>
         <translation>Distanz</translation>
     </message>
     <message>
-        <location filename="../../Gui/Perspective.cpp" line="1467"/>
+        <location filename="../../Gui/Perspective.cpp" line="1470"/>
         <source>Edit</source>
         <translation>Bearbeiten</translation>
     </message>
     <message>
-        <location filename="../../Gui/Perspective.cpp" line="1468"/>
+        <location filename="../../Gui/Perspective.cpp" line="1471"/>
         <source>Elapsed Time</source>
         <translation>Vergangene Zeit</translation>
     </message>
     <message>
-        <location filename="../../Gui/Perspective.cpp" line="1469"/>
+        <location filename="../../Gui/Perspective.cpp" line="1472"/>
         <source>Heartrate</source>
         <translation>Herzfrequenz</translation>
     </message>
     <message>
-        <location filename="../../Gui/Perspective.cpp" line="1470"/>
+        <location filename="../../Gui/Perspective.cpp" line="1473"/>
         <source>Lap</source>
         <translation>Runde</translation>
     </message>
     <message>
-        <location filename="../../Gui/Perspective.cpp" line="1471"/>
+        <location filename="../../Gui/Perspective.cpp" line="1474"/>
         <source>Map</source>
         <translation>Karte</translation>
     </message>
     <message>
-        <location filename="../../Gui/Perspective.cpp" line="1472"/>
+        <location filename="../../Gui/Perspective.cpp" line="1475"/>
         <source>Performance</source>
         <translation>Leistung</translation>
     </message>
     <message>
-        <location filename="../../Gui/Perspective.cpp" line="1473"/>
+        <location filename="../../Gui/Perspective.cpp" line="1476"/>
         <source>PMC</source>
         <translation>PMC</translation>
     </message>
     <message>
-        <location filename="../../Gui/Perspective.cpp" line="1474"/>
+        <location filename="../../Gui/Perspective.cpp" line="1477"/>
         <source>Power</source>
         <translation>Leistung</translation>
     </message>
     <message>
-        <location filename="../../Gui/Perspective.cpp" line="1475"/>
+        <location filename="../../Gui/Perspective.cpp" line="1478"/>
         <source>QA</source>
         <translation>QA</translation>
     </message>
     <message>
-        <location filename="../../Gui/Perspective.cpp" line="1476"/>
+        <location filename="../../Gui/Perspective.cpp" line="1479"/>
         <source>Ride</source>
         <translation>Aktivität</translation>
     </message>
     <message>
-        <location filename="../../Gui/Perspective.cpp" line="1477"/>
+        <location filename="../../Gui/Perspective.cpp" line="1480"/>
         <source>Speed</source>
         <translation>Geschwindigkeit</translation>
     </message>
     <message>
-        <location filename="../../Gui/Perspective.cpp" line="1478"/>
+        <location filename="../../Gui/Perspective.cpp" line="1481"/>
         <source>Summary</source>
         <translation>Zusammenfassung</translation>
     </message>
     <message>
-        <location filename="../../Gui/Perspective.cpp" line="1479"/>
+        <location filename="../../Gui/Perspective.cpp" line="1482"/>
         <source>Target Power</source>
         <translation>Zielleistung</translation>
     </message>
     <message>
-        <location filename="../../Gui/Perspective.cpp" line="1480"/>
+        <location filename="../../Gui/Perspective.cpp" line="1483"/>
         <source>Time and Distance</source>
         <translation>Zeit und Distanz</translation>
     </message>
     <message>
-        <location filename="../../Gui/Perspective.cpp" line="1481"/>
+        <location filename="../../Gui/Perspective.cpp" line="1484"/>
         <source>Time In Zone</source>
         <translation>Zeit in Zone</translation>
     </message>
     <message>
-        <location filename="../../Gui/Perspective.cpp" line="1482"/>
+        <location filename="../../Gui/Perspective.cpp" line="1485"/>
         <source>W&apos; In Zone</source>
         <translation>W&apos; in Zone</translation>
     </message>
     <message>
-        <location filename="../../Gui/Perspective.cpp" line="1483"/>
+        <location filename="../../Gui/Perspective.cpp" line="1486"/>
         <source>Sustained In Zone</source>
         <translation>Anhaltend in der Zone</translation>
     </message>
     <message>
-        <location filename="../../Gui/Perspective.cpp" line="1484"/>
+        <location filename="../../Gui/Perspective.cpp" line="1487"/>
         <source>Training Mix</source>
         <translation>Trainingsmix</translation>
     </message>
     <message>
-        <location filename="../../Gui/Perspective.cpp" line="1485"/>
+        <location filename="../../Gui/Perspective.cpp" line="1488"/>
         <source>Navigator</source>
         <translation>Navigator</translation>
     </message>
     <message>
-        <location filename="../../Gui/Perspective.cpp" line="1486"/>
+        <location filename="../../Gui/Perspective.cpp" line="1489"/>
         <source>W/kg</source>
         <translation>W/kg</translation>
     </message>
     <message>
-        <location filename="../../Gui/Perspective.cpp" line="1487"/>
+        <location filename="../../Gui/Perspective.cpp" line="1490"/>
         <source>Workout</source>
         <translation>Workout</translation>
     </message>
     <message>
-        <location filename="../../Gui/Perspective.cpp" line="1488"/>
+        <location filename="../../Gui/Perspective.cpp" line="1491"/>
         <source>Stress</source>
         <translation>Belastung</translation>
     </message>
     <message>
-        <location filename="../../Gui/Perspective.cpp" line="1489"/>
+        <location filename="../../Gui/Perspective.cpp" line="1492"/>
         <source>Scatter</source>
         <translation>Streudiagramm</translation>
     </message>
     <message>
-        <location filename="../../Gui/Perspective.cpp" line="1490"/>
-        <location filename="../../Gui/Perspective.cpp" line="1492"/>
+        <location filename="../../Gui/Perspective.cpp" line="1493"/>
+        <location filename="../../Gui/Perspective.cpp" line="1495"/>
         <source>HrPw</source>
         <translation>HF/ Leistung</translation>
     </message>
     <message>
-        <location filename="../../Gui/Perspective.cpp" line="1491"/>
+        <location filename="../../Gui/Perspective.cpp" line="1494"/>
         <source>Activity Log</source>
         <translation>Aktivitätenliste</translation>
     </message>
     <message>
-        <location filename="../../Gui/Perspective.cpp" line="1493"/>
+        <location filename="../../Gui/Perspective.cpp" line="1496"/>
         <source>Tracker</source>
         <translation>Kennzahlen (KPI)</translation>
     </message>
     <message>
-        <location filename="../../Gui/Perspective.cpp" line="1494"/>
+        <location filename="../../Gui/Perspective.cpp" line="1497"/>
         <source>CP History</source>
         <translation>CP Historie</translation>
     </message>
     <message>
-        <location filename="../../Gui/Perspective.cpp" line="1495"/>
+        <location filename="../../Gui/Perspective.cpp" line="1498"/>
         <source>Library</source>
         <translation>Bibliothek</translation>
     </message>
     <message>
-        <location filename="../../Gui/Perspective.cpp" line="1496"/>
+        <location filename="../../Gui/Perspective.cpp" line="1499"/>
         <source>CV</source>
         <translation>CV</translation>
     </message>
@@ -25060,14 +25102,19 @@ on and that its display says, &quot;Host&quot;</source>
 <context>
     <name>PythonChart</name>
     <message>
-        <location filename="../../Charts/PythonChart.cpp" line="298"/>
+        <location filename="../../Charts/PythonChart.cpp" line="296"/>
         <source>Web charting</source>
         <translation>Webgrafik</translation>
     </message>
     <message>
-        <location filename="../../Charts/PythonChart.cpp" line="317"/>
+        <location filename="../../Charts/PythonChart.cpp" line="312"/>
         <source>Show Console</source>
         <translation>Konsole anzeigen</translation>
+    </message>
+    <message>
+        <location filename="../../Charts/PythonChart.cpp" line="401"/>
+        <source>Warning: Python is disabled</source>
+        <translation>Warnung: Python ist deaktiviert</translation>
     </message>
 </context>
 <context>
@@ -25102,9 +25149,9 @@ on and that its display says, &quot;Host&quot;</source>
         <translation>Rad</translation>
     </message>
     <message>
-        <location filename="../../FileIO/FitRideFile.cpp" line="1762"/>
-        <location filename="../../FileIO/FitRideFile.cpp" line="2745"/>
-        <location filename="../../FileIO/TcxParser.cpp" line="420"/>
+        <location filename="../../FileIO/FitRideFile.cpp" line="1618"/>
+        <location filename="../../FileIO/FitRideFile.cpp" line="2601"/>
+        <location filename="../../FileIO/TcxParser.cpp" line="421"/>
         <source>Lap %1</source>
         <translation>Runde %1</translation>
     </message>
@@ -25354,7 +25401,7 @@ yyyy</translation>
         <translation>Schwimmen</translation>
     </message>
     <message>
-        <location filename="../../Train/ErgFile.cpp" line="1183"/>
+        <location filename="../../Train/ErgFile.cpp" line="1184"/>
         <source>Unsupported file format</source>
         <translation>Dateiformat nicht unterstützt</translation>
     </message>
@@ -25654,64 +25701,34 @@ yyyy</translation>
         <translation>10 Völlig erschöpft, keine Reserven</translation>
     </message>
     <message>
-        <location filename="../../FileIO/FixElevation.cpp" line="324"/>
-        <source>Developer limit exceeded</source>
-        <translation>Limit für Entwickler überschritten</translation>
-    </message>
-    <message>
-        <location filename="../../FileIO/FixElevation.cpp" line="326"/>
-        <source>Monthly free plan limit exceeded</source>
-        <translation>Monatliche kostenloste Quota ist überschritten</translation>
-    </message>
-    <message>
-        <location filename="../../FileIO/FixElevation.cpp" line="328"/>
-        <source>Bad request</source>
-        <translation>Ungültige Anfrage</translation>
-    </message>
-    <message>
-        <location filename="../../FileIO/FixElevation.cpp" line="330"/>
-        <source>Gateway Timeout</source>
-        <translation>Gateway-Zeitüberschreitung</translation>
-    </message>
-    <message>
-        <location filename="../../FileIO/FixElevation.cpp" line="332"/>
-        <source>Connection to remote server timed out</source>
-        <translation>Verbindung zum Remove Server hatte Time-Out</translation>
-    </message>
-    <message>
-        <location filename="../../FileIO/FixElevation.cpp" line="334"/>
-        <source>Networkerror: %1</source>
-        <translation>Netzwerkfehler: %1</translation>
-    </message>
-    <message>
-        <location filename="../../FileIO/TcxParser.cpp" line="408"/>
+        <location filename="../../FileIO/TcxParser.cpp" line="409"/>
         <source>Distance %1</source>
         <translation>Distanz %1</translation>
     </message>
     <message>
-        <location filename="../../FileIO/TcxParser.cpp" line="411"/>
+        <location filename="../../FileIO/TcxParser.cpp" line="412"/>
         <source>Location %1</source>
         <translation>Position %1</translation>
     </message>
     <message>
-        <location filename="../../FileIO/TcxParser.cpp" line="414"/>
+        <location filename="../../FileIO/TcxParser.cpp" line="415"/>
         <source>Time %1</source>
         <translation>Zeit %1</translation>
     </message>
     <message>
-        <location filename="../../FileIO/TcxParser.cpp" line="417"/>
+        <location filename="../../FileIO/TcxParser.cpp" line="418"/>
         <source>HeartRate %1</source>
         <translation>Herzfrequenz %1</translation>
     </message>
     <message>
-        <location filename="../../R/RTool.cpp" line="244"/>
+        <location filename="../../R/RTool.cpp" line="246"/>
         <source>The version of R installed is too old. You must have R version 3.4 or higher.
 </source>
         <translation>Die installierte R Version ist zu alt. Sie benötigen mind. version 3.4 oder höher von R.
 </translation>
     </message>
     <message>
-        <location filename="../../R/RTool.cpp" line="253"/>
+        <location filename="../../R/RTool.cpp" line="255"/>
         <source>The version of R installed is too new. You must have R version 3.3 or older.
 </source>
         <translation>Die installierte R Version ist zu neu. Sie benötigen Version 3.3 oder niedriger von R.
@@ -25768,9 +25785,14 @@ Python wird in den Einstellungen deaktiviert.</translation>
         <translation>GC-Diagramme verwenden</translation>
     </message>
     <message>
-        <location filename="../../Charts/RChart.cpp" line="305"/>
+        <location filename="../../Charts/RChart.cpp" line="302"/>
         <source>Show Console</source>
         <translation>Konsole anzeigen</translation>
+    </message>
+    <message>
+        <location filename="../../Charts/RChart.cpp" line="409"/>
+        <source>Warning: R is disabled</source>
+        <translation>Warnung: R ist deaktiviert</translation>
     </message>
 </context>
 <context>
@@ -27251,7 +27273,7 @@ Wollen Sie fortfahren ?</translation>
         <translation>Verhältnis</translation>
     </message>
     <message>
-        <location filename="../../FileIO/RideFile.cpp" line="2394"/>
+        <location filename="../../FileIO/RideFile.cpp" line="2386"/>
         <source>Wheelsize</source>
         <translation>Laufradgröße</translation>
     </message>
@@ -27449,27 +27471,27 @@ Wollen Sie fortfahren ?</translation>
         <translation>Ununterbrochene Anstrengungen und Körner (Leistung)</translation>
     </message>
     <message>
-        <location filename="../../FileIO/RideFile.cpp" line="3222"/>
+        <location filename="../../FileIO/RideFile.cpp" line="3214"/>
         <source>Peak</source>
         <translation>Spitze</translation>
     </message>
     <message>
-        <location filename="../../FileIO/RideFile.cpp" line="3222"/>
+        <location filename="../../FileIO/RideFile.cpp" line="3214"/>
         <source>Find</source>
         <translation>Suche</translation>
     </message>
     <message>
-        <location filename="../../FileIO/RideFile.cpp" line="3229"/>
+        <location filename="../../FileIO/RideFile.cpp" line="3221"/>
         <source>Match</source>
         <translation>Korn</translation>
     </message>
     <message>
-        <location filename="../../FileIO/RideFile.cpp" line="3235"/>
+        <location filename="../../FileIO/RideFile.cpp" line="3227"/>
         <source>Climb</source>
         <translation>Aufstieg</translation>
     </message>
     <message>
-        <location filename="../../FileIO/RideFile.cpp" line="3241"/>
+        <location filename="../../FileIO/RideFile.cpp" line="3233"/>
         <source>Best</source>
         <translation>Beste</translation>
     </message>
@@ -28224,22 +28246,22 @@ Wollen Sie fortfahren ?</translation>
 <context>
     <name>RideMetadata</name>
     <message>
-        <location filename="../../Metrics/RideMetadata.cpp" line="410"/>
+        <location filename="../../Metrics/RideMetadata.cpp" line="409"/>
         <source>Raw Data</source>
         <translation>Rohdaten</translation>
     </message>
     <message>
-        <location filename="../../Metrics/RideMetadata.cpp" line="507"/>
+        <location filename="../../Metrics/RideMetadata.cpp" line="506"/>
         <source>Bike</source>
         <translation>Bike</translation>
     </message>
     <message>
-        <location filename="../../Metrics/RideMetadata.cpp" line="1398"/>
+        <location filename="../../Metrics/RideMetadata.cpp" line="1397"/>
         <source>Problem Saving Meta Data</source>
         <translation>Problem beim Speichern der Metadaten (Konfiguration)</translation>
     </message>
     <message>
-        <location filename="../../Metrics/RideMetadata.cpp" line="1399"/>
+        <location filename="../../Metrics/RideMetadata.cpp" line="1398"/>
         <source>File: %1 cannot be opened for &apos;Writing&apos;. Please check file properties.</source>
         <translation>Datei: %1 kann nicht zum &apos;Schreiben&apos; geöffnet werden. Bitte die Dateieigenschaften prüfen.</translation>
     </message>
@@ -30047,7 +30069,7 @@ Mehr Informationen: GC Wiki - Simulate_the_physics_of_bicycle_ride.</translation
     <message>
         <location filename="../../Metrics/SpecialFields.cpp" line="64"/>
         <source>Performance Condition</source>
-        <translation>Leistung Bedingung</translation>
+        <translation>Leistungszustand</translation>
     </message>
     <message>
         <location filename="../../Metrics/SpecialFields.cpp" line="65"/>
@@ -30852,57 +30874,57 @@ Falls eine neu erstellte Aktivität zeitlich mit einer bereits existierenden zus
 <context>
     <name>Themes</name>
     <message>
-        <location filename="../../Gui/Colors.cpp" line="750"/>
+        <location filename="../../Gui/Colors.cpp" line="752"/>
         <source>Modern Dark</source>
         <translation>Modernes Dunkel</translation>
     </message>
     <message>
-        <location filename="../../Gui/Colors.cpp" line="773"/>
+        <location filename="../../Gui/Colors.cpp" line="775"/>
         <source>Modern Light</source>
         <translation>Modernes Hell</translation>
     </message>
     <message>
-        <location filename="../../Gui/Colors.cpp" line="795"/>
+        <location filename="../../Gui/Colors.cpp" line="797"/>
         <source>Modern Stealth Dark</source>
         <translation>Modernes getarntes Dunkel</translation>
     </message>
     <message>
-        <location filename="../../Gui/Colors.cpp" line="817"/>
+        <location filename="../../Gui/Colors.cpp" line="819"/>
         <source>Modern Stealth Light</source>
         <translation>Modernes getarntes Hell</translation>
     </message>
     <message>
-        <location filename="../../Gui/Colors.cpp" line="838"/>
+        <location filename="../../Gui/Colors.cpp" line="840"/>
         <source>Gnome Adwaita Dark</source>
         <translation>Gnome Adwaita Dark</translation>
     </message>
     <message>
-        <location filename="../../Gui/Colors.cpp" line="859"/>
+        <location filename="../../Gui/Colors.cpp" line="861"/>
         <source>Team Colours (light)</source>
         <translation>Team Colours (hell)</translation>
     </message>
     <message>
-        <location filename="../../Gui/Colors.cpp" line="880"/>
+        <location filename="../../Gui/Colors.cpp" line="882"/>
         <source>Ollie&apos;s Oatmeal (light)</source>
         <translation>Ollie&apos;s Oatmeal (hell)</translation>
     </message>
     <message>
-        <location filename="../../Gui/Colors.cpp" line="901"/>
+        <location filename="../../Gui/Colors.cpp" line="903"/>
         <source>Mustang (dark)</source>
         <translation>Mustang (dunekl)</translation>
     </message>
     <message>
-        <location filename="../../Gui/Colors.cpp" line="922"/>
+        <location filename="../../Gui/Colors.cpp" line="924"/>
         <source>Mono (dark)</source>
         <translation>Mono (dunkel)</translation>
     </message>
     <message>
-        <location filename="../../Gui/Colors.cpp" line="943"/>
+        <location filename="../../Gui/Colors.cpp" line="945"/>
         <source>Mono (light)</source>
         <translation>Mono (hell)</translation>
     </message>
     <message>
-        <location filename="../../Gui/Colors.cpp" line="965"/>
+        <location filename="../../Gui/Colors.cpp" line="967"/>
         <source>Schoberer (light)</source>
         <translation>Schoberer (hell)</translation>
     </message>
@@ -31574,7 +31596,7 @@ Der Wert für „Derzeitige Höhe des Trainers“ kann unter Registerkarte &quot
     <message>
         <location filename="../../Train/TrainSidebar.cpp" line="583"/>
         <source>Scan for VideoSyncs</source>
-        <translation>Nach VideoSycns suchen</translation>
+        <translation>Nach VideoSyncs suchen</translation>
     </message>
     <message>
         <location filename="../../Train/TrainSidebar.cpp" line="596"/>
@@ -31582,44 +31604,44 @@ Der Wert für „Derzeitige Höhe des Trainers“ kann unter Registerkarte &quot
         <translation>Ausgewähltes VideoSync löschen</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="932"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="956"/>
         <source>Are you sure you want to remove the reference to this video?</source>
         <translation>Sind Sie sicher, dass Sie die Referenz zu diesem Video entfernen wollen?</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="934"/>
-        <location filename="../../Train/TrainSidebar.cpp" line="996"/>
-        <location filename="../../Train/TrainSidebar.cpp" line="1072"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="958"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="1020"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="1096"/>
         <source>Remove</source>
         <translation>Entfernen</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="967"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="991"/>
         <source>Are you sure you want to delete this VideoSync?</source>
         <translation>Dieses VideoSync löschen?</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="994"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="1018"/>
         <source>The VideoSync file is either not valid or not existing and will be removed from the library.</source>
         <translation>Die VideoSync Datei ist entweder ungültig oder existiert nicht und wird aus der Bibliothek entfernt.</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="1028"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="1052"/>
         <source>Are you sure you want to delete this Workout?</source>
         <translation>Dieses Workout löschen?</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="1031"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="1055"/>
         <source>Are you sure you want to delete this %1 workouts?</source>
         <translation>Wollen Sie diese %1 Workouts wirklich löschen?</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="1070"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="1094"/>
         <source>The Workout file is either not valid or not existing and will be removed from the library.</source>
         <translation>Die Workout Datei ist entweder ungültig oder existiert nicht und wird aus der Bibliothek entfernt.</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="1214"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="1238"/>
         <source>Starting in %1</source>
         <translation>Starten in %1</translation>
     </message>
@@ -31809,34 +31831,34 @@ Lassen Sie das Rad frei laufen.</translation>
         <translation>Nach Videos suchen</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="969"/>
-        <location filename="../../Train/TrainSidebar.cpp" line="1041"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="993"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="1065"/>
         <location filename="../../Train/TrainSidebar.cpp" line="3011"/>
         <source>Delete</source>
         <translation>Löschen</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="1176"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="1200"/>
         <source>Resuming..</source>
         <translation>Weitermachen..</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="1203"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="1227"/>
         <source>Paused..</source>
         <translation>Unterbrochen..</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="1330"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="1354"/>
         <source>Starting..</source>
         <translation>Starte..</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="1518"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="1542"/>
         <source>Stopped..</source>
         <translation>Gestoppt..</translation>
     </message>
     <message>
-        <location filename="../../Train/TrainSidebar.cpp" line="1597"/>
+        <location filename="../../Train/TrainSidebar.cpp" line="1621"/>
         <source>Connected..</source>
         <translation>Verbunden..</translation>
     </message>
@@ -33453,12 +33475,12 @@ Atemabweisung; RF außerhalb des Bereichs.</translation>
 <context>
     <name>WorkoutImportDialog</name>
     <message>
-        <location filename="../../Train/Library.cpp" line="736"/>
+        <location filename="../../Train/Library.cpp" line="746"/>
         <source>Import to Library</source>
         <translation>In Bibliothek importieren</translation>
     </message>
     <message>
-        <location filename="../../Train/Library.cpp" line="771"/>
+        <location filename="../../Train/Library.cpp" line="781"/>
         <source>Please note, that when importing or drag and dropping videos into the library we DO NOT copy the file into the GoldenCheetah library, instead we add a REFERENCE to it. We DO copy workout and videoSync files, since they are smaller.
 
 You can remove references when managing the library via the context menu options</source>
@@ -33467,22 +33489,22 @@ You can remove references when managing the library via the context menu options
 Sie können die Referenzen in der Bibliothek über die Optionen im Kontektmenu löschen</translation>
     </message>
     <message>
-        <location filename="../../Train/Library.cpp" line="785"/>
+        <location filename="../../Train/Library.cpp" line="795"/>
         <source>Files</source>
         <translation>Dateien</translation>
     </message>
     <message>
-        <location filename="../../Train/Library.cpp" line="795"/>
+        <location filename="../../Train/Library.cpp" line="805"/>
         <source>Cancel</source>
         <translation>Abbrechen</translation>
     </message>
     <message>
-        <location filename="../../Train/Library.cpp" line="797"/>
+        <location filename="../../Train/Library.cpp" line="807"/>
         <source>OK</source>
         <translation>OK</translation>
     </message>
     <message>
-        <location filename="../../Train/Library.cpp" line="801"/>
+        <location filename="../../Train/Library.cpp" line="811"/>
         <source>Overwite existing files</source>
         <translation>Überschreibe bestehende Dateien</translation>
     </message>
