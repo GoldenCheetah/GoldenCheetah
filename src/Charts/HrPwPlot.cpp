@@ -426,7 +426,7 @@ HrPwPlot::addHrStepCurve(QVector<double> &finalHr, int nbpoints)
     QMapIterator<double,double> l(hrHist);
     while (l.hasNext()) {
         l.next();
-        array[(int) round(l.key())] += l.value();
+        if (l.key() >= 0 && l.key() < maxHr) array[(int) round(l.key())] += l.value();
     }
 
 
@@ -447,7 +447,6 @@ HrPwPlot::addHrStepCurve(QVector<double> &finalHr, int nbpoints)
     }
     smoothTimeStep2[t] = 0.0;
     smoothHrStep[t] = t * 2;
-
     hrStepCurve->setSamples(smoothTimeStep2.data(), smoothHrStep.data(), nbSteps+1);
     delete [] array;
 }
