@@ -140,16 +140,24 @@ FixElevation::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString
     QString latLngCollection = "";
     int pointCount = 0;
     try {
+
         for (std::vector<elevationGPSPoint>::iterator point = elvPoints.begin();
              point != elvPoints.end(); ++point) {
-            if (latLngCollection.length() != 0) {
-                latLngCollection.append('|');
+
+            if (latLngCollection.length() == 0) {
+                latLngCollection.append("{\"locations\":[");
+            } else {
+                latLngCollection.append(',');
             }
+
             // these values need extended precision or place marker jumps around.
-            latLngCollection.append(QString::number(point->lat,'g',10));
+            latLngCollection.append("{\"latitude\":" + QString::number(point->lat,'g',10));
             latLngCollection.append(',');
-            latLngCollection.append(QString::number(point->lon,'g',10));
-            if (pointCount == 45) { // Open-Elevation has a 1024 bytes limit for Get requests
+            latLngCollection.append("\"longitude\":" + QString::number(point->lon,'g',10) + "}");
+
+            // this should not happen, it is preserve just in case we need to break the requests
+            if (pointCount == 86400) {
+                latLngCollection.append("]}");
                 elevationPoints = elevationPoints + FetchElevationData(latLngCollection);
                 latLngCollection = "";
                 pointCount = 0;
@@ -157,10 +165,15 @@ FixElevation::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString
                 ++pointCount;
             }
         }
+
+        // send a request for the remainder points, currently all at once for efficiency
         if (pointCount > 0) {
+            latLngCollection.append("]}");
             elevationPoints = elevationPoints + FetchElevationData(latLngCollection);
         }
+
     } catch (QString err) {
+
         qDebug() << "Cannot fetch elevation data: " << err;
         QMessageBox oops(QMessageBox::Critical, tr("Fix Elevation Data not possible"),
                          tr("The following problem occured: %1").arg(err));
@@ -168,6 +181,7 @@ FixElevation::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString
         // close LUW
         ride->command->endLUW();
         return false;
+
     }
 
 
@@ -261,11 +275,14 @@ FixElevation::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString
 QList<double>
 FixElevation::FetchElevationData(QString latLngCollection)
 {
-    // https://api.open-elevation.com/api/v1/lookup?locations=10,10|20,20|41.161758,-8.583933
     QList<double> elevationPoints;
+
+    QNetworkRequest request(QUrl(QString("https://api.open-elevation.com/api/v1/lookup")));
+    request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
+    request.setRawHeader("Accept", "application/json");
+
     QNetworkAccessManager *networkMgr = new QNetworkAccessManager();
-    QNetworkReply *reply = networkMgr->get( QNetworkRequest(
-            QUrl( QString("https://api.open-elevation.com/api/v1/lookup?locations=" + latLngCollection ) ) ) );
+    QNetworkReply *reply = networkMgr->post(request, latLngCollection.toUtf8());
 
     QEventLoop loop;
     QObject::connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
