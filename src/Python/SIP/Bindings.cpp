@@ -180,12 +180,14 @@ class gcZoneConfig {
     QString sport;
     QDate date;
     QList<int> zoneslow;
+    QList<int> hrzoneslow;
+    QList<double> pacezoneslow;
     int cp, wprime, pmax,aetp,ftp,lthr,aethr,rhr,hrmax;
     double cv,aetv;
 };
 
 // Return a dataframe with:
-// date, sport, cp, w', pmax, aetp, ftp, lthr, aethr, rhr, hrmax, cv, aetv, zoneslow, zonescolor
+// date, sport, cp, w', pmax, aetp, ftp, lthr, aethr, rhr, hrmax, cv, aetv, zoneslow, hrzoneslow, pacezoneslow zonescolor
 PyObject*
 Bindings::athleteZones(PyObject* date, QString sport) const
 {
@@ -204,202 +206,125 @@ Bindings::athleteZones(PyObject* date, QString sport) const
         // convert PyDate to QDate
         QDate forDate(QDate(PyDateTime_GET_YEAR(date), PyDateTime_GET_MONTH(date), PyDateTime_GET_DAY(date)));
 
-        gcZoneConfig bike("bike");
-        gcZoneConfig run("run");
-        gcZoneConfig swim("bike");
+        // Look for the range in Power, HR and Pace zones for each sport
+        foreach (QString sp, GlobalContext::context()->rideMetadata->sports()) {
 
-        // BIKE POWER
-        if (context->athlete->zones("Bike")) {
+            // Power Zones
+            if (context->athlete->zones(sp)) {
 
-            // run through the bike zones
-            int range=context->athlete->zones("Bike")->whichRange(forDate);
-            if (range >= 0) {
-                bike.date =  forDate;
-                bike.cp = context->athlete->zones("Bike")->getCP(range);
-                bike.wprime = context->athlete->zones("Bike")->getWprime(range);
-                bike.pmax = context->athlete->zones("Bike")->getPmax(range);
-                bike.aetp = context->athlete->zones("Bike")->getAeT(range);
-                bike.ftp = context->athlete->zones("Bike")->getFTP(range);
-                bike.zoneslow = context->athlete->zones("Bike")->getZoneLows(range);
+                // run through the power zones
+                int range=context->athlete->zones(sp)->whichRange(forDate);
+                if (range >= 0) {
+
+                    gcZoneConfig c(sp);
+
+                    c.date = forDate;
+                    c.cp = context->athlete->zones(sp)->getCP(range);
+                    c.wprime = context->athlete->zones(sp)->getWprime(range);
+                    c.pmax = context->athlete->zones(sp)->getPmax(range);
+                    c.aetp = context->athlete->zones(sp)->getAeT(range);
+                    c.ftp = context->athlete->zones(sp)->getFTP(range);
+                    c.zoneslow = context->athlete->zones(sp)->getZoneLows(range);
+
+                    config << c;
+                }
+            }
+
+            // HR Zones
+            if (context->athlete->hrZones(sp)) {
+
+                int range=context->athlete->hrZones(sp)->whichRange(forDate);
+                if (range >= 0) {
+
+                    gcZoneConfig c(sp);
+
+                    c.date = forDate;
+                    c.lthr = context->athlete->hrZones(sp)->getLT(range);
+                    c.aethr = context->athlete->hrZones(sp)->getAeT(range);
+                    c.rhr = context->athlete->hrZones(sp)->getRestHr(range);
+                    c.hrmax = context->athlete->hrZones(sp)->getMaxHr(range);
+                    c.hrzoneslow = context->athlete->hrZones(sp)->getZoneLows(range);
+
+                    config << c;
+                }
+            }
+
+            // Pace Zones
+            if ((sp == "Run" || sp == "Swim") && context->athlete->paceZones(sp=="Swim")) {
+
+                int range=context->athlete->paceZones(sp=="Swim")->whichRange(forDate);
+                if (range >= 0) {
+
+                    gcZoneConfig c(sp);
+
+                    c.date =  forDate;
+                    c.cv =  context->athlete->paceZones(sp=="Swim")->getCV(range);
+                    c.aetv =  context->athlete->paceZones(sp=="Swim")->getAeT(range);
+                    c.pacezoneslow = context->athlete->paceZones(sp=="Swim")->getZoneLows(range);
+
+                    config << c;
+                }
             }
         }
-
-        // RUN POWER
-        if (context->athlete->zones("Run")) {
-
-            // run through the bike zones
-            int range=context->athlete->zones("Run")->whichRange(forDate);
-            if (range >= 0) {
-
-                run.date = forDate;
-                run.cp = context->athlete->zones("Run")->getCP(range);
-                run.wprime = context->athlete->zones("Run")->getWprime(range);
-                run.pmax = context->athlete->zones("Run")->getPmax(range);
-                run.aetp = context->athlete->zones("Run")->getAeT(range);
-                run.ftp = context->athlete->zones("Run")->getFTP(range);
-                run.zoneslow = context->athlete->zones("Run")->getZoneLows(range);
-            }
-        }
-
-        // BIKE HR
-        if (context->athlete->hrZones("Bike")) {
-
-            int range=context->athlete->hrZones("Bike")->whichRange(forDate);
-            if (range >= 0) {
-
-                bike.date =  forDate;
-                bike.lthr =  context->athlete->hrZones("Bike")->getLT(range);
-                bike.aethr =  context->athlete->hrZones("Bike")->getAeT(range);
-                bike.rhr =  context->athlete->hrZones("Bike")->getRestHr(range);
-                bike.hrmax =  context->athlete->hrZones("Bike")->getMaxHr(range);
-            }
-        }
-
-        // RUN HR
-        if (context->athlete->hrZones("Run")) {
-
-            int range=context->athlete->hrZones("Run")->whichRange(forDate);
-            if (range >= 0) {
-
-                run.date =  forDate;
-                run.lthr =  context->athlete->hrZones("Run")->getLT(range);
-                run.aethr =  context->athlete->hrZones("Run")->getAeT(range);
-                run.rhr =  context->athlete->hrZones("Run")->getRestHr(range);
-                run.hrmax =  context->athlete->hrZones("Run")->getMaxHr(range);
-            }
-        }
-
-        // RUN PACE
-        if (context->athlete->paceZones(false)) {
-
-            int range=context->athlete->paceZones(false)->whichRange(forDate);
-            if (range >= 0) {
-
-                run.date =  forDate;
-                run.cv =  context->athlete->paceZones(false)->getCV(range);
-                run.aetv =  context->athlete->paceZones(false)->getAeT(range);
-            }
-        }
-
-        // SWIM PACE
-        if (context->athlete->paceZones(true)) {
-
-            int range=context->athlete->paceZones(true)->whichRange(forDate);
-            if (range >= 0) {
-
-                swim.date =  forDate;
-                swim.cv =  context->athlete->paceZones(true)->getCV(range);
-                swim.aetv =  context->athlete->paceZones(true)->getAeT(range);
-            }
-        }
-
-        if (bike.date == forDate) config << bike;
-        if (run.date == forDate) config << run;
-        if (swim.date == forDate) config << swim;
-
     } else {
 
-        // BIKE POWER
-        if (context->athlete->zones("Bike")) {
+        // Look for the ranges in Power, HR and Pace zones for each sport
+        foreach (QString sp, GlobalContext::context()->rideMetadata->sports()) {
 
-            for (int range=0; range < context->athlete->zones("Bike")->getRangeSize(); range++) {
+            // Power Zones
+            if (context->athlete->zones(sp)) {
 
-                // run through the bike zones
-                gcZoneConfig c("bike");
+                for (int range=0; range < context->athlete->zones(sp)->getRangeSize(); range++) {
 
-                c.date =  context->athlete->zones("Bike")->getStartDate(range);
-                c.cp = context->athlete->zones("Bike")->getCP(range);
-                c.wprime = context->athlete->zones("Bike")->getWprime(range);
-                c.pmax = context->athlete->zones("Bike")->getPmax(range);
-                c.aetp = context->athlete->zones("Bike")->getAeT(range);
-                c.ftp = context->athlete->zones("Bike")->getFTP(range);
-                c.zoneslow = context->athlete->zones("Bike")->getZoneLows(range);
+                    // run through the bike zones
+                    gcZoneConfig c(sp);
 
-                config << c;
+                    c.date =  context->athlete->zones(sp)->getStartDate(range);
+                    c.cp = context->athlete->zones(sp)->getCP(range);
+                    c.wprime = context->athlete->zones(sp)->getWprime(range);
+                    c.pmax = context->athlete->zones(sp)->getPmax(range);
+                    c.aetp = context->athlete->zones(sp)->getAeT(range);
+                    c.ftp = context->athlete->zones(sp)->getFTP(range);
+                    c.zoneslow = context->athlete->zones(sp)->getZoneLows(range);
+
+                    config << c;
+                }
+            }
+
+            // HR Zones
+            if (context->athlete->hrZones(sp)) {
+
+                for (int range=0; range < context->athlete->hrZones(sp)->getRangeSize(); range++) {
+
+                    gcZoneConfig c(sp);
+
+                    c.date =  context->athlete->hrZones(sp)->getStartDate(range);
+                    c.lthr =  context->athlete->hrZones(sp)->getLT(range);
+                    c.aethr =  context->athlete->hrZones(sp)->getAeT(range);
+                    c.rhr =  context->athlete->hrZones(sp)->getRestHr(range);
+                    c.hrmax =  context->athlete->hrZones(sp)->getMaxHr(range);
+                    c.hrzoneslow = context->athlete->hrZones(sp)->getZoneLows(range);
+
+                    config << c;
+                }
+            }
+
+            // Pace Zones
+            if ((sp == "Run" || sp == "Swim") && context->athlete->paceZones(sp=="Swim")) {
+
+                for (int range=0; range < context->athlete->paceZones(sp=="Swim")->getRangeSize(); range++) {
+
+                    gcZoneConfig c(sp);
+
+                    c.date =  context->athlete->paceZones(sp=="Swim")->getStartDate(range);
+                    c.cv =  context->athlete->paceZones(sp=="Swim")->getCV(range);
+                    c.aetv =  context->athlete->paceZones(sp=="Swim")->getAeT(range);
+                    c.pacezoneslow = context->athlete->paceZones(sp=="Swim")->getZoneLows(range);
+
+                    config << c;
+                }
             }
         }
-
-        // RUN POWER
-        if (context->athlete->zones("Run")) {
-
-            // run through the bike zones
-            for (int range=0; range < context->athlete->zones("Run")->getRangeSize(); range++) {
-
-                // run through the bike zones
-                gcZoneConfig c("run");
-
-                c.date =  context->athlete->zones("Run")->getStartDate(range);
-                c.cp = context->athlete->zones("Run")->getCP(range);
-                c.wprime = context->athlete->zones("Run")->getWprime(range);
-                c.pmax = context->athlete->zones("Run")->getPmax(range);
-                c.aetp = context->athlete->zones("Run")->getAeT(range);
-                c.ftp = context->athlete->zones("Run")->getFTP(range);
-                c.zoneslow = context->athlete->zones("Run")->getZoneLows(range);
-
-                config << c;
-            }
-        }
-
-        // BIKE HR
-        if (context->athlete->hrZones("Bike")) {
-
-            for (int range=0; range < context->athlete->hrZones("Bike")->getRangeSize(); range++) {
-
-                gcZoneConfig c("bike");
-                c.date =  context->athlete->hrZones("Bike")->getStartDate(range);
-                c.lthr =  context->athlete->hrZones("Bike")->getLT(range);
-                c.aethr =  context->athlete->hrZones("Bike")->getAeT(range);
-                c.rhr =  context->athlete->hrZones("Bike")->getRestHr(range);
-                c.hrmax =  context->athlete->hrZones("Bike")->getMaxHr(range);
-
-                config << c;
-            }
-        }
-
-        // RUN HR
-        if (context->athlete->hrZones("Run")) {
-
-            for (int range=0; range < context->athlete->hrZones("Run")->getRangeSize(); range++) {
-
-                gcZoneConfig c("run");
-                c.date =  context->athlete->hrZones("Run")->getStartDate(range);
-                c.lthr =  context->athlete->hrZones("Run")->getLT(range);
-                c.aethr =  context->athlete->hrZones("Run")->getAeT(range);
-                c.rhr =  context->athlete->hrZones("Run")->getRestHr(range);
-                c.hrmax =  context->athlete->hrZones("Run")->getMaxHr(range);
-
-                config << c;
-            }
-        }
-
-        // RUN PACE
-        if (context->athlete->paceZones(false)) {
-
-            for (int range=0; range < context->athlete->paceZones(false)->getRangeSize(); range++) {
-
-                gcZoneConfig c("run");
-                c.date =  context->athlete->paceZones(false)->getStartDate(range);
-                c.cv =  context->athlete->paceZones(false)->getCV(range);
-                c.aetv =  context->athlete->paceZones(false)->getAeT(range);
-
-                config << c;
-            }
-        }
-
-        // SWIM PACE
-        if (context->athlete->paceZones(true)) {
-
-            for (int range=0; range < context->athlete->paceZones(true)->getRangeSize(); range++) {
-
-                gcZoneConfig c("swim");
-                c.date =  context->athlete->paceZones(true)->getStartDate(range);
-                c.cv =  context->athlete->paceZones(true)->getCV(range);
-                c.aetv =  context->athlete->paceZones(true)->getAeT(range);
-
-                config << c;
-            }
-        }
-
     }
 
     // no config ?
@@ -409,86 +334,45 @@ Bindings::athleteZones(PyObject* date, QString sport) const
     QList<gcZoneConfig> compressed;
     std::sort(config.begin(),config.end());
 
-    // all will have date zero
-    gcZoneConfig lastRun("run"), lastBike("bike"), lastSwim("swim");
+    foreach (QString sp, GlobalContext::context()->rideMetadata->sports()) {
 
-    foreach(gcZoneConfig x, config) {
+        // will have date zero
+        gcZoneConfig last(sp);
 
-        // BIKE
-        if (x.sport == "bike" && (sport=="" || sport=="bike")) {
+        foreach(gcZoneConfig x, config) {
 
-            // new date so save what we have collected
-            if (x.date > lastBike.date) {
+            if (x.sport == sp && (sport=="" || sport==sp)) {
 
-                if (lastBike.date > QDate(01,01,01))  compressed << lastBike;
-                lastBike.date = x.date;
-            }
+                // new date so save what we have collected
+                if (x.date > last.date) {
 
-            // merge new values
-            if (x.date == lastBike.date) {
-                // merge with prior
-                if (x.cp) lastBike.cp = x.cp;
-                if (x.wprime) lastBike.wprime = x.wprime;
-                if (x.pmax) lastBike.pmax = x.pmax;
-                if (x.aetp) lastBike.aetp = x.aetp;
-                if (x.ftp) lastBike.ftp = x.ftp;
-                if (x.lthr) lastBike.lthr = x.lthr;
-                if (x.aethr) lastBike.aethr = x.aethr;
-                if (x.rhr) lastBike.rhr = x.rhr;
-                if (x.hrmax) lastBike.hrmax = x.hrmax;
-                if (x.zoneslow.length()) lastBike.zoneslow = x.zoneslow;
-            }
-        }
+                    if (last.date > QDate(01,01,01))  compressed << last;
+                    last.date = x.date;
+                }
 
-        // RUN
-        if (x.sport == "run" && (sport=="" || sport=="run")) {
-
-            // new date so save what we have collected
-            if (x.date > lastRun.date) {
-                // add last
-                if (lastRun.date > QDate(01,01,01)) compressed << lastRun;
-                lastRun.date = x.date;
-            }
-
-            // merge new values
-            if (x.date == lastRun.date) {
-                // merge with prior
-                if (x.cp) lastRun.cp = x.cp;
-                if (x.wprime) lastRun.wprime = x.wprime;
-                if (x.pmax) lastRun.pmax = x.pmax;
-                if (x.aetp) lastRun.aetp = x.aetp;
-                if (x.ftp) lastRun.ftp = x.ftp;
-                if (x.lthr) lastRun.lthr = x.lthr;
-                if (x.aethr) lastRun.aethr = x.aethr;
-                if (x.rhr) lastRun.rhr = x.rhr;
-                if (x.hrmax) lastRun.hrmax = x.hrmax;
-                if (x.cv) lastRun.cv = x.cv;
-                if (x.aetv) lastRun.cv = x.aetv;
-                if (x.zoneslow.length()) lastRun.zoneslow = x.zoneslow;
+                // merge new values
+                if (x.date == last.date) {
+                    // merge with prior
+                    if (x.cp) last.cp = x.cp;
+                    if (x.wprime) last.wprime = x.wprime;
+                    if (x.pmax) last.pmax = x.pmax;
+                    if (x.aetp) last.aetp = x.aetp;
+                    if (x.ftp) last.ftp = x.ftp;
+                    if (x.lthr) last.lthr = x.lthr;
+                    if (x.aethr) last.aethr = x.aethr;
+                    if (x.rhr) last.rhr = x.rhr;
+                    if (x.hrmax) last.hrmax = x.hrmax;
+                    if (x.cv) last.cv = x.cv;
+                    if (x.aetv) last.cv = x.aetv;
+                    if (x.zoneslow.length()) last.zoneslow = x.zoneslow;
+                    if (x.hrzoneslow.length()) last.hrzoneslow = x.hrzoneslow;
+                    if (x.pacezoneslow.length()) last.pacezoneslow = x.pacezoneslow;
+                }
             }
         }
 
-        // SWIM
-        if (x.sport == "swim" && (sport=="" || sport=="swim")) {
-
-            // new date so save what we have collected
-            if (x.date > lastSwim.date) {
-                // add last
-                if (lastSwim.date > QDate(01,01,01)) compressed << lastSwim;
-                lastSwim.date = x.date;
-            }
-
-            // merge new values
-            if (x.date == lastSwim.date) {
-                // merge with prior
-                if (x.cv) lastSwim.cv = x.cv;
-                if (x.aetv) lastSwim.aetv = x.aetv;
-            }
-        }
+        if (last.date > QDate(01,01,01)) compressed << last;
     }
-    if (lastBike.date > QDate(01,01,01)) compressed << lastBike;
-    if (lastRun.date > QDate(01,01,01)) compressed << lastRun;
-    if (lastSwim.date > QDate(01,01,01)) compressed << lastSwim;
 
     // now use the new compressed ones
     config = compressed;
@@ -514,6 +398,8 @@ Bindings::athleteZones(PyObject* date, QString sport) const
     PyObject* cv = PyList_New(size);
     PyObject* aetv = PyList_New(size);
     PyObject* zoneslow = PyList_New(size);
+    PyObject* hrzoneslow = PyList_New(size);
+    PyObject* pacezoneslow = PyList_New(size);
     PyObject* zonescolor = PyList_New(size);
 
     int index=0;
@@ -534,16 +420,31 @@ Bindings::athleteZones(PyObject* date, QString sport) const
         PyList_SET_ITEM(cv, index, PyFloat_FromDouble(x.cv));
         PyList_SET_ITEM(aetv, index, PyFloat_FromDouble(x.aetv));
 
-        int indexlow=0;
         PyObject* lows = PyList_New(x.zoneslow.length());
+        PyObject* hrlows = PyList_New(x.hrzoneslow.length());
+        PyObject* pacelows = PyList_New(x.pacezoneslow.length());
         PyObject* colors = PyList_New(x.zoneslow.length());
+        int indexlow=0;
         foreach(int low, x.zoneslow) {
             PyList_SET_ITEM(lows, indexlow, PyFloat_FromDouble(low));
             PyList_SET_ITEM(colors, indexlow, PyUnicode_FromString(zoneColor(indexlow, x.zoneslow.length()).name().toUtf8().constData()));
             indexlow++;
         }
+        indexlow=0;
+        foreach(int low, x.hrzoneslow) {
+            PyList_SET_ITEM(hrlows, indexlow, PyFloat_FromDouble(low));
+            indexlow++;
+        }
+        indexlow=0;
+        foreach(int low, x.pacezoneslow) {
+            PyList_SET_ITEM(pacelows, indexlow, PyFloat_FromDouble(low));
+            indexlow++;
+        }
         PyList_SET_ITEM(zoneslow, index, lows);
+        PyList_SET_ITEM(hrzoneslow, index, hrlows);
+        PyList_SET_ITEM(pacezoneslow, index, pacelows);
         PyList_SET_ITEM(zonescolor, index, colors);
+
         index++;
     }
 
@@ -562,6 +463,8 @@ Bindings::athleteZones(PyObject* date, QString sport) const
     PyDict_SetItemString(dict, "cv", cv);
     PyDict_SetItemString(dict, "aetv", aetv);
     PyDict_SetItemString(dict, "zoneslow", zoneslow);
+    PyDict_SetItemString(dict, "hrzoneslow", hrzoneslow);
+    PyDict_SetItemString(dict, "pacezoneslow", pacezoneslow);
     PyDict_SetItemString(dict, "zonescolor", zonescolor);
 
     return dict;
