@@ -436,7 +436,7 @@ Bindings::athleteZones(PyObject* date, QString sport) const
             indexlow++;
         }
         indexlow=0;
-        foreach(int low, x.pacezoneslow) {
+        foreach(double low, x.pacezoneslow) {
             PyList_SET_ITEM(pacelows, indexlow, PyFloat_FromDouble(low));
             indexlow++;
         }

@@ -506,6 +506,8 @@ class gcZoneConfig {
     QString sport;
     QDate date;
     QList<int> zoneslow;
+    QList<int> hrzoneslow;
+    QList<double> pacezoneslow;
     int cp, wprime, pmax,aetp,ftp,lthr,aethr,rhr,hrmax;
     double cv, aetv;
 };
@@ -514,7 +516,7 @@ SEXP
 RTool::zones(SEXP pDate, SEXP pSport)
 {
     // return a dataframe with
-    // date, sport, cp, w', pmax, aetp, ftp, lthr, aethr, rhr, hrmax, cv, aetv, zoneslow, zonescolor
+    // date, sport, cp, w', pmax, aetp, ftp, lthr, aethr, rhr, hrmax, cv, aetv, zoneslow, hrzoneslow, pacezoneslow, zonescolor
 
     // need non-null context
     if (!rtool || !rtool->context)  return Rf_allocVector(INTSXP, 0);
@@ -530,206 +532,130 @@ RTool::zones(SEXP pDate, SEXP pSport)
         // get settings for...
         QDate forDate=d1970.addDays(INTEGER(pDate)[0]);
 
-        gcZoneConfig bike("bike");
-        gcZoneConfig run("run");
-        gcZoneConfig swim("bike");
+        // Look for the range in Power, HR and Pace zones for each sport
+        foreach (QString sp, GlobalContext::context()->rideMetadata->sports()) {
 
-        // BIKE POWER
-        if (rtool->context->athlete->zones("Bike")) {
+            // Power Zones
+            if (rtool->context->athlete->zones(sp)) {
 
-            // run through the bike zones
-            int range=rtool->context->athlete->zones("Bike")->whichRange(forDate);
-            if (range >= 0) {
-                bike.date =  forDate;
-                bike.cp = rtool->context->athlete->zones("Bike")->getCP(range);
-                bike.wprime = rtool->context->athlete->zones("Bike")->getWprime(range);
-                bike.pmax = rtool->context->athlete->zones("Bike")->getPmax(range);
-                bike.aetp = rtool->context->athlete->zones("Bike")->getAeT(range);
-                bike.ftp = rtool->context->athlete->zones("Bike")->getFTP(range);
-                bike.zoneslow = rtool->context->athlete->zones("Bike")->getZoneLows(range);
+                // run through the power zones
+                int range=rtool->context->athlete->zones(sp)->whichRange(forDate);
+                if (range >= 0) {
+
+                    gcZoneConfig c(sp);
+
+                    c.date =  forDate;
+                    c.cp = rtool->context->athlete->zones(sp)->getCP(range);
+                    c.wprime = rtool->context->athlete->zones(sp)->getWprime(range);
+                    c.pmax = rtool->context->athlete->zones(sp)->getPmax(range);
+                    c.aetp = rtool->context->athlete->zones(sp)->getAeT(range);
+                    c.ftp = rtool->context->athlete->zones(sp)->getFTP(range);
+                    c.zoneslow = rtool->context->athlete->zones(sp)->getZoneLows(range);
+
+                    config << c;
+                }
+            }
+
+            // HR Zones
+            if (rtool->context->athlete->hrZones(sp)) {
+
+                int range=rtool->context->athlete->hrZones(sp)->whichRange(forDate);
+                if (range >= 0) {
+
+                    gcZoneConfig c(sp);
+
+                    c.date =  forDate;
+                    c.lthr =  rtool->context->athlete->hrZones(sp)->getLT(range);
+                    c.aethr =  rtool->context->athlete->hrZones(sp)->getAeT(range);
+                    c.rhr =  rtool->context->athlete->hrZones(sp)->getRestHr(range);
+                    c.hrmax =  rtool->context->athlete->hrZones(sp)->getMaxHr(range);
+                    c.hrzoneslow = rtool->context->athlete->hrZones(sp)->getZoneLows(range);
+
+                    config << c;
+                }
+            }
+
+            // Pace Zones
+            if ((sp == "Run" || sp == "Swim") && rtool->context->athlete->paceZones(sp=="Swim")) {
+
+                int range=rtool->context->athlete->paceZones(sp=="Swim")->whichRange(forDate);
+                if (range >= 0) {
+
+                    gcZoneConfig c(sp);
+
+                    c.date =  forDate;
+                    c.cv =  rtool->context->athlete->paceZones(sp=="Swim")->getCV(range);
+                    c.aetv =  rtool->context->athlete->paceZones(sp=="Swim")->getAeT(range);
+                    c.pacezoneslow = rtool->context->athlete->paceZones(sp=="Swim")->getZoneLows(range);
+
+                    config << c;
+                }
             }
         }
-
-        // RUN POWER
-        if (rtool->context->athlete->zones("Run")) {
-
-            // run through the bike zones
-            int range=rtool->context->athlete->zones("Run")->whichRange(forDate);
-            if (range >= 0) {
-
-                run.date = forDate;
-                run.cp = rtool->context->athlete->zones("Run")->getCP(range);
-                run.wprime = rtool->context->athlete->zones("Run")->getWprime(range);
-                run.pmax = rtool->context->athlete->zones("Run")->getPmax(range);
-                run.aetp = rtool->context->athlete->zones("Run")->getAeT(range);
-                run.ftp = rtool->context->athlete->zones("Run")->getFTP(range);
-                run.zoneslow = rtool->context->athlete->zones("Run")->getZoneLows(range);
-            }
-        }
-
-        // BIKE HR
-        if (rtool->context->athlete->hrZones("Bike")) {
-
-            int range=rtool->context->athlete->hrZones("Bike")->whichRange(forDate);
-            if (range >= 0) {
-
-                bike.date =  forDate;
-                bike.lthr =  rtool->context->athlete->hrZones("Bike")->getLT(range);
-                bike.aethr =  rtool->context->athlete->hrZones("Bike")->getAeT(range);
-                bike.rhr =  rtool->context->athlete->hrZones("Bike")->getRestHr(range);
-                bike.hrmax =  rtool->context->athlete->hrZones("Bike")->getMaxHr(range);
-            }
-        }
-
-        // RUN HR
-        if (rtool->context->athlete->hrZones("Run")) {
-
-            int range=rtool->context->athlete->hrZones("Run")->whichRange(forDate);
-            if (range >= 0) {
-
-                run.date =  forDate;
-                run.lthr =  rtool->context->athlete->hrZones("Run")->getLT(range);
-                run.aethr =  rtool->context->athlete->hrZones("Run")->getAeT(range);
-                run.rhr =  rtool->context->athlete->hrZones("Run")->getRestHr(range);
-                run.hrmax =  rtool->context->athlete->hrZones("Run")->getMaxHr(range);
-            }
-        }
-
-        // RUN PACE
-        if (rtool->context->athlete->paceZones(false)) {
-
-            int range=rtool->context->athlete->paceZones(false)->whichRange(forDate);
-            if (range >= 0) {
-
-                run.date =  forDate;
-                run.cv =  rtool->context->athlete->paceZones(false)->getCV(range);
-                run.aetv =  rtool->context->athlete->paceZones(false)->getAeT(range);
-            }
-        }
-
-        // SWIM PACE
-        if (rtool->context->athlete->paceZones(true)) {
-
-            int range=rtool->context->athlete->paceZones(true)->whichRange(forDate);
-            if (range >= 0) {
-
-                swim.date =  forDate;
-                swim.cv =  rtool->context->athlete->paceZones(true)->getCV(range);
-                swim.aetv =  rtool->context->athlete->paceZones(true)->getAeT(range);
-            }
-        }
-
-        if (bike.date == forDate) config << bike;
-        if (run.date == forDate) config << run;
-        if (swim.date == forDate) config << swim;
 
     } else {
 
-        // BIKE POWER
-        if (rtool->context->athlete->zones("Bike")) {
+        // Look for the ranges in Power, HR and Pace zones for each sport
+        foreach (QString sp, GlobalContext::context()->rideMetadata->sports()) {
 
-            for (int range=0; range < rtool->context->athlete->zones("Bike")->getRangeSize(); range++) {
+            // Power Zones
+            if (rtool->context->athlete->zones(sp)) {
 
-                // run through the bike zones
-                gcZoneConfig c("bike");
+                for (int range=0; range < rtool->context->athlete->zones(sp)->getRangeSize(); range++) {
 
-                c.date =  rtool->context->athlete->zones("Bike")->getStartDate(range);
-                c.cp = rtool->context->athlete->zones("Bike")->getCP(range);
-                c.wprime = rtool->context->athlete->zones("Bike")->getWprime(range);
-                c.pmax = rtool->context->athlete->zones("Bike")->getPmax(range);
-                c.aetp = rtool->context->athlete->zones("Bike")->getAeT(range);
-                c.ftp = rtool->context->athlete->zones("Bike")->getFTP(range);
-                c.zoneslow = rtool->context->athlete->zones("Bike")->getZoneLows(range);
+                    // run through the power zones
+                    gcZoneConfig c(sp);
 
-                config << c;
+                    c.date =  rtool->context->athlete->zones(sp)->getStartDate(range);
+                    c.cp = rtool->context->athlete->zones(sp)->getCP(range);
+                    c.wprime = rtool->context->athlete->zones(sp)->getWprime(range);
+                    c.pmax = rtool->context->athlete->zones(sp)->getPmax(range);
+                    c.aetp = rtool->context->athlete->zones(sp)->getAeT(range);
+                    c.ftp = rtool->context->athlete->zones(sp)->getFTP(range);
+                    c.zoneslow = rtool->context->athlete->zones(sp)->getZoneLows(range);
+
+                    config << c;
+
+                }
             }
-        }
 
-        // RUN POWER
-        if (rtool->context->athlete->zones("Run")) {
+            // HR Zones
+            if (rtool->context->athlete->hrZones(sp)) {
 
-            // run through the bike zones
-            for (int range=0; range < rtool->context->athlete->zones("Run")->getRangeSize(); range++) {
+                for (int range=0; range < rtool->context->athlete->hrZones(sp)->getRangeSize(); range++) {
 
-                // run through the bike zones
-                gcZoneConfig c("run");
+                    gcZoneConfig c(sp);
 
-                c.date =  rtool->context->athlete->zones("Run")->getStartDate(range);
-                c.cp = rtool->context->athlete->zones("Run")->getCP(range);
-                c.wprime = rtool->context->athlete->zones("Run")->getWprime(range);
-                c.pmax = rtool->context->athlete->zones("Run")->getPmax(range);
-                c.aetp = rtool->context->athlete->zones("Run")->getAeT(range);
-                c.ftp = rtool->context->athlete->zones("Run")->getFTP(range);
-                c.zoneslow = rtool->context->athlete->zones("Run")->getZoneLows(range);
+                    c.date =  rtool->context->athlete->hrZones(sp)->getStartDate(range);
+                    c.lthr =  rtool->context->athlete->hrZones(sp)->getLT(range);
+                    c.aethr =  rtool->context->athlete->hrZones(sp)->getAeT(range);
+                    c.rhr =  rtool->context->athlete->hrZones(sp)->getRestHr(range);
+                    c.hrmax =  rtool->context->athlete->hrZones(sp)->getMaxHr(range);
+                    c.hrzoneslow = rtool->context->athlete->hrZones(sp)->getZoneLows(range);
 
-                config << c;
+                    config << c;
+                }
             }
-        }
 
-        // BIKE HR
-        if (rtool->context->athlete->hrZones("Bike")) {
+            // Pace Zones
+            if ((sp == "Run" || sp == "Swim") && rtool->context->athlete->paceZones(sp=="Swim")) {
 
-            for (int range=0; range < rtool->context->athlete->hrZones("Bike")->getRangeSize(); range++) {
+                for (int range=0; range < rtool->context->athlete->paceZones(sp=="Swim")->getRangeSize(); range++) {
 
-                gcZoneConfig c("bike");
-                c.date =  rtool->context->athlete->hrZones("Bike")->getStartDate(range);
-                c.lthr =  rtool->context->athlete->hrZones("Bike")->getLT(range);
-                c.aethr =  rtool->context->athlete->hrZones("Bike")->getAeT(range);
-                c.rhr =  rtool->context->athlete->hrZones("Bike")->getRestHr(range);
-                c.hrmax =  rtool->context->athlete->hrZones("Bike")->getMaxHr(range);
+                    gcZoneConfig c(sp);
+                    c.date =  rtool->context->athlete->paceZones(sp=="Swim")->getStartDate(range);
+                    c.cv =  rtool->context->athlete->paceZones(sp=="Swim")->getCV(range);
+                    c.aetv =  rtool->context->athlete->paceZones(sp=="Swim")->getAeT(range);
+                    c.pacezoneslow = rtool->context->athlete->paceZones(sp=="Swim")->getZoneLows(range);
 
-                config << c;
-            }
-        }
-
-        // RUN HR
-        if (rtool->context->athlete->hrZones("Run")) {
-
-            for (int range=0; range < rtool->context->athlete->hrZones("Run")->getRangeSize(); range++) {
-
-                gcZoneConfig c("run");
-                c.date =  rtool->context->athlete->hrZones("Run")->getStartDate(range);
-                c.lthr =  rtool->context->athlete->hrZones("Run")->getLT(range);
-                c.aethr =  rtool->context->athlete->hrZones("Run")->getAeT(range);
-                c.rhr =  rtool->context->athlete->hrZones("Run")->getRestHr(range);
-                c.hrmax =  rtool->context->athlete->hrZones("Run")->getMaxHr(range);
-
-                config << c;
-            }
-        }
-
-        // RUN PACE
-        if (rtool->context->athlete->paceZones(false)) {
-
-            for (int range=0; range < rtool->context->athlete->paceZones(false)->getRangeSize(); range++) {
-
-                gcZoneConfig c("run");
-                c.date =  rtool->context->athlete->paceZones(false)->getStartDate(range);
-                c.cv =  rtool->context->athlete->paceZones(false)->getCV(range);
-                c.aetv =  rtool->context->athlete->paceZones(false)->getAeT(range);
-
-                config << c;
-            }
-        }
-
-        // SWIM PACE
-        if (rtool->context->athlete->paceZones(true)) {
-
-            for (int range=0; range < rtool->context->athlete->paceZones(true)->getRangeSize(); range++) {
-
-                gcZoneConfig c("swim");
-                c.date =  rtool->context->athlete->paceZones(true)->getStartDate(range);
-                c.cv =  rtool->context->athlete->paceZones(true)->getCV(range);
-                c.aetv =  rtool->context->athlete->paceZones(true)->getAeT(range);
-
-                config << c;
+                    config << c;
+                }
             }
         }
     }
 
     // pDate
     UNPROTECT(1);
-
 
     // no config ?
     if (config.count() == 0) return Rf_allocVector(INTSXP, 0);
@@ -745,86 +671,45 @@ RTool::zones(SEXP pDate, SEXP pSport)
     QList<gcZoneConfig> compressed;
     std::sort(config.begin(),config.end());
 
-    // all will have date zero
-    gcZoneConfig lastRun("run"), lastBike("bike"), lastSwim("swim");
+    foreach (QString sp, GlobalContext::context()->rideMetadata->sports()) {
 
-    foreach(gcZoneConfig x, config) {
+        // will have date zero
+        gcZoneConfig last(sp);
 
-        // BIKE
-        if (x.sport == "bike" && (want=="" || want=="bike")) {
+        foreach(gcZoneConfig x, config) {
 
-            // new date so save what we have collected
-            if (x.date > lastBike.date) {
+            if (x.sport == sp && (want=="" || want==sp)) {
 
-                if (lastBike.date > QDate(01,01,01))  compressed << lastBike;
-                lastBike.date = x.date;
-            }
+                // new date so save what we have collected
+                if (x.date > last.date) {
 
-            // merge new values
-            if (x.date == lastBike.date) {
-                // merge with prior
-                if (x.cp) lastBike.cp = x.cp;
-                if (x.wprime) lastBike.wprime = x.wprime;
-                if (x.pmax) lastBike.pmax = x.pmax;
-                if (x.aetp) lastBike.aetp = x.aetp;
-                if (x.ftp) lastBike.ftp = x.ftp;
-                if (x.lthr) lastBike.lthr = x.lthr;
-                if (x.aethr) lastBike.aethr = x.aethr;
-                if (x.rhr) lastBike.rhr = x.rhr;
-                if (x.hrmax) lastBike.hrmax = x.hrmax;
-                if (x.zoneslow.length()) lastBike.zoneslow = x.zoneslow;
-            }
-        }
+                    if (last.date > QDate(01,01,01))  compressed << last;
+                    last.date = x.date;
+                }
 
-        // RUN
-        if (x.sport == "run" && (want=="" || want=="run")) {
-
-            // new date so save what we have collected
-            if (x.date > lastRun.date) {
-                // add last
-                if (lastRun.date > QDate(01,01,01)) compressed << lastRun;
-                lastRun.date = x.date;
-            }
-
-            // merge new values
-            if (x.date == lastRun.date) {
-                // merge with prior
-                if (x.cp) lastRun.cp = x.cp;
-                if (x.wprime) lastRun.wprime = x.wprime;
-                if (x.pmax) lastRun.pmax = x.pmax;
-                if (x.aetp) lastRun.aetp = x.aetp;
-                if (x.ftp) lastRun.ftp = x.ftp;
-                if (x.lthr) lastRun.lthr = x.lthr;
-                if (x.aethr) lastRun.aethr = x.aethr;
-                if (x.rhr) lastRun.rhr = x.rhr;
-                if (x.hrmax) lastRun.hrmax = x.hrmax;
-                if (x.cv) lastRun.cv = x.cv;
-                if (x.aetv) lastRun.aetv = x.aetv;
-                if (x.zoneslow.length()) lastRun.zoneslow = x.zoneslow;
+                // merge new values
+                if (x.date == last.date) {
+                    // merge with prior
+                    if (x.cp) last.cp = x.cp;
+                    if (x.wprime) last.wprime = x.wprime;
+                    if (x.pmax) last.pmax = x.pmax;
+                    if (x.aetp) last.aetp = x.aetp;
+                    if (x.ftp) last.ftp = x.ftp;
+                    if (x.lthr) last.lthr = x.lthr;
+                    if (x.aethr) last.aethr = x.aethr;
+                    if (x.rhr) last.rhr = x.rhr;
+                    if (x.hrmax) last.hrmax = x.hrmax;
+                    if (x.cv) last.cv = x.cv;
+                    if (x.aetv) last.aetv = x.aetv;
+                    if (x.zoneslow.length()) last.zoneslow = x.zoneslow;
+                    if (x.hrzoneslow.length()) last.hrzoneslow = x.hrzoneslow;
+                    if (x.pacezoneslow.length()) last.pacezoneslow = x.pacezoneslow;
+                }
             }
         }
 
-        // SWIM
-        if (x.sport == "swim" && (want=="" || want=="swim")) {
-
-            // new date so save what we have collected
-            if (x.date > lastSwim.date) {
-                // add last
-                if (lastSwim.date > QDate(01,01,01)) compressed << lastSwim;
-                lastSwim.date = x.date;
-            }
-
-            // merge new values
-            if (x.date == lastSwim.date) {
-                // merge with prior
-                if (x.cv) lastSwim.cv = x.cv;
-                if (x.aetv) lastSwim.aetv = x.aetv;
-            }
-        }
+        if (last.date > QDate(01,01,01)) compressed << last;
     }
-    if (lastBike.date > QDate(01,01,01)) compressed << lastBike;
-    if (lastRun.date > QDate(01,01,01)) compressed << lastRun;
-    if (lastSwim.date > QDate(01,01,01)) compressed << lastSwim;
 
     // now use the new compressed ones
     config = compressed;
@@ -833,12 +718,12 @@ RTool::zones(SEXP pDate, SEXP pSport)
 
     // CREATE A DATAFRAME OF CONFIG
     SEXP ans;
-    PROTECT(ans = Rf_allocVector(VECSXP, 15));
+    PROTECT(ans = Rf_allocVector(VECSXP, 17));
 
-    // 15 columns, size rows
+    // 17 columns, size rows
     SEXP date;
     SEXP sport;
-    SEXP cp, wprime, pmax,aetp,ftp,lthr,aethr,rhr,hrmax,cv,aetv, zoneslow, zonescolor;
+    SEXP cp, wprime, pmax,aetp,ftp,lthr,aethr,rhr,hrmax,cv,aetv, zoneslow, hrzoneslow, pacezoneslow, zonescolor;
     SEXP rownames;
 
     PROTECT(date=Rf_allocVector(INTSXP, size));
@@ -855,6 +740,8 @@ RTool::zones(SEXP pDate, SEXP pSport)
     PROTECT(cv=Rf_allocVector(REALSXP, size));
     PROTECT(aetv=Rf_allocVector(REALSXP, size));
     PROTECT(zoneslow=Rf_allocVector(VECSXP, size));
+    PROTECT(hrzoneslow=Rf_allocVector(VECSXP, size));
+    PROTECT(pacezoneslow=Rf_allocVector(VECSXP, size));
     PROTECT(zonescolor=Rf_allocVector(VECSXP, size));
     PROTECT(rownames=Rf_allocVector(STRSXP, size));
 
@@ -882,18 +769,32 @@ RTool::zones(SEXP pDate, SEXP pSport)
         REAL(cv)[index] = x.cv;
         REAL(aetv)[index] = x.aetv;
 
-        int indexlow=0;
-        SEXP lows, colors;
+        SEXP lows, hrlows, pacelows, colors;
         PROTECT(lows=Rf_allocVector(INTSXP, x.zoneslow.length()));
+        PROTECT(hrlows=Rf_allocVector(INTSXP, x.hrzoneslow.length()));
+        PROTECT(pacelows=Rf_allocVector(REALSXP, x.pacezoneslow.length()));
         PROTECT(colors=Rf_allocVector(STRSXP, x.zoneslow.length()));
+        int indexlow=0;
         foreach(int low, x.zoneslow) {
             INTEGER(lows)[indexlow] = low;
             SET_STRING_ELT(colors, indexlow, Rf_mkChar(zoneColor(indexlow, x.zoneslow.length()).name().toLatin1().constData()));
             indexlow++;
         }
+        indexlow=0;
+        foreach(int low, x.hrzoneslow) {
+            INTEGER(hrlows)[indexlow] = low;
+            indexlow++;
+        }
+        indexlow=0;
+        foreach(double low, x.pacezoneslow) {
+            REAL(pacelows)[indexlow] = low;
+            indexlow++;
+        }
         SET_VECTOR_ELT(zoneslow, index, lows);
+        SET_VECTOR_ELT(hrzoneslow, index, hrlows);
+        SET_VECTOR_ELT(pacezoneslow, index, pacelows);
         SET_VECTOR_ELT(zonescolor, index, colors);
-        UNPROTECT(2);
+        UNPROTECT(4);
         index++;
     }
 
@@ -912,11 +813,13 @@ RTool::zones(SEXP pDate, SEXP pSport)
     SET_VECTOR_ELT(ans, 11, cv);
     SET_VECTOR_ELT(ans, 12, aetv);
     SET_VECTOR_ELT(ans, 13, zoneslow);
-    SET_VECTOR_ELT(ans, 14, zonescolor);
+    SET_VECTOR_ELT(ans, 14, hrzoneslow);
+    SET_VECTOR_ELT(ans, 15, pacezoneslow);
+    SET_VECTOR_ELT(ans, 16, zonescolor);
 
     // turn into a data.frame, name class etc
     SEXP names;
-    PROTECT(names = Rf_allocVector(STRSXP, 15));
+    PROTECT(names = Rf_allocVector(STRSXP, 17));
     SET_STRING_ELT(names, 0, Rf_mkChar("date"));
     SET_STRING_ELT(names, 1, Rf_mkChar("sport"));
     SET_STRING_ELT(names, 2, Rf_mkChar("cp"));
@@ -931,13 +834,15 @@ RTool::zones(SEXP pDate, SEXP pSport)
     SET_STRING_ELT(names, 11, Rf_mkChar("cv"));
     SET_STRING_ELT(names, 12, Rf_mkChar("aetv"));
     SET_STRING_ELT(names, 13, Rf_mkChar("zoneslow"));
-    SET_STRING_ELT(names, 14, Rf_mkChar("zonescolor"));
+    SET_STRING_ELT(names, 14, Rf_mkChar("hrzoneslow"));
+    SET_STRING_ELT(names, 15, Rf_mkChar("pacezoneslow"));
+    SET_STRING_ELT(names, 16, Rf_mkChar("zonescolor"));
 
     Rf_setAttrib(ans, R_ClassSymbol, Rf_mkString("data.frame"));
     Rf_setAttrib(ans, R_RowNamesSymbol, rownames);
     Rf_namesgets(ans, names);
 
-    UNPROTECT(19);
+    UNPROTECT(21);
 
     // fail
     return ans;
@@ -2465,7 +2370,6 @@ RTool::activity(SEXP datetime, SEXP pCompare, SEXP pSplit, SEXP pJoin)
             QList<SEXP> f;
 
             // create a data.frame for each and add to list
-            int index=0;
             foreach(RideItem *item, activities) {
 
                 // we DO NOT use R_CheckUserInterrupt since it longjmps
@@ -3633,7 +3537,7 @@ RTool::measures(SEXP pAll, SEXP pGroup)
 
         int index=0;
         int day = from;
-        for(int k=0; k < size; k++) {
+        for(unsigned int k=0; k < size; k++) {
 
             // day today
             if (day >= from && day <= to) {
