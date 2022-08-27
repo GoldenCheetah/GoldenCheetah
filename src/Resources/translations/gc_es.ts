@@ -1044,7 +1044,7 @@ Si usted elige copiar a la biblioteca el archivo será copiado a la biblioteca d
     <message>
         <location filename="../../Gui/Perspective.cpp" line="1911"/>
         <source>Map Workout</source>
-        <translation type="unfinished"></translation>
+        <translation>Mapa</translation>
     </message>
     <message>
         <location filename="../../Gui/Perspective.cpp" line="1913"/>
@@ -10706,12 +10706,12 @@ Aviso: la precisión de la estimación puede ser demasiado pobre para ser de uso
     <message>
         <location filename="../../FileIO/FixElevation.cpp" line="92"/>
         <source>Fix Elevation errors</source>
-        <translation>Corregir errores de altimetría</translation>
+        <translation>Corregir errores de altitud</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixElevation.cpp" line="178"/>
         <source>Fix Elevation Data not possible</source>
-        <translation>No es posible obtener los datos de altimetría</translation>
+        <translation type="unfinished">No es posible obtener los datos de altitud</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixElevation.cpp" line="179"/>
@@ -10721,22 +10721,22 @@ Aviso: la precisión de la estimación puede ser demasiado pobre para ser de uso
     <message>
         <location filename="../../FileIO/FixElevation.cpp" line="302"/>
         <source>Connection to remote server timed out</source>
-        <translation type="unfinished">Tiempo excedido en la conexión al servidor remoto</translation>
+        <translation>Tiempo excedido en la conexión al servidor remoto</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixElevation.cpp" line="304"/>
         <source>Network error: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Error de red: %1</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixElevation.cpp" line="323"/>
         <source>Unexpected response from server: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Respuesta inesperada del servidor: %1</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixElevation.cpp" line="328"/>
         <source>Parse response error: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Error en el análisis sintáctico: %1</translation>
     </message>
 </context>
 <context>
@@ -10763,7 +10763,10 @@ Se requiere conexión a internet.</translation>
 Elevation data is provided by Open-Elevation.com public API, consider a donation if you find it useful.
 
 INTERNET CONNECTION REQUIRED.</source>
-        <translation type="unfinished"></translation>
+        <translation>Corregir o añadir valores de altitud. Si la actividad contiene estos datos, se borrarán y se añadirán los nuevos.
+Los valores de altitud se obtienen de https://open-elevation.com/, a través de su API pública. Considere donar al proyecto so lo encuentra útil.
+
+Esta función requiere conexión a internet.</translation>
     </message>
 </context>
 <context>
@@ -12195,7 +12198,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Gui/Colors.cpp" line="253"/>
         <source>Stress Ramp Rate</source>
-        <translation type="unfinished"></translation>
+        <translation>Rampa de estrés (RE/RR)</translation>
     </message>
     <message>
         <source>Overview Card Background</source>
@@ -18176,12 +18179,12 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Core/DataFilter.cpp" line="2248"/>
         <source>%1(name|date|priority|description)</source>
-        <translation type="unfinished"></translation>
+        <translation>%1(name|date|priority|description)</translation>
     </message>
     <message>
         <location filename="../../Core/DataFilter.cpp" line="2256"/>
         <source>invalid symbol &apos;%1&apos;, should be &apos;name|date|priority|description&apos;&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>parámetro inválido &apos;%1&apos;. Debe ser uno de entre &apos;name|date|priority|description&apos;</translation>
     </message>
     <message>
         <location filename="../../Core/DataFilter.cpp" line="2269"/>
@@ -18606,7 +18609,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Train/Library.cpp" line="184"/>
         <source>%1 cannot be written to videoSync library %2, check permissions and free space</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 no puede ser escrito en la biblioteca de videoSync %2. Compruebe los permisos y si hay espacio disponible en disco</translation>
     </message>
     <message>
         <location filename="../../Train/Library.cpp" line="217"/>
@@ -18617,7 +18620,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Train/Library.cpp" line="218"/>
         <source>%1 already exists in workout library: %2</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 ya existe en la biblioteca de actividades: %2</translation>
     </message>
     <message>
         <location filename="../../Train/Library.cpp" line="222"/>
@@ -25167,7 +25170,7 @@ y que muestra la palabra &quot;Host&quot;</translation>
     <message>
         <location filename="../../Charts/PythonChart.cpp" line="401"/>
         <source>Warning: Python is disabled</source>
-        <translation type="unfinished"></translation>
+        <translation>Warning: Python está deshabilitado</translation>
     </message>
 </context>
 <context>
@@ -25847,7 +25850,7 @@ Python deshabilitado en preferencias.</translation>
     <message>
         <location filename="../../Charts/RChart.cpp" line="409"/>
         <source>Warning: R is disabled</source>
-        <translation type="unfinished"></translation>
+        <translation>Warning: R está deshabilitado</translation>
     </message>
 </context>
 <context>
