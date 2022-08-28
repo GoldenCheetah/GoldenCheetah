@@ -288,11 +288,11 @@ Estimator::run()
 
             // so long as the important model derived values are sensible ...
             if (add.WPrime > 1000 && add.CP > 100 && add.CP < 1000) {
-                printd("Estimates for %s - %s: CP=%.f W'=%.f\n", add.from.toString().toStdString().c_str(), add.to.toString().toStdString().c_str(), add.CP, add.WPrime);
+                printd("Estimates for %s - %s (%s): CP=%.f W'=%.f\n", add.from.toString().toStdString().c_str(), add.to.toString().toStdString().c_str(), add.model.toStdString().c_str(), add.CP, add.WPrime);
                 est << add;
+            } else {
+                printd("Estimates for %s - %s (%s): Not available\n", add.from.toString().toStdString().c_str(), add.to.toString().toStdString().c_str(), add.model.toStdString().c_str());
             }
-
-            //qDebug()<<add.to<<add.from<<model->code()<< "W'="<< model->WPrime() <<"CP="<< model->CP() <<"pMax="<<model->PMax();
 
             // set the wpk data
             model->setData(bestsWPK.aggregate());
@@ -313,11 +313,12 @@ Estimator::run()
                 (!model->hasCP() || (add.CP > 1.0f && add.CP < 10.0)) &&
                 (!model->hasPMax() || add.PMax > 1.0f) &&
                 (!model->hasFTP() || add.FTP > 1.0f)) {
-                printd("WPK Estimates for %s - %s: CP=%.1f W'=%.1f\n", add.from.toString().toStdString().c_str(), add.to.toString().toStdString().c_str(), add.CP, add.WPrime);
+                printd("WPK Estimates for %s - %s (%s): CP=%.1f W'=%.1f\n", add.from.toString().toStdString().c_str(), add.to.toString().toStdString().c_str(), add.model.toStdString().c_str(), add.CP, add.WPrime);
                 est << add;
+            } else {
+                printd("WPK Estimates for %s - %s (%s): Not available\n", add.from.toString().toStdString().c_str(), add.to.toString().toStdString().c_str(), add.model.toStdString().c_str(), add.CP, add.WPrime);
             }
 
-            //qDebug()<<add.from<<model->code()<< "KG W'="<< model->WPrime() <<"CP="<< model->CP() <<"pMax="<<model->PMax();
         }
 
         // go forward a week
