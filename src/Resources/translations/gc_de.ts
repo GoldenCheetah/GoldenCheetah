@@ -5588,18 +5588,6 @@ ddd, dd.MMM yyyy</translation>
         <translation>Folgende SSL Fehler sind aufgetreten: %1</translation>
     </message>
     <message>
-        <source>Authorization for Google CalDAV is missing in preferences</source>
-        <translation type="vanished">Autorisierung für Google CalDAV fehlt in den Einstellungen</translation>
-    </message>
-    <message>
-        <source>Authorization Error</source>
-        <translation type="vanished">Autorisierungsfehler</translation>
-    </message>
-    <message>
-        <source>Error requesting access token</source>
-        <translation type="vanished">Fehler bei der Anforderung des &quot;access token&quot;</translation>
-    </message>
-    <message>
         <location filename="../../Cloud/CalDAV.cpp" line="498"/>
         <source>CalDAV Calendar url error</source>
         <translation>CalDAV Kalender url Fehler</translation>
@@ -5607,10 +5595,6 @@ ddd, dd.MMM yyyy</translation>
 </context>
 <context>
     <name>CalDAVCloud</name>
-    <message>
-        <source>Google Calendar using CalDAV protocol and authenticate using Google Account</source>
-        <translation type="vanished">Google Kalender über CalDAV Protokoll und Authentisierung mittels Google Konto</translation>
-    </message>
     <message>
         <location filename="../../Cloud/CalDAVCloud.h" line="68"/>
         <source>Web Calendar using iCal format as a web resource</source>
@@ -13225,33 +13209,6 @@ Drehmomentkorrektur - Der absolute Korrekturwert in Nm (oder Pfund pro Quadratin
     </message>
 </context>
 <context>
-    <name>GoogleDrive</name>
-    <message>
-        <source>You must authorise with GoogleDrive first</source>
-        <translation type="vanished">Sie müssen GoogleDrive zuerst autorisieren</translation>
-    </message>
-    <message>
-        <source>No such directory, try setting a new location in options.</source>
-        <translation type="vanished">Verzeichnis nicht vorhanden, versuchen Sie in den Optionen eine neues Verzeichnis einzustellen.</translation>
-    </message>
-    <message>
-        <source>Completed.</source>
-        <translation type="vanished">Abgeschlossen.</translation>
-    </message>
-    <message>
-        <source>Upload failed</source>
-        <translation type="vanished">Hochladen fehlgeschlagen</translation>
-    </message>
-    <message>
-        <source>Google Drive</source>
-        <translation type="vanished">Google Drive</translation>
-    </message>
-    <message>
-        <source>Sync your data via your cloud storage.</source>
-        <translation type="vanished">Synchronisieren Sie ihre Daten über ihren Cloud Speicher.</translation>
-    </message>
-</context>
-<context>
     <name>Gradient</name>
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="2647"/>
@@ -16091,80 +16048,6 @@ Drehmomentkorrektur - Der absolute Korrekturwert in Nm (oder Pfund pro Quadratin
     </message>
 </context>
 <context>
-    <name>KentUniversity</name>
-    <message>
-        <source>You must authorise with KentUniversity first</source>
-        <translation type="vanished">Sie müssen KentUniversity zuerst autorisieren</translation>
-    </message>
-    <message>
-        <source>No such directory, try setting a new location in options.</source>
-        <translation type="vanished">Verzeichnis nicht vorhanden, versuchen Sie in den Optionen eine neues Verzeichnis einzustellen.</translation>
-    </message>
-    <message>
-        <source>Completed.</source>
-        <translation type="vanished">Abgeschlossen.</translation>
-    </message>
-    <message>
-        <source>Upload failed</source>
-        <translation type="vanished">Hochladen fehlgeschlagen</translation>
-    </message>
-    <message>
-        <source>University of Kent</source>
-        <translation type="vanished">University of Kent</translation>
-    </message>
-    <message>
-        <source>Participate in academic studies sharing data via google drive.</source>
-        <translation type="vanished">Teilnahme an akademischen Studien über das Teilen von Daten mittels Google Drive.</translation>
-    </message>
-</context>
-<context>
-    <name>KentUniversityUploadDialog</name>
-    <message>
-        <source>Upload to Kent University</source>
-        <translation type="vanished">Hochladen zu Kent University</translation>
-    </message>
-    <message>
-        <source>Session Perceived Exertion (sRPE)</source>
-        <translation type="vanished">Session wahrgenommene Belastung (sRPE)</translation>
-    </message>
-    <message>
-        <source>Post Session Fatigue (ROF)</source>
-        <translation type="vanished">Erschöpfung nach der Session (ROF)</translation>
-    </message>
-    <message>
-        <source>Notes</source>
-        <translation type="vanished">Bemerkungen</translation>
-    </message>
-    <message>
-        <source>Missed workouts</source>
-        <translation type="vanished">Verpasste Trainings</translation>
-    </message>
-    <message>
-        <source>Is a self administered test workout</source>
-        <translation type="vanished">Ist ein selbst verwaltetes Testtraining</translation>
-    </message>
-    <message>
-        <source>Uploading %1 bytes...</source>
-        <translation type="vanished">Hochladen läuft (%1 Byte)...</translation>
-    </message>
-    <message>
-        <source>Upload</source>
-        <translation type="vanished">Hochladen</translation>
-    </message>
-    <message>
-        <source>Upload Failed</source>
-        <translation type="vanished">Hochladen fehlgeschlagen</translation>
-    </message>
-    <message>
-        <source>Unable to upload, check your configuration in preferences.</source>
-        <translation type="vanished">Hochladen nicht möglich, bitte überprüfen Sie ihre Konfiguration in den Einstellungen.</translation>
-    </message>
-    <message>
-        <source>Done</source>
-        <translation type="vanished">Fertig</translation>
-    </message>
-</context>
-<context>
     <name>KettlerController</name>
     <message>
         <location filename="../../Train/KettlerController.cpp" line="84"/>
@@ -18933,7 +18816,7 @@ on and that its display says, &quot;PC Link&quot;</source>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="511"/>
         <source>&amp;Save activity</source>
-        <translation>&amp;Speichere Aktivität</translation>
+        <translation>&amp;Speichern Aktivität</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="512"/>
@@ -19047,7 +18930,8 @@ on and that its display says, &quot;PC Link&quot;</source>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="1232"/>
         <source>You are about to reset all charts to the default setup</source>
-        <translation>Sie sind dabei, alle Diagramme auf die Voreinstellungen zurückzusetzen</translation>
+        <translation>Warnung: Alle selbst erstellten Diagramme und Perspektiven werden gelöscht!
+Sie sind dabei, alle Diagramme auf die Voreinstellungen zurückzusetzen</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="1233"/>
@@ -19099,7 +18983,7 @@ on and that its display says, &quot;PC Link&quot;</source>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="493"/>
         <source>Save all modified activities</source>
-        <translation>Speichere alle geänderten Aktivitäten</translation>
+        <translation>Speichern alle geänderten Aktivitäten</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="495"/>
@@ -21624,18 +21508,6 @@ Keine Aktivitäten zum Importieren gefunden.
         <translation>Cycling Analytics Autorisierung war erfolgreich.</translation>
     </message>
     <message>
-        <source>Google Calendar authorization was successful.</source>
-        <translation type="vanished">Google Kalender Autorisierung ware erfolgreich.</translation>
-    </message>
-    <message>
-        <source>Kent University Google Drive authorization was successful.</source>
-        <translation type="vanished">Kent University Google Drive Autorisierung war erfolgreich.</translation>
-    </message>
-    <message>
-        <source>Google Drive authorization was successful.</source>
-        <translation type="vanished">Google Drive Autorisierung war erfolgreich.</translation>
-    </message>
-    <message>
         <location filename="../../Cloud/OAuthDialog.cpp" line="460"/>
         <source>Today&apos;s Plan authorization was successful.</source>
         <translation>Today&apos;s Plan Autorisierung war erfolgreich.</translation>
@@ -21659,10 +21531,6 @@ Keine Aktivitäten zum Importieren gefunden.
         <location filename="../../Cloud/OAuthDialog.cpp" line="508"/>
         <source>SSL Token Refresh Error</source>
         <translation>SSL Token Aktualisierungsfehler</translation>
-    </message>
-    <message>
-        <source>Error retrieving authoriation credentials</source>
-        <translation type="vanished">Fehler beim Holen der Autorisierungsdaten</translation>
     </message>
 </context>
 <context>
@@ -25551,94 +25419,6 @@ yyyy</translation>
         <translation>Ungültig</translation>
     </message>
     <message>
-        <source>0 Rest</source>
-        <translation type="vanished">0 Erholung</translation>
-    </message>
-    <message>
-        <source>1 Very, very easy</source>
-        <translation type="vanished">1 Sehr leicht</translation>
-    </message>
-    <message>
-        <source>2 Easy</source>
-        <translation type="vanished">2 Leicht</translation>
-    </message>
-    <message>
-        <source>3 Moderate</source>
-        <translation type="vanished">3 Moderat</translation>
-    </message>
-    <message>
-        <source>4 Somewhat hard</source>
-        <translation type="vanished">4 Schon härter</translation>
-    </message>
-    <message>
-        <source>5 Hard</source>
-        <translation type="vanished">5 Hart</translation>
-    </message>
-    <message>
-        <source>6 Hard+</source>
-        <translation type="vanished">6 Hart+</translation>
-    </message>
-    <message>
-        <source>7 Very hard</source>
-        <translation type="vanished">7 Sehr hart</translation>
-    </message>
-    <message>
-        <source>8 Very hard+</source>
-        <translation type="vanished">8 Sehr hart+</translation>
-    </message>
-    <message>
-        <source>9 Very hard++</source>
-        <translation type="vanished">9 Sehr hart++</translation>
-    </message>
-    <message>
-        <source>10 Maximum</source>
-        <translation type="vanished">10 Maximal</translation>
-    </message>
-    <message>
-        <source>0 Not Fatigued At All</source>
-        <translation type="vanished">0 Keinerlei Erschöpfung</translation>
-    </message>
-    <message>
-        <source>1 </source>
-        <translation type="vanished">1 </translation>
-    </message>
-    <message>
-        <source>2 A Little Fatigued</source>
-        <translation type="vanished">2 Ein wenig erschöpft</translation>
-    </message>
-    <message>
-        <source>3 </source>
-        <translation type="vanished">3 </translation>
-    </message>
-    <message>
-        <source>4 </source>
-        <translation type="vanished">4 </translation>
-    </message>
-    <message>
-        <source>5 Moderately Fatigued</source>
-        <translation type="vanished">5 Moderat erschöpft</translation>
-    </message>
-    <message>
-        <source>6 </source>
-        <translation type="vanished">6 </translation>
-    </message>
-    <message>
-        <source>7 Very fatigued+</source>
-        <translation type="vanished">7 Sehr erschöpft+</translation>
-    </message>
-    <message>
-        <source>8 </source>
-        <translation type="vanished">8 </translation>
-    </message>
-    <message>
-        <source>9 </source>
-        <translation type="vanished">9 </translation>
-    </message>
-    <message>
-        <source>10 Total Fatigue, Nothing Left</source>
-        <translation type="vanished">10 Völlig erschöpft, keine Reserven</translation>
-    </message>
-    <message>
         <location filename="../../FileIO/TcxParser.cpp" line="409"/>
         <source>Distance %1</source>
         <translation>Distanz %1</translation>
@@ -27913,7 +27693,7 @@ Wollen Sie fortfahren ?</translation>
     <message>
         <location filename="../../Gui/RideImportWizard.cpp" line="1095"/>
         <source>Saving file...</source>
-        <translation>Speichere Datei...</translation>
+        <translation>Speichern Datei...</translation>
     </message>
     <message>
         <location filename="../../Gui/RideImportWizard.cpp" line="1058"/>
