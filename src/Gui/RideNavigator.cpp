@@ -1376,7 +1376,7 @@ RideNavigator::showTreeContextMenuPopup(const QPoint &pos)
 
 RideTreeView::RideTreeView(QWidget *parent) : QTreeView(parent)
 {
-    setDragDropMode(QAbstractItemView::InternalMove);
+    setDragDropMode(QAbstractItemView::DragDrop);
     setDragEnabled(true);
     setDragDropOverwriteMode(false);
     setDropIndicatorShown(true);
