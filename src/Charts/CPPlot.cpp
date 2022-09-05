@@ -1075,7 +1075,7 @@ CPPlot::plotTests(RideItem *rideitem)
         fs.addFilter(parent->searchBox->isFiltered(), SearchFilterBox::matches(context, parent->searchBox->filter())); // chart settings
         fs.addFilter(context->isfiltered, context->filters);
         fs.addFilter(context->ishomefiltered, context->homeFilters);
-        fs.addFilter(parent->myPerspective->isFiltered(), parent->myPerspective->filterlist(DateRange(startDate,endDate)));
+        if (parent->myPerspective) fs.addFilter(parent->myPerspective->isFiltered(), parent->myPerspective->filterlist(DateRange(startDate,endDate)));
         Specification spec;
         spec.setFilterSet(fs);
         spec.setDateRange(DateRange(startDate, endDate));
@@ -1206,8 +1206,8 @@ CPPlot::plotBests(RideItem *rideItem)
         // but only if rangemode (aka on trends)
         if (rangemode) {
             bestsCache = new RideFileCache(context, startDate, endDate,
-                            isFiltered||parent->myPerspective->isFiltered(),
-                            files + (parent->myPerspective->isFiltered() ? parent->myPerspective->filterlist(DateRange(startDate,endDate)) : QStringList()),
+                            isFiltered || (parent->myPerspective && parent->myPerspective->isFiltered()),
+                            files + ((parent->myPerspective && parent->myPerspective->isFiltered()) ? parent->myPerspective->filterlist(DateRange(startDate,endDate)) : QStringList()),
                             rangemode, rideItem);
         } else {
             bestsCache = new RideFileCache(context, startDate, endDate, isFiltered, files, rangemode, rideItem);
@@ -1771,7 +1771,7 @@ CPPlot::plotEfforts()
         FilterSet fs; // apply filters when selecting intervals
         fs.addFilter(context->isfiltered, context->filters);
         fs.addFilter(context->ishomefiltered, context->homeFilters);
-        fs.addFilter(parent->myPerspective->isFiltered(), parent->myPerspective->filterlist(DateRange(startDate,endDate)));
+        if (parent->myPerspective) fs.addFilter(parent->myPerspective->isFiltered(), parent->myPerspective->filterlist(DateRange(startDate,endDate)));
         Specification spec;
         spec.setFilterSet(fs);
         spec.setDateRange(DateRange(startDate, endDate));

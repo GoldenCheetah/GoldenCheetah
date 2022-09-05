@@ -1757,7 +1757,7 @@ CriticalPowerWindow::dateRangeChanged(DateRange dateRange)
         fs.addFilter(searchBox->isFiltered(), SearchFilterBox::matches(context, filter()));
         fs.addFilter(context->isfiltered, context->filters);
         fs.addFilter(context->ishomefiltered, context->homeFilters);
-        fs.addFilter(myPerspective->isFiltered(), myPerspective->filterlist(dateRange));
+        if (myPerspective) fs.addFilter(myPerspective->isFiltered(), myPerspective->filterlist(dateRange));
         int nActivities, nRides, nRuns, nSwims;
         QString sport;
         context->athlete->rideCache->getRideTypeCounts(
