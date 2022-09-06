@@ -1032,8 +1032,8 @@ HistogramWindow::updateChart()
                 // plotting a data series, so refresh the ridefilecache
 
                 if (rangemode) {
-                    source = new RideFileCache(context, use.from, use.to, isfiltered||myPerspective->isFiltered(),
-                                                                          files + myPerspective->filterlist(use), rangemode);
+                    source = new RideFileCache(context, use.from, use.to, isfiltered || (myPerspective && myPerspective->isFiltered()),
+                                               files + (myPerspective ? myPerspective->filterlist(use) : QStringList()), rangemode);
                 } else source = new RideFileCache(context, use.from, use.to, isfiltered, files, rangemode);
 
                 cfrom = use.from;
@@ -1071,7 +1071,7 @@ HistogramWindow::updateChart()
                 fs.addFilter(isfiltered, files);
                 fs.addFilter(context->isfiltered, context->filters);
                 fs.addFilter(context->ishomefiltered, context->homeFilters);
-                fs.addFilter(myPerspective->isFiltered(), myPerspective->filterlist(use));
+                if (myPerspective) fs.addFilter(myPerspective->isFiltered(), myPerspective->filterlist(use));
 
                 // setData using the summary metrics -- always reset since filters may
                 // have changed, or perhaps the bin width...

@@ -637,7 +637,7 @@ LTMWindow::presetSelected(int index)
         fs.addFilter(context->isfiltered, context->filters);
         fs.addFilter(context->ishomefiltered, context->homeFilters);
         fs.addFilter(ltmTool->isFiltered(), ltmTool->filters());
-        fs.addFilter(myPerspective->isFiltered(), myPerspective->filterlist(myDateRange));
+        if (myPerspective) fs.addFilter(myPerspective->isFiltered(), myPerspective->filterlist(myDateRange));
         settings.specification.setFilterSet(fs);
         settings.specification.setDateRange(DateRange(settings.start.date(), settings.end.date()));
 
@@ -1075,7 +1075,7 @@ LTMWindow::filterChanged()
     fs.addFilter(context->isfiltered, context->filters);
     fs.addFilter(context->ishomefiltered, context->homeFilters);
     fs.addFilter(ltmTool->isFiltered(), ltmTool->filters());
-    fs.addFilter(myPerspective->isFiltered(), myPerspective->filterlist(myDateRange));
+    if (myPerspective) fs.addFilter(myPerspective->isFiltered(), myPerspective->filterlist(myDateRange));
     settings.specification.setFilterSet(fs);
     settings.specification.setDateRange(DateRange(settings.start.date(), settings.end.date()));
 
@@ -1202,7 +1202,7 @@ LTMWindow::applyClicked()
         fs.addFilter(context->isfiltered, context->filters);
         fs.addFilter(context->ishomefiltered, context->homeFilters);
         fs.addFilter(ltmTool->isFiltered(), ltmTool->filters());
-        fs.addFilter(myPerspective->isFiltered(), myPerspective->filterlist(myDateRange));
+        if (myPerspective) fs.addFilter(myPerspective->isFiltered(), myPerspective->filterlist(myDateRange));
         settings.specification.setFilterSet(fs);
         settings.specification.setDateRange(DateRange(settings.start.date(), settings.end.date()));
 
