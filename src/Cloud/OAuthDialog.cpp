@@ -261,8 +261,8 @@ OAuthDialog::urlChanged(const QUrl &url)
                 urlstr = QString("https://www.nolio.io/api/token/?");
                 params.addQueryItem("grant_type", "authorization_code");
                 params.addQueryItem("redirect_uri", "http://www.goldencheetah.org/");
-#if (defined GC_NOLIO_CLIENT_ID) && (defined GC_NOLIO_CLIENT_SECRET)
-                authheader = QString("%1:%2").arg(GC_NOLIO_CLIENT_ID).arg(GC_NOLIO_CLIENT_SECRET);
+#if (defined GC_NOLIO_CLIENT_ID) && (defined GC_NOLIO_SECRET)
+                authheader = QString("%1:%2").arg(GC_NOLIO_CLIENT_ID).arg(GC_NOLIO_SECRET);
 #endif
 
             }  else if (site == CYCLING_ANALYTICS) {
