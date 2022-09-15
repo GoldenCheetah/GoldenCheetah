@@ -506,7 +506,7 @@ Xert::writeFile(QByteArray &data, QString remotename, RideFile *ride)
         QHttpPart namePart;
         namePart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"name\""));
         printd("request: %s\n", name.toStdString().c_str());
-        namePart.setBody(name.toLatin1());
+        namePart.setBody(name.toUtf8());
         multiPart->append(namePart);
     }
 
