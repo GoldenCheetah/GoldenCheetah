@@ -4262,7 +4262,7 @@ Presione siguiente para continuar
     <message>
         <location filename="../../Gui/AthletePages.cpp" line="525"/>
         <source>times the athlete is closed - 0 means never</source>
-        <translation>veces el atleta se cierra - 0 significa nunca</translation>
+        <translation>veces que el atleta se cierra (0 significa nunca)</translation>
     </message>
     <message>
         <location filename="../../Gui/AthletePages.cpp" line="548"/>
