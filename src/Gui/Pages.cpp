@@ -1287,8 +1287,8 @@ ColorsPage::ColorsPage(QWidget *parent) : QWidget(parent)
 #ifndef Q_OS_MAC
     grid->addWidget(rideScrollLabel, 2,3);
     grid->addWidget(rideScroll, 2,4);
-    grid->addWidget(rideHeadLabel, 3,3);
-    grid->addWidget(rideHead, 3,4);
+    //grid->addWidget(rideHeadLabel, 3,3); // Disabled in RideNavigator
+    //grid->addWidget(rideHead, 3,4);      // better don't display
 #endif
 
     grid->addWidget(def, 0,1, Qt::AlignVCenter|Qt::AlignLeft);
