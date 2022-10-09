@@ -1642,6 +1642,7 @@ bool Leaf::isNumber(DataFilterRuntime *df, Leaf *leaf)
 
 void Leaf::clear(Leaf *leaf)
 {
+    return; // TODO: fix this function to release memory in all Leaf cases avoiding crashes
 
     switch(leaf->type) {
     case Leaf::String : delete leaf->lvalue.s; break;
