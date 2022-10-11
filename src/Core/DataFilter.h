@@ -114,7 +114,7 @@ class Leaf {
 
     public:
 
-        Leaf(int loc, int leng) : type(none),op(0),series(NULL),dynamic(false),loc(loc),leng(leng),inerror(false) { }
+        Leaf(int loc, int leng) : type(none),lvalue(),rvalue(),cond(),op(0),series(NULL),dynamic(false),loc(loc),leng(leng),inerror(false) { }
 
         // evaluate against a RideItem using its context
         //
@@ -145,6 +145,7 @@ class Leaf {
                Compound, Script } type;
 
         union value {
+            value() { l = NULL; };
             float f;
             int i;
             QString *s;

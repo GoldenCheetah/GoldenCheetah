@@ -1642,23 +1642,47 @@ bool Leaf::isNumber(DataFilterRuntime *df, Leaf *leaf)
 
 void Leaf::clear(Leaf *leaf)
 {
-    return; // TODO: fix this function to release memory in all Leaf cases avoiding crashes
+    if (leaf == NULL) return; // critical to avoid crashes
 
     switch(leaf->type) {
+    case Leaf::Script :
     case Leaf::String : delete leaf->lvalue.s; break;
     case Leaf::Symbol : delete leaf->lvalue.n; break;
     case Leaf::Logical  :
     case Leaf::BinaryOperation :
     case Leaf::Operation : clear(leaf->lvalue.l);
                            clear(leaf->rvalue.l);
-                           delete(leaf->lvalue.l);
-                           delete(leaf->rvalue.l);
+                           delete leaf->lvalue.l;
+                           delete leaf->rvalue.l;
+                           break;
+    case Leaf::UnaryOperation : clear(leaf->lvalue.l);
+                           delete leaf->lvalue.l;
                            break;
     case Leaf::Function :  clear(leaf->lvalue.l);
-                           delete(leaf->lvalue.l);
-                            break;
-    default:
-        break;
+                           delete leaf->lvalue.l;
+                           clear(leaf->series);
+                           delete leaf->series;
+                           foreach (Leaf* l, leaf->fparms) clear(l);
+                           leaf->fparms.clear();
+                           break;
+    case Leaf::Compound :  foreach (Leaf* l, *(leaf->lvalue.b)) clear(l);
+                           delete leaf->lvalue.b;
+                           break;
+    case Leaf::Conditional : clear(leaf->lvalue.l);
+                           clear(leaf->rvalue.l);
+                           clear(leaf->cond.l);
+                           delete leaf->lvalue.l;
+                           delete leaf->rvalue.l;
+                           delete leaf->cond.l;
+                           break;
+    case Leaf::Index :
+    case Leaf::Select :    clear(leaf->lvalue.l);
+                           delete leaf->lvalue.l;
+                           foreach (Leaf* l, leaf->fparms) clear(l);
+                           leaf->fparms.clear();
+                           break;
+    case Leaf::Float :
+    case Leaf::Integer :   break;
     }
 
 }
@@ -3323,6 +3347,7 @@ void DataFilter::clearFilter()
 {
     if (treeRoot) {
         treeRoot->clear(treeRoot);
+        delete treeRoot;
         treeRoot = NULL;
     }
     rt.isdynamic = false;
