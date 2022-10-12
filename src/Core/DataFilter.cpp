@@ -1662,10 +1662,10 @@ void Leaf::clear(Leaf *leaf)
                            delete leaf->lvalue.l;
                            clear(leaf->series);
                            delete leaf->series;
-                           foreach (Leaf* l, leaf->fparms) clear(l);
+                           foreach (Leaf* l, leaf->fparms) { clear(l); delete l; }
                            leaf->fparms.clear();
                            break;
-    case Leaf::Compound :  foreach (Leaf* l, *(leaf->lvalue.b)) clear(l);
+    case Leaf::Compound :  foreach (Leaf* l, *(leaf->lvalue.b)) { clear(l); delete l; }
                            delete leaf->lvalue.b;
                            break;
     case Leaf::Conditional : clear(leaf->lvalue.l);
@@ -1678,7 +1678,7 @@ void Leaf::clear(Leaf *leaf)
     case Leaf::Index :
     case Leaf::Select :    clear(leaf->lvalue.l);
                            delete leaf->lvalue.l;
-                           foreach (Leaf* l, leaf->fparms) clear(l);
+                           foreach (Leaf* l, leaf->fparms) { clear(l); delete l; }
                            leaf->fparms.clear();
                            break;
     case Leaf::Float :
