@@ -219,6 +219,7 @@ class DataFilter : public QObject
     public:
         DataFilter(QObject *parent, Context *context);
         DataFilter(QObject *parent, Context *context, QString formula);
+        ~DataFilter() { clearFilter(); }
 
         // runtime passed by datafilter
         DataFilterRuntime rt;
