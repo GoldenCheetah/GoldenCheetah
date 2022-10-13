@@ -458,6 +458,8 @@ expr:
                                                   $1->type = Leaf::Function;
                                                   $1->series = NULL; // not tiz/best
                                                   $1->function = *($1->lvalue.n);
+                                                  delete $1->lvalue.n; // not used anymore
+                                                  $1->lvalue.l = NULL; // avoid double deletion
                                                   $1->fparms.clear(); // no parameters!
                                                 }
         | '(' expr ')'                          { $$ = new Leaf(@2.first_column, @2.last_column);
