@@ -137,7 +137,10 @@ void DataFilter_setString(QString p)
 {
     BEGIN(0);
     DataFiltercolumn = 0;
-    DataFilter_scan_string(p.toLatin1().data());
+    // internally work with UTF-8 encoding
+    // this works for FLEX, since the multi-byte characters only appear WITHIN a "String",
+    // but not as part of the grammar - this is important since a char in UTF-8 can have up to 4 bytes
+    DataFilter_scan_string(p.toUtf8().data());
 }
 
 void DataFilter_clearString()
