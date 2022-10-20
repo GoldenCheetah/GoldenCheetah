@@ -3155,10 +3155,6 @@ DataFilter::DataFilter(QObject *parent, Context *context, QString formula) : QOb
         treeRoot->validateFilter(context, &rt, treeRoot);
     else
         treeRoot=NULL;
-
-    // save away the results if it passed semantic validation
-    if (DataFiltererrors.count() != 0)
-        treeRoot= NULL;
 }
 
 Result DataFilter::evaluate(RideItem *item, RideFilePoint *p)
@@ -3243,6 +3239,7 @@ QStringList DataFilter::check(QString query)
 
     // if it passed syntax lets check semantics
     if (treeRoot && DataFiltererrors.count() == 0) treeRoot->validateFilter(context, &rt, treeRoot);
+    else treeRoot = NULL; // This avoids crashes, but it can produce memory leaks
 
     // ok, did it pass all tests?
     if (!treeRoot || DataFiltererrors.count() > 0) { // nope
@@ -3283,6 +3280,7 @@ QStringList DataFilter::parseFilter(Context *context, QString query, QStringList
 
     // if it passed syntax lets check semantics
     if (treeRoot && DataFiltererrors.count() == 0) treeRoot->validateFilter(context, &rt, treeRoot);
+    else treeRoot = NULL; // This avoids crashes, but it can produce memory leaks
 
     // ok, did it pass all tests?
     if (!treeRoot || DataFiltererrors.count() > 0) { // nope
