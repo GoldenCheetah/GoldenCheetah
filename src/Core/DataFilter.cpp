@@ -3239,7 +3239,7 @@ QStringList DataFilter::check(QString query)
 
     // if it passed syntax lets check semantics
     if (treeRoot && DataFiltererrors.count() == 0) treeRoot->validateFilter(context, &rt, treeRoot);
-    else treeRoot = NULL; // This avoids crashes, but it can produce memory leaks
+    else treeRoot = NULL;
 
     // ok, did it pass all tests?
     if (!treeRoot || DataFiltererrors.count() > 0) { // nope
@@ -3280,7 +3280,7 @@ QStringList DataFilter::parseFilter(Context *context, QString query, QStringList
 
     // if it passed syntax lets check semantics
     if (treeRoot && DataFiltererrors.count() == 0) treeRoot->validateFilter(context, &rt, treeRoot);
-    else treeRoot = NULL; // This avoids crashes, but it can produce memory leaks
+    else treeRoot = NULL;
 
     // ok, did it pass all tests?
     if (!treeRoot || DataFiltererrors.count() > 0) { // nope

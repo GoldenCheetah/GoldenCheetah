@@ -70,6 +70,9 @@ extern Leaf *DataFilterroot; // root node for parsed statement
    char function[32];
 }
 
+%destructor { $$->clear($$); delete $$; } <leaf>
+%destructor { foreach (Leaf* l, *$$) { l->clear(l); delete l; } delete $$; } <comp>
+
 %locations
 
 %type <leaf> symbol array select literal lexpr cexpr expr parms block statement expression parameter;
