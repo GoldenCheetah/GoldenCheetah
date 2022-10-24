@@ -19,6 +19,9 @@ rm -rf '/usr/local/include/c++'
 ## brew install --HEAD travis/libkml.rb
 sudo chmod -R +w /usr/local
 
+brew update
+brew install bison@2.7
+
 # GSL - install from source due to homebrew issues
 curl -k -O https://ftp.gnu.org/gnu/gsl/gsl-2.6.tar.gz
 tar xf gsl-2.6.tar.gz
