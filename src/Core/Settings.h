@@ -31,7 +31,7 @@
 #ifndef GC_SETTINGS_APP
 #define GC_SETTINGS_APP                       "GoldenCheetah"
 #endif
-#define GC_SETTINGS_FAVOURITE_METRICS_DEFAULT "workout_time,total_distance,total_work,average_power,average_hr,average_cad,average_speed,pace,pace_swim,distance_swim"
+#define GC_SETTINGS_FAVOURITE_METRICS_DEFAULT "workout_time,time_recording,time_riding,total_distance,distance_swim,total_work,average_power,average_hr,average_cad,average_run_cad,average_speed,pace,pace_swim"
 #define GC_UNIT_METRIC                       "Metric"
 #define GC_UNIT_IMPERIAL                     "Imperial"
 
