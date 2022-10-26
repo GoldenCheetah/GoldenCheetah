@@ -1415,6 +1415,14 @@ Leaf::toString()
         }
         break;
 
+    case Leaf::Compound : //qDebug()<<"comp:"<<op;
+        {
+                    QString returning("{");
+                    foreach (Leaf* l, *(lvalue.b)) returning.append(l->toString()).append(";");
+                    return returning.append("}");
+        }
+        break;
+
     default:
         break;
 
