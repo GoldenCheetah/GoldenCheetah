@@ -973,7 +973,7 @@ Strava::prepareResponse(QByteArray* data)
 
                     double start = starttime.secsTo(QDateTime::fromString(lap["start_date_local"].toString(), Qt::ISODate));
                     if (start < last_lap) start = last_lap + 1; // Don't overlap
-                    double end = start + lap["elapsed_time"].toDouble() - 1;
+                    double end = start + std::max(lap["elapsed_time"].toDouble(), 1.0) - 1;
 
                     last_lap = end;
 
