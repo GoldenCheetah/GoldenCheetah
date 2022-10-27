@@ -77,16 +77,15 @@
 # You may need to specify the full path if things don't work.
 #QMAKE_LEX  = flex
 #QMAKE_YACC = bison
+# If you are using bison 3.7 or higher, uncomment the line below
+#QMAKE_MOVE = cp
 # If you're compiling with nmake and VC then you
 # will likely also use win_flex and win_bison
 # so uncomment below
-#QMAKE_LEX = win_flex
-#QMAKE_YACC = win_bison
-#win32 {
-#  QMAKE_YACC = bison --file-prefix=y -t
-#  QMAKE_MOVE = cmd /c move
-#  QMAKE_DEL_FILE = rm -f
-#}
+#QMAKE_LEX  = win_flex --wincompat
+#QMAKE_YACC = win_bison --file-prefix=y -t
+# If you are using bison 3.7 or higher, uncomment the line below
+#QMAKE_MOVE = copy
 
 # If you want SRM download support you must install SRMIO
 #     http://www.zuto.de/project/srmio/
