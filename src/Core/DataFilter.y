@@ -49,11 +49,11 @@ extern Leaf *DataFilterroot; // root node for parsed statement
 
 %}
 
-// Symbol can be meta or metric name
-%token <leaf> SYMBOL PYTHON
+// Symbol can be meta, metric, variable or function name
+%token <string> SYMBOL PYTHON
 
 // Constants can be a string or a number
-%token <leaf> DF_STRING DF_INTEGER DF_FLOAT
+%token <string> DF_STRING DF_INTEGER DF_FLOAT
 %token <function> BEST TIZ CONFIG CONST_
 
 // comparative operators
@@ -68,6 +68,7 @@ extern Leaf *DataFilterroot; // root node for parsed statement
    QList<Leaf*> *comp;
    int op;
    char function[32];
+   char* string;
 }
 
 %destructor { $$->clear($$); delete $$; } <leaf>
@@ -140,7 +141,7 @@ block:
 statements: 
 
         statement                               { $$ = new QList<Leaf*>(); $$->append($1); }
-        | statements statement                  { $$->append($2); }
+        | statements statement                  { $1->append($2); $$ = $1; }
         ;
 
 /*
@@ -253,7 +254,9 @@ parms:
                                                   $$->fparms << $1;
                                                 }
         | parms ',' parameter                   { $1->fparms << $3;
-                                                  $1->leng = @3.last_column; }
+                                                  $1->leng = @3.last_column;
+                                                  $$ = $1;
+                                                }
         ;
 
 /*
@@ -464,6 +467,7 @@ expr:
                                                   delete $1->lvalue.n; // not used anymore
                                                   $1->lvalue.l = NULL; // avoid double deletion
                                                   $1->fparms.clear(); // no parameters!
+                                                  $$ = $1;
                                                 }
         | '(' expr ')'                          { $$ = new Leaf(@2.first_column, @2.last_column);
                                                   $$->type = Leaf::Logical;
