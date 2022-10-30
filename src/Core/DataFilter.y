@@ -23,7 +23,7 @@
 // enable multiple grammars in a single executable you
 // should make sure you use the very latest bison since it
 // has been known to be problematic in the past. It is
-// know to work well with bison v2.4.1.
+// know to work well with bison v2.7.
 //
 // To make the grammar readable I have placed the code
 // for each nterm at column 40, this source file is best

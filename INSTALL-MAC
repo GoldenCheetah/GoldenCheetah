@@ -3,9 +3,10 @@ Manager to install dependencies, including Qt and GSL, on Travis-ci
 macOS Mojave build environment.
 You can check the travis/osx folder for the complete and updated build scripts,
 the minimum Qt version known to work is 5.13 with Qt WebEngine and Qt Charts.
-GSL - GNU Scientific Library is a mandatory dependency starting with v3.6
+GSL - GNU Scientific Library is a mandatory dependency starting with v3.6 and
+minimum bison version is 2.7, both can be installed using Homebrew.
 
-Ale Martinez - Jul, 2022
+Ale Martinez - Oct, 2022
 
                                  +++++++++++++++++++++++
                                 MAC OSX BUILD WALKTHROUGH
