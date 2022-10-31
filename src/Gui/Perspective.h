@@ -67,9 +67,9 @@ class Perspective : public GcWindow
         // am I relevant? (for switching when ride selected)
         bool relevant(RideItem*);
 
-        // the items I'd choose (for filtering on trends view)
+        // the items I'd choose (for filtering on trends view, optionally refined by chart filter)
         bool isFiltered() const override { return (type_ == VIEW_TRENDS && df != NULL); }
-        QStringList filterlist(DateRange dr);
+        QStringList filterlist(DateRange dr, bool isfiltered=false, QStringList files=QStringList());
 
         // get/set the expression (will compile df)
         QString expression() const;

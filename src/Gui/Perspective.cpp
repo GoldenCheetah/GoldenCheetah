@@ -1704,13 +1704,14 @@ Perspective::relevant(RideItem *item)
 }
 
 QStringList
-Perspective::filterlist(DateRange dr)
+Perspective::filterlist(DateRange dr, bool isfiltered, QStringList files)
 {
     SSS;
     QStringList returning;
 
     Specification spec;
     spec.setDateRange(dr);
+    spec.setFilterSet(FilterSet(isfiltered, files)); // typically chart level filter
 
     foreach(RideItem *item, context->athlete->rideCache->rides()) {
         if (!spec.pass(item)) continue;

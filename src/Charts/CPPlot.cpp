@@ -1202,12 +1202,12 @@ CPPlot::plotBests(RideItem *rideItem)
     if (bestsCache == NULL) {
         // isFiltered and files are filters from CriticalPowerWindow's filter setting
         // we also need to take into account the perspective filter if on trends so
-        // its easier to just aggregate the filter list here (bit hacky but works ok)
+        // we pass isFiltered and files for filterlist to take care of them,
         // but only if rangemode (aka on trends)
         if (rangemode) {
             bestsCache = new RideFileCache(context, startDate, endDate,
                             isFiltered || (parent->myPerspective && parent->myPerspective->isFiltered()),
-                            files + ((parent->myPerspective && parent->myPerspective->isFiltered()) ? parent->myPerspective->filterlist(DateRange(startDate,endDate)) : QStringList()),
+                            parent->myPerspective ? parent->myPerspective->filterlist(DateRange(startDate,endDate), isFiltered, files) : files,
                             rangemode, rideItem);
         } else {
             bestsCache = new RideFileCache(context, startDate, endDate, isFiltered, files, rangemode, rideItem);
