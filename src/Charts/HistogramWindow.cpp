@@ -1032,8 +1032,9 @@ HistogramWindow::updateChart()
                 // plotting a data series, so refresh the ridefilecache
 
                 if (rangemode) {
+                    // filterlist takes care of both chart and perspective filters to generate the file list
                     source = new RideFileCache(context, use.from, use.to, isfiltered || (myPerspective && myPerspective->isFiltered()),
-                                               files + (myPerspective ? myPerspective->filterlist(use) : QStringList()), rangemode);
+                                               myPerspective ? myPerspective->filterlist(use, isfiltered, files) : files, rangemode);
                 } else source = new RideFileCache(context, use.from, use.to, isfiltered, files, rangemode);
 
                 cfrom = use.from;
