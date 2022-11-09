@@ -155,8 +155,8 @@ FixElevation::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString
             latLngCollection.append(',');
             latLngCollection.append("\"longitude\":" + QString::number(point->lon,'g',10) + "}");
 
-            // this should not happen, it is preserve just in case we need to break the requests
-            if (pointCount == 86400) {
+            // To avoid 302 error for longer rides we break requests in 2000 points chunks
+            if (pointCount == 2000) {
                 latLngCollection.append("]}");
                 elevationPoints = elevationPoints + FetchElevationData(latLngCollection);
                 latLngCollection = "";
