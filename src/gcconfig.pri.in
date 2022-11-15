@@ -254,9 +254,6 @@ macx {
 #DEFINES += GC_DROPBOX_CLIENT_ID=\\\"xxxxxxxxxxxxxxx\\\"
 #DEFINES += GC_DROPBOX_CLIENT_SECRET=\\\"xxxxxxxxxxxxxxx\\\"
 
-# if you have your own MAPQUEST KEY
-#DEFINES += GC_MAPQUESTAPI_KEY=\\\"xxxxxxxxxxxxxxxxxxxxxx\\\"
-
 # USING THE WITHINGS API (http://oauth.withings.com/api, use https://www.goldencheetah.org as CALLBACK URL)
 #DEFINES += GC_NOKIA_CLIENT_ID=\\\"xxxxxxxxxxxxxxx\\\"
 #DEFINES += GC_NOKIA_CLIENT_SECRET=\\\"xxxxxxxxxxxxxxx\\\"
