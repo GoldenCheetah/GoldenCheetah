@@ -104,6 +104,9 @@ win32 {
   QMAKE_DEL_FILE = rm -f
 }
 
+And if you are using bison 3.7 or higher, make sure to also add:
+QMAKE_MOVE = cp
+
 To compile translation you need the QT tool lrelease
 If it is not found using the defaults in src/src.pro then set the full path and
 filename in gcconfig.pri, s.t.
