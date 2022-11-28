@@ -145,6 +145,7 @@ class Bindings {
         PyObject* rideFileCacheMeanmax(RideFileCache* cache) const;
         PyObject* seasonPeaks(bool all, DateRange range, QString filter, QList<RideFile::SeriesType> series, QList<int> durations) const;
 
+        int PyDict_SetItemString_Steal(PyObject *p, const char *key, PyObject *val) const;
 };
 
 #endif // _Bindings_h

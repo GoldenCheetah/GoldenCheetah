@@ -380,7 +380,7 @@ public:
     // working with intervals
     QString intervalType(int type=1) const;
     PyObject* seasonIntervals(QString type=QString(), bool compare=false) /TransferBack/;
-    PyObject* activityIntervals(QString type=QString(), PyObject* activity=NULL) /TransferBAck/;
+    PyObject* activityIntervals(QString type=QString(), PyObject* activity=NULL) /TransferBack/;
 
     // editing data
     bool createXDataSeries(QString name, QString series, QString seriesUnit, PyObject *activity = NULL) const;

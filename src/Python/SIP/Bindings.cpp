@@ -149,25 +149,25 @@ PyObject* Bindings::athlete() const
     if (dict == NULL) return dict;
 
     // NAME
-    PyDict_SetItemString(dict, "name", PyUnicode_FromString(context->athlete->cyclist.toUtf8().constData()));
+    PyDict_SetItemString_Steal(dict, "name", PyUnicode_FromString(context->athlete->cyclist.toUtf8().constData()));
 
     // HOME
-    PyDict_SetItemString(dict, "home", PyUnicode_FromString(context->athlete->home->root().absolutePath().toUtf8().constData()));
+    PyDict_SetItemString_Steal(dict, "home", PyUnicode_FromString(context->athlete->home->root().absolutePath().toUtf8().constData()));
 
     // DOB
     if (PyDateTimeAPI == NULL) PyDateTime_IMPORT;// import datetime if necessary
     QDate d = appsettings->cvalue(context->athlete->cyclist, GC_DOB).toDate();
-    PyDict_SetItemString(dict, "dob", PyDate_FromDate(d.year(), d.month(), d.day()));
+    PyDict_SetItemString_Steal(dict, "dob", PyDate_FromDate(d.year(), d.month(), d.day()));
 
     // WEIGHT
-    PyDict_SetItemString(dict, "weight", PyFloat_FromDouble(appsettings->cvalue(context->athlete->cyclist, GC_WEIGHT).toDouble()));
+    PyDict_SetItemString_Steal(dict, "weight", PyFloat_FromDouble(appsettings->cvalue(context->athlete->cyclist, GC_WEIGHT).toDouble()));
 
     // HEIGHT
-    PyDict_SetItemString(dict, "height", PyFloat_FromDouble(appsettings->cvalue(context->athlete->cyclist, GC_HEIGHT).toDouble()));
+    PyDict_SetItemString_Steal(dict, "height", PyFloat_FromDouble(appsettings->cvalue(context->athlete->cyclist, GC_HEIGHT).toDouble()));
 
     // GENDER
     int isfemale = appsettings->cvalue(context->athlete->cyclist, GC_SEX).toInt();
-    PyDict_SetItemString(dict, "gender", PyUnicode_FromString(isfemale ? "female" : "male"));
+    PyDict_SetItemString_Steal(dict, "gender", PyUnicode_FromString(isfemale ? "female" : "male"));
 
     return dict;
 }
@@ -449,23 +449,23 @@ Bindings::athleteZones(PyObject* date, QString sport) const
     }
 
     // add to dict
-    PyDict_SetItemString(dict, "date", dates);
-    PyDict_SetItemString(dict, "sport", sports);
-    PyDict_SetItemString(dict, "cp", cp);
-    PyDict_SetItemString(dict, "wprime", wprime);
-    PyDict_SetItemString(dict, "pmax", pmax);
-    PyDict_SetItemString(dict, "aetp", aetp);
-    PyDict_SetItemString(dict, "ftp", ftp);
-    PyDict_SetItemString(dict, "lthr", lthr);
-    PyDict_SetItemString(dict, "aethr", aethr);
-    PyDict_SetItemString(dict, "rhr", rhr);
-    PyDict_SetItemString(dict, "hrmax", hrmax);
-    PyDict_SetItemString(dict, "cv", cv);
-    PyDict_SetItemString(dict, "aetv", aetv);
-    PyDict_SetItemString(dict, "zoneslow", zoneslow);
-    PyDict_SetItemString(dict, "hrzoneslow", hrzoneslow);
-    PyDict_SetItemString(dict, "pacezoneslow", pacezoneslow);
-    PyDict_SetItemString(dict, "zonescolor", zonescolor);
+    PyDict_SetItemString_Steal(dict, "date", dates);
+    PyDict_SetItemString_Steal(dict, "sport", sports);
+    PyDict_SetItemString_Steal(dict, "cp", cp);
+    PyDict_SetItemString_Steal(dict, "wprime", wprime);
+    PyDict_SetItemString_Steal(dict, "pmax", pmax);
+    PyDict_SetItemString_Steal(dict, "aetp", aetp);
+    PyDict_SetItemString_Steal(dict, "ftp", ftp);
+    PyDict_SetItemString_Steal(dict, "lthr", lthr);
+    PyDict_SetItemString_Steal(dict, "aethr", aethr);
+    PyDict_SetItemString_Steal(dict, "rhr", rhr);
+    PyDict_SetItemString_Steal(dict, "hrmax", hrmax);
+    PyDict_SetItemString_Steal(dict, "cv", cv);
+    PyDict_SetItemString_Steal(dict, "aetv", aetv);
+    PyDict_SetItemString_Steal(dict, "zoneslow", zoneslow);
+    PyDict_SetItemString_Steal(dict, "hrzoneslow", hrzoneslow);
+    PyDict_SetItemString_Steal(dict, "pacezoneslow", pacezoneslow);
+    PyDict_SetItemString_Steal(dict, "zonescolor", zonescolor);
 
     return dict;
 }
@@ -958,9 +958,9 @@ Bindings::activityMetrics(RideItem* item) const
     //
     if (PyDateTimeAPI == NULL) PyDateTime_IMPORT;// import datetime if necessary
     QDate d = item->dateTime.date();
-    PyDict_SetItemString(dict, "date", PyDate_FromDate(d.year(), d.month(), d.day()));
+    PyDict_SetItemString_Steal(dict, "date", PyDate_FromDate(d.year(), d.month(), d.day()));
     QTime t = item->dateTime.time();
-    PyDict_SetItemString(dict, "time", PyTime_FromTime(t.hour(), t.minute(), t.second(), t.msec()*10));
+    PyDict_SetItemString_Steal(dict, "time", PyTime_FromTime(t.hour(), t.minute(), t.second(), t.msec()*10));
 
     //
     // METRICS
@@ -983,7 +983,7 @@ Bindings::activityMetrics(RideItem* item) const
         }
 
         // add to the dict
-        PyDict_SetItemString(dict, name.toUtf8().constData(), PyFloat_FromDouble(value));
+        PyDict_SetItemString_Steal(dict, name.toUtf8().constData(), PyFloat_FromDouble(value));
     }
 
     //
@@ -996,7 +996,7 @@ Bindings::activityMetrics(RideItem* item) const
             GlobalContext::context()->specialFields.isMetric(field.name)) continue;
 
         // add to the dict
-        PyDict_SetItemString(dict, field.name.replace(" ","_").toUtf8().constData(), PyUnicode_FromString(item->getText(field.name, "").toUtf8().constData()));
+        PyDict_SetItemString_Steal(dict, field.name.replace(" ","_").toUtf8().constData(), PyUnicode_FromString(item->getText(field.name, "").toUtf8().constData()));
     }
 
     //
@@ -1018,7 +1018,7 @@ Bindings::activityMetrics(RideItem* item) const
         color = item->color.name();
 
     // add to the dict
-    PyDict_SetItemString(dict, "color", PyUnicode_FromString(color.toUtf8().constData()));
+    PyDict_SetItemString_Steal(dict, "color", PyUnicode_FromString(color.toUtf8().constData()));
 
     return dict;
 }
@@ -1156,9 +1156,9 @@ Bindings::seasonMetrics(bool all, DateRange range, QString filter) const
         }
     }
 
-    PyDict_SetItemString(dict, "date", datelist);
-    PyDict_SetItemString(dict, "time", timelist);
-    PyDict_SetItemString(dict, "color", colorlist);
+    PyDict_SetItemString_Steal(dict, "date", datelist);
+    PyDict_SetItemString_Steal(dict, "time", timelist);
+    PyDict_SetItemString_Steal(dict, "color", colorlist);
 
     //
     // METRICS
@@ -1185,7 +1185,7 @@ Bindings::seasonMetrics(bool all, DateRange range, QString filter) const
         }
 
         // add to the dict
-        PyDict_SetItemString(dict, name.toUtf8().constData(), metriclist);
+        PyDict_SetItemString_Steal(dict, name.toUtf8().constData(), metriclist);
     }
 
     //
@@ -1209,7 +1209,7 @@ Bindings::seasonMetrics(bool all, DateRange range, QString filter) const
         }
 
         // add to the dict
-        PyDict_SetItemString(dict, field.name.replace(" ","_").toUtf8().constData(), metalist);
+        PyDict_SetItemString_Steal(dict, field.name.replace(" ","_").toUtf8().constData(), metalist);
     }
 
     return dict;
@@ -1355,11 +1355,11 @@ Bindings::seasonIntervals(DateRange range, QString type) const
         }
     }
 
-    PyDict_SetItemString(dict, "date", datelist);
-    PyDict_SetItemString(dict, "time", timelist);
-    PyDict_SetItemString(dict, "name", namelist);
-    PyDict_SetItemString(dict, "type", typelist);
-    PyDict_SetItemString(dict, "color", colorlist);
+    PyDict_SetItemString_Steal(dict, "date", datelist);
+    PyDict_SetItemString_Steal(dict, "time", timelist);
+    PyDict_SetItemString_Steal(dict, "name", namelist);
+    PyDict_SetItemString_Steal(dict, "type", typelist);
+    PyDict_SetItemString_Steal(dict, "color", colorlist);
 
     //
     // METRICS
@@ -1390,7 +1390,7 @@ Bindings::seasonIntervals(DateRange range, QString type) const
         }
 
         // add to the dict
-        PyDict_SetItemString(dict, name.toUtf8().constData(), metriclist);
+        PyDict_SetItemString_Steal(dict, name.toUtf8().constData(), metriclist);
     }
 
     return dict;
@@ -1472,12 +1472,12 @@ Bindings::activityIntervals(QString type, PyObject* activity) const
             idx++;
         }
 
-    PyDict_SetItemString(dict, "start", startlist);
-    PyDict_SetItemString(dict, "stop", stoplist);
-    PyDict_SetItemString(dict, "name", namelist);
-    PyDict_SetItemString(dict, "type", typelist);
-    PyDict_SetItemString(dict, "color", colorlist);
-    PyDict_SetItemString(dict, "selected", selectedlist);
+    PyDict_SetItemString_Steal(dict, "start", startlist);
+    PyDict_SetItemString_Steal(dict, "stop", stoplist);
+    PyDict_SetItemString_Steal(dict, "name", namelist);
+    PyDict_SetItemString_Steal(dict, "type", typelist);
+    PyDict_SetItemString_Steal(dict, "color", colorlist);
+    PyDict_SetItemString_Steal(dict, "selected", selectedlist);
 
     //
     // METRICS
@@ -1502,7 +1502,7 @@ Bindings::activityIntervals(QString type, PyObject* activity) const
         }
 
         // add to the dict
-        PyDict_SetItemString(dict, name.toUtf8().constData(), metriclist);
+        PyDict_SetItemString_Steal(dict, name.toUtf8().constData(), metriclist);
     }
 
     return dict;
@@ -1955,7 +1955,7 @@ Bindings::rideFileCacheMeanmax(RideFileCache* cache) const
         for(int j=0; j<values.count(); j++) PyList_SET_ITEM(list, j, PyFloat_FromDouble(values[j]));
 
         // add to the dict
-        PyDict_SetItemString(ans, RideFile::seriesName(series, true).toUtf8().constData(), list);
+        PyDict_SetItemString_Steal(ans, RideFile::seriesName(series, true).toUtf8().constData(), list);
 
         // if is power add the dates
         if(series == RideFile::watts) {
@@ -1974,7 +1974,7 @@ Bindings::rideFileCacheMeanmax(RideFileCache* cache) const
             }
 
             // add to the dict
-            PyDict_SetItemString(ans, "power_date", datelist);
+            PyDict_SetItemString_Steal(ans, "power_date", datelist);
         }
     }
 
@@ -2028,7 +2028,7 @@ Bindings::seasonPmc(bool all, QString metric) const
         }
 
         // add to the dict
-        PyDict_SetItemString(ans, "date", datelist);
+        PyDict_SetItemString_Steal(ans, "date", datelist);
 
         // PMC DATA
 
@@ -2069,11 +2069,11 @@ Bindings::seasonPmc(bool all, QString metric) const
         }
 
         // add to the dict
-        PyDict_SetItemString(ans, "stress", stress);
-        PyDict_SetItemString(ans, "lts", lts);
-        PyDict_SetItemString(ans, "sts", sts);
-        PyDict_SetItemString(ans, "sb", sb);
-        PyDict_SetItemString(ans, "rr", rr);
+        PyDict_SetItemString_Steal(ans, "stress", stress);
+        PyDict_SetItemString_Steal(ans, "lts", lts);
+        PyDict_SetItemString_Steal(ans, "sts", sts);
+        PyDict_SetItemString_Steal(ans, "sb", sb);
+        PyDict_SetItemString_Steal(ans, "rr", rr);
 
         // return it
         return ans;
@@ -2123,7 +2123,7 @@ Bindings::seasonMeasures(bool all, QString group) const
         }
 
         // add to the dict
-        PyDict_SetItemString(ans, "date", datelist);
+        PyDict_SetItemString_Steal(ans, "date", datelist);
 
         // MEASURES DATA
         QStringList fieldSymbols = context->athlete->measures->getFieldSymbols(groupIdx);
@@ -2146,7 +2146,7 @@ Bindings::seasonMeasures(bool all, QString group) const
 
         // add to the dict
         for (int fieldIdx=0; fieldIdx<fields.count(); fieldIdx++)
-            PyDict_SetItemString(ans, fieldSymbols[fieldIdx].toUtf8().constData(), fields[fieldIdx]);
+            PyDict_SetItemString_Steal(ans, fieldSymbols[fieldIdx].toUtf8().constData(), fields[fieldIdx]);
 
         // return it
         return ans;
@@ -2214,10 +2214,10 @@ Bindings::season(bool all, bool compare) const
     }
 
     // list into a data.frame
-    PyDict_SetItemString(ans, "start", start);
-    PyDict_SetItemString(ans, "end", end);
-    PyDict_SetItemString(ans, "name", name);
-    PyDict_SetItemString(ans, "color", color);
+    PyDict_SetItemString_Steal(ans, "start", start);
+    PyDict_SetItemString_Steal(ans, "end", end);
+    PyDict_SetItemString_Steal(ans, "name", name);
+    PyDict_SetItemString_Steal(ans, "color", color);
 
     // return it
     return ans;
@@ -2363,7 +2363,7 @@ Bindings::seasonPeaks(bool all, DateRange range, QString filter, QList<RideFile:
     }
 
     // add to the dict
-    PyDict_SetItemString(ans, "datetime", datetimelist);
+    PyDict_SetItemString_Steal(ans, "datetime", datetimelist);
 
     foreach(RideFile::SeriesType pseries, series) {
 
@@ -2393,9 +2393,19 @@ Bindings::seasonPeaks(bool all, DateRange range, QString filter, QList<RideFile:
             }
 
             // add to the dict
-            PyDict_SetItemString(ans, name.toUtf8().constData(), list);
+            PyDict_SetItemString_Steal(ans, name.toUtf8().constData(), list);
         }
     }
 
     return ans;
+}
+
+
+int
+Bindings::PyDict_SetItemString_Steal
+(PyObject *p, const char *key, PyObject *val) const
+{
+    int ret = PyDict_SetItemString(p, key, val);
+    Py_DECREF(val);
+    return ret;
 }
