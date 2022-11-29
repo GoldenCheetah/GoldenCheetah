@@ -1418,7 +1418,7 @@ Se scegli di copiare nella libreria il file verrà copiato nella libreria Golden
     <message>
         <location filename="../../Gui/Perspective.cpp" line="1901"/>
         <source>Switch expression</source>
-        <translation>Cambia espessione</translation>
+        <translation>Cambia espressione</translation>
     </message>
     <message>
         <location filename="../../Gui/Perspective.cpp" line="1902"/>
@@ -12249,7 +12249,10 @@ E&apos; NECESSARIA UNA CONNESSIONE INTERNET.</translation>
 Elevation data is provided by Open-Elevation.com public API, consider a donation if you find it useful.
 
 INTERNET CONNECTION REQUIRED.</source>
-        <translation type="unfinished"></translation>
+        <translation>Corregge o aggiunge i dati della quota. Se i dati della quota sono presenti, saranno rimossi e sostituiti.
+I dati della quota sono forniti dalle API pubbliche di Open-Elevation.com; se le trovi utili, considera una donazione.
+
+È NECESSARIA LA CONNESSIONE A INTERNET.</translation>
     </message>
 </context>
 <context>
@@ -14621,12 +14624,12 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Gui/GcWindowRegistry.cpp" line="83"/>
         <source>Activity Overview</source>
-        <translation type="unfinished"></translation>
+        <translation>Panoramica Attività</translation>
     </message>
     <message>
         <location filename="../../Gui/GcWindowRegistry.cpp" line="84"/>
         <source>Blank Overview</source>
-        <translation type="unfinished"></translation>
+        <translation>Panoramica Vuota</translation>
     </message>
     <message>
         <location filename="../../Gui/GcWindowRegistry.cpp" line="85"/>
@@ -14691,12 +14694,12 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Gui/GcWindowRegistry.cpp" line="74"/>
         <source>Season Overview</source>
-        <translation type="unfinished"></translation>
+        <translation>Panoramica Stagione</translation>
     </message>
     <message>
         <location filename="../../Gui/GcWindowRegistry.cpp" line="75"/>
         <source>Blank Overview </source>
-        <translation type="unfinished"></translation>
+        <translation>Panoramica Vuota</translation>
     </message>
     <message>
         <location filename="../../Gui/GcWindowRegistry.cpp" line="97"/>
@@ -15411,7 +15414,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="61"/>
         <source>More Help</source>
-        <translation>UlteriorI Aiuti</translation>
+        <translation>Ulteriori Aiuti</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="75"/>
@@ -15499,7 +15502,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="77"/>
         <source>Analysis of a single activity with diagrams like activity plot, W&apos;bal, ... and Chung&apos;s Aerolab</source>
-        <translation>Analisi di una singlo attività con diagrammi come grafico attività, W&apos; bal, ...and Aerolab di Chung</translation>
+        <translation>Analisi di una singola attività con diagrammi come grafico attività, W&apos; bal, ...e Aerolab di Chung</translation>
     </message>
     <message>
         <source>Activate / De-activate the Compare Pane - which allows to compare activities, intervals or date ranges - also across athletes</source>
@@ -15523,7 +15526,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="67"/>
         <source>Table of Contents</source>
-        <translation type="unfinished"></translation>
+        <translation>Sommario</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="71"/>
@@ -15548,27 +15551,28 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="87"/>
         <source>Navigate backward</source>
-        <translation type="unfinished"></translation>
+        <translation>Naviga indietro</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="89"/>
         <source>Navigate forward</source>
-        <translation type="unfinished"></translation>
+        <translation>Naviga avanti</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="91"/>
         <source>Select active perspective for the current view, create new perspectives and manage existing ones</source>
-        <translation type="unfinished"></translation>
+        <translation>Scegli la prospettiva per la vista corrente, crea nuove prospettive e gestisci quelle esistenti</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="95"/>
         <source>Activate / De-activate the Compare Pane - which allows to compare activities and intervals in Activities View or date ranges in Trends View - also across athletes. In Train View it shows/hide the Intensity Adjustments and Workout Control Pane.</source>
-        <translation type="unfinished"></translation>
+        <translation>Attiva / Disattiva il Pannello di Confronto - il quale permette di confrontare attività e intervalli in Attività, o intervalli di date in Trends - anche tra atleti differenti.
+In modalità Allenamento, visualizza/nasconde la Regolazione Intensità e il Pannello di Controllo dell&apos;Allenamento.</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="97"/>
         <source>Changes the current view layout between Tabbed and Tiled</source>
-        <translation type="unfinished"></translation>
+        <translation>Cambia il layout della vista corrente tra &quot;A schede&quot; e &quot;Affiancato&quot;</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="122"/>
@@ -18191,13 +18195,13 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Metrics/Coggan.cpp" line="45"/>
         <source>IsoPower</source>
-        <translation type="unfinished">IsoPower</translation>
+        <translation>IsoPower</translation>
     </message>
     <message>
         <location filename="../../Metrics/Coggan.cpp" line="47"/>
         <location filename="../../Metrics/Coggan.cpp" line="48"/>
         <source>watts</source>
-        <translation type="unfinished"></translation>
+        <translation>watts</translation>
     </message>
     <message>
         <location filename="../../Metrics/Coggan.cpp" line="50"/>
@@ -20275,7 +20279,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Core/DataFilter.cpp" line="1991"/>
         <source>round(v) or round(v, dp)</source>
-        <translation type="unfinished"></translation>
+        <translation>round(v) o round(v, dp)</translation>
     </message>
     <message>
         <location filename="../../Core/DataFilter.cpp" line="2005"/>
@@ -20432,12 +20436,12 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Core/DataFilter.cpp" line="2281"/>
         <source>%1(name|date|priority|description)</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../Core/DataFilter.cpp" line="2289"/>
         <source>invalid symbol &apos;%1&apos;, should be &apos;name|date|priority|description&apos;&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>simbolo &apos;%1&apos; non valido, dovrebbe essere &apos;name|date|priority|description&apos;&apos;</translation>
     </message>
     <message>
         <location filename="../../Core/DataFilter.cpp" line="2597"/>
@@ -24843,12 +24847,12 @@ Nessuna uscita in bici trovata da importare.
     <message>
         <location filename="../../Charts/Overview.cpp" line="42"/>
         <source>Settings...</source>
-        <translation type="unfinished">Impostazioni...</translation>
+        <translation>Impostazioni...</translation>
     </message>
     <message>
         <location filename="../../Charts/Overview.cpp" line="53"/>
         <source>Minimum Columns</source>
-        <translation type="unfinished"></translation>
+        <translation>N. minimo colonne</translation>
     </message>
     <message>
         <location filename="../../Charts/Overview.cpp" line="130"/>
@@ -24980,17 +24984,17 @@ Nessuna uscita in bici trovata da importare.
     <message>
         <location filename="../../Metrics/PDModel.cpp" line="213"/>
         <source>RMSE %1w CV %4% R&lt;sup&gt;2&lt;/sup&gt;=%3 [LR] %2 points</source>
-        <translation type="unfinished"></translation>
+        <translation>RMSE %1w CV %4% R&lt;sup&gt;2&lt;/sup&gt;=%3 [LR] %2 punti</translation>
     </message>
     <message>
         <location filename="../../Metrics/PDModel.cpp" line="332"/>
         <source>RMSE %1w CV %3% [LM] %2 points</source>
-        <translation type="unfinished"></translation>
+        <translation>RMSE %1w CV %3% [LM] %2 punti</translation>
     </message>
     <message>
         <location filename="../../Metrics/PDModel.cpp" line="479"/>
         <source>RMSE %1w CV %3% [envelope] %2 points</source>
-        <translation type="unfinished"></translation>
+        <translation>RMSE %1w CV %3% [inviluppo] %2 punti</translation>
     </message>
 </context>
 <context>
@@ -28067,7 +28071,7 @@ on and that its display says, &quot;Host&quot;</source>
     <message>
         <location filename="../../Charts/PythonChart.cpp" line="401"/>
         <source>Warning: Python is disabled</source>
-        <translation type="unfinished"></translation>
+        <translation>Attenzione: Python è disabilitato</translation>
     </message>
 </context>
 <context>
@@ -28791,7 +28795,7 @@ Python disabilitato nelle preferenze.</translation>
     <message>
         <location filename="../../Charts/RChart.cpp" line="409"/>
         <source>Warning: R is disabled</source>
-        <translation type="unfinished"></translation>
+        <translation>Attenzione: R è disabilitato</translation>
     </message>
 </context>
 <context>
@@ -33625,17 +33629,17 @@ per la simulazione della velocita&apos; quando e&apos; attiva l&apos;opzione
     <message>
         <location filename="../../Metrics/SpecialFields.cpp" line="59"/>
         <source>VO2max detected</source>
-        <translation type="unfinished"></translation>
+        <translation>VO2max rilevata</translation>
     </message>
     <message>
         <location filename="../../Metrics/SpecialFields.cpp" line="60"/>
         <source>Aerobic Training Effect</source>
-        <translation type="unfinished"></translation>
+        <translation>Effetto Allenamento Aerobico</translation>
     </message>
     <message>
         <location filename="../../Metrics/SpecialFields.cpp" line="61"/>
         <source>Anaerobic Training Effect</source>
-        <translation type="unfinished"></translation>
+        <translation>Effetto Allenamento Anaerobico</translation>
     </message>
     <message>
         <location filename="../../Metrics/SpecialFields.cpp" line="62"/>
@@ -33645,22 +33649,22 @@ per la simulazione della velocita&apos; quando e&apos; attiva l&apos;opzione
     <message>
         <location filename="../../Metrics/SpecialFields.cpp" line="63"/>
         <source>Recovery Time</source>
-        <translation type="unfinished"></translation>
+        <translation>Tempo di Recupero</translation>
     </message>
     <message>
         <location filename="../../Metrics/SpecialFields.cpp" line="64"/>
         <source>Performance Condition</source>
-        <translation type="unfinished"></translation>
+        <translation>Condizione di Prestazione</translation>
     </message>
     <message>
         <location filename="../../Metrics/SpecialFields.cpp" line="65"/>
         <source>LTHR detected</source>
-        <translation type="unfinished"></translation>
+        <translation>LTHR rilevata</translation>
     </message>
     <message>
         <location filename="../../Metrics/SpecialFields.cpp" line="66"/>
         <source>LTS detected</source>
-        <translation type="unfinished"></translation>
+        <translation>LTS rilevata</translation>
     </message>
     <message>
         <location filename="../../Metrics/SpecialFields.cpp" line="31"/>
@@ -34806,12 +34810,12 @@ Se la nuova attività è in conflitto con un&apos;attività pre-esistente (stess
     <message>
         <location filename="../../Gui/Colors.cpp" line="797"/>
         <source>Modern Stealth Dark</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../Gui/Colors.cpp" line="819"/>
         <source>Modern Stealth Light</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../Gui/Colors.cpp" line="840"/>
@@ -35407,7 +35411,7 @@ della bicicletta virtuale.</translation>
     <message>
         <location filename="../../Gui/Pages.cpp" line="747"/>
         <source>Allow multiple devices in Train View</source>
-        <translation>Consenti multipli dispositivi in modalità Allena</translation>
+        <translation>Consenti dispositivi multipli in modalità Allena</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="750"/>
@@ -36356,7 +36360,7 @@ Premi F3 sul Controller quando finito.</translation>
         <location filename="../../Charts/UserChart.cpp" line="830"/>
         <location filename="../../Charts/UserChart.cpp" line="832"/>
         <source>Background</source>
-        <translation type="unfinished"></translation>
+        <translation>Colore Sfondo</translation>
     </message>
     <message>
         <source>Scale</source>
