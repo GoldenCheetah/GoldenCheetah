@@ -722,6 +722,11 @@ AbstractView::setPerspectives(QComboBox *perspectiveSelector, bool selectChart)
     perspectiveSelector->insertSeparator(perspectives_.count());
     perspectiveactive=false;
 
+    // Select current perspective to keep perspectiveSelector synced
+    // when switching between athlete tabs
+    int index = perspectives_.indexOf(perspective_);
+    if (index >= 0) perspectiveSelector->setCurrentIndex(index);
+
     // if we only just loaded the charts and views, we need to select
     // one to get the ride item and date range selected
     if (!loaded || selectChart) {
