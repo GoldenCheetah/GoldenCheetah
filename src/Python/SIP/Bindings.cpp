@@ -912,7 +912,9 @@ Bindings::activityMetrics(bool compare) const
                 if (p.isChecked()) {
 
                     // create a tuple (metrics, color)
-                    PyObject* tuple = Py_BuildValue("(Os)", activityMetrics(p.rideItem), p.color.name().toUtf8().constData());
+                    PyObject* am = activityMetrics(p.rideItem);
+                    PyObject* tuple = Py_BuildValue("(Os)", am, p.color.name().toUtf8().constData());
+                    Py_DECREF(am);
                     PyList_SET_ITEM(list, idx++, tuple);
                 }
             }
@@ -925,7 +927,9 @@ Bindings::activityMetrics(bool compare) const
             RideItem *item = const_cast<RideItem*>(context->currentRideItem());
             PyObject* list = PyList_New(1);
 
-            PyObject* tuple = Py_BuildValue("(Os)", activityMetrics(item), "#FF00FF");
+            PyObject* am = activityMetrics(item);
+            PyObject* tuple = Py_BuildValue("(Os)", am, "#FF00FF");
+            Py_DECREF(am);
             PyList_SET_ITEM(list, 0, tuple);
 
             return list;
@@ -1048,7 +1052,9 @@ Bindings::seasonMetrics(bool all, QString filter, bool compare) const
                 if (p.isChecked()) {
 
                     // create a tuple (metrics, color)
-                    PyObject* tuple = Py_BuildValue("(Os)", seasonMetrics(all, DateRange(p.start, p.end), filter), p.color.name().toUtf8().constData());
+                    PyObject* sm = seasonMetrics(all, DateRange(p.start, p.end), filter);
+                    PyObject* tuple = Py_BuildValue("(Os)", sm, p.color.name().toUtf8().constData());
+                    Py_DECREF(sm);
                     // add to back and move on
                     PyList_SET_ITEM(list, idx++, tuple);
                 }
@@ -1063,7 +1069,9 @@ Bindings::seasonMetrics(bool all, QString filter, bool compare) const
 
             // create a tuple (metrics, color)
             DateRange range = context->currentDateRange();
-            PyObject* tuple = Py_BuildValue("(Os)", seasonMetrics(all, range, filter), "#FF00FF");
+            PyObject* sm = seasonMetrics(all, range, filter);
+            PyObject* tuple = Py_BuildValue("(Os)", sm, "#FF00FF");
+            Py_DECREF(sm);
             // add to back and move on
             PyList_SET_ITEM(list, 0, tuple);
 
@@ -1240,7 +1248,9 @@ Bindings::seasonIntervals(QString type, bool compare) const
                 if (p.isChecked()) {
 
                     // create a tuple (metrics, color)
-                    PyObject* tuple = Py_BuildValue("(Os)", seasonIntervals(DateRange(p.start, p.end), type), p.color.name().toUtf8().constData());
+                    PyObject* si = seasonIntervals(DateRange(p.start, p.end), type);
+                    PyObject* tuple = Py_BuildValue("(Os)", si, p.color.name().toUtf8().constData());
+                    Py_DECREF(si);
                     // add to back and move on
                     PyList_SET_ITEM(list, idx++, tuple);
                 }
@@ -1255,7 +1265,9 @@ Bindings::seasonIntervals(QString type, bool compare) const
 
             // create a tuple (metrics, color)
             DateRange range = context->currentDateRange();
-            PyObject* tuple = Py_BuildValue("(Os)", seasonIntervals(range, type), "#FF00FF");
+            PyObject* si = seasonIntervals(range, type);
+            PyObject* tuple = Py_BuildValue("(Os)", si, "#FF00FF");
+            Py_DECREF(si);
             // add to back and move on
             PyList_SET_ITEM(list, 0, tuple);
 
@@ -1805,7 +1817,9 @@ Bindings::activityMeanmax(bool compare) const
                 if (p.isChecked()) {
 
                     // create a tuple (meanmax, color)
-                    PyObject* tuple = Py_BuildValue("(Os)", activityMeanmax(p.rideItem), p.color.name().toUtf8().constData());
+                    PyObject* am = activityMeanmax(p.rideItem);
+                    PyObject* tuple = Py_BuildValue("(Os)", am, p.color.name().toUtf8().constData());
+                    Py_DECREF(am);
                     PyList_SET_ITEM(list, idx++, tuple);
                 }
             }
@@ -1817,7 +1831,9 @@ Bindings::activityMeanmax(bool compare) const
             if (context->currentRideItem()==NULL) return NULL;
             PyObject* list = PyList_New(1);
 
-            PyObject* tuple = Py_BuildValue("(Os)", activityMeanmax(context->currentRideItem()), "#FF00FF");
+            PyObject* am = activityMeanmax(context->currentRideItem());
+            PyObject* tuple = Py_BuildValue("(Os)", am, "#FF00FF");
+            Py_DECREF(am);
             PyList_SET_ITEM(list, 0, tuple);
 
             return list;
@@ -1856,7 +1872,9 @@ Bindings::seasonMeanmax(bool all, QString filter, bool compare) const
                 if (p.isChecked()) {
 
                     // create a tuple (meanmax, color)
-                    PyObject* tuple = Py_BuildValue("(Os)", seasonMeanmax(all, DateRange(p.start, p.end), filter), p.color.name().toUtf8().constData());
+                    PyObject* sm = seasonMeanmax(all, DateRange(p.start, p.end), filter);
+                    PyObject* tuple = Py_BuildValue("(Os)", sm, p.color.name().toUtf8().constData());
+                    Py_DECREF(sm);
                     // add to back and move on
                     PyList_SET_ITEM(list, idx++, tuple);
                 }
@@ -1871,7 +1889,9 @@ Bindings::seasonMeanmax(bool all, QString filter, bool compare) const
 
             // create a tuple (meanmax, color)
             DateRange range = context->currentDateRange();
-            PyObject* tuple = Py_BuildValue("(Os)", seasonMeanmax(all, range, filter), "#FF00FF");
+            PyObject* sm = seasonMeanmax(all, range, filter);
+            PyObject* tuple = Py_BuildValue("(Os)", sm, "#FF00FF");
+            Py_DECREF(sm);
             // add to back and move on
             PyList_SET_ITEM(list, 0, tuple);
 
@@ -2269,7 +2289,9 @@ Bindings::seasonPeaks(QString series, int duration, bool all, QString filter, bo
                 if (p.isChecked()) {
 
                     // create a tuple (peaks, color)
-                    PyObject* tuple = Py_BuildValue("(Os)", seasonPeaks(all, DateRange(p.start, p.end), filter, seriesList, durations), p.color.name().toUtf8().constData());
+                    PyObject* sp = seasonPeaks(all, DateRange(p.start, p.end), filter, seriesList, durations);
+                    PyObject* tuple = Py_BuildValue("(Os)", sp, p.color.name().toUtf8().constData());
+                    Py_DECREF(sp);
                     // add to back and move on
                     PyList_SET_ITEM(list, idx++, tuple);
                 }
@@ -2284,7 +2306,9 @@ Bindings::seasonPeaks(QString series, int duration, bool all, QString filter, bo
 
             // create a tuple (peaks, color)
             DateRange range = context->currentDateRange();
-            PyObject* tuple = Py_BuildValue("(Os)", seasonPeaks(all, range, filter, seriesList, durations), "#FF00FF");
+            PyObject* sp = seasonPeaks(all, range, filter, seriesList, durations);
+            PyObject* tuple = Py_BuildValue("(Os)", sp, "#FF00FF");
+            Py_DECREF(sp);
             // add to back and move on
             PyList_SET_ITEM(list, 0, tuple);
 
