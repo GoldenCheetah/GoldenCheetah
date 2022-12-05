@@ -338,6 +338,10 @@ Strava::writeFile(QByteArray &data, QString remotename, RideFile *ride)
       activityTypePart.setBody("NordicSki");
     else if (ride->sport() == "Gym")
       activityTypePart.setBody("WeightTraining");
+    else if (ride->sport() == "Walking")
+      activityTypePart.setBody("Walk");
+    else if (ride->xdata("TRAIN") && ride->isDataPresent(RideFile::lat))
+      activityTypePart.setBody("VirtualRide");
     else
       activityTypePart.setBody("Ride");
     multiPart->append(activityTypePart);
@@ -381,7 +385,7 @@ Strava::writeFile(QByteArray &data, QString remotename, RideFile *ride)
     trainerPart.setHeader(QNetworkRequest::ContentDispositionHeader,
                           QVariant("form-data; name=\"trainer\""));
     trainerPart.setBody((ride->getTag("Trainer", "0").toInt() ||
-                         ride->xdata("TRAIN")) ? "1" : "0");
+                         ride->xdata("TRAIN") && !ride->isDataPresent(RideFile::lat)) ? "1" : "0");
     multiPart->append(trainerPart);
 
     if (manual) {
@@ -897,6 +901,7 @@ Strava::prepareResponse(QByteArray* data)
             else if (stype.endsWith("Rowing")) ride->setTag("Sport", "Row");
             else if (stype.endsWith("Ski")) ride->setTag("Sport", "Ski");
             else if (stype.startsWith("Weight")) ride->setTag("Sport", "Gym");
+            else if (stype.endsWith("Walk")) ride->setTag("Sport", "Walking");
             else ride->setTag("Sport", stype);
             // Set SubSport to preserve the original when Sport was mapped
             if (stype != ride->getTag("Sport", "")) ride->setTag("SubSport", stype);
