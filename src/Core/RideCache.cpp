@@ -479,7 +479,7 @@ RideCache::nextRefresh()
 
     if (updates < 0) {
         returning = -1; // force termination by returning -1
-    } else if (updates < reverse_.count()-1) {
+    } else if (updates < reverse_.count()) {
         returning = updates;
         updates++;
         progressing(returning);
@@ -544,7 +544,6 @@ RideCache::refresh()
     int staleCount = 0;
 
     foreach(RideItem *item, rides_) {
-
         // ok set stale so we refresh
         if (item->checkStale())
             staleCount++;
@@ -867,7 +866,7 @@ void RideCacheRefreshThread::run()
     while (1) {
 
         int n = cache->nextRefresh();
-        //fprintf(stderr, "refreshing %d of %d\n", n, cache->reverse_.count()); fflush(stderr);
+        //fprintf(stderr, "refreshing %d of %d\n", n+1, cache->reverse_.count()); fflush(stderr);
         if (n<0) {
             //fprintf(stderr, "worker thread exits!\n"); fflush(stderr);
             goto exitthread;
