@@ -115,7 +115,7 @@
 #define VERSION33_BUILD   3933 // development release
 #define VERSION34_BUILD   3955 // released
 #define VERSION35_BUILD   3990 // released
-#define VERSION36_BUILD   4011 // second release candidate
+#define VERSION36_BUILD   4012 // third release candidate
 
 // will keep changing during testing and before final release
 #define VERSION31_BUILD VERSION31_UPG
