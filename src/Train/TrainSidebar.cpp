@@ -2027,14 +2027,14 @@ void TrainSidebar::newLap()
 {
     qDebug() << "running:" << (status&RT_RUNNING) << "paused:" << (status&RT_PAUSED);
 
-    if ((status&RT_RUNNING) && ((status&RT_PAUSED) == 0)) {
+    if ((status&RT_RUNNING) && ((status&RT_PAUSED) == 0) &&
+        ergFileQueryAdapter.addNewLap(displayWorkoutDistance * 1000.) >= 0) {
 
         pwrcount  = 0;
         cadcount  = 0;
         hrcount   = 0;
         spdcount  = 0;
 
-        ergFileQueryAdapter.addNewLap(displayWorkoutDistance * 1000.);
         
         resetTextAudioEmitTracking();
         maintainLapDistanceState();
@@ -2695,7 +2695,7 @@ void TrainSidebar::RewindLap()
         lapmarker = ergFileQueryAdapter.prevLap(target);
 
         // Go to slightly before lap marker so the lap transition message will be displayed.
-        lapmarker = std::max(0., lapmarker - 10.1);
+        if (lapmarker >= 0.) lapmarker = std::max(0., lapmarker - 10.1);
 
         if (lapmarker >= 0.) displayWorkoutDistance = lapmarker / 1000; // jump to lapmarker
     }
