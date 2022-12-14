@@ -341,7 +341,7 @@ Bindings::athleteZones(PyObject* date, QString sport) const
 
         foreach(gcZoneConfig x, config) {
 
-            if (x.sport == sp && (sport=="" || sport==sp)) {
+            if (x.sport == sp && (sport=="" || QString::compare(sport, sp, Qt::CaseInsensitive)==0)) {
 
                 // new date so save what we have collected
                 if (x.date > last.date) {

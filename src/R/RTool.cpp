@@ -682,7 +682,7 @@ RTool::zones(SEXP pDate, SEXP pSport)
 
         foreach(gcZoneConfig x, config) {
 
-            if (x.sport == sp && (want=="" || want==sp)) {
+            if (x.sport == sp && (want=="" || QString::compare(want, sp, Qt::CaseInsensitive)==0)) {
 
                 // new date so save what we have collected
                 if (x.date > last.date) {
