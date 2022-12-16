@@ -189,7 +189,7 @@
        <RelativeSize Width="25.0" Height="45.0" />
        <RelativePosition X="12.0" Y="20.0" />
        <Zoom>16</Zoom>
-       <osmURL>http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png</osmURL>
+       <osmURL>https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png</osmURL>
    </meter>
 </layout>
 

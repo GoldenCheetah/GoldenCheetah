@@ -85,7 +85,7 @@ LiveMapWebPageWindow::LiveMapWebPageWindow(Context *context) : GcChartWindow(con
     customUrl = new QLineEdit(this);
     customUrl->setFixedWidth(600);
 
-    if (customUrl->text() == "") customUrl->setText("https://tile.thunderforest.com/cycle/{z}/{x}/{y}.png?apikey=<YOUR_API_KEY>");
+    if (customUrl->text().trimmed().isEmpty()) customUrl->setText("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png");
     commonLayout->addRow(customUrlLabel, customUrl);
 
     connect(customUrl, SIGNAL(returnPressed()), this, SLOT(userUrl()));
@@ -171,7 +171,7 @@ void LiveMapWebPageWindow::ergFileSelected(ErgFile* f)
             // So we create divs with the 2 methods we need to run when the document loads
             code = QString("showRoute (" + routeLatLngs + ");");
             js += ("<div><script type=\"text/javascript\">" + code + "</script></div>\n");
-            if (customUrl->text() == "") customUrl->setText("https://tile.thunderforest.com/cycle/{z}/{x}/{y}.png?apikey=<YOUR_API_KEY>");
+            if (customUrl->text().trimmed().isEmpty()) customUrl->setText("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png");
             createHtml(customUrl->text(), js);
             view->page()->setHtml(currentPage);
         }
