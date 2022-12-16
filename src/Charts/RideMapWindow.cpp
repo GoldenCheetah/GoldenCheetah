@@ -98,7 +98,7 @@ RideMapWindow::RideMapWindow(Context *context, int mapType) : GcChartWindow(cont
     tileCombo->addItem(tr("Custom Tile Server C"), QVariant(30));
 
     osmTSUrl = new QLineEdit("");
-    osmTSUrl->setFixedWidth(250);
+    osmTSUrl->setFixedWidth(600);
 
     gkey = new QLineEdit("");
     gkeylabel = new QLabel(tr("Google API key"));
@@ -220,7 +220,7 @@ RideMapWindow::setTileServerUrlForTileType(int x)
         ts = appsettings->cvalue(context->athlete->cyclist, GC_OSM_TS_DEFAULT, "").toString();
         // set/save the default if necessary
         if (ts.isEmpty()) {
-           ts = "http://{s}.tile.openstreetmap.org";
+           ts = "https://{s}.tile.openstreetmap.org";
            appsettings->setCValue(context->athlete->cyclist, GC_OSM_TS_DEFAULT, ts);
         }
         break;
@@ -228,7 +228,7 @@ RideMapWindow::setTileServerUrlForTileType(int x)
         ts = appsettings->cvalue(context->athlete->cyclist, GC_OSM_TS_A, "").toString();
         // set/save some useful default if empty
         if (ts.isEmpty()) {
-           ts = "http://{s}.tile.openstreetmap.de";
+           ts = "https://{s}.tile.openstreetmap.de";
            appsettings->setCValue(context->athlete->cyclist, GC_OSM_TS_A, ts);
         }
         break;
@@ -236,7 +236,7 @@ RideMapWindow::setTileServerUrlForTileType(int x)
         ts = appsettings->cvalue(context->athlete->cyclist, GC_OSM_TS_B, "").toString();
         // set/save some useful default if empty
         if (ts.isEmpty()) {
-           ts = "http://{s}.tile.openstreetmap.fr/osmfr";
+           ts = "https://{s}.tile.openstreetmap.fr/osmfr";
            appsettings->setCValue(context->athlete->cyclist, GC_OSM_TS_B, ts);
         }
         break;
@@ -244,7 +244,7 @@ RideMapWindow::setTileServerUrlForTileType(int x)
         ts = appsettings->cvalue(context->athlete->cyclist, GC_OSM_TS_C, "").toString();
         // set/save some useful default if empty
         if (ts.isEmpty()) {
-           ts = "https://{s}.tile.opentopomap.org";
+           ts = "https://tile.thunderforest.com/cycle";
            appsettings->setCValue(context->athlete->cyclist, GC_OSM_TS_C, ts);
         }
         break;
