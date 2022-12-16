@@ -18,6 +18,7 @@
  */
 
 #include "RealtimeData.h"
+#include "RideFile.h"
 
 #include <QtDebug>
 
@@ -28,7 +29,8 @@ RealtimeData::RealtimeData()
     cadence = distance = altDistance = virtualSpeed = wbal = 0.0;
     lap = msecs = lapMsecs = lapMsecsRemaining = ergMsecsRemaining = 0;
     thb = smo2 = o2hb = hhb = 0.0;
-    lrbalance = rte = lte = lps = rps = 0.0;
+    lrbalance = RideFile::NA;
+    rte = lte = lps = rps = 0.0;
     latitude = longitude = altitude = 0.0;
     rf = rmv = vo2 = vco2 = tv = feo2 = 0.0;
     routeDistance = distanceRemaining = 0.0;

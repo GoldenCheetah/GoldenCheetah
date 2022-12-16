@@ -27,6 +27,7 @@
 #include "DeviceConfiguration.h"
 #include "RideImportWizard.h"
 #include "HelpWhatsThis.h"
+#include "RideFile.h"
 #include <QApplication>
 #include <QtGui>
 #include <QRegExp>
@@ -365,7 +366,8 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
     displayWorkoutDistance = displayDistance = displayPower = displayHeartRate =
     displaySpeed = displayCadence = slope = load = 0;
     displaySMO2 = displayTHB = displayO2HB = displayHHB = 0;
-    displayLRBalance = displayLTE = displayRTE = displayLPS = displayRPS = 0;
+    displayLRBalance = RideFile::NA;
+    displayLTE = displayRTE = displayLPS = displayRPS = 0;
     displayLatitude = displayLongitude = displayAltitude = 0.0;
 
     connect(gui_timer, SIGNAL(timeout()), this, SLOT(guiUpdate()));
