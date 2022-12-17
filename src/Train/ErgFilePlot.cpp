@@ -19,6 +19,7 @@
 #include "ErgFilePlot.h"
 #include "WPrime.h"
 #include "Context.h"
+#include "Units.h"
 
 #include <unordered_map>
 
@@ -26,7 +27,9 @@
 // create a separate array for the ergfile data, we plot
 // directly from the ErgFile points array
 double ErgFileData::x(size_t i) const {
-    if (context->currentErgFile()) return context->currentErgFile()->Points.at(i).x;
+    // convert if bydist using imperial units
+    double unitsFactor = (!bydist || GlobalContext::context()->useMetricUnits) ? 1.0 : MILES_PER_KM;
+    if (context->currentErgFile()) return context->currentErgFile()->Points.at(i).x * unitsFactor;
     else return 0;
 }
 
@@ -62,9 +65,11 @@ QRectF ErgFileData::boundingRect() const
     return QRectF(0,0,0,0);
 }
 
-
 // Now bar
-double NowData::x(size_t) const { return context->getNow(); }
+double NowData::x(size_t) const { 
+    if (!bydist || GlobalContext::context()->useMetricUnits) return context->getNow();
+    else return context->getNow() * MILES_PER_KM;
+}
 double NowData::y(size_t i) const {
     if (i) {
         if (context->currentErgFile()) return context->currentErgFile()->maxY;
@@ -431,6 +436,8 @@ ErgFilePlot::setData(ErgFile *ergfile)
 
         // is this by distance or time?
         bydist = (ergfile->format == CRS) ? true : false;
+        nowData->setByDist(bydist);
+        lodData->setByDist(bydist);
 
         if (bydist == true) {
 
@@ -514,7 +521,10 @@ ErgFilePlot::setData(ErgFile *ergfile)
             add->setLineStyle(QwtPlotMarker::VLine);
             add->setLinePen(QPen(GColor(CPLOTMARKER), 0, Qt::DashDotLine));
             add->setLabelAlignment(labelAlignment);
-            add->setValue(lap.x, 0);
+            // convert to imperial according to settings
+            double unitsFactor = (!bydist || GlobalContext::context()->useMetricUnits) ? 1.0 : MILES_PER_KM;
+            add->setValue(lap.x * unitsFactor, 0);
+            
             add->setLabel(text);
             add->attach(this);
 
@@ -526,18 +536,17 @@ ErgFilePlot::setData(ErgFile *ergfile)
             double maxX = (double)context->currentErgFile()->Points.last().x;
 
             if (bydist) {
-
-                // tics every 5 kilometer, if workout shorter tics every 1000m
+                if (!GlobalContext::context()->useMetricUnits) maxX *= MILES_PER_KM;
                 double step = 5000;
+                // tics every 5 kilometers/miles, if workout shorter tics every 1 km/mi
                 if (maxX <= 1000) step = 100;
                 else if (maxX < 5000) step = 1000;
 
                 // axis setup for distance
                 setAxisScale(xBottom, (double)0, maxX, step);
-
                 QwtText title;
                 title.setFont(stGiles);
-                title.setText("Distance (km)");
+                title.setText("Distance " + ((GlobalContext::context()->useMetricUnits) ? tr("(km)") : tr("(mi)")));
                 QwtPlot::setAxisFont(xBottom, stGiles);
                 QwtPlot::setAxisTitle(xBottom, title);
 
@@ -553,7 +562,6 @@ ErgFilePlot::setData(ErgFile *ergfile)
 
                 // tics every 15 minutes, if workout shorter tics every minute
                 setAxisScale(xBottom, (double)0, maxX, maxX > (15*60*1000) ? 15*60*1000 : 60*1000);
-
                 QwtText title;
                 title.setFont(stGiles);
                 title.setText("Time (mins)");
@@ -618,10 +626,9 @@ ErgFilePlot::performancePlot(RealtimeData rtdata)
     // don't update this plot if we are not running or are paused
     if ((!context->isRunning) || (context->isPaused)) return;
 
-    // we got some data
-    // x is plotted in meters or micro-seconds
-    double x = bydist ? (rtdata.getDistance() * 1000) : rtdata.getMsecs();
-
+    // we got some data, convert if bydist using imperial units
+    double x = bydist ? rtdata.getDistance() * 1000 * (GlobalContext::context()->useMetricUnits ? 1.0 : MILES_PER_KM)
+                      : rtdata.getMsecs();
     // when not using a workout we need to extend the axis when we
     // go out of bounds -- we do not use autoscale for x, because we
     // want to control stepping and tick marking add another 30 mins

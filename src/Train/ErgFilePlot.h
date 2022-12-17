@@ -54,9 +54,12 @@ class ErgFileData : public QwtPointArrayData
     double x(size_t i) const ;
     double y(size_t i) const ;
     size_t size() const ;
+    void setByDist(bool bd) { bydist = bd; };
+    bool byDist() const { return bydist; };
 
     private:
     Context *context;
+    bool bydist;
 
     virtual QPointF sample(size_t i) const;
     virtual QRectF boundingRect() const;
@@ -69,10 +72,13 @@ class NowData : public QwtPointArrayData
     double x(size_t i) const ;
     double y(size_t i) const ;
     size_t size() const ;
+    void setByDist(bool bd) { bydist = bd; };
+    bool byDist() const { return bydist; };
 
     void init() ;
     private:
     Context *context;
+    bool bydist;
 
     virtual QPointF sample(size_t i) const;
     //virtual QRectF boundingRect() const;
