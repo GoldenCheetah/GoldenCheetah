@@ -27,7 +27,9 @@
 // create a separate array for the ergfile data, we plot
 // directly from the ErgFile points array
 double ErgFileData::x(size_t i) const {
-    if (context->currentErgFile()) return context->currentErgFile()->Points.at(i).x;
+    // convert if bydist using imperial units
+    double unitsFactor = (!bydist || GlobalContext::context()->useMetricUnits) ? 1.0 : MILES_PER_KM;
+    if (context->currentErgFile()) return context->currentErgFile()->Points.at(i).x * unitsFactor;
     else return 0;
 }
 
@@ -65,10 +67,8 @@ QRectF ErgFileData::boundingRect() const
 
 // Now bar
 double NowData::x(size_t) const { 
-    if (GlobalContext::context()->useMetricUnits) return context->getNow();
-    // convert 5280 (feet/mile) to a number between 0 and 1000 to be plotted correctly  
-    if ( bydist ) return (context->getNow() * FEET_PER_METER * 1000) / FEET_PER_MILE;
-    else return context->getNow();
+    if (!bydist || GlobalContext::context()->useMetricUnits) return context->getNow();
+    else return context->getNow() * MILES_PER_KM;
 }
 double NowData::y(size_t i) const {
     if (i) {
@@ -436,8 +436,8 @@ ErgFilePlot::setData(ErgFile *ergfile)
 
         // is this by distance or time?
         bydist = (ergfile->format == CRS) ? true : false;
-        nowData->byDist() = bydist;
-        lodData->byDist() = bydist;
+        nowData->setByDist(bydist);
+        lodData->setByDist(bydist);
 
         if (bydist == true) {
 
@@ -521,12 +521,9 @@ ErgFilePlot::setData(ErgFile *ergfile)
             add->setLineStyle(QwtPlotMarker::VLine);
             add->setLinePen(QPen(GColor(CPLOTMARKER), 0, Qt::DashDotLine));
             add->setLabelAlignment(labelAlignment);
-            if (bydist == true) {
-            // convert 5280 (feet/mile) to a number between 0 and 1000 to be plotted correctly 
-                double plotFeetOrMeters = (GlobalContext::context()->useMetricUnits) ? lap.x : (lap.x * FEET_PER_METER * 1000) / FEET_PER_MILE;
-                add->setValue(plotFeetOrMeters, 0);
-            }
-            else add->setValue(lap.x, 0);
+            // convert to imperial according to settings
+            double unitsFactor = (!bydist || GlobalContext::context()->useMetricUnits) ? 1.0 : MILES_PER_KM;
+            add->setValue(lap.x * unitsFactor, 0);
             
             add->setLabel(text);
             add->attach(this);
@@ -539,9 +536,9 @@ ErgFilePlot::setData(ErgFile *ergfile)
             double maxX = (double)context->currentErgFile()->Points.last().x;
 
             if (bydist) {
-                if (!GlobalContext::context()->useMetricUnits) maxX = (double)context->currentErgFile()->Points.last().x * MILES_PER_KM;
+                if (!GlobalContext::context()->useMetricUnits) maxX *= MILES_PER_KM;
                 double step = 5000;
-                // tics every 5 kilometers/miles, if workout shorter tics every 1000m
+                // tics every 5 kilometers/miles, if workout shorter tics every 1 km/mi
                 if (maxX <= 1000) step = 100;
                 else if (maxX < 5000) step = 1000;
 
@@ -629,11 +626,9 @@ ErgFilePlot::performancePlot(RealtimeData rtdata)
     // don't update this plot if we are not running or are paused
     if ((!context->isRunning) || (context->isPaused)) return;
 
-    // we got some data
-    // convert 5280 (feet/mile) to a number between 0 and 1000 to be plotted correctly 
-    double plotFeetOrMeters = (GlobalContext::context()->useMetricUnits) ? rtdata.getDistance() * 1000 : (rtdata.getDistance() * 1000 * FEET_PER_METER * 1000) / FEET_PER_MILE;
-    // x is plotted in meters/feet or micro-seconds
-    double x = bydist ? plotFeetOrMeters : rtdata.getMsecs();
+    // we got some data, convert if bydist using imperial units
+    double x = bydist ? rtdata.getDistance() * 1000 * (GlobalContext::context()->useMetricUnits ? 1.0 : MILES_PER_KM)
+                      : rtdata.getMsecs();
     // when not using a workout we need to extend the axis when we
     // go out of bounds -- we do not use autoscale for x, because we
     // want to control stepping and tick marking add another 30 mins
