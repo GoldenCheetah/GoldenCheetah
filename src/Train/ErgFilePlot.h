@@ -46,6 +46,7 @@
 #include <qwt_point_data.h>
 
 #define DEFAULT_TAU 450
+#define FEET_PER_MILE 5280
 
 class ErgFileData : public QwtPointArrayData
 {
@@ -54,9 +55,12 @@ class ErgFileData : public QwtPointArrayData
     double x(size_t i) const ;
     double y(size_t i) const ;
     size_t size() const ;
+    bool& byDist() { return bydist; };
+    bool byDist() const { return bydist; };
 
     private:
     Context *context;
+    bool bydist;
 
     virtual QPointF sample(size_t i) const;
     virtual QRectF boundingRect() const;
@@ -69,10 +73,13 @@ class NowData : public QwtPointArrayData
     double x(size_t i) const ;
     double y(size_t i) const ;
     size_t size() const ;
+    bool& byDist() { return bydist; };
+    bool byDist() const { return bydist; };
 
     void init() ;
     private:
     Context *context;
+    bool bydist;
 
     virtual QPointF sample(size_t i) const;
     //virtual QRectF boundingRect() const;
