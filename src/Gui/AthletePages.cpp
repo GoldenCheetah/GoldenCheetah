@@ -209,6 +209,7 @@ AboutRiderPage::AboutRiderPage(QWidget *parent, Context *context) : QWidget(pare
     dob = new QDateEdit(this);
     dob->setDate(appsettings->cvalue(context->athlete->cyclist, GC_DOB).toDate());
     dob->setCalendarPopup(true);
+    dob->setDisplayFormat("yyyy/MM/dd");
 
     sex = new QComboBox(this);
     sex->addItem(tr("Male"));
