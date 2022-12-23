@@ -104,7 +104,7 @@
 // 4009 - V3.6 DEVELOPMENT 2110 (NOV 2021) (Pre-release)
 // 4010 - V3.6 DEVELOPMENT 2202 (FEB 2022) (Pre-release RC1)
 // 4011 - V3.6 DEVELOPMENT 2208 (AUG 2022) (Pre-release RC2)
-// 4012 - V3.6 DEVELOPMENT 2208 (OCT 2022) (Pre-release RC3) - triggered 29/10
+// 4012 - V3.6 DEVELOPMENT 2208 (OCT 2022) (Pre-release RC3) - triggered 29/10 - updated snapshot 23/12
 
 #define VERSION3_BUILD    3010 // released
 #define VERSION3_SP1      3030 // released
