@@ -3459,7 +3459,8 @@ struct FitFileReaderState
         // - start altitude of first transition not correct (zero), leads to too high climb figure
         //   i think this is not really a big deal yet
 
-        if (session_tags_.size() < 2) {
+        // check multiple rides are expected and available, otherwise return just the whole activity
+        if (!rides || session_tags_.size() < 2) {
             // just check if it was a run activity and adjust values, like it was done
             // in decoding the session before.
             if (rideFile->isRun()) {
