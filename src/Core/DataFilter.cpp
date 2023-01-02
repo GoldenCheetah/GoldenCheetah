@@ -3677,7 +3677,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
                 fs.addFilter(m->context->isfiltered, m->context->filters);
                 fs.addFilter(m->context->ishomefiltered, m->context->homeFilters);
             }
-            Specification spec;
+            Specification spec(s);
             spec.setFilterSet(fs);
             spec.setDateRange(d);  // current date range selected
 
@@ -3688,66 +3688,9 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
                 // symbol dereference
                 QString symbol=*(leaf->fparms[i]->lvalue.n);
                 QString o_symbol = df->lookupMap.value(symbol,"");
-                RideMetricFactory &factory = RideMetricFactory::instance();
-                const RideMetric *e = factory.rideMetric(o_symbol);
 
-                // loop through
-                double withduration=0;
-                double totalduration=0;
-                double runningtotal=0;
-                double minimum=0;
-                double maximum=0;
-                double count=0;
-
-                // loop through rides for daterange
-                foreach(RideItem *ride, m->context->athlete->rideCache->rides()) {
-
-                    if (!s.pass(ride)) continue; // relies upon the daterange being passed to eval...
-                    if (!spec.pass(ride)) continue; // relies upon the daterange being passed to eval...
-
-
-                    double value=0;
-                    QString asstring;
-                    value =  ride->getForSymbol(df->lookupMap.value(symbol,""), GlobalContext::context()->useMetricUnits);
-
-                    // keep count of time for ride, useful when averaging
-                    count++;
-                    double duration = ride->getForSymbol("workout_time");
-                    totalduration += duration;
-                    withduration += value * duration;
-                    runningtotal += value;
-                    if (count==1) {
-                        minimum = maximum = value;
-                    } else {
-                        if (value <minimum) minimum=value;
-                        if (value >maximum) maximum=value;
-                    }
-                }
-
-                // aggregate results
-                double aggregate=0;
-                switch(e ? e->type() : RideMetric::Average) {
-                case RideMetric::Total:
-                case RideMetric::RunningTotal:
-                    aggregate = runningtotal;
-                    break;
-                default:
-                case RideMetric::Average:
-                    {
-                    // aggregate taking into account duration
-                    aggregate = withduration / totalduration;
-                    break;
-                    }
-                case RideMetric::Low:
-                    aggregate = minimum;
-                    break;
-                case RideMetric::Peak:
-                    aggregate = maximum;
-                    break;
-                }
-
-                // format and return
-                returning.asString() << (e ? e->toString(aggregate) : "(null)");
+                // get metric aggregate from RideCache and return
+                returning.asString() << m->context->athlete->rideCache->getAggregate(o_symbol, spec, GlobalContext::context()->useMetricUnits);
             }
 
             return returning;
