@@ -149,8 +149,10 @@ DialWindow::telemetryUpdate(const RealtimeData &rtData)
         series == RealtimeData::Cadence) {
 
         sum += value;
-        int j = index-(count<average*5?count:average*5);
-        sum -= rolling[(j>=0?j:150+j)];
+        if (count >= average*5) {
+            int j = index - average*5;
+            sum -= rolling[(j>=0?j:150+j)];
+        }
 
         //store value
         rolling[index] = value;
