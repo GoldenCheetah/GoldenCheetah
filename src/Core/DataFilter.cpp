@@ -443,7 +443,7 @@ DataFilter::builtins(Context *context)
         if (i == 30 || i == 95) { // special case 'estimate' and 'estimates' we describe it
 
             if (i==30) { foreach(QString model, pdmodels(context)) returning << "estimate(" + model + ", cp|ftp|w'|pmax|x)"; }
-            if (i==95) { foreach(QString model, pdmodels(context)) returning << "estimates(" + model + ", cp|ftp|w'|pmax|x|date|isrun)"; }
+            if (i==95) { foreach(QString model, pdmodels(context)) returning << "estimates(" + model + ", cp|ftp|w'|pmax|x|date)"; }
 
         } else if (i == 31) { // which example
             returning << "which(x>0, ...)";
@@ -631,7 +631,7 @@ DataFilter::builtins(Context *context)
             returning << "interpolate(linear|cubic|akima|steffen, xvector, yvector, xvalues)";
 
             // 94 resample
-            // 95 estimates (see above) - also Kyle !!!!
+            // 95 estimates
 
         } else if (i == 96) {
 
@@ -2960,7 +2960,7 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
 
                             // check symbol name if it is a symbol
                             if (leaf->fparms[1]->type == Leaf::Symbol) {
-                                QRegExp estimateValidSymbols(name == "estimate" ? "^(cp|ftp|pmax|w')$" : "^(cp|ftp|pmax|w'|date|isrun)", Qt::CaseInsensitive);
+                                QRegExp estimateValidSymbols(name == "estimate" ? "^(cp|ftp|pmax|w')$" : "^(cp|ftp|pmax|w'|date)", Qt::CaseInsensitive);
                                 if (!estimateValidSymbols.exactMatch(*(leaf->fparms[1]->lvalue.n))) {
                                     leaf->inerror = leaf->fparms[1]->inerror = true;
                                     DataFiltererrors << QString(tr("%1 function expects parameter or duration as second parameter")).arg(name);
@@ -6861,7 +6861,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
                         // power estimates in formulas, since the user can just divide by config(weight)
                         // or Athlete_Weight (which takes into account values stored in ride files.
                         // Bike or Run models are used according to activity type
-                        PDEstimate pde = m->context->athlete->getPDEstimateFor(m->dateTime.date(), model, false, m->isRun);
+                        PDEstimate pde = m->context->athlete->getPDEstimateFor(m->dateTime.date(), model, false, m->sport);
 
                         // no model estimate for this date
                         if (pde.parameters.count() == 0) return Result(0);
@@ -6902,11 +6902,17 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
 
                         Result returning(0);
 
+                        // Trends view: sport from included activities
+                        int nActivities, nRides, nRuns, nSwims;
+                        QString sport;
+                        m->context->athlete->rideCache->getRideTypeCounts(s, nActivities, nRides, nRuns, nSwims, sport);
+                        if (sport.isEmpty()) sport = "Bike"; // default to Bike estimates for backward compatibility
+
                         // date range, returning a vector
                         foreach(PDEstimate pde, m->context->athlete->getPDEstimates()) {
 
                             // does it match our criteria?
-                            if (pde.model == model && pde.parameters.count() != 0 && pde.from <= d.to && pde.to >= d.from && pde.wpk==false) {
+                            if (pde.model == model && pde.parameters.count() != 0 && pde.from <= d.to && pde.to >= d.from && pde.wpk==false && pde.sport == sport) {
 
                                 // overlaps, but truncate the dates we return
                                 int dfrom, dto;
@@ -6942,7 +6948,6 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
                                     if (parm == "ftp") v1=v2=pde.FTP;
                                     if (parm == "pmax") v1=v2=pde.PMax;
                                     if (parm == "date") { v1=dfrom; v2=dto; }
-                                    if (parm == "isrun") { v1=v2=pde.run; }
                                 }
 
                                 returning.number() += v1+v2;
@@ -7382,7 +7387,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
                                 }
                             } else {
                                 // look for bests on the same day
-                                Performance onday = m->context->athlete->rideCache->estimator->getPerformanceForDate(m->dateTime.date(), false); //XXX fixme for runs
+                                Performance onday = m->context->athlete->rideCache->estimator->getPerformanceForDate(m->dateTime.date(), m->sport);
                                 if (onday.duration >0) {
                                     double value = wantduration ? onday.duration : onday.power;
                                     returning.number() += value;
@@ -7392,10 +7397,10 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
 
                         } else {
 
-                            FilterSet fs;
+                            Specification spec = s;
+                            FilterSet fs = spec.filterSet();
                             fs.addFilter(m->context->isfiltered, m->context->filters);
                             fs.addFilter(m->context->ishomefiltered, m->context->homeFilters);
-                            Specification spec;
                             spec.setFilterSet(fs);
                             spec.setDateRange(d); // fallback to daterange selected
 
@@ -7421,10 +7426,16 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
 
                             } else {
 
+                                // Trends view: sport from included activities
+                                int nActivities, nRides, nRuns, nSwims;
+                                QString sport;
+                                m->context->athlete->rideCache->getRideTypeCounts(spec, nActivities, nRides, nRuns, nSwims, sport);
+                                if (sport.isEmpty()) sport = "Bike"; // default to Bike estimates for backward compatibility
+
                                 // weekly best performances
                                 QList<Performance> perfs = m->context->athlete->rideCache->estimator->allPerformances();
                                 foreach(Performance p, perfs) {
-                                    if (p.submaximal == false && p.run == false && p.when >= d.from && p.when <= d.to) { // XXX fixme p.run == false
+                                    if (p.submaximal == false && p.sport == sport && p.when >= d.from && p.when <= d.to) {
                                         double value = wantduration ? p.duration : p.power;
                                         returning.number() += value;
                                         returning.asNumeric() << value;
