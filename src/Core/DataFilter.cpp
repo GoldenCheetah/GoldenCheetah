@@ -6515,11 +6515,11 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
                 // return a vector
                 QVector<double> powerindexes;
                 for(int i=0; i<power.asNumeric().count() && i<duration.asNumeric().count(); i++)
-                    powerindexes << powerIndex(power.asNumeric().at(i), duration.asNumeric().at(i), false);
+                    powerindexes << powerIndex(power.asNumeric().at(i), duration.asNumeric().at(i));
                 returning = Result(powerindexes);
             } else {
                 // return a value
-                returning = Result(powerIndex(power.number(), duration.number(), false));
+                returning = Result(powerIndex(power.number(), duration.number()));
             }
             return returning;
         }
