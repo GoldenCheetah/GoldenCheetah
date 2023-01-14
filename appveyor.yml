@@ -59,7 +59,7 @@ cache:
 - jom_1_1_3.zip
 - sip-4.19.8.zip
 - C:\R
-- C:\Python -> src\Python\requirements.txt
+- C:\python37-x64 -> src\Python\requirements.txt
 - c:\tools\vcpkg\installed\
 - qwt
 
@@ -94,13 +94,13 @@ install:
 
 # Get Python embeddable and install packages
 - ps: >-
-    if (-not (Test-Path 'C:\Python')) {
+    if (-not (Test-Path 'C:\python37-x64')) {
       Start-FileDownload "https://www.python.org/ftp/python/3.7.9/python-3.7.9-embed-amd64.zip" Python.zip
-      7z x Python.zip -oC:\Python\
-      echo python37.zip . '' 'import site' | Out-File C:\Python\python37._pth -Encoding ascii
-      mkdir C:\Python\lib\site-packages
+      7z x Python.zip -oC:\python37-x64\
+      echo python37.zip . '' 'import site' | Out-File C:\python37-x64\python37._pth -Encoding ascii
+      mkdir C:\python37-x64\lib\site-packages
       c:\python37-x64\python -m pip install --upgrade pip
-      c:\python37-x64\python -m pip install -r src\Python\requirements.txt -t C:\Python\lib\site-packages
+      c:\python37-x64\python -m pip install -r src\python37-x64\requirements.txt -t C:\python37-x64\lib\site-packages
     }
 
 # Get SIP and and install on Python
@@ -178,8 +178,8 @@ after_build:
 - xcopy /s /i /e /q c:\libs\10_Precompiled_DLL\VLC\win64\plugins plugins
 - copy c:\OpenSSL-v111-Win64\bin\lib*.dll
 - copy c:\OpenSSL-v111-Win64\license.txt "OpenSSL License.txt"
-- xcopy /s /i /e /q C:\Python .
-- copy C:\Python\LICENSE.txt "PYTHON LICENSE.txt"
+- xcopy /s /i /e /q C:\python37-x64 .
+- copy C:\python37-x64\LICENSE.txt "PYTHON LICENSE.txt"
 - copy c:\tools\vcpkg\installed\x64-windows\bin\gsl*.dll
 
 # ReadMe, license and icon files
