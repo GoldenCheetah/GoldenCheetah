@@ -4865,14 +4865,15 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
 
             // returning numbers or strings
             Result returning(0);
+            Result durations(0); // for aggregating
             if (wantstrings) returning.isNumber=false;
 
-            Specification spec = s;
-            FilterSet fs = spec.filterSet();
+            FilterSet fs;
             if (m) {
                 fs.addFilter(m->context->isfiltered, m->context->filters);
                 fs.addFilter(m->context->ishomefiltered, m->context->homeFilters);
             }
+            Specification spec;
             spec.setFilterSet(fs);
 
             // date range can be controlled, if no date range is set then we just
@@ -4904,21 +4905,20 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
             // no ride selected, or none available
             if (m == NULL) return Result(0);
 
-            // return an aggregate?
-            if (wantaggregate) {
-
-                // get aggregate from RideCache and return in the required format
-                if (wantstrings) returning = Result(m->context->athlete->rideCache->getAggregate(o_symbol, spec, GlobalContext::context()->useMetricUnits));
-                else returning = Result(m->context->athlete->rideCache->getAggregate(o_symbol, spec, GlobalContext::context()->useMetricUnits, true).toDouble());
-
-                return returning;
-            }
-
+            // for aggregating
+            double withduration=0;
+            double totalduration=0;
+            double runningtotal=0;
+            double minimum=0;
+            double maximum=0;
+            double count=0;
 
             // loop through rides for daterange
             foreach(RideItem *ride, m->context->athlete->rideCache->rides()) {
 
+                if (!s.pass(ride)) continue; // relies upon the daterange being passed to eval...
                 if (!spec.pass(ride)) continue; // relies upon the daterange being passed to eval...
+
 
                 double value=0;
                 QString asstring;
@@ -4933,12 +4933,53 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
                     if (wantstrings) e ? asstring = e->toString(value) : "(null)";
                 }
 
+                // keep count of time for ride, useful when averaging
+                count++;
+                double duration = ride->getForSymbol("workout_time");
+                totalduration += duration;
+                withduration += value * duration;
+                runningtotal += value;
+                if (count==1) {
+                    minimum = maximum = value;
+                } else {
+                    if (value <minimum) minimum=value;
+                    if (value >maximum) maximum=value;
+                }
+
                 if (wantstrings) { // capture strings as we go, only if we don't aggregate
                     returning.asString().append(asstring);
                 } else {
                     returning.number() += value;
                     returning.asNumeric().append(value);
                 }
+            }
+
+            // return an aggregate?
+            if (wantaggregate) {
+                double aggregate=0;
+                switch(e->type()) {
+                case RideMetric::Total:
+                case RideMetric::RunningTotal:
+                    aggregate = runningtotal;
+                    break;
+                default:
+                case RideMetric::Average:
+                    {
+                    // aggregate taking into account duration
+                    aggregate = withduration / totalduration;
+                    break;
+                    }
+                case RideMetric::Low:
+                    aggregate = minimum;
+                    break;
+                case RideMetric::Peak:
+                    aggregate = maximum;
+                    break;
+                }
+
+                // format and return
+                if (wantstrings) returning = Result(e->toString(aggregate));
+                else returning = Result(aggregate);
             }
 
             return returning;
