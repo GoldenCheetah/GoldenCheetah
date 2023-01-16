@@ -4912,6 +4912,8 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
             double minimum=0;
             double maximum=0;
             double count=0;
+            // do we aggregate zero values ?
+            bool aggZero = e ? e->aggregateZero() : true;
 
             // loop through rides for daterange
             foreach(RideItem *ride, m->context->athlete->rideCache->rides()) {
@@ -4929,14 +4931,14 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
                     value= QTime(0,0,0).secsTo(ride->dateTime.time());
                     if (wantstrings) asstring = ride->dateTime.toString("hh:mm:ss");
                 } else {
-                    value =  ride->getForSymbol(df->lookupMap.value(symbol,""), GlobalContext::context()->useMetricUnits);
+                    value =  ride->getForSymbol(o_symbol, GlobalContext::context()->useMetricUnits);
                     if (wantstrings) e ? asstring = e->toString(value) : "(null)";
                 }
 
                 // keep count of time for ride, useful when averaging
                 count++;
-                double duration = ride->getForSymbol("workout_time");
-                totalduration += duration;
+                double duration = ride->getCountForSymbol(o_symbol);
+                if (value || aggZero) totalduration += duration;
                 withduration += value * duration;
                 runningtotal += value;
                 if (count==1) {
