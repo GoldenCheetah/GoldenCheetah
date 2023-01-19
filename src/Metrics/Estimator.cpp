@@ -155,6 +155,8 @@ Estimator::run()
 
   foreach (QString sport, GlobalContext::context()->rideMetadata->sports()) {
 
+    sport = RideFile::sportTag(sport); // Normalize sport name
+
     printd("%s Estimates start.\n", sport.toStdString().c_str());
 
     // this needs to be done once all the other metrics
