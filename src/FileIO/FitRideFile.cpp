@@ -852,7 +852,7 @@ struct FitFileReaderState
                     sport = FitFileReaderState::getSport(value);
                   }
                   break;
-                case 6: // sub sport (ignored at present)
+                case 6: // sub sport
                     if (subsport_found == false) {
                       subsport_found = true;
                       subsport = FitFileReaderState::getSubSport(value);
@@ -3827,12 +3827,17 @@ void write_session(QByteArray *array, const RideFile *ride, QHash<QString,RideMe
 
     // 6. sport
     // Export as bike, run or swim, default sport is bike. 
-    // todo: support all sports based on tag "Sport"
-    int sport = ride->isRun() ? 1 : ride->isSwim() ? 5 : 2;
-    write_int8(array, sport);
+    value=FitFileReaderState::getSportId(ride->getTag("Sport",""));
+    if (value==0) {
+        // we consider "Sport" tag as reliable however when not accepted
+        // then we define sport to bike, swim or run:
+        value = ride->isRun() ? 1 : ride->isSwim() ? 5 : 2;
+    }
+    write_int8(array, value);
 
     // 7. sub sport
-    write_int8(array, 0);
+    value=FitFileReaderState::getSubSportId(ride->getTag("SubSport",""));
+    write_int8(array, value);
 
     // 8. total_elapsed_time (7)
     value = computed.value("workout_time")->value(true) * 1000;
