@@ -3453,6 +3453,168 @@ struct FitFileReaderState
             case 19:
                 return "Paddling";
                 break;
+            case 20: // flying
+                return "flying";
+                break;
+            case 21: // e biking
+                return "e-biking";
+                break;
+            case 22: // motorcycling
+                return "motorcycling";
+                break;
+            case 23: // boating
+                return "boating";
+                break;
+            case 24: // driving
+                return "driving";
+                break;
+            case 25: // golf
+                return "golf";
+                break;
+            case 26: // hang gliding
+                return "hang gliding";
+                break;
+            case 27: // horseback riding
+                return "horseback riding";
+                break;
+            case 28: // hunting
+                return "hunting";
+                break;
+            case 29: // fishing
+                return "fishing";
+                break;
+            case 30: // inline skating
+                return "inline skating";
+                break;
+            case 31: // rock climbing
+                return "rock climbing";
+                break;
+            case 32: // sailing
+                return "sailing";
+                break;
+            case 33: // ice skating
+                return "ice skating";
+                break;
+            case 34: // sky diving
+                return "sky diving";
+                break;
+            case 35: // snowshoeing
+                return "snowshoeing";
+                break;
+            case 36: // snowmobiling
+                return "snowmobiling";
+                break;
+            case 37: // stand up paddleboarding
+                return "stand up paddleboarding";
+                break;
+            case 38: // surfing
+                return "surfing";
+                break;
+            case 39: // wakeboarding
+                return "wakeboarding";
+                break;
+            case 40: // water skiing
+                return "water skiing";
+                break;
+            case 41: // kayaking
+                return "kayaking";
+                break;
+            case 42: // rafting
+                return "rafting";
+                break;
+            case 43: // windsurfing
+                return "windsurfing";
+                break;
+            case 44: // kitesurfing
+                return "kitesurfing";
+                break;
+            case 45: // tactical
+                return "tactical";
+                break;
+            case 46: // jumpmaster
+                return "jumpmaster";
+                break;
+            case 47: // boxing
+                return "boxing";
+                break;
+            case 48: // floor climbing
+                return "floor climbing";
+                break;
+            case 49: // baseball
+                return "baseball";
+                break;
+            case 50: // softball fast pitch
+                return "softball fast pitch";
+                break;
+            case 51: // softball slow pitch
+                return "softball slow pitch";
+                break;
+            case 56: // shooting
+                return "shooting";
+                break;
+            case 57: // auto racing
+                return "auto racing";
+                break;
+            case 58: // winter sport
+                return "winter sport";
+                break;
+            case 59: // grinding
+                return "grinding";
+                break;
+            case 60: // health monitoring
+                return "health monitoring";
+                break;
+            case 61: // marine
+                return "marine";
+                break;
+            case 62: // hiit
+                return "hiit";
+                break;
+            case 63: // video gaming
+                return "video gaming";
+                break;
+            case 64: // racket
+                return "racket";
+                break;
+            case 65: // wheelchair push walk
+                return "wheelchair push walk";
+                break;
+            case 66: // wheelchair push run
+                return "wheelchair push run";
+                break;
+            case 67: // meditation
+                return "meditation";
+                break;
+            case 68: // para sport
+                return "para sport";
+                break;
+            case 69: // disc golf
+                return "disc golf";
+                break;
+            case 70: // team sport
+                return "team sport";
+                break;
+            case 71: // cricket
+                return "cricket";
+                break;
+            case 72: // rugby
+                return "rugby";
+                break;
+            case 73: // hockey
+                return "hockey";
+                break;
+            case 74: // lacrosse
+                return "lacrosse";
+                break;
+            case 75: // volleyball
+                return "volleyball";
+                break;
+            case 76: // water tubing
+                return "water tubing";
+                break;
+            case 77: // wakesurfing
+                return "wakesurfing";
+                break;
             default: // if we can't work it out, treat as Generic
                 return ""; break;
         }
@@ -3597,6 +3759,174 @@ struct FitFileReaderState
                 break;
             case 41: // whitewater
                 return "whitewater";
+                break;
+            case 42: // skate skiing
+                return "skate skiing";
+                break;
+            case 43: // yoga
+                return "yoga";
+                break;
+            case 44: // pilates
+                return "pilates";
+                break;
+            case 45: // indoor running
+                return "indoor running";
+                break;
+            case 46: // gravel cycling
+                return "gravel cycling";
+                break;
+            case 47: // e bike mountain
+                return "e-bike mountain";
+                break;
+            case 48: // commuting
+                return "commuting";
+                break;
+            case 49: // mixed surface
+                return "mixed surface";
+                break;
+            case 50: // navigate
+                return "navigate";
+                break;
+            case 51: // track me
+                return "track me";
+                break;
+            case 52: // map
+                return "map";
+                break;
+            case 53: // single gas diving
+                return "single gas diving";
+                break;
+            case 54: // multi gas diving
+                return "multi gas diving";
+                break;
+            case 55: // gauge diving
+                return "gauge diving";
+                break;
+            case 56: // apnea diving
+                return "apnea diving";
+                break;
+            case 57: // apnea hunting
+                return "apnea hunting";
+                break;
+            case 58: // virtual activity
+                return "virtual activity";
+                break;
+            case 59: // obstacle
+                return "obstacle";
+                break;
+            case 60: // assistance
+                return "assistance";
+                break;
+            case 61: // incident detected
+                return "incident detected";
+                break;
+            case 62: // breathing
+                return "breathing";
+                break;
+            case 63: // ccr diving
+                return "ccr diving";
+                break;
+            case 64: // area calc
+                return "area calc";
+                break;
+            case 65: // sail race
+                return "sail race";
+                break;
+            case 66: // expedition
+                return "expedition";
+                break;
+            case 67: // ultra
+                return "ultra";
+                break;
+            case 68: // indoor climbing
+                return "indoor climbing";
+                break;
+            case 69: // bouldering
+                return "bouldering";
+                break;
+            case 70: // hiit
+                return "hiit";
+                break;
+            case 71: // indoor grinding
+                return "indoor grinding";
+                break;
+            case 72: // hunting with dogs
+                return "hunting with dogs";
+                break;
+            case 73: // amrap
+                return "amrap";
+                break;
+            case 74: // emom
+                return "emom";
+                break;
+            case 75: // tabata
+                return "tabata";
+                break;
+            case 76: // fall detected
+                return "fall detected";
+                break;
+            case 77: // esport
+                return "esport";
+                break;
+            case 78: // triathlon
+                return "triathlon";
+                break;
+            case 79: // duathlon
+                return "duathlon";
+                break;
+            case 80: // brick
+                return "brick";
+                break;
+            case 81: // swim run
+                return "swim run";
+                break;
+            case 82: // adventure race
+                return "adventure race";
+                break;
+            case 83: // trucker workout
+                return "trucker workout";
+                break;
+            case 84: // pickleball
+                return "pickleball";
+                break;
+            case 85: // padel
+                return "padel";
+                break;
+            case 86: // indoor wheelchair walk
+                return "indoor wheelchair walk";
+                break;
+            case 87: // indoor wheelchair run
+                return "indoor wheelchair run";
+                break;
+            case 88: // indoor hand cycling
+                return "indoor hand cycling";
+                break;
+            case 89: // anchor
+                return "anchor";
+                break;
+            case 90: // field
+                return "field";
+                break;
+            case 91: // ice
+                return "ice";
+                break;
+            case 92: // ultimate
+                return "ultimate";
+                break;
+            case 93: // platform
+                return "platform";
+                break;
+            case 94: // squash
+                return "squash";
+                break;
+            case 95: // badminton
+                return "badminton";
+                break;
+            case 96: // racquetball
+                return "racquetball";
+                break;
+            case 97: // table tennis
+                return "table tennis";
                 break;
             case 254: // all
             default:    // default, treat as Generic
