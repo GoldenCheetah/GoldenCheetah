@@ -274,6 +274,7 @@ struct FitFileReaderState
     bool stopped;
     bool isLapSwim;
     double last_length;
+    double last_RR;
     int last_event_type;
     int last_event;
     int last_msg_type;
@@ -300,6 +301,7 @@ struct FitFileReaderState
         file(file), errors(errors), rideFile(NULL), start_time(0),
         last_time(0), last_distance(0.00f), interval(0), calibration(0),
         devices(0), stopped(true), isLapSwim(false), last_length(0.0),
+        last_RR(0.0),
         last_event_type(-1), last_event(-1), last_msg_type(-1),
         last_altitude(0.0)
     {}
@@ -2338,6 +2340,7 @@ struct FitFileReaderState
 
         QList<double> timestamps;
         QList<double> hr;
+        QList<double> rr;
 
         int a = 0;
         int j = 0;
@@ -2371,6 +2374,7 @@ struct FitFileReaderState
                           // update start_timestamp only if Timestamp (253) included for resyncs
                           if (time > 0) start_timestamp = time-last_event_timestamp/1024.0;
                           timestamps.append(last_event_timestamp/1024.0);
+                          last_RR=last_event_timestamp;
                           break;
                 case 10:  // event_timestamp_12
                           j=0;
@@ -2392,11 +2396,28 @@ struct FitFileReaderState
 
                               timestamps.append(last_event_timestamp/1024.0);
                               j++;
+
+                              rr.append((last_event_timestamp/1024.0-last_RR/1024.0)*1000); // R-R in ms
+                              last_RR=last_event_timestamp;
                           }
 
                           break;
 
                 default: ; // ignore it
+            }
+        }
+
+        // Garmin HR-Swim belt with internal memory
+        if (timestamps.count()>0 && timestamps.count()==rr.count() && timestamps.count()==hr.count()) {
+            // start from i=1 as we cannot determine R-R for the very first heart beat
+            for (int i=1;i<timestamps.count(); i++) {
+                double secs = timestamps.at(i) + start_timestamp - start_time;
+                if (secs>=0 && rr.at(i)!=0) {
+                    XDataPoint *p = new XDataPoint();
+                    p->secs = secs;
+                    p->number[0] = rr.at(i);
+                    hrvXdata->datapoints.append(p);
+                }
             }
         }
 
