@@ -849,207 +849,13 @@ struct FitFileReaderState
                 case 5: // sport field
                   if (sport_found == false) {
                     sport_found = true;
-                    switch (value) {
-                        case 0: // Generic
-                          sport = "";
-                          break;
-                        case 1: // running:
-                          sport = "Run";
-                          break;
-                        case 2: // cycling
-                          sport = "Bike";
-                          break;
-                        case 3: // transition:
-                          sport = "Transition";
-                          break;
-                        case 4: // running:
-                            sport = "Fitness equipment";
-                            break;
-                        case 5: // swimming
-                            sport = "Swim";
-                            break;
-                        case 6: // Basketball:
-                            sport = "Basketball";
-                            break;
-                        case 7: //
-                            sport = "Soccer";
-                            break;
-                        case 8: // running:
-                            sport = "Tennis";
-                            break;
-                        case 9: // running:
-                            sport = "American fotball";
-                            break;
-                        case 10: // running:
-                            sport = "Training";
-                            break;
-                        case 11: // running:
-                            sport = "Walking";
-                            break;
-                        case 12: // running:
-                            sport = "Cross country skiing";
-                            break;
-                        case 13: // running:
-                            sport = "Alpine skiing";
-                            break;
-                        case 14: // running:
-                            sport = "Snowboarding";
-                            break;
-                        case 15: // running:
-                            sport = "Rowing";
-                            break;
-                        case 16: // running:
-                            sport = "Mountaineering";
-                            break;
-                        case 17: // running:
-                            sport = "Hiking";
-                            break;
-                        case 18: // running:
-                            sport = "Multisport";
-                            break;
-                        case 19: // running:
-                            sport = "Paddling";
-                            break;
-                        default: // if we can't work it out, treat as Generic
-                            sport = ""; break;
-                      }
-                    }
-                    break;
+                    sport = FitFileReaderState::getSport(value);
+                  }
+                  break;
                 case 6: // sub sport (ignored at present)
                     if (subsport_found == false) {
                       subsport_found = true;
-                      switch (value) {
-                        case 0:    // generic
-                            subsport = "";
-                            break;
-                        case 1:    // treadmill
-                            subsport = "treadmill";
-                            break;
-                        case 2:    // street
-                            subsport = "street";
-                            break;
-                        case 3:    // trail
-                            subsport = "trail";
-                            break;
-                        case 4:    // track
-                            subsport = "track";
-                            break;
-                        case 5:    // spin
-                            subsport = "spinning";
-                            break;
-                        case 6:    // home trainer
-                            subsport = "home trainer";
-                            break;
-                        case 7:    // route
-                            subsport = "route";
-                            break;
-                        case 8:    // mountain
-                            subsport = "mountain";
-                            break;
-                        case 9:    // downhill
-                            subsport = "downhill";
-                            break;
-                        case 10:    // recumbent
-                            subsport = "recumbent";
-                            break;
-                        case 11:    // cyclocross
-                            subsport = "cyclocross";
-                            break;
-                        case 12:    // hand_cycling
-                            subsport = "hand cycling";
-                            break;
-                        case 13:    // piste
-                            subsport = "piste";
-                            break;
-                        case 14:    // indoor_rowing
-                        subsport = "indoor rowing";
-                        break;
-                        case 15:    // elliptical
-                        subsport = "elliptical";
-                        break;
-                      case 16: // stair climbing
-                        subsport = "stair climbing";
-                        break;
-                      case 17: // lap swimming
-                        subsport = "lap swimming";
-                        break;
-                      case 18: // open water
-                        subsport = "open water";
-                        break;
-                      case 19: // flexibility training
-                        subsport = "flexibility training";
-                        break;
-                      case 20: // strength_training
-                        subsport = "strength_training";
-                        break;
-                      case 21: // warm_up
-                        subsport = "warm_up";
-                        break;
-                      case 22: // match
-                        subsport = "match";
-                        break;
-                      case 23: // exercise
-                        subsport = "exercise";
-                        break;
-                      case 24: // challenge
-                        subsport = "challenge";
-                        break;
-                      case 25: // indoor_skiing
-                        subsport = "indoor_skiing";
-                        break;
-                      case 26: // cardio_training
-                        subsport = "cardio_training";
-                        break;
-                      case 27: // indoor_walking
-                        subsport = "indoor_walking";
-                        break;
-                      case 28: // e_bike_fitness
-                        subsport = "e_bike_fitness";
-                        break;
-                      case 29: // bmx
-                        subsport = "bmx";
-                        break;
-                      case 30: // casual_walking
-                        subsport = "casual_walking";
-                        break;
-                      case 31: // speed_walking
-                        subsport = "speed_walking";
-                        break;
-                      case 32: // bike_to_run_transition
-                        subsport = "bike_to_run_transition";
-                        break;
-                      case 33: // run_to_bike_transition
-                        subsport = "run_to_bike_transition";
-                        break;
-                      case 34: // swim_to_bike_transition
-                        subsport = "swim_to_bike_transition";
-                        break;
-                      case 35: // atv
-                        subsport = "atv";
-                        break;
-                      case 36: // motocross
-                        subsport = "motocross";
-                        break;
-                      case 37: // backcountry
-                        subsport = "backcountry";
-                        break;
-                      case 38: // resort
-                        subsport = "resort";
-                        break;
-                      case 39: // rc_drone
-                        subsport = "rc_drone";
-                        break;
-                      case 40: // wingsuit
-                        subsport = "wingsuit";
-                        break;
-                      case 41: // whitewater
-                        subsport = "whitewater";
-                        break;
-                      case 254: // all
-                      default:    // default, treat as Generic
-                        subsport = "";
-                        break;
-                      }
+                      subsport = FitFileReaderState::getSubSport(value);
                     }
                     break;
                 case 44: // pool_length
@@ -3583,6 +3389,233 @@ struct FitFileReaderState
 
         // return original file
         return rideFile;
+    }
+
+    static QString getSport(quint8 sport_id) {
+        switch (sport_id) {
+            case 0: // Generic
+                return "";
+                break;
+            case 1: // running:
+                return "Run";
+                break;
+            case 2: // cycling
+                return "Bike";
+                break;
+            case 3: // transition:
+                return "Transition";
+                break;
+            case 4: // running:
+                return "Fitness equipment";
+                break;
+            case 5: // swimming
+                return "Swim";
+                break;
+            case 6: // Basketball:
+                return "Basketball";
+                break;
+            case 7: //
+                return "Soccer";
+                break;
+            case 8: // running:
+                return "Tennis";
+                break;
+            case 9: // running:
+                return "American fotball";
+                break;
+            case 10: // running:
+                return "Training";
+                break;
+            case 11: // running:
+                return "Walking";
+                break;
+            case 12: // running:
+                return "Cross country skiing";
+                break;
+            case 13: // running:
+                return "Alpine skiing";
+                break;
+            case 14: // running:
+                return "Snowboarding";
+                break;
+            case 15: // running:
+                return "Rowing";
+                break;
+            case 16: // running:
+                return "Mountaineering";
+                break;
+            case 17: // running:
+                return "Hiking";
+                break;break
+            case 18: // running:
+                return "Multisport";
+                break;
+            case 19: // running:
+                return "Paddling";
+                break;
+            default: // if we can't work it out, treat as Generic
+                return ""; break;
+        }
+    }
+
+    static quint8 getSportId(QString sport_descr) {
+        if (sport_descr=="") {
+            return 0;
+        }
+        for (quint16 i=0; i<=255; i++) {
+            if (sport_descr.compare(FitFileReaderState::getSport(i), Qt::CaseInsensitive)==0) {
+                return (quint8) i;
+            }
+        }
+        return 0; // when not found return generic sport id
+    }
+
+    static QString getSubSport(quint8 subsport_id) {
+        switch (subsport_id) {
+            case 0:    // generic
+                return "";
+                break;
+            case 1:    // treadmill
+                return "treadmill";
+                break;
+            case 2:    // street
+                return "street";
+                break;
+            case 3:    // trail
+                return "trail";
+                break;
+            case 4:    // track
+                return "track";
+                break;
+            case 5:    // spin
+                return "spinning";
+                break;
+            case 6:    // home trainer
+                return "home trainer";
+                break;
+            case 7:    // route
+                return "route";
+                break;
+            case 8:    // mountain
+                return "mountain";
+                break;
+            case 9:    // downhill
+                return "downhill";
+                break;
+            case 10:    // recumbent
+                return "recumbent";
+                break;
+            case 11:    // cyclocross
+                return "cyclocross";
+                break;
+            case 12:    // hand_cycling
+                return "hand cycling";
+                break;
+            case 13:    // piste
+                return "piste";
+                break;
+            case 14:    // indoor_rowing
+                return "indoor rowing";
+                break;
+            case 15:    // elliptical
+                return "elliptical";
+                break;
+            case 16: // stair climbing
+                return "stair climbing";
+                break;
+            case 17: // lap swimming
+                return "lap swimming";
+                break;
+            case 18: // open water
+                return "open water";
+                break;
+            case 19: // flexibility training
+                return "flexibility training";
+                break;
+            case 20: // strength_training
+                return "strength_training";
+                break;
+            case 21: // warm_up
+                return "warm_up";
+                break;
+            case 22: // match
+                return "match";
+                break;
+            case 23: // exercise
+                return "exercise";
+                break;
+            case 24: // challenge
+                return "challenge";
+                break;
+            case 25: // indoor_skiing
+                return "indoor_skiing";
+                break;
+            case 26: // cardio_training
+                return "cardio_training";
+                break;
+            case 27: // indoor_walking
+                return "indoor_walking";
+                break;
+            case 28: // e_bike_fitness
+                return "e_bike_fitness";
+                break;
+            case 29: // bmx
+                return "bmx";
+                break;
+            case 30: // casual_walking
+                return "casual_walking";
+                break;
+            case 31: // speed_walking
+                return "speed_walking";
+                break;
+            case 32: // bike_to_run_transition
+                return "bike_to_run_transition";
+                break;
+            case 33: // run_to_bike_transition
+                return "run_to_bike_transition";
+                break;
+            case 34: // swim_to_bike_transition
+                return "swim_to_bike_transition";
+                break;
+            case 35: // atv
+                return "atv";
+                break;
+            case 36: // motocross
+                return "motocross";
+                break;
+            case 37: // backcountry
+                return "backcountry";
+                break;
+            case 38: // resort
+                return "resort";
+                break;
+            case 39: // rc_drone
+                return "rc_drone";
+                break;
+            case 40: // wingsuit
+                return "wingsuit";
+                break;
+            case 41: // whitewater
+                return "whitewater";
+                break;
+            case 254: // all
+            default:    // default, treat as Generic
+                return "";
+                break;
+        }
+    }
+
+    static quint8 getSubSportId(QString subsport_descr) {
+        if (subsport_descr=="") {
+            return 0;
+        }
+        for (quint16 i=0; i<=255; i++) {
+            if (subsport_descr.compare(FitFileReaderState::getSubSport(i), Qt::CaseInsensitive)==0) {
+                return (quint8) i;
+            }
+        }
+        // qDebug() << "getSubSportId(QString subsport_descr): subsport_descr was not found";
+        return 0; // when not found return generic sport id
     }
 };
 
