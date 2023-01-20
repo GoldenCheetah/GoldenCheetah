@@ -3405,7 +3405,7 @@ struct FitFileReaderState
             case 3: // transition:
                 return "Transition";
                 break;
-            case 4: // running:
+            case 4:
                 return "Fitness equipment";
                 break;
             case 5: // swimming
@@ -3414,43 +3414,43 @@ struct FitFileReaderState
             case 6: // Basketball:
                 return "Basketball";
                 break;
-            case 7: //
+            case 7:
                 return "Soccer";
                 break;
-            case 8: // running:
+            case 8:
                 return "Tennis";
                 break;
-            case 9: // running:
+            case 9:
                 return "American fotball";
                 break;
-            case 10: // running:
+            case 10:
                 return "Training";
                 break;
-            case 11: // running:
+            case 11:
                 return "Walking";
                 break;
-            case 12: // running:
+            case 12:
                 return "Cross country skiing";
                 break;
-            case 13: // running:
+            case 13:
                 return "Alpine skiing";
                 break;
-            case 14: // running:
+            case 14:
                 return "Snowboarding";
                 break;
-            case 15: // running:
+            case 15:
                 return "Rowing";
                 break;
-            case 16: // running:
+            case 16:
                 return "Mountaineering";
                 break;
-            case 17: // running:
+            case 17:
                 return "Hiking";
-                break;break
-            case 18: // running:
+                break;
+            case 18:
                 return "Multisport";
                 break;
-            case 19: // running:
+            case 19:
                 return "Paddling";
                 break;
             default: // if we can't work it out, treat as Generic
