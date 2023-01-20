@@ -1265,6 +1265,60 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
     }
     file.close();
 
+    // here we were capturing data on hometrainer with GoldenCheetah
+    if (csvType == gc) {
+        // add Sport Tag
+        rideFile->setTag("Sport", "Bike");
+
+        // default mode is not virtual activity but home-trainer
+        rideFile->setTag("SubSport", "home trainer");
+        // check if GPS available and moving out of "home-trainer" location
+        if (rideFile->areDataPresent()->lat && rideFile->areDataPresent()->lon) {
+            // GPS data available (but may be static ones)
+            // Find the top left and bottom right extents
+            // of the trace and detect treadmill or home-trainer
+            // by checking athlete movement
+
+            double minlat=999, minlon=999;
+            double maxlat=-999, maxlon=-999;
+            foreach(RideFilePoint *p, rideFile->dataPoints()) {
+
+                // ignore zero values and out of bounds
+                if (p->lat == 0 || p->lon == 0 ||
+                    p->lon < -180 || p->lon > 180 ||
+                    p->lat < -90 || p->lat > 90) continue;
+
+                if (p->lat > maxlat) maxlat=p->lat;
+                if (p->lat < minlat) minlat=p->lat;
+                if (p->lon < minlon) minlon=p->lon;
+                if (p->lon > maxlon) maxlon=p->lon;
+            }
+            double difflon = (maxlon - minlon);
+            double difflat = (maxlat - minlat);
+
+            // assert data are available and valid
+            if (minlat!=999 && minlon!=999 &&
+                maxlat!=-999 && maxlon!=-999 &&
+                difflon+difflat!=0) {
+
+                // estimate bounding box dimensions
+                // using geometric arc length between points
+                double distmeters;
+                distmeters = sin(DEG_TO_RAD(minlat))*sin(DEG_TO_RAD(maxlat)) +
+                    cos(DEG_TO_RAD(minlat))*cos(DEG_TO_RAD(maxlat))*cos(DEG_TO_RAD(difflon));
+                distmeters = acos(distmeters) * 6371000;
+                // qDebug() << "distmeters="<<distmeters;
+
+                // we consider that home-trainer is used
+                // without virtual activity with fake GPS trace
+                // when distance is less than 200m (empiric)
+                if (std::isnan(distmeters) == false && distmeters>=200) {
+                    rideFile->setTag("SubSport", "virtual activity");
+                }
+            }
+        }
+    }
+
     // To estimate the recording interval, take the median of the
     // first 1000 samples and round to nearest millisecond.
     int n = rideFile->dataPoints().size();

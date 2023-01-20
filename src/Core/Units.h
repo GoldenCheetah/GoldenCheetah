@@ -39,6 +39,7 @@
 #define KG_FORCE_PER_METER 9.80665f
 #define MS_IN_ONE_HOUR 3600000
 #define MS_IN_WKO_HOURS 360000 // yes this number of ms is required to match for WKO
+#define DEG_TO_RAD(deg) (deg * M_PI / 180)
 
 #include <QString>
 extern QString kphToPace(double kph, bool metric, bool isSwim=false);
