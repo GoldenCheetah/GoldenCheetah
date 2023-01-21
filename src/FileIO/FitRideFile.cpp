@@ -4156,13 +4156,7 @@ void write_session(QByteArray *array, const RideFile *ride, QHash<QString,RideMe
     write_int32(array, value, true);
 
     // 6. sport
-    // Export as bike, run or swim, default sport is bike. 
-    value=FitFileReaderState::getSportId(ride->getTag("Sport",""));
-    if (value==0) {
-        // we consider "Sport" tag as reliable however when not accepted
-        // then we define sport to bike, swim or run:
-        value = ride->isRun() ? 1 : ride->isSwim() ? 5 : 2;
-    }
+    value=FitFileReaderState::getSportId(ride->sport());
     write_int8(array, value);
 
     // 7. sub sport
