@@ -124,7 +124,7 @@ WebPageWindow::WebPageWindow(Context *context) : GcChartWindow(context), context
     customUrl->setText("");
 
     commonLayout->addRow(customUrlLabel, customUrl);
-    commonLayout->addRow(new QLabel("Hit return to apply URL"));
+    commonLayout->addRow(new QLabel(tr("Hit return to apply URL")));
 
     setControls(settingsWidget);
 
