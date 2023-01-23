@@ -62,6 +62,12 @@
 #endif
 
 // Xert
+#ifndef GC_AZUM_CLIENT_ID
+#define GC_AZUM_CLIENT_ID "vhNabGIWHbvl9lIy5XTAGOJ3Ypa7Qqg9cBrBloca"
+#endif
+
+
+// Xert
 #ifndef GC_XERT_CLIENT_ID
 #define GC_XERT_CLIENT_ID "xert_goldencheetah"
 #endif
@@ -396,6 +402,12 @@
 #define GC_SIXCYCLE_USER                "<athlete-private>sixcycle_user"
 #define GC_SIXCYCLE_PASS                "<athlete-private>sixcycle_pass"
 #define GC_SIXCYCLE_URL                 "<athlete-private>sixcycle_url"
+
+// Azum
+#define GC_AZUM_ACCESS_TOKEN            "<athlete-private>azum_access_token"
+#define GC_AZUM_REFRESH_TOKEN           "<athlete-private>azum_refresh_token"
+#define GC_AZUM_URL                     "<athlete-private>azum_url"
+#define GC_AZUM_ATHLETE_ID              "<athlete-private>azum_athlete_id"
 
 // Polar Flow
 #define GC_POLARFLOW_TOKEN             "<athlete-private>polarflow_token"
