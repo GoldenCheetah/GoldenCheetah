@@ -9954,12 +9954,12 @@ le sugerirá los posibles nombres
     <message>
         <location filename="../../Train/ErgFilePlot.cpp" line="549"/>
         <source>(km)</source>
-        <translation type="unfinished"></translation>
+        <translation>(km)</translation>
     </message>
     <message>
         <location filename="../../Train/ErgFilePlot.cpp" line="549"/>
         <source>(mi)</source>
-        <translation type="unfinished"></translation>
+        <translation>(mi)</translation>
     </message>
     <message>
         <location filename="../../Train/ErgFilePlot.cpp" line="584"/>
@@ -10721,7 +10721,7 @@ Aviso: la precisión de la estimación puede ser demasiado pobre para ser de uso
     <message>
         <location filename="../../FileIO/FixElevation.cpp" line="178"/>
         <source>Fix Elevation Data not possible</source>
-        <translation type="unfinished">No es posible obtener los datos de altitud</translation>
+        <translation>No es posible obtener los datos de altitud</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixElevation.cpp" line="179"/>
@@ -13853,7 +13853,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="95"/>
         <source>Activate / De-activate the Compare Pane - which allows to compare activities and intervals in Activities View or date ranges in Trends View - also across athletes. In Train View it shows/hide the Intensity Adjustments and Workout Control Pane.</source>
-        <translation>Activa/desactiva el panel de comparación, que permite comparar (incluso entre atletas distintos) actividades e intervalos en la sección de Actividades e intervalos temporales en la sección de Tendencias. En el modo Entrenar muestra/oculta los ajustes de intensidad y el panel de control del entrenamiento</translation>
+        <translation>Activa/desactiva el panel de comparación, que permite comparar (incluso entre atletas distintos) actividades e intervalos en la sección de Actividades e intervalos temporales en la sección de Tendencias. En el modo Entrenar muestra/oculta los ajustes de intensidad y el panel de control del entrenamiento.</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="97"/>
@@ -33457,7 +33457,7 @@ Aguante la respiración durante 5 segundos.</translation>
     <message>
         <location filename="../../Train/WebPageWindow.cpp" line="127"/>
         <source>Hit return to apply URL</source>
-        <translation type="unfinished"></translation>
+        <translation>Pulse la tecla Enter para aplicar la selección</translation>
     </message>
 </context>
 <context>
