@@ -1266,9 +1266,9 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
     file.close();
 
     // here we were capturing data on hometrainer with GoldenCheetah
-    if (csvType == gc) {
-        // add Sport Tag
-        rideFile->setTag("Sport", "Bike");
+    if ((csvType == gc) && rideFile->isBike()) {
+        // add Sport Tag when not already there
+        rideFile->setTag("Sport", rideFile->sport());
 
         // default mode is not virtual activity but home-trainer
         rideFile->setTag("SubSport", "home trainer");
