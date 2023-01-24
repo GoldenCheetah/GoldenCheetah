@@ -1358,8 +1358,8 @@ RPEOverviewItem::setData(RideItem *item)
         const qint64 old = prior->dateTime.daysTo(item->dateTime);
         if (old > SPARKDAYS) break;
 
-        // only activities with matching sport flags
-        if (prior->isRun == item->isRun && prior->isSwim == item->isSwim) {
+        // only activities with matching sport
+        if (prior->sport == item->sport) {
 
            double v = prior->getText("RPE", "0").toDouble();
            if (std::isinf(v) || std::isnan(v)) v=0;
@@ -1433,8 +1433,8 @@ MetricOverviewItem::setData(RideItem *item)
         const qint64 old = prior->dateTime.daysTo(item->dateTime);
         if (old > SPARKDAYS) break;
 
-        // only activities with matching sport flags
-        if (prior->isRun == item->isRun && prior->isSwim == item->isSwim) {
+        // only activities with matching sport
+        if (prior->sport == item->sport) {
 
             double v = prior->getForSymbol(symbol, GlobalContext::context()->useMetricUnits);
             if (std::isinf(v) || std::isnan(v)) v=0;
@@ -1772,8 +1772,8 @@ MetaOverviewItem::setData(RideItem *item)
             const qint64 old = prior->dateTime.daysTo(item->dateTime);
             if (old > SPARKDAYS) break;
 
-            // only activities with matching sport flags
-            if (prior->isRun == item->isRun && prior->isSwim == item->isSwim) {
+            // only activities with matching sport
+            if (prior->sport == item->sport) {
 
                 double v;
 
