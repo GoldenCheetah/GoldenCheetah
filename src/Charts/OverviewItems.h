@@ -261,7 +261,7 @@ class MetricOverviewItem : public ChartSpaceItem
         static ChartSpaceItem *create(ChartSpace *parent) { return new MetricOverviewItem(parent, "PowerIndex", "power_index"); }
 
         QString symbol;
-        RideMetric *metric;
+        const RideMetric *metric;
         QString units;
 
         bool up, showrange;
@@ -322,7 +322,7 @@ class TopNOverviewItem : public ChartSpaceItem
         void configChanged(qint32) override;
 
         QString symbol;
-        RideMetric *metric;
+        const RideMetric *metric;
         QString units;
 
         QList<topnentry> ranked;
@@ -464,7 +464,7 @@ class DonutOverviewItem : public ChartSpaceItem
 
         // config
         QString symbol, meta;
-        RideMetric *metric;
+        const RideMetric *metric;
 
         // Categories and values
         QVector<aggmeta> values;

@@ -4123,6 +4123,7 @@ OverviewItemConfig::dataChanged()
             MetricOverviewItem *mi = dynamic_cast<MetricOverviewItem*>(item);
             mi->name = name->text();
             if (metric1->isValid()) {
+                mi->metric = metric1->rideMetric();
                 mi->symbol = metric1->rideMetric()->symbol();
                 mi->units = metric1->rideMetric()->units(GlobalContext::context()->useMetricUnits);
             }
@@ -4134,7 +4135,10 @@ OverviewItemConfig::dataChanged()
         {
             DonutOverviewItem *mi = dynamic_cast<DonutOverviewItem*>(item);
             mi->name = name->text();
-            if (metric1->isValid())  mi->symbol = metric1->rideMetric()->symbol();
+            if (metric1->isValid()) {
+                mi->metric = metric1->rideMetric();
+                mi->symbol = metric1->rideMetric()->symbol();
+            }
             if (meta1->isValid())  mi->meta = meta1->metaname();
             mi->bgcolor = bgcolor->getColor().name();
         }
@@ -4145,6 +4149,7 @@ OverviewItemConfig::dataChanged()
             TopNOverviewItem *mi = dynamic_cast<TopNOverviewItem*>(item);
             mi->name = name->text();
             if (metric1->isValid()) {
+                mi->metric = metric1->rideMetric();
                 mi->symbol = metric1->rideMetric()->symbol();
                 mi->units = metric1->rideMetric()->units(GlobalContext::context()->useMetricUnits);
             }
