@@ -342,8 +342,7 @@ MainWindow::MainWindow(const QDir &home)
     perspectiveSelector->setStyle(toolStyle);
     perspectiveSelector->setFixedWidth(200 * dpiXFactor);
     perspectiveSelector->setFixedHeight(gl_toolheight * dpiYFactor);
-    // activated instead of currentIndexChange signal is used to avoid triggering when changed by code due to 3a16d1e
-    connect(perspectiveSelector, SIGNAL(activated(int)), this, SLOT(perspectiveSelected(int)));
+    connect(perspectiveSelector, SIGNAL(currentIndexChanged(int)), this, SLOT(perspectiveSelected(int)));
     HelpWhatsThis *helpPerspectiveSelector = new HelpWhatsThis(perspectiveSelector);
     perspectiveSelector->setWhatsThis(helpPerspectiveSelector->getWhatsThisText(HelpWhatsThis::ToolBar_PerspectiveSelector));
 
@@ -1484,8 +1483,6 @@ MainWindow::perspectiveSelected(int index)
 
     // which perspective is currently being shown?
     int prior = current->perspectives_.indexOf(current->perspective_);
-
-    if (prior == index) return; // activated but nothing changed
 
     if (index < current->perspectives_.count()) {
 
