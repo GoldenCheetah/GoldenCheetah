@@ -1462,6 +1462,7 @@ MainWindow::resetPerspective(int view, bool force)
     }
 
     // set the perspective
+    pactive=true;
     current->setPerspectives(perspectiveSelector);
     perspectiveSelector->setCurrentIndex(current->currentPerspective());
     pactive=false;
