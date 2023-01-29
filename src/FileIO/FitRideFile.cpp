@@ -636,9 +636,6 @@ struct FitFileReaderState
             case 139: //CoreTemp
                 return "CORETEMP";
 
-            case 139: //CoreTemp
-                return "CORETEMP";
-
             case 116: // Stress
                 return "STRESS";
 
