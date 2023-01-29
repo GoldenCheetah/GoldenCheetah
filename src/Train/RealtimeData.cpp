@@ -85,6 +85,7 @@ void RealtimeData::setRouteDistance(double x) { this->routeDistance = x; }
 
 void RealtimeData::setDistanceRemaining(double x) {
   this->distanceRemaining = x;
+}
 
 void RealtimeData::setLapDistance(double x) { this->lapDistance = x; }
 

@@ -803,7 +803,7 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
                 // Store in XDATA
                 emit tcoreData(antMessage.coreTemp, antMessage.skinTemp, antMessage.tempQual);
                 // and forward to telemetry
-                parent->setCoreTemp(antMessage.coreTemp);
+                parent->setCoreTemp(antMessage.coreTemp, antMessage.skinTemp);
             }
         }
         break;

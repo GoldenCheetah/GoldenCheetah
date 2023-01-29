@@ -636,7 +636,7 @@ public:
     }
     void setHb(double smo2, double thb);
 
-    void setCoreTemp(double core);
+    void setCoreTemp(double core, double skin);
 
     void setLRBalance (double lrbalance) {
         telemetry.setLRBalance(lrbalance);
