@@ -73,22 +73,15 @@ CriticalPowerWindow::CriticalPowerWindow(Context *context, bool rangemode) :
     rDeltaPercent->setText(tr("as percentage"));
     rDeltaPercent->hide();
 
-    QVBoxLayout *checks = new QVBoxLayout;
-    checks->addStretch();
-    checks->addWidget(rPercent);
-    checks->addWidget(rHeat);
-    checks->addWidget(rDelta);
-    checks->addWidget(rDeltaPercent);
-    checks->addStretch();
-
     revealLayout->addStretch();
     revealLayout->addWidget(rSeriesLabel);
     revealLayout->addWidget(rSeriesSelector);
     revealLayout->addSpacing(20);
-    revealLayout->addLayout(checks);
+    revealLayout->addWidget(rPercent);
+    revealLayout->addWidget(rHeat);
+    revealLayout->addWidget(rDelta);
+    revealLayout->addWidget(rDeltaPercent);
     revealLayout->addStretch();
-
-    setRevealLayout(revealLayout);
 
     //
     // main plot area
@@ -97,6 +90,7 @@ CriticalPowerWindow::CriticalPowerWindow(Context *context, bool rangemode) :
     setChartLayout(mainLayout);
 
     cpPlot = new CPPlot(this, context, rangemode);
+    mainLayout->addLayout(revealLayout);
     mainLayout->addWidget(cpPlot);
     HelpWhatsThis *help = new HelpWhatsThis(cpPlot);
     if (rangemode) cpPlot->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::ChartTrends_Critical_MM));
