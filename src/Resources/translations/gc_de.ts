@@ -7261,7 +7261,7 @@ Wollen Sie die Änderung durchführen und GoldenCheetah neu starten?</translatio
     <message>
         <location filename="../../Charts/CriticalPowerWindow.cpp" line="251"/>
         <source>Show as percentage</source>
-        <translation>Prozent des Bestwertes</translation>
+        <translation>In Prozent anzeigen</translation>
     </message>
     <message>
         <location filename="../../Charts/CriticalPowerWindow.cpp" line="256"/>
@@ -9885,12 +9885,12 @@ an den Computer anschließen und
     <message>
         <location filename="../../Train/ErgFilePlot.cpp" line="549"/>
         <source>(km)</source>
-        <translation type="unfinished"></translation>
+        <translation>(km)</translation>
     </message>
     <message>
         <location filename="../../Train/ErgFilePlot.cpp" line="549"/>
         <source>(mi)</source>
-        <translation type="unfinished"></translation>
+        <translation>(mi)</translation>
     </message>
     <message>
         <location filename="../../Train/ErgFilePlot.cpp" line="584"/>
@@ -18758,7 +18758,7 @@ on and that its display says, &quot;PC Link&quot;</source>
 <context>
     <name>MainWindow</name>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="2180"/>
+        <location filename="../../Gui/MainWindow.cpp" line="2182"/>
         <source>Ctrl+N</source>
         <translation>Strg+N</translation>
     </message>
@@ -18789,7 +18789,7 @@ on and that its display says, &quot;PC Link&quot;</source>
         <translation>Seitenleiste an/aus</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1923"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1925"/>
         <source>Delete Activity</source>
         <translation>Aktivität löschen</translation>
     </message>
@@ -18854,51 +18854,51 @@ on and that its display says, &quot;PC Link&quot;</source>
         <translation>Metriken als .CSV exportieren...</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1659"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1661"/>
         <source>Chart Import</source>
         <translation>Diagramm Import</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1803"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1805"/>
         <source>Failed to export activity, please check permissions</source>
         <translation>Konnte Aktivität nicht exportieren, bitte Dateizugriffsrechte prüfen</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1839"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1841"/>
         <source>No Activity To Save</source>
         <translation>Keine Aktivität zum Sichern vorhanden</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1840"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1842"/>
         <source>There is no currently selected activity to save.</source>
         <translation>Keine der aktuell ausgewählten Aktivitäten muss gespeichert werden.</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1899"/>
         <location filename="../../Gui/MainWindow.cpp" line="1901"/>
-        <location filename="../../Gui/MainWindow.cpp" line="1911"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1903"/>
         <location filename="../../Gui/MainWindow.cpp" line="1913"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1915"/>
         <source>Split Activity</source>
         <translation>Aktivität aufteilen</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1899"/>
-        <location filename="../../Gui/MainWindow.cpp" line="1911"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1901"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1913"/>
         <source>No activity selected</source>
         <translation>Keine Aktivität ausgewählt</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1901"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1903"/>
         <source>Current activity contains no data to split</source>
         <translation>Aktuelle Aktivität enthält keine Daten zum Aufteilien</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1913"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1915"/>
         <source>Current activity contains no data to merge</source>
         <translation>Aktuelle Aktivität enthält keine Daten zum Zusammenführen</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1929"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1931"/>
         <source>Are you sure you want to delete the activity:</source>
         <translation>Sind Sie sicher, dass Sie diese Aktivität löschen möchten:</translation>
     </message>
@@ -18949,23 +18949,23 @@ Sie sind dabei, alle Diagramme auf die Voreinstellungen zurückzusetzen</transla
         <translation>Wollen Sie die Diagramme zurücksetzen?</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1736"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1738"/>
         <source>Select Activity</source>
         <translation>Aktivität auswählen</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1736"/>
-        <location filename="../../Gui/MainWindow.cpp" line="1923"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1738"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1925"/>
         <source>No activity selected!</source>
         <translation>Keine Aktivität ausgewählt!</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1749"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1751"/>
         <source>Export Activity</source>
         <translation>Exportiere Aktivität</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1802"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1804"/>
         <source>Export Failed</source>
         <translation>Export nicht erfolgreich</translation>
     </message>
@@ -19117,50 +19117,50 @@ Sie sind dabei, alle Diagramme auf die Voreinstellungen zurückzusetzen</transla
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="1144"/>
-        <location filename="../../Gui/MainWindow.cpp" line="2040"/>
-        <location filename="../../Gui/MainWindow.cpp" line="2069"/>
+        <location filename="../../Gui/MainWindow.cpp" line="2042"/>
+        <location filename="../../Gui/MainWindow.cpp" line="2071"/>
         <source>Activity Import</source>
         <translation>Aktivitäten importieren</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="1144"/>
-        <location filename="../../Gui/MainWindow.cpp" line="2040"/>
-        <location filename="../../Gui/MainWindow.cpp" line="2069"/>
+        <location filename="../../Gui/MainWindow.cpp" line="2042"/>
+        <location filename="../../Gui/MainWindow.cpp" line="2071"/>
         <source>Closing of athlete window not possible while background activity import is in progress...</source>
         <translation>Schliessen des Athleten Fensters ist nicht möglich, solange im Hintergrund der Import von Aktivitäten läuft...</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="2180"/>
+        <location filename="../../Gui/MainWindow.cpp" line="2182"/>
         <source>&amp;New Athlete...</source>
         <translation>&amp;Neuer Athlet...</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="2408"/>
-        <location filename="../../Gui/MainWindow.cpp" line="2429"/>
+        <location filename="../../Gui/MainWindow.cpp" line="2410"/>
+        <location filename="../../Gui/MainWindow.cpp" line="2431"/>
         <source>The workout directory is not configured, or the directory selected no longer exists.
 
 Please check your preference settings.</source>
         <translation>Das Workout Verzeichnis ist nicht konfiguriert oder das definierte Verzeichnis existiert nicht (mehr). Bitte Einstellungen überprüfen.</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="2639"/>
+        <location filename="../../Gui/MainWindow.cpp" line="2641"/>
         <source>New Python Fix...</source>
         <translation>Neuer Python Fix...</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="2640"/>
+        <location filename="../../Gui/MainWindow.cpp" line="2642"/>
         <source>Manage Python Fixes...</source>
         <translation>Verwalten von Python Fixes...</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="2713"/>
-        <location filename="../../Gui/MainWindow.cpp" line="2734"/>
+        <location filename="../../Gui/MainWindow.cpp" line="2715"/>
+        <location filename="../../Gui/MainWindow.cpp" line="2736"/>
         <source>CloudDB</source>
         <translation>CloudDB</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="2713"/>
-        <location filename="../../Gui/MainWindow.cpp" line="2734"/>
+        <location filename="../../Gui/MainWindow.cpp" line="2715"/>
+        <location filename="../../Gui/MainWindow.cpp" line="2736"/>
         <source>Current athlete is not registered as curator - please contact the GoldenCheetah team</source>
         <translation>Aktueller Athlete ist nicht als Verwalter registriert - bitte das GoldenCheetah Team kontaktieren</translation>
     </message>
@@ -19414,39 +19414,39 @@ Please check your preference settings.</source>
         <translation>Import Perspektive</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1659"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1661"/>
         <source>Imported %1 metric charts</source>
         <translation>%1 Metrik Diagramme importiert</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1824"/>
-        <location filename="../../Gui/MainWindow.cpp" line="2377"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1826"/>
+        <location filename="../../Gui/MainWindow.cpp" line="2379"/>
         <source>Import from File</source>
         <translation>Aus Datei importieren</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="2350"/>
+        <location filename="../../Gui/MainWindow.cpp" line="2352"/>
         <source>Refresh in Progress</source>
         <translation>Aktualisierung läuft</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="2356"/>
+        <location filename="../../Gui/MainWindow.cpp" line="2358"/>
         <source>Export Metrics</source>
         <translation>Metriken exportieren</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="2356"/>
+        <location filename="../../Gui/MainWindow.cpp" line="2358"/>
         <source>Comma Separated Variables (*.csv)</source>
         <translation>Comma Separated Values (*.csv)</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="2407"/>
-        <location filename="../../Gui/MainWindow.cpp" line="2428"/>
+        <location filename="../../Gui/MainWindow.cpp" line="2409"/>
+        <location filename="../../Gui/MainWindow.cpp" line="2430"/>
         <source>Workout Directory Invalid</source>
         <translation>Verzeichnis für Workouts ungültig</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1931"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1933"/>
         <source>Delete</source>
         <translation>Löschen</translation>
     </message>
@@ -25369,62 +25369,62 @@ yyyy</translation>
         <translation>Metrik aufschlüsseln nach Kategorien</translation>
     </message>
     <message>
-        <location filename="../../Charts/OverviewItems.cpp" line="4235"/>
+        <location filename="../../Charts/OverviewItems.cpp" line="4240"/>
         <source>Rest</source>
         <translation>Erholung</translation>
     </message>
     <message>
-        <location filename="../../Charts/OverviewItems.cpp" line="4236"/>
+        <location filename="../../Charts/OverviewItems.cpp" line="4241"/>
         <source>Very, very easy</source>
         <translation>Sehr leicht</translation>
     </message>
     <message>
-        <location filename="../../Charts/OverviewItems.cpp" line="4237"/>
+        <location filename="../../Charts/OverviewItems.cpp" line="4242"/>
         <source>Easy</source>
         <translation>Leicht</translation>
     </message>
     <message>
-        <location filename="../../Charts/OverviewItems.cpp" line="4238"/>
+        <location filename="../../Charts/OverviewItems.cpp" line="4243"/>
         <source>Moderate</source>
         <translation>Moderat</translation>
     </message>
     <message>
-        <location filename="../../Charts/OverviewItems.cpp" line="4239"/>
+        <location filename="../../Charts/OverviewItems.cpp" line="4244"/>
         <source>Somewhat hard</source>
         <translation>Schon härter</translation>
     </message>
     <message>
-        <location filename="../../Charts/OverviewItems.cpp" line="4240"/>
+        <location filename="../../Charts/OverviewItems.cpp" line="4245"/>
         <source>Hard</source>
         <translation>Hart</translation>
     </message>
     <message>
-        <location filename="../../Charts/OverviewItems.cpp" line="4241"/>
+        <location filename="../../Charts/OverviewItems.cpp" line="4246"/>
         <source>Hard+</source>
         <translation>Hart+</translation>
     </message>
     <message>
-        <location filename="../../Charts/OverviewItems.cpp" line="4242"/>
+        <location filename="../../Charts/OverviewItems.cpp" line="4247"/>
         <source>Very hard</source>
         <translation>Sehr hart</translation>
     </message>
     <message>
-        <location filename="../../Charts/OverviewItems.cpp" line="4243"/>
+        <location filename="../../Charts/OverviewItems.cpp" line="4248"/>
         <source>Very hard+</source>
         <translation>Sehr hart+</translation>
     </message>
     <message>
-        <location filename="../../Charts/OverviewItems.cpp" line="4244"/>
+        <location filename="../../Charts/OverviewItems.cpp" line="4249"/>
         <source>Very hard++</source>
         <translation>Sehr hart++</translation>
     </message>
     <message>
-        <location filename="../../Charts/OverviewItems.cpp" line="4245"/>
+        <location filename="../../Charts/OverviewItems.cpp" line="4250"/>
         <source>Maximum</source>
         <translation>Maximal</translation>
     </message>
     <message>
-        <location filename="../../Charts/OverviewItems.cpp" line="4270"/>
+        <location filename="../../Charts/OverviewItems.cpp" line="4275"/>
         <source>Invalid</source>
         <translation>Ungültig</translation>
     </message>
@@ -32677,18 +32677,18 @@ Atemabweisung; RF außerhalb des Bereichs.</translation>
 <context>
     <name>ViewSplitter</name>
     <message>
-        <location filename="../../Gui/AbstractView.h" line="241"/>
+        <location filename="../../Gui/AbstractView.h" line="242"/>
         <source>Clear</source>
         <translation>Zurücksetzen</translation>
     </message>
     <message>
-        <location filename="../../Gui/AbstractView.h" line="252"/>
-        <location filename="../../Gui/AbstractView.h" line="333"/>
+        <location filename="../../Gui/AbstractView.h" line="253"/>
+        <location filename="../../Gui/AbstractView.h" line="334"/>
         <source>OFF</source>
         <translation>AUS</translation>
     </message>
     <message>
-        <location filename="../../Gui/AbstractView.h" line="328"/>
+        <location filename="../../Gui/AbstractView.h" line="329"/>
         <source>ON</source>
         <translation>AN</translation>
     </message>
@@ -33098,7 +33098,7 @@ Atemabweisung; RF außerhalb des Bereichs.</translation>
     <message>
         <location filename="../../Train/WebPageWindow.cpp" line="127"/>
         <source>Hit return to apply URL</source>
-        <translation type="unfinished"></translation>
+        <translation>Drücken Sie die Eingabetaste, um die URL anzuwenden</translation>
     </message>
 </context>
 <context>
