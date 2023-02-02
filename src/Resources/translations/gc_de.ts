@@ -7261,7 +7261,7 @@ Wollen Sie die Änderung durchführen und GoldenCheetah neu starten?</translatio
     <message>
         <location filename="../../Charts/CriticalPowerWindow.cpp" line="251"/>
         <source>Show as percentage</source>
-        <translation>In Prozent anzeigen</translation>
+        <translation>Als Prozentsatz anzeigen</translation>
     </message>
     <message>
         <location filename="../../Charts/CriticalPowerWindow.cpp" line="256"/>
