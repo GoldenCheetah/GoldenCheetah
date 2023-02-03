@@ -5454,6 +5454,7 @@ VScrollBar::setAreaHeight(double n)
 void
 VScrollBar::setPos(double x)
 {
+    Q_UNUSED(x);
     // xxx todo
 }
 
