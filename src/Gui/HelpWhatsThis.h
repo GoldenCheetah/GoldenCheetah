@@ -94,6 +94,7 @@ Q_OBJECT
                  MenuBar_Edit_FilterHrv,
                  MenuBar_Edit_FixSmO2,
                  MenuBar_Edit_FixCdA,
+                 MenuBar_Edit_FixRiderPosition,
 
 
                  MenuBar_View,

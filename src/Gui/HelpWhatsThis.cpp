@@ -175,6 +175,8 @@ HelpWhatsThis::getText(GCHelp chapter) {
     case MenuBar_Edit_FixMoxy:
         return text.arg("Menu%20Bar_Edit").arg(tr("Fix Moxy data by moving the moxy values from speed"
                                                   " and cadence into the Moxy series"));
+    case MenuBar_Edit_FixRiderPosition:
+        return text.arg("Menu%20Bar_Edit").arg(tr("Fix Rider position from cadence and speed"));
     case MenuBar_Edit_FilterHrv:
         return text.arg("Menu%20Bar_Edit").arg(tr("Filter R-R outliers"));
     case MenuBar_Edit_FixSmO2:

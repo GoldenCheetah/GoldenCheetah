@@ -216,6 +216,9 @@
 #define GC_FIXGPS_ROUTE_FIX_DEGREE1     "<global-general>dataprocess/fixgps/route_degree1"
 #define GC_FIXGPS_ROUTE_FIX_DOAPPLY     "<global-general>dataprocess/fixgps/route_doapply"
 #define GC_FIXGPS_ROUTE_OUTLIER_PERCENT "<global-general>dataprocess/fixgps/route_outlier_percent"
+#define GC_FIXPOSITION_NOCAD_DELAY      "<global-general>dataprocess/fixposition/no_cad_delay"
+#define GC_FIXPOSITION_NOKPH_DELAY      "<global-general>dataprocess/fixposition/no_kph_delay"
+#define GC_FIXPOSITION_NOKPH_TRIGGER    "<global-general>dataprocess/fixposition/no_kph_trigger"
 
 // device Configurations NAME/SPEC/TYPE/DEFI/DEFR all get a number appended
 // to them to specify which configured device i.e. devices1 ... devicesn where
