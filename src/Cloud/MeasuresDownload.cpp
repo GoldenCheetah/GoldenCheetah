@@ -44,10 +44,12 @@ MeasuresDownload::MeasuresDownload(Context *context, MeasuresGroup *measuresGrou
     downloadWithings = new QRadioButton(tr("Withings"));
     downloadTP = new QRadioButton(tr("Today's Plan"));
     downloadCSV = new QRadioButton(tr("Import CSV file"));
+    downloadPOLARFLOW = new QRadioButton(tr("Polar Flow"));
     QVBoxLayout *vbox1 = new QVBoxLayout;
     vbox1->addWidget(downloadWithings);
     vbox1->addWidget(downloadTP);
     vbox1->addWidget(downloadCSV);
+    vbox1->addWidget(downloadPOLARFLOW);
     groupBox1->setLayout(vbox1);
     mainLayout->addWidget(groupBox1);
 
@@ -111,12 +113,15 @@ MeasuresDownload::MeasuresDownload(Context *context, MeasuresGroup *measuresGrou
     connect(downloadWithings, SIGNAL(toggled(bool)), this, SLOT(downloadWithingsSettingChanged(bool)));
     connect(downloadTP, SIGNAL(toggled(bool)), this, SLOT(downloadTPSettingChanged(bool)));
     connect(downloadCSV, SIGNAL(toggled(bool)), this, SLOT(downloadCSVSettingChanged(bool)));
+    connect(downloadPOLARFLOW, SIGNAL(toggled(bool)), this, SLOT(downloadPFSettingChanged(bool)));
 
     // don't allow options which are not authorized
     downloadWithings->setEnabled((measuresGroup->getSymbol() == "Body") &&
         (appsettings->cvalue(context->athlete->cyclist, GC_NOKIA_TOKEN, "").toString() !=""));
     downloadTP->setEnabled((measuresGroup->getSymbol() == "Body") &&
         (appsettings->cvalue(context->athlete->cyclist, GC_TODAYSPLAN_TOKEN, "").toString() != ""));
+    downloadPOLARFLOW->setEnabled((measuresGroup->getSymbol() == "Body") &&
+        (appsettings->cvalue(context->athlete->cyclist, GC_POLARFLOW_TOKEN, "").toString() != ""));
 
     // select the default checked / based on available properties and last selection
     int last_selection = appsettings->cvalue(context->athlete->cyclist, GC_BM_LAST_TYPE, 0).toInt();
@@ -136,7 +141,12 @@ MeasuresDownload::MeasuresDownload(Context *context, MeasuresGroup *measuresGrou
     if (!done) {
         downloadCSV->setChecked(true);
     }
-
+    if (!done && downloadPOLARFLOW->isEnabled()) {
+        if (last_selection == 0 || last_selection == POLARFLOW) {
+            downloadPOLARFLOW->setChecked(true);
+            done = true;
+        }
+    }
     // set the default from "last"
     int last_timeframe = appsettings->cvalue(context->athlete->cyclist, GC_BM_LAST_TIMEFRAME, ALL).toInt();
     switch (last_timeframe) {
@@ -159,6 +169,7 @@ MeasuresDownload::MeasuresDownload(Context *context, MeasuresGroup *measuresGrou
     withingsDownload = new WithingsDownload(context);
     todaysPlanBodyMeasureDownload = new TodaysPlanBodyMeasures(context);
     csvFileImport = new MeasuresCsvImport(context, this);
+    polarFlowBodyMeasureDownload = new PolarFlowBodyMeasures(context);
 
     // connect the progress bar
     connect(todaysPlanBodyMeasureDownload, SIGNAL(downloadStarted(int)), this, SLOT(downloadProgressStart(int)));
@@ -172,6 +183,11 @@ MeasuresDownload::MeasuresDownload(Context *context, MeasuresGroup *measuresGrou
     connect(csvFileImport, SIGNAL(downloadStarted(int)), this, SLOT(downloadProgressStart(int)));
     connect(csvFileImport, SIGNAL(downloadProgress(int)), this, SLOT(downloadProgress(int)));
     connect(csvFileImport, SIGNAL(downloadEnded(int)), this, SLOT(downloadProgressEnd(int)));
+
+    connect(polarFlowBodyMeasureDownload, SIGNAL(downloadStarted(int)), this, SLOT(downloadProgressStart(int)));
+    connect(polarFlowBodyMeasureDownload, SIGNAL(downloadProgress(int)), this, SLOT(downloadProgress(int)));
+    connect(polarFlowBodyMeasureDownload, SIGNAL(downloadEnded(int)), this, SLOT(downloadProgressEnd(int)));
+
 }
 
 MeasuresDownload::~MeasuresDownload() {
@@ -179,6 +195,7 @@ MeasuresDownload::~MeasuresDownload() {
     delete withingsDownload;
     delete todaysPlanBodyMeasureDownload;
     delete csvFileImport;
+    delete polarFlowBodyMeasureDownload;
 
 }
 
@@ -245,6 +262,8 @@ MeasuresDownload::download() {
      downloadOk = todaysPlanBodyMeasureDownload->getBodyMeasures(err, fromDate, toDate, measures);
    } else if (downloadCSV->isChecked()) {
        downloadOk = csvFileImport->getMeasures(measuresGroup, err, fromDate, toDate, measures);
+   } else if (downloadPOLARFLOW->isChecked()) {
+     downloadOk = polarFlowBodyMeasureDownload->getBodyMeasures(err, fromDate, toDate, measures); //(err, fromDate, toDate, measures)
    } else return;
 
    if (downloadOk) {

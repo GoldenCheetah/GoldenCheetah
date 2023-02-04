@@ -25,6 +25,7 @@
 #include "WithingsDownload.h"
 #include "TodaysPlanBodyMeasures.h"
 #include "MeasuresCsvImport.h"
+#include "PolarFlowBodyMeasures.h"
 
 #include <QDialog>
 #include <QCheckBox>
@@ -55,6 +56,7 @@ private:
      WithingsDownload *withingsDownload;
      TodaysPlanBodyMeasures *todaysPlanBodyMeasureDownload;
      MeasuresCsvImport *csvFileImport;
+     PolarFlowBodyMeasures *polarFlowBodyMeasureDownload;
 
      QPushButton *downloadButton;
      QPushButton *closeButton;
@@ -65,6 +67,7 @@ private:
      QRadioButton *downloadWithings;
      QRadioButton *downloadTP;
      QRadioButton *downloadCSV;
+     QRadioButton *downloadPOLARFLOW;
 
      //  all, from last measure, manual date interval
      QRadioButton *dateRangeAll;
@@ -79,7 +82,8 @@ private:
 
      enum source { WITHINGS = 1,
                    TP = 2,
-                   CSV = 3
+                   CSV = 3,
+                   POLARFLOW = 4
                  } ;
 
      enum timeframe { ALL = 1,
