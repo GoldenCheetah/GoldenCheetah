@@ -6876,7 +6876,7 @@ int IntervalPlotData::intervalCount() const
 double IntervalPlotData::x(size_t i) const
 {
     // for each interval there are four points, which interval is this for?
-    int interval = i ? i/4 : 0;
+    int interval = i ? static_cast<int>(i)/4 : 0;
     interval += 1; // interval numbers start at 1 not ZERO in the utility functions
 
     double multiplier = GlobalContext::context()->useMetricUnits ? 1 : MILES_PER_KM;
