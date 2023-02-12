@@ -592,6 +592,7 @@ class AutoImportPage : public QWidget
         QList<RideAutoImportRule> rules;
 
         QTreeWidget *fields;
+        QCheckBox* cloudSyncChkBox;
 
 #ifndef Q_OS_MAC
         QToolButton *upButton, *downButton;

@@ -74,6 +74,7 @@ RideAutoImportConfig::readConfig()
 
     // go read them!
     _configList = handler.getRules();
+    cloudSync = handler.importCloudSyncEnabled();
 
     // let everyone know they have changed
     changedConfig();
@@ -82,9 +83,9 @@ RideAutoImportConfig::readConfig()
 void
 RideAutoImportConfig::writeConfig()
 {
-    // update seasons.xml
+    // update autoimportrules.xml
     QString file = QString(config.canonicalPath() + "/autoimportrules.xml");
-    RideAutoImportConfigParser::serialize(file, _configList);
+    RideAutoImportConfigParser::serialize(file, cloudSync, _configList);
 
     changedConfig(); // signal!
 }
@@ -95,6 +96,7 @@ bool
 RideAutoImportConfigParser::startDocument()
 {
     buffer.clear();
+    cloudSync = false;
     return true;
 }
 
@@ -109,10 +111,15 @@ RideAutoImportConfigParser::endElement( const QString&, const QString&, const QS
         rule.setImportRule(buffer.trimmed().toInt());
         buffer.clear();
     }
-     else if(qName == "rule") {
+    else if(qName == "rule") {
         rules.append(rule);
         buffer.clear();
     }
+    else if (qName == "importcloudsyncenabled") {
+        cloudSync = buffer.trimmed().toInt();
+        buffer.clear();
+    }
+
     return true;
 }
 
@@ -147,7 +154,7 @@ RideAutoImportConfigParser::endDocument()
 }
 
 bool
-RideAutoImportConfigParser::serialize(QString filename, QList<RideAutoImportRule> rules)
+RideAutoImportConfigParser::serialize(QString filename, bool cloudSync, QList<RideAutoImportRule> rules)
 {
     // open file - truncate contents
     QFile file(filename);
@@ -177,6 +184,8 @@ RideAutoImportConfigParser::serialize(QString filename, QList<RideAutoImportRule
                                                       .arg(QString::number(rule.getImportRule()));
             out <<QString("\t</rule>\n");
     }
+
+    out << QString("\t<importcloudsyncenabled>%1</importcloudsyncenabled>\n").arg(QString::number(cloudSync));
 
     // end document
     out << "</autoimportrules>\n";

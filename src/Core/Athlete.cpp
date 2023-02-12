@@ -366,6 +366,11 @@ Athlete::configChanged(qint32 state)
 void
 Athlete::importFilesWhenOpeningAthlete() {
 
+    if (autoImportConfig->importCloudSyncEnabled()) {
+        // sync with cloud
+        cloudAutoDownload->checkDownload();
+    }
+
     autoImport = NULL;
     // just do it if something is configured
     if (autoImportConfig->hasRules()) {

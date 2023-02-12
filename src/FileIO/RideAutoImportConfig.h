@@ -63,6 +63,7 @@ class RideAutoImportConfig : public QObject {
         void writeConfig();
         QList<RideAutoImportRule> getConfig() { return _configList; }
         bool hasRules() { return (_configList.count() > 0); }
+        bool importCloudSyncEnabled() { return cloudSync; }
 
     signals:
         void changedConfig();
@@ -70,6 +71,7 @@ class RideAutoImportConfig : public QObject {
     private:
         QDir config;
         QList<RideAutoImportRule> _configList;
+        bool cloudSync;
 };
 
 
@@ -78,7 +80,7 @@ class RideAutoImportConfigParser : public QXmlDefaultHandler
 
 public:
     // marshall
-    static bool serialize(QString, QList<RideAutoImportRule> rules);
+    static bool serialize(QString filename, bool cloudSync, QList<RideAutoImportRule> rules);
 
     // unmarshall
     bool startDocument();
@@ -87,11 +89,13 @@ public:
     bool startElement(const QString&, const QString&, const QString &name, const QXmlAttributes& );
     bool characters( const QString& str );
     QList<RideAutoImportRule> getRules();
+    bool importCloudSyncEnabled() { return cloudSync; }
 
 private:
     QString buffer;
     RideAutoImportRule rule;
     QList<RideAutoImportRule> rules;
+    bool cloudSync;
     static QString EncodeXML ( const QString& );
     static QString DecodeXML ( const QString& );
 

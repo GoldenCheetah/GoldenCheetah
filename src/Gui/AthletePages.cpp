@@ -2025,7 +2025,6 @@ LTPage::LTPage(Context *context, HrZones *hrZones, HrSchemePage *schemePage) :
     addLayout->addWidget(dateEdit);
     addLayout->addStretch();
 
-    QHBoxLayout *addLayout2 = new QHBoxLayout;
     QLabel *ltLabel = new QLabel(tr("Lactate Threshold"));
     QLabel *aetLabel = new QLabel(tr("Aerobic Threshold"));
     QLabel *restHrLabel = new QLabel(tr("Rest HR"));
@@ -3488,10 +3487,16 @@ AutoImportPage::AutoImportPage(Context *context) : context(context)
 
     fields->setCurrentItem(fields->invisibleRootItem()->child(0));
 
-    mainLayout->addWidget(fields, 0,0);
-    mainLayout->addLayout(actionButtons, 1,0);
-
     context->athlete->autoImportConfig->readConfig();
+ 
+    cloudSyncChkBox = new QCheckBox(tr("Enable Cloud Sync On Import"), this);
+    bool enabled = context->athlete->autoImportConfig->importCloudSyncEnabled();
+    cloudSyncChkBox->setChecked(enabled);
+
+    mainLayout->addWidget(cloudSyncChkBox, 0, 0);
+    mainLayout->addWidget(fields, 1,0);
+    mainLayout->addLayout(actionButtons, 2,0);
+
     QList<RideAutoImportRule> rules = context->athlete->autoImportConfig->getConfig();
     int index = 0;
     foreach (RideAutoImportRule rule, rules) {
@@ -3606,7 +3611,7 @@ AutoImportPage::saveClicked()
 
     // write to disk
     QString file = QString(context->athlete->home->config().canonicalPath() + "/autoimport.xml");
-    RideAutoImportConfigParser::serialize(file, rules);
+    RideAutoImportConfigParser::serialize(file, cloudSyncChkBox->isChecked(), rules);
 
     // re-read
     context->athlete->autoImportConfig->readConfig();
