@@ -389,6 +389,9 @@ static struct {
     { "kmeans", 0 },        // kmeans(centers|assignments, k, dim1, dim2, dim3 .. dimn) - return the centers or cluster assignment
                             // from a k means cluser of the data with n dimensions (but commonly just 2- x and y)
 
+    // coerce to type
+    //{ "string", 1 },     // coerce value to string (listed above, removes decimal places, not sure why)
+    { "double", 1 },     // coerce value to double
 
     // add new ones above this line
     { "", -1 }
@@ -3514,6 +3517,15 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
             return !eval(df, leaf->fparms[0],x, it, m, p, c, s, d).isNumber;
         }
 
+        // coersion
+        if (leaf->function == "double") {
+
+            Result returning = eval(df, leaf->fparms[0],x, it, m, p, c, s, d);
+
+            // coerce to string and then force returning as a string
+            if (returning.isVector()) return returning.asNumeric();
+            else return returning.number();
+        }
 
         // string functions
         if (leaf->function == "tolower") {
