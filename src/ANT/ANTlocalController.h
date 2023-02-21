@@ -85,6 +85,8 @@ signals:
     // made a special case to support HRV tool without complication
     void rrData(uint16_t  measurementTime, uint8_t heartrateBeats, uint8_t instantHeartrate);
 
+    void posData(uint8_t position);
+
     // signal for passing remote control commands to train view
     void remoteControl(uint16_t command);
 

@@ -128,6 +128,7 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
     XDataSeries *rowSeries=NULL;
     XDataSeries *trainSeries=NULL;
     XDataSeries *rrSeries=NULL;
+    XDataSeries *posSeries=NULL;
     XDataSeries *ibikeSeries=NULL;
     XDataSeries *xdataSeries=NULL;
     XDataSeries *vo2Series=NULL;
@@ -1457,67 +1458,133 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
     }
 
 
-    // last, is there an associated rr file?
+    // is there an associated rr file?
     //
     // typically only for GC csv, but lets not constrain that
     // so long as the filename matches we'll import it into XDATA
     QFile rrfile(file.fileName().replace(".csv",".rr"));
-    if (!rrfile.open(QFile::ReadOnly)) return rideFile;
+    if (rrfile.open(QFile::ReadOnly))
+    {
 
-    // create the XDATA series
-    rrSeries = new XDataSeries();
-    rrSeries->name = "HRV"; // using same format as Polar HRV imports
-    rrSeries->valuename << "R-R";
-    rrSeries->unitname << "msecs";
+        // create the XDATA series
+        rrSeries = new XDataSeries();
+        rrSeries->name = "HRV"; // using same format as Polar HRV imports
+        rrSeries->valuename << "R-R";
+        rrSeries->unitname << "msecs";
 
-    // attempt to read and add the data
-    lineno=1;
-    QTextStream rs(&rrfile);
+        // attempt to read and add the data
+        lineno=1;
+        QTextStream rs(&rrfile);
 
-    // loop through lines and truncate etc
-    while (!rs.atEnd()) {
-        // the readLine() method doesn't handle old Macintosh CR line endings
-        // this workaround will load the the entire file if it has CR endings
-        // then split and loop through each line
-        // otherwise, there will be nothing to split and it will read each line as expected.
-        QString linesIn = rs.readLine();
-        QStringList lines = linesIn.split('\r');
-        // workaround for empty lines
-        if(lines.isEmpty()) {
-            lineno++;
-            continue;
-        }
-        for (int li = 0; li < lines.size(); ++li) {
-            QString line = lines[li];
-
-            if (line.length()==0) {
+        // loop through lines and truncate etc
+        while (!rs.atEnd()) {
+            // the readLine() method doesn't handle old Macintosh CR line endings
+            // this workaround will load the the entire file if it has CR endings
+            // then split and loop through each line
+            // otherwise, there will be nothing to split and it will read each line as expected.
+            QString linesIn = rs.readLine();
+            QStringList lines = linesIn.split('\r');
+            // workaround for empty lines
+            if(lines.isEmpty()) {
+                lineno++;
                 continue;
             }
+            for (int li = 0; li < lines.size(); ++li) {
+                QString line = lines[li];
 
-            // first line is a header line
-            if (lineno > 1) {
+                if (line.length()==0) {
+                    continue;
+                }
 
-                // split comma separated secs, hr, msecs
-                QStringList values = line.split(",", QString::KeepEmptyParts);
+                // first line is a header line
+                if (lineno > 1) {
 
-                // and add
-                XDataPoint *p = new XDataPoint();
-                p->secs = values.at(0).toDouble();
-                p->km = 0;
-                p->number[0] = values.at(2).toDouble();
+                    // split comma separated secs, hr, msecs
+                    QStringList values = line.split(",", QString::KeepEmptyParts);
 
-                rrSeries->datapoints.append(p);
+                    // and add
+                    XDataPoint *p = new XDataPoint();
+                    p->secs = values.at(0).toDouble();
+                    p->km = 0;
+                    p->number[0] = values.at(2).toDouble();
+
+                    rrSeries->datapoints.append(p);
+                }
+
+                // onto next line
+                ++lineno;
             }
-
-            // onto next line
-            ++lineno;
         }
-    }
-    // free handle
-    rrfile.close();
+        // free handle
+        rrfile.close();
 
-    // add if we got any ....
-    if (rrSeries->datapoints.count() > 0) rideFile->addXData("HRV", rrSeries);
+        // add if we got any ....
+        if (rrSeries->datapoints.count() > 0) rideFile->addXData("HRV", rrSeries);
+    }
+
+    // is there an associated cyclist position file?
+    //
+    // typically only for GC csv, but lets not constrain that
+    // so long as the filename matches we'll import it into XDATA
+    QFile posFile(file.fileName().replace(".csv",".pos.csv"));
+    if (posFile.open(QFile::ReadOnly))
+    {
+
+        // create the XDATA series
+        posSeries = new XDataSeries();
+        posSeries->name = "position";
+        posSeries->valuename << "position";
+        posSeries->unitname << "";
+
+        // attempt to read and add the data
+        lineno=1;
+        QTextStream rs(&posFile);
+
+        // loop through lines and truncate etc
+        while (!rs.atEnd()) {
+            // the readLine() method doesn't handle old Macintosh CR line endings
+            // this workaround will load the the entire file if it has CR endings
+            // then split and loop through each line
+            // otherwise, there will be nothing to split and it will read each line as expected.
+            QString linesIn = rs.readLine();
+            QStringList lines = linesIn.split('\r');
+            // workaround for empty lines
+            if(lines.isEmpty()) {
+                lineno++;
+                continue;
+            }
+            for (int li = 0; li < lines.size(); ++li) {
+                QString line = lines[li];
+
+                if (line.length()==0) {
+                    continue;
+                }
+
+                // first line is a header line
+                if (lineno > 1) {
+
+                    // split comma separated secs, hr, msecs
+                    QStringList values = line.split(",", QString::KeepEmptyParts);
+
+                    // and add
+                    XDataPoint *p = new XDataPoint();
+                    p->secs = values.at(0).toDouble();
+                    p->km = 0;
+                    p->number[0] = values.at(1).toDouble();
+
+                    posSeries->datapoints.append(p);
+                }
+
+                // onto next line
+                ++lineno;
+            }
+        }
+        // free handle
+        posFile.close();
+
+        // add if we got any ....
+        if (posSeries->datapoints.count() > 0) rideFile->addXData("position", posSeries);
+    }
 
     // all done
     return rideFile;

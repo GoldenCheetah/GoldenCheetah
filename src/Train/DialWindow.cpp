@@ -710,6 +710,11 @@ void DialWindow::seriesChanged()
             foreground = GColor(CLTE);
             break;
 
+    // TODO: define colors tags for each Power phases
+    case RealtimeData::RightPowerPhaseBegin:
+    case RealtimeData::RightPowerPhaseEnd:
+    case RealtimeData::RightPowerPhasePeakBegin:
+    case RealtimeData::RightPowerPhasePeakEnd:
     case RealtimeData::RightTorqueEffectiveness:
            foreground = GColor(CRTE);
            break;

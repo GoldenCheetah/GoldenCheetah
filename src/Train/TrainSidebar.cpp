@@ -348,7 +348,7 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
     lap_elapsed_msec = 0;
     secs_to_start = 0;
 
-    rrFile = recordFile = vo2File = NULL;
+    rrFile = posFile = recordFile = vo2File = NULL;
     lastRecordSecs = 0;
     status = 0;
     setStatusFlags(RT_MODE_ERGO);         // ergo mode by default
@@ -369,6 +369,9 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
     displayLRBalance = RideFile::NA;
     displayLTE = displayRTE = displayLPS = displayRPS = 0;
     displayLatitude = displayLongitude = displayAltitude = 0.0;
+    displayPosition = RealtimeData::seated;
+    displayRppb = displayRppe = displayRpppb = displayRpppe = 0.0;
+    displayLppb = displayLppe = displayLpppb = displayLpppe = 0.0;
 
     connect(gui_timer, SIGNAL(timeout()), this, SLOT(guiUpdate()));
     connect(disk_timer, SIGNAL(timeout()), this, SLOT(diskUpdate()));
@@ -687,6 +690,7 @@ TrainSidebar::configChanged(qint32)
             connect(Devices[i].controller, SIGNAL(remoteControl(uint16_t)), this, SLOT(remoteControl(uint16_t)));
             // connect slot for receiving rrData
             connect(Devices[i].controller, SIGNAL(rrData(uint16_t,uint8_t,uint8_t)), this, SLOT(rrData(uint16_t,uint8_t,uint8_t)));
+            connect(Devices[i].controller, SIGNAL(posData(uint8_t)), this, SLOT(posData(uint8_t)));
 #ifdef QT_BLUETOOTH_LIB
         } else if (Devices.at(i).type == DEV_BT40) {
             Devices[i].controller = new BT40Controller(this, &Devices[i]);
@@ -1471,6 +1475,14 @@ void TrainSidebar::Stop(int deviceStatus)        // when stop button is pressed
             rrFile=NULL;
         }
 
+        // close posFile
+        if (posFile) {
+            //fprintf(stderr, "Closing position file\n"); fflush(stderr);
+            posFile->close();
+            delete posFile;
+            posFile=NULL;
+        }
+
         // close vo2File
         if (vo2File) {
             fprintf(stderr, "Closing vo2 file\n"); fflush(stderr);
@@ -1567,6 +1579,15 @@ void TrainSidebar::updateData(RealtimeData &rtData)
     displayLatitude = rtData.getLatitude();
     displayLongitude = rtData.getLongitude();
     displayAltitude = rtData.getAltitude();
+    displayRppb = rtData.getRppb();
+    displayRppe = rtData.getRppe();
+    displayRpppb = rtData.getRpppb();
+    displayRpppe = rtData.getRpppe();
+    displayLppb = rtData.getLppb();
+    displayLppe = rtData.getLppe();
+    displayLpppb = rtData.getLpppb();
+    displayLpppe = rtData.getLpppe();
+    displayPosition = rtData.getPosition();
     // Gradient not supported
     return;
 }
@@ -1789,6 +1810,14 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
                     rtData.setRTE(local.getRTE());
                     rtData.setLPS(local.getLPS());
                     rtData.setRPS(local.getRPS());
+                    rtData.setRppb(local.getRppb());
+                    rtData.setRppe(local.getRppe());
+                    rtData.setRpppb(local.getRpppb());
+                    rtData.setRpppe(local.getRpppe());
+                    rtData.setLppb(local.getLppb());
+                    rtData.setLppe(local.getLppe());
+                    rtData.setLpppb(local.getLpppb());
+                    rtData.setLpppe(local.getLpppe());
                 }
                 if (local.getTrainerStatusAvailable())
                 {
@@ -1990,6 +2019,15 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
             displayLatitude = rtData.getLatitude();
             displayLongitude = rtData.getLongitude();
             displayAltitude = rtData.getAltitude();
+            displayRppb = rtData.getRppb();
+            displayRppe = rtData.getRppe();
+            displayRpppb = rtData.getRpppb();
+            displayRpppe = rtData.getRpppe();
+            displayLppb = rtData.getLppb();
+            displayLppe = rtData.getLppe();
+            displayLpppb = rtData.getLpppb();
+            displayLpppe = rtData.getLpppe();
+            displayPosition = rtData.getPosition();
 
             double weightKG = bicycle.MassKG();
             double vs = computeInstantSpeed(weightKG, rtData.getSlope(), rtData.getAltitude(), rtData.getWatts());
@@ -3152,6 +3190,44 @@ void TrainSidebar::rrData(uint16_t  rrtime, uint8_t count, uint8_t bpm)
         recordFileStream << secs << ", " << bpm << ", " << rrtime << "\n";
     }
     //fprintf(stderr, "R-R: %d ms, HR=%d, count=%d\n", rrtime, bpm, count); fflush(stderr);
+}
+
+// cyclist position data received
+void TrainSidebar::posData(uint8_t position)
+{
+    QMutexLocker locker(&posMutex);
+
+    // convert from milliseconds to secondes
+    double secs = double(session_elapsed_msec + session_time.elapsed()) / 1000.00;
+
+    if (status&RT_RECORDING && posFile == NULL && recordFile != NULL) {
+        QString posFilename = recordFile->fileName().replace(".csv", ".pos.csv");
+        //fprintf(stderr, "First cyclist position, need to open file %s\n", posFilename.toStdString().c_str()); fflush(stderr);
+
+        // setup the pos.csv file
+        posFile = new QFile(posFilename);
+        if (!posFile->open(QFile::WriteOnly | QFile::Truncate)) {
+            delete posFile;
+            posFile=NULL;
+        } else {
+
+            // CSV File header
+            QTextStream recordFileStream(posFile);
+            recordFileStream << "secs,position\n";
+            // add "seated" at begining when data stream starts late
+            if (secs!=0.0)
+                recordFileStream << "0,0\n";
+        }
+    }
+
+    // output a line if recording and file ready
+    if (status&RT_RECORDING && posFile) {
+        QTextStream recordFileStream(posFile);
+
+        // output a line
+        recordFileStream << secs << "," << position << "\n";
+    }
+    //fprintf(stderr, "position: %d ms, position=%d\n", posTime, position); fflush(stderr);
 }
 
 // VO2 Measurement data received
