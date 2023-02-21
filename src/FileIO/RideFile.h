@@ -291,9 +291,12 @@ class RideFile : public QObject // QObject to emit signals
                                  double rvert, double rcad, double rcontact, double tcore,
                                  int interval, bool forceAppend);
 
+        void updatePointValue(QString valueName, QString valueStr);
+
         void appendPoint(const RideFilePoint &);
 
         void updatePoint(RideFilePoint *point, const RideFilePoint *oldPoint);
+        void updatePoint(RideFilePoint *point, QString valueName, QString value);
 
         const QVector<RideFilePoint*> &dataPoints() const { return dataPoints_; }
 
@@ -393,6 +396,9 @@ class RideFile : public QObject // QObject to emit signals
         // rather use the RideFileCommand *command
         // to manipulate the ride data
         void setPointValue(int index, SeriesType series, double value);
+        // void setPointValue(int index, SeriesType series, int value);
+        void setPointValue(double secs, SeriesType series, double value);
+        // void setPointValue(double secs, SeriesType series, int value);
         void deletePoint(int index);
         void deletePoints(int index, int count);
         void insertPoint(int index, RideFilePoint *point);
@@ -450,6 +456,7 @@ class RideFile : public QObject // QObject to emit signals
         QVariant getPointFromValue(double value, SeriesType series) const;
         void updateMin(RideFilePoint* point);
         void updateMax(RideFilePoint* point);
+        void updateAvg(SeriesType series, double value);
         void updateAvg(RideFilePoint* point);
 
         bool dstale; // is derived data up to date?
