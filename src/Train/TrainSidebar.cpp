@@ -2169,8 +2169,11 @@ void TrainSidebar::diskUpdate()
                          << "," << displayLatitude;
     }
 
+    QString slopeStr = (status&RT_MODE_SLOPE)?QString::number(slope):QString("");
+    QString loadStr = (status&RT_MODE_ERGO)?QString::number(load):QString("");
+
     recordFileStream    << "," // headwind
-                        << "," // slope
+                        << "," << slopeStr
                         << "," // temp
                         << "," << displayWorkoutLap
                         << "," << displayLRBalance
@@ -2182,7 +2185,7 @@ void TrainSidebar::diskUpdate()
                         << "," << displayTHB
                         << "," << displayO2HB
                         << "," << displayHHB
-                        << "," << load
+                        << "," << loadStr
                         << "," << "\n";
 }
 
