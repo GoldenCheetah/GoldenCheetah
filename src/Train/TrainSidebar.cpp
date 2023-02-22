@@ -1350,7 +1350,7 @@ void TrainSidebar::Start()       // when start button is pressed
                 // CSV File header
 
                 QTextStream recordFileStream(recordFile);
-                recordFileStream << "secs, cad, hr, km, kph, nm, watts, alt, lon, lat, headwind, slope, temp, interval, lrbalance, lte, rte, lps, rps, smo2, thb, o2hb, hhb, target\n";
+                recordFileStream << "secs, cad, hr, km, kph, nm, watts, alt, lon, lat, headwind, slope, temp, interval, lrbalance, lte, rte, lps, rps, smo2, thb, o2hb, hhb, target, rppb, rppe, rpppb, rpppe, lppb, lppe, lpppb, lpppe\n";
 
                 disk_timer->start(SAMPLERATE);  // start screen
             }
@@ -2148,7 +2148,7 @@ void TrainSidebar::diskUpdate()
     if (secs <= lastRecordSecs) return; // Avoid duplicates
     lastRecordSecs = secs;
 
-    // GoldenCheetah CVS Format "secs, cad, hr, km, kph, nm, watts, alt, lon, lat, headwind, slope, temp, interval, lrbalance, lte, rte, lps, rps, smo2, thb, o2hb, hhb, target\n";
+    // GoldenCheetah CVS Format "secs, cad, hr, km, kph, nm, watts, alt, lon, lat, headwind, slope, temp, interval, lrbalance, lte, rte, lps, rps, smo2, thb, o2hb, hhb, target, rppb, rppe, rpppb, rpppe, lppb, lppe, lpppb, lpppe\n";
 
     recordFileStream    << secs
                         << "," << displayCadence
@@ -2186,6 +2186,14 @@ void TrainSidebar::diskUpdate()
                         << "," << displayO2HB
                         << "," << displayHHB
                         << "," << loadStr
+                        << "," << displayRppb
+                        << "," << displayRppe
+                        << "," << displayRpppb
+                        << "," << displayRpppe
+                        << "," << displayLppb
+                        << "," << displayLppe
+                        << "," << displayLpppb
+                        << "," << displayLpppe
                         << "," << "\n";
 }
 

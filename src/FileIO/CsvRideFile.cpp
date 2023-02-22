@@ -663,6 +663,8 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                 double lrbalance = RideFile::NA;
                 double lte = 0.0, rte = 0.0;
                 double lps = 0.0, rps = 0.0;
+                double rppb = 0.0, rppe = 0.0, rpppb = 0.0, rpppe = 0.0;
+                double lppb = 0.0, lppe = 0.0, lpppb = 0.0, lpppe = 0.0;
                 double smo2 = 0.0, thb = 0.0;
                 double gct = 0.0, vo = 0.0, rcad = 0.0;
                 //UNUSED double o2hb = 0.0, hhb = 0.0;
@@ -746,6 +748,22 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                                 lps = valueStr.toDouble();
                             } else if (valueName == "rps") {
                                 rps = valueStr.toDouble();
+                            } else if (valueName == "rppb") {
+                                rppb = valueStr.toDouble();
+                            } else if (valueName == "rppe") {
+                                rppe = valueStr.toDouble();
+                            } else if (valueName == "rpppb") {
+                                rpppb = valueStr.toDouble();
+                            } else if (valueName == "rpppe") {
+                                rpppe = valueStr.toDouble();
+                            } else if (valueName == "lppb") {
+                                lppb = valueStr.toDouble();
+                            } else if (valueName == "lppe") {
+                                lppe = valueStr.toDouble();
+                            } else if (valueName == "lpppb") {
+                                lpppb = valueStr.toDouble();
+                            } else if (valueName == "lpppe") {
+                                lpppe = valueStr.toDouble();
                             } else if (valueName == "smo2") {
                                 smo2 = valueStr.toDouble();
                             } else if (valueName == "thb") {
@@ -1311,6 +1329,25 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                                           0.0, 0.0, 0.0, 0.0,
                                           smo2, thb,
                                           vo, rcad, gct, 0.0, interval);
+
+                    if (csvType == gc) {
+                        if (gcSeries->valuename.indexOf("rppb")!=-1)
+                            rideFile->setPointValue(minutes * 60.0, RideFile::rppb, rppb);
+                        if (gcSeries->valuename.indexOf("rppe")!=-1)
+                            rideFile->setPointValue(minutes * 60.0, RideFile::rppe, rppe);
+                        if (gcSeries->valuename.indexOf("rpppb")!=-1)
+                            rideFile->setPointValue(minutes * 60.0, RideFile::rpppb, rpppb);
+                        if (gcSeries->valuename.indexOf("rpppe")!=-1)
+                            rideFile->setPointValue(minutes * 60.0, RideFile::rpppe, rpppe);
+                        if (gcSeries->valuename.indexOf("lppb")!=-1)
+                            rideFile->setPointValue(minutes * 60.0, RideFile::lppb, lppb);
+                        if (gcSeries->valuename.indexOf("lppe")!=-1)
+                            rideFile->setPointValue(minutes * 60.0, RideFile::lppe, lppe);
+                        if (gcSeries->valuename.indexOf("lpppb")!=-1)
+                            rideFile->setPointValue(minutes * 60.0, RideFile::lpppb, lpppb);
+                        if (gcSeries->valuename.indexOf("lpppe")!=-1)
+                            rideFile->setPointValue(minutes * 60.0, RideFile::lpppe, lpppe);
+                    }
 
                     if (target > 0.0) {
                         if (trainSeries == NULL)  {
