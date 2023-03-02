@@ -1617,7 +1617,7 @@ Bindings::postProcess(QString processor, PyObject *activity) const
     if (f == nullptr) return false;
 
     DataProcessor* dp = DataProcessorFactory::instance().getProcessors().value(processor, nullptr);
-    if (!dp || !dp->isCoreProcessor()) return false; // Python DPs are disabled due to #4095
+    if (!dp) return false;
     return dp->postProcess(f, nullptr, "PYTHON");
 }
 

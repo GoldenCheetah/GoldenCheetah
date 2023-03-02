@@ -7382,8 +7382,6 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
 
                         if (!f) return Result(0); // eek!
 
-                        if (!dp->isCoreProcessor()) return Result(0); // Python DPs are disabled due to #4095
-
                         // now run the data processor
                         if (dp->postProcess(f)) {
                             // rideFile is now dirty!
