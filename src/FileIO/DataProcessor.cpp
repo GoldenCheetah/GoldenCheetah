@@ -99,9 +99,6 @@ DataProcessorFactory::autoProcess(RideFile *ride, QString mode, QString op)
     i.toFront();
     while (i.hasNext()) {
         i.next();
-
-        if (!i.value()->isCoreProcessor()) continue; // Python DP are not supported in automatic mode
-
         QString configsetting = QString("dp/%1/apply").arg(i.key());
 
         // if we're being run manually, run all that are defined

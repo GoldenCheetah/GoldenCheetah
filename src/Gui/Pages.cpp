@@ -2715,7 +2715,7 @@ ProcessorPage::ProcessorPage(Context *context) : context(context)
 {
     // get the available processors
     const DataProcessorFactory &factory = DataProcessorFactory::instance();
-    processors = factory.getProcessors(true);
+    processors = factory.getProcessors();
 
     QGridLayout *mainLayout = new QGridLayout(this);
 
