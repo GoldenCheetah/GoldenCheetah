@@ -1,5 +1,6 @@
 #include "FixPyDataProcessor.h"
 #include "FixPyRunner.h"
+#include "Athlete.h"
 
 // Config widget used by the Preferences/Options config panes
 class FixPyDataProcessorConfig : public DataProcessorConfig
@@ -24,7 +25,17 @@ bool FixPyDataProcessor::postProcess(RideFile *rideFile, DataProcessorConfig *se
     QString errText;
     bool useNewThread = op != "PYTHON";
     Context* context = (rideFile) ? rideFile->context : nullptr;
-    FixPyRunner pyRunner(context, rideFile, useNewThread);
+    RideItem* rideItem = nullptr;
+    if (context && rideFile) {
+        // get RideItem from RideFile for Python functions using it
+        foreach(RideItem *item, context->athlete->rideCache->rides()) {
+            if (item->dateTime == rideFile->startTime()) {
+                rideItem = item;
+                break;
+            }
+        }
+    }
+    FixPyRunner pyRunner(context, rideFile, rideItem, useNewThread);
     return pyRunner.run(pyScript->source, pyScript->iniKey, errText) == 0;
 }
 

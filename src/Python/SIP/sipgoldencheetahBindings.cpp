@@ -1182,6 +1182,40 @@ static PyObject *meth_Bindings_hasTag(PyObject *sipSelf, PyObject *sipArgs, PyOb
 }
 
 
+extern "C" {static PyObject *meth_Bindings_getTag(PyObject *, PyObject *, PyObject *);}
+static PyObject *meth_Bindings_getTag(PyObject *sipSelf, PyObject *sipArgs, PyObject *sipKwds)
+{
+    PyObject *sipParseErr = NULL;
+
+    {
+         ::QString* a0;
+        int a0State = 0;
+        PyObject * a1 = 0;
+        const  ::Bindings *sipCpp;
+
+        static const char *sipKwdList[] = {
+            sipName_name,
+            sipName_activity,
+        };
+
+        if (sipParseKwdArgs(&sipParseErr, sipArgs, sipKwds, sipKwdList, NULL, "BJ1|P0", &sipSelf, sipType_Bindings, &sipCpp, sipType_QString,&a0, &a0State, &a1))
+        {
+             ::QString*sipRes;
+
+            sipRes = new  ::QString(sipCpp->getTag(*a0,a1));
+            sipReleaseType(a0,sipType_QString,a0State);
+
+            return sipConvertFromNewType(sipRes,sipType_QString,NULL);
+        }
+    }
+
+    /* Raise an exception if the arguments couldn't be parsed. */
+    sipNoMethod(sipParseErr, sipName_Bindings, sipName_getTag, NULL);
+
+    return NULL;
+}
+
+
 extern "C" {static PyObject *meth_Bindings_configChart(PyObject *, PyObject *, PyObject *);}
 static PyObject *meth_Bindings_configChart(PyObject *sipSelf, PyObject *sipArgs, PyObject *sipKwds)
 {
@@ -1482,6 +1516,7 @@ static PyMethodDef methods_Bindings[] = {
     {SIP_MLNAME_CAST(sipName_delTag), (PyCFunction)meth_Bindings_delTag, METH_VARARGS|METH_KEYWORDS, NULL},
     {SIP_MLNAME_CAST(sipName_deleteActivitySample), (PyCFunction)meth_Bindings_deleteActivitySample, METH_VARARGS|METH_KEYWORDS, NULL},
     {SIP_MLNAME_CAST(sipName_deleteSeries), (PyCFunction)meth_Bindings_deleteSeries, METH_VARARGS|METH_KEYWORDS, NULL},
+    {SIP_MLNAME_CAST(sipName_getTag), (PyCFunction)meth_Bindings_getTag, METH_VARARGS|METH_KEYWORDS, NULL},
     {SIP_MLNAME_CAST(sipName_hasTag), (PyCFunction)meth_Bindings_hasTag, METH_VARARGS|METH_KEYWORDS, NULL},
     {SIP_MLNAME_CAST(sipName_intervalType), (PyCFunction)meth_Bindings_intervalType, METH_VARARGS|METH_KEYWORDS, NULL},
     {SIP_MLNAME_CAST(sipName_metrics), (PyCFunction)meth_Bindings_metrics, METH_VARARGS|METH_KEYWORDS, NULL},
@@ -1522,7 +1557,7 @@ sipClassTypeDef sipTypeDef_goldencheetah_Bindings = {
     {
         sipNameNr_Bindings,
         {0, 0, 1},
-        39, methods_Bindings,
+        40, methods_Bindings,
         0, 0,
         0, 0,
         {0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
