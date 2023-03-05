@@ -1728,10 +1728,10 @@ QString
 Bindings::getTag(QString name, PyObject *activity) const
 {
     Context *context = python->contexts.value(threadid()).context;
-    if (context == nullptr) return false;
+    if (context == nullptr) return QString();
 
     RideFile *f = selectRideFile(activity);
-    if (f == nullptr) return false;
+    if (f == nullptr) return QString();
 
     name = name.replace("_"," ");
     if (GlobalContext::context()->specialFields.isMetric(name)) {
