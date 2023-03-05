@@ -390,6 +390,7 @@ public:
     bool setTag(QString name, QString value, PyObject *activity = NULL) const;
     bool delTag(QString name, PyObject *activity = NULL) const;
     bool hasTag(QString name, PyObject *activity = NULL) const;
+    QString getTag(QString name, PyObject *activity = NULL) const;
 
     // working with qt charts
     bool configChart(QString title, int type, bool animate, int legpos, bool stack, int orientation) const;

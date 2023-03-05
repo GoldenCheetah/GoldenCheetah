@@ -1630,11 +1630,7 @@ Bindings::setTag(QString name, QString value, PyObject *activity) const
     Context *context = python->contexts.value(threadid()).context;
     if (context == nullptr) return false;
 
-    RideItem* m = fromDateTime(activity);
-    if (m == nullptr) m = const_cast<RideItem*>(context->currentRideItem());
-    if (m == nullptr) return false;
-
-    RideFile *f = m->ride();
+    RideFile *f = selectRideFile(activity);
     if (f == nullptr) return false;
 
     name = name.replace("_"," ");
@@ -1656,10 +1652,16 @@ Bindings::setTag(QString name, QString value, PyObject *activity) const
         f->setTag(name, value);
     }
 
-    // rideFile is now dirty!
-    m->setDirty(true);
-    // get refresh done, coz overrides state has changed
-    m->notifyRideMetadataChanged();
+    // Notify changes if activity is already in rideCache
+    RideItem* m = fromDateTime(activity);
+    if (m == nullptr) m = python->contexts.value(threadid()).item;
+    if (m == nullptr) m = context->rideItem();
+    if (m && m->dateTime == f->startTime()) {
+        // rideFile is now dirty!
+        m->setDirty(true);
+        // get refresh done, coz overrides state has changed
+        m->notifyRideMetadataChanged();
+    }
 
     return true;
 }
@@ -1673,23 +1675,25 @@ Bindings::delTag(QString name, PyObject *activity) const
     Context *context = python->contexts.value(threadid()).context;
     if (context == nullptr) return false;
 
-    RideItem* m = fromDateTime(activity);
-    if (m == nullptr) m = const_cast<RideItem*>(context->currentRideItem());
-    if (m == nullptr) return false;
-
-    RideFile *f = m->ride();
+    RideFile *f = selectRideFile(activity);
     if (f == nullptr) return false;
+
+    RideItem* m = fromDateTime(activity);
+    if (m == nullptr) m = python->contexts.value(threadid()).item;
+    if (m == nullptr) m = context->rideItem();
 
     name = name.replace("_"," ");
     if (GlobalContext::context()->specialFields.isMetric(name)) {
 
         if (f->metricOverrides.remove(GlobalContext::context()->specialFields.metricSymbol(name))) {
 
-            // rideFile is now dirty!
-            m->setDirty(true);
-            // get refresh done, coz overrides state has changed
-            m->notifyRideMetadataChanged();
-
+            // Notify changes if activity is already in rideCache
+            if (m && m->dateTime == f->startTime()) {
+                // rideFile is now dirty!
+                m->setDirty(true);
+                // get refresh done, coz overrides state has changed
+                m->notifyRideMetadataChanged();
+	    }
             return true;
         }
         return false;
@@ -1698,11 +1702,13 @@ Bindings::delTag(QString name, PyObject *activity) const
 
         if (f->removeTag(name)) {
 
-            // rideFile is now dirty!
-            m->setDirty(true);
-            // get refresh done, coz overrides state has changed
-            m->notifyRideMetadataChanged();
-
+            // Notify changes if activity is already in rideCache
+            if (m && m->dateTime == f->startTime()) {
+                // rideFile is now dirty!
+                m->setDirty(true);
+                // get refresh done, coz overrides state has changed
+                m->notifyRideMetadataChanged();
+	    }
             return true;
         }
         return false;
@@ -1715,15 +1721,31 @@ Bindings::hasTag(QString name, PyObject *activity) const
     Context *context = python->contexts.value(threadid()).context;
     if (context == nullptr) return false;
 
-    RideItem* m = fromDateTime(activity);
-    if (m == nullptr) m = const_cast<RideItem*>(context->currentRideItem());
-    if (m == nullptr) return false;
+    RideFile *f = selectRideFile(activity);
+    if (f == nullptr) return false;
 
     name = name.replace("_"," ");
     if (GlobalContext::context()->specialFields.isMetric(name)) {
-        return m->overrides_.contains(GlobalContext::context()->specialFields.metricSymbol(name));
+        return f->metricOverrides.contains(GlobalContext::context()->specialFields.metricSymbol(name));
     } else {
-        return m->hasText(name);
+        return f->tags().contains(name);
+    }
+}
+
+QString
+Bindings::getTag(QString name, PyObject *activity) const
+{
+    Context *context = python->contexts.value(threadid()).context;
+    if (context == nullptr) return QString();
+
+    RideFile *f = selectRideFile(activity);
+    if (f == nullptr) return QString();
+
+    name = name.replace("_"," ");
+    if (GlobalContext::context()->specialFields.isMetric(name)) {
+        return f->metricOverrides[GlobalContext::context()->specialFields.metricSymbol(name)]["value"];
+    } else {
+        return f->getTag(name, "");
     }
 }
 
