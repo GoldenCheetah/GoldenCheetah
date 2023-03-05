@@ -1091,6 +1091,9 @@ RideImportWizard::abortClicked()
             tableWidget->item(i,STATUS_COLUMN)->setText(tr("Processing..."));
             DataProcessorFactory::instance().autoProcess(ride, "Auto", "Import");
             ride->recalculateDerivedSeries();
+            // now metrics have been calculated
+            DataProcessorFactory::instance().autoProcess(ride, "Save", "ADD");
+
 
             tableWidget->item(i,STATUS_COLUMN)->setText(tr("Saving file..."));
 
@@ -1121,9 +1124,6 @@ RideImportWizard::abortClicked()
         } else {
             tableWidget->item(i,STATUS_COLUMN)->setText(tr("Error - Import of activitiy file failed"));
         }
-
-        // now metrics have been calculated
-        DataProcessorFactory::instance().autoProcess(ride, "Save", "ADD");
 
         // clear
         delete ride;
