@@ -1627,6 +1627,9 @@ Bindings::setTag(QString name, QString value, PyObject *activity) const
     bool readOnly = python->contexts.value(threadid()).readOnly;
     if (readOnly) return false;
 
+    Context *context = python->contexts.value(threadid()).context;
+    if (context == nullptr) return false;
+
     RideFile *f = selectRideFile(activity);
     if (f == nullptr) return false;
 
@@ -1652,7 +1655,8 @@ Bindings::setTag(QString name, QString value, PyObject *activity) const
     // Notify changes if activity is already in rideCache
     RideItem* m = fromDateTime(activity);
     if (m == nullptr) m = python->contexts.value(threadid()).item;
-    if (m) {
+    if (m == nullptr) m = context->rideItem();
+    if (m && m->dateTime == f->startTime()) {
         // rideFile is now dirty!
         m->setDirty(true);
         // get refresh done, coz overrides state has changed
@@ -1668,11 +1672,15 @@ Bindings::delTag(QString name, PyObject *activity) const
     bool readOnly = python->contexts.value(threadid()).readOnly;
     if (readOnly) return false;
 
+    Context *context = python->contexts.value(threadid()).context;
+    if (context == nullptr) return false;
+
     RideFile *f = selectRideFile(activity);
     if (f == nullptr) return false;
 
     RideItem* m = fromDateTime(activity);
     if (m == nullptr) m = python->contexts.value(threadid()).item;
+    if (m == nullptr) m = context->rideItem();
 
     name = name.replace("_"," ");
     if (GlobalContext::context()->specialFields.isMetric(name)) {
@@ -1680,7 +1688,7 @@ Bindings::delTag(QString name, PyObject *activity) const
         if (f->metricOverrides.remove(GlobalContext::context()->specialFields.metricSymbol(name))) {
 
             // Notify changes if activity is already in rideCache
-            if (m) {
+            if (m && m->dateTime == f->startTime()) {
                 // rideFile is now dirty!
                 m->setDirty(true);
                 // get refresh done, coz overrides state has changed
@@ -1695,7 +1703,7 @@ Bindings::delTag(QString name, PyObject *activity) const
         if (f->removeTag(name)) {
 
             // Notify changes if activity is already in rideCache
-            if (m) {
+            if (m && m->dateTime == f->startTime()) {
                 // rideFile is now dirty!
                 m->setDirty(true);
                 // get refresh done, coz overrides state has changed
