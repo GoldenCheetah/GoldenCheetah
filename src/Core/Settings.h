@@ -406,6 +406,7 @@
 // Azum
 #define GC_AZUM_ACCESS_TOKEN            "<athlete-private>azum_access_token"
 #define GC_AZUM_REFRESH_TOKEN           "<athlete-private>azum_refresh_token"
+#define GC_AZUM_USERKEY                 "<athlete-private>azum_userkey"
 #define GC_AZUM_URL                     "<athlete-private>azum_url"
 #define GC_AZUM_ATHLETE_ID              "<athlete-private>azum_athlete_id"
 

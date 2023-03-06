@@ -10,7 +10,7 @@
 #include <QWebEngineView>
 
 #ifndef AZUM_DEBUG
-#define AZUM_DEBUG false
+#define AZUM_DEBUG true
 #endif
 #ifdef Q_CC_MSVC
 #define printd(fmt, ...) do {                                                \
@@ -50,6 +50,7 @@ Azum::Azum(Context *context) : CloudService(context), context(context), root_(NU
     settings.insert(URL, GC_AZUM_URL);
     settings.insert(DefaultURL, "https://training.azum.com");
     settings.insert(AthleteID, GC_AZUM_ATHLETE_ID);
+    settings.insert(Key, GC_AZUM_USERKEY);
 }
 
 Azum::~Azum() {
@@ -82,6 +83,9 @@ Azum::open(QStringList &errors)
     }
 
     printd("Get access token for this session.\n");
+    QString clientSecret = getSetting(GC_AZUM_USERKEY, "").toString().trimmed();
+    if (clientSecret == "")
+        clientSecret = GC_AZUM_CLIENT_SECRET;
 
     // refresh endpoint
     QString baseUrl = QString("%1/oauth/token/")
@@ -92,7 +96,7 @@ Azum::open(QStringList &errors)
     // set params
     QString data;
     data += "client_id=" GC_AZUM_CLIENT_ID;
-    data += "&client_secret=" GC_AZUM_CLIENT_SECRET;
+    data += "&client_secret=" + clientSecret;
     data += "&refresh_token=" + getSetting(GC_AZUM_REFRESH_TOKEN).toString();
     data += "&grant_type=refresh_token";
 
