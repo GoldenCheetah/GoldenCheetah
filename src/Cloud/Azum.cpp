@@ -10,7 +10,7 @@
 #include <QWebEngineView>
 
 #ifndef AZUM_DEBUG
-#define AZUM_DEBUG true
+#define AZUM_DEBUG false
 #endif
 #ifdef Q_CC_MSVC
 #define printd(fmt, ...) do {                                                \
