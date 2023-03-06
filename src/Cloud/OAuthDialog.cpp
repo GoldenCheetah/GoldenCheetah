@@ -327,7 +327,11 @@ OAuthDialog::urlChanged(const QUrl &url)
                 if (baseURL=="") baseURL=service->getSetting(GC_AZUM_URL, "https://training.azum.com").toString();
                 urlstr = QString("%1/oauth/token/?").arg(baseURL);
                 params.addQueryItem("client_id", GC_AZUM_CLIENT_ID);
-                params.addQueryItem("client_secret", GC_AZUM_CLIENT_SECRET);
+                if (service->getSetting(GC_AZUM_USERKEY, "").toString() != "") {
+                    params.addQueryItem("client_secret", service->getSetting(GC_AZUM_USERKEY, "").toString());
+                } else {
+                    params.addQueryItem("client_secret", GC_AZUM_CLIENT_SECRET);
+                }
                 params.addQueryItem("redirect_uri","http://www.goldencheetah.org/");
                 params.addQueryItem("grant_type", "authorization_code");
             }
