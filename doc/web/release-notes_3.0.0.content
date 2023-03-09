@@ -77,7 +77,7 @@ Alejandro Martinez (49):
       Merge branch 'master' of https://github.com/GoldenCheetah/GoldenCheetah
       Enabled translation of Season and Event details     Updated spanish translation     Updated german translation (by Tilman Schmiedeberg)
       UI Nits: enlarge Aerolab Crr box to fit the allowed 6 decimal places
-      Enabled translation of BatchProcessingDialog     Updated Spanish Translation     Updated Italian Translation (by Marco Piccirilli)
+      Enabled translation of BatchExportDialog     Updated Spanish Translation     Updated Italian Translation (by Marco Piccirilli)
       Enabled translation of GroupBy labels and formats in RideNavigator
       Use Distance as a PMC metric     Fixes #570
       Enabled progress translation in PowerTap download     Updated spanish translation

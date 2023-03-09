@@ -541,8 +541,6 @@ class ProcessorPage : public QWidget
         QTreeWidget *processorTree;
         //QPushButton *upButton, *downButton;
 
-        void createProcessorEntry(QMapIterator<QString, DataProcessor*>& i);
-
 };
 
 class DefaultsPage : public QWidget
