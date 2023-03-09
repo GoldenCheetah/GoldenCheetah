@@ -51,6 +51,8 @@
 //
 // ManualDataProcessorDialog is a dialog box to manually execute a
 // dataprocessor on the current ride and is called from the mainWindow menus
+// when no ride but DataProcessorConfig is provided it allows edit and confirm
+// to apply to multiple ride in BatchProcessingDialog
 //
 
 // every data processor must supply a configuration Widget
@@ -111,7 +113,7 @@ class ManualDataProcessorDialog : public QDialog
 
 
     public:
-        ManualDataProcessorDialog(Context *, QString, RideItem *);
+        ManualDataProcessorDialog(Context *, QString, RideItem *, DataProcessorConfig *config=nullptr);
 
     private slots:
         void cancelClicked();

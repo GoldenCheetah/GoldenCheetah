@@ -28,59 +28,9 @@
 #include "CsvRideFile.h"
 #include "DataProcessor.h"
 #include "RideMetadata.h"
-#include "DataProcessor.h"
-#include "ConfigDialog.h"
-
-extern ConfigDialog* configdialog_ptr;
-
-#ifdef GC_WANT_PYTHON
-#include "FixPyScriptsDialog.h"
-#endif
 
 #include <QFormLayout>
 #include <QButtonGroup>
-
-Q_DECLARE_METATYPE(DataProcessor*)
-
-CoreDpOptionsDialog::CoreDpOptionsDialog(Context* context) :  ProcessorPage(context) {
-
-    dialog = new QDialog(this);
-
-    QVBoxLayout* lp = new QVBoxLayout(this);
-    lp->addWidget(processorTree);
-    
-    QHBoxLayout* buttonFrame = new QHBoxLayout;
-    buttonFrame->addStretch();
-    QPushButton* cancelButton = new QPushButton(tr("Cancel"), this);
-    buttonFrame->addWidget(cancelButton);
-    buttonFrame->addSpacing(10);
-    QPushButton* saveButton = new QPushButton(tr("Save"), this);
-    buttonFrame->addWidget(saveButton);
-    lp->addItem(buttonFrame);
-
-    dialog->setMinimumWidth(850 * dpiXFactor);
-    dialog->setMinimumHeight(570 * dpiYFactor);
-    dialog->setLayout(lp);
-
-    connect(cancelButton, SIGNAL(clicked()), this, SLOT(cancelDpEdits()));
-    connect(saveButton, SIGNAL(clicked()), this, SLOT(saveDpEdits()));
-
-    dialog->exec();
-}
-
-CoreDpOptionsDialog::~CoreDpOptionsDialog() {
-    delete dialog;
-}
-void
-CoreDpOptionsDialog::saveDpEdits() {
-    saveClicked();
-    dialog->done(0);
-}
-
-void
-CoreDpOptionsDialog::cancelDpEdits() {
-    dialog->done(0);
-}
 
 #define bpABORT "Abort"
 #define bpFINISH "Finish"
@@ -197,14 +147,14 @@ processed(0), fails(0), numFilesToProcess(0) {
     QHBoxLayout* dpGrid = new QHBoxLayout;
     dpGrid->setContentsMargins(0, 0, 0, 0);
 
-    QRadioButton* dpRadioBox = new QRadioButton(tr("Run Core Data Processor "), this);
+    QRadioButton* dpRadioBox = new QRadioButton(tr("Run Data Processor "), this);
     radioGroup->addButton(dpRadioBox, int(BatchProcessingDialog::dataProcessorB));
 
     dataProcessorToRun = new QComboBox(this);
 
     // get the available core processors
     const DataProcessorFactory& factory = DataProcessorFactory::instance();
-    QMap<QString, DataProcessor*> coreProcessors = factory.getProcessors(true);
+    QMap<QString, DataProcessor*> coreProcessors = factory.getProcessors();
 
     // iterate over all the processors and add an entry for each data processor
     foreach(DataProcessor * i, coreProcessors) {
@@ -213,67 +163,6 @@ processed(0), fails(0), numFilesToProcess(0) {
 
     dpGrid->addWidget(dpRadioBox);
     dpGrid->addWidget(dataProcessorToRun);
-
-    // If one or more Python Fixes Data Processors are available then provide
-    // quick access to the python scripts editing window.
-    QPushButton* dpEditParametersButton = new QPushButton(tr("Configure"), this);
-    dpGrid->addSpacing(5);
-    dpGrid->addWidget(dpEditParametersButton);
-    dpGrid->addStretch();
-
-    //  --------------- Python Data Processing menu items -----------------------
-
-#ifdef GC_WANT_PYTHON
-
-    pythonProcessorToRun = new QComboBox(this);
-
-    // Initialise the Py Scripts in case they haven't been
-    QList<FixPyScript*> fixPyScripts = fixPySettings->getScripts();
-
-    // get all the available processors
-    QMap<QString, DataProcessor*> allProcessors = factory.getProcessors(false);
-
-    // Search to see if python processor has been defined
-    foreach(DataProcessor * k, allProcessors) {
-        // add an entry for each python data processor
-        if (!(k->isCoreProcessor())) pythonProcessorToRun->addItem(k->name());
-    }
-
-    bool pythonFixesDefined = pythonProcessorToRun->count();
-    bool embedPython = appsettings->value(nullptr, GC_EMBED_PYTHON, true).toBool();
-
-    QHBoxLayout* pyGrid = new QHBoxLayout;
-    pyGrid->setContentsMargins(0, 0, 0, 0);
-
-    QRadioButton* pyRadioBox = new QRadioButton(tr("Run Python Data Processor "), this);
-    radioGroup->addButton(pyRadioBox, int(BatchProcessingDialog::pythonProcessorB));
-
-    pyGrid->addWidget(pyRadioBox);
-    pyGrid->addWidget(pythonProcessorToRun);
-
-    // If one or more Python Fixes Data Processors are available then provide
-    // quick access to the python scripts editing window.
-    QPushButton* pyEditParametersButton = new QPushButton(tr("Edit"), this);
-    pyGrid->addSpacing(5);
-    pyGrid->addWidget(pyEditParametersButton);
-    pyGrid->addStretch();
-
-    // If there are no Python Fixes defined then default the menu item
-    if (!pythonFixesDefined) {
-        pythonProcessorToRun->addItem(tr("None Defined"));
-        pyEditParametersButton->setVisible(false);
-        pyRadioBox->setCheckable(false);
-        radioGroup->removeButton(pyRadioBox);
-    }
-
-    // If Python isn't enabled then hide all relevant widgets
-    if (!embedPython) {
-        pythonProcessorToRun->setVisible(false);
-        pyRadioBox->setVisible(false);
-        pyEditParametersButton->setVisible(false);
-    }
-
-#endif
 
     //  --------------- Set Meta Data Processing menu items -----------------------
 
@@ -389,11 +278,6 @@ processed(0), fails(0), numFilesToProcess(0) {
     layout1->addRow(exportGrid2);
     layout1->addRow(dpGrid);
 
-#ifdef GC_WANT_PYTHON
-    // If Python is enabled then add the relevant widgets
-    if (embedPython) layout1->addRow(pyGrid);
-#endif
-
     layout1->addRow(setMetadataGrid); 
     layout1->addRow(setMetricOverrideGrid);
     layout1->addRow(clearMetricOverrideGrid);
@@ -419,16 +303,7 @@ processed(0), fails(0), numFilesToProcess(0) {
             [=](int) { this->fileSelected(current); });
     }
 
-#ifdef GC_WANT_PYTHON
-    // If Python is enabled and Python Fixes are defined then connect up the relevant signals
-    if ((embedPython) && (pythonFixesDefined)) {
-        connect(pythonProcessorToRun, SIGNAL(currentIndexChanged(int)), this, SLOT(comboSelected()));
-        connect(pyEditParametersButton, SIGNAL(clicked()), this, SLOT(pyEditParametersButtonSelected()));
-    }
-#endif
-
-    // Core data processor signals
-    connect(dpEditParametersButton, SIGNAL(clicked()), this, SLOT(dpEditParametersButtonSelected()));
+    // Data processor signals
     connect(dataProcessorToRun, SIGNAL(currentIndexChanged(int)), this, SLOT(comboSelected()));
 
     // export file format signals
@@ -472,24 +347,6 @@ BatchProcessingDialog::selectClicked()
     }
     return;
 }
-
-void
-BatchProcessingDialog::dpEditParametersButtonSelected() {
-
-    CoreDpOptionsDialog dpOptionsDialog(context);
-}
-
-#ifdef GC_WANT_PYTHON
-void
-BatchProcessingDialog::pyEditParametersButtonSelected() {
-
-    FixPyScript* pyScript = fixPySettings->getScript(pythonProcessorToRun->currentText());
-    if (pyScript) {
-        EditFixPyScriptDialog editDlg(context, pyScript, this);
-        editDlg.exec();
-    }
-}
-#endif
 
 void
 BatchProcessingDialog::comboSelected() {
@@ -568,12 +425,6 @@ BatchProcessingDialog::okClicked()
             case BatchProcessingDialog::dataProcessorB: {
                 result = runDataProcessorOnActivities(dataProcessorToRun->currentText());
             } break;
-
-#ifdef GC_WANT_PYTHON
-            case BatchProcessingDialog::pythonProcessorB: {
-                result = runDataProcessorOnActivities(pythonProcessorToRun->currentText());
-            } break;
-#endif
 
             case BatchProcessingDialog::metadataSetB: {
                 result = setMetadataForActivities(metadataFieldToSet->currentText(), metadataEditField->text());
@@ -728,12 +579,6 @@ BatchProcessingDialog::getActionColumnText() {
     case BatchProcessingDialog::dataProcessorB: {
         return dataProcessorToRun->currentText();
     }
-
-#ifdef GC_WANT_PYTHON
-    case BatchProcessingDialog::pythonProcessorB: {
-        return pythonProcessorToRun->currentText();
-    }
-#endif
 
     case BatchProcessingDialog::metadataSetB: {
         return "Update Metadata field - " + metadataFieldToSet->currentText();
@@ -900,14 +745,16 @@ BatchProcessingDialog::runDataProcessorOnActivities(const QString& processorName
 
     if (!dp) return BatchProcessingDialog::noDataProcessorF; // No such data processor
 
-    // Save the currently selected ride.
-    // To achieve batch processing we are going to need to change this in the context temporarily
-    // because the python processing is structured that the currently selected RideItem is the one
-    // that gets processed with its associated RideFile. See #4095 for consequences on "import".
-    RideItem* rideISafe = context->ride;
+    // get processor config
+    DataProcessorConfig *config = dp->processorConfig(this);
+
+    // Allow the user to set parameters and confirm or cancel
+    ManualDataProcessorDialog *p = new ManualDataProcessorDialog(context, processorName, nullptr, config);
+    p->setWindowModality(Qt::ApplicationModal); // don't allow select other ride or it all goes wrong!
+    bool ok = p->exec();
 
     // loop through the table and run the data processor on each selected activity
-    for (int i = 0; i < files->invisibleRootItem()->childCount(); i++) {
+    for (int i = 0; ok && i < files->invisibleRootItem()->childCount(); i++) {
 
         // give user a chance to abort..
         QApplication::processEvents();
@@ -917,15 +764,12 @@ BatchProcessingDialog::runDataProcessorOnActivities(const QString& processorName
 
         QTreeWidgetItem* current = files->invisibleRootItem()->child(i);
 
-        // is it selected for delete ?
+        // is it selected for processing ?
         if (static_cast<QCheckBox*>(files->itemWidget(current, 0))->isChecked()) {
 
             RideItem *rideI = context->athlete->rideCache->getRide(current->text(1));
 
             if (!rideI) { failedToProcessEntry(current); continue; } // eek!
-
-            // Set the current ride to the one being processed for the duration of the processing.
-            context->ride = rideI;
 
             // ack ! we need to autoprocess, so open the ride
             RideFile* rideF = rideI->ride();
@@ -935,7 +779,7 @@ BatchProcessingDialog::runDataProcessorOnActivities(const QString& processorName
             files->setCurrentItem(current);
 
             // now run the data processor
-            if (dp->postProcess(rideF, NULL, "PYTHON")) {
+            if (dp->postProcess(rideF, config, "UPDATE")) {
                 // rideFile is now dirty!
                 rideI->setDirty(true);
                 current->setText(4, tr("Processed"));
@@ -947,9 +791,6 @@ BatchProcessingDialog::runDataProcessorOnActivities(const QString& processorName
             QApplication::processEvents();
         }
     }
-
-    // Restore the selected ride before the batch processing
-    context->ride = rideISafe;
 
     return BatchProcessingDialog::finishedF;
 }

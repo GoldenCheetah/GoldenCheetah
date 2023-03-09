@@ -109,7 +109,7 @@ DataProcessorFactory::autoProcess(RideFile *ride, QString mode, QString op)
     return changed;
 }
 
-ManualDataProcessorDialog::ManualDataProcessorDialog(Context *context, QString name, RideItem *ride) : context(context), ride(ride)
+ManualDataProcessorDialog::ManualDataProcessorDialog(Context *context, QString name, RideItem *ride, DataProcessorConfig *config) : context(context), ride(ride), config(config)
 {
     setAttribute(Qt::WA_DeleteOnClose);
     setWindowTitle(name);
@@ -134,7 +134,7 @@ ManualDataProcessorDialog::ManualDataProcessorDialog(Context *context, QString n
     QLabel *explainLabel = new QLabel(tr("Description"), this);
     explainLabel->setFont(font);
 
-    config = processor->processorConfig(this, ride->ride());
+    if (config == nullptr) config = processor->processorConfig(this, ride ? ride->ride() : nullptr);
     config->readConfig();
     explain = new QTextEdit(this);
     explain->setText(config->explain());

@@ -25,7 +25,6 @@
 #include "Context.h"
 #include "Settings.h"
 #include "Units.h"
-#include "Pages.h"
 
 #include "RideItem.h"
 #include "RideFile.h"
@@ -39,27 +38,6 @@
 #include <QLabel>
 #include <QListIterator>
 #include <QDebug>
-
- // Dialog class to allow editing of core data processor parameters
-class CoreDpOptionsDialog : public ProcessorPage
-{
-    Q_OBJECT
-    G_OBJECT
-
-public:
-    CoreDpOptionsDialog(Context* context);
-    ~CoreDpOptionsDialog();
-
-protected:
-    QDialog* dialog;
-
-signals:
-
-private slots:
-    void saveDpEdits();
-    void cancelDpEdits();
-};
-
 
 // Dialog class to allow batch processing of activities
 class BatchProcessingDialog : public QDialog
@@ -81,11 +59,6 @@ private slots:
     void allClicked();
     void radioClicked(int);
     void comboSelected();
-    void dpEditParametersButtonSelected();
-
-#ifdef GC_WANT_PYTHON
-    void pyEditParametersButtonSelected();
-#endif
 
 private:
 
@@ -102,9 +75,6 @@ private:
     typedef enum {
         exportB,
         dataProcessorB,
-#ifdef GC_WANT_PYTHON
-        pythonProcessorB,
-#endif
         metadataSetB,
         metricSetB,
         metricClearB,
@@ -119,10 +89,6 @@ private:
     QTreeWidget* files; // choose files to export
 
     QWidget* disableContainer;
-
-#ifdef GC_WANT_PYTHON
-    QComboBox* pythonProcessorToRun;
-#endif
 
     QComboBox* fileFormat, *dataProcessorToRun;
     QComboBox* metadataFieldToSet, *metricFieldToSet, *metricFieldToClear;
