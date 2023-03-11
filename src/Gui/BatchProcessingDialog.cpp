@@ -59,6 +59,9 @@ processed(0), fails(0), numFilesToProcess(0) {
 
     //  --------------- File/Activity Window items -----------------------
 
+    QVBoxLayout* fileSelection = new QVBoxLayout;
+    all = new QCheckBox(tr("check/uncheck all"), this);
+    all->setChecked(true);
     files = new QTreeWidget;
     files->headerItem()->setText(0, tr(""));
     files->headerItem()->setText(1, tr("Filename"));
@@ -103,6 +106,8 @@ processed(0), fails(0), numFilesToProcess(0) {
 
         numFilesToProcess++;
     }
+    fileSelection->addWidget(all);
+    fileSelection->addWidget(files);
 
     //  --------------- Export menu items -----------------------
 
@@ -258,14 +263,10 @@ processed(0), fails(0), numFilesToProcess(0) {
     // buttons
     QHBoxLayout* buttons = new QHBoxLayout;
 
-    all = new QCheckBox(tr("check/uncheck all"), this);
-    all->setChecked(true);
     status = new QLabel("", this);
-    //status->hide();
     cancel = new QPushButton(tr("Cancel"), this);
     ok = new QPushButton(tr(bpEXECUTE), this);
 
-    buttons->addWidget(all);
     buttons->addWidget(status);
     buttons->addStretch();
     buttons->addWidget(cancel);
@@ -282,7 +283,7 @@ processed(0), fails(0), numFilesToProcess(0) {
     layout1->addRow(setMetricOverrideGrid);
     layout1->addRow(clearMetricOverrideGrid);
     layout1->addRow(deleteGrid);
-    layout->addRow(files);
+    layout->addRow(fileSelection);
     layout->addRow(buttons);
 
     layout->setHorizontalSpacing(0); // between columns
@@ -331,7 +332,7 @@ processed(0), fails(0), numFilesToProcess(0) {
 
 void
 BatchProcessingDialog::updateNumberSelected() {
-    status->setText(QString(tr("           %1 files selected")).arg(numFilesToProcess));
+    status->setText(QString(tr("%1 files selected")).arg(numFilesToProcess));
 }
 
 void
