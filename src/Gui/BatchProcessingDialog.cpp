@@ -707,8 +707,17 @@ BatchProcessingDialog::exportFiles()
 BatchProcessingDialog::bpFailureType
 BatchProcessingDialog::deleteFiles() {
 
+    QMessageBox msgBox;
+    msgBox.setText(tr("Are you sure you want to delete all selected activities?"));
+    QPushButton *deleteButton = msgBox.addButton(tr("Delete"),QMessageBox::YesRole);
+    msgBox.setStandardButtons(QMessageBox::Cancel);
+    msgBox.setDefaultButton(QMessageBox::Cancel);
+    msgBox.setIcon(QMessageBox::Critical);
+    msgBox.exec();
+    bool ok = msgBox.clickedButton() == deleteButton;
+
     // loop through the table and delete all selected
-    for (int i = 0; i < files->invisibleRootItem()->childCount(); i++) {
+    for (int i = 0; ok && i < files->invisibleRootItem()->childCount(); i++) {
 
         // give user a chance to abort..
         QApplication::processEvents();
