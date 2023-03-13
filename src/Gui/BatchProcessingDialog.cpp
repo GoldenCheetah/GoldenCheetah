@@ -802,6 +802,8 @@ BatchProcessingDialog::runDataProcessorOnActivities(const QString& processorName
         }
     }
 
+    delete p; // no parent and WA_DeleteOnClose not set, lets delete it.
+
     return BatchProcessingDialog::finishedF;
 }
 

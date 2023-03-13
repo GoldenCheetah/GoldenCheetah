@@ -111,7 +111,7 @@ DataProcessorFactory::autoProcess(RideFile *ride, QString mode, QString op)
 
 ManualDataProcessorDialog::ManualDataProcessorDialog(Context *context, QString name, RideItem *ride, DataProcessorConfig *config) : context(context), ride(ride), config(config)
 {
-    setAttribute(Qt::WA_DeleteOnClose);
+    if (config == nullptr) setAttribute(Qt::WA_DeleteOnClose); // don't destroy received config
     setWindowTitle(name);
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
 
