@@ -41,6 +41,8 @@ environment:
     secure: mmMksvVnfBiXufBDn2gAhQY53n0J9BokSCtDY51uU918QJ/LL4XOojtJp5tMFn8T7ugyDhNASpqZXiK55vxSD53vm+tjufpfzppKEeh93Babvc/VrndLB1X/RZCRUQTR6rka05fYl4e0eBzP1H091A==
   GC_XERT_CLIENT_SECRET:
     secure: /1rVLT8LyJCZ4xNJ5W+NtAcZ1rtKaUjW9SYm/T3gHoc=
+  GC_AZUM_CLIENT_SECRET:
+    secure: n4HXFKdE9BIrEi9GtYMxVSoy3zyyHd4hLbNdir5UQJk7cv4lHcM2eLMGkwWT77XnWUCevpjnyKFTe+xriccZkLO1KyppVNHkimD9wlNKStFFnID2h2yjW+vzzkx/KSc9MXciXG+llHcuc6/IXaQVXFZj0HEe2OGHZa/wcmaQPPYDyrU6EVbdumktG21Xvrdk
 
 init:
 # Setup QT 5.15 - 64Bit
