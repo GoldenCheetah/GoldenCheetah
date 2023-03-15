@@ -246,6 +246,7 @@ struct setChannelAtom {
 #define ANT_SPORT_FITNESS_EQUIPMENT_PERIOD 8192
 #define ANT_FAST_QUARQ_PERIOD (8182/16)
 #define ANT_QUARQ_PERIOD (8182*4)
+#define ANT_SPORT_CORETEMP_PERIOD (16384)
 
 #define ANT_SPORT_HR_TYPE 0x78
 #define ANT_SPORT_POWER_TYPE 11
@@ -260,6 +261,7 @@ struct setChannelAtom {
 #define ANT_FAST_QUARQ_TYPE_WAS 11 // before release 1.8
 #define ANT_FAST_QUARQ_TYPE 0x60
 #define ANT_QUARQ_TYPE 0x60
+#define ANT_SPORT_CORETEMP_TYPE 0x7F
 
 #define ANT_SPORT_FREQUENCY 57
 #define ANT_FOOTPOD_FREQUENCY 57
@@ -424,6 +426,8 @@ signals:
     // made a special case to support HRV tool without complication
     void rrData(uint16_t  rrtime, uint8_t heartrateBeats, uint8_t instantHeartrate);
 
+    void tcoreData(float core, float skin, int qual);
+    
     // signal for passing remote control commands
     void antRemoteControl(uint16_t command);
 
@@ -631,6 +635,8 @@ public:
         telemetry.setAltWatts(x);
     }
     void setHb(double smo2, double thb);
+
+    void setCoreTemp(double core, double skin);
 
     void setLRBalance (double lrbalance) {
         telemetry.setLRBalance(lrbalance);

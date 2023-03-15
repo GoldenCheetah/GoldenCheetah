@@ -146,7 +146,8 @@ DialWindow::telemetryUpdate(const RealtimeData &rtData)
         series == RealtimeData::Watts  ||
         series == RealtimeData::AltWatts  ||
         (series == RealtimeData::LRBalance && value != RideFile::NA)  ||
-        series == RealtimeData::Cadence) {
+        series == RealtimeData::Cadence ||
+        series == RealtimeData::CoreTemp) {
 
         sum += value;
         if (count >= average*5) {
@@ -539,6 +540,9 @@ DialWindow::telemetryUpdate(const RealtimeData &rtData)
         valueLabel->setText(QString("%1").arg(value, 0, 'f', 2));
         break;
 
+    case RealtimeData::CoreTemp:
+        valueLabel->setText(QString("%1").arg(displayValue, 0, 'f', 2));
+        break;
     default:
         valueLabel->setText(QString("%1").arg(round(displayValue)));
         break;
@@ -571,7 +575,8 @@ void DialWindow::seriesChanged()
         series == RealtimeData::Watts  ||
         series == RealtimeData::AltWatts  ||
         series == RealtimeData::LRBalance  ||
-        series == RealtimeData::Cadence) {
+        series == RealtimeData::Cadence ||
+        series == RealtimeData::CoreTemp ) {
         averageLabel->show();
         averageEdit->show();
         averageSlider->show();
@@ -659,6 +664,7 @@ void DialWindow::seriesChanged()
     case RealtimeData::VirtualSpeed:
     case RealtimeData::AvgSpeed:
     case RealtimeData::AvgSpeedLap:
+    case RealtimeData::CoreTemp:
             foreground = GColor(CSPEED);
             break;
 

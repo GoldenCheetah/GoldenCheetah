@@ -5452,7 +5452,7 @@ VScrollBar::setAreaHeight(double n)
 }
 
 void
-VScrollBar::setPos(double x)
+VScrollBar::setPos(double /*x*/)
 {
     // xxx todo
 }

@@ -55,6 +55,7 @@
 #define FILE_CREATOR_MSG_NUM    49
 #define HRV_MSG_NUM             78
 #define SEGMENT_MSG_NUM         142
+#define FIELD_DESCRIPTION       206
 
 // Fit types metadata
 struct FITproduct { int manu, prod; QString name; };
@@ -589,6 +590,8 @@ struct FitFileReaderState
 
             case 253: // SECS
                 return RideFile::secs;
+            case 139: // CoreTemp
+                return RideFile::tcore;
             default:
                 return RideFile::none;
         }
@@ -629,6 +632,9 @@ struct FitFileReaderState
 
             case 115: // MTB Dynamics - Flow
                 return "FLOW";
+
+            case 139: //CoreTemp
+                return "CORETEMP";
 
             case 116: // Stress
                 return "STRESS";
@@ -1457,6 +1463,7 @@ struct FitFileReaderState
 
         double rvert = 0, rcad = 0, rcontact = 0;
         double smO2 = 0, tHb = 0;
+        double tcore = 0;
         //bool run=false;
 
         XDataPoint *p_deve = NULL;
@@ -1731,6 +1738,9 @@ struct FitFileReaderState
                     case 116: // Stress
                              native_num = -1;
                              break;
+                    case 139: // Core Temp
+                             tcore = value;
+                             break;
                     default:
                             unknown_record_fields.insert(native_num);
                             native_num = -1;
@@ -1954,7 +1964,7 @@ struct FitFileReaderState
                         prevPoint->rvert + (deltarvert * weight),
                         prevPoint->rcad + (deltarcad * weight),
                         prevPoint->rcontact + (deltarcontact * weight),
-                        0.0, // tcore
+                        tcore, // tcore
                         interval);
                 }
             }
@@ -1966,7 +1976,7 @@ struct FitFileReaderState
                      leftPedalCenterOffset, rightPedalCenterOffset,
                      leftTopDeathCenter, rightTopDeathCenter, leftBottomDeathCenter, rightBottomDeathCenter,
                      leftTopPeakPowerPhase, rightTopPeakPowerPhase, leftBottomPeakPowerPhase, rightBottomPeakPowerPhase,
-                     smO2, tHb, rvert, rcad, rcontact, 0.0, interval, false);
+                     smO2, tHb, rvert, rcad, rcontact, tcore, interval, false);
 
         last_time = time;
         last_distance = km;
@@ -3080,10 +3090,10 @@ struct FitFileReaderState
         swimXdata->valuename << "STROKES";
         swimXdata->unitname << "";
 
-	hrvXdata = new XDataSeries();
-	hrvXdata->name = "HRV";
-	hrvXdata->valuename << "R-R";
-	hrvXdata->unitname << "msecs";
+        hrvXdata = new XDataSeries();
+        hrvXdata->name = "HRV";
+        hrvXdata->valuename << "R-R";
+        hrvXdata->unitname << "msecs";
 
         gearsXdata = new XDataSeries();
         gearsXdata->name = "GEARS";
@@ -3985,6 +3995,14 @@ RideFile *FitFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
 
 // ******************************
 
+//Zero pad string to length of field (len)
+void write_string(QByteArray *array, const char *str, int len)
+{
+    int slen = strlen(str);
+    array->append(str, slen);
+    array->append(len-slen, 0);
+}
+
 void write_int8(QByteArray *array, fit_value_t value) {
     array->append(value);
 }
@@ -4004,13 +4022,21 @@ void write_int32(QByteArray *array, fit_value_t value,  bool is_big_endian) {
         ? qFromBigEndian<qint32>( value )
         : qFromLittleEndian<qint32>( value );
 
-
-
     for (int i=0; i<32; i=i+8) {
         array->append(value >> i);
     }
 }
 
+void write_float32(QByteArray *array, float f, bool is_big_endian) {
+    if (is_big_endian) {
+        f = qbswap(f);
+    }
+
+    uint32_t *p=(uint32_t *)&f;
+    for (int i=0; i<32; i=i+8) {
+        array->append((*p) >> i);
+    }
+}
 
 uint16_t crc16(char *buf, int len)
 {
@@ -4354,6 +4380,48 @@ void write_activity(QByteArray *array, const RideFile *ride, QHash<QString,RideM
     write_int8(array, value);
 }
 
+// Add developer field definitions
+void write_dev_fields(QByteArray *array, const RideFile *ride, int local_msg_type) {
+  int num_fields = 0;
+  QByteArray *fields = new QByteArray();
+
+  if (ride->areDataPresent()->tcore) {
+
+    // Minimal developer header
+    write_message_definition(array, 207, local_msg_type, 2); // global_msg_num, local_msg_type, num_fields
+    write_field_definition(array, 2, 2, 132); 
+    write_field_definition(array, 3, 1, 2);
+
+    write_int8(array, 0);
+    write_int16(array, 0, true);
+    write_int8(array, 0);
+
+    // Store core temerature as a developer field until included in ANT spec
+    write_field_definition(fields, 3, 64, 0x07); //'core_temperature'
+    write_field_definition(fields, 8, 16, 0x07); //'°C'
+    write_field_definition(fields, 14, 2, 0x84); // 20
+    write_field_definition(fields, 1,  1, 0x02); // uint8 - local id
+    write_field_definition(fields, 2,  1, 0x02); // uint8 - (float32) 136
+    write_field_definition(fields, 15, 1, 0x02); // unit8 - (native#) 139
+    write_field_definition(fields, 0,  1, 0x02); // developer id
+
+    num_fields=7;
+
+    write_message_definition(array, FIELD_DESCRIPTION, local_msg_type, num_fields);
+    array->append(fields->data(), fields->size());
+
+    write_int8(array, 0);
+
+    write_string(array, "core_temperature", 64);
+    write_string(array, "C", 16);
+    write_int16(array, 20, true);
+    write_int8(array, 80);  // Local num (increment counter)
+    write_int8(array, 136);
+    write_int8(array, 139); // Native num
+    write_int8(array, 0);   // developer id 0
+  }
+}
+
 void write_record_definition(QByteArray *array, const RideFile *ride, QMap<int, int> *local_msg_type_for_record_type, bool withAlt, bool withWatts, bool withHr, bool withCad, int type ) {
     int num_fields = 1;
     QByteArray *fields = new QByteArray();
@@ -4403,7 +4471,18 @@ void write_record_definition(QByteArray *array, const RideFile *ride, QMap<int, 
 
     int local_msg_type = local_msg_type_for_record_type->values().count()+1;
 
-    write_message_definition(array, RECORD_MSG_NUM, local_msg_type, num_fields); // global_msg_num, local_msg_type, num_fields
+    bool withDev=false;
+    // Do we need our developer fields adding?
+    if ( ride->areDataPresent()->tcore ) {
+        withDev=true;
+        write_dev_fields(array, ride, 0); //add custom field definitions
+
+        write_int8(fields, 1); // one dev field
+        write_field_definition(fields, 80, 4, 0); // tcore
+    }
+
+    //Add developer field flag to header
+    write_message_definition(array, RECORD_MSG_NUM, local_msg_type|(withDev?32:0), num_fields); // global_msg_num, local_msg_type, num_fields
     array->append(fields->data(), fields->size());
 
     local_msg_type_for_record_type->insert(type, local_msg_type);
@@ -4426,6 +4505,7 @@ void write_record(QByteArray *array, const RideFile *ride, bool withAlt, bool wi
         // Add record definition for this type of record
         if (local_msg_type_for_record_type->value(type, -1)==-1)
             write_record_definition(array, ride, local_msg_type_for_record_type, withAlt, withWatts, withHr, withCad, type);
+
         int record_header = local_msg_type_for_record_type->value(type, 1);
 
         // RidePoint
@@ -4471,9 +4551,12 @@ void write_record(QByteArray *array, const RideFile *ride, bool withAlt, bool wi
             write_int8(ridePoint, 0x80 + (100-point->lrbalance));
         }
 
+        if ( ride->areDataPresent()->tcore ) {
+            write_float32(ridePoint, point->tcore, true);
+        }
+
         array->append(ridePoint->data(), ridePoint->size());
     }
-
 }
 
 QByteArray
@@ -4513,6 +4596,7 @@ FitFileReader::toByteArray(Context *context, const RideFile *ride, bool withAlt,
     write_file_id(&data, ride); // file_id 0
     write_file_creator(&data); // file_creator 49
     write_start_event(&data, ride); // event 21 (x15)
+    
     write_record(&data, ride, withAlt, withWatts, withHr, withCad); // record 20 (x14)  
     write_lap(&data, ride); // lap 19 (x11)
     write_stop_event(&data, ride); // event 21 (x15)

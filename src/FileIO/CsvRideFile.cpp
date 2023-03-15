@@ -131,6 +131,7 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
     XDataSeries *ibikeSeries=NULL;
     XDataSeries *xdataSeries=NULL;
     XDataSeries *vo2Series=NULL;
+    XDataSeries *tcoreSeries=NULL;
 
     /* Joule 1.0
     Version,Date/Time,Km,Minutes,RPE,Tags,"Weight, kg","Work, kJ",FTP,"Sample Rate, s",Device Type,Firmware Version,Last Updated,Category 1,Category 2
@@ -157,8 +158,8 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
     QRegExp iBikeCSV("iBike,\\d\\d?,[a-z]+", Qt::CaseInsensitive);
     QRegExp moxyCSV("FW Part Number:", Qt::CaseInsensitive);
     QRegExp smo2CSV("Type,Local Number,Message");
-    QRegExp gcCSV("secs,cad,hr,km,kph,nm,watts,alt,lon,lat,headwind,slope,temp,interval,lrbalance,lte,rte,lps,rps,smo2,thb,o2hb,hhb");
-    QRegExp gcCSVold("secs, cad, hr, km, kph, nm, watts, alt, lon, lat, headwind, slope, temp, interval, lrbalance, lte, rte, lps, rps, smo2, thb, o2hb, hhb");
+    QRegExp gcCSV("secs,cad,hr,km,kph,nm,watts,alt,lon,lat,headwind,slope,temp,interval,lrbalance,lte,rte,lps,rps,smo2,thb,o2hb,hhb,tcore");
+    QRegExp gcCSVold("secs, cad, hr, km, kph, nm, watts, alt, lon, lat, headwind, slope, temp, interval, lrbalance, lte, rte, lps, rps, smo2, thb, o2hb, hhb,tcore");
     QRegExp periCSV("mm-dd,hh:mm:ss,SmO2 Live,SmO2 Averaged,THb,Target Power,Heart Rate,Speed,Power,Cadence");
     QRegExp freemotionCSV("Stages Data", Qt::CaseInsensitive);
     QRegExp cpexportCSV("seconds, value,[ model,]* date", Qt::CaseInsensitive);
@@ -634,6 +635,7 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                 double lps = 0.0, rps = 0.0;
                 double smo2 = 0.0, thb = 0.0;
                 double gct = 0.0, vo = 0.0, rcad = 0.0;
+                double tcore = 0.0;
                 //UNUSED double o2hb = 0.0, hhb = 0.0;
                 double target = 0.0;
 
@@ -670,7 +672,7 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                     }
 
                 } else if (csvType == gc) {
-                    // GoldenCheetah CVS Format "secs, cad, hr, km, kph, nm, watts, alt, lon, lat, headwind, slope, temp, interval, lrbalance, lte, rte, lps, rps, smo2, thb, o2hb, hhb\n";
+                    // GoldenCheetah CVS Format "secs, cad, hr, km, kph, nm, watts, alt, lon, lat, headwind, slope, temp, interval, lrbalance, lte, rte, lps, rps, smo2, thb, o2hb, hhb,tcore\n";
 
                     seconds = line.section(',', 0, 0).toDouble();
                     minutes = seconds / 60.0f;
@@ -696,7 +698,8 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                     thb = line.section(',', 20, 20).toDouble();
                     //UNUSED o2hb = line.section(',', 21, 21).toDouble();
                     //UNUSED hhb = line.section(',', 22, 22).toDouble();
-                    target = line.section(',', 23, 23).toInt();
+                    tcore = line.section(',', 23, 23).toDouble();
+                    target = line.section(',', 24, 24).toInt();
 
                 } else if (csvType == peripedal) {
 
@@ -1240,7 +1243,7 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                                           0.0, 0.0, 0.0, 0.0,
                                           0.0, 0.0, 0.0, 0.0,
                                           smo2, thb,
-                                          vo, rcad, gct, 0.0, interval);
+                                          vo, rcad, gct, tcore, interval);
 
                     if (target > 0.0) {
                         if (trainSeries == NULL)  {
@@ -1456,6 +1459,67 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
         }
     }
 
+    // is there an associated tcore tcr file?
+    QFile tcorefile(file.fileName().replace(".csv",".tcr"));
+    if (tcorefile.open(QFile::ReadOnly))
+    {
+        // create the XDATA series
+        tcoreSeries = new XDataSeries();
+        tcoreSeries->name = "CoreTemp Measurements";
+        tcoreSeries->valuename << "Core" << "Skin" << "Quality";
+        tcoreSeries->unitname << "C" << "C" << "q";
+
+        // attempt to read and add the data
+        lineno=1;
+        QTextStream rs(&tcorefile);
+
+        // loop through lines and truncate etc
+        while (!rs.atEnd()) {
+            // the readLine() method doesn't handle old Macintosh CR line endings
+            // this workaround will load the the entire file if it has CR endings
+            // then split and loop through each line
+            // otherwise, there will be nothing to split and it will read each line as expected.
+            QString linesIn = rs.readLine();
+            QStringList lines = linesIn.split('\r');
+            // workaround for empty lines
+            if(lines.isEmpty()) {
+                lineno++;
+                continue;
+            }
+            for (int li = 0; li < lines.size(); ++li) {
+                QString line = lines[li];
+
+                if (line.length()==0) {
+                    continue;
+                }
+
+                // first line is a header line
+                if (lineno > 1) {
+
+                    // split comma separated secs, hr, msecs
+                    QStringList values = line.split(",", QString::KeepEmptyParts);
+
+                    // and add
+                    XDataPoint *p = new XDataPoint();
+                    p->secs = values.at(0).toDouble();
+                    p->km = 0;
+                    p->number[0] = values.at(1).toDouble();
+                    p->number[1] = values.at(2).toDouble();
+                    p->number[2] = values.at(3).toInt();
+                    tcoreSeries->datapoints.append(p);
+                }
+
+                // onto next line
+                ++lineno;
+            }
+        }
+        // free handle
+        tcorefile.close();
+        
+        // add if we got any ....
+        if (tcoreSeries->datapoints.count() > 0) rideFile->addXData("TCORE", tcoreSeries);
+    }
+    
 
     // last, is there an associated rr file?
     //
@@ -1537,7 +1601,7 @@ CsvFileReader::writeRideFile(Context *, const RideFile *ride, QFile &file, CsvTy
 
     if (format == gc) {
         // CSV File header
-        out << "secs,cad,hr,km,kph,nm,watts,alt,lon,lat,headwind,slope,temp,interval,lrbalance,lte,rte,lps,rps,smo2,thb,o2hb,hhb\n";
+        out << "secs,cad,hr,km,kph,nm,watts,alt,lon,lat,headwind,slope,temp,interval,lrbalance,lte,rte,lps,rps,smo2,thb,o2hb,hhb,tcore\n";
 
         foreach (const RideFilePoint *point, ride->dataPoints()) {
             out << point->secs;
@@ -1585,6 +1649,8 @@ CsvFileReader::writeRideFile(Context *, const RideFile *ride, QFile &file, CsvTy
             out << point->o2hb;
             out << ",";
             out << point->hhb;
+            out << ",";
+            out << point->tcore;
 
             out << "\n";
         }

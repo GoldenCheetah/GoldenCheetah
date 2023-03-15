@@ -348,7 +348,7 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
     lap_elapsed_msec = 0;
     secs_to_start = 0;
 
-    rrFile = recordFile = vo2File = NULL;
+    rrFile = recordFile = vo2File = tcoreFile = NULL;
     lastRecordSecs = 0;
     status = 0;
     setStatusFlags(RT_MODE_ERGO);         // ergo mode by default
@@ -369,6 +369,7 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
     displayLRBalance = RideFile::NA;
     displayLTE = displayRTE = displayLPS = displayRPS = 0;
     displayLatitude = displayLongitude = displayAltitude = 0.0;
+    displayCoreTemp = 0.0;
 
     connect(gui_timer, SIGNAL(timeout()), this, SLOT(guiUpdate()));
     connect(disk_timer, SIGNAL(timeout()), this, SLOT(diskUpdate()));
@@ -687,6 +688,8 @@ TrainSidebar::configChanged(qint32)
             connect(Devices[i].controller, SIGNAL(remoteControl(uint16_t)), this, SLOT(remoteControl(uint16_t)));
             // connect slot for receiving rrData
             connect(Devices[i].controller, SIGNAL(rrData(uint16_t,uint8_t,uint8_t)), this, SLOT(rrData(uint16_t,uint8_t,uint8_t)));
+
+            connect(Devices[i].controller, SIGNAL(tcoreData(float,float,int)), this, SLOT(tcoreData(float,float,int)));
 #ifdef QT_BLUETOOTH_LIB
         } else if (Devices.at(i).type == DEV_BT40) {
             Devices[i].controller = new BT40Controller(this, &Devices[i]);
@@ -1346,7 +1349,7 @@ void TrainSidebar::Start()       // when start button is pressed
                 // CSV File header
 
                 QTextStream recordFileStream(recordFile);
-                recordFileStream << "secs, cad, hr, km, kph, nm, watts, alt, lon, lat, headwind, slope, temp, interval, lrbalance, lte, rte, lps, rps, smo2, thb, o2hb, hhb, target\n";
+                recordFileStream << "secs, cad, hr, km, kph, nm, watts, alt, lon, lat, headwind, slope, temp, interval, lrbalance, lte, rte, lps, rps, smo2, thb, o2hb, hhb,tcore, target\n";
 
                 disk_timer->start(SAMPLERATE);  // start screen
             }
@@ -1483,6 +1486,14 @@ void TrainSidebar::Stop(int deviceStatus)        // when stop button is pressed
         rrMutex.unlock();
         vo2Mutex.unlock();
 
+        // close tcoreFile
+        if (tcoreFile) {
+            fprintf(stderr, "Closing tcore file\n"); fflush(stderr);
+            tcoreFile->close();
+            delete tcoreFile;
+            tcoreFile=NULL;
+        }
+
         if(deviceStatus == DEVICE_ERROR)
         {
             recordFile->remove();
@@ -1567,6 +1578,7 @@ void TrainSidebar::updateData(RealtimeData &rtData)
     displayLatitude = rtData.getLatitude();
     displayLongitude = rtData.getLongitude();
     displayAltitude = rtData.getAltitude();
+    displayCoreTemp = rtData.getCoreTemp();
     // Gradient not supported
     return;
 }
@@ -1770,6 +1782,7 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
                     rtData.setFeO2(local.getFeO2());
                 }
 
+                rtData.setTemp(local.getCoreTemp(),0);
                 // what are we getting from this one?
                 if (dev == bpmTelemetry) rtData.setHr(local.getHr());
                 if (dev == rpmTelemetry) rtData.setCadence(local.getCadence());
@@ -1989,6 +2002,7 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
             displayLatitude = rtData.getLatitude();
             displayLongitude = rtData.getLongitude();
             displayAltitude = rtData.getAltitude();
+            displayCoreTemp = rtData.getCoreTemp();
 
             double weightKG = context->athlete->getWeight(QDate::currentDate()) + 10; // 10kg bike
             double vs = computeInstantSpeed(weightKG, rtData.getSlope(), rtData.getAltitude(), rtData.getWatts());
@@ -2114,7 +2128,7 @@ void TrainSidebar::diskUpdate()
     if (secs <= lastRecordSecs) return; // Avoid duplicates
     lastRecordSecs = secs;
 
-    // GoldenCheetah CVS Format "secs, cad, hr, km, kph, nm, watts, alt, lon, lat, headwind, slope, temp, interval, lrbalance, lte, rte, lps, rps, smo2, thb, o2hb, hhb\n";
+    // GoldenCheetah CVS Format "secs, cad, hr, km, kph, nm, watts, alt, lon, lat, headwind, slope, temp, interval, lrbalance, lte, rte, lps, rps, smo2, thb, o2hb, hhb,tcore\n";
 
     recordFileStream    << secs
                         << "," << displayCadence
@@ -2137,7 +2151,7 @@ void TrainSidebar::diskUpdate()
 
     recordFileStream    << "," // headwind
                         << "," // slope
-                        << "," // temp
+                        << "," // << displayCoreTemp // temp
                         << "," << displayWorkoutLap
                         << "," << displayLRBalance
                         << "," << displayLTE
@@ -2148,6 +2162,7 @@ void TrainSidebar::diskUpdate()
                         << "," << displayTHB
                         << "," << displayO2HB
                         << "," << displayHHB
+                        << "," << displayCoreTemp
                         << "," << load
                         << "," << "\n";
 }
@@ -3156,6 +3171,37 @@ void TrainSidebar::rrData(uint16_t  rrtime, uint8_t count, uint8_t bpm)
         recordFileStream << secs << ", " << bpm << ", " << rrtime << "\n";
     }
     //fprintf(stderr, "R-R: %d ms, HR=%d, count=%d\n", rrtime, bpm, count); fflush(stderr);
+}
+
+// HRV R-R data received
+void TrainSidebar::tcoreData(float  core, float skin, int qual)
+{
+    if (status&RT_RECORDING && tcoreFile == NULL && recordFile != NULL) {
+        QString tcorefile = recordFile->fileName().replace("csv", "tcr");
+
+        // setup the rr file
+        tcoreFile = new QFile(tcorefile);
+        if (!tcoreFile->open(QFile::WriteOnly | QFile::Truncate)) {
+            delete tcoreFile;
+            tcoreFile=NULL;
+        } else {
+
+            // CSV File header
+            QTextStream recordFileStream(rrFile);
+            recordFileStream << "secs, core, skin, qual\n";
+        }
+    }
+
+    // output a line if recording and file ready
+    if (status&RT_RECORDING && tcoreFile) {
+        QTextStream recordFileStream(tcoreFile);
+
+        // convert from milliseconds to secondes
+        double secs = double(session_elapsed_msec + session_time.elapsed()) / 1000.00;
+
+        // output a line
+        recordFileStream << secs << ", " << core << ", " << skin << ", " << qual << "\n";
+    }
 }
 
 // VO2 Measurement data received
