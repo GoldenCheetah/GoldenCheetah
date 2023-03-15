@@ -109,7 +109,7 @@ DataProcessorFactory::autoProcess(RideFile *ride, QString mode, QString op)
     return changed;
 }
 
-ManualDataProcessorDialog::ManualDataProcessorDialog(Context *context, QString name, RideItem *ride, DataProcessorConfig *config) : context(context), ride(ride), config(config)
+ManualDataProcessorDialog::ManualDataProcessorDialog(Context *context, QString name, RideItem *ride, DataProcessorConfig *conf) : context(context), ride(ride), config(conf)
 {
     if (config == nullptr) setAttribute(Qt::WA_DeleteOnClose); // don't destroy received config
     setWindowTitle(name);
@@ -145,9 +145,12 @@ ManualDataProcessorDialog::ManualDataProcessorDialog(Context *context, QString n
     mainLayout->addWidget(explainLabel);
     mainLayout->addWidget(explain);
 
+    saveAsDefault = new QCheckBox(tr("Save parameters as default"), this);
+    saveAsDefault->setChecked(false);
     ok = new QPushButton(tr("OK"), this);
     cancel = new QPushButton(tr("Cancel"), this);
     QHBoxLayout *buttons = new QHBoxLayout();
+    buttons->addWidget(saveAsDefault);
     buttons->addStretch();
     buttons->addWidget(cancel);
     buttons->addWidget(ok);
@@ -170,6 +173,9 @@ ManualDataProcessorDialog::okClicked()
     if (ride && ride->ride() && processor->postProcess((RideFile *)ride->ride(), config, "UPDATE") == true) {
         context->notifyRideSelected(ride);     // to remain compatible with rest of GC for now
     }
+
+    // Save parameters as default on user request
+    if (saveAsDefault->isChecked()) config->saveConfig();
 
     // reset cursor and wait
     QApplication::restoreOverrideCursor();

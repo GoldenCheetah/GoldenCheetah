@@ -113,7 +113,7 @@ class ManualDataProcessorDialog : public QDialog
 
 
     public:
-        ManualDataProcessorDialog(Context *, QString, RideItem *, DataProcessorConfig *config=nullptr);
+        ManualDataProcessorDialog(Context *, QString, RideItem *, DataProcessorConfig *conf=nullptr);
 
     private slots:
         void cancelClicked();
@@ -126,6 +126,7 @@ class ManualDataProcessorDialog : public QDialog
         DataProcessor *processor;
         DataProcessorConfig *config;
         QTextEdit *explain;
+        QCheckBox *saveAsDefault;
         QPushButton *ok, *cancel;
 };
 #endif // _DataProcessor_h
