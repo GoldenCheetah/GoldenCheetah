@@ -28,6 +28,9 @@
 #include "CsvRideFile.h"
 #include "DataProcessor.h"
 #include "RideMetadata.h"
+#ifdef GC_WANT_PYTHON
+#include "FixPyScriptsDialog.h"
+#endif
 
 #include <QFormLayout>
 #include <QButtonGroup>
@@ -157,17 +160,22 @@ processed(0), fails(0), numFilesToProcess(0) {
 
     dataProcessorToRun = new QComboBox(this);
 
-    // get the available core processors
+    // get the available processors
     const DataProcessorFactory& factory = DataProcessorFactory::instance();
-    QMap<QString, DataProcessor*> coreProcessors = factory.getProcessors();
+    QMap<QString, DataProcessor*> processors = factory.getProcessors();
 
     // iterate over all the processors and add an entry for each data processor
-    foreach(DataProcessor * i, coreProcessors) {
+    foreach(DataProcessor *i, processors) {
         dataProcessorToRun->addItem(i->name());
     }
 
+    dpButton = new QPushButton(tr("Edit"), this);
+    dpButton->setVisible(false);
+
     dpGrid->addWidget(dpRadioBox);
     dpGrid->addWidget(dataProcessorToRun);
+    dpGrid->addStretch();
+    dpGrid->addWidget(dpButton);
 
     //  --------------- Set Meta Data Processing menu items -----------------------
 
@@ -305,6 +313,7 @@ processed(0), fails(0), numFilesToProcess(0) {
     }
 
     // Data processor signals
+    connect(dpButton, SIGNAL(clicked()), this, SLOT(dpButtonClicked()));
     connect(dataProcessorToRun, SIGNAL(currentIndexChanged(int)), this, SLOT(comboSelected()));
 
     // export file format signals
@@ -326,7 +335,7 @@ processed(0), fails(0), numFilesToProcess(0) {
     // Set default button to export after signals connected as this is the least destructive option
     exportRadioBox->setChecked(true);
     outputMode = BatchProcessingDialog::exportB;
-    updateActionColumn();
+    comboSelected();
     updateNumberSelected();
 }
 
@@ -350,10 +359,28 @@ BatchProcessingDialog::selectClicked()
 }
 
 void
+BatchProcessingDialog::dpButtonClicked() {
+
+#ifdef GC_WANT_PYTHON
+    FixPyScript* pyScript = fixPySettings->getScript(dataProcessorToRun->currentText());
+    if (pyScript) {
+        EditFixPyScriptDialog editDlg(context, pyScript, this);
+        editDlg.exec();
+    }
+#endif
+}
+
+void
 BatchProcessingDialog::comboSelected() {
 
     // ensures the Action column matches the Combobox selections
     updateActionColumn();
+
+#ifdef GC_WANT_PYTHON
+    // lookup processor and enable dpButton for Python fixes
+    DataProcessor* dp = DataProcessorFactory::instance().getProcessors().value(dataProcessorToRun->currentText(), NULL);
+    dpButton->setVisible(dp && !dp->isCoreProcessor());
+#endif
 
     updateMetadataTypeField();
     updateMetricDataTypeField();

@@ -53,6 +53,7 @@ protected:
 signals:
 
 private slots:
+    void dpButtonClicked();
     void cancelClicked();
     void okClicked();
     void selectClicked();
@@ -97,7 +98,7 @@ private:
 
     QLabel *dirName, *status;
     QCheckBox *overwrite, *all;
-    QPushButton *cancel, *ok;
+    QPushButton *dpButton, *cancel, *ok;
 
     void updateActionColumn();
     QString getActionColumnText();
