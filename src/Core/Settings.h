@@ -61,9 +61,9 @@
 #define GC_POLARFLOW_CLIENT_ID "Not defined"
 #endif
 
-// Xert
+// Azum
 #ifndef GC_AZUM_CLIENT_ID
-#define GC_AZUM_CLIENT_ID "vhNabGIWHbvl9lIy5XTAGOJ3Ypa7Qqg9cBrBloca"
+#define GC_AZUM_CLIENT_ID "2XVhIzyXCSyM2gzq4zcK0YM0R5TJRBuH4CgtdpSw"
 #endif
 
 
