@@ -27,7 +27,6 @@
 #include "HelpWhatsThis.h"
 #include "CsvRideFile.h"
 #include "DataProcessor.h"
-#include "RideMetadata.h"
 #ifdef GC_WANT_PYTHON
 #include "FixPyScriptsDialog.h"
 #endif
@@ -177,85 +176,6 @@ processed(0), fails(0), numFilesToProcess(0) {
     dpGrid->addStretch();
     dpGrid->addWidget(dpButton);
 
-    //  --------------- Set Meta Data Processing menu items -----------------------
-
-    QHBoxLayout* setMetadataGrid = new QHBoxLayout;
-    setMetadataGrid->setContentsMargins(0, 0, 0, 0);
-
-    QRadioButton* setMetadataRadioBox = new QRadioButton(tr("Update Metadata"), this);
-    radioGroup->addButton(setMetadataRadioBox, int(BatchProcessingDialog::metadataSetB));
-
-    metadataFieldToSet = new QComboBox(this);
-    metadataEditField =  new QLineEdit(this);
-
-    // now add the ride metadata fields -- should be the same generally
-    foreach(FieldDefinition field, GlobalContext::context()->rideMetadata->getFields()) {
-
-        // Remove fundamental key fields from the editing capability, as batch editing these could be very destructive
-        if (field.name != "Start Time" && field.name != "Start Date" && field.name != "Data") {
-
-            if (displayNametoRideMetric(field.name) == NULL) metadataFieldToSet->addItem(field.name);
-        }
-    }
-
-    // Setup the type field to match the selected metadata field
-    updateMetadataTypeField();
-
-    setMetadataGrid->addWidget(setMetadataRadioBox);
-    setMetadataGrid->addWidget(metadataFieldToSet);
-    setMetadataGrid->addSpacing(5);
-    setMetadataGrid->addWidget(metadataEditField);
-    setMetadataGrid->addSpacing(5);
-
-    //  --------------- Set Metric Override menu items -----------------------
-
-    QHBoxLayout* setMetricOverrideGrid = new QHBoxLayout;
-    setMetricOverrideGrid->setContentsMargins(0, 0, 0, 0);
-
-    QRadioButton* setMetricRadioBox = new QRadioButton(tr("Set Metric Override"), this);
-    radioGroup->addButton(setMetricRadioBox, int(BatchProcessingDialog::metricSetB));
-
-    metricFieldToSet = new QComboBox(this);
-    metricDataEditField = new QLineEdit(this);
-
-    // now add the ride metadata fields -- should be the same generally
-    foreach(FieldDefinition field, GlobalContext::context()->rideMetadata->getFields()) {
-        if (displayNametoRideMetric(field.name)) metricFieldToSet->addItem(field.name);
-    }
-
-    metricUnitsLabel = new QLabel(tr(""), this);
-
-    // Setup the type field to match the selected metadata field
-    updateMetricDataTypeField();
-
-    setMetricOverrideGrid->addWidget(setMetricRadioBox);
-    setMetricOverrideGrid->addWidget(metricFieldToSet);
-    setMetricOverrideGrid->addSpacing(5);
-    setMetricOverrideGrid->addWidget(metricDataEditField);
-    setMetricOverrideGrid->addSpacing(5);
-    setMetricOverrideGrid->addWidget(metricUnitsLabel);
-    setMetricOverrideGrid->addStretch();
-
-    //  --------------- Clear Metric Override menu items -----------------------
-
-    QHBoxLayout* clearMetricOverrideGrid = new QHBoxLayout;
-    clearMetricOverrideGrid->setContentsMargins(0, 0, 0, 0);
-
-    QRadioButton* clearMetricOverrideRadioBox = new QRadioButton(tr("Clear Metric Override"), this);
-    radioGroup->addButton(clearMetricOverrideRadioBox, int(BatchProcessingDialog::metricClearB));
-
-    metricFieldToClear = new QComboBox(this);
-
-    // now add the ride metric fields
-    foreach(FieldDefinition field, GlobalContext::context()->rideMetadata->getFields()) {
-        if (displayNametoRideMetric(field.name)) metricFieldToClear->addItem(field.name);
-    }
-
-    clearMetricOverrideGrid->addWidget(clearMetricOverrideRadioBox);
-    clearMetricOverrideGrid->addWidget(metricFieldToClear);
-    clearMetricOverrideGrid->addStretch();
-    
-
     //  --------------- Delete menu items -----------------------
 
     QHBoxLayout* deleteGrid = new QHBoxLayout;
@@ -286,10 +206,6 @@ processed(0), fails(0), numFilesToProcess(0) {
     layout1->addRow(exportGrid1);
     layout1->addRow(exportGrid2);
     layout1->addRow(dpGrid);
-
-    layout1->addRow(setMetadataGrid); 
-    layout1->addRow(setMetricOverrideGrid);
-    layout1->addRow(clearMetricOverrideGrid);
     layout1->addRow(deleteGrid);
     layout->addRow(fileSelection);
     layout->addRow(buttons);
@@ -320,11 +236,6 @@ processed(0), fails(0), numFilesToProcess(0) {
     connect(fileFormat, SIGNAL(currentIndexChanged(int)), this, SLOT(comboSelected()));
     connect(selectDir, SIGNAL(clicked()), this, SLOT(selectClicked()));
 
-    // metadata signals
-    connect(metadataFieldToSet, SIGNAL(currentIndexChanged(int)), this, SLOT(comboSelected()));
-    connect(metricFieldToSet, SIGNAL(currentIndexChanged(int)), this, SLOT(comboSelected()));
-    connect(metricFieldToClear, SIGNAL(currentIndexChanged(int)), this, SLOT(comboSelected()));
-        
     // radio buttons
     connect(radioGroup, SIGNAL(buttonClicked(int)), this, SLOT(radioClicked(int)));
 
@@ -381,9 +292,6 @@ BatchProcessingDialog::comboSelected() {
     DataProcessor* dp = DataProcessorFactory::instance().getProcessors().value(dataProcessorToRun->currentText(), NULL);
     dpButton->setVisible(dp && !dp->isCoreProcessor());
 #endif
-
-    updateMetadataTypeField();
-    updateMetricDataTypeField();
 }
 
 void
@@ -454,18 +362,6 @@ BatchProcessingDialog::okClicked()
                 result = runDataProcessorOnActivities(dataProcessorToRun->currentText());
             } break;
 
-            case BatchProcessingDialog::metadataSetB: {
-                result = setMetadataForActivities(metadataFieldToSet->currentText(), metadataEditField->text());
-            } break;
-
-            case BatchProcessingDialog::metricSetB: {
-                result = setMetricFieldForActivities(metricFieldToSet->currentText(), metricDataEditField->text());
-            } break;
-
-            case BatchProcessingDialog::metricClearB: {
-                result = clearMetricFieldForActivities(metricFieldToClear->currentText());
-            } break;
-
             case BatchProcessingDialog::deleteB: {
                 result = deleteFiles();
                 summaryType = "Deleted ";
@@ -519,63 +415,6 @@ BatchProcessingDialog::cancelClicked()
 }
 
 void
-BatchProcessingDialog::updateMetadataTypeField() {
-
-    // find the selected metadata field and update the display with its type
-    foreach(FieldDefinition field, GlobalContext::context()->rideMetadata->getFields()) {
-        if (metadataFieldToSet->currentText() == field.name) {
-            switch (field.type) {
-                case FIELD_INTEGER: {
-                    metadataEditField->setText("0");
-                    return;
-                }
-                case FIELD_DOUBLE: {
-                    metadataEditField->setText("0.00");
-                    return;
-                }
-                case FIELD_DATE: {
-                    metadataEditField->setText("dd/mm/yyyy");
-                    return;
-                }
-                case FIELD_TIME: {
-                    metadataEditField->setText("hh:mm:ss");
-                    return;
-                }
-                case FIELD_CHECKBOX: {
-                    metadataEditField->setText("1|0");
-                    return;
-                }
-                case FIELD_TEXT:
-                case FIELD_TEXTBOX:
-                case FIELD_SHORTTEXT:
-                default: {
-                    metadataEditField->setText("");
-                    return;
-                }
-            }
-        }
-    }
-}
-
-void
-BatchProcessingDialog::updateMetricDataTypeField() {
-
-    RideMetric* rideM = displayNametoRideMetric(metricFieldToSet->currentText());
-
-    // Display metric fields format and units
-    if(rideM->isTime()) {
-        metricDataEditField->setText("hh:mm:ss");
-        metricUnitsLabel->setText("");
-    } else if (rideM->isDate()) {
-        metricDataEditField->setText("dd/mm/yyyy");
-        metricUnitsLabel->setText("");
-    } else {
-        metricDataEditField->setText("0.00");
-        metricUnitsLabel->setText((rideM) ? rideM->units(GlobalContext::context()->useMetricUnits) : "");
-    }
-}
-
-void
 BatchProcessingDialog::updateActionColumn() {
 
     QString colText = getActionColumnText();
@@ -608,41 +447,11 @@ BatchProcessingDialog::getActionColumnText() {
         return dataProcessorToRun->currentText();
     }
 
-    case BatchProcessingDialog::metadataSetB: {
-        return "Update Metadata field - " + metadataFieldToSet->currentText();
-    }
-
-    case BatchProcessingDialog::metricSetB: {
-        return "Set Metric Override - " + metricFieldToSet->currentText();
-    }
-
-    case BatchProcessingDialog::metricClearB: {
-        return "Clear Metric Override - " + metricFieldToClear->currentText();
-    }
-
     case BatchProcessingDialog::deleteB: {
         return "Delete";
     }
     }
     return QString("Undefined");
-}
-
-RideMetric*
-BatchProcessingDialog::displayNametoRideMetric(const QString& fieldDisplayName) {
-
-    // lookup metrics (we override them)
-    RideMetricFactory& factory = RideMetricFactory::instance();
-    QHash<QString, RideMetric*> metrics = factory.metricHash();
-
-    // find the metric from the display name
-    QHashIterator<QString, RideMetric*> itr(metrics);
-    while (itr.hasNext()) {
-        itr.next();
-        if (itr.value()->name() == fieldDisplayName) {
-            return itr.value();
-        }
-    }
-    return NULL;
 }
 
 BatchProcessingDialog::bpFailureType
@@ -834,199 +643,8 @@ BatchProcessingDialog::runDataProcessorOnActivities(const QString& processorName
     return BatchProcessingDialog::finishedF;
 }
 
-BatchProcessingDialog::bpFailureType
-BatchProcessingDialog::setMetadataForActivities(const QString& metadataFieldName,
-                                                QString metadataValue) {
-
-    // find the selected metadata field and update the display with its type
-    foreach(FieldDefinition field, GlobalContext::context()->rideMetadata->getFields()) {
-        if (metadataFieldName == field.name) {
-
-            if (field.type == FIELD_TIME) {
-                metadataValue.simplified().remove(' ');
-                QRegularExpression re("([0-1]?[0-9]|2[0-3]):([0-5]?[0-9]):([0-5]?[0-9])");
-                if (!re.match(metadataValue).hasMatch()) return BatchProcessingDialog::timeFormatF;
-            }
-
-            if (field.type == FIELD_DATE) {
-                metadataValue.simplified().remove(' ');
-                QRegularExpression re("([0]?[1-9]|[1][0-9]|3[0-1])/([0]?[1-9]|[1][0-2])/([0-9]{4})");
-                if (!re.match(metadataValue).hasMatch()) return BatchProcessingDialog::dateFormatF;
-            }
-            break;
-        }
-    }
-
-    // loop through the table and set the metdata on each selected activity
-    for (int i = 0; i < files->invisibleRootItem()->childCount(); i++) {
-
-        // give user a chance to abort..
-        QApplication::processEvents();
-
-        // did they?
-        if (aborted == true) return BatchProcessingDialog::userF; // user aborted!
-
-        QTreeWidgetItem* current = files->invisibleRootItem()->child(i);
-
-        // is it selected for metadata update ?
-        if (static_cast<QCheckBox*>(files->itemWidget(current, 0))->isChecked()) {
-
-            RideItem* rideI = context->athlete->rideCache->getRide(current->text(1));
-
-            if (!rideI) { failedToProcessEntry(current); continue; } // eek!
-
-            // ack ! we need to autoprocess, so open the ride
-            RideFile* rideF = rideI->ride();
-
-            if (!rideF) { failedToProcessEntry(current); continue; } // eek!
-
-            rideF->setTag(metadataFieldName, metadataValue);
-
-            // rideFile is now dirty!
-            rideI->setDirty(true);
-
-            // get refresh done, coz overrides state has changed
-            rideI->notifyRideMetadataChanged();
-
-            // Update the files entry
-            current->setText(4, tr("Metadata Tag Set"));
-            processed++;
-        }
-    }
-
-    return BatchProcessingDialog::finishedF;
-}
-
-BatchProcessingDialog::bpFailureType
-BatchProcessingDialog::setMetricFieldForActivities(const QString& metricDataFieldName,
-                                                    QString metricDataValue) {
-
-    RideMetric* rideM = displayNametoRideMetric(metricDataFieldName);
-
-    if (!rideM) return BatchProcessingDialog::noRideMFoundF; // eek!
-
-    // check time format and calculate number of seconds to simplify the data input for the user.
-    if (rideM->isTime()) {
-
-        metricDataValue.simplified().remove(' ');
-        QRegularExpression re("([0-1]?[0-9]|2[0-3]):([0-5]?[0-9]):([0-5]?[0-9])");
-        QRegularExpressionMatch rem = re.match(metricDataValue);
-
-        if (rem.hasMatch()) {
-            int hours = rem.captured(1).toInt();
-            int mins = rem.captured(2).toInt();
-            int secs = rem.captured(3).toInt();
-
-            metricDataValue = QString("%1").arg((hours * 3600) + (mins * 60) + secs);
-
-        } else {
-            return BatchProcessingDialog::timeFormatF;
-        }
-    }
-
-    // No metric date fields are available for batch processing so this shouldn't occur
-    if (rideM->isDate()) return BatchProcessingDialog::dateFormatF;
-
-    // loop through the table and set the metric override on each selected activity
-    for (int i = 0; i < files->invisibleRootItem()->childCount(); i++) {
-
-        // give user a chance to abort..
-        QApplication::processEvents();
-
-        // did they?
-        if (aborted == true) return BatchProcessingDialog::userF; // user aborted!
-
-        QTreeWidgetItem* current = files->invisibleRootItem()->child(i);
-
-        // is it selected for metric override ?
-        if (static_cast<QCheckBox*>(files->itemWidget(current, 0))->isChecked()) {
-
-            RideItem* rideI = context->athlete->rideCache->getRide(current->text(1));
-
-            if (!rideI) { failedToProcessEntry(current); continue; } // eek!
-
-            // ack ! we need to autoprocess, so open the ride
-            RideFile* rideF = rideI->ride();
-
-            if (!rideF) { failedToProcessEntry(current); continue; } // eek!
-
-            // set metric override
-            QMap<QString, QString> override;
-            override.insert("value", QString("%1").arg(metricDataValue.toDouble() / rideM->conversion()));
-            rideF->metricOverrides.insert(rideM->symbol(), override);
-
-            // rideFile is now dirty!
-            rideI->setDirty(true);
-
-            // get refresh done, coz overrides state has changed
-            rideI->notifyRideMetadataChanged();
-
-            // Update the files entry
-            current->setText(4, tr("Metric Override Set"));
-            processed++;
-        }
-    }
-
-    return BatchProcessingDialog::finishedF;
-}
-
-BatchProcessingDialog::bpFailureType
-BatchProcessingDialog::clearMetricFieldForActivities(const QString& metricDataFieldName) {
-
-    RideMetric* rideM = displayNametoRideMetric(metricDataFieldName);
-
-    if (!rideM) return BatchProcessingDialog::noRideMFoundF; // eek!
-
-    // loop through the table and clear the metdata on each selected activity
-    for (int i = 0; i < files->invisibleRootItem()->childCount(); i++) {
-
-        // give user a chance to abort..
-        QApplication::processEvents();
-
-        // did they?
-        if (aborted == true) return BatchProcessingDialog::userF; // user aborted!
-
-        QTreeWidgetItem* current = files->invisibleRootItem()->child(i);
-
-        // is it selected for metadata clearing ?
-        if (static_cast<QCheckBox*>(files->itemWidget(current, 0))->isChecked()) {
-
-            RideItem* rideI = context->athlete->rideCache->getRide(current->text(1));
-
-            if (!rideI) { failedToProcessEntry(current); continue; } // eek!
-
-            // ack ! we need to autoprocess, so open the ride
-            RideFile* rideF = rideI->ride();
-
-            if (!rideF) { failedToProcessEntry(current); continue; } // eek!
-
-            // now clear the override 
-            if (rideM) {
-
-                rideF->metricOverrides.remove(rideM->symbol());
-
-                // rideFile is now dirty!
-                rideI->setDirty(true);
-
-                // get refresh done, coz overrides state has changed
-                rideI->notifyRideMetadataChanged();
-
-                // Update the files entry
-                current->setText(4, tr("Metric Override Removed"));
-                processed++;
-
-            } else {
-                failedToProcessEntry(current);
-            }
-        }
-    }
-
-    return BatchProcessingDialog::finishedF;
-}
-
 void
 BatchProcessingDialog::failedToProcessEntry(QTreeWidgetItem* current) {
     current->setText(4, tr("Failed to process activity"));
     fails++;
 }
-
