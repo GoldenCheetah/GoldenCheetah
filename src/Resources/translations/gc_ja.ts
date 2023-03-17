@@ -196,10 +196,6 @@ It might be necessary to manually disable it.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Browse</source>
-        <translation type="obsolete">参照</translation>
-    </message>
-    <message>
         <location filename="../../Gui/AthletePages.cpp" line="365"/>
         <source>Choose Picture</source>
         <translation type="unfinished">写真の選択</translation>
@@ -380,13 +376,6 @@ It might be necessary to manually disable it.</source>
     </message>
 </context>
 <context>
-    <name>AddChartFinal</name>
-    <message>
-        <source>Done</source>
-        <translation type="obsolete">終了</translation>
-    </message>
-</context>
-<context>
     <name>AddClass</name>
     <message>
         <location filename="../../Cloud/AddCloudWizard.cpp" line="89"/>
@@ -506,22 +495,6 @@ It might be necessary to manually disable it.</source>
         <location filename="../../Train/AddDeviceWizard.cpp" line="1539"/>
         <source>Virtual Power</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Power</source>
-        <translation type="obsolete">出力</translation>
-    </message>
-    <message>
-        <source>Heartrate</source>
-        <translation type="obsolete">心拍数</translation>
-    </message>
-    <message>
-        <source>Speed</source>
-        <translation type="obsolete">速度</translation>
-    </message>
-    <message>
-        <source>Cadence</source>
-        <translation type="obsolete">ケイデンス</translation>
     </message>
 </context>
 <context>
@@ -715,10 +688,6 @@ If you choose to copy to library the file will be copied into the GoldenCheetah 
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Interval length: </source>
-        <translation type="obsolete">インターバル長: </translation>
-    </message>
-    <message>
         <location filename="../../Gui/AddIntervalDialog.cpp" line="40"/>
         <source>Find Intervals</source>
         <translation type="unfinished"></translation>
@@ -862,22 +831,6 @@ If you choose to copy to library the file will be copied into the GoldenCheetah 
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&amp;Done</source>
-        <translation type="obsolete">完了(&amp;D)</translation>
-    </message>
-    <message>
-        <source>&amp;Add to Intervals</source>
-        <translation type="obsolete">インターバルを追加(&amp;A)</translation>
-    </message>
-    <message>
-        <source>Select Ride</source>
-        <translation type="obsolete">ライドを選択</translation>
-    </message>
-    <message>
-        <source>No ride selected!</source>
-        <translation type="obsolete">ライドが選択されていません!</translation>
-    </message>
-    <message>
         <location filename="../../Gui/AddIntervalDialog.cpp" line="530"/>
         <location filename="../../Gui/AddIntervalDialog.cpp" line="555"/>
         <source>Bad Interval Length</source>
@@ -975,10 +928,6 @@ If you choose to copy to library the file will be copied into the GoldenCheetah 
         <location filename="../../Train/AddDeviceWizard.cpp" line="1022"/>
         <source>Auto detect at Startup</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Value</source>
-        <translation type="obsolete">値</translation>
     </message>
     <message>
         <location filename="../../Train/AddDeviceWizard.cpp" line="991"/>
@@ -1990,14 +1939,6 @@ Press Next to Continue
         <source>Feet</source>
         <translation>フィート</translation>
     </message>
-    <message>
-        <source>Distance </source>
-        <translation type="obsolete">距離 </translation>
-    </message>
-    <message>
-        <source>Time (minutes)</source>
-        <translation type="obsolete">時間 (分)</translation>
-    </message>
 </context>
 <context>
     <name>AllPlotObject</name>
@@ -2220,10 +2161,6 @@ Press Next to Continue
 <context>
     <name>AllPlotWindow</name>
     <message>
-        <source>Show:</source>
-        <translation type="obsolete">見る:</translation>
-    </message>
-    <message>
         <location filename="../../Charts/AllPlotWindow.cpp" line="190"/>
         <location filename="../../Charts/AllPlotWindow.cpp" line="444"/>
         <source>Smooth</source>
@@ -2243,10 +2180,6 @@ Press Next to Continue
         <location filename="../../Charts/AllPlotWindow.cpp" line="200"/>
         <source>Fullplot</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Stacked view</source>
-        <translation type="obsolete">スタックビュー</translation>
     </message>
     <message>
         <location filename="../../Charts/AllPlotWindow.cpp" line="201"/>
@@ -2622,18 +2555,6 @@ Press Next to Continue
         <source>X Axis</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <source>X Axis Shows Time</source>
-        <translation type="obsolete">時間をX軸に</translation>
-    </message>
-    <message>
-        <source>X Axis Shows Distance</source>
-        <translation type="obsolete">距離をX軸に</translation>
-    </message>
-    <message>
-        <source>Smoothing (secs)</source>
-        <translation type="obsolete">平滑化 (秒)</translation>
-    </message>
 </context>
 <context>
     <name>AnalysisSidebar</name>
@@ -2780,22 +2701,6 @@ Press Next to Continue
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Find Best Intervals</source>
-        <translation type="obsolete">ベストインターバルを検索</translation>
-    </message>
-    <message>
-        <source>All Rides</source>
-        <translation type="obsolete">全てのライド</translation>
-    </message>
-    <message>
-        <source>Delete Ride</source>
-        <translation type="obsolete">ライドを削除</translation>
-    </message>
-    <message>
-        <source>Split Ride</source>
-        <translation type="obsolete">ライドを分割</translation>
-    </message>
-    <message>
         <location filename="../../Gui/AnalysisSidebar.cpp" line="408"/>
         <location filename="../../Gui/AnalysisSidebar.cpp" line="478"/>
         <source>Find Intervals...</source>
@@ -2842,26 +2747,10 @@ Press Next to Continue
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Bring to Front</source>
-        <translation type="obsolete">手前へ</translation>
-    </message>
-    <message>
-        <source>Send to back</source>
-        <translation type="obsolete">背面へ</translation>
-    </message>
-    <message>
         <location filename="../../Gui/AnalysisSidebar.cpp" line="650"/>
         <location filename="../../Gui/AnalysisSidebar.cpp" line="652"/>
         <source>Find Intervals</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source> (%1 watts)</source>
-        <translation type="obsolete"> (%1 ワット)</translation>
-    </message>
-    <message>
-        <source>Find Power Peaks</source>
-        <translation type="obsolete">ピーク出力を検索</translation>
     </message>
 </context>
 <context>
@@ -2946,22 +2835,6 @@ Press Next to Continue
 </context>
 <context>
     <name>Athlete</name>
-    <message>
-        <source>Zones File Error</source>
-        <translation type="obsolete">ゾーン設定ファイルエラー</translation>
-    </message>
-    <message>
-        <source>Reading Zones File</source>
-        <translation type="obsolete">ゾーン設定ファイルの読み込み中</translation>
-    </message>
-    <message>
-        <source>Intervals</source>
-        <translation type="obsolete">インターバル</translation>
-    </message>
-    <message>
-        <source>Can&apos;t rename %1 to %2</source>
-        <translation type="obsolete">%1 から %2 にリネームできません</translation>
-    </message>
     <message>
         <location filename="../../Core/Athlete.cpp" line="140"/>
         <source>Pace Zones File %1 Error</source>
@@ -3292,10 +3165,6 @@ Press Next to Continue
         <location filename="../../Gui/AthleteConfigDialog.cpp" line="204"/>
         <source>About</source>
         <translation type="unfinished">概要</translation>
-    </message>
-    <message>
-        <source>Power Zones</source>
-        <translation type="obsolete">パワーゾーン</translation>
     </message>
     <message>
         <location filename="../../Gui/AthleteConfigDialog.cpp" line="208"/>
@@ -4172,6 +4041,44 @@ Press Next to Continue
     </message>
 </context>
 <context>
+    <name>Azum</name>
+    <message>
+        <location filename="../../Cloud/Azum.cpp" line="75"/>
+        <source>There is no token</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Cloud/Azum.cpp" line="81"/>
+        <source>There is no selected athlete</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Cloud/Azum.cpp" line="127"/>
+        <source>JSON parser error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Cloud/Azum.cpp" line="173"/>
+        <source>No selected athlete</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Cloud/Azum.cpp" line="297"/>
+        <source>Completed.</source>
+        <translation type="unfinished">完了。</translation>
+    </message>
+    <message>
+        <location filename="../../Cloud/Azum.h" line="20"/>
+        <source>Azum</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Cloud/Azum.h" line="21"/>
+        <source>Sync with new and unique coaching platform from Switzerland.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>BT40Controller</name>
     <message>
         <location filename="../../Train/BT40Controller.cpp" line="173"/>
@@ -4322,187 +4229,207 @@ Press Next to Continue
     </message>
 </context>
 <context>
-    <name>BatchExportDialog</name>
+    <name>BatchProcessingDialog</name>
     <message>
-        <location filename="../../Gui/BatchExportDialog.cpp" line="46"/>
-        <source>Filename</source>
-        <translation type="unfinished">ファイル名</translation>
-    </message>
-    <message>
-        <location filename="../../Gui/BatchExportDialog.cpp" line="47"/>
-        <source>Date</source>
-        <translation type="unfinished">日付</translation>
-    </message>
-    <message>
-        <location filename="../../Gui/BatchExportDialog.cpp" line="48"/>
-        <source>Time</source>
-        <translation type="unfinished">時間</translation>
-    </message>
-    <message>
-        <location filename="../../Gui/BatchExportDialog.cpp" line="49"/>
-        <source>Action</source>
+        <location filename="../../Gui/BatchProcessingDialog.cpp" line="44"/>
+        <source>Activity Batch Processing</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/BatchExportDialog.cpp" line="83"/>
-        <source>dd MMM yyyy</source>
-        <translation type="unfinished">yyyy年MMMMd日</translation>
-    </message>
-    <message>
-        <source>hh:mm:ss ap</source>
-        <translation type="obsolete">hh:mm:ss ap</translation>
-    </message>
-    <message>
-        <location filename="../../Gui/BatchExportDialog.cpp" line="33"/>
-        <source>Activity Batch Export</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../Gui/BatchExportDialog.cpp" line="87"/>
-        <location filename="../../Gui/BatchExportDialog.cpp" line="126"/>
-        <location filename="../../Gui/BatchExportDialog.cpp" line="175"/>
-        <source>Export</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../Gui/BatchExportDialog.cpp" line="92"/>
-        <source>Export as</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../Gui/BatchExportDialog.cpp" line="96"/>
-        <source>Export all data (CSV)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../Gui/BatchExportDialog.cpp" line="100"/>
-        <source>Browse</source>
-        <translation type="unfinished">参照</translation>
-    </message>
-    <message>
-        <location filename="../../Gui/BatchExportDialog.cpp" line="101"/>
-        <source>Export to</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../Gui/BatchExportDialog.cpp" line="108"/>
+        <location filename="../../Gui/BatchProcessingDialog.cpp" line="65"/>
         <source>check/uncheck all</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/BatchExportDialog.cpp" line="124"/>
-        <source>Overwrite existing files</source>
+        <location filename="../../Gui/BatchProcessingDialog.cpp" line="69"/>
+        <source>Filename</source>
+        <translation type="unfinished">ファイル名</translation>
+    </message>
+    <message>
+        <location filename="../../Gui/BatchProcessingDialog.cpp" line="70"/>
+        <source>Date</source>
+        <translation type="unfinished">日付</translation>
+    </message>
+    <message>
+        <location filename="../../Gui/BatchProcessingDialog.cpp" line="71"/>
+        <source>Time</source>
+        <translation type="unfinished">時間</translation>
+    </message>
+    <message>
+        <location filename="../../Gui/BatchProcessingDialog.cpp" line="72"/>
+        <source>Action</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/BatchExportDialog.cpp" line="125"/>
+        <location filename="../../Gui/BatchProcessingDialog.cpp" line="105"/>
+        <source>dd MMM yyyy</source>
+        <translation type="unfinished">yyyy年MMMMd日</translation>
+    </message>
+    <message>
+        <location filename="../../Gui/BatchProcessingDialog.cpp" line="120"/>
+        <source>Export</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Gui/BatchProcessingDialog.cpp" line="123"/>
+        <source>As</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Gui/BatchProcessingDialog.cpp" line="128"/>
+        <source>All data (CSV)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Gui/BatchProcessingDialog.cpp" line="132"/>
+        <source>Browse</source>
+        <translation type="unfinished">参照</translation>
+    </message>
+    <message>
+        <location filename="../../Gui/BatchProcessingDialog.cpp" line="134"/>
+        <source>To</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Gui/BatchProcessingDialog.cpp" line="141"/>
+        <source>Overwrite Files</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Gui/BatchProcessingDialog.cpp" line="166"/>
+        <source>Run Data Processor</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Gui/BatchProcessingDialog.cpp" line="180"/>
+        <source>Edit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Gui/BatchProcessingDialog.cpp" line="198"/>
+        <source>Delete All Selected Activities</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Gui/BatchProcessingDialog.cpp" line="209"/>
         <source>Cancel</source>
         <translation type="unfinished">キャンセル</translation>
     </message>
     <message>
-        <location filename="../../Gui/BatchExportDialog.cpp" line="150"/>
+        <location filename="../../Gui/BatchProcessingDialog.cpp" line="263"/>
+        <source>%1 files selected</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Gui/BatchProcessingDialog.cpp" line="270"/>
         <source>Select Target Directory</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/BatchExportDialog.cpp" line="179"/>
-        <source>Exporting...</source>
+        <location filename="../../Gui/BatchProcessingDialog.cpp" line="351"/>
+        <location filename="../../Gui/BatchProcessingDialog.cpp" line="456"/>
+        <source>--</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/BatchExportDialog.cpp" line="182"/>
-        <location filename="../../Gui/BatchExportDialog.cpp" line="189"/>
-        <source>Abort</source>
-        <translation type="unfinished">中止</translation>
-    </message>
-    <message>
-        <location filename="../../Gui/BatchExportDialog.cpp" line="186"/>
-        <source>%1 activities exported, %2 failed or skipped.</source>
+        <location filename="../../Gui/BatchProcessingDialog.cpp" line="372"/>
+        <source>Processing...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/BatchExportDialog.cpp" line="187"/>
-        <location filename="../../Gui/BatchExportDialog.cpp" line="191"/>
-        <source>Finish</source>
-        <translation type="unfinished">終了</translation>
+        <location filename="../../Gui/BatchProcessingDialog.cpp" line="398"/>
+        <source>Processing failed due date format error...</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/BatchExportDialog.cpp" line="229"/>
+        <location filename="../../Gui/BatchProcessingDialog.cpp" line="402"/>
+        <source>Processing failed due time format error...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Gui/BatchProcessingDialog.cpp" line="406"/>
+        <source>Processing failed as the ride metric cannot be found...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Gui/BatchProcessingDialog.cpp" line="410"/>
+        <source>Processing aborted by the user...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Gui/BatchProcessingDialog.cpp" line="414"/>
+        <source>Processing failed as the data processor cannot be found...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Gui/BatchProcessingDialog.cpp" line="418"/>
+        <source>%1 activities successfully, %2 failed or skipped.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Gui/BatchProcessingDialog.cpp" line="423"/>
+        <source>Processing failed for an unknown reason...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Gui/BatchProcessingDialog.cpp" line="511"/>
         <source>Exists - not exported</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/BatchExportDialog.cpp" line="237"/>
+        <location filename="../../Gui/BatchProcessingDialog.cpp" line="519"/>
         <source>Removing...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/BatchExportDialog.cpp" line="242"/>
+        <location filename="../../Gui/BatchProcessingDialog.cpp" line="523"/>
         <source>Reading...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/BatchExportDialog.cpp" line="254"/>
+        <location filename="../../Gui/BatchProcessingDialog.cpp" line="534"/>
         <source>Writing...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/BatchExportDialog.cpp" line="267"/>
+        <location filename="../../Gui/BatchProcessingDialog.cpp" line="548"/>
         <source>Exported</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/BatchExportDialog.cpp" line="270"/>
+        <location filename="../../Gui/BatchProcessingDialog.cpp" line="551"/>
         <source>Write failed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/BatchExportDialog.cpp" line="278"/>
+        <location filename="../../Gui/BatchProcessingDialog.cpp" line="559"/>
         <source>Read error</source>
         <translation type="unfinished"></translation>
     </message>
-</context>
-<context>
-    <name>BestIntervalDialog</name>
     <message>
-        <source>Interval length: </source>
-        <translation type="vanished">インターバル長: </translation>
+        <location filename="../../Gui/BatchProcessingDialog.cpp" line="572"/>
+        <source>Are you sure you want to delete all selected activities?</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>How many to find: </source>
-        <translation type="vanished">検索対象数: </translation>
+        <location filename="../../Gui/BatchProcessingDialog.cpp" line="573"/>
+        <source>Delete</source>
+        <translation type="unfinished">削除</translation>
     </message>
     <message>
-        <source>Results:</source>
-        <translation type="vanished">結果:</translation>
+        <location filename="../../Gui/BatchProcessingDialog.cpp" line="597"/>
+        <source>Deleted</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&amp;Find Intervals</source>
-        <translation type="vanished">インターバルを検索(&amp;F)</translation>
+        <location filename="../../Gui/BatchProcessingDialog.cpp" line="655"/>
+        <source>Processed</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&amp;Done</source>
-        <translation type="vanished">完了(&amp;D)</translation>
-    </message>
-    <message>
-        <source>&amp;Add to Intervals</source>
-        <translation type="vanished">インターバルを追加(&amp;A)</translation>
-    </message>
-    <message>
-        <source>Select Ride</source>
-        <translation type="obsolete">ライドを選択</translation>
-    </message>
-    <message>
-        <source>No ride selected!</source>
-        <translation type="obsolete">ライドが選択されていません!</translation>
-    </message>
-    <message>
-        <source>Bad Interval Length</source>
-        <translation type="vanished">無効なインターバル長</translation>
-    </message>
-    <message>
-        <source>Interval length must be greater than zero!</source>
-        <translation type="vanished">インターバル長は0以上である必要があります!</translation>
+        <location filename="../../Gui/BatchProcessingDialog.cpp" line="672"/>
+        <source>Failed to process activity</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4537,10 +4464,6 @@ Press Next to Continue
         <source>minutes</source>
         <translation type="unfinished">分</translation>
     </message>
-    <message>
-        <source>seconds</source>
-        <translation type="obsolete">秒</translation>
-    </message>
 </context>
 <context>
     <name>BestTime100m</name>
@@ -4554,10 +4477,6 @@ Press Next to Continue
         <location filename="../../Metrics/PeakPace.cpp" line="804"/>
         <source>minutes</source>
         <translation type="unfinished">分</translation>
-    </message>
-    <message>
-        <source>seconds</source>
-        <translation type="obsolete">秒</translation>
     </message>
 </context>
 <context>
@@ -4573,10 +4492,6 @@ Press Next to Continue
         <source>minutes</source>
         <translation type="unfinished">分</translation>
     </message>
-    <message>
-        <source>seconds</source>
-        <translation type="obsolete">秒</translation>
-    </message>
 </context>
 <context>
     <name>BestTime1500m</name>
@@ -4590,10 +4505,6 @@ Press Next to Continue
         <location filename="../../Metrics/PeakPace.cpp" line="918"/>
         <source>minutes</source>
         <translation type="unfinished">分</translation>
-    </message>
-    <message>
-        <source>seconds</source>
-        <translation type="obsolete">秒</translation>
     </message>
 </context>
 <context>
@@ -4609,10 +4520,6 @@ Press Next to Continue
         <source>minutes</source>
         <translation type="unfinished">分</translation>
     </message>
-    <message>
-        <source>seconds</source>
-        <translation type="obsolete">秒</translation>
-    </message>
 </context>
 <context>
     <name>BestTime2000m</name>
@@ -4626,10 +4533,6 @@ Press Next to Continue
         <location filename="../../Metrics/PeakPace.cpp" line="937"/>
         <source>minutes</source>
         <translation type="unfinished">分</translation>
-    </message>
-    <message>
-        <source>seconds</source>
-        <translation type="obsolete">秒</translation>
     </message>
 </context>
 <context>
@@ -4645,10 +4548,6 @@ Press Next to Continue
         <source>minutes</source>
         <translation type="unfinished">分</translation>
     </message>
-    <message>
-        <source>seconds</source>
-        <translation type="obsolete">秒</translation>
-    </message>
 </context>
 <context>
     <name>BestTime20km</name>
@@ -4662,10 +4561,6 @@ Press Next to Continue
         <location filename="../../Metrics/PeakPace.cpp" line="1051"/>
         <source>minutes</source>
         <translation type="unfinished">分</translation>
-    </message>
-    <message>
-        <source>seconds</source>
-        <translation type="obsolete">秒</translation>
     </message>
 </context>
 <context>
@@ -4681,10 +4576,6 @@ Press Next to Continue
         <source>minutes</source>
         <translation type="unfinished">分</translation>
     </message>
-    <message>
-        <source>seconds</source>
-        <translation type="obsolete">秒</translation>
-    </message>
 </context>
 <context>
     <name>BestTime30km</name>
@@ -4698,10 +4589,6 @@ Press Next to Continue
         <location filename="../../Metrics/PeakPace.cpp" line="1089"/>
         <source>minutes</source>
         <translation type="unfinished">分</translation>
-    </message>
-    <message>
-        <source>seconds</source>
-        <translation type="obsolete">秒</translation>
     </message>
 </context>
 <context>
@@ -4717,10 +4604,6 @@ Press Next to Continue
         <source>minutes</source>
         <translation type="unfinished">分</translation>
     </message>
-    <message>
-        <source>seconds</source>
-        <translation type="obsolete">秒</translation>
-    </message>
 </context>
 <context>
     <name>BestTime400m</name>
@@ -4734,10 +4617,6 @@ Press Next to Continue
         <location filename="../../Metrics/PeakPace.cpp" line="842"/>
         <source>minutes</source>
         <translation type="unfinished">分</translation>
-    </message>
-    <message>
-        <source>seconds</source>
-        <translation type="obsolete">秒</translation>
     </message>
 </context>
 <context>
@@ -4753,10 +4632,6 @@ Press Next to Continue
         <source>minutes</source>
         <translation type="unfinished">分</translation>
     </message>
-    <message>
-        <source>seconds</source>
-        <translation type="obsolete">秒</translation>
-    </message>
 </context>
 <context>
     <name>BestTime5000m</name>
@@ -4770,10 +4645,6 @@ Press Next to Continue
         <location filename="../../Metrics/PeakPace.cpp" line="994"/>
         <source>minutes</source>
         <translation type="unfinished">分</translation>
-    </message>
-    <message>
-        <source>seconds</source>
-        <translation type="obsolete">秒</translation>
     </message>
 </context>
 <context>
@@ -4789,10 +4660,6 @@ Press Next to Continue
         <source>minutes</source>
         <translation type="unfinished">分</translation>
     </message>
-    <message>
-        <source>seconds</source>
-        <translation type="obsolete">秒</translation>
-    </message>
 </context>
 <context>
     <name>BestTime50m</name>
@@ -4806,10 +4673,6 @@ Press Next to Continue
         <location filename="../../Metrics/PeakPace.cpp" line="785"/>
         <source>minutes</source>
         <translation type="unfinished">分</translation>
-    </message>
-    <message>
-        <source>seconds</source>
-        <translation type="obsolete">秒</translation>
     </message>
 </context>
 <context>
@@ -4825,10 +4688,6 @@ Press Next to Continue
         <source>minutes</source>
         <translation type="unfinished">分</translation>
     </message>
-    <message>
-        <source>seconds</source>
-        <translation type="obsolete">秒</translation>
-    </message>
 </context>
 <context>
     <name>BestTimeHalfMarathon</name>
@@ -4842,10 +4701,6 @@ Press Next to Continue
         <location filename="../../Metrics/PeakPace.cpp" line="1070"/>
         <source>minutes</source>
         <translation type="unfinished">分</translation>
-    </message>
-    <message>
-        <source>seconds</source>
-        <translation type="obsolete">秒</translation>
     </message>
 </context>
 <context>
@@ -4861,36 +4716,9 @@ Press Next to Continue
         <source>minutes</source>
         <translation type="unfinished">分</translation>
     </message>
-    <message>
-        <source>seconds</source>
-        <translation type="obsolete">秒</translation>
-    </message>
-</context>
-<context>
-    <name>BestsMetricsPage</name>
-    <message>
-        <source>Available Metrics</source>
-        <translation type="obsolete">使用可能な統計</translation>
-    </message>
-    <message>
-        <source>Selected Metrics</source>
-        <translation type="obsolete">選択された統計</translation>
-    </message>
-    <message>
-        <source>&amp;#8482;</source>
-        <translation type="obsolete">&amp;#8482;</translation>
-    </message>
-    <message>
-        <source> (TM)</source>
-        <translation type="obsolete"> (TM)</translation>
-    </message>
 </context>
 <context>
     <name>BikeScore</name>
-    <message>
-        <source>BikeScore&amp;#8482;</source>
-        <translation type="obsolete">BikeScore&amp;#8482;</translation>
-    </message>
     <message>
         <location filename="../../Metrics/BikeScore.cpp" line="404"/>
         <source>Skiba&apos;s stress score taking into account both the intensity and the duration of the training session, similar to BikeStress it can be computed as 100 * hours * (Relative Intensity)^2</source>
@@ -4903,13 +4731,6 @@ Press Next to Continue
         <location filename="../../Metrics/Coggan.cpp" line="225"/>
         <source>Training Stress Score takes into account both the intensity and the duration of the training session, it can be computed as 100 * hours * IF^2</source>
         <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>BingMap</name>
-    <message>
-        <source>No GPS Data Present</source>
-        <translation type="obsolete">GPSデータがありません</translation>
     </message>
 </context>
 <context>
@@ -5082,28 +4903,6 @@ Let&apos;s get you setup.</source>
     </message>
 </context>
 <context>
-    <name>BodyMeasures</name>
-    <message>
-        <source>kg</source>
-        <translation type="obsolete">kg</translation>
-    </message>
-    <message>
-        <source>%</source>
-        <translation type="obsolete">%</translation>
-    </message>
-</context>
-<context>
-    <name>BodyMeasuresDownload</name>
-    <message>
-        <source>Import CSV file</source>
-        <translation type="obsolete">CSVファイルの取り込み</translation>
-    </message>
-    <message>
-        <source>Close</source>
-        <translation type="obsolete">閉じる</translation>
-    </message>
-</context>
-<context>
     <name>CP2Model</name>
     <message>
         <location filename="../../Metrics/PDModel.h" line="240"/>
@@ -5140,26 +4939,6 @@ Let&apos;s get you setup.</source>
 </context>
 <context>
     <name>CPPage</name>
-    <message>
-        <source>Add CP</source>
-        <translation type="obsolete">CPを追加</translation>
-    </message>
-    <message>
-        <source>Delete CP</source>
-        <translation type="obsolete">CPを削除</translation>
-    </message>
-    <message>
-        <source>Default</source>
-        <translation type="obsolete">デフォルト</translation>
-    </message>
-    <message>
-        <source>Add Zone</source>
-        <translation type="obsolete">ゾーンを追加</translation>
-    </message>
-    <message>
-        <source>Delete Zone</source>
-        <translation type="obsolete">ゾーンを削除</translation>
-    </message>
     <message>
         <location filename="../../Gui/AthletePages.cpp" line="1136"/>
         <location filename="../../Gui/AthletePages.cpp" line="1145"/>
@@ -5694,21 +5473,9 @@ Let&apos;s get you setup.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Total work (kJ)</source>
-        <translation type="obsolete">総エネルギー (kJ)</translation>
-    </message>
-    <message>
-        <source>Interval Length (minutes)</source>
-        <translation type="obsolete">インターバル長 (分)</translation>
-    </message>
-    <message>
         <location filename="../../Charts/CPPlot.cpp" line="1277"/>
         <source>Bests</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>ddd MMM d, yyyy h:mm AP</source>
-        <translation type="obsolete">yyyy年MMMMd日 (ddd) h:mm</translation>
     </message>
     <message>
         <location filename="../../Charts/CPPlot.cpp" line="2127"/>
@@ -5913,13 +5680,6 @@ ddd, dd MMM yyyy</source>
     </message>
 </context>
 <context>
-    <name>Card</name>
-    <message>
-        <source>seconds</source>
-        <translation type="obsolete">秒</translation>
-    </message>
-</context>
-<context>
     <name>ChartBar</name>
     <message>
         <location filename="../../Charts/ChartBar.cpp" line="119"/>
@@ -5938,49 +5698,6 @@ ddd, dd MMM yyyy</source>
     </message>
 </context>
 <context>
-    <name>ChartManagerDialog</name>
-    <message>
-        <source>Manage Charts</source>
-        <translation type="obsolete">チャート管理</translation>
-    </message>
-    <message>
-        <source>Import...</source>
-        <translation type="obsolete">取り込み…</translation>
-    </message>
-    <message>
-        <source>Export...</source>
-        <translation type="obsolete">エクスポート…</translation>
-    </message>
-    <message>
-        <source>Move up</source>
-        <translation type="obsolete">上へ</translation>
-    </message>
-    <message>
-        <source>Move down</source>
-        <translation type="obsolete">下へ</translation>
-    </message>
-    <message>
-        <source>Rename</source>
-        <translation type="obsolete">リネーム</translation>
-    </message>
-    <message>
-        <source>Delete</source>
-        <translation type="obsolete">削除</translation>
-    </message>
-    <message>
-        <source>&amp;OK</source>
-        <translation type="obsolete">OK(&amp;O)</translation>
-    </message>
-    <message>
-        <source>&amp;Cancel</source>
-        <translation type="obsolete">キャンセル(&amp;C)</translation>
-    </message>
-    <message>
-        <source>Chart File (*.xml)</source>
-        <translation type="obsolete">チャートファイル (*.xml)</translation>
-    </message>
-</context>
-<context>
     <name>ChartSettings</name>
     <message>
         <location filename="../../Charts/ChartSettings.cpp" line="26"/>
@@ -5995,10 +5712,6 @@ ddd, dd MMM yyyy</source>
 </context>
 <context>
     <name>ChooseCyclistDialog</name>
-    <message>
-        <source>Choose a Cyclist</source>
-        <translation type="obsolete">サイクリストの選択</translation>
-    </message>
     <message>
         <location filename="../../Gui/ChooseCyclistDialog.cpp" line="53"/>
         <source>Choose an Athlete</source>
@@ -6040,22 +5753,6 @@ ddd, dd MMM yyyy</source>
 
 Are you sure?</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Create New Cyclist</source>
-        <translation type="obsolete">新しいサイクリスト</translation>
-    </message>
-    <message>
-        <source>Enter New Cyclist&apos;s Name</source>
-        <translation type="obsolete">サイクリスト名を入力してください</translation>
-    </message>
-    <message>
-        <source>Fatal Error</source>
-        <translation type="obsolete">深刻なエラー</translation>
-    </message>
-    <message>
-        <source>Can&apos;t create new directory </source>
-        <translation type="obsolete">新しいディレクトリが作成できません</translation>
     </message>
 </context>
 <context>
@@ -7228,10 +6925,6 @@ This may lead to inconsistencies between your local activities and the uploaded 
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Shade Zones</source>
-        <translation type="obsolete">ゾーンシェード</translation>
-    </message>
-    <message>
         <location filename="../../Gui/Pages.cpp" line="1195"/>
         <source>Swatch</source>
         <translation type="unfinished"></translation>
@@ -7255,10 +6948,6 @@ This may lead to inconsistencies between your local activities and the uploaded 
         <location filename="../../Gui/Pages.cpp" line="1239"/>
         <source>Apply Theme</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Default</source>
-        <translation type="obsolete">デフォルト</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="1307"/>
@@ -7415,212 +7104,9 @@ Do you want to apply and restart GoldenCheetah?</source>
         <source>Options</source>
         <translation>オプション</translation>
     </message>
-    <message>
-        <source>Settings</source>
-        <translation type="obsolete">設定</translation>
-    </message>
-    <message>
-        <source>Athlete</source>
-        <translation type="obsolete">アスリート</translation>
-    </message>
-    <message>
-        <source>Devices</source>
-        <translation type="obsolete">デバイス</translation>
-    </message>
-    <message>
-        <source>Twitter</source>
-        <translation type="obsolete">Twitter</translation>
-    </message>
-    <message>
-        <source>Short Term Stress</source>
-        <translation type="obsolete">短期ストレス (STS)</translation>
-    </message>
-    <message>
-        <source>STS</source>
-        <translation type="obsolete">STS</translation>
-    </message>
-    <message>
-        <source>Long Term Stress</source>
-        <translation type="obsolete">長期ストレス (LTS)</translation>
-    </message>
-    <message>
-        <source>LTS</source>
-        <translation type="obsolete">LTS</translation>
-    </message>
-    <message>
-        <source>Stress Balance</source>
-        <translation type="obsolete">ストレスバランス (SB)</translation>
-    </message>
-    <message>
-        <source>SB</source>
-        <translation type="obsolete">SB</translation>
-    </message>
-</context>
-<context>
-    <name>ConfigurationPage</name>
-    <message>
-        <source>Basic Settings</source>
-        <translation type="obsolete">基本設定</translation>
-    </message>
-    <message>
-        <source>Colors</source>
-        <translation type="obsolete">カラー</translation>
-    </message>
-    <message>
-        <source>Interval Metrics</source>
-        <translation type="obsolete">インターバルの統計</translation>
-    </message>
-    <message>
-        <source>Ride Data</source>
-        <translation type="obsolete">ライドデータ</translation>
-    </message>
-    <message>
-        <source>Language:</source>
-        <translation type="obsolete">言語:</translation>
-    </message>
-    <message>
-        <source>English</source>
-        <translation type="obsolete">英語</translation>
-    </message>
-    <message>
-        <source>French</source>
-        <translation type="obsolete">フランス語</translation>
-    </message>
-    <message>
-        <source>Japanese</source>
-        <translation type="obsolete">日本語</translation>
-    </message>
-    <message>
-        <source>Unit of Measurement:</source>
-        <translation type="obsolete">計測単位:</translation>
-    </message>
-    <message>
-        <source>Metric</source>
-        <translation type="obsolete">メートル</translation>
-    </message>
-    <message>
-        <source>Imperial</source>
-        <translation type="obsolete">ヤード・ポンド</translation>
-    </message>
-    <message>
-        <source>Crank Length:</source>
-        <translation type="obsolete">クランク長:</translation>
-    </message>
-    <message>
-        <source>Sort ride list ascending.</source>
-        <translation type="obsolete">ライドを昇順に並び替える。</translation>
-    </message>
-    <message>
-        <source>Settings</source>
-        <translation type="obsolete">設定</translation>
-    </message>
-    <message>
-        <source>Use Garmin Smart Recording.</source>
-        <translation type="obsolete">Garminスマートレコーディングを使用する。</translation>
-    </message>
-    <message>
-        <source>Smart Recording Threshold </source>
-        <translation type="obsolete">スマートレコーディング閾値</translation>
-    </message>
-    <message>
-        <source> secs.</source>
-        <translation type="obsolete">秒</translation>
-    </message>
-    <message>
-        <source>Requires Restart To Take Effect</source>
-        <translation type="obsolete">再起動後に設定されます</translation>
-    </message>
-    <message>
-        <source>BikeScore Estimate: use rides within last </source>
-        <translation type="obsolete">BikeScore予測: 利用する過去のライド日数 </translation>
-    </message>
-    <message>
-        <source> days</source>
-        <translation type="obsolete"> 日</translation>
-    </message>
-    <message>
-        <source>BikeScore estimate mode: </source>
-        <translation type="obsolete">バイクスコア予測モード: </translation>
-    </message>
-    <message>
-        <source>time</source>
-        <translation type="obsolete">時間</translation>
-    </message>
-    <message>
-        <source>distance</source>
-        <translation type="obsolete">距離</translation>
-    </message>
-    <message>
-        <source>Workout Library</source>
-        <translation type="obsolete">ワークアウトライブラリ</translation>
-    </message>
-    <message>
-        <source>Browse</source>
-        <translation type="obsolete">参照</translation>
-    </message>
-    <message>
-        <source>Select Workout Library</source>
-        <translation type="obsolete">ワークアウトライブラリの選択</translation>
-    </message>
-</context>
-<context>
-    <name>CpintPlot</name>
-    <message>
-        <source>Average Power (watts)</source>
-        <translation type="obsolete">平均出力 (ワット)</translation>
-    </message>
-    <message>
-        <source>Interval Length</source>
-        <translation type="obsolete">インターバル長</translation>
-    </message>
-    <message>
-        <source>Total work (kJ)</source>
-        <translation type="obsolete">総エネルギー (kJ)</translation>
-    </message>
-    <message>
-        <source>Interval Length (minutes)</source>
-        <translation type="obsolete">インターバル長 (分)</translation>
-    </message>
-    <message>
-        <source>maximal power</source>
-        <translation type="obsolete">最大出力</translation>
-    </message>
-    <message>
-        <source>Computing critical power intervals.
-This may take a while.
-</source>
-        <translation type="obsolete">クリティカルパワーインターバルを計算中。
-しばらくお待ちください。
-
-</translation>
-    </message>
-    <message>
-        <source>Abort</source>
-        <translation type="obsolete">中止</translation>
-    </message>
-    <message>
-        <source>Processing %1...</source>
-        <translation type="obsolete">%1 を処理中...</translation>
-    </message>
-    <message>
-        <source>Aggregating over all files.</source>
-        <translation type="obsolete">全てのファイルの情報を結合中。</translation>
-    </message>
-    <message>
-        <source>ddd MMM d, yyyy h:mm AP</source>
-        <translation type="obsolete">yyyy年MMMMd日 (ddd) h:mm</translation>
-    </message>
 </context>
 <context>
     <name>CredentialsPage</name>
-    <message>
-        <source>Twitter</source>
-        <translation type="obsolete">Twitter</translation>
-    </message>
-    <message>
-        <source>Browse</source>
-        <translation type="obsolete">参照</translation>
-    </message>
     <message>
         <location filename="../../Gui/AthletePages.cpp" line="64"/>
         <source>+</source>
@@ -7660,14 +7146,6 @@ This may take a while.
 <context>
     <name>CriticalPower</name>
     <message>
-        <source>60 min Peak Power</source>
-        <translation type="obsolete">60分間の最大出力</translation>
-    </message>
-    <message>
-        <source>watts</source>
-        <translation type="obsolete">ワット</translation>
-    </message>
-    <message>
         <location filename="../../Metrics/BikeScore.cpp" line="207"/>
         <source>Critical Power</source>
         <translation type="unfinished">クリティカルパワー</translation>
@@ -7681,31 +7159,11 @@ This may take a while.
 <context>
     <name>CriticalPowerWindow</name>
     <message>
-        <source>Interval Duration:</source>
-        <translation type="obsolete">インターバル時間:</translation>
-    </message>
-    <message>
-        <source>Today:</source>
-        <translation type="obsolete">今日:</translation>
-    </message>
-    <message>
-        <location filename="../../Charts/CriticalPowerWindow.cpp" line="1530"/>
-        <location filename="../../Charts/CriticalPowerWindow.cpp" line="1541"/>
-        <location filename="../../Charts/CriticalPowerWindow.cpp" line="1560"/>
+        <location filename="../../Charts/CriticalPowerWindow.cpp" line="1539"/>
+        <location filename="../../Charts/CriticalPowerWindow.cpp" line="1550"/>
+        <location filename="../../Charts/CriticalPowerWindow.cpp" line="1569"/>
         <source>no data</source>
         <translation>データなし</translation>
-    </message>
-    <message>
-        <source>Best:</source>
-        <translation type="obsolete">ベスト:</translation>
-    </message>
-    <message>
-        <source>CP Curve:</source>
-        <translation type="obsolete">CPカーブ:</translation>
-    </message>
-    <message>
-        <source>&amp;Save CP value</source>
-        <translation type="obsolete">CP値を保存(&amp;S)</translation>
     </message>
     <message>
         <location filename="../../Charts/CriticalPowerWindow.cpp" line="66"/>
@@ -7719,11 +7177,13 @@ This may take a while.
     </message>
     <message>
         <location filename="../../Charts/CriticalPowerWindow.cpp" line="70"/>
+        <location filename="../../Charts/CriticalPowerWindow.cpp" line="275"/>
         <source>Delta compare</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../Charts/CriticalPowerWindow.cpp" line="73"/>
+        <location filename="../../Charts/CriticalPowerWindow.cpp" line="277"/>
         <source>as percentage</source>
         <translation type="unfinished"></translation>
     </message>
@@ -7759,34 +7219,34 @@ This may take a while.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Charts/CriticalPowerWindow.cpp" line="275"/>
+        <location filename="../../Charts/CriticalPowerWindow.cpp" line="281"/>
         <source>Activity Mean Max</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Charts/CriticalPowerWindow.cpp" line="276"/>
+        <location filename="../../Charts/CriticalPowerWindow.cpp" line="282"/>
         <source>Activity Centile</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Charts/CriticalPowerWindow.cpp" line="277"/>
+        <location filename="../../Charts/CriticalPowerWindow.cpp" line="283"/>
         <source>No Activity</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Charts/CriticalPowerWindow.cpp" line="280"/>
+        <location filename="../../Charts/CriticalPowerWindow.cpp" line="286"/>
         <source>Current Activity</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Charts/CriticalPowerWindow.cpp" line="285"/>
+        <location filename="../../Charts/CriticalPowerWindow.cpp" line="291"/>
         <source>None</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../Charts/CriticalPowerWindow.cpp" line="153"/>
-        <location filename="../../Charts/CriticalPowerWindow.cpp" line="295"/>
-        <location filename="../../Charts/CriticalPowerWindow.cpp" line="512"/>
+        <location filename="../../Charts/CriticalPowerWindow.cpp" line="301"/>
+        <location filename="../../Charts/CriticalPowerWindow.cpp" line="518"/>
         <source>Model</source>
         <translation type="unfinished"></translation>
     </message>
@@ -7866,315 +7326,289 @@ This may take a while.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Charts/CriticalPowerWindow.cpp" line="286"/>
+        <location filename="../../Charts/CriticalPowerWindow.cpp" line="292"/>
         <source>2 parameter</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Charts/CriticalPowerWindow.cpp" line="287"/>
+        <location filename="../../Charts/CriticalPowerWindow.cpp" line="293"/>
         <source>3 parameter</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Charts/CriticalPowerWindow.cpp" line="288"/>
+        <location filename="../../Charts/CriticalPowerWindow.cpp" line="294"/>
         <source>Extended CP</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Charts/CriticalPowerWindow.cpp" line="290"/>
+        <location filename="../../Charts/CriticalPowerWindow.cpp" line="296"/>
         <source>Multicomponent</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Charts/CriticalPowerWindow.cpp" line="291"/>
+        <location filename="../../Charts/CriticalPowerWindow.cpp" line="297"/>
         <source>Ward-Smith</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Charts/CriticalPowerWindow.cpp" line="298"/>
+        <location filename="../../Charts/CriticalPowerWindow.cpp" line="304"/>
         <source>Envelope</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Charts/CriticalPowerWindow.cpp" line="299"/>
+        <location filename="../../Charts/CriticalPowerWindow.cpp" line="305"/>
         <source>Least Squares (LMA)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Charts/CriticalPowerWindow.cpp" line="300"/>
+        <location filename="../../Charts/CriticalPowerWindow.cpp" line="306"/>
         <source>Linear Regression (Work)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Charts/CriticalPowerWindow.cpp" line="302"/>
+        <location filename="../../Charts/CriticalPowerWindow.cpp" line="308"/>
         <source>Curve Fit</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Charts/CriticalPowerWindow.cpp" line="305"/>
+        <location filename="../../Charts/CriticalPowerWindow.cpp" line="311"/>
         <source>MMP bests</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Charts/CriticalPowerWindow.cpp" line="306"/>
+        <location filename="../../Charts/CriticalPowerWindow.cpp" line="312"/>
         <source>Performance tests</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Charts/CriticalPowerWindow.cpp" line="308"/>
+        <location filename="../../Charts/CriticalPowerWindow.cpp" line="314"/>
         <source>Data to fit</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Charts/CriticalPowerWindow.cpp" line="310"/>
-        <location filename="../../Charts/CriticalPowerWindow.cpp" line="315"/>
+        <location filename="../../Charts/CriticalPowerWindow.cpp" line="316"/>
+        <location filename="../../Charts/CriticalPowerWindow.cpp" line="321"/>
         <source> </source>
         <translation type="unfinished"> </translation>
     </message>
     <message>
-        <location filename="../../Charts/CriticalPowerWindow.cpp" line="312"/>
+        <location filename="../../Charts/CriticalPowerWindow.cpp" line="318"/>
         <source>CP and W&apos; Decay</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Charts/CriticalPowerWindow.cpp" line="317"/>
+        <location filename="../../Charts/CriticalPowerWindow.cpp" line="323"/>
         <source>Search Interval</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Charts/CriticalPowerWindow.cpp" line="318"/>
+        <location filename="../../Charts/CriticalPowerWindow.cpp" line="324"/>
         <source>(seconds)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Charts/CriticalPowerWindow.cpp" line="321"/>
+        <location filename="../../Charts/CriticalPowerWindow.cpp" line="327"/>
         <source>Anaerobic</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Charts/CriticalPowerWindow.cpp" line="344"/>
+        <location filename="../../Charts/CriticalPowerWindow.cpp" line="350"/>
         <source>Aerobic</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Charts/CriticalPowerWindow.cpp" line="383"/>
+        <location filename="../../Charts/CriticalPowerWindow.cpp" line="389"/>
         <source>Short anaerobic</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Charts/CriticalPowerWindow.cpp" line="406"/>
+        <location filename="../../Charts/CriticalPowerWindow.cpp" line="412"/>
         <source>Long aerobic</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Charts/CriticalPowerWindow.cpp" line="414"/>
+        <location filename="../../Charts/CriticalPowerWindow.cpp" line="420"/>
         <source>Exponential</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Charts/CriticalPowerWindow.cpp" line="416"/>
+        <location filename="../../Charts/CriticalPowerWindow.cpp" line="422"/>
         <source>Variant</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Charts/CriticalPowerWindow.cpp" line="417"/>
+        <location filename="../../Charts/CriticalPowerWindow.cpp" line="423"/>
         <source>Linear feedback</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Charts/CriticalPowerWindow.cpp" line="419"/>
+        <location filename="../../Charts/CriticalPowerWindow.cpp" line="425"/>
         <source>Regeneration</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Charts/CriticalPowerWindow.cpp" line="444"/>
+        <location filename="../../Charts/CriticalPowerWindow.cpp" line="450"/>
         <source>Value</source>
         <translation type="unfinished">値</translation>
     </message>
     <message>
-        <location filename="../../Charts/CriticalPowerWindow.cpp" line="445"/>
+        <location filename="../../Charts/CriticalPowerWindow.cpp" line="451"/>
         <source>Rank</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Charts/CriticalPowerWindow.cpp" line="446"/>
+        <location filename="../../Charts/CriticalPowerWindow.cpp" line="452"/>
         <source>W&apos;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Charts/CriticalPowerWindow.cpp" line="447"/>
+        <location filename="../../Charts/CriticalPowerWindow.cpp" line="453"/>
         <source>0 kJ</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Charts/CriticalPowerWindow.cpp" line="448"/>
-        <location filename="../../Charts/CriticalPowerWindow.cpp" line="451"/>
         <location filename="../../Charts/CriticalPowerWindow.cpp" line="454"/>
-        <location filename="../../Charts/CriticalPowerWindow.cpp" line="456"/>
+        <location filename="../../Charts/CriticalPowerWindow.cpp" line="457"/>
+        <location filename="../../Charts/CriticalPowerWindow.cpp" line="460"/>
+        <location filename="../../Charts/CriticalPowerWindow.cpp" line="462"/>
         <source>n/a</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Charts/CriticalPowerWindow.cpp" line="449"/>
+        <location filename="../../Charts/CriticalPowerWindow.cpp" line="455"/>
         <source>CP</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Charts/CriticalPowerWindow.cpp" line="450"/>
-        <location filename="../../Charts/CriticalPowerWindow.cpp" line="453"/>
+        <location filename="../../Charts/CriticalPowerWindow.cpp" line="456"/>
+        <location filename="../../Charts/CriticalPowerWindow.cpp" line="459"/>
         <source>0 w</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Charts/CriticalPowerWindow.cpp" line="452"/>
+        <location filename="../../Charts/CriticalPowerWindow.cpp" line="458"/>
         <source>Pmax</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Charts/CriticalPowerWindow.cpp" line="455"/>
+        <location filename="../../Charts/CriticalPowerWindow.cpp" line="461"/>
         <source>Endurance Index</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Charts/CriticalPowerWindow.cpp" line="510"/>
+        <location filename="../../Charts/CriticalPowerWindow.cpp" line="516"/>
         <source>Motor Unit Model</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Charts/CriticalPowerWindow.cpp" line="1570"/>
+        <location filename="../../Charts/CriticalPowerWindow.cpp" line="1579"/>
         <source>Power</source>
         <translation type="unfinished">出力</translation>
     </message>
     <message>
-        <location filename="../../Charts/CriticalPowerWindow.cpp" line="1571"/>
+        <location filename="../../Charts/CriticalPowerWindow.cpp" line="1580"/>
         <source>Watts per Kilogram</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Charts/CriticalPowerWindow.cpp" line="1572"/>
+        <location filename="../../Charts/CriticalPowerWindow.cpp" line="1581"/>
         <source>xPower</source>
         <translation type="unfinished">xPower</translation>
     </message>
     <message>
-        <location filename="../../Charts/CriticalPowerWindow.cpp" line="1573"/>
+        <location filename="../../Charts/CriticalPowerWindow.cpp" line="1582"/>
         <source>Iso Power</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Charts/CriticalPowerWindow.cpp" line="1574"/>
+        <location filename="../../Charts/CriticalPowerWindow.cpp" line="1583"/>
         <source>Heartrate</source>
         <translation type="unfinished">心拍数</translation>
     </message>
     <message>
-        <location filename="../../Charts/CriticalPowerWindow.cpp" line="1575"/>
+        <location filename="../../Charts/CriticalPowerWindow.cpp" line="1584"/>
         <source>Speed</source>
         <translation type="unfinished">速度</translation>
     </message>
     <message>
-        <location filename="../../Charts/CriticalPowerWindow.cpp" line="1576"/>
+        <location filename="../../Charts/CriticalPowerWindow.cpp" line="1585"/>
         <source>Acceleration</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Charts/CriticalPowerWindow.cpp" line="1577"/>
+        <location filename="../../Charts/CriticalPowerWindow.cpp" line="1586"/>
         <source>Power %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Charts/CriticalPowerWindow.cpp" line="1578"/>
+        <location filename="../../Charts/CriticalPowerWindow.cpp" line="1587"/>
         <source>Cadence %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Charts/CriticalPowerWindow.cpp" line="1579"/>
+        <location filename="../../Charts/CriticalPowerWindow.cpp" line="1588"/>
         <source>Torque %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Charts/CriticalPowerWindow.cpp" line="1580"/>
+        <location filename="../../Charts/CriticalPowerWindow.cpp" line="1589"/>
         <source>Heartrate %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Charts/CriticalPowerWindow.cpp" line="1581"/>
+        <location filename="../../Charts/CriticalPowerWindow.cpp" line="1590"/>
         <source>Cadence</source>
         <translation type="unfinished">ケイデンス</translation>
     </message>
     <message>
-        <location filename="../../Charts/CriticalPowerWindow.cpp" line="1582"/>
+        <location filename="../../Charts/CriticalPowerWindow.cpp" line="1591"/>
         <source>Torque</source>
         <translation type="unfinished">トルク</translation>
     </message>
     <message>
-        <location filename="../../Charts/CriticalPowerWindow.cpp" line="1583"/>
+        <location filename="../../Charts/CriticalPowerWindow.cpp" line="1592"/>
         <source>VAM</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Charts/CriticalPowerWindow.cpp" line="1584"/>
+        <location filename="../../Charts/CriticalPowerWindow.cpp" line="1593"/>
         <source>aPower</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Charts/CriticalPowerWindow.cpp" line="1585"/>
+        <location filename="../../Charts/CriticalPowerWindow.cpp" line="1594"/>
         <source>aPower per Kilogram</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Charts/CriticalPowerWindow.cpp" line="1586"/>
+        <location filename="../../Charts/CriticalPowerWindow.cpp" line="1595"/>
         <source>Work</source>
         <translation type="unfinished">エネルギー</translation>
     </message>
     <message>
-        <location filename="../../Charts/CriticalPowerWindow.cpp" line="1587"/>
+        <location filename="../../Charts/CriticalPowerWindow.cpp" line="1596"/>
         <source>Veloclinic Plot</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Charts/CriticalPowerWindow.cpp" line="1589"/>
+        <location filename="../../Charts/CriticalPowerWindow.cpp" line="1598"/>
         <source>Unknown</source>
         <translation type="unfinished">不明</translation>
     </message>
     <message>
-        <location filename="../../Charts/CriticalPowerWindow.cpp" line="2013"/>
+        <location filename="../../Charts/CriticalPowerWindow.cpp" line="2031"/>
         <source>Save Best Data as CSV</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Y Axis Shows Power</source>
-        <translation type="obsolete">出力をY軸に</translation>
-    </message>
-    <message>
-        <source>Y Axis Shows Energy</source>
-        <translation type="obsolete">エネルギーをY軸に表示</translation>
-    </message>
-    <message>
-        <source>Set CP value to extracted value</source>
-        <translation type="obsolete">抽出された値でCPを設定する</translation>
-    </message>
-    <message>
-        <source>No non-zero extracted value was identified:
-</source>
-        <translation type="obsolete">ゼロ以外の数値が抽出できませんでした:
-</translation>
-    </message>
-    <message>
-        <source>Zones were unchanged.</source>
-        <translation type="obsolete">ゾーンは変更なし。</translation>
-    </message>
-    <message>
-        <location filename="../../Charts/CriticalPowerWindow.cpp" line="1557"/>
+        <location filename="../../Charts/CriticalPowerWindow.cpp" line="1566"/>
         <source>no date</source>
         <translation>データなし</translation>
     </message>
     <message>
-        <location filename="../../Charts/CriticalPowerWindow.cpp" line="1557"/>
+        <location filename="../../Charts/CriticalPowerWindow.cpp" line="1566"/>
         <source>MM/dd/yyyy</source>
         <translation>yyyy/M/d</translation>
-    </message>
-    <message>
-        <source>All Seasons</source>
-        <translation type="obsolete">全シーズン</translation>
     </message>
 </context>
 <context>
@@ -8353,68 +7787,6 @@ This may take a while.
     </message>
 </context>
 <context>
-    <name>CyclingAnalyticsUploader</name>
-    <message>
-        <source>OK</source>
-        <translation type="obsolete">OK</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation type="obsolete">キャンセル</translation>
-    </message>
-</context>
-<context>
-    <name>CyclistPage</name>
-    <message>
-        <source>Performance Manager</source>
-        <translation type="obsolete">パフォーマンスマネージャ</translation>
-    </message>
-    <message>
-        <source>Power Zones</source>
-        <translation type="obsolete">パワーゾーン</translation>
-    </message>
-    <message>
-        <source>Rider</source>
-        <translation type="obsolete">ライダー</translation>
-    </message>
-    <message>
-        <source>HR Zones</source>
-        <translation type="obsolete">心拍ゾーン</translation>
-    </message>
-    <message>
-        <source>Show Stress Balance Today</source>
-        <translation type="obsolete">今日のストレスバランスを見る</translation>
-    </message>
-    <message>
-        <source>Starting LTS</source>
-        <translation type="obsolete">初期LTS</translation>
-    </message>
-    <message>
-        <source>STS average (days)</source>
-        <translation type="obsolete">短期ストレス平均に用いる日数</translation>
-    </message>
-    <message>
-        <source>LTS average (days)</source>
-        <translation type="obsolete">長期ストレス平均に用いる日数</translation>
-    </message>
-</context>
-<context>
-    <name>DBAccess</name>
-    <message>
-        <source>Cannot open database</source>
-        <translation type="obsolete">データベースを開けませんでした</translation>
-    </message>
-    <message>
-        <source>Unable to establish a database connection.
-This feature requires SQLite support. Please read the Qt SQL driver documentation for information how to build it.
-
-Click Cancel to exit.</source>
-        <translation type="obsolete">データベースに接続することが出来ません。
-この機能はSQLiteサポートが必要です。Qt SQLドライバのドキュメントを参照してください。
-キャンセルをクリックすると終了します。</translation>
-    </message>
-</context>
-<context>
     <name>DanielsEquivalentPower</name>
     <message>
         <location filename="../../Metrics/DanielsPoints.cpp" line="274"/>
@@ -8449,8 +7821,8 @@ Click Cancel to exit.</source>
 <context>
     <name>DataFilter</name>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="3256"/>
-        <location filename="../../Core/DataFilter.cpp" line="3296"/>
+        <location filename="../../Core/DataFilter.cpp" line="3259"/>
+        <location filename="../../Core/DataFilter.cpp" line="3299"/>
         <source>malformed expression.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -8484,33 +7856,6 @@ Click Cancel to exit.</source>
         <location filename="../../Charts/OverviewItems.cpp" line="2853"/>
         <source>Export Table Data to CSV</source>
         <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>DatePickerDialog</name>
-    <message>
-        <source>Import CSV file</source>
-        <translation type="obsolete">CSVファイルの取り込み</translation>
-    </message>
-    <message>
-        <source>File to import...</source>
-        <translation type="obsolete">ファイルの取り込み...</translation>
-    </message>
-    <message>
-        <source>OK</source>
-        <translation type="obsolete">OK</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation type="obsolete">キャンセル</translation>
-    </message>
-    <message>
-        <source>Import CSV</source>
-        <translation type="obsolete">CSVの取り込み</translation>
-    </message>
-    <message>
-        <source>Comma Separated Values (*.csv)</source>
-        <translation type="obsolete">カンマ区切りファイル (*.csv)</translation>
     </message>
 </context>
 <context>
@@ -8737,26 +8082,6 @@ Click Cancel to exit.</source>
 <context>
     <name>DevicePage</name>
     <message>
-        <source>Devices</source>
-        <translation type="obsolete">デバイス</translation>
-    </message>
-    <message>
-        <source>Device Name</source>
-        <translation type="obsolete">デバイス名</translation>
-    </message>
-    <message>
-        <source>Device Type</source>
-        <translation type="obsolete">デバイスタイプ</translation>
-    </message>
-    <message>
-        <source>Device Port</source>
-        <translation type="obsolete">ポート</translation>
-    </message>
-    <message>
-        <source>Device Profile</source>
-        <translation type="obsolete">プロファイル</translation>
-    </message>
-    <message>
         <location filename="../../Gui/Pages.cpp" line="460"/>
         <source>Add</source>
         <translation type="unfinished">追加</translation>
@@ -8765,10 +8090,6 @@ Click Cancel to exit.</source>
         <location filename="../../Gui/Pages.cpp" line="461"/>
         <source>Delete</source>
         <translation type="unfinished">削除</translation>
-    </message>
-    <message>
-        <source>Pair</source>
-        <translation type="obsolete">ペアリング</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="455"/>
@@ -8865,18 +8186,6 @@ Click Cancel to exit.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Weekly Summary</source>
-        <translation type="obsolete">週間のライド概要</translation>
-    </message>
-    <message>
-        <source>Metrics</source>
-        <translation type="obsolete">統計</translation>
-    </message>
-    <message>
-        <source>seconds</source>
-        <translation type="obsolete">秒</translation>
-    </message>
-    <message>
         <location filename="../../Gui/DiarySidebar.cpp" line="666"/>
         <source>dddd MMMM d</source>
         <translation type="unfinished"></translation>
@@ -8921,17 +8230,9 @@ Click Cancel to exit.</source>
 <context>
     <name>DownloadRideDialog</name>
     <message>
-        <source>Instructions:</source>
-        <translation type="obsolete">手順:</translation>
-    </message>
-    <message>
         <location filename="../../Gui/DownloadRideDialog.cpp" line="67"/>
         <source>&amp;Download</source>
         <translation>ダウンロード(&amp;D)</translation>
-    </message>
-    <message>
-        <source>&amp;Erase Ride(s)</source>
-        <translation type="obsolete">ライドを削除(&amp;E)</translation>
     </message>
     <message>
         <location filename="../../Gui/DownloadRideDialog.cpp" line="69"/>
@@ -9072,10 +8373,6 @@ You may need to (re)install the FTDI or PL2303 drivers before downloading.</sour
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Download canceled</source>
-        <translation type="obsolete">ダウンロードがキャンセルされました</translation>
-    </message>
-    <message>
         <location filename="../../Gui/DownloadRideDialog.cpp" line="337"/>
         <source>Cancel clicked by user.</source>
         <translation>ユーザーによってキャンセルされました。</translation>
@@ -9085,10 +8382,6 @@ You may need to (re)install the FTDI or PL2303 drivers before downloading.</sour
         <location filename="../../Gui/DownloadRideDialog.cpp" line="343"/>
         <source>Download failed</source>
         <translation>ダウンロード失敗</translation>
-    </message>
-    <message>
-        <source>Ride Already Downloaded</source>
-        <translation type="obsolete">ライドは既にダウンロード済みです</translation>
     </message>
     <message>
         <location filename="../../Gui/DownloadRideDialog.cpp" line="398"/>
@@ -9104,18 +8397,6 @@ You may need to (re)install the FTDI or PL2303 drivers before downloading.</sour
         <location filename="../../Gui/DownloadRideDialog.cpp" line="416"/>
         <source>Failed to rename %1 to %2: %3</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>This ride appears to have already </source>
-        <translation type="obsolete">このライドは既に </translation>
-    </message>
-    <message>
-        <source>been downloaded.  Do you want to </source>
-        <translation type="obsolete">ダウンロード済みのようです </translation>
-    </message>
-    <message>
-        <source>overwrite the previous download?</source>
-        <translation type="obsolete">既存のものを上書きしますか?</translation>
     </message>
     <message>
         <location filename="../../Gui/DownloadRideDialog.cpp" line="383"/>
@@ -9138,26 +8419,6 @@ You may need to (re)install the FTDI or PL2303 drivers before downloading.</sour
         <location filename="../../Gui/DownloadRideDialog.cpp" line="466"/>
         <source>Error</source>
         <translation>エラー</translation>
-    </message>
-    <message>
-        <source>Failed to remove existing file </source>
-        <translation type="obsolete">既存ファイルの削除に失敗</translation>
-    </message>
-    <message>
-        <source>Failed to rename </source>
-        <translation type="obsolete">リネームに失敗 </translation>
-    </message>
-    <message>
-        <source> to </source>
-        <translation type="obsolete"> から </translation>
-    </message>
-    <message>
-        <source>Success</source>
-        <translation type="obsolete">成功</translation>
-    </message>
-    <message>
-        <source>Download complete.</source>
-        <translation type="obsolete">ダウンロード完了。</translation>
     </message>
 </context>
 <context>
@@ -9324,10 +8585,6 @@ You may need to (re)install the FTDI or PL2303 drivers before downloading.</sour
 </context>
 <context>
     <name>EditMetricDetailDialog</name>
-    <message>
-        <source>Settings</source>
-        <translation type="obsolete">設定</translation>
-    </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="2071"/>
         <source>Name</source>
@@ -10998,22 +10255,6 @@ You may need to (re)install the FTDI or PL2303 drivers before downloading.</sour
 <context>
     <name>FieldsPage</name>
     <message>
-        <source>Move up</source>
-        <translation type="obsolete">上へ</translation>
-    </message>
-    <message>
-        <source>Move down</source>
-        <translation type="obsolete">下へ</translation>
-    </message>
-    <message>
-        <source>Insert</source>
-        <translation type="obsolete">挿入</translation>
-    </message>
-    <message>
-        <source>Rename</source>
-        <translation type="obsolete">リネーム</translation>
-    </message>
-    <message>
         <location filename="../../Gui/Pages.cpp" line="2521"/>
         <source>Delete</source>
         <translation type="unfinished">削除</translation>
@@ -11120,51 +10361,6 @@ You may need to (re)install the FTDI or PL2303 drivers before downloading.</sour
     </message>
 </context>
 <context>
-    <name>FileStoreDialog</name>
-    <message>
-        <source>Type</source>
-        <translation type="obsolete">種別</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation type="obsolete">キャンセル</translation>
-    </message>
-</context>
-<context>
-    <name>FileStoreSyncDialog</name>
-    <message>
-        <source>Close</source>
-        <translation type="obsolete">閉じる</translation>
-    </message>
-    <message>
-        <source>Date</source>
-        <translation type="obsolete">日付</translation>
-    </message>
-    <message>
-        <source>Time</source>
-        <translation type="obsolete">時間</translation>
-    </message>
-    <message>
-        <source>Distance</source>
-        <translation type="obsolete">距離</translation>
-    </message>
-    <message>
-        <source>Completed.</source>
-        <translation type="obsolete">完了。</translation>
-    </message>
-</context>
-<context>
-    <name>FileStoreUploadDialog</name>
-    <message>
-        <source>Cancel</source>
-        <translation type="obsolete">キャンセル</translation>
-    </message>
-    <message>
-        <source>OK</source>
-        <translation type="obsolete">OK</translation>
-    </message>
-</context>
-<context>
     <name>FilterHrvOutliers</name>
     <message>
         <location filename="../../FileIO/FilterHRV.cpp" line="246"/>
@@ -11205,7 +10401,7 @@ You may need to (re)install the FTDI or PL2303 drivers before downloading.</sour
   - &quot;R-R min and maximum&quot; exclude samples outside (flag -1). Also excluded when filtering range.
   - &quot;Filter range&quot; of the average within a window (flag 0)
   - &quot;Filter window size&quot; distance on either side of the current interval
-  - &quot;Set Rest HRV&quot; if checked the computed HRV metrics are set as Rest HRV Measures
+  - &quot;Set Rest HRV&quot; if checked on interactive use the computed HRV metrics are set as Rest HRV Measures
 </source>
         <translation type="unfinished"></translation>
     </message>
@@ -11282,10 +10478,6 @@ You may need to (re)install the FTDI or PL2303 drivers before downloading.</sour
         <location filename="../../Charts/RideEditor.cpp" line="2128"/>
         <source>Find</source>
         <translation>検索</translation>
-    </message>
-    <message>
-        <source>Close</source>
-        <translation type="obsolete">閉じる</translation>
     </message>
     <message>
         <location filename="../../Charts/RideEditor.cpp" line="2139"/>
@@ -11523,10 +10715,6 @@ INTERNET CONNECTION REQUIRED.</source>
 </context>
 <context>
     <name>FixGPSConfig</name>
-    <message>
-        <source>Remove GPS errors and interpolate positional data where the GPS device did not record any data, or the data that was recorded is invalid.</source>
-        <translation type="vanished">デバイスが地点データを記録していないか、異常な値が記録されているためGPSデータを削除します。</translation>
-    </message>
     <message>
         <location filename="../../FileIO/FixGPS.cpp" line="255"/>
         <location filename="../../FileIO/FixGPS.cpp" line="504"/>
@@ -11997,6 +11185,14 @@ If both parameters are given, first the relative adjustment takes place, then th
     </message>
 </context>
 <context>
+    <name>FixPyDataProcessorConfig</name>
+    <message>
+        <location filename="../../FileIO/FixPyDataProcessor.cpp" line="13"/>
+        <source>Custom Python Data Processor</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>FixRunningCadence</name>
     <message>
         <location filename="../../FileIO/FixRunningCadence.cpp" line="77"/>
@@ -12171,26 +11367,6 @@ Variance (Watts) - Determines the threshold beyond which a data point will be fi
 
 </source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Occasionally power meters will erroneously report high values for power. For crank based power meters such as SRM and Quarq this is caused by an erroneous cadence reading as a result of triggering a reed switch whilst pushing off
-
-This function will look for spikes/anomalies in power data and replace the erroneous data by smoothing/interpolating the data from either side of the point in question
-
-It takes the following parameters:
-
-Absolute Max - this defines an absolute value for watts, and will smooth any values above this absolute value that have been identified as being anomalies (i.e. at odds with the data surrounding it)
-
-Variance (%) - this will smooth any values which are higher than this percentage of the rolling average wattage for the 30 seconds leading up to the spike.</source>
-        <translation type="vanished">パワーメーターは、稀に巨大な値を報告することがあります。SRMやQuarqのクランク型のものでは、正しいケイデンス値が取れないことによってこの症状が出るようです。
-
-ここでは、パワー値のスパイクや例外値を発見し、前後の値を利用して平滑化処理を行うことでエラーの修正を試みます。
-
-指定するパラメーターは二つです。
-
-最大 - ワット数の絶対値を指定します。この値よりも大きなパワー値は、例外値として処理されます。
-
-変動(%) - 30秒の平均値がこの割合を超えてスパイクを形成している場合に平滑化の対象とします。</translation>
     </message>
 </context>
 <context>
@@ -13019,32 +12195,6 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     </message>
 </context>
 <context>
-    <name>GarminUploader</name>
-    <message>
-        <source>OK</source>
-        <translation type="obsolete">OK</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation type="obsolete">キャンセル</translation>
-    </message>
-</context>
-<context>
-    <name>GcCalendar</name>
-    <message>
-        <source>Weekly Summary</source>
-        <translation type="obsolete">週間のライド概要</translation>
-    </message>
-    <message>
-        <source>Metrics</source>
-        <translation type="obsolete">統計</translation>
-    </message>
-    <message>
-        <source>seconds</source>
-        <translation type="obsolete">秒</translation>
-    </message>
-</context>
-<context>
     <name>GcCalendarModel</name>
     <message>
         <location filename="../../Core/GcCalendarModel.h" line="112"/>
@@ -13124,10 +12274,6 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
         <location filename="../../Charts/GoldenCheetah.cpp" line="1122"/>
         <source>Charts containing user defined metrics cannot be uploaded to the GoldenCheetah Cloud.</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Close</source>
-        <translation type="obsolete">閉じる</translation>
     </message>
     <message>
         <location filename="../../Charts/GoldenCheetah.cpp" line="885"/>
@@ -13219,13 +12365,6 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
         <location filename="../../Gui/DiarySidebar.cpp" line="593"/>
         <source>MMMM yyyy</source>
         <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>GcScopeBar</name>
-    <message>
-        <source>Intervals</source>
-        <translation type="obsolete">インターバル</translation>
     </message>
 </context>
 <context>
@@ -13489,10 +12628,6 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Close</source>
-        <translation type="obsolete">閉じる</translation>
-    </message>
-    <message>
         <location filename="../../Charts/GoldenCheetah.cpp" line="219"/>
         <source>More...</source>
         <translation type="unfinished"></translation>
@@ -13518,18 +12653,6 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
 </context>
 <context>
     <name>GcWindowRegistry</name>
-    <message>
-        <source>Performance Manager</source>
-        <translation type="obsolete">パフォーマンスマネージャ</translation>
-    </message>
-    <message>
-        <source>Ride Summary</source>
-        <translation type="obsolete">ライド概要</translation>
-    </message>
-    <message>
-        <source>Editor</source>
-        <translation type="obsolete">エディタ</translation>
-    </message>
     <message>
         <location filename="../../Gui/GcWindowRegistry.cpp" line="90"/>
         <source>Performance</source>
@@ -13697,18 +12820,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     </message>
 </context>
 <context>
-    <name>GcWindowTool</name>
-    <message>
-        <source>Chart</source>
-        <translation type="obsolete">チャート</translation>
-    </message>
-</context>
-<context>
     <name>GeneralPage</name>
-    <message>
-        <source>Language:</source>
-        <translation type="obsolete">言語:</translation>
-    </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="73"/>
         <source>Language</source>
@@ -13865,10 +12977,6 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Crank Length:</source>
-        <translation type="obsolete">クランク長:</translation>
-    </message>
-    <message>
         <location filename="../../Gui/Pages.cpp" line="141"/>
         <source>Use Garmin Smart Recording</source>
         <translation type="unfinished"></translation>
@@ -13915,43 +13023,11 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>time</source>
-        <translation type="obsolete">時間</translation>
-    </message>
-    <message>
-        <source>distance</source>
-        <translation type="obsolete">距離</translation>
-    </message>
-    <message>
         <location filename="../../Gui/Pages.cpp" line="233"/>
         <location filename="../../Gui/Pages.cpp" line="252"/>
         <location filename="../../Gui/Pages.cpp" line="271"/>
         <source>Browse</source>
         <translation type="unfinished">参照</translation>
-    </message>
-    <message>
-        <source>Short Term Stress</source>
-        <translation type="obsolete">短期ストレス (STS)</translation>
-    </message>
-    <message>
-        <source>STS</source>
-        <translation type="obsolete">STS</translation>
-    </message>
-    <message>
-        <source>Long Term Stress</source>
-        <translation type="obsolete">長期ストレス (LTS)</translation>
-    </message>
-    <message>
-        <source>LTS</source>
-        <translation type="obsolete">LTS</translation>
-    </message>
-    <message>
-        <source>SB</source>
-        <translation type="obsolete">SB</translation>
-    </message>
-    <message>
-        <source>Select Workout Library</source>
-        <translation type="obsolete">ワークアウトライブラリの選択</translation>
     </message>
 </context>
 <context>
@@ -14071,40 +13147,6 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
         <location filename="../../Charts/GenericPlot.cpp" line="1323"/>
         <source>time</source>
         <translation type="unfinished">時間</translation>
-    </message>
-</context>
-<context>
-    <name>GoogleDrive</name>
-    <message>
-        <source>Completed.</source>
-        <translation type="obsolete">完了。</translation>
-    </message>
-</context>
-<context>
-    <name>GoogleMapControl</name>
-    <message>
-        <source>Intervals</source>
-        <translation type="obsolete">インターバル</translation>
-    </message>
-    <message>
-        <source>No GPS Data Present</source>
-        <translation type="obsolete">GPSデータがありません</translation>
-    </message>
-    <message>
-        <source>KPH</source>
-        <translation type="obsolete">km/h</translation>
-    </message>
-    <message>
-        <source>MPH</source>
-        <translation type="obsolete">m/h</translation>
-    </message>
-    <message>
-        <source>Meters</source>
-        <translation type="obsolete">メートル</translation>
-    </message>
-    <message>
-        <source>Feet</source>
-        <translation type="obsolete">フィート</translation>
     </message>
 </context>
 <context>
@@ -14381,10 +13423,6 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
         <source>All Activities</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <source>All Rides</source>
-        <translation type="obsolete">全てのライド</translation>
-    </message>
 </context>
 <context>
     <name>HeartBeats</name>
@@ -14450,11 +13488,6 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="110"/>
         <source>Manual creation of an activity where the most relevant data can be added in this dialog</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../Gui/HelpWhatsThis.cpp" line="115"/>
-        <source>Exports a (selectable) set of activties in one of the supported export formats</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -14555,6 +13588,11 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="97"/>
         <source>Changes the current view layout between Tabbed and Tiled</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Gui/HelpWhatsThis.cpp" line="115"/>
+        <source>Batch processes a (selectable) set of activties</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -15214,65 +14252,6 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
         <source>Show Zone limits</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <source>Watts</source>
-        <translation type="obsolete">ワット</translation>
-    </message>
-    <message>
-        <source>Watts (by Zone)</source>
-        <translation type="obsolete">ワット（ゾーン別）</translation>
-    </message>
-    <message>
-        <source>Torque</source>
-        <translation type="obsolete">トルク</translation>
-    </message>
-    <message>
-        <source>Heartrate</source>
-        <translation type="obsolete">心拍数</translation>
-    </message>
-    <message>
-        <source>Heartrate (by Zone)</source>
-        <translation type="obsolete">心拍数（ゾーン別）</translation>
-    </message>
-    <message>
-        <source>Speed</source>
-        <translation type="obsolete">速度</translation>
-    </message>
-    <message>
-        <source>Cadence</source>
-        <translation type="obsolete">ケイデンス</translation>
-    </message>
-    <message>
-        <source>no data</source>
-        <translation type="obsolete">データなし</translation>
-    </message>
-</context>
-<context>
-    <name>HomeWindow</name>
-    <message>
-        <source>Cadence</source>
-        <translation type="obsolete">ケイデンス</translation>
-    </message>
-    <message>
-        <source>Distance</source>
-        <translation type="obsolete">距離</translation>
-    </message>
-    <message>
-        <source>Heartrate</source>
-        <translation type="obsolete">心拍数</translation>
-    </message>
-    <message>
-        <source>Map</source>
-        <translation type="obsolete">地図</translation>
-    </message>
-    <message>
-        <source>Power</source>
-        <translation type="obsolete">出力</translation>
-    </message>
-    <message>
-        <source>Speed</source>
-        <translation type="obsolete">速度</translation>
-    </message>
 </context>
 <context>
     <name>HrNp</name>
@@ -15353,10 +14332,6 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
         <location filename="../../Gui/AthletePages.cpp" line="1811"/>
         <source>Add</source>
         <translation type="unfinished">追加</translation>
-    </message>
-    <message>
-        <source>Rename</source>
-        <translation type="obsolete">リネーム</translation>
     </message>
     <message>
         <location filename="../../Gui/AthletePages.cpp" line="1812"/>
@@ -15597,18 +14572,6 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
 </context>
 <context>
     <name>HrZonePage</name>
-    <message>
-        <source>Lactic Threshold History</source>
-        <translation type="obsolete">LT値履歴</translation>
-    </message>
-    <message>
-        <source>Default Zones</source>
-        <translation type="obsolete">デフォルトゾーン</translation>
-    </message>
-    <message>
-        <source>Lactic Threshold</source>
-        <translation type="obsolete">LT値</translation>
-    </message>
     <message>
         <location filename="../../Gui/AthletePages.cpp" line="1722"/>
         <source>Sport</source>
@@ -15969,10 +14932,6 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>LT must be greater than zero in zone range %1 of hr.zones</source>
-        <translation type="vanished">LT値はHRゾーンのゾーンレンジ%1以上でなければなりません</translation>
-    </message>
-    <message>
         <location filename="../../Metrics/HrZones.cpp" line="411"/>
         <source>Range %1: matching top of zone %2 (%3) to bottom of zone %4 (%5).
 </source>
@@ -16015,10 +14974,6 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Threshold: %1</source>
-        <translation type="obsolete">閾値: %1</translation>
-    </message>
-    <message>
         <location filename="../../Metrics/HrZones.cpp" line="649"/>
         <source>&lt;td align=&quot;center&quot;&gt;Zone&lt;/td&gt;</source>
         <translation>&lt;td align=&quot;center&quot;&gt;ゾーン&lt;/td&gt;</translation>
@@ -16029,46 +14984,9 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
         <translation>&lt;td align=&quot;center&quot;&gt;説明&lt;/td&gt;</translation>
     </message>
     <message>
-        <source>&lt;td align=&quot;center&quot;&gt;Low&lt;/td&gt;</source>
-        <translation type="obsolete">&lt;td align=&quot;center&quot;&gt;Low&lt;/td&gt;</translation>
-    </message>
-    <message>
-        <source>&lt;td align=&quot;center&quot;&gt;High&lt;/td&gt;</source>
-        <translation type="obsolete">&lt;td align=&quot;center&quot;&gt;High&lt;/td&gt;</translation>
-    </message>
-    <message>
         <location filename="../../Metrics/HrZones.cpp" line="653"/>
         <source>&lt;td align=&quot;center&quot;&gt;Time&lt;/td&gt;</source>
         <translation>&lt;td align=&quot;center&quot;&gt;時間&lt;/td&gt;</translation>
-    </message>
-</context>
-<context>
-    <name>HrvMeasures</name>
-    <message>
-        <source>%</source>
-        <translation type="obsolete">%</translation>
-    </message>
-</context>
-<context>
-    <name>HrvMeasuresDownload</name>
-    <message>
-        <source>Import CSV file</source>
-        <translation type="obsolete">CSVファイルの取り込み</translation>
-    </message>
-    <message>
-        <source>Close</source>
-        <translation type="obsolete">閉じる</translation>
-    </message>
-</context>
-<context>
-    <name>HrvPage</name>
-    <message>
-        <source>Add</source>
-        <translation type="obsolete">追加</translation>
-    </message>
-    <message>
-        <source>Delete</source>
-        <translation type="obsolete">削除</translation>
     </message>
 </context>
 <context>
@@ -16756,62 +15674,6 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     </message>
 </context>
 <context>
-    <name>IntervalGroupByModel</name>
-    <message>
-        <source>All Rides</source>
-        <translation type="obsolete">全てのライド</translation>
-    </message>
-</context>
-<context>
-    <name>IntervalMetricsPage</name>
-    <message>
-        <source>Available Metrics</source>
-        <translation type="vanished">使用可能な統計</translation>
-    </message>
-    <message>
-        <source>Selected Metrics</source>
-        <translation type="vanished">選択された統計</translation>
-    </message>
-    <message>
-        <source>&amp;#8482;</source>
-        <translation type="obsolete">&amp;#8482;</translation>
-    </message>
-    <message>
-        <source> (TM)</source>
-        <translation type="obsolete"> (TM)</translation>
-    </message>
-</context>
-<context>
-    <name>IntervalNavigator</name>
-    <message>
-        <source>Date</source>
-        <translation type="obsolete">日付</translation>
-    </message>
-    <message>
-        <source>Time</source>
-        <translation type="obsolete">時間</translation>
-    </message>
-    <message>
-        <source>Remove Column</source>
-        <translation type="obsolete">カラムの削除</translation>
-    </message>
-</context>
-<context>
-    <name>IntervalNavigatorCellDelegate</name>
-    <message>
-        <source>seconds</source>
-        <translation type="obsolete">秒</translation>
-    </message>
-    <message>
-        <source>Date</source>
-        <translation type="obsolete">日付</translation>
-    </message>
-    <message>
-        <source>Time</source>
-        <translation type="obsolete">時間</translation>
-    </message>
-</context>
-<context>
     <name>IntervalOverviewItem</name>
     <message>
         <location filename="../../Charts/OverviewItems.h" line="527"/>
@@ -17027,24 +15889,6 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     </message>
 </context>
 <context>
-    <name>KentUniversity</name>
-    <message>
-        <source>Completed.</source>
-        <translation type="obsolete">完了。</translation>
-    </message>
-</context>
-<context>
-    <name>KentUniversityUploadDialog</name>
-    <message>
-        <source>Notes</source>
-        <translation type="obsolete">ノート</translation>
-    </message>
-    <message>
-        <source>Done</source>
-        <translation type="obsolete">終了</translation>
-    </message>
-</context>
-<context>
     <name>KettlerController</name>
     <message>
         <location filename="../../Train/KettlerController.cpp" line="84"/>
@@ -17114,22 +15958,6 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
         <location filename="../../Gui/Pages.cpp" line="2293"/>
         <source>-</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Move up</source>
-        <translation type="obsolete">上へ</translation>
-    </message>
-    <message>
-        <source>Move down</source>
-        <translation type="obsolete">下へ</translation>
-    </message>
-    <message>
-        <source>Insert</source>
-        <translation type="obsolete">挿入</translation>
-    </message>
-    <message>
-        <source>Rename</source>
-        <translation type="obsolete">リネーム</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="2305"/>
@@ -17600,10 +16428,6 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Rename range</source>
-        <translation type="obsolete">レンジのリネーム</translation>
-    </message>
-    <message>
         <location filename="../../Gui/LTMSidebar.cpp" line="104"/>
         <location filename="../../Gui/LTMSidebar.cpp" line="114"/>
         <location filename="../../Gui/LTMSidebar.cpp" line="148"/>
@@ -17637,10 +16461,6 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
         <location filename="../../Gui/LTMSidebar.cpp" line="710"/>
         <source>Edit details</source>
         <translation type="unfinished">詳細の編集</translation>
-    </message>
-    <message>
-        <source>Delete range</source>
-        <translation type="obsolete">レンジを削除</translation>
     </message>
     <message>
         <location filename="../../Gui/LTMSidebar.cpp" line="75"/>
@@ -17771,14 +16591,6 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Metrics</source>
-        <translation type="obsolete">統計</translation>
-    </message>
-    <message>
-        <source>seconds</source>
-        <translation type="obsolete">秒</translation>
-    </message>
-    <message>
         <location filename="../../Gui/LTMSidebar.cpp" line="1478"/>
         <source>Add Chart</source>
         <translation type="unfinished"></translation>
@@ -17853,78 +16665,14 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
 <context>
     <name>LTMTool</name>
     <message>
-        <source>Date Range</source>
-        <translation type="obsolete">日付範囲</translation>
-    </message>
-    <message>
         <location filename="../../Charts/LTMTool.cpp" line="1310"/>
         <source>Metric</source>
         <translation>統計</translation>
     </message>
     <message>
-        <source>All Dates</source>
-        <translation type="obsolete">全ての日付</translation>
-    </message>
-    <message>
-        <source>This Year</source>
-        <translation type="obsolete">今年</translation>
-    </message>
-    <message>
-        <source>This Month</source>
-        <translation type="obsolete">今月</translation>
-    </message>
-    <message>
-        <source>This Week</source>
-        <translation type="obsolete">今週</translation>
-    </message>
-    <message>
-        <source>Last 7 days</source>
-        <translation type="obsolete">直近の7日</translation>
-    </message>
-    <message>
-        <source>Last 14 days</source>
-        <translation type="obsolete">直近の14日</translation>
-    </message>
-    <message>
-        <source>Last 28 days</source>
-        <translation type="obsolete">直近の28日</translation>
-    </message>
-    <message>
-        <source>Last 3 months</source>
-        <translation type="obsolete">直近の3ヶ月</translation>
-    </message>
-    <message>
-        <source>Last 6 months</source>
-        <translation type="obsolete">直近の6ヶ月</translation>
-    </message>
-    <message>
-        <source>Last 12 months</source>
-        <translation type="obsolete">直近の12ヶ月</translation>
-    </message>
-    <message>
-        <source>Unknown Metric</source>
-        <translation type="obsolete">不明な統計</translation>
-    </message>
-    <message>
-        <source>Rename range</source>
-        <translation type="obsolete">レンジのリネーム</translation>
-    </message>
-    <message>
-        <source>Edit details</source>
-        <translation type="obsolete">詳細の編集</translation>
-    </message>
-    <message>
-        <source>Delete range</source>
-        <translation type="obsolete">レンジを削除</translation>
-    </message>
-    <message>
         <location filename="../../Charts/LTMTool.cpp" line="80"/>
         <source>Filter</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Chart</source>
-        <translation type="obsolete">チャート</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="86"/>
@@ -17980,14 +16728,6 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
         <location filename="../../Charts/LTMTool.cpp" line="114"/>
         <source>Show Events</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Add</source>
-        <translation type="obsolete">追加</translation>
-    </message>
-    <message>
-        <source>Manage</source>
-        <translation type="obsolete">管理</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="358"/>
@@ -18328,10 +17068,6 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Error</source>
-        <translation type="obsolete">エラー</translation>
-    </message>
-    <message>
         <location filename="../../Charts/LTMTool.cpp" line="275"/>
         <source>Edit</source>
         <translation type="unfinished"></translation>
@@ -18382,18 +17118,6 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Chart File (*.xml)</source>
-        <translation type="obsolete">チャートファイル (*.xml)</translation>
-    </message>
-    <message>
-        <source>Pick Color</source>
-        <translation type="obsolete">カラーピッカー</translation>
-    </message>
-    <message>
-        <source>Settings</source>
-        <translation type="obsolete">設定</translation>
-    </message>
-    <message>
         <location filename="../../Charts/LTMTool.cpp" line="100"/>
         <source>Data Table</source>
         <translation type="unfinished"></translation>
@@ -18407,30 +17131,6 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
         <location filename="../../Charts/LTMTool.cpp" line="127"/>
         <source>Stack Zoom</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Import...</source>
-        <translation type="obsolete">取り込み…</translation>
-    </message>
-    <message>
-        <source>Export...</source>
-        <translation type="obsolete">エクスポート…</translation>
-    </message>
-    <message>
-        <source>Move up</source>
-        <translation type="obsolete">上へ</translation>
-    </message>
-    <message>
-        <source>Move down</source>
-        <translation type="obsolete">下へ</translation>
-    </message>
-    <message>
-        <source>Rename</source>
-        <translation type="obsolete">リネーム</translation>
-    </message>
-    <message>
-        <source>Delete</source>
-        <translation type="obsolete">削除</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="161"/>
@@ -18510,18 +17210,6 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
 </context>
 <context>
     <name>LTMWindow</name>
-    <message>
-        <source>Add</source>
-        <translation type="obsolete">追加</translation>
-    </message>
-    <message>
-        <source>Manage</source>
-        <translation type="obsolete">管理</translation>
-    </message>
-    <message>
-        <source>Chart</source>
-        <translation type="obsolete">チャート</translation>
-    </message>
     <message>
         <location filename="../../Charts/LTMWindow.cpp" line="198"/>
         <source>Days</source>
@@ -18701,10 +17389,6 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Shade Zones</source>
-        <translation type="obsolete">ゾーンシェード</translation>
-    </message>
-    <message>
         <location filename="../../Charts/LTMWindow.cpp" line="194"/>
         <source>Group by</source>
         <translation type="unfinished"></translation>
@@ -18714,33 +17398,9 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
         <source>Time Of Day</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <source>Shade zones</source>
-        <translation type="obsolete">ゾーンシェード</translation>
-    </message>
 </context>
 <context>
     <name>LTPage</name>
-    <message>
-        <source>Add LT</source>
-        <translation type="obsolete">LT値を追加</translation>
-    </message>
-    <message>
-        <source>Delete LT</source>
-        <translation type="obsolete">LT値を削除</translation>
-    </message>
-    <message>
-        <source>Default</source>
-        <translation type="obsolete">デフォルト</translation>
-    </message>
-    <message>
-        <source>Add Zone</source>
-        <translation type="obsolete">ゾーンを追加</translation>
-    </message>
-    <message>
-        <source>Delete Zone</source>
-        <translation type="obsolete">ゾーンを削除</translation>
-    </message>
     <message>
         <location filename="../../Gui/AthletePages.cpp" line="1986"/>
         <location filename="../../Gui/AthletePages.cpp" line="1995"/>
@@ -18816,10 +17476,6 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
         <location filename="../../Gui/AthletePages.cpp" line="2414"/>
         <source>New (%1)</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Lactic Threshold</source>
-        <translation type="obsolete">LT値</translation>
     </message>
     <message>
         <location filename="../../Gui/AthletePages.cpp" line="2031"/>
@@ -18917,655 +17573,655 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
 <context>
     <name>Leaf</name>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1758"/>
+        <location filename="../../Core/DataFilter.cpp" line="1761"/>
         <source>Index must be numeric.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1784"/>
+        <location filename="../../Core/DataFilter.cpp" line="1787"/>
         <source>invalid data series for best(): %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1789"/>
+        <location filename="../../Core/DataFilter.cpp" line="1792"/>
         <source>invalid data series for tiz(): %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1794"/>
+        <location filename="../../Core/DataFilter.cpp" line="1797"/>
         <source>invalid literal for config(): %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1800"/>
+        <location filename="../../Core/DataFilter.cpp" line="1803"/>
         <source>invalid literal for const(): %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1910"/>
+        <location filename="../../Core/DataFilter.cpp" line="1913"/>
         <source>which function has at least 2 parameters.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1733"/>
+        <location filename="../../Core/DataFilter.cpp" line="1736"/>
         <source>%1 is an unknown symbol</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1825"/>
+        <location filename="../../Core/DataFilter.cpp" line="1828"/>
         <source>activities(&quot;fexpr&quot;, expr) - where fexpr is a filter expression</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1837"/>
+        <location filename="../../Core/DataFilter.cpp" line="1840"/>
         <source>daterange(start|stop)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1842"/>
+        <location filename="../../Core/DataFilter.cpp" line="1845"/>
         <source>daterange(start|stop) - unknown symbol &apos;%1&apos;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1853"/>
+        <location filename="../../Core/DataFilter.cpp" line="1856"/>
         <source>daterange(start|stop) or daterange(datefrom, dateto, expression)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1860"/>
+        <location filename="../../Core/DataFilter.cpp" line="1863"/>
         <source>%1 needs a single parameter</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1867"/>
+        <location filename="../../Core/DataFilter.cpp" line="1870"/>
         <source>filename() has no parameters</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1892"/>
+        <location filename="../../Core/DataFilter.cpp" line="1895"/>
         <source>zones(hr|power|pace|fatigue, name|description|low|high|units|time|percent) needs 2 specific parameters</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1899"/>
+        <location filename="../../Core/DataFilter.cpp" line="1902"/>
         <source>exists(&quot;symbol&quot;) supports only 1 parameter.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1903"/>
+        <location filename="../../Core/DataFilter.cpp" line="1906"/>
         <source>exists(&quot;symbol&quot;) parameter must be a constant string.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1926"/>
+        <location filename="../../Core/DataFilter.cpp" line="1929"/>
         <source>should be rep(value, n)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1936"/>
+        <location filename="../../Core/DataFilter.cpp" line="1939"/>
         <source>should be seq(start, stop, step)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1946"/>
+        <location filename="../../Core/DataFilter.cpp" line="1949"/>
         <source>should be length(expr)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1956"/>
+        <location filename="../../Core/DataFilter.cpp" line="1959"/>
         <source>should be cumsum(vector)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1964"/>
+        <location filename="../../Core/DataFilter.cpp" line="1967"/>
         <source>should be aggregate(vector, byvector, mean|sum|max|min|count)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1974"/>
+        <location filename="../../Core/DataFilter.cpp" line="1977"/>
         <source>aggregate(vector, by, func) func must be one of mean|sum|max|min|count.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1979"/>
+        <location filename="../../Core/DataFilter.cpp" line="1982"/>
         <source>unknown function &apos;%1&apos;, must be one of mean|sum|max|min|count.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2005"/>
+        <location filename="../../Core/DataFilter.cpp" line="2008"/>
         <source>interpolate(algorithm, xvector, yvector, xvalues)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2010"/>
+        <location filename="../../Core/DataFilter.cpp" line="2013"/>
         <source>interpolate(algorithm, xvector, yvector, xvalues) - must specify and algorithm</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2018"/>
+        <location filename="../../Core/DataFilter.cpp" line="2021"/>
         <source>unknown algorithm &apos;%1&apos;, must be one of linear, cubic, akima or steffen.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2032"/>
+        <location filename="../../Core/DataFilter.cpp" line="2035"/>
         <source>should be append(a,b,[pos])</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2041"/>
+        <location filename="../../Core/DataFilter.cpp" line="2044"/>
         <source>append(a,b,[pos]) but &apos;a&apos; must be a symbol</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2045"/>
+        <location filename="../../Core/DataFilter.cpp" line="2048"/>
         <source>append(a,b,[pos]) but &apos;a&apos; must be a user symbol</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2055"/>
+        <location filename="../../Core/DataFilter.cpp" line="2058"/>
         <source>should be remove(a,pos,count)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2063"/>
+        <location filename="../../Core/DataFilter.cpp" line="2066"/>
         <source>remove(a,pos,count) but &apos;a&apos; must be a symbol</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2067"/>
+        <location filename="../../Core/DataFilter.cpp" line="2070"/>
         <source>remove(a,pos, count) but &apos;a&apos; must be a user symbol</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2079"/>
+        <location filename="../../Core/DataFilter.cpp" line="2082"/>
         <source>should be mid(a,pos,count)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2086"/>
+        <location filename="../../Core/DataFilter.cpp" line="2089"/>
         <source>XDATA expects two parameters</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2096"/>
+        <location filename="../../Core/DataFilter.cpp" line="2099"/>
         <source>XDATA expects a string for the first parameters</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2104"/>
-        <location filename="../../Core/DataFilter.cpp" line="2110"/>
+        <location filename="../../Core/DataFilter.cpp" line="2107"/>
+        <location filename="../../Core/DataFilter.cpp" line="2113"/>
         <source>xdata expects a string, &apos;km&apos; or &apos;secs&apos; for second parameters</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2119"/>
-        <location filename="../../Core/DataFilter.cpp" line="2123"/>
+        <location filename="../../Core/DataFilter.cpp" line="2122"/>
+        <location filename="../../Core/DataFilter.cpp" line="2126"/>
         <source>samples(SERIES), SERIES should be POWER, SECS, HEARTRATE etc.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2132"/>
-        <location filename="../../Core/DataFilter.cpp" line="2316"/>
-        <location filename="../../Core/DataFilter.cpp" line="2538"/>
-        <location filename="../../Core/DataFilter.cpp" line="2573"/>
+        <location filename="../../Core/DataFilter.cpp" line="2135"/>
+        <location filename="../../Core/DataFilter.cpp" line="2319"/>
+        <location filename="../../Core/DataFilter.cpp" line="2541"/>
+        <location filename="../../Core/DataFilter.cpp" line="2576"/>
         <source>invalid series name &apos;%1&apos;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2141"/>
+        <location filename="../../Core/DataFilter.cpp" line="2144"/>
         <source>tests(user|bests, duration|power)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2147"/>
-        <location filename="../../Core/DataFilter.cpp" line="2154"/>
+        <location filename="../../Core/DataFilter.cpp" line="2150"/>
+        <location filename="../../Core/DataFilter.cpp" line="2157"/>
         <source>tests() first parameter must be &apos;user&apos; or &apos;bests&apos;.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2161"/>
-        <location filename="../../Core/DataFilter.cpp" line="2168"/>
+        <location filename="../../Core/DataFilter.cpp" line="2164"/>
+        <location filename="../../Core/DataFilter.cpp" line="2171"/>
         <source>tests() second parameter must be &apos;duration&apos; or &apos;power&apos;.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="3714"/>
+        <location filename="../../Core/DataFilter.cpp" line="3726"/>
         <source>Date</source>
         <translation type="unfinished">日付</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="3715"/>
+        <location filename="../../Core/DataFilter.cpp" line="3727"/>
         <source>Time</source>
         <translation type="unfinished">時間</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="3716"/>
+        <location filename="../../Core/DataFilter.cpp" line="3728"/>
         <source>Name</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="3717"/>
+        <location filename="../../Core/DataFilter.cpp" line="3729"/>
         <source>Start</source>
         <translation type="unfinished">開始</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="3718"/>
+        <location filename="../../Core/DataFilter.cpp" line="3730"/>
         <source>Stop</source>
         <translation type="unfinished">停止</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="3719"/>
+        <location filename="../../Core/DataFilter.cpp" line="3731"/>
         <source>Type</source>
         <translation type="unfinished">種別</translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="3720"/>
+        <location filename="../../Core/DataFilter.cpp" line="3732"/>
         <source>Test</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="3721"/>
+        <location filename="../../Core/DataFilter.cpp" line="3733"/>
         <source>Color</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="3722"/>
+        <location filename="../../Core/DataFilter.cpp" line="3734"/>
         <source>Route</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="3723"/>
+        <location filename="../../Core/DataFilter.cpp" line="3735"/>
         <source>Selected</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="3724"/>
+        <location filename="../../Core/DataFilter.cpp" line="3736"/>
         <source>File Name</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2302"/>
+        <location filename="../../Core/DataFilter.cpp" line="2305"/>
         <source>bests() - first parameters is a symbol should be a series name or &apos;date&apos;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="1991"/>
+        <location filename="../../Core/DataFilter.cpp" line="1994"/>
         <source>round(v) or round(v, dp)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2281"/>
+        <location filename="../../Core/DataFilter.cpp" line="2284"/>
         <source>%1(name|date|priority|description)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2289"/>
+        <location filename="../../Core/DataFilter.cpp" line="2292"/>
         <source>invalid symbol &apos;%1&apos;, should be &apos;name|date|priority|description&apos;&apos;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2343"/>
+        <location filename="../../Core/DataFilter.cpp" line="2346"/>
         <source>too many parameters</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2350"/>
+        <location filename="../../Core/DataFilter.cpp" line="2353"/>
         <source>measures(group, field) - must have group and field parameters.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2359"/>
+        <location filename="../../Core/DataFilter.cpp" line="2362"/>
         <source>measures group must be a string.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2365"/>
+        <location filename="../../Core/DataFilter.cpp" line="2368"/>
         <source>invalid measures group &apos;%1&apos;.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2372"/>
+        <location filename="../../Core/DataFilter.cpp" line="2375"/>
         <source>measures field must be a string.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2378"/>
+        <location filename="../../Core/DataFilter.cpp" line="2381"/>
         <source>invalid measures field &apos;%1&apos; for group &apos;%2&apos;, should be one of: %3.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2389"/>
+        <location filename="../../Core/DataFilter.cpp" line="2392"/>
         <source>quantil(vector, quantiles)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2399"/>
+        <location filename="../../Core/DataFilter.cpp" line="2402"/>
         <source>multisort(ascend|descend, list [, .. list n])</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2405"/>
+        <location filename="../../Core/DataFilter.cpp" line="2408"/>
         <source>multisort(ascend|descend, list [, .. list n]), need to specify ascend or descend</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2417"/>
+        <location filename="../../Core/DataFilter.cpp" line="2420"/>
         <source>multisort: list arguments must be a symbol</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2421"/>
-        <location filename="../../Core/DataFilter.cpp" line="2483"/>
-        <location filename="../../Core/DataFilter.cpp" line="2499"/>
+        <location filename="../../Core/DataFilter.cpp" line="2424"/>
+        <location filename="../../Core/DataFilter.cpp" line="2486"/>
+        <location filename="../../Core/DataFilter.cpp" line="2502"/>
         <source>&apos;%1&apos; is not a user symbol</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2433"/>
+        <location filename="../../Core/DataFilter.cpp" line="2436"/>
         <source>sort(ascend|descend, list), need to specify ascend or descend</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2446"/>
+        <location filename="../../Core/DataFilter.cpp" line="2449"/>
         <source>rank(ascend|descend, list), need to specify ascend or descend</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2459"/>
-        <location filename="../../Core/DataFilter.cpp" line="2495"/>
+        <location filename="../../Core/DataFilter.cpp" line="2462"/>
+        <location filename="../../Core/DataFilter.cpp" line="2498"/>
         <source>argsort(ascend|descend, list), need to specify ascend or descend</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2470"/>
+        <location filename="../../Core/DataFilter.cpp" line="2473"/>
         <source>multiuniq(list [, .. list n])</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2479"/>
+        <location filename="../../Core/DataFilter.cpp" line="2482"/>
         <source>multiuniq: list arguments must be a symbol</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2510"/>
+        <location filename="../../Core/DataFilter.cpp" line="2513"/>
         <source>curve(seriesname, x|y|z|d|t), need to specify series name and data.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2515"/>
+        <location filename="../../Core/DataFilter.cpp" line="2518"/>
         <source>&apos;%1&apos; is not a valid, x, y, z, d or t expected</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2525"/>
+        <location filename="../../Core/DataFilter.cpp" line="2528"/>
         <source>meanmax(SERIES|data [,start, stop]) or meanmax(xvector,yvector)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2532"/>
+        <location filename="../../Core/DataFilter.cpp" line="2535"/>
         <source>meanmax(SERIES), SERIES should be POWER, HEARTRATE etc.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2558"/>
+        <location filename="../../Core/DataFilter.cpp" line="2561"/>
         <source>dist(series, data|bins), both parameters are required.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2565"/>
+        <location filename="../../Core/DataFilter.cpp" line="2568"/>
         <source>dist(series, data|bins), series should be one ofPOWER, HEARTRATE etc.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2580"/>
-        <location filename="../../Core/DataFilter.cpp" line="2586"/>
+        <location filename="../../Core/DataFilter.cpp" line="2583"/>
+        <location filename="../../Core/DataFilter.cpp" line="2589"/>
         <source>dist(series, data|bins), second parameter must be ether &apos;data&apos; or &apos;bins&apos;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2606"/>
+        <location filename="../../Core/DataFilter.cpp" line="2609"/>
         <source>annotation type &apos;%1&apos; not available</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2613"/>
+        <location filename="../../Core/DataFilter.cpp" line="2616"/>
         <source>annotate(voronoi, centers)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2620"/>
+        <location filename="../../Core/DataFilter.cpp" line="2623"/>
         <source>annotate(lr, solid|dash|dot|dashdot|dashdotdot, &quot;colorname&quot;)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2631"/>
+        <location filename="../../Core/DataFilter.cpp" line="2634"/>
         <source>annotate(hline|vline, &apos;label&apos;, solid|dash|dot|dashdot|dashdotdot, value)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2650"/>
+        <location filename="../../Core/DataFilter.cpp" line="2653"/>
         <source>smooth(list, algorithm [,parameters]) need at least 2 parameters.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2657"/>
+        <location filename="../../Core/DataFilter.cpp" line="2660"/>
         <source>smoothing algorithm &apos;%1&apos; not available</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2664"/>
-        <location filename="../../Core/DataFilter.cpp" line="2672"/>
+        <location filename="../../Core/DataFilter.cpp" line="2667"/>
+        <location filename="../../Core/DataFilter.cpp" line="2675"/>
         <source>smooth(list, sma, forward|centered|backward, windowsize</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2685"/>
+        <location filename="../../Core/DataFilter.cpp" line="2688"/>
         <source>smooth(list, ewma, alpha (between 0 and 1)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2699"/>
+        <location filename="../../Core/DataFilter.cpp" line="2702"/>
         <source>lowerbound(list, value), need list and value to find</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2710"/>
+        <location filename="../../Core/DataFilter.cpp" line="2713"/>
         <source>lr(x, y), need x and y vectors.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2722"/>
+        <location filename="../../Core/DataFilter.cpp" line="2725"/>
         <source>mlr(yvector, xvector1 .. xvectorn), need at least 1 xvector and y vectors.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2733"/>
+        <location filename="../../Core/DataFilter.cpp" line="2736"/>
         <source>lm(expr, xlist, ylist), need formula, x and y data to fit to.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2753"/>
+        <location filename="../../Core/DataFilter.cpp" line="2756"/>
         <source>lm(expr, xlist, ylist), formula must have at least one parameter to estimate.
 </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2761"/>
+        <location filename="../../Core/DataFilter.cpp" line="2764"/>
         <source>sapply(list, expr), need 2 parameters.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2772"/>
+        <location filename="../../Core/DataFilter.cpp" line="2775"/>
         <source>pmc(metric, stress|lts|sts|sb|rr|date), need to specify a metric and series.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2782"/>
+        <location filename="../../Core/DataFilter.cpp" line="2785"/>
         <source>invalid PMC series &apos;%1&apos;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2791"/>
+        <location filename="../../Core/DataFilter.cpp" line="2794"/>
         <source>should be banister(load_metric, perf_metric, nte|pte|perf|cp|date)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2829"/>
+        <location filename="../../Core/DataFilter.cpp" line="2832"/>
         <source>XDATA needs 3 parameters.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2836"/>
+        <location filename="../../Core/DataFilter.cpp" line="2839"/>
         <source>XDATA expects a string for first two parameters</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2843"/>
+        <location filename="../../Core/DataFilter.cpp" line="2846"/>
         <source>XDATA expects a symbol, one of sparse, repeat, interpolate or resample for third parameter.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2850"/>
+        <location filename="../../Core/DataFilter.cpp" line="2853"/>
         <source>XDATA expects one of sparse, repeat, interpolate or resample for third parameter. (%1)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2873"/>
+        <location filename="../../Core/DataFilter.cpp" line="2876"/>
         <source>XDATA_UNITS needs 2 parameters.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2880"/>
+        <location filename="../../Core/DataFilter.cpp" line="2883"/>
         <source>XDATA_UNITS expects a string for first two parameters</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2895"/>
+        <location filename="../../Core/DataFilter.cpp" line="2898"/>
         <source>isset/set/unset function first parameter is field/metric to set.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2912"/>
+        <location filename="../../Core/DataFilter.cpp" line="2915"/>
         <source>%1 is not supported in isset/set/unset operations</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2922"/>
+        <location filename="../../Core/DataFilter.cpp" line="2925"/>
         <source>isset has one parameter, a symbol to check.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2929"/>
+        <location filename="../../Core/DataFilter.cpp" line="2932"/>
         <source>set function needs 3 paramaters; symbol, value and expression.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2930"/>
+        <location filename="../../Core/DataFilter.cpp" line="2933"/>
         <source>unset function needs 2 paramaters; symbol and expression.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2949"/>
+        <location filename="../../Core/DataFilter.cpp" line="2952"/>
         <source>%1 function expects model name as first parameter.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2955"/>
+        <location filename="../../Core/DataFilter.cpp" line="2958"/>
         <source>%1 function expects model name as first parameter</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2966"/>
+        <location filename="../../Core/DataFilter.cpp" line="2969"/>
         <source>%1 function expects parameter or duration as second parameter</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="3032"/>
+        <location filename="../../Core/DataFilter.cpp" line="3035"/>
         <source>array assignment must be to symbol.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="3040"/>
+        <location filename="../../Core/DataFilter.cpp" line="3043"/>
         <source>&apos;%1&apos; unknown variable</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="3046"/>
+        <location filename="../../Core/DataFilter.cpp" line="3049"/>
         <source>assign to selection not supported at present. sorry.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2986"/>
+        <location filename="../../Core/DataFilter.cpp" line="2989"/>
         <source>function &apos;%1&apos; expects %2 parameter(s) not %3</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2179"/>
+        <location filename="../../Core/DataFilter.cpp" line="2182"/>
         <source>no metric specified, %1(symbol) symbol should be a metric name</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2188"/>
+        <location filename="../../Core/DataFilter.cpp" line="2191"/>
         <source>only metric names are supported</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2193"/>
+        <location filename="../../Core/DataFilter.cpp" line="2196"/>
         <source>unknown metric %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2202"/>
+        <location filename="../../Core/DataFilter.cpp" line="2205"/>
         <source>kmeans(centers|assignments, k, dim1, dim2, dimn)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2207"/>
+        <location filename="../../Core/DataFilter.cpp" line="2210"/>
         <source>kmeans(centers|assignments, k, dim1, dim2, dimn) - %s unknown</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2219"/>
+        <location filename="../../Core/DataFilter.cpp" line="2222"/>
         <source>%1(symbol|date), symbol should be a metric name</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2226"/>
+        <location filename="../../Core/DataFilter.cpp" line="2229"/>
         <source>invalid symbol &apos;%1&apos;, should be either a metric name or &apos;time&apos; or &apos;date&apos;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2241"/>
+        <location filename="../../Core/DataFilter.cpp" line="2244"/>
         <source>too many parameters: %1(symbol|date, start, stop)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2249"/>
+        <location filename="../../Core/DataFilter.cpp" line="2252"/>
         <source>%1(symbol|name|start|stop|type|test|color|route|selected|date|filename), symbol should be a metric name</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2257"/>
+        <location filename="../../Core/DataFilter.cpp" line="2260"/>
         <source>invalid symbol &apos;%1&apos;, should be either a metric name or &apos;name|start|stop|type|test|color|route|selected|date|time|filename&apos;&apos;</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2273"/>
+        <location filename="../../Core/DataFilter.cpp" line="2276"/>
         <source>too many parameters: %1(symbol, start, stop)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2597"/>
+        <location filename="../../Core/DataFilter.cpp" line="2600"/>
         <source>annotate(label|hline|vline|voronoi, ...) need at least 2 parameters.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="2998"/>
+        <location filename="../../Core/DataFilter.cpp" line="3001"/>
         <source>unknown function %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/DataFilter.cpp" line="3008"/>
+        <location filename="../../Core/DataFilter.cpp" line="3011"/>
         <source>unary negation on a string!</source>
         <translation type="unfinished"></translation>
     </message>
@@ -19931,81 +18587,9 @@ on and that its display says, &quot;PC Link&quot;</source>
 <context>
     <name>MainWindow</name>
     <message>
-        <source>Invalid Ride File Name</source>
-        <translation type="obsolete">無効なライドファイル名</translation>
-    </message>
-    <message>
-        <source>Invalid date/time in filename:
-%1
-Skipping file...</source>
-        <translation type="obsolete">ファイル名に無効な日時が含まれています。
-%1
-スキップします...</translation>
-    </message>
-    <message>
-        <source>Zones File Error</source>
-        <translation type="obsolete">ゾーン設定ファイルエラー</translation>
-    </message>
-    <message>
-        <source>Reading Zones File</source>
-        <translation type="obsolete">ゾーン設定ファイルの読み込み中</translation>
-    </message>
-    <message>
-        <source>All Rides</source>
-        <translation type="obsolete">全てのライド</translation>
-    </message>
-    <message>
-        <source>Intervals</source>
-        <translation type="obsolete">インターバル</translation>
-    </message>
-    <message>
-        <source>Ride Summary</source>
-        <translation type="obsolete">ライド概要</translation>
-    </message>
-    <message>
-        <source>Ride Plot</source>
-        <translation type="obsolete">ライドグラフ</translation>
-    </message>
-    <message>
-        <source>3D</source>
-        <translation type="obsolete">3D</translation>
-    </message>
-    <message>
-        <source>Weekly Summary</source>
-        <translation type="obsolete">週間のライド概要</translation>
-    </message>
-    <message>
-        <source>&amp;Cyclist</source>
-        <translation type="obsolete">サイクリスト(&amp;C)</translation>
-    </message>
-    <message>
-        <source>&amp;New...</source>
-        <translation type="obsolete">新規(&amp;N)...</translation>
-    </message>
-    <message>
-        <location filename="../../Gui/MainWindow.cpp" line="2180"/>
+        <location filename="../../Gui/MainWindow.cpp" line="2177"/>
         <source>Ctrl+N</source>
         <translation>Ctrl+N</translation>
-    </message>
-    <message>
-        <source>&amp;Open...</source>
-        <translation type="obsolete">開く(&amp;O)...</translation>
-    </message>
-    <message>
-        <source>Ctrl+O</source>
-        <translation type="obsolete">Ctrl+O</translation>
-    </message>
-    <message>
-        <source>&amp;Quit</source>
-        <translation type="obsolete">終了(&amp;Q)</translation>
-    </message>
-    <message>
-        <source>Ctrl+Q</source>
-        <translation type="vanished">Ctrl+Q</translation>
-    </message>
-    <message>
-        <source>&amp;Ride</source>
-        <translation type="obsolete">ライド(&amp;R)</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="511"/>
@@ -20033,7 +18617,7 @@ Skipping file...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1923"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1920"/>
         <source>Delete Activity</source>
         <translation type="unfinished"></translation>
     </message>
@@ -20065,11 +18649,6 @@ Skipping file...</source>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="507"/>
         <source>&amp;Export...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../../Gui/MainWindow.cpp" line="508"/>
-        <source>&amp;Batch export...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -20200,94 +18779,94 @@ Skipping file...</source>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="1144"/>
-        <location filename="../../Gui/MainWindow.cpp" line="2040"/>
-        <location filename="../../Gui/MainWindow.cpp" line="2069"/>
+        <location filename="../../Gui/MainWindow.cpp" line="2037"/>
+        <location filename="../../Gui/MainWindow.cpp" line="2066"/>
         <source>Activity Import</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="1144"/>
-        <location filename="../../Gui/MainWindow.cpp" line="2040"/>
-        <location filename="../../Gui/MainWindow.cpp" line="2069"/>
+        <location filename="../../Gui/MainWindow.cpp" line="2037"/>
+        <location filename="../../Gui/MainWindow.cpp" line="2066"/>
         <source>Closing of athlete window not possible while background activity import is in progress...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1659"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1656"/>
         <source>Chart Import</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1803"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1800"/>
         <source>Failed to export activity, please check permissions</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1839"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1836"/>
         <source>No Activity To Save</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1840"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1837"/>
         <source>There is no currently selected activity to save.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1899"/>
-        <location filename="../../Gui/MainWindow.cpp" line="1901"/>
-        <location filename="../../Gui/MainWindow.cpp" line="1911"/>
-        <location filename="../../Gui/MainWindow.cpp" line="1913"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1896"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1898"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1908"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1910"/>
         <source>Split Activity</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1899"/>
-        <location filename="../../Gui/MainWindow.cpp" line="1911"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1896"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1908"/>
         <source>No activity selected</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1901"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1898"/>
         <source>Current activity contains no data to split</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1913"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1910"/>
         <source>Current activity contains no data to merge</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1929"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1926"/>
         <source>Are you sure you want to delete the activity:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="2408"/>
-        <location filename="../../Gui/MainWindow.cpp" line="2429"/>
+        <location filename="../../Gui/MainWindow.cpp" line="2405"/>
+        <location filename="../../Gui/MainWindow.cpp" line="2426"/>
         <source>The workout directory is not configured, or the directory selected no longer exists.
 
 Please check your preference settings.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="2639"/>
+        <location filename="../../Gui/MainWindow.cpp" line="2636"/>
         <source>New Python Fix...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="2640"/>
+        <location filename="../../Gui/MainWindow.cpp" line="2637"/>
         <source>Manage Python Fixes...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="2713"/>
-        <location filename="../../Gui/MainWindow.cpp" line="2734"/>
+        <location filename="../../Gui/MainWindow.cpp" line="2710"/>
+        <location filename="../../Gui/MainWindow.cpp" line="2731"/>
         <source>CloudDB</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="2713"/>
-        <location filename="../../Gui/MainWindow.cpp" line="2734"/>
+        <location filename="../../Gui/MainWindow.cpp" line="2710"/>
+        <location filename="../../Gui/MainWindow.cpp" line="2731"/>
         <source>Current athlete is not registered as curator - please contact the GoldenCheetah team</source>
         <translation type="unfinished"></translation>
     </message>
@@ -20372,12 +18951,12 @@ Please check your preference settings.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1659"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1656"/>
         <source>Imported %1 metric charts</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="2180"/>
+        <location filename="../../Gui/MainWindow.cpp" line="2177"/>
         <source>&amp;New Athlete...</source>
         <translation type="unfinished"></translation>
     </message>
@@ -20387,29 +18966,25 @@ Please check your preference settings.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1736"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1733"/>
         <source>Select Activity</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1736"/>
-        <location filename="../../Gui/MainWindow.cpp" line="1923"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1733"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1920"/>
         <source>No activity selected!</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1749"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1746"/>
         <source>Export Activity</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1802"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1799"/>
         <source>Export Failed</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&amp;Export to CSV...</source>
-        <translation type="obsolete">CSVファイルにエクスポート(&amp;E)...</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="507"/>
@@ -20422,77 +18997,9 @@ Please check your preference settings.</source>
         <translation>Ctrl+I</translation>
     </message>
     <message>
-        <source>Find &amp;best intervals...</source>
-        <translation type="obsolete">ベストインターバルを検索(&amp;B)...</translation>
-    </message>
-    <message>
         <location filename="../../Gui/MainWindow.cpp" line="508"/>
         <source>Ctrl+B</source>
         <translation>Ctrl+B</translation>
-    </message>
-    <message>
-        <source>Find power &amp;peaks...</source>
-        <translation type="obsolete">パワーのピーク値を検索(&amp;P)...</translation>
-    </message>
-    <message>
-        <source>Ctrl+P</source>
-        <translation type="obsolete">Ctrl+P</translation>
-    </message>
-    <message>
-        <source>Split &amp;ride...</source>
-        <translation type="obsolete">ライドを分割(&amp;R)...</translation>
-    </message>
-    <message>
-        <source>D&amp;elete ride...</source>
-        <translation type="obsolete">ライドを削除(&amp;E)...</translation>
-    </message>
-    <message>
-        <source>&amp;Manual ride entry...</source>
-        <translation type="obsolete">ライドを手動で作成(&amp;M)...</translation>
-    </message>
-    <message>
-        <source>Hr Zones File Error</source>
-        <translation type="obsolete">心拍ゾーンファイルエラー</translation>
-    </message>
-    <message>
-        <source>Reading Hr Zones File</source>
-        <translation type="obsolete">心拍ゾーンファイルを読み込んでいます</translation>
-    </message>
-    <message>
-        <source>Notes</source>
-        <translation type="obsolete">ノート</translation>
-    </message>
-    <message>
-        <source>Critical Power</source>
-        <translation type="obsolete">クリティカルパワー</translation>
-    </message>
-    <message>
-        <source>Histograms</source>
-        <translation type="obsolete">ヒストグラム</translation>
-    </message>
-    <message>
-        <source>PF/PV</source>
-        <translation type="obsolete">PF/PV</translation>
-    </message>
-    <message>
-        <source>Metrics</source>
-        <translation type="obsolete">統計</translation>
-    </message>
-    <message>
-        <source>PM</source>
-        <translation type="obsolete">PM</translation>
-    </message>
-    <message>
-        <source>Aerolab</source>
-        <translation type="obsolete">エアロラボ</translation>
-    </message>
-    <message>
-        <source>Map</source>
-        <translation type="obsolete">地図</translation>
-    </message>
-    <message>
-        <source>Editor</source>
-        <translation type="obsolete">エディタ</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="504"/>
@@ -20505,22 +19012,6 @@ Please check your preference settings.</source>
         <translation>Ctrl+M</translation>
     </message>
     <message>
-        <source>Export to GC...</source>
-        <translation type="obsolete">GCファイルをエクスポート...</translation>
-    </message>
-    <message>
-        <source>&amp;Export to KML...</source>
-        <translation type="obsolete">KMLをエクスポート(&amp;E)...</translation>
-    </message>
-    <message>
-        <source>Export to PWX...</source>
-        <translation type="obsolete">PWXファイルをエクスポート...</translation>
-    </message>
-    <message>
-        <source>&amp;Save ride</source>
-        <translation type="obsolete">ライドを保存(&amp;S)</translation>
-    </message>
-    <message>
         <location filename="../../Gui/MainWindow.cpp" line="554"/>
         <source>&amp;Tools</source>
         <translation>ツール(&amp;T)</translation>
@@ -20529,10 +19020,6 @@ Please check your preference settings.</source>
         <location filename="../../Gui/MainWindow.cpp" line="590"/>
         <source>&amp;Options...</source>
         <translation>オプション(&amp;O)...</translation>
-    </message>
-    <message>
-        <source>Critical Power Calculator</source>
-        <translation type="obsolete">CP計算機</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="630"/>
@@ -20640,6 +19127,11 @@ Please check your preference settings.</source>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="493"/>
         <source>Save all modified activities</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Gui/MainWindow.cpp" line="508"/>
+        <source>&amp;Batch Processing...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -20753,202 +19245,34 @@ Please check your preference settings.</source>
         <translation>Golden Cheetah について(&amp;A)</translation>
     </message>
     <message>
-        <source>Can&apos;t rename %1 to %2</source>
-        <translation type="obsolete">%1 から %2 にリネームできません</translation>
-    </message>
-    <message>
-        <source>Select Ride</source>
-        <translation type="obsolete">ライドを選択</translation>
-    </message>
-    <message>
-        <source>No ride selected!</source>
-        <translation type="obsolete">ライドが選択されていません!</translation>
-    </message>
-    <message>
-        <source>Export PWX</source>
-        <translation type="obsolete">PWXファイルをエクスポート</translation>
-    </message>
-    <message>
-        <source>PWX (*.pwx)</source>
-        <translation type="obsolete">PWX (*.pwx)</translation>
-    </message>
-    <message>
-        <source>Export GC</source>
-        <translation type="obsolete">GCファイルをエクスポート</translation>
-    </message>
-    <message>
-        <source>GC (*.gc)</source>
-        <translation type="obsolete">GCファイル (*.gc)</translation>
-    </message>
-    <message>
-        <source>Export KML</source>
-        <translation type="obsolete">KMLファイルをエクスポート</translation>
-    </message>
-    <message>
-        <source>Google Earth KML (*.kml)</source>
-        <translation type="obsolete">Google Earth KML (*.kml)</translation>
-    </message>
-    <message>
-        <source>Metric</source>
-        <translation type="obsolete">メートル</translation>
-    </message>
-    <message>
-        <source>Imperial</source>
-        <translation type="obsolete">ヤード・ポンド</translation>
-    </message>
-    <message>
-        <source>Select Units</source>
-        <translation type="obsolete">単位を選択</translation>
-    </message>
-    <message>
-        <source>Units:</source>
-        <translation type="obsolete">単位:</translation>
-    </message>
-    <message>
-        <source>Export CSV</source>
-        <translation type="obsolete">CSVファイルをエクスポート</translation>
-    </message>
-    <message>
-        <source>Comma-Separated Values (*.csv)</source>
-        <translation type="obsolete">カンマ区切りファイル (*.csv)</translation>
-    </message>
-    <message>
-        <source>Split Ride</source>
-        <translation type="obsolete">ライドを分割</translation>
-    </message>
-    <message>
-        <source>The file %1 can&apos;t be opened for writing</source>
-        <translation type="obsolete">%1 への書き込みに失敗しました</translation>
-    </message>
-    <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1824"/>
-        <location filename="../../Gui/MainWindow.cpp" line="2377"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1821"/>
+        <location filename="../../Gui/MainWindow.cpp" line="2374"/>
         <source>Import from File</source>
         <translation>ファイルを取り込み</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="2350"/>
+        <location filename="../../Gui/MainWindow.cpp" line="2347"/>
         <source>Refresh in Progress</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="2356"/>
+        <location filename="../../Gui/MainWindow.cpp" line="2353"/>
         <source>Export Metrics</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="2356"/>
+        <location filename="../../Gui/MainWindow.cpp" line="2353"/>
         <source>Comma Separated Variables (*.csv)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="2407"/>
-        <location filename="../../Gui/MainWindow.cpp" line="2428"/>
+        <location filename="../../Gui/MainWindow.cpp" line="2404"/>
+        <location filename="../../Gui/MainWindow.cpp" line="2425"/>
         <source>Workout Directory Invalid</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source> (%1 watts)</source>
-        <translation type="obsolete"> (%1 ワット)</translation>
-    </message>
-    <message>
-        <source>Save Changes to Ride</source>
-        <translation type="obsolete">ライドの変更を保存</translation>
-    </message>
-    <message>
-        <source>Revert to Saved Ride</source>
-        <translation type="obsolete">保存されたライドを戻す</translation>
-    </message>
-    <message>
-        <source>Delete Ride</source>
-        <translation type="obsolete">ライドを削除</translation>
-    </message>
-    <message>
-        <source>Find Best Intervals</source>
-        <translation type="obsolete">ベストインターバルを検索</translation>
-    </message>
-    <message>
-        <source>Find Power Peaks</source>
-        <translation type="obsolete">ピーク出力を検索</translation>
-    </message>
-    <message>
-        <source>Tweet Ride</source>
-        <translation type="obsolete">Twitterに送信</translation>
-    </message>
-    <message>
-        <source>Rename interval</source>
-        <translation type="obsolete">インターバルをリネーム</translation>
-    </message>
-    <message>
-        <source>Delete interval</source>
-        <translation type="obsolete">インターバルを削除</translation>
-    </message>
-    <message>
-        <source>Zoom to interval</source>
-        <translation type="obsolete">インターバルを拡大</translation>
-    </message>
-    <message>
-        <source>Bring to Front</source>
-        <translation type="obsolete">手前へ</translation>
-    </message>
-    <message>
-        <source>Send to back</source>
-        <translation type="obsolete">背面へ</translation>
-    </message>
-    <message>
-        <source>Computing bike score estimating factors.
-</source>
-        <translation type="obsolete">バイクスコアの予測値を計算中。
-</translation>
-    </message>
-    <message>
-        <source>Abort</source>
-        <translation type="obsolete">中止</translation>
-    </message>
-    <message>
-        <source>Processing %1...</source>
-        <translation type="obsolete">%1 を処理中...</translation>
-    </message>
-    <message>
-        <source>Read Error</source>
-        <translation type="obsolete">読み込みエラー</translation>
-    </message>
-    <message>
-        <source>Can&apos;t read notes file %1</source>
-        <translation type="obsolete">ノートファイル %1 の読み込みに失敗</translation>
-    </message>
-    <message>
-        <source>Write Error</source>
-        <translation type="obsolete">書き込みエラー</translation>
-    </message>
-    <message>
-        <source>Can&apos;t write notes file %1</source>
-        <translation type="obsolete">ノートファイル %1 の書き込みに失敗</translation>
-    </message>
-    <message>
-        <source>CP saved</source>
-        <translation type="obsolete">CPが保存されました</translation>
-    </message>
-    <message>
-        <source>Range from %1 to %2
-Rider CP set to %3 watts</source>
-        <translation type="obsolete">%1 から %2 のレンジが
-CP値%3ワットに設定されました</translation>
-    </message>
-    <message>
-        <source>About GoldenCheetah</source>
-        <translation type="obsolete">GoldenCheetah について</translation>
-    </message>
-    <message>
-        <source>&lt;center&gt;&lt;h2&gt;GoldenCheetah&lt;/h2&gt;Cycling Power Analysis Software&lt;br&gt;for Linux, Mac, and Windows&lt;p&gt;Build date: %1 %2&lt;p&gt;Version: %3&lt;p&gt;GoldenCheetah is licensed under the&lt;br&gt;&lt;a href=&quot;http://www.gnu.org/copyleft/gpl.html&quot;&gt;GNU General Public License&lt;/a&gt;.&lt;p&gt;Source code can be obtained from&lt;br&gt;&lt;a href=&quot;http://goldencheetah.org/&quot;&gt;http://goldencheetah.org/&lt;/a&gt;.&lt;p&gt;Ride files and other data are stored in&lt;br&gt;&lt;a href=&quot;%4&quot;&gt;%5&lt;/a&gt;&lt;/center&gt;</source>
-        <translation type="obsolete">&lt;center&gt;&lt;h2&gt;GoldenCheetah&lt;/h2&gt;&lt;byte value=&quot;x1f&quot;/&gt;Cycling Power Analysis Software&lt;br&gt;for Linux, Mac, and Windows&lt;p&gt;Build date: %1 %2&lt;p&gt;Version: %3&lt;p&gt;GoldenCheetah is licensed under the&lt;br&gt;&lt;a href=&quot;http://www.gnu.org/copyleft/gpl.html&quot;&gt;GNU General Public License&lt;/a&gt;.&lt;p&gt;ソースコードは以下の公式サイトより入手可能です。&lt;br&gt;&lt;a href=&quot;http://goldencheetah.org/&quot;&gt;http://goldencheetah.org/&lt;/a&gt;&lt;p&gt;各種ライドデータは次のディレクトリを御覧ください。&lt;br&gt;&lt;a href=&quot;%4&quot;&gt;%5&lt;/a&gt;&lt;/center&gt;</translation>
-    </message>
-    <message>
-        <source>Are you sure you want to delete the ride:</source>
-        <translation type="obsolete">本当にこのライドを削除しますか:</translation>
-    </message>
-    <message>
-        <location filename="../../Gui/MainWindow.cpp" line="1931"/>
+        <location filename="../../Gui/MainWindow.cpp" line="1928"/>
         <source>Delete</source>
         <translation>削除</translation>
     </message>
@@ -20994,92 +19318,33 @@ CP値%3ワットに設定されました</translation>
 <context>
     <name>ManualDataProcessorDialog</name>
     <message>
-        <location filename="../../FileIO/DataProcessor.cpp" line="135"/>
+        <location filename="../../FileIO/DataProcessor.cpp" line="132"/>
         <source>Settings</source>
         <translation>設定</translation>
     </message>
     <message>
-        <location filename="../../FileIO/DataProcessor.cpp" line="137"/>
+        <location filename="../../FileIO/DataProcessor.cpp" line="134"/>
         <source>Description</source>
         <translation>説明</translation>
     </message>
     <message>
-        <location filename="../../FileIO/DataProcessor.cpp" line="151"/>
+        <location filename="../../FileIO/DataProcessor.cpp" line="148"/>
+        <source>Save parameters as default</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../FileIO/DataProcessor.cpp" line="150"/>
         <source>OK</source>
         <translation>OK</translation>
     </message>
     <message>
-        <location filename="../../FileIO/DataProcessor.cpp" line="152"/>
+        <location filename="../../FileIO/DataProcessor.cpp" line="151"/>
         <source>Cancel</source>
         <translation>キャンセル</translation>
     </message>
 </context>
 <context>
     <name>ManualRideDialog</name>
-    <message>
-        <source>Manually Enter Ride Data</source>
-        <translation type="obsolete">ライド情報を手動入力</translation>
-    </message>
-    <message>
-        <source>Ride date: </source>
-        <translation type="obsolete">ライド日付: </translation>
-    </message>
-    <message>
-        <source>ddd MMM d, yyyy  h:mm AP</source>
-        <translation type="obsolete">yyyy年MMMMd日 (ddd) h:mm</translation>
-    </message>
-    <message>
-        <source>Ride length: </source>
-        <translation type="obsolete">時間: </translation>
-    </message>
-    <message>
-        <source>hours</source>
-        <translation type="obsolete">時間</translation>
-    </message>
-    <message>
-        <source>mins</source>
-        <translation type="obsolete">分</translation>
-    </message>
-    <message>
-        <source>secs</source>
-        <translation type="obsolete">秒</translation>
-    </message>
-    <message>
-        <source>(1 sec to 99:59:59) </source>
-        <translation type="obsolete">(1秒から99:59:59) </translation>
-    </message>
-    <message>
-        <source>Distance </source>
-        <translation type="obsolete">距離 </translation>
-    </message>
-    <message>
-        <source>km</source>
-        <translation type="obsolete">キロメートル</translation>
-    </message>
-    <message>
-        <source>miles</source>
-        <translation type="obsolete">マイル</translation>
-    </message>
-    <message>
-        <source>(0-9999) </source>
-        <translation type="obsolete">(0-9999) </translation>
-    </message>
-    <message>
-        <source>Average HR: </source>
-        <translation type="obsolete">平均心拍数: </translation>
-    </message>
-    <message>
-        <source>(30-199) </source>
-        <translation type="obsolete">(30-199) </translation>
-    </message>
-    <message>
-        <source>Estimate BikeScore by: </source>
-        <translation type="obsolete">BikeScore予想に: </translation>
-    </message>
-    <message>
-        <source>Time</source>
-        <translation type="obsolete">時間</translation>
-    </message>
     <message>
         <location filename="../../Gui/ManualRideDialog.cpp" line="121"/>
         <source>Manual Entry</source>
@@ -21191,10 +19456,6 @@ CP値%3ワットに設定されました</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>BikeScore: </source>
-        <translation type="obsolete">BikeScore: </translation>
-    </message>
-    <message>
         <location filename="../../Gui/ManualRideDialog.cpp" line="253"/>
         <source>Daniel Points: </source>
         <translation type="unfinished"></translation>
@@ -21220,10 +19481,6 @@ CP値%3ワットに設定されました</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Daniels Points: </source>
-        <translation type="obsolete">Daniels Points: </translation>
-    </message>
-    <message>
         <location filename="../../Gui/ManualRideDialog.cpp" line="275"/>
         <source>&amp;OK</source>
         <translation>OK(&amp;O)</translation>
@@ -21232,64 +19489,6 @@ CP値%3ワットに設定されました</translation>
         <location filename="../../Gui/ManualRideDialog.cpp" line="276"/>
         <source>&amp;Cancel</source>
         <translation>キャンセル(&amp;C)</translation>
-    </message>
-    <message>
-        <source>Values out of range</source>
-        <translation type="obsolete">範囲外の値です</translation>
-    </message>
-    <message>
-        <source>The values you&apos;ve entered in:
- </source>
-        <translation type="obsolete">入力された値: 
-</translation>
-    </message>
-    <message>
-        <source>are invalid, please fix.</source>
-        <translation type="obsolete">は無効のため、修正してください。</translation>
-    </message>
-    <message>
-        <source>Ride Already Downloaded</source>
-        <translation type="obsolete">ライドは既にダウンロード済みです</translation>
-    </message>
-    <message>
-        <source>This ride appears to have already </source>
-        <translation type="obsolete">このライドは既に </translation>
-    </message>
-    <message>
-        <source>been downloaded.  Do you want to </source>
-        <translation type="obsolete">ダウンロード済みです </translation>
-    </message>
-    <message>
-        <source>download it again and overwrite </source>
-        <translation type="obsolete">再ダウンロードして </translation>
-    </message>
-    <message>
-        <source>the previous download?</source>
-        <translation type="obsolete">既存のものに上書きしますか?</translation>
-    </message>
-    <message>
-        <source>&amp;Overwrite</source>
-        <translation type="obsolete">上書き(&amp;O)</translation>
-    </message>
-    <message>
-        <source>Error</source>
-        <translation type="obsolete">エラー</translation>
-    </message>
-    <message>
-        <source>Failed to create temporary file </source>
-        <translation type="obsolete">一時ファイルの作成に失敗しました </translation>
-    </message>
-    <message>
-        <source>Failed to remove existing file </source>
-        <translation type="obsolete">既存のファイルの削除に失敗しました </translation>
-    </message>
-    <message>
-        <source>Failed to rename </source>
-        <translation type="obsolete">リネームに失敗 </translation>
-    </message>
-    <message>
-        <source> to </source>
-        <translation type="obsolete"> から </translation>
     </message>
 </context>
 <context>
@@ -22010,22 +20209,6 @@ CP値%3ワットに設定されました</translation>
 <context>
     <name>MeasuresPage</name>
     <message>
-        <source>Move up</source>
-        <translation type="obsolete">上へ</translation>
-    </message>
-    <message>
-        <source>Move down</source>
-        <translation type="obsolete">下へ</translation>
-    </message>
-    <message>
-        <source>Insert</source>
-        <translation type="obsolete">挿入</translation>
-    </message>
-    <message>
-        <source>Rename</source>
-        <translation type="obsolete">リネーム</translation>
-    </message>
-    <message>
         <location filename="../../Gui/AthletePages.cpp" line="576"/>
         <source>Time dependent %1 measures</source>
         <translation type="unfinished"></translation>
@@ -22087,14 +20270,6 @@ CP値%3ワットに設定されました</translation>
         <location filename="../../Gui/AthletePages.cpp" line="630"/>
         <source>Add</source>
         <translation type="unfinished">追加</translation>
-    </message>
-    <message>
-        <source>Screen Tab</source>
-        <translation type="obsolete">スクリーンタブ</translation>
-    </message>
-    <message>
-        <source>Type</source>
-        <translation type="obsolete">種別</translation>
     </message>
 </context>
 <context>
@@ -22275,30 +20450,6 @@ If you press continue the activity will be saved, if you do not want to continue
 <context>
     <name>MergeSelect</name>
     <message>
-        <source>Power</source>
-        <translation type="obsolete">出力</translation>
-    </message>
-    <message>
-        <source>Heart Rate</source>
-        <translation type="obsolete">心拍数</translation>
-    </message>
-    <message>
-        <source>Speed</source>
-        <translation type="obsolete">速度</translation>
-    </message>
-    <message>
-        <source>Cadence</source>
-        <translation type="obsolete">ケイデンス</translation>
-    </message>
-    <message>
-        <source>Altitude</source>
-        <translation type="obsolete">標高</translation>
-    </message>
-    <message>
-        <source>No Power</source>
-        <translation type="obsolete">出力なし</translation>
-    </message>
-    <message>
         <location filename="../../Gui/MergeActivityWizard.cpp" line="1244"/>
         <source>Merge Data Series</source>
         <translation type="unfinished"></translation>
@@ -22452,28 +20603,6 @@ If you press continue the activity will be saved, if you do not want to continue
     </message>
 </context>
 <context>
-    <name>MergeSync</name>
-    <message>
-        <source>watts</source>
-        <translation type="obsolete">ワット</translation>
-    </message>
-    <message>
-        <source>kph</source>
-        <translation type="obsolete">km/h</translation>
-    </message>
-</context>
-<context>
-    <name>MergeUpload</name>
-    <message>
-        <source>Import from File</source>
-        <translation type="obsolete">ファイルを取り込み</translation>
-    </message>
-    <message>
-        <source>Error - Unknown file type</source>
-        <translation type="obsolete">エラー - 不明なファイルタイプ</translation>
-    </message>
-</context>
-<context>
     <name>MergeWelcome</name>
     <message>
         <location filename="../../Gui/MergeActivityWizard.cpp" line="599"/>
@@ -22509,10 +20638,6 @@ You will be able to import or download data before merging or joining the data a
         <translation>フィールド</translation>
     </message>
     <message>
-        <source>Notes Keywords</source>
-        <translation type="vanished">ノートキーワード</translation>
-    </message>
-    <message>
         <location filename="../../Gui/Pages.cpp" line="2211"/>
         <source>Colour Keywords</source>
         <translation type="unfinished"></translation>
@@ -22529,17 +20654,6 @@ You will be able to import or download data before merging or joining the data a
     </message>
 </context>
 <context>
-    <name>MetricAggregator</name>
-    <message>
-        <source>Refreshing Metrics Database...</source>
-        <translation type="obsolete">統計データベースを更新しています…</translation>
-    </message>
-    <message>
-        <source>Abort</source>
-        <translation type="obsolete">中止</translation>
-    </message>
-</context>
-<context>
     <name>MetricConfig</name>
     <message>
         <location filename="../../Gui/ConfigDialog.cpp" line="344"/>
@@ -22550,10 +20664,6 @@ You will be able to import or download data before merging or joining the data a
         <location filename="../../Gui/ConfigDialog.cpp" line="345"/>
         <source>Favourites</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Intervals</source>
-        <translation type="obsolete">インターバル</translation>
     </message>
 </context>
 <context>
@@ -22687,204 +20797,6 @@ You will be able to import or download data before merging or joining the data a
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="2096"/>
         <source>Minimum total hemoglobin concentration. The total grams of hemoglobin per deciliter.</source>
         <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>ModelDataProvider</name>
-    <message>
-        <source>Power (watts)</source>
-        <translation type="obsolete">出力（ワット）</translation>
-    </message>
-    <message>
-        <source>Cadence (rpm)</source>
-        <translation type="obsolete">ケイデンス (rpm)</translation>
-    </message>
-    <message>
-        <source>Heartrate (bpm)</source>
-        <translation type="obsolete">心拍数 (bpm)</translation>
-    </message>
-    <message>
-        <source>Average Effective Pedal Force (N)</source>
-        <translation type="obsolete">実効平均ペダルフォース (N)</translation>
-    </message>
-    <message>
-        <source>Power Zone</source>
-        <translation type="obsolete">パワーゾーン</translation>
-    </message>
-    <message>
-        <source>Unknown</source>
-        <translation type="obsolete">不明</translation>
-    </message>
-    <message>
-        <source>Power</source>
-        <translation type="obsolete">出力</translation>
-    </message>
-    <message>
-        <source>Cadence</source>
-        <translation type="obsolete">ケイデンス</translation>
-    </message>
-    <message>
-        <source>Heartrate</source>
-        <translation type="obsolete">心拍数</translation>
-    </message>
-    <message>
-        <source>Speed</source>
-        <translation type="obsolete">速度</translation>
-    </message>
-    <message>
-        <source>Altitude</source>
-        <translation type="obsolete">標高</translation>
-    </message>
-    <message>
-        <source>Time</source>
-        <translation type="obsolete">時間</translation>
-    </message>
-    <message>
-        <source>Distance</source>
-        <translation type="obsolete">距離</translation>
-    </message>
-    <message>
-        <source>Interval</source>
-        <translation type="obsolete">インターバル</translation>
-    </message>
-    <message>
-        <source>Latitude</source>
-        <translation type="obsolete">緯度</translation>
-    </message>
-    <message>
-        <source>Longitude</source>
-        <translation type="obsolete">経度</translation>
-    </message>
-    <message>
-        <source>CPV</source>
-        <translation type="obsolete">CPV</translation>
-    </message>
-    <message>
-        <source>AEPF</source>
-        <translation type="obsolete">AEPF</translation>
-    </message>
-</context>
-<context>
-    <name>ModelWindow</name>
-    <message>
-        <source>Power</source>
-        <translation type="vanished">出力</translation>
-    </message>
-    <message>
-        <source>Cadence</source>
-        <translation type="vanished">ケイデンス</translation>
-    </message>
-    <message>
-        <source>Heartrate</source>
-        <translation type="vanished">心拍数</translation>
-    </message>
-    <message>
-        <source>Speed</source>
-        <translation type="vanished">速度</translation>
-    </message>
-    <message>
-        <source>Altitude</source>
-        <translation type="vanished">標高</translation>
-    </message>
-    <message>
-        <source>Torque</source>
-        <translation type="vanished">トルク</translation>
-    </message>
-    <message>
-        <source>AEPF</source>
-        <translation type="vanished">AEPF</translation>
-    </message>
-    <message>
-        <source>CPV</source>
-        <translation type="vanished">CPV</translation>
-    </message>
-    <message>
-        <source>Time</source>
-        <translation type="vanished">時間</translation>
-    </message>
-    <message>
-        <source>Distance</source>
-        <translation type="vanished">距離</translation>
-    </message>
-    <message>
-        <source>Latitude</source>
-        <translation type="vanished">緯度</translation>
-    </message>
-    <message>
-        <source>Longitude</source>
-        <translation type="vanished">経度</translation>
-    </message>
-    <message>
-        <source>Analyse</source>
-        <translation type="vanished">解析</translation>
-    </message>
-    <message>
-        <source>X-Axis:</source>
-        <translation type="vanished">X軸:</translation>
-    </message>
-    <message>
-        <source>Y-Axis:</source>
-        <translation type="vanished">Y軸:</translation>
-    </message>
-    <message>
-        <source>Z-Axis:</source>
-        <translation type="vanished">Z軸:</translation>
-    </message>
-    <message>
-        <source>Color:</source>
-        <translation type="vanished">色:</translation>
-    </message>
-    <message>
-        <source>Bin Width:</source>
-        <translation type="vanished">平均化幅:</translation>
-    </message>
-    <message>
-        <source>Time at X&amp;Y</source>
-        <translation type="vanished">XおよびYに時間</translation>
-    </message>
-    <message>
-        <source>Power Zone</source>
-        <translation type="vanished">パワーゾーン</translation>
-    </message>
-    <message>
-        <source>Bar</source>
-        <translation type="vanished">バー</translation>
-    </message>
-    <message>
-        <source>Grid</source>
-        <translation type="vanished">グリッド</translation>
-    </message>
-    <message>
-        <source>Surface</source>
-        <translation type="vanished">面</translation>
-    </message>
-    <message>
-        <source>Dots</source>
-        <translation type="vanished">ドット</translation>
-    </message>
-    <message>
-        <source>Ignore Zero</source>
-        <translation type="vanished">ゼロを無視する</translation>
-    </message>
-    <message>
-        <source>Show Grid</source>
-        <translation type="vanished">グリッドの表示</translation>
-    </message>
-    <message>
-        <source>Frame Intervals</source>
-        <translation type="vanished">インターバル枠</translation>
-    </message>
-    <message>
-        <source>Legend</source>
-        <translation type="vanished">凡例</translation>
-    </message>
-    <message>
-        <source>Reset View</source>
-        <translation type="obsolete">表示のリセット</translation>
-    </message>
-    <message>
-        <source>Plot</source>
-        <translation type="obsolete">描画</translation>
     </message>
 </context>
 <context>
@@ -23067,10 +20979,6 @@ No rides found to import.
 <context>
     <name>NavigatorCellDelegate</name>
     <message>
-        <source>seconds</source>
-        <translation type="obsolete">秒</translation>
-    </message>
-    <message>
         <location filename="../../Gui/RideNavigator.cpp" line="1125"/>
         <source>Date</source>
         <translation type="unfinished">日付</translation>
@@ -23094,10 +21002,6 @@ No rides found to import.
         <location filename="../../Gui/RideNavigator.cpp" line="1134"/>
         <source>ddd MMM d, yyyy hh:mm</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>ddd MMM d, yyyy h:mm AP</source>
-        <translation type="obsolete">yyyy年MMMMd日 (ddd) h:mm</translation>
     </message>
 </context>
 <context>
@@ -23289,10 +21193,6 @@ No rides found to import.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Images (*.png *.jpg *.bmp</source>
-        <translation type="obsolete">画像フォーマット (*.png *.jpg *.bmp</translation>
-    </message>
-    <message>
         <location filename="../../Gui/NewCyclistDialog.cpp" line="368"/>
         <location filename="../../Gui/NewCyclistDialog.cpp" line="371"/>
         <location filename="../../Gui/NewCyclistDialog.cpp" line="374"/>
@@ -23387,74 +21287,80 @@ No rides found to import.
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Cloud/OAuthDialog.cpp" line="57"/>
+        <location filename="../../Cloud/OAuthDialog.cpp" line="58"/>
         <source>SSL Security Libraries required for &apos;Authorise&apos; are missing in this installation.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Cloud/OAuthDialog.cpp" line="58"/>
+        <location filename="../../Cloud/OAuthDialog.cpp" line="59"/>
         <source>Authorization Error</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Cloud/OAuthDialog.cpp" line="492"/>
+        <location filename="../../Cloud/OAuthDialog.cpp" line="511"/>
         <source>Withings authorization was successful.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Cloud/OAuthDialog.cpp" line="392"/>
-        <location filename="../../Cloud/OAuthDialog.cpp" line="401"/>
-        <location filename="../../Cloud/OAuthDialog.cpp" line="438"/>
-        <location filename="../../Cloud/OAuthDialog.cpp" line="447"/>
-        <location filename="../../Cloud/OAuthDialog.cpp" line="454"/>
-        <location filename="../../Cloud/OAuthDialog.cpp" line="461"/>
-        <location filename="../../Cloud/OAuthDialog.cpp" line="493"/>
-        <location filename="../../Cloud/OAuthDialog.cpp" line="501"/>
+        <location filename="../../Cloud/OAuthDialog.cpp" line="411"/>
+        <location filename="../../Cloud/OAuthDialog.cpp" line="420"/>
+        <location filename="../../Cloud/OAuthDialog.cpp" line="457"/>
+        <location filename="../../Cloud/OAuthDialog.cpp" line="466"/>
+        <location filename="../../Cloud/OAuthDialog.cpp" line="473"/>
+        <location filename="../../Cloud/OAuthDialog.cpp" line="480"/>
+        <location filename="../../Cloud/OAuthDialog.cpp" line="512"/>
+        <location filename="../../Cloud/OAuthDialog.cpp" line="520"/>
+        <location filename="../../Cloud/OAuthDialog.cpp" line="526"/>
         <source>Information</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Cloud/OAuthDialog.cpp" line="391"/>
+        <location filename="../../Cloud/OAuthDialog.cpp" line="410"/>
         <source>Dropbox authorization was successful.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Cloud/OAuthDialog.cpp" line="400"/>
+        <location filename="../../Cloud/OAuthDialog.cpp" line="419"/>
         <source>SportTracks authorization was successful.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Cloud/OAuthDialog.cpp" line="437"/>
+        <location filename="../../Cloud/OAuthDialog.cpp" line="456"/>
         <source>Polar Flow authorization was successful.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Cloud/OAuthDialog.cpp" line="446"/>
+        <location filename="../../Cloud/OAuthDialog.cpp" line="465"/>
         <source>Strava authorization was successful.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Cloud/OAuthDialog.cpp" line="453"/>
+        <location filename="../../Cloud/OAuthDialog.cpp" line="472"/>
         <source>Cycling Analytics authorization was successful.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Cloud/OAuthDialog.cpp" line="460"/>
+        <location filename="../../Cloud/OAuthDialog.cpp" line="479"/>
         <source>Today&apos;s Plan authorization was successful.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Cloud/OAuthDialog.cpp" line="500"/>
+        <location filename="../../Cloud/OAuthDialog.cpp" line="519"/>
         <source>Nolio authorization was successful.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Cloud/OAuthDialog.cpp" line="507"/>
+        <location filename="../../Cloud/OAuthDialog.cpp" line="525"/>
+        <source>Azum authorization was successful.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Cloud/OAuthDialog.cpp" line="533"/>
         <source>Error retrieving access token, %1 (%2)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Cloud/OAuthDialog.cpp" line="508"/>
+        <location filename="../../Cloud/OAuthDialog.cpp" line="534"/>
         <source>SSL Token Refresh Error</source>
         <translation type="unfinished"></translation>
     </message>
@@ -23748,54 +21654,6 @@ No rides found to import.
         <location filename="../../Charts/Overview.cpp" line="174"/>
         <source>We only support importing valid User Charts built for this view at present.</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Notes</source>
-        <translation type="obsolete">ノート</translation>
-    </message>
-    <message>
-        <source>Heartrate</source>
-        <translation type="obsolete">心拍数</translation>
-    </message>
-    <message>
-        <source>Cadence</source>
-        <translation type="obsolete">ケイデンス</translation>
-    </message>
-    <message>
-        <source>Work</source>
-        <translation type="obsolete">エネルギー</translation>
-    </message>
-    <message>
-        <source>hh:mm:ss</source>
-        <translation type="obsolete">hh:mm:ss</translation>
-    </message>
-    <message>
-        <source>Max Power</source>
-        <translation type="obsolete">最大出力</translation>
-    </message>
-    <message>
-        <source>Average Power</source>
-        <translation type="obsolete">平均出力</translation>
-    </message>
-    <message>
-        <source>Intervals</source>
-        <translation type="obsolete">インターバル</translation>
-    </message>
-    <message>
-        <source>Power</source>
-        <translation type="obsolete">出力</translation>
-    </message>
-    <message>
-        <source>Power Zones</source>
-        <translation type="obsolete">パワーゾーン</translation>
-    </message>
-    <message>
-        <source>Distance</source>
-        <translation type="obsolete">距離</translation>
-    </message>
-    <message>
-        <source>Speed</source>
-        <translation type="obsolete">速度</translation>
     </message>
 </context>
 <context>
@@ -25619,13 +23477,6 @@ Do you want to continue?</source>
     </message>
 </context>
 <context>
-    <name>PeakPower</name>
-    <message>
-        <source>watts</source>
-        <translation type="obsolete">ワット</translation>
-    </message>
-</context>
-<context>
     <name>PeakPower10m</name>
     <message>
         <location filename="../../Metrics/PeakPower.cpp" line="548"/>
@@ -26135,60 +23986,6 @@ Do you want to continue?</source>
     </message>
 </context>
 <context>
-    <name>PerfPlot</name>
-    <message>
-        <source>Performance Manager</source>
-        <translation type="obsolete">パフォーマンスマネージャ</translation>
-    </message>
-    <message>
-        <source>Daily</source>
-        <translation type="obsolete">デイリー</translation>
-    </message>
-    <message>
-        <source>Short Term Stress</source>
-        <translation type="obsolete">短期ストレス (STS)</translation>
-    </message>
-    <message>
-        <source>Long Term Stress</source>
-        <translation type="obsolete">長期ストレス (LTS)</translation>
-    </message>
-    <message>
-        <source>Stress Balance</source>
-        <translation type="obsolete">ストレスバランス</translation>
-    </message>
-</context>
-<context>
-    <name>PerformanceManagerWindow</name>
-    <message>
-        <source>Day:</source>
-        <translation type="obsolete">日:</translation>
-    </message>
-    <message>
-        <source>no data</source>
-        <translation type="obsolete">データなし</translation>
-    </message>
-    <message>
-        <source>Use BikeScore</source>
-        <translation type="obsolete">BikeScoreを使用</translation>
-    </message>
-    <message>
-        <source>Use DanielsPoints</source>
-        <translation type="obsolete">DanielsPointsを使用</translation>
-    </message>
-    <message>
-        <source>Use TRIMP</source>
-        <translation type="obsolete">TRIMPを使用</translation>
-    </message>
-    <message>
-        <source>to</source>
-        <translation type="obsolete">から</translation>
-    </message>
-    <message>
-        <source>MMM d yyyy</source>
-        <translation type="obsolete">yyyy年MMMMd日</translation>
-    </message>
-</context>
-<context>
     <name>Perspective</name>
     <message>
         <location filename="../../Gui/Perspective.cpp" line="91"/>
@@ -26500,10 +24297,6 @@ Do you want to continue?</source>
         <location filename="../../Charts/PfPvPlot.cpp" line="154"/>
         <source>Circumferential Pedal Velocity (m/s)</source>
         <translation type="unfinished">ペダル周速度 (m/s)</translation>
-    </message>
-    <message>
-        <source>no cadence</source>
-        <translation type="obsolete">ケイデンスなし</translation>
     </message>
 </context>
 <context>
@@ -26959,10 +24752,6 @@ on and that its display says, &quot;Host&quot;</source>
         <source>Save</source>
         <translation type="unfinished">保存</translation>
     </message>
-    <message>
-        <source>Auto</source>
-        <translation type="vanished">自動</translation>
-    </message>
 </context>
 <context>
     <name>PythonChart</name>
@@ -26992,10 +24781,6 @@ on and that its display says, &quot;Host&quot;</source>
 </context>
 <context>
     <name>QObject</name>
-    <message>
-        <source>Unknown ride metric &quot;%1&quot;.</source>
-        <translation type="obsolete">不明なライド基準 &quot;%1&quot;.</translation>
-    </message>
     <message>
         <location filename="../../FileIO/PwxRideFile.cpp" line="637"/>
         <source>Biking</source>
@@ -27111,10 +24896,6 @@ yyyy</source>
         <location filename="../../FileIO/KmlRideFile.cpp" line="301"/>
         <source>Bike %1</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Unknown</source>
-        <translation type="obsolete">不明</translation>
     </message>
     <message>
         <location filename="../../Core/Measures.cpp" line="161"/>
@@ -27403,88 +25184,64 @@ yyyy</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Charts/OverviewItems.cpp" line="4235"/>
+        <location filename="../../Charts/OverviewItems.cpp" line="4240"/>
         <source>Rest</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Charts/OverviewItems.cpp" line="4236"/>
+        <location filename="../../Charts/OverviewItems.cpp" line="4241"/>
         <source>Very, very easy</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Charts/OverviewItems.cpp" line="4237"/>
+        <location filename="../../Charts/OverviewItems.cpp" line="4242"/>
         <source>Easy</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Charts/OverviewItems.cpp" line="4238"/>
+        <location filename="../../Charts/OverviewItems.cpp" line="4243"/>
         <source>Moderate</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Charts/OverviewItems.cpp" line="4239"/>
+        <location filename="../../Charts/OverviewItems.cpp" line="4244"/>
         <source>Somewhat hard</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Charts/OverviewItems.cpp" line="4240"/>
+        <location filename="../../Charts/OverviewItems.cpp" line="4245"/>
         <source>Hard</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Charts/OverviewItems.cpp" line="4241"/>
+        <location filename="../../Charts/OverviewItems.cpp" line="4246"/>
         <source>Hard+</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Charts/OverviewItems.cpp" line="4242"/>
+        <location filename="../../Charts/OverviewItems.cpp" line="4247"/>
         <source>Very hard</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Charts/OverviewItems.cpp" line="4243"/>
+        <location filename="../../Charts/OverviewItems.cpp" line="4248"/>
         <source>Very hard+</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Charts/OverviewItems.cpp" line="4244"/>
+        <location filename="../../Charts/OverviewItems.cpp" line="4249"/>
         <source>Very hard++</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Charts/OverviewItems.cpp" line="4245"/>
+        <location filename="../../Charts/OverviewItems.cpp" line="4250"/>
         <source>Maximum</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Charts/OverviewItems.cpp" line="4270"/>
+        <location filename="../../Charts/OverviewItems.cpp" line="4275"/>
         <source>Invalid</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>1 </source>
-        <translation type="obsolete">3D {1 ?}</translation>
-    </message>
-    <message>
-        <source>3 </source>
-        <translation type="obsolete">3D {3 ?}</translation>
-    </message>
-    <message>
-        <source>4 </source>
-        <translation type="obsolete">3D {4 ?}</translation>
-    </message>
-    <message>
-        <source>6 </source>
-        <translation type="obsolete">3D {6 ?}</translation>
-    </message>
-    <message>
-        <source>8 </source>
-        <translation type="obsolete">3D {8 ?}</translation>
-    </message>
-    <message>
-        <source>9 </source>
-        <translation type="obsolete">3D {9 ?}</translation>
     </message>
     <message>
         <location filename="../../FileIO/TcxParser.cpp" line="409"/>
@@ -27558,17 +25315,6 @@ Python disabled in preferences.</source>
         <location filename="../../Gui/AthleteView.cpp" line="12"/>
         <source>Athlete Card</source>
         <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>QxtScheduleViewProxy</name>
-    <message>
-        <source>Date</source>
-        <translation type="obsolete">日付</translation>
-    </message>
-    <message>
-        <source>Filename</source>
-        <translation type="obsolete">ファイル名</translation>
     </message>
 </context>
 <context>
@@ -28008,109 +25754,6 @@ Python disabled in preferences.</source>
     </message>
 </context>
 <context>
-    <name>RealtimeWindow</name>
-    <message>
-        <source>Save</source>
-        <translation type="obsolete">保存</translation>
-    </message>
-    <message>
-        <source>Start</source>
-        <translation type="obsolete">開始</translation>
-    </message>
-    <message>
-        <source>Pause</source>
-        <translation type="obsolete">一時停止</translation>
-    </message>
-    <message>
-        <source>Stop</source>
-        <translation type="obsolete">停止</translation>
-    </message>
-    <message>
-        <source>WATTS</source>
-        <translation type="obsolete">出力 (ワット)</translation>
-    </message>
-    <message>
-        <source>BPM</source>
-        <translation type="obsolete">心拍数 (BPM)</translation>
-    </message>
-    <message>
-        <source>KPH</source>
-        <translation type="obsolete">速度 (km/h)</translation>
-    </message>
-    <message>
-        <source>RPM</source>
-        <translation type="obsolete">ケイデンス (RPM)</translation>
-    </message>
-    <message>
-        <source>Lap/Interval</source>
-        <translation type="obsolete">ラップ</translation>
-    </message>
-    <message>
-        <source>Load WATTS</source>
-        <translation type="obsolete">負荷ワット</translation>
-    </message>
-    <message>
-        <source>Distance (KM)</source>
-        <translation type="obsolete">距離 (km)</translation>
-    </message>
-    <message>
-        <source>Avg WATTS</source>
-        <translation type="obsolete">平均出力 (ワット)</translation>
-    </message>
-    <message>
-        <source>Avg BPM</source>
-        <translation type="obsolete">平均心拍数 (BPM)</translation>
-    </message>
-    <message>
-        <source>Avg KPH</source>
-        <translation type="obsolete">平均速度 (km/h)</translation>
-    </message>
-    <message>
-        <source>Distance (Miles)</source>
-        <translation type="obsolete">距離 (マイル)</translation>
-    </message>
-    <message>
-        <source>MPH</source>
-        <translation type="obsolete">m/h</translation>
-    </message>
-    <message>
-        <source>Avg MPH</source>
-        <translation type="obsolete">平均時速 (m/h)</translation>
-    </message>
-    <message>
-        <source>Avg RPM</source>
-        <translation type="obsolete">平均ケイデンス (RPM)</translation>
-    </message>
-    <message>
-        <source>Avg Load WATTS</source>
-        <translation type="obsolete">平均負荷 (ワット)</translation>
-    </message>
-    <message>
-        <source>LAP TIME</source>
-        <translation type="obsolete">ラップ時間</translation>
-    </message>
-    <message>
-        <source>TIME</source>
-        <translation type="obsolete">時間</translation>
-    </message>
-    <message>
-        <source>Un-Pause</source>
-        <translation type="obsolete">再開</translation>
-    </message>
-    <message>
-        <source>No Devices Configured</source>
-        <translation type="obsolete">デバイスが設定されていません</translation>
-    </message>
-    <message>
-        <source>Gradient PERCENT</source>
-        <translation type="obsolete">勾配</translation>
-    </message>
-    <message>
-        <source>Avg Gradient PERCENT</source>
-        <translation type="obsolete">平均勾配</translation>
-    </message>
-</context>
-<context>
     <name>ReferenceLineDialog</name>
     <message>
         <location filename="../../Charts/ReferenceLineDialog.cpp" line="29"/>
@@ -28364,22 +26007,22 @@ Python disabled in preferences.</source>
 <context>
     <name>RideCache</name>
     <message>
-        <location filename="../../Core/RideCache.cpp" line="379"/>
+        <location filename="../../Core/RideCache.cpp" line="392"/>
         <source>Can&apos;t rename %1 to %2 in %3</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/RideCache.cpp" line="437"/>
+        <location filename="../../Core/RideCache.cpp" line="458"/>
         <source>Problem Saving Ride Cache</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/RideCache.cpp" line="438"/>
+        <location filename="../../Core/RideCache.cpp" line="459"/>
         <source>File: %1 cannot be opened for &apos;Writing&apos;. Please check file properties.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Core/RideCache.cpp" line="669"/>
+        <location filename="../../Core/RideCache.cpp" line="690"/>
         <source>seconds</source>
         <translation type="unfinished">秒</translation>
     </message>
@@ -28419,13 +26062,6 @@ Python disabled in preferences.</source>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="49"/>
         <source>Activity Date</source>
         <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>RideDelegate</name>
-    <message>
-        <source>dd MMM yyyy</source>
-        <translation type="vanished">yyyy年MMMMd日</translation>
     </message>
 </context>
 <context>
@@ -28684,40 +26320,6 @@ Do you want to continue?</source>
         <location filename="../../Charts/RideEditor.cpp" line="1608"/>
         <source>Basic Data</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Invalid recording gap</source>
-        <translatorcomment>微妙</translatorcomment>
-        <translation type="obsolete">無効な記録内のずれ</translation>
-    </message>
-    <message>
-        <source>Distance goes backwards.</source>
-        <translatorcomment>びみょう</translatorcomment>
-        <translation type="obsolete">距離が逆になっています。</translation>
-    </message>
-    <message>
-        <source>Suspiciously high cadence</source>
-        <translation type="obsolete">高すぎるケイデンス値</translation>
-    </message>
-    <message>
-        <source>Suspiciously high heartrate</source>
-        <translation type="obsolete">高すぎる心拍数</translation>
-    </message>
-    <message>
-        <source>Suspiciously high speed</source>
-        <translation type="obsolete">Suspiciously high speed</translation>
-    </message>
-    <message>
-        <source>Out of bounds value</source>
-        <translation type="obsolete">範囲外の値</translation>
-    </message>
-    <message>
-        <source>Non-zero torque but zero cadence</source>
-        <translation type="obsolete">ケイデンスゼロでトルク値がゼロ以外</translation>
-    </message>
-    <message>
-        <source>Data spike candidate</source>
-        <translation type="obsolete">データスパイク候補</translation>
     </message>
     <message>
         <location filename="../../Charts/RideEditor.cpp" line="759"/>
@@ -29317,18 +26919,6 @@ Do you want to continue?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Invalid Ride File Name</source>
-        <translation type="obsolete">無効なライドファイル名</translation>
-    </message>
-    <message>
-        <source>Invalid date/time in filename:
-%1
-Skipping file...</source>
-        <translation type="obsolete">ファイル名に無効な日時が含まれています。
-%1
-スキップします...</translation>
-    </message>
-    <message>
         <location filename="../../FileIO/RideFile.cpp" line="2386"/>
         <source>Wheelsize</source>
         <translation type="unfinished"></translation>
@@ -29685,14 +27275,6 @@ Skipping file...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Overwrite Existing Files</source>
-        <translation type="obsolete">既存のファイルを上書きする</translation>
-    </message>
-    <message>
-        <source>Import Ride Files</source>
-        <translation type="obsolete">ライドファイルの取り込み</translation>
-    </message>
-    <message>
         <location filename="../../Gui/RideImportWizard.cpp" line="298"/>
         <source>Filename</source>
         <translation>ファイル名</translation>
@@ -29758,10 +27340,6 @@ Skipping file...</source>
         <translation>エラー - 不明なファイルタイプ</translation>
     </message>
     <message>
-        <source>Error - Not a valid file</source>
-        <translation type="vanished">エラー - 無効なファイル</translation>
-    </message>
-    <message>
         <location filename="../../Gui/RideImportWizard.cpp" line="538"/>
         <source>Step 2 of 4: Validating Files</source>
         <translation>手順2/4 ファイルの検証</translation>
@@ -29807,10 +27385,6 @@ Skipping file...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>dd MMM yyyy</source>
-        <translation type="vanished">yyyy年MMMMd日</translation>
-    </message>
-    <message>
         <location filename="../../Gui/RideImportWizard.cpp" line="789"/>
         <source>No files for automatic import selected.</source>
         <translation type="unfinished"></translation>
@@ -29851,32 +27425,24 @@ Skipping file...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/RideImportWizard.cpp" line="1115"/>
+        <location filename="../../Gui/RideImportWizard.cpp" line="1118"/>
         <source>Error - Moving %1 to activities folder</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/RideImportWizard.cpp" line="1119"/>
+        <location filename="../../Gui/RideImportWizard.cpp" line="1122"/>
         <source>Error - .JSON creation failed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/RideImportWizard.cpp" line="1122"/>
+        <location filename="../../Gui/RideImportWizard.cpp" line="1125"/>
         <source>Error - Import of activitiy file failed</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>hh:mm:ss ap</source>
-        <translation type="obsolete">hh:mm:ss ap</translation>
     </message>
     <message>
         <location filename="../../Gui/RideImportWizard.cpp" line="712"/>
         <source>Error - </source>
         <translation>エラー - </translation>
-    </message>
-    <message>
-        <source> </source>
-        <translation type="vanished"> </translation>
     </message>
     <message>
         <location filename="../../Gui/RideImportWizard.cpp" line="102"/>
@@ -29934,30 +27500,14 @@ Skipping file...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Step 3 of 4: Confirm Date and Time</source>
-        <translation type="vanished">手順3/4 日付と時間を確認</translation>
-    </message>
-    <message>
         <location filename="../../Gui/RideImportWizard.cpp" line="758"/>
         <source>Save</source>
         <translation>保存</translation>
     </message>
     <message>
-        <source>hh:mm:ss</source>
-        <translation type="obsolete">hh:mm:ss</translation>
-    </message>
-    <message>
         <location filename="../../Gui/RideImportWizard.cpp" line="887"/>
         <source>Invalid Selection</source>
         <translation>無効な選択</translation>
-    </message>
-    <message>
-        <source>More than 24hrs of rides to fit into a day</source>
-        <translation type="obsolete">1日に24時間以上のライドが指定されています</translation>
-    </message>
-    <message>
-        <source>hh:mm:ss a</source>
-        <translation type="obsolete">hh:mm:ss a</translation>
     </message>
     <message>
         <location filename="../../Gui/RideImportWizard.cpp" line="986"/>
@@ -29970,58 +27520,14 @@ Skipping file...</source>
         <translation>保存中...</translation>
     </message>
     <message>
-        <source>Error - Source is Target</source>
-        <translation type="obsolete">エラー - 保存元と保存先が同一です</translation>
-    </message>
-    <message>
-        <source>Overwriting file...</source>
-        <translation type="obsolete">ファイルを上書き中...</translation>
-    </message>
-    <message>
-        <source>/</source>
-        <translation type="obsolete">/</translation>
-    </message>
-    <message>
-        <source>.tmp</source>
-        <translation type="obsolete">.tmp</translation>
-    </message>
-    <message>
-        <source>File Overwritten</source>
-        <translation type="obsolete">ファイルは上書きされました</translation>
-    </message>
-    <message>
-        <source>Error - overwrite failed</source>
-        <translation type="obsolete">エラー - 上書き失敗</translation>
-    </message>
-    <message>
-        <source>Error - File exists</source>
-        <translation type="obsolete">エラー - ファイルが存在します</translation>
-    </message>
-    <message>
-        <location filename="../../Gui/RideImportWizard.cpp" line="1095"/>
+        <location filename="../../Gui/RideImportWizard.cpp" line="1098"/>
         <source>Saving file...</source>
         <translation>ファイルを保存中...</translation>
     </message>
     <message>
-        <location filename="../../Gui/RideImportWizard.cpp" line="1111"/>
+        <location filename="../../Gui/RideImportWizard.cpp" line="1114"/>
         <source>File Saved</source>
         <translation>保存されました</translation>
-    </message>
-    <message>
-        <source>Error - copy failed</source>
-        <translation type="obsolete">エラー - コピー失敗</translation>
-    </message>
-    <message>
-        <source>Step 5 of 5: Calculating Critical Powers</source>
-        <translation type="obsolete">手順5/5 クリティカルパワーを計算中</translation>
-    </message>
-    <message>
-        <source>Calculating...</source>
-        <translation type="obsolete">計算中...</translation>
-    </message>
-    <message>
-        <source>Completed.</source>
-        <translation type="obsolete">完了。</translation>
     </message>
     <message>
         <location filename="../../Gui/RideImportWizard.cpp" line="1145"/>
@@ -30356,61 +27862,6 @@ Skipping file...</source>
     </message>
 </context>
 <context>
-    <name>RideSummaryWindow</name>
-    <message>
-        <source>&lt;p&gt;Couldn&apos;t read file &quot;</source>
-        <translation type="vanished">&lt;p&gt;ファイルを読み込めませんでした &quot;</translation>
-    </message>
-    <message>
-        <source>dddd MMMM d, yyyy, h:mm AP</source>
-        <translation type="obsolete">yyyy年MMMMd日 (ddd) h:mm</translation>
-    </message>
-    <message>
-        <source>Device Type: </source>
-        <translation type="vanished">デバイスタイプ: </translation>
-    </message>
-    <message>
-        <source>watts</source>
-        <translation type="obsolete">ワット</translation>
-    </message>
-    <message>
-        <source>dd MMM yyyy</source>
-        <translation type="obsolete">yyyy年MMMMd日</translation>
-    </message>
-    <message>
-        <source>Metrics</source>
-        <translation type="obsolete">統計</translation>
-    </message>
-    <message>
-        <source>seconds</source>
-        <translation type="obsolete">秒</translation>
-    </message>
-    <message>
-        <source>&lt;h3&gt;Power Zones&lt;/h3&gt;</source>
-        <translation type="obsolete">&lt;h2&gt;パワーゾーン&lt;/h2&gt; {3&gt;?} {3&gt;?}</translation>
-    </message>
-    <message>
-        <source>^Average </source>
-        <translation type="obsolete">^平均 </translation>
-    </message>
-    <message>
-        <source>&lt;h2&gt;Hr Zones&lt;/h2&gt;</source>
-        <translation type="obsolete">&lt;h2&gt;心拍ゾーン&lt;/h2&gt;</translation>
-    </message>
-    <message>
-        <source>Intervals</source>
-        <translation type="vanished">インターバル</translation>
-    </message>
-    <message>
-        <source>&lt;p&gt;&lt;h2&gt;Errors reading file:&lt;/h2&gt;&lt;ul&gt;</source>
-        <translation type="vanished">&lt;p&gt;&lt;h2&gt;読み込みファイルのエラー:&lt;/h2&gt;&lt;ul&gt;</translation>
-    </message>
-    <message>
-        <source>&lt;h2&gt;Power Zones&lt;/h2&gt;</source>
-        <translation type="obsolete">&lt;h2&gt;パワーゾーン&lt;/h2&gt;</translation>
-    </message>
-</context>
-<context>
     <name>RideWithGPS</name>
     <message>
         <location filename="../../Cloud/RideWithGPS.cpp" line="92"/>
@@ -30436,122 +27887,6 @@ Skipping file...</source>
         <location filename="../../Cloud/RideWithGPS.h" line="35"/>
         <source>Upload rides and analyse them using Google Maps.</source>
         <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>RideWithGPSDialog</name>
-    <message>
-        <source>&amp;Cancel</source>
-        <translation type="obsolete">キャンセル(&amp;C)</translation>
-    </message>
-    <message>
-        <source>OK</source>
-        <translation type="obsolete">OK</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation type="obsolete">キャンセル</translation>
-    </message>
-</context>
-<context>
-    <name>RideWithGpsUploader</name>
-    <message>
-        <source>OK</source>
-        <translation type="obsolete">OK</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation type="obsolete">キャンセル</translation>
-    </message>
-</context>
-<context>
-    <name>RiderPage</name>
-    <message>
-        <source>Nickname</source>
-        <translation type="vanished">ニックネーム</translation>
-    </message>
-    <message>
-        <source>Date of Birth</source>
-        <translation type="vanished">誕生日</translation>
-    </message>
-    <message>
-        <source>Gender</source>
-        <translation type="obsolete">性別</translation>
-    </message>
-    <message>
-        <source>Bio</source>
-        <translation type="vanished">Bio</translation>
-    </message>
-    <message>
-        <source>Weight (%1)</source>
-        <translation type="vanished">体重 (%1)</translation>
-    </message>
-    <message>
-        <source>kg</source>
-        <translation type="vanished">kg</translation>
-    </message>
-    <message>
-        <source>lb</source>
-        <translation type="vanished">lb</translation>
-    </message>
-    <message>
-        <source>Male</source>
-        <translation type="vanished">男性</translation>
-    </message>
-    <message>
-        <source>Female</source>
-        <translation type="vanished">女性</translation>
-    </message>
-    <message>
-        <source>Imperial</source>
-        <translation type="obsolete">ヤード・ポンド</translation>
-    </message>
-    <message>
-        <source>Choose Picture</source>
-        <translation type="vanished">写真の選択</translation>
-    </message>
-    <message>
-        <source>Images (*.png *.jpg *.bmp</source>
-        <translation type="obsolete">画像フォーマット (*.png *.jpg *.bmp</translation>
-    </message>
-</context>
-<context>
-    <name>RiderPhysPage</name>
-    <message>
-        <source>Weight (%1)</source>
-        <translation type="obsolete">体重 (%1)</translation>
-    </message>
-    <message>
-        <source>kg</source>
-        <translation type="obsolete">kg</translation>
-    </message>
-    <message>
-        <source>lb</source>
-        <translation type="obsolete">lb</translation>
-    </message>
-    <message>
-        <source>STS average (days)</source>
-        <translation type="obsolete">短期ストレス平均に用いる日数</translation>
-    </message>
-    <message>
-        <source>LTS average (days)</source>
-        <translation type="obsolete">長期ストレス平均に用いる日数</translation>
-    </message>
-    <message>
-        <source>From Date</source>
-        <translation type="obsolete">開始日</translation>
-    </message>
-    <message>
-        <source>Add</source>
-        <translation type="obsolete">追加</translation>
-    </message>
-    <message>
-        <source>Delete</source>
-        <translation type="obsolete">削除</translation>
-    </message>
-    <message>
-        <source>Time</source>
-        <translation type="obsolete">時間</translation>
     </message>
 </context>
 <context>
@@ -30583,21 +27918,6 @@ Skipping file...</source>
         <location filename="../../Charts/OverviewItems.h" line="502"/>
         <source>Route</source>
         <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>RouteSegment</name>
-    <message>
-        <source>Invalid Ride File Name</source>
-        <translation type="obsolete">無効なライドファイル名</translation>
-    </message>
-    <message>
-        <source>Invalid date/time in filename:
-%1
-Skipping file...</source>
-        <translation type="obsolete">ファイル名に無効な日時が含まれています。
-%1
-スキップします...</translation>
     </message>
 </context>
 <context>
@@ -30702,14 +28022,6 @@ You have made changes to </source>
         <location filename="../../Gui/SaveDialogs.cpp" line="232"/>
         <source>Save and Conversion</source>
         <translation>保存と変換</translation>
-    </message>
-    <message>
-        <source> If you want to save
-them, we need to convert the ride to GoldenCheetah&apos;s
-native format. Should we do so?
-</source>
-        <translation type="obsolete">ファイルに変更が加えられましたが保存されていません。
-保存するにはGoldenCheetah独自のフォーマットに変換する必要がありますがどうしますか?</translation>
     </message>
     <message>
         <location filename="../../Gui/SaveDialogs.cpp" line="236"/>
@@ -31267,10 +28579,6 @@ native format. Should we do so?
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>00:00:00</source>
-        <translation type="obsolete">3D {00:00:00?}</translation>
-    </message>
-    <message>
         <location filename="../../Charts/ScatterWindow.cpp" line="109"/>
         <location filename="../../Charts/ScatterWindow.cpp" line="179"/>
         <source>Ignore Zero</source>
@@ -31298,10 +28606,6 @@ native format. Should we do so?
         <location filename="../../Gui/AthletePages.cpp" line="976"/>
         <source>Add</source>
         <translation type="unfinished">追加</translation>
-    </message>
-    <message>
-        <source>Rename</source>
-        <translation type="obsolete">リネーム</translation>
     </message>
     <message>
         <location filename="../../Gui/AthletePages.cpp" line="977"/>
@@ -31520,14 +28824,6 @@ native format. Should we do so?
 <context>
     <name>SeasonsPage</name>
     <message>
-        <source>Move up</source>
-        <translation type="obsolete">上へ</translation>
-    </message>
-    <message>
-        <source>Move down</source>
-        <translation type="obsolete">下へ</translation>
-    </message>
-    <message>
         <location filename="../../Gui/AthletePages.cpp" line="3247"/>
         <source>Add</source>
         <translation type="unfinished">追加</translation>
@@ -31588,17 +28884,6 @@ native format. Should we do so?
         <location filename="../../Gui/AthletePages.cpp" line="3264"/>
         <source>To</source>
         <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>SelfLoopsUploader</name>
-    <message>
-        <source>OK</source>
-        <translation type="obsolete">OK</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation type="obsolete">キャンセル</translation>
     </message>
 </context>
 <context>
@@ -31665,33 +28950,6 @@ native format. Should we do so?
         <location filename="../../FileIO/RideFileCommand.cpp" line="631"/>
         <source>Set XData point value</source>
         <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>ShareDialog</name>
-    <message>
-        <source>Altitude</source>
-        <translation type="obsolete">標高</translation>
-    </message>
-    <message>
-        <source>Power</source>
-        <translation type="obsolete">出力</translation>
-    </message>
-    <message>
-        <source>Cadence</source>
-        <translation type="obsolete">ケイデンス</translation>
-    </message>
-    <message>
-        <source>Heartrate</source>
-        <translation type="obsolete">心拍数</translation>
-    </message>
-    <message>
-        <source>OK</source>
-        <translation type="obsolete">OK</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation type="obsolete">キャンセル</translation>
     </message>
 </context>
 <context>
@@ -32321,17 +29579,9 @@ Power&apos; option in the training preferences tab.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Notes</source>
-        <translation type="obsolete">ノート</translation>
-    </message>
-    <message>
         <location filename="../../Metrics/SpecialFields.cpp" line="30"/>
         <source>Recording Interval</source>
         <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Torque Adjust</source>
-        <translation type="obsolete">トルク調整</translation>
     </message>
     <message>
         <location filename="../../Metrics/SpecialFields.cpp" line="37"/>
@@ -32399,10 +29649,6 @@ Power&apos; option in the training preferences tab.</source>
 </context>
 <context>
     <name>SplitActivityWizard</name>
-    <message>
-        <source>Split Ride</source>
-        <translation type="obsolete">ライドを分割</translation>
-    </message>
     <message>
         <location filename="../../Gui/SplitActivityWizard.cpp" line="46"/>
         <source>Split Activity</source>
@@ -32483,10 +29729,6 @@ Power&apos; option in the training preferences tab.</source>
         <location filename="../../Gui/SplitActivityWizard.cpp" line="374"/>
         <source>dd MMM yyyy</source>
         <translation type="unfinished">yyyy年MMMMd日</translation>
-    </message>
-    <message>
-        <source>hh:mm:ss ap</source>
-        <translation type="obsolete">hh:mm:ss ap</translation>
     </message>
     <message>
         <location filename="../../Gui/SplitActivityWizard.cpp" line="352"/>
@@ -32604,29 +29846,6 @@ In addition, you can set a minimum segment size. Any segment smaller than this l
     </message>
 </context>
 <context>
-    <name>SplitRideDialog</name>
-    <message>
-        <source>Split at the following positions:</source>
-        <translation type="obsolete">以下のポジションで分割する:</translation>
-    </message>
-    <message>
-        <source>&amp;OK</source>
-        <translation type="obsolete">OK(&amp;O)</translation>
-    </message>
-    <message>
-        <source>&amp;Cancel</source>
-        <translation type="obsolete">キャンセル(&amp;C)</translation>
-    </message>
-    <message>
-        <source>Split Ride</source>
-        <translation type="obsolete">ライドを分割</translation>
-    </message>
-    <message>
-        <source>The file %1 already exists and will not be overwritten</source>
-        <translation type="obsolete">ファイル %1 が既に存在するので上書きは行われません</translation>
-    </message>
-</context>
-<context>
     <name>SplitSelect</name>
     <message>
         <location filename="../../Gui/SplitActivityWizard.cpp" line="592"/>
@@ -32641,10 +29860,6 @@ In addition, you can set a minimum segment size. Any segment smaller than this l
 </context>
 <context>
     <name>SplitWelcome</name>
-    <message>
-        <source>Split Ride</source>
-        <translation type="obsolete">ライドを分割</translation>
-    </message>
     <message>
         <location filename="../../Gui/SplitActivityWizard.cpp" line="455"/>
         <source>Split Activity</source>
@@ -32936,114 +30151,6 @@ If the newly created activity clashes with an existing activity (same date and t
     </message>
 </context>
 <context>
-    <name>StravaDialog</name>
-    <message>
-        <source>Altitude</source>
-        <translation type="obsolete">標高</translation>
-    </message>
-    <message>
-        <source>Power</source>
-        <translation type="obsolete">出力</translation>
-    </message>
-    <message>
-        <source>Cadence</source>
-        <translation type="obsolete">ケイデンス</translation>
-    </message>
-    <message>
-        <source>Heartrate</source>
-        <translation type="obsolete">心拍数</translation>
-    </message>
-    <message>
-        <source>&amp;Cancel</source>
-        <translation type="obsolete">キャンセル(&amp;C)</translation>
-    </message>
-    <message>
-        <source>OK</source>
-        <translation type="obsolete">OK</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation type="obsolete">キャンセル</translation>
-    </message>
-    <message>
-        <source>Golden Cheetah-&gt;Preferences</source>
-        <translation type="obsolete">Golden Cheetah-&gt;設定</translation>
-    </message>
-    <message>
-        <source>Tools-&gt;Options</source>
-        <translation type="obsolete">ツール-&gt;オプション</translation>
-    </message>
-</context>
-<context>
-    <name>StravaDownloadDialog</name>
-    <message>
-        <source>&amp;Cancel</source>
-        <translation type="obsolete">キャンセル(&amp;C)</translation>
-    </message>
-    <message>
-        <source>Failed to create temporary file </source>
-        <translation type="obsolete">一時ファイルの作成に失敗しました </translation>
-    </message>
-    <message>
-        <source>Golden Cheetah-&gt;Preferences</source>
-        <translation type="obsolete">Golden Cheetah-&gt;設定</translation>
-    </message>
-    <message>
-        <source>Tools-&gt;Options</source>
-        <translation type="obsolete">ツール-&gt;オプション</translation>
-    </message>
-</context>
-<context>
-    <name>StravaUploadDialog</name>
-    <message>
-        <source>Altitude</source>
-        <translation type="obsolete">標高</translation>
-    </message>
-    <message>
-        <source>Power</source>
-        <translation type="obsolete">出力</translation>
-    </message>
-    <message>
-        <source>Cadence</source>
-        <translation type="obsolete">ケイデンス</translation>
-    </message>
-    <message>
-        <source>Heartrate</source>
-        <translation type="obsolete">心拍数</translation>
-    </message>
-    <message>
-        <source>&amp;Cancel</source>
-        <translation type="obsolete">キャンセル(&amp;C)</translation>
-    </message>
-    <message>
-        <source>OK</source>
-        <translation type="obsolete">OK</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation type="obsolete">キャンセル</translation>
-    </message>
-    <message>
-        <source>Golden Cheetah-&gt;Preferences</source>
-        <translation type="obsolete">Golden Cheetah-&gt;設定</translation>
-    </message>
-    <message>
-        <source>Tools-&gt;Options</source>
-        <translation type="obsolete">ツール-&gt;オプション</translation>
-    </message>
-</context>
-<context>
-    <name>StravaUploader</name>
-    <message>
-        <source>OK</source>
-        <translation type="obsolete">OK</translation>
-    </message>
-    <message>
-        <source>Cancel</source>
-        <translation type="obsolete">キャンセル</translation>
-    </message>
-</context>
-<context>
     <name>StrokeRate</name>
     <message>
         <location filename="../../Metrics/SwimMetrics.cpp" line="274"/>
@@ -33079,39 +30186,6 @@ If the newly created activity clashes with an existing activity (same date and t
         <location filename="../../Metrics/SwimMetrics.cpp" line="346"/>
         <source>Strokes per length, counting the arm using the watch, Pool Length defaults to 50m for open water swims</source>
         <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>SummaryMetrics</name>
-    <message>
-        <source>seconds</source>
-        <translation type="obsolete">秒</translation>
-    </message>
-</context>
-<context>
-    <name>SummaryMetricsPage</name>
-    <message>
-        <source>Available Metrics</source>
-        <translation type="obsolete">使用可能な統計</translation>
-    </message>
-    <message>
-        <source>Selected Metrics</source>
-        <translation type="obsolete">選択された統計</translation>
-    </message>
-    <message>
-        <source>&amp;#8482;</source>
-        <translation type="obsolete">&amp;#8482;</translation>
-    </message>
-    <message>
-        <source> (TM)</source>
-        <translation type="obsolete"> (TM)</translation>
-    </message>
-</context>
-<context>
-    <name>SummaryWindow</name>
-    <message>
-        <source>dddd MMMM d, yyyy, h:mm AP</source>
-        <translation type="obsolete">yyyy年MMMMd日 (ddd) h:mm</translation>
     </message>
 </context>
 <context>
@@ -33221,24 +30295,6 @@ If the newly created activity clashes with an existing activity (same date and t
     </message>
 </context>
 <context>
-    <name>TPDownloadDialog</name>
-    <message>
-        <source>Close</source>
-        <translation type="obsolete">閉じる</translation>
-    </message>
-</context>
-<context>
-    <name>TPUploadDialog</name>
-    <message>
-        <source>Abort</source>
-        <translation type="obsolete">中止</translation>
-    </message>
-    <message>
-        <source>Close</source>
-        <translation type="obsolete">閉じる</translation>
-    </message>
-</context>
-<context>
     <name>TPace</name>
     <message>
         <location filename="../../Metrics/VDOT.cpp" line="108"/>
@@ -33328,10 +30384,6 @@ If the newly created activity clashes with an existing activity (same date and t
 </context>
 <context>
     <name>Themes</name>
-    <message>
-        <source>Default</source>
-        <translation type="obsolete">デフォルト</translation>
-    </message>
     <message>
         <location filename="../../Gui/Colors.cpp" line="752"/>
         <source>Modern Dark</source>
@@ -33428,10 +30480,6 @@ If the newly created activity clashes with an existing activity (same date and t
 </context>
 <context>
     <name>TimeRiding</name>
-    <message>
-        <source>Time Riding</source>
-        <translation type="obsolete">走行時間</translation>
-    </message>
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="276"/>
         <source>Time Moving</source>
@@ -33676,45 +30724,6 @@ If the newly created activity clashes with an existing activity (same date and t
         <location filename="../../Train/TodaysPlanWorkoutDownload.cpp" line="334"/>
         <source>You must authorise with Today&apos;s Plan first</source>
         <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>ToolsDialog</name>
-    <message>
-        <source>Critical Power Calculator</source>
-        <translation type="obsolete">CP計算機</translation>
-    </message>
-    <message>
-        <source>Your best short effort (3-5 min):</source>
-        <translation type="vanished">短時間のベストエフォート (3-5分):</translation>
-    </message>
-    <message>
-        <source>Your best long effort (15-60 min):</source>
-        <translation type="vanished">長時間のベストエフォート (15-60分):</translation>
-    </message>
-    <message>
-        <source>Your critical power:</source>
-        <translation type="vanished">あなたのクリティカルパワー:</translation>
-    </message>
-    <message>
-        <source>km</source>
-        <translation type="obsolete">キロメートル</translation>
-    </message>
-    <message>
-        <source>mi</source>
-        <translation type="obsolete">mi</translation>
-    </message>
-    <message>
-        <source>m</source>
-        <translation type="obsolete">m</translation>
-    </message>
-    <message>
-        <source>Calculate CP</source>
-        <translation type="obsolete">クリティカルパワーを計算</translation>
-    </message>
-    <message>
-        <source>Done</source>
-        <translation type="vanished">終了</translation>
     </message>
 </context>
 <context>
@@ -34379,10 +31388,6 @@ Press F3 on Controller when done.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Done</source>
-        <translation type="obsolete">終了</translation>
-    </message>
-    <message>
         <location filename="../../Train/TrainSidebar.cpp" line="2965"/>
         <location filename="../../Train/TrainSidebar.cpp" line="2983"/>
         <source>Add Device</source>
@@ -34398,51 +31403,6 @@ Press F3 on Controller when done.</source>
         <location filename="../../Train/TrainSidebar.cpp" line="3011"/>
         <source>Are you sure you want to delete this device?</source>
         <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>TrainTabs</name>
-    <message>
-        <source>Solo Ride</source>
-        <translation type="obsolete">ソロライド</translation>
-    </message>
-</context>
-<context>
-    <name>TrainTool</name>
-    <message>
-        <source>Devices</source>
-        <translation type="obsolete">デバイス</translation>
-    </message>
-    <message>
-        <source>Workout Library</source>
-        <translation type="obsolete">ワークアウトライブラリ</translation>
-    </message>
-    <message>
-        <source>Manual Ergo Mode</source>
-        <translation type="obsolete">手動エルゴモード</translation>
-    </message>
-    <message>
-        <source>Manual Slope  Mode</source>
-        <translation type="obsolete">手動スロープモード</translation>
-    </message>
-    <message>
-        <source>No Devices Configured</source>
-        <translation type="obsolete">デバイスが設定されていません</translation>
-    </message>
-    <message>
-        <source>Done</source>
-        <translation type="obsolete">終了</translation>
-    </message>
-    <message>
-        <source>Delete</source>
-        <translation type="obsolete">削除</translation>
-    </message>
-</context>
-<context>
-    <name>TrainingStageBuch</name>
-    <message>
-        <source>Completed.</source>
-        <translation type="obsolete">完了。</translation>
     </message>
 </context>
 <context>
@@ -34552,179 +31512,6 @@ Press F3 on Controller when done.</source>
         <location filename="../../Metrics/SwimScore.cpp" line="397"/>
         <source>TriScore combined stress metric based on Dr. Skiba stress metrics, defined as BikeScore for cycling, GOVSS for running and SwimScore for swimming. On zero fallback to TRIMP Zonal Points for HR based score.</source>
         <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>TtbDialog</name>
-    <message>
-        <source>&amp;Cancel</source>
-        <translation type="obsolete">キャンセル(&amp;C)</translation>
-    </message>
-</context>
-<context>
-    <name>TwitterDialog</name>
-    <message>
-        <source>Choose which metrics you wish to tweet: </source>
-        <translation type="vanished">Twitterに送信する項目を選んでください: </translation>
-    </message>
-    <message>
-        <source>Workout Time</source>
-        <translation type="vanished">ワークアウト時間</translation>
-    </message>
-    <message>
-        <source>Time Riding</source>
-        <translation type="obsolete">走行時間</translation>
-    </message>
-    <message>
-        <source>Total Distance</source>
-        <translation type="vanished">総走行距離</translation>
-    </message>
-    <message>
-        <source>Elevation Gain</source>
-        <translation type="vanished">獲得標高</translation>
-    </message>
-    <message>
-        <source>Total Work (kJ)</source>
-        <translation type="vanished">総エネルギー (kJ)</translation>
-    </message>
-    <message>
-        <source>Average Speed</source>
-        <translation type="vanished">平均速度</translation>
-    </message>
-    <message>
-        <source>Average Power</source>
-        <translation type="vanished">平均出力</translation>
-    </message>
-    <message>
-        <source>Average Heart Rate</source>
-        <translation type="vanished">平均心拍数</translation>
-    </message>
-    <message>
-        <source>Average Cadence</source>
-        <translation type="vanished">平均ケイデンス</translation>
-    </message>
-    <message>
-        <source>Max Power</source>
-        <translation type="vanished">最大出力</translation>
-    </message>
-    <message>
-        <source>Max Heart Rate</source>
-        <translation type="vanished">最大心拍数</translation>
-    </message>
-    <message>
-        <source>Twitter Message:</source>
-        <translation type="vanished">メッセージ:</translation>
-    </message>
-    <message>
-        <source>Message Length: </source>
-        <translation type="vanished">文字数: </translation>
-    </message>
-    <message>
-        <source>&amp;Tweet Ride</source>
-        <translation type="obsolete">Twitterに送信 (&amp;T)</translation>
-    </message>
-    <message>
-        <source>&amp;Cancel</source>
-        <translation type="vanished">キャンセル(&amp;C)</translation>
-    </message>
-    <message>
-        <source>Golden Cheetah-&gt;Preferences</source>
-        <translation type="vanished">Golden Cheetah-&gt;設定</translation>
-    </message>
-    <message>
-        <source>Tools-&gt;Options</source>
-        <translation type="vanished">ツール-&gt;オプション</translation>
-    </message>
-    <message>
-        <source>Error fetching OAuth credentials.  Please make sure to complete the twitter authorization procedure found under %1.</source>
-        <translation type="vanished">OAuthの認証情報の取得に失敗しました。%1の下に書かれたtwitterの認証処理を行ってください。</translation>
-    </message>
-    <message>
-        <source>OAuth Error</source>
-        <translation type="vanished">OAuthエラー</translation>
-    </message>
-    <message>
-        <source>Tweet Length Error</source>
-        <translation type="vanished">文字数エラー</translation>
-    </message>
-    <message>
-        <source>Tweet must be 140 characters or fewer.</source>
-        <translation type="obsolete">送信する文字は140文字以内でなければなりません。</translation>
-    </message>
-    <message>
-        <source>Error Posting Tweet</source>
-        <translation type="vanished">送信したメッセージがエラーになりました</translation>
-    </message>
-    <message>
-        <source>There was an error connecting to Twitter.  Check your network connection and try again.</source>
-        <translation type="vanished">Twitterへの接続時にエラーが発生しました。ネットワーク接続を確認して再度お試しください。</translation>
-    </message>
-    <message>
-        <source>seconds</source>
-        <translation type="obsolete">秒</translation>
-    </message>
-    <message>
-        <source>km</source>
-        <translation type="obsolete">キロメートル</translation>
-    </message>
-    <message>
-        <source>mi</source>
-        <translation type="obsolete">mi</translation>
-    </message>
-    <message>
-        <source>m</source>
-        <translation type="obsolete">m</translation>
-    </message>
-    <message>
-        <source>ft</source>
-        <translation type="obsolete">ft</translation>
-    </message>
-    <message>
-        <source>kJ</source>
-        <translation type="obsolete">kJ</translation>
-    </message>
-    <message>
-        <source>km/h</source>
-        <translation type="obsolete">km/h</translation>
-    </message>
-    <message>
-        <source>mph</source>
-        <translation type="obsolete">mph</translation>
-    </message>
-    <message>
-        <source>watts</source>
-        <translation type="obsolete">ワット</translation>
-    </message>
-    <message>
-        <source>bpm</source>
-        <translation type="obsolete">bpm</translation>
-    </message>
-    <message>
-        <source>rpm</source>
-        <translation type="obsolete">rpm</translation>
-    </message>
-    <message>
-        <source>Message Length: %1</source>
-        <translation type="vanished">文字数: %1</translation>
-    </message>
-</context>
-<context>
-    <name>TwitterPage</name>
-    <message>
-        <source>Twitter Config</source>
-        <translation type="obsolete">Twitter設定</translation>
-    </message>
-    <message>
-        <source>Authorize</source>
-        <translation type="obsolete">認証</translation>
-    </message>
-    <message>
-        <source>Click the Authorize button. Your default browser will open to Twitter. Once you have authorized Golden Cheetah access your Twitter account, Copy/Paste PIN number from Twitter into PIN field. Click Save</source>
-        <translation type="obsolete">認証ボタンをクリックするとブラウザが開きます。TwitterでGoldenCheetahの認証を受けるとPINコードが出力されます。コピーアンドペーストして保存をクリックします</translation>
-    </message>
-    <message>
-        <source>Enter PIN: </source>
-        <translation type="obsolete">PINの入力: </translation>
     </message>
 </context>
 <context>
@@ -35639,31 +32426,20 @@ Press F3 on Controller when done.</source>
     </message>
 </context>
 <context>
-    <name>ViewSelection</name>
-    <message>
-        <source>Ride Analysis View</source>
-        <translation type="obsolete">ライド解析</translation>
-    </message>
-    <message>
-        <source>Train and Racing View</source>
-        <translation type="obsolete">レース&amp;トレーニング</translation>
-    </message>
-</context>
-<context>
     <name>ViewSplitter</name>
     <message>
-        <location filename="../../Gui/AbstractView.h" line="241"/>
+        <location filename="../../Gui/AbstractView.h" line="242"/>
         <source>Clear</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/AbstractView.h" line="252"/>
-        <location filename="../../Gui/AbstractView.h" line="333"/>
+        <location filename="../../Gui/AbstractView.h" line="253"/>
+        <location filename="../../Gui/AbstractView.h" line="334"/>
         <source>OFF</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/AbstractView.h" line="328"/>
+        <location filename="../../Gui/AbstractView.h" line="329"/>
         <source>ON</source>
         <translation type="unfinished"></translation>
     </message>
@@ -35770,17 +32546,6 @@ Press F3 on Controller when done.</source>
         <location filename="../../Metrics/WPrime.cpp" line="1334"/>
         <source>Time expended when Power is above CP and W&apos; bal is above 75% of W&apos;.</source>
         <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>WFApi</name>
-    <message>
-        <source>Unknown</source>
-        <translation type="obsolete">不明</translation>
-    </message>
-    <message>
-        <source>Heart Rate</source>
-        <translation type="obsolete">心拍数</translation>
     </message>
 </context>
 <context>
@@ -36085,34 +32850,6 @@ Press F3 on Controller when done.</source>
         <location filename="../../Train/WebPageWindow.cpp" line="127"/>
         <source>Hit return to apply URL</source>
         <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>WeeklySummaryWindow</name>
-    <message>
-        <source>&lt;center&gt;&lt;h2&gt;Week of %1 through %2&lt;/h2&gt;&lt;h2&gt;Summary&lt;/h2&gt;&lt;p&gt;&lt;table align=&quot;center&quot; width=&quot;60%&quot; border=0&gt;&lt;tr&gt;&lt;td&gt;Total time riding:&lt;/td&gt;    &lt;td align=&quot;right&quot;&gt;%3:%4:%5&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;Total distance (%6):&lt;/td&gt;    &lt;td align=&quot;right&quot;&gt;%7&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;Total work (kJ):&lt;/td&gt;    &lt;td align=&quot;right&quot;&gt;%8&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;Daily Average work (kJ):&lt;/td&gt;    &lt;td align=&quot;right&quot;&gt;%9&lt;/td&gt;&lt;/tr&gt;</source>
-        <translation type="obsolete">&lt;center&gt;&lt;h2&gt;%1から%2まで&lt;/h2&gt;&lt;h2&gt;概要&lt;/h2&gt;&lt;p&gt;&lt;table align=&quot;center&quot; width=&quot;60%&quot; border=&quot;0&quot;&gt;&lt;tr&gt;&lt;td&gt;走行時間:&lt;/td&gt;    &lt;td align=&quot;right&quot;&gt;%3:%4:%5&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;走行距離 (%6):&lt;/td&gt;    &lt;td align=&quot;right&quot;&gt;%7&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;エネルギー (kJ):&lt;/td&gt;    &lt;td align=&quot;right&quot;&gt;%8&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;日平均のエネルギー (kJ):&lt;/td&gt;    &lt;td align=&quot;right&quot;&gt;%9&lt;/td&gt;&lt;/tr&gt;</translation>
-    </message>
-    <message>
-        <source>&lt;center&gt;&lt;h3&gt;Week of %1 through %2&lt;/h3&gt;&lt;h3&gt;Summary&lt;/h3&gt;&lt;p&gt;&lt;table align=&quot;center&quot; width=&quot;60%&quot; border=0&gt;&lt;tr&gt;&lt;td&gt;Total time riding:&lt;/td&gt;    &lt;td align=&quot;right&quot;&gt;%3:%4:%5&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;Total distance (%6):&lt;/td&gt;    &lt;td align=&quot;right&quot;&gt;%7&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;Total work (kJ):&lt;/td&gt;    &lt;td align=&quot;right&quot;&gt;%8&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;Daily Average work (kJ):&lt;/td&gt;    &lt;td align=&quot;right&quot;&gt;%9&lt;/td&gt;&lt;/tr&gt;</source>
-        <translation type="obsolete">&lt;center&gt;&lt;h2&gt;%1から%2まで&lt;/h2&gt;&lt;h2&gt;概要&lt;/h2&gt;&lt;p&gt;&lt;table align=&quot;center&quot; width=&quot;60%&quot; border=&quot;0&quot;&gt;&lt;tr&gt;&lt;td&gt;走行時間:&lt;/td&gt;    &lt;td align=&quot;right&quot;&gt;%3:%4:%5&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;走行距離 (%6):&lt;/td&gt;    &lt;td align=&quot;right&quot;&gt;%7&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;エネルギー (kJ):&lt;/td&gt;    &lt;td align=&quot;right&quot;&gt;%8&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;日平均のエネルギー (kJ):&lt;/td&gt;    &lt;td align=&quot;right&quot;&gt;%9&lt;/td&gt;&lt;/tr&gt; {3&gt;?} {1 ?} {2&lt;?} {3&gt;?} {3&gt;?} {3&gt;?} {60%?} {0&gt;?} {3:%4:%5&lt;?} {6)?} {7&lt;?} {8&lt;?} {9&lt;?}</translation>
-    </message>
-    <message>
-        <source>MM/dd/yyyy</source>
-        <translation type="obsolete">yyyy年MMMMd日</translation>
-    </message>
-    <message>
-        <source>&lt;tr&gt;&lt;td&gt;Total BikeScore:&lt;/td&gt;    &lt;td align=&quot;right&quot;&gt;%1&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;Total Daniels Points:&lt;/td&gt;    &lt;td align=&quot;right&quot;&gt;%2&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;Net Relative Intensity:&lt;/td&gt;    &lt;td align=&quot;right&quot;&gt;%3&lt;/td&gt;&lt;/tr&gt;</source>
-        <translatorcomment>微妙</translatorcomment>
-        <translation type="obsolete">&lt;tr&gt;&lt;td&gt;Total BikeScore:&lt;/td&gt;    &lt;td align=&quot;right&quot;&gt;%1&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;Total Daniels Points:&lt;/td&gt;    &lt;td align=&quot;right&quot;&gt;%2&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;Net Relative Intensity:&lt;/td&gt;    &lt;td align=&quot;right&quot;&gt;%3&lt;/td&gt;&lt;/tr&gt;</translation>
-    </message>
-    <message>
-        <source>&lt;/table&gt;&lt;h3&gt;Power Zones&lt;/h3&gt;</source>
-        <translation type="obsolete">&lt;/table&gt;&lt;h2&gt;パワーゾーン&lt;/h2&gt; {3&gt;?} {3&gt;?}</translation>
-    </message>
-    <message>
-        <source>&lt;/table&gt;&lt;h2&gt;Power Zones&lt;/h2&gt;</source>
-        <translation type="obsolete">&lt;/table&gt;&lt;h2&gt;パワーゾーン&lt;/h2&gt;</translation>
     </message>
 </context>
 <context>
@@ -36954,14 +33691,6 @@ You can remove references when managing the library via the context menu options
 <context>
     <name>ZonePage</name>
     <message>
-        <source>Critical Power History</source>
-        <translation type="obsolete">CP履歴</translation>
-    </message>
-    <message>
-        <source>Default Zones</source>
-        <translation type="obsolete">デフォルトゾーン</translation>
-    </message>
-    <message>
         <location filename="../../Gui/AthletePages.cpp" line="881"/>
         <source>Sport</source>
         <translation type="unfinished"></translation>
@@ -37330,10 +34059,6 @@ You can remove references when managing the library via the context menu options
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>CP must be greater than zero in zone range %1 of power.zones</source>
-        <translation type="vanished">CP値はパワーゾーンレンジ%1に含まれ、&lt;byte value=&quot;x1c&quot;/&gt;ゼロ以上である必要があります&lt;byte value=&quot;x1c&quot;/&gt;</translation>
-    </message>
-    <message>
         <location filename="../../Metrics/Zones.cpp" line="497"/>
         <source>Range %1: matching top of zone %2 (%3) to bottom of zone %4 (%5).
 </source>
@@ -37376,10 +34101,6 @@ You can remove references when managing the library via the context menu options
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Critical Power: %1</source>
-        <translation type="obsolete">クリティカルパワー: %1</translation>
-    </message>
-    <message>
         <location filename="../../Metrics/Zones.cpp" line="764"/>
         <source>&lt;td align=&quot;center&quot;&gt;Zone&lt;/td&gt;</source>
         <translation>&lt;td align=&quot;center&quot;&gt;ゾーン&lt;/td&gt;</translation>
@@ -37388,14 +34109,6 @@ You can remove references when managing the library via the context menu options
         <location filename="../../Metrics/Zones.cpp" line="765"/>
         <source>&lt;td align=&quot;center&quot;&gt;Description&lt;/td&gt;</source>
         <translation>&lt;td align=&quot;center&quot;&gt;説明&lt;/td&gt;</translation>
-    </message>
-    <message>
-        <source>&lt;td align=&quot;center&quot;&gt;Low&lt;/td&gt;</source>
-        <translation type="obsolete">&lt;td align=&quot;center&quot;&gt;Low&lt;/td&gt;</translation>
-    </message>
-    <message>
-        <source>&lt;td align=&quot;center&quot;&gt;High&lt;/td&gt;</source>
-        <translation type="obsolete">&lt;td align=&quot;center&quot;&gt;High&lt;/td&gt;</translation>
     </message>
     <message>
         <location filename="../../Metrics/Zones.cpp" line="768"/>
