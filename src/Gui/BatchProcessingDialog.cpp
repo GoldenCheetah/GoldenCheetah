@@ -142,13 +142,13 @@ processed(0), fails(0), numFilesToProcess(0) {
 
     exportGrid1->addWidget(formatLabel);
     exportGrid1->addWidget(fileFormat);
-    exportGrid1->addStretch();
     exportGrid1->addWidget(overwrite);
+    exportGrid1->addStretch();
 
     exportGrid2->addWidget(dirLabel);
     exportGrid2->addWidget(dirName);
-    exportGrid2->addStretch();
     exportGrid2->addWidget(selectDir);
+    exportGrid2->addStretch();
 
     exportContainer = new QWidget;
     QVBoxLayout* exportLayout = new QVBoxLayout(exportContainer);
@@ -183,8 +183,8 @@ processed(0), fails(0), numFilesToProcess(0) {
     dpContainer = new QWidget;
     QHBoxLayout* dpLayout = new QHBoxLayout(dpContainer);
     dpLayout->addWidget(dataProcessorToRun);
-    dpLayout->addStretch();
     dpLayout->addWidget(dpButton);
+    dpLayout->addStretch();
     dpContainer->setEnabled(false);
 
     dpGrid->addWidget(dpRadioBox);
