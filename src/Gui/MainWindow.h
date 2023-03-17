@@ -251,7 +251,7 @@ class MainWindow : public QMainWindow
         void downloadRide();
         void manualRide();
         void exportRide();
-        void exportBatch();
+        void batchProcessing();
         void generateHeatMap();
         void exportMetrics();
         void addAccount();

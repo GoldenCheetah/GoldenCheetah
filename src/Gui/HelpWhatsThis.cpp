@@ -111,8 +111,8 @@ HelpWhatsThis::getText(GCHelp chapter) {
     case MenuBar_Activity_Manual_LapsEditor:
         return text.arg("Menu%20Bar_Activity").arg(tr("Laps Editor allows to enter a sequence of work-rest intervals series -defined by number of repetitions (reps), distance (dist, units according to preferences in Pace Zones) and duration (min and sec)- to generate the data points for the activity"));
 
-    case MenuBar_Activity_BatchExport:
-        return text.arg("Menu%20Bar_Activity").arg(tr("Exports a (selectable) set of activties in one of the supported export formats"));
+    case MenuBar_Activity_BatchProcessing:
+        return text.arg("Menu%20Bar_Activity").arg(tr("Batch processes a (selectable) set of activties"));
     case MenuBar_Activity_SplitRide:
         return text.arg("Menu%20Bar_Activity").arg(tr("Wizard to split an activity into multiple activities based on configurable criteria"));
     case MenuBar_Activity_CombineRides:

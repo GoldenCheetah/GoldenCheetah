@@ -5,10 +5,12 @@
 // Config widget used by the Preferences/Options config panes
 class FixPyDataProcessorConfig : public DataProcessorConfig
 {
+    Q_DECLARE_TR_FUNCTIONS(FixPyDataProcessorConfig)
+
 public:
     // there is no config
     FixPyDataProcessorConfig(QWidget *parent) : DataProcessorConfig(parent) {}
-    QString explain() { return QString(); }
+    QString explain() { return tr("Custom Python Data Processor"); }
     void readConfig() {}
     void saveConfig() {}
 };
