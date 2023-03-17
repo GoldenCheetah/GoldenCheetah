@@ -597,7 +597,7 @@ MainWindow::MainWindow(const QDir &home)
     QMenu *editMenu = menuBar()->addMenu(tr("&Edit"));
     // Add all the data processors to the tools menu
     const DataProcessorFactory &factory = DataProcessorFactory::instance();
-    QMap<QString, DataProcessor*> processors = factory.getProcessors(true);
+    QMap<QString, DataProcessor*> processors = factory.getProcessors();
 
     if (processors.count()) {
 
@@ -1255,14 +1255,9 @@ void MainWindow::manualProcess(QString name)
             name = name.remove(0, 8);
 
             FixPyScript *script = fixPySettings->getScript(name);
-            if (script == nullptr) {
-                return;
-            }
-
-            QString errText;
-            FixPyRunner pyRunner(currentAthleteTab->context);
-            if (pyRunner.run(script->source, script->iniKey, errText) != 0) {
-                QMessageBox::critical(this, "GoldenCheetah", errText);
+            if (script) {
+                EditFixPyScriptDialog editDlg(currentAthleteTab->context, script, this);
+                editDlg.exec();
             }
 
             return;
