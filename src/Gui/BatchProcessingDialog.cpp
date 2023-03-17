@@ -113,11 +113,14 @@ processed(0), fails(0), numFilesToProcess(0) {
 
     //  --------------- Export menu items -----------------------
 
+    QHBoxLayout* exportGrid = new QHBoxLayout;
     QHBoxLayout* exportGrid1 = new QHBoxLayout;
     QHBoxLayout* exportGrid2 = new QHBoxLayout;
 
-    QRadioButton* exportRadioBox = new QRadioButton(tr("Export "), this);
+    QRadioButton* exportRadioBox = new QRadioButton(tr("Export"), this);
     radioGroup->addButton(exportRadioBox, int(BatchProcessingDialog::exportB));
+
+    QLabel* formatLabel = new QLabel(tr("As"), this);
 
     fileFormat = new QComboBox(this);
 
@@ -127,7 +130,8 @@ processed(0), fails(0), numFilesToProcess(0) {
     fileFormat->setCurrentIndex(appsettings->value(this, GC_BE_LASTFMT, "0").toInt());
 
     QPushButton* selectDir = new QPushButton(tr("Browse"), this);
-    QLabel* dirLabel = new QLabel(tr("Export to  "), this);
+
+    QLabel* dirLabel = new QLabel(tr("To"), this);
 
     // default to last used
     QString dirDefault = appsettings->value(this, GC_BE_LASTDIR, QDir::home().absolutePath()).toString();
@@ -136,25 +140,30 @@ processed(0), fails(0), numFilesToProcess(0) {
     dirName = new QLabel(dirDefault, this);
     overwrite = new QCheckBox(tr("Overwrite Files"), this);
 
-    exportGrid1->addWidget(exportRadioBox);
+    exportGrid1->addWidget(formatLabel);
     exportGrid1->addWidget(fileFormat);
-    exportGrid1->addSpacing(10);
-    exportGrid1->addWidget(selectDir);
-    exportGrid1->addSpacing(10);
-    exportGrid1->addWidget(overwrite);
     exportGrid1->addStretch();
+    exportGrid1->addWidget(overwrite);
 
-    exportGrid2->addSpacing(20);
     exportGrid2->addWidget(dirLabel);
     exportGrid2->addWidget(dirName);
     exportGrid2->addStretch();
+    exportGrid2->addWidget(selectDir);
+
+    exportContainer = new QWidget;
+    QVBoxLayout* exportLayout = new QVBoxLayout(exportContainer);
+    exportLayout->addLayout(exportGrid1);
+    exportLayout->addLayout(exportGrid2);
+
+    exportGrid->addWidget(exportRadioBox);
+    exportGrid->addWidget(exportContainer);
 
     //  --------------- Data Processing menu items -----------------------
 
     QHBoxLayout* dpGrid = new QHBoxLayout;
     dpGrid->setContentsMargins(0, 0, 0, 0);
 
-    QRadioButton* dpRadioBox = new QRadioButton(tr("Run Data Processor "), this);
+    QRadioButton* dpRadioBox = new QRadioButton(tr("Run Data Processor"), this);
     radioGroup->addButton(dpRadioBox, int(BatchProcessingDialog::dataProcessorB));
 
     dataProcessorToRun = new QComboBox(this);
@@ -171,17 +180,22 @@ processed(0), fails(0), numFilesToProcess(0) {
     dpButton = new QPushButton(tr("Edit"), this);
     dpButton->setVisible(false);
 
+    dpContainer = new QWidget;
+    QHBoxLayout* dpLayout = new QHBoxLayout(dpContainer);
+    dpLayout->addWidget(dataProcessorToRun);
+    dpLayout->addStretch();
+    dpLayout->addWidget(dpButton);
+    dpContainer->setEnabled(false);
+
     dpGrid->addWidget(dpRadioBox);
-    dpGrid->addWidget(dataProcessorToRun);
-    dpGrid->addStretch();
-    dpGrid->addWidget(dpButton);
+    dpGrid->addWidget(dpContainer);
 
     //  --------------- Delete menu items -----------------------
 
     QHBoxLayout* deleteGrid = new QHBoxLayout;
     deleteGrid->setContentsMargins(0, 0, 0, 0);
 
-    QRadioButton* deleteRadioBox = new QRadioButton(tr("Delete All Selected Activities "), this);
+    QRadioButton* deleteRadioBox = new QRadioButton(tr("Delete All Selected Activities"), this);
     radioGroup->addButton(deleteRadioBox, int(BatchProcessingDialog::deleteB));
 
     deleteGrid->addWidget(deleteRadioBox);
@@ -198,21 +212,15 @@ processed(0), fails(0), numFilesToProcess(0) {
     buttons->addWidget(status);
     buttons->addStretch();
     buttons->addWidget(cancel);
-    buttons->addSpacing(5);
     buttons->addWidget(ok);
 
     // --------------- Arrange dialog layout ----------------------
 
-    layout1->addRow(exportGrid1);
-    layout1->addRow(exportGrid2);
+    layout1->addRow(exportGrid);
     layout1->addRow(dpGrid);
     layout1->addRow(deleteGrid);
     layout->addRow(fileSelection);
     layout->addRow(buttons);
-
-    layout->setHorizontalSpacing(0); // between columns
-    layout->setVerticalSpacing(10); // between rows
-    layout1->setVerticalSpacing(10); // between rows
 
     adjustSize(); // Window to contents
 
@@ -300,6 +308,22 @@ BatchProcessingDialog::radioClicked(int buttonId) {
     // ensures the Action info column matches the processing option selected
     outputMode = batchRadioBType(buttonId);
     updateActionColumn();
+
+    // enable only useful widgets
+    switch (outputMode) {
+    case BatchProcessingDialog::exportB:
+        exportContainer->setEnabled(true);
+        dpContainer->setEnabled(false);
+	break;
+    case BatchProcessingDialog::dataProcessorB:
+        exportContainer->setEnabled(false);
+        dpContainer->setEnabled(true);
+	break;
+    case BatchProcessingDialog::deleteB:
+        exportContainer->setEnabled(false);
+        dpContainer->setEnabled(false);
+	break;
+    }
 }
 
 void

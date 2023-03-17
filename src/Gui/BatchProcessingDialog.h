@@ -86,7 +86,7 @@ private:
 
     QTreeWidget *files; // choose files to export
 
-    QWidget *disableContainer;
+    QWidget *disableContainer, *dpContainer, *exportContainer;
 
     QComboBox *fileFormat, *dataProcessorToRun;
 
