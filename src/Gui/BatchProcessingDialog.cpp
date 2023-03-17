@@ -33,6 +33,7 @@
 
 #include <QFormLayout>
 #include <QButtonGroup>
+#include <QMessageBox>
 
 #define bpABORT "Abort"
 #define bpFINISH "Finish"
