@@ -4083,37 +4083,37 @@ Presione siguiente para continuar
     <message>
         <location filename="../../Cloud/Azum.cpp" line="75"/>
         <source>There is no token</source>
-        <translation type="unfinished"></translation>
+        <translation>No hay token configurado</translation>
     </message>
     <message>
         <location filename="../../Cloud/Azum.cpp" line="81"/>
         <source>There is no selected athlete</source>
-        <translation type="unfinished"></translation>
+        <translation>No hay ningún atleta seleccionado</translation>
     </message>
     <message>
         <location filename="../../Cloud/Azum.cpp" line="127"/>
         <source>JSON parser error</source>
-        <translation type="unfinished">Error en el análisis JSON</translation>
+        <translation>Error en el análisis sintáctico de JSON</translation>
     </message>
     <message>
         <location filename="../../Cloud/Azum.cpp" line="173"/>
         <source>No selected athlete</source>
-        <translation type="unfinished"></translation>
+        <translation>No hay ningún atleta seleccionado</translation>
     </message>
     <message>
         <location filename="../../Cloud/Azum.cpp" line="297"/>
         <source>Completed.</source>
-        <translation type="unfinished">Finalizado.</translation>
+        <translation>Finalizado.</translation>
     </message>
     <message>
         <location filename="../../Cloud/Azum.h" line="20"/>
         <source>Azum</source>
-        <translation type="unfinished"></translation>
+        <translation>Azum</translation>
     </message>
     <message>
         <location filename="../../Cloud/Azum.h" line="21"/>
         <source>Sync with new and unique coaching platform from Switzerland.</source>
-        <translation type="unfinished"></translation>
+        <translation>Sincronizar con la plataforma de entrenamiento suiza Azum.</translation>
     </message>
 </context>
 <context>
@@ -4271,203 +4271,203 @@ Presione siguiente para continuar
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="44"/>
         <source>Activity Batch Processing</source>
-        <translation type="unfinished"></translation>
+        <translation>Procesado de la actividad en segundo plano</translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="65"/>
         <source>check/uncheck all</source>
-        <translation type="unfinished">marcar/desmarcar todo</translation>
+        <translation>marcar/desmarcar todo</translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="69"/>
         <source>Filename</source>
-        <translation type="unfinished">Nombre de archivo</translation>
+        <translation>Nombre de archivo</translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="70"/>
         <source>Date</source>
-        <translation type="unfinished">Fecha</translation>
+        <translation>Fecha</translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="71"/>
         <source>Time</source>
-        <translation type="unfinished"></translation>
+        <translation>Hora</translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="72"/>
         <source>Action</source>
-        <translation type="unfinished">Acción</translation>
+        <translation>Acción</translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="105"/>
         <source>dd MMM yyyy</source>
-        <translation type="unfinished"></translation>
+        <translation>dd MMM yyyy</translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="120"/>
         <source>Export</source>
-        <translation type="unfinished">Exportar</translation>
+        <translation>Exportar</translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="123"/>
         <source>As</source>
-        <translation type="unfinished"></translation>
+        <translation>Como</translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="128"/>
         <source>All data (CSV)</source>
-        <translation type="unfinished"></translation>
+        <translation>Todos los datos (CSV)</translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="132"/>
         <source>Browse</source>
-        <translation type="unfinished">Buscar</translation>
+        <translation>Buscar</translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="134"/>
         <source>To</source>
-        <translation type="unfinished">Hasta</translation>
+        <translation>Hasta</translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="141"/>
         <source>Overwrite Files</source>
-        <translation type="unfinished"></translation>
+        <translation>Sobrescribir archivos</translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="166"/>
         <source>Run Data Processor</source>
-        <translation type="unfinished"></translation>
+        <translation>Ejecutar el procesador de datos</translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="180"/>
         <source>Edit</source>
-        <translation type="unfinished">Editar</translation>
+        <translation>Editar</translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="198"/>
         <source>Delete All Selected Activities</source>
-        <translation type="unfinished"></translation>
+        <translation>Eliminar todos los archivos seleccionados</translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="209"/>
         <source>Cancel</source>
-        <translation type="unfinished">Cancelar</translation>
+        <translation>Cancelar</translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="263"/>
         <source>%1 files selected</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 fichero(s) seleccionados</translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="270"/>
         <source>Select Target Directory</source>
-        <translation type="unfinished"></translation>
+        <translation>Seleccionar el directorio de destino</translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="351"/>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="456"/>
         <source>--</source>
-        <translation type="unfinished"></translation>
+        <translation>--</translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="372"/>
         <source>Processing...</source>
-        <translation type="unfinished">Procesando...</translation>
+        <translation>Procesando...</translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="398"/>
         <source>Processing failed due date format error...</source>
-        <translation type="unfinished"></translation>
+        <translation>Fallo en el procesado por error de formato...</translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="402"/>
         <source>Processing failed due time format error...</source>
-        <translation type="unfinished"></translation>
+        <translation>Fallo en el procesado por error en el formato de tiempo...</translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="406"/>
         <source>Processing failed as the ride metric cannot be found...</source>
-        <translation type="unfinished"></translation>
+        <translation>Fallo en el procesado porque no existen métricas de la actividad...</translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="410"/>
         <source>Processing aborted by the user...</source>
-        <translation type="unfinished"></translation>
+        <translation>Procesado cancelado por el usuario...</translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="414"/>
         <source>Processing failed as the data processor cannot be found...</source>
-        <translation type="unfinished"></translation>
+        <translation>Fallo en el procesado porque no se encuentran...</translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="418"/>
         <source>%1 activities successfully, %2 failed or skipped.</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 actividad(es) procesada(s) correctamente, %2 fallida(s) u omitida(s).</translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="423"/>
         <source>Processing failed for an unknown reason...</source>
-        <translation type="unfinished"></translation>
+        <translation>Fallo en el procesado por una razón desconocida...</translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="511"/>
         <source>Exists - not exported</source>
-        <translation type="unfinished">Existe - no se exporta</translation>
+        <translation>Existe - no se exporta</translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="519"/>
         <source>Removing...</source>
-        <translation type="unfinished">Eliminando...</translation>
+        <translation>Eliminando...</translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="523"/>
         <source>Reading...</source>
-        <translation type="unfinished">Leyendo...</translation>
+        <translation>Leyendo...</translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="534"/>
         <source>Writing...</source>
-        <translation type="unfinished">Grabando...</translation>
+        <translation>Grabando...</translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="548"/>
         <source>Exported</source>
-        <translation type="unfinished">Exportado</translation>
+        <translation>Exportado</translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="551"/>
         <source>Write failed</source>
-        <translation type="unfinished">Falló la escritura</translation>
+        <translation>Fallo de escritura</translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="559"/>
         <source>Read error</source>
-        <translation type="unfinished">Error de lectura</translation>
+        <translation>Error de lectura</translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="572"/>
         <source>Are you sure you want to delete all selected activities?</source>
-        <translation type="unfinished"></translation>
+        <translation>¿Está seguro de que quiere elimitar todas las actividades seleccionadas?</translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="573"/>
         <source>Delete</source>
-        <translation type="unfinished">Eliminar</translation>
+        <translation>Eliminar</translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="597"/>
         <source>Deleted</source>
-        <translation type="unfinished"></translation>
+        <translation>Eliminada</translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="655"/>
         <source>Processed</source>
-        <translation type="unfinished"></translation>
+        <translation>Terminado</translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="672"/>
         <source>Failed to process activity</source>
-        <translation type="unfinished"></translation>
+        <translation>Fallo al procesar la actividad</translation>
     </message>
 </context>
 <context>
@@ -7814,7 +7814,7 @@ Los datos actuales no estarán más disponibles y es necesario reiniciar GoldenC
     <message>
         <location filename="../../Cloud/CyclingAnalytics.cpp" line="109"/>
         <source>You must authorise with Cycling Analytics first</source>
-        <translation>Primero debe autorizar con Cycling Analytics</translation>
+        <translation>Primero tiene que identificarse en Cycling Analytics</translation>
     </message>
     <message>
         <location filename="../../Cloud/CyclingAnalytics.cpp" line="332"/>
@@ -7846,7 +7846,7 @@ Los datos actuales no estarán más disponibles y es necesario reiniciar GoldenC
     <message>
         <location filename="../../Cloud/CyclingAnalytics.h" line="35"/>
         <source>Sync with the power focused cycling site.</source>
-        <translation>Sincronizar con el sitio de ciclismo enfocado en potencia.</translation>
+        <translation>Sincronizar con el sitio de ciclismo enfocado en el entrenamiento por potencia.</translation>
     </message>
 </context>
 <context>
@@ -8499,7 +8499,7 @@ Puede ser necesario (re)instalar el controlador FTDI o PL2303 antes de descargar
     <message>
         <location filename="../../Cloud/Dropbox.cpp" line="130"/>
         <source>You must authorise with Dropbox first</source>
-        <translation>Primero tiene que autorizar con Dropbox</translation>
+        <translation>Primero tiene que identificarse en Dropbox</translation>
     </message>
     <message>
         <location filename="../../Cloud/Dropbox.cpp" line="205"/>
@@ -10444,7 +10444,7 @@ le sugerirá los posibles nombres
     <message>
         <location filename="../../FileIO/FilterHRV.cpp" line="246"/>
         <source>Filter R-R Outliers</source>
-        <translation>Filtrar R-R atípicos</translation>
+        <translation>Filtrar errores en R-R</translation>
     </message>
 </context>
 <context>
@@ -10482,7 +10482,12 @@ le sugerirá los posibles nombres
   - &quot;Filter window size&quot; distance on either side of the current interval
   - &quot;Set Rest HRV&quot; if checked on interactive use the computed HRV metrics are set as Rest HRV Measures
 </source>
-        <translation type="unfinished"></translation>
+        <translation>Filtrado de errores en R-R (ver el campo &quot;R-R flag&quot; en la pestaña HRV de la sección &quot;Datos brutos&quot; del panel de detalles). Los datos correctos se marcan como &quot;1&quot;.
+  - &quot;R-R mínimo y máximo&quot;: se excluyen los datos fuera del intervalo (se etiquetan como &quot;-1&quot; y quedan excluidos del resto de cálculos).
+  - &quot;Rango de filtrado&quot;: valor en tanto por uno. Dado el valor medio de una cantidad de datos igual al tamaño de la ventana de filtrado, se excluyen los datos (se etiquetan como &quot;0&quot;) cuyo valor difiera en más del rango pasado del valor medio calculado.
+  - &quot;Tamaño de la ventana de filtrado&quot;: tamaño de la ventana de filtrado para realizar el cálculo del valor medio y excluir posibles datos en conjunción con el parámetro &quot;rango de filtrado&quot;.
+  - &quot;Establecer HRV en reposo&quot;: si se selecciona, las métricas calculadas de HRV se asignan como valores en reposo.
+</translation>
     </message>
 </context>
 <context>
@@ -10819,26 +10824,26 @@ Esta función requiere conexión a internet.</translation>
         <location filename="../../FileIO/FixGPS.cpp" line="255"/>
         <location filename="../../FileIO/FixGPS.cpp" line="504"/>
         <source>Min Slope:</source>
-        <translation>Pendiente mínima: </translation>
+        <translation>Pendiente mínima:</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixGPS.cpp" line="256"/>
         <location filename="../../FileIO/FixGPS.cpp" line="505"/>
         <source>Max Slope:</source>
-        <translation>Pendiente máxima: </translation>
+        <translation>Pendiente máxima:</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixGPS.cpp" line="257"/>
         <location filename="../../FileIO/FixGPS.cpp" line="506"/>
         <source>Avg Slope:</source>
-        <translation>Pendiente media: </translation>
+        <translation>Pendiente media:</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixGPS.cpp" line="258"/>
         <location filename="../../FileIO/FixGPS.cpp" line="279"/>
         <location filename="../../FileIO/FixGPS.cpp" line="507"/>
         <source>Outliers:</source>
-        <translation>Datos erróneos: </translation>
+        <translation>Datos erróneos:</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixGPS.cpp" line="266"/>
@@ -10864,13 +10869,13 @@ Esta función requiere conexión a internet.</translation>
         <location filename="../../FileIO/FixGPS.cpp" line="277"/>
         <location filename="../../FileIO/FixGPS.cpp" line="529"/>
         <source>P1 Route Deviation:</source>
-        <translation>Desviación de la ruta tras la primera pasada: </translation>
+        <translation>Desviación de la ruta tras la primera pasada:</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixGPS.cpp" line="278"/>
         <location filename="../../FileIO/FixGPS.cpp" line="530"/>
         <source>P2 Route Deviation:</source>
-        <translation>Desviación de la ruta tras la segunda pasada: </translation>
+        <translation>Desviación de la ruta tras la segunda pasada:</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixGPS.cpp" line="289"/>
@@ -11077,7 +11082,7 @@ aquí seleccionado en (cm) se refiere a la distancia medida desde el spline.
     <message>
         <location filename="../../FileIO/FixGPS.cpp" line="508"/>
         <source>Step Deviation:</source>
-        <translation>Desviación del paso: </translation>
+        <translation>Desviación del paso:</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixGPS.cpp" line="517"/>
@@ -11107,7 +11112,7 @@ aquí seleccionado en (cm) se refiere a la distancia medida desde el spline.
     <message>
         <location filename="../../FileIO/FixGPS.cpp" line="531"/>
         <source>Route Outliers:</source>
-        <translation>Datos erróneos de la ruta: </translation>
+        <translation>Datos erróneos de la ruta:</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixGPS.cpp" line="538"/>
@@ -11338,7 +11343,7 @@ Si ambos parámetros son distintos de cero primero se aplica el porcentaje de aj
     <message>
         <location filename="../../FileIO/FixPyDataProcessor.cpp" line="13"/>
         <source>Custom Python Data Processor</source>
-        <translation type="unfinished"></translation>
+        <translation>Procesador Python de datos personalizado</translation>
     </message>
 </context>
 <context>
@@ -13783,7 +13788,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="115"/>
         <source>Batch processes a (selectable) set of activties</source>
-        <translation type="unfinished"></translation>
+        <translation>Procesado en segundo plano de un conjunto de actividades</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="122"/>
@@ -13888,7 +13893,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="179"/>
         <source>Filter R-R outliers</source>
-        <translation>Filtrar R-R atípicos</translation>
+        <translation>Filtrar errores en R-R</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="181"/>
@@ -19074,7 +19079,7 @@ encendido y muestra &quot;PC-Link&quot;</translation>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="508"/>
         <source>&amp;Batch Processing...</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Procesado en segundo plano...</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="525"/>
@@ -19532,7 +19537,7 @@ Por favor, verifique la configuración de preferencias.</translation>
     <message>
         <location filename="../../FileIO/DataProcessor.cpp" line="148"/>
         <source>Save parameters as default</source>
-        <translation type="unfinished"></translation>
+        <translation>Salvar la configuración para usar por omisión</translation>
     </message>
     <message>
         <location filename="../../FileIO/DataProcessor.cpp" line="150"/>
@@ -21473,7 +21478,7 @@ No se han encontrado actividades para importar.
     <message>
         <location filename="../../Cloud/Nolio.h" line="38"/>
         <source>Nolio</source>
-        <translation></translation>
+        <translation>Nolio</translation>
     </message>
     <message>
         <location filename="../../Cloud/Nolio.h" line="39"/>
@@ -21520,7 +21525,7 @@ No se han encontrado actividades para importar.
     <message>
         <location filename="../../Cloud/OAuthDialog.cpp" line="511"/>
         <source>Withings authorization was successful.</source>
-        <translation>La autorización de Withings fue exitosa.</translation>
+        <translation>La autorización en Withings fue exitosa.</translation>
     </message>
     <message>
         <location filename="../../Cloud/OAuthDialog.cpp" line="411"/>
@@ -21538,42 +21543,42 @@ No se han encontrado actividades para importar.
     <message>
         <location filename="../../Cloud/OAuthDialog.cpp" line="410"/>
         <source>Dropbox authorization was successful.</source>
-        <translation>La autorización con Dropbox fue exitosa.</translation>
+        <translation>La autorización en Dropbox fue exitosa.</translation>
     </message>
     <message>
         <location filename="../../Cloud/OAuthDialog.cpp" line="419"/>
         <source>SportTracks authorization was successful.</source>
-        <translation>La autorización de SportTracks fue exitosa.</translation>
+        <translation>La autorización en SportTracks fue exitosa.</translation>
     </message>
     <message>
         <location filename="../../Cloud/OAuthDialog.cpp" line="456"/>
         <source>Polar Flow authorization was successful.</source>
-        <translation>La autorización de Polar Flow fue exitosa.</translation>
+        <translation>La autorización en Polar Flow fue exitosa.</translation>
     </message>
     <message>
         <location filename="../../Cloud/OAuthDialog.cpp" line="465"/>
         <source>Strava authorization was successful.</source>
-        <translation>La autorización de Strava fue exitosa.</translation>
+        <translation>La autorización en Strava fue exitosa.</translation>
     </message>
     <message>
         <location filename="../../Cloud/OAuthDialog.cpp" line="472"/>
         <source>Cycling Analytics authorization was successful.</source>
-        <translation>La autorización de Cycling Analytics fue exitosa.</translation>
+        <translation>La autorización en Cycling Analytics fue exitosa.</translation>
     </message>
     <message>
         <location filename="../../Cloud/OAuthDialog.cpp" line="479"/>
         <source>Today&apos;s Plan authorization was successful.</source>
-        <translation>La autorización de Today&apos;s Plan fue exitosa.</translation>
+        <translation>La autorización en Today&apos;s Plan fue exitosa.</translation>
     </message>
     <message>
         <location filename="../../Cloud/OAuthDialog.cpp" line="519"/>
         <source>Nolio authorization was successful.</source>
-        <translation>La autorización con Nolio fue exitosa.</translation>
+        <translation>La autorización en Nolio fue exitosa.</translation>
     </message>
     <message>
         <location filename="../../Cloud/OAuthDialog.cpp" line="525"/>
         <source>Azum authorization was successful.</source>
-        <translation type="unfinished"></translation>
+        <translation>La autorización en Azum fue exitosa.</translation>
     </message>
     <message>
         <location filename="../../Cloud/OAuthDialog.cpp" line="533"/>
@@ -28100,7 +28105,7 @@ Do you want to continue?</source>
     <message>
         <location filename="../../Cloud/RideWithGPS.cpp" line="92"/>
         <source>You must authorise with RideWithGPS first</source>
-        <translation>Primero tiene que identificarse con RideWithGPS</translation>
+        <translation>Primero tiene que identificarse en RideWithGPS</translation>
     </message>
     <message>
         <location filename="../../Cloud/RideWithGPS.cpp" line="256"/>
@@ -29144,7 +29149,7 @@ formato GoldenCheetah. ¿Quiere hacerlo?
     <message>
         <location filename="../../Cloud/Selfloops.h" line="34"/>
         <source>Selfloops</source>
-        <translation></translation>
+        <translation>Selfloops</translation>
     </message>
     <message>
         <location filename="../../Cloud/Selfloops.h" line="35"/>
@@ -29199,7 +29204,7 @@ formato GoldenCheetah. ¿Quiere hacerlo?
     <message>
         <location filename="../../Gui/Pages.cpp" line="929"/>
         <source>Mass of everything that isn&apos;t wheels, tires, skewers...</source>
-        <translation>Masa de todo aquello que no sean ruedas ni sus componentes asociados</translation>
+        <translation>Masa de todo aquello que no sean ruedas ni sus componentes asociados...</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="930"/>
@@ -29209,7 +29214,7 @@ formato GoldenCheetah. ¿Quiere hacerlo?
     <message>
         <location filename="../../Gui/Pages.cpp" line="930"/>
         <source>Mass of front wheel excluding tires and skewers...</source>
-        <translation>Masa de la rueda delantera excluyendo neumático, cámara, disco y cierre</translation>
+        <translation>Masa de la rueda delantera excluyendo neumático, cámara, (disco) y cierre</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="931"/>
@@ -29262,7 +29267,7 @@ formato GoldenCheetah. ¿Quiere hacerlo?
         <location filename="../../Gui/Pages.cpp" line="937"/>
         <location filename="../../Gui/Pages.cpp" line="947"/>
         <source>Mass of anything inside the tire: sealant, tube...</source>
-        <translation>Masa de cualquier cosa que vaya dentro del neumático (líquido, cámara)...</translation>
+        <translation>Masa de cualquier cosa que vaya dentro del neumático (líquido, cámara, fondo de llanta)</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="938"/>
@@ -29294,7 +29299,7 @@ formato GoldenCheetah. ¿Quiere hacerlo?
     <message>
         <location filename="../../Gui/Pages.cpp" line="940"/>
         <source>Mass of rear wheel excluding tires and skewers...</source>
-        <translation>Masa de la rueda trasera excluyendo neumático, cámara, disco, cassette y cierre</translation>
+        <translation>Masa de la rueda trasera excluyendo neumático, cámara, (disco), cassette y cierre</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="941"/>
@@ -29507,12 +29512,12 @@ preferencias de entrenamiento.</translation>
     <message>
         <location filename="../../Cloud/SixCycle.cpp" line="161"/>
         <source>Problem with Sixcycle authentication.</source>
-        <translation>Problema con la autenticación Sixcycle.</translation>
+        <translation>Problema con la autenticación en Sixcycle.</translation>
     </message>
     <message>
         <location filename="../../Cloud/SixCycle.cpp" line="203"/>
         <source>You must authenticate with Sixcycle first</source>
-        <translation>Primero tiene que autorizar con Sixcycle</translation>
+        <translation>Primero tiene que identificarse en Sixcycle</translation>
     </message>
     <message>
         <location filename="../../Cloud/SixCycle.cpp" line="452"/>
@@ -29533,7 +29538,7 @@ preferencias de entrenamiento.</translation>
     <message>
         <location filename="../../Cloud/SixCycle.h" line="39"/>
         <source>Sync with the innovative training site.</source>
-        <translation>Sincronizar con el sitio de entrenamiento innovativo.</translation>
+        <translation>Sincronizar con el sitio de planificación del entrenamiento Sixcycle.</translation>
     </message>
 </context>
 <context>
@@ -30145,12 +30150,12 @@ Si la nueva actividad colisiona con una existente (misma fecha y hora) el asiste
     <message>
         <location filename="../../Cloud/SportTracks.cpp" line="123"/>
         <source>JSON parser error</source>
-        <translation>Error en el análisis JSON</translation>
+        <translation>Error en el análisis sintáctico de JSON</translation>
     </message>
     <message>
         <location filename="../../Cloud/SportTracks.cpp" line="158"/>
         <source>You must authorise with SportTracks first</source>
-        <translation>Primero tiene que autorizar con SportTracks</translation>
+        <translation>Primero tiene que identificarse en SportTracks</translation>
     </message>
     <message>
         <location filename="../../Cloud/SportTracks.cpp" line="539"/>
@@ -30376,12 +30381,12 @@ Si la nueva actividad colisiona con una existente (misma fecha y hora) el asiste
     <message>
         <location filename="../../Cloud/Strava.cpp" line="140"/>
         <source>JSON parser error</source>
-        <translation>Error en el análisis JSON</translation>
+        <translation>Error en el análisis sintáctico de JSON</translation>
     </message>
     <message>
         <location filename="../../Cloud/Strava.cpp" line="175"/>
         <source>You must authorise with Strava first</source>
-        <translation>Es necesario primero autorizar con Strava</translation>
+        <translation>Primero tiene que identificarse en Strava</translation>
     </message>
     <message>
         <location filename="../../Cloud/Strava.cpp" line="211"/>
@@ -30780,7 +30785,7 @@ Si la nueva actividad colisiona con una existente (misma fecha y hora) el asiste
     <message>
         <location filename="../../Cloud/TodaysPlan.cpp" line="134"/>
         <source>Please re-authorise and select an athlete</source>
-        <translation>Por favor ,reautorice y elija un atleta</translation>
+        <translation>Por favor, reautorice y elija un atleta</translation>
     </message>
     <message>
         <location filename="../../Cloud/TodaysPlan.cpp" line="147"/>
@@ -30795,7 +30800,7 @@ Si la nueva actividad colisiona con una existente (misma fecha y hora) el asiste
     <message>
         <location filename="../../Cloud/TodaysPlan.cpp" line="199"/>
         <source>You must authorise with Today&apos;s Plan first</source>
-        <translation>Primero tiene que autorizar con Today&apos;s Plan</translation>
+        <translation>Primero tiene que identificarse en Today&apos;s Plan</translation>
     </message>
     <message>
         <location filename="../../Cloud/TodaysPlan.cpp" line="474"/>
@@ -31731,7 +31736,7 @@ Presionar F3 en el controlador al finalizar.</translation>
     <message>
         <location filename="../../Cloud/TrainingsTageBuch.h" line="44"/>
         <source>Trainingstagebuch</source>
-        <translation>Diario de entrenamiento</translation>
+        <translation>Trainingstagebuch</translation>
     </message>
     <message>
         <location filename="../../Cloud/TrainingsTageBuch.h" line="45"/>
@@ -33773,12 +33778,12 @@ Puede eliminar las referencias cuando administra la biblioteca usando el menú d
     <message>
         <location filename="../../Cloud/Xert.cpp" line="141"/>
         <source>JSON parser error</source>
-        <translation>Error en el análisis JSON</translation>
+        <translation>Error en el análisis sintáctico de JSON</translation>
     </message>
     <message>
         <location filename="../../Cloud/Xert.cpp" line="176"/>
         <source>You must authorise with Xert first</source>
-        <translation>Es necesario primero autorizar con Xert</translation>
+        <translation>Primero tiene que identificarse en Xert</translation>
     </message>
     <message>
         <location filename="../../Cloud/Xert.cpp" line="479"/>
