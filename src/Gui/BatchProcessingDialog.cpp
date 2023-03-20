@@ -35,10 +35,6 @@
 #include <QButtonGroup>
 #include <QMessageBox>
 
-#define bpABORT "Abort"
-#define bpFINISH "Finish"
-#define bpEXECUTE "Execute"
-
 BatchProcessingDialog::BatchProcessingDialog(Context* context) : QDialog(context->mainWindow), context(context),
 processed(0), fails(0), numFilesToProcess(0) {
     setAttribute(Qt::WA_DeleteOnClose);
@@ -174,8 +170,11 @@ processed(0), fails(0), numFilesToProcess(0) {
     QMap<QString, DataProcessor*> processors = factory.getProcessors();
 
     // iterate over all the processors and add an entry for each data processor
-    foreach(DataProcessor *i, processors) {
-        dataProcessorToRun->addItem(i->name());
+    QMapIterator<QString, DataProcessor*> i(processors);
+    i.toFront();
+    while (i.hasNext()) {
+        i.next();
+        dataProcessorToRun->addItem(i.value()->name(), i.key());
     }
 
     dpButton = new QPushButton(tr("Edit"), this);
@@ -208,7 +207,7 @@ processed(0), fails(0), numFilesToProcess(0) {
 
     status = new QLabel("", this);
     cancel = new QPushButton(tr("Cancel"), this);
-    ok = new QPushButton(tr(bpEXECUTE), this);
+    ok = new QPushButton(tr("Execute"), this);
 
     buttons->addWidget(status);
     buttons->addStretch();
@@ -358,7 +357,7 @@ BatchProcessingDialog::fileSelected(QTreeWidgetItem* current) {
 void
 BatchProcessingDialog::okClicked()
 {
-    if (ok->text() == bpEXECUTE || ok->text() == tr(bpEXECUTE)) {
+    if (ok->text() == "Execute" || ok->text() == tr("Execute")) {
         aborted = false;
 
         // hide or disable editing in widgets
@@ -371,42 +370,30 @@ BatchProcessingDialog::okClicked()
         }
 
         status->setText(tr("Processing..."));
-        ok->setText(tr(bpABORT));
+        ok->setText(tr("Abort"));
         bpFailureType result = BatchProcessingDialog::unknownF;
 
-        QString summaryType("Processed ");
+        QString summaryType(tr("Processed "));
 
         // call the selected type of batch processing
         switch (outputMode) {
             case BatchProcessingDialog::exportB: {
                 result = exportFiles();
-                summaryType = "Exported ";
+                summaryType = tr("Exported ");
             } break;
 
             case BatchProcessingDialog::dataProcessorB: {
-                result = runDataProcessorOnActivities(dataProcessorToRun->currentText());
+                result = runDataProcessorOnActivities(dataProcessorToRun->currentData().toString());
             } break;
 
             case BatchProcessingDialog::deleteB: {
                 result = deleteFiles();
-                summaryType = "Deleted ";
+                summaryType = tr("Deleted ");
             } break;
         }
     
         switch (result) {
 
-            case BatchProcessingDialog::dateFormatF: {
-                status->setText(tr("Processing failed due date format error..."));
-                break;
-            }
-            case BatchProcessingDialog::timeFormatF: {
-                status->setText(tr("Processing failed due time format error..."));
-                break;
-            }
-            case BatchProcessingDialog::noRideMFoundF: {
-                status->setText(tr("Processing failed as the ride metric cannot be found..."));
-                break;
-            }
             case BatchProcessingDialog::userF: {
                 status->setText(tr("Processing aborted by the user..."));
                 break;
@@ -417,7 +404,7 @@ BatchProcessingDialog::okClicked()
             }
             case BatchProcessingDialog::finishedF: {
                 status->setText(summaryType + QString(tr("%1 activities successfully, %2 failed or skipped.")).arg(processed).arg(fails));
-                ok->setText(tr(bpFINISH));
+                ok->setText(tr("Finish"));
                 break;
             }
             default: {
@@ -425,10 +412,10 @@ BatchProcessingDialog::okClicked()
                 break;
             }
         }
-    } else if (ok->text() == bpABORT || ok->text() == tr(bpABORT)) {
+    } else if (ok->text() == "Abort" || ok->text() == tr("Abort")) {
         aborted = true;
-        ok->setText(tr(bpFINISH));
-    } else if (ok->text() == bpFINISH || ok->text() == tr(bpFINISH)) {
+        ok->setText(tr("Finish"));
+    } else if (ok->text() == "Finish" || ok->text() == tr("Finish")) {
         accept(); // our work is done!
     }
 }
@@ -465,7 +452,7 @@ BatchProcessingDialog::getActionColumnText() {
     // provides the Action info text for the various processing options
     switch (outputMode) {
     case BatchProcessingDialog::exportB: {
-        return "Export as " + fileFormat->currentText();
+        return tr("Export as ") + fileFormat->currentText();
     }
 
     case BatchProcessingDialog::dataProcessorB: {
@@ -473,10 +460,10 @@ BatchProcessingDialog::getActionColumnText() {
     }
 
     case BatchProcessingDialog::deleteB: {
-        return "Delete";
+        return tr("Delete");
     }
     }
-    return QString("Undefined");
+    return QString(tr("Undefined"));
 }
 
 BatchProcessingDialog::bpFailureType

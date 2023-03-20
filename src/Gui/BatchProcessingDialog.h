@@ -67,9 +67,6 @@ private:
         unknownF,
         finishedF,
         userF,
-        dateFormatF,
-        timeFormatF,
-        noRideMFoundF,
         noDataProcessorF
     } bpFailureType;
 
