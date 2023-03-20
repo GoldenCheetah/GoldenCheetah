@@ -4231,203 +4231,233 @@ Press Next to Continue
 <context>
     <name>BatchProcessingDialog</name>
     <message>
-        <location filename="../../Gui/BatchProcessingDialog.cpp" line="44"/>
+        <location filename="../../Gui/BatchProcessingDialog.cpp" line="41"/>
         <source>Activity Batch Processing</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/BatchProcessingDialog.cpp" line="65"/>
+        <location filename="../../Gui/BatchProcessingDialog.cpp" line="62"/>
         <source>check/uncheck all</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/BatchProcessingDialog.cpp" line="69"/>
+        <location filename="../../Gui/BatchProcessingDialog.cpp" line="66"/>
         <source>Filename</source>
         <translation type="unfinished">ファイル名</translation>
     </message>
     <message>
-        <location filename="../../Gui/BatchProcessingDialog.cpp" line="70"/>
+        <location filename="../../Gui/BatchProcessingDialog.cpp" line="67"/>
         <source>Date</source>
         <translation type="unfinished">日付</translation>
     </message>
     <message>
-        <location filename="../../Gui/BatchProcessingDialog.cpp" line="71"/>
+        <location filename="../../Gui/BatchProcessingDialog.cpp" line="68"/>
         <source>Time</source>
         <translation type="unfinished">時間</translation>
     </message>
     <message>
-        <location filename="../../Gui/BatchProcessingDialog.cpp" line="72"/>
+        <location filename="../../Gui/BatchProcessingDialog.cpp" line="69"/>
         <source>Action</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/BatchProcessingDialog.cpp" line="105"/>
+        <location filename="../../Gui/BatchProcessingDialog.cpp" line="102"/>
         <source>dd MMM yyyy</source>
         <translation type="unfinished">yyyy年MMMMd日</translation>
     </message>
     <message>
-        <location filename="../../Gui/BatchProcessingDialog.cpp" line="120"/>
+        <location filename="../../Gui/BatchProcessingDialog.cpp" line="117"/>
         <source>Export</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/BatchProcessingDialog.cpp" line="123"/>
+        <location filename="../../Gui/BatchProcessingDialog.cpp" line="120"/>
         <source>As</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/BatchProcessingDialog.cpp" line="128"/>
+        <location filename="../../Gui/BatchProcessingDialog.cpp" line="125"/>
         <source>All data (CSV)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/BatchProcessingDialog.cpp" line="132"/>
+        <location filename="../../Gui/BatchProcessingDialog.cpp" line="129"/>
         <source>Browse</source>
         <translation type="unfinished">参照</translation>
     </message>
     <message>
-        <location filename="../../Gui/BatchProcessingDialog.cpp" line="134"/>
+        <location filename="../../Gui/BatchProcessingDialog.cpp" line="131"/>
         <source>To</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/BatchProcessingDialog.cpp" line="141"/>
+        <location filename="../../Gui/BatchProcessingDialog.cpp" line="138"/>
         <source>Overwrite Files</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/BatchProcessingDialog.cpp" line="166"/>
+        <location filename="../../Gui/BatchProcessingDialog.cpp" line="163"/>
         <source>Run Data Processor</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/BatchProcessingDialog.cpp" line="180"/>
+        <location filename="../../Gui/BatchProcessingDialog.cpp" line="177"/>
         <source>Edit</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/BatchProcessingDialog.cpp" line="198"/>
+        <location filename="../../Gui/BatchProcessingDialog.cpp" line="195"/>
         <source>Delete All Selected Activities</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/BatchProcessingDialog.cpp" line="209"/>
+        <location filename="../../Gui/BatchProcessingDialog.cpp" line="206"/>
         <source>Cancel</source>
         <translation type="unfinished">キャンセル</translation>
     </message>
     <message>
-        <location filename="../../Gui/BatchProcessingDialog.cpp" line="263"/>
+        <location filename="../../Gui/BatchProcessingDialog.cpp" line="207"/>
+        <location filename="../../Gui/BatchProcessingDialog.cpp" line="357"/>
+        <source>Execute</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Gui/BatchProcessingDialog.cpp" line="260"/>
         <source>%1 files selected</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/BatchProcessingDialog.cpp" line="270"/>
+        <location filename="../../Gui/BatchProcessingDialog.cpp" line="267"/>
         <source>Select Target Directory</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/BatchProcessingDialog.cpp" line="351"/>
-        <location filename="../../Gui/BatchProcessingDialog.cpp" line="456"/>
+        <location filename="../../Gui/BatchProcessingDialog.cpp" line="348"/>
+        <location filename="../../Gui/BatchProcessingDialog.cpp" line="441"/>
         <source>--</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/BatchProcessingDialog.cpp" line="372"/>
+        <location filename="../../Gui/BatchProcessingDialog.cpp" line="369"/>
         <source>Processing...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/BatchProcessingDialog.cpp" line="398"/>
-        <source>Processing failed due date format error...</source>
+        <location filename="../../Gui/BatchProcessingDialog.cpp" line="370"/>
+        <location filename="../../Gui/BatchProcessingDialog.cpp" line="412"/>
+        <source>Abort</source>
+        <translation type="unfinished">中止</translation>
+    </message>
+    <message>
+        <location filename="../../Gui/BatchProcessingDialog.cpp" line="373"/>
+        <source>Processed </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/BatchProcessingDialog.cpp" line="402"/>
-        <source>Processing failed due time format error...</source>
+        <location filename="../../Gui/BatchProcessingDialog.cpp" line="379"/>
+        <source>Exported </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/BatchProcessingDialog.cpp" line="406"/>
-        <source>Processing failed as the ride metric cannot be found...</source>
+        <location filename="../../Gui/BatchProcessingDialog.cpp" line="388"/>
+        <source>Deleted </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/BatchProcessingDialog.cpp" line="410"/>
+        <location filename="../../Gui/BatchProcessingDialog.cpp" line="395"/>
         <source>Processing aborted by the user...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/BatchProcessingDialog.cpp" line="414"/>
+        <location filename="../../Gui/BatchProcessingDialog.cpp" line="399"/>
         <source>Processing failed as the data processor cannot be found...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/BatchProcessingDialog.cpp" line="418"/>
+        <location filename="../../Gui/BatchProcessingDialog.cpp" line="403"/>
         <source>%1 activities successfully, %2 failed or skipped.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/BatchProcessingDialog.cpp" line="423"/>
+        <location filename="../../Gui/BatchProcessingDialog.cpp" line="404"/>
+        <location filename="../../Gui/BatchProcessingDialog.cpp" line="414"/>
+        <location filename="../../Gui/BatchProcessingDialog.cpp" line="415"/>
+        <source>Finish</source>
+        <translation type="unfinished">終了</translation>
+    </message>
+    <message>
+        <location filename="../../Gui/BatchProcessingDialog.cpp" line="408"/>
         <source>Processing failed for an unknown reason...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/BatchProcessingDialog.cpp" line="511"/>
+        <location filename="../../Gui/BatchProcessingDialog.cpp" line="452"/>
+        <source>Export as </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Gui/BatchProcessingDialog.cpp" line="463"/>
+        <source>Undefined</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../../Gui/BatchProcessingDialog.cpp" line="496"/>
         <source>Exists - not exported</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/BatchProcessingDialog.cpp" line="519"/>
+        <location filename="../../Gui/BatchProcessingDialog.cpp" line="504"/>
         <source>Removing...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/BatchProcessingDialog.cpp" line="523"/>
+        <location filename="../../Gui/BatchProcessingDialog.cpp" line="508"/>
         <source>Reading...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/BatchProcessingDialog.cpp" line="534"/>
+        <location filename="../../Gui/BatchProcessingDialog.cpp" line="519"/>
         <source>Writing...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/BatchProcessingDialog.cpp" line="548"/>
+        <location filename="../../Gui/BatchProcessingDialog.cpp" line="533"/>
         <source>Exported</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/BatchProcessingDialog.cpp" line="551"/>
+        <location filename="../../Gui/BatchProcessingDialog.cpp" line="536"/>
         <source>Write failed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/BatchProcessingDialog.cpp" line="559"/>
+        <location filename="../../Gui/BatchProcessingDialog.cpp" line="544"/>
         <source>Read error</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/BatchProcessingDialog.cpp" line="572"/>
+        <location filename="../../Gui/BatchProcessingDialog.cpp" line="557"/>
         <source>Are you sure you want to delete all selected activities?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/BatchProcessingDialog.cpp" line="573"/>
+        <location filename="../../Gui/BatchProcessingDialog.cpp" line="460"/>
+        <location filename="../../Gui/BatchProcessingDialog.cpp" line="558"/>
         <source>Delete</source>
         <translation type="unfinished">削除</translation>
     </message>
     <message>
-        <location filename="../../Gui/BatchProcessingDialog.cpp" line="597"/>
+        <location filename="../../Gui/BatchProcessingDialog.cpp" line="582"/>
         <source>Deleted</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/BatchProcessingDialog.cpp" line="655"/>
+        <location filename="../../Gui/BatchProcessingDialog.cpp" line="640"/>
         <source>Processed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../../Gui/BatchProcessingDialog.cpp" line="672"/>
+        <location filename="../../Gui/BatchProcessingDialog.cpp" line="657"/>
         <source>Failed to process activity</source>
         <translation type="unfinished"></translation>
     </message>
@@ -8618,7 +8648,7 @@ You may need to (re)install the FTDI or PL2303 drivers before downloading.</sour
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="1612"/>
         <source>Metric</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">統計</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="1613"/>
@@ -9478,7 +9508,7 @@ You may need to (re)install the FTDI or PL2303 drivers before downloading.</sour
     <message>
         <location filename="../../Gui/EditUserMetricDialog.cpp" line="194"/>
         <source>Metric</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">統計</translation>
     </message>
     <message>
         <location filename="../../Gui/EditUserMetricDialog.cpp" line="195"/>
@@ -12373,7 +12403,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
         <location filename="../../Core/GcUpgrade.cpp" line="252"/>
         <location filename="../../Core/GcUpgrade.cpp" line="268"/>
         <source>Metric</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">統計</translation>
     </message>
     <message>
         <location filename="../../Core/GcUpgrade.cpp" line="254"/>
@@ -12904,7 +12934,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Gui/Pages.cpp" line="117"/>
         <source>Metric</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">統計</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="118"/>
@@ -19678,7 +19708,7 @@ Please check your preference settings.</source>
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="2295"/>
         <source>mph</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">m/h</translation>
     </message>
     <message>
         <location filename="../../Metrics/BasicRideMetrics.cpp" line="2299"/>
@@ -21155,7 +21185,7 @@ No rides found to import.
     <message>
         <location filename="../../Gui/NewCyclistDialog.cpp" line="66"/>
         <source>Metric</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">統計</translation>
     </message>
     <message>
         <location filename="../../Gui/NewCyclistDialog.cpp" line="67"/>
@@ -21550,7 +21580,7 @@ No rides found to import.
     <message>
         <location filename="../../Charts/OverviewItems.cpp" line="3741"/>
         <source>Metric</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">統計</translation>
     </message>
     <message>
         <location filename="../../Charts/OverviewItems.cpp" line="3749"/>
@@ -25071,7 +25101,7 @@ yyyy</source>
     <message>
         <location filename="../../Charts/OverviewItems.cpp" line="59"/>
         <source>Metric</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">統計</translation>
     </message>
     <message>
         <location filename="../../Charts/OverviewItems.cpp" line="59"/>
@@ -26763,7 +26793,7 @@ Do you want to continue?</source>
     <message>
         <location filename="../../FileIO/RideFile.cpp" line="482"/>
         <source>mph</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">m/h</translation>
     </message>
     <message>
         <location filename="../../FileIO/RideFile.cpp" line="483"/>
@@ -29624,7 +29654,7 @@ Power&apos; option in the training preferences tab.</source>
     <message>
         <location filename="../../Metrics/SpecialFields.cpp" line="152"/>
         <source>Metric</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">統計</translation>
     </message>
     <message>
         <location filename="../../Metrics/SpecialFields.cpp" line="153"/>
@@ -30741,7 +30771,7 @@ If the newly created activity clashes with an existing activity (same date and t
     <message>
         <location filename="../../Gui/ToolsRhoEstimator.cpp" line="54"/>
         <source>Metric</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">統計</translation>
     </message>
     <message>
         <location filename="../../Gui/ToolsRhoEstimator.cpp" line="57"/>
@@ -31480,7 +31510,7 @@ Press F3 on Controller when done.</source>
         <location filename="../../Charts/TreeMapWindow.cpp" line="111"/>
         <location filename="../../Charts/TreeMapWindow.cpp" line="138"/>
         <source>Metric</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">統計</translation>
     </message>
     <message>
         <location filename="../../Charts/TreeMapWindow.cpp" line="141"/>
