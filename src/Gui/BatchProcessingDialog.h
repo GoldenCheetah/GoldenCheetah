@@ -43,7 +43,7 @@
 class BatchProcessingDialog : public QDialog
 {
     Q_OBJECT
-    G_OBJECT
+        G_OBJECT
 
 public:
     BatchProcessingDialog(Context *context);
@@ -67,12 +67,18 @@ private:
         unknownF,
         finishedF,
         userF,
+        dateFormatF,
+        timeFormatF,
+        noRideMFoundF,
         noDataProcessorF
     } bpFailureType;
 
     typedef enum {
         exportB,
         dataProcessorB,
+        metadataSetB,
+        metricSetB,
+        metricClearB,
         deleteB } batchRadioBType;
 
     Context *context;
@@ -84,8 +90,12 @@ private:
     QTreeWidget *files; // choose files to export
 
     QWidget *disableContainer, *dpContainer, *exportContainer;
+    QWidget *metaDataContainer, *metricDataContainer, *clearMetricDataContainer;
 
     QComboBox *fileFormat, *dataProcessorToRun;
+    QComboBox *metadataFieldToSet, *metricFieldToSet, *metricFieldToClear;
+    QLineEdit *metadataEditField, *metricDataEditField;
+    QLabel *metricUnitsLabel;
 
     QLabel *dirName, *status;
     QCheckBox *overwrite, *all;
@@ -95,12 +105,20 @@ private:
     QString getActionColumnText();
     void fileSelected(QTreeWidgetItem* current);
     void updateNumberSelected();
+    void updateMetadataTypeField();
+    void updateMetricDataTypeField();
 
     bpFailureType exportFiles();
     bpFailureType deleteFiles();
     bpFailureType runDataProcessorOnActivities(const QString& processorName);
+    bpFailureType setMetadataForActivities(const QString& metaDataFieldName,
+        QString metaDataValue);
+    bpFailureType setMetricFieldForActivities(const QString& metricDataFieldName,
+        QString metricDataValue);
+    bpFailureType clearMetricFieldForActivities(const QString& metricDataFieldName);
 
+    RideMetric* displayNametoRideMetric(const QString& fieldDisplayName);
     void failedToProcessEntry(QTreeWidgetItem* current);
-    
+
 };
 #endif // _BatchProcessingDialog_h
