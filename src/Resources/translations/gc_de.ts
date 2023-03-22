@@ -352,7 +352,7 @@ Sie müssen diesen möglicherweise manuell de-aktivieren.</translation>
     <message>
         <location filename="../../Cloud/AddCloudWizard.cpp" line="287"/>
         <source>Key (optional)</source>
-        <translation>Key (optional)</translation>
+        <translation>Schlüssel (optional)</translation>
     </message>
     <message>
         <location filename="../../Cloud/AddCloudWizard.cpp" line="288"/>
@@ -4090,37 +4090,37 @@ gespeichert</translation>
     <message>
         <location filename="../../Cloud/Azum.cpp" line="75"/>
         <source>There is no token</source>
-        <translation type="unfinished"></translation>
+        <translation>Es gibt kein Token</translation>
     </message>
     <message>
         <location filename="../../Cloud/Azum.cpp" line="81"/>
         <source>There is no selected athlete</source>
-        <translation type="unfinished"></translation>
+        <translation>Es gibt keinen ausgewählten Athleten</translation>
     </message>
     <message>
         <location filename="../../Cloud/Azum.cpp" line="127"/>
         <source>JSON parser error</source>
-        <translation type="unfinished">JSON Parser Fehler</translation>
+        <translation>JSON Parser Fehler</translation>
     </message>
     <message>
         <location filename="../../Cloud/Azum.cpp" line="173"/>
         <source>No selected athlete</source>
-        <translation type="unfinished"></translation>
+        <translation>Kein Athlet ausgewählt</translation>
     </message>
     <message>
         <location filename="../../Cloud/Azum.cpp" line="297"/>
         <source>Completed.</source>
-        <translation type="unfinished">Abgeschlossen.</translation>
+        <translation>Abgeschlossen.</translation>
     </message>
     <message>
         <location filename="../../Cloud/Azum.h" line="20"/>
         <source>Azum</source>
-        <translation type="unfinished"></translation>
+        <translation>Azum</translation>
     </message>
     <message>
         <location filename="../../Cloud/Azum.h" line="21"/>
         <source>Sync with new and unique coaching platform from Switzerland.</source>
-        <translation type="unfinished"></translation>
+        <translation>Synchronisieren mit der neuern und einzigartigen Coaching-Plattform aus der Schweiz.</translation>
     </message>
 </context>
 <context>
@@ -4278,233 +4278,233 @@ gespeichert</translation>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="41"/>
         <source>Activity Batch Processing</source>
-        <translation type="unfinished"></translation>
+        <translation>Stapelverarbeitung von Aktivitäten</translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="62"/>
         <source>check/uncheck all</source>
-        <translation type="unfinished">Alle auswählen/abwählen</translation>
+        <translation>Alle auswählen/abwählen</translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="66"/>
         <source>Filename</source>
-        <translation type="unfinished">Dateiname</translation>
+        <translation>Dateiname</translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="67"/>
         <source>Date</source>
-        <translation type="unfinished">Datum</translation>
+        <translation>Datum</translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="68"/>
         <source>Time</source>
-        <translation type="unfinished">Zeit</translation>
+        <translation>Zeit</translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="69"/>
         <source>Action</source>
-        <translation type="unfinished">Aktion</translation>
+        <translation>Aktion</translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="102"/>
         <source>dd MMM yyyy</source>
-        <translation type="unfinished">dd.MMM yyyy</translation>
+        <translation>dd.MMM yyyy</translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="117"/>
         <source>Export</source>
-        <translation type="unfinished">Exportieren</translation>
+        <translation>Exportieren</translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="120"/>
         <source>As</source>
-        <translation type="unfinished"></translation>
+        <translation>Als</translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="125"/>
         <source>All data (CSV)</source>
-        <translation type="unfinished"></translation>
+        <translation>Alle Daten (CSV)</translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="129"/>
         <source>Browse</source>
-        <translation type="unfinished">Durchsuchen</translation>
+        <translation>Durchsuchen</translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="131"/>
         <source>To</source>
-        <translation type="unfinished"></translation>
+        <translation>nach</translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="138"/>
         <source>Overwrite Files</source>
-        <translation type="unfinished"></translation>
+        <translation>Dateien überschreiben</translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="163"/>
         <source>Run Data Processor</source>
-        <translation type="unfinished"></translation>
+        <translation>Datenverarbeitung ausführen</translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="177"/>
         <source>Edit</source>
-        <translation type="unfinished">Bearbeiten</translation>
+        <translation>Bearbeiten</translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="195"/>
         <source>Delete All Selected Activities</source>
-        <translation type="unfinished"></translation>
+        <translation>Alle ausgewählten Aktivitäten löschen</translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="206"/>
         <source>Cancel</source>
-        <translation type="unfinished">Abbrechen</translation>
+        <translation>Abbrechen</translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="207"/>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="357"/>
         <source>Execute</source>
-        <translation type="unfinished"></translation>
+        <translation>Ausführen</translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="260"/>
         <source>%1 files selected</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 Dateien ausgewählt</translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="267"/>
         <source>Select Target Directory</source>
-        <translation type="unfinished">Zielverzeichnis auswählen</translation>
+        <translation>Zielverzeichnis auswählen</translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="348"/>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="441"/>
         <source>--</source>
-        <translation type="unfinished"></translation>
+        <translation>--</translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="369"/>
         <source>Processing...</source>
-        <translation type="unfinished">Verarbeite...</translation>
+        <translation>Berechnet Werte...</translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="370"/>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="412"/>
         <source>Abort</source>
-        <translation type="unfinished">Abbrechen</translation>
+        <translation>Abbrechen</translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="373"/>
         <source>Processed </source>
-        <translation type="unfinished"></translation>
+        <translation>Verarbeitet </translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="379"/>
         <source>Exported </source>
-        <translation type="unfinished"></translation>
+        <translation>Exportiert </translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="388"/>
         <source>Deleted </source>
-        <translation type="unfinished"></translation>
+        <translation>Gelöscht </translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="395"/>
         <source>Processing aborted by the user...</source>
-        <translation type="unfinished"></translation>
+        <translation>Verarbeitung durch den Benutzer abgebrochen...</translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="399"/>
         <source>Processing failed as the data processor cannot be found...</source>
-        <translation type="unfinished"></translation>
+        <translation>Verarbeitung fehlgeschlagen, da der Datenverarbeiter nicht gefunden werden kann...</translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="403"/>
         <source>%1 activities successfully, %2 failed or skipped.</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 Aktivitäten erfolgreich, %2 fehlgeschlagen oder übersprungen.</translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="404"/>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="414"/>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="415"/>
         <source>Finish</source>
-        <translation type="unfinished">Fertig</translation>
+        <translation>Fertig</translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="408"/>
         <source>Processing failed for an unknown reason...</source>
-        <translation type="unfinished"></translation>
+        <translation>Die Verarbeitung ist aus einem unbekannten Grund fehlgeschlagen...</translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="452"/>
         <source>Export as </source>
-        <translation type="unfinished"></translation>
+        <translation>Exportieren als </translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="463"/>
         <source>Undefined</source>
-        <translation type="unfinished">Nicht definiert</translation>
+        <translation>Undefiniert</translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="496"/>
         <source>Exists - not exported</source>
-        <translation type="unfinished">Bereits vorhanden - nicht exportiert</translation>
+        <translation>Bereits vorhanden - nicht exportiert</translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="504"/>
         <source>Removing...</source>
-        <translation type="unfinished">Lösche...</translation>
+        <translation>Lösche...</translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="508"/>
         <source>Reading...</source>
-        <translation type="unfinished">Lese...</translation>
+        <translation>Lese...</translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="519"/>
         <source>Writing...</source>
-        <translation type="unfinished">Schreibe...</translation>
+        <translation>Schreibe...</translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="533"/>
         <source>Exported</source>
-        <translation type="unfinished">Exportiert</translation>
+        <translation>Exportiert</translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="536"/>
         <source>Write failed</source>
-        <translation type="unfinished">Schreiben fehlgeschlagen</translation>
+        <translation>Schreiben fehlgeschlagen</translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="544"/>
         <source>Read error</source>
-        <translation type="unfinished">Lesefehler</translation>
+        <translation>Lesefehler</translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="557"/>
         <source>Are you sure you want to delete all selected activities?</source>
-        <translation type="unfinished"></translation>
+        <translation>Sind Sie sicher, dass Sie alle ausgewählten Aktivitäten löschen wollen?</translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="460"/>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="558"/>
         <source>Delete</source>
-        <translation type="unfinished">Löschen</translation>
+        <translation>Löschen</translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="582"/>
         <source>Deleted</source>
-        <translation type="unfinished"></translation>
+        <translation>Gelöscht</translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="640"/>
         <source>Processed</source>
-        <translation type="unfinished"></translation>
+        <translation>Verarbeitet</translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="657"/>
         <source>Failed to process activity</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktivität konnte nicht verarbeitet werden</translation>
     </message>
 </context>
 <context>
@@ -10518,7 +10518,12 @@ an den Computer anschließen und
   - &quot;Filter window size&quot; distance on either side of the current interval
   - &quot;Set Rest HRV&quot; if checked on interactive use the computed HRV metrics are set as Rest HRV Measures
 </source>
-        <translation type="unfinished"></translation>
+        <translation>R-R-Ausreißer filtern (siehe &quot;R-R flag&quot; in HRV Xdata). Nicht-Ausreißer sind mit &quot;1&quot; gekennzeichnet.
+  - &quot;R-R Minimum und Maximum&quot; schließen Daten ausserhalb dieser Bereich aus (Kennzeichen -1). Sie werden auch beim Filtern des Bereichs ausgeschlossen.
+  - &quot;Filterbereich&quot; des Durchschnitts innerhalb eines Fensters (Kennzeichen 0)
+  - &quot;Filter Fenstergröße&quot; Abstand auf beiden Seiten des aktuellen Intervalls
+  - Wenn &quot;Ruhe HRV festlegen&quot; ausgewählt ist, werden die berechneten HRV-Metriken als Ruhe HRV Messwert gespeichert
+</translation>
     </message>
 </context>
 <context>
@@ -11353,7 +11358,7 @@ Wenn beide Parameter angegeben werden, wird zunächst die prozentuale Anpassung 
     <message>
         <location filename="../../FileIO/FixPyDataProcessor.cpp" line="13"/>
         <source>Custom Python Data Processor</source>
-        <translation type="unfinished"></translation>
+        <translation>Benutzerdefinierte Python-Datenverarbeitung</translation>
     </message>
 </context>
 <context>
@@ -13555,7 +13560,7 @@ Drehmomentkorrektur - Der absolute Korrekturwert in Nm (oder Pfund pro Quadratin
     <message>
         <location filename="../../Gui/RideNavigator.cpp" line="883"/>
         <source>Undefined</source>
-        <translation>Nicht definiert</translation>
+        <translation>Undefiniert</translation>
     </message>
     <message>
         <location filename="../../Gui/RideNavigator.cpp" line="893"/>
@@ -13802,7 +13807,7 @@ Drehmomentkorrektur - Der absolute Korrekturwert in Nm (oder Pfund pro Quadratin
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="115"/>
         <source>Batch processes a (selectable) set of activties</source>
-        <translation type="unfinished"></translation>
+        <translation>Massenexport eines auswählbaren Satzes von Aktivitäten</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="122"/>
@@ -19425,7 +19430,7 @@ Please check your preference settings.</source>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="508"/>
         <source>&amp;Batch Processing...</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Stapelverarbeitung...</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="533"/>
@@ -19644,7 +19649,7 @@ Please check your preference settings.</source>
     <message>
         <location filename="../../FileIO/DataProcessor.cpp" line="148"/>
         <source>Save parameters as default</source>
-        <translation type="unfinished"></translation>
+        <translation>Einstellungen als Standard speichern</translation>
     </message>
     <message>
         <location filename="../../FileIO/DataProcessor.cpp" line="150"/>
@@ -21681,7 +21686,7 @@ Keine Aktivitäten zum Importieren gefunden.
     <message>
         <location filename="../../Cloud/OAuthDialog.cpp" line="525"/>
         <source>Azum authorization was successful.</source>
-        <translation type="unfinished"></translation>
+        <translation>Azum Autorisierung war erfolgreich.</translation>
     </message>
     <message>
         <location filename="../../Cloud/OAuthDialog.cpp" line="533"/>
