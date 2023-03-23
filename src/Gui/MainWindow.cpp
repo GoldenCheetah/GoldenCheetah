@@ -2539,21 +2539,9 @@ MainWindow::configChanged(qint32)
     tabbar->setShape(QTabBar::RoundedSouth);
     tabbar->setDrawBase(false);
 
-    // *** Code below copied NewSideBarItem::configChanged(qint32)
-    
-     // if foreground is white then we're "dark" if its
-    // black the we're "light" so this controls palette
-    bool dark = (GCColor::invertColor(GColor(CTOOLBAR)) == QColor(Qt::white));
-    bool isblack = (GColor(CTOOLBAR) == QColor(Qt::black)); // e.g. mustang theme
-
     // on select
-    QColor bg_select = GColor(CTOOLBAR);
-    if (dark) bg_select = bg_select.lighter(200);
-    else bg_select = bg_select.darker(200);
-    if (isblack) bg_select = QColor(30, 30, 30);
+    QColor bg_select = GCColor::selectedColor(GColor(CTOOLBAR));
     QColor fg_select = GCColor::invertColor(bg_select);
-
-    // *** Code above copied NewSideBarItem::configChanged(qint32)
 
     tabbar->setStyleSheet(QString("QTabBar::tab { background-color: %1; color: %2;}"
         "QTabBar::tab::selected { background-color: %3; color: %4; }").arg(GColor(CTOOLBAR).name())
