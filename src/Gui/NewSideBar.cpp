@@ -218,8 +218,9 @@ static QImage imageRGB(QImage &source, QColor target)
 void
 NewSideBarItem::configChanged(qint32)
 {
-    QColor col = GColor(CCHROME);
-    QString style=QString("QWidget { background: rgb(%1,%2,%3); }").arg(col.red()).arg(col.green()).arg(col.blue());
+    // set background colors
+    bg_normal = GColor(CCHROME);
+    QString style = QString("QWidget { background: rgb(%1,%2,%3); }").arg(bg_normal.red()).arg(bg_normal.green()).arg(bg_normal.blue());
     setStyleSheet(style);
 
     // set foreground colors
@@ -232,16 +233,8 @@ NewSideBarItem::configChanged(qint32)
     if (dark) fg_disabled = QColor(80,80,80);
     else fg_disabled = QColor(180,180,180);
 
-    // set background colors
-    col=GColor(CCHROME);
-    bool isblack = (col == QColor(Qt::black)); // e.g. mustang theme
-    bg_normal = col;
-
     // on select
-    bg_select =GColor(CCHROME);
-    if (dark) bg_select = bg_select.lighter(200);
-    else bg_select = bg_select.darker(200);
-    if (isblack) bg_select = QColor(30,30,30);
+    bg_select = GCColor::selectedColor(bg_normal);
     fg_select = GCColor::invertColor(bg_select);
 
     // on hover

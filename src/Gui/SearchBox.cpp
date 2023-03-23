@@ -148,6 +148,9 @@ SearchBox::configChanged(qint32)
                   .arg(clearButton->sizeHint().width() + frameWidth + 12));
 
     }
+        
+    toolButton->setStyleSheet(QString("QToolButton { background: transparent; color: %1;}")
+                                   .arg(GCColor::invertColor(GColor(CTOOLBAR)).name()));
 
     // get suitably formated list
     QList<QString> list;

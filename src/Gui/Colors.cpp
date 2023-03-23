@@ -444,6 +444,22 @@ QColor GCColor::alternateColor(QColor bgColor)
         return QColor(Qt::lightGray);
 }
 
+QColor GCColor::selectedColor(QColor bgColor)
+{
+     // if foreground is white then we're "dark" if it's
+     // black the we're "light" so this controls palette
+     bool dark = invertColor(bgColor) == QColor(Qt::white);
+     bool isblack = bgColor == QColor(Qt::black); // e.g. mustang theme
+
+     // on select background color
+     QColor bg_select = bgColor;
+     if (dark) bg_select = bg_select.lighter(200);
+     else bg_select = bg_select.darker(200);
+     if (isblack) bg_select = QColor(30, 30, 30);
+
+     return bg_select;
+}
+
 const Colors * GCColor::colorSet()
 {
     return ColorList;

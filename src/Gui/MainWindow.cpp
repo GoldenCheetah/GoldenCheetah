@@ -2535,15 +2535,21 @@ MainWindow::configChanged(qint32)
     whatsthis->setStyleSheet(buttonstyle);
 
     // All platforms
-    QPalette tabbarPalette;
     tabbar->setAutoFillBackground(true);
     tabbar->setShape(QTabBar::RoundedSouth);
     tabbar->setDrawBase(false);
 
-    tabbarPalette.setBrush(backgroundRole(), GColor(CTOOLBAR));
-    tabbarPalette.setBrush(foregroundRole(), GCColor::invertColor(GColor(CTOOLBAR)));
-    tabbar->setPalette(tabbarPalette);
-    athleteView->setPalette(tabbarPalette);
+    // on select
+    QColor bg_select = GCColor::selectedColor(GColor(CTOOLBAR));
+    QColor fg_select = GCColor::invertColor(bg_select);
+
+    tabbar->setStyleSheet(QString("QTabBar::tab { background-color: %1; color: %2;}"
+        "QTabBar::tab::selected { background-color: %3; color: %4; }").arg(GColor(CTOOLBAR).name())
+                                                                        .arg(GCColor::invertColor(GColor(CTOOLBAR)).name())
+                                                                        .arg(bg_select.name())
+                                                                        .arg(fg_select.name()));
+    tabbar->setDocumentMode(true);
+    athleteView->setPalette(tabbar->palette());
 
     head->updateGeometry();
     repaint();

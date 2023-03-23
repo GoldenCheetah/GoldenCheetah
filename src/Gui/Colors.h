@@ -130,6 +130,7 @@ class GCColor : public QObject
         static double luminance(QColor color); // return the relative luminance
         static QColor invertColor(QColor); // return the contrasting color
         static QColor alternateColor(QColor); // return the alternate background
+        static QColor selectedColor(QColor); // return the on select background color
         static QColor htmlCode(QColor x) { return x.name(); } // return the alternate background
         static Themes &themes(); 
         static void applyTheme(int index);
