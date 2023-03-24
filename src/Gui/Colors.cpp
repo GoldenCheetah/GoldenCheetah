@@ -635,14 +635,8 @@ GCColor::stylesheet(bool train)
     // make it to order to reflect current config
     QColor bgColor = train ? GColor(CTRAINPLOTBACKGROUND) : GColor(CPLOTBACKGROUND);
     QColor fgColor = GCColor::invertColor(bgColor);
-    QColor bgSelColor = train ? GColor(CCALACTUAL) : GColor(CPLOTBACKGROUND);
-    // TODO: Add dedicated color setting for train selection but this have to be done on version change only
-    //       in order to include a user configuration upgrade accordingly using GcUpgrade.cpp
+    QColor bgSelColor = selectedColor(bgColor);
     QColor fgSelColor = GCColor::invertColor(bgSelColor);
-    QString additionalStyle = !train ? "" :
-                                QString("QTreeView::item:selected { color: %2; background-color: %1; font-weight: bold;}")
-                                .arg(bgSelColor.name()).arg(fgSelColor.name());
-
     return QString("QTreeView { color: %2; background: %1; }"
                    "%3"
                    "QTableWidget { color: %2; background: %1; }"
@@ -651,9 +645,9 @@ GCColor::stylesheet(bool train)
                    "QHeaderView::section { background-color: %1; color: %2; border: 0px ; }"
 #endif
                    "QTableWidget::item:hover { color: black; background: lightGray; }"
-                   "QTreeView::item:hover { color: black; background: lightGray; }")
-                   .arg(bgColor.name()).arg(fgColor.name())
-                   .arg(additionalStyle);
+                   "QTreeView::item:hover { color: black; background: lightGray; }"
+                   "QTreeView::item:selected { color: %4; background-color: %3; }"
+                  ).arg(bgColor.name()).arg(fgColor.name()).arg(bgSelColor.name()).arg(fgSelColor.name());
 }
 
 bool
