@@ -148,10 +148,6 @@ SearchBox::configChanged(qint32)
                   .arg(clearButton->sizeHint().width() + frameWidth + 12));
 
     }
-        
-    toolButton->setStyleSheet(QString("QToolButton { border: none; padding: 0px; background: %1; color: %2;}")
-                                   .arg(GColor(CTOOLBAR).name())
-                                   .arg(GCColor::invertColor(GColor(CTOOLBAR)).name()));
 
     // get suitably formated list
     QList<QString> list;
@@ -271,9 +267,9 @@ void SearchBox::resizeEvent(QResizeEvent *)
     clearButton->move(rect().right() - frameWidth - sz.width() - 1, 3);
     searchButton->move(3 *dpiXFactor, 6 *dpiYFactor);
 #ifndef Q_OS_MAC
-    toolButton->move(10*dpiXFactor, 2);
+    toolButton->move(10*dpiXFactor, 0);
 #else
-    toolButton->move(10*dpiXFactor, 2);
+    toolButton->move(10*dpiXFactor, 0);
 #endif
 
     //container->move(rect().left(), rect().bottom() + 3); // named dialog...
