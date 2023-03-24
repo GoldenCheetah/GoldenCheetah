@@ -1686,7 +1686,7 @@ Clicca Successivo per Continuare
     <message>
         <location filename="../../Charts/AllPlot.cpp" line="6993"/>
         <source>R-R</source>
-        <translation>R-R</translation>
+        <translation type="unfinished">R-R</translation>
     </message>
     <message>
         <location filename="../../Charts/AllPlot.cpp" line="3873"/>
@@ -4084,37 +4084,37 @@ Clicca Successivo per Continuare
     <message>
         <location filename="../../Cloud/Azum.cpp" line="75"/>
         <source>There is no token</source>
-        <translation type="unfinished"></translation>
+        <translation>Non c&apos;è il token</translation>
     </message>
     <message>
         <location filename="../../Cloud/Azum.cpp" line="81"/>
         <source>There is no selected athlete</source>
-        <translation type="unfinished"></translation>
+        <translation>Nessun atleta selezionato</translation>
     </message>
     <message>
         <location filename="../../Cloud/Azum.cpp" line="127"/>
         <source>JSON parser error</source>
-        <translation type="unfinished">Errore parser JSON</translation>
+        <translation>Errore parser JSON</translation>
     </message>
     <message>
         <location filename="../../Cloud/Azum.cpp" line="173"/>
         <source>No selected athlete</source>
-        <translation type="unfinished"></translation>
+        <translation>Atleta non selezionato</translation>
     </message>
     <message>
         <location filename="../../Cloud/Azum.cpp" line="297"/>
         <source>Completed.</source>
-        <translation type="unfinished">Completato.</translation>
+        <translation>Completato.</translation>
     </message>
     <message>
         <location filename="../../Cloud/Azum.h" line="20"/>
         <source>Azum</source>
-        <translation type="unfinished"></translation>
+        <translation>Azum</translation>
     </message>
     <message>
         <location filename="../../Cloud/Azum.h" line="21"/>
         <source>Sync with new and unique coaching platform from Switzerland.</source>
-        <translation type="unfinished"></translation>
+        <translation>Sincronizza con la nuova e unica piattaforma di coaching svizzera.</translation>
     </message>
 </context>
 <context>
@@ -4272,233 +4272,233 @@ Clicca Successivo per Continuare
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="41"/>
         <source>Activity Batch Processing</source>
-        <translation type="unfinished"></translation>
+        <translation>Elaborazione Batch delle Attività</translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="62"/>
         <source>check/uncheck all</source>
-        <translation type="unfinished"></translation>
+        <translation>seleziona/deseleziona tutto</translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="66"/>
         <source>Filename</source>
-        <translation type="unfinished">Nome file</translation>
+        <translation>Nome file</translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="67"/>
         <source>Date</source>
-        <translation type="unfinished">Data</translation>
+        <translation>Data</translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="68"/>
         <source>Time</source>
-        <translation type="unfinished"></translation>
+        <translation>Ora</translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="69"/>
         <source>Action</source>
-        <translation type="unfinished">Azione</translation>
+        <translation>Azione</translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="102"/>
         <source>dd MMM yyyy</source>
-        <translation type="unfinished">dd MMM yyyy</translation>
+        <translation>dd MMM yyyy</translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="117"/>
         <source>Export</source>
-        <translation type="unfinished">Esporta</translation>
+        <translation>Esporta</translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="120"/>
         <source>As</source>
-        <translation type="unfinished"></translation>
+        <translation>Come</translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="125"/>
         <source>All data (CSV)</source>
-        <translation type="unfinished"></translation>
+        <translation>Tutti i dati (CSV)</translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="129"/>
         <source>Browse</source>
-        <translation type="unfinished">Sfoglia</translation>
+        <translation>Sfoglia</translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="131"/>
         <source>To</source>
-        <translation type="unfinished"></translation>
+        <translation>A</translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="138"/>
         <source>Overwrite Files</source>
-        <translation type="unfinished"></translation>
+        <translation>Sovrascrive i File</translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="163"/>
         <source>Run Data Processor</source>
-        <translation type="unfinished"></translation>
+        <translation>Esegue il processore dei dati</translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="177"/>
         <source>Edit</source>
-        <translation type="unfinished">Modifica</translation>
+        <translation>Modifica</translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="195"/>
         <source>Delete All Selected Activities</source>
-        <translation type="unfinished"></translation>
+        <translation>Elimina Tutte le Attività Selezionate</translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="206"/>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>Annulla</translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="207"/>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="357"/>
         <source>Execute</source>
-        <translation type="unfinished"></translation>
+        <translation>Esegue</translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="260"/>
         <source>%1 files selected</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 file selezionati</translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="267"/>
         <source>Select Target Directory</source>
-        <translation type="unfinished">Seleziona Rubrica di Destinazione</translation>
+        <translation>Seleziona la cartella di destinazione</translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="348"/>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="441"/>
         <source>--</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="369"/>
         <source>Processing...</source>
-        <translation type="unfinished">In elaborazione...</translation>
+        <translation>In elaborazione...</translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="370"/>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="412"/>
         <source>Abort</source>
-        <translation type="unfinished"></translation>
+        <translation>Interrompe</translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="373"/>
         <source>Processed </source>
-        <translation type="unfinished"></translation>
+        <translation>Elaborate </translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="379"/>
         <source>Exported </source>
-        <translation type="unfinished"></translation>
+        <translation>Esportate </translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="388"/>
         <source>Deleted </source>
-        <translation type="unfinished"></translation>
+        <translation>Eliminate </translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="395"/>
         <source>Processing aborted by the user...</source>
-        <translation type="unfinished"></translation>
+        <translation>Elaborazione interrotta dall&apos;utente...</translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="399"/>
         <source>Processing failed as the data processor cannot be found...</source>
-        <translation type="unfinished"></translation>
+        <translation>Elaborazione fallita perchè il processore dei dati non è stato trovato...</translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="403"/>
         <source>%1 activities successfully, %2 failed or skipped.</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 attività, %2 fallite o escluse.</translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="404"/>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="414"/>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="415"/>
         <source>Finish</source>
-        <translation type="unfinished">Finito</translation>
+        <translation>Fine</translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="408"/>
         <source>Processing failed for an unknown reason...</source>
-        <translation type="unfinished"></translation>
+        <translation>Elaborazione non riuscita per cause sconosciute...</translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="452"/>
         <source>Export as </source>
-        <translation type="unfinished"></translation>
+        <translation>Esporta come </translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="463"/>
         <source>Undefined</source>
-        <translation type="unfinished">Indefinito</translation>
+        <translation>Non definito</translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="496"/>
         <source>Exists - not exported</source>
-        <translation type="unfinished">Già esistente, non esportato</translation>
+        <translation>Già esistente - non esportato</translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="504"/>
         <source>Removing...</source>
-        <translation type="unfinished"></translation>
+        <translation>Rimozione...</translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="508"/>
         <source>Reading...</source>
-        <translation type="unfinished">In lettura...</translation>
+        <translation>In lettura...</translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="519"/>
         <source>Writing...</source>
-        <translation type="unfinished">In scrittura...</translation>
+        <translation>In scrittura...</translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="533"/>
         <source>Exported</source>
-        <translation type="unfinished">Esportato</translation>
+        <translation>Esportato</translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="536"/>
         <source>Write failed</source>
-        <translation type="unfinished">Scrittura fallita</translation>
+        <translation>Scrittura fallita</translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="544"/>
         <source>Read error</source>
-        <translation type="unfinished">Errore in lettura</translation>
+        <translation>Errore in lettura</translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="557"/>
         <source>Are you sure you want to delete all selected activities?</source>
-        <translation type="unfinished"></translation>
+        <translation>Confermi di voler eliminare tutte le attività selezionate?</translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="460"/>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="558"/>
         <source>Delete</source>
-        <translation type="unfinished"></translation>
+        <translation>Elimina</translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="582"/>
         <source>Deleted</source>
-        <translation type="unfinished"></translation>
+        <translation>Eliminato</translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="640"/>
         <source>Processed</source>
-        <translation type="unfinished"></translation>
+        <translation>Elaborato</translation>
     </message>
     <message>
         <location filename="../../Gui/BatchProcessingDialog.cpp" line="657"/>
         <source>Failed to process activity</source>
-        <translation type="unfinished"></translation>
+        <translation>Elaborazione attività fallita</translation>
     </message>
 </context>
 <context>
@@ -10006,12 +10006,12 @@ Forse ti occorre (ri)installare FTDI o PL2303 drivers prima del download.</trans
     <message>
         <location filename="../../Train/ErgFilePlot.cpp" line="549"/>
         <source>(km)</source>
-        <translation type="unfinished"></translation>
+        <translation>(km)</translation>
     </message>
     <message>
         <location filename="../../Train/ErgFilePlot.cpp" line="549"/>
         <source>(mi)</source>
-        <translation type="unfinished"></translation>
+        <translation>(mi)</translation>
     </message>
     <message>
         <location filename="../../Train/ErgFilePlot.cpp" line="584"/>
@@ -10464,7 +10464,7 @@ Forse ti occorre (ri)installare FTDI o PL2303 drivers prima del download.</trans
     <message>
         <location filename="../../FileIO/FilterHRV.cpp" line="246"/>
         <source>Filter R-R Outliers</source>
-        <translation>Filtra Outliers R-R</translation>
+        <translation>Filtra valori anomali R-R</translation>
     </message>
 </context>
 <context>
@@ -10472,27 +10472,27 @@ Forse ti occorre (ri)installare FTDI o PL2303 drivers prima del download.</trans
     <message>
         <location filename="../../FileIO/FilterHRV.cpp" line="154"/>
         <source>R-R maximum (msec)</source>
-        <translation>massimo R-R (msec)</translation>
+        <translation>Massimo R-R (msec)</translation>
     </message>
     <message>
         <location filename="../../FileIO/FilterHRV.cpp" line="155"/>
         <source>R-R minimum (msec)</source>
-        <translation>minimo R-R (msec)</translation>
+        <translation>Minimo R-R (msec)</translation>
     </message>
     <message>
         <location filename="../../FileIO/FilterHRV.cpp" line="156"/>
         <source>Filter range</source>
-        <translation>Intervallo filtro</translation>
+        <translation>Intervallo del filtro</translation>
     </message>
     <message>
         <location filename="../../FileIO/FilterHRV.cpp" line="157"/>
         <source>Filter window size (#)</source>
-        <translation>Taglia della finestra del filtro (#)</translation>
+        <translation>Ampiezza finestra del filtro (#)</translation>
     </message>
     <message>
         <location filename="../../FileIO/FilterHRV.cpp" line="183"/>
         <source>Set Rest Hrv</source>
-        <translation>Fissa Hrv a Riposo</translation>
+        <translation>Imposta Hrv a riposo</translation>
     </message>
     <message>
         <location filename="../../FileIO/FilterHRV.cpp" line="198"/>
@@ -10502,7 +10502,12 @@ Forse ti occorre (ri)installare FTDI o PL2303 drivers prima del download.</trans
   - &quot;Filter window size&quot; distance on either side of the current interval
   - &quot;Set Rest HRV&quot; if checked on interactive use the computed HRV metrics are set as Rest HRV Measures
 </source>
-        <translation type="unfinished"></translation>
+        <translation>Filtra i valori anomali R-R (vedi &quot;Flag R-R&quot; in HRV Xdata, dove i dati validi sono contrassegnati con &quot;1&quot;).
+  - &quot;R-R minimo e massimo&quot; esclude i campioni esterni all&apos;intervallo (flag -1). Esclusi anche quando si filtra per intervallo.
+  - &quot;Intervallo del filtro&quot; della media all&apos;interno della finestra (flag 0)
+  - &quot;Ampiezza finestra del filtro&quot; distanza dagli estremi dell&apos;intervallo corrente
+  - &quot;Imposta HRV a riposo&quot; se selezionato, le metriche HRV calcolate sono memorizzate come misurazioni HRV a riposo
+</translation>
     </message>
 </context>
 <context>
@@ -10769,7 +10774,7 @@ Avvertenza: l&apos;accuratezza della stima della potenza può essere troppo bass
     <message>
         <location filename="../../FileIO/FixElevation.cpp" line="178"/>
         <source>Fix Elevation Data not possible</source>
-        <translation>Correzzione dati dislivello non possibile</translation>
+        <translation>Correzione dati dislivello non possibile</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixElevation.cpp" line="179"/>
@@ -10779,22 +10784,22 @@ Avvertenza: l&apos;accuratezza della stima della potenza può essere troppo bass
     <message>
         <location filename="../../FileIO/FixElevation.cpp" line="302"/>
         <source>Connection to remote server timed out</source>
-        <translation type="unfinished">Connessione al server remoto timed out</translation>
+        <translation>Timeout per la connessione al server remoto</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixElevation.cpp" line="304"/>
         <source>Network error: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Errore di rete: %1</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixElevation.cpp" line="323"/>
         <source>Unexpected response from server: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Risposta non prevista dal server: %1</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixElevation.cpp" line="328"/>
         <source>Parse response error: %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Errore durante l&apos;analisi della risposta: %1</translation>
     </message>
 </context>
 <context>
@@ -11172,7 +11177,7 @@ Generally altitude data is noisiest and requires highest degree for
 reasonable smoothness. Route gps data gnerally requires a much
 lighter touch.
 </source>
-        <translation>Correzzione GPS a più passaggi:
+        <translation>Correzione GPS a più passaggi:
 0 - Sempre: rimuove gli errori GPS e interpola i dati
     di posizione dove il dispositivo GPS non ha registrato alcun dato,
     oppure i dati che sono stati registrati non sono validi.
@@ -11239,7 +11244,7 @@ stop - definisce la dimensione massima del gap (in secondi) che avrà un algorit
     <message>
         <location filename="../../FileIO/FixHRSpikes.cpp" line="116"/>
         <source>Fix HR Spikes</source>
-        <translation>Correggi Spikes FC</translation>
+        <translation>Correggi Picchi FC</translation>
     </message>
 </context>
 <context>
@@ -11247,7 +11252,7 @@ stop - definisce la dimensione massima del gap (in secondi) che avrà un algorit
     <message>
         <location filename="../../FileIO/FixHRSpikes.cpp" line="54"/>
         <source>Max</source>
-        <translation>Max</translation>
+        <translation>Massimo Assoluto</translation>
     </message>
     <message>
         <location filename="../../FileIO/FixHRSpikes.cpp" line="70"/>
@@ -11256,11 +11261,11 @@ stop - definisce la dimensione massima del gap (in secondi) che avrà un algorit
 It takes the following parameter:
 
 Absolute Max - this defines an absolute value for heart rates, and will smooth any values above this absolute value that have been identified as being anomalies (i.e. at odds with the data surrounding it).</source>
-        <translation>Occasionalmente i misuratori di frequenza cardiaca riportano erroneamente alti valori o cadute della frequenza cardiaca (0). Questa funzione controllerà per spikes e cadute nei valori di FC e rimpiazzeranno i dati errati interpolando i dati da entrambi i lati del dato in esame
+        <translation>Occasionalmente i misuratori di frequenza cardiaca riportano erroneamente picchi o cadute anomale della frequenza cardiaca (0). La funzione controlla questi picchi e cadute nei valori di FC e  rimpiazza i dati anomali, interpolando i campioni da entrambi i lati del dato in esame
 
-Considereranno i seguenti parametri:
+Utilizza i seguenti parametri:
 
-Massimo Assoluto - questo definisce un valore assoluto per la FC, e approssimera&apos; qualsiasi valore al di sopra questo valore assoluto che è stato identificato come anomalia (es.:uno strano valore rispetto i dati presedenti e successivi).</translation>
+Massimo Assoluto - definisce un valore assoluto per la FC, e approssima qualsiasi valore al di sopra di questo parametro, che è stato identificato come anomalia (es.: un valore in contrasto con i dati che lo circondano).</translation>
     </message>
 </context>
 <context>
@@ -13708,7 +13713,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="104"/>
         <source>Main functions related to activities like Activity Creation, Sharing and Export, and Splitting or Combining Activities</source>
-        <translation>Funzioni principali correlate alle attività come GEnerazione, Condivisione e Esportazione Attività o Unione Attività</translation>
+        <translation>Funzioni principali correlate alle attività come Creazione, Condivisione, Esportazione, Suddivisione o Unione Attività</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="110"/>
@@ -13819,7 +13824,7 @@ In modalità Allenamento, visualizza/nasconde la Regolazione Intensità e il Pan
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="115"/>
         <source>Batch processes a (selectable) set of activties</source>
-        <translation type="unfinished"></translation>
+        <translation>Elaborazione batch di un insieme (selezionabile) di attività</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="122"/>
@@ -19393,7 +19398,7 @@ Si prega di verificare le impostazioni delle preferenze.</translation>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="508"/>
         <source>&amp;Batch Processing...</source>
-        <translation type="unfinished"></translation>
+        <translation>Elaborazioni &amp;Batch...</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="533"/>
@@ -19562,7 +19567,7 @@ Si prega di verificare le impostazioni delle preferenze.</translation>
     <message>
         <location filename="../../FileIO/DataProcessor.cpp" line="148"/>
         <source>Save parameters as default</source>
-        <translation type="unfinished"></translation>
+        <translation>Salva come parametri di default</translation>
     </message>
     <message>
         <location filename="../../FileIO/DataProcessor.cpp" line="150"/>
@@ -21593,12 +21598,12 @@ Nessuna uscita in bici trovata da importare.
     <message>
         <location filename="../../Cloud/OAuthDialog.cpp" line="519"/>
         <source>Nolio authorization was successful.</source>
-        <translation type="unfinished"></translation>
+        <translation>Autorizzazione Nolio effettuata con successo.</translation>
     </message>
     <message>
         <location filename="../../Cloud/OAuthDialog.cpp" line="525"/>
         <source>Azum authorization was successful.</source>
-        <translation type="unfinished"></translation>
+        <translation>Autorizzazione Azum effettuata con successo.</translation>
     </message>
     <message>
         <location filename="../../Cloud/OAuthDialog.cpp" line="533"/>
@@ -33162,7 +33167,7 @@ Premi F3 sul Controller quando finito.</translation>
     <message>
         <location filename="../../Train/WebPageWindow.cpp" line="127"/>
         <source>Hit return to apply URL</source>
-        <translation type="unfinished"></translation>
+        <translation>Premere Invio per applicare l&apos;URL</translation>
     </message>
 </context>
 <context>
