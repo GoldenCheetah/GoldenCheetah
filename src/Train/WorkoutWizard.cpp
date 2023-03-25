@@ -406,10 +406,14 @@ RelWattagePage::RelWattagePage(QWidget *parent) : WorkoutPage(parent) {}
 void RelWattagePage::initializePage()
 {
     if (hackContext->athlete->zones("Bike") && hackContext->athlete->zones("Bike")->whichRange(QDate::currentDate()) >= 0) {
+        // get ftp according to settings
         int zoneRange = hackContext->athlete->zones("Bike")->whichRange(QDate::currentDate());
-        ftp = hackContext->athlete->zones("Bike")->getCP(zoneRange);
+        bool useCPForFTP = (appsettings->cvalue(hackContext->athlete->cyclist,
+                            hackContext->athlete->zones("Bike")->useCPforFTPSetting(), 0).toInt() == 0);
+        if (useCPForFTP) ftp = hackContext->athlete->zones("Bike")->getCP(zoneRange);
+        else ftp = hackContext->athlete->zones("Bike")->getFTP(zoneRange);
     } else {
-        ftp = 100; // if zones are not available let's make absolute watts match percentajes
+        ftp = 100; // if zones are not available let's make absolute watts match percentages
     }
 
     setTitle(tr("Workout Wizard"));
