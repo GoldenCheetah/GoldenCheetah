@@ -228,7 +228,7 @@ void WorkoutTypePage::initializePage()
     buttonGroupBox = new QButtonGroup(this);
     absWattageRadioButton = new QRadioButton(tr("Absolute Wattage"));
     absWattageRadioButton->click();
-    relWattageRadioButton = new QRadioButton(tr("% FTP Wattage"));
+    relWattageRadioButton = new QRadioButton(tr("Relative Wattage"));
     gradientRadioButton = new QRadioButton(tr("Gradient"));
 
     if (hackContext->rideItem()) {
@@ -413,11 +413,11 @@ void RelWattagePage::initializePage()
     }
 
     setTitle(tr("Workout Wizard"));
-    QString subTitle = tr("Relative Wattage Workout Wizard, current CP60 = ") + QString::number(ftp);
+    QString subTitle = tr("Relative Wattage Workout Creator, current CP = ") + QString::number(ftp);
     setSubTitle(subTitle);
 
     plot = new WorkoutPlot();
-    plot->setYAxisTitle(tr("% of FTP"));
+    plot->setYAxisTitle(tr("%"));
     plot->setXAxisTitle(tr("Time (minutes)"));
     plot->setAxisScale(QwtPlot::yLeft,0,200,0);
     plot->setAxisScale(QwtPlot::xBottom,0,120,0);
@@ -426,7 +426,7 @@ void RelWattagePage::initializePage()
     setLayout(layout);
     QStringList colms;
     colms.append(tr("Minutes"));
-    colms.append(tr("% of FTP"));
+    colms.append(tr("%"));
     colms.append(tr("Wattage"));
     we = new WorkoutEditorRel(colms,ftp);
     layout->addWidget(we);

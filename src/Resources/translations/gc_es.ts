@@ -4339,163 +4339,163 @@ Presione siguiente para continuar
         <translation>Ejecutar el procesador de datos</translation>
     </message>
     <message>
-        <location filename="../../Gui/BatchProcessingDialog.cpp" line="177"/>
+        <location filename="../../Gui/BatchProcessingDialog.cpp" line="180"/>
         <source>Edit</source>
         <translation>Editar</translation>
     </message>
     <message>
-        <location filename="../../Gui/BatchProcessingDialog.cpp" line="195"/>
+        <location filename="../../Gui/BatchProcessingDialog.cpp" line="198"/>
         <source>Delete All Selected Activities</source>
         <translation>Eliminar todos los archivos seleccionados</translation>
     </message>
     <message>
-        <location filename="../../Gui/BatchProcessingDialog.cpp" line="206"/>
+        <location filename="../../Gui/BatchProcessingDialog.cpp" line="209"/>
         <source>Cancel</source>
         <translation>Cancelar</translation>
     </message>
     <message>
-        <location filename="../../Gui/BatchProcessingDialog.cpp" line="207"/>
-        <location filename="../../Gui/BatchProcessingDialog.cpp" line="357"/>
+        <location filename="../../Gui/BatchProcessingDialog.cpp" line="210"/>
+        <location filename="../../Gui/BatchProcessingDialog.cpp" line="360"/>
         <source>Execute</source>
         <translation>Ejecutar</translation>
     </message>
     <message>
-        <location filename="../../Gui/BatchProcessingDialog.cpp" line="260"/>
+        <location filename="../../Gui/BatchProcessingDialog.cpp" line="263"/>
         <source>%1 files selected</source>
         <translation>%1 archivo(s) seleccionados</translation>
     </message>
     <message>
-        <location filename="../../Gui/BatchProcessingDialog.cpp" line="267"/>
+        <location filename="../../Gui/BatchProcessingDialog.cpp" line="270"/>
         <source>Select Target Directory</source>
         <translation>Seleccionar el directorio de destino</translation>
     </message>
     <message>
-        <location filename="../../Gui/BatchProcessingDialog.cpp" line="348"/>
-        <location filename="../../Gui/BatchProcessingDialog.cpp" line="441"/>
+        <location filename="../../Gui/BatchProcessingDialog.cpp" line="351"/>
+        <location filename="../../Gui/BatchProcessingDialog.cpp" line="444"/>
         <source>--</source>
         <translation>--</translation>
     </message>
     <message>
-        <location filename="../../Gui/BatchProcessingDialog.cpp" line="369"/>
+        <location filename="../../Gui/BatchProcessingDialog.cpp" line="372"/>
         <source>Processing...</source>
         <translation>Procesando...</translation>
     </message>
     <message>
-        <location filename="../../Gui/BatchProcessingDialog.cpp" line="370"/>
-        <location filename="../../Gui/BatchProcessingDialog.cpp" line="412"/>
+        <location filename="../../Gui/BatchProcessingDialog.cpp" line="373"/>
+        <location filename="../../Gui/BatchProcessingDialog.cpp" line="415"/>
         <source>Abort</source>
         <translation>Abortar</translation>
     </message>
     <message>
-        <location filename="../../Gui/BatchProcessingDialog.cpp" line="373"/>
+        <location filename="../../Gui/BatchProcessingDialog.cpp" line="376"/>
         <source>Processed </source>
         <translation>Procesada </translation>
     </message>
     <message>
-        <location filename="../../Gui/BatchProcessingDialog.cpp" line="379"/>
+        <location filename="../../Gui/BatchProcessingDialog.cpp" line="382"/>
         <source>Exported </source>
         <translation>Exportada </translation>
     </message>
     <message>
-        <location filename="../../Gui/BatchProcessingDialog.cpp" line="388"/>
+        <location filename="../../Gui/BatchProcessingDialog.cpp" line="391"/>
         <source>Deleted </source>
         <translation>Eliminada </translation>
     </message>
     <message>
-        <location filename="../../Gui/BatchProcessingDialog.cpp" line="395"/>
+        <location filename="../../Gui/BatchProcessingDialog.cpp" line="398"/>
         <source>Processing aborted by the user...</source>
         <translation>Procesado cancelado por el usuario...</translation>
     </message>
     <message>
-        <location filename="../../Gui/BatchProcessingDialog.cpp" line="399"/>
+        <location filename="../../Gui/BatchProcessingDialog.cpp" line="402"/>
         <source>Processing failed as the data processor cannot be found...</source>
         <translation>Fallo en el procesado porque no se encuentra el procesador de datos...</translation>
     </message>
     <message>
-        <location filename="../../Gui/BatchProcessingDialog.cpp" line="403"/>
+        <location filename="../../Gui/BatchProcessingDialog.cpp" line="406"/>
         <source>%1 activities successfully, %2 failed or skipped.</source>
         <translation>%1 actividad(es) procesada(s) correctamente, %2 fallida(s) u omitida(s).</translation>
     </message>
     <message>
-        <location filename="../../Gui/BatchProcessingDialog.cpp" line="404"/>
-        <location filename="../../Gui/BatchProcessingDialog.cpp" line="414"/>
-        <location filename="../../Gui/BatchProcessingDialog.cpp" line="415"/>
+        <location filename="../../Gui/BatchProcessingDialog.cpp" line="407"/>
+        <location filename="../../Gui/BatchProcessingDialog.cpp" line="417"/>
+        <location filename="../../Gui/BatchProcessingDialog.cpp" line="418"/>
         <source>Finish</source>
         <translation>Finalizar</translation>
     </message>
     <message>
-        <location filename="../../Gui/BatchProcessingDialog.cpp" line="408"/>
+        <location filename="../../Gui/BatchProcessingDialog.cpp" line="411"/>
         <source>Processing failed for an unknown reason...</source>
         <translation>Fallo en el procesado por una razón desconocida...</translation>
     </message>
     <message>
-        <location filename="../../Gui/BatchProcessingDialog.cpp" line="452"/>
+        <location filename="../../Gui/BatchProcessingDialog.cpp" line="455"/>
         <source>Export as </source>
         <translation>Exportar como </translation>
     </message>
     <message>
-        <location filename="../../Gui/BatchProcessingDialog.cpp" line="463"/>
+        <location filename="../../Gui/BatchProcessingDialog.cpp" line="466"/>
         <source>Undefined</source>
         <translation>No definido</translation>
     </message>
     <message>
-        <location filename="../../Gui/BatchProcessingDialog.cpp" line="496"/>
+        <location filename="../../Gui/BatchProcessingDialog.cpp" line="499"/>
         <source>Exists - not exported</source>
         <translation>Existe - no se exporta</translation>
     </message>
     <message>
-        <location filename="../../Gui/BatchProcessingDialog.cpp" line="504"/>
+        <location filename="../../Gui/BatchProcessingDialog.cpp" line="507"/>
         <source>Removing...</source>
         <translation>Eliminando...</translation>
     </message>
     <message>
-        <location filename="../../Gui/BatchProcessingDialog.cpp" line="508"/>
+        <location filename="../../Gui/BatchProcessingDialog.cpp" line="511"/>
         <source>Reading...</source>
         <translation>Leyendo...</translation>
     </message>
     <message>
-        <location filename="../../Gui/BatchProcessingDialog.cpp" line="519"/>
+        <location filename="../../Gui/BatchProcessingDialog.cpp" line="522"/>
         <source>Writing...</source>
         <translation>Grabando...</translation>
     </message>
     <message>
-        <location filename="../../Gui/BatchProcessingDialog.cpp" line="533"/>
+        <location filename="../../Gui/BatchProcessingDialog.cpp" line="536"/>
         <source>Exported</source>
         <translation>Exportada</translation>
     </message>
     <message>
-        <location filename="../../Gui/BatchProcessingDialog.cpp" line="536"/>
+        <location filename="../../Gui/BatchProcessingDialog.cpp" line="539"/>
         <source>Write failed</source>
         <translation>Fallo de escritura</translation>
     </message>
     <message>
-        <location filename="../../Gui/BatchProcessingDialog.cpp" line="544"/>
+        <location filename="../../Gui/BatchProcessingDialog.cpp" line="547"/>
         <source>Read error</source>
         <translation>Error de lectura</translation>
     </message>
     <message>
-        <location filename="../../Gui/BatchProcessingDialog.cpp" line="557"/>
+        <location filename="../../Gui/BatchProcessingDialog.cpp" line="560"/>
         <source>Are you sure you want to delete all selected activities?</source>
         <translation>¿Está seguro de que quiere elimitar todas las actividades seleccionadas?</translation>
     </message>
     <message>
-        <location filename="../../Gui/BatchProcessingDialog.cpp" line="460"/>
-        <location filename="../../Gui/BatchProcessingDialog.cpp" line="558"/>
+        <location filename="../../Gui/BatchProcessingDialog.cpp" line="463"/>
+        <location filename="../../Gui/BatchProcessingDialog.cpp" line="561"/>
         <source>Delete</source>
         <translation>Eliminar</translation>
     </message>
     <message>
-        <location filename="../../Gui/BatchProcessingDialog.cpp" line="582"/>
+        <location filename="../../Gui/BatchProcessingDialog.cpp" line="585"/>
         <source>Deleted</source>
         <translation>Eliminada</translation>
     </message>
     <message>
-        <location filename="../../Gui/BatchProcessingDialog.cpp" line="640"/>
+        <location filename="../../Gui/BatchProcessingDialog.cpp" line="643"/>
         <source>Processed</source>
         <translation>Procesada</translation>
     </message>
     <message>
-        <location filename="../../Gui/BatchProcessingDialog.cpp" line="657"/>
+        <location filename="../../Gui/BatchProcessingDialog.cpp" line="660"/>
         <source>Failed to process activity</source>
         <translation>Fallo al procesar la actividad</translation>
     </message>
@@ -19455,24 +19455,24 @@ Please check your preference settings.</source>
 Por favor, verifique la configuración de preferencias.</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="2636"/>
+        <location filename="../../Gui/MainWindow.cpp" line="2642"/>
         <source>New Python Fix...</source>
         <translation>Nuevo procesador Python...</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="2637"/>
+        <location filename="../../Gui/MainWindow.cpp" line="2643"/>
         <source>Manage Python Fixes...</source>
         <translation>Administrar procesadores Python...</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="2710"/>
-        <location filename="../../Gui/MainWindow.cpp" line="2731"/>
+        <location filename="../../Gui/MainWindow.cpp" line="2716"/>
+        <location filename="../../Gui/MainWindow.cpp" line="2737"/>
         <source>CloudDB</source>
         <translation>CloudDB</translation>
     </message>
     <message>
-        <location filename="../../Gui/MainWindow.cpp" line="2710"/>
-        <location filename="../../Gui/MainWindow.cpp" line="2731"/>
+        <location filename="../../Gui/MainWindow.cpp" line="2716"/>
+        <location filename="../../Gui/MainWindow.cpp" line="2737"/>
         <source>Current athlete is not registered as curator - please contact the GoldenCheetah team</source>
         <translation>Este atleta no está registrado como curador. Por favor, contacte con el equipo de GoldenCheetah</translation>
     </message>
@@ -26078,14 +26078,14 @@ Python deshabilitado en preferencias.</translation>
     </message>
     <message>
         <location filename="../../Train/WorkoutWizard.cpp" line="416"/>
-        <source>Relative Wattage Workout Wizard, current CP60 = </source>
-        <translation>Asistente de entrenamiento para potencia relativa, PC/CP actual = </translation>
+        <source>Relative Wattage Workout Creator, current CP = </source>
+        <translation>Crear entrenamiento con potencia relativa, PC/CP actual = </translation>
     </message>
     <message>
         <location filename="../../Train/WorkoutWizard.cpp" line="420"/>
         <location filename="../../Train/WorkoutWizard.cpp" line="429"/>
-        <source>% of FTP</source>
-        <translation>% del FTP</translation>
+        <source>%</source>
+        <translation>%</translation>
     </message>
     <message>
         <location filename="../../Train/WorkoutWizard.cpp" line="421"/>
@@ -30680,57 +30680,57 @@ Si la nueva actividad colisiona con una existente (misma fecha y hora) el asiste
 <context>
     <name>Themes</name>
     <message>
-        <location filename="../../Gui/Colors.cpp" line="752"/>
+        <location filename="../../Gui/Colors.cpp" line="773"/>
         <source>Modern Dark</source>
         <translation>Modern Dark</translation>
     </message>
     <message>
-        <location filename="../../Gui/Colors.cpp" line="775"/>
+        <location filename="../../Gui/Colors.cpp" line="796"/>
         <source>Modern Light</source>
         <translation>Modern Light</translation>
     </message>
     <message>
-        <location filename="../../Gui/Colors.cpp" line="797"/>
+        <location filename="../../Gui/Colors.cpp" line="818"/>
         <source>Modern Stealth Dark</source>
         <translation>Modern Stealth Dark</translation>
     </message>
     <message>
-        <location filename="../../Gui/Colors.cpp" line="819"/>
+        <location filename="../../Gui/Colors.cpp" line="840"/>
         <source>Modern Stealth Light</source>
         <translation>Modern Stealth Light</translation>
     </message>
     <message>
-        <location filename="../../Gui/Colors.cpp" line="840"/>
+        <location filename="../../Gui/Colors.cpp" line="861"/>
         <source>Gnome Adwaita Dark</source>
         <translation>Oscuro Gnome Adwaita</translation>
     </message>
     <message>
-        <location filename="../../Gui/Colors.cpp" line="861"/>
+        <location filename="../../Gui/Colors.cpp" line="882"/>
         <source>Team Colours (light)</source>
         <translation>Team Colours (light)</translation>
     </message>
     <message>
-        <location filename="../../Gui/Colors.cpp" line="882"/>
+        <location filename="../../Gui/Colors.cpp" line="903"/>
         <source>Ollie&apos;s Oatmeal (light)</source>
         <translation>Ollie&apos;s Oatmeal (light)</translation>
     </message>
     <message>
-        <location filename="../../Gui/Colors.cpp" line="903"/>
+        <location filename="../../Gui/Colors.cpp" line="924"/>
         <source>Mustang (dark)</source>
         <translation>Mustang (dark)</translation>
     </message>
     <message>
-        <location filename="../../Gui/Colors.cpp" line="924"/>
+        <location filename="../../Gui/Colors.cpp" line="945"/>
         <source>Mono (dark)</source>
         <translation>Mono (dark)</translation>
     </message>
     <message>
-        <location filename="../../Gui/Colors.cpp" line="945"/>
+        <location filename="../../Gui/Colors.cpp" line="966"/>
         <source>Mono (light)</source>
         <translation>Mono (light)</translation>
     </message>
     <message>
-        <location filename="../../Gui/Colors.cpp" line="967"/>
+        <location filename="../../Gui/Colors.cpp" line="988"/>
         <source>Schoberer (light)</source>
         <translation>Schoberer (light)</translation>
     </message>
@@ -33368,8 +33368,8 @@ Puede eliminar las referencias cuando administra la biblioteca usando el menú d
     </message>
     <message>
         <location filename="../../Train/WorkoutWizard.cpp" line="231"/>
-        <source>% FTP Wattage</source>
-        <translation>Potencia como % del FTP</translation>
+        <source>Relative Wattage</source>
+        <translation>Potencia relativa</translation>
     </message>
     <message>
         <location filename="../../Train/WorkoutWizard.cpp" line="232"/>
