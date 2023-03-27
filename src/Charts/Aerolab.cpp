@@ -132,7 +132,7 @@ double IntervalAerolabData::x
 
     double result = 0;
 
-    int interval_no = number ? 1 + number / 4 : 1;
+    int interval_no = number ? 1 + static_cast<int>(number) / 4 : 1;
     // get the interval
     IntervalItem *current = intervalNum( interval_no );
 
