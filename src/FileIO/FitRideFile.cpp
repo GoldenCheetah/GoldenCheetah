@@ -633,6 +633,9 @@ struct FitFileReaderState
             case 116: // Stress
                 return "STRESS";
 
+            case 133: // Pulse Ox
+                return "PULSEOX";
+
             case 137: // Potential Stamina
                 return "POTENTIALSTAMINA";
 
@@ -1729,6 +1732,9 @@ struct FitFileReaderState
                              native_num = -1;
                              break;
                     case 116: // Stress
+                             native_num = -1;
+                             break;
+                    case 133: // Pulse Ox
                              native_num = -1;
                              break;
                     default:
