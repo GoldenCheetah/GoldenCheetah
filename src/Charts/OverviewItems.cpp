@@ -1173,7 +1173,7 @@ DataOverviewItem::sort(int column, Qt::SortOrder order)
     // dates in German are weird, a month is "Mai", "Juli" or even "Jan."
     // even when requesting a date in format dd MMM yyyy
     // remember: a dot (.) inside brackets ([]) does NOT need to be escaped
-    QRegExp redate("^[0-9][0-9] [.A-Za-zÀ-ž\u0370-\u03FF\u0400-\u04FF]+ [0-9][0-9]*$");
+    QRegExp redate(QString::fromWCharArray(L"^[0-9][0-9] [.A-Za-zÀ-ž\u0370-\u03FF\u0400-\u04FF]+ [0-9][0-9]*$"));
     QRegExp retime("^[0-9:]*$");
     QRegExp renumber("^[0-9.-]*$");
 
@@ -5454,6 +5454,7 @@ VScrollBar::setAreaHeight(double n)
 void
 VScrollBar::setPos(double x)
 {
+    Q_UNUSED(x);
     // xxx todo
 }
 
