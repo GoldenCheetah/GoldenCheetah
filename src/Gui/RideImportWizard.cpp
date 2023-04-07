@@ -244,10 +244,24 @@ void
 RideImportWizard::init(QList<QString> original, Context * /*mainWindow*/)
 {
 
+    // save target dir for the file import
+    this->homeImports = context->athlete->home->imports();
+    this->homeActivities = context->athlete->home->activities();
+    this->tmpActivities = context->athlete->home->tmpActivities();
+
     // expand files if they are archives - this may involve unzipping or extracting
     //                                     files into a subdirectory, so we also clean-up
     //                                     before we close.
-    QList<QString> files = expandFiles(original);
+    QList<QString> expanded = expandFiles(original);
+
+    QList<QString> files;
+    if (autoImportMode) {
+        // on auto-import skip files present in imports folder to avoid re-import
+        foreach (QString fname, expanded) if (homeImports.entryList(QStringList()<<QFileInfo(fname).baseName()+"*").isEmpty()) files<<fname;
+    } else {
+        // all files on manual import
+        files = expanded;
+    }
 
     // setup Help
     HelpWhatsThis *help = new HelpWhatsThis(this);
@@ -317,11 +331,6 @@ RideImportWizard::init(QList<QString> original, Context * /*mainWindow*/)
     QTableWidgetItem *statusHeading = new QTableWidgetItem;
     statusHeading->setText(tr("Import Status"));
     tableWidget->setHorizontalHeaderItem(STATUS_COLUMN, statusHeading);
-
-    // save target dir for the file import
-    this->homeImports = context->athlete->home->imports();
-    this->homeActivities = context->athlete->home->activities();
-    this->tmpActivities = context->athlete->home->tmpActivities();
 
     // Fill in the filenames and all the textItems
     for (int i=0; i < files.count(); i++) {
