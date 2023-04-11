@@ -299,7 +299,7 @@ static PyObject *meth_Bindings_seriesPresent(PyObject *sipSelf, PyObject *sipArg
         static const char *sipKwdList[] = {
             sipName_type,
             sipName_activity,
-            sipName_compare,
+            sipName_compareindex,
         };
 
         if (sipParseKwdArgs(&sipParseErr, sipArgs, sipKwds, sipKwdList, NULL, "B|iP0i", &sipSelf, sipType_Bindings, &sipCpp, &a0, &a1, &a2))
@@ -388,7 +388,7 @@ static PyObject *meth_Bindings_series(PyObject *sipSelf, PyObject *sipArgs, PyOb
         static const char *sipKwdList[] = {
             sipName_type,
             sipName_activity,
-            sipName_compare,
+            sipName_compareindex,
         };
 
         if (sipParseKwdArgs(&sipParseErr, sipArgs, sipKwds, sipKwdList, NULL, "B|iP0i", &sipSelf, sipType_Bindings, &sipCpp, &a0, &a1, &a2))
@@ -420,7 +420,7 @@ static PyObject *meth_Bindings_activityWbal(PyObject *sipSelf, PyObject *sipArgs
 
         static const char *sipKwdList[] = {
             sipName_activity,
-            sipName_compare,
+            sipName_compareindex,
         };
 
         if (sipParseKwdArgs(&sipParseErr, sipArgs, sipKwds, sipKwdList, NULL, "B|P0i", &sipSelf, sipType_Bindings, &sipCpp, &a0, &a1))
@@ -462,7 +462,7 @@ static PyObject *meth_Bindings_xdata(PyObject *sipSelf, PyObject *sipArgs, PyObj
             sipName_series,
             sipName_join,
             sipName_activity,
-            sipName_compare,
+            sipName_compareindex,
         };
 
         if (sipParseKwdArgs(&sipParseErr, sipArgs, sipKwds, sipKwdList, NULL, "BJ1J1|J1P0i", &sipSelf, sipType_Bindings, &sipCpp, sipType_QString,&a0, &a0State, sipType_QString,&a1, &a1State, sipType_QString,&a2, &a2State, &a3, &a4))
@@ -503,7 +503,7 @@ static PyObject *meth_Bindings_xdataSeries(PyObject *sipSelf, PyObject *sipArgs,
             sipName_name,
             sipName_series,
             sipName_activity,
-            sipName_compare,
+            sipName_compareindex,
         };
 
         if (sipParseKwdArgs(&sipParseErr, sipArgs, sipKwds, sipKwdList, NULL, "BJ1J1|P0i", &sipSelf, sipType_Bindings, &sipCpp, sipType_QString,&a0, &a0State, sipType_QString,&a1, &a1State, &a2, &a3))
@@ -541,7 +541,7 @@ static PyObject *meth_Bindings_xdataNames(PyObject *sipSelf, PyObject *sipArgs, 
         static const char *sipKwdList[] = {
             sipName_name,
             sipName_activity,
-            sipName_compare,
+            sipName_compareindex,
         };
 
         if (sipParseKwdArgs(&sipParseErr, sipArgs, sipKwds, sipKwdList, NULL, "B|J1P0i", &sipSelf, sipType_Bindings, &sipCpp, sipType_QString,&a0, &a0State, &a1, &a2))
