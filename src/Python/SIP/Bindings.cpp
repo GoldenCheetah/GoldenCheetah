@@ -554,11 +554,20 @@ Bindings::fromDateTime(PyObject* activity) const
 }
 
 RideFile *
-Bindings::selectRideFile(PyObject *activity) const
+Bindings::selectRideFile(PyObject *activity, int compare) const
 {
+    Context *context = python->contexts.value(threadid()).context;
     RideFile *f;
     RideItem* item = fromDateTime(activity);
     if (item && item->ride()) return item->ride();
+
+    // return compare item when requested
+    if (compare >= 0 && context && context->isCompareIntervals) {
+        int idx = 0;
+        foreach(CompareInterval p, context->compareIntervals)
+            if (p.isChecked() && compare == idx++) return p.rideItem->ride();
+        return nullptr;
+    }
 
     f = python->contexts.value(threadid()).rideFile;
     if (f) return f;
@@ -566,7 +575,6 @@ Bindings::selectRideFile(PyObject *activity) const
     item = python->contexts.value(threadid()).item;
     if (item && item->ride()) return item->ride();
 
-    Context *context = python->contexts.value(threadid()).context;
     if (context) {
         item = const_cast<RideItem*>(context->currentRideItem());
         if (item && item->ride()) return item->ride();
@@ -577,9 +585,9 @@ Bindings::selectRideFile(PyObject *activity) const
 
 // get the data series for the currently selected ride
 PythonDataSeries*
-Bindings::series(int type, PyObject* activity) const
+Bindings::series(int type, PyObject* activity, int compare) const
 {
-    RideFile *f = selectRideFile(activity);
+    RideFile *f = selectRideFile(activity, compare);
     if (f == nullptr) return nullptr;
 
     // count the included points, create data series output and copy data
@@ -606,9 +614,9 @@ Bindings::series(int type, PyObject* activity) const
 
 // get the wbal series for the currently selected ride
 PythonDataSeries*
-Bindings::activityWbal(PyObject* activity) const
+Bindings::activityWbal(PyObject* activity, int compare) const
 {
-    RideFile *f = selectRideFile(activity);
+    RideFile *f = selectRideFile(activity, compare);
     if (f == nullptr) return nullptr;
 
     f->recalculateDerivedSeries();
@@ -634,7 +642,7 @@ Bindings::activityWbal(PyObject* activity) const
 
 // get the xdata series for the currently selected ride
 PythonDataSeries*
-Bindings::xdata(QString name, QString series, QString join, PyObject* activity) const
+Bindings::xdata(QString name, QString series, QString join, PyObject* activity, int compare) const
 {
     // XDATA join method
     RideFile::XDataJoin xjoin;
@@ -649,7 +657,7 @@ Bindings::xdata(QString name, QString series, QString join, PyObject* activity) 
         case 3: xjoin = RideFile::RESAMPLE; break;
     }
 
-    RideFile *f = selectRideFile(activity);
+    RideFile *f = selectRideFile(activity, compare);
     if (f == nullptr) return nullptr;
 
     if (!f->xdata().contains(name)) return NULL; // No such XData series
@@ -674,9 +682,9 @@ Bindings::xdata(QString name, QString series, QString join, PyObject* activity) 
 }
 
 // get the xdata series for the currently selected ride, without interpolation
-PythonXDataSeries *Bindings::xdataSeries(QString name, QString series, PyObject* activity) const
+PythonXDataSeries *Bindings::xdataSeries(QString name, QString series, PyObject* activity, int compare) const
 {
-    RideFile *f = selectRideFile(activity);
+    RideFile *f = selectRideFile(activity, compare);
     if (f == nullptr) return nullptr;
 
     if (!f->xdata().contains(name)) return NULL; // No such XData series
@@ -723,9 +731,9 @@ PythonXDataSeries *Bindings::xdataSeries(QString name, QString series, PyObject*
 }
 
 PyObject*
-Bindings::xdataNames(QString name, PyObject* activity) const
+Bindings::xdataNames(QString name, PyObject* activity, int compare) const
 {
-    RideFile *f = selectRideFile(activity);
+    RideFile *f = selectRideFile(activity, compare);
     if (f == nullptr) return nullptr;
 
     QStringList namelist;
@@ -756,9 +764,9 @@ Bindings::seriesName(int type) const
 }
 
 bool
-Bindings::seriesPresent(int type, PyObject* activity) const
+Bindings::seriesPresent(int type, PyObject* activity, int compare) const
 {
-    RideFile *f = selectRideFile(activity);
+    RideFile *f = selectRideFile(activity, compare);
     if (f == nullptr) return false;
 
     return f->isDataPresent(static_cast<RideFile::SeriesType>(type));

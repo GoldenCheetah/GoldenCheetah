@@ -293,18 +293,20 @@ static PyObject *meth_Bindings_seriesPresent(PyObject *sipSelf, PyObject *sipArg
     {
         int a0 = 10;
         PyObject * a1 = 0;
+        int a2 = -1;
         const  ::Bindings *sipCpp;
 
         static const char *sipKwdList[] = {
             sipName_type,
             sipName_activity,
+            sipName_compare,
         };
 
-        if (sipParseKwdArgs(&sipParseErr, sipArgs, sipKwds, sipKwdList, NULL, "B|iP0", &sipSelf, sipType_Bindings, &sipCpp, &a0, &a1))
+        if (sipParseKwdArgs(&sipParseErr, sipArgs, sipKwds, sipKwdList, NULL, "B|iP0i", &sipSelf, sipType_Bindings, &sipCpp, &a0, &a1, &a2))
         {
             bool sipRes;
 
-            sipRes = sipCpp->seriesPresent(a0,a1);
+            sipRes = sipCpp->seriesPresent(a0,a1,a2);
 
             return PyBool_FromLong(sipRes);
         }
@@ -380,18 +382,20 @@ static PyObject *meth_Bindings_series(PyObject *sipSelf, PyObject *sipArgs, PyOb
     {
         int a0 = 10;
         PyObject * a1 = 0;
+        int a2 = -1;
          ::Bindings *sipCpp;
 
         static const char *sipKwdList[] = {
             sipName_type,
             sipName_activity,
+            sipName_compare,
         };
 
-        if (sipParseKwdArgs(&sipParseErr, sipArgs, sipKwds, sipKwdList, NULL, "B|iP0", &sipSelf, sipType_Bindings, &sipCpp, &a0, &a1))
+        if (sipParseKwdArgs(&sipParseErr, sipArgs, sipKwds, sipKwdList, NULL, "B|iP0i", &sipSelf, sipType_Bindings, &sipCpp, &a0, &a1, &a2))
         {
              ::PythonDataSeries*sipRes;
 
-            sipRes = new  ::PythonDataSeries(sipCpp->series(a0,a1));
+            sipRes = new  ::PythonDataSeries(sipCpp->series(a0,a1,a2));
 
             return sipConvertFromNewType(sipRes,sipType_PythonDataSeries,Py_None);
         }
@@ -411,17 +415,19 @@ static PyObject *meth_Bindings_activityWbal(PyObject *sipSelf, PyObject *sipArgs
 
     {
         PyObject * a0 = 0;
+        int a1 = -1;
          ::Bindings *sipCpp;
 
         static const char *sipKwdList[] = {
             sipName_activity,
+            sipName_compare,
         };
 
-        if (sipParseKwdArgs(&sipParseErr, sipArgs, sipKwds, sipKwdList, NULL, "B|P0", &sipSelf, sipType_Bindings, &sipCpp, &a0))
+        if (sipParseKwdArgs(&sipParseErr, sipArgs, sipKwds, sipKwdList, NULL, "B|P0i", &sipSelf, sipType_Bindings, &sipCpp, &a0, &a1))
         {
              ::PythonDataSeries*sipRes;
 
-            sipRes = new  ::PythonDataSeries(sipCpp->activityWbal(a0));
+            sipRes = new  ::PythonDataSeries(sipCpp->activityWbal(a0,a1));
 
             return sipConvertFromNewType(sipRes,sipType_PythonDataSeries,Py_None);
         }
@@ -448,6 +454,7 @@ static PyObject *meth_Bindings_xdata(PyObject *sipSelf, PyObject *sipArgs, PyObj
          ::QString* a2 = &a2def;
         int a2State = 0;
         PyObject * a3 = 0;
+        int a4 = -1;
          ::Bindings *sipCpp;
 
         static const char *sipKwdList[] = {
@@ -455,13 +462,14 @@ static PyObject *meth_Bindings_xdata(PyObject *sipSelf, PyObject *sipArgs, PyObj
             sipName_series,
             sipName_join,
             sipName_activity,
+            sipName_compare,
         };
 
-        if (sipParseKwdArgs(&sipParseErr, sipArgs, sipKwds, sipKwdList, NULL, "BJ1J1|J1P0", &sipSelf, sipType_Bindings, &sipCpp, sipType_QString,&a0, &a0State, sipType_QString,&a1, &a1State, sipType_QString,&a2, &a2State, &a3))
+        if (sipParseKwdArgs(&sipParseErr, sipArgs, sipKwds, sipKwdList, NULL, "BJ1J1|J1P0i", &sipSelf, sipType_Bindings, &sipCpp, sipType_QString,&a0, &a0State, sipType_QString,&a1, &a1State, sipType_QString,&a2, &a2State, &a3, &a4))
         {
              ::PythonDataSeries*sipRes;
 
-            sipRes = new  ::PythonDataSeries(sipCpp->xdata(*a0,*a1,*a2,a3));
+            sipRes = new  ::PythonDataSeries(sipCpp->xdata(*a0,*a1,*a2,a3,a4));
             sipReleaseType(a0,sipType_QString,a0State);
             sipReleaseType(a1,sipType_QString,a1State);
             sipReleaseType(a2,sipType_QString,a2State);
@@ -488,19 +496,21 @@ static PyObject *meth_Bindings_xdataSeries(PyObject *sipSelf, PyObject *sipArgs,
          ::QString* a1;
         int a1State = 0;
         PyObject * a2 = 0;
+        int a3 = -1;
          ::Bindings *sipCpp;
 
         static const char *sipKwdList[] = {
             sipName_name,
             sipName_series,
             sipName_activity,
+            sipName_compare,
         };
 
-        if (sipParseKwdArgs(&sipParseErr, sipArgs, sipKwds, sipKwdList, NULL, "BJ1J1|P0", &sipSelf, sipType_Bindings, &sipCpp, sipType_QString,&a0, &a0State, sipType_QString,&a1, &a1State, &a2))
+        if (sipParseKwdArgs(&sipParseErr, sipArgs, sipKwds, sipKwdList, NULL, "BJ1J1|P0i", &sipSelf, sipType_Bindings, &sipCpp, sipType_QString,&a0, &a0State, sipType_QString,&a1, &a1State, &a2, &a3))
         {
              ::PythonXDataSeries*sipRes;
 
-            sipRes = new  ::PythonXDataSeries(sipCpp->xdataSeries(*a0,*a1,a2));
+            sipRes = new  ::PythonXDataSeries(sipCpp->xdataSeries(*a0,*a1,a2,a3));
             sipReleaseType(a0,sipType_QString,a0State);
             sipReleaseType(a1,sipType_QString,a1State);
 
@@ -525,18 +535,20 @@ static PyObject *meth_Bindings_xdataNames(PyObject *sipSelf, PyObject *sipArgs, 
          ::QString* a0 = &a0def;
         int a0State = 0;
         PyObject * a1 = 0;
+        int a2 = -1;
          ::Bindings *sipCpp;
 
         static const char *sipKwdList[] = {
             sipName_name,
             sipName_activity,
+            sipName_compare,
         };
 
-        if (sipParseKwdArgs(&sipParseErr, sipArgs, sipKwds, sipKwdList, NULL, "B|J1P0", &sipSelf, sipType_Bindings, &sipCpp, sipType_QString,&a0, &a0State, &a1))
+        if (sipParseKwdArgs(&sipParseErr, sipArgs, sipKwds, sipKwdList, NULL, "B|J1P0i", &sipSelf, sipType_Bindings, &sipCpp, sipType_QString,&a0, &a0State, &a1, &a2))
         {
             PyObject * sipRes;
 
-            sipRes = sipCpp->xdataNames(*a0,a1);
+            sipRes = sipCpp->xdataNames(*a0,a1,a2);
             sipReleaseType(a0,sipType_QString,a0State);
 
             return sipRes;
