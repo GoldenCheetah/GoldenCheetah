@@ -356,14 +356,14 @@ public:
     PyObject* season(bool all=false, bool compare=false) /TransferBack/;
 
     // working with series
-    bool seriesPresent(int type=10, PyObject* activity=NULL) const;
+    bool seriesPresent(int type=10, PyObject* activity=NULL, int compareindex=-1) const;
     QString seriesName(int type=10) const;
     int seriesLast() const;
-    PythonDataSeries series(int type=10, PyObject* activity=NULL) /TransferBack/;
-    PythonDataSeries activityWbal(PyObject* activity=NULL) /TransferBack/;
-    PythonDataSeries xdata(QString name, QString series, QString join="repeat", PyObject* activity=NULL) /TransferBack/;
-    PythonXDataSeries xdataSeries(QString name, QString series, PyObject* activity=NULL) /TransferBack/;
-    PyObject* xdataNames(QString name=QString(), PyObject* activity=NULL) /TransferBack/;
+    PythonDataSeries series(int type=10, PyObject* activity=NULL, int compareindex=-1) /TransferBack/;
+    PythonDataSeries activityWbal(PyObject* activity=NULL, int compareindex=-1) /TransferBack/;
+    PythonDataSeries xdata(QString name, QString series, QString join="repeat", PyObject* activity=NULL, int compareindex=-1) /TransferBack/;
+    PythonXDataSeries xdataSeries(QString name, QString series, PyObject* activity=NULL, int compareindex=-1) /TransferBack/;
+    PyObject* xdataNames(QString name=QString(), PyObject* activity=NULL, int compareindex=-1) /TransferBack/;
 
     // working with metrics
     PyObject* activityMetrics(bool compare=false) /TransferBack/;
