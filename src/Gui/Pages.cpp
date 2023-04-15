@@ -1182,7 +1182,7 @@ SimBicyclePage::saveClicked()
 }
 
 
-static double scalefactors[9] = { 0.5f, 0.6f, 0.8, 0.9, 1.0f, 1.1f, 1.25f, 1.5f, 2.0f };
+static double scalefactors[12] = { 0.5f, 0.6f, 0.8, 0.9, 1.0f, 1.1f, 1.25f, 1.5f, 2.0f, 2.5f, 3.0f, 5.0f };
 
 //
 // Appearances page
@@ -1255,11 +1255,11 @@ ColorsPage::ColorsPage(QWidget *parent) : QWidget(parent)
     double scale = appsettings->value(this, GC_FONT_SCALE, 1.0).toDouble();
     fontscale = new QSlider(this);
     fontscale->setMinimum(0);
-    fontscale->setMaximum(8);
+    fontscale->setMaximum(11);
     fontscale->setTickInterval(1);
     fontscale->setValue(3);
     fontscale->setOrientation(Qt::Horizontal);
-    for(int i=0; i<7; i++) {
+    for(int i=0; i<12; i++) {
         if (scalefactors[i] == scale) {
             fontscale->setValue(i);
             break;
@@ -1271,7 +1271,7 @@ ColorsPage::ColorsPage(QWidget *parent) : QWidget(parent)
     fonttext = new QLabel(this);
     fonttext->setText(tr("The quick brown fox jumped over the lazy dog"));
     fonttext->setFont(font);
-    fonttext->setFixedHeight(30 * dpiYFactor);
+    fonttext->setFixedHeight(90 * dpiYFactor);
     fonttext->setFixedWidth(330 * dpiXFactor);
 
     QGridLayout *grid = new QGridLayout;
@@ -1285,8 +1285,8 @@ ColorsPage::ColorsPage(QWidget *parent) : QWidget(parent)
     grid->addWidget(antiAliasLabel, 1,3);
     grid->addWidget(antiAliased, 1,4);
 #ifndef Q_OS_MAC
-    grid->addWidget(rideScrollLabel, 2,3);
-    grid->addWidget(rideScroll, 2,4);
+    grid->addWidget(rideScrollLabel, 2,3, Qt::AlignLeft|Qt::AlignTop);
+    grid->addWidget(rideScroll, 2,4, Qt::AlignLeft|Qt::AlignTop);
     //grid->addWidget(rideHeadLabel, 3,3); // Disabled in RideNavigator
     //grid->addWidget(rideHead, 3,4);      // better don't display
 #endif
