@@ -19,7 +19,6 @@
 #include "Context.h"
 #include "Athlete.h"
 #include "MainWindow.h"
-#include "NewMainWindow.h"
 #include "Settings.h"
 #include "CloudService.h"
 #include "TrainDB.h"
@@ -254,7 +253,6 @@ main(int argc, char *argv[])
     bool server = false;
     nogui = false;
     bool help = false;
-    bool newgui = false;
 
     // honour command line switches
     QString arg;
