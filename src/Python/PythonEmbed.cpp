@@ -98,7 +98,7 @@ bool PythonEmbed::pythonInstalled(QString &pybin, QString &pypath, QString PYTHO
             if (QFileInfo(filename).exists() && QFileInfo(filename).isExecutable()) {
                 pythonbinary=filename;
                 pybin=pythonbinary;
-                printd("Binary found");
+                printd("Binary found\n");
                 break;
             }
         }
@@ -126,6 +126,7 @@ bool PythonEmbed::pythonInstalled(QString &pybin, QString &pypath, QString PYTHO
                     "print('ZZ', '%1'.join(sys.path), 'ZZ')\n"
                     "quit()\n").arg(PATHSEP);
     py.setArguments(args);
+    py.setProcessChannelMode(QProcess::ForwardedErrorChannel);
     py.start();
 
     // failed to start python
