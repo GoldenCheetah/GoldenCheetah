@@ -91,7 +91,7 @@ processed(0), fails(0), numFilesToProcess(0) {
         if (!spec.pass(rideItem)) continue;
 
         QTreeWidgetItem* add = new QTreeWidgetItem(files->invisibleRootItem());
-        add->setFlags(add->flags() | Qt::ItemIsEditable);
+        add->setFlags(add->flags() | Qt::ItemIsSelectable);
 
         // selector
         QCheckBox* checkBox = new QCheckBox("", this);
