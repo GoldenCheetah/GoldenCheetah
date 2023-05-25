@@ -50,7 +50,7 @@ AnalysisView::AnalysisView(Context *context, QStackedWidget *controls) : Abstrac
     setBlank(b);
     setBottom(new ComparePane(context, this, ComparePane::interval));
 
-    setSidebarEnabled(appsettings->value(this, GC_SETTINGS_MAIN_SIDEBAR "analysis", true).toBool());
+    setSidebarEnabled(appsettings->value(this, GC_SETTINGS_MAIN_SIDEBAR "analysis", defaultAppearance.sideanalysis).toBool());
 
     connect(bottomSplitter(), SIGNAL(compareChanged(bool)), this, SLOT(compareChanged(bool)));
     connect(bottomSplitter(), SIGNAL(compareClear()), bottom(), SLOT(clear()));
@@ -145,7 +145,7 @@ DiaryView::DiaryView(Context *context, QStackedWidget *controls) : AbstractView(
     setPages(pstack);
     setBlank(b);
 
-    setSidebarEnabled(appsettings->value(this,  GC_SETTINGS_MAIN_SIDEBAR "diary", true).toBool());
+    setSidebarEnabled(appsettings->value(this,  GC_SETTINGS_MAIN_SIDEBAR "diary", false).toBool());
     connect(diarySidebar, SIGNAL(dateRangeChanged(DateRange)), this, SLOT(dateRangeChanged(DateRange)));
 }
 
@@ -196,7 +196,7 @@ TrendsView::TrendsView(Context *context, QStackedWidget *controls) : AbstractVie
     setBlank(b);
     setBottom(new ComparePane(context, this, ComparePane::season));
 
-    setSidebarEnabled(appsettings->value(this,  GC_SETTINGS_MAIN_SIDEBAR "trend", true).toBool());
+    setSidebarEnabled(appsettings->value(this,  GC_SETTINGS_MAIN_SIDEBAR "trend", defaultAppearance.sidetrend).toBool());
     connect(sidebar, SIGNAL(dateRangeChanged(DateRange)), this, SLOT(dateRangeChanged(DateRange)));
     connect(this, SIGNAL(onSelectionChanged()), this, SLOT(justSelected()));
     connect(bottomSplitter(), SIGNAL(compareChanged(bool)), this, SLOT(compareChanged(bool)));
@@ -307,7 +307,7 @@ TrainView::TrainView(Context *context, QStackedWidget *controls) : AbstractView(
     setBottom(trainBottom);
     setHideBottomOnIdle(false);
 
-    setSidebarEnabled(appsettings->value(NULL,  GC_SETTINGS_MAIN_SIDEBAR "train").toBool());
+    setSidebarEnabled(appsettings->value(NULL,  GC_SETTINGS_MAIN_SIDEBAR "train", defaultAppearance.sidetrain).toBool());
     connect(this, SIGNAL(onSelectionChanged()), this, SLOT(onSelectionChanged()));
     connect(trainBottom, SIGNAL(autoHideChanged(bool)), this, SLOT(onAutoHideChanged(bool)));
 }

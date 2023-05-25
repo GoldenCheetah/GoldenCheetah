@@ -22,6 +22,7 @@
 #include "MainWindow.h"
 #include "Colors.h"
 #include <QSettings>
+#include <QDesktopWidget>
 #include <QDebug>
 
 #ifdef Q_OS_MAC
@@ -33,6 +34,8 @@ int OperatingSystem = LINUX;
 #elif defined Q_OS_OPENBSD
 int OperatingSystem = OPENBSD;
 #endif
+
+double scalefactors[13] = { 0.5f, 0.6f, 0.8, 0.9, 1.0f, 1.1f, 1.25f, 1.5f, 2.0f, 2.5f, 3.0f, 5.0f, 0 };
 
 // -------------- Initializer for the "extern" variable "appsettings" ----------------//
 
@@ -314,7 +317,6 @@ GSettings::migrateQSettingsSystem() {
 
     // do the migration for the System Settings - if not yet done
     // - System is only migrated once per PC (since it only exists once
-    // on MAC GC_CHROME is already set previously - so migrate anyway
 
     bool migrateMac = false;
     QStringList currentKeys = systemsettings->allKeys();
@@ -556,9 +558,6 @@ GSettings::upgradeSystem() {
         QString key = QString(colorIterator.next().data());
         migrateValue(key);
     }
-    migrateValue(GC_CHROME);
-
-
 }
 
 void
@@ -714,6 +713,104 @@ GSettings::upgradeAthlete(QString athlete) {
 
 }
 
+static char *fontfamilyfallback[] = {
+#ifdef Q_OS_LINUX
+    // try pretty fonts first (you never know)
+    "Noto Sans Display",
+    "DejaVu Sans",
+    "Liberation Sans",
+
+    // then distro specific ones
+    "Ubuntu",
+    "Red Hat Display",
+    "Trebuchet MS",
+
+#endif
+#ifdef Q_OS_WIN
+    "Segoe UI",
+    "Calibri",
+    "Microsoft Sans Serif",
+    "Trebuchet MS",
+#endif
+#ifdef Q_OS_MAC
+    "SF Pro Display",
+    "Helvetica Neue",
+    "Helvetica",
+    "Trebuchet MS",
+#endif
+
+    // on all OS these two should exist at a minimum
+    "Verdana",
+    "Arial",
+    NULL
+};
+
+AppearanceSettings
+GSettings::defaultAppearanceSettings()
+{
+    AppearanceSettings returning;
+
+    // lets get the geometry of the window next
+    // since its used to scale and set other
+    // appearance settings
+    QRect screensize = QApplication::desktop()->availableGeometry();
+
+    // leave 12% of the screen free to the left and right of the main window
+    // and same number of pixels above and below
+    returning.windowsize.setWidth(screensize.width() * 0.88);
+    double margin = (screensize.width() - returning.windowsize.width()) / 2;
+    returning.windowsize.setHeight(screensize.height() - (margin * 2));
+    returning.windowsize.setX(margin);
+    returning.windowsize.setY(margin);
+
+    // sidebars should be about 20% of width and no more
+    returning.sidebarwidth = returning.windowsize.width() / 5;
+
+    // lets find an appropriate font
+    returning.fontfamily = QFont().toString(); // ultimately fall back to QT default
+    for(int i=0; fontfamilyfallback[i] != NULL; i++) {
+
+        QFont font(fontfamilyfallback[i]);
+        if (font.exactMatch()) {
+            returning.fontfamily = fontfamilyfallback[i];
+            break;
+        }
+    }
+    returning.fontpointsize = 11; // default
+
+    // scaling only applies on hidpi displays
+    returning.fontscale = 1.0;
+    returning.xfactor = 1.0;
+    returning.yfactor = 1.0;
+
+    if (desktop->screen()->devicePixelRatio() <= 1 && screensize.width() > 2160) {
+       // we're on a hidpi screen - lets create a multiplier - always use smallest
+       returning.xfactor = screensize.width() / 1280.0;
+       returning.yfactor = screensize.height() / 1024.0;
+
+        // always make the same, use smallest scaling when x and y differ
+       if (returning.yfactor < returning.xfactor) returning.xfactor = returning.yfactor;
+       else if (returning.xfactor < returning.yfactor) returning.yfactor = returning.xfactor;
+
+       // set default font size -- all others will scale off this
+       double height = screensize.height() / 70;
+
+       // points = height in inches * dpi
+       returning.fontpointsize = (height / QApplication::desktop()->logicalDpiY()) * 72;
+
+    }
+
+    // best settings for UI as now designed
+    returning.theme = 5; // team purple colors
+    returning.antialias = true;
+    returning.scrollbar = true;
+    returning.head = false;
+    returning.sideanalysis = false;
+    returning.sidetrend = false;
+    returning.sidetrain = true;
+
+    return returning;
+}
 
 //----------------------------------------------------------------------------------------------//
 

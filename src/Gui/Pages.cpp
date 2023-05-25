@@ -1182,7 +1182,6 @@ SimBicyclePage::saveClicked()
 }
 
 
-static double scalefactors[12] = { 0.5f, 0.6f, 0.8, 0.9, 1.0f, 1.1f, 1.25f, 1.5f, 2.0f, 2.5f, 3.0f, 5.0f };
 
 //
 // Appearances page

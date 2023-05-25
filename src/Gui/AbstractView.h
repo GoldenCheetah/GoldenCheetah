@@ -111,6 +111,8 @@ class AbstractView : public QWidget
         bool importPerspective(QString filename);
         void exportPerspective(Perspective *, QString filename);
 
+        AppearanceSettings defaultAppearance; // default state for sidebar etc
+
     signals:
 
         void sidebarClosed(); // the user dragged the sidebar closed.

@@ -21,6 +21,7 @@
 #define _GC_Settings_h 1
 #include "GoldenCheetah.h"
 #include <QDebug>
+#include <QRect>
 
 
 /*
@@ -131,9 +132,6 @@
 #define GC_FONT_DEFAULT_SIZE            "<system>font/defaultsize"
 #define GC_FONT_CHARTLABELS_SIZE        "<system>font/chartlabelssize"
 #define GC_FONT_SCALE                   "<system>font/scale"
-
-// Colors/Chrome - see special treatment sections (also stored in <system>)
-#define GC_CHROME                       "<system>chrome" // mac or flat only so far
 
 // Location of R Installation - follows R_HOME semantics
 #define GC_R_HOME                       "<system>r_home"
@@ -440,6 +438,8 @@
 
 // Helper Class for the Athlete QSettings
 
+extern double scalefactors[];
+
 class AthleteQSettings {
     public:
 
@@ -454,6 +454,29 @@ class AthleteQSettings {
 
 };
 
+
+typedef struct {
+
+    // gui sizing
+    double xfactor, yfactor; // scaling of widgets
+    QRect windowsize; // size of the window in pixels
+
+    // fonts
+    QString fontfamily;
+    int fontpointsize;
+    double fontscale; // scaling of fonts
+
+    // ui elements, mostly standard defaults
+    int theme; // theme number to use
+    bool antialias; // antialias fonts- always true
+    bool scrollbar; //scroller on ride list- always false
+    bool head; // false for MAC, true for everyone else
+    int sidebarwidth; // width of sidebars in pixels
+    bool sideanalysis;
+    bool sidetrend;
+    bool sidetrain;
+
+} AppearanceSettings;
 
 // wrap the standard QSettings so we can offer members
 // to get global or atheleteName specific settings
@@ -495,6 +518,9 @@ public:
 
     // Cleanup if AthleteDir is changed
     void clearGlobalAndAthletes();
+
+    // reset appearance settings like theme, font, color and geometry
+    static AppearanceSettings defaultAppearanceSettings();
 
 private:
     bool newFormat;
