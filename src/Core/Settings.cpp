@@ -757,9 +757,10 @@ GSettings::defaultAppearanceSettings()
 
     // leave 12% of the screen free to the left and right of the main window
     // and same number of pixels above and below
-    returning.windowsize.setWidth(screensize.width() * 0.88);
-    double margin = (screensize.width() - returning.windowsize.width()) / 2;
-    returning.windowsize.setHeight(screensize.height() - (margin * 2));
+    double width = screensize.width() * 0.88;
+    double margin = (screensize.width() - width) / 2.0;
+    returning.windowsize.setWidth(screensize.width() - margin);
+    returning.windowsize.setHeight(screensize.height() - margin);
     returning.windowsize.setX(margin);
     returning.windowsize.setY(margin);
 

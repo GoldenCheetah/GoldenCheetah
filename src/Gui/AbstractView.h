@@ -31,6 +31,8 @@
 #include "GcSideBarItem.h"
 #include "GcWindowRegistry.h"
 
+#include "Settings.h"
+
 class AthleteTab;
 class ViewSplitter;
 class Context;
