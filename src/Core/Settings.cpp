@@ -713,7 +713,7 @@ GSettings::upgradeAthlete(QString athlete) {
 
 }
 
-static char *fontfamilyfallback[] = {
+static QString fontfamilyfallback[] = {
 #ifdef Q_OS_LINUX
     // try pretty fonts first (you never know)
     "Noto Sans Display",
