@@ -449,10 +449,13 @@ class ColorsPage : public QWidget
 
     public slots:
         void applyThemeClicked();
+        void applyThemeIndex(int index);
         void tabChanged();
 
         void scaleFont();
         void searchFilter(QString);
+
+        void resetClicked();
 
     private:
 

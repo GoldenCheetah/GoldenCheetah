@@ -465,6 +465,7 @@ typedef struct {
     QString fontfamily;
     int fontpointsize;
     double fontscale; // scaling of fonts
+    int fontscaleindex; // index into the list
 
     // ui elements, mostly standard defaults
     int theme; // theme number to use
@@ -475,6 +476,7 @@ typedef struct {
     bool sideanalysis;
     bool sidetrend;
     bool sidetrain;
+    double linewidth; // default line width
 
 } AppearanceSettings;
 

@@ -781,6 +781,7 @@ GSettings::defaultAppearanceSettings()
 
     // scaling only applies on hidpi displays
     returning.fontscale = 1.0;
+    returning.fontscaleindex = 4;
     returning.xfactor = 1.0;
     returning.yfactor = 1.0;
 
@@ -809,6 +810,14 @@ GSettings::defaultAppearanceSettings()
     returning.sideanalysis = false;
     returning.sidetrend = false;
     returning.sidetrain = true;
+
+    // linewidth must be wholly divisible by 0.5
+    // default is historically 2px but 4px is too thick
+    // on hidpi displays typically, so we adjust to 3px
+    returning.linewidth = dpiXFactor > 1 ? 1.5 * dpiXFactor : 2.0;
+    double factor = returning.linewidth / 0.5;
+    factor=qRound(factor);
+    returning.linewidth = 0.5 * factor;
 
     return returning;
 }

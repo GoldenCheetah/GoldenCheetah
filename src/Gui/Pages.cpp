@@ -1406,6 +1406,13 @@ ColorsPage::applyThemeClicked()
     // first check we have a selection!
     if (themes->currentItem() && (index=themes->invisibleRootItem()->indexOfChild(themes->currentItem())) >= 0) {
 
+        applyThemeIndex(index);
+    }
+}
+
+void
+ColorsPage::applyThemeIndex(int index)
+{
         // now get the theme selected
         ColorTheme theme = GCColor::themes().themes[index];
 
@@ -1535,7 +1542,22 @@ ColorsPage::applyThemeClicked()
         colors->setSortingEnabled(true);
         colors->sortByColumn(1, Qt::AscendingOrder); // first sort by name
         colors->sortByColumn(0, Qt::AscendingOrder);
-    }
+}
+
+void
+ColorsPage::resetClicked()
+{
+    fprintf(stderr, "reset appearance settings!\n"); fflush(stderr);
+    AppearanceSettings defaults = GSettings::defaultAppearanceSettings();
+
+    def->setCurrentFont(QFont(defaults.fontfamily));
+    fontscale->setValue(defaults.fontscaleindex);
+    lineWidth->setValue(defaults.linewidth);
+    antiAliased->setChecked(defaults.antialias);
+    rideHead->setChecked(defaults.head);
+    rideScroll->setChecked(defaults.scrollbar);
+
+    applyThemeIndex(defaults.theme);
 }
 
 qint32
