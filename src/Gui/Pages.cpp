@@ -1547,15 +1547,16 @@ ColorsPage::applyThemeIndex(int index)
 void
 ColorsPage::resetClicked()
 {
-    fprintf(stderr, "reset appearance settings!\n"); fflush(stderr);
     AppearanceSettings defaults = GSettings::defaultAppearanceSettings();
 
     def->setCurrentFont(QFont(defaults.fontfamily));
     fontscale->setValue(defaults.fontscaleindex);
     lineWidth->setValue(defaults.linewidth);
     antiAliased->setChecked(defaults.antialias);
+#ifndef Q_OS_MAC // they do scrollbars nicely
     rideHead->setChecked(defaults.head);
     rideScroll->setChecked(defaults.scrollbar);
+#endif
 
     applyThemeIndex(defaults.theme);
 }
