@@ -785,6 +785,9 @@ GSettings::defaultAppearanceSettings()
     returning.xfactor = 1.0;
     returning.yfactor = 1.0;
 
+    // dpiXFactor and dpiYFactor are used to scale across the code
+    // typically to increase the size of widgets but also some other
+    // graphical elements
     if (desktop->screen()->devicePixelRatio() <= 1 && screensize.width() > 2160) {
        // we're on a hidpi screen - lets create a multiplier - always use smallest
        returning.xfactor = screensize.width() / 1280.0;
@@ -798,8 +801,27 @@ GSettings::defaultAppearanceSettings()
        double height = screensize.height() / 70;
 
        // points = height in inches * dpi
-       returning.fontpointsize = (height / QApplication::desktop()->logicalDpiY()) * 72;
+       //returning.fontpointsize = (height / QApplication::desktop()->logicalDpiY()) * 72;
 
+    }
+
+    // we also need to make sure fonts are scaled to be large/small enough
+    // to use the screen estate reasonably- whilst some users will prefer
+    // small fonts, we scale to a size that looks the same on all resolutions
+    // and avoid overly small fonts. Users can of course adjust the scaling
+    // to their own preferences later
+    for (int i=0; scalefactors[i] != 0; i++) {
+
+        QFont font(returning.fontfamily);
+        font.setPointSizeF(returning.fontpointsize * scalefactors[i]);
+        QFontMetricsF metrics(font);
+        double height = metrics.boundingRect("TEST").height();
+
+        if (returning.windowsize.height() / height < 43) {
+            returning.fontscale = scalefactors[i];
+            returning.fontscaleindex = i;
+            break;
+        }
     }
 
     // best settings for UI as now designed
