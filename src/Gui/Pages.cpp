@@ -1182,7 +1182,6 @@ SimBicyclePage::saveClicked()
 }
 
 
-static double scalefactors[12] = { 0.5f, 0.6f, 0.8, 0.9, 1.0f, 1.1f, 1.25f, 1.5f, 2.0f, 2.5f, 3.0f, 5.0f };
 
 //
 // Appearances page
@@ -1407,6 +1406,13 @@ ColorsPage::applyThemeClicked()
     // first check we have a selection!
     if (themes->currentItem() && (index=themes->invisibleRootItem()->indexOfChild(themes->currentItem())) >= 0) {
 
+        applyThemeIndex(index);
+    }
+}
+
+void
+ColorsPage::applyThemeIndex(int index)
+{
         // now get the theme selected
         ColorTheme theme = GCColor::themes().themes[index];
 
@@ -1536,7 +1542,23 @@ ColorsPage::applyThemeClicked()
         colors->setSortingEnabled(true);
         colors->sortByColumn(1, Qt::AscendingOrder); // first sort by name
         colors->sortByColumn(0, Qt::AscendingOrder);
-    }
+}
+
+void
+ColorsPage::resetClicked()
+{
+    AppearanceSettings defaults = GSettings::defaultAppearanceSettings();
+
+    def->setCurrentFont(QFont(defaults.fontfamily));
+    fontscale->setValue(defaults.fontscaleindex);
+    lineWidth->setValue(defaults.linewidth);
+    antiAliased->setChecked(defaults.antialias);
+#ifndef Q_OS_MAC // they do scrollbars nicely
+    rideHead->setChecked(defaults.head);
+    rideScroll->setChecked(defaults.scrollbar);
+#endif
+
+    applyThemeIndex(defaults.theme);
 }
 
 qint32

@@ -188,21 +188,12 @@ MainWindow::MainWindow(const QDir &home)
          restoreGeometry(appsettings->value(this, GC_SETTINGS_MAIN_GEOM).toByteArray());
          restoreState(appsettings->value(this, GC_SETTINGS_MAIN_STATE).toByteArray());
      } else {
-         // first run -- lets set some sensible defaults...
-         // lets put it in the middle of screen 1
-        QRect screenSize = desktop->availableGeometry();
-         struct SizeSettings app = GCColor::defaultSizes(screenSize.height(), screenSize.width());
+
+         AppearanceSettings defaults = GSettings::defaultAppearanceSettings();
 
          // center on the available screen (minus toolbar/sidebar)
-         move((screenSize.width()-screenSize.x())/2 - app.width/2,
-              (screenSize.height()-screenSize.y())/2 - app.height/2);
-
-         // set to the right default
-         resize(app.width, app.height);
-
-         // set all the default font sizes
-         appsettings->setValue(GC_FONT_DEFAULT_SIZE, app.defaultFont);
-         appsettings->setValue(GC_FONT_CHARTLABELS_SIZE, app.labelFont);
+         move(defaults.windowsize.x(), defaults.windowsize.y());
+         resize(defaults.windowsize.width(), defaults.windowsize.height());
 
      }
 
@@ -460,7 +451,7 @@ MainWindow::MainWindow(const QDir &home)
      * Application Menus
      *--------------------------------------------------------------------*/
 #ifdef WIN32
-    QString menuColorString = (GCColor::isFlat() ? GColor(CTOOLBAR).name() : "rgba(225,225,225)");
+    QString menuColorString = GColor(CTOOLBAR).name();
     menuBar()->setStyleSheet(QString("QMenuBar { color: black; background: %1; }"
                              "QMenuBar::item { color: black; background: %1; }").arg(menuColorString));
     menuBar()->setContentsMargins(0,0,0,0);
@@ -2505,7 +2496,7 @@ MainWindow::configChanged(qint32)
     // Windows and Linux menu bar should match chrome
     QColor textCol(Qt::black);
     if (GCColor::luminance(GColor(CTOOLBAR)) < 127)  textCol = QColor(Qt::white);
-    QString menuColorString = (GCColor::isFlat() ? GColor(CTOOLBAR).name() : "rgba(225,225,225)");
+    QString menuColorString = GColor(CTOOLBAR).name();
     menuBar()->setStyleSheet(QString("QMenuBar { color: %1; background: %2; }"
                              "QMenuBar::item { color: %1; background: %2; }")
                              .arg(textCol.name()).arg(menuColorString));

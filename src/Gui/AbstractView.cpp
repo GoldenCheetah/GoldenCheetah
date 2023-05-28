@@ -41,6 +41,9 @@ AbstractView::AbstractView(Context *context, int type) :
     sidebar_(NULL), bottom_(NULL), perspective_(NULL), blank_(NULL),
     loaded(false)
 {
+
+    defaultAppearance= GSettings::defaultAppearanceSettings();
+
     // setup the basic widget
     QVBoxLayout *layout = new QVBoxLayout(this);
     setContentsMargins(0,0,0,0);

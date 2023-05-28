@@ -76,6 +76,8 @@ GcUpgrade::upgrade(const QDir &home)
     // what was the last version? -- do we need to upgrade?
     int last = appsettings->cvalue(home.dirName(), GC_VERSION_USED, 0).toInt();
 
+    AppearanceSettings defaults = GSettings::defaultAppearanceSettings();
+
     // Upgrade processing was introduced in Version 3 -- below must be performed
     // for athlete directories from prior to Version 3
     // and can essentially be used as a template for all major release
@@ -116,12 +118,12 @@ GcUpgrade::upgrade(const QDir &home)
             if (weight_ <= 0.00) appsettings->setCValue(home.dirName(), GC_WEIGHT, "75.0");
 
             // 5. startup with common sidebars shown (less ugly)
-            appsettings->setCValue(home.dirName(), GC_QSETTINGS_ATHLETE_LAYOUT+QString("splitter/LTM/hide"), true);
+            appsettings->setCValue(home.dirName(), GC_QSETTINGS_ATHLETE_LAYOUT+QString("splitter/LTM/hide"), !defaults.sidetrend);
             appsettings->setCValue(home.dirName(), GC_QSETTINGS_ATHLETE_LAYOUT+QString("splitter/LTM/hide/0"), false);
             appsettings->setCValue(home.dirName(), GC_QSETTINGS_ATHLETE_LAYOUT+QString("splitter/LTM/hide/1"), false);
             appsettings->setCValue(home.dirName(), GC_QSETTINGS_ATHLETE_LAYOUT+QString("splitter/LTM/hide/2"), false);
             appsettings->setCValue(home.dirName(), GC_QSETTINGS_ATHLETE_LAYOUT+QString("splitter/LTM/hide/3"), true);
-            appsettings->setCValue(home.dirName(), GC_QSETTINGS_ATHLETE_LAYOUT+QString("splitter/analysis/hide"), true);
+            appsettings->setCValue(home.dirName(), GC_QSETTINGS_ATHLETE_LAYOUT+QString("splitter/analysis/hide"), !defaults.sideanalysis);
             appsettings->setCValue(home.dirName(), GC_QSETTINGS_ATHLETE_LAYOUT+QString("splitter/analysis/hide/0"), false);
             appsettings->setCValue(home.dirName(), GC_QSETTINGS_ATHLETE_LAYOUT+QString("splitter/analysis/hide/1"), true);
             appsettings->setCValue(home.dirName(), GC_QSETTINGS_ATHLETE_LAYOUT+QString("splitter/analysis/hide/2"), false);
@@ -130,7 +132,7 @@ GcUpgrade::upgrade(const QDir &home)
             appsettings->setCValue(home.dirName(), GC_QSETTINGS_ATHLETE_LAYOUT+QString("splitter/diary/hide/0"), false);
             appsettings->setCValue(home.dirName(), GC_QSETTINGS_ATHLETE_LAYOUT+QString("splitter/diary/hide/1"), false);
             appsettings->setCValue(home.dirName(), GC_QSETTINGS_ATHLETE_LAYOUT+QString("splitter/diary/hide/2"), true);
-            appsettings->setCValue(home.dirName(), GC_QSETTINGS_ATHLETE_LAYOUT+QString("splitter/train/hide"), true);
+            appsettings->setCValue(home.dirName(), GC_QSETTINGS_ATHLETE_LAYOUT+QString("splitter/train/hide"), !defaults.sidetrain);
             appsettings->setCValue(home.dirName(), GC_QSETTINGS_ATHLETE_LAYOUT+QString("splitter/train/hide/0"), false);
             appsettings->setCValue(home.dirName(), GC_QSETTINGS_ATHLETE_LAYOUT+QString("splitter/train/hide/1"), false);
             appsettings->setCValue(home.dirName(), GC_QSETTINGS_ATHLETE_LAYOUT+QString("splitter/train/hide/2"), false);
@@ -202,9 +204,10 @@ GcUpgrade::upgrade(const QDir &home)
         if (charts.exists()) charts.remove();
 
         // 3. Reset colour defaults **
-        GCColor::applyTheme(0); // set to default theme
+        GCColor::applyTheme(defaults.theme); // set to default theme
 
         // 4. Theme and Chrome Color
+#if 0 // this is no longer required, but keeping in case we need to reinstate- XXX fixme
         QString theme = "Flat";
         QColor chromeColor = QColor(0xec,0xec,0xec);
 #ifdef Q_OS_MAC
@@ -224,6 +227,7 @@ GcUpgrade::upgrade(const QDir &home)
                                                  .arg(chromeColor.blue());
         appsettings->setValue("CCHROME", colorstring);
         GCColor::setColor(CCHROME, chromeColor);
+#endif
 
         // 5. Metrics and Notes keywords
         QString filename = home.canonicalPath()+"/metadata.xml";
@@ -365,9 +369,6 @@ GcUpgrade::upgrade(const QDir &home)
     //----------------------------------------------------------------------
     if (last < VERSION35_BUILD) {
 
-        // metallic style deprecated
-        appsettings->setValue(GC_CHROME, "Flat");
-
         // set the default scale factor to 1.0, if not already done
         if (appsettings->value(NULL, GC_FONT_SCALE, "0").toDouble() == 0)
             appsettings->setValue(GC_FONT_SCALE, QVariant::fromValue(1.0f));
@@ -392,8 +393,11 @@ GcUpgrade::upgrade(const QDir &home)
         }
 
         // reset themes on basis of plot background (first 2 themes are default dark and light themes
+#if 0
         if (GCColor::luminance(GColor(CPLOTBACKGROUND)) < 127)  GCColor::applyTheme(0);
         else GCColor::applyTheme(1);
+#endif
+        GCColor::applyTheme(defaults.theme);
 
     }
 
@@ -599,18 +603,6 @@ GcUpgrade::upgrade(const QDir &home)
                                                  .arg(color.green())
                                                  .arg(color.blue());
         appsettings->setValue("COLORTRENDPLOTBACKGROUND", colorstring);
-
-        // and on non-Mac platforms we want flat look and feel
-        // by default now, the metal look is de-rigeur
-#ifndef Q_OS_MAC
-        color = QColor(0xe5,0xe5,0xe5);
-        colorstring = QString("%1:%2:%3").arg(color.red())
-                                         .arg(color.green())
-                                         .arg(color.blue());
-        appsettings->setValue("CCHROME", colorstring);
-        appsettings->setValue(GC_CHROME, "Flat");
-#endif
-
     }
     return 0;
 }

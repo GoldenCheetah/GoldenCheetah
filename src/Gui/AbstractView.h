@@ -31,6 +31,8 @@
 #include "GcSideBarItem.h"
 #include "GcWindowRegistry.h"
 
+#include "Settings.h"
+
 class AthleteTab;
 class ViewSplitter;
 class Context;
@@ -110,6 +112,8 @@ class AbstractView : public QWidget
 
         bool importPerspective(QString filename);
         void exportPerspective(Perspective *, QString filename);
+
+        AppearanceSettings defaultAppearance; // default state for sidebar etc
 
     signals:
 
