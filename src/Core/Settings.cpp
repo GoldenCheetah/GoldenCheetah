@@ -716,28 +716,30 @@ GSettings::upgradeAthlete(QString athlete) {
 static QString fontfamilyfallback[] = {
 #ifdef Q_OS_LINUX
     // try pretty fonts first (you never know)
-    "Noto Sans Display",
-    "DejaVu Sans",
-    "Liberation Sans",
+    "Noto Sans Display", // google free font
+    "Clear Sans", // intel free font
+    "DejaVu Sans", // gnome free font
+    "Liberation Sans", // red hat free font
 
     // then distro specific ones
     "Ubuntu",
     "Red Hat Display",
-    "Trebuchet MS",
 
 #endif
 #ifdef Q_OS_WIN
     "Segoe UI",
     "Calibri",
     "Microsoft Sans Serif",
-    "Trebuchet MS",
 #endif
 #ifdef Q_OS_MAC
     "SF Pro Display",
+    "PT Sans",
     "Helvetica Neue",
-    "Helvetica",
-    "Trebuchet MS",
 #endif
+
+    // common fonts
+    "Trebuchet MS",
+    "Helvetica",
 
     // on all OS these two should exist at a minimum
     "Verdana",
