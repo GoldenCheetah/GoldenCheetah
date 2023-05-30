@@ -749,6 +749,14 @@ static QString fontfamilyfallback[] = {
     NULL
 };
 
+
+// font selection and scaling uses slightly smaller fonts on MacOS
+#ifdef Q_OS_MAC
+#define FONTROWS 48
+#else
+#define FONTROWS 43
+#endif
+
 AppearanceSettings
 GSettings::defaultAppearanceSettings()
 {
@@ -808,12 +816,6 @@ breakout:
        if (returning.yfactor < returning.xfactor) returning.xfactor = returning.yfactor;
        else if (returning.xfactor < returning.yfactor) returning.yfactor = returning.xfactor;
 
-       // set default font size -- all others will scale off this
-       double height = screensize.height() / 70;
-
-       // points = height in inches * dpi
-       //returning.fontpointsize = (height / QApplication::desktop()->logicalDpiY()) * 72;
-
     }
 
     // we also need to make sure fonts are scaled to be large/small enough
@@ -828,7 +830,7 @@ breakout:
         QFontMetricsF metrics(font);
         double height = metrics.boundingRect("TEST").height();
 
-        if (returning.windowsize.height() / height < 43) {
+        if (returning.windowsize.height() / height < FONTROWS) {
             returning.fontscale = scalefactors[i];
             returning.fontscaleindex = i;
             break;
