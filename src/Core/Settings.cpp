@@ -25,6 +25,8 @@
 #include <QDesktopWidget>
 #include <QDebug>
 
+#include <QFontDatabase>
+
 #ifdef Q_OS_MAC
 int OperatingSystem = OSX;
 #elif defined Q_OS_WIN32
@@ -771,14 +773,21 @@ GSettings::defaultAppearanceSettings()
 
     // lets find an appropriate font
     returning.fontfamily = QFont().toString(); // ultimately fall back to QT default
+    QFontDatabase fontdb;
     for(int i=0; fontfamilyfallback[i] != NULL; i++) {
 
-        QFont font(fontfamilyfallback[i]);
-        if (font.exactMatch()) {
-            returning.fontfamily = fontfamilyfallback[i];
-            break;
+        foreach(QString family, fontdb.families()) {
+
+            // is it installed ?
+            if (family == fontfamilyfallback[i]) {
+                returning.fontfamily = fontfamilyfallback[i];
+                goto breakout;
+            }
         }
     }
+
+breakout:
+
     returning.fontpointsize = 11; // default
 
     // scaling only applies on hidpi displays
