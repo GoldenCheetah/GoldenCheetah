@@ -225,8 +225,8 @@ PythonEmbed::PythonEmbed(const bool verbose, const bool interactive) : verbose(v
         printd("Python is installed: %s\n", pybin.toStdString().c_str());
 
         // tell python our program name - pretend to be the usual interpreter
-        printd("Py_SetProgramName: %s\n", pybin.toStdString().c_str());
-        Py_SetProgramName((wchar_t*) pybin.toStdString().c_str());
+        printd("Py_SetProgramName: %s\n", pybin.toStdWString().c_str());
+        Py_SetProgramName((wchar_t*) pybin.toStdWString().c_str());
 
         // our own module
         printd("PyImport_AppendInittab: goldencheetah\n");
