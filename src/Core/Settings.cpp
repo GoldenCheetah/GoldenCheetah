@@ -25,6 +25,8 @@
 #include <QDesktopWidget>
 #include <QDebug>
 
+#include <QFontDatabase>
+
 #ifdef Q_OS_MAC
 int OperatingSystem = OSX;
 #elif defined Q_OS_WIN32
@@ -747,6 +749,14 @@ static QString fontfamilyfallback[] = {
     NULL
 };
 
+
+// font selection and scaling uses slightly smaller fonts on MacOS
+#ifdef Q_OS_MAC
+#define FONTROWS 48
+#else
+#define FONTROWS 43
+#endif
+
 AppearanceSettings
 GSettings::defaultAppearanceSettings()
 {
@@ -771,14 +781,21 @@ GSettings::defaultAppearanceSettings()
 
     // lets find an appropriate font
     returning.fontfamily = QFont().toString(); // ultimately fall back to QT default
+    QFontDatabase fontdb;
     for(int i=0; fontfamilyfallback[i] != NULL; i++) {
 
-        QFont font(fontfamilyfallback[i]);
-        if (font.exactMatch()) {
-            returning.fontfamily = fontfamilyfallback[i];
-            break;
+        foreach(QString family, fontdb.families()) {
+
+            // is it installed ?
+            if (family == fontfamilyfallback[i]) {
+                returning.fontfamily = fontfamilyfallback[i];
+                goto breakout;
+            }
         }
     }
+
+breakout:
+
     returning.fontpointsize = 11; // default
 
     // scaling only applies on hidpi displays
@@ -799,12 +816,6 @@ GSettings::defaultAppearanceSettings()
        if (returning.yfactor < returning.xfactor) returning.xfactor = returning.yfactor;
        else if (returning.xfactor < returning.yfactor) returning.yfactor = returning.xfactor;
 
-       // set default font size -- all others will scale off this
-       double height = screensize.height() / 70;
-
-       // points = height in inches * dpi
-       //returning.fontpointsize = (height / QApplication::desktop()->logicalDpiY()) * 72;
-
     }
 
     // we also need to make sure fonts are scaled to be large/small enough
@@ -819,7 +830,7 @@ GSettings::defaultAppearanceSettings()
         QFontMetricsF metrics(font);
         double height = metrics.boundingRect("TEST").height();
 
-        if (returning.windowsize.height() / height < 43) {
+        if (returning.windowsize.height() / height < FONTROWS) {
             returning.fontscale = scalefactors[i];
             returning.fontscaleindex = i;
             break;
