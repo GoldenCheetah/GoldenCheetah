@@ -1,6 +1,6 @@
-<img src="src/Resources/images/gc.png" height="25%" width="25%">
-
 # GoldenCheetah
+
+<img src="https://raw.githubusercontent.com/GoldenCheetah/GoldenCheetah/067696aafdad21c702672b2c9c41da03c076451c/doc/wiki/GoldenCheetah-Screenshot.png" width="100%">
 
 ## About 
 
