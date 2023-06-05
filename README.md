@@ -18,6 +18,12 @@ GoldenCheetah provides tools for users to develop their own own metrics, models 
 * Local Python runtime or embedding a user installed runtime 
 * Embedded user installed R runtime 
 
+GoldenCheetah supports community sharing via the Cloud
+* Upload and download user developed metrics
+* Upload and download user, Python or R charts
+* Import indoor workouts from the ErgDB
+* Share anonymised data with researchers via the OpenData initiative
+
 GoldenCheetah is free for everyone to use and modify, released under the GPL v2 open source license with pre-built binaries for Mac, Windows and Linux.
 
 ## Installing 
