@@ -1990,7 +1990,7 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
             displayLongitude = rtData.getLongitude();
             displayAltitude = rtData.getAltitude();
 
-            double weightKG = context->athlete->getWeight(QDate::currentDate()) + 10; // 10kg bike
+            double weightKG = bicycle.MassKG();
             double vs = computeInstantSpeed(weightKG, rtData.getSlope(), rtData.getAltitude(), rtData.getWatts());
 
             rtData.setVirtualSpeed(vs);

@@ -104,6 +104,7 @@ class FormField : public QWidget
         bool edited;                // value has been changed
         bool active;                // when data being changed for rideSelected
         bool isTime;                // when we edit metrics but they are really times
+        bool warn;                  // a warning is displayed
 };
 
 class Form : public QScrollArea
