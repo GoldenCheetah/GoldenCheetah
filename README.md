@@ -35,7 +35,7 @@ INSTALL-WIN32   For building on Microsoft Windows
 
 INSTALL-LINUX   For building on Linux
 
-INSTALL-MAC     For building on Apple OS X
+INSTALL-MAC     For building on Apple MacOS
 
 
 macOS and Linux: [![Build Status](https://app.travis-ci.com/GoldenCheetah/GoldenCheetah.svg?branch=master)](https://app.travis-ci.com/GoldenCheetah/GoldenCheetah)
