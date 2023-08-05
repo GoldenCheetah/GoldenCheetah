@@ -117,7 +117,7 @@
 #define VERSION33_BUILD   3933 // development release
 #define VERSION34_BUILD   3955 // released
 #define VERSION35_BUILD   3990 // released
-#define VERSION36_BUILD   5000 // released
+#define VERSION36_BUILD   5000 // released 5/8/23
 
 // will keep changing during testing and before final release
 #define VERSION31_BUILD VERSION31_UPG
