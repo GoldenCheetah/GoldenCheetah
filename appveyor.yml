@@ -125,8 +125,8 @@ install:
 - echo GSL_LIBS=-Lc:\tools\vcpkg\installed\x64-windows\lib -lgsl -lgslcblas >> src\gcconfig.pri
 
 before_build:
-# Define GC version string, only for tagged builds
-- if %APPVEYOR_REPO_TAG%==true echo DEFINES+=GC_VERSION=VERSION_STRING >> src\gcconfig.pri
+# Define GC version string
+- echo DEFINES+=GC_VERSION=VERSION_STRING >> src\gcconfig.pri
 
 # Enable CloudDB
 - echo CloudDB=active >> src\gcconfig.pri
