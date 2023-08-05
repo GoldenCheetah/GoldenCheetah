@@ -59,7 +59,7 @@ consider upgrading to Lion to get the latest bug fixes and capabilities.
 To install Xcode on Lion you need to download it via the App Store. You can
 launch the App Store from launchpad, or it may be already in your dock.
 
-Under the search box type in Xcode and it will return a few optios, generally
+Under the search box type in Xcode and it will return a few options, generally
 Xcode is the first item and shows a blueprint with a hammer icon. Click on
 this to install it. It should be free. The usual app store process will apply
 as the application is downloaded and installed. The download is about 2GB
@@ -119,7 +119,7 @@ where you got it from of course!).
 
 GoldenCheetah is developed using the Nokia QT toolkit, it is large and will
 need to be downloaded and installed from their website. Alternatively, you 
-can intall qt via macports (http://www.macports.org) as described in section 
+can install qt via macports (http://www.macports.org) as described in section 
 1.5.1. 
 
 As of today, the latest stable release is 5.6.0, we need 4.7 or higher so
@@ -156,7 +156,7 @@ $ sudo ln -s ~/Qt5.6.0/5.6/clang_64/bin/qmake /usr/local/bin/qmake
 1.5.1 Install via Mac Ports
 ---------------------------
 
-If you have macports installed, you can install the qt dependices 
+If you have macports installed, you can install the qt dependencies 
 with the following commands: 
 
 $ sudo port install qt4-mac

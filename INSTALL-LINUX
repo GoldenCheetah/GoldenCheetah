@@ -112,7 +112,7 @@ and add the library path to LIBZ_INCLUDE =, you will need to have the compress l
 #LIBZ_INCLUDE =
 #LIBZ_LIBS = -lz
 
-compiling with gcc -O3 (tree vectorization can have a significat impact)
+compiling with gcc -O3 (tree vectorization can have a significant impact)
 [or -Ofast]
 
 If so you might like to uncomment:

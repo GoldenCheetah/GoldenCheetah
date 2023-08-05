@@ -48,7 +48,7 @@ do
 done
 popd
 
-# Final deployment to generate dmg (may take longer than 10' wihout output)
+# Final deployment to generate dmg (may take longer than 10' without output)
 python3.7 -m pip install travis-wait-improved
 /Library/Frameworks/Python.framework/Versions/3.7/bin/travis-wait-improved --timeout 20m /usr/local/opt/qt5/bin/macdeployqt GoldenCheetah.app -verbose=2 -fs=hfs+ -dmg
 
