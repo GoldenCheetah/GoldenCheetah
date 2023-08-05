@@ -4,8 +4,8 @@ export PATH=/opt/qt515/bin:$PATH
 
 cp qwt/qwtconfig.pri.in qwt/qwtconfig.pri
 cp src/gcconfig.pri.in src/gcconfig.pri
-# Define GC version string
-echo DEFINES += GC_VERSION=VERSION_STRING >> src/gcconfig.pri
+# Define GC version string, only for tagged builds
+if [ -n "$TRAVIS_TAG" ]; then echo DEFINES += GC_VERSION=VERSION_STRING >> src/gcconfig.pri; fi
 # make a release build
 sed -i "s|#\(CONFIG += release.*\)|\1 static|" src/gcconfig.pri
 sed -i "s|^#QMAKE_CXXFLAGS|QMAKE_CXXFLAGS|" src/gcconfig.pri

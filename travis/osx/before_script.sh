@@ -26,8 +26,8 @@ cp qwt/qwtconfig.pri.in qwt/qwtconfig.pri
 cp src/gcconfig.pri.in src/gcconfig.pri
 # Bison
 echo QMAKE_YACC=/usr/local/opt/bison@2.7/bin/bison >> src/gcconfig.pri
-# Define GC version string
-echo DEFINES += GC_VERSION=VERSION_STRING >> src/gcconfig.pri
+# Define GC version string, only for tagged builds
+if [ -n "$TRAVIS_TAG" ]; then echo DEFINES += GC_VERSION=VERSION_STRING >> src/gcconfig.pri; fi
 sed -i "" "s|#\(CONFIG += release.*\)|\1 static |" src/gcconfig.pri
 sed -i "" "s|#\(QMAKE_CXXFLAGS\).*|\1_RELEASE += -mmacosx-version-min=10.7 -arch x86_64|" src/gcconfig.pri
 sed -i "" "s|^#CloudDB|CloudDB|" src/gcconfig.pri
