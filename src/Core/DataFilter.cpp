@@ -3166,11 +3166,13 @@ DataFilter::DataFilter(QObject *parent, Context *context, QString formula) : QOb
         treeRoot->validateFilter(context, &rt, treeRoot);
     else
         treeRoot=NULL;
+
+    errors = DataFiltererrors;
 }
 
 Result DataFilter::evaluate(RideItem *item, RideFilePoint *p)
 {
-    if (!item || !treeRoot || DataFiltererrors.count())
+    if (!item || !treeRoot || errors.count())
         return Result(0);
 
     // reset stack
@@ -3199,7 +3201,7 @@ Result DataFilter::evaluate(Specification spec, DateRange dr)
     // if there is no current ride item then there is no data
     // so it really is ok to baulk at no current ride item here
     // we must always have a ride since context is used
-    if (context->currentRideItem() == NULL || !treeRoot || DataFiltererrors.count()) return Result(0);
+    if (context->currentRideItem() == NULL || !treeRoot || errors.count()) return Result(0);
 
     Result res(0);
 
@@ -3358,6 +3360,7 @@ void DataFilter::clearFilter()
         treeRoot->clear(treeRoot);
         delete treeRoot;
         treeRoot = NULL;
+        errors.clear();
     }
     rt.isdynamic = false;
     sig = "";
