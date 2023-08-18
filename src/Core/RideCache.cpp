@@ -318,37 +318,51 @@ RideCache::addRide(QString name, bool dosignal, bool select, bool useTempActivit
     estimator->refresh();
 }
 
-void
-RideCache::removeCurrentRide()
-{
-    if (context->ride == NULL) return;
+bool
+RideCache::removeCurrentRide() {
 
-    RideItem *select = NULL; // ride to select once its gone
-    RideItem *todelete = context->ride;
+    // if there is no current activity to delete then return
+    if (context->ride == NULL) return false;
 
-    bool found = false;
-    int index=0; // index to wipe out
+    // pass the current ride filename for deletion
+    return removeRide(context->ride->fileName);
+}
 
-    // find ours in the list and select the one
-    // immediately after it, but if it is the last
-    // one on the list select the one before
-    for(index=0; index < rides_.count(); index++) {
+bool
+RideCache::removeRide(const QString& filenameToDelete) {
+  
+    // if there is no file activity to delete then return
+    if (filenameToDelete.isEmpty()) return false;
 
-       if (rides_[index]->fileName == context->ride->fileName) {
+    RideItem* select = NULL; // ride to select once its gone
+    RideItem* todelete = NULL;
+    int index = 0; // index to wipe out
 
-          // bingo!
-          found = true;
-          if (rides_.count()-index > 1) select = rides_[index+1];
-          else if (index > 0) select = rides_[index-1];
-          break;
+    // find the filenameToDelete in the list and if it happens to be the
+    // the current ride then select another one immediately after it, but
+    // if it is the last one on the list select the one before
+    for (index = 0; index < rides_.count(); index++) {
 
-       }
+        RideItem* rideI = rides_[index];
+
+        if (rideI->fileName == filenameToDelete) {
+
+            // bingo!
+            todelete = rideI;
+
+            // if the ride to be deleted happens to be the current ride, then select another
+            if (context->ride == todelete) {
+                if (rides_.count() - index > 1) select = rides_[index + 1];
+                else if (index > 0) select = rides_[index - 1];
+            }
+            break;
+        }
     }
 
     // WTAF!?
-    if (!found) {
+    if (!todelete) {
         qDebug()<<"ERROR: delete not found.";
-        return;
+        return false;
     }
 
     // dataprocessor runs on "save" which is a short
@@ -365,11 +379,10 @@ RideCache::removeCurrentRide()
     model_->endRemove(index);
 
     // delete the file by renaming it
-    QString strOldFileName = context->ride->fileName;
+    QFile file((todelete->planned ? plannedDirectory : directory).canonicalPath() + "/" + filenameToDelete);
 
-    QFile file((context->ride->planned ? plannedDirectory : directory).canonicalPath() + "/" + strOldFileName);
     // purposefully don't remove the old ext so the user wouldn't have to figure out what the old file type was
-    QString strNewName = strOldFileName + ".bak";
+    QString strNewName = filenameToDelete + ".bak";
 
     // in case there was an existing bak file, delete it
     // ignore errors since it probably isn't there.
@@ -377,7 +390,7 @@ RideCache::removeCurrentRide()
 
     if (!file.rename(context->athlete->home->fileBackup().canonicalPath() + "/" + strNewName)) {
         QMessageBox::critical(NULL, "Rename Error", tr("Can't rename %1 to %2 in %3")
-            .arg(strOldFileName).arg(strNewName).arg(context->athlete->home->fileBackup().canonicalPath()));
+            .arg(filenameToDelete).arg(strNewName).arg(context->athlete->home->fileBackup().canonicalPath()));
     }
 
     // remove any other derived/additional files; notes, cpi etc (they can only exist in /cache )
@@ -385,29 +398,37 @@ RideCache::removeCurrentRide()
     extras << "notes" << "cpi" << "cpx";
     foreach (QString extension, extras) {
 
-        QString deleteMe = QFileInfo(strOldFileName).baseName() + "." + extension;
+        QString deleteMe = QFileInfo(filenameToDelete).baseName() + "." + extension;
         QFile::remove(context->athlete->home->cache().canonicalPath() + "/" + deleteMe);
-
     }
 
-    // we don't want the whole delete, select next flicker
-    context->mainWindow->setUpdatesEnabled(false);
+    if (select) {
 
-    // select a different ride
-    context->ride = select;
+        // we don't want the whole delete, select next flicker
+        context->mainWindow->setUpdatesEnabled(false);
 
-    // notify after removed from list
-    context->notifyRideDeleted(todelete);
+        // select a different ride
+        context->ride = select;
 
-    // now we can update
-    context->mainWindow->setUpdatesEnabled(true);
-    QApplication::processEvents();
+        // notify after removed from list
+        context->notifyRideDeleted(todelete);
 
-    // now select another ride
-    context->notifyRideSelected(select);
+        // now we can update
+        context->mainWindow->setUpdatesEnabled(true);
+        QApplication::processEvents();
+
+        // now select another ride
+        context->notifyRideSelected(select);
+
+    } else {
+        // re-select the context ride (if it exists) when deleting a non current ride
+        context->notifyRideSelected(context->ride);
+    }
 
     // model estimates (lazy refresh)
     estimator->refresh();
+
+    return true;
 }
 
 // NOTE:
@@ -607,7 +628,7 @@ RideCache::getAggregate(QString name, Specification spec, bool useMetricUnits, b
 
         // get this value
         double value = item->getForSymbol(name);
-        double count = item->getForSymbol("workout_time"); // for averaging
+        double count = item->getCountForSymbol(name); // for averaging
 
         // check values are bounded, just in case
         if (std::isnan(value) || std::isinf(value)) value = 0;

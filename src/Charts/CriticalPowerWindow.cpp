@@ -271,6 +271,12 @@ CriticalPowerWindow::CriticalPowerWindow(Context *context, bool rangemode) :
     showCSLinearLabel = new QLabel(tr("Show time scale linear"));
     cl->addRow(showCSLinearLabel, showCSLinearCheck);
 
+    showDeltaCheck = new QCheckBox(this);
+    showDeltaCheck->setText(tr("Delta compare"));
+    showDeltaPercentCheck = new QCheckBox(this);
+    showDeltaPercentCheck->setText(tr("as percentage"));
+    cl->addRow(showDeltaCheck, showDeltaPercentCheck);
+
     ridePlotStyleCombo = new QComboBox(this);
     ridePlotStyleCombo->addItem(tr("Activity Mean Max"));
     ridePlotStyleCombo->addItem(tr("Activity Centile"));
@@ -580,6 +586,8 @@ CriticalPowerWindow::CriticalPowerWindow(Context *context, bool rangemode) :
     connect(rDeltaPercent, SIGNAL(stateChanged(int)), this, SLOT(rDeltaChanged()));
     connect(showHeatByDateCheck, SIGNAL(stateChanged(int)), this, SLOT(showHeatByDateChanged(int)));
     connect(showPercentCheck, SIGNAL(stateChanged(int)), this, SLOT(showPercentChanged(int)));
+    connect(showDeltaCheck, SIGNAL(stateChanged(int)), this, SLOT(showDeltaChanged()));
+    connect(showDeltaPercentCheck, SIGNAL(stateChanged(int)), this, SLOT(showDeltaChanged()));
     connect(showPowerIndexCheck, SIGNAL(stateChanged(int)), this, SLOT(showPowerIndexChanged(int)));
     connect(showTestCheck, SIGNAL(stateChanged(int)), this, SLOT(showTestChanged(int)));
     connect(showBestCheck, SIGNAL(stateChanged(int)), this, SLOT(showBestChanged(int)));
@@ -987,6 +995,7 @@ CriticalPowerWindow::forceReplot()
 {
     stale = true; // we must become stale
 
+    CriticalSeriesType series = static_cast<CriticalSeriesType>(seriesCombo->itemData(seriesCombo->currentIndex()).toInt());
     if ((rangemode && context->isCompareDateRanges) || (!rangemode && context->isCompareIntervals)) {
 
         // hide in compare mode
@@ -1000,7 +1009,6 @@ CriticalPowerWindow::forceReplot()
     } else {
 
         // show helper if we're showing power
-        CriticalSeriesType series = static_cast<CriticalSeriesType>(seriesCombo->itemData(seriesCombo->currentIndex()).toInt());
         updateOptions(series);
 
         // these are allowed outside of compare mode
@@ -1009,6 +1017,7 @@ CriticalPowerWindow::forceReplot()
         rDelta->hide();
         rDeltaPercent->hide();
     }
+    cpPlot->setSeries(series); // Update y-axis
 
     if (rangemode) {
 
@@ -1961,7 +1970,16 @@ CriticalPowerWindow::rHeatChanged(int check)
 void
 CriticalPowerWindow::rDeltaChanged()
 {
-    cpPlot->setShowDelta(rDelta->isChecked(), rDeltaPercent->isChecked());
+    showDeltaCheck->setChecked(rDelta->isChecked());
+    showDeltaPercentCheck->setChecked(rDeltaPercent->isChecked());
+}
+
+void
+CriticalPowerWindow::showDeltaChanged()
+{
+    rDelta->setChecked(showDeltaCheck->isChecked());
+    rDeltaPercent->setChecked(showDeltaPercentCheck->isChecked());
+    cpPlot->setShowDelta(showDeltaCheck->isChecked(), showDeltaPercentCheck->isChecked());
 
     // redraw
     if (rangemode) dateRangeChanged(DateRange());

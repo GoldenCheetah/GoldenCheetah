@@ -649,6 +649,7 @@ FormField::FormField(FieldDefinition field, RideMetadata *meta) : definition(fie
     QString units;
     enabled = NULL;
     isTime = false;
+    warn = false;
 
     if (GlobalContext::context()->specialFields.isMetric(field.name)) {
         field.type = FIELD_DOUBLE; // whatever they say, we want a double!
@@ -965,7 +966,12 @@ FormField::editFinished()
 
                  if (definition.values.count() != 1 && definition.values.at(0) != "*") // wildcard no warning
                   // just warn? - does nothing for now, in case they are just "suggestions"
-                 QMessageBox::warning(this, definition.name, tr("You entered '%1' which is not an expected value.").arg(text));
+                  if (!warn) {
+                    //warn = true;
+                    QString name = definition.name;
+                    QMessageBox::warning(this, name, tr("You entered '%1' which is not an expected value.").arg(text));
+                    warn = false;
+                  }
              }
              break;
     case FIELD_TEXTBOX :

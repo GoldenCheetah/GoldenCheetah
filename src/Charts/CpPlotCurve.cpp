@@ -168,7 +168,7 @@ CpPlotCurve::drawSeries( QPainter *painter,
         return;
 
     if ( to < 0 )
-        to = dataSize() - 1;
+        to = static_cast<int>(dataSize()) - 1;
 
     if ( from < 0 )
         from = 0;

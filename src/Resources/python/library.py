@@ -7,24 +7,24 @@
 #--------------------------------------------------
 
 # basic activity data
-def __GCactivity(join="repeat", activity=None):
+def __GCactivity(join="repeat", activity=None, compareindex=-1):
    rd={}
    for x in range(0,GC.seriesLast()):
-      if (GC.seriesPresent(x, activity)):
-         rd[GC.seriesName(x)] = GC.series(x, activity)
-   for name in GC.xdataNames("", activity):
-      for serie in GC.xdataNames(name, activity):
-         xd = GC.xdata(name, serie, join, activity)
+      if (GC.seriesPresent(x, activity, compareindex)):
+         rd[GC.seriesName(x)] = GC.series(x, activity, compareindex)
+   for name in GC.xdataNames("", activity, compareindex):
+      for serie in GC.xdataNames(name, activity, compareindex):
+         xd = GC.xdata(name, serie, join, activity, compareindex)
          rd[str(xd)] = xd
    return rd
 
 # xdata
-def __GCactivityXdata(name="", activity=None):
+def __GCactivityXdata(name="", activity=None, compareindex=-1):
    if not name:
-      return GC.xdataNames("")
+      return GC.xdataNames("", activity, compareindex)
    rd={}
-   for serie in GC.xdataNames(name, activity):
-      xd = GC.xdataSeries(name, serie, activity)
+   for serie in GC.xdataNames(name, activity, compareindex):
+      xd = GC.xdataSeries(name, serie, activity, compareindex)
       rd[str(xd)] = xd
    return rd
 

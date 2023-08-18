@@ -66,7 +66,7 @@
 #include "SplitActivityWizard.h"
 #include "MergeActivityWizard.h"
 #include "GenerateHeatMapDialog.h"
-#include "BatchExportDialog.h"
+#include "BatchProcessingDialog.h"
 #include "TodaysPlan.h"
 #include "MeasuresDownload.h"
 #include "WorkoutWizard.h"
@@ -188,21 +188,12 @@ MainWindow::MainWindow(const QDir &home)
          restoreGeometry(appsettings->value(this, GC_SETTINGS_MAIN_GEOM).toByteArray());
          restoreState(appsettings->value(this, GC_SETTINGS_MAIN_STATE).toByteArray());
      } else {
-         // first run -- lets set some sensible defaults...
-         // lets put it in the middle of screen 1
-        QRect screenSize = desktop->availableGeometry();
-         struct SizeSettings app = GCColor::defaultSizes(screenSize.height(), screenSize.width());
+
+         AppearanceSettings defaults = GSettings::defaultAppearanceSettings();
 
          // center on the available screen (minus toolbar/sidebar)
-         move((screenSize.width()-screenSize.x())/2 - app.width/2,
-              (screenSize.height()-screenSize.y())/2 - app.height/2);
-
-         // set to the right default
-         resize(app.width, app.height);
-
-         // set all the default font sizes
-         appsettings->setValue(GC_FONT_DEFAULT_SIZE, app.defaultFont);
-         appsettings->setValue(GC_FONT_CHARTLABELS_SIZE, app.labelFont);
+         move(defaults.windowsize.x(), defaults.windowsize.y());
+         resize(defaults.windowsize.width(), defaults.windowsize.height());
 
      }
 
@@ -460,7 +451,7 @@ MainWindow::MainWindow(const QDir &home)
      * Application Menus
      *--------------------------------------------------------------------*/
 #ifdef WIN32
-    QString menuColorString = (GCColor::isFlat() ? GColor(CTOOLBAR).name() : "rgba(225,225,225)");
+    QString menuColorString = GColor(CTOOLBAR).name();
     menuBar()->setStyleSheet(QString("QMenuBar { color: black; background: %1; }"
                              "QMenuBar::item { color: black; background: %1; }").arg(menuColorString));
     menuBar()->setContentsMargins(0,0,0,0);
@@ -505,7 +496,7 @@ MainWindow::MainWindow(const QDir &home)
     rideMenu->addAction(tr("&Manual entry..."), this, SLOT(manualRide()), tr("Ctrl+M"));
     rideMenu->addSeparator ();
     rideMenu->addAction(tr("&Export..."), this, SLOT(exportRide()), tr("Ctrl+E"));
-    rideMenu->addAction(tr("&Batch export..."), this, SLOT(exportBatch()), tr("Ctrl+B"));
+    rideMenu->addAction(tr("&Batch Processing..."), this, SLOT(batchProcessing()), tr("Ctrl+B"));
 
     rideMenu->addSeparator ();
     rideMenu->addAction(tr("&Save activity"), this, SLOT(saveRide()), tr("Ctrl+S"));
@@ -597,7 +588,7 @@ MainWindow::MainWindow(const QDir &home)
     QMenu *editMenu = menuBar()->addMenu(tr("&Edit"));
     // Add all the data processors to the tools menu
     const DataProcessorFactory &factory = DataProcessorFactory::instance();
-    QMap<QString, DataProcessor*> processors = factory.getProcessors(true);
+    QMap<QString, DataProcessor*> processors = factory.getProcessors();
 
     if (processors.count()) {
 
@@ -1255,14 +1246,9 @@ void MainWindow::manualProcess(QString name)
             name = name.remove(0, 8);
 
             FixPyScript *script = fixPySettings->getScript(name);
-            if (script == nullptr) {
-                return;
-            }
-
-            QString errText;
-            FixPyRunner pyRunner(currentAthleteTab->context);
-            if (pyRunner.run(script->source, script->iniKey, errText) != 0) {
-                QMessageBox::critical(this, "GoldenCheetah", errText);
+            if (script) {
+                EditFixPyScriptDialog editDlg(currentAthleteTab->context, script, this);
+                editDlg.exec();
             }
 
             return;
@@ -1462,7 +1448,9 @@ MainWindow::resetPerspective(int view, bool force)
     }
 
     // set the perspective
+    pactive=true;
     current->setPerspectives(perspectiveSelector);
+    perspectiveSelector->setCurrentIndex(current->currentPerspective());
     pactive=false;
 }
 
@@ -1716,9 +1704,9 @@ MainWindow::manualRide()
 }
 
 void
-MainWindow::exportBatch()
+MainWindow::batchProcessing()
 {
-    BatchExportDialog *d = new BatchExportDialog(currentAthleteTab->context);
+    BatchProcessingDialog *d = new BatchProcessingDialog(currentAthleteTab->context);
     d->exec();
 }
 
@@ -2508,7 +2496,7 @@ MainWindow::configChanged(qint32)
     // Windows and Linux menu bar should match chrome
     QColor textCol(Qt::black);
     if (GCColor::luminance(GColor(CTOOLBAR)) < 127)  textCol = QColor(Qt::white);
-    QString menuColorString = (GCColor::isFlat() ? GColor(CTOOLBAR).name() : "rgba(225,225,225)");
+    QString menuColorString = GColor(CTOOLBAR).name();
     menuBar()->setStyleSheet(QString("QMenuBar { color: %1; background: %2; }"
                              "QMenuBar::item { color: %1; background: %2; }")
                              .arg(textCol.name()).arg(menuColorString));
@@ -2538,15 +2526,21 @@ MainWindow::configChanged(qint32)
     whatsthis->setStyleSheet(buttonstyle);
 
     // All platforms
-    QPalette tabbarPalette;
     tabbar->setAutoFillBackground(true);
     tabbar->setShape(QTabBar::RoundedSouth);
     tabbar->setDrawBase(false);
 
-    tabbarPalette.setBrush(backgroundRole(), GColor(CTOOLBAR));
-    tabbarPalette.setBrush(foregroundRole(), GCColor::invertColor(GColor(CTOOLBAR)));
-    tabbar->setPalette(tabbarPalette);
-    athleteView->setPalette(tabbarPalette);
+    // on select
+    QColor bg_select = GCColor::selectedColor(GColor(CTOOLBAR));
+    QColor fg_select = GCColor::invertColor(bg_select);
+
+    tabbar->setStyleSheet(QString("QTabBar::tab { background-color: %1; color: %2;}"
+        "QTabBar::tab::selected { background-color: %3; color: %4; }").arg(GColor(CTOOLBAR).name())
+                                                                        .arg(GCColor::invertColor(GColor(CTOOLBAR)).name())
+                                                                        .arg(bg_select.name())
+                                                                        .arg(fg_select.name()));
+    tabbar->setDocumentMode(true);
+    athleteView->setPalette(tabbar->palette());
 
     head->updateGeometry();
     repaint();

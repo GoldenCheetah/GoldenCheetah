@@ -1182,7 +1182,6 @@ SimBicyclePage::saveClicked()
 }
 
 
-static double scalefactors[9] = { 0.5f, 0.6f, 0.8, 0.9, 1.0f, 1.1f, 1.25f, 1.5f, 2.0f };
 
 //
 // Appearances page
@@ -1255,11 +1254,11 @@ ColorsPage::ColorsPage(QWidget *parent) : QWidget(parent)
     double scale = appsettings->value(this, GC_FONT_SCALE, 1.0).toDouble();
     fontscale = new QSlider(this);
     fontscale->setMinimum(0);
-    fontscale->setMaximum(8);
+    fontscale->setMaximum(11);
     fontscale->setTickInterval(1);
     fontscale->setValue(3);
     fontscale->setOrientation(Qt::Horizontal);
-    for(int i=0; i<7; i++) {
+    for(int i=0; i<12; i++) {
         if (scalefactors[i] == scale) {
             fontscale->setValue(i);
             break;
@@ -1271,7 +1270,7 @@ ColorsPage::ColorsPage(QWidget *parent) : QWidget(parent)
     fonttext = new QLabel(this);
     fonttext->setText(tr("The quick brown fox jumped over the lazy dog"));
     fonttext->setFont(font);
-    fonttext->setFixedHeight(30 * dpiYFactor);
+    fonttext->setFixedHeight(90 * dpiYFactor);
     fonttext->setFixedWidth(330 * dpiXFactor);
 
     QGridLayout *grid = new QGridLayout;
@@ -1285,8 +1284,8 @@ ColorsPage::ColorsPage(QWidget *parent) : QWidget(parent)
     grid->addWidget(antiAliasLabel, 1,3);
     grid->addWidget(antiAliased, 1,4);
 #ifndef Q_OS_MAC
-    grid->addWidget(rideScrollLabel, 2,3);
-    grid->addWidget(rideScroll, 2,4);
+    grid->addWidget(rideScrollLabel, 2,3, Qt::AlignLeft|Qt::AlignTop);
+    grid->addWidget(rideScroll, 2,4, Qt::AlignLeft|Qt::AlignTop);
     //grid->addWidget(rideHeadLabel, 3,3); // Disabled in RideNavigator
     //grid->addWidget(rideHead, 3,4);      // better don't display
 #endif
@@ -1407,6 +1406,13 @@ ColorsPage::applyThemeClicked()
     // first check we have a selection!
     if (themes->currentItem() && (index=themes->invisibleRootItem()->indexOfChild(themes->currentItem())) >= 0) {
 
+        applyThemeIndex(index);
+    }
+}
+
+void
+ColorsPage::applyThemeIndex(int index)
+{
         // now get the theme selected
         ColorTheme theme = GCColor::themes().themes[index];
 
@@ -1536,7 +1542,23 @@ ColorsPage::applyThemeClicked()
         colors->setSortingEnabled(true);
         colors->sortByColumn(1, Qt::AscendingOrder); // first sort by name
         colors->sortByColumn(0, Qt::AscendingOrder);
-    }
+}
+
+void
+ColorsPage::resetClicked()
+{
+    AppearanceSettings defaults = GSettings::defaultAppearanceSettings();
+
+    def->setCurrentFont(QFont(defaults.fontfamily));
+    fontscale->setValue(defaults.fontscaleindex);
+    lineWidth->setValue(defaults.linewidth);
+    antiAliased->setChecked(defaults.antialias);
+#ifndef Q_OS_MAC // they do scrollbars nicely
+    rideHead->setChecked(defaults.head);
+    rideScroll->setChecked(defaults.scrollbar);
+#endif
+
+    applyThemeIndex(defaults.theme);
 }
 
 qint32
@@ -2715,7 +2737,7 @@ ProcessorPage::ProcessorPage(Context *context) : context(context)
 {
     // get the available processors
     const DataProcessorFactory &factory = DataProcessorFactory::instance();
-    processors = factory.getProcessors(true);
+    processors = factory.getProcessors();
 
     QGridLayout *mainLayout = new QGridLayout(this);
 

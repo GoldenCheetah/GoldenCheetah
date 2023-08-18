@@ -105,49 +105,24 @@ SearchBox::configChanged(qint32)
     int frameWidth = style()->pixelMetric(QStyle::PM_DefaultFrameWidth);
     QColor color = QPalette().color(QPalette::Highlight);
 
-    // flat mode has square corners
-    if (GCColor::isFlat()) {
-
-        setStyleSheet(QString( //"QLineEdit { padding-right: %1px; } "
-                          "QLineEdit#SearchBox {"
-                          "    border-radius: 3px; "
-                          "    border: 1px solid rgba(127,127,127,127);"
-                          "    padding: 0px %1px;"
-                          "}"
-                          "QLineEdit#SearchBox:focus {"
-                          "    border-radius: 3px; "
+    setStyleSheet(QString( //"QLineEdit { padding-right: %1px; } "
+                      "QLineEdit#SearchBox {"
+                      "    border-radius: 3px; "
+                      "    border: 1px solid rgba(127,127,127,127);"
+                      "    padding: 0px %1px;"
+                      "}"
+                      "QLineEdit#SearchBox:focus {"
+                      "    border-radius: 3px; "
 #ifdef WIN32
-                          "    border: 1px solid rgba(%2,%3,%4,255);"
+                      "    border: 1px solid rgba(%2,%3,%4,255);"
 #else
-                          "    border: 2px solid rgba(%2,%3,%4,255);"
+                      "    border: 2px solid rgba(%2,%3,%4,255);"
 #endif
-                          "    padding: 0px %5px;"
-                          "}"
-                 ).arg(clearButton->sizeHint().width() + frameWidth + 12)
-                  .arg(color.red()).arg(color.green()).arg(color.blue())
-                  .arg(clearButton->sizeHint().width() + frameWidth + 12));
-
-    } else { 
-        setStyleSheet(QString( //"QLineEdit { padding-right: %1px; } "
-                          "QLineEdit#SearchBox {"
-                          "    border-radius: 10px; "
-                          "    border: 1px solid rgba(127,127,127,127);"
-                          "    padding: 0px %1px;"
-                          "}"
-                          "QLineEdit#SearchBox:focus {"
-                          "    border-radius: 10px; "
-#ifdef WIN32
-                          "    border: 1px solid rgba(%2,%3,%4,255);"
-#else
-                          "    border: 2px solid rgba(%2,%3,%4,255);"
-#endif
-                          "    padding: 0px %5px;"
-                          "}"
-                 ).arg(clearButton->sizeHint().width() + frameWidth + 12)
-                  .arg(color.red()).arg(color.green()).arg(color.blue())
-                  .arg(clearButton->sizeHint().width() + frameWidth + 12));
-
-    }
+                      "    padding: 0px %5px;"
+                      "}"
+             ).arg(clearButton->sizeHint().width() + frameWidth + 12)
+              .arg(color.red()).arg(color.green()).arg(color.blue())
+              .arg(clearButton->sizeHint().width() + frameWidth + 12));
 
     // get suitably formated list
     QList<QString> list;

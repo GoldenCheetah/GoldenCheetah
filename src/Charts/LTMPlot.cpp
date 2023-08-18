@@ -3055,14 +3055,14 @@ void
 LTMPlot::createEstimateData(Context *context, LTMSettings *settings, MetricDetail metricDetail,
                                               QVector<double>&x,QVector<double>&y,int&n, bool)
 {
-    // curve specific filter, used to figure out if all activities are runs
+    // curve specific filter, used to figure out if all activities are from the same sport
     Specification spec = settings->specification;
     if (!SearchFilterBox::isNull(metricDetail.datafilter))
         spec.addMatches(SearchFilterBox::matches(context, metricDetail.datafilter));
     int nActivities, nRides, nRuns, nSwims;
     QString sport;
     context->athlete->rideCache->getRideTypeCounts(spec, nActivities, nRides, nRuns, nSwims, sport);
-    metricDetail.run = (nRuns > 0 && nActivities == nRuns);
+    if (sport.isEmpty()) sport = "Bike"; // Mixed sports use Bike estimates for backward compatibility
 
     // resize the curve array to maximum possible size (even if we don't need it)
     int maxdays = groupForDate(settings->end.date(), settings->groupBy)
@@ -3089,7 +3089,7 @@ LTMPlot::createEstimateData(Context *context, LTMSettings *settings, MetricDetai
     foreach(PDEstimate est, context->athlete->getPDEstimates()) {
 
         // skip if not the requested sport
-        if (est.run != metricDetail.run) continue;
+        if (est.sport != sport) continue;
 
         // wpk skip for now
         if (est.wpk != metricDetail.wpk) continue;
@@ -3751,14 +3751,14 @@ LTMPlot::createMeasureData(Context *context, LTMSettings *settings, MetricDetail
 void
 LTMPlot::createPerformanceData(Context *context, LTMSettings *settings, MetricDetail metricDetail, QVector<double>&x,QVector<double>&y,int&n, bool)
 {
-    // curve specific filter, used to figure out if all activities are runs
+    // curve specific filter, used to figure out if all activities are from the same sport
     Specification spec = settings->specification;
     if (!SearchFilterBox::isNull(metricDetail.datafilter))
         spec.addMatches(SearchFilterBox::matches(context, metricDetail.datafilter));
     int nActivities, nRides, nRuns, nSwims;
     QString sport;
     context->athlete->rideCache->getRideTypeCounts(spec, nActivities, nRides, nRuns, nSwims, sport);
-    metricDetail.run = (nRuns > 0 && nActivities == nRuns);
+    if (sport.isEmpty()) sport = "Bike"; // Mixed sports use Bike performances for backward compatibility
 
     int maxdays = groupForDate(settings->end.date(), settings->groupBy)
                   - groupForDate(settings->start.date(), settings->groupBy) + 1;
@@ -3820,12 +3820,12 @@ LTMPlot::createPerformanceData(Context *context, LTMSettings *settings, MetricDe
         }
         if (metricDetail.perfs && value <= 0) {
             // is there a weekly performance today?
-            Performance p = context->athlete->rideCache->estimator->getPerformanceForDate(date, metricDetail.run);
+            Performance p = context->athlete->rideCache->estimator->getPerformanceForDate(date, sport);
             if (!p.submaximal) value = p.powerIndex;
         }
         if (metricDetail.submax && value <= 0) {
             // is there a submax weekly performance today?
-            Performance p = context->athlete->rideCache->estimator->getPerformanceForDate(date, metricDetail.run);
+            Performance p = context->athlete->rideCache->estimator->getPerformanceForDate(date, sport);
             if (p.submaximal) value = p.powerIndex;
         }
 

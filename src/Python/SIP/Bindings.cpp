@@ -554,11 +554,20 @@ Bindings::fromDateTime(PyObject* activity) const
 }
 
 RideFile *
-Bindings::selectRideFile(PyObject *activity) const
+Bindings::selectRideFile(PyObject *activity, int compareindex) const
 {
+    Context *context = python->contexts.value(threadid()).context;
     RideFile *f;
     RideItem* item = fromDateTime(activity);
     if (item && item->ride()) return item->ride();
+
+    // return compare item when requested
+    if (compareindex >= 0 && context && context->isCompareIntervals) {
+        int idx = 0;
+        foreach(CompareInterval p, context->compareIntervals)
+            if (p.isChecked() && compareindex == idx++) return p.rideItem->ride();
+        return nullptr;
+    }
 
     f = python->contexts.value(threadid()).rideFile;
     if (f) return f;
@@ -566,7 +575,6 @@ Bindings::selectRideFile(PyObject *activity) const
     item = python->contexts.value(threadid()).item;
     if (item && item->ride()) return item->ride();
 
-    Context *context = python->contexts.value(threadid()).context;
     if (context) {
         item = const_cast<RideItem*>(context->currentRideItem());
         if (item && item->ride()) return item->ride();
@@ -577,9 +585,9 @@ Bindings::selectRideFile(PyObject *activity) const
 
 // get the data series for the currently selected ride
 PythonDataSeries*
-Bindings::series(int type, PyObject* activity) const
+Bindings::series(int type, PyObject* activity, int compareindex) const
 {
-    RideFile *f = selectRideFile(activity);
+    RideFile *f = selectRideFile(activity, compareindex);
     if (f == nullptr) return nullptr;
 
     // count the included points, create data series output and copy data
@@ -606,9 +614,9 @@ Bindings::series(int type, PyObject* activity) const
 
 // get the wbal series for the currently selected ride
 PythonDataSeries*
-Bindings::activityWbal(PyObject* activity) const
+Bindings::activityWbal(PyObject* activity, int compareindex) const
 {
-    RideFile *f = selectRideFile(activity);
+    RideFile *f = selectRideFile(activity, compareindex);
     if (f == nullptr) return nullptr;
 
     f->recalculateDerivedSeries();
@@ -634,7 +642,7 @@ Bindings::activityWbal(PyObject* activity) const
 
 // get the xdata series for the currently selected ride
 PythonDataSeries*
-Bindings::xdata(QString name, QString series, QString join, PyObject* activity) const
+Bindings::xdata(QString name, QString series, QString join, PyObject* activity, int compareindex) const
 {
     // XDATA join method
     RideFile::XDataJoin xjoin;
@@ -649,7 +657,7 @@ Bindings::xdata(QString name, QString series, QString join, PyObject* activity) 
         case 3: xjoin = RideFile::RESAMPLE; break;
     }
 
-    RideFile *f = selectRideFile(activity);
+    RideFile *f = selectRideFile(activity, compareindex);
     if (f == nullptr) return nullptr;
 
     if (!f->xdata().contains(name)) return NULL; // No such XData series
@@ -674,9 +682,9 @@ Bindings::xdata(QString name, QString series, QString join, PyObject* activity) 
 }
 
 // get the xdata series for the currently selected ride, without interpolation
-PythonXDataSeries *Bindings::xdataSeries(QString name, QString series, PyObject* activity) const
+PythonXDataSeries *Bindings::xdataSeries(QString name, QString series, PyObject* activity, int compareindex) const
 {
-    RideFile *f = selectRideFile(activity);
+    RideFile *f = selectRideFile(activity, compareindex);
     if (f == nullptr) return nullptr;
 
     if (!f->xdata().contains(name)) return NULL; // No such XData series
@@ -723,9 +731,9 @@ PythonXDataSeries *Bindings::xdataSeries(QString name, QString series, PyObject*
 }
 
 PyObject*
-Bindings::xdataNames(QString name, PyObject* activity) const
+Bindings::xdataNames(QString name, PyObject* activity, int compareindex) const
 {
-    RideFile *f = selectRideFile(activity);
+    RideFile *f = selectRideFile(activity, compareindex);
     if (f == nullptr) return nullptr;
 
     QStringList namelist;
@@ -756,9 +764,9 @@ Bindings::seriesName(int type) const
 }
 
 bool
-Bindings::seriesPresent(int type, PyObject* activity) const
+Bindings::seriesPresent(int type, PyObject* activity, int compareindex) const
 {
-    RideFile *f = selectRideFile(activity);
+    RideFile *f = selectRideFile(activity, compareindex);
     if (f == nullptr) return false;
 
     return f->isDataPresent(static_cast<RideFile::SeriesType>(type));
@@ -1617,7 +1625,7 @@ Bindings::postProcess(QString processor, PyObject *activity) const
     if (f == nullptr) return false;
 
     DataProcessor* dp = DataProcessorFactory::instance().getProcessors().value(processor, nullptr);
-    if (!dp || !dp->isCoreProcessor()) return false; // Python DPs are disabled due to #4095
+    if (!dp) return false;
     return dp->postProcess(f, nullptr, "PYTHON");
 }
 
@@ -1630,11 +1638,7 @@ Bindings::setTag(QString name, QString value, PyObject *activity) const
     Context *context = python->contexts.value(threadid()).context;
     if (context == nullptr) return false;
 
-    RideItem* m = fromDateTime(activity);
-    if (m == nullptr) m = const_cast<RideItem*>(context->currentRideItem());
-    if (m == nullptr) return false;
-
-    RideFile *f = m->ride();
+    RideFile *f = selectRideFile(activity);
     if (f == nullptr) return false;
 
     name = name.replace("_"," ");
@@ -1656,10 +1660,16 @@ Bindings::setTag(QString name, QString value, PyObject *activity) const
         f->setTag(name, value);
     }
 
-    // rideFile is now dirty!
-    m->setDirty(true);
-    // get refresh done, coz overrides state has changed
-    m->notifyRideMetadataChanged();
+    // Notify changes if activity is already in rideCache
+    RideItem* m = fromDateTime(activity);
+    if (m == nullptr) m = python->contexts.value(threadid()).item;
+    if (m == nullptr) m = context->rideItem();
+    if (m && m->dateTime == f->startTime()) {
+        // rideFile is now dirty!
+        m->setDirty(true);
+        // get refresh done, coz overrides state has changed
+        m->notifyRideMetadataChanged();
+    }
 
     return true;
 }
@@ -1673,23 +1683,25 @@ Bindings::delTag(QString name, PyObject *activity) const
     Context *context = python->contexts.value(threadid()).context;
     if (context == nullptr) return false;
 
-    RideItem* m = fromDateTime(activity);
-    if (m == nullptr) m = const_cast<RideItem*>(context->currentRideItem());
-    if (m == nullptr) return false;
-
-    RideFile *f = m->ride();
+    RideFile *f = selectRideFile(activity);
     if (f == nullptr) return false;
+
+    RideItem* m = fromDateTime(activity);
+    if (m == nullptr) m = python->contexts.value(threadid()).item;
+    if (m == nullptr) m = context->rideItem();
 
     name = name.replace("_"," ");
     if (GlobalContext::context()->specialFields.isMetric(name)) {
 
         if (f->metricOverrides.remove(GlobalContext::context()->specialFields.metricSymbol(name))) {
 
-            // rideFile is now dirty!
-            m->setDirty(true);
-            // get refresh done, coz overrides state has changed
-            m->notifyRideMetadataChanged();
-
+            // Notify changes if activity is already in rideCache
+            if (m && m->dateTime == f->startTime()) {
+                // rideFile is now dirty!
+                m->setDirty(true);
+                // get refresh done, coz overrides state has changed
+                m->notifyRideMetadataChanged();
+	    }
             return true;
         }
         return false;
@@ -1698,11 +1710,13 @@ Bindings::delTag(QString name, PyObject *activity) const
 
         if (f->removeTag(name)) {
 
-            // rideFile is now dirty!
-            m->setDirty(true);
-            // get refresh done, coz overrides state has changed
-            m->notifyRideMetadataChanged();
-
+            // Notify changes if activity is already in rideCache
+            if (m && m->dateTime == f->startTime()) {
+                // rideFile is now dirty!
+                m->setDirty(true);
+                // get refresh done, coz overrides state has changed
+                m->notifyRideMetadataChanged();
+	    }
             return true;
         }
         return false;
@@ -1715,15 +1729,31 @@ Bindings::hasTag(QString name, PyObject *activity) const
     Context *context = python->contexts.value(threadid()).context;
     if (context == nullptr) return false;
 
-    RideItem* m = fromDateTime(activity);
-    if (m == nullptr) m = const_cast<RideItem*>(context->currentRideItem());
-    if (m == nullptr) return false;
+    RideFile *f = selectRideFile(activity);
+    if (f == nullptr) return false;
 
     name = name.replace("_"," ");
     if (GlobalContext::context()->specialFields.isMetric(name)) {
-        return m->overrides_.contains(GlobalContext::context()->specialFields.metricSymbol(name));
+        return f->metricOverrides.contains(GlobalContext::context()->specialFields.metricSymbol(name));
     } else {
-        return m->hasText(name);
+        return f->tags().contains(name);
+    }
+}
+
+QString
+Bindings::getTag(QString name, PyObject *activity) const
+{
+    Context *context = python->contexts.value(threadid()).context;
+    if (context == nullptr) return QString();
+
+    RideFile *f = selectRideFile(activity);
+    if (f == nullptr) return QString();
+
+    name = name.replace("_"," ");
+    if (GlobalContext::context()->specialFields.isMetric(name)) {
+        return f->metricOverrides[GlobalContext::context()->specialFields.metricSymbol(name)]["value"];
+    } else {
+        return f->getTag(name, "");
     }
 }
 

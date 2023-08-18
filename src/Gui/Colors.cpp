@@ -1,5 +1,4 @@
-/*
- * Copyright (c) 2010 Mark Liversedge (liversedge@gmail.com)
+ /* Copyright (c) 2010 Mark Liversedge (liversedge@gmail.com)
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
@@ -258,13 +257,6 @@ void GCColor::setupColors()
     init[CCALCURRENT].color = QPalette().color(QPalette::Highlight);
     init[CTOOLBAR].color = QPalette().color(QPalette::Window);
 
-#ifdef Q_OS_MAC
-    // if on yosemite set default chrome to #e5e5e5
-    if (QSysInfo::MacintoshVersion == 12) {
-        init[CCHROME].color = QColor(0xe5,0xe5,0xe5);
-        appsettings->setValue(GC_CHROME, "Flat");
-    }
-#endif
     copyArray(init, DarkDefaultColorList);
     copyArray(init, LightDefaultColorList);
     copyArray(init, ColorList);
@@ -384,40 +376,6 @@ void GCColor::setupColors()
     LightDefaultColorList[109].color = QColor(0,102,0); // 109:Stress Ramp Rate
 }
 
-// default settings for fonts etc
-// we err on the side of caution -- smaller is better
-struct SizeSettings defaultAppearance[] ={
-
-    // small screens include netbooks and old vga 800x600, 1024x768
-    { 1024, 768,  8,8,6,6,6,    800, 600 },
-
-    // medium screen size includes typical 16:9 pc formats and TV screens
-    { 1280, 800,  8,8,6,6,6,    800, 600},
-
-    // high resolution screens 
-    { 1650, 1080,  10,10,8,8,8,   1024,650 },
-
-    // very big panels, incl. e.g.  mac 27"
-    { 9999, 9999,  10,10,8,8,8,   1280,700 },
-
-    { 0,0,0,0,0,0,0,0,0 },
-};
-
-struct SizeSettings
-GCColor::defaultSizes(int width, int height)
-{
-    for (int i=0; defaultAppearance[i].maxheight; i++) {
-
-        if (height > defaultAppearance[i].maxheight && width > defaultAppearance[i].maxwidth)
-            continue;
-
-        else return defaultAppearance[i];
-
-    }
-    return defaultAppearance[0]; // shouldn't get here
-}
-
-
 // returns a luminance for a color from 0 (dark) to 255 (very light) 127 is a half way house gray
 double GCColor::luminance(QColor color)
 {
@@ -442,6 +400,22 @@ QColor GCColor::alternateColor(QColor bgColor)
         return QColor(75,75,75); // avoid darkGray as clashes with text cursor on hidpi displays (!)
     else
         return QColor(Qt::lightGray);
+}
+
+QColor GCColor::selectedColor(QColor bgColor)
+{
+     // if foreground is white then we're "dark" if it's
+     // black the we're "light" so this controls palette
+     bool dark = invertColor(bgColor) == QColor(Qt::white);
+     bool isblack = bgColor == QColor(Qt::black); // e.g. mustang theme
+
+     // on select background color
+     QColor bg_select = bgColor;
+     if (dark) bg_select = bg_select.lighter(200);
+     else bg_select = bg_select.darker(200);
+     if (isblack) bg_select = QColor(30, 30, 30);
+
+     return bg_select;
 }
 
 const Colors * GCColor::colorSet()
@@ -619,97 +593,55 @@ GCColor::stylesheet(bool train)
     // make it to order to reflect current config
     QColor bgColor = train ? GColor(CTRAINPLOTBACKGROUND) : GColor(CPLOTBACKGROUND);
     QColor fgColor = GCColor::invertColor(bgColor);
+    QColor bgSelColor = selectedColor(bgColor);
+    QColor fgSelColor = GCColor::invertColor(bgSelColor);
     return QString("QTreeView { color: %2; background: %1; }"
+                   "%3"
                    "QTableWidget { color: %2; background: %1; }"
 #ifndef Q_OS_MAC
                    "QHeaderView { background-color: %1; color: %2; }"
                    "QHeaderView::section { background-color: %1; color: %2; border: 0px ; }"
 #endif
                    "QTableWidget::item:hover { color: black; background: lightGray; }"
-                   "QTreeView::item:hover { color: black; background: lightGray; }").arg(bgColor.name()).arg(fgColor.name());
-}
-
-bool
-GCColor::isFlat()
-{
-    return true;
+                   "QTreeView::item:hover { color: black; background: lightGray; }"
+                   "QTreeView::item:selected { color: %4; background-color: %3; }"
+                  ).arg(bgColor.name()).arg(fgColor.name()).arg(bgSelColor.name()).arg(fgSelColor.name());
 }
 
 // setup a linearGradient for the metallic backgrounds used on things like
 // the toolbar, sidebar handles and so on
 QLinearGradient
-GCColor::linearGradient(int size, bool active, bool alternate)
+GCColor::linearGradient(int size, bool, bool)
 {
     QLinearGradient returning;
-
-    QString chrome = appsettings->value(NULL, GC_CHROME, "Flat").toString();
-
-    if (chrome == "Mac") {
-        int shade, inshade;
-        if (!alternate) {
-#ifdef Q_OS_MAC
-            shade = 178;
-            inshade = 225;
-#else
-            shade = 200;
-            inshade = 250;
-#endif
-        } else {
-#ifdef Q_OS_MAC
-            inshade = 225;
-            shade = 210;
-#else
-            inshade = 250;
-            shade = 225;
-#endif
-        }
-
-        // metallic
-        if (active) {
-            returning = QLinearGradient(0, 0, 0, size);
-            returning.setColorAt(0.0, QColor(shade,shade,shade, 100));
-            returning.setColorAt(0.5, QColor(shade,shade,shade, 180));
-            returning.setColorAt(1.0, QColor(shade,shade,shade, 255));
-            returning.setSpread(QGradient::PadSpread);
-        } else {
-            returning = QLinearGradient(0, 0, 0, size);
-            returning.setColorAt(0.0, QColor(inshade,inshade,inshade, 100));
-            returning.setColorAt(0.5, QColor(inshade,inshade,inshade, 180));
-            returning.setColorAt(1.0, QColor(inshade,inshade,inshade, 255));
-            returning.setSpread(QGradient::PadSpread);
-        }
-
-    } else {
-
-        QColor color = GColor(CCHROME);
+    QColor color = GColor(CCHROME);
 
 //
 // The DWM api is how the MS windows color settings should be accessed
 //
 #ifdef GC_HAVE_DWM
 
-        if (color == QColor(1,1,1)) { // use system default, user hasn't changed
+    if (color == QColor(1,1,1)) { // use system default, user hasn't changed
 
-            // use Windows API
-            DWORD wincolor = 0;
-            BOOL opaque = FALSE;
+        // use Windows API
+        DWORD wincolor = 0;
+        BOOL opaque = FALSE;
 
-            HRESULT hr = DwmGetColorizationColor(&wincolor, &opaque);
-            if (SUCCEEDED(hr)) {
-                BYTE red = GetRValue(wincolor);
-                BYTE green = GetGValue(wincolor);
-                BYTE blue = GetBValue(wincolor);
-                color = QColor::fromRgb(red,green,blue,255);
-            } 
+        HRESULT hr = DwmGetColorizationColor(&wincolor, &opaque);
+        if (SUCCEEDED(hr)) {
+            BYTE red = GetRValue(wincolor);
+            BYTE green = GetGValue(wincolor);
+            BYTE blue = GetBValue(wincolor);
+            color = QColor::fromRgb(red,green,blue,255);
         }
+    }
 #endif
 
-        // just blocks of color
-        returning = QLinearGradient(0, 0, 0, size);
-        returning.setColorAt(0.0, color);
-        returning.setColorAt(1.0, color);
+    // just blocks of color
+    returning = QLinearGradient(0, 0, 0, size);
+    returning.setColorAt(0.0, color);
+    returning.setColorAt(1.0, color);
 
-    }
 
     return returning; 
 }
@@ -1121,7 +1053,6 @@ GCColor::applyTheme(int index)
                                                  .arg(color.green())
                                                  .arg(color.blue());
         appsettings->setValue(ColorList[CCHROME].setting, colorstring);
-        appsettings->setValue(GC_CHROME, "Flat");
     }
 #endif
 }

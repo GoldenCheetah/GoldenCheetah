@@ -603,13 +603,13 @@ CPPlot::plotModel()
             if (criticalSeries == CriticalPowerWindow::veloclinicplot) {
                 // Plot the model for the veloclinic plot
                 pdModel->setMinutes(false);
-                QVector<double> power(pdModel->size());
-                QVector<double> wprime(pdModel->size());
-                for (size_t t = 0; t < pdModel->size(); t++) {
+                QVector<double> power(static_cast<int>(pdModel->size()));
+                QVector<double> wprime(static_cast<int>(pdModel->size()));
+                for (int t = 0; t < pdModel->size(); t++) {
                     power[t] = pdModel->y(t+1);
                     wprime[t] = (pdModel->y(t+1)-veloCP) * (pdModel->x(t+1)); // Joules
                 }
-                modelCurve->setSamples(power.data(), wprime.data(), pdModel->size()-1);
+                modelCurve->setSamples(power.data(), wprime.data(), static_cast<int>(pdModel->size())-1);
             }
             else
                 modelCurve->setData(pdModel);
@@ -2258,7 +2258,7 @@ CPPlot::exportBests(QString filename)
     foreach(QwtPlotCurve *bestsCurve, bestsCurves) {
 
         // just output for the bests curve
-        for (size_t i=0; i<bestsCurve->data()->size(); i++) {
+        for (int i=0; i<bestsCurve->data()->size(); i++) {
             const double xvalue = bestsCurve->sample(i).x();
             const double yvalue = bestsCurve->sample(i).y();
             const double modelvalue = expmodel ? pdModel->y(xvalue) : 0;

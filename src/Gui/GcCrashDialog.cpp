@@ -240,8 +240,9 @@ QString GcCrashDialog::versionHTML()
             "<br>Metrics: %7"
             "<br>OS: %6"
 #ifdef Q_OS_LINUX
-            "<br>OpenGL: %8"
+            "<br>OpenGL: %10"
 #endif
+            "<br>UI: dpi scale (%8) font size (%9)"
             "<br>")
             .arg(__DATE__)
             .arg(__TIME__)
@@ -254,6 +255,8 @@ QString GcCrashDialog::versionHTML()
             .arg(schemaVersion)
             .arg(os)
             .arg(factory.metricCount())
+            .arg(dpiXFactor)
+            .arg(QFont().pointSizeF())
 #ifdef Q_OS_LINUX
             .arg(gl_version)
 #endif

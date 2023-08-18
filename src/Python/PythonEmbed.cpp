@@ -98,7 +98,7 @@ bool PythonEmbed::pythonInstalled(QString &pybin, QString &pypath, QString PYTHO
             if (QFileInfo(filename).exists() && QFileInfo(filename).isExecutable()) {
                 pythonbinary=filename;
                 pybin=pythonbinary;
-                printd("Binary found");
+                printd("Binary found\n");
                 break;
             }
         }
@@ -126,6 +126,7 @@ bool PythonEmbed::pythonInstalled(QString &pybin, QString &pypath, QString PYTHO
                     "print('ZZ', '%1'.join(sys.path), 'ZZ')\n"
                     "quit()\n").arg(PATHSEP);
     py.setArguments(args);
+    py.setProcessChannelMode(QProcess::ForwardedErrorChannel);
     py.start();
 
     // failed to start python
@@ -224,8 +225,8 @@ PythonEmbed::PythonEmbed(const bool verbose, const bool interactive) : verbose(v
         printd("Python is installed: %s\n", pybin.toStdString().c_str());
 
         // tell python our program name - pretend to be the usual interpreter
-        printd("Py_SetProgramName: %s\n", pybin.toStdString().c_str());
-        Py_SetProgramName((wchar_t*) pybin.toStdString().c_str());
+        printd("Py_SetProgramName: %s\n", pybin.toStdString().c_str()); // not wide char string as printd uses printf not wprintf
+        Py_SetProgramName((wchar_t*) pybin.toStdWString().c_str());
 
         // our own module
         printd("PyImport_AppendInittab: goldencheetah\n");

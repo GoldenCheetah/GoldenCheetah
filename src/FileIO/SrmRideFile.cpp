@@ -160,7 +160,7 @@ RideFile *SrmFileReader::openRideFile(QFile &file, QStringList &errorStrings, QL
         char mcomment[256];
         size_t mcommentlen = version < 6 ? 3 : 255;
         assert( mcommentlen < sizeof(mcomment) );
-        in.readRawData(mcomment, mcommentlen );
+        in.readRawData(mcomment, static_cast<int>(mcommentlen) );
         mcomment[mcommentlen] = '\0';
 
         quint8 active = readByte(in);

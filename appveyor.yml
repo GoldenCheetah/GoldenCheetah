@@ -41,6 +41,8 @@ environment:
     secure: mmMksvVnfBiXufBDn2gAhQY53n0J9BokSCtDY51uU918QJ/LL4XOojtJp5tMFn8T7ugyDhNASpqZXiK55vxSD53vm+tjufpfzppKEeh93Babvc/VrndLB1X/RZCRUQTR6rka05fYl4e0eBzP1H091A==
   GC_XERT_CLIENT_SECRET:
     secure: /1rVLT8LyJCZ4xNJ5W+NtAcZ1rtKaUjW9SYm/T3gHoc=
+  GC_AZUM_CLIENT_SECRET:
+    secure: 2ZpXsA3TQv1zftYVyZSF6f83ftCzza+K22ZX1doj7Yc/5dmGl1bnsSeVChJgJ8lQ2fRPYpdmun9cjqwcrtG/zXTTsYuTvYWegHz/4Y0u6Mg=
 
 init:
 # Setup QT 5.15 - 64Bit
@@ -159,6 +161,7 @@ before_build:
 - ps: (Get-Content src\Core\Secrets.h) -replace '__GC_NOLIO_CLIENT_ID__', $env:GC_NOLIO_CLIENT_ID | Set-Content src\Core\Secrets.h
 - ps: (Get-Content src\Core\Secrets.h) -replace '__GC_NOLIO_SECRET__', $env:GC_NOLIO_SECRET | Set-Content src\Core\Secrets.h
 - ps: (Get-Content src\Core\Secrets.h) -replace '__GC_XERT_CLIENT_SECRET__', $env:GC_XERT_CLIENT_SECRET | Set-Content src\Core\Secrets.h
+- ps: (Get-Content src\Core\Secrets.h) -replace '__GC_AZUM_CLIENT_SECRET__', $env:GC_AZUM_CLIENT_SECRET | Set-Content src\Core\Secrets.h
 
 build_script:
 - qmake.exe build.pro -r -spec win32-msvc

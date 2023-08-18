@@ -41,6 +41,9 @@ AbstractView::AbstractView(Context *context, int type) :
     sidebar_(NULL), bottom_(NULL), perspective_(NULL), blank_(NULL),
     loaded(false)
 {
+
+    defaultAppearance= GSettings::defaultAppearanceSettings();
+
     // setup the basic widget
     QVBoxLayout *layout = new QVBoxLayout(this);
     setContentsMargins(0,0,0,0);
@@ -356,24 +359,47 @@ AbstractView::restoreState(bool useDefault)
         }
     }
 
+    QList<Perspective*>restored;
+
     //  if we don't have content read from file/resource
     if (content == "") {
 
         // if no local perspectives file fall back to old
         // layout file (pre-version 3.6) - will get a single perspective,
+        // renamed as "Legacy" and prepended to default perspectives,
         // except when useDefault is requested
         if (!finfo.exists() && !useDefault) {
             filename = context->athlete->home->config().canonicalPath() + "/" + view + "-layout.xml";
-            finfo.setFile(filename);
-            useDefault = false;
             legacy = true;
+            QFile file(filename);
+            if (file.open(QIODevice::ReadOnly)) {
+                content = file.readAll();
+                file.close();
+            }
+            if (content != "") {
+                // whilst this happens don't show user
+                setUpdatesEnabled(false);
+
+                // setup the handler
+                QXmlInputSource source;
+                source.setData(content);
+                QXmlSimpleReader xmlReader;
+                ViewParser handler(context, type, useDefault);
+                xmlReader.setContentHandler(&handler);
+                xmlReader.setErrorHandler(&handler);
+
+                // parse and instantiate the charts
+                xmlReader.parse(source);
+                restored = handler.perspectives;
+
+                setUpdatesEnabled(true);
+            }
         }
 
         // drop back to what is baked in
         if (!finfo.exists()) {
             filename = QString(":xml/%1-perspectives.xml").arg(view);
             useDefault = true;
-            legacy = false;
         }
         QFile file(filename);
         if (file.open(QIODevice::ReadOnly)) {
@@ -384,7 +410,6 @@ AbstractView::restoreState(bool useDefault)
 
     // if we *still* don't have content then something went
     // badly wrong, so only reset if its not blank
-    QList<Perspective*>restored;
     if (content != "") {
 
         // whilst this happens don't show user
@@ -400,10 +425,11 @@ AbstractView::restoreState(bool useDefault)
 
         // parse and instantiate the charts
         xmlReader.parse(source);
-        restored = handler.perspectives;
+        restored += handler.perspectives;
 
+        setUpdatesEnabled(true);
     }
-    if (legacy && restored.count() == 1) restored[0]->title_ = "General";
+    if (legacy && restored.count() >= 1) restored[0]->title_ = "Legacy";
 
     // MUST have at least one
     if (restored.count() == 0)  restored << new Perspective(context, "empty", type);
@@ -721,11 +747,6 @@ AbstractView::setPerspectives(QComboBox *perspectiveSelector, bool selectChart)
     perspectiveSelector->addItem(tr("Manage Perspectives..."));
     perspectiveSelector->insertSeparator(perspectives_.count());
     perspectiveactive=false;
-
-    // Select current perspective to keep perspectiveSelector synced
-    // when switching between athlete tabs
-    int index = perspectives_.indexOf(perspective_);
-    if (index >= 0) perspectiveSelector->setCurrentIndex(index);
 
     // if we only just loaded the charts and views, we need to select
     // one to get the ride item and date range selected

@@ -31,6 +31,8 @@
 #include "GcSideBarItem.h"
 #include "GcWindowRegistry.h"
 
+#include "Settings.h"
+
 class AthleteTab;
 class ViewSplitter;
 class Context;
@@ -82,6 +84,7 @@ class AbstractView : public QWidget
 
         void setPerspectives(QComboBox *perspectiveSelector, bool selectChart=false); // set the combobox when view selected
         void perspectiveSelected(int index); // combobox selections changed because the user selected a perspective
+        int currentPerspective() const { if (pstack && pstack->currentIndex() >=0) return pstack->currentIndex(); else return 0; }
 
         // add a new perspective
         Perspective *addPerspective(QString);
@@ -109,6 +112,8 @@ class AbstractView : public QWidget
 
         bool importPerspective(QString filename);
         void exportPerspective(Perspective *, QString filename);
+
+        AppearanceSettings defaultAppearance; // default state for sidebar etc
 
     signals:
 

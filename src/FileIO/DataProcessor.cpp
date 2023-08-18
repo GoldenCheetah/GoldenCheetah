@@ -99,9 +99,6 @@ DataProcessorFactory::autoProcess(RideFile *ride, QString mode, QString op)
     i.toFront();
     while (i.hasNext()) {
         i.next();
-
-        if (!i.value()->isCoreProcessor()) continue; // Python DP are not supported in automatic mode
-
         QString configsetting = QString("dp/%1/apply").arg(i.key());
 
         // if we're being run manually, run all that are defined
@@ -112,9 +109,9 @@ DataProcessorFactory::autoProcess(RideFile *ride, QString mode, QString op)
     return changed;
 }
 
-ManualDataProcessorDialog::ManualDataProcessorDialog(Context *context, QString name, RideItem *ride) : context(context), ride(ride)
+ManualDataProcessorDialog::ManualDataProcessorDialog(Context *context, QString name, RideItem *ride, DataProcessorConfig *conf) : context(context), ride(ride), config(conf)
 {
-    setAttribute(Qt::WA_DeleteOnClose);
+    if (config == nullptr) setAttribute(Qt::WA_DeleteOnClose); // don't destroy received config
     setWindowTitle(name);
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
 
@@ -137,7 +134,7 @@ ManualDataProcessorDialog::ManualDataProcessorDialog(Context *context, QString n
     QLabel *explainLabel = new QLabel(tr("Description"), this);
     explainLabel->setFont(font);
 
-    config = processor->processorConfig(this, ride->ride());
+    if (config == nullptr) config = processor->processorConfig(this, ride ? ride->ride() : nullptr);
     config->readConfig();
     explain = new QTextEdit(this);
     explain->setText(config->explain());
@@ -148,9 +145,12 @@ ManualDataProcessorDialog::ManualDataProcessorDialog(Context *context, QString n
     mainLayout->addWidget(explainLabel);
     mainLayout->addWidget(explain);
 
+    saveAsDefault = new QCheckBox(tr("Save parameters as default"), this);
+    saveAsDefault->setChecked(false);
     ok = new QPushButton(tr("OK"), this);
     cancel = new QPushButton(tr("Cancel"), this);
     QHBoxLayout *buttons = new QHBoxLayout();
+    buttons->addWidget(saveAsDefault);
     buttons->addStretch();
     buttons->addWidget(cancel);
     buttons->addWidget(ok);
@@ -173,6 +173,9 @@ ManualDataProcessorDialog::okClicked()
     if (ride && ride->ride() && processor->postProcess((RideFile *)ride->ride(), config, "UPDATE") == true) {
         context->notifyRideSelected(ride);     // to remain compatible with rest of GC for now
     }
+
+    // Save parameters as default on user request
+    if (saveAsDefault->isChecked()) config->saveConfig();
 
     // reset cursor and wait
     QApplication::restoreOverrideCursor();

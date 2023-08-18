@@ -53,7 +53,7 @@ python3.7 --version
 wget --no-verbose https://sourceforge.net/projects/pyqt/files/sip/sip-4.19.8/sip-4.19.8.tar.gz
 tar xf sip-4.19.8.tar.gz
 cd sip-4.19.8
-python3.7 configure.py
+python3.7 configure.py --incdir=/usr/include/python3.7
 make
 sudo make install
 cd ${TRAVIS_BUILD_DIR}

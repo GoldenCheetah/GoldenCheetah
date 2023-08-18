@@ -389,6 +389,9 @@ static struct {
     { "kmeans", 0 },        // kmeans(centers|assignments, k, dim1, dim2, dim3 .. dimn) - return the centers or cluster assignment
                             // from a k means cluser of the data with n dimensions (but commonly just 2- x and y)
 
+    // coerce to type
+    //{ "string", 1 },     // coerce value to string (listed above, removes decimal places, not sure why)
+    { "double", 1 },     // coerce value to double
 
     // add new ones above this line
     { "", -1 }
@@ -443,7 +446,7 @@ DataFilter::builtins(Context *context)
         if (i == 30 || i == 95) { // special case 'estimate' and 'estimates' we describe it
 
             if (i==30) { foreach(QString model, pdmodels(context)) returning << "estimate(" + model + ", cp|ftp|w'|pmax|x)"; }
-            if (i==95) { foreach(QString model, pdmodels(context)) returning << "estimates(" + model + ", cp|ftp|w'|pmax|x|date|isrun)"; }
+            if (i==95) { foreach(QString model, pdmodels(context)) returning << "estimates(" + model + ", cp|ftp|w'|pmax|x|date)"; }
 
         } else if (i == 31) { // which example
             returning << "which(x>0, ...)";
@@ -631,7 +634,7 @@ DataFilter::builtins(Context *context)
             returning << "interpolate(linear|cubic|akima|steffen, xvector, yvector, xvalues)";
 
             // 94 resample
-            // 95 estimates (see above) - also Kyle !!!!
+            // 95 estimates
 
         } else if (i == 96) {
 
@@ -2960,7 +2963,7 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
 
                             // check symbol name if it is a symbol
                             if (leaf->fparms[1]->type == Leaf::Symbol) {
-                                QRegExp estimateValidSymbols(name == "estimate" ? "^(cp|ftp|pmax|w')$" : "^(cp|ftp|pmax|w'|date|isrun)", Qt::CaseInsensitive);
+                                QRegExp estimateValidSymbols(name == "estimate" ? "^(cp|ftp|pmax|w')$" : "^(cp|ftp|pmax|w'|date)", Qt::CaseInsensitive);
                                 if (!estimateValidSymbols.exactMatch(*(leaf->fparms[1]->lvalue.n))) {
                                     leaf->inerror = leaf->fparms[1]->inerror = true;
                                     DataFiltererrors << QString(tr("%1 function expects parameter or duration as second parameter")).arg(name);
@@ -3163,11 +3166,13 @@ DataFilter::DataFilter(QObject *parent, Context *context, QString formula) : QOb
         treeRoot->validateFilter(context, &rt, treeRoot);
     else
         treeRoot=NULL;
+
+    errors = DataFiltererrors;
 }
 
 Result DataFilter::evaluate(RideItem *item, RideFilePoint *p)
 {
-    if (!item || !treeRoot || DataFiltererrors.count())
+    if (!item || !treeRoot || errors.count())
         return Result(0);
 
     // reset stack
@@ -3196,7 +3201,7 @@ Result DataFilter::evaluate(Specification spec, DateRange dr)
     // if there is no current ride item then there is no data
     // so it really is ok to baulk at no current ride item here
     // we must always have a ride since context is used
-    if (context->currentRideItem() == NULL || !treeRoot || DataFiltererrors.count()) return Result(0);
+    if (context->currentRideItem() == NULL || !treeRoot || errors.count()) return Result(0);
 
     Result res(0);
 
@@ -3355,6 +3360,7 @@ void DataFilter::clearFilter()
         treeRoot->clear(treeRoot);
         delete treeRoot;
         treeRoot = NULL;
+        errors.clear();
     }
     rt.isdynamic = false;
     sig = "";
@@ -3514,6 +3520,15 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
             return !eval(df, leaf->fparms[0],x, it, m, p, c, s, d).isNumber;
         }
 
+        // coersion
+        if (leaf->function == "double") {
+
+            Result returning = eval(df, leaf->fparms[0],x, it, m, p, c, s, d);
+
+            // coerce to string and then force returning as a string
+            if (returning.isVector()) return returning.asNumeric();
+            else return returning.number();
+        }
 
         // string functions
         if (leaf->function == "tolower") {
@@ -3671,12 +3686,12 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
             Result returning(0);
             returning.isNumber = false;
 
+            if (m == NULL) return Result(0); // no ride then no context
+
             Specification spec = s;
             FilterSet fs = spec.filterSet();
-            if (m) {
-                fs.addFilter(m->context->isfiltered, m->context->filters);
-                fs.addFilter(m->context->ishomefiltered, m->context->homeFilters);
-            }
+            fs.addFilter(m->context->isfiltered, m->context->filters);
+            fs.addFilter(m->context->ishomefiltered, m->context->homeFilters);
             spec.setFilterSet(fs);
             spec.setDateRange(d);  // current date range selected
 
@@ -3725,7 +3740,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
                 else if (wantunit && symbols.exactMatch(symbol))
                     list << "";
                 else {
-                    if (e) {
+                    if (e && m) {
                         if (wantname) list << e->name();
                         else if (wantunit) list << e->units(GlobalContext::context()->useMetricUnits);
                         else {
@@ -3752,6 +3767,8 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
             // filters activities using an expression, in the same way the
             // daterange function filters on date, in fact the daterange
             // closure could be implemented using activities and an expression
+
+            if (m == NULL) return Result(0); // no ride then no context
 
             // the user will have ecaped quotes to embed in a string
             QString prog = *(leaf->fparms[0]->lvalue.s);
@@ -3812,7 +3829,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
 
         if (leaf->function == "config") {
             //
-            // Get CP and W' estimates for date of ride
+            // Get CP and W' for date of ride
             //
             double CP = 0;
             double AeTP = 0;
@@ -3820,6 +3837,8 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
             double WPRIME = 0;
             double PMAX = 0;
             int zoneRange;
+
+            if (m == NULL) return Result(0); // no ride then no context
 
             if (m->context->athlete->zones(m->sport)) {
 
@@ -4724,6 +4743,9 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
 
             Result returning("");
             returning.isNumber = false;
+
+            if (m == NULL) return returning; // no ride then no context
+
             QString name = eval(df, leaf->fparms[0],x, it, m, p, c, s, d).string();
 
             if (d.from==QDate() && d.to==QDate()) {
@@ -4780,6 +4802,8 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
 
             Result returning("");
             returning.isNumber = false;
+
+            if (m == NULL) return returning; // no ride then no context
 
             if (d.from==QDate() && d.to==QDate()) {
 
@@ -4856,14 +4880,15 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
 
             // returning numbers or strings
             Result returning(0);
+            Result durations(0); // for aggregating
             if (wantstrings) returning.isNumber=false;
 
-            Specification spec = s;
-            FilterSet fs = spec.filterSet();
+            FilterSet fs;
             if (m) {
                 fs.addFilter(m->context->isfiltered, m->context->filters);
                 fs.addFilter(m->context->ishomefiltered, m->context->homeFilters);
             }
+            Specification spec;
             spec.setFilterSet(fs);
 
             // date range can be controlled, if no date range is set then we just
@@ -4895,21 +4920,22 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
             // no ride selected, or none available
             if (m == NULL) return Result(0);
 
-            // return an aggregate?
-            if (wantaggregate) {
-
-                // get aggregate from RideCache and return in the required format
-                if (wantstrings) returning = Result(m->context->athlete->rideCache->getAggregate(o_symbol, spec, GlobalContext::context()->useMetricUnits));
-                else returning = Result(m->context->athlete->rideCache->getAggregate(o_symbol, spec, GlobalContext::context()->useMetricUnits, true).toDouble());
-
-                return returning;
-            }
-
+            // for aggregating
+            double withduration=0;
+            double totalduration=0;
+            double runningtotal=0;
+            double minimum=0;
+            double maximum=0;
+            double count=0;
+            // do we aggregate zero values ?
+            bool aggZero = e ? e->aggregateZero() : true;
 
             // loop through rides for daterange
             foreach(RideItem *ride, m->context->athlete->rideCache->rides()) {
 
+                if (!s.pass(ride)) continue; // relies upon the daterange being passed to eval...
                 if (!spec.pass(ride)) continue; // relies upon the daterange being passed to eval...
+
 
                 double value=0;
                 QString asstring;
@@ -4920,8 +4946,21 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
                     value= QTime(0,0,0).secsTo(ride->dateTime.time());
                     if (wantstrings) asstring = ride->dateTime.toString("hh:mm:ss");
                 } else {
-                    value =  ride->getForSymbol(df->lookupMap.value(symbol,""), GlobalContext::context()->useMetricUnits);
+                    value =  ride->getForSymbol(o_symbol, GlobalContext::context()->useMetricUnits);
                     if (wantstrings) e ? asstring = e->toString(value) : "(null)";
+                }
+
+                // keep count of time for ride, useful when averaging
+                count++;
+                double duration = ride->getCountForSymbol(o_symbol);
+                if (value || aggZero) totalduration += duration;
+                withduration += value * duration;
+                runningtotal += value;
+                if (count==1) {
+                    minimum = maximum = value;
+                } else {
+                    if (value <minimum) minimum=value;
+                    if (value >maximum) maximum=value;
                 }
 
                 if (wantstrings) { // capture strings as we go, only if we don't aggregate
@@ -4930,6 +4969,34 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
                     returning.number() += value;
                     returning.asNumeric().append(value);
                 }
+            }
+
+            // return an aggregate?
+            if (wantaggregate) {
+                double aggregate=0;
+                switch(e->type()) {
+                case RideMetric::Total:
+                case RideMetric::RunningTotal:
+                    aggregate = runningtotal;
+                    break;
+                default:
+                case RideMetric::Average:
+                    {
+                    // aggregate taking into account duration
+                    aggregate = withduration / totalduration;
+                    break;
+                    }
+                case RideMetric::Low:
+                    aggregate = minimum;
+                    break;
+                case RideMetric::Peak:
+                    aggregate = maximum;
+                    break;
+                }
+
+                // format and return
+                if (wantstrings) returning = Result(e->toString(aggregate));
+                else returning = Result(aggregate);
             }
 
             return returning;
@@ -4950,6 +5017,8 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
             // returning numbers or strings
             Result returning(0);
             if (wantstrings) returning.isNumber=false;
+
+            if (m == NULL) return returning; // no ride then no context
 
             FilterSet fs;
             fs.addFilter(m->context->isfiltered, m->context->filters);
@@ -5068,6 +5137,8 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
             Result returning(0);
             if (symbol != "date") returning.isNumber = false;
 
+            if (m == NULL) return returning; // no ride then no context
+
             QList<Season> tmpSeasons = m->context->athlete->seasons->seasons;
             std::sort(tmpSeasons.begin(),tmpSeasons.end(),Season::LessThanForStarts);
             foreach (Season s, tmpSeasons) {
@@ -5097,6 +5168,8 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
             Result returning(0);
             QDate earliest(1900,01,01);
             bool wantdate=false;
+
+            if (m == NULL) return Result(0); // no ride then no context
 
             FilterSet fs;
             fs.addFilter(m->context->isfiltered, m->context->filters);
@@ -5137,6 +5210,8 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
 
         // retrieve best meanmax effort for a given duration and daterange
         if (leaf->function == "bests") {
+
+            if (m == NULL) return Result(0); // no ride then no context
 
             // work out what the date range is...
             QDate earliest(1900,01,01);
@@ -5194,6 +5269,8 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
 
         // meanmax array
         if (leaf->function == "meanmax") {
+
+            if (m == NULL) return Result(0); // no ride then no context
 
             Result returning(0);
 
@@ -5580,6 +5657,8 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
         // distribution
         if (leaf->function == "dist") {
 
+            if (m == NULL) return Result(0); // no ride then no context
+
             Result returning(0);
 
             // get the two symbols
@@ -5792,6 +5871,9 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
 
         // store/fetch from athlete storage
         if (leaf->function == "store") {
+
+            if (m == NULL) return Result(0); // no ride then no context
+
             // name and value in parameter 1 and 2
             QString name= eval(df, leaf->fparms[0],x, it, m, p, c, s, d).string();
             Result value= eval(df, leaf->fparms[1],x, it, m, p, c, s, d);
@@ -5803,6 +5885,9 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
         }
 
         if (leaf->function == "fetch") {
+
+            if (m == NULL) return Result(0); // no ride then no context
+
             // name and value in parameter 1 and 2
             QString name= eval(df, leaf->fparms[0],x, it, m, p, c, s, d).string();
 
@@ -6346,6 +6431,8 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
         // pmc
         if (leaf->function == "pmc") {
 
+            if (m == NULL) return Result(0); // no ride then no context
+
             if (d.from==QDate() || d.to==QDate()) return Result(0);
 
             QString series = *(leaf->fparms[1]->lvalue.n);
@@ -6378,6 +6465,9 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
 
         // banister
         if (leaf->function == "banister") {
+
+            if (m == NULL) return Result(0); // no ride then no context
+
             Leaf *first=leaf->fparms[0];
             Leaf *second=leaf->fparms[1];
             Leaf *third=leaf->fparms[2];
@@ -6515,11 +6605,11 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
                 // return a vector
                 QVector<double> powerindexes;
                 for(int i=0; i<power.asNumeric().count() && i<duration.asNumeric().count(); i++)
-                    powerindexes << powerIndex(power.asNumeric().at(i), duration.asNumeric().at(i), false);
+                    powerindexes << powerIndex(power.asNumeric().at(i), duration.asNumeric().at(i));
                 returning = Result(powerindexes);
             } else {
                 // return a value
-                returning = Result(powerIndex(power.number(), duration.number(), false));
+                returning = Result(powerIndex(power.number(), duration.number()));
             }
             return returning;
         }
@@ -6543,7 +6633,8 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
                     if (df->lookupType.value(*(leaf->lvalue.l->lvalue.n)) == true) {
                         // numeric
                         if (c) duration = RideMetric::getForSymbol(rename=df->lookupMap.value(*(leaf->lvalue.l->lvalue.n),""), c);
-                        else duration = m->getForSymbol(rename=df->lookupMap.value(*(leaf->lvalue.l->lvalue.n),""));
+                        else if (m) duration = m->getForSymbol(rename=df->lookupMap.value(*(leaf->lvalue.l->lvalue.n),""));
+                        else duration = 0;
                     } else if (*(leaf->lvalue.l->lvalue.n) == "x") {
                         duration = Result(x).number();
                     } else if (*(leaf->lvalue.l->lvalue.n) == "i") {
@@ -6569,11 +6660,19 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
                 break;
             }
 
-            if (leaf->function == "best")
-                return Result(RideFileCache::best(m->context, m->fileName, leaf->seriesType, duration));
+            if (leaf->function == "best") {
 
-            if (leaf->function == "tiz") // duration is really zone number
+                if (m == NULL) return Result(0); // no ride then no context
+
+                return Result(RideFileCache::best(m->context, m->fileName, leaf->seriesType, duration));
+            }
+
+            if (leaf->function == "tiz") { // duration is really zone number
+
+                if (m == NULL) return Result(0); // no ride then no context
+
                 return Result(RideFileCache::tiz(m->context, m->fileName, leaf->seriesType, duration));
+            }
         }
 
         if (leaf->function == "round") {
@@ -6817,24 +6916,36 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
                   break;
 
         case 26 : { /* LTS (expr) */
+
+                    if (m == NULL) return Result(0); // no ride then no context
+
                     PMCData *pmcData = m->context->athlete->getPMCFor(leaf->fparms[0], df);
                     return Result(pmcData->lts(m->dateTime.date()));
                   }
                   break;
 
         case 27 : { /* STS (expr) */
+
+                    if (m == NULL) return Result(0); // no ride then no context
+
                     PMCData *pmcData = m->context->athlete->getPMCFor(leaf->fparms[0], df);
                     return Result(pmcData->sts(m->dateTime.date()));
                   }
                   break;
 
         case 28 : { /* SB (expr) */
+
+                    if (m == NULL) return Result(0); // no ride then no context
+
                     PMCData *pmcData = m->context->athlete->getPMCFor(leaf->fparms[0], df);
                     return Result(pmcData->sb(m->dateTime.date()));
                   }
                   break;
 
         case 29 : { /* RR (expr) */
+
+                    if (m == NULL) return Result(0); // no ride then no context
+
                     PMCData *pmcData = m->context->athlete->getPMCFor(leaf->fparms[0], df);
                     return Result(pmcData->rr(m->dateTime.date()));
                   }
@@ -6844,6 +6955,8 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
         case 95 :
                 { /* ESTIMATE( model, CP | FTP | W' | PMAX | duration ) */
                   /* ESTIMATES( model, CP | FTP | W' | PMAX | duration | date) */
+
+                    if (m == NULL) return Result(0); // no ride then no context
 
                     // which model ?
                     QString model = *leaf->fparms[0]->lvalue.n;
@@ -6855,13 +6968,11 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
 
                     if (fnum == 30) {
 
-                        if (m == NULL) return Result(0); // no ride
-
                         // get the PD Estimate for this date - note we always work with the absolulte
                         // power estimates in formulas, since the user can just divide by config(weight)
                         // or Athlete_Weight (which takes into account values stored in ride files.
                         // Bike or Run models are used according to activity type
-                        PDEstimate pde = m->context->athlete->getPDEstimateFor(m->dateTime.date(), model, false, m->isRun);
+                        PDEstimate pde = m->context->athlete->getPDEstimateFor(m->dateTime.date(), model, false, m->sport);
 
                         // no model estimate for this date
                         if (pde.parameters.count() == 0) return Result(0);
@@ -6902,11 +7013,17 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
 
                         Result returning(0);
 
+                        // Trends view: sport from included activities
+                        int nActivities, nRides, nRuns, nSwims;
+                        QString sport;
+                        m->context->athlete->rideCache->getRideTypeCounts(s, nActivities, nRides, nRuns, nSwims, sport);
+                        if (sport.isEmpty()) sport = "Bike"; // default to Bike estimates for backward compatibility
+
                         // date range, returning a vector
                         foreach(PDEstimate pde, m->context->athlete->getPDEstimates()) {
 
                             // does it match our criteria?
-                            if (pde.model == model && pde.parameters.count() != 0 && pde.from <= d.to && pde.to >= d.from && pde.wpk==false) {
+                            if (pde.model == model && pde.parameters.count() != 0 && pde.from <= d.to && pde.to >= d.from && pde.wpk==false && pde.sport == sport) {
 
                                 // overlaps, but truncate the dates we return
                                 int dfrom, dto;
@@ -6942,7 +7059,6 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
                                     if (parm == "ftp") v1=v2=pde.FTP;
                                     if (parm == "pmax") v1=v2=pde.PMax;
                                     if (parm == "date") { v1=dfrom; v2=dto; }
-                                    if (parm == "isrun") { v1=v2=pde.run; }
                                 }
 
                                 returning.number() += v1+v2;
@@ -7000,6 +7116,9 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
 
         case 32 :
                 {   // SET (field, value, expression ) returns expression evaluated
+
+                    if (m == NULL) return Result(0); // no ride
+
                     Result returning(0);
 
                     if (leaf->fparms.count() < 3) return returning;
@@ -7070,6 +7189,9 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
                 break;
         case 33 :
                 {   // UNSET (field, expression ) remove override or tag
+
+                    if (m == NULL) return Result(0); // no ride
+
                     Result returning(0);
 
                     if (leaf->fparms.count() < 2) return returning;
@@ -7124,6 +7246,8 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
 
                     if (leaf->fparms.count() != 1) return Result(0);
 
+                    if (m == NULL) return Result(0); // no ride
+
                     // symbol we are setting
                     QString symbol = *(leaf->fparms[0]->lvalue.n);
 
@@ -7156,6 +7280,8 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
         case 36 :
                 {   // BESTTIME (distance[km])
 
+                    if (m == NULL) return Result(0); // no ride
+
                     if (leaf->fparms.count() != 1 || m->fileCache() == NULL) return Result(0);
 
                     return Result (m->fileCache()->bestTime(eval(df, leaf->fparms[0],x, it, m, p, c, s, d).number()));
@@ -7163,6 +7289,8 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
 
         case 37 :
                 {   // XDATA ("XDATA", "XDATASERIES", (sparse, repeat, interpolate, resample)
+
+                    if (m == NULL) return Result(0); // no ride
 
                     if (!p) {
 
@@ -7210,6 +7338,9 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
 
         case 39 :
                 {   // AUTOPROCESS(expression) to run automatic data processors
+
+                    if (m == NULL) return Result(0); // no ride
+
                     Result returning(0);
 
                     if (leaf->fparms.count() != 1) return returning;
@@ -7254,8 +7385,6 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
 
                         if (!f) return Result(0); // eek!
 
-                        if (!dp->isCoreProcessor()) return Result(0); // Python DPs are disabled due to #4095
-
                         // now run the data processor
                         if (dp->postProcess(f)) {
                             // rideFile is now dirty!
@@ -7268,6 +7397,8 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
 
         case 41 :
                 {   // XDATA_UNITS ("XDATA", "XDATASERIES")
+
+                    if (m == NULL) return Result(0); // no ride
 
                     if (p) { // only valid when iterating
 
@@ -7298,6 +7429,9 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
 
         case 42 :
                 {   // MEASURE (DATE, GROUP, FIELD) get measure
+
+                    if (m == NULL) return Result(0); // no ride then no context
+
                     if (leaf->fparms.count() < 3) return Result(0);
 
                     Result days = eval(df, leaf->fparms[0],x, it, m, p, c, s, d);
@@ -7325,6 +7459,9 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
                 {
                     // if no parameters just return the number of tests either in the current
                     // date range -or- for the current ride
+
+                    if (m == NULL) return Result(0); // no ride then no context
+
                     if (leaf->fparms.count() == 0) {
 
                         // activity
@@ -7382,7 +7519,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
                                 }
                             } else {
                                 // look for bests on the same day
-                                Performance onday = m->context->athlete->rideCache->estimator->getPerformanceForDate(m->dateTime.date(), false); //XXX fixme for runs
+                                Performance onday = m->context->athlete->rideCache->estimator->getPerformanceForDate(m->dateTime.date(), m->sport);
                                 if (onday.duration >0) {
                                     double value = wantduration ? onday.duration : onday.power;
                                     returning.number() += value;
@@ -7392,10 +7529,10 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
 
                         } else {
 
-                            FilterSet fs;
+                            Specification spec = s;
+                            FilterSet fs = spec.filterSet();
                             fs.addFilter(m->context->isfiltered, m->context->filters);
                             fs.addFilter(m->context->ishomefiltered, m->context->homeFilters);
-                            Specification spec;
                             spec.setFilterSet(fs);
                             spec.setDateRange(d); // fallback to daterange selected
 
@@ -7421,10 +7558,16 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
 
                             } else {
 
+                                // Trends view: sport from included activities
+                                int nActivities, nRides, nRuns, nSwims;
+                                QString sport;
+                                m->context->athlete->rideCache->getRideTypeCounts(spec, nActivities, nRides, nRuns, nSwims, sport);
+                                if (sport.isEmpty()) sport = "Bike"; // default to Bike estimates for backward compatibility
+
                                 // weekly best performances
                                 QList<Performance> perfs = m->context->athlete->rideCache->estimator->allPerformances();
                                 foreach(Performance p, perfs) {
-                                    if (p.submaximal == false && p.run == false && p.when >= d.from && p.when <= d.to) { // XXX fixme p.run == false
+                                    if (p.submaximal == false && p.sport == sport && p.when >= d.from && p.when <= d.to) {
                                         double value = wantduration ? p.duration : p.power;
                                         returning.number() += value;
                                         returning.asNumeric() << value;
@@ -7452,6 +7595,8 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
 
         // run a script
  #ifdef GC_WANT_PYTHON
+        if (m == NULL) return Result(0); // no ride then no context
+
         if (leaf->function == "python")  return Result(df->runPythonScript(m->context, *leaf->lvalue.s, m, c, s));
  #endif
         return Result(0);
@@ -7468,6 +7613,8 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
         QString lhsstring;
         QString rename;
         QString symbol = *(leaf->lvalue.n);
+
+        if (m == NULL) return Result(0); // no ride then no context
 
         // ride series name when running through sample override metrics etc
         if (p && (lhsisNumber = df->dataSeriesSymbols.contains(*(leaf->lvalue.n))) == true) {

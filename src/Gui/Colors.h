@@ -126,16 +126,15 @@ class GCColor : public QObject
         static const Colors *colorSet();
         static const Colors *defaultColorSet(bool dark);
         static void resetColors();
-        static struct SizeSettings defaultSizes(int width, int height);
         static double luminance(QColor color); // return the relative luminance
         static QColor invertColor(QColor); // return the contrasting color
         static QColor alternateColor(QColor); // return the alternate background
+        static QColor selectedColor(QColor); // return the on select background color
         static QColor htmlCode(QColor x) { return x.name(); } // return the alternate background
         static Themes &themes(); 
         static void applyTheme(int index);
 
         // for styling things with current preferences
-        static bool isFlat();
         static QLinearGradient linearGradient(int size, bool active, bool alternate=false);
         static QString css(bool ridesummary=true);
         static QPalette palette();

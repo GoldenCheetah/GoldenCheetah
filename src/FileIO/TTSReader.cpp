@@ -106,7 +106,7 @@ int getUByte(ByteArray &buffer, int offset) {
 int getUShort(ByteArray buffer, size_t offset) {
     if((offset + 1) < buffer.size())
         return *(unsigned short*)&buffer[offset];    
-    return getUByte(buffer, offset);
+    return getUByte(buffer, static_cast<int>(offset));
 }
 
 int getUInt(ByteArray &buffer, size_t offset) {
@@ -391,7 +391,7 @@ bool TTSReader::readData(QDataStream &is, ByteArray& buffer, bool copyPre) {
     if (buffer.size() != first) {
         size_t readSize = buffer.size() - first;
 
-        size_t iBytesRead = is.readRawData((char*)&buffer[first], (int)buffer.size() - first);
+        size_t iBytesRead = is.readRawData((char*)&buffer[first], (int)buffer.size() - static_cast<int>(first));
         if (iBytesRead != readSize) return false;
     }
 

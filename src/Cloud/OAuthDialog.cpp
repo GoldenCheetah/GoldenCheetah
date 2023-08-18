@@ -50,6 +50,7 @@ OAuthDialog::OAuthDialog(Context *context, OAuthSite site, CloudService *service
         if (service->id() == "SportTracks.mobi") site = this->site = SPORTTRACKS;
         if (service->id() == "Xert") site = this->site = XERT;
         if (service->id() == "RideWithGPS") site = this->site = RIDEWITHGPS;
+        if (service->id() == "Azum") site = this->site = AZUM;
     }
 
     // check if SSL is available - if not - message and end
@@ -162,15 +163,21 @@ OAuthDialog::OAuthDialog(Context *context, OAuthSite site, CloudService *service
         urlChanged(QUrl("http://www.goldencheetah.org/?code=0"));
     } else if (site == RIDEWITHGPS) {
         urlChanged(QUrl("http://www.goldencheetah.org/?code=0"));
+    } else if (site == AZUM) {
+        if (baseURL=="") baseURL=service->getSetting(GC_AZUM_URL, "https://training.azum.com").toString();
+        urlstr = QString("%1/oauth/authorize/?").arg(baseURL);
+
+        urlstr.append("redirect_uri=http://www.goldencheetah.org/&");
+        urlstr.append("response_type=code&");
+        urlstr.append("client_id=").append(GC_AZUM_CLIENT_ID);
     }
 
     //
     // STEP 1: LOGIN AND AUTHORISE THE APPLICATION
     //
-    if (site == NOLIO || site == DROPBOX || site == STRAVA || site == CYCLING_ANALYTICS || site == POLAR || site == SPORTTRACKS || site == TODAYSPLAN || site == WITHINGS) {
+    if (site == NOLIO || site == DROPBOX || site == STRAVA || site == CYCLING_ANALYTICS || site == POLAR || site == SPORTTRACKS || site == TODAYSPLAN || site == WITHINGS || site == AZUM) {
         url = QUrl(urlstr);
         view->setUrl(url);
-
         // connects
         connect(view, SIGNAL(urlChanged(const QUrl&)), this, SLOT(urlChanged(const QUrl&)));
     }
@@ -204,7 +211,7 @@ OAuthDialog::urlChanged(const QUrl &url)
     QString authheader;
 
     // sites that use this scheme
-    if (site == NOLIO || site == DROPBOX || site == STRAVA || site == CYCLING_ANALYTICS || site == TODAYSPLAN || site == POLAR || site == SPORTTRACKS || site == XERT || site == RIDEWITHGPS || site == WITHINGS) {
+    if (site == NOLIO || site == DROPBOX || site == STRAVA || site == CYCLING_ANALYTICS || site == TODAYSPLAN || site == POLAR || site == SPORTTRACKS || site == XERT || site == RIDEWITHGPS || site == WITHINGS || site == AZUM) {
 
         if (url.toString().startsWith("http://www.goldencheetah.org/?state=&code=") ||
                 url.toString().contains("blank.html?code=") ||
@@ -315,6 +322,18 @@ OAuthDialog::urlChanged(const QUrl &url)
                 params.addQueryItem("action", "requesttoken");
                 params.addQueryItem("grant_type", "authorization_code");
 
+            } else if (site == AZUM) {
+
+                if (baseURL=="") baseURL=service->getSetting(GC_AZUM_URL, "https://training.azum.com").toString();
+                urlstr = QString("%1/oauth/token/?").arg(baseURL);
+                params.addQueryItem("client_id", GC_AZUM_CLIENT_ID);
+                if (service->getSetting(GC_AZUM_USERKEY, "").toString() != "") {
+                    params.addQueryItem("client_secret", service->getSetting(GC_AZUM_USERKEY, "").toString());
+                } else {
+                    params.addQueryItem("client_secret", GC_AZUM_CLIENT_SECRET);
+                }
+                params.addQueryItem("redirect_uri","http://www.goldencheetah.org/");
+                params.addQueryItem("grant_type", "authorization_code");
             }
 
             // all services will need us to send the temporary code received
@@ -500,6 +519,13 @@ OAuthDialog::networkRequestFinished(QNetworkReply *reply)
             QString info = QString(tr("Nolio authorization was successful."));
             QMessageBox information(QMessageBox::Information, tr("Information"), info);
             information.exec();
+        } else if (site == AZUM) {
+            service->setSetting(GC_AZUM_ACCESS_TOKEN, access_token);
+            service->setSetting(GC_AZUM_REFRESH_TOKEN, refresh_token);
+            QString info = QString(tr("Azum authorization was successful."));
+            QMessageBox information(QMessageBox::Information, tr("Information"), info);
+            information.exec();
+
         }
 
     } else {

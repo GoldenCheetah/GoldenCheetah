@@ -85,14 +85,14 @@ class Bindings {
         PyObject* season(bool all=false, bool compare=false) const;
 
         // working with data series
-        bool seriesPresent(int type, PyObject* activity=NULL) const;
+        bool seriesPresent(int type, PyObject* activity=NULL, int compareindex=-1) const;
         int seriesLast() const;
         QString seriesName(int type) const;
-        PythonDataSeries *series(int type, PyObject* activity=NULL) const;
-        PythonDataSeries *activityWbal(PyObject* activity=NULL) const;
-        PythonDataSeries *xdata(QString name, QString series, QString join="repeat", PyObject* activity=NULL) const;
-        PythonXDataSeries *xdataSeries(QString name, QString series, PyObject* activity=NULL) const;
-        PyObject* xdataNames(QString name=QString(), PyObject* activity=NULL) const;
+        PythonDataSeries *series(int type, PyObject* activity=NULL, int compareindex=-1) const;
+        PythonDataSeries *activityWbal(PyObject* activity=NULL, int compareindex=-1) const;
+        PythonDataSeries *xdata(QString name, QString series, QString join="repeat", PyObject* activity=NULL, int compareindex=-1) const;
+        PythonXDataSeries *xdataSeries(QString name, QString series, PyObject* activity=NULL, int compareindex=-1) const;
+        PyObject* xdataNames(QString name=QString(), PyObject* activity=NULL, int compareindex=-1) const;
 
         // working with metrics
         PyObject* activityMetrics(bool compare=false) const;
@@ -119,6 +119,7 @@ class Bindings {
         bool setTag(QString name, QString value, PyObject *activity = NULL) const;
         bool delTag(QString name, PyObject *activity = NULL) const;
         bool hasTag(QString name, PyObject *activity = NULL) const;
+        QString getTag(QString name, PyObject *activity = NULL) const;
 
         // working with charts
         bool configChart(QString title, int type, bool animate, int pos, bool stack, int orientation) const;
@@ -132,7 +133,7 @@ class Bindings {
     private:
         // find a RideItem by DateTime
         RideItem* fromDateTime(PyObject* activity=NULL) const;
-        RideFile *selectRideFile(PyObject *activity = nullptr) const;
+        RideFile *selectRideFile(PyObject *activity = nullptr, int compareindex=-1) const;
 
         // get a dict populated with metrics and metadata
         PyObject* activityMetrics(RideItem* item) const;

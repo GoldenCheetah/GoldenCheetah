@@ -21,6 +21,7 @@
 #define _GC_Settings_h 1
 #include "GoldenCheetah.h"
 #include <QDebug>
+#include <QRect>
 
 
 /*
@@ -60,6 +61,12 @@
 #ifndef GC_POLARFLOW_CLIENT_ID
 #define GC_POLARFLOW_CLIENT_ID "Not defined"
 #endif
+
+// Azum
+#ifndef GC_AZUM_CLIENT_ID
+#define GC_AZUM_CLIENT_ID "2XVhIzyXCSyM2gzq4zcK0YM0R5TJRBuH4CgtdpSw"
+#endif
+
 
 // Xert
 #ifndef GC_XERT_CLIENT_ID
@@ -125,9 +132,6 @@
 #define GC_FONT_DEFAULT_SIZE            "<system>font/defaultsize"
 #define GC_FONT_CHARTLABELS_SIZE        "<system>font/chartlabelssize"
 #define GC_FONT_SCALE                   "<system>font/scale"
-
-// Colors/Chrome - see special treatment sections (also stored in <system>)
-#define GC_CHROME                       "<system>chrome" // mac or flat only so far
 
 // Location of R Installation - follows R_HOME semantics
 #define GC_R_HOME                       "<system>r_home"
@@ -397,6 +401,13 @@
 #define GC_SIXCYCLE_PASS                "<athlete-private>sixcycle_pass"
 #define GC_SIXCYCLE_URL                 "<athlete-private>sixcycle_url"
 
+// Azum
+#define GC_AZUM_ACCESS_TOKEN            "<athlete-private>azum_access_token"
+#define GC_AZUM_REFRESH_TOKEN           "<athlete-private>azum_refresh_token"
+#define GC_AZUM_USERKEY                 "<athlete-private>azum_userkey"
+#define GC_AZUM_URL                     "<athlete-private>azum_url"
+#define GC_AZUM_ATHLETE_ID              "<athlete-private>azum_athlete_id"
+
 // Polar Flow
 #define GC_POLARFLOW_TOKEN             "<athlete-private>polarflow_token"
 #define GC_POLARFLOW_USER_ID           "<athlete-private>polarflow_user_id"
@@ -427,6 +438,8 @@
 
 // Helper Class for the Athlete QSettings
 
+extern double scalefactors[];
+
 class AthleteQSettings {
     public:
 
@@ -441,6 +454,31 @@ class AthleteQSettings {
 
 };
 
+
+typedef struct {
+
+    // gui sizing
+    double xfactor, yfactor; // scaling of widgets
+    QRect windowsize; // size of the window in pixels
+
+    // fonts
+    QString fontfamily;
+    int fontpointsize;
+    double fontscale; // scaling of fonts
+    int fontscaleindex; // index into the list
+
+    // ui elements, mostly standard defaults
+    int theme; // theme number to use
+    bool antialias; // antialias fonts- always true
+    bool scrollbar; //scroller on ride list- always false
+    bool head; // false for MAC, true for everyone else
+    int sidebarwidth; // width of sidebars in pixels
+    bool sideanalysis;
+    bool sidetrend;
+    bool sidetrain;
+    double linewidth; // default line width
+
+} AppearanceSettings;
 
 // wrap the standard QSettings so we can offer members
 // to get global or atheleteName specific settings
@@ -482,6 +520,9 @@ public:
 
     // Cleanup if AthleteDir is changed
     void clearGlobalAndAthletes();
+
+    // reset appearance settings like theme, font, color and geometry
+    static AppearanceSettings defaultAppearanceSettings();
 
 private:
     bool newFormat;

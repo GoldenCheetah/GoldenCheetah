@@ -1173,7 +1173,7 @@ DataOverviewItem::sort(int column, Qt::SortOrder order)
     // dates in German are weird, a month is "Mai", "Juli" or even "Jan."
     // even when requesting a date in format dd MMM yyyy
     // remember: a dot (.) inside brackets ([]) does NOT need to be escaped
-    QRegExp redate("^[0-9][0-9] [.A-Za-zÀ-ž\u0370-\u03FF\u0400-\u04FF]+ [0-9][0-9]*$");
+    QRegExp redate(QString::fromWCharArray(L"^[0-9][0-9] [.A-Za-zÀ-ž\u0370-\u03FF\u0400-\u04FF]+ [0-9][0-9]*$"));
     QRegExp retime("^[0-9:]*$");
     QRegExp renumber("^[0-9.-]*$");
 
@@ -1358,8 +1358,8 @@ RPEOverviewItem::setData(RideItem *item)
         const qint64 old = prior->dateTime.daysTo(item->dateTime);
         if (old > SPARKDAYS) break;
 
-        // only activities with matching sport flags
-        if (prior->isRun == item->isRun && prior->isSwim == item->isSwim) {
+        // only activities with matching sport
+        if (prior->sport == item->sport) {
 
            double v = prior->getText("RPE", "0").toDouble();
            if (std::isinf(v) || std::isnan(v)) v=0;
@@ -1433,8 +1433,8 @@ MetricOverviewItem::setData(RideItem *item)
         const qint64 old = prior->dateTime.daysTo(item->dateTime);
         if (old > SPARKDAYS) break;
 
-        // only activities with matching sport flags
-        if (prior->isRun == item->isRun && prior->isSwim == item->isSwim) {
+        // only activities with matching sport
+        if (prior->sport == item->sport) {
 
             double v = prior->getForSymbol(symbol, GlobalContext::context()->useMetricUnits);
             if (std::isinf(v) || std::isnan(v)) v=0;
@@ -1772,8 +1772,8 @@ MetaOverviewItem::setData(RideItem *item)
             const qint64 old = prior->dateTime.daysTo(item->dateTime);
             if (old > SPARKDAYS) break;
 
-            // only activities with matching sport flags
-            if (prior->isRun == item->isRun && prior->isSwim == item->isSwim) {
+            // only activities with matching sport
+            if (prior->sport == item->sport) {
 
                 double v;
 
@@ -4123,6 +4123,7 @@ OverviewItemConfig::dataChanged()
             MetricOverviewItem *mi = dynamic_cast<MetricOverviewItem*>(item);
             mi->name = name->text();
             if (metric1->isValid()) {
+                mi->metric = metric1->rideMetric();
                 mi->symbol = metric1->rideMetric()->symbol();
                 mi->units = metric1->rideMetric()->units(GlobalContext::context()->useMetricUnits);
             }
@@ -4134,7 +4135,10 @@ OverviewItemConfig::dataChanged()
         {
             DonutOverviewItem *mi = dynamic_cast<DonutOverviewItem*>(item);
             mi->name = name->text();
-            if (metric1->isValid())  mi->symbol = metric1->rideMetric()->symbol();
+            if (metric1->isValid()) {
+                mi->metric = metric1->rideMetric();
+                mi->symbol = metric1->rideMetric()->symbol();
+            }
             if (meta1->isValid())  mi->meta = meta1->metaname();
             mi->bgcolor = bgcolor->getColor().name();
         }
@@ -4145,6 +4149,7 @@ OverviewItemConfig::dataChanged()
             TopNOverviewItem *mi = dynamic_cast<TopNOverviewItem*>(item);
             mi->name = name->text();
             if (metric1->isValid()) {
+                mi->metric = metric1->rideMetric();
                 mi->symbol = metric1->rideMetric()->symbol();
                 mi->units = metric1->rideMetric()->units(GlobalContext::context()->useMetricUnits);
             }
@@ -5449,6 +5454,7 @@ VScrollBar::setAreaHeight(double n)
 void
 VScrollBar::setPos(double x)
 {
+    Q_UNUSED(x);
     // xxx todo
 }
 
