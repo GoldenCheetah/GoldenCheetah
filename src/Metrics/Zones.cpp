@@ -746,6 +746,21 @@ QList <QString> Zones::getZoneNames(int rnum) const
     return return_values;
 }
 
+// return the list of zone names
+QList <QString> Zones::getZoneDescriptions(int rnum) const
+{
+    if (rnum >= ranges.size()) return QList <QString>();
+
+    const ZoneRange &range = ranges[rnum];
+    QList <QString> return_values;
+
+    for (int i = 0; i < range.zones.size(); i++) {
+        return_values.append(ranges[rnum].zones[i].desc);
+    }
+
+    return return_values;
+}
+
 QString Zones::summarize(int rnum, QVector<double> &time_in_zone, QColor color) const
 {
     assert(rnum < ranges.size());

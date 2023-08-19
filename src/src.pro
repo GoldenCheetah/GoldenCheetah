@@ -668,11 +668,13 @@ greaterThan(QT_MAJOR_VERSION, 4) {
 
 YACCSOURCES += Core/DataFilter.y \
                FileIO/JsonRideFile.y \
-               Core/RideDB.y
+               Core/RideDB.y \
+			   Train/filter/WorkoutFilter.y
 
 LEXSOURCES  += Core/DataFilter.l \
                FileIO/JsonRideFile.l \
-               Core/RideDB.l
+               Core/RideDB.l \
+			   Train/filter/WorkoutFilter.l
 
 
 ###=========================================
@@ -766,7 +768,10 @@ HEADERS += Train/AddDeviceWizard.h Train/CalibrationData.h Train/ComputrainerCon
            Train/Library.h Train/LibraryParser.h Train/MeterWidget.h Train/NullController.h Train/RealtimeController.h \
            Train/RealtimeData.h Train/RealtimePlot.h Train/RealtimePlotWindow.h Train/RemoteControl.h Train/SpinScanPlot.h \
            Train/SpinScanPlotWindow.h Train/SpinScanPolarPlot.h Train/GarminServiceHelper.h Train/PhysicsUtility.h Train/BicycleSim.h \
-           Train/PolynomialRegression.h Train/MultiRegressionizer.h
+           Train/PolynomialRegression.h Train/MultiRegressionizer.h \
+           Train/VideoSyncFileBase.h Train/ErgFileBase.h \
+           Train/filter/ModelFilter.h Train/filter/MultiFilterProxyModel.h Train/filter/WorkoutFilter.h \
+		   Train/filter/FilterEditor.h
 
 greaterThan(QT_MAJOR_VERSION, 4) {
     HEADERS += Train/TodaysPlanWorkoutDownload.h
@@ -775,7 +780,9 @@ greaterThan(QT_MAJOR_VERSION, 4) {
 HEADERS += Train/TrainBottom.h Train/TrainDB.h Train/TrainSidebar.h \
            Train/VideoLayoutParser.h Train/VideoSyncFile.h Train/WorkoutPlotWindow.h Train/WebPageWindow.h \
            Train/WorkoutWidget.h Train/WorkoutWidgetItems.h Train/WorkoutWindow.h Train/WorkoutWizard.h Train/ZwoParser.h \
-           Train/LiveMapWebPageWindow.h
+           Train/LiveMapWebPageWindow.h \
+           Train/info/InfoWidget.h Train/info/PowerInfoWidget.h Train/info/PowerZonesWidget.h Train/info/RatingWidget.h \
+		   Train/info/ErgOverview.h Train/info/Shy.h
 
 
 ###=============
@@ -878,7 +885,10 @@ SOURCES += Train/AddDeviceWizard.cpp Train/CalibrationData.cpp Train/Computraine
            Train/Library.cpp Train/LibraryParser.cpp Train/MeterWidget.cpp Train/NullController.cpp Train/RealtimeController.cpp \
            Train/RealtimeData.cpp Train/RealtimePlot.cpp Train/RealtimePlotWindow.cpp Train/RemoteControl.cpp Train/SpinScanPlot.cpp \
            Train/SpinScanPlotWindow.cpp Train/SpinScanPolarPlot.cpp Train/GarminServiceHelper.cpp Train/PhysicsUtility.cpp Train/BicycleSim.cpp \
-           Train/PolynomialRegression.cpp
+           Train/PolynomialRegression.cpp \
+           Train/VideoSyncFileBase.cpp Train/ErgFileBase.cpp \
+           Train/filter/ModelFilter.cpp Train/filter/MultiFilterProxyModel.cpp Train/filter/WorkoutFilter.cpp \
+		   Train/filter/FilterEditor.cpp
 
 greaterThan(QT_MAJOR_VERSION, 4) {
     SOURCES  += Train/TodaysPlanWorkoutDownload.cpp
@@ -887,7 +897,9 @@ greaterThan(QT_MAJOR_VERSION, 4) {
 SOURCES += Train/TrainBottom.cpp Train/TrainDB.cpp Train/TrainSidebar.cpp \
            Train/VideoLayoutParser.cpp Train/VideoSyncFile.cpp Train/WorkoutPlotWindow.cpp Train/WebPageWindow.cpp \
            Train/WorkoutWidget.cpp Train/WorkoutWidgetItems.cpp Train/WorkoutWindow.cpp Train/WorkoutWizard.cpp Train/ZwoParser.cpp \
-           Train/LiveMapWebPageWindow.cpp
+           Train/LiveMapWebPageWindow.cpp \
+           Train/info/InfoWidget.cpp Train/info/PowerInfoWidget.cpp Train/info/PowerZonesWidget.cpp Train/info/RatingWidget.cpp \
+		   Train/info/ErgOverview.cpp Train/info/Shy.cpp
 
 ## Crash Handling
 win32-msvc* {
