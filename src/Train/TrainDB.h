@@ -24,6 +24,8 @@
 #include <QtSql>
 #include <QAbstractTableModel>
 
+#include <TagStore.h>
+
 #include "VideoSyncFileBase.h"
 #include "ErgFileBase.h"
 
@@ -118,7 +120,7 @@ enum class ZoneContentType {
 extern int workoutModelZoneIndex(int zone, ZoneContentType zt);
 
 
-class TrainDB : public QObject
+class TrainDB : public QObject, public TagStore
 {
     Q_OBJECT
 
@@ -159,6 +161,33 @@ class TrainDB : public QObject
 
         bool hasItem(QString filepath, QString table) const;
 
+        // Implementation of TagStore
+        virtual void deferTagSignals(bool deferred);
+        virtual bool isDeferredTagSignals();
+        virtual void catchupTagSignals();
+        virtual int addTag(const QString &label);
+        virtual bool updateTag(int id, const QString &label);
+        virtual bool deleteTag(int id);
+        virtual bool deleteTag(const QString &label);
+        virtual int getTagId(const QString &label) const;
+        virtual QString getTagLabel(int id) const;
+        virtual bool hasTag(int id) const;
+        virtual bool hasTag(const QString &label) const;
+
+        virtual QList<Tag> getTags() const;
+        virtual QList<int> getTagIds() const;
+        virtual QStringList getTagLabels() const;
+        virtual QStringList getTagLabels(const QList<int> ids) const;
+
+        virtual int countTagUsage(int id) const;
+
+        // Helpers for Taggable
+        bool workoutHasTag(const QString &filepath, int id) const;
+        void workoutAddTag(const QString &filepath, int id);
+        void workoutRemoveTag(const QString &filepath, int id);
+        void workoutClearTags(const QString &filepath);
+        QList<int> workoutGetTagIds(const QString &filepath) const;
+
         // for 3.3
         // TODO Upgrade-Functions come last - after everything else is running
         bool upgradeDefaultEntriesWorkout();
@@ -174,11 +203,17 @@ class TrainDB : public QObject
 
     signals:
         void dataChanged();
+        void tagsChanged(int idAdded, int idDeleted, int idUpdated);
+        void deferredTagsChanged(QList<int> idsAdded, QList<int> idsDeleted, QList<int> idsUpdated);
 
     private:
         QDir home;
         QSqlDatabase *db;
         const QString sessionid;
+        bool tagSignalsDeferred = false;
+        QList<int> deferredTagsAdded;
+        QList<int> deferredTagsDeleted;
+        QList<int> deferredTagsUpdated;
 
         // get connection name
         QSqlDatabase connection() const;
@@ -194,6 +229,8 @@ class TrainDB : public QObject
         bool createDefaultEntriesWorkout() const;
         bool createDefaultEntriesVideo() const;
         bool createDefaultEntriesVideoSync() const;
+        bool createDefaultEntriesTagStore() const;
+        bool createDefaultEntriesWorkoutTags() const;
 
         bool createAllDataTables() const;
         bool dropAllDataTables() const;

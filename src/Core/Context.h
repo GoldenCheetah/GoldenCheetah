@@ -58,6 +58,7 @@
 #define CONFIG_WBAL              0x2000     // which w'bal formula to use ?
 #define CONFIG_WORKOUTS          0x4000     // workout location / files
 #define CONFIG_DISCOVERY         0x8000     // interval discovery
+#define CONFIG_WORKOUTTAGMANAGER 0x10000    // workout tags
 
 class RideItem;
 class IntervalItem;

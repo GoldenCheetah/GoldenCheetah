@@ -26,10 +26,13 @@
 #include <QColor>
 #include <QEvent>
 
+#include <TagBar.h>
+
 #include "RatingWidget.h"
 #include "PowerInfoWidget.h"
 #include "PowerZonesWidget.h"
 #include "ErgFileBase.h"
+#include "WorkoutTagWrapper.h"
 
 
 class InfoWidget : public QFrame
@@ -62,7 +65,9 @@ class InfoWidget : public QFrame
         PowerZonesWidget *powerZonesWidget;
         QLabel *descriptionLabel;
         QLabel *lastRunLabel;
+        TagBar *tagBar;
         QString filepath;
+        WorkoutTagWrapper workoutTagWrapper;
 
     private slots:
         void rated(int rating);

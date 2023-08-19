@@ -137,6 +137,7 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
     mediaTree->header()->setMinimumSectionSize(0);
     mediaTree->header()->setFocusPolicy(Qt::NoFocus);
     mediaTree->setFrameStyle(QFrame::NoFrame);
+    mediaTree->setRootIsDecorated(false);
 #ifdef Q_OS_MAC
     mediaTree->header()->setSortIndicatorShown(false); // blue looks nasty
     mediaTree->setAttribute(Qt::WA_MacShowFocusRect, 0);
@@ -173,6 +174,7 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
     videosyncTree->header()->setMinimumSectionSize(0);
     videosyncTree->header()->setFocusPolicy(Qt::NoFocus);
     videosyncTree->setFrameStyle(QFrame::NoFrame);
+    videosyncTree->setRootIsDecorated(false);
 #ifdef Q_OS_MAC
     videosyncTree->header()->setSortIndicatorShown(false); // blue looks nasty
     videosyncTree->setAttribute(Qt::WA_MacShowFocusRect, 0);
@@ -198,6 +200,7 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
     deviceTree->setIndentation(5);
     deviceTree->expandItem(deviceTree->invisibleRootItem());
     deviceTree->setContextMenuPolicy(Qt::CustomContextMenu);
+    deviceTree->setRootIsDecorated(false);
 #ifdef Q_OS_WIN
     QStyle *xde = QStyleFactory::create(OS_STYLE);
     deviceTree->verticalScrollBar()->setStyle(xde);
@@ -230,6 +233,7 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
     workoutTree->header()->setMinimumSectionSize(0);
     workoutTree->header()->setFocusPolicy(Qt::NoFocus);
     workoutTree->setFrameStyle(QFrame::NoFrame);
+    workoutTree->setRootIsDecorated(false);
 #ifdef Q_OS_MAC
     workoutTree->header()->setSortIndicatorShown(false); // blue looks nasty
     workoutTree->setAttribute(Qt::WA_MacShowFocusRect, 0);
@@ -837,6 +841,10 @@ TrainSidebar::workoutTreeWidgetSelectionChanged()
     // wipe away the current selected workout once we've told everyone
     // since they might be editing it and want to save changes first (!!)
     ErgFile *prior = const_cast<ErgFile*>(ergFileQueryAdapter.getErgFile());
+    if (prior != nullptr && prior->filename() == filename) {
+        // Prevent re-loading if the prior element is the same the new one
+        return;
+    }
     workoutfile = filename;
 
     if (filename == "") {
@@ -1211,7 +1219,7 @@ TrainSidebar::workoutFilterChanged
     bool ok = true;
     QString msg;
     QString input(text.trimmed());
-    while (input.back().isSpace() || input.back() == ',') {
+    while (input.length() > 0 && (input.back().isSpace() || input.back() == ',')) {
         input.chop(1);
     }
     if (input.length() > 0) {

@@ -73,6 +73,11 @@ InfoWidget::InfoWidget
     l->addWidget(powerZonesWidget, row, 0, 1, -1);
     ++row;
 
+    tagBar = new TagBar(trainDB, this);
+    connect(trainDB, SIGNAL(tagsChanged(int, int, int)), tagBar, SLOT(tagStoreChanged(int, int, int)));
+    l->addWidget(tagBar, row, 0, 1, -1);
+    ++row;
+
     descriptionLabel = new QLabel();
     descriptionLabel->setWordWrap(true);
     QBoxLayout *descriptionLayout = new QHBoxLayout();
@@ -119,6 +124,14 @@ InfoWidget::setContent
 
     // Common fields
     ratingWidget->setRating(rating);
+
+    workoutTagWrapper.setFilepath(ergFileBase.filename());
+    if (! ergFileBase.filename().isEmpty()) {
+        tagBar->setTaggable(&workoutTagWrapper);
+    } else {
+        tagBar->setTaggable(nullptr);
+    }
+
     if (! ergFileBase.description().isEmpty()) {
         descriptionLabel->setText(ergFileBase.description());
         descriptionLabel->show();
@@ -191,7 +204,7 @@ void
 InfoWidget::ergFileSelected
 (ErgFileBase *ergFileBase)
 {
-    if (ergFileBase != 0) {
+    if (ergFileBase != nullptr) {
         WorkoutUserInfo wui = trainDB->getWorkoutUserInfo(ergFileBase->filename());
         setContent(*ergFileBase, wui.rating, wui.lastRun);
         emit relayErgFileSelected(ergFileBase);

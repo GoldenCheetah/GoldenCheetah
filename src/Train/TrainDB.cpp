@@ -37,6 +37,19 @@
     "schema_version INTEGER NOT NULL," \
     "creation_date INTEGER NOT NULL," \
     "PRIMARY KEY(table_name)"
+
+#define TABLE_TAGSTORE "tagstore"
+#define FIELDS_TAGSTORE \
+    "id INTEGER NOT NULL UNIQUE," \
+    "label TEXT NOT NULL," \
+    "PRIMARY KEY(id)"
+
+#define TABLE_WORKOUT_TAG "workout_tag"
+#define FIELDS_WORKOUT_TAG \
+    "filepath TEXT NOT NULL," \
+    "id INTEGER NOT NULL," \
+    "PRIMARY KEY(filepath, id)"
+
 #define TABLE_WORKOUT "workout"
 // if: Intensity Factor
 // vi: Variability Index
@@ -83,12 +96,14 @@
     "rating INTEGER," \
     "last_run INTEGER," \
     "PRIMARY KEY(filepath)"
+
 #define TABLE_VIDEO "video"
 #define FIELDS_VIDEO \
     "filepath TEXT NOT NULL UNIQUE," \
     "creation_date INTEGER NOT NULL DEFAULT (STRFTIME('%s', 'now'))," \
     "displayname TEXT NOT NULL," \
     "PRIMARY KEY(filepath)"
+
 #define TABLE_VIDEOSYNC "videosync"
 #define FIELDS_VIDEOSYNC \
     "filepath TEXT NOT NULL UNIQUE," \
@@ -96,6 +111,7 @@
     "source TEXT," \
     "displayname TEXT NOT NULL," \
     "PRIMARY KEY(filepath)"
+
 
 static int TrainDBSchemaVersion = 2;
 TrainDB *trainDB;
@@ -181,6 +197,359 @@ TrainDB::rebuildDB
 {
     dropAllDataTables();
     createAllDataTables();
+}
+
+
+///////////////////////// Implementation of TagStore
+
+
+void
+TrainDB::deferTagSignals
+(bool deferred)
+{
+    if (tagSignalsDeferred && ! deferred) {
+        catchupTagSignals();
+    }
+    tagSignalsDeferred = deferred;
+}
+
+
+bool
+TrainDB::isDeferredTagSignals
+()
+{
+    return tagSignalsDeferred;
+}
+
+
+void
+TrainDB::catchupTagSignals
+()
+{
+    if (! tagSignalsDeferred) {
+        return;
+    }
+    if (   deferredTagsAdded.size() > 0
+        || deferredTagsDeleted.size() > 0
+        || deferredTagsUpdated.size() > 0) {
+        emit deferredTagsChanged(deferredTagsAdded, deferredTagsDeleted, deferredTagsUpdated);
+        if (   deferredTagsDeleted.size() > 0
+            || deferredTagsUpdated.size() > 0) {
+            emit dataChanged();
+        }
+        deferredTagsAdded.clear();
+        deferredTagsDeleted.clear();
+        deferredTagsUpdated.clear();
+    }
+}
+
+
+int
+TrainDB::addTag
+(const QString &label)
+{
+    QSqlQuery query(connection());
+    query.prepare("INSERT INTO tagstore (label) values (:label)");
+    query.bindValue(":label", label);
+    if (! query.exec()) {
+        qDebug() << "bool TrainDB::addTag(QString label)" << query.lastError() << "/" << query.lastQuery();
+    }
+    int id = getTagId(label);
+    if (id != TAGSTORE_UNDEFINED_ID) {
+        if (isDeferredTagSignals()) {
+            deferredTagsAdded << id;
+        } else {
+            emit tagsChanged(id, TAGSTORE_UNDEFINED_ID, TAGSTORE_UNDEFINED_ID);
+        }
+    }
+    return id;
+}
+
+
+bool
+TrainDB::updateTag
+(int id, const QString &label)
+{
+    QSqlQuery query(connection());
+    query.prepare("UPDATE tagstore "
+                  "   SET label = :label "
+                  " WHERE id = :id");
+    query.bindValue(":id", id);
+    query.bindValue(":label", label);
+    if (query.exec()) {
+        if (isDeferredTagSignals()) {
+            deferredTagsUpdated << id;
+        } else {
+            emit tagsChanged(TAGSTORE_UNDEFINED_ID, TAGSTORE_UNDEFINED_ID, id);
+            emit dataChanged();
+        }
+        return true;
+    }
+    return false;
+}
+
+
+bool
+TrainDB::deleteTag
+(int id)
+{
+    bool ok = true;
+    QSqlQuery query(connection());
+
+    query.prepare("DELETE FROM workout_tag WHERE id = :id");
+    query.bindValue(":id", id);
+    ok &= query.exec();
+
+    query.prepare("DELETE FROM tagstore WHERE id = :id");
+    query.bindValue(":id", id);
+    ok &= query.exec();
+
+    if (ok) {
+        if (isDeferredTagSignals()) {
+            deferredTagsDeleted << id;
+        } else {
+            emit tagsChanged(TAGSTORE_UNDEFINED_ID, id, TAGSTORE_UNDEFINED_ID);
+            emit dataChanged();
+        }
+    }
+
+    return ok;
+}
+
+
+bool
+TrainDB::deleteTag
+(const QString &label)
+{
+    bool ok = true;
+    QSqlQuery query(connection());
+
+    query.prepare("DELETE "
+                  "  FROM workout_tag "
+                  " WHERE id IN (SELECT id "
+                  "                FROM tagstore "
+                  "               WHERE label = :label)");
+    query.bindValue(":label", label);
+    ok &= query.exec();
+
+    query.prepare("DELETE FROM tagstore WHERE label = :label");
+    query.bindValue(":label", label);
+    ok &= query.exec();
+
+    return ok;
+}
+
+
+int
+TrainDB::getTagId
+(const QString &label) const
+{
+    QSqlQuery query(connection());
+    query.prepare("SELECT id FROM tagstore WHERE label = :label");
+    query.bindValue(":label", label);
+    if (query.exec() && query.next()) {
+        return query.value(0).toInt();
+    }
+    return TAGSTORE_UNDEFINED_ID;
+}
+
+
+QString
+TrainDB::getTagLabel
+(int id) const
+{
+    QSqlQuery query(connection());
+    query.prepare("SELECT label FROM tagstore WHERE id = :id");
+    query.bindValue(":id", id);
+    if (query.exec() && query.next()) {
+        return query.value(0).toString();
+    }
+    return "";
+}
+
+
+int
+TrainDB::countTagUsage
+(int id) const
+{
+    QSqlQuery query(connection());
+    query.prepare("SELECT count(*) FROM workout_tag WHERE id = :id");
+    query.bindValue(":id", id);
+    if (query.exec() && query.next()) {
+        return query.value(0).toInt();
+    }
+    return 0;
+}
+
+
+bool
+TrainDB::hasTag
+(int id) const
+{
+    QSqlQuery query(connection());
+    query.prepare("SELECT label FROM tagstore WHERE id = :id");
+    query.bindValue(":id", id);
+    return query.exec() && query.next();
+}
+
+
+bool
+TrainDB::hasTag
+(const QString &label) const
+{
+    QSqlQuery query(connection());
+    query.prepare("SELECT id FROM tagstore WHERE label = :label");
+    query.bindValue(":label", label);
+    return query.exec() && query.next();
+}
+
+
+QList<TagStore::Tag>
+TrainDB::getTags
+() const
+{
+    QList<TagStore::Tag> ret;
+    QSqlQuery query(connection());
+    query.prepare("SELECT id, label FROM tagstore");
+    if (query.exec()) {
+        while (query.next()) {
+            ret << TagStore::Tag(query.value(0).toInt(), query.value(1).toString());
+        }
+    }
+    return ret;
+}
+
+
+QList<int>
+TrainDB::getTagIds
+() const
+{
+    QList<int> ret;
+    QSqlQuery query(connection());
+    query.prepare("SELECT id FROM tagstore");
+    if (query.exec()) {
+        while (query.next()) {
+            ret << query.value(0).toInt();
+        }
+    }
+    return ret;
+}
+
+
+QStringList
+TrainDB::getTagLabels
+() const
+{
+    QStringList ret;
+    QSqlQuery query(connection());
+    query.prepare("SELECT label FROM tagstore");
+    if (query.exec()) {
+        while (query.next()) {
+            ret << query.value(0).toString();
+        }
+    }
+    return ret;
+}
+
+
+QStringList
+TrainDB::getTagLabels
+(const QList<int> ids) const
+{
+    QStringList ret;
+    for (const auto &i : getTagIds()) {
+        if (ids.contains(i)) {
+            ret << getTagLabel(i);
+        }
+    }
+    return ret;
+}
+
+
+///////////////////////// Helpers for Taggable / Workout
+
+bool
+TrainDB::workoutHasTag
+(const QString &filepath, int id) const
+{
+    QSqlQuery query(connection());
+    query.prepare("SELECT COUNT(*) FROM workout_tag WHERE filepath = :filepath AND id = :id");
+    query.bindValue(":filepath", filepath);
+    query.bindValue(":id", id);
+
+    if (query.exec() && query.next()) {
+        return query.value(0).toInt() > 0;
+    }
+    return false;
+}
+
+
+void
+TrainDB::workoutAddTag
+(const QString &filepath, int id)
+{
+    QSqlQuery query(connection());
+    query.prepare("INSERT OR REPLACE INTO workout_tag (filepath, id) values (:filepath, :id)");
+    query.bindValue(":filepath", filepath);
+    query.bindValue(":id", id);
+    if (query.exec()) {
+        emit dataChanged();
+    } else {
+        qDebug() << "bool TrainDB::workoutAddTag(const QString &filepath, int id) const" << query.lastError() << "/" << query.lastQuery();
+    }
+}
+
+
+void
+TrainDB::workoutRemoveTag
+(const QString &filepath, int id)
+{
+    QSqlQuery query(connection());
+    query.prepare("DELETE FROM workout_tag WHERE filepath = :filepath AND id = :id");
+    query.bindValue(":filepath", filepath);
+    query.bindValue(":id", id);
+    if (query.exec()) {
+        emit dataChanged();
+    } else {
+        qDebug() << "bool TrainDB::workoutRemoveTag(const QString &filepath, int id) const" << query.lastError() << "/" << query.lastQuery();
+    }
+}
+
+
+void
+TrainDB::workoutClearTags
+(const QString &filepath)
+{
+    QSqlQuery query(connection());
+    query.prepare("DELETE FROM workout_tag WHERE filepath = :filepath");
+    query.bindValue(":filepath", filepath);
+    if (query.exec()) {
+        emit dataChanged();
+    } else {
+        qDebug() << "bool TrainDB::workoutClearTags(const QString &filepath) const" << query.lastError() << "/" << query.lastQuery();
+    }
+}
+
+
+QList<int>
+TrainDB::workoutGetTagIds
+(const QString &filepath) const
+{
+    QList<int> ret;
+    QSqlQuery query(connection());
+    query.prepare("  SELECT wt.id "
+                  "    FROM workout_tag wt "
+                  "         INNER JOIN tagstore ts "
+                  "                 ON ts.id = wt.id "
+                  "   WHERE wt.filepath = :filepath "
+                  "ORDER BY ts.label COLLATE NOCASE");
+    query.bindValue(":filepath", filepath);
+    if (query.exec()) {
+        while (query.next()) {
+            ret << query.value(0).toInt();
+        }
+    }
+    return ret;
 }
 
 
@@ -308,7 +677,9 @@ TrainDB::checkDBVersion
     QSet<QString> dataTables;
     dataTables << TABLE_WORKOUT
                << TABLE_VIDEO
-               << TABLE_VIDEOSYNC;
+               << TABLE_VIDEOSYNC
+               << TABLE_TAGSTORE
+               << TABLE_WORKOUT_TAG;
 
     // can we get a version number?
     QSqlQuery query("SELECT table_name, schema_version, creation_date FROM version", connection());
@@ -347,7 +718,7 @@ bool
 TrainDB::needsUpgrade
 () const
 {
-    QSqlQuery query("SELECT MIN(schema_version) from version", connection());
+    QSqlQuery query("SELECT MIN(schema_version) FROM version", connection());
     if (query.exec() && query.next()) {
         return query.value(0).toInt() != 2;
     }
@@ -360,7 +731,7 @@ TrainDB::getCount
 () const
 {
     // how many workouts are there?
-    QSqlQuery query("SELECT count(*) FROM workout", connection());
+    QSqlQuery query("SELECT COUNT(*) FROM workout", connection());
 
     if (query.exec() && query.next()) {
         return query.value(0).toInt();
@@ -391,27 +762,31 @@ TrainDB::getWorkoutModel
 () const
 {
     QSqlQuery query(connection());
-
-    query.prepare("SELECT w.displayname, w.type || '_' || upper(w.displayname) as _sortdummy, "
-                  "       w.displayname || ' ' || IFNULL(w.description, '') || ' ' || w.type || ' ' || IFNULL(w.erg_subtype, '') || ' ' || IFNULL(w.source, '') as _fulltext, "
+    query.prepare("SELECT w.displayname, w.type || '_' || UPPER(w.displayname) AS _sortdummy, "
+                  "       w.displayname || ' ' || IFNULL(w.description, '') || ' ' || w.type || ' ' || IFNULL(w.erg_subtype, '') || ' ' || IFNULL(w.source, '') || ' ' || IFNULL(t.tag_labels, '') AS _fulltext, "
                   "       w.description, w.filepath, w.type, w.creation_date, "
                   "       w.erg_duration, "
                   "       w.erg_bikestress, w.erg_if, w.erg_iso_power, w.erg_vi, w.erg_xp, w.erg_ri, w.erg_bs, w.erg_svi, "
                   "       w.erg_min_power, w.erg_max_power, w.erg_avg_power, "
                   "       w.erg_dominant_zone, w.erg_num_zones, "
-                  "       w.erg_duration_z1, w.erg_duration_z1 * w.erg_duration / 100000 as _erg_duration_z1_secs, "
-                  "       w.erg_duration_z2, w.erg_duration_z2 * w.erg_duration / 100000 as _erg_duration_z2_secs, "
-                  "       w.erg_duration_z3, w.erg_duration_z3 * w.erg_duration / 100000 as _erg_duration_z3_secs, "
-                  "       w.erg_duration_z4, w.erg_duration_z4 * w.erg_duration / 100000 as _erg_duration_z4_secs, "
-                  "       w.erg_duration_z5, w.erg_duration_z5 * w.erg_duration / 100000 as _erg_duration_z5_secs, "
-                  "       w.erg_duration_z6, w.erg_duration_z6 * w.erg_duration / 100000 as _erg_duration_z6_secs, "
-                  "       w.erg_duration_z7, w.erg_duration_z7 * w.erg_duration / 100000 as _erg_duration_z7_secs, "
-                  "       w.erg_duration_z8, w.erg_duration_z8 * w.erg_duration / 100000 as _erg_duration_z8_secs, "
-                  "       w.erg_duration_z9, w.erg_duration_z9 * w.erg_duration / 100000 as _erg_duration_z9_secs, "
-                  "       w.erg_duration_z10, w.erg_duration_z10 * w.erg_duration / 100000 as _erg_duration_z10_secs, "
+                  "       w.erg_duration_z1, w.erg_duration_z1 * w.erg_duration / 100000 AS _erg_duration_z1_secs, "
+                  "       w.erg_duration_z2, w.erg_duration_z2 * w.erg_duration / 100000 AS _erg_duration_z2_secs, "
+                  "       w.erg_duration_z3, w.erg_duration_z3 * w.erg_duration / 100000 AS _erg_duration_z3_secs, "
+                  "       w.erg_duration_z4, w.erg_duration_z4 * w.erg_duration / 100000 AS _erg_duration_z4_secs, "
+                  "       w.erg_duration_z5, w.erg_duration_z5 * w.erg_duration / 100000 AS _erg_duration_z5_secs, "
+                  "       w.erg_duration_z6, w.erg_duration_z6 * w.erg_duration / 100000 AS _erg_duration_z6_secs, "
+                  "       w.erg_duration_z7, w.erg_duration_z7 * w.erg_duration / 100000 AS _erg_duration_z7_secs, "
+                  "       w.erg_duration_z8, w.erg_duration_z8 * w.erg_duration / 100000 AS _erg_duration_z8_secs, "
+                  "       w.erg_duration_z9, w.erg_duration_z9 * w.erg_duration / 100000 AS _erg_duration_z9_secs, "
+                  "       w.erg_duration_z10, w.erg_duration_z10 * w.erg_duration / 100000 AS _erg_duration_z10_secs, "
                   "       w.slp_distance, w.slp_elevation, w.slp_avg_grade, "
-                  "       IFNULL(w.rating, 0) as _rating, w.last_run "
-                  "  FROM workout w ");
+                  "       IFNULL(w.rating, 0) AS _rating, w.last_run, t.tag_labels "
+                  "  FROM workout w "
+                  "       LEFT JOIN (SELECT workout_tag.filepath, GROUP_CONCAT(tagstore.label, ' ') AS tag_labels "
+                  "                    FROM workout_tag, tagstore "
+                  "                   WHERE workout_tag.id = tagstore.id "
+                  "                   GROUP BY workout_tag.filepath) t "
+                  "              ON w.filepath = t.filepath");
 
     query.exec();
     QSqlQueryModel *model = new QSqlQueryModel();
@@ -419,7 +794,11 @@ TrainDB::getWorkoutModel
     while (model->canFetchMore(QModelIndex())) {
         model->fetchMore(QModelIndex());
     }
-    qDebug() << "TrainDB::getWorkoutModel: " << model->rowCount() << "x" << model->columnCount() << "/" << query.lastError();
+    if (model->rowCount() > 0) {
+        qDebug() << "TrainDB::getWorkoutModel:" << model->rowCount() << "x" << model->columnCount();
+    } else {
+        qDebug() << "TrainDB::getWorkoutModel: ERROR" <<  query.lastError();
+    }
     return model;
 }
 
@@ -488,11 +867,18 @@ bool
 TrainDB::deleteWorkout
 (QString filepath) const
 {
+    bool ok = true;
     QSqlQuery query(connection());
+
+    query.prepare("DELETE FROM workout_tag WHERE filepath = :filepath");
+    query.bindValue(":filepath", filepath);
+    ok &= query.exec();
 
     query.prepare("DELETE FROM workout WHERE filepath = :filepath");
     query.bindValue(":filepath", filepath);
-    return query.exec();
+    ok &= query.exec();
+
+    return ok;
 }
 
 
@@ -819,6 +1205,22 @@ TrainDB::createDefaultEntriesVideoSync
 
 
 bool
+TrainDB::createDefaultEntriesTagStore
+() const
+{
+    return true;
+}
+
+
+bool
+TrainDB::createDefaultEntriesWorkoutTags
+() const
+{
+    return true;
+}
+
+
+bool
 TrainDB::createAllDataTables
 () const
 {
@@ -836,6 +1238,14 @@ TrainDB::createAllDataTables
     if (ret > 0) {
         ok &= createDefaultEntriesVideoSync();
     }
+    ok &= (ret = createTable(TABLE_TAGSTORE, FIELDS_TAGSTORE)) != -1;
+    if (ret > 0) {
+        ok &= createDefaultEntriesTagStore();
+    }
+    ok &= (ret = createTable(TABLE_WORKOUT_TAG, FIELDS_WORKOUT_TAG)) != -1;
+    if (ret > 0) {
+        ok &= createDefaultEntriesWorkoutTags();
+    }
     return ok;
 }
 
@@ -847,6 +1257,8 @@ TrainDB::dropAllDataTables
     bool ok = dropTable(TABLE_WORKOUT);
     ok &= dropTable(TABLE_VIDEO);
     ok &= dropTable(TABLE_VIDEOSYNC);
+    ok &= dropTable(TABLE_TAGSTORE);
+    ok &= dropTable(TABLE_WORKOUT_TAG);
     return ok;
 }
 
@@ -858,7 +1270,7 @@ TrainDB::dropTable
     bool ok = true;
     if (hasVersionEntry) {
         QSqlQuery queryDelete(connection());
-        queryDelete.prepare("DELETE FROM version where table_name = :tablename");
+        queryDelete.prepare("DELETE FROM version WHERE table_name = :tablename");
         queryDelete.bindValue(":tablename", tableName);
         ok = queryDelete.exec();
     }
@@ -913,7 +1325,7 @@ TrainDB::updateTableVersion
 (QString tableName) const
 {
     QSqlQuery query(connection());
-    query.prepare("INSERT OR REPLACE INTO version (table_name, schema_version, creation_date) values (:tablename, :schemaversion, :creationdate)");
+    query.prepare("INSERT OR REPLACE INTO version (table_name, schema_version, creation_date) VALUES (:tablename, :schemaversion, :creationdate)");
     query.bindValue(":tablename", tableName);
     query.bindValue(":schemaversion", TrainDBSchemaVersion);
     query.bindValue(":creationdate", QDateTime::currentDateTime().toSecsSinceEpoch());
@@ -930,7 +1342,7 @@ TrainDB::getTableVersion
 (QString tableName) const
 {
     QSqlQuery masterQuery(connection());
-    masterQuery.prepare("SELECT name FROM sqlite_master WHERE type='table' and name = :tablename");
+    masterQuery.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name = :tablename");
     masterQuery.bindValue(":tablename", tableName);
     if (masterQuery.exec()) {
         if (! masterQuery.next()) {
