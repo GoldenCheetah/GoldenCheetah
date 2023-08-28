@@ -92,10 +92,15 @@ class MapWebBridge : public QObject
         Q_INVOKABLE void clickPath(double lat, double lng);
         Q_INVOKABLE void mouseup();
 
+        // Comparemode
+        Q_INVOKABLE QVariantList setCompareIntervals();
+
         void intervalsChanged() { emit drawIntervals(); }
+        void compareIntervalsChanged() { emit drawCompareIntervals(); }
 
     signals:
         void drawIntervals();
+        void drawCompareIntervals();
 };
 
 class RideMapWindow : public GcChartWindow
@@ -180,6 +185,9 @@ class RideMapWindow : public GcChartWindow
         void drawTempInterval(IntervalItem *current);
         void clearTempInterval();
 
+        void compareIntervalsStateChanged(bool state);
+        void compareIntervalsChanged();
+
     private:
 
         bool first;
@@ -211,6 +219,10 @@ class RideMapWindow : public GcChartWindow
 
         QColor GetColor(int watts);
         void createHtml();
+
+        bool getCompareBoundingBox(double &minLat, double &maxLat, double &minLon, double &maxLon) const;
+
+        int countCompareIntervals = 0;
 
     private slots:
         void loadRide();
