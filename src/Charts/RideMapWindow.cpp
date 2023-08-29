@@ -443,8 +443,10 @@ void RideMapWindow::createHtml()
     // No GPS data, so sorry no map
     QColor bgColor = GColor(CPLOTBACKGROUND);
     QColor fgColor = GCColor::invertColor(bgColor);
-    if(   (context->isCompareIntervals && ! hasComparePositions)
-       || !ride || !ride->ride() || ride->ride()->areDataPresent()->lat == false || ride->ride()->areDataPresent()->lon == false) {
+    if (   (   context->isCompareIntervals
+            && ! hasComparePositions)
+        || (   ! context->isCompareIntervals
+            && (!ride || !ride->ride() || ride->ride()->areDataPresent()->lat == false || ride->ride()->areDataPresent()->lon == false))) {
         currentPage = QString("<STYLE>BODY { background-color: %1; color: %2 }</STYLE><center>%3</center>").arg(bgColor.name()).arg(fgColor.name()).arg(tr("No GPS Data Present"));
         setIsBlank(true);
         return;
@@ -479,9 +481,9 @@ void RideMapWindow::createHtml()
 
     // load the js API
     if (mapCombo->currentIndex() == OSM) {
-        // Load leaflet (1.3.4) API
-        currentPage += QString("<link rel=\"stylesheet\" href=\"https://unpkg.com/leaflet@1.3.4/dist/leaflet.css\" integrity=\"sha512-puBpdR0798OZvTTbP4A8Ix/l+A4dHDD0DGqYW6RQ+9jxkRFclaxxQb/SJAWZfWAkuyeQUytO7+7N4QKrDh+drA==\" crossorigin=\"\"/> \n");
-        currentPage += QString("<script type=\"text/javascript\" src=\"https://unpkg.com/leaflet@1.3.4/dist/leaflet.js\" integrity=\"sha512-nMMmRyTVoLYqjP9hrbed9S+FzjZHW5gY1TWCHA5ckwXZBadntCNs8kEqAWdrb9O7rxbCaA4lKTIWjDXZxflOcA==\" crossorigin=\"\"></script> \n");
+        // Load leaflet (1.9.4) API
+        currentPage += QString("<link rel=\"stylesheet\" href=\"https://unpkg.com/leaflet@1.9.4/dist/leaflet.css\" integrity=\"sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=\" crossorigin=\"\" /> \n"
+                               "<script src=\"https://unpkg.com/leaflet@1.9.4/dist/leaflet.js\" integrity=\"sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=\" crossorigin=\"\"></script>\n");
     } else if (mapCombo->currentIndex() == GOOGLE) {
         // Load Google Map v3 API
         currentPage += QString("<script type=\"text/javascript\" src=\"http://maps.googleapis.com/maps/api/js?key=%1\"></script> \n").arg(gkey->text());
@@ -1698,6 +1700,13 @@ RideMapWindow::event(QEvent *event)
         if (firstShow) {
             firstShow = false;
             helperWidget()->move(mainWidget()->geometry().width()-(275*dpiXFactor), 50*dpiYFactor);
+            if (mapCombo->currentIndex() == OSM) {
+                // Leaflet on OSM does not set the bounds correctly when its widget / canvas was never visible
+                // Leaflets map.whenReady() does not help resolving this
+                // Therefore forcing a replot (Google Maps does not have this issue)
+                // This helps to display the correct zoomlevel after perspective change
+                forceReplot();
+            }
         }
 
         // if off the screen move on screen
