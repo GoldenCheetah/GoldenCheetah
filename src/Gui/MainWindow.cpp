@@ -2138,6 +2138,8 @@ MainWindow::setOpenTabMenu()
 
         QString name = i.next();
         SKIP_QTWE_CACHE  // skip Folder Names created by QTWebEngine on Windows
+        if (name.startsWith(".")) continue; // ignore dot folders
+
         // new action
         QAction *action = new QAction(QString("%1").arg(name), this);
 
@@ -2180,6 +2182,8 @@ MainWindow::setBackupAthleteMenu()
 
         QString name = i.next();
         SKIP_QTWE_CACHE  // skip Folder Names created by QTWebEngine on Windows
+        if (name.startsWith(".")) continue; // ignore dot folders
+
         // new action
         QAction *action = new QAction(QString("%1").arg(name), this);
 
@@ -2217,6 +2221,8 @@ MainWindow::setDeleteAthleteMenu()
 
         QString name = i.next();
         SKIP_QTWE_CACHE  // skip Folder Names created by QTWebEngine on Windows
+        if (name.startsWith(".")) continue; // ignore dot folders
+
         // new action
         QAction *action = new QAction(QString("%1").arg(name), this);
 
