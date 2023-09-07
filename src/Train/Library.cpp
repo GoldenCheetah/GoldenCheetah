@@ -181,7 +181,7 @@ Library::importFiles(Context *context, QStringList files, bool forcedialog)
             } else if (targetSync != QFileInfo(source).absoluteFilePath() && !source.copy(targetSync)) {
 
                 QMessageBox::warning(NULL, tr("Copy VideoSync Failed"),
-                    QString(tr("%1 cannot be written to videoSync library %2, check permissions and free space")).arg(QFileInfo(targetSync).fileName()).arg(videosyncDir));
+                    QString(tr("%1 cannot be written to videoSync library %2. Check library path, permissions and free space")).arg(QFileInfo(targetSync).fileName()).arg(videosyncDir));
             }
 
             // still add it, it may not have been scanned
@@ -219,7 +219,7 @@ Library::importFiles(Context *context, QStringList files, bool forcedialog)
                 } else if (targetWorkout != QFileInfo(source).absoluteFilePath() && !source.copy(targetWorkout)) {
 
                     QMessageBox::warning(NULL, tr("Copy Workout Failed"),
-                        QString(tr("%1 cannot be written to workout library %2, check permissions and free space")).arg(QFileInfo(targetWorkout).fileName()).arg(workoutDir));
+                        QString(tr("%1 cannot be written to workout library %2. Check library path, permissions and free space")).arg(QFileInfo(targetWorkout).fileName()).arg(workoutDir));
                 }
             }
 
