@@ -62,15 +62,15 @@ class MapWebBridge : public QObject
         Context *context;
         RideMapWindow *mw;
 
-        RideFilePoint* point;
+        RideFilePoint const * point;
         bool m_startDrag = false;
         bool m_drag = false;
         int selection = 1;
 
-        QList<RideFilePoint*> searchPoint(double lat, double lng);
+        RideFilePoint const *searchPoint(double lat, double lng) const;
 
     public:
-        MapWebBridge(Context *context, RideMapWindow *mw) : context(context), mw(mw), selection(0) {}
+        MapWebBridge(Context *context, RideMapWindow *mw) : context(context), mw(mw), point(nullptr), selection(0) {}
 
     public slots:
         Q_INVOKABLE void call(int count);
