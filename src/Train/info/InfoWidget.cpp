@@ -120,24 +120,6 @@ void
 InfoWidget::setContent
 (const ErgFileBase &ergFileBase, int rating, qlonglong lastRun)
 {
-    filepath = ergFileBase.filename();
-
-    // Common fields
-    ratingWidget->setRating(rating);
-
-    workoutTagWrapper.setFilepath(ergFileBase.filename());
-    if (! ergFileBase.filename().isEmpty()) {
-        tagBar->setTaggable(&workoutTagWrapper);
-    } else {
-        tagBar->setTaggable(nullptr);
-    }
-
-    if (! ergFileBase.description().isEmpty()) {
-        descriptionLabel->setText(ergFileBase.description());
-        descriptionLabel->show();
-    } else {
-        descriptionLabel->hide();
-    }
     if (lastRun > 0) {
         QDateTime timestamp;
         timestamp.setTime_t(lastRun);
@@ -162,6 +144,29 @@ InfoWidget::setContent
                                      .arg(ago, timestamp.toString(QLocale::system().dateTimeFormat(QLocale::ShortFormat))));
     } else {
         lastRunLabel->setText(QString("Last Run: <b>Never</b>"));
+    }
+    ratingWidget->setRating(rating);
+
+    if (filepath == ergFileBase.filename()) {
+        // Stop if the workout is only reselected
+        return;
+    }
+
+    filepath = ergFileBase.filename();
+
+    // Common fields
+    workoutTagWrapper.setFilepath(ergFileBase.filename());
+    if (! ergFileBase.filename().isEmpty()) {
+        tagBar->setTaggable(&workoutTagWrapper);
+    } else {
+        tagBar->setTaggable(nullptr);
+    }
+
+    if (! ergFileBase.description().isEmpty()) {
+        descriptionLabel->setText(ergFileBase.description());
+        descriptionLabel->show();
+    } else {
+        descriptionLabel->hide();
     }
 
     // Hide all individual fields
