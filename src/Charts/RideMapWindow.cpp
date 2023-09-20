@@ -168,6 +168,9 @@ RideMapWindow::RideMapWindow(Context *context, int mapType) : GcChartWindow(cont
     connect(context, SIGNAL(intervalSelected()), webBridge, SLOT(intervalsChanged()));
     connect(context, SIGNAL(intervalZoom(IntervalItem*)), this, SLOT(zoomInterval(IntervalItem*)));
     connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
+    connect(context, SIGNAL(compareIntervalsStateChanged(bool)), this, SLOT(compareIntervalsStateChanged(bool)));
+    connect(context, SIGNAL(compareIntervalsChanged()), this, SLOT(compareIntervalsChanged()));
+    connect(context, SIGNAL(compareIntervalsChanged()), webBridge, SLOT(compareIntervalsChanged()));
 
     // just the hr and power as a plot
     smallPlot = new SmallPlot(this);
@@ -263,12 +266,18 @@ void
 RideMapWindow::showMarkersChanged(int value)
 {
     Q_UNUSED(value);
+    if (context->isCompareIntervals) {
+        return;
+    }
     forceReplot();
 }
 
 void
 RideMapWindow::showIntervalsChanged(int value)
 {
+    if (context->isCompareIntervals) {
+        return;
+    }
     // show or hide the helper
     overlayWidget->setVisible(value);
 }
@@ -276,6 +285,9 @@ RideMapWindow::showIntervalsChanged(int value)
 void
 RideMapWindow::showFullPlotChanged(int value)
 {
+    if (context->isCompareIntervals) {
+        return;
+    }
     smallPlot->setVisible(value != 0);
 }
 
@@ -283,6 +295,9 @@ void
 RideMapWindow::hideShadedZonesChanged(int value)
 {
     Q_UNUSED(value);
+    if (context->isCompareIntervals) {
+        return;
+    }
     forceReplot();
 }
 
@@ -290,6 +305,9 @@ void
 RideMapWindow::hideYellowLineChanged(int value)
 {
     Q_UNUSED(value);
+    if (context->isCompareIntervals) {
+        return;
+    }
     forceReplot();
 }
 
@@ -297,6 +315,9 @@ void
 RideMapWindow::hideRouteLineOpacityChanged(int value)
 {
     Q_UNUSED(value);
+    if (context->isCompareIntervals) {
+        return;
+    }
     forceReplot();
 }
 
@@ -338,13 +359,22 @@ RideMapWindow::configChanged(qint32 value)
 void
 RideMapWindow::forceReplot()
 {
-    stale=true;
-    rideSelected();
+    if (context->isCompareIntervals) {
+        createHtml();
+        view->page()->setHtml(currentPage);
+    } else {
+        stale=true;
+        rideSelected();
+    }
 }
 
 void
 RideMapWindow::rideSelected()
 {
+    if (context->isCompareIntervals) {
+        return;
+    }
+
     RideItem * ride = myRideItem;
 
     // set/unset blank then decide what to do next
@@ -399,29 +429,41 @@ void RideMapWindow::createHtml()
 {
     RideItem * ride = myRideItem;
     currentPage = "";
-    double minLat, minLon, maxLat, maxLon;
-    minLat = minLon = 1000;
-    maxLat = maxLon = -1000; // larger than 360
 
-    // get bounding co-ordinates for ride
-    foreach(RideFilePoint *rfp, myRideItem->ride()->dataPoints()) {
-        if (rfp->lat || rfp->lon) {
-            minLat = std::min(minLat,rfp->lat);
-            maxLat = std::max(maxLat,rfp->lat);
-            minLon = std::min(minLon,rfp->lon);
-            maxLon = std::max(maxLon,rfp->lon);
-        }
+    double minLat = 1000;
+    double minLon = 1000;
+    double maxLat = -1000;
+    double maxLon = -1000;
+    bool hasComparePositions = false;
+
+    if (context->isCompareIntervals) {
+        hasComparePositions = getCompareBoundingBox(minLat, maxLat, minLon, maxLon);
     }
 
     // No GPS data, so sorry no map
     QColor bgColor = GColor(CPLOTBACKGROUND);
     QColor fgColor = GCColor::invertColor(bgColor);
-    if(!ride || !ride->ride() || ride->ride()->areDataPresent()->lat == false || ride->ride()->areDataPresent()->lon == false) {
+    if (   (   context->isCompareIntervals
+            && ! hasComparePositions)
+        || (   ! context->isCompareIntervals
+            && (!ride || !ride->ride() || ride->ride()->areDataPresent()->lat == false || ride->ride()->areDataPresent()->lon == false))) {
         currentPage = QString("<STYLE>BODY { background-color: %1; color: %2 }</STYLE><center>%3</center>").arg(bgColor.name()).arg(fgColor.name()).arg(tr("No GPS Data Present"));
         setIsBlank(true);
         return;
     } else {
         setIsBlank(false);
+    }
+
+    // get bounding co-ordinates for ride
+    if (! context->isCompareIntervals) {
+        foreach(RideFilePoint *rfp, myRideItem->ride()->dataPoints()) {
+            if (rfp->lat || rfp->lon) {
+                minLat = std::min(minLat,rfp->lat);
+                maxLat = std::max(maxLat,rfp->lat);
+                minLon = std::min(minLon,rfp->lon);
+                maxLon = std::max(maxLon,rfp->lon);
+            }
+        }
     }
 
     // html page
@@ -439,9 +481,9 @@ void RideMapWindow::createHtml()
 
     // load the js API
     if (mapCombo->currentIndex() == OSM) {
-        // Load leaflet (1.3.4) API
-        currentPage += QString("<link rel=\"stylesheet\" href=\"https://unpkg.com/leaflet@1.3.4/dist/leaflet.css\" integrity=\"sha512-puBpdR0798OZvTTbP4A8Ix/l+A4dHDD0DGqYW6RQ+9jxkRFclaxxQb/SJAWZfWAkuyeQUytO7+7N4QKrDh+drA==\" crossorigin=\"\"/> \n");
-        currentPage += QString("<script type=\"text/javascript\" src=\"https://unpkg.com/leaflet@1.3.4/dist/leaflet.js\" integrity=\"sha512-nMMmRyTVoLYqjP9hrbed9S+FzjZHW5gY1TWCHA5ckwXZBadntCNs8kEqAWdrb9O7rxbCaA4lKTIWjDXZxflOcA==\" crossorigin=\"\"></script> \n");
+        // Load leaflet (1.9.4) API
+        currentPage += QString("<link rel=\"stylesheet\" href=\"https://unpkg.com/leaflet@1.9.4/dist/leaflet.css\" integrity=\"sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=\" crossorigin=\"\" /> \n"
+                               "<script src=\"https://unpkg.com/leaflet@1.9.4/dist/leaflet.js\" integrity=\"sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=\" crossorigin=\"\"></script>\n");
     } else if (mapCombo->currentIndex() == GOOGLE) {
         // Load Google Map v3 API
         currentPage += QString("<script type=\"text/javascript\" src=\"http://maps.googleapis.com/maps/api/js?key=%1\"></script> \n").arg(gkey->text());
@@ -470,140 +512,246 @@ void RideMapWindow::createHtml()
 
     // local functions
     currentPage += QString("<script type=\"text/javascript\">\n"
-    "var map;\n"  // the map object
-    "var intervalList;\n"  // array of intervals
-    "var markerList;\n"  // array of markers
-    "var polyList;\n"  // array of polylines
-    "var tmpIntervalHighlighter;\n"  // temp interval
-
-    // Draw the entire route, we use a local webbridge
-    // to supply the data to a) reduce bandwidth and
-    // b) allow local manipulation. This makes the UI
-    // considerably more 'snappy'
-    "function drawRoute() {\n"
-    // load the GPS co-ordinates
-    "   webBridge.getLatLons(0, drawRouteForLatLons);\n"
-    "}\n"
-    "\n");
-
-    if (mapCombo->currentIndex() == OSM) {
-
-        currentPage += QString("function drawRouteForLatLons(latlons) {\n"
-
-
-            // route will be drawn with these options
-            "    var routeOptionsYellow = {\n"
-            "        stroke : true,\n"
-            "        color: '#FFFF00',\n"
-            "        opacity: %1,\n"
-            "        weight: 10,\n"
-            "        zIndex: -2\n"
-            "    };\n"
-
-            // lastly, populate the route path
-            "    var path = [];\n"
-            "    var j=0;\n"
-            "    while (j < latlons.length) { \n"
-            "        path.push(new L.LatLng(latlons[j], latlons[j+1]));\n"
-            "        j += 2;\n"
-            "    };\n"
-
-            "    var routeYellow = new L.Polyline(path, routeOptionsYellow).addTo(map);\n"
-
-            // Listen mouse events
-            "routeYellow.on('mousedown', function(event) { map.dragging.disable();L.DomEvent.stopPropagation(event);webBridge.clickPath(event.latlng.lat, event.latlng.lng); });\n" // map.setOptions({draggable: false, zoomControl: false, scrollwheel: false, disableDoubleClickZoom: true});
-            "routeYellow.on('mouseup',   function(event) { map.dragging.enable();L.DomEvent.stopPropagation(event);webBridge.mouseup(); });\n" // setOptions ?
-            "routeYellow.on('mouseover', function(event) { webBridge.hoverPath(event.latlng.lat, event.latlng.lng); });\n"
-            "routeYellow.on('mousemove', function(event) { webBridge.hoverPath(event.latlng.lat, event.latlng.lng); });\n"
-
-            "}\n").arg(hideYellowLine() ? 0.0 : 0.4f);
-    }
-    else if (mapCombo->currentIndex() == GOOGLE) {
-
-       currentPage += QString("function drawRouteForLatLons(latlons) {\n"
-
-           // route will be drawn with these options
-           "    var routeOptionsYellow = {\n"
-           "        strokeColor: '#FFFF00',\n"
-           "        strokeOpacity: %1,\n"
-           "        strokeWeight: 10,\n"
-           "        zIndex: -2\n"
-           "    };\n"
-
-           // create the route Polyline
-           "    var routeYellow = new google.maps.Polyline(routeOptionsYellow);\n"
-           "    routeYellow.setMap(map);\n"
-
-           // lastly, populate the route path
-           "    var path = routeYellow.getPath();\n"
-           "    var j=0;\n"
-           "    while (j < latlons.length) { \n"
-           "        path.push(new google.maps.LatLng(latlons[j], latlons[j+1]));\n"
-           "        j += 2;\n"
-           "    }\n"
-
-           // Listen mouse events
-           "    google.maps.event.addListener(routeYellow, 'mousedown', function(event) { map.setOptions({draggable: false, zoomControl: false, scrollwheel: false, disableDoubleClickZoom: true}); webBridge.clickPath(event.latLng.lat(), event.latLng.lng()); });\n"
-           "    google.maps.event.addListener(routeYellow, 'mouseup',   function(event) { map.setOptions({draggable: true, zoomControl: true, scrollwheel: true, disableDoubleClickZoom: false}); webBridge.mouseup(); });\n"
-           "    google.maps.event.addListener(routeYellow, 'mouseover', function(event) { webBridge.hoverPath(event.latLng.lat(), event.latLng.lng()); });\n"
-
-           "}\n").arg(hideYellowLine() ? 0.0 : 0.4f);
+                           "var map;\n");  // the map object
+    if (context->isCompareIntervals) {
+        currentPage += QString("var compareIntervalGroup;\n");  // compare Intervals
+    } else {
+        currentPage += QString("var intervalList;\n"  // array of intervals
+                               "var markerList;\n"  // array of markers
+                               "var polyList;\n"  // array of polylines
+                               "var tmpIntervalHighlighter;\n");  // temp interval
     }
 
-    currentPage += QString("function drawIntervals() { \n"
-    // how many to draw?
-    "   webBridge.intervalCount(drawIntervalsCount);\n"
-    "}\n"
 
-    "function drawIntervalsCount(intervals) { \n"
-    // remove previous intervals highlighted
-    "   j= intervalList.length;\n"
-    "    while (j) {\n"
-    "       var highlighted = intervalList.pop();\n");
+    //////////////////////////////////////////////////////////////////////
+    // drawRoute
 
-    // remove highlighted
-    if (mapCombo->currentIndex() == OSM) {
+    if (! context->isCompareIntervals) {
         currentPage += QString(""
-        "       map.removeLayer(highlighted);\n");
-    } else if (mapCombo->currentIndex() == GOOGLE) {
-        currentPage += QString(""
-        "       highlighted.setMap(null);\n");
+                               // Draw the entire route, we use a local webbridge
+                               // to supply the data to a) reduce bandwidth and
+                               // b) allow local manipulation. This makes the UI
+                               // considerably more 'snappy'
+                               "function drawRoute() {\n"
+                               // load the GPS co-ordinates
+                               "   webBridge.getLatLons(0, drawRouteForLatLons);\n"
+                               "}\n"
+                               "\n");
+
+        if (mapCombo->currentIndex() == OSM) {
+            currentPage += QString("function drawRouteForLatLons(latlons) {\n"
+
+                // route will be drawn with these options
+                "    var routeOptionsYellow = {\n"
+                "        stroke : true,\n"
+                "        color: '#FFFF00',\n"
+                "        opacity: %1,\n"
+                "        weight: 10,\n"
+                "        zIndex: -2\n"
+                "    };\n"
+
+                // lastly, populate the route path
+                "    var path = [];\n"
+                "    var j=0;\n"
+                "    while (j < latlons.length) { \n"
+                "        path.push(new L.LatLng(latlons[j], latlons[j+1]));\n"
+                "        j += 2;\n"
+                "    };\n"
+
+                "    var routeYellow = new L.Polyline(path, routeOptionsYellow).addTo(map);\n"
+
+                // Listen mouse events
+                "    routeYellow.on('mousedown', function(event) { map.dragging.disable();L.DomEvent.stopPropagation(event);webBridge.clickPath(event.latlng.lat, event.latlng.lng); });\n" // map.setOptions({draggable: false, zoomControl: false, scrollwheel: false, disableDoubleClickZoom: true});
+                "    routeYellow.on('mouseup',   function(event) { map.dragging.enable();L.DomEvent.stopPropagation(event);webBridge.mouseup(); });\n" // setOptions ?
+                "    routeYellow.on('mouseover', function(event) { webBridge.hoverPath(event.latlng.lat, event.latlng.lng); });\n"
+                "    routeYellow.on('mousemove', function(event) { webBridge.hoverPath(event.latlng.lat, event.latlng.lng); });\n"
+
+                "}\n").arg(hideYellowLine() ? 0.0 : 0.4f);
+        }
+        else if (mapCombo->currentIndex() == GOOGLE) {
+
+           currentPage += QString("function drawRouteForLatLons(latlons) {\n"
+
+               // route will be drawn with these options
+               "    var routeOptionsYellow = {\n"
+               "        strokeColor: '#FFFF00',\n"
+               "        strokeOpacity: %1,\n"
+               "        strokeWeight: 10,\n"
+               "        zIndex: -2\n"
+               "    };\n"
+
+               // create the route Polyline
+               "    var routeYellow = new google.maps.Polyline(routeOptionsYellow);\n"
+               "    routeYellow.setMap(map);\n"
+
+               // lastly, populate the route path
+               "    var path = routeYellow.getPath();\n"
+               "    var j=0;\n"
+               "    while (j < latlons.length) { \n"
+               "        path.push(new google.maps.LatLng(latlons[j], latlons[j+1]));\n"
+               "        j += 2;\n"
+               "    }\n"
+
+               // Listen mouse events
+               "    google.maps.event.addListener(routeYellow, 'mousedown', function(event) { map.setOptions({draggable: false, zoomControl: false, scrollwheel: false, disableDoubleClickZoom: true}); webBridge.clickPath(event.latLng.lat(), event.latLng.lng()); });\n"
+               "    google.maps.event.addListener(routeYellow, 'mouseup',   function(event) { map.setOptions({draggable: true, zoomControl: true, scrollwheel: true, disableDoubleClickZoom: false}); webBridge.mouseup(); });\n"
+               "    google.maps.event.addListener(routeYellow, 'mouseover', function(event) { webBridge.hoverPath(event.latLng.lat(), event.latLng.lng()); });\n"
+
+               "}\n").arg(hideYellowLine() ? 0.0 : 0.4f);
+        }
     }
+
+
+    //////////////////////////////////////////////////////////////////////
+    // drawCompareIntervals
+
+    if (context->isCompareIntervals) {
+        currentPage += QString("function drawCompareIntervals() { \n"
+                               "   webBridge.setCompareIntervals(doDrawCompareIntervals);\n"
+                               "} \n");
+
+        if (mapCombo->currentIndex() == OSM) {
+            currentPage += QString("function doDrawCompareIntervals(intervalInfos) { \n"
+                                   "    compareIntervalGroup.clearLayers();\n"
+                                   "    for (i in intervalInfos) {\n"
+                                   "        var interval = intervalInfos[i];\n"
+                                   "        var polyOptions = {\n"
+                                   "            stroke : true,\n"
+                                   "            color: interval['color'],\n"
+                                   "            opacity: 0.8,\n"
+                                   "            weight: 5,\n"
+                                   "            zIndex: -1\n"
+                                   "        }\n"
+                                   "        var path = [];\n"
+                                   "        for (j in interval['lats']) {\n"
+                                   "            path.push([interval['lats'][j], interval['lons'][j]]);\n"
+                                   "        }\n"
+                                   "        compareIntervalGroup.addLayer(L.polyline(path, polyOptions));\n"
+                                   "    }\n"
+                                   "    map.fitBounds(compareIntervalGroup.getBounds());\n"
+                                   "} \n");
+        } else if (mapCombo->currentIndex() == GOOGLE) {
+            currentPage += QString("function doDrawCompareIntervals(intervalInfos) { \n"
+                                   "    var minLat = 1000;\n"
+                                   "    var minLon = 1000;\n"
+                                   "    var maxLat = -1000;\n"
+                                   "    var maxLon = -1000;\n"
+                                   "    for (r in compareIntervalGroup) {\n"
+                                   "        compareIntervalGroup[r].setMap(null);\n"
+                                   "    }\n"
+                                   "    compareIntervalGroup = [];\n"
+                                   "    for (i in intervalInfos) {\n"
+                                   "        var interval = intervalInfos[i];\n"
+                                   "        var routeOptions = {\n"
+                                   "            strokeColor: interval['color'],\n"
+                                   "            strokeOpacity: 0.8,\n"
+                                   "            strokeWeight: 5,\n"
+                                   "            zIndex: -1\n"
+                                   "        };\n"
+                                   "        var route = new google.maps.Polyline(routeOptions);\n"
+                                   "        route.setMap(map);\n"
+                                   "        var path = route.getPath();\n"
+                                   "        for (j in interval['lats']) {\n"
+                                   "            path.push(new google.maps.LatLng(interval['lats'][j], interval['lons'][j]));\n"
+                                   "            minLat = Math.min(minLat, interval['lats'][j]);\n"
+                                   "            maxLat = Math.max(maxLat, interval['lats'][j]);\n"
+                                   "            minLon = Math.min(minLon, interval['lons'][j]);\n"
+                                   "            maxLon = Math.max(maxLon, interval['lons'][j]);\n"
+                                   "        }\n"
+                                   "        compareIntervalGroup.push(route);\n"
+                                   "    }\n"
+                                   "    var southwest = new google.maps.LatLng(minLat, minLon);\n"
+                                   "    var northeast = new google.maps.LatLng(maxLat, maxLon);\n"
+                                   "    map.fitBounds(new google.maps.LatLngBounds(southwest, northeast));\n"
+                                   "} \n");
+        }
+    }
+
+
+    //////////////////////////////////////////////////////////////////////
+    // drawIntervals
+
+    if (! context->isCompareIntervals) {
+        currentPage += QString("function drawIntervals() { \n"
+        // how many to draw?
+        "   webBridge.intervalCount(drawIntervalsCount);\n"
+        "}\n"
+
+        "function drawIntervalsCount(intervals) { \n"
+        // remove previous intervals highlighted
+        "   j= intervalList.length;\n"
+        "    while (j) {\n"
+        "       var highlighted = intervalList.pop();\n");
+
+        // remove highlighted
+        if (mapCombo->currentIndex() == OSM) {
+            currentPage += QString(""
+            "       map.removeLayer(highlighted);\n");
+        } else if (mapCombo->currentIndex() == GOOGLE) {
+            currentPage += QString(""
+            "       highlighted.setMap(null);\n");
+        }
+
+        currentPage += QString(""
+        "       j--;\n"
+        "    }\n"
+
+        "   while (intervals > 0) {\n"
+        "       webBridge.getLatLons(intervals, drawInterval);\n"
+        "       intervals--;\n"
+        "   }\n"
+        "}\n");
+
+        if (mapCombo->currentIndex() == OSM) {
+            currentPage += QString("function drawInterval(latlons) { \n"
+                                   // intervals will be drawn with these options
+                                   "   var polyOptions = {\n"
+                                   "       stroke : true,\n"
+                                   "       color: '#0000FF',\n"
+                                   "       opacity: 0.6,\n"
+                                   "       weight: 10,\n"
+                                   "       zIndex: -1\n"  // put at the bottom
+                                   "   }\n"
+                                   "   var path = [];\n"
+                                   "   var j=0;\n"
+                                   "   while (j<latlons.length) {\n"
+                                   "       path.push([latlons[j], latlons[j+1]]);\n"
+                                   "       j += 2;\n"
+                                   "   }\n"
+
+                                   "   var intervalHighlighter = L.polyline(path, polyOptions).addTo(map);\n"
+                                   "   intervalList.push(intervalHighlighter);\n"
+                                   "}\n");
+        } else if (mapCombo->currentIndex() == OSM) {
+            currentPage += QString("function drawInterval(latlons) { \n"
+                                   // intervals will be drawn with these options
+                                   "   var polyOptions = {\n"
+                                   "       strokeColor: '#0000FF',\n"
+                                   "       strokeOpacity: 0.6,\n"
+                                   "       strokeWeight: 10,\n"
+                                   "       zIndex: -1\n"  // put at the bottom
+                                   "   }\n"
+                                   "   var intervalHighlighter = new google.maps.Polyline(polyOptions);\n"
+                                   "   intervalHighlighter.setMap(map);\n"
+                                   "   intervalList.push(intervalHighlighter);\n"
+                                   "   var path = intervalHighlighter.getPath();\n"
+                                   "   var j=0;\n"
+                                   "   while (j<latlons.length) {\n"
+                                   "       path.push(new google.maps.LatLng(latlons[j], latlons[j+1]));\n"
+                                   "       j += 2;\n"
+                                   "   }\n"
+                                   "}\n");
+        }
+    }
+
+
+    //////////////////////////////////////////////////////////////////////
+    // Initialize
 
     currentPage += QString(""
-    "       j--;\n"
-    "    }\n"
-
-    "   while (intervals > 0) {\n"
-    "       webBridge.getLatLons(intervals, drawInterval);\n"
-    "       intervals--;\n"
-    "   }\n"
-    "}\n");
-
+                           // initialise function called when map loaded
+                           "function initialize() {\n");
     if (mapCombo->currentIndex() == OSM) {
-        currentPage += QString("function drawInterval(latlons) { \n"
-                               // intervals will be drawn with these options
-                               "   var polyOptions = {\n"
-                               "       stroke : true,\n"
-                               "       color: '#0000FF',\n"
-                               "       opacity: 0.6,\n"
-                               "       weight: 10,\n"
-                               "       zIndex: -1\n"  // put at the bottom
-                               "   }\n"
-                               "   var path = [];\n"
-                               "   var j=0;\n"
-                               "   while (j<latlons.length) {\n"
-                               "       path.push([latlons[j], latlons[j+1]]);\n"
-                               "       j += 2;\n"
-                               "   }\n"
-
-                               "   var intervalHighlighter = L.polyline(path, polyOptions).addTo(map);\n"
-                               "   intervalList.push(intervalHighlighter);\n"
-                               "}\n"
-
-                               // initialise function called when map loaded
-                               "function initialize() {\n");
-
         currentPage += QString(""
                                // TERRAIN style map please and make it draggable
                                // note that because QT webkit offers touch/gesture
@@ -639,58 +787,45 @@ void RideMapWindow::createHtml()
                                "                 maxZoom: 18"
                                "              }).addTo(map);\n").arg(tsUrl);
 
+        if (context->isCompareIntervals) {
+            currentPage += QString(""
+                                   // initialise local variables
+                                   "    compareIntervalGroup = L.featureGroup().addTo(map);\n"
+
+                                   "    drawCompareIntervals();\n"
+                                   // catch signals to redraw intervals
+                                   "    webBridge.drawCompareIntervals.connect(drawCompareIntervals);\n");
+        } else {
+            currentPage += QString(""
+                                   // initialise local variables
+                                   "    markerList = new Array();\n"
+                                   "    intervalList = new Array();\n"
+                                   "    polyList = new Array();\n"
+
+                                   // draw the main route data, getting the geo
+                                   // data from the webbridge - reduces data sent/received
+                                   // to the map server and makes the UI pretty snappy
+                                   "    drawRoute();\n"
+                                   "    drawIntervals();\n"
+                                   // catch signals to redraw intervals
+                                   "    webBridge.drawIntervals.connect(drawIntervals);\n"
+
+                                   // we're done now let the C++ side draw its overlays
+                                   "    webBridge.drawOverlays();\n"
+
+                                   // Liste mouse events
+                                   "    map.on('mouseup', function(event) { map.dragging.enable();L.DomEvent.stopPropagation(event); webBridge.mouseup(); });\n");
+        }
         currentPage += QString(""
-                               // initialise local variables
-                               "    markerList = new Array();\n"
-                               "    intervalList = new Array();\n"
-                               "    polyList = new Array();\n"
-
-                               // draw the main route data, getting the geo
-                               // data from the webbridge - reduces data sent/received
-                               // to the map server and makes the UI pretty snappy
-                               "    drawRoute();\n"
-                               "    drawIntervals();\n"
-                               // catch signals to redraw intervals
-                               "    webBridge.drawIntervals.connect(drawIntervals);\n"
-
-                               // we're done now let the C++ side draw its overlays
-                               "    webBridge.drawOverlays();\n"
-
-                               // Liste mouse events
-                               "    map.on('mouseup', function(event) { map.dragging.enable();L.DomEvent.stopPropagation(event); webBridge.mouseup(); });\n"
-
-
                                "}\n"
                                "</script>\n");
     } else if (mapCombo->currentIndex() == GOOGLE) {
-        currentPage += QString("function drawInterval(latlons) { \n"
-            // intervals will be drawn with these options
-            "   var polyOptions = {\n"
-            "       strokeColor: '#0000FF',\n"
-            "       strokeOpacity: 0.6,\n"
-            "       strokeWeight: 10,\n"
-            "       zIndex: -1\n"  // put at the bottom
-            "   }\n"
-            "   var intervalHighlighter = new google.maps.Polyline(polyOptions);\n"
-            "   intervalHighlighter.setMap(map);\n"
-            "   intervalList.push(intervalHighlighter);\n"
-            "   var path = intervalHighlighter.getPath();\n"
-            "   var j=0;\n"
-            "   while (j<latlons.length) {\n"
-            "       path.push(new google.maps.LatLng(latlons[j], latlons[j+1]));\n"
-            "       j += 2;\n"
-            "   }\n"
-            "}\n"
-
-            // initialise function called when map loaded
-            "function initialize() {\n");
-
-            // TERRAIN style map please and make it draggable
-            // note that because QT webkit offers touch/gesture
-            // support the Google API only supports dragging
-            // via gestures - this is alrady registered as a bug
-            // with the google map team
-            currentPage += QString(""
+        // TERRAIN style map please and make it draggable
+        // note that because QT webkit offers touch/gesture
+        // support the Google API only supports dragging
+        // via gestures - this is alrady registered as a bug
+        // with the google map team
+        currentPage += QString(""
             "    var controlOptions = {\n"
             "      style: google.maps.MapTypeControlStyle.DEFAULT\n"
             "    };\n");
@@ -706,8 +841,6 @@ void RideMapWindow::createHtml()
             "    };\n").arg("google.maps.MapTypeId.TERRAIN")
                        .arg("false");
 
-
-
         currentPage += QString(""
            // setup the map, and fit to contain the limits of the route
            "    map = new google.maps.Map(document.getElementById('map-canvas'), myOptions);\n"
@@ -719,45 +852,77 @@ void RideMapWindow::createHtml()
                 arg(maxLat,0,'g',GPS_COORD_TO_STRING).
                 arg(maxLon,0,'g',GPS_COORD_TO_STRING);
 
-
         currentPage += QString(""
             // add the bike layer, useful in some areas, but coverage
             // is limited, US gets best coverage at this point (Summer 2011)
             "    var bikeLayer = new google.maps.BicyclingLayer();\n"
             "    bikeLayer.setMap(map);\n");
 
+        if (context->isCompareIntervals) {
+            currentPage += QString(""
+                // initialise local variables
+                "    compareIntervalGroup = new Array();\n"
 
+                "    drawCompareIntervals();\n"
+                // catch signals to redraw intervals
+                "    webBridge.drawCompareIntervals.connect(drawCompareIntervals);\n");
+        } else {
+            currentPage += QString(""
+                // initialise local variables
+                "    markerList = new Array();\n"
+                "    intervalList = new Array();\n"
+                "    polyList = new Array();\n"
+
+                // draw the main route data, getting the geo
+                // data from the webbridge - reduces data sent/received
+                // to the map server and makes the UI pretty snappy
+                "    drawRoute();\n"
+                "    drawIntervals();\n"
+                // catch signals to redraw intervals
+                "    webBridge.drawIntervals.connect(drawIntervals);\n"
+
+                // we're done now let the C++ side draw its overlays
+                "    webBridge.drawOverlays();\n"
+
+                // Liste mouse events
+                "    google.maps.event.addListener(map, 'mouseup', function(event) { map.setOptions({draggable: true, zoomControl: true, scrollwheel: true, disableDoubleClickZoom: false}); webBridge.mouseup(); });\n");
+        }
         currentPage += QString(""
-            // initialise local variables
-            "    markerList = new Array();\n"
-            "    intervalList = new Array();\n"
-            "    polyList = new Array();\n"
-
-            // draw the main route data, getting the geo
-            // data from the webbridge - reduces data sent/received
-            // to the map server and makes the UI pretty snappy
-            "    drawRoute();\n"
-            "    drawIntervals();\n"
-            // catch signals to redraw intervals
-            "    webBridge.drawIntervals.connect(drawIntervals);\n"
-
-            // we're done now let the C++ side draw its overlays
-            "    webBridge.drawOverlays();\n"
-
-            // Liste mouse events
-            "    google.maps.event.addListener(map, 'mouseup', function(event) { map.setOptions({draggable: true, zoomControl: true, scrollwheel: true, disableDoubleClickZoom: false}); webBridge.mouseup(); });\n"
-
-
-            "}\n"
-            "</script>\n");
-
-
+                               "}\n"
+                               "</script>\n");
     }
 
     // the main page is rather trivial
     currentPage += QString("</body>\n"
     "</html>\n");
+}
 
+
+bool
+RideMapWindow::getCompareBoundingBox
+(double &minLat, double &maxLat, double &minLon, double &maxLon) const
+{
+    // values outside -360..360
+    minLat = minLon = 1000;
+    maxLat = maxLon = -1000;
+    if (! context->isCompareIntervals) {
+        return false;
+    }
+    bool hasPositions = false;
+    for (const CompareInterval &ci : context->compareIntervals) {
+        if (ci.isChecked()) {
+            for (RideFilePoint const * const &rfp : ci.data->dataPoints()) {
+                if (rfp->lat || rfp->lon) {
+                    minLat = std::min(minLat, rfp->lat);
+                    maxLat = std::max(maxLat, rfp->lat);
+                    minLon = std::min(minLon, rfp->lon);
+                    maxLon = std::max(maxLon, rfp->lon);
+                    hasPositions = true;
+                }
+            }
+        }
+    }
+    return hasPositions;
 }
 
 
@@ -771,6 +936,9 @@ QColor RideMapWindow::GetColor(int watts)
 void
 RideMapWindow::drawShadedRoute()
 {
+    if (context->isCompareIntervals) {
+        return;
+    }
     int intervalTime = 60;  // 60 seconds
     double rtime=0; // running total for accumulated data
     int count=0;  // how many samples ?
@@ -865,6 +1033,9 @@ RideMapWindow::drawShadedRoute()
 
 void
 RideMapWindow::clearTempInterval() {
+    if (context->isCompareIntervals) {
+        return;
+    }
     QString code;
     if (mapCombo->currentIndex() == OSM) {
         code = QString( "{ \n"
@@ -880,8 +1051,50 @@ RideMapWindow::clearTempInterval() {
     view->page()->runJavaScript(code);
 }
 
+
+void
+RideMapWindow::compareIntervalsStateChanged
+(bool state)
+{
+    countCompareIntervals = context->compareIntervals.size();
+    smallPlot->setVisible(! state && showFullPlotCk->checkState() != Qt::Unchecked);
+    overlayWidget->setVisible(! state && showInt->checkState() != Qt::Unchecked);
+
+    forceReplot();
+}
+
+
+void
+RideMapWindow::compareIntervalsChanged
+()
+{
+    if (! context->isCompareIntervals) {
+        return;
+    }
+    int oldCountCompareIntervals = countCompareIntervals;
+    countCompareIntervals = 0;
+    for (const CompareInterval &ci : context->compareIntervals) {
+        if (ci.isChecked()) {
+            for (RideFilePoint const * const &rfp : ci.data->dataPoints()) {
+                if (rfp->lat || rfp->lon) {
+                    ++countCompareIntervals;
+                    break;
+                }
+            }
+        }
+    }
+
+    if (oldCountCompareIntervals == 0 || countCompareIntervals == 0) {
+        createHtml();
+        view->page()->setHtml(currentPage);
+    }
+}
+
 void
 RideMapWindow::drawTempInterval(IntervalItem *current) {
+    if (context->isCompareIntervals) {
+        return;
+    }
     QString code;
 
     if (mapCombo->currentIndex() == OSM) {
@@ -978,7 +1191,7 @@ static double distanceBetween(double fromLat, double fromLon, double toLat, doub
 void
 RideMapWindow::createMarkers()
 {
-    if (!showMarkersCk->checkState())
+    if (!showMarkersCk->checkState() || context->isCompareIntervals)
         return;
     QString code;
 
@@ -1251,6 +1464,10 @@ MapWebBridge::getLatLons(int i)
 void
 MapWebBridge::drawOverlays()
 {
+    if (context->isCompareIntervals) {
+        return;
+    }
+
     // overlay the markers
     mw->createMarkers();
 
@@ -1445,6 +1662,32 @@ MapWebBridge::mouseup()
 }
 
 
+QVariantList
+MapWebBridge::setCompareIntervals
+()
+{
+    QVariantList intervals;
+    for (const CompareInterval &ci : context->compareIntervals) {
+        if (ci.isChecked()) {
+            QVariantMap interval;
+            interval["color"] = ci.color.name();
+            QVariantList lats;
+            QVariantList lons;
+            for (RideFilePoint const * const &rfp : ci.data->dataPoints()) {
+                if (rfp->lat || rfp->lon) {
+                    lats << rfp->lat;
+                    lons << rfp->lon;
+                }
+            }
+            interval["lons"] = lons;
+            interval["lats"] = lats;
+            intervals << interval;
+        }
+    }
+    return intervals;
+}
+
+
 bool
 RideMapWindow::event(QEvent *event)
 {
@@ -1457,6 +1700,13 @@ RideMapWindow::event(QEvent *event)
         if (firstShow) {
             firstShow = false;
             helperWidget()->move(mainWidget()->geometry().width()-(275*dpiXFactor), 50*dpiYFactor);
+            if (mapCombo->currentIndex() == OSM) {
+                // Leaflet on OSM does not set the bounds correctly when its widget / canvas was never visible
+                // Leaflets map.whenReady() does not help resolving this
+                // Therefore forcing a replot (Google Maps does not have this issue)
+                // This helps to display the correct zoomlevel after perspective change
+                forceReplot();
+            }
         }
 
         // if off the screen move on screen

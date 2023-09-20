@@ -130,8 +130,8 @@ class RideItem : public QObject
         QString getStringForSymbol(QString name, bool useMetricUnits=true);
 
         // access the metadata
-        QString getText(QString name, QString fallback) const { return metadata_.value(name, fallback); }
-        bool hasText(QString name) { return metadata_.contains(name); }
+        QString getText(QString name, QString fallback) const;
+        bool hasText(QString name) const;
 
         // get at the first class data
         QString path;

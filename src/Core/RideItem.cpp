@@ -806,6 +806,24 @@ RideItem::getStdVarianceForSymbol(QString name)
     return 0.0f;
 }
 
+// access the metadata
+QString
+RideItem::getText(QString name, QString fallback) const
+{
+    // Start Date and Time are special cases, defined as metadata fields but stored in a different way
+    if (name == "Start Date") return QString::number(QDate(1900,01,01).daysTo(dateTime.date()));
+    if (name == "Start Time") return QString::number(QTime(0,0,0).secsTo(dateTime.time()));
+    return metadata_.value(name, fallback);
+}
+
+bool
+RideItem::hasText(QString name) const
+{
+    if (name == "Start Date") return true;
+    if (name == "Start Time") return true;
+    return metadata_.contains(name);
+}
+
 QString
 RideItem::getStringForSymbol(QString name, bool useMetricUnits)
 {
