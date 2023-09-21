@@ -2,7 +2,7 @@
 set -ev
 
 # Add recent Qt dependency ppa, update on a newer qt version.
-sudo add-apt-repository -y ppa:beineri/opt-qt-5.15.2-bionic
+sudo add-apt-repository -y ppa:beineri/opt-qt-5.15.2-focal
 sudo apt-get update -qq
 sudo apt-get install -qq qt5-default qt515base qt515tools qt515serialport\
  qt515svg qt515multimedia qt515connectivity qt515webengine qt515charts-no-lgpl\
@@ -14,22 +14,19 @@ sudo apt-get install -qq libkml-dev
 sudo apt-get install -qq libical-dev
 
 # Add VLC 3
-sudo add-apt-repository -y ppa:jonathonf/vlc-3
-sudo add-apt-repository -y ppa:jonathonf/ffmpeg-4
-sudo apt-get update -qq
 sudo apt-get install -y vlc libvlc-dev libvlccore-dev
 
 # R 4.0
 sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E298A3A825C0D65DFD57CBB651716619E084DAB9
-sudo add-apt-repository -y "deb https://cloud.r-project.org/bin/linux/ubuntu bionic-cran40/"
+sudo add-apt-repository -y "deb https://cloud.r-project.org/bin/linux/ubuntu focal-cran40/"
 sudo apt-get update -qq
 sudo apt-get install r-base-dev
 R --version
 
 # D2XX - refresh cache if folder is empty
 if [ -z "$(ls -A D2XX)" ]; then
-    wget --no-verbose http://www.ftdichip.com/Drivers/D2XX/Linux/libftd2xx-x86_64-1.3.6.tgz
-    tar xf libftd2xx-x86_64-1.3.6.tgz -C D2XX
+    wget --no-verbose https://ftdichip.com/wp-content/uploads/2022/07/libftd2xx-x86_64-1.4.27.tgz
+    tar xf libftd2xx-x86_64-1.4.27.tgz -C D2XX
 fi
 
 # SRMIO
