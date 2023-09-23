@@ -118,10 +118,10 @@ WorkoutWidget::updateErgFile(ErgFile *f)
     // update f with current values etc
     // just the points FOR NOW
     f->Points.clear();
-    f->Duration = 0;
+    f->duration(0);
     foreach(WWPoint *p, points_) {
         f->Points.append(ErgFilePoint(p->x * 1000, p->y, p->y));
-        f->Duration = p->x * 1000; // whatever the last is
+        f->duration(p->x * 1000); // whatever the last is
     }
 
     f->Laps = laps_;
@@ -1446,7 +1446,7 @@ WorkoutWidget::ergFileSelected(ErgFile *ergFile)
     points_.clear();
 
     // we suport ERG but not MRC/CRS currently
-    if (ergFile && (ergFile->format == MRC || ergFile->format == ERG)) {
+    if (ergFile && (ergFile->format() == ErgFileFormat::mrc || ergFile->format() == ErgFileFormat::erg)) {
 
         this->ergFile = ergFile;
 
@@ -1506,10 +1506,10 @@ WorkoutWidget::save()
     // so do not need to be scaled back, that happens when
     // they are read/written to file on disk
     ergFile->Points.clear();
-    ergFile->Duration = 0;
+    ergFile->duration(0);
     foreach(WWPoint *p, points_) {
         ergFile->Points.append(ErgFilePoint(p->x * 1000, p->y, p->y));
-        ergFile->Duration = p->x * 1000; // whatever the last is
+        ergFile->duration(p->x * 1000); // whatever the last is
     }
     ergFile->Laps = laps_;
     ergFile->Texts = texts_;

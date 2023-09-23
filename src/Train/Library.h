@@ -31,6 +31,13 @@
 #include <QTreeWidgetItem>
 #include <QThread>
 
+
+enum class LibraryBatchImportConfirmation {
+    forcedDialog,
+    optionalDialog,
+    noDialog
+};
+
 class Library : QObject
 {
     Q_OBJECT
@@ -42,8 +49,10 @@ class Library : QObject
 
         static void initialise(QDir); // init
         static Library *findLibrary(QString);
-        static void importFiles(Context *context, QStringList files, bool forcedialog=false);
+        static void importFiles(Context *context, QStringList files, LibraryBatchImportConfirmation dialog=LibraryBatchImportConfirmation::optionalDialog);
         void removeRef(Context *context, QString ref);
+
+        static bool refreshWorkouts(Context *context);
 };
 
 extern QList<Library *> libraries;        // keep track of all Library search paths for all users
