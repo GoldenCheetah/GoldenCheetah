@@ -60,7 +60,9 @@ INCLUDEPATH +=  ../qwt/src \
                 ../contrib/qxt/src \
                 ../contrib/qtsolutions/json \
                 ../contrib/qtsolutions/qwtcurve \
+                ../contrib/qtsolutions/flowlayout \
                 ../contrib/lmfit \
+                ../contrib/tags \
                 ../contrib/levmar \
                 ../contrib/boost \
                 ../contrib/kmeans \
@@ -668,11 +670,13 @@ greaterThan(QT_MAJOR_VERSION, 4) {
 
 YACCSOURCES += Core/DataFilter.y \
                FileIO/JsonRideFile.y \
-               Core/RideDB.y
+               Core/RideDB.y \
+               Train/filter/WorkoutFilter.y
 
 LEXSOURCES  += Core/DataFilter.l \
                FileIO/JsonRideFile.l \
-               Core/RideDB.l
+               Core/RideDB.l \
+               Train/filter/WorkoutFilter.l
 
 
 ###=========================================
@@ -736,7 +740,7 @@ HEADERS += Gui/AboutDialog.h Gui/AddIntervalDialog.h Gui/AnalysisSidebar.h Gui/C
            Gui/Views.h Gui/BatchProcessingDialog.h Gui/DownloadRideDialog.h Gui/ManualRideDialog.h Gui/NewSideBar.h \
            Gui/MergeActivityWizard.h Gui/RideImportWizard.h Gui/SplitActivityWizard.h Gui/SolverDisplay.h Gui/MetricSelect.h \
            Gui/AddTileWizard.h Gui/NavigationModel.h Gui/AthleteView.h Gui/AthleteConfigDialog.h Gui/AthletePages.h Gui/Perspective.h \
-           Gui/PerspectiveDialog.h
+           Gui/PerspectiveDialog.h Gui/StyledItemDelegates.h
 
 # metrics and models
 HEADERS += Metrics/Banister.h Metrics/CPSolver.h Metrics/Estimator.h Metrics/ExtendedCriticalPower.h Metrics/HrZones.h Metrics/PaceZones.h \
@@ -749,6 +753,7 @@ HEADERS += Planning/PlanningWindow.h
 
 # contrib
 HEADERS += ../contrib/qtsolutions/codeeditor/codeeditor.h ../contrib/qtsolutions/json/mvjson.h \
+           ../contrib/qtsolutions/flowlayout/flowlayout.h \
            ../contrib/qtsolutions/qwtcurve/qwt_plot_gapped_curve.h  ../contrib/qxt/src/qxtspanslider.h \
            ../contrib/qxt/src/qxtspanslider_p.h ../contrib/qxt/src/qxtstringspinbox.h ../contrib/qzip/zipreader.h \
            ../contrib/qzip/zipwriter.h ../contrib/lmfit/lmcurve.h  ../contrib/lmfit/lmcurve_tyd.h \
@@ -757,7 +762,8 @@ HEADERS += ../contrib/qtsolutions/codeeditor/codeeditor.h ../contrib/qtsolutions
            ../contrib/boost/GeometricTools_BSplineCurve.h \
            ../contrib/kmeans/kmeans_dataset.h ../contrib/kmeans/kmeans_general_functions.h ../contrib/kmeans/hamerly_kmeans.h \
            ../contrib/kmeans/kmeans.h ../contrib/kmeans/original_space_kmeans.h ../contrib/kmeans/triangle_inequality_base_kmeans.h \
-           ../contrib/voronoi/Voronoi.h
+           ../contrib/voronoi/Voronoi.h \
+           ../contrib/tags/TagBar.h ../contrib/tags/Taggable.h ../contrib/tags/TagStore.h ../contrib/tags/TagWidget.h
 
 
 # Train View
@@ -766,7 +772,10 @@ HEADERS += Train/AddDeviceWizard.h Train/CalibrationData.h Train/ComputrainerCon
            Train/Library.h Train/LibraryParser.h Train/MeterWidget.h Train/NullController.h Train/RealtimeController.h \
            Train/RealtimeData.h Train/RealtimePlot.h Train/RealtimePlotWindow.h Train/RemoteControl.h Train/SpinScanPlot.h \
            Train/SpinScanPlotWindow.h Train/SpinScanPolarPlot.h Train/GarminServiceHelper.h Train/PhysicsUtility.h Train/BicycleSim.h \
-           Train/PolynomialRegression.h Train/MultiRegressionizer.h
+           Train/PolynomialRegression.h Train/MultiRegressionizer.h \
+           Train/VideoSyncFileBase.h Train/ErgFileBase.h \
+           Train/filter/ModelFilter.h Train/filter/MultiFilterProxyModel.h Train/filter/WorkoutFilter.h \
+           Train/filter/FilterEditor.h
 
 greaterThan(QT_MAJOR_VERSION, 4) {
     HEADERS += Train/TodaysPlanWorkoutDownload.h
@@ -775,7 +784,10 @@ greaterThan(QT_MAJOR_VERSION, 4) {
 HEADERS += Train/TrainBottom.h Train/TrainDB.h Train/TrainSidebar.h \
            Train/VideoLayoutParser.h Train/VideoSyncFile.h Train/WorkoutPlotWindow.h Train/WebPageWindow.h \
            Train/WorkoutWidget.h Train/WorkoutWidgetItems.h Train/WorkoutWindow.h Train/WorkoutWizard.h Train/ZwoParser.h \
-           Train/LiveMapWebPageWindow.h
+           Train/LiveMapWebPageWindow.h \
+           Train/info/InfoWidget.h Train/info/PowerInfoWidget.h Train/info/PowerZonesWidget.h Train/info/RatingWidget.h \
+           Train/info/ErgOverview.h Train/info/Shy.h \
+           Train/WorkoutTagWrapper.h
 
 
 ###=============
@@ -842,7 +854,7 @@ SOURCES += Gui/AboutDialog.cpp Gui/AddIntervalDialog.cpp Gui/AnalysisSidebar.cpp
            Gui/BatchProcessingDialog.cpp Gui/DownloadRideDialog.cpp Gui/ManualRideDialog.cpp Gui/EditUserMetricDialog.cpp Gui/NewSideBar.cpp \
            Gui/MergeActivityWizard.cpp Gui/RideImportWizard.cpp Gui/SplitActivityWizard.cpp Gui/SolverDisplay.cpp Gui/MetricSelect.cpp \
            Gui/AddTileWizard.cpp Gui/NavigationModel.cpp Gui/AthleteView.cpp Gui/AthleteConfigDialog.cpp Gui/AthletePages.cpp Gui/Perspective.cpp \
-           Gui/PerspectiveDialog.cpp
+           Gui/PerspectiveDialog.cpp Gui/StyledItemDelegates.cpp
 
 ## Models and Metrics
 SOURCES += Metrics/aBikeScore.cpp Metrics/aCoggan.cpp Metrics/AerobicDecoupling.cpp Metrics/Banister.cpp Metrics/BasicRideMetrics.cpp \
@@ -860,6 +872,7 @@ SOURCES += Planning/PlanningWindow.cpp
 
 ## Contributed solutions
 SOURCES += ../contrib/qtsolutions/codeeditor/codeeditor.cpp ../contrib/qtsolutions/json/mvjson.cpp \
+           ../contrib/qtsolutions/flowlayout/flowlayout.cpp \
            ../contrib/qtsolutions/qwtcurve/qwt_plot_gapped_curve.cpp \
            ../contrib/qxt/src/qxtspanslider.cpp ../contrib/qxt/src/qxtstringspinbox.cpp ../contrib/qzip/zip.cpp \
            ../contrib/lmfit/lmcurve.c ../contrib/lmfit/lmmin.c \
@@ -869,7 +882,8 @@ SOURCES += ../contrib/qtsolutions/codeeditor/codeeditor.cpp ../contrib/qtsolutio
            ../contrib/levmar/lmlec_core.c ../contrib/levmar/misc_core.c \
            ../contrib/kmeans/kmeans_dataset.cpp ../contrib/kmeans/kmeans_general_functions.cpp ../contrib/kmeans/hamerly_kmeans.cpp \
            ../contrib/kmeans/kmeans.cpp ../contrib/kmeans/original_space_kmeans.cpp ../contrib/kmeans/triangle_inequality_base_kmeans.cpp \
-           ../contrib/voronoi/Voronoi.cpp
+           ../contrib/voronoi/Voronoi.cpp \
+           ../contrib/tags/TagBar.cpp ../contrib/tags/TagWidget.cpp
 
 
 ## Train View Components
@@ -878,7 +892,10 @@ SOURCES += Train/AddDeviceWizard.cpp Train/CalibrationData.cpp Train/Computraine
            Train/Library.cpp Train/LibraryParser.cpp Train/MeterWidget.cpp Train/NullController.cpp Train/RealtimeController.cpp \
            Train/RealtimeData.cpp Train/RealtimePlot.cpp Train/RealtimePlotWindow.cpp Train/RemoteControl.cpp Train/SpinScanPlot.cpp \
            Train/SpinScanPlotWindow.cpp Train/SpinScanPolarPlot.cpp Train/GarminServiceHelper.cpp Train/PhysicsUtility.cpp Train/BicycleSim.cpp \
-           Train/PolynomialRegression.cpp
+           Train/PolynomialRegression.cpp \
+           Train/VideoSyncFileBase.cpp Train/ErgFileBase.cpp \
+           Train/filter/ModelFilter.cpp Train/filter/MultiFilterProxyModel.cpp Train/filter/WorkoutFilter.cpp \
+           Train/filter/FilterEditor.cpp
 
 greaterThan(QT_MAJOR_VERSION, 4) {
     SOURCES  += Train/TodaysPlanWorkoutDownload.cpp
@@ -887,7 +904,10 @@ greaterThan(QT_MAJOR_VERSION, 4) {
 SOURCES += Train/TrainBottom.cpp Train/TrainDB.cpp Train/TrainSidebar.cpp \
            Train/VideoLayoutParser.cpp Train/VideoSyncFile.cpp Train/WorkoutPlotWindow.cpp Train/WebPageWindow.cpp \
            Train/WorkoutWidget.cpp Train/WorkoutWidgetItems.cpp Train/WorkoutWindow.cpp Train/WorkoutWizard.cpp Train/ZwoParser.cpp \
-           Train/LiveMapWebPageWindow.cpp
+           Train/LiveMapWebPageWindow.cpp \
+           Train/info/InfoWidget.cpp Train/info/PowerInfoWidget.cpp Train/info/PowerZonesWidget.cpp Train/info/RatingWidget.cpp \
+           Train/info/ErgOverview.cpp Train/info/Shy.cpp \
+           Train/WorkoutTagWrapper.cpp
 
 ## Crash Handling
 win32-msvc* {

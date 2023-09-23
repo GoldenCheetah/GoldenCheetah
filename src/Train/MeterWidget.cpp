@@ -382,9 +382,9 @@ void ElevationMeterWidget::lazySetup(void)
 
     // Compute if size has changed. Store truncated values to allow equality comparison.
     double minX = 0.;
-    double maxX = floor(ergFile->Duration);
-    double minY = floor(ergFile->minY);
-    double maxY = floor(ergFile->maxY);
+    double maxX = floor(ergFile->duration());
+    double minY = floor(ergFile->minY());
+    double maxY = floor(ergFile->maxY());
     if (m_savedWidth != m_Width || m_savedHeight != m_Height || m_savedMinY != minY || m_savedMaxY != maxY) {
 
         m_savedMinY = minY;
