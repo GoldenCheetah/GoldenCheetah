@@ -21,6 +21,9 @@
 #include <QDebug>
 #include <QFontMetrics>
 
+#define STAR_FILLED 0x2605
+#define STAR_EMPTY 0x2606
+
 
 RatingWidget::RatingWidget
 (QWidget *parent)
@@ -62,7 +65,7 @@ RatingWidget::mouseMoveEvent
     QMargins cm = contentsMargins();
     Qt::Alignment a = alignment();
     int leftOffset = 0;
-    static const QString fullS("★★★★★");
+    static const QString fullS(5, QChar(STAR_FILLED));
     QFontMetrics fontMetrics(font(), this);
     QRect fullRect = fontMetrics.boundingRect(fullS);
     if (a & Qt::AlignHCenter) {
@@ -75,7 +78,7 @@ RatingWidget::mouseMoveEvent
     QString s;
     mouseOverRating = 5;
     for (int i = 1; i <= 5; ++i) {
-        s.append(u'★');
+        s.append(QChar(STAR_FILLED));
         QRect starRect = fontMetrics.boundingRect(s);
         int ratingWidth = starRect.width() + leftOffset;
         if (event->localPos().x() < ratingWidth) {
@@ -106,7 +109,7 @@ RatingWidget::showRating
 (int r)
 {
     QString ratingStr;
-    ratingStr.fill(u'★', r);
-    ratingStr.resize(5, u'☆');
+    ratingStr.fill(QChar(STAR_FILLED), r);
+    ratingStr.resize(5, QChar(STAR_EMPTY));
     setText(ratingStr);
 }
