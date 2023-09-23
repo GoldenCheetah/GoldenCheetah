@@ -296,14 +296,14 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
     workoutInfo = new InfoWidget(zoneColors, context->athlete->zones("Bike")->getZoneDescriptions(zonerange));
     workoutInfo->setFrameStyle(QFrame::NoFrame);
     workoutInfo->setStyleSheet(GCColor::stylesheet(true));
-#ifdef Q_OS_WIN
-    QStyle *xde = QStyleFactory::create(OS_STYLE);
-    workoutInfo->verticalScrollBar()->setStyle(xde);
-#endif
     connect(context, SIGNAL(ergFileSelected(ErgFileBase*)), workoutInfo, SLOT(ergFileSelected(ErgFileBase*)));
     QScrollArea *workoutInfoScroller = new QScrollArea();
     workoutInfoScroller->setWidgetResizable(true);
     workoutInfoScroller->setWidget(workoutInfo);
+#ifdef Q_OS_WIN
+    xde = QStyleFactory::create(OS_STYLE);
+    workoutInfoScroller->verticalScrollBar()->setStyle(xde);
+#endif
     workoutInfoItem = new GcSplitterItem(tr("Workout Info"), iconFromPNG(":images/sidebar/charts.png"), this);
     workoutInfoItem->addWidget(workoutInfoScroller);
     trainSplitter->addWidget(workoutInfoItem);
