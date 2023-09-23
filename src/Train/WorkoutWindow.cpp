@@ -135,7 +135,7 @@ WorkoutWindow::WorkoutWindow(Context *context) :
 
     setControls(settingsWidget);
     ergFile = NULL;
-    format = 0;
+    format = ErgFileFormat::unknown;
 
     QVBoxLayout *main = new QVBoxLayout;
     QHBoxLayout *layout = new QHBoxLayout;
@@ -520,7 +520,7 @@ WorkoutWindow::scrollMoved()
 }
 
 void
-WorkoutWindow::ergFileSelected(ErgFile*f, int format)
+WorkoutWindow::ergFileSelected(ErgFile*f, ErgFileFormat format)
 {
     if (active) return;
 
@@ -542,8 +542,8 @@ WorkoutWindow::ergFileSelected(ErgFile*f, int format)
     }
 
     // just get on with it.
-    format = f ? f->format : format;
-    if (format == MRC) codeFormat->setText(tr("MRC - Relative Watts"));
+    format = f ? f->format() : format;
+    if (format == ErgFileFormat::mrc) codeFormat->setText(tr("MRC - Relative Watts"));
     else codeFormat->setText(tr("ERG - Absolute Watts"));
 
     ergFile = f;
@@ -558,7 +558,7 @@ void
 WorkoutWindow::newErgFile()
 {
     // new blank file clear points .. texts .. metadata etc
-    ergFileSelected(NULL, ERG);
+    ergFileSelected(NULL, ErgFileFormat::erg);
 }
 
 
@@ -566,13 +566,13 @@ void
 WorkoutWindow::newMrcFile()
 {
     // new blank file clear points .. texts .. metadata etc
-    ergFileSelected(NULL, MRC);
+    ergFileSelected(NULL, ErgFileFormat::mrc);
 }
 
 void
 WorkoutWindow::saveAs()
 {
-    QString selected = format == MRC ? "MRC workout (*.mrc)" : "ERG workout (*.erg)";
+    QString selected = format == ErgFileFormat::mrc ? "MRC workout (*.mrc)" : "ERG workout (*.erg)";
     QString filename = QFileDialog::getSaveFileName(this, tr("Save Workout File"),
                                                     appsettings->value(this, GC_WORKOUTDIR, "").toString(),
                                                     "ERG workout (*.erg);;MRC workout (*.mrc);;Zwift workout (*.zwo)",
@@ -585,7 +585,7 @@ WorkoutWindow::saveAs()
 
     // filetype defaults to .erg
     if(!filename.endsWith(".erg") && !filename.endsWith(".mrc") && !filename.endsWith(".zwo")) {
-        if (format == MRC) filename.append(".mrc");
+        if (format == ErgFileFormat::mrc) filename.append(".mrc");
         else filename.append(".erg");
     }
 
@@ -594,14 +594,14 @@ WorkoutWindow::saveAs()
 
     // we need to set sensible defaults for
     // all the metadata in the file.
-    newergFile->Version = "2.0";
-    newergFile->Units = "";
-    newergFile->Filename = QFileInfo(filename).fileName();
-    newergFile->filename = filename;
-    newergFile->Name = "New Workout";
-    newergFile->Ftp = newergFile->CP;
+    newergFile->version("2.0");
+    newergFile->units("");
+    newergFile->originalFilename(QFileInfo(filename).fileName());
+    newergFile->filename(filename);
+    newergFile->name("New Workout");
+    newergFile->ftp(newergFile->CP());
     newergFile->valid = true;
-    newergFile->format = format;
+    newergFile->format(format);
 
     // if we're save as from an existing keep all the data
     // EXCEPT filename, which has just been changed!

@@ -68,7 +68,7 @@ class WorkoutWindow : public GcChartWindow
 
         // the ergfile we are editing
         ErgFile *ergFile;
-        int format;
+        ErgFileFormat format;
 
         // edit the definition
         QLabel *codeFormat;
@@ -111,7 +111,7 @@ class WorkoutWindow : public GcChartWindow
         void scrollMoved();
 
         // and erg file was selected
-        void ergFileSelected(ErgFile *, int format = 0);
+        void ergFileSelected(ErgFile *, ErgFileFormat format = ErgFileFormat::unknown);
 
         // qwkcode edited!
         void qwkcodeChanged();
