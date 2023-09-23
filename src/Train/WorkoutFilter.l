@@ -21,7 +21,7 @@
 #include <QDebug>
 
 #include "ModelFilter.h"
-#include "WorkoutFilter.tab.h"
+#include "WorkoutFilter_yacc.h"
 
 extern YYSTYPE yylval;
 %}
