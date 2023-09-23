@@ -190,7 +190,7 @@ InfoWidget::setContent
         slpInfo.append(QString("<tr><td>%1</td><td>&nbsp;</td><td><b>%2 km</b></td></tr>")
                               .arg(tr("Distance"))
                               .arg(ergFileBase.distance() / 1000.0, 0, 'f', 1));
-        slpInfo.append(QString("<tr><td>%1</td><td>&nbsp;</td><td><b>%2 m<br/>%3 km @ %4 \%</b></b></td></tr>")
+        slpInfo.append(QString("<tr><td>%1</td><td>&nbsp;</td><td><b>%2 m<br/>%3 km @ %4 %</b></b></td></tr>")
                               .arg(tr("Elevation Gain"))
                               .arg(ergFileBase.ele(), 0, 'f', 1)
                               .arg(ergFileBase.eleDist() / 1000.0, 0, 'f', 1)

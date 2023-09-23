@@ -255,7 +255,7 @@ PowerZonesWidget::fillDetailsDoc
                                        "    <td><b>Z%1</b></td>"
                                        "    <td><b>%2</b></td>"
                                        "    <td><b>%3:%4</b></td>"
-                                       "    <td align=\"right\"><b>%5\%</b></td>"
+                                       "    <td align=\"right\"><b>%5 %</b></td>"
                                        "</tr>")
                                      .arg(i + 1)
                                      .arg(name(i))
@@ -268,7 +268,7 @@ PowerZonesWidget::fillDetailsDoc
                                        "    <td%7>Z%1</td>"
                                        "    <td%7>%2</td>"
                                        "    <td%7>%3:%4</td>"
-                                       "    <td align=\"right\" %7>%5\%</td>"
+                                       "    <td align=\"right\" %7>%5 %</td>"
                                        "</tr>")
                                      .arg(i + 1)
                                      .arg(name(i))
