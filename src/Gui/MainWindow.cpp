@@ -1658,7 +1658,7 @@ MainWindow::dropEvent(QDropEvent *event)
     if (list.count())  importCharts(list);
 
     // import workouts
-    if (workouts.count()) Library::importFiles(currentAthleteTab->context, workouts, true);
+    if (workouts.count()) Library::importFiles(currentAthleteTab->context, workouts, LibraryBatchImportConfirmation::forcedDialog);
 
     // if there is anything left, process based upon view...
     if (filenames.count()) {

@@ -31,6 +31,9 @@
 
 #include "TTSReader.h"
 
+#define MIN_WATTS 10000
+
+
 // Supported file types
 static QStringList supported;
 static bool setSupported()
@@ -47,6 +50,7 @@ static bool setSupported()
 
     return true;
 }
+
 static bool isinit = setSupported();
 bool ErgFile::isWorkout(QString name)
 {
@@ -56,40 +60,49 @@ bool ErgFile::isWorkout(QString name)
     }
     return false;
 }
-ErgFile::ErgFile(QString filename, int mode, Context *context) :
-    filename(filename), mode(mode), StrictGradient(true), fHasGPS(false), context(context)
+
+ErgFile::ErgFile(QString filename, ErgFileFormat mode, Context *context)
+: context(context)
 {
+    this->filename(filename);
+    this->mode(mode);
+    strictGradient(true);
+    fHasGPS(false);
     if (context->athlete->zones("Bike")) {
         int zonerange = context->athlete->zones("Bike")->whichRange(QDateTime::currentDateTime().date());
-        if (zonerange >= 0) CP = context->athlete->zones("Bike")->getCP(zonerange);
+        if (zonerange >= 0) CP(context->athlete->zones("Bike")->getCP(zonerange));
     }
     reload();
 }
 
-ErgFile::ErgFile(Context *context) : mode(0), StrictGradient(true), fHasGPS(false), context(context)
+ErgFile::ErgFile(Context *context)
+: context(context)
 {
+    mode(ErgFileFormat::unknown);
+    strictGradient(true);
+    fHasGPS(false);
     if (context->athlete->zones("Bike")) {
         int zonerange = context->athlete->zones("Bike")->whichRange(QDateTime::currentDateTime().date());
-        if (zonerange >= 0) CP = context->athlete->zones("Bike")->getCP(zonerange);
+        if (zonerange >= 0) CP(context->athlete->zones("Bike")->getCP(zonerange));
     } else {
-        CP = 300;
+        CP(300);
     }
-    filename ="";
+    filename("");
 }
 
 void
 ErgFile::setFrom(ErgFile *f)
 {
     // don't rename it !
-    QString filename=this->filename;
-    QString Filename=this->filename;
+    QString filename=this->filename();
+    QString Filename=this->filename();
 
     // take a copy
     *this = *f;
 
     // keep filename
-    this->filename = filename;
-    this->Filename = Filename;
+    this->filename(filename);
+    this->originalFilename(Filename);
 }
 
 ErgFile *
@@ -123,11 +136,11 @@ void ErgFile::reload()
 
     // which parser to call? NOTE: we should look at moving to an ergfile factory
     // like we do with ride files if we end up with lots of different formats
-    if      (filename.endsWith(".pgmf",   Qt::CaseInsensitive)) parseTacx();
-    else if (filename.endsWith(".zwo",    Qt::CaseInsensitive)) parseZwift();
-    else if (fact.exactMatch(filename))                         parseFromRideFileFactory();
-    else if (filename.endsWith(".erg2",   Qt::CaseInsensitive)) parseErg2();
-    else if (filename.endsWith(".tts",    Qt::CaseInsensitive)) parseTTS();
+    if      (filename().endsWith(".pgmf",   Qt::CaseInsensitive)) parseTacx();
+    else if (filename().endsWith(".zwo",    Qt::CaseInsensitive)) parseZwift();
+    else if (fact.exactMatch(filename()))                         parseFromRideFileFactory();
+    else if (filename().endsWith(".erg2",   Qt::CaseInsensitive)) parseErg2();
+    else if (filename().endsWith(".tts",    Qt::CaseInsensitive)) parseTTS();
     else parseComputrainer();
 
     finalize();
@@ -136,21 +149,22 @@ void ErgFile::reload()
 void ErgFile::parseZwift()
 {
     // Initialise
-    Version = "";
-    Units = "";
-    Filename = "";
-    Name = "";
-    Duration = -1;
-    Ftp = 0;       // FTP this file was targetted at
-    MaxWatts = 0;  // maxWatts in this ergfile (scaling)
+    version("");
+    units("");
+    originalFilename("");
+    name("");
+    duration(-1);
+    ftp(0);       // FTP this file was targetted at
+    minWatts(MIN_WATTS);  // minWatts in this ergfile
+    maxWatts(0);  // maxWatts in this ergfile
     valid = false; // did it parse ok?
-    format = ERG;  // default to couse until we know
+    format(ErgFileFormat::mrc);  // default to couse until we know
     Points.clear();
     Laps.clear();
     Texts.clear();
 
     // parse the file
-    QFile zwo(filename);
+    QFile zwo(filename());
     QXmlInputSource source(&zwo);
     QXmlSimpleReader xmlReader;
     ZwoParser handler;
@@ -160,19 +174,20 @@ void ErgFile::parseZwift()
 
     // save the metadata into our fields
     // we lose category and category index (for now)
-    Name=handler.name;
-    Description=handler.description;
-    Source=handler.author;
-    Tags=handler.tags;
+    name(handler.name);
+    description(handler.description);
+    this->source(handler.author);
+    tags(handler.tags);
 
     // extract contents into ErgFile....
     // each watts value is in percent terms so apply CP
     // and put into our format as integer
     foreach(ErgFilePoint p, handler.points) {
-        double watts = int(p.y * CP / 100.0);
+        double watts = int(p.y * CP() / 100.0);
         Points << ErgFilePoint(p.x, watts, watts);
-        if (watts > MaxWatts) MaxWatts = watts;
-        Duration = p.x;
+        if (watts > maxWatts()) maxWatts(watts);
+        if (watts < minWatts()) minWatts(watts);
+        duration(p.x);
     }
 
     // texts
@@ -180,7 +195,7 @@ void ErgFile::parseZwift()
 
     if (Points.count()) {
         valid = true;
-        Duration = Points.last().x;      // last is the end point in msecs
+        duration(Points.last().x);      // last is the end point in msecs
 
         // calculate climbing etc
         calculateMetrics();
@@ -189,17 +204,19 @@ void ErgFile::parseZwift()
 
 void ErgFile::parseErg2(QString p)
 {
-    QFile ergFile(filename);
+    QFile ergFile(filename());
     // Initialise
-    Version = "";
-    Units = "";
-    Filename = "";
-    Name = "";
-    Duration = -1;
-    Ftp = 0;       // FTP this file was targetted at
-    MaxWatts = 0;  // maxWatts in this ergfile (scaling)
+    version("");
+    units("");
+    originalFilename("");
+    name("");
+    duration(-1);
+    ftp(0);       // FTP this file was targetted at
+    minWatts(MIN_WATTS);  // minWatts in this ergfile (scaling)
+    maxWatts(0);  // maxWatts in this ergfile (scaling)
     valid = false; // did it parse ok?
-    mode = format = ERG;  // default to couse until we know
+    mode(ErgFileFormat::erg);
+    format(ErgFileFormat::mrc);  // default to mrc until we know
     Points.clear();
     Laps.clear();
     Texts.clear();
@@ -223,6 +240,12 @@ void ErgFile::parseErg2(QString p)
         QJsonObject object = document.object();
 
         QJsonArray segments = object["segments"].toArray();
+        if (object.contains("description")) {
+            description(object["description"].toString());
+        }
+        if (object.contains("title")) {
+            name(object["title"].toString());
+        }
 
         int time = 0;
         if (segments.size()>0) {
@@ -231,16 +254,22 @@ void ErgFile::parseErg2(QString p)
 
                 ErgFilePoint add;
                 add.x = time;
-                add.val = add.y = int((segment.at(1).toDouble() /100.00) * CP);
+                double relWatts = segment.at(1).toDouble();
+                add.val = add.y = int((relWatts /100.00) * CP());
+                if (add.y > maxWatts()) maxWatts(add.y);
+                if (add.y < minWatts()) minWatts(add.y);
                 Points.append(add);
 
                 time += segment.at(0).toDouble() * 60000;// from mins to 1000ths of a second
                 add.x = time;
-                add.val = add.y = int((segment.at(2).toDouble() /100.00) * CP);
+                relWatts = segment.at(2).toDouble();
+                add.val = add.y = int((relWatts /100.00) * CP());
+                if (add.y > maxWatts()) maxWatts(add.y);
+                if (add.y < minWatts()) minWatts(add.y);
                 Points.append(add);
             }
             // set ErgFile duration
-            Duration = Points.last().x;      // last is the end point in msecs
+            duration(Points.last().x);      // last is the end point in msecs
 
             valid = true;
             calculateMetrics();
@@ -251,15 +280,16 @@ void ErgFile::parseErg2(QString p)
 void ErgFile::parseTacx()
 {
     // Initialise
-    Version = "";
-    Units = "";
-    Filename = "";
-    Name = "";
-    Duration = -1;
-    Ftp = 0;        // FTP this file was targetted at
-    MaxWatts = 0;   // maxWatts in this ergfile (scaling)
+    version("");
+    units("");
+    originalFilename("");
+    name("");
+    duration(-1);
+    ftp(0);        // FTP this file was targetted at
+    minWatts(MIN_WATTS);   // minWatts in this ergfile (scaling)
+    maxWatts(0);   // maxWatts in this ergfile (scaling)
     valid = false;  // did it parse ok?
-    format = CRS;   // default to couse until we know
+    format(ErgFileFormat::crs);   // default to couse until we know
     Points.clear();
     Laps.clear();
     Texts.clear();
@@ -269,7 +299,7 @@ void ErgFile::parseTacx()
     double ralt = 200; // always start at 200 meters just to prettify the graph
 
     // open the file for binary reading and open a datastream
-    QFile pgmfFile(filename);
+    QFile pgmfFile(filename());
     if (pgmfFile.open(QIODevice::ReadOnly) == false) return;
     QDataStream input(&pgmfFile);
     input.setByteOrder(QDataStream::LittleEndian);
@@ -349,10 +379,12 @@ void ErgFile::parseTacx()
                     input>>general.brakeCategory;
                     switch (general.wattSlopePulse) {
                     case 0 :
-                        mode = format = ERG;
+                        mode(ErgFileFormat::erg);
+                        format(ErgFileFormat::erg);
                         break;
                     case 1 :
-                        mode = format = CRS;
+                        mode(ErgFileFormat::crs);
+                        format(ErgFileFormat::crs);
                         break;
                     default:
                         happy = false;
@@ -375,7 +407,7 @@ void ErgFile::parseTacx()
 
                         ErgFilePoint add;
 
-                        if (format == CRS) {
+                        if (format() == ErgFileFormat::crs) {
 		                    // distance guff
                             add.x = rdist;
 		                    double distance = program.distance; // in meters
@@ -394,7 +426,8 @@ void ErgFile::parseTacx()
                         }
 
                         Points.append(add);
-                        if (add.y > MaxWatts) MaxWatts=add.y;
+                        if (add.y > maxWatts()) maxWatts(add.y);
+                        if (add.y < minWatts()) minWatts(add.y);
 
                     }
                 }
@@ -426,7 +459,7 @@ void ErgFile::parseTacx()
         valid = true;
 
         // set ErgFile duration
-        Duration = Points.last().x;      // last is the end point in msecs
+        duration(Points.last().x);      // last is the end point in msecs
 
         // calculate climbing etc
         calculateMetrics();
@@ -435,11 +468,13 @@ void ErgFile::parseTacx()
 
 void ErgFile::parseComputrainer(QString p)
 {
-    QFile ergFile(filename);
+    QFile ergFile(filename());
     int section = NOMANSLAND;            // section 0=init, 1=header data, 2=course data
-    MaxWatts = Ftp = 0;
+    minWatts(MIN_WATTS);
+    maxWatts(0);
+    ftp(0);
     int lapcounter = 0;
-    format = ERG;                         // either ERG or MRC
+    format(ErgFileFormat::erg);                         // either ERG or MRC
     Points.clear();
     Texts.clear();
 
@@ -531,13 +566,16 @@ void ErgFile::parseComputrainer(QString p)
                 section = END;
             } else if (ergformat.exactMatch(line)) {
                 // save away the format
-                mode = format = ERG;
+                mode(ErgFileFormat::erg);
+                format(ErgFileFormat::erg);
             } else if (mrcformat.exactMatch(line)) {
                 // save away the format
-                mode = format = MRC;
+                mode(ErgFileFormat::mrc);
+                format(ErgFileFormat::mrc);
             } else if (crsformat.exactMatch(line)) {
                 // save away the format
-                mode = format = CRS;
+                mode(ErgFileFormat::crs);
+                format(ErgFileFormat::crs);
             } else if (lapmarker.exactMatch(line)) {
                 // lap marker found
                 ErgFileLap add;
@@ -561,33 +599,33 @@ void ErgFile::parseComputrainer(QString p)
             } else if (settings.exactMatch(line)) {
                 // we have name = value setting
                 QRegExp pversion("^VERSION *", Qt::CaseInsensitive);
-                if (pversion.exactMatch(settings.cap(1))) Version = settings.cap(2);
+                if (pversion.exactMatch(settings.cap(1))) version(settings.cap(2));
 
                 QRegExp pfilename("^FILE NAME *", Qt::CaseInsensitive);
-                if (pfilename.exactMatch(settings.cap(1))) Filename = settings.cap(2);
+                if (pfilename.exactMatch(settings.cap(1))) originalFilename(settings.cap(2));
 
                 QRegExp pname("^DESCRIPTION *", Qt::CaseInsensitive);
-                if (pname.exactMatch(settings.cap(1))) Name = settings.cap(2);
+                if (pname.exactMatch(settings.cap(1))) description(settings.cap(2));
 
                 QRegExp iname("^ERGDBID *", Qt::CaseInsensitive);
-                if (iname.exactMatch(settings.cap(1))) ErgDBId = settings.cap(2);
+                if (iname.exactMatch(settings.cap(1))) ergDBId(settings.cap(2));
 
                 QRegExp sname("^SOURCE *", Qt::CaseInsensitive);
-                if (sname.exactMatch(settings.cap(1))) Source = settings.cap(2);
+                if (sname.exactMatch(settings.cap(1))) source(settings.cap(2));
 
                 QRegExp punit("^UNITS *", Qt::CaseInsensitive);
                 if (punit.exactMatch(settings.cap(1))) {
-                    Units = settings.cap(2);
+                    units(settings.cap(2));
                     // UNITS can be ENGLISH or METRIC (miles/km)
                     QRegExp penglish(" ENGLISH$", Qt::CaseInsensitive);
-                    if (penglish.exactMatch(Units)) { // Units <> METRIC
+                    if (penglish.exactMatch(units())) { // Units <> METRIC
                       //qDebug("Setting conversion to ENGLISH");
                       bIsMetric = false;
                     }
                   }
 
                 QRegExp pftp("^FTP *", Qt::CaseInsensitive);
-                if (pftp.exactMatch(settings.cap(1))) Ftp = settings.cap(2).toInt();
+                if (pftp.exactMatch(settings.cap(1))) ftp(settings.cap(2).toInt());
 
             } else if (absoluteWatts.exactMatch(line)) {
                 // we have mins watts line
@@ -596,35 +634,40 @@ void ErgFile::parseComputrainer(QString p)
                 add.x = absoluteWatts.cap(1).toDouble() * 60000; // from mins to 1000ths of a second
                 add.val = add.y = round(absoluteWatts.cap(2).toDouble());             // plain watts
 
-                switch (format) {
+                switch (format()) {
 
-                case ERG:       // its an absolute wattage
-                    if (Ftp) { // adjust if target FTP is set.
+                case ErgFileFormat::erg:       // its an absolute wattage
+                    if (ftp()) { // adjust if target FTP is set.
                         // if ftp is set then convert to the users CP
 
                         double watts = add.y;
-                        double ftp = Ftp;
-                        watts *= CP/ftp;
+                        // TODO: WHY WAS THIS VARIABLE DEFINED: double ftp = Ftp;
+                        watts *= CP()/ftp();
                         add.y = add.val = int(watts);
                     }
                     break;
-                case MRC:       // its a percent relative to CP (mrc file)
-                    add.y *= CP;
+                case ErgFileFormat::mrc:       // its a percent relative to CP (mrc file)
+                    add.y *= CP();
                     add.y /= 100.00;
                     add.val = add.y = int(add.y);
                     break;
+                default:
+                    break;
                 }
                 Points.append(add);
-                if (add.y > MaxWatts) MaxWatts=add.y;
+                if (add.y > maxWatts()) maxWatts(add.y);
+                if (add.y < minWatts()) minWatts(add.y);
 
             } else if (relativeWatts.exactMatch(line)) {
 
                 // we have a relative watts match
                 ErgFilePoint add;
                 add.x = relativeWatts.cap(1).toDouble() * 60000; // from mins to 1000ths of a second
-                add.val = add.y = int((relativeWatts.cap(2).toDouble() /100.00) * CP);
+                double relWatts = relativeWatts.cap(2).toDouble();
+                add.val = add.y = int((relWatts /100.00) * CP());
                 Points.append(add);
-                if (add.y > MaxWatts) MaxWatts=add.y;
+                if (add.y > maxWatts()) maxWatts(add.y);
+                if (add.y < minWatts()) minWatts(add.y);
 
             } else if (absoluteSlope.exactMatch(line)) {
                 // dist, grade, wind strength
@@ -643,7 +686,8 @@ void ErgFile::parseComputrainer(QString p)
                 ralt += distance * add.val / 100.; /* paused */
 
                 Points.append(add);
-                if (add.y > MaxWatts) MaxWatts=add.y;
+                if (add.y > maxWatts()) maxWatts(add.y);
+                if (add.y < minWatts()) minWatts(add.y);
 
 
             } else if (ignore.exactMatch(line)) {
@@ -669,7 +713,7 @@ void ErgFile::parseComputrainer(QString p)
     if (section == END && Points.count() > 0) {
         valid = true;
 
-        if (mode == CRS) {
+        if (mode() == ErgFileFormat::crs) {
             // Add the last point for a crs file
             ErgFilePoint add;
 
@@ -677,7 +721,8 @@ void ErgFile::parseComputrainer(QString p)
             add.val = 0.0;
             add.y = ralt;
             Points.append(add);
-            if (add.y > MaxWatts) MaxWatts=add.y;
+            if (add.y > maxWatts()) maxWatts(add.y);
+            if (add.y < minWatts()) minWatts(add.y);
 
             // Add a final meta-lap at the end - causes the system to correctly mark off laps.
             // An improvement would be to check for a lap marker at end, and only add this if required.
@@ -701,10 +746,9 @@ void ErgFile::parseComputrainer(QString p)
         }
 
         // set ErgFile duration
-        Duration = Points.last().x;      // last is the end point in msecs
+        duration(Points.last().x);      // last is the end point in msecs
 
         calculateMetrics();
-
     } else {
         valid = false;
     }
@@ -719,25 +763,27 @@ void ErgFile::parseComputrainer(QString p)
 void ErgFile::parseFromRideFileFactory()
 {
     // Initialise
-    Version = "";
-    Units = "";
-    Filename = "";
-    Name = "";
-    Duration = -1;
-    Ftp = 0;       // FTP this file was targetted at
-    MaxWatts = 0;  // maxWatts in this ergfile (scaling)
+    version("");
+    units("");
+    originalFilename("");
+    name("");
+    duration(-1);
+    ftp(0);       // FTP this file was targetted at
+    minWatts(0);  // minWatts in this ergfile (scaling)
+    maxWatts(0);  // maxWatts in this ergfile (scaling)
     valid = false; // did it parse ok?
-    format = mode = CRS;
+    mode(ErgFileFormat::crs);
+    format(ErgFileFormat::crs);
     Points.clear();
     Laps.clear();
     Texts.clear();
 
     // TTS File Gradient Should be smoothly interpolated from Altitude.
-    StrictGradient = false;
+    strictGradient(false);
 
     static double km = 0;
 
-    QFile gpxFile(filename);
+    QFile gpxFile(filename());
 
     // check file exists
     if (!gpxFile.exists()) {
@@ -759,7 +805,7 @@ void ErgFile::parseFromRideFileFactory()
     bool fHasLon   = ride->areDataPresent()->lon;
     bool fHasAlt   = ride->areDataPresent()->alt;
     bool fHasSlope = ride->areDataPresent()->slope;
-    fHasGPS   = fHasLat && fHasLon;
+    fHasGPS(fHasLat && fHasLon);
 
     if (fHasKm && fHasSlope) {}     // same as crs file
     else if (fHasKm && fHasAlt) {}  // derive slope from distance and alt
@@ -817,12 +863,13 @@ void ErgFile::parseFromRideFileFactory()
         add.y   = alt;
         add.val = slope;
 
-        if (fHasGPS) {
+        if (fHasGPS()) {
             add.lat = point->lat;
             add.lon = point->lon;
         }
 
-        if (add.y > MaxWatts) MaxWatts = add.y;
+        if (add.y > maxWatts()) maxWatts(add.y);
+        if (add.y < minWatts()) minWatts(add.y);
 
         Points.append(add);
     }
@@ -848,7 +895,7 @@ void ErgFile::parseFromRideFileFactory()
     valid = true;
 
     // set ErgFile duration
-    Duration = Points.last().x;      // end point in meters
+    duration(Points.last().x);      // end point in meters
 
     // calculate climbing etc
     calculateMetrics();
@@ -858,23 +905,25 @@ void ErgFile::parseFromRideFileFactory()
 void ErgFile::parseTTS()
 {
     // Initialise
-    Version = "";
-    Units = "";
-    Filename = "";
-    Name = "";
-    Duration = -1;
-    Ftp = 0;       // FTP this file was targetted at
-    MaxWatts = 0;  // maxWatts in this ergfile (scaling)
+    version("");
+    units("");
+    originalFilename("");
+    name("");
+    duration(-1);
+    ftp(0);       // FTP this file was targetted at
+    minWatts(MIN_WATTS);  // minWatts in this ergfile (scaling)
+    maxWatts(0);  // maxWatts in this ergfile (scaling)
     valid = false; // did it parse ok?
-    format = mode = CRS;
+    mode(ErgFileFormat::crs);
+    format(ErgFileFormat::crs);
     Points.clear();
     Laps.clear();
     Texts.clear();
 
     // TTS File Gradient Should be smoothly interpolated from Altitude.
-    StrictGradient = false;
+    strictGradient(false);
 
-    QFile ttsFile(filename);
+    QFile ttsFile(filename());
     if (ttsFile.open(QIODevice::ReadOnly) == false) {
         valid = false;
        return;
@@ -902,7 +951,7 @@ void ErgFile::parseTTS()
     bool fHasKm    = ttsReader.hasKm();
     bool fHasAlt   = ttsReader.hasElevation();
     bool fHasSlope = ttsReader.hasGradient();
-    fHasGPS   = ttsReader.hasGPS();
+    fHasGPS(ttsReader.hasGPS());
 
     if (fHasKm && fHasSlope) {}     // same as crs file
     else if (fHasKm && fHasAlt) {}  // derive slope from distance and alt
@@ -911,8 +960,8 @@ void ErgFile::parseTTS()
         return;
     }
 
-    Name = QString::fromStdWString(ttsReader.getRouteName());               // description in file
-    Description = QString::fromStdWString(ttsReader.getRouteDescription()); // long narrative for workout
+    name(QString::fromStdWString(ttsReader.getRouteName()));               // description in file
+    description(QString::fromStdWString(ttsReader.getRouteDescription())); // long narrative for workout
 
     const NS_TTSReader::Point *prevPoint, *point, *nextPoint;
 
@@ -952,10 +1001,10 @@ void ErgFile::parseTTS()
         } else if (nextPoint && fHasAlt) {
             double km0 = (i == 0) ? 0 : point->getDistanceFromStart(); // first entry holds total distance
             double alt0 = point->getElevation();
-        
+
             double km1 = nextPoint->getDistanceFromStart();
             double alt1 = nextPoint->getElevation();
-        
+
             double rise = alt1 - alt0;
             double h = km1 - km0;
 
@@ -966,12 +1015,13 @@ void ErgFile::parseTTS()
         add.y = alt;
         add.val = slope;
 
-        if (fHasGPS) {
+        if (fHasGPS()) {
             add.lat = point->getLatitude();
             add.lon = point->getLongitude();
         }
 
-        if (add.y > MaxWatts) MaxWatts = add.y;
+        if (add.y > maxWatts()) maxWatts(add.y);
+        if (add.y < minWatts()) minWatts(add.y);
 
         Points.append(add);
     }
@@ -1145,7 +1195,7 @@ void ErgFile::parseTTS()
     valid = true;
 
     // set ErgFile duration
-    Duration = Points.last().x;      // end point in meters
+    duration(Points.last().x);      // end point in meters
 
     // calculate climbing etc
     calculateMetrics();
@@ -1180,23 +1230,20 @@ ErgFile::save(QStringList &errors)
 {
     // save the file including changes
     // XXX TODO we don't support writing pgmf or CRS just yet...
-    if (filename.endsWith("pgmf", Qt::CaseInsensitive) || format == CRS) {
+    if (filename().endsWith("pgmf", Qt::CaseInsensitive) || format() == ErgFileFormat::crs) {
         errors << QString(QObject::tr("Unsupported file format"));
         return false;
     }
 
     // type
-    QString typestring("UNKNOWN");
-    if (format==ERG) typestring = "ERG";
-    if (format==MRC) typestring = "MRC";
-    if (format==CRS) typestring = "CRS";
-    if (filename.endsWith("zwo", Qt::CaseInsensitive)) typestring="ZWO";
+    QString typestring(formatString());
+    if (filename().endsWith("zwo", Qt::CaseInsensitive)) typestring="ZWO";
 
     // get CP so we can scale back etc
-    int CP=0;
+    int lCP=0;
     if (context->athlete->zones("Bike")) {
         int zonerange = context->athlete->zones("Bike")->whichRange(QDateTime::currentDateTime().date());
-        if (zonerange >= 0) CP = context->athlete->zones("Bike")->getCP(zonerange);
+        if (zonerange >= 0) lCP = context->athlete->zones("Bike")->getCP(zonerange);
     }
 
     // MRC and ERG formats are ok
@@ -1204,10 +1251,10 @@ ErgFile::save(QStringList &errors)
     //
     // ERG file
     //
-    if (typestring == "ERG" && format == ERG) {
+    if (typestring == "ERG" && format() == ErgFileFormat::erg) {
 
         // open the file etc
-        QFile f(filename);
+        QFile f(filename());
         if (f.open(QIODevice::WriteOnly | QIODevice::Truncate | QIODevice::Text) == false) {
             errors << "Unable to open file for writing.";
             return false;
@@ -1232,13 +1279,13 @@ ErgFile::save(QStringList &errors)
         // MINUTES  WATTS
         // [END COURSE HEADER]
         out << "[COURSE HEADER]\n";
-        if (Ftp) out <<"FTP="<<QString("%1").arg(Ftp)<<"\n";
-        if (Source != "") out<<"SOURCE="<<Source<<"\n";
-        if (ErgDBId != "") out<<"ERGDBID="<<ErgDBId<<"\n";
-        if (Version != "") out<<"VERSION="<<Version<<"\n";
-        if (Units != "") out<<"UNITS="<<Units<<"\n";
-        if (Name != "") out<<"DESCRIPTION="<<Name<<"\n";
-        if (Filename != "") out<<"FILE NAME="<<Filename<<"\n";
+        if (ftp()) out <<"FTP="<<QString("%1").arg(ftp())<<"\n";
+        if (source() != "") out<<"SOURCE="<<source()<<"\n";
+        if (ergDBId() != "") out<<"ERGDBID="<<ergDBId()<<"\n";
+        if (version() != "") out<<"VERSION="<<version()<<"\n";
+        if (units() != "") out<<"UNITS="<<units()<<"\n";
+        if (description() != "") out<<"DESCRIPTION="<<description()<<"\n";
+        if (originalFilename() != "") out<<"FILE NAME="<<originalFilename()<<"\n";
         out << "MINUTES WATTS\n";
         out << "[END COURSE HEADER]\n";
 
@@ -1262,7 +1309,7 @@ ErgFile::save(QStringList &errors)
             double minutes = double(p.x) / (1000.0f*60.0f);
 
             // we scale back if needed
-            if (Ftp && CP) watts = (double(p.y)/CP) * Ftp;
+            if (ftp() && lCP) watts = (double(p.y)/lCP) * ftp();
 
             // check if a lap marker should be inserted
             foreach(ErgFileLap l, Laps) {
@@ -1314,10 +1361,10 @@ ErgFile::save(QStringList &errors)
     //
     // MRC
     //
-    if (typestring == "MRC" && format == MRC) {
+    if (typestring == "MRC" && format() == ErgFileFormat::mrc) {
 
         // open the file etc
-        QFile f(filename);
+        QFile f(filename());
         if (f.open(QIODevice::WriteOnly | QIODevice::Truncate | QIODevice::Text) == false) {
             errors << "Unable to open file for writing.";
             return false;
@@ -1342,12 +1389,12 @@ ErgFile::save(QStringList &errors)
         // MINUTES  WATTS
         // [END COURSE HEADER]
         out << "[COURSE HEADER]\n";
-        if (Source != "") out<<"SOURCE="<<Source<<"\n";
-        if (ErgDBId != "") out<<"ERGDBID="<<ErgDBId<<"\n";
-        if (Version != "") out<<"VERSION="<<Version<<"\n";
-        if (Units != "") out<<"UNITS="<<Units<<"\n";
-        if (Name != "") out<<"DESCRIPTION="<<Name<<"\n";
-        if (Filename != "") out<<"FILE NAME="<<Filename<<"\n";
+        if (source() != "") out<<"SOURCE="<<source()<<"\n";
+        if (ergDBId() != "") out<<"ERGDBID="<<ergDBId()<<"\n";
+        if (version() != "") out<<"VERSION="<<version()<<"\n";
+        if (units() != "") out<<"UNITS="<<units()<<"\n";
+        if (description() != "") out<<"DESCRIPTION="<<description()<<"\n";
+        if (originalFilename() != "") out<<"FILE NAME="<<originalFilename()<<"\n";
         out << "MINUTES PERCENT\n";
         out << "[END COURSE HEADER]\n";
 
@@ -1370,7 +1417,7 @@ ErgFile::save(QStringList &errors)
             double minutes = double(p.x) / (1000.0f*60.0f);
 
             // we scale back if needed
-            if (CP) watts = (double(p.y)/CP) * 100.0f;
+            if (lCP) watts = (double(p.y)/lCP) * 100.0f;
 
             // check if a lap marker should be inserted
             foreach(ErgFileLap l, Laps) {
@@ -1419,10 +1466,10 @@ ErgFile::save(QStringList &errors)
 
     }
 
-    if (typestring == "ZWO" && format == ERG) {
+    if (typestring == "ZWO" && format() == ErgFileFormat::erg) {
 
         // open the file etc
-        QFile f(filename);
+        QFile f(filename());
         if (f.open(QIODevice::WriteOnly | QIODevice::Truncate | QIODevice::Text) == false) {
             errors << "Unable to open file for writing.";
             return false;
@@ -1435,12 +1482,12 @@ ErgFile::save(QStringList &errors)
         out << "<workout_file>\n";
 
         // metadata at top
-        if (Name != "") out << "    <name>"<<Utils::xmlprotect(Name)<<"</name>\n";
-        if (Source != "") out << "    <author>"<<Utils::xmlprotect(Source)<<"</author>\n";
-        if (Description != "") out << "    <description>"<<Utils::xmlprotect(Description)<<"</description>\n";
-        if (Tags.count()) {
+        if (name() != "") out << "    <name>"<<Utils::xmlprotect(name())<<"</name>\n";
+        if (source() != "") out << "    <author>"<<Utils::xmlprotect(source())<<"</author>\n";
+        if (description() != "") out << "    <description>"<<Utils::xmlprotect(description())<<"</description>\n";
+        if (tags().count()) {
             out << "    <tags>\n";
-            foreach(QString tag, Tags)
+            foreach(QString tag, tags())
                 out << "        <tag>"<<Utils::xmlprotect(tag)<<"</tag>\n";
             out << "    </tags>\n";
         }
@@ -1492,10 +1539,10 @@ ErgFile::save(QStringList &errors)
                 out << "        <IntervalsT Repeat=\""<<(count+1)<<"\" "
                     << "OnDuration=\"" << sections[i].duration/1000 << "\" "
                     << "OffDuration=\"" << sections[i+1].duration/1000 << "\" "
-                    << "PowerOnLow=\"" << sections[i].start/CP << "\" "
-                    << "PowerOnHigh=\"" << sections[i].end/CP << "\" "
-                    << "PowerOffLow=\"" << sections[i+1].start/CP << "\" "
-                    << "PowerOffHigh=\"" << sections[i+1].end/CP << "\" ";
+                    << "PowerOnLow=\"" << sections[i].start/lCP << "\" "
+                    << "PowerOnHigh=\"" << sections[i].end/lCP << "\" "
+                    << "PowerOffLow=\"" << sections[i+1].start/lCP << "\" "
+                    << "PowerOffHigh=\"" << sections[i+1].end/lCP << "\" ";
 
                 int d = (count+1)*(sections[i].duration+sections[i+1].duration);
                 if (Texts.count() > 0) {
@@ -1524,8 +1571,8 @@ ErgFile::save(QStringList &errors)
                 else if (sections[i].start <  sections[i].end) tag = "Warmup";
 
                 out << "        <" << tag << " Duration=\""<<sections[i].duration/1000 << "\" "
-                                  << "PowerLow=\"" <<sections[i].start/CP << "\" "
-                                  << "PowerHigh=\"" <<sections[i].end/CP << "\"";
+                                  << "PowerLow=\"" <<sections[i].start/lCP << "\" "
+                                  << "PowerHigh=\"" <<sections[i].end/lCP << "\"";
                 if (Texts.count() > 0) {
                     out << ">\n";
                     foreach (ErgFileText cue, Texts) {
@@ -1601,7 +1648,7 @@ void ErgFile::finalize()
         Laps.append(lap);
 
         // End lap
-        lap.x = Duration;
+        lap.x = duration();
         lap.LapNum = 2;
         lap.selected = false;
         lap.name = "Route End";
@@ -1724,39 +1771,34 @@ bool ErgFile::textsInRange(double searchStart, double searchRange, int& rangeSta
 void
 ErgFile::calculateMetrics()
 {
-    // reset metrics
-    XP = CP = AP = IsoPower = IF = RI = BikeStress = BS = SVI = VI = 0;
-    ELE = ELEDIST = GRADE = 0;
-
-    minY = 0;
-    maxY = 0;
+    resetMetrics();
 
     // is it valid?
     if (!isValid()) return;
 
-    if (format == CRS) {
+    if (format() == ErgFileFormat::crs) {
 
         ErgFilePoint last;
         bool first = true;
         foreach(ErgFilePoint p, Points) {
 
             if (first == true) {
-                minY = p.y;
-                maxY = p.y;
+                minY(p.y);
+                maxY(p.y);
                 first = false;
             } else {
-                minY = std::min(minY, p.y);
-                maxY = std::max(maxY, p.y);
+                minY(std::min(minY(), p.y));
+                maxY(std::max(maxY(), p.y));
 
                 if (p.y > last.y) {
-                    ELEDIST += p.x - last.x;
-                    ELE += p.y - last.y;
+                    eleDist(eleDist() + p.x - last.x);
+                    ele(ele() + p.y - last.y);
                 }
             }
             last = p;
         }
-        if (ELE == 0 || ELEDIST == 0) GRADE = 0;
-        else GRADE = ELE / ELEDIST * 100;
+        if (ele() == 0 || eleDist() == 0) grade(0);
+        else grade(ele() / eleDist() * 100);
 
     }
     else {
@@ -1787,19 +1829,35 @@ ErgFile::calculateMetrics()
 
         ErgFilePoint last;
         bool first = true;
+
+        // CP
+        int zonerange = context->athlete->zones("Bike")->whichRange(QDateTime::currentDateTime().date());
+        if (context->athlete->zones("Bike")) {
+            if (zonerange >= 0) CP(context->athlete->zones("Bike")->getCP(zonerange));
+        }
+        QList<int> powerZones = context->athlete->zones("Bike")->getZoneHighs(zonerange);
+        numZones(powerZones.length());
+        long secondsInZone[MAX_ZONES] = {};
+
         foreach (ErgFilePoint p, Points) {
 
             // set the minimum/maximum Y value
             if (first) {
-                minY = p.y;
-                maxY = p.y;
+                minY(p.y);
+                maxY(p.y);
                 first = false;
             } else {
-                minY = std::min(minY, p.y);
-                maxY = std::max(maxY, p.y);
+                minY(std::min(minY(), p.y));
+                maxY(std::max(maxY(), p.y));
             }
 
             while (nextSecs < p.x) {
+                for (int i = 0; i < powerZones.length(); ++i) {
+                    if (p.y < powerZones[i] || i == powerZones.length() - 1) {
+                        ++secondsInZone[i];
+                        break;
+                    }
+                }
 
                 // CALCULATE IsoPower
                 apsum += last.y;
@@ -1833,40 +1891,57 @@ ErgFile::calculateMetrics()
         }
 
         // XP, IsoPower and AP
-        XP = pow(sktotal / skcount, 0.25);
-        IsoPower = pow(total / count, 0.25);
-        AP = apsum / count;
-
-        // CP
-        if (context->athlete->zones("Bike")) {
-            int zonerange = context->athlete->zones("Bike")->whichRange(QDateTime::currentDateTime().date());
-            if (zonerange >= 0) CP = context->athlete->zones("Bike")->getCP(zonerange);
-        }
+        XP(pow(sktotal / skcount, 0.25));
+        IsoPower(pow(total / count, 0.25));
+        AP(apsum / count);
 
         // IF
-        if (CP) {
-            IF = IsoPower / CP;
-            RI = XP / CP;
+        if (CP()) {
+            IF(IsoPower() / CP());
+            RI(XP() / CP());
         }
 
         // BikeStress
-        double normWork = IsoPower * (Duration / 1000); // msecs
-        double rawTSS = normWork * IF;
-        double workInAnHourAtCP = CP * 3600;
-        BikeStress = rawTSS / workInAnHourAtCP * 100.0;
+        double normWork = IsoPower() * (duration() / 1000); // msecs
+        double rawTSS = normWork * IF();
+        double workInAnHourAtCP = CP() * 3600;
+        bikeStress(rawTSS / workInAnHourAtCP * 100.0);
 
         // BS
-        double xWork = XP * (Duration / 1000); // msecs
-        double rawBS = xWork * RI;
-        BS = rawBS / workInAnHourAtCP * 100.0;
+        double xWork = XP() * (duration() / 1000); // msecs
+        double rawBS = xWork * RI();
+        BS(rawBS / workInAnHourAtCP * 100.0);
 
         // VI and RI
-        if (AP) {
-            VI = IsoPower / AP;
-            SVI = XP / AP;
+        if (AP()) {
+            VI(IsoPower() / AP());
+            SVI(XP() / AP());
+        }
+
+
+        int weightedZoneDurations[MAX_ZONES] = {};
+        int durationInZones = 0;
+        for (int i = 0; i < powerZoneList().length(); ++i) {
+            powerZonePC(powerZoneList()[i], secondsInZone[i] * 100000 / double(duration()));
+            weightedZoneDurations[i] = (i + 1) * secondsInZone[i];
+            durationInZones += secondsInZone[i];
+        }
+        if (durationInZones > 0) {
+            int wzdmi = 0;
+            double wzdm = weightedZoneDurations[wzdmi];
+            for (int i = 1; i < powerZoneList().length(); ++i) {
+                if (weightedZoneDurations[i] > 0 && wzdm <= weightedZoneDurations[i]) {
+                    wzdm = weightedZoneDurations[i];
+                    wzdmi = i;
+                }
+            }
+            dominantZone(wzdmi + 1);
+        } else {
+            dominantZone(0);
         }
     }
 }
+
 
 // Update query state to bracket query location.
 // Returns false if bracket cannot be established, otherwise true.

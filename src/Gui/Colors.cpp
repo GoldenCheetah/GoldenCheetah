@@ -598,6 +598,8 @@ GCColor::stylesheet(bool train)
     return QString("QTreeView { color: %2; background: %1; }"
                    "%3"
                    "QTableWidget { color: %2; background: %1; }"
+                   "QLabel { color: %2; background: %1; }"
+                   "QFrame { background: %1; }"
 #ifndef Q_OS_MAC
                    "QHeaderView { background-color: %1; color: %2; }"
                    "QHeaderView::section { background-color: %1; color: %2; border: 0px ; }"

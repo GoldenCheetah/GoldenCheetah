@@ -52,7 +52,7 @@ void
 WorkoutPlotWindow::ergFileSelected(ErgFile *f)
 {
     // rename window to workout name
-    if (f && f->Name != "") setProperty("subtitle", f->Name);
+    if (f && f->name() != "") setProperty("subtitle", f->name());
     else setProperty("subtitle", "");
 
     ergPlot->setData(f);
