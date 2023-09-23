@@ -17,9 +17,9 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#include <unistd.h>
 #include <QString>
 #include <QDebug>
+
 #include "ModelFilter.h"
 #include "WorkoutFilter.tab.h"
 
