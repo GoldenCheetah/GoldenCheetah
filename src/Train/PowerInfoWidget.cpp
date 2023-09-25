@@ -156,11 +156,6 @@ PowerInfoWidget::paintEvent
             }
             painter.drawText(weightedLabelRect, Qt::AlignLeft | Qt::AlignVCenter, weightedLabel);
         }
-
-#if 0
-        painter.setPen(QColor("black"));
-        painter.drawRect(0, 0, width() - 1, height() - 1);
-#endif
     }
     event->accept();
 }

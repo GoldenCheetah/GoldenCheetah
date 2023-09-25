@@ -129,15 +129,6 @@ class ErgFile : public ErgFileBase
 
         bool isValid() const;            // is the file valid or not?
 
-#if 0
-        double Cp;
-        int format;             // ERG, CRS, MRC, ERG2 currently supported
-
-        bool hasGradient() const { return CRS == format; } // Has Gradient and Altitude
-        bool hasWatts()    const { return ERG == format || MRC == format; }
-        bool hasGPS()      const { return fHasGPS; } // Has Lat/Lon
-#endif
-
 private:
         void sortLaps() const;
         void sortTexts() const;

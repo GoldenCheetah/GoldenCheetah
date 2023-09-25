@@ -147,10 +147,6 @@ PowerZonesWidget::paintEvent
         painter.restore();
     }
 
-#if 0
-    painter.setPen(QPen(QColor("red"), 5));
-    painter.drawRect(0, 0, drawArea.width() - 1, drawArea.height() - 1);
-#endif
     event->accept();
 }
 
