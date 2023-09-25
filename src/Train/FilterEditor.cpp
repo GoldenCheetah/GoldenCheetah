@@ -420,9 +420,5 @@ FilterEditorHelper::evaluateCompletion
     }
     ++cp;
 
-#if 0
-    qDebug().noquote() << "FilterEditorHelper::evaluateCompletion:" << QString("QCOMPARE(feh.evaluateCompletion(\"%1\", \"%2\", \"%3\", %4, %5, %6), rp(\"%7\", %8));").arg(originalText).arg(completion).arg(cursorPosition).arg(selectionStart).arg(selectionLength).arg(newText).arg(cp);
-#endif
-
     return std::make_pair<QString, int>(QString(newText), int(cp));
 }
