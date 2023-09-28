@@ -281,6 +281,8 @@ class TrainSidebar : public GcWindow
         int status;
         int displaymode;
 
+        QString codeWorkoutKey;     // traindb-key of the workout in the case of a code-workout; empty otherwise
+        QString codeWorkoutTitle;   // title of the workout in the case of a code-workout; empty otherwise
         QFile *recordFile;      // where we record!
         int lastRecordSecs;     // to avoid duplicates
         QMutex rrMutex;         // to coordinate async recording from ANT+ thread
