@@ -836,6 +836,7 @@ TrainSidebar::workoutTreeWidgetSelectionChanged()
     QModelIndex current = workoutTree->currentIndex();
     QModelIndex target = sortModel->mapToSource(current);
     QString filename = workoutModel->data(workoutModel->index(target.row(), TdbWorkoutModelIdx::filepath), Qt::DisplayRole).toString();
+    QString workoutTitle = workoutModel->data(workoutModel->index(target.row(), TdbWorkoutModelIdx::displayname), Qt::DisplayRole).toString();
     QString workoutType = workoutModel->data(workoutModel->index(target.row(), TdbWorkoutModelIdx::type), Qt::DisplayRole).toString();
 
     // wipe away the current selected workout once we've told everyone
@@ -868,6 +869,8 @@ TrainSidebar::workoutTreeWidgetSelectionChanged()
     // is it the auto mode?
     if (filename == "//1") {
         // ergo mode
+        codeWorkoutKey = filename;
+        codeWorkoutTitle = workoutTitle;
         context->notifyErgFileSelected(NULL);
         ergFileQueryAdapter.setErgFile(NULL);
         mode = ErgFileFormat::erg;
@@ -876,6 +879,8 @@ TrainSidebar::workoutTreeWidgetSelectionChanged()
         //ergPlot->setVisible(false);
     } else if (filename == "//2") {
         // slope mode
+        codeWorkoutKey = filename;
+        codeWorkoutTitle = workoutTitle;
         context->notifyErgFileSelected(NULL);
         ergFileQueryAdapter.setErgFile(NULL);
         mode = ErgFileFormat::crs;
@@ -884,6 +889,8 @@ TrainSidebar::workoutTreeWidgetSelectionChanged()
         //ergPlot->setVisible(false);
     } else {
         // workout mode
+        codeWorkoutKey = QString();
+        codeWorkoutTitle = QString();
         ErgFile* ergFile = new ErgFile(filename, mode, context);
         mode = ergFile->mode();
 
@@ -1433,6 +1440,8 @@ void TrainSidebar::Start()       // when start button is pressed
             QString workoutName;
             if (context->currentErgFile()) {
                 workoutName = QFileInfo(context->currentErgFile()->filename()).baseName();
+            } else if (! codeWorkoutTitle.isEmpty()) {
+                workoutName = codeWorkoutTitle;
             }
 
             QDateTime now = QDateTime::currentDateTime();
@@ -1604,7 +1613,11 @@ void TrainSidebar::Stop(int deviceStatus)        // when stop button is pressed
 
             RideImportWizard *dialog = new RideImportWizard (list, context);
             dialog->process(); // do it!
-            trainDB->lastWorkout(context->currentErgFile()->filename());
+            if (context->currentErgFile() != nullptr) {
+                trainDB->lastWorkout(context->currentErgFile()->filename());
+            } else if (! codeWorkoutKey.isEmpty()) {
+                trainDB->lastWorkout(codeWorkoutKey);
+            }
         }
     }
 
