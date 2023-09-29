@@ -29,6 +29,7 @@
 #include "Shy.h"
 #include "ErgOverview.h"
 #include "TrainDB.h"
+#include "Colors.h"
 
 
 InfoWidget::InfoWidget
@@ -73,7 +74,7 @@ InfoWidget::InfoWidget
     l->addWidget(powerZonesWidget, row, 0, 1, -1);
     ++row;
 
-    tagBar = new TagBar(trainDB, this);
+    tagBar = new TagBar(trainDB, GCColor::invertColor(GColor(CTRAINPLOTBACKGROUND)), this);
     connect(trainDB, SIGNAL(tagsChanged(int, int, int)), tagBar, SLOT(tagStoreChanged(int, int, int)));
     l->addWidget(tagBar, row, 0, 1, -1);
     ++row;
@@ -113,6 +114,7 @@ InfoWidget::changeEvent
         ratingFont.setPointSizeF(ratingFont.pointSizeF() * 1.5);
         ratingWidget->setFont(ratingFont);
     }
+    tagBar->setColor(GCColor::invertColor(GColor(CTRAINPLOTBACKGROUND)));
 }
 
 
