@@ -21,6 +21,7 @@
 
 #include <QWidget>
 #include <QLineEdit>
+#include <QColor>
 #include <QString>
 #include <QStringList>
 #include <QList>
@@ -45,10 +46,12 @@ class TagBar : public QWidget
     Q_OBJECT
 
 public:
-    TagBar(TagStore * const tagStore, QWidget *parent = nullptr);
+    TagBar(TagStore * const tagStore, const QColor &color, QWidget *parent = nullptr);
     ~TagBar();
 
     void setTaggable(Taggable *taggable);
+
+    void setColor(const QColor &color);
 
     QStringList getTagLabels() const;
     QList<int> getTagIds() const;
@@ -67,6 +70,7 @@ private:
     TagStore * const tagStore;
     Taggable *taggable;
     TagEdit *edit;
+    QColor color;
 
     void setCompletionList();
 };
