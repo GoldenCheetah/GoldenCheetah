@@ -21,6 +21,8 @@
 
 #include <QFrame>
 #include <QLabel>
+#include <QPushButton>
+#include <QColor>
 #include <QString>
 #include <QPropertyAnimation>
 
@@ -30,11 +32,13 @@ class TagWidget : public QFrame
     Q_OBJECT
 
 public:
-    TagWidget(int id, const QString &text, bool fadein = false, QWidget *parent = nullptr);
+    TagWidget(int id, const QString &text, bool fadein = false, const QColor &color = QColor(), QWidget *parent = nullptr);
     ~TagWidget();
 
     int getId() const;
     QString getLabel() const;
+
+    void setColor(const QColor &color);
 
     void updateAnimation();
 
@@ -49,6 +53,7 @@ private slots:
 private:
     const int id;
     bool deleteScheduled;
+    QPushButton *delButton;
     QLabel *label;
     QPropertyAnimation *animation;
 

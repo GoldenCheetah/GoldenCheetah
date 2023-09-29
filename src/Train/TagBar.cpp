@@ -57,8 +57,8 @@ TagEdit::keyPressEvent
 
 
 TagBar::TagBar
-(TagStore * const tagStore, QWidget *parent)
-: QWidget(parent), tagStore(tagStore), taggable(nullptr)
+(TagStore * const tagStore, const QColor &color, QWidget *parent)
+: QWidget(parent), tagStore(tagStore), taggable(nullptr), color(color)
 {
     FlowLayout *layout = new FlowLayout(0, -1, -1);
 
@@ -69,7 +69,6 @@ TagBar::TagBar
     completer->setFilterMode(Qt::MatchContains);
 
     edit = new TagEdit();
-    edit->setStyleSheet("QLineEdit { border: 0px; background-color: rgba(0, 0, 0, 0); }");
     edit->setPlaceholderText(tr("Add Tag..."));
     edit->setCompleter(completer);
     edit->setVisible(false);
@@ -77,6 +76,8 @@ TagBar::TagBar
     layout->addWidget(edit);
 
     setLayout(layout);
+
+    setColor(color);
 }
 
 
@@ -107,7 +108,7 @@ TagBar::setTaggable
         for (const auto &tagId : tagIds) {
             QString title = tagStore->getTagLabel(tagId);
 
-            TagWidget *tagWidget = new TagWidget(tagId, title, false);
+            TagWidget *tagWidget = new TagWidget(tagId, title, false, color);
             connect(tagWidget, SIGNAL(deleted(int)), this, SLOT(removeTag(int)));
             layout()->addWidget(tagWidget);
         }
@@ -118,6 +119,22 @@ TagBar::setTaggable
         edit->setVisible(false);
     }
     layout()->update();
+}
+
+
+void
+TagBar::setColor
+(const QColor &color)
+{
+    this->color = color;
+    if (color.isValid()) {
+        edit->setStyleSheet(QString("QLineEdit { border: 0px; background-color: rgba(0, 0, 0, 0); color: %1; }").arg(color.name(QColor::HexRgb)));
+    } else {
+        edit->setStyleSheet("QLineEdit { border: 0px; background-color: rgba(0, 0, 0, 0); }");
+    }
+    for (int i = 0; i < layout()->count() - 1; ++i) {
+        static_cast<TagWidget*>(layout()->itemAt(i)->widget())->setColor(color);
+    }
 }
 
 
@@ -151,7 +168,7 @@ TagBar::addTag
         QString title = tagStore->getTagLabel(id);
         QLayoutItem *editItem = layout()->takeAt(layout()->count() - 1);
 
-        TagWidget *tagWidget = new TagWidget(id, title, true);
+        TagWidget *tagWidget = new TagWidget(id, title, true, color);
         connect(tagWidget, SIGNAL(deleted(int)), this, SLOT(removeTag(int)));
         layout()->addWidget(tagWidget);
 

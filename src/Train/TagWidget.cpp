@@ -26,10 +26,9 @@
 
 
 TagWidget::TagWidget
-(int id, const QString &text, bool fadein, QWidget *parent)
+(int id, const QString &text, bool fadein, const QColor &color, QWidget *parent)
 : QFrame(parent), id(id), deleteScheduled(false)
 {
-    setStyleSheet("QFrame { border: 1px solid; border-radius: 6px; }");
     setContentsMargins(0, 0, 0, 0);
 
     setObjectName(mkObjectName(id));
@@ -45,12 +44,12 @@ TagWidget::TagWidget
     } else {
         label->setText(labelText);
     }
-    label->setStyleSheet("QLabel { border: 0px; }");
 
-    QPushButton *delButton = new QPushButton("✖");
+    delButton = new QPushButton("✖");
     delButton->setFlat(true);
-    delButton->setStyleSheet("QPushButton { padding: 0px; }");
     connect(delButton, &QPushButton::clicked, [=] { deleteScheduled = true; deleteAnimation(); });
+
+    setColor(color);
 
     layout->addWidget(delButton);
     layout->addWidget(label);
@@ -88,6 +87,24 @@ TagWidget::getLabel
 () const
 {
     return label->text();
+}
+
+
+void
+TagWidget::setColor
+(const QColor &color)
+{
+    if (color.isValid()) {
+        QColor alphaColor = color;
+        alphaColor.setAlpha(128);
+        setStyleSheet(QString("QFrame { border: 1px solid %1; border-radius: 6px; }").arg(alphaColor.name(QColor::HexArgb)));
+        label->setStyleSheet(QString("QLabel { border: 0px; color: %1; }").arg(color.name(QColor::HexRgb)));
+        delButton->setStyleSheet(QString("QPushButton { padding: 0px; color: %1; }").arg(alphaColor.name(QColor::HexArgb)));
+    } else {
+        setStyleSheet("QFrame { border: 1px solid; border-radius: 6px; }");
+        label->setStyleSheet("QLabel { border: 0px; }");
+        delButton->setStyleSheet("QPushButton { padding: 0px; }");
+    }
 }
 
 
