@@ -234,9 +234,9 @@ class TrainSidebar : public GcWindow
                        *videosyncItem,
                        *mediaItem;
 
-        QAbstractTableModel *videoModel;
-        QAbstractTableModel *videosyncModel;
-        QAbstractTableModel *workoutModel;
+        QAbstractTableModel *videoModel = nullptr;
+        QAbstractTableModel *videosyncModel = nullptr;
+        QAbstractTableModel *workoutModel = nullptr;
 
         DeviceTreeView *deviceTree;
         QTreeView *workoutTree;

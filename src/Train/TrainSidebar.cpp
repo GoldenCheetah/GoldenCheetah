@@ -429,9 +429,19 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
 TrainSidebar::~TrainSidebar
 ()
 {
-    delete videoModel;
-    delete videosyncModel;
-    delete workoutModel;
+#if !defined GC_VIDEO_NONE
+    if (videoModel != nullptr) {
+        delete videoModel;
+    }
+#ifdef GC_HAVE_VLC  // RLV currently only support for VLC
+    if (videosyncModel != nullptr) {
+        delete videosyncModel;
+    }
+#endif
+#endif
+    if (workoutModel != nullptr) {
+        delete workoutModel;
+    }
 }
 
 void
