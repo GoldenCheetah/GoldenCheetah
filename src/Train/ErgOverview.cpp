@@ -34,7 +34,7 @@ ErgOverview::ErgOverview
     QGridLayout *layout = new QGridLayout();
     int row = 0;
 
-    layout->addWidget(new QLabel("🕑"), row, 0, 1, 2, Qt::AlignCenter);
+    layout->addWidget(new QLabel(tr("Duration")), row, 0, 1, 2, Qt::AlignCenter);
     layout->addWidget(new QLabel(tr("Intensity")), row, 2, 1, 2, Qt::AlignCenter);
     layout->addWidget(new QLabel(tr("Stress")), row, 4, 1, 2, Qt::AlignCenter);
     ++row;
