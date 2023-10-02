@@ -58,9 +58,6 @@ export FINAL_NAME=GoldenCheetah_v3.6-DEV_x64.dmg
 mv GoldenCheetah.dmg $FINAL_NAME
 ls -l $FINAL_NAME
 
-#echo "Mounting dmg file and testing it can execute"
-#hdiutil mount $FINAL_NAME
-#/Volumes/GoldenCheetah/GoldenCheetah.app/Contents/MacOS/GoldenCheetah --version 2>GCversionMacOS.txt
 # Add last commit message and SHA256 to txt file
 git log -1 >> GCversionMacOS.txt
 echo "SHA256 hash of $FINAL_NAME:" >> GCversionMacOS.txt
