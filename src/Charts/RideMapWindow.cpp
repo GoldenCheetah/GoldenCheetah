@@ -454,7 +454,7 @@ void RideMapWindow::createHtml()
         setIsBlank(false);
     }
 
-    // get bounding co-ordinates for ride
+    // get bounding coordinates for ride
     if (! context->isCompareIntervals) {
         foreach(RideFilePoint *rfp, myRideItem->ride()->dataPoints()) {
             if (rfp->lat || rfp->lon) {
@@ -720,9 +720,11 @@ void RideMapWindow::createHtml()
                                    "   }\n"
 
                                    "   var intervalHighlighter = L.polyline(path, polyOptions).addTo(map);\n"
+                                   "   intervalHighlighter.on('mouseover', function(event) { L.DomEvent.stopPropagation(event); webBridge.hoverPath(event.latlng.lat, event.latlng.lng); });\n"
+                                   "   intervalHighlighter.on('mousemove', function(event) { L.DomEvent.stopPropagation(event); webBridge.hoverPath(event.latlng.lat, event.latlng.lng); });\n"
                                    "   intervalList.push(intervalHighlighter);\n"
                                    "}\n");
-        } else if (mapCombo->currentIndex() == OSM) {
+        } else if (mapCombo->currentIndex() == GOOGLE) {
             currentPage += QString("function drawInterval(latlons) { \n"
                                    // intervals will be drawn with these options
                                    "   var polyOptions = {\n"
@@ -1532,36 +1534,37 @@ MapWebBridge::clearHover()
 {
 }
 
-QList<RideFilePoint*>
-MapWebBridge::searchPoint(double lat, double lng)
+RideFilePoint const *
+MapWebBridge::searchPoint(double lat, double lng) const
 {
-    QList<RideFilePoint*> list;
-
     RideItem *rideItem = mw->property("ride").value<RideItem*>();
 
-    RideFilePoint *candidat = NULL;
+    RideFilePoint *candidate = nullptr;
+    double candidateDist = std::numeric_limits<double>::max();
     foreach (RideFilePoint *p1, rideItem->ride()->dataPoints()) {
         if (p1->lat == 0 && p1->lon == 0)
             continue;
 
-        if (((p1->lat-lat> 0 && p1->lat-lat< 0.0001) || (p1->lat-lat< 0 && p1->lat-lat> -0.0001)) &&
-            ((p1->lon-lng> 0 && p1->lon-lng< 0.0001) || (p1->lon-lng< 0 && p1->lon-lng> -0.0001))) {
-            // Verifie distance avec dernier candidat
-            candidat = p1;
-        } else if (candidat)  {
-            list.append(candidat);
-            candidat = NULL;
+        double deltaLat = fabs(p1->lat - lat);
+        double deltaLon = fabs(p1->lon - lng);
+        if (deltaLat < 0.001 && deltaLon < 0.001) {
+            // exact distance if of no interest, a rough approximation is sufficient
+            double x = deltaLon * cos(lat);
+            double approxDist = sqrt(x * x + deltaLat * deltaLat);
+            if (approxDist < candidateDist) {
+                candidate = p1;
+                candidateDist = approxDist;
+            }
         }
     }
 
-    return list;
+    return candidate;
 }
 
 void
 MapWebBridge::hoverPath(double lat, double lng)
 {
     if (point) {
-
         RideItem *rideItem = mw->property("ride").value<RideItem*>();
         QString name = QString(tr("Selection #%1 ")).arg(selection);
 
@@ -1585,21 +1588,21 @@ MapWebBridge::hoverPath(double lat, double lng)
             IntervalItem *last = rideItem->intervals(RideFileInterval::USER).last();
 
             if (last->name.startsWith(name) && last->rideInterval) {
+                RideFilePoint const *secondPoint = searchPoint(lat, lng);
 
-                QList<RideFilePoint*> list = searchPoint(lat, lng);
-
-
-                if (list.count() > 0)  {
-
-                    RideFilePoint* secondPoint = list.at(0);
-                    //qDebug()<< "hoverPath" << secondPoint->lat << secondPoint->lon;
-
-                    if (secondPoint->secs>point->secs) {
+                if (secondPoint != nullptr) {
+                    if (secondPoint->secs > point->secs) {
+                        if (last->stop == secondPoint->secs) {
+                            return;
+                        }
                         last->rideInterval->start = last->start = point->secs;
                         last->rideInterval->stop = last->stop = secondPoint->secs;
                     } else {
-                        last->rideInterval->stop = last->stop = point->secs;
+                        if (last->start == secondPoint->secs) {
+                            return;
+                        }
                         last->rideInterval->start = last->start = secondPoint->secs;
+                        last->rideInterval->stop = last->stop = point->secs;
                     }
                     last->startKM = last->rideItem()->ride()->timeToDistance(last->start);
                     last->stopKM = last->rideItem()->ride()->timeToDistance(last->stop);
@@ -1616,7 +1619,7 @@ MapWebBridge::hoverPath(double lat, double lng)
                     // update charts etc
                     context->notifyIntervalsChanged();
                  } else
-                    qDebug()<< "hoverPath no point";
+                    qDebug() << "MapWebBridge::hoverPath(.): no point";
             }
         }
 
@@ -1632,16 +1635,11 @@ MapWebBridge::hoverPath(double lat, double lng)
 void
 MapWebBridge::clickPath(double lat, double lng)
 {
-    QList<RideFilePoint*> list = searchPoint(lat, lng);
-
-    if (list.count() > 0)  {
-
-        point = list.at(0);
+    if ((point = searchPoint(lat, lng)) != nullptr) {
         m_startDrag = true;
-
     } else {
-        qDebug()<< "clickPath: no point";
-        point = NULL;
+        qDebug() << "MapWebBridge::clickPath(.): No Point near click";
+        point = nullptr;
     }
 }
 
@@ -1651,9 +1649,8 @@ MapWebBridge::mouseup()
     // clear the temorary highlighter
     if (point) {
         mw->clearTempInterval();
-        point = NULL;
-        if (m_drag)
-        {
+        point = nullptr;
+        if (m_drag) {
             selection++;
             m_drag = false;
         }
