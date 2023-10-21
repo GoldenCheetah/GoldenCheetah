@@ -299,6 +299,7 @@ PythonChart::PythonChart(Context *context, bool ridesummary) : GcChartWindow(con
     // sert no render widget
     canvas=NULL;
     plot=NULL;
+    syntax=NULL;
 
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->setSpacing(0);
@@ -515,8 +516,12 @@ PythonChart::configChanged(qint32)
     palette.setColor(QPalette::Text, GColor(CPLOTMARKER));
     palette.setColor(QPalette::Base, GCColor::alternateColor(GColor(CPLOTBACKGROUND)));
     setPalette(palette);
+    script->setPalette(palette);
+    script->setStyleSheet(AbstractView::ourStyleSheet());
 
-    // refresh
+    // refresh highlighter
+    if (syntax) delete syntax;
+    syntax = new PythonSyntax(script->document(), GCColor::luminance(GColor(CPLOTBACKGROUND)) < 127);
     runScript();
 }
 
@@ -549,7 +554,6 @@ PythonChart::setScript(QString string)
 {
     if (python && script) {
         script->setText(string);
-        new PythonSyntax(script->document());
     }
     text = string;
 }

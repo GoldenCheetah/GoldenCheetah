@@ -173,7 +173,7 @@ AbstractView::ourStyleSheet()
     return QString::fromUtf8("QScrollBar { background-color: %1; border: 0px; }"
            "QTabWidget { background: %1; }"
            "QTabWidget::pane { border: 1px solid %2; } "
-           "QTextEdit { background: %1; }"
+           "QTextEdit { background: %1; color: %7; }"
            "QTextEdit#metadata { background: %3; }"
            "QTreeView { background: %1; }"
            "QScrollBar:vertical {"
@@ -247,6 +247,7 @@ AbstractView::ourStyleSheet()
             .arg(8 * dpiXFactor) // width
             .arg(4 * dpiXFactor) // border radius
             .arg(GColor(CPLOTMARKER).name())
+            .arg(GCColor::invertColor(GColor(CPLOTBACKGROUND)).name())
             ;
 }
 
