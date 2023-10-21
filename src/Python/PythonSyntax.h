@@ -31,7 +31,7 @@ class PythonSyntax : public QSyntaxHighlighter
     Q_OBJECT
 
  public:
-    PythonSyntax(QTextDocument *parent = 0);
+    PythonSyntax(QTextDocument *parent = 0, bool dark=true);
 
  protected:
     void highlightBlock(const QString &text);
