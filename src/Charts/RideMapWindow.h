@@ -48,6 +48,14 @@ class RideMapWindow;
 class IntervalSummaryWindow;
 class SmallPlot;
 
+
+struct PositionItem {
+    PositionItem(double lat, double lng): lat(lat), lng(lng) {}
+
+    double lat, lng;
+};
+
+
 // trick the maps api into ignoring gestures by
 // pretending to be chrome. see: http://developer.qt.nokia.com/forums/viewthread/1643/P15
 class mapWebPage : public QWebEnginePage
@@ -185,6 +193,9 @@ class RideMapWindow : public GcChartWindow
         void drawTempInterval(IntervalItem *current);
         void clearTempInterval();
 
+        void showPosition(double mins);
+        void hidePosition();
+
         void compareIntervalsStateChanged(bool state);
         void compareIntervalsChanged();
 
@@ -215,10 +226,13 @@ class RideMapWindow : public GcChartWindow
         bool firstShow;
         IntervalSummaryWindow *overlayIntervals;
 
+        QList<PositionItem> positionItems;
+
         QString osmTileServerUrlDefault;
 
         QColor GetColor(int watts);
         void createHtml();
+        void buildPositionList();
 
         bool getCompareBoundingBox(double &minLat, double &maxLat, double &minLon, double &maxLon) const;
 
