@@ -10,8 +10,9 @@ GoldenCheetah is a desktop application for cyclists and triathletes and coaches
 * Track and predict performance using models like Banister and PMC
 * Optimise aerodynamics using Virtual Elevation
 * Train indoors with ANT and BTLE trainers
-* Upload and Download with many cloud services including Strava and Todays Plan
+* Upload and Download with many cloud services including Strava, Withings and Todays Plan
 * Import and export data to and from a wide range of bike computers and file formats
+* Track body measures, equipment use and setup your own metadata to track  
 
 GoldenCheetah provides tools for users to develop their own own metrics, models and charts
 * A high-performance and powerful built-in scripting language
@@ -32,16 +33,11 @@ Golden Cheetah install and build instructions are documented
 for each platform;
 
 INSTALL-WIN32   For building on Microsoft Windows
-
 INSTALL-LINUX   For building on Linux
-
 INSTALL-MAC     For building on Apple MacOS
 
-
 macOS and Linux: [![Build Status](https://app.travis-ci.com/GoldenCheetah/GoldenCheetah.svg?branch=master)](https://app.travis-ci.com/GoldenCheetah/GoldenCheetah)
-
 Windows: [![Build status](https://ci.appveyor.com/api/projects/status/i6dwn4m8oyu52ihi?svg=true)](https://ci.appveyor.com/project/Joern-R/goldencheetah-knhd8)
-
 [![Coverity Status](https://scan.coverity.com/projects/7503/badge.svg)](https://scan.coverity.com/projects/goldencheetah-goldencheetah)
 
 Official release builds, snapshots and development builds are all available from http://www.goldencheetah.org
