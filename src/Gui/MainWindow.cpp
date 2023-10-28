@@ -491,15 +491,15 @@ MainWindow::MainWindow(const QDir &home)
 
     // ACTIVITY MENU
     QMenu *rideMenu = menuBar()->addMenu(tr("A&ctivity"));
-    rideMenu->addAction(tr("&Download from device..."), this, SLOT(downloadRide()), tr("Ctrl+D"));
+    rideMenu->addAction(tr("&Download from device..."), this, SLOT(downloadRide()), QKeySequence("Ctrl+D"));
     rideMenu->addAction(tr("&Import from file..."), this, SLOT (importFile()), tr ("Ctrl+I"));
-    rideMenu->addAction(tr("&Manual entry..."), this, SLOT(manualRide()), tr("Ctrl+M"));
+    rideMenu->addAction(tr("&Manual entry..."), this, SLOT(manualRide()), QKeySequence("Ctrl+M"));
     rideMenu->addSeparator ();
-    rideMenu->addAction(tr("&Export..."), this, SLOT(exportRide()), tr("Ctrl+E"));
-    rideMenu->addAction(tr("&Batch Processing..."), this, SLOT(batchProcessing()), tr("Ctrl+B"));
+    rideMenu->addAction(tr("&Export..."), this, SLOT(exportRide()), QKeySequence("Ctrl+E"));
+    rideMenu->addAction(tr("&Batch Processing..."), this, SLOT(batchProcessing()), QKeySequence("Ctrl+B"));
 
     rideMenu->addSeparator ();
-    rideMenu->addAction(tr("&Save activity"), this, SLOT(saveRide()), tr("Ctrl+S"));
+    rideMenu->addAction(tr("&Save activity"), this, SLOT(saveRide()), QKeySequence("Ctrl+S"));
     rideMenu->addAction(tr("D&elete activity..."), this, SLOT(deleteRide()));
     rideMenu->addAction(tr("Split &activity..."), this, SLOT(splitRide()));
     rideMenu->addAction(tr("Combine activities..."), this, SLOT(mergeRide()));
@@ -514,7 +514,7 @@ MainWindow::MainWindow(const QDir &home)
 
     // default options
     shareAction = new QAction(tr("Add Cloud Account..."), this);
-    shareAction->setShortcut(tr("Ctrl+A"));
+    shareAction->setShortcut(QKeySequence("Ctrl+A"));
     connect(shareAction, SIGNAL(triggered(bool)), this, SLOT(addAccount()));
     shareMenu->addAction(shareAction);
     shareMenu->addSeparator();
@@ -555,8 +555,8 @@ MainWindow::MainWindow(const QDir &home)
     optionsMenu->addAction(tr("Import workouts, videos, videoSyncs..."), this, SLOT(importWorkout()));
     optionsMenu->addAction(tr("Scan disk for workouts, videos, videoSyncs..."), this, SLOT(manageLibrary()));
 
-    optionsMenu->addAction(tr("Create Heat Map..."), this, SLOT(generateHeatMap()), tr(""));
-    optionsMenu->addAction(tr("Export Metrics as CSV..."), this, SLOT(exportMetrics()), tr(""));
+    optionsMenu->addAction(tr("Create Heat Map..."), this, SLOT(generateHeatMap()));
+    optionsMenu->addAction(tr("Export Metrics as CSV..."), this, SLOT(exportMetrics()));
 
 #ifdef GC_HAS_CLOUD_DB
     // CloudDB options
@@ -2167,7 +2167,7 @@ MainWindow::setOpenTabMenu()
 
     // add create new option
     openTabMenu->addSeparator();
-    openTabMenu->addAction(tr("&New Athlete..."), this, SLOT(newCyclistTab()), tr("Ctrl+N"));
+    openTabMenu->addAction(tr("&New Athlete..."), this, SLOT(newCyclistTab()), QKeySequence("Ctrl+N"));
 }
 
 void
