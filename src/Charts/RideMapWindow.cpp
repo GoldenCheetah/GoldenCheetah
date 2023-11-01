@@ -174,6 +174,9 @@ RideMapWindow::RideMapWindow(Context *context, int mapType) : GcChartWindow(cont
 
     // just the hr and power as a plot
     smallPlot = new SmallPlot(this);
+    smallPlot->enableTracking();
+    connect(smallPlot, SIGNAL(selectedPosX(double)), this, SLOT(showPosition(double)));
+    connect(smallPlot, SIGNAL(mouseLeft()), this, SLOT(hidePosition()));
     smallPlot->setMaximumHeight(200);
     smallPlot->setMinimumHeight(100);
     smallPlot->setVisible(false);
@@ -200,6 +203,26 @@ RideMapWindow::mapTypeSelected(int x)
     }
     forceReplot();
 }
+
+
+void
+RideMapWindow::showPosition(double mins)
+{
+    long secs = mins * 60;
+    int idx = secs / 5;
+    idx = std::max(idx, 0);
+    idx = std::min(idx, positionItems.length() - 1);
+    PositionItem positionItem = positionItems.at(idx);
+    view->page()->runJavaScript(QString("setPosMarker(%1, %2);").arg(positionItem.lat).arg(positionItem.lng));
+}
+
+
+void
+RideMapWindow::hidePosition()
+{
+    view->page()->runJavaScript(QString("hidePosMarker();"));
+}
+
 
 void
 RideMapWindow::setCustomTSWidgetVisible(bool value)
@@ -411,6 +434,7 @@ RideMapWindow::rideSelected()
 void RideMapWindow::loadRide()
 {
     createHtml();
+    buildPositionList();
 
     view->page()->setHtml(currentPage);
 }
@@ -519,7 +543,27 @@ void RideMapWindow::createHtml()
         currentPage += QString("var intervalList;\n"  // array of intervals
                                "var markerList;\n"  // array of markers
                                "var polyList;\n"  // array of polylines
-                               "var tmpIntervalHighlighter;\n");  // temp interval
+                               "var tmpIntervalHighlighter;\n"  // temp interval
+                               "var posMarker;\n");  // marker for position tracking
+    }
+
+    if (mapCombo->currentIndex() == OSM) {
+        currentPage += QString("const svgPosIcon = L.divIcon({\n"
+            "html: `\n"
+            "<svg\n"
+            "  width=\"16\"\n"
+            "  height=\"16\"\n"
+            "  viewBox=\"0 0 100 100\"\n"
+            "  version=\"1.1\"\n"
+            "  preserveAspectRatio=\"none\"\n"
+            "  xmlns=\"http://www.w3.org/2000/svg\"\n"
+            ">\n"
+            "  <circle cx=\"50\" cy=\"50\" r=\"50\" fill=\"green\"/>\n"
+            "</svg>`,\n"
+            "  className: \"svg-pos-marker\",\n"
+            "  iconSize: [16, 16],\n"
+            "  iconAnchor: [8, 8],\n"
+            "});\n");
     }
 
 
@@ -748,6 +792,46 @@ void RideMapWindow::createHtml()
 
 
     //////////////////////////////////////////////////////////////////////
+    // Position Marker
+
+    if (mapCombo->currentIndex() == OSM) {
+        currentPage += QString("function setPosMarker(lat, lng) {\n"
+                               "    var latlng = new L.LatLng(lat, lng);\n"
+                               "    if (typeof posMarker !== 'undefined') {\n"
+                               "        posMarker.setLatLng(latlng);\n"
+                               "    } else {\n"
+                               "        posMarker = new L.marker(latlng, {icon: svgPosIcon});\n"
+                               "        posMarker.addTo(map);\n"
+                               "    }\n"
+                               "}\n"
+                               "\n"
+                               "function hidePosMarker() {\n"
+                               "    if (typeof posMarker !== 'undefined') {\n"
+                               "        posMarker.remove();\n"
+                               "        posMarker = undefined;\n"
+                               "    }\n"
+                               "}\n");
+    } else if (mapCombo->currentIndex() == GOOGLE) {
+        currentPage += QString("function setPosMarker(lat, lng) {\n"
+                               "    var latlng = new google.maps.LatLng(lat, lng);\n"
+                               "    if (typeof posMarker !== 'undefined') {\n"
+                               "        posMarker.setPosition(latlng);\n"
+                               "    } else {\n"
+                               "        posMarker = new google.maps.Marker({ position: latlng });\n"
+                               "        posMarker.setMap(map);\n"
+                               "    }\n"
+                               "}\n"
+                               "\n"
+                               "function hidePosMarker() {\n"
+                               "    if (typeof posMarker !== 'undefined') {\n"
+                               "        posMarker.setMap(null);\n"
+                               "        posMarker = undefined;\n"
+                               "    }\n"
+                               "}\n");
+    }
+
+
+    //////////////////////////////////////////////////////////////////////
     // Initialize
 
     currentPage += QString(""
@@ -925,6 +1009,37 @@ RideMapWindow::getCompareBoundingBox
         }
     }
     return hasPositions;
+}
+
+
+void
+RideMapWindow::buildPositionList
+()
+{
+    double lastLat = 1000;
+    double lastLon = 1000;
+    long lastSecs = -5;
+    bool first = true;
+    positionItems.clear();
+    foreach(RideFilePoint *rfp, myRideItem->ride()->dataPoints()) {
+        long secs = rfp->secs;
+        if (first) {
+            secs = 0;
+            first = false;
+        }
+        if (secs % 5 == 0 && secs - lastSecs == 5) {
+            lastLat = rfp->lat;
+            lastLon = rfp->lon;
+            positionItems.append(PositionItem(lastLat, lastLon));
+            lastSecs = secs;
+        } else if (secs - lastSecs > 5) {
+            // Add dummy points with last known position if not moving
+            while (lastSecs < secs) {
+                lastSecs += 5;
+                positionItems.append(PositionItem(lastLat, lastLon));
+            }
+        }
+    }
 }
 
 
