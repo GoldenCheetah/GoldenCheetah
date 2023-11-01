@@ -627,8 +627,8 @@ ErgFilePlot::performancePlot(RealtimeData rtdata)
     if ((!context->isRunning) || (context->isPaused)) return;
 
     // we got some data, convert if bydist using imperial units
-    double x = bydist ? rtdata.getDistance() * 1000 * (GlobalContext::context()->useMetricUnits ? 1.0 : MILES_PER_KM)
-                      : rtdata.getMsecs();
+    double x = bydist ? context->getNow() * (GlobalContext::context()->useMetricUnits ? 1.0 : MILES_PER_KM)
+                      : context->getNow();
     // when not using a workout we need to extend the axis when we
     // go out of bounds -- we do not use autoscale for x, because we
     // want to control stepping and tick marking add another 30 mins
