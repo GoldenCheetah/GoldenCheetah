@@ -1858,10 +1858,11 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
                     // If ergfile has no gradient then there is no location, or altitude (or slope.)
                     if (ergFile->hasGradient()) {
                         bool fAltitudeSet = false;
+                        int curLap; // displayWorkoutLap is updated by loadUpdate
                         if (!ergFile->StrictGradient) {
                             // Attempt to obtain location and derived slope from altitude in ergfile.
                             geolocation geoloc;
-                            if (ergFileQueryAdapter.locationAt(displayWorkoutDistance * 1000, displayWorkoutLap, geoloc, slope)) {
+                            if (ergFileQueryAdapter.locationAt(displayWorkoutDistance * 1000, curLap, geoloc, slope)) {
                                 displayLatitude = geoloc.Lat();
                                 displayLongitude = geoloc.Long();
                                 displayAltitude = geoloc.Alt();
@@ -1875,12 +1876,12 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
                         }
 
                         if (ergFile->StrictGradient || !fAltitudeSet) {
-                            slope = ergFileQueryAdapter.gradientAt(displayWorkoutDistance * 1000, displayWorkoutLap);
+                            slope = ergFileQueryAdapter.gradientAt(displayWorkoutDistance * 1000, curLap);
                         }
 
                         if (!fAltitudeSet) {
                             // Since we have gradient, we also have altitude
-                            displayAltitude = ergFileQueryAdapter.altitudeAt(displayWorkoutDistance * 1000, displayWorkoutLap);
+                            displayAltitude = ergFileQueryAdapter.altitudeAt(displayWorkoutDistance * 1000, curLap);
                         }
 
                         rtData.setSlope(slope);
@@ -2032,15 +2033,6 @@ void TrainSidebar::newLap()
     if ((status&RT_RUNNING) && ((status&RT_PAUSED) == 0) &&
         ergFileQueryAdapter.addNewLap(displayWorkoutDistance * 1000.) >= 0) {
 
-        pwrcount  = 0;
-        cadcount  = 0;
-        hrcount   = 0;
-        spdcount  = 0;
-
-        
-        resetTextAudioEmitTracking();
-        maintainLapDistanceState();
-
         context->notifyNewLap();
 
         emit setNotification(tr("New lap.."), 2);
@@ -2052,6 +2044,10 @@ void TrainSidebar::resetLapTimer()
     lap_time.restart();
     lap_elapsed_msec = 0;
     displayLapDistance = 0;
+    pwrcount  = 0;
+    cadcount  = 0;
+    hrcount   = 0;
+    spdcount  = 0;
     this->resetTextAudioEmitTracking();
     this->maintainLapDistanceState();
 }

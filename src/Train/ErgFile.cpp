@@ -1662,7 +1662,7 @@ ErgFile::currentLap(double x) const
 
     // If the current position is before the start of the next lap, return this lap
     for (int i=0; i<Laps.count() - 1; i++) {
-        if (x<Laps.at(i+1).x) return Laps.at(i).x;
+        if (x>=Laps.at(i).x && x<Laps.at(i+1).x) return Laps.at(i).x;
     }
     return -1; // No matching lap
 }
