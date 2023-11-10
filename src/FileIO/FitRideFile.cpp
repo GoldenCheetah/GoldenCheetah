@@ -1895,16 +1895,18 @@ struct FitFileParser
             // the XDATA section, so lets see if it is a start_time field?
             if (strcmp(metadata.name.c_str(), "start_time") == 0)  timestamp = value;
 
-            // add the xdata series if not present yet
-            seriesindex=xdseries->valuename.indexOf(metadata.name.c_str());
-            if (seriesindex == -1) {
-                xdseries->valuename.append(metadata.name.c_str());
-                xdseries->unitname.append(metadata.unit.c_str());
-                xdseries->valuetype.append(RideFile::SeriesType::none); // makes no sense, if it was a series type it wouldn't be xdata
+            // add the xdata series if not present yet, guarding against hitting the maximum
+            if (xdseries->valuename.count() < XDATA_MAXVALUES) {
                 seriesindex=xdseries->valuename.indexOf(metadata.name.c_str());
+                if (seriesindex == -1) {
+                    xdseries->valuename.append(metadata.name.c_str());
+                    xdseries->unitname.append(metadata.unit.c_str());
+                    xdseries->valuetype.append(RideFile::SeriesType::none); // makes no sense, if it was a series type it wouldn't be xdata
+                    seriesindex=xdseries->valuename.indexOf(metadata.name.c_str());
+                }
+                add->number[seriesindex] = scaledvalue;
+                count++;
             }
-            add->number[seriesindex] = scaledvalue;
-            count++;
 
             if (FIT_DEBUG && FIT_DEBUG_LEVEL>3) {
                 fprintf(stderr, "decodeGeneric(%s) %d: %s field %d bytes, num %d, type %s [%s]=%f %s\n",
