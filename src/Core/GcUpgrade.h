@@ -107,6 +107,7 @@
 // 4012 - V3.6 DEVELOPMENT 2210 (OCT 2022) (Pre-release RC3)
 // 4013 - V3.6 DEVELOPMENT 2303 (MAR 2023) (Pre-release RC4)
 // 5000 - V3.6 RELEASE (August 2023) - latest snapshot 24/9
+// 5001 - V3.7 DEVELOPMENT (NOV 2023)
 
 #define VERSION3_BUILD    3010 // released
 #define VERSION3_SP1      3030 // released
@@ -118,6 +119,7 @@
 #define VERSION34_BUILD   3955 // released
 #define VERSION35_BUILD   3990 // released
 #define VERSION36_BUILD   5000 // released 5/8/23
+#define VERSION37_BUILD   5001 // released 5/8/23
 
 // will keep changing during testing and before final release
 #define VERSION31_BUILD VERSION31_UPG

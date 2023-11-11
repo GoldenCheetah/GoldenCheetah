@@ -406,6 +406,17 @@ GcUpgrade::upgrade(const QDir &home)
     //----------------------------------------------------------------------
 
 
+    //----------------------------------------------------------------------
+    // Current development release processing
+    //----------------------------------------------------------------------
+    if (last < VERSION37_BUILD) {
+        // remove FITmetadata.json since it now has message number metadata
+        // any previously cached version would ordinarily override the internal
+        // version, and if there is no internet it will never get refreshed
+        // so we delete the cache to ensure the built-in (current latest) is used
+        QString filename = home.canonicalPath()+"/../FITmetadata.json";
+        QFile::remove(filename);
+    }
 
     //----------------------------------------------------------------------
     // All Version dependent Upgrade Steps are done ...
