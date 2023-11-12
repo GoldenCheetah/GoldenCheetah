@@ -100,6 +100,13 @@ RideMapWindow::RideMapWindow(Context *context, int mapType) : GcChartWindow(cont
     osmTSUrl = new QLineEdit("");
     osmTSUrl->setFixedWidth(600);
 
+    osmGrayLabel = new QLabel(tr("Map Grayscale Filter"));
+    osmGraySlider = new QSlider();
+    osmGraySlider->setOrientation(Qt::Horizontal);
+    osmGraySlider->setRange(0, 10);
+    osmGraySlider->setTickInterval(1);
+    osmGraySlider->setTickPosition(QSlider::TicksBelow);
+
     gkey = new QLineEdit("");
     gkeylabel = new QLabel(tr("Google API key"));
 
@@ -110,6 +117,7 @@ RideMapWindow::RideMapWindow(Context *context, int mapType) : GcChartWindow(cont
     commonLayout->addRow(osmTSTitle);
     commonLayout->addRow(osmTSLabel, tileCombo);
     commonLayout->addRow(osmTSUrlLabel, osmTSUrl);
+    commonLayout->addRow(osmGrayLabel, osmGraySlider);
     commonLayout->addRow(gkeylabel, gkey);
 
     connect(mapCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(mapTypeSelected(int)));
@@ -120,6 +128,7 @@ RideMapWindow::RideMapWindow(Context *context, int mapType) : GcChartWindow(cont
     connect(hideYellowLineCk, SIGNAL(stateChanged(int)), this, SLOT(hideYellowLineChanged(int)));
     connect(hideRouteLineOpacityCk, SIGNAL(stateChanged(int)), this, SLOT(hideRouteLineOpacityChanged(int)));
     connect(osmTSUrl, SIGNAL(editingFinished()), this, SLOT(osmCustomTSURLEditingFinished()));
+    connect(osmGraySlider, SIGNAL(valueChanged(int)), this, SLOT(osmGrayValueChanged(int)));
     connect(tileCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(tileTypeSelected(int)));
 
     setControls(settingsWidget);
@@ -183,6 +192,8 @@ RideMapWindow::RideMapWindow(Context *context, int mapType) : GcChartWindow(cont
     layout->addWidget(smallPlot);
     layout->setStretch(1, 20);
 
+    setCustomTSWidgetVisible(mapCombo->currentIndex() == 0);
+
     configChanged(CONFIG_APPEARANCE);
 }
 
@@ -191,6 +202,7 @@ RideMapWindow::~RideMapWindow()
     delete webBridge;
     if (view) delete view->page();
 }
+
 
 void
 RideMapWindow::mapTypeSelected(int x)
@@ -231,6 +243,8 @@ RideMapWindow::setCustomTSWidgetVisible(bool value)
     osmTSLabel->setVisible(value);
     osmTSUrlLabel->setVisible(value);
     osmTSUrl->setVisible(value);
+    osmGrayLabel->setVisible(value);
+    osmGraySlider->setVisible(value);
     tileCombo->setVisible(value);
     gkeylabel->setVisible(!value);
     gkey->setVisible(!value);
@@ -278,12 +292,58 @@ RideMapWindow::setTileServerUrlForTileType(int x)
     osmTSUrl->setText(ts);
 }
 
+
+void
+RideMapWindow::setGrayscaleForTileType
+(int x)
+{
+    int gray = 0;
+    switch (x) {
+    case 0:
+        gray = appsettings->cvalue(context->athlete->cyclist, GC_OSM_DEFAULT_GRAY, "-1").toInt();
+        // set/save the default if necessary
+        if (gray < 0) {
+           gray = 0;
+           appsettings->setCValue(context->athlete->cyclist, GC_OSM_DEFAULT_GRAY, gray);
+        }
+        break;
+    case 10:
+        gray = appsettings->cvalue(context->athlete->cyclist, GC_OSM_A_GRAY, "-1").toInt();
+        // set/save the default if necessary
+        if (gray < 0) {
+           gray = 0;
+           appsettings->setCValue(context->athlete->cyclist, GC_OSM_A_GRAY, gray);
+        }
+        break;
+    case 20:
+        gray = appsettings->cvalue(context->athlete->cyclist, GC_OSM_B_GRAY, "-1").toInt();
+        // set/save the default if necessary
+        if (gray < 0) {
+           gray = 0;
+           appsettings->setCValue(context->athlete->cyclist, GC_OSM_B_GRAY, gray);
+        }
+        break;
+    case 30:
+        gray = appsettings->cvalue(context->athlete->cyclist, GC_OSM_C_GRAY, "-1").toInt();
+        // set/save the default if necessary
+        if (gray < 0) {
+           gray = 0;
+           appsettings->setCValue(context->athlete->cyclist, GC_OSM_C_GRAY, gray);
+        }
+        break;
+    }
+    osmGraySlider->setValue(gray);
+}
+
+
 void
 RideMapWindow::tileTypeSelected(int x)
 {
     setTileServerUrlForTileType(tileCombo->itemData(x).toInt());
+    setGrayscaleForTileType(tileCombo->itemData(x).toInt());
     forceReplot();
 }
+
 
 void
 RideMapWindow::showMarkersChanged(int value)
@@ -367,6 +427,36 @@ RideMapWindow::osmCustomTSURLEditingFinished()
 
     forceReplot();
 }
+
+
+void
+RideMapWindow::osmGrayValueChanged
+(int value)
+{
+    switch (osmTS()) {
+    case 0:
+        appsettings->setCValue(context->athlete->cyclist, GC_OSM_DEFAULT_GRAY, value);
+        break;
+    case 10:
+        appsettings->setCValue(context->athlete->cyclist, GC_OSM_A_GRAY, value);
+        break;
+    case 20:
+        appsettings->setCValue(context->athlete->cyclist, GC_OSM_B_GRAY, value);
+        break;
+    case 30:
+        appsettings->setCValue(context->athlete->cyclist, GC_OSM_C_GRAY, value);
+        break;
+    }
+
+    // Only update the filter if the tile pane is already available
+    view->page()->runJavaScript(QString("{\n"
+                                        "    const elems = document.getElementsByClassName('leaflet-tile-pane');\n"
+                                        "    if (elems.length > 0 && elems[0] !== null && elems[0].style !== undefined) {\n"
+                                        "        elems[0].style.filter = 'grayscale(%1)';\n"
+                                        "    }\n"
+                                        "}\n").arg(value / 10.0));
+}
+
 
 void
 RideMapWindow::configChanged(qint32 value)
@@ -508,6 +598,15 @@ void RideMapWindow::createHtml()
         // Load leaflet (1.9.4) API
         currentPage += QString("<link rel=\"stylesheet\" href=\"https://unpkg.com/leaflet@1.9.4/dist/leaflet.css\" integrity=\"sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=\" crossorigin=\"\" /> \n"
                                "<script src=\"https://unpkg.com/leaflet@1.9.4/dist/leaflet.js\" integrity=\"sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=\" crossorigin=\"\"></script>\n");
+
+        // Add grayscale filter if required
+        if (osmGraySlider->value() > 0) {
+            currentPage += QString("<style type=\"text/css\">\n"
+                                   "    .leaflet-tile-pane {\n"
+                                   "        filter: grayscale(%1);\n"
+                                   "    }\n"
+                                   "</style>\n").arg(osmGraySlider->value() / 10.0);
+        }
     } else if (mapCombo->currentIndex() == GOOGLE) {
         // Load Google Map v3 API
         currentPage += QString("<script type=\"text/javascript\" src=\"http://maps.googleapis.com/maps/api/js?key=%1\"></script> \n").arg(gkey->text());
