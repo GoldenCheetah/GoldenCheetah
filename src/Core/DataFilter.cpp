@@ -393,6 +393,10 @@ static struct {
     //{ "string", 1 },     // coerce value to string (listed above, removes decimal places, not sure why)
     { "double", 1 },     // coerce value to double
 
+    { "xdataseries", 1 }, // returns a string vector of all the series in an xdata e.g. xdataseries("SESSION")
+    { "xdataunits", 1 },  // returns a string vector of all the units in an xdata e.g. xdataunits("SESSION");
+    { "xdatavalues", 1 }, // returns a vector of doubles of all vales in an xdata suitable for display in an overview tile
+
     // add new ones above this line
     { "", -1 }
 };
@@ -2113,6 +2117,13 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
                             DataFiltererrors << QString(tr("xdata expects a string, 'km' or 'secs' for second parameters"));
                             leaf->inerror = true;
                         }
+                    }
+
+                } else if (leaf->function == "xdataseries" || leaf->function == "xdataunits" || leaf->function == "xdatavalues") {
+
+                    if (leaf->fparms.count() != 1 || leaf->fparms[0]->type != Leaf::String) {
+                        leaf->inerror=true;
+                        DataFiltererrors << QString(tr("%s expects a string name (the tab name in the raw data view)").arg(leaf->function));
                     }
 
                 } else if (leaf->function == "samples") {
@@ -4691,6 +4702,43 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
             }
             return returning;
         }
+
+        if (leaf->function == "xdataseries" || leaf->function == "xdataunits" || leaf->function=="xdatavalues") {
+            Result returning(0);
+
+            QString name = *(leaf->fparms[0]->lvalue.s);
+
+            // lets get the xdata series - only if the item is already open to avoid accidentally
+            // iterating over all ride data, same approach as in the samples function below
+            if (m == NULL || !m->isOpen() || m->ride(false) == NULL) {
+                return Result(0);
+
+            } else {
+                XDataSeries *xds = m->ride()->xdata(name);
+                if (xds == NULL) return returning;
+
+                // return a vector of all the column names
+                if (leaf->function == "xdataseries") returning = Result(xds->valuename);
+                if (leaf->function == "xdataunits") returning = Result(xds->unitname);
+
+
+                // now we need to get all the values into returning
+                // for every row we have
+                if (leaf->function == "xdatavalues") {
+
+                    for (int idx=0; idx <xds->valuename.count(); idx++) {
+                        foreach(XDataPoint *p, xds->datapoints) {
+
+                            returning.asNumeric() << p->number[idx];
+                            returning.number()  += p->number[idx];
+                        }
+                    }
+                }
+            }
+
+            return returning;
+        }
+
         if (leaf->function == "samples") {
 
             // nothing to return -- note we check if the ride is open
