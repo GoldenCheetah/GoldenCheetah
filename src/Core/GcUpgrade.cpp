@@ -416,6 +416,41 @@ GcUpgrade::upgrade(const QDir &home)
         // so we delete the cache to ensure the built-in (current latest) is used
         QString filename = home.canonicalPath()+"/../FITmetadata.json";
         QFile::remove(filename);
+
+        // update metadata.xml to include interval metadata
+        // just add some very basic fields as an example
+        QList<KeywordDefinition> keywordDefinitions;
+        QList<FieldDefinition>   fieldDefinitions;
+        QString colorfield;
+        QList<DefaultDefinition> defaultDefinitions;
+
+        // read em in (should be in parent directory of athlete home)
+        filename = home.canonicalPath()+"/../metadata.xml";
+        RideMetadata::readXML(filename, keywordDefinitions, fieldDefinitions, colorfield, defaultDefinitions);
+
+        // just check we haven't already added Interval metadata
+        bool hasIntervalMetadata=false;
+        foreach(FieldDefinition x, fieldDefinitions)
+            if (x.interval == true)
+                hasIntervalMetadata = true;
+
+        // just add a couple of basic fields to help user get started
+        // if we read in some definitions successfully and there were no
+        // interval specific metadata fields already defined
+        if (fieldDefinitions.count() && !hasIntervalMetadata) {
+
+            FieldDefinition add;
+            add.name = "Interval Notes";
+            add.tab = "Interval";
+            add.type = FIELD_TEXTBOX;
+            add.interval = 1;
+            fieldDefinitions << add;
+
+            add.name = "Interval Goal";
+            fieldDefinitions << add;
+
+            RideMetadata::serialize(filename, keywordDefinitions, fieldDefinitions, colorfield, defaultDefinitions);
+        }
     }
 
     //----------------------------------------------------------------------

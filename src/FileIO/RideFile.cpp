@@ -911,6 +911,43 @@ RideFile *RideFileFactory::openRideFile(Context *context, QFile &file,
 
         result->context = context;
 
+        // post process metadata- take tags from main metadata
+        // and move to interval metadata where there is a match
+        // this really only applies to JSON ride files
+        QStringList removelist;
+        QMap<QString,QString>::const_iterator i;
+        for (i=result->tags().constBegin(); i != result->tags().constEnd(); i++) {
+
+            QString name = i.key();
+            QString value = i.value();
+
+            // if contains '##' we should id it as interval metadata
+            if (name.contains("##")) {
+                bool found=false;
+                foreach(FieldDefinition x, GlobalContext::context()->rideMetadata->getFields()) {
+                    if (x.interval == true) {
+                        if (name.endsWith("##" + x.name)) {
+                            // we have some metadata, lets see if it matches
+                            // any intervals we have defined
+                            foreach(RideFileInterval *p, result->intervals()) {
+                                if (name.startsWith(p->name + "##")) {
+                                    // we have a winner, lets transfer
+                                    p->setTag(x.name, value);
+                                    found=true;
+                                    removelist << name;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    if (found) break;
+                }
+            }
+        }
+        // now remove metadata that was inserted into
+        // interval metadata from the main tags
+        foreach(QString key, removelist) result->tags_.remove(key);
+
         if (result->intervals().empty()) result->fillInIntervals();
         // override the file ride time with that set from the filename
         // but only if it matches the GC format

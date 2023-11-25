@@ -35,6 +35,7 @@
 // in writeRideFile below, this is NOT a generic json parser.
 
 #include "JsonRideFile.h"
+#include "RideMetadata.h"
 
 // now we have a reentrant parser we save context data
 // in a structure rather than in global variables -- so
@@ -457,11 +458,11 @@ JsonFileReader::openRideFile(QFile &file, QStringList &errors, QList<RideFile*>*
         delete jc->JsonRide;
         delete jc;
         return NULL;
-    } else {
-        RideFile *returning = jc->JsonRide;
-        delete jc;
-        return returning;
     }
+
+    RideFile *returning = jc->JsonRide;
+    delete jc;
+    return returning;
 }
 
 QByteArray
@@ -529,11 +530,24 @@ JsonFileReader::toByteArray(Context *, const RideFile *ride, bool withAlt, bool 
 
                 out += "\t\t\t\"" + i.key() + "\":\"" + protect(i.value()) + "\"";
                 if (i+1 != ride->tags().constEnd()) out += ",\n";
-                else out += "\n";
+        }
+
+        foreach(RideFileInterval *inter, ride->intervals()) {
+            bool first=true;
+            QMap<QString,QString>::const_iterator i;
+            for (i=inter->tags().constBegin(); i != inter->tags().constEnd(); i++) {
+
+                    if (first) {
+                        out += ",\n";
+                        first=false;
+                    }
+                    out += "\t\t\t\"" + inter->name + "##" + i.key() + "\":\"" + protect(i.value()) + "\"";
+                    if (i+1 != inter->tags().constEnd()) out += ",\n";
+            }
         }
 
         // end of the tags
-        out += "\t\t}";
+        out += "\n\t\t}";
     }
 
     //
