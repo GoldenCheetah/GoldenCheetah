@@ -2704,7 +2704,7 @@ FieldsPage::addClicked()
     add->setTextAlignment(2, Qt::AlignHCenter);
     fields->setItemWidget(add, 2, comboButton);
     fields->setItemWidget(add, 4, checkBox);
-    fields->setItemWidget(add, 4, checkBoxInt);
+    fields->setItemWidget(add, 5, checkBoxInt);
 }
 
 void
