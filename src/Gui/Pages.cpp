@@ -2557,13 +2557,17 @@ FieldsPage::FieldsPage(QWidget *parent, QList<FieldDefinition>fieldDefinitions) 
     fields->headerItem()->setText(1, tr("Field"));
     fields->headerItem()->setText(2, tr("Type"));
     fields->headerItem()->setText(3, tr("Values"));
-    fields->headerItem()->setText(4, tr("Diary"));
-    fields->setColumnWidth(0,80 *dpiXFactor);
+    fields->headerItem()->setText(4, tr("Summary"));
+    fields->headerItem()->setText(5, tr("Interval"));
+    fields->headerItem()->setText(6, tr("Expression"));
+    fields->setColumnWidth(0,100 *dpiXFactor);
     fields->setColumnWidth(1,100 *dpiXFactor);
     fields->setColumnWidth(2,100 *dpiXFactor);
-    fields->setColumnWidth(3,80 *dpiXFactor);
-    fields->setColumnWidth(4,20 *dpiXFactor);
-    fields->setColumnCount(5);
+    fields->setColumnWidth(3,100 *dpiXFactor);
+    fields->setColumnWidth(4,80 *dpiXFactor);
+    fields->setColumnWidth(5,80 *dpiXFactor);
+    fields->setColumnWidth(6,80 *dpiXFactor);
+    fields->setColumnCount(7);
     fields->setSelectionMode(QAbstractItemView::SingleSelection);
     fields->setEditTriggers(QAbstractItemView::SelectedClicked); // allow edit
     //fields->setUniformRowHeights(true); // causes height problems when adding - in case of non-text fields
@@ -2576,6 +2580,9 @@ FieldsPage::FieldsPage(QWidget *parent, QList<FieldDefinition>fieldDefinitions) 
         QComboBox *comboButton = new QComboBox(this);
         QCheckBox *checkBox = new QCheckBox("", this);
         checkBox->setChecked(field.diary);
+
+        QCheckBox *checkBoxInt = new QCheckBox("", this);
+        checkBoxInt->setChecked(field.interval);
 
         addFieldTypes(comboButton);
         comboButton->setCurrentIndex(field.type);
@@ -2594,6 +2601,10 @@ FieldsPage::FieldsPage(QWidget *parent, QList<FieldDefinition>fieldDefinitions) 
         add->setTextAlignment(2, Qt::AlignHCenter);
         fields->setItemWidget(add, 2, comboButton);
         fields->setItemWidget(add, 4, checkBox);
+        fields->setItemWidget(add, 5, checkBoxInt);
+
+        // expression
+        add->setText(6, field.expression);
     }
     fields->setCurrentItem(fields->invisibleRootItem()->child(0));
 
@@ -2617,15 +2628,19 @@ FieldsPage::upClicked()
         // movin on up!
         QWidget *button = fields->itemWidget(fields->currentItem(),2);
         QWidget *check = fields->itemWidget(fields->currentItem(),4);
+        QWidget *checkInt = fields->itemWidget(fields->currentItem(),5);
         QComboBox *comboButton = new QComboBox(this);
         addFieldTypes(comboButton);
         comboButton->setCurrentIndex(((QComboBox*)button)->currentIndex());
         QCheckBox *checkBox = new QCheckBox("", this);
         checkBox->setChecked(((QCheckBox*)check)->isChecked());
+        QCheckBox *checkBoxInt = new QCheckBox("", this);
+        checkBoxInt->setChecked(((QCheckBox*)checkInt)->isChecked());
         QTreeWidgetItem* moved = fields->invisibleRootItem()->takeChild(index);
         fields->invisibleRootItem()->insertChild(index-1, moved);
         fields->setItemWidget(moved, 2, comboButton);
         fields->setItemWidget(moved, 4, checkBox);
+        fields->setItemWidget(moved, 5, checkBoxInt);
         fields->setCurrentItem(moved);
     }
 }
@@ -2639,15 +2654,19 @@ FieldsPage::downClicked()
 
         QWidget *button = fields->itemWidget(fields->currentItem(),2);
         QWidget *check = fields->itemWidget(fields->currentItem(),4);
+        QWidget *checkInt = fields->itemWidget(fields->currentItem(),5);
         QComboBox *comboButton = new QComboBox(this);
         addFieldTypes(comboButton);
         comboButton->setCurrentIndex(((QComboBox*)button)->currentIndex());
         QCheckBox *checkBox = new QCheckBox("", this);
         checkBox->setChecked(((QCheckBox*)check)->isChecked());
+        QCheckBox *checkBoxInt = new QCheckBox("", this);
+        checkBoxInt->setChecked(((QCheckBox*)checkInt)->isChecked());
         QTreeWidgetItem* moved = fields->invisibleRootItem()->takeChild(index);
         fields->invisibleRootItem()->insertChild(index+1, moved);
         fields->setItemWidget(moved, 2, comboButton);
         fields->setItemWidget(moved, 4, checkBox);
+        fields->setItemWidget(moved, 5, checkBoxInt);
         fields->setCurrentItem(moved);
     }
 }
@@ -2668,6 +2687,7 @@ FieldsPage::addClicked()
     QComboBox *comboButton = new QComboBox(this);
     addFieldTypes(comboButton);
     QCheckBox *checkBox = new QCheckBox("", this);
+    QCheckBox *checkBoxInt = new QCheckBox("", this);
 
     add = new QTreeWidgetItem;
     fields->invisibleRootItem()->insertChild(index, add);
@@ -2684,6 +2704,7 @@ FieldsPage::addClicked()
     add->setTextAlignment(2, Qt::AlignHCenter);
     fields->setItemWidget(add, 2, comboButton);
     fields->setItemWidget(add, 4, checkBox);
+    fields->setItemWidget(add, 5, checkBoxInt);
 }
 
 void
@@ -2720,6 +2741,8 @@ FieldsPage::getDefinitions(QList<FieldDefinition> &fieldList)
         add.name = sp.internalName(item->text(1));
         add.values = item->text(3).split(QRegExp("(, *|,)"), QString::KeepEmptyParts);
         add.diary = ((QCheckBox*)fields->itemWidget(item, 4))->isChecked();
+        add.interval = ((QCheckBox*)fields->itemWidget(item, 5))->isChecked();
+        add.expression = item->text(6);
 
         if (sp.isMetric(add.name))
             add.type = 4;

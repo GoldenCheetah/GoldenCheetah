@@ -270,8 +270,11 @@ void Athlete::selectRideFile(QString fileName)
     foreach (RideItem *rideItem, rideCache->rides()) {
 
         context->ride = (RideItem*) rideItem;
-        if (context->ride->fileName == fileName) 
+        if (context->ride->fileName == fileName)  {
+            // lets open it before we let folks know
+            context->ride->ride();
             break;
+        }
     }
     context->notifyRideSelected(context->ride);
 }
