@@ -35,6 +35,14 @@ BT40Controller::BT40Controller(TrainSidebar *parent, DeviceConfiguration *dc) : 
     windResistance = 0.6;
     wheelSize = 2100;
 
+    if (localDc && !localDc->deviceProfile.isEmpty())
+    {
+        foreach (QString deviceInfoString, localDc->deviceProfile.split(","))
+        {
+            allowedDevices.append(DeviceInfo(deviceInfoString));
+        }
+    }
+
     connect(discoveryAgent, SIGNAL(deviceDiscovered(const QBluetoothDeviceInfo&)),
 	    this, SLOT(addDevice(const QBluetoothDeviceInfo&)));
     connect(discoveryAgent, SIGNAL(error(QBluetoothDeviceDiscoveryAgent::Error)),
@@ -52,6 +60,18 @@ void
 BT40Controller::setDevice(QString)
 {
     // not required
+}
+
+QList<QBluetoothDeviceInfo>
+BT40Controller::getDeviceInfo()
+{
+    QList<QBluetoothDeviceInfo> deviceInfo;
+    foreach(BT40Device* dev, devices)
+    {
+        deviceInfo.append(dev->deviceInfo());
+    }
+
+    return deviceInfo;
 }
 
 int
@@ -145,32 +165,61 @@ BT40Controller::addDevice(const QBluetoothDeviceInfo &info)
             }
         }
 
+        // Check for device configuration and only
+        // connect to configured sensors.
+        //
+        // We can still connect to all available devices
+        // is the device profile is empty
+        foreach (const DeviceInfo deviceInfo, allowedDevices)
+        {
+            if (info.address().isNull())
+            {
+                // macOS
+                if (info.deviceUuid().toString() != deviceInfo.getUuid())
+                {
+                    return;
+                }
+            }
+            else
+            {
+                if (info.address().toString() != deviceInfo.getAddress())
+                {
+                    return;
+                }
+            }
+        }
+
         BT40Device* dev = new BT40Device(this, info);
         devices.append(dev);
 
-        // When start() is called, it initiates the device scan and returns immediately.
-        // Then, commands like setWeight() may come before any device is discovered.
-        // In that case, the weight is stored but is sent to an empty list of devices.
-        // However, when devices are added, the stored parameters are sent.
-        dev->setWheelCircumference(wheelSize);
-        dev->setRollingResistance(rollingResistance);
-        dev->setWindResistance(windResistance);
-        dev->setWeight(weight);
-        dev->setWindSpeed(windSpeed);
-        dev->setMode(mode);
-        if (mode == RT_MODE_ERGO) dev->setLoad(load);
-        else dev->setGradient(gradient);
+        // Only connect to device if we really want
+        // to use them for a workout
+        if(localDc)
+        {
+            // When start() is called, it initiates the device scan and returns immediately.
+            // Then, commands like setWeight() may come before any device is discovered.
+            // In that case, the weight is stored but is sent to an empty list of devices.
+            // However, when devices are added, the stored parameters are sent.
+            dev->setWheelCircumference(wheelSize);
+            dev->setRollingResistance(rollingResistance);
+            dev->setWindResistance(windResistance);
+            dev->setWeight(weight);
+            dev->setWindSpeed(windSpeed);
+            dev->setMode(mode);
+            if (mode == RT_MODE_ERGO) dev->setLoad(load);
+            else dev->setGradient(gradient);
 
-        dev->connectDevice();
-        connect(dev, &BT40Device::setNotification, this, &BT40Controller::setNotification);
+            dev->connectDevice();
+            connect(dev, &BT40Device::setNotification, this, &BT40Controller::setNotification);
+        }
     }
 }
 
-
 void
 BT40Controller::scanFinished()
-{
+{    
     emit setNotification(tr("Bluetooth scan finished"), 2);
+    emit scanFinished(devices.count() > 0);
     qDebug() << "BT scan finished";
 }
 
@@ -317,3 +366,29 @@ void BT40Controller::setWheelCircumference(double wc)
   }
 }
 
+
+DeviceInfo::DeviceInfo(QString data)
+{
+    QStringList deviceInfo = data.split(";");
+    if (deviceInfo.size() == 3)
+    {
+        name = deviceInfo[0];
+        address = deviceInfo[1];
+        uuid = deviceInfo[2];
+    }
+}
+
+QString DeviceInfo::getName() const
+{
+    return name;
+}
+
+QString DeviceInfo::getUuid() const
+{
+    return uuid;
+}
+
+QString DeviceInfo::getAddress() const
+{
+    return address;
+}

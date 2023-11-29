@@ -29,6 +29,8 @@
 #ifndef _GC_BT40Controller_h
 #define _GC_BT40Controller_h 1
 
+class DeviceInfo;
+
 class BT40Controller : public RealtimeController
 {
     Q_OBJECT
@@ -45,6 +47,7 @@ public:
     bool find();
     bool discover(QString name);
     void setDevice(QString);
+    QList<QBluetoothDeviceInfo> getDeviceInfo();
 
     void setLoad(double);
     void setGradient(double);
@@ -101,6 +104,7 @@ public:
 
 signals:
     void vo2Data(double rf, double rmv, double vo2, double vco2, double tv, double feo2);
+    void scanFinished(bool foundAnyDevices);
 
 private slots:
     void addDevice(const QBluetoothDeviceInfo&);
@@ -113,6 +117,7 @@ private:
     RealtimeData telemetry;
     QList<BT40Device*> devices;
     DeviceConfiguration* localDc;
+    QList<DeviceInfo> allowedDevices;
 
     double load;
     double gradient;
@@ -124,4 +129,16 @@ private:
     double wheelSize;
 };
 
+class DeviceInfo
+{
+public:
+    DeviceInfo(QString data);
+    QString getName() const;
+    QString getUuid() const;
+    QString getAddress() const;
+private:
+    QString name;
+    QString uuid;
+    QString address;
+};
 #endif // _GC_BT40Controller_h
