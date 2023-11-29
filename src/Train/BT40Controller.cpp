@@ -202,6 +202,11 @@ BT40Controller::deviceAllowed(const QBluetoothDeviceInfo& info)
     //
     // We can still connect to all available devices
     // is the device profile is empty
+    if (allowedDevices.size() == 0)
+    {
+        return true;
+    }
+
     foreach (const DeviceInfo deviceInfo, allowedDevices)
     {
         if (info.address().isNull())
