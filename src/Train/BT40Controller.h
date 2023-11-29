@@ -112,6 +112,9 @@ private slots:
     void deviceScanError(QBluetoothDeviceDiscoveryAgent::Error);
 
 private:
+    bool deviceAllowed(const QBluetoothDeviceInfo& info);
+
+private:
     QBluetoothDeviceDiscoveryAgent *discoveryAgent;
     QBluetoothLocalDevice* localDevice;
     RealtimeData telemetry;

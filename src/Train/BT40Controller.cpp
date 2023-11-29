@@ -165,59 +165,68 @@ BT40Controller::addDevice(const QBluetoothDeviceInfo &info)
             }
         }
 
-        // Check for device configuration and only
-        // connect to configured sensors.
-        //
-        // We can still connect to all available devices
-        // is the device profile is empty
-        foreach (const DeviceInfo deviceInfo, allowedDevices)
+        if (deviceAllowed(info))
         {
-            if (info.address().isNull())
+            BT40Device* dev = new BT40Device(this, info);
+            devices.append(dev);
+
+            // Only connect to device if we really want
+            // to use them for a workout
+            if(localDc)
             {
-                // macOS
-                if (info.deviceUuid().toString() != deviceInfo.getUuid())
-                {
-                    return;
-                }
+                // When start() is called, it initiates the device scan and returns immediately.
+                // Then, commands like setWeight() may come before any device is discovered.
+                // In that case, the weight is stored but is sent to an empty list of devices.
+                // However, when devices are added, the stored parameters are sent.
+                dev->setWheelCircumference(wheelSize);
+                dev->setRollingResistance(rollingResistance);
+                dev->setWindResistance(windResistance);
+                dev->setWeight(weight);
+                dev->setWindSpeed(windSpeed);
+                dev->setMode(mode);
+                if (mode == RT_MODE_ERGO) dev->setLoad(load);
+                else dev->setGradient(gradient);
+
+                dev->connectDevice();
+                connect(dev, &BT40Device::setNotification, this, &BT40Controller::setNotification);
             }
-            else
-            {
-                if (info.address().toString() != deviceInfo.getAddress())
-                {
-                    return;
-                }
-            }
-        }
-
-        BT40Device* dev = new BT40Device(this, info);
-        devices.append(dev);
-
-        // Only connect to device if we really want
-        // to use them for a workout
-        if(localDc)
-        {
-            // When start() is called, it initiates the device scan and returns immediately.
-            // Then, commands like setWeight() may come before any device is discovered.
-            // In that case, the weight is stored but is sent to an empty list of devices.
-            // However, when devices are added, the stored parameters are sent.
-            dev->setWheelCircumference(wheelSize);
-            dev->setRollingResistance(rollingResistance);
-            dev->setWindResistance(windResistance);
-            dev->setWeight(weight);
-            dev->setWindSpeed(windSpeed);
-            dev->setMode(mode);
-            if (mode == RT_MODE_ERGO) dev->setLoad(load);
-            else dev->setGradient(gradient);
-
-            dev->connectDevice();
-            connect(dev, &BT40Device::setNotification, this, &BT40Controller::setNotification);
         }
     }
 }
 
+bool
+BT40Controller::deviceAllowed(const QBluetoothDeviceInfo& info)
+{
+    // Check for device configuration and only
+    // connect to configured sensors.
+    //
+    // We can still connect to all available devices
+    // is the device profile is empty
+    foreach (const DeviceInfo deviceInfo, allowedDevices)
+    {
+        if (info.address().isNull())
+        {
+            // macOS
+            if (info.deviceUuid().toString() == deviceInfo.getUuid())
+            {
+                return true;
+            }
+        }
+        else
+        {
+            if (info.address().toString() == deviceInfo.getAddress())
+            {
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
 void
 BT40Controller::scanFinished()
-{    
+{
     emit setNotification(tr("Bluetooth scan finished"), 2);
     emit scanFinished(devices.count() > 0);
     qDebug() << "BT scan finished";
