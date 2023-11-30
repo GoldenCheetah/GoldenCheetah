@@ -1059,16 +1059,21 @@ AddPairBTLE::validatePage()
 
         if (item->isSelected())
         {
-            QVariant name = item->data(0, NameRole);
-            QVariant address = item->data(0, AddressRole);
-            QVariant uuid = item->data(0, UuidRole);
+            // pack into device info for validation
+            DeviceInfo deviceInfo(
+                        item->data(0, NameRole).toString(),
+                        item->data(0, AddressRole).toString(),
+                        item->data(0, UuidRole).toString());
 
-            // Split sensors with ','
-            // Split name, address and uuid with ';'
-            wizard->profile += QString(wizard->profile != "" ? ", %1;%2;%3" : "%1;%2;%3")
-                               .arg(name.toString())
-                               .arg(address.toString())
-                               .arg(uuid.toString());
+            if (deviceInfo.isValid())
+            {
+                // Split sensors with ','
+                // Split name, address and uuid with ';'
+                wizard->profile += QString(wizard->profile != "" ? ", %1;%2;%3" : "%1;%2;%3")
+                                   .arg(deviceInfo.getName())
+                                   .arg(deviceInfo.getAddress())
+                                   .arg(deviceInfo.getUuid());
+            }
         }
     }
 

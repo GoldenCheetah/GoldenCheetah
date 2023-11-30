@@ -136,12 +136,15 @@ class DeviceInfo
 {
 public:
     DeviceInfo(QString data);
+    DeviceInfo(QString name, QString address, QString uuid);
     QString getName() const;
-    QString getUuid() const;
     QString getAddress() const;
+    QString getUuid() const;
+    bool isValid() const;
+
 private:
     QString name;
-    QString uuid;
     QString address;
+    QString uuid;
 };
 #endif // _GC_BT40Controller_h

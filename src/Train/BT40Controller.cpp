@@ -39,7 +39,11 @@ BT40Controller::BT40Controller(TrainSidebar *parent, DeviceConfiguration *dc) : 
     {
         foreach (QString deviceInfoString, localDc->deviceProfile.split(","))
         {
-            allowedDevices.append(DeviceInfo(deviceInfoString));
+            DeviceInfo deviceInfo(deviceInfoString);
+            if (deviceInfo.isValid())
+            {
+                allowedDevices.append(DeviceInfo(deviceInfoString));
+            }
         }
     }
 
@@ -380,7 +384,6 @@ void BT40Controller::setWheelCircumference(double wc)
   }
 }
 
-
 DeviceInfo::DeviceInfo(QString data)
 {
     QStringList deviceInfo = data.split(";");
@@ -390,6 +393,11 @@ DeviceInfo::DeviceInfo(QString data)
         address = deviceInfo[1];
         uuid = deviceInfo[2];
     }
+}
+
+DeviceInfo::DeviceInfo(QString name, QString address, QString uuid)
+    : name(name), address(address), uuid(uuid)
+{
 }
 
 QString DeviceInfo::getName() const
@@ -405,4 +413,15 @@ QString DeviceInfo::getUuid() const
 QString DeviceInfo::getAddress() const
 {
     return address;
+}
+
+bool DeviceInfo::isValid() const
+{
+    // Linux and Windows will report an address and macOS will report an uuid.
+    // We can still check for empty values, because we save
+    // 00:00:00:00:00:00 or {00000000-0000-0000-0000-000000000000}
+    // for unavailable identifier.
+    // This also means, the allow list is not portable. Users have to create
+    // profiles for Windows/Linux or macOS.
+    return !name.isEmpty() && !address.isEmpty() && !uuid.isEmpty();
 }
