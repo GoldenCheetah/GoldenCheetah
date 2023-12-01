@@ -1025,14 +1025,20 @@ AddPairBTLE::scanFinished(bool foundDevices)
         {
             QTreeWidgetItem *add = new QTreeWidgetItem(channelWidget->invisibleRootItem());
 
+            // Remove chars used as separator in storage
+            QString deviceName = deviceInfo.name();
+            deviceName.replace(';', ' ');
+            deviceName.replace(',', ' ');
+            deviceName = deviceName.trimmed();
+
             // Save device info in item
-            add->setData(0, NameRole, deviceInfo.name());
-            add->setData(0, AddressRole, deviceInfo.address().toString()); // macOS
-            add->setData(0, UuidRole, deviceInfo.deviceUuid().toString()); // other OS
+            add->setData(0, NameRole, deviceName);
+            add->setData(0, AddressRole, deviceInfo.address().toString()); // other OS
+            add->setData(0, UuidRole, deviceInfo.deviceUuid().toString()); // macOS
 
             // Setup display text
             QLabel *status = new QLabel(this);
-            status->setText(deviceInfo.name());
+            status->setText(deviceName);
             channelWidget->setItemWidget(add, 0, status);
         }
     }
