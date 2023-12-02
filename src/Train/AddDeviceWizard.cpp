@@ -254,7 +254,6 @@ DeviceScanner::quickScan(bool deep) // scan quickly or if true scan forever, as 
             // Go to next page where we do not found, rescan and manual override
             if (!deep) return false;
         }
-
     
         //----------------------------------------------------------------------
         // Search serial ports
@@ -963,10 +962,17 @@ AddPair::validatePage()
 AddPairBTLE::AddPairBTLE(AddDeviceWizard *parent) : QWizardPage(parent), wizard(parent)
 {
     setTitle(tr("Bluetooth 4.0 Sensors"));
-    setSubTitle(tr("Search for and pair of BTLE sensors happens at Train session startup"));
+    setSubTitle(tr("Search for and pair of BTLE sensors."));
 
     QVBoxLayout *layout = new QVBoxLayout;
     setLayout(layout);
+
+    // Indicate search in progress
+    bar = new QProgressBar(this);
+    bar->setMaximum(0);
+    bar->setMinimum(0);
+    bar->setValue(0);
+    layout->addWidget(bar);
 
     channelWidget = new QTreeWidget(this);
     layout->addWidget(channelWidget);
@@ -975,6 +981,10 @@ AddPairBTLE::AddPairBTLE(AddDeviceWizard *parent) : QWizardPage(parent), wizard(
 void
 AddPairBTLE::cleanupPage()
 {
+    // Reset progress bar on "back"
+    bar->setMaximum(0);
+    bar->setMinimum(0);
+    bar->setValue(0);
 }
 
 void
@@ -982,54 +992,97 @@ AddPairBTLE::initializePage()
 {
     // currently BT40Controller cannot report supported and detected sensors
     // nor can enable them selectively, it just uses HR,Power and CSC sensors
-    // it found at startup, in this step we just inform the use which type of
-    // sensors are supported indicating it will be auto-detected at startup.
 
     // Tree Widget of the channel controls
     channelWidget->clear();
-    channelWidget->headerItem()->setText(0, tr("Sensor"));
-    channelWidget->headerItem()->setText(1, tr("Status"));
-    channelWidget->setColumnCount(2);
-    channelWidget->setSelectionMode(QAbstractItemView::NoSelection);
+    channelWidget->headerItem()->setText(0, tr("Device"));
+    channelWidget->setColumnCount(1);
+    // Use MultiSelection for device selection
+    channelWidget->setSelectionMode(QAbstractItemView::MultiSelection);
     channelWidget->setUniformRowHeights(true);
     channelWidget->setIndentation(0);
 
-    channelWidget->header()->resizeSection(0,330*dpiXFactor); // type
-    channelWidget->header()->resizeSection(1,110*dpiXFactor); // status
+    channelWidget->header()->resizeSection(0,440*dpiXFactor); // Device name
 
-    // which services/sensors are supported?
-    foreach(btle_sensor_type_t sensor_type, BT40Device::supportedServices) {
 
-        QTreeWidgetItem *add = new QTreeWidgetItem(channelWidget->invisibleRootItem());
+    // Start search
+    if (wizard->controller) delete wizard->controller;
+    wizard->controller = new BT40Controller(NULL,NULL);
+    connect(wizard->controller, SIGNAL(scanFinished(bool)), this, SLOT(scanFinished(bool)));
+    wizard->controller->start();
+}
 
-        // sensor type
-        QComboBox *sensorSelector = new QComboBox(this);
-        if (*sensor_type.iconname != '\0') {
+void
+AddPairBTLE::scanFinished(bool foundDevices)
+{
+    // Show search done
+    bar->setMaximum(1);
+    bar->setValue(1);
 
-            // we want dark not light
-            QImage img(sensor_type.iconname);
-            img.invertPixels();
-            QIcon icon(QPixmap::fromImage(img));
+    if (foundDevices)
+    {
+        foreach(QBluetoothDeviceInfo deviceInfo, dynamic_cast<BT40Controller*>(wizard->controller)->getDeviceInfo())
+        {
+            QTreeWidgetItem *add = new QTreeWidgetItem(channelWidget->invisibleRootItem());
 
-            sensorSelector->addItem(icon, sensor_type.descriptive_name);
-        } else {
-            sensorSelector->addItem(sensor_type.descriptive_name);
+            // Remove chars used as separator in storage
+            QString deviceName = deviceInfo.name();
+            deviceName.replace(';', ' ');
+            deviceName.replace(',', ' ');
+            deviceName = deviceName.trimmed();
+
+            // Save device info in item
+            add->setData(0, NameRole, deviceName);
+            add->setData(0, AddressRole, deviceInfo.address().toString()); // other OS
+            add->setData(0, UuidRole, deviceInfo.deviceUuid().toString()); // macOS
+
+            // Setup display text
+            QLabel *status = new QLabel(this);
+            status->setText(deviceName);
+            channelWidget->setItemWidget(add, 0, status);
         }
-        channelWidget->setItemWidget(add, 0, sensorSelector);
-
-        // status
-        QLabel *status = new QLabel(this);
-        status->setText(tr("Auto detect at Startup"));
-        channelWidget->setItemWidget(add, 1, status);
     }
+    else
+    {
+        QTreeWidgetItem *add = new QTreeWidgetItem(channelWidget->invisibleRootItem());
+        QLabel *status = new QLabel(this);
+        status->setText(tr("No sensors found..."));
+        channelWidget->setItemWidget(add, 0, status);
+    }
+
+    // Disconnect and cleanup
+    wizard->controller->stop();
 }
 
 bool
 AddPairBTLE::validatePage()
 {
-    // when next is clicked a blank profile will be created.
-    // This means devices will be automatically paired at runtime
     wizard->profile="";
+
+    // Add selected sensors to profile
+    for (int i=0; i< channelWidget->invisibleRootItem()->childCount(); i++) {
+        QTreeWidgetItem *item = channelWidget->invisibleRootItem()->child(i);
+
+        if (item->isSelected())
+        {
+            // pack into device info for validation
+            DeviceInfo deviceInfo(
+                        item->data(0, NameRole).toString(),
+                        item->data(0, AddressRole).toString(),
+                        item->data(0, UuidRole).toString());
+
+            if (deviceInfo.isValid())
+            {
+                // Split sensors with ','
+                // Split name, address and uuid with ';'
+                wizard->profile += QString(wizard->profile != "" ? ", %1;%2;%3" : "%1;%2;%3")
+                                   .arg(deviceInfo.getName())
+                                   .arg(deviceInfo.getAddress())
+                                   .arg(deviceInfo.getUuid());
+            }
+        }
+    }
+
     return true;
 }
 
