@@ -79,6 +79,7 @@
 
 #include "TrainDB.h"
 #include "Library.h"
+#include "BT40DeviceConnectionDialog.h"
 
 TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(context),
     bicycle(context)
@@ -1607,15 +1608,37 @@ void TrainSidebar::Connect()
 
     activeDevices = devices();
 
+    // TODOBTLE connection status:
+    // Step1: Single connect. Show connect dialog
+    // Step2: Multi select: Collect devices and show dialog (or use old behaviour, because
+    // multi select should be a rare edge case)
+
     foreach(int dev, activeDevices) {
         Devices[dev].controller->setWheelCircumference(Devices[dev].wheelSize);
         Devices[dev].controller->setRollingResistance(bicycle.RollingResistance());
         Devices[dev].controller->setWeight(bicycle.MassKG());
         Devices[dev].controller->setWindSpeed(0); // Move to loadUpdate when wind simulation is added
-
-        Devices[dev].controller->start();
-        Devices[dev].controller->resetCalibrationState();
         connect(Devices[dev].controller, &RealtimeController::setNotification, this, &TrainSidebar::setNotification);
+
+        if (deviceTree->selectedItems().count() == 1
+                && Devices[dev].type == DEV_BT40
+                && dynamic_cast<BT40Controller*>(Devices[dev].controller)->hasAllowList())
+        {
+            // connect with a dialog, showing the current status
+            BT40DeviceConnectionDialog *dialog = new BT40DeviceConnectionDialog(dynamic_cast<BT40Controller*>(Devices[dev].controller));
+            if (dialog->exec() == false)
+            {
+                Disconnect();
+                return;
+            }
+        }
+        else
+        {
+            // just connect them
+            Devices[dev].controller->start();
+            Devices[dev].controller->resetCalibrationState();
+        }
+
     }
     setStatusFlags(RT_CONNECTED);
     gui_timer->start(REFRESHRATE);

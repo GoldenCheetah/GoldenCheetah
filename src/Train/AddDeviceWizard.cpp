@@ -1037,9 +1037,9 @@ AddPairBTLE::scanFinished(bool foundDevices)
             add->setData(0, UuidRole, deviceInfo.deviceUuid().toString()); // macOS
 
             // Setup display text
-            QLabel *status = new QLabel(this);
-            status->setText(deviceName);
-            channelWidget->setItemWidget(add, 0, status);
+            QLabel *name = new QLabel(this);
+            name->setText(deviceName);
+            channelWidget->setItemWidget(add, 0, name);
         }
     }
     else

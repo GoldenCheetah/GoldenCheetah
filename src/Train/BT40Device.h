@@ -77,6 +77,10 @@ private slots:
 
 signals:
     void setNotification(QString msg, int timeout);
+    void deviceConnected(QString address, QString uuid);
+    void deviceDisconnected(QString address, QString uuid);
+    void deviceConnectionError(QString address, QString uuid);
+
 private:
     QObject *parent;
     QBluetoothDeviceInfo m_currentDevice;

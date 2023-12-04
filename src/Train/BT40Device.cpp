@@ -112,6 +112,7 @@ void
 BT40Device::deviceConnected()
 {
     qDebug() << "Connected to device" << m_currentDevice.name() << " " << m_currentDevice.deviceUuid();
+    emit deviceConnected(m_currentDevice.address().toString(), m_currentDevice.deviceUuid().toString());
     m_control->discoverServices();
 }
 
@@ -119,6 +120,7 @@ void
 BT40Device::controllerError(QLowEnergyController::Error error)
 {
     qWarning() << "Controller Error:" << error << "for device" << m_currentDevice.name() << " " << m_currentDevice.deviceUuid();
+    emit deviceConnectionError(m_currentDevice.address().toString(), m_currentDevice.deviceUuid().toString());
 }
 
 void
@@ -126,6 +128,7 @@ BT40Device::deviceDisconnected()
 {
     qDebug() << "Lost connection to" << m_currentDevice.name() << " " << m_currentDevice.deviceUuid();
 
+    emit deviceDisconnected(m_currentDevice.address().toString(), m_currentDevice.deviceUuid().toString());
     // Zero any readings provided by this device
     foreach (QLowEnergyService* const &service, m_services) {
 
@@ -301,14 +304,14 @@ BT40Device::serviceStateChanged(QLowEnergyService::ServiceState s)
                 QList<QLowEnergyCharacteristic> characteristics;
                 if (service->serviceUuid() == QBluetoothUuid(QBluetoothUuid::HeartRate)) {
 
-                    emit setNotification(tr("Connected to device / service: ") + m_currentDevice.name() + 
+                    emit setNotification(tr("Connected to device / service: ") + m_currentDevice.name() +
                                 " / HeartRate", 4);
                     characteristics.append(service->characteristic(
                     QBluetoothUuid(QBluetoothUuid::HeartRateMeasurement)));
 
                 } else if (service->serviceUuid() == QBluetoothUuid(QBluetoothUuid::CyclingPower)) {
 
-                    emit setNotification(tr("Connected to device / service: ") + m_currentDevice.name() + 
+                    emit setNotification(tr("Connected to device / service: ") + m_currentDevice.name() +
                                 " / CyclingPower", 4);
                     characteristics.append(service->characteristic(
                     QBluetoothUuid(QBluetoothUuid::CyclingPowerMeasurement)));
@@ -322,13 +325,13 @@ BT40Device::serviceStateChanged(QLowEnergyService::ServiceState s)
 
                 } else if (service->serviceUuid() == QBluetoothUuid(QBluetoothUuid::CyclingSpeedAndCadence)) {
 
-                    emit setNotification(tr("Connected to device / service: ") + m_currentDevice.name() + 
+                    emit setNotification(tr("Connected to device / service: ") + m_currentDevice.name() +
                                 " / CyclingSpeedAndCadence", 4);
                     characteristics.append(service->characteristic(
                     QBluetoothUuid(QBluetoothUuid::CSCMeasurement)));
                 } else if (service->serviceUuid() == QBluetoothUuid(QString(VO2MASTERPRO_SERVICE_UUID))) {
 
-                    emit setNotification(tr("Connected to device / service: ") + m_currentDevice.name() + 
+                    emit setNotification(tr("Connected to device / service: ") + m_currentDevice.name() +
                                 " / VO2MASTERPRO", 4);
                     characteristics.append(service->characteristic(
                                 QBluetoothUuid(QString(VO2MASTERPRO_VENTILATORY_CHAR_UUID))));
@@ -347,7 +350,7 @@ BT40Device::serviceStateChanged(QLowEnergyService::ServiceState s)
                     }
                 } else if (service->serviceUuid() == QBluetoothUuid(QString(BLE_TACX_UART_UUID))) {
 
-                    emit setNotification(tr("Connected to device / service: ") + m_currentDevice.name() + 
+                    emit setNotification(tr("Connected to device / service: ") + m_currentDevice.name() +
                                 " / TACX_UART", 4);
                     characteristics.append(service->characteristic(
                                 QBluetoothUuid(QString(BLE_TACX_UART_CHAR_WRITE))));
@@ -356,7 +359,7 @@ BT40Device::serviceStateChanged(QLowEnergyService::ServiceState s)
 
                     emit setNotification(tr("Connected to device / service: ") + m_currentDevice.name() +
                         " / KINETIC_INRIDE", 4);
-                    
+
                     characteristics.append(service->characteristic(s_KurtInRideService_Power_UUID));
                     characteristics.append(service->characteristic(s_KurtInRideService_Config_UUID));
                     characteristics.append(service->characteristic(s_KurtInRideService_Control_UUID));
@@ -633,10 +636,10 @@ BT40Device::updateValue(const QLowEnergyCharacteristic &c, const QByteArray &val
 
         inride_power_data ipd = inride_process_power_data((const uint8_t*)value.constData());
 
-        qDebug() << inride_state_to_debug_string(ipd.state, ipd.calibrationResult) << " : " 
-                 << inride_command_result_to_string(ipd.commandResult) << " : " 
-                 << ipd.speedKPH << ": " << ipd.cadenceRPM 
-                 << ipd.lastSpindownResultTime << " : " 
+        qDebug() << inride_state_to_debug_string(ipd.state, ipd.calibrationResult) << " : "
+                 << inride_command_result_to_string(ipd.commandResult) << " : "
+                 << ipd.speedKPH << ": " << ipd.cadenceRPM
+                 << ipd.lastSpindownResultTime << " : "
                  << ipd.spindownTime;
 
         calibrationData.setState(inride_state_to_calibration_state(ipd.state, ipd.calibrationResult));
@@ -658,9 +661,9 @@ BT40Device::updateValue(const QLowEnergyCharacteristic &c, const QByteArray &val
                 qDebug()<<QString("Unexpected INRIDE state: %1").arg(ipd.state);
                 break;
             }
-        
+
             notifyString.append(QString::number(ipd.speedKPH));
-        
+
             emit setNotification(notifyString, 4);
         }
 
@@ -878,7 +881,7 @@ BT40Device::serviceError(QLowEnergyService::ServiceError e)
         break;
 
     case QLowEnergyService::CharacteristicWriteError:
-        {    
+        {
             qWarning() << "Failed to write BTLE characteristic" << "for device" << m_currentDevice.name() << " " << m_currentDevice.deviceUuid();
             if(loadType == Wahoo_Kickr) commandWriteFailed();
         }
@@ -1046,7 +1049,7 @@ BT40Device::setMode(int m)
                 uint8_t systemID[6];
                 inride_BTDeviceInfoToSystemID(deviceInfo(), systemID);
 
-                qDebug() << tr("Kurt_InRide: STARTING CALIBRATION:") << 
+                qDebug() << tr("Kurt_InRide: STARTING CALIBRATION:") <<
                     hex <<
                     systemID[0] << systemID[1] << systemID[2] <<
                     systemID[3] << systemID[4] << systemID[5];
@@ -1318,8 +1321,8 @@ BT40Device::setRiderCharacteristics(double weight, double rollingResistance, dou
 
 /* On the Wahoo Kickr and possibly many other BT40 devices, writes often fail.
    It seems that you need the previous command to be completed and the device
-   to be ready for a new command. This queue insures that commands are sent one 
-   after another and even retries a few times upon fail. 
+   to be ready for a new command. This queue insures that commands are sent one
+   after another and even retries a few times upon fail.
 */
 
 void

@@ -48,6 +48,8 @@ public:
     bool discover(QString name);
     void setDevice(QString);
     QList<QBluetoothDeviceInfo> getDeviceInfo();
+    QList<DeviceInfo> getAllowedDevices() const;
+    bool hasAllowList() const;
 
     void setLoad(double);
     void setGradient(double);
@@ -105,6 +107,10 @@ public:
 signals:
     void vo2Data(double rf, double rmv, double vo2, double vco2, double tv, double feo2);
     void scanFinished(bool foundAnyDevices);
+    void deviceConnecting(QString address, QString uuid);
+    void deviceConnected(QString address, QString uuid);
+    void deviceDisconnected(QString address, QString uuid);
+    void deviceConnectionError(QString address, QString uuid);
 
 private slots:
     void addDevice(const QBluetoothDeviceInfo&);

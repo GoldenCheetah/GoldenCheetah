@@ -78,6 +78,24 @@ BT40Controller::getDeviceInfo()
     return deviceInfo;
 }
 
+QList<DeviceInfo>
+BT40Controller::getAllowedDevices() const
+{
+    QList<DeviceInfo> deviceInfo;
+    foreach(DeviceInfo dev, allowedDevices)
+    {
+        deviceInfo.append(dev);
+    }
+
+    return deviceInfo;
+}
+
+bool
+BT40Controller::hasAllowList() const
+{
+    return allowedDevices.size() > 0;
+}
+
 int
 BT40Controller::start()
 {
@@ -188,11 +206,23 @@ BT40Controller::addDevice(const QBluetoothDeviceInfo &info)
                 dev->setWeight(weight);
                 dev->setWindSpeed(windSpeed);
                 dev->setMode(mode);
-                if (mode == RT_MODE_ERGO) dev->setLoad(load);
-                else dev->setGradient(gradient);
+
+                if (mode == RT_MODE_ERGO)
+                {
+                    dev->setLoad(load);
+                }
+                else
+                {
+                    dev->setGradient(gradient);
+                }
+
+                emit deviceConnecting(dev->deviceInfo().address().toString(), dev->deviceInfo().deviceUuid().toString());
+                connect(dev, SIGNAL(deviceConnected(QString, QString)), this, SIGNAL(deviceConnected(QString, QString)));
+                connect(dev, SIGNAL(deviceDisconnected(QString, QString)), this, SIGNAL(deviceDisconnected(QString, QString)));
+                connect(dev, SIGNAL(deviceConnectionError(QString, QString)), this, SIGNAL(deviceConnectionError(QString, QString)));
+                connect(dev, &BT40Device::setNotification, this, &BT40Controller::setNotification);
 
                 dev->connectDevice();
-                connect(dev, &BT40Device::setNotification, this, &BT40Controller::setNotification);
             }
         }
     }
@@ -328,7 +358,7 @@ void BT40Controller::setLoad(double l)
   }
 }
 
-void BT40Controller::setGradient(double g) 
+void BT40Controller::setGradient(double g)
 {
   gradient = g;
   for (auto* dev: devices) {
@@ -389,7 +419,7 @@ DeviceInfo::DeviceInfo(QString data)
     QStringList deviceInfo = data.split(";");
     if (deviceInfo.size() == 3)
     {
-        name = deviceInfo[0];
+        name = deviceInfo[0].trimmed();
         address = deviceInfo[1];
         uuid = deviceInfo[2];
     }
