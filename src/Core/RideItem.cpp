@@ -46,7 +46,7 @@
 RideItem::RideItem() 
     : 
     ride_(NULL), fileCache_(NULL), context(NULL), isdirty(false), isstale(true), isedit(false), skipsave(false), path(""), fileName(""),
-    color(QColor(1,1,1)), sport(""), isBike(false), isRun(false), isSwim(false), isXtrain(false), samples(false), zoneRange(-1), hrZoneRange(-1), paceZoneRange(-1), fingerprint(0), metacrc(0), crc(0), timestamp(0), dbversion(0), udbversion(0), weight(0) {
+    color(QColor(1,1,1)), sport(""), isBike(false), isRun(false), isSwim(false), isXtrain(false), isAero(false), samples(false), zoneRange(-1), hrZoneRange(-1), paceZoneRange(-1), fingerprint(0), metacrc(0), crc(0), timestamp(0), dbversion(0), udbversion(0), weight(0) {
     metrics_.fill(0, RideMetricFactory::instance().metricCount());
     count_.fill(0, RideMetricFactory::instance().metricCount());
 }
@@ -54,7 +54,7 @@ RideItem::RideItem()
 RideItem::RideItem(RideFile *ride, Context *context) 
     : 
     ride_(ride), fileCache_(NULL), context(context), isdirty(false), isstale(true), isedit(false), skipsave(false), path(""), fileName(""),
-    color(QColor(1,1,1)), sport(""), isBike(false), isRun(false), isSwim(false), isXtrain(false), samples(false), zoneRange(-1), hrZoneRange(-1), paceZoneRange(-1), fingerprint(0), metacrc(0), crc(0), timestamp(0), dbversion(0), udbversion(0), weight(0)
+    color(QColor(1,1,1)), sport(""), isBike(false), isRun(false), isSwim(false), isXtrain(false), isAero(false), samples(false), zoneRange(-1), hrZoneRange(-1), paceZoneRange(-1), fingerprint(0), metacrc(0), crc(0), timestamp(0), dbversion(0), udbversion(0), weight(0)
 {
     metrics_.fill(0, RideMetricFactory::instance().metricCount());
     count_.fill(0, RideMetricFactory::instance().metricCount());
@@ -63,7 +63,7 @@ RideItem::RideItem(RideFile *ride, Context *context)
 RideItem::RideItem(QString path, QString fileName, QDateTime &dateTime, Context *context, bool planned)
     :
     ride_(NULL), fileCache_(NULL), context(context), isdirty(false), isstale(true), isedit(false), skipsave(false), path(path), fileName(fileName),
-    dateTime(dateTime), color(QColor(1,1,1)), planned(planned), sport(""), isBike(false), isRun(false), isSwim(false), isXtrain(false), samples(false), zoneRange(-1), hrZoneRange(-1), paceZoneRange(-1), fingerprint(0),
+    dateTime(dateTime), color(QColor(1,1,1)), planned(planned), sport(""), isBike(false), isRun(false), isSwim(false), isXtrain(false), isAero(false), samples(false), zoneRange(-1), hrZoneRange(-1), paceZoneRange(-1), fingerprint(0),
     metacrc(0), crc(0), timestamp(0), dbversion(0), udbversion(0), weight(0) 
 {
     metrics_.fill(0, RideMetricFactory::instance().metricCount());
@@ -127,6 +127,7 @@ RideItem::setFrom(RideItem&here, bool temp) // used when loading cache/rideDB.js
     isRun = here.isRun;
     isSwim = here.isSwim;
     isXtrain = here.isXtrain;
+    isAero = here.isAero;
     weight = here.weight;
     overrides_ = here.overrides_;
     samples = here.samples;
@@ -596,6 +597,7 @@ RideItem::refresh()
         isRun = f->isRun();
         isSwim = f->isSwim();
         isXtrain = f->isXtrain();
+        isAero = f->isAero();
         color = GlobalContext::context()->colorEngine->colorFor(f->getTag(GlobalContext::context()->rideMetadata->getColorField(), ""));
         present = f->getTag("Data", "");
         samples = f->dataPoints().count() > 0;
