@@ -256,8 +256,8 @@ bool
 RideFile::isBike() const
 {
     // for now we just look at Sport and default to Bike when Sport is not
-    // set and isRun and isSwim are false
-    return (sportTag(getTag("Sport", "")) == "Bike") ||
+    // set and isRun and isSwim are false- but if its an aero test it must be bike
+    return isAero() || (sportTag(getTag("Sport", "")) == "Bike") ||
            (getTag("Sport","").isEmpty() && !isRun() && !isSwim());
 }
 
@@ -281,7 +281,13 @@ RideFile::isSwim() const
 bool
 RideFile::isXtrain() const
 {
-    return !isBike() && !isRun() && !isSwim();
+    return !isBike() && !isRun() && !isSwim() && !isAero();
+}
+
+bool
+RideFile::isAero() const
+{
+    return (getTag("Sport","") == "Aero" || xdata("AERO") != NULL);
 }
 
 // compatibility means used in e.g. R so no spaces in names,

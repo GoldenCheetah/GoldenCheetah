@@ -256,6 +256,7 @@ class RideFile : public QObject // QObject to emit signals
         bool isRun() const;
         bool isSwim() const;
         bool isXtrain() const;
+        bool isAero() const;
 
         // Working with DATAPOINTS -- ***use command to modify***
         RideFileCommand *command;
@@ -371,7 +372,7 @@ class RideFile : public QObject // QObject to emit signals
         WPrime *wprimeData(); // return wprime, init/refresh if needed
 
         // XDATA
-        XDataSeries *xdata(QString name) { return xdata_.value(name, NULL); }
+        XDataSeries *xdata(QString name) const { return xdata_.value(name, NULL); }
         void addXData(QString name, XDataSeries *series);
         QMap<QString,XDataSeries*> &xdata() { return xdata_; }
         double xdataValue(RideFilePoint *p, int &idx, QString xdata, QString series, RideFile::XDataJoin);
