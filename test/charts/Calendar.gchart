@@ -1,7 +1,7 @@
 {
 	"CHART":{
 		"VERSION":"1",
-		"VIEW":"0",
+		"VIEW":"home",
 		"TYPE":"4",
 		"PROPERTIES":{
 			"title":"Calendar ",
