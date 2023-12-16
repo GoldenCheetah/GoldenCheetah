@@ -222,7 +222,7 @@ HelpWhatsThis::getText(GCHelp chapter) {
     case ChartRides_Summary:
         return text.arg("ChartTypes_Activities#activity-summary").arg(tr("Detailed information of a single activity - the metrics shown here are configurable"));
     case ChartRides_Details:
-        return text.arg("ChartTypes_Activities#details").arg("Configurable tabbed view of activity detail data, plus technical details and change log");
+        return text.arg("ChartTypes_Activities#details").arg(tr("Configurable tabbed view of activity detail data, plus technical details and change log"));
     case ChartRides_Editor:
         return text.arg("ChartTypes_Activities#editor").arg(tr("Editor for activity file data - allowing to change/correct data, find entries and find anomalies"));
 
