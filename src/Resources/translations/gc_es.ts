@@ -935,22 +935,22 @@ Si usted elige copiar a la biblioteca el archivo será copiado a la biblioteca d
     <message>
         <location filename="../../Train/AddDeviceWizard.cpp" line="964"/>
         <source>Bluetooth 4.0 Sensors</source>
-        <translation>Sensores Bluetooth 4.0</translation>
+        <translation>Dispositivos Bluetooth 4.0</translation>
     </message>
     <message>
         <location filename="../../Train/AddDeviceWizard.cpp" line="965"/>
         <source>Search for and pair of BTLE sensors.</source>
-        <translation type="unfinished"></translation>
+        <translation>Buscando y enlazando dispositivos Bluetooth de baja energía (BTLE).</translation>
     </message>
     <message>
         <location filename="../../Train/AddDeviceWizard.cpp" line="998"/>
         <source>Device</source>
-        <translation type="unfinished">Dispositivo</translation>
+        <translation>Dispositivo</translation>
     </message>
     <message>
         <location filename="../../Train/AddDeviceWizard.cpp" line="1049"/>
         <source>No sensors found...</source>
-        <translation type="unfinished"></translation>
+        <translation>No se han encontrado dispositivos...</translation>
     </message>
     <message>
         <source>Search for and pair of BTLE sensors happens at Train session startup</source>
@@ -7170,7 +7170,7 @@ Esto puede conducir a inconsistencias entre sus activides locales en GoldenCheet
     <message>
         <location filename="../../Gui/ConfigDialog.cpp" line="159"/>
         <source>Reset Appearance to Defaults</source>
-        <translation type="unfinished"></translation>
+        <translation>Restablecer a los valores por defecto</translation>
     </message>
     <message>
         <location filename="../../Gui/ConfigDialog.cpp" line="245"/>
@@ -10432,17 +10432,17 @@ le sugerirá los posibles nombres
     <message>
         <location filename="../../Gui/Pages.cpp" line="2560"/>
         <source>Summary</source>
-        <translation type="unfinished">Resumen</translation>
+        <translation>Resumen</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="2561"/>
         <source>Interval</source>
-        <translation type="unfinished">Intervalo</translation>
+        <translation>Intervalo</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="2562"/>
         <source>Expression</source>
-        <translation type="unfinished"></translation>
+        <translation>Expresión</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="2530"/>
@@ -12557,7 +12557,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Gui/GcCrashDialog.cpp" line="235"/>
         <source>&lt;p&gt;Build date: %1 %2&lt;br&gt;Build id: %3&lt;br&gt;Version: %4&lt;br&gt;DB Schema: %5&lt;br&gt;Metrics: %7&lt;br&gt;OS: %6&lt;br&gt;OpenGL: %10&lt;br&gt;UI: dpi scale (%8) font size (%9)&lt;br&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;p&gt;Fecha de compilación: %1 %2&lt;br&gt;ID de la compilación: %3&lt;br&gt;Versión: %4&lt;br&gt;Esquema de la base de datos: %5&lt;br&gt;Métricas: %7&lt;br&gt;Sistema operativo: %6&lt;br&gt;OpenGL: %10&lt;br&gt;Interfaz de usuario: escala ppp (%8) tamaño de fuente (%9)&lt;br&gt;</translation>
     </message>
     <message>
         <source>&lt;p&gt;Build date: %1 %2&lt;br&gt;Build id: %3&lt;br&gt;Version: %4&lt;br&gt;DB Schema: %5&lt;br&gt;Metrics: %7&lt;br&gt;OS: %6&lt;br&gt;OpenGL: %8&lt;br&gt;</source>
@@ -14023,7 +14023,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="225"/>
         <source>Configurable tabbed view of activity detail data, plus technical details and change log</source>
-        <translation type="unfinished"></translation>
+        <translation>Vista de pestañas con detalles de la actividad, técnicos y de cambios</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="227"/>
@@ -18033,7 +18033,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Core/DataFilter.cpp" line="2127"/>
         <source>%s expects a string name (the tab name in the raw data view)</source>
-        <translation type="unfinished"></translation>
+        <translation>%s espera una cadena de texto (el nombre de la pestña en la vista de datos brutos)</translation>
     </message>
     <message>
         <location filename="../../Core/DataFilter.cpp" line="2134"/>
@@ -18549,12 +18549,12 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Train/Library.cpp" line="184"/>
         <source>%1 cannot be written to videoSync library %2. Check library path, permissions and free space</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 no se puede escribir en la biblioteca de VideoSync %2. Compruebe la ruta, los permisos y si hay espacio libre</translation>
     </message>
     <message>
         <location filename="../../Train/Library.cpp" line="222"/>
         <source>%1 cannot be written to workout library %2. Check library path, permissions and free space</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 no se puede escribir en la biblioteca de actividades %2. Compruebe la ruta, los permisos y si hay espacio libre</translation>
     </message>
     <message>
         <source>%1 cannot be written to videoSync library %2, check permissions and free space</source>
@@ -29928,22 +29928,22 @@ preferencias de entrenamiento.</translation>
     <message>
         <location filename="../../Metrics/SpecialFields.cpp" line="67"/>
         <source>Interval Notes</source>
-        <translation type="unfinished"></translation>
+        <translation>Notas del intervalo</translation>
     </message>
     <message>
         <location filename="../../Metrics/SpecialFields.cpp" line="68"/>
         <source>Interval Goal</source>
-        <translation type="unfinished"></translation>
+        <translation>Objetivo del intervalo</translation>
     </message>
     <message>
         <location filename="../../Metrics/SpecialFields.cpp" line="69"/>
         <source>Spike Time</source>
-        <translation type="unfinished"></translation>
+        <translation>Instante del pico</translation>
     </message>
     <message>
         <location filename="../../Metrics/SpecialFields.cpp" line="70"/>
         <source>Spikes</source>
-        <translation type="unfinished"></translation>
+        <translation>Picos</translation>
     </message>
     <message>
         <location filename="../../Metrics/SpecialFields.cpp" line="33"/>
@@ -29991,7 +29991,7 @@ preferencias de entrenamiento.</translation>
     <message>
         <location filename="../../Metrics/SpecialFields.cpp" line="161"/>
         <source>Interval</source>
-        <translation type="unfinished">Intervalo</translation>
+        <translation>Intervalo</translation>
     </message>
 </context>
 <context>
