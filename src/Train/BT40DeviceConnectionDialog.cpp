@@ -18,6 +18,7 @@ BT40DeviceConnectionDialog::BT40DeviceConnectionDialog(BT40Controller *controlle
 
     mainLayout = new QVBoxLayout;
     searching = tr("Searching...");
+    connected = tr("Connected");
     setWindowTitle(tr("Connecting to Bluetooth devices"));
 
     createSubTitle();
@@ -114,8 +115,15 @@ BT40DeviceConnectionDialog::deviceConnected(QString address, QString uuid)
     setDeviceStatus(
         address,
         uuid,
-        tr("Connected"),
+        connected,
         Qt::darkGreen);
+
+    if (allConnected())
+    {
+        // Don't wait for scan to finish. All required devices
+        // already discovered and connected.
+        okButton->setEnabled(true);
+    }
 }
 
 void
@@ -262,4 +270,20 @@ void BT40DeviceConnectionDialog::updateLabel(QLabel* label, const QString& statu
 
         label->setText(status);
     }
+}
+
+bool
+BT40DeviceConnectionDialog::allConnected()
+{
+    for (int i=0; i< tree->invisibleRootItem()->childCount(); i++)
+    {
+        QTreeWidgetItem *item = tree->invisibleRootItem()->child(i);
+        QLabel *label = dynamic_cast<QLabel *>(tree->itemWidget(item,1));
+        if (label->text() != connected)
+        {
+            return false;
+        }
+    }
+
+    return true;
 }

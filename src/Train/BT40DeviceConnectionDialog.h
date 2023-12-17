@@ -35,6 +35,7 @@ private:
     void addDevices();
     void setDeviceStatus(const QString& address, const QString& uuid, const QString& status, QColor color);
     void updateLabel(QLabel* label, const QString& status, QColor color);
+    bool allConnected();
 
 private:
     QVBoxLayout *mainLayout;
@@ -46,6 +47,7 @@ private:
     BT40Controller *controller;
 
     QString searching;
+    QString connected;
 
     static const int AddressRole = Qt::UserRole + 1;
     static const int UuidRole = Qt::UserRole + 2;
