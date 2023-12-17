@@ -935,12 +935,12 @@ Si usted elige copiar a la biblioteca el archivo será copiado a la biblioteca d
     <message>
         <location filename="../../Train/AddDeviceWizard.cpp" line="964"/>
         <source>Bluetooth 4.0 Sensors</source>
-        <translation>Dispositivos Bluetooth 4.0</translation>
+        <translation>Sensores Bluetooth 4.0</translation>
     </message>
     <message>
         <location filename="../../Train/AddDeviceWizard.cpp" line="965"/>
         <source>Search for and pair of BTLE sensors.</source>
-        <translation>Buscando y enlazando dispositivos Bluetooth de baja energía (BTLE).</translation>
+        <translation>Buscando y enlazando sensores Bluetooth de baja energía (BTLE).</translation>
     </message>
     <message>
         <location filename="../../Train/AddDeviceWizard.cpp" line="998"/>
@@ -950,7 +950,7 @@ Si usted elige copiar a la biblioteca el archivo será copiado a la biblioteca d
     <message>
         <location filename="../../Train/AddDeviceWizard.cpp" line="1049"/>
         <source>No sensors found...</source>
-        <translation>No se han encontrado dispositivos...</translation>
+        <translation>No se han encontrado sensores...</translation>
     </message>
     <message>
         <source>Search for and pair of BTLE sensors happens at Train session startup</source>
@@ -18033,7 +18033,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Core/DataFilter.cpp" line="2127"/>
         <source>%s expects a string name (the tab name in the raw data view)</source>
-        <translation>%s espera una cadena de texto (el nombre de la pestña en la vista de datos brutos)</translation>
+        <translation>%s espera una cadena de texto (el nombre de la pestaña en la vista de datos brutos)</translation>
     </message>
     <message>
         <location filename="../../Core/DataFilter.cpp" line="2134"/>
