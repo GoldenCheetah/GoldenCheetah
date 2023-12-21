@@ -458,6 +458,7 @@ struct FitFileParser
     QVariant GarminHWM;
     XDataSeries *weatherXdata;
     XDataSeries *gearsXdata;
+    XDataSeries *positionXdata;
     XDataSeries *swimXdata;
     XDataSeries *deveXdata;
     XDataSeries *extraXdata;
@@ -1627,6 +1628,11 @@ struct FitFileParser
         else
             delete gearsXdata;
 
+        if (!positionXdata->datapoints.empty())
+            rf->addXData("POSITION", positionXdata);
+        else
+            delete positionXdata;
+
         if (!deveXdata->datapoints.empty())
             rf->addXData("DEVELOPER", deveXdata);
         else
@@ -2435,6 +2441,26 @@ genericnext:
                 }
                 break;
 
+            case 44: /* rider_position_change */
+                {
+                    int secs = (start_time==0?0:time-start_time);
+                    XDataPoint *p = new XDataPoint();
+
+                    switch (event_type) {
+                        case 3:
+                            p->secs = secs;
+                            p->km = last_distance;
+                            p->number[0] = (data32 & 255);
+                            positionXdata->datapoints.append(p);
+                            // qDebug() << QString("Rider position event received %1 type %2 data %3").arg(event).arg(event_type).arg(data32);
+                            break;
+                        default:
+                            errors << QString("Unknown rider position change event %1 type %2").arg(event).arg(event_type);
+                            break;
+                    }
+                }
+                break;
+
             case 3: /* workout */
             case 4: /* workout_step */
             case 5: /* power_down */
@@ -2463,6 +2489,10 @@ genericnext:
             case 28: /* length */
             case 32: /* user_marker */
             case 33: /* sport_point */
+            case 45: /* elev_high_alert */
+            case 46: /* elev_low_alert */
+            case 47: /* comm_timeout */
+            case 75: /* radar_threat_alert */
             default: ;
         }
 
@@ -4498,6 +4528,11 @@ genericnext:
         gearsXdata->unitname << "";
         gearsXdata->valuename << "REAR-NUM";
         gearsXdata->unitname << "";
+
+        positionXdata = new XDataSeries();
+        positionXdata->name = "POSITION";
+        positionXdata->valuename << "POSITION";
+        positionXdata->unitname << "positiontype";
 
         deveXdata = new XDataSeries();
         deveXdata->name = "DEVELOPER";

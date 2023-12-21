@@ -1354,46 +1354,48 @@ void RideFile::updateMax(RideFilePoint* point)
 
 void RideFile::updateAvg(RideFilePoint* point)
 {
-    // AVG
-    totalPoint->secs += point->secs;
-    totalPoint->cad += point->cad;
-    totalPoint->hr += point->hr;
-    totalPoint->km += point->km;
-    totalPoint->kph += point->kph;
-    totalPoint->nm += point->nm;
-    totalPoint->watts += point->watts;
-    totalPoint->alt += point->alt;
-    totalPoint->lon += point->lon;
-    totalPoint->lat += point->lat;
-    totalPoint->headwind += point->headwind;
-    totalPoint->slope += point->slope;
-    totalPoint->temp += point->temp == NA ? 0 : point->temp;
-    totalPoint->lte += point->lte;
-    totalPoint->rte += point->rte;
-    totalPoint->lps += point->lps;
-    totalPoint->rps += point->rps;
-    totalPoint->lrbalance += point->lrbalance;
-    totalPoint->lpco += point->lpco;
-    totalPoint->rpco += point->rpco;
-    totalPoint->lppb += point->lppb;
-    totalPoint->rppb += point->rppb;
-    totalPoint->rppe += point->rppe;
-    totalPoint->lpppb += point->lpppb;
-    totalPoint->rpppb += point->rpppb;
-    totalPoint->lpppe += point->lpppe;
-    totalPoint->rpppe += point->rpppe;
-    totalPoint->smo2 += point->smo2;
-    totalPoint->thb += point->thb;
-    totalPoint->o2hb += point->o2hb;
-    totalPoint->hhb += point->hhb;
-    totalPoint->rvert += point->rvert;
-    totalPoint->rcad += point->rcad;
-    totalPoint->rcontact += point->rcontact;
-    totalPoint->gear += point->gear;
-    totalPoint->tcore += point->tcore;
+    if (point!=NULL) {
+        // AVG
+        totalPoint->secs += point->secs;
+        totalPoint->cad += point->cad;
+        totalPoint->hr += point->hr;
+        totalPoint->km += point->km;
+        totalPoint->kph += point->kph;
+        totalPoint->nm += point->nm;
+        totalPoint->watts += point->watts;
+        totalPoint->alt += point->alt;
+        totalPoint->lon += point->lon;
+        totalPoint->lat += point->lat;
+        totalPoint->headwind += point->headwind;
+        totalPoint->slope += point->slope;
+        totalPoint->temp += point->temp == NA ? 0 : point->temp;
+        totalPoint->lte += point->lte;
+        totalPoint->rte += point->rte;
+        totalPoint->lps += point->lps;
+        totalPoint->rps += point->rps;
+        totalPoint->lrbalance += point->lrbalance;
+        totalPoint->lpco += point->lpco;
+        totalPoint->rpco += point->rpco;
+        totalPoint->lppb += point->lppb;
+        totalPoint->rppb += point->rppb;
+        totalPoint->rppe += point->rppe;
+        totalPoint->lpppb += point->lpppb;
+        totalPoint->rpppb += point->rpppb;
+        totalPoint->lpppe += point->lpppe;
+        totalPoint->rpppe += point->rpppe;
+        totalPoint->smo2 += point->smo2;
+        totalPoint->thb += point->thb;
+        totalPoint->o2hb += point->o2hb;
+        totalPoint->hhb += point->hhb;
+        totalPoint->rvert += point->rvert;
+        totalPoint->rcad += point->rcad;
+        totalPoint->rcontact += point->rcontact;
+        totalPoint->gear += point->gear;
+        totalPoint->tcore += point->tcore;
 
-    ++totalCount;
-    if (point->temp != NA) ++totalTemp;
+        ++totalCount;
+        if (point->temp != NA) ++totalTemp;
+    }
 
     // todo : division only for last after last point
     avgPoint->secs = totalPoint->secs/totalCount;
@@ -1433,6 +1435,53 @@ void RideFile::updateAvg(RideFilePoint* point)
     avgPoint->rcontact = totalPoint->rcontact/totalCount;
     avgPoint->gear = totalPoint->gear/totalCount;
     avgPoint->tcore = totalPoint->tcore/totalCount;
+}
+
+void RideFile::updateAvg(SeriesType series, double value)
+{
+   switch (series) {
+        case secs : totalPoint->secs += value; break;
+        case cad : totalPoint->cad += value; break;
+        case hr : totalPoint->hr += value; break;
+        case km : totalPoint->km += value; break;
+        case kph : totalPoint->kph += value; break;
+        case nm : totalPoint->nm += value; break;
+        case watts : totalPoint->watts += value; break;
+        case alt : totalPoint->alt += value; break;
+        case lon : totalPoint->lon += value; break;
+        case lat : totalPoint->lat += value; break;
+        case headwind : totalPoint->headwind += value; break;
+        case slope : totalPoint->slope += value; break;
+        case temp : totalPoint->temp += value; break;
+        case lrbalance : totalPoint->lrbalance += value; break;
+        case lte : totalPoint->lte += value; break;
+        case rte : totalPoint->rte += value; break;
+        case lps : totalPoint->lps += value; break;
+        case rps : totalPoint->rps += value; break;
+        case lpco : totalPoint->lpco += value; break;
+        case rpco : totalPoint->rpco += value; break;
+        case lppb : totalPoint->lppb += value; break;
+        case rppb : totalPoint->rppb += value; break;
+        case lppe : totalPoint->lppe += value; break;
+        case rppe : totalPoint->rppe += value; break;
+        case lpppb : totalPoint->lpppb += value; break;
+        case rpppb : totalPoint->rpppb += value; break;
+        case lpppe : totalPoint->lpppe += value; break;
+        case rpppe : totalPoint->rpppe += value; break;
+        case smo2 : totalPoint->smo2 += value; break;
+        case thb : totalPoint->thb += value; break;
+        case o2hb : totalPoint->o2hb += value; break;
+        case hhb : totalPoint->hhb += value; break;
+        case rvert : totalPoint->rvert += value; break;
+        case rcad : totalPoint->rcad += value; break;
+        case rcontact : totalPoint->rcontact += value; break;
+        case gear : totalPoint->gear += value; break;
+        case tcore : totalPoint->tcore += value; break;
+        case wbal : break; // not present
+        default:
+        case none : break;
+    }
+    updateAvg(NULL);
 }
 
 void RideFile::appendPoint(double secs, double cad, double hr, double km,
@@ -1816,6 +1865,35 @@ RideFile::isDataPresent(SeriesType series)
     }
     return false;
 }
+
+void
+RideFile::setPointValue(double secs, SeriesType series, double value) {
+    int idx = timeIndex(secs);
+    if ((idx != -1) && (dataPoints_.at(idx)->secs == secs)) {
+        double previousVal = getPointValue(idx, series);
+        setPointValue(idx, series, value);
+        setDataPresent(series, true);
+
+        updateAvg(series, value-previousVal);
+        updateMin(dataPoints_.at(idx));
+        updateMax(dataPoints_.at(idx));
+    }
+}
+
+// void
+// RideFile::setPointValue(double secs, SeriesType series, int value) {
+//     int idx = timeIndex(secs);
+//     if ((idx != -1) && (dataPoints_.at(idx)->secs == secs)) {
+//         int previousVal = getPointValue(idx, series);
+//         setPointValue(idx, series, value);
+//         setDataPresent(series, true);
+
+//         updateAvg(series, value-previousVal);
+//         updateMin(dataPoints_.at(idx));
+//         updateMax(dataPoints_.at(idx));
+//     }
+// }
+
 void
 RideFile::setPointValue(int index, SeriesType series, double value)
 {

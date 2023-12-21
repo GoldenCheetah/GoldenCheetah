@@ -190,6 +190,10 @@ struct setChannelAtom {
 #define ANT_CW_INIT            0x53
 #define ANT_CW_TEST            0x48
 
+#define ANT_REQUEST_DATA_PAGE  0x46
+#define ANT_RQST_MST_DATA_PAGE 0x01
+#define ANT_RQST_SLV_DATA_PAGE 0x03
+
 #define ANT_TX_TYPE_SLAVE      0x00
 #define ANT_TX_TYPE_MASTER     0x05 // typical tx type for master device, see ANT Message Protocol and Usage doc
 
@@ -235,6 +239,7 @@ struct setChannelAtom {
 // ANT+sport
 #define ANT_SPORT_HR_PERIOD 8070
 #define ANT_SPORT_POWER_PERIOD 8182
+#define ANT_SPORT_POWER_8HZ_PERIOD 4091 // when accessing additional data shall be 8Hz
 #define ANT_SPORT_FOOTPOD_PERIOD 8134
 #define ANT_SPORT_SPEED_PERIOD 8118
 #define ANT_SPORT_CADENCE_PERIOD 8102
@@ -284,6 +289,33 @@ struct setChannelAtom {
 
 #define ANT_SPORT_AUTOZERO_OFF                        0x00
 #define ANT_SPORT_AUTOZERO_ON                         0x01
+
+// std power pages
+#define POWER_POWERONLY_DATA_PAGE                     0x10
+#define POWER_GETSET_PARAM_PAGE                       0x02
+#define POWER_MANUFACTURER_ID                         0x50
+#define POWER_PRODUCT_INFO                            0x51
+#define POWER_ADV_CAPABILITIES1_SUBPAGE               0xFD
+#define POWER_ADV_CAPABILITIES2_SUBPAGE               0xFE
+// std power ANT transmissions parameters
+#define POWER_CAPABILITIES_DELAY                      2
+#define POWER_CAPABILITIES_RQST_NBR                   2
+
+// Cycling dynamics data pages
+#define POWER_CYCL_DYN_R_FORCE_ANGLE_PAGE             0xE0
+#define POWER_CYCL_DYN_L_FORCE_ANGLE_PAGE             0xE1
+#define POWER_CYCL_DYN_PEDALPOSITION_PAGE             0xE2
+#define POWER_CYCL_DYN_TORQUE_BARYC_PAGE              0x14
+
+// note: capabilities are available or enabled when set to "0"
+#define POWER_NO_4HZ_MODE_CAPABILITY                  0x01
+#define POWER_NO_8HZ_MODE_CAPABILITY                  0x02
+#define POWER_NO_POWERPHASE_CAPABILITY                0x08
+#define POWER_NO_PCO_CAPABILITY                       0x10
+#define POWER_NO_POSITION_CAPABILITY                  0x20
+#define POWER_NO_TORQUE_BARYCENTER_CAPABILITY         0x40
+
+#define POWER_CYCL_DYN_INVALID                        0xC0
 
 // kickr
 #define KICKR_COMMAND_INTERVAL         60 // every 60 ms
@@ -423,6 +455,8 @@ signals:
     // signal instantly on data receipt for R-R data
     // made a special case to support HRV tool without complication
     void rrData(uint16_t  rrtime, uint8_t heartrateBeats, uint8_t instantHeartrate);
+
+    void posData(uint8_t position);
 
     // signal for passing remote control commands
     void antRemoteControl(uint16_t command);
@@ -646,6 +680,19 @@ public:
         telemetry.setRPS(rps);
     }
 
+    void setRppb(double value) { telemetry.setRppb(value); }
+    void setRppe(double value) { telemetry.setRppe(value); }
+    void setRpppb(double value) { telemetry.setRpppb(value); }
+    void setRpppe(double value) { telemetry.setRpppe(value); }
+    void setLppb(double value) { telemetry.setLppb(value); }
+    void setLppe(double value) { telemetry.setLppe(value); }
+    void setLpppb(double value) { telemetry.setLpppb(value); }
+    void setLpppe(double value) { telemetry.setLpppe(value); }
+    void setRightPCO(uint8_t value) { telemetry.setRightPCO(value); }
+    void setLeftPCO(uint8_t value) { telemetry.setLeftPCO(value); }
+    void setPosition(RealtimeData::riderPosition value) { telemetry.setPosition(value); }
+    void setRTorque(double torque) { telemetry.setRTorque(torque); }
+    void setLTorque(double torque) { telemetry.setLTorque(torque); }
     void setTorque(double torque) {
         telemetry.setTorque(torque);
     }
@@ -656,7 +703,12 @@ public:
     void requestFecCapabilities();
     void requestFecCalibration(uint8_t type);
 
+    void setPwrChannel(int channel);
     void requestPwrCalibration(uint8_t channel, uint8_t type);
+    void requestPwrCapabilities1(const uint8_t chan);
+    void requestPwrCapabilities2(const uint8_t chan);
+    void enablePwrCapabilities1(const uint8_t chan, const uint8_t capabilitiesMask, const uint8_t capabilitiesSetup);
+    void enablePwrCapabilities2(const uint8_t chan, const uint8_t capabilitiesMask, const uint8_t capabilitiesSetup);
 
     void setVortexData(int channel, int id);
     void refreshVortexLoad();
@@ -735,6 +787,7 @@ private:
 
     // fitness equipment data
     int fecChannel;
+    int pwrChannel;
 
     // tacx vortex (we'll probably want to abstract this out cf. kickr)
     int vortexID;

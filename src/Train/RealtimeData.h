@@ -45,6 +45,9 @@ public:
                       VirtualSpeed, AltWatts, LRBalance, LapTimeRemaining,
                       LeftTorqueEffectiveness, RightTorqueEffectiveness,
                       LeftPedalSmoothness, RightPedalSmoothness, Slope, 
+                      RightPowerPhaseBegin, RightPowerPhaseEnd,
+                      RightPowerPhasePeakBegin, RightPowerPhasePeakEnd,
+                      Position, RightPCO, LeftPCO,
                       LapDistance, LapDistanceRemaining, ErgTimeRemaining,
                       Latitude, Longitude, Altitude, RouteDistance,
                       DistanceRemaining };
@@ -54,6 +57,14 @@ public:
     double value(DataSeries) const;
     static QString seriesName(DataSeries);
     static const QList<DataSeries> &listDataSeries();
+
+    // style is coded to be compatible with FIT files
+    // we use same IDs than ANT power meters messages.
+    // Aero is an additional one for virtual speed estimation
+    // (we can suppose aero position when no power is generated during 10s ?)
+    // and off means not riding (when speed is 0 during 10s ?)
+    enum riderposition { seated = 0, transistionToSeated = 1, standing = 2, transitionToStanding=3, aero = 10, off = 11 };
+    typedef enum riderposition riderPosition;
 
     RealtimeData();
     void reset(); // set all values to zero
@@ -89,7 +100,20 @@ public:
     void setRTE(double);
     void setLPS(double);
     void setRPS(double);
+    void setRppb(double);
+    void setRppe(double);
+    void setRpppb(double);
+    void setRpppe(double);
+    void setLppb(double);
+    void setLppe(double);
+    void setLpppb(double);
+    void setLpppe(double);
+    void setRightPCO(double);
+    void setLeftPCO(double);
+    void setPosition(RealtimeData::riderPosition);
     void setTorque(double);
+    void setRTorque(double);
+    void setLTorque(double);
     void setLatitude(double);
     void setLongitude(double);
     void setAltitude(double);
@@ -143,6 +167,17 @@ public:
     double getRTE() const;
     double getLPS() const;
     double getRPS() const;
+    double getRppb() const;
+    double getRppe() const;
+    double getRpppb() const;
+    double getRpppe() const;
+    double getLppb() const;
+    double getLppe() const;
+    double getLpppb() const;
+    double getLpppe() const;
+    double getRightPCO() const;
+    double getLeftPCO() const;
+    RealtimeData::riderPosition getPosition() const;
     double getTorque() const;
     double getLatitude() const;
     double getLongitude() const;
@@ -171,9 +206,14 @@ private:
     double cadence;      // in rpm
     double smo2, thb;
     double lte, rte, lps, rps; // torque efficiency and pedal smoothness
+    double rppb, rppe, rpppb, rpppe;
+    double lppb, lppe, lpppb, lpppe;
+    double rightPCO, leftPCO;
     double torque; // raw torque data for calibration display
+    double RTorque, LTorque;
     double latitude, longitude, altitude;
     double vo2, vco2, rf, rmv, tv, feo2;
+    RealtimeData::riderPosition position;
 
     std::chrono::high_resolution_clock::time_point wheelRpmSampleTime;
 
