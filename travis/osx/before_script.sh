@@ -29,7 +29,6 @@ echo QMAKE_YACC=/usr/local/opt/bison@2.7/bin/bison >> src/gcconfig.pri
 # Define GC version string, only for tagged builds
 if [ -n "$TRAVIS_TAG" ]; then echo DEFINES += GC_VERSION=VERSION_STRING >> src/gcconfig.pri; fi
 sed -i "" "s|#\(CONFIG += release.*\)|\1 static |" src/gcconfig.pri
-sed -i "" "s|#\(QMAKE_CXXFLAGS\).*|\1_RELEASE += -mmacosx-version-min=10.7 -arch x86_64|" src/gcconfig.pri
 sed -i "" "s|^#CloudDB|CloudDB|" src/gcconfig.pri
 sed -i "" "s|^#LIBZ|LIBZ|" src/gcconfig.pri
 # SRMIO
@@ -56,15 +55,18 @@ sed -i "" "s|#\(DEFINES += GC_WANT_ROBOT.*\)|\1 |" src/gcconfig.pri
 sed -i "" "s|#\(VLC_INSTALL =.*\)|\1 ../VLC|" src/gcconfig.pri
 sed -i "" "s|\(DEFINES += GC_VIDEO_NONE.*\)|#\1 |" src/gcconfig.pri
 sed -i "" "s|#\(DEFINES += GC_VIDEO_VLC.*\)|\1 |" src/gcconfig.pri
-##Issues with c++11 and stdlib on travis and dependencies
+# Enable R embedding
 sed -i "" "s|#\(DEFINES += GC_WANT_R.*\)|\1 |" src/gcconfig.pri
-echo "QMAKE_CFLAGS_RELEASE += -mmacosx-version-min=10.7 -arch x86_64" >> src/gcconfig.pri
 # Python (avoiding colision between GC Context.h and Python context.h)
 echo DEFINES += GC_WANT_PYTHON >> src/gcconfig.pri
 echo PYTHONINCLUDES = -ICore `python3.7-config --includes` >> src/gcconfig.pri
 echo PYTHONLIBS = `python3.7-config --ldflags` >> src/gcconfig.pri
 # GSL
 echo GSL_LIBS = -lgsl -lgslcblas -lm >> src/gcconfig.pri
+# macOS version config
+echo "QMAKE_CXXFLAGS += -mmacosx-version-min=10.7 -arch x86_64" >> src/gcconfig.pri
+echo "QMAKE_CFLAGS_RELEASE += -mmacosx-version-min=10.7 -arch x86_64" >> src/gcconfig.pri
+echo "QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.15" >> src/gcconfig.pri
 
 # Patch Secrets.h
 sed -i "" "s/__GC_GOOGLE_CALENDAR_CLIENT_SECRET__/"$GC_GOOGLE_CALENDAR_CLIENT_SECRET"/" src/Core/Secrets.h
