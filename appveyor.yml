@@ -63,7 +63,6 @@ cache:
 - C:\R
 - C:\Python -> src\Python\requirements.txt
 - c:\tools\vcpkg\installed\
-- qwt
 
 install:
 # Get the libraries
@@ -73,7 +72,6 @@ install:
 - vcpkg install gsl:x64-windows
 
 # Get config
-- copy qwt\qwtconfig.pri.in qwt\qwtconfig.pri
 - copy c:\libs\gcconfig64-Release.appveyor.pri src\gcconfig.pri
 
 # Get jom

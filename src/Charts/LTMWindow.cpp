@@ -695,7 +695,7 @@ void
 LTMWindow::spanSliderChanged()
 {
     // so reset the axis range for ltmPlot
-    ltmPlot->setAxisScale(QwtPlot::xBottom, spanSlider->lowerValue(), spanSlider->upperValue());
+    ltmPlot->setAxisScale(QwtAxis::XBottom, spanSlider->lowerValue(), spanSlider->upperValue());
     ltmPlot->replot();
 }
 
@@ -735,8 +735,8 @@ LTMWindow::refreshPlot()
                 stackWidget->setCurrentIndex(0);
                 dirty = false;
 
-                spanSlider->setMinimum(ltmPlot->axisScaleDiv(QwtPlot::xBottom).lowerBound());
-                spanSlider->setMaximum(ltmPlot->axisScaleDiv(QwtPlot::xBottom).upperBound());
+                spanSlider->setMinimum(ltmPlot->axisScaleDiv(QwtAxis::XBottom).lowerBound());
+                spanSlider->setMaximum(ltmPlot->axisScaleDiv(QwtAxis::XBottom).upperBound());
                 spanSlider->setLowerValue(spanSlider->minimum());
                 spanSlider->setUpperValue(spanSlider->maximum());
             }
