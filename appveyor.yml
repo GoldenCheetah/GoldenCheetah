@@ -165,7 +165,7 @@ before_build:
 build_script:
 - qmake.exe build.pro -r -spec win32-msvc
 - cd qwt\
-- jom -j1
+- jom -j4
 - cd ..
 - jom -j4
 
