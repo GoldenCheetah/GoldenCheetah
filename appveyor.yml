@@ -63,7 +63,6 @@ cache:
 - C:\R
 - C:\Python -> src\Python\requirements.txt
 - c:\tools\vcpkg\installed\
-- qwt
 
 install:
 # Get the libraries
