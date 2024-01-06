@@ -29,7 +29,6 @@
 
 #include "qwt_plot.h"
 #include "qwt_plot_curve.h"
-#include "qwt_compat.h"
 #include <limits>
 
 
@@ -54,11 +53,11 @@ public:
     }
     void setYAxisTitle(QString title)
     {
-        setAxisTitle(QwtPlot::yLeft, title);
+        setAxisTitle(QwtAxis::YLeft, title);
     }
     void setXAxisTitle(QString title)
     {
-        setAxisTitle(QwtPlot::xBottom,title);
+        setAxisTitle(QwtAxis::XBottom,title);
     }
     void setData(QVector<double> &xData, QVector<double> &yData)
     {
@@ -286,8 +285,8 @@ void AbsWattagePage::initializePage()
     plot = new WorkoutPlot();
     plot->setYAxisTitle(tr("Wattage"));
     plot->setXAxisTitle(tr("Time (minutes)"));
-    plot->setAxisScale(QwtPlot::yLeft,0,500,0);
-    plot->setAxisScale(QwtPlot::xBottom,0,120,0);
+    plot->setAxisScale(QwtAxis::YLeft,0,500,0);
+    plot->setAxisScale(QwtAxis::XBottom,0,120,0);
     summaryLayout->addWidget(plot);
     summaryLayout->addStretch(1);
     layout->addLayout(summaryLayout);
@@ -299,8 +298,8 @@ void AbsWattagePage::initializePage()
 void AbsWattagePage::updateMetrics()
 {
     QVector<QPair<QString,QString> > data;
-    QwtArray<double> x;
-    QwtArray<double> y;
+    QVector<double> x;
+    QVector<double> y;
 
     we->rawData(data);
 
@@ -335,8 +334,8 @@ void AbsWattagePage::updateMetrics()
 
     }
     // replot workoutplot
-    plot->setAxisAutoScale(QwtPlot::yLeft);
-    plot->setAxisAutoScale(QwtPlot::xBottom);
+    plot->setAxisAutoScale(QwtAxis::YLeft);
+    plot->setAxisAutoScale(QwtAxis::XBottom);
     plot->setData(x,y);
     plot->replot();
 
@@ -419,8 +418,8 @@ void RelWattagePage::initializePage()
     plot = new WorkoutPlot();
     plot->setYAxisTitle(tr("%"));
     plot->setXAxisTitle(tr("Time (minutes)"));
-    plot->setAxisScale(QwtPlot::yLeft,0,200,0);
-    plot->setAxisScale(QwtPlot::xBottom,0,120,0);
+    plot->setAxisScale(QwtAxis::YLeft,0,200,0);
+    plot->setAxisScale(QwtAxis::XBottom,0,120,0);
 
     QHBoxLayout *layout = new QHBoxLayout();
     setLayout(layout);
@@ -443,8 +442,8 @@ void RelWattagePage::initializePage()
 void RelWattagePage::updateMetrics()
 {
     QVector<QPair<QString,QString> > data;
-    QwtArray<double> x;
-    QwtArray<double> y;
+    QVector<double> x;
+    QVector<double> y;
 
     we->rawData(data);
 
@@ -475,8 +474,8 @@ void RelWattagePage::updateMetrics()
     }
 
     // replot workoutplot
-    plot->setAxisAutoScale(QwtPlot::yLeft);
-    plot->setAxisAutoScale(QwtPlot::xBottom);
+    plot->setAxisAutoScale(QwtAxis::YLeft);
+    plot->setAxisAutoScale(QwtAxis::XBottom);
     plot->setData(x,y);;
     plot->replot();
 
@@ -703,8 +702,8 @@ void ImportPage::initializePage()
 
 void ImportPage::updatePlot()
 {
-    QwtArray<double> x;
-    QwtArray<double> y;
+    QVector<double> x;
+    QVector<double> y;
     QPair<double,double> p;
 
     int segmentLength = segmentBox->value();
