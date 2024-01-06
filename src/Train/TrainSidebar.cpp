@@ -1841,6 +1841,10 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
                     maintainLapDistanceState();
                 }
 
+                //  'Clone' of variables used below, to avoid modifications of original code. They are used later
+                bool fAltitudeSet4compass = false;
+                geolocation currentgeoloc;
+
                 rtData.setDistance(displayDistance);
                 rtData.setRouteDistance(displayWorkoutDistance);
                 rtData.setLapDistance(displayLapDistance);
@@ -1872,8 +1876,10 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
                                     rtData.setLongitude(displayLongitude);
                                 }
                                 fAltitudeSet = true;
+                                currentgeoloc = geoloc;
                             }
                         }
+                        fAltitudeSet4compass = fAltitudeSet;
 
                         if (ergFile->StrictGradient || !fAltitudeSet) {
                             slope = ergFileQueryAdapter.gradientAt(displayWorkoutDistance * 1000, curLap);
@@ -1894,6 +1900,21 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
                     double altitudeDeltaMeters = slope * (10 * distanceTick); // ((slope / 100) * distanceTick) * 1000
                     displayAltitude += altitudeDeltaMeters;
                     rtData.setAltitude(displayAltitude);
+                }
+
+                {
+                    //  Bearing (for the compass)
+                    if (fAltitudeSet4compass) {
+                        int lap;
+                        double gradient;
+                        geolocation geoloc2seconds;
+                        double dist2seconds = rtData.getSpeed() / 3.6 * 2;
+                        ergFileQueryAdapter.locationAt(displayWorkoutDistance * 1000. + dist2seconds, lap, geoloc2seconds, gradient);
+                        double displayBearing = currentgeoloc.BearingTo(geoloc2seconds);
+                        displayBearing = displayBearing/3.1415924536*180 + (displayBearing>0?0:360);
+                        rtData.setBearing(displayBearing);
+                    }
+
                 }
 
                 // time
