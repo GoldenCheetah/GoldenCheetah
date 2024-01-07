@@ -52,6 +52,9 @@ ConfigDialog::ConfigDialog(QDir _home, Context *context) :
     setMinimumSize(800 *dpiXFactor,650 *dpiYFactor);   //changed for hidpi sizing
 #endif
 
+    // Enable What's this button and disable minimize/maximize buttons
+    setWindowFlags(Qt::Window | Qt::WindowContextHelpButtonHint | Qt::WindowCloseButtonHint);
+
     // center
     QWidget *spacer = new QWidget(this);
     spacer->setAutoFillBackground(false);
@@ -143,7 +146,7 @@ ConfigDialog::ConfigDialog(QDir _home, Context *context) :
 
     measures = new MeasuresConfig(_home, context);
     HelpWhatsThis *measuresHelp = new HelpWhatsThis(measures);
-    measures->setWhatsThis(intervalHelp->getWhatsThisText(HelpWhatsThis::Preferences_Measures));
+    measures->setWhatsThis(measuresHelp->getWhatsThisText(HelpWhatsThis::Preferences_Measures));
     pagesWidget->addWidget(measures);
 
     train = new TrainConfig(_home, context);
@@ -153,11 +156,13 @@ ConfigDialog::ConfigDialog(QDir _home, Context *context) :
 
     closeButton = new QPushButton(tr("Close"));
     saveButton = new QPushButton(tr("Save"));
+    resetAppearance = new QPushButton(tr("Reset Appearance to Defaults"));
 
     QHBoxLayout *horizontalLayout = new QHBoxLayout;
     horizontalLayout->addWidget(pagesWidget, 1);
 
     QHBoxLayout *buttonsLayout = new QHBoxLayout;
+    buttonsLayout->addWidget(resetAppearance);
     buttonsLayout->addStretch();
     buttonsLayout->setSpacing(5 *dpiXFactor);
     buttonsLayout->addWidget(closeButton);
@@ -181,8 +186,11 @@ ConfigDialog::ConfigDialog(QDir _home, Context *context) :
     setWindowTitle(tr("Options"));
 #endif
 
+    resetAppearance->hide();
+
     connect(closeButton, SIGNAL(clicked()), this, SLOT(closeClicked()));
     connect(saveButton, SIGNAL(clicked()), this, SLOT(saveClicked()));
+    connect(resetAppearance, SIGNAL(clicked()), appearance->appearancePage, SLOT(resetClicked()));
 }
 
 ConfigDialog::~ConfigDialog()
@@ -193,6 +201,10 @@ ConfigDialog::~ConfigDialog()
 
 void ConfigDialog::changePage(int index)
 {
+    // only want reset appearance button on the appearances page
+    if (index == 1) resetAppearance->show();
+    else resetAppearance->hide();
+
     pagesWidget->setCurrentIndex(index);
 }
 
@@ -225,7 +237,7 @@ void ConfigDialog::saveClicked()
 
     // did the home directory change?
     QString shome = appsettings->value(this, GC_HOMEDIR).toString();
-    if (shome != general->generalPage->athleteWAS || QFileInfo(shome).absoluteFilePath() != QFileInfo(home.absolutePath()).absolutePath()) {
+    if (shome != general->generalPage->athleteWAS) {
 
         // are you sure you want to change the location of the athlete library?
         // if so we will restart, if not I'll revert to current directory
@@ -260,8 +272,8 @@ void ConfigDialog::saveClicked()
 
         } else {
 
-            // revert to current home and let everyone know
-            appsettings->setValue(GC_HOMEDIR, QFileInfo(home.absolutePath()).absolutePath());
+            // revert to previous home
+            appsettings->setValue(GC_HOMEDIR, general->generalPage->athleteWAS);
         }
 
     } 
@@ -329,9 +341,7 @@ MetricConfig::MetricConfig(QDir home, Context *context) :
     home(home), context(context)
 {
     // the widgets
-    bestsPage = new BestsMetricsPage(this);
-    intervalsPage = new IntervalMetricsPage(this);
-    summaryPage = new SummaryMetricsPage(this);
+    intervalsPage = new FavouriteMetricsPage(this);
     customPage = new CustomMetricsPage(this, context);
 
     setContentsMargins(0,0,0,0);
@@ -341,9 +351,7 @@ MetricConfig::MetricConfig(QDir home, Context *context) :
 
     QTabWidget *tabs = new QTabWidget(this);
     tabs->addTab(customPage, tr("Custom"));
-    tabs->addTab(bestsPage, tr("Bests"));
-    tabs->addTab(summaryPage, tr("Summary"));
-    tabs->addTab(intervalsPage, tr("Intervals"));
+    tabs->addTab(intervalsPage, tr("Favourites"));
     mainLayout->addWidget(tabs);
 }
 
@@ -351,8 +359,6 @@ qint32 MetricConfig::saveClicked()
 {
     qint32 state = 0;
 
-    state |= bestsPage->saveClicked();
-    state |= summaryPage->saveClicked();
     state |= intervalsPage->saveClicked();
     state |= customPage->saveClicked();
 

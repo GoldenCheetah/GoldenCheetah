@@ -67,7 +67,7 @@ class VideoSyncFile;
 class Context;
 class Athlete;
 class MainWindow;
-class Tab;
+class AthleteTab;
 class NavigationModel;
 class RideMetadata;
 class ColorEngine;
@@ -100,6 +100,7 @@ class GlobalContext : public QObject
 
 };
 
+class RideNavigator;
 class Context : public QObject
 {
     Q_OBJECT;
@@ -124,9 +125,10 @@ class Context : public QObject
         const RideItem *currentRideItem() { return ride; }
         DateRange currentDateRange() { return dr_; }
 
-        // current selections
+        // current selections and widgetry
         MainWindow * const mainWindow;
-        Tab *tab;
+        RideNavigator *rideNavigator;
+        AthleteTab *tab;
         Athlete *athlete;
         RideItem *ride;  // the currently selected ride
         DateRange dr_;

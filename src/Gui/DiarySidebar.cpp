@@ -157,18 +157,10 @@ GcLabel::paintEvent(QPaintEvent *)
     if (text() != "<" && text() != ">") {
         painter.setFont(this->font());
 
-        if (!GCColor::isFlat() && (xoff || yoff)) {
-
-            // draw text in white behind...
-            QRectF off(xoff,yoff,width(),height());
-            painter.setPen(QColor(255,255,255,200));
-            painter.drawText(off, alignment(), text());
-        }
-
         if (filtered && !selected && !underMouse()) painter.setPen(GColor(CCALCURRENT));
         else {
 
-            if (isChrome && GCColor::isFlat()) {
+            if (isChrome) {
 
                 if (GCColor::luminance(GColor(CCHROME)) < 127)
                     painter.setPen(QColor(Qt::white));
@@ -483,7 +475,7 @@ void
 GcMiniCalendar::previous()
 {
     QList<QDateTime> allDates = context->athlete->rideCache->getAllDates();
-    qSort(allDates);
+    std::sort(allDates.begin(), allDates.end());
 
     // begin of month
     QDateTime bom(QDate(year,month,01), QTime(0,0,0));
@@ -517,7 +509,7 @@ void
 GcMiniCalendar::next()
 {
     QList<QDateTime> allDates = context->athlete->rideCache->getAllDates();
-    qSort(allDates);
+    std::sort(allDates.begin(), allDates.end());
 
     // end of month
     QDateTime eom(QDate(year,month,01).addMonths(1), QTime(00,00,00));

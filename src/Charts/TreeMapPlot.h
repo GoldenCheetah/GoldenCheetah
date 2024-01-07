@@ -78,7 +78,7 @@ class TreeMap
 
         void sort() {
             // sort the children in descending order
-            qSort(children.begin(), children.end(), TreeMapLessThan);
+            std::sort(children.begin(), children.end(), TreeMapLessThan);
             foreach (TreeMap *child, children) child->sort();
         }
 

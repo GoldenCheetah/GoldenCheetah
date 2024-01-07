@@ -26,6 +26,7 @@
 #include "RideFile.h"
 #include "MeterWidget.h"
 #include "VideoLayoutParser.h"
+#include "HelpWhatsThis.h"
 
 class Lock
 {
@@ -38,6 +39,9 @@ public:
 VideoWindow::VideoWindow(Context *context)  :
     GcChartWindow(context), context(context), m_MediaChanged(false), layoutSelector(NULL)
 {
+    HelpWhatsThis *helpContents = new HelpWhatsThis(this);
+    this->setWhatsThis(helpContents->getWhatsThisText(HelpWhatsThis::ChartTrain_VideoPlayer));
+
     QWidget *c = NULL;
     setProperty("color", QColor(Qt::black));
 
@@ -104,6 +108,8 @@ VideoWindow::VideoWindow(Context *context)  :
 
         // Create the layout selector form
         c = new QWidget(this);
+        HelpWhatsThis *helpConfig = new HelpWhatsThis(c);
+        c->setWhatsThis(helpConfig->getWhatsThisText(HelpWhatsThis::ChartTrain_VideoPlayer));
         c->setContentsMargins(0,0,0,0);
         QVBoxLayout *cl = new QVBoxLayout(c);
         QFormLayout *controlsLayout = new QFormLayout();
@@ -216,7 +222,7 @@ bool VideoWindow::hasActiveVideo() const
     }
 #endif
 #ifdef GC_VIDEO_QT5
-    if (LoadedMedia == mp->mediaStatus())
+    if (mp->state() != QMediaPlayer::StoppedState)
         return true;
 #endif
 
@@ -356,10 +362,11 @@ void VideoWindow::startPlayback()
         // This commonly occurs when a gpx file is used for workout with an older
         // tts used for videosync. Example: CH_Umbrail, or pretty much any older
         // tacx video where tts doesn't contain location data.
+        // Only applies to distance-slope (CRS) workouts
         double videoSyncDistanceMeters = currentVideoSyncFile->Distance * 1000.;
         if (videoSyncDistanceMeters > 0.) {
             ErgFile* currentErgFile = context->currentErgFile();
-            if (currentErgFile) {
+            if (currentErgFile && currentErgFile->mode == CRS) {
                 double ergFileDistanceMeters = currentErgFile->Duration;
                 if (ergFileDistanceMeters > 0.) {
                     videoSyncDistanceAdjustFactor = ergFileDistanceMeters / videoSyncDistanceMeters;
@@ -801,7 +808,10 @@ void VideoWindow::seekPlayback(long ms)
 #endif
 
 #ifdef GC_VIDEO_QT5
-    mp->setPosition(ms);
+    Q_UNUSED(ms)
+//TODO
+//    // seek to ms position in current file
+//    mp->setPosition(ms);
 #endif
 }
 

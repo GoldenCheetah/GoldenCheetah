@@ -19,14 +19,20 @@
 
 #include "RealtimePlotWindow.h"
 #include "Athlete.h"
+#include "HelpWhatsThis.h"
 
 RealtimePlotWindow::RealtimePlotWindow(Context *context) :
     GcChartWindow(context), context(context), active(false)
 {
+    HelpWhatsThis *helpContents = new HelpWhatsThis(this);
+    this->setWhatsThis(helpContents->getWhatsThisText(HelpWhatsThis::ChartTrain_Realtime));
+
     setContentsMargins(0,0,0,0);
     setProperty("color", GColor(CTRAINPLOTBACKGROUND));
 
     QWidget *c = new QWidget;
+    HelpWhatsThis *helpConfig = new HelpWhatsThis(c);
+    c->setWhatsThis(helpConfig->getWhatsThisText(HelpWhatsThis::ChartTrain_Realtime));
     QVBoxLayout *cl = new QVBoxLayout(c);
     setControls(c);
 

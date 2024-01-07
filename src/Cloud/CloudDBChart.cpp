@@ -1066,12 +1066,11 @@ CloudDBChartListDialog::applyAllFilters() {
     // setup to only show charts that are relevant to the current view
     unsigned int mask=0;
     switch(g_chartView) {
-        case 0 : mask = VIEW_HOME; break;
+        case 0 : mask = VIEW_TRENDS; break;
         default:
         case 1 : mask = VIEW_ANALYSIS; break;
         case 2 : mask = VIEW_DIARY; break;
         case 3 : mask = VIEW_TRAIN; break;
-        case 4 : mask = VIEW_INTERVAL; break;
     }
 
     QStringList searchList;

@@ -25,7 +25,7 @@
 #include "RideNavigator.h"
 #include "RideNavigatorProxy.h"
 #include "SearchFilterBox.h"
-#include "TabView.h"
+#include "AbstractView.h"
 #include "HelpWhatsThis.h"
 
 #include <QtGui>
@@ -49,6 +49,7 @@ RideNavigator::RideNavigator(Context *context, bool mainwindow) : GcChartWindow(
     fontHeight = QFontMetrics(QFont()).height();
     reverseColor = GlobalContext::context()->colorEngine->reverseColor;
     currentItem = NULL;
+    hasCalendarText = false;
 
     init = false;
 
@@ -168,10 +169,11 @@ RideNavigator::configChanged(qint32 state)
 {
     fontHeight = QFontMetrics(QFont()).height();
     reverseColor = GlobalContext::context()->colorEngine->reverseColor;
+    hasCalendarText = GlobalContext::context()->rideMetadata->hasCalendarText();
 
     // hide ride list scroll bar ?
 #ifndef Q_OS_MAC
-    tableView->setStyleSheet(TabView::ourStyleSheet());
+    tableView->setStyleSheet(AbstractView::ourStyleSheet());
     if (mainwindow) {
         if (appsettings->value(this, GC_RIDESCROLL, true).toBool() == false)
             tableView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -1074,7 +1076,7 @@ QSize NavigatorCellDelegate::sizeHint(const QStyleOptionViewItem & /*option*/, c
     QSize s;
 
     if (rideNavigator->groupByModel->mapToSource(rideNavigator->sortModel->mapToSource(index)) != QModelIndex() &&
-        rideNavigator->groupByModel->data(rideNavigator->sortModel->mapToSource(index), Qt::UserRole).toString() != "") {
+        rideNavigator->hasCalendarText) {
         s.setHeight((rideNavigator->fontHeight+2) * 4);
     } else s.setHeight(rideNavigator->fontHeight + 2);
     return s;
@@ -1211,7 +1213,7 @@ void NavigatorCellDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
         painter->setFont(isFont);
 
         // now get the calendar text to appear ...
-        if (calendarText != "") {
+        if (rideNavigator->hasCalendarText) {
             QRect high(myOption.rect.x()+myOption.rect.width() - (7*dpiXFactor), myOption.rect.y(), (7*dpiXFactor), (rideNavigator->fontHeight+2) * 4);
 
             myOption.rect.setX(0);
@@ -1305,7 +1307,7 @@ ColumnChooser::ColumnChooser(QList<QString>&logicalHeadings)
     smallFont.setPointSizeF(baseFont.pointSizeF() *0.8f);
 
     QList<QString> buttonNames = logicalHeadings;
-    qSort(buttonNames.begin(), buttonNames.end(), insensitiveLessThan);
+    std::sort(buttonNames.begin(), buttonNames.end(), insensitiveLessThan);
 
     QString last;
     foreach (QString column, buttonNames) {
@@ -1374,7 +1376,7 @@ RideNavigator::showTreeContextMenuPopup(const QPoint &pos)
 
 RideTreeView::RideTreeView(QWidget *parent) : QTreeView(parent)
 {
-    setDragDropMode(QAbstractItemView::InternalMove);
+    setDragDropMode(QAbstractItemView::DragDrop);
     setDragEnabled(true);
     setDragDropOverwriteMode(false);
     setDropIndicatorShown(true);

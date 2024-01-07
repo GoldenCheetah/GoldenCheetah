@@ -22,6 +22,7 @@
 #include "Context.h"
 #include "HelpWhatsThis.h"
 
+
 // Minimum gap in recording to find a natural break to split
 static const double defaultMinimumGap = 1; // 1 minute
 
@@ -233,7 +234,7 @@ SplitActivityWizard::setIntervalsList(SplitSelect *selector)
     segments.append(rideItem->ride()->intervals());
 
     // now lets sort the segments in start order
-    qSort(segments.begin(), segments.end());
+    std::sort(segments.begin(), segments.end());
 
     // first just add all the current ride intervals
     counter = 0;
@@ -691,7 +692,7 @@ SplitConfirm::initializePage()
     // not guaranteed to be ordered
     QList<long> points;
     foreach(long mark, wizard->marks) points.append(mark); // marks are indexes to ensure absolute accuracy
-    qSort(points.begin(), points.end());
+    std::sort(points.begin(), points.end());
 
     // Create a new ride for each marked segment
     long lastmark = -1;

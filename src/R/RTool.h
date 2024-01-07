@@ -38,6 +38,7 @@ class RTool {
         // the canvas to plot on, it may be null
         // if no canvas is active
         RCanvas *canvas;
+        Perspective *perspective;
         RChart *chart;
 
         Context *context;
@@ -50,6 +51,9 @@ class RTool {
         // athlete
         static SEXP athlete();
         static SEXP zones(SEXP date, SEXP sport);
+
+        // intervals
+        static SEXP intervalType(SEXP type);
 
         // activities
         static SEXP activities(SEXP filter);

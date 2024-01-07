@@ -344,7 +344,7 @@ template <size_t T_bitsize> class MyBitset
         return (((x + (x >> 4)) & 0xF0F0F0F) * 0x1010101) >> 24;
     }
 
-    void truncate() { m_mask &= (((unsigned)(-1 << (32 - T_bitsize))) >> (32 - T_bitsize)); }
+    void truncate() { m_mask &= ((~0U << (32 - T_bitsize)) >> (32 - T_bitsize)); }
 
 public:
 

@@ -92,8 +92,9 @@ Athlete::Athlete(Context *context, const QDir &homeDir)
 
 
     // Power Zones for Bike & Run
-    for (int i=0; i < 2; i++) {
-        zones_[i] = new Zones(i>0);
+    foreach (QString sport, GlobalContext::context()->rideMetadata->sports()) {
+        QString i = RideFile::sportTag(sport);
+        zones_[i] = new Zones(i);
         QFile zonesFile(home->config().canonicalPath() + "/" + zones_[i]->fileName());
         if (zonesFile.exists()) {
             if (!zones_[i]->read(zonesFile)) {
@@ -102,17 +103,18 @@ Athlete::Athlete(Context *context, const QDir &homeDir)
                 QMessageBox::warning(context->mainWindow, tr("Reading Zones File %1").arg(zones_[i]->fileName()), zones_[i]->warningString());
             }
         }
-        if (i == 1 && zones_[i]->getRangeSize() == 0) { // No running Power zones
+        if (i != "Bike" && zones_[i]->getRangeSize() == 0) { // No Power zones
             // Start with Cycling Power zones for backward compatibilty
-            QFile zonesFile(home->config().canonicalPath() + "/" + zones_[0]->fileName());
+            QFile zonesFile(home->config().canonicalPath() + "/" + Zones().fileName());
             // Load without error/warning report to avoid repetition
             if (zonesFile.exists()) zones_[i]->read(zonesFile);
         }
     }
 
-    // Heartrate Zones for Bike & Run
-    for (int i=0; i < 2; i++) {
-        hrzones_[i] = new HrZones(i>0);
+    // Heartrate Zones
+    foreach (QString sport, GlobalContext::context()->rideMetadata->sports()) {
+        QString i = RideFile::sportTag(sport);
+        hrzones_[i] = new HrZones(i);
         QFile hrzonesFile(home->config().canonicalPath() + "/" + hrzones_[i]->fileName());
         if (hrzonesFile.exists()) {
             if (!hrzones_[i]->read(hrzonesFile)) {
@@ -121,9 +123,9 @@ Athlete::Athlete(Context *context, const QDir &homeDir)
                 QMessageBox::warning(context->mainWindow, tr("Reading HR Zones File %1").arg(hrzones_[i]->fileName()), hrzones_[i]->warningString());
             }
         }
-        if (i == 1 && hrzones_[i]->getRangeSize() == 0) { // No running HR zones
+        if (i != "Bike" && hrzones_[i]->getRangeSize() == 0) { // No HR zones
             // Start with Cycling HR zones for backward compatibilty
-            QFile hrzonesFile(home->config().canonicalPath() + "/" + hrzones_[0]->fileName());
+            QFile hrzonesFile(home->config().canonicalPath() + "/" + HrZones().fileName());
             // Load without error/warning report to avoid repetition
             if (hrzonesFile.exists()) hrzones_[i]->read(hrzonesFile);
         }
@@ -251,8 +253,8 @@ Athlete::~Athlete()
     delete seasons;
     delete measures;
 
-    for (int i=0; i<2; i++) delete zones_[i];
-    for (int i=0; i<2; i++) delete hrzones_[i];
+    foreach (Zones* zones, zones_) delete zones;
+    foreach (HrZones* hrzones, hrzones_) delete hrzones;
     for (int i=0; i<2; i++) delete pacezones_[i];
     delete autoImportConfig;
     delete autoImport;
@@ -268,8 +270,11 @@ void Athlete::selectRideFile(QString fileName)
     foreach (RideItem *rideItem, rideCache->rides()) {
 
         context->ride = (RideItem*) rideItem;
-        if (context->ride->fileName == fileName) 
+        if (context->ride->fileName == fileName)  {
+            // lets open it before we let folks know
+            context->ride->ride();
             break;
+        }
     }
     context->notifyRideSelected(context->ride);
 }
@@ -585,11 +590,11 @@ Athlete::getPMCFor(Leaf *expr, DataFilterRuntime *df, int stsdays, int ltsdays)
 }
 
 PDEstimate
-Athlete::getPDEstimateFor(QDate date, QString model, bool wpk, bool run)
+Athlete::getPDEstimateFor(QDate date, QString model, bool wpk, QString sport)
 {
     // whats the estimate for this date
     foreach(PDEstimate est, getPDEstimates()) {
-        if (est.model == model && est.wpk == wpk && est.run == run && est.from <= date && est.to >= date)
+        if (est.model == model && est.wpk == wpk && est.sport == sport && est.from <= date && est.to >= date)
             return est;
     }
     return PDEstimate();

@@ -20,6 +20,7 @@
 #include "WorkoutWindow.h"
 #include "WorkoutWidget.h"
 #include "WorkoutWidgetItems.h"
+#include "HelpWhatsThis.h"
 
 static int MINTOOLHEIGHT = 350; // smaller than this, lose the toolbar
 
@@ -39,6 +40,9 @@ WorkoutWindow::WorkoutWindow(Context *context) :
     plotVentilationAvg(1),
     plotSpeedAvg(1)
 {
+    HelpWhatsThis *helpContents = new HelpWhatsThis(this);
+    this->setWhatsThis(helpContents->getWhatsThisText(HelpWhatsThis::ChartTrain_WorkoutEditor));
+
     setContentsMargins(0,0,0,0);
     setProperty("color", GColor(CTRAINPLOTBACKGROUND));
 
@@ -47,6 +51,8 @@ WorkoutWindow::WorkoutWindow(Context *context) :
     //
 
     QWidget *settingsWidget = new QWidget(this);
+    HelpWhatsThis *helpConfig = new HelpWhatsThis(settingsWidget);
+    settingsWidget->setWhatsThis(helpConfig->getWhatsThisText(HelpWhatsThis::ChartTrain_WorkoutEditor));
     settingsWidget->setContentsMargins(0,0,0,0);
 
     QGridLayout *gridLayout = new QGridLayout(settingsWidget);
@@ -356,7 +362,7 @@ WorkoutWindow::configChanged(qint32)
     xlabel->setFixedWidth(fm.boundingRect(" 00:00:00 ").width());
     ylabel->setFixedWidth(fm.boundingRect(" 1000w ").width());
 
-    scroll->setStyleSheet(TabView::ourStyleSheet());
+    scroll->setStyleSheet(AbstractView::ourStyleSheet());
     toolbar->setStyleSheet(QString("::enabled { background: %1; color: %2; border: 0px; } ")
                            .arg(GColor(CTRAINPLOTBACKGROUND).name())
                            .arg(GCColor::invertColor(GColor(CTRAINPLOTBACKGROUND)).name()));
@@ -388,7 +394,7 @@ WorkoutWindow::configChanged(qint32)
     }
 
 #ifndef Q_OS_MAC // the scrollers appear when needed on Mac, we'll keep that
-    code->setStyleSheet(TabView::ourStyleSheet());
+    code->setStyleSheet(AbstractView::ourStyleSheet());
 #endif
 
     palette.setColor(QPalette::WindowText, GCColor::invertColor(GColor(CTRAINPLOTBACKGROUND)));

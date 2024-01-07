@@ -23,7 +23,6 @@
 AboutDialog::AboutDialog(Context *context) : context(context)
 {
     setWindowTitle(tr("About GoldenCheetah"));
-
     aboutPage = new AboutPage(context);
     versionPage = new VersionPage(context);
     contributorsPage = new ContributorsPage(context);
@@ -52,6 +51,7 @@ AboutPage::AboutPage(Context *context) : context(context)
     QLabel *text;
     text=new QLabel(this);
     text->setContentsMargins(0,0,0,0);
+    text->setOpenExternalLinks(true);
     text->setText(
               tr(
                 "<center>"
@@ -62,8 +62,8 @@ AboutPage::AboutPage(Context *context) : context(context)
                 "<a href=\"https://opensource.org/licenses/GPL-2.0\">GNU General "
                 "Public License 2.0</a>."
                 "<p>Source code can be obtained from<br>"
-                "<a href=\"http://goldencheetah.org/\">"
-                "http://goldencheetah.org/</a>."
+                "<a href=\"https://www.goldencheetah.org/\">"
+                "https://www.goldencheetah.org/</a>."
                 "<br><p>Activity files and other data are stored in<br>"
                 "<a href=\"%1\">%2</a>"
                 "<p>Athlete ID %3<br>"
@@ -180,6 +180,7 @@ ContributorsPage::ContributorsPage(Context *context) : context(context)
     contributors.append("Okano Takayoshi");
     contributors.append("Omar Torres");
     contributors.append("Patrick McNerthney");
+    contributors.append("Paul Johnson");
     contributors.append("Peter Kanatselis");
     contributors.append("Dr Phil Skiba");
     contributors.append("Philip Willoughby");

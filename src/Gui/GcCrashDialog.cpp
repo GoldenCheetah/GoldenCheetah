@@ -154,33 +154,15 @@ GcCrashDialog::GcCrashDialog(QDir homeDir) : QDialog(NULL, Qt::Dialog), home(hom
     setHTML();
 }
 
+GcCrashDialog::~GcCrashDialog()
+{
+    if (report) delete report->page();
+}
+
 QString GcCrashDialog::versionHTML()
 {
     // -- OS ----
-    QString os = "";
-
-    #ifdef Q_OS_LINUX
-    os = "Linux";
-    #endif
-
-    #ifdef WIN32
-    os = "Win";
-    #endif
-
-    #ifdef Q_OS_MAC
-    os = QString("Mac OS X 10.%1").arg(QSysInfo::MacintoshVersion - 2);
-    if (QSysInfo::MacintoshVersion == QSysInfo::MV_SNOWLEOPARD)
-        os += " Snow Leopard";
-    else if (QSysInfo::MacintoshVersion == QSysInfo::MV_LION)
-        os += " Lion";
-    else if (QSysInfo::MacintoshVersion == 10)
-        os += " Mountain Lion";
-    else if (QSysInfo::MacintoshVersion == 11)
-        os += " Mavericks";
-    else if (QSysInfo::MacintoshVersion == 12)
-        os += " Yosemite";
-
-    #endif
+    QString os = QSysInfo::prettyProductName();
 
     // -- SCHEMA VERSION ----
     QString schemaVersion = QString("%1").arg(DBSchemaVersion);
@@ -258,8 +240,9 @@ QString GcCrashDialog::versionHTML()
             "<br>Metrics: %7"
             "<br>OS: %6"
 #ifdef Q_OS_LINUX
-            "<br>OpenGL: %8"
+            "<br>OpenGL: %10"
 #endif
+            "<br>UI: dpi scale (%8) font size (%9)"
             "<br>")
             .arg(__DATE__)
             .arg(__TIME__)
@@ -272,6 +255,8 @@ QString GcCrashDialog::versionHTML()
             .arg(schemaVersion)
             .arg(os)
             .arg(factory.metricCount())
+            .arg(dpiXFactor)
+            .arg(QFont().pointSizeF())
 #ifdef Q_OS_LINUX
             .arg(gl_version)
 #endif

@@ -31,6 +31,7 @@
 #include "Units.h"
 #include "Zones.h"
 #include "Utils.h"
+#include "HelpWhatsThis.h"
 
 #include <QCheckBox>
 #include <QFormLayout>
@@ -115,6 +116,9 @@ class CTableWidgetItem : public QTableWidgetItem
 
 ComparePane::ComparePane(Context *context, QWidget *parent, CompareMode mode) : QWidget(parent), context(context), mode_(mode)
 {
+    HelpWhatsThis *help = new HelpWhatsThis(this);
+    this->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::ComparePane));
+
     QVBoxLayout *layout = new QVBoxLayout(this);
     layout->setContentsMargins(0,0,0,0);
     layout->setSpacing(0);
@@ -181,8 +185,8 @@ ComparePane::refreshTable()
         // metric summary
         QStringList always;
         always << "workout_time" << "total_distance";
-        QString s = appsettings->value(this, GC_SETTINGS_INTERVAL_METRICS, GC_SETTINGS_INTERVAL_METRICS_DEFAULT).toString();
-        if (s == "") s = GC_SETTINGS_INTERVAL_METRICS_DEFAULT;
+        QString s = appsettings->value(this, GC_SETTINGS_FAVOURITE_METRICS, GC_SETTINGS_FAVOURITE_METRICS_DEFAULT).toString();
+        if (s == "") s = GC_SETTINGS_FAVOURITE_METRICS_DEFAULT;
         QStringList metricColumns = always + s.split(","); // always showm metrics plus user defined summary metrics
         metricColumns.removeDuplicates(); // where user has already added workout_time, total_distance
 
@@ -346,8 +350,8 @@ ComparePane::refreshTable()
         // metric summary
         QStringList always;
         always << "workout_time" << "total_distance";
-        QString s = appsettings->value(this, GC_SETTINGS_SUMMARY_METRICS, GC_SETTINGS_SUMMARY_METRICS_DEFAULT).toString();
-        if (s == "") s = GC_SETTINGS_SUMMARY_METRICS_DEFAULT;
+        QString s = appsettings->value(this, GC_SETTINGS_FAVOURITE_METRICS, GC_SETTINGS_FAVOURITE_METRICS_DEFAULT).toString();
+        if (s == "") s = GC_SETTINGS_FAVOURITE_METRICS_DEFAULT;
         QStringList metricColumns = always + s.split(","); // always showm metrics plus user defined summary metrics
         metricColumns.removeDuplicates(); // where user has already added workout_time, total_distance
 
@@ -789,6 +793,7 @@ ComparePane::dropEvent(QDropEvent *event)
             add.rideItem->getWeight();
             add.rideItem->isRun = add.data->isRun();
             add.rideItem->isSwim = add.data->isSwim();
+            add.rideItem->sport = add.data->sport();
             add.rideItem->present = add.data->getTag("Data", "");
             add.rideItem->samples = add.data->dataPoints().count() > 0;
 
@@ -821,11 +826,11 @@ ComparePane::dropEvent(QDropEvent *event)
             QVector<int> seasonCount(newOnes[0].sourceContext->athlete->seasons->seasons.count());
             QList<IntervalItem*> matches;
 
-            // loop through rides finding intervals on this route
+            // loop through rides finding intervals on this route for the same sport
             foreach(RideItem *ride, newOnes[0].sourceContext->athlete->rideCache->rides()) {
                 // find the interval?
                 foreach(IntervalItem *interval, ride->intervals(RideFileInterval::ROUTE)) {
-                    if (interval->route == newOnes[0].route) {
+                    if (interval->route == newOnes[0].route && interval->rideItem()->sport == newOnes[0].rideItem->sport) {
 
                         // add to the main list
                         matches << interval;
@@ -847,7 +852,7 @@ ComparePane::dropEvent(QDropEvent *event)
             if (matches.count() > 1 ) {
 
                 // sort matches so most recent first
-                qSort(matches.begin(), matches.end(), dateRecentFirst);
+                std::sort(matches.begin(), matches.end(), dateRecentFirst);
 
                 // ok, lets crank up a dialog to ask
                 // one only, or the season to use

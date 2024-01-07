@@ -24,7 +24,7 @@
 #include <QFontMetrics>
 
 #ifdef Q_OS_MAC
-static int spacing_=4;
+static int spacing_=12;
 #else
 static int spacing_=8;
 #endif
@@ -72,10 +72,9 @@ ChartBar::ChartBar(Context *context) : QWidget(context->mainWindow), context(con
     anim = new QPropertyAnimation(buttonBar, "pos", this);
 
     // scroller buttons
-    left = new QToolButton(this);
-    left->setStyleSheet("QToolButton { border: none; padding: 0px; }");
+    left = new QPushButton(this);
     left->setAutoFillBackground(false);
-    left->setFixedSize(20*dpiXFactor,20*dpiYFactor);
+    left->setFixedSize(24*dpiXFactor,24*dpiYFactor);
     left->setIcon(leftIcon);
     left->setIconSize(QSize(20*dpiXFactor,20*dpiYFactor));
     left->setFocusPolicy(Qt::NoFocus);
@@ -85,10 +84,9 @@ ChartBar::ChartBar(Context *context) : QWidget(context->mainWindow), context(con
     // menu bar in the middle of the buttons
     mlayout->addWidget(scrollArea);
 
-    right = new QToolButton(this);
-    right->setStyleSheet("QToolButton { border: none; padding: 0px; }");
+    right = new QPushButton(this);
     right->setAutoFillBackground(false);
-    right->setFixedSize(20*dpiXFactor,20*dpiYFactor);
+    right->setFixedSize(24*dpiXFactor,24*dpiYFactor);
     right->setIcon(rightIcon);
     right->setIconSize(QSize(20*dpiXFactor,20*dpiYFactor));
     right->setFocusPolicy(Qt::NoFocus);
@@ -102,12 +100,11 @@ ChartBar::ChartBar(Context *context) : QWidget(context->mainWindow), context(con
     spacer->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
     mlayout->addWidget(spacer);
 
-    menuButton = new QToolButton(this);
-    menuButton->setStyleSheet("QToolButton { border: none; padding: 0px; }");
+    menuButton = new QPushButton(this);
     menuButton->setAutoFillBackground(false);
-    menuButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
-    menuButton->setIcon(iconFromPNG(":images/sidebar/plus.png"));
-    menuButton->setIconSize(QSize(10*dpiXFactor,10*dpiYFactor));
+    menuButton->setFixedSize(24*dpiXFactor,24*dpiYFactor);
+    menuButton->setIcon(iconFromPNG(":images/sidebar/plus.png", QSize(12*dpiXFactor, 12*dpiXFactor)));
+    menuButton->setIconSize(QSize(20*dpiXFactor,20*dpiYFactor));
     menuButton->setFocusPolicy(Qt::NoFocus);
     mlayout->addWidget(menuButton);
     //connect(p, SIGNAL(clicked()), action, SLOT(trigger()));
@@ -119,13 +116,14 @@ ChartBar::ChartBar(Context *context) : QWidget(context->mainWindow), context(con
     connect(menuMapper, SIGNAL(mapped(int)), this, SLOT(triggerContextMenu(int)));
 
     barMenu = new QMenu("Add");
-    chartMenu = barMenu->addMenu(tr("New "));
+    chartMenu = barMenu->addMenu(tr("New Chart"));
 
-    barMenu->addAction(tr("Import ..."), context->mainWindow, SLOT(importChart()));
+    barMenu->addAction(tr("Import Chart ..."), context->mainWindow, SLOT(importChart()));
 
 #ifdef GC_HAS_CLOUD_DB
-    barMenu->addAction(tr("Download ..."), context->mainWindow, SLOT(addChartFromCloudDB()));
+    barMenu->addAction(tr("Download Chart..."), context->mainWindow, SLOT(addChartFromCloudDB()));
 #endif
+
     // menu
     connect(menuButton, SIGNAL(clicked()), this, SLOT(menuPopup()));
     connect(chartMenu, SIGNAL(aboutToShow()), this, SLOT(setChartMenu()));
@@ -151,7 +149,7 @@ ChartBar::configChanged(qint32)
     scrollArea->setFixedHeight(height);
     buttonBar->setFixedHeight(height);
 
-    QColor col=GColor(CCHROME);
+    QColor col=GColor(CCHARTBAR);
     scrollArea->setStyleSheet(QString("QScrollArea { background: rgb(%1,%2,%3); }").arg(col.red()).arg(col.green()).arg(col.blue()));
 
     foreach(ChartBarItem *b, buttons) {
@@ -161,6 +159,16 @@ ChartBar::configChanged(qint32)
         b->setFixedWidth(width);
         b->setFixedHeight(height);
     }
+
+    QString buttonstyle = QString("QPushButton { border: none; border-radius: %2px; background-color: %1; "
+                                                "padding-left: 0px; padding-right: 0px; "
+                                                "padding-top:  0px; padding-bottom: 0px; }"
+                                  "QPushButton:hover { background-color: %3; }"
+                                  "QPushButton:hover:pressed { background-color: %3; }"
+                                ).arg(GColor(CCHARTBAR).name()).arg(3 * dpiXFactor).arg(GColor(CHOVER).name());
+    menuButton->setStyleSheet(buttonstyle);
+    left->setStyleSheet(buttonstyle);
+    right->setStyleSheet(buttonstyle);
 }
 
 void
@@ -385,7 +393,7 @@ ChartBar::paintBackground(QPaintEvent *)
     painter.save();
     QRect all(0,0,width(),height());
 
-    painter.fillRect(all, GColor(CCHROME));
+    painter.fillRect(all, GColor(CCHARTBAR));
 
     painter.restore();
 }
@@ -408,24 +416,10 @@ ButtonBar::paintBackground(QPaintEvent *)
     painter.save();
     QRect all(0,0,width(),height());
 
-    // linear gradients
-    QLinearGradient active = GCColor::linearGradient(23*dpiYFactor, true);
-    QLinearGradient inactive = GCColor::linearGradient(23*dpiYFactor, false);
-
     // fill with a linear gradient
     painter.setPen(Qt::NoPen);
     painter.fillRect(all, QColor(Qt::white));
-    painter.fillRect(all, isActiveWindow() ? active : inactive);
-
-    if (!GCColor::isFlat()) {
-        QPen black(QColor(100,100,100,200));
-        painter.setPen(black);
-        painter.drawLine(0,height()-1, width()-1, height()-1);
-
-        QPen gray(QColor(230,230,230));
-        painter.setPen(gray);
-        painter.drawLine(0,0, width()-1, 0);
-    }
+    painter.fillRect(all, GColor(CCHARTBAR));
 
     painter.restore();
 }
@@ -456,8 +450,8 @@ ChartBarItem::paintEvent(QPaintEvent *)
     painter.setPen(Qt::NoPen);
 
     // background - chrome or slected colour
-    QBrush brush(GColor(CCHROME));
-    if (underMouse() && !checked) brush = QBrush(Qt::darkGray);
+    QBrush brush(GColor(CCHARTBAR));
+    if (underMouse() && !checked) brush = GColor(CHOVER);
     if (checked) brush = color;
     painter.fillRect(body, brush);
 
@@ -467,7 +461,16 @@ ChartBarItem::paintEvent(QPaintEvent *)
     painter.drawText(body, text, Qt::AlignHCenter | Qt::AlignVCenter);
 
     // draw the bar
-    if (checked) painter.fillRect(QRect(0,0,geometry().width(), 3*dpiXFactor), QBrush(GColor(CPLOTMARKER)));
+    if (checked) {
+        // at the top if the chartbar background is different to the plot background
+        if (GColor(CCHARTBAR) != color) painter.fillRect(QRect(0,0,geometry().width(), 3*dpiXFactor), QBrush(GColor(CPLOTMARKER)));
+        else {
+            // only underline the text with a little extra (why adding "XXX" below)
+            QFontMetrics fm(font());
+            double width = fm.boundingRect(text+"XXX").width();
+            painter.fillRect(QRect((geometry().width()-width)/2.0,geometry().height()-(3*dpiXFactor),width, 3*dpiXFactor), QBrush(GColor(CPLOTMARKER)));
+        }
+    }
 
     // draw the menu indicator
     if (underMouse()) {
@@ -478,13 +481,13 @@ ChartBarItem::paintEvent(QPaintEvent *)
         if (checked) {
 
             // different color if under mouse
-            QBrush brush(Qt::darkGray);
+            QBrush brush(GCColor::invertColor(color));
             if (hotspot.contains(mouse)) brush.setColor(GColor(CPLOTMARKER));
             painter.fillPath (triangle, brush);
         } else {
 
             // visual clue there is a menu option when tab selected
-            QBrush brush(Qt::lightGray);
+            QBrush brush(GColor(CHOVER));
             painter.fillPath (triangle, brush);
         }
     }
@@ -514,9 +517,9 @@ ChartBarItem::event(QEvent *e)
 {
     // resize?
     if (e->type() == QEvent::Resize) {
-        int startx = width() - (20*dpiXFactor);
+        int startx = width() - (25*dpiXFactor);
         int depth = height() / 4;
-        int starty = (height() / 2.0) - (depth/2) + 3*dpiXFactor; // middle, taking into account bar at top
+        int starty = (height() / 2.0) - (depth/2) + 1*dpiXFactor; // middle, taking into account bar at top
         int hs = 3 * dpiXFactor;
 
         // set the triangle
@@ -597,6 +600,7 @@ ChartBarItem::event(QEvent *e)
             repaint();
 
             dragging = new ChartBarItem(chartbar);
+            dragging->setColor(color);
             dragging->state = Clone;
             dragging->text = text;
             dragging->checked = checked;

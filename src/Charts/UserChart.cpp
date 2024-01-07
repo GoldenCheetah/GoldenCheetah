@@ -19,50 +19,63 @@
 #include "UserChart.h"
 
 #include "Colors.h"
-#include "TabView.h"
+#include "AbstractView.h"
 #include "RideFileCommand.h"
 #include "Utils.h"
-#include "Tab.h"
+#include "AthleteTab.h"
+#include "Views.h"
+#include "AnalysisSidebar.h"
 #include "LTMTool.h"
 #include "RideNavigator.h"
 #include "ColorButton.h"
 #include "MainWindow.h"
 #include "UserChartData.h"
 #include "TimeUtils.h"
+#include "HelpWhatsThis.h"
+#include "RideItem.h"
 
 #include <limits>
 #include <QScrollArea>
 #include <QDialog>
 
-UserChart::UserChart(Context *context, bool rangemode) : GcChartWindow(context), context(context), rangemode(rangemode), stale(true), last(NULL)
+UserChart::UserChart(QWidget *parent, Context *context, bool rangemode, QString bg)
+    : QWidget(parent), context(context), rangemode(rangemode), stale(true), last(NULL), ride(NULL), intervals(0), item(NULL)
 {
+    HelpWhatsThis *helpContents = new HelpWhatsThis(this);
+    this->setWhatsThis(helpContents->getWhatsThisText(HelpWhatsThis::Chart_User));
+
     // the config
-    settingsTool = new UserChartSettings(context, rangemode, chartinfo, seriesinfo, axisinfo);
-    setControls(settingsTool);
+    settingsTool_ = new UserChartSettings(context, rangemode, chartinfo, seriesinfo, axisinfo);
+    settingsTool_->hide();
 
     // layout
     QVBoxLayout *main=new QVBoxLayout();
-    setChartLayout(main); // we're a gcchartwindow
+    setLayout(main);
     main->setSpacing(0);
     main->setContentsMargins(0,0,0,0);
+
+    // we don't know our perspective yet...
+    setPerspective(NULL);
 
     // the chart
     chart = new GenericChart(this, context);
     main->addWidget(chart);
 
-    // when a ride is selected
-    if (!rangemode) {
-        connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(setRide(RideItem*)));
-    } else {
-        connect(this, SIGNAL(dateRangeChanged(DateRange)), SLOT(setDateRange(DateRange)));
-        connect(context, SIGNAL(homeFilterChanged()), this, SLOT(refresh()));
-        connect(context, SIGNAL(filterChanged()), this, SLOT(refresh()));
-    }
+    // when a ride is selected, etc we get notified by our parent
+    // which is a UserChartWindow or a UserChartOverviewItem
 
-    // need to refresh when chart settings change
-    connect(settingsTool, SIGNAL(chartConfigChanged()), this, SLOT(chartConfigChanged()));
+    // but we do need to refresh when chart settings change
+    connect(settingsTool_, SIGNAL(chartConfigChanged()), this, SLOT(chartConfigChanged()));
     connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
+    connect(context, SIGNAL(intervalSelected()), this, SLOT(intervalRefresh()));
+    connect(context, SIGNAL(intervalsChanged()), this, SLOT(intervalRefresh()));
 
+    // defaults, can be overriden via setBackgroundColor()
+    if (bg != "") chartinfo.bgcolor = bg;
+    else if (rangemode) chartinfo.bgcolor = StandardColor(CTRENDPLOTBACKGROUND).name();
+    else chartinfo.bgcolor = StandardColor(CPLOTBACKGROUND).name();
+
+    // set default background color
     configChanged(0);
 }
 
@@ -71,16 +84,16 @@ UserChart::configChanged(qint32)
 {
     setUpdatesEnabled(false);
 
-    if (rangemode) setProperty("color", GColor(CTRENDPLOTBACKGROUND));
-    else setProperty("color", GColor(CPLOTBACKGROUND));
-
     // tinted palette for headings etc
     QPalette palette;
-    palette.setBrush(QPalette::Window, QBrush(GColor(CPLOTBACKGROUND)));
+    palette.setBrush(QPalette::Window, RGBColor(chartinfo.bgcolor));
+    palette.setBrush(QPalette::Background, RGBColor(chartinfo.bgcolor));
     palette.setColor(QPalette::WindowText, GColor(CPLOTMARKER));
     palette.setColor(QPalette::Text, GColor(CPLOTMARKER));
-    palette.setColor(QPalette::Base, GCColor::alternateColor(GColor(CPLOTBACKGROUND)));
+    palette.setColor(QPalette::Base, RGBColor(chartinfo.bgcolor) /*GCColor::alternateColor(bgcolor)*/);
     setPalette(palette);
+
+    setAutoFillBackground(true);
 
     // redraw
     chartConfigChanged();
@@ -89,27 +102,36 @@ UserChart::configChanged(qint32)
 }
 
 void
+UserChart::setGraphicsItem(QGraphicsItem *item)
+{
+    this->item = item;
+    chart->setGraphicsItem(item);
+}
+
+void
 UserChart::chartConfigChanged()
 {
-    if (!myRideItem) return;
+    emit userChartConfigChanged();
+
+    if (!ride) return;
 
     stale = true;
 
     if (rangemode) setDateRange(context->currentDateRange());
-    else setRide(myRideItem);
+    else  setRide(ride);
 }
 
 //
 // Ride selected
 //
 void
-UserChart::setRide(RideItem *item)
+UserChart::setRide(const RideItem *item)
 {
     // not being shown so just ignore
-    if (!amVisible()) { stale=true; return; }
+    if (!isVisible()) { stale=true; return; }
 
     // make sure its not NULL etc
-    if (item == NULL || item->ride() == NULL) return;
+    if (item == NULL || const_cast<RideItem*>(item)->ride() == NULL) return;
 
     // have we already seen it?
     if (last == item && !stale) return;
@@ -120,7 +142,7 @@ UserChart::setRide(RideItem *item)
     ride = last = item;
     stale = false;
 
-    dr=DateRange(); // always set to no range
+    //dr=DateRange(); // always set to no range
 
     refresh();
  }
@@ -128,24 +150,55 @@ UserChart::setRide(RideItem *item)
  void
  UserChart::setDateRange(DateRange d)
  {
-    if (!amVisible()) return;
+    if (!isVisible()) return;
 
     // we don't really need to worry too much
     // about not refreshing as it doesn't get
     // called so often in trends view.
     dr = d;
-    ride = myRideItem; // always current
+    ride = context->currentRideItem(); // always current
 
     refresh();
  }
 
- void
- UserChart::refresh()
- {
-    if (!amVisible()) { stale=true; return; }
+void
+UserChart::intervalRefresh()
+{
+    // refresh on intervals change is user configurable
+    if (!rangemode && chartinfo.intervalrefresh && context->currentRideItem()) {
+
+        // are there any intervals selected?
+        int ints = 0;
+        foreach (IntervalItem*p, const_cast<RideItem*>(context->currentRideItem())->intervals()) {
+            if (p != NULL && p->selected == true) ints++;
+        }
+
+        // if the number of intervals is selected is 0 and
+        // when we last refreshed it was also 0 then just ignore
+        // this signal (on ride change the ride changed signal
+        // will trigger a refresh, lets not duplicate it)
+        if (ints !=0 || intervals !=0) {
+            refresh();
+        }
+    }
+}
+
+void
+UserChart::refresh()
+{
+    if (context->currentRideItem() == NULL) return;
+
+    if (!isVisible()) { stale=true; return; }
+
+    // remember how many interval were selected when we refreshed
+    intervals = 0;
+    foreach (IntervalItem*p, const_cast<RideItem*>(context->currentRideItem())->intervals()) {
+        if (p != NULL && p->selected == true) intervals++;
+    }
 
     // ok, we've run out of excuses, looks like we need to plot
-    chart->initialiseChart(chartinfo.title, chartinfo.type, chartinfo.animate, chartinfo.legendpos, chartinfo.stack, chartinfo.orientation);
+    chart->setBackgroundColor(RGBColor(chartinfo.bgcolor));
+    chart->initialiseChart(chartinfo.title, chartinfo.type, chartinfo.animate, chartinfo.legendpos, chartinfo.stack, chartinfo.orientation, chartinfo.scale);
 
     // now generate the series data
     for (int ii=0; ii<seriesinfo.count(); ii++) {
@@ -154,19 +207,63 @@ UserChart::setRide(RideItem *item)
         GenericSeriesInfo &series = seriesinfo[ii];
 
         // clear old annotations for this series
-        annotations.clear();
+        series.annotations.clear();
 
         // re-create program (may be edited)
         if (series.user1 != NULL) delete static_cast<UserChartData*>(series.user1);
         series.user1 = new UserChartData(context, this, series.string1, rangemode);
-        connect(static_cast<UserChartData*>(series.user1)->program, SIGNAL(annotateLabel(QStringList&)), this, SLOT(annotateLabel(QStringList&)));
+        connect(static_cast<UserChartData*>(series.user1)->program, SIGNAL(annotate(GenericAnnotationInfo&)), this, SLOT(annotate(GenericAnnotationInfo&)));
 
         // cast so we can work with it
         UserChartData *ucd = static_cast<UserChartData*>(series.user1);
-        ucd->compute(ride, Specification(), dr);
+        // NOTE: specification is blank so doesn't honor perspective or filters, use activity {} in program for that (!!)
+        ucd->compute(const_cast<RideItem*>(ride), Specification(), dr);
         series.xseries = ucd->x.asNumeric();
         series.yseries = ucd->y.asNumeric();
         series.fseries = ucd->f.asString();
+
+        // lookup axis info to get groupby or smoothing
+        // we need to preprocess data as axis management
+        // resolves for the series data
+        //
+        // this means group and smooth applies to user data
+        // charts but not R and Python where it will need
+        // to be managed within the script by the user
+        int ay=GenericAxisInfo::findAxis(axisinfo, series.yname);
+        int ax=GenericAxisInfo::findAxis(axisinfo, series.xname);
+
+        // TIME smoothing (applies to y axis)
+        double xsmooth=0, ysmooth=0;
+        if (ax != -1 && axisinfo[ax].smooth != 0 && axisinfo[ax].type == GenericAxisInfo::TIME) ysmooth=axisinfo[ax].smooth;
+        if (ay != -1 && axisinfo[ay].smooth != 0 && axisinfo[ay].type == GenericAxisInfo::TIME) xsmooth=axisinfo[ay].smooth;
+
+        // lets pre-process the data- and might as well use sampling if losing resolution- some performance benefits here
+        if (xsmooth >= 2) {
+            series.xseries = Utils::smooth_sma(series.xseries, GC_SMOOTH_CENTERED, xsmooth, 3);
+            series.yseries = Utils::sample(series.yseries, 3);
+        }
+        if (ysmooth >= 2) {
+            series.yseries = Utils::smooth_sma(series.yseries, GC_SMOOTH_CENTERED, ysmooth, 3);
+            series.xseries = Utils::sample(series.xseries, 3);
+        }
+
+        // DATE groupby (applies to date axis)
+        int xgroupby=0, ygroupby=0;
+        if (ax != -1 && axisinfo[ax].groupby != 0 && axisinfo[ax].type == GenericAxisInfo::DATERANGE) xgroupby=axisinfo[ax].groupby;
+        if (ay != -1 && axisinfo[ay].groupby != 0 && axisinfo[ay].type == GenericAxisInfo::DATERANGE) ygroupby=axisinfo[ay].groupby;
+
+
+        // groupBy uses pass by reference and will update what is passed
+        // we update the ucd result as its used elsewhere
+        if (xgroupby > 0) groupBy(xgroupby, series.aggregateby, series.xseries, series.yseries, chartinfo.type == GC_CHART_BAR || chartinfo.type == GC_CHART_STACK || chartinfo.type == GC_CHART_PERCENT);
+        if (ygroupby > 0) groupBy(ygroupby, series.aggregateby, series.yseries, series.xseries, chartinfo.type == GC_CHART_BAR || chartinfo.type == GC_CHART_STACK || chartinfo.type == GC_CHART_PERCENT);
+
+        // this is a bit of a hack, but later processing references ucd->x and y, so we
+        // update them since they have been smoothed/aggregated.
+        if (xsmooth >= 2 || ysmooth >= 2 || ygroupby > 0 || xgroupby > 0) {
+            ucd->x.asNumeric() = series.xseries;
+            ucd->y.asNumeric() = series.yseries;
+        }
 
         // pie charts need labels
         if (chartinfo.type == GC_CHART_PIE) {
@@ -203,11 +300,8 @@ UserChart::setRide(RideItem *item)
 
         // data now generated so can add curve
         chart->addCurve(series.name, series.xseries, series.yseries, series.fseries, series.xname, series.yname,
-                        series.labels, series.colors,
-                        series.line, series.symbol, series.size, series.color, series.opacity, series.opengl, series.legend, series.datalabels, series.fill);
-
-        // add series annotations
-        foreach(QStringList list, annotations) chart->annotateLabel(series.name, list);
+                        series.labels, series.colors, series.line, series.symbol, series.size, series.color, series.opacity,
+                        series.opengl, series.legend, series.datalabels, series.fill, series.aggregateby, series.annotations);
 
     }
 
@@ -227,21 +321,54 @@ UserChart::setRide(RideItem *item)
         // on a user chart the series sets the categories for a bar chart
         // find the first series for this axis and set the categories
         // to the x series values.
-        if (chartinfo.type == GC_CHART_BAR && axis.orientation == Qt::Horizontal) {
+        if ((chartinfo.type == GC_CHART_BAR || chartinfo.type == GC_CHART_STACK || chartinfo.type == GC_CHART_PERCENT) && axis.orientation == Qt::Horizontal) {
             // DATERANGE values are days from 01-01-1900
             QDateTime earliest(QDate(1900,01,01), QTime(0,0,0), Qt::LocalTime);
 
             // find the first series for axis.name
             foreach(GenericSeriesInfo s, seriesinfo) {
                 if (s.xname == axis.name && s.user1) {
+
                     axis.categories.clear();
+
+
                     UserChartData *ucd = static_cast<UserChartData*>(s.user1);
                     switch (axis.type) {
                         case GenericAxisInfo::TIME:
                             for(int i=0; i<ucd->x.asNumeric().count(); i++) axis.categories << time_to_string(ucd->x.asNumeric()[i], true);
                             break;
-                        case GenericAxisInfo::DATERANGE:
-                            for(int i=0; i<ucd->x.asNumeric().count(); i++) axis.categories << earliest.addDays(ucd->x.asNumeric()[i]).toString("dd MMM yy");
+                        case GenericAxisInfo::DATERANGE: {
+
+                                // date labels, date, week #, month name, year
+                                QString dateformat= "dd MMM yy";
+                                int ax=GenericAxisInfo::findAxis(axisinfo, s.xname); // lookup axisinfo
+                                if (ax != -1 && axisinfo[ax].groupby != 0 && axisinfo[ax].type == GenericAxisInfo::DATERANGE)  {
+
+                                    // date format depends on how data was grouped
+                                    switch(axisinfo[ax].groupby) {
+                                    default:
+                                    case GenericAxisInfo::NONE:
+                                    case GenericAxisInfo::DAY:
+                                        dateformat= "dd MMM yy";
+                                        break;
+
+                                    case GenericAxisInfo::WEEK:
+                                        dateformat = "d/M"; // week commencing
+
+                                        break;
+                                    case GenericAxisInfo::MONTH:
+                                        dateformat = "MMM yy";
+                                        break;
+
+                                    case GenericAxisInfo::YEAR:
+                                        dateformat = "yyyy";
+                                        break;
+                                    }
+                                }
+                                // create the labels
+                                for(int i=0; i<ucd->x.asNumeric().count(); i++)
+                                    axis.categories << earliest.addDays(ucd->x.asNumeric()[i]).toString(dateformat);
+                            }
                             break;
                         default:
                             for(int i=0; i<ucd->x.asString().count(); i++) axis.categories << ucd->x.asString()[i];
@@ -255,7 +382,7 @@ UserChart::setRide(RideItem *item)
 
         // we need to set max and min based upon the barsets for bar charts since
         // the generic plot only looks are series associated with an axis and we have 0 of those
-        if (min==-1 && max==-1 && chartinfo.type == GC_CHART_BAR && axis.orientation == Qt::Vertical) {
+        if (min==-1 && max==-1 && (chartinfo.type == GC_CHART_BAR || chartinfo.type == GC_CHART_STACK || chartinfo.type == GC_CHART_PERCENT) && axis.orientation == Qt::Vertical) {
 
             // loop through all the series and look at max and min y values
             bool first=true;
@@ -284,10 +411,150 @@ UserChart::setRide(RideItem *item)
     chart->finaliseChart();
 }
 
+
+// dates are always days since 1900,1,1 at this point as they
+// were returned by the datafilter. later on (notably after the
+// genericchart has intervened) they are converted to MSsincetheEpoch
+// but at this point, we have days since Jan 1 1900
 void
-UserChart::annotateLabel(QStringList &list)
+UserChart::groupBy(int groupby, int aggregateby, QVector<double> &xseries, QVector<double> &yseries, bool fillzero)
 {
-    annotations << list;
+    // used to aggregate
+    double aggregate=0;
+    long lastgroup=0;
+    long groupcount=0;
+
+    QVector<double> newx, newy;
+
+    QDate epoch(1900,1,1);
+
+    for(int i=0; i<xseries.count() && i <yseries.count(); i++) {
+
+        // value
+        double value = yseries[i];
+
+        // date
+        QDate date = epoch.addDays(xseries[i]);
+        long group=groupForDate(groupby, date);
+
+        // first entry needs to set group
+        if (lastgroup == 0) lastgroup = group;
+
+        // when the group changes we save last seen value
+        // assumes in date order, we could sort first (?)
+        if (group != lastgroup && groupcount > 0) {
+
+            newx << epoch.daysTo(dateForGroup(groupby, lastgroup));
+            newy << aggregate;
+
+            if (fillzero) {
+
+                // we fill gaps with zero for some chart types
+                // notably category based charts e.g. bar chart
+                for(int j=lastgroup+1; j<group;j++) {
+                    newx << epoch.daysTo(dateForGroup(groupby, j));
+                    newy << 0;
+                }
+            }
+
+            aggregate = 0;
+            lastgroup = group;
+            groupcount = 0;
+        }
+
+        // lets aggregate for this group
+        switch (aggregateby) {
+        case RideMetric::Total:
+        case RideMetric::RunningTotal:
+            aggregate += value;
+            break;
+        case RideMetric::Average:
+            {
+            // simple mean, no accounting for duration of ride etc
+            aggregate = ((aggregate * groupcount) + value) / (groupcount+1);
+            break;
+            }
+        case RideMetric::Low:
+            if (value < aggregate) aggregate = value;
+            break;
+        case RideMetric::Peak:
+            if (value > aggregate) aggregate = value;
+            break;
+        case RideMetric::MeanSquareRoot:
+            if (value) aggregate = sqrt((pow(aggregate,2)*groupcount + pow(value,2)*value)/(groupcount+1));
+            break;
+        }
+
+        groupcount++;
+    }
+
+    if (groupcount >0) {
+
+        // pick up on last one
+        newx << epoch.daysTo(dateForGroup(groupby, lastgroup));
+        newy << aggregate;
+    }
+
+    // replace
+    xseries = newx;
+    yseries = newy;
+}
+
+long
+UserChart::groupForDate(int groupby, QDate date)
+{
+    switch(groupby) {
+    case GenericAxisInfo::WEEK:
+        {
+        // must start from 1 not zero!
+        return date.toJulianDay() / 7;
+        }
+    case GenericAxisInfo::MONTH: return (date.year()*12) + (date.month()-1);
+    case GenericAxisInfo::YEAR:  return date.year();
+    case GenericAxisInfo::DAY:
+    default:
+        return date.toJulianDay();
+    }
+}
+
+QDate
+UserChart::dateForGroup(int groupby, long group)
+{
+    switch(groupby) {
+    case GenericAxisInfo::WEEK:
+        {
+        // must start from 1 not zero!
+        return QDate::fromJulianDay(group*7);
+        }
+    case GenericAxisInfo::MONTH:
+        {
+            int year = group/12;
+            int month = group - (year*12);
+            return QDate(year, month+1, 1);
+        }
+    case GenericAxisInfo::YEAR:
+        {
+            return QDate(group, 1, 1);
+        }
+    case GenericAxisInfo::DAY:
+    default:
+        return QDate::fromJulianDay(group);
+    }
+}
+
+void
+UserChart::annotate(GenericAnnotationInfo &annotation)
+{
+    QObject *from = sender();
+
+    for(int i=0; i<seriesinfo.count(); i++) {
+        if (seriesinfo[i].user1) {
+            UserChartData *ucd = static_cast<UserChartData*>(seriesinfo[i].user1);
+            if (ucd->program == from) {
+                seriesinfo[i].annotations << annotation;
+            }
+        }
+    }
 }
 
 //
@@ -303,13 +570,16 @@ UserChart::settings() const
     out << "{ ";
 
     // chartinfo
-    out << "\"title\": \""       << Utils::jsonprotect(chartinfo.title) << "\",\n";
-    out << "\"description\": \"" << Utils::jsonprotect(chartinfo.description) << "\",\n";
+    out << "\"title\": \""       << Utils::jsonprotect2(chartinfo.title) << "\",\n";
+    out << "\"description\": \"" << Utils::jsonprotect2(chartinfo.description) << "\",\n";
     out << "\"type\": "          << chartinfo.type << ",\n";
     out << "\"animate\": "       << (chartinfo.animate ? "true" : "false") << ",\n";
+    out << "\"intervalrefresh\": "  << (chartinfo.intervalrefresh ? "true" : "false") << ",\n";
     out << "\"legendpos\": "     << chartinfo.legendpos << ",\n";
     out << "\"stack\": "         << (chartinfo.stack ? "true" : "false") << ",\n";
-    out << "\"orientation\": "   << chartinfo.orientation; // note no trailing comma
+    out << "\"orientation\": "   << chartinfo.orientation << ",\n";
+    out << "\"bgcolor\": \""       << chartinfo.bgcolor.name() << "\", \n";
+    out << "\"scale\": "         << QString("%1").arg(chartinfo.scale); // note no trailing comma
 
     // seriesinfos
     if (seriesinfo.count()) out << ",\n\"SERIES\": [\n"; // that trailing comma
@@ -323,11 +593,11 @@ UserChart::settings() const
 
         // out as a json object in the "SERIES" array
         out << "{ ";
-        out << "\"name\": \""    << Utils::jsonprotect(series.name) << "\", ";
-        out << "\"group\": \""   << Utils::jsonprotect(series.group) << "\", ";
-        out << "\"xname\": \""   << Utils::jsonprotect(series.xname) << "\", ";
-        out << "\"yname\": \""   << Utils::jsonprotect(series.yname) << "\", ";
-        out << "\"program\": \"" << Utils::jsonprotect(series.string1) << "\", ";
+        out << "\"name\": \""    << Utils::jsonprotect2(series.name) << "\", ";
+        out << "\"group\": \""   << Utils::jsonprotect2(series.group) << "\", ";
+        out << "\"xname\": \""   << Utils::jsonprotect2(series.xname) << "\", ";
+        out << "\"yname\": \""   << Utils::jsonprotect2(series.yname) << "\", ";
+        out << "\"program\": \"" << Utils::jsonprotect2(series.string1) << "\", ";
         out << "\"line\": "      << series.line << ", ";
         out << "\"symbol\": "    << series.symbol << ", ";
         out << "\"size\": "      << series.size << ", ";
@@ -336,6 +606,7 @@ UserChart::settings() const
         out << "\"legend\": "    << (series.legend ? "true" : "false") << ", ";
         out << "\"opengl\": "    << (series.opengl ? "true" : "false") << ", ";
         out << "\"datalabels\": "    << (series.datalabels ? "true" : "false") << ", ";
+        out << "\"aggregate\": " << static_cast<int>(series.aggregateby) << ", ";
         out << "\"fill\": "    << (series.fill ? "true" : "false"); // NOTE: no trailing comma- when adding something new
         out << "}"; // note no trailing comman
     }
@@ -354,7 +625,7 @@ UserChart::settings() const
         // out as a json object in the AXES array
         out << "{ ";
 
-        out << "\"name\": \""       << Utils::jsonprotect(axis.name) << "\", ";
+        out << "\"name\": \""       << Utils::jsonprotect2(axis.name) << "\", ";
         out << "\"type\": "         << axis.type << ", ";
         out << "\"orientation\": "  << axis.orientation << ", ";
         out << "\"align\": "        << axis.align << ", ";
@@ -362,6 +633,8 @@ UserChart::settings() const
         out << "\"maxx\": "         << axis.maxx << ", ";
         out << "\"miny\": "         << axis.miny << ", ";
         out << "\"maxy\": "         << axis.maxy << ", ";
+        out << "\"smooth\": "       << axis.smooth << ", ";
+        out << "\"groupby\": "      << static_cast<int>(axis.groupby) << ", ";
         out << "\"visible\": "      << (axis.visible ? "true" : "false") << ", ";
         out << "\"fixed\": "        << (axis.fixed ? "true" : "false") << ", ";
         out << "\"log\": "          << (axis.log ? "true" : "false") << ", ";
@@ -388,13 +661,18 @@ UserChart::applySettings(QString x)
     QJsonObject obj = doc.object();
 
     // chartinfo
-    chartinfo.title = Utils::jsonunprotect(obj["title"].toString());
-    chartinfo.description = Utils::jsonunprotect(obj["description"].toString());
+    chartinfo.title = Utils::jsonunprotect2(obj["title"].toString());
+    chartinfo.description = Utils::jsonunprotect2(obj["description"].toString());
     chartinfo.type = obj["type"].toInt();
     chartinfo.animate = obj["animate"].toBool();
     chartinfo.legendpos = obj["legendpos"].toInt();
     chartinfo.stack = obj["stack"].toBool();
     chartinfo.orientation = obj["orientation"].toInt();
+    if (obj.contains("bgcolor")) chartinfo.bgcolor = obj["bgcolor"].toString();
+    if (obj.contains("scale")) chartinfo.scale = obj["scale"].toDouble();
+    else chartinfo.scale = 1.0f;
+    if (obj.contains("intervalrefresh")) chartinfo.intervalrefresh = obj["intervalrefresh"].toBool();
+    else chartinfo.intervalrefresh = false;
 
     // array of series, but userchartdata needs to be deleted
     foreach(GenericSeriesInfo series, seriesinfo)
@@ -408,11 +686,11 @@ UserChart::applySettings(QString x)
         QJsonObject series=it.toObject();
 
         GenericSeriesInfo add;
-        add.name = Utils::jsonunprotect(series["name"].toString());
-        add.group = Utils::jsonunprotect(series["group"].toString());
-        add.xname = Utils::jsonunprotect(series["xname"].toString());
-        add.yname = Utils::jsonunprotect(series["yname"].toString());
-        add.string1 = Utils::jsonunprotect(series["program"].toString());
+        add.name = Utils::jsonunprotect2(series["name"].toString());
+        add.group = Utils::jsonunprotect2(series["group"].toString());
+        add.xname = Utils::jsonunprotect2(series["xname"].toString());
+        add.yname = Utils::jsonunprotect2(series["yname"].toString());
+        add.string1 = Utils::jsonunprotect2(series["program"].toString());
         add.line = series["line"].toInt();
         add.symbol = series["symbol"].toInt();
         add.size = series["size"].toDouble();
@@ -420,6 +698,8 @@ UserChart::applySettings(QString x)
         add.opacity = series["opacity"].toDouble();
         add.legend = series["legend"].toBool();
         add.opengl = series["opengl"].toBool();
+        if (series.contains("aggregate")) add.aggregateby = static_cast<RideMetric::MetricType>(series["aggregate"].toInt());
+        else add.aggregateby = RideMetric::Average;
 
         // added later, may be null, if so, unset
         if (!series["datalabels"].isNull())  add.datalabels = series["datalabels"].toBool();
@@ -438,7 +718,7 @@ UserChart::applySettings(QString x)
         QJsonObject axis=it.toObject();
 
         GenericAxisInfo add;
-        add.name = Utils::jsonunprotect(axis["name"].toString());
+        add.name = Utils::jsonunprotect2(axis["name"].toString());
         add.type = static_cast<GenericAxisInfo::AxisInfoType>(axis["type"].toInt());
         add.orientation = static_cast<Qt::Orientation>(axis["orientation"].toInt());
         add.align = static_cast<Qt::AlignmentFlag>(axis["align"].toInt());
@@ -453,14 +733,18 @@ UserChart::applySettings(QString x)
         add.majorgrid = axis["majorgrid"].toBool();
         add.labelcolor = QColor(axis["labelcolor"].toString());
         add.axiscolor = QColor(axis["axiscolor"].toString());
+        if (axis.contains("smooth")) add.smooth = axis["smooth"].toDouble();
+        else add.smooth = 0;
+        if (axis.contains("groupby")) add.groupby = static_cast<GenericAxisInfo::AxisGroupBy>(axis["groupby"].toInt());
+        else add.groupby = GenericAxisInfo::NONE;
 
         axisinfo.append(add);
     }
 
     // update configuration widgets to reflect new settings loaded
-    settingsTool->refreshChartInfo();
-    settingsTool->refreshSeriesTab();
-    settingsTool->refreshAxesTab();
+    settingsTool_->refreshChartInfo();
+    settingsTool_->refreshSeriesTab();
+    settingsTool_->refreshAxesTab();
 
     // config changed...
     chartConfigChanged();
@@ -470,9 +754,15 @@ UserChart::applySettings(QString x)
 // core user chart settings
 //
 UserChartSettings::UserChartSettings(Context *context, bool rangemode, GenericChartInfo &chart, QList<GenericSeriesInfo> &series, QList<GenericAxisInfo> &axes) :
-  context(context), rangemode(rangemode), chartinfo(chart), seriesinfo(series), axisinfo(axes), updating(false)
+  QWidget(NULL), context(context), rangemode(rangemode), chartinfo(chart), seriesinfo(series), axisinfo(axes), updating(false), blocked(false)
 {
-    QVBoxLayout *layout = new QVBoxLayout(this);
+    HelpWhatsThis *helpConfig = new HelpWhatsThis(this);
+    this->setWhatsThis(helpConfig->getWhatsThisText(HelpWhatsThis::Chart_User));
+
+    setMinimumHeight(500*dpiYFactor);
+    setMinimumWidth(450*dpiXFactor);
+
+    layout = new QVBoxLayout(this);
     tabs = new QTabWidget(this);
     layout->addWidget(tabs);
 
@@ -500,6 +790,8 @@ UserChartSettings::UserChartSettings(Context *context, bool rangemode, GenericCh
     type->addItem(tr("Line Chart"), GC_CHART_LINE);
     type->addItem(tr("Scatter Chart"), GC_CHART_SCATTER);
     type->addItem(tr("Bar Chart"), GC_CHART_BAR);
+    type->addItem(tr("Stacked Bar Chart"), GC_CHART_STACK);
+    type->addItem(tr("Stacked Percent Chart"), GC_CHART_PERCENT);
     type->addItem(tr("Pie Chart"), GC_CHART_PIE);
     type->setSizePolicy(QSizePolicy::Minimum,QSizePolicy::Preferred);
     zz->addWidget(type);
@@ -526,11 +818,28 @@ UserChartSettings::UserChartSettings(Context *context, bool rangemode, GenericCh
     zz->addStretch();
     cf->addRow(tr("Legend"), zz);
 
+    scale = new QSlider(Qt::Horizontal, this);
+    scale->setTickInterval(1);
+    scale->setMinimum(1);
+    scale->setMaximum(18);
+    scale->setSingleStep(1);
+    scale->setValue(1 + ((chart.scale-1)*2)); // scale is in increments of 0.5
     cf->addRow("  ", (QWidget*)NULL);
+    cf->addRow(tr("Font scaling"), scale);
+
+    bgcolor = new ColorButton(this, tr("Background"), QColor(chartinfo.bgcolor), true);
+    bgcolor->setSelectAll(true);
+    cf->addRow(tr("Background"), bgcolor);
+    cf->addRow("  ", (QWidget*)NULL);
+
     animate = new QCheckBox(tr("Animate"));
     cf->addRow(" ", animate);
     stack = new QCheckBox(tr("Single series per plot"));
     cf->addRow(" ", stack);
+
+    intervalrefresh = new QCheckBox(tr("Refresh for intervals"), this);
+    intervalrefresh->setChecked(chart.intervalrefresh);
+    cf->addRow(" ", intervalrefresh);
 
     // Series tab
     QWidget *seriesWidget = new QWidget(this);
@@ -652,7 +961,18 @@ UserChartSettings::UserChartSettings(Context *context, bool rangemode, GenericCh
     connect(animate, SIGNAL(stateChanged(int)), this, SLOT(updateChartInfo()));
     connect(legpos, SIGNAL(currentIndexChanged(QString)), this, SLOT(updateChartInfo()));
     connect(stack, SIGNAL(stateChanged(int)), this, SLOT(updateChartInfo()));
+    connect(intervalrefresh, SIGNAL(stateChanged(int)), this, SLOT(updateChartInfo()));
     connect(orientation, SIGNAL(currentIndexChanged(int)), this, SLOT(updateChartInfo()));
+    connect(scale, SIGNAL(valueChanged(int)), this, SLOT(updateChartInfo()));
+    connect(bgcolor, SIGNAL(colorChosen(QColor)), this, SLOT(updateChartInfo()));
+}
+
+void
+UserChartSettings::insertLayout(QLayout *p)
+{
+    // e.g. UserChartOverviewItem adds a layout for editing
+    //      the chart name
+    layout->insertLayout(0, p);
 }
 
 void
@@ -673,7 +993,9 @@ UserChartSettings::refreshChartInfo()
     index=orientation->findData(chartinfo.orientation);
     if (index >= 0) orientation->setCurrentIndex(index);
     else orientation->setCurrentIndex(0);
-
+    scale->setValue(1 + ((chartinfo.scale-1)*2)); // 1-5 mapped to 1-7, where scale is 1,1.5,2,2.5,3,3.5,4,4.5,5
+    intervalrefresh->setChecked(chartinfo.intervalrefresh);
+    bgcolor->setColor(QColor(chartinfo.bgcolor));
     updating=false;
 }
 
@@ -681,7 +1003,10 @@ void
 UserChartSettings::updateChartInfo()
 {
     // if refresh chart info is updating, just ignore for now...
-    if (updating) return;
+    if (blocked || updating) return;
+
+    // don't interrupt as charts get zapped too soon...
+    blocked = true;
 
     bool refresh=true;
 
@@ -694,9 +1019,14 @@ UserChartSettings::updateChartInfo()
     chartinfo.legendpos = legpos->itemData(legpos->currentIndex()).toInt();
     chartinfo.stack = stack->isChecked();
     chartinfo.orientation = orientation->itemData(orientation->currentIndex()).toInt();
+    chartinfo.scale = 1 + ((scale->value() - 1) * 0.5);
+    chartinfo.intervalrefresh = intervalrefresh->isChecked();
+    chartinfo.bgcolor = bgcolor->getColor().name();
 
     // we need to refresh whenever stuff changes....
     if (refresh) emit chartConfigChanged();
+
+    blocked = false; // now we can process another...
 }
 
 void
@@ -1088,7 +1418,7 @@ EditUserSeriesDialog::EditUserSeriesDialog(Context *context, bool rangemode, Gen
 
     cf->addRow(" ", (QWidget *)NULL);
     name = new QLineEdit(this);
-    QLabel *glabel=new QLabel("Group");
+    QLabel *glabel=new QLabel(tr("Group"));
     groupname = new QLineEdit(this);
     QHBoxLayout *zz = new QHBoxLayout();
     zz->addWidget(name);
@@ -1103,7 +1433,7 @@ EditUserSeriesDialog::EditUserSeriesDialog(Context *context, bool rangemode, Gen
     SpecialFields sp;
 
     // get sorted list
-    QStringList names = context->tab->rideNavigator()->logicalHeadings;
+    QStringList names = context->rideNavigator->logicalHeadings;
 
     // start with just a list of functions
     list = DataFilter::builtins(context);
@@ -1114,15 +1444,18 @@ EditUserSeriesDialog::EditUserSeriesDialog(Context *context, bool rangemode, Gen
     // add special functions (older code needs fixing !)
     list << "config(cranklength)";
     list << "config(cp)";
+    list << "config(aetp)";
     list << "config(ftp)";
     list << "config(w')";
     list << "config(pmax)";
     list << "config(cv)";
+    list << "config(aetv)";
     list << "config(sex)";
     list << "config(dob)";
     list << "config(height)";
     list << "config(weight)";
     list << "config(lthr)";
+    list << "config(aethr)";
     list << "config(maxhr)";
     list << "config(rhr)";
     list << "config(units)";
@@ -1149,7 +1482,7 @@ EditUserSeriesDialog::EditUserSeriesDialog(Context *context, bool rangemode, Gen
     list << "best(vam, 3600)";
     list << "best(wpk, 3600)";
 
-    qSort(names.begin(), names.end(), insensitiveLessThan);
+    std::sort(names.begin(), names.end(), insensitiveLessThan);
 
     foreach(QString name, names) {
 
@@ -1182,13 +1515,25 @@ EditUserSeriesDialog::EditUserSeriesDialog(Context *context, bool rangemode, Gen
     zz = new QHBoxLayout();
     zz->addWidget(yname);
     zz->addStretch();
-    cf->addRow("Y units", zz);
+    cf->addRow(tr("Y units"), zz);
     xname = new QLineEdit(this);
     zz = new QHBoxLayout();
     zz->addWidget(xname);
     zz->addStretch();
-    cf->addRow("X units", zz);
+    cf->addRow(tr("X units"), zz);
 
+    cf->addRow(" ", (QWidget *)NULL);
+    aggregate = new QComboBox(this);
+    aggregate->addItem(tr("Sum"));
+    aggregate->addItem(tr("Average"));
+    aggregate->addItem(tr("Peak"));
+    aggregate->addItem(tr("Low"));
+    aggregate->addItem(tr("Running Total"));
+    aggregate->addItem(tr("Mean Square Root"));
+    aggregate->addItem(tr("Std Deviation"));
+    aggregate->setCurrentIndex(info.aggregateby);
+    aggregate->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    cf->addRow(tr("Aggregate"), aggregate);
     cf->addRow(" ", (QWidget *)NULL);
 
     line = new QComboBox(this);
@@ -1217,7 +1562,8 @@ EditUserSeriesDialog::EditUserSeriesDialog(Context *context, bool rangemode, Gen
     zz->addWidget(legend);
     cf->addRow(tr("Symbol"), zz);
 
-    color = new ColorButton(this, "Color", Qt::red);
+    // we allow colors using the GC palette and default to power colors
+    color = new ColorButton(this, "Color", QColor(1,1,CPOWER), true, false);
     zz = new QHBoxLayout();
     zz->addWidget(color);
     zz->addStretch();
@@ -1292,11 +1638,6 @@ EditUserSeriesDialog::EditUserSeriesDialog(Context *context, bool rangemode, Gen
             "\n"
             "    relevant {\n"
             "        Data contains \"P\";\n"
-            "    }\n"
-            "\n"
-            "    sample {\n"
-            "        # as we iterate over activity data points\n"
-            "        count <- count + 1;\n"
             "    }\n"
             "\n"
             "    finalise {\n"
@@ -1374,6 +1715,7 @@ EditUserSeriesDialog::okClicked()
     original.legend = legend->isChecked();
     original.datalabels = datalabels->isChecked();
     original.fill = fill->isChecked();
+    original.aggregateby = static_cast<RideMetric::MetricType>(aggregate->currentIndex());
     // update the source
 
     accept();
@@ -1408,11 +1750,13 @@ EditUserAxisDialog::EditUserAxisDialog(Context *context, GenericAxisInfo &info)
     axistype = new QComboBox();
     for(int i=0; i< GenericAxisInfo::LAST; i++)
         axistype->addItem(GenericAxisInfo::axisTypeDescription(static_cast<GenericAxisInfo::AxisInfoType>(i)), i);
-    log = new QCheckBox(tr("Logarithmic Scale"));
     QHBoxLayout *zz=new QHBoxLayout();
     zz->addWidget(axistype);
     zz->addStretch();
     cf->addRow(tr("Type"), zz);
+
+    // log scale with a continous axis - otherwise not shown
+    log = new QCheckBox(tr("Logarithmic Scale"));
     cf->addRow(tr(" "), log);
 
     fixed = new QCheckBox(tr("Fixed"));
@@ -1432,26 +1776,93 @@ EditUserAxisDialog::EditUserAxisDialog(Context *context, GenericAxisInfo &info)
     zz->addWidget(max);
     zz->addStretch();
     cf->addRow(tr("Range"),zz);
+    cf->addRow(tr(" "), new QWidget(this));
+
+    // smoothing of series with a time axis - otherwise not shown
+    smooth = new QSlider(this);
+    smooth->setRange(0,60); // 0-60s smoothing
+    smooth->setSingleStep(1);
+    smooth->setOrientation(Qt::Horizontal);
+    smoothlabel = new QLabel(tr("Smoothing"), this);
+    cf->addRow(smoothlabel, smooth);
+
+    // group by of series with a date axis - otherwise not shown
+    groupby = new QComboBox(this);
+    groupby->addItem(tr("None"));
+    groupby->addItem(tr("Day"));
+    groupby->addItem(tr("Week"));
+    groupby->addItem(tr("Month"));
+    groupby->addItem(tr("Year"));
+    groupby->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    groupbylabel = new QLabel(tr("Group By"), this);
+    cf->addRow(groupbylabel, groupby);
 
     // make it wide enough
     setMinimumWidth(350 *dpiXFactor);
     setMinimumHeight(250 *dpiXFactor);
 
     // update gui items from Axis info
-    axisname->setText(original.name);
-    log->setChecked(original.log);
     int index=axistype->findData(original.type);
     if (index >=0) axistype->setCurrentIndex(index);
     else axistype->setCurrentIndex(0);
+
+    // show / hide widgets on current config, setting defaults
+    setWidgets();
+
+    axisname->setText(original.name);
+    log->setChecked(original.log);
     fixed->setChecked(original.fixed);
     min->setValue(original.min());
     max->setValue(original.max());
+    smooth->setValue(original.smooth);
+    groupby->setCurrentIndex(original.groupby);
+
+    // connect axis type selection to widget selector
+    connect(axistype, SIGNAL(currentIndexChanged(int)), this, SLOT(setWidgets()));
 
     // connect up slots
     connect(okButton, SIGNAL(clicked()), this, SLOT(okClicked()));
     connect(cancelButton, SIGNAL(clicked()), this, SLOT(cancelClicked()));
+
 }
 
+void
+EditUserAxisDialog::setWidgets()
+{
+    // set widgets shown/hidden on the basis of controlling config
+
+    // first- axistype determines the use of smoothing or groupby
+    switch(axistype->currentIndex()) {
+        case GenericAxisInfo::DATERANGE:
+            log->hide();
+            groupby->show();
+            groupbylabel->show();
+            smooth->setValue(0);
+            smooth->hide();
+            smoothlabel->hide();
+            break;
+
+        case GenericAxisInfo::TIME:
+            log->hide();
+            smooth->setValue(5); // default to 5 seconds smoothing user can override
+            smooth->show();
+            smoothlabel->show();
+            groupby->setCurrentIndex(0);
+            groupby->hide();
+            groupbylabel->hide();
+            break;
+
+        default:
+            log->show();
+            groupby->setCurrentIndex(0);
+            smooth->setValue(0);
+            smooth->hide();
+            smoothlabel->hide();
+            groupby->hide();
+            groupbylabel->hide();
+            break; // do nothing
+    }
+}
 
 void
 EditUserAxisDialog::cancelClicked()
@@ -1473,6 +1884,8 @@ EditUserAxisDialog::okClicked()
         original.miny= min->value();
         original.maxy= max->value();
     }
+    original.smooth = smooth->value();
+    original.groupby = static_cast<GenericAxisInfo::AxisGroupBy>(groupby->currentIndex());
 
     accept();
 }

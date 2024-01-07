@@ -57,10 +57,9 @@ public:
 
     double values[MAX_MEASURES]; // field values for standard measures
 
-    // used by qSort()
-    bool operator< (Measure right) const {
-        return (when < right.when);
-    }
+    // used by std::sort
+    bool operator< (Measure right) const { return (when < right.when); }
+
     // calculate a CRC for the Measure data - used to see if
     // data is changed in Configuration pages
     quint16 getFingerprint() const;

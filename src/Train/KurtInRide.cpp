@@ -33,6 +33,8 @@ uint8_t inride_state_to_calibration_state(inride_state state, inride_calibration
     case INRIDE_STATE_SPINDOWN_READY:
     case INRIDE_STATE_SPINDOWN_ACTIVE:
         return CALIBRATION_STATE_COAST;
+    default:
+        break;
     }
 
     return CALIBRATION_STATE_FAILURE;
@@ -76,6 +78,7 @@ const char* inride_state_to_debug_string(inride_state state, inride_calibration_
         case INRIDE_CAL_RESULT_TOO_SLOW: return "INRIDE SPINDOWN_ACTIVE CALIBRATION:TOO_SLOW";
         case INRIDE_CAL_RESULT_MIDDLE:   return "INRIDE SPINDOWN_ACTIVE CALIBRATION:MIDDLE";
         }
+    default:
         break;
     }
 
@@ -101,6 +104,8 @@ const char* inride_state_to_rtd_string(inride_state state, inride_calibration_re
 
     case INRIDE_STATE_SPINDOWN_ACTIVE:
         return "INRIDE SPINDOWN - COASTING, DO NOT PEDAL";
+    default:
+        break;
     }
 
     return "INRIDE UNKNOWN STATE";
@@ -114,6 +119,7 @@ QString inride_command_result_to_string(inride_command_result r) {
     case INRIDE_COM_RESULT_INVALID_REQUEST:    return QString("INRIDE_COM_RESULT_INVALID_REQUEST");
     case INRIDE_COM_RESULT_CALIBRATION_RESULT: return QString("INRIDE_COM_RESULT_CALIBRATION_RESULT");
     case INRIDE_COM_RESULT_UNKNOWN_ERROR:      return QString("INRIDE_COM_RESULT_UNKNOWN_ERROR");
+    default: break;
     }
     return QString("Error");
 }
@@ -165,7 +171,7 @@ void inride_BTDeviceInfoToSystemID(const QBluetoothDeviceInfo &devinfo, uint8_t 
     }
 
 
-    qDebug() << "SystemID: " << hex << systemID[0] << systemID[1] << systemID[2] << systemID[3] << systemID[4] << systemID[5];
+    qDebug() << "SystemID: " << Qt::hex << systemID[0] << systemID[1] << systemID[2] << systemID[3] << systemID[4] << systemID[5];
 }
 
 
@@ -201,6 +207,7 @@ typedef struct alpha_coast {
 
 alpha_coast alpha(uint32_t interval, uint32_t ticks, uint32_t revs, double speedKPH, uint32_t ticksPrevious, uint32_t revsPrevious, double speedKPHPrevious, bool proFlywheel)
 {
+    Q_UNUSED(interval);
     alpha_coast result;
     result.alpha = 0.0;
     result.coasting = false;
@@ -224,6 +231,8 @@ alpha_coast alpha(uint32_t interval, uint32_t ticks, uint32_t revs, double speed
 
 int power_for_speed(double kph, double spindown, double alpha, uint32_t revolutions)
 {
+    Q_UNUSED(alpha);
+    Q_UNUSED(revolutions);
     double mph = kph * 0.621371;
     double rawPower = (5.244820 * mph) + (0.019168 * (mph * mph * mph));
     double dragOffset = 0;

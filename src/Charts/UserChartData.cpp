@@ -17,6 +17,8 @@
  */
 
 #include "RideMetric.h"
+#include "Perspective.h"
+#include "UserChart.h"
 #include "UserChartData.h"
 #include "DataFilter.h"
 #include "Athlete.h"
@@ -54,7 +56,7 @@ UserChartData::~UserChartData()
 void
 UserChartData::compute(RideItem *item, Specification spec, DateRange dr)
 {
-    if (!root)  return;
+    if (!root || item == NULL)  return;
 
     // clear rt indexes
     rt->indexes.clear();
@@ -63,11 +65,11 @@ UserChartData::compute(RideItem *item, Specification spec, DateRange dr)
     relevant=x=y=z=d=t=Result(0);
 
     // always init first
-    if (finit) root->eval(rt, finit, 0, 0, const_cast<RideItem*>(item), NULL, NULL, spec, dr);
+    if (finit) root->eval(rt, finit, Result(0), 0, const_cast<RideItem*>(item), NULL, NULL, spec, dr);
 
     // is it relevant ?
     if (frelevant) {
-        relevant = root->eval(rt, frelevant, 0, 0, const_cast<RideItem*>(item), NULL, NULL, spec, dr);
+        relevant = root->eval(rt, frelevant, Result(0), 0, const_cast<RideItem*>(item), NULL, NULL, spec, dr);
         if (relevant.number() == 0) return;
     }
 
@@ -78,7 +80,7 @@ UserChartData::compute(RideItem *item, Specification spec, DateRange dr)
             FilterSet fs;
             fs.addFilter(context->isfiltered, context->filters);
             fs.addFilter(context->ishomefiltered, context->homeFilters);
-            Specification spec;
+            if (rt->chart->myPerspective) fs.addFilter(rt->chart->myPerspective->isFiltered(), rt->chart->myPerspective->filterlist(dr));
             spec.setFilterSet(fs);
 
             // loop through rides for daterange
@@ -88,7 +90,7 @@ UserChartData::compute(RideItem *item, Specification spec, DateRange dr)
                 if (!spec.pass(ride)) continue; // relies upon the daterange being passed to eval...
 
 
-                root->eval(rt, factivity, 0, 0, const_cast<RideItem*>(ride), NULL, NULL, spec, dr);
+                root->eval(rt, factivity, Result(0), 0, const_cast<RideItem*>(ride), NULL, NULL, spec, dr);
             }
         }
 
@@ -98,7 +100,7 @@ UserChartData::compute(RideItem *item, Specification spec, DateRange dr)
 
             while(it.hasNext()) {
                 struct RideFilePoint *point = it.next();
-                root->eval(rt, fsample, 0, 0, const_cast<RideItem*>(item), point, NULL, spec, dr);
+                root->eval(rt, fsample, Result(0), 0, const_cast<RideItem*>(item), point, NULL, spec, dr);
             }
         }
 
@@ -106,15 +108,15 @@ UserChartData::compute(RideItem *item, Specification spec, DateRange dr)
 
     // finalise computation
     if (ffinalise) {
-        root->eval(rt, ffinalise, 0, 0, const_cast<RideItem*>(item), NULL, NULL, spec, dr);
+        root->eval(rt, ffinalise, Result(0), 0, const_cast<RideItem*>(item), NULL, NULL, spec, dr);
     }
 
     // values
-    if (fx) x = root->eval(rt, fx, 0, 0, const_cast<RideItem*>(item), NULL, NULL, spec, dr);
-    if (fy) y = root->eval(rt, fy, 0, 0, const_cast<RideItem*>(item), NULL, NULL, spec, dr);
-    if (fz) z = root->eval(rt, fz, 0, 0, const_cast<RideItem*>(item), NULL, NULL, spec, dr);
-    if (ft) t = root->eval(rt, ft, 0, 0, const_cast<RideItem*>(item), NULL, NULL, spec, dr);
-    if (fd) d = root->eval(rt, fd, 0, 0, const_cast<RideItem*>(item), NULL, NULL, spec, dr);
-    if (ff) f = root->eval(rt, ff, 0, 0, const_cast<RideItem*>(item), NULL, NULL, spec, dr);
+    if (fx) x = root->eval(rt, fx, Result(0), 0, const_cast<RideItem*>(item), NULL, NULL, spec, dr);
+    if (fy) y = root->eval(rt, fy, Result(0), 0, const_cast<RideItem*>(item), NULL, NULL, spec, dr);
+    if (fz) z = root->eval(rt, fz, Result(0), 0, const_cast<RideItem*>(item), NULL, NULL, spec, dr);
+    if (ft) t = root->eval(rt, ft, Result(0), 0, const_cast<RideItem*>(item), NULL, NULL, spec, dr);
+    if (fd) d = root->eval(rt, fd, Result(0), 0, const_cast<RideItem*>(item), NULL, NULL, spec, dr);
+    if (ff) f = root->eval(rt, ff, Result(0), 0, const_cast<RideItem*>(item), NULL, NULL, spec, dr);
 
 }

@@ -231,7 +231,7 @@ MoxyDevice::download( const QDir &tmpdir,
 
     // we need to sort the data by timestamp since the moxy uses a circular
     // buffer which mean new lines arrive before old ones.
-    qSort(data);
+    std::sort(data.begin(), data.end());
 
     // for deciding when to split rides
     QDateTime last = QDateTime();
@@ -545,7 +545,7 @@ MoxyDevice::writeCommand(CommPortPtr dev, const char *command, QString &err)
     // on qt4 we need to waste some cycles
     msleep(100);
 
-    int len = strlen(command);
+    size_t len = strlen(command);
     int n = dev->write(const_cast<char*>(command), len, err);
 
     if (n != len) {

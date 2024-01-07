@@ -6,6 +6,9 @@
 ###############################################################################
 
 !versionAtLeast(QT_VERSION, 5.13):error("Use at least Qt version 5.13")
+greaterThan(QT_MAJOR_VERSION, 5) {
+    error("Qt6 is unsupported whilst we wait for key dependencies to be included.")
+}
 
 ###==========================
 ### IMPORT USER CONFIGURATION
@@ -53,7 +56,16 @@ QMAKE_CFLAGS_ISYSTEM =
 ###=======================================================================
 
 # qwt, qxt, libz, json, lmfit and qwtcurve
-INCLUDEPATH += ../qwt/src ../qxt/src ../qtsolutions/json ../qtsolutions/qwtcurve ../lmfit ../levmar
+INCLUDEPATH +=  ../qwt/src \
+                ../contrib/qxt/src \
+                ../contrib/qtsolutions/json \
+                ../contrib/qtsolutions/qwtcurve \
+                ../contrib/lmfit \
+                ../contrib/levmar \
+                ../contrib/boost \
+                ../contrib/kmeans \
+                ../contrib/voronoi
+
 DEFINES += QXT_STATIC
 
 # to make sure we are toolchain neutral we NEVER refer to a lib
@@ -132,9 +144,6 @@ macx {
     # on mac we use native buttons and video, but have native fullscreen support
     LIBS    += -lobjc -framework IOKit -framework AppKit
 
-    # mac native controls for new mainwindow
-    OBJECTIVE_SOURCES += Gui/NewMainWindowMac.mm
-
     # on mac we use QTKit or AV Foundation
     contains(DEFINES, "GC_VIDEO_AV") {
 
@@ -172,10 +181,6 @@ macx {
     HEADERS += Train/VideoWindow.h
     SOURCES += Train/VideoWindow.cpp
 }
-
-#### these are no longer non-mac only
-HEADERS += ../qtsolutions/segmentcontrol/qtsegmentcontrol.h
-SOURCES += ../qtsolutions/segmentcontrol/qtsegmentcontrol.cpp
 
 # X11
 if (defined(GC_WANT_X11)) {
@@ -498,42 +503,40 @@ contains(DEFINES, "GC_WANT_R") {
 
 
 ###==================================
-### OPTIONAL => HTTP API WEB SERVICES
+### HTTP API WEB SERVICES
 ###==================================
 
-!isEmpty (HTPATH) {
+HTPATH = ../contrib/httpserver
+INCLUDEPATH += $$HTPATH
+DEPENDPATH += $$HTPATH
 
-    INCLUDEPATH += $$HTPATH
-    DEPENDPATH += $$HTPATH
+DEFINES += GC_WANT_HTTP
 
-    DEFINES += GC_WANT_HTTP
+HEADERS +=  Core/APIWebService.h
+SOURCES +=  Core/APIWebService.cpp
 
-    HEADERS +=  Core/APIWebService.h
-    SOURCES +=  Core/APIWebService.cpp
-
-    HEADERS +=  $$HTPATH/httpglobal.h \
-                $$HTPATH/httplistener.h \
-                $$HTPATH/httpconnectionhandler.h \
-                $$HTPATH/httpconnectionhandlerpool.h \
-                $$HTPATH/httprequest.h \
-                $$HTPATH/httpresponse.h \
-                $$HTPATH/httpcookie.h \
-                $$HTPATH/httprequesthandler.h \
-                $$HTPATH/httpsession.h \
-                $$HTPATH/httpsessionstore.h \
-                $$HTPATH/staticfilecontroller.h
-    SOURCES +=  $$HTPATH/httpglobal.cpp \
-                $$HTPATH/httplistener.cpp \
-                $$HTPATH/httpconnectionhandler.cpp \
-                $$HTPATH/httpconnectionhandlerpool.cpp \
-                $$HTPATH/httprequest.cpp \
-                $$HTPATH/httpresponse.cpp \
-                $$HTPATH/httpcookie.cpp \
-                $$HTPATH/httprequesthandler.cpp \
-                $$HTPATH/httpsession.cpp \
-                $$HTPATH/httpsessionstore.cpp \
-                $$HTPATH/staticfilecontroller.cpp
-}
+HEADERS +=  $$HTPATH/httpglobal.h \
+            $$HTPATH/httplistener.h \
+            $$HTPATH/httpconnectionhandler.h \
+            $$HTPATH/httpconnectionhandlerpool.h \
+            $$HTPATH/httprequest.h \
+            $$HTPATH/httpresponse.h \
+            $$HTPATH/httpcookie.h \
+            $$HTPATH/httprequesthandler.h \
+            $$HTPATH/httpsession.h \
+            $$HTPATH/httpsessionstore.h \
+            $$HTPATH/staticfilecontroller.h
+SOURCES +=  $$HTPATH/httpglobal.cpp \
+            $$HTPATH/httplistener.cpp \
+            $$HTPATH/httpconnectionhandler.cpp \
+            $$HTPATH/httpconnectionhandlerpool.cpp \
+            $$HTPATH/httprequest.cpp \
+            $$HTPATH/httpresponse.cpp \
+            $$HTPATH/httpcookie.cpp \
+            $$HTPATH/httprequesthandler.cpp \
+            $$HTPATH/httpsession.cpp \
+            $$HTPATH/httpsessionstore.cpp \
+            $$HTPATH/staticfilecontroller.cpp
 
 
 ###=====================================================
@@ -597,8 +600,6 @@ greaterThan(QT_MAJOR_VERSION, 4) {
     # Features that only work with QT5 or higher
     SOURCES += Cloud/Dropbox.cpp
     HEADERS += Cloud/Dropbox.h
-    SOURCES += Cloud/GoogleDrive.cpp Cloud/KentUniversity.cpp
-    HEADERS += Cloud/GoogleDrive.h Cloud/KentUniversity.h
     SOURCES += Cloud/OpenData.cpp
     HEADERS += Cloud/OpenData.h
 
@@ -611,6 +612,8 @@ greaterThan(QT_MAJOR_VERSION, 4) {
         HEADERS += Cloud/SportTracks.h
         SOURCES += Cloud/TodaysPlan.cpp
         HEADERS += Cloud/TodaysPlan.h
+        SOURCES += Cloud/Nolio.cpp
+        HEADERS += Cloud/Nolio.h
     }
 
     SOURCES += Train/MonarkController.cpp Train/MonarkConnection.cpp
@@ -633,6 +636,8 @@ greaterThan(QT_MAJOR_VERSION, 4) {
         SOURCES += Train/BT40Controller.cpp Train/BT40Device.cpp
         HEADERS += Train/VMProConfigurator.h Train/VMProWidget.h
         SOURCES += Train/VMProConfigurator.cpp Train/VMProWidget.cpp
+        SOURCES += Train/Ftms.cpp
+        HEADERS += Train/Ftms.h
     }
 
     # qt charts is officially supported from QT5.8 or higher
@@ -648,8 +653,10 @@ greaterThan(QT_MAJOR_VERSION, 4) {
 
         # generic chart
         DEFINES += GC_HAVE_GENERIC
-        HEADERS += Charts/UserChart.h Charts/UserChartData.h Charts/GenericChart.h Charts/GenericPlot.h Charts/GenericSelectTool.h Charts/GenericLegend.h
-        SOURCES += Charts/UserChart.cpp Charts/UserChartData.cpp Charts/GenericChart.cpp Charts/GenericPlot.cpp Charts/GenericSelectTool.cpp Charts/GenericLegend.cpp
+        HEADERS += Charts/UserChartWindow.h Charts/UserChartOverviewItem.h Charts/UserChart.h Charts/UserChartData.h \
+                   Charts/GenericChart.h Charts/GenericPlot.h Charts/GenericSelectTool.h Charts/GenericLegend.h Charts/GenericAnnotations.h
+        SOURCES += Charts/UserChartWindow.cpp Charts/UserChartOverviewItem.cpp Charts/UserChart.cpp Charts/UserChartData.cpp \
+                   Charts/GenericChart.cpp Charts/GenericPlot.cpp Charts/GenericSelectTool.cpp Charts/GenericLegend.cpp Charts/GenericAnnotations.cpp
 
     }
 }
@@ -679,13 +686,13 @@ HEADERS  += ANT/ANTChannel.h ANT/ANT.h ANT/ANTlocalController.h ANT/ANTLogger.h 
 HEADERS += Charts/Aerolab.h Charts/AerolabWindow.h Charts/AllPlot.h Charts/AllPlotInterval.h Charts/AllPlotSlopeCurve.h \
            Charts/AllPlotWindow.h Charts/BlankState.h Charts/ChartBar.h Charts/ChartSettings.h \
            Charts/CpPlotCurve.h Charts/CPPlot.h Charts/CriticalPowerWindow.h Charts/DaysScaleDraw.h Charts/ExhaustionDialog.h Charts/GcOverlayWidget.h \
-           Charts/GcPane.h Charts/GoldenCheetah.h Charts/HistogramWindow.h Charts/HomeWindow.h \
+           Charts/GcPane.h Charts/GoldenCheetah.h Charts/HistogramWindow.h \
            Charts/HrPwPlot.h Charts/HrPwWindow.h Charts/IndendPlotMarker.h Charts/IntervalSummaryWindow.h Charts/LogTimeScaleDraw.h \
            Charts/LTMCanvasPicker.h Charts/LTMChartParser.h Charts/LTMOutliers.h Charts/LTMPlot.h Charts/LTMPopup.h \
            Charts/LTMSettings.h Charts/LTMTool.h Charts/LTMTrend2.h Charts/LTMTrend.h Charts/LTMWindow.h \
            Charts/MetadataWindow.h Charts/MUPlot.h Charts/MUPool.h Charts/MUWidget.h Charts/PfPvPlot.h Charts/PfPvWindow.h \
-           Charts/PowerHist.h Charts/ReferenceLineDialog.h Charts/RideEditor.h Charts/RideMapWindow.h Charts/RideSummaryWindow.h \
-           Charts/ScatterPlot.h Charts/ScatterWindow.h Charts/SmallPlot.h Charts/SummaryWindow.h Charts/TreeMapPlot.h \
+           Charts/PowerHist.h Charts/ReferenceLineDialog.h Charts/RideEditor.h Charts/RideMapWindow.h \
+           Charts/ScatterPlot.h Charts/ScatterWindow.h Charts/SmallPlot.h Charts/TreeMapPlot.h \
            Charts/TreeMapWindow.h Charts/ZoneScaleDraw.h
 
 # cloud services
@@ -693,14 +700,15 @@ HEADERS += Cloud/CalendarDownload.h Cloud/CloudService.h \
            Cloud/LocalFileStore.h Cloud/OAuthDialog.h Cloud/TodaysPlanBodyMeasures.h \
            Cloud/WithingsDownload.h Cloud/Strava.h Cloud/CyclingAnalytics.h Cloud/RideWithGPS.h \
            Cloud/TrainingsTageBuch.h Cloud/Selfloops.h Cloud/Velohero.h Cloud/SportsPlusHealth.h \
-           Cloud/AddCloudWizard.h Cloud/Withings.h Cloud/MeasuresDownload.h Cloud/Xert.h
+           Cloud/AddCloudWizard.h Cloud/Withings.h Cloud/MeasuresDownload.h Cloud/Xert.h \
+           Cloud/Azum.h
 
 # core data 
 HEADERS += Core/Athlete.h Core/Context.h Core/DataFilter.h Core/FreeSearch.h Core/GcCalendarModel.h Core/GcUpgrade.h \
            Core/IdleTimer.h Core/IntervalItem.h Core/NamedSearch.h Core/RideCache.h Core/RideCacheModel.h Core/RideDB.h \
            Core/RideItem.h Core/Route.h Core/RouteParser.h Core/Season.h Core/SeasonParser.h Core/Secrets.h Core/Settings.h \
            Core/Specification.h Core/TimeUtils.h Core/Units.h Core/UserData.h Core/Utils.h \
-           Core/Measures.h Core/Quadtree.h
+           Core/Measures.h Core/Quadtree.h Core/SplineLookup.h
 
 # device and file IO or edit
 HEADERS += FileIO/ArchiveFile.h FileIO/AthleteBackup.h  FileIO/Bin2RideFile.h FileIO/BinRideFile.h \
@@ -722,27 +730,35 @@ HEADERS += FileIO/ArchiveFile.h FileIO/AthleteBackup.h  FileIO/Bin2RideFile.h Fi
 HEADERS += Gui/AboutDialog.h Gui/AddIntervalDialog.h Gui/AnalysisSidebar.h Gui/ChooseCyclistDialog.h Gui/ColorButton.h \
            Gui/Colors.h Gui/CompareDateRange.h Gui/CompareInterval.h Gui/ComparePane.h Gui/ConfigDialog.h Gui/DiarySidebar.h \
            Gui/DragBar.h Gui/EstimateCPDialog.h Gui/GcCrashDialog.h Gui/GcSideBarItem.h Gui/GcToolBar.h Gui/GcWindowLayout.h \
-           Gui/GcWindowRegistry.h Gui/GenerateHeatMapDialog.h Gui/GProgressDialog.h Gui/HelpWhatsThis.h Gui/HelpWindow.h \
+           Gui/GcWindowRegistry.h Gui/GenerateHeatMapDialog.h Gui/HelpWhatsThis.h Gui/HelpWindow.h \
            Gui/IntervalTreeView.h Gui/LTMSidebar.h Gui/MainWindow.h Gui/NewCyclistDialog.h Gui/Pages.h Gui/RideNavigator.h Gui/RideNavigatorProxy.h \
-           Gui/SaveDialogs.h Gui/SearchBox.h Gui/SearchFilterBox.h Gui/SolveCPDialog.h Gui/Tab.h Gui/TabView.h Gui/ToolsRhoEstimator.h \
-           Gui/Views.h Gui/BatchExportDialog.h Gui/DownloadRideDialog.h Gui/ManualRideDialog.h Gui/NewMainWindow.h Gui/NewSideBar.h \
+           Gui/SaveDialogs.h Gui/SearchBox.h Gui/SearchFilterBox.h Gui/SolveCPDialog.h Gui/AthleteTab.h Gui/AbstractView.h Gui/ToolsRhoEstimator.h \
+           Gui/Views.h Gui/BatchProcessingDialog.h Gui/DownloadRideDialog.h Gui/ManualRideDialog.h Gui/NewSideBar.h \
            Gui/MergeActivityWizard.h Gui/RideImportWizard.h Gui/SplitActivityWizard.h Gui/SolverDisplay.h Gui/MetricSelect.h \
-           Gui/AddChartWizard.h Gui/NavigationModel.h Gui/AthleteView.h Gui/AthleteConfigDialog.h Gui/AthletePages.h
+           Gui/AddTileWizard.h Gui/NavigationModel.h Gui/AthleteView.h Gui/AthleteConfigDialog.h Gui/AthletePages.h Gui/Perspective.h \
+           Gui/PerspectiveDialog.h
 
 # metrics and models
 HEADERS += Metrics/Banister.h Metrics/CPSolver.h Metrics/Estimator.h Metrics/ExtendedCriticalPower.h Metrics/HrZones.h Metrics/PaceZones.h \
            Metrics/PDModel.h Metrics/PMCData.h Metrics/PowerProfile.h Metrics/RideMetadata.h Metrics/RideMetric.h Metrics/SpecialFields.h \
            Metrics/Statistic.h Metrics/UserMetricParser.h Metrics/UserMetricSettings.h Metrics/VDOTCalculator.h Metrics/WPrime.h Metrics/Zones.h \
-           Metrics/BlinnSolver.h
+           Metrics/BlinnSolver.h Metrics/FastKmeans.h
 
 ## Planning and Compliance
 HEADERS += Planning/PlanningWindow.h
 
 # contrib
-HEADERS += ../qtsolutions/codeeditor/codeeditor.h ../qtsolutions/json/mvjson.h ../qtsolutions/qwtcurve/qwt_plot_gapped_curve.h \
-           ../qxt/src/qxtspanslider.h ../qxt/src/qxtspanslider_p.h ../qxt/src/qxtstringspinbox.h ../qzip/zipreader.h \
-           ../qzip/zipwriter.h ../lmfit/lmcurve.h  ../lmfit/lmcurve_tyd.h  ../lmfit/lmmin.h  ../lmfit/lmstruct.h \
-           ../levmar/compiler.h  ../levmar/levmar.h  ../levmar/lm.h  ../levmar/misc.h
+HEADERS += ../contrib/qtsolutions/codeeditor/codeeditor.h ../contrib/qtsolutions/json/mvjson.h \
+           ../contrib/qtsolutions/qwtcurve/qwt_plot_gapped_curve.h  ../contrib/qxt/src/qxtspanslider.h \
+           ../contrib/qxt/src/qxtspanslider_p.h ../contrib/qxt/src/qxtstringspinbox.h ../contrib/qzip/zipreader.h \
+           ../contrib/qzip/zipwriter.h ../contrib/lmfit/lmcurve.h  ../contrib/lmfit/lmcurve_tyd.h \
+           ../contrib/lmfit/lmmin.h  ../contrib/lmfit/lmstruct.h \
+           ../contrib/levmar/compiler.h  ../contrib/levmar/levmar.h  ../contrib/levmar/lm.h  ../contrib/levmar/misc.h \
+           ../contrib/boost/GeometricTools_BSplineCurve.h \
+           ../contrib/kmeans/kmeans_dataset.h ../contrib/kmeans/kmeans_general_functions.h ../contrib/kmeans/hamerly_kmeans.h \
+           ../contrib/kmeans/kmeans.h ../contrib/kmeans/original_space_kmeans.h ../contrib/kmeans/triangle_inequality_base_kmeans.h \
+           ../contrib/voronoi/Voronoi.h
+
 
 # Train View
 HEADERS += Train/AddDeviceWizard.h Train/CalibrationData.h Train/ComputrainerController.h Train/Computrainer.h Train/DeviceConfiguration.h \
@@ -773,13 +789,13 @@ SOURCES += ANT/ANTChannel.cpp ANT/ANT.cpp ANT/ANTlocalController.cpp ANT/ANTLogg
 SOURCES += Charts/Aerolab.cpp Charts/AerolabWindow.cpp Charts/AllPlot.cpp Charts/AllPlotInterval.cpp Charts/AllPlotSlopeCurve.cpp \
            Charts/AllPlotWindow.cpp Charts/BlankState.cpp Charts/ChartBar.cpp Charts/ChartSettings.cpp \
            Charts/CPPlot.cpp Charts/CpPlotCurve.cpp Charts/CriticalPowerWindow.cpp Charts/ExhaustionDialog.cpp Charts/GcOverlayWidget.cpp Charts/GcPane.cpp \
-           Charts/GoldenCheetah.cpp Charts/HistogramWindow.cpp Charts/HomeWindow.cpp Charts/HrPwPlot.cpp \
+           Charts/GoldenCheetah.cpp Charts/HistogramWindow.cpp Charts/HrPwPlot.cpp \
            Charts/HrPwWindow.cpp Charts/IndendPlotMarker.cpp Charts/IntervalSummaryWindow.cpp Charts/LogTimeScaleDraw.cpp \
            Charts/LTMCanvasPicker.cpp Charts/LTMChartParser.cpp Charts/LTMOutliers.cpp Charts/LTMPlot.cpp Charts/LTMPopup.cpp \
            Charts/LTMSettings.cpp Charts/LTMTool.cpp Charts/LTMTrend.cpp Charts/LTMWindow.cpp \
            Charts/MetadataWindow.cpp Charts/MUPlot.cpp Charts/MUWidget.cpp Charts/PfPvPlot.cpp Charts/PfPvWindow.cpp \
-           Charts/PowerHist.cpp Charts/ReferenceLineDialog.cpp Charts/RideEditor.cpp Charts/RideMapWindow.cpp Charts/RideSummaryWindow.cpp \
-           Charts/ScatterPlot.cpp Charts/ScatterWindow.cpp Charts/SmallPlot.cpp Charts/SummaryWindow.cpp Charts/TreeMapPlot.cpp \
+           Charts/PowerHist.cpp Charts/ReferenceLineDialog.cpp Charts/RideEditor.cpp Charts/RideMapWindow.cpp \
+           Charts/ScatterPlot.cpp Charts/ScatterWindow.cpp Charts/SmallPlot.cpp Charts/TreeMapPlot.cpp \
            Charts/TreeMapWindow.cpp
 
 ## Cloud Services / Web resources
@@ -787,14 +803,15 @@ SOURCES += Cloud/CalendarDownload.cpp Cloud/CloudService.cpp \
            Cloud/LocalFileStore.cpp Cloud/OAuthDialog.cpp Cloud/TodaysPlanBodyMeasures.cpp \
            Cloud/WithingsDownload.cpp Cloud/Strava.cpp Cloud/CyclingAnalytics.cpp Cloud/RideWithGPS.cpp \
            Cloud/TrainingsTageBuch.cpp Cloud/Selfloops.cpp Cloud/Velohero.cpp Cloud/SportsPlusHealth.cpp \
-           Cloud/AddCloudWizard.cpp Cloud/Withings.cpp Cloud/MeasuresDownload.cpp Cloud/Xert.cpp
+           Cloud/AddCloudWizard.cpp Cloud/Withings.cpp Cloud/MeasuresDownload.cpp Cloud/Xert.cpp \
+           Cloud/Azum.cpp
 
 ## Core Data Structures
 SOURCES += Core/Athlete.cpp Core/Context.cpp Core/DataFilter.cpp Core/FreeSearch.cpp Core/GcUpgrade.cpp Core/IdleTimer.cpp \
            Core/IntervalItem.cpp Core/main.cpp Core/NamedSearch.cpp Core/RideCache.cpp Core/RideCacheModel.cpp Core/RideItem.cpp \
            Core/Route.cpp Core/RouteParser.cpp Core/Season.cpp Core/SeasonParser.cpp Core/Settings.cpp Core/Specification.cpp \
            Core/TimeUtils.cpp Core/Units.cpp Core/UserData.cpp Core/Utils.cpp \
-           Core/Measures.cpp Core/Quadtree.cpp
+           Core/Measures.cpp Core/Quadtree.cpp Core/SplineLookup.cpp
 
 ## File and Device IO and Editing
 SOURCES += FileIO/ArchiveFile.cpp FileIO/AthleteBackup.cpp FileIO/Bin2RideFile.cpp FileIO/BinRideFile.cpp \
@@ -819,12 +836,13 @@ SOURCES += FileIO/ArchiveFile.cpp FileIO/AthleteBackup.cpp FileIO/Bin2RideFile.c
 SOURCES += Gui/AboutDialog.cpp Gui/AddIntervalDialog.cpp Gui/AnalysisSidebar.cpp Gui/ChooseCyclistDialog.cpp Gui/ColorButton.cpp \
            Gui/Colors.cpp Gui/CompareDateRange.cpp Gui/CompareInterval.cpp Gui/ComparePane.cpp Gui/ConfigDialog.cpp Gui/DiarySidebar.cpp \
            Gui/DragBar.cpp Gui/EstimateCPDialog.cpp Gui/GcCrashDialog.cpp Gui/GcSideBarItem.cpp Gui/GcToolBar.cpp Gui/GcWindowLayout.cpp \
-           Gui/GcWindowRegistry.cpp Gui/GenerateHeatMapDialog.cpp Gui/GProgressDialog.cpp Gui/HelpWhatsThis.cpp Gui/HelpWindow.cpp \
+           Gui/GcWindowRegistry.cpp Gui/GenerateHeatMapDialog.cpp Gui/HelpWhatsThis.cpp Gui/HelpWindow.cpp \
            Gui/IntervalTreeView.cpp Gui/LTMSidebar.cpp Gui/MainWindow.cpp Gui/NewCyclistDialog.cpp Gui/Pages.cpp Gui/RideNavigator.cpp Gui/SaveDialogs.cpp \
-           Gui/SearchBox.cpp Gui/SearchFilterBox.cpp Gui/SolveCPDialog.cpp Gui/Tab.cpp Gui/TabView.cpp Gui/ToolsRhoEstimator.cpp Gui/Views.cpp \
-           Gui/BatchExportDialog.cpp Gui/DownloadRideDialog.cpp Gui/ManualRideDialog.cpp Gui/EditUserMetricDialog.cpp Gui/NewMainWindow.cpp Gui/NewSideBar.cpp \
+           Gui/SearchBox.cpp Gui/SearchFilterBox.cpp Gui/SolveCPDialog.cpp Gui/AthleteTab.cpp Gui/AbstractView.cpp Gui/ToolsRhoEstimator.cpp Gui/Views.cpp \
+           Gui/BatchProcessingDialog.cpp Gui/DownloadRideDialog.cpp Gui/ManualRideDialog.cpp Gui/EditUserMetricDialog.cpp Gui/NewSideBar.cpp \
            Gui/MergeActivityWizard.cpp Gui/RideImportWizard.cpp Gui/SplitActivityWizard.cpp Gui/SolverDisplay.cpp Gui/MetricSelect.cpp \
-           Gui/AddChartWizard.cpp Gui/NavigationModel.cpp Gui/AthleteView.cpp Gui/AthleteConfigDialog.cpp Gui/AthletePages.cpp
+           Gui/AddTileWizard.cpp Gui/NavigationModel.cpp Gui/AthleteView.cpp Gui/AthleteConfigDialog.cpp Gui/AthletePages.cpp Gui/Perspective.cpp \
+           Gui/PerspectiveDialog.cpp
 
 ## Models and Metrics
 SOURCES += Metrics/aBikeScore.cpp Metrics/aCoggan.cpp Metrics/AerobicDecoupling.cpp Metrics/Banister.cpp Metrics/BasicRideMetrics.cpp \
@@ -834,19 +852,25 @@ SOURCES += Metrics/aBikeScore.cpp Metrics/aCoggan.cpp Metrics/AerobicDecoupling.
            Metrics/PMCData.cpp Metrics/PowerProfile.cpp Metrics/RideMetadata.cpp Metrics/RideMetric.cpp Metrics/RunMetrics.cpp \
            Metrics/SwimMetrics.cpp Metrics/SpecialFields.cpp Metrics/Statistic.cpp Metrics/SustainMetric.cpp Metrics/SwimScore.cpp \
            Metrics/TimeInZone.cpp Metrics/TRIMPPoints.cpp Metrics/UserMetric.cpp Metrics/UserMetricParser.cpp Metrics/VDOTCalculator.cpp \
-           Metrics/VDOT.cpp Metrics/WattsPerKilogram.cpp Metrics/WPrime.cpp Metrics/Zones.cpp Metrics/HrvMetrics.cpp Metrics/BlinnSolver.cpp
+           Metrics/VDOT.cpp Metrics/WattsPerKilogram.cpp Metrics/WPrime.cpp Metrics/Zones.cpp Metrics/HrvMetrics.cpp Metrics/BlinnSolver.cpp \
+           Metrics/RowMetrics.cpp Metrics/FastKmeans.cpp
 
 ## Planning and Compliance
 SOURCES += Planning/PlanningWindow.cpp
 
 ## Contributed solutions
-SOURCES += ../qtsolutions/codeeditor/codeeditor.cpp ../qtsolutions/json/mvjson.cpp ../qtsolutions/qwtcurve/qwt_plot_gapped_curve.cpp \
-           ../qxt/src/qxtspanslider.cpp ../qxt/src/qxtstringspinbox.cpp ../qzip/zip.cpp \
-           ../lmfit/lmcurve.c ../lmfit/lmmin.c \
-           ../levmar/Axb.c ../levmar/lm_core.c ../levmar/lmbc_core.c \
-           ../levmar/lmblec_core.c ../levmar/lmbleic_core.c ../levmar/lmlec.c ../levmar/misc.c \
-           ../levmar/Axb_core.c ../levmar/lm.c ../levmar/lmbc.c ../levmar/lmblec.c ../levmar/lmbleic.c \
-           ../levmar/lmlec_core.c ../levmar/misc_core.c
+SOURCES += ../contrib/qtsolutions/codeeditor/codeeditor.cpp ../contrib/qtsolutions/json/mvjson.cpp \
+           ../contrib/qtsolutions/qwtcurve/qwt_plot_gapped_curve.cpp \
+           ../contrib/qxt/src/qxtspanslider.cpp ../contrib/qxt/src/qxtstringspinbox.cpp ../contrib/qzip/zip.cpp \
+           ../contrib/lmfit/lmcurve.c ../contrib/lmfit/lmmin.c \
+           ../contrib/levmar/Axb.c ../contrib/levmar/lm_core.c ../contrib/levmar/lmbc_core.c \
+           ../contrib/levmar/lmblec_core.c ../contrib/levmar/lmbleic_core.c ../contrib/levmar/lmlec.c ../contrib/levmar/misc.c \
+           ../contrib/levmar/Axb_core.c ../contrib/levmar/lm.c ../contrib/levmar/lmbc.c ../contrib/levmar/lmblec.c ../contrib/levmar/lmbleic.c \
+           ../contrib/levmar/lmlec_core.c ../contrib/levmar/misc_core.c \
+           ../contrib/kmeans/kmeans_dataset.cpp ../contrib/kmeans/kmeans_general_functions.cpp ../contrib/kmeans/hamerly_kmeans.cpp \
+           ../contrib/kmeans/kmeans.cpp ../contrib/kmeans/original_space_kmeans.cpp ../contrib/kmeans/triangle_inequality_base_kmeans.cpp \
+           ../contrib/voronoi/Voronoi.cpp
+
 
 ## Train View Components
 SOURCES += Train/AddDeviceWizard.cpp Train/CalibrationData.cpp Train/ComputrainerController.cpp Train/Computrainer.cpp Train/DeviceConfiguration.cpp \

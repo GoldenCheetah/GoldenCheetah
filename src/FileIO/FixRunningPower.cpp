@@ -254,7 +254,7 @@ FixRunningPower::postProcess(RideFile *ride, DataProcessorConfig *config=0, QStr
             double forw = Cr * Mtotal * eff * V;
             double aero = 0.5 * rho * Cx * FA * DraftM * (vw*vw) * V;
             double grav = 9.81 * Mtotal * sin(Slope) * V;
-            double chgV = p->kphd > 1 ? 1 : p->kphd * Mtotal * V;
+            double chgV = (p->kphd > 1 ? 1 : p->kphd) * Mtotal * V;
 
             // Power = moving forward + aerodynamic + gravity + change of speed
             double watts = forw + aero + grav + chgV;

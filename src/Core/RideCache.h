@@ -34,7 +34,7 @@
 
 class Context;
 class LTMPlot;
-class RideCacheBackgroundRefresh;
+class RideCacheRefreshThread;
 class Specification;
 class AthleteBest;
 class RideCacheModel;
@@ -72,7 +72,7 @@ class RideCache : public QObject
 
         // Count of activities matching specification
         void getRideTypeCounts(Specification specification, int& nActivities,
-                               int& nRides, int& nRuns, int& nSwims);
+                               int& nRides, int& nRuns, int& nSwims, QString& sport);
         // Check if metric is relevant for some  activity matching specification
         enum SportRestriction { AnySport, OnlyRides, OnlyRuns, OnlySwims, OnlyXtrains };
         bool isMetricRelevantForRides(Specification specification,
@@ -80,14 +80,21 @@ class RideCache : public QObject
                                       SportRestriction sport=AnySport);
 
         // is running ?
-        bool isRunning() { return future.isRunning(); }
+        bool isRunning() { return refreshThreads.count() != 0; }
+
+        // how is update going?
+        QMutex updateMutex;
+        int updates; // for watching progress
+        int nextRefresh(); // returns -1 when all done
+        void threadCompleted(RideCacheRefreshThread*);
 
         // the ride list
 	    QVector<RideItem*>&rides() { return rides_; } 
 
         // add/remove a ride to the list
         void addRide(QString name, bool dosignal, bool select, bool useTempActivities, bool planned);
-        void removeCurrentRide();
+        bool removeCurrentRide();
+        bool removeRide(const QString& filenameToDelete);
 
         // export metrics in CSV format
         void writeAsCSV(QString filename);
@@ -136,12 +143,12 @@ class RideCache : public QObject
 
         friend class ::Athlete;
         friend class ::MainWindow; // save dialog
-        friend class ::RideCacheBackgroundRefresh;
         friend class ::LTMPlot; // get weekly performances
         friend class ::Banister; // get weekly performances
         friend class ::Leaf; // get weekly performances
         friend class ::RideItem; // adds to deletelist in destructor
         friend class ::NavigationModel; // checks deletelist during redo/undo
+        friend class ::RideCacheRefreshThread;
 
         Context *context;
         QDir directory, plannedDirectory;
@@ -154,8 +161,7 @@ class RideCache : public QObject
         bool exiting;
 	    double progress_; // percent
 
-        QFuture<void> future;
-        QFutureWatcher<void> watcher;
+        QVector<RideCacheRefreshThread*> refreshThreads;
 
         Estimator *estimator;
         bool first; // updated when estimates are marked stale
@@ -168,8 +174,22 @@ class AthleteBest
     QString value; // formatted value
     QDate date;
 
-    // for qsort
+    // for std::sort
     bool operator< (AthleteBest right) const { return (nvalue < right.nvalue); }
+};
+
+class RideCacheRefreshThread : public QThread
+{
+    public:
+        RideCacheRefreshThread(RideCache *cache) : cache(cache) {}
+
+    protected:
+
+        // refresh metrics
+        virtual void run() override;
+
+    private:
+        RideCache *cache;
 };
 
 #endif // _GC_RideCache_h

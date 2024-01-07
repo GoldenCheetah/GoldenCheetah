@@ -195,7 +195,7 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
     bool dfpmExists   = false;
     int iBikeVersion  = 0;
 
-    int xTrainVersion  = 0;
+    //UNUSED int xTrainVersion  = 0;
 
     //UNUSED int timestampIndex=-1;
     int secsIndex=-1;
@@ -273,7 +273,7 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                     rideFile->setDeviceType("xtrainCSV");
                     rideFile->setFileFormat("xtrainCSV");
                     unitsHeader = 2;
-                    xTrainVersion = line.section( ',', 1, 1 ).toInt();
+                    //UNUSED xTrainVersion = line.section( ',', 1, 1 ).toInt();
 
                     ++lineno;
                     continue;
@@ -670,7 +670,7 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                     }
 
                 } else if (csvType == gc) {
-                    // GoldenCheetah CVS Format "secs, cad, hr, km, kph, nm, watts, alt, lon, lat, headwind, slope, temp, interval, lrbalance, lte, rte, lps, rps, smo2, thb, o2hb, hhb\n";
+                    // GoldenCheetah CVS Format "secs, cad, hr, km, kph, nm, watts, alt, lon, lat, headwind, slope, temp, interval, lrbalance, lte, rte, lps, rps, smo2, thb, o2hb, hhb, target\n";
 
                     seconds = line.section(',', 0, 0).toDouble();
                     minutes = seconds / 60.0f;
@@ -1289,8 +1289,10 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
         return NULL;
     }
 
+    // GC naming convention, with optional workout name for Train View
+    // yyyy_MM_dd_hh_mm_ss[_workoutname].csv
     QRegExp rideTime("^.*/(\\d\\d\\d\\d)_(\\d\\d)_(\\d\\d)_"
-                     "(\\d\\d)_(\\d\\d)_(\\d\\d)\\.csv$");
+                     "(\\d\\d)_(\\d\\d)_(\\d\\d)(_[^\\.]*)?\\.csv$");
     rideTime.setCaseSensitivity(Qt::CaseInsensitive);
 
     if (startTime != QDateTime()) {
@@ -1308,6 +1310,9 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                                  rideTime.cap(5).toInt(),
                                  rideTime.cap(6).toInt()));
         rideFile->setStartTime(datetime);
+
+        // Optional workout name saved as Route metadata if present
+        if (!rideTime.cap(7).isEmpty()) rideFile->setTag("Route", rideTime.cap(7).mid(1));
 
     } else {
 

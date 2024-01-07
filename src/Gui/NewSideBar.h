@@ -18,7 +18,7 @@ class NewSideBar : public QWidget
 
         // managing items - the id can be assigned or will get a default
         //                  it returns the id used
-        int addItem(QImage icon, QString name, int id=-1);
+        int addItem(QImage icon, QString name, int id=-1, QString whatsThisText="");
 
         // leave a gap- we have main icons, gap, apps, gap, sync, prefs
         void addStretch();

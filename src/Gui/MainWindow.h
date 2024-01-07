@@ -69,7 +69,7 @@ class MainWindow;
 class Athlete;
 class AthleteLoader;
 class Context;
-class Tab;
+class AthleteTab;
 
 
 extern QList<MainWindow *> mainwindows; // keep track of all the MainWindows we have open
@@ -94,11 +94,14 @@ class MainWindow : public QMainWindow
         int loading;
 
         // currently selected tab
-        Tab *athleteTab() { return currentTab; }
+        AthleteTab *athleteTab() { return currentAthleteTab; }
         NewSideBar *newSidebar() { return sidebar; }
 
         // tab view keeps this up to date
         QAction *showhideSidebar;
+
+        // switch perspective
+        void switchPerspective(int index);
 
     protected:
 
@@ -106,9 +109,9 @@ class MainWindow : public QMainWindow
         // have already been opened
         friend class ::ChooseCyclistDialog;
         friend class ::AthleteLoader;
-        QMap<QString,Tab*> tabs;
-        Tab *currentTab;
-        QList<Tab*> tabList;
+        QMap<QString,AthleteTab*> athletetabs;
+        AthleteTab *currentAthleteTab;
+        QList<AthleteTab*> tabList;
 
         virtual void resizeEvent(QResizeEvent*);
         virtual void moveEvent(QMoveEvent*);
@@ -141,6 +144,15 @@ class MainWindow : public QMainWindow
         void support();
         void actionClicked(int);
 
+        // perspective selected
+        void perspectiveSelected(int index);
+        void perspectivesChanged(); // when the list of perspectives is updated in PerspectivesDialog
+        void resetPerspective(int view, bool force=false); // reset when view changes
+
+        // import and export perspectives
+        void exportPerspective();
+        void importPerspective();
+
         // chart importing
         void importCharts(QStringList);
 
@@ -149,14 +161,14 @@ class MainWindow : public QMainWindow
 
         void setOpenTabMenu(); // set the Open Tab menu
         void newCyclistTab();  // create a new Cyclist
-        void openTab(QString name);
+        void openAthleteTab(QString name);
         void loadCompleted(QString name, Context *context);
         void closeTabClicked(int index); // user clicked to close tab
-        bool closeTab(QString name); // close named athlete
-        bool closeTab();       // close current, might not if the user
+        bool closeAthleteTab(QString name); // close named athlete
+        bool closeAthleteTab();       // close current, might not if the user
                                // changes mind if there are unsaved changes.
-        void removeTab(Tab*);  // remove without question
-        void switchTab(int index); // for switching between one tab and another
+        void removeAthleteTab(AthleteTab*);  // remove without question
+        void switchAthleteTab(int index); // for switching between one tab and another
 
         // sidebar selecting views and actions
         void sidebarClicked(int id);
@@ -170,16 +182,18 @@ class MainWindow : public QMainWindow
         void setDeleteAthleteMenu();
         void deleteAthlete(QString name);
 
+        // Athlete Settings
+        void athleteSettings();
+
         // Search / Filter
         void setFilter(QStringList);
         void clearFilter();
 
         void selectAthlete();
-        void selectHome();
+        void selectTrends();
         void selectDiary();
         void selectAnalysis();
         void selectTrain();
-        void selectInterval();
 
         void setChartMenu();
         void setSubChartMenu();
@@ -196,15 +210,16 @@ class MainWindow : public QMainWindow
         void showOptions();
 
         void toggleSidebar();
+        void showViewbar(bool want);
         void showSidebar(bool want);
         void showToolbar(bool want);
         void showTabbar(bool want);
         void resetWindowLayout();
         void toggleStyle();
         void setToolButtons(); // set toolbar buttons to match tabview
-        void setStyleFromSegment(int); // special case for linux/win qtsegmentcontrol toggline
         void toggleLowbar();
         void showLowbar(bool want);
+        void enterWhatsThisMode();
 
         // Analysis View
         void showEstimateCP();
@@ -236,7 +251,7 @@ class MainWindow : public QMainWindow
         void downloadRide();
         void manualRide();
         void exportRide();
-        void exportBatch();
+        void batchProcessing();
         void generateHeatMap();
         void exportMetrics();
         void addAccount();
@@ -286,16 +301,17 @@ class MainWindow : public QMainWindow
         QTFullScreen *fullScreen;
 #endif
 
+        QComboBox *perspectiveSelector;
+        bool pactive; // when programmatically manipulating selector
         SearchFilterBox *searchBox;
 
         // Not on Mac so use other types
-        QPushButton *sidelist, *lowbar;
+        QPushButton *sidelist, *lowbar, *tabtile, *whatsthis;
         QPushButton *back, *forward;
-        QtSegmentControl *styleSelector;
         GcToolBar *head;
 
         // the icons
-        QIcon backIcon, forwardIcon, sidebarIcon, lowbarIcon, tabbedIcon, tiledIcon;
+        QIcon backIcon, forwardIcon, sidebarIcon, lowbarIcon, tiledIcon, whatIcon;
 
         // tab bar (that supports swtitching on drag and drop)
         DragBar *tabbar;
@@ -322,6 +338,7 @@ class MainWindow : public QMainWindow
 
         // Toolbar state checkables in View menu / context
         QAction *styleAction;
+        QAction *showhideViewbar;
         QAction *showhideLowbar;
         QAction *showhideToolbar;
         QAction *showhideTabbar;

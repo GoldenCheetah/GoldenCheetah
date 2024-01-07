@@ -571,15 +571,21 @@ WorkoutWidget::eventFilter(QObject *obj, QEvent *event)
     //
     if (event->type() == QEvent::Wheel) {
 
-        // STATE: NONE
-        if (state == none) {
-            QWheelEvent *w = static_cast<QWheelEvent*>(event);
-            updateNeeded = scale(w->angleDelta());
-            filterNeeded = true;
-        }
+        Qt::KeyboardModifiers kmod = static_cast<QInputEvent*>(event)->modifiers();
+        bool ctrl = (kmod & Qt::ControlModifier) != 0;
+        if (ctrl) {
 
-        // will need to ..
-        recompute();
+            // STATE: NONE
+            if (state == none) {
+
+                QWheelEvent *w = static_cast<QWheelEvent*>(event);
+                updateNeeded = scale(w->angleDelta());
+                filterNeeded = true;
+            }
+
+            // will need to ..
+            recompute();
+        }
     }
 
     //
@@ -1552,13 +1558,14 @@ WorkoutWidget::recompute(bool editing)
     setBlockCursor();
 
     int rnum=-1;
-    if (context->athlete->zones(false) == NULL ||
-        (rnum = context->athlete->zones(false)->whichRange(QDate::currentDate())) == -1) {
+    if (context->athlete->zones("Bike") == NULL ||
+        (rnum = context->athlete->zones("Bike")->whichRange(QDate::currentDate())) == -1) {
 
         // no cp or ftp set
         parent->TSSlabel->setText("- Stress");
         parent->IFlabel->setText("- Intensity");
 
+        return; // nothing to do if zones are not available to get CP et.al.
     }
 
     //
@@ -1566,12 +1573,12 @@ WorkoutWidget::recompute(bool editing)
     //
 
     // get CP/FTP to use in calculation
-    int WPRIME = context->athlete->zones(false)->getWprime(rnum);
-    int CP = context->athlete->zones(false)->getCP(rnum);
-    int PMAX = context->athlete->zones(false)->getPmax(rnum);
-    int FTP = context->athlete->zones(false)->getFTP(rnum);
+    int WPRIME = context->athlete->zones("Bike")->getWprime(rnum);
+    int CP = context->athlete->zones("Bike")->getCP(rnum);
+    int PMAX = context->athlete->zones("Bike")->getPmax(rnum);
+    int FTP = context->athlete->zones("Bike")->getFTP(rnum);
     bool useCPForFTP = (appsettings->cvalue(context->athlete->cyclist,
-                        context->athlete->zones(false)->useCPforFTPSetting(), 0).toInt() == 0);
+                        context->athlete->zones("Bike")->useCPforFTPSetting(), 0).toInt() == 0);
     if (useCPForFTP) FTP=CP;
     if (PMAX<=0) PMAX=1000;
     int K=WPRIME/(PMAX-CP);
@@ -1791,6 +1798,8 @@ WorkoutWidget::qwkcode()
     //    5x30s@450r30s    - 5 times 30seconds at 450w followed by 30s at 'recovery'
     //    20m@100-400       - 20 minutes going from 100w to 400w
     //
+    //    NOTE: only integer watts are supported, floating point numbers are
+    //    rounded when qwkcode is generated.
     //
     //    XXX COME AND FIX THIS EXAMPLE XXX
     //    A complete workout example;
@@ -1805,7 +1814,7 @@ WorkoutWidget::qwkcode()
     // just loop through for now doing xx@yy and optionally add rxx
     if (points_.count() == 1) {
         // just a single point?
-        codeStrings << QString("%1@%2").arg(qduration(points_[0]->x)).arg(points_[0]->y);
+        codeStrings << QString("%1@0-%2").arg(qduration(points_[0]->x)).arg(round(points_[0]->y));
         codePoints<<0;
     }
 
@@ -1841,7 +1850,7 @@ WorkoutWidget::qwkcode()
             if (i==0 || points_[i]->x - points_[i-1]->x <= 0) {
 
                 // its a block
-                section = QString("0@%1-%2").arg(points_[i]->y).arg(points_[i+1]->y);
+                section = QString("0@%1-%2").arg(round(points_[i]->y)).arg(round(points_[i+1]->y));
                 ap = points_[i]->y;
 
             } else {
@@ -1855,14 +1864,14 @@ WorkoutWidget::qwkcode()
         if (doubles_equal(points_[i+1]->y, points_[i]->y)) {
 
             // its a block
-            section = QString("%1@%2").arg(qduration(duration)).arg(points_[i]->y);
+            section = QString("%1@%2").arg(qduration(duration)).arg(round(points_[i]->y));
             ap = points_[i]->y;
 
         } else {
             // its a rise
             section = QString("%1@%2-%3").arg(qduration(duration))
-                                         .arg(points_[i]->y)
-                                         .arg(points_[i+1]->y);
+                                         .arg(round(points_[i]->y))
+                                         .arg(round(points_[i+1]->y));
             ap = ((points_[i]->y + points_[i+1]->y) / 2);
         }
 
@@ -1910,6 +1919,7 @@ WorkoutWidget::qwkcode()
                 break; // stop when end of matches
         }
 
+        /* Text cues are not supported on qwkcode yet
         foreach (const ErgFileText cue, texts_) {
             int secs = i > 0 ? points_[sectionp[i-1]]->x : 0;
             int offset = cue.x/1000 - secs;
@@ -1920,6 +1930,7 @@ WorkoutWidget::qwkcode()
                 codePoints << sectionp[i];
             }
         }
+        */
 
         // multiple or no ..
         if (count > 1) {
@@ -2154,7 +2165,7 @@ WorkoutWidget::apply(QString code)
 
                 // EFFORT
                 // add a point for starting watts if not already there
-                if (w1 != watts) {
+                if (w1 != watts || points_.isEmpty()) {
                     index++;
                     new WWPoint(this, secs, w1);
                     bool addLap = laps_.isEmpty() ? secs != 0 : (laps_.last().x != secs*1000) && secs != 0;

@@ -26,7 +26,6 @@
 #include "SmallPlot.h"
 #include "Context.h"
 #include "Athlete.h"
-#include "Zones.h"
 #include "Settings.h"
 #include "Colors.h"
 #include "Units.h"
@@ -40,16 +39,20 @@
 //#include <QWebEngineProfile>
 
 // overlay helper
-#include "TabView.h"
+#include "AbstractView.h"
 #include "GcOverlayWidget.h"
 #include "IntervalSummaryWindow.h"
+#include "HelpWhatsThis.h"
 
 // declared in main, we only want to use it to get QStyle
 extern QApplication *application;
 
 LiveMapWebPageWindow::LiveMapWebPageWindow(Context *context) : GcChartWindow(context), context(context)
 {
-     // Connect signal to receive updates on lat/lon for ploting on map.
+    HelpWhatsThis *helpContents = new HelpWhatsThis(this);
+    this->setWhatsThis(helpContents->getWhatsThisText(HelpWhatsThis::ChartTrain_LiveMap));
+
+    // Connect signal to receive updates on lat/lon for ploting on map.
     connect(context, SIGNAL(telemetryUpdate(RealtimeData)), this, SLOT(telemetryUpdate(RealtimeData)));
     connect(context, SIGNAL(stop()), this, SLOT(stop()));
     connect(context, SIGNAL(ergFileSelected(ErgFile*)), this, SLOT(ergFileSelected(ErgFile*)));
@@ -71,19 +74,18 @@ LiveMapWebPageWindow::LiveMapWebPageWindow(Context *context) : GcChartWindow(con
 
     // Chart settings
     QWidget * settingsWidget = new QWidget(this);
+    HelpWhatsThis *helpConfig = new HelpWhatsThis(settingsWidget);
+    settingsWidget->setWhatsThis(helpConfig->getWhatsThisText(HelpWhatsThis::ChartTrain_LiveMap));
     settingsWidget->setContentsMargins(0,0,0,0);
     setProperty("color", GColor(CTRAINPLOTBACKGROUND));
 
     QFormLayout* commonLayout = new QFormLayout(settingsWidget);
 
-    QString sValue = "";
     customUrlLabel = new QLabel(tr("OSM Base URL"));
     customUrl = new QLineEdit(this);
-    customUrl->setFixedWidth(300);
+    customUrl->setFixedWidth(600);
 
-    if (customUrl->text() == "") {
-        customUrl->setText("http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png");
-    }
+    if (customUrl->text().trimmed().isEmpty()) customUrl->setText("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png");
     commonLayout->addRow(customUrlLabel, customUrl);
 
     connect(customUrl, SIGNAL(returnPressed()), this, SLOT(userUrl()));
@@ -121,16 +123,14 @@ LiveMapWebPageWindow::LiveMapWebPageWindow(Context *context) : GcChartWindow(con
 
 void LiveMapWebPageWindow::userUrl()
 {
-    // add http:// if scheme is missing
-    QRegExp hasscheme("^[^:]*://.*");
-    QString url = rCustomUrl->text();
-    if (!hasscheme.exactMatch(url)) url = "http://" + url;
+    QString url = customUrl->text();
     view->setZoomFactor(dpiXFactor);
     view->setUrl(QUrl(url));
 }
 
 LiveMapWebPageWindow::~LiveMapWebPageWindow()
 {
+  if (view) delete view->page();
 }
 
 void LiveMapWebPageWindow::ergFileSelected(ErgFile* f)
@@ -171,6 +171,7 @@ void LiveMapWebPageWindow::ergFileSelected(ErgFile* f)
             // So we create divs with the 2 methods we need to run when the document loads
             code = QString("showRoute (" + routeLatLngs + ");");
             js += ("<div><script type=\"text/javascript\">" + code + "</script></div>\n");
+            if (customUrl->text().trimmed().isEmpty()) customUrl->setText("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png");
             createHtml(customUrl->text(), js);
             view->page()->setHtml(currentPage);
         }

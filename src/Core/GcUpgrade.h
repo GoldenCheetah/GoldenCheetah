@@ -97,6 +97,17 @@
 // 4001 - V3.6 DEVELOPMENT 2006 (JUN 2020)
 // 4002 - V3.6 DEVELOPMENT 2009 (SEP 2020)
 // 4003 - V3.6 DEVELOPMENT 2101 (JAN 2021)
+// 4004 - V3.6 DEVELOPMENT 2106 (JUN 2021)
+// 4006 - V3.6 DEVELOPMENT 2107 (JUL 2021)
+// 4007 - V3.6 DEVELOPMENT 2108 (AUG 2021)
+// 4008 - V3.6 DEVELOPMENT 2110 (OCT 2021) (Pre-release)
+// 4009 - V3.6 DEVELOPMENT 2110 (NOV 2021) (Pre-release)
+// 4010 - V3.6 DEVELOPMENT 2202 (FEB 2022) (Pre-release RC1)
+// 4011 - V3.6 DEVELOPMENT 2208 (AUG 2022) (Pre-release RC2)
+// 4012 - V3.6 DEVELOPMENT 2210 (OCT 2022) (Pre-release RC3)
+// 4013 - V3.6 DEVELOPMENT 2303 (MAR 2023) (Pre-release RC4)
+// 5000 - V3.6 RELEASE (August 2023) - latest snapshot 6/1/24
+// 5001 - V3.7 DEVELOPMENT (NOV 2023)
 
 #define VERSION3_BUILD    3010 // released
 #define VERSION3_SP1      3030 // released
@@ -107,17 +118,18 @@
 #define VERSION33_BUILD   3933 // development release
 #define VERSION34_BUILD   3955 // released
 #define VERSION35_BUILD   3990 // released
-#define VERSION36_BUILD   4002 // development build September 2020
+#define VERSION36_BUILD   5000 // released 5/8/23
+#define VERSION37_BUILD   5001 // released 5/8/23
 
 // will keep changing during testing and before final release
 #define VERSION31_BUILD VERSION31_UPG
 
 // the next two will with each build/release
-#define VERSION_LATEST 4003
-#define VERSION_STRING "V3.6-DEV2101"
+#define VERSION_LATEST 5000
+#define VERSION_STRING "V3.6"
 
 // default config for this release cycle
-#define VERSION_CONFIG_PREFIX "http://www.goldencheetah.org/defaults/3.5"
+#define VERSION_CONFIG_PREFIX "http://www.goldencheetah.org/defaults/3.6"
 
 class GcUpgradeLogDialog : public QDialog
 {
@@ -125,6 +137,7 @@ class GcUpgradeLogDialog : public QDialog
 
     public:
         GcUpgradeLogDialog(QDir);
+        ~GcUpgradeLogDialog();
         void enableButtons();
         void append(QString, int level=0);
 

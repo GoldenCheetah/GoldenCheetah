@@ -47,11 +47,11 @@ class DateRange : QObject
         DateRange(const DateRange& other);
         DateRange(QDate from = QDate(), QDate to = QDate(), QString name ="", QColor=QColor(127,127,127));
         DateRange& operator=(const DateRange &);
-        bool operator!=(const DateRange&other) {
+        bool operator!=(const DateRange&other) const {
             if (other.from != from || other.to != to || other.name != name) return true;
             return false;
         }
-        bool operator==(const DateRange&other) {
+        bool operator==(const DateRange&other) const {
             if (other.from == from && other.to == to && other.name == name) return true;
             return false;
         }
@@ -62,14 +62,14 @@ class DateRange : QObject
         QUuid id;
 
         // does this date fall in the range selection ?
-        bool pass(QDate date) {
+        bool pass(QDate date) const {
             if (from == QDate() && to == QDate()) return true;
             if (from == QDate() && date <= to) return true;
             if (to == QDate() && date >= from) return true;
             if (date >= from && date <= to) return true;
             return false;
         }
-        bool isValid() { return valid; }
+        bool isValid() const { return valid; }
 
 
     signals:

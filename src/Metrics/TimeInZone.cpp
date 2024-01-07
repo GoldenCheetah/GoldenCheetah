@@ -32,9 +32,6 @@ class ZoneTime : public RideMetric {
     int level;
     double seconds;
 
-    QList<int> lo;
-    QList<int> hi;
-
     public:
 
     ZoneTime() : level(0), seconds(0.0)
@@ -53,7 +50,7 @@ class ZoneTime : public RideMetric {
 
         // no ride or no samples
         if (spec.isEmpty(item->ride()) ||
-            item->context->athlete->zones(item->isRun) == NULL || item->zoneRange < 0 ||
+            item->context->athlete->zones(item->sport) == NULL || item->zoneRange < 0 ||
             !item->ride()->areDataPresent()->watts) {
             setValue(RideFile::NIL);
             setCount(0);
@@ -68,7 +65,7 @@ class ZoneTime : public RideMetric {
         while (it.hasNext()) {
             struct RideFilePoint *point = it.next();
             totalSecs += item->ride()->recIntSecs();
-            if (item->context->athlete->zones(item->isRun)->whichZone(item->zoneRange, point->watts) == level)
+            if (item->context->athlete->zones(item->sport)->whichZone(item->zoneRange, point->watts) == level)
                 seconds += item->ride()->recIntSecs();
         }
         setValue(seconds);
@@ -723,7 +720,311 @@ class ZonePTime10 : public RideMetric {
         RideMetric *clone() const { return new ZonePTime10(*this); }
 };
 
+// Time in Zones I, II and III
+class ZoneTimeI : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(ZoneTimeI)
+    double seconds;
+
+    public:
+
+    ZoneTimeI() : seconds(0.0)
+    {
+        setType(RideMetric::Total);
+        setMetricUnits(tr("seconds"));
+        setImperialUnits(tr("seconds"));
+        setPrecision(0);
+        setConversion(1.0);
+        setSymbol("time_in_zone_LI");
+        setInternalName("LI Time in Zone");
+    }
+
+    void initialize ()
+    {
+        setName(tr("LI Time in Zone"));
+        setMetricUnits(tr("seconds"));
+        setImperialUnits(tr("seconds"));
+        setDescription(tr("Time in Power Zone I - Below AeT"));
+    }
+
+    bool isTime() const { return true; }
+
+    void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &) {
+
+        // no ride or no samples
+        if (spec.isEmpty(item->ride()) ||
+            item->context->athlete->zones(item->sport) == NULL || item->zoneRange < 0 ||
+            !item->ride()->areDataPresent()->watts) {
+            setValue(RideFile::NIL);
+            setCount(0);
+            return;
+        }
+
+        int AeT = item->context->athlete->zones(item->sport)->getAeT(item->zoneRange);
+        double totalSecs = 0.0;
+        seconds = 0;
+
+        // iterate and compute
+        RideFileIterator it(item->ride(), spec);
+        while (it.hasNext()) {
+            struct RideFilePoint *point = it.next();
+            totalSecs += item->ride()->recIntSecs();
+            if (point->watts < AeT)
+                seconds += item->ride()->recIntSecs();
+        }
+        setValue(seconds);
+        setCount(totalSecs);
+    }
+
+    MetricClass classification() const { return Undefined; }
+    MetricValidity validity() const { return Unknown; }
+    RideMetric *clone() const { return new ZoneTimeI(*this); }
+};
+
+class ZoneTimeII : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(ZoneTimeII)
+    double seconds;
+
+    public:
+
+    ZoneTimeII() : seconds(0.0)
+    {
+        setType(RideMetric::Total);
+        setMetricUnits(tr("seconds"));
+        setImperialUnits(tr("seconds"));
+        setPrecision(0);
+        setConversion(1.0);
+        setSymbol("time_in_zone_LII");
+        setInternalName("LII Time in Zone");
+    }
+
+    void initialize ()
+    {
+        setName(tr("LII Time in Zone"));
+        setMetricUnits(tr("seconds"));
+        setImperialUnits(tr("seconds"));
+        setDescription(tr("Time in Power Zone II - Between AeT and CP"));
+    }
+
+    bool isTime() const { return true; }
+
+    void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &) {
+
+        // no ride or no samples
+        if (spec.isEmpty(item->ride()) ||
+            item->context->athlete->zones(item->sport) == NULL || item->zoneRange < 0 ||
+            !item->ride()->areDataPresent()->watts) {
+            setValue(RideFile::NIL);
+            setCount(0);
+            return;
+        }
+
+        int AeT = item->context->athlete->zones(item->sport)->getAeT(item->zoneRange);
+        int CP = item->context->athlete->zones(item->sport)->getCP(item->zoneRange);
+        double totalSecs = 0.0;
+        seconds = 0;
+
+        // iterate and compute
+        RideFileIterator it(item->ride(), spec);
+        while (it.hasNext()) {
+            struct RideFilePoint *point = it.next();
+            totalSecs += item->ride()->recIntSecs();
+            if (point->watts >= AeT && point->watts < CP)
+                seconds += item->ride()->recIntSecs();
+        }
+        setValue(seconds);
+        setCount(totalSecs);
+    }
+
+    MetricClass classification() const { return Undefined; }
+    MetricValidity validity() const { return Unknown; }
+    RideMetric *clone() const { return new ZoneTimeII(*this); }
+};
+
+class ZoneTimeIII : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(ZoneTimeIII)
+    double seconds;
+
+    public:
+
+    ZoneTimeIII() : seconds(0.0)
+    {
+        setType(RideMetric::Total);
+        setMetricUnits(tr("seconds"));
+        setImperialUnits(tr("seconds"));
+        setPrecision(0);
+        setConversion(1.0);
+        setSymbol("time_in_zone_LIII");
+        setInternalName("LIII Time in Zone");
+    }
+
+    void initialize ()
+    {
+        setName(tr("LIII Time in Zone"));
+        setMetricUnits(tr("seconds"));
+        setImperialUnits(tr("seconds"));
+        setDescription(tr("Time in Power Zone III - Above CP"));
+    }
+
+    bool isTime() const { return true; }
+
+    void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &) {
+
+        // no ride or no samples
+        if (spec.isEmpty(item->ride()) ||
+            item->context->athlete->zones(item->sport) == NULL || item->zoneRange < 0 ||
+            !item->ride()->areDataPresent()->watts) {
+            setValue(RideFile::NIL);
+            setCount(0);
+            return;
+        }
+
+        int CP = item->context->athlete->zones(item->sport)->getCP(item->zoneRange);
+        double totalSecs = 0.0;
+        seconds = 0;
+
+        // iterate and compute
+        RideFileIterator it(item->ride(), spec);
+        while (it.hasNext()) {
+            struct RideFilePoint *point = it.next();
+            totalSecs += item->ride()->recIntSecs();
+            if (point->watts >= CP)
+                seconds += item->ride()->recIntSecs();
+        }
+        setValue(seconds);
+        setCount(totalSecs);
+    }
+
+    MetricClass classification() const { return Undefined; }
+    MetricValidity validity() const { return Unknown; }
+    RideMetric *clone() const { return new ZoneTimeIII(*this); }
+};
+
+// Now for Time In Zones as a Percentage of Ride Time
+class ZonePTimeI : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(ZonePTimeI)
+
+    public:
+
+    ZonePTimeI()
+    {
+        setSymbol("percent_in_zone_LI");
+        setInternalName("LI Percent in Zone");
+        setType(RideMetric::Average);
+        setMetricUnits("%");
+        setImperialUnits("%");
+        setPrecision(0);
+        setConversion(1.0);
+    }
+
+    void initialize ()
+    {
+        setName(tr("LI Percent in Zone"));
+        setDescription(tr("Percent of Time in Power Zone I - Below AeT"));
+    }
+
+    void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &deps)
+    {
+        assert(deps.contains("time_in_zone_LI"));
+
+        // compute
+        double time = deps.value("time_in_zone_LI")->count();
+        double inzone = deps.value("time_in_zone_LI")->value(true);
+
+        if (time && inzone) setValue((inzone / time) * 100.00);
+        else setValue(0);
+        setCount(time);
+    }
+
+    bool aggregateZero() const { return true; }
+    MetricClass classification() const { return Undefined; }
+    MetricValidity validity() const { return Unknown; }
+    RideMetric *clone() const { return new ZonePTimeI(*this); }
+};
+
+class ZonePTimeII : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(ZonePTimeII)
+
+    public:
+
+    ZonePTimeII()
+    {
+        setSymbol("percent_in_zone_LII");
+        setInternalName("LII Percent in Zone");
+        setType(RideMetric::Average);
+        setMetricUnits("%");
+        setImperialUnits("%");
+        setPrecision(0);
+        setConversion(1.0);
+    }
+
+    void initialize ()
+    {
+        setName(tr("LII Percent in Zone"));
+        setDescription(tr("Percent of Time in Power Zone II - Between AeT and CP"));
+    }
+
+    void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &deps)
+    {
+        assert(deps.contains("time_in_zone_LII"));
+
+        // compute
+        double time = deps.value("time_in_zone_LII")->count();
+        double inzone = deps.value("time_in_zone_LII")->value(true);
+
+        if (time && inzone) setValue((inzone / time) * 100.00);
+        else setValue(0);
+        setCount(time);
+    }
+
+    bool aggregateZero() const { return true; }
+    MetricClass classification() const { return Undefined; }
+    MetricValidity validity() const { return Unknown; }
+    RideMetric *clone() const { return new ZonePTimeII(*this); }
+};
+
+class ZonePTimeIII : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(ZonePTimeIII)
+
+    public:
+
+    ZonePTimeIII()
+    {
+        setSymbol("percent_in_zone_LIII");
+        setInternalName("LIII Percent in Zone");
+        setType(RideMetric::Average);
+        setMetricUnits("%");
+        setImperialUnits("%");
+        setPrecision(0);
+        setConversion(1.0);
+    }
+
+    void initialize ()
+    {
+        setName(tr("LIII Percent in Zone"));
+        setDescription(tr("Percent of Time in Power Zone III - Above CP"));
+    }
+
+    void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &deps)
+    {
+        assert(deps.contains("time_in_zone_LIII"));
+
+        // compute
+        double time = deps.value("time_in_zone_LIII")->count();
+        double inzone = deps.value("time_in_zone_LIII")->value(true);
+
+        if (time && inzone) setValue((inzone / time) * 100.00);
+        else setValue(0);
+        setCount(time);
+    }
+
+    bool aggregateZero() const { return true; }
+    MetricClass classification() const { return Undefined; }
+    MetricValidity validity() const { return Unknown; }
+    RideMetric *clone() const { return new ZonePTimeIII(*this); }
+};
+
 static bool addAllZones() {
+
     RideMetricFactory::instance().addMetric(ZoneTime1());
     RideMetricFactory::instance().addMetric(ZoneTime2());
     RideMetricFactory::instance().addMetric(ZoneTime3());
@@ -734,6 +1035,7 @@ static bool addAllZones() {
     RideMetricFactory::instance().addMetric(ZoneTime8());
     RideMetricFactory::instance().addMetric(ZoneTime9());
     RideMetricFactory::instance().addMetric(ZoneTime10());
+
     QVector<QString> deps;
     deps.append("time_in_zone_L1");
     RideMetricFactory::instance().addMetric(ZonePTime1(), &deps);
@@ -764,6 +1066,21 @@ static bool addAllZones() {
     deps.clear();
     deps.append("time_in_zone_L10");
     RideMetricFactory::instance().addMetric(ZonePTime10(), &deps);
+
+    RideMetricFactory::instance().addMetric(ZoneTimeI());
+    RideMetricFactory::instance().addMetric(ZoneTimeII());
+    RideMetricFactory::instance().addMetric(ZoneTimeIII());
+
+    deps.clear();
+    deps.append("time_in_zone_LI");
+    RideMetricFactory::instance().addMetric(ZonePTimeI(), &deps);
+    deps.clear();
+    deps.append("time_in_zone_LII");
+    RideMetricFactory::instance().addMetric(ZonePTimeII(), &deps);
+    deps.clear();
+    deps.append("time_in_zone_LIII");
+    RideMetricFactory::instance().addMetric(ZonePTimeIII(), &deps);
+
     return true;
 }
 

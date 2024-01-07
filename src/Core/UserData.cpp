@@ -19,7 +19,7 @@
 #include "UserData.h"
 
 #include "RideNavigator.h"
-#include "Tab.h"
+#include "AthleteTab.h"
 #include "HelpWhatsThis.h"
 #include "Utils.h"
 
@@ -112,7 +112,7 @@ EditUserDataDialog::EditUserDataDialog(Context *context, UserData *here) :
     SpecialFields sp;
 
     // get sorted list
-    QStringList names = context->tab->rideNavigator()->logicalHeadings;
+    QStringList names = context->rideNavigator->logicalHeadings;
 
     // start with just a list of functions
     list = DataFilter::builtins(context);
@@ -123,15 +123,18 @@ EditUserDataDialog::EditUserDataDialog(Context *context, UserData *here) :
     // add special functions (older code needs fixing !)
     list << "config(cranklength)";
     list << "config(cp)";
+    list << "config(aetp)";
     list << "config(ftp)";
     list << "config(w')";
     list << "config(pmax)";
     list << "config(cv)";
+    list << "config(aetv)";
     list << "config(sex)";
     list << "config(dob)";
     list << "config(height)";
     list << "config(weight)";
     list << "config(lthr)";
+    list << "config(aethr)";
     list << "config(maxhr)";
     list << "config(rhr)";
     list << "config(units)";
@@ -160,7 +163,7 @@ EditUserDataDialog::EditUserDataDialog(Context *context, UserData *here) :
     list << "RECINTSECS";
     list << "NA";
 
-    qSort(names.begin(), names.end(), insensitiveLessThan);
+    std::sort(names.begin(), names.end(), insensitiveLessThan);
 
     foreach(QString name, names) {
 

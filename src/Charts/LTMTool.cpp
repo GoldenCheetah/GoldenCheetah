@@ -22,10 +22,12 @@
 #include "Athlete.h"
 #include "Settings.h"
 #include "Units.h"
-#include "Tab.h"
+#include "AthleteTab.h"
 #include "RideNavigator.h"
 #include "HelpWhatsThis.h"
 #include "Utils.h"
+#include "Colors.h" // NamedColor and RGBColor
+#include "ColorButton.h" // GColorDialog
 
 #include <QApplication>
 #include <QtGui>
@@ -240,7 +242,7 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
     }
 
     // sort the list
-    qSort(metrics);
+    std::sort(metrics.begin(), metrics.end());
 
     //----------------------------------------------------------------------------------------------------------
     // Custom Curves (4th TAB)
@@ -1738,9 +1740,9 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
     // working with estimates, local utility functions
     models << new CP2Model(context);
     models << new CP3Model(context);
-    models << new MultiModel(context);
+    //models << new MultiModel(context); disabled in v3.6
     models << new ExtendedModel(context);
-    models << new WSModel(context);
+    //models << new WSModel(context); disabled in v3.6
     foreach(PDModel *model, models) {
         modelSelect->addItem(model->name(), model->code());
     }
@@ -1860,7 +1862,7 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
     SpecialFields sp;
 
     // get sorted list
-    QStringList names = context->tab->rideNavigator()->logicalHeadings;
+    QStringList names = context->rideNavigator->logicalHeadings;
 
     // start with just a list of functions
     list = DataFilter::builtins(context);
@@ -1871,15 +1873,18 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
     // add special functions (older code needs fixing !)
     list << "config(cranklength)";
     list << "config(cp)";
+    list << "config(aetp)";
     list << "config(ftp)";
     list << "config(w')";
     list << "config(pmax)";
     list << "config(cv)";
+    list << "config(aetv)";
     list << "config(sex)";
     list << "config(dob)";
     list << "config(height)";
     list << "config(weight)";
     list << "config(lthr)";
+    list << "config(aethr)";
     list << "config(maxhr)";
     list << "config(rhr)";
     list << "config(units)";
@@ -1906,7 +1911,7 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
     list << "best(vam, 3600)";
     list << "best(wpk, 3600)";
 
-    qSort(names.begin(), names.end(), insensitiveLessThan);
+    std::sort(names.begin(), names.end(), insensitiveLessThan);
 
     foreach(QString name, names) {
 
@@ -2108,7 +2113,7 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
  
     // color background...
     penColor = metricDetail->penColor;
-    setButtonIcon(penColor);
+    setButtonIcon(RGBColor(penColor));
 
     QLabel *topN = new QLabel(tr("Highlight Highest"));
     showBest = new QDoubleSpinBox(this);
@@ -2480,7 +2485,7 @@ EditMetricDetailDialog::metricSelected()
         baseLine->setValue(ltmTool->metrics[index].baseline);
         penColor = ltmTool->metrics[index].penColor;
         trendType->setCurrentIndex(ltmTool->metrics[index].trendtype);
-        setButtonIcon(penColor);
+        setButtonIcon(RGBColor(penColor));
 
         // curve style
         switch (ltmTool->metrics[index].curveStyle) {
@@ -2656,13 +2661,12 @@ EditMetricDetailDialog::cancelClicked()
 void
 EditMetricDetailDialog::colorClicked()
 {
-    // don't use native dialog, since there is a nasty bug causing focus loss
-    // see https://bugreports.qt-project.org/browse/QTBUG-14889
-    QColor color = QColorDialog::getColor(metricDetail->penColor, this, tr("Choose Metric Color"), QColorDialog::DontUseNativeDialog);
+    QColor color = GColorDialog::getColor(penColor.name());
 
-    if (color.isValid()) {
-        setButtonIcon(penColor=color);
-    }
+    if (NamedColor(color)) { // named color
+        penColor=color;
+        setButtonIcon(RGBColor(color));
+    } else if (color.isValid()) setButtonIcon(penColor=color); // normal rgb color
 }
 
 void

@@ -352,7 +352,7 @@ void Imagic::run()
              * For ergo or slope mode, this will set the brake resistance
              *************************************************************/
             double setResistance = 0;
-            int rc;
+            int rc = 0;
 
             pvars.lock();
             mode = this->mode;
@@ -418,16 +418,13 @@ void Imagic::run()
 
                       // Smooth gradient transitions
                       double gradientDiff = gradient - lastGradient;
-                      if (gradientDiff > 0.1)
-                          if (gradientDiff > 0.5)
-                              gradient = lastGradient + (gradientDiff / 5);
-                          else
-                              gradient = lastGradient + 0.1;
-                      else if (gradientDiff < -0.1)
-                          if (gradientDiff < -0.5)
-                              gradient = lastGradient + (gradientDiff / 5);
-                          else
-                              gradient = lastGradient - 0.1;
+                      if (gradientDiff > 0.1) {
+                          if (gradientDiff > 0.5) gradient = lastGradient + (gradientDiff / 5);
+                          else gradient = lastGradient + 0.1;
+                      } else if (gradientDiff < -0.1) {
+                          if (gradientDiff < -0.5) gradient = lastGradient + (gradientDiff / 5);
+                          else gradient = lastGradient - 0.1;
+                      }
                       lastGradient = gradient;
 
                       // Calculate vertical speed in internal units

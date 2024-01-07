@@ -1,5 +1,7 @@
 <RCC>
     <qresource prefix="/">
+        <file>charts/overview-analysis.gchart</file>
+        <file>charts/overview-trends.gchart</file>
         <file>webservice/httpserver.ini</file>
         <file>sidebar/apps.png</file>
         <file>sidebar/assess.png</file>
@@ -15,6 +17,10 @@
         <file>images/devices/kickr.png</file>
         <file>images/devices/fortius.png</file>
         <file>images/devices/quarqd.png</file>
+        <file>images/titlebar/sidebar.png</file>
+        <file>images/titlebar/bottombar.png</file>
+        <file>images/titlebar/whatsthis.png</file>
+        <file>images/titlebar/tile.png</file>
         <file>images/toolbar/main/togglefull.png</file>
         <file>images/toolbar/main/hideside.png</file>
         <file>images/toolbar/main/hiderside.png</file>
@@ -105,13 +111,14 @@
         <file>translations/gc_zh-tw.qm</file>
         <file>translations/gc_nl.qm</file>
         <file>translations/gc_sv.qm</file>
+        <file>json/FITmetadata.json</file>
         <file>xml/charts.xml</file>
         <file>xml/metadata.xml</file>
-        <file>xml/train-layout.xml</file>
+        <file>xml/train-perspectives.xml</file>
         <file>xml/video-layout.xml</file>
-        <file>xml/diary-layout.xml</file>
-        <file>xml/analysis-layout.xml</file>
-        <file>xml/home-layout.xml</file>
+        <file>xml/diary-perspectives.xml</file>
+        <file>xml/analysis-perspectives.xml</file>
+        <file>xml/home-perspectives.xml</file>
         <file>ini/measures.ini</file>
         <file>html/ltm-summary.html</file>
         <file>images/oxygen/power-off.png</file>
@@ -180,13 +187,11 @@
         <file>images/oxygen/down.png</file>
         <file>audio/lap.wav</file>
         <file>images/configure.png</file>
-        <file>web/googlemap/dark.css</file>
         <file>images/toolbar/cloud.png</file>
         <file>images/services/strava_compatible.png</file>
         <file>images/services/strava_connect.png</file>
         <file>images/services/cyclinganalytics.png</file>
         <file>images/services/dropbox.png</file>
-        <file>images/services/googledrive.png</file>
         <file>images/services/localstore.png</file>
         <file>images/services/ridewithgps.png</file>
         <file>images/services/selfloops.png</file>
@@ -198,6 +203,7 @@
         <file>images/services/velohero.png</file>
         <file>images/services/polarflow.png</file>
         <file>images/services/sporttracks.png</file>
+        <file>images/services/nolio.png</file>
         <file>python/library.py</file>
         <file>images/devices/imagic.png</file>
         <file>data/powerprofile.csv</file>

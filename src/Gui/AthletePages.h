@@ -274,6 +274,7 @@ class CPPage : public QWidget
 
         QDateEdit *dateEdit;
         QDoubleSpinBox *cpEdit;
+        QDoubleSpinBox *aetEdit;
         QDoubleSpinBox *ftpEdit;
         QDoubleSpinBox *wEdit;
         QDoubleSpinBox *pmaxEdit;
@@ -310,19 +311,17 @@ class ZonePage : public QWidget
 
     private:
 
-        static const int nSports = 2;
-
         QLabel *sportLabel;
         QComboBox *sportCombo;
 
         //ZoneScheme scheme;
-        Zones *zones[nSports];
-        quint16 b4Fingerprint[nSports]; // how did it start ?
-        SchemePage *schemePage[nSports];
-        CPPage *cpPage[nSports];
+        QHash<QString, Zones*> zones;
+        QHash<QString, quint16> b4Fingerprint; // how did it start ?
+        QHash<QString, SchemePage*> schemePage;
+        QHash<QString, CPPage*> cpPage;
 
     private slots:
-        void changeSport(int i);
+        void changeSport();
 
 };
 
@@ -377,6 +376,7 @@ class LTPage : public QWidget
 
         QDateEdit *dateEdit;
         QDoubleSpinBox *ltEdit;
+        QDoubleSpinBox *aetEdit;
         QDoubleSpinBox *restHrEdit;
         QDoubleSpinBox *maxHrEdit;
 
@@ -412,19 +412,17 @@ class HrZonePage : public QWidget
 
     private:
 
-        static const int nSports = 2;
-
         QLabel *sportLabel;
         QComboBox *sportCombo;
 
-        HrZones *hrZones[nSports];
-        quint16 b4Fingerprint[nSports]; // how did it start ?
-        HrSchemePage *schemePage[nSports];
-        LTPage *ltPage[nSports];
+        QHash<QString, HrZones*> hrZones;
+        QHash<QString, quint16> b4Fingerprint; // how did it start ?
+        QHash<QString, HrSchemePage*> schemePage;
+        QHash<QString, LTPage*> ltPage;
 
     private slots:
         
-        void changeSport(int i);
+        void changeSport();
 
 };
 
@@ -479,6 +477,7 @@ class CVPage : public QWidget
 
         QDateEdit *dateEdit;
         QTimeEdit *cvEdit;
+        QTimeEdit *aetEdit;
 
         PaceZones* paceZones;
         PaceSchemePage *schemePage;

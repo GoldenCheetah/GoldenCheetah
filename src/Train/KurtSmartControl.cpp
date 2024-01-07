@@ -112,7 +112,7 @@ smart_control_power_data smart_control_process_power_data(const uint8_t *data, s
 
         uint8_t hashSeed = 0x42;
         uint8_t inData[20];
-        for (int i = 0; i < size; ++i) {
+        for (size_t i = 0; i < size; ++i) {
             inData[i] = data[i];
         }
         uint8_t hash = hash8WithSeed(hashSeed, &inData[size - 1], 1);
@@ -148,7 +148,7 @@ smart_control_config_data smart_control_process_config_data(const uint8_t *data,
 {
     uint8_t hashSeed = 0x42;
     uint8_t* inData = (uint8_t*)malloc(size);
-    for (int i = 0; i < size; ++i) {
+    for (size_t i = 0; i < size; ++i) {
         inData[i] = data[i];
     }
     uint8_t hash = hash8WithSeed(hashSeed, &inData[size - 1], 1);
@@ -217,6 +217,9 @@ smart_control_config_data smart_control_process_config_data(const uint8_t *data,
 
 
 #ifndef MIN
+#ifdef __GNUC__
+#pragma GCC diagnostic ignored "-Wtype-limits"
+#endif
 #define MIN(a,b) (((a)<(b))?(a):(b))
 #define MAX(a,b) (((a)>(b))?(a):(b))
 #endif

@@ -54,10 +54,7 @@
 CalDAVCloud::CalDAVCloud(Context *context, CalDAV::type variant) : CloudService(context), context(context), variant(variant) {
 
     // config
-    if (variant == CalDAV::Google) {
-        settings.insert(Key, GC_DVGOOGLE_CALID);
-        settings.insert(OAuthToken, GC_GOOGLE_CALENDAR_REFRESH_TOKEN);
-    } else if (variant == CalDAV::Webcal) {
+    if (variant == CalDAV::Webcal) {
         settings.insert(URL, GC_WEBCAL_URL);
     } else {
         settings.insert(URL, GC_DVURL);
@@ -80,7 +77,6 @@ QImage CalDAVCloud::logo() const
 }
 
 static bool addCalDAVCloud() {
-    CloudServiceFactory::instance().addService(new CalDAVCloud(NULL, CalDAV::Google));
     CloudServiceFactory::instance().addService(new CalDAVCloud(NULL, CalDAV::Standard));
     CloudServiceFactory::instance().addService(new CalDAVCloud(NULL, CalDAV::Webcal));
     return true;

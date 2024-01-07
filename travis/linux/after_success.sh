@@ -1,7 +1,7 @@
 #!/bin/bash
 set -ev
-export PATH=/opt/qt514/bin:$PATH
-export LD_LIBRARY_PATH=/opt/qt514/lib/x86_64-linux-gnu:/opt/qt514/lib:$LD_LIBRARY_PATH
+export PATH=/opt/qt515/bin:$PATH
+export LD_LIBRARY_PATH=/opt/qt515/lib/x86_64-linux-gnu:/opt/qt515/lib:$LD_LIBRARY_PATH
 
 ### This script should be run from GoldenCheetah src directory after build
 cd src
@@ -18,6 +18,15 @@ mkdir -p appdir
 # Executable
 cp GoldenCheetah appdir
 
+# AppRun file
+cat >appdir/AppRun <<EOF
+#!/bin/bash
+HERE="\$(dirname "\$(readlink -f "\${0}")")"
+export QTWEBENGINE_DISABLE_SANDBOX=1
+exec "\${HERE}/GoldenCheetah" "\$@"
+EOF
+chmod a+x appdir/AppRun
+
 # Desktop file
 cat >appdir/GoldenCheetah.desktop <<EOF
 [Desktop Entry]
@@ -33,41 +42,37 @@ EOF
 # Icon
 cp Resources/images/gc.png appdir/
 
-### Add OpenSSL 1.1 libs (to make it easier for Xenial users)
-mkdir appdir/lib
-cp /usr/local/lib/libssl.so.1.1 appdir/lib
-cp /usr/local/lib/libcrypto.so.1.1 appdir/lib
-
 ### Add vlc 3
+mkdir appdir/lib
 cp -r /usr/lib/x86_64-linux-gnu/vlc appdir/lib/vlc
 sudo appdir/lib/vlc/vlc-cache-gen appdir/lib/vlc/plugins
 
 ### Download current version of linuxdeployqt
-wget --no-verbose -c https://github.com/probonopd/linuxdeployqt/releases/download/6/linuxdeployqt-6-x86_64.AppImage
-chmod a+x linuxdeployqt-6-x86_64.AppImage
+wget --no-verbose -c https://github.com/probonopd/linuxdeployqt/releases/download/7/linuxdeployqt-7-x86_64.AppImage
+chmod a+x linuxdeployqt-7-x86_64.AppImage
 
 ### Deploy to appdir
-./linuxdeployqt-6-x86_64.AppImage appdir/GoldenCheetah -verbose=2 -bundle-non-qt-libs -exclude-libs=libqsqlmysql,libqsqlpsql,libnss3,libnssutil3,libxcb-dri3.so.0
+./linuxdeployqt-7-x86_64.AppImage appdir/GoldenCheetah -verbose=2 -bundle-non-qt-libs -exclude-libs=libqsqlmysql,libqsqlpsql,libnss3,libnssutil3,libxcb-dri3.so.0 -unsupported-allow-new-glibc
 
 # Add Python and core modules
-wget https://github.com/niess/python-appimage/releases/download/python3.7/python3.7.9-cp37-cp37m-manylinux1_x86_64.AppImage
-chmod +x python3.7.9-cp37-cp37m-manylinux1_x86_64.AppImage
-./python3.7.9-cp37-cp37m-manylinux1_x86_64.AppImage --appimage-extract
-rm -f python3.7.9-cp37-cp37m-manylinux1_x86_64.AppImage
+wget --no-verbose https://github.com/niess/python-appimage/releases/download/python3.7/python3.7.17-cp37-cp37m-manylinux1_x86_64.AppImage
+chmod +x python3.7.17-cp37-cp37m-manylinux1_x86_64.AppImage
+./python3.7.17-cp37-cp37m-manylinux1_x86_64.AppImage --appimage-extract
+rm -f python3.7.17-cp37-cp37m-manylinux1_x86_64.AppImage
 export PATH="$(pwd)/squashfs-root/usr/bin:$PATH"
 pip install --upgrade pip
-pip install -r Python/requirements.txt
+pip install -q -r Python/requirements.txt
 mv squashfs-root/usr appdir/usr
 mv squashfs-root/opt appdir/opt
 rm -rf squashfs-root
 
 # Generate AppImage
-wget "https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage"
+wget --no-verbose "https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage"
 chmod a+x appimagetool-x86_64.AppImage
 ./appimagetool-x86_64.AppImage appdir
 
 ### Cleanup
-rm linuxdeployqt-6-x86_64.AppImage
+rm linuxdeployqt-7-x86_64.AppImage
 rm appimagetool-x86_64.AppImage
 rm -rf appdir
 

@@ -28,6 +28,9 @@
 #include "Settings.h"
 #include "Context.h"
 
+Q_DECLARE_LOGGING_CATEGORY(gcUsb)
+Q_LOGGING_CATEGORY(gcUsb, "gc.usb")
+
 #ifdef LIBUSB_V_1
 #define USB_ENDPOINT_DIR_MASK LIBUSB_ENDPOINT_DIR_MASK
 
@@ -166,6 +169,7 @@ void LibUsb::close()
     if (libNotInstalled) return;
 #endif
     if (device) {
+        qCDebug(gcUsb) << "Closing usb device" << device;
         // stop any further write attempts whilst we close down
         usb_dev_handle *p = device;
         device = NULL;
@@ -202,6 +206,7 @@ int LibUsb::read(char *buf, int bytes, int timeout)
         // Yes, so do it
         memcpy(buf, readBuf+readBufIndex, bytes);
         readBufIndex += bytes;
+        qCDebug(gcUsb) << "Read" << QByteArray((const char *)buf, bytes).toHex(':') << "from buffer for usb device" << device;
         return bytes;
     }
 
@@ -210,6 +215,7 @@ int LibUsb::read(char *buf, int bytes, int timeout)
     //     devices not working again after restart "sometimes"
     if (bufRemain > 0) {
         memcpy(buf, readBuf+readBufIndex, bufRemain);
+        qCDebug(gcUsb) << "Read first" << bufRemain << "bytes from buffer for usb device" << device;
     }
 
     readBufSize = 0;
@@ -218,8 +224,8 @@ int LibUsb::read(char *buf, int bytes, int timeout)
     int rc = usb_bulk_read(device, readEndpoint, readBuf, 64, timeout);
     if (rc < 0)
     {
-        // don't report timeouts - lots of noise so commented out
-        //qDebug()<<"usb_bulk_read Error reading: "<<rc<< usb_strerror();
+        // don't report timeouts by default, lots of noise, active only in gcUsb logging category
+        qCDebug(gcUsb) << "usb_bulk_read Error reading:" << rc << usb_strerror();
         return rc;
     }
     readBufSize = rc;
@@ -239,6 +245,7 @@ int LibUsb::read(char *buf, int bytes, int timeout)
         readBufIndex = 0;
     }
 
+    qCDebug(gcUsb) << "Read" << QByteArray((const char *)buf, rc).toHex(':') << "from usb device" << device;
     return rc;
 }
 
@@ -262,11 +269,13 @@ int LibUsb::write(char *buf, int bytes, int timeout)
     int rc;
     if (OperatingSystem == WINDOWS) {
         rc = usb_interrupt_write(device, writeEndpoint, buf, bytes, 1000);
+        qCDebug(gcUsb) << "Write" << QByteArray((const char *)buf, bytes).toHex(':') << "to usb device" << device;
     } else {
         // we use a non-interrupted write on Linux/Mac since the interrupt
         // write block size is incorrectly implemented in the version of
         // libusb we build with. It is no less efficient.
         rc = usb_bulk_write(device, writeEndpoint, buf, bytes, timeout);
+        qCDebug(gcUsb) << "Write" << QByteArray((const char *)buf, bytes).toHex(':') << "to usb device" << device;
     }
 
     if (rc < 0)
@@ -316,6 +325,7 @@ bool LibUsb::findFortius()
     delete firstBus;
 #endif
 
+    qCDebug(gcUsb) << "findFortius returns" << found;
     return found;
 }
 
@@ -375,6 +385,7 @@ usb_dev_handle* LibUsb::OpenFortius()
                 if ((udev = usb_open(dev))) {
 
                     // LOAD THE FIRMWARE
+                    qCDebug(gcUsb) << "Load firmware to uninitialized Fortius usb device" << dev->filename;
                     ezusb_load_ram (udev, appsettings->value(NULL, FORTIUS_FIRMWARE, "").toString().toLatin1(), 0, 0, usb_control_msg_ptr);
                 }
 
@@ -447,6 +458,7 @@ usb_dev_handle* LibUsb::OpenFortius()
 #ifdef LIBUSB_V_1
                                     delete firstBus;
 #endif
+                                    qCDebug(gcUsb) << "Open initialized Fortius usb device" << udev << dev->filename;
                                     return udev;
                                 }
                             }
@@ -494,6 +506,7 @@ bool LibUsb::findImagic()
     delete firstBus;
 #endif
 
+    qCDebug(gcUsb) << "findImagic returns" << found;
     return found;
 }
 
@@ -547,6 +560,7 @@ usb_dev_handle* LibUsb::OpenImagic()
                 if ((udev = usb_open(dev))) {
 
                     // LOAD THE FIRMWARE
+                    qCDebug(gcUsb) << "Load firmware to uninitialized Imagic usb device" << dev->filename;
                     int rc = ezusb_load_ram_imagic(udev, appsettings->value(NULL, IMAGIC_FIRMWARE, "").toString().toLatin1(), usb_control_msg_ptr);
 
                     if (rc < 0) {
@@ -581,6 +595,7 @@ usb_dev_handle* LibUsb::OpenImagic()
 #ifdef LIBUSB_V_1
                                             delete firstBus;
 #endif
+                                        qCDebug(gcUsb) << "Open initialized Imagic usb device" << udev << dev->filename;
                                         return udev;
                                         }
                                      }
@@ -627,6 +642,7 @@ bool LibUsb::findAntStick()
     delete firstBus;
 #endif
 
+    qCDebug(gcUsb) << "findAnt returns" << found;
     return found;
 }
 
@@ -705,6 +721,7 @@ usb_dev_handle* LibUsb::OpenAntStick()
 #ifdef LIBUSB_V_1
                                     delete firstBus;
 #endif
+                                    qCDebug(gcUsb) << "Open Ant usb device" << udev << dev->filename;
                                     return udev;
                                 }
                             }

@@ -55,7 +55,9 @@ ANTChannel::init()
     messages_received=0;
     messages_dropped=0;
     setId();
-    srm_offset=400; // default relatively arbitrary, but matches common 'indoors' values
+    // retrieve srm_offset from last successful calibration,
+    // default relatively arbitrary, but matches common 'indoors' values
+    srm_offset=appsettings->value(this, SRM_OFFSET, 400).toDouble();
     burstInit();
     value2=value=0;
     status = Closed;
@@ -413,6 +415,8 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
                         // 5 seconds have elapsed since starting calibration, so assume completed
                         qDebug() << "ANT Sport calibration succeeded";
                         srm_offset = srm_offset_instant;
+                        // persist offset value in global settings
+                        appsettings->setValue(SRM_OFFSET, srm_offset);
                         parent->setCalibrationZeroOffset(srm_offset);
                         parent->setCalibrationSlope(srm_slope);
                         parent->setCalibrationState(CALIBRATION_STATE_SUCCESS);

@@ -209,10 +209,10 @@ QString IntervalSummaryWindow::summary(QList<IntervalItem*> intervals, QString &
     }
 
     QString s;
-    if (appsettings->contains(GC_SETTINGS_INTERVAL_METRICS))
-        s = appsettings->value(this, GC_SETTINGS_INTERVAL_METRICS).toString();
+    if (appsettings->contains(GC_SETTINGS_FAVOURITE_METRICS))
+        s = appsettings->value(this, GC_SETTINGS_FAVOURITE_METRICS).toString();
     else
-        s = GC_SETTINGS_INTERVAL_METRICS_DEFAULT;
+        s = GC_SETTINGS_FAVOURITE_METRICS_DEFAULT;
     QStringList intervalMetrics = s.split(",");
     const RideMetricFactory &factory = RideMetricFactory::instance();
 
@@ -306,10 +306,10 @@ QString IntervalSummaryWindow::summary(IntervalItem *interval)
     bool useMetricUnits = GlobalContext::context()->useMetricUnits;
 
     QString s;
-    if (appsettings->contains(GC_SETTINGS_INTERVAL_METRICS))
-        s = appsettings->value(this, GC_SETTINGS_INTERVAL_METRICS).toString();
+    if (appsettings->contains(GC_SETTINGS_FAVOURITE_METRICS))
+        s = appsettings->value(this, GC_SETTINGS_FAVOURITE_METRICS).toString();
     else
-        s = GC_SETTINGS_INTERVAL_METRICS_DEFAULT;
+        s = GC_SETTINGS_FAVOURITE_METRICS_DEFAULT;
     QStringList intervalMetrics = s.split(",");
 
     html += "<b>" + interval->name + "</b>";

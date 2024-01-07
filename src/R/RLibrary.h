@@ -19,6 +19,10 @@
 #ifndef GC_R_Library_H
 #define GC_R_Library_H
 
+#ifdef __GNUC__
+#pragma GCC diagnostic ignored "-Wparentheses"
+#endif
+
 // QFunctionPointer typedef introduced in QT5
 #include <QtGlobal>
 #include <QCoreApplication>

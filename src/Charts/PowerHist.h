@@ -38,8 +38,9 @@
 #include <qwt_plot_zoomer.h>
 #include <qwt_plot_marker.h>
 #include <qwt_point_3d.h>
-#include <qwt_compat.h>
 #include <qwt_scale_draw.h>
+#include <qwt_scale_map.h>
+#include <qwt_text.h>
 #include <qsettings.h>
 #include <qvariant.h>
 #include <algorithm> // for std::min()
@@ -171,6 +172,7 @@ class PowerHist : public QwtPlot
         void setWithZeros(bool value);
         void setZoned(bool value);
         void setCPZoned(bool value);
+        void setZoneLimited(bool value);
         void setSumY(bool value);
         void configChanged(qint32);
         void setAxisTitle(int axis, QString label);
@@ -226,6 +228,7 @@ class PowerHist : public QwtPlot
         bool shade;
         bool zoned;        // show in zones
         bool cpzoned;        // show in cp zones
+        bool zoneLimited;  // show zone limits
         double binw;
         bool withz;        // whether zeros are included in histogram
         double dt;         // length of sample
@@ -280,6 +283,7 @@ class PowerHist : public QwtPlot
         bool LASTlny;
         bool LASTzoned;        // show in zones
         bool LASTcpzoned;        // show in zones
+        bool LASTzoneLimited;  // show zone limits
         double LASTbinw;
         bool LASTwithz;        // whether zeros are included in histogram
         double LASTdt;         // length of sample
@@ -319,7 +323,7 @@ public:
 	if (! rideItem)
 	    return;
 
-	const Zones *zones = parent->context->athlete->zones(rideItem->isRun);
+	const Zones *zones = parent->context->athlete->zones(rideItem->sport);
         int zone_range = -1;
         if (zones) zone_range = zones->whichRange(rideItem->dateTime.date());
 
@@ -382,7 +386,7 @@ public:
 	if (! rideItem)
 	    return;
 
-	const Zones *zones = parent->context->athlete->zones(rideItem->isRun);
+	const Zones *zones = parent->context->athlete->zones(rideItem->sport);
         int zone_range = -1;
         if (zones) zone_range = zones->whichRange(rideItem->dateTime.date());
 
@@ -473,7 +477,7 @@ public:
 	if (! rideItem)
 	    return;
 
-	const HrZones *zones = parent->context->athlete->hrZones(rideItem->isRun);
+	const HrZones *zones = parent->context->athlete->hrZones(rideItem->sport);
         int zone_range = -1;
         if (zones) zone_range = zones->whichRange(rideItem->dateTime.date());
 
@@ -524,7 +528,7 @@ public:
 	if (! rideItem)
 	    return;
 
-	const HrZones *zones = parent->context->athlete->hrZones(rideItem->isRun);
+	const HrZones *zones = parent->context->athlete->hrZones(rideItem->sport);
         int zone_range = -1;
         if (zones) zone_range = zones->whichRange(rideItem->dateTime.date());
 

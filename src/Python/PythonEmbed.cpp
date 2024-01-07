@@ -98,7 +98,7 @@ bool PythonEmbed::pythonInstalled(QString &pybin, QString &pypath, QString PYTHO
             if (QFileInfo(filename).exists() && QFileInfo(filename).isExecutable()) {
                 pythonbinary=filename;
                 pybin=pythonbinary;
-                printd("Binary found");
+                printd("Binary found\n");
                 break;
             }
         }
@@ -126,18 +126,19 @@ bool PythonEmbed::pythonInstalled(QString &pybin, QString &pypath, QString PYTHO
                     "print('ZZ', '%1'.join(sys.path), 'ZZ')\n"
                     "quit()\n").arg(PATHSEP);
     py.setArguments(args);
+    py.setProcessChannelMode(QProcess::ForwardedErrorChannel);
     py.start();
 
     // failed to start python
     if (py.waitForStarted(500) == false) {
-        printd("Failed to start: %s\n", pythonbinary.toStdString().c_str());
+        fprintf(stderr, "Failed to start: %s\n", pythonbinary.toStdString().c_str());
         py.terminate();
         return false;
     }
 
     // wait for output, should be rapid
-    if (py.waitForReadyRead(2000)==false) {
-        printd("Didn't get output: %s\n", pythonbinary.toStdString().c_str());
+    if (py.waitForReadyRead(4000)==false) {
+        fprintf(stderr, "Didn't get output: %s\n", pythonbinary.toStdString().c_str());
         py.terminate();
         return false;
     }
@@ -147,7 +148,7 @@ bool PythonEmbed::pythonInstalled(QString &pybin, QString &pypath, QString PYTHO
 
     // close if it didn't already
     if (py.waitForFinished(500)==false) {
-        printd("forced terminate of %s\n", pythonbinary.toStdString().c_str());
+        fprintf(stderr, "forced terminate of %s\n", pythonbinary.toStdString().c_str());
         py.terminate();
     }
 
@@ -186,6 +187,8 @@ bool PythonEmbed::pythonInstalled(QString &pybin, QString &pypath, QString PYTHO
 PythonEmbed::PythonEmbed(const bool verbose, const bool interactive) : verbose(verbose), interactive(interactive)
 {
     loaded = false;
+    chart = NULL;
+    perspective = NULL;
     threadid=-1;
     name = QString("GoldenCheetah");
 
@@ -222,8 +225,8 @@ PythonEmbed::PythonEmbed(const bool verbose, const bool interactive) : verbose(v
         printd("Python is installed: %s\n", pybin.toStdString().c_str());
 
         // tell python our program name - pretend to be the usual interpreter
-        printd("Py_SetProgramName: %s\n", pybin.toStdString().c_str());
-        Py_SetProgramName((wchar_t*) pybin.toStdString().c_str());
+        printd("Py_SetProgramName: %s\n", pybin.toStdString().c_str()); // not wide char string as printd uses printf not wprintf
+        Py_SetProgramName((wchar_t*) pybin.toStdWString().c_str());
 
         // our own module
         printd("PyImport_AppendInittab: goldencheetah\n");

@@ -163,6 +163,7 @@ bool PaceZones::read(QFile &file)
                 "\\s*:?\\s*$",                                       // optional :
                 Qt::CaseInsensitive)
     };
+    QRegExp aetrx("^AeT=([\\d\\.]+)$");
     QRegExp zonerx("^\\s*([^ ,][^,]*),\\s*([^ ,][^,]*),\\s*"
                    "([\\d\\.]+)\\s*(%?)\\s*(?:,\\s*([\\d\\.]+|MAX)\\s*(%?)\\s*)?$",
                    Qt::CaseInsensitive);
@@ -176,6 +177,7 @@ bool PaceZones::read(QFile &file)
     bool in_range = false;
     QDate begin = date_zero, end = date_infinity;
     double cv=0;
+    double aet=0;
     QList<PaceZoneInfo> zoneInfos;
 
     // true if zone defaults are found in the file (then we need to write them)
@@ -216,7 +218,7 @@ bool PaceZones::read(QFile &file)
                 if (in_range) {
 
                     // if zones are empty, then generate them
-                    PaceZoneRange range(begin, end, cv);
+                    PaceZoneRange range(begin, end, cv, aet);
                     range.zones = zoneInfos;
 
                     if (range.zones.empty()) {
@@ -235,7 +237,7 @@ bool PaceZones::read(QFile &file)
 
                     } else {
 
-                        qSort(range.zones);
+                        std::sort(range.zones.begin(), range.zones.end());
 
                     }
                     ranges.append(range);
@@ -282,6 +284,14 @@ bool PaceZones::read(QFile &file)
                 // bleck
                 goto next_line;
             }
+        }
+
+        // check for AeT
+        if (aetrx.indexIn(line, 0) != -1) {
+            if (!in_range)
+                qDebug()<<"ignoring errant AeT= in "<<fileName_;
+            else
+                aet = aetrx.cap(1).toDouble();
         }
 
         // check for zone definition
@@ -371,7 +381,7 @@ next_line: {}
 
     if (in_range) {
 
-        PaceZoneRange range(begin, end, cv);
+        PaceZoneRange range(begin, end, cv, aet);
         range.zones = zoneInfos;
 
         if (range.zones.empty()) {
@@ -389,7 +399,7 @@ next_line: {}
 
         } else {
 
-            qSort(range.zones);
+            std::sort(range.zones.begin(), range.zones.end());
         }
 
         ranges.append(range);
@@ -397,7 +407,7 @@ next_line: {}
     file.close();
 
     // sort the ranges
-    qSort(ranges);
+    std::sort(ranges.begin(), ranges.end());
 
     // set the default zones if not in file
     if (!scheme.nzones_default)  {
@@ -570,6 +580,20 @@ void PaceZones::setCV(int rnum, double cv)
     modificationTime = QDateTime::currentDateTime();
 }
 
+double PaceZones::getAeT(int rnum) const
+{
+    assert(rnum < ranges.size());
+    if (ranges[rnum].aet > 0) return ranges[rnum].aet;
+    if (swim) return 0.975*ranges[rnum].cv; // Default 97.5% CV for swims
+    return 0.9*ranges[rnum].cv;             // Default 90% CV for runs
+}
+
+void PaceZones::setAeT(int rnum, double aet)
+{
+    ranges[rnum].aet = aet;
+    modificationTime = QDateTime::currentDateTime();
+}
+
 // generate a list of zones from CV
 int PaceZones::lowsFromCV(QList <double> *lows, double cv) const {
     lows->clear();
@@ -610,7 +634,7 @@ void PaceZones::setZonesFromCV(PaceZoneRange &range)
 
     // sort the zones (some may be pct, others absolute, so zones need to be sorted,
     // rather than the defaults
-    qSort(range.zones);
+    std::sort(range.zones.begin(), range.zones.end());
 
     // set zone end dates
     for (int i = 0; i < range.zones.size(); i++) {
@@ -766,6 +790,7 @@ void PaceZones::write(QDir home)
     for (int i = 0; i < ranges.size(); i++) {
 
         double cv = getCV(i);
+        double aet = getAeT(i);
 
         // print header for range
         // note this explicitly sets the first and last ranges such that all time is spanned
@@ -776,6 +801,9 @@ void PaceZones::write(QDir home)
         //       since it becomes Jan 01 1900
         strzones += QString("%1: CV=%2").arg(getStartDate(i).toString("yyyy/MM/dd")).arg(cv);
         strzones += QString("\n");
+
+        // wite out the AeT value
+        strzones += QString("AeT=%1\n").arg(aet);
 
         // step through and print the zones if they've been explicitly set
         if (!ranges[i].zonesSetFromCV) {
@@ -834,14 +862,14 @@ void PaceZones::write(QDir home)
     }
 }
 
-void PaceZones::addZoneRange(QDate _start, QDate _end, double _cv)
+void PaceZones::addZoneRange(QDate _start, QDate _end, double _cv, double _aet)
 {
-    ranges.append(PaceZoneRange(_start, _end, _cv));
+    ranges.append(PaceZoneRange(_start, _end, _cv, _aet));
 }
 
 // insert a new zone range using the current scheme
 // return the range number
-int PaceZones::addZoneRange(QDate _start, double _cv)
+int PaceZones::addZoneRange(QDate _start, double _cv, double _aet)
 {
     int rnum;
 
@@ -849,8 +877,8 @@ int PaceZones::addZoneRange(QDate _start, double _cv)
     for(rnum=0; rnum < ranges.count(); rnum++) if (ranges[rnum].begin > _start) break;
 
     // at the end ?
-    if (rnum == ranges.count()) ranges.append(PaceZoneRange(_start, date_infinity, _cv)); 
-    else ranges.insert(rnum, PaceZoneRange(_start, ranges[rnum].begin, _cv));
+    if (rnum == ranges.count()) ranges.append(PaceZoneRange(_start, date_infinity, _cv, _aet)); 
+    else ranges.insert(rnum, PaceZoneRange(_start, ranges[rnum].begin, _cv, _aet));
 
     // modify previous end date
     if (rnum) ranges[rnum-1].end = _start;
@@ -960,6 +988,9 @@ PaceZones::getFingerprint() const
         // CV
         x += int(double(100.0f * ranges[i].cv));
 
+        // AeT
+        x += int(double(100.0f * ranges[i].aet));
+
         // each zone definition (manual edit/default changed)
         for (int j=0; j<ranges[i].zones.count(); j++) {
             x += int(double(100.0f * ranges[i].zones[j].lo));
@@ -981,6 +1012,9 @@ PaceZones::getFingerprint(QDate forDate) const
         // CV
         x += int(double(100.0f * ranges[i].cv));
 
+        // AeT
+        x += int(double(100.0f * ranges[i].aet));
+
         // each zone definition (manual edit/default changed)
         for (int j=0; j<ranges[i].zones.count(); j++) {
             x += int(double(100.0f * ranges[i].zones[j].lo));
@@ -998,6 +1032,7 @@ PaceZones::kphFromTime(QTimeEdit *cvedit, bool metric) const
     // it to kph so we can store it in the zones file
 
     double secs = cvedit->time().secsTo(QTime(0,0,0)) * -1;
+    if (secs == 0) return 0; // avoid division by zero
     if (swim)
         return (metric ? 1.00f : METERS_PER_YARD ) * (360.00f / secs);
     else

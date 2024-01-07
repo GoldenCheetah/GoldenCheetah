@@ -41,7 +41,7 @@
 #include <QWebEngineDownloadItem>
 
 // overlay helper
-#include "TabView.h"
+#include "AbstractView.h"
 #include "GcOverlayWidget.h"
 #include "IntervalSummaryWindow.h"
 #include <QDebug>
@@ -113,8 +113,8 @@ WebPageWindow::WebPageWindow(Context *context) : GcChartWindow(context), context
 
     QWidget *settingsWidget = new QWidget(this);
     settingsWidget->setContentsMargins(0,0,0,0);
-    //HelpWhatsThis *helpSettings = new HelpWhatsThis(settingsWidget);
-    //settingsWidget->setWhatsThis(helpSettings->getWhatsThisText(HelpWhatsThis::ChartRides_Critical_MM_Config_Settings));
+    HelpWhatsThis *helpSettings = new HelpWhatsThis(settingsWidget);
+    settingsWidget->setWhatsThis(helpSettings->getWhatsThisText(HelpWhatsThis::Chart_Web));
 
 
     QFormLayout *commonLayout = new QFormLayout(settingsWidget);
@@ -124,7 +124,7 @@ WebPageWindow::WebPageWindow(Context *context) : GcChartWindow(context), context
     customUrl->setText("");
 
     commonLayout->addRow(customUrlLabel, customUrl);
-    commonLayout->addRow(new QLabel("Hit return to apply URL"));
+    commonLayout->addRow(new QLabel(tr("Hit return to apply URL")));
 
     setControls(settingsWidget);
 
@@ -166,7 +166,7 @@ WebPageWindow::WebPageWindow(Context *context) : GcChartWindow(context), context
     layout->addWidget(view);
 
     HelpWhatsThis *help = new HelpWhatsThis(view);
-    view->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::ChartRides_Map));
+    view->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::Chart_Web));
 
     // if we change in settings, force replot by pressing return
     connect(customUrl, SIGNAL(returnPressed()), this, SLOT(forceReplot()));
@@ -181,6 +181,7 @@ WebPageWindow::WebPageWindow(Context *context) : GcChartWindow(context), context
 
 WebPageWindow::~WebPageWindow()
 {
+  if (view) delete view->page();
 }
 
 void 

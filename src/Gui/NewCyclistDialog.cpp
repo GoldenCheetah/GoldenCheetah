@@ -56,6 +56,7 @@ NewCyclistDialog::NewCyclistDialog(QDir home) : QDialog(NULL, Qt::Dialog), home(
 
     dob = new QDateEdit(this);
     dob->setCalendarPopup(true);
+    dob->setDisplayFormat("yyyy/MM/dd");
 
     sex = new QComboBox(this);
     sex->addItem(tr("Male"));
@@ -330,22 +331,22 @@ NewCyclistDialog::saveClicked()
 
                 // Setup Power Zones
                 Zones zones;
-                zones.addZoneRange(QDate(1900, 01, 01), cp->value(), cp->value(), w->value(), pmax->value());
+                zones.addZoneRange(QDate(1900, 01, 01), cp->value(), 0, cp->value(), w->value(), pmax->value());
                 zones.write(athleteHome->config().canonicalPath());
 
                 // HR Zones too!
                 HrZones hrzones;
-                hrzones.addHrZoneRange(QDate(1900, 01, 01), lthr->value(), resthr->value(), maxhr->value());
+                hrzones.addHrZoneRange(QDate(1900, 01, 01), lthr->value(), 0, resthr->value(), maxhr->value());
                 hrzones.write(athleteHome->config().canonicalPath());
 
                 // Pace Zones for Run
                 PaceZones rnPaceZones(false);
-                rnPaceZones.addZoneRange(QDate(1900, 01, 01), rnPaceZones.kphFromTime(cvRn, useMetricUnits));
+                rnPaceZones.addZoneRange(QDate(1900, 01, 01), rnPaceZones.kphFromTime(cvRn, useMetricUnits), 0);
                 rnPaceZones.write(athleteHome->config().canonicalPath());
 
                 // Pace Zones for Run
                 PaceZones swPaceZones(true);
-                swPaceZones.addZoneRange(QDate(1900, 01, 01), swPaceZones.kphFromTime(cvSw, useMetricUnits));
+                swPaceZones.addZoneRange(QDate(1900, 01, 01), swPaceZones.kphFromTime(cvSw, useMetricUnits), 0);
                 swPaceZones.write(athleteHome->config().canonicalPath());
 
                 appsettings->syncQSettingsAllAthletes();

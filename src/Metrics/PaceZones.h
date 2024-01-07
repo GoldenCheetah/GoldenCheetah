@@ -48,7 +48,7 @@ struct PaceZoneInfo {
     PaceZoneInfo(const QString &n, const QString &d, double l, double h) :
         name(n), desc(d), lo(l), hi(h) {}
 
-    // used by qSort()
+    // used by std::sort
     bool operator< (PaceZoneInfo right) const {
         return ((lo < right.lo) || ((lo == right.lo) && (hi < right.hi)));
     }
@@ -63,14 +63,15 @@ struct PaceZoneInfo {
 struct PaceZoneRange {
     QDate begin, end;
     double cv;
+    double aet;
     QList<PaceZoneInfo> zones;
     bool zonesSetFromCV;
     PaceZoneRange(const QDate &b, const QDate &e) :
-        begin(b), end(e), cv(0), zonesSetFromCV(false) {}
-    PaceZoneRange(const QDate &b, const QDate &e, double _cv) :
-        begin(b), end(e), cv(_cv), zonesSetFromCV(false) {}
+        begin(b), end(e), cv(0), aet(0), zonesSetFromCV(false) {}
+    PaceZoneRange(const QDate &b, const QDate &e, double _cv, double _aet) :
+        begin(b), end(e), cv(_cv), aet(_aet), zonesSetFromCV(false) {}
 
-    // used by qSort()
+    // used by std::sort
     bool operator< (PaceZoneRange right) const {
         return (((! right.begin.isNull()) &&
                 (begin.isNull() || begin < right.begin )) ||
@@ -132,8 +133,8 @@ class PaceZones : public QObject
         int getRangeSize() const;
 
         // Add ranges
-        void addZoneRange(QDate _start, QDate _end, double _cv);
-        int addZoneRange(QDate _start, double _cv);
+        void addZoneRange(QDate _start, QDate _end, double _cv, double _aet);
+        int addZoneRange(QDate _start, double _cv, double _aet);
         void addZoneRange();
 
         // Get / Set ZoneRange details
@@ -143,6 +144,10 @@ class PaceZones : public QObject
         // get and set CV for a given range
         double getCV(int rnum) const;
         void setCV(int rnum, double cv);
+
+        // get and set AeT for a given range
+        double getAeT(int rnum) const;
+        void setAeT(int rnum, double aet);
 
         // calculate and then set zoneinfo for a given range
         void setZonesFromCV(int rnum);

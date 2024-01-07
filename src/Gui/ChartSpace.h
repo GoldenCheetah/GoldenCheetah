@@ -57,6 +57,8 @@ class ChartSpaceItem : public QGraphicsWidget
 {
     Q_OBJECT
 
+    friend class ::ChartSpace;
+
     public:
 
         // When subclassing you must reimplement these
@@ -64,13 +66,22 @@ class ChartSpaceItem : public QGraphicsWidget
         virtual void itemGeometryChanged() =0;
         virtual void setData(RideItem *item)=0;
         virtual void setDateRange(DateRange )=0;
+        virtual QColor color();
         virtual QRectF hotspot() { return QRectF(0,0,0,0); } // don't steal events from this area of the item
 
         virtual QWidget *config()=0; // must supply a widget to configure
+        virtual void configChanged(qint32) {}
 
         // turn off/on the config corner button
         void setShowConfig(bool x) { showconfig=x; update(); }
         bool showConfig() const { return showconfig; }
+
+        // let item know that dragging is in process
+        // for some widgets (e.g. UserChart) this means
+        // its best to hide the widgets as rendering into
+        // the scene can be really slow. For other widgets
+        // it can be safely ignored.
+        virtual void dragging(bool) { }
 
         // what type am I- managed by user
         int type;
@@ -88,6 +99,7 @@ class ChartSpaceItem : public QGraphicsWidget
             setZValue(10);
 
             // a sensible default?
+            span = 1;
             type = 0;
             delcounter=0;
 
@@ -99,6 +111,8 @@ class ChartSpaceItem : public QGraphicsWidget
             effect->setBlurRadius(10);
             this->setGraphicsEffect(effect);
 #endif
+
+            bgcolor = StandardColor(CCARDBACKGROUND).name();
 
             // watch geom changes
             connect(this, SIGNAL(geometryChanged()), SLOT(geometryChanged()));
@@ -131,11 +145,12 @@ class ChartSpaceItem : public QGraphicsWidget
         QString datafilter;
 
         // which column, sequence and size in rows
-        int column, order, deep;
+        int column, span, order, deep;
         bool onscene, placing, drag;
         bool incorner;
         bool invisible;
         bool showconfig;
+        QString bgcolor;
         QGraphicsDropShadowEffect *effect;
 
         // base paint
@@ -144,6 +159,28 @@ class ChartSpaceItem : public QGraphicsWidget
     public slots:
 
         void geometryChanged();
+};
+
+// we copy the current items and manage their layout (which is an iterative process)
+// and once the layout is done we create an animation to move from the current positions
+// to the new positions using this class to temporarily store new co-ordinates
+class LayoutChartSpaceItem {
+
+    public:
+        LayoutChartSpaceItem(ChartSpaceItem *from) :
+            column(from->column), span(from->span), order (from->order ), deep(from->deep), onscene(from->onscene),
+            placing(from->placing), drag(from->drag), incorner(from->incorner), invisible(from->invisible),
+            item(from), geometry(from->geometry()) {}
+
+        static bool LayoutChartSpaceItemSort(const LayoutChartSpaceItem left, const LayoutChartSpaceItem right);
+
+        int column, span, order, deep;
+        bool onscene, placing, drag;
+        bool incorner;
+        bool invisible;
+
+        ChartSpaceItem *item;
+        QRectF geometry;
 };
 
 class ChartSpace : public QWidget
@@ -155,14 +192,20 @@ class ChartSpace : public QWidget
 
     public:
 
-        ChartSpace(Context *context, int scope);
+        ChartSpace(Context *context, int scope, GcWindow *window);
+        QGraphicsScene *getScene() { return scene; }
 
         // current state for event processing
-        enum { NONE, DRAG, XRESIZE, YRESIZE } state;
+        enum { NONE, DRAG, SPAN, XRESIZE, YRESIZE } state;
+
+        void setMinimumColumns(int x) { mincols=x; updateGeometry(); updateView(); }
+        int minimumColumns() const { return mincols; }
 
         // used by children
         Context *context;
         int scope;
+        int mincols;
+
         QGraphicsView *view;
         QFont titlefont, bigfont, midfont, smallfont, tinyfont;
 
@@ -174,6 +217,9 @@ class ChartSpace : public QWidget
         QGraphicsView *device() { return view; }
         const QList<ChartSpaceItem*> allItems() { return items; }
 
+        // window we are rendered in
+        GcWindow *window;
+
 
     signals:
         void itemConfigRequested(ChartSpaceItem*);
@@ -184,6 +230,10 @@ class ChartSpace : public QWidget
         void rideSelected(RideItem *item);
         void dateRangeChanged(DateRange);
         void filterChanged();
+
+        // column sizing
+        QVector<int> columnWidths() { return columns; }
+        void setColumnWidths(QVector<int> x) { columns =x; updateGeometry(); }
 
         // for smooth scrolling
         void setViewY(int x) { if (_viewY != x) {_viewY =x; updateView();} }
@@ -209,12 +259,13 @@ class ChartSpace : public QWidget
 
         // set geometry on the widgets (size and pos)
         void updateGeometry();
+        QList<LayoutChartSpaceItem> layoutItems(); // moves geom and lays out items
 
         // set scale, zoom etc appropriately
         void updateView();
 
         // add a ChartSpaceItem to the view
-        void addItem(int row, int column, int deep, ChartSpaceItem *item);
+        void addItem(int row, int column, int span, int deep, ChartSpaceItem *item);
 
         // remove an item
         void removeItem(ChartSpaceItem *item);
@@ -223,6 +274,11 @@ class ChartSpace : public QWidget
         // zoom width, so we don't get a massive athlete
         // card when only one athlete
         void setFixedZoom(int width);
+
+        // which column are we in for position x
+        int columnForX(int x);
+        // how many items are in this column?
+        int columnCount(int x);
 
     protected:
 
@@ -272,6 +328,7 @@ class ChartSpace : public QWidget
             } yresize;
 
             struct {
+                ChartSpaceItem *item; // span resize
                 double posx;
                 int width;
                 int column;

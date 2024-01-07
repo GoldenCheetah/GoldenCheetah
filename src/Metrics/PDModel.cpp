@@ -210,7 +210,7 @@ PDModel::deriveCPParameters(int model)
         // RMSE
         double RMSE=sqrt(mean);
         double CV=(RMSE/MEAN) * 100;
-        fitsummary = QString("RMSE %1w CV %4% R<sup>2</sup>=%3 [LR] %2 points").arg(RMSE, 0, 'f', 0)
+        fitsummary = tr("RMSE %1w CV %4% R<sup>2</sup>=%3 [LR] %2 points").arg(RMSE, 0, 'f', 0)
                                                                                        .arg(t.size())
                                                                                        .arg(R2, 0, 'f', 3)
                                                                                        .arg(CV, 0, 'f', 1);
@@ -329,7 +329,7 @@ PDModel::deriveCPParameters(int model)
         // RMSE and CV
         double RMSE=sqrt(mean);
         double CV=(RMSE/MEAN) * 100;
-        fitsummary = QString("RMSE %1w CV %3% [LM] %2 points").arg(RMSE, 0, 'f', 0)
+        fitsummary = tr("RMSE %1w CV %3% [LM] %2 points").arg(RMSE, 0, 'f', 0)
                                                                       .arg(p.size())
                                                                       .arg(CV, 0, 'f', 1);
 
@@ -476,7 +476,7 @@ PDModel::calcSummary()
     // RMSE
     double RMSE=sqrt(mean);
     double CV=(RMSE/MEAN) *100;
-    fitsummary = QString("RMSE %1w CV %3% [envelope] %2 points").arg(RMSE, 0, 'f', 0).arg(data.size()).arg(CV,0,'f',1);
+    fitsummary = tr("RMSE %1w CV %3% [envelope] %2 points").arg(RMSE, 0, 'f', 0).arg(data.size()).arg(CV,0,'f',1);
 }
 
 //
@@ -989,16 +989,6 @@ ExtendedModel::onIntervalsChanged()
 void
 ExtendedModel::deriveExtCPParameters()
 {
-    // initial estimates
-    paa = 1000;
-    etau = 1.2;
-    ecp = 300;
-    paa_dec = -2;
-    ecp_del = -0.9;
-    tau_del = -4.8;
-    ecp_dec = -0.6;
-    ecp_dec_del = -180;
-
 #if 0
     // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     // LEAST SQUARES FIT WITH ECP MODEL REQUIRES
@@ -1114,6 +1104,15 @@ ExtendedModel::deriveExtCPParameters()
                 break;
 
 
+        // initial estimates
+        paa = 1000;
+        etau = 1.2;
+        ecp = 300;
+        paa_dec = -2;
+        ecp_del = -0.9;
+        tau_del = -4.8;
+        ecp_dec = -0.6;
+        ecp_dec_del = -180;
 
         // previous loop values
         double etau_prev;
@@ -1318,7 +1317,7 @@ ExtendedModel::deriveExtCPParameters()
         // RMSE
         double RMSE=sqrt(mean);
         double CV=(RMSE/MEAN)*100;
-        fitsummary = QString("RMSE %1w CV %3% [envelope] %2 points").arg(RMSE, 0, 'f', 0).arg(data.size()).arg(CV,0,'f',1);
+        fitsummary = tr("RMSE %1w CV %3% [envelope] %2 points").arg(RMSE, 0, 'f', 0).arg(data.size()).arg(CV,0,'f',1);
 }
 
 QList<QPointF> 

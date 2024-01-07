@@ -39,7 +39,6 @@
 #include "HelpWhatsThis.h"
 #include "GcUpgrade.h"
 #include "Dropbox.h"
-#include "GoogleDrive.h"
 #include "LocalFileStore.h"
 #include "Secrets.h"
 #include "Utils.h"
@@ -445,6 +444,9 @@ GeneralPage::browseAthleteDir()
 //
 DevicePage::DevicePage(QWidget *parent, Context *context) : QWidget(parent), context(context)
 {
+    HelpWhatsThis *help = new HelpWhatsThis(this);
+    this->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::Preferences_Training_TrainDevices));
+
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
 
     DeviceTypes all;
@@ -712,6 +714,9 @@ bool deviceModel::setData(const QModelIndex &index, const QVariant &value, int r
 //
 TrainOptionsPage::TrainOptionsPage(QWidget *parent, Context *context) : QWidget(parent), context(context)
 {
+    HelpWhatsThis *help = new HelpWhatsThis(this);
+    this->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::Preferences_Training_Preferences));
+
     //
     // Workout directory (train view)
     //
@@ -725,7 +730,7 @@ TrainOptionsPage::TrainOptionsPage(QWidget *parent, Context *context) : QWidget(
     connect(workoutBrowseButton, SIGNAL(clicked()), this, SLOT(browseWorkoutDir()));
 
     useSimulatedSpeed = new QCheckBox(tr("Simulate Speed From Power"), this);
-    useSimulatedSpeed->setChecked(appsettings->value(this, TRAIN_USESIMULATEDSPEED, false).toBool());
+    useSimulatedSpeed->setChecked(appsettings->value(this, TRAIN_USESIMULATEDSPEED, true).toBool());
     useSimulatedSpeed->setToolTip(tr("Simulation physics uses current athlete parameters and settings\n"
                                      "from the virtual bicycle specifications tab. For Erg Mode workouts\n"
                                      "the slope is assumed to be zero."));
@@ -745,11 +750,16 @@ TrainOptionsPage::TrainOptionsPage(QWidget *parent, Context *context) : QWidget(
     autoHide = new QCheckBox(tr("Auto-hide bottom bar in Train View"), this);
     autoHide->setChecked(appsettings->value(this, TRAIN_AUTOHIDE, false).toBool());
 
-    // Disabled until ported across from the existing bottom bar checkbox
-    autoHide->setDisabled(true);
-
     lapAlert = new QCheckBox(tr("Play sound before new lap"), this);
     lapAlert->setChecked(appsettings->value(this, TRAIN_LAPALERT, false).toBool());
+
+    delayLabel = new QLabel(tr("Start Countdown"));
+    startDelay = new QSpinBox(this);
+    startDelay->setMaximum(600);
+    startDelay->setMinimum(0);
+    startDelay->setSuffix(tr(" secs"));
+    startDelay->setValue(appsettings->value(this, TRAIN_STARTDELAY, 0).toUInt());
+    startDelay->setToolTip(tr("Countdown for workout start"));
 
     QVBoxLayout *all = new QVBoxLayout(this);
 
@@ -765,6 +775,13 @@ TrainOptionsPage::TrainOptionsPage(QWidget *parent, Context *context) : QWidget(
     all->addWidget(autoConnect);
     all->addWidget(autoHide);
     all->addWidget(lapAlert);
+
+    QHBoxLayout *delayLayout = new QHBoxLayout;
+    delayLayout->addWidget(delayLabel);
+    delayLayout->addWidget(startDelay);
+    delayLayout->addStretch();
+    all->addLayout(delayLayout);
+
     all->addStretch();
 }
 
@@ -778,6 +795,7 @@ TrainOptionsPage::saveClicked()
     appsettings->setValue(TRAIN_USESIMULATEDHYPOXIA, useSimulatedHypoxia->isChecked());
     appsettings->setValue(TRAIN_MULTI, multiCheck->isChecked());
     appsettings->setValue(TRAIN_AUTOCONNECT, autoConnect->isChecked());
+    appsettings->setValue(TRAIN_STARTDELAY, startDelay->value());
     appsettings->setValue(TRAIN_AUTOHIDE, autoHide->isChecked());
     appsettings->setValue(TRAIN_LAPALERT, lapAlert->isChecked());
 
@@ -800,6 +818,9 @@ TrainOptionsPage::browseWorkoutDir()
 //
 RemotePage::RemotePage(QWidget *parent, Context *context) : QWidget(parent), context(context)
 {
+    HelpWhatsThis *help = new HelpWhatsThis(this);
+    this->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::Preferences_Training_RemoteControls));
+
     remote = new RemoteControl;
 
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
@@ -831,7 +852,7 @@ RemotePage::RemotePage(QWidget *parent, Context *context) : QWidget(parent), con
     foreach (RemoteCmd nativeCmd, nativeCmds) {
 
         QComboBox *comboBox = new QComboBox(this);
-        comboBox->addItem("<unset>");
+        comboBox->addItem(tr("<unset>"));
 
         // populate the combo box with all possible ANT commands
         foreach(RemoteCmd antCmd, antCmds) {
@@ -1040,6 +1061,9 @@ SimBicyclePage::SetStatsLabelArray(double )
 
 SimBicyclePage::SimBicyclePage(QWidget *parent, Context *context) : QWidget(parent), context(context)
 {
+    HelpWhatsThis *help = new HelpWhatsThis(this);
+    this->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::Preferences_Training_VirtualBicycleSpecifications));
+
     QVBoxLayout *all = new QVBoxLayout(this);
     QGridLayout *grid = new QGridLayout;
 
@@ -1158,7 +1182,6 @@ SimBicyclePage::saveClicked()
 }
 
 
-static double scalefactors[9] = { 0.5f, 0.6f, 0.8, 0.9, 1.0f, 1.1f, 1.25f, 1.5f, 2.0f };
 
 //
 // Appearances page
@@ -1178,11 +1201,19 @@ ColorsPage::ColorsPage(QWidget *parent) : QWidget(parent)
     themes->setIndentation(0);
     //colors->header()->resizeSection(0,300);
 
+    QLabel *searchLabel = new QLabel(tr("Search"));
+    searchEdit = new QLineEdit(this);
+    QHBoxLayout *searchLayout = new QHBoxLayout();
+    searchLayout->addWidget(searchLabel);
+    searchLayout->addWidget(searchEdit);
+
     colors = new QTreeWidget;
-    colors->headerItem()->setText(0, tr("Color"));
-    colors->headerItem()->setText(1, tr("Select"));
-    colors->setColumnCount(2);
-    colors->setColumnWidth(0,350 *dpiXFactor);
+    colors->headerItem()->setText(0, tr("Group"));
+    colors->headerItem()->setText(1, tr("Color"));
+    colors->headerItem()->setText(2, tr("Select"));
+    colors->setColumnCount(3);
+    colors->setColumnWidth(0,70 *dpiXFactor);
+    colors->setColumnWidth(1,350 *dpiXFactor);
     colors->setSelectionMode(QAbstractItemView::NoSelection);
     //colors->setEditTriggers(QAbstractItemView::SelectedClicked); // allow edit
     colors->setUniformRowHeights(true); // causes height problems when adding - in case of non-text fields
@@ -1223,11 +1254,11 @@ ColorsPage::ColorsPage(QWidget *parent) : QWidget(parent)
     double scale = appsettings->value(this, GC_FONT_SCALE, 1.0).toDouble();
     fontscale = new QSlider(this);
     fontscale->setMinimum(0);
-    fontscale->setMaximum(8);
+    fontscale->setMaximum(11);
     fontscale->setTickInterval(1);
     fontscale->setValue(3);
     fontscale->setOrientation(Qt::Horizontal);
-    for(int i=0; i<7; i++) {
+    for(int i=0; i<12; i++) {
         if (scalefactors[i] == scale) {
             fontscale->setValue(i);
             break;
@@ -1237,9 +1268,9 @@ ColorsPage::ColorsPage(QWidget *parent) : QWidget(parent)
     QFont font=baseFont;
     font.setPointSizeF(baseFont.pointSizeF() * scale);
     fonttext = new QLabel(this);
-    fonttext->setText("The quick brown fox jumped over the lazy dog");
+    fonttext->setText(tr("The quick brown fox jumped over the lazy dog"));
     fonttext->setFont(font);
-    fonttext->setFixedHeight(30 * dpiYFactor);
+    fonttext->setFixedHeight(90 * dpiYFactor);
     fonttext->setFixedWidth(330 * dpiXFactor);
 
     QGridLayout *grid = new QGridLayout;
@@ -1253,10 +1284,10 @@ ColorsPage::ColorsPage(QWidget *parent) : QWidget(parent)
     grid->addWidget(antiAliasLabel, 1,3);
     grid->addWidget(antiAliased, 1,4);
 #ifndef Q_OS_MAC
-    grid->addWidget(rideScrollLabel, 2,3);
-    grid->addWidget(rideScroll, 2,4);
-    grid->addWidget(rideHeadLabel, 3,3);
-    grid->addWidget(rideHead, 3,4);
+    grid->addWidget(rideScrollLabel, 2,3, Qt::AlignLeft|Qt::AlignTop);
+    grid->addWidget(rideScroll, 2,4, Qt::AlignLeft|Qt::AlignTop);
+    //grid->addWidget(rideHeadLabel, 3,3); // Disabled in RideNavigator
+    //grid->addWidget(rideHead, 3,4);      // better don't display
 #endif
 
     grid->addWidget(def, 0,1, Qt::AlignVCenter|Qt::AlignLeft);
@@ -1273,7 +1304,12 @@ ColorsPage::ColorsPage(QWidget *parent) : QWidget(parent)
 
     colorTab = new QTabWidget(this);
     colorTab->addTab(themes, tr("Theme"));
-    colorTab->addTab(colors, tr("Colors"));
+
+    QWidget *colortab= new QWidget(this);
+    QVBoxLayout *colorLayout = new QVBoxLayout(colortab);
+    colorLayout->addLayout(searchLayout);
+    colorLayout->addWidget(colors);
+    colorTab->addTab(colortab, tr("Colors"));
     colorTab->setCornerWidget(applyTheme);
 
     mainLayout->addWidget(colorTab);
@@ -1284,10 +1320,16 @@ ColorsPage::ColorsPage(QWidget *parent) : QWidget(parent)
         QTreeWidgetItem *add;
         ColorButton *colorButton = new ColorButton(this, colorSet[i].name, colorSet[i].color);
         add = new QTreeWidgetItem(colors->invisibleRootItem());
-        add->setText(0, colorSet[i].name);
-        colors->setItemWidget(add, 1, colorButton);
+        add->setData(0, Qt::UserRole, i); // remember which index it is for since gets sorted
+        add->setText(0, colorSet[i].group);
+        add->setText(1, colorSet[i].name);
+        colors->setItemWidget(add, 2, colorButton);
 
     }
+    colors->setSortingEnabled(true);
+    colors->sortByColumn(1, Qt::AscendingOrder); // first sort by name
+    colors->sortByColumn(0, Qt::AscendingOrder); // now by group
+
     connect(applyTheme, SIGNAL(clicked()), this, SLOT(applyThemeClicked()));
 
     foreach(ColorTheme theme, GCColor::themes().themes) {
@@ -1303,6 +1345,7 @@ ColorsPage::ColorsPage(QWidget *parent) : QWidget(parent)
     connect(colorTab, SIGNAL(currentChanged(int)), this, SLOT(tabChanged()));
     connect(def, SIGNAL(currentFontChanged(QFont)), this, SLOT(scaleFont()));
     connect(fontscale, SIGNAL(valueChanged(int)), this, SLOT(scaleFont()));
+    connect(searchEdit, SIGNAL(textChanged(QString)), this, SLOT(searchFilter(QString)));
 
     // save initial values
     b4.alias = antiAliased->isChecked();
@@ -1312,6 +1355,30 @@ ColorsPage::ColorsPage(QWidget *parent) : QWidget(parent)
 #endif
     b4.line = lineWidth->value();
     b4.fingerprint = Colors::fingerprint(colorSet);
+}
+
+void
+ColorsPage::searchFilter(QString text)
+{
+    QStringList toks = text.split(" ", Qt::SkipEmptyParts);
+    bool empty;
+    if (toks.count() == 0 || text == "") empty=true;
+    else empty=false;
+
+    for(int i=0; i<colors->invisibleRootItem()->childCount(); i++) {
+        if (empty) colors->setRowHidden(i, colors->rootIndex(), false);
+        else {
+            QString text = colors->invisibleRootItem()->child(i)->text(1);
+            bool found=false;
+            foreach(QString tok, toks) {
+                if (text.contains(tok, Qt::CaseInsensitive)) {
+                    found = true;
+                    break;
+                }
+            }
+            colors->setRowHidden(i, colors->rootIndex(), !found);
+        }
+    }
 }
 
 void
@@ -1339,14 +1406,23 @@ ColorsPage::applyThemeClicked()
     // first check we have a selection!
     if (themes->currentItem() && (index=themes->invisibleRootItem()->indexOfChild(themes->currentItem())) >= 0) {
 
+        applyThemeIndex(index);
+    }
+}
+
+void
+ColorsPage::applyThemeIndex(int index)
+{
         // now get the theme selected
         ColorTheme theme = GCColor::themes().themes[index];
 
         // reset to base
-        colorSet = GCColor::defaultColorSet();
+        colorSet = GCColor::defaultColorSet(theme.dark);
 
         // reset the color selection tools
         colors->clear();
+        colors->setSortingEnabled(false);
+
         for (int i=0; colorSet[i].name != ""; i++) {
 
             QColor color;
@@ -1357,9 +1433,14 @@ ColorsPage::applyThemeClicked()
             case CPLOTBACKGROUND:
             case CRIDEPLOTBACKGROUND:
             case CTRENDPLOTBACKGROUND:
-            case CTRAINPLOTBACKGROUND:
                 color = theme.colors[0]; // background color
                 break;
+
+            case CTRAINPLOTBACKGROUND:
+                // always, and I mean always default to a black background
+                color = QColor(Qt::black);
+                break;
+
 
             case COVERVIEWBACKGROUND:
                 // set back to light black for dark themes
@@ -1373,9 +1454,27 @@ ColorsPage::applyThemeClicked()
                 color = theme.colors[11];
                 break;
 
+            case CCARDBACKGROUND2:
+                // set back to light black for dark themes
+                // and gray for light themes
+                color = theme.colors[12];
+                break;
+
+            case CCARDBACKGROUND3:
+                // set back to light black for dark themes
+                // and gray for light themes
+                color = theme.colors[13];
+                break;
+
             case CCHROME:
+            case CCHARTBAR:
+            case CTOOLBAR: // we always keep them the same, but user can make different
                 //  set to black for dark themese and grey for light themes
                 color = theme.colors[1];
+                break;
+
+            case CHOVER:
+                color = theme.stealth ? theme.colors[11] : (theme.dark ? QColor(50,50,50) : QColor(200,200,200));
                 break;
 
             case CPLOTSYMBOL:
@@ -1434,11 +1533,32 @@ ColorsPage::applyThemeClicked()
             QTreeWidgetItem *add;
             ColorButton *colorButton = new ColorButton(this, colorSet[i].name, color);
             add = new QTreeWidgetItem(colors->invisibleRootItem());
-            add->setText(0, colorSet[i].name);
-            colors->setItemWidget(add, 1, colorButton);
+            add->setData(0, Qt::UserRole, i); // remember which index it is for since gets sorted
+            add->setText(0, colorSet[i].group);
+            add->setText(1, colorSet[i].name);
+            colors->setItemWidget(add, 2, colorButton);
 
         }
-    }
+        colors->setSortingEnabled(true);
+        colors->sortByColumn(1, Qt::AscendingOrder); // first sort by name
+        colors->sortByColumn(0, Qt::AscendingOrder);
+}
+
+void
+ColorsPage::resetClicked()
+{
+    AppearanceSettings defaults = GSettings::defaultAppearanceSettings();
+
+    def->setCurrentFont(QFont(defaults.fontfamily));
+    fontscale->setValue(defaults.fontscaleindex);
+    lineWidth->setValue(defaults.linewidth);
+    antiAliased->setChecked(defaults.antialias);
+#ifndef Q_OS_MAC // they do scrollbars nicely
+    rideHead->setChecked(defaults.head);
+    rideScroll->setChecked(defaults.scrollbar);
+#endif
+
+    applyThemeIndex(defaults.theme);
 }
 
 qint32
@@ -1456,11 +1576,12 @@ ColorsPage::saveClicked()
     // run down and get the current colors and save
     for (int i=0; colorSet[i].name != ""; i++) {
         QTreeWidgetItem *current = colors->invisibleRootItem()->child(i);
-        QColor newColor = ((ColorButton*)colors->itemWidget(current, 1))->getColor();
+        QColor newColor = ((ColorButton*)colors->itemWidget(current, 2))->getColor();
         QString colorstring = QString("%1:%2:%3").arg(newColor.red())
                                                  .arg(newColor.green())
                                                  .arg(newColor.blue());
-        appsettings->setValue(colorSet[i].setting, colorstring);
+        int colornum = current->data(0, Qt::UserRole).toInt();
+        appsettings->setValue(colorSet[colornum].setting, colorstring);
     }
 
     // update basefont family
@@ -1494,7 +1615,7 @@ ColorsPage::saveClicked()
         return 0;
 }
 
-IntervalMetricsPage::IntervalMetricsPage(QWidget *parent) :
+FavouriteMetricsPage::FavouriteMetricsPage(QWidget *parent) :
     QWidget(parent), changed(false)
 {
     HelpWhatsThis *help = new HelpWhatsThis(this);
@@ -1509,7 +1630,7 @@ IntervalMetricsPage::IntervalMetricsPage(QWidget *parent) :
     selectedList = new QListWidget;
     selectedList->setSelectionMode(QAbstractItemView::SingleSelection);
     QVBoxLayout *selectedLayout = new QVBoxLayout;
-    selectedLayout->addWidget(new QLabel(tr("Selected Metrics")));
+    selectedLayout->addWidget(new QLabel(tr("Favourites")));
     selectedLayout->addWidget(selectedList);
 #ifndef Q_OS_MAC
     upButton = new QToolButton(this);
@@ -1561,10 +1682,10 @@ IntervalMetricsPage::IntervalMetricsPage(QWidget *parent) :
     setLayout(hlayout);
 
     QString s;
-    if (appsettings->contains(GC_SETTINGS_INTERVAL_METRICS))
-        s = appsettings->value(this, GC_SETTINGS_INTERVAL_METRICS).toString();
+    if (appsettings->contains(GC_SETTINGS_FAVOURITE_METRICS))
+        s = appsettings->value(this, GC_SETTINGS_FAVOURITE_METRICS).toString();
     else
-        s = GC_SETTINGS_INTERVAL_METRICS_DEFAULT;
+        s = GC_SETTINGS_FAVOURITE_METRICS_DEFAULT;
     QStringList selectedMetrics = s.split(",");
 
     const RideMetricFactory &factory = RideMetricFactory::instance();
@@ -1604,7 +1725,7 @@ IntervalMetricsPage::IntervalMetricsPage(QWidget *parent) :
 }
 
 void
-IntervalMetricsPage::upClicked()
+FavouriteMetricsPage::upClicked()
 {
     assert(!selectedList->selectedItems().isEmpty());
     QListWidgetItem *item = selectedList->selectedItems().first();
@@ -1617,7 +1738,7 @@ IntervalMetricsPage::upClicked()
 }
 
 void
-IntervalMetricsPage::downClicked()
+FavouriteMetricsPage::downClicked()
 {
     assert(!selectedList->selectedItems().isEmpty());
     QListWidgetItem *item = selectedList->selectedItems().first();
@@ -1630,7 +1751,7 @@ IntervalMetricsPage::downClicked()
 }
 
 void
-IntervalMetricsPage::leftClicked()
+FavouriteMetricsPage::leftClicked()
 {
     assert(!selectedList->selectedItems().isEmpty());
     QListWidgetItem *item = selectedList->selectedItems().first();
@@ -1641,7 +1762,7 @@ IntervalMetricsPage::leftClicked()
 }
 
 void
-IntervalMetricsPage::rightClicked()
+FavouriteMetricsPage::rightClicked()
 {
     assert(!availList->selectedItems().isEmpty());
     QListWidgetItem *item = availList->selectedItems().first();
@@ -1651,13 +1772,13 @@ IntervalMetricsPage::rightClicked()
 }
 
 void
-IntervalMetricsPage::availChanged()
+FavouriteMetricsPage::availChanged()
 {
     rightButton->setEnabled(!availList->selectedItems().isEmpty());
 }
 
 void
-IntervalMetricsPage::selectedChanged()
+FavouriteMetricsPage::selectedChanged()
 {
     if (selectedList->selectedItems().isEmpty()) {
         upButton->setEnabled(false);
@@ -1679,211 +1800,14 @@ IntervalMetricsPage::selectedChanged()
 }
 
 qint32
-IntervalMetricsPage::saveClicked()
+FavouriteMetricsPage::saveClicked()
 {
     if (!changed) return 0;
 
     QStringList metrics;
     for (int i = 0; i < selectedList->count(); ++i)
         metrics << selectedList->item(i)->data(Qt::UserRole).toString();
-    appsettings->setValue(GC_SETTINGS_INTERVAL_METRICS, metrics.join(","));
-
-    return 0;
-}
-
-BestsMetricsPage::BestsMetricsPage(QWidget *parent) :
-    QWidget(parent), changed(false)
-{
-    HelpWhatsThis *help = new HelpWhatsThis(this);
-    this->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::Preferences_Metrics_Best));
-
-    availList = new QListWidget;
-    availList->setSortingEnabled(true);
-    availList->setSelectionMode(QAbstractItemView::SingleSelection);
-    QVBoxLayout *availLayout = new QVBoxLayout;
-    availLayout->addWidget(new QLabel(tr("Available Metrics")));
-    availLayout->addWidget(availList);
-    selectedList = new QListWidget;
-    selectedList->setSelectionMode(QAbstractItemView::SingleSelection);
-    QVBoxLayout *selectedLayout = new QVBoxLayout;
-    selectedLayout->addWidget(new QLabel(tr("Selected Metrics")));
-    selectedLayout->addWidget(selectedList);
-#ifndef Q_OS_MAC
-    upButton = new QToolButton(this);
-    downButton = new QToolButton(this);
-    leftButton = new QToolButton(this);
-    rightButton = new QToolButton(this);
-    upButton->setArrowType(Qt::UpArrow);
-    downButton->setArrowType(Qt::DownArrow);
-    leftButton->setArrowType(Qt::LeftArrow);
-    rightButton->setArrowType(Qt::RightArrow);
-    upButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
-    downButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
-    leftButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
-    rightButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
-#else
-    upButton = new QPushButton(tr("Up"));
-    downButton = new QPushButton(tr("Down"));
-    leftButton = new QPushButton("<");
-    rightButton = new QPushButton(">");
-#endif
-    QVBoxLayout *buttonGrid = new QVBoxLayout;
-    QHBoxLayout *upLayout = new QHBoxLayout;
-    QHBoxLayout *inexcLayout = new QHBoxLayout;
-    QHBoxLayout *downLayout = new QHBoxLayout;
-
-    upLayout->addStretch();
-    upLayout->addWidget(upButton);
-    upLayout->addStretch();
-
-    inexcLayout->addStretch();
-    inexcLayout->addWidget(leftButton);
-    inexcLayout->addWidget(rightButton);
-    inexcLayout->addStretch();
-
-    downLayout->addStretch();
-    downLayout->addWidget(downButton);
-    downLayout->addStretch();
-
-    buttonGrid->addStretch();
-    buttonGrid->addLayout(upLayout);
-    buttonGrid->addLayout(inexcLayout);
-    buttonGrid->addLayout(downLayout);
-    buttonGrid->addStretch();
-
-    QHBoxLayout *hlayout = new QHBoxLayout;
-    hlayout->addLayout(availLayout);
-    hlayout->addLayout(buttonGrid);
-    hlayout->addLayout(selectedLayout);
-    setLayout(hlayout);
-
-    QString s;
-    if (appsettings->contains(GC_SETTINGS_BESTS_METRICS))
-        s = appsettings->value(this, GC_SETTINGS_BESTS_METRICS).toString();
-    else
-        s = GC_SETTINGS_BESTS_METRICS_DEFAULT;
-    QStringList selectedMetrics = s.split(",");
-
-    const RideMetricFactory &factory = RideMetricFactory::instance();
-    for (int i = 0; i < factory.metricCount(); ++i) {
-        QString symbol = factory.metricName(i);
-        if (selectedMetrics.contains(symbol) || symbol.startsWith("compatibility_"))
-            continue;
-        QSharedPointer<RideMetric> m(factory.newMetric(symbol));
-        QListWidgetItem *item = new QListWidgetItem(Utils::unprotect(m->name()));
-        item->setData(Qt::UserRole, symbol);
-        item->setToolTip(m->description());
-        availList->addItem(item);
-    }
-    foreach (QString symbol, selectedMetrics) {
-        if (!factory.haveMetric(symbol))
-            continue;
-        QSharedPointer<RideMetric> m(factory.newMetric(symbol));
-        QListWidgetItem *item = new QListWidgetItem(Utils::unprotect(m->name()));
-        item->setData(Qt::UserRole, symbol);
-        item->setToolTip(m->description());
-        selectedList->addItem(item);
-    }
-
-    upButton->setEnabled(false);
-    downButton->setEnabled(false);
-    leftButton->setEnabled(false);
-    rightButton->setEnabled(false);
-
-    connect(upButton, SIGNAL(clicked()), this, SLOT(upClicked()));
-    connect(downButton, SIGNAL(clicked()), this, SLOT(downClicked()));
-    connect(leftButton, SIGNAL(clicked()), this, SLOT(leftClicked()));
-    connect(rightButton, SIGNAL(clicked()), this, SLOT(rightClicked()));
-    connect(availList, SIGNAL(itemSelectionChanged()),
-            this, SLOT(availChanged()));
-    connect(selectedList, SIGNAL(itemSelectionChanged()),
-            this, SLOT(selectedChanged()));
-}
-
-void
-BestsMetricsPage::upClicked()
-{
-    assert(!selectedList->selectedItems().isEmpty());
-    QListWidgetItem *item = selectedList->selectedItems().first();
-    int row = selectedList->row(item);
-    assert(row > 0);
-    selectedList->takeItem(row);
-    selectedList->insertItem(row - 1, item);
-    selectedList->setCurrentItem(item);
-    changed = true;
-}
-
-void
-BestsMetricsPage::downClicked()
-{
-    assert(!selectedList->selectedItems().isEmpty());
-    QListWidgetItem *item = selectedList->selectedItems().first();
-    int row = selectedList->row(item);
-    assert(row < selectedList->count() - 1);
-    selectedList->takeItem(row);
-    selectedList->insertItem(row + 1, item);
-    selectedList->setCurrentItem(item);
-    changed = true;
-}
-
-void
-BestsMetricsPage::leftClicked()
-{
-    assert(!selectedList->selectedItems().isEmpty());
-    QListWidgetItem *item = selectedList->selectedItems().first();
-    selectedList->takeItem(selectedList->row(item));
-    availList->addItem(item);
-    changed = true;
-    selectedChanged();
-}
-
-void
-BestsMetricsPage::rightClicked()
-{
-    assert(!availList->selectedItems().isEmpty());
-    QListWidgetItem *item = availList->selectedItems().first();
-    availList->takeItem(availList->row(item));
-    selectedList->addItem(item);
-    changed = true;
-}
-
-void
-BestsMetricsPage::availChanged()
-{
-    rightButton->setEnabled(!availList->selectedItems().isEmpty());
-}
-
-void
-BestsMetricsPage::selectedChanged()
-{
-    if (selectedList->selectedItems().isEmpty()) {
-        upButton->setEnabled(false);
-        downButton->setEnabled(false);
-        leftButton->setEnabled(false);
-        return;
-    }
-    QListWidgetItem *item = selectedList->selectedItems().first();
-    int row = selectedList->row(item);
-    if (row == 0)
-        upButton->setEnabled(false);
-    else
-        upButton->setEnabled(true);
-    if (row == selectedList->count() - 1)
-        downButton->setEnabled(false);
-    else
-        downButton->setEnabled(true);
-    leftButton->setEnabled(true);
-}
-
-qint32
-BestsMetricsPage::saveClicked()
-{
-    if (!changed) return 0;
-
-    QStringList metrics;
-    for (int i = 0; i < selectedList->count(); ++i)
-        metrics << selectedList->item(i)->data(Qt::UserRole).toString();
-    appsettings->setValue(GC_SETTINGS_BESTS_METRICS, metrics.join(","));
+    appsettings->setValue(GC_SETTINGS_FAVOURITE_METRICS, metrics.join(","));
 
     return 0;
 }
@@ -2031,7 +1955,8 @@ CustomMetricsPage::addClicked()
     here.name = "My Average Power";
     here.type = 1;
     here.precision = 0;
-    here.description = "Average Power computed using Joules to account for variable recording.";
+    here.istime = false;
+    here.description = "Average Power";
     here.unitsMetric = "watts";
     here.unitsImperial = "watts";
     here.conversion = 1.00;
@@ -2041,17 +1966,12 @@ CustomMetricsPage::addClicked()
     relevant { Data contains \"P\"; }\n\
 \n\
     # initialise aggregating variables\n\
-    init { joules <- 0; seconds <- 0; }\n\
-\n\
-    # joules = power x time, for each sample\n\
-    sample { \n\
-        joules <- joules + (POWER * RECINTSECS);\n\
-        seconds <- seconds + RECINTSECS;\n\
-    }\n\
+    # does nothing, update as needed\n\
+    init { 0; }\n\
 \n\
     # calculate metric value at end\n\
-    value { joules / seconds; }\n\
-    count { seconds; }\n\
+    value { mean(samples(POWER)); }\n\
+    count { Duration; }\n\
 }";
 
     EditUserMetricDialog editor(this, context, here);
@@ -2289,199 +2209,6 @@ CustomMetricsPage::saveClicked()
 
     // the change will need to be signalled by context, not us
     return returning;
-}
-
-SummaryMetricsPage::SummaryMetricsPage(QWidget *parent) :
-    QWidget(parent), changed(false)
-{
-    HelpWhatsThis *help = new HelpWhatsThis(this);
-    this->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::Preferences_Metrics_Summary));
-
-    availList = new QListWidget;
-    availList->setSortingEnabled(true);
-    availList->setSelectionMode(QAbstractItemView::SingleSelection);
-    QVBoxLayout *availLayout = new QVBoxLayout;
-    availLayout->addWidget(new QLabel(tr("Available Metrics")));
-    availLayout->addWidget(availList);
-    selectedList = new QListWidget;
-    selectedList->setSelectionMode(QAbstractItemView::SingleSelection);
-    QVBoxLayout *selectedLayout = new QVBoxLayout;
-    selectedLayout->addWidget(new QLabel(tr("Selected Metrics")));
-    selectedLayout->addWidget(selectedList);
-#ifndef Q_OS_MAC
-    upButton = new QToolButton(this);
-    downButton = new QToolButton(this);
-    leftButton = new QToolButton(this);
-    rightButton = new QToolButton(this);
-    upButton->setArrowType(Qt::UpArrow);
-    downButton->setArrowType(Qt::DownArrow);
-    leftButton->setArrowType(Qt::LeftArrow);
-    rightButton->setArrowType(Qt::RightArrow);
-    upButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
-    downButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
-    leftButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
-    rightButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
-#else
-    upButton = new QPushButton(tr("Up"));
-    downButton = new QPushButton(tr("Down"));
-    leftButton = new QPushButton("<");
-    rightButton = new QPushButton(">");
-#endif
-    QVBoxLayout *buttonGrid = new QVBoxLayout;
-    QHBoxLayout *upLayout = new QHBoxLayout;
-    QHBoxLayout *inexcLayout = new QHBoxLayout;
-    QHBoxLayout *downLayout = new QHBoxLayout;
-
-    upLayout->addStretch();
-    upLayout->addWidget(upButton);
-    upLayout->addStretch();
-
-    inexcLayout->addStretch();
-    inexcLayout->addWidget(leftButton);
-    inexcLayout->addWidget(rightButton);
-    inexcLayout->addStretch();
-
-    downLayout->addStretch();
-    downLayout->addWidget(downButton);
-    downLayout->addStretch();
-
-    buttonGrid->addStretch();
-    buttonGrid->addLayout(upLayout);
-    buttonGrid->addLayout(inexcLayout);
-    buttonGrid->addLayout(downLayout);
-    buttonGrid->addStretch();
-
-    QHBoxLayout *hlayout = new QHBoxLayout;
-    hlayout->addLayout(availLayout);
-    hlayout->addLayout(buttonGrid);
-    hlayout->addLayout(selectedLayout);
-    setLayout(hlayout);
-
-    QString s = appsettings->value(this, GC_SETTINGS_SUMMARY_METRICS, GC_SETTINGS_SUMMARY_METRICS_DEFAULT).toString();
-    QStringList selectedMetrics = s.split(",");
-
-    const RideMetricFactory &factory = RideMetricFactory::instance();
-    for (int i = 0; i < factory.metricCount(); ++i) {
-        QString symbol = factory.metricName(i);
-        if (selectedMetrics.contains(symbol) || symbol.startsWith("compatibility_"))
-            continue;
-        QSharedPointer<RideMetric> m(factory.newMetric(symbol));
-        QListWidgetItem *item = new QListWidgetItem(Utils::unprotect(m->name()));
-        item->setData(Qt::UserRole, symbol);
-        item->setToolTip(m->description());
-        availList->addItem(item);
-    }
-    foreach (QString symbol, selectedMetrics) {
-        if (!factory.haveMetric(symbol))
-            continue;
-        QSharedPointer<RideMetric> m(factory.newMetric(symbol));
-        QListWidgetItem *item = new QListWidgetItem(Utils::unprotect(m->name()));
-        item->setData(Qt::UserRole, symbol);
-        item->setToolTip(m->description());
-        selectedList->addItem(item);
-    }
-
-    upButton->setEnabled(false);
-    downButton->setEnabled(false);
-    leftButton->setEnabled(false);
-    rightButton->setEnabled(false);
-
-    connect(upButton, SIGNAL(clicked()), this, SLOT(upClicked()));
-    connect(downButton, SIGNAL(clicked()), this, SLOT(downClicked()));
-    connect(leftButton, SIGNAL(clicked()), this, SLOT(leftClicked()));
-    connect(rightButton, SIGNAL(clicked()), this, SLOT(rightClicked()));
-    connect(availList, SIGNAL(itemSelectionChanged()),
-            this, SLOT(availChanged()));
-    connect(selectedList, SIGNAL(itemSelectionChanged()),
-            this, SLOT(selectedChanged()));
-}
-
-void
-SummaryMetricsPage::upClicked()
-{
-    assert(!selectedList->selectedItems().isEmpty());
-    QListWidgetItem *item = selectedList->selectedItems().first();
-    int row = selectedList->row(item);
-    assert(row > 0);
-    selectedList->takeItem(row);
-    selectedList->insertItem(row - 1, item);
-    selectedList->setCurrentItem(item);
-    changed = true;
-}
-
-void
-SummaryMetricsPage::downClicked()
-{
-    assert(!selectedList->selectedItems().isEmpty());
-    QListWidgetItem *item = selectedList->selectedItems().first();
-    int row = selectedList->row(item);
-    assert(row < selectedList->count() - 1);
-    selectedList->takeItem(row);
-    selectedList->insertItem(row + 1, item);
-    selectedList->setCurrentItem(item);
-    changed = true;
-}
-
-void
-SummaryMetricsPage::leftClicked()
-{
-    assert(!selectedList->selectedItems().isEmpty());
-    QListWidgetItem *item = selectedList->selectedItems().first();
-    selectedList->takeItem(selectedList->row(item));
-    availList->addItem(item);
-    changed = true;
-    selectedChanged();
-}
-
-void
-SummaryMetricsPage::rightClicked()
-{
-    assert(!availList->selectedItems().isEmpty());
-    QListWidgetItem *item = availList->selectedItems().first();
-    availList->takeItem(availList->row(item));
-    selectedList->addItem(item);
-    changed = true;
-}
-
-void
-SummaryMetricsPage::availChanged()
-{
-    rightButton->setEnabled(!availList->selectedItems().isEmpty());
-}
-
-void
-SummaryMetricsPage::selectedChanged()
-{
-    if (selectedList->selectedItems().isEmpty()) {
-        upButton->setEnabled(false);
-        downButton->setEnabled(false);
-        leftButton->setEnabled(false);
-        return;
-    }
-    QListWidgetItem *item = selectedList->selectedItems().first();
-    int row = selectedList->row(item);
-    if (row == 0)
-        upButton->setEnabled(false);
-    else
-        upButton->setEnabled(true);
-    if (row == selectedList->count() - 1)
-        downButton->setEnabled(false);
-    else
-        downButton->setEnabled(true);
-    leftButton->setEnabled(true);
-}
-
-qint32
-SummaryMetricsPage::saveClicked()
-{
-    if (!changed) return 0;
-
-    QStringList metrics;
-    for (int i = 0; i < selectedList->count(); ++i)
-        metrics << selectedList->item(i)->data(Qt::UserRole).toString();
-    appsettings->setValue(GC_SETTINGS_SUMMARY_METRICS, metrics.join(","));
-
-    return 0;
 }
 
 MetadataPage::MetadataPage(Context *context) : context(context)
@@ -2830,13 +2557,17 @@ FieldsPage::FieldsPage(QWidget *parent, QList<FieldDefinition>fieldDefinitions) 
     fields->headerItem()->setText(1, tr("Field"));
     fields->headerItem()->setText(2, tr("Type"));
     fields->headerItem()->setText(3, tr("Values"));
-    fields->headerItem()->setText(4, tr("Diary"));
-    fields->setColumnWidth(0,80 *dpiXFactor);
+    fields->headerItem()->setText(4, tr("Summary"));
+    fields->headerItem()->setText(5, tr("Interval"));
+    fields->headerItem()->setText(6, tr("Expression"));
+    fields->setColumnWidth(0,100 *dpiXFactor);
     fields->setColumnWidth(1,100 *dpiXFactor);
     fields->setColumnWidth(2,100 *dpiXFactor);
-    fields->setColumnWidth(3,80 *dpiXFactor);
-    fields->setColumnWidth(4,20 *dpiXFactor);
-    fields->setColumnCount(5);
+    fields->setColumnWidth(3,100 *dpiXFactor);
+    fields->setColumnWidth(4,80 *dpiXFactor);
+    fields->setColumnWidth(5,80 *dpiXFactor);
+    fields->setColumnWidth(6,80 *dpiXFactor);
+    fields->setColumnCount(7);
     fields->setSelectionMode(QAbstractItemView::SingleSelection);
     fields->setEditTriggers(QAbstractItemView::SelectedClicked); // allow edit
     //fields->setUniformRowHeights(true); // causes height problems when adding - in case of non-text fields
@@ -2849,6 +2580,9 @@ FieldsPage::FieldsPage(QWidget *parent, QList<FieldDefinition>fieldDefinitions) 
         QComboBox *comboButton = new QComboBox(this);
         QCheckBox *checkBox = new QCheckBox("", this);
         checkBox->setChecked(field.diary);
+
+        QCheckBox *checkBoxInt = new QCheckBox("", this);
+        checkBoxInt->setChecked(field.interval);
 
         addFieldTypes(comboButton);
         comboButton->setCurrentIndex(field.type);
@@ -2867,6 +2601,10 @@ FieldsPage::FieldsPage(QWidget *parent, QList<FieldDefinition>fieldDefinitions) 
         add->setTextAlignment(2, Qt::AlignHCenter);
         fields->setItemWidget(add, 2, comboButton);
         fields->setItemWidget(add, 4, checkBox);
+        fields->setItemWidget(add, 5, checkBoxInt);
+
+        // expression
+        add->setText(6, field.expression);
     }
     fields->setCurrentItem(fields->invisibleRootItem()->child(0));
 
@@ -2890,15 +2628,19 @@ FieldsPage::upClicked()
         // movin on up!
         QWidget *button = fields->itemWidget(fields->currentItem(),2);
         QWidget *check = fields->itemWidget(fields->currentItem(),4);
+        QWidget *checkInt = fields->itemWidget(fields->currentItem(),5);
         QComboBox *comboButton = new QComboBox(this);
         addFieldTypes(comboButton);
         comboButton->setCurrentIndex(((QComboBox*)button)->currentIndex());
         QCheckBox *checkBox = new QCheckBox("", this);
         checkBox->setChecked(((QCheckBox*)check)->isChecked());
+        QCheckBox *checkBoxInt = new QCheckBox("", this);
+        checkBoxInt->setChecked(((QCheckBox*)checkInt)->isChecked());
         QTreeWidgetItem* moved = fields->invisibleRootItem()->takeChild(index);
         fields->invisibleRootItem()->insertChild(index-1, moved);
         fields->setItemWidget(moved, 2, comboButton);
         fields->setItemWidget(moved, 4, checkBox);
+        fields->setItemWidget(moved, 5, checkBoxInt);
         fields->setCurrentItem(moved);
     }
 }
@@ -2912,15 +2654,19 @@ FieldsPage::downClicked()
 
         QWidget *button = fields->itemWidget(fields->currentItem(),2);
         QWidget *check = fields->itemWidget(fields->currentItem(),4);
+        QWidget *checkInt = fields->itemWidget(fields->currentItem(),5);
         QComboBox *comboButton = new QComboBox(this);
         addFieldTypes(comboButton);
         comboButton->setCurrentIndex(((QComboBox*)button)->currentIndex());
         QCheckBox *checkBox = new QCheckBox("", this);
         checkBox->setChecked(((QCheckBox*)check)->isChecked());
+        QCheckBox *checkBoxInt = new QCheckBox("", this);
+        checkBoxInt->setChecked(((QCheckBox*)checkInt)->isChecked());
         QTreeWidgetItem* moved = fields->invisibleRootItem()->takeChild(index);
         fields->invisibleRootItem()->insertChild(index+1, moved);
         fields->setItemWidget(moved, 2, comboButton);
         fields->setItemWidget(moved, 4, checkBox);
+        fields->setItemWidget(moved, 5, checkBoxInt);
         fields->setCurrentItem(moved);
     }
 }
@@ -2941,6 +2687,7 @@ FieldsPage::addClicked()
     QComboBox *comboButton = new QComboBox(this);
     addFieldTypes(comboButton);
     QCheckBox *checkBox = new QCheckBox("", this);
+    QCheckBox *checkBoxInt = new QCheckBox("", this);
 
     add = new QTreeWidgetItem;
     fields->invisibleRootItem()->insertChild(index, add);
@@ -2957,6 +2704,7 @@ FieldsPage::addClicked()
     add->setTextAlignment(2, Qt::AlignHCenter);
     fields->setItemWidget(add, 2, comboButton);
     fields->setItemWidget(add, 4, checkBox);
+    fields->setItemWidget(add, 5, checkBoxInt);
 }
 
 void
@@ -2993,6 +2741,8 @@ FieldsPage::getDefinitions(QList<FieldDefinition> &fieldList)
         add.name = sp.internalName(item->text(1));
         add.values = item->text(3).split(QRegExp("(, *|,)"), QString::KeepEmptyParts);
         add.diary = ((QCheckBox*)fields->itemWidget(item, 4))->isChecked();
+        add.interval = ((QCheckBox*)fields->itemWidget(item, 5))->isChecked();
+        add.expression = item->text(6);
 
         if (sp.isMetric(add.name))
             add.type = 4;
@@ -3614,7 +3364,7 @@ MeasuresConfigPage::removeMeasuresFieldClicked()
 ///
 MeasuresSettingsDialog::MeasuresSettingsDialog(QWidget *parent, QString &symbol, QString &name) : QDialog(parent), symbol(symbol), name(name)
 {
-    setWindowTitle("Measures Group");
+    setWindowTitle(tr("Measures Group"));
     setAttribute(Qt::WA_DeleteOnClose);
     setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint | Qt::Tool);
 
@@ -3669,7 +3419,7 @@ void MeasuresSettingsDialog::okClicked()
 ///
 MeasuresFieldSettingsDialog::MeasuresFieldSettingsDialog(QWidget *parent, MeasuresField &field) : QDialog(parent), field(field)
 {
-    setWindowTitle("Measures Field");
+    setWindowTitle(tr("Measures Field"));
     setAttribute(Qt::WA_DeleteOnClose);
     setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint | Qt::Tool);
 

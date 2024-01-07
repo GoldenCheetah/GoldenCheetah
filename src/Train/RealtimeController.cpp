@@ -176,7 +176,7 @@ void RealtimeController::processRealtimeData(RealtimeData &rtData)
 
 // Wrap static array in function to ensure it is init on use, which is after PolyFitGenerator
 // who is static init at load time.
-const VirtualPowerTrainer * const PredefinedVirtualPowerTrainerArray(size_t &size) {
+const VirtualPowerTrainer * PredefinedVirtualPowerTrainerArray(size_t &size) {
 
     static const VirtualPowerTrainer s_PredefinedVirtualPowerTrainerArray[] =
     {
