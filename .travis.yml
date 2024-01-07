@@ -48,7 +48,8 @@ jobs:
   - os: osx
     osx_image: xcode14.2
     compiler: clang
-  - os: linux
+  - if: commit_message !~ /\[skip linux\]/
+    os: linux
     dist: focal
     compiler: gcc
 
