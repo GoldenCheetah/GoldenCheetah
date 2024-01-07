@@ -3,8 +3,10 @@
 // it requires.
 
 // disable warning messages
+#ifdef __GNUC__
 #pragma GCC diagnostic ignored "-Wunused-value"
 #pragma GCC diagnostic ignored "-Wunused-but-set-variable"
+#endif
 
 #define LogError(a)    (0); return 0;
 #define LogAssert(a,b) (0)

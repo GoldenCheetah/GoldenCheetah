@@ -33,10 +33,20 @@ environment:
     secure: h2JdlC1i4QOmwpkz+Xxbrw==
   GC_SPORTTRACKS_CLIENT_SECRET:
     secure: n6a8nJgqMyg+VsVeoIIR8TFzxyDFVi2w/ggetQk5agY=
+  GC_RWGPS_API_KEY:
+    secure: uUtCyF5ByZ1VYJOztUngIA==
+  GC_NOLIO_CLIENT_ID:
+    secure: /OFVjEBwU7o3SItIQVf/YlJ8XErxneXIT2N0JyPMSXR1tCbdZVWixMHpqKNWoNk4
+  GC_NOLIO_SECRET:
+    secure: mmMksvVnfBiXufBDn2gAhQY53n0J9BokSCtDY51uU918QJ/LL4XOojtJp5tMFn8T7ugyDhNASpqZXiK55vxSD53vm+tjufpfzppKEeh93Babvc/VrndLB1X/RZCRUQTR6rka05fYl4e0eBzP1H091A==
+  GC_XERT_CLIENT_SECRET:
+    secure: /1rVLT8LyJCZ4xNJ5W+NtAcZ1rtKaUjW9SYm/T3gHoc=
+  GC_AZUM_CLIENT_SECRET:
+    secure: 2ZpXsA3TQv1zftYVyZSF6f83ftCzza+K22ZX1doj7Yc/5dmGl1bnsSeVChJgJ8lQ2fRPYpdmun9cjqwcrtG/zXTTsYuTvYWegHz/4Y0u6Mg=
 
 init:
-# Setup QT 5.14 - 64Bit
-- set QTDIR=C:\Qt\5.14\msvc2017_64
+# Setup QT 5.15 - 64Bit
+- set QTDIR=C:\Qt\5.15\msvc2019_64
 - set PATH=%QTDIR%\bin;%PATH%
 - qmake --version
 
@@ -53,7 +63,7 @@ cache:
 - C:\R
 - C:\Python -> src\Python\requirements.txt
 - c:\tools\vcpkg\installed\
-- qwt
+- qwt -> qwt/qwtconfig.pri.in
 
 install:
 # Get the libraries
@@ -74,7 +84,9 @@ install:
 # Get R and add to config
 - ps: >-
     if (-not (Test-Path 'C:\R')) {
-      $rurl = $(ConvertFrom-JSON $(Invoke-WebRequest https://rversions.r-pkg.org/r-release-win).Content).URL
+      # Lets use 4.1 until 4.2 issues are fixed
+      #$rurl = $(ConvertFrom-JSON $(Invoke-WebRequest https://rversions.r-pkg.org/r-release-win).Content).URL
+      $rurl = "https://cran.r-project.org/bin/windows/base/old/4.1.3/R-4.1.3-win.exe"
       Start-FileDownload $rurl "R-win.exe"
       Start-Process -FilePath .\R-win.exe -ArgumentList "/VERYSILENT /DIR=C:\R" -NoNewWindow -Wait
     }
@@ -122,6 +134,9 @@ before_build:
 # Add Train Robot
 - echo DEFINES+=GC_WANT_ROBOT >> src\gcconfig.pri
 
+# Avoid macro redefinition warnings
+- echo DEFINES+=_MATH_DEFINES_DEFINED >> src\gcconfig.pri
+
 # Add debug console
 #- echo CONFIG+=console >> src\gcconfig.pri
 
@@ -142,6 +157,11 @@ before_build:
 - ps: (Get-Content src\Core\Secrets.h) -replace '__GC_CLOUD_DB_APP_NAME__', $env:GC_CLOUD_DB_APP_NAME | Set-Content src\Core\Secrets.h
 - ps: (Get-Content src\Core\Secrets.h) -replace '__GC_POLARFLOW_CLIENT_SECRET__', $env:GC_POLARFLOW_CLIENT_SECRET | Set-Content src\Core\Secrets.h
 - ps: (Get-Content src\Core\Secrets.h) -replace '__GC_SPORTTRACKS_CLIENT_SECRET__', $env:GC_SPORTTRACKS_CLIENT_SECRET | Set-Content src\Core\Secrets.h
+- ps: (Get-Content src\Core\Secrets.h) -replace '__GC_RWGPS_API_KEY__', $env:GC_RWGPS_API_KEY | Set-Content src\Core\Secrets.h
+- ps: (Get-Content src\Core\Secrets.h) -replace '__GC_NOLIO_CLIENT_ID__', $env:GC_NOLIO_CLIENT_ID | Set-Content src\Core\Secrets.h
+- ps: (Get-Content src\Core\Secrets.h) -replace '__GC_NOLIO_SECRET__', $env:GC_NOLIO_SECRET | Set-Content src\Core\Secrets.h
+- ps: (Get-Content src\Core\Secrets.h) -replace '__GC_XERT_CLIENT_SECRET__', $env:GC_XERT_CLIENT_SECRET | Set-Content src\Core\Secrets.h
+- ps: (Get-Content src\Core\Secrets.h) -replace '__GC_AZUM_CLIENT_SECRET__', $env:GC_AZUM_CLIENT_SECRET | Set-Content src\Core\Secrets.h
 
 build_script:
 - qmake.exe build.pro -r -spec win32-msvc
@@ -173,11 +193,11 @@ after_build:
 - copy ..\Resources\win32\gc.ico
 
 # Installer script
-- copy ..\Resources\win32\GC3.6-Dev-Master-W64-QT5.14.2.nsi
+- copy ..\Resources\win32\GC3.6-Master-W64-QT5.nsi
 
 # Build the installer
-- makensis GC3.6-Dev-Master-W64-QT5.14.2.nsi
-- move GoldenCheetah_v3.6-DEV_64bit_Windows.exe ..\..\GoldenCheetah_v3.6-DEV_x64.exe
+- makensis GC3.6-Master-W64-QT5.nsi
+- move GoldenCheetah_v3.6_64bit_Windows.exe ..\..\GoldenCheetah_v3.6_x64.exe
 - cd ..\..
 - ps: Set-AppveyorBuildVariable -Name 'PUBLISH_BINARIES' -Value false
 - ps: if ($env:APPVEYOR_REPO_COMMIT_MESSAGE_EXTENDED -Match "\[publish binaries\]") { Set-AppveyorBuildVariable -Name 'PUBLISH_BINARIES' -Value true }
@@ -186,11 +206,11 @@ test_script:
 # minimum test
 - src\release\GoldenCheetah --version 2>GCversionWindows.txt
 - git log -1 >> GCversionWindows.txt
-- ps: CertUtil -hashfile GoldenCheetah_v3.6-DEV_x64.exe sha256 | Select-Object -First 2 | Add-Content GCversionWindows.txt
+- ps: CertUtil -hashfile GoldenCheetah_v3.6_x64.exe sha256 | Select-Object -First 2 | Add-Content GCversionWindows.txt
 - type GCversionWindows.txt
 
 artifacts:
-- path: GoldenCheetah_v3.6-DEV_x64.exe
+- path: GoldenCheetah_v3.6_x64.exe
   name: GCinstaller
 - path: GCversionWindows.txt
   name: GCversionWindows

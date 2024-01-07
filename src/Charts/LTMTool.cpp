@@ -22,7 +22,7 @@
 #include "Athlete.h"
 #include "Settings.h"
 #include "Units.h"
-#include "Tab.h"
+#include "AthleteTab.h"
 #include "RideNavigator.h"
 #include "HelpWhatsThis.h"
 #include "Utils.h"
@@ -1740,9 +1740,9 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
     // working with estimates, local utility functions
     models << new CP2Model(context);
     models << new CP3Model(context);
-    models << new MultiModel(context);
+    //models << new MultiModel(context); disabled in v3.6
     models << new ExtendedModel(context);
-    models << new WSModel(context);
+    //models << new WSModel(context); disabled in v3.6
     foreach(PDModel *model, models) {
         modelSelect->addItem(model->name(), model->code());
     }

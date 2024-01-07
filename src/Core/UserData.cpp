@@ -19,7 +19,7 @@
 #include "UserData.h"
 
 #include "RideNavigator.h"
-#include "Tab.h"
+#include "AthleteTab.h"
 #include "HelpWhatsThis.h"
 #include "Utils.h"
 

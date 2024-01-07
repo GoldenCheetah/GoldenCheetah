@@ -11,9 +11,11 @@
 
 #ifndef QT_NO_DEBUG_STREAM
 
-QDebug operator<<( QDebug debug, const QwtAxisId &axisId )
+#include <qdebug.h>
+
+QDebug operator<<( QDebug debug, const QwtAxisId& axisId )
 {
-    static const char *posNames[] = { "yLeft", "yRight", "xBottom", "xTop" };
+    static const char* posNames[] = { "yLeft", "yRight", "xBottom", "xTop" };
 
     debug.nospace();
 
@@ -22,7 +24,7 @@ QDebug operator<<( QDebug debug, const QwtAxisId &axisId )
     if ( axisId.pos >= 0 && axisId.pos < 4 )
         debug << posNames[axisId.pos];
     else
-        debug << axisId.pos; 
+        debug << axisId.pos;
 
     debug << "," << axisId.id << ")";
 

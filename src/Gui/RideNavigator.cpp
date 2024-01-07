@@ -25,7 +25,7 @@
 #include "RideNavigator.h"
 #include "RideNavigatorProxy.h"
 #include "SearchFilterBox.h"
-#include "TabView.h"
+#include "AbstractView.h"
 #include "HelpWhatsThis.h"
 
 #include <QtGui>
@@ -173,7 +173,7 @@ RideNavigator::configChanged(qint32 state)
 
     // hide ride list scroll bar ?
 #ifndef Q_OS_MAC
-    tableView->setStyleSheet(TabView::ourStyleSheet());
+    tableView->setStyleSheet(AbstractView::ourStyleSheet());
     if (mainwindow) {
         if (appsettings->value(this, GC_RIDESCROLL, true).toBool() == false)
             tableView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -1376,7 +1376,7 @@ RideNavigator::showTreeContextMenuPopup(const QPoint &pos)
 
 RideTreeView::RideTreeView(QWidget *parent) : QTreeView(parent)
 {
-    setDragDropMode(QAbstractItemView::InternalMove);
+    setDragDropMode(QAbstractItemView::DragDrop);
     setDragEnabled(true);
     setDragDropOverwriteMode(false);
     setDropIndicatorShown(true);

@@ -1,6 +1,6 @@
 #!/bin/bash
 set -ev
-export PATH=/opt/qt514/bin:$PATH
+export PATH=/opt/qt515/bin:$PATH
 
 cp qwt/qwtconfig.pri.in qwt/qwtconfig.pri
 cp src/gcconfig.pri.in src/gcconfig.pri
@@ -61,6 +61,11 @@ sed -i "s/__GC_NOKIA_CLIENT_SECRET__/"$GC_NOKIA_CLIENT_SECRET"/" src/Core/Secret
 sed -i "s/__GC_SPORTTRACKS_CLIENT_SECRET__/"$GC_SPORTTRACKS_CLIENT_SECRET"/" src/Core/Secrets.h
 sed -i "s/OPENDATA_DISABLE/OPENDATA_ENABLE/" src/Core/Secrets.h
 sed -i "s/__GC_CLOUD_OPENDATA_SECRET__/"$GC_CLOUD_OPENDATA_SECRET"/" src/Core/Secrets.h
+sed -i "s/__GC_RWGPS_API_KEY__/"$GC_RWGPS_API_KEY"/" src/Core/Secrets.h
+sed -i "s/__GC_NOLIO_CLIENT_ID__/"$GC_NOLIO_CLIENT_ID"/" src/Core/Secrets.h
+sed -i "s/__GC_NOLIO_SECRET__/"$GC_NOLIO_SECRET"/" src/Core/Secrets.h
+sed -i "s/__GC_XERT_CLIENT_SECRET__/"$GC_XERT_CLIENT_SECRET"/" src/Core/Secrets.h
+sed -i "s/__GC_AZUM_CLIENT_SECRET__/"$GC_AZUM_CLIENT_SECRET"/" src/Core/Secrets.h
 cat src/gcconfig.pri
 # update translations
 lupdate src/src.pro

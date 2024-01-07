@@ -118,7 +118,7 @@ ChooseCyclistDialog::getList()
 
         // only allow selection of cyclists which are not already open
         foreach (MainWindow *x, mainwindows) {
-            QMapIterator<QString, Tab*> t(x->tabs);
+            QMapIterator<QString, AthleteTab*> t(x->athletetabs);
             while (t.hasNext()) {
                 t.next();
                 if (t.key() == name)

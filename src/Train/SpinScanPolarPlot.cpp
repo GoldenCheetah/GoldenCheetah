@@ -70,31 +70,31 @@ QRectF SpinScanPolarData::boundingRect() const
 SpinScanPolarPlot::SpinScanPolarPlot(QWidget *parent, uint8_t *spinData) : QwtPlot(parent), leftCurve(NULL), rightCurve(NULL), spinData(spinData)
 {
     // Setup the axis
-    setAxisTitle(yLeft, "SpinScan");
-    setAxisMaxMinor(xBottom, 0);
-    setAxisMaxMinor(yLeft, 0);
+    setAxisTitle(QwtAxis::YLeft, "SpinScan");
+    setAxisMaxMinor(QwtAxis::XBottom, 0);
+    setAxisMaxMinor(QwtAxis::YLeft, 0);
 
     QPalette pal;
-    setAxisScale(yLeft, -90, 90); // max 8 bit plus a little
-    setAxisScale(xBottom, -90, 90); // max 8 bit plus a little
+    setAxisScale(QwtAxis::YLeft, -90, 90); // max 8 bit plus a little
+    setAxisScale(QwtAxis::XBottom, -90, 90); // max 8 bit plus a little
     pal.setColor(QPalette::WindowText, GColor(CSPINSCANLEFT));
     pal.setColor(QPalette::Text, GColor(CSPINSCANLEFT));
-    axisWidget(QwtPlot::yLeft)->setPalette(pal);
-    axisWidget(QwtPlot::yLeft)->scaleDraw()->setTickLength(QwtScaleDiv::MajorTick, 3);
+    axisWidget(QwtAxis::YLeft)->setPalette(pal);
+    axisWidget(QwtAxis::YLeft)->scaleDraw()->setTickLength(QwtScaleDiv::MajorTick, 3);
 
-    enableAxis(xBottom, false); // very little value and some cpu overhead
-    enableAxis(yLeft, false);
+    setAxisVisible(QwtAxis::XBottom, false); // very little value and some cpu overhead
+    setAxisVisible(QwtAxis::YLeft, false);
 
     rightCurve = new QwtPlotCurve("SpinScan Right");
     rightCurve->setRenderHint(QwtPlotItem::RenderAntialiased); // too cpu intensive
     rightCurve->attach(this);
-    rightCurve->setYAxis(QwtPlot::yLeft);
+    rightCurve->setYAxis(QwtAxis::YLeft);
     rightSpinScanPolarData = new SpinScanPolarData(spinData, false);
 
     leftCurve = new QwtPlotCurve("SpinScan Left");
     leftCurve->setRenderHint(QwtPlotItem::RenderAntialiased); // too cpu intensive
     leftCurve->attach(this);
-    leftCurve->setYAxis(QwtPlot::yLeft);
+    leftCurve->setYAxis(QwtAxis::YLeft);
     leftSpinScanPolarData = new SpinScanPolarData(spinData, true);
 
     static_cast<QwtPlotCanvas*>(canvas())->setFrameStyle(QFrame::NoFrame);

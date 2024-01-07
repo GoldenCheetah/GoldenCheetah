@@ -60,6 +60,7 @@ class AppearanceConfig : public QWidget
 
     public:
         AppearanceConfig(QDir home, Context *context);
+        ColorsPage *appearancePage;
 
     public slots:
         qint32 saveClicked();
@@ -68,7 +69,6 @@ class AppearanceConfig : public QWidget
         QDir home;
         Context *context;
 
-        ColorsPage *appearancePage;
 };
 
 // METADATA PAGE
@@ -186,7 +186,8 @@ class ConfigDialog : public QMainWindow
 
         QStackedWidget *pagesWidget;
         QPushButton *saveButton;
-	    QPushButton *closeButton;
+        QPushButton *closeButton;
+        QPushButton *resetAppearance;
 
         // the config pages
         GeneralConfig *general;

@@ -45,8 +45,10 @@ class Result {
 
         // construct a result
         Result (double value) : isNumber(true), string_(""), number_(value) {}
+        Result (QVector<double>x) : isNumber(true), string_(""), number_(0), vector(x) { foreach(double n, x) number_ += n; }
         Result (QString value) : isNumber(false), string_(value), number_(0.0f) {}
         Result (QVector<QString> &list) : isNumber(false), string_(""), number_(0.0f), strings(list) {}
+        Result (QStringList &list) : isNumber(false), string_(""), number_(0.0f) { foreach (QString string, list) strings<<string; }
         Result () : isNumber(true), string_(""), number_(0) {}
 
         // vectorize, turn into vector of size n
@@ -113,7 +115,7 @@ class Leaf {
 
     public:
 
-        Leaf(int loc, int leng) : type(none),op(0),series(NULL),dynamic(false),loc(loc),leng(leng),inerror(false) { }
+        Leaf(int loc, int leng) : type(none),lvalue(),rvalue(),cond(),op(0),series(NULL),dynamic(false),loc(loc),leng(leng),inerror(false) { }
 
         // evaluate against a RideItem using its context
         //
@@ -125,7 +127,7 @@ class Leaf {
         // User Metric - using symbols from QHash<..> (RideItem + Interval) and
         // Spec to delimit samples in R/Python Scripts
         //
-        Result eval(DataFilterRuntime *df, Leaf *, const Result &x, long it, RideItem *m, RideFilePoint *p = NULL, const QHash<QString,RideMetric*> *metrics=NULL, Specification spec=Specification(), DateRange d=DateRange());
+        Result eval(DataFilterRuntime *df, Leaf *, const Result &x, long it, RideItem *m, RideFilePoint *p = NULL, const QHash<QString,RideMetric*> *metrics=NULL, const Specification &spec=Specification(), const  DateRange &d=DateRange());
 
         // tree traversal etc
         void print(int level, DataFilterRuntime*);  // print leaf and all children
@@ -144,6 +146,7 @@ class Leaf {
                Compound, Script } type;
 
         union value {
+            value() { l = NULL; };
             float f;
             int i;
             QString *s;
@@ -165,6 +168,7 @@ class Leaf {
 };
 
 class UserChart;
+class GenericAnnotationInfo;
 class DataFilterRuntime {
 
     // allocated for each thread to avoid race
@@ -216,9 +220,11 @@ class DataFilter : public QObject
     public:
         DataFilter(QObject *parent, Context *context);
         DataFilter(QObject *parent, Context *context, QString formula);
+        ~DataFilter() { clearFilter(); }
 
         // runtime passed by datafilter
         DataFilterRuntime rt;
+        QObject *parent() { return parent_; }
 
         // compile time errors
         QStringList &errorList() { return errors; }
@@ -260,7 +266,7 @@ class DataFilter : public QObject
         void parseBad(QStringList erorrs);
         void results(QStringList);
 
-        void annotateLabel(QStringList&);
+        void annotate(GenericAnnotationInfo&);
 
     private:
         void setSignature(QString &query);
@@ -271,6 +277,8 @@ class DataFilter : public QObject
         QStringList filenames;
         QStringList *list;
         QString sig;
+
+        QObject *parent_;
 };
 
 // general purpose model fitting to x/y data

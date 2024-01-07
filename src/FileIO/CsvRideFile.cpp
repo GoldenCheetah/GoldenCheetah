@@ -670,7 +670,7 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                     }
 
                 } else if (csvType == gc) {
-                    // GoldenCheetah CVS Format "secs, cad, hr, km, kph, nm, watts, alt, lon, lat, headwind, slope, temp, interval, lrbalance, lte, rte, lps, rps, smo2, thb, o2hb, hhb\n";
+                    // GoldenCheetah CVS Format "secs, cad, hr, km, kph, nm, watts, alt, lon, lat, headwind, slope, temp, interval, lrbalance, lte, rte, lps, rps, smo2, thb, o2hb, hhb, target\n";
 
                     seconds = line.section(',', 0, 0).toDouble();
                     minutes = seconds / 60.0f;

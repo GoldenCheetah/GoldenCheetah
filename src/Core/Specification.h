@@ -64,7 +64,7 @@ class FilterSet
         }
 
         // does the name in question pass the filter set ?
-        bool pass(QString name) {
+        bool pass(QString name) const {
             foreach(QSet<QString> set, filters_)
                 if (!set.contains(name))
                     return false;
@@ -84,16 +84,16 @@ class Specification
         Specification();
 
         // does the date pass the specification ?
-        bool pass(QDate);
+        bool pass(QDate) const;
 
         // does the rideitem pass the specification ?
-        bool pass(RideItem*);
+        bool pass(RideItem*) const;
 
         // does the ridepoint pass the specification ?
-        bool pass(RideFilePoint *p);
+        bool pass(RideFilePoint *p) const;
 
         // would it yield no data points for this ride ?
-        bool isEmpty(RideFile *);
+        bool isEmpty(RideFile *) const;
 
         // non-null if exists
         IntervalItem *interval() { return it; }

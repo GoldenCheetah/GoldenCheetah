@@ -56,6 +56,7 @@ NewCyclistDialog::NewCyclistDialog(QDir home) : QDialog(NULL, Qt::Dialog), home(
 
     dob = new QDateEdit(this);
     dob->setCalendarPopup(true);
+    dob->setDisplayFormat("yyyy/MM/dd");
 
     sex = new QComboBox(this);
     sex->addItem(tr("Male"));

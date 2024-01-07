@@ -43,9 +43,9 @@ class ScriptContext {
               interactiveShell(interactiveShell), readOnly(true), editedRideFiles(NULL) {}
 
         // read/write ctor
-        ScriptContext(Context *context, RideFile *rideFile, bool interactiveShell,
+        ScriptContext(Context *context, RideFile *rideFile, RideItem *item, bool interactiveShell,
                       bool readOnly, QList<RideFile *> *editedRideFiles)
-            : context(context), item(NULL), rideFile(rideFile), metrics(NULL), spec(),
+            : context(context), item(item), rideFile(rideFile), metrics(NULL), spec(),
               interactiveShell(interactiveShell), readOnly(readOnly), editedRideFiles(editedRideFiles) {}
 
         // default ctor

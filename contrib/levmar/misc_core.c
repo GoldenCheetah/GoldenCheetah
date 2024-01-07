@@ -22,8 +22,10 @@
 #endif
 
 
+#ifdef __GNUC__
 #pragma GCC diagnostic ignored "-Wimplicit-fallthrough"
 #pragma GCC diagnostic ignored "-Wcpp"
+#endif
 
 /* precision-specific definitions */
 #define LEVMAR_CHKJAC LM_ADD_PREFIX(levmar_chkjac)

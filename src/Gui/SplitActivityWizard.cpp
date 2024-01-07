@@ -22,6 +22,7 @@
 #include "Context.h"
 #include "HelpWhatsThis.h"
 
+
 // Minimum gap in recording to find a natural break to split
 static const double defaultMinimumGap = 1; // 1 minute
 

@@ -26,33 +26,17 @@
 static int bigHandle = 23;
 static int smallHandle = 18;
 
-// creates an icon in the apple style of gray emboss
-QIcon iconFromPNG(QString filename, bool emboss)
+// creates an icon with a modern style
+QIcon iconFromPNG(QString filename, bool )
 {
     QImage pngImage;
     pngImage.load(filename);
 
     // use muted dark gray color
     QImage gray8 = pngImage.convertToFormat(QImage::Format_Indexed8);
-    gray8.setColor(0, QColor(80,80,80, 170).rgb());
+    gray8.setColor(0, QColor(127,127,127,127).rgb());
 
-    if (GCColor::isFlat()) return QIcon(QPixmap::fromImage(gray8));
-
-    QImage white8 = pngImage.convertToFormat(QImage::Format_Indexed8);
-    white8.setColor(0, QColor(255,255,255, 255).rgb());
-
-    // now convert to a format we can paint with!
-    QImage white = white8.convertToFormat(QImage::Format_ARGB32_Premultiplied);
-    QImage gray = gray8.convertToFormat(QImage::Format_ARGB32_Premultiplied);
-
-    QPainter painter;
-    painter.begin(&white);
-    painter.setBackgroundMode(Qt::TransparentMode);
-    if (emboss) painter.drawImage(0,-1, gray);
-    else painter.drawImage(0,0, gray);
-    painter.end();
-
-    return QIcon(QPixmap::fromImage(white));
+    return QIcon(QPixmap::fromImage(gray8));
 }
 
 QIcon iconFromPNG(QString filename, QSize size)
@@ -62,7 +46,7 @@ QIcon iconFromPNG(QString filename, QSize size)
 
     // use muted dark gray color
     QImage gray8 = pngImage.convertToFormat(QImage::Format_Indexed8);
-    gray8.setColor(0, QColor(80,80,80, 170).rgb());
+    gray8.setColor(0, QColor(127,127,127, 127).rgb());
 
     return QIcon(QPixmap::fromImage(gray8,Qt::ColorOnly|Qt::PreferDither|Qt::DiffuseAlphaDither).scaled(size, Qt::IgnoreAspectRatio, Qt::SmoothTransformation));
 
@@ -394,17 +378,6 @@ GcSplitterHandle::paintBackground(QPaintEvent *)
     QLinearGradient inactive = GCColor::linearGradient(height(), false, !metal);
 
     painter.fillRect(all, isActiveWindow() ? active : inactive);
-
-    if (!GCColor::isFlat()) {
-        QPen black(QColor(100,100,100,200));
-        painter.setPen(black);
-        painter.drawLine(0,height()-1, width()-1, height()-1);
-
-        QPen gray(QColor(230,230,230));
-        painter.setPen(gray);
-        painter.drawLine(0,0, width()-1, 0);
-    }
-
     painter.restore();
 }
 
@@ -448,12 +421,6 @@ GcSplitterControl::paintBackground(QPaintEvent *)
     // fill with a linear gradient
     painter.setPen(Qt::NoPen);
     painter.fillRect(all, isActiveWindow() ? active : inactive);
-
-    if (!GCColor::isFlat()) {
-        QPen gray(QColor(230,230,230));
-        painter.setPen(gray);
-        painter.drawLine(0,0, width()-1, 0);
-    }
 }
 
 void

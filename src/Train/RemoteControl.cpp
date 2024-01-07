@@ -86,32 +86,32 @@ RemoteControl::RemoteControl()
 
     remoteCmd.setCmdId(GC_REMOTE_CMD_START);
     remoteCmd.setCmdStr(GC_REMOTE_START);
-    remoteCmd.setDisplayStr("Start");
+    remoteCmd.setDisplayStr(tr("Start"));
     _nativeCmdList.append(remoteCmd);
 
     remoteCmd.setCmdId(GC_REMOTE_CMD_STOP);
     remoteCmd.setCmdStr(GC_REMOTE_STOP);
-    remoteCmd.setDisplayStr("Stop");
+    remoteCmd.setDisplayStr(tr("Stop"));
     _nativeCmdList.append(remoteCmd);
 
     remoteCmd.setCmdId(GC_REMOTE_CMD_LAP);
     remoteCmd.setCmdStr(GC_REMOTE_LAP);
-    remoteCmd.setDisplayStr("Lap");
+    remoteCmd.setDisplayStr(tr("Lap"));
     _nativeCmdList.append(remoteCmd);
 
     remoteCmd.setCmdId(GC_REMOTE_CMD_HIGHER);
     remoteCmd.setCmdStr(GC_REMOTE_HIGHER);
-    remoteCmd.setDisplayStr("Higher");
+    remoteCmd.setDisplayStr(tr("Higher"));
     _nativeCmdList.append(remoteCmd);
 
     remoteCmd.setCmdId(GC_REMOTE_CMD_LOWER);
     remoteCmd.setCmdStr(GC_REMOTE_LOWER);
-    remoteCmd.setDisplayStr("Lower");
+    remoteCmd.setDisplayStr(tr("Lower"));
     _nativeCmdList.append(remoteCmd);
 
     remoteCmd.setCmdId(GC_REMOTE_CMD_CALIBRATE);
     remoteCmd.setCmdStr(GC_REMOTE_CALIBRATE);
-    remoteCmd.setDisplayStr("Calibrate");
+    remoteCmd.setDisplayStr(tr("Calibrate"));
     _nativeCmdList.append(remoteCmd);
 
     //

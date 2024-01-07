@@ -100,7 +100,7 @@ PerformanceManagerWindow::PerformanceManagerWindow(Context *context) :
     vlayout->addLayout(PMPickerLayout);
     setLayout(vlayout);
 
-    PMpicker = new QwtPlotPicker(QwtPlot::xBottom, QwtPlot::yLeft,
+    PMpicker = new QwtPlotPicker(QwtAxis::XBottom, QwtAxis::YLeft,
                                QwtPicker::VLineRubberBand,
                                QwtPicker::AlwaysOff, perfplot->canvas());
     PMpicker->setStateMachine(new QwtPickerDragPointMachine);
@@ -283,7 +283,7 @@ void PerformanceManagerWindow::replot()
 void
 PerformanceManagerWindow::PMpickerMoved(const QPoint &pos)
 {
-    double day = perfplot->invTransform(QwtPlot::xBottom, pos.x());
+    double day = perfplot->invTransform(QwtAxis::XBottom, pos.x());
     QDateTime date;
     double sts, lts, sb;
 

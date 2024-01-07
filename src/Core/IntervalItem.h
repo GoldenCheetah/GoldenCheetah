@@ -21,7 +21,6 @@
 #include "GoldenCheetah.h"
 
 #include "RideItem.h"
-#include "RideItem.h"
 #include <QtGui>
 #include <QDialog>
 #include <QLabel>
