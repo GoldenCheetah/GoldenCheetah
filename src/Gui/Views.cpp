@@ -31,7 +31,7 @@
 #include <QDesktopWidget>
 extern QDesktopWidget *desktop;
 
-AnalysisView::AnalysisView(Context *context, QStackedWidget *controls) : TabView(context, VIEW_ANALYSIS)
+AnalysisView::AnalysisView(Context *context, QStackedWidget *controls) : AbstractView(context, VIEW_ANALYSIS)
 {
     analSidebar = new AnalysisSidebar(context);
     BlankStateAnalysisPage *b = new BlankStateAnalysisPage(context);
@@ -50,7 +50,7 @@ AnalysisView::AnalysisView(Context *context, QStackedWidget *controls) : TabView
     setBlank(b);
     setBottom(new ComparePane(context, this, ComparePane::interval));
 
-    setSidebarEnabled(appsettings->value(this, GC_SETTINGS_MAIN_SIDEBAR "analysis", true).toBool());
+    setSidebarEnabled(appsettings->value(this, GC_SETTINGS_MAIN_SIDEBAR "analysis", defaultAppearance.sideanalysis).toBool());
 
     connect(bottomSplitter(), SIGNAL(compareChanged(bool)), this, SLOT(compareChanged(bool)));
     connect(bottomSplitter(), SIGNAL(compareClear()), bottom(), SLOT(clear()));
@@ -71,6 +71,8 @@ AnalysisView::~AnalysisView()
 void
 AnalysisView::setRide(RideItem *ride)
 {
+    if (!loaded) return; // not loaded yet, all bets are off till then.
+
     // when ride selected, but not from the sidebar.
     static_cast<AnalysisSidebar*>(sidebar())->setRide(ride); // save settings
 
@@ -127,7 +129,7 @@ AnalysisView::isBlank()
     else return true;
 }
 
-DiaryView::DiaryView(Context *context, QStackedWidget *controls) : TabView(context, VIEW_DIARY)
+DiaryView::DiaryView(Context *context, QStackedWidget *controls) : AbstractView(context, VIEW_DIARY)
 {
     diarySidebar = new DiarySidebar(context);
     BlankStateDiaryPage *b = new BlankStateDiaryPage(context);
@@ -143,7 +145,7 @@ DiaryView::DiaryView(Context *context, QStackedWidget *controls) : TabView(conte
     setPages(pstack);
     setBlank(b);
 
-    setSidebarEnabled(appsettings->value(this,  GC_SETTINGS_MAIN_SIDEBAR "diary", true).toBool());
+    setSidebarEnabled(appsettings->value(this,  GC_SETTINGS_MAIN_SIDEBAR "diary", false).toBool());
     connect(diarySidebar, SIGNAL(dateRangeChanged(DateRange)), this, SLOT(dateRangeChanged(DateRange)));
 }
 
@@ -177,7 +179,7 @@ DiaryView::isBlank()
     else return true;
 }
 
-TrendsView::TrendsView(Context *context, QStackedWidget *controls) : TabView(context, VIEW_TRENDS)
+TrendsView::TrendsView(Context *context, QStackedWidget *controls) : AbstractView(context, VIEW_TRENDS)
 {
     sidebar = new LTMSidebar(context);
     BlankStateHomePage *b = new BlankStateHomePage(context);
@@ -194,7 +196,7 @@ TrendsView::TrendsView(Context *context, QStackedWidget *controls) : TabView(con
     setBlank(b);
     setBottom(new ComparePane(context, this, ComparePane::season));
 
-    setSidebarEnabled(appsettings->value(this,  GC_SETTINGS_MAIN_SIDEBAR "trend", true).toBool());
+    setSidebarEnabled(appsettings->value(this,  GC_SETTINGS_MAIN_SIDEBAR "trend", defaultAppearance.sidetrend).toBool());
     connect(sidebar, SIGNAL(dateRangeChanged(DateRange)), this, SLOT(dateRangeChanged(DateRange)));
     connect(this, SIGNAL(onSelectionChanged()), this, SLOT(justSelected()));
     connect(bottomSplitter(), SIGNAL(compareChanged(bool)), this, SLOT(compareChanged(bool)));
@@ -283,9 +285,10 @@ TrendsView::justSelected()
     }
 }
 
-TrainView::TrainView(Context *context, QStackedWidget *controls) : TabView(context, VIEW_TRAIN)
+TrainView::TrainView(Context *context, QStackedWidget *controls) : AbstractView(context, VIEW_TRAIN)
 {
     trainTool = new TrainSidebar(context);
+    trainTool->setTrainView(this);
     trainTool->hide();
     BlankStateTrainPage *b = new BlankStateTrainPage(context);
 
@@ -304,7 +307,7 @@ TrainView::TrainView(Context *context, QStackedWidget *controls) : TabView(conte
     setBottom(trainBottom);
     setHideBottomOnIdle(false);
 
-    setSidebarEnabled(appsettings->value(NULL,  GC_SETTINGS_MAIN_SIDEBAR "train").toBool());
+    setSidebarEnabled(appsettings->value(NULL,  GC_SETTINGS_MAIN_SIDEBAR "train", defaultAppearance.sidetrain).toBool());
     connect(this, SIGNAL(onSelectionChanged()), this, SLOT(onSelectionChanged()));
     connect(trainBottom, SIGNAL(autoHideChanged(bool)), this, SLOT(onAutoHideChanged(bool)));
 }

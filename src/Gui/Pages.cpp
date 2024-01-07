@@ -39,7 +39,6 @@
 #include "HelpWhatsThis.h"
 #include "GcUpgrade.h"
 #include "Dropbox.h"
-#include "GoogleDrive.h"
 #include "LocalFileStore.h"
 #include "Secrets.h"
 #include "Utils.h"
@@ -731,7 +730,7 @@ TrainOptionsPage::TrainOptionsPage(QWidget *parent, Context *context) : QWidget(
     connect(workoutBrowseButton, SIGNAL(clicked()), this, SLOT(browseWorkoutDir()));
 
     useSimulatedSpeed = new QCheckBox(tr("Simulate Speed From Power"), this);
-    useSimulatedSpeed->setChecked(appsettings->value(this, TRAIN_USESIMULATEDSPEED, false).toBool());
+    useSimulatedSpeed->setChecked(appsettings->value(this, TRAIN_USESIMULATEDSPEED, true).toBool());
     useSimulatedSpeed->setToolTip(tr("Simulation physics uses current athlete parameters and settings\n"
                                      "from the virtual bicycle specifications tab. For Erg Mode workouts\n"
                                      "the slope is assumed to be zero."));
@@ -750,9 +749,6 @@ TrainOptionsPage::TrainOptionsPage(QWidget *parent, Context *context) : QWidget(
 
     autoHide = new QCheckBox(tr("Auto-hide bottom bar in Train View"), this);
     autoHide->setChecked(appsettings->value(this, TRAIN_AUTOHIDE, false).toBool());
-
-    // Disabled until ported across from the existing bottom bar checkbox
-    autoHide->setDisabled(true);
 
     lapAlert = new QCheckBox(tr("Play sound before new lap"), this);
     lapAlert->setChecked(appsettings->value(this, TRAIN_LAPALERT, false).toBool());
@@ -856,7 +852,7 @@ RemotePage::RemotePage(QWidget *parent, Context *context) : QWidget(parent), con
     foreach (RemoteCmd nativeCmd, nativeCmds) {
 
         QComboBox *comboBox = new QComboBox(this);
-        comboBox->addItem("<unset>");
+        comboBox->addItem(tr("<unset>"));
 
         // populate the combo box with all possible ANT commands
         foreach(RemoteCmd antCmd, antCmds) {
@@ -1186,7 +1182,6 @@ SimBicyclePage::saveClicked()
 }
 
 
-static double scalefactors[9] = { 0.5f, 0.6f, 0.8, 0.9, 1.0f, 1.1f, 1.25f, 1.5f, 2.0f };
 
 //
 // Appearances page
@@ -1213,10 +1208,12 @@ ColorsPage::ColorsPage(QWidget *parent) : QWidget(parent)
     searchLayout->addWidget(searchEdit);
 
     colors = new QTreeWidget;
-    colors->headerItem()->setText(0, tr("Color"));
-    colors->headerItem()->setText(1, tr("Select"));
-    colors->setColumnCount(2);
-    colors->setColumnWidth(0,350 *dpiXFactor);
+    colors->headerItem()->setText(0, tr("Group"));
+    colors->headerItem()->setText(1, tr("Color"));
+    colors->headerItem()->setText(2, tr("Select"));
+    colors->setColumnCount(3);
+    colors->setColumnWidth(0,70 *dpiXFactor);
+    colors->setColumnWidth(1,350 *dpiXFactor);
     colors->setSelectionMode(QAbstractItemView::NoSelection);
     //colors->setEditTriggers(QAbstractItemView::SelectedClicked); // allow edit
     colors->setUniformRowHeights(true); // causes height problems when adding - in case of non-text fields
@@ -1257,11 +1254,11 @@ ColorsPage::ColorsPage(QWidget *parent) : QWidget(parent)
     double scale = appsettings->value(this, GC_FONT_SCALE, 1.0).toDouble();
     fontscale = new QSlider(this);
     fontscale->setMinimum(0);
-    fontscale->setMaximum(8);
+    fontscale->setMaximum(11);
     fontscale->setTickInterval(1);
     fontscale->setValue(3);
     fontscale->setOrientation(Qt::Horizontal);
-    for(int i=0; i<7; i++) {
+    for(int i=0; i<12; i++) {
         if (scalefactors[i] == scale) {
             fontscale->setValue(i);
             break;
@@ -1271,9 +1268,9 @@ ColorsPage::ColorsPage(QWidget *parent) : QWidget(parent)
     QFont font=baseFont;
     font.setPointSizeF(baseFont.pointSizeF() * scale);
     fonttext = new QLabel(this);
-    fonttext->setText("The quick brown fox jumped over the lazy dog");
+    fonttext->setText(tr("The quick brown fox jumped over the lazy dog"));
     fonttext->setFont(font);
-    fonttext->setFixedHeight(30 * dpiYFactor);
+    fonttext->setFixedHeight(90 * dpiYFactor);
     fonttext->setFixedWidth(330 * dpiXFactor);
 
     QGridLayout *grid = new QGridLayout;
@@ -1287,10 +1284,10 @@ ColorsPage::ColorsPage(QWidget *parent) : QWidget(parent)
     grid->addWidget(antiAliasLabel, 1,3);
     grid->addWidget(antiAliased, 1,4);
 #ifndef Q_OS_MAC
-    grid->addWidget(rideScrollLabel, 2,3);
-    grid->addWidget(rideScroll, 2,4);
-    grid->addWidget(rideHeadLabel, 3,3);
-    grid->addWidget(rideHead, 3,4);
+    grid->addWidget(rideScrollLabel, 2,3, Qt::AlignLeft|Qt::AlignTop);
+    grid->addWidget(rideScroll, 2,4, Qt::AlignLeft|Qt::AlignTop);
+    //grid->addWidget(rideHeadLabel, 3,3); // Disabled in RideNavigator
+    //grid->addWidget(rideHead, 3,4);      // better don't display
 #endif
 
     grid->addWidget(def, 0,1, Qt::AlignVCenter|Qt::AlignLeft);
@@ -1323,10 +1320,16 @@ ColorsPage::ColorsPage(QWidget *parent) : QWidget(parent)
         QTreeWidgetItem *add;
         ColorButton *colorButton = new ColorButton(this, colorSet[i].name, colorSet[i].color);
         add = new QTreeWidgetItem(colors->invisibleRootItem());
-        add->setText(0, colorSet[i].name);
-        colors->setItemWidget(add, 1, colorButton);
+        add->setData(0, Qt::UserRole, i); // remember which index it is for since gets sorted
+        add->setText(0, colorSet[i].group);
+        add->setText(1, colorSet[i].name);
+        colors->setItemWidget(add, 2, colorButton);
 
     }
+    colors->setSortingEnabled(true);
+    colors->sortByColumn(1, Qt::AscendingOrder); // first sort by name
+    colors->sortByColumn(0, Qt::AscendingOrder); // now by group
+
     connect(applyTheme, SIGNAL(clicked()), this, SLOT(applyThemeClicked()));
 
     foreach(ColorTheme theme, GCColor::themes().themes) {
@@ -1365,7 +1368,7 @@ ColorsPage::searchFilter(QString text)
     for(int i=0; i<colors->invisibleRootItem()->childCount(); i++) {
         if (empty) colors->setRowHidden(i, colors->rootIndex(), false);
         else {
-            QString text = colors->invisibleRootItem()->child(i)->text(0);
+            QString text = colors->invisibleRootItem()->child(i)->text(1);
             bool found=false;
             foreach(QString tok, toks) {
                 if (text.contains(tok, Qt::CaseInsensitive)) {
@@ -1403,6 +1406,13 @@ ColorsPage::applyThemeClicked()
     // first check we have a selection!
     if (themes->currentItem() && (index=themes->invisibleRootItem()->indexOfChild(themes->currentItem())) >= 0) {
 
+        applyThemeIndex(index);
+    }
+}
+
+void
+ColorsPage::applyThemeIndex(int index)
+{
         // now get the theme selected
         ColorTheme theme = GCColor::themes().themes[index];
 
@@ -1411,6 +1421,8 @@ ColorsPage::applyThemeClicked()
 
         // reset the color selection tools
         colors->clear();
+        colors->setSortingEnabled(false);
+
         for (int i=0; colorSet[i].name != ""; i++) {
 
             QColor color;
@@ -1442,10 +1454,27 @@ ColorsPage::applyThemeClicked()
                 color = theme.colors[11];
                 break;
 
+            case CCARDBACKGROUND2:
+                // set back to light black for dark themes
+                // and gray for light themes
+                color = theme.colors[12];
+                break;
+
+            case CCARDBACKGROUND3:
+                // set back to light black for dark themes
+                // and gray for light themes
+                color = theme.colors[13];
+                break;
+
             case CCHROME:
+            case CCHARTBAR:
             case CTOOLBAR: // we always keep them the same, but user can make different
                 //  set to black for dark themese and grey for light themes
                 color = theme.colors[1];
+                break;
+
+            case CHOVER:
+                color = theme.stealth ? theme.colors[11] : (theme.dark ? QColor(50,50,50) : QColor(200,200,200));
                 break;
 
             case CPLOTSYMBOL:
@@ -1504,11 +1533,32 @@ ColorsPage::applyThemeClicked()
             QTreeWidgetItem *add;
             ColorButton *colorButton = new ColorButton(this, colorSet[i].name, color);
             add = new QTreeWidgetItem(colors->invisibleRootItem());
-            add->setText(0, colorSet[i].name);
-            colors->setItemWidget(add, 1, colorButton);
+            add->setData(0, Qt::UserRole, i); // remember which index it is for since gets sorted
+            add->setText(0, colorSet[i].group);
+            add->setText(1, colorSet[i].name);
+            colors->setItemWidget(add, 2, colorButton);
 
         }
-    }
+        colors->setSortingEnabled(true);
+        colors->sortByColumn(1, Qt::AscendingOrder); // first sort by name
+        colors->sortByColumn(0, Qt::AscendingOrder);
+}
+
+void
+ColorsPage::resetClicked()
+{
+    AppearanceSettings defaults = GSettings::defaultAppearanceSettings();
+
+    def->setCurrentFont(QFont(defaults.fontfamily));
+    fontscale->setValue(defaults.fontscaleindex);
+    lineWidth->setValue(defaults.linewidth);
+    antiAliased->setChecked(defaults.antialias);
+#ifndef Q_OS_MAC // they do scrollbars nicely
+    rideHead->setChecked(defaults.head);
+    rideScroll->setChecked(defaults.scrollbar);
+#endif
+
+    applyThemeIndex(defaults.theme);
 }
 
 qint32
@@ -1526,11 +1576,12 @@ ColorsPage::saveClicked()
     // run down and get the current colors and save
     for (int i=0; colorSet[i].name != ""; i++) {
         QTreeWidgetItem *current = colors->invisibleRootItem()->child(i);
-        QColor newColor = ((ColorButton*)colors->itemWidget(current, 1))->getColor();
+        QColor newColor = ((ColorButton*)colors->itemWidget(current, 2))->getColor();
         QString colorstring = QString("%1:%2:%3").arg(newColor.red())
                                                  .arg(newColor.green())
                                                  .arg(newColor.blue());
-        appsettings->setValue(colorSet[i].setting, colorstring);
+        int colornum = current->data(0, Qt::UserRole).toInt();
+        appsettings->setValue(colorSet[colornum].setting, colorstring);
     }
 
     // update basefont family
@@ -1904,7 +1955,8 @@ CustomMetricsPage::addClicked()
     here.name = "My Average Power";
     here.type = 1;
     here.precision = 0;
-    here.description = "Average Power computed using Joules to account for variable recording.";
+    here.istime = false;
+    here.description = "Average Power";
     here.unitsMetric = "watts";
     here.unitsImperial = "watts";
     here.conversion = 1.00;
@@ -1914,17 +1966,12 @@ CustomMetricsPage::addClicked()
     relevant { Data contains \"P\"; }\n\
 \n\
     # initialise aggregating variables\n\
-    init { joules <- 0; seconds <- 0; }\n\
-\n\
-    # joules = power x time, for each sample\n\
-    sample { \n\
-        joules <- joules + (POWER * RECINTSECS);\n\
-        seconds <- seconds + RECINTSECS;\n\
-    }\n\
+    # does nothing, update as needed\n\
+    init { 0; }\n\
 \n\
     # calculate metric value at end\n\
-    value { joules / seconds; }\n\
-    count { seconds; }\n\
+    value { mean(samples(POWER)); }\n\
+    count { Duration; }\n\
 }";
 
     EditUserMetricDialog editor(this, context, here);
@@ -2510,13 +2557,17 @@ FieldsPage::FieldsPage(QWidget *parent, QList<FieldDefinition>fieldDefinitions) 
     fields->headerItem()->setText(1, tr("Field"));
     fields->headerItem()->setText(2, tr("Type"));
     fields->headerItem()->setText(3, tr("Values"));
-    fields->headerItem()->setText(4, tr("Diary"));
-    fields->setColumnWidth(0,80 *dpiXFactor);
+    fields->headerItem()->setText(4, tr("Summary"));
+    fields->headerItem()->setText(5, tr("Interval"));
+    fields->headerItem()->setText(6, tr("Expression"));
+    fields->setColumnWidth(0,100 *dpiXFactor);
     fields->setColumnWidth(1,100 *dpiXFactor);
     fields->setColumnWidth(2,100 *dpiXFactor);
-    fields->setColumnWidth(3,80 *dpiXFactor);
-    fields->setColumnWidth(4,20 *dpiXFactor);
-    fields->setColumnCount(5);
+    fields->setColumnWidth(3,100 *dpiXFactor);
+    fields->setColumnWidth(4,80 *dpiXFactor);
+    fields->setColumnWidth(5,80 *dpiXFactor);
+    fields->setColumnWidth(6,80 *dpiXFactor);
+    fields->setColumnCount(7);
     fields->setSelectionMode(QAbstractItemView::SingleSelection);
     fields->setEditTriggers(QAbstractItemView::SelectedClicked); // allow edit
     //fields->setUniformRowHeights(true); // causes height problems when adding - in case of non-text fields
@@ -2529,6 +2580,9 @@ FieldsPage::FieldsPage(QWidget *parent, QList<FieldDefinition>fieldDefinitions) 
         QComboBox *comboButton = new QComboBox(this);
         QCheckBox *checkBox = new QCheckBox("", this);
         checkBox->setChecked(field.diary);
+
+        QCheckBox *checkBoxInt = new QCheckBox("", this);
+        checkBoxInt->setChecked(field.interval);
 
         addFieldTypes(comboButton);
         comboButton->setCurrentIndex(field.type);
@@ -2547,6 +2601,10 @@ FieldsPage::FieldsPage(QWidget *parent, QList<FieldDefinition>fieldDefinitions) 
         add->setTextAlignment(2, Qt::AlignHCenter);
         fields->setItemWidget(add, 2, comboButton);
         fields->setItemWidget(add, 4, checkBox);
+        fields->setItemWidget(add, 5, checkBoxInt);
+
+        // expression
+        add->setText(6, field.expression);
     }
     fields->setCurrentItem(fields->invisibleRootItem()->child(0));
 
@@ -2570,15 +2628,19 @@ FieldsPage::upClicked()
         // movin on up!
         QWidget *button = fields->itemWidget(fields->currentItem(),2);
         QWidget *check = fields->itemWidget(fields->currentItem(),4);
+        QWidget *checkInt = fields->itemWidget(fields->currentItem(),5);
         QComboBox *comboButton = new QComboBox(this);
         addFieldTypes(comboButton);
         comboButton->setCurrentIndex(((QComboBox*)button)->currentIndex());
         QCheckBox *checkBox = new QCheckBox("", this);
         checkBox->setChecked(((QCheckBox*)check)->isChecked());
+        QCheckBox *checkBoxInt = new QCheckBox("", this);
+        checkBoxInt->setChecked(((QCheckBox*)checkInt)->isChecked());
         QTreeWidgetItem* moved = fields->invisibleRootItem()->takeChild(index);
         fields->invisibleRootItem()->insertChild(index-1, moved);
         fields->setItemWidget(moved, 2, comboButton);
         fields->setItemWidget(moved, 4, checkBox);
+        fields->setItemWidget(moved, 5, checkBoxInt);
         fields->setCurrentItem(moved);
     }
 }
@@ -2592,15 +2654,19 @@ FieldsPage::downClicked()
 
         QWidget *button = fields->itemWidget(fields->currentItem(),2);
         QWidget *check = fields->itemWidget(fields->currentItem(),4);
+        QWidget *checkInt = fields->itemWidget(fields->currentItem(),5);
         QComboBox *comboButton = new QComboBox(this);
         addFieldTypes(comboButton);
         comboButton->setCurrentIndex(((QComboBox*)button)->currentIndex());
         QCheckBox *checkBox = new QCheckBox("", this);
         checkBox->setChecked(((QCheckBox*)check)->isChecked());
+        QCheckBox *checkBoxInt = new QCheckBox("", this);
+        checkBoxInt->setChecked(((QCheckBox*)checkInt)->isChecked());
         QTreeWidgetItem* moved = fields->invisibleRootItem()->takeChild(index);
         fields->invisibleRootItem()->insertChild(index+1, moved);
         fields->setItemWidget(moved, 2, comboButton);
         fields->setItemWidget(moved, 4, checkBox);
+        fields->setItemWidget(moved, 5, checkBoxInt);
         fields->setCurrentItem(moved);
     }
 }
@@ -2621,6 +2687,7 @@ FieldsPage::addClicked()
     QComboBox *comboButton = new QComboBox(this);
     addFieldTypes(comboButton);
     QCheckBox *checkBox = new QCheckBox("", this);
+    QCheckBox *checkBoxInt = new QCheckBox("", this);
 
     add = new QTreeWidgetItem;
     fields->invisibleRootItem()->insertChild(index, add);
@@ -2637,6 +2704,7 @@ FieldsPage::addClicked()
     add->setTextAlignment(2, Qt::AlignHCenter);
     fields->setItemWidget(add, 2, comboButton);
     fields->setItemWidget(add, 4, checkBox);
+    fields->setItemWidget(add, 5, checkBoxInt);
 }
 
 void
@@ -2673,6 +2741,8 @@ FieldsPage::getDefinitions(QList<FieldDefinition> &fieldList)
         add.name = sp.internalName(item->text(1));
         add.values = item->text(3).split(QRegExp("(, *|,)"), QString::KeepEmptyParts);
         add.diary = ((QCheckBox*)fields->itemWidget(item, 4))->isChecked();
+        add.interval = ((QCheckBox*)fields->itemWidget(item, 5))->isChecked();
+        add.expression = item->text(6);
 
         if (sp.isMetric(add.name))
             add.type = 4;
@@ -3294,7 +3364,7 @@ MeasuresConfigPage::removeMeasuresFieldClicked()
 ///
 MeasuresSettingsDialog::MeasuresSettingsDialog(QWidget *parent, QString &symbol, QString &name) : QDialog(parent), symbol(symbol), name(name)
 {
-    setWindowTitle("Measures Group");
+    setWindowTitle(tr("Measures Group"));
     setAttribute(Qt::WA_DeleteOnClose);
     setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint | Qt::Tool);
 
@@ -3349,7 +3419,7 @@ void MeasuresSettingsDialog::okClicked()
 ///
 MeasuresFieldSettingsDialog::MeasuresFieldSettingsDialog(QWidget *parent, MeasuresField &field) : QDialog(parent), field(field)
 {
-    setWindowTitle("Measures Field");
+    setWindowTitle(tr("Measures Field"));
     setAttribute(Qt::WA_DeleteOnClose);
     setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint | Qt::Tool);
 

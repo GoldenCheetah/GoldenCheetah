@@ -76,6 +76,13 @@
 		</field>
 		<field>
 			<fieldtab>"Workout"</fieldtab>
+			<fieldname>"Feel"</fieldname>
+			<fieldtype>3</fieldtype>
+			<fieldvalues>"0,25,50,75,100"</fieldvalues>
+			<fielddiary>0</fielddiary>
+		</field>
+		<field>
+			<fieldtab>"Workout"</fieldtab>
 			<fieldname>"Commute"</fieldname>
 			<fieldtype>7</fieldtype>
 			<fieldvalues>""</fieldvalues>

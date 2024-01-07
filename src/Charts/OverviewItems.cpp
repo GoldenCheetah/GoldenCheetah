@@ -18,7 +18,7 @@
 
 #include "OverviewItems.h"
 
-#include "TabView.h"
+#include "AbstractView.h"
 #include "Athlete.h"
 #include "RideCache.h"
 #include "IntervalItem.h"
@@ -33,9 +33,11 @@
 #include "DataFilter.h"
 #include "Utils.h"
 #include "TimeUtils.h"
-#include "Tab.h"
+#include "AthleteTab.h"
 #include "LTMTool.h"
 #include "RideNavigator.h"
+
+#include "UserChartOverviewItem.h"
 
 #include <cmath>
 #include <QGraphicsSceneMouseEvent>
@@ -46,14 +48,17 @@
 #include <QJsonArray>
 #include <QJsonValue>
 
-static bool _registerItems()
+bool
+OverviewItemConfig::registerItems()
 {
     // get the factory
     ChartSpaceItemRegistry &registry = ChartSpaceItemRegistry::instance();
 
     // Register      TYPE                          SHORT                      DESCRIPTION                                        SCOPE            CREATOR
+    registry.addItem(OverviewItemType::USERCHART,  QObject::tr("User Chart"), QObject::tr("User defined interactive chart"),     OverviewScope::ANALYSIS|OverviewScope::TRENDS, UserChartOverviewItem::create);
     registry.addItem(OverviewItemType::METRIC,     QObject::tr("Metric"),     QObject::tr("Metric and Sparkline"),               OverviewScope::ANALYSIS|OverviewScope::TRENDS, MetricOverviewItem::create);
     registry.addItem(OverviewItemType::KPI,        QObject::tr("KPI"),        QObject::tr("KPI calculation and progress bar"),   OverviewScope::ANALYSIS|OverviewScope::TRENDS, KPIOverviewItem::create);
+    registry.addItem(OverviewItemType::DATATABLE,  QObject::tr("Table"),      QObject::tr("Table of data"),                      OverviewScope::ANALYSIS|OverviewScope::TRENDS, DataOverviewItem::create);
     registry.addItem(OverviewItemType::TOPN,       QObject::tr("Bests"),      QObject::tr("Ranked list of bests"),               OverviewScope::TRENDS,                         TopNOverviewItem::create);
     registry.addItem(OverviewItemType::META,       QObject::tr("Metadata"),   QObject::tr("Metadata and Sparkline"),             OverviewScope::ANALYSIS,                       MetaOverviewItem::create);
     registry.addItem(OverviewItemType::ZONE,       QObject::tr("Zones"),      QObject::tr("Zone Histogram"),                     OverviewScope::ANALYSIS|OverviewScope::TRENDS, ZoneOverviewItem::create);
@@ -66,7 +71,6 @@ static bool _registerItems()
 
     return true;
 }
-static bool registered = _registerItems();
 
 static void setFilter(ChartSpaceItem *item, Specification &spec)
 {
@@ -80,7 +84,7 @@ static void setFilter(ChartSpaceItem *item, Specification &spec)
 
         // property gets set after chartspace is initialised, so when we start up its not
         // available, but comes later...
-        if (item->parent->window->property("perspective").isValid())
+        if (item->parent->window->myPerspective != NULL)
             fs.addFilter(item->parent->window->myPerspective->isFiltered(), item->parent->window->myPerspective->filterlist(item->parent->myDateRange));
 
         // local filter
@@ -92,12 +96,15 @@ static void setFilter(ChartSpaceItem *item, Specification &spec)
 
 RPEOverviewItem::RPEOverviewItem(ChartSpace *parent, QString name) : ChartSpaceItem(parent, name)
 {
-
     // a META widget, "RPE" using the FOSTER modified 0-10 scale
     this->type = OverviewItemType::RPE;
 
     sparkline = new Sparkline(this, name);
     rperating = new RPErating(this, name);
+
+    configwidget = new OverviewItemConfig(this);
+    configwidget->hide();
+
 }
 
 RPEOverviewItem::~RPEOverviewItem()
@@ -108,7 +115,6 @@ RPEOverviewItem::~RPEOverviewItem()
 
 KPIOverviewItem::KPIOverviewItem(ChartSpace *parent, QString name, double start, double stop, QString program, QString units, bool istime) : ChartSpaceItem(parent, name)
 {
-
     this->type = OverviewItemType::KPI;
     this->start = start;
     this->stop = stop;
@@ -118,6 +124,9 @@ KPIOverviewItem::KPIOverviewItem(ChartSpace *parent, QString name, double start,
 
     value ="";
     progressbar = new ProgressBar(this, start, stop, value.toDouble());
+
+    configwidget = new OverviewItemConfig(this);
+    configwidget->hide();
 }
 
 KPIOverviewItem::~KPIOverviewItem()
@@ -126,10 +135,456 @@ KPIOverviewItem::~KPIOverviewItem()
     delete progressbar;
 }
 
+DataOverviewItem::DataOverviewItem(ChartSpace *parent, QString name, QString program) : ChartSpaceItem(parent, name)
+{
+    this->type = OverviewItemType::DATATABLE;
+    this->program = program;
+
+    click = false;
+    lastsort = sortcolumn = -1;
+    lastorder = Qt::AscendingOrder;
+    clickthru = NULL;
+
+    configwidget = new OverviewItemConfig(this);
+    configwidget->hide();
+
+    scrollbar = new VScrollBar(this, parent);
+
+    // refresh when interval events happen (only on analysis view)
+    if (parent->scope == OverviewScope::ANALYSIS) {
+        //connect(parent->context, SIGNAL(intervalSelected()), this, SLOT(intervalSelectRefresh()));
+        //connect(parent->context, SIGNAL(intervalsChanged()), this, SLOT(intervalSelectRefresh()));
+        //connect(parent->context, SIGNAL(intervalsUpdate(RideItem*)), this, SLOT(intervalSelectRefresh()));
+        connect(parent->context, SIGNAL(intervalHover(IntervalItem*)), this, SLOT(intervalHover(IntervalItem*)));
+        //connect(parent->context, SIGNAL(intervalZoom(IntervalItem*)), this, SLOT(intervalSelectRefresh()));
+        //connect(parent->context, SIGNAL(intervalItemSelectionChanged(IntervalItem*)), this, SLOT(intervalSelectRefresh()));
+    }
+}
+
+DataOverviewItem::~DataOverviewItem()
+{
+}
+
+#define DATA_TABLE_TOTALS      1
+#define DATA_TABLE_AVERAGES    2
+#define DATA_TABLE_MAXIMUMS    3
+#define DATA_TABLE_METRICS     4
+#define DATA_TABLE_ZONES       5
+#define DATA_TABLE_INTERVALS   6
+#define DATA_TABLE_TRENDS      9
+
+// this is the old metric configuration, now deprecated, we will look it up
+// when setting the legacy metrics, as a convenience for users
+#define GC_SETTINGS_SUMMARY_METRICS     "<global-general>rideSummaryWindow/summaryMetrics"
+
+QString DataOverviewItem::getLegacyProgram(int type, DataFilterRuntime &rt, bool trends)
+{
+    QString program;
+
+    // we need to aggregate on trends view
+    QString prefix = trends ? "agg" : "";
+    bool replace=false;
+
+    switch(type) {
+
+    case DATA_TABLE_TRENDS:
+            program =
+            "{\n"
+            "\n"
+            "# column names, if using metrics then best\n"
+            "# to use metricname() to get correct name for locale\n"
+            "# otherwise it won't translate to other languages\n"
+            "names {\n"
+            "    metricname(date,\n"
+            "         Duration,\n"
+            "         Time_Moving,\n"
+            "         Distance,\n"
+            "         Work,\n"
+            "         W'_Work,\n"
+            "         30_min_Peak_Power);\n"
+            "}\n"
+            "\n"
+            "# column units, if using metrics then best\n"
+            "# to use metricunit() function to get correct string\n"
+            "# for locale and metric/imperial\n"
+            "units {\n"
+            "    metricunit(date,\n"
+            "         Duration,\n"
+            "         Time_Moving,\n"
+            "         Distance,\n"
+            "         Work,\n"
+            "         W'_Work,\n"
+            "         30_min_Peak_Power);\n"
+            "}\n"
+            "\n"
+            "# values to display as doubles or strings\n"
+            "# if using metrics always best to use asstring()\n"
+            "# to convert correctly with dp, metric/imperial\n"
+            "# or specific formats eg. rowing pace xx/500m\n"
+            "values { \n"
+            "    c(metricstrings(date),\n"
+            "      metricstrings(Duration),\n"
+            "      metricstrings(Time_Moving),\n"
+            "      metricstrings(Distance),\n"
+            "      metricstrings(Work),\n"
+            "      metricstrings(W'_Work),\n"
+            "      metricstrings(30_min_Peak_Power)); \n"
+            "} \n"
+            "\n"
+            "# heat values for coloring the cell\n"
+            "# must be between 0 and 1 where the\n"
+            "heat { \n"
+            "    c(normalize(0,0,metrics(date)),\n"
+            "      normalize(0,0,metrics(Duration)),\n"
+            "      normalize(0,0,metrics(Time_Moving)),\n"
+            "      normalize(0,0,metrics(Distance)),\n"
+            "      normalize(0,0,metrics(Work)),\n"
+            "      normalize(0,0,metrics(W'_Work)),\n"
+            "      normalize(0,300,metrics(30_min_Peak_Power))); \n"
+            "} \n"
+            "\n"
+            "# Click thru for the row, we can set the file\n"
+            "# this row represents. In the same way as a user chart.\n"
+            "f { \n"
+            "    filename();\n"
+            "}\n"
+            "\n"
+            "}";
+    break;
+
+    case DATA_TABLE_AVERAGES:
+    program =
+            "{\n"
+            "\n"
+            "# column names, if using metrics then best\n"
+            "# to use metricname() to get correct name for locale\n"
+            "# otherwise it won't translate to other languages\n"
+            "names { \n"
+            "    metricname(Athlete_Weight,\n"
+            "         Average_Speed,\n"
+            "         Average_Power,\n"
+            "         Average_Heart_Rate,\n"
+            "         Average_Cadence);\n"
+            "}\n"
+            "\n"
+            "# column units, if using metrics then best\n"
+            "# to use metricunit() function to get correct string\n"
+            "# for locale and metric/imperial\n"
+            "units { \n"
+            "    metricunit(Athlete_Weight,\n"
+            "         Average_Speed,\n"
+            "         Average_Power,\n"
+            "         Average_Heart_Rate,\n"
+            "         Average_Cadence);\n"
+            "}\n"
+            "\n"
+            "# values to display as doubles or strings\n"
+            "# if using metrics always best to use asstring()\n"
+            "# to convert correctly with dp, metric/imperial\n"
+            "# or specific formats eg. rowing pace xx/500m\n"
+            "values { \n"
+            "    as%1string(Athlete_Weight,\n"
+            "         Average_Speed,\n"
+            "         Average_Power,\n"
+            "         Average_Heart_Rate,\n"
+            "         Average_Cadence); \n"
+            "} \n"
+            "\n"
+            "}\n";
+    replace = true;
+    break;
+
+    case DATA_TABLE_MAXIMUMS:
+    program =
+            "{\n"
+            "\n"
+            "# column names, if using metrics then best\n"
+            "# to use metricname() to get correct name for locale\n"
+            "# otherwise it won't translate to other languages\n"
+            "names { \n"
+            "    metricname(Max_Speed,\n"
+            "         Max_Power,\n"
+            "         Max_Heartrate,\n"
+            "         Max_Cadence,\n"
+            "         Max_W'_Expended);\n"
+            "}\n"
+            "\n"
+            "# column units, if using metrics then best\n"
+            "# to use metricunit() function to get correct string\n"
+            "# for locale and metric/imperial\n"
+            "units { \n"
+            "    metricunit(Max_Speed,\n"
+            "         Max_Power,\n"
+            "         Max_Heartrate,\n"
+            "         Max_Cadence,\n"
+            "         Max_W'_Expended);\n"
+            "}\n"
+            "\n"
+            "# values to display as doubles or strings\n"
+            "# if using metrics always best to use asstring()\n"
+            "# to convert correctly with dp, metric/imperial\n"
+            "# or specific formats eg. rowing pace xx/500m\n"
+            "values { \n"
+            "    as%1string(Max_Speed,\n"
+            "         Max_Power,\n"
+            "         Max_Heartrate,\n"
+            "         Max_Cadence,\n"
+            "         Max_W'_Expended); \n"
+            "} \n"
+            "\n"
+            "}\n";
+        replace=true;
+    break;
+
+    case DATA_TABLE_METRICS:
+    {
+        // get a string list of the metrics to show
+        QString s;
+        if (appsettings->contains(GC_SETTINGS_SUMMARY_METRICS)) s = appsettings->value(NULL, GC_SETTINGS_SUMMARY_METRICS).toString();
+        else s = GC_SETTINGS_FAVOURITE_METRICS_DEFAULT;
+        QStringList symbols = s.split(",");
+
+        // convert metric symbols to names we can use in the program
+        QStringList list;
+        QMapIterator<QString, QString> i(rt.lookupMap);
+        while (i.hasNext()) {
+            i.next();
+            if (symbols.contains(i.value())) list << i.key();
+        }
+
+        // generate a program
+        QString metrics = list.join(",\n              ");
+
+        program =
+            "{\n"
+            "\n"
+            "# column names, if using metrics then best\n"
+            "# to use metricname() to get correct name for locale\n"
+            "# otherwise it won't translate to other languages\n"
+            "names { \n"
+            "    metricname(" + metrics + ");\n"
+            "}\n"
+            "\n"
+            "# column units, if using metrics then best\n"
+            "# to use metricunit() function to get correct string\n"
+            "# for locale and metric/imperial\n"
+            "units { \n"
+            "    metricunit(" + metrics +  ");\n"
+            "}\n"
+            "\n"
+            "# values to display as doubles or strings\n"
+            "# if using metrics always best to use asstring()\n"
+            "# to convert correctly with dp, metric/imperial\n"
+            "# or specific formats eg. rowing pace xx/500m\n"
+            "values { \n"
+            "    as%1string(" + metrics + ");\n"
+            "} \n"
+            "\n"
+            "}\n";
+            replace = true;
+    }
+    break;
+
+    case DATA_TABLE_INTERVALS:
+    {
+        // get a string list of the metrics to show
+        QString s;
+        if (appsettings->contains(GC_SETTINGS_FAVOURITE_METRICS)) s = appsettings->value(NULL, GC_SETTINGS_FAVOURITE_METRICS).toString();
+        else s = GC_SETTINGS_FAVOURITE_METRICS_DEFAULT;
+        QStringList symbols = s.split(",");
+
+        // convert metric symbols to names we can use in the program
+        QStringList list;
+        list << "name";
+        QMapIterator<QString, QString> i(rt.lookupMap);
+        while (i.hasNext()) {
+            i.next();
+            if (symbols.contains(i.value())) list << i.key();
+        }
+
+        // generate a program
+        QString metrics = list.join(",\n              ");
+
+        program =
+            "{\n"
+            "\n"
+            "# column names, if using metrics then best\n"
+            "# to use metricname() to get correct name for locale\n"
+            "# otherwise it won't translate to other languages\n"
+            "names { \n"
+            "    metricname(" + metrics + ");\n"
+            "}\n"
+            "\n"
+            "# column units, if using metrics then best\n"
+            "# to use metricunit() function to get correct string\n"
+            "# for locale and metric/imperial\n"
+            "units { \n"
+            "    metricunit(" + metrics +  ");\n"
+            "}\n"
+            "\n"
+            "# values to display as doubles or strings\n"
+            "# if using metrics always best to use asstring()\n"
+            "# to convert correctly with dp, metric/imperial\n"
+            "# or specific formats eg. rowing pace xx/500m\n"
+            "values { \n"
+            "    c(";
+
+            bool first=true;
+            foreach(QString metric, list) {
+
+                // commas
+                if (first) first = false;
+                else program += ",\n      ";
+
+                program += "intervalstrings(" + metric + ")";
+            }
+
+            program += ");\n}\n\n";
+
+            program +=
+            "# interval names indicate which interval\n"
+            "# the row represents so we can select\n"
+            "# and hover over them\n"
+            "i {\n"
+            "    intervalstrings(name);\n"
+            "}\n\n";
+
+            program +=
+            "# heatmap values are from 0-1 so we use the\n"
+            "# normalize() function to calculate it for the metrics\n"
+            "# in question. When we use normalize(0,0,metric) we\n"
+            "# will always get no heat, you can edit the min\n"
+            "# max values to set the range to set the heat color\n"
+            "heat { \n"
+            "    c(";
+
+            first=true;
+            foreach(QString metric, list) {
+
+                // commas
+                if (first) first = false;
+                else program += ",\n      ";
+
+                program += "normalize(0, 0, intervals(" + metric + "))";
+            }
+
+            program += ");\n}\n\n}\n";
+    }
+    break;
+
+    case DATA_TABLE_ZONES:
+    program =
+            "{\n"
+            "\n"
+            "# column names, if using metrics then best\n"
+            "# to use metricname() to get correct name for locale\n"
+            "# otherwise it won't translate to other languages\n"
+            "names { \n"
+            "    c(\"Name\",\"Description\",\"Low\",\"High\",\"Time\",\"%\");\n"
+            "}\n"
+            "\n"
+            "# column units, if using metrics then best\n"
+            "# to use metricunit() function to get correct string\n"
+            "# for locale and metric/imperial\n"
+            "units {\n"
+            "\n"
+            "    c(\"\",\n"
+            "      \"\",\n"
+            "      zones(power,units),\n"
+            "      zones(power,units), \"\", \"\");\n"
+            "}\n"
+            "\n"
+            "# values to display as doubles or strings\n"
+            "# if using metrics always best to use asstring()\n"
+            "# to convert correctly with dp, metric/imperial\n"
+            "# or specific formats eg. rowing pace xx/500m\n"
+            "values { \n"
+            "\n"
+            "   c( zones(power,name),\n"
+            "      zones(power,description),\n"
+            "      zones(power,low),\n"
+            "      zones(power,high),\n"
+            "      zones(power,time),\n"
+            "      zones(power,percent));\n"
+            "} \n"
+            "\n"
+            "}\n";
+    break;
+
+    default:
+    case DATA_TABLE_TOTALS:
+    program =
+            "{\n"
+            "\n"
+            "# column names, if using metrics then best\n"
+            "# to use metricname() to get correct name for locale\n"
+            "# otherwise it won't translate to other languages\n"
+            "names { \n"
+            "    metricname(Duration,\n"
+            "         Time_Moving,\n"
+            "         Distance,\n"
+            "         Work,\n"
+            "         W'_Work,\n"
+            "         Elevation_Gain);\n"
+            "}\n"
+            "\n"
+            "# column units, if using metrics then best\n"
+            "# to use metricunit() function to get correct string\n"
+            "# for locale and metric/imperial\n"
+            "units { \n"
+            "    metricunit(Duration,\n"
+            "         Time_Moving,\n"
+            "         Distance,\n"
+            "         Work,\n"
+            "         W'_Work,\n"
+            "         Elevation_Gain);\n"
+            "}\n"
+            "\n"
+            "# values to display as doubles or strings\n"
+            "# if using metrics always best to use asstring()\n"
+            "# to convert correctly with dp, metric/imperial\n"
+            "# or specific formats eg. rowing pace xx/500m\n"
+            "values { \n"
+            "    as%1string(Duration,\n"
+            "             Time_Moving,\n"
+            "             Distance,\n"
+            "             Work,\n"
+            "             W'_Work,\n"
+            "             Elevation_Gain); \n"
+            "} \n"
+            "\n"
+            "}\n";
+            replace = true;
+    break;
+
+    }
+    return replace ? QString(program).arg(prefix) : program;
+}
+
+ChartSpaceItem *
+DataOverviewItem::create(ChartSpace *parent) {
+
+    // temporary - bit expensive, but creation is expensive anyway
+    DataFilter df(parent, parent->context);
+
+    if (parent->scope == ANALYSIS) return new DataOverviewItem(parent, "Totals", getLegacyProgram(DATA_TABLE_TOTALS, df.rt, false));
+    else return new DataOverviewItem(parent, "Activities", getLegacyProgram(DATA_TABLE_TRENDS, df.rt, true));
+}
+
+void
+DataOverviewItem::dragChanged(bool x)
+{
+    if (x) scrollbar->hide();
+    else scrollbar->show();
+}
+
 RouteOverviewItem::RouteOverviewItem(ChartSpace *parent, QString name) : ChartSpaceItem(parent, name)
 {
     this->type = OverviewItemType::ROUTE;
     routeline = new Routeline(this, name);
+
+    configwidget = new OverviewItemConfig(this);
+    configwidget->hide();
 }
 
 RouteOverviewItem::~RouteOverviewItem()
@@ -196,7 +651,6 @@ static const QStringList timeInZonesWBAL = QStringList()
 
 ZoneOverviewItem::ZoneOverviewItem(ChartSpace *parent, QString name, RideFile::seriestype series, bool polarized) : ChartSpaceItem(parent, name)
 {
-
     this->type = OverviewItemType::ZONE;
     this->series = series;
     this->polarized = polarized;
@@ -211,10 +665,29 @@ ZoneOverviewItem::ZoneOverviewItem(ChartSpace *parent, QString name, RideFile::s
     // we have a mid sized font for chart labels etc
     chart->setFont(parent->midfont);
 
+    configwidget = new OverviewItemConfig(this);
+    configwidget->hide();
+
+    barset = NULL;
+    barseries = NULL;
+    barcategoryaxis = NULL;
+
+    // setup
+    configChanged(0);
+}
+
+void
+ZoneOverviewItem::configChanged(qint32)
+{
+    if (barcategoryaxis) delete barcategoryaxis;
+    if (barset) delete barset;
+    if (barseries) delete barseries;
+
     // needs a set of bars
     barset = new QBarSet(tr("Time In Zone"), this);
     barset->setLabelFont(parent->midfont);
 
+    // config changed...
     if (series == RideFile::hr) {
         barset->setLabelColor(GColor(CHEARTRATE));
         barset->setBorderColor(GColor(CHEARTRATE));
@@ -233,6 +706,7 @@ ZoneOverviewItem::ZoneOverviewItem(ChartSpace *parent, QString name, RideFile::s
         barset->setBrush(GColor(CSPEED));
     }
 
+    categories.clear();
 
     //
     // HEARTRATE
@@ -306,6 +780,7 @@ ZoneOverviewItem::ZoneOverviewItem(ChartSpace *parent, QString name, RideFile::s
     chart->axisY(barseries)->setLabelsVisible(false);
     chart->axisY(barseries)->setRange(0,100);
     chart->axisY(barseries)->setGridLineVisible(false);
+
 }
 
 ZoneOverviewItem::~ZoneOverviewItem()
@@ -315,7 +790,6 @@ ZoneOverviewItem::~ZoneOverviewItem()
 
 DonutOverviewItem::DonutOverviewItem(ChartSpace *parent, QString name, QString symbol, QString meta) : ChartSpaceItem(parent, name)
 {
-
     this->type = OverviewItemType::DONUT;
     this->symbol = symbol;
     this->meta = meta;
@@ -333,6 +807,10 @@ DonutOverviewItem::DonutOverviewItem(ChartSpace *parent, QString name, QString s
 
     // we have a mid sized font for chart labels etc
     chart->setFont(parent->midfont);
+
+    configwidget = new OverviewItemConfig(this);
+    configwidget->hide();
+
 }
 
 DonutOverviewItem::~DonutOverviewItem()
@@ -359,6 +837,8 @@ MetricOverviewItem::MetricOverviewItem(ChartSpace *parent, QString name, QString
     bool bigdot = parent->scope == ANALYSIS ? true : false;
     sparkline = new Sparkline(this, name, bigdot);
 
+    configwidget = new OverviewItemConfig(this);
+    configwidget->hide();
 }
 
 MetricOverviewItem::~MetricOverviewItem()
@@ -366,17 +846,26 @@ MetricOverviewItem::~MetricOverviewItem()
     delete sparkline;
 }
 
-TopNOverviewItem::TopNOverviewItem(ChartSpace *parent, QString name, QString symbol) : ChartSpaceItem(parent, name), click(false)
+TopNOverviewItem::TopNOverviewItem(ChartSpace *parent, QString name, QString symbol) : ChartSpaceItem(parent, name), click(false), clickthru(NULL)
 {
     // metric
     this->type = OverviewItemType::TOPN;
     this->symbol = symbol;
 
+    animator=new QPropertyAnimation(this, "transition");
+
+    configwidget = new OverviewItemConfig(this);
+    configwidget->hide();
+
+    configChanged(0);
+}
+
+void
+TopNOverviewItem::configChanged(qint32)
+{
     RideMetricFactory &factory = RideMetricFactory::instance();
     this->metric = const_cast<RideMetric*>(factory.rideMetric(symbol));
     if (metric) units = metric->units(GlobalContext::context()->useMetricUnits);
-
-    animator=new QPropertyAnimation(this, "transition");
 }
 
 TopNOverviewItem::~TopNOverviewItem()
@@ -392,6 +881,8 @@ PMCOverviewItem::PMCOverviewItem(ChartSpace *parent, QString symbol) : ChartSpac
     this->type = OverviewItemType::PMC;
     this->symbol = symbol;
 
+    configwidget = new OverviewItemConfig(this);
+    configwidget->hide();
 }
 
 PMCOverviewItem::~PMCOverviewItem()
@@ -400,11 +891,20 @@ PMCOverviewItem::~PMCOverviewItem()
 
 MetaOverviewItem::MetaOverviewItem(ChartSpace *parent, QString name, QString symbol) : ChartSpaceItem(parent, name)
 {
-
     // metric or meta or pmc
     this->type = OverviewItemType::META;
     this->symbol = symbol;
+    sparkline = NULL;
 
+    configwidget = new OverviewItemConfig(this);
+    configwidget->hide();
+
+    configChanged(0);
+}
+
+void
+MetaOverviewItem::configChanged(qint32)
+{
     //  Get the field type
     fieldtype = -1;
     foreach(FieldDefinition p, GlobalContext::context()->rideMetadata->getFields()) {
@@ -416,9 +916,12 @@ MetaOverviewItem::MetaOverviewItem(ChartSpace *parent, QString name, QString sym
 
     // sparkline if are we numeric?
     if (fieldtype == FIELD_INTEGER || fieldtype == FIELD_DOUBLE) {
-        sparkline = new Sparkline(this, name);
+        if (sparkline == NULL) sparkline = new Sparkline(this, name);
     } else {
-        sparkline = NULL;
+        if (sparkline) {
+            delete sparkline;
+            sparkline = NULL;
+        }
     }
 }
 
@@ -435,9 +938,25 @@ IntervalOverviewItem::IntervalOverviewItem(ChartSpace *parent, QString name, QSt
     this->xsymbol = xsymbol;
     this->ysymbol = ysymbol;
     this->zsymbol = zsymbol;
+    this->item = NULL;
+    block=false;
 
     // we may plot the metric sparkline if the tile is big enough
     bubble = new BubbleViz(this, "intervals");
+    bubble->setIntervalHoverSignal(true);
+
+    configwidget = new OverviewItemConfig(this);
+    configwidget->hide();
+
+    // refresh when interval events happen (only on analysis view)
+    if (parent->scope == OverviewScope::ANALYSIS) {
+        connect(parent->context, SIGNAL(intervalSelected()), this, SLOT(intervalSelectRefresh()));
+        //connect(parent->context, SIGNAL(intervalsChanged()), this, SLOT(intervalSelectRefresh()));
+        connect(parent->context, SIGNAL(intervalsUpdate(RideItem*)), this, SLOT(intervalSelectRefresh()));
+        connect(parent->context, SIGNAL(intervalHover(IntervalItem*)), this, SLOT(intervalHover(IntervalItem*)));
+        //connect(parent->context, SIGNAL(intervalZoom(IntervalItem*)), this, SLOT(intervalSelectRefresh()));
+        //connect(parent->context, SIGNAL(intervalItemSelectionChanged(IntervalItem*)), this, SLOT(intervalSelectRefresh()));
+    }
 }
 
 IntervalOverviewItem::~IntervalOverviewItem()
@@ -494,6 +1013,321 @@ KPIOverviewItem::setDateRange(DateRange dr)
 }
 
 void
+DataOverviewItem::setData(RideItem *item)
+{
+    // reset interval hovering
+    hovered = hoverinterval = hoversignal = "";
+
+    // remove old values
+    names.clear();
+    units.clear();
+    values.clear();
+    files.clear();
+    intervals.clear();
+    heat.clear();
+
+    if (item == NULL || item->ride() == NULL) return;
+
+    // calculate the value...
+    DataFilter parser(this, item->context, program);
+
+    // so long as it evaluated correctly we can call the functions
+    if (parser.root() && parser.errorList().isEmpty() && parent->context->currentRideItem()) {
+
+        Specification spec;
+        DateRange dr;
+
+        // find them, users may forget or get it wrong ...
+        fnames = parser.rt.functions.contains("names") ? parser.rt.functions.value("names") : NULL;
+        funits = parser.rt.functions.contains("units") ? parser.rt.functions.value("units") : NULL;
+        fvalues = parser.rt.functions.contains("values") ? parser.rt.functions.value("values") : NULL;
+        ffiles = parser.rt.functions.contains("f") ? parser.rt.functions.value("f") : NULL;
+        fintervals = parser.rt.functions.contains("i") ? parser.rt.functions.value("i") : NULL;
+        fheat = parser.rt.functions.contains("heat") ? parser.rt.functions.value("heat") : NULL;
+
+        // fetch the data
+        if (fnames) names = parser.root()->eval(&parser.rt, fnames, Result(0), 0, const_cast<RideItem*>(item), NULL, NULL, spec, dr).asString();
+        if (funits) units = parser.root()->eval(&parser.rt, funits, Result(0), 0, const_cast<RideItem*>(item), NULL, NULL, spec, dr).asString();
+        if (fvalues) values = parser.root()->eval(&parser.rt, fvalues, Result(0), 0, const_cast<RideItem*>(item), NULL, NULL, spec, dr).asString();
+        if (ffiles) files = parser.root()->eval(&parser.rt, ffiles, Result(0), 0, const_cast<RideItem*>(item), NULL, NULL, spec, dr).asString();
+        if (fintervals) intervals = parser.root()->eval(&parser.rt, fintervals, Result(0), 0, const_cast<RideItem*>(item), NULL, NULL, spec, dr).asString();
+        if (fheat) heat = parser.root()->eval(&parser.rt, fheat, Result(0), 0, const_cast<RideItem*>(item), NULL, NULL, spec, dr).asNumeric();
+
+        postProcess();
+    }
+}
+
+void
+IntervalOverviewItem::intervalHover(IntervalItem *hover)
+{
+    this->hover = hover;
+    intervalSelectRefresh();
+}
+
+void
+IntervalOverviewItem::intervalSelectRefresh()
+{
+    // reset but don't animate
+    if (item) setData(item, false);
+}
+
+void
+DataOverviewItem::postProcess()
+{
+    // we never show units called "seconds" - they generally are time strings
+    for(int i=0; i<units.count(); i++)
+        if (units[i] == tr("seconds"))
+            units[i] = "";
+
+    // if we have some columns and more values than columns then show as rows
+    // otherwise its a simple 3 column table; name value unit
+    multirow = (names.count() > 0 && values.count() > names.count());
+
+    // what are the max column sizes
+    QFontMetrics fm(parent->midfont);
+
+    // lets set the column widths by content
+    // when painting the overall geometry is
+    // taken into account to center/space this
+    // but we set the minimum columns widths
+    // based upon the data
+    columnWidths.clear();
+
+    if (!multirow) {
+
+        // Just 3 columns - name value unit
+        // max name width
+        double maxwidth=0;
+        foreach(QString name, names) {
+            double width = fm.boundingRect(name).width();
+            if (width > maxwidth) maxwidth=width;
+        }
+        columnWidths << maxwidth;
+
+        // max unit width
+        maxwidth=0;
+        foreach(QString unit, units) {
+            double width = fm.boundingRect(unit).width();
+            if (width > maxwidth) maxwidth=width;
+        }
+        columnWidths << maxwidth;
+
+        // max value width
+        maxwidth=0;
+        foreach(QString value, values) {
+            double width = fm.boundingRect(value).width();
+            if (width > maxwidth) maxwidth=width;
+        }
+        columnWidths << maxwidth;
+
+        // tell the scrollbar we don't need scrolling
+        scrollbar->setAreaHeight(0);
+
+    } else {
+
+        // One column per series - name1  name2  name3  name4
+        //                         unit1  unit2  unit3  unit4
+        //                         val1   val4   val7   val10
+        //                         val2   val5   val8   val11
+        //                         val3   val6   val9   val12
+        int rows = values.count() / names.count();
+        for(int i=0; i<names.count(); i++) {
+
+            double maxwidth = names.count() > i ? fm.boundingRect(names[i]).width() : 0; // heading row
+            double width = units.count() > i ? fm.boundingRect(units[i]).width() : 0;    // units row
+            if (width > maxwidth) maxwidth = width;
+
+            // now see if there are any values that are wider
+            int offset = rows * i;
+            for (int j=0; j<rows && offset+j < values.count(); j++) {
+                width = fm.boundingRect(values[offset + j]).width();
+                if (width > maxwidth) maxwidth = width;
+            }
+
+            columnWidths << maxwidth;
+        }
+
+        // tell scrollbar how big the scroll area is
+        QFontMetrics fm(multirow ? parent->smallfont : parent->midfont, parent->device());
+        double lineheight = fm.boundingRect("XXX").height() * 1.2f;
+        scrollbar->setAreaHeight(rows * lineheight); // no scrolling
+    }
+
+    // keep the same sorting...
+    if (lastsort != -1) sort(lastsort, lastorder);
+
+    // show/hide widgets on the basis of geometry
+    itemGeometryChanged();
+}
+
+void
+DataOverviewItem::sort(int column, Qt::SortOrder order)
+{
+    if (column >= names.count()) return; // out of bounds
+
+    // step 1: infer the type for column
+    int isdate=0, istime=0, isnumber=0, isstring=0;
+
+    int rows = values.count() / names.count();
+
+    // dates in German are weird, a month is "Mai", "Juli" or even "Jan."
+    // even when requesting a date in format dd MMM yyyy
+    // remember: a dot (.) inside brackets ([]) does NOT need to be escaped
+    QRegExp redate(QString::fromWCharArray(L"^[0-9][0-9] [.A-Za-zÀ-ž\u0370-\u03FF\u0400-\u04FF]+ [0-9][0-9]*$"));
+    QRegExp retime("^[0-9:]*$");
+    QRegExp renumber("^[0-9.-]*$");
+
+    for(int i= rows * column; i<values.count() && i< rows * (column+1) ; i++) {
+        QString &val = values[i];
+
+        // check, the order here is important
+        if (renumber.exactMatch(val)) isnumber++; // numbers + .
+        else if (retime.exactMatch(val)) istime++; // numbers + :
+        else if (redate.exactMatch(val)) isdate++; // numbers + date
+        else isstring++; // all bets are off
+    }
+    // step 2: generate an argsort index as strings or numbers
+    QVector<int> argsortindex;
+    if (isstring) {
+
+        QVector<QString> in;
+        for(int i= rows * column; i<values.count() && i< rows * (column+1) ; i++) in<<values[i];
+        argsortindex = Utils::argsort(in, order==Qt::AscendingOrder);
+
+    } else {
+
+        const QDate epoch(1970,1,1);
+        QVector<double> in;
+        for(int i= rows * column; i<values.count() && i< rows * (column+1) ; i++) {
+
+            QString &val = values[i];
+
+            // convert to double based upon type
+            if (renumber.exactMatch(val)) in << val.toDouble();
+            else if (retime.exactMatch(val)) {
+
+                // time formats are painful- these are formats we use in the code...
+                QStringList formats = { "h:mm:ss", "hh:mm:ss", "mm:ss", "s" };
+                QTime attempt;
+
+                foreach(QString format, formats) {
+                    attempt = QTime::fromString(val, format);
+                    if (attempt.isValid()) break;
+                }
+
+                in << QTime(0,0,0).secsTo(attempt);
+
+            } else if (redate.exactMatch(val)) {
+
+                // common formats
+                QStringList formats = { "dd MMM yyyy", "dd MMM yy" };
+                QDate attempt;
+
+                foreach(QString format, formats) {
+                    attempt = QDate::fromString(val, format);
+                    if (attempt.isValid()) break;
+                }
+                in <<  epoch.daysTo(attempt);
+
+            } else in << 0; // nope, don't understand
+        }
+        argsortindex = Utils::argsort(in, order==Qt::AscendingOrder);
+    }
+
+    // step 3: reorder values by the argsort index
+    QVector<QString> ordered = values;
+    for(int i=0; i<names.count(); i++) {
+        // resequence column i
+        for(int k=0; k<argsortindex.count() && (i*rows)+k < ordered.count(); k++)
+            ordered[(i*rows)+k] = values[(i*rows)+argsortindex[k]];
+    }
+
+    // phew!
+    values = ordered;
+
+    QVector<double> heatordered = heat;
+    for(int i=0; i<names.count(); i++) {
+        // resequence column i
+        for(int k=0; k<argsortindex.count() && (i*rows)+k < heatordered.count(); k++)
+            heatordered[(i*rows)+k] = heat[(i*rows)+argsortindex[k]];
+    }
+
+    heat = heatordered;
+
+    // don't forget the filenames used in clickthru
+    if (files.count()) {
+        QVector<QString> newfiles = files;
+
+        // resequence
+        for(int k=0; k<argsortindex.count() && k < newfiles.count(); k++)
+            newfiles[k] = files[argsortindex[k]];
+
+        files = newfiles;
+    }
+
+    // don't forget the intervals used in hover
+    if (intervals.count()) {
+        QVector<QString> newintervals = intervals;
+
+        // resequence
+        for(int k=0; k<argsortindex.count() && k < newintervals.count(); k++)
+            newintervals[k] = intervals[argsortindex[k]];
+
+        intervals = newintervals;
+    }
+
+    lastsort = column;
+    lastorder = order;
+}
+
+void
+DataOverviewItem::intervalHover(IntervalItem *item)
+{
+    if (item) hovered = item->name;
+    else hovered = "";
+
+    if (intervals.count()) update();
+}
+
+void
+DataOverviewItem::setDateRange(DateRange dr)
+{
+    // remove old values
+    names.clear();
+    units.clear();
+    values.clear();
+    files.clear();
+    heat.clear();
+
+    // calculate the value...
+    DataFilter parser(this, parent->context, program);
+
+    // so long as it evaluated correctly we can call the functions
+    if (parser.root() && parser.errorList().isEmpty() && parent->context->currentRideItem()) {
+
+        Specification spec;
+        spec.setDateRange(dr);
+        setFilter(this, spec);
+
+        // find them, users may forget or get it wrong ...
+        fnames = parser.rt.functions.contains("names") ? parser.rt.functions.value("names") : NULL;
+        funits = parser.rt.functions.contains("units") ? parser.rt.functions.value("units") : NULL;
+        fvalues = parser.rt.functions.contains("values") ? parser.rt.functions.value("values") : NULL;
+        ffiles = parser.rt.functions.contains("f") ? parser.rt.functions.value("f") : NULL;
+        fheat = parser.rt.functions.contains("heat") ? parser.rt.functions.value("heat") : NULL;
+
+        // fetch the data
+        if (fnames) names = parser.root()->eval(&parser.rt, fnames, Result(0), 0, const_cast<RideItem*>(parent->context->currentRideItem()), NULL, NULL, spec, dr).asString();
+        if (funits) units = parser.root()->eval(&parser.rt, funits, Result(0), 0, const_cast<RideItem*>(parent->context->currentRideItem()), NULL, NULL, spec, dr).asString();
+        if (fvalues) values = parser.root()->eval(&parser.rt, fvalues, Result(0), 0, const_cast<RideItem*>(parent->context->currentRideItem()), NULL, NULL, spec, dr).asString();
+        if (ffiles) files = parser.root()->eval(&parser.rt, ffiles, Result(0), 0, const_cast<RideItem*>(parent->context->currentRideItem()), NULL, NULL, spec, dr).asString();
+        if (fheat) heat = parser.root()->eval(&parser.rt, fheat, Result(0), 0, const_cast<RideItem*>(parent->context->currentRideItem()), NULL, NULL, spec, dr).asNumeric();
+
+        postProcess();
+    }
+}
+
+void
 RPEOverviewItem::setData(RideItem *item)
 {
     if (item == NULL || item->ride() == NULL) return;
@@ -524,8 +1358,8 @@ RPEOverviewItem::setData(RideItem *item)
         const qint64 old = prior->dateTime.daysTo(item->dateTime);
         if (old > SPARKDAYS) break;
 
-        // only activities with matching sport flags
-        if (prior->isRun == item->isRun && prior->isSwim == item->isSwim) {
+        // only activities with matching sport
+        if (prior->sport == item->sport) {
 
            double v = prior->getText("RPE", "0").toDouble();
            if (std::isinf(v) || std::isnan(v)) v=0;
@@ -599,8 +1433,8 @@ MetricOverviewItem::setData(RideItem *item)
         const qint64 old = prior->dateTime.daysTo(item->dateTime);
         if (old > SPARKDAYS) break;
 
-        // only activities with matching sport flags
-        if (prior->isRun == item->isRun && prior->isSwim == item->isSwim) {
+        // only activities with matching sport
+        if (prior->sport == item->sport) {
 
             double v = prior->getForSymbol(symbol, GlobalContext::context()->useMetricUnits);
             if (std::isinf(v) || std::isnan(v)) v=0;
@@ -938,8 +1772,8 @@ MetaOverviewItem::setData(RideItem *item)
             const qint64 old = prior->dateTime.daysTo(item->dateTime);
             if (old > SPARKDAYS) break;
 
-            // only activities with matching sport flags
-            if (prior->isRun == item->isRun && prior->isSwim == item->isSwim) {
+            // only activities with matching sport
+            if (prior->sport == item->sport) {
 
                 double v;
 
@@ -1557,7 +2391,6 @@ IntervalOverviewItem::setDateRange(DateRange dr)
         first = false;
     }
 
-
     // set scale
     double ydiff = (maxy-miny) / 10.0f;
     if (miny >= 0 && ydiff > miny) miny = ydiff;
@@ -1567,13 +2400,25 @@ IntervalOverviewItem::setDateRange(DateRange dr)
     maxy=ceil(maxy); miny=floor(miny);
 
     // set range before points to filter
-    bubble->setPoints(points, minx,maxx,miny,maxy);
+    bubble->setPoints(points, minx,maxx,miny,maxy, true);
 }
 
 void
 IntervalOverviewItem::setData(RideItem *item)
 {
+    this->item = item;
+
     if (item == NULL || item->ride() == NULL) return;
+
+    setData(item, true);
+}
+
+void
+IntervalOverviewItem::setData(RideItem *item, bool animate)
+{
+
+    if (block) return;
+    block = true;
 
     RideMetricFactory &factory = RideMetricFactory::instance();
     const RideMetric *xm = factory.rideMetric(xsymbol);
@@ -1600,7 +2445,9 @@ IntervalOverviewItem::setData(RideItem *item)
         add.x = x;
         add.y = y;
         add.z = z;
-        add.fill = interval->color;
+
+        if (interval == this->hover || interval->selected) add.fill = GColor(CPLOTMARKER);
+        else add.fill = interval->color;
         add.label = interval->name;
         points << add;
 
@@ -1612,15 +2459,21 @@ IntervalOverviewItem::setData(RideItem *item)
 
 
     // set scale
+#if 0 // not clear why this is here or what it is supposed to do
+      // but it results in items being filtered out.
     double ydiff = (maxy-miny) / 10.0f;
     if (miny >= 0 && ydiff > miny) miny = ydiff;
     double xdiff = (maxx-minx) / 10.0f;
     if (minx >= 0 && xdiff > minx) minx = xdiff;
+#endif
     maxx=round(maxx); minx=round(minx);
     maxy=round(maxy); miny=round(miny);
 
     // set range before points to filter
-    bubble->setPoints(points, minx,maxx,miny,maxy);
+    bubble->setPoints(points, minx,maxx,miny,maxy, animate);
+
+    // avoid reentrancy
+    block=false;
 }
 
 
@@ -1668,6 +2521,40 @@ KPIOverviewItem::itemGeometryChanged() {
         } else {
             progressbar->hide();
         }
+    }
+}
+
+void
+DataOverviewItem::itemGeometryChanged()
+{
+    if (names.count() > 0) {
+
+        // if we are multirow we need to set the scrollbar
+        int rows = values.count() / names.count();
+
+        if (rows > 2) {
+
+            // lets work out the dataarea, bit of a faff and need to keep aligned with paint
+            // method - todo: refactor out duplicated code
+            QFontMetrics fm(multirow ? parent->smallfont : parent->midfont, parent->device());
+            double lineheight = fm.boundingRect("XXX").height() * 1.2f;
+            double scrollwidth = fm.boundingRect("X").width();
+            QRectF paintarea = QRectF(20,ROWHEIGHT*2, geometry().width()-40, geometry().height()-20-(ROWHEIGHT*2));
+            QRectF dataarea = paintarea;
+            dataarea.setY(dataarea.y() + (lineheight*2) + (lineheight*0.25f)); // 0.2 is the line spacing
+
+            // set geometry to rhs
+            scrollbar->setGeometry(dataarea.right() - scrollwidth, dataarea.top(), scrollwidth, dataarea.height());
+
+        } else {
+            // not needed
+            scrollbar->setGeometry(0,0,0,0);
+        }
+
+    } else {
+
+        // not needed- optimising out just adds another calc
+        scrollbar->setGeometry(0,0,0,0);
     }
 }
 
@@ -1851,6 +2738,407 @@ KPIOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, 
                 painter->setFont(parent->midfont);
                 painter->drawText(QPointF((geometry().width() - mrect.width()) / 2.0f, (ROWHEIGHT * 4.5) + mid + (mfm.ascent() / 3.0f)), percenttext); // divided by 3 to account for "gap" at top of font
             }
+        }
+    }
+}
+
+void
+DataOverviewItem::wheelEvent(QGraphicsSceneWheelEvent *w)
+{
+    if (globalpos != QCursor::pos() && scrollbar->canscroll) {
+        scrollbar->movePos(w->delta());
+        w->accept();
+    }
+
+    return;
+}
+
+bool
+DataOverviewItem::sceneEvent(QEvent *event)
+{
+    click = false;
+
+    // do we need to signal hover?
+    if (parent->context->currentRideItem() && hoverinterval != "" && hoverinterval != hoversignal) {
+        hoversignal = hoverinterval;
+        foreach(IntervalItem *it, const_cast<RideItem*>(parent->context->currentRideItem())->intervals()) {
+            if (it->name == hoverinterval) {
+                parent->context->notifyIntervalHover(it);
+                break;
+            }
+        }
+    }
+
+    if (event->type() == QEvent::GraphicsSceneHoverMove) {
+
+        // mouse moved so hover paint anyway
+        update();
+
+
+    }  else if (event->type() == QEvent::GraphicsSceneHoverLeave) {
+
+        update();
+
+    } else if (event->type() == QEvent::GraphicsSceneMousePress) {
+
+        QRectF paintarea = QRectF(20,ROWHEIGHT*2, geometry().width()-40, geometry().height()-20-(ROWHEIGHT*2));
+
+        QPoint vpos = parent->view->mapFromGlobal(QCursor::pos());
+        QPointF pos = parent->view->mapToScene(vpos);
+        QPointF cpos = pos - geometry().topLeft();
+
+        // grab this before its interpreted as initiate drag
+        if (paintarea.contains(cpos)) {
+            event->accept();
+
+            // pain will work out if we have something to select
+            click = true;
+            sortcolumn = -1;
+            clickthru = NULL;
+            update();
+
+            return true;
+        }
+
+    } else if (event->type() == QEvent::GraphicsSceneMouseRelease) {
+
+        if (clickthru) {
+            // do we need to select?
+            parent->context->notifyRideSelected(clickthru);
+            clickthru = NULL;
+        }
+
+        if (sortcolumn != -1) {
+            // sort !!
+            click=false;
+            if (lastsort == sortcolumn) sort(sortcolumn, lastorder == Qt::DescendingOrder ? Qt::AscendingOrder : Qt::DescendingOrder);
+            else sort(sortcolumn, Qt::DescendingOrder);
+            update();
+        }
+
+        event->accept();
+        return true;
+
+    } else if (event->type() == QEvent::GraphicsSceneHoverEnter) {
+
+        // lets remember to cursor global position
+        globalpos = QCursor::pos();
+        update();
+
+    }
+    return false;
+}
+
+QRectF
+DataOverviewItem::hotspot()
+{
+    // use the paint area, regardless of rows as too expensive to compute
+    return QRectF(20,ROWHEIGHT*2, geometry().width()-40, geometry().height()-20-(ROWHEIGHT*2));
+}
+
+// export the data to a CSV file
+void
+DataOverviewItem::exportData()
+{
+    // badly formed or no data to export
+    if (names.count() == 0 || values.count() == 0 || values.count() < names.count()) {
+        QMessageBox::critical(parent, tr("Export Table Data"), tr("Data malformed or not available."));
+        return;
+    }
+
+    QString basename = name == "" ? "data" : name;
+    QString suffix="csv";
+
+    // get a filename to open
+    QString fileName = QFileDialog::getSaveFileName(parent, tr("Export Table Data to CSV"),
+                       QDir::homePath()+"/" + basename + ".csv",
+                       ("*.csv;;"), &suffix, QFileDialog::DontUseNativeDialog); // native dialog hangs
+
+    if (fileName.isEmpty()) return;
+
+    // open and truncate
+    QFile file(fileName);
+    if (!file.open(QIODevice::WriteOnly)) return;
+    file.resize(0);
+
+    // stream, output without a BOM, unlikely to be expected (?)
+    QTextStream out(&file);
+    // unified codepage and BOM for identification on all platforms
+    out.setCodec("UTF-8");
+    //out.setGenerateByteOrderMark(true);
+
+    // headers- taking care to protect for csv output
+    for (int col=0; col<names.count(); col++) {
+        out << Utils::csvprotect(names[col], QChar(','));
+        if ((col+1) < names.count()) out << ",";
+    }
+    out << "\n";
+
+    // line items
+    int rows = values.count() / names.count();
+    for (int row=0; row<rows; row++) {
+
+        // output a row
+        for(int j=0; j<names.count(); j++) {
+            int offset = (rows * j) + row;
+            out << (values.count() > offset ? Utils::csvprotect(values[offset], QChar(',')) : "");
+            if ((j+1) < names.count()) out << ",";
+        }
+        out << "\n";
+    }
+
+    // close
+    out.flush();
+    file.close();
+
+}
+
+void
+DataOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) {
+
+    // paint nothing if no values - or a mismatch
+    if (names.count() == 0 || values.count() == 0 || values.count() < names.count()) return;
+
+    // don't paint on the edges
+    QRectF geom = geometry();
+    painter->setClipRect(40,40,geom.width()-80,geom.height()-80);
+
+    // step 1: calculate paint metrics, colors, fonts, margins etc etc ...
+
+    // we use the mid font, so lets get some font metrics
+    QFontMetrics fm(multirow ? parent->smallfont : parent->midfont, parent->device());
+    double lineheight = fm.boundingRect("XXX").height() * 1.2f;
+
+    // default horizontal spacing, no flex here, is what it is
+    double hmargin=ROWHEIGHT;
+
+    // our bounding rectangle
+    QRectF paintarea = QRectF(20,ROWHEIGHT*2, geometry().width()-40, geometry().height()-20-(ROWHEIGHT*2));
+
+    // rows of data with column headings- will make paged and interactive in v3.7
+    //
+    // layout like this:  |hvvvsvvvsvvvsvvvsvvvh|
+    // where:
+    //     h is hmargin
+    //     vvv is metric value
+    //     s is hspace
+    //
+    double content = 0;
+    foreach(double width, columnWidths) content += width;
+    double hspace = geometry().width() - (content + hmargin + hmargin);
+    hspace = (hspace > 0) ? hspace / (columnWidths.count()-1) : hmargin; // minimum space
+
+    // fonts and colors for data
+    QFont normal = multirow ? parent->smallfont : parent->midfont;
+    QFont bold = normal;
+    bold.setBold(true);
+
+    // normal just grey, we highlight with plot marker
+    QColor cnormal = (GCColor::luminance(GColor(CCARDBACKGROUND)) < 127) ? QColor(200,200,200) : QColor(70,70,70);
+
+
+    // step 2: where is the mouse hovering, paint a background etc ....
+
+    int hoverrow = -1; // remember if the mouse is over a particular row.
+
+    // scroll position, only really relevant for multirow
+    double scrollareapos = scrollbar->pos();
+    int startrow = 0;
+    if (scrollareapos) startrow = scrollareapos/lineheight + 1;
+
+    // paint the hover background, only matters when have multiple rows
+    if (multirow && underMouse()) {
+
+        QRectF dataarea = paintarea;
+        dataarea.setY(dataarea.y() + (lineheight*2) + (lineheight*0.25f)); // 0.2 is the line spacing
+
+        QRectF headingarea = paintarea;
+        headingarea.setHeight(lineheight*2);
+
+        // single row just highlight the first data point
+        if (!multirow) dataarea.setY(dataarea.y() - (lineheight*2));
+
+        // set value based upon the location of the mouse
+        QPoint vpos = parent->view->mapFromGlobal(QCursor::pos());
+        QPointF pos = parent->view->mapToScene(vpos);
+        QPointF cpos = pos - geometry().topLeft();
+
+        // what row would we be on?
+        int row = (cpos.y()-dataarea.topLeft().y())/lineheight;
+        QRectF itemarea(dataarea.left(), dataarea.top()+(row*lineheight), dataarea.width(), lineheight);
+
+        // in header or data area?
+        if (headingarea.contains(cpos)) {
+
+            // column number and rectangle
+            int column = -1, cn=0;
+            double xoffset = 0;
+            QRectF crect;
+            foreach(double width, columnWidths) {
+
+                // bound for column cn heading
+                QRectF prect = QRectF(headingarea.x()+xoffset, headingarea.y(), width+hspace, lineheight*2.25f);
+                if (prect.contains(cpos)) {
+                    column = cn;
+                    crect=prect;
+                }
+
+                // and on to the next column
+                cn++;
+                xoffset += width + hspace;
+            }
+
+            // lets paint the hover background for the column
+            if (column != -1) {
+                painter->setPen(Qt::NoPen);
+                QColor darkgray(120,120,120,120);
+                painter->setBrush(darkgray);
+                painter->drawRect(crect);
+
+                if (click) sortcolumn = column;
+            }
+
+        } else if (!scrollbar->isDragging() && itemarea.contains(cpos)) {
+
+            if (files.count() && row+startrow < files.count() && files[row+startrow] != "") {
+                painter->setPen(Qt::NoPen);
+                QColor darkgray(120,120,120,120);
+                painter->setBrush(darkgray);
+                painter->drawRect(itemarea);
+
+                if (click) {
+                    clickthru = parent->context->athlete->rideCache->getRide(files[row+startrow]);
+                    click = false;
+                }
+            } else {
+                // clicktru is not available bit lets at least make the
+                if (multirow) hoverrow = row+startrow;
+            }
+
+            // if its an interval we should signal hovering
+            if (intervals.count() && hoverrow >=0 && hoverrow < intervals.count()) {
+                // signal hover!
+                hoverinterval = intervals[hoverrow];
+            }
+        }
+    }
+
+
+    // step 3: paint the table from here ....
+    painter->setFont(normal);
+    painter->setRenderHint(QPainter::Antialiasing);
+    painter->setPen(QPen(cnormal, 4, Qt::SolidLine, Qt::RoundCap));
+
+    if (multirow) {
+
+        // heading row
+        double xoffset = hmargin;
+        double yoffset = paintarea.topLeft().y()+lineheight;
+        for(int i=0; i<names.count(); i++) {
+
+            // column name
+            painter->drawText(xoffset, yoffset, names[i]); // todo: centering
+
+            // if we are the sort column we need an indicator
+            if (lastsort == i) {
+
+                QFontMetrics fm(normal);
+                QRectF tb = fm.boundingRect(names[i]);
+                QRectF cb = fm.boundingRect("X");
+
+                double direction = lastorder == Qt::AscendingOrder ? +1 : -1;
+
+                // tick
+                QPointF start(xoffset+tb.width()+(cb.width()*1.8), yoffset-(cb.height()/5));
+                painter->drawLine(start, start-QPointF(cb.width()/2, direction * cb.height()/5));
+                painter->drawLine(start-QPointF(cb.width()/2, direction * cb.height()/5), start-QPointF(cb.width(), 0));
+
+                //painter->setPen(cnormal);
+            }
+            xoffset += columnWidths[i] + hspace;
+        }
+        yoffset += lineheight;
+
+        // units row
+        xoffset = hmargin;
+        for(int i=0; i<names.count(); i++) {
+            if (units.count() > i) painter->drawText(xoffset, yoffset, units[i]); // todo: centering
+            xoffset += columnWidths[i] + hspace;
+        }
+
+        // separator for heading from data
+        painter->setPen(QPen(cnormal, 4, Qt::SolidLine, Qt::RoundCap));
+        painter->drawLine(paintarea.topLeft() + QPointF(0, lineheight * 2.2),
+                          paintarea.topRight() + QPointF(0, lineheight * 2.2));
+
+        // data values
+        xoffset = hmargin;
+
+        // lets see if there is a hoverrow signalled from another widget
+        int hoveredrow=-1;
+        if (parent->scope == OverviewScope::ANALYSIS && hovered != "" && intervals.count())  hoveredrow = intervals.indexOf(hovered);
+
+        int rows = values.count() / names.count();
+        for(int i=0; i<names.count(); i++) {
+
+            // start at top
+            yoffset = paintarea.topLeft().y()+(lineheight*3);
+
+            // paint values in columns
+            int offset = rows * i;
+            for (int j=startrow; j<rows && offset+j < values.count(); j++) {
+                QString value = values[offset+j];
+                double heatvalue = heat.count() > (offset+j) ? heat[offset+j] : 0;
+
+                // if no heat then no brush
+                if (heatvalue == 0) painter->setBrush(Qt::NoBrush);
+                else {
+                    // lets use the heat color, but with a little translucency
+                    QColor brushcolor = Utils::heatcolor(heatvalue);
+                    brushcolor.setAlpha(127);
+                    painter->fillRect(xoffset,yoffset-(lineheight*0.8), columnWidths[i]+(hspace/2), lineheight, QBrush(brushcolor));
+                }
+
+                // highlight rows when hovering and click thru not available
+                if ((j == hoverrow || j == hoveredrow) && !scrollbar->isDragging()) {
+                    painter->setFont(bold);
+                    painter->setPen(GColor(CPLOTMARKER));
+                } else {
+                    painter->setFont(normal);
+                    painter->setPen(cnormal);
+                }
+
+                painter->drawText(xoffset, yoffset, value);
+                yoffset += lineheight;
+            }
+
+            // move across to next column
+            xoffset += columnWidths[i] + hspace;
+        }
+
+    } else {
+
+        // names (units) - left aligned
+        double xoffset = hmargin;
+        double yoffset = paintarea.topLeft().y()+lineheight;
+        for(int i=0; i<names.count() && i<values.count(); i++) {
+
+            QString text = names[i];
+            if (i<units.count() && units[i] != "") text += " (" + units[i] + ")";
+
+            painter->drawText(xoffset, yoffset, text);
+            yoffset += lineheight;
+        }
+
+        // value - right aligned
+        yoffset = paintarea.topLeft().y()+lineheight;
+        for(int i=0; i<values.count(); i++) {
+
+            QRectF bound = fm.boundingRect(values[i]);
+            xoffset = geometry().width() - (bound.width() + hmargin);
+
+            painter->drawText(xoffset, yoffset, values[i]);
+            yoffset += lineheight;
         }
     }
 }
@@ -2049,9 +3337,18 @@ TopNOverviewItem::sceneEvent(QEvent *event)
         if (paintarea.contains(cpos)) {
             event->accept();
             click = true;
+            clickthru = NULL;
             update();
             return true;
         }
+
+    } else if (event->type() == QEvent::GraphicsSceneMouseRelease) {
+
+        if (clickthru) {
+            parent->context->notifyRideSelected(clickthru);
+            clickthru = NULL;
+        }
+        return true;
 
     } else if (event->type() == QEvent::GraphicsSceneHoverEnter) {
 
@@ -2105,6 +3402,8 @@ TopNOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *,
     int width = paintarea.width() - (numrect.width() + daterect.width() + valuerect.width() + (margins * 6));
     QRectF barrect = QRectF(0,10, width, 30);
 
+    // text color
+    QColor cnormal = (GCColor::luminance(GColor(CCARDBACKGROUND)) < 127) ? QColor(200,200,200) : QColor(70,70,70);
 
     // PAINT
     for (int i=0; i<maxrows && i<ranked.count(); i++) {
@@ -2123,11 +3422,11 @@ TopNOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *,
             painter->setBrush(darkgray);
             painter->drawRect(itemarea);
 
-            if (click && ranked[i].item) parent->context->notifyRideSelected(ranked[i].item);
+            clickthru = ranked[i].item;
         }
 
         // rank
-        painter->setPen(QColor(100,100,100));
+        painter->setPen(cnormal);
         painter->drawText(paintarea.topLeft()+QPointF(margins, margins+(i*rowheight)+fm.ascent()), QString("%1.").arg(i+1));
 
         // date
@@ -2155,7 +3454,6 @@ TopNOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *,
         painter->fillRect(bar, markerbrush);
 
         // value
-        painter->setPen(QColor(100,100,100));
         painter->drawText(paintarea.topLeft()+QPointF(numrect.width()+daterect.width()+fullbar.width()+(margins*4),0)+QPointF(margins, margins+(i*rowheight)+fm.ascent()), ranked[i].value);
 
     }
@@ -2391,18 +3689,41 @@ static bool insensitiveLessThan(const QString &a, const QString &b)
 {
     return a.toLower() < b.toLower();
 }
-OverviewItemConfig::OverviewItemConfig(ChartSpaceItem *item) : QWidget(item->parent), item(item), block(false)
+OverviewItemConfig::OverviewItemConfig(ChartSpaceItem *item) : QWidget(NULL), item(item), block(false)
 {
     QVBoxLayout *main = new QVBoxLayout(this);
     QFormLayout *layout = new QFormLayout();
     main->addLayout(layout);
-    main->addStretch();
+
+    if (item->type != OverviewItemType::KPI && item->type != OverviewItemType::DATATABLE) main->addStretch();
 
     // everyone except PMC
     if (item->type != OverviewItemType::PMC) {
         name = new QLineEdit(this);
         connect(name, SIGNAL(textChanged(QString)), this, SLOT(dataChanged()));
         layout->addRow(tr("Name"), name);
+    }
+
+    if (item->type == OverviewItemType::DATATABLE) {
+        exp = new QPushButton(tr("Export Data"));
+        exp->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+        legacySelector = new QComboBox(this);
+        legacySelector->addItem(tr("User defined"), 0);
+        legacySelector->addItem(tr("Totals"), DATA_TABLE_TOTALS);
+        legacySelector->addItem(tr("Averages"), DATA_TABLE_AVERAGES);
+        legacySelector->addItem(tr("Maximums"), DATA_TABLE_MAXIMUMS);
+        legacySelector->addItem(tr("Metrics"), DATA_TABLE_METRICS);
+        legacySelector->addItem(tr("Zones"), DATA_TABLE_ZONES);
+        if (item->parent->scope & OverviewScope::ANALYSIS) {
+            legacySelector->addItem(tr("Intervals"), DATA_TABLE_INTERVALS);
+        } else {
+            legacySelector->addItem(tr("Activities"), DATA_TABLE_TRENDS);
+        }
+
+        layout->addRow(tr("Legacy"), legacySelector);
+        connect(legacySelector, SIGNAL(currentIndexChanged(int)), this, SLOT(setProgram(int)));
+        connect(exp, SIGNAL(clicked()), item, SLOT(exportData()));
+
     }
 
     // trends view always has a filter
@@ -2465,6 +3786,10 @@ OverviewItemConfig::OverviewItemConfig(ChartSpaceItem *item) : QWidget(item->par
         layout->addRow(tr("Stop"), double2);
         connect(double1, SIGNAL(valueChanged(double)), this, SLOT(dataChanged()));
         connect(double2, SIGNAL(valueChanged(double)), this, SLOT(dataChanged()));
+    }
+
+
+    if (item->type == OverviewItemType::KPI || item->type == OverviewItemType::DATATABLE) {
 
         //
         // Program editor... bit of a faff needs refactoring!!
@@ -2545,7 +3870,9 @@ OverviewItemConfig::OverviewItemConfig(ChartSpaceItem *item) : QWidget(item->par
         // program editor
         QVBoxLayout *pl= new QVBoxLayout();
         editor = new DataFilterEdit(this, item->parent->context);
-        editor->setMinimumHeight(50 * dpiXFactor); // give me some space!
+        editor->setMinimumHeight(250 * dpiXFactor); // give me some space!
+        editor->setMinimumWidth(450 * dpiXFactor); // give me some space!
+        editor->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
         DataFilterCompleter *completer = new DataFilterCompleter(list, this);
         editor->setCompleter(completer);
         errors = new QLabel(this);
@@ -2559,6 +3886,10 @@ OverviewItemConfig::OverviewItemConfig(ChartSpaceItem *item) : QWidget(item->par
         connect(editor, SIGNAL(syntaxErrors(QStringList&)), this, SLOT(setErrors(QStringList&)));
         connect(editor, SIGNAL(textChanged()), this, SLOT(dataChanged()));
 
+    }
+
+
+    if (item->type == OverviewItemType::KPI) {
         // istime
         cb1 = new QCheckBox(this);
         layout->addRow(tr("Time"), cb1);
@@ -2571,8 +3902,37 @@ OverviewItemConfig::OverviewItemConfig(ChartSpaceItem *item) : QWidget(item->par
 
     }
 
+    if (item->type != OverviewItemType::USERCHART) {
+        // bg color
+        bgcolor = new ColorButton(this, tr("Background"), QColor(item->color()), true);
+        bgcolor->setSelectAll(true);
+        layout->addRow(tr("Color"), bgcolor);
+        connect(bgcolor, SIGNAL(colorChosen(QColor)), this, SLOT(dataChanged()));
+    }
+
+    // last item to export the data, note in main layout, aligned with bottom buttons
+    if (item->type == OverviewItemType::DATATABLE)  {
+        main->addWidget(exp);
+
+        // need to align with botton buttons
+        QMargins mm = main->contentsMargins();
+        mm.setLeft(0);
+        main->setContentsMargins(mm);
+    }
+
     // reflect current config
     setWidgets();
+}
+
+void
+OverviewItemConfig::setProgram(int index)
+{
+    if (index >= 0) {
+        index = legacySelector->itemData(index).toInt();
+        // for metric lookup
+        DataFilter df(item->parent, item->parent->context);
+        editor->setText(DataOverviewItem::getLegacyProgram(index, df.rt, item->parent->scope == OverviewScope::TRENDS));
+    }
 }
 
 void
@@ -2581,7 +3941,53 @@ OverviewItemConfig::setErrors(QStringList &list)
     errors->setText(list.join(";"));
 }
 
-OverviewItemConfig::~OverviewItemConfig() {}
+OverviewItemConfig::~OverviewItemConfig() {
+#if 0
+    // everyone except PMC
+    if (item->type != OverviewItemType::PMC)  delete name ;
+
+    // trends view always has a filter
+    if (item->parent->scope & OverviewScope::TRENDS)  delete filterEditor;
+
+    // single metric names
+    if (item->type == OverviewItemType::TOPN || item->type == OverviewItemType::METRIC  ||
+        item->type == OverviewItemType::PMC || item->type == OverviewItemType::DONUT) delete metric1;
+
+    // metric1, metric2 and metric3
+    if (item->type == OverviewItemType::INTERVAL || item->type == OverviewItemType::ACTIVITIES) {
+        delete metric1;
+        delete metric2;
+        delete metric3;
+    }
+
+    if (item->type == OverviewItemType::META || item->type == OverviewItemType::DONUT)  delete meta1;
+
+    if (item->type == OverviewItemType::ZONE) {
+        delete series1;
+        delete cb1;
+    }
+
+    if (item->type == OverviewItemType::KPI) {
+
+        delete double1;
+        delete double2;
+    }
+
+
+    if (item->type == OverviewItemType::KPI || item->type == OverviewItemType::DATATABLE) {
+
+        delete editor;
+        delete errors;
+    }
+
+
+    if (item->type == OverviewItemType::KPI) {
+        delete cb1;
+        delete string1;
+
+    }
+#endif
+}
 
 void
 OverviewItemConfig::setWidgets()
@@ -2668,6 +4074,14 @@ OverviewItemConfig::setWidgets()
         }
         break;
 
+    case OverviewItemType::DATATABLE:
+        {
+            DataOverviewItem *mi = dynamic_cast<DataOverviewItem*>(item);
+            name->setText(mi->name);
+            editor->setText(mi->program);
+        }
+        break;
+
     case OverviewItemType::KPI:
         {
             KPIOverviewItem *mi = dynamic_cast<KPIOverviewItem*>(item);
@@ -2700,6 +4114,7 @@ OverviewItemConfig::dataChanged()
         {
             RPEOverviewItem *mi = dynamic_cast<RPEOverviewItem*>(item);
             mi->name = name->text();
+            mi->bgcolor = bgcolor->getColor().name();
         }
         break;
 
@@ -2708,9 +4123,11 @@ OverviewItemConfig::dataChanged()
             MetricOverviewItem *mi = dynamic_cast<MetricOverviewItem*>(item);
             mi->name = name->text();
             if (metric1->isValid()) {
+                mi->metric = metric1->rideMetric();
                 mi->symbol = metric1->rideMetric()->symbol();
                 mi->units = metric1->rideMetric()->units(GlobalContext::context()->useMetricUnits);
             }
+            mi->bgcolor = bgcolor->getColor().name();
         }
         break;
 
@@ -2718,8 +4135,12 @@ OverviewItemConfig::dataChanged()
         {
             DonutOverviewItem *mi = dynamic_cast<DonutOverviewItem*>(item);
             mi->name = name->text();
-            if (metric1->isValid())  mi->symbol = metric1->rideMetric()->symbol();
+            if (metric1->isValid()) {
+                mi->metric = metric1->rideMetric();
+                mi->symbol = metric1->rideMetric()->symbol();
+            }
             if (meta1->isValid())  mi->meta = meta1->metaname();
+            mi->bgcolor = bgcolor->getColor().name();
         }
         break;
 
@@ -2728,9 +4149,11 @@ OverviewItemConfig::dataChanged()
             TopNOverviewItem *mi = dynamic_cast<TopNOverviewItem*>(item);
             mi->name = name->text();
             if (metric1->isValid()) {
+                mi->metric = metric1->rideMetric();
                 mi->symbol = metric1->rideMetric()->symbol();
                 mi->units = metric1->rideMetric()->units(GlobalContext::context()->useMetricUnits);
             }
+            mi->bgcolor = bgcolor->getColor().name();
         }
         break;
 
@@ -2739,6 +4162,7 @@ OverviewItemConfig::dataChanged()
             MetaOverviewItem *mi = dynamic_cast<MetaOverviewItem*>(item);
             mi->name = name->text();
             if (meta1->isValid()) mi->symbol = meta1->metaname();
+            mi->bgcolor = bgcolor->getColor().name();
         }
         break;
 
@@ -2748,6 +4172,7 @@ OverviewItemConfig::dataChanged()
             mi->name = name->text();
             if (series1->currentIndex() >= 0) mi->series = static_cast<RideFile::SeriesType>(series1->itemData(series1->currentIndex(), Qt::UserRole).toInt());
             mi->polarized = cb1->isChecked();
+            mi->bgcolor = bgcolor->getColor().name();
         }
         break;
 
@@ -2759,6 +4184,7 @@ OverviewItemConfig::dataChanged()
             if (metric1->isValid()) mi->xsymbol = metric1->rideMetric()->symbol();
             if (metric2->isValid()) mi->ysymbol = metric2->rideMetric()->symbol();
             if (metric3->isValid()) mi->zsymbol = metric3->rideMetric()->symbol();
+            mi->bgcolor = bgcolor->getColor().name();
         }
         break;
 
@@ -2766,6 +4192,7 @@ OverviewItemConfig::dataChanged()
         {
             RouteOverviewItem *mi = dynamic_cast<RouteOverviewItem*>(item);
             mi->name = name->text();
+            mi->bgcolor = bgcolor->getColor().name();
         }
         break;
 
@@ -2773,6 +4200,15 @@ OverviewItemConfig::dataChanged()
         {
             PMCOverviewItem *mi = dynamic_cast<PMCOverviewItem*>(item);
             if (metric1->isValid()) mi->symbol = metric1->rideMetric()->symbol();
+        }
+        break;
+
+    case OverviewItemType::DATATABLE:
+        {
+            DataOverviewItem *mi = dynamic_cast<DataOverviewItem*>(item);
+            mi->name = name->text();
+            mi->program = editor->toPlainText();
+            mi->bgcolor = bgcolor->getColor().name();
         }
         break;
 
@@ -2785,6 +4221,7 @@ OverviewItemConfig::dataChanged()
             mi->program = editor->toPlainText();
             mi->start = double1->value();
             mi->stop = double2->value();
+            mi->bgcolor = bgcolor->getColor().name();
         }
     }
 }
@@ -3020,6 +4457,8 @@ BubbleViz::BubbleViz(IntervalOverviewItem *parent, QString name) : QGraphicsItem
     setZValue(11);
     setAcceptHoverEvents(true);
 
+    clickthru = NULL;
+    intervalsignal=false;
     group = new QSequentialAnimationGroup(this);
 
     QParallelAnimationGroup *par = new QParallelAnimationGroup(this);
@@ -3031,6 +4470,8 @@ BubbleViz::BubbleViz(IntervalOverviewItem *parent, QString name) : QGraphicsItem
 
     transitionAnimation=new QPropertyAnimation(this, "transition");
     group->addAnimation(transitionAnimation);
+
+    minx=maxx=miny=maxy=-1; // initial values
 }
 
 BubbleViz::~BubbleViz()
@@ -3085,7 +4526,29 @@ BubbleViz::sceneEvent(QEvent *event)
 
     if (event->type() == QEvent::GraphicsSceneMousePress) {
         click = true;
+        clickthru=NULL;
+        update();
     }
+
+    if (event->type() == QEvent::GraphicsSceneMouseRelease) {
+        if (clickthru) {
+            parent->parent->context->notifyRideSelected(clickthru);
+            clickthru = NULL;
+        }
+    }
+
+    // hoversignal?
+    if (intervalsignal && intervalhover != "" && intervalhover != lastintervalsignal) {
+        lastintervalsignal = intervalhover;
+        // lets signal that hover todo
+        foreach(IntervalItem *it, const_cast<RideItem*>(parent->parent->context->currentRideItem())->intervals()) {
+            if (it->name == intervalhover) {
+                parent->parent->context->notifyIntervalHover(it);
+                break;
+            }
+        }
+    }
+
     return false;
 }
 
@@ -3100,8 +4563,16 @@ bool scoresBiggerThan(const BubbleVizTuple i1, const BubbleVizTuple i2)
     return i1.score > i2.score;
 }
 void
-BubbleViz::setPoints(QList<BPointF> p, double minx, double maxx, double miny, double maxy)
+BubbleViz::setPoints(QList<BPointF> p, double minx, double maxx, double miny, double maxy, bool animate)
 {
+    // initial conditions?
+    if (this->miny == -1 && this->maxy == -1 && this->minx == -1 && this->maxx == -1)  {
+        this->minx=minx;
+        this->miny=miny;
+        this->maxy=maxy;
+        this->maxx=maxx;
+    }
+
     xaxisAnimation->setStartValue(QPointF(this->minx,this->maxx));
     xaxisAnimation->setEndValue(QPointF(minx,maxx));
     yaxisAnimation->setStartValue(QPointF(this->miny,this->maxy));
@@ -3170,11 +4641,16 @@ BubbleViz::setPoints(QList<BPointF> p, double minx, double maxx, double miny, do
 
     // stop any transition animation currently running
     group->stop();
-    transitionAnimation->setStartValue(0);
-    transitionAnimation->setEndValue(256);
-    transitionAnimation->setEasingCurve(QEasingCurve::OutQuad);
-    transitionAnimation->setDuration(400);
-    group->start();
+    if (animate) {
+        transitionAnimation->setStartValue(0);
+        transitionAnimation->setEndValue(256);
+        transitionAnimation->setEasingCurve(QEasingCurve::OutQuad);
+        transitionAnimation->setDuration(400);
+        group->start();
+    } else {
+        transition=256;
+        update();
+    }
 }
 
 static double pointDistance(QPointF a, QPointF b)
@@ -3320,6 +4796,7 @@ BubbleViz::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
         }
 
     } else {
+
         // when transition is -1 we are rescaling the axes first
         int index=0;
         foreach(BPointF point, oldpoints) {
@@ -3333,8 +4810,7 @@ BubbleViz::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
 
             // resize if transitioning
             QPointF center(plotarea.left() + (xratio * point.x), plotarea.bottom() - (yratio * point.y));
-            int alpha = 200;
-            if (parent->parent->scope == OverviewScope::TRENDS) alpha /= 2;
+            int alpha = 100;
 
             double size = (point.z / mean) * area;
             if (size > area * 6) size=area*6;
@@ -3472,8 +4948,11 @@ BubbleViz::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
                           canvas.top()+bminx.height()-10, nearest.label);
     }
 
+    // we hovering...
+    if (intervalsignal) intervalhover = nearest.label;
+
     if (click && nearvalue >= 0 && nearest.item != NULL) {
-        parent->parent->context->notifyRideSelected(nearest.item);
+        clickthru = nearest.item;
     }
     click = false;
 
@@ -3861,11 +5340,18 @@ Button::setGeometry(double x, double y, double width, double height)
 void
 Button::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
 {
+    static const int gl_border = 2;
+    static const int gl_radius = 24;
+
+    // anti aliasing please- none of that sketchy lines
+    painter->setRenderHint(QPainter::Antialiasing);
 
     // button background
     QColor pc = GCColor::invertColor(GColor(CCARDBACKGROUND));
-    pc.setAlpha(128);
-    painter->setPen(QPen(pc));
+    pc.setAlpha(64);
+    QPen line(pc,gl_border, Qt::SolidLine);
+    line.setJoinStyle(Qt::RoundJoin);
+    painter->setPen(line);
     QPointF pos=mapToParent(geom.x(), geom.y());
     if (isUnderMouse()) {
         QColor hover=GColor(CPLOTMARKER);
@@ -3873,7 +5359,7 @@ Button::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
         else hover.setAlpha(100);
         painter->setBrush(QBrush(hover));
     } else painter->setBrush(QBrush(GColor(CCARDBACKGROUND)));
-    painter->drawRoundedRect(pos.x(), pos.y(), geom.width(), geom.height(), 20, 20);
+    painter->drawRoundedRect(pos.x()+gl_border, pos.y()+gl_border, geom.width()-(gl_border*2), geom.height()-(gl_border*2), gl_radius, gl_radius);
 
     // text using large font clipped
     if (isUnderMouse()) {
@@ -3925,6 +5411,150 @@ Button::sceneEvent(QEvent *event)
     } else if (event->type() == QEvent::GraphicsSceneHoverEnter) {
 
         update();
+    }
+    return false;
+}
+
+VScrollBar::VScrollBar(QGraphicsWidget *parent, ChartSpace *space) : QGraphicsItem(parent), parent(parent), space(space), height(0)
+{
+    setZValue(11); // slightly higher than host
+
+    // hovering and dragging state set to initial conditions
+    origin = QPointF(0,0);
+    barhover=hover=false;
+    obarpos=barpos=0;
+    state=NONE;
+
+    // we need to watch events...
+    setAcceptHoverEvents(true);
+}
+
+double
+VScrollBar::pos() const
+{
+    if (geom.height() == 0) return 0;
+
+    // return pos as point in scrollarea thats at the top
+    return height * (barpos / geom.height());
+}
+void
+VScrollBar::setGeometry(double x, double y, double width, double height)
+{
+    geom = QRectF(x,y,width,height);
+    barpos = 0;
+}
+
+void
+VScrollBar::setAreaHeight(double n)
+{
+    height = n;
+    barpos = 0;
+}
+
+void
+VScrollBar::setPos(double x)
+{
+    Q_UNUSED(x);
+    // xxx todo
+}
+
+void
+VScrollBar::movePos(int x)
+{
+    // just normalise to plus or minus but not natural scrolling
+    // which is how the chart space works too
+    x = x < 0 ? +1 : -1;
+
+    // move at least .8 of a page down
+    double barheight = geom.height() * (geom.height() / height);
+    barpos += barheight * 0.8 * x;
+    if (barpos < 0) barpos = 0;
+    if (barpos + barheight > geom.height()) barpos = geom.height() - barheight;
+
+    parent->update();
+    update();
+}
+
+// the usual
+void
+VScrollBar::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
+{
+    if (isVisible() && geom.height() && geom.height() < height) {
+
+        canscroll=true;
+        double barheight = geom.height() * (geom.height() / height);
+        QColor barcolor(127,127,127,64);
+        if (state == DRAG) {
+            barcolor = GColor(CPLOTMARKER);
+        } else if (hover) {
+            if (barhover) barcolor = QColor(127,127,127,255);
+            else barcolor = QColor(127,127,127,127);
+        }
+
+        painter->setBrush(barcolor);
+        painter->setPen(Qt::NoPen);
+        painter->drawRoundedRect(QRectF(geom.x(), geom.y()+barpos, geom.width(), barheight), geom.width()/2, geom.width()/2);
+    } else {
+        canscroll=false;
+    }
+}
+
+// spotting mouse events hover, click move and wheel (but only in small area of scrollbar)
+bool
+VScrollBar::sceneEvent(QEvent *event)
+{
+    // we are not needed as scrollable area fits anyway
+    if (height == 0 || geom.height() >= height) return false;
+
+    // set value based upon the location of the mouse
+    QPoint vpos = space->mapFromGlobal(QCursor::pos());
+    QPointF spos = space->view->mapToScene(vpos);
+    QPointF cpos = spos - parent->geometry().topLeft();
+
+    // remember what it was....
+    bool oldhover = hover;
+    bool oldbarhover = barhover;
+
+    // scrollbar space
+    if (geom.contains(cpos)) hover = true;
+    else hover=false;
+
+    // the actual bar
+    double barheight = geom.height() * (geom.height() / height);
+    QRectF barrect = QRectF(geom.x(), geom.y()+barpos, geom.width(), barheight);
+    if (barrect.contains(cpos)) barhover = true;
+    else barhover = false;
+
+    // plain old mouse move
+    if (oldhover != hover || oldbarhover != barhover) update();
+
+    if (event->type() == QEvent::GraphicsSceneMouseMove && state == DRAG) {
+
+        // mouse moved so hover paint anyway
+        barpos = obarpos + cpos.y() - origin.y();
+        if (barpos < 0) barpos = 0;
+        if (barpos + barheight > geom.height()) barpos = geom.height() - barheight;
+        parent->update();
+        update();
+
+        return true;
+
+    } else if (barhover && event->type() == QEvent::GraphicsSceneMousePress) {
+
+        state = DRAG;
+        origin = cpos;
+        obarpos = barpos;
+        update();
+
+        return true;
+
+    } else if (event->type() == QEvent::GraphicsSceneMouseRelease) {
+
+        // remember what it was
+        state = NONE;
+        update();
+
+        return true;
     }
     return false;
 }

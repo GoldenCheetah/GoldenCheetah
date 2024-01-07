@@ -24,6 +24,7 @@
 #include "RideFileCache.h"
 #include <qwt_symbol.h>
 #include <qwt_color_map.h>
+#include <qwt_text.h>
 
 #include <QtGui>
 #include <QMessageBox>

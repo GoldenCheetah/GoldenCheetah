@@ -24,7 +24,6 @@
 #include "SearchFilterBox.h"
 #include "CPPlot.h"
 #include "Context.h"
-#include "Context.h"
 #include "Athlete.h"
 #include "RideItem.h"
 #include "TimeUtils.h"
@@ -32,7 +31,7 @@
 #include "GcOverlayWidget.h"
 #include "MUWidget.h"
 #include "HelpWhatsThis.h"
-#include "TabView.h" // stylesheet
+#include "AbstractView.h" // stylesheet
 #include "RideCache.h"
 #include <qwt_picker.h>
 #include <qwt_picker_machine.h>
@@ -40,7 +39,6 @@
 #include <qwt_plot_curve.h>
 #include <qwt_series_data.h>
 #include <qwt_scale_div.h>
-#include <qwt_compat.h>
 #include <QFile>
 #include "Season.h"
 #include "SeasonParser.h"
@@ -272,6 +270,12 @@ CriticalPowerWindow::CriticalPowerWindow(Context *context, bool rangemode) :
     showCSLinearLabel = new QLabel(tr("Show time scale linear"));
     cl->addRow(showCSLinearLabel, showCSLinearCheck);
 
+    showDeltaCheck = new QCheckBox(this);
+    showDeltaCheck->setText(tr("Delta compare"));
+    showDeltaPercentCheck = new QCheckBox(this);
+    showDeltaPercentCheck->setText(tr("as percentage"));
+    cl->addRow(showDeltaCheck, showDeltaPercentCheck);
+
     ridePlotStyleCombo = new QComboBox(this);
     ridePlotStyleCombo->addItem(tr("Activity Mean Max"));
     ridePlotStyleCombo->addItem(tr("Activity Centile"));
@@ -426,9 +430,9 @@ CriticalPowerWindow::CriticalPowerWindow(Context *context, bool rangemode) :
     grid->enableX(false); // not needed
     grid->enableY(true);
     grid->setZ(-20);
-    QwtValueList ytick[QwtScaleDiv::NTickTypes];
+    QList<double> ytick[QwtScaleDiv::NTickTypes];
     for (double i=0.0; i<=2500; i+= 100) ytick[QwtScaleDiv::MajorTick]<<i;
-    cpPlot->setAxisScaleDiv(QwtPlot::yLeft,QwtScaleDiv(0.0,2500.0,ytick));
+    cpPlot->setAxisScaleDiv(QwtAxis::YLeft,QwtScaleDiv(0.0,2500.0,ytick));
     grid->attach(cpPlot);
 
     // the model helper -- showing model parameters etc
@@ -511,6 +515,7 @@ CriticalPowerWindow::CriticalPowerWindow(Context *context, bool rangemode) :
     addHelper(QString(tr("Motor Unit Model")), new MUWidget(this, context));
 #endif
     addHelper(QString(tr("Model")), helper);
+    GcChartWindow::overlayWidget->move(100,100);
 
     if (rangemode) {
         connect(this, SIGNAL(dateRangeChanged(DateRange)), SLOT(dateRangeChanged(DateRange)));
@@ -580,6 +585,8 @@ CriticalPowerWindow::CriticalPowerWindow(Context *context, bool rangemode) :
     connect(rDeltaPercent, SIGNAL(stateChanged(int)), this, SLOT(rDeltaChanged()));
     connect(showHeatByDateCheck, SIGNAL(stateChanged(int)), this, SLOT(showHeatByDateChanged(int)));
     connect(showPercentCheck, SIGNAL(stateChanged(int)), this, SLOT(showPercentChanged(int)));
+    connect(showDeltaCheck, SIGNAL(stateChanged(int)), this, SLOT(showDeltaChanged()));
+    connect(showDeltaPercentCheck, SIGNAL(stateChanged(int)), this, SLOT(showDeltaChanged()));
     connect(showPowerIndexCheck, SIGNAL(stateChanged(int)), this, SLOT(showPowerIndexChanged(int)));
     connect(showTestCheck, SIGNAL(stateChanged(int)), this, SLOT(showTestChanged(int)));
     connect(showBestCheck, SIGNAL(stateChanged(int)), this, SLOT(showBestChanged(int)));
@@ -987,6 +994,7 @@ CriticalPowerWindow::forceReplot()
 {
     stale = true; // we must become stale
 
+    CriticalSeriesType series = static_cast<CriticalSeriesType>(seriesCombo->itemData(seriesCombo->currentIndex()).toInt());
     if ((rangemode && context->isCompareDateRanges) || (!rangemode && context->isCompareIntervals)) {
 
         // hide in compare mode
@@ -1000,7 +1008,6 @@ CriticalPowerWindow::forceReplot()
     } else {
 
         // show helper if we're showing power
-        CriticalSeriesType series = static_cast<CriticalSeriesType>(seriesCombo->itemData(seriesCombo->currentIndex()).toInt());
         updateOptions(series);
 
         // these are allowed outside of compare mode
@@ -1009,6 +1016,7 @@ CriticalPowerWindow::forceReplot()
         rDelta->hide();
         rDeltaPercent->hide();
     }
+    cpPlot->setSeries(series); // Update y-axis
 
     if (rangemode) {
 
@@ -1159,7 +1167,7 @@ CriticalPowerWindow::intervalHover(IntervalItem* x)
         hoverCurve = new QwtPlotCurve("Interval");
         hoverCurve->setPen(pen);
         if (appsettings->value(this, GC_ANTIALIAS, true).toBool() == true) hoverCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
-        hoverCurve->setYAxis(QwtPlot::yLeft);
+        hoverCurve->setYAxis(QwtAxis::YLeft);
         hoverCurve->setSamples(array);
         hoverCurve->setVisible(true);
         hoverCurve->setZ(100);
@@ -1365,7 +1373,7 @@ CriticalPowerWindow::event(QEvent *event)
         }
 
         // if off the screen move on screen
-        if (helperWidget()->geometry().x() > geometry().width()) {
+        if (helperWidget()->geometry().x() > geometry().width() || helperWidget()->geometry().x() < geometry().x()) {
             helperWidget()->move(mainWidget()->geometry().width()-(275*dpiXFactor), 50*dpiYFactor);
         }
     }
@@ -1757,7 +1765,7 @@ CriticalPowerWindow::dateRangeChanged(DateRange dateRange)
         fs.addFilter(searchBox->isFiltered(), SearchFilterBox::matches(context, filter()));
         fs.addFilter(context->isfiltered, context->filters);
         fs.addFilter(context->ishomefiltered, context->homeFilters);
-        fs.addFilter(myPerspective->isFiltered(), myPerspective->filterlist(dateRange));
+        if (myPerspective) fs.addFilter(myPerspective->isFiltered(), myPerspective->filterlist(dateRange));
         int nActivities, nRides, nRuns, nSwims;
         QString sport;
         context->athlete->rideCache->getRideTypeCounts(
@@ -1794,7 +1802,7 @@ CriticalPowerWindow::dateRangeChanged(DateRange dateRange)
             cpPlot->setSport(sport);
         } else {
             cpPlot->setDateCV(0.0);
-            cpPlot->setSport("");
+            cpPlot->setSport(sport);
         }
 
         cpPlot->setDateRange(dateRange.from, dateRange.to, stale);
@@ -1961,7 +1969,16 @@ CriticalPowerWindow::rHeatChanged(int check)
 void
 CriticalPowerWindow::rDeltaChanged()
 {
-    cpPlot->setShowDelta(rDelta->isChecked(), rDeltaPercent->isChecked());
+    showDeltaCheck->setChecked(rDelta->isChecked());
+    showDeltaPercentCheck->setChecked(rDeltaPercent->isChecked());
+}
+
+void
+CriticalPowerWindow::showDeltaChanged()
+{
+    rDelta->setChecked(showDeltaCheck->isChecked());
+    rDeltaPercent->setChecked(showDeltaPercentCheck->isChecked());
+    cpPlot->setShowDelta(showDeltaCheck->isChecked(), showDeltaPercentCheck->isChecked());
 
     // redraw
     if (rangemode) dateRangeChanged(DateRange());

@@ -91,9 +91,8 @@ class RChart : public GcChartWindow {
     public:
         RChart(Context *context, bool ridesummary);
 
-        // reveal
-        bool hasReveal() { return true; }
         QCheckBox *showCon;
+        QLabel *noR;
 
         // receives all the events
         QTextEdit *script;

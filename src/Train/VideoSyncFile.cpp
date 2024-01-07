@@ -31,6 +31,7 @@ static bool setSupported()
     ::supported << ".rlv";
     ::supported << ".tts";
     ::supported << ".json";
+    ::supported << ".gpx";
 
     return true;
 }

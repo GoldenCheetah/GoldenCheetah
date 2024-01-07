@@ -338,6 +338,10 @@ Strava::writeFile(QByteArray &data, QString remotename, RideFile *ride)
       activityTypePart.setBody("NordicSki");
     else if (ride->sport() == "Gym")
       activityTypePart.setBody("WeightTraining");
+    else if (ride->sport() == "Walking")
+      activityTypePart.setBody("Walk");
+    else if (ride->xdata("TRAIN") && ride->isDataPresent(RideFile::lat))
+      activityTypePart.setBody("VirtualRide");
     else
       activityTypePart.setBody("Ride");
     multiPart->append(activityTypePart);
@@ -381,7 +385,7 @@ Strava::writeFile(QByteArray &data, QString remotename, RideFile *ride)
     trainerPart.setHeader(QNetworkRequest::ContentDispositionHeader,
                           QVariant("form-data; name=\"trainer\""));
     trainerPart.setBody((ride->getTag("Trainer", "0").toInt() ||
-                         ride->xdata("TRAIN")) ? "1" : "0");
+                         ride->xdata("TRAIN") && !ride->isDataPresent(RideFile::lat)) ? "1" : "0");
     multiPart->append(trainerPart);
 
     if (manual) {
@@ -897,6 +901,7 @@ Strava::prepareResponse(QByteArray* data)
             else if (stype.endsWith("Rowing")) ride->setTag("Sport", "Row");
             else if (stype.endsWith("Ski")) ride->setTag("Sport", "Ski");
             else if (stype.startsWith("Weight")) ride->setTag("Sport", "Gym");
+            else if (stype.endsWith("Walk")) ride->setTag("Sport", "Walking");
             else ride->setTag("Sport", stype);
             // Set SubSport to preserve the original when Sport was mapped
             if (stype != ride->getTag("Sport", "")) ride->setTag("SubSport", stype);
@@ -934,6 +939,10 @@ Strava::prepareResponse(QByteArray* data)
             }
         }
 
+        if (!each["perceived_exertion"].isNull()) {
+            ride->setTag("RPE", QString("%1").arg(each["perceived_exertion"].toDouble()));
+        }
+
         if (each["manual"].toBool()) {
             if (each["distance"].toDouble()>0) {
                 QMap<QString,QString> map;
@@ -969,7 +978,7 @@ Strava::prepareResponse(QByteArray* data)
 
                     double start = starttime.secsTo(QDateTime::fromString(lap["start_date_local"].toString(), Qt::ISODate));
                     if (start < last_lap) start = last_lap + 1; // Don't overlap
-                    double end = start + lap["elapsed_time"].toDouble() - 1;
+                    double end = start + std::max(lap["elapsed_time"].toDouble(), 1.0) - 1;
 
                     last_lap = end;
 
@@ -1002,4 +1011,3 @@ static bool addStrava() {
 }
 
 static bool add = addStrava();
-

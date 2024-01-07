@@ -1,6 +1,6 @@
 #include "AthleteView.h"
 #include "AthleteConfigDialog.h"
-#include "TabView.h"
+#include "AbstractView.h"
 #include "JsonRideFile.h" // for DATETIME_FORMAT
 #include "HelpWhatsThis.h"
 
@@ -62,7 +62,7 @@ AthleteView::newAthlete(QString name)
 
     // add a card for each athlete
     AthleteCard *ath = new AthleteCard(this, name);
-    addItem(row,col,gl_athletes_deep,ath);
+    addItem(row,col,1,gl_athletes_deep,ath);
 
     // we have 5 athletes per row
     if (++col >= gl_athletes_per_row) {
@@ -88,7 +88,7 @@ void
 AthleteView::configChanged(qint32)
 {
     // appearances
-    setStyleSheet(TabView::ourStyleSheet());
+    setStyleSheet(AbstractView::ourStyleSheet());
 
 }
 
@@ -133,7 +133,7 @@ AthleteCard::AthleteCard(ChartSpace *parent, QString path) : ChartSpaceItem(pare
         loadprogress = 100;
         anchor=true;
         setShowConfig(true);
-        button->setText("Close");
+        button->setText(tr("Close"));
         button->hide();
 
         // watch metric updates
@@ -209,8 +209,8 @@ AthleteCard::configAthlete()
 void
 AthleteCard::clicked()
 {
-    if (loadprogress==100) parent->context->mainWindow->closeTab(path);
-    else parent->context->mainWindow->openTab(path);
+    if (loadprogress==100) parent->context->mainWindow->closeAthleteTab(path);
+    else parent->context->mainWindow->openAthleteTab(path);
 }
 
 void
@@ -220,7 +220,7 @@ AthleteCard::opening(QString name, Context*context)
     if (name == path) {
         this->context = context;
         loadprogress = 100;
-        button->setText("Close");
+        button->setText(tr("Close"));
         button->hide();
         connect(context,SIGNAL(loadProgress(QString,double)), this, SLOT(loadProgress(QString,double)));
         connect(context,SIGNAL(loadDone(QString,Context*)), this, SLOT(loadDone(QString,Context*)));
@@ -268,7 +268,7 @@ AthleteCard::closing(QString name, Context *)
         setShowConfig(false);
         this->context = NULL;
         loadprogress = 0;
-        button->setText("Open");
+        button->setText(tr("Open"));
         update();
     }
 }
@@ -291,8 +291,8 @@ AthleteCard::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, QWid
     if (/*maxy == 0 && */last != QDateTime() || count == 0) {
         QRectF rectf = QRectF(ROWHEIGHT,geometry().height()-(ROWHEIGHT*5), geometry().width()-(ROWHEIGHT*2), ROWHEIGHT*1.5);
         QString message;
-        if (count == 0) message = "No activities.";
-        else message = QString("Last workout %1 days ago").arg(last.daysTo(QDateTime::currentDateTime()));
+        if (count == 0) message = tr("No activities.");
+        else message = QString(tr("Last workout %1 days ago")).arg(last.daysTo(QDateTime::currentDateTime()));
         painter->setFont(parent->midfont);
         painter->setPen(QColor(150,150,150));
         painter->drawText(rectf, message, Qt::AlignHCenter | Qt::AlignVCenter);

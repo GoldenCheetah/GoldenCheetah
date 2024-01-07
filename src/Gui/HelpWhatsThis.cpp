@@ -64,7 +64,7 @@ HelpWhatsThis::getText(GCHelp chapter) {
 
     default:
     case Default:
-        return text.arg("Main-Page_Table-of-contents").arg("Table of Contents");
+        return text.arg("Main-Page_Table-of-contents").arg(tr("Table of Contents"));
 
     // Scope Bar
     case ScopeBar:
@@ -83,14 +83,18 @@ HelpWhatsThis::getText(GCHelp chapter) {
         return text.arg("ScopeBar_Views#options").arg(tr("Application level Options/Preferences for all athletes"));
 
     // Tool Bar
-    case ToolBar_Download:
-        return text.arg("First-Steps_Download-or-import#downloading-a-activity-from-device").arg(tr("Direct download from Powertap, SRM, Joule, Joule GPS, Moxy Monitor or Macro-X device"));
-    case ToolBar_Manual:
-        return text.arg("Menu%20Bar_Activity").arg(tr("Import any activity file - supported by Golden Cheetah - mass import is supported here"));
+    case ToolBar_Back:
+        return text.arg("Tool%20Bar_Functions#back").arg(tr("Navigate backward"));
+    case ToolBar_Forward:
+        return text.arg("Tool%20Bar_Functions#forward").arg(tr("Navigate forward"));
+    case ToolBar_PerspectiveSelector:
+        return text.arg("Tool%20Bar_Functions#perspective-selector").arg(tr("Select active perspective for the current view, create new perspectives and manage existing ones"));
     case ToolBar_ToggleSidebar:
-        return text.arg("Menu%20Bar_View").arg(tr("Activate / De-activate the Sidebar - which provides different sub-sections to select data shown in the main view"));
+        return text.arg("Tool%20Bar_Functions#side-bar").arg(tr("Activate / De-activate the Sidebar - which provides different sub-sections to select data shown in the main view"));
     case ToolBar_ToggleComparePane:
-        return text.arg("Compare-Pane_General").arg(tr("Activate / De-activate the Compare Pane - which allows to compare activities, intervals or date ranges - also across athletes"));
+        return text.arg("Tool%20Bar_Functions#bottom-bar").arg(tr("Activate / De-activate the Compare Pane - which allows to compare activities and intervals in Activities View or date ranges in Trends View - also across athletes. In Train View it shows/hide the Intensity Adjustments and Workout Control Pane."));
+    case ToolBar_TabTile:
+        return text.arg("Tool%20Bar_Functions#tabtile").arg(tr("Changes the current view layout between Tabbed and Tiled"));
 
     // Menus
     case MenuBar_Athlete:
@@ -107,8 +111,8 @@ HelpWhatsThis::getText(GCHelp chapter) {
     case MenuBar_Activity_Manual_LapsEditor:
         return text.arg("Menu%20Bar_Activity").arg(tr("Laps Editor allows to enter a sequence of work-rest intervals series -defined by number of repetitions (reps), distance (dist, units according to preferences in Pace Zones) and duration (min and sec)- to generate the data points for the activity"));
 
-    case MenuBar_Activity_BatchExport:
-        return text.arg("Menu%20Bar_Activity").arg(tr("Exports a (selectable) set of activties in one of the supported export formats"));
+    case MenuBar_Activity_BatchProcessing:
+        return text.arg("Menu%20Bar_Activity").arg(tr("Batch processes a (selectable) set of activties"));
     case MenuBar_Activity_SplitRide:
         return text.arg("Menu%20Bar_Activity").arg(tr("Wizard to split an activity into multiple activities based on configurable criteria"));
     case MenuBar_Activity_CombineRides:
@@ -213,10 +217,12 @@ HelpWhatsThis::getText(GCHelp chapter) {
         return text.arg("ChartTypes_Diary#navigator").arg(tr("Configurable activity log - with build in search capabilities"));
     case ChartRides_Overview:
         return text.arg("ChartTypes_Activities#Overview").arg(tr("Dashboard for a single activity - the tiles shown here are configurable"));
+    case ChartRides_Overview_Config:
+        return text.arg("ChartTypes_Activities#Overview-%1");
     case ChartRides_Summary:
         return text.arg("ChartTypes_Activities#activity-summary").arg(tr("Detailed information of a single activity - the metrics shown here are configurable"));
     case ChartRides_Details:
-        return text.arg("ChartTypes_Activities#details").arg("Configurable tabbed view of activity detail data, plus technical details and change log");
+        return text.arg("ChartTypes_Activities#details").arg(tr("Configurable tabbed view of activity detail data, plus technical details and change log"));
     case ChartRides_Editor:
         return text.arg("ChartTypes_Activities#editor").arg(tr("Editor for activity file data - allowing to change/correct data, find entries and find anomalies"));
 
@@ -255,6 +261,8 @@ HelpWhatsThis::getText(GCHelp chapter) {
         return text.arg("ChartTypes_Trends#summary").arg(tr("Chart specific filter/search and date range settings"));
     case Chart_Overview:
         return text.arg("ChartTypes_Trends#Overview").arg(tr("Dashboard for the selected data range - the tiles shown are configurable"));
+    case Chart_Overview_Config:
+        return text.arg("ChartTypes_Trends#Overview-%1");
     case Chart_R:
         return text.arg("Special-Topics_Working-with-R").arg(tr("Embedded R Chart"));
     case Chart_Python:

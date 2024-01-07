@@ -27,20 +27,20 @@ Specification::Specification() : it(NULL), recintsecs(0), ri(NULL) {}
 
 // does the date pass the specification ?
 bool
-Specification::pass(QDate date)
+Specification::pass(QDate date) const
 {
     return (dr.pass(date));
 }
 
 // does the rideitem pass the specification ?
 bool 
-Specification::pass(RideItem*item)
+Specification::pass(RideItem*item) const
 {
     return (dr.pass(item->dateTime.date()) && fs.pass(item->fileName));
 }
 
 bool
-Specification::pass(RideFilePoint *p)
+Specification::pass(RideFilePoint *p) const
 {
     if (it == NULL) return true;
     else if ((p->secs+recintsecs) >= it->start && p->secs <= it->stop) return true;
@@ -88,7 +88,7 @@ Specification::secsEnd() const
 }
 
 bool
-Specification::isEmpty(RideFile *ride)
+Specification::isEmpty(RideFile *ride) const
 {
     // its null !
     if (!ride) return true;

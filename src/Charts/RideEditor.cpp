@@ -24,7 +24,7 @@
 #include "Context.h"
 #include "Settings.h"
 #include "Colors.h"
-#include "TabView.h"
+#include "AbstractView.h"
 #include "HelpWhatsThis.h"
 #include "HrZones.h"
 #include "XDataDialog.h"
@@ -289,8 +289,8 @@ RideEditor::configChanged(qint32)
                     .arg(GCColor::invertColor(GColor(CPLOTBACKGROUND)).name()));
     table->horizontalHeader()->setDefaultAlignment(Qt::AlignLeft | Qt::AlignVCenter);
 #ifndef Q_OS_MAC
-    table->verticalScrollBar()->setStyleSheet(TabView::ourStyleSheet());
-    table->horizontalScrollBar()->setStyleSheet(TabView::ourStyleSheet());
+    table->verticalScrollBar()->setStyleSheet(AbstractView::ourStyleSheet());
+    table->horizontalScrollBar()->setStyleSheet(AbstractView::ourStyleSheet());
 #endif
     toolbar->setStyleSheet(QString("::enabled { background: %1; color: %2; border: 0px; } ").arg(GColor(CPLOTBACKGROUND).name())
                     .arg(GCColor::invertColor(GColor(CPLOTBACKGROUND)).name()));
@@ -520,10 +520,11 @@ AnomalyDialog::check()
     QVector<double> power;
     QVector<double> cad;
     QVector<double> secs;
-    double lastdistance=9;
+    double lastdistance=0;
     double lastpower=0;
     double lastcad=0;
     int count = 0;
+    int nSpeedDist = 0;
 
     foreach (RideFilePoint *point, rideEditor->ride->ride()->dataPoints()) {
         power.append(point->watts);
@@ -558,6 +559,13 @@ AnomalyDialog::check()
                                        tr("Cadence/Power duplicated when freewheeling."));
                 }
             }
+        }
+
+        // check for the first 10 speed/distance inconsistencies
+        if (nSpeedDist < 10 && abs(lastdistance + point->kph*rideEditor->ride->ride()->recIntSecs()/3600.0 - point->km) > 0.001) {
+            nSpeedDist++;
+            rideEditor->data->anomalies.insert(xsstring(count, RideFile::kph),
+                                   tr("Speed Inconsistent with Distance/Time, stopping at 10 examples"));
         }
 
         // so we can look back one quickly
@@ -3065,8 +3073,8 @@ void XDataEditor::configChanged()
                     .arg(GColor(CPLOTBACKGROUND).name())
                     .arg(GCColor::invertColor(GColor(CPLOTBACKGROUND)).name()));
 #ifndef Q_OS_MAC
-    verticalScrollBar()->setStyleSheet(TabView::ourStyleSheet());
-    horizontalScrollBar()->setStyleSheet(TabView::ourStyleSheet());
+    verticalScrollBar()->setStyleSheet(AbstractView::ourStyleSheet());
+    horizontalScrollBar()->setStyleSheet(AbstractView::ourStyleSheet());
 #endif
 }
 

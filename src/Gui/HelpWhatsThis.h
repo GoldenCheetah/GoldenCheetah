@@ -41,10 +41,12 @@ Q_OBJECT
                  ScopeBar_Sync,
                  ScopeBar_Options,
 
-                 ToolBar_Download,
-                 ToolBar_Manual,
+                 ToolBar_Back,
+                 ToolBar_Forward,
+                 ToolBar_PerspectiveSelector,
                  ToolBar_ToggleSidebar,
                  ToolBar_ToggleComparePane,
+                 ToolBar_TabTile,
 
                  MenuBar_Athlete,
 
@@ -53,7 +55,7 @@ Q_OBJECT
                  MenuBar_Activity_Import,
                  MenuBar_Activity_Manual,
                  MenuBar_Activity_Manual_LapsEditor,
-                 MenuBar_Activity_BatchExport,
+                 MenuBar_Activity_BatchProcessing,
                  MenuBar_Activity_SplitRide,
                  MenuBar_Activity_CombineRides,
 
@@ -116,6 +118,7 @@ Q_OBJECT
                  ChartDiary_Navigator,
 
                  ChartRides_Overview,
+                 ChartRides_Overview_Config,
                  ChartRides_Summary,
                  ChartRides_Details,
                  ChartRides_Editor,
@@ -137,6 +140,7 @@ Q_OBJECT
                  Chart_Summary,
                  Chart_Summary_Config,
                  Chart_Overview,
+                 Chart_Overview_Config,
                  Chart_R,
                  Chart_Python,
                  Chart_User,
