@@ -223,13 +223,13 @@ public:
     virtual void SaveWorkout() = 0;
     void SaveWorkoutHeader(QTextStream &stream, QString fileName, QString description, QString units)
     {
-        stream << "[COURSE HEADER]" << endl;
-        stream << "VERSION = 2" << endl;
-        stream << "UNITS = METRIC" << endl;
-        stream << "DESCRIPTION = " << description << endl;
-        stream << "FILE NAME = " << fileName << endl;
-        stream <<  units << endl;
-        stream << "[END COURSE HEADER]" << endl;
+        stream << "[COURSE HEADER]" << Qt::endl;
+        stream << "VERSION = 2" << Qt::endl;
+        stream << "UNITS = METRIC" << Qt::endl;
+        stream << "DESCRIPTION = " << description << Qt::endl;
+        stream << "FILE NAME = " << fileName << Qt::endl;
+        stream <<  units << Qt::endl;
+        stream << "[END COURSE HEADER]" << Qt::endl;
     }
 
 };

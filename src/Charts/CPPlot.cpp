@@ -2252,7 +2252,7 @@ CPPlot::exportBests(QString filename)
 
     // open stream and write header
     QTextStream stream(&f);
-    stream << "seconds, value," << (expmodel ? " model, date" : " date") << endl;
+    stream << "seconds, value," << (expmodel ? " model, date" : " date") << Qt::endl;
 
     // output a row for each second
     foreach(QwtPlotCurve *bestsCurve, bestsCurves) {
@@ -2270,8 +2270,8 @@ CPPlot::exportBests(QString filename)
             }
 
             // values
-            if (expmodel) stream << int(xvalue * 60.00f) << "," << yvalue << "," << modelvalue << "," << date.toString(Qt::ISODate) << endl;
-            else stream << int(xvalue * 60.00f) << "," << yvalue << "," << date.toString(Qt::ISODate) << endl;
+            if (expmodel) stream << int(xvalue * 60.00f) << "," << yvalue << "," << modelvalue << "," << date.toString(Qt::ISODate) << Qt::endl;
+            else stream << int(xvalue * 60.00f) << "," << yvalue << "," << date.toString(Qt::ISODate) << Qt::endl;
         }
     }
 
