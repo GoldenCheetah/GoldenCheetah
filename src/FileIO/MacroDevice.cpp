@@ -180,7 +180,7 @@ MacroDevice::download( const QDir &tmpdir,
     files.append(file);
 
     QTextStream os(&tmp);
-    os << hex;
+    os << Qt::hex;
 
     for (int i = 0; i < count; i++)
     {
