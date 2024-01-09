@@ -2698,7 +2698,7 @@ KPIOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, 
         painter->setPen(QColor(100,100,100));
         painter->setFont(parent->smallfont);
 
-        painter->drawText(QPointF((geometry().width() - QFontMetrics(parent->smallfont).width(units)) / 2.0f,
+        painter->drawText(QPointF((geometry().width() - QFontMetrics(parent->smallfont).horizontalAdvance(units)) / 2.0f,
                               mid + (fm.ascent() / 3.0f) + addy), units); // divided by 3 to account for "gap" at top of font
     }
 
@@ -2717,7 +2717,7 @@ KPIOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, 
 
         QString stoptext = istime ? time_to_string(stop, true) : Utils::removeDP(QString("%1").arg(stop));
         QString starttext = istime ? time_to_string (start, true) : Utils::removeDP(QString("%1").arg(start));
-        painter->drawText(QPointF(right - QFontMetrics(parent->smallfont).width(stoptext), bottom), stoptext);
+        painter->drawText(QPointF(right - QFontMetrics(parent->smallfont).horizontalAdvance(stoptext), bottom), stoptext);
         painter->drawText(QPointF(left, bottom), starttext);
 
         // percentage in mid font...
@@ -3176,13 +3176,13 @@ RPEOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, 
         painter->setPen(QColor(100,100,100));
         painter->setFont(parent->smallfont);
 
-        painter->drawText(QPointF(right - QFontMetrics(parent->smallfont).width(upper) - 80,
+        painter->drawText(QPointF(right - QFontMetrics(parent->smallfont).horizontalAdvance(upper) - 80,
                               top - 40 + (fm.ascent() / 2.0f)), upper);
-        painter->drawText(QPointF(right - QFontMetrics(parent->smallfont).width(lower) - 80,
+        painter->drawText(QPointF(right - QFontMetrics(parent->smallfont).horizontalAdvance(lower) - 80,
                               bottom -40), lower);
 
         painter->setPen(QColor(50,50,50));
-        painter->drawText(QPointF(right - QFontMetrics(parent->smallfont).width(mean) - 80,
+        painter->drawText(QPointF(right - QFontMetrics(parent->smallfont).horizontalAdvance(mean) - 80,
                               ((top+bottom)/2) + (fm.tightBoundingRect(mean).height()/2) - 60), mean);
     }
 
@@ -3256,7 +3256,7 @@ MetricOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem 
         painter->setPen(QColor(100,100,100));
         painter->setFont(parent->smallfont);
 
-        painter->drawText(QPointF((geometry().width() - QFontMetrics(parent->smallfont).width(units)) / 2.0f,
+        painter->drawText(QPointF((geometry().width() - QFontMetrics(parent->smallfont).horizontalAdvance(units)) / 2.0f,
                               mid + (fm.ascent() / 3.0f) + addy), units); // divided by 3 to account for "gap" at top of font
     }
 
@@ -3272,13 +3272,13 @@ MetricOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem 
         painter->setPen(QColor(100,100,100));
         painter->setFont(parent->smallfont);
 
-        painter->drawText(QPointF(right - QFontMetrics(parent->smallfont).width(upper) - 80,
+        painter->drawText(QPointF(right - QFontMetrics(parent->smallfont).horizontalAdvance(upper) - 80,
                               top - 40 + (fm.ascent() / 2.0f)), upper);
-        painter->drawText(QPointF(right - QFontMetrics(parent->smallfont).width(lower) - 80,
+        painter->drawText(QPointF(right - QFontMetrics(parent->smallfont).horizontalAdvance(lower) - 80,
                               bottom -40), lower);
 
         painter->setPen(QColor(50,50,50));
-        painter->drawText(QPointF(right - QFontMetrics(parent->smallfont).width(mean) - 80,
+        painter->drawText(QPointF(right - QFontMetrics(parent->smallfont).horizontalAdvance(mean) - 80,
                               ((top+bottom)/2) + (fm.tightBoundingRect(mean).height()/2) - 60), mean);
     }
 
@@ -3528,14 +3528,14 @@ MetaOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *,
             painter->setPen(QColor(100,100,100));
             painter->setFont(parent->smallfont);
 
-            painter->drawText(QPointF(right - QFontMetrics(parent->smallfont).width(upper) - 80,
+            painter->drawText(QPointF(right - QFontMetrics(parent->smallfont).horizontalAdvance(upper) - 80,
                                   top - 40 + (fm.ascent() / 2.0f)), upper);
-            painter->drawText(QPointF(right - QFontMetrics(parent->smallfont).width(lower) - 80,
+            painter->drawText(QPointF(right - QFontMetrics(parent->smallfont).horizontalAdvance(lower) - 80,
                                   bottom -40), lower);
 
 
             painter->setPen(QColor(50,50,50));
-            painter->drawText(QPointF(right - QFontMetrics(parent->smallfont).width(mean) - 80,
+            painter->drawText(QPointF(right - QFontMetrics(parent->smallfont).horizontalAdvance(mean) - 80,
                                   ((top+bottom)/2) + (fm.tightBoundingRect(mean).height()/2) - 60), mean);
             }
 

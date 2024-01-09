@@ -1813,7 +1813,7 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
     QFontMetrics fm(courier);
 
     formulaEdit->setFont(courier);
-    formulaEdit->setTabStopWidth(4 * fm.width(' ')); // 4 char tabstop
+    formulaEdit->setTabStopDistance(4 * fm.horizontalAdvance(' ')); // 4 char tabstop
     //formulaEdit->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     formulaType = new QComboBox(this);
     formulaType->addItem(tr("Total"), static_cast<int>(RideMetric::Total));

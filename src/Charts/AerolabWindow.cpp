@@ -47,7 +47,7 @@ AerolabWindow::AerolabWindow(Context *context) :
   // Left controls layout:
   QVBoxLayout *leftControls  =  new QVBoxLayout;
   QFontMetrics metrics(QApplication::font());
-  int labelWidth1 = metrics.width("Crr") + 10;
+  int labelWidth1 = metrics.horizontalAdvance("Crr") + 10;
 
   // Crr:
   QHBoxLayout *crrLayout = new QHBoxLayout;
@@ -134,7 +134,7 @@ AerolabWindow::AerolabWindow(Context *context) :
 
   // Right controls layout:
   QVBoxLayout *rightControls  =  new QVBoxLayout;
-  int labelWidth2 = metrics.width("Total Mass (kg)") + 10;
+  int labelWidth2 = metrics.horizontalAdvance("Total Mass (kg)") + 10;
 
   // Total mass:
   QHBoxLayout *mLayout = new QHBoxLayout;
