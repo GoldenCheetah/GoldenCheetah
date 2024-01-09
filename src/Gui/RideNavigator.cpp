@@ -237,14 +237,14 @@ RideNavigator::resetView()
 {
     active = true;
 
-    QList<QString> cols = _columns.split("|", QString::SkipEmptyParts);
-    int widco = _widths.split("|", QString::SkipEmptyParts).count();
+    QList<QString> cols = _columns.split("|", Qt::SkipEmptyParts);
+    int widco = _widths.split("|", Qt::SkipEmptyParts).count();
 
     // something is wrong with the config ? reset 
     if (widco != cols.count() || widco <= 1) {
         _columns = QString(tr("*|Workout Code|Date|"));
         _widths = QString("0|100|100|");
-        cols = _columns.split("|", QString::SkipEmptyParts);
+        cols = _columns.split("|", Qt::SkipEmptyParts);
     }
 
     // to account for translations
@@ -331,7 +331,7 @@ RideNavigator::resetView()
 
     // set the column widths
     int columnnumber=0;
-    foreach(QString size, _widths.split("|", QString::SkipEmptyParts)) {
+    foreach(QString size, _widths.split("|", Qt::SkipEmptyParts)) {
 
         if (columnnumber >= cols.count()) break;
 
@@ -491,7 +491,7 @@ RideNavigator::eventFilter(QObject *object, QEvent *e)
             active=true;
             // set the column widths
             int columnnumber=0;
-            foreach(QString size, _widths.split("|", QString::SkipEmptyParts)) {
+            foreach(QString size, _widths.split("|", Qt::SkipEmptyParts)) {
                 tableView->setColumnWidth(columnnumber, size.toInt());
             }
             active=false;
