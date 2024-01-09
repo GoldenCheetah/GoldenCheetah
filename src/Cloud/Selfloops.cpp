@@ -105,7 +105,7 @@ Selfloops::writeFile(QByteArray &data, QString remotename, RideFile *ride)
     QUrl url = QUrl( "https://www.selfloops.com/restapi/public/activities/upload.json" );
     QNetworkRequest request = QNetworkRequest(url);
 
-    QString boundary = QVariant(qrand()).toString()+QVariant(qrand()).toString()+QVariant(qrand()).toString();
+    QString boundary = QVariant(QRandomGenerator::global()->generate()).toString()+QVariant(QRandomGenerator::global()->generate()).toString()+QVariant(QRandomGenerator::global()->generate()).toString();
 
     QString username = getSetting(GC_SELUSER).toString();
     QString password = getSetting(GC_SELPASS).toString();

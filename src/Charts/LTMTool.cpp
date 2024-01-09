@@ -187,7 +187,6 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
 
         adds.symbol = factory.metricName(i);
         adds.metric = factory.rideMetric(factory.metricName(i));
-        qsrand(QTime::currentTime().msec());
         cHSV.setHsv((i%6)*(255/(factory.metricCount()/5)), 255, 255);
         adds.penColor = cHSV.convertTo(QColor::Rgb);
         adds.curveStyle = curveStyle(factory.metricType(i));

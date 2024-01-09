@@ -395,7 +395,7 @@ TodaysPlan::writeFile(QByteArray &data, QString remotename, RideFile *ride)
     // MULTIPART *****************
 
     QHttpMultiPart *multiPart = new QHttpMultiPart(QHttpMultiPart::FormDataType);
-    QString boundary = QVariant(qrand()).toString()+QVariant(qrand()).toString()+QVariant(qrand()).toString();
+    QString boundary = QVariant(QRandomGenerator::global()->generate()).toString()+QVariant(QRandomGenerator::global()->generate()).toString()+QVariant(QRandomGenerator::global()->generate()).toString();
     multiPart->setBoundary(boundary.toLatin1());
 
     request.setRawHeader("Authorization", (QString("Bearer %1").arg(token)).toLatin1());
