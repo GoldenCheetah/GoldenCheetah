@@ -339,7 +339,7 @@ OAuthDialog::urlChanged(const QUrl &url)
             // all services will need us to send the temporary code received
             params.addQueryItem("code", code);
 
-            data.append(params.query(QUrl::FullyEncoded));
+            data.append(params.query(QUrl::FullyEncoded).toUtf8());
 
             // trade-in the temporary access code retrieved by the Call-Back URL for the finale token
             QUrl url = QUrl(urlstr);
@@ -436,7 +436,7 @@ OAuthDialog::networkRequestFinished(QNetworkReply *reply)
 
             // data to post
             QByteArray data;
-            data.append(QString("{\"member-id\":\"%1\"}").arg(context->athlete->cyclist));
+            data.append(QString("{\"member-id\":\"%1\"}").arg(context->athlete->cyclist).toUtf8());
 
             // the request will fallback to this method on networkRequestFinished
             // but we are done, so set ignore= true to get this function to just
