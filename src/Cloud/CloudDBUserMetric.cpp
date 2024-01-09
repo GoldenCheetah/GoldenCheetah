@@ -949,7 +949,7 @@ CloudDBUserMetricListDialog::applyAllFilters() {
     g_currentHeaderList->clear();
     if (!textFilter->text().isEmpty()) {
         // split by any whitespace
-        searchList = textFilter->text().split(QRegExp("\\s+"), QString::SkipEmptyParts);
+        searchList = textFilter->text().split(QRegExp("\\s+"), Qt::SkipEmptyParts);
     }
     foreach (CommonAPIHeaderV1 usermetric, *g_fullHeaderList) {
 

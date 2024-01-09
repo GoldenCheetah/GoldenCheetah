@@ -945,7 +945,16 @@ LTMSidebar::filterNotify()
         } else {
 
             // both are set, so merge results
-            QStringList merged = autoFilterFiles.toSet().intersect(queryFilterFiles.toSet()).toList();
+            auto mergedSet =
+                    QSet<QString>(
+                            autoFilterFiles.begin(),
+                            autoFilterFiles.end()).intersect(
+                    QSet<QString>(
+                            queryFilterFiles.begin(),
+                            queryFilterFiles.end()
+                            )
+                    );
+            QStringList merged = QStringList(mergedSet.begin(), mergedSet.end());
             context->setHomeFilter(merged);
         }
 
