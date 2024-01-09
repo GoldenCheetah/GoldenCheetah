@@ -2491,7 +2491,7 @@ void
 CPPlot::plotCentile(RideItem *rideItem)
 {
     qDebug() << "calculateCentile";
-    QTime elapsed;
+    QElapsedTimer elapsed;
     elapsed.start();
 
     qDebug() << "prepare datas ";
