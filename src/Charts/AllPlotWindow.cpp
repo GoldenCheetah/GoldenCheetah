@@ -1170,7 +1170,7 @@ AllPlotWindow::moveUserDataUp()
     int index = customTable->row(items.first());
 
     if (index > 0) {
-        userDataSeries.swap(index, index-1);
+        userDataSeries.swapItemsAt(index, index-1);
          // refresh
         refreshCustomTable(index-1);
 
@@ -1192,7 +1192,7 @@ AllPlotWindow::moveUserDataDown()
     int index = customTable->row(items.first());
 
     if (index+1 <  userDataSeries.size()) {
-        userDataSeries.swap(index, index+1);
+        userDataSeries.swapItemsAt(index, index+1);
          // refresh
         refreshCustomTable(index+1);
 
