@@ -730,7 +730,7 @@ Form::arrange()
     // special case -- a textbox and its the only field on the tab needs no label
     //                 this is how the "Notes" tab is created
     if (fields.count() == 1 && fields[0]->definition.type == FIELD_TEXTBOX) {
-        hlayout->addWidget(fields[0]->widget, 0, 0);
+        hlayout->addWidget(fields[0]->widget, 0, Qt::Alignment());
         ((GTextEdit*)(fields[0]->widget))->setFrameStyle(QFrame::NoFrame);
         ((GTextEdit*)(fields[0]->widget))->viewport()->setAutoFillBackground(false);
         return;
@@ -764,7 +764,7 @@ Form::arrange()
         Qt::Alignment labelalignment = Qt::AlignLeft|Qt::AlignTop;
         Qt::Alignment alignment = Qt::AlignLeft|Qt::AlignTop;
 
-        if (fields[i]->definition.type < FIELD_SHORTTEXT) alignment = 0; // text types
+        if (fields[i]->definition.type < FIELD_SHORTTEXT) alignment = Qt::Alignment(); // text types
 
         here->addWidget(fields[i]->label, y, 0, labelalignment);
 

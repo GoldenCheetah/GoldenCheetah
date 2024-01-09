@@ -836,7 +836,7 @@ RemotePage::RemotePage(QWidget *parent, Context *context) : QWidget(parent), con
 
     fields->setCurrentItem(fields->invisibleRootItem()->child(0));
 
-    mainLayout->addWidget(fields, 0,0);
+    mainLayout->addWidget(fields, 0, Qt::Alignment());
 
     // Load the native command list
     QList <RemoteCmd> nativeCmds = remote->getNativeCmds();
