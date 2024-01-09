@@ -468,7 +468,7 @@ JsonFileReader::openRideFile(QFile &file, QStringList &errors, QList<RideFile*>*
 QByteArray
 JsonFileReader::toByteArray(Context *, const RideFile *ride, bool withAlt, bool withWatts, bool withHr, bool withCad) const
 {
-    QByteArray out;
+    QString out;
 
     // start of document and ride
     out += "{\n\t\"RIDE\":{\n";
@@ -780,7 +780,7 @@ JsonFileReader::toByteArray(Context *, const RideFile *ride, bool withAlt, bool 
     // end of ride and document
     out += "\n\t}\n}\n";
 
-    return out;
+    return out.toUtf8();
 }
 
 // Writes valid .json (validated at www.jsonlint.com)
