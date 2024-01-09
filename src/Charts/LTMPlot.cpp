@@ -222,7 +222,7 @@ LTMPlot::setAxisTitle(QwtAxisId axis, QString label)
 void
 LTMPlot::setData(LTMSettings *set)
 {
-    QTime timer;
+    QElapsedTimer timer;
     timer.start();
 
     curveColors->isolated = false;
@@ -1388,7 +1388,7 @@ LTMPlot::setData(LTMSettings *set)
 void
 LTMPlot::setCompareData(LTMSettings *set)
 {
-    QTime timer;
+    QElapsedTimer timer;
     timer.start();
 
     MAXX=0.0; // maximum value for x, always from 0-n

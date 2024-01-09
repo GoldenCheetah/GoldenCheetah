@@ -1062,7 +1062,7 @@ RideItem::updateIntervals()
         // anything longer than a day or negative is skipped
         if (arraySize >= 0 && arraySize < (24*3600)) { // no indent, as added late
 
-        QTime timer;
+        QElapsedTimer timer;
         timer.start();
 
         // setup an integrated series

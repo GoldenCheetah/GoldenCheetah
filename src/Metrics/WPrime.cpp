@@ -110,7 +110,7 @@ WPrime::setRide(RideFile *input)
 {
     bool integral = (appsettings->value(NULL, GC_WBALFORM, "int").toString() == "int");
 
-    QTime time; // for profiling performance of the code
+    QElapsedTimer time; // for profiling performance of the code
     time.start();
 
     // remember the ride for next time
@@ -379,7 +379,7 @@ WPrime::setWatts(Context *context, QVector<int>&wattsArray, int CP, int WPRIME)
 {
     bool integral = (appsettings->value(NULL, GC_WBALFORM, "int").toString() == "int");
 
-    QTime time; // for profiling performance of the code
+    QElapsedTimer time; // for profiling performance of the code
     time.start();
 
     // reset from previous
@@ -478,7 +478,7 @@ WPrime::setErg(ErgFile *input)
 {
     bool integral = (appsettings->value(NULL, GC_WBALFORM, "int").toString() == "int");
 
-    QTime time; // for profiling performance of the code
+    QElapsedTimer time; // for profiling performance of the code
     time.start();
 
     // reset from previous
