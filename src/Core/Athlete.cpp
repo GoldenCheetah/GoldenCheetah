@@ -408,7 +408,7 @@ AthleteDirectoryStructure::AthleteDirectoryStructure(const QDir home){
 
 AthleteDirectoryStructure::~AthleteDirectoryStructure() {
 
-    myhome = NULL;
+    myhome = QDir();
 
 }
 
