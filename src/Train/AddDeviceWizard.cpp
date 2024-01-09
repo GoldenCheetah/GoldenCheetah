@@ -867,7 +867,7 @@ AddPair::sensorChanged(int channel)
         // for a remote control we are the master, so there is nothing for us to pair
         // just generate a random device number between 1 & 65535
         dynamic_cast<QLabel*>(channelWidget->itemWidget(item,3))->setText(tr("Master"));
-        uint16_t deviceNumber = (qrand() % 65535) + 1;
+        uint16_t deviceNumber = (QRandomGenerator::global()->generate() % 65535) + 1;
         dynamic_cast<QLineEdit *>(channelWidget->itemWidget(item,1))->setText(QString("%1").arg(deviceNumber));
         dynamic_cast<ANTlocalController*>(wizard->controller)->myANTlocal->setChannel(channel, deviceNumber, channel_type);
     } else {
