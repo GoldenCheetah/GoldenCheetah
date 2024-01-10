@@ -1,4 +1,4 @@
-/* -*- mode: C++ ; c-file-style: "stroustrup" -*- *****************************
+/******************************************************************************
  * Qwt Widget Library
  * Copyright (C) 1997   Josef Wilgen
  * Copyright (C) 2002   Uwe Rathmann
@@ -11,80 +11,37 @@
 #define QWT_AXIS_ID_H
 
 #include "qwt_global.h"
-
-#ifndef QT_NO_DEBUG_STREAM
-#include <qdebug.h>
-#endif
-
-namespace QwtAxis
-{
-    //! \brief Axis position
-    enum Position
-    {
-        //! Y axis left of the canvas
-        yLeft,
-
-        //! Y axis right of the canvas
-        yRight,
-
-        //! X axis below the canvas
-        xBottom,
-
-        //! X axis above the canvas
-        xTop
-    };
-
-    //! \brief Number of axis positions
-    enum { PosCount = xTop + 1 };
-
-    bool isValid( int axisPos );
-    bool isYAxis( int axisPos );
-    bool isXAxis( int axisPos );
-};
-
-inline bool QwtAxis::isValid( int axisPos )
-{
-    return ( axisPos >= 0 && axisPos < PosCount );
-}
-
-inline bool QwtAxis::isXAxis( int axisPos )
-{
-    return ( axisPos == xBottom ) || ( axisPos == xTop );
-}
-
-inline bool QwtAxis::isYAxis( int axisPos )
-{
-    return ( axisPos == yLeft ) || ( axisPos == yRight );
-}
+#include "qwt_axis.h"
+#include <qhash.h>
 
 class QWT_EXPORT QwtAxisId
 {
-public:
+  public:
     QwtAxisId( int position, int index = 0 );
 
-    bool operator==( const QwtAxisId & ) const;
-    bool operator!=( const QwtAxisId & ) const;
+    bool operator==( const QwtAxisId& ) const;
+    bool operator!=( const QwtAxisId& ) const;
 
     bool isXAxis() const;
     bool isYAxis() const;
 
-public:
+  public:
     int pos;
     int id;
 };
 
-inline QwtAxisId::QwtAxisId( int position, int index ):
-    pos( position ),
-    id( index )
+inline QwtAxisId::QwtAxisId( int position, int index )
+    : pos( position )
+    , id( index )
 {
 }
 
-inline bool QwtAxisId::operator==( const QwtAxisId &other ) const
+inline bool QwtAxisId::operator==( const QwtAxisId& other ) const
 {
     return ( pos == other.pos ) && ( id == other.id );
 }
 
-inline bool QwtAxisId::operator!=( const QwtAxisId &other ) const
+inline bool QwtAxisId::operator!=( const QwtAxisId& other ) const
 {
     return !operator==( other );
 }
@@ -99,8 +56,40 @@ inline bool QwtAxisId::isYAxis() const
     return QwtAxis::isYAxis( pos );
 }
 
+#if QT_VERSION < 0x050000
+
+inline uint qHash( const QwtAxisId &axisId ) noexcept
+{
+    return qHash(axisId.pos) ^ qHash(axisId.id);
+}
+
+#elif QT_VERSION < 0x060000
+
+inline uint qHash( const QwtAxisId& axisId, uint seed = 0 ) noexcept
+{
+    return qHash( axisId.pos, seed ) ^ qHash( axisId.id, seed );
+}
+
+#else
+
+inline size_t qHash( const QwtAxisId& axisId, size_t seed = 0 ) noexcept
+{
+    return qHash( axisId.pos, seed ) ^ qHash( axisId.id, seed );
+}
+
+#endif
+
+namespace QwtAxis
+{
+    // compatibility APIs
+    inline bool isValid( QwtAxisId axisId )
+        { return isValid( axisId.pos ) && ( axisId.id >= 0 ); }
+    inline bool isXAxis( QwtAxisId axisId ) { return isXAxis( axisId.pos ); }
+    inline bool isYAxis( QwtAxisId axisId ) { return isYAxis( axisId.pos ); }
+}
+
 #ifndef QT_NO_DEBUG_STREAM
-QWT_EXPORT QDebug operator<<( QDebug, const QwtAxisId & );
+QWT_EXPORT QDebug operator<<( QDebug, const QwtAxisId& );
 #endif
 
 #endif

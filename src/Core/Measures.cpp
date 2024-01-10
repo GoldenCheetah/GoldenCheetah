@@ -42,7 +42,7 @@ Measure::getFingerprint() const
     for (int i = 0; i<MAX_MEASURES; i++) x += 1000.0 * values[i];
 
     QByteArray ba = QByteArray::number(x);
-    ba.append(comment);
+    ba.append(comment.toUtf8());
 
     return qChecksum(ba, ba.length());
 }

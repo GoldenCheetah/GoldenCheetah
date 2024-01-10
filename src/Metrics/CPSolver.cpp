@@ -186,7 +186,7 @@ CPSolver::start()
     s0.W =    constraints.wto;
     s0.TAU =  constraints.tto;
 
-    QTime p;
+    QElapsedTimer p;
     p.start();
 
     // initial conditions

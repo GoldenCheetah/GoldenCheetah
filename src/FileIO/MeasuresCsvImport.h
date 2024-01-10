@@ -95,7 +95,7 @@ class CsvString : public QString
             else value += current;
         }
     }
-    if (!value.isEmpty()) returning.append(value);
+    if (!isEmpty()) returning.append(value);
 
     return returning;
 }

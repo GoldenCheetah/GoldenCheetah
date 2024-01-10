@@ -38,6 +38,7 @@ extern double dpiXFactor, dpiYFactor;
 extern QFont baseFont;
 
 // turn color to rgb, checks if a named color
+#define StandardColor(x) (QColor(1,1,x))
 #define NamedColor(x) (x.red()==1 && x.green()==1)
 #define RGBColor(x) (NamedColor(x) ? GColor(x.blue()) : x)
 
@@ -74,7 +75,8 @@ class Colors
 {
 public:
         static unsigned long fingerprint(const Colors*set);
-        QString name,
+        QString group,
+                name,
                 setting;
         QColor  color;
 };
@@ -87,6 +89,7 @@ class ColorTheme
         // all public
         QString name;
         bool dark;
+        bool stealth;
         QList<QColor> colors;
 };
 
@@ -123,16 +126,15 @@ class GCColor : public QObject
         static const Colors *colorSet();
         static const Colors *defaultColorSet(bool dark);
         static void resetColors();
-        static struct SizeSettings defaultSizes(int width, int height);
         static double luminance(QColor color); // return the relative luminance
         static QColor invertColor(QColor); // return the contrasting color
         static QColor alternateColor(QColor); // return the alternate background
+        static QColor selectedColor(QColor); // return the on select background color
         static QColor htmlCode(QColor x) { return x.name(); } // return the alternate background
         static Themes &themes(); 
         static void applyTheme(int index);
 
         // for styling things with current preferences
-        static bool isFlat();
         static QLinearGradient linearGradient(int size, bool active, bool alternate=false);
         static QString css(bool ridesummary=true);
         static QPalette palette();
@@ -183,7 +185,7 @@ class ColorEngine : public QObject
 #define GColor(x) GCColor::getColor(x)
 
 // Define how many cconfigurable metric colors are available
-#define CNUMOFCFGCOLORS       104
+#define CNUMOFCFGCOLORS       110
 
 #define CPLOTBACKGROUND       0
 #define CRIDEPLOTBACKGROUND   1
@@ -289,4 +291,10 @@ class ColorEngine : public QObject
 #define CTIDALVOLUME          101
 #define CRESPFREQUENCY        102
 #define CFEO2                 103
+#define CHOVER                104
+#define CCHARTBAR             105
+#define CCARDBACKGROUND2      106
+#define CCARDBACKGROUND3      107
+#define MAPROUTELINE          108
+#define COLORRR               109
 #endif

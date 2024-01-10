@@ -20,8 +20,8 @@
 #include "Athlete.h"
 #include "Context.h"
 #include "RideCache.h"
-#include "Tab.h"
-#include "TabView.h"
+#include "AthleteTab.h"
+#include "AbstractView.h"
 
 #include "RideCacheModel.h"
 

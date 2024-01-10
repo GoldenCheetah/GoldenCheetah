@@ -50,6 +50,7 @@ class IntervalTreeView : public QTreeWidget
     protected:
         Context *context;
 
+        void dragEnterEvent(QDragEnterEvent* event);
         void dropEvent(QDropEvent* event);
 
 };

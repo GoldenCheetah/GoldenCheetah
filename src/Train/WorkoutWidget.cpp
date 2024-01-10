@@ -571,15 +571,21 @@ WorkoutWidget::eventFilter(QObject *obj, QEvent *event)
     //
     if (event->type() == QEvent::Wheel) {
 
-        // STATE: NONE
-        if (state == none) {
-            QWheelEvent *w = static_cast<QWheelEvent*>(event);
-            updateNeeded = scale(w->angleDelta());
-            filterNeeded = true;
-        }
+        Qt::KeyboardModifiers kmod = static_cast<QInputEvent*>(event)->modifiers();
+        bool ctrl = (kmod & Qt::ControlModifier) != 0;
+        if (ctrl) {
 
-        // will need to ..
-        recompute();
+            // STATE: NONE
+            if (state == none) {
+
+                QWheelEvent *w = static_cast<QWheelEvent*>(event);
+                updateNeeded = scale(w->angleDelta());
+                filterNeeded = true;
+            }
+
+            // will need to ..
+            recompute();
+        }
     }
 
     //

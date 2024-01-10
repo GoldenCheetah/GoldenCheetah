@@ -132,6 +132,7 @@ class ErgFile
 
         bool hasGradient() const { return CRS == format; } // Has Gradient and Altitude
         bool hasWatts()    const { return ERG == format || MRC == format; }
+        bool hasGPS()      const { return fHasGPS; } // Has Lat/Lon
 
 private:
         void sortLaps() const;
@@ -166,6 +167,7 @@ public:
         bool    valid;          // did it parse ok?
         int     mode;
         bool    StrictGradient; // should gradient be strict or smoothed?
+        bool    fHasGPS;        // has Lat/Lon?
 
         QList<ErgFilePoint>         Points; // points in workout
         mutable QList<ErgFileLap>   Laps;   // interval markers in the file
@@ -231,6 +233,7 @@ public:
     // Const getters
     bool   hasGradient() const { return ergFile && ergFile->hasGradient(); }
     bool   hasWatts()    const { return ergFile && ergFile->hasWatts();    }
+    bool   hasGPS()      const { return ergFile && ergFile->hasGPS();      }
 
     double nextLap   (double x) const { return !ergFile ? -1 : ergFile->nextLap(x);    }
     double prevLap   (double x) const { return !ergFile ? -1 : ergFile->prevLap(x);    }

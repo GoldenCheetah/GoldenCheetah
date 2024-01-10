@@ -67,7 +67,7 @@ ErgDBDownloadDialog::ErgDBDownloadDialog(Context *context) : QDialog(context->ma
 
         // selector
         QCheckBox *checkBox = new QCheckBox("", this);
-        checkBox->setChecked(true);
+        checkBox->setChecked(false);
         files->setItemWidget(add, 0, checkBox);
 
         add->setText(1, item.name);
@@ -83,7 +83,7 @@ ErgDBDownloadDialog::ErgDBDownloadDialog(Context *context) : QDialog(context->ma
     }
 
     all = new QCheckBox(tr("check/uncheck all"), this);
-    all->setChecked(true);
+    all->setChecked(false);
 
     // buttons
     QHBoxLayout *buttons = new QHBoxLayout;

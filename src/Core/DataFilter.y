@@ -23,7 +23,7 @@
 // enable multiple grammars in a single executable you
 // should make sure you use the very latest bison since it
 // has been known to be problematic in the past. It is
-// know to work well with bison v2.4.1.
+// know to work well with bison v2.7.
 //
 // To make the grammar readable I have placed the code
 // for each nterm at column 40, this source file is best
@@ -49,11 +49,11 @@ extern Leaf *DataFilterroot; // root node for parsed statement
 
 %}
 
-// Symbol can be meta or metric name
-%token <leaf> SYMBOL PYTHON
+// Symbol can be meta, metric, variable or function name
+%token <string> SYMBOL PYTHON
 
 // Constants can be a string or a number
-%token <leaf> DF_STRING DF_INTEGER DF_FLOAT
+%token <string> DF_STRING DF_INTEGER DF_FLOAT
 %token <function> BEST TIZ CONFIG CONST_
 
 // comparative operators
@@ -68,11 +68,15 @@ extern Leaf *DataFilterroot; // root node for parsed statement
    QList<Leaf*> *comp;
    int op;
    char function[32];
+   char* string;
 }
+
+%destructor { $$->clear($$); delete $$; } <leaf>
+%destructor { foreach (Leaf* l, *$$) { l->clear(l); delete l; } delete $$; } <comp>
 
 %locations
 
-%type <leaf> symbol array select literal lexpr cexpr expr parms block statement expression;
+%type <leaf> symbol array select literal lexpr cexpr expr parms block statement expression parameter;
 %type <leaf> simple_statement if_clause while_clause function_def;
 %type <leaf> python_script;
 %type <comp> statements
@@ -137,7 +141,7 @@ block:
 statements: 
 
         statement                               { $$ = new QList<Leaf*>(); $$->append($1); }
-        | statements statement                  { $$->append($2); }
+        | statements statement                  { $1->append($2); $$ = $1; }
         ;
 
 /*
@@ -233,18 +237,26 @@ function_def:
                                                 }
         ;
 
+parameter:
+
+        lexpr                                   { $$ = $1; }
+        | block                                 { $$ = $1; }
+        ;
+
 /*
  * A parameter list, as passed to a function
  */
 parms: 
 
-        lexpr                                   { $$ = new Leaf(@1.first_column, @1.last_column);
+        parameter                               { $$ = new Leaf(@1.first_column, @1.last_column);
                                                   $$->type = Leaf::Function;
                                                   $$->series = NULL; // not tiz/best
                                                   $$->fparms << $1;
                                                 }
-        | parms ',' lexpr                       { $1->fparms << $3;
-                                                  $1->leng = @3.last_column; }
+        | parms ',' parameter                   { $1->fparms << $3;
+                                                  $1->leng = @3.last_column;
+                                                  $$ = $1;
+                                                }
         ;
 
 /*
@@ -452,7 +464,10 @@ expr:
                                                   $1->type = Leaf::Function;
                                                   $1->series = NULL; // not tiz/best
                                                   $1->function = *($1->lvalue.n);
+                                                  delete $1->lvalue.n; // not used anymore
+                                                  $1->lvalue.l = NULL; // avoid double deletion
                                                   $1->fparms.clear(); // no parameters!
+                                                  $$ = $1;
                                                 }
         | '(' expr ')'                          { $$ = new Leaf(@2.first_column, @2.last_column);
                                                   $$->type = Leaf::Logical;
@@ -490,7 +505,7 @@ literal:
 
         DF_STRING                               { $$ = new Leaf(@1.first_column, @1.last_column);
                                                   $$->type = Leaf::String;
-                                                  QString s2(DataFiltertext);
+                                                  QString s2 = Utils::unescape(DataFiltertext); // user can escape chars in string
                                                   $$->lvalue.s = new QString(s2.mid(1,s2.length()-2));
                                                 }
         | DF_FLOAT                              { $$ = new Leaf(@1.first_column, @1.last_column);

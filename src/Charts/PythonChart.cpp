@@ -21,7 +21,7 @@
 #include "PythonSyntax.h"
 
 #include "Colors.h"
-#include "TabView.h"
+#include "AbstractView.h"
 #include "RideFileCommand.h"
 #include "HelpWhatsThis.h"
 
@@ -70,7 +70,7 @@ PythonConsole::configChanged(qint32)
     p.setColor(QPalette::Base, GColor(CPLOTBACKGROUND));
     p.setColor(QPalette::Text, GCColor::invertColor(GColor(CPLOTBACKGROUND)));
     setPalette(p);
-    setStyleSheet(TabView::ourStyleSheet());
+    setStyleSheet(AbstractView::ourStyleSheet());
 }
 
 void
@@ -191,7 +191,7 @@ void PythonConsole::keyPressEvent(QKeyEvent *e)
             if (pythonHost->chart()) {
                 python->canvas = pythonHost->chart()->canvas;
                 python->chart = pythonHost->chart();
-                python->perspective = myPerspective;
+                python->perspective = pythonHost->chart()->myPerspective;
             }
 
             try {
@@ -202,7 +202,7 @@ void PythonConsole::keyPressEvent(QKeyEvent *e)
                 bool readOnly = pythonHost->readOnly();
                 QList<RideFile *> editedRideFiles;
                 python->cancelled = false;
-                python->runline(ScriptContext(context, nullptr, true, readOnly, &editedRideFiles), line);
+                python->runline(ScriptContext(context, nullptr, nullptr, true, readOnly, &editedRideFiles), line);
 
                 // finish up commands on edited rides
                 foreach (RideFile *f, editedRideFiles) {
@@ -290,18 +290,16 @@ PythonChart::PythonChart(Context *context, bool ridesummary) : GcChartWindow(con
     HelpWhatsThis *helpConfig = new HelpWhatsThis(c);
     c->setWhatsThis(helpConfig->getWhatsThisText(HelpWhatsThis::Chart_Python));
     setControls(c);
-    //HelpWhatsThis *helpConfig = new HelpWhatsThis(c);
-    //c->setWhatsThis(helpConfig->getWhatsThisText(HelpWhatsThis::ChartRides_Performance));
 
     // settings
     QVBoxLayout *clv = new QVBoxLayout(c);
     web = new QCheckBox(tr("Web charting"), this);
     clv->addWidget(web);
-    clv->addStretch();
 
     // sert no render widget
     canvas=NULL;
     plot=NULL;
+    syntax=NULL;
 
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->setSpacing(0);
@@ -312,17 +310,10 @@ PythonChart::PythonChart(Context *context, bool ridesummary) : GcChartWindow(con
     // then disable the PythonConsole altogether.
     if (python) {
 
-        // reveal controls
-        QHBoxLayout *rev = new QHBoxLayout();
         showCon = new QCheckBox(tr("Show Console"), this);
         showCon->setChecked(true);
-
-
-        rev->addStretch();
-        rev->addWidget(showCon);
-        rev->addStretch();
-
-        setRevealLayout(rev);
+        clv->addWidget(showCon);
+        clv->addStretch();
 
         leftsplitter = new QSplitter(Qt::Vertical, this);
         leftsplitter->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
@@ -339,7 +330,7 @@ PythonChart::PythonChart(Context *context, bool ridesummary) : GcChartWindow(con
         p.setColor(QPalette::Base, GColor(CPLOTBACKGROUND));
         p.setColor(QPalette::Text, GCColor::invertColor(GColor(CPLOTBACKGROUND)));
         script->setPalette(p);
-        script->setStyleSheet(TabView::ourStyleSheet());
+        script->setStyleSheet(AbstractView::ourStyleSheet());
 
         // syntax highlighter
         setScript("##\n## Python program will run on selection.\n##\n");
@@ -408,6 +399,10 @@ PythonChart::PythonChart(Context *context, bool ridesummary) : GcChartWindow(con
     } else {
 
         // not starting
+        noPython = new QLabel(tr("Warning: Python is disabled"), this);
+        clv->addWidget(noPython);
+        clv->addStretch();
+
         script = NULL;
         splitter = NULL;
         console = NULL;
@@ -448,6 +443,7 @@ PythonChart::setWeb(bool x)
         canvas->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
         // stop stealing focus!
         canvas->settings()->setAttribute(QWebEngineSettings::FocusOnNavigationEnabled, false);
+        canvas->settings()->setAttribute(QWebEngineSettings::LocalContentCanAccessRemoteUrls, true);
         renderlayout->insertWidget(0, canvas);
     }
 
@@ -470,7 +466,7 @@ PythonChart::setWeb(bool x)
                 plot,   SLOT( addCurve(QString,QVector<double>,QVector<double>,QStringList,QString,QString,QStringList,QStringList,int,int,int,QString,int,bool,bool,bool,bool)));
         connect(this, SIGNAL(emitAxis(QString,bool,int,double,double,int,QString,QString,bool,QStringList)),
                 plot,   SLOT(configureAxis(QString,bool,int,double,double,int,QString,QString,bool,QStringList)));
-        connect(this,SIGNAL(emitAnnotation(QString,QStringList)), plot,  SLOT(annotateLabel(QString,QStringList)));
+        //connect(this,SIGNAL(emitAnnotation(QString,QStringList)), plot,  SLOT(annotateLabel(QString,QStringList))); // XXX fixme
 
     }
 
@@ -509,8 +505,9 @@ PythonChart::eventFilter(QObject *, QEvent *e)
 void
 PythonChart::configChanged(qint32)
 {
-    if (!ridesummary) setProperty("color", GColor(CTRENDPLOTBACKGROUND));
-    else setProperty("color", GColor(CPLOTBACKGROUND));
+    QColor bgcolor = !ridesummary ? GColor(CTRENDPLOTBACKGROUND) : GColor(CPLOTBACKGROUND);
+    setProperty("color", bgcolor);
+    if (plot) plot->setBackgroundColor(bgcolor);
 
     // tinted palette for headings etc
     QPalette palette;
@@ -519,7 +516,13 @@ PythonChart::configChanged(qint32)
     palette.setColor(QPalette::Text, GColor(CPLOTMARKER));
     palette.setColor(QPalette::Base, GCColor::alternateColor(GColor(CPLOTBACKGROUND)));
     setPalette(palette);
+    script->setPalette(palette);
+    script->setStyleSheet(AbstractView::ourStyleSheet());
 
+    // refresh highlighter
+    if (syntax) delete syntax;
+    syntax = new PythonSyntax(script->document(), GCColor::luminance(GColor(CPLOTBACKGROUND)) < 127);
+    runScript();
 }
 
 void
@@ -551,7 +554,6 @@ PythonChart::setScript(QString string)
 {
     if (python && script) {
         script->setText(string);
-        new PythonSyntax(script->document());
     }
     text = string;
 }
@@ -576,7 +578,12 @@ PythonChart::setState(QString)
 void
 PythonChart::execScript(PythonChart *chart)
 {
-    python->runline(ScriptContext(chart->context), chart->script->toPlainText());
+    QString line = chart->script->toPlainText();
+
+    // replace $$ with chart identifier (to avoid shared data)
+    line = line.replace("$$", chart->console->chartid);
+
+    python->runline(ScriptContext(chart->context), line);
 }
 
 void
@@ -607,12 +614,7 @@ PythonChart::runScript()
         // set to defaults with gc applied
         python->cancelled = false;
 
-        QString line = script->toPlainText();
-
         try {
-
-            // replace $$ with chart identifier (to avoid shared data)
-            line = line.replace("$$", console->chartid);
 
             // run it
             QFutureWatcher<void>watcher;
