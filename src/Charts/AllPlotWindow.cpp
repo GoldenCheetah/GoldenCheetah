@@ -499,7 +499,7 @@ AllPlotWindow::AllPlotWindow(Context *context) :
                                Qt::RightButton);
 
     allPanner = new QwtPlotPanner(allPlot->canvas());
-    allPanner->setMouseButton(Qt::MidButton);
+    allPanner->setMouseButton(Qt::MiddleButton);
 
     // TODO: zoomer doesn't interact well with automatic axis resizing
 
