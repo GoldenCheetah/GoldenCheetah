@@ -236,7 +236,7 @@ WithingsDownload::jsonDocumentToWithingsReading(QJsonDocument doc) {
         thisReading.groupId = grpid;
         thisReading.attribution = attrib;
         thisReading.category = category;
-        thisReading.when.setTime_t(date);
+        thisReading.when.setSecsSinceEpoch(date);
         thisReading.comment = comment;
 
         //Iterate the individual measurements in each group to create a WithingsReading object
