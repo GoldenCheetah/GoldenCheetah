@@ -479,7 +479,7 @@ Sie müssen diesen möglicherweise manuell deaktivieren.</translation>
         <source>We will now add a new device with the configuration shown below. Please take a moment to review and then click Finish to add the device and complete this wizard, or press the Back button to make amendments.
 
 </source>
-        <translation>Es wird nun ein neues Gerät mit der unten angezeigten Konfiguration hinzugefügt. Bitte überprüfen Sie die Konfiguration und wählen Sie &quot;Fertigstellen&quot; um das Gerät hinzuzufügen oder &quot;Zurück&quot; um Korrekturen vorzunehmen.
+        <translation>Ein neues Gerät mit der unten dargestellten Konfiguration wird hinzugefügt. Bitte überprüfen Sie die Konfiguration und wählen Sie &quot;Abschließen&quot; um das Gerät hinzuzufügen oder &quot;Zurück&quot; um Korrekturen vorzunehmen.
 
 </translation>
     </message>
@@ -936,22 +936,22 @@ Wenn Sie sich für das Kopieren in die Bibliothek entscheiden, wird die Datei in
     <message>
         <location filename="../../Train/AddDeviceWizard.cpp" line="964"/>
         <source>Bluetooth 4.0 Sensors</source>
-        <translation>Bluetooth-4.0-Sensoren</translation>
+        <translation>Bluetooth-4.0 Sensoren</translation>
     </message>
     <message>
         <location filename="../../Train/AddDeviceWizard.cpp" line="965"/>
         <source>Search for and pair of BTLE sensors.</source>
-        <translation type="unfinished"></translation>
+        <translation>Suchen und koppeln von BTLE-Sensoren.</translation>
     </message>
     <message>
         <location filename="../../Train/AddDeviceWizard.cpp" line="998"/>
         <source>Device</source>
-        <translation type="unfinished">Gerät</translation>
+        <translation>Geräte</translation>
     </message>
     <message>
         <location filename="../../Train/AddDeviceWizard.cpp" line="1049"/>
         <source>No sensors found...</source>
-        <translation type="unfinished"></translation>
+        <translation>Keine Sensoren gefunden...</translation>
     </message>
     <message>
         <source>Search for and pair of BTLE sensors happens at Train session startup</source>
@@ -1262,7 +1262,7 @@ Gerät gefunden.
         <source>Use this page to setup virtual power for trainers that can only report speed or rpm. It is probably a bad idea to derive power from speed when also receiving power data from the trainer.
 
 </source>
-        <translation>Verwenden Sie diese Seite, um die virtuelle Leistung für Trainer einzurichten, die nur Geschwindigkeit oder Drehzahl melden können. Es ist wahrscheinlich keine gute Idee, die Leistung von der Geschwindigkeit abzuleiten, wenn Sie auch Leistungsdaten vom Trainer erhalten.
+        <translation>Verwenden Sie diese Seite, um die virtuelle Leistung für Trainer einzurichten, die nur Geschwindigkeit oder Drehzahl melden können. Es ist wahrscheinlich eine schlechte Idee, die Leistung aus der Geschwindigkeit abzuleiten, wenn man auch Leistungswerte vom Trainer erhält.
 
 </translation>
     </message>
@@ -2728,7 +2728,7 @@ Gerät gefunden.
     <message>
         <location filename="../../Gui/AnalysisSidebar.cpp" line="809"/>
         <source>Are you sure you want to delete selected interval?</source>
-        <translation type="unfinished">Möchten Sie das ausgewählte Intervall wirklich löschen?</translation>
+        <translation>Möchten Sie das ausgewählte Intervall wirklich löschen?</translation>
     </message>
     <message>
         <location filename="../../Gui/AnalysisSidebar.cpp" line="810"/>
@@ -10473,17 +10473,17 @@ then click &quot;Rescan&quot; to check again.</source>
     <message>
         <location filename="../../Gui/Pages.cpp" line="2560"/>
         <source>Summary</source>
-        <translation type="unfinished">Zusammenfassung</translation>
+        <translation>Zusammenfassung</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="2561"/>
         <source>Interval</source>
-        <translation type="unfinished">Intervall</translation>
+        <translation>Intervall</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="2562"/>
         <source>Expression</source>
-        <translation type="unfinished"></translation>
+        <translation>Ausdruck</translation>
     </message>
     <message>
         <source>Diary</source>
@@ -14007,7 +14007,7 @@ Drehmomentkorrektur - Der absolute Korrekturwert in Nm (oder Pfund pro Quadratin
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="225"/>
         <source>Configurable tabbed view of activity detail data, plus technical details and change log</source>
-        <translation type="unfinished"></translation>
+        <translation>Konfigurierbare Reiteransicht von Aktivitätsdetaildaten mit technischen Details und Änderungsprotokoll</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="227"/>
@@ -18108,7 +18108,7 @@ Drehmomentkorrektur - Der absolute Korrekturwert in Nm (oder Pfund pro Quadratin
     <message>
         <location filename="../../Core/DataFilter.cpp" line="2127"/>
         <source>%s expects a string name (the tab name in the raw data view)</source>
-        <translation type="unfinished"></translation>
+        <translation>%s erwartet einen String-Namen (den Reiter-Namen aus der Ansicht Rohdaten)</translation>
     </message>
     <message>
         <location filename="../../Core/DataFilter.cpp" line="2134"/>
@@ -18624,12 +18624,12 @@ Drehmomentkorrektur - Der absolute Korrekturwert in Nm (oder Pfund pro Quadratin
     <message>
         <location filename="../../Train/Library.cpp" line="184"/>
         <source>%1 cannot be written to videoSync library %2. Check library path, permissions and free space</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 kann nicht in die videoSync-Bibliothek %2 geschrieben werden, überprüfen Sie den Bibliothekspfad, die Berechtigungen und auf ausreichenden freien Speicherplatz</translation>
     </message>
     <message>
         <location filename="../../Train/Library.cpp" line="222"/>
         <source>%1 cannot be written to workout library %2. Check library path, permissions and free space</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 kann nicht in die Workout-Bibliothek %2 geschrieben werden, überprüfen Sie den Bibliothekspfad, die Berechtigungen und auf ausreichenden freien Speicherplatz</translation>
     </message>
     <message>
         <source>%1 cannot be written to videoSync library %2, check permissions and free space</source>
@@ -30005,22 +30005,22 @@ Mehr Informationen: GC Wiki - Simulate_the_physics_of_bicycle_ride.</translation
     <message>
         <location filename="../../Metrics/SpecialFields.cpp" line="67"/>
         <source>Interval Notes</source>
-        <translation type="unfinished"></translation>
+        <translation>Intervall-Notizen</translation>
     </message>
     <message>
         <location filename="../../Metrics/SpecialFields.cpp" line="68"/>
         <source>Interval Goal</source>
-        <translation type="unfinished"></translation>
+        <translation>Intervall-Ziel</translation>
     </message>
     <message>
         <location filename="../../Metrics/SpecialFields.cpp" line="69"/>
         <source>Spike Time</source>
-        <translation type="unfinished"></translation>
+        <translation>Ausreißerzeit</translation>
     </message>
     <message>
         <location filename="../../Metrics/SpecialFields.cpp" line="70"/>
         <source>Spikes</source>
-        <translation type="unfinished"></translation>
+        <translation>Ausreißer</translation>
     </message>
 </context>
 <context>
@@ -30063,7 +30063,7 @@ Mehr Informationen: GC Wiki - Simulate_the_physics_of_bicycle_ride.</translation
     <message>
         <location filename="../../Metrics/SpecialFields.cpp" line="161"/>
         <source>Interval</source>
-        <translation type="unfinished">Intervall</translation>
+        <translation>Intervall</translation>
     </message>
 </context>
 <context>
@@ -31759,12 +31759,12 @@ Lassen Sie das Rad frei laufen.</translation>
     <message>
         <location filename="../../Train/TrainSidebar.cpp" line="2731"/>
         <source>Increasing intensity..</source>
-        <translation>Intensität erhöhen..</translation>
+        <translation>Intensität erhöht..</translation>
     </message>
     <message>
         <location filename="../../Train/TrainSidebar.cpp" line="2757"/>
         <source>Decreasing intensity..</source>
-        <translation>Intensität verringern..</translation>
+        <translation>Intensität verringert..</translation>
     </message>
     <message>
         <location filename="../../Train/TrainSidebar.cpp" line="555"/>
