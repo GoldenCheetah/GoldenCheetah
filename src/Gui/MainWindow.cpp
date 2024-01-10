@@ -525,7 +525,7 @@ MainWindow::MainWindow(const QDir &home)
     measuresMenu = shareMenu->addMenu(tr("Get Measures..."));
     shareMenu->addSeparator();
     checkAction = new QAction(tr("Check For New Activities"), this);
-    checkAction->setShortcut(QKeySequence("Ctrl+C"));
+    checkAction->setShortcut(QKeySequence("")); // Ctrl+C is already in use for clipboard copy
     connect(checkAction, SIGNAL(triggered(bool)), this, SLOT(checkCloud()));
     shareMenu->addAction(checkAction);
 
