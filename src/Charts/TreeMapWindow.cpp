@@ -250,7 +250,7 @@ TreeMapWindow::refresh()
         FilterSet fs;
         fs.addFilter(context->isfiltered, context->filters);
         fs.addFilter(context->ishomefiltered, context->homeFilters);
-        fs.addFilter(myPerspective->isFiltered(), myPerspective->filterlist(dr));
+        if (myPerspective) fs.addFilter(myPerspective->isFiltered(), myPerspective->filterlist(dr));
         settings.specification.setFilterSet(fs);
         settings.specification.setDateRange(dr);
 

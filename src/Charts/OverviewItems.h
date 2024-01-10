@@ -30,6 +30,7 @@
 #include <QBarSet>
 #include <QBarSeries>
 #include <QLineSeries>
+#include <QCursor>
 
 // subwidgets for viz inside each overview item
 class RPErating;
@@ -38,6 +39,8 @@ class Sparkline;
 class BubbleViz;
 class Routeline;
 class ProgressBar;
+class VScrollBar;
+class ColorButton;
 
 // sparklines number of points - look back 6 weeks
 #define SPARKDAYS 42
@@ -46,7 +49,8 @@ class ProgressBar;
 #define ROUTEPOINTS 250
 
 // types we use start from 100 to avoid clashing with main chart types
-enum OverviewItemType { RPE=100, METRIC, META, ZONE, INTERVAL, PMC, ROUTE, KPI, TOPN, DONUT, ACTIVITIES, ATHLETE };
+enum OverviewItemType { RPE=100, METRIC, META, ZONE, INTERVAL, PMC, ROUTE, KPI,
+                        TOPN, DONUT, ACTIVITIES, ATHLETE, DATATABLE, USERCHART };
 
 //
 // Configuration widget for ALL Overview Items
@@ -60,6 +64,8 @@ class OverviewItemConfig : public QWidget
         OverviewItemConfig(ChartSpaceItem *);
         ~OverviewItemConfig();
 
+        static bool registerItems();
+
     public slots:
 
         // retrieve values when user edits them (if they're valid)
@@ -71,12 +77,24 @@ class OverviewItemConfig : public QWidget
         // program editor
         void setErrors(QStringList &errors);
 
+        // legacy data table selector (connected to legacySelector below)
+        void setProgram(int n);
+
+    protected:
+
+        // before show, lets make sure the widgets are set correctly
+        void showEvent(QShowEvent *) override { setWidgets(); }
+
     private:
 
         // the widget we are configuring
         ChartSpaceItem *item;
 
+        // export data button (data table)
+        QPushButton *exp;
+
         // editor for program
+        QComboBox *legacySelector; // used for configuring the data table widget
         DataFilterEdit *editor;
         SearchFilterBox *filterEditor;
         QLabel *errors;
@@ -90,6 +108,9 @@ class OverviewItemConfig : public QWidget
         MetricSelect *metric1, *metric2, *metric3; // Metric/Interval/PMC
         MetricSelect *meta1; // Meta
         SeriesSelect *series1; // Zone Histogram
+
+        // background color
+        ColorButton *bgcolor;
 
 };
 
@@ -106,7 +127,8 @@ class KPIOverviewItem : public ChartSpaceItem
         void itemGeometryChanged();
         void setData(RideItem *item);
         void setDateRange(DateRange);
-        QWidget *config() { return new OverviewItemConfig(this); }
+
+        QWidget *config() { return configwidget ; }
 
         // create and config
         static ChartSpaceItem *create(ChartSpace *parent) { return new KPIOverviewItem(parent, "CP Estimate", 0, 360, "{ round(estimate(cp3,cp)); }", "watts", false); }
@@ -121,6 +143,73 @@ class KPIOverviewItem : public ChartSpaceItem
 
         // progress bar viz
         ProgressBar *progressbar;
+        OverviewItemConfig *configwidget;
+};
+
+class DataOverviewItem : public ChartSpaceItem
+{
+    Q_OBJECT
+
+    public slots:
+        void intervalHover(IntervalItem *); // watching intervals being hovered
+        void exportData();                  // export table to a csv file
+
+    public:
+
+        DataOverviewItem(ChartSpace *parent, QString name, QString program);
+        ~DataOverviewItem();
+
+        bool sceneEvent(QEvent *event); // click thru
+        void wheelEvent(QGraphicsSceneWheelEvent *event);
+
+        void itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *);
+        QRectF hotspot();
+        void itemGeometryChanged();
+        void setData(RideItem *item);
+        void setDateRange(DateRange);
+        void postProcess(); // work with data returned from program
+        void dragChanged(bool x);
+
+        QWidget *config() { return configwidget; }
+
+        // create and config
+        static ChartSpaceItem *create(ChartSpace *parent);
+
+        // transition support, get a program to mimic
+        // the look and feel of the old ride summary
+        static QString getLegacyProgram(int, DataFilterRuntime &, bool trends);
+
+        // sort the datatable
+        void sort(int column, Qt::SortOrder order);
+
+        // settings
+        QString program;
+        Leaf *fnames, *funits, *fvalues, *ffiles, *fintervals, *fheat;
+
+        // the data
+        QVector<QString> names, units, values, files, intervals;
+        QVector<double> heat;
+
+        // display control
+        bool multirow;
+        QList<double> columnWidths;
+        OverviewItemConfig *configwidget;
+
+        bool click; // for clickthru
+        RideItem *clickthru;
+        QString hovered;       // we got told it was hovered
+        QString hoverinterval; // last interval we hovered on in paint
+        QString hoversignal;   // last interval we signalled for hover
+        int sortcolumn; // for sorting a column
+
+        // watching cursor moves when scrolling
+        QPoint globalpos;
+
+        int lastsort; // the column we last sorted on
+        Qt::SortOrder lastorder; // the order we last sorted on
+
+        VScrollBar *scrollbar;
+
 };
 
 class RPEOverviewItem : public ChartSpaceItem
@@ -136,7 +225,8 @@ class RPEOverviewItem : public ChartSpaceItem
         void itemGeometryChanged();
         void setData(RideItem *item);
         void setDateRange(DateRange) {} // doesn't support trends view
-        QWidget *config() { return new OverviewItemConfig(this); }
+
+        QWidget *config() { return configwidget; }
 
         // create and config
         static ChartSpaceItem *create(ChartSpace *parent) { return new RPEOverviewItem(parent, "RPE"); }
@@ -148,6 +238,7 @@ class RPEOverviewItem : public ChartSpaceItem
         // for setting sparkline & painting
         bool up, showrange;
         QString value, upper, lower, mean;
+        OverviewItemConfig *configwidget;
 };
 
 class MetricOverviewItem : public ChartSpaceItem
@@ -163,13 +254,14 @@ class MetricOverviewItem : public ChartSpaceItem
         void itemGeometryChanged();
         void setData(RideItem *item);
         void setDateRange(DateRange);
-        QWidget *config() { return new OverviewItemConfig(this); }
+
+        QWidget *config() { return configwidget; }
 
         // create and config
         static ChartSpaceItem *create(ChartSpace *parent) { return new MetricOverviewItem(parent, "PowerIndex", "power_index"); }
 
         QString symbol;
-        RideMetric *metric;
+        const RideMetric *metric;
         QString units;
 
         bool up, showrange;
@@ -180,6 +272,8 @@ class MetricOverviewItem : public ChartSpaceItem
         int rank; // rank 1,2 or 3
         QString beststring;
         QPixmap gold, silver, bronze; // medals
+
+        OverviewItemConfig *configwidget;
 };
 
 // top N uses this to hold details for date range
@@ -214,19 +308,21 @@ class TopNOverviewItem : public ChartSpaceItem
         int getTransition() const {return transition;}
         void setTransition(int x) { if (transition !=x) {transition=x; update();}}
 
-        bool sceneEvent(QEvent *event);
-        void itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *);
-        void itemGeometryChanged();
-        void setData(RideItem *) {} // doesn't support analysis view
-        void setDateRange(DateRange);
-        QRectF hotspot();
-        QWidget *config() { return new OverviewItemConfig(this); }
+        bool sceneEvent(QEvent *event) override;
+        void itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) override;
+        void itemGeometryChanged() override;
+        void setData(RideItem *) override {} // doesn't support analysis view
+        void setDateRange(DateRange) override;
+        QRectF hotspot() override;
+
+        QWidget *config() override { return configwidget; }
 
         // create and config
         static ChartSpaceItem *create(ChartSpace *parent) { return new TopNOverviewItem(parent, "PowerIndex", "power_index"); }
+        void configChanged(qint32) override;
 
         QString symbol;
-        RideMetric *metric;
+        const RideMetric *metric;
         QString units;
 
         QList<topnentry> ranked;
@@ -241,6 +337,9 @@ class TopNOverviewItem : public ChartSpaceItem
 
         // interaction
         bool click;
+        RideItem *clickthru;
+
+        OverviewItemConfig *configwidget;
 };
 
 class MetaOverviewItem : public ChartSpaceItem
@@ -252,14 +351,17 @@ class MetaOverviewItem : public ChartSpaceItem
         MetaOverviewItem(ChartSpace *parent, QString name, QString symbol);
         ~MetaOverviewItem();
 
-        void itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *);
-        void itemGeometryChanged();
-        void setData(RideItem *item);
-        void setDateRange(DateRange) {} // doesn't support trends view
-        QWidget *config() { return new OverviewItemConfig(this); }
+        void itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) override;
+        void itemGeometryChanged() override;
+        void setData(RideItem *item) override;
+        void setDateRange(DateRange) override {} // doesn't support trends view
+
+        QWidget *config() override { return configwidget; }
 
         // create and config
         static ChartSpaceItem *create(ChartSpace *parent) { return new MetaOverviewItem(parent, tr("Workout Code"), "Workout Code"); }
+
+        void configChanged(qint32) override;
 
         QString symbol;
         int fieldtype;
@@ -269,6 +371,8 @@ class MetaOverviewItem : public ChartSpaceItem
         QString value, upper, lower, mean;
 
         Sparkline *sparkline;
+
+        OverviewItemConfig *configwidget;
 };
 
 class PMCOverviewItem : public ChartSpaceItem
@@ -284,7 +388,8 @@ class PMCOverviewItem : public ChartSpaceItem
         void itemGeometryChanged();
         void setData(RideItem *item);
         void setDateRange(DateRange) {} // doesn't support trends view
-        QWidget *config() { return new OverviewItemConfig(this); }
+
+        QWidget *config() { return configwidget ; }
 
         // create and config
         static ChartSpaceItem *create(ChartSpace *parent) { return new PMCOverviewItem(parent, "coggan_tss"); }
@@ -292,6 +397,8 @@ class PMCOverviewItem : public ChartSpaceItem
         QString symbol;
 
         double sts, lts, sb, rr, stress;
+
+        OverviewItemConfig *configwidget;
 };
 
 class ZoneOverviewItem : public ChartSpaceItem
@@ -303,15 +410,17 @@ class ZoneOverviewItem : public ChartSpaceItem
         ZoneOverviewItem(ChartSpace *parent, QString name, RideFile::seriestype, bool polarized);
         ~ZoneOverviewItem();
 
-        void itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *);
-        void itemGeometryChanged();
-        void setData(RideItem *item);
-        void setDateRange(DateRange);
-        void dragChanged(bool x);
-        QWidget *config() { return new OverviewItemConfig(this); }
+        void itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *) override;
+        void itemGeometryChanged() override;
+        void setData(RideItem *item) override;
+        void setDateRange(DateRange) override;
+        void dragChanged(bool x) override;
+
+        QWidget *config() override { return configwidget; }
 
         // create and config
         static ChartSpaceItem *create(ChartSpace *parent) { return new ZoneOverviewItem(parent, tr("Power Zones"), RideFile::watts, false); }
+        void configChanged(qint32) override;
 
         RideFile::seriestype series;
         bool polarized;
@@ -321,6 +430,8 @@ class ZoneOverviewItem : public ChartSpaceItem
         QBarSeries *barseries;
         QStringList categories;
         QBarCategoryAxis *barcategoryaxis;
+
+        OverviewItemConfig *configwidget;
 };
 
 struct aggmeta {
@@ -345,14 +456,15 @@ class DonutOverviewItem : public ChartSpaceItem
         void setData(RideItem *) {} // trends view only
         void setDateRange(DateRange);
         void dragChanged(bool x);
-        QWidget *config() { return new OverviewItemConfig(this); }
+
+        QWidget *config() { return configwidget ; }
 
         // create and config
         static ChartSpaceItem *create(ChartSpace *parent) { return new DonutOverviewItem(parent, tr("Sport"), "ride_count", "Sport"); }
 
         // config
         QString symbol, meta;
-        RideMetric *metric;
+        const RideMetric *metric;
 
         // Categories and values
         QVector<aggmeta> values;
@@ -363,6 +475,8 @@ class DonutOverviewItem : public ChartSpaceItem
         QBarSet *barset;
         QBarSeries *barseries;
         QBarCategoryAxis *barcategoryaxis;
+
+        OverviewItemConfig *configwidget;
 
     public slots:
         void hoverSlice(QPieSlice *slice, bool state);
@@ -381,12 +495,15 @@ class RouteOverviewItem : public ChartSpaceItem
         void itemGeometryChanged();
         void setData(RideItem *item);
         void setDateRange(DateRange) {} // doesn't support trends view
-        QWidget *config() { return new OverviewItemConfig(this); }
+
+        QWidget *config() { return configwidget; }
 
         // create and config
         static ChartSpaceItem *create(ChartSpace *parent) { return new RouteOverviewItem(parent, tr("Route")); }
 
         Routeline *routeline;
+
+        OverviewItemConfig *configwidget;
 };
 
 class IntervalOverviewItem : public ChartSpaceItem
@@ -401,8 +518,10 @@ class IntervalOverviewItem : public ChartSpaceItem
         void itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *);
         void itemGeometryChanged();
         void setData(RideItem *item);
+        void setData(RideItem *item, bool animate);
         void setDateRange(DateRange);
-        QWidget *config() { return new OverviewItemConfig(this); }
+
+        QWidget *config() { return configwidget; }
 
         // create and config
         static ChartSpaceItem *createInterval(ChartSpace *parent) { return new IntervalOverviewItem(parent, tr("Intervals"), "elapsed_time", "average_power", "workout_time"); }
@@ -411,6 +530,16 @@ class IntervalOverviewItem : public ChartSpaceItem
         QString xsymbol, ysymbol, zsymbol;
         int xdp, ydp;
         BubbleViz *bubble;
+
+        bool block; // block when signals occur too quickly
+        RideItem *item;  // remember what we are showing
+        IntervalItem *hover; // currently being hovered
+
+        OverviewItemConfig *configwidget;
+
+    public slots:
+        void intervalSelectRefresh();
+        void intervalHover(IntervalItem *);
 };
 
 
@@ -454,6 +583,9 @@ class BubbleViz : public QObject, public QGraphicsItem
         void setGeometry(double x, double y, double width, double height);
         QRectF geometry() { return geom; }
 
+        // set hover signal for intervals
+        void setIntervalHoverSignal(bool x) { intervalsignal=x; }
+
         // transition animation 0-255
         int getTransition() const {return transition;}
         void setTransition(int x) { if (transition !=x) {transition=x; update();}}
@@ -465,7 +597,7 @@ class BubbleViz : public QObject, public QGraphicsItem
         void setXAxis(QPointF x) { minx=x.x(); maxx=x.y(); update(); }
 
         // null members for now just get hooked up
-        void setPoints(QList<BPointF>points, double minx, double maxx, double miny, double maxy);
+        void setPoints(QList<BPointF>points, double minx, double maxx, double miny, double maxy, bool animate=true);
 
         void setAxisNames(QString xlabel, QString ylabel) { this->xlabel=xlabel; this->ylabel=ylabel; update(); }
 
@@ -488,7 +620,12 @@ class BubbleViz : public QObject, public QGraphicsItem
         // where is the cursor?
         bool hover;
         bool click;
+        RideItem *clickthru;
         QPointF plotpos;
+
+        // we should signal interval hovers?
+        bool intervalsignal;
+        QString intervalhover, lastintervalsignal;
 
         // for animated transition
         QList <BPointF> oldpoints; // for animation
@@ -576,6 +713,59 @@ class Sparkline : public QGraphicsItem
         bool bigdot;
         bool fill;
         QList<QPointF> points;
+};
+
+// vertical scrollbar
+class VScrollBar : public QGraphicsItem
+{
+    public:
+        VScrollBar(QGraphicsWidget *parent, ChartSpace *space); // create empty, geometry and boundary gets changed all the time
+
+        // we monkey around with this *A LOT*
+        void setGeometry(double x, double y, double width, double height);
+        QRectF geometry() { return geom; }
+
+        // the size of the scroll area
+        void setAreaHeight(double n);
+
+        // pos - this is the position in the area being scrolled
+        //       that should be painted in the viewable area
+        //       since its a vertical scrollbar its the y position
+        //       it can be set by parent when e.g. catch key events
+        void setPos(double x);
+        void movePos(int x);
+        double pos() const;
+
+        bool isDragging() { return state == DRAG; }
+
+        // needed as pure virtual in QGraphicsItem
+        QRectF boundingRect() const override { return geom; }
+        QVariant itemChange(GraphicsItemChange change, const QVariant &value) override
+        {
+            if (change == ItemPositionChange && parent->scene())  prepareGeometryChange();
+            return QGraphicsItem::itemChange(change, value);
+        }
+
+        // the usual
+        void paint(QPainter*, const QStyleOptionGraphicsItem *, QWidget*) override;
+
+        // spotting mouse events hover, click move and wheel (but only in small area of scrollbar)
+        bool sceneEvent(QEvent *event) override;
+
+        bool canscroll; // can we do scrolling?
+
+    private:
+
+        QGraphicsWidget *parent;
+        ChartSpace *space;
+        QRectF geom;
+        double height;
+        bool hover; // is mouse in our rect?
+        bool barhover; // is mouse over the scrollbar itself?
+
+        QPointF origin;
+        enum { NONE, DRAG } state;
+        double barpos, obarpos;
 };
 
 // visualisation of a GPS route as a shape

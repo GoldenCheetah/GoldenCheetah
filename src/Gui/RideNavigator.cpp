@@ -25,7 +25,7 @@
 #include "RideNavigator.h"
 #include "RideNavigatorProxy.h"
 #include "SearchFilterBox.h"
-#include "TabView.h"
+#include "AbstractView.h"
 #include "HelpWhatsThis.h"
 
 #include <QtGui>
@@ -173,7 +173,7 @@ RideNavigator::configChanged(qint32 state)
 
     // hide ride list scroll bar ?
 #ifndef Q_OS_MAC
-    tableView->setStyleSheet(TabView::ourStyleSheet());
+    tableView->setStyleSheet(AbstractView::ourStyleSheet());
     if (mainwindow) {
         if (appsettings->value(this, GC_RIDESCROLL, true).toBool() == false)
             tableView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -237,14 +237,14 @@ RideNavigator::resetView()
 {
     active = true;
 
-    QList<QString> cols = _columns.split("|", QString::SkipEmptyParts);
-    int widco = _widths.split("|", QString::SkipEmptyParts).count();
+    QList<QString> cols = _columns.split("|", Qt::SkipEmptyParts);
+    int widco = _widths.split("|", Qt::SkipEmptyParts).count();
 
     // something is wrong with the config ? reset 
     if (widco != cols.count() || widco <= 1) {
         _columns = QString(tr("*|Workout Code|Date|"));
         _widths = QString("0|100|100|");
-        cols = _columns.split("|", QString::SkipEmptyParts);
+        cols = _columns.split("|", Qt::SkipEmptyParts);
     }
 
     // to account for translations
@@ -331,7 +331,7 @@ RideNavigator::resetView()
 
     // set the column widths
     int columnnumber=0;
-    foreach(QString size, _widths.split("|", QString::SkipEmptyParts)) {
+    foreach(QString size, _widths.split("|", Qt::SkipEmptyParts)) {
 
         if (columnnumber >= cols.count()) break;
 
@@ -491,7 +491,7 @@ RideNavigator::eventFilter(QObject *object, QEvent *e)
             active=true;
             // set the column widths
             int columnnumber=0;
-            foreach(QString size, _widths.split("|", QString::SkipEmptyParts)) {
+            foreach(QString size, _widths.split("|", Qt::SkipEmptyParts)) {
                 tableView->setColumnWidth(columnnumber, size.toInt());
             }
             active=false;
@@ -1376,7 +1376,7 @@ RideNavigator::showTreeContextMenuPopup(const QPoint &pos)
 
 RideTreeView::RideTreeView(QWidget *parent) : QTreeView(parent)
 {
-    setDragDropMode(QAbstractItemView::InternalMove);
+    setDragDropMode(QAbstractItemView::DragDrop);
     setDragEnabled(true);
     setDragDropOverwriteMode(false);
     setDropIndicatorShown(true);

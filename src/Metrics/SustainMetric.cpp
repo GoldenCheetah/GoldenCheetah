@@ -42,6 +42,9 @@ class L1Sustain : public RideMetric {
         setSymbol("l1_sustain");
         setInternalName("L1 Sustained Time");
     }
+
+    bool isTime() const { return true; }
+
     void initialize() {
         setName(tr("L1 Sustained Time"));
         setMetricUnits(tr("seconds"));
@@ -70,6 +73,8 @@ class L2Sustain : public RideMetric {
         setInternalName("L2 Sustained Time");
     }
 
+    bool isTime() const { return true; }
+
     void initialize() {
         setName(tr("L2 Sustained Time"));
         setMetricUnits(tr("seconds"));
@@ -96,6 +101,8 @@ class L3Sustain : public RideMetric {
         setSymbol("l3_sustain");
         setInternalName("L3 Sustained Time");
     }
+
+    bool isTime() const { return true; }
     void initialize() {
         setName(tr("L3 Sustained Time"));
         setMetricUnits(tr("seconds"));
@@ -122,6 +129,8 @@ class L4Sustain : public RideMetric {
         setSymbol("l4_sustain");
         setInternalName("L4 Sustained Time");
     }
+
+    bool isTime() const { return true; }
     void initialize() {
         setName(tr("L4 Sustained Time"));
         setMetricUnits(tr("seconds"));
@@ -148,6 +157,8 @@ class L5Sustain : public RideMetric {
         setSymbol("l5_sustain");
         setInternalName("L5 Sustained Time");
     }
+
+    bool isTime() const { return true; }
     void initialize() {
         setName(tr("L5 Sustained Time"));
         setMetricUnits(tr("seconds"));
@@ -174,6 +185,8 @@ class L6Sustain : public RideMetric {
         setSymbol("l6_sustain");
         setInternalName("L6 Sustained Time");
     }
+
+    bool isTime() const { return true; }
     void initialize() {
         setName(tr("L6 Sustained Time"));
         setMetricUnits(tr("seconds"));
@@ -200,6 +213,8 @@ class L7Sustain : public RideMetric {
         setSymbol("l7_sustain");
         setInternalName("L7 Sustained Time");
     }
+
+    bool isTime() const { return true; }
     void initialize() {
         setName(tr("L7 Sustained Time"));
         setMetricUnits(tr("seconds"));
@@ -226,6 +241,8 @@ class L8Sustain : public RideMetric {
         setSymbol("l8_sustain");
         setInternalName("L8 Sustained Time");
     }
+
+    bool isTime() const { return true; }
     void initialize() {
         setName(tr("L8 Sustained Time"));
         setMetricUnits(tr("seconds"));
@@ -252,6 +269,8 @@ class L9Sustain : public RideMetric {
         setSymbol("l9_sustain");
         setInternalName("L9 Sustained Time");
     }
+
+    bool isTime() const { return true; }
     void initialize() {
         setName(tr("L9 Sustained Time"));
         setMetricUnits(tr("seconds"));
@@ -278,6 +297,8 @@ class L10Sustain : public RideMetric {
         setSymbol("l10_sustain");
         setInternalName("L10 Sustained Time");
     }
+
+    bool isTime() const { return true; }
     void initialize() {
         setName(tr("L10 Sustained Time"));
         setMetricUnits(tr("seconds"));

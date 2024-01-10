@@ -18,6 +18,7 @@
 
 #include "Xert.h"
 #include "Athlete.h"
+#include "Secrets.h"
 #include "Settings.h"
 #include "Units.h"
 #include "JsonRideFile.h"
@@ -100,7 +101,8 @@ Xert::open(QStringList &errors)
     QNetworkRequest request(QUrl("https://www.xertonline.com/oauth/token"));
     request.setRawHeader("Content-Type", "application/x-www-form-urlencoded");
 
-    QString authheader = QString("%1:%1").arg("xert_public");
+    QString authheader = QString("%1:%2").arg(GC_XERT_CLIENT_ID).arg(GC_XERT_CLIENT_SECRET);
+
     request.setRawHeader("Authorization", "Basic " +  authheader.toLatin1().toBase64());
 
     // set params
@@ -437,6 +439,9 @@ Xert::readFileCompleted()
             if (!data["hr"].isNull())
                 add.hr = data["hr"].toInt();
 
+            if (!data["cad"].isNull())
+                add.cad = data["cad"].toDouble();
+
             if (!data["alt"].isNull())
                 add.alt = data["alt"].toDouble();
 
@@ -490,7 +495,7 @@ Xert::writeFile(QByteArray &data, QString remotename, RideFile *ride)
     // MULTIPART *****************
 
     QHttpMultiPart *multiPart = new QHttpMultiPart(QHttpMultiPart::FormDataType);
-    QString boundary = QVariant(qrand()).toString()+QVariant(qrand()).toString()+QVariant(qrand()).toString();
+    QString boundary = QVariant(QRandomGenerator::global()->generate()).toString()+QVariant(QRandomGenerator::global()->generate()).toString()+QVariant(QRandomGenerator::global()->generate()).toString();
     multiPart->setBoundary(boundary.toLatin1());
 
     request.setRawHeader("Authorization", (QString("Bearer %1").arg(token)).toLatin1());
@@ -501,7 +506,7 @@ Xert::writeFile(QByteArray &data, QString remotename, RideFile *ride)
         QHttpPart namePart;
         namePart.setHeader(QNetworkRequest::ContentDispositionHeader, QVariant("form-data; name=\"name\""));
         printd("request: %s\n", name.toStdString().c_str());
-        namePart.setBody(name.toLatin1());
+        namePart.setBody(name.toUtf8());
         multiPart->append(namePart);
     }
 

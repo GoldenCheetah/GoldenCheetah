@@ -35,6 +35,7 @@
 #include <qwt_legend.h>
 #include <qwt_series_data.h>
 #include <qwt_scale_widget.h>
+#include <qwt_scale_map.h>
 
 
 static inline double
@@ -129,15 +130,15 @@ HrPwPlot::configChanged(qint32)
     QwtScaleDraw *sd = new QwtScaleDraw;
     sd->setTickLength(QwtScaleDiv::MajorTick, 3);
     sd->setTickLength(QwtScaleDiv::MinorTick, 0);
-    setAxisScaleDraw(QwtPlot::xBottom, sd);
-    axisWidget(QwtPlot::xBottom)->setPalette(palette);
+    setAxisScaleDraw(QwtAxis::XBottom, sd);
+    axisWidget(QwtAxis::XBottom)->setPalette(palette);
 
     sd = new QwtScaleDraw;
     sd->setTickLength(QwtScaleDiv::MajorTick, 3);
     sd->enableComponent(QwtScaleDraw::Ticks, false);
     sd->enableComponent(QwtScaleDraw::Backbone, false);
-    setAxisScaleDraw(QwtPlot::yLeft, sd);
-    axisWidget(QwtPlot::yLeft)->setPalette(palette);
+    setAxisScaleDraw(QwtAxis::YLeft, sd);
+    axisWidget(QwtAxis::YLeft)->setPalette(palette);
 
     QPen gridPen;
     gridPen.setColor(GColor(CPLOTGRID));
@@ -300,7 +301,7 @@ HrPwPlot::recalc()
         delete plotedHrArray[i];
     }       
 
-    setAxisScale(xBottom, 0.0, maxWatt);
+    setAxisScale(QwtAxis::XBottom, 0.0, maxWatt);
 
     setYMax();
     refreshZoneLabels();
@@ -358,8 +359,8 @@ HrPwPlot::setYMax()
             ymax = max(ymax, hrCurves[i]->maxYValue());
         }
     }
-    setAxisScale(yLeft, minHr, ymax * 1.2);
-    setAxisTitle(yLeft, tr("Heart Rate(BPM)"));
+    setAxisScale(QwtAxis::YLeft, minHr, ymax * 1.2);
+    setAxisTitle(QwtAxis::YLeft, tr("Heart Rate(BPM)"));
 }
 
 void
@@ -425,7 +426,7 @@ HrPwPlot::addHrStepCurve(QVector<double> &finalHr, int nbpoints)
     QMapIterator<double,double> l(hrHist);
     while (l.hasNext()) {
         l.next();
-        array[(int) round(l.key())] += l.value();
+        if (l.key() >= 0 && l.key() < maxHr) array[(int) round(l.key())] += l.value();
     }
 
 
@@ -446,7 +447,6 @@ HrPwPlot::addHrStepCurve(QVector<double> &finalHr, int nbpoints)
     }
     smoothTimeStep2[t] = 0.0;
     smoothHrStep[t] = t * 2;
-
     hrStepCurve->setSamples(smoothTimeStep2.data(), smoothHrStep.data(), nbSteps+1);
     delete [] array;
 }
@@ -466,7 +466,7 @@ HrPwPlot::addRegLinCurve( double rslope, double rintercept)
 void
 HrPwPlot::setXTitle()
 {
-    setAxisTitle(xBottom, tr("Power (Watts)"));
+    setAxisTitle(QwtAxis::XBottom, tr("Power (Watts)"));
 }
 
 void

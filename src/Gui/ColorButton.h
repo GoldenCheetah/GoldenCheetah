@@ -37,6 +37,7 @@ class ColorButton : public QPushButton
         void setColor(QColor);
         QColor getColor() { return color; }
         QString getName() { return name; }
+        void setSelectAll(bool x) { all=x; }
 
     public slots:
         void clicked();
@@ -46,6 +47,7 @@ class ColorButton : public QPushButton
 
     protected:
         bool gc;
+        bool all;
         QColor color;
         QString name;
 };
@@ -63,7 +65,7 @@ class GColorDialog : public QDialog
 
     public:
         // main constructor
-        GColorDialog(QColor selected, QWidget *parent);
+        GColorDialog(QColor selected, QWidget *parent, bool all);
         QColor returned() { return returning; }
 
         // User entry point- opens a dialog gets the answer
@@ -78,7 +80,7 @@ class GColorDialog : public QDialog
         //
         // or just r,g,b for normal colors (meaning that: 1,1,x is never a possible color)
         //
-        static QColor getColor(QColor color);
+        static QColor getColor(QColor color, bool all=false);
 
     public slots:
 
@@ -111,6 +113,8 @@ class GColorDialog : public QDialog
         QTreeWidget *colorlist;
         QPushButton *cancel, *ok;
         QSignalMapper *mapper;
+
+        bool all;
 };
 
 #endif

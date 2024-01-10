@@ -34,6 +34,7 @@
 #include <QUrl>
 #include <QtCharts>
 #include <QGraphicsItem>
+#include <QSyntaxHighlighter>
 
 #include "GoldenCheetah.h"
 #include "Context.h"
@@ -103,9 +104,8 @@ class PythonChart : public GcChartWindow, public PythonHost {
         PythonChart(Context *context, bool ridesummary);
         ~PythonChart();
 
-        // reveal
-        bool hasReveal() { return true; }
         QCheckBox *showCon, *web;
+        QLabel *noPython;
 
         // receives all the events
         QTextEdit *script;
@@ -163,6 +163,7 @@ class PythonChart : public GcChartWindow, public PythonHost {
         Context *context;
         QString text; // if Rtool not alive
         bool ridesummary;
+        QSyntaxHighlighter *syntax;
 };
 
 

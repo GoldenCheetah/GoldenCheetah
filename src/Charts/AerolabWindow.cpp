@@ -21,11 +21,12 @@
 #include "Context.h"
 #include "AerolabWindow.h"
 #include "Aerolab.h"
-#include "TabView.h"
+#include "AbstractView.h"
 #include "IntervalItem.h"
 #include "RideItem.h"
 #include "Colors.h"
 #include "HelpWhatsThis.h"
+#include "Units.h"
 #include <QtGui>
 #include <qwt_plot_zoomer.h>
 
@@ -46,7 +47,7 @@ AerolabWindow::AerolabWindow(Context *context) :
   // Left controls layout:
   QVBoxLayout *leftControls  =  new QVBoxLayout;
   QFontMetrics metrics(QApplication::font());
-  int labelWidth1 = metrics.width("Crr") + 10;
+  int labelWidth1 = metrics.horizontalAdvance("Crr") + 10;
 
   // Crr:
   QHBoxLayout *crrLayout = new QHBoxLayout;
@@ -133,7 +134,7 @@ AerolabWindow::AerolabWindow(Context *context) :
 
   // Right controls layout:
   QVBoxLayout *rightControls  =  new QVBoxLayout;
-  int labelWidth2 = metrics.width("Total Mass (kg)") + 10;
+  int labelWidth2 = metrics.horizontalAdvance("Total Mass (kg)") + 10;
 
   // Total mass:
   QHBoxLayout *mLayout = new QHBoxLayout;
@@ -283,8 +284,8 @@ AerolabWindow::AerolabWindow(Context *context) :
 
   // tooltip on hover over point
   //************************************
-    aerolab->tooltip = new LTMToolTip( QwtPlot::xBottom,
-                                       QwtPlot::yLeft,
+    aerolab->tooltip = new LTMToolTip( QwtAxis::XBottom,
+                                       QwtAxis::YLeft,
                                        QwtPicker::VLineRubberBand,
                                        QwtPicker::AlwaysOn,
                                        aerolab->canvas(),
@@ -361,7 +362,7 @@ AerolabWindow::configChanged(qint32)
   commentEdit->setPalette(palette);
 
 #ifndef Q_OS_MAC
-    aerolab->setStyleSheet(TabView::ourStyleSheet());
+    aerolab->setStyleSheet(AbstractView::ourStyleSheet());
 #endif
 }
 
@@ -640,14 +641,14 @@ AerolabWindow::doEstCdACrr()
 
 void
 AerolabWindow::zoomInterval(IntervalItem *which) {
-  QwtDoubleRect rect;
+  QRectF rect;
 
   if (!aerolab->byDistance()) {
     rect.setLeft(which->start/60);
     rect.setRight(which->stop/60);
   } else {
-    rect.setLeft(which->startKM);
-    rect.setRight(which->stopKM);
+    rect.setLeft(which->startKM * (GlobalContext::context()->useMetricUnits ? 1 : MILES_PER_KM));
+    rect.setRight(which->stopKM * (GlobalContext::context()->useMetricUnits ? 1 : MILES_PER_KM));
   }
   rect.setTop(aerolab->veCurve->maxYValue()*1.1);
   rect.setBottom(aerolab->veCurve->minYValue()-10);
@@ -667,13 +668,13 @@ void AerolabWindow::intervalSelected()
 
 double AerolabWindow::getCanvasTop() const
 {
-    const QwtDoubleRect &canvasRect = allZoomer->zoomRect();
+    const QRectF &canvasRect = allZoomer->zoomRect();
     return canvasRect.top();
 }
 
 double AerolabWindow::getCanvasBottom() const
 {
-    const QwtDoubleRect &canvasRect = allZoomer->zoomRect();
+    const QRectF &canvasRect = allZoomer->zoomRect();
     return canvasRect.bottom();
 }
 

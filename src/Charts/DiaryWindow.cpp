@@ -23,7 +23,7 @@
 #include "RideCacheModel.h"
 #include "Athlete.h"
 #include "Context.h"
-#include "TabView.h"
+#include "AbstractView.h"
 #include "HelpWhatsThis.h"
 
 DiaryWindow::DiaryWindow(Context *context) :
@@ -127,8 +127,8 @@ DiaryWindow::configChanged(qint32)
                     .arg(GColor(CPLOTBACKGROUND).name())
                     .arg(GCColor::invertColor(GColor(CPLOTBACKGROUND)).name()));
 #ifndef Q_OS_MAC
-    monthlyView->verticalScrollBar()->setStyleSheet(TabView::ourStyleSheet());
-    monthlyView->horizontalScrollBar()->setStyleSheet(TabView::ourStyleSheet());
+    monthlyView->verticalScrollBar()->setStyleSheet(AbstractView::ourStyleSheet());
+    monthlyView->horizontalScrollBar()->setStyleSheet(AbstractView::ourStyleSheet());
 #endif
     title->setStyleSheet(QString("background: %1; color: %2;").arg(GColor(CPLOTBACKGROUND).name())
                                                               .arg(GColor(CPLOTMARKER).name()));

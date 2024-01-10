@@ -57,6 +57,7 @@ private:
 
     // what kind of window is this?
     Q_PROPERTY(GcWinID type READ type WRITE setType) // not a user modifiable property
+    Q_PROPERTY(Perspective *perspective READ getPerspective WRITE setPerspective USER false)
 
     // each window has an instance name - default set
     // by the widget constructor but overide from layou manager
@@ -104,6 +105,7 @@ private:
     bool _gripped;
     int _style;
     bool _noevents; // don't work with events
+    Perspective *_perspective;
 
     enum drag { None, Close, Flip, Move, Left, Right, Top, Bottom, TLCorner, TRCorner, BLCorner, BRCorner };
     typedef enum drag DragState;
@@ -146,6 +148,9 @@ public:
     // must call this before set controls
     void addAction(QAction *act) { actions << act; }
     void setNoEvents(bool x) { _noevents = x; }
+
+    void setPerspective(Perspective *x) { _perspective=x; }
+    Perspective *getPerspective() const { return _perspective; }
 
     void virtual setControls(QWidget *x);
     QWidget *controls() const;

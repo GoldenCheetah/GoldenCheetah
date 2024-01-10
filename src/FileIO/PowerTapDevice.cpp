@@ -104,6 +104,7 @@ PowerTapDevice::doWrite(CommPortPtr dev, char c, bool hwecho, QString &err)
 int
 PowerTapDevice::readUntilNewline(CommPortPtr dev, char *buf, int len, QString &err)
 {
+    Q_UNUSED(len);
     int sofar = 0;
     while (!hasNewline(buf, sofar)) {
         assert(sofar < len);
@@ -295,7 +296,7 @@ PowerTapDevice::download( const QDir &tmpdir,
     file.name = tmp.fileName();
 
     QTextStream os(&tmp);
-    os << hex;
+    os << Qt::hex;
     os.setPadChar('0');
 
     bool time_set = false;

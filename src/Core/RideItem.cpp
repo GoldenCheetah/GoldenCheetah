@@ -46,7 +46,7 @@
 RideItem::RideItem() 
     : 
     ride_(NULL), fileCache_(NULL), context(NULL), isdirty(false), isstale(true), isedit(false), skipsave(false), path(""), fileName(""),
-    color(QColor(1,1,1)), sport(""), isBike(false), isRun(false), isSwim(false), isXtrain(false), samples(false), zoneRange(-1), hrZoneRange(-1), paceZoneRange(-1), fingerprint(0), metacrc(0), crc(0), timestamp(0), dbversion(0), udbversion(0), weight(0) {
+    color(QColor(1,1,1)), sport(""), isBike(false), isRun(false), isSwim(false), isXtrain(false), isAero(false), samples(false), zoneRange(-1), hrZoneRange(-1), paceZoneRange(-1), fingerprint(0), metacrc(0), crc(0), timestamp(0), dbversion(0), udbversion(0), weight(0) {
     metrics_.fill(0, RideMetricFactory::instance().metricCount());
     count_.fill(0, RideMetricFactory::instance().metricCount());
 }
@@ -54,7 +54,7 @@ RideItem::RideItem()
 RideItem::RideItem(RideFile *ride, Context *context) 
     : 
     ride_(ride), fileCache_(NULL), context(context), isdirty(false), isstale(true), isedit(false), skipsave(false), path(""), fileName(""),
-    color(QColor(1,1,1)), sport(""), isBike(false), isRun(false), isSwim(false), isXtrain(false), samples(false), zoneRange(-1), hrZoneRange(-1), paceZoneRange(-1), fingerprint(0), metacrc(0), crc(0), timestamp(0), dbversion(0), udbversion(0), weight(0)
+    color(QColor(1,1,1)), sport(""), isBike(false), isRun(false), isSwim(false), isXtrain(false), isAero(false), samples(false), zoneRange(-1), hrZoneRange(-1), paceZoneRange(-1), fingerprint(0), metacrc(0), crc(0), timestamp(0), dbversion(0), udbversion(0), weight(0)
 {
     metrics_.fill(0, RideMetricFactory::instance().metricCount());
     count_.fill(0, RideMetricFactory::instance().metricCount());
@@ -63,7 +63,7 @@ RideItem::RideItem(RideFile *ride, Context *context)
 RideItem::RideItem(QString path, QString fileName, QDateTime &dateTime, Context *context, bool planned)
     :
     ride_(NULL), fileCache_(NULL), context(context), isdirty(false), isstale(true), isedit(false), skipsave(false), path(path), fileName(fileName),
-    dateTime(dateTime), color(QColor(1,1,1)), planned(planned), sport(""), isBike(false), isRun(false), isSwim(false), isXtrain(false), samples(false), zoneRange(-1), hrZoneRange(-1), paceZoneRange(-1), fingerprint(0),
+    dateTime(dateTime), color(QColor(1,1,1)), planned(planned), sport(""), isBike(false), isRun(false), isSwim(false), isXtrain(false), isAero(false), samples(false), zoneRange(-1), hrZoneRange(-1), paceZoneRange(-1), fingerprint(0),
     metacrc(0), crc(0), timestamp(0), dbversion(0), udbversion(0), weight(0) 
 {
     metrics_.fill(0, RideMetricFactory::instance().metricCount());
@@ -127,6 +127,7 @@ RideItem::setFrom(RideItem&here, bool temp) // used when loading cache/rideDB.js
     isRun = here.isRun;
     isSwim = here.isSwim;
     isXtrain = here.isXtrain;
+    isAero = here.isAero;
     weight = here.weight;
     overrides_ = here.overrides_;
     samples = here.samples;
@@ -164,8 +165,8 @@ RideItem::metaCRC()
         // with configuration, not user updates
         if (i.key() == "Calendar Text") continue;
 
-        ba.append(i.key());
-        ba.append(i.value());
+        ba.append(i.key().toUtf8());
+        ba.append(i.value().toUtf8());
     }
     return qChecksum(ba, ba.length());
 }
@@ -596,6 +597,7 @@ RideItem::refresh()
         isRun = f->isRun();
         isSwim = f->isSwim();
         isXtrain = f->isXtrain();
+        isAero = f->isAero();
         color = GlobalContext::context()->colorEngine->colorFor(f->getTag(GlobalContext::context()->rideMetadata->getColorField(), ""));
         present = f->getTag("Data", "");
         samples = f->dataPoints().count() > 0;
@@ -804,6 +806,24 @@ RideItem::getStdVarianceForSymbol(QString name)
         }
     }
     return 0.0f;
+}
+
+// access the metadata
+QString
+RideItem::getText(QString name, QString fallback) const
+{
+    // Start Date and Time are special cases, defined as metadata fields but stored in a different way
+    if (name == "Start Date") return QString::number(QDate(1900,01,01).daysTo(dateTime.date()));
+    if (name == "Start Time") return QString::number(QTime(0,0,0).secsTo(dateTime.time()));
+    return metadata_.value(name, fallback);
+}
+
+bool
+RideItem::hasText(QString name) const
+{
+    if (name == "Start Date") return true;
+    if (name == "Start Time") return true;
+    return metadata_.contains(name);
 }
 
 QString
@@ -1042,7 +1062,7 @@ RideItem::updateIntervals()
         // anything longer than a day or negative is skipped
         if (arraySize >= 0 && arraySize < (24*3600)) { // no indent, as added late
 
-        QTime timer;
+        QElapsedTimer timer;
         timer.start();
 
         // setup an integrated series

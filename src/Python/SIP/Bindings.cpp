@@ -149,25 +149,25 @@ PyObject* Bindings::athlete() const
     if (dict == NULL) return dict;
 
     // NAME
-    PyDict_SetItemString(dict, "name", PyUnicode_FromString(context->athlete->cyclist.toUtf8().constData()));
+    PyDict_SetItemString_Steal(dict, "name", PyUnicode_FromString(context->athlete->cyclist.toUtf8().constData()));
 
     // HOME
-    PyDict_SetItemString(dict, "home", PyUnicode_FromString(context->athlete->home->root().absolutePath().toUtf8().constData()));
+    PyDict_SetItemString_Steal(dict, "home", PyUnicode_FromString(context->athlete->home->root().absolutePath().toUtf8().constData()));
 
     // DOB
     if (PyDateTimeAPI == NULL) PyDateTime_IMPORT;// import datetime if necessary
     QDate d = appsettings->cvalue(context->athlete->cyclist, GC_DOB).toDate();
-    PyDict_SetItemString(dict, "dob", PyDate_FromDate(d.year(), d.month(), d.day()));
+    PyDict_SetItemString_Steal(dict, "dob", PyDate_FromDate(d.year(), d.month(), d.day()));
 
     // WEIGHT
-    PyDict_SetItemString(dict, "weight", PyFloat_FromDouble(appsettings->cvalue(context->athlete->cyclist, GC_WEIGHT).toDouble()));
+    PyDict_SetItemString_Steal(dict, "weight", PyFloat_FromDouble(appsettings->cvalue(context->athlete->cyclist, GC_WEIGHT).toDouble()));
 
     // HEIGHT
-    PyDict_SetItemString(dict, "height", PyFloat_FromDouble(appsettings->cvalue(context->athlete->cyclist, GC_HEIGHT).toDouble()));
+    PyDict_SetItemString_Steal(dict, "height", PyFloat_FromDouble(appsettings->cvalue(context->athlete->cyclist, GC_HEIGHT).toDouble()));
 
     // GENDER
     int isfemale = appsettings->cvalue(context->athlete->cyclist, GC_SEX).toInt();
-    PyDict_SetItemString(dict, "gender", PyUnicode_FromString(isfemale ? "female" : "male"));
+    PyDict_SetItemString_Steal(dict, "gender", PyUnicode_FromString(isfemale ? "female" : "male"));
 
     return dict;
 }
@@ -180,12 +180,14 @@ class gcZoneConfig {
     QString sport;
     QDate date;
     QList<int> zoneslow;
+    QList<int> hrzoneslow;
+    QList<double> pacezoneslow;
     int cp, wprime, pmax,aetp,ftp,lthr,aethr,rhr,hrmax;
     double cv,aetv;
 };
 
 // Return a dataframe with:
-// date, sport, cp, w', pmax, aetp, ftp, lthr, aethr, rhr, hrmax, cv, aetv, zoneslow, zonescolor
+// date, sport, cp, w', pmax, aetp, ftp, lthr, aethr, rhr, hrmax, cv, aetv, zoneslow, hrzoneslow, pacezoneslow zonescolor
 PyObject*
 Bindings::athleteZones(PyObject* date, QString sport) const
 {
@@ -204,202 +206,125 @@ Bindings::athleteZones(PyObject* date, QString sport) const
         // convert PyDate to QDate
         QDate forDate(QDate(PyDateTime_GET_YEAR(date), PyDateTime_GET_MONTH(date), PyDateTime_GET_DAY(date)));
 
-        gcZoneConfig bike("bike");
-        gcZoneConfig run("run");
-        gcZoneConfig swim("bike");
+        // Look for the range in Power, HR and Pace zones for each sport
+        foreach (QString sp, GlobalContext::context()->rideMetadata->sports()) {
 
-        // BIKE POWER
-        if (context->athlete->zones("Bike")) {
+            // Power Zones
+            if (context->athlete->zones(sp)) {
 
-            // run through the bike zones
-            int range=context->athlete->zones("Bike")->whichRange(forDate);
-            if (range >= 0) {
-                bike.date =  forDate;
-                bike.cp = context->athlete->zones("Bike")->getCP(range);
-                bike.wprime = context->athlete->zones("Bike")->getWprime(range);
-                bike.pmax = context->athlete->zones("Bike")->getPmax(range);
-                bike.aetp = context->athlete->zones("Bike")->getAeT(range);
-                bike.ftp = context->athlete->zones("Bike")->getFTP(range);
-                bike.zoneslow = context->athlete->zones("Bike")->getZoneLows(range);
+                // run through the power zones
+                int range=context->athlete->zones(sp)->whichRange(forDate);
+                if (range >= 0) {
+
+                    gcZoneConfig c(sp);
+
+                    c.date = forDate;
+                    c.cp = context->athlete->zones(sp)->getCP(range);
+                    c.wprime = context->athlete->zones(sp)->getWprime(range);
+                    c.pmax = context->athlete->zones(sp)->getPmax(range);
+                    c.aetp = context->athlete->zones(sp)->getAeT(range);
+                    c.ftp = context->athlete->zones(sp)->getFTP(range);
+                    c.zoneslow = context->athlete->zones(sp)->getZoneLows(range);
+
+                    config << c;
+                }
+            }
+
+            // HR Zones
+            if (context->athlete->hrZones(sp)) {
+
+                int range=context->athlete->hrZones(sp)->whichRange(forDate);
+                if (range >= 0) {
+
+                    gcZoneConfig c(sp);
+
+                    c.date = forDate;
+                    c.lthr = context->athlete->hrZones(sp)->getLT(range);
+                    c.aethr = context->athlete->hrZones(sp)->getAeT(range);
+                    c.rhr = context->athlete->hrZones(sp)->getRestHr(range);
+                    c.hrmax = context->athlete->hrZones(sp)->getMaxHr(range);
+                    c.hrzoneslow = context->athlete->hrZones(sp)->getZoneLows(range);
+
+                    config << c;
+                }
+            }
+
+            // Pace Zones
+            if ((sp == "Run" || sp == "Swim") && context->athlete->paceZones(sp=="Swim")) {
+
+                int range=context->athlete->paceZones(sp=="Swim")->whichRange(forDate);
+                if (range >= 0) {
+
+                    gcZoneConfig c(sp);
+
+                    c.date =  forDate;
+                    c.cv =  context->athlete->paceZones(sp=="Swim")->getCV(range);
+                    c.aetv =  context->athlete->paceZones(sp=="Swim")->getAeT(range);
+                    c.pacezoneslow = context->athlete->paceZones(sp=="Swim")->getZoneLows(range);
+
+                    config << c;
+                }
             }
         }
-
-        // RUN POWER
-        if (context->athlete->zones("Run")) {
-
-            // run through the bike zones
-            int range=context->athlete->zones("Run")->whichRange(forDate);
-            if (range >= 0) {
-
-                run.date = forDate;
-                run.cp = context->athlete->zones("Run")->getCP(range);
-                run.wprime = context->athlete->zones("Run")->getWprime(range);
-                run.pmax = context->athlete->zones("Run")->getPmax(range);
-                run.aetp = context->athlete->zones("Run")->getAeT(range);
-                run.ftp = context->athlete->zones("Run")->getFTP(range);
-                run.zoneslow = context->athlete->zones("Run")->getZoneLows(range);
-            }
-        }
-
-        // BIKE HR
-        if (context->athlete->hrZones("Bike")) {
-
-            int range=context->athlete->hrZones("Bike")->whichRange(forDate);
-            if (range >= 0) {
-
-                bike.date =  forDate;
-                bike.lthr =  context->athlete->hrZones("Bike")->getLT(range);
-                bike.aethr =  context->athlete->hrZones("Bike")->getAeT(range);
-                bike.rhr =  context->athlete->hrZones("Bike")->getRestHr(range);
-                bike.hrmax =  context->athlete->hrZones("Bike")->getMaxHr(range);
-            }
-        }
-
-        // RUN HR
-        if (context->athlete->hrZones("Run")) {
-
-            int range=context->athlete->hrZones("Run")->whichRange(forDate);
-            if (range >= 0) {
-
-                run.date =  forDate;
-                run.lthr =  context->athlete->hrZones("Run")->getLT(range);
-                run.aethr =  context->athlete->hrZones("Run")->getAeT(range);
-                run.rhr =  context->athlete->hrZones("Run")->getRestHr(range);
-                run.hrmax =  context->athlete->hrZones("Run")->getMaxHr(range);
-            }
-        }
-
-        // RUN PACE
-        if (context->athlete->paceZones(false)) {
-
-            int range=context->athlete->paceZones(false)->whichRange(forDate);
-            if (range >= 0) {
-
-                run.date =  forDate;
-                run.cv =  context->athlete->paceZones(false)->getCV(range);
-                run.aetv =  context->athlete->paceZones(false)->getAeT(range);
-            }
-        }
-
-        // SWIM PACE
-        if (context->athlete->paceZones(true)) {
-
-            int range=context->athlete->paceZones(true)->whichRange(forDate);
-            if (range >= 0) {
-
-                swim.date =  forDate;
-                swim.cv =  context->athlete->paceZones(true)->getCV(range);
-                swim.aetv =  context->athlete->paceZones(true)->getAeT(range);
-            }
-        }
-
-        if (bike.date == forDate) config << bike;
-        if (run.date == forDate) config << run;
-        if (swim.date == forDate) config << swim;
-
     } else {
 
-        // BIKE POWER
-        if (context->athlete->zones("Bike")) {
+        // Look for the ranges in Power, HR and Pace zones for each sport
+        foreach (QString sp, GlobalContext::context()->rideMetadata->sports()) {
 
-            for (int range=0; range < context->athlete->zones("Bike")->getRangeSize(); range++) {
+            // Power Zones
+            if (context->athlete->zones(sp)) {
 
-                // run through the bike zones
-                gcZoneConfig c("bike");
+                for (int range=0; range < context->athlete->zones(sp)->getRangeSize(); range++) {
 
-                c.date =  context->athlete->zones("Bike")->getStartDate(range);
-                c.cp = context->athlete->zones("Bike")->getCP(range);
-                c.wprime = context->athlete->zones("Bike")->getWprime(range);
-                c.pmax = context->athlete->zones("Bike")->getPmax(range);
-                c.aetp = context->athlete->zones("Bike")->getAeT(range);
-                c.ftp = context->athlete->zones("Bike")->getFTP(range);
-                c.zoneslow = context->athlete->zones("Bike")->getZoneLows(range);
+                    // run through the bike zones
+                    gcZoneConfig c(sp);
 
-                config << c;
+                    c.date =  context->athlete->zones(sp)->getStartDate(range);
+                    c.cp = context->athlete->zones(sp)->getCP(range);
+                    c.wprime = context->athlete->zones(sp)->getWprime(range);
+                    c.pmax = context->athlete->zones(sp)->getPmax(range);
+                    c.aetp = context->athlete->zones(sp)->getAeT(range);
+                    c.ftp = context->athlete->zones(sp)->getFTP(range);
+                    c.zoneslow = context->athlete->zones(sp)->getZoneLows(range);
+
+                    config << c;
+                }
+            }
+
+            // HR Zones
+            if (context->athlete->hrZones(sp)) {
+
+                for (int range=0; range < context->athlete->hrZones(sp)->getRangeSize(); range++) {
+
+                    gcZoneConfig c(sp);
+
+                    c.date =  context->athlete->hrZones(sp)->getStartDate(range);
+                    c.lthr =  context->athlete->hrZones(sp)->getLT(range);
+                    c.aethr =  context->athlete->hrZones(sp)->getAeT(range);
+                    c.rhr =  context->athlete->hrZones(sp)->getRestHr(range);
+                    c.hrmax =  context->athlete->hrZones(sp)->getMaxHr(range);
+                    c.hrzoneslow = context->athlete->hrZones(sp)->getZoneLows(range);
+
+                    config << c;
+                }
+            }
+
+            // Pace Zones
+            if ((sp == "Run" || sp == "Swim") && context->athlete->paceZones(sp=="Swim")) {
+
+                for (int range=0; range < context->athlete->paceZones(sp=="Swim")->getRangeSize(); range++) {
+
+                    gcZoneConfig c(sp);
+
+                    c.date =  context->athlete->paceZones(sp=="Swim")->getStartDate(range);
+                    c.cv =  context->athlete->paceZones(sp=="Swim")->getCV(range);
+                    c.aetv =  context->athlete->paceZones(sp=="Swim")->getAeT(range);
+                    c.pacezoneslow = context->athlete->paceZones(sp=="Swim")->getZoneLows(range);
+
+                    config << c;
+                }
             }
         }
-
-        // RUN POWER
-        if (context->athlete->zones("Run")) {
-
-            // run through the bike zones
-            for (int range=0; range < context->athlete->zones("Run")->getRangeSize(); range++) {
-
-                // run through the bike zones
-                gcZoneConfig c("run");
-
-                c.date =  context->athlete->zones("Run")->getStartDate(range);
-                c.cp = context->athlete->zones("Run")->getCP(range);
-                c.wprime = context->athlete->zones("Run")->getWprime(range);
-                c.pmax = context->athlete->zones("Run")->getPmax(range);
-                c.aetp = context->athlete->zones("Run")->getAeT(range);
-                c.ftp = context->athlete->zones("Run")->getFTP(range);
-                c.zoneslow = context->athlete->zones("Run")->getZoneLows(range);
-
-                config << c;
-            }
-        }
-
-        // BIKE HR
-        if (context->athlete->hrZones("Bike")) {
-
-            for (int range=0; range < context->athlete->hrZones("Bike")->getRangeSize(); range++) {
-
-                gcZoneConfig c("bike");
-                c.date =  context->athlete->hrZones("Bike")->getStartDate(range);
-                c.lthr =  context->athlete->hrZones("Bike")->getLT(range);
-                c.aethr =  context->athlete->hrZones("Bike")->getAeT(range);
-                c.rhr =  context->athlete->hrZones("Bike")->getRestHr(range);
-                c.hrmax =  context->athlete->hrZones("Bike")->getMaxHr(range);
-
-                config << c;
-            }
-        }
-
-        // RUN HR
-        if (context->athlete->hrZones("Run")) {
-
-            for (int range=0; range < context->athlete->hrZones("Run")->getRangeSize(); range++) {
-
-                gcZoneConfig c("run");
-                c.date =  context->athlete->hrZones("Run")->getStartDate(range);
-                c.lthr =  context->athlete->hrZones("Run")->getLT(range);
-                c.aethr =  context->athlete->hrZones("Run")->getAeT(range);
-                c.rhr =  context->athlete->hrZones("Run")->getRestHr(range);
-                c.hrmax =  context->athlete->hrZones("Run")->getMaxHr(range);
-
-                config << c;
-            }
-        }
-
-        // RUN PACE
-        if (context->athlete->paceZones(false)) {
-
-            for (int range=0; range < context->athlete->paceZones(false)->getRangeSize(); range++) {
-
-                gcZoneConfig c("run");
-                c.date =  context->athlete->paceZones(false)->getStartDate(range);
-                c.cv =  context->athlete->paceZones(false)->getCV(range);
-                c.aetv =  context->athlete->paceZones(false)->getAeT(range);
-
-                config << c;
-            }
-        }
-
-        // SWIM PACE
-        if (context->athlete->paceZones(true)) {
-
-            for (int range=0; range < context->athlete->paceZones(true)->getRangeSize(); range++) {
-
-                gcZoneConfig c("swim");
-                c.date =  context->athlete->paceZones(true)->getStartDate(range);
-                c.cv =  context->athlete->paceZones(true)->getCV(range);
-                c.aetv =  context->athlete->paceZones(true)->getAeT(range);
-
-                config << c;
-            }
-        }
-
     }
 
     // no config ?
@@ -409,86 +334,45 @@ Bindings::athleteZones(PyObject* date, QString sport) const
     QList<gcZoneConfig> compressed;
     std::sort(config.begin(),config.end());
 
-    // all will have date zero
-    gcZoneConfig lastRun("run"), lastBike("bike"), lastSwim("swim");
+    foreach (QString sp, GlobalContext::context()->rideMetadata->sports()) {
 
-    foreach(gcZoneConfig x, config) {
+        // will have date zero
+        gcZoneConfig last(sp);
 
-        // BIKE
-        if (x.sport == "bike" && (sport=="" || sport=="bike")) {
+        foreach(gcZoneConfig x, config) {
 
-            // new date so save what we have collected
-            if (x.date > lastBike.date) {
+            if (x.sport == sp && (sport=="" || QString::compare(sport, sp, Qt::CaseInsensitive)==0)) {
 
-                if (lastBike.date > QDate(01,01,01))  compressed << lastBike;
-                lastBike.date = x.date;
-            }
+                // new date so save what we have collected
+                if (x.date > last.date) {
 
-            // merge new values
-            if (x.date == lastBike.date) {
-                // merge with prior
-                if (x.cp) lastBike.cp = x.cp;
-                if (x.wprime) lastBike.wprime = x.wprime;
-                if (x.pmax) lastBike.pmax = x.pmax;
-                if (x.aetp) lastBike.aetp = x.aetp;
-                if (x.ftp) lastBike.ftp = x.ftp;
-                if (x.lthr) lastBike.lthr = x.lthr;
-                if (x.aethr) lastBike.aethr = x.aethr;
-                if (x.rhr) lastBike.rhr = x.rhr;
-                if (x.hrmax) lastBike.hrmax = x.hrmax;
-                if (x.zoneslow.length()) lastBike.zoneslow = x.zoneslow;
-            }
-        }
+                    if (last.date > QDate(01,01,01))  compressed << last;
+                    last.date = x.date;
+                }
 
-        // RUN
-        if (x.sport == "run" && (sport=="" || sport=="run")) {
-
-            // new date so save what we have collected
-            if (x.date > lastRun.date) {
-                // add last
-                if (lastRun.date > QDate(01,01,01)) compressed << lastRun;
-                lastRun.date = x.date;
-            }
-
-            // merge new values
-            if (x.date == lastRun.date) {
-                // merge with prior
-                if (x.cp) lastRun.cp = x.cp;
-                if (x.wprime) lastRun.wprime = x.wprime;
-                if (x.pmax) lastRun.pmax = x.pmax;
-                if (x.aetp) lastRun.aetp = x.aetp;
-                if (x.ftp) lastRun.ftp = x.ftp;
-                if (x.lthr) lastRun.lthr = x.lthr;
-                if (x.aethr) lastRun.aethr = x.aethr;
-                if (x.rhr) lastRun.rhr = x.rhr;
-                if (x.hrmax) lastRun.hrmax = x.hrmax;
-                if (x.cv) lastRun.cv = x.cv;
-                if (x.aetv) lastRun.cv = x.aetv;
-                if (x.zoneslow.length()) lastRun.zoneslow = x.zoneslow;
+                // merge new values
+                if (x.date == last.date) {
+                    // merge with prior
+                    if (x.cp) last.cp = x.cp;
+                    if (x.wprime) last.wprime = x.wprime;
+                    if (x.pmax) last.pmax = x.pmax;
+                    if (x.aetp) last.aetp = x.aetp;
+                    if (x.ftp) last.ftp = x.ftp;
+                    if (x.lthr) last.lthr = x.lthr;
+                    if (x.aethr) last.aethr = x.aethr;
+                    if (x.rhr) last.rhr = x.rhr;
+                    if (x.hrmax) last.hrmax = x.hrmax;
+                    if (x.cv) last.cv = x.cv;
+                    if (x.aetv) last.cv = x.aetv;
+                    if (x.zoneslow.length()) last.zoneslow = x.zoneslow;
+                    if (x.hrzoneslow.length()) last.hrzoneslow = x.hrzoneslow;
+                    if (x.pacezoneslow.length()) last.pacezoneslow = x.pacezoneslow;
+                }
             }
         }
 
-        // SWIM
-        if (x.sport == "swim" && (sport=="" || sport=="swim")) {
-
-            // new date so save what we have collected
-            if (x.date > lastSwim.date) {
-                // add last
-                if (lastSwim.date > QDate(01,01,01)) compressed << lastSwim;
-                lastSwim.date = x.date;
-            }
-
-            // merge new values
-            if (x.date == lastSwim.date) {
-                // merge with prior
-                if (x.cv) lastSwim.cv = x.cv;
-                if (x.aetv) lastSwim.aetv = x.aetv;
-            }
-        }
+        if (last.date > QDate(01,01,01)) compressed << last;
     }
-    if (lastBike.date > QDate(01,01,01)) compressed << lastBike;
-    if (lastRun.date > QDate(01,01,01)) compressed << lastRun;
-    if (lastSwim.date > QDate(01,01,01)) compressed << lastSwim;
 
     // now use the new compressed ones
     config = compressed;
@@ -514,6 +398,8 @@ Bindings::athleteZones(PyObject* date, QString sport) const
     PyObject* cv = PyList_New(size);
     PyObject* aetv = PyList_New(size);
     PyObject* zoneslow = PyList_New(size);
+    PyObject* hrzoneslow = PyList_New(size);
+    PyObject* pacezoneslow = PyList_New(size);
     PyObject* zonescolor = PyList_New(size);
 
     int index=0;
@@ -534,35 +420,52 @@ Bindings::athleteZones(PyObject* date, QString sport) const
         PyList_SET_ITEM(cv, index, PyFloat_FromDouble(x.cv));
         PyList_SET_ITEM(aetv, index, PyFloat_FromDouble(x.aetv));
 
-        int indexlow=0;
         PyObject* lows = PyList_New(x.zoneslow.length());
+        PyObject* hrlows = PyList_New(x.hrzoneslow.length());
+        PyObject* pacelows = PyList_New(x.pacezoneslow.length());
         PyObject* colors = PyList_New(x.zoneslow.length());
+        int indexlow=0;
         foreach(int low, x.zoneslow) {
             PyList_SET_ITEM(lows, indexlow, PyFloat_FromDouble(low));
             PyList_SET_ITEM(colors, indexlow, PyUnicode_FromString(zoneColor(indexlow, x.zoneslow.length()).name().toUtf8().constData()));
             indexlow++;
         }
+        indexlow=0;
+        foreach(int low, x.hrzoneslow) {
+            PyList_SET_ITEM(hrlows, indexlow, PyFloat_FromDouble(low));
+            indexlow++;
+        }
+        indexlow=0;
+        foreach(double low, x.pacezoneslow) {
+            PyList_SET_ITEM(pacelows, indexlow, PyFloat_FromDouble(low));
+            indexlow++;
+        }
         PyList_SET_ITEM(zoneslow, index, lows);
+        PyList_SET_ITEM(hrzoneslow, index, hrlows);
+        PyList_SET_ITEM(pacezoneslow, index, pacelows);
         PyList_SET_ITEM(zonescolor, index, colors);
+
         index++;
     }
 
     // add to dict
-    PyDict_SetItemString(dict, "date", dates);
-    PyDict_SetItemString(dict, "sport", sports);
-    PyDict_SetItemString(dict, "cp", cp);
-    PyDict_SetItemString(dict, "wprime", wprime);
-    PyDict_SetItemString(dict, "pmax", pmax);
-    PyDict_SetItemString(dict, "aetp", aetp);
-    PyDict_SetItemString(dict, "ftp", ftp);
-    PyDict_SetItemString(dict, "lthr", lthr);
-    PyDict_SetItemString(dict, "aethr", aethr);
-    PyDict_SetItemString(dict, "rhr", rhr);
-    PyDict_SetItemString(dict, "hrmax", hrmax);
-    PyDict_SetItemString(dict, "cv", cv);
-    PyDict_SetItemString(dict, "aetv", aetv);
-    PyDict_SetItemString(dict, "zoneslow", zoneslow);
-    PyDict_SetItemString(dict, "zonescolor", zonescolor);
+    PyDict_SetItemString_Steal(dict, "date", dates);
+    PyDict_SetItemString_Steal(dict, "sport", sports);
+    PyDict_SetItemString_Steal(dict, "cp", cp);
+    PyDict_SetItemString_Steal(dict, "wprime", wprime);
+    PyDict_SetItemString_Steal(dict, "pmax", pmax);
+    PyDict_SetItemString_Steal(dict, "aetp", aetp);
+    PyDict_SetItemString_Steal(dict, "ftp", ftp);
+    PyDict_SetItemString_Steal(dict, "lthr", lthr);
+    PyDict_SetItemString_Steal(dict, "aethr", aethr);
+    PyDict_SetItemString_Steal(dict, "rhr", rhr);
+    PyDict_SetItemString_Steal(dict, "hrmax", hrmax);
+    PyDict_SetItemString_Steal(dict, "cv", cv);
+    PyDict_SetItemString_Steal(dict, "aetv", aetv);
+    PyDict_SetItemString_Steal(dict, "zoneslow", zoneslow);
+    PyDict_SetItemString_Steal(dict, "hrzoneslow", hrzoneslow);
+    PyDict_SetItemString_Steal(dict, "pacezoneslow", pacezoneslow);
+    PyDict_SetItemString_Steal(dict, "zonescolor", zonescolor);
 
     return dict;
 }
@@ -651,11 +554,20 @@ Bindings::fromDateTime(PyObject* activity) const
 }
 
 RideFile *
-Bindings::selectRideFile(PyObject *activity) const
+Bindings::selectRideFile(PyObject *activity, int compareindex) const
 {
+    Context *context = python->contexts.value(threadid()).context;
     RideFile *f;
     RideItem* item = fromDateTime(activity);
     if (item && item->ride()) return item->ride();
+
+    // return compare item when requested
+    if (compareindex >= 0 && context && context->isCompareIntervals) {
+        int idx = 0;
+        foreach(CompareInterval p, context->compareIntervals)
+            if (p.isChecked() && compareindex == idx++) return p.rideItem->ride();
+        return nullptr;
+    }
 
     f = python->contexts.value(threadid()).rideFile;
     if (f) return f;
@@ -663,7 +575,6 @@ Bindings::selectRideFile(PyObject *activity) const
     item = python->contexts.value(threadid()).item;
     if (item && item->ride()) return item->ride();
 
-    Context *context = python->contexts.value(threadid()).context;
     if (context) {
         item = const_cast<RideItem*>(context->currentRideItem());
         if (item && item->ride()) return item->ride();
@@ -674,9 +585,9 @@ Bindings::selectRideFile(PyObject *activity) const
 
 // get the data series for the currently selected ride
 PythonDataSeries*
-Bindings::series(int type, PyObject* activity) const
+Bindings::series(int type, PyObject* activity, int compareindex) const
 {
-    RideFile *f = selectRideFile(activity);
+    RideFile *f = selectRideFile(activity, compareindex);
     if (f == nullptr) return nullptr;
 
     // count the included points, create data series output and copy data
@@ -703,9 +614,9 @@ Bindings::series(int type, PyObject* activity) const
 
 // get the wbal series for the currently selected ride
 PythonDataSeries*
-Bindings::activityWbal(PyObject* activity) const
+Bindings::activityWbal(PyObject* activity, int compareindex) const
 {
-    RideFile *f = selectRideFile(activity);
+    RideFile *f = selectRideFile(activity, compareindex);
     if (f == nullptr) return nullptr;
 
     f->recalculateDerivedSeries();
@@ -731,7 +642,7 @@ Bindings::activityWbal(PyObject* activity) const
 
 // get the xdata series for the currently selected ride
 PythonDataSeries*
-Bindings::xdata(QString name, QString series, QString join, PyObject* activity) const
+Bindings::xdata(QString name, QString series, QString join, PyObject* activity, int compareindex) const
 {
     // XDATA join method
     RideFile::XDataJoin xjoin;
@@ -746,7 +657,7 @@ Bindings::xdata(QString name, QString series, QString join, PyObject* activity) 
         case 3: xjoin = RideFile::RESAMPLE; break;
     }
 
-    RideFile *f = selectRideFile(activity);
+    RideFile *f = selectRideFile(activity, compareindex);
     if (f == nullptr) return nullptr;
 
     if (!f->xdata().contains(name)) return NULL; // No such XData series
@@ -771,9 +682,9 @@ Bindings::xdata(QString name, QString series, QString join, PyObject* activity) 
 }
 
 // get the xdata series for the currently selected ride, without interpolation
-PythonXDataSeries *Bindings::xdataSeries(QString name, QString series, PyObject* activity) const
+PythonXDataSeries *Bindings::xdataSeries(QString name, QString series, PyObject* activity, int compareindex) const
 {
-    RideFile *f = selectRideFile(activity);
+    RideFile *f = selectRideFile(activity, compareindex);
     if (f == nullptr) return nullptr;
 
     if (!f->xdata().contains(name)) return NULL; // No such XData series
@@ -820,9 +731,9 @@ PythonXDataSeries *Bindings::xdataSeries(QString name, QString series, PyObject*
 }
 
 PyObject*
-Bindings::xdataNames(QString name, PyObject* activity) const
+Bindings::xdataNames(QString name, PyObject* activity, int compareindex) const
 {
-    RideFile *f = selectRideFile(activity);
+    RideFile *f = selectRideFile(activity, compareindex);
     if (f == nullptr) return nullptr;
 
     QStringList namelist;
@@ -853,9 +764,9 @@ Bindings::seriesName(int type) const
 }
 
 bool
-Bindings::seriesPresent(int type, PyObject* activity) const
+Bindings::seriesPresent(int type, PyObject* activity, int compareindex) const
 {
-    RideFile *f = selectRideFile(activity);
+    RideFile *f = selectRideFile(activity, compareindex);
     if (f == nullptr) return false;
 
     return f->isDataPresent(static_cast<RideFile::SeriesType>(type));
@@ -1009,7 +920,9 @@ Bindings::activityMetrics(bool compare) const
                 if (p.isChecked()) {
 
                     // create a tuple (metrics, color)
-                    PyObject* tuple = Py_BuildValue("(Os)", activityMetrics(p.rideItem), p.color.name().toUtf8().constData());
+                    PyObject* am = activityMetrics(p.rideItem);
+                    PyObject* tuple = Py_BuildValue("(Os)", am, p.color.name().toUtf8().constData());
+                    Py_DECREF(am);
                     PyList_SET_ITEM(list, idx++, tuple);
                 }
             }
@@ -1022,7 +935,9 @@ Bindings::activityMetrics(bool compare) const
             RideItem *item = const_cast<RideItem*>(context->currentRideItem());
             PyObject* list = PyList_New(1);
 
-            PyObject* tuple = Py_BuildValue("(Os)", activityMetrics(item), "#FF00FF");
+            PyObject* am = activityMetrics(item);
+            PyObject* tuple = Py_BuildValue("(Os)", am, "#FF00FF");
+            Py_DECREF(am);
             PyList_SET_ITEM(list, 0, tuple);
 
             return list;
@@ -1055,9 +970,9 @@ Bindings::activityMetrics(RideItem* item) const
     //
     if (PyDateTimeAPI == NULL) PyDateTime_IMPORT;// import datetime if necessary
     QDate d = item->dateTime.date();
-    PyDict_SetItemString(dict, "date", PyDate_FromDate(d.year(), d.month(), d.day()));
+    PyDict_SetItemString_Steal(dict, "date", PyDate_FromDate(d.year(), d.month(), d.day()));
     QTime t = item->dateTime.time();
-    PyDict_SetItemString(dict, "time", PyTime_FromTime(t.hour(), t.minute(), t.second(), t.msec()*10));
+    PyDict_SetItemString_Steal(dict, "time", PyTime_FromTime(t.hour(), t.minute(), t.second(), t.msec()*10));
 
     //
     // METRICS
@@ -1080,7 +995,7 @@ Bindings::activityMetrics(RideItem* item) const
         }
 
         // add to the dict
-        PyDict_SetItemString(dict, name.toUtf8().constData(), PyFloat_FromDouble(value));
+        PyDict_SetItemString_Steal(dict, name.toUtf8().constData(), PyFloat_FromDouble(value));
     }
 
     //
@@ -1093,7 +1008,7 @@ Bindings::activityMetrics(RideItem* item) const
             GlobalContext::context()->specialFields.isMetric(field.name)) continue;
 
         // add to the dict
-        PyDict_SetItemString(dict, field.name.replace(" ","_").toUtf8().constData(), PyUnicode_FromString(item->getText(field.name, "").toUtf8().constData()));
+        PyDict_SetItemString_Steal(dict, field.name.replace(" ","_").toUtf8().constData(), PyUnicode_FromString(item->getText(field.name, "").toUtf8().constData()));
     }
 
     //
@@ -1115,7 +1030,7 @@ Bindings::activityMetrics(RideItem* item) const
         color = item->color.name();
 
     // add to the dict
-    PyDict_SetItemString(dict, "color", PyUnicode_FromString(color.toUtf8().constData()));
+    PyDict_SetItemString_Steal(dict, "color", PyUnicode_FromString(color.toUtf8().constData()));
 
     return dict;
 }
@@ -1145,7 +1060,9 @@ Bindings::seasonMetrics(bool all, QString filter, bool compare) const
                 if (p.isChecked()) {
 
                     // create a tuple (metrics, color)
-                    PyObject* tuple = Py_BuildValue("(Os)", seasonMetrics(all, DateRange(p.start, p.end), filter), p.color.name().toUtf8().constData());
+                    PyObject* sm = seasonMetrics(all, DateRange(p.start, p.end), filter);
+                    PyObject* tuple = Py_BuildValue("(Os)", sm, p.color.name().toUtf8().constData());
+                    Py_DECREF(sm);
                     // add to back and move on
                     PyList_SET_ITEM(list, idx++, tuple);
                 }
@@ -1160,7 +1077,9 @@ Bindings::seasonMetrics(bool all, QString filter, bool compare) const
 
             // create a tuple (metrics, color)
             DateRange range = context->currentDateRange();
-            PyObject* tuple = Py_BuildValue("(Os)", seasonMetrics(all, range, filter), "#FF00FF");
+            PyObject* sm = seasonMetrics(all, range, filter);
+            PyObject* tuple = Py_BuildValue("(Os)", sm, "#FF00FF");
+            Py_DECREF(sm);
             // add to back and move on
             PyList_SET_ITEM(list, 0, tuple);
 
@@ -1253,9 +1172,9 @@ Bindings::seasonMetrics(bool all, DateRange range, QString filter) const
         }
     }
 
-    PyDict_SetItemString(dict, "date", datelist);
-    PyDict_SetItemString(dict, "time", timelist);
-    PyDict_SetItemString(dict, "color", colorlist);
+    PyDict_SetItemString_Steal(dict, "date", datelist);
+    PyDict_SetItemString_Steal(dict, "time", timelist);
+    PyDict_SetItemString_Steal(dict, "color", colorlist);
 
     //
     // METRICS
@@ -1282,7 +1201,7 @@ Bindings::seasonMetrics(bool all, DateRange range, QString filter) const
         }
 
         // add to the dict
-        PyDict_SetItemString(dict, name.toUtf8().constData(), metriclist);
+        PyDict_SetItemString_Steal(dict, name.toUtf8().constData(), metriclist);
     }
 
     //
@@ -1306,7 +1225,7 @@ Bindings::seasonMetrics(bool all, DateRange range, QString filter) const
         }
 
         // add to the dict
-        PyDict_SetItemString(dict, field.name.replace(" ","_").toUtf8().constData(), metalist);
+        PyDict_SetItemString_Steal(dict, field.name.replace(" ","_").toUtf8().constData(), metalist);
     }
 
     return dict;
@@ -1337,7 +1256,9 @@ Bindings::seasonIntervals(QString type, bool compare) const
                 if (p.isChecked()) {
 
                     // create a tuple (metrics, color)
-                    PyObject* tuple = Py_BuildValue("(Os)", seasonIntervals(DateRange(p.start, p.end), type), p.color.name().toUtf8().constData());
+                    PyObject* si = seasonIntervals(DateRange(p.start, p.end), type);
+                    PyObject* tuple = Py_BuildValue("(Os)", si, p.color.name().toUtf8().constData());
+                    Py_DECREF(si);
                     // add to back and move on
                     PyList_SET_ITEM(list, idx++, tuple);
                 }
@@ -1352,7 +1273,9 @@ Bindings::seasonIntervals(QString type, bool compare) const
 
             // create a tuple (metrics, color)
             DateRange range = context->currentDateRange();
-            PyObject* tuple = Py_BuildValue("(Os)", seasonIntervals(range, type), "#FF00FF");
+            PyObject* si = seasonIntervals(range, type);
+            PyObject* tuple = Py_BuildValue("(Os)", si, "#FF00FF");
+            Py_DECREF(si);
             // add to back and move on
             PyList_SET_ITEM(list, 0, tuple);
 
@@ -1452,11 +1375,11 @@ Bindings::seasonIntervals(DateRange range, QString type) const
         }
     }
 
-    PyDict_SetItemString(dict, "date", datelist);
-    PyDict_SetItemString(dict, "time", timelist);
-    PyDict_SetItemString(dict, "name", namelist);
-    PyDict_SetItemString(dict, "type", typelist);
-    PyDict_SetItemString(dict, "color", colorlist);
+    PyDict_SetItemString_Steal(dict, "date", datelist);
+    PyDict_SetItemString_Steal(dict, "time", timelist);
+    PyDict_SetItemString_Steal(dict, "name", namelist);
+    PyDict_SetItemString_Steal(dict, "type", typelist);
+    PyDict_SetItemString_Steal(dict, "color", colorlist);
 
     //
     // METRICS
@@ -1487,10 +1410,16 @@ Bindings::seasonIntervals(DateRange range, QString type) const
         }
 
         // add to the dict
-        PyDict_SetItemString(dict, name.toUtf8().constData(), metriclist);
+        PyDict_SetItemString_Steal(dict, name.toUtf8().constData(), metriclist);
     }
 
     return dict;
+}
+
+QString
+Bindings::intervalType(int type) const
+{
+    return RideFileInterval::typeDescription(static_cast<RideFileInterval::IntervalType>(type));
 }
 
 PyObject*
@@ -1563,12 +1492,12 @@ Bindings::activityIntervals(QString type, PyObject* activity) const
             idx++;
         }
 
-    PyDict_SetItemString(dict, "start", startlist);
-    PyDict_SetItemString(dict, "stop", stoplist);
-    PyDict_SetItemString(dict, "name", namelist);
-    PyDict_SetItemString(dict, "type", typelist);
-    PyDict_SetItemString(dict, "color", colorlist);
-    PyDict_SetItemString(dict, "selected", selectedlist);
+    PyDict_SetItemString_Steal(dict, "start", startlist);
+    PyDict_SetItemString_Steal(dict, "stop", stoplist);
+    PyDict_SetItemString_Steal(dict, "name", namelist);
+    PyDict_SetItemString_Steal(dict, "type", typelist);
+    PyDict_SetItemString_Steal(dict, "color", colorlist);
+    PyDict_SetItemString_Steal(dict, "selected", selectedlist);
 
     //
     // METRICS
@@ -1593,7 +1522,7 @@ Bindings::activityIntervals(QString type, PyObject* activity) const
         }
 
         // add to the dict
-        PyDict_SetItemString(dict, name.toUtf8().constData(), metriclist);
+        PyDict_SetItemString_Steal(dict, name.toUtf8().constData(), metriclist);
     }
 
     return dict;
@@ -1709,11 +1638,7 @@ Bindings::setTag(QString name, QString value, PyObject *activity) const
     Context *context = python->contexts.value(threadid()).context;
     if (context == nullptr) return false;
 
-    RideItem* m = fromDateTime(activity);
-    if (m == nullptr) m = const_cast<RideItem*>(context->currentRideItem());
-    if (m == nullptr) return false;
-
-    RideFile *f = m->ride();
+    RideFile *f = selectRideFile(activity);
     if (f == nullptr) return false;
 
     name = name.replace("_"," ");
@@ -1735,10 +1660,16 @@ Bindings::setTag(QString name, QString value, PyObject *activity) const
         f->setTag(name, value);
     }
 
-    // rideFile is now dirty!
-    m->setDirty(true);
-    // get refresh done, coz overrides state has changed
-    m->notifyRideMetadataChanged();
+    // Notify changes if activity is already in rideCache
+    RideItem* m = fromDateTime(activity);
+    if (m == nullptr) m = python->contexts.value(threadid()).item;
+    if (m == nullptr) m = context->rideItem();
+    if (m && m->dateTime == f->startTime()) {
+        // rideFile is now dirty!
+        m->setDirty(true);
+        // get refresh done, coz overrides state has changed
+        m->notifyRideMetadataChanged();
+    }
 
     return true;
 }
@@ -1752,23 +1683,25 @@ Bindings::delTag(QString name, PyObject *activity) const
     Context *context = python->contexts.value(threadid()).context;
     if (context == nullptr) return false;
 
-    RideItem* m = fromDateTime(activity);
-    if (m == nullptr) m = const_cast<RideItem*>(context->currentRideItem());
-    if (m == nullptr) return false;
-
-    RideFile *f = m->ride();
+    RideFile *f = selectRideFile(activity);
     if (f == nullptr) return false;
+
+    RideItem* m = fromDateTime(activity);
+    if (m == nullptr) m = python->contexts.value(threadid()).item;
+    if (m == nullptr) m = context->rideItem();
 
     name = name.replace("_"," ");
     if (GlobalContext::context()->specialFields.isMetric(name)) {
 
         if (f->metricOverrides.remove(GlobalContext::context()->specialFields.metricSymbol(name))) {
 
-            // rideFile is now dirty!
-            m->setDirty(true);
-            // get refresh done, coz overrides state has changed
-            m->notifyRideMetadataChanged();
-
+            // Notify changes if activity is already in rideCache
+            if (m && m->dateTime == f->startTime()) {
+                // rideFile is now dirty!
+                m->setDirty(true);
+                // get refresh done, coz overrides state has changed
+                m->notifyRideMetadataChanged();
+	    }
             return true;
         }
         return false;
@@ -1777,11 +1710,13 @@ Bindings::delTag(QString name, PyObject *activity) const
 
         if (f->removeTag(name)) {
 
-            // rideFile is now dirty!
-            m->setDirty(true);
-            // get refresh done, coz overrides state has changed
-            m->notifyRideMetadataChanged();
-
+            // Notify changes if activity is already in rideCache
+            if (m && m->dateTime == f->startTime()) {
+                // rideFile is now dirty!
+                m->setDirty(true);
+                // get refresh done, coz overrides state has changed
+                m->notifyRideMetadataChanged();
+	    }
             return true;
         }
         return false;
@@ -1794,15 +1729,31 @@ Bindings::hasTag(QString name, PyObject *activity) const
     Context *context = python->contexts.value(threadid()).context;
     if (context == nullptr) return false;
 
-    RideItem* m = fromDateTime(activity);
-    if (m == nullptr) m = const_cast<RideItem*>(context->currentRideItem());
-    if (m == nullptr) return false;
+    RideFile *f = selectRideFile(activity);
+    if (f == nullptr) return false;
 
     name = name.replace("_"," ");
     if (GlobalContext::context()->specialFields.isMetric(name)) {
-        return m->overrides_.contains(GlobalContext::context()->specialFields.metricSymbol(name));
+        return f->metricOverrides.contains(GlobalContext::context()->specialFields.metricSymbol(name));
     } else {
-        return m->hasText(name);
+        return f->tags().contains(name);
+    }
+}
+
+QString
+Bindings::getTag(QString name, PyObject *activity) const
+{
+    Context *context = python->contexts.value(threadid()).context;
+    if (context == nullptr) return QString();
+
+    RideFile *f = selectRideFile(activity);
+    if (f == nullptr) return QString();
+
+    name = name.replace("_"," ");
+    if (GlobalContext::context()->specialFields.isMetric(name)) {
+        return f->metricOverrides[GlobalContext::context()->specialFields.metricSymbol(name)]["value"];
+    } else {
+        return f->getTag(name, "");
     }
 }
 
@@ -1896,7 +1847,9 @@ Bindings::activityMeanmax(bool compare) const
                 if (p.isChecked()) {
 
                     // create a tuple (meanmax, color)
-                    PyObject* tuple = Py_BuildValue("(Os)", activityMeanmax(p.rideItem), p.color.name().toUtf8().constData());
+                    PyObject* am = activityMeanmax(p.rideItem);
+                    PyObject* tuple = Py_BuildValue("(Os)", am, p.color.name().toUtf8().constData());
+                    Py_DECREF(am);
                     PyList_SET_ITEM(list, idx++, tuple);
                 }
             }
@@ -1908,7 +1861,9 @@ Bindings::activityMeanmax(bool compare) const
             if (context->currentRideItem()==NULL) return NULL;
             PyObject* list = PyList_New(1);
 
-            PyObject* tuple = Py_BuildValue("(Os)", activityMeanmax(context->currentRideItem()), "#FF00FF");
+            PyObject* am = activityMeanmax(context->currentRideItem());
+            PyObject* tuple = Py_BuildValue("(Os)", am, "#FF00FF");
+            Py_DECREF(am);
             PyList_SET_ITEM(list, 0, tuple);
 
             return list;
@@ -1947,7 +1902,9 @@ Bindings::seasonMeanmax(bool all, QString filter, bool compare) const
                 if (p.isChecked()) {
 
                     // create a tuple (meanmax, color)
-                    PyObject* tuple = Py_BuildValue("(Os)", seasonMeanmax(all, DateRange(p.start, p.end), filter), p.color.name().toUtf8().constData());
+                    PyObject* sm = seasonMeanmax(all, DateRange(p.start, p.end), filter);
+                    PyObject* tuple = Py_BuildValue("(Os)", sm, p.color.name().toUtf8().constData());
+                    Py_DECREF(sm);
                     // add to back and move on
                     PyList_SET_ITEM(list, idx++, tuple);
                 }
@@ -1962,7 +1919,9 @@ Bindings::seasonMeanmax(bool all, QString filter, bool compare) const
 
             // create a tuple (meanmax, color)
             DateRange range = context->currentDateRange();
-            PyObject* tuple = Py_BuildValue("(Os)", seasonMeanmax(all, range, filter), "#FF00FF");
+            PyObject* sm = seasonMeanmax(all, range, filter);
+            PyObject* tuple = Py_BuildValue("(Os)", sm, "#FF00FF");
+            Py_DECREF(sm);
             // add to back and move on
             PyList_SET_ITEM(list, 0, tuple);
 
@@ -2046,7 +2005,7 @@ Bindings::rideFileCacheMeanmax(RideFileCache* cache) const
         for(int j=0; j<values.count(); j++) PyList_SET_ITEM(list, j, PyFloat_FromDouble(values[j]));
 
         // add to the dict
-        PyDict_SetItemString(ans, RideFile::seriesName(series, true).toUtf8().constData(), list);
+        PyDict_SetItemString_Steal(ans, RideFile::seriesName(series, true).toUtf8().constData(), list);
 
         // if is power add the dates
         if(series == RideFile::watts) {
@@ -2065,7 +2024,7 @@ Bindings::rideFileCacheMeanmax(RideFileCache* cache) const
             }
 
             // add to the dict
-            PyDict_SetItemString(ans, "power_date", datelist);
+            PyDict_SetItemString_Steal(ans, "power_date", datelist);
         }
     }
 
@@ -2119,7 +2078,7 @@ Bindings::seasonPmc(bool all, QString metric) const
         }
 
         // add to the dict
-        PyDict_SetItemString(ans, "date", datelist);
+        PyDict_SetItemString_Steal(ans, "date", datelist);
 
         // PMC DATA
 
@@ -2160,11 +2119,11 @@ Bindings::seasonPmc(bool all, QString metric) const
         }
 
         // add to the dict
-        PyDict_SetItemString(ans, "stress", stress);
-        PyDict_SetItemString(ans, "lts", lts);
-        PyDict_SetItemString(ans, "sts", sts);
-        PyDict_SetItemString(ans, "sb", sb);
-        PyDict_SetItemString(ans, "rr", rr);
+        PyDict_SetItemString_Steal(ans, "stress", stress);
+        PyDict_SetItemString_Steal(ans, "lts", lts);
+        PyDict_SetItemString_Steal(ans, "sts", sts);
+        PyDict_SetItemString_Steal(ans, "sb", sb);
+        PyDict_SetItemString_Steal(ans, "rr", rr);
 
         // return it
         return ans;
@@ -2214,7 +2173,7 @@ Bindings::seasonMeasures(bool all, QString group) const
         }
 
         // add to the dict
-        PyDict_SetItemString(ans, "date", datelist);
+        PyDict_SetItemString_Steal(ans, "date", datelist);
 
         // MEASURES DATA
         QStringList fieldSymbols = context->athlete->measures->getFieldSymbols(groupIdx);
@@ -2237,7 +2196,7 @@ Bindings::seasonMeasures(bool all, QString group) const
 
         // add to the dict
         for (int fieldIdx=0; fieldIdx<fields.count(); fieldIdx++)
-            PyDict_SetItemString(ans, fieldSymbols[fieldIdx].toUtf8().constData(), fields[fieldIdx]);
+            PyDict_SetItemString_Steal(ans, fieldSymbols[fieldIdx].toUtf8().constData(), fields[fieldIdx]);
 
         // return it
         return ans;
@@ -2305,10 +2264,10 @@ Bindings::season(bool all, bool compare) const
     }
 
     // list into a data.frame
-    PyDict_SetItemString(ans, "start", start);
-    PyDict_SetItemString(ans, "end", end);
-    PyDict_SetItemString(ans, "name", name);
-    PyDict_SetItemString(ans, "color", color);
+    PyDict_SetItemString_Steal(ans, "start", start);
+    PyDict_SetItemString_Steal(ans, "end", end);
+    PyDict_SetItemString_Steal(ans, "name", name);
+    PyDict_SetItemString_Steal(ans, "color", color);
 
     // return it
     return ans;
@@ -2360,7 +2319,9 @@ Bindings::seasonPeaks(QString series, int duration, bool all, QString filter, bo
                 if (p.isChecked()) {
 
                     // create a tuple (peaks, color)
-                    PyObject* tuple = Py_BuildValue("(Os)", seasonPeaks(all, DateRange(p.start, p.end), filter, seriesList, durations), p.color.name().toUtf8().constData());
+                    PyObject* sp = seasonPeaks(all, DateRange(p.start, p.end), filter, seriesList, durations);
+                    PyObject* tuple = Py_BuildValue("(Os)", sp, p.color.name().toUtf8().constData());
+                    Py_DECREF(sp);
                     // add to back and move on
                     PyList_SET_ITEM(list, idx++, tuple);
                 }
@@ -2375,7 +2336,9 @@ Bindings::seasonPeaks(QString series, int duration, bool all, QString filter, bo
 
             // create a tuple (peaks, color)
             DateRange range = context->currentDateRange();
-            PyObject* tuple = Py_BuildValue("(Os)", seasonPeaks(all, range, filter, seriesList, durations), "#FF00FF");
+            PyObject* sp = seasonPeaks(all, range, filter, seriesList, durations);
+            PyObject* tuple = Py_BuildValue("(Os)", sp, "#FF00FF");
+            Py_DECREF(sp);
             // add to back and move on
             PyList_SET_ITEM(list, 0, tuple);
 
@@ -2454,7 +2417,7 @@ Bindings::seasonPeaks(bool all, DateRange range, QString filter, QList<RideFile:
     }
 
     // add to the dict
-    PyDict_SetItemString(ans, "datetime", datetimelist);
+    PyDict_SetItemString_Steal(ans, "datetime", datetimelist);
 
     foreach(RideFile::SeriesType pseries, series) {
 
@@ -2484,9 +2447,19 @@ Bindings::seasonPeaks(bool all, DateRange range, QString filter, QList<RideFile:
             }
 
             // add to the dict
-            PyDict_SetItemString(ans, name.toUtf8().constData(), list);
+            PyDict_SetItemString_Steal(ans, name.toUtf8().constData(), list);
         }
     }
 
     return ans;
+}
+
+
+int
+Bindings::PyDict_SetItemString_Steal
+(PyObject *p, const char *key, PyObject *val) const
+{
+    int ret = PyDict_SetItemString(p, key, val);
+    Py_DECREF(val);
+    return ret;
 }

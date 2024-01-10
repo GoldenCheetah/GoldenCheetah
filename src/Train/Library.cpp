@@ -174,10 +174,14 @@ Library::importFiles(Context *context, QStringList files, bool forcedialog)
             // set target filename
             targetSync = videosyncDir + "/" + QFileInfo(source).fileName();
 
-            if (!source.copy(targetSync)) {
+            if (targetSync != QFileInfo(source).absoluteFilePath() && QFile(targetSync).exists()) {
 
                 QMessageBox::warning(NULL, tr("Copy VideoSync Failed"),
                     QString(tr("%1 already exists in videoSync library: %2")).arg(QFileInfo(targetSync).fileName()).arg(videosyncDir));
+            } else if (targetSync != QFileInfo(source).absoluteFilePath() && !source.copy(targetSync)) {
+
+                QMessageBox::warning(NULL, tr("Copy VideoSync Failed"),
+                    QString(tr("%1 cannot be written to videoSync library %2. Check library path, permissions and free space")).arg(QFileInfo(targetSync).fileName()).arg(videosyncDir));
             }
 
             // still add it, it may not have been scanned
@@ -206,10 +210,16 @@ Library::importFiles(Context *context, QStringList files, bool forcedialog)
             // Some (highly advanced) files can be both workouts and videosync.
             // If we find a videosync here in the workout list then it was
             // emplaced above so don't the file copy again.
+
             if (!VideoSyncFile::isVideoSync(QFileInfo(source).fileName())) {
-                if (targetWorkout != QFileInfo(source).absoluteFilePath() && !source.copy(targetWorkout)) {
+                if (targetWorkout != QFileInfo(source).absoluteFilePath() && QFile(targetWorkout).exists()) {
+
                     QMessageBox::warning(NULL, tr("Copy Workout Failed"),
-                        QString(tr("%1 cannot be written to workout library %2, check permissions and free space")).arg(QFileInfo(targetWorkout).fileName()).arg(workoutDir));
+                        QString(tr("%1 already exists in workout library: %2")).arg(QFileInfo(source).fileName()).arg(workoutDir));
+                } else if (targetWorkout != QFileInfo(source).absoluteFilePath() && !source.copy(targetWorkout)) {
+
+                    QMessageBox::warning(NULL, tr("Copy Workout Failed"),
+                        QString(tr("%1 cannot be written to workout library %2. Check library path, permissions and free space")).arg(QFileInfo(targetWorkout).fileName()).arg(workoutDir));
                 }
             }
 
