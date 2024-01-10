@@ -258,7 +258,6 @@ RideEditor::configChanged(qint32)
 
     QPalette palette;
     palette.setBrush(QPalette::Window, QBrush(GColor(CPLOTBACKGROUND)));
-    palette.setBrush(QPalette::Background, QBrush(GColor(CPLOTBACKGROUND)));
     palette.setBrush(QPalette::Base, QBrush(GColor(CPLOTBACKGROUND)));
     palette.setColor(QPalette::WindowText, GCColor::invertColor(GColor(CPLOTBACKGROUND)));
     palette.setColor(QPalette::Text, GCColor::invertColor(GColor(CPLOTBACKGROUND)));
@@ -3049,12 +3048,12 @@ void XDataEditor::configChanged()
 {
 
     QPalette palette;
-    palette.setColor(QPalette::Active, QPalette::Background, GColor(CPLOTBACKGROUND));
+    palette.setColor(QPalette::Active, QPalette::Window, GColor(CPLOTBACKGROUND));
     palette.setColor(QPalette::Active, QPalette::Base, GColor(CPLOTBACKGROUND));
     palette.setColor(QPalette::Active, QPalette::WindowText, GCColor::invertColor(GColor(CPLOTBACKGROUND)));
     palette.setColor(QPalette::Active, QPalette::Text, GCColor::invertColor(GColor(CPLOTBACKGROUND)));
     palette.setColor(QPalette::Active, QPalette::Window, GCColor::invertColor(GColor(CPLOTBACKGROUND)));
-    palette.setColor(QPalette::Inactive, QPalette::Background, GColor(CPLOTBACKGROUND));
+    palette.setColor(QPalette::Inactive, QPalette::Window, GColor(CPLOTBACKGROUND));
     palette.setColor(QPalette::Inactive, QPalette::Base, GColor(CPLOTBACKGROUND));
     palette.setColor(QPalette::Inactive, QPalette::WindowText, GCColor::invertColor(GColor(CPLOTBACKGROUND)));
     palette.setColor(QPalette::Inactive, QPalette::Text, GCColor::invertColor(GColor(CPLOTBACKGROUND)));

@@ -459,7 +459,7 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     mainControls->addRow(smoothLabel, smoothLayout);
 
     QPalette palette;
-    palette.setBrush(QPalette::Background, QBrush(GColor(CRIDEPLOTBACKGROUND)));
+    palette.setBrush(QPalette::Window, QBrush(GColor(CRIDEPLOTBACKGROUND)));
 
     allPlot = new AllPlot(this, this, context);
     allPlot->setContentsMargins(0,0,0,0);
@@ -845,7 +845,7 @@ AllPlotWindow::configChanged(qint32 state)
     // 'complicate' or 'make busy' the general
     // look and feel
     QPalette palette;
-    palette.setBrush(QPalette::Background, QBrush(GColor(CRIDEPLOTBACKGROUND)));
+    palette.setBrush(QPalette::Window, QBrush(GColor(CRIDEPLOTBACKGROUND)));
     setPalette(palette); // propagates to children
 
     // set style sheets
@@ -1472,7 +1472,7 @@ AllPlotWindow::compareChanged()
 
         // create blank and add to gui
         QPalette palette;
-        palette.setBrush(QPalette::Background, Qt::NoBrush);
+        palette.setBrush(QPalette::Window, Qt::NoBrush);
 
         foreach(SeriesWanted x, wanted) {
 
@@ -3629,7 +3629,7 @@ AllPlotWindow::setupSeriesStackPlots()
     seriesstackFrame->setUpdatesEnabled(false);
 
     QPalette palette;
-    palette.setBrush(QPalette::Background, Qt::NoBrush);
+    palette.setBrush(QPalette::Window, Qt::NoBrush);
 
     QList<SeriesWanted> serieslist;
     SeriesWanted s;
@@ -3798,7 +3798,7 @@ AllPlotWindow::setupStackPlots()
         nbplot = (int)floor(duration/_stackWidth/60)+1;
 
     QPalette palette;
-    palette.setBrush(QPalette::Background, Qt::NoBrush);
+    palette.setBrush(QPalette::Window, Qt::NoBrush);
 
     for(int i = 0 ; i < nbplot ; i++) {
 

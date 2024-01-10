@@ -642,7 +642,6 @@ ChartSpace::configChanged(qint32 why)
     // text edit colors
     QPalette palette;
     palette.setColor(QPalette::Window, GColor(COVERVIEWBACKGROUND));
-    palette.setColor(QPalette::Background, GColor(COVERVIEWBACKGROUND));
 
     // only change base if moved away from white plots
     // which is a Mac thing
