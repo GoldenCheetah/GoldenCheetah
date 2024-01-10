@@ -211,7 +211,9 @@ RideImportWizard::RideImportWizard(RideAutoImportConfig *dirs, Context *context,
                 case RideAutoImportRule::importBackground90:
                 case RideAutoImportRule::importBackground180:
                 case RideAutoImportRule::importBackground360:
-                    if (f.created().date() >= selectAfter || f.lastModified().date() >= selectAfter) {
+                    if (f.birthTime().date() >= selectAfter
+                        || f.metadataChangeTime().date() >= selectAfter
+                        || f.lastModified().date() >= selectAfter) {
                         files.append(f.absoluteFilePath());
                         j++;
                     };
