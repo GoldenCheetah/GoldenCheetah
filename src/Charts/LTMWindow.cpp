@@ -67,7 +67,7 @@ LTMWindow::LTMWindow(Context *context) :
     QVBoxLayout *mainLayout = new QVBoxLayout;
 
     QPalette palette;
-    palette.setBrush(QPalette::Background, QBrush(GColor(CTRENDPLOTBACKGROUND)));
+    palette.setBrush(QPalette::Window, QBrush(GColor(CTRENDPLOTBACKGROUND)));
 
     // single plot
     plotWidget = new QWidget(this);
@@ -519,7 +519,6 @@ LTMWindow::configChanged(qint32)
     // inverted palette for data etc
     QPalette whitepalette;
     whitepalette.setBrush(QPalette::Window, QBrush(GColor(CTRENDPLOTBACKGROUND)));
-    whitepalette.setBrush(QPalette::Background, QBrush(GColor(CTRENDPLOTBACKGROUND)));
     whitepalette.setColor(QPalette::WindowText, GCColor::invertColor(GColor(CTRENDPLOTBACKGROUND)));
     whitepalette.setColor(QPalette::Base, GCColor::alternateColor(GColor(CPLOTBACKGROUND)));
     whitepalette.setColor(QPalette::Text, GCColor::invertColor(GColor(CTRENDPLOTBACKGROUND)));

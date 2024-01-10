@@ -324,7 +324,6 @@ AerolabWindow::configChanged(qint32)
   QPalette palette;
 
   palette.setColor(QPalette::Window, GColor(CPLOTBACKGROUND));
-  palette.setColor(QPalette::Background, GColor(CPLOTBACKGROUND));
 
   // only change base if moved away from white plots
   // which is a Mac thing
