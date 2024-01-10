@@ -352,7 +352,7 @@ RideImportWizard::init(QList<QString> original, Context * /*mainWindow*/)
         t = new QTableWidgetItem();
         t->setText(tr(""));
         t->setFlags(t->flags()  | Qt::ItemIsEditable);
-        t->setBackgroundColor(Qt::red);
+        t->setBackground(Qt::red);
         tableWidget->setItem(i,DATE_COLUMN,t);
 
         // Time
@@ -613,7 +613,7 @@ RideImportWizard::process()
                      t = new QTableWidgetItem();
                      t->setText(tr(""));
                      t->setFlags(t->flags()  | Qt::ItemIsEditable);
-                     t->setBackgroundColor(Qt::red);
+                     t->setBackground(Qt::red);
                      tableWidget->setItem(here+counter,DATE_COLUMN,t);
 
                      // Time
