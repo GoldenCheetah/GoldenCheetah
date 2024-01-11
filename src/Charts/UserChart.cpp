@@ -1398,7 +1398,7 @@ EditUserSeriesDialog::EditUserSeriesDialog(Context *context, bool rangemode, Gen
 
     // set the dialog
     QVBoxLayout *main = new QVBoxLayout(this);
-    main->setMargin(10*dpiXFactor);
+    main->setContentsMargins(10*dpiXFactor,10*dpiXFactor,10*dpiXFactor,10*dpiXFactor);
     QHBoxLayout *hf = new QHBoxLayout();
     QVBoxLayout *pl = new QVBoxLayout();
     QFormLayout *cf = new QFormLayout();
@@ -1731,7 +1731,7 @@ EditUserAxisDialog::EditUserAxisDialog(Context *context, GenericAxisInfo &info)
 
     // set the dialog
     QVBoxLayout *main = new QVBoxLayout(this);
-    main->setMargin(10*dpiXFactor);
+    main->setContentsMargins(10*dpiXFactor,10*dpiXFactor,10*dpiXFactor,10*dpiXFactor);
     QFormLayout *cf = new QFormLayout();
     main->addLayout(cf);
     main->addStretch();
