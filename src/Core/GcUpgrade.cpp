@@ -1003,7 +1003,6 @@ GcUpgradeLogDialog::GcUpgradeLogDialog(QDir homeDir) : QDialog(NULL, Qt::Dialog)
 
     report = new QWebEngineView(this);
     report->setContentsMargins(0,0,0,0);
-    report->page()->view()->setContentsMargins(0,0,0,0);
     report->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     //XXX WEBENGINE report->page()->setLinkDelegationPolicy(QWebPage::DelegateAllLinks);
     report->setContextMenuPolicy(Qt::NoContextMenu);
