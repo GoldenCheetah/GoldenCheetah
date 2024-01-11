@@ -104,6 +104,7 @@ PowerTapDevice::doWrite(CommPortPtr dev, char c, bool hwecho, QString &err)
 int
 PowerTapDevice::readUntilNewline(CommPortPtr dev, char *buf, int len, QString &err)
 {
+    Q_UNUSED(len);
     int sofar = 0;
     while (!hasNewline(buf, sofar)) {
         assert(sofar < len);
@@ -295,7 +296,7 @@ PowerTapDevice::download( const QDir &tmpdir,
     file.name = tmp.fileName();
 
     QTextStream os(&tmp);
-    os << hex;
+    os << Qt::hex;
     os.setPadChar('0');
 
     bool time_set = false;
@@ -314,7 +315,7 @@ PowerTapDevice::download( const QDir &tmpdir,
         if (!time_set && PowerTapUtil::is_time(data + i, bIsVer81)) {
             struct tm time;
             time_t timet = PowerTapUtil::unpack_time(data + i, &time, bIsVer81);
-            file.startTime.setTime_t( timet );
+            file.startTime.setSecsSinceEpoch( timet );
             time_set = true;
         }
     }

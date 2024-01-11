@@ -82,7 +82,7 @@ class CTableWidgetItem : public QTableWidgetItem
                              int factor;
                              double t1 = 0;
                              // split seconds, minutes, hours into a list and compute Seconds (Right to Left)
-                             list = text().split(":", QString::SkipEmptyParts, Qt::CaseInsensitive);
+                             list = text().split(":", Qt::SkipEmptyParts, Qt::CaseInsensitive);
                              factor = 1;
                              while (!list.isEmpty()) {
                                  t1 += list.takeLast().toInt() * factor; // start from the end
@@ -90,7 +90,7 @@ class CTableWidgetItem : public QTableWidgetItem
                              }
                              double t2 = 0;
                              // split seconds, minutes, hours into a list and compute Seconds (Right to Left)
-                             list = other.text().split(":", QString::SkipEmptyParts, Qt::CaseInsensitive);
+                             list = other.text().split(":", Qt::SkipEmptyParts, Qt::CaseInsensitive);
                              factor = 1;
                              while (!list.isEmpty()) {
                                  t2 += list.takeLast().toInt() * factor; // start from the end
@@ -793,6 +793,7 @@ ComparePane::dropEvent(QDropEvent *event)
             add.rideItem->getWeight();
             add.rideItem->isRun = add.data->isRun();
             add.rideItem->isSwim = add.data->isSwim();
+            add.rideItem->sport = add.data->sport();
             add.rideItem->present = add.data->getTag("Data", "");
             add.rideItem->samples = add.data->dataPoints().count() > 0;
 
@@ -825,11 +826,11 @@ ComparePane::dropEvent(QDropEvent *event)
             QVector<int> seasonCount(newOnes[0].sourceContext->athlete->seasons->seasons.count());
             QList<IntervalItem*> matches;
 
-            // loop through rides finding intervals on this route
+            // loop through rides finding intervals on this route for the same sport
             foreach(RideItem *ride, newOnes[0].sourceContext->athlete->rideCache->rides()) {
                 // find the interval?
                 foreach(IntervalItem *interval, ride->intervals(RideFileInterval::ROUTE)) {
-                    if (interval->route == newOnes[0].route) {
+                    if (interval->route == newOnes[0].route && interval->rideItem()->sport == newOnes[0].rideItem->sport) {
 
                         // add to the main list
                         matches << interval;

@@ -20,6 +20,7 @@
 #include "DialWindow.h"
 #include "Athlete.h"
 #include "Context.h"
+#include "RideFile.h"
 #include "HelpWhatsThis.h"
 
 DialWindow::DialWindow(Context *context) :
@@ -144,11 +145,14 @@ DialWindow::telemetryUpdate(const RealtimeData &rtData)
     if (series == RealtimeData::HeartRate ||
         series == RealtimeData::Watts  ||
         series == RealtimeData::AltWatts  ||
+        (series == RealtimeData::LRBalance && value != RideFile::NA)  ||
         series == RealtimeData::Cadence) {
 
         sum += value;
-        int j = index-(count<average*5?count:average*5);
-        sum -= rolling[(j>=0?j:150+j)];
+        if (count >= average*5) {
+            int j = index - average*5;
+            sum -= rolling[(j>=0?j:150+j)];
+        }
 
         //store value
         rolling[index] = value;
@@ -229,14 +233,14 @@ DialWindow::telemetryUpdate(const RealtimeData &rtData)
     case RealtimeData::LRBalance:
         {
           double left = 0; double right = 0;
-          if (value == 0) { // no LR Balance provided - so use previous logic
+          if (value == RideFile::NA) { // no LR Balance provided - so use previous logic
               double tot = rtData.getWatts() + rtData.getAltWatts();
               left = rtData.getWatts() / tot * 100.00f;
               right = 100.00 - left;
-              if (tot < 0.1) left = right = 0;
+              if (tot < 0.1 || left >= 100) left = right = 0; // No power or no AltWatts
           } else {
-              left = 100.00 - value; // value in ANT message is the "right" pedal portion
-              right = value;
+              right = 100.00 - displayValue; // value in GC is the "left" pedal portion
+              left = displayValue;
           }
           valueLabel->setText(QString("%1 / %2").arg(left, 0, 'f', 0).arg(right, 0, 'f', 0));
         }
@@ -546,19 +550,12 @@ void DialWindow::resizeEvent(QResizeEvent * )
 {
     QFont font;
 
-    // hidpi is a bit more complex
-    if (dpiXFactor > 1) {
+    // set point size within reasonable limits for low dpi screens
+    int size = (geometry().height() - 24) * 72 / logicalDpiY();
+    if (size <= 0) size = 4;
+    if (size >= 64) size = 64;
 
-        font.setPixelSize(pixelSizeForFont(font, geometry().height()-(24*dpiYFactor)));
-
-    } else {
-        // set point size within reasonable limits for low dpi screens
-        int size = (geometry().height() - 24) * 72 / logicalDpiY();
-        if (size <= 0) size = 4;
-        if (size >= 64) size = 64;
-
-        font.setPointSize(size);
-    }
+    font.setPointSize(size);
 
     font.setWeight(QFont::Bold);
     valueLabel->setFont(font);
@@ -573,6 +570,7 @@ void DialWindow::seriesChanged()
     if (series == RealtimeData::HeartRate ||
         series == RealtimeData::Watts  ||
         series == RealtimeData::AltWatts  ||
+        series == RealtimeData::LRBalance  ||
         series == RealtimeData::Cadence) {
         averageLabel->show();
         averageEdit->show();

@@ -235,7 +235,7 @@ TodaysPlan::readdir(QString path, QStringList &errors, QDateTime from, QDateTime
             // Prepare the Search Payload for First Call to Search
             QString userId = getSetting(GC_TODAYSPLAN_ATHLETE_ID, "").toString();
             // application/json
-            QByteArray jsonString;
+            QString jsonString;
             jsonString += "{\"criteria\": {";
             if (userId.length()>0)
                 jsonString += "\"user\": "+ QString("%1").arg(userId) +", ";
@@ -248,13 +248,15 @@ TodaysPlan::readdir(QString path, QStringList &errors, QDateTime from, QDateTime
             jsonString += "\"opts\": 1 "; // without fields description
             jsonString += "}";
 
-            printd("request: %s\n", jsonString.toStdString().c_str());
+            printd("request: %s\n", jsonString.toUtf8().toStdString().c_str());
 
-            QByteArray jsonStringDataSize = QByteArray::number(jsonString.size());
+            QByteArray jsonStringAsUTF8 = jsonString.toUtf8();
+
+            QByteArray jsonStringDataSize = QByteArray::number(jsonStringAsUTF8.size());
 
             request.setHeader(QNetworkRequest::ContentTypeHeader,"application/json");
             request.setRawHeader("Content-Length", jsonStringDataSize);
-            reply = nam->post(request, jsonString);
+            reply = nam->post(request, jsonStringAsUTF8);
         } else {
             // get further pages of the Search
             reply = nam->get(request);
@@ -395,7 +397,7 @@ TodaysPlan::writeFile(QByteArray &data, QString remotename, RideFile *ride)
     // MULTIPART *****************
 
     QHttpMultiPart *multiPart = new QHttpMultiPart(QHttpMultiPart::FormDataType);
-    QString boundary = QVariant(qrand()).toString()+QVariant(qrand()).toString()+QVariant(qrand()).toString();
+    QString boundary = QVariant(QRandomGenerator::global()->generate()).toString()+QVariant(QRandomGenerator::global()->generate()).toString()+QVariant(QRandomGenerator::global()->generate()).toString();
     multiPart->setBoundary(boundary.toLatin1());
 
     request.setRawHeader("Authorization", (QString("Bearer %1").arg(token)).toLatin1());

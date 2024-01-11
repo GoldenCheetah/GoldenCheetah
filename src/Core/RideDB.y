@@ -144,12 +144,14 @@ ride_tuple: string ':' string                                   {
                                                                      else if ($1 == "dbversion") jc->item.dbversion = $3.toInt();
                                                                      else if ($1 == "udbversion") jc->item.udbversion = $3.toInt();
                                                                      else if ($1 == "color") jc->item.color = QColor($3);
+                                                                     else if ($1 == "aero") jc->item.isAero = $3.toInt() ? true: false;
                                                                      else if ($1 == "sport") {
                                                                          jc->item.sport = ($3);
-                                                                         jc->item.isBike=jc->item.isRun=jc->item.isSwim=jc->item.isXtrain=false;
+                                                                         jc->item.isBike=jc->item.isRun=jc->item.isSwim=jc->item.isXtrain=jc->item.isAero=false;
                                                                          if ($3 == "Bike") jc->item.isBike = true;
                                                                          else if ($3 == "Run") jc->item.isRun = true;
                                                                          else if ($3 == "Swim") jc->item.isSwim = true;
+                                                                         else if ($3 == "Aero") jc->item.isAero = true;
                                                                          else jc->item.isXtrain = true;
                                                                      }
                                                                      else if ($1 == "present") jc->item.present = $3;
@@ -544,6 +546,7 @@ void RideCache::save(bool opendata, QString filename)
                 stream << "\t\t\"color\":\"" <<item->color.name() <<"\",\n";
                 stream << "\t\t\"present\":\"" <<item->present <<"\",\n";
                 stream << "\t\t\"sport\":\"" <<item->sport <<"\",\n";
+                stream << "\t\t\"aero\":\"" << (item->isAero ? "1" : "0") <<"\",\n";
                 stream << "\t\t\"weight\":\"" <<item->weight <<"\",\n";
 
                 if (item->zoneRange >= 0) stream << "\t\t\"zonerange\":\"" <<item->zoneRange <<"\",\n";

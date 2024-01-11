@@ -6,7 +6,7 @@
                                      John Ehrlinger
                                      Ale Martinez
 
-                                        Mar 2021
+                                        Jul 2022
                                       Version 3.6
 
 A walkthrough of building GoldenCheetah from scratch on Ubuntu linux 18.04
@@ -48,7 +48,7 @@ Install Qt
 ----------
 Download and install the Qt SDK from http://qt-project.org/
 You can use a browser to download and run the interactive installer, be sure to
-select version 5.14.2 or higher including at least the following modules:
+select version 5.15.2 or higher Qt 5 version, including at least the following modules:
 - Desktop gcc 64-bit
 - Qt Charts
 - Qt WebEngine
@@ -88,25 +88,29 @@ $ cd ../src
 $ cp gcconfig.pri.in gcconfig.pri
 $ vi gcconfig.pri
 
-Ensure you have the following lines (which are now also in gcconfig.pri.in which has
-been updated to reflect the new dependencies in version 3)
+Uncomment below and configure the location of the GNU scientific library, this is a mandatory dependency.
 
-QMAKE_LEX  = flex
-QMAKE_YACC = bison
-win32 {
-  QMAKE_YACC = bison --file-prefix=y -t
-  QMAKE_MOVE = cmd /c move
-  QMAKE_DEL_FILE = rm -f
-}
+#GSL_INCLUDES = /usr/include
+#GSL_LIBS = -lgsl -lgslcblas -lm
+
+Uncomment the following lines to use flex and bison:
+
+#QMAKE_LEX  = flex
+#QMAKE_YACC = bison
+
+and if you are using bison 3.7 or higher, make sure to also uncomment:
+
+#QMAKE_MOVE = cp
 
 To compile translation you need the QT tool lrelease
 If it is not found using the defaults in src/src.pro then set the full path and
 filename in gcconfig.pri, s.t.
 QMAKE_LRELEASE = /usr/bin/lrelease
 
-If your QT build includes its own local compress libs then you should comment the line below in gcconfig.pri,
-otherwise you will need to have the compress libraries installed separately.
-LIBZ_LIBS    = -lz
+If your QT build doesn't include its own local compress libs then you should uncomment the lines below,
+and add the library path to LIBZ_INCLUDE =, you will need to have the compress libraries installed separately.
+#LIBZ_INCLUDE =
+#LIBZ_LIBS = -lz
 
 compiling with gcc -O3 (tree vectorization can have a significat impact)
 [or -Ofast]
@@ -131,8 +135,9 @@ during the build at a later point in time via the "lrelease" command you
 configured in gcconfig.pri
 
 Congratulations you have now build a basic GoldenCheetah and can run this
-safely. See below for optional dependencies you can install to support
-other features.
+safely from src folder.
+
+See below for optional dependencies you can install to support other features.
 
 
 2. ADDING OPTIONAL DEPENDENCIES

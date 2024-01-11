@@ -19,7 +19,7 @@
 #ifndef _GC_PerspectiveDialog_h
 #define _GC_PerspectiveDialog_h 1
 #include "GoldenCheetah.h"
-#include "TabView.h"
+#include "AbstractView.h"
 #include "Perspective.h"
 
 #include <QtGui>
@@ -66,7 +66,7 @@ class PerspectiveDialog : public QDialog
     G_OBJECT
 
     public:
-        PerspectiveDialog(QWidget *parent, TabView *tabView);
+        PerspectiveDialog(QWidget *parent, AbstractView *tabView);
 
     private slots:
 
@@ -91,7 +91,7 @@ class PerspectiveDialog : public QDialog
         void perspectivesChanged();
 
     private:
-        TabView *tabView;
+        AbstractView *tabView;
 
         PerspectiveTableWidget *perspectiveTable;
         ChartTableWidget *chartTable;

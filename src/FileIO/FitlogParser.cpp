@@ -227,6 +227,10 @@ FitlogParser::endElement( const QString&, const QString&, const QString& qName)
         }
         rideFile->setRecIntSecs(populardelta);
 
+    } else if (qName == "Name") {
+
+        rideFile->setTag("Objective", buffer);
+
     } else if (qName == "Notes") {
 
         rideFile->setTag("Notes", buffer);

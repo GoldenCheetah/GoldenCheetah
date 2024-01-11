@@ -533,7 +533,7 @@ public:
             }
 
             // sort by row again
-            qStableSort(rankedRows.begin(), rankedRows.end(), rankx::sortByRow);
+            std::stable_sort(rankedRows.begin(), rankedRows.end(), rankx::sortByRow);
 
 
             // create a QMap from 'group' string to list of rows in that group

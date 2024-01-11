@@ -445,7 +445,7 @@ CyclingAnalytics::writeFile(QByteArray &data, QString remotename, RideFile *ride
     QUrl url = QUrl( "https://www.cyclinganalytics.com/api/me/upload" );
     QNetworkRequest request = QNetworkRequest(url);
 
-    QString boundary = QVariant(qrand()).toString()+QVariant(qrand()).toString()+QVariant(qrand()).toString();
+    QString boundary = QVariant(QRandomGenerator::global()->generate()).toString()+QVariant(QRandomGenerator::global()->generate()).toString()+QVariant(QRandomGenerator::global()->generate()).toString();
 
     // MULTIPART *****************
 

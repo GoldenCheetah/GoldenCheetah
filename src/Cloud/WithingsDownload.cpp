@@ -85,12 +85,13 @@ WithingsDownload::getBodyMeasures(QString &error, QDateTime from, QDateTime to, 
 
         QString refresh_token = appsettings->cvalue(context->athlete->cyclist, GC_NOKIA_REFRESH_TOKEN).toString();
 
+        postData.addQueryItem("action", "requesttoken");
         postData.addQueryItem("grant_type", "refresh_token");
         postData.addQueryItem("client_id", GC_NOKIA_CLIENT_ID );
         postData.addQueryItem("client_secret", GC_NOKIA_CLIENT_SECRET );
         postData.addQueryItem("refresh_token", refresh_token );
 
-        QUrl url = QUrl( "https://account.withings.com/oauth2/token" );
+        QUrl url = QUrl( "https://wbsapi.withings.net/v2/oauth2" );
 
         emit downloadStarted(100);
 
@@ -110,9 +111,9 @@ WithingsDownload::getBodyMeasures(QString &error, QDateTime from, QDateTime to, 
                 QJsonParseError parseResult;
                 QJsonDocument migrateJson = QJsonDocument::fromJson(response.toUtf8(), &parseResult);
 
-                access_token = migrateJson.object()["access_token"].toString();
-                QString refresh_token = migrateJson.object()["refresh_token"].toString();
-                QString userid = QString("%1").arg(migrateJson.object()["userid"].toInt());
+                access_token = migrateJson.object()["body"].toObject()["access_token"].toString();
+                QString refresh_token = migrateJson.object()["body"].toObject()["refresh_token"].toString();
+                QString userid = QString("%1").arg(migrateJson.object()["body"].toObject()["userid"].toInt());
 
 
                 if (access_token != "") appsettings->setCValue(context->athlete->cyclist, GC_NOKIA_TOKEN, access_token);
@@ -235,7 +236,7 @@ WithingsDownload::jsonDocumentToWithingsReading(QJsonDocument doc) {
         thisReading.groupId = grpid;
         thisReading.attribution = attrib;
         thisReading.category = category;
-        thisReading.when.setTime_t(date);
+        thisReading.when.setSecsSinceEpoch(date);
         thisReading.comment = comment;
 
         //Iterate the individual measurements in each group to create a WithingsReading object

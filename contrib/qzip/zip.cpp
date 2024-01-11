@@ -430,6 +430,10 @@ void QZipPrivate::fillFileInfo(int index, ZipReader::FileInfo &fileInfo) const
     fileInfo.crc_32 = readUInt(header.h.crc_32);
     fileInfo.size = readUInt(header.h.uncompressed_size);
     fileInfo.lastModified = readMSDosDate(header.h.last_mod_file);
+    // Files of size 0 ending in "/" seems to be an alternative directory encoding used by some compressors
+    bool altIsDir = (fileInfo.size == 0 && fileInfo.filePath.endsWith("/"));
+    fileInfo.isDir = fileInfo.isDir || altIsDir;
+    fileInfo.isFile = fileInfo.isFile && !altIsDir;
 }
 
 class ZipReaderPrivate : public QZipPrivate
@@ -930,7 +934,7 @@ bool ZipReader::extractAll(const QString &destinationDir) const
         if (fi.isDir) {
             if (!baseDir.mkpath(fi.filePath))
                 return false;
-            if (!QFile::setPermissions(absPath, fi.permissions))
+            if (fi.permissions > 0 && !QFile::setPermissions(absPath, fi.permissions))
                 return false;
         }
     }

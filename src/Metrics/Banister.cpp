@@ -307,7 +307,7 @@ Banister::refresh()
             // is a weekly performance already identified
             // This applies only when performance metric is power_index
             if (!(todaybest > 0) && perf_symbol == "power_index") {
-                Performance p = context->athlete->rideCache->estimator->getPerformanceForDate(item->dateTime.date(), item->isRun);
+                Performance p = context->athlete->rideCache->estimator->getPerformanceForDate(item->dateTime.date(), item->sport);
                 if (!p.submaximal && p.powerIndex > 0) {
 
                     // its not submax
@@ -567,9 +567,9 @@ void Banister::fit()
 //
 
 // power index metric
-double powerIndex(double averagepower, double duration, bool isRun)
+double powerIndex(double averagepower, double duration, QString sport)
 {
-    Q_UNUSED(isRun); // TODO: different parameters for Running
+    Q_UNUSED(sport) // TODO: different parameters for other sports?
 
     // so now lets work out what the 3p model says the
     // typical athlete would do for the same duration
@@ -638,7 +638,7 @@ class PowerIndex : public RideMetric {
         }
 
         // calculate power index, 0=out of bounds
-        double pix = powerIndex(averagepower, duration, item->isRun);
+        double pix = powerIndex(averagepower, duration, item->sport);
 
         // we could convert to linear work time model before
         // indexing, but they cancel out so no value in doing so
@@ -689,7 +689,7 @@ class PeakPowerIndex : public RideMetric {
 
             // calculate peak power index, starting from 3 mins, 0=out of bounds
             for (int secs=180; secs<vector.count(); secs++) {
-                double pix = powerIndex(vector[secs], secs, item->isRun);
+                double pix = powerIndex(vector[secs], secs, item->sport);
                 if (pix > peakpix) {
                     peakpix=pix;
                 }

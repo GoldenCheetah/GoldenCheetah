@@ -205,11 +205,11 @@ JouleDevice::download( const QDir &tmpdir,
                 DeviceDownloadFile file;
                 file.extension = "bin2";
                 file.name = tmp.fileName();
-                file.startTime.setTime_t( mktime( &start ));
+                file.startTime.setSecsSinceEpoch( mktime( &start ));
                 files.append(file);
 
                 QTextStream os(&tmp);
-                os << hex;
+                os << Qt::hex;
 
                 qDebug() << tmp.fileName() << "-" << tmpl;
                 tmp.write(versionResponse.dataArray());

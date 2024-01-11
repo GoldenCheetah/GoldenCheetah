@@ -59,7 +59,7 @@ public:
     typedef enum metricsport MetricSport;
 
     // Type of metric for aggregation
-    enum metrictype { Total, Average, Peak, Low, RunningTotal, MeanSquareRoot, StdDev};
+    enum metrictype { Total=0, Average, Peak, Low, RunningTotal, MeanSquareRoot, StdDev};
     typedef enum metrictype MetricType;
 
     // Class of metric to help browse
