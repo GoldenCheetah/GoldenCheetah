@@ -529,9 +529,9 @@ RideFile *PolarFileReader::openRideFile(QFile &file, QStringList &errors, QList<
 
   if (n_s > 12)
     {
-      location = suffix.midRef(0, n_s - 12).toString();
-      hrmFileDate = suffix.midRef(n_s - 12, 6).toString();
-      hrmFile_orig = suffix.midRef(n_s - 12, n_s).toString();
+      location = suffix.mid(0, n_s - 12);
+      hrmFileDate = suffix.mid(n_s - 12, 6);
+      hrmFile_orig = suffix.mid(n_s - 12, n_s);
       pddfile.setFileName(location + "20" + hrmFileDate + ".pdd");
     }
 
