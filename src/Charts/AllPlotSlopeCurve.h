@@ -40,7 +40,7 @@ class AllPlotSlopeCurve: public QwtPlotCurve
 
 public:
 
-    explicit AllPlotSlopeCurve( const QString &title = QString::null );
+    explicit AllPlotSlopeCurve( const QString &title = QString() );
     explicit AllPlotSlopeCurve( const QwtText &title );
 
     virtual ~AllPlotSlopeCurve();

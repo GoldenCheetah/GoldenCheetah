@@ -670,7 +670,7 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                     }
 
                 } else if (csvType == gc) {
-                    // GoldenCheetah CVS Format "secs, cad, hr, km, kph, nm, watts, alt, lon, lat, headwind, slope, temp, interval, lrbalance, lte, rte, lps, rps, smo2, thb, o2hb, hhb\n";
+                    // GoldenCheetah CVS Format "secs, cad, hr, km, kph, nm, watts, alt, lon, lat, headwind, slope, temp, interval, lrbalance, lte, rte, lps, rps, smo2, thb, o2hb, hhb, target\n";
 
                     seconds = line.section(',', 0, 0).toDouble();
                     minutes = seconds / 60.0f;
@@ -881,7 +881,7 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                         QDateTime time;
 
                         if (seconds < 1000000000000.0L)
-                            time = QDateTime::fromTime_t(seconds);
+                            time = QDateTime::fromSecsSinceEpoch(seconds);
                         else
                             time = QDateTime::fromMSecsSinceEpoch(seconds);
 
@@ -1185,7 +1185,7 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                        }
                    } else if (xdataSeries != NULL) {
 
-                       QStringList els = line.split(",", QString::KeepEmptyParts);
+                       QStringList els = line.split(",", Qt::KeepEmptyParts);
                        if (els.count() != xdataSeries->valuename.count()+2) continue;
                        // add ALL data series to XDATA
                        XDataPoint *p = new XDataPoint();
@@ -1427,7 +1427,7 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                 if (lineno > 1) {
 
                     // split comma separated secs, hr, msecs
-                    QStringList values = line.split(",", QString::KeepEmptyParts);
+                    QStringList values = line.split(",", Qt::KeepEmptyParts);
 
                     // and add
                     XDataPoint *p = new XDataPoint();
@@ -1498,7 +1498,7 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
             if (lineno > 1) {
 
                 // split comma separated secs, hr, msecs
-                QStringList values = line.split(",", QString::KeepEmptyParts);
+                QStringList values = line.split(",", Qt::KeepEmptyParts);
 
                 // and add
                 XDataPoint *p = new XDataPoint();

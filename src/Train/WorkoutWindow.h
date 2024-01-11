@@ -35,7 +35,7 @@
 #include "Context.h"
 #include "RideFile.h" // for data series types
 #include "Library.h"  // workout library
-#include "TabView.h"  // stylesheet for scroller
+#include "AbstractView.h"  // stylesheet for scroller
 
 #include "Settings.h"
 #include "Units.h"

@@ -20,6 +20,7 @@
 #define _GC_SmallPlot_h 1
 
 #include <qwt_plot.h>
+#include <qwt_plot_picker.h>
 #include <QtGui>
 
 class QwtPlotCurve;
@@ -37,6 +38,8 @@ class SmallPlot : public QwtPlot
         SmallPlot(QWidget *parent=0);
 
 
+        void enableTracking();
+        bool hasTracking() const;
         int smoothing() const { return smooth; }
         void setData(RideItem *rideItem);
         void setData(RideFile *rideFile);
@@ -51,7 +54,14 @@ class SmallPlot : public QwtPlot
         void showHr(int state);
         void setSmoothing(int value);
 
+    signals:
+
+        void selectedPosX(double dataPosX);
+        void mouseLeft();
+
     protected:
+
+        virtual void leaveEvent(QEvent *event);
 
         QwtPlotGrid *grid;
         QwtPlotCurve *wattsCurve;
@@ -69,6 +79,23 @@ class SmallPlot : public QwtPlot
         QVector<int> interArray;
 
         int smooth;
+        bool tracking;
+
+    protected slots:
+
+        void pointMoved(const QPoint &pos);
+};
+
+
+class SmallPlotPicker : public QwtPlotPicker
+{
+    Q_OBJECT
+
+    public:
+        SmallPlotPicker(QWidget *canvas);
+
+    protected:
+        virtual QwtText trackerText(const QPoint &point) const override;
 };
 
 #endif // _GC_SmallPlot_h

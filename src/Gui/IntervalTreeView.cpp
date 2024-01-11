@@ -31,7 +31,8 @@
 
 IntervalTreeView::IntervalTreeView(Context *context) : context(context)
 {
-    setDragDropMode(QAbstractItemView::InternalMove);
+    setDragDropMode(QAbstractItemView::DragDrop);
+    setDefaultDropAction(Qt::MoveAction);
     setDragDropOverwriteMode(false);
     setDropIndicatorShown(true);
 #ifdef Q_OS_MAC
@@ -59,6 +60,14 @@ IntervalTreeView::mouseHover(QTreeWidgetItem *item, int)
 
     // NULL is a tree, non-NULL is a node
     if (hover) context->notifyIntervalHover(hover);
+}
+
+void
+IntervalTreeView::dragEnterEvent(QDragEnterEvent* event)
+{
+    if (event->source() != this || event->dropAction() != Qt::MoveAction) return;
+
+    QAbstractItemView::dragEnterEvent(event);
 }
 
 void

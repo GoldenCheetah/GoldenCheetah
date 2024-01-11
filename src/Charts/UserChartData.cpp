@@ -80,7 +80,7 @@ UserChartData::compute(RideItem *item, Specification spec, DateRange dr)
             FilterSet fs;
             fs.addFilter(context->isfiltered, context->filters);
             fs.addFilter(context->ishomefiltered, context->homeFilters);
-            fs.addFilter(rt->chart->myPerspective->isFiltered(), rt->chart->myPerspective->filterlist(dr));
+            if (rt->chart->myPerspective) fs.addFilter(rt->chart->myPerspective->isFiltered(), rt->chart->myPerspective->filterlist(dr));
             spec.setFilterSet(fs);
 
             // loop through rides for daterange

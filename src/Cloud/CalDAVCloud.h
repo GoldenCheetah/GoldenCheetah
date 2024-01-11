@@ -49,7 +49,6 @@ class CalDAVCloud : public CloudService {
 
         QString id() const {
             switch(variant) {
-            case CalDAV::Google: return "Google Calendar";
             case CalDAV::Webcal: return "Web Calendar";
             default:
             case CalDAV::Standard: return "CalDAV Calendar";
@@ -58,7 +57,6 @@ class CalDAVCloud : public CloudService {
 
         QString uiName() const {
             switch(variant) {
-            case CalDAV::Google: return "Google Calendar";
             case CalDAV::Webcal: return "Web Calendar";
             default:
             case CalDAV::Standard: return "CalDAV Calendar";
@@ -67,7 +65,6 @@ class CalDAVCloud : public CloudService {
 
         QString description() const {
             switch(variant) {
-            case CalDAV::Google: return tr("Google Calendar using CalDAV protocol and authenticate using Google Account");
             case CalDAV::Webcal: return tr("Web Calendar using iCal format as a web resource");
             default:
             case CalDAV::Standard: return tr("Generic CalDAV Calendar such as Apple iCloud calendar");
@@ -76,7 +73,7 @@ class CalDAVCloud : public CloudService {
 
         QImage logo() const;
 
-        // we can be instantiated as a generic calDAV service or a Google
+        // we can be instantiated as a generic CalDAV service or a Webcal
         // CalDAV service. We don't have separate implementations, so at startup
         // we register one of each with the cloud service factory
         CalDAVCloud(Context *context, CalDAV::type variant);

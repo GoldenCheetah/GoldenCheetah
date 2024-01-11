@@ -362,7 +362,7 @@ WorkoutWindow::configChanged(qint32)
     xlabel->setFixedWidth(fm.boundingRect(" 00:00:00 ").width());
     ylabel->setFixedWidth(fm.boundingRect(" 1000w ").width());
 
-    scroll->setStyleSheet(TabView::ourStyleSheet());
+    scroll->setStyleSheet(AbstractView::ourStyleSheet());
     toolbar->setStyleSheet(QString("::enabled { background: %1; color: %2; border: 0px; } ")
                            .arg(GColor(CTRAINPLOTBACKGROUND).name())
                            .arg(GCColor::invertColor(GColor(CTRAINPLOTBACKGROUND)).name()));
@@ -380,7 +380,6 @@ WorkoutWindow::configChanged(qint32)
     // text edit colors
     QPalette palette;
     palette.setColor(QPalette::Window, GColor(CTRAINPLOTBACKGROUND));
-    palette.setColor(QPalette::Background, GColor(CTRAINPLOTBACKGROUND));
 
     // only change base if moved away from white plots
     // which is a Mac thing
@@ -394,7 +393,7 @@ WorkoutWindow::configChanged(qint32)
     }
 
 #ifndef Q_OS_MAC // the scrollers appear when needed on Mac, we'll keep that
-    code->setStyleSheet(TabView::ourStyleSheet());
+    code->setStyleSheet(AbstractView::ourStyleSheet());
 #endif
 
     palette.setColor(QPalette::WindowText, GCColor::invertColor(GColor(CTRAINPLOTBACKGROUND)));

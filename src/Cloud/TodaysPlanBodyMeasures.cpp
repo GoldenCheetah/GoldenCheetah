@@ -88,7 +88,7 @@ TodaysPlanBodyMeasures::getBodyMeasures(QString &error, QDateTime from, QDateTim
             // Prepare the Search Payload for First Call to Search
             QString userId = appsettings->cvalue(context->athlete->cyclist, GC_TODAYSPLAN_ATHLETE_ID, "").toString();
             // application/json
-            QByteArray jsonString;
+            QString jsonString;
             jsonString += "{\"criteria\": { ";
             if (userId.length()>0)
                 jsonString += " \"userIds\": [ "+ QString("%1").arg(userId) +" ], ";
@@ -99,11 +99,13 @@ TodaysPlanBodyMeasures::getBodyMeasures(QString &error, QDateTime from, QDateTim
             jsonString += "\"fields\": [\"att.ts\",\"att.weight\", \"att.fat\",\"att.muscleMass\",\"att.boneMass\",\"att.fatMass\", \"att.height\" , \"att.source\"] ";
             jsonString += "}";
 
-            QByteArray jsonStringDataSize = QByteArray::number(jsonString.size());
+            QByteArray jsonStringAsUTF8 = jsonString.toUtf8();
+
+            QByteArray jsonStringDataSize = QByteArray::number(jsonStringAsUTF8.size());
 
             request.setHeader(QNetworkRequest::ContentTypeHeader,"application/json");
             request.setRawHeader("Content-Length", jsonStringDataSize);
-            reply = nam->post(request, jsonString);
+            reply = nam->post(request, jsonStringAsUTF8);
         } else {
             // get further pages of the Search
             reply = nam->get(request);

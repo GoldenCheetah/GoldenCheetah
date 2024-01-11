@@ -292,7 +292,7 @@ OpenData::run()
 
     // send as multipart form data - "secret" field, "id" field and "data" file
     QHttpMultiPart form (QHttpMultiPart::FormDataType);
-    QString boundary = QVariant(qrand()).toString() + QVariant(qrand()).toString() + QVariant(qrand()).toString();
+    QString boundary = QVariant(QRandomGenerator::global()->generate()).toString() + QVariant(QRandomGenerator::global()->generate()).toString() + QVariant(QRandomGenerator::global()->generate()).toString();
     form.setBoundary(boundary.toLatin1());
 
     QHttpPart secretpart;

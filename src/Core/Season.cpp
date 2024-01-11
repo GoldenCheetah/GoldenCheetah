@@ -556,12 +556,21 @@ Seasons::writeSeasons()
 
 SeasonTreeView::SeasonTreeView(Context *context) : context(context)
 {
-    setDragDropMode(QAbstractItemView::InternalMove);
+    setDragDropMode(QAbstractItemView::DragDrop);
+    setDefaultDropAction(Qt::MoveAction);
     setDragDropOverwriteMode(true);
 #ifdef Q_OS_MAC
     setAttribute(Qt::WA_MacShowFocusRect, 0);
 #endif
 
+}
+
+void
+SeasonTreeView::dragEnterEvent(QDragEnterEvent* event)
+{
+    if (event->source() != this || event->dropAction() != Qt::MoveAction) return;
+
+    QAbstractItemView::dragEnterEvent(event);
 }
 
 void

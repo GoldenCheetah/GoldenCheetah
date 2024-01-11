@@ -115,12 +115,19 @@ class RideFileInterval
         static QString typeDescriptionLong(IntervalType);              // return a longer string to represent the type
         static qint32 intervalTypeBits(IntervalType);                  // returns the bit value or'ed into GC_DISCOVERY
 
+        const QMap<QString,QString>& tags() const { return tags_; }
+        QString getTag(QString name, QString fallback) const { return tags_.value(name, fallback); }
+        void setTag(QString name, QString value) { tags_.insert(name, value); }
+        bool removeTag(QString name) { return tags_.remove(name); }
+
         QString typeString;
         IntervalType type;
         double start, stop;
         QString name;
         bool test;
         QColor color;
+        QMap<QString,QString> tags_;
+
         RideFileInterval() : type(USER), start(0.0), stop(0.0), test(false), color(Qt::black) {}
         RideFileInterval(IntervalType type, double start, double stop, QString name, QColor color, bool test=false) :
         type(type), start(start), stop(stop), name(name), test(test), color(color) {}
@@ -189,7 +196,7 @@ class RideFile : public QObject // QObject to emit signals
         // fix tools
         friend class FixLapSwim;
         friend class Snippets;
-        friend struct FitFileReaderState;
+        friend struct FitFileParser;
 
         // utility
         static unsigned int computeFileCRC(QString); 
@@ -249,6 +256,7 @@ class RideFile : public QObject // QObject to emit signals
         bool isRun() const;
         bool isSwim() const;
         bool isXtrain() const;
+        bool isAero() const;
 
         // Working with DATAPOINTS -- ***use command to modify***
         RideFileCommand *command;
@@ -350,7 +358,8 @@ class RideFile : public QObject // QObject to emit signals
         int timeIndex(double) const;          // get index offset for time in secs
         int distanceIndex(double) const;      // get index offset for distance in KM
 
-        // Working with the METADATA TAGS
+        // Working with the METADATA TAGS -- these are ride metadata, there are similar in the RideFileInterval
+        //                                   to store and manage interval metadata
         const QMap<QString,QString>& tags() const { return tags_; }
         QString getTag(QString name, QString fallback) const { return tags_.value(name, fallback); }
         void setTag(QString name, QString value) { tags_.insert(name, value); }
@@ -363,7 +372,7 @@ class RideFile : public QObject // QObject to emit signals
         WPrime *wprimeData(); // return wprime, init/refresh if needed
 
         // XDATA
-        XDataSeries *xdata(QString name) { return xdata_.value(name, NULL); }
+        XDataSeries *xdata(QString name) const { return xdata_.value(name, NULL); }
         void addXData(QString name, XDataSeries *series);
         QMap<QString,XDataSeries*> &xdata() { return xdata_; }
         double xdataValue(RideFilePoint *p, int &idx, QString xdata, QString series, RideFile::XDataJoin);
@@ -551,7 +560,7 @@ class RideFileIterator {
         int start, stop, index;
 };
 
-#define XDATA_MAXVALUES 32
+#define XDATA_MAXVALUES 64
 
 class XDataPoint {
 public:

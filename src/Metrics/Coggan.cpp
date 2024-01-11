@@ -42,10 +42,10 @@ class IsoPower : public RideMetric {
         setInternalName("IsoPower");
     }
     void initialize() {
-        setName("IsoPower");
+        setName(tr("IsoPower"));
         setType(RideMetric::Average);
-        setMetricUnits("watts");
-        setImperialUnits("watts");
+        setMetricUnits(tr("watts"));
+        setImperialUnits(tr("watts"));
         setPrecision(0);
         setDescription(tr("Iso Power is an estimate of the power that you could have maintained for the same physiological 'cost' if your power output had been perfectly constant."));
     }

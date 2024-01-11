@@ -19,7 +19,6 @@
 #include "Context.h"
 #include "Athlete.h"
 #include "MainWindow.h"
-#include "NewMainWindow.h"
 #include "Settings.h"
 #include "CloudService.h"
 #include "TrainDB.h"
@@ -28,6 +27,7 @@
 #include "IdleTimer.h"
 #include "PowerProfile.h"
 #include "GcCrashDialog.h" // for versionHTML
+#include "OverviewItems.h"
 
 #include <QApplication>
 #include <QDesktopWidget>
@@ -220,6 +220,7 @@ main(int argc, char *argv[])
         freopen("CONOUT$", "w", stderr);
         freopen("CONOUT$", "w", stdout);
     }
+    bool angle=true;
 #endif
 
     //
@@ -247,12 +248,11 @@ main(int argc, char *argv[])
     // By default, print messages from all categories, but not those from
     // specialised categories like qt.* or gc.* which can be quite verbose
     QString debugRules = QString("*.debug=true;gc.*.debug=false;qt.*.debug=false");
-    QString debugFile = NULL;
+    QString debugFile = QString();
 
     bool server = false;
     nogui = false;
     bool help = false;
-    bool newgui = false;
 
     // honour command line switches
     QString arg;
@@ -294,6 +294,9 @@ main(int argc, char *argv[])
 #endif
 #ifdef GC_WANT_R
             fprintf(stderr, "--no-r              to disable R startup\n");
+#endif
+#ifdef Q_OS_WIN
+            fprintf(stderr, "--no-angle          to disable ANGLE rendering\n");
 #endif
             fprintf (stderr, "\nSpecify the folder and/or athlete to open on startup\n");
             fprintf(stderr, "If no parameters are passed it will reopen the last athlete.\n\n");
@@ -349,6 +352,10 @@ main(int argc, char *argv[])
 #else
             fprintf(stderr, "CloudDB support not compiled in, exiting.\n");
             exit(1);
+#endif
+#ifdef Q_OS_WIN
+        } else if (arg == "--no-angle") {
+            angle = false;
 #endif
         } else {
 
@@ -414,27 +421,37 @@ main(int argc, char *argv[])
     // what to do. We may add our own error handler later.
     gsl_set_error_handler_off();
 
+#ifdef Q_OS_WIN
+    if (angle) {
+        // windows we use ANGLE for opengl on top of DirectX/Direct3D
+        // it avoids issues with bad graphics drivers
+        QCoreApplication::setAttribute(Qt::AA_UseOpenGLES);
+    }
+#endif
+
     // create the application -- only ever ONE regardless of restarts
     application = new QApplication(argc, argv);
+
+    // select the desktop (used in defaultAppearanceSettings below and elsewhere)
+    desktop = QApplication::desktop();
+
     //XXXIdleEventFilter idleFilter;
     //XXXapplication->installEventFilter(&idleFilter);
 
     // read defaults
     initPowerProfile();
 
-    // set default colors
-    GCColor::setupColors();
-    appsettings->migrateQSettingsSystem(); // colors must be setup before migration can take place, but reading has to be from the migrated ones
-    GCColor::readConfig();
-
     // output colors as configured so we can cut and paste into Colors.cpp
     // uncomment when developers working on theme colors
     //GCColor::dumpColors();
 
-    // set defaultfont - may be adjusted below
+    // get defaults in case need them later
+    AppearanceSettings defaults = GSettings::defaultAppearanceSettings();
+
+    // set font family and size
     QFont font;
-    font.fromString(appsettings->value(NULL, GC_FONT_DEFAULT, QFont().toString()).toString());
-    font.setPointSize(11);
+    font.fromString(appsettings->value(NULL, GC_FONT_DEFAULT, defaults.fontfamily).toString());
+    font.setPointSize(defaults.fontpointsize);
 
     // use the default before taking into account screen size
     baseFont = font;
@@ -442,63 +459,20 @@ main(int argc, char *argv[])
     // hidpi ratios -- single desktop for now
     desktop = QApplication::desktop();
 
-
-    // since almost all dialogs are sized for a screen resolution
-    // of 1280x1024, to save issues we will scale DIALOGS to the
-    // overall screen estate when supporting HI-DPI. For widgetry
-    // all code needs to be changed to set height based upon font
-    // sizing instead.
-    dpiXFactor = 1.0;
-    dpiYFactor = 1.0;
+    dpiXFactor = defaults.xfactor;
+    dpiYFactor = defaults.yfactor;
 
 #ifndef Q_OS_MAC // not needed on a Mac
 
-    // We will set screen ratio factor for sizing when a screen
-    // is greater than the Surface Pro 3 2160x1440, since its a break
-    // point with resolutions above that being devices like the
-    // 2560x1700 chromebook pixel before we get to truly hi-dpi
-    // resolutions like apples MBP retina 2880x1800 up through
-    // UHD, 4k and 5k displays at 3840x2160, 4096x2304 and 5120 x 2160.
-    QRect screenSize = desktop->availableGeometry();
-
-    // if we're running with dpiawareness of 0 the screen resolution
-    // will be expressed taking into account the scaling applied
-    // so for example a 3840x2160 screen will likely be expressed as
-    // being 1920 x 1080 rather than the native resolution
-    if (desktop->screen()->devicePixelRatio() <= 1 && screenSize.width() > 2160) {
-       // we're on a hidpi screen - lets create a multiplier - always use smallest
-       dpiXFactor = screenSize.width() / 1280.0;
-       dpiYFactor = screenSize.height() / 1024.0;
-
-       if (dpiYFactor < dpiXFactor) dpiXFactor = dpiYFactor;
-       else if (dpiXFactor < dpiYFactor) dpiYFactor = dpiXFactor;
-
-       // set default font size -- all others will scale off this
-       // choose a font size that would allow 60 lines of text on screen
-       // we can include the option for the user to set a scaling factor
-       // in settings before we release this in v3.5
-       double height = screenSize.height() / 70;
-
-       // points = height in inches * dpi
-       double pointsize = (height / QApplication::desktop()->logicalDpiY()) * 72;
-       baseFont.setPointSizeF(pointsize);
-
-       // fixup some style issues from QT not adjusting defaults on hidpi displays
-       // initially just pushbutton and combobox spacing...
-       application->setStyleSheet(QString("QPushButton { padding-left: %1px; padding-right: %1px; "
-                                          "              padding-top: %2px; padding-bottom: %2px; }"
-                                          "QComboBox   { padding-left: %1px; padding-right: %1px; }")
-                                          .arg(15*dpiXFactor)
-                                          .arg(3*dpiYFactor));
-
-       //qDebug()<<"geom:"<<QApplication::desktop()->geometry()<<"default font size:"<<pointsize<<"hidpi scaling:"<<dpiXFactor<<"physcial DPI:"<<QApplication::desktop()->physicalDpiX()<<"logical DPI:"<<QApplication::desktop()->logicalDpiX();
-    } else {
-       //qDebug()<<"geom:"<<QApplication::desktop()->geometry()<<"no need for hidpi scaling"<<"physcial DPI:"<<QApplication::desktop()->physicalDpiX()<<"logical DPI:"<<QApplication::desktop()->logicalDpiX();
-    }
+    application->setStyleSheet(QString("QPushButton { padding-left: %1px; padding-right: %1px; "
+                                       "              padding-top: %2px; padding-bottom: %2px; }"
+                                       "QComboBox   { padding-left: %1px; padding-right: %1px; }")
+                                       .arg(15*dpiXFactor)
+                                       .arg(3*dpiYFactor));
 #endif
 
     // scale up to user scale factor
-    double fontscale = appsettings->value(NULL, GC_FONT_SCALE, 1.0).toDouble();
+    double fontscale = appsettings->value(NULL, GC_FONT_SCALE, defaults.fontscale).toDouble();
     font.setPointSizeF(baseFont.pointSizeF() * fontscale);
 
     // now apply !
@@ -509,6 +483,7 @@ main(int argc, char *argv[])
     appsettings->setValue(GC_FONT_CHARTLABELS, font.toString());
     appsettings->setValue(GC_FONT_DEFAULT_SIZE, font.pointSizeF());
     appsettings->setValue(GC_FONT_CHARTLABELS_SIZE, font.pointSizeF() * 0.8);
+
 
     // what filestores are registered (whilst we refactor)
     //qDebug()<<"Cloud services registered:"<<CloudServiceFactory::instance().serviceNames();
@@ -598,7 +573,7 @@ main(int argc, char *argv[])
 
 
         // now redirect stderr and set the log filter and format
-        if (debugFile != NULL) nostderr(debugFile);
+        if (debugFile != QString()) nostderr(debugFile);
         else if (!debug) nostderr(QString("%1/%2").arg(home.canonicalPath()).arg("goldencheetah.log"));
         qSetMessagePattern(debugFormat);
         QLoggingCategory::setFilterRules(debugRules.replace(";", "\n")); // accept ; as separator like QT_LOGGING_RULES
@@ -621,11 +596,25 @@ main(int argc, char *argv[])
             gcTranslator.load(":translations" + translation_file);
         application->installTranslator(&gcTranslator);
 
+        // Now the translator is installed, set default colors with translated names
+        GCColor::setupColors();
+
+        // has a default theme been applied (first run) ?
+        QString powercolor = appsettings->value(NULL, "COLORPOWER", "").toString();
+        if (powercolor == "")  GCColor::applyTheme(defaults.theme);
+
+        // migration
+        appsettings->migrateQSettingsSystem(); // colors must be setup before migration can take place, but reading has to be from the migrated ones
+        GCColor::readConfig();
+
         // Initialize metrics once the translator is installed
         RideMetricFactory::instance().initialize();
 
         // Initialize global registry once the translator is installed
         GcWindowRegistry::initialize();
+
+        // initialize Overview Items once the translator is installed
+        OverviewItemConfig::registerItems();
 
         // initialise the trainDB
         trainDB = new TrainDB(home);
