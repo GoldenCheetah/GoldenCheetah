@@ -33,7 +33,7 @@ NewMainWindow::NewMainWindow(QApplication *app) : QMainWindow(NULL), state(Inact
     setCentralWidget(main);
     layout = new QVBoxLayout(main);
     layout->setSpacing(0);
-    layout->setMargin(0);
+    layout->setContentsMargins(QMargins());
 
     // toolbar
     setupToolbar();
