@@ -41,7 +41,7 @@
 #include <QWebEngineDownloadItem>
 
 // overlay helper
-#include "TabView.h"
+#include "AbstractView.h"
 #include "GcOverlayWidget.h"
 #include "IntervalSummaryWindow.h"
 #include <QDebug>
@@ -124,7 +124,7 @@ WebPageWindow::WebPageWindow(Context *context) : GcChartWindow(context), context
     customUrl->setText("");
 
     commonLayout->addRow(customUrlLabel, customUrl);
-    commonLayout->addRow(new QLabel("Hit return to apply URL"));
+    commonLayout->addRow(new QLabel(tr("Hit return to apply URL")));
 
     setControls(settingsWidget);
 
@@ -137,7 +137,7 @@ WebPageWindow::WebPageWindow(Context *context) : GcChartWindow(context), context
     view = new QWebEngineView(this);
     connect(view, SIGNAL(loadFinished(bool)), this, SLOT(loadFinished(bool)));
 
-    view->page()->profile()->setHttpUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.79 Safari/537.36 Edge/14.14393");
+    //view->page()->profile()->setHttpUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.79 Safari/537.36 Edge/14.14393");
 
     // add a download interceptor
     WebDownloadInterceptor *interceptor = new WebDownloadInterceptor;
@@ -160,7 +160,6 @@ WebPageWindow::WebPageWindow(Context *context) : GcChartWindow(context), context
 
     view->setPage(new simpleWebPage());
     view->setContentsMargins(0,0,0,0);
-    view->page()->view()->setContentsMargins(0,0,0,0);
     view->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     view->setAcceptDrops(false);
     layout->addWidget(view);
@@ -270,7 +269,7 @@ WebPageWindow::downloadRequested(QWebEngineDownloadItem *item)
 
     // lets go get it!
     filenames.clear();
-    filenames << item->path();
+    filenames << QDir(item->downloadDirectory()).absoluteFilePath(item->downloadFileName());
 
     // set save
     connect(item, SIGNAL(downloadProgress(qint64, qint64)), this, SLOT(downloadProgress(qint64,qint64)));

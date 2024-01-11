@@ -21,11 +21,11 @@
 #include "PythonSyntax.h"
 
 
-PythonSyntax::PythonSyntax(QTextDocument *parent) : QSyntaxHighlighter(parent)
+PythonSyntax::PythonSyntax(QTextDocument *parent, bool dark) : QSyntaxHighlighter(parent)
 {
     HighlightingRule rule;
 
-    assignmentFormat.setForeground(QColor(255,204,000));
+    assignmentFormat.setForeground(dark ? QColor(255,204,000): Qt::black);
     rule.pattern = QRegExp("<{1,2}[-]");
     rule.format = assignmentFormat;
     highlightingRules.append(rule);
@@ -35,7 +35,7 @@ PythonSyntax::PythonSyntax(QTextDocument *parent) : QSyntaxHighlighter(parent)
 
 
     // function: anything followed by (
-    functionFormat.setForeground(Qt::cyan);
+    functionFormat.setForeground(dark ? Qt::cyan : Qt::darkBlue);
     //functionFormat.setFontItalic(true);
     rule.pattern = QRegExp("\\b[A-Za-z0-9_\\.]+(?=[ ]*\\()");
     rule.format = functionFormat;
@@ -49,7 +49,7 @@ PythonSyntax::PythonSyntax(QTextDocument *parent) : QSyntaxHighlighter(parent)
     highlightingRules.append(rule);
 
     // numbers
-    numberFormat.setForeground(Qt::red);
+    numberFormat.setForeground(dark ? Qt::red : Qt::darkRed);
     QStringList numberPatterns;
     numberPatterns << "\\b[0-9]+[\\.]?[0-9]*\\b"  << "\\b[\\.][0-9]+\\b";
     foreach (QString pattern, numberPatterns) {
@@ -59,7 +59,7 @@ PythonSyntax::PythonSyntax(QTextDocument *parent) : QSyntaxHighlighter(parent)
     }
 
     // constants: TRUE FALSE NA NULL Inf NaN
-    constantFormat.setForeground(Qt::red);
+    constantFormat.setForeground(dark ? Qt::red : Qt::darkRed);
     QStringList constantPatterns;
     constantPatterns << "\\bTrue\\b" << "\\bFalse\\b" << "\\bNone\\b"  << "\\bNull\\b" << "\\bInf\\b" << "\\bNaN\\b";
     foreach (QString pattern, constantPatterns) {
@@ -70,7 +70,7 @@ PythonSyntax::PythonSyntax(QTextDocument *parent) : QSyntaxHighlighter(parent)
 
     // keywords: while for in repeat if else switch break next
     // function return message warning stop
-    keywordFormat.setForeground(QColor(255,204,000));
+    keywordFormat.setForeground(dark ? QColor(255,204,000) : Qt::black);
     //keywordFormat.setFontItalic(true);
     QStringList keywordPatterns;
     keywordPatterns  << "\\bas\\b" << "\\bassert\\b" << "\\bbreak\\b"
@@ -88,7 +88,7 @@ PythonSyntax::PythonSyntax(QTextDocument *parent) : QSyntaxHighlighter(parent)
 
     // common functions (says who? (I hate attach)): library attach
     // detach source require
-    commonFunctionFormat.setForeground(QColor(40,255,40));
+    commonFunctionFormat.setForeground(dark ? QColor(40,255,40) : Qt::darkGray);
     QStringList commonFunctionPatterns;
     commonFunctionPatterns << "\\bGC\\b" << "\\bdef\\b" << "\\bself\\b";
     foreach (QString pattern, commonFunctionPatterns) {
@@ -98,7 +98,7 @@ PythonSyntax::PythonSyntax(QTextDocument *parent) : QSyntaxHighlighter(parent)
     }
 
     // operators
-    operatorFormat.setForeground(QColor(255,204,000));
+    operatorFormat.setForeground(dark ? QColor(255,204,000) : Qt::black);
     //operatorFormat.setForeground(Qt::darkCyan);
     //operatorFormat.setFontWeight(QFont::Bold);
     QStringList operatorPatterns;
@@ -120,7 +120,7 @@ PythonSyntax::PythonSyntax(QTextDocument *parent) : QSyntaxHighlighter(parent)
 
     // quotes: only activated after quotes are closed.  Does not
     // span lines.
-    quotationFormat.setForeground(Qt::red);
+    quotationFormat.setForeground(dark ? Qt::red : Qt::darkRed);
     rule.pattern = QRegExp("\"[^\"]*\"");
     rule.format = quotationFormat;
     highlightingRules.append(rule);
@@ -129,7 +129,7 @@ PythonSyntax::PythonSyntax(QTextDocument *parent) : QSyntaxHighlighter(parent)
     highlightingRules.append(rule);
 
     // comments (should override everything else)
-    commentFormat.setForeground(QColor(100,149,237));
+    commentFormat.setForeground(dark ? QColor(100,149,237) : Qt::darkBlue);
     rule.pattern = QRegExp("#[^\n]*");
     rule.format = commentFormat;
     highlightingRules.append(rule);

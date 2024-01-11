@@ -22,6 +22,7 @@
 
 #include <QWidget>
 #include <QDialog>
+#include <QNetworkReply>
 
 #include <string>
 #include <iostream>

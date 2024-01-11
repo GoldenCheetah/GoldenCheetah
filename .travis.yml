@@ -14,6 +14,7 @@ cache:
   - D2XX
   - site-packages
   - VLC
+  - src/GoldenCheetah.app
 
 env:
   global:
@@ -36,14 +37,20 @@ env:
   - secure: cc0pAJjkmFNw2bO3zVACmtyHTwINAHALrtUxi+nRD+FhOO9KxuxuuwvcKCZKfp9EUOjz5PrYWKV1ZH/zt/jMix8A4Gyue2mWX8WYih7aTmJBcJWsFNTCybnClreKBCh18kHdWWhkmhk8EMINDvlqxzJZGpcNO04gxhL9wuLLrNQ=
   - secure: em0xXIm69rMHsHXYQiizeJB7dEFBkX33PsWDHwBNrX6lFBued23eL96KJC4RVbk6A+AHFtXFATrreZ14D5JH/E/37CXhe3X2R93WqiPUSH0s7NI4fFA1BroKUNAlqO4bMqDBidtNmwMPaLTXjaOnOZyvbAG7z+QV3TKC8tOeZDU=
   - secure: VFaSERlgsjzjiDQhKw8XFvQrjdvFzHHL7V3NQg+RfELHoT6I1pAGFdl/+lRBIVOiVkbQ6XnpBA28nlf0QydPHElRZdqmh0azQV/bkUXD4ffPE8q0iSqeqhAZ+5L05K5K+Gby/y8TZE4FX6e/7trFL7oq+h9x0gq5RQO8rAcTV84=
+  - secure: eTSJmS38EsTkI22yvDJLUrBxSyLDwd3pDRsyLQfZ3ThN0UJ9cQN2uB7aLy3OzNYadpi+Axlr46MgG0G5qGV1hHXkf+C4orGkURQWxHA7L5R/oE98TuYMO1bisZu9dJEVbmEM4cehCjbB7DExzxK4m6+oTJsWhVbIwlNh5Poq/v4=
+  - secure: gUDTEErUOhzkSVofEvdw1jqHHsE/K+/SOqRBKDToaFPhi6XK+Tvu1LqPMjfPdjYLaCSiwc/R79fJrAEuK+7KSwdiLEnDv3RMpRS5g1UWyJ/ZYd5xNR+WiBqUvnY/S/CJokuNw7gBbGq7JCO4pmIGV5YB9FA4Na6MG/eHzTSOIig=
+  - secure: Qk+gzBLwjrB8abUYzxap10dYSpIeKpB1gqhdoMbqS23G0r1lejnsjutIfReuJGK/efCmhisKN1xIX/InvJWD8z6GsLJFmf3F0oRj7aDJ/X5UIn9Upflje9xgHQafP1FJuzZBWtzandNfPE8EmEOgAQsJZ3c7xBE1SY/6xcJaQTc=
+  - secure: m4+k3/QcYvqmMoRO8uq3ef2jAO1FWeRVDG/XtlbjBlgmB5OR/zW5c7c1Ywm6IM5yzsi1rRks8GFffZ6gYqXhML10EfGKVbnyBcZZ7HVylNtvxDF68W1BLacChzDs4mGYQSV8kJRGI3EaVNdyFJ5yln/HUZ6qBbQ473MtxprO6BI=
+  - secure: GEyUuLuIc7D3F4noKhtTCbWbQAlm61Y7Vh2mOKBEgmyfoV1johwlEL0RaeRyr9MnU2MN+4jeFthvDjxm3LGP19zrpB46GTGHU6/H9BZBodDCJsFTqj32T+5QTcAF2RQ66ZgYpSyTf063/RLlfy7YjCb8KLiJ2asCaoYtQIjx3hA=
 
 jobs:
   include:
   - os: osx
-    osx_image: xcode11.3
+    osx_image: xcode14.2
     compiler: clang
-  - os: linux
-    dist: bionic
+  - if: commit_message !~ /\[skip linux\]/
+    os: linux
+    dist: focal
     compiler: gcc
 
 before_install:

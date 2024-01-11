@@ -16,7 +16,7 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 #include "MainWindow.h"
-#include "Tab.h"
+#include "AthleteTab.h"
 #include "Athlete.h"
 #include "RideCache.h"
 #include "Estimator.h"

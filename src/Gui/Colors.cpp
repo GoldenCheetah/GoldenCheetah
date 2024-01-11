@@ -1,5 +1,4 @@
-/*
- * Copyright (c) 2010 Mark Liversedge (liversedge@gmail.com)
+ /* Copyright (c) 2010 Mark Liversedge (liversedge@gmail.com)
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
@@ -42,12 +41,20 @@ QFont baseFont;                 // base font scaled to display (before user scal
 // find the right pixelSize for font and height
 int pixelSizeForFont(QFont &font, int height)
 {
+    static QMap<int,int> maps; // cache as expensive to calculate
+
+    int pixelsize = maps.value(height, 0);
+    if (pixelsize) return pixelsize;
+
     QFont with = font;
-    int pixelsize=6;
+    pixelsize=6;
     do {
         with.setPixelSize(pixelsize+1);
         QFontMetrics fm(with);
-        if (fm.tightBoundingRect("Fy").height() > height) return pixelsize;
+        if (fm.tightBoundingRect("Fy").height() > height) {
+            maps.insert(height, pixelsize);
+            return pixelsize;
+        }
         else pixelsize++;
 
     } while (pixelsize<200); // should never loop that much
@@ -97,7 +104,7 @@ unsigned long Colors::fingerprint(const Colors *set)
 {
     QByteArray ba;
     while(set->name != "") {
-        ba.append(set->color.name());
+        ba.append(set->color.name().toUtf8());
         set++;
     }
     return qChecksum(ba, ba.length());
@@ -125,132 +132,131 @@ void GCColor::setupColors()
     // consider removing when we can guarantee extended initialisation support in gcc
     // (c++0x not supported by Qt currently and not planned for 4.8 or 5.0)
     Colors init[CNUMOFCFGCOLORS+1] = {
-        { tr("Plot Background"), "COLORPLOTBACKGROUND", QColor(52,52,52) },
-        { tr("Performance Plot Background"), "COLORRIDEPLOTBACKGROUND", QColor(52,52,52) },
-        { tr("Trend Plot Background"), "COLORTRENDPLOTBACKGROUND", Qt::black },
-        { tr("Train Plot Background"), "COLORTRAINPLOTBACKGROUND", Qt::black },
-        { tr("Plot Symbols"), "COLORRIDEPLOTSYMBOLS", Qt::cyan },
-        { tr("Performance Plot X Axis"), "COLORRIDEPLOTXAXIS", Qt::blue },
-        { tr("Performance Plot Y Axis"), "COLORRIDEPLOTYAXIS", Qt::red },
-        { tr("Plot Thumbnail Background"), "COLORPLOTTHUMBNAIL", Qt::gray },
-        { tr("Plot Title"), "COLORPLOTTITLE", Qt::black },
-        { tr("Plot Selection Pen"), "COLORPLOTSELECT", Qt::blue },
-        { tr("Plot TrackerPen"), "COLORPLOTTRACKER", Qt::blue },
-        { tr("Plot Markers"), "COLORPLOTMARKER", Qt::cyan },
-        { tr("Plot Grid"), "COLORGRID", QColor(65,65,65) },
-        { tr("Interval Highlighter"), "COLORINTERVALHIGHLIGHTER", Qt::blue },
-        { tr("Heart Rate"), "COLORHEARTRATE", Qt::red },
-        { tr("Core Temperature"), "COLORCORETEMP", QColor(255, 173, 92) },
-        { tr("Speed"), "COLORSPEED", Qt::green },
-        { tr("Acceleration"), "COLORACCEL", Qt::cyan },
-        { tr("Power"), "COLORPOWER", Qt::yellow },
-        { tr("Iso Power"), "CNPOWER", Qt::magenta },
-        { tr("Skiba xPower"), "CXPOWER", Qt::magenta },
-        { tr("Altitude Power"), "CAPOWER", Qt::magenta },
-        { tr("Train Target Power"), "CTPOWER", Qt::blue },
-        { tr("Critical Power"), "COLORCP", Qt::cyan },
-        { tr("Cadence"), "COLORCADENCE", QColor(0,204,204) },
-        { tr("Altitude"), "COLORALTITUTDE", QColor(Qt::gray) },
-        { tr("Altitude Shading"), "COLORALTITUDESHADE", QColor(Qt::lightGray) },
-        { tr("Wind Speed"), "COLORWINDSPEED", Qt::darkGreen },
-        { tr("Torque"), "COLORTORQUE", Qt::magenta },
-        { tr("Slope"), "CSLOPE", Qt::green },
-        { tr("Gear Ratio"), "COLORGEAR", QColor(0xff, 0x90, 0x00) },
-        { tr("Run Vertical Oscillation"), "COLORRVERT", QColor(0xff, 0x90, 0x00) }, // same as garmin connect colors
-        { tr("Run Cadence"), "COLORRCAD", QColor(0xff, 0x90, 0x00) }, // same as garmin connect colors
-        { tr("Run Ground Contact"), "COLORGCT", QColor(0xff, 0x90, 0x00) }, // same as garmin connect colors
-        { tr("Muscle Oxygen (SmO2)"), "COLORSMO2", QColor(0x00, 0x89, 0x77) }, // green same as moxy monitor
-        { tr("Haemoglobin Mass (tHb)"), "COLORTHB", QColor(0xa3,0x44,0x02) },  // brown same as moxy monitor
-        { tr("Oxygenated Haemoglobin (O2Hb)"), "CO2HB", QColor(0xd1,0x05,0x72) },
-        { tr("Deoxygenated Haemoglobin (HHb)"), "CHHB", QColor(0x00,0x7f,0xcc) },
-        { tr("Load"), "COLORLOAD", Qt::yellow },
-        { tr("BikeStress"), "COLORTSS", Qt::green },
-        { tr("Short Term Stress"), "COLORSTS", Qt::blue },
-        { tr("Long Term Stress"), "COLORLTS", Qt::green },
-        { tr("Stress Balance"), "COLORSB", Qt::black },
-        { tr("Daily Stress"), "COLORDAILYSTRESS", Qt::red },
-        { "Bike Score (TM)", "COLORBIKESCORE", Qt::gray },
-        { tr("Calendar Text"), "COLORCALENDARTEXT", Qt::black },
-        { tr("Power Zone 1 Shading"), "COLORZONE1", QColor(255,0,255) },
-        { tr("Power Zone 2 Shading"), "COLORZONE2", QColor(42,0,255) },
-        { tr("Power Zone 3 Shading"), "COLORZONE3", QColor(0,170,255) },
-        { tr("Power Zone 4 Shading"), "COLORZONE4", QColor(0,255,128) },
-        { tr("Power Zone 5 Shading"), "COLORZONE5", QColor(85,255,0) },
-        { tr("Power Zone 6 Shading"), "COLORZONE6", QColor(255,213,0) },
-        { tr("Power Zone 7 Shading"), "COLORZONE7", QColor(255,0,0) },
-        { tr("Power Zone 8 Shading"), "COLORZONE8", Qt::gray },
-        { tr("Power Zone 9 Shading"), "COLORZONE9", Qt::gray },
-        { tr("Power Zone 10 Shading"), "COLORZONE10", Qt::gray },
-        { tr("HR Zone 1 Shading"), "HRCOLORZONE1", QColor(255,0,255) },
-        { tr("HR Zone 2 Shading"), "HRCOLORZONE2", QColor(42,0,255) },
-        { tr("HR Zone 3 Shading"), "HRCOLORZONE3", QColor(0,170,255) },
-        { tr("HR Zone 4 Shading"), "HRCOLORZONE4", QColor(0,255,128) },
-        { tr("HR Zone 5 Shading"), "HRCOLORZONE5", QColor(85,255,0) },
-        { tr("HR Zone 6 Shading"), "HRCOLORZONE6", QColor(255,213,0) },
-        { tr("HR Zone 7 Shading"), "HRCOLORZONE7", QColor(255,0,0) },
-        { tr("HR Zone 8 Shading"), "HRCOLORZONE8", Qt::gray },
-        { tr("HR Zone 9 Shading"), "HRCOLORZONE9", Qt::gray },
-        { tr("HR Zone 10 Shading"), "HRCOLORZONE10", Qt::gray },
-        { tr("Aerolab Vrtual Elevation"), "COLORAEROVE", Qt::blue },
-        { tr("Aerolab Elevation"), "COLORAEROEL", Qt::green },
-        { tr("Calendar background"), "CCALCELL", Qt::white },
-        { tr("Calendar heading"), "CCALHEAD", QColor(230,230,230) },
-        { tr("Calendar Current Selection"), "CCALCURRENT", QColor(255,213,0) },
-        { tr("Calendar Actual Workout"), "CCALACTUAL", Qt::green },
-        { tr("Calendar Planned Workout"), "CCALPLANNED", Qt::yellow },
-        { tr("Calendar Today"), "CCALTODAY", Qt::cyan },
-        { tr("Pop Up Windows Background"), "CPOPUP", Qt::lightGray },
-        { tr("Pop Up Windows Foreground"), "CPOPUPTEXT", Qt::white },
-        { tr("Chart Bar Unselected"), "CTILEBAR", Qt::gray },
-        { tr("Chart Bar Selected"), "CTILEBARSELECT", Qt::yellow },
-        { tr("ToolBar Background"), "CTOOLBAR", Qt::white },
-        { tr("Activity History Group"), "CRIDEGROUP", QColor(236,246,255) },
-        { tr("SpinScan Left"), "CSPINSCANLEFT", Qt::gray },
-        { tr("SpinScan Right"), "CSPINSCANRIGHT", Qt::cyan },
-        { tr("Temperature"), "COLORTEMPERATURE", Qt::yellow },
-        { tr("Default Dial Color"), "CDIAL", Qt::gray },
-        { tr("Alternate Power"), "CALTPOWER", Qt::magenta },
-        { tr("Left Balance"), "CBALANCELEFT", QColor(178,0,0) },
-        { tr("Right Balance"), "CBALANCERIGHT", QColor(128,0,50) },
-        { tr("W' Balance"), "CWBAL", Qt::red },
-        { tr("Mean-maximal Power"), "CRIDECP", Qt::red },
-        { tr("Aerobic TISS"), "CATISS", Qt::magenta },
-        { tr("Anaerobic TISS"), "CANTISS", Qt::cyan },
-        { tr("Left Torque Effectiveness"), "CLTE", Qt::cyan },
-        { tr("Right Torque Effectiveness"), "CRTE", Qt::magenta },
-        { tr("Left Pedal Smoothness"), "CLPS", Qt::cyan },
-        { tr("Right Pedal Smoothness"), "CRPS", Qt::magenta },
+        { tr("Chart"), tr("Plot Background"), "COLORPLOTBACKGROUND", QColor(52,52,52) },
+        { tr("Chart"), tr("Performance Plot Background"), "COLORRIDEPLOTBACKGROUND", QColor(52,52,52) },
+        { tr("Chart"), tr("Trend Plot Background"), "COLORTRENDPLOTBACKGROUND", Qt::black },
+        { tr("Chart"), tr("Train Plot Background"), "COLORTRAINPLOTBACKGROUND", Qt::black },
+        { tr("Chart"), tr("Plot Symbols"), "COLORRIDEPLOTSYMBOLS", Qt::cyan },
+        { tr("Chart"), tr("Performance Plot X Axis"), "COLORRIDEPLOTXAXIS", Qt::blue },
+        { tr("Chart"), tr("Performance Plot Y Axis"), "COLORRIDEPLOTYAXIS", Qt::red },
+        { tr("Chart"), tr("Plot Thumbnail Background"), "COLORPLOTTHUMBNAIL", Qt::gray },
+        { tr("Chart"), tr("Plot Title"), "COLORPLOTTITLE", Qt::gray },
+        { tr("Chart"), tr("Plot Selection Pen"), "COLORPLOTSELECT", Qt::blue },
+        { tr("Chart"), tr("Plot TrackerPen"), "COLORPLOTTRACKER", Qt::blue },
+        { tr("Chart"), tr("Plot Markers"), "COLORPLOTMARKER", Qt::cyan },
+        { tr("Chart"), tr("Plot Grid"), "COLORGRID", QColor(65,65,65) },
+        { tr("Chart"), tr("Interval Highlighter"), "COLORINTERVALHIGHLIGHTER", Qt::blue },
+        { tr("Data"), tr("Heart Rate"), "COLORHEARTRATE", Qt::red },
+        { tr("Data"), tr("Core Temperature"), "COLORCORETEMP", QColor(255, 173, 92) },
+        { tr("Data"), tr("Speed"), "COLORSPEED", Qt::green },
+        { tr("Data"), tr("Acceleration"), "COLORACCEL", Qt::cyan },
+        { tr("Data"), tr("Power"), "COLORPOWER", Qt::yellow },
+        { tr("Data"), tr("Iso Power"), "CNPOWER", Qt::magenta },
+        { tr("Data"), tr("Skiba xPower"), "CXPOWER", Qt::magenta },
+        { tr("Data"), tr("Altitude Power"), "CAPOWER", Qt::magenta },
+        { tr("Data"), tr("Train Target Power"), "CTPOWER", Qt::blue },
+        { tr("Data"), tr("Critical Power"), "COLORCP", Qt::cyan },
+        { tr("Data"), tr("Cadence"), "COLORCADENCE", QColor(0,204,204) },
+        { tr("Data"), tr("Altitude"), "COLORALTITUTDE", QColor(Qt::gray) },
+        { tr("Data"), tr("Altitude Shading"), "COLORALTITUDESHADE", QColor(Qt::lightGray) },
+        { tr("Data"), tr("Wind Speed"), "COLORWINDSPEED", Qt::darkGreen },
+        { tr("Data"), tr("Torque"), "COLORTORQUE", Qt::magenta },
+        { tr("Data"), tr("Slope"), "CSLOPE", Qt::green },
+        { tr("Data"), tr("Gear Ratio"), "COLORGEAR", QColor(0xff, 0x90, 0x00) },
+        { tr("Data"), tr("Run Vertical Oscillation"), "COLORRVERT", QColor(0xff, 0x90, 0x00) }, // same as garmin connect colors
+        { tr("Data"), tr("Run Cadence"), "COLORRCAD", QColor(0xff, 0x90, 0x00) }, // same as garmin connect colors
+        { tr("Data"), tr("Run Ground Contact"), "COLORGCT", QColor(0xff, 0x90, 0x00) }, // same as garmin connect colors
+        { tr("Data"), tr("Muscle Oxygen (SmO2)"), "COLORSMO2", QColor(0x00, 0x89, 0x77) }, // green same as moxy monitor
+        { tr("Data"), tr("Haemoglobin Mass (tHb)"), "COLORTHB", QColor(0xa3,0x44,0x02) },  // brown same as moxy monitor
+        { tr("Data"), tr("Oxygenated Haemoglobin (O2Hb)"), "CO2HB", QColor(0xd1,0x05,0x72) },
+        { tr("Data"), tr("Deoxygenated Haemoglobin (HHb)"), "CHHB", QColor(0x00,0x7f,0xcc) },
+        { tr("Data"), tr("Load"), "COLORLOAD", Qt::yellow },
+        { tr("Data"), tr("BikeStress"), "COLORTSS", Qt::green },
+        { tr("Data"), tr("Short Term Stress"), "COLORSTS", Qt::blue },
+        { tr("Data"), tr("Long Term Stress"), "COLORLTS", Qt::green },
+        { tr("Data"), tr("Stress Balance"), "COLORSB", QColor(180,140,140) },
+        { tr("Data"), tr("Daily Stress"), "COLORDAILYSTRESS", Qt::red },
+        { tr("Data"), "Bike Score (TM)", "COLORBIKESCORE", Qt::gray },
+        { tr("Gui"), tr("Calendar Text"), "COLORCALENDARTEXT", Qt::gray },
+        { tr("Data"), tr("Power Zone 1 Shading"), "COLORZONE1", QColor(255,0,255) },
+        { tr("Data"), tr("Power Zone 2 Shading"), "COLORZONE2", QColor(42,0,255) },
+        { tr("Data"), tr("Power Zone 3 Shading"), "COLORZONE3", QColor(0,170,255) },
+        { tr("Data"), tr("Power Zone 4 Shading"), "COLORZONE4", QColor(0,255,128) },
+        { tr("Data"), tr("Power Zone 5 Shading"), "COLORZONE5", QColor(85,255,0) },
+        { tr("Data"), tr("Power Zone 6 Shading"), "COLORZONE6", QColor(255,213,0) },
+        { tr("Data"), tr("Power Zone 7 Shading"), "COLORZONE7", QColor(255,0,0) },
+        { tr("Data"), tr("Power Zone 8 Shading"), "COLORZONE8", Qt::gray },
+        { tr("Data"), tr("Power Zone 9 Shading"), "COLORZONE9", Qt::gray },
+        { tr("Data"), tr("Power Zone 10 Shading"), "COLORZONE10", Qt::gray },
+        { tr("Data"), tr("HR Zone 1 Shading"), "HRCOLORZONE1", QColor(255,0,255) },
+        { tr("Data"), tr("HR Zone 2 Shading"), "HRCOLORZONE2", QColor(42,0,255) },
+        { tr("Data"), tr("HR Zone 3 Shading"), "HRCOLORZONE3", QColor(0,170,255) },
+        { tr("Data"), tr("HR Zone 4 Shading"), "HRCOLORZONE4", QColor(0,255,128) },
+        { tr("Data"), tr("HR Zone 5 Shading"), "HRCOLORZONE5", QColor(85,255,0) },
+        { tr("Data"), tr("HR Zone 6 Shading"), "HRCOLORZONE6", QColor(255,213,0) },
+        { tr("Data"), tr("HR Zone 7 Shading"), "HRCOLORZONE7", QColor(255,0,0) },
+        { tr("Data"), tr("HR Zone 8 Shading"), "HRCOLORZONE8", Qt::gray },
+        { tr("Data"), tr("HR Zone 9 Shading"), "HRCOLORZONE9", Qt::gray },
+        { tr("Data"), tr("HR Zone 10 Shading"), "HRCOLORZONE10", Qt::gray },
+        { tr("Data"), tr("Aerolab Vrtual Elevation"), "COLORAEROVE", Qt::blue },
+        { tr("Data"), tr("Aerolab Elevation"), "COLORAEROEL", Qt::green },
+        { tr("Gui"), tr("Calendar background"), "CCALCELL", Qt::white },
+        { tr("Gui"), tr("Calendar heading"), "CCALHEAD", QColor(230,230,230) },
+        { tr("Gui"), tr("Calendar Current Selection"), "CCALCURRENT", QColor(255,213,0) },
+        { tr("Gui"), tr("Calendar Actual Workout"), "CCALACTUAL", Qt::green },
+        { tr("Gui"), tr("Calendar Planned Workout"), "CCALPLANNED", Qt::yellow },
+        { tr("Gui"), tr("Calendar Today"), "CCALTODAY", Qt::cyan },
+        { tr("Gui"), tr("Pop Up Windows Background"), "CPOPUP", Qt::lightGray },
+        { tr("Gui"), tr("Pop Up Windows Foreground"), "CPOPUPTEXT", Qt::white },
+        { tr("Gui"), tr("Chart Bar Unselected"), "CTILEBAR", Qt::gray },
+        { tr("Gui"), tr("Chart Bar Selected"), "CTILEBARSELECT", Qt::yellow },
+        { tr("Gui"), tr("ToolBar Background"), "CTOOLBAR", Qt::white },
+        { tr("Gui"), tr("Activity History Group"), "CRIDEGROUP", QColor(236,246,255) },
+        { tr("Data"), tr("SpinScan Left"), "CSPINSCANLEFT", Qt::gray },
+        { tr("Data"), tr("SpinScan Right"), "CSPINSCANRIGHT", Qt::cyan },
+        { tr("Data"), tr("Temperature"), "COLORTEMPERATURE", Qt::yellow },
+        { tr("Data"), tr("Default Dial Color"), "CDIAL", Qt::gray },
+        { tr("Data"), tr("Alternate Power"), "CALTPOWER", Qt::magenta },
+        { tr("Data"), tr("Left Balance"), "CBALANCELEFT", QColor(178,0,0) },
+        { tr("Data"), tr("Right Balance"), "CBALANCERIGHT", QColor(128,0,50) },
+        { tr("Data"), tr("W' Balance"), "CWBAL", Qt::red },
+        { tr("Data"), tr("Mean-maximal Power"), "CRIDECP", Qt::red },
+        { tr("Data"), tr("Aerobic TISS"), "CATISS", Qt::magenta },
+        { tr("Data"), tr("Anaerobic TISS"), "CANTISS", Qt::cyan },
+        { tr("Data"), tr("Left Torque Effectiveness"), "CLTE", Qt::cyan },
+        { tr("Data"), tr("Right Torque Effectiveness"), "CRTE", Qt::magenta },
+        { tr("Data"), tr("Left Pedal Smoothness"), "CLPS", Qt::cyan },
+        { tr("Data"), tr("Right Pedal Smoothness"), "CRPS", Qt::magenta },
 #ifdef GC_HAVE_DWM
-        { tr("Toolbar and Sidebar"), "CCHROME", QColor(1,1,1) },
+        { tr("Gui"), tr("Toolbar and Sidebar"), "CCHROME", QColor(1,1,1) },
 #else
 #ifdef Q_OS_MAC
-        { tr("Toolbar and Sidebar"), "CCHROME", QColor(213,213,213) },
+        { tr("Gui"), tr("Sidebar background"), "CCHROME", QColor(213,213,213) },
 #else
-        { tr("Sidebar background"), "CCHROME", QColor(0xec,0xec,0xec) },
+        { tr("Gui"), tr("Sidebar background"), "CCHROME", QColor(0xec,0xec,0xec) },
 #endif
 #endif
-        { tr("Overview Background"), "COVERVIEWBACKGROUND", QColor(0,0,0) },
-        { tr("Overview Card Background"), "CCARDBACKGROUND", QColor(52,52,52) },
-        { tr("VO2"), "CVO2", Qt::magenta },
-        { tr("Ventilation"), "CVENTILATION", Qt::cyan },
-        { tr("VCO2"), "CVCO2", Qt::green },
-        { tr("Tidal Volume"), "CTIDALVOLUME", Qt::yellow },
-        { tr("Respiratory Frequency"), "CRESPFREQUENCY", Qt::yellow },
-        { tr("FeO2"), "CFEO2", Qt::yellow },
-        { "", "", QColor(0,0,0) },
+        { tr("Gui"), tr("Overview Background"), "COVERVIEWBACKGROUND", QColor(0,0,0) },
+        { tr("Gui"), tr("Overview Tile Background"), "CCARDBACKGROUND", QColor(52,52,52) },
+        { tr("Data"), tr("VO2"), "CVO2", Qt::magenta },
+        { tr("Data"), tr("Ventilation"), "CVENTILATION", Qt::cyan },
+        { tr("Data"), tr("VCO2"), "CVCO2", Qt::green },
+        { tr("Data"), tr("Tidal Volume"), "CTIDALVOLUME", Qt::yellow },
+        { tr("Data"), tr("Respiratory Frequency"), "CRESPFREQUENCY", Qt::yellow },
+        { tr("Data"), tr("FeO2"), "CFEO2", Qt::yellow },
+        { tr("Gui"), tr("Toolbar Hover"), "CHOVER", Qt::lightGray },
+        { tr("Gui"), tr("Chartbar background"), "CCHARTBAR", Qt::lightGray },
+        { tr("Gui"), tr("Overview Tile Background Alternate"), "CCARDBACKGROUND2", QColor(0,0,0) },
+        { tr("Gui"), tr("Overview Tile Background Vibrant"), "CCARDBACKGROUND3", QColor(52,52,52) },
+        { tr("Gui"), tr("Map Route Line"), "MAPROUTELINE", Qt::red },
+        { tr("Data"), tr("Stress Ramp Rate"), "COLORRR", Qt::green },
+        { "", "", "", QColor(0,0,0) },
     };
 
     // set the defaults to system defaults
     init[CCALCURRENT].color = QPalette().color(QPalette::Highlight);
     init[CTOOLBAR].color = QPalette().color(QPalette::Window);
 
-#ifdef Q_OS_MAC
-    // if on yosemite set default chrome to #e5e5e5
-    if (QSysInfo::MacintoshVersion == 12) {
-        init[CCHROME].color = QColor(0xe5,0xe5,0xe5);
-        appsettings->setValue(GC_CHROME, "Flat");
-    }
-#endif
     copyArray(init, DarkDefaultColorList);
     copyArray(init, LightDefaultColorList);
     copyArray(init, ColorList);
@@ -357,48 +363,18 @@ void GCColor::setupColors()
     LightDefaultColorList[94].color = QColor(117,0,117); // 94:Right Pedal Smoothness
     LightDefaultColorList[95].color = QColor(54,55,75); // 95:Toolbar and Sidebar
     LightDefaultColorList[96].color = QColor(227,224,232); // 96:Overview Background
-    LightDefaultColorList[97].color = QColor(255,255,255); // 97:Overview Card Background
+    LightDefaultColorList[97].color = QColor(255,255,255); // 97:Overview Tile Background
     LightDefaultColorList[98].color = QColor(255,25,167); // 98:VO2
     LightDefaultColorList[99].color = QColor(27,203,177); // 99:Ventilation
     LightDefaultColorList[100].color = QColor(0,121,0); // 100:VCO2
     LightDefaultColorList[101].color = QColor(101,44,45); // 101:Tidal Volume
     LightDefaultColorList[102].color = QColor(134,74,255); // 102:Respiratory Frequency
     LightDefaultColorList[103].color = QColor(255,46,46); // 103:FeO2
+    LightDefaultColorList[106].color = QColor(180,180,180); // 106:Tile Alternate
+    LightDefaultColorList[107].color = QColor(238,248,255); // 107:Tile Vibrant
+    LightDefaultColorList[108].color = QColor(255, 0, 0); // 105:MapRouteLine
+    LightDefaultColorList[109].color = QColor(0,102,0); // 109:Stress Ramp Rate
 }
-
-// default settings for fonts etc
-// we err on the side of caution -- smaller is better
-struct SizeSettings defaultAppearance[] ={
-
-    // small screens include netbooks and old vga 800x600, 1024x768
-    { 1024, 768,  8,8,6,6,6,    800, 600 },
-
-    // medium screen size includes typical 16:9 pc formats and TV screens
-    { 1280, 800,  8,8,6,6,6,    800, 600},
-
-    // high resolution screens 
-    { 1650, 1080,  10,10,8,8,8,   1024,650 },
-
-    // very big panels, incl. e.g.  mac 27"
-    { 9999, 9999,  10,10,8,8,8,   1280,700 },
-
-    { 0,0,0,0,0,0,0,0,0 },
-};
-
-struct SizeSettings
-GCColor::defaultSizes(int width, int height)
-{
-    for (int i=0; defaultAppearance[i].maxheight; i++) {
-
-        if (height > defaultAppearance[i].maxheight && width > defaultAppearance[i].maxwidth)
-            continue;
-
-        else return defaultAppearance[i];
-
-    }
-    return defaultAppearance[0]; // shouldn't get here
-}
-
 
 // returns a luminance for a color from 0 (dark) to 255 (very light) 127 is a half way house gray
 double GCColor::luminance(QColor color)
@@ -424,6 +400,22 @@ QColor GCColor::alternateColor(QColor bgColor)
         return QColor(75,75,75); // avoid darkGray as clashes with text cursor on hidpi displays (!)
     else
         return QColor(Qt::lightGray);
+}
+
+QColor GCColor::selectedColor(QColor bgColor)
+{
+     // if foreground is white then we're "dark" if it's
+     // black the we're "light" so this controls palette
+     bool dark = invertColor(bgColor) == QColor(Qt::white);
+     bool isblack = bgColor == QColor(Qt::black); // e.g. mustang theme
+
+     // on select background color
+     QColor bg_select = bgColor;
+     if (dark) bg_select = bg_select.lighter(200);
+     else bg_select = bg_select.darker(200);
+     if (isblack) bg_select = QColor(30, 30, 30);
+
+     return bg_select;
 }
 
 const Colors * GCColor::colorSet()
@@ -456,10 +448,13 @@ GCColor::readConfig()
                                         rgb[2].toInt());
         } else {
 
-            // set sensible defaults for any not set...
+            // set sensible defaults for any not set (as new colors are added)
             if (ColorList[i].name == "CTOOLBAR") {
                 QPalette def;
                 ColorList[i].color = def.color(QPalette::Window);
+            }
+            if (ColorList[i].name == "CCHARTBAR") {
+                ColorList[i].color = ColorList[CTOOLBAR].color;
             }
             if (ColorList[i].name == "CCALCURRENT") {
                 QPalette def;
@@ -583,7 +578,6 @@ GCColor::palette()
     // make it to order, to reflect current config
     QPalette palette;
     palette.setBrush(QPalette::Window, QBrush(GColor(CPLOTBACKGROUND)));
-    palette.setBrush(QPalette::Background, QBrush(GColor(CPLOTBACKGROUND)));
     palette.setBrush(QPalette::Base, QBrush(GColor(CPLOTBACKGROUND)));
     palette.setColor(QPalette::WindowText, GCColor::invertColor(GColor(CPLOTBACKGROUND)));
     palette.setColor(QPalette::Text, GCColor::invertColor(GColor(CPLOTBACKGROUND)));
@@ -598,97 +592,55 @@ GCColor::stylesheet(bool train)
     // make it to order to reflect current config
     QColor bgColor = train ? GColor(CTRAINPLOTBACKGROUND) : GColor(CPLOTBACKGROUND);
     QColor fgColor = GCColor::invertColor(bgColor);
+    QColor bgSelColor = selectedColor(bgColor);
+    QColor fgSelColor = GCColor::invertColor(bgSelColor);
     return QString("QTreeView { color: %2; background: %1; }"
+                   "%3"
                    "QTableWidget { color: %2; background: %1; }"
 #ifndef Q_OS_MAC
                    "QHeaderView { background-color: %1; color: %2; }"
                    "QHeaderView::section { background-color: %1; color: %2; border: 0px ; }"
 #endif
                    "QTableWidget::item:hover { color: black; background: lightGray; }"
-                   "QTreeView::item:hover { color: black; background: lightGray; }").arg(bgColor.name()).arg(fgColor.name());
-}
-
-bool
-GCColor::isFlat()
-{
-    return true;
+                   "QTreeView::item:hover { color: black; background: lightGray; }"
+                   "QTreeView::item:selected { color: %4; background-color: %3; }"
+                  ).arg(bgColor.name()).arg(fgColor.name()).arg(bgSelColor.name()).arg(fgSelColor.name());
 }
 
 // setup a linearGradient for the metallic backgrounds used on things like
 // the toolbar, sidebar handles and so on
 QLinearGradient
-GCColor::linearGradient(int size, bool active, bool alternate)
+GCColor::linearGradient(int size, bool, bool)
 {
     QLinearGradient returning;
-
-    QString chrome = appsettings->value(NULL, GC_CHROME, "Flat").toString();
-
-    if (chrome == "Mac") {
-        int shade, inshade;
-        if (!alternate) {
-#ifdef Q_OS_MAC
-            shade = 178;
-            inshade = 225;
-#else
-            shade = 200;
-            inshade = 250;
-#endif
-        } else {
-#ifdef Q_OS_MAC
-            inshade = 225;
-            shade = 210;
-#else
-            inshade = 250;
-            shade = 225;
-#endif
-        }
-
-        // metallic
-        if (active) {
-            returning = QLinearGradient(0, 0, 0, size);
-            returning.setColorAt(0.0, QColor(shade,shade,shade, 100));
-            returning.setColorAt(0.5, QColor(shade,shade,shade, 180));
-            returning.setColorAt(1.0, QColor(shade,shade,shade, 255));
-            returning.setSpread(QGradient::PadSpread);
-        } else {
-            returning = QLinearGradient(0, 0, 0, size);
-            returning.setColorAt(0.0, QColor(inshade,inshade,inshade, 100));
-            returning.setColorAt(0.5, QColor(inshade,inshade,inshade, 180));
-            returning.setColorAt(1.0, QColor(inshade,inshade,inshade, 255));
-            returning.setSpread(QGradient::PadSpread);
-        }
-
-    } else {
-
-        QColor color = GColor(CCHROME);
+    QColor color = GColor(CCHROME);
 
 //
 // The DWM api is how the MS windows color settings should be accessed
 //
 #ifdef GC_HAVE_DWM
 
-        if (color == QColor(1,1,1)) { // use system default, user hasn't changed
+    if (color == QColor(1,1,1)) { // use system default, user hasn't changed
 
-            // use Windows API
-            DWORD wincolor = 0;
-            BOOL opaque = FALSE;
+        // use Windows API
+        DWORD wincolor = 0;
+        BOOL opaque = FALSE;
 
-            HRESULT hr = DwmGetColorizationColor(&wincolor, &opaque);
-            if (SUCCEEDED(hr)) {
-                BYTE red = GetRValue(wincolor);
-                BYTE green = GetGValue(wincolor);
-                BYTE blue = GetBValue(wincolor);
-                color = QColor::fromRgb(red,green,blue,255);
-            } 
+        HRESULT hr = DwmGetColorizationColor(&wincolor, &opaque);
+        if (SUCCEEDED(hr)) {
+            BYTE red = GetRValue(wincolor);
+            BYTE green = GetGValue(wincolor);
+            BYTE blue = GetBValue(wincolor);
+            color = QColor::fromRgb(red,green,blue,255);
         }
+    }
 #endif
 
-        // just blocks of color
-        returning = QLinearGradient(0, 0, 0, size);
-        returning.setColorAt(0.0, color);
-        returning.setColorAt(1.0, color);
+    // just blocks of color
+    returning = QLinearGradient(0, 0, 0, size);
+    returning.setColorAt(0.0, color);
+    returning.setColorAt(1.0, color);
 
-    }
 
     return returning; 
 }
@@ -730,6 +682,7 @@ Themes::Themes()
     // MODERN DARK (Sublime Editor inspired)
     add.name = tr("Modern Dark");
     add.dark = true;
+    add.stealth = false;
     colors << QColor(19,19,19) // Plot Background
            << QColor(32,32,32) // Toolbar and Sidebar Chrome
            << QColor(85,170,255) // Accent color (markers)
@@ -741,7 +694,9 @@ Themes::Themes()
            << QColor(0,204,204) // Cadence
            << QColor(Qt::magenta) // Torque
            << QColor(19,19,19) // Overview Background
-           << QColor(42,42,42);// Overview Card Background
+           << QColor(39,39,39) // Overview Tile Background
+           << QColor(60,60,60) // Overview Tile Background 2
+           << QColor(84,84,84);// Overview Tile Background 3
     add.colors = colors;
     themes << add;
     colors.clear();
@@ -750,6 +705,7 @@ Themes::Themes()
     // MODERN LIGHT (SAP Fiori Belize inspired)
     add.name = tr("Modern Light");
     add.dark = false;
+    add.stealth = false;
     colors << QColor(Qt::white)  // Plot Background
            << QColor(0xef,0xf4,0xf9) // Toolbar and Sidebar Chrome
            << QColor(0x26,0x84,0xf6) // Accent color (markers)
@@ -761,13 +717,60 @@ Themes::Themes()
            << QColor(0,204,204) // Cadence
            << QColor(Qt::magenta) // Torque
            << QColor(0xcb,0xdc,0xea) // Overview Background
-           << QColor(255,255,255);// Overview Card Background
+           << QColor(255,255,255) // Overview Tile Background
+           << QColor(247,252,255) // Overview Tile Background 2
+           << QColor(231,241,250);// Overview Tile Background 3
+    add.colors = colors;
+    themes << add;
+    colors.clear();
+
+    // STEALTH DARK (tab placement and mostly black)
+    add.name = tr("Modern Stealth Dark");
+    add.dark = true;
+    add.stealth = true;
+    colors << QColor(19,19,19) // Plot Background
+           << QColor(19,19,19) // Toolbar and Sidebar Chrome
+           << QColor(85,170,255) // Accent color (markers)
+           << QColor(194,194,194) // Selection color
+           << QColor(Qt::yellow) // Critical Power and W'Bal
+           << QColor(Qt::red) // Heartrate
+           << QColor(Qt::green) // Speed
+           << QColor(255,170,0) // Power
+           << QColor(0,204,204) // Cadence
+           << QColor(Qt::magenta) // Torque
+           << QColor(19,19,19) // Overview Background
+           << QColor(30,30,30) // Overview Tile Background
+           << QColor(38,38,38) // Overview Tile Background 2
+           << QColor(88,88,88);// Overview Tile Background 3
+    add.colors = colors;
+    themes << add;
+    colors.clear();
+
+    // STEALTH LIGHT (tab placement and mostly white)
+    add.name = tr("Modern Stealth Light");
+    add.dark = false;
+    add.stealth = true;
+    colors << QColor(255,255,255) // Plot Background
+           << QColor(255,255,255) // Toolbar and Sidebar Chrome
+           << QColor(52,99,255) // Accent color (markers)
+           << QColor(Qt::blue) // Selection color
+           << QColor(Qt::darkMagenta) // Critical Power and W'Bal
+           << QColor(Qt::red) // Heartrate
+           << QColor(85,170,0) // Speed
+           << QColor(255,170,0) // Power
+           << QColor(0,204,204) // Cadence
+           << QColor(Qt::magenta) // Torque
+           << QColor(255,255,255) // Overview Background
+           << QColor(245,245,245) // Overview Tile Background
+           << QColor(227,227,227) // Overview Tile Background 2
+           << QColor(202,202,202);// Overview Tile Background 3
     add.colors = colors;
     themes << add;
     colors.clear();
 
     add.name = tr("Gnome Adwaita Dark");
     add.dark = true;
+    add.stealth = false;
     colors << QColor(19,19,19)  // Plot Background
            << QColor(44,49,51) // Toolbar and Sidebar Chrome
            << QColor(85,170,255) // Accent color (markers)
@@ -779,13 +782,16 @@ Themes::Themes()
            << QColor(0,204,204) // Cadence
            << QColor(Qt::magenta) // Torque
            << QColor(19,19,19) // Overview Background
-           << QColor(44,49,51);// Overview Card Background
+           << QColor(44,49,51) // Overview Tile Background
+           << QColor(57,63,66) // Overview Tile Background 2
+           << QColor(73,81,91);// Overview Tile Background 3
     add.colors = colors;
     themes  << add;
     colors.clear();
 
     add.name = tr("Team Colours (light)");
     add.dark = false;
+    add.stealth = false;
     colors << QColor(Qt::white)  // Plot Background
            << QColor(0x36,0x37,0x4b) // Toolbar and Sidebar Chrome
            << QColor(0x65,0x69,0xa5) // Accent color (markers)
@@ -797,15 +803,18 @@ Themes::Themes()
            << QColor(0,204,204) // Cadence
            << QColor(Qt::magenta) // Torque
            << QColor(0xe3,0xe0,0xe8) // Overview Background
-           << QColor(Qt::white);// Overview Card Background
+           << QColor(Qt::white) // Overview Tile Background
+           << QColor(252,249,255) // Overview Tile Background 2
+           << QColor(235,235,250);// Overview Tile Background 3
     add.colors = colors;
     themes  << add;
     colors.clear();
 
     add.name = tr("Ollie's Oatmeal (light)");
     add.dark = false;
-    colors << QColor(0xdd,0xef,0xe6)  // Plot Background
-           << QColor(0x31,0x25,0x0b) // Toolbar and Sidebar Chrome
+    add.stealth = false;
+    colors << QColor(255,255,255)  // Plot Background
+           << QColor(63,69,58) // Toolbar and Sidebar Chrome
            << QColor(0x8d,0x57,0x30) // Accent color (markers)
            << QColor(194,194,194) // Selection color
            << QColor(Qt::darkMagenta) // Critical Power and W'Bal
@@ -814,14 +823,17 @@ Themes::Themes()
            << QColor(255,170,0) // Power
            << QColor(0,204,204) // Cadence
            << QColor(Qt::magenta) // Torque
-           << QColor(0xdd,0xef,0xe6) // Overview Background
-           << QColor(0xce,0xd6,0xc6);// Overview Card Background
+           << QColor(192,201,197) // Overview Background
+           << QColor(235,241,234) // Overview Tile Background
+           << QColor(250,255,247) // Overview Tile Background 2
+           << QColor(83,93,82);// Overview Tile Background 3
     add.colors = colors;
     themes  << add;
     colors.clear();
 
     add.name = tr("Mustang (dark)"); // ** DARK **
     add.dark = true;
+    add.stealth = false;
     colors << QColor(0,0,0)  // Plot Background
            << QColor(35,35,35) // Toolbar and Sidebar Chrome
            << QColor(255,152,0) // Accent color (markers)
@@ -833,13 +845,16 @@ Themes::Themes()
            << QColor(0,204,204) // Cadence
            << QColor(Qt::magenta) // Torque
            << QColor(0,0,0) // Overview Background
-           << QColor(42,42,42);// Overview Card Background
+           << QColor(42,42,42) // Overview Tile Background
+           << QColor(30,30,30) // Overview Tile Background 2
+           << QColor(80,80,80);// Overview Tile Background 3
     add.colors = colors;
     themes  << add;
     colors.clear();
 
     add.name = tr("Mono (dark)"); // New v3.1 default colors // ** DARK **
     add.dark = true;
+    add.stealth = false;
     colors << QColor(Qt::black)  // Plot Background
            << QColor(Qt::black) // Toolbar and Sidebar Chrome
            << QColor(Qt::white) // Accent color (markers)
@@ -851,13 +866,16 @@ Themes::Themes()
            << QColor(0,204,204) // Cadence
            << QColor(Qt::magenta) // Torque
            << QColor(0,0,0) // Overview Background
-           << QColor(42,42,42);// Overview Card Background
+           << QColor(42,42,42) // Overview Tile Background
+           << QColor(42,42,42) // Overview Tile Background 2
+           << QColor(42,42,42);// Overview Tile Background 3
     add.colors = colors;
     themes  << add;
     colors.clear();
 
     add.name = tr("Mono (light)"); // New v3.1 default colors // ** LIGHT **
     add.dark = false;
+    add.stealth = false;
     colors  << QColor(Qt::white)  // Plot Background
            << QColor(Qt::white) // Toolbar and Sidebar Chrome
            << QColor(Qt::black) // Accent color (markers)
@@ -869,7 +887,9 @@ Themes::Themes()
            << QColor(0,204,204) // Cadence
            << QColor(Qt::magenta) // Torque
            << QColor(255,255,255) // Overview Background
-           << QColor(245,245,245);// Overview Card Background
+           << QColor(245,245,245) // Overview Tile Background
+           << QColor(245,245,245) // Overview Tile Background 2
+           << QColor(245,245,245);// Overview Tile Background 3
     add.colors = colors;
     themes  << add;
     colors.clear();
@@ -877,6 +897,7 @@ Themes::Themes()
     // we can add more later ....
     add.name = tr("Schoberer (light)"); // Old GoldenCheetah colors // ** LIGHT **
     add.dark = false;
+    add.stealth = false;
     colors << QColor(Qt::white)  // Plot Background
            << QColor(0xec,0xec,0xec) // Toolbar and Sidebar Chrome
            << QColor(Qt::black) // Accent color (markers)
@@ -888,14 +909,16 @@ Themes::Themes()
            << QColor(Qt::blue) // Cadence
            << QColor(Qt::darkGreen) // Torque
            << QColor(255,255,255) // Overview Background
-           << QColor(245,245,245);// Overview Card Background
+           << QColor(245,245,245) // Overview Tile Background
+           << QColor(245,245,245) // Overview Tile Background 2
+           << QColor(245,245,245);// Overview Tile Background 3
     add.colors = colors;
     themes  << add;
     colors.clear();
 
 }
 
-// NOTE: this is duplicated in Pages.cpp:1565:ColorsPage::applyThemeClicked()
+// NOTE: this is duplicated in Pages.cpp:1407:ColorsPage::applyThemeClicked()
 //       you need to change there too. Sorry.
 void
 GCColor::applyTheme(int index) 
@@ -928,13 +951,32 @@ GCColor::applyTheme(int index)
             color = theme.colors[11];
             break;
 
+        case CCARDBACKGROUND2:
+            // set back to light black for dark themes
+            // and gray for light themes
+            color = theme.colors[12];
+            break;
+
+        case CCARDBACKGROUND3:
+            // set back to light black for dark themes
+            // and gray for light themes
+            color = theme.colors[13];
+            break;
+
         case COVERVIEWBACKGROUND:
             color = theme.colors[10];
             break;
 
         case CCHROME:
+        case CCHARTBAR:
         case CTOOLBAR: // we always keep them the same, but user can make different
             color = theme.colors[1];
+            break;
+
+        case CHOVER:
+            // stealthy themes use overview card background for hover color since they are close
+            // all other themes get a boring default
+            color = theme.stealth ? ColorList[96].color : (theme.dark ? QColor(50,50,50) : QColor(200,200,200));
             break;
 
         case CPLOTSYMBOL:
@@ -1010,7 +1052,6 @@ GCColor::applyTheme(int index)
                                                  .arg(color.green())
                                                  .arg(color.blue());
         appsettings->setValue(ColorList[CCHROME].setting, colorstring);
-        appsettings->setValue(GC_CHROME, "Flat");
     }
 #endif
 }

@@ -79,6 +79,8 @@ class CmdMap
 
 class RemoteControl
 {
+    Q_DECLARE_TR_FUNCTIONS(RemoteControl)
+
     private:
         QList<CmdMap>    _cmdMaps;
         QList<RemoteCmd> _antCmdList;

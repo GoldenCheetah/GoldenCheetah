@@ -41,7 +41,6 @@
 #include "HelpWhatsThis.h"
 #include "GcUpgrade.h"
 #include "Dropbox.h"
-#include "GoogleDrive.h"
 #include "LocalFileStore.h"
 #include "Secrets.h"
 #include "Utils.h"
@@ -210,6 +209,7 @@ AboutRiderPage::AboutRiderPage(QWidget *parent, Context *context) : QWidget(pare
     dob = new QDateEdit(this);
     dob->setDate(appsettings->cvalue(context->athlete->cyclist, GC_DOB).toDate());
     dob->setCalendarPopup(true);
+    dob->setDisplayFormat("yyyy/MM/dd");
 
     sex = new QComboBox(this);
     sex->addItem(tr("Male"));
@@ -250,8 +250,12 @@ AboutRiderPage::AboutRiderPage(QWidget *parent, Context *context) : QWidget(pare
     // Crank length - only used by PfPv chart (should move there!)
     //
     QLabel *crankLengthLabel = new QLabel(tr("Crank Length"));
-    QVariant crankLength = appsettings->cvalue(context->athlete->cyclist, GC_CRANKLENGTH);
+    QVariant crankLength = appsettings->cvalue(context->athlete->cyclist, GC_CRANKLENGTH, "175");
     crankLengthCombo = new QComboBox();
+    crankLengthCombo->addItem("130");
+    crankLengthCombo->addItem("135");
+    crankLengthCombo->addItem("140");
+    crankLengthCombo->addItem("145");
     crankLengthCombo->addItem("150");
     crankLengthCombo->addItem("155");
     crankLengthCombo->addItem("160");
@@ -265,19 +269,14 @@ AboutRiderPage::AboutRiderPage(QWidget *parent, Context *context) : QWidget(pare
     crankLengthCombo->addItem("180");
     crankLengthCombo->addItem("182.5");
     crankLengthCombo->addItem("185");
-    if(crankLength.toString() == "150") crankLengthCombo->setCurrentIndex(0);
-    if(crankLength.toString() == "155") crankLengthCombo->setCurrentIndex(1);
-    if(crankLength.toString() == "160") crankLengthCombo->setCurrentIndex(2);
-    if(crankLength.toString() == "162.5") crankLengthCombo->setCurrentIndex(3);
-    if(crankLength.toString() == "165") crankLengthCombo->setCurrentIndex(4);
-    if(crankLength.toString() == "167.5") crankLengthCombo->setCurrentIndex(5);
-    if(crankLength.toString() == "170") crankLengthCombo->setCurrentIndex(6);
-    if(crankLength.toString() == "172.5") crankLengthCombo->setCurrentIndex(7);
-    if(crankLength.toString() == "175") crankLengthCombo->setCurrentIndex(8);
-    if(crankLength.toString() == "177.5") crankLengthCombo->setCurrentIndex(9);
-    if(crankLength.toString() == "180") crankLengthCombo->setCurrentIndex(10);
-    if(crankLength.toString() == "182.5") crankLengthCombo->setCurrentIndex(11);
-    if(crankLength.toString() == "185") crankLengthCombo->setCurrentIndex(12);
+    crankLengthCombo->addItem("190");
+    crankLengthCombo->addItem("195");
+    crankLengthCombo->addItem("200");
+    crankLengthCombo->addItem("205");
+    crankLengthCombo->addItem("210");
+    crankLengthCombo->addItem("215");
+    crankLengthCombo->addItem("220");
+    crankLengthCombo->setCurrentText(crankLength.toString());
 
     //
     // Wheel size

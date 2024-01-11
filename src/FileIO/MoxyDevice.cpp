@@ -283,7 +283,7 @@ MoxyDevice::download( const QDir &tmpdir,
             QString tmpl = tmpdir.absoluteFilePath(".mxdl.XXXXXX");
             tmpFile = new QTemporaryFile(tmpl);
             if (!tmpFile->open()) {
-                err = tr("Failed to create temporary file ") + tmpl + ": " + tmpFile->error();
+                err = tr("Failed to create temporary file ") + tmpl + ": " + tmpFile->errorString();
                 return false;
             }
 
@@ -545,7 +545,7 @@ MoxyDevice::writeCommand(CommPortPtr dev, const char *command, QString &err)
     // on qt4 we need to waste some cycles
     msleep(100);
 
-    int len = strlen(command);
+    size_t len = strlen(command);
     int n = dev->write(const_cast<char*>(command), len, err);
 
     if (n != len) {

@@ -19,11 +19,12 @@
 #include "GenericSelectTool.h"
 
 #include "Colors.h"
-#include "TabView.h"
+#include "AbstractView.h"
 #include "RideFileCommand.h"
 #include "Utils.h"
 
 #include <limits>
+#include <cmath> // for isinf() isnan()
 
 GenericSelectTool::GenericSelectTool(GenericPlot *host) : QObject(host), QGraphicsItem(NULL), host(host)
 {
@@ -49,7 +50,7 @@ void GenericSelectTool::paint(QPainter*painter, const QStyleOptionGraphicsItem *
     // min max texts
     QFont stGiles; // hoho - Chart Font St. Giles ... ok you have to be British to get this joke
     stGiles.fromString(appsettings->value(NULL, GC_FONT_CHARTLABELS, QFont().toString()).toString());
-    stGiles.setPointSize(appsettings->value(NULL, GC_FONT_CHARTLABELS_SIZE, 8).toInt());
+    stGiles.setPointSizeF(appsettings->value(NULL, GC_FONT_CHARTLABELS_SIZE, 8).toInt()*host->scale_);
     QFontMetrics fm(stGiles); // adjust position to align centre
 
     //
@@ -88,7 +89,7 @@ void GenericSelectTool::paint(QPainter*painter, const QStyleOptionGraphicsItem *
                 QColor invert = GCColor::invertColor(GColor(CPLOTBACKGROUND));
                 painter->setBrush(invert);
                 painter->setPen(invert);
-                QRectF circle(0,0,gl_linemarker*dpiXFactor,gl_linemarker*dpiYFactor);
+                QRectF circle(0,0,gl_linemarker*dpiXFactor*host->scale_,gl_linemarker*dpiYFactor*host->scale_);
                 circle.moveCenter(pos);
                 painter->drawEllipse(circle);
                 painter->setBrush(Qt::NoBrush);
@@ -116,7 +117,7 @@ void GenericSelectTool::paint(QPainter*painter, const QStyleOptionGraphicsItem *
                         QColor invert = GCColor::invertColor(GColor(CPLOTBACKGROUND));
                         painter->setBrush(invert);
                         painter->setPen(invert);
-                        QRectF circle(0,0,gl_scattermarker*dpiXFactor,gl_scattermarker*dpiYFactor);
+                        QRectF circle(0,0,gl_scattermarker*dpiXFactor*host->scale_,gl_scattermarker*dpiYFactor*host->scale_);
                         circle.moveCenter(hoverpoint);
                         painter->drawEllipse(circle);
                         painter->setBrush(Qt::NoBrush);
@@ -165,7 +166,7 @@ void GenericSelectTool::paint(QPainter*painter, const QStyleOptionGraphicsItem *
                         painter->setPen(QPen(axisColor));
 
                         // y value
-                        QString label=QString("%1").arg(v.y(),0,'f',0); // no decimal places XXX fixup on series info
+                        QString label=QString("%1").arg(v.y(),0,'f',2); // no decimal places XXX fixup on series info
                         label = Utils::removeDP(label); // remove unneccessary decimal places
                         painter->drawText(posyp+QPointF(0,fm.tightBoundingRect(label).height()/2.0), label);
 
@@ -191,7 +192,7 @@ void GenericSelectTool::paint(QPainter*painter, const QStyleOptionGraphicsItem *
                         if (xaxis && xaxis->type() == QAbstractAxis::AxisTypeDateTime)
                             label=QDateTime::fromMSecsSinceEpoch(v.x()).toString(static_cast<QDateTimeAxis*>(xaxis)->format());
                         else
-                            label=QString("%1").arg(v.x(),0,'f',0); // no decimal places XXX fixup on series info
+                            label=QString("%1").arg(v.x(),0,'f',2); // no decimal places XXX fixup on series info
                         label = Utils::removeDP(label); // remove unneccessary decimal places
                         painter->setClipRect(mapRectFromScene(host->qchart->plotArea()));
                         painter->drawText(posxp-(QPointF(fm.tightBoundingRect(label).width()/2.0,4)), label);
@@ -264,7 +265,7 @@ void GenericSelectTool::paint(QPainter*painter, const QStyleOptionGraphicsItem *
                             col.setAlphaF(1);
                             QPen line(col);
                             line.setStyle(Qt::SolidLine);
-                            line.setWidthF(0.5 * dpiXFactor);
+                            line.setWidthF(0.5 * dpiXFactor*host->scale_);
                             painter->setPen(line);
                             if (host->charttype == GC_CHART_LINE) painter->setClipRect(r); // too jarring on a line plot
                             else painter->setClipRect(mapRectFromScene(host->qchart->plotArea())); // need context for a scatter plot
@@ -300,7 +301,7 @@ void GenericSelectTool::paint(QPainter*painter, const QStyleOptionGraphicsItem *
                         // min max texts
                         QFont stGiles; // hoho - Chart Font St. Giles ... ok you have to be British to get this joke
                         stGiles.fromString(appsettings->value(NULL, GC_FONT_CHARTLABELS, QFont().toString()).toString());
-                        stGiles.setPointSize(appsettings->value(NULL, GC_FONT_CHARTLABELS_SIZE, 8).toInt());
+                        stGiles.setPointSizeF(appsettings->value(NULL, GC_FONT_CHARTLABELS_SIZE, 8).toInt()*host->scale_);
                         painter->setFont(stGiles);
 
                         QPen markerpen(GColor(CPLOTMARKER));
@@ -506,7 +507,8 @@ GenericSelectTool::released(QPointF pos)
                 QPointF v = host->qchart->mapToValue(pos,yseries);
 
                 // add to chart
-                host->addAnnotation(GenericPlot::LINE, yseries, v.y());
+                // not implemented yet, need to decide how they persist, will do in 3.7
+                // host->addAnnotation(GenericPlot::LINE, yseries, v.y());
             }
 
             return true; // don't drop through into selection logic
@@ -665,8 +667,11 @@ GenericSelectTool::moved(QPointF pos)
             }
 
             // we need to clear x-axis if we aren't hovering on anything at all
+            // but bar and stack charts already get status in hover signals
+            // so don't do this for those chart types.
             if (hoverv == GPointF()) {
-                emit unhoverx();
+                if (host->charttype != GC_CHART_BAR && host->charttype != GC_CHART_STACK && host->charttype != GC_CHART_PERCENT)
+                    emit unhoverx();
             }
 
             // for mouse moves..
@@ -842,6 +847,7 @@ GenericCalculator::initialise()
     x.max = x.min = x.sum = x.mean =
     y.max = y.min = y.sum = y.mean = 0;
     xaxis=yaxis=NULL;
+    actual.clear();
     midnight=QDateTime(QDate::currentDate(), QTime(0,0,0));
 
 }
@@ -854,6 +860,9 @@ GenericCalculator::addPoint(QPointF point)
     // we need original values for linear regress, all other calcs are fine
     // at this point
     QPointF lr=point;
+
+    // if nan/inf ignore it
+    if (std::isinf(point.x()) || std::isnan(point.x()) || std::isinf(point.y()) || std::isnan(point.y())) return;
 
     // X
     if (xaxis && xaxis->type() == QAbstractAxis::AxisTypeDateTime &&

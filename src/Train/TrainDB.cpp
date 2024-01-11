@@ -129,7 +129,7 @@ bool TrainDB::createVideoTable()
         query.prepare("INSERT INTO version (table_name, schema_version, creation_date) values (?,?,?);");
         query.addBindValue("videos");
 	    query.addBindValue(TrainDBSchemaVersion);
-	    query.addBindValue(QDateTime::currentDateTime().toTime_t());
+	    query.addBindValue(QDateTime::currentDateTime().toSecsSinceEpoch());
         rc = query.exec();
     }
     return rc;
@@ -169,7 +169,7 @@ bool TrainDB::createVideoSyncTable()
         query.prepare("INSERT INTO version (table_name, schema_version, creation_date) values (?,?,?);");
         query.addBindValue("videosyncs");
 	    query.addBindValue(TrainDBSchemaVersion);
-	    query.addBindValue(QDateTime::currentDateTime().toTime_t());
+	    query.addBindValue(QDateTime::currentDateTime().toSecsSinceEpoch());
         rc = query.exec();
     }
     return rc;
@@ -219,7 +219,7 @@ bool TrainDB::createWorkoutTable()
         query.prepare("INSERT INTO version (table_name, schema_version, creation_date) values (?,?,?);");
         query.addBindValue("workouts");
 	    query.addBindValue(TrainDBSchemaVersion);
-	    query.addBindValue(QDateTime::currentDateTime().toTime_t());
+	    query.addBindValue(QDateTime::currentDateTime().toSecsSinceEpoch());
         rc = query.exec();
     }
     return rc;

@@ -148,7 +148,7 @@ Snippets::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString op=
             for (i=ride->tags().constBegin(); i != ride->tags().constEnd(); i++) {
 
                     out << "\t\t\t\"" << i.key() << "\": \"" << protect(i.value()) << "\"";
-                    if (i+1 != ride->tags().constEnd()) out << ",\n";
+                    if (std::next(i) != ride->tags().constEnd()) out << ",\n";
                     else out << "\n";
             }
 

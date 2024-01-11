@@ -1,4 +1,4 @@
-/* -*- mode: C++ ; c-file-style: "stroustrup" -*- *****************************
+/******************************************************************************
  * Qwt Widget Library
  * Copyright (C) 1997   Josef Wilgen
  * Copyright (C) 2002   Uwe Rathmann
@@ -14,10 +14,10 @@
 
 // QWT_VERSION is (major << 16) + (minor << 8) + patch.
 
-#define QWT_VERSION       0x060101
-#define QWT_VERSION_STR   "6.1.1"
+#define QWT_VERSION       0x060400
+#define QWT_VERSION_STR   "6.4.0"
 
-#if defined(_MSC_VER) /* MSVC Compiler */
+#if defined( _MSC_VER ) /* MSVC Compiler */
 /* template-class specialization 'identifier' is already instantiated */
 #pragma warning(disable: 4660)
 /* inherits via dominance */
@@ -26,10 +26,10 @@
 
 #ifdef QWT_DLL
 
-#if defined(QWT_MAKEDLL)     // create a Qwt DLL library 
+#if defined( QWT_MAKEDLL )     // create a Qwt DLL library
 #define QWT_EXPORT Q_DECL_EXPORT
 #else                        // use a Qwt DLL library
-#define QWT_EXPORT Q_DECL_IMPORT 
+#define QWT_EXPORT Q_DECL_IMPORT
 #endif
 
 #endif // QWT_DLL
@@ -38,4 +38,23 @@
 #define QWT_EXPORT
 #endif
 
-#endif 
+#define QWT_CONSTEXPR Q_DECL_CONSTEXPR
+
+#if QT_VERSION >= 0x050000
+#define QWT_OVERRIDE Q_DECL_OVERRIDE
+#define QWT_FINAL Q_DECL_FINAL
+#endif
+
+#ifndef QWT_CONSTEXPR
+#define QWT_CONSTEXPR
+#endif
+
+#ifndef QWT_OVERRIDE
+#define QWT_OVERRIDE
+#endif
+
+#ifndef QWT_FINAL
+#define QWT_FINAL
+#endif
+
+#endif

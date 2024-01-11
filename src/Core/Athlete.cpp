@@ -270,8 +270,11 @@ void Athlete::selectRideFile(QString fileName)
     foreach (RideItem *rideItem, rideCache->rides()) {
 
         context->ride = (RideItem*) rideItem;
-        if (context->ride->fileName == fileName) 
+        if (context->ride->fileName == fileName)  {
+            // lets open it before we let folks know
+            context->ride->ride();
             break;
+        }
     }
     context->notifyRideSelected(context->ride);
 }
@@ -405,7 +408,7 @@ AthleteDirectoryStructure::AthleteDirectoryStructure(const QDir home){
 
 AthleteDirectoryStructure::~AthleteDirectoryStructure() {
 
-    myhome = NULL;
+    myhome = QDir();
 
 }
 
@@ -587,11 +590,11 @@ Athlete::getPMCFor(Leaf *expr, DataFilterRuntime *df, int stsdays, int ltsdays)
 }
 
 PDEstimate
-Athlete::getPDEstimateFor(QDate date, QString model, bool wpk, bool run)
+Athlete::getPDEstimateFor(QDate date, QString model, bool wpk, QString sport)
 {
     // whats the estimate for this date
     foreach(PDEstimate est, getPDEstimates()) {
-        if (est.model == model && est.wpk == wpk && est.run == run && est.from <= date && est.to >= date)
+        if (est.model == model && est.wpk == wpk && est.sport == sport && est.from <= date && est.to >= date)
             return est;
     }
     return PDEstimate();

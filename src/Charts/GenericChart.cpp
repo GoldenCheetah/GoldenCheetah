@@ -19,7 +19,7 @@
 #include "GenericChart.h"
 
 #include "Colors.h"
-#include "TabView.h"
+#include "AbstractView.h"
 #include "RideFileCommand.h"
 #include "Utils.h"
 
@@ -42,11 +42,11 @@
 // honoured too, since multiple series stacked can get
 // cramped, so these are placed into a scroll area
 //
-GenericChart::GenericChart(QWidget *parent, Context *context) : QWidget(parent), context(context)
+GenericChart::GenericChart(QWidget *parent, Context *context) : QWidget(parent), context(context), item(NULL), blocked(false)
 {
     // for scrollarea, since we see a little of it.
     QPalette palette;
-    palette.setBrush(QPalette::Background, QBrush(GColor(CRIDEPLOTBACKGROUND)));
+    palette.setBrush(QPalette::Window, QBrush(GColor(CRIDEPLOTBACKGROUND)));
 
     // main layout for widget
     QVBoxLayout *main=new QVBoxLayout(this);
@@ -83,6 +83,8 @@ GenericChart::GenericChart(QWidget *parent, Context *context) : QWidget(parent),
     // watch for color/themes change
     connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
 
+    // default bgcolor
+    bgcolor = GColor(CPLOTBACKGROUND);
     configChanged(0);
 }
 
@@ -91,21 +93,36 @@ GenericChart::configChanged(qint32)
 {
     setUpdatesEnabled(false);
 
-    setProperty("color", GColor(CPLOTBACKGROUND));
+    setProperty("color", bgcolor);
     QPalette palette;
-    palette.setBrush(QPalette::Background, QBrush(GColor(CRIDEPLOTBACKGROUND)));
+    palette.setBrush(QPalette::Window, QBrush(bgcolor));
     setPalette(palette); // propagates to children
 
     // set style sheets
 #ifndef Q_OS_MAC
-    stackFrame->setStyleSheet(TabView::ourStyleSheet());
+    stackFrame->setStyleSheet(AbstractView::ourStyleSheet());
 #endif
     setUpdatesEnabled(true);
 }
 
+void
+GenericChart::setBackgroundColor(QColor bgcolor)
+{
+    if (bgcolor != this->bgcolor) {
+        this->bgcolor = bgcolor;
+        configChanged(0);
+    }
+}
+
+void
+GenericChart::setGraphicsItem(QGraphicsItem *item)
+{
+    this->item = item;
+}
+
 // set chart settings
 bool
-GenericChart::initialiseChart(QString title, int type, bool animate, int legendpos, bool stack, int orientation)
+GenericChart::initialiseChart(QString title, int type, bool animate, int legendpos, bool stack, int orientation, double scale)
 {
     // Remember the settings, we use them for every new plot
     this->title = title;
@@ -114,6 +131,7 @@ GenericChart::initialiseChart(QString title, int type, bool animate, int legendp
     this->legendpos = legendpos;
     this->stack = stack;
     this->orientation = orientation;
+    this->scale = scale;
 
     // store info as its passed to us
     newSeries.clear();
@@ -125,40 +143,29 @@ GenericChart::initialiseChart(QString title, int type, bool animate, int legendp
 // add a curve, associating an axis
 bool
 GenericChart::addCurve(QString name, QVector<double> xseries, QVector<double> yseries, QVector<QString> fseries, QString xname, QString yname,
-                      QStringList labels, QStringList colors,
-                      int line, int symbol, int size, QString color, int opacity, bool opengl, bool legend, bool datalabels, bool fill)
+                      QStringList labels, QStringList colors, int line, int symbol, int size, QString color, int opacity, bool opengl,
+                      bool legend, bool datalabels, bool fill, RideMetric::MetricType mtype, QList<GenericAnnotationInfo> annotations)
 {
 
-    newSeries << GenericSeriesInfo(name, xseries, yseries, fseries, xname, yname, labels, colors, line, symbol, size, color, opacity, opengl, legend, datalabels, fill);
+    newSeries << GenericSeriesInfo(name, xseries, yseries, fseries, xname, yname, labels, colors, line, symbol, size, color, opacity, opengl, legend, datalabels, fill, mtype, annotations);
     return true;
 }
 
 #if QT_VERSION < 0x060000
 // In Qt 6, QStringList is a QVector<QString>, so we don't need an additional overload
-// helper for python
+// helper for python - no aggregateby, no annotations
 bool
 GenericChart::addCurve(QString name, QVector<double> xseries, QVector<double> yseries, QStringList fseries, QString xname, QString yname,
-                      QStringList labels, QStringList colors,
-                      int line, int symbol, int size, QString color, int opacity, bool opengl, bool legend, bool datalabels, bool fill)
+                      QStringList labels, QStringList colors, int line, int symbol, int size, QString color, int opacity, bool opengl,
+                      bool legend, bool datalabels, bool fill)
 {
     QVector<QString> flist;
     for(int i=0; i<fseries.count(); i++) flist << fseries.at(i);
-    newSeries << GenericSeriesInfo(name, xseries, yseries, flist, xname, yname, labels, colors, line, symbol, size, color, opacity, opengl, legend, datalabels, fill);
+    newSeries << GenericSeriesInfo(name, xseries, yseries, flist, xname, yname, labels, colors, line, symbol, size, color, opacity,
+                                   opengl, legend, datalabels, fill, RideMetric::Average, QList<GenericAnnotationInfo>());
     return true;
 }
 #endif
-
-// add a label to a series
-bool
-GenericChart::annotateLabel(QString name, QStringList list)
-{
-    // add to the curve
-    for(int i=0; i<newSeries.count(); i++)
-        if (newSeries[i].name == name)
-            newSeries[i].annotateLabels << list;
-
-    return true;
-}
 
 // configure axis, after curves added
 bool
@@ -249,6 +256,10 @@ GenericChart::preprocessData()
 void
 GenericChart::finaliseChart()
 {
+    if (blocked) return;
+
+    blocked = true; // absolutely not reentrant or thread-safe
+
     setUpdatesEnabled(false); // lets not open our kimono here
 
     // now we know the axis/series and relationships we can
@@ -336,16 +347,17 @@ GenericChart::finaliseChart()
         int index = GenericPlotInfo::findPlot(currentPlots, newPlots[i]);
 
         // don't reuse bar/pie charts, easier to rebuild
-        if (type == GC_CHART_PIE || type == GC_CHART_BAR) index = -1;
+        if (type == GC_CHART_PIE || type == GC_CHART_BAR || type == GC_CHART_STACK || type == GC_CHART_PERCENT) index = -1;
 
         if (index <0) {
             // new one required
-            newPlots[i].plot = new GenericPlot(this, context);
+            newPlots[i].plot = new GenericPlot(this, context, item);
 
             target->addWidget(newPlots[i].plot);
             target->setStretchFactor(newPlots[i].plot, 10);// make them all the same
         } else {
             newPlots[i].plot = currentPlots[index].plot; // reuse
+            newPlots[i].plot->clearAnnotations(); // zap annottions left behind
             currentPlots[index].state = GenericPlotInfo::matched; // don't deleteme !
 
             // make sure its in the right layout (might remove and add back to the same layout!)
@@ -367,26 +379,34 @@ GenericChart::finaliseChart()
     // stack mode. I would expect this to make things
     // worse but for some reason, it solves the problem.
     // do not remove !!!
-    QApplication::processEvents();
+    //
+    // **REMOVED 31/08/2021** as it is dangerous to do
+    // whilst charts are being destroyed and also
+    // led to a problem with events being ignored
+    // commented out to fix:
+    // https://github.com/GoldenCheetah/GoldenCheetah/issues/4029
+    // Could not recreate the original issue with axis
+    // being painted/repainted in different locations
+    // that this originally "resolved" so seemed save to
+    // remove for now.
+    //QApplication::processEvents();
 
     // now initialise all the newPlots
     for(int i=0; i<newPlots.count(); i++) {
 
         // set initial parameters
-        newPlots[i].plot->initialiseChart(title, type, animate, legendpos);
+        newPlots[i].plot->setBackgroundColor(bgcolor);
+        newPlots[i].plot->initialiseChart(title, type, animate, legendpos, scale);
 
         // add curves
         QListIterator<GenericSeriesInfo>s(newPlots[i].series);
         while(s.hasNext()) {
-            GenericSeriesInfo p=s.next();
-            newPlots[i].plot->addCurve(p.name, p.xseries, p.yseries, p.fseries, p.xname, p.yname, p.labels, p.colors, p.line, p.symbol, p.size, p.color, p.opacity, p.opengl, p.legend, p.datalabels, p.fill);
 
-            // did we get some labels associated with the curve?
-            QListIterator<QStringList>l(p.annotateLabels);
-            while(l.hasNext()) {
-                QStringList list=l.next();
-                newPlots[i].plot->addAnnotation(GenericPlot::LABEL, list.join(" "), RGBColor(QColor(p.color)));
-            }
+            GenericSeriesInfo p=s.next();
+
+            // add curve-- with additional axis info in advance since it finally is added to an actual chart
+            newPlots[i].plot->addCurve(p.name, p.xseries, p.yseries, p.fseries, p.xname, p.yname, p.labels, p.colors, p.line,
+                                       p.symbol, p.size, p.color, p.opacity, p.opengl, p.legend, p.datalabels, p.fill, p.annotations);
 
         }
 
@@ -410,4 +430,7 @@ GenericChart::finaliseChart()
 
     // and display
     setUpdatesEnabled(true);
+
+    // happy to do again now
+    blocked=false;
 }
