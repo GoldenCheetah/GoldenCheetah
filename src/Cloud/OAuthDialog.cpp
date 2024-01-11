@@ -79,7 +79,6 @@ OAuthDialog::OAuthDialog(Context *context, OAuthSite site, CloudService *service
     view->page()->profile()->cookieStore()->deleteAllCookies();
 
     view->setContentsMargins(0,0,0,0);
-    view->page()->view()->setContentsMargins(0,0,0,0);
     view->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     view->setAcceptDrops(false);
     layout->addWidget(view);
