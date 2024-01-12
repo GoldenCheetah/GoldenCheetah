@@ -164,7 +164,9 @@ MeasuresGroup::serialize(QString filename, QList<Measure> &data)
     };
     file.resize(0);
     QTextStream out(&file);
+#if QT_VERSION < 0x060000
     out.setCodec("UTF-8");
+#endif
 
     Measure *m = NULL;
     QJsonArray measures;

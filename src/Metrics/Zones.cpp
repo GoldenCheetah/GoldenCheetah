@@ -105,7 +105,9 @@ bool Zones::read(QFile &file)
         return false;
     }
     QTextStream fileStream(&file);
+#if QT_VERSION < 0x060000
     fileStream.setCodec("UTF-8");
+#endif
 
     QRegExp commentrx("\\s*#.*$");
     QRegExp blankrx("^[ \t]*$");
@@ -892,7 +894,9 @@ void Zones::write(QDir home)
     if (file.open(QFile::WriteOnly)) {
 
         QTextStream stream(&file);
+#if QT_VERSION < 0x060000
         stream.setCodec("UTF-8");
+#endif
         stream << strzones;
         file.close();
     } else {
