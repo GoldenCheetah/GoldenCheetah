@@ -35,7 +35,6 @@
 #include <QJsonArray>
 #include <QXmlInputSource>
 #include <QXmlSimpleReader>
-#include <QDesktopWidget>
 
 CloudDBUserMetricClient::CloudDBUserMetricClient()
 {

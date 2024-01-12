@@ -33,7 +33,6 @@
 #include <QFileIconProvider>
 #include <QMessageBox>
 #include <QHeaderView>
-#include <QDesktopWidget>
 
 #include "../qzip/zipwriter.h"
 #include "../qzip/zipreader.h"

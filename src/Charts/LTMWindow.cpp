@@ -36,7 +36,6 @@
 #include "GcOverlayWidget.h"
 
 #include <QWebEngineSettings>
-#include <QDesktopWidget>
 
 #include <QtGlobal>
 #include <QtGui>
@@ -144,7 +143,7 @@ LTMWindow::LTMWindow(Context *context) :
     //XXXdataSummary->setEnabled(false); // stop grabbing focus
     if (dpiXFactor > 1) {
     // 80 lines per page on hidpi screens (?)
-        int pixelsize = pixelSizeForFont(defaultFont, QApplication::desktop()->geometry().height()/80);
+        int pixelsize = pixelSizeForFont(defaultFont, QApplication::primaryScreen()->geometry().height()/80);
         dataSummary->settings()->setFontSize(QWebEngineSettings::DefaultFontSize, pixelsize);
     } else {
         dataSummary->settings()->setFontSize(QWebEngineSettings::DefaultFontSize, defaultFont.pointSize()+1);
