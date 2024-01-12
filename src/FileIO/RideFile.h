@@ -27,6 +27,7 @@
 #include <QMap>
 #include <QVector>
 #include <QObject>
+#include <QRegExp>
 
 class RideItem;
 class RideCache;

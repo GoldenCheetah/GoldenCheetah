@@ -437,7 +437,7 @@ Routes::createRouteFromInterval(IntervalItem *activeInterval)
     int index = context->athlete->routes->newRoute("route");
     RouteSegment *route = &context->athlete->routes->routes[index];
 
-    QRegExp watts("\\([0-9]* *watts\\)");
+    QRegularExpression watts("\\([0-9]* *watts\\)");
 
     QString name = activeInterval->name; //activeInterval->text(0).trimmed();
     if (name.contains(watts))

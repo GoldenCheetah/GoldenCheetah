@@ -22,6 +22,7 @@
 #include "TimeUtils.h"
 #include <QtGui>
 #include <QtAlgorithms>
+#include <QRegExp>
 #include <qcolor.h>
 #include <assert.h>
 #include <cmath>

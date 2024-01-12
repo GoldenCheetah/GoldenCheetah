@@ -702,7 +702,7 @@ MergeSource::importFile()
 
     const RideFileFactory &rff = RideFileFactory::instance();
     QStringList suffixList = rff.suffixes();
-    suffixList.replaceInStrings(QRegExp("^"), "*.");
+    suffixList.replaceInStrings(QRegularExpression("^"), "*.");
     QStringList fileNames;
     QStringList allFormats;
     allFormats << QString(tr("All Supported Formats (%1)")).arg(suffixList.join(" "));

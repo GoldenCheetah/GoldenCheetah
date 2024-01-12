@@ -2739,7 +2739,7 @@ FieldsPage::getDefinitions(QList<FieldDefinition> &fieldList)
 
         add.tab = st.internalName(item->text(0));
         add.name = sp.internalName(item->text(1));
-        add.values = item->text(3).split(QRegExp("(, *|,)"), Qt::KeepEmptyParts);
+        add.values = item->text(3).split(QRegularExpression("(, *|,)"), Qt::KeepEmptyParts);
         add.diary = ((QCheckBox*)fields->itemWidget(item, 4))->isChecked();
         add.interval = ((QCheckBox*)fields->itemWidget(item, 5))->isChecked();
         add.expression = item->text(6);

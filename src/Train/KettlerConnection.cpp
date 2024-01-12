@@ -22,6 +22,7 @@
 #include <QDebug>
 #include <QFile>
 #include <QTextStream>
+#include <QRegularExpression>
 
 KettlerConnection::KettlerConnection() :
     m_serial(0),
@@ -126,7 +127,7 @@ void KettlerConnection::requestAll()
         }
 
         QString dataString = QString(data);
-        QStringList splits = dataString.split(QRegExp("\\s"));
+        QStringList splits = dataString.split(QRegularExpression("\\s"));
 
         // We need to make sure the last split is 3 chars long, otherwise we
         // might have read a partial power value

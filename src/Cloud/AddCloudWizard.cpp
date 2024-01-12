@@ -690,7 +690,7 @@ AddFinish::initializePage()
             case CloudService::Local3:
             case CloudService::Local4:
             case CloudService::Local5:
-            case CloudService::Local6: label=want.value().split(QRegExp("[<>/]")).last(); break;
+            case CloudService::Local6: label=want.value().split(QRegularExpression("[<>/]")).last(); break;
             case CloudService::Consent:
             case CloudService::DefaultURL: break;
         }
