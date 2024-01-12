@@ -107,11 +107,7 @@ GcOverlayWidget::GcOverlayWidget(Context *context, QWidget *parent) : QWidget(pa
 void
 GcOverlayWidget::configChanged(qint32)
 {
-    if (GCColor::isFlat()) {
-        titleLabel->setStyleSheet(QString("color: %1;").arg(GCColor::invertColor(GColor(CCHROME)).name()));
-    } else {
-        titleLabel->setStyleSheet("color: black;");
-    }
+    titleLabel->setStyleSheet(QString("color: %1;").arg(GCColor::invertColor(GColor(CCHROME)).name()));
 }
 
 void
@@ -223,16 +219,6 @@ GcOverlayWidget::paintBackground(QPaintEvent *)
     QRect title(1*dpiXFactor,1*dpiYFactor,width()-(2*dpiXFactor),22*dpiYFactor);
     painter.fillRect(title, QColor(Qt::white));
     painter.fillRect(title, isActiveWindow() ? active : inactive);
-
-    if (!GCColor::isFlat()) {
-        QPen black(QColor(100,100,100,200));
-        painter.setPen(black);
-        painter.drawLine(0,22*dpiYFactor, width()-(1*dpiXFactor), 22*dpiYFactor);
-
-        //QPen gray(QColor(230,230,230));
-        //painter.setPen(gray);
-        //painter.drawLine(0,0, width()-1, 0);
-    }
 
     painter.restore();
 }

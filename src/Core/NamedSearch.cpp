@@ -91,13 +91,13 @@ NamedSearches::read()
         NamedSearch namedSearch;
         namedSearch.type = NamedSearch::filter;
         namedSearch.name = tr("Swim");
-        namedSearch.text = "isSwim<>0";
+        namedSearch.text = "isSwim";
         list.append(namedSearch);
         namedSearch.name = tr("Bike");
-        namedSearch.text = "(isRun=0) and (isSwim=0)";
+        namedSearch.text = "isRide";
         list.append(namedSearch);
         namedSearch.name = tr("Run");
-        namedSearch.text = "isRun<>0";
+        namedSearch.text = "isRun";
         list.append(namedSearch);
     }
 
@@ -198,7 +198,9 @@ NamedSearchParser::serialize(QString filename, QList<NamedSearch>NamedSearches)
     };
     file.resize(0);
     QTextStream out(&file);
+#if QT_VERSION < 0x060000
     out.setCodec("UTF-8");
+#endif
 
     // begin document
     out << "<NamedSearches>\n";

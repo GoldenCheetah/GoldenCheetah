@@ -59,7 +59,7 @@ class IntervalCache;
 class Context;
 class ColorEngine;
 class AnalysisSidebar;
-class Tab;
+class AthleteTab;
 class Leaf;
 class DataFilterRuntime;
 class CloudServiceAutoDownload;
@@ -100,7 +100,7 @@ class Athlete : public QObject
         CloudServiceAutoDownload *cloudAutoDownload;
 
         // Estimates
-        PDEstimate getPDEstimateFor(QDate, QString model, bool wpk, bool run);
+        PDEstimate getPDEstimateFor(QDate, QString model, bool wpk, QString sport);
         QList<PDEstimate> getPDEstimates();
 
         // PMC Data

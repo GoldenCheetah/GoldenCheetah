@@ -18,6 +18,7 @@
 
 #include "ErgDB.h"
 #include <QJsonDocument>
+#include <QTextDocumentFragment>
 
 #ifndef ERG_DEBUG
 #define ERG_DEBUG false
@@ -92,7 +93,8 @@ ErgDB::getListFinished(QNetworkReply *reply)
 
                 ErgDBItem add;
                 add.id = each["id"].toInt();
-                add.name = each["title"].toString();
+                // title is HTML encoded and may contain "/", lets try to make it a readable and valid filename
+                add.name = QTextDocumentFragment::fromHtml(each["title"].toString()).toPlainText().replace("/", "-");
                 QString type = each["user_wo_type"].toString();
                 if (type != each["ergdb_wo_type"].toString())
                     type += "/"+each["ergdb_wo_type"].toString();

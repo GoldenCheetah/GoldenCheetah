@@ -3,7 +3,7 @@
 #include "FixPyScriptsDialog.h"
 #include "MainWindow.h"
 #include "Colors.h"
-#include "TabView.h"
+#include "AbstractView.h"
 #include "PythonEmbed.h"
 #include "PythonSyntax.h"
 
@@ -140,7 +140,7 @@ EditFixPyScriptDialog::EditFixPyScriptDialog(Context *context, FixPyScript *fix,
     p.setColor(QPalette::Base, GColor(CPLOTBACKGROUND));
     p.setColor(QPalette::Text, GCColor::invertColor(GColor(CPLOTBACKGROUND)));
     script->setPalette(p);
-    script->setStyleSheet(TabView::ourStyleSheet());
+    script->setStyleSheet(AbstractView::ourStyleSheet());
     scriptLayout->addWidget(script);
 
     // syntax highlighter

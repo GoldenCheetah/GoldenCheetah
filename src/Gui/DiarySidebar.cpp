@@ -157,18 +157,10 @@ GcLabel::paintEvent(QPaintEvent *)
     if (text() != "<" && text() != ">") {
         painter.setFont(this->font());
 
-        if (!GCColor::isFlat() && (xoff || yoff)) {
-
-            // draw text in white behind...
-            QRectF off(xoff,yoff,width(),height());
-            painter.setPen(QColor(255,255,255,200));
-            painter.drawText(off, alignment(), text());
-        }
-
         if (filtered && !selected && !underMouse()) painter.setPen(GColor(CCALCURRENT));
         else {
 
-            if (isChrome && GCColor::isFlat()) {
+            if (isChrome) {
 
                 if (GCColor::luminance(GColor(CCHROME)) < 127)
                     painter.setPen(QColor(Qt::white));
@@ -377,7 +369,7 @@ GcMiniCalendar::GcMiniCalendar(Context *context, bool master) : context(context)
     layout->addStretch();
 
     // day clicked
-    connect(signalMapper, SIGNAL(mapped(int)), this, SLOT(dayClicked(int)));
+    connect(signalMapper, &QSignalMapper::mappedInt, this, &GcMiniCalendar::dayClicked);
 
     // set up for current selections - and watch for future changes
     connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));

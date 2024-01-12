@@ -13,6 +13,9 @@
 #include "qwt_plot_marker.h"
 #include "qwt_painter.h"
 #include "qwt_scale_map.h"
+#include "qwt_text.h"
+
+#include <QPainter>
 
 #include <iostream>       // std::cerr
 #include <stdexcept>      // std::out_of_range

@@ -658,7 +658,7 @@ int VirtualPowerTrainerManager::PushCustomVirtualPowerTrainer(const QString& str
         if (pieceCount != 5 && pieceCount != 6) break; // no inertia supported for back compat
 
         // section 0 DEF
-        QStringList defPieces = pieces.at(0).split(QRegExp(QRegExp::escape(",")));
+        QStringList defPieces = pieces.at(0).split(QRegularExpression(QRegExp::escape(",")));
         size_t defCount = defPieces.size();
         if (defCount != 3) break; // bad prefix section count...
 
@@ -677,7 +677,7 @@ int VirtualPowerTrainerManager::PushCustomVirtualPowerTrainer(const QString& str
         if (numeratorCount <= 0 || numeratorCount > 14) break; // bad numerator coef count
 
         // section 1 COEFS
-        QStringList coefs = pieces.at(1).split(QRegExp(QRegExp::escape(",")));
+        QStringList coefs = pieces.at(1).split(QRegularExpression(QRegExp::escape(",")));
         size_t coefPieceCount = coefs.size();
         if (coefPieceCount != coefCount) break; // wrong number of coefs in string
 

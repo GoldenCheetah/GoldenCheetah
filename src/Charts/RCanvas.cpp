@@ -20,7 +20,7 @@
 
 #include "Context.h"
 #include "Colors.h"
-#include "TabView.h"
+#include "AbstractView.h"
 
 
 
@@ -79,7 +79,7 @@ RCanvas::configChanged(qint32)
     p.setColor(QPalette::Base, GColor(CPLOTBACKGROUND));
     p.setColor(QPalette::Text, GCColor::invertColor(GColor(CPLOTBACKGROUND)));
     setPalette(p);
-    setStyleSheet(TabView::ourStyleSheet());
+    setStyleSheet(AbstractView::ourStyleSheet());
 }
 
 void

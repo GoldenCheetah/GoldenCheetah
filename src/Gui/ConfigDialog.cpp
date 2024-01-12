@@ -73,7 +73,7 @@ ConfigDialog::ConfigDialog(QDir _home, Context *context) :
     // Setup the signal mapping so the right config
     // widget is displayed when the icon is clicked
     QSignalMapper *iconMapper = new QSignalMapper(this); // maps each option
-    connect(iconMapper, SIGNAL(mapped(int)), this, SLOT(changePage(int)));
+    connect(iconMapper, &QSignalMapper::mappedInt, this, &ConfigDialog::changePage);
     head->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
     head->setIconSize(QSize(32*dpiXFactor,32*dpiXFactor)); // use XFactor for both to ensure aspect ratio maintained
 
@@ -156,11 +156,13 @@ ConfigDialog::ConfigDialog(QDir _home, Context *context) :
 
     closeButton = new QPushButton(tr("Close"));
     saveButton = new QPushButton(tr("Save"));
+    resetAppearance = new QPushButton(tr("Reset Appearance to Defaults"));
 
     QHBoxLayout *horizontalLayout = new QHBoxLayout;
     horizontalLayout->addWidget(pagesWidget, 1);
 
     QHBoxLayout *buttonsLayout = new QHBoxLayout;
+    buttonsLayout->addWidget(resetAppearance);
     buttonsLayout->addStretch();
     buttonsLayout->setSpacing(5 *dpiXFactor);
     buttonsLayout->addWidget(closeButton);
@@ -184,8 +186,11 @@ ConfigDialog::ConfigDialog(QDir _home, Context *context) :
     setWindowTitle(tr("Options"));
 #endif
 
+    resetAppearance->hide();
+
     connect(closeButton, SIGNAL(clicked()), this, SLOT(closeClicked()));
     connect(saveButton, SIGNAL(clicked()), this, SLOT(saveClicked()));
+    connect(resetAppearance, SIGNAL(clicked()), appearance->appearancePage, SLOT(resetClicked()));
 }
 
 ConfigDialog::~ConfigDialog()
@@ -196,6 +201,10 @@ ConfigDialog::~ConfigDialog()
 
 void ConfigDialog::changePage(int index)
 {
+    // only want reset appearance button on the appearances page
+    if (index == 1) resetAppearance->show();
+    else resetAppearance->hide();
+
     pagesWidget->setCurrentIndex(index);
 }
 

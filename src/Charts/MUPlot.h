@@ -31,7 +31,7 @@
 #include <qwt_plot_marker.h>
 #include <qwt_plot_spectrocurve.h>
 #include <qwt_point_3d.h>
-#include <qwt_compat.h>
+#include <qwt_text.h>
 
 // series data from a function
 #include <qwt_series_data.h>

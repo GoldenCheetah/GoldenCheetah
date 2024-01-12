@@ -93,7 +93,7 @@ AddClass::AddClass(AddCloudWizard *parent) : QWizardPage(parent), wizard(parent)
     setLayout(layout);
 
     mapper = new QSignalMapper(this);
-    connect(mapper, SIGNAL(mapped(int)), this, SLOT(clicked(int)));
+    connect(mapper, &QSignalMapper::mappedInt, this, &AddClass::clicked);
 
     // Activities
     QFont font;
@@ -147,7 +147,7 @@ AddService::AddService(AddCloudWizard *parent) : QWizardPage(parent), wizard(par
     scrollarea->setWidget(buttons);
 
     mapper = new QSignalMapper(this);
-    connect(mapper, SIGNAL(mapped(QString)), this, SLOT(clicked(QString)));
+    connect(mapper, &QSignalMapper::mappedString, this, &AddService::clicked);
 
     layout->addWidget(scrollarea);
 
@@ -472,7 +472,7 @@ AddAthlete::AddAthlete(AddCloudWizard *parent) : QWizardPage(parent), wizard(par
     scrollarea->setWidget(buttons);
 
     mapper = new QSignalMapper(this);
-    connect(mapper, SIGNAL(mapped(int)), this, SLOT(clicked(int)));
+    connect(mapper, &QSignalMapper::mappedInt, this, &AddAthlete::clicked);
 
     layout->addWidget(scrollarea);
 
@@ -690,7 +690,7 @@ AddFinish::initializePage()
             case CloudService::Local3:
             case CloudService::Local4:
             case CloudService::Local5:
-            case CloudService::Local6: label=want.value().split(QRegExp("[<>/]")).last(); break;
+            case CloudService::Local6: label=want.value().split(QRegularExpression("[<>/]")).last(); break;
             case CloudService::Consent:
             case CloudService::DefaultURL: break;
         }

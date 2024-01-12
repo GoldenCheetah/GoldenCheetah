@@ -20,5 +20,9 @@
 	<string>@BUNDLEIDENTIFIER@</string>
 	<key>NSSupportsAutomaticGraphicsSwitching</key>
 	<true/>
+	<key>NSBluetoothPeripheralUsageDescription</key>
+	<string>Used to connect to BTLE sensors in Train</string>
+	<key>NSBluetoothAlwaysUsageDescription</key>
+	<string>Used to connect to BTLE sensors in Train</string>
 </dict>
 </plist>

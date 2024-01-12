@@ -43,6 +43,7 @@ static bool setSupported()
     ::supported << ".gpx";
     ::supported << ".tts";
     ::supported << ".json";
+    ::supported << ".erg2";
 
     return true;
 }
@@ -56,7 +57,7 @@ bool ErgFile::isWorkout(QString name)
     return false;
 }
 ErgFile::ErgFile(QString filename, int mode, Context *context) :
-    filename(filename), mode(mode), StrictGradient(true), context(context)
+    filename(filename), mode(mode), StrictGradient(true), fHasGPS(false), context(context)
 {
     if (context->athlete->zones("Bike")) {
         int zonerange = context->athlete->zones("Bike")->whichRange(QDateTime::currentDateTime().date());
@@ -65,7 +66,7 @@ ErgFile::ErgFile(QString filename, int mode, Context *context) :
     reload();
 }
 
-ErgFile::ErgFile(Context *context) : mode(0), StrictGradient(true), context(context)
+ErgFile::ErgFile(Context *context) : mode(0), StrictGradient(true), fHasGPS(false), context(context)
 {
     if (context->athlete->zones("Bike")) {
         int zonerange = context->athlete->zones("Bike")->whichRange(QDateTime::currentDateTime().date());
@@ -241,8 +242,8 @@ void ErgFile::parseErg2(QString p)
             // set ErgFile duration
             Duration = Points.last().x;      // last is the end point in msecs
 
-            calculateMetrics();
             valid = true;
+            calculateMetrics();
         }
     }
 }
@@ -483,8 +484,15 @@ void ErgFile::parseComputrainer(QString p)
     QRegExp lapmarker("^[ \\t]*([0-9\\.]+)[ \\t]*LAP[ \\t\\n]*(.*)$", Qt::CaseInsensitive);
     QRegExp crslapmarker("^[ \\t]*LAP[ \\t\\n]*(.*)$", Qt::CaseInsensitive);
 
-    // text cue records
-    QRegExp textCue("^([0-9\\.]+)[ \\t]*([^\\t]+)[\\t]+([0-9]+)[ \\t\\n]*$", Qt::CaseInsensitive);
+    // text cue records - try and be flexible about formatting:
+    // sol <number> <whitespace> <text including whitespace and numbers> <whitespace> <number> <optional whitespace> eol
+    //
+    // there is no standard, so we need to try our best to accomodate different formats and trim
+    // the text to remove any whitespace before and after it when displaying to the user
+    //
+    // since we only match with this expression when in text section there is no need to worry
+    // about it clashing with any other rows which helps.
+    QRegExp textCue("^([0-9\\.]+)[ \\t]*(.*)[ \\t]([0-9]+)[ \\t\\n]*$", Qt::CaseInsensitive);
 
     // ok. opened ok lets parse.
     QTextStream inputStream(&ergFile);
@@ -645,7 +653,7 @@ void ErgFile::parseComputrainer(QString p)
                 // x, text cue, duration
                 double x = textCue.cap(1).toDouble() * 1000.; // convert to msecs or m
                 int duration = textCue.cap(3).toInt(); // duration in secs
-                Texts<<ErgFileText(x, duration, textCue.cap(2));
+                Texts<<ErgFileText(x, duration, textCue.cap(2).trimmed());
             } else {
               // ignore bad lines for now. just bark.
               //qDebug()<<"huh?" << line;
@@ -749,9 +757,9 @@ void ErgFile::parseFromRideFileFactory()
     bool fHasKm    = ride->areDataPresent()->km;
     bool fHasLat   = ride->areDataPresent()->lat;
     bool fHasLon   = ride->areDataPresent()->lon;
-    bool fHasGPS   = fHasLat && fHasLon;
     bool fHasAlt   = ride->areDataPresent()->alt;
     bool fHasSlope = ride->areDataPresent()->slope;
+    fHasGPS   = fHasLat && fHasLon;
 
     if (fHasKm && fHasSlope) {}     // same as crs file
     else if (fHasKm && fHasAlt) {}  // derive slope from distance and alt
@@ -892,9 +900,9 @@ void ErgFile::parseTTS()
 
     // Enumerate the data types that are available.
     bool fHasKm    = ttsReader.hasKm();
-    bool fHasGPS   = ttsReader.hasGPS();
     bool fHasAlt   = ttsReader.hasElevation();
     bool fHasSlope = ttsReader.hasGradient();
+    fHasGPS   = ttsReader.hasGPS();
 
     if (fHasKm && fHasSlope) {}     // same as crs file
     else if (fHasKm && fHasAlt) {}  // derive slope from distance and alt
@@ -1207,7 +1215,9 @@ ErgFile::save(QStringList &errors)
 
         // setup output stream to file
         QTextStream out(&f);
+#if QT_VERSION < 0x060000
         out.setCodec("UTF-8");
+#endif
 
         // write the header
         //
@@ -1317,7 +1327,9 @@ ErgFile::save(QStringList &errors)
 
         // setup output stream to file
         QTextStream out(&f);
+#if QT_VERSION < 0x060000
         out.setCodec("UTF-8");
+#endif
 
         // write the header
         //
@@ -1422,7 +1434,9 @@ ErgFile::save(QStringList &errors)
 
         // setup output stream to file
         QTextStream out(&f);
+#if QT_VERSION < 0x060000
         out.setCodec("UTF-8");
+#endif
 
         out << "<workout_file>\n";
 
@@ -1654,7 +1668,7 @@ ErgFile::currentLap(double x) const
 
     // If the current position is before the start of the next lap, return this lap
     for (int i=0; i<Laps.count() - 1; i++) {
-        if (x<Laps.at(i+1).x) return Laps.at(i).x;
+        if (x>=Laps.at(i).x && x<Laps.at(i+1).x) return Laps.at(i).x;
     }
     return -1; // No matching lap
 }
@@ -1788,7 +1802,7 @@ ErgFile::calculateMetrics()
                 first = false;
             } else {
                 minY = std::min(minY, p.y);
-                maxY = std::min(maxY, p.y);
+                maxY = std::max(maxY, p.y);
             }
 
             while (nextSecs < p.x) {

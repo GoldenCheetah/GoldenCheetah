@@ -77,6 +77,7 @@ MetricSelect::setSymbol(QString symbol)
         text = text.replace(' ','_');
         if (text.startsWith("BikeScore")) text="BikeScore"; // stoopid tm sign in name ffs sean
         setText(text);
+        setWhatsThis(m->description());
     }
     // check it...
     isValid();

@@ -286,9 +286,9 @@ SrmDevice::preview( QString &err )
         DeviceRideItemPtr ride( new DeviceRideItem );
 
         if( block.start )
-            ride->startTime.setTime_t( 0.1 * block.start );
+            ride->startTime.setSecsSinceEpoch( 0.1 * block.start );
         if( block.end )
-            ride->endTime.setTime_t( 0.1 * block.end );
+            ride->endTime.setSecsSinceEpoch( 0.1 * block.end );
         ride->work = block.total;
         ride->wanted = false;
         rideList.append( ride );
@@ -386,7 +386,7 @@ SrmDevice::download( const QDir &tmpdir,
 
         } else {
             for( int i = 0; i < rideList.size(); ++i ){
-                if( rideList.at(i)->startTime.toTime_t() == block.start / 10 ){
+                if( rideList.at(i)->startTime.toSecsSinceEpoch() == block.start / 10 ){
                     wanted = rideList.at(i)->wanted;
                     break;
                 }
@@ -558,7 +558,7 @@ SrmDevice::download( const QDir &tmpdir,
                 .arg(serr.message);
             goto fail;
         }
-        file.startTime.setTime_t( 0.1 * stime );
+        file.startTime.setSecsSinceEpoch( 0.1 * stime );
 
         fh = fopen( file.name.toLatin1().constData(), "wb" );
         if( ! fh ){

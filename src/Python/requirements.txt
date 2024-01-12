@@ -4,10 +4,11 @@
 #
 sip == 4.19.8
 numpy
-pandas
+pandas == 1.2.3
 scipy
 lmfit
 plotly
+importlib_metadata
 #
 # Nice to have
 #

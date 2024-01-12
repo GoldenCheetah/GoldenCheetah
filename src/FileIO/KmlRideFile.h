@@ -23,7 +23,10 @@
 #include "RideFile.h"
 
 struct KmlFileReader : public RideFileReader {
-    virtual RideFile *openRideFile(QFile &, QStringList &, QList<RideFile*>* =0) const { return NULL; } // does not support reading
+    virtual RideFile *openRideFile(QFile &, QStringList &errors, QList<RideFile*>* =0) const {
+        errors << QString("kml files are not supported for import"); // does not support reading
+        return NULL;
+    }
     bool writeRideFile(Context *, const RideFile *ride, QFile &file) const;
     bool hasWrite() const { return true; }
 };

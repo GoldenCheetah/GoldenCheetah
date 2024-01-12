@@ -21,7 +21,7 @@
 #include "RSyntax.h"
 
 #include "Colors.h"
-#include "TabView.h"
+#include "AbstractView.h"
 #include "GenericChart.h"
 #include "HelpWhatsThis.h"
 
@@ -60,7 +60,7 @@ RConsole::configChanged(qint32)
     p.setColor(QPalette::Base, GColor(CPLOTBACKGROUND));
     p.setColor(QPalette::Text, GCColor::invertColor(GColor(CPLOTBACKGROUND)));
     setPalette(p);
-    setStyleSheet(TabView::ourStyleSheet());
+    setStyleSheet(AbstractView::ourStyleSheet());
 
     // set default colors
     if (rtool) rtool->configChanged();
@@ -288,7 +288,6 @@ RChart::RChart(Context *context, bool ridesummary) : GcChartWindow(context), con
     c->setWhatsThis(helpConfig->getWhatsThisText(HelpWhatsThis::Chart_R));
     QVBoxLayout *cl = new QVBoxLayout(c);
     cl->addWidget(plotOnChartSetting);
-    cl->addStretch();
     setControls(c);
 
     QVBoxLayout *mainLayout = new QVBoxLayout;
@@ -300,16 +299,10 @@ RChart::RChart(Context *context, bool ridesummary) : GcChartWindow(context), con
     // then disable the RConsole altogether.
     if (rtool) {
 
-        // reveal controls
-        QHBoxLayout *rev = new QHBoxLayout();
         showCon = new QCheckBox(tr("Show Console"), this);
         showCon->setChecked(true);
-
-        rev->addStretch();
-        rev->addWidget(showCon);
-        rev->addStretch();
-
-        setRevealLayout(rev);
+        cl->addWidget(showCon);
+        cl->addStretch();
 
         leftsplitter = new QSplitter(Qt::Vertical, this);
         leftsplitter->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
@@ -326,7 +319,7 @@ RChart::RChart(Context *context, bool ridesummary) : GcChartWindow(context), con
         p.setColor(QPalette::Base, GColor(CPLOTBACKGROUND));
         p.setColor(QPalette::Text, GCColor::invertColor(GColor(CPLOTBACKGROUND)));
         script->setPalette(p);
-        script->setStyleSheet(TabView::ourStyleSheet());
+        script->setStyleSheet(AbstractView::ourStyleSheet());
 
         // syntax highlighter
         setScript("## R script will run on selection.\n"
@@ -413,6 +406,10 @@ RChart::RChart(Context *context, bool ridesummary) : GcChartWindow(context), con
     } else {
 
         // not starting
+        noR = new QLabel(tr("Warning: R is disabled"), this);
+        cl->addWidget(noR);
+        cl->addStretch();
+
         script = NULL;
         splitter = NULL;
         console = NULL;
@@ -467,8 +464,10 @@ RChart::eventFilter(QObject *, QEvent *e)
 void
 RChart::configChanged(qint32)
 {
-    if (!ridesummary) setProperty("color", GColor(CTRENDPLOTBACKGROUND));
-    else setProperty("color", GColor(CPLOTBACKGROUND));
+    QColor bgcolor = !ridesummary ? GColor(CTRENDPLOTBACKGROUND) : GColor(CPLOTBACKGROUND);
+    setProperty("color", bgcolor);
+    chart->setBackgroundColor(bgcolor);
+
 
     // tinted palette for headings etc
     QPalette palette;
@@ -477,6 +476,8 @@ RChart::configChanged(qint32)
     palette.setColor(QPalette::Text, GColor(CPLOTMARKER));
     palette.setColor(QPalette::Base, GCColor::alternateColor(GColor(CPLOTBACKGROUND)));
     setPalette(palette);
+
+    runScript(); // to update
 }
 
 void

@@ -3,6 +3,7 @@
 #include "qwt_color_map.h"
 #include "qwt_scale_map.h"
 #include "qwt_painter.h"
+#include "qwt_text.h"
 #include <qpainter.h>
 
 class CpPlotCurve::PrivateData
@@ -168,7 +169,7 @@ CpPlotCurve::drawSeries( QPainter *painter,
         return;
 
     if ( to < 0 )
-        to = dataSize() - 1;
+        to = static_cast<int>(dataSize()) - 1;
 
     if ( from < 0 )
         from = 0;
@@ -205,8 +206,10 @@ void CpPlotCurve::drawDots( QPainter *painter,
     const bool doAlign = QwtPainter::roundingAlignment( painter );
 
     const QwtColorMap::Format format = d_data->colorMap->format();
-    if ( format == QwtColorMap::Indexed )
-        d_data->colorTable = d_data->colorMap->colorTable( d_data->colorRange );
+    if ( format == QwtColorMap::Indexed ) {
+        auto vector = d_data->colorMap->colorTable(256);
+        d_data->colorTable = vector;
+    }
 
     const QwtSeriesData<QwtPoint3D> *series = data();
 
@@ -238,7 +241,7 @@ void CpPlotCurve::drawDots( QPainter *painter,
         else
         {
             const unsigned char index = d_data->colorMap->colorIndex(
-                d_data->colorRange, sample.z() );
+                256, d_data->colorRange, sample.z() );
 
             painter->setPen( QPen( QColor::fromRgba( d_data->colorTable[index] ), 
                 d_data->penWidth ) );
@@ -262,7 +265,7 @@ CpPlotCurve::drawLines( QPainter *painter,
 
     const QwtColorMap::Format format = d_data->colorMap->format();
     if ( format == QwtColorMap::Indexed )
-        d_data->colorTable = d_data->colorMap->colorTable( d_data->colorRange );
+        d_data->colorTable = d_data->colorMap->colorTable( 256 );
 
     const bool noDuplicates = d_data->paintAttributes & CpPlotCurve::FilterPoints;
 
@@ -342,7 +345,7 @@ CpPlotCurve::drawLines( QPainter *painter,
          else
          {
              const unsigned char index = d_data->colorMap->colorIndex(
-                 d_data->colorRange, sample.z() );
+                 256, d_data->colorRange, sample.z() );
 
              painter->setPen( QPen( QColor::fromRgba( d_data->colorTable[index] ),
                  width ) );
