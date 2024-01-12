@@ -21,7 +21,6 @@
 #include <QApplication>
 #include <QtGui>
 #include <QRegExp>
-#include <QDesktopWidget>
 #include <QNetworkProxyQuery>
 #include <QMenuBar>
 #include <QStyle>
@@ -121,7 +120,6 @@
 
 // We keep track of all theopen mainwindows
 QList<MainWindow *> mainwindows;
-extern QDesktopWidget *desktop;
 extern ConfigDialog *configdialog_ptr;
 extern QString gl_version;
 extern double gl_major; // 1.x 2.x 3.x - we insist on 2.x or higher to enable OpenGL
@@ -771,7 +769,7 @@ MainWindow::setSplash(bool first)
 
     if (first) {
         // middle of screen
-        splash->move(desktop->availableGeometry().center()-QPoint(50, 25));
+        splash->move(QGuiApplication::primaryScreen()->availableGeometry().center()-QPoint(50, 25));
     } else {
         // middle of mainwindow is appropriate
         splash->move(geometry().center()-QPoint(50, 25));
@@ -1063,7 +1061,7 @@ void
 MainWindow::toggleFullScreen()
 {
 #ifdef Q_OS_MAC
-    QRect screenSize = desktop->availableGeometry();
+    QRect screenSize = QGuiApplication::primaryScreen()->availableGeometry();
     if (screenSize.width() > frameGeometry().width() ||
         screenSize.height() > frameGeometry().height())
         showFullScreen();

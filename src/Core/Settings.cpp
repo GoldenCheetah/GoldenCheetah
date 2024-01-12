@@ -765,7 +765,7 @@ GSettings::defaultAppearanceSettings()
     // lets get the geometry of the window next
     // since its used to scale and set other
     // appearance settings
-    QRect screensize = QApplication::desktop()->availableGeometry();
+    QRect screensize = QApplication::primaryScreen()->availableGeometry();
 
     // leave 12% of the screen free to the left and right of the main window
     // and same number of pixels above and below
@@ -807,7 +807,7 @@ breakout:
     // dpiXFactor and dpiYFactor are used to scale across the code
     // typically to increase the size of widgets but also some other
     // graphical elements
-    if (desktop->screen()->devicePixelRatio() <= 1 && screensize.width() > 2160) {
+    if (QApplication::primaryScreen()->devicePixelRatio() <= 1 && screensize.width() > 2160) {
        // we're on a hidpi screen - lets create a multiplier - always use smallest
        returning.xfactor = screensize.width() / 1280.0;
        returning.yfactor = screensize.height() / 1024.0;

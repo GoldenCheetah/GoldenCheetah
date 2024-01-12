@@ -30,7 +30,6 @@
 #include "OverviewItems.h"
 
 #include <QApplication>
-#include <QDesktopWidget>
 #include <QtGui>
 #include <QFile>
 #include <QMessageBox>
@@ -69,7 +68,6 @@ static int gc_opened=0;
 //
 QString gcroot;
 QApplication *application;
-QDesktopWidget *desktop = NULL;
 
 #ifdef GC_WANT_HTTP
 #include "APIWebService.h"
@@ -432,9 +430,6 @@ main(int argc, char *argv[])
     // create the application -- only ever ONE regardless of restarts
     application = new QApplication(argc, argv);
 
-    // select the desktop (used in defaultAppearanceSettings below and elsewhere)
-    desktop = QApplication::desktop();
-
     //XXXIdleEventFilter idleFilter;
     //XXXapplication->installEventFilter(&idleFilter);
 
@@ -456,9 +451,7 @@ main(int argc, char *argv[])
     // use the default before taking into account screen size
     baseFont = font;
 
-    // hidpi ratios -- single desktop for now
-    desktop = QApplication::desktop();
-
+    // hidpi ratios
     dpiXFactor = defaults.xfactor;
     dpiYFactor = defaults.yfactor;
 
@@ -469,6 +462,7 @@ main(int argc, char *argv[])
                                        "QComboBox   { padding-left: %1px; padding-right: %1px; }")
                                        .arg(15*dpiXFactor)
                                        .arg(3*dpiYFactor));
+
 #endif
 
     // scale up to user scale factor
