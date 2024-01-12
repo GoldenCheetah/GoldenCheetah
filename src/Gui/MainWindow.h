@@ -73,7 +73,6 @@ class AthleteTab;
 
 
 extern QList<MainWindow *> mainwindows; // keep track of all the MainWindows we have open
-extern QDesktopWidget *desktop;         // how many screens / res etc
 extern QString gcroot;                  // root directory for gc
 
 class MainWindow : public QMainWindow
