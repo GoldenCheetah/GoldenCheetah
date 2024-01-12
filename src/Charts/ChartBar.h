@@ -24,6 +24,7 @@
 #include <QAction>
 #include <QHBoxLayout>
 #include <QScrollArea>
+#include <QPushButton>
 #include <QToolButton>
 #include <QObject>
 #include <QEvent>
@@ -84,9 +85,9 @@ private:
     Context *context;
 
     ButtonBar *buttonBar;
-    QToolButton *left, *right; // scrollers, hidden if menu fits
+    QPushButton *left, *right; // scrollers, hidden if menu fits
     QPropertyAnimation *anim; // scroll left and right - animated to show whats happening
-    QToolButton *menuButton;
+    QPushButton *menuButton;
 
     QFont buttonFont;
     QSignalMapper *signalMapper, *menuMapper;

@@ -329,7 +329,7 @@ SolveCPDialog::SolveCPDialog(QWidget *parent, Context *context) : QDialog(parent
         t->setTextAlignment(2, Qt::AlignHCenter);
 
         // remember which rideitem this is for
-        t->setData(0, Qt::UserRole, qVariantFromValue(static_cast<void*>(item)));
+        t->setData(0, Qt::UserRole, QVariant::fromValue(static_cast<void*>(item)));
 
         // checkbox
         QCheckBox *check = new QCheckBox(this);
@@ -357,7 +357,12 @@ SolveCPDialog::eventFilter(QObject *o, QEvent *e)
     // this is a hack related to mouse event compression
     // and is not required after QT5.6, but does no harm
     // and reduces processing overhead anyway.
-    static QTime t;
+    static QElapsedTimer t;
+    static bool started = false;
+    if (!started) {
+        t.start();
+        started = true;
+    }
     static int gc__last = 0;
 
     if (e->type()==QEvent::Paint) return false;

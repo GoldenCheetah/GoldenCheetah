@@ -35,7 +35,7 @@ SearchFilterBox::SearchFilterBox(QWidget *parent, Context *context, bool nochoos
 
     // no column chooser if my parent widget is a modal widget
     searchbox = new SearchBox(context, this, nochooser);
-    searchbox->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
+    searchbox->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed));
     contents->addWidget(searchbox);
 
     freeSearch = new FreeSearch(this, context);

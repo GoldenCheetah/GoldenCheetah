@@ -44,19 +44,14 @@ CalDAV::getConfig() {
     int t = appsettings->cvalue(context->athlete->cyclist, GC_DVCALDAVTYPE, "0").toInt();
     if (t == 0) {
         calDavType = Standard;
-    } else {
-        calDavType = Google;
-    };
+    }
 
     if (calDavType == Standard) {
         url = appsettings->cvalue(context->athlete->cyclist, GC_DVURL, "").toString();
-    } else { // calDavType = GOOGLE
-        calID = appsettings->cvalue(context->athlete->cyclist, GC_DVGOOGLE_CALID, "").toString();
-        url =  googleCalDAVurl.arg(calID);
     }
 
     // check if we have an useful URL (not space and not the Google Default without CalID
-    if ((url == "" && calDavType == Standard) || (calID == "" && calDavType == Google)) {
+    if (url == "" && calDavType == Standard) {
         return false;
     }
 
@@ -84,9 +79,6 @@ CalDAV::download(bool ignoreErrors)
 
     if (calDavType == Standard) {
         return doDownload();
-    } else { // calDavType = GOOGLE
-        // after having the token the function defined in "mode" will be executed
-        requestGoogleAccessTokenToExecute();
     }
     return true;
 }
@@ -116,10 +108,6 @@ CalDAV::doDownload()
     request.setRawHeader("Depth", "0");
     request.setRawHeader("Content-Type", "application/xml; charset=\"utf-8\"");
     request.setRawHeader("Content-Length", (QString("%1").arg(queryText->size())).toLatin1());
-    if (calDavType == Google && googleCalendarAccessToken != "") {
-        request.setRawHeader("Authorization", "Bearer "+googleCalendarAccessToken );
-    }
-
 
     QBuffer *query = new QBuffer(queryText);
 
@@ -319,10 +307,6 @@ icalcomponent *createEvent(RideItem *rideItem)
     // set description using standard stuff
     icalcomponent_set_description(event, rideItem->ride()->getTag("Calendar Text", "").toLatin1());
 
-    // attach ridefile
-    // google doesn't support attachments yet. There is a labs option to use google docs
-    // but it is only available to Google Apps customers.
-
     // put the event into root
     icalcomponent_add_component(root, event);
     return root;
@@ -486,9 +470,6 @@ CalDAV::upload(QByteArray vcardtxt)
     vcardtext = vcardtxt;
     if (calDavType == Standard) {
         return doUpload();
-    } else { // calDavType = GOOGLE
-        // after having the token the function defined in "mode" will be executed
-        requestGoogleAccessTokenToExecute();
     }
     return true;
 }
@@ -509,9 +490,6 @@ CalDAV::doUpload()
     QNetworkRequest request = QNetworkRequest(QUrl(url));
     request.setRawHeader("Content-Type", "text/calendar");
     request.setRawHeader("Content-Length", "xxxx");
-    if (calDavType == Google && googleCalendarAccessToken != "") {
-        request.setRawHeader("Authorization", "Bearer "+googleCalendarAccessToken );
-    }
 
     mode = Put;
     QNetworkReply *reply = nam->put(request, vcardtext);
@@ -589,82 +567,3 @@ CalDAV::sslErrors(QNetworkReply* reply ,QList<QSslError> errors)
         reply->ignoreSslErrors();
     }
 }
-
-
-
-//
-// gets Google Calendar Access Token (from Refresh Token)
-//
-void
-CalDAV::requestGoogleAccessTokenToExecute() {
-
-    QString refresh_token = appsettings->cvalue(context->athlete->cyclist, GC_GOOGLE_CALENDAR_REFRESH_TOKEN, "").toString();
-    if (refresh_token == "") {
-        if (!(mode == Events && ignoreDownloadErrors)) {
-            QMessageBox::warning(context->mainWindow, tr("Missing Preferences"), tr("Authorization for Google CalDAV is missing in preferences"));
-        }
-        mode = None;
-        return;
-    }
-
-    // get a valid access token
-    QByteArray data;
-    QUrlQuery params;
-    QString urlstr = "https://www.googleapis.com/oauth2/v3/token?";
-    params.addQueryItem("client_id", GC_GOOGLE_CALENDAR_CLIENT_ID);
-#ifdef GC_GOOGLE_CALENDAR_CLIENT_SECRET
-    params.addQueryItem("client_secret", GC_GOOGLE_CALENDAR_CLIENT_SECRET);
-#endif
-    params.addQueryItem("refresh_token", refresh_token);
-    params.addQueryItem("grant_type", "refresh_token");
-
-    data.append(params.query(QUrl::FullyEncoded));
-
-    // get a new Access Token (since they are just temporarily valid)
-    QUrl url = QUrl(urlstr);
-    QNetworkRequest request = QNetworkRequest(url);
-    request.setHeader(QNetworkRequest::ContentTypeHeader,"application/x-www-form-urlencoded");
-
-    // now get the final token
-    googleNetworkAccessManager = new QNetworkAccessManager(this);
-    connect(googleNetworkAccessManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(googleNetworkRequestFinished(QNetworkReply*)));
-    googleNetworkAccessManager->post(request, data);
-
-}
-
-//
-// extract the token and call the requested CALDAV function
-//
-void
-CalDAV::googleNetworkRequestFinished(QNetworkReply* reply)   {
-
-    googleCalendarAccessToken = "";
-    if (reply->error() == QNetworkReply::NoError) {
-        QByteArray payload = reply->readAll(); // JSON
-        QByteArray token_type = "\"access_token\":";
-        int token_length = 15;
-
-        // get the token
-        int at = payload.indexOf(token_type);
-        if (at >=0 ) {
-            int from = at + token_length; // first char after ":"
-            int next = payload.indexOf("\"", from);
-            from = next + 1;
-            int to = payload.indexOf("\"", from);
-            googleCalendarAccessToken = payload.mid(from, to-from);
-
-        } else { // something failed
-
-            if (!(mode == Events && ignoreDownloadErrors)) {
-                QMessageBox::warning(context->mainWindow, tr("Authorization Error"), tr("Error requesting access token"));
-            };
-            mode = None;
-            return;
-        }
-    }
-
-    // now we have a token and can do the requested jobs
-    if (mode == Put) doUpload();
-    if (mode == Events) doDownload();
-}
-

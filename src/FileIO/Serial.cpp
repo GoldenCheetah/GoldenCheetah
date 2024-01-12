@@ -263,7 +263,7 @@ Q_UNUSED(err);
     //           which handles timeouts / ready read
     //
     DWORD cBytes;
-    int rc = ReadFile(fd, buf, nbyte, &cBytes, NULL);
+    int rc = ReadFile(fd, buf, static_cast<DWORD>(nbyte), &cBytes, NULL);
     if (rc) return (int)cBytes;
     else return (-1);
 
@@ -303,7 +303,7 @@ Serial::write(void *buf, size_t nbyte, QString &err)
     // Windows use the writefile WIN32 API
     //
     DWORD cBytes;
-    int rc = WriteFile(fd, buf, nbyte, &cBytes, NULL);
+    int rc = WriteFile(fd, buf, static_cast<DWORD>(nbyte), &cBytes, NULL);
     if (!rc) {
         err = QString("write: error %1").arg(rc);
         return -1;

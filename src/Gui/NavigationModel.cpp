@@ -26,7 +26,7 @@
 #include "MainWindow.h"
 
 
-NavigationModel::NavigationModel(Tab *tab) : tab(tab), block(false), viewinit(false), drinit(false), iteminit(false)
+NavigationModel::NavigationModel(AthleteTab *tab) : tab(tab), block(false), viewinit(false), drinit(false), iteminit(false)
 {
     connect(tab, SIGNAL(viewChanged(int)), this, SLOT(viewChanged(int)));
     connect(tab, SIGNAL(rideItemSelected(RideItem*)), this, SLOT(rideChanged(RideItem*)));

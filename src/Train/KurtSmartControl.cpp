@@ -217,7 +217,9 @@ smart_control_config_data smart_control_process_config_data(const uint8_t *data,
 
 
 #ifndef MIN
+#ifdef __GNUC__
 #pragma GCC diagnostic ignored "-Wtype-limits"
+#endif
 #define MIN(a,b) (((a)<(b))?(a):(b))
 #define MAX(a,b) (((a)>(b))?(a):(b))
 #endif

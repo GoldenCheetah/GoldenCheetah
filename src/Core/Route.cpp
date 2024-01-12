@@ -25,7 +25,6 @@
 #include "IntervalItem.h"
 #include "RouteParser.h"
 #include "RideFile.h"
-#include "GProgressDialog.h"
 
 #include <QString>
 #include <QFile>

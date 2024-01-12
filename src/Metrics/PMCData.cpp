@@ -127,7 +127,7 @@ void PMCData::refresh()
         else stsDays_ = sts.toInt();
     }
 
-    QTime timer;
+    QElapsedTimer timer;
     timer.start();
 
     //

@@ -1124,7 +1124,7 @@ MergeAdjust::MergeAdjust(MergeActivityWizard *parent) : QWizardPage(parent), wiz
     static_cast<QwtPlotCanvas*>(fullPlot->canvas())->setBorderRadius(0);
     fullPlot->setWantAxis(false, true);
     QPalette pal = palette();
-    fullPlot->axisWidget(QwtPlot::xBottom)->setPalette(pal);
+    fullPlot->axisWidget(QwtAxis::XBottom)->setPalette(pal);
 
     layout->addWidget(spanSlider);
     layout->addWidget(fullPlot);
@@ -1234,7 +1234,7 @@ MergeAdjust::resetClicked()
 void
 MergeAdjust::zoomChanged()
 {
-    fullPlot->setAxisScale(QwtPlot::xBottom, spanSlider->lowerValue()/60.0f, spanSlider->upperValue()/60.0f);
+    fullPlot->setAxisScale(QwtAxis::XBottom, spanSlider->lowerValue()/60.0f, spanSlider->upperValue()/60.0f);
     fullPlot->replot();
 }
 

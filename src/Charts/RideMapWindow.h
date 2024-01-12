@@ -48,6 +48,14 @@ class RideMapWindow;
 class IntervalSummaryWindow;
 class SmallPlot;
 
+
+struct PositionItem {
+    PositionItem(double lat, double lng): lat(lat), lng(lng) {}
+
+    double lat, lng;
+};
+
+
 // trick the maps api into ignoring gestures by
 // pretending to be chrome. see: http://developer.qt.nokia.com/forums/viewthread/1643/P15
 class mapWebPage : public QWebEnginePage
@@ -62,15 +70,15 @@ class MapWebBridge : public QObject
         Context *context;
         RideMapWindow *mw;
 
-        RideFilePoint* point;
+        RideFilePoint const * point = nullptr;
         bool m_startDrag = false;
         bool m_drag = false;
         int selection = 1;
 
-        QList<RideFilePoint*> searchPoint(double lat, double lng);
+        RideFilePoint const *searchPoint(double lat, double lng) const;
 
     public:
-        MapWebBridge(Context *context, RideMapWindow *mw) : context(context), mw(mw), selection(0) {}
+        MapWebBridge(Context *context, RideMapWindow *mw) : context(context), mw(mw) {}
 
     public slots:
         Q_INVOKABLE void call(int count);
@@ -92,10 +100,15 @@ class MapWebBridge : public QObject
         Q_INVOKABLE void clickPath(double lat, double lng);
         Q_INVOKABLE void mouseup();
 
+        // Comparemode
+        Q_INVOKABLE QVariantList setCompareIntervals();
+
         void intervalsChanged() { emit drawIntervals(); }
+        void compareIntervalsChanged() { emit drawCompareIntervals(); }
 
     signals:
         void drawIntervals();
+        void drawCompareIntervals();
 };
 
 class RideMapWindow : public GcChartWindow
@@ -111,6 +124,7 @@ class RideMapWindow : public GcChartWindow
     Q_PROPERTY(bool showintervals READ showIntervals WRITE setShowIntervals USER true)
     Q_PROPERTY(bool hideShadedZones READ hideShadedZones WRITE setHideShadedZones USER true)
     Q_PROPERTY(bool hideYellowLine READ hideYellowLine WRITE setHideYellowLine USER true)
+    Q_PROPERTY(bool hideRouteLineOpacity READ hideRouteLineOpacity WRITE setRouteLineOpacity USER true)
     Q_PROPERTY(int osmts READ osmTS WRITE setOsmTS USER true)
     Q_PROPERTY(QString googleKey READ googleKey WRITE setGoogleKey USER true)
 
@@ -138,6 +152,9 @@ class RideMapWindow : public GcChartWindow
         bool hideYellowLine() const { return hideYellowLineCk->isChecked(); }
         void setHideYellowLine(bool x) { hideYellowLineCk->setChecked(x); }
 
+        bool hideRouteLineOpacity() const { return hideRouteLineOpacityCk->isChecked(); }
+        void setRouteLineOpacity(bool x) { hideRouteLineOpacityCk->setChecked(x); }
+
         bool showMarkers() const { return ( showMarkersCk->checkState() == Qt::Checked); }
         void setShowMarkers(bool x) { if (x) showMarkersCk->setCheckState(Qt::Checked); else showMarkersCk->setCheckState(Qt::Unchecked) ;}
 
@@ -161,6 +178,7 @@ class RideMapWindow : public GcChartWindow
         void showFullPlotChanged(int value);
         void hideShadedZonesChanged(int value);
         void hideYellowLineChanged(int value);
+        void hideRouteLineOpacityChanged(int value);
         void showIntervalsChanged(int value);
         void osmCustomTSURLEditingFinished();
 
@@ -175,13 +193,19 @@ class RideMapWindow : public GcChartWindow
         void drawTempInterval(IntervalItem *current);
         void clearTempInterval();
 
+        void showPosition(double mins);
+        void hidePosition();
+
+        void compareIntervalsStateChanged(bool state);
+        void compareIntervalsChanged();
+
     private:
 
         bool first;
 
         QComboBox *mapCombo, *tileCombo;
         QCheckBox *showMarkersCk, *showFullPlotCk, *showInt;
-        QCheckBox* hideShadedZonesCk, * hideYellowLineCk;
+        QCheckBox* hideShadedZonesCk, * hideYellowLineCk, * hideRouteLineOpacityCk;
         QLabel *osmTSTitle, *osmTSLabel, *osmTSUrlLabel;
         QLineEdit *osmTSUrl;
 
@@ -202,10 +226,17 @@ class RideMapWindow : public GcChartWindow
         bool firstShow;
         IntervalSummaryWindow *overlayIntervals;
 
+        QList<PositionItem> positionItems;
+
         QString osmTileServerUrlDefault;
 
         QColor GetColor(int watts);
         void createHtml();
+        void buildPositionList();
+
+        bool getCompareBoundingBox(double &minLat, double &maxLat, double &minLon, double &maxLon) const;
+
+        int countCompareIntervals = 0;
 
     private slots:
         void loadRide();

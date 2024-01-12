@@ -55,6 +55,7 @@
 #include "AboutDialog.h"
 #include "ChooseCyclistDialog.h"
 #include "ConfigDialog.h"
+#include "AthleteConfigDialog.h"
 #include "DownloadRideDialog.h"
 #include "ManualRideDialog.h"
 #include "RideImportWizard.h"
@@ -65,15 +66,13 @@
 #include "SplitActivityWizard.h"
 #include "MergeActivityWizard.h"
 #include "GenerateHeatMapDialog.h"
-#include "BatchExportDialog.h"
+#include "BatchProcessingDialog.h"
 #include "TodaysPlan.h"
 #include "MeasuresDownload.h"
 #include "WorkoutWizard.h"
 #include "ErgDBDownloadDialog.h"
 #include "AddDeviceWizard.h"
 #include "Dropbox.h"
-#include "GoogleDrive.h"
-#include "KentUniversity.h"
 #include "SixCycle.h"
 #include "OpenData.h"
 #include "AddCloudWizard.h"
@@ -84,7 +83,7 @@
 #endif
 
 // GUI Widgets
-#include "Tab.h"
+#include "AthleteTab.h"
 #include "GcToolBar.h"
 #include "NewSideBar.h"
 #include "HelpWindow.h"
@@ -94,7 +93,6 @@
 #if !defined(Q_OS_MAC)
 #include "QTFullScreen.h" // not mac!
 #endif
-#include "../qtsolutions/segmentcontrol/qtsegmentcontrol.h"
 
 // SEARCH / FILTER
 #include "NamedSearch.h"
@@ -128,6 +126,9 @@ extern ConfigDialog *configdialog_ptr;
 extern QString gl_version;
 extern double gl_major; // 1.x 2.x 3.x - we insist on 2.x or higher to enable OpenGL
 
+// constants for gui
+static int gl_toolheight=28;
+
 MainWindow::MainWindow(const QDir &home)
 {
     /*----------------------------------------------------------------------
@@ -154,7 +155,7 @@ MainWindow::MainWindow(const QDir &home)
     // bootstrap
     Context *context = new Context(this);
     context->athlete = new Athlete(context, home);
-    currentTab = new Tab(context);
+    currentAthleteTab = new AthleteTab(context);
 
     // get rid of splash when currentTab is shown
     clearSplash();
@@ -171,22 +172,15 @@ MainWindow::MainWindow(const QDir &home)
         QNetworkProxy::setApplicationProxy(listOfProxies.first());
     }
 
-    static const QIcon hideIcon(":images/toolbar/main/hideside.png");
-    static const QIcon rhideIcon(":images/toolbar/main/hiderside.png");
-    static const QIcon showIcon(":images/toolbar/main/showside.png");
-    static const QIcon rshowIcon(":images/toolbar/main/showrside.png");
-    static const QIcon tabIcon(":images/toolbar/main/tab.png");
-    static const QIcon tileIcon(":images/toolbar/main/tile.png");
-    static const QIcon fullIcon(":images/toolbar/main/togglefull.png");
-
 #ifndef Q_OS_MAC
     fullScreen = new QTFullScreen(this);
 #endif
 
     // if no workout directory is configured, default to the
     // top level GoldenCheetah directory
-    if (appsettings->value(NULL, GC_WORKOUTDIR).toString() == "")
-        appsettings->setValue(GC_WORKOUTDIR, QFileInfo(context->athlete->home->root().canonicalPath() + "/../").canonicalPath());
+    if (appsettings->value(NULL, GC_WORKOUTDIR, "").toString() == ""){
+        appsettings->setValue(GC_WORKOUTDIR, QFileInfo(context->athlete->home->root().canonicalPath()).canonicalPath());
+    }
 
     /*----------------------------------------------------------------------
      *  GUI setup
@@ -195,21 +189,12 @@ MainWindow::MainWindow(const QDir &home)
          restoreGeometry(appsettings->value(this, GC_SETTINGS_MAIN_GEOM).toByteArray());
          restoreState(appsettings->value(this, GC_SETTINGS_MAIN_STATE).toByteArray());
      } else {
-         // first run -- lets set some sensible defaults...
-         // lets put it in the middle of screen 1
-        QRect screenSize = desktop->availableGeometry();
-         struct SizeSettings app = GCColor::defaultSizes(screenSize.height(), screenSize.width());
+
+         AppearanceSettings defaults = GSettings::defaultAppearanceSettings();
 
          // center on the available screen (minus toolbar/sidebar)
-         move((screenSize.width()-screenSize.x())/2 - app.width/2,
-              (screenSize.height()-screenSize.y())/2 - app.height/2);
-
-         // set to the right default
-         resize(app.width, app.height);
-
-         // set all the default font sizes
-         appsettings->setValue(GC_FONT_DEFAULT_SIZE, app.defaultFont);
-         appsettings->setValue(GC_FONT_CHARTLABELS_SIZE, app.labelFont);
+         move(defaults.windowsize.x(), defaults.windowsize.y());
+         resize(defaults.windowsize.width(), defaults.windowsize.height());
 
      }
 
@@ -271,102 +256,93 @@ MainWindow::MainWindow(const QDir &home)
     head = new GcToolBar(this);
 
     QStyle *toolStyle = QStyleFactory::create("fusion");
-    QPalette metal;
-    metal.setColor(QPalette::Button, QColor(215,215,215));
 
     // get those icons
-    sidebarIcon = iconFromPNG(":images/mac/sidebar.png", QSize(16*dpiXFactor,16*dpiXFactor));
-    lowbarIcon = iconFromPNG(":images/mac/lowbar.png", QSize(16*dpiXFactor,16*dpiXFactor));
-    tabbedIcon = iconFromPNG(":images/mac/tabbed.png", QSize(20*dpiXFactor,20*dpiXFactor));
-    tiledIcon = iconFromPNG(":images/mac/tiled.png", QSize(20*dpiXFactor,20*dpiXFactor));
+    sidebarIcon = iconFromPNG(":images/titlebar/sidebar.png");
+    lowbarIcon = iconFromPNG(":images/titlebar/bottombar.png");
+    tiledIcon = iconFromPNG(":images/titlebar/tile.png");
     backIcon = iconFromPNG(":images/mac/back.png");
+    whatIcon = iconFromPNG(":images/titlebar/whatsthis.png");
     forwardIcon = iconFromPNG(":images/mac/forward.png");
-    QSize isize(20 *dpiXFactor,20 *dpiYFactor);
+    QSize isize(16 *dpiXFactor,16 *dpiYFactor);
 
     back = new QPushButton(this);
     back->setIcon(backIcon);
-    back->setFixedHeight(24 *dpiYFactor);
-    back->setFixedWidth(24 *dpiYFactor);
+    back->setFixedHeight(gl_toolheight *dpiYFactor);
+    back->setFixedWidth(gl_toolheight *dpiYFactor);
     back->setIconSize(isize);
     back->setStyle(toolStyle);
     connect(back, SIGNAL(clicked(bool)), this, SIGNAL(backClicked()));
+    HelpWhatsThis *helpBack = new HelpWhatsThis(back);
+    back->setWhatsThis(helpBack->getWhatsThisText(HelpWhatsThis::ToolBar_Back));
 
     forward = new QPushButton(this);
     forward->setIcon(forwardIcon);
-    forward->setFixedHeight(24 *dpiYFactor);
-    forward->setFixedWidth(24 *dpiYFactor);
+    forward->setFixedHeight(gl_toolheight *dpiYFactor);
+    forward->setFixedWidth(gl_toolheight *dpiYFactor);
     forward->setIconSize(isize);
     forward->setStyle(toolStyle);
     connect(forward, SIGNAL(clicked(bool)), this, SIGNAL(forwardClicked()));
+    HelpWhatsThis *helpForward = new HelpWhatsThis(forward);
+    forward->setWhatsThis(helpForward->getWhatsThisText(HelpWhatsThis::ToolBar_Forward));
 
     lowbar = new QPushButton(this);
     lowbar->setIcon(lowbarIcon);
-    lowbar->setFixedHeight(24 *dpiYFactor);
+    lowbar->setFixedHeight(gl_toolheight *dpiYFactor);
+    lowbar->setFixedWidth(gl_toolheight *dpiYFactor);
     lowbar->setIconSize(isize);
     lowbar->setStyle(toolStyle);
     lowbar->setToolTip(tr("Toggle Compare Pane"));
-    lowbar->setPalette(metal);
     connect(lowbar, SIGNAL(clicked(bool)), this, SLOT(toggleLowbar()));
     HelpWhatsThis *helpLowBar = new HelpWhatsThis(lowbar);
     lowbar->setWhatsThis(helpLowBar->getWhatsThisText(HelpWhatsThis::ToolBar_ToggleComparePane));
 
     sidelist = new QPushButton(this);
     sidelist->setIcon(sidebarIcon);
-    sidelist->setFixedHeight(24 * dpiYFactor);
+    sidelist->setFixedHeight(gl_toolheight * dpiYFactor);
+    sidelist->setFixedWidth(gl_toolheight *dpiYFactor);
     sidelist->setIconSize(isize);
     sidelist->setStyle(toolStyle);
     sidelist->setToolTip(tr("Toggle Sidebar"));
-    sidelist->setPalette(metal);
     connect(sidelist, SIGNAL(clicked(bool)), this, SLOT(toggleSidebar()));
     HelpWhatsThis *helpSideBar = new HelpWhatsThis(sidelist);
     sidelist->setWhatsThis(helpSideBar->getWhatsThisText(HelpWhatsThis::ToolBar_ToggleSidebar));
 
-    styleSelector = new QtSegmentControl(this);
-    styleSelector->setStyle(toolStyle);
-    styleSelector->setCount(2);
-    styleSelector->setSegmentIcon(0, tabbedIcon);
-    styleSelector->setSegmentIcon(1, tiledIcon);
-    styleSelector->setSegmentToolTip(0, tr("Tabbed View"));
-    styleSelector->setSegmentToolTip(1, tr("Tiled View"));
-    styleSelector->setSelectionBehavior(QtSegmentControl::SelectOne); //wince. spelling. ugh
-    styleSelector->setFixedHeight(24 * dpiYFactor);
-    styleSelector->setIconSize(isize);
-    styleSelector->setPalette(metal);
-    connect(styleSelector, SIGNAL(segmentSelected(int)), this, SLOT(setStyleFromSegment(int))); //avoid toggle infinitely
+    tabtile = new QPushButton(this);
+    tabtile->setIcon(tiledIcon);
+    tabtile->setFixedHeight(gl_toolheight *dpiYFactor);
+    tabtile->setFixedWidth(gl_toolheight *dpiYFactor);
+    tabtile->setIconSize(isize);
+    lowbar->setStyle(toolStyle);
+    tabtile->setToolTip(tr("Toggle Tab/Tile"));
+    connect(tabtile, SIGNAL(clicked(bool)), this, SLOT(toggleStyle()));
+    HelpWhatsThis *helpTabtile = new HelpWhatsThis(tabtile);
+    tabtile->setWhatsThis(helpTabtile->getWhatsThisText(HelpWhatsThis::ToolBar_TabTile));
 
     // What's this button
     whatsthis = new QPushButton(this);
-    whatsthis->setIcon(myHelper->icon());
-    whatsthis->setFixedHeight(24 * dpiYFactor);
+    whatsthis->setIcon(whatIcon);
+    whatsthis->setFixedHeight(gl_toolheight * dpiYFactor);
+    whatsthis->setFixedWidth(gl_toolheight * dpiYFactor);
     whatsthis->setIconSize(isize);
     whatsthis->setStyle(toolStyle);
     whatsthis->setToolTip(tr("What's This?"));
-    whatsthis->setPalette(metal);
     connect(whatsthis, SIGNAL(clicked(bool)), this, SLOT(enterWhatsThisMode()));
-
- #if defined(WIN32) || defined (Q_OS_LINUX)
-    // are we in hidpi mode? if so undo global defaults for toolbar pushbuttons
-    if (dpiXFactor > 1) {
-        QString nopad = QString("QPushButton { padding-left: 0px; padding-right: 0px; "
-                                "              padding-top:  0px; padding-bottom: 0px; }");
-        sidelist->setStyleSheet(nopad);
-        lowbar->setStyleSheet(nopad);
-        whatsthis->setStyleSheet(nopad);
-    }
-#endif
 
     // add a search box on far right, but with a little space too
     perspectiveSelector = new QComboBox(this);
     perspectiveSelector->setStyle(toolStyle);
     perspectiveSelector->setFixedWidth(200 * dpiXFactor);
-    perspectiveSelector->setFixedHeight(28 * dpiYFactor);
+    perspectiveSelector->setFixedHeight(gl_toolheight * dpiYFactor);
     connect(perspectiveSelector, SIGNAL(currentIndexChanged(int)), this, SLOT(perspectiveSelected(int)));
+    HelpWhatsThis *helpPerspectiveSelector = new HelpWhatsThis(perspectiveSelector);
+    perspectiveSelector->setWhatsThis(helpPerspectiveSelector->getWhatsThisText(HelpWhatsThis::ToolBar_PerspectiveSelector));
 
     searchBox = new SearchFilterBox(this,context,false);
 
     searchBox->setStyle(toolStyle);
     searchBox->setFixedWidth(400 * dpiXFactor);
-    searchBox->setFixedHeight(28 * dpiYFactor);
+    searchBox->setFixedHeight(gl_toolheight * dpiYFactor);
 
     QWidget *space = new QWidget(this);
     space->setAutoFillBackground(false);
@@ -379,9 +355,12 @@ MainWindow::MainWindow(const QDir &home)
     head->addStretch();
     head->addWidget(sidelist);
     head->addWidget(lowbar);
-    head->addWidget(styleSelector);
-    head->addWidget(whatsthis);
+    head->addWidget(tabtile);
+#ifdef Q_OS_MAC // no menu on mac, so lets have some breathing space
+    head->setFixedHeight(searchBox->height() + (20 *dpiXFactor * 2));
+#else
     head->setFixedHeight(searchBox->height() + (16 *dpiXFactor));
+#endif
 
     connect(searchBox, SIGNAL(searchResults(QStringList)), this, SLOT(setFilter(QStringList)));
     connect(searchBox, SIGNAL(searchClear()), this, SLOT(clearFilter()));
@@ -392,6 +371,10 @@ MainWindow::MainWindow(const QDir &home)
     space->setFixedWidth(5 *dpiYFactor);
     head->addWidget(space);
     head->addWidget(searchBox);
+    space = new Spacer(this);
+    space->setFixedWidth(5 *dpiYFactor);
+    head->addWidget(space);
+    head->addWidget(whatsthis);
     space = new Spacer(this);
     space->setFixedWidth(5 *dpiYFactor);
     head->addWidget(space);
@@ -429,16 +412,16 @@ MainWindow::MainWindow(const QDir &home)
     viewStack->addWidget(tabStack);
 
     // first tab
-    tabs.insert(currentTab->context->athlete->home->root().dirName(), currentTab);
+    athletetabs.insert(currentAthleteTab->context->athlete->home->root().dirName(), currentAthleteTab);
 
     // stack, list and bar all share a common index
-    tabList.append(currentTab);
-    tabbar->addTab(currentTab->context->athlete->home->root().dirName());
-    tabStack->addWidget(currentTab);
+    tabList.append(currentAthleteTab);
+    tabbar->addTab(currentAthleteTab->context->athlete->home->root().dirName());
+    tabStack->addWidget(currentAthleteTab);
     tabStack->setCurrentIndex(0);
 
-    connect(tabbar, SIGNAL(dragTab(int)), this, SLOT(switchTab(int)));
-    connect(tabbar, SIGNAL(currentChanged(int)), this, SLOT(switchTab(int)));
+    connect(tabbar, SIGNAL(dragTab(int)), this, SLOT(switchAthleteTab(int)));
+    connect(tabbar, SIGNAL(currentChanged(int)), this, SLOT(switchAthleteTab(int)));
     //connect(tabbar, SIGNAL(tabCloseRequested(int)), this, SLOT(closeTabClicked(int))); // use athlete view
 
     /*----------------------------------------------------------------------
@@ -469,7 +452,7 @@ MainWindow::MainWindow(const QDir &home)
      * Application Menus
      *--------------------------------------------------------------------*/
 #ifdef WIN32
-    QString menuColorString = (GCColor::isFlat() ? GColor(CTOOLBAR).name() : "rgba(225,225,225)");
+    QString menuColorString = GColor(CTOOLBAR).name();
     menuBar()->setStyleSheet(QString("QMenuBar { color: black; background: %1; }"
                              "QMenuBar::item { color: black; background: %1; }").arg(menuColorString));
     menuBar()->setContentsMargins(0,0,0,0);
@@ -482,7 +465,7 @@ MainWindow::MainWindow(const QDir &home)
     connect(openTabMenu, SIGNAL(aboutToShow()), this, SLOT(setOpenTabMenu()));
 
     tabMapper = new QSignalMapper(this); // maps each option
-    connect(tabMapper, SIGNAL(mapped(const QString &)), this, SLOT(openTab(const QString &)));
+    connect(tabMapper, SIGNAL(mapped(const QString &)), this, SLOT(openAthleteTab(const QString &)));
 
     fileMenu->addSeparator();
     backupAthleteMenu = fileMenu->addMenu(tr("Backup..."));
@@ -497,6 +480,8 @@ MainWindow::MainWindow(const QDir &home)
     connect(deleteMapper, SIGNAL(mapped(const QString &)), this, SLOT(deleteAthlete(const QString &)));
 
     fileMenu->addSeparator();
+    fileMenu->addAction(tr("Settings..."), this, SLOT(athleteSettings()));
+    fileMenu->addSeparator();
     fileMenu->addAction(tr("Save all modified activities"), this, SLOT(saveAllUnsavedRides()));
     fileMenu->addSeparator();
     fileMenu->addAction(tr("Close Window"), this, SLOT(closeWindow()));
@@ -507,20 +492,20 @@ MainWindow::MainWindow(const QDir &home)
 
     // ACTIVITY MENU
     QMenu *rideMenu = menuBar()->addMenu(tr("A&ctivity"));
-    rideMenu->addAction(tr("&Download from device..."), this, SLOT(downloadRide()), tr("Ctrl+D"));
-    rideMenu->addAction(tr("&Import from file..."), this, SLOT (importFile()), tr ("Ctrl+I"));
-    rideMenu->addAction(tr("&Manual entry..."), this, SLOT(manualRide()), tr("Ctrl+M"));
+    rideMenu->addAction(tr("&Download from device..."), this, SLOT(downloadRide()), QKeySequence("Ctrl+D"));
+    rideMenu->addAction(tr("&Import from file..."), this, SLOT (importFile()), QKeySequence("Ctrl+I"));
+    rideMenu->addAction(tr("&Manual entry..."), this, SLOT(manualRide()), QKeySequence("Ctrl+M"));
     rideMenu->addSeparator ();
-    rideMenu->addAction(tr("&Export..."), this, SLOT(exportRide()), tr("Ctrl+E"));
-    rideMenu->addAction(tr("&Batch export..."), this, SLOT(exportBatch()), tr("Ctrl+B"));
+    rideMenu->addAction(tr("&Export..."), this, SLOT(exportRide()), QKeySequence("Ctrl+E"));
+    rideMenu->addAction(tr("&Batch Processing..."), this, SLOT(batchProcessing()), QKeySequence("Ctrl+B"));
 
     rideMenu->addSeparator ();
-    rideMenu->addAction(tr("&Save activity"), this, SLOT(saveRide()), tr("Ctrl+S"));
+    rideMenu->addAction(tr("&Save activity"), this, SLOT(saveRide()), QKeySequence("Ctrl+S"));
     rideMenu->addAction(tr("D&elete activity..."), this, SLOT(deleteRide()));
     rideMenu->addAction(tr("Split &activity..."), this, SLOT(splitRide()));
     rideMenu->addAction(tr("Combine activities..."), this, SLOT(mergeRide()));
     rideMenu->addSeparator ();
-    rideMenu->addAction(tr("Find intervals..."), this, SLOT(addIntervals()), tr (""));
+    rideMenu->addAction(tr("Find intervals..."), this, SLOT(addIntervals()), QKeySequence(""));
 
     HelpWhatsThis *helpRideMenu = new HelpWhatsThis(rideMenu);
     rideMenu->setWhatsThis(helpRideMenu->getWhatsThisText(HelpWhatsThis::MenuBar_Activity));
@@ -530,7 +515,7 @@ MainWindow::MainWindow(const QDir &home)
 
     // default options
     shareAction = new QAction(tr("Add Cloud Account..."), this);
-    shareAction->setShortcut(tr("Ctrl+A"));
+    shareAction->setShortcut(QKeySequence("Ctrl+A"));
     connect(shareAction, SIGNAL(triggered(bool)), this, SLOT(addAccount()));
     shareMenu->addAction(shareAction);
     shareMenu->addSeparator();
@@ -540,7 +525,7 @@ MainWindow::MainWindow(const QDir &home)
     measuresMenu = shareMenu->addMenu(tr("Get Measures..."));
     shareMenu->addSeparator();
     checkAction = new QAction(tr("Check For New Activities"), this);
-    checkAction->setShortcut(tr("Ctrl-C"));
+    checkAction->setShortcut(QKeySequence("")); // Ctrl+C is already in use for clipboard copy
     connect(checkAction, SIGNAL(triggered(bool)), this, SLOT(checkCloud()));
     shareMenu->addAction(checkAction);
 
@@ -571,8 +556,8 @@ MainWindow::MainWindow(const QDir &home)
     optionsMenu->addAction(tr("Import workouts, videos, videoSyncs..."), this, SLOT(importWorkout()));
     optionsMenu->addAction(tr("Scan disk for workouts, videos, videoSyncs..."), this, SLOT(manageLibrary()));
 
-    optionsMenu->addAction(tr("Create Heat Map..."), this, SLOT(generateHeatMap()), tr(""));
-    optionsMenu->addAction(tr("Export Metrics as CSV..."), this, SLOT(exportMetrics()), tr(""));
+    optionsMenu->addAction(tr("Create Heat Map..."), this, SLOT(generateHeatMap()));
+    optionsMenu->addAction(tr("Export Metrics as CSV..."), this, SLOT(exportMetrics()));
 
 #ifdef GC_HAS_CLOUD_DB
     // CloudDB options
@@ -604,7 +589,7 @@ MainWindow::MainWindow(const QDir &home)
     QMenu *editMenu = menuBar()->addMenu(tr("&Edit"));
     // Add all the data processors to the tools menu
     const DataProcessorFactory &factory = DataProcessorFactory::instance();
-    QMap<QString, DataProcessor*> processors = factory.getProcessors(true);
+    QMap<QString, DataProcessor*> processors = factory.getProcessors();
 
     if (processors.count()) {
 
@@ -640,6 +625,9 @@ MainWindow::MainWindow(const QDir &home)
 #else
     viewMenu->addAction(tr("Toggle Full Screen"), this, SLOT(toggleFullScreen()));
 #endif
+    showhideViewbar = viewMenu->addAction(tr("Show View Sidebar"), this, SLOT(showViewbar(bool)));
+    showhideViewbar->setCheckable(true);
+    showhideViewbar->setChecked(true);
     showhideSidebar = viewMenu->addAction(tr("Show Left Sidebar"), this, SLOT(showSidebar(bool)));
     showhideSidebar->setCheckable(true);
     showhideSidebar->setChecked(true);
@@ -704,11 +692,11 @@ MainWindow::MainWindow(const QDir &home)
     //connect(this, SIGNAL(rideDirty()), this, SLOT(enableSaveButton()));
     //connect(this, SIGNAL(rideClean()), this, SLOT(enableSaveButton()));
 
-    saveGCState(currentTab->context); // set to whatever we started with
+    saveGCState(currentAthleteTab->context); // set to whatever we started with
     selectAnalysis();
 
     //grab focus
-    currentTab->setFocus();
+    currentAthleteTab->setFocus();
 
     installEventFilter(this);
 
@@ -723,7 +711,7 @@ MainWindow::MainWindow(const QDir &home)
      *--------------------------------------------------------------------*/
 
 #if !defined(OPENDATA_DISABLE)
-    OpenData::check(currentTab->context);
+    OpenData::check(currentAthleteTab->context);
 #else
     fprintf(stderr, "OpenData disabled, secret not defined.\n"); fflush(stderr);
 #endif
@@ -804,14 +792,20 @@ MainWindow::clearSplash()
 void
 MainWindow::toggleSidebar()
 {
-    currentTab->toggleSidebar();
+    currentAthleteTab->toggleSidebar();
     setToolButtons();
 }
-
+void
+MainWindow::showViewbar(bool want)
+{
+    want ? sidebar->show() : sidebar->hide();
+    showhideViewbar->setChecked(want);
+    setToolButtons();
+}
 void
 MainWindow::showSidebar(bool want)
 {
-    currentTab->setSidebarEnabled(want);
+    currentAthleteTab->setSidebarEnabled(want);
     showhideSidebar->setChecked(want);
     setToolButtons();
 }
@@ -819,14 +813,14 @@ MainWindow::showSidebar(bool want)
 void
 MainWindow::toggleLowbar()
 {
-    if (currentTab->hasBottom()) currentTab->setBottomRequested(!currentTab->isBottomRequested());
+    if (currentAthleteTab->hasBottom()) currentAthleteTab->setBottomRequested(!currentAthleteTab->isBottomRequested());
     setToolButtons();
 }
 
 void
 MainWindow::showLowbar(bool want)
 {
-    if (currentTab->hasBottom()) currentTab->setBottomRequested(want);
+    if (currentAthleteTab->hasBottom()) currentAthleteTab->setBottomRequested(want);
     showhideLowbar->setChecked(want);
     setToolButtons();
 }
@@ -873,7 +867,7 @@ MainWindow::setChartMenu()
     // called when chart menu about to be shown
     // setup to only show charts that are relevant
     // to this view
-    switch(currentTab->currentView()) {
+    switch(currentAthleteTab->currentView()) {
         case 0 : mask = VIEW_TRENDS; break;
         default:
         case 1 : mask = VIEW_ANALYSIS; break;
@@ -903,7 +897,7 @@ MainWindow::setChartMenu(QMenu *menu)
     // called when chart menu about to be shown
     // setup to only show charts that are relevant
     // to this view
-    switch(currentTab->currentView()) {
+    switch(currentAthleteTab->currentView()) {
         case 0 : mask = VIEW_TRENDS; break;
         default:
         case 1 : mask = VIEW_ANALYSIS; break;
@@ -933,7 +927,7 @@ MainWindow::addChart(QAction*action)
         }
     }
     if (id != GcWindowTypes::None)
-        currentTab->addChart(id); // called from MainWindow to inset chart
+        currentAthleteTab->addChart(id); // called from MainWindow to inset chart
 }
 
 void
@@ -951,16 +945,16 @@ MainWindow::importChart()
 void
 MainWindow::exportPerspective()
 {
-    int view = currentTab->currentView();
-    TabView *current = NULL;
+    int view = currentAthleteTab->currentView();
+    AbstractView *current = NULL;
 
     QString typedesc;
 
     switch (view) {
-    case 0:  current = currentTab->homeView; typedesc = "Trends"; break;
-    case 1:  current = currentTab->analysisView; typedesc = "Analysis"; break;
-    case 2:  current = currentTab->diaryView; typedesc = "Diary"; break;
-    case 3:  current = currentTab->trainView; typedesc = "Train"; break;
+    case 0:  current = currentAthleteTab->homeView; typedesc = "Trends"; break;
+    case 1:  current = currentAthleteTab->analysisView; typedesc = "Analysis"; break;
+    case 2:  current = currentAthleteTab->diaryView; typedesc = "Diary"; break;
+    case 3:  current = currentAthleteTab->trainView; typedesc = "Train"; break;
     }
 
     // export the current perspective to a file
@@ -979,14 +973,14 @@ MainWindow::exportPerspective()
 void
 MainWindow::importPerspective()
 {
-    int view = currentTab->currentView();
-    TabView *current = NULL;
+    int view = currentAthleteTab->currentView();
+    AbstractView *current = NULL;
 
     switch (view) {
-    case 0:  current = currentTab->homeView; break;
-    case 1:  current = currentTab->analysisView; break;
-    case 2:  current = currentTab->diaryView; break;
-    case 3:  current = currentTab->trainView; break;
+    case 0:  current = currentAthleteTab->homeView; break;
+    case 1:  current = currentAthleteTab->analysisView; break;
+    case 2:  current = currentAthleteTab->diaryView; break;
+    case 3:  current = currentAthleteTab->trainView; break;
     }
 
     // import a new perspective from a file
@@ -1000,7 +994,8 @@ MainWindow::importPerspective()
         if (current->importPerspective(fileName)) {
 
             // on success we select the new one
-            current->setPerspectives(perspectiveSelector);
+            resetPerspective(view);
+            //current->setPerspectives(perspectiveSelector);
 
             // and select remember pactive is true, so we do the heavy lifting here
             perspectiveSelector->setCurrentIndex(current->perspectives_.count()-1);
@@ -1018,7 +1013,7 @@ MainWindow::exportChartToCloudDB()
 {
     // upload the current chart selected to the chart db
     // called from the sidebar menu
-    Perspective *page=currentTab->view(currentTab->currentView())->page();
+    Perspective *page=currentAthleteTab->view(currentAthleteTab->currentView())->page();
     if (page->currentStyle == 0 && page->currentChart())
         page->currentChart()->exportChartToCloudDB();
 }
@@ -1026,29 +1021,29 @@ MainWindow::exportChartToCloudDB()
 void
 MainWindow::addChartFromCloudDB()
 {
-    if (!(appsettings->cvalue(currentTab->context->athlete->cyclist, GC_CLOUDDB_TC_ACCEPTANCE, false).toBool())) {
-       CloudDBAcceptConditionsDialog acceptDialog(currentTab->context->athlete->cyclist);
+    if (!(appsettings->cvalue(currentAthleteTab->context->athlete->cyclist, GC_CLOUDDB_TC_ACCEPTANCE, false).toBool())) {
+       CloudDBAcceptConditionsDialog acceptDialog(currentAthleteTab->context->athlete->cyclist);
        acceptDialog.setModal(true);
        if (acceptDialog.exec() == QDialog::Rejected) {
           return;
        };
     }
 
-    if (currentTab->context->cdbChartListDialog == NULL) {
-        currentTab->context->cdbChartListDialog = new CloudDBChartListDialog();
+    if (currentAthleteTab->context->cdbChartListDialog == NULL) {
+        currentAthleteTab->context->cdbChartListDialog = new CloudDBChartListDialog();
     }
 
-    if (currentTab->context->cdbChartListDialog->prepareData(currentTab->context->athlete->cyclist, CloudDBCommon::UserImport, currentTab->currentView())) {
-        if (currentTab->context->cdbChartListDialog->exec() == QDialog::Accepted) {
+    if (currentAthleteTab->context->cdbChartListDialog->prepareData(currentAthleteTab->context->athlete->cyclist, CloudDBCommon::UserImport, currentAthleteTab->currentView())) {
+        if (currentAthleteTab->context->cdbChartListDialog->exec() == QDialog::Accepted) {
 
             // get selected chartDef
-            QList<QString> chartDefs = currentTab->context->cdbChartListDialog->getSelectedSettings();
+            QList<QString> chartDefs = currentAthleteTab->context->cdbChartListDialog->getSelectedSettings();
 
             // parse charts into property pairs
             foreach (QString chartDef, chartDefs) {
                 QList<QMap<QString,QString> > properties = GcChartWindow::chartPropertiesFromString(chartDef);
                 for (int i = 0; i< properties.size(); i++) {
-                    currentTab->context->mainWindow->athleteTab()->view(currentTab->currentView())->importChart(properties.at(i), false);
+                    currentAthleteTab->context->mainWindow->athleteTab()->view(currentAthleteTab->currentView())->importChart(properties.at(i), false);
                 }
             }
         }
@@ -1057,17 +1052,10 @@ MainWindow::addChartFromCloudDB()
 #endif
 
 void
-MainWindow::setStyleFromSegment(int segment)
-{
-    currentTab->setTiled(segment);
-    styleAction->setChecked(!segment);
-}
-
-void
 MainWindow::toggleStyle()
 {
-    currentTab->toggleTile();
-    styleAction->setChecked(currentTab->isTiled());
+    currentAthleteTab->toggleTile();
+    styleAction->setChecked(currentAthleteTab->isTiled());
     setToolButtons();
 }
 
@@ -1091,7 +1079,14 @@ bool
 MainWindow::eventFilter(QObject *o, QEvent *e)
 {
     if (o == this) {
-        if (e->type() == QEvent::WindowStateChange) resizeEvent(NULL); // see below
+        if (e->type() == QEvent::WindowStateChange) {
+
+            // if we are entering full screen mode we hide the sidebar
+            if (windowState()&Qt::WindowFullScreen) showViewbar(false);
+            else showViewbar(true);
+
+            resizeEvent(NULL); // see below
+        }
     }
     return false;
 }
@@ -1101,6 +1096,7 @@ MainWindow::resizeEvent(QResizeEvent*)
 {
     //appsettings->setValue(GC_SETTINGS_MAIN_GEOM, saveGeometry());
     //appsettings->setValue(GC_SETTINGS_MAIN_STATE, saveState());
+
 }
 
 void
@@ -1108,7 +1104,7 @@ MainWindow::showOptions()
 {
     // Create a new config dialog only if it doesn't exist
     ConfigDialog *cd = configdialog_ptr ? configdialog_ptr
-                                        : new ConfigDialog(currentTab->context->athlete->home->root(), currentTab->context);
+                                        : new ConfigDialog(currentAthleteTab->context->athlete->home->root(), currentAthleteTab->context);
 
     // move to the centre of the screen
     cd->move(geometry().center()-QPoint(cd->geometry().width()/2, cd->geometry().height()/2));
@@ -1125,13 +1121,13 @@ MainWindow::moveEvent(QMoveEvent*)
 void
 MainWindow::closeEvent(QCloseEvent* event)
 {
-    QList<Tab*> closing = tabList;
+    QList<AthleteTab*> closing = tabList;
     bool needtosave = false;
     bool importrunning = false;
 
     // close all the tabs .. if any refuse we need to ignore
     //                       the close event
-    foreach(Tab *tab, closing) {
+    foreach(AthleteTab *tab, closing) {
 
         // check for if RideImport is is process and let it finalize / or be stopped by the user
         if (tab->context->athlete->autoImport) {
@@ -1145,7 +1141,7 @@ MainWindow::closeEvent(QCloseEvent* event)
         if (!importrunning) {
             // do we need to save?
             if (tab->context->mainWindow->saveRideExitDialog(tab->context) == true)
-                removeTab(tab);
+                removeAthleteTab(tab);
             else
                 needtosave = true;
         }
@@ -1182,19 +1178,19 @@ MainWindow::~MainWindow()
 }
 
 // global search/data filter
-void MainWindow::setFilter(QStringList f) { currentTab->context->setFilter(f); }
-void MainWindow::clearFilter() { currentTab->context->clearFilter(); }
+void MainWindow::setFilter(QStringList f) { currentAthleteTab->context->setFilter(f); }
+void MainWindow::clearFilter() { currentAthleteTab->context->clearFilter(); }
 
 void
 MainWindow::aboutDialog()
 {
-    AboutDialog *ad = new AboutDialog(currentTab->context);
+    AboutDialog *ad = new AboutDialog(currentAthleteTab->context);
     ad->exec();
 }
 
 void MainWindow::showSolveCP()
 {
-   SolveCPDialog *td = new SolveCPDialog(this, currentTab->context);
+   SolveCPDialog *td = new SolveCPDialog(this, currentAthleteTab->context);
    td->show();
 }
 
@@ -1206,7 +1202,7 @@ void MainWindow::showEstimateCP()
 
 void MainWindow::showRhoEstimator()
 {
-   ToolsRhoEstimator *tre = new ToolsRhoEstimator(currentTab->context);
+   ToolsRhoEstimator *tre = new ToolsRhoEstimator(currentAthleteTab->context);
    tre->show();
 }
 
@@ -1218,7 +1214,7 @@ void MainWindow::showVDOTCalculator()
 
 void MainWindow::showWorkoutWizard()
 {
-   WorkoutWizard *ww = new WorkoutWizard(currentTab->context);
+   WorkoutWizard *ww = new WorkoutWizard(currentAthleteTab->context);
    ww->show();
 }
 
@@ -1233,7 +1229,7 @@ void MainWindow::resetWindowLayout()
     msgBox.exec();
 
     if(msgBox.clickedButton() == msgBox.button(QMessageBox::Ok))
-        currentTab->resetLayout();
+        currentAthleteTab->resetLayout(perspectiveSelector);
 }
 
 void MainWindow::manualProcess(QString name)
@@ -1243,7 +1239,7 @@ void MainWindow::manualProcess(QString name)
     // and also show the explanation
     // of what this function does
     // then call it!
-    RideItem *rideitem = (RideItem*)currentTab->context->currentRideItem();
+    RideItem *rideitem = (RideItem*)currentAthleteTab->context->currentRideItem();
     if (rideitem) {
 
 #ifdef GC_WANT_PYTHON
@@ -1251,21 +1247,16 @@ void MainWindow::manualProcess(QString name)
             name = name.remove(0, 8);
 
             FixPyScript *script = fixPySettings->getScript(name);
-            if (script == nullptr) {
-                return;
-            }
-
-            QString errText;
-            FixPyRunner pyRunner(currentTab->context);
-            if (pyRunner.run(script->source, script->iniKey, errText) != 0) {
-                QMessageBox::critical(this, "GoldenCheetah", errText);
+            if (script) {
+                EditFixPyScriptDialog editDlg(currentAthleteTab->context, script, this);
+                editDlg.exec();
             }
 
             return;
         }
 #endif
 
-        ManualDataProcessorDialog *p = new ManualDataProcessorDialog(currentTab->context, name, rideitem);
+        ManualDataProcessorDialog *p = new ManualDataProcessorDialog(currentAthleteTab->context, name, rideitem);
         p->setWindowModality(Qt::ApplicationModal); // don't allow select other ride or it all goes wrong!
         p->exec();
     }
@@ -1275,7 +1266,7 @@ void MainWindow::manualProcess(QString name)
 void
 MainWindow::helpWindow()
 {
-    HelpWindow* help = new HelpWindow(currentTab->context);
+    HelpWindow* help = new HelpWindow(currentAthleteTab->context);
     help->show();
 }
 
@@ -1337,10 +1328,11 @@ MainWindow::selectAthlete()
 void
 MainWindow::selectAnalysis()
 {
-    currentTab->analysisView->setPerspectives(perspectiveSelector);
+    resetPerspective(1);
+    //currentTab->analysisView->setPerspectives(perspectiveSelector);
     viewStack->setCurrentIndex(1);
     sidebar->setItemSelected(3, true);
-    currentTab->selectView(1);
+    currentAthleteTab->selectView(1);
     perspectiveSelector->show();
     setToolButtons();
 }
@@ -1348,10 +1340,11 @@ MainWindow::selectAnalysis()
 void
 MainWindow::selectTrain()
 {
-    currentTab->trainView->setPerspectives(perspectiveSelector);
+    resetPerspective(3);
+    //currentTab->trainView->setPerspectives(perspectiveSelector);
     viewStack->setCurrentIndex(1);
     sidebar->setItemSelected(5, true);
-    currentTab->selectView(3);
+    currentAthleteTab->selectView(3);
     perspectiveSelector->show();
     setToolButtons();
 }
@@ -1359,9 +1352,10 @@ MainWindow::selectTrain()
 void
 MainWindow::selectDiary()
 {
-    currentTab->diaryView->setPerspectives(perspectiveSelector);
+    resetPerspective(2);
+    //currentTab->diaryView->setPerspectives(perspectiveSelector);
     viewStack->setCurrentIndex(1);
-    currentTab->selectView(2);
+    currentAthleteTab->selectView(2);
     perspectiveSelector->show();
     setToolButtons();
 }
@@ -1369,34 +1363,28 @@ MainWindow::selectDiary()
 void
 MainWindow::selectTrends()
 {
-    currentTab->homeView->setPerspectives(perspectiveSelector);
+    resetPerspective(0);
+    //currentTab->homeView->setPerspectives(perspectiveSelector);
     viewStack->setCurrentIndex(1);
     sidebar->setItemSelected(2, true);
-    currentTab->selectView(0);
+    currentAthleteTab->selectView(0);
     perspectiveSelector->show();
-    setToolButtons();
-}
-
-void
-MainWindow::selectInterval()
-{
-    currentTab->selectView(4);
     setToolButtons();
 }
 
 void
 MainWindow::setToolButtons()
 {
-    int select = currentTab->isTiled() ? 1 : 0;
-    int lowselected = currentTab->isBottomRequested() ? 1 : 0;
+    int select = currentAthleteTab->isTiled() ? 1 : 0;
+    int lowselected = currentAthleteTab->isBottomRequested() ? 1 : 0;
 
     styleAction->setChecked(select);
     showhideLowbar->setChecked(lowselected);
 
-    if (styleSelector->isSegmentSelected(select) == false)
-        styleSelector->setSegmentSelected(select, true);
+    //if (styleSelector->isSegmentSelected(select) == false)
+        //styleSelector->setSegmentSelected(select, true);
 
-    int index = currentTab->currentView();
+    int index = currentAthleteTab->currentView();
 
     //XXX WTAF! The index used is fucked up XXX
     //          hack around this and then come back
@@ -1432,8 +1420,39 @@ MainWindow::setToolButtons()
 void
 MainWindow::switchPerspective(int index)
 {
+    if (pactive) return;
+
     if (index >=0 && index < perspectiveSelector->count())
         perspectiveSelector->setCurrentIndex(index);
+}
+
+void
+MainWindow::resetPerspective(int view, bool force)
+{
+    static AthleteTab *lastathlete=NULL;
+    static int lastview=-1;
+
+    if (!force && lastview == view && lastathlete == currentAthleteTab) return;
+
+    // remember who last updated it.
+    lastathlete = currentAthleteTab;
+    lastview = view;
+
+    // don't argue just reset the perspective for this view
+    AbstractView *current = NULL;
+    switch (view) {
+
+    case 0:  current = currentAthleteTab->homeView; break;
+    case 1:  current = currentAthleteTab->analysisView; break;
+    case 2:  current = currentAthleteTab->diaryView; break;
+    case 3:  current = currentAthleteTab->trainView; break;
+    }
+
+    // set the perspective
+    pactive=true;
+    current->setPerspectives(perspectiveSelector);
+    perspectiveSelector->setCurrentIndex(current->currentPerspective());
+    pactive=false;
 }
 
 void
@@ -1442,13 +1461,13 @@ MainWindow::perspectiveSelected(int index)
     if (pactive) return;
 
     // set the perspective for the current view
-    int view = currentTab->currentView();
-    TabView *current = NULL;
+    int view = currentAthleteTab->currentView();
+    AbstractView *current = NULL;
     switch (view) {
-    case 0:  current = currentTab->homeView; break;
-    case 1:  current = currentTab->analysisView; break;
-    case 2:  current = currentTab->diaryView; break;
-    case 3:  current = currentTab->trainView; break;
+    case 0:  current = currentAthleteTab->homeView; break;
+    case 1:  current = currentAthleteTab->analysisView; break;
+    case 2:  current = currentAthleteTab->diaryView; break;
+    case 3:  current = currentAthleteTab->trainView; break;
     }
 
     // which perspective is currently being shown?
@@ -1478,7 +1497,8 @@ MainWindow::perspectiveSelected(int index)
             {
                 QString name;
                 QString expression;
-                AddPerspectiveDialog *dialog= new AddPerspectiveDialog(this, currentTab->context, name, expression, current->type);
+                Perspective::switchenum trainswitch=Perspective::None;
+                AddPerspectiveDialog *dialog= new AddPerspectiveDialog(this, currentAthleteTab->context, name, expression, current->type, trainswitch);
                 int ret= dialog->exec();
                 delete dialog;
                 if (ret == QDialog::Accepted && name != "") {
@@ -1486,6 +1506,7 @@ MainWindow::perspectiveSelected(int index)
                     // add...
                     Perspective *newone = current->addPerspective(name);
                     newone->setExpression(expression);
+                    newone->setTrainSwitch(trainswitch);
                     current->setPerspectives(perspectiveSelector);
 
                     // and select remember pactive is true, so we do the heavy lifting here
@@ -1509,21 +1530,24 @@ MainWindow::perspectiveSelected(int index)
 void
 MainWindow::perspectivesChanged()
 {
-    int view = currentTab->currentView();
-    TabView *current = NULL;
+    int view = currentAthleteTab->currentView();
+    AbstractView *current = NULL;
 
     switch (view) {
-    case 0:  current = currentTab->homeView; break;
-    case 1:  current = currentTab->analysisView; break;
-    case 2:  current = currentTab->diaryView; break;
-    case 3:  current = currentTab->trainView; break;
+    case 0:  current = currentAthleteTab->homeView; break;
+    case 1:  current = currentAthleteTab->analysisView; break;
+    case 2:  current = currentAthleteTab->diaryView; break;
+    case 3:  current = currentAthleteTab->trainView; break;
     }
 
     // which perspective is currently being selected (before we go setting the combobox)
     Perspective *prior = current->perspective_;
 
-    // ok, so reset the combobox
-    current->setPerspectives(perspectiveSelector);
+    // ok, so reset the combobox and force, since whilst it may have already
+    // been set for this athlete+view combination the config was just changed
+    // so it needs to be redone.
+    resetPerspective(view, true);
+    //current->setPerspectives(perspectiveSelector);
 
     // is the old selected perspective still available?
     int index = current->perspectives_.indexOf(prior);
@@ -1604,7 +1628,7 @@ MainWindow::dropEvent(QDropEvent *event)
             imported += handler.getSettings();
 
         // Look for Workout files only in Train view
-        } else if (currentTab->currentView() == 3 && ErgFile::isWorkout(filename)) {
+        } else if (currentAthleteTab->currentView() == 3 && ErgFile::isWorkout(filename)) {
             workouts << filename;
         } else {
             filenames.append(filename);
@@ -1615,10 +1639,10 @@ MainWindow::dropEvent(QDropEvent *event)
     if (imported.count()) {
 
         // now append to the QList and QTreeWidget
-        currentTab->context->athlete->presets += imported;
+        currentAthleteTab->context->athlete->presets += imported;
 
         // notify we changed and tree updates
-        currentTab->context->notifyPresetsChanged();
+        currentAthleteTab->context->notifyPresetsChanged();
 
         // tell the user
         QMessageBox::information(this, tr("Chart Import"), QString(tr("Imported %1 metric charts")).arg(imported.count()));
@@ -1627,20 +1651,20 @@ MainWindow::dropEvent(QDropEvent *event)
         selectTrends();
 
         // now select what was added
-        currentTab->context->notifyPresetSelected(currentTab->context->athlete->presets.count()-1);
+        currentAthleteTab->context->notifyPresetSelected(currentAthleteTab->context->athlete->presets.count()-1);
     }
 
     // are there any .gcharts to import?
     if (list.count())  importCharts(list);
 
     // import workouts
-    if (workouts.count()) Library::importFiles(currentTab->context, workouts, true);
+    if (workouts.count()) Library::importFiles(currentAthleteTab->context, workouts, true);
 
     // if there is anything left, process based upon view...
     if (filenames.count()) {
 
         // We have something to process then
-        RideImportWizard *dialog = new RideImportWizard (filenames, currentTab->context);
+        RideImportWizard *dialog = new RideImportWizard (filenames, currentAthleteTab->context);
         dialog->process(); // do it!
     }
     return;
@@ -1657,7 +1681,7 @@ MainWindow::importCharts(QStringList list)
     }
 
     // And import them with a dialog to select location
-    ImportChartDialog importer(currentTab->context, charts, this);
+    ImportChartDialog importer(currentAthleteTab->context, charts, this);
     importer.exec();
 }
 
@@ -1670,34 +1694,34 @@ MainWindow::importCharts(QStringList list)
 void
 MainWindow::downloadRide()
 {
-    (new DownloadRideDialog(currentTab->context))->show();
+    (new DownloadRideDialog(currentAthleteTab->context))->show();
 }
 
 
 void
 MainWindow::manualRide()
 {
-    (new ManualRideDialog(currentTab->context))->show();
+    (new ManualRideDialog(currentAthleteTab->context))->show();
 }
 
 void
-MainWindow::exportBatch()
+MainWindow::batchProcessing()
 {
-    BatchExportDialog *d = new BatchExportDialog(currentTab->context);
+    BatchProcessingDialog *d = new BatchProcessingDialog(currentAthleteTab->context);
     d->exec();
 }
 
 void
 MainWindow::generateHeatMap()
 {
-    GenerateHeatMapDialog *d = new GenerateHeatMapDialog(currentTab->context);
+    GenerateHeatMapDialog *d = new GenerateHeatMapDialog(currentAthleteTab->context);
     d->exec();
 }
 
 void
 MainWindow::exportRide()
 {
-    if (currentTab->context->ride == NULL) {
+    if (currentAthleteTab->context->ride == NULL) {
         QMessageBox::critical(this, tr("Select Activity"), tr("No activity selected!"));
         return;
     }
@@ -1721,7 +1745,7 @@ MainWindow::exportRide()
     getSuffix.exactMatch(suffix);
 
     QFile file(fileName);
-    RideFile *currentRide = currentTab->context->ride ? currentTab->context->ride->ride() : NULL;
+    RideFile *currentRide = currentAthleteTab->context->ride ? currentAthleteTab->context->ride->ride() : NULL;
     bool result=false;
 
     // Extract suffix from chosen file name and convert to lower case
@@ -1739,7 +1763,7 @@ MainWindow::exportRide()
 
     if (useFileTypeSuffix)
     {
-        result = RideFileFactory::instance().writeRideFile(currentTab->context, currentRide, file, fileNameSuffix);
+        result = RideFileFactory::instance().writeRideFile(currentAthleteTab->context, currentRide, file, fileNameSuffix);
     }
     else
     {
@@ -1748,17 +1772,17 @@ MainWindow::exportRide()
 
         if (idx>1) {
 
-            result = RideFileFactory::instance().writeRideFile(currentTab->context, currentRide, file, getSuffix.cap(1));
+            result = RideFileFactory::instance().writeRideFile(currentAthleteTab->context, currentRide, file, getSuffix.cap(1));
 
         } else if (idx==0){
 
             CsvFileReader writer;
-            result = writer.writeRideFile(currentTab->context, currentRide, file, CsvFileReader::gc);
+            result = writer.writeRideFile(currentAthleteTab->context, currentRide, file, CsvFileReader::gc);
 
         } else if (idx==1){
 
             CsvFileReader writer;
-            result = writer.writeRideFile(currentTab->context, currentRide, file, CsvFileReader::wprime);
+            result = writer.writeRideFile(currentAthleteTab->context, currentRide, file, CsvFileReader::wprime);
 
         }
     }
@@ -1791,7 +1815,7 @@ MainWindow::importFile()
         lastDir = QFileInfo(fileNames.front()).absolutePath();
         appsettings->setValue(GC_SETTINGS_LAST_IMPORT_PATH, lastDir);
         QStringList fileNamesCopy = fileNames; // QT doc says iterate over a copy
-        RideImportWizard *import = new RideImportWizard(fileNamesCopy, currentTab->context);
+        RideImportWizard *import = new RideImportWizard(fileNamesCopy, currentAthleteTab->context);
         import->process();
     }
 }
@@ -1800,7 +1824,7 @@ void
 MainWindow::saveRide()
 {
     // no ride
-    if (currentTab->context->ride == NULL) {
+    if (currentAthleteTab->context->ride == NULL) {
         QMessageBox oops(QMessageBox::Critical, tr("No Activity To Save"),
                          tr("There is no currently selected activity to save."));
         oops.exec();
@@ -1808,52 +1832,59 @@ MainWindow::saveRide()
     }
 
     // flush in-flight changes
-    currentTab->context->notifyMetadataFlush();
-    currentTab->context->ride->notifyRideMetadataChanged();
+    currentAthleteTab->context->notifyMetadataFlush();
+    currentAthleteTab->context->ride->notifyRideMetadataChanged();
 
     // nothing to do if not dirty
     //XXX FORCE A SAVE if (currentTab->context->ride->isDirty() == false) return;
 
     // save
-    if (currentTab->context->ride) {
-        saveRideSingleDialog(currentTab->context, currentTab->context->ride); // will signal save to everyone
+    if (currentAthleteTab->context->ride) {
+        saveRideSingleDialog(currentAthleteTab->context, currentAthleteTab->context->ride); // will signal save to everyone
     }
+}
+
+void
+MainWindow::athleteSettings()
+{
+    AthleteConfigDialog *dialog = new AthleteConfigDialog(currentAthleteTab->context->athlete->home->root(), currentAthleteTab->context);
+    dialog->exec();
 }
 
 void
 MainWindow::saveAllUnsavedRides()
 {
     // flush in-flight changes
-    currentTab->context->notifyMetadataFlush();
-    currentTab->context->ride->notifyRideMetadataChanged();
+    currentAthleteTab->context->notifyMetadataFlush();
+    currentAthleteTab->context->ride->notifyRideMetadataChanged();
 
     // save
-    if (currentTab->context->ride) {
-        saveAllFilesSilent(currentTab->context); // will signal save to everyone
+    if (currentAthleteTab->context->ride) {
+        saveAllFilesSilent(currentAthleteTab->context); // will signal save to everyone
     }
 }
 
 void
 MainWindow::revertRide()
 {
-    currentTab->context->ride->close();
-    currentTab->context->ride->ride(); // force re-load
+    currentAthleteTab->context->ride->close();
+    currentAthleteTab->context->ride->ride(); // force re-load
 
     // in case reverted ride has different starttime
-    currentTab->context->ride->setStartTime(currentTab->context->ride->ride()->startTime());
-    currentTab->context->ride->ride()->emitReverted();
+    currentAthleteTab->context->ride->setStartTime(currentAthleteTab->context->ride->ride()->startTime());
+    currentAthleteTab->context->ride->ride()->emitReverted();
 
     // and notify everyone we changed which also has the side
     // effect of updating the cached values too
-    currentTab->context->notifyRideSelected(currentTab->context->ride);
+    currentAthleteTab->context->notifyRideSelected(currentAthleteTab->context->ride);
 }
 
 void
 MainWindow::splitRide()
 {
-    if (currentTab->context->ride && currentTab->context->ride->ride() && currentTab->context->ride->ride()->dataPoints().count()) (new SplitActivityWizard(currentTab->context))->exec();
+    if (currentAthleteTab->context->ride && currentAthleteTab->context->ride->ride() && currentAthleteTab->context->ride->ride()->dataPoints().count()) (new SplitActivityWizard(currentAthleteTab->context))->exec();
     else {
-        if (!currentTab->context->ride || !currentTab->context->ride->ride())
+        if (!currentAthleteTab->context->ride || !currentAthleteTab->context->ride->ride())
             QMessageBox::critical(this, tr("Split Activity"), tr("No activity selected"));
         else
             QMessageBox::critical(this, tr("Split Activity"), tr("Current activity contains no data to split"));
@@ -1863,9 +1894,9 @@ MainWindow::splitRide()
 void
 MainWindow::mergeRide()
 {
-    if (currentTab->context->ride && currentTab->context->ride->ride() && currentTab->context->ride->ride()->dataPoints().count()) (new MergeActivityWizard(currentTab->context))->exec();
+    if (currentAthleteTab->context->ride && currentAthleteTab->context->ride->ride() && currentAthleteTab->context->ride->ride()->dataPoints().count()) (new MergeActivityWizard(currentAthleteTab->context))->exec();
     else {
-        if (!currentTab->context->ride || !currentTab->context->ride->ride())
+        if (!currentAthleteTab->context->ride || !currentAthleteTab->context->ride->ride())
             QMessageBox::critical(this, tr("Split Activity"), tr("No activity selected"));
         else
             QMessageBox::critical(this, tr("Split Activity"), tr("Current activity contains no data to merge"));
@@ -1875,7 +1906,7 @@ MainWindow::mergeRide()
 void
 MainWindow::deleteRide()
 {
-    RideItem *_item = currentTab->context->ride;
+    RideItem *_item = currentAthleteTab->context->ride;
 
     if (_item==NULL) {
         QMessageBox::critical(this, tr("Delete Activity"), tr("No activity selected!"));
@@ -1892,7 +1923,7 @@ MainWindow::deleteRide()
     msgBox.setIcon(QMessageBox::Critical);
     msgBox.exec();
     if(msgBox.clickedButton() == deleteButton)
-        currentTab->context->athlete->removeCurrentRide();
+        currentAthleteTab->context->athlete->removeCurrentRide();
 }
 
 /*----------------------------------------------------------------------
@@ -1903,7 +1934,7 @@ MainWindow::addDevice()
 {
 
     // lets get a new one
-    AddDeviceWizard *p = new AddDeviceWizard(currentTab->context);
+    AddDeviceWizard *p = new AddDeviceWizard(currentAthleteTab->context);
     p->show();
 
 }
@@ -1915,12 +1946,12 @@ MainWindow::addDevice()
 void
 MainWindow::newCyclistTab()
 {
-    QDir newHome = currentTab->context->athlete->home->root();
+    QDir newHome = currentAthleteTab->context->athlete->home->root();
     newHome.cdUp();
     QString name = ChooseCyclistDialog::newCyclistDialog(newHome, this);
     if (!name.isEmpty()) {
         emit newAthlete(name);
-        openTab(name);
+        openAthleteTab(name);
     }
 }
 
@@ -1933,7 +1964,7 @@ MainWindow::closeWindow()
 }
 
 void
-MainWindow::openTab(QString name)
+MainWindow::openAthleteTab(QString name)
 {
     QDir home(gcroot);
     appsettings->initializeQSettingsGlobal(gcroot);
@@ -1959,18 +1990,18 @@ void
 MainWindow::loadCompleted(QString name, Context *context)
 {
     // athlete loaded
-    currentTab = new Tab(context);
+    currentAthleteTab = new AthleteTab(context);
 
     // clear splash - progress whilst loading tab
     //clearSplash();
 
     // first tab
-    tabs.insert(currentTab->context->athlete->home->root().dirName(), currentTab);
+    athletetabs.insert(currentAthleteTab->context->athlete->home->root().dirName(), currentAthleteTab);
 
     // stack, list and bar all share a common index
-    tabList.append(currentTab);
-    tabbar->addTab(currentTab->context->athlete->home->root().dirName());
-    tabStack->addWidget(currentTab);
+    tabList.append(currentAthleteTab);
+    tabbar->addTab(currentAthleteTab->context->athlete->home->root().dirName());
+    tabStack->addWidget(currentAthleteTab);
 
     // switch to newly created athlete
     tabbar->setCurrentIndex(tabList.count()-1);
@@ -1980,7 +2011,7 @@ MainWindow::loadCompleted(QString name, Context *context)
     showTabbar(true);
 
     // tell everyone
-    currentTab->context->notifyLoadDone(name, context);
+    currentAthleteTab->context->notifyLoadDone(name, context);
 
     // now do the automatic ride file import
     context->athlete->importFilesWhenOpeningAthlete();
@@ -1990,7 +2021,7 @@ void
 MainWindow::closeTabClicked(int index)
 {
 
-    Tab *tab = tabList[index];
+    AthleteTab *tab = tabList[index];
 
     // check for autoimport and let it finalize
     if (tab->context->athlete->autoImport) {
@@ -2003,11 +2034,11 @@ MainWindow::closeTabClicked(int index)
     if (saveRideExitDialog(tab->context) == false) return;
 
     // lets wipe it
-    removeTab(tab);
+    removeAthleteTab(tab);
 }
 
 bool
-MainWindow::closeTab(QString name)
+MainWindow::closeAthleteTab(QString name)
 {
     for(int i=0; i<tabbar->count(); i++) {
         if (name == tabbar->tabText(i)) {
@@ -2019,24 +2050,24 @@ MainWindow::closeTab(QString name)
 }
 
 bool
-MainWindow::closeTab()
+MainWindow::closeAthleteTab()
 {
   // check for autoimport and let it finalize
-    if (currentTab->context->athlete->autoImport) {
-        if (currentTab->context->athlete->autoImport->importInProcess() ) {
+    if (currentAthleteTab->context->athlete->autoImport) {
+        if (currentAthleteTab->context->athlete->autoImport->importInProcess() ) {
             QMessageBox::information(this, tr("Activity Import"), tr("Closing of athlete window not possible while background activity import is in progress..."));
             return false;
         }
     }
 
     // wipe it down ...
-    if (saveRideExitDialog(currentTab->context) == false) return false;
+    if (saveRideExitDialog(currentAthleteTab->context) == false) return false;
 
     // if its the last tab we close the window
     if (tabList.count() == 1)
         closeWindow();
     else {
-        removeTab(currentTab);
+        removeAthleteTab(currentAthleteTab);
     }
     appsettings->syncQSettings();
     // we did it
@@ -2045,7 +2076,7 @@ MainWindow::closeTab()
 
 // no questions asked just wipe away the current tab
 void
-MainWindow::removeTab(Tab *tab)
+MainWindow::removeAthleteTab(AthleteTab *tab)
 {
     setUpdatesEnabled(false);
 
@@ -2069,8 +2100,8 @@ MainWindow::removeTab(Tab *tab)
     // if we're not the last then switch
     // before removing so the GUI is clean
     if (tabList.count() > 1) {
-        if (index) switchTab(index-1);
-        else switchTab(index+1);
+        if (index) switchAthleteTab(index-1);
+        else switchAthleteTab(index+1);
     }
 
     // close gracefully
@@ -2078,7 +2109,7 @@ MainWindow::removeTab(Tab *tab)
     tab->context->athlete->close();
 
     // remove from state
-    tabs.remove(name);
+    athletetabs.remove(name);
     tabList.removeAt(index);
     tabbar->removeTab(index);
     tabStack->removeWidget(tab);
@@ -2108,6 +2139,8 @@ MainWindow::setOpenTabMenu()
 
         QString name = i.next();
         SKIP_QTWE_CACHE  // skip Folder Names created by QTWebEngine on Windows
+        if (name.startsWith(".")) continue; // ignore dot folders
+
         // new action
         QAction *action = new QAction(QString("%1").arg(name), this);
 
@@ -2119,7 +2152,7 @@ MainWindow::setOpenTabMenu()
 
         // only allow selection of cyclists which are not already open
         foreach (MainWindow *x, mainwindows) {
-            QMapIterator<QString, Tab*> t(x->tabs);
+            QMapIterator<QString, AthleteTab*> t(x->athletetabs);
             while (t.hasNext()) {
                 t.next();
                 if (t.key() == name)
@@ -2135,7 +2168,7 @@ MainWindow::setOpenTabMenu()
 
     // add create new option
     openTabMenu->addSeparator();
-    openTabMenu->addAction(tr("&New Athlete..."), this, SLOT(newCyclistTab()), tr("Ctrl+N"));
+    openTabMenu->addAction(tr("&New Athlete..."), this, SLOT(newCyclistTab()), QKeySequence("Ctrl+N"));
 }
 
 void
@@ -2150,6 +2183,8 @@ MainWindow::setBackupAthleteMenu()
 
         QString name = i.next();
         SKIP_QTWE_CACHE  // skip Folder Names created by QTWebEngine on Windows
+        if (name.startsWith(".")) continue; // ignore dot folders
+
         // new action
         QAction *action = new QAction(QString("%1").arg(name), this);
 
@@ -2187,6 +2222,8 @@ MainWindow::setDeleteAthleteMenu()
 
         QString name = i.next();
         SKIP_QTWE_CACHE  // skip Folder Names created by QTWebEngine on Windows
+        if (name.startsWith(".")) continue; // ignore dot folders
+
         // new action
         QAction *action = new QAction(QString("%1").arg(name), this);
 
@@ -2198,7 +2235,7 @@ MainWindow::setDeleteAthleteMenu()
 
         // only allow selection of cyclists which are not already open
         foreach (MainWindow *x, mainwindows) {
-            QMapIterator<QString, Tab*> t(x->tabs);
+            QMapIterator<QString, AthleteTab*> t(x->athletetabs);
             while (t.hasNext()) {
                 t.next();
                 if (t.key() == name)
@@ -2238,7 +2275,21 @@ MainWindow::saveGCState(Context *context)
 void
 MainWindow::restoreGCState(Context *context)
 {
-    // restore window state from the supplied context
+    if (viewStack->currentIndex() != 0) {
+
+        // not on athlete view...
+        resetPerspective(currentAthleteTab->currentView()); // will lazy load, hence doing it first
+
+        // restore window state from the supplied context
+            switch(currentAthleteTab->currentView()) {
+            case 0: sidebar->setItemSelected(2,true); break;
+            case 1: sidebar->setItemSelected(3,true); break;
+            case 2: break; // diary not an icon
+            case 3: sidebar->setItemSelected(5, true); break;
+            default: sidebar->setItemSelected(0, true); break;
+        }
+    }
+
     showSidebar(context->showSidebar);
     showToolbar(context->showToolbar);
     //showTabbar(context->showTabbar);
@@ -2248,7 +2299,7 @@ MainWindow::restoreGCState(Context *context)
 }
 
 void
-MainWindow::switchTab(int index)
+MainWindow::switchAthleteTab(int index)
 {
     if (index < 0) return;
 
@@ -2267,15 +2318,16 @@ MainWindow::switchTab(int index)
 #endif
 
     // save how we are
-    saveGCState(currentTab->context);
+    saveGCState(currentAthleteTab->context);
 
-    currentTab = tabList[index];
+    currentAthleteTab = tabList[index];
     tabStack->setCurrentIndex(index);
 
     // restore back
-    restoreGCState(currentTab->context);
+    restoreGCState(currentAthleteTab->context);
 
-    setWindowTitle(currentTab->context->athlete->home->root().dirName());
+    setWindowTitle(currentAthleteTab->context->athlete->home->root().dirName());
+
 
     setUpdatesEnabled(true);
 }
@@ -2289,7 +2341,7 @@ void
 MainWindow::exportMetrics()
 {
     // if the refresh process is running, try again when its completed
-    if (currentTab->context->athlete->rideCache->isRunning()) {
+    if (currentAthleteTab->context->athlete->rideCache->isRunning()) {
         QMessageBox::warning(this, tr("Refresh in Progress"),
         "A metric refresh is currently running, please try again once that has completed.");
         return;
@@ -2300,7 +2352,7 @@ MainWindow::exportMetrics()
     if (fileName.length() == 0) return;
 
     // export
-    currentTab->context->athlete->rideCache->writeAsCSV(fileName);
+    currentAthleteTab->context->athlete->rideCache->writeAsCSV(fileName);
 }
 
 /*----------------------------------------------------------------------
@@ -2329,7 +2381,7 @@ MainWindow::importWorkout()
         QStringList fileNamesCopy = fileNames; // QT doc says iterate over a copy
 
         // import them via the workoutimporter
-        Library::importFiles(currentTab->context, fileNamesCopy);
+        Library::importFiles(currentAthleteTab->context, fileNamesCopy);
     }
 }
 /*----------------------------------------------------------------------
@@ -2344,7 +2396,7 @@ MainWindow::downloadErgDB()
     QFileInfo fi(workoutDir);
 
     if (fi.exists() && fi.isDir()) {
-        ErgDBDownloadDialog *d = new ErgDBDownloadDialog(currentTab->context);
+        ErgDBDownloadDialog *d = new ErgDBDownloadDialog(currentAthleteTab->context);
         d->exec();
     } else{
         QMessageBox::critical(this, tr("Workout Directory Invalid"),
@@ -2365,7 +2417,7 @@ MainWindow::downloadTodaysPlanWorkouts()
     QFileInfo fi(workoutDir);
 
     if (fi.exists() && fi.isDir()) {
-        TodaysPlanWorkoutDownload *d = new TodaysPlanWorkoutDownload(currentTab->context);
+        TodaysPlanWorkoutDownload *d = new TodaysPlanWorkoutDownload(currentAthleteTab->context);
         d->exec();
     } else{
         QMessageBox::critical(this, tr("Workout Directory Invalid"),
@@ -2380,7 +2432,7 @@ MainWindow::downloadTodaysPlanWorkouts()
 void
 MainWindow::manageLibrary()
 {
-    LibrarySearchDialog *search = new LibrarySearchDialog(currentTab->context);
+    LibrarySearchDialog *search = new LibrarySearchDialog(currentAthleteTab->context);
     search->exec();
 }
 
@@ -2392,7 +2444,7 @@ void
 MainWindow::addAccount()
 {
     // lets get a new cloud service account
-    AddCloudWizard *p = new AddCloudWizard(currentTab->context);
+    AddCloudWizard *p = new AddCloudWizard(currentAthleteTab->context);
     p->show();
 }
 
@@ -2400,17 +2452,17 @@ void
 MainWindow::checkCloud()
 {
     // kick off a check
-    currentTab->context->athlete->cloudAutoDownload->checkDownload();
+    currentAthleteTab->context->athlete->cloudAutoDownload->checkDownload();
 
     // and auto import too whilst we're at it
-    currentTab->context->athlete->importFilesWhenOpeningAthlete();
+    currentAthleteTab->context->athlete->importFilesWhenOpeningAthlete();
 }
 
 void
 MainWindow::importCloud()
 {
     // lets get a new cloud service account
-    AddCloudWizard *p = new AddCloudWizard(currentTab->context, "", true);
+    AddCloudWizard *p = new AddCloudWizard(currentAthleteTab->context, "", true);
     p->show();
 }
 
@@ -2418,18 +2470,12 @@ void
 MainWindow::uploadCloud(QAction *action)
 {
     // upload current ride, if we have one
-    if (currentTab->context->ride) {
+    if (currentAthleteTab->context->ride) {
         // & removed to avoid issues with kde AutoCheckAccelerators
         QString actionText = QString(action->text()).replace("&", "");
 
-        if (actionText == "University of Kent") {
-            CloudService *db = CloudServiceFactory::instance().newService(action->data().toString(), currentTab->context);
-            KentUniversityUploadDialog uploader(this, db, currentTab->context->ride);
-            int ret = uploader.exec();
-        } else {
-            CloudService *db = CloudServiceFactory::instance().newService(action->data().toString(), currentTab->context);
-            CloudService::upload(this, currentTab->context, db, currentTab->context->ride);
-        }
+        CloudService *db = CloudServiceFactory::instance().newService(action->data().toString(), currentAthleteTab->context);
+        CloudService::upload(this, currentAthleteTab->context, db, currentAthleteTab->context->ride);
     }
 }
 
@@ -2437,8 +2483,8 @@ void
 MainWindow::syncCloud(QAction *action)
 {
     // sync with cloud
-    CloudService *db = CloudServiceFactory::instance().newService(action->data().toString(), currentTab->context);
-    CloudServiceSyncDialog sync(currentTab->context, db);
+    CloudService *db = CloudServiceFactory::instance().newService(action->data().toString(), currentAthleteTab->context);
+    CloudServiceSyncDialog sync(currentAthleteTab->context, db);
     sync.exec();
 }
 
@@ -2454,12 +2500,10 @@ MainWindow::syncCloud(QAction *action)
 void
 MainWindow::configChanged(qint32)
 {
-
-#if defined (WIN32) || defined (Q_OS_LINUX)
     // Windows and Linux menu bar should match chrome
     QColor textCol(Qt::black);
     if (GCColor::luminance(GColor(CTOOLBAR)) < 127)  textCol = QColor(Qt::white);
-    QString menuColorString = (GCColor::isFlat() ? GColor(CTOOLBAR).name() : "rgba(225,225,225)");
+    QString menuColorString = GColor(CTOOLBAR).name();
     menuBar()->setStyleSheet(QString("QMenuBar { color: %1; background: %2; }"
                              "QMenuBar::item { color: %1; background: %2; }")
                              .arg(textCol.name()).arg(menuColorString));
@@ -2474,21 +2518,36 @@ MainWindow::configChanged(qint32)
                                                "QComboBox::item { background: %1; color: %2; }"
                                                "QComboBox::item::selected { background: %3; color: %1; }").arg(GColor(CTOOLBAR).name()).arg(GCColor::invertColor(GColor(CTOOLBAR)).name()).arg(selected.name()));
 
-#endif
-    QString buttonstyle = QString("QPushButton { border: none; background-color: %1; }").arg(CTOOLBAR);
+    QString buttonstyle = QString("QPushButton { border: none; border-radius: %2px; background-color: %1; "
+                                                "padding-left: 0px; padding-right: 0px; "
+                                                "padding-top:  0px; padding-bottom: 0px; }"
+                                  "QPushButton:hover { background-color: %3; }"
+                                  "QPushButton:hover:pressed { background-color: %3; }"
+                                ).arg(GColor(CTOOLBAR).name()).arg(3 * dpiXFactor).arg(GColor(CHOVER).name());
+
     back->setStyleSheet(buttonstyle);
     forward->setStyleSheet(buttonstyle);
+    sidelist->setStyleSheet(buttonstyle);
+    tabtile->setStyleSheet(buttonstyle);
+    lowbar->setStyleSheet(buttonstyle);
+    whatsthis->setStyleSheet(buttonstyle);
 
     // All platforms
-    QPalette tabbarPalette;
     tabbar->setAutoFillBackground(true);
     tabbar->setShape(QTabBar::RoundedSouth);
     tabbar->setDrawBase(false);
 
-    tabbarPalette.setBrush(backgroundRole(), GColor(CTOOLBAR));
-    tabbarPalette.setBrush(foregroundRole(), GCColor::invertColor(GColor(CTOOLBAR)));
-    tabbar->setPalette(tabbarPalette);
-    athleteView->setPalette(tabbarPalette);
+    // on select
+    QColor bg_select = GCColor::selectedColor(GColor(CTOOLBAR));
+    QColor fg_select = GCColor::invertColor(bg_select);
+
+    tabbar->setStyleSheet(QString("QTabBar::tab { background-color: %1; color: %2;}"
+        "QTabBar::tab::selected { background-color: %3; color: %4; }").arg(GColor(CTOOLBAR).name())
+                                                                        .arg(GCColor::invertColor(GColor(CTOOLBAR)).name())
+                                                                        .arg(bg_select.name())
+                                                                        .arg(fg_select.name()));
+    tabbar->setDocumentMode(true);
+    athleteView->setPalette(tabbar->palette());
 
     head->updateGeometry();
     repaint();
@@ -2503,8 +2562,8 @@ void
 MainWindow::setMeasuresMenu()
 {
     measuresMenu->clear();
-    if (currentTab->context->athlete == nullptr) return;
-    Measures *measures = currentTab->context->athlete->measures;
+    if (currentAthleteTab->context->athlete == nullptr) return;
+    Measures *measures = currentAthleteTab->context->athlete->measures;
     int group = 0;
     foreach(QString name, measures->getGroupNames()) {
 
@@ -2520,10 +2579,10 @@ void
 MainWindow::downloadMeasures(QAction *action)
 {
     // download or import from CSV file
-    if (currentTab->context->athlete == nullptr) return;
-    Measures *measures = currentTab->context->athlete->measures;
+    if (currentAthleteTab->context->athlete == nullptr) return;
+    Measures *measures = currentAthleteTab->context->athlete->measures;
     int group = action->data().toInt();
-    MeasuresDownload dialog(currentTab->context, measures->getGroup(group));
+    MeasuresDownload dialog(currentAthleteTab->context, measures->getGroup(group));
     dialog.exec();
 }
 
@@ -2533,7 +2592,7 @@ MainWindow::actionClicked(int index)
     switch(index) {
 
     default:
-    case 0: currentTab->addIntervals();
+    case 0: currentAthleteTab->addIntervals();
             break;
 
     case 1 : splitRide();
@@ -2548,13 +2607,13 @@ MainWindow::actionClicked(int index)
 void
 MainWindow::addIntervals()
 {
-    currentTab->addIntervals();
+    currentAthleteTab->addIntervals();
 }
 
 void
 MainWindow::ridesAutoImport() {
 
-    currentTab->context->athlete->importFilesWhenOpeningAthlete();
+    currentAthleteTab->context->athlete->importFilesWhenOpeningAthlete();
 
 }
 
@@ -2583,12 +2642,12 @@ void MainWindow::buildPyFixesMenu()
 }
 
 void MainWindow::showManageFixPyScriptsDlg() {
-    ManageFixPyScriptsDialog dlg(currentTab->context);
+    ManageFixPyScriptsDialog dlg(currentAthleteTab->context);
     dlg.exec();
 }
 
 void MainWindow::showCreateFixPyScriptDlg() {
-    EditFixPyScriptDialog dlg(currentTab->context, nullptr, this);
+    EditFixPyScriptDialog dlg(currentAthleteTab->context, nullptr, this);
     dlg.exec();
 }
 #endif
@@ -2597,42 +2656,42 @@ void MainWindow::showCreateFixPyScriptDlg() {
 void
 MainWindow::cloudDBuserEditChart()
 {
-    if (!(appsettings->cvalue(currentTab->context->athlete->cyclist, GC_CLOUDDB_TC_ACCEPTANCE, false).toBool())) {
-       CloudDBAcceptConditionsDialog acceptDialog(currentTab->context->athlete->cyclist);
+    if (!(appsettings->cvalue(currentAthleteTab->context->athlete->cyclist, GC_CLOUDDB_TC_ACCEPTANCE, false).toBool())) {
+       CloudDBAcceptConditionsDialog acceptDialog(currentAthleteTab->context->athlete->cyclist);
        acceptDialog.setModal(true);
        if (acceptDialog.exec() == QDialog::Rejected) {
           return;
        };
     }
 
-    if (currentTab->context->cdbChartListDialog == NULL) {
-        currentTab->context->cdbChartListDialog = new CloudDBChartListDialog();
+    if (currentAthleteTab->context->cdbChartListDialog == NULL) {
+        currentAthleteTab->context->cdbChartListDialog = new CloudDBChartListDialog();
     }
 
     // force refresh in prepare to allways get the latest data here
-    if (currentTab->context->cdbChartListDialog->prepareData(currentTab->context->athlete->cyclist, CloudDBCommon::UserEdit)) {
-        currentTab->context->cdbChartListDialog->exec(); // no action when closed
+    if (currentAthleteTab->context->cdbChartListDialog->prepareData(currentAthleteTab->context->athlete->cyclist, CloudDBCommon::UserEdit)) {
+        currentAthleteTab->context->cdbChartListDialog->exec(); // no action when closed
     }
 }
 
 void
 MainWindow::cloudDBuserEditUserMetric()
 {
-    if (!(appsettings->cvalue(currentTab->context->athlete->cyclist, GC_CLOUDDB_TC_ACCEPTANCE, false).toBool())) {
-       CloudDBAcceptConditionsDialog acceptDialog(currentTab->context->athlete->cyclist);
+    if (!(appsettings->cvalue(currentAthleteTab->context->athlete->cyclist, GC_CLOUDDB_TC_ACCEPTANCE, false).toBool())) {
+       CloudDBAcceptConditionsDialog acceptDialog(currentAthleteTab->context->athlete->cyclist);
        acceptDialog.setModal(true);
        if (acceptDialog.exec() == QDialog::Rejected) {
           return;
        };
     }
 
-    if (currentTab->context->cdbUserMetricListDialog == NULL) {
-        currentTab->context->cdbUserMetricListDialog = new CloudDBUserMetricListDialog();
+    if (currentAthleteTab->context->cdbUserMetricListDialog == NULL) {
+        currentAthleteTab->context->cdbUserMetricListDialog = new CloudDBUserMetricListDialog();
     }
 
     // force refresh in prepare to allways get the latest data here
-    if (currentTab->context->cdbUserMetricListDialog->prepareData(currentTab->context->athlete->cyclist, CloudDBCommon::UserEdit)) {
-        currentTab->context->cdbUserMetricListDialog->exec(); // no action when closed
+    if (currentAthleteTab->context->cdbUserMetricListDialog->prepareData(currentAthleteTab->context->athlete->cyclist, CloudDBCommon::UserEdit)) {
+        currentAthleteTab->context->cdbUserMetricListDialog->exec(); // no action when closed
     }
 }
 
@@ -2641,15 +2700,15 @@ MainWindow::cloudDBcuratorEditChart()
 {
     // first check if the user is a curator
     CloudDBCuratorClient *curatorClient = new CloudDBCuratorClient;
-    if (curatorClient->isCurator(appsettings->cvalue(currentTab->context->athlete->cyclist, GC_ATHLETE_ID, "" ).toString())) {
+    if (curatorClient->isCurator(appsettings->cvalue(currentAthleteTab->context->athlete->cyclist, GC_ATHLETE_ID, "" ).toString())) {
 
-        if (currentTab->context->cdbChartListDialog == NULL) {
-            currentTab->context->cdbChartListDialog = new CloudDBChartListDialog();
+        if (currentAthleteTab->context->cdbChartListDialog == NULL) {
+            currentAthleteTab->context->cdbChartListDialog = new CloudDBChartListDialog();
         }
 
         // force refresh in prepare to allways get the latest data here
-        if (currentTab->context->cdbChartListDialog->prepareData(currentTab->context->athlete->cyclist, CloudDBCommon::CuratorEdit)) {
-            currentTab->context->cdbChartListDialog->exec(); // no action when closed
+        if (currentAthleteTab->context->cdbChartListDialog->prepareData(currentAthleteTab->context->athlete->cyclist, CloudDBCommon::CuratorEdit)) {
+            currentAthleteTab->context->cdbChartListDialog->exec(); // no action when closed
         }
     } else {
         QMessageBox::warning(0, tr("CloudDB"), QString(tr("Current athlete is not registered as curator - please contact the GoldenCheetah team")));
@@ -2662,15 +2721,15 @@ MainWindow::cloudDBcuratorEditUserMetric()
 {
     // first check if the user is a curator
     CloudDBCuratorClient *curatorClient = new CloudDBCuratorClient;
-    if (curatorClient->isCurator(appsettings->cvalue(currentTab->context->athlete->cyclist, GC_ATHLETE_ID, "" ).toString())) {
+    if (curatorClient->isCurator(appsettings->cvalue(currentAthleteTab->context->athlete->cyclist, GC_ATHLETE_ID, "" ).toString())) {
 
-        if (currentTab->context->cdbUserMetricListDialog == NULL) {
-            currentTab->context->cdbUserMetricListDialog = new CloudDBUserMetricListDialog();
+        if (currentAthleteTab->context->cdbUserMetricListDialog == NULL) {
+            currentAthleteTab->context->cdbUserMetricListDialog = new CloudDBUserMetricListDialog();
         }
 
         // force refresh in prepare to allways get the latest data here
-        if (currentTab->context->cdbUserMetricListDialog->prepareData(currentTab->context->athlete->cyclist, CloudDBCommon::CuratorEdit)) {
-            currentTab->context->cdbUserMetricListDialog->exec(); // no action when closed
+        if (currentAthleteTab->context->cdbUserMetricListDialog->prepareData(currentAthleteTab->context->athlete->cyclist, CloudDBCommon::CuratorEdit)) {
+            currentAthleteTab->context->cdbUserMetricListDialog->exec(); // no action when closed
         }
     } else {
         QMessageBox::warning(0, tr("CloudDB"), QString(tr("Current athlete is not registered as curator - please contact the GoldenCheetah team")));
@@ -2694,7 +2753,7 @@ MainWindow::setUploadMenu()
     foreach(QString name, CloudServiceFactory::instance().serviceNames()) {
 
         const CloudService *s = CloudServiceFactory::instance().service(name);
-        if (!s || appsettings->cvalue(currentTab->context->athlete->cyclist, s->activeSettingName(), "false").toString() != "true") continue;
+        if (!s || appsettings->cvalue(currentAthleteTab->context->athlete->cyclist, s->activeSettingName(), "false").toString() != "true") continue;
 
         if (s->capabilities() & CloudService::Upload) {
 
@@ -2702,9 +2761,6 @@ MainWindow::setUploadMenu()
             QAction *service = new QAction(NULL);
             service->setText(s->uiName());
             service->setData(name);
-
-            // Kent doesn't use the standard uploader, we trap for that
-            // in the upload action method
             uploadMenu->addAction(service);
         }
     }
@@ -2717,12 +2773,9 @@ MainWindow::setSyncMenu()
     foreach(QString name, CloudServiceFactory::instance().serviceNames()) {
 
         const CloudService *s = CloudServiceFactory::instance().service(name);
-        if (!s || appsettings->cvalue(currentTab->context->athlete->cyclist, s->activeSettingName(), "false").toString() != "true") continue;
+        if (!s || appsettings->cvalue(currentAthleteTab->context->athlete->cyclist, s->activeSettingName(), "false").toString() != "true") continue;
 
         if (s->capabilities() & CloudService::Query)  {
-
-            // We don't sync with Kent
-            if (s->id() == "University of Kent") continue;
 
             // we need the technical name to identify the service to be called
             QAction *service = new QAction(NULL);

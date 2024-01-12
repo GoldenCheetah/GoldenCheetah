@@ -271,6 +271,7 @@ class SeasonTreeView : public QTreeWidget
         void itemMoved(QTreeWidgetItem* item, int previous, int actual);
 
     protected:
+        void dragEnterEvent(QDragEnterEvent* event);
         void dropEvent(QDropEvent* event);
         Context *context;
 

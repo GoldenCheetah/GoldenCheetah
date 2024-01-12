@@ -226,7 +226,6 @@ LTMSidebar::LTMSidebar(Context *context) : QWidget(context->mainWindow), context
     // our date ranges
     connect(dateRangeTree,SIGNAL(itemSelectionChanged()), this, SLOT(dateRangeTreeWidgetSelectionChanged()));
     connect(dateRangeTree,SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(dateRangePopup(const QPoint &)));
-    connect(dateRangeTree,SIGNAL(itemChanged(QTreeWidgetItem *,int)), this, SLOT(dateRangeChanged(QTreeWidgetItem*, int)));
     connect(dateRangeTree,SIGNAL(itemMoved(QTreeWidgetItem *,int, int)), this, SLOT(dateRangeMoved(QTreeWidgetItem*, int, int)));
 
     // filters
@@ -946,7 +945,16 @@ LTMSidebar::filterNotify()
         } else {
 
             // both are set, so merge results
-            QStringList merged = autoFilterFiles.toSet().intersect(queryFilterFiles.toSet()).toList();
+            auto mergedSet =
+                    QSet<QString>(
+                            autoFilterFiles.begin(),
+                            autoFilterFiles.end()).intersect(
+                    QSet<QString>(
+                            queryFilterFiles.begin(),
+                            queryFilterFiles.end()
+                            )
+                    );
+            QStringList merged = QStringList(mergedSet.begin(), mergedSet.end());
             context->setHomeFilter(merged);
         }
 
@@ -1039,7 +1047,7 @@ LTMSidebar::autoFilterSelectionChanged()
     }
 
     // all done
-    autoFilterFiles = matched.toList();
+    autoFilterFiles = matched.values();
 
     // tell the world
     filterNotify();
@@ -1111,23 +1119,6 @@ LTMSidebar::deleteFilter()
         context->athlete->namedSearches->deleteNamedSearch(index);
     }
     active = false;
-}
-
-void
-LTMSidebar::dateRangeChanged(QTreeWidgetItem*item, int)
-{
-    if (active == true) return;
-
-    int index = allDateRanges->indexOfChild(item);
-    seasons->seasons[index].setName(item->text(0));
-
-    // save changes away
-    active = true;
-    seasons->writeSeasons();
-    active = false;
-
-    // signal date selected changed
-    //dateRangeSelected(&seasons->seasons[index]);
 }
 
 void

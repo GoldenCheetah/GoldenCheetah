@@ -204,7 +204,7 @@ RideFile *TxtFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
 
                 // either a data line, or a headings line
                 if (headings.count() == 0) {
-                    headings = line.split(sepPattern, QString::SkipEmptyParts);
+                    headings = line.split(sepPattern, Qt::SkipEmptyParts);
 
                     // where are the values stored?
                     timeIndex = headings.indexOf("ms");
@@ -224,7 +224,7 @@ RideFile *TxtFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                 line.replace(QRegularExpression("\" +"), "\"");
 
                 // now split
-                QStringList values = line.split(sepPattern, QString::SkipEmptyParts);
+                QStringList values = line.split(sepPattern, Qt::SkipEmptyParts);
 
                 // mmm... didn't get much data
                 if (values.count() < 2) continue;

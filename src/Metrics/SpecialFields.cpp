@@ -31,18 +31,43 @@ SpecialFields::SpecialFields()
     namesmap.insert("Change History", tr("Change History"));         // set by RideFileCommand
     namesmap.insert("Calendar Text", "Calendar Text");               // set by openRideFile and rideMetadata DO NOT TRANSLATE
     namesmap.insert("Source Filename", tr("Source Filename"));       // set by openRideFile
+    namesmap.insert("Athlete", tr("Athlete"));                       // athlete name
+    namesmap.insert("Data", tr("Data"));                             // data present
+    namesmap.insert("File Format", tr("File Format"));               // file format
+    namesmap.insert("Filename", tr("Filename"));                     // filename
+    namesmap.insert("Month", tr("Month"));                           // month name
+    namesmap.insert("Weekday", tr("Weekday"));                       // weekday name
+    namesmap.insert("Year", tr("Year"));                             // year
+
     namesmap.insert("Route", tr("Route"));                           // GPS map Route tag
     namesmap.insert("Sport", tr("Sport"));                           // Sport Code
+    namesmap.insert("SubSport", tr("SubSport"));                     // SubSport Code
     namesmap.insert("Workout Code", tr("Workout Code"));             // Workout Code
     namesmap.insert("Workout Title", tr("Workout Title"));           // Workout Title
     namesmap.insert("Weight", tr("Weight"));                         // Weight tag
     namesmap.insert("RPE", tr("RPE"));                               // RPE tag
+    namesmap.insert("Commute", tr("Commute"));                       // Commute tag
+    namesmap.insert("Trainer", tr("Trainer"));                       // Trainer tag
+    namesmap.insert("Feel", tr("Feel"));                             // Feel tag
     namesmap.insert("Objective", tr("Objective"));                   // Objective tag
     namesmap.insert("Keywords", tr("Keywords"));                     // Keywords tag
     namesmap.insert("Equipment", tr("Equipment"));                   // Equipment tag
     namesmap.insert("Device", tr("Device"));                         // Device tag
     namesmap.insert("Device Info", tr("Device Info"));               // Device Info tag
     namesmap.insert("Pool Length", tr("Pool Length"));               // Pool Length tag
+
+    namesmap.insert("VO2max detected", tr("VO2max detected"));       // Garmin VO2max detected
+    namesmap.insert("Aerobic Training Effect", tr("Aerobic Training Effect"));// Garmin Aerobic Training Effect
+    namesmap.insert("Anaerobic Training Effect", tr("Anaerobic Training Effect"));// Garmin Anaerobic Training Effect
+    namesmap.insert("EPOC", tr("EPOC"));                             // Garmin EPOC
+    namesmap.insert("Recovery Time", tr("Recovery Time"));           // Garmin Recovery Time
+    namesmap.insert("Performance Condition", tr("Performance Condition"));// Garmin Performance Condition
+    namesmap.insert("LTHR detected", tr("LTHR detected"));           // Garmin LTHR detected
+    namesmap.insert("LTS detected", tr("LTS detected"));             // Garmin LTS detected
+    namesmap.insert("Interval Notes", tr("Interval Notes"));         // Interval Notes for the new Interval tab
+    namesmap.insert("Interval Goal", tr("Interval Goal"));           // Interval Goal for the new Interval tab
+    namesmap.insert("Spike Time", tr("Spike Time"));                 // Spike Time from FixSpikes DP
+    namesmap.insert("Spikes", tr("Spikes"));                         // Spikes from FixSpikes DP
 
     // now add all the metric fields (for metric overrides)
     const RideMetricFactory &factory = RideMetricFactory::instance();
@@ -130,8 +155,10 @@ SpecialTabs::SpecialTabs()
     namesmap.insert("Notes", tr("Notes"));
     namesmap.insert("Metric", tr("Metric"));
     namesmap.insert("Extra", tr("Extra"));
+    namesmap.insert("Raw Data", tr("Raw Data"));
     namesmap.insert("Device", tr("Device"));
     namesmap.insert("Athlete", tr("Athlete"));
+    namesmap.insert("Interval", tr("Interval"));
 }
 
 QString
