@@ -462,7 +462,9 @@ RideCache::writeAsCSV(QString filename)
     };
     file.resize(0);
     QTextStream out(&file);
+#if QT_VERSION < 0x060000
     out.setCodec("UTF-8"); // Metric names can be translated
+#endif
 
     // write headings
     out<<"date, time, filename";

@@ -408,7 +408,9 @@ JsonFileReader::openRideFile(QFile &file, QStringList &errors, QList<RideFile*>*
         // read in the whole thing
         QTextStream in(&file);
         // GC .JSON is stored in UTF-8 with BOM(Byte order mark) for identification
+#if QT_VERSION < 0x060000
         in.setCodec ("UTF-8");
+#endif
         contents = in.readAll();
         file.close();
 
@@ -417,7 +419,11 @@ JsonFileReader::openRideFile(QFile &file, QStringList &errors, QList<RideFile*>*
         if (contents.contains(QChar::ReplacementCharacter)) {
            if (file.exists() && file.open(QFile::ReadOnly | QFile::Text)) {
              QTextStream in(&file);
+#if QT_VERSION < 0x060000
              in.setCodec ("ISO 8859-1");
+#else
+             in.setCodec (QStringConverter::Latin1);
+#endif
              contents = in.readAll();
              file.close();
            }
@@ -798,7 +804,9 @@ JsonFileReader::writeRideFile(Context *context, const RideFile *ride, QFile &fil
     // setup streamer
     QTextStream out(&file);
     // unified codepage and BOM for identification on all platforms
+#if QT_VERSION < 0x060000
     out.setCodec("UTF-8");
+#endif
     out.setGenerateByteOrderMark(true);
 
     out << xml;
