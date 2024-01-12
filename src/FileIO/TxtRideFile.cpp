@@ -89,7 +89,7 @@ RideFile *TxtFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
     // the pattern "name [units]"
     bool isWattBike = false;
     QString line = in.readLine();
-    QStringList tokens = line.split(QRegExp("[\t\n\r]"), Qt::SkipEmptyParts);
+    QStringList tokens = line.split(QRegularExpression("[\t\n\r]"), Qt::SkipEmptyParts);
 
     if (tokens.count() > 1) {
         // ok, so we have a bunch of tokens, thats a good sign this
@@ -120,7 +120,7 @@ RideFile *TxtFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
     enum { RR_None, RR_Type1, RR_Type2 } rrType = RR_None;
     if (!isWattBike) {
         bool ok;
-        tokens = line.split(QRegExp("[ \t]"), Qt::SkipEmptyParts);
+        tokens = line.split(QRegularExpression("[ \t]"), Qt::SkipEmptyParts);
         if (tokens.count() == 1 && tokens[0].toDouble() > 0) rrType = RR_Type1;
         if (tokens.count() == 2 && tokens[0].toDouble(&ok) >= 0 && ok && tokens[1].toDouble() > 0) rrType = RR_Type2;
     }
@@ -170,7 +170,7 @@ RideFile *TxtFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                 //
                 QRegExp sectionPattern("^\\[.*\\]$");
                 QRegExp unitsPattern("^UNITS += +\\(.*\\)$");
-                QRegExp sepPattern("( +|,)");
+                QRegularExpression sepPattern("( +|,)");
 
                 // ignore blank lines
                 if (line == "") continue;
@@ -221,7 +221,7 @@ RideFile *TxtFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                 // right! we now have a record
                 // first replace spaces in quoted values as they break
                 // the way we find separators 
-                line.replace(QRegExp("\" +"), "\"");
+                line.replace(QRegularExpression("\" +"), "\"");
 
                 // now split
                 QStringList values = line.split(sepPattern, Qt::SkipEmptyParts);
@@ -452,7 +452,7 @@ RideFile *TxtFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
         while (!in.atEnd()) {
 
             QString line = in.readLine();
-            QStringList tokens = line.split(QRegExp("[\r\n\t]"), Qt::SkipEmptyParts);
+            QStringList tokens = line.split(QRegularExpression("[\r\n\t]"), Qt::SkipEmptyParts);
 
             // do we have as many columns as we expected?
             if (tokens.count() == columns) {
@@ -557,7 +557,7 @@ RideFile *TxtFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
             double rr;
 
             line = is.readLine();
-            tokens = line.split(QRegExp("[ \t]"), Qt::SkipEmptyParts);
+            tokens = line.split(QRegularExpression("[ \t]"), Qt::SkipEmptyParts);
 
             if (rrType == RR_Type2 && tokens.count() > 1) rr = tokens[1].toDouble();
             else if (rrType == RR_Type1 && tokens.count() > 0) rr = tokens[0].toDouble();

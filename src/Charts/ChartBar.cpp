@@ -110,10 +110,10 @@ ChartBar::ChartBar(Context *context) : QWidget(context->mainWindow), context(con
     //connect(p, SIGNAL(clicked()), action, SLOT(trigger()));
 
     signalMapper = new QSignalMapper(this); // maps each option
-    connect(signalMapper, SIGNAL(mapped(int)), this, SLOT(clicked(int)));
+    connect(signalMapper, &QSignalMapper::mappedInt, this, &ChartBar::clicked);
 
     menuMapper = new QSignalMapper(this); // maps each option
-    connect(menuMapper, SIGNAL(mapped(int)), this, SLOT(triggerContextMenu(int)));
+    connect(menuMapper, &QSignalMapper::mappedInt, this, &ChartBar::triggerContextMenu);
 
     barMenu = new QMenu("Add");
     chartMenu = barMenu->addMenu(tr("New Chart"));

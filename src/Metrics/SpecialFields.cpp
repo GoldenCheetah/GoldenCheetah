@@ -111,7 +111,7 @@ SpecialFields::makeTechName(QString name) const
     // strip spaces and only keep alpha values - everything else
     // becomes an underscore
     QString s = name;
-    return s.replace(QRegExp("[^0-9A-Za-z]"), "_");
+    return s.replace(QRegularExpression("[^0-9A-Za-z]"), "_");
 }
 
 QString

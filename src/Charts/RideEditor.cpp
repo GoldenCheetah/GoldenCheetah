@@ -79,9 +79,9 @@ getPaste(QVector<QVector<double> >&cells, QStringList &seps, QStringList &head, 
     regexpStr = "[";
     foreach (QString sep, seps) regexpStr += sep;
     regexpStr += "]";
-    QRegExp sep(regexpStr); // RegExp for separators
+    QRegularExpression sep(regexpStr); // RegExp for separators
 
-    QRegExp ELine(("\n|\r|\r\n")); //RegExp for line endings
+    QRegularExpression ELine(("\n|\r|\r\n")); //RegExp for line endings
 
     foreach(QString line, text.split(ELine)) {
         if (line == "") continue;
@@ -869,7 +869,7 @@ RideEditor::borderMenu(const QPoint &pos)
         // add menu options for each column
         if (colMapper) delete colMapper;
         colMapper = new QSignalMapper(this);
-        connect(colMapper, SIGNAL(mapped(const QString &)), this, SLOT(insColumn(const QString &)));
+        connect(colMapper, &QSignalMapper::mappedString, this, &RideEditor::insColumn);
 
         foreach(QString heading, whatColumns()) {
             QAction *insColAct = new QAction(heading, table);

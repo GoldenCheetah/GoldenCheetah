@@ -465,19 +465,19 @@ MainWindow::MainWindow(const QDir &home)
     connect(openTabMenu, SIGNAL(aboutToShow()), this, SLOT(setOpenTabMenu()));
 
     tabMapper = new QSignalMapper(this); // maps each option
-    connect(tabMapper, SIGNAL(mapped(const QString &)), this, SLOT(openAthleteTab(const QString &)));
+    connect(tabMapper, &QSignalMapper::mappedString, this, &MainWindow::openAthleteTab);
 
     fileMenu->addSeparator();
     backupAthleteMenu = fileMenu->addMenu(tr("Backup..."));
     connect(backupAthleteMenu, SIGNAL(aboutToShow()), this, SLOT(setBackupAthleteMenu()));
     backupMapper = new QSignalMapper(this); // maps each option
-    connect(backupMapper, SIGNAL(mapped(const QString &)), this, SLOT(backupAthlete(const QString &)));
+    connect(backupMapper, &QSignalMapper::mappedString, this, &MainWindow::backupAthlete);
 
     fileMenu->addSeparator();
     deleteAthleteMenu = fileMenu->addMenu(tr("Delete..."));
     connect(deleteAthleteMenu, SIGNAL(aboutToShow()), this, SLOT(setDeleteAthleteMenu()));
     deleteMapper = new QSignalMapper(this); // maps each option
-    connect(deleteMapper, SIGNAL(mapped(const QString &)), this, SLOT(deleteAthlete(const QString &)));
+    connect(deleteMapper, &QSignalMapper::mappedString, this, &MainWindow::deleteAthlete);
 
     fileMenu->addSeparator();
     fileMenu->addAction(tr("Settings..."), this, SLOT(athleteSettings()));
@@ -595,7 +595,7 @@ MainWindow::MainWindow(const QDir &home)
 
         toolMapper = new QSignalMapper(this); // maps each option
         QMapIterator<QString, DataProcessor*> i(processors);
-        connect(toolMapper, SIGNAL(mapped(const QString &)), this, SLOT(manualProcess(const QString &)));
+        connect(toolMapper, &QSignalMapper::mappedString, this, &MainWindow::manualProcess);
 
         i.toFront();
         while (i.hasNext()) {
@@ -1803,7 +1803,7 @@ MainWindow::importFile()
 
     const RideFileFactory &rff = RideFileFactory::instance();
     QStringList suffixList = rff.suffixes();
-    suffixList.replaceInStrings(QRegExp("^"), "*.");
+    suffixList.replaceInStrings(QRegularExpression("^"), "*.");
     QStringList fileNames;
     QStringList allFormats;
     allFormats << QString("All Supported Formats (%1)").arg(suffixList.join(" "));

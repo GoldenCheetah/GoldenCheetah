@@ -1289,7 +1289,7 @@ ColumnChooser::ColumnChooser(QList<QString>&logicalHeadings)
     setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint | Qt::Tool);
 
     clicked = new QSignalMapper(this); // maps each button click event
-    connect(clicked, SIGNAL(mapped(const QString &)), this, SLOT(buttonClicked(const QString &)));
+    connect(clicked, &QSignalMapper::mappedString, this, &ColumnChooser::buttonClicked);
 
     QVBoxLayout *us = new QVBoxLayout(this);
     us->setSpacing(0);
@@ -1402,8 +1402,8 @@ bool RideNavigatorSortProxyModel::lessThan(const QModelIndex &left,
     QString leftString = leftData.toString();
     QString rightString = rightData.toString();
 
-    if (leftString.contains(QRegExp("[^0-9.,]")) ||
-            rightString.contains(QRegExp("[^0-9.,]"))) { // alpha
+    if (leftString.contains(QRegularExpression("[^0-9.,]")) ||
+            rightString.contains(QRegularExpression("[^0-9.,]"))) { // alpha
         return QString::localeAwareCompare(leftString, rightString) < 0;
     }
     // assume numeric
