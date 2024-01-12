@@ -151,6 +151,8 @@ GenericChart::addCurve(QString name, QVector<double> xseries, QVector<double> ys
     return true;
 }
 
+#if QT_VERSION < 0x060000
+// In Qt 6, QStringList is a QVector<QString>, so we don't need an additional overload
 // helper for python - no aggregateby, no annotations
 bool
 GenericChart::addCurve(QString name, QVector<double> xseries, QVector<double> yseries, QStringList fseries, QString xname, QString yname,
@@ -163,6 +165,7 @@ GenericChart::addCurve(QString name, QVector<double> xseries, QVector<double> ys
                                    opengl, legend, datalabels, fill, RideMetric::Average, QList<GenericAnnotationInfo>());
     return true;
 }
+#endif
 
 // configure axis, after curves added
 bool

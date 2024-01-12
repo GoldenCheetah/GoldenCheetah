@@ -355,7 +355,10 @@ Measures::Measures(QDir dir, bool withData) : dir(dir), withData(withData)
     }
 
     QSettings config(filename, QSettings::IniFormat);
+
+#if QT_VERSION < 0x060000
     config.setIniCodec("UTF-8"); // to allow translated names
+#endif
 
     foreach (QString group, config.value("Measures", "").toStringList()) {
 
@@ -423,7 +426,11 @@ Measures::saveConfig()
     // save measures configuration to measures.ini
     QString filename = QDir(gcroot).canonicalPath() + "/measures.ini";
     QSettings config(filename, QSettings::IniFormat);
+
+#if QT_VERSION < 0x060000
     config.setIniCodec("UTF-8"); // to allow translated names
+#endif
+
     config.clear();
 
     config.setValue("Measures", getGroupSymbols());
