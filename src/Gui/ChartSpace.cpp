@@ -25,7 +25,9 @@
 
 #include <cmath>
 #include <QGraphicsSceneMouseEvent>
+#if QT_VERSION < 0x060000
 #include <QGLWidget>
+#endif
 
 #include <QJsonDocument>
 #include <QJsonObject>
@@ -55,6 +57,7 @@ ChartSpace::ChartSpace(Context *context, int scope, GcWindow *window) :
     view = new QGraphicsView(this);
 
     // hardware acceleration is important for this widget
+#if QT_VERSION < 0x060000
 #if defined(Q_OS_LINUX)
     // if we have OpenGL and its 2.0 or higher, lets use it.
     // this is pretty much any GPU since 2004 and keeps Qt happy.
@@ -69,6 +72,7 @@ ChartSpace::ChartSpace(Context *context, int scope, GcWindow *window) :
 #endif
 #if defined (Q_OS_MACOS)
     // we have no options right now, it sucks
+#endif
 #endif
 
     view->viewport()->setAttribute(Qt::WA_AcceptTouchEvents, false); // stops it stealing focus on mouseover

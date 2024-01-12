@@ -48,7 +48,6 @@ GcPane::GcPane() : QWidget(NULL, Qt::FramelessWindowHint),
     scene->addItem(widget);
 
     view = new QGraphicsView(scene); // we made our own to resize nicely
-    //view->setViewport(new QGLWidget(QGLFormat(QGL::SampleBuffers)));
     view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     view->setAutoFillBackground(false);

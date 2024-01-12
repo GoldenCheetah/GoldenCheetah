@@ -41,7 +41,6 @@
 
 #include <cmath>
 #include <QGraphicsSceneMouseEvent>
-#include <QGLWidget>
 
 #include <QJsonDocument>
 #include <QJsonObject>
