@@ -2863,7 +2863,9 @@ DataOverviewItem::exportData()
     // stream, output without a BOM, unlikely to be expected (?)
     QTextStream out(&file);
     // unified codepage and BOM for identification on all platforms
+#if QT_VERSION < 0x060000
     out.setCodec("UTF-8");
+#endif
     //out.setGenerateByteOrderMark(true);
 
     // headers- taking care to protect for csv output

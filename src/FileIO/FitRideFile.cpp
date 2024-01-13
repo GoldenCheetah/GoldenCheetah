@@ -1925,7 +1925,7 @@ genericnext:
         // what timestamp to use for this row if XDATA ?
         if (timestamp <= 0) timestamp=0;
         QDateTime time= qbase_time.addSecs(timestamp);
-        QDateTime start= QDateTime::fromTime_t(start_time);
+        QDateTime start= QDateTime::fromSecsSinceEpoch(start_time);
         if (timestamp <= 0 || time < start) time=start;
 
         // update the xdata series with the timestamp and add for our record

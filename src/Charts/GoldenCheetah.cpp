@@ -961,7 +961,7 @@ GcChartWindow::serializeChartToQTextStream(QTextStream& out) {
 
     for (int i=0; i<m->propertyCount(); i++) {
         QMetaProperty p = m->property(i);
-        if (p.isUser(this)) {
+        if (p.isUser()) {
             if (QString(p.typeName()) == "int")      out<<"\t\t\t\""<<p.name()<<"\":\""<<p.read(this).toInt()<<"\",\n";
             if (QString(p.typeName()) == "double")   out<<"\t\t\t\""<<p.name()<<"\":\""<<p.read(this).toDouble()<<"\",\n";
             if (QString(p.typeName()) == "QDate")    out<<"\t\t\t\""<<p.name()<<"\":\""<<p.read(this).toDate().toString()<<"\",\n";
@@ -1170,7 +1170,7 @@ GcChartWindow::chartHasUserMetrics() {
 
     for (int i=0; i<m->propertyCount(); i++) {
         QMetaProperty p = m->property(i);
-        if (p.isUser(this)) {
+        if (p.isUser()) {
             if (QString(p.typeName()) == "LTMSettings") {
                 LTMSettings x = p.read(this).value<LTMSettings>();
                 foreach (MetricDetail metricDetail, x.metrics) {

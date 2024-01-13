@@ -38,7 +38,11 @@
 
 #include <QtWebChannel>
 #include <QWebEngineProfile>
+#if QT_VERSION < 0x060000
 #include <QWebEngineDownloadItem>
+#else
+#include <QWebEngineDownloadRequest>
+#endif
 
 // overlay helper
 #include "AbstractView.h"
@@ -174,7 +178,11 @@ WebPageWindow::WebPageWindow(Context *context) : GcChartWindow(context), context
     configChanged(CONFIG_APPEARANCE);
 
     // intercept downloads
+#if QT_VERSION < 0x060000
     connect(view->page()->profile(), SIGNAL(downloadRequested(QWebEngineDownloadItem*)), this, SLOT(downloadRequested(QWebEngineDownloadItem*)));
+#else
+    connect(view->page()->profile(), SIGNAL(downloadRequested(QWebEngineDownloadRequest*)), this, SLOT(downloadRequested(QWebEngineDownloadRequest*)));
+#endif
     connect(view->page(), SIGNAL(linkHovered(QString)), this, SLOT(linkHovered(QString)));
 }
 
@@ -255,7 +263,11 @@ WebPageWindow::event(QEvent *event)
 }
 
 void
+#if QT_VERSION < 0x060000
 WebPageWindow::downloadRequested(QWebEngineDownloadItem *item)
+#else
+WebPageWindow::downloadRequested(QWebEngineDownloadRequest *item)
+#endif
 {
     // only do it if I am visible, as shared across web page instances
     if (!amVisible()) return;

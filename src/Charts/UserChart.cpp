@@ -87,7 +87,6 @@ UserChart::configChanged(qint32)
     // tinted palette for headings etc
     QPalette palette;
     palette.setBrush(QPalette::Window, RGBColor(chartinfo.bgcolor));
-    palette.setBrush(QPalette::Background, RGBColor(chartinfo.bgcolor));
     palette.setColor(QPalette::WindowText, GColor(CPLOTMARKER));
     palette.setColor(QPalette::Text, GColor(CPLOTMARKER));
     palette.setColor(QPalette::Base, RGBColor(chartinfo.bgcolor) /*GCColor::alternateColor(bgcolor)*/);

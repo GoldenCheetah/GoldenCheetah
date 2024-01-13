@@ -422,7 +422,7 @@ JsonFileReader::openRideFile(QFile &file, QStringList &errors, QList<RideFile*>*
 #if QT_VERSION < 0x060000
              in.setCodec ("ISO 8859-1");
 #else
-             in.setCodec (QStringConverter::Latin1);
+             in.setEncoding (QStringConverter::Latin1);
 #endif
              contents = in.readAll();
              file.close();

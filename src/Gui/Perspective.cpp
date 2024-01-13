@@ -1630,7 +1630,7 @@ Perspective::toXml(QTextStream &out)
         const QMetaObject *m = chart->metaObject();
         for (int i=0; i<m->propertyCount(); i++) {
             QMetaProperty p = m->property(i);
-            if (p.isUser(chart)) {
+            if (p.isUser()) {
                out<<"\t\t<property name=\""<<Utils::xmlprotect(p.name())<<"\" "
                   <<"type=\""<<p.typeName()<<"\" "
                   <<"value=\"";
