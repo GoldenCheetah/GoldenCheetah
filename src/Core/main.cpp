@@ -524,7 +524,7 @@ main(int argc, char *argv[])
 #if defined(Q_OS_MACX)
         QString libraryPath="Library/GoldenCheetah";
 #elif defined(Q_OS_WIN)
-        QStringList paths=QStandardPaths::standardLocations(QStandardPaths::DataLocation);
+        QStringList paths=QStandardPaths::standardLocations(QStandardPaths::AppLocalDataLocation);
         QString libraryPath = paths.at(0); 
 #else // not windows or osx (must be Linux or OpenBSD)
         // Q_OS_LINUX et al
