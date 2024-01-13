@@ -466,7 +466,7 @@ BT40Device::serviceStateChanged(QLowEnergyService::ServiceState s)
                             commandDs << (quint8)FtmsControlPointCommand::FTMS_REQUEST_CONTROL;
 
                             // Start notifications since command results will come on this char
-                            const QLowEnergyDescriptor notificationDesc = characteristic.descriptor(QBluetoothUuid::ClientCharacteristicConfiguration);
+                            const QLowEnergyDescriptor notificationDesc = characteristic.descriptor(QBluetoothUuid::DescriptorType::ClientCharacteristicConfiguration);
                             if (notificationDesc.isValid()) {
                                 service->writeDescriptor(notificationDesc, QByteArray::fromHex("0100"));
                             }
