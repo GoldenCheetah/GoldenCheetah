@@ -210,7 +210,7 @@ RideMapWindow::showPosition(double mins)
     long secs = mins * 60;
     int idx = secs / 5;
     idx = std::max(idx, 0);
-    idx = std::min(idx, positionItems.length() - 1);
+    idx = std::min(idx, (int)positionItems.length() - 1);
     PositionItem positionItem = positionItems.at(idx);
     view->page()->runJavaScript(QString("setPosMarker(%1, %2);").arg(positionItem.lat).arg(positionItem.lng));
 }
