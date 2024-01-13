@@ -211,7 +211,7 @@ Azum::readdir(QString path, QStringList &errors, QDateTime from, QDateTime to)
                 for (int i=0;i<activities.count();i++) {
                     QJsonObject activity = activities.at(i).toObject();
                     QString export_name = activity["export_name"].toString();
-                    if (export_name == NULL) {
+                    if (export_name.isEmpty()) {
                         continue;
                     }
                     QString export_name_extension = QFileInfo(export_name).suffix();
@@ -224,7 +224,7 @@ Azum::readdir(QString path, QStringList &errors, QDateTime from, QDateTime to)
                     add->distance = activity["distance"].toDouble() / 1000.0f; // m -> km
                     add->isDir = false;
                     // Duration return in the following format - 'P0DT00H25M57S' (https://en.wikipedia.org/wiki/ISO_8601#Durations)
-                    const QRegExp rx(QLatin1String("[^0-9]+"));
+                    const QRegularExpression rx(QLatin1String("[^0-9]+"));
                     const auto&& parts = activity["timer_time"].toString().split(rx, QString::SkipEmptyParts);
                     int sum = 0;
                     sum+= parts[0].toInt() * 24 * 60 * 60; // D - days
@@ -340,7 +340,7 @@ Azum::listAthletes()
         } else {
             return returning;
         }
-    } while (next != NULL);
+    } while (!next.isEmpty());
 
     return returning;
 }
