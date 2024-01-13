@@ -2330,7 +2330,7 @@ RTool::activitiesFor(SEXP datetime)
         if (dt==0) continue;
 
         // we need to find this one !
-        QDateTime asdt = QDateTime::fromTime_t(dt);
+        QDateTime asdt = QDateTime::fromSecsSinceEpoch(dt);
 
         foreach(RideItem*item, rtool->context->athlete->rideCache->rides()) {
             if (item->dateTime.toUTC() == asdt.toUTC()) {
