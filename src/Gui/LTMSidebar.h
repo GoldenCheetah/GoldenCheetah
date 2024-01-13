@@ -59,7 +59,6 @@ class LTMSidebar : public QWidget
         void dateRangeTreeWidgetSelectionChanged();
         void dateRangePopup(QPoint);
         void dateRangePopup();
-        void dateRangeChanged(QTreeWidgetItem *, int);
         void dateRangeMoved(QTreeWidgetItem *, int, int);
         void addRange();
         void editRange();

@@ -1,0 +1,30 @@
+voronoi - compute Voronoi diagram or Delaunay triangulation
+SYNOPSIS
+	voronoi [-s -t] <pointfile >outputfile
+
+Voronoi reads the standard input for a set of points in the plane and writes either
+the Voronoi diagram or the Delaunay triangulation to the standard output.
+Each input line should consist of two real numbers, separated by white space.
+
+If option
+	-t 
+is present, the Delaunay triangulation is produced. 
+Each output line is a triple
+	i j k
+which are the indices of the three points in a Delaunay triangle. Points are
+numbered starting at 0. If this option is not present, the
+Voronoi diagram is produced.  There are four output record types.
+	s a b
+indicates that an input point at coordinates 
+	l a b c
+indicates a line with equation ax + by = c.
+	v a b
+indicates a vertex at  a b.
+	e l v1 v2
+indicates a Voronoi segment which is a subsegment of line number l;
+with endpoints numbered v1 and v2.  If v1 or v2 is -1, the line
+extends to infinity.
+
+AUTHOR
+Steve J. Fortune (1987) A Sweepline Algorithm for Voronoi Diagrams,
+Algorithmica 2, 153-174.

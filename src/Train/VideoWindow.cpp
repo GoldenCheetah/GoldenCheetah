@@ -362,10 +362,11 @@ void VideoWindow::startPlayback()
         // This commonly occurs when a gpx file is used for workout with an older
         // tts used for videosync. Example: CH_Umbrail, or pretty much any older
         // tacx video where tts doesn't contain location data.
+        // Only applies to distance-slope (CRS) workouts
         double videoSyncDistanceMeters = currentVideoSyncFile->Distance * 1000.;
         if (videoSyncDistanceMeters > 0.) {
             ErgFile* currentErgFile = context->currentErgFile();
-            if (currentErgFile) {
+            if (currentErgFile && currentErgFile->mode == CRS) {
                 double ergFileDistanceMeters = currentErgFile->Duration;
                 if (ergFileDistanceMeters > 0.) {
                     videoSyncDistanceAdjustFactor = ergFileDistanceMeters / videoSyncDistanceMeters;

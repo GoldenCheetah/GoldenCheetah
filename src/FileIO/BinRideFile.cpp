@@ -281,7 +281,7 @@ struct BinFileReaderState
 
         QDateTime dateTime(QDate((0xff & c1)*256+(0xff & c2), (0xff & c3), (0xff & c4)), QTime((0xff & c5), (0xff & c6), (0xff & c7)), Qt::LocalTime);
 
-        return dateTime.toTime_t();
+        return dateTime.toSecsSinceEpoch();
     }
 
 
@@ -298,7 +298,7 @@ struct BinFileReaderState
                 switch (field.id) {
                     case FORMAT_ID__RIDE_START : {
                         start_time = value;
-                        t.setTime_t(value);
+                        t.setSecsSinceEpoch(value);
                         rideFile->setStartTime(t);
                         break;
                     }
@@ -310,7 +310,7 @@ struct BinFileReaderState
                         deviceInfo += rideFile->deviceType()+QString(" Version %1\n").arg(value);
                         break;
                     case FORMAT_ID__LAST_UPDATE :
-                        //t.setTime_t(value);
+                        //t.setSecsSinceEpoch(value);
                         //deviceInfo += QString("Last update %1\n").arg(t.toString());
                         unused_format_identifiers_for_record_types[def.format_identifier].insert(field.id);
                         break;

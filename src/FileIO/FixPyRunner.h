@@ -11,6 +11,7 @@ struct FixPyRunParams
 {
     Context *context;
     RideFile *rideFile;
+    RideItem *rideItem;
     QString script;
 };
 
@@ -19,7 +20,7 @@ class FixPyRunner : public QObject
     Q_OBJECT
 
 public:
-    FixPyRunner(Context *context = nullptr, RideFile *rideFile = nullptr, bool useNewThread = true);
+    FixPyRunner(Context *context = nullptr, RideFile *rideFile = nullptr, RideItem *rideItem = nullptr, bool useNewThread = true);
 
     int run(QString source, QString scriptKey, QString &errText);
     static void execScript(FixPyRunParams *params);
@@ -27,6 +28,7 @@ public:
 private:
     Context *context;
     RideFile *rideFile;
+    RideItem *rideItem;
     bool useNewThread;
 };
 

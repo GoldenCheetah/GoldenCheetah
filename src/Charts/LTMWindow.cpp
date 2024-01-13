@@ -21,7 +21,7 @@
 #include "LTMPlot.h"
 #include "LTMSettings.h"
 #include "LTMChartParser.h"
-#include "TabView.h"
+#include "AbstractView.h"
 #include "Context.h"
 #include "Context.h"
 #include "Athlete.h"
@@ -36,7 +36,6 @@
 #include "GcOverlayWidget.h"
 
 #include <QWebEngineSettings>
-#include <QDesktopWidget>
 
 #include <QtGlobal>
 #include <QtGui>
@@ -67,7 +66,7 @@ LTMWindow::LTMWindow(Context *context) :
     QVBoxLayout *mainLayout = new QVBoxLayout;
 
     QPalette palette;
-    palette.setBrush(QPalette::Background, QBrush(GColor(CTRENDPLOTBACKGROUND)));
+    palette.setBrush(QPalette::Window, QBrush(GColor(CTRENDPLOTBACKGROUND)));
 
     // single plot
     plotWidget = new QWidget(this);
@@ -144,14 +143,13 @@ LTMWindow::LTMWindow(Context *context) :
     //XXXdataSummary->setEnabled(false); // stop grabbing focus
     if (dpiXFactor > 1) {
     // 80 lines per page on hidpi screens (?)
-        int pixelsize = pixelSizeForFont(defaultFont, QApplication::desktop()->geometry().height()/80);
+        int pixelsize = pixelSizeForFont(defaultFont, QApplication::primaryScreen()->geometry().height()/80);
         dataSummary->settings()->setFontSize(QWebEngineSettings::DefaultFontSize, pixelsize);
     } else {
         dataSummary->settings()->setFontSize(QWebEngineSettings::DefaultFontSize, defaultFont.pointSize()+1);
     }
     dataSummary->settings()->setFontFamily(QWebEngineSettings::StandardFont, defaultFont.family());
     dataSummary->setContentsMargins(0,0,0,0);
-    dataSummary->page()->view()->setContentsMargins(0,0,0,0);
     dataSummary->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     dataSummary->setAcceptDrops(false);
 
@@ -269,7 +267,7 @@ LTMWindow::LTMWindow(Context *context) :
     t2label1 = new QLabel(tr("Negative decay"), this);
     t2label2 = new QLabel(tr("days"), this);
     RMSElabel = new QLabel(this);
-    RMSElabel->setText("RMSE 2.9 for 22 tests.");
+    RMSElabel->setText(tr("RMSE 2.9 for 22 tests."));
 
     // add to layout
     bang->addWidget(ilabel,0,0);
@@ -441,7 +439,7 @@ LTMWindow::event(QEvent *event)
         }
 
         // if off the screen move on screen
-        if (helperWidget()->geometry().x() > geometry().width()) {
+        if (helperWidget()->geometry().x() > geometry().width() || helperWidget()->geometry().x() < geometry().x()) {
             helperWidget()->move(mainWidget()->geometry().width()-(500*dpiXFactor), 90*dpiYFactor);
         }
     }
@@ -488,14 +486,14 @@ LTMWindow::refreshBanister()
         QDate when = banister->getPeakPerf(settings.start.date(), settings.end.date(), perf, CP);
 
         // set peak label
-        if (CP >0 && when != QDate()) peaklabel ->setText(QString("%1 watts on %2").arg(CP).arg(when.toString("d MMM yyyy")));
-        else if (perf >0.0 && when != QDate()) peaklabel ->setText(QString("%1 on %2").arg(perf, 0, 'f', 1).arg(when.toString("d MMM yyyy")));
+        if (CP >0 && when != QDate()) peaklabel ->setText(tr("%1 watts on %2").arg(CP).arg(when.toString("d MMM yyyy")));
+        else if (perf >0.0 && when != QDate()) peaklabel ->setText(tr("%1 on %2").arg(perf, 0, 'f', 1).arg(when.toString("d MMM yyyy")));
         else peaklabel->setText("");
 
         // set RMSE for current view
         int count;
         double RMSE = banister->RMSE(settings.start.date(), settings.end.date(), count);
-        if (count && RMSE >0) RMSElabel->setText(QString("RMSE %1 for %2 tests.").arg(RMSE, 0, 'f', 2).arg(count));
+        if (count && RMSE >0) RMSElabel->setText(tr("RMSE %1 for %2 tests.").arg(RMSE, 0, 'f', 2).arg(count));
         else RMSElabel->setText("");
 
     } else {
@@ -519,7 +517,6 @@ LTMWindow::configChanged(qint32)
     // inverted palette for data etc
     QPalette whitepalette;
     whitepalette.setBrush(QPalette::Window, QBrush(GColor(CTRENDPLOTBACKGROUND)));
-    whitepalette.setBrush(QPalette::Background, QBrush(GColor(CTRENDPLOTBACKGROUND)));
     whitepalette.setColor(QPalette::WindowText, GCColor::invertColor(GColor(CTRENDPLOTBACKGROUND)));
     whitepalette.setColor(QPalette::Base, GCColor::alternateColor(GColor(CPLOTBACKGROUND)));
     whitepalette.setColor(QPalette::Text, GCColor::invertColor(GColor(CTRENDPLOTBACKGROUND)));
@@ -553,11 +550,11 @@ LTMWindow::configChanged(qint32)
     RMSElabel->setPalette(whitepalette);
 
 #ifndef Q_OS_MAC
-    banT1->setStyleSheet(TabView::ourStyleSheet());
-    banT2->setStyleSheet(TabView::ourStyleSheet());
-    banCombo->setStyleSheet(TabView::ourStyleSheet());
-    plotArea->setStyleSheet(TabView::ourStyleSheet());
-    compareplotArea->setStyleSheet(TabView::ourStyleSheet());
+    banT1->setStyleSheet(AbstractView::ourStyleSheet());
+    banT2->setStyleSheet(AbstractView::ourStyleSheet());
+    banCombo->setStyleSheet(AbstractView::ourStyleSheet());
+    plotArea->setStyleSheet(AbstractView::ourStyleSheet());
+    compareplotArea->setStyleSheet(AbstractView::ourStyleSheet());
 #endif
     refresh();
 }
@@ -637,7 +634,7 @@ LTMWindow::presetSelected(int index)
         fs.addFilter(context->isfiltered, context->filters);
         fs.addFilter(context->ishomefiltered, context->homeFilters);
         fs.addFilter(ltmTool->isFiltered(), ltmTool->filters());
-        fs.addFilter(myPerspective->isFiltered(), myPerspective->filterlist(myDateRange));
+        if (myPerspective) fs.addFilter(myPerspective->isFiltered(), myPerspective->filterlist(myDateRange));
         settings.specification.setFilterSet(fs);
         settings.specification.setDateRange(DateRange(settings.start.date(), settings.end.date()));
 
@@ -695,7 +692,7 @@ void
 LTMWindow::spanSliderChanged()
 {
     // so reset the axis range for ltmPlot
-    ltmPlot->setAxisScale(QwtPlot::xBottom, spanSlider->lowerValue(), spanSlider->upperValue());
+    ltmPlot->setAxisScale(QwtAxis::XBottom, spanSlider->lowerValue(), spanSlider->upperValue());
     ltmPlot->replot();
 }
 
@@ -735,8 +732,8 @@ LTMWindow::refreshPlot()
                 stackWidget->setCurrentIndex(0);
                 dirty = false;
 
-                spanSlider->setMinimum(ltmPlot->axisScaleDiv(QwtPlot::xBottom).lowerBound());
-                spanSlider->setMaximum(ltmPlot->axisScaleDiv(QwtPlot::xBottom).upperBound());
+                spanSlider->setMinimum(ltmPlot->axisScaleDiv(QwtAxis::XBottom).lowerBound());
+                spanSlider->setMaximum(ltmPlot->axisScaleDiv(QwtAxis::XBottom).upperBound());
                 spanSlider->setLowerValue(spanSlider->minimum());
                 spanSlider->setUpperValue(spanSlider->maximum());
             }
@@ -1075,7 +1072,7 @@ LTMWindow::filterChanged()
     fs.addFilter(context->isfiltered, context->filters);
     fs.addFilter(context->ishomefiltered, context->homeFilters);
     fs.addFilter(ltmTool->isFiltered(), ltmTool->filters());
-    fs.addFilter(myPerspective->isFiltered(), myPerspective->filterlist(myDateRange));
+    if (myPerspective) fs.addFilter(myPerspective->isFiltered(), myPerspective->filterlist(myDateRange));
     settings.specification.setFilterSet(fs);
     settings.specification.setDateRange(DateRange(settings.start.date(), settings.end.date()));
 
@@ -1202,7 +1199,7 @@ LTMWindow::applyClicked()
         fs.addFilter(context->isfiltered, context->filters);
         fs.addFilter(context->ishomefiltered, context->homeFilters);
         fs.addFilter(ltmTool->isFiltered(), ltmTool->filters());
-        fs.addFilter(myPerspective->isFiltered(), myPerspective->filterlist(myDateRange));
+        if (myPerspective) fs.addFilter(myPerspective->isFiltered(), myPerspective->filterlist(myDateRange));
         settings.specification.setFilterSet(fs);
         settings.specification.setDateRange(DateRange(settings.start.date(), settings.end.date()));
 
@@ -1669,7 +1666,9 @@ LTMWindow::exportData()
 
         // open stream and write header
         QTextStream stream(&f);
+#if QT_VERSION < 0x060000
         stream.setCodec("UTF-8"); // Names and Units can be translated
+#endif
         stream << content;
 
         // and we're done

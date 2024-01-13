@@ -42,7 +42,6 @@
 #include <QJsonArray>
 #include <QXmlInputSource>
 #include <QXmlSimpleReader>
-#include <QDesktopWidget>
 
 CloudDBChartClient::CloudDBChartClient()
 {
@@ -1077,7 +1076,7 @@ CloudDBChartListDialog::applyAllFilters() {
     g_currentHeaderList->clear();
     if (!textFilter->text().isEmpty()) {
         // split by any whitespace
-        searchList = textFilter->text().split(QRegExp("\\s+"), QString::SkipEmptyParts);
+        searchList = textFilter->text().split(QRegularExpression("\\s+"), Qt::SkipEmptyParts);
     }
     foreach (CommonAPIHeaderV1 chart, *g_fullHeaderList) {
 
@@ -1172,7 +1171,7 @@ CloudDBChartListDialog::cellDoubleClicked(int row, int /*column */) {
 
 CloudDBChartShowPictureDialog::CloudDBChartShowPictureDialog(QByteArray imageData) : imageData(imageData) {
 
-    QRect rec = QApplication::desktop()->screenGeometry();
+    QRect rec = QApplication::primaryScreen()->geometry();
     imageLabel = new QLabel();
     imageLabel->setMinimumSize(150,100); // not scaled to hi-dpi screens (cloud db constraint not device)
     chartImage.loadFromData(imageData);

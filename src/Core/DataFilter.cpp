@@ -37,6 +37,8 @@
 #include "lmcurve.h"
 #include "LTMTrend.h" // for LR when copying CP chart filtering mechanism
 #include "WPrime.h" // for LR when copying CP chart filtering mechanism
+#include "FastKmeans.h" // for kmeans(...)
+#include "Season.h" // for events(...)
 
 #ifdef GC_HAVE_SAMPLERATE
 // we have libsamplerate
@@ -53,6 +55,7 @@ QMutex pythonMutex;
 #include <gsl/gsl_statistics.h>
 #include <gsl/gsl_interp.h>
 #include <gsl/gsl_randist.h>
+#include <gsl/gsl_cdf.h>
 
 #include "Zones.h"
 #include "PaceZones.h"
@@ -95,7 +98,7 @@ static struct {
 
     { "ceil", 1 },
     { "floor", 1 },
-    { "round", 1 },
+    { "round", 0 }, // round(x) or round(x, dp)
 
     { "fabs", 1 },
     { "isinf", 1 },
@@ -211,10 +214,12 @@ static struct {
                    // grammar does not support (a*x>1), instead we can use a*bool(x>1). All non
                    // zero expressions will evaluate to 1.
 
-    { "annotate", 0 }, // annotate(type, parms) - add an annotation to the chart, will no doubt
-                       // extend over time to cover lots of different types, but for now
-                       // supports 'label', which has n texts and numbers which are concatenated
-                       // together to make a label; eg. annotate(label, "CP ", cpval, " watts");
+    { "annotate", 0 }, // current supported annotations:
+                       // annotate(label, string1, string2 .. stringn) - adds label at top of a chart
+                       // annotate(voronoi, centers) - associated with a series on a user chart
+                       // annotate(hline, label, style, value) - associated with a series on a user chart
+                       // annotate(vline, label, style, value) - associated with a series on a user chart (see linestyle for vals below)
+                       // annotate(lr, style, "colorname") - plot a linear regression for the series
 
     { "arguniq", 1 },  // returns an index of the uniq values in a vector, in the same way
                        // argsort returns an index, can then be used to select from samples
@@ -326,6 +331,72 @@ static struct {
     { "fetch", 1 },    // fetch("name") retrieves a value previously stored returns 0 if the value
                        // is not in the athlete store
 
+    { "metricname", 0 },     // metricname(Average_Power, BikeStress) returns the metric name, crucially in the local
+                       // language. Will return a vector for multiple values
+
+    { "metricunit", 0 },     // unit(Average_Power, BikeStress) returns the metric unit name, crucially in the local
+                       // language. Will return a vector for multiple values
+
+    { "datestring", 1 }, // datestring(a) will return a vector of strings converting the passed parameter
+                        // from days since to a string
+
+    { "timestring", 1 }, // timestring(a) will return a vector of strings converting the passed parameter
+                        // from secs since midnight to a time string
+
+    { "asstring", 0 }, // asstring(Average_Power, BikeStress) returns the metric value as a string
+                       // so honouring decimal places and conversion to metric/imperial etc.
+
+    { "metricstrings", 0 }, // metricstrings(Metrics [,start [,stop]]) - same as metrics above but instead of
+                            // returning a vector of numbers, the values are converted to strings as
+                            // appropriate for the metric (e.g. rowing pace xxx/500m).
+
+    { "zones", 2 },   // zones(power|hr|pace|fatigue, name|description|low|high|unit|time|percent) - returns a vector
+                      // of the zone details and the time in zone and percentage metric.
+
+    { "string", 1 }, // string(a) will convert the passed entries to a string if they are numeric.
+
+    { "activities", 2 }, // activities("expression", expr) - provides a closure for expr using the filter in expression
+                         // for example filter("Workout_Code = \"FTP\"", metrics(BikeStress)) will return a vector of
+                         // BikeStress values for activities that have the metadata "Workout_Code"
+
+    { "intervals", 0 }, // intervals(symbol|name|start|stop|type|test|color|route|selected|date|filename [,start [,stop]])
+                        // - returns a vector of values for the metric or field specified for each interval
+                        // if no start/stop is supplied it uses the currently selected date range or activity.
+
+    { "intervalstrings", 0 }, // intervalstring(symbol|name|start|stop|type|test|color|route|selected|date|filename [,start [,stop]])
+                              //  - same as intervals above but instead of returning a vector of numbers, the values
+                              //  are converted to strings as appropriate for the metric (e.g. Pace_Rowing mm:ss/500m).
+
+    { "events", 0 }, // events(name|date|priority|description)
+                     // - returns a vector of values for the field specified for each even in current date range
+
+    { "powerindex", 2 }, // powerindex(power, secs) - returns an array or value representing the power and duration
+                         //                           represented as a power index
+
+    { "aggmetrics", 0 },        // aggregate metrics before returning a single value, see metrics above
+    { "aggmetricstrings", 0 },  // aggregate metrics and return as a string value, see metricstringsabove
+    { "asaggstring", 0 },       // asaggstring(metric1, metricn) - aggregates for metrics listed
+    { "normalize", 3 },      // normalize(vector, min, max) - unity based normalize to values between 0 and 1 for the vector or value
+                             // based upon the min and max values. anything below min will be mapped to 0 and anything
+                             // above max will be mapped to 1
+    { "pdfnormal", 2 },           // pdfnormal(sigma, x) returns the probability density function for value x
+    { "cdfnormal", 2 },           // cdfnormal(sigma, x) returns the cumulative density function for value x
+    { "pdfbeta", 3 },           // pdfbeta(a,b, x) as above for the beta distribution
+    { "cdfbeta", 3 },           // cdfbeta(a,b, x) as above for the beta distribution
+    { "pdfgamma", 3 },           // pdfgamma(a,b, x) as above for the gamma distribution
+    { "cdfgamma", 3 },           // cdfgamma(a,b, x) as above for the gamma distribution
+
+    { "kmeans", 0 },        // kmeans(centers|assignments, k, dim1, dim2, dim3 .. dimn) - return the centers or cluster assignment
+                            // from a k means cluser of the data with n dimensions (but commonly just 2- x and y)
+
+    // coerce to type
+    //{ "string", 1 },     // coerce value to string (listed above, removes decimal places, not sure why)
+    { "double", 1 },     // coerce value to double
+
+    { "xdataseries", 1 }, // returns a string vector of all the series in an xdata e.g. xdataseries("SESSION")
+    { "xdataunits", 1 },  // returns a string vector of all the units in an xdata e.g. xdataunits("SESSION");
+    { "xdatavalues", 1 }, // returns a vector of doubles of all vales in an xdata suitable for display in an overview tile
+
     // add new ones above this line
     { "", -1 }
 };
@@ -336,10 +407,34 @@ static QStringList pdmodels(Context *context)
 
     returning << CP2Model(context).code();
     returning << CP3Model(context).code();
-    returning << MultiModel(context).code();
+    //returning << MultiModel(context).code(); disabled in v3.6
     returning << ExtendedModel(context).code();
-    returning << WSModel(context).code();
+    //returning << WSModel(context).code(); disabled in v3.6
     return returning;
+}
+
+// whenever we use a line style
+static struct {
+    const char *name;
+    Qt::PenStyle type;
+} linestyles_[] = {
+    { "solid", Qt::SolidLine },
+    { "dash", Qt::DashLine },
+    { "dot", Qt::DotLine },
+    { "dashdot", Qt::DashDotLine },
+    { "dashdotdot", Qt::DashDotDotLine },
+    { "", Qt::NoPen },
+};
+
+static Qt::PenStyle linestyle(QString name)
+{
+    int index=0;
+    while (linestyles_[index].type != Qt::NoPen) {
+        if (name == linestyles_[index].name)
+            return linestyles_[index].type;
+        index++;
+    }
+    return Qt::NoPen; // not known
 }
 
 QStringList
@@ -467,7 +562,7 @@ DataFilter::builtins(Context *context)
 
         } else if (i == 66) {
 
-            returning << "annotate(label, ...)";
+            returning << "annotate(label|lr|hline|vline|voronoi, ...)";
 
         } else if (i == 67) {
 
@@ -543,7 +638,7 @@ DataFilter::builtins(Context *context)
             returning << "interpolate(linear|cubic|akima|steffen, xvector, yvector, xvalues)";
 
             // 94 resample
-            // 95 estimates (see above) - also Kyle !!!!
+            // 95 estimates
 
         } else if (i == 96) {
 
@@ -559,6 +654,15 @@ DataFilter::builtins(Context *context)
 
             // filename (or vector of names)
             returning << "filename()";
+
+        } else if (i== 118) {
+            // zone details
+            returning << "zones(hr|power|pace|fatigue, name|description|units|low|high|time|percent)";
+
+        } else if (i  == 127) {
+
+            // heat
+           returning << "normalize(min, max, v)";
 
         } else {
 
@@ -734,6 +838,7 @@ DataFilter::colorSyntax(QTextDocument *document, int pos)
     int symbolstart=0;
     int brace=0;
     int brack=0;
+    int sbrack=0;
 
     for(int i=0; i<string.length(); i++) {
 
@@ -759,6 +864,7 @@ DataFilter::colorSyntax(QTextDocument *document, int pos)
 
                 // isRun isa special, we may add more later (e.g. date)
                 if (!sym.compare("Date", Qt::CaseInsensitive) ||
+                    !sym.compare("Time", Qt::CaseInsensitive) ||
                     !sym.compare("banister", Qt::CaseInsensitive) ||
                     !sym.compare("best", Qt::CaseInsensitive) ||
                     !sym.compare("tiz", Qt::CaseInsensitive) ||
@@ -963,6 +1069,78 @@ DataFilter::colorSyntax(QTextDocument *document, int pos)
             }
         }
 
+        // are the brackets balanced  [ ] ?
+        if (!instring && !incomment && string[i]=='[') {
+            sbrack++;
+
+            // match close/open if over cursor
+            if (i==pos-1) {
+                cursor.setPosition(i, QTextCursor::MoveAnchor);
+                cursor.selectionStart();
+                cursor.setPosition(i+1, QTextCursor::KeepAnchor);
+                cursor.selectionEnd();
+                cursor.mergeCharFormat(cyanbg);
+
+                // run forward looking for match
+                int bb=0;
+                for(int j=i; j<string.length(); j++) {
+                    if (string[j]=='[') bb++;
+                    if (string[j]==']') {
+                        bb--;
+                        if (bb == 0) {
+                            bpos = j; // matched brack here, don't change color!
+
+                            cursor.setPosition(j, QTextCursor::MoveAnchor);
+                            cursor.selectionStart();
+                            cursor.setPosition(j+1, QTextCursor::KeepAnchor);
+                            cursor.selectionEnd();
+                            cursor.mergeCharFormat(cyanbg);
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        if (!instring && !incomment && string[i]==']') {
+            sbrack--;
+
+            if (i==pos-1) {
+
+                cursor.setPosition(i, QTextCursor::MoveAnchor);
+                cursor.selectionStart();
+                cursor.setPosition(i+1, QTextCursor::KeepAnchor);
+                cursor.selectionEnd();
+                cursor.mergeCharFormat(cyanbg);
+
+                // run backward looking for match
+                int bb=0;
+                for(int j=i; j>=0; j--) {
+                    if (string[j]==']') bb++;
+                    if (string[j]=='[') {
+                        bb--;
+                        if (bb == 0) {
+                            bpos = j; // matched brack here, don't change color!
+
+                            cursor.setPosition(j, QTextCursor::MoveAnchor);
+                            cursor.selectionStart();
+                            cursor.setPosition(j+1, QTextCursor::KeepAnchor);
+                            cursor.selectionEnd();
+                            cursor.mergeCharFormat(cyanbg);
+                            break;
+                        }
+                    }
+                }
+
+            } else if (sbrack < 0 && i != bpos-1) {
+
+                cursor.setPosition(i, QTextCursor::MoveAnchor);
+                cursor.selectionStart();
+                cursor.setPosition(i+1, QTextCursor::KeepAnchor);
+                cursor.selectionEnd();
+                cursor.mergeCharFormat(redbg);
+            }
+        }
+
         // are the braces balanced  ( ) ?
         if (!instring && !incomment && string[i]=='{') {
             brace++;
@@ -1059,10 +1237,27 @@ DataFilter::colorSyntax(QTextDocument *document, int pos)
         brack = 0;
         for(int i=string.length(); i>=0; i--) {
 
-            if (string[i] == ')') brace++;
-            if (string[i] == '(') brace--;
+            if (string[i] == ')') brack++;
+            if (string[i] == '(') brack--;
 
             if (brack < 0 && string[i] == '(' && i != pos-1 && i != bpos-1) {
+                cursor.setPosition(i, QTextCursor::MoveAnchor);
+                cursor.selectionStart();
+                cursor.setPosition(i+1, QTextCursor::KeepAnchor);
+                cursor.selectionEnd();
+                cursor.mergeCharFormat(redbg);
+            }
+        }
+    }
+
+    if (sbrack > 0) {
+        sbrack = 0;
+        for(int i=string.length(); i>=0; i--) {
+
+            if (string[i] == ']') sbrack++;
+            if (string[i] == '[') sbrack--;
+
+            if (sbrack < 0 && string[i] == '[' && i != pos-1 && i != bpos-1) {
                 cursor.setPosition(i, QTextCursor::MoveAnchor);
                 cursor.selectionStart();
                 cursor.setPosition(i+1, QTextCursor::KeepAnchor);
@@ -1224,6 +1419,14 @@ Leaf::toString()
                         .arg(cond.l->toString())
                         .arg(lvalue.l->toString());
                     }
+        }
+        break;
+
+    case Leaf::Compound : //qDebug()<<"comp:"<<op;
+        {
+                    QString returning("{");
+                    foreach (Leaf* l, *(lvalue.b)) returning.append(l->toString()).append(";");
+                    return returning.append("}");
         }
         break;
 
@@ -1422,6 +1625,7 @@ bool Leaf::isNumber(DataFilterRuntime *df, Leaf *leaf)
                 symbol == "isRun" || symbol == "isXtrain") return true;
             if (symbol == "x" || symbol == "i") return true;
             else if (!symbol.compare("Date", Qt::CaseInsensitive)) return true;
+            else if (!symbol.compare("Time", Qt::CaseInsensitive)) return true;
             else if (!symbol.compare("Today", Qt::CaseInsensitive)) return true;
             else if (!symbol.compare("Current", Qt::CaseInsensitive)) return true;
             else if (!symbol.compare("RECINTSECS", Qt::CaseInsensitive)) return true;
@@ -1453,25 +1657,49 @@ bool Leaf::isNumber(DataFilterRuntime *df, Leaf *leaf)
 
 void Leaf::clear(Leaf *leaf)
 {
-Q_UNUSED(leaf);
-#if 0 // memory leak!!!
+    if (leaf == NULL) return; // critical to avoid crashes
+
     switch(leaf->type) {
+    case Leaf::Script :
     case Leaf::String : delete leaf->lvalue.s; break;
     case Leaf::Symbol : delete leaf->lvalue.n; break;
     case Leaf::Logical  :
     case Leaf::BinaryOperation :
     case Leaf::Operation : clear(leaf->lvalue.l);
                            clear(leaf->rvalue.l);
-                           delete(leaf->lvalue.l);
-                           delete(leaf->rvalue.l);
+                           delete leaf->lvalue.l;
+                           delete leaf->rvalue.l;
+                           break;
+    case Leaf::UnaryOperation : clear(leaf->lvalue.l);
+                           delete leaf->lvalue.l;
                            break;
     case Leaf::Function :  clear(leaf->lvalue.l);
-                           delete(leaf->lvalue.l);
-                            break;
-    default:
-        break;
+                           delete leaf->lvalue.l;
+                           clear(leaf->series);
+                           delete leaf->series;
+                           foreach (Leaf* l, leaf->fparms) { clear(l); delete l; }
+                           leaf->fparms.clear();
+                           break;
+    case Leaf::Compound :  foreach (Leaf* l, *(leaf->lvalue.b)) { clear(l); delete l; }
+                           delete leaf->lvalue.b;
+                           break;
+    case Leaf::Conditional : clear(leaf->lvalue.l);
+                           clear(leaf->rvalue.l);
+                           clear(leaf->cond.l);
+                           delete leaf->lvalue.l;
+                           delete leaf->rvalue.l;
+                           delete leaf->cond.l;
+                           break;
+    case Leaf::Index :
+    case Leaf::Select :    clear(leaf->lvalue.l);
+                           delete leaf->lvalue.l;
+                           foreach (Leaf* l, leaf->fparms) { clear(l); delete l; }
+                           leaf->fparms.clear();
+                           break;
+    case Leaf::Float :
+    case Leaf::Integer :   break;
     }
-#endif
+
 }
 
 void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
@@ -1495,6 +1723,7 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
 
                 // isRun isa special, we may add more later (e.g. date)
                 if (symbol.compare("Date", Qt::CaseInsensitive) &&
+                    symbol.compare("Time", Qt::CaseInsensitive) &&
                     symbol.compare("x", Qt::CaseInsensitive) && // used by which and [lexpr]
                     symbol.compare("i", Qt::CaseInsensitive) && // used by which and [lexpr]
                     symbol.compare("Today", Qt::CaseInsensitive) &&
@@ -1504,6 +1733,7 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
                     !df->dataSeriesSymbols.contains(symbol) &&
                     symbol != "isRide" && symbol != "isSwim" &&
                     symbol != "isRun" && symbol != "isXtrain" &&
+                    symbol != "isAero" &&
                     !isCoggan(symbol)) {
 
                     // unknown, is it user defined ?
@@ -1549,7 +1779,7 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
             QRegExp dateRangeValidSymbols("^(start|stop)$", Qt::CaseInsensitive); // date range
             QRegExp pmcValidSymbols("^(stress|lts|sts|sb|rr|date)$", Qt::CaseInsensitive);
             QRegExp smoothAlgos("^(sma|ewma)$", Qt::CaseInsensitive);
-            QRegExp annotateTypes("^(label)$", Qt::CaseInsensitive);
+            QRegExp annotateTypes("^(label|lr|hline|vline|voronoi)$", Qt::CaseInsensitive);
             QRegExp curveData("^(x|y|z|d|t)$", Qt::CaseInsensitive);
             QRegExp aggregateFunc("^(mean|sum|max|min|count)$", Qt::CaseInsensitive);
             QRegExp interpolateAlgorithms("^(linear|cubic|akima|steffen)$", Qt::CaseInsensitive);
@@ -1596,7 +1826,17 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
 
                 bool found=false;
 
-                if (leaf->function == "daterange") {
+                if (leaf->function == "activities") {
+
+                    if (leaf->fparms.count() != 2 || leaf->fparms[0]->type != Leaf::String) {
+                        inerror=true;
+                        DataFiltererrors << tr("activities(\"fexpr\", expr) - where fexpr is a filter expression");
+                    }
+
+                    // validate the expression
+                    if (leaf->fparms.count() == 2) validateFilter(context,df,leaf->fparms[1]);
+
+                } else if (leaf->function == "daterange") {
 
                     if (leaf->fparms.count()==1) {
 
@@ -1621,12 +1861,43 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
                         DataFiltererrors << QString(tr("daterange(start|stop) or daterange(datefrom, dateto, expression)"));
                         leaf->inerror = true;
                     }
+                } else if (leaf->function == "datestring" || leaf->function == "timestring") {
+
+                    if (leaf->fparms.count() != 1) {
+                        leaf->inerror = true;
+                        DataFiltererrors << QString(tr("%1 needs a single parameter")).arg(leaf->function);
+                    }
+
                 } else if (leaf->function == "filename") {
 
                     if (leaf->fparms.count() != 0) {
                         leaf->inerror = true;
                         DataFiltererrors << QString(tr("filename() has no parameters"));
                     }
+
+                } else if (leaf->function == "zones") {
+
+                    // need exactly 2 symbols
+                    if (leaf->fparms.count() != 2 ||
+                        leaf->fparms[0]->type != Leaf::Symbol ||
+                        leaf->fparms[1]->type != Leaf::Symbol) {
+                        leaf->inerror = true;
+
+                    } else {
+
+                        QRegExp reseries("^(hr|power|pace|fatigue)$", Qt::CaseInsensitive);
+                        QRegExp refield("^(name|description|units|low|high|time|percent)$", Qt::CaseInsensitive);
+
+                        // lets check the combinations
+                        QString series = *leaf->fparms[0]->lvalue.n;
+                        QString field = *leaf->fparms[1]->lvalue.n;
+
+                        if (!reseries.exactMatch(series)) inerror=true;
+                        if (!refield.exactMatch(field)) inerror=true;
+                    }
+
+                    // same error for any badly formed function call
+                    if (leaf->inerror) DataFiltererrors << QString(tr("zones(hr|power|pace|fatigue, name|description|low|high|units|time|percent) needs 2 specific parameters"));
 
                 } else if (leaf->function == "exists") {
 
@@ -1715,6 +1986,22 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
                                 leaf->inerror = true;
                                 DataFiltererrors << QString(tr("unknown function '%1', must be one of mean|sum|max|min|count.").arg(symbol));
                             }
+                        }
+                    }
+
+                } else if (leaf->function == "round") {
+
+                    // can  be either round(expr) or round(expr, dp)
+                    // where expr evaluates to numeric and dp is a number
+                    if (leaf->fparms.count() != 1 && leaf->fparms.count() != 2) {
+
+                        leaf->inerror = true;
+                        DataFiltererrors << QString(tr("round(v) or round(v, dp)"));
+
+                    } else {
+                        // validate the parameters
+                        for(int i=0; i<leaf->fparms.count(); i++) {
+                            validateFilter(context, df, leaf->fparms[i]);
                         }
                     }
 
@@ -1833,6 +2120,13 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
                         }
                     }
 
+                } else if (leaf->function == "xdataseries" || leaf->function == "xdataunits" || leaf->function == "xdatavalues") {
+
+                    if (leaf->fparms.count() != 1 || leaf->fparms[0]->type != Leaf::String) {
+                        leaf->inerror=true;
+                        DataFiltererrors << QString(tr("%s expects a string name (the tab name in the raw data view)").arg(leaf->function));
+                    }
+
                 } else if (leaf->function == "samples") {
 
                     if (leaf->fparms.count() < 1) {
@@ -1891,19 +2185,60 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
                         }
                     }
 
-                } else if (leaf->function == "metrics") {
+                } else if (leaf->function == "metricname" || leaf->function == "metricunit" || leaf->function == "asstring" || leaf->function == "asaggstring") {
+
+                    // check the parameters are all valid metric names
+                    if (leaf->fparms.count() < 1) {
+                        // need at least one metric name
+                        leaf->inerror = true;
+                        DataFiltererrors << QString(tr("no metric specified, %1(symbol) symbol should be a metric name")).arg(leaf->function);
+
+                    } else {
+
+                        // check they are all valid metrics
+                        QRegExp symbols("^(name|start|stop|type|test|color|route|selected|date|time|filename)$");
+                        for(int i=0; i<leaf->fparms.count(); i++) {
+                            if (leaf->fparms[i]->type != Leaf::Symbol) {
+                                leaf->inerror = true;
+                                DataFiltererrors << QString(tr("only metric names are supported")).arg(leaf->function);
+                            } else {
+                                QString symbol=*(leaf->fparms[0]->lvalue.n);
+                                if (!symbols.exactMatch(symbol) && df->lookupMap.value(symbol,"") == "") {
+                                    inerror = true;
+                                    DataFiltererrors << QString(tr("unknown metric %1")).arg(symbol);
+                                }
+                            }
+                        }
+                    }
+                } else if (leaf->function == "kmeans") {
+
+                    if (leaf->fparms.count() < 4 || leaf->fparms[0]->type != Leaf::Symbol) {
+                        leaf->inerror = true;
+                        DataFiltererrors << QString(tr("kmeans(centers|assignments, k, dim1, dim2, dimn)"));
+                    } else {
+                        QString symbol=*(leaf->fparms[0]->lvalue.n);
+                        if (symbol != "centers" && symbol != "assignments") {
+                            leaf->inerror = true;
+                            DataFiltererrors << QString(tr("kmeans(centers|assignments, k, dim1, dim2, dimn) - %s unknown")).arg(symbol);
+                        } else {
+                            for(int i=1; i<leaf->fparms.count(); i++) validateFilter(context, df, leaf->fparms[i]);
+                        }
+                    }
+
+                } else if (leaf->function == "metrics" || leaf->function == "metricstrings" ||
+                           leaf->function == "aggmetrics" || leaf->function == "aggmetricstrings") {
 
                     // is the param a symbol and either a metric name or 'date'
                     if (leaf->fparms.count() < 1 || leaf->fparms[0]->type != Leaf::Symbol) {
                        leaf->inerror = true;
-                       DataFiltererrors << QString(tr("metrics(symbol|date), symbol should be a metric name"));
+                       DataFiltererrors << QString(tr("%1(symbol|date), symbol should be a metric name")).arg(leaf->function);
 
                     } else if (leaf->fparms.count() >= 1) {
 
                         QString symbol=*(leaf->fparms[0]->lvalue.n);
-                        if (symbol != "date" && df->lookupMap.value(symbol,"") == "") {
+                        if (symbol != "date" && symbol != "time" && df->lookupMap.value(symbol,"") == "") {
                             leaf->inerror = true;
-                            DataFiltererrors << QString(tr("invalid symbol '%1', should be either a metric name or 'date'").arg(symbol));
+                            DataFiltererrors << QString(tr("invalid symbol '%1', should be either a metric name or 'time' or 'date'").arg(symbol));
                         }
                     } else if (leaf->fparms.count() >= 2) {
 
@@ -1918,7 +2253,58 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
                     } else if (leaf->fparms.count() > 3) {
 
                        leaf->inerror = true;
-                       DataFiltererrors << QString(tr("too many parameters: metrics(symbol|date, start, stop)"));
+                       DataFiltererrors << QString(tr("too many parameters: %1(symbol|date, start, stop)")).arg(leaf->function);
+                    }
+
+                } else if (leaf->function == "intervals" || leaf->function == "intervalstrings") {
+
+                    // is the param a symbol and either a metric name or 'date'
+                    if (leaf->fparms.count() < 1 || leaf->fparms[0]->type != Leaf::Symbol) {
+                       leaf->inerror = true;
+                       DataFiltererrors << QString(tr("%1(symbol|name|start|stop|type|test|color|route|selected|date|filename), symbol should be a metric name").arg(leaf->function));
+
+                    } else if (leaf->fparms.count() >= 1) {
+
+                        QRegExp symbols("^(name|start|stop|type|test|color|route|selected|date|time|filename)$");
+                        QString symbol=*(leaf->fparms[0]->lvalue.n);
+                        if (!symbols.exactMatch(symbol) && df->lookupMap.value(symbol,"") == "") {
+                            leaf->inerror = true;
+                            DataFiltererrors << QString(tr("invalid symbol '%1', should be either a metric name or 'name|start|stop|type|test|color|route|selected|date|time|filename''").arg(symbol));
+
+                        }
+                    } else if (leaf->fparms.count() >= 2) {
+
+                        // validate what was passed as second value - can be number or datestring
+                        validateFilter(context, df, leaf->fparms[1]);
+
+                    } else if (leaf->fparms.count() == 3) {
+
+                        // validate what was passed as second value - can be number or datestring
+                        validateFilter(context, df, leaf->fparms[2]);
+
+                    } else if (leaf->fparms.count() > 3) {
+
+                       leaf->inerror = true;
+                       DataFiltererrors << QString(tr("too many parameters: %1(symbol, start, stop)").arg(leaf->function));
+                    }
+
+                } else if (leaf->function == "events") {
+
+                    // is the param a symbol
+                    if (leaf->fparms.count() != 1 || leaf->fparms[0]->type != Leaf::Symbol) {
+                       leaf->inerror = true;
+                       DataFiltererrors << QString(tr("%1(name|date|priority|description)").arg(leaf->function));
+
+                    } else if (leaf->fparms.count() == 1) {
+
+                        QRegExp symbols("^(name|date|priority|description)$");
+                        QString symbol=*(leaf->fparms[0]->lvalue.n);
+                        if (!symbols.exactMatch(symbol) && df->lookupMap.value(symbol,"") == "") {
+                            leaf->inerror = true;
+                            DataFiltererrors << QString(tr("invalid symbol '%1', should be 'name|date|priority|description''").arg(symbol));
+
+                        }
+
                     }
 
                 } else if (leaf->function == "bests") {
@@ -2223,16 +2609,51 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
                     if (leaf->fparms.count() < 2 || leaf->fparms[0]->type != Leaf::Symbol) {
 
                        leaf->inerror = true;
-                       DataFiltererrors << QString(tr("annotate(label, list of strings, numbers) need at least 2 parameters."));
+                       DataFiltererrors << QString(tr("annotate(label|hline|vline|voronoi, ...) need at least 2 parameters."));
 
                     } else {
 
                         QString type = *(leaf->fparms[0]->lvalue.n);
+
+                        // is the type of annotation supported?
                         if (!annotateTypes.exactMatch(type)) {
                             leaf->inerror = true;
                             DataFiltererrors << QString(tr("annotation type '%1' not available").arg(type));
                         } else {
-                            for(int i=1; i<leaf->fparms.count(); i++) validateFilter(context, df, leaf->fparms[i]);
+
+                            // its valid type, but what about the parameters?
+                            if (type == "voronoi" && leaf->fparms.count() != 2) { // VORONOI
+
+                                leaf->inerror = true;
+                                DataFiltererrors << QString(tr("annotate(voronoi, centers)"));
+
+                            } else if (type == "lr") { // LINEAR REGRESSION LINE
+
+                                if (leaf->fparms.count() != 3 || linestyle(*(leaf->fparms[1]->lvalue.n)) == Qt::NoPen) {
+
+                                    leaf->inerror = true;
+                                    DataFiltererrors << QString(tr("annotate(lr, solid|dash|dot|dashdot|dashdotdot, \"colorname\")"));
+
+                                }
+
+                            } else if (type == "hline" || type == "vline") { // HLINE and VLINE
+
+                                // just make sure the type of line is supported, the other parameters
+                                // can be coerced from whatever the user passed anyway
+                                if (leaf->fparms.count() != 4 || leaf->fparms[2]->type != Leaf::Symbol
+                                                                  || linestyle(*(leaf->fparms[2]->lvalue.n)) == Qt::NoPen) {
+                                    leaf->inerror = true;
+                                    DataFiltererrors << QString(tr("annotate(hline|vline, 'label', solid|dash|dot|dashdot|dashdotdot, value)"));
+                                } else {
+                                    // make sure the parms are well formed
+                                    validateFilter(context, df, leaf->fparms[1]);
+                                    validateFilter(context, df, leaf->fparms[3]);
+                                }
+
+                            } else { // Any other types, e.g LABEL
+
+                                for(int i=1; i<leaf->fparms.count(); i++) validateFilter(context, df, leaf->fparms[i]);
+                            }
                         }
                     }
 
@@ -2492,6 +2913,7 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
 
                             //  some specials are not allowed
                             if (!symbol.compare("Date", Qt::CaseInsensitive) ||
+                                !symbol.compare("Time", Qt::CaseInsensitive) ||
                                 !symbol.compare("x", Qt::CaseInsensitive) || // used by which
                                 !symbol.compare("i", Qt::CaseInsensitive) || // used by which
                                 !symbol.compare("Today", Qt::CaseInsensitive) ||
@@ -2690,7 +3112,7 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
     }
 }
 
-DataFilter::DataFilter(QObject *parent, Context *context) : QObject(parent), context(context), treeRoot(NULL)
+DataFilter::DataFilter(QObject *parent, Context *context) : QObject(parent), context(context), treeRoot(NULL), parent_(parent)
 {
     // let folks know who owns this rumtime for signalling
     rt.owner = this;
@@ -2718,7 +3140,7 @@ DataFilter::DataFilter(QObject *parent, Context *context) : QObject(parent), con
     //connect(context, SIGNAL(rideSelected(RideItem*)), this, SLOT(dynamicParse()));
 }
 
-DataFilter::DataFilter(QObject *parent, Context *context, QString formula) : QObject(parent), context(context), treeRoot(NULL)
+DataFilter::DataFilter(QObject *parent, Context *context, QString formula) : QObject(parent), context(context), treeRoot(NULL), parent_(parent)
 {
     // let folks know who owns this rumtime for signalling
     rt.owner = this;
@@ -2757,14 +3179,12 @@ DataFilter::DataFilter(QObject *parent, Context *context, QString formula) : QOb
     else
         treeRoot=NULL;
 
-    // save away the results if it passed semantic validation
-    if (DataFiltererrors.count() != 0)
-        treeRoot= NULL;
+    errors = DataFiltererrors;
 }
 
 Result DataFilter::evaluate(RideItem *item, RideFilePoint *p)
 {
-    if (!item || !treeRoot || DataFiltererrors.count())
+    if (!item || !treeRoot || errors.count())
         return Result(0);
 
     // reset stack
@@ -2790,6 +3210,11 @@ Result DataFilter::evaluate(RideItem *item, RideFilePoint *p)
 
 Result DataFilter::evaluate(Specification spec, DateRange dr)
 {
+    // if there is no current ride item then there is no data
+    // so it really is ok to baulk at no current ride item here
+    // we must always have a ride since context is used
+    if (context->currentRideItem() == NULL || !treeRoot || errors.count()) return Result(0);
+
     Result res(0);
 
     // if we are a set of functions..
@@ -2810,11 +3235,6 @@ Result DataFilter::evaluate(Specification spec, DateRange dr)
 
 Result DataFilter::evaluate(DateRange dr, QString filter)
 {
-    // if there is no current ride item then there is no data
-    // so it really is ok to baulk at no current ride item here
-    // we must always have a ride since context is used
-    if (context->currentRideItem() == NULL || !treeRoot || DataFiltererrors.count()) return Result(0);
-
     // reset stack
     rt.stack = 0;
 
@@ -2844,6 +3264,7 @@ QStringList DataFilter::check(QString query)
 
     // if it passed syntax lets check semantics
     if (treeRoot && DataFiltererrors.count() == 0) treeRoot->validateFilter(context, &rt, treeRoot);
+    else treeRoot = NULL;
 
     // ok, did it pass all tests?
     if (!treeRoot || DataFiltererrors.count() > 0) { // nope
@@ -2884,6 +3305,7 @@ QStringList DataFilter::parseFilter(Context *context, QString query, QStringList
 
     // if it passed syntax lets check semantics
     if (treeRoot && DataFiltererrors.count() == 0) treeRoot->validateFilter(context, &rt, treeRoot);
+    else treeRoot = NULL;
 
     // ok, did it pass all tests?
     if (!treeRoot || DataFiltererrors.count() > 0) { // nope
@@ -2948,7 +3370,9 @@ void DataFilter::clearFilter()
 {
     if (treeRoot) {
         treeRoot->clear(treeRoot);
+        delete treeRoot;
         treeRoot = NULL;
+        errors.clear();
     }
     rt.isdynamic = false;
     sig = "";
@@ -2964,8 +3388,7 @@ void DataFilter::configChanged(qint32)
     const RideMetricFactory &factory = RideMetricFactory::instance();
     for (int i=0; i<factory.metricCount(); i++) {
         QString symbol = factory.metricName(i);
-        QString name = GlobalContext::context()->specialFields.internalName(factory.rideMetric(symbol)->name());
-
+        QString name = factory.rideMetric(symbol)->internalName();
         rt.lookupMap.insert(name.replace(" ","_"), symbol);
         rt.lookupType.insert(name.replace(" ","_"), true);
     }
@@ -3033,7 +3456,7 @@ static int monthsTo(QDate from, QDate to)
     return months;
 }
 
-Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, RideItem *m, RideFilePoint *p, const QHash<QString,RideMetric*> *c, Specification s, DateRange d)
+Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, RideItem *m, RideFilePoint *p, const QHash<QString,RideMetric*> *c, const  Specification &s, const DateRange &d)
 {
     // if error state all bets are off
     //if (inerror) return Result(0);
@@ -3079,8 +3502,9 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
     {
         double duration;
 
-        // calling a user defined function
-        if (df->functions.contains(leaf->function)) {
+        // calling a user defined function (but don't call user defined count in user metrics)
+        // terrible design mistake using "count" as a user defined function for user metrics. Sorry.
+        if (leaf->function != "count" && df->functions.contains(leaf->function)) {
 
             // going down
             df->stack += 1;
@@ -3108,6 +3532,15 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
             return !eval(df, leaf->fparms[0],x, it, m, p, c, s, d).isNumber;
         }
 
+        // coersion
+        if (leaf->function == "double") {
+
+            Result returning = eval(df, leaf->fparms[0],x, it, m, p, c, s, d);
+
+            // coerce to string and then force returning as a string
+            if (returning.isVector()) return returning.asNumeric();
+            else return returning.number();
+        }
 
         // string functions
         if (leaf->function == "tolower") {
@@ -3235,7 +3668,149 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
             return df->functions.contains(symbol) || df->symbols.contains(symbol);
         }
 
+        if (leaf->function == "datestring" || leaf->function == "timestring") {
+
+            Result returning;
+
+            QDate earliest(1900,01,01);
+            bool wantdate = leaf->function == "datestring";
+            Result r=eval(df, leaf->fparms[0],x, it, m, p, c, s, d);
+
+            if (r.isVector()) {
+                QVector<QString> list;
+                foreach(double n, r.asNumeric()) {
+                    if (wantdate) list << earliest.addDays(n).toString("dd MMM yyyy");
+                    else list << time_to_string(n);
+                }
+                returning = Result(list);
+            } else {
+
+                float n = r.number();
+                if (wantdate) returning = Result(earliest.addDays(n).toString("dd MMM yyyy"));
+                else returning = Result(time_to_string(n));
+            }
+            return returning;
+        }
+
+        // aggregate strings is easier to separate
+        if (leaf->function == "asaggstring") {
+
+            Result returning(0);
+            returning.isNumber = false;
+
+            if (m == NULL) return Result(0); // no ride then no context
+
+            Specification spec = s;
+            FilterSet fs = spec.filterSet();
+            fs.addFilter(m->context->isfiltered, m->context->filters);
+            fs.addFilter(m->context->ishomefiltered, m->context->homeFilters);
+            spec.setFilterSet(fs);
+            spec.setDateRange(d);  // current date range selected
+
+            // we get passed a list of metrics that we need to aggregate and return
+            // one value for each parameter passed
+            for(int i=0; i<leaf->fparms.count(); i++) {
+
+                // symbol dereference
+                QString symbol=*(leaf->fparms[i]->lvalue.n);
+                QString o_symbol = df->lookupMap.value(symbol,"");
+
+                // get metric aggregate from RideCache and return
+                returning.asString() << m->context->athlete->rideCache->getAggregate(o_symbol, spec, GlobalContext::context()->useMetricUnits);
+            }
+
+            return returning;
+        }
+
+        if (leaf->function == "metricname" || leaf->function == "metricunit" || leaf->function == "asstring") {
+
+            bool wantname = (leaf->function == "metricname");
+            bool wantunit = (leaf->function == "metricunit");
+
+            QVector<QString> list;
+
+            QRegExp symbols("^(name|start|stop|type|test|color|route|selected|date|time|filename)$");
+            for(int i=0; i<leaf->fparms.count(); i++) {
+
+                // symbol dereference
+                QString symbol=*(leaf->fparms[i]->lvalue.n);
+                QString o_symbol = df->lookupMap.value(symbol,"");
+                RideMetricFactory &factory = RideMetricFactory::instance();
+                const RideMetric *e = factory.rideMetric(o_symbol);
+
+                if (wantname  && symbol == "date") list << tr("Date");
+                else if (wantname  && symbol == "time") list << tr("Time");
+                else if (wantname  && symbol == "name") list << tr("Name");
+                else if (wantname  && symbol == "start") list << tr("Start");
+                else if (wantname  && symbol == "stop") list << tr("Stop");
+                else if (wantname  && symbol == "type") list << tr("Type");
+                else if (wantname  && symbol == "test") list << tr("Test");
+                else if (wantname  && symbol == "color") list << tr("Color");
+                else if (wantname  && symbol == "route") list << tr("Route");
+                else if (wantname  && symbol == "selected") list << tr("Selected");
+                else if (wantname  && symbol == "filename") list << tr("File Name");
+                else if (wantunit && symbols.exactMatch(symbol))
+                    list << "";
+                else {
+                    if (e && m) {
+                        if (wantname) list << e->name();
+                        else if (wantunit) list << e->units(GlobalContext::context()->useMetricUnits);
+                        else {
+                            // get metric value then convert to string
+                            double value = 0;
+                            if (c) value = RideMetric::getForSymbol(o_symbol, c);
+                            else value = m->getForSymbol(o_symbol, GlobalContext::context()->useMetricUnits);
+
+                            // use metric converter to get as string with correct dp etc
+                            list << e->toString(value);
+                        }
+                    }
+                    else list << "(null)";
+                }
+            }
+
+            // return a single value, or a list
+            if (list.count() == 1) return Result(list[0]);
+            else return Result(list);
+        }
+
+        if (leaf->function == "activities") {
+
+            // filters activities using an expression, in the same way the
+            // daterange function filters on date, in fact the daterange
+            // closure could be implemented using activities and an expression
+
+            if (m == NULL) return Result(0); // no ride then no context
+
+            // the user will have ecaped quotes to embed in a string
+            QString prog = *(leaf->fparms[0]->lvalue.s);
+
+            // now compile it
+            DataFilter filter(df->owner->parent(), df->owner->context, prog);
+
+            // failed to parse
+            if (filter.root() == NULL) {
+                return Result(0);
+            }
+
+            // get a filter list
+            QStringList filters;
+            foreach(RideItem *ride, m->context->athlete->rideCache->rides()) {
+
+                Result r = filter.evaluate(ride, NULL);
+                if (r.number()) filters << ride->fileName;
+            }
+            Specification spec = s;
+            spec.addMatches(filters);
+
+            // now evaluate- but using an updated specification
+            return  eval(df, leaf->fparms[1],x, it, m, p, c, spec, d);
+        }
+
         if (leaf->function == "daterange") {
+
+            // cannot get a context via ride as none selected or available
+            if (m == NULL) return Result(0);
 
             // sets the daterange for the expression, a bit like a closure
             // so we don't have to add parameters to functions that do things
@@ -3266,7 +3841,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
 
         if (leaf->function == "config") {
             //
-            // Get CP and W' estimates for date of ride
+            // Get CP and W' for date of ride
             //
             double CP = 0;
             double AeTP = 0;
@@ -3274,6 +3849,8 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
             double WPRIME = 0;
             double PMAX = 0;
             int zoneRange;
+
+            if (m == NULL) return Result(0); // no ride then no context
 
             if (m->context->athlete->zones(m->sport)) {
 
@@ -3390,7 +3967,168 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
             }
         }
 
-        // bool(expr)
+        // zone descriptions and high / lows, but not cp/cv, w'/d' et al
+        if (leaf->function == "zones") {
+            // parms
+            QString series = *leaf->fparms[0]->lvalue.n;
+            QString field = *leaf->fparms[1]->lvalue.n;
+
+            // what we will ultimately return
+            QVector<QString> strings;
+
+            // if m is null all bets are off
+            if (m == NULL) return Result(0);
+
+            // we want to minimise duplicated code
+            // so get the zones and ranges setup
+            // then loop through the zones in a single
+            // loop, so lets get the control variables here
+            QString sport;
+            QDate date;
+            const Zones *powerzones;
+            const HrZones *hrzones;
+            const PaceZones *pacezones;
+
+            // which sport and date?
+            if (d == DateRange()) {
+                // Actvities view: activity sport and date
+                sport = m->sport;
+                date = m->dateTime.date();
+            } else {
+                // Trends view: sport from included activities and range end date
+                int nActivities, nRides, nRuns, nSwims;
+                m->context->athlete->rideCache->getRideTypeCounts(s, nActivities, nRides, nRuns, nSwims, sport);
+                date = d.to;
+            }
+
+            // which range and how many zones are there
+            int range=-1, nzones = 0;
+
+            // metric prefix
+            QString metricprefix;
+
+            // metric/imperial pace setting for runs and swims
+            bool metricpace;
+
+            // setup
+            if (series == "power") {
+
+                // power zones are for Run or Bike, but not Swim
+                powerzones = m->context->athlete->zones(sport);
+                range= powerzones->whichRange(date);
+                if (range >= 0) nzones = powerzones->numZones(range);
+                metricprefix = "time_in_zone_L";
+
+            } else if (series == "hr") {
+
+                // hr zones are also for run or bike, but not Swim
+                hrzones = m->context->athlete->hrZones(sport);
+                range= hrzones->whichRange(date);
+                if (range >= 0) nzones = hrzones->numZones(range);
+                metricprefix = "time_in_zone_H";
+
+            } else if (series == "pace") {
+
+                // pace zones are for run or swim
+                pacezones = m->context->athlete->paceZones(sport == "Swim");
+                range= pacezones->whichRange(date);
+                if (range >= 0) nzones = pacezones->numZones(range);
+                metricprefix = "time_in_zone_P";
+                metricpace = appsettings->value(nullptr, pacezones->paceSetting(), GlobalContext::context()->useMetricUnits).toBool();
+
+            } else if (series == "fatigue") {
+
+                int WPRIME = 0;
+                powerzones = m->context->athlete->zones(sport);
+                range = powerzones->whichRange(date);
+                if (range >= 0) WPRIME = powerzones->getWprime(range);
+                // easy for us, they are hardcoded
+                for (int i=0; i<WPrime::zoneCount(); i++) {
+                    if (field == "name") strings << WPrime::zoneName(i);
+                    else if (field == "description") strings << WPrime::zoneDesc(i);
+                    else if (field == "low") strings << QString("%1").arg(WPrime::zoneLo(i, WPRIME));
+                    else if (field == "high") strings << QString("%1").arg(WPrime::zoneHi(i, WPRIME));
+                }
+                metricprefix = "wtime_in_zone_L";
+                range=-1;
+                nzones=WPrime::zoneCount(); // for metric lookup
+
+            }
+
+            if (field == "units") {
+
+                // Units are fixed, except for pace where they depend on sport
+                if (series == "power") return Result(RideFile::unitName(RideFile::watts, nullptr));
+                else if (series == "hr") return Result(RideFile::unitName(RideFile::hr, nullptr));
+                else if (series == "pace") return Result(pacezones->paceUnits(metricpace));
+                else if (series == "fatigue") return Result(RideFile::unitName(RideFile::wprime, nullptr));
+
+            } else if (field == "time" ) {
+
+                // time in zones and percent in zones use metrics
+                for(int n=0; n<nzones; n++) {
+                    QString name = QString("%1%2").arg(metricprefix).arg(n+1);
+                    double value = (d==DateRange()) ? m->getForSymbol(name, true)
+                                                    : m->context->athlete->rideCache->getAggregate(name, s, true, true).toDouble();
+                    strings << time_to_string(value);
+                }
+
+            } else if (field == "percent") {
+
+                QString totalMetric = (series == "fatigue") ? "workout_time" : "time_recording";
+
+                double total = (d==DateRange()) ? m->getForSymbol(totalMetric, true)
+                                                : m->context->athlete->rideCache->getAggregate(totalMetric, s, true, true).toDouble();
+                for(int n=0; n<nzones; n++) {
+                    QString name = QString("%1%2").arg(metricprefix).arg(n+1);
+                    double value = (d==DateRange()) ? m->getForSymbol(name, true)
+                                                    : m->context->athlete->rideCache->getAggregate(name, s, true, true).toDouble();
+                    double percent = round(value/total * 100.0);
+                    strings << QString("%1").arg(percent);
+                }
+
+            } else {
+
+                // all other fields use zoneinfo
+
+                for(int n=0; range >=0 && n<nzones; n++) {
+
+                    // placeholders for various zoneinfo calls
+                    QString name, desc;
+                    int ilow, ihigh;
+                    double low,high;
+                    double trimp; // ignored
+
+                    if (series == "power") { powerzones->zoneInfo(range, n, name, desc, ilow, ihigh); low=ilow; high=ihigh; }
+                    else if (series == "hr") { hrzones->zoneInfo(range, n, name, desc, ilow, ihigh, trimp);low=ilow; high=ihigh; }
+                    else if (series == "pace") pacezones->zoneInfo(range, n, name, desc, low, high);
+
+
+                    // so now we can do our thing - use the scheme for the names...
+                    if (field == "name")  strings << name;
+
+                    else if (field == "description") strings << desc;
+
+                    else if (field == "low") {
+                        if (series != "pace") strings << QString("%1").arg(low);
+                        else strings << pacezones->kphToPaceString(low, metricpace);
+
+                    } else if (field == "high") {
+                        if (n==nzones-1) strings << ""; // infinite, so make blank
+                        else {
+                            if (series != "pace") strings << QString("%1").arg(high);
+                            else strings << pacezones->kphToPaceString(high, metricpace);
+                        }
+                    }
+                }
+
+            }
+
+            // returning what was collected
+            return Result(strings);
+        }
+
+        // bool(expr) - convert to boolean
         if (leaf->function == "bool") {
             Result r=eval(df, leaf->fparms[0],x, it, m, p, c, s, d);
             if (r.isVector()) {
@@ -3405,6 +4143,26 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
                 if (r.number() != 0) return Result(1);
                 else return Result(0);
             }
+        }
+
+        // string(expr) convert to string
+        if (leaf->function == "string") {
+            Result r=eval(df, leaf->fparms[0],x, it, m, p, c, s, d);
+
+            if (r.isNumber) {
+                if (r.isVector()) {
+                    QVector<QString> results;
+                    for(int i=0; i<r.asNumeric().count(); i++) {
+                        QString asstring = Utils::removeDP(QString("%1").arg(r.asNumeric().at(i)));
+                        results << asstring;
+                    }
+                    return Result(results);
+                } else {
+                    return Result(Utils::removeDP(QString("%1").arg("g", r.number())));
+                }
+            }
+
+            return r; // just return what it is
         }
 
         // c (concat into a vector)
@@ -3441,6 +4199,130 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
                 }
                 if (!asstring) returning.number() += v.number();
             }
+            return returning;
+        }
+
+        if (leaf->function == "pdfbeta") {
+
+            Result returning(0);
+            double a= eval(df, leaf->fparms[0],x, it, m, p, c, s, d).number();
+            double b= eval(df, leaf->fparms[1],x, it, m, p, c, s, d).number();
+            Result v= eval(df, leaf->fparms[2],x, it, m, p, c, s, d);
+
+            if (v.isVector() && v.isNumber) {
+
+                // vector
+                foreach(double val, v.asNumeric()) {
+                    double f = gsl_ran_beta_pdf(val, a, b);
+                    returning.asNumeric() << f;
+                    returning.number() += f;
+                }
+
+            } else if (v.isNumber) returning.number() = gsl_ran_beta_pdf(v.number(), a,b);
+
+            return returning;
+        }
+
+        if (leaf->function == "cdfbeta") {
+
+            Result returning(0);
+            double a= eval(df, leaf->fparms[0],x, it, m, p, c, s, d).number();
+            double b= eval(df, leaf->fparms[1],x, it, m, p, c, s, d).number();
+            Result v= eval(df, leaf->fparms[2],x, it, m, p, c, s, d);
+
+            if (v.isVector() && v.isNumber) {
+
+                // vector
+                foreach(double val, v.asNumeric()) {
+                    double f = gsl_cdf_beta_P(val, a, b);
+                    returning.asNumeric() << f;
+                    returning.number() += f;
+                }
+
+            } else if (v.isNumber) returning.number() = gsl_cdf_beta_P(v.number(), a,b);
+
+            return returning;
+        }
+
+        if (leaf->function == "pdfgamma") {
+
+            Result returning(0);
+            double a= eval(df, leaf->fparms[0],x, it, m, p, c, s, d).number();
+            double b= eval(df, leaf->fparms[1],x, it, m, p, c, s, d).number();
+            Result v= eval(df, leaf->fparms[2],x, it, m, p, c, s, d);
+
+            if (v.isVector() && v.isNumber) {
+
+                // vector
+                foreach(double val, v.asNumeric()) {
+                    double f = gsl_ran_gamma_pdf(val, a, b);
+                    returning.asNumeric() << f;
+                    returning.number() += f;
+                }
+
+            } else if (v.isNumber) returning.number() = gsl_ran_gamma_pdf(v.number(), a,b);
+
+            return returning;
+        }
+
+        if (leaf->function == "cdfgamma") {
+
+            Result returning(0);
+            double a= eval(df, leaf->fparms[0],x, it, m, p, c, s, d).number();
+            double b= eval(df, leaf->fparms[1],x, it, m, p, c, s, d).number();
+            Result v= eval(df, leaf->fparms[2],x, it, m, p, c, s, d);
+
+            if (v.isVector() && v.isNumber) {
+
+                // vector
+                foreach(double val, v.asNumeric()) {
+                    double f = gsl_cdf_gamma_P(val, a, b);
+                    returning.asNumeric() << f;
+                    returning.number() += f;
+                }
+
+            } else if (v.isNumber) returning.number() = gsl_cdf_gamma_P(v.number(), a,b);
+
+            return returning;
+        }
+
+        if (leaf->function == "cdfnormal") {
+
+            Result returning(0);
+            double sigma= eval(df, leaf->fparms[0],x, it, m, p, c, s, d).number();
+            Result v= eval(df, leaf->fparms[1],x, it, m, p, c, s, d);
+
+            if (v.isVector() && v.isNumber) {
+
+                // vector
+                foreach(double val, v.asNumeric()) {
+                    double f = gsl_cdf_gaussian_P(val, sigma);
+                    returning.asNumeric() << f;
+                    returning.number() += f;
+                }
+
+            } else if (v.isNumber) returning.number() = gsl_cdf_gaussian_P(v.number(), sigma);
+
+            return returning;
+        }
+
+        if (leaf->function == "pdfnormal") {
+
+            Result returning(0);
+            double sigma= eval(df, leaf->fparms[0],x, it, m, p, c, s, d).number();
+            Result v= eval(df, leaf->fparms[1],x, it, m, p, c, s, d);
+
+            if (v.isVector() && v.isNumber) {
+
+                // vector
+                foreach(double val, v.asNumeric()) {
+                    double f = gsl_ran_gaussian_pdf(val, sigma);
+                    returning.asNumeric() << f;
+                    returning.number() += f;
+                }
+
+            } else if (v.isNumber) returning.number() = gsl_ran_gaussian_pdf(v.number(), sigma);
+
             return returning;
         }
 
@@ -3483,12 +4365,12 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
             double count= eval(df, leaf->fparms[1],x, it, m, p, c, s, d).number();
 
             if (count <= 0) return returning;
-
             while (count >0) {
                 if (value.isNumber) {
                     returning.asNumeric().append(value.number());
                     returning.number() += value.number();
                 } else {
+                    returning.isNumber = false;
                     returning.asString().append(value.string());
                 }
                 count--;
@@ -3676,6 +4558,8 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
             // do it...
             if (append.isVector()) {
 
+                current.number() += append.number();
+
                 if (pos==-1) {
                     if (current.isNumber) current.asNumeric().append(append.asNumeric());
                     else current.asString().append(append.asString());
@@ -3692,6 +4576,9 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
                 }
 
             } else {
+
+                current.number() += append.number();
+
                 if (current.isNumber) {
                     if (pos == -1) current.asNumeric().append(append.number()); // just a single number
                     else current.asNumeric().insert(pos, append.number()); // just a single number
@@ -3799,6 +4686,11 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
                 int index=0;
                 if (km || secs || (index=xds->valuename.indexOf(series)) != -1) {
                     foreach(XDataPoint *p, xds->datapoints) {
+
+                        // honor interval boundaries when limits are set
+                        if (p->secs < s.secsStart()) continue;
+                        if (s.secsEnd() > -1 && p->secs > s.secsEnd()) break;
+
                         double value=0;
                         if (km) value = p->km;
                         else if (secs) value = p->secs;
@@ -3811,6 +4703,43 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
             }
             return returning;
         }
+
+        if (leaf->function == "xdataseries" || leaf->function == "xdataunits" || leaf->function=="xdatavalues") {
+            Result returning(0);
+
+            QString name = *(leaf->fparms[0]->lvalue.s);
+
+            // lets get the xdata series - only if the item is already open to avoid accidentally
+            // iterating over all ride data, same approach as in the samples function below
+            if (m == NULL || !m->isOpen() || m->ride(false) == NULL) {
+                return Result(0);
+
+            } else {
+                XDataSeries *xds = m->ride()->xdata(name);
+                if (xds == NULL) return returning;
+
+                // return a vector of all the column names
+                if (leaf->function == "xdataseries") returning = Result(xds->valuename);
+                if (leaf->function == "xdataunits") returning = Result(xds->unitname);
+
+
+                // now we need to get all the values into returning
+                // for every row we have
+                if (leaf->function == "xdatavalues") {
+
+                    for (int idx=0; idx <xds->valuename.count(); idx++) {
+                        foreach(XDataPoint *p, xds->datapoints) {
+
+                            returning.asNumeric() << p->number[idx];
+                            returning.number()  += p->number[idx];
+                        }
+                    }
+                }
+            }
+
+            return returning;
+        }
+
         if (leaf->function == "samples") {
 
             // nothing to return -- note we check if the ride is open
@@ -3863,6 +4792,9 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
 
             Result returning("");
             returning.isNumber = false;
+
+            if (m == NULL) return returning; // no ride then no context
+
             QString name = eval(df, leaf->fparms[0],x, it, m, p, c, s, d).string();
 
             if (d.from==QDate() && d.to==QDate()) {
@@ -3893,10 +4825,34 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
             return returning;
         }
 
+        // normalize values to between 0 and 1
+        // use when generating a heatmap in a data overview table
+        // but potentially for other things in the future
+        if (leaf->function == "normalize") {
+
+            Result min =  eval(df, leaf->fparms[0],x, it, m, p, c, s, d);
+            Result max =  eval(df, leaf->fparms[1],x, it, m, p, c, s, d);
+            Result value =  eval(df, leaf->fparms[2],x, it, m, p, c, s, d);
+            Result returning(0);
+
+            // return as number or vector
+            if (value.isVector()) {
+
+                foreach(double v, value.asNumeric()) returning.asNumeric() << Utils::heat(min.number(), max.number(), v);
+
+            } else {
+                returning = Result(Utils::heat(min.number(), max.number(), value.number()));
+            }
+
+            return returning;
+        }
+
         if (leaf->function == "filename") {
 
             Result returning("");
             returning.isNumber = false;
+
+            if (m == NULL) return returning; // no ride then no context
 
             if (d.from==QDate() && d.to==QDate()) {
 
@@ -3925,17 +4881,62 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
             return returning;
         }
 
-        if (leaf->function == "metrics") {
+        if (leaf->function == "kmeans") {
+            // kmeans(centers|assignments, k, dim1, dim2, dim3)
 
-            QDate earliest(1900,01,01);
-            bool wantdate=false;
-            QString symbol = *(leaf->fparms[0]->lvalue.n);
-            if (symbol == "date") wantdate=true;
             Result returning(0);
 
+            QString symbol = *(leaf->fparms[0]->lvalue.n);
+            bool wantcenters=false;
+            if (symbol == "centers") wantcenters=true;
+
+            // get k
+            int k = eval(df, leaf->fparms[1],x, it, m, p, c, s, d).number();
+
+            FastKmeans *kmeans = new FastKmeans();
+
+            // loop through the dimensions
+            for(int i=2; i<leaf->fparms.count(); i++)
+                kmeans->addDimension(eval(df, leaf->fparms[i],x, it, m, p, c, s, d).asNumeric());
+
+            // calculate
+            if (kmeans->run(k)) {
+                if (wantcenters) returning = kmeans->centers();
+                else returning = kmeans->assignments();
+            }
+
+            return returning;
+        }
+
+        if (leaf->function == "metrics" || leaf->function == "metricstrings" ||
+            leaf->function == "aggmetrics" || leaf->function == "aggmetricstrings") {
+
+            bool wantstrings = (leaf->function.endsWith("strings"));
+            QDate earliest(1900,01,01);
+            bool wantdate=false;
+            bool wanttime=false;
+            QString symbol = *(leaf->fparms[0]->lvalue.n);
+            if (symbol == "date") wantdate=true;
+            if (symbol == "time") wanttime=true;
+
+            // find the metric
+            QString o_symbol = df->lookupMap.value(symbol,"");
+            RideMetricFactory &factory = RideMetricFactory::instance();
+            const RideMetric *e = factory.rideMetric(o_symbol);
+
+            // only aggregate if its a metric!
+            bool wantaggregate = e != NULL && (leaf->function.startsWith("agg"));
+
+            // returning numbers or strings
+            Result returning(0);
+            Result durations(0); // for aggregating
+            if (wantstrings) returning.isNumber=false;
+
             FilterSet fs;
-            fs.addFilter(m->context->isfiltered, m->context->filters);
-            fs.addFilter(m->context->ishomefiltered, m->context->homeFilters);
+            if (m) {
+                fs.addFilter(m->context->isfiltered, m->context->filters);
+                fs.addFilter(m->context->ishomefiltered, m->context->homeFilters);
+            }
             Specification spec;
             spec.setFilterSet(fs);
 
@@ -3965,21 +4966,248 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
                 spec.setDateRange(d); // fallback to daterange selected
             }
 
+            // no ride selected, or none available
+            if (m == NULL) return Result(0);
+
+            // for aggregating
+            double withduration=0;
+            double totalduration=0;
+            double runningtotal=0;
+            double minimum=0;
+            double maximum=0;
+            double count=0;
+            // do we aggregate zero values ?
+            bool aggZero = e ? e->aggregateZero() : true;
+
             // loop through rides for daterange
-            int count=0;
             foreach(RideItem *ride, m->context->athlete->rideCache->rides()) {
 
                 if (!s.pass(ride)) continue; // relies upon the daterange being passed to eval...
                 if (!spec.pass(ride)) continue; // relies upon the daterange being passed to eval...
 
-                count++;
 
                 double value=0;
-                if(wantdate) value= QDate(1900,01,01).daysTo(ride->dateTime.date());
-                else value =  ride->getForSymbol(df->lookupMap.value(symbol,""));
-                returning.number() += value;
-                returning.asNumeric().append(value);
+                QString asstring;
+                if(wantdate) {
+                    value= QDate(1900,01,01).daysTo(ride->dateTime.date());
+                    if (wantstrings) asstring = ride->dateTime.date().toString("dd MMM yyyy");
+                } else if (wanttime) {
+                    value= QTime(0,0,0).secsTo(ride->dateTime.time());
+                    if (wantstrings) asstring = ride->dateTime.toString("hh:mm:ss");
+                } else {
+                    value =  ride->getForSymbol(o_symbol, GlobalContext::context()->useMetricUnits);
+                    if (wantstrings) e ? asstring = e->toString(value) : "(null)";
+                }
+
+                // keep count of time for ride, useful when averaging
+                count++;
+                double duration = ride->getCountForSymbol(o_symbol);
+                if (value || aggZero) totalduration += duration;
+                withduration += value * duration;
+                runningtotal += value;
+                if (count==1) {
+                    minimum = maximum = value;
+                } else {
+                    if (value <minimum) minimum=value;
+                    if (value >maximum) maximum=value;
+                }
+
+                if (wantstrings) { // capture strings as we go, only if we don't aggregate
+                    returning.asString().append(asstring);
+                } else {
+                    returning.number() += value;
+                    returning.asNumeric().append(value);
+                }
             }
+
+            // return an aggregate?
+            if (wantaggregate) {
+                double aggregate=0;
+                switch(e->type()) {
+                case RideMetric::Total:
+                case RideMetric::RunningTotal:
+                    aggregate = runningtotal;
+                    break;
+                default:
+                case RideMetric::Average:
+                    {
+                    // aggregate taking into account duration
+                    aggregate = withduration / totalduration;
+                    break;
+                    }
+                case RideMetric::Low:
+                    aggregate = minimum;
+                    break;
+                case RideMetric::Peak:
+                    aggregate = maximum;
+                    break;
+                }
+
+                // format and return
+                if (wantstrings) returning = Result(e->toString(aggregate));
+                else returning = Result(aggregate);
+            }
+
+            return returning;
+        }
+
+        if (leaf->function == "intervals" || leaf->function == "intervalstrings") {
+
+            bool currentride = false;
+            bool wantstrings = (leaf->function == "intervalstrings");
+            QDate earliest(1900,01,01);
+            QString symbol = *(leaf->fparms[0]->lvalue.n);
+
+            // find the metric
+            QString o_symbol = df->lookupMap.value(symbol,"");
+            RideMetricFactory &factory = RideMetricFactory::instance();
+            const RideMetric *e = factory.rideMetric(o_symbol);
+
+            // returning numbers or strings
+            Result returning(0);
+            if (wantstrings) returning.isNumber=false;
+
+            if (m == NULL) return returning; // no ride then no context
+
+            FilterSet fs;
+            fs.addFilter(m->context->isfiltered, m->context->filters);
+            fs.addFilter(m->context->ishomefiltered, m->context->homeFilters);
+            Specification spec;
+            spec.setFilterSet(fs);
+
+            // date range can be controlled, if no date range is set then we just
+            // use the currently selected date range if valid, otherwise current activity
+            if (leaf->fparms.count() == 3 && Leaf::isNumber(df, leaf->fparms[1]) && Leaf::isNumber(df, leaf->fparms[2])) {
+
+                // start to stop
+                Result b = eval(df, leaf->fparms[1],x, it, m, p, c, s, d);
+                QDate start = earliest.addDays(b.number());
+
+                Result e = eval(df, leaf->fparms[2],x, it, m, p, c, s, d);
+                QDate stop = earliest.addDays(e.number());
+
+                spec.setDateRange(DateRange(start,stop));
+
+            } else if (leaf->fparms.count() == 2 && Leaf::isNumber(df, leaf->fparms[1])) {
+
+                // start to today
+                Result b = eval(df, leaf->fparms[1],x, it, m, p, c, s, d);
+                QDate start = earliest.addDays(b.number());
+                QDate stop = QDate::currentDate();
+
+                spec.setDateRange(DateRange(start,stop));
+
+            } else if (d != DateRange()) {
+                spec.setDateRange(d); // fallback to daterange selected, if provided
+            } else {
+                currentride = true;
+            }
+
+            // no rides available or selected
+            if (m == NULL) return Result(0);
+
+            // loop through rides for daterange or currentride
+            foreach(RideItem *ride, m->context->athlete->rideCache->rides()) {
+
+                // when current ride is requested we loop one time to avoid code duplication,
+                // otherwise filters are honored and only passing rides are processed
+                if (currentride) ride = m;
+                else if (!s.pass(ride)) continue;
+                else if (!spec.pass(ride)) continue;
+
+                foreach(IntervalItem *ii, ride->intervals()) {
+
+                    double value=0;
+                    QString asstring;
+                    if(symbol == "date") {
+                        value= QDate(1900,01,01).daysTo(ride->dateTime.date());
+                        if (wantstrings) asstring = ride->dateTime.date().toString("dd MMM yyyy");
+                    } else if(symbol == "time") {
+                        value= QTime(0,0,0).secsTo(ride->dateTime.time().addSecs(ii->start));
+                        if (wantstrings) asstring = ride->dateTime.time().addSecs(ii->start).toString("hh:mm:ss");
+                    } else if(symbol == "filename") {
+                        asstring = ride->fileName;
+                    } else if(symbol == "name") {
+                        asstring = ii->name;
+                    } else if(symbol == "start") {
+                        value = ii->start;
+                        if (wantstrings) asstring = time_to_string(ii->start);
+                    } else if(symbol == "stop") {
+                        value = ii->stop;
+                        if (wantstrings) asstring = time_to_string(ii->stop);
+                    } else if(symbol == "type") {
+                        value = ii->type;
+                        if (wantstrings) asstring = RideFileInterval::typeDescription(ii->type);
+                    } else if(symbol == "test") {
+                        value = ii->test;
+                        if (wantstrings) asstring = QString("%1").arg(ii->test);
+                    } else if(symbol == "color") {
+                        // apply item color, remembering that 1,1,1 means use default (reverse in this case)
+                        if (ii->color == QColor(1,1,1,1)) {
+                            // use the inverted color, not plot marker as that hideous
+                            QColor col =GCColor::invertColor(GColor(CPLOTBACKGROUND));
+                            // white is jarring on a dark background!
+                            if (col==QColor(Qt::white)) col=QColor(127,127,127);
+                            asstring = col.name();
+                        } else {
+                            asstring = ii->color.name();
+                        }
+                    } else if(symbol == "route") {
+                        asstring = ii->route.toString();
+                    } else if(symbol == "selected") {
+                        value = ii->selected;
+                        asstring = QString("%1").arg(ii->selected);
+                    } else {
+                        value = ii->getForSymbol(df->lookupMap.value(symbol,""), GlobalContext::context()->useMetricUnits);
+                        if (wantstrings) e ? asstring = e->toString(value) : "(null)";
+                    }
+
+                    if (wantstrings) {
+                        returning.asString().append(asstring);
+                    } else {
+                        returning.number() += value;
+                        returning.asNumeric().append(value);
+                    }
+
+                }
+
+                // when current ride is requested we are done
+                if (currentride) break;
+            }
+            return returning;
+        }
+
+        if (leaf->function == "events") {
+
+            // symbol determines what to return
+            QString symbol = *(leaf->fparms[0]->lvalue.n);
+
+            // returning numbers or strings
+            Result returning(0);
+            if (symbol != "date") returning.isNumber = false;
+
+            if (m == NULL) return returning; // no ride then no context
+
+            QList<Season> tmpSeasons = m->context->athlete->seasons->seasons;
+            std::sort(tmpSeasons.begin(),tmpSeasons.end(),Season::LessThanForStarts);
+            foreach (Season s, tmpSeasons) {
+                foreach (SeasonEvent event, s.events) {
+                    if (event.date >= d.from && event.date <= d.to) {
+                        if (symbol == "date") {
+                            int value = QDate(1900,01,01).daysTo(event.date);
+                            returning.number() += value;
+                            returning.asNumeric().append(value);
+			} if (symbol == "name") {
+                            returning.asString().append(event.name);
+			} if (symbol == "priority") {
+                            returning.asString().append(SeasonEvent::priorityList().at(event.priority));
+			} if (symbol == "description") {
+                            returning.asString().append(event.description);
+                        }
+                    }
+                }
+            }
+
             return returning;
         }
 
@@ -3989,6 +5217,8 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
             Result returning(0);
             QDate earliest(1900,01,01);
             bool wantdate=false;
+
+            if (m == NULL) return Result(0); // no ride then no context
 
             FilterSet fs;
             fs.addFilter(m->context->isfiltered, m->context->filters);
@@ -4029,6 +5259,8 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
 
         // retrieve best meanmax effort for a given duration and daterange
         if (leaf->function == "bests") {
+
+            if (m == NULL) return Result(0); // no ride then no context
 
             // work out what the date range is...
             QDate earliest(1900,01,01);
@@ -4086,6 +5318,8 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
 
         // meanmax array
         if (leaf->function == "meanmax") {
+
+            if (m == NULL) return Result(0); // no ride then no context
 
             Result returning(0);
 
@@ -4472,6 +5706,8 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
         // distribution
         if (leaf->function == "dist") {
 
+            if (m == NULL) return Result(0); // no ride then no context
+
             Result returning(0);
 
             // get the two symbols
@@ -4684,6 +5920,9 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
 
         // store/fetch from athlete storage
         if (leaf->function == "store") {
+
+            if (m == NULL) return Result(0); // no ride then no context
+
             // name and value in parameter 1 and 2
             QString name= eval(df, leaf->fparms[0],x, it, m, p, c, s, d).string();
             Result value= eval(df, leaf->fparms[1],x, it, m, p, c, s, d);
@@ -4695,6 +5934,9 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
         }
 
         if (leaf->function == "fetch") {
+
+            if (m == NULL) return Result(0); // no ride then no context
+
             // name and value in parameter 1 and 2
             QString name= eval(df, leaf->fparms[0],x, it, m, p, c, s, d).string();
 
@@ -4944,6 +6186,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
                         if (v2.asNumeric()[i2] == find) {
                             returning.number() += i2;
                             returning.asNumeric() << i2;
+                            break;
                         }
                     }
                 }
@@ -4953,6 +6196,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
                     for(int i2=0; i2<v2.asString().count(); i2++) {
                         if (v2.asString()[i2] == find) {
                             returning.asNumeric() << i2;
+                            break;
                         }
                     }
                 }
@@ -4981,8 +6225,9 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
         // annotate
         if (leaf->function == "annotate") {
 
+            QString type = *(leaf->fparms[0]->lvalue.n);
 
-            if (*(leaf->fparms[0]->lvalue.n) == "label") {
+            if (type == "label") {
 
                 QStringList list;
 
@@ -5016,8 +6261,50 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
                 }
 
                 // send the signal.
-                if (list.count())  df->owner->annotateLabel(list);
+                if (list.count())  {
+                    GenericAnnotationInfo label(GenericAnnotationInfo::Label);
+                    label.labels = list;
+                    df->owner->annotate(label);
+                }
             }
+
+            if (type == "voronoi") {
+                Result centers = eval(df,leaf->fparms[1],x, it, m, p, c, s, d);
+
+                if (centers.isVector() && centers.isNumber && centers.asNumeric().count() >=2 && centers.asNumeric().count()%2 == 0) {
+
+                    GenericAnnotationInfo voronoi(GenericAnnotationInfo::Voronoi);
+                    int n=centers.asNumeric().count()/2;
+                    for(int i=0; i<n; i++) {
+                        voronoi.vx << centers.asNumeric()[i];
+                        voronoi.vy << centers.asNumeric()[i+n];
+                    }
+
+                    // send signal
+                    df->owner->annotate(voronoi);
+                }
+            }
+
+            if (type == "hline" || type == "vline") {
+
+                GenericAnnotationInfo line(type == "vline" ? GenericAnnotationInfo::VLine : GenericAnnotationInfo::HLine);
+                line.text =  eval(df,leaf->fparms[1],x, it, m, p, c, s, d).string();
+                line.linestyle = linestyle(*(leaf->fparms[2]->lvalue.n));
+                line.value = eval(df,leaf->fparms[3],x, it, m, p, c, s, d).number();
+
+                // send signal
+                df->owner->annotate(line);
+            }
+
+            if (type == "lr") {
+                GenericAnnotationInfo lr(GenericAnnotationInfo::LR);
+                lr.linestyle = linestyle(*(leaf->fparms[1]->lvalue.n));
+                lr.color = eval(df,leaf->fparms[2],x, it, m, p, c, s, d).string();
+
+                // send signal
+                df->owner->annotate(lr);
+            }
+
         }
 
         // smooth
@@ -5033,9 +6320,9 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
                 Result data = eval(df,leaf->fparms[0],x, it, m, p, c, s, d);
                 int pos=2; // fallback
 
-                if (type=="backward") pos=0;
-                if (type=="forward") pos=1;
-                if (type=="centered") pos=2;
+                if (type=="backward") pos=GC_SMOOTH_BACKWARD;
+                if (type=="forward") pos=GC_SMOOTH_FORWARD;
+                if (type=="centered") pos=GC_SMOOTH_CENTERED;
 
                 returning.asNumeric() = Utils::smooth_sma(data.asNumeric(), pos, window);
 
@@ -5193,6 +6480,8 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
         // pmc
         if (leaf->function == "pmc") {
 
+            if (m == NULL) return Result(0); // no ride then no context
+
             if (d.from==QDate() || d.to==QDate()) return Result(0);
 
             QString series = *(leaf->fparms[1]->lvalue.n);
@@ -5225,6 +6514,9 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
 
         // banister
         if (leaf->function == "banister") {
+
+            if (m == NULL) return Result(0); // no ride then no context
+
             Leaf *first=leaf->fparms[0];
             Leaf *second=leaf->fparms[1];
             Leaf *third=leaf->fparms[2];
@@ -5351,6 +6643,26 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
             return returning;
         }
 
+        // powerindex(power,duration) - return value or vector of values translating to powerindex
+        if (leaf->function == "powerindex") {
+
+            Result returning(0);
+            Result power = eval(df, leaf->fparms[0],x, it, m, p, c, s, d);
+            Result duration = eval(df, leaf->fparms[1],x, it, m, p, c, s, d);
+
+            if (power.isVector() && duration.isVector()) {
+                // return a vector
+                QVector<double> powerindexes;
+                for(int i=0; i<power.asNumeric().count() && i<duration.asNumeric().count(); i++)
+                    powerindexes << powerIndex(power.asNumeric().at(i), duration.asNumeric().at(i));
+                returning = Result(powerindexes);
+            } else {
+                // return a value
+                returning = Result(powerIndex(power.number(), duration.number()));
+            }
+            return returning;
+        }
+
         // get here for tiz and best
         if (leaf->function == "best" || leaf->function == "tiz") {
 
@@ -5370,7 +6682,8 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
                     if (df->lookupType.value(*(leaf->lvalue.l->lvalue.n)) == true) {
                         // numeric
                         if (c) duration = RideMetric::getForSymbol(rename=df->lookupMap.value(*(leaf->lvalue.l->lvalue.n),""), c);
-                        else duration = m->getForSymbol(rename=df->lookupMap.value(*(leaf->lvalue.l->lvalue.n),""));
+                        else if (m) duration = m->getForSymbol(rename=df->lookupMap.value(*(leaf->lvalue.l->lvalue.n),""));
+                        else duration = 0;
                     } else if (*(leaf->lvalue.l->lvalue.n) == "x") {
                         duration = Result(x).number();
                     } else if (*(leaf->lvalue.l->lvalue.n) == "i") {
@@ -5396,11 +6709,42 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
                 break;
             }
 
-            if (leaf->function == "best")
-                return Result(RideFileCache::best(m->context, m->fileName, leaf->seriesType, duration));
+            if (leaf->function == "best") {
 
-            if (leaf->function == "tiz") // duration is really zone number
+                if (m == NULL) return Result(0); // no ride then no context
+
+                return Result(RideFileCache::best(m->context, m->fileName, leaf->seriesType, duration));
+            }
+
+            if (leaf->function == "tiz") { // duration is really zone number
+
+                if (m == NULL) return Result(0); // no ride then no context
+
                 return Result(RideFileCache::tiz(m->context, m->fileName, leaf->seriesType, duration));
+            }
+        }
+
+        if (leaf->function == "round") {
+            // round(expr) or round(expr, dp)
+            Result returning(0);
+
+            double factor = 1; // 0 decimal places
+            if (leaf->fparms.count() == 2) {
+                Result dpv = eval(df, leaf->fparms[1],x, it, m, p, c, s, d);
+                factor=pow(10, dpv.number()); // multiply by then divide
+            }
+
+            Result v = eval(df, leaf->fparms[0],x, it, m, p, c, s, d);
+            if (v.asNumeric().count()) {
+                for(int i=0; i<v.asNumeric().count(); i++) {
+                    double r = round(v.asNumeric()[i]*factor)/factor;
+                    returning.asNumeric() << r;
+                    returning.number() += r;
+                }
+            } else {
+                returning.number() =  round(v.number()*factor)/factor;
+            }
+            return returning;
         }
 
         // if we get here its general function handling
@@ -5424,9 +6768,10 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
 
         switch (fnum) {
             case 0 : case 1 : case 2: case 3: case 4: case 5: case 6: case 7: case 8: case 9: case 10:
-            case 11 : case 12: case 13: case 14: case 15: case 16: case 17: case 18: case 19: case 20:
+            case 11 : case 12: case 13: case 14: case 15: case 16: case 18: case 19: case 20:
             {
                 Result returning(0);
+
 
                 // TRIG FUNCTIONS
 
@@ -5454,7 +6799,6 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
 
                 case 15 : func = ceil; break;
                 case 16 : func = floor; break;
-                case 17 : func = round; break;
 
                 case 18 : func = fabs; break;
                 case 19 : func = Utils::myisinf; break;
@@ -5621,24 +6965,36 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
                   break;
 
         case 26 : { /* LTS (expr) */
+
+                    if (m == NULL) return Result(0); // no ride then no context
+
                     PMCData *pmcData = m->context->athlete->getPMCFor(leaf->fparms[0], df);
                     return Result(pmcData->lts(m->dateTime.date()));
                   }
                   break;
 
         case 27 : { /* STS (expr) */
+
+                    if (m == NULL) return Result(0); // no ride then no context
+
                     PMCData *pmcData = m->context->athlete->getPMCFor(leaf->fparms[0], df);
                     return Result(pmcData->sts(m->dateTime.date()));
                   }
                   break;
 
         case 28 : { /* SB (expr) */
+
+                    if (m == NULL) return Result(0); // no ride then no context
+
                     PMCData *pmcData = m->context->athlete->getPMCFor(leaf->fparms[0], df);
                     return Result(pmcData->sb(m->dateTime.date()));
                   }
                   break;
 
         case 29 : { /* RR (expr) */
+
+                    if (m == NULL) return Result(0); // no ride then no context
+
                     PMCData *pmcData = m->context->athlete->getPMCFor(leaf->fparms[0], df);
                     return Result(pmcData->rr(m->dateTime.date()));
                   }
@@ -5648,6 +7004,8 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
         case 95 :
                 { /* ESTIMATE( model, CP | FTP | W' | PMAX | duration ) */
                   /* ESTIMATES( model, CP | FTP | W' | PMAX | duration | date) */
+
+                    if (m == NULL) return Result(0); // no ride then no context
 
                     // which model ?
                     QString model = *leaf->fparms[0]->lvalue.n;
@@ -5663,7 +7021,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
                         // power estimates in formulas, since the user can just divide by config(weight)
                         // or Athlete_Weight (which takes into account values stored in ride files.
                         // Bike or Run models are used according to activity type
-                        PDEstimate pde = m->context->athlete->getPDEstimateFor(m->dateTime.date(), model, false, m->isRun);
+                        PDEstimate pde = m->context->athlete->getPDEstimateFor(m->dateTime.date(), model, false, m->sport);
 
                         // no model estimate for this date
                         if (pde.parameters.count() == 0) return Result(0);
@@ -5704,11 +7062,17 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
 
                         Result returning(0);
 
+                        // Trends view: sport from included activities
+                        int nActivities, nRides, nRuns, nSwims;
+                        QString sport;
+                        m->context->athlete->rideCache->getRideTypeCounts(s, nActivities, nRides, nRuns, nSwims, sport);
+                        if (sport.isEmpty()) sport = "Bike"; // default to Bike estimates for backward compatibility
+
                         // date range, returning a vector
                         foreach(PDEstimate pde, m->context->athlete->getPDEstimates()) {
 
                             // does it match our criteria?
-                            if (pde.model == model && pde.parameters.count() != 0 && pde.from <= d.to && pde.to >= d.from && pde.run==false && pde.wpk==false) {
+                            if (pde.model == model && pde.parameters.count() != 0 && pde.from <= d.to && pde.to >= d.from && pde.wpk==false && pde.sport == sport) {
 
                                 // overlaps, but truncate the dates we return
                                 int dfrom, dto;
@@ -5801,6 +7165,9 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
 
         case 32 :
                 {   // SET (field, value, expression ) returns expression evaluated
+
+                    if (m == NULL) return Result(0); // no ride
+
                     Result returning(0);
 
                     if (leaf->fparms.count() < 3) return returning;
@@ -5871,6 +7238,9 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
                 break;
         case 33 :
                 {   // UNSET (field, expression ) remove override or tag
+
+                    if (m == NULL) return Result(0); // no ride
+
                     Result returning(0);
 
                     if (leaf->fparms.count() < 2) return returning;
@@ -5925,6 +7295,8 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
 
                     if (leaf->fparms.count() != 1) return Result(0);
 
+                    if (m == NULL) return Result(0); // no ride
+
                     // symbol we are setting
                     QString symbol = *(leaf->fparms[0]->lvalue.n);
 
@@ -5957,6 +7329,8 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
         case 36 :
                 {   // BESTTIME (distance[km])
 
+                    if (m == NULL) return Result(0); // no ride
+
                     if (leaf->fparms.count() != 1 || m->fileCache() == NULL) return Result(0);
 
                     return Result (m->fileCache()->bestTime(eval(df, leaf->fparms[0],x, it, m, p, c, s, d).number()));
@@ -5964,6 +7338,8 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
 
         case 37 :
                 {   // XDATA ("XDATA", "XDATASERIES", (sparse, repeat, interpolate, resample)
+
+                    if (m == NULL) return Result(0); // no ride
 
                     if (!p) {
 
@@ -6011,6 +7387,9 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
 
         case 39 :
                 {   // AUTOPROCESS(expression) to run automatic data processors
+
+                    if (m == NULL) return Result(0); // no ride
+
                     Result returning(0);
 
                     if (leaf->fparms.count() != 1) return returning;
@@ -6068,6 +7447,8 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
         case 41 :
                 {   // XDATA_UNITS ("XDATA", "XDATASERIES")
 
+                    if (m == NULL) return Result(0); // no ride
+
                     if (p) { // only valid when iterating
 
                         // processing ride item (e.g. filter, formula)
@@ -6097,6 +7478,9 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
 
         case 42 :
                 {   // MEASURE (DATE, GROUP, FIELD) get measure
+
+                    if (m == NULL) return Result(0); // no ride then no context
+
                     if (leaf->fparms.count() < 3) return Result(0);
 
                     Result days = eval(df, leaf->fparms[0],x, it, m, p, c, s, d);
@@ -6124,6 +7508,9 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
                 {
                     // if no parameters just return the number of tests either in the current
                     // date range -or- for the current ride
+
+                    if (m == NULL) return Result(0); // no ride then no context
+
                     if (leaf->fparms.count() == 0) {
 
                         // activity
@@ -6181,7 +7568,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
                                 }
                             } else {
                                 // look for bests on the same day
-                                Performance onday = m->context->athlete->rideCache->estimator->getPerformanceForDate(m->dateTime.date(), false); //XXX fixme for runs
+                                Performance onday = m->context->athlete->rideCache->estimator->getPerformanceForDate(m->dateTime.date(), m->sport);
                                 if (onday.duration >0) {
                                     double value = wantduration ? onday.duration : onday.power;
                                     returning.number() += value;
@@ -6191,10 +7578,10 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
 
                         } else {
 
-                            FilterSet fs;
+                            Specification spec = s;
+                            FilterSet fs = spec.filterSet();
                             fs.addFilter(m->context->isfiltered, m->context->filters);
                             fs.addFilter(m->context->ishomefiltered, m->context->homeFilters);
-                            Specification spec;
                             spec.setFilterSet(fs);
                             spec.setDateRange(d); // fallback to daterange selected
 
@@ -6220,10 +7607,16 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
 
                             } else {
 
+                                // Trends view: sport from included activities
+                                int nActivities, nRides, nRuns, nSwims;
+                                QString sport;
+                                m->context->athlete->rideCache->getRideTypeCounts(spec, nActivities, nRides, nRuns, nSwims, sport);
+                                if (sport.isEmpty()) sport = "Bike"; // default to Bike estimates for backward compatibility
+
                                 // weekly best performances
                                 QList<Performance> perfs = m->context->athlete->rideCache->estimator->allPerformances();
                                 foreach(Performance p, perfs) {
-                                    if (p.submaximal == false && p.run == false && p.when >= d.from && p.when <= d.to) { // XXX fixme p.run == false
+                                    if (p.submaximal == false && p.sport == sport && p.when >= d.from && p.when <= d.to) {
                                         double value = wantduration ? p.duration : p.power;
                                         returning.number() += value;
                                         returning.asNumeric() << value;
@@ -6251,6 +7644,8 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
 
         // run a script
  #ifdef GC_WANT_PYTHON
+        if (m == NULL) return Result(0); // no ride then no context
+
         if (leaf->function == "python")  return Result(df->runPythonScript(m->context, *leaf->lvalue.s, m, c, s));
  #endif
         return Result(0);
@@ -6267,6 +7662,8 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
         QString lhsstring;
         QString rename;
         QString symbol = *(leaf->lvalue.n);
+
+        if (m == NULL) return Result(0); // no ride then no context
 
         // ride series name when running through sample override metrics etc
         if (p && (lhsisNumber = df->dataSeriesSymbols.contains(*(leaf->lvalue.n))) == true) {
@@ -6311,6 +7708,10 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
             lhsdouble = m->isXtrain ? 1 : 0;
             lhsisNumber = true;
 
+        } else if (symbol == "isAero") {
+            lhsdouble = m->isAero ? 1 : 0;
+            lhsisNumber = true;
+
         } else if (!symbol.compare("NA", Qt::CaseInsensitive)) {
 
             lhsdouble = RideFile::NA;
@@ -6339,6 +7740,11 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
         } else if (!symbol.compare("Date", Qt::CaseInsensitive)) {
 
             lhsdouble = QDate(1900,01,01).daysTo(m->dateTime.date());
+            lhsisNumber = true;
+
+        } else if (!symbol.compare("Time", Qt::CaseInsensitive)) {
+
+            lhsdouble = QTime(0,0,0).secsTo(m->dateTime.time());
             lhsisNumber = true;
 
         } else if (isCoggan(symbol)) {
@@ -6458,37 +7864,55 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
                     if (df->symbols.contains(symbol)) {
                         Result sym = df->symbols.value(symbol);
 
+                        // assigning number to strings, need to coerce rhs to string
+                        if (rhs.isNumber && !sym.isNumber) {
+                            rhs.string();
+                            rhs.isNumber = false;
+                        }
+
+                        // assigning a string to a numeric vector - need to convert sym to strings
+                        if (sym.isNumber && !rhs.isNumber) {
+                            sym.asString(); // will coerce
+                            sym.isNumber = false;
+                        }
+
                         // is it a single value e.g. a[10] or a range e.g. a[x>2]
                         QVector<double> selected;
                         if (indexes.asNumeric().count()) selected=indexes.asNumeric();
                         else selected << indexes.number();
 
+                        int rindex=0;
                         for(int i=0; i< selected.count(); i++) {
 
                             int index=static_cast<int>(selected[i]);
 
+                            // get the next value to apply - needs to work with vectors
+                            // and vectors will be repeated if they are too short
+                            double number;
+                            QString string;
+                            if (rhs.isVector()) {
+                                if (rhs.isNumber) {
+                                    if (rindex > rhs.asNumeric().count()) rindex=0;
+                                    number = rhs.asNumeric()[rindex++];
+                                } else {
+                                    if (rindex > rhs.asString().count()) rindex=0;
+                                    string = rhs.asString()[rindex++];
+                                }
+                            } else {
+                                if (rhs.isNumber) number = rhs.number();
+                                else string = rhs.string();
+                            }
+
                             // working with numbers on both sides
                             if (rhs.isNumber && sym.isNumber) {
                                 if (sym.asNumeric().count() <= index) { sym.asNumeric().resize(index+1); }
-                                sym.asNumeric()[index] = rhs.number();
-                            }
-
-                            // assigning number to strings, need to coerce rhs to string
-                            if (rhs.isNumber && !sym.isNumber) {
-                                rhs.string();
-                                rhs.isNumber = false;
-                            }
-
-                            // assigning a string to a numeric vector - need to convert sym to strings
-                            if (sym.isNumber && !rhs.isNumber) {
-                                sym.asString(); // will coerce
-                                sym.isNumber = false;
+                                sym.asNumeric()[index] = number;
                             }
 
                             // working with strings on both sides
                             if (!sym.isNumber && !rhs.isNumber) {
                                 if (sym.asString().count() <= index) { sym.asString().resize(index+1); }
-                                sym.asString()[index] = rhs.string();
+                                sym.asString()[index] = string;
                             }
                         }
 
@@ -6684,7 +8108,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
                 // CPU and 'hang' for badly written code..
                 static int maxwhile = 1000000;
                 int count=0;
-                QTime timer;
+                QElapsedTimer timer;
                 timer.start();
 
                 Result returning(0);

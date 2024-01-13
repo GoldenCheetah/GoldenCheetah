@@ -35,7 +35,6 @@
 #include <QTableWidget>
 #include <QHeaderView>
 #include <QMessageBox>
-#include <QDesktopWidget>
 #include <QToolBar>
 #include <QItemDelegate>
 #include <QStackedWidget>

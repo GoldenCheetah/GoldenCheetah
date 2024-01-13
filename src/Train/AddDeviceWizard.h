@@ -223,10 +223,17 @@ class AddPairBTLE : public QWizardPage
         bool validatePage();
         void cleanupPage();
 
+    private slots:
+        void scanFinished(bool foundDevices);
+
     private:
         AddDeviceWizard *wizard;
         QTreeWidget *channelWidget;
+        QProgressBar *bar;
 
+        static const int NameRole = Qt::UserRole + 1;
+        static const int AddressRole = Qt::UserRole + 2;
+        static const int UuidRole = Qt::UserRole + 3;
 };
 
 class AddVirtualPower : public QWizardPage

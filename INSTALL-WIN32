@@ -1,11 +1,11 @@
-Update Note: to build GoldenCheetah v3.6 we are using Microsoft Visual C++ 2017,
-included in Microsoft Visual Studio 2019, with pre-installed Qt and GSL
+Update Note: to build GoldenCheetah v3.6 we are using Microsoft Visual C++ 2019,
+included in Microsoft Visual Studio 2019 AppVeyor image, with Qt5.15.2 and GSL 2.7
 insalled with vcpkg, on AppVeyor continuous integration platform.
 You can check the appveyor.yml for the complete and updated build script,
 the minimum Qt version known to work is 5.13 with Qt WebEngine and Qt Charts.
 GSL - GNU Scientific Library is a mandatory dependency starting with v3.6
 
-Ale Martinez - May, 2020
+Ale Martinez - Jul, 2022
                                  +++++++++++++++++++++++
                                  WIN32 BUILD WALKTHROUGH
                                  +++++++++++++++++++++++

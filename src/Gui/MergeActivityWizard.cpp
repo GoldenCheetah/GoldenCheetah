@@ -623,7 +623,7 @@ MergeSource::MergeSource(MergeActivityWizard *parent) : QWizardPage(parent), wiz
     setLayout(layout);
 
     mapper = new QSignalMapper(this);
-    connect(mapper, SIGNAL(mapped(QString)), this, SLOT(clicked(QString)));
+    connect(mapper, &QSignalMapper::mappedString, this, &MergeSource::clicked);
 
     // select a file
     QCommandLinkButton *p = new QCommandLinkButton(tr("Import from a File"), 
@@ -702,7 +702,7 @@ MergeSource::importFile()
 
     const RideFileFactory &rff = RideFileFactory::instance();
     QStringList suffixList = rff.suffixes();
-    suffixList.replaceInStrings(QRegExp("^"), "*.");
+    suffixList.replaceInStrings(QRegularExpression("^"), "*.");
     QStringList fileNames;
     QStringList allFormats;
     allFormats << QString(tr("All Supported Formats (%1)")).arg(suffixList.join(" "));
@@ -930,7 +930,7 @@ MergeMode::MergeMode(MergeActivityWizard *parent) : QWizardPage(parent), wizard(
     setLayout(layout);
 
     mapper = new QSignalMapper(this);
-    connect(mapper, SIGNAL(mapped(QString)), this, SLOT(clicked(QString)));
+    connect(mapper, &QSignalMapper::mappedString, this, &MergeMode::clicked);
 
     // merge
     QCommandLinkButton *p = new QCommandLinkButton(tr("Merge Data to add another data series"), 
@@ -992,7 +992,7 @@ MergeStrategy::MergeStrategy(MergeActivityWizard *parent) : QWizardPage(parent),
     setLayout(layout);
 
     mapper = new QSignalMapper(this);
-    connect(mapper, SIGNAL(mapped(QString)), this, SLOT(clicked(QString)));
+    connect(mapper, &QSignalMapper::mappedString, this, &MergeStrategy::clicked);
 
     // time
     QCommandLinkButton *p = new QCommandLinkButton(tr("Align using start time"), 
@@ -1124,7 +1124,7 @@ MergeAdjust::MergeAdjust(MergeActivityWizard *parent) : QWizardPage(parent), wiz
     static_cast<QwtPlotCanvas*>(fullPlot->canvas())->setBorderRadius(0);
     fullPlot->setWantAxis(false, true);
     QPalette pal = palette();
-    fullPlot->axisWidget(QwtPlot::xBottom)->setPalette(pal);
+    fullPlot->axisWidget(QwtAxis::XBottom)->setPalette(pal);
 
     layout->addWidget(spanSlider);
     layout->addWidget(fullPlot);
@@ -1234,7 +1234,7 @@ MergeAdjust::resetClicked()
 void
 MergeAdjust::zoomChanged()
 {
-    fullPlot->setAxisScale(QwtPlot::xBottom, spanSlider->lowerValue()/60.0f, spanSlider->upperValue()/60.0f);
+    fullPlot->setAxisScale(QwtAxis::XBottom, spanSlider->lowerValue()/60.0f, spanSlider->upperValue()/60.0f);
     fullPlot->replot();
 }
 

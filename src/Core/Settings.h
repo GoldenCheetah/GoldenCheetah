@@ -21,6 +21,7 @@
 #define _GC_Settings_h 1
 #include "GoldenCheetah.h"
 #include <QDebug>
+#include <QRect>
 
 
 /*
@@ -31,12 +32,9 @@
 #ifndef GC_SETTINGS_APP
 #define GC_SETTINGS_APP                       "GoldenCheetah"
 #endif
-#define GC_SETTINGS_FAVOURITE_METRICS_DEFAULT "workout_time,total_distance,total_work,average_power,average_hr,average_cad,average_speed,pace,pace_swim,distance_swim"
+#define GC_SETTINGS_FAVOURITE_METRICS_DEFAULT "workout_time,time_recording,time_riding,total_distance,distance_swim,total_work,average_power,average_hr,average_cad,average_run_cad,average_speed,pace,pace_swim"
 #define GC_UNIT_METRIC                       "Metric"
 #define GC_UNIT_IMPERIAL                     "Imperial"
-
-//Google Calendar-CALDAV oauthkeys / see also Athlete parameter
-#define GC_GOOGLE_CALENDAR_CLIENT_ID      "426009671216-c588t1u6hafep30tfs7g0g1nuo72s8ko.apps.googleusercontent.com"
 
 //Today's Plan
 #define GC_TODAYSPLAN_CLIENT_ID    "GoldenCheetah" // app id
@@ -62,6 +60,17 @@
 // PolarFlow client ID
 #ifndef GC_POLARFLOW_CLIENT_ID
 #define GC_POLARFLOW_CLIENT_ID "Not defined"
+#endif
+
+// Azum
+#ifndef GC_AZUM_CLIENT_ID
+#define GC_AZUM_CLIENT_ID "2XVhIzyXCSyM2gzq4zcK0YM0R5TJRBuH4CgtdpSw"
+#endif
+
+
+// Xert
+#ifndef GC_XERT_CLIENT_ID
+#define GC_XERT_CLIENT_ID "xert_goldencheetah"
 #endif
 
 /*
@@ -123,9 +132,6 @@
 #define GC_FONT_DEFAULT_SIZE            "<system>font/defaultsize"
 #define GC_FONT_CHARTLABELS_SIZE        "<system>font/chartlabelssize"
 #define GC_FONT_SCALE                   "<system>font/scale"
-
-// Colors/Chrome - see special treatment sections (also stored in <system>)
-#define GC_CHROME                       "<system>chrome" // mac or flat only so far
 
 // Location of R Installation - follows R_HOME semantics
 #define GC_R_HOME                       "<system>r_home"
@@ -191,7 +197,6 @@
 #define GC_DPRP_EQUIPWEIGHT             "<global-general>dataprocess/fixrunningpower/equipwheight"
 #define GC_DPDR_DRAFTM                  "<global-general>dataprocess/fixrunningpower/draftm"
 #define GC_DPFV_MA                      "<global-general>dataprocess/fixspeed/ma"
-#define GC_DPFE_AK                      "<global-general>dataprocess/fixelevation/ak"
 #define GC_CAD2SMO2                     "<global-general>dataprocess/fixmoxy/cad2smo2"
 #define GC_SPD2THB		            	"<global-general>dataprocess/fixmoxy/spd2thb"
 #define GC_DPFLS_PL                     "<global-general>dataprocess/fixlapswim/pool_length"
@@ -362,46 +367,28 @@
 #define GC_DVUSER                       "<athlete-private>dv/user"
 #define GC_DVPASS                       "<athlete-private>dv/pass"
 #define GC_DVCALDAVTYPE                 "<athlete-private>dv/type"
-#define GC_DVGOOGLE_CALID               "<athlete-private>dv/googlecalid"
-#define GC_DVGOOGLE_DRIVE               "<athlete-private>dv/googledrive"
+
 //Dropbox oauth keys
 #define GC_DROPBOX_TOKEN                "<athlete-private>dropbox/token"
 #define GC_DROPBOX_FOLDER               "<athlete-private>dropbox/folder"
 
-//Google oauth keys
-#define GC_GOOGLE_DRIVE_AUTH_SCOPE      "<athlete-private>google-drive/auth_scope"
-#define GC_GOOGLE_DRIVE_ACCESS_TOKEN   "<athlete-private>google-drive/access_token"
-#define GC_GOOGLE_DRIVE_REFRESH_TOKEN   "<athlete-private>google-drive/refresh_token"
-#define GC_GOOGLE_DRIVE_LAST_ACCESS_TOKEN_REFRESH "<athlete-private>google-drive/last_access_token_refresh"
-
-#define GC_GOOGLE_DRIVE_FOLDER          "<athlete-private>google-drive/folder"
-#define GC_GOOGLE_DRIVE_FOLDER_ID       "<athlete-private>google-drive/folder_id"
-
-//University of Kent (same as google drive)
-#define GC_UOK_CONSENT                      "<athlete-private>uok-google-drive/consent"
-#define GC_UOK_GOOGLE_DRIVE_AUTH_SCOPE      "<athlete-private>uok-google-drive/auth_scope"
-#define GC_UOK_GOOGLE_DRIVE_ACCESS_TOKEN   "<athlete-private>uok-google-drive/access_token"
-#define GC_UOK_GOOGLE_DRIVE_REFRESH_TOKEN   "<athlete-private>uok-google-drive/refresh_token"
-#define GC_UOK_GOOGLE_DRIVE_LAST_ACCESS_TOKEN_REFRESH "<athlete-private>uok-google-drive/last_access_token_refresh"
-
-#define GC_UOK_GOOGLE_DRIVE_FOLDER          "<athlete-private>uok-google-drive/folder"
-#define GC_UOK_GOOGLE_DRIVE_FOLDER_ID       "<athlete-private>uok-google-drive/folder_id"
-
 //Withings
 #define GC_WITHINGS_TOKEN               "<athlete-private>withings_token"
 #define GC_WITHINGS_SECRET              "<athlete-private>withings_secret"
+
 //Nokia
 #define GC_NOKIA_TOKEN                  "<athlete-private>nokia_token"
 #define GC_NOKIA_REFRESH_TOKEN          "<athlete-private>nokia_refresh_token"
-//Google Calendar-CALDAV oauthkeys
-#define GC_GOOGLE_CALENDAR_REFRESH_TOKEN  "<athlete-private>google_cal_refresh_token"
+
 //Strava
 #define GC_STRAVA_TOKEN                 "<athlete-private>strava_token"
 #define GC_STRAVA_REFRESH_TOKEN         "<athlete-private>strava_refresh_token"
 #define GC_STRAVA_LAST_REFRESH          "<athlete-private>strava_last_refresh"
 #define GC_STRAVA_ACTIVITY_NAME         "<athlete-private>strava_metaname"
+
 //Cycling Analytics
 #define GC_CYCLINGANALYTICS_TOKEN       "<athlete-private>cyclinganalytics_token"
+
 //Today's Plan
 #define GC_TODAYSPLAN_TOKEN             "<athlete-private>todaysplan_token"
 #define GC_TODAYSPLAN_URL               "<athlete-private>todaysplan_url"
@@ -413,24 +400,45 @@
 #define GC_SIXCYCLE_USER                "<athlete-private>sixcycle_user"
 #define GC_SIXCYCLE_PASS                "<athlete-private>sixcycle_pass"
 #define GC_SIXCYCLE_URL                 "<athlete-private>sixcycle_url"
+
+// Azum
+#define GC_AZUM_ACCESS_TOKEN            "<athlete-private>azum_access_token"
+#define GC_AZUM_REFRESH_TOKEN           "<athlete-private>azum_refresh_token"
+#define GC_AZUM_USERKEY                 "<athlete-private>azum_userkey"
+#define GC_AZUM_URL                     "<athlete-private>azum_url"
+#define GC_AZUM_ATHLETE_ID              "<athlete-private>azum_athlete_id"
+
 // Polar Flow
 #define GC_POLARFLOW_TOKEN             "<athlete-private>polarflow_token"
 #define GC_POLARFLOW_USER_ID           "<athlete-private>polarflow_user_id"
+
 // SportTracks
 #define GC_SPORTTRACKS_TOKEN           "<athlete-private>sporttracks/sporttracks_token"
 #define GC_SPORTTRACKS_REFRESH_TOKEN   "<athlete-private>sporttracks/refresh_token"
 #define GC_SPORTTRACKS_LAST_REFRESH    "<athlete-private>sporttracks/last_refresh"
+
 // Xert
 #define GC_XERTUSER                    "<athlete-private>xert/user"
 #define GC_XERTPASS                    "<athlete-private>xert/pass"
 #define GC_XERT_TOKEN                  "<athlete-private>xert/xert_token"
 #define GC_XERT_REFRESH_TOKEN          "<athlete-private>xert/refresh_token"
 #define GC_XERT_LAST_REFRESH           "<athlete-private>xert/last_refresh"
+
+// Nolio
+#define GC_NOLIO_ACCESS_TOKEN          "<global-general>nolio_access_token"
+#define GC_NOLIO_REFRESH_TOKEN         "<global-general>nolio_refresh_token"
+#define GC_NOLIO_LAST_REFRESH          "<global-general>nolio_last_refresh"
+#define GC_NOLIO_URL                   "<athlete-private>nolio_url"
+#define GC_NOLIO_ATHLETE_ID            "<athlete-private>nolio_athlete_id"
+#define GC_NOLIO_ATHLETE_NAME          "<athlete-private>nolio_athlete_name"
+
 // --------------------------------------------------------------------------------
 #include <QSettings>
 #include <QFileInfo>
 
 // Helper Class for the Athlete QSettings
+
+extern double scalefactors[];
 
 class AthleteQSettings {
     public:
@@ -446,6 +454,31 @@ class AthleteQSettings {
 
 };
 
+
+typedef struct {
+
+    // gui sizing
+    double xfactor, yfactor; // scaling of widgets
+    QRect windowsize; // size of the window in pixels
+
+    // fonts
+    QString fontfamily;
+    int fontpointsize;
+    double fontscale; // scaling of fonts
+    int fontscaleindex; // index into the list
+
+    // ui elements, mostly standard defaults
+    int theme; // theme number to use
+    bool antialias; // antialias fonts- always true
+    bool scrollbar; //scroller on ride list- always false
+    bool head; // false for MAC, true for everyone else
+    int sidebarwidth; // width of sidebars in pixels
+    bool sideanalysis;
+    bool sidetrend;
+    bool sidetrain;
+    double linewidth; // default line width
+
+} AppearanceSettings;
 
 // wrap the standard QSettings so we can offer members
 // to get global or atheleteName specific settings
@@ -487,6 +520,9 @@ public:
 
     // Cleanup if AthleteDir is changed
     void clearGlobalAndAthletes();
+
+    // reset appearance settings like theme, font, color and geometry
+    static AppearanceSettings defaultAppearanceSettings();
 
 private:
     bool newFormat;

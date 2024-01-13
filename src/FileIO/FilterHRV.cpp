@@ -199,7 +199,7 @@ public:
                           "  - \"R-R min and maximum\" exclude samples outside (flag -1). Also excluded when filtering range.\n"
                           "  - \"Filter range\" of the average within a window (flag 0)\n"
                           "  - \"Filter window size\" distance on either side of the current interval\n"
-                          "  - \"Set Rest HRV\" if checked the computed HRV metrics are set as Rest HRV Measures\n"
+                          "  - \"Set Rest HRV\" if checked on interactive use the computed HRV metrics are set as Rest HRV Measures\n"
                           ""
                           )));
     }
@@ -279,11 +279,19 @@ FilterHrvOutliers::postProcess(RideFile *ride, DataProcessorConfig *config=0, QS
             setRestHrv = (bool) ((FilterHrvOutliersConfig*)(config))->setRestHrv->checkState();
         }
         FilterHrv(series, rrMin, rrMax, rrFilt, rrWindow);
-        ride->context->rideItem()->refresh();
 
-        // Set HRV Measures according to user request
-        if (setRestHrv) {
-            RideItem *rideItem = ride->context->rideItem();
+        // refresh if present in RideCache
+        RideItem *rideItem = nullptr;
+        foreach(RideItem *item, ride->context->athlete->rideCache->rides()) {
+            if (item->dateTime == ride->startTime()) {
+                rideItem = item;
+                break;
+            }
+        }
+        if (rideItem) rideItem->refresh();
+
+        // Set HRV Measures according to user request if present in RideCache
+        if (setRestHrv && rideItem) {
             QStringList fieldSymbols = ride->context->athlete->measures->getFieldSymbols(Measures::Hrv);
 
             double avnn = rideItem->getForSymbol("AVNN");

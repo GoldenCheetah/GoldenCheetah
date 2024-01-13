@@ -25,7 +25,7 @@
 #include <QLineEdit>
 #include <QLabel>
 
-ColorButton::ColorButton(QWidget *parent, QString name, QColor color, bool gc, bool ignore) : QPushButton("", parent), gc(gc), color(color), name(name)
+ColorButton::ColorButton(QWidget *parent, QString name, QColor color, bool gc, bool ignore) : QPushButton("", parent), gc(gc), all(false), color(color), name(name)
 {
 #if defined(WIN32) || defined (Q_OS_LINUX)
     // are we in hidpi mode? if so undo global defaults for toolbar pushbuttons
@@ -71,7 +71,7 @@ void
 ColorButton::clicked()
 {
     // Color picker dialog - gc uses color palettes, otherwise not
-    QColor rcolor = (gc == true) ? GColorDialog::getColor(color.name())
+    QColor rcolor = (gc == true) ? GColorDialog::getColor(color.name(), all)
                                  : QColorDialog::getColor(color, this, tr("Choose Color"), QColorDialog::DontUseNativeDialog);
 
     // if we got a good color use it and notify others
@@ -82,7 +82,7 @@ ColorButton::clicked()
 }
 
 
-GColorDialog::GColorDialog(QColor selected, QWidget *parent) : QDialog(parent), original(selected)
+GColorDialog::GColorDialog(QColor selected, QWidget *parent, bool all) : QDialog(parent), original(selected), all(all)
 {
     // set some flags
     setWindowTitle(tr("Choose a Color"));
@@ -116,18 +116,20 @@ GColorDialog::GColorDialog(QColor selected, QWidget *parent) : QDialog(parent), 
     colorlist->headerItem()->setText(0, tr("Color"));
     colorlist->headerItem()->setText(1, tr("Select"));
     colorlist->setColumnCount(2);
-    colorlist->setColumnWidth(0,200 *dpiXFactor);
+    colorlist->setColumnWidth(0,250 *dpiXFactor);
     colorlist->setSelectionMode(QAbstractItemView::SingleSelection);
     colorlist->setUniformRowHeights(true); // causes height problems when adding - in case of non-text fields
     colorlist->setIndentation(0);
 
     // map button signals
     mapper = new QSignalMapper(this);
-    connect(mapper, SIGNAL(mappedInt(int)), this, SLOT(gcClicked(int)));
+    connect(mapper, &QSignalMapper::mappedInt, this, &GColorDialog::gcClicked);
 
     // now add all the colours to select
     colorSet = GCColor::colorSet();
     for (int i=0; colorSet[i].name != ""; i++) {
+
+        if (!all && colorSet[i].group != tr("Data")) continue;
 
         QTreeWidgetItem *add;
         ColorButton *colorButton = new ColorButton(this, colorSet[i].name, colorSet[i].color, false, true);
@@ -135,6 +137,7 @@ GColorDialog::GColorDialog(QColor selected, QWidget *parent) : QDialog(parent), 
         connect(colorButton, SIGNAL(clicked()), mapper, SLOT(map()));
         mapper->setMapping(colorButton, i);
         add = new QTreeWidgetItem(colorlist->invisibleRootItem());
+        add->setData(0, Qt::UserRole, i);
         add->setText(0, colorSet[i].name);
         colorlist->setItemWidget(add, 1, colorButton);
     }
@@ -145,10 +148,18 @@ GColorDialog::GColorDialog(QColor selected, QWidget *parent) : QDialog(parent), 
     colordialog->setOptions(QColorDialog::DontUseNativeDialog);
     tabwidget->addTab(colordialog, tr("Custom"));
 
+    colorlist->setSortingEnabled(true);
+    colorlist->sortByColumn(0, Qt::AscendingOrder);
+
     // set the default to the current selection
     if (original.red() == 1 && original.green() == 1) {
         tabwidget->setCurrentIndex(0);
-        colorlist->setCurrentItem(colorlist->invisibleRootItem()->child(original.blue()));
+        for(int i=0; i<colorlist->invisibleRootItem()->childCount(); i++) {
+            if (colorlist->invisibleRootItem()->child(i)->data(0, Qt::UserRole).toInt() == original.blue()) {
+                colorlist->setCurrentItem(colorlist->invisibleRootItem()->child(i));
+                break;
+            }
+        }
         colordialog->setCurrentColor(GColor(original.blue()));
     } else {
         tabwidget->setCurrentIndex(1);
@@ -191,9 +202,9 @@ GColorDialog::searchFilter(QString text)
     }
 }
 
-QColor GColorDialog::getColor(QColor color)
+QColor GColorDialog::getColor(QColor color, bool all)
 {
-    GColorDialog *dialog = new GColorDialog(color, NULL);
+    GColorDialog *dialog = new GColorDialog(color, NULL, all);
     dialog->exec();
     color = dialog->returned();
     delete dialog;
@@ -219,6 +230,7 @@ void
 GColorDialog::gcOKClicked()
 {
     int index = colorlist->invisibleRootItem()->indexOfChild(colorlist->currentItem());
+    index = colorlist->invisibleRootItem()->child(index)->data(0, Qt::UserRole).toInt();
     returning = QColor(1,1,index);
     accept();
 }
