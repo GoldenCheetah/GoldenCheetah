@@ -64,7 +64,7 @@ bool ScanPddFile(QFile &file, QString &hrmFile, QString &hrvFile, QString &gpxFi
 #if QT_VERSION < 0x060000
       is.setCodec ("ISO 8859-1");
 #else
-      is.setCodec (QStringConverter::Latin1);
+      is.setEncoding (QStringConverter::Latin1);
 #endif
 
   while (!is.atEnd()) {
@@ -215,7 +215,7 @@ void HrmRideFile(RideFile *rideFile, RideFile*gpxresult, bool haveGPX, XDataSeri
 #if QT_VERSION < 0x060000
       is.setCodec ("ISO 8859-1");
 #else
-      is.setCodec (QStringConverter::Latin1);
+      is.setEncoding (QStringConverter::Latin1);
 #endif
   QString section = NULL;
 
