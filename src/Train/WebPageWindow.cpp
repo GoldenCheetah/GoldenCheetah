@@ -181,7 +181,7 @@ WebPageWindow::WebPageWindow(Context *context) : GcChartWindow(context), context
 #if QT_VERSION < 0x060000
     connect(view->page()->profile(), SIGNAL(downloadRequested(QWebEngineDownloadItem*)), this, SLOT(downloadRequested(QWebEngineDownloadItem*)));
 #else
-    connect(view->page()->profile(), SIGNAL(downloadRequested(QWebEngineDownloadRequest*)), this, &downloadRequested);
+    connect(view->page()->profile(), SIGNAL(downloadRequested(QWebEngineDownloadRequest*)), this, SLOT(downloadRequested(QWebEngineDownloadRequest*)));
 #endif
     connect(view->page(), SIGNAL(linkHovered(QString)), this, SLOT(linkHovered(QString)));
 }
