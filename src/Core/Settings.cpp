@@ -22,7 +22,6 @@
 #include "MainWindow.h"
 #include "Colors.h"
 #include <QSettings>
-#include <QDesktopWidget>
 #include <QDebug>
 
 #include <QFontDatabase>
@@ -782,7 +781,7 @@ GSettings::defaultAppearanceSettings()
     // lets find an appropriate font
     returning.fontfamily = QFont().toString(); // ultimately fall back to QT default
     QFontDatabase fontdb;
-    for(int i=0; fontfamilyfallback[i] != NULL; i++) {
+    for(int i=0; !fontfamilyfallback[i].isEmpty(); i++) {
 
         foreach(QString family, fontdb.families()) {
 
