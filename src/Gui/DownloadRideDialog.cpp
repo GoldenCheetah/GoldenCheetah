@@ -50,7 +50,7 @@ DownloadRideDialog::DownloadRideDialog(Context *context, bool embedded) :
     int idx = deviceCombo->findText( defaultDevice );
     if( idx >= 0 )
         deviceCombo->setCurrentIndex( idx );
-    connect(deviceCombo, SIGNAL(currentIndexChanged(QString)), this, SLOT(deviceChanged(QString)));
+    connect(deviceCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(deviceChanged()));
 
     portCombo = new QComboBox(this);
 
@@ -270,10 +270,8 @@ DownloadRideDialog::updateProgress( const QString &progressText )
 
 
 void
-DownloadRideDialog::deviceChanged( QString deviceType )
+DownloadRideDialog::deviceChanged()
 {
-    (void)deviceType;
-
     updateAction(action); // adjust erase button visibility
     updatePort();
 }
