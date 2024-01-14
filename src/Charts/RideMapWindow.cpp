@@ -1614,7 +1614,12 @@ MapWebBridge::drawOverlays()
         }
 
         // Get the highest value and set the next selection number.
-        selection = *std::max_element(wNameSelectionIndexList.constBegin(), wNameSelectionIndexList.constEnd()) + 1;
+        auto maxElem = std::max_element(wNameSelectionIndexList.constBegin(), wNameSelectionIndexList.constEnd());
+        if (maxElem != wNameSelectionIndexList.constEnd()) {
+            selection = *maxElem + 1;
+        } else {
+            selection = 1;
+        }
     }
     else
         selection = 1;
