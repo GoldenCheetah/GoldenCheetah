@@ -958,9 +958,9 @@ UserChartSettings::UserChartSettings(Context *context, bool rangemode, GenericCh
     // watch for chartinfo edits (the series/axis stuff is managed by separate dialogs)
     connect(title, SIGNAL(textChanged(QString)), this, SLOT(updateChartInfo()));
     connect(description, SIGNAL(textChanged()), this, SLOT(updateChartInfo()));
-    connect(type, SIGNAL(currentIndexChanged(QString)), this, SLOT(updateChartInfo()));
+    connect(type, SIGNAL(currentIndexChanged(int)), this, SLOT(updateChartInfo()));
     connect(animate, SIGNAL(stateChanged(int)), this, SLOT(updateChartInfo()));
-    connect(legpos, SIGNAL(currentIndexChanged(QString)), this, SLOT(updateChartInfo()));
+    connect(legpos, SIGNAL(currentIndexChanged(int)), this, SLOT(updateChartInfo()));
     connect(stack, SIGNAL(stateChanged(int)), this, SLOT(updateChartInfo()));
     connect(intervalrefresh, SIGNAL(stateChanged(int)), this, SLOT(updateChartInfo()));
     connect(orientation, SIGNAL(currentIndexChanged(int)), this, SLOT(updateChartInfo()));
