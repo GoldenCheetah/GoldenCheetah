@@ -631,7 +631,7 @@ QVariant deviceModel::data(const QModelIndex &index, int role) const
                 {
                 DeviceTypes all;
                 DeviceType lookupType = all.getType (Entry.type);
-                return lookupType.name;
+                return (const char*)(lookupType.name);
                 }
                 break;
             case 2 :
