@@ -284,8 +284,12 @@ WebPageWindow::downloadRequested(QWebEngineDownloadRequest *item)
     filenames << QDir(item->downloadDirectory()).absoluteFilePath(item->downloadFileName());
 
     // set save
+#if QT_VERSION < 0x060000
     connect(item, SIGNAL(downloadProgress(qint64, qint64)), this, SLOT(downloadProgress(qint64,qint64)));
     connect(item, SIGNAL(finished()), this, SLOT(downloadFinished()));
+#else
+    connect(item, SIGNAL(isFinishedChanged()), this, SLOT(downloadFinished()));
+#endif
 
     // kick off download
     item->accept(); // lets download it!
