@@ -416,7 +416,7 @@ CloudDBChartClient::unmarshallAPIv1Object(QJsonObject* object, ChartAPIv1* chart
     chart->ChartDef = object->value("chartDef").toString();
     QString imageString = object->value("image").toString();
     QByteArray ba;
-    ba.append(imageString);
+    ba.append(imageString.toUtf8());
     chart->Image = QByteArray::fromBase64(ba);
     chart->CreatorNick = object->value("creatorNick").toString();
     chart->CreatorEmail = object->value("creatorEmail").toString();
