@@ -733,7 +733,7 @@ CloudDBChartListDialog::updateCurrentPresets(int index, int count) {
         newPxItem->setSizeHint(QSize(chartImageWidth, chartImageHeight));
         newPxItem->setFlags(newPxItem->flags() & ~Qt::ItemIsEditable);
         tableWidget->setItem(i, 0, newPxItem);
-        tableWidget->item(i,0)->setBackgroundColor(Qt::darkGray);
+        tableWidget->item(i,0)->setBackground(Qt::darkGray);
         tableWidget->setRowHeight(i, chartImageHeight+20);
 
         QString cellText = QString(tr("<h3>%1</h3><h4>Last Edited At: %2 - Creator: %3</h4>%4"))

@@ -651,7 +651,7 @@ CloudDBUserMetricListDialog::updateCurrentPresets(int index, int count) {
         QTableWidgetItem *newItem = new QTableWidgetItem(preset.name);
         newItem->setFlags(newItem->flags() & ~Qt::ItemIsEditable);
         tableWidget->setItem(i, 0, newItem);
-        tableWidget->item(i,0)->setBackgroundColor(Qt::darkGray);
+        tableWidget->item(i,0)->setBackground(Qt::darkGray);
         tableWidget->setRowHeight(i, 80*dpiYFactor);
 
         QString cellText = QString(tr("%1<h4>Last Edited At: %2 - Creator: %3</h4>"))
