@@ -17,7 +17,6 @@
  */
 
 #include <QSyntaxHighlighter>
-#include <QRegularExpression>
 
 #include "PythonSyntax.h"
 
