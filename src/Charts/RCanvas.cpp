@@ -99,7 +99,7 @@ RCanvas::wheelEvent(QWheelEvent *event){
     setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
     // Scale the view / do the zoom
     double scaleFactor = 1.15;
-    if(event->delta() > 0) {
+    if(event->angleDelta().y() > 0) {
         // Zoom in
         scale(scaleFactor, scaleFactor);
 

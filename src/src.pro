@@ -137,8 +137,10 @@ win32 {
 }
 
 macx {
-    # Mac native widget support
-    QT += macextras
+    lessThan(QT_MAJOR_VERSION, 6) {
+        # Mac native widget support
+        QT += macextras
+    }
 
     # we have our own plist
     QMAKE_INFO_PLIST = ./Resources/mac/Info.plist.app

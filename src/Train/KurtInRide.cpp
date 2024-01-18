@@ -160,7 +160,11 @@ void inride_BTDeviceInfoToSystemID(const QBluetoothDeviceInfo &devinfo, uint8_t 
 
         quint128 be_uuid128 = uuid.toUInt128();
 
+#if QT_VERSION < 0x060600
         addr64 = *(uint64_t*)be_uuid128.data;
+#else
+        addr64 = *(uint64_t*)&be_uuid128;
+#endif
     }
 
     uint8_t* paddr64 = (uint8_t*)&addr64;

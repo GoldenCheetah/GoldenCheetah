@@ -319,14 +319,10 @@ class GenericChart : public QWidget {
                       int line, int symbol, int size, QString color, int opacity, bool opengl, bool legend, bool datalabels,
                       bool fill, RideMetric::MetricType mtype, QList<GenericAnnotationInfo>annotations);
 
-#if QT_VERSION < 0x060000
-        // In Qt 6, QStringList is a QVector<QString>, so we don't need an additional overload
-
         // helper for Python and R charts fseries is a stringlist
         bool addCurve(QString name, QVector<double> xseries, QVector<double> yseries, QStringList fseries, QString xname, QString yname,
                       QStringList labels, QStringList colors,
                       int line, int symbol, int size, QString color, int opacity, bool opengl, bool legend, bool datalabels, bool fill);
-#endif
 
         // configure axis, after curves added
         bool configureAxis(QString name, bool visible, int align, double min, double max,

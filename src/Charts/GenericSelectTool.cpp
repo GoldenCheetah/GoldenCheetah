@@ -711,11 +711,13 @@ GenericSelectTool::moved(QPointF pos)
                     // lower_bound to value near x
                     QVector<QPointF>::const_iterator i = std::lower_bound(p.begin(), p.end(), x, CompareQPointFX());
 
-                    // collect them away
-                    vals.insert(series, GPointF(i->x(), i->y(), i-p.begin()));
+                    if (i != p.end()) {
+                        // collect them away
+                        vals.insert(series, GPointF(i->x(), i->y(), i-p.begin()));
 
-                    // nearest x?
-                    if (i->x() != 0 && (nearestx == -9999 || (std::fabs(i->x()-xvalue)) < std::fabs((nearestx-xvalue)))) nearestx = i->x();
+                        // nearest x?
+                        if (i->x() != 0 && (nearestx == -9999 || (std::fabs(i->x()-xvalue)) < std::fabs((nearestx-xvalue)))) nearestx = i->x();
+                    }
                 }
 
             }

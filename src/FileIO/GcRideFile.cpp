@@ -38,7 +38,7 @@ GcFileReader::openRideFile(QFile &file, QStringList &errors, QList<RideFile*>*) 
         return NULL;
     }
 
-    bool parsed = doc.setContent(&file);
+    bool parsed = bool(doc.setContent(&file));
     file.close();
     if (!parsed) {
         errors << "Could not parse file.";
