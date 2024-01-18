@@ -399,15 +399,6 @@ main(int argc, char *argv[])
     XInitThreads();
 #endif
 
-#ifdef Q_OS_MACX
-    if ( QSysInfo::MacintoshVersion > QSysInfo::MV_10_8 )
-    {
-        // fix Mac OS X 10.9 (mavericks) font issue
-        // https://bugreports.qt-project.org/browse/QTBUG-32789
-        QFont::insertSubstitution("LucidaGrande", "Lucida Grande");
-    }
-#endif
-
 #ifdef GC_WANT_R
     rtool = NULL;
 #endif
