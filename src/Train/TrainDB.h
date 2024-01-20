@@ -161,6 +161,8 @@ class TrainDB : public QObject, public TagStore
 
         bool hasItem(QString filepath, QString table) const;
 
+        virtual QStringList getWorkouts() const;
+
         // Implementation of TagStore
         virtual void deferTagSignals(bool deferred);
         virtual bool isDeferredTagSignals();
@@ -194,6 +196,8 @@ class TrainDB : public QObject, public TagStore
 
         // drop and recreate tables
         void rebuildDB() const;
+        // As rebuildDB() but keeps tables that hold user data: ratings, tags, etc
+        void rebuildDBButUserDataTables() const;
 
         // Helpers for DB-upgrade
         QStringList getMigrateableWorkoutPaths() const;
@@ -234,6 +238,7 @@ class TrainDB : public QObject, public TagStore
 
         bool createAllDataTables() const;
         bool dropAllDataTables() const;
+        bool dropTablesButUserDataTables() const;
 
         bool dropTable(QString tableName, bool hasVersionEntry = true) const;
 
