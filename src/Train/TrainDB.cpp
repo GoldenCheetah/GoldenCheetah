@@ -200,6 +200,18 @@ TrainDB::rebuildDB
 }
 
 
+// wipe away all data but personal data: tags, rating, etc
+// To keep personal data, we are not deleting workouts table and tags related tables
+void
+TrainDB::rebuildDBButUserDataTables
+() const
+{
+    dropTablesButUserDataTables();
+    createAllDataTables(); // Tables that exist are not recreated
+}
+
+
+
 ///////////////////////// Implementation of TagStore
 
 
@@ -464,6 +476,22 @@ TrainDB::getTagLabels
     }
     return ret;
 }
+
+QStringList
+TrainDB::getWorkouts
+() const
+{
+    QStringList ret;
+    QSqlQuery query(connection());
+    query.prepare("SELECT filepath FROM workout WHERE source IS NOT 'gcdefault' AND type IS NOT 'code'");
+    if (query.exec()) {
+        while (query.next()) {
+            ret << query.value(0).toString();
+        }
+    }
+    return ret;
+}
+
 
 
 ///////////////////////// Helpers for Taggable / Workout
@@ -1254,6 +1282,17 @@ TrainDB::dropAllDataTables
     ok &= dropTable(TABLE_WORKOUT_TAG);
     return ok;
 }
+
+// Keep tables that can hold user date: ratings, tags, etc: TABLE_WORKOUT, TABLE_TAGSTORE and TABLE_WORKOUT_TAG
+bool
+TrainDB::dropTablesButUserDataTables
+() const
+{
+    bool ok = dropTable(TABLE_VIDEO);
+    ok &= dropTable(TABLE_VIDEOSYNC);
+    return ok;
+}
+
 
 
 bool
