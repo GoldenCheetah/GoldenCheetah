@@ -40,7 +40,7 @@
 #include <QKeyEvent>
 #include <QMutexLocker>
 
-#include <QSound>
+#include <QSoundEffect>
 
 // Three current realtime device types supported are:
 #include "RealtimeController.h"
@@ -379,9 +379,9 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
     start_timer = new QTimer(this);
     start_timer->setSingleShot(true);
 
-    session_time = QTime();
+    session_time.start();
     session_elapsed_msec = 0;
-    lap_time = QTime();
+    lap_time.start();
     lap_elapsed_msec = 0;
     secs_to_start = 0;
 
@@ -2057,7 +2057,9 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
 
                     if (fPlayAudio) {
                         lapAudioThisLap = false;
-                        QSound::play(":audio/lap.wav");
+                        QSoundEffect effect;
+                        effect.setSource(QUrl::fromLocalFile(":audio/lap.wav"));
+                        effect.play();
                     }
                 }
 

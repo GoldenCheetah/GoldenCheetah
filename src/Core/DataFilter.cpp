@@ -1733,6 +1733,7 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
                     !df->dataSeriesSymbols.contains(symbol) &&
                     symbol != "isRide" && symbol != "isSwim" &&
                     symbol != "isRun" && symbol != "isXtrain" &&
+                    symbol != "isAero" &&
                     !isCoggan(symbol)) {
 
                     // unknown, is it user defined ?
@@ -7707,6 +7708,10 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
             lhsdouble = m->isXtrain ? 1 : 0;
             lhsisNumber = true;
 
+        } else if (symbol == "isAero") {
+            lhsdouble = m->isAero ? 1 : 0;
+            lhsisNumber = true;
+
         } else if (!symbol.compare("NA", Qt::CaseInsensitive)) {
 
             lhsdouble = RideFile::NA;
@@ -8103,7 +8108,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
                 // CPU and 'hang' for badly written code..
                 static int maxwhile = 1000000;
                 int count=0;
-                QTime timer;
+                QElapsedTimer timer;
                 timer.start();
 
                 Result returning(0);

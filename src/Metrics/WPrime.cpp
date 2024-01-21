@@ -53,6 +53,8 @@
 #include "Units.h" // for MILES_PER_KM
 #include "Settings.h" // for GC_WBALFORM
 
+#include <qwt_spline_cubic.h> // smoothing
+
 #if notyet
 const double WprimeMultConst = 1.0;
 const int WPrimeDecayPeriod = 1800; // 1 hour, tried infinite but costly and limited value
@@ -102,12 +104,13 @@ WPrime::check()
     }
 }
 
+
 void
 WPrime::setRide(RideFile *input)
 {
     bool integral = (appsettings->value(NULL, GC_WBALFORM, "int").toString() == "int");
 
-    QTime time; // for profiling performance of the code
+    QElapsedTimer time; // for profiling performance of the code
     time.start();
 
     // remember the ride for next time
@@ -167,11 +170,10 @@ WPrime::setRide(RideFile *input)
     }
 
     // Create a spline
-    distance.setSplineType(QwtSpline::Periodic);
-    distance.setPoints(QPolygonF(pointsd));
-    smoothed.setSplineType(QwtSpline::Periodic);
-    smoothed.setPoints(QPolygonF(points));
-
+    QwtSplineCubic spline;
+    spline.setBoundaryType(QwtSpline::PeriodicPolygon);
+    distance.update(spline, QPolygonF(pointsd), 0.5);
+    smoothed.update(spline, QPolygonF(points), 0.5);
     // Get CP
     CP = 250; // default
     WPRIME = 20000;
@@ -198,7 +200,7 @@ WPrime::setRide(RideFile *input)
     EXP = 0;
     for (int i=0; i<last; i++) {
 
-        int value = smoothed.value(i);
+        int value = smoothed.valueY(i);
         if (value < 0) value = 0; // don't go negative now
 
         powerValues[i] = value > CP ? value-CP : 0;
@@ -210,7 +212,7 @@ WPrime::setRide(RideFile *input)
     }
 
     // Tau can be set in the ridefile metadata
-    // or in the athlete preferences, but when we have an 
+    // or in the athlete preferences, but when we have an
     // integral formulation it should be computed from data
     if (!TAU || integral) {
         if (countBelowCP > 0)
@@ -250,7 +252,7 @@ WPrime::setRide(RideFile *input)
         for(int t=0; t <= last; t++) {
             double value = WPRIME - values[t];
             values[t] = value;
-            xdvalues[t] = distance.value(t);
+            xdvalues[t] = distance.valueY(t);
 
             if (value > maxY) maxY = value;
             if (value < minY) minY = value;
@@ -269,11 +271,12 @@ WPrime::setRide(RideFile *input)
 
         double W = WPRIME;
         for (int t=0; t<=last; t++) {
+            int smoothedValue = smoothed.valueY(t);
 
-            if(smoothed.value(t) < CP) {
-                W  = W + (CP-smoothed.value(t))*(WPRIME-W)/WPRIME;
+            if (smoothedValue < CP) {
+                W  = W + (CP-smoothedValue)*(WPRIME-W)/WPRIME;
             } else {
-                W  = W + (CP-smoothed.value(t));
+                W  = W + (CP-smoothedValue);
             }
 
             if (W > maxY) maxY = W;
@@ -281,7 +284,7 @@ WPrime::setRide(RideFile *input)
 
             values[t] = W;
             xvalues[t] = double(t) / 60.00f;
-            xdvalues[t] = distance.value(t);
+            xdvalues[t] = distance.valueY(t);
         }
     }
 
@@ -292,16 +295,16 @@ WPrime::setRide(RideFile *input)
 
     // STEP 3: FIND MATCHES
 
-    // SMOOTH DATA SERIES 
+    // SMOOTH DATA SERIES
 
     // get raw data adjusted to 1s intervals (as before)
     smoothArray.resize(last+1);
     QVector<int> rawArray(last+1);
     for (int i=0; i<last; i++) {
-        smoothArray[i] = smoothed.value(i);
-        rawArray[i] = smoothed.value(i);
+        smoothArray[i] = smoothed.valueY(i);
+        rawArray[i] = smoothArray[i];
     }
-    
+
     // initialise rolling average
     double rtot = 0;
     for (int i=WprimeMatchSmoothing; i>0 && last-i >=0; i--) {
@@ -316,7 +319,7 @@ WPrime::setRide(RideFile *input)
         rtot += smoothArray[i-WprimeMatchSmoothing];
     }
 
-    // FIND MATCHES -- INTERVALS WHERE POWER > CP 
+    // FIND MATCHES -- INTERVALS WHERE POWER > CP
     //                 AND W' DEPLETED BY > WprimeMatchMinJoules
     bool inmatch=false;
     matches.clear();
@@ -376,7 +379,7 @@ WPrime::setWatts(Context *context, QVector<int>&wattsArray, int CP, int WPRIME)
 {
     bool integral = (appsettings->value(NULL, GC_WBALFORM, "int").toString() == "int");
 
-    QTime time; // for profiling performance of the code
+    QElapsedTimer time; // for profiling performance of the code
     time.start();
 
     // reset from previous
@@ -475,7 +478,7 @@ WPrime::setErg(ErgFile *input)
 {
     bool integral = (appsettings->value(NULL, GC_WBALFORM, "int").toString() == "int");
 
-    QTime time; // for profiling performance of the code
+    QElapsedTimer time; // for profiling performance of the code
     time.start();
 
     // reset from previous
@@ -602,16 +605,14 @@ WPrime::PCP()
 
     int cp = CP;
     do {
-    
         if (minForCP(cp) > 0) return PCP_=cp;
         else cp += 3; // +/- 3w is ok, especially since +/- 2kJ is typical accuracy for W' anyway
-
     } while (cp <= 500);
 
     return PCP_=cp;
 }
 
-int 
+int
 WPrime::minForCP(int cp)
 {
     // STEP 2: ITERATE OVER DATA TO CREATE W' DATA SERIES
@@ -620,11 +621,11 @@ WPrime::minForCP(int cp)
     int min = WPRIME;
     double W = WPRIME;
     for (int t=0; t<=last; t++) {
-
-        if(smoothed.value(t) < cp) {
-            W  = W + (cp-smoothed.value(t))*(WPRIME-W)/WPRIME;
+        int smoothedValue = smoothed.valueY(t);
+        if(smoothedValue < cp) {
+            W  = W + (cp-smoothedValue)*(WPRIME-W)/WPRIME;
         } else {
-            W  = W + (cp-smoothed.value(t));
+            W  = W + (cp-smoothedValue);
         }
 
         if (W < min) min = W;
@@ -636,7 +637,7 @@ double
 WPrime::maxMatch()
 {
     double max=0;
-    foreach(struct Match match, matches) 
+    foreach(struct Match match, matches)
         if (match.cost > max) max = match.cost;
 
     return max;

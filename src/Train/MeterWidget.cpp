@@ -187,7 +187,7 @@ void TextMeterWidget::paintEvent(QPaintEvent* paintevent)
 
     QPainterPath my_painterPath;
     my_painterPath.addText(QPointF(0,0),m_MainFont,Text);
-    my_painterPath.addText(QPointF(QFontMetrics(m_MainFont).width(Text), 0),m_AltFont,AltText);
+    my_painterPath.addText(QPointF(QFontMetrics(m_MainFont).horizontalAdvance(Text), 0),m_AltFont,AltText);
     QRectF ValueBoundingRct = my_painterPath.boundingRect();
 
     // We use leading whitespace for alignment which boundingRect() does not count

@@ -155,7 +155,7 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
     charts->setEditTriggers(QAbstractItemView::SelectedClicked); // allow edit
     charts->setIndentation(0);
 
-    presetLayout->addWidget(charts, 0,0);
+    presetLayout->addWidget(charts, 0, Qt::Alignment());
 
     applyButton = new QPushButton(tr("Apply")); // connected in LTMWindow.cpp (weird!?)
     newButton = new QPushButton(tr("Add Current"));
@@ -187,7 +187,6 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
 
         adds.symbol = factory.metricName(i);
         adds.metric = factory.rideMetric(factory.metricName(i));
-        qsrand(QTime::currentTime().msec());
         cHSV.setHsv((i%6)*(255/(factory.metricCount()/5)), 255, 255);
         adds.penColor = cHSV.convertTo(QColor::Rgb);
         adds.curveStyle = curveStyle(factory.metricType(i));
@@ -1432,7 +1431,7 @@ LTMTool::moveMetricUp()
     int index = customTable->row(items.first());
 
     if (index > 0) {
-        settings->metrics.swap(index, index-1);
+        settings->metrics.swapItemsAt(index, index-1);
          // refresh
         refreshCustomTable(index-1);
         curvesChanged();
@@ -1448,7 +1447,7 @@ LTMTool::moveMetricDown()
     int index = customTable->row(items.first());
 
     if (index+1 <  settings->metrics.size()) {
-        settings->metrics.swap(index, index+1);
+        settings->metrics.swapItemsAt(index, index+1);
          // refresh
         refreshCustomTable(index+1);
         curvesChanged();
@@ -1814,7 +1813,7 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
     QFontMetrics fm(courier);
 
     formulaEdit->setFont(courier);
-    formulaEdit->setTabStopWidth(4 * fm.width(' ')); // 4 char tabstop
+    formulaEdit->setTabStopDistance(4 * fm.horizontalAdvance(' ')); // 4 char tabstop
     //formulaEdit->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     formulaType = new QComboBox(this);
     formulaType->addItem(tr("Total"), static_cast<int>(RideMetric::Total));

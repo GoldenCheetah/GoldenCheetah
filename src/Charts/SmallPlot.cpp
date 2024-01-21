@@ -32,7 +32,6 @@
 #include <qwt_text.h>
 #include <qwt_legend.h>
 #include <qwt_series_data.h>
-#include <qwt_compat.h>
 
 
 SmallPlotPicker::SmallPlotPicker(QWidget *canvas) : QwtPlotPicker(canvas)
@@ -109,25 +108,25 @@ SmallPlot::SmallPlot(QWidget *parent) : QwtPlot(parent), d_mrk(NULL), smooth(30)
     static_cast<QwtPlotCanvas*>(canvas())->setFrameStyle(QFrame::NoFrame);
 
     setXTitle();
-    setAxesCount(QwtAxis::yLeft, 2);
+    setAxesCount(QwtAxis::YLeft, 2);
 
     altCurve = new QwtPlotCurve(tr("Altitude"));
     altCurve->setPen(QPen(GColor(CALTITUDE)));
     QColor brush_color = GColor(CALTITUDEBRUSH);
     brush_color.setAlpha(180);
     altCurve->setBrush(brush_color);
-    altCurve->setYAxis(QwtAxisId(QwtAxis::yLeft,1));
+    altCurve->setYAxis(QwtAxisId(QwtAxis::YLeft,1));
     altCurve->attach(this);
 
     wattsCurve = new QwtPlotCurve("Power");
     //timeCurves.resize(36);// wattsCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
-    wattsCurve->setYAxis(QwtAxisId(QwtAxis::yLeft,0));
+    wattsCurve->setYAxis(QwtAxisId(QwtAxis::YLeft,0));
     wattsCurve->setPen(QPen(GColor(CPOWER)));
     wattsCurve->attach(this);
 
     hrCurve = new QwtPlotCurve("Heart Rate");
     // hrCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
-    hrCurve->setYAxis(QwtAxisId(QwtAxis::yLeft,0));
+    hrCurve->setYAxis(QwtAxisId(QwtAxis::YLeft,0));
     hrCurve->setPen(QPen(GColor(CHEARTRATE)));
     hrCurve->attach(this);
 
@@ -185,7 +184,7 @@ SmallPlot::recalc()
 
     long rideTimeSecs = (long) ceil(timeArray[arrayLength - 1]);
     if (rideTimeSecs < 0 || rideTimeSecs > SECONDS_IN_A_WEEK) {
-        QwtArray<double> data;
+        QVector<double> data;
         wattsCurve->setSamples(data, data);
         hrCurve->setSamples(data, data);
         altCurve->setSamples(data, data);
@@ -253,7 +252,7 @@ SmallPlot::recalc()
     wattsCurve->setSamples(smoothTime.constData(), smoothWatts.constData(), rideTimeSecs + 1);
     hrCurve->setSamples(smoothTime.constData(), smoothHr.constData(), rideTimeSecs + 1);
     altCurve->setSamples(smoothTime.constData(), smoothAlt.constData(), rideTimeSecs + 1);
-    setAxisScale(xBottom, 0.0, smoothTime[rideTimeSecs]);
+    setAxisScale(QwtAxis::XBottom, 0.0, smoothTime[rideTimeSecs]);
 
     setYMax();
     replot();
@@ -290,19 +289,19 @@ SmallPlot::setYMax()
         y1max = curMaxY;
         y1label = "m";
     }
-    setAxisScale(QwtAxisId(QwtAxis::yLeft,0), 0.0, ymax * 1.1);
-    setAxisTitle(QwtAxisId(QwtAxis::yLeft,0), ylabel);
-    setAxisScale(QwtAxisId(QwtAxis::yLeft,1), y1min * 0.9, y1max * 1.1);
-    setAxisTitle(QwtAxisId(QwtAxis::yLeft,1), y1label);
-    setAxisVisible(QwtAxisId(QwtAxis::yLeft,0), false); // hide for a small plot
-    setAxisVisible(QwtAxisId(QwtAxis::yLeft,1), false); // hide for a small plot
+    setAxisScale(QwtAxisId(QwtAxis::YLeft,0), 0.0, ymax * 1.1);
+    setAxisTitle(QwtAxisId(QwtAxis::YLeft,0), ylabel);
+    setAxisScale(QwtAxisId(QwtAxis::YLeft,1), y1min * 0.9, y1max * 1.1);
+    setAxisTitle(QwtAxisId(QwtAxis::YLeft,1), y1label);
+    setAxisVisible(QwtAxisId(QwtAxis::YLeft,0), false); // hide for a small plot
+    setAxisVisible(QwtAxisId(QwtAxis::YLeft,1), false); // hide for a small plot
 }
 
 void
 SmallPlot::setXTitle()
 {
-    setAxisTitle(xBottom, tr("Time (minutes)"));
-    enableAxis(xBottom, true);
+    setAxisTitle(QwtAxis::XBottom, tr("Time (minutes)"));
+    setAxisVisible(QwtAxis::XBottom, true);
 }
 
 void
@@ -381,7 +380,7 @@ SmallPlot::setSmoothing(int value)
 void
 SmallPlot::pointMoved(const QPoint &pos)
 {
-    double dataPosX = invTransform(QwtAxis::xBottom, pos.x());
+    double dataPosX = invTransform(QwtAxis::XBottom, pos.x());
     emit selectedPosX(dataPosX);
 }
 

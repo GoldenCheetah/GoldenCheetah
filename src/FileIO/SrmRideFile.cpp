@@ -217,7 +217,7 @@ RideFile *SrmFileReader::openRideFile(QFile &file, QStringList &errorStrings, QL
         // it seems safe to always treat this number as signed.
         qint32 hsecsincemidn = readLong(in);
         blockhdrs[i].chunkcnt = version < 9 ? readShort(in) : readLong(in);
-        blockhdrs[i].dt = QDateTime(date);
+        blockhdrs[i].dt = QDateTime(date.startOfDay());
         blockhdrs[i].dt = blockhdrs[i].dt.addMSecs(hsecsincemidn * 10);
         blockchunkcnt += blockhdrs[i].chunkcnt;
     }
@@ -249,7 +249,7 @@ RideFile *SrmFileReader::openRideFile(QFile &file, QStringList &errorStrings, QL
     if( blockcnt < 1 ){
         blockcnt = 0;
         blockhdrs[0].chunkcnt = datacnt;
-        blockhdrs[0].dt = QDateTime(date);
+        blockhdrs[0].dt = QDateTime(date.startOfDay());
     }
 
     // datacnt might overflow at 64k - so, use sum from blocks, instead
@@ -330,9 +330,9 @@ RideFile *SrmFileReader::openRideFile(QFile &file, QStringList &errorStrings, QL
             blkidx = 0;
             QDateTime start = blockhdrs[blknum].dt;
             qint64 endms =
-                ((qint64) end.toTime_t()) * 1000 + end.time().msec();
+                ((qint64) end.toSecsSinceEpoch()) * 1000 + end.time().msec();
             qint64 startms =
-                ((qint64) start.toTime_t()) * 1000 + start.time().msec();
+                ((qint64) start.toSecsSinceEpoch()) * 1000 + start.time().msec();
             double diff_secs = (startms - endms + recintms) / 1000.0;
             if (diff_secs < result->recIntSecs()) {
                 errorStrings << QString("ERROR: time goes backwards by %1 s"

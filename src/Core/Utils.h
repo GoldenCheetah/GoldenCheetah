@@ -31,7 +31,6 @@
 #endif
 class QString;
 class QColor;
-class QStringList;
 
 #define GC_SMOOTH_FORWARD 0
 #define GC_SMOOTH_BACKWARD 1

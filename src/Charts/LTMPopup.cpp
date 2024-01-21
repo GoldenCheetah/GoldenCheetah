@@ -455,7 +455,7 @@ LTMPopup::setSummaryHTML(RideItem *item)
         }
 
         // Maximum Max and Average Average looks nasty, remove from name for display
-        QString s = metric ? metric->name().replace(QRegExp(tr("^(Average|Max) ")), "") : "unknown";
+        QString s = metric ? metric->name().replace(QRegularExpression(tr("^(Average|Max) ")), "") : "unknown";
 
         // don't show units for time values
         if (metric && (metric->units(GlobalContext::context()->useMetricUnits) == "seconds" ||

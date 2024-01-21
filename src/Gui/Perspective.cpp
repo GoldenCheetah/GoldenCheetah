@@ -63,7 +63,6 @@
 #include "RTool.h"
 #endif
 
-#include <QDesktopWidget>
 #include <QStyle>
 #include <QStyleFactory>
 #include <QScrollBar>
@@ -1307,7 +1306,7 @@ GcWindowDialog::GcWindowDialog(GcWinID type, Context *context, GcChartWindow **h
     setWindowFlags(windowFlags());
     setWindowTitle(tr("Chart Setup"));
 
-    QRect size= desktop->availableGeometry();
+    QRect size= QGuiApplication::primaryScreen()->availableGeometry();
     setMinimumHeight(500);
 
     // chart and settings side by side need to be big!
@@ -1595,7 +1594,9 @@ Perspective::toFile(QString filename)
     // truncate and use 8bit encoding
     file.resize(0);
     QTextStream out(&file);
+#if QT_VERSION < 0x060000
     out.setCodec("UTF-8");
+#endif
 
     // write to output stream
     toXml(out);
@@ -1629,7 +1630,7 @@ Perspective::toXml(QTextStream &out)
         const QMetaObject *m = chart->metaObject();
         for (int i=0; i<m->propertyCount(); i++) {
             QMetaProperty p = m->property(i);
-            if (p.isUser(chart)) {
+            if (p.isUser()) {
                out<<"\t\t<property name=\""<<Utils::xmlprotect(p.name())<<"\" "
                   <<"type=\""<<p.typeName()<<"\" "
                   <<"value=\"";

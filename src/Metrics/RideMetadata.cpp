@@ -22,6 +22,7 @@
 #include "MainWindow.h"
 #include "RideCache.h"
 #include "RideItem.h"
+#include "IntervalItem.h"
 #include "Context.h"
 #include "Athlete.h"
 #include "Settings.h"
@@ -48,6 +49,7 @@
 RideMetadata::RideMetadata(Context *context, bool singlecolumn) :
     QWidget(context != NULL ? context->mainWindow : NULL), singlecolumn(singlecolumn), context(context)
 {
+    active = false;
 
     if (context) {
         _ride = _connected = NULL;
@@ -83,6 +85,11 @@ RideMetadata::RideMetadata(Context *context, bool singlecolumn) :
         connect(tabs, SIGNAL(currentChanged(int)), this, SLOT(setExtraTab()));
         connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
 
+        // watch interval changes since interval metadata needs to be refreshed
+        connect(context, SIGNAL(intervalSelected()), this, SLOT(intervalSelected()));
+        connect(context, SIGNAL(intervalsChanged()), this, SLOT(intervalsChanged()));
+        connect(context, SIGNAL(intervalsUpdate(RideItem*)), this, SLOT(intervalsChanged()));
+
     } else {
 
         // we are not a real widget
@@ -105,10 +112,73 @@ RideMetadata::setRideItem(RideItem *ride)
 
     if (ride) {
         connect (_connected, SIGNAL(rideMetadataChanged()), this, SLOT(metadataChanged()));
+
+        // tell the forms (setting interval)
+        QMapIterator<QString, Form*> d(tabList);
+        d.toFront();
+        while (d.hasNext()) {
+            d.next();
+            d.value()->rideSelected(ride);
+        }
+
+        // now reset the extras tab before..
         setExtraTab();
+
+        // .. we reread the metadata and set the editing widgets
         metadataChanged();
     }
     editor->rideSelected(ride);
+}
+
+void
+RideMetadata::intervalsChanged()
+{
+    // ignore signals generated when field editing
+    // generates changes to ride metrics and intervals
+    if (active) return;
+
+    // we will just mimic an interval being selected to reset
+    // bearing in mind  the data we manage is stored in the
+    // ridefile intervals themselves, so we won't lose data
+    // if no ride is currently selected (weird situ) then
+    // lets notify that a NULL ride is selected to clear
+    // whatever we have
+    if (_ride) {
+        intervalSelected();
+    } else {
+        // tell the forms that contain interval data
+        // the others don't need to know
+        QMapIterator<QString, Form*> d(tabList);
+        d.toFront();
+        while (d.hasNext()) {
+            d.next();
+            if (d.value()->hasintervals) {
+                d.value()->rideSelected(_ride);
+                d.value()->metadataChanged();
+            }
+        }
+    }
+}
+
+void
+RideMetadata::intervalSelected()
+{
+    if (_ride) {
+        if (_ride->intervalsSelected().count() > 0) {
+
+            // pick the first one when multiple selected
+            IntervalItem *i = _ride->intervalsSelected()[0];
+
+            // tell all the forms, because we need to refresh
+            QMapIterator<QString, Form*> d(tabList);
+            d.toFront();
+            while (d.hasNext()) {
+                d.next();
+                d.value()->intervalSelected(i);
+            }
+
+        }
+    }
 }
 
 void
@@ -179,7 +249,7 @@ RideMetadata::setExtraTab()
             else if (tags.value().length() < 30) type = FIELD_SHORTTEXT;
             else type = FIELD_TEXT;
 
-            extraDefs.append(FieldDefinition("Extra", tags.key(), type, false, QStringList()));
+            extraDefs.append(FieldDefinition("Extra", tags.key(), type, false, false, QStringList(), ""));
             extraForm->addField(extraDefs[extraDefs.count()-1]);
         }
     }
@@ -228,6 +298,11 @@ RideMetadata::metadataChanged()
     d.toFront();
     while (d.hasNext()) {
        d.next();
+
+       // tell the form
+       d.value()->metadataChanged();
+
+       // tell the fields
        foreach(FormField *field, d.value()->fields) // keep track so we can destroy
           field->metadataChanged();
     }
@@ -342,7 +417,6 @@ RideMetadata::configChanged(qint32)
         palette = QPalette();
 
         palette.setColor(QPalette::Window, GColor(CPLOTBACKGROUND));
-        palette.setColor(QPalette::Background, GColor(CPLOTBACKGROUND));
 
         // only change base if moved away from white plots
         // which is a Mac thing
@@ -439,6 +513,25 @@ RideMetadata::configChanged(qint32)
                             ;
         tabs->setStyleSheet(styling);
 
+        // form button styling
+        QString buttonstyle = QString("QPushButton { border: none; border-radius: %2px; background-color: %1; "
+                                                    "padding-left: 0px; padding-right: 0px; "
+                                                    "padding-top:  0px; padding-bottom: 0px; }"
+                                      "QPushButton:hover { background-color: %3; }"
+                                      "QPushButton:hover:pressed { background-color: %3; }"
+                                    ).arg(GColor(CPLOTBACKGROUND).name()).arg(3 * dpiXFactor).arg(GColor(CHOVER).name());
+
+        QFont df;
+        QFontMetrics fm(df);
+        float namewidth = fm.boundingRect("XXXXXXXXXXXXXXXXXXXXXXXXX").width();
+        i.toFront();
+        while (i.hasNext()) {
+            i.next();
+            i.value()->left->setStyleSheet(buttonstyle);
+            i.value()->right->setStyleSheet(buttonstyle);
+            i.value()->intervalname->setFixedWidth(namewidth);
+        }
+
         metadataChanged(); // re-read the values!
     }
 }
@@ -513,6 +606,8 @@ RideMetadata::sports()
  *--------------------------------------------------------------------*/
 Form::Form(RideMetadata *meta) : meta(meta)
 {
+    left=right=NULL;
+    intervalname=NULL;
     initialise();
 }
 
@@ -547,6 +642,9 @@ Form::clear()
 void
 Form::initialise()
 {
+    static QIcon leftIcon = iconFromPNG(":images/mac/left.png");
+    static QIcon rightIcon = iconFromPNG(":images/mac/right.png");
+
     setPalette(meta->palette);
     contents = new QWidget;
     contents->setContentsMargins(5*dpiXFactor, 20*dpiXFactor,5*dpiXFactor,5*dpiXFactor); // padding between tabbar and fields
@@ -556,6 +654,43 @@ Form::initialise()
     hlayout = new QHBoxLayout;
     vlayout1 = vlayout2 = NULL;
     grid1 = grid2 = NULL;
+
+    // does this form have interval metadata on it?
+    hasintervals=false;
+    interval=NULL;
+
+    // widgets for showing interval name
+    // and selecting next/previous
+    QHBoxLayout *intervalinfo = new QHBoxLayout();
+    left = new QPushButton(this);
+    left->setAutoFillBackground(false);
+    left->setContentsMargins(0,0,0,0);
+    left->setFixedSize(24*dpiXFactor,24*dpiYFactor);
+    left->setIcon(leftIcon);
+    left->setIconSize(QSize(20*dpiXFactor,20*dpiYFactor));
+    left->setFocusPolicy(Qt::NoFocus);
+    right = new QPushButton(this);
+    right->setContentsMargins(0,0,0,0);
+    right->setAutoFillBackground(false);
+    right->setFixedSize(24*dpiXFactor,24*dpiYFactor);
+    right->setIcon(rightIcon);
+    right->setIconSize(QSize(20*dpiXFactor,20*dpiYFactor));
+    right->setFocusPolicy(Qt::NoFocus);
+
+    intervalname = new QLabel("interval name", this);
+    intervalname->setAlignment(Qt::AlignVCenter|Qt::AlignHCenter);
+
+    intervalinfo->addStretch();
+    intervalinfo->addWidget(left);
+    intervalinfo->addWidget(intervalname);
+    intervalinfo->addWidget(right);
+    intervalinfo->addStretch();
+    mainLayout->addLayout(intervalinfo);
+
+    left->hide();
+    right->hide();
+    intervalname->hide();
+
     mainLayout->addLayout(hlayout);
     //mainLayout->addStretch();
     contents->setLayout(mainLayout);
@@ -563,14 +698,19 @@ Form::initialise()
     setFrameStyle(QFrame::NoFrame);
     setWidgetResizable(true);
     setWidget(contents);
+
+    connect(left, SIGNAL(clicked()), this, SLOT(intervalLeft()));
+    connect(right, SIGNAL(clicked()), this, SLOT(intervalRight()));
 }
 
 void
 Form::addField(FieldDefinition &x)
 {
-    FormField *p = new FormField(x, meta);
+    FormField *p = new FormField(this, x, meta);
     fields.append(p);
     meta->addFormField(p);
+
+    if (x.interval == true) hasintervals=true;
 }
 
 void
@@ -581,10 +721,15 @@ Form::arrange()
     int x=0;
     int y=0;
 
+    // ok, so we are managing interval metadata
+    left->setVisible(hasintervals);
+    right->setVisible(hasintervals);
+    intervalname->setVisible(hasintervals);
+
     // special case -- a textbox and its the only field on the tab needs no label
     //                 this is how the "Notes" tab is created
     if (fields.count() == 1 && fields[0]->definition.type == FIELD_TEXTBOX) {
-        hlayout->addWidget(fields[0]->widget, 0, 0);
+        hlayout->addWidget(fields[0]->widget, 0, Qt::Alignment());
         ((GTextEdit*)(fields[0]->widget))->setFrameStyle(QFrame::NoFrame);
         ((GTextEdit*)(fields[0]->widget))->viewport()->setAutoFillBackground(false);
         return;
@@ -618,7 +763,7 @@ Form::arrange()
         Qt::Alignment labelalignment = Qt::AlignLeft|Qt::AlignTop;
         Qt::Alignment alignment = Qt::AlignLeft|Qt::AlignTop;
 
-        if (fields[i]->definition.type < FIELD_SHORTTEXT) alignment = 0; // text types
+        if (fields[i]->definition.type < FIELD_SHORTTEXT) alignment = Qt::Alignment(); // text types
 
         here->addWidget(fields[i]->label, y, 0, labelalignment);
 
@@ -641,10 +786,109 @@ Form::arrange()
     }
 }
 
+void
+Form::rideSelected(RideItem *ride)
+{
+    // when we get a new ride we need to decide which interval
+    // to be current before the metadatachanged() function gets called
+    interval = NULL;
+    intervalname->setText("");
+
+    if (ride == NULL) return;
+
+    if (hasintervals) {
+
+        // use first user interval we can find
+        foreach(IntervalItem *i, ride->intervals()) {
+            if (i->type == RideFileInterval::USER && i->rideInterval) {
+                interval = i->rideInterval;
+                intervalname->setText(interval->name);
+                break;
+            }
+        }
+    }
+}
+
+void
+Form::intervalSelected(IntervalItem *selected)
+{
+    // when intervals are selected on the sidebar we follow
+    // the selection so need to refresh from the current interval
+    interval= selected->rideInterval;
+
+    if (hasintervals) {
+
+        // set interval details
+        metadataChanged();
+
+        // we need to run through the fields
+        // and re-read the metadata
+        foreach(FormField *f, fields) {
+            f->metadataChanged();
+        }
+    }
+}
+
+void
+Form::intervalLeft()
+{
+    if (interval == NULL) return;
+
+    int found=-1;
+    for(int idx=0; meta->rideItem()->intervals().count() > idx; idx++) {
+        if (meta->rideItem()->intervals()[idx]->rideInterval == interval) {
+            // we have a winner
+            found=idx;
+            break;
+        }
+    }
+
+    // if one to the left is user lets choose it and reset all the fields
+    if (found > 0 && meta->rideItem()->intervals()[found-1]->type == RideFileInterval::USER) {
+        interval = meta->rideItem()->intervals()[found-1]->rideInterval;
+        metadataChanged();
+        foreach(FormField *f, fields) {
+            f->metadataChanged();
+        }
+    }
+}
+
+void
+Form::intervalRight()
+{
+    if (interval == NULL) return;
+
+    int found=-1;
+    for(int idx=0; meta->rideItem()->intervals().count() > idx; idx++) {
+        if (meta->rideItem()->intervals()[idx]->rideInterval == interval) {
+            // we have a winner
+            found=idx;
+            break;
+        }
+    }
+
+    // if one to the left is user lets choose it and reset all the fields
+    if (found < meta->rideItem()->intervals().count()-1 && meta->rideItem()->intervals()[found+1]->type == RideFileInterval::USER) {
+        interval = meta->rideItem()->intervals()[found+1]->rideInterval;
+        metadataChanged();
+        foreach(FormField *f, fields) {
+            f->metadataChanged();
+        }
+    }
+}
+
+void
+Form::metadataChanged()
+{
+    if (hasintervals && interval) {
+        intervalname->setText(interval->name);
+    }
+}
+
 /*----------------------------------------------------------------------
  * Form fields
  *--------------------------------------------------------------------*/
-FormField::FormField(FieldDefinition field, RideMetadata *meta) : definition(field), meta(meta), active(true)
+FormField::FormField(Form *form, FieldDefinition field, RideMetadata *meta) : form(form), definition(field), meta(meta), active(true)
 {
     QString units;
     enabled = NULL;
@@ -830,6 +1074,8 @@ FormField::metadataFlush()
 {
     if (ourRideItem == NULL) return;
 
+    if (definition.interval && form->interval == NULL) return;
+
     // get values from the widgets
     QString text;
 
@@ -919,7 +1165,8 @@ FormField::metadataFlush()
             }
 
             // just update the tags QMap!
-            ourRideItem->ride()->setTag(definition.name, text);
+            if (definition.interval) form->interval->setTag(definition.name, text);
+            else ourRideItem->ride()->setTag(definition.name, text);
         }
     }
 
@@ -928,13 +1175,17 @@ FormField::metadataFlush()
 void
 FormField::focusOut(QFocusEvent *)
 {
+    // if this is interval metadata but no interval selected then ignore
+    if (definition.interval && form->interval == NULL) return;
+
     if (ourRideItem && ourRideItem->ride()) {
 
         // watch to see if we actually have changed ?
         if (definition.type == FIELD_TEXTBOX && definition.name != "Change History") {
 
             // what did we used to be ?
-            QString value = ourRideItem->ride()->getTag(definition.name, "");
+            QString value = definition.interval ? form->interval->getTag(definition.name, "")
+                                                : ourRideItem->ride()->getTag(definition.name, "");
             if (value != dynamic_cast<GTextEdit*>(widget)->document()->toPlainText()) {
                 edited = true;
                 editFinished(); // we made a change so reflect it !
@@ -946,6 +1197,9 @@ FormField::focusOut(QFocusEvent *)
 void
 FormField::editFinished()
 {
+    // if this is interval metadata but no interval selected then ignore
+    if (definition.interval && form->interval == NULL) return;
+
     bool changed = false;
 
     if (active || ourRideItem == NULL ||
@@ -992,7 +1246,7 @@ FormField::editFinished()
     case FIELD_TIME : text = ((QTimeEdit*)widget)->time().toString("hh:mm:ss.zzz"); break;
     }
 
-    active = true;
+    meta->active = active = true;
 
     // Update special field
     if (definition.name == "Device") {
@@ -1080,16 +1334,22 @@ FormField::editFinished()
             }
 
             // just update the tags QMap!
-            QString current = ourRideItem->ride()->getTag(definition.name, "");
+            QString current = definition.interval ? form->interval->getTag(definition.name, "")
+                                                  : ourRideItem->ride()->getTag(definition.name, "");
             if (current != text) {
                 changed = true;
-                ourRideItem->ride()->setTag(definition.name, text);
+                if (definition.interval) form->interval->setTag(definition.name, text);
+                else ourRideItem->ride()->setTag(definition.name, text);
             }
         }
     }
 
-    // default values
-    if (changed) {
+    // update everything, because metric changes like CP
+    // need to flush through. For interval metadata we
+    // don't force a recalculation since its counter-productive
+    // user can save the activity if they really want the changes
+    // to be reflected now
+    if (changed && definition.interval == false) {
 
         // we actually edited it !
         setLinkedDefault(text);
@@ -1100,12 +1360,15 @@ FormField::editFinished()
         // rideFile is now dirty!
         ourRideItem->setDirty(true);
     }
-    active = false;
+    meta->active = active = false;
 }
 
 void
 FormField::setLinkedDefault(QString text)
 {
+    // no defaults on interval metadata
+    if (definition.interval) return;
+
     foreach (DefaultDefinition adefault, meta->getDefaults()) {
         if (adefault.field == definition.name && adefault.value == text) {
             //qDebug() << "Default for" << adefault.linkedField << ":" << adefault.linkedValue;
@@ -1148,9 +1411,12 @@ FormField::stateChanged(int state)
 {
     if (active || ourRideItem == NULL) return; // being updated programmatically
 
+    if (definition.interval && form->interval == NULL) return;
+
     // are we a checkbox -- do the simple stuff
     if (definition.type == FIELD_CHECKBOX) {
-        ourRideItem->ride()->setTag(definition.name, ((QCheckBox *)widget)->isChecked() ? "1" : "0");
+        if (definition.interval) form->interval->setTag(definition.name, ((QCheckBox *)widget)->isChecked() ? "1" : "0");
+        else ourRideItem->ride()->setTag(definition.name, ((QCheckBox *)widget)->isChecked() ? "1" : "0");
         ourRideItem->setDirty(true);
         return;
     }
@@ -1194,6 +1460,9 @@ FormField::stateChanged(int state)
 void
 FormField::metadataChanged()
 {
+    // ignore interval metadata when no interval selected
+    if (definition.interval && form->interval == NULL) return;
+
     if (active == true) return;
 
     active = true;
@@ -1245,7 +1514,8 @@ FormField::metadataChanged()
                     widget->setHidden(true);
                 }
             } else {
-                value = ourRideItem->ride()->getTag(definition.name, "");
+                value = definition.interval ? form->interval->getTag(definition.name, "")
+                                            : ourRideItem->ride()->getTag(definition.name, "");
             }
         }
     } else {
@@ -1317,11 +1587,11 @@ FieldDefinition::fingerprint(QList<FieldDefinition> list)
 
     foreach(FieldDefinition def, list) {
 
-        ba.append(def.tab);
-        ba.append(def.name);
+        ba.append(def.tab.toUtf8());
+        ba.append(def.name.toUtf8());
         ba.append(def.type);
         ba.append(def.diary);
-        ba.append(def.values.join(""));
+        ba.append(def.values.join("").toUtf8());
     }
 
     return qChecksum(ba, ba.length());
@@ -1380,9 +1650,9 @@ KeywordDefinition::fingerprint(QList<KeywordDefinition> list)
 
     foreach(KeywordDefinition def, list) {
 
-        ba.append(def.name);
-        ba.append(def.color.name());
-        ba.append(def.tokens.join(""));
+        ba.append(def.name.toUtf8());
+        ba.append(def.color.name().toUtf8());
+        ba.append(def.tokens.join("").toUtf8());
     }
 
     return qChecksum(ba, ba.length());
@@ -1407,7 +1677,9 @@ RideMetadata::serialize(QString filename, QList<KeywordDefinition>keywordDefinit
     };
     file.resize(0);
     QTextStream out(&file);
+#if QT_VERSION < 0x060000
     out.setCodec("UTF-8");
+#endif
 
     // begin document
     out << "<metadata>\n";
@@ -1447,6 +1719,8 @@ RideMetadata::serialize(QString filename, QList<KeywordDefinition>keywordDefinit
         out<<QString("\t\t\t<fieldtype>%1</fieldtype>\n").arg(field.type);
         out<<QString("\t\t\t<fieldvalues>\"%1\"</fieldvalues>\n").arg(Utils::xmlprotect(field.values.join(",")));
         out<<QString("\t\t\t<fielddiary>%1</fielddiary>\n").arg(field.diary ? 1 : 0);
+        out<<QString("\t\t\t<fieldinterval>%1</fieldinterval>\n").arg(field.interval ? 1 : 0);
+        out<<QString("\t\t\t<fieldexpression>\"%1\"</fieldexpression>\n").arg(Utils::xmlprotect(field.expression));
         out<<QString("\t\t</field>\n");
     }
     out <<"\t</fields>\n";
@@ -1560,13 +1834,15 @@ bool MetadataXMLParser::endElement( const QString&, const QString&, const QStrin
     }
     else if(qName == "fieldtab") field.tab = Utils::unprotect(buffer);
     else if(qName == "fieldname") field.name =  Utils::unprotect(buffer);
+    else if(qName == "fieldexpression") field.expression =  Utils::unprotect(buffer);
     else if(qName == "fieldtype") {
         field.type = buffer.trimmed().toInt();
         if (field.tab != "" && field.type < 3 && field.name != "Filename" &&
             field.name != "Change History") field.diary = true; // default!
     } else if(qName == "fieldvalues") {
-        field.values = Utils::unprotect(buffer).split(",", QString::SkipEmptyParts);
+        field.values = Utils::unprotect(buffer).split(",", Qt::SkipEmptyParts);
     } else if (qName == "fielddiary") field.diary = (buffer.trimmed().toInt() != 0);
+    else if (qName == "fieldinterval") field.interval = (buffer.trimmed().toInt() != 0);
     else if(qName == "defaultfield") adefault.field =  Utils::unprotect(buffer);
     else if(qName == "defaultvalue") adefault.value =  Utils::unprotect(buffer);
     else if(qName == "defaultlinkedfield") adefault.linkedField =  Utils::unprotect(buffer);

@@ -21,7 +21,6 @@
 #include <QApplication>
 #include <QtGui>
 #include <QRegExp>
-#include <QDesktopWidget>
 #include <QNetworkProxyQuery>
 #include <QMenuBar>
 #include <QStyle>
@@ -121,7 +120,6 @@
 
 // We keep track of all theopen mainwindows
 QList<MainWindow *> mainwindows;
-extern QDesktopWidget *desktop;
 extern ConfigDialog *configdialog_ptr;
 extern QString gl_version;
 extern double gl_major; // 1.x 2.x 3.x - we insist on 2.x or higher to enable OpenGL
@@ -465,19 +463,19 @@ MainWindow::MainWindow(const QDir &home)
     connect(openTabMenu, SIGNAL(aboutToShow()), this, SLOT(setOpenTabMenu()));
 
     tabMapper = new QSignalMapper(this); // maps each option
-    connect(tabMapper, SIGNAL(mapped(const QString &)), this, SLOT(openAthleteTab(const QString &)));
+    connect(tabMapper, &QSignalMapper::mappedString, this, &MainWindow::openAthleteTab);
 
     fileMenu->addSeparator();
     backupAthleteMenu = fileMenu->addMenu(tr("Backup..."));
     connect(backupAthleteMenu, SIGNAL(aboutToShow()), this, SLOT(setBackupAthleteMenu()));
     backupMapper = new QSignalMapper(this); // maps each option
-    connect(backupMapper, SIGNAL(mapped(const QString &)), this, SLOT(backupAthlete(const QString &)));
+    connect(backupMapper, &QSignalMapper::mappedString, this, &MainWindow::backupAthlete);
 
     fileMenu->addSeparator();
     deleteAthleteMenu = fileMenu->addMenu(tr("Delete..."));
     connect(deleteAthleteMenu, SIGNAL(aboutToShow()), this, SLOT(setDeleteAthleteMenu()));
     deleteMapper = new QSignalMapper(this); // maps each option
-    connect(deleteMapper, SIGNAL(mapped(const QString &)), this, SLOT(deleteAthlete(const QString &)));
+    connect(deleteMapper, &QSignalMapper::mappedString, this, &MainWindow::deleteAthlete);
 
     fileMenu->addSeparator();
     fileMenu->addAction(tr("Settings..."), this, SLOT(athleteSettings()));
@@ -493,7 +491,7 @@ MainWindow::MainWindow(const QDir &home)
     // ACTIVITY MENU
     QMenu *rideMenu = menuBar()->addMenu(tr("A&ctivity"));
     rideMenu->addAction(tr("&Download from device..."), this, SLOT(downloadRide()), QKeySequence("Ctrl+D"));
-    rideMenu->addAction(tr("&Import from file..."), this, SLOT (importFile()), tr ("Ctrl+I"));
+    rideMenu->addAction(tr("&Import from file..."), this, SLOT (importFile()), QKeySequence("Ctrl+I"));
     rideMenu->addAction(tr("&Manual entry..."), this, SLOT(manualRide()), QKeySequence("Ctrl+M"));
     rideMenu->addSeparator ();
     rideMenu->addAction(tr("&Export..."), this, SLOT(exportRide()), QKeySequence("Ctrl+E"));
@@ -505,7 +503,7 @@ MainWindow::MainWindow(const QDir &home)
     rideMenu->addAction(tr("Split &activity..."), this, SLOT(splitRide()));
     rideMenu->addAction(tr("Combine activities..."), this, SLOT(mergeRide()));
     rideMenu->addSeparator ();
-    rideMenu->addAction(tr("Find intervals..."), this, SLOT(addIntervals()), tr (""));
+    rideMenu->addAction(tr("Find intervals..."), this, SLOT(addIntervals()), QKeySequence(""));
 
     HelpWhatsThis *helpRideMenu = new HelpWhatsThis(rideMenu);
     rideMenu->setWhatsThis(helpRideMenu->getWhatsThisText(HelpWhatsThis::MenuBar_Activity));
@@ -525,7 +523,7 @@ MainWindow::MainWindow(const QDir &home)
     measuresMenu = shareMenu->addMenu(tr("Get Measures..."));
     shareMenu->addSeparator();
     checkAction = new QAction(tr("Check For New Activities"), this);
-    checkAction->setShortcut(tr("Ctrl-C"));
+    checkAction->setShortcut(QKeySequence("")); // Ctrl+C is already in use for clipboard copy
     connect(checkAction, SIGNAL(triggered(bool)), this, SLOT(checkCloud()));
     shareMenu->addAction(checkAction);
 
@@ -595,7 +593,7 @@ MainWindow::MainWindow(const QDir &home)
 
         toolMapper = new QSignalMapper(this); // maps each option
         QMapIterator<QString, DataProcessor*> i(processors);
-        connect(toolMapper, SIGNAL(mapped(const QString &)), this, SLOT(manualProcess(const QString &)));
+        connect(toolMapper, &QSignalMapper::mappedString, this, &MainWindow::manualProcess);
 
         i.toFront();
         while (i.hasNext()) {
@@ -771,7 +769,7 @@ MainWindow::setSplash(bool first)
 
     if (first) {
         // middle of screen
-        splash->move(desktop->availableGeometry().center()-QPoint(50, 25));
+        splash->move(QGuiApplication::primaryScreen()->availableGeometry().center()-QPoint(50, 25));
     } else {
         // middle of mainwindow is appropriate
         splash->move(geometry().center()-QPoint(50, 25));
@@ -1063,7 +1061,7 @@ void
 MainWindow::toggleFullScreen()
 {
 #ifdef Q_OS_MAC
-    QRect screenSize = desktop->availableGeometry();
+    QRect screenSize = QGuiApplication::primaryScreen()->availableGeometry();
     if (screenSize.width() > frameGeometry().width() ||
         screenSize.height() > frameGeometry().height())
         showFullScreen();
@@ -1803,7 +1801,7 @@ MainWindow::importFile()
 
     const RideFileFactory &rff = RideFileFactory::instance();
     QStringList suffixList = rff.suffixes();
-    suffixList.replaceInStrings(QRegExp("^"), "*.");
+    suffixList.replaceInStrings(QRegularExpression("^"), "*.");
     QStringList fileNames;
     QStringList allFormats;
     allFormats << QString("All Supported Formats (%1)").arg(suffixList.join(" "));
@@ -2512,7 +2510,7 @@ MainWindow::configChanged(qint32)
 
     // perspective selector mimics sidebar colors
     QColor selected;
-    if (GCColor::invertColor(GColor(CTOOLBAR)).name() == Qt::white) selected = QColor(Qt::lightGray);
+    if (GCColor::invertColor(GColor(CTOOLBAR)) == Qt::white) selected = QColor(Qt::lightGray);
     else selected = QColor(Qt::darkGray);
     perspectiveSelector->setStyleSheet(QString("QComboBox { background: %1; color: %2; }"
                                                "QComboBox::item { background: %1; color: %2; }"

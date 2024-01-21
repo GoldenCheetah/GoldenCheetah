@@ -237,7 +237,7 @@ class LTMScaleDraw: public QwtScaleDraw
                 int year=group/12;
                 int month=group%12;
                 if (!month) { year--; month=12; }
-                label = QString("%1\n%2").arg(QDate::shortMonthName(month)).arg(year);
+                label = QString("%1\n%2").arg(QLocale::system().monthName(month, QLocale::ShortFormat)).arg(year);
             }
             break;
 

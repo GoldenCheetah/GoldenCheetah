@@ -33,7 +33,6 @@
 #include <QFileIconProvider>
 #include <QMessageBox>
 #include <QHeaderView>
-#include <QDesktopWidget>
 
 #include "../qzip/zipwriter.h"
 #include "../qzip/zipreader.h"
@@ -2036,7 +2035,7 @@ CloudServiceAutoDownloadWidget::paintEvent(QPaintEvent*)
     QFontMetrics fm(font);
     painter.setFont(font);
     painter.setPen(GCColor::invertColor(GColor(CPLOTBACKGROUND)));
-    QRectF textbox = QRectF(0,0, fm.width(statusstring), height() / 2.0f);
+    QRectF textbox = QRectF(0,0, fm.horizontalAdvance(statusstring), height() / 2.0f);
     painter.drawText(textbox, Qt::AlignVCenter | Qt::AlignCenter, statusstring);
 
     // rectangle

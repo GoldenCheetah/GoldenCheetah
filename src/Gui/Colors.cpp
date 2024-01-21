@@ -104,7 +104,7 @@ unsigned long Colors::fingerprint(const Colors *set)
 {
     QByteArray ba;
     while(set->name != "") {
-        ba.append(set->color.name());
+        ba.append(set->color.name().toUtf8());
         set++;
     }
     return qChecksum(ba, ba.length());
@@ -465,7 +465,8 @@ GCColor::readConfig()
     }
 #ifdef Q_OS_MAC
     // if on yosemite set default chrome to #e5e5e5
-    if (QSysInfo::MacintoshVersion == 12) {
+    // TODO dgr
+    if (QSysInfo::productVersion().toFloat() >= 12 | QSysInfo::productVersion().toFloat() < 13) {
         ColorList[CCHROME].color = QColor(0xe5,0xe5,0xe5);
     }
 #endif
@@ -578,7 +579,6 @@ GCColor::palette()
     // make it to order, to reflect current config
     QPalette palette;
     palette.setBrush(QPalette::Window, QBrush(GColor(CPLOTBACKGROUND)));
-    palette.setBrush(QPalette::Background, QBrush(GColor(CPLOTBACKGROUND)));
     palette.setBrush(QPalette::Base, QBrush(GColor(CPLOTBACKGROUND)));
     palette.setColor(QPalette::WindowText, GCColor::invertColor(GColor(CPLOTBACKGROUND)));
     palette.setColor(QPalette::Text, GCColor::invertColor(GColor(CPLOTBACKGROUND)));
@@ -1048,7 +1048,9 @@ GCColor::applyTheme(int index)
 
 #ifdef Q_OS_MAC
     // if on yosemite we always set default chrome to #e5e5e5 and flat
-    if (QSysInfo::MacintoshVersion == 12) {
+    // TODO dgr
+    qDebug() << "productVersion:" << QSysInfo::productVersion();
+    if (QSysInfo::productVersion().toFloat() >= 12 | QSysInfo::productVersion().toFloat() < 13) {
         QColor color = QColor(0xe5,0xe5,0xe5);
         ColorList[CCHROME].color = color;
         QString colorstring = QString("%1:%2:%3").arg(color.red())

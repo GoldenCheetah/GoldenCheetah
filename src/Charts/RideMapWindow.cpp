@@ -135,7 +135,6 @@ RideMapWindow::RideMapWindow(Context *context, int mapType) : GcChartWindow(cont
     view->settings()->setAttribute(QWebEngineSettings::FocusOnNavigationEnabled, false);
     view->setPage(new mapWebPage());
     view->setContentsMargins(0,0,0,0);
-    view->page()->view()->setContentsMargins(0,0,0,0);
     view->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     view->setAcceptDrops(false);
     layout->addWidget(view);
@@ -211,7 +210,7 @@ RideMapWindow::showPosition(double mins)
     long secs = mins * 60;
     int idx = secs / 5;
     idx = std::max(idx, 0);
-    idx = std::min(idx, positionItems.length() - 1);
+    idx = std::min(idx, (int)positionItems.length() - 1);
     PositionItem positionItem = positionItems.at(idx);
     view->page()->runJavaScript(QString("setPosMarker(%1, %2);").arg(positionItem.lat).arg(positionItem.lng));
 }
@@ -1615,7 +1614,12 @@ MapWebBridge::drawOverlays()
         }
 
         // Get the highest value and set the next selection number.
-        selection = *std::max_element(wNameSelectionIndexList.constBegin(), wNameSelectionIndexList.constEnd()) + 1;
+        auto maxElem = std::max_element(wNameSelectionIndexList.constBegin(), wNameSelectionIndexList.constEnd());
+        if (maxElem != wNameSelectionIndexList.constEnd()) {
+            selection = *maxElem + 1;
+        } else {
+            selection = 1;
+        }
     }
     else
         selection = 1;

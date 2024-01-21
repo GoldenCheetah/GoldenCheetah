@@ -132,7 +132,6 @@ GcCrashDialog::GcCrashDialog(QDir homeDir) : QDialog(NULL, Qt::Dialog), home(hom
 
     report = new QWebEngineView(this);
     report->setContentsMargins(0,0,0,0);
-    report->page()->view()->setContentsMargins(0,0,0,0);
     report->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     report->setAcceptDrops(false);
     report->settings()->setFontSize(QWebEngineSettings::DefaultFontSize, defaultFont.pointSize()+1);
@@ -477,7 +476,9 @@ GcCrashDialog::saveAs()
     QFile file(fileName);
     file.resize(0);
     QTextStream out(&file);
+#if QT_VERSION < 0x060000
     out.setCodec("UTF-8");
+#endif
 
     if (file.open(QIODevice::WriteOnly)) {
         // write the texts

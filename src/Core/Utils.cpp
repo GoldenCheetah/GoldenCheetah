@@ -25,6 +25,7 @@
 #include <QDir>
 #include <QVector>
 #include <QRegularExpression>
+#include <QStringRef>
 
 #include "GenericChart.h"
 #include "RideMetric.h"
@@ -84,14 +85,14 @@ protected:
 
 public:
 
-    QString BuildSubstitutedString(QStringRef s) const
+    QString BuildSubstitutedString(QString s) const
     {
         QRegularExpression qr = GetFindAnyRegex();
 
         QRegularExpressionMatchIterator i = qr.globalMatch(s);
 
         if (!i.hasNext())
-            return s.toString();
+            return s;
 
         QString newstring;
 
@@ -135,7 +136,7 @@ struct RidefileUnEscaper : public StringSubstitutionizer
     }
 };
 
-QString RidefileUnEscape(const QStringRef s)
+QString RidefileUnEscape(const QString s)
 {
     // Static const object constructs it's search regex at load time.
     static const RidefileUnEscaper s_RidefileUnescaper;
@@ -591,7 +592,7 @@ number(QString x)
         if (QString("0123456789").contains(x[i])) {
             innumber = true;
             extract += x[i];
-        } else if (innumber && (x[i] == "," ||  x[i]==".")) {
+        } else if (innumber && (x[i] == QChar(',') ||  x[i] == QChar('.'))) {
             if (seendp) break;
             else {
                 seendp = true;

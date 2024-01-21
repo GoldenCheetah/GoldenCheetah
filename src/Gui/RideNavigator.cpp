@@ -237,14 +237,14 @@ RideNavigator::resetView()
 {
     active = true;
 
-    QList<QString> cols = _columns.split("|", QString::SkipEmptyParts);
-    int widco = _widths.split("|", QString::SkipEmptyParts).count();
+    QList<QString> cols = _columns.split("|", Qt::SkipEmptyParts);
+    int widco = _widths.split("|", Qt::SkipEmptyParts).count();
 
     // something is wrong with the config ? reset 
     if (widco != cols.count() || widco <= 1) {
         _columns = QString(tr("*|Workout Code|Date|"));
         _widths = QString("0|100|100|");
-        cols = _columns.split("|", QString::SkipEmptyParts);
+        cols = _columns.split("|", Qt::SkipEmptyParts);
     }
 
     // to account for translations
@@ -331,7 +331,7 @@ RideNavigator::resetView()
 
     // set the column widths
     int columnnumber=0;
-    foreach(QString size, _widths.split("|", QString::SkipEmptyParts)) {
+    foreach(QString size, _widths.split("|", Qt::SkipEmptyParts)) {
 
         if (columnnumber >= cols.count()) break;
 
@@ -491,7 +491,7 @@ RideNavigator::eventFilter(QObject *object, QEvent *e)
             active=true;
             // set the column widths
             int columnnumber=0;
-            foreach(QString size, _widths.split("|", QString::SkipEmptyParts)) {
+            foreach(QString size, _widths.split("|", Qt::SkipEmptyParts)) {
                 tableView->setColumnWidth(columnnumber, size.toInt());
             }
             active=false;
@@ -1130,7 +1130,7 @@ void NavigatorCellDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
             value = dateTime.toString("hh:mm:ss"); // same format as ride list
         } else if (columnName == tr("Last updated")) {
             QDateTime dateTime;
-            dateTime.setTime_t(index.model()->data(index, Qt::DisplayRole).toInt());
+            dateTime.setSecsSinceEpoch(index.model()->data(index, Qt::DisplayRole).toInt());
             value = dateTime.toString(tr("ddd MMM d, yyyy hh:mm")); // same format as ride list
         }
     }
@@ -1289,7 +1289,7 @@ ColumnChooser::ColumnChooser(QList<QString>&logicalHeadings)
     setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint | Qt::Tool);
 
     clicked = new QSignalMapper(this); // maps each button click event
-    connect(clicked, SIGNAL(mapped(const QString &)), this, SLOT(buttonClicked(const QString &)));
+    connect(clicked, &QSignalMapper::mappedString, this, &ColumnChooser::buttonClicked);
 
     QVBoxLayout *us = new QVBoxLayout(this);
     us->setSpacing(0);
@@ -1402,8 +1402,8 @@ bool RideNavigatorSortProxyModel::lessThan(const QModelIndex &left,
     QString leftString = leftData.toString();
     QString rightString = rightData.toString();
 
-    if (leftString.contains(QRegExp("[^0-9.,]")) ||
-            rightString.contains(QRegExp("[^0-9.,]"))) { // alpha
+    if (leftString.contains(QRegularExpression("[^0-9.,]")) ||
+            rightString.contains(QRegularExpression("[^0-9.,]"))) { // alpha
         return QString::localeAwareCompare(leftString, rightString) < 0;
     }
     // assume numeric
