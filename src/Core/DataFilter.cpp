@@ -4474,7 +4474,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
 
             // by is coerced to strings if it isn't a string list already
             // this simplifies all the logic for watching it change
-            if (by.asString().count()==0) by.asString() << by.string();
+            if (by.asString().count()==0) by.asNumeric() << by.number();
 
             // state as we loop through a group
             QString laststring =by.asString()[0];
