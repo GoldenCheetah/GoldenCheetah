@@ -184,7 +184,7 @@ QDataStream &operator<<(QDataStream &out, const LTMSettings &settings)
     out<<settings.field2;
     out<<int(-1);
     out<<int(LTM_VERSION_NUMBER); // defined in LTMSettings.h
-    out<<settings.metrics.count();
+    out<<int(settings.metrics.count());
     foreach(MetricDetail metric, settings.metrics) {
         bool discard = false;
         out<<metric.type;
