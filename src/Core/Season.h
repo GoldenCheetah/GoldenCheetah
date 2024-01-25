@@ -116,7 +116,7 @@ class Season
 
     public:
         static QList<QString> types;
-        enum SeasonType { season=0, cycle=1, adhoc=2, temporary=3 };
+        enum SeasonType { season=0, cycle=1, adhoc=2, temporary=3, yearToDate=4 };
         //typedef enum seasontype SeasonType;
 
         Season();
@@ -136,7 +136,7 @@ class Season
         // length of a relative season, SeasonLength() if fixed
         SeasonLength getLength() const { return _length; }
 
-        int getType();
+        int getType() const;
         static bool LessThanForStarts(const Season &a, const Season &b);
 
         // make the season fixed (by invalidating _offset and _length)
@@ -175,7 +175,7 @@ class Season
     protected:
         SeasonOffset _offset; // offset of the start (relative season)
         SeasonLength _length; // length (relative season)
-        QDate _start; // first day (fixed season)
+        QDate _start; // first day (fixed season + year to date)
         QDate _end; // last day (fixed season)
         int _seed;
         int _low; // low point for SB .. default to -50
@@ -202,12 +202,16 @@ class EditSeasonDialog : public QDialog
         Context *context;
         Season *season;
 
+        QLabel *to;
         QPushButton *applyButton, *cancelButton;
         QLineEdit *nameEdit;
         QComboBox *typeEdit;
         QDateEdit *fromEdit, *toEdit;
         QDoubleSpinBox *seedEdit;
         QDoubleSpinBox *lowEdit;
+
+    public slots:
+        void typeChanged();
 };
 
 class EditSeasonEventDialog : public QDialog
