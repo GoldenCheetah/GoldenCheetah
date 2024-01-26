@@ -2835,7 +2835,7 @@ void DataFilterEdit::keyPressEvent(QKeyEvent *e)
 
     // are we in a comment ?
     QString line = textCursor().block().text().trimmed();
-    for(int i=textCursor().positionInBlock(); i>=0; i--)
+    for(int i=textCursor().positionInBlock(); i>=0 && i<line.size(); i--)
         if (line[i]=='#') return;
 
     if (!isShortcut && (hasModifier || e->text().isEmpty()|| completionPrefix.length() < 1
