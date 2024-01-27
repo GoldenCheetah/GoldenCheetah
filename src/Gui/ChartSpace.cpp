@@ -54,7 +54,7 @@ ChartSpace::ChartSpace(Context *context, int scope, GcWindow *window) :
 
     // add a view and scene and centre
     scene = new QGraphicsScene(this);
-    view = new QGraphicsView(this);
+    view = new GGraphicsView(context, this);
 
     // hardware acceleration is important for this widget
 #if QT_VERSION < 0x060000
