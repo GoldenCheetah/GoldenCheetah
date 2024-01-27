@@ -366,12 +366,12 @@ HelpWhatsThis::getText(GCHelp chapter) {
         return text.arg("Preferences_Data%20Fields#processing").arg(tr("Definition of processing default parameters for the fix, adjust,... tools"));
     case Preferences_Metrics:
         return text.arg("Preferences_Metrics").arg(tr("Metrics"));
-    case Preferences_Metrics_Best:
-        return text.arg("Preferences_Metrics#bests").arg(tr("Metrics shown in 'Bests'"));
-    case Preferences_Metrics_Summary:
-        return text.arg("Preferences_Metrics#summary").arg(tr("Metrics shown in 'Summary'"));
-    case Preferences_Metrics_Intervals:
-        return text.arg("Preferences_Metrics#intervals").arg(tr("Metrics shown in 'Intervals'"));
+    case Preferences_Metrics_Favourites:
+        return text.arg("Preferences_Metrics#favourites").arg(tr("Metrics shown in 'Intervals' and 'Summary'"));
+    case Preferences_Metrics_Custom:
+        return text.arg("Preferences_Metrics#custom").arg(tr("User/Custom Metrics"));
+    case Preferences_Metrics_UserMetrics:
+        return text.arg("Special-Topics_Creating-User-Metrics").arg(tr("Create or Edit a User Metric"));
     case Preferences_Measures:
         return text.arg("Preferences_Measures").arg(tr("Measures"));
     case Preferences_Training:

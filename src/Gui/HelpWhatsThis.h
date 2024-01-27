@@ -195,9 +195,9 @@ Q_OBJECT
                  Preferences_DataFields_Processing,
 
                  Preferences_Metrics,
-                 Preferences_Metrics_Best,
-                 Preferences_Metrics_Summary,
-                 Preferences_Metrics_Intervals,
+                 Preferences_Metrics_Favourites,
+                 Preferences_Metrics_Custom,
+                 Preferences_Metrics_UserMetrics,
 
                  Preferences_Training,
                  Preferences_Training_Preferences,
