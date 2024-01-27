@@ -70,6 +70,7 @@ class Athlete;
 class AthleteLoader;
 class Context;
 class AthleteTab;
+class GGraphicsView;
 
 
 extern QList<MainWindow *> mainwindows; // keep track of all the MainWindows we have open
@@ -108,6 +109,7 @@ class MainWindow : public QMainWindow
         // have already been opened
         friend class ::ChooseCyclistDialog;
         friend class ::AthleteLoader;
+        friend class ::GGraphicsView;
         QMap<QString,AthleteTab*> athletetabs;
         AthleteTab *currentAthleteTab;
         QList<AthleteTab*> tabList;
