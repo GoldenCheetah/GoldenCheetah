@@ -786,7 +786,7 @@ BT40Device::updateValue(const QLowEnergyCharacteristic &c, const QByteArray &val
             dynamic_cast<BT40Controller*>(parent)->setCadence(bd.inst_cadence/2.0f);
         }
 
-        if (bd.flags & !FtmsIndoorBikeFlags::FTMS_MORE_DATA)
+        if ( !(bd.flags & FtmsIndoorBikeFlags::FTMS_MORE_DATA) )
         {
             // If "more data" is false, inst speed is present. Convert to km/h by dividing with 100.
             dynamic_cast<BT40Controller*>(parent)->setSpeed(bd.inst_speed/100.0f);
