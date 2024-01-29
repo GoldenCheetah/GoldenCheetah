@@ -1619,7 +1619,7 @@ FavouriteMetricsPage::FavouriteMetricsPage(QWidget *parent) :
     QWidget(parent), changed(false)
 {
     HelpWhatsThis *help = new HelpWhatsThis(this);
-    this->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::Preferences_Metrics_Intervals));
+    this->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::Preferences_Metrics_Favourites));
 
     availList = new QListWidget;
     availList->setSortingEnabled(true);
@@ -1825,6 +1825,9 @@ static quint16 userMetricsCRC(QList<UserMetricSettings> userMetrics)
 CustomMetricsPage::CustomMetricsPage(QWidget *parent, Context *context) :
     QWidget(parent), context(context)
 {
+    HelpWhatsThis *help = new HelpWhatsThis(this);
+    this->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::Preferences_Metrics_Custom));
+
     // copy as current, so we can edit...
     metrics = _userMetrics;
     b4.crc = userMetricsCRC(metrics);
