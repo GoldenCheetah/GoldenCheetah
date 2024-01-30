@@ -1600,11 +1600,11 @@ MainWindow::dropEvent(QDropEvent *event)
     // is this a chart file ?
     QStringList filenames;
     QList<LTMSettings> imported;
-    QStringList list, workouts;
+    QStringList list, workouts, images;
     for(int i=0; i<urls.count(); i++) {
 
         QString filename = QFileInfo(urls.value(i).toLocalFile()).absoluteFilePath();
-        fprintf(stderr, "%s\n", filename.toStdString().c_str()); fflush(stderr);
+        //fprintf(stderr, "%s\n", filename.toStdString().c_str()); fflush(stderr);
 
         if (filename.endsWith(".gchart", Qt::CaseInsensitive)) {
             // add to the list of charts to import
@@ -1624,6 +1624,9 @@ MainWindow::dropEvent(QDropEvent *event)
             // parse and get return values
             xmlReader.parse(source);
             imported += handler.getSettings();
+
+        } else if (Utils::isImage(filename)) {
+            images << filename;
 
         // Look for Workout files only in Train view
         } else if (currentAthleteTab->currentView() == 3 && ErgFile::isWorkout(filename)) {
@@ -1658,6 +1661,9 @@ MainWindow::dropEvent(QDropEvent *event)
     // import workouts
     if (workouts.count()) Library::importFiles(currentAthleteTab->context, workouts, true);
 
+    // import images (these will be attached to the current ride)
+    if (images.count()) importImages(images);
+
     // if there is anything left, process based upon view...
     if (filenames.count()) {
 
@@ -1666,6 +1672,21 @@ MainWindow::dropEvent(QDropEvent *event)
         dialog->process(); // do it!
     }
     return;
+}
+
+void
+MainWindow::importImages(QStringList list)
+{
+    // we need to be on activities view and with a current
+    // ride otherwise we just ignore the list
+    if (currentAthleteTab->currentView() != 1 || currentAthleteTab->context->ride == NULL) {
+        QMessageBox::critical(this, tr("Import Images Failed"), tr("You can only import images on the activities view with an activity selected."));
+        return;
+    }
+
+    // lets import them
+    int count = currentAthleteTab->context->ride->importImages(list);
+    QMessageBox::information(this, tr("Import Images to Activity"), QString(tr("%1 images imported.")).arg(count));
 }
 
 void
