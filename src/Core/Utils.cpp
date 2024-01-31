@@ -623,6 +623,21 @@ heatcolor(double value)
     return returning;
 }
 
+// setup list of image extensions we will support
+static QVector<QString> imageexts;
+static bool initextensions() { imageexts << ".png" << ".gif" << ".jpeg" << ".jpg" << ".bmp"; return true; }
+static bool initexts = initextensions();
+
+// is the file an image?
+bool isImage(QString filename)
+{
+    QString lowername = filename.toLower();
+    foreach(QString ext, imageexts) {
+        if (lowername.endsWith(ext)) return true;
+    }
+    return false;
+}
+
 // used std::sort, std::lower_bound et al
 
 bool doubledescend(const double &s1, const double &s2) { return s1 > s2; }

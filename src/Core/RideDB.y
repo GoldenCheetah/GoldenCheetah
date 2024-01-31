@@ -335,15 +335,11 @@ RideCache::load()
         QDir plannedDirectory = context->athlete->home->planned();
 
         // ok, lets read it in
-        QTextStream stream(&rideDB);
-#if QT_VERSION < 0x060000
-        stream.setCodec("UTF-8");
-#endif
 
         // Read the entire file into a QString -- we avoid using fopen since it
         // doesn't handle foreign characters well. Instead we use QFile and parse
         // from a QString
-        QString contents = stream.readAll();
+        QString contents = QString(rideDB.readAll());
         rideDB.close();
 
         // create scanner context for reentrant parsing

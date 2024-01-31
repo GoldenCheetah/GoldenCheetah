@@ -1628,3 +1628,99 @@ RideItem::xdataMatch(QString name, QString series, QString &mname, QString &mser
     }
     return false;
 }
+
+bool
+RideItem::addImage(QString filename)
+{
+    // get list of images
+    QStringList list=images();
+
+    // filename should be full path since we need to copy into the media folder
+    // we will rename it with a number at the front that cycles
+    QFileInfo fi(filename);
+    if (!fi.exists() || !fi.isReadable() || !fi.isFile()) return false;
+
+    // lets generate a target filename
+    bool isduplicate=true;
+    QString targetname;
+    for(int prefix=1; isduplicate; prefix++) {
+        targetname=QString("%1-%2").arg(prefix).arg(fi.fileName());
+        isduplicate = list.contains(targetname);
+        if (!isduplicate) {
+            // lets check it doesn't already exist on disk
+            QFileInfo ti(context->athlete->home->media().canonicalPath() + "/" + targetname);
+            isduplicate = ti.exists();
+        }
+    }
+
+    // lets copy from source full path, to media folder
+    if (QFile::copy(filename, QString("%1/%2").arg(context->athlete->home->media().canonicalPath()).arg(targetname))) {
+        // success !
+        list << targetname;
+        ride_->setTag("Images", list.join("\n"));
+
+        // make sure it gets saved !
+        setDirty(true);
+        return true;
+    }
+    return false;
+}
+
+bool
+RideItem::removeImage(QString filename)
+{
+    // if it really exists then zap it!
+    QFileInfo fi(context->athlete->home->media().canonicalPath() + "/" + filename);
+    if (fi.exists() && fi.isReadable() && fi.isFile()) {
+
+        QFile::remove(fi.absoluteFilePath());
+
+        // remove from metadata
+        QStringList list=images();
+        int index= list.indexOf(filename);
+        if (index != -1) list.removeAt(index);
+        ride_->setTag("Images", list.join("\n"));
+
+        // set dirty
+        setDirty(true);
+
+        return true;
+    }
+    return false;
+}
+
+// read from the metadata but also check they actually exist
+QStringList
+RideItem::images() const
+{
+    QStringList exist;
+    foreach(QString filename, ride_->getTag("Images", "").split("\n")) {
+        QFileInfo fi(context->athlete->home->media().canonicalPath() + "/" + filename);
+        if (fi.exists() && fi.isReadable() && fi.isFile()) exist << filename;
+    }
+
+    return exist;
+}
+
+// we hide the implementation of directory here since we may change our
+// minds later and store in sub-folders etc
+QStringList RideItem::imagePaths() const
+{
+    QStringList paths;
+    foreach(QString filename, images())
+        paths << context->athlete->home->media().canonicalPath() + "/" + filename;
+
+    return paths;
+}
+
+int
+RideItem::importImages(QStringList files)
+{
+    int count=0;
+
+    foreach(QString file, files) {
+        if (addImage(file) == true) count++;
+    }
+
+    return count;
+}

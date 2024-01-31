@@ -157,6 +157,9 @@ class MainWindow : public QMainWindow
         // chart importing
         void importCharts(QStringList);
 
+        // import images into the current ride
+        void importImages(QStringList);
+
         // open and closing windows and tabs
         void closeWindow();
 

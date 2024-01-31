@@ -62,6 +62,9 @@ namespace Utils
     double heat(double min, double max, double value); // return value normalised between 0-1 for min/max
     QColor heatcolor(double value);                    // return color hear for value between 0 and 1
 
+    // media
+    bool isImage(QString);
+
     // used std::sort, std::lower_bound et al
     struct comparedouble { bool operator()(const double p1, const double p2) { return p1 < p2; } };
     struct compareqstring { bool operator()(const QString p1, const QString p2) { return p1 < p2; } };
