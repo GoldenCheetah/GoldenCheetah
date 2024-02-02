@@ -626,7 +626,7 @@ SeasonTreeView::mimeData
 
     // pack data
     stream << (quint64)(context); // where did this come from?
-    stream << items.count();
+    stream << int(items.count());
     foreach (QTreeWidgetItem *p, items) {
         int seasonIdx = -1;
         int phaseIdx = -1;
