@@ -55,6 +55,14 @@ public:
     static QString seriesName(DataSeries);
     static const QList<DataSeries> &listDataSeries();
 
+    // style is coded to be compatible with FIT files
+    // we use same IDs than ANT power meters messages.
+    // Aero is an additional one for virtual speed estimation
+    // (we can suppose aero position when no power is generated during 10s ?)
+    // and off means not riding (when speed is 0 during 10s ?)
+    enum riderposition { seated = 0, transistionToSeated = 1, standing = 2, transitionToStanding=3, aero = 10, off = 11 };
+    typedef enum riderposition riderPosition;
+
     RealtimeData();
     void reset(); // set all values to zero
 
