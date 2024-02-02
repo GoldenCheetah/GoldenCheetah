@@ -265,7 +265,7 @@ protected:
         return toggle;
     }
 
-    virtual void dragEnterEvent(QDragEnterEvent *event) {
+    virtual void dragEnterEvent(QDragEnterEvent *event) override {
 
         // we handle intervals or seasons
         if (event->mimeData()->formats().contains("application/x-gc-intervals") ||
@@ -279,7 +279,7 @@ protected:
         }
     }
 
-    virtual void dragLeaveEvent(QDragLeaveEvent *) {
+    virtual void dragLeaveEvent(QDragLeaveEvent *) override {
 
         int X = this->mapFromGlobal(QCursor::pos()).x();
         int Y = this->mapFromGlobal(QCursor::pos()).y();

@@ -264,15 +264,19 @@ class SeasonTreeView : public QTreeWidget
         SeasonTreeView(Context *);
 
         // for drag/drop
-        QStringList mimeTypes () const;
-        QMimeData * mimeData ( const QList<QTreeWidgetItem *> items ) const;
+        QStringList mimeTypes () const override;
+#if QT_VERSION < 0x060000
+        QMimeData *mimeData(const QList<QTreeWidgetItem *> items) const override;
+#else
+        QMimeData *mimeData(const QList<QTreeWidgetItem *> &items) const override;
+#endif
 
     signals:
         void itemMoved(QTreeWidgetItem* item, int previous, int actual);
 
     protected:
-        void dragEnterEvent(QDragEnterEvent* event);
-        void dropEvent(QDropEvent* event);
+        void dragEnterEvent(QDragEnterEvent* event) override;
+        void dropEvent(QDropEvent* event) override;
         Context *context;
 
 
