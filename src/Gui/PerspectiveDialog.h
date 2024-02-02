@@ -40,9 +40,9 @@ class PerspectiveTableWidget : public QTableWidget
         PerspectiveTableWidget(QWidget *parent) : QTableWidget(parent) { setMouseTracking(true); }
 
         // process drag and drop
-        virtual void dragEnterEvent(QDragEnterEvent *);
-        virtual void dragMoveEvent(QDragMoveEvent *);
-        virtual void dropEvent(QDropEvent *);
+        virtual void dragEnterEvent(QDragEnterEvent *) override;
+        virtual void dragMoveEvent(QDragMoveEvent *) override;
+        virtual void dropEvent(QDropEvent *) override;
 
     signals:
         void chartMoved(GcChartWindow*);
@@ -56,8 +56,12 @@ class ChartTableWidget : public QTableWidget
     public:
         ChartTableWidget(QWidget *parent) : QTableWidget(parent) {}
 
-        virtual QStringList mimeTypes() const;
-        virtual QMimeData *mimeData (const QList<QTableWidgetItem *> items) const;
+        virtual QStringList mimeTypes() const override;
+#if QT_VERSION < 0x060000
+        virtual QMimeData *mimeData (const QList<QTableWidgetItem *> items) const override;
+#else
+        virtual QMimeData *mimeData (const QList<QTableWidgetItem *> &items) const override;
+#endif
 };
 
 class PerspectiveDialog : public QDialog
