@@ -197,7 +197,7 @@ ChartTreeView::dropEvent(QDropEvent* event)
     }*/
 }
 
-QStringList 
+QStringList
 ChartTreeView::mimeTypes() const
 {
     QStringList returning;
@@ -207,7 +207,12 @@ ChartTreeView::mimeTypes() const
 }
 
 QMimeData *
-ChartTreeView::mimeData (const QList<QTreeWidgetItem *> items) const
+ChartTreeView::mimeData
+#if QT_VERSION < 0x060000
+(const QList<QTreeWidgetItem *> items) const
+#else
+(const QList<QTreeWidgetItem *> &items) const
+#endif
 {
     QMimeData *returning = new QMimeData;
 
@@ -216,7 +221,7 @@ ChartTreeView::mimeData (const QList<QTreeWidgetItem *> items) const
     QDataStream stream(&rawData, QIODevice::WriteOnly);
     stream.setVersion(QDataStream::Qt_4_6);
 
-    // pack data 
+    // pack data
     stream << (quint64)(context); // where did this come from?
     stream << items.count();
     foreach (QTreeWidgetItem *p, items) {
