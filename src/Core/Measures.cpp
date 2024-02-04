@@ -44,7 +44,11 @@ Measure::getFingerprint() const
     QByteArray ba = QByteArray::number(x);
     ba.append(comment.toUtf8());
 
+#if QT_VERSION < 0x060000
     return qChecksum(ba, ba.length());
+#else
+    return qChecksum(ba);
+#endif
 }
 
 QString

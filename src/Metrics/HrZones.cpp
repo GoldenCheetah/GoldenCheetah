@@ -924,7 +924,11 @@ HrZones::getFingerprint() const
         }
     }
     QByteArray ba = QByteArray::number(x);
+#if QT_VERSION < 0x060000
     return qChecksum(ba, ba.length());
+#else
+    return qChecksum(ba);
+#endif
 }
 
 quint16
@@ -948,5 +952,9 @@ HrZones::getFingerprint(QDate forDate) const
         }
     }
     QByteArray ba = QByteArray::number(x);
+#if QT_VERSION < 0x060000
     return qChecksum(ba, ba.length());
+#else
+    return qChecksum(ba);
+#endif
 }
