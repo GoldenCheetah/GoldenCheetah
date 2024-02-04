@@ -70,6 +70,7 @@ AbstractView::AbstractView(Context *context, int type) :
     QString heading = tr("Compare Activities and Intervals");
     if (type == VIEW_TRENDS) heading = tr("Compare Date Ranges");
     else if (type == VIEW_TRAIN) heading = tr("Intensity Adjustments and Workout Control");
+    else if (type == VIEW_EQUIPMENT) heading = tr("Equipment Management");
 
     mainSplitter = new ViewSplitter(Qt::Vertical, heading, this);
     mainSplitter->setHandleWidth(23 *dpiXFactor);
@@ -270,13 +271,7 @@ AbstractView::saveState()
     // we're not interested in them
     // NOTE: currently we support QString, int, double and bool types - beware custom types!!
 
-    QString view = "none";
-    switch(type) {
-    case VIEW_ANALYSIS: view = "analysis"; break;
-    case VIEW_TRAIN: view = "train"; break;
-    case VIEW_DIARY: view = "diary"; break;
-    case VIEW_TRENDS: view = "home"; break;
-    }
+    QString view = viewName();
 
     QString filename = context->athlete->home->config().canonicalPath() + "/" + view + "-perspectives.xml";
     QFile file(filename);
@@ -310,20 +305,15 @@ AbstractView::saveState()
 void
 AbstractView::restoreState(bool useDefault)
 {
-    QString view = "none";
-    switch(type) {
-    case VIEW_ANALYSIS: view = "analysis"; break;
-    case VIEW_TRAIN: view = "train"; break;
-    case VIEW_DIARY: view = "diary"; break;
-    case VIEW_TRENDS: view = "home"; break;
-    }
+    QString content = "";
+    bool legacy = false;
+
+    QString view(viewName());
+    restoreConfiguration(useDefault, content);
 
     // restore window state
     QString filename = context->athlete->home->config().canonicalPath() + "/" + view + "-perspectives.xml";
     QFileInfo finfo(filename);
-
-    QString content = "";
-    bool legacy = false;
 
     // set content from the default
     if (useDefault) {
@@ -460,6 +450,13 @@ AbstractView::restoreState(bool useDefault)
             context->athlete->selectRideFile(context->athlete->rideCache->rides().last()->fileName);
         }
     }
+}
+
+void
+AbstractView::restoreConfiguration(bool& , QString& )
+{
+    // prevents c++11 compiler warning about unused parameters,
+    // for derived classes to modify parameters if required.
 }
 
 void

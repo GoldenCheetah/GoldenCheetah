@@ -29,6 +29,7 @@
 #include "RideItem.h"
 #include "TimeUtils.h"
 #include "DragBar.h"
+#include "EquipmentModelManager.h"
 #ifdef GC_HAS_CLOUD_DB
 #include "CloudDBChart.h"
 #include "CloudDBUserMetric.h"
@@ -73,6 +74,8 @@ class AthleteLoader;
 class Context;
 class AthleteTab;
 class GGraphicsView;
+class EquipmentTab;
+class EquipmentModelManager;
 
 
 extern QList<MainWindow *> mainwindows; // keep track of all the MainWindows we have open
@@ -103,6 +106,8 @@ class MainWindow : public QMainWindow
 
         bool isStarting() const;
 
+		EquipmentModelManager* equipmentModelMngr;
+
     protected:
 
         // used by ChooseCyclistDialog to see which athletes
@@ -113,6 +118,7 @@ class MainWindow : public QMainWindow
         QMap<QString,AthleteTab*> athletetabs;
         AthleteTab *currentAthleteTab;
         QList<AthleteTab*> tabList;
+		EquipmentTab* equipmentTab;
 
         virtual void resizeEvent(QResizeEvent*);
         virtual void moveEvent(QMoveEvent*);
@@ -200,6 +206,7 @@ class MainWindow : public QMainWindow
         void selectDiary();
         void selectAnalysis();
         void selectTrain();
+        void selectEquipment();
 
         void setChartMenu();
         void setSubChartMenu();
@@ -322,7 +329,7 @@ class MainWindow : public QMainWindow
 
         // tab bar (that supports swtitching on drag and drop)
         DragBar *tabbar;
-        QStackedWidget *viewStack, *tabStack;
+        QStackedWidget *viewStack, *tabStack, *eqTabStack;
 
         // window and tab menu
         QMenu *openTabMenu;

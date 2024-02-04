@@ -34,6 +34,7 @@
 #include "Settings.h"
 
 class AthleteTab;
+class EquipmentTab;
 class ViewSplitter;
 class Context;
 class BlankStatePage;
@@ -79,7 +80,7 @@ class AbstractView : public QWidget
 
         // load/save perspectives
         void restoreState(bool useDefault = false);
-        void saveState();
+        virtual void saveState();
         void appendPerspective(Perspective *page);
 
         void setPerspectives(QComboBox *perspectiveSelector, bool selectChart=false); // set the combobox when view selected
@@ -148,8 +149,11 @@ class AbstractView : public QWidget
 
     protected:
 
+        virtual QString viewName() = 0;
+        virtual void restoreConfiguration(bool& useDefault, QString& content);
+
         Context *context;
-        int type; // used by windowregistry; e.g VIEW_TRAIN VIEW_ANALYSIS VIEW_DIARY VIEW_TRENDS
+        int type; // used by windowregistry; e.g VIEW_TRAIN VIEW_ANALYSIS VIEW_DIARY VIEW_TRENDS VIEW_EQUIPMENT
                   // we don't care what values are pass through to the GcWindowRegistry to decide
                   // what charts are relevant for this view.
 

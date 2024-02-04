@@ -108,6 +108,12 @@ Perspective::Perspective(Context *context, QString title, int type) :
     case VIEW_DIARY: view="diary"; break;
     case VIEW_TRENDS: view="home"; break;
     case VIEW_TRAIN: view="train"; break;
+    case VIEW_EQUIPMENT: {
+        view = "equipment";
+        // These are not required in equipment view
+        titleLabel->setHidden(true);
+        titleEdit->setHidden(true);
+        } break;
     }
     setProperty("isManager", true);
     nomenu=true;

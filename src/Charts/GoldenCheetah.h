@@ -228,9 +228,9 @@ public:
     void mouseReleaseEvent(QMouseEvent *) override;
     void mouseMoveEvent(QMouseEvent *) override;
 #if QT_VERSION >= 0x060000
-    void enterEvent(QEnterEvent *) override;
+    virtual void enterEvent(QEnterEvent *) override;
 #else
-    void enterEvent(QEvent *) override;
+    virtual void enterEvent(QEvent *) override;
 #endif
     void leaveEvent(QEvent *) override;
     void setDragState(DragState);

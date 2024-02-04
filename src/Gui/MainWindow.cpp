@@ -82,6 +82,7 @@
 
 // GUI Widgets
 #include "AthleteTab.h"
+#include "EquipmentTab.h"
 #include "GcToolBar.h"
 #include "NewSideBar.h"
 #include "HelpWindow.h"
@@ -153,6 +154,8 @@ MainWindow::MainWindow(const QDir &home)
     Context *context = new Context(this);
     context->athlete = new Athlete(context, home);
     currentAthleteTab = new AthleteTab(context);
+    equipmentModelMngr = new EquipmentModelManager(context);
+    equipmentTab = new EquipmentTab(context);
 
     setWindowIcon(QIcon(":images/gc.png"));
     setWindowTitle(context->athlete->home->root().dirName());
@@ -220,16 +223,18 @@ MainWindow::MainWindow(const QDir &home)
 
     sidebar->addItem(QImage(":sidebar/train.png"), tr("train"), 5, helpNewSideBar->getWhatsThisText(HelpWhatsThis::ScopeBar_Train));
 
+    sidebar->addItem(QImage(":sidebar/equipment.png"), tr("equipment"), 6, helpNewSideBar->getWhatsThisText(HelpWhatsThis::ScopeBar_Equipment));
+
     sidebar->addStretch();
-    sidebar->addItem(QImage(":sidebar/apps.png"), tr("apps"), 6, tr("Feature not implemented yet"));
-    sidebar->setItemEnabled(6, false);
+    sidebar->addItem(QImage(":sidebar/apps.png"), tr("apps"), 7, tr("Feature not implemented yet"));
+    sidebar->setItemEnabled(7, false);
     sidebar->addStretch();
 
     // we can click on the quick icons, but they aren't selectable views
-    sidebar->addItem(QImage(":sidebar/sync.png"), tr("sync"), 7, helpNewSideBar->getWhatsThisText(HelpWhatsThis::ScopeBar_Sync));
-    sidebar->setItemSelectable(7, false);
-    sidebar->addItem(QImage(":sidebar/prefs.png"), tr("options"), 8, helpNewSideBar->getWhatsThisText(HelpWhatsThis::ScopeBar_Options));
+    sidebar->addItem(QImage(":sidebar/sync.png"), tr("sync"), 8, helpNewSideBar->getWhatsThisText(HelpWhatsThis::ScopeBar_Sync));
     sidebar->setItemSelectable(8, false);
+    sidebar->addItem(QImage(":sidebar/prefs.png"), tr("options"), 9, helpNewSideBar->getWhatsThisText(HelpWhatsThis::ScopeBar_Options));
+    sidebar->setItemSelectable(9, false);
 
     connect(sidebar, SIGNAL(itemClicked(int)), this, SLOT(sidebarClicked(int)));
     connect(sidebar, SIGNAL(itemSelected(int)), this, SLOT(sidebarSelected(int)));
@@ -409,6 +414,11 @@ MainWindow::MainWindow(const QDir &home)
 
     tabStack = new QStackedWidget(this);
     viewStack->addWidget(tabStack);
+
+    eqTabStack = new QStackedWidget(this);
+    eqTabStack->addWidget(equipmentTab);
+    eqTabStack->setCurrentIndex(1);
+    viewStack->addWidget(eqTabStack);
 
     // first tab
     athletetabs.insert(currentAthleteTab->context->athlete->home->root().dirName(), currentAthleteTab);
@@ -798,6 +808,7 @@ void
 MainWindow::showSidebar(bool want)
 {
     currentAthleteTab->setSidebarEnabled(want);
+    equipmentTab->setSidebarEnabled(true);
     showhideSidebar->setChecked(want);
     setToolButtons();
 }
@@ -865,6 +876,7 @@ MainWindow::setChartMenu()
         case 1 : mask = VIEW_ANALYSIS; break;
         case 2 : mask = VIEW_DIARY; break;
         case 3 : mask = VIEW_TRAIN; break;
+        case 4 : mask = VIEW_EQUIPMENT; break;
     }
 
     chartMenu->clear();
@@ -890,11 +902,12 @@ MainWindow::setChartMenu(QMenu *menu)
     // setup to only show charts that are relevant
     // to this view
     switch(currentAthleteTab->currentView()) {
-        case 0 : mask = VIEW_TRENDS; break;
-        default:
-        case 1 : mask = VIEW_ANALYSIS; break;
-        case 2 : mask = VIEW_DIARY; break;
-        case 3 : mask = VIEW_TRAIN; break;
+		case 0 : mask = VIEW_TRENDS; break;
+		default:
+		case 1 : mask = VIEW_ANALYSIS; break;
+		case 2 : mask = VIEW_DIARY; break;
+		case 3 : mask = VIEW_TRAIN; break;
+		case 4 : mask = VIEW_EQUIPMENT; break;
     }
 
     menu->clear();
@@ -947,6 +960,7 @@ MainWindow::exportPerspective()
     case 1:  current = currentAthleteTab->analysisView; typedesc = "Analysis"; break;
     case 2:  current = currentAthleteTab->diaryView; typedesc = "Diary"; break;
     case 3:  current = currentAthleteTab->trainView; typedesc = "Train"; break;
+    case 4:  current = equipmentTab->equipView_; typedesc = "Equipment"; break;
     }
 
     // export the current perspective to a file
@@ -973,6 +987,7 @@ MainWindow::importPerspective()
     case 1:  current = currentAthleteTab->analysisView; break;
     case 2:  current = currentAthleteTab->diaryView; break;
     case 3:  current = currentAthleteTab->trainView; break;
+    case 4:  current = equipmentTab->equipView_; break;
     }
 
     // import a new perspective from a file
@@ -1114,6 +1129,10 @@ void
 MainWindow::closeEvent(QCloseEvent* event)
 {
     QGuiApplication::setOverrideCursor(Qt::WaitCursor);
+
+	// Save equipment configuration
+	equipmentModelMngr->close();
+
     QList<AthleteTab*> closing = tabList;
     bool needtosave = false;
     bool importrunning = false;
@@ -1171,6 +1190,10 @@ MainWindow::~MainWindow()
     // aside from the tabs, we may need to clean
     // up any dangling widgets created in MainWindow::MainWindow (?)
     if (configdialog_ptr) configdialog_ptr->close();
+
+	// tidy up equipment instances
+	delete equipmentTab;
+	delete equipmentModelMngr;
 }
 
 // global search/data filter
@@ -1290,10 +1313,10 @@ void
 MainWindow::sidebarClicked(int id)
 {
     // sync quick link
-    if (id == 7) checkCloud();
+    if (id == 8) checkCloud();
 
     // prefs
-    if (id == 8) showOptions();
+    if (id == 9) showOptions();
 
 }
 
@@ -1309,7 +1332,8 @@ MainWindow::sidebarSelected(int id)
     case 4: // reflect not written yet
             break;
     case 5: selectTrain(); break;
-    case 6: // apps not written yet
+    case 6: selectEquipment(); break;
+    case 7: // apps not written yet
             break;
     }
 }
@@ -1343,6 +1367,15 @@ MainWindow::selectTrain()
     currentAthleteTab->selectView(3);
     perspectiveSelector->show();
     setToolButtons();
+}
+
+void
+MainWindow::selectEquipment()
+{
+    resetPerspective(4);
+    viewStack->setCurrentIndex(2);
+    sidebar->setItemSelected(6, true);
+    perspectiveSelector->hide();
 }
 
 void
@@ -1451,6 +1484,7 @@ MainWindow::resetPerspective(int view, bool force)
     case 1:  current = currentAthleteTab->analysisView; break;
     case 2:  current = currentAthleteTab->diaryView; break;
     case 3:  current = currentAthleteTab->trainView; break;
+    case 4:  current = equipmentTab->equipView_; break;
     }
 
     // set the perspective
@@ -1473,6 +1507,7 @@ MainWindow::perspectiveSelected(int index)
     case 1:  current = currentAthleteTab->analysisView; break;
     case 2:  current = currentAthleteTab->diaryView; break;
     case 3:  current = currentAthleteTab->trainView; break;
+    case 4:  current = equipmentTab->equipView_; break;
     }
 
     // which perspective is currently being shown?
@@ -1486,6 +1521,7 @@ MainWindow::perspectiveSelected(int index)
         case 1:  current->perspectiveSelected(index); break;
         case 2:  current->perspectiveSelected(index); break;
         case 3:  current->perspectiveSelected(index); break;
+        case 4:  current->perspectiveSelected(index); break;
         }
 
     } else {
@@ -1543,6 +1579,7 @@ MainWindow::perspectivesChanged()
     case 1:  current = currentAthleteTab->analysisView; break;
     case 2:  current = currentAthleteTab->diaryView; break;
     case 3:  current = currentAthleteTab->trainView; break;
+    case 4:  current = equipmentTab->equipView_; break;
     }
 
     // which perspective is currently being selected (before we go setting the combobox)
@@ -2576,6 +2613,7 @@ MainWindow::configChanged(qint32)
                                                                         .arg(fg_select.name()));
     tabbar->setDocumentMode(true);
     athleteView->setPalette(tabbar->palette());
+	equipmentTab->equipView_->setPalette(tabbar->palette());
 
     head->updateGeometry();
     repaint();
