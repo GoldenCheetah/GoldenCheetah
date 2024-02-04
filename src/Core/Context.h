@@ -101,6 +101,8 @@ class GlobalContext : public QObject
 };
 
 class RideNavigator;
+class EquipmentNode;
+
 class Context : public QObject
 {
     Q_OBJECT;
@@ -249,6 +251,15 @@ class Context : public QObject
         void notifySteerScroll(int scrollAmount) { emit steerScroll(scrollAmount); }
         void notifyEstimatesRefreshed() { emit estimatesRefreshed(); }
 
+        // Equipment
+        void notifyEquipmentSelected(EquipmentNode* eqItem, bool eqListView) { equipmentSelected(eqItem, eqListView); }
+        void notifyEquipmentAdded(EquipmentNode* eqParent, int eqToAdd) { equipmentAdded(eqParent, eqToAdd); }
+        void notifyEquipmentDeleted(EquipmentNode* eqItem, bool warnOnEqDelete) { equipmentDeleted(eqItem, warnOnEqDelete); }
+		void notifyEquipmentMove(EquipmentNode* eqItem, bool eqListView, bool up) { equipmentMove(eqItem, eqListView, up); }
+        void notifyEqRecalculationStart() { eqRecalculationStart(); }
+		void notifyEqRecalculationEnd() { eqRecalculationEnd(); }
+		void notifyUpdateEqSettings(bool load) { updateEqSettings(load); }
+
     protected:
 
         // we need to act since the user metric config changed
@@ -337,5 +348,15 @@ class Context : public QObject
 
         // Trainer controls
         void steerScroll(int);
+
+        // Equipment
+        void equipmentSelected(EquipmentNode* eqItem, bool eqListView);
+        void equipmentAdded(EquipmentNode*, int eqToAdd);
+		void equipmentDeleted(EquipmentNode*, bool warnOnEqDelete);
+		void equipmentMove(EquipmentNode* eqItem, bool eqListView, bool up);
+        void eqRecalculationStart();
+		void eqRecalculationEnd();
+		void updateEqSettings(bool load);
+
 };
 #endif // _GC_Context_h

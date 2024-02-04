@@ -22,6 +22,7 @@
 #include "AbstractView.h"
 class TrainSidebar;
 class AnalysisSidebar;
+class EquipmentSidebar;
 class IntervalSidebar;
 class QDialog;
 class RideNavigator;
@@ -35,6 +36,8 @@ class AnalysisView : public AbstractView
 
         AnalysisView(Context *context, QStackedWidget *controls);
         ~AnalysisView();
+
+		QString viewName() override { return "analysis"; };
         void close() override;
         void setRide(RideItem*ride) override;
         void addIntervals();
@@ -61,6 +64,8 @@ class DiaryView : public AbstractView
 
         DiaryView(Context *context, QStackedWidget *controls);
         ~DiaryView();
+
+		QString viewName() override { return "diary"; };
         void setRide(RideItem*ride) override;
 
     public slots:
@@ -82,6 +87,8 @@ class TrainView : public AbstractView
 
         TrainView(Context *context, QStackedWidget *controls);
         ~TrainView();
+
+		QString viewName() override { return "train"; };
         void close() override;
 
     public slots:
@@ -109,10 +116,11 @@ class TrendsView : public AbstractView
         TrendsView(Context *context, QStackedWidget *controls);
         ~TrendsView();
 
+		QString viewName() override { return "home"; };
+		int countActivities(Perspective*, DateRange dr);
+
         LTMSidebar *sidebar;
         Perspective *hw;
-
-        int countActivities(Perspective *, DateRange dr);
 
     signals:
         void dateChanged(DateRange);
@@ -123,6 +131,36 @@ class TrendsView : public AbstractView
         void justSelected();
         void dateRangeChanged(DateRange);
         void compareChanged(bool);
+};
+
+class EquipView : public AbstractView
+{
+	Q_OBJECT
+
+	public:
+
+		EquipView(Context* context, QStackedWidget* controls);
+		~EquipView();
+
+		QString viewName() override { return "Equipment"; };
+
+		// Don't want the base class behaviour for these...
+		virtual void setRide(RideItem*) override {}
+		virtual void saveState() override {}
+
+		EquipmentSidebar* equipmentSidebar_;
+		EquipmentSidebar* equipmentRefsSidebar_;
+
+	public slots:
+
+	bool isBlank() override;
+
+	protected:
+		void restoreConfiguration(bool& useDefault, QString& content) override;
+
+	private:
+		Perspective* hw;
+
 };
 
 #endif // _GC_Views_h

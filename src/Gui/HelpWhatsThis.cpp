@@ -77,6 +77,8 @@ HelpWhatsThis::getText(GCHelp chapter) {
          return text.arg("ScopeBar_Views#activities").arg(tr("Analysis of a single activity with diagrams like activity plot, W'bal, ... and Chung's Aerolab"));
     case ScopeBar_Train:
         return text.arg("ScopeBar_Views#train").arg(tr("Ride indoors, following pre-programmed workouts - with multi device and video playback support"));
+    case ScopeBar_Equipment:
+        return text.arg("ScopeBar_Views#equipment").arg(tr("Tracks equipment wear & tear, supporting proactive maintenance"));
     case ScopeBar_Sync:
         return text.arg("ScopeBar_Views#sync").arg(tr("Sync with all Cloud Services with Sync on Start Up option enabled"));
     case ScopeBar_Options:
@@ -287,6 +289,9 @@ HelpWhatsThis::getText(GCHelp chapter) {
     case ChartTrain_LiveMap:
         return text.arg("ChartTypes_Train#live-map").arg(tr("Real time display of the route of simulation workouts in an Open Street Map"));
 
+	case EquipmentWindow_Details:
+		return text.arg("EquipmentWindow#details").arg(tr("Tracks equipment wear & tear, supporting proactive maintenance"));
+		
     // Sidebars
     case SideBarTrendsView_DateRanges:
         return text.arg("Side-Bar_Trends-view#date-ranges").arg(tr("Predefined and configurable set of data ranges for selection of activities to be analysed"));
@@ -302,6 +307,8 @@ HelpWhatsThis::getText(GCHelp chapter) {
         return text.arg("Side-Bar_Activities-view#calendar").arg(tr("Calendar"));
     case SideBarRidesView_Rides:
         return text.arg("Side-Bar_Activities-view#activities").arg(tr("Configurable list of activities"));
+	case SideBarEquipmentView_Eq:
+		return text.arg("Side-Bar_Equipment-view#equipment").arg(tr("Configurable list of equipment"));
     case SideBarRidesView_Intervals:
         return text.arg("Side-Bar_Activities-view#intervals").arg(tr("Display the available and add new intervals using simple query methods"));
     case SideBarDiaryView_Calendar:

@@ -227,7 +227,7 @@ public:
     void mousePressEvent(QMouseEvent *);
     void mouseReleaseEvent(QMouseEvent *);
     void mouseMoveEvent(QMouseEvent *);
-    void enterEvent(QEvent *);
+    virtual void enterEvent(QEvent *);
     void leaveEvent(QEvent *);
     void setDragState(DragState);
     void setCursorShape(DragState);
