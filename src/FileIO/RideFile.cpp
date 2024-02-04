@@ -421,57 +421,57 @@ QColor
 RideFile::colorFor(SeriesType series)
 {
     switch (series) {
-    case RideFile::cad: return GColor(CCADENCE);
-    case RideFile::cadd: return GColor(CCADENCE);
-    case RideFile::hr: return GColor(CHEARTRATE);
-    case RideFile::hrd: return GColor(CHEARTRATE);
-    case RideFile::kph: return GColor(CSPEED);
-    case RideFile::kphd: return GColor(CSPEED);
-    case RideFile::nm: return GColor(CTORQUE);
-    case RideFile::nmd: return GColor(CTORQUE);
-    case RideFile::watts: return GColor(CPOWER);
-    case RideFile::wattsd: return GColor(CPOWER);
-    case RideFile::xPower: return GColor(CXPOWER);
-    case RideFile::aPower: return GColor(CAPOWER);
-    case RideFile::aTISS: return GColor(CNPOWER);
-    case RideFile::anTISS: return GColor(CNPOWER);
-    case RideFile::IsoPower: return GColor(CNPOWER);
-    case RideFile::alt: return GColor(CALTITUDE);
-    case RideFile::headwind: return GColor(CWINDSPEED);
-    case RideFile::temp: return GColor(CTEMP);
-    case RideFile::lrbalance: return GColor(CBALANCELEFT);
-    case RideFile::lte: return GColor(CLTE);
-    case RideFile::rte: return GColor(CRTE);
-    case RideFile::lps: return GColor(CLPS);
-    case RideFile::rps: return GColor(CRPS);
-    case RideFile::lpco: return GColor(CLPS);
-    case RideFile::rpco: return GColor(CRPS);
-    case RideFile::lppb: return GColor(CLPS);
-    case RideFile::rppb: return GColor(CRPS);
-    case RideFile::lppe: return GColor(CLPS);
-    case RideFile::rppe: return GColor(CRPS);
-    case RideFile::lpppb: return GColor(CLPS);
-    case RideFile::rpppb: return GColor(CRPS);
-    case RideFile::lpppe: return GColor(CLPS);
-    case RideFile::rpppe: return GColor(CRPS);
+    case RideFile::cad: return GColor(GCol::CADENCE);
+    case RideFile::cadd: return GColor(GCol::CADENCE);
+    case RideFile::hr: return GColor(GCol::HEARTRATE);
+    case RideFile::hrd: return GColor(GCol::HEARTRATE);
+    case RideFile::kph: return GColor(GCol::SPEED);
+    case RideFile::kphd: return GColor(GCol::SPEED);
+    case RideFile::nm: return GColor(GCol::TORQUE);
+    case RideFile::nmd: return GColor(GCol::TORQUE);
+    case RideFile::watts: return GColor(GCol::POWER);
+    case RideFile::wattsd: return GColor(GCol::POWER);
+    case RideFile::xPower: return GColor(GCol::XPOWER);
+    case RideFile::aPower: return GColor(GCol::APOWER);
+    case RideFile::aTISS: return GColor(GCol::NPOWER);
+    case RideFile::anTISS: return GColor(GCol::NPOWER);
+    case RideFile::IsoPower: return GColor(GCol::NPOWER);
+    case RideFile::alt: return GColor(GCol::ALTITUDE);
+    case RideFile::headwind: return GColor(GCol::WINDSPEED);
+    case RideFile::temp: return GColor(GCol::TEMP);
+    case RideFile::lrbalance: return GColor(GCol::BALANCELEFT);
+    case RideFile::lte: return GColor(GCol::LTE);
+    case RideFile::rte: return GColor(GCol::RTE);
+    case RideFile::lps: return GColor(GCol::LPS);
+    case RideFile::rps: return GColor(GCol::RPS);
+    case RideFile::lpco: return GColor(GCol::LPS);
+    case RideFile::rpco: return GColor(GCol::RPS);
+    case RideFile::lppb: return GColor(GCol::LPS);
+    case RideFile::rppb: return GColor(GCol::RPS);
+    case RideFile::lppe: return GColor(GCol::LPS);
+    case RideFile::rppe: return GColor(GCol::RPS);
+    case RideFile::lpppb: return GColor(GCol::LPS);
+    case RideFile::rpppb: return GColor(GCol::RPS);
+    case RideFile::lpppe: return GColor(GCol::LPS);
+    case RideFile::rpppe: return GColor(GCol::RPS);
     case RideFile::interval: return QColor(Qt::white);
-    case RideFile::wattsKg: return GColor(CPOWER);
-    case RideFile::wprime: return GColor(CWBAL);
-    case RideFile::smo2: return GColor(CSMO2);
-    case RideFile::thb: return GColor(CTHB);
-    case RideFile::o2hb: return GColor(CO2HB);
-    case RideFile::hhb: return GColor(CHHB);
-    case RideFile::slope: return GColor(CSLOPE);
-    case RideFile::rvert: return GColor(CRV);
-    case RideFile::rcontact: return GColor(CRGCT);
-    case RideFile::rcad: return GColor(CRCAD);
-    case RideFile::gear: return GColor(CGEAR);
+    case RideFile::wattsKg: return GColor(GCol::POWER);
+    case RideFile::wprime: return GColor(GCol::WBAL);
+    case RideFile::smo2: return GColor(GCol::SMO2);
+    case RideFile::thb: return GColor(GCol::THB);
+    case RideFile::o2hb: return GColor(GCol::O2HB);
+    case RideFile::hhb: return GColor(GCol::HHB);
+    case RideFile::slope: return GColor(GCol::SLOPE);
+    case RideFile::rvert: return GColor(GCol::RV);
+    case RideFile::rcontact: return GColor(GCol::RGCT);
+    case RideFile::rcad: return GColor(GCol::RCAD);
+    case RideFile::gear: return GColor(GCol::GEAR);
     case RideFile::secs:
     case RideFile::km:
     case RideFile::vam:
     case RideFile::lon:
     case RideFile::lat:
-    default: return GColor(CPLOTMARKER);
+    default: return GColor(GCol::PLOTMARKER);
     }
 }
 

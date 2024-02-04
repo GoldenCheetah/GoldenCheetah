@@ -311,19 +311,19 @@ ChartSpaceItem::underMouse()
 void
 ChartSpaceItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *opt, QWidget *widget) {
 
-    if (drag) painter->setBrush(QBrush(GColor(CPLOTMARKER)));
-    else painter->setBrush(RGBColor(color()));
+    if (drag) painter->setBrush(QBrush(GColor(GCol::PLOTMARKER)));
+    else painter->setBrush(GRGBColorToQColor(color()));
 
     QPainterPath path;
     path.addRoundedRect(QRectF(0,0,geometry().width(),geometry().height()), ROWHEIGHT/5, ROWHEIGHT/5);
     painter->setPen(Qt::NoPen);
     //painter->fillPath(path, brush.color());
     painter->drawPath(path);
-    painter->setPen(GColor(CPLOTGRID));
+    painter->setPen(GColor(GCol::PLOTGRID));
     //XXXpainter->drawLine(QLineF(0,ROWHEIGHT*2,geometry().width(),ROWHEIGHT*2));
     //painter->fillRect(QRectF(0,0,geometry().width()+1,geometry().height()+1), brush);
     //titlefont.setWeight(QFont::Bold);
-    if (GCColor::luminance(RGBColor(color())) < 127) painter->setPen(QColor(200,200,200));
+    if (GLuminance(GRGBColorToQColor(color())) < 127) painter->setPen(QColor(200,200,200));
     else painter->setPen(QColor(70,70,70));
 
     painter->setFont(parent->titlefont);
@@ -346,7 +346,7 @@ ChartSpaceItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *opt, QW
                 path.addRoundedRect(QRectF(geometry().width()-40-ROWHEIGHT,0,
                                     ROWHEIGHT+40, ROWHEIGHT+40), ROWHEIGHT/5, ROWHEIGHT/5);
                 painter->setPen(Qt::NoPen);
-                QColor darkgray(RGBColor(color()).lighter(200));
+                QColor darkgray(GRGBColorToQColor(color()).lighter(200));
                 painter->setBrush(darkgray);
                 painter->drawPath(path);
                 painter->fillRect(QRectF(geometry().width()-40-ROWHEIGHT, 0, ROWHEIGHT+40-(ROWHEIGHT/5), ROWHEIGHT+40), QBrush(darkgray));
@@ -369,7 +369,7 @@ ChartSpaceItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *opt, QW
     if (!drag) {
         QPainterPath path;
         path.addRoundedRect(QRectF(1*dpiXFactor,1*dpiXFactor,geometry().width()-(2*dpiXFactor),geometry().height()-(2*dpiXFactor)), ROWHEIGHT/5, ROWHEIGHT/5);
-        QColor edge(RGBColor(color()));
+        QColor edge(GRGBColorToQColor(color()));
         edge = edge.darker(105);
         QPen pen(edge);
         pen.setWidth(3*dpiXFactor);
@@ -622,7 +622,7 @@ ChartSpace::updateGeometry()
 void
 ChartSpace::configChanged(qint32 why)
 {
-    grayConfig = colouredIconFromPNG(":images/configure.png", GColor(COVERVIEWBACKGROUND).lighter(75));
+    grayConfig = colouredIconFromPNG(":images/configure.png", GColor(GCol::OVERVIEWBACKGROUND).lighter(75));
     whiteConfig = colouredIconFromPNG(":images/configure.png", QColor(100,100,100));
     accentConfig = colouredIconFromPNG(":images/configure.png", QColor(150,150,150));
 
@@ -638,32 +638,32 @@ ChartSpace::configChanged(qint32 why)
     tinyfont.setPixelSize(pixelSizeForFont(smallfont, ROWHEIGHT*0.5f));
     tinyfont.setHintingPreference(QFont::HintingPreference::PreferNoHinting);
 
-    setProperty("color", GColor(COVERVIEWBACKGROUND));
-    view->setBackgroundBrush(QBrush(GColor(COVERVIEWBACKGROUND)));
-    scene->setBackgroundBrush(QBrush(GColor(COVERVIEWBACKGROUND)));
+    setProperty("color", GColor(GCol::OVERVIEWBACKGROUND));
+    view->setBackgroundBrush(QBrush(GColor(GCol::OVERVIEWBACKGROUND)));
+    scene->setBackgroundBrush(QBrush(GColor(GCol::OVERVIEWBACKGROUND)));
     scrollbar->setStyleSheet(AbstractView::ourStyleSheet());
 
     // text edit colors
     QPalette palette;
-    palette.setColor(QPalette::Window, GColor(COVERVIEWBACKGROUND));
+    palette.setColor(QPalette::Window, GColor(GCol::OVERVIEWBACKGROUND));
 
     // only change base if moved away from white plots
     // which is a Mac thing
 #ifndef Q_OS_MAC
-    if (GColor(COVERVIEWBACKGROUND) != Qt::white)
+    if (GColor(GCol::OVERVIEWBACKGROUND) != Qt::white)
 #endif
     {
-        //palette.setColor(QPalette::Base, GCColor::alternateColor(GColor(CTRAINPLOTBACKGROUND)));
-        palette.setColor(QPalette::Base, GColor(COVERVIEWBACKGROUND));
-        palette.setColor(QPalette::Window, GColor(COVERVIEWBACKGROUND));
+        //palette.setColor(QPalette::Base, GAlternateColor(GCol::TRAINPLOTBACKGROUND));
+        palette.setColor(QPalette::Base, GColor(GCol::OVERVIEWBACKGROUND));
+        palette.setColor(QPalette::Window, GColor(GCol::OVERVIEWBACKGROUND));
     }
 
 #ifndef Q_OS_MAC // the scrollers appear when needed on Mac, we'll keep that
     //code->setStyleSheet(TabView::ourStyleSheet());
 #endif
 
-    palette.setColor(QPalette::WindowText, GCColor::invertColor(GColor(COVERVIEWBACKGROUND)));
-    palette.setColor(QPalette::Text, GCColor::invertColor(GColor(COVERVIEWBACKGROUND)));
+    palette.setColor(QPalette::WindowText, GInvertColor(GCol::OVERVIEWBACKGROUND));
+    palette.setColor(QPalette::Text, GInvertColor(GCol::OVERVIEWBACKGROUND));
     //code->setPalette(palette);
 
     foreach(ChartSpaceItem *item, items) item->configChanged(why);
@@ -1307,8 +1307,8 @@ ChartSpaceItem::clicked()
     if (isVisible()) hide();
     else show();
 
-    //if (brush.color() == GColor(CChartSpaceItemBACKGROUND)) brush.setColor(Qt::red);
-    //else brush.setColor(GColor(CChartSpaceItemBACKGROUND));
+    //if (brush.color() == GColor(GCol::hartSpaceItemBACKGROUND)) brush.setColor(Qt::red);
+    //else brush.setColor(GColor(GCol::hartSpaceItemBACKGROUND));
 
     update(geometry());
 }

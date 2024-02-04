@@ -450,7 +450,7 @@ MainWindow::MainWindow(const QDir &home)
      * Application Menus
      *--------------------------------------------------------------------*/
 #ifdef WIN32
-    QString menuColorString = GColor(CTOOLBAR).name();
+    QString menuColorString = GColor(GCol::TOOLBAR).name();
     menuBar()->setStyleSheet(QString("QMenuBar { color: black; background: %1; }"
                              "QMenuBar::item { color: black; background: %1; }").arg(menuColorString));
     menuBar()->setContentsMargins(0,0,0,0);
@@ -2521,28 +2521,28 @@ MainWindow::configChanged(qint32)
 {
     // Windows and Linux menu bar should match chrome
     QColor textCol(Qt::black);
-    if (GCColor::luminance(GColor(CTOOLBAR)) < 127)  textCol = QColor(Qt::white);
-    QString menuColorString = GColor(CTOOLBAR).name();
+    if (GLuminance(GColor(GCol::TOOLBAR)) < 127)  textCol = QColor(Qt::white);
+    QString menuColorString = GColor(GCol::TOOLBAR).name();
     menuBar()->setStyleSheet(QString("QMenuBar { color: %1; background: %2; }"
                              "QMenuBar::item { color: %1; background: %2; }")
                              .arg(textCol.name()).arg(menuColorString));
     // search filter box match chrome color
-    searchBox->setStyleSheet(QString("QLineEdit { background: %1; color: %2; }").arg(GColor(CTOOLBAR).name()).arg(GCColor::invertColor(GColor(CTOOLBAR)).name()));
+    searchBox->setStyleSheet(QString("QLineEdit { background: %1; color: %2; }").arg(GColor(GCol::TOOLBAR).name()).arg(GInvertColor(GCol::TOOLBAR).name()));
 
     // perspective selector mimics sidebar colors
     QColor selected;
-    if (GCColor::invertColor(GColor(CTOOLBAR)) == Qt::white) selected = QColor(Qt::lightGray);
+    if (GInvertColor(GColor(GCol::TOOLBAR)) == Qt::white) selected = QColor(Qt::lightGray);
     else selected = QColor(Qt::darkGray);
     perspectiveSelector->setStyleSheet(QString("QComboBox { background: %1; color: %2; }"
                                                "QComboBox::item { background: %1; color: %2; }"
-                                               "QComboBox::item::selected { background: %3; color: %1; }").arg(GColor(CTOOLBAR).name()).arg(GCColor::invertColor(GColor(CTOOLBAR)).name()).arg(selected.name()));
+                                               "QComboBox::item::selected { background: %3; color: %1; }").arg(GColor(GCol::TOOLBAR).name()).arg(GInvertColor(GCol::TOOLBAR).name()).arg(selected.name()));
 
     QString buttonstyle = QString("QPushButton { border: none; border-radius: %2px; background-color: %1; "
                                                 "padding-left: 0px; padding-right: 0px; "
                                                 "padding-top:  0px; padding-bottom: 0px; }"
                                   "QPushButton:hover { background-color: %3; }"
                                   "QPushButton:hover:pressed { background-color: %3; }"
-                                ).arg(GColor(CTOOLBAR).name()).arg(3 * dpiXFactor).arg(GColor(CHOVER).name());
+                                ).arg(GColor(GCol::TOOLBAR).name()).arg(3 * dpiXFactor).arg(GColor(GCol::HOVER).name());
 
     back->setStyleSheet(buttonstyle);
     forward->setStyleSheet(buttonstyle);
@@ -2557,12 +2557,12 @@ MainWindow::configChanged(qint32)
     tabbar->setDrawBase(false);
 
     // on select
-    QColor bg_select = GCColor::selectedColor(GColor(CTOOLBAR));
-    QColor fg_select = GCColor::invertColor(bg_select);
+    QColor bg_select = GSelectedColor(GColor(GCol::TOOLBAR));
+    QColor fg_select = GInvertColor(bg_select);
 
     tabbar->setStyleSheet(QString("QTabBar::tab { background-color: %1; color: %2;}"
-        "QTabBar::tab::selected { background-color: %3; color: %4; }").arg(GColor(CTOOLBAR).name())
-                                                                        .arg(GCColor::invertColor(GColor(CTOOLBAR)).name())
+        "QTabBar::tab::selected { background-color: %3; color: %4; }").arg(GColor(GCol::TOOLBAR).name())
+                                                                        .arg(GInvertColor(GCol::TOOLBAR).name())
                                                                         .arg(bg_select.name())
                                                                         .arg(fg_select.name()));
     tabbar->setDocumentMode(true);

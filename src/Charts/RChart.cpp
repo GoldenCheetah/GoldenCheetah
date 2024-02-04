@@ -36,8 +36,8 @@ RConsole::RConsole(Context *context, RChart *parent)
     setFrameStyle(QFrame::NoFrame);
     setAcceptRichText(false);
     document()->setMaximumBlockCount(512); // lets not get carried away!
-    putData(GColor(CPLOTMARKER), QString(tr("R Console (%1)").arg(rtool->version)));
-    putData(GCColor::invertColor(GColor(CPLOTBACKGROUND)), "\n> ");
+    putData(GColor(GCol::PLOTMARKER), QString(tr("R Console (%1)").arg(rtool->version)));
+    putData(GInvertColor(GCol::PLOTBACKGROUND), "\n> ");
 
     connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
     connect(context, SIGNAL(rMessage(QString)), this, SLOT(rMessage(QString)));
@@ -57,8 +57,8 @@ RConsole::configChanged(qint32)
     QFont courier("Courier", QFont().pointSize());
     setFont(courier);
     QPalette p = palette();
-    p.setColor(QPalette::Base, GColor(CPLOTBACKGROUND));
-    p.setColor(QPalette::Text, GCColor::invertColor(GColor(CPLOTBACKGROUND)));
+    p.setColor(QPalette::Base, GColor(GCol::PLOTBACKGROUND));
+    p.setColor(QPalette::Text, GInvertColor(GCol::PLOTBACKGROUND));
     setPalette(p);
     setStyleSheet(AbstractView::ourStyleSheet());
 
@@ -69,7 +69,7 @@ RConsole::configChanged(qint32)
 void
 RConsole::rMessage(QString x)
 {
-    putData(GColor(CPLOTMARKER), x);
+    putData(GColor(GCol::PLOTMARKER), x);
 }
 
 void RConsole::putData(QColor color, QString string)
@@ -149,7 +149,7 @@ void RConsole::keyPressEvent(QKeyEvent *e)
 
                 // new prompt
                 putData("\n");
-                putData(GCColor::invertColor(GColor(CPLOTBACKGROUND)), "> ");
+                putData(GInvertColor(GCol::PLOTBACKGROUND), "> ");
 
             } else {
                 // normal C just do the usual
@@ -202,7 +202,7 @@ void RConsole::keyPressEvent(QKeyEvent *e)
                 if(rc == 0 && ret != NULL && !Rf_isNull(ret) && !line.contains("<-") && !line.contains("print"))
                     Rf_PrintValue(ret);
 
-                putData(GColor(CPLOTMARKER), rtool->messages.join(""));
+                putData(GColor(GCol::PLOTMARKER), rtool->messages.join(""));
                 rtool->messages.clear();
 
             } catch(std::exception& ex) {
@@ -227,9 +227,9 @@ void RConsole::keyPressEvent(QKeyEvent *e)
 
         // prompt ">" for new command and ">>" for a continuation line
         if (rtool->R->program.count()==0)
-            putData(GCColor::invertColor(GColor(CPLOTBACKGROUND)), "> ");
+            putData(GInvertColor(GCol::PLOTBACKGROUND), "> ");
         else
-            putData(GCColor::invertColor(GColor(CPLOTBACKGROUND)), ">>");
+            putData(GInvertColor(GCol::PLOTBACKGROUND), ">>");
     }
     break;
 
@@ -249,7 +249,7 @@ RConsole::setCurrentLine(QString p)
 
     select.select(QTextCursor::LineUnderCursor);
     select.removeSelectedText();
-    putData(GCColor::invertColor(GColor(CPLOTBACKGROUND)), "> ");
+    putData(GInvertColor(GCol::PLOTBACKGROUND), "> ");
     putData(p);
 }
 
@@ -316,8 +316,8 @@ RChart::RChart(Context *context, bool ridesummary) : GcChartWindow(context), con
         QFont courier("Courier", QFont().pointSize());
         script->setFont(courier);
         QPalette p = palette();
-        p.setColor(QPalette::Base, GColor(CPLOTBACKGROUND));
-        p.setColor(QPalette::Text, GCColor::invertColor(GColor(CPLOTBACKGROUND)));
+        p.setColor(QPalette::Base, GColor(GCol::PLOTBACKGROUND));
+        p.setColor(QPalette::Text, GInvertColor(GCol::PLOTBACKGROUND));
         script->setPalette(p);
         script->setStyleSheet(AbstractView::ourStyleSheet());
 
@@ -464,17 +464,17 @@ RChart::eventFilter(QObject *, QEvent *e)
 void
 RChart::configChanged(qint32)
 {
-    QColor bgcolor = !ridesummary ? GColor(CTRENDPLOTBACKGROUND) : GColor(CPLOTBACKGROUND);
+    QColor bgcolor = !ridesummary ? GColor(GCol::TRENDPLOTBACKGROUND) : GColor(GCol::PLOTBACKGROUND);
     setProperty("color", bgcolor);
     chart->setBackgroundColor(bgcolor);
 
 
     // tinted palette for headings etc
     QPalette palette;
-    palette.setBrush(QPalette::Window, QBrush(GColor(CPLOTBACKGROUND)));
-    palette.setColor(QPalette::WindowText, GColor(CPLOTMARKER));
-    palette.setColor(QPalette::Text, GColor(CPLOTMARKER));
-    palette.setColor(QPalette::Base, GCColor::alternateColor(GColor(CPLOTBACKGROUND)));
+    palette.setBrush(QPalette::Window, QBrush(GColor(GCol::PLOTBACKGROUND)));
+    palette.setColor(QPalette::WindowText, GColor(GCol::PLOTMARKER));
+    palette.setColor(QPalette::Text, GColor(GCol::PLOTMARKER));
+    palette.setColor(QPalette::Base, GAlternateColor(GCol::PLOTBACKGROUND));
     setPalette(palette);
 
     runScript(); // to update
@@ -565,7 +565,7 @@ RChart::runScript()
             // output on console
             if (rtool->messages.count()) {
                 console->putData("\n");
-                console->putData(GColor(CPLOTMARKER), rtool->messages.join(""));
+                console->putData(GColor(GCol::PLOTMARKER), rtool->messages.join(""));
                 rtool->messages.clear();
             }
 

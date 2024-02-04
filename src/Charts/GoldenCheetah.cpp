@@ -208,7 +208,7 @@ GcWindow::GcWindow(Context *context) : QFrame(context->mainWindow), dragState(No
     setContentsMargins(0,0,0,0);
     setResizable(false);
     setMouseTracking(true);
-    setProperty("color", GColor(CPLOTBACKGROUND));
+    setProperty("color", GColor(GCol::PLOTBACKGROUND));
     menu = NULL;
 
     // make sure its underneath the toggle button
@@ -290,7 +290,7 @@ GcWindow::paintEvent(QPaintEvent * /*event*/)
         if (showtitle) {
             // pen color needs to contrast to background color
             QColor bgColor = property("color").value<QColor>();
-            QColor fgColor = GCColor::invertColor(bgColor); // return the contrasting color
+            QColor fgColor = GInvertColor(bgColor); // return the contrasting color
 
             painter.setPen(fgColor);
             painter.drawText(bar, heading, Qt::AlignVCenter | Qt::AlignCenter);
@@ -305,7 +305,7 @@ GcWindow::paintEvent(QPaintEvent * /*event*/)
 
             if (isFiltered()) {
                 // overlay in highlight color
-                QColor over = GColor(CCALCURRENT);
+                QColor over = GColor(GCol::CALCURRENT);
                 over.setAlpha(220);
                 painter.setPen(over);
                 painter.drawText(bar, heading, Qt::AlignVCenter | Qt::AlignCenter);
@@ -319,7 +319,7 @@ GcWindow::paintEvent(QPaintEvent * /*event*/)
             QPixmap sized = closeImage.scaled(QSize(contentsMargins().top()-6,
                                                     contentsMargins().top()-6));
             QRect all(0,0,width()-1,height()-1);
-            QPen pen(GColor(CPLOTMARKER));
+            QPen pen(GColor(GCol::PLOTMARKER));
             pen.setWidth(1);
             painter.setPen(pen);
             painter.drawRect(all);
@@ -333,7 +333,7 @@ GcWindow::paintEvent(QPaintEvent * /*event*/)
         QRect all(0,0,width(),height());
         if (property("isManager").toBool() == true) {
             //painter.fillRect(all, QColor("#B3B4BA"));
-            painter.fillRect(all, GColor(CPLOTBACKGROUND));
+            painter.fillRect(all, GColor(GCol::PLOTBACKGROUND));
         }
     }
 }
@@ -765,7 +765,7 @@ GcChartWindow::GcChartWindow(Context *context) : GcWindow(context), context(cont
 void
 GcChartWindow::colorChanged(QColor z)
 {
-    QColor fgColor = GCColor::invertColor(z);
+    QColor fgColor = GInvertColor(z);
 
     // so z is color for bg and fgColor is for fg
     QString stylesheet = QString("color: rgb(%1, %2, %3); background-color: rgba(%4, %5, %6, 80%)")

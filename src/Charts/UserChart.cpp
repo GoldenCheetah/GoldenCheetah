@@ -72,8 +72,8 @@ UserChart::UserChart(QWidget *parent, Context *context, bool rangemode, QString 
 
     // defaults, can be overriden via setBackgroundColor()
     if (bg != "") chartinfo.bgcolor = bg;
-    else if (rangemode) chartinfo.bgcolor = StandardColor(CTRENDPLOTBACKGROUND).name();
-    else chartinfo.bgcolor = StandardColor(CPLOTBACKGROUND).name();
+    else if (rangemode) chartinfo.bgcolor = GColorToRGBColor(GCol::TRENDPLOTBACKGROUND).name();
+    else chartinfo.bgcolor = GColorToRGBColor(GCol::PLOTBACKGROUND).name();
 
     // set default background color
     configChanged(0);
@@ -86,10 +86,10 @@ UserChart::configChanged(qint32)
 
     // tinted palette for headings etc
     QPalette palette;
-    palette.setBrush(QPalette::Window, RGBColor(chartinfo.bgcolor));
-    palette.setColor(QPalette::WindowText, GColor(CPLOTMARKER));
-    palette.setColor(QPalette::Text, GColor(CPLOTMARKER));
-    palette.setColor(QPalette::Base, RGBColor(chartinfo.bgcolor) /*GCColor::alternateColor(bgcolor)*/);
+    palette.setBrush(QPalette::Window, GRGBColorToQColor(chartinfo.bgcolor));
+    palette.setColor(QPalette::WindowText, GColor(GCol::PLOTMARKER));
+    palette.setColor(QPalette::Text, GColor(GCol::PLOTMARKER));
+    palette.setColor(QPalette::Base, GRGBColorToQColor(chartinfo.bgcolor) /*GAlternateColor(bgcolor)*/);
     setPalette(palette);
 
     setAutoFillBackground(true);
@@ -196,7 +196,7 @@ UserChart::refresh()
     }
 
     // ok, we've run out of excuses, looks like we need to plot
-    chart->setBackgroundColor(RGBColor(chartinfo.bgcolor));
+    chart->setBackgroundColor(GRGBColorToQColor(chartinfo.bgcolor));
     chart->initialiseChart(chartinfo.title, chartinfo.type, chartinfo.animate, chartinfo.legendpos, chartinfo.stack, chartinfo.orientation, chartinfo.scale);
 
     // now generate the series data
@@ -287,7 +287,7 @@ UserChart::refresh()
             }
             series.colors.clear();
             QColor min=QColor(series.color);
-            QColor max=GCColor::invertColor(GColor(CPLOTBACKGROUND));
+            QColor max=GInvertColor(GCol::PLOTBACKGROUND);
             for(int i=0; i<series.labels.count(); i++) {
                 QColor color = QColor(min.red() + (double(max.red()-min.red()) * (i/double(series.labels.count()))),
                               min.green() + (double(max.green()-min.green()) * (i/double(series.labels.count()))),
@@ -315,7 +315,7 @@ UserChart::refresh()
         // force plot marker color for x-axis, helps to refresh after
         // config has changed. might be a better way to handle this but
         // it works for now.
-        if (axis.orientation == Qt::Horizontal)  axis.labelcolor = axis.axiscolor = GColor(CPLOTMARKER);
+        if (axis.orientation == Qt::Horizontal)  axis.labelcolor = axis.axiscolor = GColor(GCol::PLOTMARKER);
 
         // on a user chart the series sets the categories for a bar chart
         // find the first series for this axis and set the categories
@@ -1324,8 +1324,8 @@ UserChartSettings::refreshAxesTab()
                     break;
                 }
             }
-            found.axiscolor = GColor(CPLOTMARKER);
-            found.labelcolor = GColor(CPLOTMARKER);
+            found.axiscolor = GColor(GCol::PLOTMARKER);
+            found.labelcolor = GColor(GCol::PLOTMARKER);
             want << found;
             have << series.xname;
         }
@@ -1564,7 +1564,7 @@ EditUserSeriesDialog::EditUserSeriesDialog(Context *context, bool rangemode, Gen
     cf->addRow(tr("Symbol"), zz);
 
     // we allow colors using the GC palette and default to power colors
-    color = new ColorButton(this, "Color", QColor(1,1,CPOWER), true, false);
+    color = new ColorButton(this, "Color", QColor(1,1,static_cast<int>(GCol::POWER)), true, false);
     zz = new QHBoxLayout();
     zz->addWidget(color);
     zz->addStretch();

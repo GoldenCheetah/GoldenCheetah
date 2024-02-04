@@ -95,8 +95,8 @@ AllPlotInterval::AllPlotInterval(QWidget *parent, Context *context):
     //TimeScaleDraw *tsd = new TimeScaleDraw(&this->bydist) ;
     //tsd->setTickLength(QwtScaleDiv::MajorTick, 3);
     //setAxisScaleDraw(QwtAxis::XBottom, tsd);
-    //pal.setColor(QPalette::WindowText, GColor(CPLOTMARKER));
-    //pal.setColor(QPalette::Text, GColor(CPLOTMARKER));
+    //pal.setColor(QPalette::WindowText, GColor(GCol::PLOTMARKER));
+    //pal.setColor(QPalette::Text, GColor(GCol::PLOTMARKER));
     //axisWidget(QwtAxis::XBottom)->setPalette(pal);
 
     setAxisVisible(QwtAxis::XBottom, false);
@@ -123,9 +123,9 @@ void
 AllPlotInterval::configChanged(qint32)
 {
     QPalette pal = palette();
-    pal.setBrush(QPalette::Window, QBrush(GColor(CRIDEPLOTBACKGROUND)));
+    pal.setBrush(QPalette::Window, QBrush(GColor(GCol::RIDEPLOTBACKGROUND)));
     setPalette(pal);
-    setCanvasBackground(GColor(CRIDEPLOTBACKGROUND));
+    setCanvasBackground(GColor(GCol::RIDEPLOTBACKGROUND));
     static_cast<QwtPlotCanvas*>(canvas())->setFrameStyle(QFrame::NoFrame);
     update();
     replot();

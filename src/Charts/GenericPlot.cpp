@@ -260,15 +260,15 @@ GenericPlot::configChanged(qint32)
     // tinted palette for headings etc
     QPalette palette;
     palette.setBrush(QPalette::Window, QBrush(bgcolor_));
-    palette.setColor(QPalette::WindowText, GColor(CPLOTMARKER));
-    palette.setColor(QPalette::Text, GColor(CPLOTMARKER));
-    palette.setColor(QPalette::Base, GCColor::alternateColor(bgcolor_));
+    palette.setColor(QPalette::WindowText, GColor(GCol::PLOTMARKER));
+    palette.setColor(QPalette::Text, GColor(GCol::PLOTMARKER));
+    palette.setColor(QPalette::Base, GAlternateColor(bgcolor_));
     setPalette(palette);
 
     // chart colors
     chartview->setBackgroundBrush(QBrush(bgcolor_));
     qchart->setBackgroundBrush(QBrush(bgcolor_));
-    qchart->setBackgroundPen(QPen(GColor(CPLOTMARKER)));
+    qchart->setBackgroundPen(QPen(GColor(GCol::PLOTMARKER)));
 }
 
 void
@@ -527,7 +527,7 @@ GenericPlot::addCurve(QString name, QVector<double> xseries, QVector<double> yse
     QString dname = QString("d_%1").arg(name);
 
     // standard colors are encoded 1,1,x - where x is the index into the colorset
-    QColor applyColor = RGBColor(QColor(color));
+    QColor applyColor = GRGBColorToQColor(QColor(color));
 
     // labels font
     QFont labelsfont;
@@ -565,7 +565,7 @@ GenericPlot::addCurve(QString name, QVector<double> xseries, QVector<double> yse
         bottom = !bottom;
 
         // use marker color for x axes
-        xaxis->labelcolor = xaxis->axiscolor = GColor(CPLOTMARKER);
+        xaxis->labelcolor = xaxis->axiscolor = GColor(GCol::PLOTMARKER);
 
         // add to list
         axisinfos.insert(xname, xaxis);
@@ -871,7 +871,7 @@ GenericPlot::addCurve(QString name, QVector<double> xseries, QVector<double> yse
 
                 slice->setExploded();
                 slice->setLabelVisible();
-                slice->setLabelBrush(QBrush(GColor(CPLOTMARKER)));
+                slice->setLabelBrush(QBrush(GColor(GCol::PLOTMARKER)));
                 slice->setPen(Qt::NoPen);
                 if (i <colors.size()) slice->setBrush(QColor(colors.at(i)));
                 else slice->setBrush(Qt::red);
@@ -1115,7 +1115,7 @@ GenericPlot::finaliseChart()
                 add->setTitleBrush(QBrush(axisinfo->labelcolor));
 
                 // grid lines, just color for now xxx todo: ticks (sigh)
-                add->setGridLineColor(GColor(CPLOTGRID));
+                add->setGridLineColor(GColor(GCol::PLOTGRID));
                 if (charttype != GC_CHART_SCATTER && add->orientation()==Qt::Horizontal) // no x grids unless a scatter
                     add->setGridLineVisible(false);
 
@@ -1160,7 +1160,7 @@ GenericPlot::finaliseChart()
     }
 
     if (charttype== GC_CHART_PIE) {
-        foreach(QString name, havelegend)  legend->addSeries(name, GColor(CPLOTMARKER));
+        foreach(QString name, havelegend)  legend->addSeries(name, GColor(GCol::PLOTMARKER));
         legend->setClickable(false);
     }
 
@@ -1325,8 +1325,8 @@ GenericPlot::configureAxis(QString name, bool visible, int align, double min, do
     }
 
     // color
-    if (labelcolor != "") axis->labelcolor=RGBColor(QColor(labelcolor));
-    if (color != "") axis->axiscolor=RGBColor(QColor(color));
+    if (labelcolor != "") axis->labelcolor=GRGBColorToQColor(QColor(labelcolor));
+    if (color != "") axis->axiscolor=GRGBColorToQColor(QColor(color));
 
     // log ..
     axis->log = log;
@@ -1346,7 +1346,7 @@ GenericPlot::seriesColor(QAbstractSeries* series)
     case QAbstractSeries::SeriesTypeScatter: return static_cast<QScatterSeries*>(series)->color(); break;
     case QAbstractSeries::SeriesTypeLine: return static_cast<QLineSeries*>(series)->color(); break;
     case QAbstractSeries::SeriesTypeArea: return static_cast<QAreaSeries*>(series)->color(); break;
-    default: return GColor(CPLOTMARKER);
+    default: return GColor(GCol::PLOTMARKER);
     }
 }
 
@@ -1369,7 +1369,7 @@ GenericPlot::plotAnnotations(GenericSeriesInfo &seriesinfo)
             QString string = annotation.labels.join(" ");
             add->setFont(std);
             add->setText(string);
-            add->setStyleSheet(QString("color: %1").arg(RGBColor(QColor(seriesinfo.color)).name()));
+            add->setStyleSheet(QString("color: %1").arg(GRGBColorToQColor(QColor(seriesinfo.color)).name()));
             add->setFixedWidth(fm.boundingRect(string).width() + (25*dpiXFactor));
             add->setAlignment(Qt::AlignCenter);
             legend->addLabel(add);
@@ -1444,7 +1444,7 @@ GenericPlot::plotAnnotations(GenericSeriesInfo &seriesinfo)
             QLabel *add = new QLabel(this);
             add->setFont(std);
             add->setText(lr->text());
-            add->setStyleSheet(QString("color: %1").arg(RGBColor(QColor(seriesinfo.color)).name()));
+            add->setStyleSheet(QString("color: %1").arg(GRGBColorToQColor(QColor(seriesinfo.color)).name()));
             add->setFixedWidth(fm.boundingRect(lr->text()).width() + (25*dpiXFactor));
             add->setAlignment(Qt::AlignCenter);
             legend->addLabel(add);

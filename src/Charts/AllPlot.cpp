@@ -969,7 +969,7 @@ AllPlot::AllPlot(QWidget *parent, AllPlotWindow *window, Context *context, RideF
     bg->attach(this);
 
     //insertLegend(new QwtLegend(), QwtPlot::BottomLegend);
-    setCanvasBackground(GColor(CRIDEPLOTBACKGROUND));
+    setCanvasBackground(GColor(GCol::RIDEPLOTBACKGROUND));
     static_cast<QwtPlotCanvas*>(canvas())->setFrameStyle(QFrame::NoFrame);
 
     // set the axes that we use.. YLeft 3 is ALWAYS the highlighter axes and never visible
@@ -997,7 +997,7 @@ AllPlot::AllPlot(QWidget *parent, AllPlotWindow *window, Context *context, RideF
     setAxisScaleDraw(QwtAxisId(QwtAxis::YLeft, 2), sd);
 
     QPalette pal = palette();
-    pal.setBrush(QPalette::Window, QBrush(GColor(CRIDEPLOTBACKGROUND)));
+    pal.setBrush(QPalette::Window, QBrush(GColor(GCol::RIDEPLOTBACKGROUND)));
     pal.setColor(QPalette::WindowText, QColor(Qt::gray));
     pal.setColor(QPalette::Text, QColor(Qt::gray));
     axisWidget(QwtAxisId(QwtAxis::YLeft, 2))->setPalette(pal);
@@ -1103,136 +1103,136 @@ AllPlot::configChanged(qint32 what)
 
         setAltSlopePlotStyle(standard->altSlopeCurve);
 
-        setCanvasBackground(GColor(CRIDEPLOTBACKGROUND));
-        QPen wattsPen = QPen(GColor(CPOWER));
+        setCanvasBackground(GColor(GCol::RIDEPLOTBACKGROUND));
+        QPen wattsPen = QPen(GColor(GCol::POWER));
         wattsPen.setWidth(width);
         standard->wattsCurve->setPen(wattsPen);
         standard->wattsDCurve->setPen(wattsPen);
-        QPen npPen = QPen(GColor(CNPOWER));
+        QPen npPen = QPen(GColor(GCol::NPOWER));
         npPen.setWidth(width);
         standard->npCurve->setPen(npPen);
-        QPen rvPen = QPen(GColor(CRV));
+        QPen rvPen = QPen(GColor(GCol::RV));
         rvPen.setWidth(width);
         standard->rvCurve->setPen(rvPen);
-        QPen rcadPen = QPen(GColor(CRCAD));
+        QPen rcadPen = QPen(GColor(GCol::RCAD));
         rcadPen.setWidth(width);
         standard->rcadCurve->setPen(rcadPen);
-        QPen rgctPen = QPen(GColor(CRGCT));
+        QPen rgctPen = QPen(GColor(GCol::RGCT));
         rgctPen.setWidth(width);
         standard->rgctCurve->setPen(rgctPen);
-        QPen gearPen = QPen(GColor(CGEAR));
+        QPen gearPen = QPen(GColor(GCol::GEAR));
         gearPen.setWidth(width);
         standard->gearCurve->setPen(gearPen);
-        QPen smo2Pen = QPen(GColor(CSMO2));
+        QPen smo2Pen = QPen(GColor(GCol::SMO2));
         smo2Pen.setWidth(width);
         standard->smo2Curve->setPen(smo2Pen);
-        QPen thbPen = QPen(GColor(CTHB));
+        QPen thbPen = QPen(GColor(GCol::THB));
         thbPen.setWidth(width);
         standard->thbCurve->setPen(thbPen);
-        QPen o2hbPen = QPen(GColor(CO2HB));
+        QPen o2hbPen = QPen(GColor(GCol::O2HB));
         o2hbPen.setWidth(width);
         standard->o2hbCurve->setPen(o2hbPen);
-        QPen hhbPen = QPen(GColor(CHHB));
+        QPen hhbPen = QPen(GColor(GCol::HHB));
         hhbPen.setWidth(width);
         standard->hhbCurve->setPen(hhbPen);
 
-        QPen antissPen = QPen(GColor(CANTISS));
+        QPen antissPen = QPen(GColor(GCol::ANTISS));
         antissPen.setWidth(width);
         standard->antissCurve->setPen(antissPen);
-        QPen atissPen = QPen(GColor(CATISS));
+        QPen atissPen = QPen(GColor(GCol::ATISS));
         atissPen.setWidth(width);
         standard->atissCurve->setPen(atissPen);
-        QPen xpPen = QPen(GColor(CXPOWER));
+        QPen xpPen = QPen(GColor(GCol::XPOWER));
         xpPen.setWidth(width);
         standard->xpCurve->setPen(xpPen);
-        QPen apPen = QPen(GColor(CAPOWER));
+        QPen apPen = QPen(GColor(GCol::APOWER));
         apPen.setWidth(width);
         standard->apCurve->setPen(apPen);
-        QPen hrPen = QPen(GColor(CHEARTRATE));
+        QPen hrPen = QPen(GColor(GCol::HEARTRATE));
         hrPen.setWidth(width);
         standard->hrCurve->setPen(hrPen);
-        QPen tcorePen = QPen(GColor(CCORETEMP));
+        QPen tcorePen = QPen(GColor(GCol::CORETEMP));
         tcorePen.setWidth(width);
         standard->tcoreCurve->setPen(tcorePen);
         standard->hrDCurve->setPen(hrPen);
-        QPen speedPen = QPen(GColor(CSPEED));
+        QPen speedPen = QPen(GColor(GCol::SPEED));
         speedPen.setWidth(width);
         standard->speedCurve->setPen(speedPen);
-        QPen accelPen = QPen(GColor(CACCELERATION));
+        QPen accelPen = QPen(GColor(GCol::ACCELERATION));
         accelPen.setWidth(width);
         standard->accelCurve->setPen(accelPen);
-        QPen cadPen = QPen(GColor(CCADENCE));
+        QPen cadPen = QPen(GColor(GCol::CADENCE));
         cadPen.setWidth(width);
         standard->cadCurve->setPen(cadPen);
         standard->cadDCurve->setPen(cadPen);
-        QPen slopePen(GColor(CSLOPE));
+        QPen slopePen(GColor(GCol::SLOPE));
         slopePen.setWidth(width);
         standard->slopeCurve->setPen(slopePen);
-        QPen altPen(GColor(CALTITUDE));
+        QPen altPen(GColor(GCol::ALTITUDE));
         altPen.setWidth(width);
         standard->altCurve->setPen(altPen);
-        QColor brush_color = GColor(CALTITUDEBRUSH);
+        QColor brush_color = GColor(GCol::ALTITUDEBRUSH);
         brush_color.setAlpha(200);
         standard->altCurve->setBrush(brush_color);   // fill below the line
-        QPen altSlopePen(GCColor::invertColor(GColor(CPLOTBACKGROUND)));
+        QPen altSlopePen(GInvertColor(GCol::PLOTBACKGROUND));
         altSlopePen.setWidth(width);
         standard->altSlopeCurve->setPen(altSlopePen);
-        QPen tempPen = QPen(GColor(CTEMP));
+        QPen tempPen = QPen(GColor(GCol::TEMP));
         tempPen.setWidth(width);
         standard->tempCurve->setPen(tempPen);
-        //QPen windPen = QPen(GColor(CWINDSPEED));
+        //QPen windPen = QPen(GColor(GCol::WINDSPEED));
         //windPen.setWidth(width);
         standard->windCurve->setPen(QPen(Qt::NoPen));
-        QColor wbrush_color = GColor(CWINDSPEED);
+        QColor wbrush_color = GColor(GCol::WINDSPEED);
         wbrush_color.setAlpha(200);
         standard->windCurve->setBrush(wbrush_color);   // fill below the line
-        QPen torquePen = QPen(GColor(CTORQUE));
+        QPen torquePen = QPen(GColor(GCol::TORQUE));
         torquePen.setWidth(width);
         standard->torqueCurve->setPen(torquePen);
         standard->nmDCurve->setPen(torquePen);
-        QPen balanceLPen = QPen(GColor(CBALANCERIGHT));
+        QPen balanceLPen = QPen(GColor(GCol::BALANCERIGHT));
         balanceLPen.setWidth(width);
         standard->balanceLCurve->setPen(balanceLPen);
-        QColor brbrush_color = GColor(CBALANCERIGHT);
+        QColor brbrush_color = GColor(GCol::BALANCERIGHT);
         brbrush_color.setAlpha(200);
         standard->balanceLCurve->setBrush(brbrush_color);   // fill below the line
-        QPen balanceRPen = QPen(GColor(CBALANCELEFT));
+        QPen balanceRPen = QPen(GColor(GCol::BALANCELEFT));
         balanceRPen.setWidth(width);
         standard->balanceRCurve->setPen(balanceRPen);
-        QColor blbrush_color = GColor(CBALANCELEFT);
+        QColor blbrush_color = GColor(GCol::BALANCELEFT);
         blbrush_color.setAlpha(200);
         standard->balanceRCurve->setBrush(blbrush_color);   // fill below the line
-        QPen ltePen = QPen(GColor(CLTE));
+        QPen ltePen = QPen(GColor(GCol::LTE));
         ltePen.setWidth(width);
         standard->lteCurve->setPen(ltePen);
-        QPen rtePen = QPen(GColor(CRTE));
+        QPen rtePen = QPen(GColor(GCol::RTE));
         rtePen.setWidth(width);
         standard->rteCurve->setPen(rtePen);
-        QPen lpsPen = QPen(GColor(CLPS));
+        QPen lpsPen = QPen(GColor(GCol::LPS));
         lpsPen.setWidth(width);
         standard->lpsCurve->setPen(lpsPen);
-        QPen rpsPen = QPen(GColor(CRPS));
+        QPen rpsPen = QPen(GColor(GCol::RPS));
         rpsPen.setWidth(width);
         standard->rpsCurve->setPen(rpsPen);
-        QPen lpcoPen = QPen(GColor(CLPS));
+        QPen lpcoPen = QPen(GColor(GCol::LPS));
         lpcoPen.setWidth(width);
         standard->lpcoCurve->setPen(lpcoPen);
-        QPen rpcoPen = QPen(GColor(CRPS));
+        QPen rpcoPen = QPen(GColor(GCol::RPS));
         rpcoPen.setWidth(width);
         standard->rpcoCurve->setPen(rpcoPen);
-        QPen ldcPen = QPen(GColor(CLPS));
+        QPen ldcPen = QPen(GColor(GCol::LPS));
         ldcPen.setWidth(width);
         standard->lppCurve->setPen(ldcPen);
-        QPen rdcPen = QPen(GColor(CRPS));
+        QPen rdcPen = QPen(GColor(GCol::RPS));
         rdcPen.setWidth(width);
         standard->rppCurve->setPen(rdcPen);
-        QPen lpppPen = QPen(GColor(CLPS));
+        QPen lpppPen = QPen(GColor(GCol::LPS));
         lpppPen.setWidth(width);
         standard->lpppCurve->setPen(lpppPen);
-        QPen rpppPen = QPen(GColor(CRPS));
+        QPen rpppPen = QPen(GColor(GCol::RPS));
         rpppPen.setWidth(width);
         standard->rpppCurve->setPen(rpppPen);
-        QPen wPen = QPen(GColor(CWBAL)); 
+        QPen wPen = QPen(GColor(GCol::WBAL)); 
         wPen.setWidth(width); // don't thicken
         standard->wCurve->setPen(wPen);
         QwtSymbol *sym = new QwtSymbol;
@@ -1240,18 +1240,18 @@ AllPlot::configChanged(qint32 what)
         sym->setPen(QPen(QColor(255,127,0))); // orange like a match, will make configurable later
         sym->setSize(4 *dpiXFactor);
         standard->mCurve->setSymbol(sym);
-        QPen ihlPen = QPen(GColor(CINTERVALHIGHLIGHTER));
+        QPen ihlPen = QPen(GColor(GCol::INTERVALHIGHLIGHTER));
         ihlPen.setWidth(width);
         standard->intervalHighlighterCurve->setPen(QPen(Qt::NoPen));
         standard->intervalHoverCurve->setPen(QPen(Qt::NoPen));
-        QColor ihlbrush = QColor(GColor(CINTERVALHIGHLIGHTER));
+        QColor ihlbrush = QColor(GColor(GCol::INTERVALHIGHLIGHTER));
         ihlbrush.setAlpha(128);
         standard->intervalHighlighterCurve->setBrush(ihlbrush);   // fill below the line
         QColor hbrush = QColor(Qt::lightGray);
         hbrush.setAlpha(gl_alpha);
         standard->intervalHoverCurve->setBrush(hbrush);   // fill below the line
         //this->legend()->remove(intervalHighlighterCurve); // don't show in legend
-        QPen gridPen(GColor(CPLOTGRID));
+        QPen gridPen(GColor(GCol::PLOTGRID));
         //gridPen.setStyle(Qt::DotLine); // solid line is nicer
         standard->grid->setPen(gridPen);
 
@@ -1471,15 +1471,15 @@ AllPlot::configChanged(qint32 what)
         }
 
         QPalette pal = palette();
-        pal.setBrush(QPalette::Window, QBrush(GColor(CRIDEPLOTBACKGROUND)));
+        pal.setBrush(QPalette::Window, QBrush(GColor(GCol::RIDEPLOTBACKGROUND)));
         setPalette(pal);
 
         // tick draw
         TimeScaleDraw *tsd = new TimeScaleDraw(&this->bydist, &timeoffset) ;
         tsd->setTickLength(QwtScaleDiv::MajorTick, 3);
         setAxisScaleDraw(QwtAxis::XBottom, tsd);
-        pal.setColor(QPalette::WindowText, GColor(CPLOTMARKER));
-        pal.setColor(QPalette::Text, GColor(CPLOTMARKER));
+        pal.setColor(QPalette::WindowText, GColor(GCol::PLOTMARKER));
+        pal.setColor(QPalette::Text, GColor(GCol::PLOTMARKER));
         axisWidget(QwtAxis::XBottom)->setPalette(pal);
         setAxisVisible(QwtAxis::XBottom, true);
 
@@ -1488,8 +1488,8 @@ AllPlot::configChanged(qint32 what)
         sd->enableComponent(ScaleScaleDraw::Ticks, false);
         sd->enableComponent(ScaleScaleDraw::Backbone, false);
         setAxisScaleDraw(QwtAxis::YLeft, sd);
-        pal.setColor(QPalette::WindowText, GColor(CPOWER));
-        pal.setColor(QPalette::Text, GColor(CPOWER));
+        pal.setColor(QPalette::WindowText, GColor(GCol::POWER));
+        pal.setColor(QPalette::Text, GColor(GCol::POWER));
         axisWidget(QwtAxis::YLeft)->setPalette(pal);
 
         // some axis show multiple things so color them 
@@ -1506,8 +1506,8 @@ AllPlot::configChanged(qint32 what)
         sd->enableComponent(ScaleScaleDraw::Ticks, false);
         sd->enableComponent(ScaleScaleDraw::Backbone, false);
         setAxisScaleDraw(QwtAxisId(QwtAxis::YLeft, 3), sd);
-        pal.setColor(QPalette::WindowText, GColor(CPLOTMARKER));
-        pal.setColor(QPalette::Text, GColor(CPLOTMARKER));
+        pal.setColor(QPalette::WindowText, GColor(GCol::PLOTMARKER));
+        pal.setColor(QPalette::Text, GColor(GCol::PLOTMARKER));
         axisWidget(QwtAxisId(QwtAxis::YLeft, 3))->setPalette(pal);
 
         sd = new ScaleScaleDraw;
@@ -1515,8 +1515,8 @@ AllPlot::configChanged(qint32 what)
         sd->enableComponent(ScaleScaleDraw::Ticks, false);
         sd->enableComponent(ScaleScaleDraw::Backbone, false);
         setAxisScaleDraw(QwtAxisId(QwtAxis::YRight, 1), sd);
-        pal.setColor(QPalette::WindowText, GColor(CALTITUDE));
-        pal.setColor(QPalette::Text, GColor(CALTITUDE));
+        pal.setColor(QPalette::WindowText, GColor(GCol::ALTITUDE));
+        pal.setColor(QPalette::Text, GColor(GCol::ALTITUDE));
         axisWidget(QwtAxisId(QwtAxis::YRight, 1))->setPalette(pal);
 
         sd = new ScaleScaleDraw;
@@ -1525,8 +1525,8 @@ AllPlot::configChanged(qint32 what)
         sd->setTickLength(QwtScaleDiv::MajorTick, 3);
         sd->setFactor(0.001f); // in kJ
         setAxisScaleDraw(QwtAxisId(QwtAxis::YRight, 2), sd);
-        pal.setColor(QPalette::WindowText, GColor(CWBAL));
-        pal.setColor(QPalette::Text, GColor(CWBAL));
+        pal.setColor(QPalette::WindowText, GColor(GCol::WBAL));
+        pal.setColor(QPalette::Text, GColor(GCol::WBAL));
         axisWidget(QwtAxisId(QwtAxis::YRight, 2))->setPalette(pal);
 
         sd = new ScaleScaleDraw;
@@ -1534,8 +1534,8 @@ AllPlot::configChanged(qint32 what)
         sd->enableComponent(ScaleScaleDraw::Backbone, false);
         sd->setTickLength(QwtScaleDiv::MajorTick, 3);
         setAxisScaleDraw(QwtAxisId(QwtAxis::YRight, 3), sd);
-        pal.setColor(QPalette::WindowText, GColor(CATISS));
-        pal.setColor(QPalette::Text, GColor(CATISS));
+        pal.setColor(QPalette::WindowText, GColor(GCol::ATISS));
+        pal.setColor(QPalette::Text, GColor(GCol::ATISS));
         axisWidget(QwtAxisId(QwtAxis::YRight, 3))->setPalette(pal);
 
         curveColors->saveState();
@@ -1550,20 +1550,20 @@ AllPlot::setLeftOnePalette()
     // Cadence then Temp then SmO2 ...
     QColor single = QColor(Qt::red);
     if (standard->smo2Curve->isVisible()) {
-        single = GColor(CSMO2);
+        single = GColor(GCol::SMO2);
     }
     if (standard->tempCurve->isVisible() && !GlobalContext::context()->useMetricUnits) {
-        single = GColor(CTEMP);
+        single = GColor(GCol::TEMP);
     }
     if (standard->cadCurve->isVisible()) {
-        single = GColor(CCADENCE);
+        single = GColor(GCol::CADENCE);
     }
     if (standard->hrCurve->isVisible()) {
-        single = GColor(CHEARTRATE);
+        single = GColor(GCol::HEARTRATE);
     }
 
     if (standard->tcoreCurve->isVisible()) {
-        single = GColor(CCORETEMP);
+        single = GColor(GCol::CORETEMP);
     }
 
     // lets go
@@ -1574,7 +1574,7 @@ AllPlot::setLeftOnePalette()
     setAxisScaleDraw(QwtAxisId(QwtAxis::YLeft, 1), sd);
 
     QPalette pal = palette();
-    pal.setBrush(QPalette::Window, QBrush(GColor(CRIDEPLOTBACKGROUND)));
+    pal.setBrush(QPalette::Window, QBrush(GColor(GCol::RIDEPLOTBACKGROUND)));
     pal.setColor(QPalette::WindowText, single);
     pal.setColor(QPalette::Text, single);
 
@@ -1589,22 +1589,22 @@ AllPlot::setRightPalette()
     // Cadence then Temp then SmO2 ...
     QColor single = QColor(Qt::green);
     if (standard->speedCurve->isVisible()) {
-        single = GColor(CSPEED);
+        single = GColor(GCol::SPEED);
     }
     if (standard->tempCurve->isVisible() && GlobalContext::context()->useMetricUnits) {
-        single = GColor(CTEMP);
+        single = GColor(GCol::TEMP);
     }
     if (standard->o2hbCurve->isVisible()) {
-        single = GColor(CO2HB);
+        single = GColor(GCol::O2HB);
     }
     if (standard->hhbCurve->isVisible()) {
-        single = GColor(CHHB);
+        single = GColor(GCol::HHB);
     }
     if (standard->thbCurve->isVisible()) {
-        single = GColor(CTHB);
+        single = GColor(GCol::THB);
     }
     if (standard->torqueCurve->isVisible()) {
-        single = GColor(CTORQUE);
+        single = GColor(GCol::TORQUE);
     }
 
     // lets go
@@ -1616,7 +1616,7 @@ AllPlot::setRightPalette()
     setAxisScaleDraw(QwtAxisId(QwtAxis::YRight, 0), sd);
 
     QPalette pal = palette();
-    pal.setBrush(QPalette::Window, QBrush(GColor(CRIDEPLOTBACKGROUND)));
+    pal.setBrush(QPalette::Window, QBrush(GColor(GCol::RIDEPLOTBACKGROUND)));
     pal.setColor(QPalette::WindowText, single);
     pal.setColor(QPalette::Text, single);
 
@@ -2567,7 +2567,7 @@ AllPlot::refreshIntervalMarkers()
             mrk->setLabelAlignment(Qt::AlignRight | Qt::AlignTop);
 
             if (nolabel) mrk->setLinePen(QPen(QColor(127,127,127,65), 0, Qt::DashLine));
-            else mrk->setLinePen(QPen(GColor(CPLOTMARKER), 0, Qt::DashLine));
+            else mrk->setLinePen(QPen(GColor(GCol::PLOTMARKER), 0, Qt::DashLine));
 
             // put matches on second line down
             QString name(interval->name);
@@ -2578,9 +2578,9 @@ AllPlot::refreshIntervalMarkers()
             if (!nolabel) {
                 text.setFont(QFont("Helvetica", 10, QFont::Bold));
                 if (interval->name.startsWith(tr("Match"))) 
-                    text.setColor(GColor(CWBAL));
+                    text.setColor(GColor(GCol::WBAL));
                 else
-                    text.setColor(GColor(CPLOTMARKER));
+                    text.setColor(GColor(GCol::PLOTMARKER));
             }
 
             if (!bydist) {
@@ -2606,7 +2606,7 @@ AllPlot::refreshCalibrationMarkers()
     if (scope != RideFile::none && scope != RideFile::watts && scope != RideFile::aTISS && scope != RideFile::anTISS &&
         scope != RideFile::IsoPower && scope != RideFile::aPower && scope != RideFile::xPower) return;
 
-    QColor color = GColor(CPOWER);
+    QColor color = GColor(GCol::POWER);
     color.setAlpha(15); // almost invisible !
 
     if (rideItem && rideItem->ride()) {
@@ -2703,7 +2703,7 @@ AllPlot::plotReferenceLine(const RideFilePoint *referencePoint)
     if (referencePoint->watts != 0)  {
         referenceLine = new QwtPlotCurve(tr("Power Ref"));
         referenceLine->setYAxis(QwtAxis::YLeft);
-        QPen wattsPen = QPen(GColor(CPOWER));
+        QPen wattsPen = QPen(GColor(GCol::POWER));
         wattsPen.setWidth(1);
         wattsPen.setStyle(Qt::DashLine);
         referenceLine->setPen(wattsPen);
@@ -2714,7 +2714,7 @@ AllPlot::plotReferenceLine(const RideFilePoint *referencePoint)
         referenceLine = new QwtPlotCurve(tr("Heart Rate Ref"));
         if (scope == RideFile::none) referenceLine->setYAxis(QwtAxisId(QwtAxis::YLeft,1));
         else if (scope == RideFile::hr) referenceLine->setYAxis(QwtAxisId(QwtAxis::YLeft));
-        QPen hrPen = QPen(GColor(CHEARTRATE));
+        QPen hrPen = QPen(GColor(GCol::HEARTRATE));
         hrPen.setWidth(1);
         hrPen.setStyle(Qt::DashLine);
         referenceLine->setPen(hrPen);
@@ -2724,7 +2724,7 @@ AllPlot::plotReferenceLine(const RideFilePoint *referencePoint)
     } else if (referencePoint->cad != 0)  {
         referenceLine = new QwtPlotCurve(tr("Cadence Ref"));
         referenceLine->setYAxis(QwtAxis::YLeft);
-        QPen cadPen = QPen(GColor(CCADENCE));
+        QPen cadPen = QPen(GColor(GCol::CADENCE));
         cadPen.setWidth(1);
         cadPen.setStyle(Qt::DashLine);
         referenceLine->setPen(cadPen);
@@ -3108,7 +3108,7 @@ AllPlot::setXTitle()
 static void setSymbol(QwtPlotCurve *curve, int points)
 {
     QwtSymbol *sym = new QwtSymbol;
-    sym->setPen(QPen(GColor(CPLOTMARKER)));
+    sym->setPen(QPen(GColor(GCol::PLOTMARKER)));
     if (points < 150) {
         sym->setStyle(QwtSymbol::Ellipse);
         sym->setSize(3 *dpiXFactor);
@@ -3254,7 +3254,7 @@ AllPlot::setDataFromPlot(AllPlot *plot, int startidx, int stopidx)
         QFont font; // default;
         font.setWeight(QFont::Bold);
         text.setFont(font);
-        text.setColor(GColor(CWBAL));
+        text.setColor(GColor(GCol::WBAL));
         standard->curveTitle.setLabel(text);
     } else {
         standard->curveTitle.setLabel(QwtText(""));
@@ -4091,7 +4091,7 @@ AllPlot::setDataFromPlot(AllPlot *plot)
             // symbol when zoomed in super close
             if (array.size() < 150) {
                 QwtSymbol *sym = new QwtSymbol;
-                sym->setPen(QPen(GColor(CPLOTMARKER)));
+                sym->setPen(QPen(GColor(GCol::PLOTMARKER)));
                 sym->setStyle(QwtSymbol::Ellipse);
                 sym->setSize(3 *dpiXFactor);
                 ourCurve->setSymbol(sym);
@@ -4119,7 +4119,7 @@ AllPlot::setDataFromPlot(AllPlot *plot)
             // symbol when zoomed in super close
             if (array.size() < 150) {
                 QwtSymbol *sym = new QwtSymbol;
-                sym->setPen(QPen(GColor(CPLOTMARKER)));
+                sym->setPen(QPen(GColor(GCol::PLOTMARKER)));
                 sym->setStyle(QwtSymbol::Ellipse);
                 sym->setSize(3 *dpiXFactor);
                 ourCurve2->setSymbol(sym);
@@ -4846,7 +4846,7 @@ AllPlot::setDataFromPlots(QList<AllPlot *> plots)
                     // symbol when zoomed in super close
                     if (x.size() < 150) {
                         QwtSymbol *sym = new QwtSymbol;
-                        sym->setPen(QPen(GColor(CPLOTMARKER)));
+                        sym->setPen(QPen(GColor(GCol::PLOTMARKER)));
                         sym->setStyle(QwtSymbol::Ellipse);
                         sym->setSize(3 *dpiXFactor);
                         ourCurve->setSymbol(sym);
@@ -4884,7 +4884,7 @@ AllPlot::setDataFromPlots(QList<AllPlot *> plots)
                     // symbol when zoomed in super close
                     if (array.size() < 150) {
                         QwtSymbol *sym = new QwtSymbol;
-                        sym->setPen(QPen(GColor(CPLOTMARKER)));
+                        sym->setPen(QPen(GColor(GCol::PLOTMARKER)));
                         sym->setStyle(QwtSymbol::Ellipse);
                         sym->setSize(3 *dpiXFactor);
                         ourCurve2->setSymbol(sym);
@@ -7448,7 +7448,7 @@ AllPlot::plotExhaustionLine(double secs)
     if (secs <= 0 || context->isCompareIntervals) return NULL;
 
     QwtPlotMarker *marker = new QwtPlotMarker(""); //name is TODO
-    marker->setLinePen(QPen(GColor(CWBAL),5.0f));
+    marker->setLinePen(QPen(GColor(GCol::WBAL),5.0f));
     marker->setLineStyle(QwtPlotMarker::VLine);
     marker->setXValue(bydist ? rideItem->ride()->timeToDistance(secs) : secs/60.0f);
     marker->setZ(-15); // to the back

@@ -2020,7 +2020,7 @@ void
 CloudServiceAutoDownloadWidget::paintEvent(QPaintEvent*)
 {
     QPainter painter(this);
-    QBrush brush(GColor(CPLOTBACKGROUND));
+    QBrush brush(GColor(GCol::PLOTBACKGROUND));
     painter.fillRect(0,0,width(),height(), brush);
 
     QString statusstring;
@@ -2034,15 +2034,15 @@ CloudServiceAutoDownloadWidget::paintEvent(QPaintEvent*)
     QFont font;
     QFontMetrics fm(font);
     painter.setFont(font);
-    painter.setPen(GCColor::invertColor(GColor(CPLOTBACKGROUND)));
-    QRectF textbox = QRectF(0,0, fm.horizontalAdvance(statusstring), height() / 2.0f);
+    painter.setPen(GInvertColor(GColor(GCol::PLOTBACKGROUND)));
+    QRectF textbox = QRectF(0,0, fm.width(statusstring), height() / 2.0f);
     painter.drawText(textbox, Qt::AlignVCenter | Qt::AlignCenter, statusstring);
 
     // rectangle
     QRectF pr(textbox.width()+(5.0f*dpiXFactor), textbox.top()+(8.0f*dpiXFactor), width()-(10.0f*dpiXFactor)-textbox.width(), (height()/2.0f)-(16*dpiXFactor));
 
     // progress rect
-    QColor col = GColor(CPLOTMARKER);
+    QColor col = GColor(GCol::PLOTMARKER);
     col.setAlpha(150);
     brush= QBrush(col);
 

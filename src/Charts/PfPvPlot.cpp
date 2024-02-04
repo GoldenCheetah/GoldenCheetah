@@ -219,7 +219,7 @@ PfPvPlot::PfPvPlot(Context *context)
 void
 PfPvPlot::configChanged(qint32)
 {
-    setCanvasBackground(GColor(CPLOTBACKGROUND));
+    setCanvasBackground(GColor(GCol::PLOTBACKGROUND));
 
     // frame with inverse of background
     QwtSymbol *sym = new QwtSymbol;
@@ -232,23 +232,23 @@ PfPvPlot::configChanged(qint32)
     curve->setRenderHint(QwtPlotItem::RenderAntialiased);
 
     QPalette palette;
-    palette.setBrush(QPalette::Window, QBrush(GColor(CPLOTBACKGROUND)));
-    palette.setColor(QPalette::WindowText, GColor(CPLOTMARKER));
-    palette.setColor(QPalette::Text, GColor(CPLOTMARKER));
+    palette.setBrush(QPalette::Window, QBrush(GColor(GCol::PLOTBACKGROUND)));
+    palette.setColor(QPalette::WindowText, GColor(GCol::PLOTMARKER));
+    palette.setColor(QPalette::Text, GColor(GCol::PLOTMARKER));
     setPalette(palette);
 
     axisWidget(QwtAxis::XBottom)->setPalette(palette);
     axisWidget(QwtAxis::YLeft)->setPalette(palette);
 
     // use grid line color for mX, mY and CPcurve
-    QPen marker = GColor(CPLOTMARKER);
-    QPen cp = GColor(CCP);
+    QPen marker = GColor(GCol::PLOTMARKER);
+    QPen cp = GColor(GCol::CP);
     mX->setLinePen(marker);
     mY->setLinePen(marker);
     cpCurve->setPen(cp);
 
     setCL(appsettings->cvalue(context->athlete->cyclist, GC_CRANKLENGTH).toDouble() / 1000.0);
-    QPen pmax = GColor(CCP);
+    QPen pmax = GColor(GCol::CP);
     pmax.setStyle(Qt::DashLine);
     pmaxCurve->setPen(pmax);
 
@@ -480,7 +480,7 @@ PfPvPlot::refreshIntervalMarkers()
             QwtSymbol *sym = new QwtSymbol;
             sym->setStyle(QwtSymbol::Diamond);
             sym->setSize(8*dpiXFactor);
-            sym->setPen(QPen(GColor(CPLOTMARKER)));
+            sym->setPen(QPen(GColor(GCol::PLOTMARKER)));
             sym->setBrush(QBrush(color));
 
             QwtPlotMarker *p = new QwtPlotMarker();
@@ -1021,19 +1021,19 @@ PfPvPlot::recalcCompare()
     if (totaltime) {
 
         QwtText t0(QString("%1%").arg(timeInQuadrant[0] / totaltime * 100, 0, 'f', 1),QwtText::PlainText);
-        t0.setColor(GColor(CPLOTMARKER));
+        t0.setColor(GColor(GCol::PLOTMARKER));
         tiqMarker[0]->setLabel(t0);
 
         QwtText t1(QString("%1%").arg(timeInQuadrant[1] / totaltime * 100, 0, 'f', 1),QwtText::PlainText);
-        t1.setColor(GColor(CPLOTMARKER));
+        t1.setColor(GColor(GCol::PLOTMARKER));
         tiqMarker[1]->setLabel(t1);
 
         QwtText t2(QString("%1%").arg(timeInQuadrant[2] / totaltime * 100, 0, 'f', 1),QwtText::PlainText);
-        t2.setColor(GColor(CPLOTMARKER));
+        t2.setColor(GColor(GCol::PLOTMARKER));
         tiqMarker[2]->setLabel(t2);
 
         QwtText t3(QString("%1%").arg(timeInQuadrant[3] / totaltime * 100, 0, 'f', 1),QwtText::PlainText);
-        t3.setColor(GColor(CPLOTMARKER));
+        t3.setColor(GColor(GCol::PLOTMARKER));
         tiqMarker[3]->setLabel(t3);
 
     } else {
@@ -1147,19 +1147,19 @@ PfPvPlot::recalc()
         if (totaltime) {
 
             QwtText t0(QString("%1%").arg(timeInQuadrant[0] / totaltime * 100, 0, 'f', 1),QwtText::PlainText);
-            t0.setColor(GColor(CPLOTMARKER));
+            t0.setColor(GColor(GCol::PLOTMARKER));
             tiqMarker[0]->setLabel(t0);
 
             QwtText t1(QString("%1%").arg(timeInQuadrant[1] / totaltime * 100, 0, 'f', 1),QwtText::PlainText);
-            t1.setColor(GColor(CPLOTMARKER));
+            t1.setColor(GColor(GCol::PLOTMARKER));
             tiqMarker[1]->setLabel(t1);
 
             QwtText t2(QString("%1%").arg(timeInQuadrant[2] / totaltime * 100, 0, 'f', 1),QwtText::PlainText);
-            t2.setColor(GColor(CPLOTMARKER));
+            t2.setColor(GColor(GCol::PLOTMARKER));
             tiqMarker[2]->setLabel(t2);
 
             QwtText t3(QString("%1%").arg(timeInQuadrant[3] / totaltime * 100, 0, 'f', 1),QwtText::PlainText);
-            t3.setColor(GColor(CPLOTMARKER));
+            t3.setColor(GColor(GCol::PLOTMARKER));
             tiqMarker[3]->setLabel(t3);
 
         } else {

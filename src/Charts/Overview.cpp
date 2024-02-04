@@ -29,7 +29,7 @@ static QIcon grayConfig, whiteConfig, accentConfig;
 OverviewWindow::OverviewWindow(Context *context, int scope, bool blank) : GcChartWindow(context), context(context), configured(false), scope(scope), blank(blank)
 {
     setContentsMargins(0,0,0,0);
-    setProperty("color", GColor(COVERVIEWBACKGROUND));
+    setProperty("color", GColor(GCol::OVERVIEWBACKGROUND));
     setShowTitle(false);
 
     // actions...
@@ -561,7 +561,7 @@ badconfig:
         // color is common- if we actuall added one...
         if (add) {
             if (obj.contains("color") && type != OverviewItemType::USERCHART)  add->bgcolor = obj["color"].toString();
-            else add->bgcolor = StandardColor(CCARDBACKGROUND).name();
+            else add->bgcolor = GColorToRGBColor(GCol::CARDBACKGROUND).name();
         }
     }
 

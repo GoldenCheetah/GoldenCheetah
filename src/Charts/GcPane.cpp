@@ -99,7 +99,7 @@ GcPane::paintEvent(QPaintEvent *)
     // Init paint settings
     QPainter painter(this);
     //painter.setRenderHint(QPainter::Antialiasing);
-    QColor color = Qt::black; //GColor(CPOPUP);
+    QColor color = Qt::black; //GColor(GCol::POPUP);
     QPen pen(color);
 
     // border color

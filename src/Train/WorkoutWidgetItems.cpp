@@ -44,7 +44,7 @@ WWPowerScale::paint(QPainter *painter)
 
     // fill transparent to deminish "over painted" curves
     // that are shown in borders to give sense of scroll
-    QColor deminish(GColor(CTRAINPLOTBACKGROUND));
+    QColor deminish(GColor(GCol::TRAINPLOTBACKGROUND));
     deminish.setAlpha(175);
     painter->fillRect(workoutWidget()->left(), deminish);
 
@@ -122,7 +122,7 @@ WWPowerScale::paint(QPainter *painter)
     }
 
     // CP !
-    QPen cppen(GColor(CPLOTMARKER));
+    QPen cppen(GColor(GCol::PLOTMARKER));
     cppen.setStyle(Qt::DashLine);
     painter->setPen(cppen);
 
@@ -147,7 +147,7 @@ WWWBalScale::paint(QPainter *painter)
 
     // fill transparent to deminish "over painted" curves
     // that are shown in borders to give sense of scroll
-    QColor deminish(GColor(CTRAINPLOTBACKGROUND));
+    QColor deminish(GColor(GCol::TRAINPLOTBACKGROUND));
     deminish.setAlpha(175);
     painter->fillRect(workoutWidget()->right(), deminish);
 
@@ -174,7 +174,7 @@ WWWBalScale::paint(QPainter *painter)
                     QPoint(tl.x()+WBALSCALEWIDTH, tl.y() + ((i+1) * (height/4))));
 
         // draw rect
-        QColor wbal = GColor(CWBAL);
+        QColor wbal = GColor(GCol::WBAL);
         wbal.setAlpha((255/4) * (i+1));
         painter->fillRect(bound, QBrush(wbal));
 
@@ -242,7 +242,7 @@ WWLap::paint(QPainter *painter)
 
     QFontMetrics fontMetrics(workoutWidget()->bigFont);
     painter->setFont(workoutWidget()->bigFont);
-    painter->setPen(GColor(CPLOTMARKER));
+    painter->setPen(GColor(GCol::PLOTMARKER));
 
     for(int i=0; i<workoutWidget()->laps().count(); i++) {
 
@@ -304,7 +304,7 @@ WWPoint::paint(QPainter *painter)
     } else {
 
         // draw point
-        painter->setBrush(GColor(CPOWER));
+        painter->setBrush(GColor(GCol::POWER));
         painter->drawEllipse(QPointF(center.x(), center.y()), 3.0f*dpiXFactor, 3.0f*dpiXFactor);
     }
 
@@ -316,7 +316,7 @@ void
 WWLine::paint(QPainter *painter)
 {
     // thin ?
-    QPen linePen(workoutWidget()->recording() ? GColor(CTPOWER) : GColor(CPOWER));
+    QPen linePen(workoutWidget()->recording() ? GColor(GCol::TPOWER) : GColor(GCol::POWER));
     linePen.setWidth(1 *dpiXFactor);
     painter->setPen(linePen);
 
@@ -350,9 +350,9 @@ WWLine::paint(QPainter *painter)
         // now fill
         painter->setPen(Qt::NoPen);
 
-            QColor brush_color1 = QColor(GColor(CTPOWER));
+            QColor brush_color1 = QColor(GColor(GCol::TPOWER));
             brush_color1.setAlpha(240);
-            QColor brush_color2 = QColor(GColor(CTPOWER));
+            QColor brush_color2 = QColor(GColor(GCol::TPOWER));
             brush_color2.setAlpha(200);
 
             QLinearGradient linearGradient(0, 0, 0, workoutWidget()->transform(0,0).y());
@@ -374,38 +374,38 @@ WWTelemetry::paint(QPainter *painter)
     if (workoutWidget()->shouldPlotPwr())
     {
         updateAvg(workoutWidget()->watts, workoutWidget()->pwrAvg, workoutWidget()->pwrPlotAvgLength());
-        paintSampleList(painter, GColor(CPOWER), workoutWidget()->pwrAvg, WorkoutWidget::POWER);
+        paintSampleList(painter, GColor(GCol::POWER), workoutWidget()->pwrAvg, WorkoutWidget::POWER);
     }
 
     // Draw HR
     if (workoutWidget()->shouldPlotHr())
     {
         updateAvg(workoutWidget()->hr, workoutWidget()->hrAvg, workoutWidget()->hrPlotAvgLength());
-        paintSampleList(painter, GColor(CHEARTRATE), workoutWidget()->hrAvg, WorkoutWidget::HEARTRATE);
+        paintSampleList(painter, GColor(GCol::HEARTRATE), workoutWidget()->hrAvg, WorkoutWidget::HEARTRATE);
     }
     // Draw Speed
     if (workoutWidget()->shouldPlotSpeed())
     {
         updateAvg(workoutWidget()->speed, workoutWidget()->speedAvg, workoutWidget()->speedPlotAvgLength());
-        paintSampleList(painter, GColor(CSPEED), workoutWidget()->speedAvg, WorkoutWidget::SPEED);
+        paintSampleList(painter, GColor(GCol::SPEED), workoutWidget()->speedAvg, WorkoutWidget::SPEED);
     }
     // Draw Cadence
     if (workoutWidget()->shouldPlotCadence())
     {
         updateAvg(workoutWidget()->cadence, workoutWidget()->cadenceAvg, workoutWidget()->cadencePlotAvgLength());
-        paintSampleList(painter, GColor(CCADENCE), workoutWidget()->cadenceAvg, WorkoutWidget::CADENCE);
+        paintSampleList(painter, GColor(GCol::CADENCE), workoutWidget()->cadenceAvg, WorkoutWidget::CADENCE);
     }
     // Draw VO2
     if (workoutWidget()->shouldPlotVo2())
     {
         updateAvg(workoutWidget()->vo2, workoutWidget()->vo2Avg, workoutWidget()->vo2PlotAvgLength());
-        paintSampleList(painter, GColor(CVO2), workoutWidget()->vo2Avg, WorkoutWidget::VO2);
+        paintSampleList(painter, GColor(GCol::VO2), workoutWidget()->vo2Avg, WorkoutWidget::VO2);
     }
     // Draw Ventilation
     if (workoutWidget()->shouldPlotVentilation())
     {
         updateAvg(workoutWidget()->ventilation, workoutWidget()->ventilationAvg, workoutWidget()->ventilationPlotAvgLength());
-        paintSampleList(painter, GColor(CVENTILATION), workoutWidget()->ventilationAvg, WorkoutWidget::VENTILATION);
+        paintSampleList(painter, GColor(GCol::VENTILATION), workoutWidget()->ventilationAvg, WorkoutWidget::VENTILATION);
     }
 
     //
@@ -424,7 +424,7 @@ WWTelemetry::paint(QPainter *painter)
         int WPRIME = context->athlete->zones("Bike")->getWprime(rnum);
 
         // full color
-        QColor color = GColor(CWBAL);
+        QColor color = GColor(GCol::WBAL);
         QPen wlinePen(color);
         wlinePen.setWidth(1 *dpiXFactor);
         painter->setPen(wlinePen);
@@ -472,7 +472,7 @@ WWRect::paint(QPainter *painter)
     if (onRect != QPointF(-1,-1) && atRect != QPointF(-1,-1) && onRect != atRect) {
 
         // thin ?
-        QPen linePen(GColor(CPLOTMARKER));
+        QPen linePen(GColor(GCol::PLOTMARKER));
         linePen.setWidth(1 *dpiXFactor);
         painter->setPen(linePen);
 
@@ -502,7 +502,7 @@ WWBlockCursor::paint(QPainter *painter)
         QFontMetrics fontMetrics(workoutWidget()->bigFont);
         QRect textBound = fontMetrics.boundingRect(workoutWidget()->cursorBlockText);
         painter->setFont(workoutWidget()->bigFont);
-        painter->setPen(GColor(CPLOTMARKER));
+        painter->setPen(GColor(GCol::PLOTMARKER));
 
         QPointF where(workoutWidget()->cursorBlock.boundingRect().center().x()-(textBound.width()/2),
                       workoutWidget()->cursorBlock.boundingRect().bottom()-10); //XXX 10 is hardcoded space from bottom
@@ -528,7 +528,7 @@ WWBlockSelection::paint(QPainter *painter)
     if (workoutWidget()->selectionBlock == QPainterPath()) return;
 
     // set pen
-    painter->setPen(GColor(CPLOTMARKER));
+    painter->setPen(GColor(GCol::PLOTMARKER));
 
     // now draw the path
     painter->drawPath(workoutWidget()->selectionBlock);
@@ -542,7 +542,7 @@ WWBlockSelection::paint(QPainter *painter)
     QFontMetrics fontMetrics(workoutWidget()->bigFont);
     QRect textBound = fontMetrics.boundingRect(workoutWidget()->selectionBlockText);
     painter->setFont(workoutWidget()->bigFont);
-    painter->setPen(GColor(CPLOTMARKER));
+    painter->setPen(GColor(GCol::PLOTMARKER));
 
     QPointF where(workoutWidget()->selectionBlock.boundingRect().center().x()-(textBound.width()/2),
                   workoutWidget()->selectionBlock.boundingRect().bottom()-10); //XXX 10 is hardcoded space from bottom
@@ -577,7 +577,7 @@ WWWBLine::paint(QPainter *painter)
 
     // should be translucent if recording, as will be "overwritten"
     // by the actual W'bal value
-    QColor color = GColor(CWBAL);
+    QColor color = GColor(GCol::WBAL);
     if (workoutWidget()->recording()) color.setAlpha(64);
 
     // set pen
@@ -622,7 +622,7 @@ WWMMPCurve::paint(QPainter *painter)
     if (workoutWidget()->recording()) return;
 
     // thin ?
-    QPen linePen(GColor(CCP));
+    QPen linePen(GColor(GCol::CP));
     linePen.setWidth(1);
     painter->setPen(linePen);
 
@@ -736,7 +736,7 @@ WWSmartGuide::paint(QPainter *painter)
     if (selected > 0) {
 
         // for now just paint the boundary tics on the x-axis
-        QPen linePen(GColor(CPLOTMARKER));
+        QPen linePen(GColor(GCol::PLOTMARKER));
         linePen.setWidthF(0);
         painter->setPen(linePen);
 
@@ -824,7 +824,7 @@ WWSmartGuide::paint(QPainter *painter)
     if (selected > 0) {
 
         // for now just paint the boundary tics on the y-axis
-        QPen linePen(GColor(CPLOTMARKER));
+        QPen linePen(GColor(GCol::PLOTMARKER));
         linePen.setWidthF(0);
         painter->setPen(linePen);
 
@@ -860,7 +860,7 @@ WWNow::paint(QPainter *painter)
     // get now
     int px = workoutWidget()->transform(context->getNow()/1000.0f,0).x();
 
-    QPen linePen(GColor(CPLOTMARKER));
+    QPen linePen(GColor(GCol::PLOTMARKER));
     linePen.setWidthF(2 *dpiXFactor);
     painter->setPen(linePen);
 

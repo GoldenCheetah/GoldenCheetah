@@ -93,7 +93,7 @@ QPointF NowData::sample(size_t i) const
 ErgFilePlot::ErgFilePlot(Context *context) : context(context)
 {
     //insertLegend(new QwtLegend(), QwtPlot::BottomLegend);
-    setCanvasBackground(GColor(CTRAINPLOTBACKGROUND));
+    setCanvasBackground(GColor(GCol::TRAINPLOTBACKGROUND));
     static_cast<QwtPlotCanvas*>(canvas())->setFrameStyle(QFrame::NoFrame);
     //courseData = data;                      // what we plot
     setAutoDelete(false);
@@ -108,8 +108,8 @@ ErgFilePlot::ErgFilePlot(Context *context) : context(context)
     //setAxisScaleDraw(QwtAxis::YLeft, sd);
 
     QPalette pal;
-    pal.setColor(QPalette::WindowText, GColor(CRIDEPLOTYAXIS));
-    pal.setColor(QPalette::Text, GColor(CRIDEPLOTYAXIS));
+    pal.setColor(QPalette::WindowText, GColor(GCol::RIDEPLOTYAXIS));
+    pal.setColor(QPalette::Text, GColor(GCol::RIDEPLOTYAXIS));
     axisWidget(QwtAxis::YLeft)->setPalette(pal);
 
     QFont stGiles;
@@ -136,8 +136,8 @@ ErgFilePlot::ErgFilePlot(Context *context) : context(context)
     QwtPlot::setAxisFont(QwtAxis::XBottom, stGiles);
     QwtPlot::setAxisTitle(QwtAxis::XBottom, title);
 
-    pal.setColor(QPalette::WindowText, GColor(CRIDEPLOTXAXIS));
-    pal.setColor(QPalette::Text, GColor(CRIDEPLOTXAXIS));
+    pal.setColor(QPalette::WindowText, GColor(GCol::RIDEPLOTXAXIS));
+    pal.setColor(QPalette::Text, GColor(GCol::RIDEPLOTXAXIS));
     axisWidget(QwtAxis::XBottom)->setPalette(pal);
 
     // axis 1 not currently used
@@ -165,16 +165,16 @@ ErgFilePlot::ErgFilePlot(Context *context) : context(context)
     LodCurve->setYAxis(QwtAxis::YLeft);
 
     // load curve is blue for time and grey for gradient
-    QColor brush_color = QColor(GColor(CTPOWER));
+    QColor brush_color = QColor(GColor(GCol::TPOWER));
     brush_color.setAlpha(64);
     LodCurve->setBrush(brush_color);   // fill below the line
-    QPen Lodpen = QPen(GColor(CTPOWER), 1.0);
+    QPen Lodpen = QPen(GColor(GCol::TPOWER), 1.0);
     LodCurve->setPen(Lodpen);
 
     wbalCurvePredict = new QwtPlotCurve("W'bal Predict");
     wbalCurvePredict->attach(this);
     wbalCurvePredict->setYAxis(QwtAxisId(QwtAxis::YRight, 3));
-    QColor predict = GColor(CWBAL).darker();
+    QColor predict = GColor(GCol::WBAL).darker();
     predict.setAlpha(200);
     QPen wbalPen = QPen(predict, 2.0); // predict darker...
     wbalCurvePredict->setPen(wbalPen);
@@ -183,7 +183,7 @@ ErgFilePlot::ErgFilePlot(Context *context) : context(context)
     wbalCurve = new QwtPlotCurve("W'bal Actual");
     wbalCurve->attach(this);
     wbalCurve->setYAxis(QwtAxisId(QwtAxis::YRight, 3));
-    QPen wbalPenA = QPen(GColor(CWBAL), 1.0); // actual lighter
+    QPen wbalPenA = QPen(GColor(GCol::WBAL), 1.0); // actual lighter
     wbalCurve->setPen(wbalPenA);
     wbalData = new CurveData;
     wbalCurve->setSamples(wbalData->x(), wbalData->y(), wbalData->count());
@@ -194,8 +194,8 @@ ErgFilePlot::ErgFilePlot(Context *context) : context(context)
     sd->setLabelRotation(90);// in the 000s
     sd->setTickLength(QwtScaleDiv::MajorTick, 3);
     setAxisScaleDraw(QwtAxisId(QwtAxis::YRight, 3), sd);
-    pal.setColor(QPalette::WindowText, GColor(CWBAL));
-    pal.setColor(QPalette::Text, GColor(CWBAL));
+    pal.setColor(QPalette::WindowText, GColor(GCol::WBAL));
+    pal.setColor(QPalette::Text, GColor(GCol::WBAL));
     axisWidget(QwtAxisId(QwtAxis::YRight, 3))->setPalette(pal);
     QwtPlot::setAxisFont(QwtAxisId(QwtAxis::YRight, 3), stGiles);
     QwtText title2("W'bal");
@@ -204,7 +204,7 @@ ErgFilePlot::ErgFilePlot(Context *context) : context(context)
 
     // telemetry history
     wattsCurve = new QwtPlotCurve("Power");
-    QPen wattspen = QPen(GColor(CPOWER));
+    QPen wattspen = QPen(GColor(GCol::POWER));
     wattsCurve->setPen(wattspen);
     wattsCurve->attach(this);
     wattsCurve->setYAxis(QwtAxis::YLeft);
@@ -214,7 +214,7 @@ ErgFilePlot::ErgFilePlot(Context *context) : context(context)
 
     // telemetry history
     hrCurve = new QwtPlotCurve("Heartrate");
-    QPen hrpen = QPen(GColor(CHEARTRATE));
+    QPen hrpen = QPen(GColor(GCol::HEARTRATE));
     hrCurve->setPen(hrpen);
     hrCurve->attach(this);
     hrCurve->setYAxis(QwtAxis::YRight);
@@ -223,7 +223,7 @@ ErgFilePlot::ErgFilePlot(Context *context) : context(context)
 
     // telemetry history
     cadCurve = new QwtPlotCurve("Cadence");
-    QPen cadpen = QPen(GColor(CCADENCE));
+    QPen cadpen = QPen(GColor(GCol::CADENCE));
     cadCurve->setPen(cadpen);
     cadCurve->attach(this);
     cadCurve->setYAxis(QwtAxis::YRight);
@@ -232,7 +232,7 @@ ErgFilePlot::ErgFilePlot(Context *context) : context(context)
 
     // telemetry history
     speedCurve = new QwtPlotCurve("Speed");
-    QPen speedpen = QPen(GColor(CSPEED));
+    QPen speedpen = QPen(GColor(GCol::SPEED));
     speedCurve->setPen(speedpen);
     speedCurve->attach(this);
     speedCurve->setYAxis(QwtAxisId(QwtAxis::YRight,2).id);
@@ -244,10 +244,10 @@ ErgFilePlot::ErgFilePlot(Context *context) : context(context)
 
     // CP marker
     QwtText CPText(QString(tr("CP")));
-    CPText.setColor(GColor(CPLOTMARKER));
+    CPText.setColor(GColor(GCol::PLOTMARKER));
     CPMarker = new QwtPlotMarker(CPText);
     CPMarker->setLineStyle(QwtPlotMarker::HLine);
-    CPMarker->setLinePen(GColor(CPLOTMARKER), 1, Qt::DotLine);
+    CPMarker->setLinePen(GColor(GCol::PLOTMARKER), 1, Qt::DotLine);
     CPMarker->setLabel(CPText);
     CPMarker->setLabelAlignment(Qt::AlignLeft | Qt::AlignTop);
     CPMarker->setYAxis(QwtAxis::YLeft);
@@ -277,8 +277,8 @@ ErgFilePlot::ErgFilePlot(Context *context) : context(context)
 void
 ErgFilePlot::configChanged(qint32)
 {
-    setCanvasBackground(GColor(CTRAINPLOTBACKGROUND));
-    CPMarker->setLinePen(GColor(CPLOTMARKER), 1, Qt::DotLine);
+    setCanvasBackground(GColor(GCol::TRAINPLOTBACKGROUND));
+    CPMarker->setLinePen(GColor(GCol::PLOTMARKER), 1, Qt::DotLine);
 
     // set CP Marker
     double CP = 0; // default
@@ -457,9 +457,9 @@ ErgFilePlot::setData(ErgFile *ergfile)
 
         } else {
 
-            QColor brush_color1 = QColor(GColor(CTPOWER));
+            QColor brush_color1 = QColor(GColor(GCol::TPOWER));
             brush_color1.setAlpha(200);
-            QColor brush_color2 = QColor(GColor(CTPOWER));
+            QColor brush_color2 = QColor(GColor(GCol::TPOWER));
             brush_color2.setAlpha(64);
 
             QLinearGradient linearGradient(0, 0, 0, height());
@@ -468,7 +468,7 @@ ErgFilePlot::setData(ErgFile *ergfile)
             linearGradient.setSpread(QGradient::PadSpread);
 
             LodCurve->setBrush(linearGradient);   // fill below the line
-            QPen Lodpen = QPen(GColor(CTPOWER), 1.0);
+            QPen Lodpen = QPen(GColor(GCol::TPOWER), 1.0);
             LodCurve->setPen(Lodpen);
 
         }
@@ -514,12 +514,12 @@ ErgFilePlot::setData(ErgFile *ergfile)
             QwtText text(prefix + decoratedName);
                 
             text.setFont(QFont("Helvetica", 10, QFont::Bold));
-            text.setColor(GColor(CPLOTMARKER));
+            text.setColor(GColor(GCol::PLOTMARKER));
 
             // vertical line
             QwtPlotMarker *add = new QwtPlotMarker();
             add->setLineStyle(QwtPlotMarker::VLine);
-            add->setLinePen(QPen(GColor(CPLOTMARKER), 0, Qt::DashDotLine));
+            add->setLinePen(QPen(GColor(GCol::PLOTMARKER), 0, Qt::DashDotLine));
             add->setLabelAlignment(labelAlignment);
             // convert to imperial according to settings
             double unitsFactor = (!bydist || GlobalContext::context()->useMetricUnits) ? 1.0 : MILES_PER_KM;
@@ -568,8 +568,8 @@ ErgFilePlot::setData(ErgFile *ergfile)
                 QwtPlot::setAxisFont(QwtAxis::XBottom, stGiles);
                 QwtPlot::setAxisTitle(QwtAxis::XBottom, title);
 
-                pal.setColor(QPalette::WindowText, GColor(CRIDEPLOTXAXIS));
-                pal.setColor(QPalette::Text, GColor(CRIDEPLOTXAXIS));
+                pal.setColor(QPalette::WindowText, GColor(GCol::RIDEPLOTXAXIS));
+                pal.setColor(QPalette::Text, GColor(GCol::RIDEPLOTXAXIS));
                 axisWidget(QwtAxis::XBottom)->setPalette(pal);
 
                 // only allocate a new one if its not the current (they get freed by Qwt)
@@ -599,8 +599,8 @@ ErgFilePlot::setData(ErgFile *ergfile)
         QwtPlot::setAxisFont(QwtAxis::XBottom, stGiles);
         QwtPlot::setAxisTitle(QwtAxis::XBottom, title);
 
-        pal.setColor(QPalette::WindowText, GColor(CRIDEPLOTXAXIS));
-        pal.setColor(QPalette::Text, GColor(CRIDEPLOTXAXIS));
+        pal.setColor(QPalette::WindowText, GColor(GCol::RIDEPLOTXAXIS));
+        pal.setColor(QPalette::Text, GColor(GCol::RIDEPLOTXAXIS));
         axisWidget(QwtAxis::XBottom)->setPalette(pal);
 
         // set the axis so we default to an hour workout

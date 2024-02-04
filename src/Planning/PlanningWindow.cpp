@@ -23,7 +23,7 @@ PlanningWindow::PlanningWindow(Context *context) :
     GcChartWindow(context), context(context)
 {
     setContentsMargins(0,0,0,0);
-    setProperty("color", GColor(CTRENDPLOTBACKGROUND));
+    setProperty("color", GColor(GCol::TRENDPLOTBACKGROUND));
 
     setControls(NULL);
 
@@ -45,29 +45,29 @@ PlanningWindow::resizeEvent(QResizeEvent *)
 void
 PlanningWindow::configChanged(qint32)
 {
-    setProperty("color", GColor(CTRENDPLOTBACKGROUND));
+    setProperty("color", GColor(GCol::TRENDPLOTBACKGROUND));
 
     // text edit colors
     QPalette palette;
-    palette.setColor(QPalette::Window, GColor(CTRAINPLOTBACKGROUND));
+    palette.setColor(QPalette::Window, GColor(GCol::TRAINPLOTBACKGROUND));
 
     // only change base if moved away from white plots
     // which is a Mac thing
 #ifndef Q_OS_MAC
-    if (GColor(CTRENDPLOTBACKGROUND) != Qt::white)
+    if (GColor(GCol::TRENDPLOTBACKGROUND) != Qt::white)
 #endif
     {
-        //palette.setColor(QPalette::Base, GCColor::alternateColor(GColor(CTRAINPLOTBACKGROUND)));
-        palette.setColor(QPalette::Base, GColor(CTRAINPLOTBACKGROUND));
-        palette.setColor(QPalette::Window, GColor(CTRAINPLOTBACKGROUND));
+        //palette.setColor(QPalette::Base, GAlternateColor(GCol::TRAINPLOTBACKGROUND));
+        palette.setColor(QPalette::Base, GColor(GCol::TRAINPLOTBACKGROUND));
+        palette.setColor(QPalette::Window, GColor(GCol::TRAINPLOTBACKGROUND));
     }
 
 #ifndef Q_OS_MAC // the scrollers appear when needed on Mac, we'll keep that
     //code->setStyleSheet(TabView::ourStyleSheet());
 #endif
 
-    palette.setColor(QPalette::WindowText, GCColor::invertColor(GColor(CTRAINPLOTBACKGROUND)));
-    palette.setColor(QPalette::Text, GCColor::invertColor(GColor(CTRAINPLOTBACKGROUND)));
+    palette.setColor(QPalette::WindowText, GInvertColor(GCol::TRAINPLOTBACKGROUND));
+    palette.setColor(QPalette::Text, GInvertColor(GCol::TRAINPLOTBACKGROUND));
     //code->setPalette(palette);
     repaint();
 }

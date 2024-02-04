@@ -107,31 +107,31 @@ DiaryWindow::configChanged(qint32)
     fieldDefinitions = GlobalContext::context()->rideMetadata->getFields();
 
     // change colors to reflect preferences
-    setProperty("color", GColor(CPLOTBACKGROUND));
+    setProperty("color", GColor(GCol::PLOTBACKGROUND));
 
     QPalette palette;
-    palette.setBrush(QPalette::Window, QBrush(GColor(CPLOTBACKGROUND)));
-    palette.setBrush(QPalette::Base, QBrush(GColor(CPLOTBACKGROUND)));
-    palette.setColor(QPalette::WindowText, GCColor::invertColor(GColor(CPLOTBACKGROUND)));
-    palette.setColor(QPalette::Text, GCColor::invertColor(GColor(CPLOTBACKGROUND)));
-    palette.setColor(QPalette::Normal, QPalette::Window, GCColor::invertColor(GColor(CPLOTBACKGROUND)));
+    palette.setBrush(QPalette::Window, QBrush(GColor(GCol::PLOTBACKGROUND)));
+    palette.setBrush(QPalette::Base, QBrush(GColor(GCol::PLOTBACKGROUND)));
+    palette.setColor(QPalette::WindowText, GInvertColor(GColor(GCol::PLOTBACKGROUND)));
+    palette.setColor(QPalette::Text, GInvertColor(GColor(GCol::PLOTBACKGROUND)));
+    palette.setColor(QPalette::Normal, QPalette::Window, GInvertColor(GColor(GCol::PLOTBACKGROUND)));
     setPalette(palette);
     monthlyView->setPalette(palette);
     monthlyView->setStyleSheet(QString("QTableView QTableCornerButton::section { background-color: %1; color: %2; border: %1 }")
-                    .arg(GColor(CPLOTBACKGROUND).name())
-                    .arg(GCColor::invertColor(GColor(CPLOTBACKGROUND)).name()));
+                    .arg(GColor(GCol::PLOTBACKGROUND).name())
+                    .arg(GInvertColor(GCol::PLOTBACKGROUND).name()));
     monthlyView->horizontalHeader()->setStyleSheet(QString("QHeaderView::section { background-color: %1; color: %2; border: 0px }")
-                    .arg(GColor(CPLOTBACKGROUND).name())
-                    .arg(GCColor::invertColor(GColor(CPLOTBACKGROUND)).name()));
+                    .arg(GColor(GCol::PLOTBACKGROUND).name())
+                    .arg(GInvertColor(GCol::PLOTBACKGROUND).name()));
     monthlyView->verticalHeader()->setStyleSheet(QString("QHeaderView::section { background-color: %1; color: %2; border: 0px }")
-                    .arg(GColor(CPLOTBACKGROUND).name())
-                    .arg(GCColor::invertColor(GColor(CPLOTBACKGROUND)).name()));
+                    .arg(GColor(GCol::PLOTBACKGROUND).name())
+                    .arg(GInvertColor(GCol::PLOTBACKGROUND).name()));
 #ifndef Q_OS_MAC
     monthlyView->verticalScrollBar()->setStyleSheet(AbstractView::ourStyleSheet());
     monthlyView->horizontalScrollBar()->setStyleSheet(AbstractView::ourStyleSheet());
 #endif
-    title->setStyleSheet(QString("background: %1; color: %2;").arg(GColor(CPLOTBACKGROUND).name())
-                                                              .arg(GColor(CPLOTMARKER).name()));
+    title->setStyleSheet(QString("background: %1; color: %2;").arg(GColor(GCol::PLOTBACKGROUND).name())
+                                                              .arg(GColor(GCol::PLOTMARKER).name()));
 }
 
 void

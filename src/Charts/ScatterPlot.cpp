@@ -553,7 +553,7 @@ void ScatterPlot::setData (ScatterSettings *settings)
 
     if (settings->gridlines) {
 
-        QPen gridPen(GColor(CPLOTGRID));
+        QPen gridPen(GColor(GCol::PLOTGRID));
         grid = new QwtPlotGrid();
         grid->setPen(gridPen);
         grid->enableX(true);
@@ -767,7 +767,7 @@ ScatterPlot::refreshIntervalMarkers(ScatterSettings *settings)
             QwtSymbol *sym = new QwtSymbol;
             sym->setStyle(QwtSymbol::Diamond);
             sym->setSize(8*dpiXFactor);
-            sym->setPen(QPen(GColor(CPLOTMARKER)));
+            sym->setPen(QPen(GColor(GCol::PLOTMARKER)));
             sym->setBrush(QBrush(color));
 
             QwtPlotMarker *p = new QwtPlotMarker();
@@ -787,12 +787,12 @@ void
 ScatterPlot::configChanged(qint32)
 {
     // setColors bg
-    setCanvasBackground(GColor(CPLOTBACKGROUND));
+    setCanvasBackground(GColor(GCol::PLOTBACKGROUND));
 
     QPalette palette;
-    palette.setBrush(QPalette::Window, QBrush(GColor(CPLOTBACKGROUND)));
-    palette.setColor(QPalette::WindowText, GColor(CPLOTMARKER));
-    palette.setColor(QPalette::Text, GColor(CPLOTMARKER));
+    palette.setBrush(QPalette::Window, QBrush(GColor(GCol::PLOTBACKGROUND)));
+    palette.setColor(QPalette::WindowText, GColor(GCol::PLOTMARKER));
+    palette.setColor(QPalette::Text, GColor(GCol::PLOTMARKER));
 
     axisWidget(QwtAxis::XBottom)->setPalette(palette);
     axisWidget(QwtAxis::YLeft)->setPalette(palette);

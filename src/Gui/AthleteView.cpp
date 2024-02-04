@@ -300,7 +300,7 @@ AthleteCard::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, QWid
 
     // load status
     QRectF progressbar(0, geometry().height()-gl_progress_width, geometry().width() * (loadprogress/100), gl_progress_width);
-    painter->fillRect(progressbar, QBrush(GColor(CPLOTMARKER)));
+    painter->fillRect(progressbar, QBrush(GColor(GCol::PLOTMARKER)));
 
     // refresh status
     if (refresh && Context::isValid(context)) {

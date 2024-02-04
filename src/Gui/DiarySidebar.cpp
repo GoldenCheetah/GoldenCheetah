@@ -142,7 +142,7 @@ GcLabel::paintEvent(QPaintEvent *)
         if (!underMouse()) {
             painter.fillRect(all, bgColor);
         } else {
-            if (filtered) painter.fillRect(all, GColor(CCALCURRENT));
+            if (filtered) painter.fillRect(all, GColor(GCol::CALCURRENT));
             else painter.fillRect(all, Qt::lightGray);
         }
 
@@ -151,18 +151,17 @@ GcLabel::paintEvent(QPaintEvent *)
     }
 
     if (selected) {
-        painter.fillRect(all, GColor(CCALCURRENT));
+        painter.fillRect(all, GColor(GCol::CALCURRENT));
     }
 
     if (text() != "<" && text() != ">") {
         painter.setFont(this->font());
 
-        if (filtered && !selected && !underMouse()) painter.setPen(GColor(CCALCURRENT));
+        if (filtered && !selected && !underMouse()) painter.setPen(GColor(GCol::CALCURRENT));
         else {
 
             if (isChrome) {
-
-                if (GCColor::luminance(GColor(CCHROME)) < 127)
+                if (GLuminance(GColor(GCol::CHROME)) < 127)
                     painter.setPen(QColor(Qt::white));
                 else
                     painter.setPen(QColor(30,30,30,200));
@@ -173,7 +172,7 @@ GcLabel::paintEvent(QPaintEvent *)
         painter.drawText(norm, alignment(), text());
 
         if (highlighted) {
-            QColor over = GColor(CCALCURRENT);
+            QColor over = GColor(GCol::CALCURRENT);
             over.setAlpha(180);
             painter.setPen(over);
 
@@ -191,7 +190,7 @@ GcLabel::paintEvent(QPaintEvent *)
 
     if (text() != ""  && filtered) {
         QPen pen;
-        pen.setColor(GColor(CCALCURRENT));
+        pen.setColor(GColor(GCol::CALCURRENT));
         pen.setWidth(3);
         painter.setPen(pen);
         painter.drawRect(QRect(0,0,width(),height()));
@@ -379,11 +378,11 @@ GcMiniCalendar::GcMiniCalendar(Context *context, bool master) : context(context)
 void
 GcMiniCalendar::configChanged(qint32)
 {
-    QColor bgColor = GColor(CPLOTBACKGROUND);
-    QColor fgColor = GCColor::invertColor(bgColor);
+    QColor bgColor = GColor(GCol::PLOTBACKGROUND);
+    QColor fgColor = GInvertColor(bgColor);
     //XXX setStyleSheet(QString("color: %1; background: %2;").arg(fgColor.name()).arg(bgColor.name())); // clear any shit left behind from parents (Larkin ?)
     tint.setColor(QPalette::Window, bgColor);
-    tint.setColor(QPalette::WindowText, GColor(CPLOTMARKER));
+    tint.setColor(QPalette::WindowText, GColor(GCol::PLOTMARKER));
     white.setColor(QPalette::WindowText, fgColor);
     white.setColor(QPalette::Window, bgColor);
     grey.setColor(QPalette::WindowText, fgColor);
@@ -421,12 +420,12 @@ GcMiniCalendar::event(QEvent *e)
         QPainter painter(this);
         QRect all(0,0,width(),height());
         //painter.fillRect(all, QColor("#B3B4BA"));
-        painter.fillRect(all, GColor(CPLOTBACKGROUND));
+        painter.fillRect(all, GColor(GCol::PLOTBACKGROUND));
 
         if (_ride) {
             QDate when = _ride->dateTime.date();
             if (when >= QDate(year,month,01) && when < QDate(year,month,01).addMonths(1))
-            painter.fillRect(all, GColor(CPLOTMARKER));
+            painter.fillRect(all, GColor(GCol::PLOTMARKER));
         }
     }
 
@@ -618,7 +617,7 @@ GcMiniCalendar::setDate(int _month, int _year)
                 if (colors.count()) {
                     d->setBg(true);
                     d->setPalette(grey);
-                    if (colors.at(0) == QColor(1,1,1)) d->setBgColor(GColor(CPLOTMARKER)); // default
+                    if (colors.at(0) == QColor(1,1,1)) d->setBgColor(GColor(GCol::PLOTMARKER)); // default
                     else d->setBgColor(colors.at(0)); // use first always
                 } else {
                     d->setBg(false);
@@ -697,8 +696,8 @@ GcMultiCalendar::GcMultiCalendar(Context *context) : QScrollArea(context->mainWi
 void
 GcMultiCalendar::configChanged(qint32)
 {
-    QColor bgColor = GColor(CPLOTBACKGROUND);
-    QColor fgColor = GCColor::invertColor(bgColor);
+    QColor bgColor = GColor(GCol::PLOTBACKGROUND);
+    QColor fgColor = GInvertColor(bgColor);
 
     QPalette pal;
     pal.setColor(QPalette::Window, bgColor);

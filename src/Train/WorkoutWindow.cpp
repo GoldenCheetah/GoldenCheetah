@@ -44,7 +44,7 @@ WorkoutWindow::WorkoutWindow(Context *context) :
     this->setWhatsThis(helpContents->getWhatsThisText(HelpWhatsThis::ChartTrain_WorkoutEditor));
 
     setContentsMargins(0,0,0,0);
-    setProperty("color", GColor(CTRAINPLOTBACKGROUND));
+    setProperty("color", GColor(GCol::TRAINPLOTBACKGROUND));
 
     //
     // Chart settings
@@ -351,7 +351,7 @@ WorkoutWindow::resizeEvent(QResizeEvent *)
 void
 WorkoutWindow::configChanged(qint32)
 {
-    setProperty("color", GColor(CTRAINPLOTBACKGROUND));
+    setProperty("color", GColor(GCol::TRAINPLOTBACKGROUND));
     QFontMetrics fm(workout->bigFont);
     xlabel->setFont(workout->bigFont);
     ylabel->setFont(workout->bigFont);
@@ -364,8 +364,8 @@ WorkoutWindow::configChanged(qint32)
 
     scroll->setStyleSheet(AbstractView::ourStyleSheet());
     toolbar->setStyleSheet(QString("::enabled { background: %1; color: %2; border: 0px; } ")
-                           .arg(GColor(CTRAINPLOTBACKGROUND).name())
-                           .arg(GCColor::invertColor(GColor(CTRAINPLOTBACKGROUND)).name()));
+                           .arg(GColor(GCol::TRAINPLOTBACKGROUND).name())
+                           .arg(GInvertColor(GCol::TRAINPLOTBACKGROUND).name()));
 
     xlabel->setStyleSheet("color: darkGray;");
     ylabel->setStyleSheet("color: darkGray;");
@@ -379,25 +379,25 @@ WorkoutWindow::configChanged(qint32)
 
     // text edit colors
     QPalette palette;
-    palette.setColor(QPalette::Window, GColor(CTRAINPLOTBACKGROUND));
+    palette.setColor(QPalette::Window, GColor(GCol::TRAINPLOTBACKGROUND));
 
     // only change base if moved away from white plots
     // which is a Mac thing
 #ifndef Q_OS_MAC
-    if (GColor(CTRAINPLOTBACKGROUND) != Qt::white)
+    if (GColor(GCol::TRAINPLOTBACKGROUND) != Qt::white)
 #endif
     {
-        //palette.setColor(QPalette::Base, GCColor::alternateColor(GColor(CTRAINPLOTBACKGROUND)));
-        palette.setColor(QPalette::Base, GColor(CTRAINPLOTBACKGROUND));
-        palette.setColor(QPalette::Window, GColor(CTRAINPLOTBACKGROUND));
+        //palette.setColor(QPalette::Base, GAlternateColor(GCol::TRAINPLOTBACKGROUND));
+        palette.setColor(QPalette::Base, GColor(GCol::TRAINPLOTBACKGROUND));
+        palette.setColor(QPalette::Window, GColor(GCol::TRAINPLOTBACKGROUND));
     }
 
 #ifndef Q_OS_MAC // the scrollers appear when needed on Mac, we'll keep that
     code->setStyleSheet(AbstractView::ourStyleSheet());
 #endif
 
-    palette.setColor(QPalette::WindowText, GCColor::invertColor(GColor(CTRAINPLOTBACKGROUND)));
-    palette.setColor(QPalette::Text, GCColor::invertColor(GColor(CTRAINPLOTBACKGROUND)));
+    palette.setColor(QPalette::WindowText, GInvertColor(GCol::TRAINPLOTBACKGROUND));
+    palette.setColor(QPalette::Text, GInvertColor(GCol::TRAINPLOTBACKGROUND));
     code->setPalette(palette);
     repaint();
 }

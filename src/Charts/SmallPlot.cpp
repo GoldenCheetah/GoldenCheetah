@@ -93,8 +93,8 @@ SmallPlotPicker::trackerText(const QPoint &point) const
     stGiles.setWeight(QFont::Bold);
     tooltip.setFont(stGiles);
 
-    tooltip.setBackgroundBrush(QBrush(GColor(CPLOTMARKER)));
-    tooltip.setColor(GColor(CRIDEPLOTBACKGROUND));
+    tooltip.setBackgroundBrush(QBrush(GColor(GCol::PLOTMARKER)));
+    tooltip.setColor(GColor(GCol::RIDEPLOTBACKGROUND));
     tooltip.setBorderRadius(6);
     tooltip.setRenderFlags(Qt::AlignCenter | Qt::AlignVCenter);
 
@@ -104,15 +104,15 @@ SmallPlotPicker::trackerText(const QPoint &point) const
 
 SmallPlot::SmallPlot(QWidget *parent) : QwtPlot(parent), d_mrk(NULL), smooth(30), tracking(false)
 {
-    setCanvasBackground(GColor(CPLOTBACKGROUND));
+    setCanvasBackground(GColor(GCol::PLOTBACKGROUND));
     static_cast<QwtPlotCanvas*>(canvas())->setFrameStyle(QFrame::NoFrame);
 
     setXTitle();
     setAxesCount(QwtAxis::YLeft, 2);
 
     altCurve = new QwtPlotCurve(tr("Altitude"));
-    altCurve->setPen(QPen(GColor(CALTITUDE)));
-    QColor brush_color = GColor(CALTITUDEBRUSH);
+    altCurve->setPen(QPen(GColor(GCol::ALTITUDE)));
+    QColor brush_color = GColor(GCol::ALTITUDEBRUSH);
     brush_color.setAlpha(180);
     altCurve->setBrush(brush_color);
     altCurve->setYAxis(QwtAxisId(QwtAxis::YLeft,1));
@@ -121,13 +121,13 @@ SmallPlot::SmallPlot(QWidget *parent) : QwtPlot(parent), d_mrk(NULL), smooth(30)
     wattsCurve = new QwtPlotCurve("Power");
     //timeCurves.resize(36);// wattsCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
     wattsCurve->setYAxis(QwtAxisId(QwtAxis::YLeft,0));
-    wattsCurve->setPen(QPen(GColor(CPOWER)));
-    wattsCurve->attach(this);
+    wattsCurve->setPen(QPen(GColor(GCol::POWER)));
+	wattsCurve->attach(this);
 
     hrCurve = new QwtPlotCurve("Heart Rate");
     // hrCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
     hrCurve->setYAxis(QwtAxisId(QwtAxis::YLeft,0));
-    hrCurve->setPen(QPen(GColor(CHEARTRATE)));
+    hrCurve->setPen(QPen(GColor(GCol::HEARTRATE)));
     hrCurve->attach(this);
 
     // grid lines on such a small plot look AWFUL
@@ -135,7 +135,7 @@ SmallPlot::SmallPlot(QWidget *parent) : QwtPlot(parent), d_mrk(NULL), smooth(30)
     //grid->enableX(false);
     //QPen gridPen;
     //gridPen.setStyle(Qt::DotLine);
-    //grid->setPen(QPen(GColor(CPLOTGRID)));
+    //grid->setPen(QPen(GColor(GCol::PLOTGRID)));
     //grid->attach(this);
 
     //timeCurves.resize(36);
@@ -173,7 +173,7 @@ SmallPlot::enableTracking()
     picker->setTrackerMode(QwtPlotPicker::ActiveOnly);
     picker->setStateMachine(new QwtPickerTrackerMachine());
     picker->setRubberBand(QwtPicker::VLineRubberBand);
-    picker->setRubberBandPen(QPen(GColor(CPLOTMARKER)));
+    picker->setRubberBandPen(QPen(GColor(GCol::PLOTMARKER)));
     connect(picker, SIGNAL(moved(const QPoint&)), this, SLOT(pointMoved(const QPoint&)));
 }
 

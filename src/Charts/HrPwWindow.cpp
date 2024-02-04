@@ -204,7 +204,7 @@ HrPwWindow::HrPwWindow(Context *context) :
 void
 HrPwWindow::configChanged(qint32)
 {
-    setProperty("color", GColor(CPLOTBACKGROUND));
+    setProperty("color", GColor(GCol::PLOTBACKGROUND));
 }
 
 void

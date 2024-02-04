@@ -174,8 +174,8 @@ DialWindow::telemetryUpdate(const RealtimeData &rtData)
 
             // background for power, if we have a target load
             double load=rtData.getLoad();
-            QColor color = GColor(CTRAINPLOTBACKGROUND);
-            QColor foreground = GColor(CPOWER);
+            QColor color = GColor(GCol::TRAINPLOTBACKGROUND);
+            QColor foreground = GColor(GCol::POWER);
 
             if (displayValue < (load*0.95f) || displayValue > (load * 1.05)) {
                 color = displayValue < load ? QColor(Qt::blue) : QColor(Qt::red);
@@ -595,7 +595,7 @@ void DialWindow::seriesChanged()
     case RealtimeData::VI:
     case RealtimeData::SkibaVI:
     case RealtimeData::FeO2:
-        foreground = GColor(CFEO2);
+        foreground = GColor(GCol::FEO2);
         break;
             
     case RealtimeData::Distance:
@@ -607,43 +607,43 @@ void DialWindow::seriesChanged()
     case RealtimeData::LapDistanceRemaining:
     case RealtimeData::RER:
     case RealtimeData::None:
-            foreground = GColor(CDIAL);
+            foreground = GColor(GCol::DIAL);
             break;
 
     case RealtimeData::Rf:
-        foreground = GColor(CRESPFREQUENCY);
+        foreground = GColor(GCol::RESPFREQUENCY);
         break;
 
     case RealtimeData::RMV:
-        foreground = GColor(CVENTILATION);
+        foreground = GColor(GCol::VENTILATION);
         break;
 
     case RealtimeData::VO2:
-        foreground = GColor(CVO2);
+        foreground = GColor(GCol::VO2);
         break;
 
     case RealtimeData::VCO2:
-        foreground = GColor(CVCO2);
+        foreground = GColor(GCol::VCO2);
         break;
 
     case RealtimeData::TidalVolume:
-        foreground = GColor(CTIDALVOLUME);
+        foreground = GColor(GCol::TIDALVOLUME);
         break;
 
     case RealtimeData::Slope:  
-        foreground = GColor(CSLOPE);
+        foreground = GColor(GCol::SLOPE);
         break;
             
     case RealtimeData::Load:
-        foreground = GColor(CLOAD);
+        foreground = GColor(GCol::LOAD);
         break;
 
     case RealtimeData::BikeScore:
-            foreground = GColor(CBIKESCORE);
+            foreground = GColor(GCol::BIKESCORE);
             break;
 
     case RealtimeData::BikeStress:
-            foreground = GColor(CTSS);
+            foreground = GColor(GCol::TSS);
             break;
 
     case RealtimeData::XPower:
@@ -652,75 +652,75 @@ void DialWindow::seriesChanged()
     case RealtimeData::Watts:
     case RealtimeData::AvgWatts:
     case RealtimeData::AvgWattsLap:
-            foreground = GColor(CPOWER);
+            foreground = GColor(GCol::POWER);
             break;
 
     case RealtimeData::Speed:
     case RealtimeData::VirtualSpeed:
     case RealtimeData::AvgSpeed:
     case RealtimeData::AvgSpeedLap:
-            foreground = GColor(CSPEED);
+            foreground = GColor(GCol::SPEED);
             break;
 
     case RealtimeData::Wbal:
-            foreground = GColor(CWBAL);
+            foreground = GColor(GCol::WBAL);
             break;
 
     case RealtimeData::Cadence:
     case RealtimeData::AvgCadence:
     case RealtimeData::AvgCadenceLap:
-            foreground = GColor(CCADENCE);
+            foreground = GColor(GCol::CADENCE);
             break;
 
     case RealtimeData::HeartRate:
     case RealtimeData::AvgHeartRate:
     case RealtimeData::AvgHeartRateLap:
-            foreground = GColor(CHEARTRATE);
+            foreground = GColor(GCol::HEARTRATE);
             break;
 
     case RealtimeData::AltWatts:
-            foreground = GColor(CALTPOWER);
+            foreground = GColor(GCol::ALTPOWER);
             break;
 
     case RealtimeData::SmO2:
-            foreground = GColor(CSMO2);
+            foreground = GColor(GCol::SMO2);
             break;
 
     case RealtimeData::tHb:
-            foreground = GColor(CTHB);
+            foreground = GColor(GCol::THB);
             break;
 
     case RealtimeData::O2Hb:
-            foreground = GColor(CO2HB);
+            foreground = GColor(GCol::O2HB);
             break;
 
     case RealtimeData::HHb:
-            foreground = GColor(CHHB);
+            foreground = GColor(GCol::HHB);
             break;
 
     case RealtimeData::LeftPedalSmoothness:
-            foreground = GColor(CLPS);
+            foreground = GColor(GCol::LPS);
             break;
 
     case RealtimeData::RightPedalSmoothness:
-            foreground = GColor(CRPS);
+            foreground = GColor(GCol::RPS);
             break;
 
     case RealtimeData::LeftTorqueEffectiveness:
-            foreground = GColor(CLTE);
+            foreground = GColor(GCol::LTE);
             break;
 
     case RealtimeData::RightTorqueEffectiveness:
-           foreground = GColor(CRTE);
+           foreground = GColor(GCol::RTE);
            break;
 
     case RealtimeData::Altitude:
-           foreground = GColor(CALTITUDE);
+           foreground = GColor(GCol::ALTITUDE);
            break;
     }
 
     // ugh. we use style sheets because palettes don't work on labels
-    background = GColor(CTRAINPLOTBACKGROUND);
+    background = GColor(GCol::TRAINPLOTBACKGROUND);
     setProperty("color", background);
     QString sh = QString("QLabel { background: %1; color: %2; }")
                  .arg(background.name())

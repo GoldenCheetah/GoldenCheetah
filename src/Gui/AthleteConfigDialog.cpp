@@ -176,7 +176,7 @@ AthleteConfig::AthleteConfig(QDir home, Context *context) :
     // otherwise just use same as the system color for text
     QPalette std;
     QColor tabselect = std.color(QPalette::Text);
-    if (GColor(CPLOTBACKGROUND) == std.color(QPalette::Base)) tabselect = GColor(CPLOTMARKER);
+    if (GColor(GCol::PLOTBACKGROUND) == std.color(QPalette::Base)) tabselect = GColor(GCol::PLOTMARKER);
 
 #ifndef Q_OS_MAC
     QString styling = QString("QTabWidget { background: %1; }"

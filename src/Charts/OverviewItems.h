@@ -551,7 +551,7 @@ class IntervalOverviewItem : public ChartSpaceItem
 class BPointF {
 public:
 
-    BPointF() : x(0), y(0), z(0), xoff(0), yoff(0), fill(GColor(Qt::gray)), item(NULL) {}
+    BPointF() : x(0), y(0), z(0), xoff(0), yoff(0), fill(GColor(GCol::RIDEPLOTXAXIS)), item(NULL) {}
 
     double score(BPointF &other);
 

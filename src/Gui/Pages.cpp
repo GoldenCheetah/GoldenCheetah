@@ -1194,7 +1194,7 @@ ColorsPage::ColorsPage(QWidget *parent) : QWidget(parent)
     themes->headerItem()->setText(0, tr("Swatch"));
     themes->headerItem()->setText(1, tr("Name"));
     themes->setColumnCount(2);
-    themes->setColumnWidth(0,240 *dpiXFactor);
+    themes->setColumnWidth(0,440 *dpiXFactor);
     themes->setSelectionMode(QAbstractItemView::SingleSelection);
     //colors->setEditTriggers(QAbstractItemView::SelectedClicked); // allow edit
     themes->setUniformRowHeights(true); // causes height problems when adding - in case of non-text fields
@@ -1227,7 +1227,7 @@ ColorsPage::ColorsPage(QWidget *parent) : QWidget(parent)
     QLabel *rideScrollLabel = new QLabel(tr("Activity Scrollbar"));
     rideScroll = new QCheckBox;
     rideScroll->setChecked(appsettings->value(this, GC_RIDESCROLL, true).toBool());
-    QLabel *rideHeadLabel = new QLabel(tr("Activity Headings"));
+    // QLabel *rideHeadLabel = new QLabel(tr("Activity Headings"));
     rideHead = new QCheckBox;
     rideHead->setChecked(appsettings->value(this, GC_RIDEHEAD, true).toBool());
 #endif
@@ -1314,25 +1314,24 @@ ColorsPage::ColorsPage(QWidget *parent) : QWidget(parent)
 
     mainLayout->addWidget(colorTab);
 
-    colorSet = GCColor::colorSet();
-    for (int i=0; colorSet[i].name != ""; i++) {
+    for (const auto& colorElemt : GCColor::inst()->getColorTable()) {
 
         QTreeWidgetItem *add;
-        ColorButton *colorButton = new ColorButton(this, colorSet[i].name, colorSet[i].color);
+        ColorButton *colorButton = new ColorButton(this, colorElemt.second.name, colorElemt.second.qColor);
         add = new QTreeWidgetItem(colors->invisibleRootItem());
-        add->setData(0, Qt::UserRole, i); // remember which index it is for since gets sorted
-        add->setText(0, colorSet[i].group);
-        add->setText(1, colorSet[i].name);
+        add->setData(0, Qt::UserRole, static_cast<int>(colorElemt.first)); // remember which gColor it is since it gets sorted
+        add->setText(0, colorElemt.second.group);
+        add->setText(1, colorElemt.second.name);
         colors->setItemWidget(add, 2, colorButton);
-
     }
+
     colors->setSortingEnabled(true);
     colors->sortByColumn(1, Qt::AscendingOrder); // first sort by name
     colors->sortByColumn(0, Qt::AscendingOrder); // now by group
 
     connect(applyTheme, SIGNAL(clicked()), this, SLOT(applyThemeClicked()));
 
-    foreach(ColorTheme theme, GCColor::themes().themes) {
+    foreach(ColorTheme theme, Themes::inst()->themes) {
 
         QTreeWidgetItem *add;
         ColorLabel *swatch = new ColorLabel(theme);
@@ -1354,7 +1353,7 @@ ColorsPage::ColorsPage(QWidget *parent) : QWidget(parent)
     b4.head = rideHead->isChecked();
 #endif
     b4.line = lineWidth->value();
-    b4.fingerprint = Colors::fingerprint(colorSet);
+    b4.fingerprint = Colors::fingerprint(GCColor::inst()->getColorTable());
 }
 
 void
@@ -1411,137 +1410,28 @@ ColorsPage::applyThemeClicked()
 }
 
 void
-ColorsPage::applyThemeIndex(int index)
-{
-        // now get the theme selected
-        ColorTheme theme = GCColor::themes().themes[index];
+ColorsPage::applyThemeIndex(int index) {
 
-        // reset to base
-        colorSet = GCColor::defaultColorSet(theme.dark);
+    // reset the color selection tools
+    colors->clear();
+    colors->setSortingEnabled(false);
 
-        // reset the color selection tools
-        colors->clear();
-        colors->setSortingEnabled(false);
+    for (const auto& colorElemt : GCColor::inst()->getColorTable()) {
 
-        for (int i=0; colorSet[i].name != ""; i++) {
+        QColor qColor = GCColor::inst()->determineThemeQColor(index, colorElemt.first);
+                
+        QTreeWidgetItem *add;
+        ColorButton *colorButton = new ColorButton(this, colorElemt.second.name, qColor);
+        add = new QTreeWidgetItem(colors->invisibleRootItem());
+        add->setData(0, Qt::UserRole, static_cast<int>(colorElemt.first)); // remember which gColor it is since it gets sorted
+        add->setText(0, colorElemt.second.group);
+        add->setText(1, colorElemt.second.name);
+        colors->setItemWidget(add, 2, colorButton);
+    }
 
-            QColor color;
-
-            // apply theme to color
-            switch(i) {
-
-            case CPLOTBACKGROUND:
-            case CRIDEPLOTBACKGROUND:
-            case CTRENDPLOTBACKGROUND:
-                color = theme.colors[0]; // background color
-                break;
-
-            case CTRAINPLOTBACKGROUND:
-                // always, and I mean always default to a black background
-                color = QColor(Qt::black);
-                break;
-
-
-            case COVERVIEWBACKGROUND:
-                // set back to light black for dark themes
-                // and gray for light themes
-                color = theme.colors[10];
-                break;
-
-            case CCARDBACKGROUND:
-                // set back to light black for dark themes
-                // and gray for light themes
-                color = theme.colors[11];
-                break;
-
-            case CCARDBACKGROUND2:
-                // set back to light black for dark themes
-                // and gray for light themes
-                color = theme.colors[12];
-                break;
-
-            case CCARDBACKGROUND3:
-                // set back to light black for dark themes
-                // and gray for light themes
-                color = theme.colors[13];
-                break;
-
-            case CCHROME:
-            case CCHARTBAR:
-            case CTOOLBAR: // we always keep them the same, but user can make different
-                //  set to black for dark themese and grey for light themes
-                color = theme.colors[1];
-                break;
-
-            case CHOVER:
-                color = theme.stealth ? theme.colors[11] : (theme.dark ? QColor(50,50,50) : QColor(200,200,200));
-                break;
-
-            case CPLOTSYMBOL:
-            case CRIDEPLOTXAXIS:
-            case CRIDEPLOTYAXIS:
-            case CPLOTMARKER:
-                color = theme.colors[2]; // accent color
-                break;
-
-            case CPLOTSELECT:
-            case CPLOTTRACKER:
-            case CINTERVALHIGHLIGHTER:
-                color = theme.colors[3]; // select color
-                break;
-
-
-            case CPLOTGRID: // grid doesn't have a theme color
-                            // we make it barely distinguishable from background
-                {
-                    QColor bg = theme.colors[0];
-                    if(bg == QColor(Qt::black)) color = QColor(30,30,30);
-                    else color = bg.darker(110);
-                }
-                break;
-
-            case CCP:
-            case CWBAL:
-            case CRIDECP:
-                color = theme.colors[4];
-                break;
-
-            case CHEARTRATE:
-                color = theme.colors[5];
-                break;
-
-            case CSPEED:
-                color = theme.colors[6];
-                break;
-
-            case CPOWER:
-                color = theme.colors[7];
-                break;
-
-            case CCADENCE:
-                color = theme.colors[8];
-                break;
-
-            case CTORQUE:
-                color = theme.colors[9];
-                break;
-
-                default:
-                    color = colorSet[i].color;
-            }
-
-            QTreeWidgetItem *add;
-            ColorButton *colorButton = new ColorButton(this, colorSet[i].name, color);
-            add = new QTreeWidgetItem(colors->invisibleRootItem());
-            add->setData(0, Qt::UserRole, i); // remember which index it is for since gets sorted
-            add->setText(0, colorSet[i].group);
-            add->setText(1, colorSet[i].name);
-            colors->setItemWidget(add, 2, colorButton);
-
-        }
-        colors->setSortingEnabled(true);
-        colors->sortByColumn(1, Qt::AscendingOrder); // first sort by name
-        colors->sortByColumn(0, Qt::AscendingOrder);
+    colors->setSortingEnabled(true);
+    colors->sortByColumn(1, Qt::AscendingOrder); // first sort by name
+    colors->sortByColumn(0, Qt::AscendingOrder);
 }
 
 void
@@ -1573,15 +1463,18 @@ ColorsPage::saveClicked()
     appsettings->setValue(GC_RIDEHEAD, rideHead->isChecked());
 #endif
 
+    std::map<GCol, Colors>& colorTable = GCColor::inst()->getColorTable();
+
     // run down and get the current colors and save
-    for (int i=0; colorSet[i].name != ""; i++) {
+    for (int i = 0; i < colors->topLevelItemCount(); i++) {
+
         QTreeWidgetItem *current = colors->invisibleRootItem()->child(i);
         QColor newColor = ((ColorButton*)colors->itemWidget(current, 2))->getColor();
         QString colorstring = QString("%1:%2:%3").arg(newColor.red())
                                                  .arg(newColor.green())
                                                  .arg(newColor.blue());
-        int colornum = current->data(0, Qt::UserRole).toInt();
-        appsettings->setValue(colorSet[colornum].setting, colorstring);
+        GCol gColor = static_cast<GCol>(current->data(0, Qt::UserRole).toInt());
+        appsettings->setValue(colorTable[gColor].setting, colorstring);
     }
 
     // update basefont family
@@ -1599,7 +1492,7 @@ ColorsPage::saveClicked()
     appsettings->setValue(GC_FONT_CHARTLABELS_SIZE, font.pointSizeF() * 0.8);
 
     // reread into colorset so we can check for changes
-    GCColor::readConfig();
+    GCColor::inst()->readConfig();
 
     // did we change anything ?
     if(b4.alias != antiAliased->isChecked() ||
@@ -1609,7 +1502,7 @@ ColorsPage::saveClicked()
 #endif
        b4.line != lineWidth->value() ||
        b4.fontscale != scalefactors[fontscale->value()] ||
-       b4.fingerprint != Colors::fingerprint(colorSet))
+       b4.fingerprint != Colors::fingerprint(GCColor::inst()->getColorTable()))
         return CONFIG_APPEARANCE;
     else
         return 0;

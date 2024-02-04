@@ -2243,12 +2243,12 @@ WorkoutWidget::apply(QString code)
 void
 WorkoutWidget::configChanged(qint32)
 {
-    setProperty("color", GColor(CTRAINPLOTBACKGROUND));
+    setProperty("color", GColor(GCol::TRAINPLOTBACKGROUND));
 
-    gridPen = QPen(GColor(CPLOTGRID));
+    gridPen = QPen(GColor(GCol::PLOTGRID));
     gridPen.setWidth(1);
 
-    markerPen = QPen(GColor(CPLOTMARKER));
+    markerPen = QPen(GColor(GCol::PLOTMARKER));
     markerPen.setWidth(1);
 
     markerFont.fromString(appsettings->value(this, GC_FONT_CHARTLABELS, QFont().toString()).toString());
@@ -2408,7 +2408,7 @@ WorkoutWidget::paintEvent(QPaintEvent*)
     if (LOG) {
 
         // paint tics for log scale on the canvas
-        QPen power(GColor(CPOWER));
+        QPen power(GColor(GCol::POWER));
         painter.setPen(power);
 
         // typical durations

@@ -28,7 +28,7 @@ SpinScanPlotWindow::SpinScanPlotWindow(Context *context) :
     this->setWhatsThis(helpContents->getWhatsThisText(HelpWhatsThis::ChartTrain_PedalStroke));
 
     setContentsMargins(0,0,0,0);
-    setProperty("color", GColor(CTRAINPLOTBACKGROUND));
+    setProperty("color", GColor(GCol::TRAINPLOTBACKGROUND));
 
     // setup controls
     QWidget *c = new QWidget;

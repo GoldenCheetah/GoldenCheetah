@@ -241,13 +241,13 @@ AbstractView::ourStyleSheet()
            "}"
            "QTableWidget::item:hover { color: black; background: lightGray; }"
            "QTreeView::item:hover { color: black; background: lightGray; }"
-           "").arg(GColor(CPLOTBACKGROUND).name())
-            .arg(GColor(CPLOTGRID).name())
-            .arg(GCColor::alternateColor(GColor(CPLOTBACKGROUND)).name())
+           "").arg(GColor(GCol::PLOTBACKGROUND).name())
+            .arg(GColor(GCol::PLOTGRID).name())
+            .arg(GAlternateColor(GCol::PLOTBACKGROUND).name())
             .arg(8 * dpiXFactor) // width
             .arg(4 * dpiXFactor) // border radius
-            .arg(GColor(CPLOTMARKER).name())
-            .arg(GCColor::invertColor(GColor(CPLOTBACKGROUND)).name())
+            .arg(GColor(GCol::PLOTMARKER).name())
+            .arg(GInvertColor(GColor(GCol::PLOTBACKGROUND)).name())
             ;
 }
 

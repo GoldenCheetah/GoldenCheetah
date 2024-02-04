@@ -622,15 +622,15 @@ TrainSidebar::configChanged(qint32)
 
     useSimulatedSpeed = appsettings->value(this, TRAIN_USESIMULATEDSPEED, false).toBool();
 
-    setProperty("color", GColor(CTRAINPLOTBACKGROUND));
+    setProperty("color", GColor(GCol::TRAINPLOTBACKGROUND));
 #if !defined GC_VIDEO_NONE
-    mediaTree->setStyleSheet(GCColor::stylesheet(true));
+    mediaTree->setStyleSheet(GCColor::inst()->stylesheet(true));
 #ifdef GC_HAVE_VLC  // RLV currently only support for VLC
-    videosyncTree->setStyleSheet(GCColor::stylesheet(true));
+    videosyncTree->setStyleSheet(GCColor::inst()->stylesheet(true));
 #endif
 #endif
-    workoutTree->setStyleSheet(GCColor::stylesheet(true));
-    deviceTree->setStyleSheet(GCColor::stylesheet(true));
+    workoutTree->setStyleSheet(GCColor::inst()->stylesheet(true));
+    deviceTree->setStyleSheet(GCColor::inst()->stylesheet(true));
 
     // DEVICES
 

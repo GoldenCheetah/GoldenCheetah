@@ -238,9 +238,9 @@ ProgressLine::paintEvent(QPaintEvent *)
 {
 
     // nothing for test...
-    QColor translucentGray = GColor(CPLOTMARKER);
+    QColor translucentGray = GColor(GCol::PLOTMARKER);
     translucentGray.setAlpha(240);
-    QColor translucentWhite = GColor(CPLOTBACKGROUND);
+    QColor translucentWhite = GColor(GCol::PLOTBACKGROUND);
 
     // setup a painter and the area to paint
     QPainter painter(this);

@@ -59,5 +59,5 @@ MetadataWindow::rideItemChanged()
 void
 MetadataWindow::configChanged(qint32)
 {
-    setProperty("color", GColor(CPLOTBACKGROUND));
+    setProperty("color", GColor(GCol::PLOTBACKGROUND));
 }

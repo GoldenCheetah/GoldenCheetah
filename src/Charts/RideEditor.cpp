@@ -254,45 +254,45 @@ RideEditor::RideEditor(Context *context) : QWidget(context->mainWindow), data(NU
 void
 RideEditor::configChanged(qint32) 
 {
-    setProperty("color", GColor(CPLOTBACKGROUND));
+    setProperty("color", GColor(GCol::PLOTBACKGROUND));
 
     QPalette palette;
-    palette.setBrush(QPalette::Window, QBrush(GColor(CPLOTBACKGROUND)));
-    palette.setBrush(QPalette::Base, QBrush(GColor(CPLOTBACKGROUND)));
-    palette.setColor(QPalette::WindowText, GCColor::invertColor(GColor(CPLOTBACKGROUND)));
-    palette.setColor(QPalette::Text, GCColor::invertColor(GColor(CPLOTBACKGROUND)));
-    palette.setColor(QPalette::Normal, QPalette::Window, GCColor::invertColor(GColor(CPLOTBACKGROUND)));
+    palette.setBrush(QPalette::Window, QBrush(GColor(GCol::PLOTBACKGROUND)));
+    palette.setBrush(QPalette::Base, QBrush(GColor(GCol::PLOTBACKGROUND)));
+    palette.setColor(QPalette::WindowText, GInvertColor(GColor(GCol::PLOTBACKGROUND)));
+    palette.setColor(QPalette::Text, GInvertColor(GColor(GCol::PLOTBACKGROUND)));
+    palette.setColor(QPalette::Normal, QPalette::Window, GInvertColor(GColor(GCol::PLOTBACKGROUND)));
     setPalette(palette);
     tabbar->setPalette(palette);
-    QColor faded = GCColor::invertColor(GColor(CPLOTBACKGROUND));
+    QColor faded = GInvertColor(GCol::PLOTBACKGROUND);
     tabbar->setStyleSheet(QString("QTabBar::tab { background-color: %1; border: 0.5px solid %1; color: rgba(%3,%4,%5,50%) }"
                                   "QTabBar::tab:selected { background-color: %1; color: %2; border-bottom: %7px solid %1; border-bottom-color: %6 }"
                                   "QTabBar::close-button:!selected { background-color: %1; }")
-                    .arg(GColor(CPLOTBACKGROUND).name())
-                    .arg(GCColor::invertColor(GColor(CPLOTBACKGROUND)).name())
+                    .arg(GColor(GCol::PLOTBACKGROUND).name())
+                    .arg(GInvertColor(GCol::PLOTBACKGROUND).name())
                     .arg(faded.red()).arg(faded.green()).arg(faded.blue())
-                    .arg(GColor(CPLOTMARKER).name())
+                    .arg(GColor(GCol::PLOTMARKER).name())
                     .arg(4 * dpiXFactor));
     table->setPalette(palette);
     table->setStyleSheet(QString("QTableView { background-color: %1; color: %2; border: %1 }"
                                  "QTableView QTableCornerButton::section { background-color: %1; color: %2; border: %1 }"
                                  "QHeaderView { background-color: %1; color: %2; border: %1 }")
-                    .arg(GColor(CPLOTBACKGROUND).name())
-                    .arg(GCColor::invertColor(GColor(CPLOTBACKGROUND)).name()));
+                    .arg(GColor(GCol::PLOTBACKGROUND).name())
+                    .arg(GInvertColor(GCol::PLOTBACKGROUND).name()));
     table->horizontalHeader()->setStyleSheet(QString("QHeaderView::section { background-color: %1; color: %2; border: 0px; border-bottom: %3px solid %2; }")
-                    .arg(GColor(CPLOTBACKGROUND).name())
-                    .arg(GCColor::invertColor(GColor(CPLOTBACKGROUND)).name())
+                    .arg(GColor(GCol::PLOTBACKGROUND).name())
+                    .arg(GInvertColor(GCol::PLOTBACKGROUND).name())
                     .arg(2 * dpiYFactor));
     table->verticalHeader()->setStyleSheet(QString("QHeaderView::section { background-color: %1; color: %2; border: 0px }")
-                    .arg(GColor(CPLOTBACKGROUND).name())
-                    .arg(GCColor::invertColor(GColor(CPLOTBACKGROUND)).name()));
+                    .arg(GColor(GCol::PLOTBACKGROUND).name())
+                    .arg(GInvertColor(GCol::PLOTBACKGROUND).name()));
     table->horizontalHeader()->setDefaultAlignment(Qt::AlignLeft | Qt::AlignVCenter);
 #ifndef Q_OS_MAC
     table->verticalScrollBar()->setStyleSheet(AbstractView::ourStyleSheet());
     table->horizontalScrollBar()->setStyleSheet(AbstractView::ourStyleSheet());
 #endif
-    toolbar->setStyleSheet(QString("::enabled { background: %1; color: %2; border: 0px; } ").arg(GColor(CPLOTBACKGROUND).name())
-                    .arg(GCColor::invertColor(GColor(CPLOTBACKGROUND)).name()));
+    toolbar->setStyleSheet(QString("::enabled { background: %1; color: %2; border: 0px; } ").arg(GColor(GCol::PLOTBACKGROUND).name())
+                    .arg(GInvertColor(GCol::PLOTBACKGROUND).name()));
 
     // the xdata editors
     QMapIterator<QString, XDataEditor *>it(xdataEditors);
@@ -1290,7 +1290,7 @@ void CellDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option,
 
         painter->save();
         painter->translate(option.rect.x(), option.rect.y());
-        meh->drawContents(painter, GCColor::invertColor(GColor(CPLOTBACKGROUND)));
+        meh->drawContents(painter, GInvertColor(GCol::PLOTBACKGROUND));
         painter->restore();
         delete meh;
 
@@ -1643,8 +1643,8 @@ RideEditor::setTabBar(bool force)
         tb->setText("+");
         tb->setAutoRaise(true);
         tb->setStyleSheet(QString("QToolButton { background: %1; color: %2; border: 0px; } ")
-                          .arg(GColor(CPLOTBACKGROUND).name())
-                          .arg(GCColor::invertColor(GColor(CPLOTBACKGROUND)).name()));
+                          .arg(GColor(GCol::PLOTBACKGROUND).name())
+                          .arg(GInvertColor(GCol::PLOTBACKGROUND).name()));
 
         tabbar->setTabButton(tabbar->count()-1, QTabBar::LeftSide, tb);
         tabbar->setTabButton(tabbar->count()-1, QTabBar::RightSide, 0);
@@ -3049,29 +3049,29 @@ void XDataEditor::configChanged()
 {
 
     QPalette palette;
-    palette.setColor(QPalette::Active, QPalette::Window, GColor(CPLOTBACKGROUND));
-    palette.setColor(QPalette::Active, QPalette::Base, GColor(CPLOTBACKGROUND));
-    palette.setColor(QPalette::Active, QPalette::WindowText, GCColor::invertColor(GColor(CPLOTBACKGROUND)));
-    palette.setColor(QPalette::Active, QPalette::Text, GCColor::invertColor(GColor(CPLOTBACKGROUND)));
-    palette.setColor(QPalette::Active, QPalette::Window, GCColor::invertColor(GColor(CPLOTBACKGROUND)));
-    palette.setColor(QPalette::Inactive, QPalette::Window, GColor(CPLOTBACKGROUND));
-    palette.setColor(QPalette::Inactive, QPalette::Base, GColor(CPLOTBACKGROUND));
-    palette.setColor(QPalette::Inactive, QPalette::WindowText, GCColor::invertColor(GColor(CPLOTBACKGROUND)));
-    palette.setColor(QPalette::Inactive, QPalette::Text, GCColor::invertColor(GColor(CPLOTBACKGROUND)));
-    palette.setColor(QPalette::Inactive, QPalette::Window, GCColor::invertColor(GColor(CPLOTBACKGROUND)));
+    palette.setColor(QPalette::Active, QPalette::Window, GColor(GCol::PLOTBACKGROUND));
+    palette.setColor(QPalette::Active, QPalette::Base, GColor(GCol::PLOTBACKGROUND));
+    palette.setColor(QPalette::Active, QPalette::WindowText, GInvertColor(GColor(GCol::PLOTBACKGROUND)));
+    palette.setColor(QPalette::Active, QPalette::Text, GInvertColor(GColor(GCol::PLOTBACKGROUND)));
+    palette.setColor(QPalette::Active, QPalette::Window, GInvertColor(GColor(GCol::PLOTBACKGROUND)));
+    palette.setColor(QPalette::Inactive, QPalette::Window, GColor(GCol::PLOTBACKGROUND));
+    palette.setColor(QPalette::Inactive, QPalette::Base, GColor(GCol::PLOTBACKGROUND));
+    palette.setColor(QPalette::Inactive, QPalette::WindowText, GInvertColor(GColor(GCol::PLOTBACKGROUND)));
+    palette.setColor(QPalette::Inactive, QPalette::Text, GInvertColor(GColor(GCol::PLOTBACKGROUND)));
+    palette.setColor(QPalette::Inactive, QPalette::Window, GInvertColor(GColor(GCol::PLOTBACKGROUND)));
     setPalette(palette);
     setFrameStyle(QFrame::NoFrame);
     setStyleSheet(QString("QTableView QTableCornerButton::section { background-color: %1; color: %2; border: %1 }"
                                   "QHeaderView { background-color: %1; color: %2; border: %1 }")
-                    .arg(GColor(CPLOTBACKGROUND).name())
-                    .arg(GCColor::invertColor(GColor(CPLOTBACKGROUND)).name()));
+                    .arg(GColor(GCol::PLOTBACKGROUND).name())
+                    .arg(GInvertColor(GCol::PLOTBACKGROUND).name()));
     horizontalHeader()->setStyleSheet(QString("QHeaderView::section { background-color: %1; color: %2; border: 0px; border-bottom: %3px solid %2; }")
-                    .arg(GColor(CPLOTBACKGROUND).name())
-                    .arg(GCColor::invertColor(GColor(CPLOTBACKGROUND)).name())
+                    .arg(GColor(GCol::PLOTBACKGROUND).name())
+                    .arg(GInvertColor(GCol::PLOTBACKGROUND).name())
                     .arg(2 * dpiYFactor));
     verticalHeader()->setStyleSheet(QString("QHeaderView::section { background-color: %1; color: %2; border: 0px }")
-                    .arg(GColor(CPLOTBACKGROUND).name())
-                    .arg(GCColor::invertColor(GColor(CPLOTBACKGROUND)).name()));
+                    .arg(GColor(GCol::PLOTBACKGROUND).name())
+                    .arg(GInvertColor(GCol::PLOTBACKGROUND).name()));
 #ifndef Q_OS_MAC
     verticalScrollBar()->setStyleSheet(AbstractView::ourStyleSheet());
     horizontalScrollBar()->setStyleSheet(AbstractView::ourStyleSheet());

@@ -5148,7 +5148,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
                         // apply item color, remembering that 1,1,1 means use default (reverse in this case)
                         if (ii->color == QColor(1,1,1,1)) {
                             // use the inverted color, not plot marker as that hideous
-                            QColor col =GCColor::invertColor(GColor(CPLOTBACKGROUND));
+                            QColor col =GInvertColor(GCol::PLOTBACKGROUND);
                             // white is jarring on a dark background!
                             if (col==QColor(Qt::white)) col=QColor(127,127,127);
                             asstring = col.name();

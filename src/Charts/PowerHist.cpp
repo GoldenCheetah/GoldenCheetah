@@ -130,8 +130,8 @@ void
 PowerHist::configChanged(qint32)
 {
     // plot background
-    if (rangemode) setCanvasBackground(GColor(CTRENDPLOTBACKGROUND));
-    else setCanvasBackground(GColor(CPLOTBACKGROUND));
+    if (rangemode) setCanvasBackground(GColor(GCol::TRENDPLOTBACKGROUND));
+    else setCanvasBackground(GColor(GCol::PLOTBACKGROUND));
 
     // curve
     QPen pen;
@@ -148,37 +148,37 @@ PowerHist::configChanged(qint32)
         case RideFile::watts:
         case RideFile::aPower:
         case RideFile::wattsKg:
-            pen.setColor(GColor(CPOWER).darker(200));
-            brush_color = GColor(CPOWER);
+            pen.setColor(GColor(GCol::POWER).darker(200));
+            brush_color = GColor(GCol::POWER);
             break;
         case RideFile::nm:
-            pen.setColor(GColor(CTORQUE).darker(200));
-            brush_color = GColor(CTORQUE);
+            pen.setColor(GColor(GCol::TORQUE).darker(200));
+            brush_color = GColor(GCol::TORQUE);
             break;
         case RideFile::kph:
-            pen.setColor(GColor(CSPEED).darker(200));
-            brush_color = GColor(CSPEED);
+            pen.setColor(GColor(GCol::SPEED).darker(200));
+            brush_color = GColor(GCol::SPEED);
             break;
         case RideFile::cad:
-            pen.setColor(GColor(CCADENCE).darker(200));
-            brush_color = GColor(CCADENCE);
+            pen.setColor(GColor(GCol::CADENCE).darker(200));
+            brush_color = GColor(GCol::CADENCE);
             break;
         case RideFile::smo2:
-            pen.setColor(GColor(CSMO2).darker(200));
-            brush_color = GColor(CSMO2);
+            pen.setColor(GColor(GCol::SMO2).darker(200));
+            brush_color = GColor(GCol::SMO2);
             break;
         case RideFile::gear:
-            pen.setColor(GColor(CGEAR).darker(200));
-            brush_color = GColor(CGEAR);
+            pen.setColor(GColor(GCol::GEAR).darker(200));
+            brush_color = GColor(GCol::GEAR);
             break;
         case RideFile::wbal:
-            pen.setColor(GColor(CWBAL).darker(200));
-            brush_color = GColor(CGEAR);
+            pen.setColor(GColor(GCol::WBAL).darker(200));
+            brush_color = GColor(GCol::GEAR);
             break;
         default:
         case RideFile::hr:
-            pen.setColor(GColor(CHEARTRATE).darker(200));
-            brush_color = GColor(CHEARTRATE);
+            pen.setColor(GColor(GCol::HEARTRATE).darker(200));
+            brush_color = GColor(GCol::HEARTRATE);
             break;
         }
     }
@@ -202,12 +202,12 @@ PowerHist::configChanged(qint32)
     }
 
     // intervalselection
-    QPen ivl(GColor(CINTERVALHIGHLIGHTER).darker(200));
+    QPen ivl(GColor(GCol::INTERVALHIGHLIGHTER).darker(200));
     ivl.setWidth(width);
     curveSelected->setPen(ivl);
-    QColor ivlbrush = GColor(CINTERVALHIGHLIGHTER);
-    if (rangemode) ivlbrush.setAlpha(GColor(CTRENDPLOTBACKGROUND) == QColor(Qt::white) ? 64 : 200);
-    else ivlbrush.setAlpha(GColor(CPLOTBACKGROUND) == QColor(Qt::white) ? 64 : 200);
+    QColor ivlbrush = GColor(GCol::INTERVALHIGHLIGHTER);
+    if (rangemode) ivlbrush.setAlpha(GColor(GCol::TRENDPLOTBACKGROUND) == QColor(Qt::white) ? 64 : 200);
+    else ivlbrush.setAlpha(GColor(GCol::PLOTBACKGROUND) == QColor(Qt::white) ? 64 : 200);
     curveSelected->setBrush(ivlbrush);   // fill below the line
 
     // hover curve
@@ -215,20 +215,20 @@ PowerHist::configChanged(qint32)
     hvl.setWidth(width);
     curveHover->setPen(hvl);
     QColor hvlbrush = QColor(Qt::darkGray);
-    if (rangemode) hvlbrush.setAlpha((GColor(CTRENDPLOTBACKGROUND) == QColor(Qt::white) ? 64 : 200));
-    else hvlbrush.setAlpha((GColor(CPLOTBACKGROUND) == QColor(Qt::white) ? 64 : 200));
+    if (rangemode) hvlbrush.setAlpha((GColor(GCol::TRENDPLOTBACKGROUND) == QColor(Qt::white) ? 64 : 200));
+    else hvlbrush.setAlpha((GColor(GCol::PLOTBACKGROUND) == QColor(Qt::white) ? 64 : 200));
     curveHover->setBrush(hvlbrush);   // fill below the line
 
     // grid
-    QPen gridPen(GColor(CPLOTGRID));
+    QPen gridPen(GColor(GCol::PLOTGRID));
     //gridPen.setStyle(Qt::DotLine);
     grid->setPen(gridPen);
 
     QPalette palette;
-    if (rangemode) palette.setBrush(QPalette::Window, QBrush(GColor(CTRENDPLOTBACKGROUND)));
-    else palette.setBrush(QPalette::Window, QBrush(GColor(CPLOTBACKGROUND)));
-    palette.setColor(QPalette::WindowText, GColor(CPLOTMARKER));
-    palette.setColor(QPalette::Text, GColor(CPLOTMARKER));
+    if (rangemode) palette.setBrush(QPalette::Window, QBrush(GColor(GCol::TRENDPLOTBACKGROUND)));
+    else palette.setBrush(QPalette::Window, QBrush(GColor(GCol::PLOTBACKGROUND)));
+    palette.setColor(QPalette::WindowText, GColor(GCol::PLOTMARKER));
+    palette.setColor(QPalette::Text, GColor(GCol::PLOTMARKER));
     setPalette(palette);
 
     axisWidget(QwtAxis::XBottom)->setPalette(palette);
@@ -891,11 +891,11 @@ PowerHist::recalc(bool force)
                 QwtText text(QString("%1%2").arg(round(yval)).arg(absolutetime ? "" : "%"), QwtText::PlainText);
                 text.setFont(labelFont);
                 if (series == RideFile::watts)
-                    text.setColor(GColor(CPOWER).darker(200));
+                    text.setColor(GColor(GCol::POWER).darker(200));
                 else if (series == RideFile::hr)
-                    text.setColor(GColor(CHEARTRATE).darker(200));
+                    text.setColor(GColor(GCol::HEARTRATE).darker(200));
                 else
-                    text.setColor(GColor(CSPEED).darker(200));
+                    text.setColor(GColor(GCol::SPEED).darker(200));
                 label->setLabel(text);
                 label->setValue(xval+0.312f, yval);
                 label->setYAxis(QwtAxis::YLeft);

@@ -152,13 +152,13 @@ void
 MUWidget::configChanged(qint32)
 {
     QPalette palette;
-    palette.setBrush(QPalette::Window, QBrush(GColor(CPLOTBACKGROUND)));
-    palette.setColor(QPalette::WindowText, GColor(CPLOTMARKER));
-    palette.setColor(QPalette::Text, GColor(CPLOTMARKER));
+    palette.setBrush(QPalette::Window, QBrush(GColor(GCol::PLOTBACKGROUND)));
+    palette.setColor(QPalette::WindowText, GColor(GCol::PLOTMARKER));
+    palette.setColor(QPalette::Text, GColor(GCol::PLOTMARKER));
     setPalette(palette);
 
-    QColor bgColor = GColor(CPLOTBACKGROUND);
-    QColor fgColor = GCColor::invertColor(bgColor);
+    QColor bgColor = GColor(GCol::PLOTBACKGROUND);
+    QColor fgColor = GInvertColor(bgColor);
     QColor border = bgColor;
     border = border.darker(300);
 

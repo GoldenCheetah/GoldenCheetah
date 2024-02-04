@@ -315,12 +315,12 @@ public:
                     // hideous code, sorry
                     int groupNo = ((QModelIndex*)proxyIndex.internalPointer())->row();
                     if (groupNo < 0 || groupNo >= groups.count() || proxyIndex.column() == 0)
-                        colorstring= GColor(CPLOTMARKER).name();
+                        colorstring= GColor(GCol::PLOTMARKER).name();
                     else colorstring = sourceModel()->data(sourceModel()->index(groupToSourceRow.value(groups[groupNo])->at(proxyIndex.row()), colorColumn)).toString();
 
                     returning = QColor(colorstring);
                 } else {
-                    returning = GColor(CPLOTMARKER).name();
+                    returning = GColor(GCol::PLOTMARKER).name();
                 }
 
             } else if (role == (Qt::UserRole+1)) { // FILENAME ?

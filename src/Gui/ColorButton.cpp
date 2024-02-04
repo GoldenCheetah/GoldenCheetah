@@ -52,8 +52,8 @@ ColorButton::setColor(QColor ncolor)
         painter.setPen(Qt::gray);
 
         // gc standard colors
-        if (color.red() == 1 && color.green()==1) {
-            painter.setBrush(QBrush(GColor(color.blue())));
+        if (GIsRGBColor(color)) {
+            painter.setBrush(QBrush(GColor(static_cast<GCol>(color.blue()))));
         } else {
             painter.setBrush(QBrush(color));
         }
@@ -126,19 +126,18 @@ GColorDialog::GColorDialog(QColor selected, QWidget *parent, bool all) : QDialog
     connect(mapper, &QSignalMapper::mappedInt, this, &GColorDialog::gcClicked);
 
     // now add all the colours to select
-    colorSet = GCColor::colorSet();
-    for (int i=0; colorSet[i].name != ""; i++) {
+    for (const auto& color : GCColor::inst()->getColorTable()) {
 
-        if (!all && colorSet[i].group != tr("Data")) continue;
+        if (!all && color.second.group != tr("Data")) continue;
 
         QTreeWidgetItem *add;
-        ColorButton *colorButton = new ColorButton(this, colorSet[i].name, colorSet[i].color, false, true);
+        ColorButton *colorButton = new ColorButton(this, color.second.name, color.second.qColor, false, true);
         // we can click the button to choose the color directly
         connect(colorButton, SIGNAL(clicked()), mapper, SLOT(map()));
-        mapper->setMapping(colorButton, i);
+        mapper->setMapping(colorButton, static_cast<int>(color.first));
         add = new QTreeWidgetItem(colorlist->invisibleRootItem());
-        add->setData(0, Qt::UserRole, i);
-        add->setText(0, colorSet[i].name);
+        add->setData(0, Qt::UserRole, static_cast<int>(color.first));
+        add->setText(0, color.second.name);
         colorlist->setItemWidget(add, 1, colorButton);
     }
 
@@ -152,7 +151,7 @@ GColorDialog::GColorDialog(QColor selected, QWidget *parent, bool all) : QDialog
     colorlist->sortByColumn(0, Qt::AscendingOrder);
 
     // set the default to the current selection
-    if (original.red() == 1 && original.green() == 1) {
+    if (GIsRGBColor(original)) {
         tabwidget->setCurrentIndex(0);
         for(int i=0; i<colorlist->invisibleRootItem()->childCount(); i++) {
             if (colorlist->invisibleRootItem()->child(i)->data(0, Qt::UserRole).toInt() == original.blue()) {
@@ -160,10 +159,10 @@ GColorDialog::GColorDialog(QColor selected, QWidget *parent, bool all) : QDialog
                 break;
             }
         }
-        colordialog->setCurrentColor(GColor(original.blue()));
+        colordialog->setCurrentColor(GColor(static_cast<GCol>(original.blue())));
     } else {
         tabwidget->setCurrentIndex(1);
-        colorlist->setCurrentItem(colorlist->invisibleRootItem()->child(CPOWER));
+        colorlist->setCurrentItem(colorlist->invisibleRootItem()->child(static_cast<int>(GCol::POWER)));
         colordialog->setCurrentColor(original);
     }
     // returning what we got

@@ -124,18 +124,18 @@ void
 CPPlot::configChanged(qint32)
 {
     QPalette palette;
-    if (rangemode) palette.setBrush(QPalette::Window, QBrush(GColor(CTRENDPLOTBACKGROUND)));
-    else palette.setBrush(QPalette::Window, QBrush(GColor(CPLOTBACKGROUND)));
-    palette.setColor(QPalette::WindowText, GColor(CPLOTMARKER));
-    palette.setColor(QPalette::Text, GColor(CPLOTMARKER));
+    if (rangemode) palette.setBrush(QPalette::Window, QBrush(GColor(GCol::TRENDPLOTBACKGROUND)));
+    else palette.setBrush(QPalette::Window, QBrush(GColor(GCol::PLOTBACKGROUND)));
+    palette.setColor(QPalette::WindowText, GColor(GCol::PLOTMARKER));
+    palette.setColor(QPalette::Text, GColor(GCol::PLOTMARKER));
     setPalette(palette);
 
     axisWidget(QwtAxis::XBottom)->setPalette(palette);
     axisWidget(QwtAxis::YLeft)->setPalette(palette);
     axisWidget(QwtAxis::YRight)->setPalette(palette);
 
-    if (rangemode) setCanvasBackground(GColor(CTRENDPLOTBACKGROUND));
-    else setCanvasBackground(GColor(CPLOTBACKGROUND));
+    if (rangemode) setCanvasBackground(GColor(GCol::TRENDPLOTBACKGROUND));
+    else setCanvasBackground(GColor(GCol::PLOTBACKGROUND));
 }
 
 // get the fonts and colors right for the axis scales
@@ -148,7 +148,7 @@ CPPlot::setAxisTitle(int axis, QString label)
     stGiles.setPointSize(appsettings->value(NULL, GC_FONT_CHARTLABELS_SIZE, 8).toInt());
 
     QwtText title(label);
-    title.setColor(GColor(CPLOTMARKER));
+    title.setColor(GColor(GCol::PLOTMARKER));
     title.setFont(stGiles);
     QwtPlot::setAxisFont(axis, stGiles);
     QwtPlot::setAxisTitle(axis, title);
@@ -533,7 +533,7 @@ CPPlot::plotLinearWorkModel()
         workModelCurve->setSamples(x.constData(), work.constData(), 2);
 
         // curve cosmetics
-        QPen pen(GColor(CCP));
+        QPen pen(GColor(GCol::CP));
         double width = appsettings->value(this, GC_LINEWIDTH, 0.5).toDouble();
         pen.setWidth(width);
         if (showBest) pen.setStyle(Qt::DashLine);
@@ -617,8 +617,8 @@ CPPlot::plotModel()
             // plot cherries if there are any
             foreach(QPointF cherry, pdModel->cherries()) {
                 QwtSymbol *sym = new QwtSymbol;
-                sym->setBrush(QBrush(GColor(CPLOTMARKER)));
-                sym->setPen(QPen(GColor(CPLOTMARKER)));
+                sym->setBrush(QBrush(GColor(GCol::PLOTMARKER)));
+                sym->setPen(QPen(GColor(GCol::PLOTMARKER)));
                 sym->setStyle(QwtSymbol::XCross);
                 sym->setSize(10 *dpiXFactor);
 
@@ -632,7 +632,7 @@ CPPlot::plotModel()
             }
 
             // curve cosmetics
-            QPen pen(GColor(CCP));
+            QPen pen(GColor(GCol::CP));
             double width = appsettings->value(this, GC_LINEWIDTH, 0.5).toDouble();
             pen.setWidth(width);
             if (showBest) pen.setStyle(Qt::DashLine);
@@ -651,7 +651,7 @@ CPPlot::plotModel()
 
         if (appsettings->value(this, GC_ANTIALIAS, true).toBool() == true) heatCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
 
-        heatCurve->setBrush(QBrush(GColor(CCP).darker(200)));
+        heatCurve->setBrush(QBrush(GColor(GCol::CP).darker(200)));
         heatCurve->setPen(QPen(Qt::NoPen));
         heatCurve->setZ(-1);
 
@@ -1170,12 +1170,12 @@ CPPlot::plotPowerProfile()
         curve->setStyle(QwtPlotCurve::Lines);
 
         QColor color;
-        if (percentile > 95 || percentile < 5) color = GColor(CPLOTGRID);
+        if (percentile > 95 || percentile < 5) color = GColor(GCol::PLOTGRID);
         else if (percentile < 51 && percentile > 49) {
-            color = GColor(CPLOTGRID);
+            color = GColor(GCol::PLOTGRID);
             color.setRed(150);
         } else {
-            color = GColor(CPLOTGRID);
+            color = GColor(GCol::PLOTGRID);
             color.setBlue(150);
         }
 
@@ -1285,48 +1285,48 @@ CPPlot::plotBests(RideItem *rideItem)
             switch (rideSeries) {
 
             case RideFile::kphd:
-                line.setColor(GColor(CACCELERATION).darker(200));
-                fill = (GColor(CACCELERATION));
+                line.setColor(GColor(GCol::ACCELERATION).darker(200));
+                fill = (GColor(GCol::ACCELERATION));
                 break;
 
             case RideFile::kph:
-                line.setColor(GColor(CSPEED).darker(200));
-                fill = (GColor(CSPEED));
+                line.setColor(GColor(GCol::SPEED).darker(200));
+                fill = (GColor(GCol::SPEED));
                 break;
 
             case RideFile::cad:
             case RideFile::cadd:
-                line.setColor(GColor(CCADENCE).darker(200));
-                fill = (GColor(CCADENCE));
+                line.setColor(GColor(GCol::CADENCE).darker(200));
+                fill = (GColor(GCol::CADENCE));
                 break;
 
             case RideFile::nm:
             case RideFile::nmd:
-                line.setColor(GColor(CTORQUE).darker(200));
-                fill = (GColor(CTORQUE));
+                line.setColor(GColor(GCol::TORQUE).darker(200));
+                fill = (GColor(GCol::TORQUE));
                 break;
 
             case RideFile::hr:
             case RideFile::hrd:
-                line.setColor(GColor(CHEARTRATE).darker(200));
-                fill = (GColor(CHEARTRATE));
+                line.setColor(GColor(GCol::HEARTRATE).darker(200));
+                fill = (GColor(GCol::HEARTRATE));
                 break;
 
             case RideFile::vam:
-                line.setColor(GColor(CALTITUDE).darker(200));
-                fill = (GColor(CALTITUDE));
+                line.setColor(GColor(GCol::ALTITUDE).darker(200));
+                fill = (GColor(GCol::ALTITUDE));
                 break;
 
             default:
             case RideFile::watts:
-                line.setColor(GColor(CCP));
-                fill = (GColor(CCP));
+                line.setColor(GColor(GCol::CP));
+                fill = (GColor(GCol::CP));
                 break;
             case RideFile::wattsd:
             case RideFile::IsoPower:
             case RideFile::xPower:
-                line.setColor(GColor(CPOWER).darker(200));
-                fill = (GColor(CPOWER));
+                line.setColor(GColor(GCol::POWER).darker(200));
+                fill = (GColor(GCol::POWER));
                 break;
             }
 
@@ -1526,7 +1526,7 @@ CPPlot::plotBests(RideItem *rideItem)
                 if (appsettings->value(this, GC_ANTIALIAS, true).toBool() == true)
                     curve->setRenderHint(QwtPlotItem::RenderAntialiased);
                 QPen pen(color.darker(200));
-                pen.setColor(GColor(CCP)); //XXX color ?
+                pen.setColor(GColor(GCol::CP)); //XXX color ?
                 double width = appsettings->value(this, GC_LINEWIDTH, 0.5).toDouble();
                 pen.setWidth(width);
                 curve->setPen(pen);
@@ -1614,7 +1614,7 @@ CPPlot::plotBests(RideItem *rideItem)
                 if (appsettings->value(this, GC_ANTIALIAS, true).toBool() == true)
                     curve->setRenderHint(QwtPlotItem::RenderAntialiased);
                 QPen pen(color.darker(200));
-                pen.setColor(GColor(CCP)); //XXX color ?
+                pen.setColor(GColor(GCol::CP)); //XXX color ?
                 double width = appsettings->value(this, GC_LINEWIDTH, 0.5).toDouble();
                 pen.setWidth(width);
                 curve->setPen(pen);
@@ -1750,7 +1750,7 @@ CPPlot::plotEfforts()
     QwtSymbol *sym = new QwtSymbol;
     sym->setStyle(QwtSymbol::Ellipse);
     sym->setSize(dpiXFactor * (rangemode ? 4 : 6));
-    QColor col= GColor(CPOWER);
+    QColor col= GColor(GCol::POWER);
     col.setAlpha(128);
     sym->setBrush(col);
     sym->setPen(QPen(Qt::NoPen));
@@ -1880,7 +1880,7 @@ CPPlot::plotRide(RideItem *rideItem)
     // the CP plot, regardless of the series. Its only the bests
     // curve that gets any special colour treatment.
     QPen ridePen;
-    ridePen.setColor(GColor(CRIDECP));
+    ridePen.setColor(GColor(GCol::RIDECP));
     double width = appsettings->value(this, GC_LINEWIDTH, 0.5).toDouble();
     ridePen.setWidth(width);
     rideCurve->setPen(ridePen);
@@ -2463,7 +2463,7 @@ CPPlot::refreshReferenceLines(RideItem *rideItem)
                 if (referencePoint->watts != 0) {
                     QwtPlotMarker *referenceLine = new QwtPlotMarker;
                     QPen p;
-                    p.setColor(GColor(CPLOTMARKER));
+                    p.setColor(GColor(GCol::PLOTMARKER));
                     double width = appsettings->value(this, GC_LINEWIDTH, 0.5).toDouble();
                     p.setWidth(width);
                     p.setStyle(Qt::DashLine);
@@ -2723,7 +2723,7 @@ CPPlot::plotCentile(RideItem *rideItem)
             rideCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
 
             // red hue to cp curve color
-            QColor std = GColor(CRIDECP);
+            QColor std = GColor(GCol::RIDECP);
             QPen pen(QColor(250-(i*20),std.green(),std.blue()));
             pen.setStyle(Qt::DashLine); // Qt::SolidLine
             double width = appsettings->value(this, GC_LINEWIDTH, 0.5).toDouble();
