@@ -49,16 +49,6 @@ public:
        : position(OnlyOneSegment), selectedPosition(NotAdjacent) { }
     QtStyleOptionSegmentControlSegment(const QtStyleOptionSegmentControlSegment &other)
         : QStyleOption(Version, Type) { *this = other; }
-    QtStyleOptionSegmentControlSegment& operator=(const QtStyleOptionSegmentControlSegment &other)
-    {
-        QStyleOption::operator=(other);
-        text = other.text;
-        icon = other.icon;
-        iconSize = other.iconSize;
-        position = other.position;
-        selectedPosition = other.selectedPosition;
-        return *this;
-    }
 
 protected:
     QtStyleOptionSegmentControlSegment(int version);
