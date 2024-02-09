@@ -47,8 +47,8 @@ class HrPwPlot : public QwtPlot
         RideItem *rideItem;
         QwtPlotMarker *r_mrk1;
         QwtPlotMarker *r_mrk2;
-        bool joinLine;
-        int shadeZones;
+        bool joinLine = false;
+        int shadeZones = 0;
 
         void setShadeZones(int);
         int isShadeZones() const;

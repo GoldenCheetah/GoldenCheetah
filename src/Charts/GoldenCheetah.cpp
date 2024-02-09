@@ -189,7 +189,7 @@ bool GcWindow::gripped() const
     return _gripped;
 }
 
-GcWindow::GcWindow(Context *context) : QFrame(context->mainWindow), dragState(None) 
+GcWindow::GcWindow(Context *context) : QFrame(context->mainWindow)
 {
     qRegisterMetaType<QWidget*>("controls");
     qRegisterMetaType<RideItem*>("ride");

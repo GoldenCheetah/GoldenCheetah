@@ -261,7 +261,7 @@ class TreeMapPlot : public QWidget
         TMSettings *settings;
 
         TreeMap *root;      // the tree map data structure
-        TreeMap *highlight; // currently needs to be highlighted
+        TreeMap *highlight = nullptr; // currently needs to be highlighted
 };
 
 

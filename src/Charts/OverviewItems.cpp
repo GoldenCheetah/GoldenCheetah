@@ -845,7 +845,7 @@ MetricOverviewItem::~MetricOverviewItem()
     delete sparkline;
 }
 
-TopNOverviewItem::TopNOverviewItem(ChartSpace *parent, QString name, QString symbol) : ChartSpaceItem(parent, name), click(false), clickthru(NULL)
+TopNOverviewItem::TopNOverviewItem(ChartSpace *parent, QString name, QString symbol) : ChartSpaceItem(parent, name)
 {
     // metric
     this->type = OverviewItemType::TOPN;
