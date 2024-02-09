@@ -297,9 +297,9 @@ HrPwPlot::recalc()
 
     // Clean up memory
     for (int i = 0; i < 36; ++i) {
-        delete plotedWattsArray[i];
-        delete plotedHrArray[i];
-    }       
+        delete[] plotedWattsArray[i];
+        delete[] plotedHrArray[i];
+    }
 
     setAxisScale(QwtAxis::XBottom, 0.0, maxWatt);
 
