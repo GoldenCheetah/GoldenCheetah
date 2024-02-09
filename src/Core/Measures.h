@@ -41,11 +41,15 @@ public:
         for (int i = 0; i<MAX_MEASURES; i++) values[i] = 0.0;
     }
     Measure(const Measure &other) {
+        *this = other;
+    }
+    Measure& operator=(const Measure &other) {
         this->when = other.when;
         this->comment = other.comment;
         this->source = other.source;
         this->originalSource = other.originalSource;
         for (int i = 0; i<MAX_MEASURES; i++) this->values[i] = other.values[i];
+        return *this;
     }
     ~Measure() {}
 

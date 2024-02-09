@@ -799,6 +799,7 @@ SplitConfirm::createRideFile(long start, long stop)
     // and the XData Series, check in bounds too!
     foreach (XDataSeries *xdata, ride->xdata()) {
         XDataSeries* xd = new XDataSeries(*xdata);
+        foreach (XDataPoint *xdp, xd->datapoints) delete xdp;
         xd->datapoints.clear();
         foreach (XDataPoint *point, xdata->datapoints) {
             if (point->secs >= startTime && point->secs <= stopTime) {

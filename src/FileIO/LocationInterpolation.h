@@ -41,6 +41,7 @@ public:
     v3(double a, double b, double c) : m_t(a, b, c) {};
 
     v3(const v3& o) : m_t(o.m_t) {}
+    v3& operator=(const v3& o) { m_t = o.m_t; return *this; }
 
     double  x() const { return std::get<0>(m_t); }
     double  y() const { return std::get<1>(m_t); }

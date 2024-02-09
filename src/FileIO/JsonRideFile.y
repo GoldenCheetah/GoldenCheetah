@@ -262,11 +262,7 @@ xdata_list: xdata_series
             | xdata_list ',' xdata_series
             ;
 
-xdata_series: '{' xdata_items '}'              { XDataSeries *add = new XDataSeries;
-                                                 add->name=jc->xdataseries.name;
-                                                 add->datapoints=jc->xdataseries.datapoints;
-                                                 add->valuename=jc->xdataseries.valuename;
-                                                 add->unitname=jc->xdataseries.unitname;
+xdata_series: '{' xdata_items '}'              { XDataSeries *add = new XDataSeries(jc->xdataseries);
                                                  jc->JsonRide->addXData(add->name, add);
 
                                                  // clear for next one
