@@ -64,8 +64,8 @@ CPPlot::CPPlot(CriticalPowerWindow *parent, Context *context, bool rangemode) : 
     model(0), modelVariant(0), fit(0), fitdata(0), modelDecay(false),
 
     // state
-    context(context), bestsCache(NULL), dateCV(0.0), sport(""),
-    rideSeries(RideFile::watts),
+    context(context), bestsCache(NULL), veloCP(0), dateCP(0), dateCV(0.0), sport(""),
+    rideSeries(RideFile::watts), criticalSeries(CriticalPowerWindow::CriticalSeriesType::watts),
     isFiltered(false), shadeMode(2),
     shadeIntervals(true), rangemode(rangemode), 
     showTest(true), showBest(true), filterBest(false), showPowerIndex(false), showPercent(false), showHeat(false),

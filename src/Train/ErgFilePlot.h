@@ -59,7 +59,7 @@ class ErgFileData : public QwtPointArrayData<double>
 
     private:
     Context *context;
-    bool bydist;
+    bool bydist = false;
 
     virtual QPointF sample(size_t i) const;
     virtual QRectF boundingRect() const;
@@ -78,7 +78,7 @@ class NowData : public QwtPointArrayData<double>
     void init() ;
     private:
     Context *context;
-    bool bydist;
+    bool bydist = false;
 
     virtual QPointF sample(size_t i) const;
     //virtual QRectF boundingRect() const;

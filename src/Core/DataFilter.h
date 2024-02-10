@@ -180,7 +180,7 @@ class DataFilterRuntime {
 public:
 
     // stack count (to stop recursion 'hanging'
-    int stack;
+    int stack = 0;
 
     // needs to be reapplied as the ride selection changes
     bool isdynamic;

@@ -108,7 +108,7 @@ class ChartSpaceItem : public QGraphicsWidget
         ChartSpaceItem(ChartSpace *parent, QString name) : QGraphicsWidget(NULL),
                                        parent(parent), name(name),
                                        column(0), order(0), deep(5), onscene(false),
-                                       placing(false), drag(false), invisible(false),
+                                       placing(false), drag(false), incorner(false), invisible(false),
                                        showconfig(true)  {
 
             setAutoFillBackground(false);

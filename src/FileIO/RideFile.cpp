@@ -80,7 +80,7 @@ RideFile::RideFile(const QDateTime &startTime, double recIntSecs) :
 // and we want to get special fields and ESPECIALLY "CP" and "Weight"
 RideFile::RideFile(RideFile *p) :
     wstale(true), recIntSecs_(p->recIntSecs_), data(NULL), wprime_(NULL),
-    weight_(p->weight_), totalCount(0), dstale(true)
+    weight_(p->weight_), totalCount(0), totalTemp(0), dstale(true)
 {
     startTime_ = p->startTime_;
     tags_ = p->tags_;
@@ -101,7 +101,7 @@ RideFile::RideFile(RideFile *p) :
 
 RideFile::RideFile() : 
     wstale(true), recIntSecs_(0.0), data(NULL), wprime_(NULL),
-    weight_(0), totalCount(0), dstale(true)
+    weight_(0), totalCount(0), totalTemp(0), dstale(true)
 {
     command = new RideFileCommand(this);
 
