@@ -158,6 +158,7 @@ void ErgFile::parseZwift()
     minWatts(MIN_WATTS);  // minWatts in this ergfile
     maxWatts(0);  // maxWatts in this ergfile
     valid = false; // did it parse ok?
+    mode(ErgFileFormat::erg);
     format(ErgFileFormat::mrc);  // default to couse until we know
     Points.clear();
     Laps.clear();
