@@ -144,7 +144,7 @@ void ErgFile::parseZwift()
     Ftp = 0;       // FTP this file was targetted at
     MaxWatts = 0;  // maxWatts in this ergfile (scaling)
     valid = false; // did it parse ok?
-    format = ERG;  // default to couse until we know
+    mode = format = ERG;  // default to couse until we know
     Points.clear();
     Laps.clear();
     Texts.clear();
