@@ -86,6 +86,7 @@ protected:
 	bool metricUnits_;
 };
 
+class EquipmentRef;
 
 // Manage things that wear out through use: running shoes, tyres, brake pads, etc
 // Represents the actual distance based equipments which are assigned to EquipmentRefs
@@ -112,6 +113,8 @@ public:
 	QString description_;
 	QString notes_;
 	double replacementDistance_;
+
+	QVector<EquipmentNode*> linkedRefs_;
 
     friend QTextStream& operator<<(QTextStream& out, const EquipmentDistanceItem& eqItem);
 
@@ -178,19 +181,19 @@ public:
 	virtual eqNodeType getEqNodeType() const { return eqNodeType::EQ_ITEM_REF; }
 	virtual QVariant data(int column) const override;
 
-	void setEqItem(EquipmentDistanceItem* eqItem) { eqItem_ = eqItem; }
-	EquipmentDistanceItem* getEqItem() const { return eqItem_; }
-
 	void resetRefDistanceCovered() { refDistanceCovered_ = 0; }
 	void incrementDistanceCovered(double addDistance); // Atomic safe 
 	double getRefDistanceCovered() const { return refDistanceCovered_; }
 	
+	// Reference back to the equipment
+	EquipmentDistanceItem* eqItem_;
+
 	friend QTextStream& operator<<(QTextStream& out, const EquipmentRef& eqRef);
 
 protected:
 
 	std::atomic<double> refDistanceCovered_;
-	EquipmentDistanceItem* eqItem_;
+
 };
 
 

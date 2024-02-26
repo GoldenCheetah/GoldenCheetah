@@ -222,6 +222,8 @@ EquipmentModelManager::equipmentDeleted(EquipmentNode* eqItem, bool warnOnEqDele
 	} break;
 
 	case eqNodeType::EQ_ITEM_REF: {
+		// find the linked equipment and remove myself from their list
+		static_cast<EquipmentRef*>(eqItem)->eqItem_->linkedRefs_.removeOne(static_cast<EquipmentRef*>(eqItem));
 		refsModel_->removeAndDeleteEquipment(eqItem);
 	} break;
 
@@ -554,8 +556,11 @@ EquipmentModelManager::createEquipmentTree(QVector<flatEqNode>& flatEqNodes, Equ
 				if ((flatNodeSearch.nodeType_ == eqNodeType::EQ_DIST_ITEM) &&
 					(flatNodeSearch.eqId_ == flatNode.eqIdRef_)) {
 
-					// Set up pointer reference to equipment item.
-					static_cast<EquipmentRef*>(flatNode.eqNode_)->setEqItem(static_cast<EquipmentDistanceItem*>(flatNodeSearch.eqNode_));
+					// Add the equipment to the reference
+					static_cast<EquipmentRef*>(flatNode.eqNode_)->eqItem_ = static_cast<EquipmentDistanceItem*>(flatNodeSearch.eqNode_);
+
+					// Add the reference to the equipment
+					static_cast<EquipmentDistanceItem*>(flatNodeSearch.eqNode_)->linkedRefs_.push_back(static_cast<EquipmentRef*>(flatNode.eqNode_));
 					break;
 				}
 			}

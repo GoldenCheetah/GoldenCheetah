@@ -78,7 +78,7 @@ class EquipmentNavigator : public GcChartWindow
 
 		bool eqListView_;
 		Context* context_;
-		EquipmentNode* currentEqItem_;
+		static EquipmentNode* currentEqItem_;
 
 		int pwidth_; // selction box width
         int fontHeight; // font metrics for display etc

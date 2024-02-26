@@ -382,7 +382,7 @@ EquipmentWindow::displayReference(EquipmentRef* eqRef) {
 
 	static_cast<QLabel*>(pageWids[2].labelPtr)->setText(tr("Ref Distance Covered") + unitString());
 
-	EquipmentDistanceItem* eqItem = eqRef->getEqItem();
+	EquipmentDistanceItem* eqItem = eqRef->eqItem_;
 
 	if (eqItem) {
 

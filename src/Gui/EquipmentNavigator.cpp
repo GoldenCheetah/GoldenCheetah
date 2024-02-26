@@ -31,8 +31,12 @@
 #include <QStyleFactory>
 #include <QScrollBar>
 
+// There is a common selected equipment shared between both navigators so that
+// the references of selected equipments can be highlight.
+EquipmentNode* EquipmentNavigator::currentEqItem_ = nullptr;
+
 EquipmentNavigator::EquipmentNavigator(Context* context, bool eqListView) :
-		GcChartWindow(context), context_(context), currentEqItem_(nullptr), eqListView_(eqListView)
+		GcChartWindow(context), context_(context), eqListView_(eqListView)
 {
     fontHeight = QFontMetrics(QFont()).height();
 
@@ -126,9 +130,9 @@ EquipmentNavigator::eqSelectionChanged(QItemSelection selected)
 
     QModelIndex ref = selected.indexes().first();
     QModelIndex modelIndex = eqTreeView_->model()->index(ref.row(), 0, ref.parent());
+	
 	if (eqListView_)
 		currentEqItem_ = context_->mainWindow->equipmentModelMngr->refsModel_->equipmentFromIndex(modelIndex);
-		
 	else
 		currentEqItem_ = context_->mainWindow->equipmentModelMngr->equipModel_->equipmentFromIndex(modelIndex);
 
@@ -170,18 +174,20 @@ void EquipmentNavigatorCellDelegate::paint(QPainter* painter, const QStyleOption
     QString value = index.model()->data(index, Qt::DisplayRole).toString();
     QStyleOptionViewItem myOption = option;
     myOption.displayAlignment = Qt::AlignLeft | Qt::AlignTop;
+	QRect rect(myOption.rect.x(), myOption.rect.y() + 1, myOption.rect.width(), myOption.rect.height());
 
-    // basic background, render text based upon hierarchy
-    QBrush background = QBrush(GColor(CPLOTBACKGROUND));
-    QColor userColor = GColor(CPLOTTRACKER).darker(150);
-
-	EquipmentNode* eqItem = eqModel_->equipmentFromIndex(index);
+    // render text based upon hierarchy & types
+     QColor userColor = GColor(CPLOTTRACKER).darker(150);
 
 	static QColor odtColour = GColor(CHEARTRATE).darker(130);
 	static QColor rootTimeColour = GColor(CCADENCE).lighter(110);
 	static QColor rootDistColor = GColor(CPLOTTRACKER).lighter(120);
 	static QColor timeColour = GColor(CCADENCE).darker(140);
 	static QColor distColor = GColor(CPLOTTRACKER).darker(110);
+	static QColor selectTxtColor = distColor;
+	static QColor selectBkgdColor = GCColor::alternateColor(GColor(CPLOTBACKGROUND));
+
+	EquipmentNode* eqItem = eqModel_->equipmentFromIndex(index);
 
 	if (eqItem) {
 
@@ -202,13 +208,19 @@ void EquipmentNavigatorCellDelegate::paint(QPainter* painter, const QStyleOption
 		} break;
 
 		case eqNodeType::EQ_ITEM_REF: {
-			if (static_cast<EquipmentRef*>(eqItem)->getEqItem() == nullptr)
+			if (static_cast<EquipmentRef*>(eqItem)->eqItem_ == nullptr)
 				userColor = odtColour;
 			else
-				if (static_cast<EquipmentRef*>(eqItem)->getEqItem()->overDistance())
-					userColor = odtColour;
+				if (static_cast<EquipmentRef*>(eqItem)->eqItem_ == eqNav_->currentEqItem_) {
+
+					painter->fillRect(myOption.rect, selectBkgdColor);
+					userColor = selectTxtColor;
+				}
 				else
-					userColor = distColor;
+					if (static_cast<EquipmentRef*>(eqItem)->eqItem_->overDistance())
+						userColor = odtColour;
+					else
+						userColor = distColor;
 		} break;
 
 		case eqNodeType::EQ_LINK: {
@@ -219,13 +231,18 @@ void EquipmentNavigatorCellDelegate::paint(QPainter* painter, const QStyleOption
 		} break;
 
 		case eqNodeType::EQ_DIST_ITEM: {
-			if (static_cast<EquipmentDistanceItem*>(eqItem)->overDistance())
-				userColor = odtColour;
+			if (static_cast<EquipmentDistanceItem*>(eqItem)->linkedRefs_.indexOf(eqNav_->currentEqItem_) != -1) {
+				painter->fillRect(myOption.rect, selectBkgdColor);
+				userColor = selectTxtColor;
+			}
 			else
-				if (eqItem->getParentItem()->getEqNodeType() == eqNodeType::EQ_ROOT)
-					userColor = rootDistColor;
+				if (static_cast<EquipmentDistanceItem*>(eqItem)->overDistance())
+					userColor = odtColour;
 				else
-					userColor = distColor;
+					if (eqItem->getParentItem()->getEqNodeType() == eqNodeType::EQ_ROOT)
+						userColor = rootDistColor;
+					else
+						userColor = distColor;
 		} break;
 
 		default: {
@@ -248,8 +265,7 @@ void EquipmentNavigatorCellDelegate::paint(QPainter* painter, const QStyleOption
         painter->setPen(userColor);
     }
 
-    QRect normal(myOption.rect.x(), myOption.rect.y() + 1, myOption.rect.width(), myOption.rect.height());
-    painter->drawText(normal, value);
+    painter->drawText(rect, value);
     
 	// restore original painter values
     painter->setPen(isColor);
@@ -310,7 +326,6 @@ EquipmentTreeView::~EquipmentTreeView()
 void
 EquipmentTreeView::equipmentSelected(EquipmentNode*, bool)
 {
-    expandAll();
     update();
 }
 

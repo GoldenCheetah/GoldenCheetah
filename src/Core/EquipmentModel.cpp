@@ -303,8 +303,8 @@ EquipmentModel::findAndDeleteMatchingEqRefs(EquipmentNode* eqNodeTree, const Equ
 
 		// If it matches then delete it and all its equipment reference children, ok some collateral damage but they are just references
 		if (eqRef->getEqNodeType() == eqNodeType::EQ_ITEM_REF) {
-			if (static_cast<EquipmentRef*>(eqRef)->getEqItem() != nullptr) {
-				if (matchEqNode == static_cast<EquipmentRef*>(eqRef)->getEqItem()) {
+			if (static_cast<EquipmentRef*>(eqRef)->eqItem_ != nullptr) {
+				if (matchEqNode == static_cast<EquipmentRef*>(eqRef)->eqItem_) {
 
 					eqNodeTree->removeChild(eqRef);
 					delete eqRef;
@@ -362,7 +362,11 @@ EquipmentModel::copyItemTreeToRefTree(EquipmentNode* copyNodeTree) {
 
 		EquipmentNode* refNode = new EquipmentRef();
 
-		static_cast<EquipmentRef*>(refNode)->setEqItem(static_cast<EquipmentDistanceItem*>(copyNodeTree));
+		// Add the equipment to the reference
+		static_cast<EquipmentRef*>(refNode)->eqItem_ = static_cast<EquipmentDistanceItem*>(copyNodeTree);
+
+		// Add the reference to the equipment
+		static_cast<EquipmentDistanceItem*>(copyNodeTree)->linkedRefs_.push_back(static_cast<EquipmentRef*>(refNode));
 
 		for (EquipmentNode* eqItem : copyNodeTree->getChildren())
 		{
