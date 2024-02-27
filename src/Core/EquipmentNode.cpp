@@ -94,28 +94,28 @@ EquipmentDistanceItem::data(int /*column*/) const {
 }
 
 QTextStream&
-operator<<(QTextStream& out, const EquipmentDistanceItem& eqItem) {
+operator<<(QTextStream& out, const EquipmentDistanceItem& eqNode) {
 
 	out << "<eqDist "
-		<< "id=\"" << &eqItem << "\" ";
-		if (eqItem.parentItem_->getEqNodeType() == eqNodeType::EQ_ROOT)
+		<< "id=\"" << &eqNode << "\" ";
+		if (eqNode.parentItem_->getEqNodeType() == eqNodeType::EQ_ROOT)
 			out << "parentId=\"eqRootNode\" ";
 		else
-			out << "parentId=\"" << eqItem.parentItem_ << "\" ";
-		if (eqItem.nonGCDistance_ != 0) {
-			out << "nonGCDist=\"" << eqItem.nonGCDistance_ << "\" ";
+			out << "parentId=\"" << eqNode.parentItem_ << "\" ";
+		if (eqNode.nonGCDistance_ != 0) {
+			out << "nonGCDist=\"" << eqNode.nonGCDistance_ << "\" ";
 		}
-		if (eqItem.gcDistance_ != 0) {
-			out << "gcDist=\"" << eqItem.gcDistance_ << "\" ";
+		if (eqNode.gcDistance_ != 0) {
+			out << "gcDist=\"" << eqNode.gcDistance_ << "\" ";
 		}
-		if (eqItem.replacementDistance_ != 0) {
-			out << "replaceDist=\"" << eqItem.replacementDistance_ << "\" ";
+		if (eqNode.replacementDistance_ != 0) {
+			out << "replaceDist=\"" << eqNode.replacementDistance_ << "\" ";
 		}
-		if (!eqItem.description_.isEmpty()) {
-			out << "desc=\"" << Utils::xmlprotect(eqItem.description_) << "\" ";
+		if (!eqNode.description_.isEmpty()) {
+			out << "desc=\"" << Utils::xmlprotect(eqNode.description_) << "\" ";
 		}
-		if (!eqItem.notes_.isEmpty()) {
-			out << "notes=\"" << Utils::xmlprotect(eqItem.notes_) << "\" ";
+		if (!eqNode.notes_.isEmpty()) {
+			out << "notes=\"" << Utils::xmlprotect(eqNode.notes_) << "\" ";
 		}
 		out << "/>\n";
 
@@ -151,23 +151,23 @@ EquipmentTimeItem::data(int /*column*/) const {
 }
 
 QTextStream&
-operator<<(QTextStream& out, const EquipmentTimeItem& eqItem) {
+operator<<(QTextStream& out, const EquipmentTimeItem& eqNode) {
 
 	out << "<eqTime "
-		<< "id=\"" << &eqItem << "\" ";
-	if (eqItem.parentItem_->getEqNodeType() == eqNodeType::EQ_ROOT)
+		<< "id=\"" << &eqNode << "\" ";
+	if (eqNode.parentItem_->getEqNodeType() == eqNodeType::EQ_ROOT)
 		out << "parentId=\"eqRootNode\" ";
 	else
-		out << "parentId=\"" << eqItem.parentItem_ << "\" ";
-	out << "startDate=\"" << eqItem.startDate_.toString() << "\" ";
-	if (!eqItem.replacementDate_.isNull()) {
-		out << "replaceDate=\"" << eqItem.replacementDate_.toString() << "\" ";
+		out << "parentId=\"" << eqNode.parentItem_ << "\" ";
+	out << "startDate=\"" << eqNode.startDate_.toString() << "\" ";
+	if (!eqNode.replacementDate_.isNull()) {
+		out << "replaceDate=\"" << eqNode.replacementDate_.toString() << "\" ";
 	}
-	if (!eqItem.description_.isEmpty()) {
-		out << "desc=\"" << Utils::xmlprotect(eqItem.description_) << "\" ";
+	if (!eqNode.description_.isEmpty()) {
+		out << "desc=\"" << Utils::xmlprotect(eqNode.description_) << "\" ";
 	}
-	if (!eqItem.notes_.isEmpty()) {
-		out << "notes=\"" << Utils::xmlprotect(eqItem.notes_) << "\" ";
+	if (!eqNode.notes_.isEmpty()) {
+		out << "notes=\"" << Utils::xmlprotect(eqNode.notes_) << "\" ";
 	}
 	out << "/>\n";
 
@@ -220,14 +220,14 @@ QTextStream&operator<<(QTextStream& out, const EquipTimeSpan& eqTs) {
 // ---------------------------------- Equipment Reference  ---------------------------------
 
 EquipmentRef::EquipmentRef(double refDistance /* = 0 */) :
-	EquipmentNode(), eqItem_(nullptr), refDistanceCovered_(refDistance)
+	EquipmentNode(), eqDistNode_(nullptr), refDistanceCovered_(refDistance)
 {
 }
 
 QVariant
 EquipmentRef::data(int /*column*/) const {
 
-	return (eqItem_) ? eqItem_->description_ + " [" + QString::number(refDistanceCovered_, 'f', 0) + "]" : "Referenced Equipment Missing!";
+	return (eqDistNode_) ? eqDistNode_->description_ + " [" + QString::number(refDistanceCovered_, 'f', 0) + "]" : tr("Referenced Equipment Missing!");
 }
 
 void
@@ -239,7 +239,7 @@ EquipmentRef::incrementDistanceCovered(double addDistance) {
 		;
 
 	// Update the referenced original equipment item
-	if (eqItem_) eqItem_->incrementDistanceCovered(addDistance);
+	if (eqDistNode_) eqDistNode_->incrementDistanceCovered(addDistance);
 }
 
 QTextStream& operator<<(QTextStream& out, const EquipmentRef& eqRef)
@@ -247,8 +247,8 @@ QTextStream& operator<<(QTextStream& out, const EquipmentRef& eqRef)
 	out << "<eqRef "
 		<< "id=\"" << &eqRef << "\" "
 		<< "parentId=\"" << eqRef.parentItem_ << "\" ";
-	if (eqRef.eqItem_)
-		out << "eqId=\"" << eqRef.eqItem_ << "\" ";
+	if (eqRef.eqDistNode_)
+		out << "eqId=\"" << eqRef.eqDistNode_ << "\" ";
 	else
 		out << "eqId=\"eqReferenceMissing\" ";
 	if (eqRef.refDistanceCovered_ != 0) {
@@ -271,13 +271,13 @@ EquipmentLink::data(int /*column*/) const {
     return eqLinkName_;
 }
 
-QTextStream& operator<<(QTextStream& out, const EquipmentLink& eqItem) {
+QTextStream& operator<<(QTextStream& out, const EquipmentLink& eqNode) {
 
 	out << "<eqLink "
-		<< "id=\"" << &eqItem << "\" "
-		<< "eqLinkName=\"" << Utils::xmlprotect(eqItem.eqLinkName_) << "\" ";
-	if (!eqItem.description_.isEmpty()) {
-		out << "desc=\"" << Utils::xmlprotect(eqItem.description_) << "\" ";
+		<< "id=\"" << &eqNode << "\" "
+		<< "eqLinkName=\"" << Utils::xmlprotect(eqNode.eqLinkName_) << "\" ";
+	if (!eqNode.description_.isEmpty()) {
+		out << "desc=\"" << Utils::xmlprotect(eqNode.description_) << "\" ";
 	}
 	out << "/>\n";
 

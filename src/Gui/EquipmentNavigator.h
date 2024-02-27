@@ -37,7 +37,7 @@
 class EquipmentNavigatorCellDelegate;
 class EquipmentTreeView;
 
-// The EquipmentNavigator - a list of equipments displayed using a QTreeView
+// The EquipmentNavigator - a list of equipment displayed using a QTreeView
 
 class EquipmentNavigator : public GcChartWindow
 {
@@ -140,7 +140,7 @@ class EquipmentTreeView : public QTreeView
             QTreeView::selectionChanged(selected, deselected);
         }
 
-        void equipmentSelected(EquipmentNode* eqItem, bool eqListView);
+        void equipmentSelected(EquipmentNode* eqNode, bool eqListView);
 
     protected:
 

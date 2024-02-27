@@ -47,7 +47,7 @@ class EquipmentWindow : public GcChartWindow
 
 	public slots:
 		void updateEqSettings(bool load);
-		void equipmentSelected(EquipmentNode* eqItem, bool eqListView);
+		void equipmentSelected(EquipmentNode* eqNode, bool eqListView);
 		void eqRecalculationStart();
 		void eqRecalculationEnd();
 
@@ -70,12 +70,12 @@ class EquipmentWindow : public GcChartWindow
 		QMap<eqWinType, QVector< widgetMapType>> equipWids_;
 
 		QWidget* createWidsEquipmentDistanceItem();
-		void displayEquipmentDistanceItem(EquipmentDistanceItem* eqItem);
-		void saveEquipmentDistanceItem(EquipmentDistanceItem* eqItem);
+		void displayEquipmentDistanceItem(EquipmentDistanceItem* eqNode);
+		void saveEquipmentDistanceItem(EquipmentDistanceItem* eqNode);
 
 		QWidget* createWidsEquipmentTimeItem();
-		void displayEquipmentTimeItem(EquipmentTimeItem* eqItem);
-		void saveEquipmentTimeItem(EquipmentTimeItem* eqItem);
+		void displayEquipmentTimeItem(EquipmentTimeItem* eqNode);
+		void saveEquipmentTimeItem(EquipmentTimeItem* eqNode);
 
 		QWidget* createWidsTimeSpan();
 		void displayTimeSpan(EquipTimeSpan* eqTimeSpan);
@@ -85,8 +85,8 @@ class EquipmentWindow : public GcChartWindow
 		void displayReference(EquipmentRef* eqRef);
 
 		QWidget* createWidsEquipmentLink();
-		void displayEquipmentLink(EquipmentLink* actEqLink);
-		void saveEquipmentLink(EquipmentLink* actEqLink);
+		void displayEquipmentLink(EquipmentLink* eqLink);
+		void saveEquipmentLink(EquipmentLink* eqLink);
 
 		QWidget* setupWids(QVector< widgetMapType>& widMap);
 

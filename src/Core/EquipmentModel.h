@@ -39,7 +39,7 @@ class EquipmentModel : public QAbstractItemModel
 		EquipmentModel(Context* context);
 		~EquipmentModel();
 
-		void equipmentDeleted(EquipmentNode* eqItem, bool warnOnEqDelete);
+		void equipmentDeleted(EquipmentNode* eqNode, bool warnOnEqDelete);
 		EquipmentNode* equipmentFromIndex(const QModelIndex& modelIndex) const;
 
 	public slots:
@@ -68,12 +68,12 @@ class EquipmentModel : public QAbstractItemModel
 		void completeDropMimeData(EquipmentNode* draggedNode, int droppedRow, EquipmentNode* droppedOnNode, const QModelIndex& droppedOnNodeIdx);
 
 		void equipmentAdded(EquipmentNode* eqParent, int eqToAdd);
-		void equipmentMove(EquipmentNode* eqItem, bool up);
+		void equipmentMove(EquipmentNode* eqNode, bool up);
 		void addChildToParent(EquipmentNode* eqChild, EquipmentNode* eqParent);
 
 		void removeEquipment(EquipmentNode* eqNode);
 		void removeAndDeleteEquipment(EquipmentNode* eqNode);
-		void deleteEquipmentsRefsMatching(const EquipmentNode* eqNode);
+		void deleteEquipmentRefsMatching(const EquipmentNode* eqNode);
 		void findAndDeleteMatchingEqRefs(EquipmentNode* eqNodeTree, const EquipmentNode* matchEqNode); // recursive
 
 		void insertEquipment(EquipmentNode* node, int row, EquipmentNode* parentNode, const QModelIndex& parentIdx);
@@ -84,8 +84,8 @@ class EquipmentModel : public QAbstractItemModel
 		EquipmentNode* copyItemTreeToRefTree(EquipmentNode* copyNodeTree); // recursive
 
 		// for debugging
-		void printfTree(int depth, EquipmentNode* eqItemTree); // recursive
-		void printfEquipmentNode(const EquipmentNode* eqItem) const;
+		void printfTree(int depth, EquipmentNode* eqNodeTree); // recursive
+		void printfEquipmentNode(const EquipmentNode* eqNode) const;
 
 		Context *context_;
 		EquipmentRoot* rootItem_;

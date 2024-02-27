@@ -32,7 +32,7 @@
 #include <QScrollBar>
 
 // There is a common selected equipment shared between both navigators so that
-// the references of selected equipments can be highlight.
+// the references of selected equipment can be highlight.
 EquipmentNode* EquipmentNavigator::currentEqItem_ = nullptr;
 
 EquipmentNavigator::EquipmentNavigator(Context* context, bool eqListView) :
@@ -187,17 +187,17 @@ void EquipmentNavigatorCellDelegate::paint(QPainter* painter, const QStyleOption
 	static QColor selectTxtColor = distColor;
 	static QColor selectBkgdColor = GCColor::alternateColor(GColor(CPLOTBACKGROUND));
 
-	EquipmentNode* eqItem = eqModel_->equipmentFromIndex(index);
+	EquipmentNode* eqNode = eqModel_->equipmentFromIndex(index);
 
-	if (eqItem) {
+	if (eqNode) {
 
-		switch (eqItem->getEqNodeType()) {
+		switch (eqNode->getEqNodeType()) {
 
 		case eqNodeType::EQ_TIME_ITEM: {
-			if (static_cast<EquipmentTimeItem*>(eqItem)->overTime())
+			if (static_cast<EquipmentTimeItem*>(eqNode)->overTime())
 				userColor = odtColour;
 			else
-				if (eqItem->getParentItem()->getEqNodeType() == eqNodeType::EQ_ROOT)
+				if (eqNode->getParentItem()->getEqNodeType() == eqNodeType::EQ_ROOT)
 					userColor = rootTimeColour;
 				else
 					userColor = timeColour;
@@ -208,38 +208,38 @@ void EquipmentNavigatorCellDelegate::paint(QPainter* painter, const QStyleOption
 		} break;
 
 		case eqNodeType::EQ_ITEM_REF: {
-			if (static_cast<EquipmentRef*>(eqItem)->eqItem_ == nullptr)
+			if (static_cast<EquipmentRef*>(eqNode)->eqDistNode_ == nullptr)
 				userColor = odtColour;
 			else
-				if (static_cast<EquipmentRef*>(eqItem)->eqItem_ == eqNav_->currentEqItem_) {
+				if (static_cast<EquipmentRef*>(eqNode)->eqDistNode_ == eqNav_->currentEqItem_) {
 
 					painter->fillRect(myOption.rect, selectBkgdColor);
 					userColor = selectTxtColor;
 				}
 				else
-					if (static_cast<EquipmentRef*>(eqItem)->eqItem_->overDistance())
+					if (static_cast<EquipmentRef*>(eqNode)->eqDistNode_->overDistance())
 						userColor = odtColour;
 					else
 						userColor = distColor;
 		} break;
 
 		case eqNodeType::EQ_LINK: {
-			if (eqItem->getParentItem()->getEqNodeType() == eqNodeType::EQ_ROOT)
+			if (eqNode->getParentItem()->getEqNodeType() == eqNodeType::EQ_ROOT)
 				userColor = rootDistColor;
 			else
 				userColor = distColor;
 		} break;
 
 		case eqNodeType::EQ_DIST_ITEM: {
-			if (static_cast<EquipmentDistanceItem*>(eqItem)->linkedRefs_.indexOf(eqNav_->currentEqItem_) != -1) {
+			if (static_cast<EquipmentDistanceItem*>(eqNode)->linkedRefs_.indexOf(eqNav_->currentEqItem_) != -1) {
 				painter->fillRect(myOption.rect, selectBkgdColor);
 				userColor = selectTxtColor;
 			}
 			else
-				if (static_cast<EquipmentDistanceItem*>(eqItem)->overDistance())
+				if (static_cast<EquipmentDistanceItem*>(eqNode)->overDistance())
 					userColor = odtColour;
 				else
-					if (eqItem->getParentItem()->getEqNodeType() == eqNodeType::EQ_ROOT)
+					if (eqNode->getParentItem()->getEqNodeType() == eqNodeType::EQ_ROOT)
 						userColor = rootDistColor;
 					else
 						userColor = distColor;

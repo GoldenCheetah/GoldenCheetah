@@ -97,10 +97,10 @@ EquipmentSidebar::configChanged(qint32)
 }
 
 void
-EquipmentSidebar::equipmentSelected(EquipmentNode* eqItem, bool eqListView) {
+EquipmentSidebar::equipmentSelected(EquipmentNode* eqNode, bool eqListView) {
 
 	if (eqListView_ == eqListView) {
-		currentEqItem_ = eqItem;
+		currentEqItem_ = eqNode;
 	}
 	else { // deselect the other equipment sidebar
 		currentEqItem_ = nullptr;
@@ -127,9 +127,9 @@ EquipmentSidebar::equipmentPopup()
 		connect(addEquipmentLink, SIGNAL(triggered(void)), this, SLOT(addTopDistEqHandler()));
 		popMenu.addAction(addEquipmentLink);
 
-		QAction* actAddTimeEquipment = new QAction(tr("Add Time Equipment"), equipmentNavigator_);
-		connect(actAddTimeEquipment, SIGNAL(triggered(void)), this, SLOT(addTopTimeEqHandler()));
-		popMenu.addAction(actAddTimeEquipment);
+		QAction* addTimeEquipment = new QAction(tr("Add Time Equipment"), equipmentNavigator_);
+		connect(addTimeEquipment, SIGNAL(triggered(void)), this, SLOT(addTopTimeEqHandler()));
+		popMenu.addAction(addTimeEquipment);
 		popMenu.addSeparator();
 	}
 	else {
@@ -210,32 +210,32 @@ EquipmentSidebar::showEquipmentMenu(const QPoint &pos)
 {
     if (currentEqItem_ != nullptr) {
 
-		QAction* actAddEquipment = nullptr;
-		QAction* actAddTSEquipment = nullptr;
-		QAction* actAddTimeEquipment = nullptr;
-		QAction* actDeleteEquipment = nullptr;
+		QAction* addEquipment = nullptr;
+		QAction* addTSEquipment = nullptr;
+		QAction* addTimeEquipment = nullptr;
+		QAction* deleteEquipment = nullptr;
 
 		switch (currentEqItem_->getEqNodeType()) {
 
 			// Activity Trees
 			case eqNodeType::EQ_LINK: {
-				actAddTSEquipment = new QAction(tr("Add Time Span"), equipmentNavigator_);
-				actDeleteEquipment = new QAction(tr("Delete"), equipmentNavigator_);
+				addTSEquipment = new QAction(tr("Add Time Span"), equipmentNavigator_);
+				deleteEquipment = new QAction(tr("Delete"), equipmentNavigator_);
 			} break;
 
 			case eqNodeType::EQ_TIME_SPAN: {
-				actDeleteEquipment = new QAction(tr("Delete"), equipmentNavigator_);
+				deleteEquipment = new QAction(tr("Delete"), equipmentNavigator_);
 			} break;
 
 			case eqNodeType::EQ_ITEM_REF: {
-				actDeleteEquipment = new QAction(tr("Remove Reference(s)"), equipmentNavigator_);
+				deleteEquipment = new QAction(tr("Remove Reference(s)"), equipmentNavigator_);
 			} break;
 
 			case eqNodeType::EQ_TIME_ITEM:
 			case eqNodeType::EQ_DIST_ITEM: {
-				actAddEquipment = new QAction(tr("Add Distance Equipment"), equipmentNavigator_);
-				actAddTimeEquipment = new QAction(tr("Add Time Equipment"), equipmentNavigator_);
-				actDeleteEquipment = new QAction(tr("Delete"), equipmentNavigator_);
+				addEquipment = new QAction(tr("Add Distance Equipment"), equipmentNavigator_);
+				addTimeEquipment = new QAction(tr("Add Time Equipment"), equipmentNavigator_);
+				deleteEquipment = new QAction(tr("Delete"), equipmentNavigator_);
 			} break;
 
 			// Equipment root should never be selectable (it is hidden)
@@ -245,21 +245,21 @@ EquipmentSidebar::showEquipmentMenu(const QPoint &pos)
 		}
 
 		QMenu menu(this);
-		if (actAddTSEquipment) {
-			connect(actAddTSEquipment, SIGNAL(triggered(void)), this, SLOT(addTimeSpanHandler()));
-			menu.addAction(actAddTSEquipment);
+		if (addTSEquipment) {
+			connect(addTSEquipment, SIGNAL(triggered(void)), this, SLOT(addTimeSpanHandler()));
+			menu.addAction(addTSEquipment);
 		}
-		if (actAddEquipment) {
-			connect(actAddEquipment, SIGNAL(triggered(void)), this, SLOT(addEquipmentHandler()));
-			menu.addAction(actAddEquipment);
+		if (addEquipment) {
+			connect(addEquipment, SIGNAL(triggered(void)), this, SLOT(addEquipmentHandler()));
+			menu.addAction(addEquipment);
 		}
-		if (actAddTimeEquipment) {
-			connect(actAddTimeEquipment, SIGNAL(triggered(void)), this, SLOT(addEquipmentTimeHandler()));
-			menu.addAction(actAddTimeEquipment);
+		if (addTimeEquipment) {
+			connect(addTimeEquipment, SIGNAL(triggered(void)), this, SLOT(addEquipmentTimeHandler()));
+			menu.addAction(addTimeEquipment);
 		}
-		if (actDeleteEquipment) {
-			connect(actDeleteEquipment, SIGNAL(triggered(void)), this, SLOT(deleteEquipmentHandler()));
-			menu.addAction(actDeleteEquipment);
+		if (deleteEquipment) {
+			connect(deleteEquipment, SIGNAL(triggered(void)), this, SLOT(deleteEquipmentHandler()));
+			menu.addAction(deleteEquipment);
 		}
 		menu.addSeparator();
 
@@ -267,14 +267,14 @@ EquipmentSidebar::showEquipmentMenu(const QPoint &pos)
 		int currentEqItemPosn = parentsChildren.indexOf(currentEqItem_);
 
 		if (currentEqItemPosn != 0) {
-			QAction* actUpEquipment = new QAction(tr("Move Up"), equipmentNavigator_);
-			connect(actUpEquipment, SIGNAL(triggered(void)), this, SLOT(moveUpEquipmentHandler()));
-			menu.addAction(actUpEquipment);
+			QAction* upEquipment = new QAction(tr("Move Up"), equipmentNavigator_);
+			connect(upEquipment, SIGNAL(triggered(void)), this, SLOT(moveUpEquipmentHandler()));
+			menu.addAction(upEquipment);
 		}
 		if (currentEqItemPosn != (parentsChildren.size()-1)) {
-			QAction* actDownEquipment = new QAction(tr("Move Down"), equipmentNavigator_);
-			connect(actDownEquipment, SIGNAL(triggered(void)), this, SLOT(moveDownEquipmentHandler()));
-			menu.addAction(actDownEquipment);
+			QAction* downEquipment = new QAction(tr("Move Down"), equipmentNavigator_);
+			connect(downEquipment, SIGNAL(triggered(void)), this, SLOT(moveDownEquipmentHandler()));
+			menu.addAction(downEquipment);
 		}
 
 		menu.exec(pos);

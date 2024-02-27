@@ -35,11 +35,11 @@ EquipmentModelManager::EquipmentModelManager(Context* context) :
 	refsModel_ = new EquipmentModel(context);
 
 	// Create temporary storage holder for a flat collection of tree items, once createEquipmentItemTree
-	// has created the tree the ownership of the items memory will be a tree under the model's eqRootItem. 
+	// has created the tree the ownership of the item's memory will be a tree under the model's eqRootNode. 
 	QVector<flatEqNode> flatEqNodes;
 	QVector<flatEqNode> flatRefNodes;
 
-	loadEquipmentsFromXML(flatEqNodes, equipModel_->rootItem_,
+	loadEquipmentFromXML(flatEqNodes, equipModel_->rootItem_,
 						  flatRefNodes, refsModel_->rootItem_);
 
 	connect(context_, SIGNAL(updateEqSettings(bool)), this, SLOT(updateEqSettings(bool)));
@@ -62,7 +62,7 @@ EquipmentModelManager::~EquipmentModelManager()
 void
 EquipmentModelManager::close()
 {
-	saveEquipmentsToXML(equipModel_->rootItem_, refsModel_->rootItem_);
+	saveEquipmentToXML(equipModel_->rootItem_, refsModel_->rootItem_);
 }
 
 void
@@ -89,7 +89,7 @@ EquipmentModelManager::updateEqSettings(bool load)
 		QVector<flatEqNode> flatRefNodes;
 
 		// reload the xml equipment file
-		loadEquipmentsFromXML(flatEqNodes, equipModel_->rootItem_,
+		loadEquipmentFromXML(flatEqNodes, equipModel_->rootItem_,
 							flatRefNodes, refsModel_->rootItem_);
 
 		equipModel_->endResetModel();
@@ -98,7 +98,7 @@ EquipmentModelManager::updateEqSettings(bool load)
 	else
 	{
 		// save xml equipment file
-		saveEquipmentsToXML(equipModel_->rootItem_, refsModel_->rootItem_);
+		saveEquipmentToXML(equipModel_->rootItem_, refsModel_->rootItem_);
 	}
 }
 
@@ -128,13 +128,13 @@ EquipmentModelManager::equipmentAdded(EquipmentNode* eqParent, int eqToAdd) {
 }
 
 void
-EquipmentModelManager::equipmentDeleted(EquipmentNode* eqItem, bool warnOnEqDelete)
+EquipmentModelManager::equipmentDeleted(EquipmentNode* eqNode, bool warnOnEqDelete)
 {
-	switch (eqItem->getEqNodeType()) {
+	switch (eqNode->getEqNodeType()) {
 
 	case eqNodeType::EQ_DIST_ITEM: {
 
-		if (eqItem->childCount()) {
+		if (eqNode->childCount()) {
 
 			QMessageBox msgBox;
 			msgBox.setIcon(QMessageBox::Critical);
@@ -166,38 +166,38 @@ EquipmentModelManager::equipmentDeleted(EquipmentNode* eqItem, bool warnOnEqDele
 			if (deleteEq) {
 
 				// find and delete any references to the equipment.
-				refsModel_->deleteEquipmentsRefsMatching(eqItem);
+				refsModel_->deleteEquipmentRefsMatching(eqNode);
 
 				// Delete the equipment item
-				equipModel_->removeAndDeleteEquipment(eqItem);
+				equipModel_->removeAndDeleteEquipment(eqNode);
 			}
 		}
 	} break;
 
 	case eqNodeType::EQ_TIME_ITEM: {
-		if (eqItem->childCount()) {
+		if (eqNode->childCount()) {
 
 			QMessageBox msgBox;
 			msgBox.setIcon(QMessageBox::Critical);
-			msgBox.setText(tr("Time Equipments with children cannot be deleted!"));
+			msgBox.setText(tr("Time Equipment with children cannot be deleted!"));
 			msgBox.setInformativeText(tr("\nto proceed either:\n\n"
 				"\t i) delete its children, or \n"
 				"\tii) move them to another Equipment Item."));
 			msgBox.exec();
 		}
 		else {
-			equipModel_->removeAndDeleteEquipment(eqItem);
+			equipModel_->removeAndDeleteEquipment(eqNode);
 		}
 	} break;
 
 	case eqNodeType::EQ_LINK:
 	case eqNodeType::EQ_TIME_SPAN: {
-		if (eqItem->childCount() && warnOnEqDelete) {
+		if (eqNode->childCount() && warnOnEqDelete) {
 
 			QMessageBox msgBox;
 			msgBox.setIcon(QMessageBox::Critical);
 
-			if (eqItem->getEqNodeType() == eqNodeType::EQ_LINK) {
+			if (eqNode->getEqNodeType() == eqNodeType::EQ_LINK) {
 				msgBox.setText(tr("Deleting an Equipment Link with children."));
 				msgBox.setInformativeText(tr("\nProceeding will delete the selected Equipment Link,\n"
 					"and ALL of its reference children.\n"));
@@ -213,18 +213,18 @@ EquipmentModelManager::equipmentDeleted(EquipmentNode* eqItem, bool warnOnEqDele
 
 			if (msgBox.clickedButton() == deleteButton) {
 
-				refsModel_->removeAndDeleteEquipment(eqItem);
+				refsModel_->removeAndDeleteEquipment(eqNode);
 			}
 		}
 		else {
-			refsModel_->removeAndDeleteEquipment(eqItem);
+			refsModel_->removeAndDeleteEquipment(eqNode);
 		}
 	} break;
 
 	case eqNodeType::EQ_ITEM_REF: {
 		// find the linked equipment and remove myself from their list
-		static_cast<EquipmentRef*>(eqItem)->eqItem_->linkedRefs_.removeOne(static_cast<EquipmentRef*>(eqItem));
-		refsModel_->removeAndDeleteEquipment(eqItem);
+		static_cast<EquipmentRef*>(eqNode)->eqDistNode_->linkedRefs_.removeOne(static_cast<EquipmentRef*>(eqNode));
+		refsModel_->removeAndDeleteEquipment(eqNode);
 	} break;
 
 	// Equipment root should never be deleted!
@@ -239,12 +239,12 @@ EquipmentModelManager::equipmentDeleted(EquipmentNode* eqItem, bool warnOnEqDele
 }
 
 void
-EquipmentModelManager::equipmentMove(EquipmentNode* eqItem, bool eqListView, bool up) {
+EquipmentModelManager::equipmentMove(EquipmentNode* eqNode, bool eqListView, bool up) {
 	
 	if (eqListView)
-		equipModel_->equipmentMove(eqItem, up);
+		equipModel_->equipmentMove(eqNode, up);
 	else
-		refsModel_->equipmentMove(eqItem, up);
+		refsModel_->equipmentMove(eqNode, up);
 }
 
 void
@@ -263,15 +263,15 @@ EquipmentModelManager::eqRecalculationStart() {
 	refsModel_->rootItem_->setMetricUnits(GlobalContext::context()->useMetricUnits);
 
 	// Currently this code restricts the calculation to a single athlete, so needs looking at
-	/// to provide a general calcluation of distances of equipments used by all athletes.
+	/// to provide a general calcluation of distances of equipment used by all athletes.
 
-	// take a copy of the rides through the athlete's rides creating an update status table
-	rideItemStatus_ = context_->athlete->rideCache->rides();
+	// take a copy of the rides through the athlete's rides creating a ride List to process
+	rideItemList_ = context_->athlete->rideCache->rides();
 
 	// calculate number of threads and work per thread
 	int maxthreads = QThreadPool::globalInstance()->maxThreadCount();
 	int threads = maxthreads / 4; // Don't need many threads
-	if (threads == 0) threads = 1; // need at least one!
+	if (threads == 0) threads = 1; // but need at least one!
 
 	// keep launching the threads
 	while (threads--) {
@@ -290,11 +290,11 @@ EquipmentModelManager::nextRideToCheck()
 	RideItem* returning;
 	updateMutex_.lock();
 
-	if (rideItemStatus_.isEmpty()) {
+	if (rideItemList_.isEmpty()) {
 		returning = nullptr;
 	}
 	else {
-		returning = rideItemStatus_.takeLast();
+		returning = rideItemList_.takeLast();
 	}
 	updateMutex_.unlock();
 	return(returning);
@@ -331,12 +331,12 @@ EquipmentModelManager::threadCompleted(EquipmentModelRecalculationThread* thread
 void
 EquipmentModelManager::RecalculateEq(RideItem* rideItem)
 {
-	// iterate through the top level Activity Equipments to match against ride metadata
-	for (EquipmentNode* actItem : refsModel_->rootItem_->getChildren()) {
+	// iterate through the top level Equipment LInks to match against ride metadata
+	for (EquipmentNode* rootChild : refsModel_->rootItem_->getChildren()) {
 
-		if (actItem->getEqNodeType() == eqNodeType::EQ_LINK) {
+		if (rootChild->getEqNodeType() == eqNodeType::EQ_LINK) {
 
-			if (rideItem->getText("EquipmentLink", "abcde") == static_cast<EquipmentLink*>(actItem)->getEqLinkName()) {
+			if (rideItem->getText("EquipmentLink", "abcde") == static_cast<EquipmentLink*>(rootChild)->getEqLinkName()) {
 
 				QDate dRef = QDate(1900, 01, 01).addDays(rideItem->getText("Start Date", "0").toInt());
 				QTime tRef = QTime(0, 0, 0).addSecs(rideItem->getText("Start Time", "0").toInt());
@@ -346,21 +346,21 @@ EquipmentModelManager::RecalculateEq(RideItem* rideItem)
 				// get the distance metric
 				double dist = rideItem->getStringForSymbol("total_distance", GlobalContext::context()->useMetricUnits).toDouble();
 
-				for (EquipmentNode* eqActChild : actItem->getChildren()) {
+				for (EquipmentNode* eqNode : rootChild->getChildren()) {
 
 					// If its a time span encompassing the ride/activity time then
-					if (eqActChild->getEqNodeType() == eqNodeType::EQ_TIME_SPAN) {
+					if (eqNode->getEqNodeType() == eqNodeType::EQ_TIME_SPAN) {
 
-						if (static_cast<EquipTimeSpan*>(eqActChild)->isWithin(ref)) {
+						if (static_cast<EquipTimeSpan*>(eqNode)->isWithin(ref)) {
 
 							// now apply the distance to all the Equipment Items via the tree of references
-							applyDistanceToRefTreeNodes(eqActChild, dist, false);
+							applyDistanceToRefTreeNodes(eqNode, dist, false);
 						}
 					}
-					else if (eqActChild->getEqNodeType() == eqNodeType::EQ_ITEM_REF) {
+					else if (eqNode->getEqNodeType() == eqNodeType::EQ_ITEM_REF) {
 
 						// now apply the distance to all the Equipment Items via the tree of references
-						applyDistanceToRefTreeNodes(eqActChild, dist, true);
+						applyDistanceToRefTreeNodes(eqNode, dist, true);
 					}
 				}
 			}
@@ -374,28 +374,28 @@ EquipmentModelManager::RecalculateEq(RideItem* rideItem)
 void // recursive function! 
 EquipmentModelManager::ResetTreeNodesBelowEqNode(EquipmentNode* eqNodeTree) {
 
-	for (EquipmentNode* eqItem : eqNodeTree->getChildren())
+	for (EquipmentNode* eqNode : eqNodeTree->getChildren())
 	{
-		if (eqItem->getEqNodeType() == eqNodeType::EQ_ITEM_REF) {
-			static_cast<EquipmentRef*>(eqItem)->resetRefDistanceCovered();
+		if (eqNode->getEqNodeType() == eqNodeType::EQ_ITEM_REF) {
+			static_cast<EquipmentRef*>(eqNode)->resetRefDistanceCovered();
 		}
-		else if (eqItem->getEqNodeType() == eqNodeType::EQ_DIST_ITEM) {
-			static_cast<EquipmentDistanceItem*>(eqItem)->resetDistanceCovered();
+		else if (eqNode->getEqNodeType() == eqNodeType::EQ_DIST_ITEM) {
+			static_cast<EquipmentDistanceItem*>(eqNode)->resetDistanceCovered();
 		}
-		ResetTreeNodesBelowEqNode(eqItem);
+		ResetTreeNodesBelowEqNode(eqNode);
 	}
 }
 
 void // recursive function! 
-EquipmentModelManager::applyDistanceToRefTreeNodes(EquipmentNode* eqNodeTree, double dist, bool incTopEqRef) {
+EquipmentModelManager::applyDistanceToRefTreeNodes(EquipmentNode* eqNodeTree, const double dist, const bool incTopEqRef) {
 
 	if (incTopEqRef) static_cast<EquipmentRef*>(eqNodeTree)->incrementDistanceCovered(dist);
 
-	for (EquipmentNode* eqItem : eqNodeTree->getChildren())
+	for (EquipmentNode* eqNode : eqNodeTree->getChildren())
 	{
-		if (!incTopEqRef) static_cast<EquipmentRef*>(eqItem)->incrementDistanceCovered(dist);
+		if (!incTopEqRef) static_cast<EquipmentRef*>(eqNode)->incrementDistanceCovered(dist);
 
-		applyDistanceToRefTreeNodes(eqItem, dist, incTopEqRef);
+		applyDistanceToRefTreeNodes(eqNode, dist, incTopEqRef);
 	}
 }
 
@@ -411,14 +411,14 @@ EquipmentModelManager::printfEquipment() {
 // ---------------------------- XML Inport/Export functions ---------------------------------
 
 bool
-EquipmentModelManager::loadEquipmentsFromXML(QVector<flatEqNode>& flatEqNodes, EquipmentRoot* eqRootItem,
-											 QVector<flatEqNode>& flatRefNodes, EquipmentRoot* refRootItem) {
+EquipmentModelManager::loadEquipmentFromXML(QVector<flatEqNode>& flatEqNodes, EquipmentRoot* eqRootNode,
+											 QVector<flatEqNode>& flatRefNodes, EquipmentRoot* refRootNode) {
 
     bool success = false;
 
-    // load equipments from config file
+    // load equipment from config file
     QString content = "";
-    QString filename = QDir(gcroot).canonicalPath() + "/equipments.xml";
+	QString filename = context_->athlete->home->config().canonicalPath() + "/equipment.xml";
     QFile file(filename);
 
     if (file.open(QIODevice::ReadOnly)) {
@@ -444,37 +444,37 @@ EquipmentModelManager::loadEquipmentsFromXML(QVector<flatEqNode>& flatEqNodes, E
         // parse and instantiate the charts
         xmlReader.parse(source);
 
-        success = createEquipmentTree(flatEqNodes, eqRootItem,
-									  flatRefNodes, refRootItem);
+        success = createEquipmentTree(flatEqNodes, eqRootNode,
+									  flatRefNodes, refRootNode);
     }
 
 	if (success) {
 		// Record the last calculation and the units used from the xml file
-		eqRootItem->setLastRecalc(lastRecalc_);
-		refRootItem->setLastRecalc(lastRecalc_);
-		eqRootItem->setMetricUnits(xmlMetricUnits);
-		refRootItem->setMetricUnits(xmlMetricUnits);
+		eqRootNode->setLastRecalc(lastRecalc_);
+		refRootNode->setLastRecalc(lastRecalc_);
+		eqRootNode->setMetricUnits(xmlMetricUnits);
+		refRootNode->setMetricUnits(xmlMetricUnits);
 	}
 	else {
-		// Create an initial equipments which is normally loaded from the equipments.xml file.
-		eqRootItem->insertChild(0, new EquipmentDistanceItem("New Distance Equipment",""));
-		eqRootItem->insertChild(0, new EquipmentTimeItem("New Time Equipment", ""));
+		// Create an initial equipment which is normally loaded from the equipment.xml file.
+		eqRootNode->insertChild(0, new EquipmentDistanceItem(tr("New Distance Equipment"),""));
+		eqRootNode->insertChild(0, new EquipmentTimeItem(tr("New Time Equipment"), ""));
 
-		// Create an initial equipment link which is normally loaded from the equipments.xml file.
-		refRootItem->insertChild(0, new EquipmentLink("New Equipment Link", ""));
+		// Create an initial equipment link which is normally loaded from the equipment.xml file.
+		refRootNode->insertChild(0, new EquipmentLink(tr("New Equipment Link"), ""));
 
 		// set null datetime for last recalculation
-		eqRootItem->setLastRecalc(QDateTime());
-		refRootItem->setLastRecalc(QDateTime());
-		eqRootItem->setMetricUnits(GlobalContext::context()->useMetricUnits);
-		refRootItem->setMetricUnits(GlobalContext::context()->useMetricUnits);
+		eqRootNode->setLastRecalc(QDateTime());
+		refRootNode->setLastRecalc(QDateTime());
+		eqRootNode->setMetricUnits(GlobalContext::context()->useMetricUnits);
+		refRootNode->setMetricUnits(GlobalContext::context()->useMetricUnits);
 	}
 	return success;
 }
 
 bool
-EquipmentModelManager::createEquipmentTree(QVector<flatEqNode>& flatEqNodes, EquipmentRoot* eqRootItem,
-											QVector<flatEqNode>& flatRefNodes, EquipmentRoot* refRootItem)
+EquipmentModelManager::createEquipmentTree(QVector<flatEqNode>& flatEqNodes, EquipmentRoot* eqRootNode,
+											QVector<flatEqNode>& flatRefNodes, EquipmentRoot* refRootNode)
 {
     bool success = true;
 
@@ -488,11 +488,11 @@ EquipmentModelManager::createEquipmentTree(QVector<flatEqNode>& flatEqNodes, Equ
 
 			if (flatNode.eqParentId_.contains("eqRootNode")) {
 				// Set up toplevel parent - child relationship
-				equipModel_->addChildToParent(flatNode.eqNode_, eqRootItem);
+				equipModel_->addChildToParent(flatNode.eqNode_, eqRootNode);
 
 			}
 			else {
-				// if not a root node, search through all the eqItem's for an Id matching the parentId
+				// if not a root node, search through all the eqNode's for an Id matching the parentId
 				for (flatEqNode& flatParentNode : flatEqNodes)
 				{
 					if (flatParentNode.eqId_ == flatNode.eqParentId_) {
@@ -520,12 +520,12 @@ EquipmentModelManager::createEquipmentTree(QVector<flatEqNode>& flatEqNodes, Equ
 		case eqNodeType::EQ_LINK: {
 
 			// Set up toplevel parent - child relationship
-			equipModel_->addChildToParent(flatNode.eqNode_, refRootItem);
+			equipModel_->addChildToParent(flatNode.eqNode_, refRootNode);
 			} break;
 
 
 		case eqNodeType::EQ_TIME_SPAN: {
-			// search through all the eqItem's for an Id matching the parentId
+			// search through all the eqNode's for an Id matching the parentId
 			for (flatEqNode& flatParentNode : flatRefNodes)
 			{
 				if (flatParentNode.eqId_ == flatNode.eqParentId_) {
@@ -539,7 +539,7 @@ EquipmentModelManager::createEquipmentTree(QVector<flatEqNode>& flatEqNodes, Equ
 
 		case eqNodeType::EQ_ITEM_REF: {
 
-			// search through all the eqItem's for an Id matching the parentId
+			// search through all the eqNode's for an Id matching the parentId
 			for (flatEqNode& flatParentNode : flatRefNodes)
 			{
 				if (flatParentNode.eqId_ == flatNode.eqParentId_) {
@@ -550,14 +550,14 @@ EquipmentModelManager::createEquipmentTree(QVector<flatEqNode>& flatEqNodes, Equ
 				}
 			}
 
-			// search through all the eqItem's for the eqIdRef 
+			// search through all the eqNode's for the eqIdRef 
 			for (flatEqNode& flatNodeSearch : flatEqNodes)
 			{
 				if ((flatNodeSearch.nodeType_ == eqNodeType::EQ_DIST_ITEM) &&
 					(flatNodeSearch.eqId_ == flatNode.eqIdRef_)) {
 
 					// Add the equipment to the reference
-					static_cast<EquipmentRef*>(flatNode.eqNode_)->eqItem_ = static_cast<EquipmentDistanceItem*>(flatNodeSearch.eqNode_);
+					static_cast<EquipmentRef*>(flatNode.eqNode_)->eqDistNode_ = static_cast<EquipmentDistanceItem*>(flatNodeSearch.eqNode_);
 
 					// Add the reference to the equipment
 					static_cast<EquipmentDistanceItem*>(flatNodeSearch.eqNode_)->linkedRefs_.push_back(static_cast<EquipmentRef*>(flatNode.eqNode_));
@@ -577,9 +577,9 @@ EquipmentModelManager::createEquipmentTree(QVector<flatEqNode>& flatEqNodes, Equ
 }
 
 void
-EquipmentModelManager::saveEquipmentsToXML(EquipmentRoot* eqRootItem, EquipmentRoot* refRootItem) 
+EquipmentModelManager::saveEquipmentToXML(EquipmentRoot* eqRootNode, EquipmentRoot* refRootNode) 
 {
-    QString filename = QDir(gcroot).canonicalPath() + "/equipments.xml";
+	QString filename = context_->athlete->home->config().canonicalPath() + "/equipment.xml";
     QFile file(filename);
     if (file.open(QFile::WriteOnly)) {
 
@@ -588,31 +588,31 @@ EquipmentModelManager::saveEquipmentsToXML(EquipmentRoot* eqRootItem, EquipmentR
         out.setCodec("UTF-8");
 
         // support different formats using the modelVersion id (held in xmlVersion_), possibly required in the future
-        out << "<equipments>\n\n";
-        out << "\t<!-- This file contains the equipments, equipment references & time spans. --> \n";
+        out << "<equipment>\n\n";
+        out << "\t<!-- This file contains the equipment, equipment references & time spans. --> \n";
 		out << "\t<!-- Note: The ids in this file will change between saves, but the structure and relationships will be retained. --> \n\n";
 		out << "\t<eqModel version=\"1\" lastCalc=\"" << lastRecalc_.toString() << "\"";
-		out << " units=" << ((eqRootItem->getMetricUnits()) ? "\"Metric\"" : "\"Imperial\"");
+		out << " units=" << ((eqRootNode->getMetricUnits()) ? "\"Metric\"" : "\"Imperial\"");
 		out << " />\n\n";
 
 		out << "\t<!-- The equipment list items: --> \n\n";
 
-		// Write out the equipments
-		writeEquipTreeToXML(out, eqRootItem);
+		// Write out the equipment
+		writeEquipTreeToXML(out, eqRootNode);
 
 		out << "\n\t<!-- The equipment references: --> \n";
 
 		// Write out the equipment references
-		writeEquipTreeToXML(out, refRootItem);
+		writeEquipTreeToXML(out, refRootNode);
 
-        out << "\n</equipments>\n";
+        out << "\n</equipment>\n";
         file.close();
     }
     else {
 
         QMessageBox msgBox;
         msgBox.setIcon(QMessageBox::Critical);
-        msgBox.setText(tr("Problem Saving equipments.xml configuration file."));
+        msgBox.setText(tr("Problem Saving equipment.xml configuration file."));
         msgBox.setInformativeText(tr("File: %1 cannot be opened for 'Writing'. Please check file properties.").arg(filename));
         msgBox.exec();
         return;
@@ -620,26 +620,26 @@ EquipmentModelManager::saveEquipmentsToXML(EquipmentRoot* eqRootItem, EquipmentR
 }
 
 void // recursive function! 
-EquipmentModelManager::writeEquipTreeToXML(QTextStream& out, EquipmentNode* eqNode) {
+EquipmentModelManager::writeEquipTreeToXML(QTextStream& out, EquipmentNode* eqTreeNode) {
 
-	for (EquipmentNode* eqItem : eqNode->getChildren())
+	for (EquipmentNode* eqNode : eqTreeNode->getChildren())
 	{
-		switch (eqItem->getEqNodeType()) {
+		switch (eqNode->getEqNodeType()) {
 
 		case eqNodeType::EQ_DIST_ITEM: {
-			out << "\t" << *(static_cast<EquipmentDistanceItem*>(eqItem));
+			out << "\t" << *(static_cast<EquipmentDistanceItem*>(eqNode));
 		} break;
 		case eqNodeType::EQ_TIME_ITEM: {
-			out << "\t" << *(static_cast<EquipmentTimeItem*>(eqItem));
+			out << "\t" << *(static_cast<EquipmentTimeItem*>(eqNode));
 		} break;
 		case eqNodeType::EQ_LINK: {
-			out << "\n\t" << *(static_cast<EquipmentLink*>(eqItem));
+			out << "\n\t" << *(static_cast<EquipmentLink*>(eqNode));
 		} break;
 		case eqNodeType::EQ_TIME_SPAN: {
-			out << "\t\t" << *(static_cast<EquipTimeSpan*>(eqItem));
+			out << "\t\t" << *(static_cast<EquipTimeSpan*>(eqNode));
 		} break;
 		case eqNodeType::EQ_ITEM_REF: {
-			out << "\t\t" << *(static_cast<EquipmentRef*>(eqItem));
+			out << "\t\t" << *(static_cast<EquipmentRef*>(eqNode));
 		} break;
 
 		// Equipment root is never written to the xml file
@@ -650,7 +650,7 @@ EquipmentModelManager::writeEquipTreeToXML(QTextStream& out, EquipmentNode* eqNo
 		}break;
 		}
 
-		writeEquipTreeToXML(out, eqItem);
+		writeEquipTreeToXML(out, eqNode);
 	}
 }
 
@@ -666,7 +666,7 @@ bool EquipmentParser::endElement(const QString&, const QString&, const QString& 
 
 bool EquipmentParser::startElement(const QString&, const QString&, const QString& qName, const QXmlAttributes& attrs) {
 
-    if (qName == "equipments") {}
+    if (qName == "equipment") {}
 
     else if (qName == "eqModel") {
 
@@ -730,16 +730,16 @@ bool EquipmentParser::startElement(const QString&, const QString&, const QString
 
     else if (qName == "eqLink") {
 
-        QString actId, eqLinkName, description;
+        QString linkId, eqLinkName, description;
 
         // get attributes
         for (int i = 0; i < attrs.count(); i++) {
-            if (attrs.qName(i) == "id") actId = Utils::unprotect(attrs.value(i));
+            if (attrs.qName(i) == "id") linkId = Utils::unprotect(attrs.value(i));
             if (attrs.qName(i) == "eqLinkName") eqLinkName = Utils::unprotect(attrs.value(i));
             if (attrs.qName(i) == "desc") description = Utils::unprotect(attrs.value(i));
         }
 
-		flatRefNodes_.push_back(flatEqNode(actId, eqNodeType::EQ_LINK, "", "",
+		flatRefNodes_.push_back(flatEqNode(linkId, eqNodeType::EQ_LINK, "", "",
 						new EquipmentLink(eqLinkName, description)));
     }
 

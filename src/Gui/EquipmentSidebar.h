@@ -50,7 +50,7 @@ class EquipmentSidebar : public QWidget
         void showEquipmentMenu(const QPoint& pos);
 
         // equipment selected notification
-        void equipmentSelected(EquipmentNode* eqItem, bool eqListView);
+        void equipmentSelected(EquipmentNode* eqNode, bool eqListView);
 
 		// equipment menu handlers
 		void addTopDistEqHandler();

@@ -88,9 +88,9 @@ EquipmentWindow::EquipmentWindow(Context *context) :
 }
 
 void
-EquipmentWindow::equipmentSelected(EquipmentNode* eqItem, bool /* eqListView */)
+EquipmentWindow::equipmentSelected(EquipmentNode* eqNode, bool /* eqListView */)
 {
-	selectedNode_ = eqItem;
+	selectedNode_ = eqNode;
 	updateEquipmentDisplay();
 }
 
@@ -135,9 +135,9 @@ EquipmentWindow::updateEquipmentDisplay()
 		QDateTime lastRecalc = static_cast<EquipmentRoot*>(eqRoot)->getLastRecalc();
 		static QString time_format = "HH:mm   dd MMM yyyy";
 		QVariant days(abs(QDateTime::currentDateTime().daysTo(lastRecalc)));
-		lastUpdated_->setText("Last Recalc:  " +
+		lastUpdated_->setText(tr("Last Recalc:  ") +
 			lastRecalc.toString(time_format) +
-			((days==0) ? "  <today>" : ((days==1) ? "  <yesterday>" : "  <" + days.toString() + " days ago>")));
+			((days==0) ? tr("  <today>") : ((days==1) ? tr("  <yesterday>") : "  <" + days.toString() + tr(" days ago>"))));
 
 		switch (selectedNode_->getEqNodeType()) {
 
@@ -195,11 +195,11 @@ EquipmentWindow::createWidsEquipmentDistanceItem() {
 QString
 EquipmentWindow::unitString()
 {
-	return (metricUnits_) ? "\n(km)" : "\n(miles)";
+	return (metricUnits_) ? tr("\n(km)") : tr("\n(miles)");
 }
 
 void
-EquipmentWindow::displayEquipmentDistanceItem(EquipmentDistanceItem* eqItem) {
+EquipmentWindow::displayEquipmentDistanceItem(EquipmentDistanceItem* eqNode) {
 
 	QVector< widgetMapType>& pageWids = equipWids_[eqWinType::EQUIPMENT_DIST_PAGE];
 
@@ -208,25 +208,25 @@ EquipmentWindow::displayEquipmentDistanceItem(EquipmentDistanceItem* eqItem) {
 	static_cast<QLabel*>(pageWids[4].labelPtr)->setText(tr("Total Distance") + unitString());
 	static_cast<QLabel*>(pageWids[5].labelPtr)->setText(tr("Replacement Distance") + unitString());
 
-	static_cast<QLineEdit*>(pageWids[1].fieldPtr)->setText(eqItem->description_);
-	static_cast<QLineEdit*>(pageWids[2].fieldPtr)->setText(QString::number(eqItem->getNonGCDistance(), 'f', 1));
-	static_cast<QLineEdit*>(pageWids[3].fieldPtr)->setText(QString::number(eqItem->getGCDistance(), 'f', 1));
-	static_cast<QLineEdit*>(pageWids[4].fieldPtr)->setText(QString::number(eqItem->getTotalDistance(), 'f', 1));
-	static_cast<QLineEdit*>(pageWids[5].fieldPtr)->setText(QString::number(eqItem->replacementDistance_, 'f', 1));
-	static_cast<QPlainTextEdit*>(pageWids[6].fieldPtr)->setPlainText(eqItem->notes_);
+	static_cast<QLineEdit*>(pageWids[1].fieldPtr)->setText(eqNode->description_);
+	static_cast<QLineEdit*>(pageWids[2].fieldPtr)->setText(QString::number(eqNode->getNonGCDistance(), 'f', 1));
+	static_cast<QLineEdit*>(pageWids[3].fieldPtr)->setText(QString::number(eqNode->getGCDistance(), 'f', 1));
+	static_cast<QLineEdit*>(pageWids[4].fieldPtr)->setText(QString::number(eqNode->getTotalDistance(), 'f', 1));
+	static_cast<QLineEdit*>(pageWids[5].fieldPtr)->setText(QString::number(eqNode->replacementDistance_, 'f', 1));
+	static_cast<QPlainTextEdit*>(pageWids[6].fieldPtr)->setPlainText(eqNode->notes_);
 
 	stackedWidget_->setCurrentIndex(int(eqWinType::EQUIPMENT_DIST_PAGE));
 }
 
 void
-EquipmentWindow::saveEquipmentDistanceItem(EquipmentDistanceItem* eqItem) {
+EquipmentWindow::saveEquipmentDistanceItem(EquipmentDistanceItem* eqNode) {
 
 	QVector< widgetMapType>& pageWids = equipWids_[eqWinType::EQUIPMENT_DIST_PAGE];
 
-	eqItem->description_ = static_cast<QLineEdit*>(pageWids[1].fieldPtr)->text();
-	eqItem->setNonGCDistance(QVariant(static_cast<QLineEdit*>(pageWids[2].fieldPtr)->text()).toDouble());
-	eqItem->replacementDistance_ = QVariant(static_cast<QLineEdit*>(pageWids[5].fieldPtr)->text()).toDouble();
-	eqItem->notes_ = static_cast<QPlainTextEdit*>(pageWids[6].fieldPtr)->toPlainText();
+	eqNode->description_ = static_cast<QLineEdit*>(pageWids[1].fieldPtr)->text();
+	eqNode->setNonGCDistance(QVariant(static_cast<QLineEdit*>(pageWids[2].fieldPtr)->text()).toDouble());
+	eqNode->replacementDistance_ = QVariant(static_cast<QLineEdit*>(pageWids[5].fieldPtr)->text()).toDouble();
+	eqNode->notes_ = static_cast<QPlainTextEdit*>(pageWids[6].fieldPtr)->toPlainText();
 
 	// need to ensure new total distance is correctly displayed
 	updateEquipmentDisplay();
@@ -254,40 +254,40 @@ EquipmentWindow::createWidsEquipmentTimeItem() {
 }
 
 void
-EquipmentWindow::displayEquipmentTimeItem(EquipmentTimeItem* eqItem) {
+EquipmentWindow::displayEquipmentTimeItem(EquipmentTimeItem* eqNode) {
 
 	QVector< widgetMapType>& pageWids = equipWids_[eqWinType::EQUIPMENT_TIME_PAGE];
 
-	static_cast<QLineEdit*>(pageWids[1].fieldPtr)->setText(eqItem->description_);
+	static_cast<QLineEdit*>(pageWids[1].fieldPtr)->setText(eqNode->description_);
 
 	// Setting null QDateTime doesn't reset the QDateTimeEdit field
-	if (eqItem->startDate_.isNull()) {
+	if (eqNode->startDate_.isNull()) {
 		static_cast<QDateTimeEdit*>(pageWids[2].fieldPtr)->setDateTime(QDateTime(QDate::currentDate().startOfDay()));
 	}
 	else {
-		static_cast<QDateTimeEdit*>(pageWids[2].fieldPtr)->setDateTime(eqItem->startDate_);
+		static_cast<QDateTimeEdit*>(pageWids[2].fieldPtr)->setDateTime(eqNode->startDate_);
 	}
 
-	if (eqItem->replacementDate_.isNull()) {
+	if (eqNode->replacementDate_.isNull()) {
 		static_cast<QDateTimeEdit*>(pageWids[3].fieldPtr)->setDateTime(QDateTime(QDate::currentDate().endOfDay()));
 	}
 	else {
-		static_cast<QDateTimeEdit*>(pageWids[3].fieldPtr)->setDateTime(eqItem->replacementDate_);
+		static_cast<QDateTimeEdit*>(pageWids[3].fieldPtr)->setDateTime(eqNode->replacementDate_);
 	}
-	static_cast<QPlainTextEdit*>(pageWids[4].fieldPtr)->setPlainText(eqItem->notes_);
+	static_cast<QPlainTextEdit*>(pageWids[4].fieldPtr)->setPlainText(eqNode->notes_);
 
 	stackedWidget_->setCurrentIndex(int(eqWinType::EQUIPMENT_TIME_PAGE));
 }
 
 void
-EquipmentWindow::saveEquipmentTimeItem(EquipmentTimeItem* eqItem) {
+EquipmentWindow::saveEquipmentTimeItem(EquipmentTimeItem* eqNode) {
 
 	QVector< widgetMapType>& pageWids = equipWids_[eqWinType::EQUIPMENT_TIME_PAGE];
 
-	eqItem->description_ = static_cast<QLineEdit*>(pageWids[1].fieldPtr)->text();
-	eqItem->startDate_ = static_cast<QDateTimeEdit*>(pageWids[2].fieldPtr)->dateTime();
-	eqItem->replacementDate_ = static_cast<QDateTimeEdit*>(pageWids[3].fieldPtr)->dateTime();
-	eqItem->notes_ = static_cast<QPlainTextEdit*>(pageWids[4].fieldPtr)->toPlainText();
+	eqNode->description_ = static_cast<QLineEdit*>(pageWids[1].fieldPtr)->text();
+	eqNode->startDate_ = static_cast<QDateTimeEdit*>(pageWids[2].fieldPtr)->dateTime();
+	eqNode->replacementDate_ = static_cast<QDateTimeEdit*>(pageWids[3].fieldPtr)->dateTime();
+	eqNode->notes_ = static_cast<QPlainTextEdit*>(pageWids[4].fieldPtr)->toPlainText();
 }
 
 // ----------------------------- Equipment Time Span ------------------------------------
@@ -368,7 +368,7 @@ EquipmentWindow::createWidsReference() {
 
 	pageWids.push_back(struct widgetMapType { new QLabel(), new QLabel(tr("Distance Equipment Reference")), false });
 	pageWids.push_back(struct widgetMapType { new QLabel(tr("Description")), new QLineEdit(), false	});
-	pageWids.push_back(struct widgetMapType { new QLabel(tr("Ref Distance Covered")), new QLineEdit(), false });
+	pageWids.push_back(struct widgetMapType { new QLabel(tr("Reference Distance")), new QLineEdit(), false });
 
 	equipWids_[eqWinType::REFERENCE_PAGE] = pageWids;
 
@@ -380,17 +380,17 @@ EquipmentWindow::displayReference(EquipmentRef* eqRef) {
 
 	QVector< widgetMapType>& pageWids = equipWids_[eqWinType::REFERENCE_PAGE];
 
-	static_cast<QLabel*>(pageWids[2].labelPtr)->setText(tr("Ref Distance Covered") + unitString());
+	static_cast<QLabel*>(pageWids[2].labelPtr)->setText(tr("Reference Distance") + unitString());
 
-	EquipmentDistanceItem* eqItem = eqRef->eqItem_;
+	EquipmentDistanceItem* eqNode = eqRef->eqDistNode_;
 
-	if (eqItem) {
+	if (eqNode) {
 
-		static_cast<QLineEdit*>(pageWids[1].fieldPtr)->setText(eqItem->description_);
+		static_cast<QLineEdit*>(pageWids[1].fieldPtr)->setText(eqNode->description_);
 		static_cast<QLineEdit*>(pageWids[2].fieldPtr)->setText(QString::number(eqRef->getRefDistanceCovered(), 'f', 1));
 	}
 	else {
-		static_cast<QLineEdit*>(pageWids[1].fieldPtr)->setText("Referenced Equipment Missing!");
+		static_cast<QLineEdit*>(pageWids[1].fieldPtr)->setText(tr("Referenced Equipment Missing!"));
 	}
 
 	stackedWidget_->setCurrentIndex(int(eqWinType::REFERENCE_PAGE));
@@ -419,40 +419,40 @@ EquipmentWindow::createWidsEquipmentLink() {
 }
 
 void
-EquipmentWindow::displayEquipmentLink(EquipmentLink* actEqLink) {
+EquipmentWindow::displayEquipmentLink(EquipmentLink* eqLink) {
 
 	QVector< widgetMapType>& pageWids = equipWids_[eqWinType::ACTIVITY_LINK_PAGE];
 
-	static_cast<QLineEdit*>(pageWids[1].fieldPtr)->setText(actEqLink->getEqLinkName());
-	static_cast<QLineEdit*>(pageWids[2].fieldPtr)->setText(actEqLink->description_);
+	static_cast<QLineEdit*>(pageWids[1].fieldPtr)->setText(eqLink->getEqLinkName());
+	static_cast<QLineEdit*>(pageWids[2].fieldPtr)->setText(eqLink->description_);
 
 	stackedWidget_->setCurrentIndex(int(eqWinType::ACTIVITY_LINK_PAGE));
 }
 
 void
-EquipmentWindow::saveEquipmentLink(EquipmentLink* actEqLink) {
+EquipmentWindow::saveEquipmentLink(EquipmentLink* eqLink) {
 
 
 	QVector< widgetMapType>& pageWids = equipWids_[eqWinType::ACTIVITY_LINK_PAGE];
 	
-	actEqLink->description_ = static_cast<QLineEdit*>(pageWids[2].fieldPtr)->text();
+	eqLink->description_ = static_cast<QLineEdit*>(pageWids[2].fieldPtr)->text();
 
 	QList<FieldDefinition> fieldDefinitions = GlobalContext::context()->rideMetadata->getFields();
 
 	// If the equipment Link name has changed, then if its
 	// unique to this equipment link remove it from the choice list
-	if (actEqLink->getEqLinkName() != static_cast<QLineEdit*>(pageWids[1].fieldPtr)->text()) {
+	if (eqLink->getEqLinkName() != static_cast<QLineEdit*>(pageWids[1].fieldPtr)->text()) {
 
 		// find my root parent, this must be the reference tree as this is an equipment link
-		EquipmentNode* eqRoot = actEqLink->getParentItem();
+		EquipmentNode* eqRoot = eqLink->getParentItem();
 
 		bool uniqueEqLinkName = true;
 
 		// now check that other equipment links do not have the same name as the one being replaced
 		for (EquipmentNode* rootChild : eqRoot->getChildren()) {
 			// don't check myself!
-			if (rootChild != actEqLink) {
-				uniqueEqLinkName &= (static_cast<EquipmentLink*>(rootChild)->getEqLinkName() != actEqLink->getEqLinkName());
+			if (rootChild != eqLink) {
+				uniqueEqLinkName &= (static_cast<EquipmentLink*>(rootChild)->getEqLinkName() != eqLink->getEqLinkName());
 			}
 		}
 
@@ -461,7 +461,7 @@ EquipmentWindow::saveEquipmentLink(EquipmentLink* actEqLink) {
 			for (FieldDefinition& field : fieldDefinitions) {
 				if (field.name == "EquipmentLink") {
 					for (int i = 0; i < field.values.size(); ++i) {
-						if (field.values.at(i).contains(actEqLink->getEqLinkName()))
+						if (field.values.at(i).contains(eqLink->getEqLinkName()))
 							field.values.removeAt(i);
 					}
 					break;
@@ -470,7 +470,7 @@ EquipmentWindow::saveEquipmentLink(EquipmentLink* actEqLink) {
 		}
 
 		// now update the model with the new equipment link name
-		actEqLink->setEqLinkName(static_cast<QLineEdit*>(pageWids[1].fieldPtr)->text());
+		eqLink->setEqLinkName(static_cast<QLineEdit*>(pageWids[1].fieldPtr)->text());
 	}
 
 	// update the choice list with the new equipment link name, in case its not already in the choice list
@@ -478,10 +478,10 @@ EquipmentWindow::saveEquipmentLink(EquipmentLink* actEqLink) {
 		if (field.name == "EquipmentLink") {
 
 			// if the equipment link name is missing t
-			if (!field.values.contains(actEqLink->getEqLinkName())) {
+			if (!field.values.contains(eqLink->getEqLinkName())) {
 
 				// add missing equipment link to the choice list
-				field.values.append(actEqLink->getEqLinkName());
+				field.values.append(eqLink->getEqLinkName());
 
 				// keep the choices tidy (just incase their are two eqLinks with this name)
 				field.values.removeDuplicates();
@@ -573,8 +573,7 @@ EquipmentWindow::configChanged(qint32)
 
 		palette_.setColor(QPalette::Window, GColor(CPLOTBACKGROUND));
 
-		// only change base if moved away from white plots
-		// which is a Mac thing
+		// only change base if moved away from white plots which is a Mac thing
 #ifndef Q_OS_MAC
 		if (GColor(CPLOTBACKGROUND) != Qt::white)
 #endif

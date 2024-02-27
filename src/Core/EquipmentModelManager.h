@@ -43,7 +43,7 @@ class flatEqNode {
 		EquipmentNode* eqNode_;
 };
 
-// reads in equipments
+// reads in equipment
 class EquipmentParser : public QXmlDefaultHandler {
 
 	public:
@@ -101,34 +101,34 @@ class EquipmentModelManager : public QObject
 		void updateEqSettings(bool load);
 		void eqRecalculationStart();
 		void equipmentAdded(EquipmentNode* eqParent, int eqToAdd);
-		void equipmentDeleted(EquipmentNode* eqItem, bool warnOnEqDelete);
-		void equipmentMove(EquipmentNode* eqItem, bool eqListView, bool up);
+		void equipmentDeleted(EquipmentNode* eqNode, bool warnOnEqDelete);
+		void equipmentMove(EquipmentNode* eqNode, bool eqListView, bool up);
 
 	protected:
 
 		friend class ::EquipmentModelRecalculationThread;
 
 		// XML input functions
-		bool loadEquipmentsFromXML(QVector<flatEqNode>& flatEqNodes, EquipmentRoot* eqRootItem,
-									QVector<flatEqNode>& flatRefNodes, EquipmentRoot* refRootItem);
-		bool createEquipmentTree(QVector<flatEqNode>& flatEqNodes, EquipmentRoot* eqRootItem,
-									QVector<flatEqNode>& flatRefNodes, EquipmentRoot* refRootItem);
+		bool loadEquipmentFromXML(QVector<flatEqNode>& flatEqNodes, EquipmentRoot* eqRootNode,
+									QVector<flatEqNode>& flatRefNodes, EquipmentRoot* refRootNode);
+		bool createEquipmentTree(QVector<flatEqNode>& flatEqNodes, EquipmentRoot* eqRootNode,
+									QVector<flatEqNode>& flatRefNodes, EquipmentRoot* refRootNode);
 
 		// XML output functions
-		void saveEquipmentsToXML(EquipmentRoot* eqRootItem, EquipmentRoot* refRootItem);
-		void writeEquipTreeToXML(QTextStream& out, EquipmentNode* eqNode); // recursive
+		void saveEquipmentToXML(EquipmentRoot* eqRootNode, EquipmentRoot* refRootNode);
+		void writeEquipTreeToXML(QTextStream& out, EquipmentNode* eqTreeNode); // recursive
 
 		// distance calculation
 		void RecalculateEq(RideItem* rideItem);
 		RideItem* nextRideToCheck();
 		void threadCompleted(EquipmentModelRecalculationThread* thread);
 		void ResetTreeNodesBelowEqNode(EquipmentNode* eqNodeTree); // recursive
-		void applyDistanceToRefTreeNodes(EquipmentNode* eqNodeTree, double dist, bool incTopEqRef); // recursive
+		void applyDistanceToRefTreeNodes(EquipmentNode* eqNodeTree, const double dist, const bool incTopEqRef); // recursive
 
 		// Equipment distance recalculation
 		QMutex updateMutex_;
 		QVector<EquipmentModelRecalculationThread*> recalculationThreads_;
-		QVector<RideItem*>  rideItemStatus_;
+		QVector<RideItem*>  rideItemList_;
 
 		// for debugging
 		void printfEquipment();

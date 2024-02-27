@@ -64,7 +64,7 @@ protected:
 };
 
 
-// There is a single instance of this class, it is the root of the all the equipments.
+// There is a single instance of this class, it is the root of the all the equipment.
 class EquipmentRoot : public EquipmentNode
 {
 public:
@@ -89,7 +89,7 @@ protected:
 class EquipmentRef;
 
 // Manage things that wear out through use: running shoes, tyres, brake pads, etc
-// Represents the actual distance based equipments which are assigned to EquipmentRefs
+// Represents the actual distance based equipment which are assigned to EquipmentRefs
 class EquipmentDistanceItem : public EquipmentNode
 {
 public:
@@ -116,7 +116,7 @@ public:
 
 	QVector<EquipmentNode*> linkedRefs_;
 
-    friend QTextStream& operator<<(QTextStream& out, const EquipmentDistanceItem& eqItem);
+    friend QTextStream& operator<<(QTextStream& out, const EquipmentDistanceItem& eqNode);
 
 protected:
 	double nonGCDistance_;
@@ -126,7 +126,7 @@ protected:
 
 
 // Manage things that age over time: Bike services, Bleeding of brakes, etc
-// Represents the actual time based equipments, held under the Equipment List
+// Represents the actual time based equipment, held under the Equipment List
 class EquipmentTimeItem : public EquipmentNode
 {
 public:
@@ -145,7 +145,7 @@ public:
 	QDateTime startDate_;
 	QDateTime replacementDate_;
 
-	friend QTextStream& operator<<(QTextStream& out, const EquipmentTimeItem& eqItem);
+	friend QTextStream& operator<<(QTextStream& out, const EquipmentTimeItem& eqNode);
 };
 
 
@@ -186,7 +186,7 @@ public:
 	double getRefDistanceCovered() const { return refDistanceCovered_; }
 	
 	// Reference back to the equipment
-	EquipmentDistanceItem* eqItem_;
+	EquipmentDistanceItem* eqDistNode_;
 
 	friend QTextStream& operator<<(QTextStream& out, const EquipmentRef& eqRef);
 

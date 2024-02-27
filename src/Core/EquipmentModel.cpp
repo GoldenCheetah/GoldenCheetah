@@ -281,7 +281,7 @@ EquipmentModel::removeAndDeleteEquipment(EquipmentNode* eqNode)
 }
 
 void
-EquipmentModel::deleteEquipmentsRefsMatching(const EquipmentNode* eqNode)
+EquipmentModel::deleteEquipmentRefsMatching(const EquipmentNode* eqNode)
 {
 	emit layoutAboutToBeChanged();
 
@@ -303,8 +303,8 @@ EquipmentModel::findAndDeleteMatchingEqRefs(EquipmentNode* eqNodeTree, const Equ
 
 		// If it matches then delete it and all its equipment reference children, ok some collateral damage but they are just references
 		if (eqRef->getEqNodeType() == eqNodeType::EQ_ITEM_REF) {
-			if (static_cast<EquipmentRef*>(eqRef)->eqItem_ != nullptr) {
-				if (matchEqNode == static_cast<EquipmentRef*>(eqRef)->eqItem_) {
+			if (static_cast<EquipmentRef*>(eqRef)->eqDistNode_ != nullptr) {
+				if (matchEqNode == static_cast<EquipmentRef*>(eqRef)->eqDistNode_) {
 
 					eqNodeTree->removeChild(eqRef);
 					delete eqRef;
@@ -346,7 +346,7 @@ EquipmentModel::configChanged(qint32)
 void
 EquipmentModel::createReferenceCopy(EquipmentNode* copyNode, int destRow, EquipmentNode* destNode, const QModelIndex& destIdx) {
 
-	// create copies of the equipments for the equipment reference tree
+	// create copies of the equipment for the equipment reference tree
 	EquipmentNode* refs = copyItemTreeToRefTree(copyNode);
 
 	// insert the equipment copies into the equipment reference tree
@@ -363,14 +363,14 @@ EquipmentModel::copyItemTreeToRefTree(EquipmentNode* copyNodeTree) {
 		EquipmentNode* refNode = new EquipmentRef();
 
 		// Add the equipment to the reference
-		static_cast<EquipmentRef*>(refNode)->eqItem_ = static_cast<EquipmentDistanceItem*>(copyNodeTree);
+		static_cast<EquipmentRef*>(refNode)->eqDistNode_ = static_cast<EquipmentDistanceItem*>(copyNodeTree);
 
 		// Add the reference to the equipment
 		static_cast<EquipmentDistanceItem*>(copyNodeTree)->linkedRefs_.push_back(static_cast<EquipmentRef*>(refNode));
 
-		for (EquipmentNode* eqItem : copyNodeTree->getChildren())
+		for (EquipmentNode* eqNode : copyNodeTree->getChildren())
 		{
-			EquipmentNode* refChild = copyItemTreeToRefTree(eqItem);
+			EquipmentNode* refChild = copyItemTreeToRefTree(eqNode);
 			if (refChild) addChildToParent(refChild, refNode);
 		}
 		return refNode;
@@ -387,40 +387,40 @@ EquipmentModel::addChildToParent(EquipmentNode* eqChild, EquipmentNode* eqParent
 
 
 void // recursive function! 
-EquipmentModel::printfTree(int depth, EquipmentNode* eqItemTree) {
+EquipmentModel::printfTree(int depth, EquipmentNode* eqNodeTree) {
 
 	depth += 3;
 	for (int i = 0; i < depth; i++) { putchar(' '); }
 
-	printfEquipmentNode(eqItemTree);
+	printfEquipmentNode(eqNodeTree);
 
-	for (EquipmentNode* eqItem : eqItemTree->getChildren()) {
-		printfTree(depth, eqItem);
+	for (EquipmentNode* eqNode : eqNodeTree->getChildren()) {
+		printfTree(depth, eqNode);
 	}
 }
 
 void
-EquipmentModel::printfEquipmentNode(const EquipmentNode* eqItem) const {
+EquipmentModel::printfEquipmentNode(const EquipmentNode* eqNode) const {
 
-	switch (eqItem->getEqNodeType()) {
+	switch (eqNode->getEqNodeType()) {
 
 	case eqNodeType::EQ_LINK: {
-		printf("%s\n", static_cast<const EquipmentLink*>(eqItem)->data(1).toString().toStdString().c_str());
+		printf("%s\n", static_cast<const EquipmentLink*>(eqNode)->data(1).toString().toStdString().c_str());
 	} break;
 	case eqNodeType::EQ_TIME_SPAN: {
-		printf("%s\n", static_cast<const EquipTimeSpan*>(eqItem)->data(1).toString().toStdString().c_str());
+		printf("%s\n", static_cast<const EquipTimeSpan*>(eqNode)->data(1).toString().toStdString().c_str());
 	} break;
 	case eqNodeType::EQ_DIST_ITEM: {
-		printf("%s\n", static_cast<const EquipmentDistanceItem*>(eqItem)->data(1).toString().toStdString().c_str());
+		printf("%s\n", static_cast<const EquipmentDistanceItem*>(eqNode)->data(1).toString().toStdString().c_str());
 	} break;
 	case eqNodeType::EQ_TIME_ITEM: {
-		printf("%s\n", static_cast<const EquipmentTimeItem*>(eqItem)->data(1).toString().toStdString().c_str());
+		printf("%s\n", static_cast<const EquipmentTimeItem*>(eqNode)->data(1).toString().toStdString().c_str());
 	} break;
 	case eqNodeType::EQ_ITEM_REF: {
-		printf("%s\n", static_cast<const EquipmentRef*>(eqItem)->data(1).toString().toStdString().c_str());
+		printf("%s\n", static_cast<const EquipmentRef*>(eqNode)->data(1).toString().toStdString().c_str());
 	} break;
 	case eqNodeType::EQ_ROOT: {
-		printf("%s\n", static_cast<const EquipmentRoot*>(eqItem)->data(1).toString().toStdString().c_str());
+		printf("%s\n", static_cast<const EquipmentRoot*>(eqNode)->data(1).toString().toStdString().c_str());
 	} break;
 	default: {
 		qDebug() << "Trying to display an unknown equipment type!";
@@ -438,23 +438,23 @@ EquipmentModel::equipmentAdded(EquipmentNode* eqParent, int eqToAdd) {
 	switch (eqToAdd) {
 
 	case eqNodeType::EQ_LINK: {
-		EquipmentLink* eqLink = new EquipmentLink("New Equipment Link", "todo");
+		EquipmentLink* eqLink = new EquipmentLink(tr("New Equipment Link"), tr("todo"));
 		addChildToParent(eqLink, rootItem_);
 	} break;
 
 	case eqNodeType::EQ_TIME_SPAN: {
-		EquipmentNode* eqItem = new EquipTimeSpan();
-		addChildToParent(eqItem, eqParent);
+		EquipmentNode* eqNode = new EquipTimeSpan();
+		addChildToParent(eqNode, eqParent);
 	} break;
 
 	case eqNodeType::EQ_DIST_ITEM: {
-		EquipmentNode* eqItem = new EquipmentDistanceItem("New Distance Equipment", "");
-		addChildToParent(eqItem, eqParent);
+		EquipmentNode* eqNode = new EquipmentDistanceItem(tr("New Distance Equipment"), "");
+		addChildToParent(eqNode, eqParent);
 	} break;
 
 	case eqNodeType::EQ_TIME_ITEM: {
-		EquipmentNode* eqItem = new EquipmentTimeItem("New Time Equipment", "");
-		addChildToParent(eqItem, eqParent);
+		EquipmentNode* eqNode = new EquipmentTimeItem(tr("New Time Equipment"), "");
+		addChildToParent(eqNode, eqParent);
 	} break;
 
 	// Equipment references should never be added this way, only via drag & drop!
@@ -472,12 +472,12 @@ EquipmentModel::equipmentAdded(EquipmentNode* eqParent, int eqToAdd) {
 }
 
 void
-EquipmentModel::equipmentMove(EquipmentNode* eqItem, bool up) {
+EquipmentModel::equipmentMove(EquipmentNode* eqNode, bool up) {
 
 	emit layoutAboutToBeChanged();
 
-	QVector<EquipmentNode*>& parentsChildren = eqItem->getParentItem()->getChildren();
-	int pos = parentsChildren.indexOf(eqItem);
+	QVector<EquipmentNode*>& parentsChildren = eqNode->getParentItem()->getChildren();
+	int pos = parentsChildren.indexOf(eqNode);
 
 	if (up && (pos != 0)) {
 		parentsChildren.move(pos, pos-1);
