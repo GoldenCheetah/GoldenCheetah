@@ -127,27 +127,27 @@ operator<<(QTextStream& out, const EquipmentDistanceItem& eqNode) {
 EquipmentTimeItem::EquipmentTimeItem(const QString& description, const QString& notes) :
 	EquipmentNode(), description_(description), notes_(notes)
 {
-	startDate_ = QDateTime(QDate::currentDate().startOfDay());
-	replacementDate_ = QDateTime();
+	start_ = QDateTime(QDate::currentDate().startOfDay());
+	replace_ = QDateTime();
 }
 
 EquipmentTimeItem::EquipmentTimeItem(const QString& description, const QString& notes,
-		const QDateTime& startDate,	const QDateTime& replacementDate) :
+		const QDateTime& start,	const QDateTime& replace) :
 	EquipmentNode(), description_(description), notes_(notes),
-	startDate_(startDate)
+	start_(start)
 {
-	replacementDate_ = (replacementDate.isNull()) ? QDateTime(QDate::currentDate().endOfDay()) : replacementDate;
+	replace_ = (replace.isNull()) ? QDateTime(QDate::currentDate().endOfDay()) : replace;
 }
 
 bool
 EquipmentTimeItem::overTime() const {
-	return (QDateTime::currentDateTime().daysTo(replacementDate_) < 0);
+	return (QDateTime::currentDateTime().daysTo(replace_) < 0);
 }
 
 QVariant
 EquipmentTimeItem::data(int /*column*/) const {
 
-	return description_ + " <" + QVariant(abs(QDateTime::currentDateTime().daysTo(replacementDate_))).toString() + " days>";
+	return description_ + " <" + QVariant(abs(QDateTime::currentDateTime().daysTo(replace_))).toString() + " days>";
 }
 
 QTextStream&
@@ -159,9 +159,9 @@ operator<<(QTextStream& out, const EquipmentTimeItem& eqNode) {
 		out << "parentId=\"eqRootNode\" ";
 	else
 		out << "parentId=\"" << eqNode.parentItem_ << "\" ";
-	out << "startDate=\"" << eqNode.startDate_.toString() << "\" ";
-	if (!eqNode.replacementDate_.isNull()) {
-		out << "replaceDate=\"" << eqNode.replacementDate_.toString() << "\" ";
+	out << "start=\"" << eqNode.start_.toString() << "\" ";
+	if (!eqNode.replace_.isNull()) {
+		out << "replaceDate=\"" << eqNode.replace_.toString() << "\" ";
 	}
 	if (!eqNode.description_.isEmpty()) {
 		out << "desc=\"" << Utils::xmlprotect(eqNode.description_) << "\" ";
@@ -174,60 +174,67 @@ operator<<(QTextStream& out, const EquipmentTimeItem& eqNode) {
 	return out;
 }
 
-// ---------------------------------- Equipment Time Span  ---------------------------------
-
-EquipTimeSpan::EquipTimeSpan() :
-	EquipmentNode()
-{
-	start_ = QDateTime(QDate::currentDate().startOfDay());
-}
-
-EquipTimeSpan::EquipTimeSpan(const QDateTime& start, const QString& notes, const QDateTime& end) :
-	EquipmentNode(), start_(start), end_(end), notes_(notes)
-{
-}
-
-bool
-EquipTimeSpan::isWithin(const QDateTime& time) const {
-
-	return (((start_ <= time) && end_.isNull()) ||
-			((start_ <= time) && (time < end_)));
-}
-
-QVariant
-EquipTimeSpan::data(int /*column*/) const {
-    return start_.toString("d MMM yyyy") + " -> " + end_.toString("d MMM yyyy");
-}
-
-QTextStream&operator<<(QTextStream& out, const EquipTimeSpan& eqTs) {
-
-	out << "<eqTSp "
-		<< "id=\"" << &eqTs << "\" "
-		<< "parentId=\"" << eqTs.parentItem_ << "\" "
-		<< "start=\"" << eqTs.start_.toString() << "\" ";
-	if (!eqTs.end_.isNull()) {
-		out << "end=\"" << eqTs.end_.toString() << "\" ";
-	}
-	if (!eqTs.notes_.isEmpty()) {
-		out << "notes=\"" << Utils::xmlprotect(eqTs.notes_) << "\" ";
-	}
-	out << "/>\n";
-
-    return out;
-}
-
 
 // ---------------------------------- Equipment Reference  ---------------------------------
 
-EquipmentRef::EquipmentRef(double refDistance /* = 0 */) :
-	EquipmentNode(), eqDistNode_(nullptr), refDistanceCovered_(refDistance)
+EquipmentRef::EquipmentRef() :
+	EquipmentNode(), eqDistNode_(nullptr), refDistanceCovered_(0),
+	start_(QDateTime()), end_(QDateTime()), notes_(QString())
+{
+}
+
+EquipmentRef::EquipmentRef(double refDistance, const QDateTime& start,
+							const QDateTime& end, const QString& notes) :
+	EquipmentNode(), eqDistNode_(nullptr), refDistanceCovered_(refDistance),
+	start_(start), end_(end), notes_(notes)
 {
 }
 
 QVariant
 EquipmentRef::data(int /*column*/) const {
 
-	return (eqDistNode_) ? eqDistNode_->description_ + " [" + QString::number(refDistanceCovered_, 'f', 0) + "]" : tr("Referenced Equipment Missing!");
+	QString dataString;
+
+	// use ':' to split date & equipment text in equipment navigator
+	if (start_.isNull())
+		if (!end_.isNull())
+			dataString += end_.toString("->d MMM yyyy: ");
+		else
+			;
+	else
+		if (end_.isNull())
+			dataString += start_.toString("d MMM yyyy->: ");
+		else
+			dataString += start_.toString("d MMM yyyy->") + end_.toString("d MMM yyyy: ");
+
+	dataString += (eqDistNode_) ? eqDistNode_->description_ + " [" + QString::number(refDistanceCovered_, 'f', 0) + "]" : tr("Referenced Equipment Missing!");
+
+	return dataString;
+}
+
+bool
+EquipmentRef::rangeIsValid() const {
+
+	if (!start_.isNull() && (!end_.isNull()))
+		return end_ >= start_;
+	else
+		return true;
+}
+
+
+bool
+EquipmentRef::isWithin(const QDateTime& time) const {
+
+	if (start_.isNull())
+		if (end_.isNull())
+			return true; // no range set
+		else
+			return (time < end_); // end set but not beginning !
+	else
+		if (end_.isNull())
+			return (start_ <= time);
+		else
+			return (start_ <= time) && (time < end_);
 }
 
 void
@@ -253,6 +260,15 @@ QTextStream& operator<<(QTextStream& out, const EquipmentRef& eqRef)
 		out << "eqId=\"eqReferenceMissing\" ";
 	if (eqRef.refDistanceCovered_ != 0) {
 		out << "refDist=\"" << eqRef.refDistanceCovered_ << "\" ";
+	}
+	if (!eqRef.start_.isNull()) {
+		out << "start=\"" << eqRef.start_.toString() << "\" ";
+	}
+	if (!eqRef.end_.isNull()) {
+		out << "end=\"" << eqRef.end_.toString() << "\" ";
+	}
+	if (!eqRef.notes_.isEmpty()) {
+		out << "notes=\"" << Utils::xmlprotect(eqRef.notes_) << "\" ";
 	}
 	out << "/>\n";
 

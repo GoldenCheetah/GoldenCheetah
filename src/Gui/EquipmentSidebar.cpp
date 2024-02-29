@@ -211,7 +211,6 @@ EquipmentSidebar::showEquipmentMenu(const QPoint &pos)
     if (currentEqItem_ != nullptr) {
 
 		QAction* addEquipment = nullptr;
-		QAction* addTSEquipment = nullptr;
 		QAction* addTimeEquipment = nullptr;
 		QAction* deleteEquipment = nullptr;
 
@@ -219,16 +218,11 @@ EquipmentSidebar::showEquipmentMenu(const QPoint &pos)
 
 			// Activity Trees
 			case eqNodeType::EQ_LINK: {
-				addTSEquipment = new QAction(tr("Add Time Span"), equipmentNavigator_);
-				deleteEquipment = new QAction(tr("Delete"), equipmentNavigator_);
-			} break;
-
-			case eqNodeType::EQ_TIME_SPAN: {
 				deleteEquipment = new QAction(tr("Delete"), equipmentNavigator_);
 			} break;
 
 			case eqNodeType::EQ_ITEM_REF: {
-				deleteEquipment = new QAction(tr("Remove Reference(s)"), equipmentNavigator_);
+				deleteEquipment = new QAction(tr("Remove Reference"), equipmentNavigator_);
 			} break;
 
 			case eqNodeType::EQ_TIME_ITEM:
@@ -245,10 +239,7 @@ EquipmentSidebar::showEquipmentMenu(const QPoint &pos)
 		}
 
 		QMenu menu(this);
-		if (addTSEquipment) {
-			connect(addTSEquipment, SIGNAL(triggered(void)), this, SLOT(addTimeSpanHandler()));
-			menu.addAction(addTSEquipment);
-		}
+
 		if (addEquipment) {
 			connect(addEquipment, SIGNAL(triggered(void)), this, SLOT(addEquipmentHandler()));
 			menu.addAction(addEquipment);
@@ -277,6 +268,12 @@ EquipmentSidebar::showEquipmentMenu(const QPoint &pos)
 			menu.addAction(downEquipment);
 		}
 
+		if (currentEqItem_->getParentItem()->getEqNodeType() != eqNodeType::EQ_ROOT) {
+			QAction* leftShiftEquipment = new QAction(tr("Shift Left"), equipmentNavigator_);
+			connect(leftShiftEquipment, SIGNAL(triggered(void)), this, SLOT(leftShiftEquipmentHandler()));
+			menu.addAction(leftShiftEquipment);
+		}
+		
 		menu.exec(pos);
     }
 }
@@ -292,23 +289,21 @@ EquipmentSidebar::addEquipmentTimeHandler() {
 }
 
 void
-EquipmentSidebar::addTimeSpanHandler() {
-	context_->notifyEquipmentAdded(currentEqItem_, static_cast<int>(eqNodeType::EQ_TIME_SPAN));
-}
-
-void
 EquipmentSidebar::deleteEquipmentHandler() {
 	context_->notifyEquipmentDeleted(currentEqItem_, warnOnEqDelete_);
 }
 
 void
 EquipmentSidebar::moveUpEquipmentHandler() {
-	context_->notifyEquipmentMove(currentEqItem_, eqListView_, true);
+	context_->notifyEquipmentMove(currentEqItem_, eqListView_, static_cast<int>(eqNodeMoveType::EQ_UP));
 }
 
 void
 EquipmentSidebar::moveDownEquipmentHandler() {
-	context_->notifyEquipmentMove(currentEqItem_, eqListView_, false);
+	context_->notifyEquipmentMove(currentEqItem_, eqListView_, static_cast<int>(eqNodeMoveType::EQ_DOWN));
 }
 
-
+void
+EquipmentSidebar::leftShiftEquipmentHandler() {
+	context_->notifyEquipmentMove(currentEqItem_, eqListView_, static_cast<int>(eqNodeMoveType::EQ_LEFT_SHIFT));
+}

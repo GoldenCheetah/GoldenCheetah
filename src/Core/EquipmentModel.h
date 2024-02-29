@@ -22,13 +22,13 @@
 #include "GoldenCheetah.h"
 #include "EquipmentNode.h"
 
-//#include <QXmlDefaultHandler>
-//#include <QTextStream>
 #include <QAbstractItemModel>
 #include <QModelIndex>
 #include <QVariant>
 
 class EquipmentModelManager;
+
+enum class eqNodeMoveType { EQ_UP, EQ_DOWN, EQ_LEFT_SHIFT };
 
 class EquipmentModel : public QAbstractItemModel
 {
@@ -68,7 +68,7 @@ class EquipmentModel : public QAbstractItemModel
 		void completeDropMimeData(EquipmentNode* draggedNode, int droppedRow, EquipmentNode* droppedOnNode, const QModelIndex& droppedOnNodeIdx);
 
 		void equipmentAdded(EquipmentNode* eqParent, int eqToAdd);
-		void equipmentMove(EquipmentNode* eqNode, bool up);
+		void equipmentMove(EquipmentNode* eqNode, int move);
 		void addChildToParent(EquipmentNode* eqChild, EquipmentNode* eqParent);
 
 		void removeEquipment(EquipmentNode* eqNode);
@@ -81,7 +81,7 @@ class EquipmentModel : public QAbstractItemModel
 
 		// Creating a reference copy of the Equipment Item tree
 		void createReferenceCopy(EquipmentNode* copyNode, int destRow, EquipmentNode* destNode, const QModelIndex& destIdx);
-		EquipmentNode* copyItemTreeToRefTree(EquipmentNode* copyNodeTree); // recursive
+		EquipmentNode* copyNodeTreeToFlatRefs(EquipmentNode* copyNodeTree, int destRow, EquipmentNode* destNode, const QModelIndex& destIdx); // recursive
 
 		// for debugging
 		void printfTree(int depth, EquipmentNode* eqNodeTree); // recursive

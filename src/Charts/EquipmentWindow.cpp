@@ -46,7 +46,6 @@ EquipmentWindow::EquipmentWindow(Context *context) :
 	stackedWidget_->addWidget(new QLabel()); // blank page
 	stackedWidget_->addWidget(createWidsEquipmentDistanceItem());
 	stackedWidget_->addWidget(createWidsEquipmentTimeItem());
-	stackedWidget_->addWidget(createWidsTimeSpan());
 	stackedWidget_->addWidget(createWidsReference());
 	stackedWidget_->addWidget(createWidsEquipmentLink());
 
@@ -145,13 +144,8 @@ EquipmentWindow::updateEquipmentDisplay()
 			displayEquipmentLink(static_cast<EquipmentLink*>(selectedNode_));
 		} break;
 
-		case eqNodeType::EQ_TIME_SPAN: {
-			displayTimeSpan(static_cast<EquipTimeSpan*>(selectedNode_));
-		} break;
-
 		case eqNodeType::EQ_ITEM_REF: {
 			displayReference(static_cast<EquipmentRef*>(selectedNode_));
-			hideButtons = true;
 		} break;
 
 		case eqNodeType::EQ_DIST_ITEM: {
@@ -261,18 +255,18 @@ EquipmentWindow::displayEquipmentTimeItem(EquipmentTimeItem* eqNode) {
 	static_cast<QLineEdit*>(pageWids[1].fieldPtr)->setText(eqNode->description_);
 
 	// Setting null QDateTime doesn't reset the QDateTimeEdit field
-	if (eqNode->startDate_.isNull()) {
+	if (eqNode->start_.isNull()) {
 		static_cast<QDateTimeEdit*>(pageWids[2].fieldPtr)->setDateTime(QDateTime(QDate::currentDate().startOfDay()));
 	}
 	else {
-		static_cast<QDateTimeEdit*>(pageWids[2].fieldPtr)->setDateTime(eqNode->startDate_);
+		static_cast<QDateTimeEdit*>(pageWids[2].fieldPtr)->setDateTime(eqNode->start_);
 	}
 
-	if (eqNode->replacementDate_.isNull()) {
+	if (eqNode->replace_.isNull()) {
 		static_cast<QDateTimeEdit*>(pageWids[3].fieldPtr)->setDateTime(QDateTime(QDate::currentDate().endOfDay()));
 	}
 	else {
-		static_cast<QDateTimeEdit*>(pageWids[3].fieldPtr)->setDateTime(eqNode->replacementDate_);
+		static_cast<QDateTimeEdit*>(pageWids[3].fieldPtr)->setDateTime(eqNode->replace_);
 	}
 	static_cast<QPlainTextEdit*>(pageWids[4].fieldPtr)->setPlainText(eqNode->notes_);
 
@@ -285,78 +279,9 @@ EquipmentWindow::saveEquipmentTimeItem(EquipmentTimeItem* eqNode) {
 	QVector< widgetMapType>& pageWids = equipWids_[eqWinType::EQUIPMENT_TIME_PAGE];
 
 	eqNode->description_ = static_cast<QLineEdit*>(pageWids[1].fieldPtr)->text();
-	eqNode->startDate_ = static_cast<QDateTimeEdit*>(pageWids[2].fieldPtr)->dateTime();
-	eqNode->replacementDate_ = static_cast<QDateTimeEdit*>(pageWids[3].fieldPtr)->dateTime();
+	eqNode->start_ = static_cast<QDateTimeEdit*>(pageWids[2].fieldPtr)->dateTime();
+	eqNode->replace_ = static_cast<QDateTimeEdit*>(pageWids[3].fieldPtr)->dateTime();
 	eqNode->notes_ = static_cast<QPlainTextEdit*>(pageWids[4].fieldPtr)->toPlainText();
-}
-
-// ----------------------------- Equipment Time Span ------------------------------------
-
-QWidget*
-EquipmentWindow::createWidsTimeSpan() {
-
-	QVector< widgetMapType> pageWids;
-
-	pageWids.push_back(struct widgetMapType { new QLabel(), new QLabel(tr("Time Span")), false });
-	pageWids.push_back(struct widgetMapType { new QLabel(tr("Start Date")), new QDateTimeEdit(), true });
-	pageWids.push_back(struct widgetMapType { new QLabel(""), new QCheckBox(tr("No End Date")), true });
-	pageWids.push_back(struct widgetMapType { new QLabel(tr("End Date")), new QDateTimeEdit(), true });
-	pageWids.push_back(struct widgetMapType { new QLabel(tr("Notes")), new QPlainTextEdit(), true });
-
-
-	static_cast<QDateTimeEdit*>(pageWids[1].fieldPtr)->setCalendarPopup(true);
-	connect(static_cast<QCheckBox*>(pageWids[2].fieldPtr), SIGNAL(stateChanged(int)), this, SLOT(endDateTimeStateChanged(int)));
-	static_cast<QDateTimeEdit*>(pageWids[3].fieldPtr)->setCalendarPopup(true);
-
-	equipWids_[eqWinType::TIME_SPAN_PAGE] = pageWids;
-
-	return setupWids(pageWids);
-}
-
-void
-EquipmentWindow::endDateTimeStateChanged(int checkState) {
-
-	QVector< widgetMapType>& pageWids = equipWids_[eqWinType::TIME_SPAN_PAGE];
-
-	static_cast<QDateTimeEdit*>(pageWids[3].labelPtr)->setHidden(checkState == Qt::Checked);
-	static_cast<QDateTimeEdit*>(pageWids[3].fieldPtr)->setHidden(checkState == Qt::Checked);
-}
-
-void
-EquipmentWindow::displayTimeSpan(EquipTimeSpan* eqTimeSpan) {
-
-	QVector< widgetMapType>& pageWids = equipWids_[eqWinType::TIME_SPAN_PAGE];
-
-	static_cast<QDateTimeEdit*>(pageWids[1].fieldPtr)->setDateTime(eqTimeSpan->start_);
-
-	Qt::CheckState state = (eqTimeSpan->endIsNull()) ? Qt::Checked : Qt::Unchecked;
-	static_cast<QCheckBox*>(pageWids[2].fieldPtr)->setCheckState(state);
-
-	// Setting null QDateTime doesn't reset the QDateTimeEdit field
-	if (eqTimeSpan->end_.isNull()) {
-		static_cast<QDateTimeEdit*>(pageWids[3].fieldPtr)->setDateTime(QDateTime(QDate::currentDate().endOfDay()));
-	}
-	else {
-		static_cast<QDateTimeEdit*>(pageWids[3].fieldPtr)->setDateTime(eqTimeSpan->end_);
-	}
-	static_cast<QPlainTextEdit*>(pageWids[4].fieldPtr)->setPlainText(eqTimeSpan->notes_);
-
-	stackedWidget_->setCurrentIndex(int(eqWinType::TIME_SPAN_PAGE));
-}
-
-void
-EquipmentWindow::saveTimeSpan(EquipTimeSpan* eqTimeSpan) {
-
-	QVector< widgetMapType>& pageWids = equipWids_[eqWinType::TIME_SPAN_PAGE];
-
-	eqTimeSpan->start_ = static_cast<QDateTimeEdit*>(pageWids[1].fieldPtr)->dateTime();
-
-	if (static_cast<QCheckBox*>(pageWids[2].fieldPtr)->checkState() == Qt::Checked) {
-		eqTimeSpan->end_ = QDateTime();
-	} else {
-		eqTimeSpan->end_ = static_cast<QDateTimeEdit*>(pageWids[3].fieldPtr)->dateTime();
-	}
-	eqTimeSpan->notes_ = static_cast<QPlainTextEdit*>(pageWids[4].fieldPtr)->toPlainText();
 }
 
 // ----------------------------- Equipment Reference  ------------------------------------
@@ -369,10 +294,41 @@ EquipmentWindow::createWidsReference() {
 	pageWids.push_back(struct widgetMapType { new QLabel(), new QLabel(tr("Distance Equipment Reference")), false });
 	pageWids.push_back(struct widgetMapType { new QLabel(tr("Description")), new QLineEdit(), false	});
 	pageWids.push_back(struct widgetMapType { new QLabel(tr("Reference Distance")), new QLineEdit(), false });
+	pageWids.push_back(struct widgetMapType { new QLabel(""), new QCheckBox(tr("Start Date")), true });
+	pageWids.push_back(struct widgetMapType { new QLabel(tr("Start Date")), new QDateTimeEdit(), true });
+	pageWids.push_back(struct widgetMapType { new QLabel(""), new QCheckBox(tr("End Date")), true });
+	pageWids.push_back(struct widgetMapType { new QLabel(tr("End Date")), new QDateTimeEdit(), true });
+	pageWids.push_back(struct widgetMapType { new QLabel(tr("Notes")), new QPlainTextEdit(), true });
+
+	connect(static_cast<QCheckBox*>(pageWids[3].fieldPtr), SIGNAL(stateChanged(int)), this, SLOT(startDateTimeStateChanged(int)));
+	static_cast<QDateTimeEdit*>(pageWids[4].fieldPtr)->setCalendarPopup(true);
+	connect(static_cast<QCheckBox*>(pageWids[5].fieldPtr), SIGNAL(stateChanged(int)), this, SLOT(endDateTimeStateChanged(int)));
+	static_cast<QDateTimeEdit*>(pageWids[6].fieldPtr)->setCalendarPopup(true);
 
 	equipWids_[eqWinType::REFERENCE_PAGE] = pageWids;
 
+	startDateTimeStateChanged(Qt::Unchecked);
+	endDateTimeStateChanged(Qt::Unchecked);
+
 	return setupWids(pageWids);
+}
+
+void
+EquipmentWindow::startDateTimeStateChanged(int checkState) {
+
+	QVector< widgetMapType>& pageWids = equipWids_[eqWinType::REFERENCE_PAGE];
+
+	static_cast<QDateTimeEdit*>(pageWids[4].labelPtr)->setHidden(checkState == Qt::Unchecked);
+	static_cast<QDateTimeEdit*>(pageWids[4].fieldPtr)->setHidden(checkState == Qt::Unchecked);
+}
+
+void
+EquipmentWindow::endDateTimeStateChanged(int checkState) {
+
+	QVector< widgetMapType>& pageWids = equipWids_[eqWinType::REFERENCE_PAGE];
+
+	static_cast<QDateTimeEdit*>(pageWids[6].labelPtr)->setHidden(checkState == Qt::Unchecked);
+	static_cast<QDateTimeEdit*>(pageWids[6].fieldPtr)->setHidden(checkState == Qt::Unchecked);
 }
 
 void
@@ -393,7 +349,49 @@ EquipmentWindow::displayReference(EquipmentRef* eqRef) {
 		static_cast<QLineEdit*>(pageWids[1].fieldPtr)->setText(tr("Referenced Equipment Missing!"));
 	}
 
+	Qt::CheckState state = (eqRef->startNotSet()) ? Qt::Unchecked : Qt::Checked;
+	static_cast<QCheckBox*>(pageWids[3].fieldPtr)->setCheckState(state);
+
+	// Setting null QDateTime doesn't reset the QDateTimeEdit field
+	if (eqRef->start_.isNull())
+		static_cast<QDateTimeEdit*>(pageWids[4].fieldPtr)->setDateTime(QDateTime(QDate::currentDate().startOfDay()));
+	else
+		static_cast<QDateTimeEdit*>(pageWids[4].fieldPtr)->setDateTime(eqRef->start_);
+
+	state = (eqRef->endNotSet()) ? Qt::Unchecked : Qt::Checked;
+	static_cast<QCheckBox*>(pageWids[5].fieldPtr)->setCheckState(state);
+
+	// Setting null QDateTime doesn't reset the QDateTimeEdit field
+	if (eqRef->end_.isNull())
+		static_cast<QDateTimeEdit*>(pageWids[6].fieldPtr)->setDateTime(QDateTime(QDate::currentDate().endOfDay()));
+	else
+		static_cast<QDateTimeEdit*>(pageWids[6].fieldPtr)->setDateTime(eqRef->end_);
+
+	static_cast<QPlainTextEdit*>(pageWids[7].fieldPtr)->setPlainText(eqRef->notes_);
+
 	stackedWidget_->setCurrentIndex(int(eqWinType::REFERENCE_PAGE));
+}
+
+void
+EquipmentWindow::saveReference(EquipmentRef* eqRef) {
+
+	QVector< widgetMapType>& pageWids = equipWids_[eqWinType::REFERENCE_PAGE];
+
+	if (static_cast<QCheckBox*>(pageWids[3].fieldPtr)->checkState() == Qt::Unchecked) {
+		eqRef->start_ = QDateTime();
+	}
+	else {
+		eqRef->start_ = static_cast<QDateTimeEdit*>(pageWids[4].fieldPtr)->dateTime();
+	}
+
+	if (static_cast<QCheckBox*>(pageWids[5].fieldPtr)->checkState() == Qt::Unchecked) {
+		eqRef->end_ = QDateTime();
+	}
+	else {
+		eqRef->end_ = static_cast<QDateTimeEdit*>(pageWids[6].fieldPtr)->dateTime();
+	}
+
+	eqRef->notes_ = static_cast<QPlainTextEdit*>(pageWids[7].fieldPtr)->toPlainText();
 }
 
 // ----------------------------- Activity Link  ------------------------------------
@@ -537,16 +535,16 @@ EquipmentWindow::saveButtonClicked() {
 			saveEquipmentLink(static_cast<EquipmentLink*>(selectedNode_));
 		} break;
 
-		case eqNodeType::EQ_TIME_SPAN: {
-			saveTimeSpan(static_cast<EquipTimeSpan*>(selectedNode_));
-		} break;
-
 		case eqNodeType::EQ_DIST_ITEM: {
 			saveEquipmentDistanceItem(static_cast<EquipmentDistanceItem*>(selectedNode_));
 		} break;
 
 		case eqNodeType::EQ_TIME_ITEM: {
 			saveEquipmentTimeItem(static_cast<EquipmentTimeItem*>(selectedNode_));
+		} break;
+
+		case eqNodeType::EQ_ITEM_REF: {
+			saveReference(static_cast<EquipmentRef*>(selectedNode_));
 		} break;
 
 		// all other equipment types are read-only

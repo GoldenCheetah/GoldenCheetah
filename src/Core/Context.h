@@ -255,7 +255,7 @@ class Context : public QObject
         void notifyEquipmentSelected(EquipmentNode* eqNode, bool eqListView) { equipmentSelected(eqNode, eqListView); }
         void notifyEquipmentAdded(EquipmentNode* eqParent, int eqToAdd) { equipmentAdded(eqParent, eqToAdd); }
         void notifyEquipmentDeleted(EquipmentNode* eqNode, bool warnOnEqDelete) { equipmentDeleted(eqNode, warnOnEqDelete); }
-		void notifyEquipmentMove(EquipmentNode* eqNode, bool eqListView, bool up) { equipmentMove(eqNode, eqListView, up); }
+		void notifyEquipmentMove(EquipmentNode* eqNode, bool eqListView, int move) { equipmentMove(eqNode, eqListView, move); }
         void notifyEqRecalculationStart() { eqRecalculationStart(); }
 		void notifyEqRecalculationEnd() { eqRecalculationEnd(); }
 		void notifyUpdateEqSettings(bool load) { updateEqSettings(load); }
@@ -353,7 +353,7 @@ class Context : public QObject
         void equipmentSelected(EquipmentNode* eqNode, bool eqListView);
         void equipmentAdded(EquipmentNode*, int eqToAdd);
 		void equipmentDeleted(EquipmentNode*, bool warnOnEqDelete);
-		void equipmentMove(EquipmentNode* eqNode, bool eqListView, bool up);
+		void equipmentMove(EquipmentNode* eqNode, bool eqListView, int move);
         void eqRecalculationStart();
 		void eqRecalculationEnd();
 		void updateEqSettings(bool load);

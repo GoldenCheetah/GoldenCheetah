@@ -24,7 +24,7 @@
 #include <iostream>
 #include <memory>
 
-enum class eqNodeType { EQ_ROOT, EQ_DIST_ITEM, EQ_TIME_ITEM, EQ_TIME_SPAN, EQ_ITEM_REF, EQ_LINK };
+enum class eqNodeType { EQ_ROOT, EQ_DIST_ITEM, EQ_TIME_ITEM, EQ_ITEM_REF, EQ_LINK };
 
 // Abstract Node class, providing the tree connection and maintenance functions
 class EquipmentNode : public QObject
@@ -58,9 +58,9 @@ public:
 
 protected:
 
-    // Tree structure pointers
-    EquipmentNode* parentItem_;
-    QVector<EquipmentNode*> childItems_;
+	// Tree structure pointers
+	EquipmentNode* parentItem_;
+	QVector<EquipmentNode*> childItems_;
 };
 
 
@@ -78,7 +78,7 @@ public:
 	bool getMetricUnits() const { return metricUnits_; }
 
 	virtual eqNodeType getEqNodeType() const { return eqNodeType::EQ_ROOT; }
-	virtual QVariant data(int /* column */ ) const override { return "Root"; }
+	virtual QVariant data(int /* column */) const override { return "Root"; }
 
 protected:
 	// The last time the tree's nodes were recalculated.
@@ -94,12 +94,12 @@ class EquipmentDistanceItem : public EquipmentNode
 {
 public:
 
-    EquipmentDistanceItem(const QString& description, const QString& notes, double nonGCDistance = 0,
-					double gcDistance=0, double replacementDistance=0);
+	EquipmentDistanceItem(const QString& description, const QString& notes, double nonGCDistance = 0,
+							double gcDistance = 0, double replacementDistance = 0);
 	virtual ~EquipmentDistanceItem() {};
 
-    virtual eqNodeType getEqNodeType() const { return eqNodeType::EQ_DIST_ITEM; }
-    virtual QVariant data(int column) const;
+	virtual eqNodeType getEqNodeType() const { return eqNodeType::EQ_DIST_ITEM; }
+	virtual QVariant data(int column) const;
 
 	void resetDistanceCovered();
 	void incrementDistanceCovered(double addDistance);
@@ -116,7 +116,7 @@ public:
 
 	QVector<EquipmentNode*> linkedRefs_;
 
-    friend QTextStream& operator<<(QTextStream& out, const EquipmentDistanceItem& eqNode);
+	friend QTextStream& operator<<(QTextStream& out, const EquipmentDistanceItem& eqNode);
 
 protected:
 	double nonGCDistance_;
@@ -132,7 +132,7 @@ class EquipmentTimeItem : public EquipmentNode
 public:
 	EquipmentTimeItem(const QString& description, const QString& notes);
 	EquipmentTimeItem(const QString& description, const QString& notes,
-		const QDateTime& startDate, const QDateTime& replacementDate = QDateTime());
+					const QDateTime& start, const QDateTime& replace = QDateTime());
 	virtual ~EquipmentTimeItem() {};
 
 	virtual eqNodeType getEqNodeType() const { return eqNodeType::EQ_TIME_ITEM; }
@@ -142,40 +142,20 @@ public:
 	// Equipment description
 	QString description_;
 	QString notes_;
-	QDateTime startDate_;
-	QDateTime replacementDate_;
+	QDateTime start_;
+	QDateTime replace_;
 
 	friend QTextStream& operator<<(QTextStream& out, const EquipmentTimeItem& eqNode);
 };
 
 
-// Provides a mechanism to assign a time span to an equipment usage.
-class EquipTimeSpan : public EquipmentNode
-{
-public:
-	EquipTimeSpan();
-	EquipTimeSpan(const QDateTime& start, const QString& notes = QString(), const QDateTime& end = QDateTime());
-	virtual ~EquipTimeSpan() {};
-
-	virtual eqNodeType getEqNodeType() const { return eqNodeType::EQ_TIME_SPAN; }
-	virtual QVariant data(int column) const override;
-
-	bool isWithin(const QDateTime& time) const;
-    bool endIsNull() const { return end_.isNull(); }
-
-	QString notes_;
-	QDateTime start_;
-	QDateTime end_;
-
-    friend QTextStream& operator<<(QTextStream& out, const EquipTimeSpan& equipUse);
-};
-
-
-// Holds a reference
+// Holds an equipment reference, plus an optional time span for the equipment's usage
 class EquipmentRef : public EquipmentNode
 {
 public:
-	EquipmentRef(double refDistance = 0);
+	EquipmentRef();
+	EquipmentRef(double refDistance, const QDateTime& start,
+				const QDateTime& end, const QString& notes);
 	virtual ~EquipmentRef() {};
 
 	virtual eqNodeType getEqNodeType() const { return eqNodeType::EQ_ITEM_REF; }
@@ -184,16 +164,23 @@ public:
 	void resetRefDistanceCovered() { refDistanceCovered_ = 0; }
 	void incrementDistanceCovered(double addDistance); // Atomic safe 
 	double getRefDistanceCovered() const { return refDistanceCovered_; }
-	
+
+	bool rangeIsValid() const;
+	bool isWithin(const QDateTime& time) const;
+	bool startNotSet() const { return start_.isNull(); }
+	bool endNotSet() const { return end_.isNull(); }
+
 	// Reference back to the equipment
 	EquipmentDistanceItem* eqDistNode_;
+	QString notes_;
+	QDateTime start_;
+	QDateTime end_;
 
 	friend QTextStream& operator<<(QTextStream& out, const EquipmentRef& eqRef);
 
 protected:
 
 	std::atomic<double> refDistanceCovered_;
-
 };
 
 
@@ -202,27 +189,27 @@ class EquipmentLink : public EquipmentNode
 {
 public:
 
-    EquipmentLink(const QString& eqLinkName, const QString& description);
+	EquipmentLink(const QString& eqLinkName, const QString& description);
 	virtual ~EquipmentLink() {};
 
-    virtual eqNodeType getEqNodeType() const { return eqNodeType::EQ_LINK; }
-    virtual QVariant data(int column) const override;
+	virtual eqNodeType getEqNodeType() const { return eqNodeType::EQ_LINK; }
+	virtual QVariant data(int column) const override;
 
-    QString getEqLinkName() const { return eqLinkName_; }
-    void setEqLinkName(const QString& eqLinkName) { eqLinkName_ = eqLinkName; }
+	QString getEqLinkName() const { return eqLinkName_; }
+	void setEqLinkName(const QString& eqLinkName) { eqLinkName_ = eqLinkName; }
 
 	// Equipment Link description
 	QString description_;
 
-    friend QTextStream& operator<<(QTextStream& out, const EquipmentLink& equipItem);
+	friend QTextStream& operator<<(QTextStream& out, const EquipmentLink& equipItem);
 
 protected:
 
-    // This field "links" to the ride/activity Metadata
-    QString eqLinkName_;
+	// This field "links" to the ride/activity Metadata
+	QString eqLinkName_;
 };
 
 Q_DECLARE_OPAQUE_POINTER(EquipmentNode*);
 Q_DECLARE_METATYPE(EquipmentNode*)
- 
+
 #endif // _GC_EquipmentNode_h

@@ -102,7 +102,7 @@ class EquipmentModelManager : public QObject
 		void eqRecalculationStart();
 		void equipmentAdded(EquipmentNode* eqParent, int eqToAdd);
 		void equipmentDeleted(EquipmentNode* eqNode, bool warnOnEqDelete);
-		void equipmentMove(EquipmentNode* eqNode, bool eqListView, bool up);
+		void equipmentMove(EquipmentNode* eqNode, bool eqListView, int move);
 
 	protected:
 
@@ -111,7 +111,7 @@ class EquipmentModelManager : public QObject
 		// XML input functions
 		bool loadEquipmentFromXML(QVector<flatEqNode>& flatEqNodes, EquipmentRoot* eqRootNode,
 									QVector<flatEqNode>& flatRefNodes, EquipmentRoot* refRootNode);
-		bool createEquipmentTree(QVector<flatEqNode>& flatEqNodes, EquipmentRoot* eqRootNode,
+		bool createEquipmentNodeTree(QVector<flatEqNode>& flatEqNodes, EquipmentRoot* eqRootNode,
 									QVector<flatEqNode>& flatRefNodes, EquipmentRoot* refRootNode);
 
 		// XML output functions
@@ -123,7 +123,7 @@ class EquipmentModelManager : public QObject
 		RideItem* nextRideToCheck();
 		void threadCompleted(EquipmentModelRecalculationThread* thread);
 		void ResetTreeNodesBelowEqNode(EquipmentNode* eqNodeTree); // recursive
-		void applyDistanceToRefTreeNodes(EquipmentNode* eqNodeTree, const double dist, const bool incTopEqRef); // recursive
+		void applyDistanceToRefTreeNodes(EquipmentNode* eqNodeTree, const double dist); // recursive
 
 		// Equipment distance recalculation
 		QMutex updateMutex_;

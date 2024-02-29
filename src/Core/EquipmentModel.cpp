@@ -189,15 +189,6 @@ EquipmentModel::dropMimeData(const QMimeData* mimeData, Qt::DropAction action, i
         switch (draggedNode->getEqNodeType()) {
 
 			case eqNodeType::EQ_ITEM_REF: {
-				if ((droppedOnNode->getEqNodeType() == eqNodeType::EQ_ITEM_REF) ||
-					(droppedOnNode->getEqNodeType() == eqNodeType::EQ_TIME_SPAN) ||
-					(droppedOnNode->getEqNodeType() == eqNodeType::EQ_LINK)) {
-
-					completeDropMimeData(draggedNode, row, droppedOnNode, parent);
-				}
-			} break;
-
-			case eqNodeType::EQ_TIME_SPAN: {
 				if (droppedOnNode->getEqNodeType() == eqNodeType::EQ_LINK) {
 
 					completeDropMimeData(draggedNode, row, droppedOnNode, parent);
@@ -210,9 +201,7 @@ EquipmentModel::dropMimeData(const QMimeData* mimeData, Qt::DropAction action, i
 
 					completeDropMimeData(draggedNode, row, droppedOnNode, parent);
 				}
-				else if ((droppedOnNode->getEqNodeType() == eqNodeType::EQ_ITEM_REF) ||
-						(droppedOnNode->getEqNodeType() == eqNodeType::EQ_TIME_SPAN) ||
-						(droppedOnNode->getEqNodeType() == eqNodeType::EQ_LINK)) {
+				else if (droppedOnNode->getEqNodeType() == eqNodeType::EQ_LINK) {
 
 					// Create a reference copy of the node and its children
 					createReferenceCopy(draggedNode, row, droppedOnNode, parent);
@@ -347,14 +336,14 @@ void
 EquipmentModel::createReferenceCopy(EquipmentNode* copyNode, int destRow, EquipmentNode* destNode, const QModelIndex& destIdx) {
 
 	// create copies of the equipment for the equipment reference tree
-	EquipmentNode* refs = copyItemTreeToRefTree(copyNode);
+	EquipmentNode* refs = copyNodeTreeToFlatRefs(copyNode, destRow, destNode, destIdx);
 
 	// insert the equipment copies into the equipment reference tree
 	insertEquipment(refs, destRow, destNode, destIdx);
 }
 
 EquipmentNode* // recursive function! 
-EquipmentModel::copyItemTreeToRefTree(EquipmentNode* copyNodeTree) {
+EquipmentModel::copyNodeTreeToFlatRefs(EquipmentNode* copyNodeTree, int destRow, EquipmentNode* destNode, const QModelIndex& destIdx) {
 
 	// Cannot copy any nodes other than distance items,
 	// as they cannot exist in the equipment references tree.
@@ -370,8 +359,8 @@ EquipmentModel::copyItemTreeToRefTree(EquipmentNode* copyNodeTree) {
 
 		for (EquipmentNode* eqNode : copyNodeTree->getChildren())
 		{
-			EquipmentNode* refChild = copyItemTreeToRefTree(eqNode);
-			if (refChild) addChildToParent(refChild, refNode);
+			EquipmentNode* refChild = copyNodeTreeToFlatRefs(eqNode, destRow, destNode, destIdx);
+			if (refChild) insertEquipment(refChild, destRow, destNode, destIdx);
 		}
 		return refNode;
 	}
@@ -407,9 +396,6 @@ EquipmentModel::printfEquipmentNode(const EquipmentNode* eqNode) const {
 	case eqNodeType::EQ_LINK: {
 		printf("%s\n", static_cast<const EquipmentLink*>(eqNode)->data(1).toString().toStdString().c_str());
 	} break;
-	case eqNodeType::EQ_TIME_SPAN: {
-		printf("%s\n", static_cast<const EquipTimeSpan*>(eqNode)->data(1).toString().toStdString().c_str());
-	} break;
 	case eqNodeType::EQ_DIST_ITEM: {
 		printf("%s\n", static_cast<const EquipmentDistanceItem*>(eqNode)->data(1).toString().toStdString().c_str());
 	} break;
@@ -442,11 +428,6 @@ EquipmentModel::equipmentAdded(EquipmentNode* eqParent, int eqToAdd) {
 		addChildToParent(eqLink, rootItem_);
 	} break;
 
-	case eqNodeType::EQ_TIME_SPAN: {
-		EquipmentNode* eqNode = new EquipTimeSpan();
-		addChildToParent(eqNode, eqParent);
-	} break;
-
 	case eqNodeType::EQ_DIST_ITEM: {
 		EquipmentNode* eqNode = new EquipmentDistanceItem(tr("New Distance Equipment"), "");
 		addChildToParent(eqNode, eqParent);
@@ -472,22 +453,35 @@ EquipmentModel::equipmentAdded(EquipmentNode* eqParent, int eqToAdd) {
 }
 
 void
-EquipmentModel::equipmentMove(EquipmentNode* eqNode, bool up) {
+EquipmentModel::equipmentMove(EquipmentNode* eqNode, int move) {
 
 	emit layoutAboutToBeChanged();
 
 	QVector<EquipmentNode*>& parentsChildren = eqNode->getParentItem()->getChildren();
 	int pos = parentsChildren.indexOf(eqNode);
 
-	if (up && (pos != 0)) {
+	// move up
+	if (static_cast<eqNodeMoveType>(move) == eqNodeMoveType::EQ_UP && (pos != 0)) {
 		parentsChildren.move(pos, pos-1);
 	}
-	if (!up && (pos != parentsChildren.size() - 1)) {
+	// move down
+	if (static_cast<eqNodeMoveType>(move) == eqNodeMoveType::EQ_DOWN && (pos != parentsChildren.size() - 1)) {
 		parentsChildren.move(pos, pos+1);
+	}
+	// left shift so ensure my parent isn't root
+	if ((static_cast<eqNodeMoveType>(move) == eqNodeMoveType::EQ_LEFT_SHIFT) &&
+		(eqNode->getParentItem()->getEqNodeType() != eqNodeType::EQ_ROOT)) {
+
+		// find new parent
+		EquipmentNode* eqNewParent = eqNode->getParentItem()->getParentItem();
+
+		// leave old parent
+		eqNode->getParentItem()->removeChild(eqNode);
+
+		// attach to new parent
+		addChildToParent(eqNode, eqNewParent);
 	}
 
 	emit layoutChanged();
 }
-
-
 

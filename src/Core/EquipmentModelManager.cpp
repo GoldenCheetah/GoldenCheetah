@@ -34,7 +34,7 @@ EquipmentModelManager::EquipmentModelManager(Context* context) :
 	equipModel_ = new EquipmentModel(context);
 	refsModel_ = new EquipmentModel(context);
 
-	// Create temporary storage holder for a flat collection of tree items, once createEquipmentItemTree
+	// Create temporary storage holder for a flat collection of tree nodes, once createEquipmentNodeTree
 	// has created the tree the ownership of the item's memory will be a tree under the model's eqRootNode. 
 	QVector<flatEqNode> flatEqNodes;
 	QVector<flatEqNode> flatRefNodes;
@@ -46,7 +46,7 @@ EquipmentModelManager::EquipmentModelManager(Context* context) :
 	connect(context_, SIGNAL(eqRecalculationStart(void)), this, SLOT(eqRecalculationStart()));
 	connect(context_, SIGNAL(equipmentAdded(EquipmentNode*, int)), this, SLOT(equipmentAdded(EquipmentNode*, int)));
 	connect(context_, SIGNAL(equipmentDeleted(EquipmentNode*, bool)), this, SLOT(equipmentDeleted(EquipmentNode*, bool)));
-	connect(context_, SIGNAL(equipmentMove(EquipmentNode*, bool, bool)), this, SLOT(equipmentMove(EquipmentNode*, bool, bool)));
+	connect(context_, SIGNAL(equipmentMove(EquipmentNode*, bool, int)), this, SLOT(equipmentMove(EquipmentNode*, bool, int)));
 
 	// for debug
 	// printfEquipment();
@@ -107,8 +107,7 @@ EquipmentModelManager::equipmentAdded(EquipmentNode* eqParent, int eqToAdd) {
 
 	switch (eqToAdd) {
 
-	case eqNodeType::EQ_LINK:
-	case eqNodeType::EQ_TIME_SPAN: {
+	case eqNodeType::EQ_LINK: {
 		refsModel_->equipmentAdded(eqParent, eqToAdd);
 	} break;
 
@@ -190,8 +189,7 @@ EquipmentModelManager::equipmentDeleted(EquipmentNode* eqNode, bool warnOnEqDele
 		}
 	} break;
 
-	case eqNodeType::EQ_LINK:
-	case eqNodeType::EQ_TIME_SPAN: {
+	case eqNodeType::EQ_LINK: {
 		if (eqNode->childCount() && warnOnEqDelete) {
 
 			QMessageBox msgBox;
@@ -239,12 +237,12 @@ EquipmentModelManager::equipmentDeleted(EquipmentNode* eqNode, bool warnOnEqDele
 }
 
 void
-EquipmentModelManager::equipmentMove(EquipmentNode* eqNode, bool eqListView, bool up) {
+EquipmentModelManager::equipmentMove(EquipmentNode* eqNode, bool eqListView, int move) {
 	
 	if (eqListView)
-		equipModel_->equipmentMove(eqNode, up);
+		equipModel_->equipmentMove(eqNode, move);
 	else
-		refsModel_->equipmentMove(eqNode, up);
+		refsModel_->equipmentMove(eqNode, move);
 }
 
 void
@@ -348,19 +346,14 @@ EquipmentModelManager::RecalculateEq(RideItem* rideItem)
 
 				for (EquipmentNode* eqNode : rootChild->getChildren()) {
 
-					// If its a time span encompassing the ride/activity time then
-					if (eqNode->getEqNodeType() == eqNodeType::EQ_TIME_SPAN) {
+					if (eqNode->getEqNodeType() == eqNodeType::EQ_ITEM_REF) {
 
-						if (static_cast<EquipTimeSpan*>(eqNode)->isWithin(ref)) {
+						// If its within any defined time span encompassing the ride/activity time then
+						if (static_cast<EquipmentRef*>(eqNode)->isWithin(ref)) {
 
 							// now apply the distance to all the Equipment Items via the tree of references
-							applyDistanceToRefTreeNodes(eqNode, dist, false);
+							applyDistanceToRefTreeNodes(eqNode, dist);
 						}
-					}
-					else if (eqNode->getEqNodeType() == eqNodeType::EQ_ITEM_REF) {
-
-						// now apply the distance to all the Equipment Items via the tree of references
-						applyDistanceToRefTreeNodes(eqNode, dist, true);
 					}
 				}
 			}
@@ -369,7 +362,6 @@ EquipmentModelManager::RecalculateEq(RideItem* rideItem)
 }
 
 // ---------------------------- Recalculation of distances ---------------------------------
-
 
 void // recursive function! 
 EquipmentModelManager::ResetTreeNodesBelowEqNode(EquipmentNode* eqNodeTree) {
@@ -387,15 +379,13 @@ EquipmentModelManager::ResetTreeNodesBelowEqNode(EquipmentNode* eqNodeTree) {
 }
 
 void // recursive function! 
-EquipmentModelManager::applyDistanceToRefTreeNodes(EquipmentNode* eqNodeTree, const double dist, const bool incTopEqRef) {
+EquipmentModelManager::applyDistanceToRefTreeNodes(EquipmentNode* eqNodeTree, const double dist) {
 
-	if (incTopEqRef) static_cast<EquipmentRef*>(eqNodeTree)->incrementDistanceCovered(dist);
+	static_cast<EquipmentRef*>(eqNodeTree)->incrementDistanceCovered(dist);
 
 	for (EquipmentNode* eqNode : eqNodeTree->getChildren())
 	{
-		if (!incTopEqRef) static_cast<EquipmentRef*>(eqNode)->incrementDistanceCovered(dist);
-
-		applyDistanceToRefTreeNodes(eqNode, dist, incTopEqRef);
+		applyDistanceToRefTreeNodes(eqNode, dist);
 	}
 }
 
@@ -444,7 +434,7 @@ EquipmentModelManager::loadEquipmentFromXML(QVector<flatEqNode>& flatEqNodes, Eq
         // parse and instantiate the charts
         xmlReader.parse(source);
 
-        success = createEquipmentTree(flatEqNodes, eqRootNode,
+        success = createEquipmentNodeTree(flatEqNodes, eqRootNode,
 									  flatRefNodes, refRootNode);
     }
 
@@ -473,7 +463,7 @@ EquipmentModelManager::loadEquipmentFromXML(QVector<flatEqNode>& flatEqNodes, Eq
 }
 
 bool
-EquipmentModelManager::createEquipmentTree(QVector<flatEqNode>& flatEqNodes, EquipmentRoot* eqRootNode,
+EquipmentModelManager::createEquipmentNodeTree(QVector<flatEqNode>& flatEqNodes, EquipmentRoot* eqRootNode,
 											QVector<flatEqNode>& flatRefNodes, EquipmentRoot* refRootNode)
 {
     bool success = true;
@@ -521,20 +511,6 @@ EquipmentModelManager::createEquipmentTree(QVector<flatEqNode>& flatEqNodes, Equ
 
 			// Set up toplevel parent - child relationship
 			equipModel_->addChildToParent(flatNode.eqNode_, refRootNode);
-			} break;
-
-
-		case eqNodeType::EQ_TIME_SPAN: {
-			// search through all the eqNode's for an Id matching the parentId
-			for (flatEqNode& flatParentNode : flatRefNodes)
-			{
-				if (flatParentNode.eqId_ == flatNode.eqParentId_) {
-
-					// Set up parent - child relationship
-					equipModel_->addChildToParent(flatNode.eqNode_, flatParentNode.eqNode_);
-					break;
-				}
-			}
 			} break;
 
 		case eqNodeType::EQ_ITEM_REF: {
@@ -635,9 +611,6 @@ EquipmentModelManager::writeEquipTreeToXML(QTextStream& out, EquipmentNode* eqTr
 		case eqNodeType::EQ_LINK: {
 			out << "\n\t" << *(static_cast<EquipmentLink*>(eqNode));
 		} break;
-		case eqNodeType::EQ_TIME_SPAN: {
-			out << "\t\t" << *(static_cast<EquipTimeSpan*>(eqNode));
-		} break;
 		case eqNodeType::EQ_ITEM_REF: {
 			out << "\t\t" << *(static_cast<EquipmentRef*>(eqNode));
 		} break;
@@ -710,7 +683,7 @@ bool EquipmentParser::startElement(const QString&, const QString&, const QString
 
 	else if (qName == "eqTime") {
 
-		QString eqId, eqParentId, description, notes, startDate, ReplaceDate;
+		QString eqId, eqParentId, description, notes, start, replace;
 
 		// get attributes
 		for (int i = 0; i < attrs.count(); i++) {
@@ -718,14 +691,14 @@ bool EquipmentParser::startElement(const QString&, const QString&, const QString
 			if (attrs.qName(i) == "parentId") eqParentId = Utils::unprotect(attrs.value(i));
 			if (attrs.qName(i) == "desc") description = Utils::unprotect(attrs.value(i));
 			if (attrs.qName(i) == "notes") notes = Utils::unprotect(attrs.value(i));
-			if (attrs.qName(i) == "startDate") startDate = Utils::unprotect(attrs.value(i));
-			if (attrs.qName(i) == "replaceDate") ReplaceDate = Utils::unprotect(attrs.value(i));
+			if (attrs.qName(i) == "start") start = Utils::unprotect(attrs.value(i));
+			if (attrs.qName(i) == "replace") replace = Utils::unprotect(attrs.value(i));
 		}
 
-		QDateTime Replace = ReplaceDate.isEmpty() ? QDateTime() : QDateTime().fromString(ReplaceDate);
+		QDateTime Replace = replace.isEmpty() ? QDateTime() : QDateTime().fromString(replace);
 
 		flatEqNodes_.push_back(flatEqNode(eqId, eqNodeType::EQ_TIME_ITEM, eqParentId, "",
-			new EquipmentTimeItem(description, notes, QDateTime().fromString(startDate), Replace)));
+			new EquipmentTimeItem(description, notes, QDateTime().fromString(start), Replace)));
 	}
 
     else if (qName == "eqLink") {
@@ -743,28 +716,9 @@ bool EquipmentParser::startElement(const QString&, const QString&, const QString
 						new EquipmentLink(eqLinkName, description)));
     }
 
-    else if (qName == "eqTSp") {
-
-        QString useId, useParentId, start, end, notes;
-
-        // get attributes
-        for (int i = 0; i < attrs.count(); i++) {
-			if (attrs.qName(i) == "id") useId = Utils::unprotect(attrs.value(i));
-			if (attrs.qName(i) == "parentId") useParentId = Utils::unprotect(attrs.value(i));
-            if (attrs.qName(i) == "start") start = Utils::unprotect(attrs.value(i));
-            if (attrs.qName(i) == "end") end = Utils::unprotect(attrs.value(i));
-			if (attrs.qName(i) == "notes") notes = Utils::unprotect(attrs.value(i));
-        }
-
-		QDateTime endTS = end.isEmpty() ? QDateTime() : QDateTime().fromString(end);
-
-		flatRefNodes_.push_back(flatEqNode(useId, eqNodeType::EQ_TIME_SPAN, useParentId, "",
-						new EquipTimeSpan(QDateTime().fromString(start), notes, endTS)));
-    }
-
 	else if (qName == "eqRef") {
 
-		QString useId, useParentId, eqIdRef, refDistance;
+		QString useId, useParentId, eqIdRef, refDistance, start, end, notes;
 
 		// get attributes
 		for (int i = 0; i < attrs.count(); i++) {
@@ -772,12 +726,18 @@ bool EquipmentParser::startElement(const QString&, const QString&, const QString
 			if (attrs.qName(i) == "parentId") useParentId = Utils::unprotect(attrs.value(i));
 			if (attrs.qName(i) == "eqId") eqIdRef = Utils::unprotect(attrs.value(i));
 			if (attrs.qName(i) == "refDist") refDistance = Utils::unprotect(attrs.value(i));
+			if (attrs.qName(i) == "start") start = Utils::unprotect(attrs.value(i));
+			if (attrs.qName(i) == "end") end = Utils::unprotect(attrs.value(i));
+			if (attrs.qName(i) == "notes") notes = Utils::unprotect(attrs.value(i));
 		}
 
 		double optrefDistance = (refDistance.isEmpty()) ? 0 : QVariant(refDistance).toDouble();
 
+		QDateTime startTS = start.isEmpty() ? QDateTime() : QDateTime().fromString(start);
+		QDateTime endTS = end.isEmpty() ? QDateTime() : QDateTime().fromString(end);
+
 		flatRefNodes_.push_back(flatEqNode(useId, eqNodeType::EQ_ITEM_REF, useParentId, eqIdRef,
-								new EquipmentRef(optrefDistance)));
+								new EquipmentRef(optrefDistance, startTS, endTS, notes)));
 	}
 
     return true;

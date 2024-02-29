@@ -63,10 +63,10 @@ class EquipmentSidebar : public QWidget
 		// equipment menu handlers
 		void addEquipmentHandler();
 		void addEquipmentTimeHandler();
-		void addTimeSpanHandler();
 		void deleteEquipmentHandler();
 		void moveUpEquipmentHandler();
 		void moveDownEquipmentHandler();
+		void leftShiftEquipmentHandler();
 
 private:
 

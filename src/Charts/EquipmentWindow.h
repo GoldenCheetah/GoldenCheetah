@@ -29,7 +29,7 @@
 #include <QVector>
 
  // The enum class eqWinType must align with the addition of widgets to the stackedWidget_
-enum class eqWinType { BLANK_PAGE = 0, EQUIPMENT_DIST_PAGE, EQUIPMENT_TIME_PAGE, TIME_SPAN_PAGE, REFERENCE_PAGE, ACTIVITY_LINK_PAGE };
+enum class eqWinType { BLANK_PAGE = 0, EQUIPMENT_DIST_PAGE, EQUIPMENT_TIME_PAGE, REFERENCE_PAGE, ACTIVITY_LINK_PAGE };
 
 class EquipmentWindow : public GcChartWindow
 {
@@ -56,6 +56,7 @@ class EquipmentWindow : public GcChartWindow
         void configChanged(qint32);
 		void saveButtonClicked();
 		void undoButtonClicked();
+		void startDateTimeStateChanged(int checkState);
 		void endDateTimeStateChanged(int checkState);
 
     protected:
@@ -77,12 +78,9 @@ class EquipmentWindow : public GcChartWindow
 		void displayEquipmentTimeItem(EquipmentTimeItem* eqNode);
 		void saveEquipmentTimeItem(EquipmentTimeItem* eqNode);
 
-		QWidget* createWidsTimeSpan();
-		void displayTimeSpan(EquipTimeSpan* eqTimeSpan);
-		void saveTimeSpan(EquipTimeSpan* eqTimeSpan);
-
 		QWidget* createWidsReference();
 		void displayReference(EquipmentRef* eqRef);
+		void saveReference(EquipmentRef* eqRef);
 
 		QWidget* createWidsEquipmentLink();
 		void displayEquipmentLink(EquipmentLink* eqLink);

@@ -172,6 +172,10 @@ void EquipmentNavigatorCellDelegate::paint(QPainter* painter, const QStyleOption
     bool selected = option.state & QStyle::State_Selected;
 
     QString value = index.model()->data(index, Qt::DisplayRole).toString();
+
+
+
+
     QStyleOptionViewItem myOption = option;
     myOption.displayAlignment = Qt::AlignLeft | Qt::AlignTop;
 	QRect rect(myOption.rect.x(), myOption.rect.y() + 1, myOption.rect.width(), myOption.rect.height());
@@ -194,17 +198,10 @@ void EquipmentNavigatorCellDelegate::paint(QPainter* painter, const QStyleOption
 		switch (eqNode->getEqNodeType()) {
 
 		case eqNodeType::EQ_TIME_ITEM: {
-			if (static_cast<EquipmentTimeItem*>(eqNode)->overTime())
-				userColor = odtColour;
+			if (eqNode->getParentItem()->getEqNodeType() == eqNodeType::EQ_ROOT)
+				userColor = rootTimeColour;
 			else
-				if (eqNode->getParentItem()->getEqNodeType() == eqNodeType::EQ_ROOT)
-					userColor = rootTimeColour;
-				else
-					userColor = timeColour;
-		} break;
-
-		case eqNodeType::EQ_TIME_SPAN: {
-			userColor = timeColour;
+				userColor = timeColour;
 		} break;
 
 		case eqNodeType::EQ_ITEM_REF: {
@@ -217,10 +214,7 @@ void EquipmentNavigatorCellDelegate::paint(QPainter* painter, const QStyleOption
 					userColor = selectTxtColor;
 				}
 				else
-					if (static_cast<EquipmentRef*>(eqNode)->eqDistNode_->overDistance())
-						userColor = odtColour;
-					else
-						userColor = distColor;
+					userColor = distColor;
 		} break;
 
 		case eqNodeType::EQ_LINK: {
@@ -236,13 +230,10 @@ void EquipmentNavigatorCellDelegate::paint(QPainter* painter, const QStyleOption
 				userColor = selectTxtColor;
 			}
 			else
-				if (static_cast<EquipmentDistanceItem*>(eqNode)->overDistance())
-					userColor = odtColour;
+				if (eqNode->getParentItem()->getEqNodeType() == eqNodeType::EQ_ROOT)
+					userColor = rootDistColor;
 				else
-					if (eqNode->getParentItem()->getEqNodeType() == eqNodeType::EQ_ROOT)
-						userColor = rootDistColor;
-					else
-						userColor = distColor;
+					userColor = distColor;
 		} break;
 
 		default: {
@@ -260,17 +251,48 @@ void EquipmentNavigatorCellDelegate::paint(QPainter* painter, const QStyleOption
 
     myOption.rect.setHeight(eqNav_->fontHeight + 1);
 
-    if (!selected) {
-        // not selected, so invert ride plot color
-        painter->setPen(userColor);
-    }
+	// not selected, so invert ride plot color
+	if (!selected) {
+		switch (eqNode->getEqNodeType()) {
 
-    painter->drawText(rect, value);
+		case eqNodeType::EQ_DIST_ITEM: {
+			painter->setPen(static_cast<EquipmentDistanceItem*>(eqNode)->overDistance() ? odtColour : userColor);
+		} break;
+
+		case eqNodeType::EQ_ITEM_REF: {
+			painter->setPen(static_cast<EquipmentRef*>(eqNode)->eqDistNode_->overDistance() ? odtColour : userColor);
+		} break;
+
+		case eqNodeType::EQ_TIME_ITEM: {
+			painter->setPen(static_cast<EquipmentTimeItem*>(eqNode)->overTime() ? odtColour : userColor);
+		} break;
+
+		default: {
+			painter->setPen(userColor);
+		}break;
+		}
+	}
+    
+	// draw the whole string
+	painter->drawText(rect, value);
+	
+	if (!selected && eqNode->getEqNodeType() == eqNodeType::EQ_ITEM_REF) {
+
+		static QRegExp rx("(\\:)");
+		QStringList strList = value.split(rx);
+
+		if (strList.size() == 2) {
+			// overwrite the date in either time color or overdistance if range invalid
+			painter->setPen(static_cast<EquipmentRef*>(eqNode)->rangeIsValid() ? timeColour : odtColour);
+			painter->drawText(rect, strList[0]);
+		}
+	}
     
 	// restore original painter values
     painter->setPen(isColor);
     painter->setFont(isFont);
 }
+
 
 //
 // -------------------------------- EquipmentTreeView --------------------------------
