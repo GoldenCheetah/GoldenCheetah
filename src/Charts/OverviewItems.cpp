@@ -744,7 +744,7 @@ ZoneOverviewItem::configChanged(qint32)
     // W'BAL and Polarized
     //
     if (series == RideFile::wbal) {
-        categories << "Low" << "Med" << "High" << "Ext";
+        categories << "Low" << "Med" << "High" << "Sev";
         *barset << 0 << 0 << 0 << 0;
     } else if (polarized) {
         categories << "I" << "II" << "III";

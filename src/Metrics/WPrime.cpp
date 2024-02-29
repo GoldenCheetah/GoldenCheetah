@@ -74,7 +74,7 @@ static struct WPRIMEZONES {
 
 } wbal_zones[] = {
 
-    { 0, 25, "W1", QT_TRANSLATE_NOOP("wbalzone", "Recovered") },
+    { 0, 25, "W1", QT_TRANSLATE_NOOP("wbalzone", "Low Fatigue") },
     { 25, 50, "W2", QT_TRANSLATE_NOOP("wbalzone", "Moderate Fatigue") },
     { 50, 75, "W3", QT_TRANSLATE_NOOP("wbalzone", "Heavy Fatigue") },
     { 75, 100, "W4", QT_TRANSLATE_NOOP("wbalzone", "Severe Fatigue") }

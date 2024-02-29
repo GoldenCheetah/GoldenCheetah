@@ -241,6 +241,9 @@ RideFile::sportTag(QString sport)
 
         { tr("Gym"), "Gym" },
         { "Strength", "Gym" }, { tr("Strength"), "Gym" },
+
+        { tr("Walk"), "Walk" },
+        { "Walking", "Walk" }, { tr("Walking"), "Walk" },
     };
 
     return sports.value(sport, sport);
