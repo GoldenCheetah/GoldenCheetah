@@ -278,10 +278,13 @@ void EquipmentNavigatorCellDelegate::paint(QPainter* painter, const QStyleOption
 	
 	if (!selected && eqNode->getEqNodeType() == eqNodeType::EQ_ITEM_REF) {
 
-		static QRegExp rx("(\\:)");
-		QStringList strList = value.split(rx);
+		// if start or end time set
+		if (!(static_cast<EquipmentRef*>(eqNode)->startNotSet() &&
+			  static_cast<EquipmentRef*>(eqNode)->endNotSet())) {
 
-		if (strList.size() == 2) {
+			static QRegularExpression rx("\\:");
+			QStringList strList = value.split(rx);
+
 			// overwrite the date in either time color or overdistance if range invalid
 			painter->setPen(static_cast<EquipmentRef*>(eqNode)->rangeIsValid() ? timeColour : odtColour);
 			painter->drawText(rect, strList[0]);

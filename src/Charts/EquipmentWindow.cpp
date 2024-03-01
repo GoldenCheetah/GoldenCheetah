@@ -134,7 +134,7 @@ EquipmentWindow::updateEquipmentDisplay()
 		QDateTime lastRecalc = static_cast<EquipmentRoot*>(eqRoot)->getLastRecalc();
 		static QString time_format = "HH:mm   dd MMM yyyy";
 		QVariant days(abs(QDateTime::currentDateTime().daysTo(lastRecalc)));
-		lastUpdated_->setText(tr("Last Recalc:  ") +
+		lastUpdated_->setText(tr("Last Recalculation:  ") +
 			lastRecalc.toString(time_format) +
 			((days==0) ? tr("  <today>") : ((days==1) ? tr("  <yesterday>") : "  <" + days.toString() + tr(" days ago>"))));
 
@@ -179,7 +179,7 @@ EquipmentWindow::createWidsEquipmentDistanceItem() {
 	pageWids.push_back(struct widgetMapType { new QLabel(tr("GC Distance")), new QLineEdit(), false });
 	pageWids.push_back(struct widgetMapType { new QLabel(tr("Total Distance")), new QLineEdit(), false });
 	pageWids.push_back(struct widgetMapType { new QLabel(tr("Replacement Distance")), new QLineEdit(), true });
-	pageWids.push_back(struct widgetMapType { new QLabel(tr("Notes")), new QPlainTextEdit(), true });
+	pageWids.push_back(struct widgetMapType { new QLabel(tr("Distance\nNotes")), new QPlainTextEdit(), true });
 
 	equipWids_[eqWinType::EQUIPMENT_DIST_PAGE] = pageWids;
 
@@ -237,7 +237,7 @@ EquipmentWindow::createWidsEquipmentTimeItem() {
 	pageWids.push_back(struct widgetMapType { new QLabel(tr("Description")), new QLineEdit(), true });
 	pageWids.push_back(struct widgetMapType { new QLabel(tr("Start Date")), new QDateTimeEdit(), true });
 	pageWids.push_back(struct widgetMapType { new QLabel(tr("Replacement Date")), new QDateTimeEdit(), true });
-	pageWids.push_back(struct widgetMapType { new QLabel(tr("Notes")), new QPlainTextEdit(), true });
+	pageWids.push_back(struct widgetMapType { new QLabel(tr("Time\nNotes")), new QPlainTextEdit(), true });
 
 	static_cast<QDateTimeEdit*>(pageWids[2].fieldPtr)->setCalendarPopup(true);
 	static_cast<QDateTimeEdit*>(pageWids[3].fieldPtr)->setCalendarPopup(true);
@@ -298,7 +298,7 @@ EquipmentWindow::createWidsReference() {
 	pageWids.push_back(struct widgetMapType { new QLabel(tr("Start Date")), new QDateTimeEdit(), true });
 	pageWids.push_back(struct widgetMapType { new QLabel(""), new QCheckBox(tr("End Date")), true });
 	pageWids.push_back(struct widgetMapType { new QLabel(tr("End Date")), new QDateTimeEdit(), true });
-	pageWids.push_back(struct widgetMapType { new QLabel(tr("Notes")), new QPlainTextEdit(), true });
+	pageWids.push_back(struct widgetMapType { new QLabel(tr("Distance\nReference\nNotes")), new QPlainTextEdit(), true });
 
 	connect(static_cast<QCheckBox*>(pageWids[3].fieldPtr), SIGNAL(stateChanged(int)), this, SLOT(startDateTimeStateChanged(int)));
 	static_cast<QDateTimeEdit*>(pageWids[4].fieldPtr)->setCalendarPopup(true);

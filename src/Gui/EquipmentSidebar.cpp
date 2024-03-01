@@ -56,7 +56,7 @@ EquipmentSidebar::EquipmentSidebar(Context *context, bool eqListView) :
 		activityItem_ = new GcSplitterItem(tr("Equipment List"), iconFromPNG(":images/sidebar/folder.png"), this);
 
 	else
-		activityItem_ = new GcSplitterItem(tr("Equipment Links & Distance Refs"), iconFromPNG(":images/sidebar/folder.png"), this);
+		activityItem_ = new GcSplitterItem(tr("Equipment Links & Distance References"), iconFromPNG(":images/sidebar/folder.png"), this);
 
     QAction *activityAction = new QAction(iconFromPNG(":images/sidebar/extra.png"), tr("Menu"), this);
     activityItem_->addAction(activityAction);
@@ -117,12 +117,8 @@ EquipmentSidebar::equipmentPopup()
 {
     QMenu popMenu(this);
 
-	QAction* recalculateEquipment = new QAction(tr("Recalculate Distances"), equipmentNavigator_);
-	connect(recalculateEquipment, SIGNAL(triggered(void)), context_, SLOT(notifyEqRecalculationStart()));
-	popMenu.addAction(recalculateEquipment);
-	popMenu.addSeparator();
-
 	if (eqListView_) {
+
 		QAction* addEquipmentLink = new QAction(tr("Add Distance Equipment"), equipmentNavigator_);
 		connect(addEquipmentLink, SIGNAL(triggered(void)), this, SLOT(addTopDistEqHandler()));
 		popMenu.addAction(addEquipmentLink);
@@ -133,6 +129,11 @@ EquipmentSidebar::equipmentPopup()
 		popMenu.addSeparator();
 	}
 	else {
+		QAction* recalculateEquipment = new QAction(tr("Recalculate Distances"), equipmentNavigator_);
+		connect(recalculateEquipment, SIGNAL(triggered(void)), context_, SLOT(notifyEqRecalculationStart()));
+		popMenu.addAction(recalculateEquipment);
+		popMenu.addSeparator();
+
 		QAction* addEquipmentLink = new QAction(tr("Add Equipment Link"), equipmentNavigator_);
 		connect(addEquipmentLink, SIGNAL(triggered(void)), this, SLOT(addEqLinkHandler()));
 		popMenu.addAction(addEquipmentLink);
@@ -161,12 +162,10 @@ EquipmentSidebar::equipmentPopup()
 		popMenu.addSeparator();
 	}
 
-	// expand / collapse
 	QAction* expandAll = new QAction(tr("Expand All"), equipmentNavigator_);
 	connect(expandAll, SIGNAL(triggered(void)), equipmentNavigator_->eqTreeView_, SLOT(expandAll()));
 	popMenu.addAction(expandAll);
 
-	// expand / collapse
 	QAction* collapseAll = new QAction(tr("Collapse All"), equipmentNavigator_);
 	connect(collapseAll, SIGNAL(triggered(void)), equipmentNavigator_->eqTreeView_, SLOT(collapseAll()));
 	popMenu.addAction(collapseAll);
@@ -213,6 +212,7 @@ EquipmentSidebar::showEquipmentMenu(const QPoint &pos)
 		QAction* addEquipment = nullptr;
 		QAction* addTimeEquipment = nullptr;
 		QAction* deleteEquipment = nullptr;
+		QAction* leftShiftEquipment = nullptr;
 
 		switch (currentEqItem_->getEqNodeType()) {
 
@@ -230,6 +230,9 @@ EquipmentSidebar::showEquipmentMenu(const QPoint &pos)
 				addEquipment = new QAction(tr("Add Distance Equipment"), equipmentNavigator_);
 				addTimeEquipment = new QAction(tr("Add Time Equipment"), equipmentNavigator_);
 				deleteEquipment = new QAction(tr("Delete"), equipmentNavigator_);
+				if (currentEqItem_->getParentItem()->getEqNodeType() != eqNodeType::EQ_ROOT) {
+					leftShiftEquipment = new QAction(tr("Shift Left"), equipmentNavigator_);
+				}
 			} break;
 
 			// Equipment root should never be selectable (it is hidden)
@@ -268,8 +271,8 @@ EquipmentSidebar::showEquipmentMenu(const QPoint &pos)
 			menu.addAction(downEquipment);
 		}
 
-		if (currentEqItem_->getParentItem()->getEqNodeType() != eqNodeType::EQ_ROOT) {
-			QAction* leftShiftEquipment = new QAction(tr("Shift Left"), equipmentNavigator_);
+		if (leftShiftEquipment) {
+			if (parentsChildren.size() > 1) menu.addSeparator();
 			connect(leftShiftEquipment, SIGNAL(triggered(void)), this, SLOT(leftShiftEquipmentHandler()));
 			menu.addAction(leftShiftEquipment);
 		}

@@ -138,7 +138,7 @@ EquipmentModelManager::equipmentDeleted(EquipmentNode* eqNode, bool warnOnEqDele
 			QMessageBox msgBox;
 			msgBox.setIcon(QMessageBox::Critical);
 			msgBox.setText(tr("Equipment Items with children cannot be deleted!"));
-			msgBox.setInformativeText(tr("\nto proceed either:\n\n"
+			msgBox.setInformativeText(tr("\nTo proceed either:\n\n"
 				"\t i) delete its children, or \n"
 				"\tii) move them to another Equipment Item."));
 			msgBox.exec();
@@ -179,7 +179,7 @@ EquipmentModelManager::equipmentDeleted(EquipmentNode* eqNode, bool warnOnEqDele
 			QMessageBox msgBox;
 			msgBox.setIcon(QMessageBox::Critical);
 			msgBox.setText(tr("Time Equipment with children cannot be deleted!"));
-			msgBox.setInformativeText(tr("\nto proceed either:\n\n"
+			msgBox.setInformativeText(tr("\nTo proceed either:\n\n"
 				"\t i) delete its children, or \n"
 				"\tii) move them to another Equipment Item."));
 			msgBox.exec();
