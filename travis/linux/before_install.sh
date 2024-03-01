@@ -10,7 +10,6 @@ sudo apt-get install -qq qt5-default qt515base qt515tools qt515serialport\
 
 sudo apt-get install -qq libglu1-mesa-dev
 sudo apt-get install -qq libsamplerate0-dev
-sudo apt-get install -qq libkml-dev
 sudo apt-get install -qq libical-dev
 
 # Add VLC 3

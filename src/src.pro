@@ -351,32 +351,6 @@ contains(DEFINES, "GC_WANT_R") {
 }
 
 
-###=====================================
-### OPTIONAL => GOOGLE KML IMPORT EXPORT
-###=====================================
-
-!isEmpty(KML_INSTALL) {
-
-    # we will work out the rest if you tell use where it is installed
-    isEmpty(KML_INCLUDE) { KML_INCLUDE = $${KML_INSTALL}/include }
-    isEmpty(KML_LIBS)    { KML_LIBS    = -L$${KML_INSTALL}/lib/ \
-                                         -lkmldom -lkmlconvenience -lkmlengine -lkmlbase
-    }
-
-    # on MS VS the linker wants /LTCG for libkmldom due to
-    # "MSIL .netmodule or module compiled with /GL found"
-    win32-msvc* { QMAKE_LFLAGS +=  /LTCG }
-
-    DEFINES     += GC_HAVE_KML
-    INCLUDEPATH += $${KML_INCLUDE}  $${BOOST_INCLUDE}
-    LIBS        += $${KML_LIBS}
-
-    # add kml file i/o
-    SOURCES     += FileIO/KmlRideFile.cpp
-    HEADERS     += FileIO/KmlRideFile.h
-}
-
-
 ###=================
 ### OPTIONAL => ICAL
 ###=================

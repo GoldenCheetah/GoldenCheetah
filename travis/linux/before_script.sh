@@ -27,8 +27,6 @@ sed -i "s|#\(DEFINES += GC_VIDEO_VLC.*\)|\1|" src/gcconfig.pri
 sed -i "s|#\(DEFINES += GC_WANT_R.*\)|\1|" src/gcconfig.pri
 # Enable CloudDB
 sed -i "s|^#CloudDB|CloudDB|" src/gcconfig.pri
-# LIBKML
-sed -i "s|#\(KML_INSTALL =\).*|\1 /usr|" src/gcconfig.pri
 # D2XX
 sed -i "s|#\(D2XX_INCLUDE =.*\)|\1 ../D2XX/release|" src/gcconfig.pri
 # SAMPLERATE
