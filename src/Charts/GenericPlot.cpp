@@ -617,7 +617,9 @@ GenericPlot::addCurve(QString name, QVector<double> xseries, QVector<double> yse
 
             // hardware support?
             chartview->setRenderHint(QPainter::Antialiasing);
+#if QT_VERSION < 0x060400
             add->setUseOpenGL(opengl); // for scatter or line only apparently
+#endif
             qchart->setDropShadowEnabled(false);
 
             // no line, we are invisible
@@ -694,7 +696,9 @@ GenericPlot::addCurve(QString name, QVector<double> xseries, QVector<double> yse
 
                 // hardware support?
                 chartview->setRenderHint(QPainter::Antialiasing);
+#if QT_VERSION < 0x060400
                 dec->setUseOpenGL(opengl); // for scatter or line only apparently
+#endif
                 qchart->setDropShadowEnabled(false);
 
                 // chart
@@ -759,7 +763,9 @@ GenericPlot::addCurve(QString name, QVector<double> xseries, QVector<double> yse
 
             // hardware support?
             chartview->setRenderHint(QPainter::Antialiasing);
+#if QT_VERSION < 0x060400
             add->setUseOpenGL(opengl); // for scatter or line only apparently
+#endif
             qchart->setDropShadowEnabled(false);
 
             // chart
@@ -789,7 +795,9 @@ GenericPlot::addCurve(QString name, QVector<double> xseries, QVector<double> yse
 
                 // hardware support?
                 chartview->setRenderHint(QPainter::Antialiasing);
+#if QT_VERSION < 0x060400
                 dec->setUseOpenGL(opengl); // for scatter or line only apparently
+#endif
                 qchart->setDropShadowEnabled(false);
 
                 // chart
