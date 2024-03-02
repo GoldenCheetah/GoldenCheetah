@@ -4268,7 +4268,7 @@ static QColor FosterColors[11]={
 void
 RPErating::setValue(QString value)
 {
-    // RPE values from other sources (e.g. TodaysPlan) are "double"
+    // RPE values from other sources are "double"
     this->value = value;
     int v = qRound(value.toDouble());
     if (v <0 || v>10) {
