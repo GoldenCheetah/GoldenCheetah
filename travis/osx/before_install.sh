@@ -13,8 +13,6 @@ brew install libical
 brew upgrade libusb
 brew install libsamplerate
 rm -rf '/usr/local/include/c++'
-## Disable KML for now
-## brew install --HEAD travis/libkml.rb
 sudo chmod -R +w /usr/local
 
 # R 4.1.1

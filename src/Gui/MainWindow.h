@@ -234,7 +234,6 @@ class MainWindow : public QMainWindow
         // Training View
         void addDevice();
         void downloadErgDB();
-        void downloadTodaysPlanWorkouts();
         void manageLibrary();
         void showWorkoutWizard();
         void importWorkout();

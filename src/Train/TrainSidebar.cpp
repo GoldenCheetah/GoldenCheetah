@@ -439,13 +439,11 @@ TrainSidebar::workoutPopup()
     QMenu menu(workoutTree);
     QAction *import = new QAction(tr("Import Workout from File"), workoutTree);
     QAction *download = new QAction(tr("Get Workouts from ErgDB"), workoutTree);
-    QAction *dlTodaysPlan = new QAction(tr("Get Workouts from Today's Plan"), workoutTree);
     QAction *wizard = new QAction(tr("Create Workout via Wizard"), workoutTree);
     QAction *scan = new QAction(tr("Scan for Workouts"), workoutTree);
 
     menu.addAction(import);
     menu.addAction(download);
-    menu.addAction(dlTodaysPlan);
     menu.addAction(wizard);
     menu.addAction(scan);
 
@@ -478,7 +476,6 @@ TrainSidebar::workoutPopup()
     connect(import, SIGNAL(triggered(void)), context->mainWindow, SLOT(importWorkout(void)));
     connect(wizard, SIGNAL(triggered(void)), context->mainWindow, SLOT(showWorkoutWizard(void)));
     connect(download, SIGNAL(triggered(void)), context->mainWindow, SLOT(downloadErgDB(void)));
-    connect(dlTodaysPlan, SIGNAL(triggered(void)), context->mainWindow, SLOT(downloadTodaysPlanWorkouts(void)));
     connect(scan, SIGNAL(triggered(void)), context->mainWindow, SLOT(manageLibrary(void)));
 
     // execute the menu

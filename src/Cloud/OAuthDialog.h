@@ -51,7 +51,6 @@ public:
         CYCLING_ANALYTICS,
         NOLIO,
         SPORTTRACKS,
-        TODAYSPLAN,
         WITHINGS,
         POLAR,
         XERT,

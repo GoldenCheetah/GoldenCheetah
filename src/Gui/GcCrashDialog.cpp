@@ -184,13 +184,6 @@ QString GcCrashDialog::versionHTML()
     d2xx = "yes";
     #endif
 
-    // -- KML ----
-    QString kml = "none";
-
-    #ifdef GC_HAVE_KML
-    kml = "yes";
-    #endif
-
     // -- ICAL ----
     QString ical = "none";
 
@@ -268,7 +261,6 @@ QString GcCrashDialog::versionHTML()
             "<tr><td colspan=\"2\">%3</td><td>%4</td></tr>"
             "<tr><td colspan=\"2\">SRMIO</td><td>%5</td></tr>"
             "<tr><td colspan=\"2\">D2XX</td><td>%6</td></tr>"
-            "<tr><td colspan=\"2\">KML</td><td>%8</td></tr>"
             "<tr><td colspan=\"2\">ICAL</td><td>%9</td></tr>"
             "<tr><td colspan=\"2\">USBXPRESS</td><td>%10</td></tr>"
             "<tr><td colspan=\"2\">LIBUSB</td><td>%11</td></tr>"
@@ -289,7 +281,6 @@ QString GcCrashDialog::versionHTML()
             .arg(COMPILER_VERSION)
             .arg(srmio)
             .arg(d2xx)
-            .arg(kml)
             .arg(ical)
             .arg(usbxpress)
             .arg(libusb)

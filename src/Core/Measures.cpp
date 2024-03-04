@@ -60,8 +60,6 @@ Measure::getSourceDescription() const
         return tr("Manual entry");
     case Measure::Withings:
         return tr("Withings");
-    case Measure::TodaysPlan:
-        return tr("Today's Plan");
     case Measure::CSV:
         return tr("CSV Upload");
     default:

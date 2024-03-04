@@ -351,32 +351,6 @@ contains(DEFINES, "GC_WANT_R") {
 }
 
 
-###=====================================
-### OPTIONAL => GOOGLE KML IMPORT EXPORT
-###=====================================
-
-!isEmpty(KML_INSTALL) {
-
-    # we will work out the rest if you tell use where it is installed
-    isEmpty(KML_INCLUDE) { KML_INCLUDE = $${KML_INSTALL}/include }
-    isEmpty(KML_LIBS)    { KML_LIBS    = -L$${KML_INSTALL}/lib/ \
-                                         -lkmldom -lkmlconvenience -lkmlengine -lkmlbase
-    }
-
-    # on MS VS the linker wants /LTCG for libkmldom due to
-    # "MSIL .netmodule or module compiled with /GL found"
-    win32-msvc* { QMAKE_LFLAGS +=  /LTCG }
-
-    DEFINES     += GC_HAVE_KML
-    INCLUDEPATH += $${KML_INCLUDE}  $${BOOST_INCLUDE}
-    LIBS        += $${KML_LIBS}
-
-    # add kml file i/o
-    SOURCES     += FileIO/KmlRideFile.cpp
-    HEADERS     += FileIO/KmlRideFile.h
-}
-
-
 ###=================
 ### OPTIONAL => ICAL
 ###=================
@@ -580,8 +554,6 @@ SOURCES += Cloud/PolarFlow.cpp
 HEADERS += Cloud/PolarFlow.h
 SOURCES += Cloud/SportTracks.cpp
 HEADERS += Cloud/SportTracks.h
-SOURCES += Cloud/TodaysPlan.cpp
-HEADERS += Cloud/TodaysPlan.h
 SOURCES += Cloud/Nolio.cpp
 HEADERS += Cloud/Nolio.h
 
@@ -655,7 +627,7 @@ HEADERS += Charts/Aerolab.h Charts/AerolabWindow.h Charts/AllPlot.h Charts/AllPl
 
 # cloud services
 HEADERS += Cloud/CalendarDownload.h Cloud/CloudService.h \
-           Cloud/LocalFileStore.h Cloud/OAuthDialog.h Cloud/TodaysPlanBodyMeasures.h \
+           Cloud/LocalFileStore.h Cloud/OAuthDialog.h \
            Cloud/WithingsDownload.h Cloud/Strava.h Cloud/CyclingAnalytics.h Cloud/RideWithGPS.h \
            Cloud/TrainingsTageBuch.h Cloud/Selfloops.h Cloud/Velohero.h Cloud/SportsPlusHealth.h \
            Cloud/AddCloudWizard.h Cloud/Withings.h Cloud/MeasuresDownload.h Cloud/Xert.h \
@@ -726,10 +698,6 @@ HEADERS += Train/AddDeviceWizard.h Train/CalibrationData.h Train/ComputrainerCon
            Train/SpinScanPlotWindow.h Train/SpinScanPolarPlot.h Train/GarminServiceHelper.h Train/PhysicsUtility.h Train/BicycleSim.h \
            Train/PolynomialRegression.h Train/MultiRegressionizer.h
 
-greaterThan(QT_MAJOR_VERSION, 4) {
-    HEADERS += Train/TodaysPlanWorkoutDownload.h
-}
-
 HEADERS += Train/TrainBottom.h Train/TrainDB.h Train/TrainSidebar.h \
            Train/VideoLayoutParser.h Train/VideoSyncFile.h Train/WorkoutPlotWindow.h Train/WebPageWindow.h \
            Train/WorkoutWidget.h Train/WorkoutWidgetItems.h Train/WorkoutWindow.h Train/WorkoutWizard.h Train/ZwoParser.h \
@@ -758,7 +726,7 @@ SOURCES += Charts/Aerolab.cpp Charts/AerolabWindow.cpp Charts/AllPlot.cpp Charts
 
 ## Cloud Services / Web resources
 SOURCES += Cloud/CalendarDownload.cpp Cloud/CloudService.cpp \
-           Cloud/LocalFileStore.cpp Cloud/OAuthDialog.cpp Cloud/TodaysPlanBodyMeasures.cpp \
+           Cloud/LocalFileStore.cpp Cloud/OAuthDialog.cpp \
            Cloud/WithingsDownload.cpp Cloud/Strava.cpp Cloud/CyclingAnalytics.cpp Cloud/RideWithGPS.cpp \
            Cloud/TrainingsTageBuch.cpp Cloud/Selfloops.cpp Cloud/Velohero.cpp Cloud/SportsPlusHealth.cpp \
            Cloud/AddCloudWizard.cpp Cloud/Withings.cpp Cloud/MeasuresDownload.cpp Cloud/Xert.cpp \
@@ -837,10 +805,6 @@ SOURCES += Train/AddDeviceWizard.cpp Train/CalibrationData.cpp Train/Computraine
            Train/RealtimeData.cpp Train/RealtimePlot.cpp Train/RealtimePlotWindow.cpp Train/RemoteControl.cpp Train/SpinScanPlot.cpp \
            Train/SpinScanPlotWindow.cpp Train/SpinScanPolarPlot.cpp Train/GarminServiceHelper.cpp Train/PhysicsUtility.cpp Train/BicycleSim.cpp \
            Train/PolynomialRegression.cpp
-
-greaterThan(QT_MAJOR_VERSION, 4) {
-    SOURCES  += Train/TodaysPlanWorkoutDownload.cpp
-}
 
 SOURCES += Train/TrainBottom.cpp Train/TrainDB.cpp Train/TrainSidebar.cpp \
            Train/VideoLayoutParser.cpp Train/VideoSyncFile.cpp Train/WorkoutPlotWindow.cpp Train/WebPageWindow.cpp \

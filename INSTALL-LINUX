@@ -27,7 +27,6 @@ CONTENTS
    - FTDI D2XX
    - SRMIO
    - liboauth
-   - libkml
    - libvlc  - Video playback in training mode
    - libical - Diary window and CalDAV support (external calendar integration)
    - libusb  - If you want support for using USB2 sticks in Train View
@@ -204,51 +203,6 @@ $ qmake
 $ make
 
 You now have SRM support built in.
-
-LIBKML - For export to Google Earth
------------------------------------
-
-You will need Google Earth 5.2 or later and therefore libkml that supports this.
-
-$ sudo apt-get install libkml-dev
-
-if this does not work you will need to build from source:
-
-    $ sudo apt-get install subversion
-    $ sudo apt-get install expat libexpat1 libexpat1-dev
-
-    Once svn is installed you can grab the libkml source, configure, build and
-    install:
-    $ cd ~/Projects
-    $ svn checkout http://libkml.googlecode.com/svn/trunk/ libkml
-    $ cd libkml
-
-    You will need automake and friends (see SRMIO above)
-    $ sh autogen.sh
-    $ ./configure
-    $ make
-    $ make install
-    $ sudo make install
-
-    If you get errors about use of 'long long' then edit:
-    - src/kml/{convenience,dom,engine,regionator,xsd}/Makefile
-    - examples/{engine,gpx,gx,hellonet,helloworld,regionator,xsd}/Makefile
-    - and look for the flag -pedantic and remove it. I got this on Linux 64bit builds ymmv.
-
-Once libkml is installed:
-
-$ cd ~/Projects/GoldenCheetah/src
-$ vi gcconfig.pri
-
-Ensure KML_INSTALL=/usr/local
-
-Make clean is needed if you have previously built, since source files examine
-#defines before including this feature. You can skip it if you know why ;)
-$ make clean
-$ qmake
-$ make
-
-You can now export rides to Google Earth kml format.
 
 LIBICAL - Diary integration with Google or MobileMe calendars
 -------------------------------------------------------------

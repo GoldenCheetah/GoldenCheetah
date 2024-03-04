@@ -42,11 +42,9 @@ MeasuresDownload::MeasuresDownload(Context *context, MeasuresGroup *measuresGrou
 
     QGroupBox *groupBox1 = new QGroupBox(tr("Choose the download or import source"));
     downloadWithings = new QRadioButton(tr("Withings"));
-    downloadTP = new QRadioButton(tr("Today's Plan"));
     downloadCSV = new QRadioButton(tr("Import CSV file"));
     QVBoxLayout *vbox1 = new QVBoxLayout;
     vbox1->addWidget(downloadWithings);
-    vbox1->addWidget(downloadTP);
     vbox1->addWidget(downloadCSV);
     groupBox1->setLayout(vbox1);
     mainLayout->addWidget(groupBox1);
@@ -109,14 +107,11 @@ MeasuresDownload::MeasuresDownload(Context *context, MeasuresGroup *measuresGrou
     connect(dateRangeManual, SIGNAL(toggled(bool)), this, SLOT(dateRangeManualSettingChanged(bool)));
 
     connect(downloadWithings, SIGNAL(toggled(bool)), this, SLOT(downloadWithingsSettingChanged(bool)));
-    connect(downloadTP, SIGNAL(toggled(bool)), this, SLOT(downloadTPSettingChanged(bool)));
     connect(downloadCSV, SIGNAL(toggled(bool)), this, SLOT(downloadCSVSettingChanged(bool)));
 
     // don't allow options which are not authorized
     downloadWithings->setEnabled((measuresGroup->getSymbol() == "Body") &&
         (appsettings->cvalue(context->athlete->cyclist, GC_NOKIA_TOKEN, "").toString() !=""));
-    downloadTP->setEnabled((measuresGroup->getSymbol() == "Body") &&
-        (appsettings->cvalue(context->athlete->cyclist, GC_TODAYSPLAN_TOKEN, "").toString() != ""));
 
     // select the default checked / based on available properties and last selection
     int last_selection = appsettings->cvalue(context->athlete->cyclist, GC_BM_LAST_TYPE, 0).toInt();
@@ -124,12 +119,6 @@ MeasuresDownload::MeasuresDownload(Context *context, MeasuresGroup *measuresGrou
     if (downloadWithings->isEnabled()) {
         if (last_selection == 0 || last_selection == WITHINGS) {
             downloadWithings->setChecked(true);
-            done = true;
-        }
-    }
-    if (!done && downloadTP->isEnabled()) {
-        if (last_selection == 0 || last_selection == TP) {
-            downloadTP->setChecked(true);
             done = true;
         }
     }
@@ -157,14 +146,9 @@ MeasuresDownload::MeasuresDownload(Context *context, MeasuresGroup *measuresGrou
 
     // initialize the downloader
     withingsDownload = new WithingsDownload(context);
-    todaysPlanBodyMeasureDownload = new TodaysPlanBodyMeasures(context);
     csvFileImport = new MeasuresCsvImport(context, this);
 
     // connect the progress bar
-    connect(todaysPlanBodyMeasureDownload, SIGNAL(downloadStarted(int)), this, SLOT(downloadProgressStart(int)));
-    connect(todaysPlanBodyMeasureDownload, SIGNAL(downloadProgress(int)), this, SLOT(downloadProgress(int)));
-    connect(todaysPlanBodyMeasureDownload, SIGNAL(downloadEnded(int)), this, SLOT(downloadProgressEnd(int)));
-
     connect(withingsDownload, SIGNAL(downloadStarted(int)), this, SLOT(downloadProgressStart(int)));
     connect(withingsDownload, SIGNAL(downloadProgress(int)), this, SLOT(downloadProgress(int)));
     connect(withingsDownload, SIGNAL(downloadEnded(int)), this, SLOT(downloadProgressEnd(int)));
@@ -177,7 +161,6 @@ MeasuresDownload::MeasuresDownload(Context *context, MeasuresGroup *measuresGrou
 MeasuresDownload::~MeasuresDownload() {
 
     delete withingsDownload;
-    delete todaysPlanBodyMeasureDownload;
     delete csvFileImport;
 
 }
@@ -241,8 +224,6 @@ MeasuresDownload::download() {
    // do the download
    if (downloadWithings->isChecked()) {
      downloadOk = withingsDownload->getBodyMeasures(err, fromDate, toDate, measures);
-   } else if (downloadTP->isChecked()) {
-     downloadOk = todaysPlanBodyMeasureDownload->getBodyMeasures(err, fromDate, toDate, measures);
    } else if (downloadCSV->isChecked()) {
        downloadOk = csvFileImport->getMeasures(measuresGroup, err, fromDate, toDate, measures);
    } else return;
@@ -326,13 +307,6 @@ MeasuresDownload::downloadWithingsSettingChanged(bool checked) {
     }
 }
 
-void
-MeasuresDownload::downloadTPSettingChanged(bool checked) {
-
-    if (checked) {
-        appsettings->setCValue(context->athlete->cyclist, GC_BM_LAST_TYPE, TP);
-    }
-}
 
 void
 MeasuresDownload::downloadCSVSettingChanged(bool checked) {
