@@ -150,7 +150,7 @@ EquipmentModel::mimeData(const QModelIndexList& indexes) const
 }
 
 bool
-EquipmentModel::dropMimeData(const QMimeData* mimeData, Qt::DropAction action, int row, int column, const QModelIndex& parent)
+EquipmentModel::dropMimeData(const QMimeData* mimeData, Qt::DropAction action, int row, int column, const QModelIndex& droppedOnNodeIdx)
 {
     Q_ASSERT(action == Qt::MoveAction);
     Q_UNUSED(column);
@@ -166,7 +166,7 @@ EquipmentModel::dropMimeData(const QMimeData* mimeData, Qt::DropAction action, i
 	// Let's not cast pointers that come from another process...
     if (senderPid != QCoreApplication::applicationPid()) return false;
 
-    EquipmentNode* droppedOnNode = equipmentFromIndexPtr(parent);
+    EquipmentNode* droppedOnNode = equipmentFromIndexPtr(droppedOnNodeIdx);
     Q_ASSERT(droppedOnNode);
 
     int count;
@@ -174,7 +174,7 @@ EquipmentModel::dropMimeData(const QMimeData* mimeData, Qt::DropAction action, i
 
 	// invalid index means an attempt to append beyond the last item
     if (row == -1) {
-        if (parent.isValid()) row = 0; else return false;
+        if (droppedOnNodeIdx.isValid()) row = 0; else return false;
     }
 
     for (int i = 0; i < count; ++i) {
@@ -191,7 +191,16 @@ EquipmentModel::dropMimeData(const QMimeData* mimeData, Qt::DropAction action, i
 			case eqNodeType::EQ_ITEM_REF: {
 				if (droppedOnNode->getEqNodeType() == eqNodeType::EQ_LINK) {
 
-					completeDropMimeData(draggedNode, row, droppedOnNode, parent);
+					completeDropMimeData(draggedNode, row, droppedOnNode, droppedOnNodeIdx);
+
+				} if (droppedOnNode->getEqNodeType() == eqNodeType::EQ_ITEM_REF) {
+
+					// Equipment References always have an Equipment Link parent, so find the
+					// droppedOnNodes within its parent's children and drop it below that.
+					int insertRow = droppedOnNode->getParentItem()->childPosition(droppedOnNode)+1;
+
+					// Adjust the droppedOnNode and its index
+					completeDropMimeData(draggedNode, insertRow, droppedOnNode->getParentItem(), droppedOnNodeIdx.parent());
 				}
 			} break;
 
@@ -199,12 +208,12 @@ EquipmentModel::dropMimeData(const QMimeData* mimeData, Qt::DropAction action, i
 				if ((droppedOnNode->getEqNodeType() == eqNodeType::EQ_DIST_ITEM) ||
 					(droppedOnNode->getEqNodeType() == eqNodeType::EQ_TIME_ITEM)) {
 
-					completeDropMimeData(draggedNode, row, droppedOnNode, parent);
+					completeDropMimeData(draggedNode, row, droppedOnNode, droppedOnNodeIdx);
 				}
 				else if (droppedOnNode->getEqNodeType() == eqNodeType::EQ_LINK) {
 
 					// Create a reference copy of the node and its children
-					createReferenceCopy(draggedNode, row, droppedOnNode, parent);
+					createReferenceCopy(draggedNode, row, droppedOnNode, droppedOnNodeIdx);
 
 					// Must not move the actual Equipment Item, so cancel the drag & drop.
 					return false;
@@ -215,7 +224,7 @@ EquipmentModel::dropMimeData(const QMimeData* mimeData, Qt::DropAction action, i
 				if ((droppedOnNode->getEqNodeType() == eqNodeType::EQ_DIST_ITEM) ||
 					(droppedOnNode->getEqNodeType() == eqNodeType::EQ_TIME_ITEM)) {
 
-					completeDropMimeData(draggedNode, row, droppedOnNode, parent);
+					completeDropMimeData(draggedNode, row, droppedOnNode, droppedOnNodeIdx);
 				}
 			} break;
 

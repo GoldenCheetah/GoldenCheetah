@@ -64,7 +64,7 @@ class EquipmentModel : public QAbstractItemModel
 		Qt::DropActions supportedDragActions() const override { return Qt::MoveAction; }
 		QStringList mimeTypes() const override;
 		QMimeData* mimeData(const QModelIndexList& indexes) const override;
-		bool dropMimeData(const QMimeData* data, Qt::DropAction action, int row, int column, const QModelIndex& parent);
+		bool dropMimeData(const QMimeData* data, Qt::DropAction action, int row, int column, const QModelIndex& droppedOnNodeIdx);
 		void completeDropMimeData(EquipmentNode* draggedNode, int droppedRow, EquipmentNode* droppedOnNode, const QModelIndex& droppedOnNodeIdx);
 
 		void equipmentAdded(EquipmentNode* eqParent, int eqToAdd);

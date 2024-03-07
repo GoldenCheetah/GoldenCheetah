@@ -52,6 +52,7 @@ public:
 	int row() const;
 
 	// Drag & drop support
+	int childPosition(EquipmentNode* eqChild) { return childItems_.indexOf(eqChild); }
 	void insertChild(int pos, EquipmentNode* eqChild);
 	void removeChild(int row) { childItems_.removeAt(row); }
 	bool removeChild(EquipmentNode* eqChild) { return childItems_.removeOne(eqChild); }
