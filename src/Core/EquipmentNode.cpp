@@ -161,7 +161,7 @@ operator<<(QTextStream& out, const EquipmentTimeItem& eqNode) {
 		out << "parentId=\"" << eqNode.parentItem_ << "\" ";
 	out << "start=\"" << eqNode.start_.toString() << "\" ";
 	if (!eqNode.replace_.isNull()) {
-		out << "replaceDate=\"" << eqNode.replace_.toString() << "\" ";
+		out << "replace=\"" << eqNode.replace_.toString() << "\" ";
 	}
 	if (!eqNode.description_.isEmpty()) {
 		out << "desc=\"" << Utils::xmlprotect(eqNode.description_) << "\" ";
