@@ -444,6 +444,19 @@ MainWindow::MainWindow(const QDir &home)
     tablayout->addWidget(viewStack);
     setCentralWidget(central);
 
+#if QT_VERSION >= 0x060000
+    /*----------------------------------------------------------------------
+     * Hack to avoid a flickering MainWindow when showing a QWebEngineView in a chart, e.g. a Map:
+     * Temporarily add a dummy QWebEngineView with some random content before the MainWindow is shown
+     * https://forum.qt.io/topic/141398/qwebengineview-closes-reopens-window-when-added-dynamically
+     *--------------------------------------------------------------------*/
+    QWebEngineView *dummywev = new QWebEngineView();
+    dummywev->page()->setHtml("<html></html>");
+    mainLayout->addWidget(dummywev);
+    mainLayout->removeWidget(dummywev);
+    delete dummywev;
+#endif
+
     /*----------------------------------------------------------------------
      * Application Menus
      *--------------------------------------------------------------------*/
