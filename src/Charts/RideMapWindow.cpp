@@ -137,6 +137,7 @@ RideMapWindow::RideMapWindow(Context *context, int mapType) : GcChartWindow(cont
     view->setContentsMargins(0,0,0,0);
     view->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     view->setAcceptDrops(false);
+    view->page()->setHtml("<html></html>");
     layout->addWidget(view);
 
     HelpWhatsThis *help = new HelpWhatsThis(view);
