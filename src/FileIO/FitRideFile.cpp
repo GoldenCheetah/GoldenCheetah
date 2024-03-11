@@ -2322,6 +2322,16 @@ genericnext:
         if (0 == local_timestamp && 0 == timestamp)
             return;
 
+        // In the new file structure activity comes first,
+        // so we set start time when it is not already set.
+        if (start_time == 0) {
+            start_time = timestamp - 1; // recording interval?
+            last_reference_time = start_time;
+            QDateTime t;
+            t.setSecsSinceEpoch(start_time);
+            rideFile->setStartTime(t);
+        }
+
         QDateTime t(rideFile->startTime().toUTC());
         if (0 == local_timestamp) {
             // ZWift FIT files are not reporting local timestamp
@@ -2596,6 +2606,12 @@ genericnext:
             time = iniTime + total_elapsed_time - 1;
         }
 
+        // In the new file format lap messages come first
+        // and timestamp doesn't match lap stop time anymore
+        if (time <= this_start_time) {
+            time = this_start_time + total_elapsed_time - 1;
+        }
+
         if (this_start_time == 0 || this_start_time-start_time < 0) {
             //errors << QString("lap %1 has invalid start time").arg(interval);
             this_start_time = start_time; // time was corrected after lap start
@@ -2623,7 +2639,9 @@ genericnext:
                 last_length = secs;
             }
             ++interval;
-        } else if (rideFile->dataPoints().count()) { // no samples means no laps
+        } else {
+            // Lap messages can occur before record messages,
+            // so we add them without checking for samples.
             ++interval;
             if (lap_name == "") {
                 lap_name = QObject::tr("Lap %1").arg(interval);
