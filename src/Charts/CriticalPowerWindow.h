@@ -299,6 +299,11 @@ class CriticalPowerWindow : public GcChartWindow
         void exportData();
 
     private:
+        void showRelevantIntervals();
+        void showAnaerobicIntervals(bool);
+        void showAerobicIntervals(bool);
+        void showShortAnaerobicIntervals(bool);
+        void showLongAerobicIntervals(bool);
         void updateCpint(double minutes);
         void hideIntervalCurve(int index);
         void showIntervalCurve(IntervalItem *current, int index);
