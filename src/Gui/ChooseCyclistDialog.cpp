@@ -100,6 +100,10 @@ ChooseCyclistDialog::getList()
     while (i.hasNext()) {
         QString name = i.next();
         SKIP_QTWE_CACHE  // skip Folder Names created by QTWebEngine on Windows
+
+        // ignore dot folders
+        if (name.startsWith(".")) continue;
+
         QListWidgetItem *newone = new QListWidgetItem(name, listWidget);
 
         // get avatar image if it exists
@@ -114,7 +118,7 @@ ChooseCyclistDialog::getList()
 
         // only allow selection of cyclists which are not already open
         foreach (MainWindow *x, mainwindows) {
-            QMapIterator<QString, Tab*> t(x->tabs);
+            QMapIterator<QString, AthleteTab*> t(x->athletetabs);
             while (t.hasNext()) {
                 t.next();
                 if (t.key() == name)
@@ -144,17 +148,12 @@ ChooseCyclistDialog::cancelClicked()
     reject();
 }
 
-void
-ChooseCyclistDialog::deleteClicked()
+bool
+ChooseCyclistDialog::deleteAthlete(QDir &homeDir, QString name, QWidget *parent)
 {
-    // nothing selected
-    if (listWidget->selectedItems().count() <= 0) return;
-
-    QListWidgetItem *item = listWidget->selectedItems().first();
-
-    QMessageBox msgBox;
+    QMessageBox msgBox(parent);
     msgBox.setWindowTitle(tr("Delete athlete"));
-    msgBox.setText(tr("You are about to delete %1").arg(item->text()));
+    msgBox.setText(tr("You are about to delete %1").arg(name));
     msgBox.setInformativeText(tr("This cannot be undone and all data will be permanently deleted.\n\nAre you sure?"));
     msgBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
     msgBox.setDefaultButton(QMessageBox::Cancel);
@@ -164,11 +163,26 @@ ChooseCyclistDialog::deleteClicked()
     if(msgBox.clickedButton() == msgBox.button(QMessageBox::Ok)) {
 
         // ok .. lets wipe the athlete !
-        QDir athleteDir = QDir(home.absolutePath() + "/" + item->text());
+        QDir athleteDir = QDir(homeDir.absolutePath() + "/" + name);
 
         // zap!
         recursiveDelete(athleteDir);
-        home.rmdir(item->text());
+        homeDir.rmdir(name);
+
+        return true;
+    }
+    return false;
+}
+
+void
+ChooseCyclistDialog::deleteClicked()
+{
+    // nothing selected
+    if (listWidget->selectedItems().count() <= 0) return;
+
+    QListWidgetItem *item = listWidget->selectedItems().first();
+
+    if(deleteAthlete(home, item->text(), this)) {
 
         // list again, with athlete now gone
         getList();

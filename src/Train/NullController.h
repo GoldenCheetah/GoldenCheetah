@@ -29,6 +29,9 @@
 #include "RealtimeData.h"
 #include "DeviceTypes.h"
 #include "DeviceConfiguration.h"
+#include <chrono>
+#include "PhysicsUtility.h"
+#include "BicycleSim.h"
 
 class NullController : public RealtimeController
 {
@@ -52,6 +55,8 @@ class NullController : public RealtimeController
         bool doesPush() {  return false; }
         bool doesPull() {  return true; }
         bool doesLoad() {  return false; }
+
+        void setMode(int);
         void setLoad(double watts) { load = watts; }
         void getRealtimeData(RealtimeData &rtData);
         void pushRealtimeData(RealtimeData &rtData);
@@ -66,6 +71,8 @@ class NullController : public RealtimeController
 
         double load;
         int beats,count; // send an R-R signal every 4th call
+
+        Bicycle bicycle;
 };
 
 

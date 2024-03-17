@@ -26,26 +26,13 @@
 
 #include "Banister.h"
 
-#ifndef ESTIMATOR_DEBUG
-#define ESTIMATOR_DEBUG false
-#endif
+Q_DECLARE_LOGGING_CATEGORY(gcEstimator)
+Q_LOGGING_CATEGORY(gcEstimator, "gc.estimator")
+
 #ifdef Q_CC_MSVC
-#define printd(fmt, ...) do {                                                \
-    if (ESTIMATOR_DEBUG) {                                 \
-        printf("[%s:%d %s] " fmt , __FILE__, __LINE__,        \
-               __FUNCTION__, __VA_ARGS__);                    \
-        fflush(stdout);                                       \
-    }                                                         \
-} while(0)
+#define printd(fmt, ...) qCDebug(gcEstimator, fmt, __VA_ARGS__);
 #else
-#define printd(fmt, args...)                                            \
-    do {                                                                \
-        if (ESTIMATOR_DEBUG) {                                       \
-            printf("[%s:%d %s] " fmt , __FILE__, __LINE__,              \
-                   __FUNCTION__, ##args);                               \
-            fflush(stdout);                                             \
-        }                                                               \
-    } while(0)
+#define printd(fmt, args...) qCDebug(gcEstimator, fmt, ##args);
 #endif
 
 class RollingBests {
@@ -164,14 +151,16 @@ Estimator::calculate()
 void
 Estimator::run()
 {
-  for (int i = 0; i < 2; i++) {
+  bool first = true;
 
-    bool isRun = (i > 0); // two times: one for rides and other for runs
+  foreach (QString sport, GlobalContext::context()->rideMetadata->sports()) {
 
-    printd("%s Estimates start.\n", isRun ? "Run" : "Bike");
+    sport = RideFile::sportTag(sport); // Normalize sport name
+
+    printd("%s Estimates start.\n", sport.toStdString().c_str());
 
     // this needs to be done once all the other metrics
-    // Calculate a *monthly* estimate of CP, W' etc using
+    // Calculate a *weekly* estimate of CP, W' etc using
     // bests data from the previous 6 weeks
     RollingBests bests(6);
     RollingBests bestsWPK(6);
@@ -181,8 +170,8 @@ Estimator::run()
     QList<Performance> perfs;
 
     // we do this by aggregating power data into bests
-    // for each month, and having a rolling set of 3 aggregates
-    // then aggregating those up into a rolling 3 month 'bests'
+    // for each week, and having a rolling set of 6 aggregates
+    // then aggregating those up into a rolling 6 weeks 'bests'
     // which we feed to the models to get the estimates for that
     // point in time based upon the available data
     QDate from, to;
@@ -191,7 +180,7 @@ Estimator::run()
     foreach(RideItem *item, rides) {
 
         // has power and matches sport
-        if (item->present.contains("P") && item->isRun == isRun) {
+        if (item->present.contains("P") && item->sport == sport) {
 
             // no date set
             if (from == QDate()) from = item->dateTime.date();
@@ -205,10 +194,9 @@ Estimator::run()
         }
     }
 
-    // if we don't have 2 rides or more then skip this but add a blank estimate
+    // if we don't have 2 rides or more then skip this
     if (from == to || to == QDate()) {
-        printd("%s Estimator ends, less than 2 rides with power data.\n", isRun ? "Run" : "Bike");
-        est << PDEstimate();
+        printd("%s Estimator ends, less than 2 rides with power data.\n", sport.toStdString().c_str());
         continue;
     }
 
@@ -230,10 +218,10 @@ Estimator::run()
     models << &wsmodel;
 #endif
 
-    // from has first ride with Power data / looking at the next 7 days of data with Power
+    // from starts a week having first ride with Power data / looking at the next 7 days of data with Power
     // calculate Estimates for all data per week including the week of the last Power recording
-    QDate date = from;
-    while (date < to) {
+    QDate date = from.addDays((1-from.dayOfWeek())); // Weeks start on monday in GC
+    while (date <= to) {
 
         // check if we've been asked to stop
         if (abort == true) {
@@ -245,14 +233,14 @@ Estimator::run()
         QDate begin = date;
         QDate end = date.addDays(6);
 
-        printd("Model progress %d/%d\n", date.year(), date.month());
+        printd("%s Model progress %d/%d/%d\n", sport.toStdString().c_str(), date.year(), date.month(), date.day());
 
-        // months is a rolling 3 months sets of bests
+        // bests is a rolling 6 weeks sets of bests
         QVector<float> wpk; // for getting the wpk values
 
-        // include only rides or runs .............................................................vvvvv
+        // include only rides or runs or ..........................................................vvvvv
         QVector<QDate> weekdates;
-        QVector<float> week = RideFileCache::meanMaxPowerFor(context, wpk, begin, end, &weekdates, isRun);
+        QVector<float> week = RideFileCache::meanMaxPowerFor(context, wpk, begin, end, &weekdates, sport);
 
         // lets extract the best performance of the week first.
         // only care about performances between 3-20 minutes.
@@ -262,13 +250,13 @@ Estimator::run()
             double p = double(week[t]);
             if (week[t]<=0) continue;
 
-            double pix = powerIndex(p, t, isRun);
+            double pix = powerIndex(p, t, sport);
             if (pix > bestperformance.powerIndex) {
                 bestperformance.duration = t;
                 bestperformance.power = p;
                 bestperformance.powerIndex = pix;
                 bestperformance.when = weekdates[t];
-                bestperformance.run = isRun;
+                bestperformance.sport = sport;
 
                 // for filter, saves having to convert as we go
                 bestperformance.x = bestperformance.when.toJulianDay();
@@ -288,7 +276,7 @@ Estimator::run()
             model->setData(bests.aggregate());
             model->saveParameters(add.parameters); // save the computed parms
 
-            add.run = isRun;
+            add.sport = sport;
             add.wpk = false;
             add.from = begin;
             add.to = end;
@@ -301,12 +289,12 @@ Estimator::run()
             if (add.CP && add.WPrime) add.EI = add.WPrime / add.CP ;
 
             // so long as the important model derived values are sensible ...
-            if (add.WPrime > 1000 && add.CP > 100) {
-                printd("Estimates for %s - %s\n", add.from.toString().toStdString().c_str(), add.to.toString().toStdString().c_str());
+            if (add.WPrime > 1000 && add.CP > 100 && add.CP < 1000) {
+                printd("%s Estimates for %s - %s (%s): CP=%.f W'=%.f\n", sport.toStdString().c_str(), add.from.toString().toStdString().c_str(), add.to.toString().toStdString().c_str(), add.model.toStdString().c_str(), add.CP, add.WPrime);
                 est << add;
+            } else {
+                printd("%s Estimates for %s - %s (%s): Not available\n", sport.toStdString().c_str(), add.from.toString().toStdString().c_str(), add.to.toString().toStdString().c_str(), add.model.toStdString().c_str());
             }
-
-            //qDebug()<<add.to<<add.from<<model->code()<< "W'="<< model->WPrime() <<"CP="<< model->CP() <<"pMax="<<model->PMax();
 
             // set the wpk data
             model->setData(bestsWPK.aggregate());
@@ -324,29 +312,28 @@ Estimator::run()
 
             // so long as the model derived values are sensible ...
             if ((!model->hasWPrime() || add.WPrime > 10.0f) &&
-                (!model->hasCP() || add.CP > 1.0f) &&
+                (!model->hasCP() || (add.CP > 1.0f && add.CP < 10.0)) &&
                 (!model->hasPMax() || add.PMax > 1.0f) &&
                 (!model->hasFTP() || add.FTP > 1.0f)) {
-                printd("WPK Estimates for %s - %s\n", add.from.toString().toStdString().c_str(), add.to.toString().toStdString().c_str());
+                printd("%s WPK Estimates for %s - %s (%s): CP=%.1f W'=%.1f\n", sport.toStdString().c_str(), add.from.toString().toStdString().c_str(), add.to.toString().toStdString().c_str(), add.model.toStdString().c_str(), add.CP, add.WPrime);
                 est << add;
+            } else {
+                printd("%s WPK Estimates for %s - %s (%s): Not available\n", sport.toStdString().c_str(), add.from.toString().toStdString().c_str(), add.to.toString().toStdString().c_str(), add.model.toStdString().c_str(), add.CP, add.WPrime);
             }
 
-            //qDebug()<<add.from<<model->code()<< "KG W'="<< model->WPrime() <<"CP="<< model->CP() <<"pMax="<<model->PMax();
         }
 
         // go forward a week
         date = date.addDays(7);
     }
 
-    // add a dummy entry if we have no estimates to stop constantly trying to refresh
-    if (est.count() == 0)  est << PDEstimate();
-
     // filter performances
     perfs = filter(perfs);
 
     // now update them
     lock.lock();
-    if (i == 0) {
+    if (first) {
+        first = false;
         estimates = est;
         performances = perfs;
     } else {
@@ -357,17 +344,17 @@ Estimator::run()
 
     // debug dump peak performances
     foreach(Performance p, performances) {
-        printd("%s %f Peak: %f for %f secs on %s\n", p.run ? "Run" : "Bike", p.powerIndex, p.power, p.duration, p.when.toString().toStdString().c_str());
+        printd("%s %f Peak: %f for %f secs on %s\n", sport.toStdString().c_str(), p.powerIndex, p.power, p.duration, p.when.toString().toStdString().c_str());
     }
-    printd("%s Estimates end.\n", isRun ? "Run" : "Bike");
+    printd("%s Estimates end.\n", sport.toStdString().c_str());
   }
 }
 
-Performance Estimator::getPerformanceForDate(QDate date, bool wantrun)
+Performance Estimator::getPerformanceForDate(QDate date, QString sport)
 {
     // serial search is ok as low numberish - always takes first as should be no dupes
     foreach(Performance p, performances) {
-        if (p.when == date && p.run == wantrun) return p;
+        if (p.when == date && p.sport == sport) return p;
     }
     return Performance(QDate(),0,0,0);
 }

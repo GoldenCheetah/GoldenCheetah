@@ -113,12 +113,16 @@ class EditNamedSearches : public QDialog
         QTreeWidget *searchList;
         QPushButton *addButton,
                     *updateButton,
+                    *upButton,
+                    *downButton,
                     *deleteButton;
         QIcon searchIcon, filterIcon;
 
     private slots:
         void addClicked();
         void updateClicked();
+        void upClicked();
+        void downClicked();
         void deleteClicked();
         void selectionChanged();
 };

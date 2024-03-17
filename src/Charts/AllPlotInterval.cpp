@@ -31,6 +31,7 @@
 #include <qwt_plot_intervalcurve.h>
 #include <qwt_scale_div.h>
 #include <qwt_scale_widget.h>
+#include <qwt_scale_map.h>
 
 class AllPlotIntervalData : public QwtArraySeriesData<QwtIntervalSample>
 {
@@ -93,16 +94,16 @@ AllPlotInterval::AllPlotInterval(QWidget *parent, Context *context):
     // tick draw
     //TimeScaleDraw *tsd = new TimeScaleDraw(&this->bydist) ;
     //tsd->setTickLength(QwtScaleDiv::MajorTick, 3);
-    //setAxisScaleDraw(QwtPlot::xBottom, tsd);
+    //setAxisScaleDraw(QwtAxis::XBottom, tsd);
     //pal.setColor(QPalette::WindowText, GColor(CPLOTMARKER));
     //pal.setColor(QPalette::Text, GColor(CPLOTMARKER));
-    //axisWidget(QwtPlot::xBottom)->setPalette(pal);
+    //axisWidget(QwtAxis::XBottom)->setPalette(pal);
 
-    enableAxis(xBottom, false);
-    setAxisVisible(xBottom, false);
-    setAxisVisible(yLeft, false);
+    setAxisVisible(QwtAxis::XBottom, false);
+    setAxisVisible(QwtAxis::XBottom, false);
+    setAxisVisible(QwtAxis::YLeft, false);
 
-    tooltip = new LTMToolTip(QwtPlot::xBottom, QwtAxis::yLeft,
+    tooltip = new LTMToolTip(QwtAxis::XBottom, QwtAxis::YLeft,
                                    QwtPicker::NoRubberBand,
                                    QwtPicker::AlwaysOn,
                                    canvas(),
@@ -122,7 +123,7 @@ void
 AllPlotInterval::configChanged(qint32)
 {
     QPalette pal = palette();
-    pal.setBrush(QPalette::Background, QBrush(GColor(CRIDEPLOTBACKGROUND)));
+    pal.setBrush(QPalette::Window, QBrush(GColor(CRIDEPLOTBACKGROUND)));
     setPalette(pal);
     setCanvasBackground(GColor(CRIDEPLOTBACKGROUND));
     static_cast<QwtPlotCanvas*>(canvas())->setFrameStyle(QFrame::NoFrame);
@@ -168,7 +169,7 @@ void
 AllPlotInterval::sortIntervals(QList<IntervalItem*> &intervals, QList< QList<IntervalItem*> > &intervalsGroups)
 {
     // Sort by duration
-    qSort(intervals.begin(), intervals.end(), intervalBiggerThan);
+    std::sort(intervals.begin(), intervals.end(), intervalBiggerThan);
 
     QList<IntervalItem*> matchesGroup;
 
@@ -239,7 +240,7 @@ AllPlotInterval::placeIntervals()
     }
 
     setFixedHeight((1+intervalLigns.count())*(10*dpiYFactor));
-    setAxisScale(yLeft, 0, 3000*intervalLigns.count());
+    setAxisScale(QwtAxis::YLeft, 0, 3000*intervalLigns.count());
 }
 
 void
@@ -269,7 +270,7 @@ AllPlotInterval::refreshIntervalCurve()
 
         foreach(IntervalItem *interval, intervalsLign) {
             QwtPlotIntervalCurve *intervalCurve = new QwtPlotIntervalCurve();
-            intervalCurve->setYAxis(QwtAxis::yLeft);
+            intervalCurve->setYAxis(QwtAxis::YLeft);
 
             setColorForIntervalCurve(intervalCurve, interval, false);
 
@@ -340,7 +341,7 @@ double
 AllPlotIntervalData::x(size_t i) const
 {
     //if (interval == NULL) return 0; // out of bounds !?
-    double multiplier = context->athlete->useMetricUnits ? 1 : MILES_PER_KM;
+    double multiplier = GlobalContext::context()->useMetricUnits ? 1 : MILES_PER_KM;
 
     // which point are we returning?
     switch (i%4) {

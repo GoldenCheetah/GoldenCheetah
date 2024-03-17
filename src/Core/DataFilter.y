@@ -23,7 +23,7 @@
 // enable multiple grammars in a single executable you
 // should make sure you use the very latest bison since it
 // has been known to be problematic in the past. It is
-// know to work well with bison v2.4.1.
+// know to work well with bison v2.7.
 //
 // To make the grammar readable I have placed the code
 // for each nterm at column 40, this source file is best
@@ -49,12 +49,12 @@ extern Leaf *DataFilterroot; // root node for parsed statement
 
 %}
 
-// Symbol can be meta or metric name
-%token <leaf> SYMBOL PYTHON
+// Symbol can be meta, metric, variable or function name
+%token <string> SYMBOL PYTHON
 
 // Constants can be a string or a number
-%token <leaf> DF_STRING DF_INTEGER DF_FLOAT
-%token <function> BEST TIZ CONFIG CONST_ DATERANGE
+%token <string> DF_STRING DF_INTEGER DF_FLOAT
+%token <function> BEST TIZ CONFIG CONST_
 
 // comparative operators
 %token <op> IF_ ELSE_ WHILE
@@ -63,31 +63,31 @@ extern Leaf *DataFilterroot; // root node for parsed statement
 %token <op> MATCHES ENDSWITH BEGINSWITH CONTAINS
 %type <op> AND OR;
 
-// Date Range markers for vector expressions
-%token <op> LSB RSB
-
 %union {
    Leaf *leaf;
    QList<Leaf*> *comp;
    int op;
    char function[32];
+   char* string;
 }
+
+%destructor { $$->clear($$); delete $$; } <leaf>
+%destructor { foreach (Leaf* l, *$$) { l->clear(l); delete l; } delete $$; } <comp>
 
 %locations
 
-%type <leaf> symbol array literal lexpr cexpr expr parms block statement expression;
+%type <leaf> symbol array select literal lexpr cexpr expr parms block statement expression parameter;
 %type <leaf> simple_statement if_clause while_clause function_def;
 %type <leaf> python_script;
 %type <comp> statements
 
 %right '?' ':'
-%right '[' ']'
-%right LSB RSB
 %right AND OR
 %right EQ NEQ LT LTE GT GTE MATCHES ENDSWITH CONTAINS
 %left ADD SUBTRACT
 %left MULTIPLY DIVIDE
 %right POW
+%right '[' ']'
 
 %start filter;
 %%
@@ -141,7 +141,7 @@ block:
 statements: 
 
         statement                               { $$ = new QList<Leaf*>(); $$->append($1); }
-        | statements statement                  { $$->append($2); }
+        | statements statement                  { $1->append($2); $$ = $1; }
         ;
 
 /*
@@ -237,18 +237,26 @@ function_def:
                                                 }
         ;
 
+parameter:
+
+        lexpr                                   { $$ = $1; }
+        | block                                 { $$ = $1; }
+        ;
+
 /*
  * A parameter list, as passed to a function
  */
 parms: 
 
-        lexpr                                   { $$ = new Leaf(@1.first_column, @1.last_column);
+        parameter                               { $$ = new Leaf(@1.first_column, @1.last_column);
                                                   $$->type = Leaf::Function;
                                                   $$->series = NULL; // not tiz/best
                                                   $$->fparms << $1;
                                                 }
-        | parms ',' lexpr                       { $1->fparms << $3;
-                                                  $1->leng = @3.last_column; }
+        | parms ',' parameter                   { $1->fparms << $3;
+                                                  $1->leng = @3.last_column;
+                                                  $$ = $1;
+                                                }
         ;
 
 /*
@@ -270,13 +278,6 @@ lexpr:
                                                   $$->rvalue.l = $5;
                                                   $$->cond.l = $1;
                                                 }
-        | lexpr LSB lexpr ':' lexpr RSB { $$ = new Leaf(@1.first_column, @6.last_column);
-                                                  $$->type = Leaf::Vector;
-                                                  $$->lvalue.l = $1;
-                                                  $$->fparms << $3;
-                                                  $$->fparms << $5;
-                                                  $$->op = 0;
-                                                }
         | '!' lexpr %prec OR                    { $$ = new Leaf(@1.first_column, @2.last_column);
                                                   $$->type = Leaf::UnaryOperation;
                                                   $$->lvalue.l = $2;
@@ -297,13 +298,23 @@ lexpr:
                                                 }
         ;
 
-array:  symbol '[' expr ']'                    {
+array:
+         expr '[' expr ']'                    {
                                                   $$ = new Leaf(@1.first_column, @4.last_column);
                                                   $$->type = Leaf::Index;
                                                   $$->lvalue.l = $1;
                                                   $$->fparms << $3;
                                                   $$->op = 0;
                                                 }
+        ;
+
+select: expr '[' lexpr ']'                   {
+                                                  $$ = new Leaf(@1.first_column, @4.last_column);
+                                                  $$->type = Leaf::Select;
+                                                  $$->lvalue.l = $1;
+                                                  $$->fparms << $3;
+                                                  $$->op = 0;
+                                             }
         ;
 
 /*
@@ -442,11 +453,6 @@ expr:
                                                   $$->series = $3;
                                                   $$->lvalue.l = NULL;
                                                 }
-        | DATERANGE '(' symbol ')'              { $$ = new Leaf(@1.first_column, @4.last_column); $$->type = Leaf::Function;
-                                                  $$->function = QString($1);
-                                                  $$->series = $3;
-                                                  $$->lvalue.l = NULL;
-                                                }
                                                   /* functions all have zero or more parameters */
         | symbol '(' parms ')'                  { /* need to convert params to a function */
                                                   $3->loc = @1.first_column;
@@ -458,7 +464,10 @@ expr:
                                                   $1->type = Leaf::Function;
                                                   $1->series = NULL; // not tiz/best
                                                   $1->function = *($1->lvalue.n);
+                                                  delete $1->lvalue.n; // not used anymore
+                                                  $1->lvalue.l = NULL; // avoid double deletion
                                                   $1->fparms.clear(); // no parameters!
+                                                  $$ = $1;
                                                 }
         | '(' expr ')'                          { $$ = new Leaf(@2.first_column, @2.last_column);
                                                   $$->type = Leaf::Logical;
@@ -466,6 +475,7 @@ expr:
                                                   $$->op = 0;
                                                 }
         | array                                 { $$ = $1; }
+        | select                                { $$ = $1; }
         | literal                               { $$ = $1; }
         | symbol                                { $$ = $1; }
         | python_script                         { $$ = $1; }
@@ -495,7 +505,7 @@ literal:
 
         DF_STRING                               { $$ = new Leaf(@1.first_column, @1.last_column);
                                                   $$->type = Leaf::String;
-                                                  QString s2(DataFiltertext);
+                                                  QString s2 = Utils::unescape(DataFiltertext); // user can escape chars in string
                                                   $$->lvalue.s = new QString(s2.mid(1,s2.length()-2));
                                                 }
         | DF_FLOAT                              { $$ = new Leaf(@1.first_column, @1.last_column);

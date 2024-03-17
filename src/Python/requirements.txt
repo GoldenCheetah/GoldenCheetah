@@ -1,0 +1,18 @@
+#### Packages for embedded Python ###
+#
+# Core Tools
+#
+sip == 4.19.8
+numpy
+pandas == 1.2.3
+scipy
+lmfit
+plotly
+importlib_metadata
+#
+# Nice to have
+#
+# requests
+# scikit-learn
+# tensorflow
+# keras

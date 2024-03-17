@@ -32,9 +32,7 @@
 #include <QXmlSimpleReader>
 #include <QXmlDefaultHandler>
 #include <QNetworkReply>
-#if QT_VERSION > 0x050000
 #include <QUrlQuery>
-#endif
 
 class TrainingsTageBuch : public CloudService {
 

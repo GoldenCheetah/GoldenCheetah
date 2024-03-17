@@ -40,15 +40,6 @@ class Statistic
         double corr(QVector<double> &Xi, QVector<double> &Yi,int n);
         double average(QVector<double> &Xi,int n);
 
-    protected:
-        long points;
-        double sumX, sumY;
-        double sumXsquared,
-               sumYsquared;
-        double sumXY;
-        double a, b, c;   // a = intercept, b = slope, c = r2
-
-    private:
         // Maths functions used by the plots
         QVector<double> array_temp; //Déclaration d'un tableau temporaire
 
@@ -69,6 +60,14 @@ class Statistic
         double covariance(QVector<double> &Xi, QVector<double> &Yi,int n);
         double variance(QVector<double> &val,int n);
         double standarddeviation(QVector<double> &val,int n);
+
+    protected:
+        long points;
+        double sumX, sumY;
+        double sumXsquared,
+               sumYsquared;
+        double sumXY;
+        double a, b, c;   // a = intercept, b = slope, c = r2
 
 };
 

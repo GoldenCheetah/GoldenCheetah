@@ -532,16 +532,16 @@ AddIntervalDialog::createClicked()
             }
 
             if (methodPeakPower->isChecked()) {
-                findPeaks(context, byTime, ride, Specification(), RideFile::watts, RideFile::original, (byTime?windowSizeSecs:windowSizeMeters), maxIntervals, results, "Peak Power","");
+                findPeaks(context, byTime, ride, Specification(), RideFile::watts, RideFile::original, (byTime?windowSizeSecs:windowSizeMeters), maxIntervals, results, tr("Peak Power"),"");
             }
             else if (methodPeakSpeed->isChecked()) {
-                findPeaks(context, byTime, ride, Specification(), RideFile::kph, RideFile::original, (byTime?windowSizeSecs:windowSizeMeters), maxIntervals, results, "Peak Speed","");
+                findPeaks(context, byTime, ride, Specification(), RideFile::kph, RideFile::original, (byTime?windowSizeSecs:windowSizeMeters), maxIntervals, results, tr("Peak Speed"),"");
             }
             else if (methodPeakPace->isChecked()) {
-                findPeaks(context, byTime, ride, Specification(), RideFile::kph, RideFile::pace, (byTime?windowSizeSecs:windowSizeMeters), maxIntervals, results, "Peak Pace", "");
+                findPeaks(context, byTime, ride, Specification(), RideFile::kph, RideFile::pace, (byTime?windowSizeSecs:windowSizeMeters), maxIntervals, results, tr("Peak Pace"), "");
             }
             else if (methodHeartRate->isChecked()) {
-                findPeaks(context, byTime, ride, Specification(), RideFile::hr, RideFile::original, (byTime?windowSizeSecs:windowSizeMeters), maxIntervals, results, "Peak HR", "");
+                findPeaks(context, byTime, ride, Specification(), RideFile::hr, RideFile::original, (byTime?windowSizeSecs:windowSizeMeters), maxIntervals, results, tr("Peak HR"), "");
             }
         }
 

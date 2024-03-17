@@ -25,7 +25,6 @@
 
 #include "WPrime.h"
 
-#include "RideFile.h"
 #include "Settings.h"
 #include "Units.h"
 #include "Colors.h"
@@ -135,6 +134,9 @@ class WorkoutWidget : public QWidget
         QList<int> hr; // 1s samples [bpm]
         QList<double> speed; // 1s samples [km/h]
         QList<int> cadence; // 1s samples [rpm]
+        QList<int> vo2; // 1s samples [ml/min]
+        QList<int> ventilation; // 1s samples [l/min]
+        QList<double> hrAvg, pwrAvg, cadenceAvg, vo2Avg, ventilationAvg, speedAvg; // averages
 
         // interaction state;
         // none - initial state
@@ -143,6 +145,9 @@ class WorkoutWidget : public QWidget
         // rect - rectangle select tool active
         // create - clicked to create
         enum { none, create, drag, dragblock, rect } state;
+
+        enum wwseriestype { CADENCE, HEARTRATE, POWER, SPEED, WBAL, VO2, VENTILATION };
+        typedef enum wwseriestype WwSeriesType;
 
         // adding items and points
         void addItem(WorkoutWidgetItem*x) { children_.append(x); }
@@ -156,6 +161,9 @@ class WorkoutWidget : public QWidget
 
         // lap markers
         QList<ErgFileLap> &laps() { return laps_; }
+
+        // lap markers
+        QList<ErgFileText> &texts() { return texts_; }
 
         // get WPrime values
         WPrime &wprime() { return wpBal; }
@@ -193,7 +201,7 @@ class WorkoutWidget : public QWidget
         }
 
         // transform from plot to painter co-ordinate
-        QPoint transform(double x, double y, RideFile::SeriesType s=RideFile::watts);
+        QPoint transform(double x, double y, WwSeriesType s=POWER);
 
         // for log(x) scale
         int logX(double t);
@@ -294,6 +302,22 @@ class WorkoutWidget : public QWidget
         // hate this function !
         bool setBlockCursor();
 
+        // settings getters
+        bool shouldPlotHr();
+        bool shouldPlotPwr();
+        bool shouldPlotCadence();
+        bool shouldPlotWbal();
+        bool shouldPlotVo2();
+        bool shouldPlotVentilation();
+        bool shouldPlotSpeed();
+
+        int hrPlotAvgLength();
+        int pwrPlotAvgLength();
+        int cadencePlotAvgLength();
+        int vo2PlotAvgLength();
+        int ventilationPlotAvgLength();
+        int speedPlotAvgLength();
+
     protected:
 
         // interacting with points
@@ -347,6 +371,9 @@ class WorkoutWidget : public QWidget
         // the lap definitions
         QList<ErgFileLap>   laps_;      // interval markers in the file
 
+        // the lap definitions
+        QList<ErgFileText>   texts_;    // text cues in the file
+
         // Workout starts at 0 ends at maxWX_
         double maxWX_;
 
@@ -387,6 +414,8 @@ class WorkoutWidget : public QWidget
         int cadenceMax;
         int hrMax;
         double speedMax;
+        int vo2Max;
+        int ventilationMax;
 
         // resampling when recording
         double wbalSum;
@@ -394,6 +423,8 @@ class WorkoutWidget : public QWidget
         double cadenceSum;
         double speedSum;
         double hrSum;
+        double vo2Sum;
+        double ventilationSum;
         int count;
 };
 

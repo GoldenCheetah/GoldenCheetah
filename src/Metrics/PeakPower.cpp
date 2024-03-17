@@ -69,7 +69,7 @@ class PeakPercent : public RideMetric {
             double CP = 250;
             double WPRIME = 22000;
 
-            const Zones* zones = item->context->athlete->zones(item->isRun);
+            const Zones* zones = item->context->athlete->zones(item->sport);
             if (zones) {
 
                 // if range is -1 we need to fall back to a default value
@@ -99,12 +99,10 @@ class PeakPercent : public RideMetric {
 class PowerZone : public RideMetric {
 
     Q_DECLARE_TR_FUNCTIONS(PowerZone)
-    double maxp;
-    double minp;
 
     public:
 
-    PowerZone() : maxp(0.0), minp(10000)
+    PowerZone()
     {
         setType(RideMetric::Average);
         setSymbol("power_zone");
@@ -129,7 +127,7 @@ class PowerZone : public RideMetric {
     void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &deps) {
 
         // no zones
-        const Zones* zones = item->context->athlete->zones(item->isRun);
+        const Zones* zones = item->context->athlete->zones(item->sport);
         if (!zones || !item->ride()->areDataPresent()->watts) {
             setValue(RideFile::NIL);
             setCount(0);
@@ -153,7 +151,7 @@ class PowerZone : public RideMetric {
             // use Pmax as upper bound, this is used
             // for the limit of upper zone ALWAYS
             const int pmax = zones->getPmax(item->zoneRange);
-            high = std::max(high, pmax);
+            high = std::min(high, pmax);
             
             // how far in?
             percent = double(ap-low) / double(high-low);

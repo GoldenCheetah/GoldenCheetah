@@ -18,6 +18,7 @@
  */
 
 #include "ANT.h"
+#include "RideFile.h"
 #include <QDebug>
 #include <QTime>
 
@@ -54,7 +55,9 @@ ANTChannel::init()
     messages_received=0;
     messages_dropped=0;
     setId();
-    srm_offset=400; // default relatively arbitrary, but matches common 'indoors' values
+    // retrieve srm_offset from last successful calibration,
+    // default relatively arbitrary, but matches common 'indoors' values
+    srm_offset=appsettings->value(this, SRM_OFFSET, 400).toDouble();
     burstInit();
     value2=value=0;
     status = Closed;
@@ -412,6 +415,8 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
                         // 5 seconds have elapsed since starting calibration, so assume completed
                         qDebug() << "ANT Sport calibration succeeded";
                         srm_offset = srm_offset_instant;
+                        // persist offset value in global settings
+                        appsettings->setValue(SRM_OFFSET, srm_offset);
                         parent->setCalibrationZeroOffset(srm_offset);
                         parent->setCalibrationSlope(srm_slope);
                         parent->setCalibrationState(CALIBRATION_STATE_SUCCESS);
@@ -634,13 +639,14 @@ void ANTChannel::broadcastEvent(unsigned char *ant_message)
                         is_alt ? parent->setAltWatts(antMessage.instantPower) : parent->setWatts(antMessage.instantPower);
                         value2 = value = antMessage.instantPower;
                         parent->setSecondaryCadence(antMessage.instantCadence); // cadence
-                        antMessage.pedalPowerContribution ? parent->setLRBalance(antMessage.pedalPower) : parent->setLRBalance(0);
+                        // LRBalance is left side contribution, pedalPower is right side
+                        antMessage.pedalPowerContribution ? parent->setLRBalance(100-antMessage.pedalPower) : parent->setLRBalance(RideFile::NA);
                     } else {
                        stdNullCount++;
                        if (stdNullCount >= 6) { //6 for standard power according to specs
                            parent->setSecondaryCadence(0);
                            is_alt ? parent->setAltWatts(0) : parent->setWatts(0);
-                           parent->setLRBalance(0);
+                           parent->setLRBalance(RideFile::NA);
                            value2 = value = 0;
                            parent->setTE(0,0);
                            parent->setPS(0,0);

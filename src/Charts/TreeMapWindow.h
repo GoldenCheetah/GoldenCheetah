@@ -178,7 +178,7 @@ class TreeMapWindow : public GcChartWindow
 
         // Widgets
         QVBoxLayout *mainLayout;
-        TreeMapPlot *ltmPlot;
+        TreeMapPlot *treemapPlot;
         QLabel *title;
 
         QComboBox *field1,

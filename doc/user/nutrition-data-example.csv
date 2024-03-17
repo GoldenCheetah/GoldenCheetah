@@ -1,0 +1,3 @@
+Datetime,Calories,CHO,PRO,FAT,comment
+2018-05-21T12:00:00Z,2900,400,100,100,Test Data
+2018-05-22T12:00:00Z,3300,500,100,100,"Here the comment text contain commas itself, so it needs quotes"

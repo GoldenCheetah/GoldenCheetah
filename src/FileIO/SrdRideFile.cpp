@@ -316,7 +316,7 @@ static int get_recording_interval ( unsigned char b )
 {
   int ri = 0;
 
-  switch ( b ) {
+  switch ( b & 0x0f ) {
   case 0:  ri = 5;  break;
   case 1:  ri = 15; break;
   case 2:  ri = 60; break;
@@ -799,7 +799,7 @@ static S710_HRM_Type detect_hrm_type ( unsigned char * buf, unsigned int bytes )
 
     type = S710_HRM_S610;
 
-  } else if ( (buf[35] == 0 || buf[35] == 48) && buf[37] == 251 ) {
+  } else if ( (buf[35] == 0 || buf[35] == 48) && (buf[37] == 251 || buf[37] == 75) ) {
 
     /* this is either an s710 or s625x or...? */
 

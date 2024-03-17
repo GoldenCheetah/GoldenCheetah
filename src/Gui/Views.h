@@ -19,7 +19,7 @@
 #ifndef _GC_Views_h
 #define _GC_Views_h 1
 
-#include "TabView.h"
+#include "AbstractView.h"
 class TrainSidebar;
 class AnalysisSidebar;
 class IntervalSidebar;
@@ -27,7 +27,7 @@ class QDialog;
 class RideNavigator;
 class TrainBottom;
 
-class AnalysisView : public TabView
+class AnalysisView : public AbstractView
 {
     Q_OBJECT
 
@@ -35,23 +35,25 @@ class AnalysisView : public TabView
 
         AnalysisView(Context *context, QStackedWidget *controls);
         ~AnalysisView();
-        void close();
-        void setRide(RideItem*ride);
+        void close() override;
+        void setRide(RideItem*ride) override;
         void addIntervals();
 
         RideNavigator *rideNavigator();
+        AnalysisSidebar *analSidebar;
 
     public slots:
 
-        bool isBlank();
+        bool isBlank() override;
         void compareChanged(bool);
 
     private:
-        AnalysisSidebar *analSidebar;
+        Perspective *hw;
 
 };
 
-class DiaryView : public TabView
+class DiarySidebar;
+class DiaryView : public AbstractView
 {
     Q_OBJECT
 
@@ -59,16 +61,20 @@ class DiaryView : public TabView
 
         DiaryView(Context *context, QStackedWidget *controls);
         ~DiaryView();
-        void setRide(RideItem*ride);
+        void setRide(RideItem*ride) override;
 
     public slots:
 
-        bool isBlank();
+        bool isBlank() override;
         void dateRangeChanged(DateRange);
+
+    private:
+        DiarySidebar *diarySidebar;
+        Perspective *hw;
 
 };
 
-class TrainView : public TabView
+class TrainView : public AbstractView
 {
     Q_OBJECT
 
@@ -76,35 +82,44 @@ class TrainView : public TabView
 
         TrainView(Context *context, QStackedWidget *controls);
         ~TrainView();
-        void close();
+        void close() override;
 
     public slots:
 
-        bool isBlank();
+        bool isBlank() override;
         void onSelectionChanged();
 
     private:
 
         TrainSidebar *trainTool;
         TrainBottom *trainBottom;
+        Perspective *hw;
 
 private slots:
         void onAutoHideChanged(bool enabled);
 };
 
-class HomeView : public TabView
+class LTMSidebar;
+class TrendsView : public AbstractView
 {
     Q_OBJECT
 
     public:
 
-        HomeView(Context *context, QStackedWidget *controls);
-        ~HomeView();
+        TrendsView(Context *context, QStackedWidget *controls);
+        ~TrendsView();
 
+        LTMSidebar *sidebar;
+        Perspective *hw;
+
+        int countActivities(Perspective *, DateRange dr);
+
+    signals:
+        void dateChanged(DateRange);
 
     public slots:
 
-        bool isBlank();
+        bool isBlank() override;
         void justSelected();
         void dateRangeChanged(DateRange);
         void compareChanged(bool);

@@ -355,7 +355,8 @@ MergeActivityWizard::mergeRideSamplesByDistance()
         }
 
         // Compute interpolated location from current distance.
-        geolocation interpLoc = gpi.Interpolate(add.km);
+        double interpSlope = 0.;
+        geolocation interpLoc = gpi.Location(add.km, interpSlope);
 
         RideFilePoint source = *(ride2->dataPoints()[j]);
 
@@ -379,21 +380,7 @@ MergeActivityWizard::mergeRideSamplesByDistance()
                         add.setValue(io.key(), interpLoc.Alt());
                         break;
                     case RideFile::slope:
-                        {
-                            // Obtain interpolated future altitude using next unique ride1 distance
-                            // since that location is of the next altitude that will be recorded.
-                            // This is more stable than using the actual point slope at current
-                            // location and ensures that slope will match recorded altitudes.
-                            double slope = 0.0;
-                            if (ride1nextdistance != add.km)
-                            {
-                                geolocation interpLocE = gpi.Interpolate(ride1nextdistance);
-                                double altitudeDeltaM = (interpLocE.Alt() - interpLoc.Alt());
-                                double distanceDeltaM = 1000 * (ride1nextdistance - add.km);
-                                slope = 100.0 * (altitudeDeltaM / distanceDeltaM);
-                            }
-                            add.setValue(io.key(), slope);
-                        }
+                        add.setValue(io.key(), interpSlope * 100);
                         break;
                     default:
                         add.setValue(io.key(), source.value(io.key()));
@@ -457,12 +444,33 @@ MergeActivityWizard::combine()
         // and XData from second ride, append if series already present
         foreach (XDataSeries *xdata, ride2->xdata()) {
             if (combined->xdata().contains(xdata->name)) {
+
+                // Reorder to match the series present in the first activity
+                QStringList names = combined->xdata()[xdata->name]->valuename;
+                QVector<int> indexMap;
+                for (int i=0; i<names.count() && i<XDATA_MAXVALUES; i++)
+                    if (xdata->valuename.contains(names[i]))
+                        indexMap << xdata->valuename.indexOf(names[i]);
+
+                // Add the remaining ones to the end only if there is space
+                for (int i=0; i<xdata->valuename.count(); i++)
+                    if (!names.contains(xdata->valuename[i]) && combined->xdata().count()<XDATA_MAXVALUES) {
+                        combined->xdata()[xdata->name]->valuename << xdata->valuename[i];
+                        indexMap << i;
+                    }
+
+                // finally copy the data
                 foreach (XDataPoint *point, xdata->datapoints) {
-                    XDataPoint *pt = new XDataPoint(*point);
+                    XDataPoint *pt = new XDataPoint();
                     pt->secs = point->secs + timeOffset;
                     pt->km = point->km + distanceOffset;
+                    for (int i=0; i<indexMap.count(); i++) {
+                        pt->number[i] = point->number[indexMap[i]];
+                        pt->string[i] = point->string[indexMap[i]];
+                    }
                     combined->xdata(xdata->name)->datapoints.append(pt);
                 }
+
             } else {
                 XDataSeries *xd = new XDataSeries(*xdata);
                 xd->datapoints.clear();
@@ -615,7 +623,7 @@ MergeSource::MergeSource(MergeActivityWizard *parent) : QWizardPage(parent), wiz
     setLayout(layout);
 
     mapper = new QSignalMapper(this);
-    connect(mapper, SIGNAL(mapped(QString)), this, SLOT(clicked(QString)));
+    connect(mapper, &QSignalMapper::mappedString, this, &MergeSource::clicked);
 
     // select a file
     QCommandLinkButton *p = new QCommandLinkButton(tr("Import from a File"), 
@@ -694,7 +702,7 @@ MergeSource::importFile()
 
     const RideFileFactory &rff = RideFileFactory::instance();
     QStringList suffixList = rff.suffixes();
-    suffixList.replaceInStrings(QRegExp("^"), "*.");
+    suffixList.replaceInStrings(QRegularExpression("^"), "*.");
     QStringList fileNames;
     QStringList allFormats;
     allFormats << QString(tr("All Supported Formats (%1)")).arg(suffixList.join(" "));
@@ -716,9 +724,6 @@ MergeSource::importFile()
 bool
 MergeSource::importFile(QList<QString> files)
 {
-    // get fullpath name for processing
-    QFileInfo filename = QFileInfo(files[0]).absoluteFilePath();
-
     QFile thisfile(files[0]);
     QFileInfo thisfileinfo(files[0]);
     QStringList errors;
@@ -922,7 +927,7 @@ MergeMode::MergeMode(MergeActivityWizard *parent) : QWizardPage(parent), wizard(
     setLayout(layout);
 
     mapper = new QSignalMapper(this);
-    connect(mapper, SIGNAL(mapped(QString)), this, SLOT(clicked(QString)));
+    connect(mapper, &QSignalMapper::mappedString, this, &MergeMode::clicked);
 
     // merge
     QCommandLinkButton *p = new QCommandLinkButton(tr("Merge Data to add another data series"), 
@@ -984,7 +989,7 @@ MergeStrategy::MergeStrategy(MergeActivityWizard *parent) : QWizardPage(parent),
     setLayout(layout);
 
     mapper = new QSignalMapper(this);
-    connect(mapper, SIGNAL(mapped(QString)), this, SLOT(clicked(QString)));
+    connect(mapper, &QSignalMapper::mappedString, this, &MergeStrategy::clicked);
 
     // time
     QCommandLinkButton *p = new QCommandLinkButton(tr("Align using start time"), 
@@ -1101,11 +1106,7 @@ MergeAdjust::MergeAdjust(MergeActivityWizard *parent) : QWizardPage(parent), wiz
     // BUG in QMacStyle and painting of spanSlider
     // so we use a plain style to avoid it, but only
     // on a MAC, since win and linux are fine
-#if QT_VERSION > 0x5000
     QStyle *style = QStyleFactory::create("fusion");
-#else
-    QStyle *style = QStyleFactory::create("Cleanlooks");
-#endif
     spanSlider->setStyle(style);
 #endif
 
@@ -1120,7 +1121,7 @@ MergeAdjust::MergeAdjust(MergeActivityWizard *parent) : QWizardPage(parent), wiz
     static_cast<QwtPlotCanvas*>(fullPlot->canvas())->setBorderRadius(0);
     fullPlot->setWantAxis(false, true);
     QPalette pal = palette();
-    fullPlot->axisWidget(QwtPlot::xBottom)->setPalette(pal);
+    fullPlot->axisWidget(QwtAxis::XBottom)->setPalette(pal);
 
     layout->addWidget(spanSlider);
     layout->addWidget(fullPlot);
@@ -1230,7 +1231,7 @@ MergeAdjust::resetClicked()
 void
 MergeAdjust::zoomChanged()
 {
-    fullPlot->setAxisScale(QwtPlot::xBottom, spanSlider->lowerValue()/60.0f, spanSlider->upperValue()/60.0f);
+    fullPlot->setAxisScale(QwtAxis::XBottom, spanSlider->lowerValue()/60.0f, spanSlider->upperValue()/60.0f);
     fullPlot->replot();
 }
 

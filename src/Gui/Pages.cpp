@@ -26,7 +26,6 @@
 #include "Units.h"
 #include "Settings.h"
 #include "UserMetricParser.h"
-#include "Units.h"
 #include "Colors.h"
 #include "AddDeviceWizard.h"
 #include "AddCloudWizard.h"
@@ -38,16 +37,19 @@
 #include "OAuthDialog.h"
 #include "RideAutoImportConfig.h"
 #include "HelpWhatsThis.h"
-#if QT_VERSION >= 0x050000
+#include "GcUpgrade.h"
 #include "Dropbox.h"
-#include "GoogleDrive.h"
-#endif
 #include "LocalFileStore.h"
 #include "Secrets.h"
 #include "Utils.h"
 #ifdef GC_WANT_PYTHON
 #include "PythonEmbed.h"
+#include "FixPySettings.h"
 #endif
+#ifdef GC_HAS_CLOUD_DB
+#include "CloudDBUserMetric.h"
+#endif
+#include "MainWindow.h"
 extern ConfigDialog *configdialog_ptr;
 
 //
@@ -107,18 +109,29 @@ GeneralPage::GeneralPage(Context *context) : context(context)
     configLayout->addWidget(langLabel, 0,0, Qt::AlignRight);
     configLayout->addWidget(langCombo, 0,1, Qt::AlignLeft);
 
+    //
+    // Units
+    //
     QLabel *unitlabel = new QLabel(tr("Unit"));
     unitCombo = new QComboBox();
     unitCombo->addItem(tr("Metric"));
     unitCombo->addItem(tr("Imperial"));
 
-    if (context->athlete->useMetricUnits)
+    if (GlobalContext::context()->useMetricUnits)
         unitCombo->setCurrentIndex(0);
     else
         unitCombo->setCurrentIndex(1);
 
     configLayout->addWidget(unitlabel, 1,0, Qt::AlignRight);
     configLayout->addWidget(unitCombo, 1,1, Qt::AlignLeft);
+
+    metricRunPace = new QCheckBox(tr("Metric Run Pace"), this);
+    metricRunPace->setCheckState(appsettings->value(this, GC_PACE, GlobalContext::context()->useMetricUnits).toBool() ? Qt::Checked : Qt::Unchecked);
+    configLayout->addWidget(metricRunPace, 2,1, Qt::AlignLeft);
+
+    metricSwimPace = new QCheckBox(tr("Metric Swim Pace"), this);
+    metricSwimPace->setCheckState(appsettings->value(this, GC_SWIMPACE, GlobalContext::context()->useMetricUnits).toBool() ? Qt::Checked : Qt::Unchecked);
+    configLayout->addWidget(metricSwimPace, 3,1, Qt::AlignLeft);
 
     //
     // Garmin crap
@@ -135,9 +148,9 @@ GeneralPage::GeneralPage(Context *context) : context(context)
     garminHWMarkedit = new QLineEdit(garminHWMark.toString(),this);
     garminHWMarkedit->setInputMask("009");
 
-    configLayout->addWidget(garminSmartRecord, 2,1, Qt::AlignLeft);
-    configLayout->addWidget(garminHWLabel, 3,0, Qt::AlignRight);
-    configLayout->addWidget(garminHWMarkedit, 3,1, Qt::AlignLeft);
+    configLayout->addWidget(garminSmartRecord, 4,1, Qt::AlignLeft);
+    configLayout->addWidget(garminHWLabel, 5,0, Qt::AlignRight);
+    configLayout->addWidget(garminHWMarkedit, 5,1, Qt::AlignLeft);
 
     // Elevation hysterisis  GC_ELEVATION_HYSTERISIS
     QVariant elevationHysteresis = appsettings->value(this, GC_ELEVATION_HYSTERESIS);
@@ -148,8 +161,8 @@ GeneralPage::GeneralPage(Context *context) : context(context)
     hystedit = new QLineEdit(elevationHysteresis.toString(),this);
     hystedit->setInputMask("9.00");
 
-    configLayout->addWidget(hystlabel, 4,0, Qt::AlignRight);
-    configLayout->addWidget(hystedit, 4,1, Qt::AlignLeft);
+    configLayout->addWidget(hystlabel, 6,0, Qt::AlignRight);
+    configLayout->addWidget(hystedit, 6,1, Qt::AlignLeft);
 
 
     // wbal formula preference
@@ -160,30 +173,36 @@ GeneralPage::GeneralPage(Context *context) : context(context)
     if (appsettings->value(this, GC_WBALFORM, "diff").toString() == "diff") wbalForm->setCurrentIndex(0);
     else wbalForm->setCurrentIndex(1);
 
-    configLayout->addWidget(wbalFormLabel, 5,0, Qt::AlignRight);
-    configLayout->addWidget(wbalForm, 5,1, Qt::AlignLeft);
+    configLayout->addWidget(wbalFormLabel, 7,0, Qt::AlignRight);
+    configLayout->addWidget(wbalForm, 7,1, Qt::AlignLeft);
 
 
     //
     // Warn to save on exit
     warnOnExit = new QCheckBox(tr("Warn for unsaved activities on exit"), this);
     warnOnExit->setChecked(appsettings->value(NULL, GC_WARNEXIT, true).toBool());
-    configLayout->addWidget(warnOnExit, 6,1, Qt::AlignLeft);
+    configLayout->addWidget(warnOnExit, 8,1, Qt::AlignLeft);
+
+    //
+    // Open last Athlete
+    openLastAthlete = new QCheckBox(tr("Start with last opened Athlete"), this);
+    openLastAthlete->setChecked(appsettings->value(NULL, GC_OPENLASTATHLETE, true).toBool());
+    configLayout->addWidget(openLastAthlete, 9,1, Qt::AlignLeft);
 
     //
     // Run API web services when running
     //
-    int offset=0;
+    int offset=1;
 #ifdef GC_WANT_HTTP
-    offset += 1;
     startHttp = new QCheckBox(tr("Enable API Web Services"), this);
     startHttp->setChecked(appsettings->value(NULL, GC_START_HTTP, false).toBool());
-    configLayout->addWidget(startHttp, 7,1, Qt::AlignLeft);
+    configLayout->addWidget(startHttp, 9+offset,1, Qt::AlignLeft);
+    offset += 1;
 #endif
 #ifdef GC_WANT_R
     embedR = new QCheckBox(tr("Enable R"), this);
     embedR->setChecked(appsettings->value(NULL, GC_EMBED_R, true).toBool());
-    configLayout->addWidget(embedR, 7+offset,1, Qt::AlignLeft);
+    configLayout->addWidget(embedR, 9+offset,1, Qt::AlignLeft);
     offset += 1;
     connect(embedR, SIGNAL(stateChanged(int)), this, SLOT(embedRchanged(int)));
 #endif
@@ -191,19 +210,17 @@ GeneralPage::GeneralPage(Context *context) : context(context)
 #ifdef GC_WANT_PYTHON
     embedPython = new QCheckBox(tr("Enable Python"), this);
     embedPython->setChecked(appsettings->value(NULL, GC_EMBED_PYTHON, true).toBool());
-    configLayout->addWidget(embedPython, 7+offset,1, Qt::AlignLeft);
+    configLayout->addWidget(embedPython, 9+offset,1, Qt::AlignLeft);
     connect(embedPython, SIGNAL(stateChanged(int)), this, SLOT(embedPythonchanged(int)));
     offset += 1;
 #endif
 
-#if QT_VERSION >= 0x050000
     opendata = new QCheckBox(tr("Share to the OpenData project"), this);
     QString grant = appsettings->cvalue(context->athlete->cyclist, GC_OPENDATA_GRANTED, "X").toString();
     opendata->setChecked(grant == "Y");
-    configLayout->addWidget(opendata, 7+offset,1, Qt::AlignLeft);
+    configLayout->addWidget(opendata, 9+offset,1, Qt::AlignLeft);
     if (grant == "X") opendata->hide();
     offset += 1;
-#endif
 
     //
     // Athlete directory (home of athletes)
@@ -216,30 +233,11 @@ GeneralPage::GeneralPage(Context *context) : context(context)
     athleteBrowseButton = new QPushButton(tr("Browse"));
     //XXathleteBrowseButton->setFixedWidth(120);
 
-    configLayout->addWidget(athleteLabel, 7 + offset,0, Qt::AlignRight);
-    configLayout->addWidget(athleteDirectory, 7 + offset,1);
-    configLayout->addWidget(athleteBrowseButton, 7 + offset,2);
+    configLayout->addWidget(athleteLabel, 9 + offset,0, Qt::AlignRight);
+    configLayout->addWidget(athleteDirectory, 9 + offset,1);
+    configLayout->addWidget(athleteBrowseButton, 9 + offset,2);
 
     connect(athleteBrowseButton, SIGNAL(clicked()), this, SLOT(browseAthleteDir()));
-
-    //
-    // Workout directory (train view)
-    //
-    QVariant workoutDir = appsettings->value(this, GC_WORKOUTDIR, "");
-    // fix old bug..
-    if (workoutDir == "0") workoutDir = "";
-    workoutLabel = new QLabel(tr("Workout and VideoSync Library"));
-    workoutDirectory = new QLineEdit;
-    workoutDirectory->setText(workoutDir.toString());
-    workoutBrowseButton = new QPushButton(tr("Browse"));
-    //XXworkoutBrowseButton->setFixedWidth(120);
-
-    configLayout->addWidget(workoutLabel, 8 + offset,0, Qt::AlignRight);
-    configLayout->addWidget(workoutDirectory, 8 + offset,1);
-    configLayout->addWidget(workoutBrowseButton, 8 + offset,2);
-
-    connect(workoutBrowseButton, SIGNAL(clicked()), this, SLOT(browseWorkoutDir()));
-    offset++;
 
 #ifdef GC_WANT_R
     //
@@ -254,9 +252,9 @@ GeneralPage::GeneralPage(Context *context) : context(context)
     rBrowseButton = new QPushButton(tr("Browse"));
     //XXrBrowseButton->setFixedWidth(120);
 
-    configLayout->addWidget(rLabel, 8 + offset,0, Qt::AlignRight);
-    configLayout->addWidget(rDirectory, 8 + offset,1);
-    configLayout->addWidget(rBrowseButton, 8 + offset,2);
+    configLayout->addWidget(rLabel, 10 + offset,0, Qt::AlignRight);
+    configLayout->addWidget(rDirectory, 10 + offset,1);
+    configLayout->addWidget(rBrowseButton, 10 + offset,2);
     offset++;
 
     connect(rBrowseButton, SIGNAL(clicked()), this, SLOT(browseRDir()));
@@ -272,19 +270,23 @@ GeneralPage::GeneralPage(Context *context) : context(context)
     pythonDirectory->setText(pythonDir.toString());
     pythonBrowseButton = new QPushButton(tr("Browse"));
 
-    configLayout->addWidget(pythonLabel, 8 + offset,0, Qt::AlignRight);
-    configLayout->addWidget(pythonDirectory, 8 + offset,1);
-    configLayout->addWidget(pythonBrowseButton, 8 + offset,2);
+    configLayout->addWidget(pythonLabel, 10 + offset,0, Qt::AlignRight);
+    configLayout->addWidget(pythonDirectory, 10 + offset,1);
+    configLayout->addWidget(pythonBrowseButton, 10 + offset,2);
     offset++;
+
+    bool embedPython = appsettings->value(NULL, GC_EMBED_PYTHON, true).toBool();
+    embedPythonchanged(embedPython);
 
     connect(pythonBrowseButton, SIGNAL(clicked()), this, SLOT(browsePythonDir()));
 #endif
 
     // save away initial values
     b4.unit = unitCombo->currentIndex();
+    b4.metricRunPace = metricRunPace->isChecked();
+    b4.metricSwimPace = metricSwimPace->isChecked();
     b4.hyst = elevationHysteresis.toFloat();
     b4.wbal = wbalForm->currentIndex();
-    b4.warn = warnOnExit->isChecked();
 #ifdef GC_WANT_HTTP
     b4.starthttp = startHttp->isChecked();
 #endif
@@ -325,8 +327,10 @@ GeneralPage::saveClicked()
     // save on exit
     appsettings->setValue(GC_WARNEXIT, warnOnExit->isChecked());
 
+    // open last athlete on start
+    appsettings->setValue(GC_OPENLASTATHLETE, openLastAthlete->isChecked());
+
     // Directories
-    appsettings->setValue(GC_WORKOUTDIR, workoutDirectory->text());
     appsettings->setValue(GC_HOMEDIR, athleteDirectory->text());
 #ifdef GC_WANT_R
     appsettings->setValue(GC_R_HOME, rDirectory->text());
@@ -335,11 +339,9 @@ GeneralPage::saveClicked()
     appsettings->setValue(GC_PYTHON_HOME, pythonDirectory->text());
 #endif
 
-#if QT_VERSION >= 0x050000
     // update to reflect the state - if hidden user hasn't been asked yet to
     // its neither set or unset !
     if (!opendata->isHidden()) appsettings->setCValue(context->athlete->cyclist, GC_OPENDATA_GRANTED, opendata->isChecked() ? "Y" : "N");
-#endif
 
     // Elevation
     appsettings->setValue(GC_ELEVATION_HYSTERESIS, hystedit->text());
@@ -347,11 +349,14 @@ GeneralPage::saveClicked()
     // wbal formula
     appsettings->setValue(GC_WBALFORM, wbalForm->currentIndex() ? "int" : "diff");
 
+    // Units
     if (unitCombo->currentIndex()==0)
         appsettings->setValue(GC_UNIT, GC_UNIT_METRIC);
     else if (unitCombo->currentIndex()==1)
         appsettings->setValue(GC_UNIT, GC_UNIT_IMPERIAL);
 
+    appsettings->setValue(GC_PACE, metricRunPace->isChecked());
+    appsettings->setValue(GC_SWIMPACE, metricSwimPace->isChecked());
 
 #ifdef GC_WANT_HTTP
     // start http
@@ -362,6 +367,7 @@ GeneralPage::saveClicked()
 #endif
 #ifdef GC_WANT_PYTHON
     appsettings->setValue(GC_EMBED_PYTHON, embedPython->isChecked());
+    if (!embedPython->isChecked()) fixPySettings->disableFixPy();
 #endif
 
 
@@ -380,7 +386,9 @@ GeneralPage::saveClicked()
         state += CONFIG_WBAL;
 
     // units prefs changed?
-    if (b4.unit != unitCombo->currentIndex())
+    if (b4.unit != unitCombo->currentIndex() ||
+        b4.metricRunPace != metricRunPace->isChecked() ||
+        b4.metricSwimPace != metricSwimPace->isChecked())
         state += CONFIG_UNITS;
 
     return state;
@@ -422,17 +430,6 @@ GeneralPage::browsePythonDir()
 #endif
 
 void
-GeneralPage::browseWorkoutDir()
-{
-    QString currentDir = workoutDirectory->text();
-    if (!QDir(currentDir).exists()) currentDir = "";
-    QString dir = QFileDialog::getExistingDirectory(this, tr("Select Workout Library"),
-                            currentDir, QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
-    if (dir != "") workoutDirectory->setText(dir);  //only overwrite current dir, if a new was selected
-}
-
-
-void
 GeneralPage::browseAthleteDir()
 {
     QString currentDir = athleteDirectory->text();
@@ -443,1365 +440,13 @@ GeneralPage::browseAthleteDir()
 }
 
 //
-// Passwords page
-//
-CredentialsPage::CredentialsPage(Context *context) : context(context)
-{
-    QGridLayout *mainLayout = new QGridLayout(this);
-
-    addButton = new QPushButton(tr("+"));
-    deleteButton = new QPushButton(tr("-"));
-    editButton = new QPushButton(tr("Edit"));
-#ifndef Q_OS_MAC
-    addButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
-    deleteButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
-#else
-    addButton->setText(tr("Add"));
-    deleteButton->setText(tr("Delete"));
-#endif
-    QHBoxLayout *actionButtons = new QHBoxLayout;
-    actionButtons->setSpacing(2 *dpiXFactor);
-    actionButtons->addStretch();
-    actionButtons->addWidget(editButton);
-    actionButtons->addStretch();
-    actionButtons->addWidget(addButton);
-    actionButtons->addWidget(deleteButton);
-
-    accounts = new QTreeWidget;
-    accounts->headerItem()->setText(0, tr("Service"));
-    accounts->headerItem()->setText(1, tr("Description"));
-    accounts->setColumnCount(2);
-    accounts->setColumnWidth(0, 175 * dpiXFactor);
-    accounts->setSelectionMode(QAbstractItemView::SingleSelection);
-    //fields->setUniformRowHeights(true);
-    accounts->setIndentation(0);
-
-    mainLayout->addWidget(accounts, 0,0);
-    mainLayout->addLayout(actionButtons, 1,0);
-
-    // list accounts...
-    resetList();
-
-    // connect up slots
-    connect(addButton, SIGNAL(clicked()), this, SLOT(addClicked()));
-    connect(deleteButton, SIGNAL(clicked()), this, SLOT(deleteClicked()));
-    connect(editButton, SIGNAL(clicked()), this, SLOT(editClicked()));
-}
-
-void
-CredentialsPage::resetList()
-{
-    // clear whats there
-    while(accounts->invisibleRootItem()->childCount() > 0) {
-        QTreeWidgetItem *take = accounts->invisibleRootItem()->takeChild(0);
-        delete take;
-    }
-
-    // re-add
-    int index=0;
-    foreach (const QString name, CloudServiceFactory::instance().serviceNames()) {
-
-        const CloudService *s = CloudServiceFactory::instance().service(name);
-
-        // skip inactive accounts
-        if (appsettings->cvalue(context->athlete->cyclist, s->activeSettingName(), false).toBool() == false) continue;
-
-        QTreeWidgetItem *add = new QTreeWidgetItem;
-        add->setTextAlignment(0, Qt::AlignLeft | Qt::AlignVCenter);
-        add->setText(0, s->uiName());
-        add->setTextAlignment(1, Qt::AlignLeft | Qt::AlignVCenter);
-        add->setText(1, s->description());
-        add->setText(2, s->id());
-
-        accounts->invisibleRootItem()->insertChild(index++, add);
-        accounts->hideColumn(2);
-    }
-}
-
-qint32
-CredentialsPage::saveClicked()
-{
-
-    return 0;
-}
-
-void
-CredentialsPage::addClicked()
-{
-    // just run the add cloud wizard
-    AddCloudWizard *wizard = new AddCloudWizard(context);
-
-    // when the wizard closes we need to raise back - or else we get hidden
-    connect(wizard, SIGNAL(finished(int)), configdialog_ptr, SLOT(raise()));
-    wizard->exec();
-
-    // update the account list
-    resetList();
-}
-
-void
-CredentialsPage::deleteClicked()
-{
-    // delete current
-    if (accounts->selectedItems().count() == 0) return;
-
-    // does it exist?
-    const CloudService *service = CloudServiceFactory::instance().service(accounts->selectedItems().first()->text(2));
-    if (service) {
-
-        // set it inactive
-        appsettings->setCValue(context->athlete->cyclist, service->activeSettingName(), false);
-        appsettings->setCValue(context->athlete->cyclist, service->syncOnStartupSettingName(), false);
-        appsettings->setCValue(context->athlete->cyclist, service->syncOnImportSettingName(), false);
-
-        // reset
-        resetList();
-    }
-}
-
-void
-CredentialsPage::editClicked()
-{
-    // edit current
-    if (accounts->selectedItems().count() == 0) return;
-
-    // edit the details
-    AddCloudWizard *edit = new AddCloudWizard(context, accounts->selectedItems().first()->text(2));
-
-    // when the wizard closes we need to raise back - or else we get hidden
-    connect(edit, SIGNAL(finished(int)), configdialog_ptr, SLOT(raise()));
-    edit->exec();
-
-}
-
-//
-// About me
-//
-AboutRiderPage::AboutRiderPage(QWidget *parent, Context *context) : QWidget(parent), context(context)
-{
-    metricUnits = context->athlete->useMetricUnits;
-
-    QVBoxLayout *all = new QVBoxLayout(this);
-    QGridLayout *grid = new QGridLayout;
-#ifdef Q_OS_MAX
-    setContentsMargins(10,10,10,10);
-    grid->setSpacing(5 *dpiXFactor);
-    all->setSpacing(5 *dpiXFactor);
-#endif
-
-    QLabel *nicklabel = new QLabel(tr("Nickname"));
-    QLabel *doblabel = new QLabel(tr("Date of Birth"));
-    QLabel *sexlabel = new QLabel(tr("Sex"));
-    QString heighttext = QString(tr("Height (%1)")).arg(metricUnits ? tr("cm") : tr("in"));
-    heightlabel = new QLabel(heighttext);
-
-    nickname = new QLineEdit(this);
-    nickname->setText(appsettings->cvalue(context->athlete->cyclist, GC_NICKNAME, "").toString());
-    if (nickname->text() == "0") nickname->setText("");
-
-    dob = new QDateEdit(this);
-    dob->setDate(appsettings->cvalue(context->athlete->cyclist, GC_DOB).toDate());
-    dob->setCalendarPopup(true);
-
-    sex = new QComboBox(this);
-    sex->addItem(tr("Male"));
-    sex->addItem(tr("Female"));
-
-    // we set to 0 or 1 for male or female since this
-    // is language independent (and for once the code is easier!)
-    sex->setCurrentIndex(appsettings->cvalue(context->athlete->cyclist, GC_SEX).toInt());
-
-    height = new QDoubleSpinBox(this);
-    height->setMaximum(999.9);
-    height->setMinimum(0.0);
-    height->setDecimals(1);
-    height->setValue(appsettings->cvalue(context->athlete->cyclist, GC_HEIGHT).toDouble() * (metricUnits ? 100.0 : 100.0/CM_PER_INCH));
-
-    if (QFileInfo(context->athlete->home->config().canonicalPath() + "/" + "avatar.png").exists())
-        avatar = QPixmap(context->athlete->home->config().canonicalPath() + "/" + "avatar.png");
-    else
-        avatar = QPixmap(":/images/noavatar.png");
-
-    avatarButton = new QPushButton(this);
-    avatarButton->setContentsMargins(0,0,0,0);
-    avatarButton->setFlat(true);
-    avatarButton->setIcon(avatar.scaled(140,140));
-    avatarButton->setIconSize(QSize(140,140));
-    avatarButton->setFixedHeight(140);
-    avatarButton->setFixedWidth(140);
-
-    //
-    // Crank length - only used by PfPv chart (should move there!)
-    //
-    QLabel *crankLengthLabel = new QLabel(tr("Crank Length"));
-    QVariant crankLength = appsettings->cvalue(context->athlete->cyclist, GC_CRANKLENGTH);
-    crankLengthCombo = new QComboBox();
-    crankLengthCombo->addItem("150");
-    crankLengthCombo->addItem("155");
-    crankLengthCombo->addItem("160");
-    crankLengthCombo->addItem("162.5");
-    crankLengthCombo->addItem("165");
-    crankLengthCombo->addItem("167.5");
-    crankLengthCombo->addItem("170");
-    crankLengthCombo->addItem("172.5");
-    crankLengthCombo->addItem("175");
-    crankLengthCombo->addItem("177.5");
-    crankLengthCombo->addItem("180");
-    crankLengthCombo->addItem("182.5");
-    crankLengthCombo->addItem("185");
-    if(crankLength.toString() == "150") crankLengthCombo->setCurrentIndex(0);
-    if(crankLength.toString() == "155") crankLengthCombo->setCurrentIndex(1);
-    if(crankLength.toString() == "160") crankLengthCombo->setCurrentIndex(2);
-    if(crankLength.toString() == "162.5") crankLengthCombo->setCurrentIndex(3);
-    if(crankLength.toString() == "165") crankLengthCombo->setCurrentIndex(4);
-    if(crankLength.toString() == "167.5") crankLengthCombo->setCurrentIndex(5);
-    if(crankLength.toString() == "170") crankLengthCombo->setCurrentIndex(6);
-    if(crankLength.toString() == "172.5") crankLengthCombo->setCurrentIndex(7);
-    if(crankLength.toString() == "175") crankLengthCombo->setCurrentIndex(8);
-    if(crankLength.toString() == "177.5") crankLengthCombo->setCurrentIndex(9);
-    if(crankLength.toString() == "180") crankLengthCombo->setCurrentIndex(10);
-    if(crankLength.toString() == "182.5") crankLengthCombo->setCurrentIndex(11);
-    if(crankLength.toString() == "185") crankLengthCombo->setCurrentIndex(12);
-
-    //
-    // Wheel size
-    //
-    QLabel *wheelSizeLabel = new QLabel(tr("Wheelsize"), this);
-    int wheelSize = appsettings->cvalue(context->athlete->cyclist, GC_WHEELSIZE, 2100).toInt();
-
-    rimSizeCombo = new QComboBox();
-    rimSizeCombo->addItems(WheelSize::RIM_SIZES);
-
-    tireSizeCombo = new QComboBox();
-    tireSizeCombo->addItems(WheelSize::TIRE_SIZES);
-
-
-    wheelSizeEdit = new QLineEdit(QString("%1").arg(wheelSize),this);
-    wheelSizeEdit->setInputMask("0000");
-    wheelSizeEdit->setFixedWidth(40 *dpiXFactor);
-
-    QLabel *wheelSizeUnitLabel = new QLabel(tr("mm"), this);
-
-    QHBoxLayout *wheelSizeLayout = new QHBoxLayout();
-    wheelSizeLayout->addWidget(rimSizeCombo);
-    wheelSizeLayout->addWidget(tireSizeCombo);
-    wheelSizeLayout->addWidget(wheelSizeEdit);
-    wheelSizeLayout->addWidget(wheelSizeUnitLabel);
-
-    connect(rimSizeCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(calcWheelSize()));
-    connect(tireSizeCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(calcWheelSize()));
-    connect(wheelSizeEdit, SIGNAL(textEdited(QString)), this, SLOT(resetWheelSize()));
-
-    Qt::Alignment alignment = Qt::AlignLeft|Qt::AlignVCenter;
-
-    grid->addWidget(nicklabel, 0, 0, alignment);
-    grid->addWidget(doblabel, 1, 0, alignment);
-    grid->addWidget(sexlabel, 2, 0, alignment);
-    grid->addWidget(heightlabel, 3, 0, alignment);
-
-    grid->addWidget(nickname, 0, 1, alignment);
-    grid->addWidget(dob, 1, 1, alignment);
-    grid->addWidget(sex, 2, 1, alignment);
-    grid->addWidget(height, 3, 1, alignment);
-
-    grid->addWidget(crankLengthLabel, 4, 0, alignment);
-    grid->addWidget(crankLengthCombo, 4, 1, alignment);
-    grid->addWidget(wheelSizeLabel, 5, 0, alignment);
-    grid->addLayout(wheelSizeLayout, 5, 1, 1, 2, alignment);
-
-    grid->addWidget(avatarButton, 0, 1, 4, 2, Qt::AlignRight|Qt::AlignVCenter);
-    all->addLayout(grid);
-    all->addStretch();
-
-    // save initial values for things we care about
-    // note we don't worry about age or sex at this point
-    // since they are not used, nor the W'bal tau used in
-    // the realtime code. This is limited to stuff we
-    // care about tracking as it is used by metrics
-    b4.height = appsettings->cvalue(context->athlete->cyclist, GC_HEIGHT).toDouble();
-    b4.wheel = wheelSize;
-    b4.crank = crankLengthCombo->currentIndex();
-
-    connect (avatarButton, SIGNAL(clicked()), this, SLOT(chooseAvatar()));
-}
-
-void
-AboutRiderPage::unitChanged(int currentIndex)
-{
-    if (currentIndex == 0) {
-        metricUnits = true;
-        QString heighttext = QString(tr("Height (%1)")).arg(tr("cm"));
-        heightlabel->setText(heighttext);
-        height->setValue(height->value() * CM_PER_INCH);
-    } else {
-        metricUnits = false;
-        QString heighttext = QString(tr("Height (%1)")).arg(tr("in"));
-        heightlabel->setText(heighttext);
-        height->setValue(height->value() / CM_PER_INCH);
-    }
-}
-
-void
-AboutRiderPage::chooseAvatar()
-{
-    QString filename = QFileDialog::getOpenFileName(this, tr("Choose Picture"),
-                            "", tr("Images (*.png *.jpg *.bmp)"));
-    if (filename != "") {
-
-        avatar = QPixmap(filename);
-        avatarButton->setIcon(avatar.scaled(140,140));
-        avatarButton->setIconSize(QSize(140,140));
-    }
-}
-
-void
-AboutRiderPage::calcWheelSize()
-{
-   int diameter = WheelSize::calcPerimeter(rimSizeCombo->currentIndex(), tireSizeCombo->currentIndex());
-   if (diameter>0)
-        wheelSizeEdit->setText(QString("%1").arg(diameter));
-}
-
-void
-AboutRiderPage::resetWheelSize()
-{
-   rimSizeCombo->setCurrentIndex(0);
-   tireSizeCombo->setCurrentIndex(0);
-}
-
-qint32
-AboutRiderPage::saveClicked()
-{
-    appsettings->setCValue(context->athlete->cyclist, GC_NICKNAME, nickname->text());
-    appsettings->setCValue(context->athlete->cyclist, GC_DOB, dob->date());
-
-
-    appsettings->setCValue(context->athlete->cyclist, GC_SEX, sex->currentIndex());
-    avatar.save(context->athlete->home->config().canonicalPath() + "/" + "avatar.png", "PNG");
-    appsettings->setCValue(context->athlete->cyclist, GC_HEIGHT, height->value() * (metricUnits ? 1.0/100.0 : CM_PER_INCH/100.0));
-
-    appsettings->setCValue(context->athlete->cyclist, GC_CRANKLENGTH, crankLengthCombo->currentText());
-    appsettings->setCValue(context->athlete->cyclist, GC_WHEELSIZE, wheelSizeEdit->text().toInt());
-
-    qint32 state=0;
-
-    // default height changed ?
-    if (b4.height != appsettings->cvalue(context->athlete->cyclist, GC_HEIGHT).toDouble()) {
-        state += CONFIG_ATHLETE;
-    }
-
-    // general stuff changed ?
-    if (b4.wheel != wheelSizeEdit->text().toInt() ||
-        b4.crank != crankLengthCombo->currentIndex() )
-        state += CONFIG_GENERAL;
-
-    return state;
-}
-
-AboutModelPage::AboutModelPage(Context *context) : context(context)
-{
-    QVBoxLayout *all = new QVBoxLayout(this);
-    QGridLayout *grid = new QGridLayout;
-#ifdef Q_OS_MAX
-    setContentsMargins(10,10,10,10);
-    grid->setSpacing(5 *dpiXFactor);
-    all->setSpacing(5 *dpiXFactor);
-#endif
-
-    //
-    // W'bal Tau
-    //
-    wbaltaulabel = new QLabel(tr("W'bal tau (s)"));
-    wbaltau = new QSpinBox(this);
-    wbaltau->setMinimum(30);
-    wbaltau->setMaximum(1200);
-    wbaltau->setSingleStep(10);
-    wbaltau->setValue(appsettings->cvalue(context->athlete->cyclist, GC_WBALTAU, 300).toInt());
-
-    //
-    // Performance manager
-    //
-
-    perfManSTSLabel = new QLabel(tr("STS average (days)"));
-    perfManLTSLabel = new QLabel(tr("LTS average (days)"));
-    perfManSTSavgValidator = new QIntValidator(1,21,this);
-    perfManLTSavgValidator = new QIntValidator(7,56,this);
-
-    // get config or set to defaults
-    QVariant perfManSTSVal = appsettings->cvalue(context->athlete->cyclist, GC_STS_DAYS);
-    if (perfManSTSVal.isNull() || perfManSTSVal.toInt() == 0) perfManSTSVal = 7;
-    QVariant perfManLTSVal = appsettings->cvalue(context->athlete->cyclist, GC_LTS_DAYS);
-    if (perfManLTSVal.isNull() || perfManLTSVal.toInt() == 0) perfManLTSVal = 42;
-
-    perfManSTSavg = new QLineEdit(perfManSTSVal.toString(),this);
-    perfManSTSavg->setValidator(perfManSTSavgValidator);
-    perfManLTSavg = new QLineEdit(perfManLTSVal.toString(),this);
-    perfManLTSavg->setValidator(perfManLTSavgValidator);
-
-    showSBToday = new QCheckBox(tr("PMC Stress Balance Today"), this);
-    showSBToday->setChecked(appsettings->cvalue(context->athlete->cyclist, GC_SB_TODAY).toInt());
-
-    Qt::Alignment alignment = Qt::AlignLeft|Qt::AlignVCenter;
-
-    grid->addWidget(wbaltaulabel, 9, 0, alignment);
-    grid->addWidget(wbaltau, 9, 1, alignment);
-
-    grid->addWidget(perfManSTSLabel, 10, 0, alignment);
-    grid->addWidget(perfManSTSavg, 10, 1, alignment);
-    grid->addWidget(perfManLTSLabel, 11, 0, alignment);
-    grid->addWidget(perfManLTSavg, 11, 1, alignment);
-    grid->addWidget(showSBToday, 12, 1, alignment);
-
-    all->addLayout(grid);
-    all->addStretch();
-
-    // save initial values for things we care about
-    // note we don't worry about age or sex at this point
-    // since they are not used, nor the W'bal tau used in
-    // the realtime code. This is limited to stuff we
-    // care about tracking as it is used by metrics
-    b4.lts = perfManLTSVal.toInt();
-    b4.sts = perfManSTSVal.toInt();
-}
-
-qint32
-AboutModelPage::saveClicked()
-{
-    // W'bal Tau
-    appsettings->setCValue(context->athlete->cyclist, GC_WBALTAU, wbaltau->value());
-
-    // Performance Manager
-    appsettings->setCValue(context->athlete->cyclist, GC_STS_DAYS, perfManSTSavg->text());
-    appsettings->setCValue(context->athlete->cyclist, GC_LTS_DAYS, perfManLTSavg->text());
-    appsettings->setCValue(context->athlete->cyclist, GC_SB_TODAY, (int) showSBToday->isChecked());
-
-    qint32 state=0;
-
-    // PMC constants changed ?
-    if(b4.lts != perfManLTSavg->text().toInt() || b4.sts != perfManSTSavg->text().toInt())
-        state += CONFIG_PMC;
-
-    return state;
-}
-
-BackupPage::BackupPage(Context *context) : context(context)
-{
-    QVBoxLayout *all = new QVBoxLayout(this);
-    QGridLayout *grid = new QGridLayout;
-#ifdef Q_OS_MAX
-    setContentsMargins(10,10,10,10);
-    grid->setSpacing(5 *dpiXFactor);
-    all->setSpacing(5 *dpiXFactor);
-#endif
-
-    //
-    // Auto Backup
-    //
-    // Selecting the storage folder folder of the Local File Store
-    QLabel *autoBackupFolderLabel = new QLabel(tr("Auto Backup Folder"));
-    autoBackupFolder = new QLineEdit(this);
-    autoBackupFolder->setText(appsettings->cvalue(context->athlete->cyclist, GC_AUTOBACKUP_FOLDER, "").toString());
-    autoBackupFolderBrowse = new QPushButton(tr("Browse"));
-    connect(autoBackupFolderBrowse, SIGNAL(clicked()), this, SLOT(chooseAutoBackupFolder()));
-    autoBackupPeriod = new QSpinBox(this);
-    autoBackupPeriod->setMinimum(0);
-    autoBackupPeriod->setMaximum(9999);
-    autoBackupPeriod->setSingleStep(1);
-    QLabel *autoBackupPeriodLabel = new QLabel(tr("Auto Backup execution every"));
-    autoBackupPeriod->setValue(appsettings->cvalue(context->athlete->cyclist, GC_AUTOBACKUP_PERIOD, 0).toInt());
-    QLabel *autoBackupUnitLabel = new QLabel(tr("times the athlete is closed - 0 means never"));
-    QHBoxLayout *backupInput = new QHBoxLayout();
-    backupInput->addWidget(autoBackupPeriod);
-    //backupInput->addStretch();
-    backupInput->addWidget(autoBackupUnitLabel);
-
-    Qt::Alignment alignment = Qt::AlignLeft|Qt::AlignVCenter;
-
-    grid->addWidget(autoBackupFolderLabel, 7,0, alignment);
-    grid->addWidget(autoBackupFolder, 7, 1, alignment);
-    grid->addWidget(autoBackupFolderBrowse, 7, 2, alignment);
-    grid->addWidget(autoBackupPeriodLabel, 8, 0,alignment);
-    grid->addLayout(backupInput, 8, 1, alignment);
-
-    all->addLayout(grid);
-    all->addStretch();
-}
-
-void BackupPage::chooseAutoBackupFolder()
-{
-    // did the user type something ? if not, get it from the Settings
-    QString path = autoBackupFolder->text();
-    if (path == "") path = appsettings->cvalue(context->athlete->cyclist, GC_AUTOBACKUP_FOLDER, "").toString();
-    QString dir = QFileDialog::getExistingDirectory(this, tr("Choose Backup Directory"),
-                            path, QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
-    if (dir != "") autoBackupFolder->setText(dir);  //only overwrite current dir, if a new was selected
-
-}
-
-qint32
-BackupPage::saveClicked()
-{
-    // Auto Backup
-    appsettings->setCValue(context->athlete->cyclist, GC_AUTOBACKUP_FOLDER, autoBackupFolder->text());
-    appsettings->setCValue(context->athlete->cyclist, GC_AUTOBACKUP_PERIOD, autoBackupPeriod->value());
-    return 0;
-}
-
-//
-// About me - Body Measures
-//
-RiderPhysPage::RiderPhysPage(QWidget *parent, Context *context) : QWidget(parent), context(context)
-{
-    metricUnits = context->athlete->useMetricUnits;
-    const double weightFactor = (metricUnits ? 1.0 : LB_PER_KG);
-    QString weightUnits = (metricUnits ? tr(" kg") : tr(" lb"));
-
-    QVBoxLayout *all = new QVBoxLayout(this);
-    QGridLayout *measuresGrid = new QGridLayout;
-    Qt::Alignment alignment = Qt::AlignLeft|Qt::AlignVCenter;
-
-#ifdef Q_OS_MAX
-    setContentsMargins(10,10,10,10);
-    grid->setSpacing(5 *dpiXFactor);
-    all->setSpacing(5 *dpiXFactor);
-#endif
-
-    QString defaultWeighttext = tr("Default Weight");
-    defaultWeightlabel = new QLabel(defaultWeighttext);
-    defaultWeight = new QDoubleSpinBox(this);
-    defaultWeight->setMaximum(999.9);
-    defaultWeight->setMinimum(0.0);
-    defaultWeight->setDecimals(1);
-    defaultWeight->setValue(appsettings->cvalue(context->athlete->cyclist, GC_WEIGHT).toDouble() * weightFactor);
-    defaultWeight->setSuffix(weightUnits);
-
-
-    QGridLayout *defaultGrid = new QGridLayout;
-    defaultGrid->addWidget(defaultWeightlabel, 1, 0, alignment);
-    defaultGrid->addWidget(defaultWeight, 1, 1, alignment);
-
-    all->addLayout(defaultGrid);
-    all->addSpacing(2);
-
-    QFrame *line;
-    line = new QFrame;
-    line->setFrameShape(QFrame::HLine);
-    line->setFrameShadow(QFrame::Sunken);
-    all->addWidget(line);
-
-    QLabel* seperatorText = new QLabel(tr("Time dependent measurements"));
-    all->addWidget(seperatorText);
-
-    QString dateTimetext = tr("From Date - Time");
-    dateLabel = new QLabel(dateTimetext);
-    dateTimeEdit = new QDateTimeEdit;
-    dateTimeEdit->setDateTime(QDateTime::currentDateTime());
-    dateTimeEdit->setCalendarPopup(true);
-
-    QString weighttext = context->athlete->measures->getFieldNames(Measures::Body).at(BodyMeasure::WeightKg);
-    weightlabel = new QLabel(weighttext);
-    weight = new QDoubleSpinBox(this);
-    weight->setMaximum(999.9);
-    weight->setMinimum(0.0);
-    weight->setDecimals(1);
-    weight->setValue(defaultWeight->value());
-    weight->setSuffix(weightUnits);
-
-    QString fatkgtext = context->athlete->measures->getFieldNames(Measures::Body).at(BodyMeasure::FatKg);
-    fatkglabel = new QLabel(fatkgtext);
-    fatkg = new QDoubleSpinBox(this);
-    fatkg->setMaximum(999.9);
-    fatkg->setMinimum(0.0);
-    fatkg->setDecimals(1);
-    fatkg->setValue(0.0);
-    fatkg->setSuffix(weightUnits);
-
-    QString musclekgtext = context->athlete->measures->getFieldNames(Measures::Body).at(BodyMeasure::MuscleKg);
-    musclekglabel = new QLabel(musclekgtext);
-    musclekg = new QDoubleSpinBox(this);
-    musclekg->setMaximum(999.9);
-    musclekg->setMinimum(0.0);
-    musclekg->setDecimals(1);
-    musclekg->setValue(0.0);
-    musclekg->setSuffix(weightUnits);
-
-    QString boneskgtext = context->athlete->measures->getFieldNames(Measures::Body).at(BodyMeasure::BonesKg);
-    boneskglabel = new QLabel(boneskgtext);
-    boneskg = new QDoubleSpinBox(this);
-    boneskg->setMaximum(999.9);
-    boneskg->setMinimum(0.0);
-    boneskg->setDecimals(1);
-    boneskg->setValue(0.0);
-    boneskg->setSuffix(weightUnits);
-
-    QString leankgtext = context->athlete->measures->getFieldNames(Measures::Body).at(BodyMeasure::LeanKg);
-    leankglabel = new QLabel(leankgtext);
-    leankg = new QDoubleSpinBox(this);
-    leankg->setMaximum(999.9);
-    leankg->setMinimum(0.0);
-    leankg->setDecimals(1);
-    leankg->setValue(0.0);
-    leankg->setSuffix(weightUnits);
-
-    QString fatpercenttext = context->athlete->measures->getFieldNames(Measures::Body).at(BodyMeasure::FatPercent);
-    fatpercentlabel = new QLabel(fatpercenttext);
-    fatpercent = new QDoubleSpinBox(this);
-    fatpercent->setMaximum(100.0);
-    fatpercent->setMinimum(0.0);
-    fatpercent->setDecimals(1);
-    fatpercent->setValue(0.0);
-    fatpercent->setSuffix(" %");
-
-    QString commenttext = tr("Comment");
-    commentlabel = new QLabel(commenttext);
-    comment = new QLineEdit(this);
-    comment->setText("");
-
-    measuresGrid->addWidget(dateLabel, 1, 0, alignment);
-    measuresGrid->addWidget(dateTimeEdit, 1, 1, alignment);
-
-    measuresGrid->addWidget(weightlabel, 2, 0, alignment);
-    measuresGrid->addWidget(weight, 2, 1, alignment);
-
-    measuresGrid->addWidget(fatkglabel, 3, 0, alignment);
-    measuresGrid->addWidget(fatkg, 3, 1, alignment);
-
-    measuresGrid->addWidget(musclekglabel, 4, 0, alignment);
-    measuresGrid->addWidget(musclekg, 4, 1, alignment);
-
-    measuresGrid->addWidget(boneskglabel, 5, 0, alignment);
-    measuresGrid->addWidget(boneskg, 5, 1, alignment);
-
-    measuresGrid->addWidget(leankglabel, 6, 0, alignment);
-    measuresGrid->addWidget(leankg, 6, 1, alignment);
-
-    measuresGrid->addWidget(fatpercentlabel, 7, 0, alignment);
-    measuresGrid->addWidget(fatpercent, 7, 1, alignment);
-
-    measuresGrid->addWidget(commentlabel, 8, 0, alignment);
-    measuresGrid->addWidget(comment, 8, 1, alignment);
-
-    all->addLayout(measuresGrid);
-
-
-    // Buttons
-    updateButton = new QPushButton(tr("Update"));
-    updateButton->hide();
-    addButton = new QPushButton(tr("+"));
-    deleteButton = new QPushButton(tr("-"));
-#ifndef Q_OS_MAC
-    addButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
-    deleteButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
-#else
-    updateButton->setText(tr("Update"));
-    addButton->setText(tr("Add"));
-    deleteButton->setText(tr("Delete"));
-#endif
-
-    QHBoxLayout *actionButtons = new QHBoxLayout;
-    actionButtons->setSpacing(2 *dpiXFactor);
-    actionButtons->addStretch();
-    actionButtons->addWidget(updateButton);
-    actionButtons->addWidget(addButton);
-    actionButtons->addWidget(deleteButton);
-    all->addLayout(actionButtons);
-
-    // Body Measures
-    bmTree = new QTreeWidget;
-    bmTree->headerItem()->setText(0, dateTimetext);
-    bmTree->header()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
-    bmTree->headerItem()->setText(1, weighttext);
-    bmTree->header()->setSectionResizeMode(1, QHeaderView::ResizeToContents);
-    bmTree->headerItem()->setText(2, fatkgtext);
-    bmTree->header()->setSectionResizeMode(2, QHeaderView::ResizeToContents);
-    bmTree->headerItem()->setText(3, musclekgtext);
-    bmTree->header()->setSectionResizeMode(3, QHeaderView::ResizeToContents);
-    bmTree->headerItem()->setText(4, boneskgtext);
-    bmTree->header()->setSectionResizeMode(4, QHeaderView::ResizeToContents);
-    bmTree->headerItem()->setText(5, leankgtext);
-    bmTree->header()->setSectionResizeMode(5, QHeaderView::ResizeToContents);
-    bmTree->headerItem()->setText(6, fatpercenttext);
-    bmTree->header()->setSectionResizeMode(6, QHeaderView::ResizeToContents);
-    bmTree->headerItem()->setText(7, commenttext);
-    bmTree->header()->setSectionResizeMode(7, QHeaderView::ResizeToContents);
-    bmTree->headerItem()->setText(8, tr("Source"));
-    bmTree->header()->setSectionResizeMode(8, QHeaderView::ResizeToContents);
-    bmTree->headerItem()->setText(9, tr("Original Source"));
-    bmTree->setColumnCount(10);
-    bmTree->setSelectionMode(QAbstractItemView::SingleSelection);
-    bmTree->setEditTriggers(QAbstractItemView::SelectedClicked); // allow edit
-    bmTree->setUniformRowHeights(true);
-    bmTree->setIndentation(0);
-
-    // get body measures if the file exists
-    QFile bmFile(QString("%1/bodymeasures.json").arg(context->athlete->home->config().canonicalPath()));
-    if (bmFile.exists()) {
-        BodyMeasureParser::unserialize(bmFile, bodyMeasures);
-    }
-    qSort(bodyMeasures); // date order
-
-    // setup bmTree
-    for (int i=0; i<bodyMeasures.count(); i++) {
-        QTreeWidgetItem *add = new QTreeWidgetItem(bmTree->invisibleRootItem());
-        add->setFlags(add->flags() & ~Qt::ItemIsEditable);
-        // date & time
-        add->setText(0, bodyMeasures[i].when.toString(tr("MMM d, yyyy - hh:mm:ss")));
-        // weight
-        add->setText(1, QString("%1").arg(bodyMeasures[i].weightkg * weightFactor, 0, 'f', 1));
-        add->setText(2, QString("%1").arg(bodyMeasures[i].fatkg * weightFactor, 0, 'f', 1));
-        add->setText(3, QString("%1").arg(bodyMeasures[i].musclekg * weightFactor, 0, 'f', 1));
-        add->setText(4, QString("%1").arg(bodyMeasures[i].boneskg * weightFactor, 0, 'f', 1));
-        add->setText(5, QString("%1").arg(bodyMeasures[i].leankg * weightFactor, 0, 'f', 1));
-        add->setText(6, QString("%1").arg(bodyMeasures[i].fatpercent));
-        add->setText(7, bodyMeasures[i].comment);
-        // source
-        add->setText(8, bodyMeasures[i].getSourceDescription());
-        add->setText(9, bodyMeasures[i].originalSource);
-    }
-
-    all->addWidget(bmTree);
-
-    // set default edit values to newest bodymeasurement (if one exists)
-    if (bodyMeasures.count() > 0) {
-        weight->setValue(bodyMeasures.last().weightkg * weightFactor);
-        fatkg->setValue(bodyMeasures.last().fatkg * weightFactor);
-        musclekg->setValue(bodyMeasures.last().musclekg * weightFactor);
-        boneskg->setValue(bodyMeasures.last().boneskg * weightFactor);
-        leankg->setValue(bodyMeasures.last().leankg * weightFactor);
-        fatpercent->setValue(bodyMeasures.last().fatpercent);
-    }
-
-    // edit connect
-    connect(dateTimeEdit, SIGNAL(dateTimeChanged(QDateTime)), this, SLOT(rangeEdited()));
-    connect(weight, SIGNAL(valueChanged(double)), this, SLOT(rangeEdited()));
-    connect(fatkg, SIGNAL(valueChanged(double)), this, SLOT(rangeEdited()));
-    connect(musclekg, SIGNAL(valueChanged(double)), this, SLOT(rangeEdited()));
-    connect(boneskg, SIGNAL(valueChanged(double)), this, SLOT(rangeEdited()));
-    connect(leankg, SIGNAL(valueChanged(double)), this, SLOT(rangeEdited()));
-    connect(fatpercent, SIGNAL(valueChanged(double)), this, SLOT(rangeEdited()));
-    connect(comment, SIGNAL(textEdited(QString)), this, SLOT(rangeEdited()));
-
-    // button connect
-    connect(updateButton, SIGNAL(clicked()), this, SLOT(addOReditClicked()));
-    connect(addButton, SIGNAL(clicked()), this, SLOT(addOReditClicked()));
-    connect(deleteButton, SIGNAL(clicked()), this, SLOT(deleteClicked()));
-
-    // list selection connect
-    connect(bmTree, SIGNAL(itemSelectionChanged()), this, SLOT(rangeSelectionChanged()));
-
-    // save initial values for things we care about
-    // weight as stored (always metric) and BodyMeasures checksum
-    b4.defaultWeight = appsettings->cvalue(context->athlete->cyclist, GC_WEIGHT).toDouble();
-    b4.fingerprint = 0;
-    foreach (BodyMeasure bm, bodyMeasures) {
-        b4.fingerprint += bm.getFingerprint();
-    }
-}
-
-void
-RiderPhysPage::unitChanged(int currentIndex)
-{
-    if (currentIndex == 0) {
-        metricUnits = true;
-        defaultWeight->setValue(defaultWeight->value() / LB_PER_KG);
-        weight->setValue(weight->value() / LB_PER_KG);
-        fatkg->setValue(fatkg->value() / LB_PER_KG);
-        musclekg->setValue(musclekg->value() / LB_PER_KG);
-        boneskg->setValue(boneskg->value() / LB_PER_KG);
-        leankg->setValue(leankg->value() / LB_PER_KG);
-    } else {
-        metricUnits = false;
-        defaultWeight->setValue(defaultWeight->value() * LB_PER_KG);
-        weight->setValue(weight->value() * LB_PER_KG);
-        fatkg->setValue(fatkg->value() * LB_PER_KG);
-        musclekg->setValue(musclekg->value() * LB_PER_KG);
-        boneskg->setValue(boneskg->value() * LB_PER_KG);
-        leankg->setValue(leankg->value() * LB_PER_KG);
-    }
-
-    QString weightUnits = (metricUnits ? tr(" kg") : tr(" lb"));
-    defaultWeight->setSuffix(weightUnits);
-    weight->setSuffix(weightUnits);
-    fatkg->setSuffix(weightUnits);
-    musclekg->setSuffix(weightUnits);
-    boneskg->setSuffix(weightUnits);
-    leankg->setSuffix(weightUnits);
-
-    // update bmTree
-    const double weightFactor = (metricUnits ? 1.0 : LB_PER_KG);
-    for (int i=0; i<bmTree->invisibleRootItem()->childCount(); i++) {
-        QTreeWidgetItem *edit = bmTree->invisibleRootItem()->child(i);
-        // weight
-        edit->setText(1, QString("%1").arg(bodyMeasures[i].weightkg * weightFactor, 0, 'f', 1));
-        edit->setText(2, QString("%1").arg(bodyMeasures[i].fatkg * weightFactor, 0, 'f', 1));
-        edit->setText(3, QString("%1").arg(bodyMeasures[i].musclekg * weightFactor, 0, 'f', 1));
-        edit->setText(4, QString("%1").arg(bodyMeasures[i].boneskg * weightFactor, 0, 'f', 1));
-        edit->setText(5, QString("%1").arg(bodyMeasures[i].leankg * weightFactor, 0, 'f', 1));
-    }
-}
-
-qint32
-RiderPhysPage::saveClicked()
-{
-    appsettings->setCValue(context->athlete->cyclist, GC_WEIGHT, defaultWeight->value() * (metricUnits ? 1.0 : KG_PER_LB));
-
-    qint32 state=0;
-
-    // default weight changed ?
-    if (b4.defaultWeight != appsettings->cvalue(context->athlete->cyclist, GC_WEIGHT).toDouble()) {
-        state += CONFIG_ATHLETE;
-    }
-
-    // Body Measures changed ?
-    unsigned long fingerprint = 0;
-    foreach (BodyMeasure bm, bodyMeasures) {
-        fingerprint += bm.getFingerprint();
-    }
-    if (fingerprint != b4.fingerprint) {
-        // store in athlete
-        BodyMeasures* pBodyMeasures = dynamic_cast <BodyMeasures*>(context->athlete->measures->getGroup(Measures::Body));
-        pBodyMeasures->setBodyMeasures(bodyMeasures);
-        // now save data away if we actually got something !
-        pBodyMeasures->write();
-        state += CONFIG_ATHLETE;
-    }
-
-    return state;
-}
-
-void
-RiderPhysPage::addOReditClicked()
-{
-    const double weightFactor = (metricUnits ? 1.0 : LB_PER_KG);
-
-    int index;
-    QTreeWidgetItem *add;
-    BodyMeasure addBM;
-    QString dateTimeTxt = dateTimeEdit->dateTime().toString(tr("MMM d, yyyy - hh:mm:ss"));
-
-    // if an entry for this date & time already exists, edit item otherwise add new
-    QList<QTreeWidgetItem*> matches = bmTree->findItems(dateTimeTxt, Qt::MatchExactly, 0);
-    if (matches.count() > 0) {
-        // edit existing
-        add = matches[0];
-        index = bmTree->invisibleRootItem()->indexOfChild(matches[0]);
-        bodyMeasures.removeAt(index);
-    } else {
-        // add new
-        index = bodyMeasures.count();
-        add = new QTreeWidgetItem;
-        add->setFlags(add->flags() & ~Qt::ItemIsEditable);
-        bmTree->invisibleRootItem()->insertChild(index, add);
-    }
-
-    addBM.when = dateTimeEdit->dateTime().toUTC();
-    addBM.weightkg = weight->value() / weightFactor;
-    addBM.fatkg = fatkg->value() / weightFactor;
-    addBM.musclekg = musclekg->value() / weightFactor;
-    addBM.boneskg = boneskg->value() / weightFactor;
-    addBM.leankg = leankg->value() / weightFactor;
-    addBM.fatpercent = fatpercent->value();
-    addBM.comment = comment->text();
-    addBM.source = BodyMeasure::Manual;
-    addBM.originalSource = "";
-    bodyMeasures.insert(index, addBM);
-
-    // date and time
-    add->setText(0, dateTimeTxt);
-    // Weight
-    add->setText(1, QString("%1").arg(weight->value()));
-    add->setText(2, QString("%1").arg(fatkg->value()));
-    add->setText(3, QString("%1").arg(musclekg->value()));
-    add->setText(4, QString("%1").arg(boneskg->value()));
-    add->setText(5, QString("%1").arg(leankg->value()));
-    add->setText(6, QString("%1").arg(fatpercent->value()));
-    add->setText(7, QString("%1").arg(comment->text()));
-    add->setText(8, QString("%1").arg(tr("Manual entry")));
-    add->setText(9, ""); // Original Source
-
-    updateButton->hide();
-}
-
-void
-RiderPhysPage::deleteClicked()
-{
-    if (bmTree->currentItem()) {
-        int index = bmTree->invisibleRootItem()->indexOfChild(bmTree->currentItem());
-        delete bmTree->invisibleRootItem()->takeChild(index);
-        bodyMeasures.removeAt(index);
-    }
-}
-
-void
-RiderPhysPage::rangeEdited()
-{
-    const double weightFactor = (metricUnits ? 1.0 : LB_PER_KG);
-
-    if (bmTree->currentItem()) {
-        int index = bmTree->invisibleRootItem()->indexOfChild(bmTree->currentItem());
-
-        QDateTime dateTime = dateTimeEdit->dateTime();
-        QDateTime odateTime = bodyMeasures[index].when;
-
-        double nweight = weight->value();
-        double oweight = bodyMeasures[index].weightkg * weightFactor;
-        double nfatkg = fatkg->value();
-        double ofatkg = bodyMeasures[index].fatkg * weightFactor;
-        double nmusclekg = musclekg->value();
-        double omusclekg = bodyMeasures[index].musclekg * weightFactor;
-        double nboneskg = boneskg->value();
-        double oboneskg = bodyMeasures[index].boneskg * weightFactor;
-        double nleankg = leankg->value();
-        double oleankg = bodyMeasures[index].leankg * weightFactor;
-        double nfatpercent = fatpercent->value();
-        double ofatpercent = bodyMeasures[index].fatpercent;
-        QString ncomment = comment->text();
-        QString ocomment = bodyMeasures[index].comment;
-
-        if (dateTime == odateTime && (nweight != oweight ||
-                                      nfatkg != ofatkg ||
-                                      nmusclekg != omusclekg ||
-                                      nboneskg != oboneskg ||
-                                      nleankg != oleankg ||
-                                      nfatpercent != ofatpercent ||
-                                      ncomment != ocomment))
-            updateButton->show();
-        else
-            updateButton->hide();
-    }
-}
-
-void
-RiderPhysPage::rangeSelectionChanged()
-{
-    const double weightFactor = (metricUnits ? 1.0 : LB_PER_KG);
-
-    // fill with current details
-    if (bmTree->currentItem()) {
-
-        int index = bmTree->invisibleRootItem()->indexOfChild(bmTree->currentItem());
-        BodyMeasure current = bodyMeasures[index];
-
-        dateTimeEdit->setDateTime(current.when);
-        weight->setValue(current.weightkg * weightFactor);
-        fatkg->setValue(current.fatkg * weightFactor);
-        musclekg->setValue(current.musclekg * weightFactor);
-        boneskg->setValue(current.boneskg * weightFactor);
-        leankg->setValue(current.leankg * weightFactor);
-        fatpercent->setValue(current.fatpercent);
-        comment->setText(current.comment);
-
-        updateButton->hide();
-    }
-}
-
-//
-// About me - HRV Measures
-//
-HrvPage::HrvPage(QWidget *parent, Context *context) : QWidget(parent), context(context)
-{
-    QVBoxLayout *all = new QVBoxLayout(this);
-    QGridLayout *measuresGrid = new QGridLayout;
-    Qt::Alignment alignment = Qt::AlignLeft|Qt::AlignVCenter;
-
-#ifdef Q_OS_MAX
-    setContentsMargins(10,10,10,10);
-    grid->setSpacing(5 *dpiXFactor);
-    all->setSpacing(5 *dpiXFactor);
-#endif
-
-    QLabel* seperatorText = new QLabel(tr("Time dependent HRV measurements"));
-    all->addWidget(seperatorText);
-
-    QString dateTimetext = tr("From Date - Time");
-    dateLabel = new QLabel(dateTimetext);
-    dateTimeEdit = new QDateTimeEdit;
-    dateTimeEdit->setDateTime(QDateTime::currentDateTime());
-    dateTimeEdit->setCalendarPopup(true);
-
-    QString rmssdtext = context->athlete->measures->getFieldNames(Measures::Hrv).at(HrvMeasure::RMSSD);
-    rmssdlabel = new QLabel(rmssdtext);
-    rmssd = new QDoubleSpinBox(this);
-    rmssd->setMaximum(999.9);
-    rmssd->setMinimum(0.0);
-    rmssd->setDecimals(1);
-    rmssd->setValue(0.0);
-
-    QString hrtext = context->athlete->measures->getFieldNames(Measures::Hrv).at(HrvMeasure::HR);
-    hrlabel = new QLabel(hrtext);
-    hr = new QDoubleSpinBox(this);
-    hr->setMaximum(999.9);
-    hr->setMinimum(0.0);
-    hr->setDecimals(1);
-    hr->setValue(0.0);
-
-    QString avnntext = context->athlete->measures->getFieldNames(Measures::Hrv).at(HrvMeasure::AVNN);
-    avnnlabel = new QLabel(avnntext);
-    avnn = new QDoubleSpinBox(this);
-    avnn->setMaximum(9999.9);
-    avnn->setMinimum(0.0);
-    avnn->setDecimals(1);
-    avnn->setValue(0.0);
-
-    QString sdnntext = context->athlete->measures->getFieldNames(Measures::Hrv).at(HrvMeasure::SDNN);
-    sdnnlabel = new QLabel(sdnntext);
-    sdnn = new QDoubleSpinBox(this);
-    sdnn->setMaximum(999.9);
-    sdnn->setMinimum(0.0);
-    sdnn->setDecimals(1);
-    sdnn->setValue(0.0);
-
-    QString pnn50text = context->athlete->measures->getFieldNames(Measures::Hrv).at(HrvMeasure::PNN50);
-    pnn50label = new QLabel(pnn50text);
-    pnn50 = new QDoubleSpinBox(this);
-    pnn50->setMaximum(100.0);
-    pnn50->setMinimum(0.0);
-    pnn50->setDecimals(1);
-    pnn50->setValue(0.0);
-
-    QString lftext = context->athlete->measures->getFieldNames(Measures::Hrv).at(HrvMeasure::LF);
-    lflabel = new QLabel(lftext);
-    lf = new QDoubleSpinBox(this);
-    lf->setMaximum(1.0);
-    lf->setMinimum(0.0);
-    lf->setDecimals(4);
-    lf->setValue(0.0);
-
-    QString hftext = context->athlete->measures->getFieldNames(Measures::Hrv).at(HrvMeasure::HF);
-    hflabel = new QLabel(hftext);
-    hf = new QDoubleSpinBox(this);
-    hf->setMaximum(1.0);
-    hf->setMinimum(0.0);
-    hf->setDecimals(4);
-    hf->setValue(0.0);
-
-    QString recovery_pointstext = context->athlete->measures->getFieldNames(Measures::Hrv).at(HrvMeasure::RECOVERY_POINTS);
-    recovery_pointslabel = new QLabel(recovery_pointstext);
-    recovery_points = new QDoubleSpinBox(this);
-    recovery_points->setMaximum(10.0);
-    recovery_points->setMinimum(0.0);
-    recovery_points->setDecimals(1);
-    recovery_points->setValue(0.0);
-
-    QString commenttext = tr("Comment");
-    commentlabel = new QLabel(commenttext);
-    comment = new QLineEdit(this);
-    comment->setText("");
-
-    measuresGrid->addWidget(dateLabel, 1, 0, alignment);
-    measuresGrid->addWidget(dateTimeEdit, 1, 1, alignment);
-
-    measuresGrid->addWidget(rmssdlabel, 2, 0, alignment);
-    measuresGrid->addWidget(rmssd, 2, 1, alignment);
-
-    measuresGrid->addWidget(hrlabel, 3, 0, alignment);
-    measuresGrid->addWidget(hr, 3, 1, alignment);
-
-    measuresGrid->addWidget(avnnlabel, 4, 0, alignment);
-    measuresGrid->addWidget(avnn, 4, 1, alignment);
-
-    measuresGrid->addWidget(sdnnlabel, 5, 0, alignment);
-    measuresGrid->addWidget(sdnn, 5, 1, alignment);
-
-    measuresGrid->addWidget(pnn50label, 6, 0, alignment);
-    measuresGrid->addWidget(pnn50, 6, 1, alignment);
-
-    measuresGrid->addWidget(lflabel, 7, 0, alignment);
-    measuresGrid->addWidget(lf, 7, 1, alignment);
-
-    measuresGrid->addWidget(hflabel, 8, 0, alignment);
-    measuresGrid->addWidget(hf, 8, 1, alignment);
-
-    measuresGrid->addWidget(recovery_pointslabel, 9, 0, alignment);
-    measuresGrid->addWidget(recovery_points, 9, 1, alignment);
-
-    measuresGrid->addWidget(commentlabel, 10, 0, alignment);
-    measuresGrid->addWidget(comment, 10, 1, alignment);
-
-    all->addLayout(measuresGrid);
-
-
-    // Buttons
-    updateButton = new QPushButton(tr("Update"));
-    updateButton->hide();
-    addButton = new QPushButton(tr("+"));
-    deleteButton = new QPushButton(tr("-"));
-#ifndef Q_OS_MAC
-    addButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
-    deleteButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
-#else
-    updateButton->setText(tr("Update"));
-    addButton->setText(tr("Add"));
-    deleteButton->setText(tr("Delete"));
-#endif
-
-    QHBoxLayout *actionButtons = new QHBoxLayout;
-    actionButtons->setSpacing(2 *dpiXFactor);
-    actionButtons->addStretch();
-    actionButtons->addWidget(updateButton);
-    actionButtons->addWidget(addButton);
-    actionButtons->addWidget(deleteButton);
-    all->addLayout(actionButtons);
-
-    // HRV Measures
-    hrvTree = new QTreeWidget;
-    hrvTree->headerItem()->setText(0, dateTimetext);
-    hrvTree->header()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
-    hrvTree->headerItem()->setText(1, rmssdtext);
-    hrvTree->header()->setSectionResizeMode(1, QHeaderView::ResizeToContents);
-    hrvTree->headerItem()->setText(2, hrtext);
-    hrvTree->header()->setSectionResizeMode(2, QHeaderView::ResizeToContents);
-    hrvTree->headerItem()->setText(3, avnntext);
-    hrvTree->header()->setSectionResizeMode(3, QHeaderView::ResizeToContents);
-    hrvTree->headerItem()->setText(4, sdnntext);
-    hrvTree->header()->setSectionResizeMode(4, QHeaderView::ResizeToContents);
-    hrvTree->headerItem()->setText(5, pnn50text);
-    hrvTree->header()->setSectionResizeMode(5, QHeaderView::ResizeToContents);
-    hrvTree->headerItem()->setText(6, lftext);
-    hrvTree->header()->setSectionResizeMode(6, QHeaderView::ResizeToContents);
-    hrvTree->headerItem()->setText(7, hftext);
-    hrvTree->header()->setSectionResizeMode(7, QHeaderView::ResizeToContents);
-    hrvTree->headerItem()->setText(8, recovery_pointstext);
-    hrvTree->header()->setSectionResizeMode(8, QHeaderView::ResizeToContents);
-    hrvTree->headerItem()->setText(9, commenttext);
-    hrvTree->header()->setSectionResizeMode(9, QHeaderView::ResizeToContents);
-    hrvTree->headerItem()->setText(10, tr("Source"));
-    hrvTree->header()->setSectionResizeMode(10, QHeaderView::ResizeToContents);
-    hrvTree->headerItem()->setText(11, tr("Original Source"));
-    hrvTree->setColumnCount(12);
-    hrvTree->setSelectionMode(QAbstractItemView::SingleSelection);
-    hrvTree->setEditTriggers(QAbstractItemView::SelectedClicked); // allow edit
-    hrvTree->setUniformRowHeights(true);
-    hrvTree->setIndentation(0);
-
-    // get body measures if the file exists
-    QFile hrvFile(QString("%1/hrvmeasures.json").arg(context->athlete->home->config().canonicalPath()));
-    if (hrvFile.exists()) {
-        HrvMeasureParser::unserialize(hrvFile, hrvMeasures);
-    }
-    qSort(hrvMeasures); // date order
-
-    // setup hrvTree
-    for (int i=0; i<hrvMeasures.count(); i++) {
-        QTreeWidgetItem *add = new QTreeWidgetItem(hrvTree->invisibleRootItem());
-        add->setFlags(add->flags() & ~Qt::ItemIsEditable);
-        // date & time
-        add->setText(0, hrvMeasures[i].when.toString(tr("MMM d, yyyy - hh:mm:ss")));
-        // hrv data
-        add->setText(1, QString("%1").arg(hrvMeasures[i].rmssd, 0, 'f', 1));
-        add->setText(2, QString("%1").arg(hrvMeasures[i].hr, 0, 'f', 1));
-        add->setText(3, QString("%1").arg(hrvMeasures[i].avnn, 0, 'f', 1));
-        add->setText(4, QString("%1").arg(hrvMeasures[i].sdnn, 0, 'f', 1));
-        add->setText(5, QString("%1").arg(hrvMeasures[i].pnn50));
-        add->setText(6, QString("%1").arg(hrvMeasures[i].lf, 0, 'f', 4));
-        add->setText(7, QString("%1").arg(hrvMeasures[i].hf, 0, 'f', 4));
-        add->setText(8, QString("%1").arg(hrvMeasures[i].recovery_points, 0, 'f', 1));
-        add->setText(9, hrvMeasures[i].comment);
-        // source
-        add->setText(10, hrvMeasures[i].getSourceDescription());
-        add->setText(11, hrvMeasures[i].originalSource);
-    }
-
-    all->addWidget(hrvTree);
-
-    // set default edit values to newest hrvmeasurement (if one exists)
-    if (hrvMeasures.count() > 0) {
-        rmssd->setValue(hrvMeasures.last().rmssd);
-        hr->setValue(hrvMeasures.last().hr);
-        avnn->setValue(hrvMeasures.last().avnn);
-        sdnn->setValue(hrvMeasures.last().sdnn);
-        pnn50->setValue(hrvMeasures.last().pnn50);
-        lf->setValue(hrvMeasures.last().lf);
-        hf->setValue(hrvMeasures.last().hf);
-        recovery_points->setValue(hrvMeasures.last().recovery_points);
-    }
-
-    // edit connect
-    connect(dateTimeEdit, SIGNAL(dateTimeChanged(QDateTime)), this, SLOT(rangeEdited()));
-    connect(rmssd, SIGNAL(valueChanged(double)), this, SLOT(rangeEdited()));
-    connect(hr, SIGNAL(valueChanged(double)), this, SLOT(rangeEdited()));
-    connect(avnn, SIGNAL(valueChanged(double)), this, SLOT(rangeEdited()));
-    connect(sdnn, SIGNAL(valueChanged(double)), this, SLOT(rangeEdited()));
-    connect(pnn50, SIGNAL(valueChanged(double)), this, SLOT(rangeEdited()));
-    connect(lf, SIGNAL(valueChanged(double)), this, SLOT(rangeEdited()));
-    connect(hf, SIGNAL(valueChanged(double)), this, SLOT(rangeEdited()));
-    connect(recovery_points, SIGNAL(valueChanged(double)), this, SLOT(rangeEdited()));
-    connect(comment, SIGNAL(textEdited(QString)), this, SLOT(rangeEdited()));
-
-    // button connect
-    connect(updateButton, SIGNAL(clicked()), this, SLOT(addOReditClicked()));
-    connect(addButton, SIGNAL(clicked()), this, SLOT(addOReditClicked()));
-    connect(deleteButton, SIGNAL(clicked()), this, SLOT(deleteClicked()));
-
-    // list selection connect
-    connect(hrvTree, SIGNAL(itemSelectionChanged()), this, SLOT(rangeSelectionChanged()));
-
-    // save initial values for things we care about
-    b4.fingerprint = 0;
-    foreach (HrvMeasure hrv, hrvMeasures) {
-        b4.fingerprint += hrv.getFingerprint();
-    }
-}
-
-qint32
-HrvPage::saveClicked()
-{
-    qint32 state=0;
-
-    // HRV Measures changed ?
-    unsigned long fingerprint = 0;
-    foreach (HrvMeasure hrv, hrvMeasures) {
-        fingerprint += hrv.getFingerprint();
-    }
-    if (fingerprint != b4.fingerprint) {
-        // store in athlete
-        HrvMeasures* pHrvMeasures = dynamic_cast <HrvMeasures*>(context->athlete->measures->getGroup(Measures::Hrv));
-        pHrvMeasures->setHrvMeasures(hrvMeasures);
-        // now save data away if we actually got something !
-        pHrvMeasures->write();
-        state += CONFIG_ATHLETE;
-    }
-
-    return state;
-}
-
-void
-HrvPage::addOReditClicked()
-{
-    int index;
-    QTreeWidgetItem *add;
-    HrvMeasure addHrv;
-    QString dateTimeTxt = dateTimeEdit->dateTime().toString(tr("MMM d, yyyy - hh:mm:ss"));
-
-    // if an entry for this date & time already exists, edit item otherwise add new
-    QList<QTreeWidgetItem*> matches = hrvTree->findItems(dateTimeTxt, Qt::MatchExactly, 0);
-    if (matches.count() > 0) {
-        // edit existing
-        add = matches[0];
-        index = hrvTree->invisibleRootItem()->indexOfChild(matches[0]);
-        hrvMeasures.removeAt(index);
-    } else {
-        // add new
-        index = hrvMeasures.count();
-        add = new QTreeWidgetItem;
-        add->setFlags(add->flags() & ~Qt::ItemIsEditable);
-        hrvTree->invisibleRootItem()->insertChild(index, add);
-    }
-
-    addHrv.when = dateTimeEdit->dateTime().toUTC();
-    addHrv.rmssd = rmssd->value();
-    addHrv.hr = hr->value();
-    addHrv.avnn = avnn->value();
-    addHrv.sdnn = sdnn->value();
-    addHrv.pnn50 = pnn50->value();
-    addHrv.lf = lf->value();
-    addHrv.hf = hf->value();
-    addHrv.recovery_points = recovery_points->value();
-    addHrv.comment = comment->text();
-    addHrv.source = HrvMeasure::Manual;
-    addHrv.originalSource = "";
-    hrvMeasures.insert(index, addHrv);
-
-    // date and time
-    add->setText(0, dateTimeTxt);
-    // Weight
-    add->setText(1, QString("%1").arg(rmssd->value()));
-    add->setText(2, QString("%1").arg(hr->value()));
-    add->setText(3, QString("%1").arg(avnn->value()));
-    add->setText(4, QString("%1").arg(sdnn->value()));
-    add->setText(5, QString("%1").arg(pnn50->value()));
-    add->setText(6, QString("%1").arg(lf->value()));
-    add->setText(7, QString("%1").arg(hf->value()));
-    add->setText(8, QString("%1").arg(recovery_points->value()));
-    add->setText(9, QString("%1").arg(comment->text()));
-    add->setText(10, QString("%1").arg(tr("Manual entry")));
-    add->setText(11, ""); // Original Source
-
-    updateButton->hide();
-}
-
-void
-HrvPage::deleteClicked()
-{
-    if (hrvTree->currentItem()) {
-        int index = hrvTree->invisibleRootItem()->indexOfChild(hrvTree->currentItem());
-        delete hrvTree->invisibleRootItem()->takeChild(index);
-        hrvMeasures.removeAt(index);
-    }
-}
-
-void
-HrvPage::rangeEdited()
-{
-    if (hrvTree->currentItem()) {
-        int index = hrvTree->invisibleRootItem()->indexOfChild(hrvTree->currentItem());
-
-        QDateTime dateTime = dateTimeEdit->dateTime();
-        QDateTime odateTime = hrvMeasures[index].when;
-
-        double nrmssd = rmssd->value();
-        double ormssd = hrvMeasures[index].rmssd;
-        double nhr = hr->value();
-        double ohr = hrvMeasures[index].hr;
-        double navnn = avnn->value();
-        double oavnn = hrvMeasures[index].avnn;
-        double nsdnn = sdnn->value();
-        double osdnn = hrvMeasures[index].sdnn;
-        double npnn50 = pnn50->value();
-        double opnn50 = hrvMeasures[index].pnn50;
-        double nlf = lf->value();
-        double olf = hrvMeasures[index].lf;
-        double nhf = hf->value();
-        double ohf = hrvMeasures[index].hf;
-        double nrecovery_points = recovery_points->value();
-        double orecovery_points = hrvMeasures[index].recovery_points;
-        QString ncomment = comment->text();
-        QString ocomment = hrvMeasures[index].comment;
-
-        if (dateTime == odateTime && (nrmssd != ormssd ||
-                                      nhr != ohr ||
-                                      navnn != oavnn ||
-                                      nsdnn != osdnn ||
-                                      npnn50 != opnn50 ||
-                                      nlf != olf ||
-                                      nhf != ohf ||
-                                      nrecovery_points != orecovery_points ||
-                                      ncomment != ocomment))
-            updateButton->show();
-        else
-            updateButton->hide();
-    }
-}
-
-void
-HrvPage::rangeSelectionChanged()
-{
-    // fill with current details
-    if (hrvTree->currentItem()) {
-
-        int index = hrvTree->invisibleRootItem()->indexOfChild(hrvTree->currentItem());
-        HrvMeasure current = hrvMeasures[index];
-
-        dateTimeEdit->setDateTime(current.when);
-        rmssd->setValue(current.rmssd);
-        hr->setValue(current.hr);
-        avnn->setValue(current.avnn);
-        sdnn->setValue(current.sdnn);
-        pnn50->setValue(current.pnn50);
-        lf->setValue(current.lf);
-        hf->setValue(current.hf);
-        recovery_points->setValue(current.recovery_points);
-        comment->setText(current.comment);
-
-        updateButton->hide();
-    }
-}
-
-//
 // Realtime devices page
 //
 DevicePage::DevicePage(QWidget *parent, Context *context) : QWidget(parent), context(context)
 {
+    HelpWhatsThis *help = new HelpWhatsThis(this);
+    this->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::Preferences_Training_TrainDevices));
+
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
 
     DeviceTypes all;
@@ -1892,7 +537,7 @@ deviceModel::add(DeviceConfiguration &newone)
     index = deviceModel::index(0,3, QModelIndex());
     setData(index, newone.deviceProfile, Qt::EditRole);
 
-    // insert postProcess
+    // insert virtualPowerIndex
     index = deviceModel::index(0,4, QModelIndex());
     setData(index, newone.postProcess, Qt::EditRole);
 }
@@ -1986,7 +631,7 @@ QVariant deviceModel::data(const QModelIndex &index, int role) const
                 {
                 DeviceTypes all;
                 DeviceType lookupType = all.getType (Entry.type);
-                return lookupType.name;
+                return (const char*)(lookupType.name);
                 }
                 break;
             case 2 :
@@ -2069,6 +714,33 @@ bool deviceModel::setData(const QModelIndex &index, const QVariant &value, int r
 //
 TrainOptionsPage::TrainOptionsPage(QWidget *parent, Context *context) : QWidget(parent), context(context)
 {
+    HelpWhatsThis *help = new HelpWhatsThis(this);
+    this->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::Preferences_Training_Preferences));
+
+    //
+    // Workout directory (train view)
+    //
+    QVariant workoutDir = appsettings->value(this, GC_WORKOUTDIR, "");
+    // fix old bug..
+    if (workoutDir == "0") workoutDir = "";
+    workoutLabel = new QLabel(tr("Workout and VideoSync Library"));
+    workoutDirectory = new QLineEdit;
+    workoutDirectory->setText(workoutDir.toString());
+    workoutBrowseButton = new QPushButton(tr("Browse"));
+    connect(workoutBrowseButton, SIGNAL(clicked()), this, SLOT(browseWorkoutDir()));
+
+    useSimulatedSpeed = new QCheckBox(tr("Simulate Speed From Power"), this);
+    useSimulatedSpeed->setChecked(appsettings->value(this, TRAIN_USESIMULATEDSPEED, true).toBool());
+    useSimulatedSpeed->setToolTip(tr("Simulation physics uses current athlete parameters and settings\n"
+                                     "from the virtual bicycle specifications tab. For Erg Mode workouts\n"
+                                     "the slope is assumed to be zero."));
+
+    useSimulatedHypoxia = new QCheckBox(tr("Simulate Relative Hypoxia"), this);
+    useSimulatedHypoxia->setChecked(appsettings->value(this, TRAIN_USESIMULATEDHYPOXIA, false).toBool());
+    useSimulatedHypoxia->setToolTip(tr("Power used by simulation is adjusted for hypoxia relative to\n"
+                                       "ActualTrainingAltitude value in virtual bicycle specifications\n"
+                                       "tab."));
+
     autoConnect = new QCheckBox(tr("Auto-connect devices in Train View"), this);
     autoConnect->setChecked(appsettings->value(this, TRAIN_AUTOCONNECT, false).toBool());
 
@@ -2078,17 +750,38 @@ TrainOptionsPage::TrainOptionsPage(QWidget *parent, Context *context) : QWidget(
     autoHide = new QCheckBox(tr("Auto-hide bottom bar in Train View"), this);
     autoHide->setChecked(appsettings->value(this, TRAIN_AUTOHIDE, false).toBool());
 
-    // Disabled until ported across from the existing bottom bar checkbox
-    autoHide->setDisabled(true);
-
     lapAlert = new QCheckBox(tr("Play sound before new lap"), this);
     lapAlert->setChecked(appsettings->value(this, TRAIN_LAPALERT, false).toBool());
 
+    delayLabel = new QLabel(tr("Start Countdown"));
+    startDelay = new QSpinBox(this);
+    startDelay->setMaximum(600);
+    startDelay->setMinimum(0);
+    startDelay->setSuffix(tr(" secs"));
+    startDelay->setValue(appsettings->value(this, TRAIN_STARTDELAY, 0).toUInt());
+    startDelay->setToolTip(tr("Countdown for workout start"));
+
     QVBoxLayout *all = new QVBoxLayout(this);
+
+    QGridLayout *wdLayout = new QGridLayout;
+    wdLayout->addWidget(workoutLabel, 0,0, Qt::AlignRight);
+    wdLayout->addWidget(workoutDirectory, 0,1);
+    wdLayout->addWidget(workoutBrowseButton, 0,2);
+    all->addLayout(wdLayout);
+
+    all->addWidget(useSimulatedSpeed);
+    all->addWidget(useSimulatedHypoxia);
     all->addWidget(multiCheck);
     all->addWidget(autoConnect);
     all->addWidget(autoHide);
     all->addWidget(lapAlert);
+
+    QHBoxLayout *delayLayout = new QHBoxLayout;
+    delayLayout->addWidget(delayLabel);
+    delayLayout->addWidget(startDelay);
+    delayLayout->addStretch();
+    all->addLayout(delayLayout);
+
     all->addStretch();
 }
 
@@ -2097,12 +790,26 @@ qint32
 TrainOptionsPage::saveClicked()
 {
     // Save the train view settings...
+    appsettings->setValue(GC_WORKOUTDIR, workoutDirectory->text());
+    appsettings->setValue(TRAIN_USESIMULATEDSPEED, useSimulatedSpeed->isChecked());
+    appsettings->setValue(TRAIN_USESIMULATEDHYPOXIA, useSimulatedHypoxia->isChecked());
     appsettings->setValue(TRAIN_MULTI, multiCheck->isChecked());
     appsettings->setValue(TRAIN_AUTOCONNECT, autoConnect->isChecked());
+    appsettings->setValue(TRAIN_STARTDELAY, startDelay->value());
     appsettings->setValue(TRAIN_AUTOHIDE, autoHide->isChecked());
     appsettings->setValue(TRAIN_LAPALERT, lapAlert->isChecked());
 
     return 0;
+}
+
+void
+TrainOptionsPage::browseWorkoutDir()
+{
+    QString currentDir = workoutDirectory->text();
+    if (!QDir(currentDir).exists()) currentDir = "";
+    QString dir = QFileDialog::getExistingDirectory(this, tr("Select Workout Library"),
+                            currentDir, QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+    if (dir != "") workoutDirectory->setText(dir);  //only overwrite current dir, if a new was selected
 }
 
 
@@ -2111,6 +818,9 @@ TrainOptionsPage::saveClicked()
 //
 RemotePage::RemotePage(QWidget *parent, Context *context) : QWidget(parent), context(context)
 {
+    HelpWhatsThis *help = new HelpWhatsThis(this);
+    this->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::Preferences_Training_RemoteControls));
+
     remote = new RemoteControl;
 
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
@@ -2126,7 +836,7 @@ RemotePage::RemotePage(QWidget *parent, Context *context) : QWidget(parent), con
 
     fields->setCurrentItem(fields->invisibleRootItem()->child(0));
 
-    mainLayout->addWidget(fields, 0,0);
+    mainLayout->addWidget(fields, 0, Qt::Alignment());
 
     // Load the native command list
     QList <RemoteCmd> nativeCmds = remote->getNativeCmds();
@@ -2142,7 +852,7 @@ RemotePage::RemotePage(QWidget *parent, Context *context) : QWidget(parent), con
     foreach (RemoteCmd nativeCmd, nativeCmds) {
 
         QComboBox *comboBox = new QComboBox(this);
-        comboBox->addItem("<unset>");
+        comboBox->addItem(tr("<unset>"));
 
         // populate the combo box with all possible ANT commands
         foreach(RemoteCmd antCmd, antCmds) {
@@ -2210,7 +920,268 @@ RemotePage::saveClicked()
     return 0;
 }
 
-static double scalefactors[9] = { 0.5f, 0.6f, 0.8, 0.9, 1.0f, 1.1f, 1.25f, 1.5f, 2.0f };
+const SimBicyclePartEntry& SimBicyclePage::GetSimBicyclePartEntry(int e)
+{
+    // Bike mass values approximate a good current bike. Wheels are shimano c40 with conti tubeless tires.
+
+    static const SimBicyclePartEntry arr[] = {
+          // SpinBox Title                              Path to athlete value                Default Value      Decimal      Tooltip                                                                              enum
+        { tr("Bicycle Mass Without Wheels (g)"     )  , GC_SIM_BICYCLE_MASSWITHOUTWHEELSG,   4000,              0,           tr("Mass of everything that isn't wheels, tires, skewers...")},                       // BicycleWithoutWheelsG
+        { tr("Front Wheel Mass (g)"                )  , GC_SIM_BICYCLE_FRONTWHEELG,          739,               0,           tr("Mass of front wheel excluding tires and skewers...")},                            // FrontWheelG
+        { tr("Front Spoke Count"                   )  , GC_SIM_BICYCLE_FRONTSPOKECOUNT,      24,                0,           tr("")},                                                                              // FrontSpokeCount
+        { tr("Front Spoke & Nipple Mass - Each (g)")  , GC_SIM_BICYCLE_FRONTSPOKENIPPLEG,    5.6,               1,           tr("Mass of a single spoke and nipple, washers, etc.")},                              // FrontSpokeNippleG
+        { tr("Front Rim Mass (g)"                  )  , GC_SIM_BICYCLE_FRONTRIMG,            330,               0,           tr("")},                                                                              // FrontRimG
+        { tr("Front Rotor Mass (g)"                )  , GC_SIM_BICYCLE_FRONTROTORG,          120,               0,           tr("Mass of rotor including bolts")},                                                 // FrontRotorG
+        { tr("Front Skewer Mass (g)"               )  , GC_SIM_BICYCLE_FRONTSKEWERG,         40,                0,           tr("")},                                                                              // FrontSkewerG
+        { tr("Front Tire Mass (g)"                 )  , GC_SIM_BICYCLE_FRONTTIREG,           220,               0,           tr("")},                                                                              // FrontTireG
+        { tr("Front Tube or Sealant Mass (g)"      )  , GC_SIM_BICYCLE_FRONTTUBESEALANTG,    26,                0,           tr("Mass of anything inside the tire: sealant, tube...")},                            // FrontTubeSealantG
+        { tr("Front Rim Outer Radius (m)"          )  , GC_SIM_BICYCLE_FRONTOUTERRADIUSM,    .35,               3,           tr("Functional outer radius of wheel, used for computing wheel circumference")},      // FrontOuterRadiusM
+        { tr("Front Rim Inner Radius (m)"          )  , GC_SIM_BICYCLE_FRONTRIMINNERRADIUSM, .3,                3,           tr("Inner radius of rim, for computing wheel inertia")},                              // FrontRimInnerRadiusM
+        { tr("Rear Wheel Mass (g)"                 )  , GC_SIM_BICYCLE_REARWHEELG,           739,               0,           tr("Mass of rear wheel excluding tires and skewers...")},                             // RearWheelG
+        { tr("Rear Spoke Count"                    )  , GC_SIM_BICYCLE_REARSPOKECOUNT,       24,                0,           tr("")},                                                                              // RearSpokeCount
+        { tr("Rear Spoke & Nipple Mass - Each (g)" )  , GC_SIM_BICYCLE_REARSPOKENIPPLEG,     5.6,               1,           tr("Mass of a single spoke and nipple, washers, etc.")},                              // RearSpokeNippleG
+        { tr("Rear Rim Mass (g)"                   )  , GC_SIM_BICYCLE_REARRIMG,             330,               0,           tr("")},                                                                              // RearRimG
+        { tr("Rear Rotor Mass (g)"                 )  , GC_SIM_BICYCLE_REARROTORG,           120,               0,           tr("Mass of rotor including bolts")},                                                 // RearRotorG
+        { tr("Rear Skewer Mass (g)"                )  , GC_SIM_BICYCLE_REARSKEWERG,           40,               0,           tr("Mass of skewer/axle/funbolts, etc...")},                                          // RearSkewerG
+        { tr("Rear Tire Mass (g)"                  )  , GC_SIM_BICYCLE_REARTIREG,            220,               0,           tr("Mass of tire not including tube or sealant")},                                    // RearTireG
+        { tr("Rear Tube or Sealant Mass (g)"       )  , GC_SIM_BICYCLE_REARTUBESEALANTG,      26,               0,           tr("Mass of anything inside the tire: sealant, tube...")},                            // RearTubeSealantG
+        { tr("Rear Rim Outer Radius (m)"           )  , GC_SIM_BICYCLE_REAROUTERRADIUSM,     .35,               3,           tr("Functional outer radius of wheel, used for computing wheel circumference")},      // RearOuterRadiusM
+        { tr("Rear Rim Inner Radius (m)"           )  , GC_SIM_BICYCLE_REARRIMINNERRADIUSM,  .3,                3,           tr("Inner radius of rim, for computing wheel inertia")},                              // RearRimInnerRadiusM
+        { tr("Rear Cassette Mass(g)"               )  , GC_SIM_BICYCLE_CASSETTEG,            190,               0,           tr("Mass of rear cassette, including lockring")},                                     // CassetteG
+        { tr("Coefficient of rolling resistance"   )  , GC_SIM_BICYCLE_CRR,                  0.004,             4,           tr("Total coefficient of rolling resistance for bicycle")},                           // CRR
+        { tr("Coefficient of power train loss"     )  , GC_SIM_BICYCLE_Cm,                   1.0,               3,           tr("Power train loss between reported watts and wheel. For direct drive trainer like kickr there is no relevant loss and value shold be 1.0.")},      // Cm
+        { tr("Coefficient of drag"                 )  , GC_SIM_BICYCLE_Cd,        (1.0 - 0.0045),               5,           tr("Coefficient of drag of rider and bicycle")},                                      // Cd
+        { tr("Frontal Area (m^2)"                  )  , GC_SIM_BICYCLE_Am2,                  0.5,               2,           tr("Effective frontal area of rider and bicycle")},                                   // Am2
+        { tr("Temperature (K)"                     )  , GC_SIM_BICYCLE_Tk,                 293.15,              2,           tr("Temperature in kelvin, used with altitude to compute air density")},              // Tk
+        { tr("ActualTrainerAltitude (m)"           )  , GC_SIM_BICYCLE_ACTUALTRAINERALTITUDEM, 0.,              0,           tr("Actual altitude of indoor trainer, in meters")}                                   // ActualTrainerAltitudeM
+    };
+
+    if (e < 0 || e >= LastPart) e = 0;
+
+    return arr[e];
+}
+
+double
+SimBicyclePage::GetBicyclePartValue(Context* context, int e)
+{
+    const SimBicyclePartEntry &r = GetSimBicyclePartEntry(e);
+
+    if (!context) return r.m_defaultValue;
+
+    return appsettings->cvalue(
+        context->athlete->cyclist,
+        r.m_path,
+        r.m_defaultValue).toDouble();
+}
+
+void
+SimBicyclePage::AddSpecBox(int ePart)
+{
+    const SimBicyclePartEntry & entry = GetSimBicyclePartEntry(ePart);
+
+    m_LabelArr[ePart] = new QLabel(entry.m_label);
+
+    QDoubleSpinBox * pSpinBox = new QDoubleSpinBox(this);
+
+    pSpinBox->setMaximum(99999);
+    pSpinBox->setMinimum(0.0);
+    pSpinBox->setDecimals(entry.m_decimalPlaces);
+    pSpinBox->setValue(GetBicyclePartValue(context, ePart));
+    pSpinBox->setToolTip(entry.m_tooltip);
+    double singlestep = 1.;
+    for (int i = 0; i < entry.m_decimalPlaces; i++)
+        singlestep /= 10.;
+
+    pSpinBox->setSingleStep(singlestep);
+
+    m_SpinBoxArr[ePart] = pSpinBox;
+}
+
+void
+SimBicyclePage::SetStatsLabelArray(double )
+{
+    double riderMassKG = 0;
+
+    const double bicycleMassWithoutWheelsG = m_SpinBoxArr[SimBicyclePage::BicycleWithoutWheelsG]->value();
+    const double bareFrontWheelG           = m_SpinBoxArr[SimBicyclePage::FrontWheelG          ]->value();
+    const double frontSpokeCount           = m_SpinBoxArr[SimBicyclePage::FrontSpokeCount      ]->value();
+    const double frontSpokeNippleG         = m_SpinBoxArr[SimBicyclePage::FrontSpokeNippleG    ]->value();
+    const double frontWheelOuterRadiusM    = m_SpinBoxArr[SimBicyclePage::FrontOuterRadiusM    ]->value();
+    const double frontRimInnerRadiusM      = m_SpinBoxArr[SimBicyclePage::FrontRimInnerRadiusM ]->value();
+    const double frontRimG                 = m_SpinBoxArr[SimBicyclePage::FrontRimG            ]->value();
+    const double frontRotorG               = m_SpinBoxArr[SimBicyclePage::FrontRotorG          ]->value();
+    const double frontSkewerG              = m_SpinBoxArr[SimBicyclePage::FrontSkewerG         ]->value();
+    const double frontTireG                = m_SpinBoxArr[SimBicyclePage::FrontTireG           ]->value();
+    const double frontTubeOrSealantG       = m_SpinBoxArr[SimBicyclePage::FrontTubeSealantG    ]->value();
+    const double bareRearWheelG            = m_SpinBoxArr[SimBicyclePage::RearWheelG           ]->value();
+    const double rearSpokeCount            = m_SpinBoxArr[SimBicyclePage::RearSpokeCount       ]->value();
+    const double rearSpokeNippleG          = m_SpinBoxArr[SimBicyclePage::RearSpokeNippleG     ]->value();
+    const double rearWheelOuterRadiusM     = m_SpinBoxArr[SimBicyclePage::RearOuterRadiusM     ]->value();
+    const double rearRimInnerRadiusM       = m_SpinBoxArr[SimBicyclePage::RearRimInnerRadiusM  ]->value();
+    const double rearRimG                  = m_SpinBoxArr[SimBicyclePage::RearRimG             ]->value();
+    const double rearRotorG                = m_SpinBoxArr[SimBicyclePage::RearRotorG           ]->value();
+    const double rearSkewerG               = m_SpinBoxArr[SimBicyclePage::RearSkewerG          ]->value();
+    const double rearTireG                 = m_SpinBoxArr[SimBicyclePage::RearTireG            ]->value();
+    const double rearTubeOrSealantG        = m_SpinBoxArr[SimBicyclePage::RearTubeSealantG     ]->value();
+    const double cassetteG                 = m_SpinBoxArr[SimBicyclePage::CassetteG            ]->value();
+
+    const double frontWheelG = bareFrontWheelG + frontRotorG + frontSkewerG + frontTireG + frontTubeOrSealantG;
+    const double frontWheelRotatingG = frontRimG + frontTireG + frontTubeOrSealantG + (frontSpokeCount * frontSpokeNippleG);
+    const double frontWheelCenterG = frontWheelG - frontWheelRotatingG;
+
+    BicycleWheel frontWheel(frontWheelOuterRadiusM, frontRimInnerRadiusM, frontWheelG / 1000, frontWheelCenterG /1000, frontSpokeCount, frontSpokeNippleG/1000);
+
+    const double rearWheelG = bareRearWheelG + cassetteG + rearRotorG + rearSkewerG + rearTireG + rearTubeOrSealantG;
+    const double rearWheelRotatingG = rearRimG + rearTireG + rearTubeOrSealantG + (rearSpokeCount * rearSpokeNippleG);
+    const double rearWheelCenterG = rearWheelG - rearWheelRotatingG;
+
+    BicycleWheel rearWheel (rearWheelOuterRadiusM,  rearRimInnerRadiusM,  rearWheelG / 1000,  rearWheelCenterG / 1000,  rearSpokeCount,  rearSpokeNippleG/1000);
+
+    BicycleConstants constants(
+        m_SpinBoxArr[SimBicyclePage::CRR]->value(),
+        m_SpinBoxArr[SimBicyclePage::Cm] ->value(),
+        m_SpinBoxArr[SimBicyclePage::Cd] ->value(),
+        m_SpinBoxArr[SimBicyclePage::Am2]->value(),
+        m_SpinBoxArr[SimBicyclePage::Tk] ->value(),
+        1.);
+
+    Bicycle bicycle(NULL, constants, riderMassKG, bicycleMassWithoutWheelsG / 1000., frontWheel, rearWheel);
+
+    m_StatsLabelArr[StatsLabel]              ->setText(QString(tr("------ Derived Statistics -------")));
+    m_StatsLabelArr[StatsTotalKEMass]        ->setText(QString(tr("Total KEMass:         \t%1g")).arg(bicycle.KEMass()));
+    m_StatsLabelArr[StatsFrontWheelKEMass]   ->setText(QString(tr("FrontWheel KEMass:    \t%1g")).arg(bicycle.FrontWheel().KEMass() * 1000));
+    m_StatsLabelArr[StatsFrontWheelMass]     ->setText(QString(tr("FrontWheel Mass:      \t%1g")).arg(bicycle.FrontWheel().MassKG() * 1000));
+    m_StatsLabelArr[StatsFrontWheelEquivMass]->setText(QString(tr("FrontWheel EquivMass: \t%1g")).arg(bicycle.FrontWheel().EquivalentMassKG() * 1000));
+    m_StatsLabelArr[StatsFrontWheelI]        ->setText(QString(tr("FrontWheel I:         \t%1")).arg(bicycle.FrontWheel().I()));
+    m_StatsLabelArr[StatsRearWheelKEMass]    ->setText(QString(tr("Rear Wheel KEMass:    \t%1g")).arg(bicycle.RearWheel().KEMass() * 1000));
+    m_StatsLabelArr[StatsRearWheelMass]      ->setText(QString(tr("Rear Wheel Mass:      \t%1g")).arg(bicycle.RearWheel().MassKG() * 1000));
+    m_StatsLabelArr[StatsRearWheelEquivMass] ->setText(QString(tr("Rear Wheel EquivMass: \t%1g")).arg(bicycle.RearWheel().EquivalentMassKG() * 1000));
+    m_StatsLabelArr[StatsRearWheelI]         ->setText(QString(tr("Rear Wheel I:         \t%1")).arg(bicycle.RearWheel().I()));
+}
+
+SimBicyclePage::SimBicyclePage(QWidget *parent, Context *context) : QWidget(parent), context(context)
+{
+    HelpWhatsThis *help = new HelpWhatsThis(this);
+    this->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::Preferences_Training_VirtualBicycleSpecifications));
+
+    QVBoxLayout *all = new QVBoxLayout(this);
+    QGridLayout *grid = new QGridLayout;
+
+#ifdef Q_OS_MAX
+    setContentsMargins(10, 10, 10, 10);
+    grid->setSpacing(5 * dpiXFactor);
+    all->setSpacing(5 * dpiXFactor);
+#endif
+
+    // Populate m_LabelArr and m_SpinBoxArr
+    for (int e = 0; e < LastPart; e++) {
+        AddSpecBox(e);
+    }
+
+    Qt::Alignment alignment = Qt::AlignLeft;
+
+    // Two sections. Bike mass properties are in two rows to the left.
+    // Other properties like cd, ca and temp go in section to the right.
+
+    int Section1Start = 0;
+    int Section1End = BicycleParts::CRR;
+    int Section2Start = Section1End;
+    int Section2End = BicycleParts::LastPart;
+
+    // ------------------------------------------------------------------
+    // Column 0
+    int column = 0;
+    int row = 0;
+    grid->addWidget(new QLabel(tr("The values on this page inform the bicycle physics\n"
+                                  "models for simulating speed in trainer mode. These\n"
+                                  "values are used by smart trainers and also by the\n"
+                                  "speed simulation enabled by the 'Simulate Speed From\n"
+                                  "Power' option in the training preferences tab.")),
+                                  row, column,
+                                  4, // use 4 rows of grid
+                                  2, // span across 2 columns of grid (cols 0,2)
+                                  alignment);
+
+    // Set first row +4 + 1 so there's a gap after title label.
+    int section2FirstRow = row + 5;
+
+    // Now add section 2 as a separate grid under above description text.
+    row = section2FirstRow;
+    for (int i = Section2Start; i < Section2End; i++) {
+        grid->addWidget(m_LabelArr[i], row, column, alignment);
+        row++;
+    }
+
+    // There is still room below section 2... lets put in some useful stats
+    // about the virtual bicycle.
+
+    int statsFirstRow = row + 1;
+
+    // Create Stats Labels
+    for (int i = StatsLabel; i < StatsLastPart; i++) {
+        m_StatsLabelArr[i] = new QLabel();
+    }
+
+    // Populate Stats Labels
+    SetStatsLabelArray();
+
+    row = statsFirstRow;
+    for (int i = StatsLabel; i < StatsLastPart; i++) {
+        grid->addWidget(m_StatsLabelArr[i], row, column, 1, 2, alignment);
+        row++;
+    }
+
+
+    // ------------------------------------------------------------------
+    // Column 1 - physics spinboxes
+    column++;
+
+    row = section2FirstRow;
+    for (int i = Section2Start; i < Section2End; i++) {
+        grid->addWidget(m_SpinBoxArr[i], row, column, alignment);
+        row++;
+    }
+
+    // ------------------------------------------------------------------
+    // Column 2 - mass labels
+    column = 2;
+    row = 0;
+    for (int i = Section1Start; i < Section1End; i++) {
+        grid->addWidget(m_LabelArr[i], row, column, alignment);
+        row++;
+    }
+
+    // ------------------------------------------------------------------
+    // Column 3 - mass spinboxes
+    column++;
+    row = 0;
+    for (int i = Section1Start; i < Section1End; i++) {
+        grid->addWidget(m_SpinBoxArr[i], row, column, alignment);
+        row++;
+    }
+
+    all->addLayout(grid);
+
+    for (int i = 0; i < LastPart; i++) {
+        connect(m_SpinBoxArr[i], SIGNAL(valueChanged(double)), this, SLOT(SetStatsLabelArray(double)));
+    }
+
+}
+
+qint32
+SimBicyclePage::saveClicked()
+{
+    for (int e = 0; e < BicycleParts::LastPart; e++) {
+        const SimBicyclePartEntry& entry = GetSimBicyclePartEntry(e);
+        appsettings->setCValue(context->athlete->cyclist, entry.m_path, m_SpinBoxArr[e]->value());
+    }
+
+    qint32 state = CONFIG_ATHLETE;
+
+    return state;
+}
+
+
 
 //
 // Appearances page
@@ -2230,11 +1201,19 @@ ColorsPage::ColorsPage(QWidget *parent) : QWidget(parent)
     themes->setIndentation(0);
     //colors->header()->resizeSection(0,300);
 
+    QLabel *searchLabel = new QLabel(tr("Search"));
+    searchEdit = new QLineEdit(this);
+    QHBoxLayout *searchLayout = new QHBoxLayout();
+    searchLayout->addWidget(searchLabel);
+    searchLayout->addWidget(searchEdit);
+
     colors = new QTreeWidget;
-    colors->headerItem()->setText(0, tr("Color"));
-    colors->headerItem()->setText(1, tr("Select"));
-    colors->setColumnCount(2);
-    colors->setColumnWidth(0,350 *dpiXFactor);
+    colors->headerItem()->setText(0, tr("Group"));
+    colors->headerItem()->setText(1, tr("Color"));
+    colors->headerItem()->setText(2, tr("Select"));
+    colors->setColumnCount(3);
+    colors->setColumnWidth(0,70 *dpiXFactor);
+    colors->setColumnWidth(1,350 *dpiXFactor);
     colors->setSelectionMode(QAbstractItemView::NoSelection);
     //colors->setEditTriggers(QAbstractItemView::SelectedClicked); // allow edit
     colors->setUniformRowHeights(true); // causes height problems when adding - in case of non-text fields
@@ -2275,11 +1254,11 @@ ColorsPage::ColorsPage(QWidget *parent) : QWidget(parent)
     double scale = appsettings->value(this, GC_FONT_SCALE, 1.0).toDouble();
     fontscale = new QSlider(this);
     fontscale->setMinimum(0);
-    fontscale->setMaximum(8);
+    fontscale->setMaximum(11);
     fontscale->setTickInterval(1);
     fontscale->setValue(3);
     fontscale->setOrientation(Qt::Horizontal);
-    for(int i=0; i<7; i++) {
+    for(int i=0; i<12; i++) {
         if (scalefactors[i] == scale) {
             fontscale->setValue(i);
             break;
@@ -2289,9 +1268,9 @@ ColorsPage::ColorsPage(QWidget *parent) : QWidget(parent)
     QFont font=baseFont;
     font.setPointSizeF(baseFont.pointSizeF() * scale);
     fonttext = new QLabel(this);
-    fonttext->setText("The quick brown fox jumped over the lazy dog");
+    fonttext->setText(tr("The quick brown fox jumped over the lazy dog"));
     fonttext->setFont(font);
-    fonttext->setFixedHeight(30 * dpiYFactor);
+    fonttext->setFixedHeight(90 * dpiYFactor);
     fonttext->setFixedWidth(330 * dpiXFactor);
 
     QGridLayout *grid = new QGridLayout;
@@ -2305,10 +1284,10 @@ ColorsPage::ColorsPage(QWidget *parent) : QWidget(parent)
     grid->addWidget(antiAliasLabel, 1,3);
     grid->addWidget(antiAliased, 1,4);
 #ifndef Q_OS_MAC
-    grid->addWidget(rideScrollLabel, 2,3);
-    grid->addWidget(rideScroll, 2,4);
-    grid->addWidget(rideHeadLabel, 3,3);
-    grid->addWidget(rideHead, 3,4);
+    grid->addWidget(rideScrollLabel, 2,3, Qt::AlignLeft|Qt::AlignTop);
+    grid->addWidget(rideScroll, 2,4, Qt::AlignLeft|Qt::AlignTop);
+    //grid->addWidget(rideHeadLabel, 3,3); // Disabled in RideNavigator
+    //grid->addWidget(rideHead, 3,4);      // better don't display
 #endif
 
     grid->addWidget(def, 0,1, Qt::AlignVCenter|Qt::AlignLeft);
@@ -2325,7 +1304,12 @@ ColorsPage::ColorsPage(QWidget *parent) : QWidget(parent)
 
     colorTab = new QTabWidget(this);
     colorTab->addTab(themes, tr("Theme"));
-    colorTab->addTab(colors, tr("Colors"));
+
+    QWidget *colortab= new QWidget(this);
+    QVBoxLayout *colorLayout = new QVBoxLayout(colortab);
+    colorLayout->addLayout(searchLayout);
+    colorLayout->addWidget(colors);
+    colorTab->addTab(colortab, tr("Colors"));
     colorTab->setCornerWidget(applyTheme);
 
     mainLayout->addWidget(colorTab);
@@ -2336,10 +1320,16 @@ ColorsPage::ColorsPage(QWidget *parent) : QWidget(parent)
         QTreeWidgetItem *add;
         ColorButton *colorButton = new ColorButton(this, colorSet[i].name, colorSet[i].color);
         add = new QTreeWidgetItem(colors->invisibleRootItem());
-        add->setText(0, colorSet[i].name);
-        colors->setItemWidget(add, 1, colorButton);
+        add->setData(0, Qt::UserRole, i); // remember which index it is for since gets sorted
+        add->setText(0, colorSet[i].group);
+        add->setText(1, colorSet[i].name);
+        colors->setItemWidget(add, 2, colorButton);
 
     }
+    colors->setSortingEnabled(true);
+    colors->sortByColumn(1, Qt::AscendingOrder); // first sort by name
+    colors->sortByColumn(0, Qt::AscendingOrder); // now by group
+
     connect(applyTheme, SIGNAL(clicked()), this, SLOT(applyThemeClicked()));
 
     foreach(ColorTheme theme, GCColor::themes().themes) {
@@ -2355,6 +1345,7 @@ ColorsPage::ColorsPage(QWidget *parent) : QWidget(parent)
     connect(colorTab, SIGNAL(currentChanged(int)), this, SLOT(tabChanged()));
     connect(def, SIGNAL(currentFontChanged(QFont)), this, SLOT(scaleFont()));
     connect(fontscale, SIGNAL(valueChanged(int)), this, SLOT(scaleFont()));
+    connect(searchEdit, SIGNAL(textChanged(QString)), this, SLOT(searchFilter(QString)));
 
     // save initial values
     b4.alias = antiAliased->isChecked();
@@ -2364,6 +1355,30 @@ ColorsPage::ColorsPage(QWidget *parent) : QWidget(parent)
 #endif
     b4.line = lineWidth->value();
     b4.fingerprint = Colors::fingerprint(colorSet);
+}
+
+void
+ColorsPage::searchFilter(QString text)
+{
+    QStringList toks = text.split(" ", Qt::SkipEmptyParts);
+    bool empty;
+    if (toks.count() == 0 || text == "") empty=true;
+    else empty=false;
+
+    for(int i=0; i<colors->invisibleRootItem()->childCount(); i++) {
+        if (empty) colors->setRowHidden(i, colors->rootIndex(), false);
+        else {
+            QString text = colors->invisibleRootItem()->child(i)->text(1);
+            bool found=false;
+            foreach(QString tok, toks) {
+                if (text.contains(tok, Qt::CaseInsensitive)) {
+                    found = true;
+                    break;
+                }
+            }
+            colors->setRowHidden(i, colors->rootIndex(), !found);
+        }
+    }
 }
 
 void
@@ -2391,14 +1406,23 @@ ColorsPage::applyThemeClicked()
     // first check we have a selection!
     if (themes->currentItem() && (index=themes->invisibleRootItem()->indexOfChild(themes->currentItem())) >= 0) {
 
+        applyThemeIndex(index);
+    }
+}
+
+void
+ColorsPage::applyThemeIndex(int index)
+{
         // now get the theme selected
         ColorTheme theme = GCColor::themes().themes[index];
 
         // reset to base
-        colorSet = GCColor::defaultColorSet();
+        colorSet = GCColor::defaultColorSet(theme.dark);
 
         // reset the color selection tools
         colors->clear();
+        colors->setSortingEnabled(false);
+
         for (int i=0; colorSet[i].name != ""; i++) {
 
             QColor color;
@@ -2407,23 +1431,51 @@ ColorsPage::applyThemeClicked()
             switch(i) {
 
             case CPLOTBACKGROUND:
-            case CCARDBACKGROUND:
             case CRIDEPLOTBACKGROUND:
             case CTRENDPLOTBACKGROUND:
-            case CTRAINPLOTBACKGROUND:
                 color = theme.colors[0]; // background color
                 break;
 
-            case COVERVIEWBACKGROUND:
-                // set back to black for dark themes
-                // and gray for light themes
-                if (GCColor::luminance(theme.colors[0]) < 127) {
-                    if (theme.colors[0] == Qt::black) color = QColor(35,35,35);
-                    else color = Qt::black;
-                } else color = QColor(243,255,255);
+            case CTRAINPLOTBACKGROUND:
+                // always, and I mean always default to a black background
+                color = QColor(Qt::black);
                 break;
 
-            // fg color theme.colors[1] not used YET XXX
+
+            case COVERVIEWBACKGROUND:
+                // set back to light black for dark themes
+                // and gray for light themes
+                color = theme.colors[10];
+                break;
+
+            case CCARDBACKGROUND:
+                // set back to light black for dark themes
+                // and gray for light themes
+                color = theme.colors[11];
+                break;
+
+            case CCARDBACKGROUND2:
+                // set back to light black for dark themes
+                // and gray for light themes
+                color = theme.colors[12];
+                break;
+
+            case CCARDBACKGROUND3:
+                // set back to light black for dark themes
+                // and gray for light themes
+                color = theme.colors[13];
+                break;
+
+            case CCHROME:
+            case CCHARTBAR:
+            case CTOOLBAR: // we always keep them the same, but user can make different
+                //  set to black for dark themese and grey for light themes
+                color = theme.colors[1];
+                break;
+
+            case CHOVER:
+                color = theme.stealth ? theme.colors[11] : (theme.dark ? QColor(50,50,50) : QColor(200,200,200));
+                break;
 
             case CPLOTSYMBOL:
             case CRIDEPLOTXAXIS:
@@ -2481,11 +1533,32 @@ ColorsPage::applyThemeClicked()
             QTreeWidgetItem *add;
             ColorButton *colorButton = new ColorButton(this, colorSet[i].name, color);
             add = new QTreeWidgetItem(colors->invisibleRootItem());
-            add->setText(0, colorSet[i].name);
-            colors->setItemWidget(add, 1, colorButton);
+            add->setData(0, Qt::UserRole, i); // remember which index it is for since gets sorted
+            add->setText(0, colorSet[i].group);
+            add->setText(1, colorSet[i].name);
+            colors->setItemWidget(add, 2, colorButton);
 
         }
-    }
+        colors->setSortingEnabled(true);
+        colors->sortByColumn(1, Qt::AscendingOrder); // first sort by name
+        colors->sortByColumn(0, Qt::AscendingOrder);
+}
+
+void
+ColorsPage::resetClicked()
+{
+    AppearanceSettings defaults = GSettings::defaultAppearanceSettings();
+
+    def->setCurrentFont(QFont(defaults.fontfamily));
+    fontscale->setValue(defaults.fontscaleindex);
+    lineWidth->setValue(defaults.linewidth);
+    antiAliased->setChecked(defaults.antialias);
+#ifndef Q_OS_MAC // they do scrollbars nicely
+    rideHead->setChecked(defaults.head);
+    rideScroll->setChecked(defaults.scrollbar);
+#endif
+
+    applyThemeIndex(defaults.theme);
 }
 
 qint32
@@ -2503,11 +1576,12 @@ ColorsPage::saveClicked()
     // run down and get the current colors and save
     for (int i=0; colorSet[i].name != ""; i++) {
         QTreeWidgetItem *current = colors->invisibleRootItem()->child(i);
-        QColor newColor = ((ColorButton*)colors->itemWidget(current, 1))->getColor();
+        QColor newColor = ((ColorButton*)colors->itemWidget(current, 2))->getColor();
         QString colorstring = QString("%1:%2:%3").arg(newColor.red())
                                                  .arg(newColor.green())
                                                  .arg(newColor.blue());
-        appsettings->setValue(colorSet[i].setting, colorstring);
+        int colornum = current->data(0, Qt::UserRole).toInt();
+        appsettings->setValue(colorSet[colornum].setting, colorstring);
     }
 
     // update basefont family
@@ -2541,11 +1615,11 @@ ColorsPage::saveClicked()
         return 0;
 }
 
-IntervalMetricsPage::IntervalMetricsPage(QWidget *parent) :
+FavouriteMetricsPage::FavouriteMetricsPage(QWidget *parent) :
     QWidget(parent), changed(false)
 {
     HelpWhatsThis *help = new HelpWhatsThis(this);
-    this->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::Preferences_Metrics_Intervals));
+    this->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::Preferences_Metrics_Favourites));
 
     availList = new QListWidget;
     availList->setSortingEnabled(true);
@@ -2556,7 +1630,7 @@ IntervalMetricsPage::IntervalMetricsPage(QWidget *parent) :
     selectedList = new QListWidget;
     selectedList->setSelectionMode(QAbstractItemView::SingleSelection);
     QVBoxLayout *selectedLayout = new QVBoxLayout;
-    selectedLayout->addWidget(new QLabel(tr("Selected Metrics")));
+    selectedLayout->addWidget(new QLabel(tr("Favourites")));
     selectedLayout->addWidget(selectedList);
 #ifndef Q_OS_MAC
     upButton = new QToolButton(this);
@@ -2608,10 +1682,10 @@ IntervalMetricsPage::IntervalMetricsPage(QWidget *parent) :
     setLayout(hlayout);
 
     QString s;
-    if (appsettings->contains(GC_SETTINGS_INTERVAL_METRICS))
-        s = appsettings->value(this, GC_SETTINGS_INTERVAL_METRICS).toString();
+    if (appsettings->contains(GC_SETTINGS_FAVOURITE_METRICS))
+        s = appsettings->value(this, GC_SETTINGS_FAVOURITE_METRICS).toString();
     else
-        s = GC_SETTINGS_INTERVAL_METRICS_DEFAULT;
+        s = GC_SETTINGS_FAVOURITE_METRICS_DEFAULT;
     QStringList selectedMetrics = s.split(",");
 
     const RideMetricFactory &factory = RideMetricFactory::instance();
@@ -2651,7 +1725,7 @@ IntervalMetricsPage::IntervalMetricsPage(QWidget *parent) :
 }
 
 void
-IntervalMetricsPage::upClicked()
+FavouriteMetricsPage::upClicked()
 {
     assert(!selectedList->selectedItems().isEmpty());
     QListWidgetItem *item = selectedList->selectedItems().first();
@@ -2664,7 +1738,7 @@ IntervalMetricsPage::upClicked()
 }
 
 void
-IntervalMetricsPage::downClicked()
+FavouriteMetricsPage::downClicked()
 {
     assert(!selectedList->selectedItems().isEmpty());
     QListWidgetItem *item = selectedList->selectedItems().first();
@@ -2677,7 +1751,7 @@ IntervalMetricsPage::downClicked()
 }
 
 void
-IntervalMetricsPage::leftClicked()
+FavouriteMetricsPage::leftClicked()
 {
     assert(!selectedList->selectedItems().isEmpty());
     QListWidgetItem *item = selectedList->selectedItems().first();
@@ -2688,7 +1762,7 @@ IntervalMetricsPage::leftClicked()
 }
 
 void
-IntervalMetricsPage::rightClicked()
+FavouriteMetricsPage::rightClicked()
 {
     assert(!availList->selectedItems().isEmpty());
     QListWidgetItem *item = availList->selectedItems().first();
@@ -2698,13 +1772,13 @@ IntervalMetricsPage::rightClicked()
 }
 
 void
-IntervalMetricsPage::availChanged()
+FavouriteMetricsPage::availChanged()
 {
     rightButton->setEnabled(!availList->selectedItems().isEmpty());
 }
 
 void
-IntervalMetricsPage::selectedChanged()
+FavouriteMetricsPage::selectedChanged()
 {
     if (selectedList->selectedItems().isEmpty()) {
         upButton->setEnabled(false);
@@ -2726,221 +1800,37 @@ IntervalMetricsPage::selectedChanged()
 }
 
 qint32
-IntervalMetricsPage::saveClicked()
+FavouriteMetricsPage::saveClicked()
 {
     if (!changed) return 0;
 
     QStringList metrics;
     for (int i = 0; i < selectedList->count(); ++i)
         metrics << selectedList->item(i)->data(Qt::UserRole).toString();
-    appsettings->setValue(GC_SETTINGS_INTERVAL_METRICS, metrics.join(","));
+    appsettings->setValue(GC_SETTINGS_FAVOURITE_METRICS, metrics.join(","));
 
     return 0;
 }
 
-BestsMetricsPage::BestsMetricsPage(QWidget *parent) :
-    QWidget(parent), changed(false)
+static quint16 userMetricsCRC(QList<UserMetricSettings> userMetrics)
 {
-    HelpWhatsThis *help = new HelpWhatsThis(this);
-    this->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::Preferences_Metrics_Best));
+    // run through metrics and compute a CRC to detect changes
+    quint16 crc = 0;
+    foreach(UserMetricSettings userMetric, userMetrics)
+        crc += userMetric.getCRC();
 
-    availList = new QListWidget;
-    availList->setSortingEnabled(true);
-    availList->setSelectionMode(QAbstractItemView::SingleSelection);
-    QVBoxLayout *availLayout = new QVBoxLayout;
-    availLayout->addWidget(new QLabel(tr("Available Metrics")));
-    availLayout->addWidget(availList);
-    selectedList = new QListWidget;
-    selectedList->setSelectionMode(QAbstractItemView::SingleSelection);
-    QVBoxLayout *selectedLayout = new QVBoxLayout;
-    selectedLayout->addWidget(new QLabel(tr("Selected Metrics")));
-    selectedLayout->addWidget(selectedList);
-#ifndef Q_OS_MAC
-    upButton = new QToolButton(this);
-    downButton = new QToolButton(this);
-    leftButton = new QToolButton(this);
-    rightButton = new QToolButton(this);
-    upButton->setArrowType(Qt::UpArrow);
-    downButton->setArrowType(Qt::DownArrow);
-    leftButton->setArrowType(Qt::LeftArrow);
-    rightButton->setArrowType(Qt::RightArrow);
-    upButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
-    downButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
-    leftButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
-    rightButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
-#else
-    upButton = new QPushButton(tr("Up"));
-    downButton = new QPushButton(tr("Down"));
-    leftButton = new QPushButton("<");
-    rightButton = new QPushButton(">");
-#endif
-    QVBoxLayout *buttonGrid = new QVBoxLayout;
-    QHBoxLayout *upLayout = new QHBoxLayout;
-    QHBoxLayout *inexcLayout = new QHBoxLayout;
-    QHBoxLayout *downLayout = new QHBoxLayout;
-
-    upLayout->addStretch();
-    upLayout->addWidget(upButton);
-    upLayout->addStretch();
-
-    inexcLayout->addStretch();
-    inexcLayout->addWidget(leftButton);
-    inexcLayout->addWidget(rightButton);
-    inexcLayout->addStretch();
-
-    downLayout->addStretch();
-    downLayout->addWidget(downButton);
-    downLayout->addStretch();
-
-    buttonGrid->addStretch();
-    buttonGrid->addLayout(upLayout);
-    buttonGrid->addLayout(inexcLayout);
-    buttonGrid->addLayout(downLayout);
-    buttonGrid->addStretch();
-
-    QHBoxLayout *hlayout = new QHBoxLayout;
-    hlayout->addLayout(availLayout);
-    hlayout->addLayout(buttonGrid);
-    hlayout->addLayout(selectedLayout);
-    setLayout(hlayout);
-
-    QString s;
-    if (appsettings->contains(GC_SETTINGS_BESTS_METRICS))
-        s = appsettings->value(this, GC_SETTINGS_BESTS_METRICS).toString();
-    else
-        s = GC_SETTINGS_BESTS_METRICS_DEFAULT;
-    QStringList selectedMetrics = s.split(",");
-
-    const RideMetricFactory &factory = RideMetricFactory::instance();
-    for (int i = 0; i < factory.metricCount(); ++i) {
-        QString symbol = factory.metricName(i);
-        if (selectedMetrics.contains(symbol) || symbol.startsWith("compatibility_"))
-            continue;
-        QSharedPointer<RideMetric> m(factory.newMetric(symbol));
-        QListWidgetItem *item = new QListWidgetItem(Utils::unprotect(m->name()));
-        item->setData(Qt::UserRole, symbol);
-        item->setToolTip(m->description());
-        availList->addItem(item);
-    }
-    foreach (QString symbol, selectedMetrics) {
-        if (!factory.haveMetric(symbol))
-            continue;
-        QSharedPointer<RideMetric> m(factory.newMetric(symbol));
-        QListWidgetItem *item = new QListWidgetItem(Utils::unprotect(m->name()));
-        item->setData(Qt::UserRole, symbol);
-        item->setToolTip(m->description());
-        selectedList->addItem(item);
-    }
-
-    upButton->setEnabled(false);
-    downButton->setEnabled(false);
-    leftButton->setEnabled(false);
-    rightButton->setEnabled(false);
-
-    connect(upButton, SIGNAL(clicked()), this, SLOT(upClicked()));
-    connect(downButton, SIGNAL(clicked()), this, SLOT(downClicked()));
-    connect(leftButton, SIGNAL(clicked()), this, SLOT(leftClicked()));
-    connect(rightButton, SIGNAL(clicked()), this, SLOT(rightClicked()));
-    connect(availList, SIGNAL(itemSelectionChanged()),
-            this, SLOT(availChanged()));
-    connect(selectedList, SIGNAL(itemSelectionChanged()),
-            this, SLOT(selectedChanged()));
-}
-
-void
-BestsMetricsPage::upClicked()
-{
-    assert(!selectedList->selectedItems().isEmpty());
-    QListWidgetItem *item = selectedList->selectedItems().first();
-    int row = selectedList->row(item);
-    assert(row > 0);
-    selectedList->takeItem(row);
-    selectedList->insertItem(row - 1, item);
-    selectedList->setCurrentItem(item);
-    changed = true;
-}
-
-void
-BestsMetricsPage::downClicked()
-{
-    assert(!selectedList->selectedItems().isEmpty());
-    QListWidgetItem *item = selectedList->selectedItems().first();
-    int row = selectedList->row(item);
-    assert(row < selectedList->count() - 1);
-    selectedList->takeItem(row);
-    selectedList->insertItem(row + 1, item);
-    selectedList->setCurrentItem(item);
-    changed = true;
-}
-
-void
-BestsMetricsPage::leftClicked()
-{
-    assert(!selectedList->selectedItems().isEmpty());
-    QListWidgetItem *item = selectedList->selectedItems().first();
-    selectedList->takeItem(selectedList->row(item));
-    availList->addItem(item);
-    changed = true;
-    selectedChanged();
-}
-
-void
-BestsMetricsPage::rightClicked()
-{
-    assert(!availList->selectedItems().isEmpty());
-    QListWidgetItem *item = availList->selectedItems().first();
-    availList->takeItem(availList->row(item));
-    selectedList->addItem(item);
-    changed = true;
-}
-
-void
-BestsMetricsPage::availChanged()
-{
-    rightButton->setEnabled(!availList->selectedItems().isEmpty());
-}
-
-void
-BestsMetricsPage::selectedChanged()
-{
-    if (selectedList->selectedItems().isEmpty()) {
-        upButton->setEnabled(false);
-        downButton->setEnabled(false);
-        leftButton->setEnabled(false);
-        return;
-    }
-    QListWidgetItem *item = selectedList->selectedItems().first();
-    int row = selectedList->row(item);
-    if (row == 0)
-        upButton->setEnabled(false);
-    else
-        upButton->setEnabled(true);
-    if (row == selectedList->count() - 1)
-        downButton->setEnabled(false);
-    else
-        downButton->setEnabled(true);
-    leftButton->setEnabled(true);
-}
-
-qint32
-BestsMetricsPage::saveClicked()
-{
-    if (!changed) return 0;
-
-    QStringList metrics;
-    for (int i = 0; i < selectedList->count(); ++i)
-        metrics << selectedList->item(i)->data(Qt::UserRole).toString();
-    appsettings->setValue(GC_SETTINGS_BESTS_METRICS, metrics.join(","));
-
-    return 0;
+    return crc;
 }
 
 CustomMetricsPage::CustomMetricsPage(QWidget *parent, Context *context) :
     QWidget(parent), context(context)
 {
+    HelpWhatsThis *help = new HelpWhatsThis(this);
+    this->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::Preferences_Metrics_Custom));
+
     // copy as current, so we can edit...
     metrics = _userMetrics;
-    b4.crc = RideMetric::userMetricFingerprint(metrics);
+    b4.crc = userMetricsCRC(metrics);
 
     table = new QTreeWidget;
     table->headerItem()->setText(0, tr("Symbol"));
@@ -2958,6 +1848,12 @@ CustomMetricsPage::CustomMetricsPage(QWidget *parent, Context *context) :
     connect(table, SIGNAL(itemDoubleClicked(QTreeWidgetItem*, int)), this, SLOT(doubleClicked(QTreeWidgetItem*, int)));
 
     editButton = new QPushButton(tr("Edit"));
+    exportButton = new QPushButton(tr("Export"));
+    importButton = new QPushButton(tr("Import"));
+#ifdef GC_HAS_CLOUD_DB
+    uploadButton = new QPushButton(tr("Upload"));
+    downloadButton = new QPushButton(tr("Download"));
+#endif
     addButton = new QPushButton(tr("+"));
     deleteButton = new QPushButton(tr("-"));
 #ifndef Q_OS_MAC
@@ -2968,7 +1864,14 @@ CustomMetricsPage::CustomMetricsPage(QWidget *parent, Context *context) :
     deleteButton->setText(tr("Delete"));
 #endif
     QHBoxLayout *buttons = new QHBoxLayout();
+    buttons->addWidget(exportButton);
+    buttons->addWidget(importButton);
     buttons->addStretch();
+#ifdef GC_HAS_CLOUD_DB
+    buttons->addWidget(uploadButton);
+    buttons->addWidget(downloadButton);
+    buttons->addStretch();
+#endif
     buttons->addWidget(editButton);
     buttons->addStretch();
     buttons->addWidget(addButton);
@@ -2979,6 +1882,12 @@ CustomMetricsPage::CustomMetricsPage(QWidget *parent, Context *context) :
     connect(addButton, SIGNAL(clicked()), this, SLOT(addClicked()));
     connect(deleteButton, SIGNAL(clicked()), this, SLOT(deleteClicked()));
     connect(editButton, SIGNAL(clicked()), this, SLOT(editClicked()));
+    connect(exportButton, SIGNAL(clicked()), this, SLOT(exportClicked()));
+    connect(importButton, SIGNAL(clicked()), this, SLOT(importClicked()));
+#ifdef GC_HAS_CLOUD_DB
+    connect(uploadButton, SIGNAL(clicked()), this, SLOT(uploadClicked()));
+    connect(downloadButton, SIGNAL(clicked()), this, SLOT(downloadClicked()));
+#endif
 }
 
 void
@@ -2992,6 +1901,14 @@ CustomMetricsPage::refreshTable()
             skipcompat++;
             continue;
         }
+
+        // user metrics are silently discarded if the symbol is already in use
+        if (!table->findItems(m.symbol, Qt::MatchExactly, 0).isEmpty())
+            QMessageBox::warning(this, tr("User Metrics"), tr("Duplicate Symbol: %1, one metric will be discarded").arg(m.symbol));
+
+        // duplicate names are allowed, but not recommended
+        if (!table->findItems(m.name, Qt::MatchExactly, 1).isEmpty())
+            QMessageBox::warning(this, tr("User Metrics"), tr("Duplicate Name: %1, one metric will not be acessible in formulas").arg(m.name));
 
         QTreeWidgetItem *add = new QTreeWidgetItem(table->invisibleRootItem());
         add->setText(0, m.symbol);
@@ -3041,7 +1958,8 @@ CustomMetricsPage::addClicked()
     here.name = "My Average Power";
     here.type = 1;
     here.precision = 0;
-    here.description = "Average Power computed using Joules to account for variable recording.";
+    here.istime = false;
+    here.description = "Average Power";
     here.unitsMetric = "watts";
     here.unitsImperial = "watts";
     here.conversion = 1.00;
@@ -3051,17 +1969,12 @@ CustomMetricsPage::addClicked()
     relevant { Data contains \"P\"; }\n\
 \n\
     # initialise aggregating variables\n\
-    init { joules <- 0; seconds <- 0; }\n\
-\n\
-    # joules = power x time, for each sample\n\
-    sample { \n\
-        joules <- joules + (POWER * RECINTSECS);\n\
-        seconds <- seconds + RECINTSECS;\n\
-    }\n\
+    # does nothing, update as needed\n\
+    init { 0; }\n\
 \n\
     # calculate metric value at end\n\
-    value { joules / seconds; }\n\
-    count { seconds; }\n\
+    value { mean(samples(POWER)); }\n\
+    count { Duration; }\n\
 }";
 
     EditUserMetricDialog editor(this, context, here);
@@ -3108,13 +2021,188 @@ CustomMetricsPage::doubleClicked(QTreeWidgetItem *item, int)
     }
 }
 
+void
+CustomMetricsPage::exportClicked()
+{
+    // nothing selected
+    if (table->selectedItems().count() <= 0) return;
+
+    // which one?
+    QTreeWidgetItem *item = table->selectedItems().first();
+
+    // nothing selected
+    if (item == NULL) return;
+
+    // find row
+    int row = table->invisibleRootItem()->indexOfChild(item);
+
+    // metric to export
+    UserMetricSettings here = metrics[row+skipcompat];
+
+    // get a filename to export to...
+    QString filename = QFileDialog::getSaveFileName(this, tr("Export Metric"), QDir::homePath() + "/" + here.symbol + ".gmetric", tr("GoldenCheetah Metric File (*.gmetric)"));
+
+    // nothing given
+    if (filename.isEmpty()) return;
+
+    UserMetricParser::serialize(filename, QList<UserMetricSettings>() << here);
+}
+
+void
+CustomMetricsPage::importClicked()
+{
+    QString fileName = QFileDialog::getOpenFileName(this, tr("Select Metric file to import"), "", tr("GoldenCheetah Metric Files (*.gmetric)"));
+
+    if (fileName.isEmpty()) {
+        QMessageBox::critical(this, tr("Import Metric"), tr("No Metric file selected!"));
+        return;
+    }
+
+    QList<UserMetricSettings> imported;
+    QFile metricFile(fileName);
+
+    // setup XML processor
+    QXmlInputSource source( &metricFile );
+    QXmlSimpleReader xmlReader;
+    UserMetricParser handler;
+    xmlReader.setContentHandler(&handler);
+    xmlReader.setErrorHandler(&handler);
+
+    // parse and get return values
+    xmlReader.parse(source);
+    imported = handler.getSettings();
+    if (imported.isEmpty()) {
+        QMessageBox::critical(this, tr("Import Metric"), tr("No Metric found in the selected file!"));
+        return;
+    }
+
+    UserMetricSettings here = imported.first();
+
+    EditUserMetricDialog editor(this, context, here);
+    if (editor.exec() == QDialog::Accepted) {
+
+        // add to the list
+        metrics.append(here);
+        refreshTable();
+
+    }
+}
+
+#ifdef GC_HAS_CLOUD_DB
+void
+CustomMetricsPage::uploadClicked()
+{
+    // nothing selected
+    if (table->selectedItems().count() <= 0) return;
+
+    // which one?
+    QTreeWidgetItem *item = table->selectedItems().first();
+
+    // nothing selected
+    if (item == NULL) return;
+
+    // find row
+    int row = table->invisibleRootItem()->indexOfChild(item);
+
+    // metric to export
+    UserMetricSettings here = metrics[row+skipcompat];
+
+    // check for CloudDB T&C acceptance
+    if (!(appsettings->cvalue(context->athlete->cyclist, GC_CLOUDDB_TC_ACCEPTANCE, false).toBool())) {
+        CloudDBAcceptConditionsDialog acceptDialog(context->athlete->cyclist);
+        acceptDialog.setModal(true);
+        if (acceptDialog.exec() == QDialog::Rejected) {
+            return;
+        }
+    }
+
+    UserMetricAPIv1 usermetric;
+    usermetric.Header.Key = here.symbol;
+    usermetric.Header.Name = here.name;
+    usermetric.Header.Description = here.description;
+    int version = VERSION_LATEST;
+    usermetric.Header.GcVersion =  QString::number(version);
+    // get the usermetric - definition xml
+    QTextStream out(&usermetric.UserMetricXML);
+    UserMetricParser::serializeToQTextStream(out, QList<UserMetricSettings>() << here);
+
+    usermetric.Header.CreatorId = appsettings->cvalue(context->athlete->cyclist, GC_ATHLETE_ID, "").toString();
+    usermetric.Header.Curated = false;
+    usermetric.Header.Deleted = false;
+
+    // now complete the usermetric with for the user manually added fields
+    CloudDBUserMetricObjectDialog dialog(usermetric, context->athlete->cyclist);
+    if (dialog.exec() == QDialog::Accepted) {
+        CloudDBUserMetricClient c;
+        if (c.postUserMetric(dialog.getUserMetric())) {
+            CloudDBHeader::setUserMetricHeaderStale(true);
+        }
+    }
+
+}
+
+void
+CustomMetricsPage::downloadClicked()
+{
+    if (!(appsettings->cvalue(context->athlete->cyclist, GC_CLOUDDB_TC_ACCEPTANCE, false).toBool())) {
+       CloudDBAcceptConditionsDialog acceptDialog(context->athlete->cyclist);
+       acceptDialog.setModal(true);
+       if (acceptDialog.exec() == QDialog::Rejected) {
+          return;
+       }
+    }
+
+    if (context->cdbUserMetricListDialog == NULL) {
+        context->cdbUserMetricListDialog = new CloudDBUserMetricListDialog();
+    }
+
+    if (context->cdbUserMetricListDialog->prepareData(context->athlete->cyclist, CloudDBCommon::UserImport)) {
+        if (context->cdbUserMetricListDialog->exec() == QDialog::Accepted) {
+
+            QList<QString> usermetricDefs = context->cdbUserMetricListDialog->getSelectedSettings();
+
+            foreach (QString usermetricDef, usermetricDefs) {
+                QList<UserMetricSettings> imported;
+
+                // setup XML processor
+                QXmlInputSource source;
+                source.setData(usermetricDef);
+                QXmlSimpleReader xmlReader;
+                UserMetricParser handler;
+                xmlReader.setContentHandler(&handler);
+                xmlReader.setErrorHandler(&handler);
+
+                // parse and get return values
+                xmlReader.parse(source);
+                imported = handler.getSettings();
+                if (imported.isEmpty()) {
+                    QMessageBox::critical(this, tr("Download Metric"), tr("No valid Metric found!"));
+                    continue;
+                }
+
+                UserMetricSettings here = imported.first();
+
+                EditUserMetricDialog editor(this, context, here);
+                if (editor.exec() == QDialog::Accepted) {
+
+                    // add to the list
+                    metrics.append(here);
+                    refreshTable();
+
+                }
+            }
+        }
+    }
+}
+#endif
+
 qint32
 CustomMetricsPage::saveClicked()
 {
     qint32 returning=0;
 
     // did we actually change them ?
-    if (b4.crc != RideMetric::userMetricFingerprint(metrics))
+    if (b4.crc != userMetricsCRC(metrics))
         returning |= CONFIG_USERMETRICS;
 
     // save away OUR version to top-level NOT athlete dir
@@ -3126,208 +2214,15 @@ CustomMetricsPage::saveClicked()
     return returning;
 }
 
-SummaryMetricsPage::SummaryMetricsPage(QWidget *parent) :
-    QWidget(parent), changed(false)
-{
-    HelpWhatsThis *help = new HelpWhatsThis(this);
-    this->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::Preferences_Metrics_Summary));
-
-    availList = new QListWidget;
-    availList->setSortingEnabled(true);
-    availList->setSelectionMode(QAbstractItemView::SingleSelection);
-    QVBoxLayout *availLayout = new QVBoxLayout;
-    availLayout->addWidget(new QLabel(tr("Available Metrics")));
-    availLayout->addWidget(availList);
-    selectedList = new QListWidget;
-    selectedList->setSelectionMode(QAbstractItemView::SingleSelection);
-    QVBoxLayout *selectedLayout = new QVBoxLayout;
-    selectedLayout->addWidget(new QLabel(tr("Selected Metrics")));
-    selectedLayout->addWidget(selectedList);
-#ifndef Q_OS_MAC
-    upButton = new QToolButton(this);
-    downButton = new QToolButton(this);
-    leftButton = new QToolButton(this);
-    rightButton = new QToolButton(this);
-    upButton->setArrowType(Qt::UpArrow);
-    downButton->setArrowType(Qt::DownArrow);
-    leftButton->setArrowType(Qt::LeftArrow);
-    rightButton->setArrowType(Qt::RightArrow);
-    upButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
-    downButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
-    leftButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
-    rightButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
-#else
-    upButton = new QPushButton(tr("Up"));
-    downButton = new QPushButton(tr("Down"));
-    leftButton = new QPushButton("<");
-    rightButton = new QPushButton(">");
-#endif
-    QVBoxLayout *buttonGrid = new QVBoxLayout;
-    QHBoxLayout *upLayout = new QHBoxLayout;
-    QHBoxLayout *inexcLayout = new QHBoxLayout;
-    QHBoxLayout *downLayout = new QHBoxLayout;
-
-    upLayout->addStretch();
-    upLayout->addWidget(upButton);
-    upLayout->addStretch();
-
-    inexcLayout->addStretch();
-    inexcLayout->addWidget(leftButton);
-    inexcLayout->addWidget(rightButton);
-    inexcLayout->addStretch();
-
-    downLayout->addStretch();
-    downLayout->addWidget(downButton);
-    downLayout->addStretch();
-
-    buttonGrid->addStretch();
-    buttonGrid->addLayout(upLayout);
-    buttonGrid->addLayout(inexcLayout);
-    buttonGrid->addLayout(downLayout);
-    buttonGrid->addStretch();
-
-    QHBoxLayout *hlayout = new QHBoxLayout;
-    hlayout->addLayout(availLayout);
-    hlayout->addLayout(buttonGrid);
-    hlayout->addLayout(selectedLayout);
-    setLayout(hlayout);
-
-    QString s = appsettings->value(this, GC_SETTINGS_SUMMARY_METRICS, GC_SETTINGS_SUMMARY_METRICS_DEFAULT).toString();
-    QStringList selectedMetrics = s.split(",");
-
-    const RideMetricFactory &factory = RideMetricFactory::instance();
-    for (int i = 0; i < factory.metricCount(); ++i) {
-        QString symbol = factory.metricName(i);
-        if (selectedMetrics.contains(symbol) || symbol.startsWith("compatibility_"))
-            continue;
-        QSharedPointer<RideMetric> m(factory.newMetric(symbol));
-        QListWidgetItem *item = new QListWidgetItem(Utils::unprotect(m->name()));
-        item->setData(Qt::UserRole, symbol);
-        item->setToolTip(m->description());
-        availList->addItem(item);
-    }
-    foreach (QString symbol, selectedMetrics) {
-        if (!factory.haveMetric(symbol))
-            continue;
-        QSharedPointer<RideMetric> m(factory.newMetric(symbol));
-        QListWidgetItem *item = new QListWidgetItem(Utils::unprotect(m->name()));
-        item->setData(Qt::UserRole, symbol);
-        item->setToolTip(m->description());
-        selectedList->addItem(item);
-    }
-
-    upButton->setEnabled(false);
-    downButton->setEnabled(false);
-    leftButton->setEnabled(false);
-    rightButton->setEnabled(false);
-
-    connect(upButton, SIGNAL(clicked()), this, SLOT(upClicked()));
-    connect(downButton, SIGNAL(clicked()), this, SLOT(downClicked()));
-    connect(leftButton, SIGNAL(clicked()), this, SLOT(leftClicked()));
-    connect(rightButton, SIGNAL(clicked()), this, SLOT(rightClicked()));
-    connect(availList, SIGNAL(itemSelectionChanged()),
-            this, SLOT(availChanged()));
-    connect(selectedList, SIGNAL(itemSelectionChanged()),
-            this, SLOT(selectedChanged()));
-}
-
-void
-SummaryMetricsPage::upClicked()
-{
-    assert(!selectedList->selectedItems().isEmpty());
-    QListWidgetItem *item = selectedList->selectedItems().first();
-    int row = selectedList->row(item);
-    assert(row > 0);
-    selectedList->takeItem(row);
-    selectedList->insertItem(row - 1, item);
-    selectedList->setCurrentItem(item);
-    changed = true;
-}
-
-void
-SummaryMetricsPage::downClicked()
-{
-    assert(!selectedList->selectedItems().isEmpty());
-    QListWidgetItem *item = selectedList->selectedItems().first();
-    int row = selectedList->row(item);
-    assert(row < selectedList->count() - 1);
-    selectedList->takeItem(row);
-    selectedList->insertItem(row + 1, item);
-    selectedList->setCurrentItem(item);
-    changed = true;
-}
-
-void
-SummaryMetricsPage::leftClicked()
-{
-    assert(!selectedList->selectedItems().isEmpty());
-    QListWidgetItem *item = selectedList->selectedItems().first();
-    selectedList->takeItem(selectedList->row(item));
-    availList->addItem(item);
-    changed = true;
-    selectedChanged();
-}
-
-void
-SummaryMetricsPage::rightClicked()
-{
-    assert(!availList->selectedItems().isEmpty());
-    QListWidgetItem *item = availList->selectedItems().first();
-    availList->takeItem(availList->row(item));
-    selectedList->addItem(item);
-    changed = true;
-}
-
-void
-SummaryMetricsPage::availChanged()
-{
-    rightButton->setEnabled(!availList->selectedItems().isEmpty());
-}
-
-void
-SummaryMetricsPage::selectedChanged()
-{
-    if (selectedList->selectedItems().isEmpty()) {
-        upButton->setEnabled(false);
-        downButton->setEnabled(false);
-        leftButton->setEnabled(false);
-        return;
-    }
-    QListWidgetItem *item = selectedList->selectedItems().first();
-    int row = selectedList->row(item);
-    if (row == 0)
-        upButton->setEnabled(false);
-    else
-        upButton->setEnabled(true);
-    if (row == selectedList->count() - 1)
-        downButton->setEnabled(false);
-    else
-        downButton->setEnabled(true);
-    leftButton->setEnabled(true);
-}
-
-qint32
-SummaryMetricsPage::saveClicked()
-{
-    if (!changed) return 0;
-
-    QStringList metrics;
-    for (int i = 0; i < selectedList->count(); ++i)
-        metrics << selectedList->item(i)->data(Qt::UserRole).toString();
-    appsettings->setValue(GC_SETTINGS_SUMMARY_METRICS, metrics.join(","));
-
-    return 0;
-}
-
 MetadataPage::MetadataPage(Context *context) : context(context)
 {
     QVBoxLayout *layout = new QVBoxLayout(this);
 
     // get current config using default file
-    keywordDefinitions = context->athlete->rideMetadata()->getKeywords();
-    fieldDefinitions = context->athlete->rideMetadata()->getFields();
-    colorfield = context->athlete->rideMetadata()->getColorField();
-    defaultDefinitions = context->athlete->rideMetadata()->getDefaults();
+    keywordDefinitions = GlobalContext::context()->rideMetadata->getKeywords();
+    fieldDefinitions = GlobalContext::context()->rideMetadata->getFields();
+    colorfield = GlobalContext::context()->rideMetadata->getColorField();
+    defaultDefinitions = GlobalContext::context()->rideMetadata->getDefaults();
 
     // setup maintenance pages using current config
     fieldsPage = new FieldsPage(this, fieldDefinitions);
@@ -3338,7 +2233,7 @@ MetadataPage::MetadataPage(Context *context) : context(context)
 
     tabs = new QTabWidget(this);
     tabs->addTab(fieldsPage, tr("Fields"));
-    tabs->addTab(keywordsPage, tr("Notes Keywords"));
+    tabs->addTab(keywordsPage, tr("Colour Keywords"));
     tabs->addTab(defaultsPage, tr("Defaults"));
     tabs->addTab(processorPage, tr("Processing"));
 
@@ -3367,7 +2262,7 @@ MetadataPage::saveClicked()
     appsettings->setValue(GC_RIDEBG, keywordsPage->rideBG->isChecked());
 
     // write to metadata.xml
-    RideMetadata::serialize(context->athlete->home->config().canonicalPath() + "/metadata.xml", keywordDefinitions, fieldDefinitions, colorfield, defaultDefinitions);
+    RideMetadata::serialize(QDir(gcroot).canonicalPath() + "/metadata.xml", keywordDefinitions, fieldDefinitions, colorfield, defaultDefinitions);
 
     // save processors config
     processorPage->saveClicked();
@@ -3620,7 +2515,7 @@ KeywordsPage::getDefinitions(QList<KeywordDefinition> &keywordList)
 
         add.name = item->text(0);
         add.color = ((ColorButton*)keywords->itemWidget(item, 1))->getColor();
-        add.tokens = item->text(2).split(",", QString::SkipEmptyParts);
+        add.tokens = item->text(2).split(",", Qt::SkipEmptyParts);
 
         keywordList.append(add);
     }
@@ -3665,13 +2560,17 @@ FieldsPage::FieldsPage(QWidget *parent, QList<FieldDefinition>fieldDefinitions) 
     fields->headerItem()->setText(1, tr("Field"));
     fields->headerItem()->setText(2, tr("Type"));
     fields->headerItem()->setText(3, tr("Values"));
-    fields->headerItem()->setText(4, tr("Diary"));
-    fields->setColumnWidth(0,80 *dpiXFactor);
+    fields->headerItem()->setText(4, tr("Summary"));
+    fields->headerItem()->setText(5, tr("Interval"));
+    fields->headerItem()->setText(6, tr("Expression"));
+    fields->setColumnWidth(0,100 *dpiXFactor);
     fields->setColumnWidth(1,100 *dpiXFactor);
     fields->setColumnWidth(2,100 *dpiXFactor);
-    fields->setColumnWidth(3,80 *dpiXFactor);
-    fields->setColumnWidth(4,20 *dpiXFactor);
-    fields->setColumnCount(5);
+    fields->setColumnWidth(3,100 *dpiXFactor);
+    fields->setColumnWidth(4,80 *dpiXFactor);
+    fields->setColumnWidth(5,80 *dpiXFactor);
+    fields->setColumnWidth(6,80 *dpiXFactor);
+    fields->setColumnCount(7);
     fields->setSelectionMode(QAbstractItemView::SingleSelection);
     fields->setEditTriggers(QAbstractItemView::SelectedClicked); // allow edit
     //fields->setUniformRowHeights(true); // causes height problems when adding - in case of non-text fields
@@ -3684,6 +2583,9 @@ FieldsPage::FieldsPage(QWidget *parent, QList<FieldDefinition>fieldDefinitions) 
         QComboBox *comboButton = new QComboBox(this);
         QCheckBox *checkBox = new QCheckBox("", this);
         checkBox->setChecked(field.diary);
+
+        QCheckBox *checkBoxInt = new QCheckBox("", this);
+        checkBoxInt->setChecked(field.interval);
 
         addFieldTypes(comboButton);
         comboButton->setCurrentIndex(field.type);
@@ -3702,6 +2604,10 @@ FieldsPage::FieldsPage(QWidget *parent, QList<FieldDefinition>fieldDefinitions) 
         add->setTextAlignment(2, Qt::AlignHCenter);
         fields->setItemWidget(add, 2, comboButton);
         fields->setItemWidget(add, 4, checkBox);
+        fields->setItemWidget(add, 5, checkBoxInt);
+
+        // expression
+        add->setText(6, field.expression);
     }
     fields->setCurrentItem(fields->invisibleRootItem()->child(0));
 
@@ -3725,15 +2631,19 @@ FieldsPage::upClicked()
         // movin on up!
         QWidget *button = fields->itemWidget(fields->currentItem(),2);
         QWidget *check = fields->itemWidget(fields->currentItem(),4);
+        QWidget *checkInt = fields->itemWidget(fields->currentItem(),5);
         QComboBox *comboButton = new QComboBox(this);
         addFieldTypes(comboButton);
         comboButton->setCurrentIndex(((QComboBox*)button)->currentIndex());
         QCheckBox *checkBox = new QCheckBox("", this);
         checkBox->setChecked(((QCheckBox*)check)->isChecked());
+        QCheckBox *checkBoxInt = new QCheckBox("", this);
+        checkBoxInt->setChecked(((QCheckBox*)checkInt)->isChecked());
         QTreeWidgetItem* moved = fields->invisibleRootItem()->takeChild(index);
         fields->invisibleRootItem()->insertChild(index-1, moved);
         fields->setItemWidget(moved, 2, comboButton);
         fields->setItemWidget(moved, 4, checkBox);
+        fields->setItemWidget(moved, 5, checkBoxInt);
         fields->setCurrentItem(moved);
     }
 }
@@ -3747,15 +2657,19 @@ FieldsPage::downClicked()
 
         QWidget *button = fields->itemWidget(fields->currentItem(),2);
         QWidget *check = fields->itemWidget(fields->currentItem(),4);
+        QWidget *checkInt = fields->itemWidget(fields->currentItem(),5);
         QComboBox *comboButton = new QComboBox(this);
         addFieldTypes(comboButton);
         comboButton->setCurrentIndex(((QComboBox*)button)->currentIndex());
         QCheckBox *checkBox = new QCheckBox("", this);
         checkBox->setChecked(((QCheckBox*)check)->isChecked());
+        QCheckBox *checkBoxInt = new QCheckBox("", this);
+        checkBoxInt->setChecked(((QCheckBox*)checkInt)->isChecked());
         QTreeWidgetItem* moved = fields->invisibleRootItem()->takeChild(index);
         fields->invisibleRootItem()->insertChild(index+1, moved);
         fields->setItemWidget(moved, 2, comboButton);
         fields->setItemWidget(moved, 4, checkBox);
+        fields->setItemWidget(moved, 5, checkBoxInt);
         fields->setCurrentItem(moved);
     }
 }
@@ -3776,6 +2690,7 @@ FieldsPage::addClicked()
     QComboBox *comboButton = new QComboBox(this);
     addFieldTypes(comboButton);
     QCheckBox *checkBox = new QCheckBox("", this);
+    QCheckBox *checkBoxInt = new QCheckBox("", this);
 
     add = new QTreeWidgetItem;
     fields->invisibleRootItem()->insertChild(index, add);
@@ -3792,6 +2707,7 @@ FieldsPage::addClicked()
     add->setTextAlignment(2, Qt::AlignHCenter);
     fields->setItemWidget(add, 2, comboButton);
     fields->setItemWidget(add, 4, checkBox);
+    fields->setItemWidget(add, 5, checkBoxInt);
 }
 
 void
@@ -3826,8 +2742,10 @@ FieldsPage::getDefinitions(QList<FieldDefinition> &fieldList)
 
         add.tab = st.internalName(item->text(0));
         add.name = sp.internalName(item->text(1));
-        add.values = item->text(3).split(QRegExp("(, *|,)"), QString::KeepEmptyParts);
+        add.values = item->text(3).split(QRegularExpression("(, *|,)"), Qt::KeepEmptyParts);
         add.diary = ((QCheckBox*)fields->itemWidget(item, 4))->isChecked();
+        add.interval = ((QCheckBox*)fields->itemWidget(item, 5))->isChecked();
+        add.expression = item->text(6);
 
         if (sp.isMetric(add.name))
             add.type = 4;
@@ -4086,2703 +3004,6 @@ DefaultsPage::getDefinitions(QList<DefaultDefinition> &defaultList)
     }
 }
 
-//
-// Power Zone Config page
-//
-ZonePage::ZonePage(Context *context) : context(context)
-{
-    QVBoxLayout *layout = new QVBoxLayout(this);
-    QHBoxLayout *hlayout = new QHBoxLayout;
-
-    sportLabel = new QLabel(tr("Sport"));
-    sportCombo = new QComboBox();
-    sportCombo->addItem(tr("Bike"));
-    sportCombo->addItem(tr("Run"));
-    sportCombo->setCurrentIndex(0);
-    hlayout->addStretch();
-    hlayout->addWidget(sportLabel);
-    hlayout->addWidget(sportCombo);
-    hlayout->addStretch();
-    layout->addLayout(hlayout);
-    connect(sportCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(changeSport(int)));
-    tabs = new QTabWidget(this);
-    layout->addWidget(tabs);
-
-    for (int i=0; i < nSports; i++) {
-        zones[i] = new Zones(i > 0);
-
-        // get current config by reading it in (leave mainwindow zones alone)
-        QFile zonesFile(context->athlete->home->config().canonicalPath() + "/" + zones[i]->fileName());
-        if (zonesFile.exists()) {
-            zones[i]->read(zonesFile);
-            zonesFile.close();
-            b4Fingerprint[i] = zones[i]->getFingerprint(); // remember original state
-        }
-
-        // setup maintenance pages using current config
-        schemePage[i] = new SchemePage(zones[i]);
-        cpPage[i] = new CPPage(context, zones[i], schemePage[i]);
-    }
-
-    // finish setup for the default sport
-    changeSport(sportCombo->currentIndex());
-}
-
-ZonePage::~ZonePage()
-{
-    for (int i=0; i<nSports; i++) delete zones[i];
-}
-
-void
-ZonePage::changeSport(int i)
-{
-    // change tabs according to the selected sport
-    tabs->clear();
-    tabs->addTab(cpPage[i], tr("Critical Power"));
-    tabs->addTab(schemePage[i], tr("Default"));
-}
-
-
-qint32
-ZonePage::saveClicked()
-{
-    qint32 changed = 0;
-    qint32 cppageChanged = 0;
-    // write
-    for (int i=0; i < nSports; i++) {
-        zones[i]->setScheme(schemePage[i]->getScheme());
-        zones[i]->write(context->athlete->home->config());
-
-        // re-read Zones in case it changed
-        QFile zonesFile(context->athlete->home->config().canonicalPath() + "/" + context->athlete->zones_[i]->fileName());
-        context->athlete->zones_[i]->read(zonesFile);
-        if (i == 1 && context->athlete->zones_[i]->getRangeSize() == 0) { // No running Power zones
-            // Start with Cycling Power zones for backward compatibilty
-            QFile zonesFile(context->athlete->home->config().canonicalPath() + "/" + context->athlete->zones_[0]->fileName());
-            if (zonesFile.exists()) context->athlete->zones_[i]->read(zonesFile);
-        }
-
-        // use CP for FTP?
-        appsettings->setCValue(context->athlete->cyclist, zones[i]->useCPforFTPSetting(), cpPage[i]->useCPForFTPCombo->currentIndex());
-
-
-        // did cp for ftp change ?
-        cppageChanged |= cpPage[i]->saveClicked();
-
-        // did we change ?
-        if (zones[i]->getFingerprint() != b4Fingerprint[i])
-            changed = CONFIG_ZONES;
-    }
-    return changed | cppageChanged;
-}
-
-SchemePage::SchemePage(Zones* zones) : zones(zones)
-{
-    QVBoxLayout *mainLayout = new QVBoxLayout(this);
-
-    addButton = new QPushButton(tr("+"));
-    deleteButton = new QPushButton(tr("-"));
-#ifndef Q_OS_MAC
-    addButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
-    deleteButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
-#else
-    addButton->setText(tr("Add"));
-    deleteButton->setText(tr("Delete"));
-#endif
-    QHBoxLayout *actionButtons = new QHBoxLayout;
-    actionButtons->setSpacing(2 *dpiXFactor);
-    actionButtons->addStretch();
-    actionButtons->addWidget(addButton);
-    actionButtons->addWidget(deleteButton);
-
-    scheme = new QTreeWidget;
-    scheme->headerItem()->setText(0, tr("Short"));
-    scheme->headerItem()->setText(1, tr("Long"));
-    scheme->headerItem()->setText(2, tr("Percent of CP"));
-    scheme->setColumnCount(3);
-    scheme->setSelectionMode(QAbstractItemView::SingleSelection);
-    scheme->setEditTriggers(QAbstractItemView::SelectedClicked); // allow edit
-    scheme->setUniformRowHeights(true);
-    scheme->setIndentation(0);
-    //scheme->header()->resizeSection(0,90);
-    //scheme->header()->resizeSection(1,200);
-    //scheme->header()->resizeSection(2,80);
-
-    // setup list
-    for (int i=0; i< zones->getScheme().nzones_default; i++) {
-
-        QTreeWidgetItem *add = new QTreeWidgetItem(scheme->invisibleRootItem());
-        add->setFlags(add->flags() | Qt::ItemIsEditable);
-
-        // tab name
-        add->setText(0, zones->getScheme().zone_default_name[i]);
-        // field name
-        add->setText(1, zones->getScheme().zone_default_desc[i]);
-
-        // low
-        QDoubleSpinBox *loedit = new QDoubleSpinBox(this);
-        loedit->setMinimum(0);
-        loedit->setMaximum(1000);
-        loedit->setSingleStep(1.0);
-        loedit->setDecimals(0);
-        loedit->setValue(zones->getScheme().zone_default[i]);
-        scheme->setItemWidget(add, 2, loedit);
-    }
-
-    mainLayout->addWidget(scheme);
-    mainLayout->addLayout(actionButtons);
-
-    // button connect
-    connect(addButton, SIGNAL(clicked()), this, SLOT(addClicked()));
-    connect(deleteButton, SIGNAL(clicked()), this, SLOT(deleteClicked()));
-}
-
-void
-SchemePage::addClicked()
-{
-    // are we at maximum already?
-    if (scheme->invisibleRootItem()->childCount() == 10) {
-        QMessageBox err;
-        err.setText(tr("Maximum of 10 zones reached."));
-        err.setIcon(QMessageBox::Warning);
-        err.exec();
-        return;
-    }
-
-    int index = scheme->invisibleRootItem()->childCount();
-
-    // new item
-    QTreeWidgetItem *add = new QTreeWidgetItem;
-    add->setFlags(add->flags() | Qt::ItemIsEditable);
-
-    QDoubleSpinBox *loedit = new QDoubleSpinBox(this);
-    loedit->setMinimum(0);
-    loedit->setMaximum(1000);
-    loedit->setSingleStep(1.0);
-    loedit->setDecimals(0);
-    loedit->setValue(100);
-
-    scheme->invisibleRootItem()->insertChild(index, add);
-    scheme->setItemWidget(add, 2, loedit);
-
-    // Short
-    QString text = tr("New");
-    for (int i=0; scheme->findItems(text, Qt::MatchExactly, 0).count() > 0; i++) {
-        text = QString(tr("New (%1)")).arg(i+1);
-    }
-    add->setText(0, text);
-
-    // long
-    text = tr("New");
-    for (int i=0; scheme->findItems(text, Qt::MatchExactly, 1).count() > 0; i++) {
-        text = QString(tr("New (%1)")).arg(i+1);
-    }
-    add->setText(1, text);
-}
-
-void
-SchemePage::renameClicked()
-{
-    // which one is selected?
-    if (scheme->currentItem()) scheme->editItem(scheme->currentItem(), 0);
-}
-
-void
-SchemePage::deleteClicked()
-{
-    if (scheme->currentItem()) {
-        int index = scheme->invisibleRootItem()->indexOfChild(scheme->currentItem());
-        delete scheme->invisibleRootItem()->takeChild(index);
-    }
-}
-
-// just for qSorting
-struct schemeitem {
-    QString name, desc;
-    int lo;
-    double trimp;
-    bool operator<(schemeitem right) const { return lo < right.lo; }
-};
-
-ZoneScheme
-SchemePage::getScheme()
-{
-    // read the scheme widget and return a scheme object
-    QList<schemeitem> table;
-    ZoneScheme results;
-
-    // read back the details from the table
-    for (int i=0; i<scheme->invisibleRootItem()->childCount(); i++) {
-
-        schemeitem add;
-        add.name = scheme->invisibleRootItem()->child(i)->text(0);
-        add.desc = scheme->invisibleRootItem()->child(i)->text(1);
-        add.lo = ((QDoubleSpinBox *)(scheme->itemWidget(scheme->invisibleRootItem()->child(i), 2)))->value();
-        table.append(add);
-    }
-
-    // sort the list into ascending order
-    qSort(table);
-
-    // now update the results
-    results.nzones_default = 0;
-    foreach(schemeitem zone, table) {
-        results.nzones_default++;
-        results.zone_default.append(zone.lo);
-        results.zone_default_is_pct.append(true);
-        results.zone_default_name.append(zone.name);
-        results.zone_default_desc.append(zone.desc);
-    }
-
-    return results;
-}
-
-
-CPPage::CPPage(Context *context, Zones *zones_, SchemePage *schemePage) :
-               context(context), zones_(zones_), schemePage(schemePage)
-{
-    active = false;
-
-    QGridLayout *mainLayout = new QGridLayout(this);
-    mainLayout->setSpacing(10 *dpiXFactor);
-
-    updateButton = new QPushButton(tr("Update"));
-    updateButton->hide();
-    addButton = new QPushButton(tr("+"));
-    deleteButton = new QPushButton(tr("-"));
-#ifndef Q_OS_MAC
-    addButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
-    deleteButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
-#else
-    addButton->setText(tr("Add"));
-    updateButton->setText(tr("Update"));
-    deleteButton->setText(tr("Delete"));
-#endif
-    defaultButton = new QPushButton(tr("Def"));
-    defaultButton->hide();
-
-    addZoneButton = new QPushButton(tr("+"));
-    deleteZoneButton = new QPushButton(tr("-"));
-#ifndef Q_OS_MAC
-    addZoneButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
-    deleteZoneButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
-#else
-    addZoneButton->setText(tr("Add"));
-    deleteZoneButton->setText(tr("Delete"));
-#endif
-
-    QHBoxLayout *zoneButtons = new QHBoxLayout;
-    zoneButtons->addStretch();
-    zoneButtons->setSpacing(0);
-    zoneButtons->addWidget(addZoneButton);
-    zoneButtons->addWidget(deleteZoneButton);
-    zoneButtons->addWidget(defaultButton);
-
-    QHBoxLayout *addLayout = new QHBoxLayout;
-    QLabel *dateLabel = new QLabel(tr("From Date"));
-    QLabel *cpLabel = new QLabel(tr("Critical Power"));
-    QLabel *ftpLabel = new QLabel(tr("FTP"));
-    QLabel *wLabel = new QLabel(tr("W'"));
-    QLabel *pmaxLabel = new QLabel(tr("Pmax"));
-    dateEdit = new QDateEdit;
-    dateEdit->setDate(QDate::currentDate());
-    dateEdit->setCalendarPopup(true);
-
-     // Use CP for FTP
-    useCPForFTPCombo = new QComboBox(this);
-    useCPForFTPCombo->addItem(tr("Use CP for all metrics"));
-    useCPForFTPCombo->addItem(tr("Use FTP for Coggan metrics"));
-
-    b4.cpforftp = appsettings->cvalue(context->athlete->cyclist, zones_->useCPforFTPSetting(), 0).toInt() ? 1 : 0;
-    useCPForFTPCombo->setCurrentIndex(b4.cpforftp);
-
-    cpEdit = new QDoubleSpinBox;
-    cpEdit->setMinimum(0);
-    cpEdit->setMaximum(1000);
-    cpEdit->setSingleStep(1.0);
-    cpEdit->setDecimals(0);
-
-    ftpEdit = new QDoubleSpinBox;
-    ftpEdit->setMinimum(0);
-    ftpEdit->setMaximum(100000);
-    ftpEdit->setSingleStep(100);
-    ftpEdit->setDecimals(0);
-
-    wEdit = new QDoubleSpinBox;
-    wEdit->setMinimum(0);
-    wEdit->setMaximum(100000);
-    wEdit->setSingleStep(100);
-    wEdit->setDecimals(0);
-
-    pmaxEdit = new QDoubleSpinBox;
-    pmaxEdit->setMinimum(0);
-    pmaxEdit->setMaximum(3000);
-    pmaxEdit->setSingleStep(1.0);
-    pmaxEdit->setDecimals(0);
-
-    QHBoxLayout *actionButtons = new QHBoxLayout;
-    actionButtons->setSpacing(2 *dpiXFactor);
-    actionButtons->addWidget(cpLabel);
-    actionButtons->addWidget(cpEdit);
-
-
-    actionButtons->addWidget(ftpLabel);
-    actionButtons->addWidget(ftpEdit);
-
-    actionButtons->addWidget(wLabel);
-    actionButtons->addWidget(wEdit);
-    actionButtons->addWidget(pmaxLabel);
-    actionButtons->addWidget(pmaxEdit);
-    actionButtons->addStretch();
-    actionButtons->addWidget(updateButton);
-    actionButtons->addWidget(addButton);
-    actionButtons->addWidget(deleteButton);
-    //actionButtons->addWidget(defaultButton); // moved to zoneButtons
-
-    addLayout->addWidget(dateLabel);
-    addLayout->addWidget(dateEdit);
-    addLayout->addStretch();
-    addLayout->addWidget(useCPForFTPCombo);
-
-    ranges = new QTreeWidget;
-    initializeRanges();
-
-    zones = new QTreeWidget;
-    zones->headerItem()->setText(0, tr("Short"));
-    zones->headerItem()->setText(1, tr("Long"));
-    zones->headerItem()->setText(2, tr("From Watts"));
-    zones->setColumnCount(3);
-    zones->setSelectionMode(QAbstractItemView::SingleSelection);
-    zones->setEditTriggers(QAbstractItemView::SelectedClicked); // allow edit
-    zones->setUniformRowHeights(true);
-    zones->setIndentation(0);
-    //zones->header()->resizeSection(0,80);
-    //zones->header()->resizeSection(1,150);
-
-    mainLayout->addLayout(addLayout, 0,0);
-    mainLayout->addLayout(actionButtons, 1,0);
-    mainLayout->addWidget(ranges, 2,0);
-    mainLayout->addLayout(zoneButtons, 3,0);
-    mainLayout->addWidget(zones, 4,0);
-
-    // edit connect
-    connect(dateEdit, SIGNAL(dateChanged(QDate)), this, SLOT(rangeEdited()));
-    connect(cpEdit, SIGNAL(valueChanged(double)), this, SLOT(rangeEdited()));
-    connect(ftpEdit, SIGNAL(valueChanged(double)), this, SLOT(rangeEdited()));
-    connect(wEdit, SIGNAL(valueChanged(double)), this, SLOT(rangeEdited()));
-    connect(pmaxEdit, SIGNAL(valueChanged(double)), this, SLOT(rangeEdited()));
-    // button connect
-    connect(addButton, SIGNAL(clicked()), this, SLOT(addClicked()));
-    connect(updateButton, SIGNAL(clicked()), this, SLOT(editClicked()));
-    connect(deleteButton, SIGNAL(clicked()), this, SLOT(deleteClicked()));
-    connect(defaultButton, SIGNAL(clicked()), this, SLOT(defaultClicked()));
-    connect(addZoneButton, SIGNAL(clicked()), this, SLOT(addZoneClicked()));
-    connect(deleteZoneButton, SIGNAL(clicked()), this, SLOT(deleteZoneClicked()));
-    connect(useCPForFTPCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(initializeRanges()));
-    connect(ranges, SIGNAL(itemSelectionChanged()), this, SLOT(rangeSelectionChanged()));
-    connect(zones, SIGNAL(itemChanged(QTreeWidgetItem*, int)), this, SLOT(zonesChanged()));
-}
-
-qint32
-CPPage::saveClicked()
-{
-    if (b4.cpforftp != useCPForFTPCombo->currentIndex())
-        return CONFIG_ZONES;
-    else
-        return 0;
-}
-
-void
-CPPage::initializeRanges() {
-    bool useCPForFTP = (useCPForFTPCombo->currentIndex() == 0? true : false);
-
-    int column = 0;
-
-    bool resize = (ranges->columnCount() == 4);
-
-    while( int nb = ranges->topLevelItemCount () )
-    {
-        delete ranges->takeTopLevelItem( nb - 1 );
-    }
-    ranges->headerItem()->setText(column++, tr("From Date"));
-
-    ranges->headerItem()->setText(column++, tr("Critical Power"));
-    if (!useCPForFTP) {
-        ranges->headerItem()->setText(column++, tr("FTP"));
-    }
-
-    ranges->headerItem()->setText(column++, tr("W'"));
-    ranges->headerItem()->setText(column++, tr("Pmax"));
-
-    if (resize)
-        ranges->setColumnWidth(3, (ranges->columnWidth(3)/2) *dpiXFactor);
-
-    ranges->setColumnCount(column);
-
-    ranges->setSelectionMode(QAbstractItemView::SingleSelection);
-    //ranges->setEditTriggers(QAbstractItemView::SelectedClicked); // allow edit
-    ranges->setUniformRowHeights(true);
-    ranges->setIndentation(0);
-
-    // setup list of ranges
-    for (int i=0; i< zones_->getRangeSize(); i++) {
-
-        QTreeWidgetItem *add = new QTreeWidgetItem(ranges->invisibleRootItem());
-        add->setFlags(add->flags() & ~Qt::ItemIsEditable);
-
-        // Embolden ranges with manually configured zones
-        QFont font;
-        font.setWeight(zones_->getZoneRange(i).zonesSetFromCP ?
-                                        QFont::Normal : QFont::Black);
-
-        int column = 0;
-        // date
-        add->setText(column, zones_->getStartDate(i).toString(tr("MMM d, yyyy")));
-        add->setFont(column++, font);
-
-        // CP
-        add->setText(column, QString("%1").arg(zones_->getCP(i)));
-        add->setFont(column++, font);
-
-        if (!useCPForFTP) {
-            // FTP
-            add->setText(column, QString("%1").arg(zones_->getFTP(i)));
-            add->setFont(column++, font);
-        }
-
-        // W'
-        add->setText(column, QString("%1").arg(zones_->getWprime(i)));
-        add->setFont(column++, font);
-
-        // Pmax
-        add->setText(column, QString("%1").arg(zones_->getPmax(i)));
-        add->setFont(column++, font);
-    }
-
-}
-
-
-
-void
-CPPage::addClicked()
-{
-
-    // get current scheme
-    zones_->setScheme(schemePage->getScheme());
-
-    int cp = cpEdit->value();
-    if( cp <= 0 ) {
-        QMessageBox err;
-        err.setText(tr("CP must be > 0"));
-        err.setIcon(QMessageBox::Warning);
-        err.exec();
-        return;
-    }
-
-    //int index = ranges->invisibleRootItem()->childCount();
-    int wp = wEdit->value() ? wEdit->value() : 20000;
-    if (wp < 1000) wp *= 1000; // entered in kJ we want joules
-
-    int pmax = pmaxEdit->value() ? pmaxEdit->value() : 1000;
-
-    int index = zones_->addZoneRange(dateEdit->date(), cpEdit->value(), ftpEdit->value(), wp, pmax);
-
-    // new item
-    QTreeWidgetItem *add = new QTreeWidgetItem;
-    add->setFlags(add->flags() & ~Qt::ItemIsEditable);
-    ranges->invisibleRootItem()->insertChild(index, add);
-
-    int column = 0;
-
-    // date
-    add->setText(column++, dateEdit->date().toString(tr("MMM d, yyyy")));
-
-    // CP
-    add->setText(column++, QString("%1").arg(cpEdit->value()));
-
-    // FTP
-    if (useCPForFTPCombo->currentIndex() == 1) {
-        add->setText(column++, QString("%1").arg(ftpEdit->value()));
-    }
-
-    // W'
-    add->setText(column++, QString("%1").arg(wp));
-
-    // Pmax
-    add->setText(column++, QString("%1").arg(pmax));
-
-}
-
-void
-CPPage::editClicked()
-{
-    // get current scheme
-    zones_->setScheme(schemePage->getScheme());
-
-    int cp = cpEdit->value();
-
-    if( cp <= 0 ){
-        QMessageBox err;
-        err.setText(tr("CP must be > 0"));
-        err.setIcon(QMessageBox::Warning);
-        err.exec();
-        return;
-    }
-
-    int ftp = ftpEdit->value() ? ftpEdit->value() : cp;
-    int wp = wEdit->value() ? wEdit->value() : 20000;
-    if (wp < 1000) wp *= 1000; // entered in kJ we want joules
-
-    int pmax = pmaxEdit->value() ? pmaxEdit->value() : 1000;
-
-    QTreeWidgetItem *edit = ranges->selectedItems().at(0);
-    int index = ranges->indexOfTopLevelItem(edit);
-
-
-    int columns = 0;
-
-    // date
-    zones_->setStartDate(index, dateEdit->date());
-    edit->setText(columns++, dateEdit->date().toString(tr("MMM d, yyyy")));
-
-    // CP
-    zones_->setCP(index, cp);
-    edit->setText(columns++, QString("%1").arg(cp));
-
-    // show FTP if we use FTP for Coggan Metrics
-    if (useCPForFTPCombo->currentIndex() == 1) {
-        zones_->setFTP(index, ftp);
-        edit->setText(columns++, QString("%1").arg(ftp));
-    }
-
-    // W'
-    zones_->setWprime(index, wp);
-    edit->setText(columns++, QString("%1").arg(wp));
-
-    // Pmax
-    zones_->setPmax(index, pmax);
-    edit->setText(columns++, QString("%1").arg(pmax));
-
-}
-
-void
-CPPage::deleteClicked()
-{
-    if (ranges->currentItem()) {
-        int index = ranges->invisibleRootItem()->indexOfChild(ranges->currentItem());
-        delete ranges->invisibleRootItem()->takeChild(index);
-        zones_->deleteRange(index);
-    }
-}
-
-void
-CPPage::defaultClicked()
-{
-    if (ranges->currentItem()) {
-
-        int index = ranges->invisibleRootItem()->indexOfChild(ranges->currentItem());
-        ZoneRange current = zones_->getZoneRange(index);
-
-        // unbold
-        QFont font;
-        font.setWeight(QFont::Normal);
-        ranges->currentItem()->setFont(0, font);
-        ranges->currentItem()->setFont(1, font);
-        ranges->currentItem()->setFont(2, font);
-
-
-        // set the range to use defaults on the scheme page
-        zones_->setScheme(schemePage->getScheme());
-        zones_->setZonesFromCP(index);
-
-        // hide the default button since we are now using defaults
-        defaultButton->hide();
-
-        // update the zones display
-        rangeSelectionChanged();
-    }
-}
-
-void
-CPPage::rangeEdited()
-{
-    if (ranges->currentItem()) {
-        int index = ranges->invisibleRootItem()->indexOfChild(ranges->currentItem());
-
-        QDate date = dateEdit->date();
-        QDate odate = zones_->getStartDate(index);
-
-        int cp = cpEdit->value();
-        int ocp = zones_->getCP(index);
-
-        int ftp = ftpEdit->value();
-        int oftp = zones_->getFTP(index);
-
-        int wp = wEdit->value();
-        int owp = zones_->getWprime(index);
-
-        int pmax = pmaxEdit->value();
-        int opmax = zones_->getPmax(index);
-
-        if (date != odate || cp != ocp || ftp != oftp || wp != owp || pmax != opmax)
-            updateButton->show();
-        else
-            updateButton->hide();
-    }
-}
-
-void
-CPPage::rangeSelectionChanged()
-{
-    active = true;
-
-    // wipe away current contents of zones
-    foreach (QTreeWidgetItem *item, zones->invisibleRootItem()->takeChildren()) {
-        delete zones->itemWidget(item, 2);
-        delete item;
-    }
-
-    // fill with current details
-    if (ranges->currentItem()) {
-
-
-        int index = ranges->invisibleRootItem()->indexOfChild(ranges->currentItem());
-        ZoneRange current = zones_->getZoneRange(index);
-
-        dateEdit->setDate(zones_->getStartDate(index));
-        cpEdit->setValue(zones_->getCP(index));
-        ftpEdit->setValue(zones_->getFTP(index));
-        wEdit->setValue(zones_->getWprime(index));
-        pmaxEdit->setValue(zones_->getPmax(index));
-
-        if (current.zonesSetFromCP) {
-
-            // reapply the scheme in case it has been changed
-            zones_->setScheme(schemePage->getScheme());
-            zones_->setZonesFromCP(index);
-            current = zones_->getZoneRange(index);
-
-            defaultButton->hide();
-
-        } else defaultButton->show();
-
-        for (int i=0; i< current.zones.count(); i++) {
-
-            QTreeWidgetItem *add = new QTreeWidgetItem(zones->invisibleRootItem());
-            add->setFlags(add->flags() | Qt::ItemIsEditable);
-
-            // tab name
-            add->setText(0, current.zones[i].name);
-            // field name
-            add->setText(1, current.zones[i].desc);
-
-            // low
-            QDoubleSpinBox *loedit = new QDoubleSpinBox(this);
-            loedit->setMinimum(0);
-            loedit->setMaximum(1000);
-            loedit->setSingleStep(1.0);
-            loedit->setDecimals(0);
-            loedit->setValue(current.zones[i].lo);
-            zones->setItemWidget(add, 2, loedit);
-            connect(loedit, SIGNAL(valueChanged(double)), this, SLOT(zonesChanged()));
-        }
-    }
-
-    active = false;
-}
-
-void
-CPPage::addZoneClicked()
-{
-    // no range selected
-    if (!ranges->currentItem()) return;
-
-    // are we at maximum already?
-    if (zones->invisibleRootItem()->childCount() == 10) {
-        QMessageBox err;
-        err.setText(tr("Maximum of 10 zones reached."));
-        err.setIcon(QMessageBox::Warning);
-        err.exec();
-        return;
-    }
-
-    active = true;
-    int index = zones->invisibleRootItem()->childCount();
-
-    // new item
-    QTreeWidgetItem *add = new QTreeWidgetItem;
-    add->setFlags(add->flags() | Qt::ItemIsEditable);
-
-    QDoubleSpinBox *loedit = new QDoubleSpinBox(this);
-    loedit->setMinimum(0);
-    loedit->setMaximum(1000);
-    loedit->setSingleStep(1.0);
-    loedit->setDecimals(0);
-    loedit->setValue(100);
-
-    zones->invisibleRootItem()->insertChild(index, add);
-    zones->setItemWidget(add, 2, loedit);
-    connect(loedit, SIGNAL(editingFinished()), this, SLOT(zonesChanged()));
-
-    // Short
-    QString text = tr("New");
-    for (int i=0; zones->findItems(text, Qt::MatchExactly, 0).count() > 0; i++) {
-        text = QString(tr("New (%1)")).arg(i+1);
-    }
-    add->setText(0, text);
-
-    // long
-    text = tr("New");
-    for (int i=0; zones->findItems(text, Qt::MatchExactly, 1).count() > 0; i++) {
-        text = QString(tr("New (%1)")).arg(i+1);
-    }
-    add->setText(1, text);
-    active = false;
-
-    zonesChanged();
-}
-
-void
-CPPage::deleteZoneClicked()
-{
-    // no range selected
-    if (ranges->invisibleRootItem()->indexOfChild(ranges->currentItem()) == -1)
-        return;
-
-    active = true;
-    if (zones->currentItem()) {
-        int index = zones->invisibleRootItem()->indexOfChild(zones->currentItem());
-        delete zones->invisibleRootItem()->takeChild(index);
-    }
-    active = false;
-
-    zonesChanged();
-}
-
-void
-CPPage::zonesChanged()
-{
-    // only take changes when they are not done programmatically
-    // the active flag is set when the tree is being modified
-    // programmatically, but not when users interact with the widgets
-    if (active == false) {
-        // get the current zone range
-        if (ranges->currentItem()) {
-
-            int index = ranges->invisibleRootItem()->indexOfChild(ranges->currentItem());
-            ZoneRange current = zones_->getZoneRange(index);
-
-            // embolden that range on the list to show it has been edited
-            QFont font;
-            font.setWeight(QFont::Black);
-            ranges->currentItem()->setFont(0, font);
-            ranges->currentItem()->setFont(1, font);
-            ranges->currentItem()->setFont(2, font);
-
-            // show the default button to undo
-            defaultButton->show();
-
-            // we manually edited so save in full
-            current.zonesSetFromCP = false;
-
-            // create the new zoneinfos for this range
-            QList<ZoneInfo> zoneinfos;
-            for (int i=0; i< zones->invisibleRootItem()->childCount(); i++) {
-                QTreeWidgetItem *item = zones->invisibleRootItem()->child(i);
-                zoneinfos << ZoneInfo(item->text(0),
-                                      item->text(1),
-                                      ((QDoubleSpinBox*)zones->itemWidget(item, 2))->value(),
-                                      0);
-            }
-
-            // now sort the list
-            qSort(zoneinfos);
-
-            // now fill the highs
-            for(int i=0; i<zoneinfos.count(); i++) {
-                if (i+1 <zoneinfos.count())
-                    zoneinfos[i].hi = zoneinfos[i+1].lo;
-                else
-                    zoneinfos[i].hi = INT_MAX;
-            }
-            current.zones = zoneinfos;
-
-            // now replace the current range struct
-            zones_->setZoneRange(index, current);
-        }
-    }
-}
-
-//
-// Zone Config page
-//
-HrZonePage::HrZonePage(Context *context) : context(context)
-{
-    QVBoxLayout *layout = new QVBoxLayout(this);
-    QHBoxLayout *hlayout = new QHBoxLayout;
-
-    sportLabel = new QLabel(tr("Sport"));
-    sportCombo = new QComboBox();
-    sportCombo->addItem(tr("Bike"));
-    sportCombo->addItem(tr("Run"));
-    sportCombo->setCurrentIndex(0);
-    hlayout->addStretch();
-    hlayout->addWidget(sportLabel);
-    hlayout->addWidget(sportCombo);
-    hlayout->addStretch();
-    layout->addLayout(hlayout);
-    connect(sportCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(changeSport(int)));
-    tabs = new QTabWidget(this);
-    layout->addWidget(tabs);
-
-    for (int i=0; i < nSports; i++) {
-        hrZones[i] = new HrZones(i > 0);
-
-        // get current config by reading it in (leave mainwindow zones alone)
-        QFile zonesFile(context->athlete->home->config().canonicalPath() + "/" + hrZones[i]->fileName());
-        if (zonesFile.exists()) {
-            hrZones[i]->read(zonesFile);
-            zonesFile.close();
-            b4Fingerprint[i] = hrZones[i]->getFingerprint(); // remember original state
-        }
-
-        // setup maintenance pages using current config
-        schemePage[i] = new HrSchemePage(hrZones[i]);
-        ltPage[i] = new LTPage(context, hrZones[i], schemePage[i]);
-    }
-
-    // finish setup for the default sport
-    changeSport(sportCombo->currentIndex());
-}
-
-HrZonePage::~HrZonePage()
-{
-    for (int i=0; i<nSports; i++) delete hrZones[i];
-}
-
-void
-HrZonePage::changeSport(int i)
-{
-    // change tabs according to the selected sport
-    tabs->clear();
-    tabs->addTab(ltPage[i], tr("Lactate Threshold"));
-    tabs->addTab(schemePage[i], tr("Default"));
-}
-
-qint32
-HrZonePage::saveClicked()
-{
-    qint32 changed = 0;
-
-    // write
-    for (int i=0; i < nSports; i++) {
-        hrZones[i]->setScheme(schemePage[i]->getScheme());
-        hrZones[i]->write(context->athlete->home->config());
-
-        // reread HR zones
-        QFile hrzonesFile(context->athlete->home->config().canonicalPath() + "/" + context->athlete->hrzones_[i]->fileName());
-        context->athlete->hrzones_[i]->read(hrzonesFile);
-        if (i == 1 && context->athlete->hrzones_[i]->getRangeSize() == 0) { // No running HR zones
-            // Start with Cycling HR zones for backward compatibilty
-            QFile hrzonesFile(context->athlete->home->config().canonicalPath() + "/" + context->athlete->hrzones_[0]->fileName());
-            if (hrzonesFile.exists()) context->athlete->hrzones_[i]->read(hrzonesFile);
-        }
-
-        // did we change ?
-        if (hrZones[i]->getFingerprint() != b4Fingerprint[i])
-            changed = CONFIG_ZONES;
-    }
-
-    return changed;
-}
-
-HrSchemePage::HrSchemePage(HrZones *hrZones) : hrZones(hrZones)
-{
-    QVBoxLayout *mainLayout = new QVBoxLayout(this);
-    mainLayout->setSpacing(5 *dpiXFactor);
-
-    addButton = new QPushButton(tr("+"));
-    deleteButton = new QPushButton(tr("-"));
-#ifndef Q_OS_MAC
-    addButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
-    deleteButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
-#else
-    addButton->setText(tr("Add"));
-    deleteButton->setText(tr("Delete"));
-#endif
-    QHBoxLayout *actionButtons = new QHBoxLayout;
-    actionButtons->setSpacing(2 *dpiXFactor);
-    actionButtons->addStretch();
-    actionButtons->addWidget(addButton);
-    actionButtons->addWidget(deleteButton);
-
-    scheme = new QTreeWidget;
-    scheme->headerItem()->setText(0, tr("Short"));
-    scheme->headerItem()->setText(1, tr("Long"));
-    scheme->headerItem()->setText(2, tr("Percent of LT"));
-    scheme->headerItem()->setText(3, tr("Trimp k"));
-    scheme->setColumnCount(4);
-    scheme->setSelectionMode(QAbstractItemView::SingleSelection);
-    scheme->setEditTriggers(QAbstractItemView::SelectedClicked); // allow edit
-    scheme->setUniformRowHeights(true);
-    scheme->setIndentation(0);
-    //scheme->header()->resizeSection(0,60);
-    //scheme->header()->resizeSection(1,180);
-    //scheme->header()->resizeSection(2,65);
-    //scheme->header()->resizeSection(3,65);
-
-    // setup list
-    for (int i=0; i< hrZones->getScheme().nzones_default; i++) {
-
-        QTreeWidgetItem *add = new QTreeWidgetItem(scheme->invisibleRootItem());
-        add->setFlags(add->flags() | Qt::ItemIsEditable);
-
-        // tab name
-        add->setText(0, hrZones->getScheme().zone_default_name[i]);
-        // field name
-        add->setText(1, hrZones->getScheme().zone_default_desc[i]);
-
-        // low
-        QDoubleSpinBox *loedit = new QDoubleSpinBox(this);
-        loedit->setMinimum(0);
-        loedit->setMaximum(1000);
-        loedit->setSingleStep(1.0);
-        loedit->setDecimals(0);
-        loedit->setValue(hrZones->getScheme().zone_default[i]);
-        scheme->setItemWidget(add, 2, loedit);
-
-        // trimp
-        QDoubleSpinBox *trimpedit = new QDoubleSpinBox(this);
-        trimpedit->setMinimum(0);
-        trimpedit->setMaximum(10);
-        trimpedit->setSingleStep(0.1);
-        trimpedit->setDecimals(2);
-        trimpedit->setValue(hrZones->getScheme().zone_default_trimp[i]);
-        scheme->setItemWidget(add, 3, trimpedit);
-    }
-
-    mainLayout->addWidget(scheme);
-    mainLayout->addLayout(actionButtons);
-
-    // button connect
-    connect(addButton, SIGNAL(clicked()), this, SLOT(addClicked()));
-    connect(deleteButton, SIGNAL(clicked()), this, SLOT(deleteClicked()));
-}
-
-void
-HrSchemePage::addClicked()
-{
-    // are we at maximum already?
-    if (scheme->invisibleRootItem()->childCount() == 10) {
-        QMessageBox err;
-        err.setText(tr("Maximum of 10 zones reached."));
-        err.setIcon(QMessageBox::Warning);
-        err.exec();
-        return;
-    }
-
-    int index = scheme->invisibleRootItem()->childCount();
-
-    // new item
-    QTreeWidgetItem *add = new QTreeWidgetItem;
-    add->setFlags(add->flags() | Qt::ItemIsEditable);
-
-    QDoubleSpinBox *loedit = new QDoubleSpinBox(this);
-    loedit->setMinimum(0);
-    loedit->setMaximum(1000);
-    loedit->setSingleStep(1.0);
-    loedit->setDecimals(0);
-    loedit->setValue(100);
-
-    scheme->invisibleRootItem()->insertChild(index, add);
-    scheme->setItemWidget(add, 2, loedit);
-
-    //trimp
-    QDoubleSpinBox *trimpedit = new QDoubleSpinBox(this);
-    trimpedit->setMinimum(0);
-    trimpedit->setMaximum(10);
-    trimpedit->setSingleStep(0.1);
-    trimpedit->setDecimals(2);
-    trimpedit->setValue(1);
-
-    scheme->setItemWidget(add, 3, trimpedit);
-
-    // Short
-    QString text = tr("New");
-    for (int i=0; scheme->findItems(text, Qt::MatchExactly, 0).count() > 0; i++) {
-        text = QString(tr("New (%1)")).arg(i+1);
-    }
-    add->setText(0, text);
-
-    // long
-    text = tr("New");
-    for (int i=0; scheme->findItems(text, Qt::MatchExactly, 1).count() > 0; i++) {
-        text = QString(tr("New (%1)")).arg(i+1);
-    }
-    add->setText(1, text);
-}
-
-void
-HrSchemePage::renameClicked()
-{
-    // which one is selected?
-    if (scheme->currentItem()) scheme->editItem(scheme->currentItem(), 0);
-}
-
-void
-HrSchemePage::deleteClicked()
-{
-    if (scheme->currentItem()) {
-        int index = scheme->invisibleRootItem()->indexOfChild(scheme->currentItem());
-        delete scheme->invisibleRootItem()->takeChild(index);
-    }
-}
-
-HrZoneScheme
-HrSchemePage::getScheme()
-{
-    // read the scheme widget and return a scheme object
-    QList<schemeitem> table;
-    HrZoneScheme results;
-
-    // read back the details from the table
-    for (int i=0; i<scheme->invisibleRootItem()->childCount(); i++) {
-
-        schemeitem add;
-        add.name = scheme->invisibleRootItem()->child(i)->text(0);
-        add.desc = scheme->invisibleRootItem()->child(i)->text(1);
-        add.lo = ((QDoubleSpinBox *)(scheme->itemWidget(scheme->invisibleRootItem()->child(i), 2)))->value();
-        add.trimp = ((QDoubleSpinBox *)(scheme->itemWidget(scheme->invisibleRootItem()->child(i), 3)))->value();
-        table.append(add);
-    }
-
-    // sort the list into ascending order
-    qSort(table);
-
-    // now update the results
-    results.nzones_default = 0;
-    foreach(schemeitem zone, table) {
-        results.nzones_default++;
-        results.zone_default.append(zone.lo);
-        results.zone_default_is_pct.append(true);
-        results.zone_default_name.append(zone.name);
-        results.zone_default_desc.append(zone.desc);
-        results.zone_default_trimp.append(zone.trimp);
-    }
-
-    return results;
-}
-
-
-LTPage::LTPage(Context *context, HrZones *hrZones, HrSchemePage *schemePage) :
-               context(context), hrZones(hrZones), schemePage(schemePage)
-{
-    active = false;
-
-    QVBoxLayout *mainLayout = new QVBoxLayout(this);
-    mainLayout->setSpacing(5 *dpiXFactor);
-
-    updateButton = new QPushButton(tr("Update"));
-    updateButton->hide();
-    addButton = new QPushButton(tr("+"));
-    deleteButton = new QPushButton(tr("-"));
-#ifndef Q_OS_MAC
-    addButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
-    updateButton->setFixedSize(60,20);
-    deleteButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
-#else
-    updateButton->setText(tr("Update"));
-    addButton->setText(tr("Add"));
-    deleteButton->setText(tr("Delete"));
-#endif
-    defaultButton = new QPushButton(tr("Def"));
-    defaultButton->hide();
-
-    addZoneButton = new QPushButton(tr("+"));
-    deleteZoneButton = new QPushButton(tr("-"));
-#ifndef Q_OS_MAC
-    addZoneButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
-    deleteZoneButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
-#else
-    addZoneButton->setText(tr("Add"));
-    deleteZoneButton->setText(tr("Delete"));
-#endif
-
-    QHBoxLayout *actionButtons = new QHBoxLayout;
-    actionButtons->setSpacing(2 *dpiXFactor);
-    actionButtons->addStretch();
-    actionButtons->addWidget(updateButton);
-    actionButtons->addWidget(addButton);
-    actionButtons->addWidget(deleteButton);
-    //actionButtons->addWidget(defaultButton); moved to zoneButtons
-
-    QHBoxLayout *zoneButtons = new QHBoxLayout;
-    zoneButtons->addStretch();
-    zoneButtons->addWidget(addZoneButton);
-    zoneButtons->addWidget(deleteZoneButton);
-    zoneButtons->addWidget(defaultButton);
-
-    QHBoxLayout *addLayout = new QHBoxLayout;
-    QLabel *dateLabel = new QLabel(tr("From Date"));
-    QLabel *ltLabel = new QLabel(tr("Lactate Threshold"));
-    dateEdit = new QDateEdit;
-    dateEdit->setDate(QDate::currentDate());
-    dateEdit->setCalendarPopup(true);
-
-    ltEdit = new QDoubleSpinBox;
-    ltEdit->setMinimum(0);
-    ltEdit->setMaximum(240);
-    ltEdit->setSingleStep(1.0);
-    ltEdit->setDecimals(0);
-
-    addLayout->addWidget(dateLabel);
-    addLayout->addWidget(dateEdit);
-    addLayout->addWidget(ltLabel);
-    addLayout->addWidget(ltEdit);
-    addLayout->addStretch();
-
-    QHBoxLayout *addLayout2 = new QHBoxLayout;
-    QLabel *restHrLabel = new QLabel(tr("Rest HR"));
-    QLabel *maxHrLabel = new QLabel(tr("Max HR"));
-
-    restHrEdit = new QDoubleSpinBox;
-    restHrEdit->setMinimum(0);
-    restHrEdit->setMaximum(240);
-    restHrEdit->setSingleStep(1.0);
-    restHrEdit->setDecimals(0);
-
-    maxHrEdit = new QDoubleSpinBox;
-    maxHrEdit->setMinimum(0);
-    maxHrEdit->setMaximum(240);
-    maxHrEdit->setSingleStep(1.0);
-    maxHrEdit->setDecimals(0);
-
-    addLayout2->addWidget(restHrLabel);
-    addLayout2->addWidget(restHrEdit);
-    addLayout2->addWidget(maxHrLabel);
-    addLayout2->addWidget(maxHrEdit);
-    addLayout2->addStretch();
-
-    ranges = new QTreeWidget;
-    ranges->headerItem()->setText(0, tr("From Date"));
-    ranges->headerItem()->setText(1, tr("Lactate Threshold"));
-    ranges->headerItem()->setText(2, tr("Rest HR"));
-    ranges->headerItem()->setText(3, tr("Max HR"));
-    ranges->setColumnCount(4);
-    ranges->setSelectionMode(QAbstractItemView::SingleSelection);
-    //ranges->setEditTriggers(QAbstractItemView::SelectedClicked); // allow edit
-    ranges->setUniformRowHeights(true);
-    ranges->setIndentation(0);
-    //ranges->header()->resizeSection(0,180);
-
-    // setup list of ranges
-    for (int i=0; i< hrZones->getRangeSize(); i++) {
-
-        QTreeWidgetItem *add = new QTreeWidgetItem(ranges->invisibleRootItem());
-        add->setFlags(add->flags() & ~Qt::ItemIsEditable);
-
-        // Embolden ranges with manually configured zones
-        QFont font;
-        font.setWeight(hrZones->getHrZoneRange(i).hrZonesSetFromLT ?
-                       QFont::Normal : QFont::Black);
-
-        // date
-        add->setText(0, hrZones->getStartDate(i).toString(tr("MMM d, yyyy")));
-        add->setFont(0, font);
-
-        // LT
-        add->setText(1, QString("%1").arg(hrZones->getLT(i)));
-        add->setFont(1, font);
-
-        // Rest HR
-        add->setText(2, QString("%1").arg(hrZones->getRestHr(i)));
-        add->setFont(2, font);
-
-        // Max HR
-        add->setText(3, QString("%1").arg(hrZones->getMaxHr(i)));
-        add->setFont(3, font);
-    }
-
-    zones = new QTreeWidget;
-    zones->headerItem()->setText(0, tr("Short"));
-    zones->headerItem()->setText(1, tr("Long"));
-    zones->headerItem()->setText(2, tr("From BPM"));
-    zones->headerItem()->setText(3, tr("Trimp k"));
-    zones->setColumnCount(4);
-    zones->setSelectionMode(QAbstractItemView::SingleSelection);
-    zones->setEditTriggers(QAbstractItemView::SelectedClicked); // allow edit
-    zones->setUniformRowHeights(true);
-    zones->setIndentation(0);
-    //zones->header()->resizeSection(0,50);
-    //zones->header()->resizeSection(1,150);
-    //zones->header()->resizeSection(2,65);
-    //zones->header()->resizeSection(3,65);
-
-    mainLayout->addLayout(addLayout);
-    mainLayout->addLayout(addLayout2);
-    mainLayout->addLayout(actionButtons);
-    mainLayout->addWidget(ranges);
-    mainLayout->addLayout(zoneButtons);
-    mainLayout->addWidget(zones);
-
-    // edit connect
-    connect(dateEdit, SIGNAL(dateChanged(QDate)), this, SLOT(rangeEdited()));
-    connect(ltEdit, SIGNAL(valueChanged(double)), this, SLOT(rangeEdited()));
-    connect(restHrEdit, SIGNAL(valueChanged(double)), this, SLOT(rangeEdited()));
-    connect(maxHrEdit, SIGNAL(valueChanged(double)), this, SLOT(rangeEdited()));
-
-    // button connect
-    connect(updateButton, SIGNAL(clicked()), this, SLOT(editClicked()));
-    connect(addButton, SIGNAL(clicked()), this, SLOT(addClicked()));
-    connect(deleteButton, SIGNAL(clicked()), this, SLOT(deleteClicked()));
-    connect(defaultButton, SIGNAL(clicked()), this, SLOT(defaultClicked()));
-    connect(addZoneButton, SIGNAL(clicked()), this, SLOT(addZoneClicked()));
-    connect(deleteZoneButton, SIGNAL(clicked()), this, SLOT(deleteZoneClicked()));
-    connect(ranges, SIGNAL(itemSelectionChanged()), this, SLOT(rangeSelectionChanged()));
-    connect(zones, SIGNAL(itemChanged(QTreeWidgetItem*, int)), this, SLOT(zonesChanged()));
-}
-
-void
-LTPage::addClicked()
-{
-    // get current scheme
-    hrZones->setScheme(schemePage->getScheme());
-
-    //int index = ranges->invisibleRootItem()->childCount();
-    int index = hrZones->addHrZoneRange(dateEdit->date(), ltEdit->value(), restHrEdit->value(), maxHrEdit->value());
-
-    // new item
-    QTreeWidgetItem *add = new QTreeWidgetItem;
-    add->setFlags(add->flags() & ~Qt::ItemIsEditable);
-    ranges->invisibleRootItem()->insertChild(index, add);
-
-    // date
-    add->setText(0, dateEdit->date().toString(tr("MMM d, yyyy")));
-
-    // LT
-    add->setText(1, QString("%1").arg(ltEdit->value()));
-    // Rest HR
-    add->setText(2, QString("%1").arg(restHrEdit->value()));
-    // Max HR
-    add->setText(3, QString("%1").arg(maxHrEdit->value()));
-}
-
-void
-LTPage::editClicked()
-{
-    // get current scheme
-    hrZones->setScheme(schemePage->getScheme());
-
-    QTreeWidgetItem *edit = ranges->selectedItems().at(0);
-    int index = ranges->indexOfTopLevelItem(edit);
-
-    // date
-    hrZones->setStartDate(index, dateEdit->date());
-    edit->setText(0, dateEdit->date().toString(tr("MMM d, yyyy")));
-
-    // LT
-    hrZones->setLT(index, ltEdit->value());
-    edit->setText(1, QString("%1").arg(ltEdit->value()));
-    // Rest HR
-    hrZones->setRestHr(index, restHrEdit->value());
-    edit->setText(2, QString("%1").arg(restHrEdit->value()));
-    // Max HR
-    hrZones->setMaxHr(index, maxHrEdit->value());
-    edit->setText(3, QString("%1").arg(maxHrEdit->value()));
-}
-
-void
-LTPage::deleteClicked()
-{
-    if (ranges->currentItem()) {
-        int index = ranges->invisibleRootItem()->indexOfChild(ranges->currentItem());
-        delete ranges->invisibleRootItem()->takeChild(index);
-        hrZones->deleteRange(index);
-    }
-}
-
-void
-LTPage::defaultClicked()
-{
-    if (ranges->currentItem()) {
-
-        int index = ranges->invisibleRootItem()->indexOfChild(ranges->currentItem());
-        HrZoneRange current = hrZones->getHrZoneRange(index);
-
-        // unbold
-        QFont font;
-        font.setWeight(QFont::Normal);
-        ranges->currentItem()->setFont(0, font);
-        ranges->currentItem()->setFont(1, font);
-        ranges->currentItem()->setFont(2, font);
-        ranges->currentItem()->setFont(3, font);
-
-
-        // set the range to use defaults on the scheme page
-        hrZones->setScheme(schemePage->getScheme());
-        hrZones->setHrZonesFromLT(index);
-
-        // hide the default button since we are now using defaults
-        defaultButton->hide();
-
-        // update the zones display
-        rangeSelectionChanged();
-    }
-}
-
-void
-LTPage::rangeEdited()
-{
-    if (ranges->currentItem()) {
-        int index = ranges->invisibleRootItem()->indexOfChild(ranges->currentItem());
-
-        QDate date = dateEdit->date();
-        QDate odate = hrZones->getStartDate(index);
-
-        int lt = ltEdit->value();
-        int olt = hrZones->getLT(index);
-
-        int maxhr = maxHrEdit->value();
-        int omaxhr = hrZones->getMaxHr(index);
-
-        int resthr = restHrEdit->value();
-        int oresthr = hrZones->getRestHr(index);
-
-        if (date != odate || lt != olt || maxhr != omaxhr || resthr != oresthr)
-            updateButton->show();
-        else
-            updateButton->hide();
-    }
-}
-
-void
-LTPage::rangeSelectionChanged()
-{
-    active = true;
-
-    // wipe away current contents of zones
-    foreach (QTreeWidgetItem *item, zones->invisibleRootItem()->takeChildren()) {
-        delete zones->itemWidget(item, 2);
-        delete item;
-    }
-
-    // fill with current details
-    if (ranges->currentItem()) {
-
-        int index = ranges->invisibleRootItem()->indexOfChild(ranges->currentItem());
-        HrZoneRange current = hrZones->getHrZoneRange(index);
-
-        dateEdit->setDate(hrZones->getStartDate(index));
-        ltEdit->setValue(hrZones->getLT(index));
-        maxHrEdit->setValue(hrZones->getMaxHr(index));
-        restHrEdit->setValue(hrZones->getRestHr(index));
-
-        if (current.hrZonesSetFromLT) {
-
-            // reapply the scheme in case it has been changed
-            hrZones->setScheme(schemePage->getScheme());
-            hrZones->setHrZonesFromLT(index);
-            current = hrZones->getHrZoneRange(index);
-
-            defaultButton->hide();
-
-        } else defaultButton->show();
-
-        for (int i=0; i< current.zones.count(); i++) {
-
-            QTreeWidgetItem *add = new QTreeWidgetItem(zones->invisibleRootItem());
-            add->setFlags(add->flags() | Qt::ItemIsEditable);
-
-            // tab name
-            add->setText(0, current.zones[i].name);
-            // field name
-            add->setText(1, current.zones[i].desc);
-
-            // low
-            QDoubleSpinBox *loedit = new QDoubleSpinBox(this);
-            loedit->setMinimum(0);
-            loedit->setMaximum(1000);
-            loedit->setSingleStep(1.0);
-            loedit->setDecimals(0);
-            loedit->setValue(current.zones[i].lo);
-            zones->setItemWidget(add, 2, loedit);
-            connect(loedit, SIGNAL(editingFinished()), this, SLOT(zonesChanged()));
-
-            //trimp
-            QDoubleSpinBox *trimpedit = new QDoubleSpinBox(this);
-            trimpedit->setMinimum(0);
-            trimpedit->setMaximum(10);
-            trimpedit->setSingleStep(0.1);
-            trimpedit->setDecimals(2);
-            trimpedit->setValue(current.zones[i].trimp);
-            zones->setItemWidget(add, 3, trimpedit);
-            connect(trimpedit, SIGNAL(editingFinished()), this, SLOT(zonesChanged()));
-
-        }
-    }
-
-    active = false;
-}
-
-void
-LTPage::addZoneClicked()
-{
-    // no range selected
-    if (!ranges->currentItem()) return;
-
-    // are we at maximum already?
-    if (zones->invisibleRootItem()->childCount() == 10) {
-        QMessageBox err;
-        err.setText(tr("Maximum of 10 zones reached."));
-        err.setIcon(QMessageBox::Warning);
-        err.exec();
-        return;
-    }
-
-    active = true;
-    int index = zones->invisibleRootItem()->childCount();
-
-    // new item
-    QTreeWidgetItem *add = new QTreeWidgetItem;
-    add->setFlags(add->flags() | Qt::ItemIsEditable);
-
-    QDoubleSpinBox *loedit = new QDoubleSpinBox(this);
-    loedit->setMinimum(0);
-    loedit->setMaximum(1000);
-    loedit->setSingleStep(1.0);
-    loedit->setDecimals(0);
-    loedit->setValue(100);
-
-    zones->invisibleRootItem()->insertChild(index, add);
-    zones->setItemWidget(add, 2, loedit);
-    connect(loedit, SIGNAL(editingFinished()), this, SLOT(zonesChanged()));
-
-    //trimp
-    QDoubleSpinBox *trimpedit = new QDoubleSpinBox(this);
-    trimpedit->setMinimum(0);
-    trimpedit->setMaximum(10);
-    trimpedit->setSingleStep(0.1);
-    trimpedit->setDecimals(2);
-    trimpedit->setValue(1);
-    zones->setItemWidget(add, 3, trimpedit);
-    connect(trimpedit, SIGNAL(editingFinished()), this, SLOT(zonesChanged()));
-
-    // Short
-    QString text = tr("New");
-    for (int i=0; zones->findItems(text, Qt::MatchExactly, 0).count() > 0; i++) {
-        text = QString(tr("New (%1)")).arg(i+1);
-    }
-    add->setText(0, text);
-
-    // long
-    text = tr("New");
-    for (int i=0; zones->findItems(text, Qt::MatchExactly, 1).count() > 0; i++) {
-        text = QString(tr("New (%1)")).arg(i+1);
-    }
-    add->setText(1, text);
-    active = false;
-
-    zonesChanged();
-}
-
-void
-LTPage::deleteZoneClicked()
-{
-    // no range selected
-    if (ranges->invisibleRootItem()->indexOfChild(ranges->currentItem()) == -1)
-        return;
-
-    active = true;
-    if (zones->currentItem()) {
-        int index = zones->invisibleRootItem()->indexOfChild(zones->currentItem());
-        delete zones->invisibleRootItem()->takeChild(index);
-    }
-    active = false;
-
-    zonesChanged();
-}
-
-void
-LTPage::zonesChanged()
-{
-    // only take changes when they are not done programmatically
-    // the active flag is set when the tree is being modified
-    // programmatically, but not when users interact with the widgets
-    if (active == false) {
-        // get the current zone range
-        if (ranges->currentItem()) {
-
-            int index = ranges->invisibleRootItem()->indexOfChild(ranges->currentItem());
-            HrZoneRange current = hrZones->getHrZoneRange(index);
-
-            // embolden that range on the list to show it has been edited
-            QFont font;
-            font.setWeight(QFont::Black);
-            ranges->currentItem()->setFont(0, font);
-            ranges->currentItem()->setFont(1, font);
-            ranges->currentItem()->setFont(2, font);
-            ranges->currentItem()->setFont(3, font);
-
-            // show the default button to undo
-            defaultButton->show();
-
-            // we manually edited so save in full
-            current.hrZonesSetFromLT = false;
-
-            // create the new zoneinfos for this range
-            QList<HrZoneInfo> zoneinfos;
-            for (int i=0; i< zones->invisibleRootItem()->childCount(); i++) {
-                QTreeWidgetItem *item = zones->invisibleRootItem()->child(i);
-                zoneinfos << HrZoneInfo(item->text(0),
-                                        item->text(1),
-                                        ((QDoubleSpinBox*)zones->itemWidget(item, 2))->value(),
-                                        0, ((QDoubleSpinBox*)zones->itemWidget(item, 3))->value());
-            }
-
-            // now sort the list
-            qSort(zoneinfos);
-
-            // now fill the highs
-            for(int i=0; i<zoneinfos.count(); i++) {
-                if (i+1 <zoneinfos.count())
-                    zoneinfos[i].hi = zoneinfos[i+1].lo;
-                else
-                    zoneinfos[i].hi = INT_MAX;
-            }
-            current.zones = zoneinfos;
-
-            // now replace the current range struct
-            hrZones->setHrZoneRange(index, current);
-        }
-    }
-}
-
-//
-// Pace Zone Config page
-//
-PaceZonePage::PaceZonePage(Context *context) : context(context)
-{
-    QVBoxLayout *layout = new QVBoxLayout(this);
-    QHBoxLayout *hlayout = new QHBoxLayout;
-
-    sportLabel = new QLabel(tr("Sport"));
-    sportCombo = new QComboBox();
-    sportCombo->addItem(tr("Run"));
-    sportCombo->addItem(tr("Swim"));
-    sportCombo->setCurrentIndex(0);
-    hlayout->addStretch();
-    hlayout->addWidget(sportLabel);
-    hlayout->addWidget(sportCombo);
-    hlayout->addStretch();
-    layout->addLayout(hlayout);
-    connect(sportCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(changeSport(int)));
-    tabs = new QTabWidget(this);
-    layout->addWidget(tabs);
-
-    for (int i=0; i < nSports; i++) {
-        paceZones[i] = new PaceZones(i > 0);
-
-        // get current config by reading it in (leave mainwindow zones alone)
-        QFile zonesFile(context->athlete->home->config().canonicalPath() + "/" + paceZones[i]->fileName());
-        if (zonesFile.exists()) {
-            paceZones[i]->read(zonesFile);
-            zonesFile.close();
-            b4Fingerprint[i] = paceZones[i]->getFingerprint(); // remember original state
-        }
-
-        // setup maintenance pages using current config
-        schemePages[i] = new PaceSchemePage(paceZones[i]);
-        cvPages[i] = new CVPage(paceZones[i], schemePages[i]);
-    }
-
-    // finish setup for the default sport
-    changeSport(sportCombo->currentIndex());
-}
-
-PaceZonePage::~PaceZonePage()
-{
-    for (int i=0; i<nSports; i++) delete paceZones[i];
-}
-
-void
-PaceZonePage::changeSport(int i)
-{
-    // change tabs according to the selected sport
-    tabs->clear();
-    tabs->addTab(cvPages[i], tr("Critical Velocity"));
-    tabs->addTab(schemePages[i], tr("Default"));
-}
-
-qint32
-PaceZonePage::saveClicked()
-{
-    qint32 changed = 0;
-    // write it
-    for (int i=0; i < nSports; i++) {
-        appsettings->setValue(paceZones[i]->paceSetting(), cvPages[i]->metric->isChecked());
-        paceZones[i]->setScheme(schemePages[i]->getScheme());
-        paceZones[i]->write(context->athlete->home->config());
-
-        // reread Pace zones
-        QFile pacezonesFile(context->athlete->home->config().canonicalPath() + "/" + context->athlete->pacezones_[i]->fileName());
-        context->athlete->pacezones_[i]->read(pacezonesFile);
-
-        // did we change ?
-        if (paceZones[i]->getFingerprint() != b4Fingerprint[i])
-            changed = CONFIG_ZONES;
-    }
-    return changed;
-}
-
-PaceSchemePage::PaceSchemePage(PaceZones* paceZones) : paceZones(paceZones)
-{
-    QVBoxLayout *mainLayout = new QVBoxLayout(this);
-
-    addButton = new QPushButton(tr("+"));
-    deleteButton = new QPushButton(tr("-"));
-#ifndef Q_OS_MAC
-    addButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
-    deleteButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
-#else
-    addButton->setText(tr("Add"));
-    deleteButton->setText(tr("Delete"));
-#endif
-    QHBoxLayout *actionButtons = new QHBoxLayout;
-    actionButtons->setSpacing(2 *dpiXFactor);
-    actionButtons->addStretch();
-    actionButtons->addWidget(addButton);
-    actionButtons->addWidget(deleteButton);
-
-    scheme = new QTreeWidget;
-    scheme->headerItem()->setText(0, tr("Short"));
-    scheme->headerItem()->setText(1, tr("Long"));
-    scheme->headerItem()->setText(2, tr("Percent of CV"));
-    scheme->setColumnCount(3);
-    scheme->setSelectionMode(QAbstractItemView::SingleSelection);
-    scheme->setEditTriggers(QAbstractItemView::SelectedClicked); // allow edit
-    scheme->setUniformRowHeights(true);
-    scheme->setIndentation(0);
-    //scheme->header()->resizeSection(0,90);
-    //scheme->header()->resizeSection(1,200);
-    //scheme->header()->resizeSection(2,80);
-
-    // setup list
-    for (int i=0; i< paceZones->getScheme().nzones_default; i++) {
-
-        QTreeWidgetItem *add = new QTreeWidgetItem(scheme->invisibleRootItem());
-        add->setFlags(add->flags() | Qt::ItemIsEditable);
-
-        // tab name
-        add->setText(0, paceZones->getScheme().zone_default_name[i]);
-        // field name
-        add->setText(1, paceZones->getScheme().zone_default_desc[i]);
-
-        // low
-        QDoubleSpinBox *loedit = new QDoubleSpinBox(this);
-        loedit->setMinimum(0);
-        loedit->setMaximum(1000);
-        loedit->setSingleStep(1.0);
-        loedit->setDecimals(0);
-        loedit->setValue(paceZones->getScheme().zone_default[i]);
-        scheme->setItemWidget(add, 2, loedit);
-    }
-
-    mainLayout->addWidget(scheme);
-    mainLayout->addLayout(actionButtons);
-
-    // button connect
-    connect(addButton, SIGNAL(clicked()), this, SLOT(addClicked()));
-    connect(deleteButton, SIGNAL(clicked()), this, SLOT(deleteClicked()));
-}
-
-void
-PaceSchemePage::addClicked()
-{
-    // are we at maximum already?
-    if (scheme->invisibleRootItem()->childCount() == 10) {
-        QMessageBox err;
-        err.setText(tr("Maximum of 10 zones reached."));
-        err.setIcon(QMessageBox::Warning);
-        err.exec();
-        return;
-    }
-
-    int index = scheme->invisibleRootItem()->childCount();
-
-    // new item
-    QTreeWidgetItem *add = new QTreeWidgetItem;
-    add->setFlags(add->flags() | Qt::ItemIsEditable);
-
-    QDoubleSpinBox *loedit = new QDoubleSpinBox(this);
-    loedit->setMinimum(0);
-    loedit->setMaximum(1000);
-    loedit->setSingleStep(1.0);
-    loedit->setDecimals(0);
-    loedit->setValue(100);
-
-    scheme->invisibleRootItem()->insertChild(index, add);
-    scheme->setItemWidget(add, 2, loedit);
-
-    // Short
-    QString text = tr("New");
-    for (int i=0; scheme->findItems(text, Qt::MatchExactly, 0).count() > 0; i++) {
-        text = QString(tr("New (%1)")).arg(i+1);
-    }
-    add->setText(0, text);
-
-    // long
-    text = tr("New");
-    for (int i=0; scheme->findItems(text, Qt::MatchExactly, 1).count() > 0; i++) {
-        text = QString(tr("New (%1)")).arg(i+1);
-    }
-    add->setText(1, text);
-}
-
-void
-PaceSchemePage::renameClicked()
-{
-    // which one is selected?
-    if (scheme->currentItem()) scheme->editItem(scheme->currentItem(), 0);
-}
-
-void
-PaceSchemePage::deleteClicked()
-{
-    if (scheme->currentItem()) {
-        int index = scheme->invisibleRootItem()->indexOfChild(scheme->currentItem());
-        delete scheme->invisibleRootItem()->takeChild(index);
-    }
-}
-
-// just for qSorting
-struct paceschemeitem {
-    QString name, desc;
-    int lo;
-    double trimp;
-    bool operator<(paceschemeitem right) const { return lo < right.lo; }
-};
-
-PaceZoneScheme
-PaceSchemePage::getScheme()
-{
-    // read the scheme widget and return a scheme object
-    QList<paceschemeitem> table;
-    PaceZoneScheme results;
-
-    // read back the details from the table
-    for (int i=0; i<scheme->invisibleRootItem()->childCount(); i++) {
-
-        paceschemeitem add;
-        add.name = scheme->invisibleRootItem()->child(i)->text(0);
-        add.desc = scheme->invisibleRootItem()->child(i)->text(1);
-        add.lo = ((QDoubleSpinBox *)(scheme->itemWidget(scheme->invisibleRootItem()->child(i), 2)))->value();
-        table.append(add);
-    }
-
-    // sort the list into ascending order
-    qSort(table);
-
-    // now update the results
-    results.nzones_default = 0;
-    foreach(paceschemeitem zone, table) {
-        results.nzones_default++;
-        results.zone_default.append(zone.lo);
-        results.zone_default_is_pct.append(true);
-        results.zone_default_name.append(zone.name);
-        results.zone_default_desc.append(zone.desc);
-    }
-
-    return results;
-}
-
-CVPage::CVPage(PaceZones* paceZones, PaceSchemePage *schemePage) :
-               paceZones(paceZones), schemePage(schemePage)
-{
-    active = false;
-
-    QGridLayout *mainLayout = new QGridLayout(this);
-    mainLayout->setSpacing(10 *dpiXFactor);
-
-    updateButton = new QPushButton(tr("Update"));
-    updateButton->hide();
-    addButton = new QPushButton(tr("+"));
-    deleteButton = new QPushButton(tr("-"));
-#ifndef Q_OS_MAC
-    updateButton->setFixedSize(60,20);
-    addButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
-    deleteButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
-#else
-    updateButton->setText(tr("Update"));
-    addButton->setText(tr("Add"));
-    deleteButton->setText(tr("Delete"));
-#endif
-    defaultButton = new QPushButton(tr("Def"));
-    defaultButton->hide();
-
-    addZoneButton = new QPushButton(tr("+"));
-    deleteZoneButton = new QPushButton(tr("-"));
-#ifndef Q_OS_MAC
-    addZoneButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
-    deleteZoneButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
-#else
-    addZoneButton->setText(tr("Add"));
-    deleteZoneButton->setText(tr("Delete"));
-#endif
-
-    QHBoxLayout *zoneButtons = new QHBoxLayout;
-    zoneButtons->addStretch();
-    zoneButtons->setSpacing(0);
-    zoneButtons->addWidget(addZoneButton);
-    zoneButtons->addWidget(deleteZoneButton);
-
-    QHBoxLayout *addLayout = new QHBoxLayout;
-    QLabel *dateLabel = new QLabel(tr("From Date"));
-    QLabel *cpLabel = new QLabel(tr("Critical Velocity"));
-    dateEdit = new QDateEdit;
-    dateEdit->setDate(QDate::currentDate());
-    dateEdit->setCalendarPopup(true);
-
-    // CV default is 4min/km for Running a round number inline with
-    // CP default and 1:36min/100 for swimming (4:1 relation)
-    cvEdit = new QTimeEdit(QTime::fromString(paceZones->isSwim() ? "01:36" : "04:00", "mm:ss"));
-    cvEdit->setMinimumTime(QTime::fromString("01:00", "mm:ss"));
-    cvEdit->setMaximumTime(QTime::fromString("20:00", "mm:ss"));
-    cvEdit->setDisplayFormat("mm:ss");
-
-    per = new QLabel(this);
-    metric = new QCheckBox(tr("Metric Pace"));
-    metric->setChecked(appsettings->value(this, paceZones->paceSetting(), true).toBool());
-    per->setText(paceZones->paceUnits(metric->isChecked()));
-    if (!metric->isChecked()) metricChanged(); // default is metric
-
-    QHBoxLayout *actionButtons = new QHBoxLayout;
-    actionButtons->setSpacing(2 *dpiXFactor);
-    actionButtons->addWidget(cpLabel);
-    actionButtons->addWidget(cvEdit);
-    actionButtons->addWidget(per);
-    actionButtons->addStretch();
-    actionButtons->addWidget(metric);
-    actionButtons->addStretch();
-    actionButtons->addWidget(updateButton);
-    actionButtons->addWidget(addButton);
-    actionButtons->addWidget(deleteButton);
-    actionButtons->addWidget(defaultButton);
-
-    addLayout->addWidget(dateLabel);
-    addLayout->addWidget(dateEdit);
-    addLayout->addStretch();
-
-    ranges = new QTreeWidget;
-    ranges->headerItem()->setText(0, tr("From Date"));
-    ranges->headerItem()->setText(1, tr("Critical Velocity"));
-    ranges->setColumnCount(2);
-    ranges->setSelectionMode(QAbstractItemView::SingleSelection);
-    //ranges->setEditTriggers(QAbstractItemView::SelectedClicked); // allow edit
-    ranges->setUniformRowHeights(true);
-    ranges->setIndentation(0);
-    //ranges->header()->resizeSection(0,180);
-
-    // setup list of ranges
-    for (int i=0; i< paceZones->getRangeSize(); i++) {
-
-        QTreeWidgetItem *add = new QTreeWidgetItem(ranges->invisibleRootItem());
-        add->setFlags(add->flags() & ~Qt::ItemIsEditable);
-
-        // Embolden ranges with manually configured zones
-        QFont font;
-        font.setWeight(paceZones->getZoneRange(i).zonesSetFromCV ?
-                                        QFont::Normal : QFont::Black);
-
-        // date
-        add->setText(0, paceZones->getStartDate(i).toString(tr("MMM d, yyyy")));
-        add->setFont(0, font);
-
-        // CV
-        double kph = paceZones->getCV(i);
-
-        add->setText(1, QString("%1 %2 %3 %4")
-                    .arg(paceZones->kphToPaceString(kph, true))
-                    .arg(paceZones->paceUnits(true))
-                    .arg(paceZones->kphToPaceString(kph, false))
-                    .arg(paceZones->paceUnits(false)));
-        add->setFont(1, font);
-
-    }
-
-    zones = new QTreeWidget;
-    zones->headerItem()->setText(0, tr("Short"));
-    zones->headerItem()->setText(1, tr("Long"));
-    zones->headerItem()->setText(2, tr("From"));
-    zones->setColumnCount(3);
-    zones->setSelectionMode(QAbstractItemView::SingleSelection);
-    zones->setEditTriggers(QAbstractItemView::SelectedClicked); // allow edit
-    zones->setUniformRowHeights(true);
-    zones->setIndentation(0);
-    //zones->header()->resizeSection(0,80);
-    //zones->header()->resizeSection(1,150);
-
-    mainLayout->addLayout(addLayout, 0,0);
-    mainLayout->addLayout(actionButtons, 1,0);
-    mainLayout->addWidget(ranges, 2,0);
-    mainLayout->addLayout(zoneButtons, 3,0);
-    mainLayout->addWidget(zones, 4,0);
-
-    // edit connect
-    connect(dateEdit, SIGNAL(dateChanged(QDate)), this, SLOT(rangeEdited()));
-    connect(cvEdit, SIGNAL(timeChanged(QTime)), this, SLOT(rangeEdited()));
-
-    // button connect
-    connect(updateButton, SIGNAL(clicked()), this, SLOT(editClicked()));
-    connect(addButton, SIGNAL(clicked()), this, SLOT(addClicked()));
-    connect(deleteButton, SIGNAL(clicked()), this, SLOT(deleteClicked()));
-    connect(defaultButton, SIGNAL(clicked()), this, SLOT(defaultClicked()));
-    connect(addZoneButton, SIGNAL(clicked()), this, SLOT(addZoneClicked()));
-    connect(deleteZoneButton, SIGNAL(clicked()), this, SLOT(deleteZoneClicked()));
-    connect(ranges, SIGNAL(itemSelectionChanged()), this, SLOT(rangeSelectionChanged()));
-    connect(zones, SIGNAL(itemChanged(QTreeWidgetItem*, int)), this, SLOT(zonesChanged()));
-    connect(metric, SIGNAL(stateChanged(int)), this, SLOT(metricChanged()));
-}
-
-void
-CVPage::metricChanged()
-{
-    // Switch between metric and imperial!
-    per->setText(paceZones->paceUnits(metric->isChecked()));
-    double kphCV = paceZones->kphFromTime(cvEdit, !metric->isChecked());
-    cvEdit->setTime(QTime::fromString(paceZones->kphToPaceString(kphCV, metric->isChecked()), "mm:ss"));
-}
-
-void
-CVPage::addClicked()
-{
-    // get current scheme
-    paceZones->setScheme(schemePage->getScheme());
-
-    int cp = paceZones->kphFromTime(cvEdit, metric->isChecked());
-    if( cp <= 0 ){
-        QMessageBox err;
-        err.setText(tr("CV must be > 0"));
-        err.setIcon(QMessageBox::Warning);
-        err.exec();
-        return;
-    }
-
-    int index = paceZones->addZoneRange(dateEdit->date(), paceZones->kphFromTime(cvEdit, metric->isChecked()));
-
-    // new item
-    QTreeWidgetItem *add = new QTreeWidgetItem;
-    add->setFlags(add->flags() & ~Qt::ItemIsEditable);
-    ranges->invisibleRootItem()->insertChild(index, add);
-
-    // date
-    add->setText(0, dateEdit->date().toString(tr("MMM d, yyyy")));
-
-    // CV
-    double kph = paceZones->kphFromTime(cvEdit, metric->isChecked());
-
-    add->setText(1, QString("%1 %2 %3 %4")
-            .arg(paceZones->kphToPaceString(kph, true))
-            .arg(paceZones->paceUnits(true))
-            .arg(paceZones->kphToPaceString(kph, false))
-            .arg(paceZones->paceUnits(false)));
-
-}
-
-void
-CVPage::editClicked()
-{
-    // get current scheme
-    paceZones->setScheme(schemePage->getScheme());
-
-    QTreeWidgetItem *edit = ranges->selectedItems().at(0);
-    int index = ranges->indexOfTopLevelItem(edit);
-
-    // date
-    paceZones->setStartDate(index, dateEdit->date());
-    edit->setText(0, dateEdit->date().toString(tr("MMM d, yyyy")));
-
-    // CV
-    double kph = paceZones->kphFromTime(cvEdit, metric->isChecked());
-    paceZones->setCV(index, kph);
-    edit->setText(1, QString("%1 %2 %3 %4")
-            .arg(paceZones->kphToPaceString(kph, true))
-            .arg(paceZones->paceUnits(true))
-            .arg(paceZones->kphToPaceString(kph, false))
-            .arg(paceZones->paceUnits(false)));
-}
-
-void
-CVPage::deleteClicked()
-{
-    if (ranges->currentItem()) {
-        int index = ranges->invisibleRootItem()->indexOfChild(ranges->currentItem());
-        delete ranges->invisibleRootItem()->takeChild(index);
-        paceZones->deleteRange(index);
-    }
-}
-
-void
-CVPage::defaultClicked()
-{
-    if (ranges->currentItem()) {
-
-        int index = ranges->invisibleRootItem()->indexOfChild(ranges->currentItem());
-        PaceZoneRange current = paceZones->getZoneRange(index);
-
-        // unbold
-        QFont font;
-        font.setWeight(QFont::Normal);
-        ranges->currentItem()->setFont(0, font);
-        ranges->currentItem()->setFont(1, font);
-        ranges->currentItem()->setFont(2, font);
-
-
-        // set the range to use defaults on the scheme page
-        paceZones->setScheme(schemePage->getScheme());
-        paceZones->setZonesFromCV(index);
-
-        // hide the default button since we are now using defaults
-        defaultButton->hide();
-
-        // update the zones display
-        rangeSelectionChanged();
-    }
-}
-
-void
-CVPage::rangeEdited()
-{
-    if (ranges->currentItem()) {
-        int index = ranges->invisibleRootItem()->indexOfChild(ranges->currentItem());
-
-        QDate date = dateEdit->date();
-        QDate odate = paceZones->getStartDate(index);
-        QTime cv = cvEdit->time();
-        QTime ocv = QTime::fromString(paceZones->kphToPaceString(paceZones->getCV(index), metric->isChecked()), "mm:ss");
-
-        if (date != odate || cv != ocv)
-            updateButton->show();
-        else
-            updateButton->hide();
-    }
-}
-
-void
-CVPage::rangeSelectionChanged()
-{
-    active = true;
-
-    // wipe away current contents of zones
-    foreach (QTreeWidgetItem *item, zones->invisibleRootItem()->takeChildren()) {
-        delete zones->itemWidget(item, 2);
-        delete item;
-    }
-
-    // fill with current details
-    if (ranges->currentItem()) {
-
-        int index = ranges->invisibleRootItem()->indexOfChild(ranges->currentItem());
-        PaceZoneRange current = paceZones->getZoneRange(index);
-        dateEdit->setDate(paceZones->getStartDate(index));
-        cvEdit->setTime(QTime::fromString(paceZones->kphToPaceString(paceZones->getCV(index), metric->isChecked()), "mm:ss"));
-
-        if (current.zonesSetFromCV) {
-
-            // reapply the scheme in case it has been changed
-            paceZones->setScheme(schemePage->getScheme());
-            paceZones->setZonesFromCV(index);
-            current = paceZones->getZoneRange(index);
-
-            defaultButton->hide();
-
-        } else defaultButton->show();
-
-        for (int i=0; i< current.zones.count(); i++) {
-
-            QTreeWidgetItem *add = new QTreeWidgetItem(zones->invisibleRootItem());
-            add->setFlags(add->flags() | Qt::ItemIsEditable);
-
-            // tab name
-            add->setText(0, current.zones[i].name);
-            // field name
-            add->setText(1, current.zones[i].desc);
-
-            // low
-            QTimeEdit *loedit = new QTimeEdit(QTime::fromString(paceZones->kphToPaceString(current.zones[i].lo, metric->isChecked()), "mm:ss"), this);
-            loedit->setMinimumTime(QTime::fromString("00:00", "mm:ss"));
-            loedit->setMaximumTime(QTime::fromString("20:00", "mm:ss"));
-            loedit->setDisplayFormat("mm:ss");
-            zones->setItemWidget(add, 2, loedit);
-            connect(loedit, SIGNAL(editingFinished()), this, SLOT(zonesChanged()));
-        }
-    }
-
-    active = false;
-}
-
-void
-CVPage::addZoneClicked()
-{
-    // no range selected
-    if (!ranges->currentItem()) return;
-
-    // are we at maximum already?
-    if (zones->invisibleRootItem()->childCount() == 10) {
-        QMessageBox err;
-        err.setText(tr("Maximum of 10 zones reached."));
-        err.setIcon(QMessageBox::Warning);
-        err.exec();
-        return;
-    }
-
-    active = true;
-    int index = zones->invisibleRootItem()->childCount();
-
-    // new item
-    QTreeWidgetItem *add = new QTreeWidgetItem;
-    add->setFlags(add->flags() | Qt::ItemIsEditable);
-
-    QTimeEdit *loedit = new QTimeEdit(QTime::fromString("00:00", "mm:ss"), this);
-    loedit->setMinimumTime(QTime::fromString("00:00", "mm:ss"));
-    loedit->setMaximumTime(QTime::fromString("20:00", "mm:ss"));
-    loedit->setDisplayFormat("mm:ss");
-
-    zones->invisibleRootItem()->insertChild(index, add);
-    zones->setItemWidget(add, 2, loedit);
-    connect(loedit, SIGNAL(editingFinished()), this, SLOT(zonesChanged()));
-
-    // Short
-    QString text = tr("New");
-    for (int i=0; zones->findItems(text, Qt::MatchExactly, 0).count() > 0; i++) {
-        text = QString(tr("New (%1)")).arg(i+1);
-    }
-    add->setText(0, text);
-
-    // long
-    text = tr("New");
-    for (int i=0; zones->findItems(text, Qt::MatchExactly, 1).count() > 0; i++) {
-        text = QString(tr("New (%1)")).arg(i+1);
-    }
-    add->setText(1, text);
-    active = false;
-
-    zonesChanged();
-}
-
-void
-CVPage::deleteZoneClicked()
-{
-    // no range selected
-    if (ranges->invisibleRootItem()->indexOfChild(ranges->currentItem()) == -1)
-        return;
-
-    active = true;
-    if (zones->currentItem()) {
-        int index = zones->invisibleRootItem()->indexOfChild(zones->currentItem());
-        delete zones->invisibleRootItem()->takeChild(index);
-    }
-    active = false;
-
-    zonesChanged();
-}
-
-void
-CVPage::zonesChanged()
-{
-    // only take changes when they are not done programmatically
-    // the active flag is set when the tree is being modified
-    // programmatically, but not when users interact with the widgets
-    if (active == false) {
-        // get the current zone range
-        if (ranges->currentItem()) {
-
-            int index = ranges->invisibleRootItem()->indexOfChild(ranges->currentItem());
-            PaceZoneRange current = paceZones->getZoneRange(index);
-
-            // embolden that range on the list to show it has been edited
-            QFont font;
-            font.setWeight(QFont::Black);
-            ranges->currentItem()->setFont(0, font);
-            ranges->currentItem()->setFont(1, font);
-            ranges->currentItem()->setFont(2, font);
-
-            // show the default button to undo
-            defaultButton->show();
-
-            // we manually edited so save in full
-            current.zonesSetFromCV = false;
-
-            // create the new zoneinfos for this range
-            QList<PaceZoneInfo> zoneinfos;
-            for (int i=0; i< zones->invisibleRootItem()->childCount(); i++) {
-                QTreeWidgetItem *item = zones->invisibleRootItem()->child(i);
-                QTimeEdit *loTimeEdit = (QTimeEdit*)zones->itemWidget(item, 2);
-                double kph = loTimeEdit->time() == QTime(0,0,0) ? 0.0 : paceZones->kphFromTime(loTimeEdit, metric->isChecked());
-                zoneinfos << PaceZoneInfo(item->text(0),
-                                      item->text(1),
-                                      kph,
-                                      0);
-            }
-
-            // now sort the list
-            qSort(zoneinfos);
-
-            // now fill the highs
-            for(int i=0; i<zoneinfos.count(); i++) {
-                if (i+1 <zoneinfos.count())
-                    zoneinfos[i].hi = zoneinfos[i+1].lo;
-                else
-                    zoneinfos[i].hi = INT_MAX;
-            }
-            current.zones = zoneinfos;
-
-            // now replace the current range struct
-            paceZones->setZoneRange(index, current);
-        }
-    }
-}
-
-//
-// Season Editor
-//
-SeasonsPage::SeasonsPage(QWidget *parent, Context *context) : QWidget(parent), context(context)
-{
-    QGridLayout *mainLayout = new QGridLayout(this);
-    QFormLayout *editLayout = new QFormLayout;
-    editLayout->setFieldGrowthPolicy(QFormLayout::FieldsStayAtSizeHint);
-
-    // get the list
-    array = context->athlete->seasons->seasons;
-
-    // Edit widgets
-    nameEdit = new QLineEdit(this);
-    typeEdit = new QComboBox(this);
-    foreach(QString t, Season::types) typeEdit->addItem(t);
-    typeEdit->setCurrentIndex(0);
-    fromEdit = new QDateEdit(this);
-    fromEdit->setCalendarPopup(true);
-
-    toEdit = new QDateEdit(this);
-    toEdit->setCalendarPopup(true);
-
-    // set form
-    editLayout->addRow(new QLabel(tr("Name")), nameEdit);
-    editLayout->addRow(new QLabel(tr("Type")), typeEdit);
-    editLayout->addRow(new QLabel(tr("From")), fromEdit);
-    editLayout->addRow(new QLabel(tr("To")), toEdit);
-
-    addButton = new QPushButton(tr("+"));
-    deleteButton = new QPushButton(tr("-"));
-#ifndef Q_OS_MAC
-    upButton = new QToolButton(this);
-    downButton = new QToolButton(this);
-    upButton->setArrowType(Qt::UpArrow);
-    downButton->setArrowType(Qt::DownArrow);
-    upButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
-    downButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
-    addButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
-    deleteButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
-#else
-    addButton->setText(tr("Add"));
-    deleteButton->setText(tr("Delete"));
-    upButton = new QPushButton(tr("Up"));
-    downButton = new QPushButton(tr("Down"));
-#endif
-
-    QVBoxLayout *actionButtons = new QVBoxLayout;
-    actionButtons->setSpacing(2 *dpiXFactor);
-    actionButtons->addWidget(deleteButton);
-    actionButtons->addWidget(upButton);
-    actionButtons->addWidget(downButton);
-    actionButtons->addStretch();
-
-    seasons = new QTreeWidget;
-    seasons->headerItem()->setText(0, tr("Name"));
-    seasons->headerItem()->setText(1, tr("Type"));
-    seasons->headerItem()->setText(2, tr("From"));
-    seasons->headerItem()->setText(3, tr("To"));
-    seasons->setColumnCount(4);
-    seasons->setSelectionMode(QAbstractItemView::SingleSelection);
-    //seasons->setEditTriggers(QAbstractItemView::SelectedClicked); // allow edit
-    seasons->setUniformRowHeights(true);
-    seasons->setIndentation(0);
-
-#ifdef Q_OS_MAC
-    //seasons->header()->resizeSection(0,160); // tab
-    //seasons->header()->resizeSection(1,80); // name
-    //seasons->header()->resizeSection(2,130); // type
-    //seasons->header()->resizeSection(3,130); // values
-#else
-    //seasons->header()->resizeSection(0,160); // tab
-    //seasons->header()->resizeSection(1,80); // name
-    //seasons->header()->resizeSection(2,130); // type
-    //seasons->header()->resizeSection(3,130); // values
-#endif
-
-    foreach(Season season, array) {
-        QTreeWidgetItem *add;
-
-        if (season.type == Season::temporary) continue;
-
-        add = new QTreeWidgetItem(seasons->invisibleRootItem());
-        add->setFlags(add->flags() & ~Qt::ItemIsEditable);
-
-        // tab name
-        add->setText(0, season.name);
-        // type
-        add->setText(1, Season::types[static_cast<int>(season.type)]);
-        // from
-        add->setText(2, season.start.toString(tr("ddd MMM d, yyyy")));
-        // to
-        add->setText(3, season.end.toString(tr("ddd MMM d, yyyy")));
-        // guid -- hidden
-        add->setText(4, season.id().toString());
-
-    }
-    seasons->setCurrentItem(seasons->invisibleRootItem()->child(0));
-
-    mainLayout->addLayout(editLayout, 0,0);
-    mainLayout->addWidget(addButton, 0,1, Qt::AlignTop);
-    mainLayout->addWidget(seasons, 1,0);
-    mainLayout->addLayout(actionButtons, 1,1);
-
-    // set all the edits to a default value
-    clearEdit();
-
-    // connect up slots
-    connect(upButton, SIGNAL(clicked()), this, SLOT(upClicked()));
-    connect(downButton, SIGNAL(clicked()), this, SLOT(downClicked()));
-    connect(addButton, SIGNAL(clicked()), this, SLOT(addClicked()));
-    connect(deleteButton, SIGNAL(clicked()), this, SLOT(deleteClicked()));
-}
-
-void
-SeasonsPage::clearEdit()
-{
-    typeEdit->setCurrentIndex(0);
-    nameEdit->setText("");
-    fromEdit->setDate(QDate::currentDate());
-    toEdit->setDate(QDate::currentDate().addMonths(3));
-}
-
-void
-SeasonsPage::upClicked()
-{
-    if (seasons->currentItem()) {
-        int index = seasons->invisibleRootItem()->indexOfChild(seasons->currentItem());
-        if (index == 0) return; // its at the top already
-
-        // movin on up!
-        QTreeWidgetItem* moved = seasons->invisibleRootItem()->takeChild(index);
-        seasons->invisibleRootItem()->insertChild(index-1, moved);
-        seasons->setCurrentItem(moved);
-
-        // and move the array too
-        array.move(index, index-1);
-    }
-}
-
-void
-SeasonsPage::downClicked()
-{
-    if (seasons->currentItem()) {
-        int index = seasons->invisibleRootItem()->indexOfChild(seasons->currentItem());
-        if (index == (seasons->invisibleRootItem()->childCount()-1)) return; // its at the bottom already
-
-        QTreeWidgetItem* moved = seasons->invisibleRootItem()->takeChild(index);
-        seasons->invisibleRootItem()->insertChild(index+1, moved);
-        seasons->setCurrentItem(moved);
-
-        array.move(index, index+1);
-    }
-}
-
-void
-SeasonsPage::renameClicked()
-{
-    // which one is selected?
-    if (seasons->currentItem()) seasons->editItem(seasons->currentItem(), 0);
-}
-
-void
-SeasonsPage::addClicked()
-{
-    if (nameEdit->text() == "") return; // just ignore it
-
-    // swap if not right way around
-    if (fromEdit->date() > toEdit->date()) {
-        QDate temp = fromEdit->date();
-        fromEdit->setDate(toEdit->date());
-        toEdit->setDate(temp);
-    }
-
-    QTreeWidgetItem *add = new QTreeWidgetItem(seasons->invisibleRootItem());
-    add->setFlags(add->flags() & ~Qt::ItemIsEditable);
-    QString id;
-
-    // tab name
-    add->setText(0, nameEdit->text());
-    // type
-    add->setText(1, Season::types[typeEdit->currentIndex()]);
-    // from
-    add->setText(2, fromEdit->date().toString(tr("ddd MMM d, yyyy")));
-    // to
-    add->setText(3, toEdit->date().toString(tr("ddd MMM d, yyyy")));
-    // guid -- hidden
-    add->setText(4, (id=QUuid::createUuid().toString()));
-
-    // now clear the edits
-    clearEdit();
-
-    Season addSeason;
-    addSeason.setStart(fromEdit->date());
-    addSeason.setEnd(toEdit->date());
-    addSeason.setName(nameEdit->text());
-    addSeason.setType(typeEdit->currentIndex());
-    addSeason.setId(id);
-    array.append(Season());
-}
-
-void
-SeasonsPage::deleteClicked()
-{
-    if (seasons->currentItem()) {
-        int index = seasons->invisibleRootItem()->indexOfChild(seasons->currentItem());
-
-        // zap!
-        delete seasons->invisibleRootItem()->takeChild(index);
-
-        array.removeAt(index);
-    }
-}
-
-qint32
-SeasonsPage::saveClicked()
-{
-    // get any edits to the names and dates
-    // since we don't trap these as they are made
-    for(int i=0; i<seasons->invisibleRootItem()->childCount(); i++) {
-
-        QTreeWidgetItem *item = seasons->invisibleRootItem()->child(i);
-
-        array[i].setName(item->text(0));
-        array[i].setType(Season::types.indexOf(item->text(1)));
-        array[i].setStart(QDate::fromString(item->text(2), "ddd MMM d, yyyy"));
-        array[i].setEnd(QDate::fromString(item->text(3), "ddd MMM d, yyyy"));
-        array[i].setId(QUuid(item->text(4)));
-    }
-
-    // write to disk
-    QString file = QString(context->athlete->home->config().canonicalPath() + "/seasons.xml");
-    SeasonParser::serialize(file, array);
-
-    // re-read
-    context->athlete->seasons->readSeasons();
-
-    return 0;
-}
-
-
-AutoImportPage::AutoImportPage(Context *context) : context(context)
-{
-    QGridLayout *mainLayout = new QGridLayout(this);
-
-    addButton = new QPushButton(tr("+"));
-    deleteButton = new QPushButton(tr("-"));
-    browseButton = new QPushButton(tr("Browse"));
-#ifndef Q_OS_MAC
-    upButton = new QToolButton(this);
-    downButton = new QToolButton(this);
-    upButton->setArrowType(Qt::UpArrow);
-    downButton->setArrowType(Qt::DownArrow);
-    upButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
-    downButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
-    addButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
-    deleteButton->setFixedSize(20*dpiXFactor,20*dpiYFactor);
-#else
-    addButton->setText(tr("Add"));
-    deleteButton->setText(tr("Delete"));
-    upButton = new QPushButton(tr("Up"));
-    downButton = new QPushButton(tr("Down"));
-#endif
-    QHBoxLayout *actionButtons = new QHBoxLayout;
-    actionButtons->setSpacing(2 *dpiXFactor);
-    actionButtons->addWidget(upButton);
-    actionButtons->addWidget(downButton);
-    actionButtons->addStretch();
-    actionButtons->addWidget(browseButton);
-    actionButtons->addStretch();
-    actionButtons->addWidget(addButton);
-    actionButtons->addWidget(deleteButton);
-
-    fields = new QTreeWidget;
-    fields->headerItem()->setText(0, tr("Directory"));
-    fields->headerItem()->setText(1, tr("Import Rule"));
-    fields->setColumnWidth(0,400 *dpiXFactor);
-    fields->setColumnWidth(1,100 *dpiXFactor);
-    fields->setColumnCount(2);
-    fields->setSelectionMode(QAbstractItemView::SingleSelection);
-    //fields->setUniformRowHeights(true);
-    fields->setIndentation(0);
-
-    fields->setCurrentItem(fields->invisibleRootItem()->child(0));
-
-    mainLayout->addWidget(fields, 0,0);
-    mainLayout->addLayout(actionButtons, 1,0);
-
-    context->athlete->autoImportConfig->readConfig();
-    QList<RideAutoImportRule> rules = context->athlete->autoImportConfig->getConfig();
-    int index = 0;
-    foreach (RideAutoImportRule rule, rules) {
-        QComboBox *comboButton = new QComboBox(this);
-        addRuleTypes(comboButton);
-        QTreeWidgetItem *add = new QTreeWidgetItem;
-        fields->invisibleRootItem()->insertChild(index, add);
-        add->setFlags(add->flags() | Qt::ItemIsEditable);
-
-        add->setTextAlignment(0, Qt::AlignLeft | Qt::AlignVCenter);
-        add->setText(0, rule.getDirectory());
-
-        add->setTextAlignment(1, Qt::AlignHCenter | Qt::AlignVCenter);
-        comboButton->setCurrentIndex(rule.getImportRule());
-        fields->setItemWidget(add, 1, comboButton);
-        index++;
-    }
-
-    // connect up slots
-    connect(upButton, SIGNAL(clicked()), this, SLOT(upClicked()));
-    connect(downButton, SIGNAL(clicked()), this, SLOT(downClicked()));
-    connect(addButton, SIGNAL(clicked()), this, SLOT(addClicked()));
-    connect(deleteButton, SIGNAL(clicked()), this, SLOT(deleteClicked()));
-    connect(browseButton, SIGNAL(clicked()), this, SLOT(browseImportDir()));
-}
-
-void
-AutoImportPage::upClicked()
-{
-    if (fields->currentItem()) {
-        int index = fields->invisibleRootItem()->indexOfChild(fields->currentItem());
-        if (index == 0) return; // its at the top already
-
-        //movin on up!
-        QWidget *button = fields->itemWidget(fields->currentItem(),1);
-        QComboBox *comboButton = new QComboBox(this);
-        addRuleTypes(comboButton);
-        comboButton->setCurrentIndex(((QComboBox*)button)->currentIndex());
-        QTreeWidgetItem* moved = fields->invisibleRootItem()->takeChild(index);
-        fields->invisibleRootItem()->insertChild(index-1, moved);
-        fields->setItemWidget(moved, 1, comboButton);
-        fields->setCurrentItem(moved);
-    }
-}
-
-void
-AutoImportPage::downClicked()
-{
-    if (fields->currentItem()) {
-        int index = fields->invisibleRootItem()->indexOfChild(fields->currentItem());
-        if (index == (fields->invisibleRootItem()->childCount()-1)) return; // its at the bottom already
-
-        QWidget *button = fields->itemWidget(fields->currentItem(),1);
-        QComboBox *comboButton = new QComboBox(this);
-        addRuleTypes(comboButton);
-        comboButton->setCurrentIndex(((QComboBox*)button)->currentIndex());
-        QTreeWidgetItem* moved = fields->invisibleRootItem()->takeChild(index);
-        fields->invisibleRootItem()->insertChild(index+1, moved);
-        fields->setItemWidget(moved, 1, comboButton);
-        fields->setCurrentItem(moved);
-    }
-}
-
-
-void
-AutoImportPage::addClicked()
-{
-
-    int index = fields->invisibleRootItem()->indexOfChild(fields->currentItem());
-    if (index < 0) index = 0;
-
-    QComboBox *comboButton = new QComboBox(this);
-    addRuleTypes(comboButton);
-
-    QTreeWidgetItem *add = new QTreeWidgetItem;
-    fields->invisibleRootItem()->insertChild(index, add);
-    add->setFlags(add->flags() | Qt::ItemIsEditable);
-
-    add->setTextAlignment(0, Qt::AlignLeft | Qt::AlignVCenter);
-    add->setText(0, tr("Enter directory or press [Browse] to select"));
-    add->setTextAlignment(1, Qt::AlignHCenter | Qt::AlignVCenter);
-    fields->setItemWidget(add, 1, comboButton);
-
-}
-
-void
-AutoImportPage::deleteClicked()
-{
-    if (fields->currentItem()) {
-        int index = fields->invisibleRootItem()->indexOfChild(fields->currentItem());
-
-        // zap!
-        delete fields->invisibleRootItem()->takeChild(index);
-    }
-}
-
-qint32
-AutoImportPage::saveClicked()
-{
-
-    rules.clear();
-    for(int i=0; i<fields->invisibleRootItem()->childCount(); i++) {
-
-        RideAutoImportRule rule;
-        rule.setDirectory(fields->invisibleRootItem()->child(i)->text(0));
-
-        QWidget *button = fields->itemWidget(fields->invisibleRootItem()->child(i),1);
-        rule.setImportRule(((QComboBox*)button)->currentIndex());
-        rules.append(rule);
-
-    }
-
-    // write to disk
-    QString file = QString(context->athlete->home->config().canonicalPath() + "/autoimport.xml");
-    RideAutoImportConfigParser::serialize(file, rules);
-
-    // re-read
-    context->athlete->autoImportConfig->readConfig();
-    return 0;
-}
-
-void
-AutoImportPage::addRuleTypes(QComboBox *p) {
-
-    RideAutoImportRule config;
-    QList<QString> descriptions = config.getRuleDescriptions();
-
-    foreach(QString description, descriptions) {
-           p->addItem(description);
-    }
-}
-
-void
-AutoImportPage::browseImportDir()
-{
-    QStringList selectedDirs;
-    if (fields->currentItem()) {
-        QFileDialog fileDialog(this);
-        fileDialog.setFileMode(QFileDialog::Directory);
-        fileDialog.setOptions(QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
-        if (fileDialog.exec()) {
-            selectedDirs = fileDialog.selectedFiles();
-        }
-        if (selectedDirs.count() > 0) {
-            QString dir = selectedDirs.at(0);
-            if (dir != "") {
-                fields->currentItem()->setText(0, dir);
-            }
-        }
-    }
-}
-
 IntervalsPage::IntervalsPage(Context *context) : context(context)
 {
     // get config
@@ -6831,4 +3052,448 @@ IntervalsPage::saveClicked()
     // return change !
     if (b4.discovery != discovery) return CONFIG_DISCOVERY;
     else return 0;
+}
+
+///
+/// MeasuresConfigPage
+///
+MeasuresConfigPage::MeasuresConfigPage(QWidget *parent, Context *context) :
+    QWidget(parent), context(context), measures(nullptr)
+{
+    // get config
+    measures = new Measures();
+
+    // create all the widgets
+    QLabel *mlabel = new QLabel(tr("Measures Groups"));
+    measuresTable = new QTreeWidget(this);
+    measuresTable->headerItem()->setText(0, tr("Symbol"));
+    measuresTable->headerItem()->setText(1, tr("Name"));
+    measuresTable->setColumnCount(2);
+    measuresTable->setColumnWidth(0,200 *dpiXFactor);
+    measuresTable->setSelectionMode(QAbstractItemView::SingleSelection);
+    measuresTable->setUniformRowHeights(true); // causes height problems when adding - in case of non-text fields
+    measuresTable->setIndentation(0);
+
+    QLabel *mflabel = new QLabel(tr("Measures Fields"));
+    measuresFieldsTable = new QTreeWidget(this);
+    measuresFieldsTable->headerItem()->setText(0, tr("Symbol"));
+    measuresFieldsTable->headerItem()->setText(1, tr("Name"));
+    measuresFieldsTable->headerItem()->setText(2, tr("Metric Units"));
+    measuresFieldsTable->headerItem()->setText(3, tr("Imperial Units"));
+    measuresFieldsTable->headerItem()->setText(4, tr("Units Factor"));
+    measuresFieldsTable->headerItem()->setText(5, tr("CSV Headers"));
+    measuresFieldsTable->setColumnCount(6);
+    measuresFieldsTable->setColumnWidth(0,200 *dpiXFactor);
+    measuresFieldsTable->setSelectionMode(QAbstractItemView::SingleSelection);
+    measuresFieldsTable->setUniformRowHeights(true); // causes height problems when adding - in case of non-text fields
+    measuresFieldsTable->setIndentation(0);
+
+    editMeasures = new QPushButton(tr("Edit"), this);
+    addMeasures = new QPushButton("+", this);
+    removeMeasures = new QPushButton("-", this);
+
+    editMeasuresField = new QPushButton(tr("Edit"), this);
+    addMeasuresField = new QPushButton("+", this);
+    removeMeasuresField = new QPushButton("-", this);
+
+#ifdef Q_OS_MAC
+    addMeasures->setText(tr("Add"));
+    removeMeasures->setText(tr("Delete"));
+    addMeasuresField->setText(tr("Add"));
+    removeMeasuresField->setText(tr("Delete"));
+#else
+    addMeasures->setFixedSize(20*dpiXFactor,20*dpiYFactor);
+    addMeasuresField->setFixedSize(20*dpiXFactor,20*dpiYFactor);
+    removeMeasures->setFixedSize(20*dpiXFactor,20*dpiYFactor);
+    removeMeasuresField->setFixedSize(20*dpiXFactor,20*dpiYFactor);
+#endif
+
+    resetMeasures = new QPushButton(tr("Reset to Default"), this);
+    QLabel *warningLabel = new QLabel(tr("Saved changes take effect after restart"));
+
+    // lay it out
+    QVBoxLayout *mainLayout = new QVBoxLayout(this);
+
+    mainLayout->addWidget(mlabel);
+    mainLayout->addWidget(measuresTable);
+    QHBoxLayout *xb = new QHBoxLayout();
+    xb->addStretch();
+    xb->addWidget(editMeasures);
+    xb->addStretch();
+    xb->addWidget(addMeasures);
+    xb->addWidget(removeMeasures);
+    mainLayout->addLayout(xb);
+
+    mainLayout->addWidget(mflabel);
+    mainLayout->addWidget(measuresFieldsTable);
+    QHBoxLayout *xs = new QHBoxLayout();
+    xs->addStretch();
+    xs->addWidget(editMeasuresField);
+    xs->addStretch();
+    xs->addWidget(addMeasuresField);
+    xs->addWidget(removeMeasuresField);
+    mainLayout->addLayout(xs);
+
+    QHBoxLayout *xr = new QHBoxLayout();
+    xr->addWidget(resetMeasures);
+    xr->addStretch();
+    xr->addWidget(warningLabel);
+    mainLayout->addLayout(xr);
+
+    connect(measuresTable, SIGNAL(currentItemChanged(QTreeWidgetItem*,QTreeWidgetItem*)), this, SLOT(measuresSelected()));
+    connect(measuresTable, SIGNAL(itemDoubleClicked(QTreeWidgetItem*, int)), this, SLOT(measuresDoubleClicked(QTreeWidgetItem*, int)));
+    connect(resetMeasures, SIGNAL(clicked()), this, SLOT(resetMeasuresClicked()));
+    connect(editMeasures, SIGNAL(clicked()), this, SLOT(editMeasuresClicked()));
+    connect(removeMeasures, SIGNAL(clicked(bool)), this, SLOT(removeMeasuresClicked()));
+    connect(addMeasures, SIGNAL(clicked(bool)), this, SLOT(addMeasuresClicked()));
+
+    connect(measuresFieldsTable, SIGNAL(itemDoubleClicked(QTreeWidgetItem*, int)), this, SLOT(measuresFieldDoubleClicked(QTreeWidgetItem*, int)));
+    connect(editMeasuresField, SIGNAL(clicked()), this, SLOT(editMeasuresFieldClicked()));
+    connect(removeMeasuresField, SIGNAL(clicked(bool)), this, SLOT(removeMeasuresFieldClicked()));
+    connect(addMeasuresField, SIGNAL(clicked(bool)), this, SLOT(addMeasuresFieldClicked()));
+
+    refreshMeasuresTable();
+}
+
+MeasuresConfigPage::~MeasuresConfigPage()
+{
+    if (measures != nullptr) delete measures;
+}
+
+qint32
+MeasuresConfigPage::saveClicked()
+{
+    measures->saveConfig();
+    return 0;
+}
+
+void
+MeasuresConfigPage::refreshMeasuresTable()
+{
+    // remove existing rows
+    measuresTable->clear();
+
+    // add a row for each measures group
+    foreach (MeasuresGroup* group, measures->getGroups()) {
+
+        QTreeWidgetItem *add = new QTreeWidgetItem(measuresTable->invisibleRootItem());
+        add->setText(0, group->getSymbol());
+        add->setText(1, group->getName());
+
+        measuresTable->setCurrentItem(add); // select the last added
+    }
+    measuresSelected();
+}
+
+void MeasuresConfigPage::measuresSelected()
+{
+    // lets find the one we have selected...
+    int row = measuresTable->invisibleRootItem()->indexOfChild(measuresTable->currentItem());
+    if (row < 0) return; // nothing selected
+
+    // update measures series table to reflect the selection
+    refreshMeasuresFieldsTable();
+}
+
+void
+MeasuresConfigPage::resetMeasuresClicked()
+{
+    // Are you sure ?
+    QMessageBox msgBox;
+    msgBox.setText(tr("Are you sure you want to remove Measures customizations and reset to default configuration?"));
+    msgBox.setInformativeText(tr("This action takes effect immediately and cannot be reverted"));
+    QPushButton *resetButton = msgBox.addButton(tr("Reset"),QMessageBox::YesRole);
+    msgBox.setStandardButtons(QMessageBox::Cancel);
+    msgBox.setDefaultButton(QMessageBox::Cancel);
+    msgBox.setIcon(QMessageBox::Critical);
+    msgBox.exec();
+
+    // nope, don't want to
+    if(msgBox.clickedButton() != resetButton) return;
+
+    QFile::remove(QDir(gcroot).canonicalPath() + "/measures.ini");
+    delete measures;
+    measures = new Measures();
+    refreshMeasuresTable();
+}
+
+void
+MeasuresConfigPage::editMeasuresClicked()
+{
+    measuresDoubleClicked(measuresTable->currentItem(), 0);
+}
+
+void
+MeasuresConfigPage::measuresDoubleClicked(QTreeWidgetItem *item, int)
+{
+    // nothing selected
+    if (item == nullptr) return;
+
+    // find group
+    MeasuresGroup* group = measures->getGroup(measuresTable->invisibleRootItem()->indexOfChild(item));
+
+    // edit
+    QString symbol = group->getSymbol();
+    QString name = group->getName();
+    MeasuresSettingsDialog *dialog = new MeasuresSettingsDialog(this, symbol, name);
+    if (dialog->exec() == QDialog::Accepted) {
+
+        group->setSymbol(symbol);
+        item->setText(0, symbol);
+        group->setName(name);
+        item->setText(1, name);
+    }
+}
+
+void
+MeasuresConfigPage::addMeasuresClicked()
+{
+    QString symbol, name;
+    MeasuresSettingsDialog *dialog = new MeasuresSettingsDialog(this, symbol, name);
+    if (dialog->exec() == QDialog::Accepted) {
+
+        measures->addGroup(new MeasuresGroup(symbol, name, QStringList(), QStringList(), QStringList(), QStringList(), QList<double>(), QList<QStringList>()));
+        refreshMeasuresTable();
+    }
+}
+
+void
+MeasuresConfigPage::removeMeasuresClicked()
+{
+    // lets find the one we have selected...
+    int row = measuresTable->invisibleRootItem()->indexOfChild(measuresTable->currentItem());
+    if (row < 0) return; // nothing selected
+
+    measures->removeGroup(row);
+
+    refreshMeasuresTable();
+}
+
+void
+MeasuresConfigPage::refreshMeasuresFieldsTable()
+{
+    // find the current Measures Group
+    MeasuresGroup* group = measures->getGroup(measuresTable->invisibleRootItem()->indexOfChild(measuresTable->currentItem()));
+    if (group == nullptr) return; // just in case...
+
+    // remove existing rows
+    measuresFieldsTable->clear();
+
+    // lets populate
+    for (int i=0; i<group->getFieldSymbols().count(); i++) {
+
+        QTreeWidgetItem *add = new QTreeWidgetItem(measuresFieldsTable->invisibleRootItem());
+        MeasuresField field = group->getField(i);
+        add->setText(0, field.symbol);
+        add->setText(1, field.name);
+        add->setText(2, field.metricUnits);
+        add->setText(3, field.imperialUnits);
+        add->setText(4, QString::number(field.unitsFactor));
+        add->setText(5, field.headers.join(","));
+
+        measuresFieldsTable->setCurrentItem(add); // select the last added
+    }
+}
+
+void
+MeasuresConfigPage::editMeasuresFieldClicked()
+{
+    measuresFieldDoubleClicked(measuresFieldsTable->currentItem(), 0);
+}
+
+void
+MeasuresConfigPage::measuresFieldDoubleClicked(QTreeWidgetItem *item, int)
+{
+    // nothing selected
+    if (item == nullptr) return;
+
+    // find group
+    MeasuresGroup* group = measures->getGroup(measuresTable->invisibleRootItem()->indexOfChild(measuresTable->currentItem()));
+
+    // find row
+    int row = measuresFieldsTable->invisibleRootItem()->indexOfChild(item);
+
+    // edit
+    MeasuresField field = group->getField(row);
+    MeasuresFieldSettingsDialog *dialog = new MeasuresFieldSettingsDialog(this, field);
+    if (dialog->exec() == QDialog::Accepted) {
+
+        group->setField(row, field);
+        item->setText(0, field.symbol);
+        item->setText(1, field.name);
+        item->setText(2, field.metricUnits);
+        item->setText(3, field.imperialUnits);
+        item->setText(4, QString::number(field.unitsFactor));
+        item->setText(5, field.headers.join(","));
+    }
+}
+
+void
+MeasuresConfigPage::addMeasuresFieldClicked()
+{
+    // lets find the one we have selected...
+    int index=measuresTable->currentIndex().row();
+    if (index <0) return;
+
+    // find group
+    MeasuresGroup* group = measures->getGroup(measuresTable->invisibleRootItem()->indexOfChild(measuresTable->currentItem()));
+    if (group == nullptr) return;
+
+    MeasuresField field;
+    MeasuresFieldSettingsDialog *dialog = new  MeasuresFieldSettingsDialog(this, field);
+    if (dialog->exec() == QDialog::Accepted) {
+
+        group->addField(field);
+        refreshMeasuresFieldsTable();
+    }
+}
+
+void
+MeasuresConfigPage::removeMeasuresFieldClicked()
+{
+    // lets find the one we have selected...
+    int row = measuresFieldsTable->invisibleRootItem()->indexOfChild(measuresFieldsTable->currentItem());
+    if (row < 0) return; // nothing selected
+
+    // find the current Measures Group
+    MeasuresGroup* group = measures->getGroup(measuresTable->invisibleRootItem()->indexOfChild(measuresTable->currentItem()));
+
+    group->removeField(row);
+    refreshMeasuresFieldsTable();
+}
+
+///
+/// MeasuresSettingsDialog
+///
+MeasuresSettingsDialog::MeasuresSettingsDialog(QWidget *parent, QString &symbol, QString &name) : QDialog(parent), symbol(symbol), name(name)
+{
+    setWindowTitle(tr("Measures Group"));
+    setAttribute(Qt::WA_DeleteOnClose);
+    setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint | Qt::Tool);
+
+    QVBoxLayout *mainLayout = new QVBoxLayout(this);
+    QFormLayout *form = new QFormLayout();
+    mainLayout->addLayout(form);
+
+
+    QLabel *symbolLabel = new QLabel(tr("Symbol"), this);
+    symbolEdit = new QLineEdit(this);
+    symbolEdit->setText(symbol);
+    form->addRow(symbolLabel, symbolEdit);
+
+    QLabel *nameLabel = new QLabel(tr("Name"), this);
+    nameEdit = new QLineEdit(this);
+    nameEdit->setText(name);
+    form->addRow(nameLabel, nameEdit);
+
+    form->addRow(new QLabel("",this), new QLabel("", this));
+    mainLayout->addStretch();
+
+    cancelButton = new QPushButton(tr("Cancel"), this);
+    okButton = new QPushButton(tr("OK"), this);
+    QHBoxLayout *buttons = new QHBoxLayout();
+    buttons->addStretch();
+    buttons->addWidget(cancelButton);
+    buttons->addWidget(okButton);
+    mainLayout->addLayout(buttons);
+
+    connect(okButton, SIGNAL(clicked(bool)), this, SLOT(okClicked()));
+    connect(cancelButton, SIGNAL(clicked(bool)), this, SLOT(reject()));
+}
+
+void MeasuresSettingsDialog::okClicked()
+{
+    // lets just check we have something etc
+    if (symbolEdit->text() == "" || nameEdit->text() == "") {
+
+        QMessageBox::warning(this, tr("Error"), tr("Symbol/Name cannot be blank"));
+        return;
+    } else {
+
+        symbol = symbolEdit->text();
+        name = nameEdit->text();
+        accept();
+    }
+}
+
+
+///
+/// MeasuresFieldSettingsDialog
+///
+MeasuresFieldSettingsDialog::MeasuresFieldSettingsDialog(QWidget *parent, MeasuresField &field) : QDialog(parent), field(field)
+{
+    setWindowTitle(tr("Measures Field"));
+    setAttribute(Qt::WA_DeleteOnClose);
+    setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint | Qt::Tool);
+
+    QVBoxLayout *mainLayout = new QVBoxLayout(this);
+    QFormLayout *form = new QFormLayout();
+    mainLayout->addLayout(form);
+
+
+    QLabel *symbolLabel = new QLabel(tr("Symbol"), this);
+    symbolEdit = new QLineEdit(this);
+    symbolEdit->setText(field.symbol);
+    form->addRow(symbolLabel, symbolEdit);
+
+    QLabel *nameLabel = new QLabel(tr("Name"), this);
+    nameEdit = new QLineEdit(this);
+    nameEdit->setText(field.name);
+    form->addRow(nameLabel, nameEdit);
+
+    QLabel *metricUnitsLabel = new QLabel(tr("Metric Units"), this);
+    metricUnitsEdit = new QLineEdit(this);
+    metricUnitsEdit->setText(field.metricUnits);
+    form->addRow(metricUnitsLabel, metricUnitsEdit);
+
+    QLabel *imperialUnitsLabel = new QLabel(tr("Imperial Units"), this);
+    imperialUnitsEdit = new QLineEdit(this);
+    imperialUnitsEdit->setText(field.imperialUnits);
+    form->addRow(imperialUnitsLabel, imperialUnitsEdit);
+
+    QLabel *unitsFactorLabel = new QLabel(tr("Units Conversion"), this);
+    unitsFactorEdit = new QDoubleSpinBox(this);
+    unitsFactorEdit->setDecimals(5);
+    unitsFactorEdit->setValue(field.unitsFactor);
+    form->addRow(unitsFactorLabel, unitsFactorEdit);
+
+    QLabel *headersLabel = new QLabel(tr("CSV Headers"), this);
+    headersEdit = new QLineEdit(this);
+    headersEdit->setText(field.headers.join(","));
+    form->addRow(headersLabel, headersEdit);
+
+    form->addRow(new QLabel("",this), new QLabel("", this));
+    mainLayout->addStretch();
+
+    cancelButton = new QPushButton(tr("Cancel"), this);
+    okButton = new QPushButton(tr("OK"), this);
+    QHBoxLayout *buttons = new QHBoxLayout();
+    buttons->addStretch();
+    buttons->addWidget(cancelButton);
+    buttons->addWidget(okButton);
+    mainLayout->addLayout(buttons);
+
+    connect(okButton, SIGNAL(clicked(bool)), this, SLOT(okClicked()));
+    connect(cancelButton, SIGNAL(clicked(bool)), this, SLOT(reject()));
+}
+
+void MeasuresFieldSettingsDialog::okClicked()
+{
+    // lets just check we have something etc
+    if (symbolEdit->text() == "" || nameEdit->text() == "") {
+
+        QMessageBox::warning(this, tr("Error"), tr("Name/Symbol cannot be blank"));
+
+        return;
+    } else {
+
+        field.symbol = symbolEdit->text();
+        field.name = nameEdit->text();
+        field.metricUnits = metricUnitsEdit->text();
+        field.imperialUnits = imperialUnitsEdit->text();
+        field.unitsFactor = unitsFactorEdit->value();
+        field.headers = headersEdit->text().split(",");
+    }
+
+    accept();
 }

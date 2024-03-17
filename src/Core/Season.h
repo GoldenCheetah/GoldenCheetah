@@ -50,6 +50,66 @@ class SeasonEvent
         QString id; // unique id
 };
 
+class SeasonOffset
+{
+    public:
+        // by default, the offset is invalid
+        SeasonOffset();
+
+        // if different from the default, the offset represent the start
+        // of the season with respect to the year/month/week that
+        // contains the reference date (i.e. either the current date, or
+        // the date of the selected activity)
+        SeasonOffset(int _years, int _months, qint64 _weeks);
+
+        // get the start of the season, or QDate() if the offset is
+        // invalid
+        QDate getStart(QDate reference) const;
+
+    private:
+        // if <=0, offset in years of the season with respect to the
+        // current year
+        // if >0, unused: go to `months`
+        int years;
+
+        // if <=0, offset in months of the season with respect to the
+        // current month
+        // if >0, unused: go to `weeks`
+        int months;
+
+        // if <=0, offset in weeks of the season with respect to the
+        // current week (Qt weeks start on Monday)
+        // if >0, the whole offset is unused (either the season is
+        // fixed, or it ends on the reference day)
+        qint64 weeks;
+
+};
+
+class SeasonLength
+{
+
+    public:
+        // by default, the length is invalid
+        SeasonLength();
+
+        // if different from the default, the length represent the
+        // number of years, months and days from the start to the end,
+        // included (i.e. if start==end, the length is (0,0,1))
+        SeasonLength(int _years, int _months, qint64 _days);
+
+        bool operator==(const SeasonLength& length);
+
+        QDate addTo(QDate start) const;
+        QDate substractFrom(QDate end) const;
+
+    private:
+        // if (0,0,0), the length is invalid (the season is fixed)
+        int years;
+        int months;
+        qint64 days;
+
+};
+
 class Season
 {
     Q_DECLARE_TR_FUNCTIONS(Season)
@@ -61,19 +121,39 @@ class Season
 
         Season();
 
-        QDate getStart();
-        QDate getEnd();
+        // get the date range (if relative, use today as reference)
+        QDate getStart() const ;
+        QDate getEnd() const ;
+        // get the date range (if relative, use the specified date as reference)
+        QDate getStart(QDate reference) const;
+        QDate getEnd(QDate reference) const;
+
         int getSeed() { return _seed; }
         int getLow() { return _low; }
         int getMaxRamp() { return _ramp; }
         QString getName();
-        int days() { return _days; } // how many days in the season, -1 if never ending
-        int prior(); // if a relative season, how many days prior does it cover e.g. Last 21 days returns 21. 0 if not relative
+
+        // length of a relative season, SeasonLength() if fixed
+        SeasonLength getLength() const { return _length; }
+
         int getType();
         static bool LessThanForStarts(const Season &a, const Season &b);
 
+        // make the season fixed (by invalidating _offset and _length)
+        // and set the limits of a fixed season
         void setStart(QDate _start);
         void setEnd(QDate _end);
+
+        // make the season relative (by setting _length; also
+        // invalidates _start and _end) and set the offset of the start
+        // with respect to the reference
+        void setOffsetAndLength(int offetYears, int offsetMonths, qint64 offsetWeeks, int years, int months, qint64 days);
+
+        // make the season relative (by setting _length; also
+        // invalidates _start and _end) and invalidates the offset to
+        // make the season end on the reference
+        void setLength(int years, int months, qint64 days);
+
         void setName(QString _name);
         void setType(int _type);
         void setSeed(int x) { _seed = x; }
@@ -84,8 +164,6 @@ class Season
         QVector<int> &load() { return _load; }
 
         int type;
-        QDate start; // first day of the season
-        QDate end; // last day of the season
 
         QString name; // name, typically users name them by year e.g. "2011 Season"
 
@@ -95,8 +173,10 @@ class Season
         QList<SeasonEvent> events;
 
     protected:
-
-        int _days; // how many days in this season?
+        SeasonOffset _offset; // offset of the start (relative season)
+        SeasonLength _length; // length (relative season)
+        QDate _start; // first day (fixed season)
+        QDate _end; // last day (fixed season)
         int _seed;
         int _low; // low point for SB .. default to -50
         int _ramp; // max ramp rate for CTL we want to see
@@ -168,9 +248,6 @@ class Seasons : public QObject {
         void writeSeasons();
         QList<Season> seasons;
 
-        // get first season the date falls within
-        Season seasonFor(QDate);
-
     signals:
         void seasonsChanged();
 
@@ -187,14 +264,19 @@ class SeasonTreeView : public QTreeWidget
         SeasonTreeView(Context *);
 
         // for drag/drop
-        QStringList mimeTypes () const;
-        QMimeData * mimeData ( const QList<QTreeWidgetItem *> items ) const;
+        QStringList mimeTypes () const override;
+#if QT_VERSION < 0x060000
+        QMimeData *mimeData(const QList<QTreeWidgetItem *> items) const override;
+#else
+        QMimeData *mimeData(const QList<QTreeWidgetItem *> &items) const override;
+#endif
 
     signals:
         void itemMoved(QTreeWidgetItem* item, int previous, int actual);
 
     protected:
-        void dropEvent(QDropEvent* event);
+        void dragEnterEvent(QDragEnterEvent* event) override;
+        void dropEvent(QDropEvent* event) override;
         Context *context;
 
 

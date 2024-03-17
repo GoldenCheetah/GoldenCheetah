@@ -1,3 +1,13 @@
+Update Note: to build GoldenCheetah v3.6 we are using the Homebrew Package
+Manager to install dependencies, including Qt and GSL, on Travis-ci
+macOS Mojave build environment.
+You can check the travis/osx folder for the complete and updated build scripts,
+the minimum Qt version known to work is 5.13 with Qt WebEngine and Qt Charts.
+GSL - GNU Scientific Library is a mandatory dependency starting with v3.6 and
+minimum bison version is 2.7, both can be installed using Homebrew.
+
+Ale Martinez - Oct, 2022
+
                                  +++++++++++++++++++++++
                                 MAC OSX BUILD WALKTHROUGH
                                  +++++++++++++++++++++++
@@ -20,7 +30,6 @@ CONTENTS
 2. ADDING OPTIONAL DEPENDENCIES
    - FTDI D2XX
    - SRMIO
-   - libkml
    - libusb
    - libical
 
@@ -208,6 +217,11 @@ $ cd .. #this should put you in the top level dir containing this file
 $ qmake -recursive
 $ make
 
+When build first time you get number of error messages on .qm files missing:
+    "RCC: Error in 'Resources/application.qrc': Cannot find file 'translations/gc_fr.qm'"
+You can ignore these messages for your build. The .qm files will be created during the
+build at a later point in time via the "lrelease" command you configured in gcconfig.pri)
+
 If make fails to find a Makefile then qmake is configured, by default, to create
 an xcode project file. You will need to change the qmake command above to tell it
 to create a makefile with the following:
@@ -236,7 +250,6 @@ $ open src/GoldenCheetah.app
 ===============================
 
    - SRMIO
-   - libkml
    - libusb
    - libical
 
@@ -251,19 +264,7 @@ should be taken into account.
 SRMIO (git)
 ./configure CFLAGS="-isysroot /Developer/SDKs/MacOSX10.7.sdk -arch x86_64" CPPFLAGS=-I/usr/local/D2XX/ --disable-dependency-tracking
 
-2.2 libkml - For export to Google Earth
----------------------------------------
-
-expat (2.0.1)
-./configure CFLAGS="-isysroot /Developer/SDKs/MacOSX10.7.sdk -arch x86_64" --disable-dependency-tracking 
-
-libkml (pulled down from the svn repo)
-
-./configure CFLAGS="-isysroot /Developer/SDKs/MacOSX10.7.sdk -arch x86_64" --disable-dependency-tracking --with-expat-include-dir=/usr/local/include --with-expat-lib-dir=/usr/local/lib --disable-swig CXXFLAGS="-isysroot /Developer/SDKs/MacOSX10.7.sdk -arch x86_64"
-
-note: the added CXXFLAGS helped clear the -Werror flag that stopped compilation.
-
-2.3 libusb - For Garmin USB2 stick support
+2.2 libusb - For Garmin USB2 stick support
 ------------------------------------------
 
 libusb (0.1.12)
@@ -280,7 +281,7 @@ make install
 
 note: that the sed line updates some commands in libtool.  not sure why the arch clags are not getting passed.  
 
-2.4 libical
+2.3 libical
 -----------
 
 libical (0.46)

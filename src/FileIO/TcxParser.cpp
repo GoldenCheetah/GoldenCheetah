@@ -39,13 +39,6 @@ TcxParser::TcxParser (RideFile* rideFile, QList<RideFile*> *rides) : rideFile(ri
     first = true;
     creator = false;
 
-    // First initialisation for altitude (not initialised for each point)
-    alt= 0;
-    // length-by-length pool swimming XData
-    swimXdata = new XDataSeries();
-    swimXdata->name = "SWIM";
-    swimXdata->valuename << "TYPE";
-    swimXdata->valuename << "DURATION";
 }
 
 bool
@@ -54,6 +47,14 @@ TcxParser::startElement( const QString&, const QString&, const QString& qName, c
     buffer.clear();
 
     if (qName == "Activity") {
+
+        // First initialisation for altitude (not initialised for each point)
+        alt= 0;
+        // length-by-length pool swimming XData
+        swimXdata = new XDataSeries();
+        swimXdata->name = "SWIM";
+        swimXdata->valuename << "TYPE";
+        swimXdata->valuename << "DURATION";
 
         lap = 0;
         for (int i = 0; i < ltLast; ++i)
@@ -129,6 +130,15 @@ TcxParser::endElement( const QString&, const QString&, const QString& qName)
 {
     if (qName == "Time") {
         time = convertToLocalTime(buffer);
+        if (start_time == QDateTime()) {
+
+            // redo initizlization on first trackpoint when Lap start time is missing
+            start_time = time;
+            rideFile->setStartTime(start_time);
+
+            last_distance = 0.0;
+            last_time = start_time;
+        }
         secs = double(start_time.msecsTo(time)) / 1000.00f;
 
     } else if (qName == "DistanceMeters") { distance = buffer.toDouble() / 1000; }
@@ -199,6 +209,7 @@ TcxParser::endElement( const QString&, const QString&, const QString& qName)
         // If sport was Other and we have distance but no GPS data
         // we assume it is a pool swimming activity and first
         // distance is pool length
+        if (swim == MayBeSwim && !badgps) swim = NotSwim; // not a pool swim if we have GPS data
         if (swim == MayBeSwim && badgps && distance > 0) {
             swim = Swim;
             rideFile->setTag("Sport", "Swim");
@@ -271,7 +282,7 @@ TcxParser::endElement( const QString&, const QString&, const QString& qName)
                     p->km = last_distance;
                     p->number[0] = deltaDist > 0 ? 1 : 0;
                     p->number[1] = deltaSecs;
-                    swimXdata->datapoints.append(p);
+                    if (swimXdata) swimXdata->datapoints.append(p);
 
                     for (int i = rideFile->timeIndex(lastLength);
                          i>= 0 && i < rideFile->dataPoints().size() &&
@@ -296,7 +307,7 @@ TcxParser::endElement( const QString&, const QString&, const QString& qName)
                     p->km = last_distance;
                     p->number[0] = deltaDist > 0 ? 1 : 0;
                     p->number[1] = deltaSecs;
-                    swimXdata->datapoints.append(p);
+                    if (swimXdata) swimXdata->datapoints.append(p);
                     lastLength = p->secs + deltaSecs;
                 }
                 // or it is pool swimming and we limit expansion for safety
@@ -360,11 +371,11 @@ TcxParser::endElement( const QString&, const QString&, const QString& qName)
             p->km = last_distance;
             p->number[0] = 0;
             p->number[1] = round(lapSecs);
-            swimXdata->datapoints.append(p);
+            if (swimXdata) swimXdata->datapoints.append(p);
             lastLength = secs + round(lapSecs);
         }
-        // expand even if Smart Recording is not enabled
-        if (swim == Swim && distance == 0) {
+        // expand only if Smart Recording is enabled
+        if (swim == Swim && distance == 0 && isGarminSmartRecording.toInt()) {
             // fill in the pause, partially if too long
             for(int i = 1; i <= round(lapSecs) && i <= 300*GarminHWM.toInt(); i++)
                 rideFile->appendPoint(secs + i,
@@ -415,10 +426,15 @@ TcxParser::endElement( const QString&, const QString&, const QString& qName)
         rideFile->addInterval(RideFileInterval::DEVICE, start, start + lapSecs, name);
     } else if (qName == "Activity") {
         // Add length-by-length Swim XData, if present
-        if (swimXdata->datapoints.count()>0)
+        if (swimXdata && swimXdata->datapoints.count()>0) {
             rideFile->addXData("SWIM", swimXdata);
-        else
+        } else if (swimXdata) {
             delete swimXdata;
+            swimXdata = NULL;
+        }
+    } else if (qName == "Notes") {
+        // Add Notes to metadata
+        rideFile->setTag("Notes", buffer);
     } else if (qName == "Creator") {
         creator = false;
     } else if (creator && qName == "Name") {

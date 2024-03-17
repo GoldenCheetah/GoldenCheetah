@@ -22,6 +22,7 @@ bool ZwoParser::startDocument()
 {
     buffer.clear();
     secs = 0;
+    sSecs = 0;
     watts = 0;
     return true;
 }
@@ -52,6 +53,7 @@ ZwoParser::startElement(const QString &, const QString &, const QString &qName, 
     double PowerLow = attrs.value("PowerLow").toDouble();
     double PowerHigh = attrs.value("PowerHigh").toDouble();
     double Power = attrs.value("Power").toDouble();
+    bool ftpTest = attrs.value("ftptest").toInt();
 
     // Either Power or PowerLow / PowerHigh are available
     // PowerHigh may be optional and should be same as low.
@@ -66,7 +68,7 @@ ZwoParser::startElement(const QString &, const QString &, const QString &qName, 
     // POINTS
 
     // basic from/to, with different names for some odd reason
-    if (qName == "Warmup" || qName == "SteadyState"  || qName == "Cooldown" || qName == "FreeRide") {
+    if (qName == "Warmup" || qName == "SteadyState"  || qName == "Cooldown" || qName == "Ramp" || qName == "FreeRide" || qName == "Freeride") {
 
         int from = int(100.0 * PowerLow);
         int to = int(100.0 * PowerHigh);
@@ -77,8 +79,9 @@ ZwoParser::startElement(const QString &, const QString &, const QString &qName, 
             from = to = ap;
         }
 
-        if (qName == "FreeRide") {
-            if (watts == 0) from = to = 70;
+        if (qName == "FreeRide" || qName == "Freeride") {
+            if (ftpTest) from = to = 100; // if marked as FTP test, assume 100%
+            else if (watts == 0) from = to = 70;
             else from = to = watts; // whatever we were just doing keep doing it
         }
 
@@ -87,6 +90,7 @@ ZwoParser::startElement(const QString &, const QString &, const QString &qName, 
             points << ErgFilePoint(secs * 1000, from, from);
             watts = from;
         }
+        sSecs = secs;
         secs += Duration;
         points << ErgFilePoint(secs * 1000, to, to);
         watts = to;
@@ -125,6 +129,7 @@ ZwoParser::startElement(const QString &, const QString &, const QString &qName, 
 
 
 
+        sSecs = secs;
         while (count--) {
 
             // add if not already on that wattage
@@ -156,8 +161,10 @@ ZwoParser::startElement(const QString &, const QString &, const QString &qName, 
     } else if (qName == "textevent") {
         int offset = attrs.value("timeoffset").toInt();
         QString message=attrs.value("message");
+        int duration = attrs.value("duration").toInt();
         int pos = attrs.value("y").toInt();
-        texts << ErgFileText((secs+offset) * 1000, pos, message);
+        if (pos >= 240) pos -= 240; // no position, use excess as delay
+        texts << ErgFileText((sSecs+offset+pos)*1000, duration, message);
     }
 
     // and clear anything left in the buffer

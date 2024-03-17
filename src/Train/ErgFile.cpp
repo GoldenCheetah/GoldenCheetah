@@ -29,6 +29,8 @@
 #include "Units.h"
 #include "Utils.h"
 
+#include "TTSReader.h"
+
 // Supported file types
 static QStringList supported;
 static bool setSupported()
@@ -39,6 +41,10 @@ static bool setSupported()
     ::supported << ".pgmf";
     ::supported << ".zwo";
     ::supported << ".gpx";
+    ::supported << ".tts";
+    ::supported << ".json";
+    ::supported << ".erg2";
+
     return true;
 }
 static bool isinit = setSupported();
@@ -51,20 +57,20 @@ bool ErgFile::isWorkout(QString name)
     return false;
 }
 ErgFile::ErgFile(QString filename, int mode, Context *context) :
-    filename(filename), mode(mode), context(context)
+    filename(filename), mode(mode), StrictGradient(true), fHasGPS(false), context(context)
 {
-    if (context->athlete->zones(false)) {
-        int zonerange = context->athlete->zones(false)->whichRange(QDateTime::currentDateTime().date());
-        if (zonerange >= 0) CP = context->athlete->zones(false)->getCP(zonerange);
+    if (context->athlete->zones("Bike")) {
+        int zonerange = context->athlete->zones("Bike")->whichRange(QDateTime::currentDateTime().date());
+        if (zonerange >= 0) CP = context->athlete->zones("Bike")->getCP(zonerange);
     }
     reload();
 }
 
-ErgFile::ErgFile(Context *context) : mode(0), context(context)
+ErgFile::ErgFile(Context *context) : mode(0), StrictGradient(true), fHasGPS(false), context(context)
 {
-    if (context->athlete->zones(false)) {
-        int zonerange = context->athlete->zones(false)->whichRange(QDateTime::currentDateTime().date());
-        if (zonerange >= 0) CP = context->athlete->zones(false)->getCP(zonerange);
+    if (context->athlete->zones("Bike")) {
+        int zonerange = context->athlete->zones("Bike")->whichRange(QDateTime::currentDateTime().date());
+        if (zonerange >= 0) CP = context->athlete->zones("Bike")->getCP(zonerange);
     } else {
         CP = 300;
     }
@@ -90,7 +96,10 @@ ErgFile *
 ErgFile::fromContent(QString contents, Context *context)
 {
     ErgFile *p = new ErgFile(context);
+
     p->parseComputrainer(contents);
+    p->finalize();
+
     return p;
 }
 
@@ -98,20 +107,30 @@ ErgFile *
 ErgFile::fromContent2(QString contents, Context *context)
 {
     ErgFile *p = new ErgFile(context);
+
     p->parseErg2(contents);
+    p->finalize();
+
     return p;
 }
 
 void ErgFile::reload()
 {
+    // All file endings that can be loaded as ergfile from rideFileFactory.
+    // Actual permitted file types are controlled by ::supported list at
+    // top of this file.
+    QRegExp fact(".+[.](gpx|json)$", Qt::CaseInsensitive);
+
     // which parser to call? NOTE: we should look at moving to an ergfile factory
     // like we do with ride files if we end up with lots of different formats
-    if (filename.endsWith(".pgmf", Qt::CaseInsensitive)) parseTacx();
-    else if (filename.endsWith(".zwo", Qt::CaseInsensitive)) parseZwift();
-    else if (filename.endsWith(".gpx", Qt::CaseInsensitive)) parseGpx();
-    else if (filename.endsWith(".erg2", Qt::CaseInsensitive)) parseErg2();
+    if      (filename.endsWith(".pgmf",   Qt::CaseInsensitive)) parseTacx();
+    else if (filename.endsWith(".zwo",    Qt::CaseInsensitive)) parseZwift();
+    else if (fact.exactMatch(filename))                         parseFromRideFileFactory();
+    else if (filename.endsWith(".erg2",   Qt::CaseInsensitive)) parseErg2();
+    else if (filename.endsWith(".tts",    Qt::CaseInsensitive)) parseTTS();
     else parseComputrainer();
 
+    finalize();
 }
 
 void ErgFile::parseZwift()
@@ -122,14 +141,13 @@ void ErgFile::parseZwift()
     Filename = "";
     Name = "";
     Duration = -1;
-    Ftp = 0;            // FTP this file was targetted at
-    MaxWatts = 0;       // maxWatts in this ergfile (scaling)
-    valid = false;             // did it parse ok?
-    rightPoint = leftPoint = 0;
-    interpolatorReadIndex = 0;
-    format = ERG; // default to couse until we know
+    Ftp = 0;       // FTP this file was targetted at
+    MaxWatts = 0;  // maxWatts in this ergfile (scaling)
+    valid = false; // did it parse ok?
+    mode = format = ERG;  // default to couse until we know
     Points.clear();
     Laps.clear();
+    Texts.clear();
 
     // parse the file
     QFile zwo(filename);
@@ -149,9 +167,9 @@ void ErgFile::parseZwift()
 
     // extract contents into ErgFile....
     // each watts value is in percent terms so apply CP
-    // and put into out format
+    // and put into our format as integer
     foreach(ErgFilePoint p, handler.points) {
-        double watts = p.y * CP / 100.0;
+        double watts = int(p.y * CP / 100.0);
         Points << ErgFilePoint(p.x, watts, watts);
         if (watts > MaxWatts) MaxWatts = watts;
         Duration = p.x;
@@ -163,9 +181,6 @@ void ErgFile::parseZwift()
     if (Points.count()) {
         valid = true;
         Duration = Points.last().x;      // last is the end point in msecs
-        leftPoint = 0;
-        rightPoint = 1;
-        interpolatorReadIndex = 0;
 
         // calculate climbing etc
         calculateMetrics();
@@ -181,14 +196,13 @@ void ErgFile::parseErg2(QString p)
     Filename = "";
     Name = "";
     Duration = -1;
-    Ftp = 0;            // FTP this file was targetted at
-    MaxWatts = 0;       // maxWatts in this ergfile (scaling)
-    valid = false;             // did it parse ok?
-    rightPoint = leftPoint = 0;
-    interpolatorReadIndex = 0;
-    format = ERG; // default to couse until we know
+    Ftp = 0;       // FTP this file was targetted at
+    MaxWatts = 0;  // maxWatts in this ergfile (scaling)
+    valid = false; // did it parse ok?
+    mode = format = ERG;  // default to couse until we know
     Points.clear();
     Laps.clear();
+    Texts.clear();
 
     // open the file
     if (p == "" && ergFile.open(QIODevice::ReadOnly | QIODevice::Text) == false) {
@@ -225,10 +239,12 @@ void ErgFile::parseErg2(QString p)
                 add.val = add.y = int((segment.at(2).toDouble() /100.00) * CP);
                 Points.append(add);
             }
-        }
+            // set ErgFile duration
+            Duration = Points.last().x;      // last is the end point in msecs
 
-        qDebug() << "document" << object["title"];
-        valid = true;
+            valid = true;
+            calculateMetrics();
+        }
     }
 }
 
@@ -240,14 +256,13 @@ void ErgFile::parseTacx()
     Filename = "";
     Name = "";
     Duration = -1;
-    Ftp = 0;            // FTP this file was targetted at
-    MaxWatts = 0;       // maxWatts in this ergfile (scaling)
-    valid = false;             // did it parse ok?
-    rightPoint = leftPoint = 0;
-    interpolatorReadIndex = 0;
-    format = CRS; // default to couse until we know
+    Ftp = 0;        // FTP this file was targetted at
+    MaxWatts = 0;   // maxWatts in this ergfile (scaling)
+    valid = false;  // did it parse ok?
+    format = CRS;   // default to couse until we know
     Points.clear();
     Laps.clear();
+    Texts.clear();
 
     // running totals
     double rdist = 0; // running total for distance
@@ -401,13 +416,17 @@ void ErgFile::parseTacx()
     // if we got here and are still happy then it
     // must have been a valid file.
     if (happy) {
+        // Set the end point for the workout
+        ErgFilePoint end;
+        end.x = rdist;
+        end.y = Points.last().y;
+        end.val = Points.last().val;
+        Points.append(end);
+
         valid = true;
 
         // set ErgFile duration
         Duration = Points.last().x;      // last is the end point in msecs
-        leftPoint = 0;
-        rightPoint = 1;
-        interpolatorReadIndex = 0;
 
         // calculate climbing etc
         calculateMetrics();
@@ -418,11 +437,11 @@ void ErgFile::parseComputrainer(QString p)
 {
     QFile ergFile(filename);
     int section = NOMANSLAND;            // section 0=init, 1=header data, 2=course data
-    leftPoint=rightPoint=0;
     MaxWatts = Ftp = 0;
     int lapcounter = 0;
     format = ERG;                         // either ERG or MRC
     Points.clear();
+    Texts.clear();
 
     // start by assuming the input file is Metric
     bool bIsMetric = true;
@@ -441,6 +460,8 @@ void ErgFile::parseComputrainer(QString p)
     QRegExp endHeader("^.*\\[END COURSE HEADER\\].*$", Qt::CaseInsensitive);
     QRegExp startData("^.*\\[COURSE DATA\\].*$", Qt::CaseInsensitive);
     QRegExp endData("^.*\\[END COURSE DATA\\].*$", Qt::CaseInsensitive);
+    QRegExp startText("^.*\\[COURSE TEXT\\].*$", Qt::CaseInsensitive);
+    QRegExp endText("^.*\\[END COURSE TEXT\\].*$", Qt::CaseInsensitive);
     // ignore whitespace and support for ';' comments (a GC extension)
     QRegExp ignore("^(;.*|[ \\t\\n]*)$", Qt::CaseInsensitive);
     // workout settings
@@ -462,6 +483,16 @@ void ErgFile::parseComputrainer(QString p)
     // Lap marker in an ERG/MRC file
     QRegExp lapmarker("^[ \\t]*([0-9\\.]+)[ \\t]*LAP[ \\t\\n]*(.*)$", Qt::CaseInsensitive);
     QRegExp crslapmarker("^[ \\t]*LAP[ \\t\\n]*(.*)$", Qt::CaseInsensitive);
+
+    // text cue records - try and be flexible about formatting:
+    // sol <number> <whitespace> <text including whitespace and numbers> <whitespace> <number> <optional whitespace> eol
+    //
+    // there is no standard, so we need to try our best to accomodate different formats and trim
+    // the text to remove any whitespace before and after it when displaying to the user
+    //
+    // since we only match with this expression when in text section there is no need to worry
+    // about it clashing with any other rows which helps.
+    QRegExp textCue("^([0-9\\.]+)[ \\t]*(.*)[ \\t]([0-9]+)[ \\t\\n]*$", Qt::CaseInsensitive);
 
     // ok. opened ok lets parse.
     QTextStream inputStream(&ergFile);
@@ -493,6 +524,10 @@ void ErgFile::parseComputrainer(QString p)
             } else if (startData.exactMatch(line)) {
                 section = DATA;
             } else if (endData.exactMatch(line)) {
+                section = END;
+            } else if (startText.exactMatch(line)) {
+                section = TEXTS;
+            } else if (endText.exactMatch(line)) {
                 section = END;
             } else if (ergformat.exactMatch(line)) {
                 // save away the format
@@ -576,7 +611,7 @@ void ErgFile::parseComputrainer(QString p)
                 case MRC:       // its a percent relative to CP (mrc file)
                     add.y *= CP;
                     add.y /= 100.00;
-                    add.val = add.y;
+                    add.val = add.y = int(add.y);
                     break;
                 }
                 Points.append(add);
@@ -597,7 +632,7 @@ void ErgFile::parseComputrainer(QString p)
 
                 // distance guff
                 add.x = rdist;
-                int distance = absoluteSlope.cap(1).toDouble() * 1000; // convert to meters
+                double distance = absoluteSlope.cap(1).toDouble() * 1000.; // convert to meters
 
                 if (!bIsMetric) distance *= KM_PER_MILE;
                 rdist += distance;
@@ -605,7 +640,7 @@ void ErgFile::parseComputrainer(QString p)
                 // gradient and altitude
                 add.val = absoluteSlope.cap(2).toDouble();
                 add.y = ralt;
-                ralt += distance * add.val / 100; /* paused */
+                ralt += distance * add.val / 100.; /* paused */
 
                 Points.append(add);
                 if (add.y > MaxWatts) MaxWatts=add.y;
@@ -613,6 +648,12 @@ void ErgFile::parseComputrainer(QString p)
 
             } else if (ignore.exactMatch(line)) {
                 // do nothing for this line
+
+            } else if (section == TEXTS && textCue.exactMatch(line)) {
+                // x, text cue, duration
+                double x = textCue.cap(1).toDouble() * 1000.; // convert to msecs or m
+                int duration = textCue.cap(3).toInt(); // duration in secs
+                Texts<<ErgFileText(x, duration, textCue.cap(2).trimmed());
             } else {
               // ignore bad lines for now. just bark.
               //qDebug()<<"huh?" << line;
@@ -631,6 +672,7 @@ void ErgFile::parseComputrainer(QString p)
         if (mode == CRS) {
             // Add the last point for a crs file
             ErgFilePoint add;
+
             add.x = rdist;
             add.val = 0.0;
             add.y = ralt;
@@ -640,6 +682,7 @@ void ErgFile::parseComputrainer(QString p)
             // Add a final meta-lap at the end - causes the system to correctly mark off laps.
             // An improvement would be to check for a lap marker at end, and only add this if required.
             ErgFileLap lap;
+
             lap.x = rdist;
             lap.LapNum = ++lapcounter;
             lap.selected = false;
@@ -650,6 +693,7 @@ void ErgFile::parseComputrainer(QString p)
         // add a start point if it doesn't exist
         if (Points.at(0).x > 0) {
             ErgFilePoint add;
+
             add.x = 0;
             add.y = Points.at(0).y;
             add.val = Points.at(0).val;
@@ -659,10 +703,6 @@ void ErgFile::parseComputrainer(QString p)
         // set ErgFile duration
         Duration = Points.last().x;      // last is the end point in msecs
 
-        leftPoint = 0;
-        rightPoint = 1;
-        interpolatorReadIndex = 0;
-
         calculateMetrics();
 
     } else {
@@ -670,8 +710,13 @@ void ErgFile::parseComputrainer(QString p)
     }
 }
 
-// parse gpx into ergfile
-void ErgFile::parseGpx()
+// Parse anything that the ridefile factory knows how to load
+// and which contains gps data, altitude or slope.
+//
+// File types supported:
+// .gpx     GPS Track
+// .json    GoldenCheetah JSON
+void ErgFile::parseFromRideFileFactory()
 {
     // Initialise
     Version = "";
@@ -679,33 +724,31 @@ void ErgFile::parseGpx()
     Filename = "";
     Name = "";
     Duration = -1;
-    Ftp = 0;            // FTP this file was targetted at
-    MaxWatts = 0;       // maxWatts in this ergfile (scaling)
-    valid = false;             // did it parse ok?
-    rightPoint = leftPoint = 0;
-    interpolatorReadIndex = 0;
+    Ftp = 0;       // FTP this file was targetted at
+    MaxWatts = 0;  // maxWatts in this ergfile (scaling)
+    valid = false; // did it parse ok?
     format = mode = CRS;
     Points.clear();
     Laps.clear();
+    Texts.clear();
+
+    // TTS File Gradient Should be smoothly interpolated from Altitude.
+    StrictGradient = false;
 
     static double km = 0;
 
     QFile gpxFile(filename);
 
-    // open the file
-    if (gpxFile.open(QIODevice::ReadOnly | QIODevice::Text) == false) {
+    // check file exists
+    if (!gpxFile.exists()) {
         valid = false;
         return;
     }
 
-    // Instantiate ride
-    //RideFile *RideFileFactory::openRideFile(Context *context, QFile &file,
-    //    QStringList &errors, QList<RideFile*> *rideList) const
-
+    // instantiate ride
     QStringList errors_;
     RideFile* ride = RideFileFactory::instance().openRideFile(context, gpxFile, errors_);
-    if (ride == NULL)
-    {
+    if (ride == NULL) {
         valid = false;
         return;
     }
@@ -716,11 +759,7 @@ void ErgFile::parseGpx()
     bool fHasLon   = ride->areDataPresent()->lon;
     bool fHasAlt   = ride->areDataPresent()->alt;
     bool fHasSlope = ride->areDataPresent()->slope;
-
-    if (fHasLat && fHasLon)
-    {
-        format = mode = CRS_LOC;
-    }
+    fHasGPS   = fHasLat && fHasLon;
 
     if (fHasKm && fHasSlope) {}     // same as crs file
     else if (fHasKm && fHasAlt) {}  // derive slope from distance and alt
@@ -740,6 +779,10 @@ void ErgFile::parseGpx()
 
         prevPoint = point;
         point = nextPoint;
+
+        if (!point)
+            break;
+
         nextPoint = ((i + 1) < pointCount) ? (ride->dataPoints()[i + 1]) : NULL;
 
         // Determine slope to next point
@@ -764,19 +807,40 @@ void ErgFile::parseGpx()
             double km1 = nextPoint->km;
             double alt1 = nextPoint->alt / 1000;
 
-            slope = 100 * (alt1 - alt0) / (km1 - km0);
+            double rise = alt1 - alt0;
+            double h = km1 - km0;
+
+            slope = 100 * (rise / (sqrt(h * h - rise * rise)));
         }
 
         add.x   = 1000 * point->km; // record distance in meters
         add.y   = alt;
         add.val = slope;
 
-        if (fHasLat) add.lat = point->lat;
-        if (fHasLon) add.lon = point->lon;
+        if (fHasGPS) {
+            add.lat = point->lat;
+            add.lon = point->lon;
+        }
 
         if (add.y > MaxWatts) MaxWatts = add.y;
 
         Points.append(add);
+    }
+
+    // Add intervals as lap markers and text cues
+    int i = 0;
+    foreach(const RideFileInterval* lap, ride->intervals()) {
+        double x = ride->timeToDistance(lap->start) * 1000.0;
+        double y = ride->timeToDistance(lap->stop) * 1000.0;
+        int duration = lap->stop - lap->start + 1;
+        if (x > 0 && duration > 0 && !lap->name.isEmpty()) {
+            // In order to support navigation, each interval is converted into
+            // two laps that are linked by sharing a non-zero group id.
+            Laps<<ErgFileLap(x, 2*i+1, i+1, lap->name);
+            Laps<<ErgFileLap(y, 2*i+2, i+1, "");
+            i++;
+            Texts<<ErgFileText(x, duration, lap->name);
+        }
     }
 
     gpxFile.close();
@@ -786,13 +850,307 @@ void ErgFile::parseGpx()
     // set ErgFile duration
     Duration = Points.last().x;      // end point in meters
 
-    leftPoint = 0;                   // setup initial sample bracketing
-    rightPoint = 1;
-    interpolatorReadIndex = 0;
+    // calculate climbing etc
+    calculateMetrics();
+}
+
+// Parse TTS into ergfile
+void ErgFile::parseTTS()
+{
+    // Initialise
+    Version = "";
+    Units = "";
+    Filename = "";
+    Name = "";
+    Duration = -1;
+    Ftp = 0;       // FTP this file was targetted at
+    MaxWatts = 0;  // maxWatts in this ergfile (scaling)
+    valid = false; // did it parse ok?
+    format = mode = CRS;
+    Points.clear();
+    Laps.clear();
+    Texts.clear();
+
+    // TTS File Gradient Should be smoothly interpolated from Altitude.
+    StrictGradient = false;
+
+    QFile ttsFile(filename);
+    if (ttsFile.open(QIODevice::ReadOnly) == false) {
+        valid = false;
+       return;
+    }
+    QStringList errors_;
+
+    QDataStream qttsStream(&ttsFile);
+    qttsStream.setByteOrder(QDataStream::LittleEndian);
+
+    NS_TTSReader::TTSReader ttsReader;
+    bool success = ttsReader.parseFile(qttsStream);
+    if (!success) {
+        valid = false;
+        return;
+    }
+
+    const std::vector<NS_TTSReader::Point> &ttsPoints = ttsReader.getPoints();
+    int pointCount = (int)ttsPoints.size();
+    if (pointCount < 2) {
+        valid = false;
+        return;
+    }
+
+    // Enumerate the data types that are available.
+    bool fHasKm    = ttsReader.hasKm();
+    bool fHasAlt   = ttsReader.hasElevation();
+    bool fHasSlope = ttsReader.hasGradient();
+    fHasGPS   = ttsReader.hasGPS();
+
+    if (fHasKm && fHasSlope) {}     // same as crs file
+    else if (fHasKm && fHasAlt) {}  // derive slope from distance and alt
+    else {
+        valid = false;
+        return;
+    }
+
+    Name = QString::fromStdWString(ttsReader.getRouteName());               // description in file
+    Description = QString::fromStdWString(ttsReader.getRouteDescription()); // long narrative for workout
+
+    const NS_TTSReader::Point *prevPoint, *point, *nextPoint;
+
+    prevPoint = NULL;
+    point = NULL;
+    nextPoint = &ttsPoints[0];
+
+    double alt = 0;
+    if (fHasAlt) {
+        alt = ttsPoints[0].getElevation();
+    }
+
+    for (int i = 0; i < pointCount; i++) { // first data point is actually the last...
+        ErgFilePoint add;
+
+        prevPoint = point;
+        point = nextPoint;
+
+        if (!point)
+            break;
+
+        nextPoint = ((i + 1) >= pointCount) ? &ttsPoints[i] : &ttsPoints[i + 1];
+
+        // Determine slope to next point
+        double slope = 0.0;
+
+        if (fHasAlt) {
+            alt = point->getElevation();
+        }
+
+        if (fHasSlope) {
+            slope = point->getGradient();
+            if (!fHasAlt && prevPoint)
+            {
+                alt += ((slope * (point->getDistanceFromStart() - prevPoint->getDistanceFromStart()))) / 100.0;
+            }
+        } else if (nextPoint && fHasAlt) {
+            double km0 = (i == 0) ? 0 : point->getDistanceFromStart(); // first entry holds total distance
+            double alt0 = point->getElevation();
+        
+            double km1 = nextPoint->getDistanceFromStart();
+            double alt1 = nextPoint->getElevation();
+        
+            double rise = alt1 - alt0;
+            double h = km1 - km0;
+
+            slope = 100 * (rise / (sqrt(h*h - rise * rise)));
+        }
+
+        add.x = point->getDistanceFromStart(); // record distance in meters
+        add.y = alt;
+        add.val = slope;
+
+        if (fHasGPS) {
+            add.lat = point->getLatitude();
+            add.lon = point->getLongitude();
+        }
+
+        if (add.y > MaxWatts) MaxWatts = add.y;
+
+        Points.append(add);
+    }
+
+    // There is an outlier near the end of T1956.54 Alpine Classic I that will
+    // cause 4.01m of videosync skew because it incorrectly extends max ride
+    // distance. This is caused because an outlier point near the end has a
+    // distance that exceeds the final route distance.
+    //
+    // 1
+    // 1.3
+    // 7    <--- Outlier
+    // 1.6
+    // 1.8
+    // 2
+    // -- end --
+    //
+    // When an outlier distance appears towards the end it can skew all of videosync,
+    // so its important to remove those points. In above case route distance would be
+    // seen as 7 but videosync intended max distance to be 1.3. If the '7' point is
+    // left in the entire videosync will be skewed by +5m.
+    //
+    // There are lots of complicated ways to remediate this issue but none
+    // are perfect.
+    //
+    // Approach taken here is to identify and rewrite distance of all single point
+    // outliers.
+    //
+    // We consider two sorts of outlier:
+    //
+    //   Negative Outlier:
+    //
+    //   A negative outlier is a single point that is less than both its successor
+    //   and its predecessor.
+    //
+    //   1
+    //   2
+    //   0 <- negative outlier
+    //   4
+    //   5
+    //
+    //   Postive outlier:
+    //
+    //   A positive outlier is a single point that is higher than its predecessor and
+    //   its successor, and the successor is greater than the predecessor.
+    //
+    //   1
+    //   2
+    //   5 <- positive outlier
+    //   4
+    //   6
+    //
+    //   These two cases occur on tacx tts files and can be easily and cleanly handled - so we do.
+
+    double predDistance = Points[0].x;
+    double curDistance = Points[1].x;
+    double nextDistance;
+    int count = Points.size();
+    for (int i = 1; i < count - 1; i++) {
+        nextDistance = Points[i + 1].x;
+
+        bool fIsNegativeOutlier = curDistance < predDistance && predDistance < nextDistance;
+        bool fIsPositiveOutlier = nextDistance < curDistance&& curDistance > predDistance && predDistance <= nextDistance;
+
+        if (fIsNegativeOutlier || fIsPositiveOutlier) {
+
+            double newDistance = (nextDistance + predDistance) / 2.;
+
+            qDebug() << curDistance << (fIsNegativeOutlier ? ": NegativeOutlier " : ": PositiveOutlier ") << "rewriting to " << newDistance;
+
+            curDistance = newDistance;
+
+            Points[i].x = curDistance;
+        }
+
+        predDistance = curDistance;
+        curDistance = nextDistance;
+    }
+
+    // Altitude is interpolated if there is slope. Actually this slope is
+    // smooth so we might consider it usable (even though its wrong.)
+    if (fHasSlope) {
+        fHasAlt = true;
+    }
+
+    // Populate lap and text lists with route and segment info from tts.
+    // Push everything in segment order, then sort by location.
+    std::vector<NS_TTSReader::Segment> segments = ttsReader.getSegments();
+    int segmentCount = (int)segments.size();
+    if (segmentCount) {
+        std::sort(segments.begin(), segments.end(), [](const NS_TTSReader::Segment& a, const NS_TTSReader::Segment& b) {
+            // Segment sort order:
+            // 1) Start Distance, first comes first
+            // 2) Segment Distance, longest comes first
+            if (a.startKM != b.startKM) return a.startKM < b.startKM;
+            return (a.endKM - a.startKM) > (b.endKM - b.startKM);
+        });
+
+        // Now segments are sorted by start and longer duration.
+
+        for (int i = 0; i < segmentCount; i++) {
+            const NS_TTSReader::Segment& segment = segments[i];
+
+            // Truncate distances to meter precision for text name.
+            int segmentStart = (int)(segment.startKM * 1000);
+            int segmentEnd = (int)(segment.endKM * 1000);
+
+            std::wstring rangeString = L" ["
+                + std::to_wstring(segmentStart)
+                + L"m ->"
+                + std::to_wstring(segmentEnd)
+                + L"m]";
+
+            // Populate Texts with segment text.
+            if (segment.name.length() + segment.description.length() > 0) {
+                QString text(QString::fromStdWString(
+                    segment.name + L": " +
+                    segment.description +
+                    rangeString));
+
+                double x = segment.startKM * 1000.;
+                int duration = (segment.endKM - segment.startKM) * 1000.;
+                Texts << ErgFileText(x, duration, text);
+            }
+
+            // Populate Laps with segment info.
+            // In order to support navigation, each segment is converted into
+            // two laps that are linked by sharing a non-zero group id.
+            Laps << ErgFileLap(segment.startKM * 1000., (2 * i) + 1, i + 1,
+                QString::fromStdWString(segment.name));
+
+            Laps << ErgFileLap(segment.endKM * 1000, (2 * i) + 2, i + 1, "");
+        }
+    }
+
+    // The following sort preserves segment overlap. If A is a superset of B then order will be:
+    // - start A
+    // - start B
+    // - end B
+    // - end A
+    //
+    // For cases of partial overlap of A then B it will do:
+    // - Start A
+    // - Start B
+    // - End A
+    // - End B
+
+    // Sort laps and texts
+    sortLaps();
+    sortTexts();
+
+    // This is load time so debug print isn't so expensive.
+    // Laps seem pretty buggy right now. Lets debug print the data
+    // to help people figure out what is happening.
+    int xx = 0;
+    qDebug() << "LAPS:";
+    for (const auto &a : Laps) {
+        qDebug() << xx << ": " << a.LapNum << " start:" << a.x / 1000. << "km, rangeId: " << a.lapRangeId << "km, name: " << a.name;
+        xx++;
+    }
+
+    qDebug() << "TEXTS:";
+    xx = 0;
+    for (const auto &a : Texts) {
+        qDebug() << xx << ": " << a.x / 1000. << " duration: " << a.duration << " text:" << a.text;
+        xx++;
+    }
+
+    ttsFile.close();
+
+    valid = true;
+
+    // set ErgFile duration
+    Duration = Points.last().x;      // end point in meters
 
     // calculate climbing etc
     calculateMetrics();
 }
+
 
 // convert points to set of sections
 QList<ErgFileSection>
@@ -822,7 +1180,7 @@ ErgFile::save(QStringList &errors)
 {
     // save the file including changes
     // XXX TODO we don't support writing pgmf or CRS just yet...
-    if (filename.endsWith("pgmf", Qt::CaseInsensitive) || format == CRS || format == CRS_LOC) {
+    if (filename.endsWith("pgmf", Qt::CaseInsensitive) || format == CRS) {
         errors << QString(QObject::tr("Unsupported file format"));
         return false;
     }
@@ -832,14 +1190,13 @@ ErgFile::save(QStringList &errors)
     if (format==ERG) typestring = "ERG";
     if (format==MRC) typestring = "MRC";
     if (format==CRS) typestring = "CRS";
-    if (format == CRS_LOC) typestring = "CRS";
     if (filename.endsWith("zwo", Qt::CaseInsensitive)) typestring="ZWO";
 
     // get CP so we can scale back etc
     int CP=0;
-    if (context->athlete->zones(false)) {
-        int zonerange = context->athlete->zones(false)->whichRange(QDateTime::currentDateTime().date());
-        if (zonerange >= 0) CP = context->athlete->zones(false)->getCP(zonerange);
+    if (context->athlete->zones("Bike")) {
+        int zonerange = context->athlete->zones("Bike")->whichRange(QDateTime::currentDateTime().date());
+        if (zonerange >= 0) CP = context->athlete->zones("Bike")->getCP(zonerange);
     }
 
     // MRC and ERG formats are ok
@@ -858,7 +1215,9 @@ ErgFile::save(QStringList &errors)
 
         // setup output stream to file
         QTextStream out(&f);
+#if QT_VERSION < 0x060000
         out.setCodec("UTF-8");
+#endif
 
         // write the header
         //
@@ -939,6 +1298,17 @@ ErgFile::save(QStringList &errors)
         }
 
         out << "[END COURSE DATA]\n";
+
+        // TEXTS in TrainerRoad compatible format
+        if (Texts.count() > 0) {
+            out << "[COURSE TEXT]\n";
+            foreach(ErgFileText cue, Texts)
+                out <<QString("%1\t%2\t%3\n").arg(cue.x/1000)
+                                             .arg(cue.text)
+                                             .arg(cue.duration);
+            out << "[END COURSE TEXT]\n";
+        }
+
         f.close();
 
     }
@@ -957,7 +1327,9 @@ ErgFile::save(QStringList &errors)
 
         // setup output stream to file
         QTextStream out(&f);
+#if QT_VERSION < 0x060000
         out.setCodec("UTF-8");
+#endif
 
         // write the header
         //
@@ -993,6 +1365,8 @@ ErgFile::save(QStringList &errors)
         out << "[COURSE DATA]\n";
 
         bool first=true;
+        long lastLap = 0;
+        double lastPointX = 0;
         foreach(ErgFilePoint p, Points) {
 
             // output watts as a percent of CP
@@ -1001,6 +1375,22 @@ ErgFile::save(QStringList &errors)
 
             // we scale back if needed
             if (CP) watts = (double(p.y)/CP) * 100.0f;
+
+            // check if a lap marker should be inserted
+            foreach(ErgFileLap l, Laps) {
+                bool addLap = false;
+                if (l.x == p.x && lastLap != l.x) {
+                    // this is the case where a lap marker matches a load marker
+                    addLap = true;
+                } else if (l.x > lastPointX && l.x < p.x) {
+                    // this is the case when a lap marker exist between two load markers
+                    addLap = true;
+                }
+                if (addLap) {
+                    out <<QString("%1    LAP\n").arg(minutes, 0, 'f', 2);
+                    lastLap = l.x;
+                }
+            }
 
             if (first) {
                 first=false;
@@ -1013,9 +1403,22 @@ ErgFile::save(QStringList &errors)
 
             // output in minutes and watts percent with no precision
             out <<QString("%1    %2\n").arg(minutes, 0, 'f', 2).arg(watts, 0, 'f', 0);
+
+            lastPointX = p.x;
         }
 
         out << "[END COURSE DATA]\n";
+
+        // TEXTS in TrainerRoad compatible format
+        if (Texts.count() > 0) {
+            out << "[COURSE TEXT]\n";
+            foreach(ErgFileText cue, Texts)
+                out <<QString("%1\t%2\t%3\n").arg(cue.x/1000)
+                                             .arg(cue.text)
+                                             .arg(cue.duration);
+            out << "[END COURSE TEXT]\n";
+        }
+
         f.close();
 
     }
@@ -1031,7 +1434,9 @@ ErgFile::save(QStringList &errors)
 
         // setup output stream to file
         QTextStream out(&f);
+#if QT_VERSION < 0x060000
         out.setCodec("UTF-8");
+#endif
 
         out << "<workout_file>\n";
 
@@ -1068,6 +1473,7 @@ ErgFile::save(QStringList &errors)
 
         out << "    <workout>\n";
         QList<ErgFileSection> sections = Sections();
+        int msecs = 0;
         for(int i=0; i<sections.count(); i++) {
 
             // are there repeated sections of efforts and recovery?
@@ -1095,8 +1501,22 @@ ErgFile::save(QStringList &errors)
                     << "PowerOnLow=\"" << sections[i].start/CP << "\" "
                     << "PowerOnHigh=\"" << sections[i].end/CP << "\" "
                     << "PowerOffLow=\"" << sections[i+1].start/CP << "\" "
-                    << "PowerOffHigh=\"" << sections[i+1].end/CP << "\" />\n";
+                    << "PowerOffHigh=\"" << sections[i+1].end/CP << "\" ";
 
+                int d = (count+1)*(sections[i].duration+sections[i+1].duration);
+                if (Texts.count() > 0) {
+                    out << ">\n";
+                    foreach (ErgFileText cue, Texts)
+                        if (cue.x >= msecs && cue.x <= msecs+d)
+                            out << "          <textevent "
+                                << "timeoffset=\""<<(cue.x-msecs)/1000
+                                << "\" message=\"" << cue.text
+                                << "\" duration=\"" << cue.duration << "\"/>\n";
+                    out << "        </IntervalsT>\n";
+                } else {
+                    out << "/>\n";
+                }
+                msecs += d;
                 // skip on, bearing in mind the main loop increases i by 1
                 i += 1 + (count*2);
 
@@ -1111,8 +1531,22 @@ ErgFile::save(QStringList &errors)
 
                 out << "        <" << tag << " Duration=\""<<sections[i].duration/1000 << "\" "
                                   << "PowerLow=\"" <<sections[i].start/CP << "\" "
-                                  << "PowerHigh=\"" <<sections[i].end/CP << "\" />\n";
-
+                                  << "PowerHigh=\"" <<sections[i].end/CP << "\"";
+                if (Texts.count() > 0) {
+                    out << ">\n";
+                    foreach (ErgFileText cue, Texts) {
+                        if (cue.x >= msecs && cue.x <= msecs+sections[i].duration) {
+                            out << "          <textevent "
+                                << "timeoffset=\""<<(cue.x-msecs)/1000
+                                << "\" message=\"" << Utils::xmlprotect(cue.text)
+                                << "\" duration=\"" << cue.duration << "\"/>\n";
+                        }
+                    }
+                    out << "        </" << tag << ">\n";
+                } else {
+                    out << "/>\n";
+                }
+                msecs += sections[i].duration;
             }
         }
         out << "    </workout>\n";
@@ -1127,187 +1561,73 @@ ErgFile::~ErgFile()
     Points.clear();
 }
 
+void ErgFile::sortLaps() const
+{
+    if (Laps.count()) {
+        // Sort laps by start, then by existing lap num
+        std::sort(Laps.begin(), Laps.end(), [](const ErgFileLap& a, const ErgFileLap& b) {
+            // 1) Start, first comes first
+            if (a.x != b.x) return a.x < b.x;
+
+            // 2) range id, lowest first. This ordering is chosen prior to segments being
+            // devolved into lap markers, so can be used to impose semantic order on laps.
+            if (a.lapRangeId != b.lapRangeId) return a.lapRangeId < b.lapRangeId;
+
+            // 3) LapNum
+            return a.LapNum < b.LapNum;
+        });
+
+        // Renumber laps to follow the new entry distance order:
+        int lapNum = 1;
+        for (auto& a : Laps)
+            a.LapNum = lapNum++;
+    }
+}
+
+void ErgFile::sortTexts() const
+{
+    std::sort(Texts.begin(), Texts.end(), [](const ErgFileText& a, const ErgFileText& b) {
+        // If distance is the same the lesser distance comes first.
+        if (a.x == b.x) return a.duration < b.duration;
+        return a.x < b.x;
+    });
+}
+
+void ErgFile::finalize()
+{
+    if (Laps.count() == 0) {
+        // If there are no laps then add a pair of laps which bracket the entire workout.
+
+        // Start lap
+        ErgFileLap lap;
+        lap.x = 0;
+        lap.LapNum = 1;
+        lap.selected = false;
+        lap.name = "Route Start";
+        Laps.append(lap);
+
+        // End lap
+        lap.x = Duration;
+        lap.LapNum = 2;
+        lap.selected = false;
+        lap.name = "Route End";
+        Laps.append(lap);
+    }
+
+    sortLaps();
+    sortTexts();
+}
+
 bool
-ErgFile::isValid()
+ErgFile::isValid() const
 {
     return valid;
-}
-
-int
-ErgFile::wattsAt(long x, int &lapnum)
-{
-    // workout what wattage load should be set for any given
-    // point in time in msecs.
-    if (!isValid()) return -100; // not a valuid ergfile
-
-    // is it in bounds?
-    if (x < 0 || x > Duration) return -100;   // out of bounds!!!
-
-    // do we need to return the Lap marker?
-    if (Laps.count() > 0) {
-        int lap=0;
-        for (int i=0; i<Laps.count(); i++) {
-            if (x>=Laps.at(i).x) lap += 1;
-        }
-        lapnum = lap;
-
-    } else lapnum = 0;
-
-    // find right section of the file
-    while (x < Points.at(leftPoint).x || x > Points.at(rightPoint).x) {
-        if (x < Points.at(leftPoint).x) {
-            leftPoint--;
-            rightPoint--;
-        } else if (x > Points.at(rightPoint).x) {
-            leftPoint++;
-            rightPoint++;
-        }
-    }
-
-    // two different points in time but the same watts
-    // at both, it doesn't really matter which value
-    // we use
-    if (Points.at(leftPoint).val == Points.at(rightPoint).val)
-        return Points.at(rightPoint).val;
-
-    // the erg file will list the point in time twice
-    // to show a jump from one wattage to another
-    // at this point in ime (i.e x=100 watts=100 followed
-    // by x=100 watts=200)
-    if (Points.at(leftPoint).x == Points.at(rightPoint).x)
-        return Points.at(rightPoint).val;
-
-    // so this point in time between two points and
-    // we are ramping from one point and another
-    // the steps in the calculation have been explicitly
-    // listed for code clarity
-    double deltaW = Points.at(rightPoint).val - Points.at(leftPoint).val;
-    double deltaT = Points.at(rightPoint).x - Points.at(leftPoint).x;
-    double offT = x - Points.at(leftPoint).x;
-    double factor = offT / deltaT;
-
-    double nowW = Points.at(leftPoint).val + (deltaW * factor);
-
-    return nowW;
-}
-
-double
-ErgFile::gradientAt(long x, int &lapnum)
-{
-    // workout what wattage load should be set for any given
-    // point in time in msecs.
-    if (!isValid()) return -100; // not a valid ergfile
-
-    // is it in bounds?
-    if (x < 0 || x > Duration) return -100;   // out of bounds!!! (-10 through +15 are valid return vals)
-
-    // do we need to return the Lap marker?
-    if (Laps.count() > 0) {
-        int lap=0;
-        for (int i=0; i<Laps.count(); i++) {
-            if (x>=Laps.at(i).x) lap += 1;
-        }
-        lapnum = lap;
-
-    } else lapnum = 0;
-
-    // find right section of the file
-    while (x < Points.at(leftPoint).x || x > Points.at(rightPoint).x) {
-        if (x < Points.at(leftPoint).x) {
-            leftPoint--;
-            rightPoint--;
-        } else if (x > Points.at(rightPoint).x) {
-            leftPoint++;
-            rightPoint++;
-        }
-    }
-    return Points.at(leftPoint).val;
-}
-
-// Returns true if a location is determined, otherwise returns false.
-bool ErgFile::locationAt(long meters, int &lapnum, geolocation &geoLoc)
-{
-    if (!isValid()) return false; // not a valid ergfile
-
-    // is it in bounds?
-    if (meters < 0 || meters > Duration) return false;
-
-    // No location unless... format contains location...
-    if (format != CRS_LOC)  return 1;
-
-    if (Laps.count() > 0) {
-        int lap = 0;
-        for (int i = 0; i<Laps.count(); i++) {
-            if (meters >= Laps.at(i).x) lap += 1;
-        }
-        lapnum = lap;
-
-    }
-    else lapnum = 0;
-
-    // Ensure that interpolator is correctly primed for this request.
-
-    // find right section of the file
-    while (meters < Points.at(leftPoint).x || meters > Points.at(rightPoint).x) {
-        if (meters < Points.at(leftPoint).x) {
-            leftPoint--;
-            rightPoint--;
-        }
-        else if (meters > Points.at(rightPoint).x) {
-            leftPoint++;
-            rightPoint++;
-        }
-    }
-
-    // At this point leftpoint and rightpoint bracket the query distance. Three cases:
-    // Bracket Covered: If query bracket compatible with the current interpolation bracket then simply interpolate
-    // Bracket Ahead:   If query bracket is ahead of current interpolation bracket then feed points to interpolator until it matches.
-    // Bracket Behind:  New bracket is behind current interpolation bracket then interpolator must be reset and new values fed in.
-
-    double d0, d1;
-
-    if (!gpi.GetBracket(d0, d1))
-    {
-        interpolatorReadIndex = 0;
-        gpi.Reset();
-    } else if (d0 > Points.at(leftPoint).x) {
-        // Current bracket is ahead of interpolator so reset and set index back
-        // so interpolator will be re-primed.
-        gpi.Reset();
-        interpolatorReadIndex = (leftPoint > 0) ? leftPoint - 1 : leftPoint;
-    } else {
-        // Otherwise interpolatorReadIndex is set reasonably.
-        // Is possible to skip ahead though...
-        if (interpolatorReadIndex < rightPoint - 4)
-        {
-            interpolatorReadIndex = rightPoint - 4;
-        }
-    }
-
-    // Push points until distance satisfied
-    while (gpi.WantsInput(meters)) {
-        if (interpolatorReadIndex < Points.count()) {
-            const ErgFilePoint * pii = &(Points.at(interpolatorReadIndex));
-            geolocation geo(pii->lat, pii->lon, pii->y);
-            gpi.Push(pii->x, geo);
-
-            interpolatorReadIndex++;
-        }
-        else {
-            gpi.NotifyInputComplete();
-            break;
-        }
-    }
-
-    geoLoc = gpi.Interpolate(meters);
-
-    return true;
 }
 
 // Retrieve the offset for the start of next lap.
 // Params: x - current workout distance (m) / time (ms)
 // Returns: distance (m) / time (ms) offset for next lap.
-int ErgFile::nextLap(long x)
+double ErgFile::nextLap(double x) const
 {
     if (!isValid()) return -1; // not a valid ergfile
 
@@ -1321,56 +1641,131 @@ int ErgFile::nextLap(long x)
     return -1; // nope, no marker ahead of there
 }
 
+// Retrieve the offset for the start of previous lap.
+// Params: x - current workout distance (m) / time (ms)
+// Returns: distance (m) / time (ms) offset for previous lap.
+double ErgFile::prevLap(double x) const
+{
+    if (!isValid()) return -1; // not a valid ergfile
+
+    // do we need to return the Lap marker?
+    if (Laps.count() > 0) {
+        for (int i = Laps.count()-1; i >= 0; i--) {
+            if (x > Laps.at(i).x) return Laps.at(i).x;
+        }
+    }
+    return -1; // nope, no marker behind us.
+}
+
+
 // Retrieve the offset for the start of current lap.
 // Params: x - current workout distance (m) / time (ms)
 // Returns: distance (m) / time (ms) offset for start of current lap.
-int
-ErgFile::currentLap(long x)
+double
+ErgFile::currentLap(double x) const
 {
     if (!isValid()) return -1; // not a valid ergfile
 
     // If the current position is before the start of the next lap, return this lap
     for (int i=0; i<Laps.count() - 1; i++) {
-        if (x<Laps.at(i+1).x) return Laps.at(i).x;
+        if (x>=Laps.at(i).x && x<Laps.at(i+1).x) return Laps.at(i).x;
     }
     return -1; // No matching lap
+}
+
+// Adds new lap at location, returns index of new lap
+int
+ErgFile::addNewLap(double loc) const
+{
+    if (isValid())
+    {
+        ErgFileLap add(loc, Laps.count(), "user lap");
+
+        Laps.append(add);
+
+        sortLaps();
+
+        auto itr = std::find_if(Laps.begin(), Laps.end(), [&add](const ErgFileLap& otherLap) {
+            return add.x == otherLap.x && add.lapRangeId == otherLap.lapRangeId && add.name == otherLap.name;
+        });
+        if (itr != Laps.end()) 
+            return (*itr).LapNum;
+    }
+
+    return -1;
+}
+
+bool ErgFile::textsInRange(double searchStart, double searchRange, int& rangeStart, int& rangeEnd) const
+{
+    bool retVal = false;
+
+    if (isValid()) {
+
+        searchStart = std::floor(searchStart);
+
+        // find first text in range, continue to last text in range.
+        rangeStart = -1;
+        rangeEnd = -1;
+
+        double searchLimit = searchStart + searchRange;
+
+        for (int i = 0; i < Texts.count(); i++) {
+            double distance = Texts.at(i).x;
+            if (distance >= searchStart && distance <= searchLimit) {
+                if (rangeStart < 0) {
+                    rangeStart = i;
+                    retVal = true;
+                }
+                rangeEnd = i;
+            }
+
+            // Texts are sorted by distance so no need to look further.
+            if (distance > searchLimit)
+                break;
+        }
+    }
+    return retVal;
 }
 
 void
 ErgFile::calculateMetrics()
 {
-
     // reset metrics
     XP = CP = AP = IsoPower = IF = RI = BikeStress = BS = SVI = VI = 0;
     ELE = ELEDIST = GRADE = 0;
 
-    maxY = 0; // we need to reset it
+    minY = 0;
+    maxY = 0;
 
     // is it valid?
     if (!isValid()) return;
 
-    if (format == CRS || format == CRS_LOC) {
+    if (format == CRS) {
 
         ErgFilePoint last;
         bool first = true;
-        foreach (ErgFilePoint p, Points) {
-
-            // set the maximum Y value
-            if (p.y > maxY) maxY= p.y;
+        foreach(ErgFilePoint p, Points) {
 
             if (first == true) {
+                minY = p.y;
+                maxY = p.y;
                 first = false;
-            } else if (p.y > last.y) {
+            } else {
+                minY = std::min(minY, p.y);
+                maxY = std::max(maxY, p.y);
 
-                ELEDIST += p.x - last.x;
-                ELE += p.y - last.y;
+                if (p.y > last.y) {
+                    ELEDIST += p.x - last.x;
+                    ELE += p.y - last.y;
+                }
             }
             last = p;
         }
         if (ELE == 0 || ELEDIST == 0) GRADE = 0;
-        else GRADE = ELE/ELEDIST * 100;
+        else GRADE = ELE / ELEDIST * 100;
 
-    } else {
+    }
+    else {
 
         QVector<double> rolling(30);
         rolling.fill(0.0f);
@@ -1397,28 +1792,36 @@ ErgFile::calculateMetrics()
         int skcount = 0;
 
         ErgFilePoint last;
+        bool first = true;
         foreach (ErgFilePoint p, Points) {
 
-            // set the maximum Y value
-            if (p.y > maxY) maxY= p.y;
+            // set the minimum/maximum Y value
+            if (first) {
+                minY = p.y;
+                maxY = p.y;
+                first = false;
+            } else {
+                minY = std::min(minY, p.y);
+                maxY = std::max(maxY, p.y);
+            }
 
             while (nextSecs < p.x) {
 
                 // CALCULATE IsoPower
                 apsum += last.y;
-                sum +=  last.y;
+                sum += last.y;
                 sum -= rolling[index];
 
                 // update 30s circular buffer
                 rolling[index] = last.y;
-                if (index == 29) index=0;
+                if (index == 29) index = 0;
                 else index++;
 
-                total += pow(sum/30, 4);
-                count ++;
+                total += pow(sum / 30, 4);
+                count++;
 
                 // CALCULATE XPOWER
-                while ((weighted > NEGLIGIBLE) && ((nextSecs / 1000) > (lastSecs/1000) + 1000 + EPSILON)) {
+                while ((weighted > NEGLIGIBLE) && ((nextSecs / 1000) > (lastSecs / 1000) + 1000 + EPSILON)) {
                     weighted *= attenuation;
                     lastSecs += 1000;
                     sktotal += pow(weighted, 4.0);
@@ -1441,9 +1844,9 @@ ErgFile::calculateMetrics()
         AP = apsum / count;
 
         // CP
-        if (context->athlete->zones(false)) {
-            int zonerange = context->athlete->zones(false)->whichRange(QDateTime::currentDateTime().date());
-            if (zonerange >= 0) CP = context->athlete->zones(false)->getCP(zonerange);
+        if (context->athlete->zones("Bike")) {
+            int zonerange = context->athlete->zones("Bike")->whichRange(QDateTime::currentDateTime().date());
+            if (zonerange >= 0) CP = context->athlete->zones("Bike")->getCP(zonerange);
         }
 
         // IF
@@ -1470,3 +1873,194 @@ ErgFile::calculateMetrics()
         }
     }
 }
+
+// Update query state to bracket query location.
+// Returns false if bracket cannot be established, otherwise true.
+bool
+ErgFileQueryAdapter::updateQueryStateFromDistance(double x, int& lapnum) const
+{
+    if (!ergFile || !ergFile->isValid()) return false; // not a valid ergfile
+
+    // is it in bounds?
+    if (x < 0 || x > Duration()) return false;
+
+    // do we need to return the Lap marker?
+    if (Laps().count() > 0) {
+        int lap = 0;
+        for (int i = 0; i < Laps().count(); i++) {
+            if (x >= Laps().at(i).x) lap += 1;
+        }
+        lapnum = lap;
+
+    }
+    else lapnum = 0;
+
+    // find right section of the file
+    while (x < Points().at(qs.leftPoint).x || x > Points().at(qs.rightPoint).x) {
+        if (x < Points().at(qs.leftPoint).x) {
+            qs.leftPoint--;
+            qs.rightPoint--;
+        }
+        else if (x > Points().at(qs.rightPoint).x) {
+            qs.leftPoint++;
+            qs.rightPoint++;
+        }
+    }
+
+    return true;
+}
+
+double
+ErgFileQueryAdapter::wattsAt(double x, int& lapnum) const
+{
+    // Establish index bracket for query.
+    if (!updateQueryStateFromDistance(x, lapnum))
+        return -100;
+
+    if (!hasWatts()) {
+        qDebug() << "wattsAt should not be called unless ergfile has watts";
+        return -100;
+    }
+
+    // two different points in time but the same watts
+    // at both, it doesn't really matter which value
+    // we use
+    if (Points().at(qs.leftPoint).val == Points().at(qs.rightPoint).val)
+        return Points().at(qs.rightPoint).val;
+
+    // the erg file will list the point in time twice
+    // to show a jump from one wattage to another
+    // at this point in ime (i.e x=100 watts=100 followed
+    // by x=100 watts=200)
+    if (Points().at(qs.leftPoint).x == Points().at(qs.rightPoint).x)
+        return Points().at(qs.rightPoint).val;
+
+    // so this point in time between two points and
+    // we are ramping from one point and another
+    // the steps in the calculation have been explicitly
+    // listed for code clarity
+    double deltaW = Points().at(qs.rightPoint).val - Points().at(qs.leftPoint).val;
+    double deltaT = Points().at(qs.rightPoint).x - Points().at(qs.leftPoint).x;
+    double offT = x - Points().at(qs.leftPoint).x;
+    double factor = offT / deltaT;
+
+    double nowW = Points().at(qs.leftPoint).val + (deltaW * factor);
+
+    return nowW;
+}
+
+// Uninterpolated gradient from ergfile. Used when running in strict gradient/workout mode.
+double
+ErgFileQueryAdapter::gradientAt(double x, int& lapnum) const
+{
+    // Establish index bracket for query.
+    if (!updateQueryStateFromDistance(x, lapnum))
+        return -100;
+
+    if (!hasGradient()) {
+        qDebug() << "gradientAt should not be called if ergfile has no gradient";
+        return -100;
+    }
+
+    double gradient = Points().at(qs.leftPoint).val;
+
+    return gradient;
+}
+
+// Altitude
+double
+ErgFileQueryAdapter::altitudeAt(double x, int& lapnum) const
+{
+    // Establish index bracket for query.
+    if (!updateQueryStateFromDistance(x, lapnum))
+        return -1000;
+
+    if (!hasGradient()) {
+        qDebug() << "altitudeAt should not be called if ergfile has no gradient";
+        return -1000;
+    }
+
+    ErgFilePoint p1 = Points().at(qs.leftPoint);
+    ErgFilePoint p2 = Points().at(qs.rightPoint);
+    double altitude = p1.y;
+    if(p1.x != p2.x) altitude += (p2.y - p1.y) * (x - p1.x) / (p2.x - p1.x);
+
+    return altitude;
+}
+
+// Returns true if a location is determined, otherwise returns false.
+// This is the const stateless edition(tm), which does not rely on location
+// state. This method is used to make queries independant of the main ergfile
+// 'owner'.
+bool ErgFileQueryAdapter::locationAt(double meters, int& lapnum, geolocation& geoLoc, double& slope100) const
+{
+    // Establish index bracket for query.
+    if (!updateQueryStateFromDistance(meters, lapnum))
+        return false;
+
+    if (!hasGradient()) {
+        qDebug() << "locationAt should not be called if ergfile has no gradient";
+        return false;
+    }
+
+    // At this point leftpoint and rightpoint bracket the query distance. Three cases:
+    // Bracket Covered: If query bracket compatible with the current interpolation bracket then simply interpolate
+    // Bracket Ahead:   If query bracket is ahead of current interpolation bracket then feed points to interpolator until it matches.
+    // Bracket Behind:  New bracket is behind current interpolation bracket then interpolator must be reset and new values fed in.
+
+    double d0, d1;
+
+    if (!qs.gpi.GetBracket(d0, d1))
+    {
+        qs.interpolatorReadIndex = 0;
+        qs.gpi.Reset();
+    }
+    else if (d0 > Points().at(qs.leftPoint).x) {
+        // Current bracket is ahead of interpolator so reset and set index back
+        // so interpolator will be re-primed.
+        qs.gpi.Reset();
+        qs.interpolatorReadIndex = (qs.leftPoint > 0) ? qs.leftPoint - 1 : qs.leftPoint;
+    }
+    else {
+        // Otherwise interpolatorReadIndex is set reasonably.
+        // Is possible to skip ahead though...
+        if (qs.interpolatorReadIndex < qs.rightPoint - 4)
+        {
+            qs.interpolatorReadIndex = qs.rightPoint - 4;
+        }
+    }
+
+    // Push points until distance satisfied
+    while (qs.gpi.WantsInput(meters)) {
+        if (qs.interpolatorReadIndex < Points().count()) {
+            const ErgFilePoint* pii = &(Points().at(qs.interpolatorReadIndex));
+
+            // When there is no geolocation, invent something to support tangent interpolation.
+            if (pii->lat || pii->lon) {
+                geolocation geo(pii->lat, pii->lon, pii->y);
+                qs.gpi.Push(pii->x, geo);
+            }
+            else {
+                qs.gpi.Push(pii->x, pii->y);
+            }
+
+            qs.interpolatorReadIndex++;
+        }
+        else {
+            qs.gpi.NotifyInputComplete();
+            break;
+        }
+    }
+
+    geoLoc = qs.gpi.Location(meters, slope100);
+
+    slope100 *= 100;
+
+    return true;
+}
+
+int ErgFileQueryAdapter::addNewLap(double loc) const
+{
+    return getErgFile() ? getErgFile()->addNewLap(loc) : -1;
+}
+

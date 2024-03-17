@@ -23,7 +23,6 @@
 
 #include "WPrime.h"
 #include "ErgFile.h"
-#include "RideFile.h"
 #include "RideFileCache.h"
 #include "RealtimeData.h"
 
@@ -96,6 +95,8 @@ WorkoutWidget::WorkoutWidget(WorkoutWindow *parent, Context *context) :
     cadenceMax = 200; // make it line up between power and hr
     hrMax = 220;
     speedMax = 50;
+    vo2Max = 5000;
+    ventilationMax = 130;
 
     onDrag = onCreate = onRect = atRect = QPointF(-1,-1);
     qwkactive = false;
@@ -127,6 +128,8 @@ WorkoutWidget::updateErgFile(ErgFile *f)
 
     f->Laps = laps_;
 
+    f->Texts = texts_;
+
     // update METADATA too
     // XXX missing!
 }
@@ -148,18 +151,28 @@ WorkoutWidget::start()
     // clear previous data
     wbal.clear();
     watts.clear();
+    pwrAvg.clear();
     hr.clear();
+    hrAvg.clear();
     speed.clear();
+    speedAvg.clear();
     cadence.clear();
+    cadenceAvg.clear();
     sampleTimes.clear();
+    vo2.clear();
+    vo2Avg.clear();
+    ventilation.clear();
+    ventilationAvg.clear();
 
     // and resampling data
-    count = wbalSum = wattsSum = hrSum = speedSum = cadenceSum =0;
+    count = wbalSum = wattsSum = hrSum = speedSum = cadenceSum = vo2Sum = ventilationSum = 0;
 
     // set initial
     cadenceMax = 200;
     hrMax = 220;
     speedMax = 50;
+    vo2Max = 5000;
+    ventilationMax = 130;
 
     // replot
     update();
@@ -189,6 +202,8 @@ WorkoutWidget::telemetryUpdate(RealtimeData rt)
     hrSum += rt.getHr();
     cadenceSum += rt.getCadence();
     speedSum += rt.getSpeed();
+    vo2Sum += rt.getVO2();
+    ventilationSum += rt.getRMV();
 
     count++;
 
@@ -204,15 +219,21 @@ WorkoutWidget::telemetryUpdate(RealtimeData rt)
         speed << s;
         int c = cadenceSum / 5.0f;
         cadence << c;
+        int v = vo2Sum / 5.0f;
+        vo2 << v;
+        int ve = ventilationSum / 5.0f;
+        ventilation << ve;
         sampleTimes << context->getNow();
 
         // clear for next time
-        count = wbalSum = wattsSum = hrSum = speedSum = cadenceSum =0;
+        count = wbalSum = wattsSum = hrSum = speedSum = cadenceSum = vo2Sum = ventilationSum = 0;
 
         // do we need to increase maxes?
         if (c > cadenceMax) cadenceMax=c;
         if (s > speedMax) speedMax=s;
         if (h > hrMax) hrMax=h;
+        if (v > vo2Max) vo2Max=v;
+        if (ve > ventilationMax) ventilationMax=ve;
 
         // Do we need to increase plot x-axis max? (add 15 min at a time)
         if (cadence.size() > maxVX_) setMaxVX(maxVX_ + 900);
@@ -552,19 +573,21 @@ WorkoutWidget::eventFilter(QObject *obj, QEvent *event)
     //
     if (event->type() == QEvent::Wheel) {
 
-        // STATE: NONE
-        if (state == none) {
-            QWheelEvent *w = static_cast<QWheelEvent*>(event);
-#if QT_VERSION >= 0x050000
-            updateNeeded = scale(w->angleDelta());
-#else
-            updateNeeded = scale(QPoint(0,w->delta()));
-#endif
-            filterNeeded = true;
-        }
+        Qt::KeyboardModifiers kmod = static_cast<QInputEvent*>(event)->modifiers();
+        bool ctrl = (kmod & Qt::ControlModifier) != 0;
+        if (ctrl) {
 
-        // will need to ..
-        recompute();
+            // STATE: NONE
+            if (state == none) {
+
+                QWheelEvent *w = static_cast<QWheelEvent*>(event);
+                updateNeeded = scale(w->angleDelta());
+                filterNeeded = true;
+            }
+
+            // will need to ..
+            recompute();
+        }
     }
 
     //
@@ -1438,9 +1461,12 @@ WorkoutWidget::ergFileSelected(ErgFile *ergFile, int format)
         // get laps
         laps_ = ergFile->Laps;
 
+        // get texts
+        texts_ = ergFile->Texts;
+
         // add points for this....
         foreach(ErgFilePoint point, ergFile->Points) {
-            WWPoint *add = new WWPoint(this, point.x / 1000.0f, point.y); // in ms
+            WWPoint *add = new WWPoint(this, round(point.x / 1000.0f), point.y); // in ms
 
             // increase view and workout maxes to match workout loaded
            // as we goo these just increase to the last point
@@ -1490,6 +1516,7 @@ WorkoutWidget::save()
         ergFile->Duration = p->x * 1000; // whatever the last is
     }
     ergFile->Laps = laps_;
+    ergFile->Texts = texts_;
 
     //
     // SAVE
@@ -1541,8 +1568,8 @@ WorkoutWidget::recompute(bool editing)
     // get CP/FTP to use in calculation
     int rnum=-1;
     int CP, FTP, WPRIME, PMAX;
-    if (context->athlete->zones(false) == NULL ||
-        (rnum = context->athlete->zones(false)->whichRange(QDate::currentDate())) == -1) {
+    if (context->athlete->zones("Bike") == NULL ||
+        (rnum = context->athlete->zones("Bike")->whichRange(QDate::currentDate())) == -1) {
 
         // no cp or ftp set
         CP = FTP = 300;
@@ -1558,7 +1585,7 @@ WorkoutWidget::recompute(bool editing)
     }
 
     bool useCPForFTP = (appsettings->cvalue(context->athlete->cyclist,
-                        context->athlete->zones(false)->useCPforFTPSetting(), 0).toInt() == 0);
+                        context->athlete->zones("Bike")->useCPforFTPSetting(), 0).toInt() == 0);
     if (useCPForFTP) FTP=CP;
     if (PMAX<=0) PMAX=1000;
     int K=WPRIME/(PMAX-CP);
@@ -1779,6 +1806,8 @@ WorkoutWidget::qwkcode()
     //    5x30s@450r30s    - 5 times 30seconds at 450w followed by 30s at 'recovery'
     //    20m@100-400       - 20 minutes going from 100w to 400w
     //
+    //    NOTE: only integer watts are supported, floating point numbers are
+    //    rounded when qwkcode is generated.
     //
     //    XXX COME AND FIX THIS EXAMPLE XXX
     //    A complete workout example;
@@ -1795,7 +1824,7 @@ WorkoutWidget::qwkcode()
     // just loop through for now doing xx@yy and optionally add rxx
     if (points_.count() == 1) {
         // just a single point?
-        codeStrings << QString("%1@%2").arg(qduration(points_[0]->x)).arg(round(points_[0]->y/denom));
+        codeStrings << QString("%1@0-%2").arg(qduration(points_[0]->x)).arg(round(points_[0]->y/denom));
         codePoints<<0;
     }
 
@@ -1899,6 +1928,19 @@ WorkoutWidget::qwkcode()
             else
                 break; // stop when end of matches
         }
+
+        /* Text cues are not supported on qwkcode yet
+        foreach (const ErgFileText cue, texts_) {
+            int secs = i > 0 ? points_[sectionp[i-1]]->x : 0;
+            int offset = cue.x/1000 - secs;
+            if (offset >= 0 && cue.x/1000 < points_[sectionp[i]]->x) {
+                codeStrings << QString("#%1@%2/%4").arg(cue.text)
+                                                   .arg(qduration(offset))
+                                                   .arg(cue.duration);
+                codePoints << sectionp[i];
+            }
+        }
+        */
 
         // multiple or no ..
         if (count > 1) {
@@ -2136,7 +2178,7 @@ WorkoutWidget::apply(QString code)
 
                 // EFFORT
                 // add a point for starting watts if not already there
-                if (w1 != watts) {
+                if (w1 != watts || points_.isEmpty()) {
                     index++;
                     new WWPoint(this, secs, w1*factor);
                     bool addLap = laps_.isEmpty() ? secs != 0 : (laps_.last().x != secs*1000) && secs != 0;
@@ -2459,7 +2501,7 @@ WorkoutWidget::logX(double t)
 
 // transform from plot to painter co-ordinate
 QPoint
-WorkoutWidget::transform(double seconds, double watts, RideFile::SeriesType s)
+WorkoutWidget::transform(double seconds, double watts, WwSeriesType s)
 {
     // from plot coords to painter coords on the canvas
     QRectF c = canvas();
@@ -2470,31 +2512,45 @@ WorkoutWidget::transform(double seconds, double watts, RideFile::SeriesType s)
     switch (s) {
 
     default:
-    case RideFile::watts:
+    case POWER:
         {
         // ratio of pixels to plot units
         yratio = double(c.height()) / (maxY()-minY());
         }
         break;
 
-    case RideFile::hr:
+    case HEARTRATE:
         {
         // ratio of pixels to plot units
         yratio = double(c.height()) / double(hrMax);
         }
         break;
 
-    case RideFile::cad:
+    case CADENCE:
         {
         // ratio of pixels to plot units
         yratio = double(c.height()) / double(cadenceMax);
         }
         break;
 
-    case RideFile::kph:
+    case SPEED:
         {
         // ratio of pixels to plot units
         yratio = double(c.height()) / double(speedMax);
+        }
+        break;
+
+    case VO2:
+        {
+        // ratio of pixels to plot units
+        yratio = double(c.height()) / double(vo2Max);
+        }
+        break;
+
+    case VENTILATION:
+        {
+        // ratio of pixels to plot units
+        yratio = double(c.height()) / double(ventilationMax);
         }
         break;
 
@@ -2951,4 +3007,82 @@ WorkoutWidget::paste()
 
     // update the display
     update();
+}
+
+bool
+WorkoutWidget::shouldPlotHr()
+{
+    return parent->shouldPlotHr();
+}
+
+bool
+WorkoutWidget::shouldPlotPwr()
+{
+    return parent->shouldPlotPwr();
+}
+
+bool
+WorkoutWidget::shouldPlotCadence()
+{
+    return parent->shouldPlotCadence();
+}
+
+bool
+WorkoutWidget::shouldPlotWbal()
+{
+    return parent->shouldPlotWbal();
+}
+
+bool
+WorkoutWidget::shouldPlotVo2()
+{
+    return parent->shouldPlotVo2();
+}
+
+bool
+WorkoutWidget::shouldPlotVentilation()
+{
+    return parent->shouldPlotVentilation();
+}
+
+bool
+WorkoutWidget::shouldPlotSpeed()
+{
+    return parent->shouldPlotSpeed();
+}
+
+int
+WorkoutWidget::hrPlotAvgLength()
+{
+    return parent->hrPlotAvgLength();
+}
+
+int
+WorkoutWidget::pwrPlotAvgLength()
+{
+    return parent->pwrPlotAvgLength();
+}
+
+int
+WorkoutWidget::cadencePlotAvgLength()
+{
+    return parent->cadencePlotAvgLength();
+}
+
+int
+WorkoutWidget::vo2PlotAvgLength()
+{
+    return parent->vo2PlotAvgLength();
+}
+
+int
+WorkoutWidget::ventilationPlotAvgLength()
+{
+    return parent->ventilationPlotAvgLength();
+}
+
+int
+WorkoutWidget::speedPlotAvgLength()
+{
+    return parent->speedPlotAvgLength();
 }

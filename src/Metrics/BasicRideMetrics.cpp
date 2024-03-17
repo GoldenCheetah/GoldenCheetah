@@ -31,6 +31,36 @@
 #include <QVector>
 #include <QApplication>
 
+class RideDate : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(RideDate)
+    public:
+
+    RideDate()
+    {
+        setSymbol("activity_date"); // ride_date already special (!!)
+        setInternalName("Activity Date");
+    }
+    bool isDate() const { return true; }
+    void initialize() {
+        setName(tr("Activity Date"));
+        setType(MetricType::Average);
+        setMetricUnits(tr(""));
+        setImperialUnits(tr(""));
+        setDescription(tr("Activity Date"));
+    }
+
+    void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &) {
+        setValue (QDate(1900,01,01).daysTo(item->dateTime.date()));
+    }
+    MetricClass classification() const { return Undefined; }
+    MetricValidity validity() const { return Unknown; }
+    RideMetric *clone() const { return new RideDate(*this); }
+};
+
+static bool dateAdded =
+    RideMetricFactory::instance().addMetric(RideDate());
+
+//////////////////////////////////////////////////////////////////////////////
 class RideCount : public RideMetric {
     Q_DECLARE_TR_FUNCTIONS(RideCount)
     public:
@@ -42,6 +72,7 @@ class RideCount : public RideMetric {
     }
     void initialize() {
         setName(tr("Activities"));
+        setType(MetricType::Total);
         setMetricUnits(tr(""));
         setImperialUnits(tr(""));
         setDescription(tr("Activity Count"));
@@ -103,6 +134,9 @@ class ElapsedTime : public RideMetric {
         setSymbol("elapsed_time");
         setInternalName("Elapsed Time");
     }
+
+    bool isTime() const { return true; }
+
     void initialize() {
         setName(tr("Elapsed Time"));
         setMetricUnits(tr("secs"));
@@ -589,6 +623,7 @@ class AthleteWeight : public RideMetric {
         if (weight <= 0.00) weight = 80.00;
 
         setValue(weight);
+        setCount(1);
     }
 
     MetricClass classification() const { return Undefined; }
@@ -625,7 +660,12 @@ class AthleteFat : public RideMetric {
 
     void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &) {
 
-        setValue(item->getWeight(BodyMeasure::FatKg));
+        setValue(item->getWeight(Measure::FatKg));
+        if (item->getWeight(Measure::FatKg) > 0)
+            setValue(item->getWeight(Measure::FatKg));
+        else
+            setValue(item->getWeight() * item->getWeight(Measure::FatPercent) / 100.0);
+        setCount(1);
     }
 
     MetricClass classification() const { return Undefined; }
@@ -661,7 +701,8 @@ class AthleteBones : public RideMetric {
     }
 
     void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &) {
-        setValue(item->getWeight(BodyMeasure::BonesKg));
+        setValue(item->getWeight(Measure::BonesKg));
+        setCount(1);
     }
 
     MetricClass classification() const { return Undefined; }
@@ -697,7 +738,8 @@ class AthleteMuscles : public RideMetric {
     }
 
     void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &) {
-        setValue(item->getWeight(BodyMeasure::MuscleKg));
+        setValue(item->getWeight(Measure::MuscleKg));
+        setCount(1);
     }
 
     MetricClass classification() const { return Undefined; }
@@ -733,7 +775,8 @@ class AthleteLean : public RideMetric {
     }
 
     void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &) {
-        setValue(item->getWeight(BodyMeasure::LeanKg));
+        setValue(item->getWeight(Measure::LeanKg));
+        setCount(1);
     }
 
     MetricClass classification() const { return Undefined; }
@@ -768,7 +811,13 @@ class AthleteFatP : public RideMetric {
     }
 
     void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &) {
-        setValue(item->getWeight(BodyMeasure::FatPercent));
+        if (item->getWeight(Measure::FatPercent) > 0)
+            setValue(item->getWeight(Measure::FatPercent));
+        else if (item->getWeight() > 0)
+            setValue(100 * item->getWeight(Measure::FatKg) / item->getWeight());
+        else
+            setValue(0.0);
+        setCount(1);
     }
 
     MetricClass classification() const { return Undefined; }
@@ -929,6 +978,7 @@ class TotalWork : public RideMetric {
 
     void initialize() {
         setName(tr("Work"));
+        setType(RideMetric::Total);
         setMetricUnits(tr("kJ"));
         setImperialUnits(tr("kJ"));
         setDescription(tr("Total Work in kJ computed from power data"));
@@ -1634,10 +1684,10 @@ class APPercent : public RideMetric {
         double percent = 0.0f;
         AvgPower *pw = dynamic_cast<AvgPower*>(deps.value("average_power"));
 
-        if (pw->value(true) > 0.0f && item->context->athlete->zones(item->isRun) && item->zoneRange >= 0) {
+        if (pw->value(true) > 0.0f && item->context->athlete->zones(item->sport) && item->zoneRange >= 0) {
 
             // get Pmax
-            double pmax = item->context->athlete->zones(item->isRun)->getPmax(item->zoneRange);
+            double pmax = item->context->athlete->zones(item->sport)->getPmax(item->zoneRange);
             percent = pw->value(true)/pmax * 100;
         }
         setValue(percent);
@@ -1991,7 +2041,7 @@ class MinSmO2 : public RideMetric {
         setName(tr("Min SmO2"));
         setMetricUnits(tr("%"));
         setImperialUnits(tr("%"));
-        setType(RideMetric::Peak);
+        setType(RideMetric::Low);
         setDescription(tr("Minimum Muscle Oxygen Saturation, the percentage of hemoglobin that is carrying oxygen."));
     }
 
@@ -2139,7 +2189,7 @@ class MinHr : public RideMetric {
         setName(tr("Min Heartrate"));
         setMetricUnits(tr("bpm"));
         setImperialUnits(tr("bpm"));
-        setType(RideMetric::Peak);
+        setType(RideMetric::Low);
         setDescription(tr("Minimum Heart Rate."));
     }
 
@@ -2402,7 +2452,7 @@ class MinTemp : public RideMetric {
         setName(tr("Min Temp"));
         setMetricUnits(tr("C"));
         setImperialUnits(tr("F"));
-        setType(RideMetric::Peak);
+        setType(RideMetric::Low);
         setPrecision(1);
         setConversion(FAHRENHEIT_PER_CENTIGRADE);
         setConversionSum(FAHRENHEIT_ADD_CENTIGRADE);
@@ -2800,7 +2850,7 @@ class AvgLTE : public RideMetric {
         while (it.hasNext()) {
             struct RideFilePoint *point = it.next();
 
-            if (point->lte && point->watts > 0.0f && point->cad && point->lrbalance > 0.0f && point->lrbalance < 100.0f) {
+            if (point->lte && point->watts > 0.0f && point->cad && point->lrbalance != RideFile::NA) {
                 samples ++;
                 total += point->lte;
             }
@@ -2854,7 +2904,7 @@ class AvgRTE : public RideMetric {
         RideFileIterator it(item->ride(), spec);
         while (it.hasNext()) {
             struct RideFilePoint *point = it.next();
-            if (point->rte && point->watts > 0.0f && point->cad && point->lrbalance > 0.0f && point->lrbalance < 100.0f) {
+            if (point->rte && point->watts > 0.0f && point->cad && point->lrbalance != RideFile::NA) {
                 samples ++;
                 total += point->rte;
             }
@@ -2908,7 +2958,7 @@ class AvgLPS : public RideMetric {
         RideFileIterator it(item->ride(), spec);
         while (it.hasNext()) {
             struct RideFilePoint *point = it.next();
-            if (point->lps && point->watts > 0.0f && point->cad && point->lrbalance > 0.0f && point->lrbalance < 100.0f) {
+            if (point->lps && point->watts > 0.0f && point->cad && point->lrbalance != RideFile::NA) {
                 samples ++;
                 total += point->lps;
             }
@@ -2962,7 +3012,7 @@ class AvgRPS : public RideMetric {
         RideFileIterator it(item->ride(), spec);
         while (it.hasNext()) {
             struct RideFilePoint *point = it.next();
-            if (point->rps && point->watts > 0.0f && point->cad && point->lrbalance > 0.0f && point->lrbalance < 100.0f) {
+            if (point->rps && point->watts > 0.0f && point->cad && point->lrbalance != RideFile::NA) {
                 samples ++;
                 total += point->rps;
             }

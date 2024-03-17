@@ -28,12 +28,27 @@
 #include "Settings.h"
 #include "Context.h"
 
+Q_DECLARE_LOGGING_CATEGORY(gcUsb)
+Q_LOGGING_CATEGORY(gcUsb, "gc.usb")
+
+#ifdef LIBUSB_V_1
+#define USB_ENDPOINT_DIR_MASK LIBUSB_ENDPOINT_DIR_MASK
+
+int (&usb_clear_halt)(usb_dev_handle*, unsigned char) = libusb_clear_halt;
+int (&usb_set_configuration)(usb_dev_handle*, int) = libusb_set_configuration;
+int (&usb_claim_interface)(usb_dev_handle*, int) = libusb_claim_interface;
+int (&usb_release_interface)(usb_dev_handle*, int) = libusb_release_interface;
+int (&usb_reset)(usb_dev_handle*) = libusb_reset_device;
+void (&usb_close)(usb_dev_handle*) = libusb_close;
+#endif
+
 LibUsb::LibUsb(int type) : type(type)
 {
 
     intf = NULL;
     readBufIndex = 0;
     readBufSize = 0;
+    rc = 0;
 
 #ifdef WIN32
     QLibrary lib("libusb0");
@@ -74,6 +89,13 @@ LibUsb::LibUsb(int type) : type(type)
     usb_find_busses();
     usb_find_devices();
 
+}
+
+LibUsb::~LibUsb()
+{
+#ifdef LIBUSB_V_1
+    libusb_exit(ctx);
+#endif
 }
 
 int LibUsb::open()
@@ -147,6 +169,7 @@ void LibUsb::close()
     if (libNotInstalled) return;
 #endif
     if (device) {
+        qCDebug(gcUsb) << "Closing usb device" << device;
         // stop any further write attempts whilst we close down
         usb_dev_handle *p = device;
         device = NULL;
@@ -183,6 +206,7 @@ int LibUsb::read(char *buf, int bytes, int timeout)
         // Yes, so do it
         memcpy(buf, readBuf+readBufIndex, bytes);
         readBufIndex += bytes;
+        qCDebug(gcUsb) << "Read" << QByteArray((const char *)buf, bytes).toHex(':') << "from buffer for usb device" << device;
         return bytes;
     }
 
@@ -191,6 +215,7 @@ int LibUsb::read(char *buf, int bytes, int timeout)
     //     devices not working again after restart "sometimes"
     if (bufRemain > 0) {
         memcpy(buf, readBuf+readBufIndex, bufRemain);
+        qCDebug(gcUsb) << "Read first" << bufRemain << "bytes from buffer for usb device" << device;
     }
 
     readBufSize = 0;
@@ -199,8 +224,8 @@ int LibUsb::read(char *buf, int bytes, int timeout)
     int rc = usb_bulk_read(device, readEndpoint, readBuf, 64, timeout);
     if (rc < 0)
     {
-        // don't report timeouts - lots of noise so commented out
-        //qDebug()<<"usb_bulk_read Error reading: "<<rc<< usb_strerror();
+        // don't report timeouts by default, lots of noise, active only in gcUsb logging category
+        qCDebug(gcUsb) << "usb_bulk_read Error reading:" << rc << usb_strerror();
         return rc;
     }
     readBufSize = rc;
@@ -220,6 +245,7 @@ int LibUsb::read(char *buf, int bytes, int timeout)
         readBufIndex = 0;
     }
 
+    qCDebug(gcUsb) << "Read" << QByteArray((const char *)buf, rc).toHex(':') << "from usb device" << device;
     return rc;
 }
 
@@ -243,11 +269,13 @@ int LibUsb::write(char *buf, int bytes, int timeout)
     int rc;
     if (OperatingSystem == WINDOWS) {
         rc = usb_interrupt_write(device, writeEndpoint, buf, bytes, 1000);
+        qCDebug(gcUsb) << "Write" << QByteArray((const char *)buf, bytes).toHex(':') << "to usb device" << device;
     } else {
         // we use a non-interrupted write on Linux/Mac since the interrupt
         // write block size is incorrectly implemented in the version of
         // libusb we build with. It is no less efficient.
         rc = usb_bulk_write(device, writeEndpoint, buf, bytes, timeout);
+        qCDebug(gcUsb) << "Write" << QByteArray((const char *)buf, bytes).toHex(':') << "to usb device" << device;
     }
 
     if (rc < 0)
@@ -266,7 +294,7 @@ bool LibUsb::findFortius()
 #ifdef WIN32
     if (libNotInstalled) return false;
 #endif
-    struct usb_bus* bus;
+    struct usb_bus* bus, *firstBus;
     struct usb_device* dev;
 
     bool found = false;
@@ -274,7 +302,8 @@ bool LibUsb::findFortius()
     //
     // Search for an UN-INITIALISED Fortius device
     //
-    for (bus = usb_get_busses(); bus; bus = bus->next) {
+    firstBus = usb_get_busses();
+    for (bus = firstBus; bus; bus = bus->next) {
 
 
         for (dev = bus->devices; dev; dev = dev->next) {
@@ -291,6 +320,12 @@ bool LibUsb::findFortius()
             }
         }
     }
+
+#ifdef LIBUSB_V_1
+    delete firstBus;
+#endif
+
+    qCDebug(gcUsb) << "findFortius returns" << found;
     return found;
 }
 
@@ -322,23 +357,24 @@ bool LibUsb::findFortius()
 //      path is the filename of the firmware file
 //      fx2 is non-zero to indicate an fx2 device (we pass 0, since the Fortius is fx)
 //      stage is to control two stage loading, we load in a single stage
-struct usb_dev_handle* LibUsb::OpenFortius()
+usb_dev_handle* LibUsb::OpenFortius()
 {
     Prototype_EzUsb_control_msg usb_control_msg_ptr = 0;
 #ifdef WIN32
     if (libNotInstalled) return NULL;
     usb_control_msg_ptr = usb_control_msg;
 #endif
-    struct usb_bus* bus;
+    struct usb_bus* bus, *firstBus;
     struct usb_device* dev;
-    struct usb_dev_handle* udev;
+    usb_dev_handle* udev;
 
     bool programmed = false;
 
     //
     // Search for an UN-INITIALISED Fortius device
     //
-    for (bus = usb_get_busses(); bus; bus = bus->next) {
+    firstBus = usb_get_busses();
+    for (bus = firstBus; bus; bus = bus->next) {
 
 
         for (dev = bus->devices; dev; dev = dev->next) {
@@ -349,6 +385,7 @@ struct usb_dev_handle* LibUsb::OpenFortius()
                 if ((udev = usb_open(dev))) {
 
                     // LOAD THE FIRMWARE
+                    qCDebug(gcUsb) << "Load firmware to uninitialized Fortius usb device" << dev->filename;
                     ezusb_load_ram (udev, appsettings->value(NULL, FORTIUS_FIRMWARE, "").toString().toLatin1(), 0, 0, usb_control_msg_ptr);
                 }
 
@@ -359,6 +396,10 @@ struct usb_dev_handle* LibUsb::OpenFortius()
             }
         }
     }
+
+#ifdef LIBUSB_V_1
+    delete firstBus;
+#endif
 
     // We need to rescan devices, since once the Fortius has
     // been programmed it will present itself again with a
@@ -383,7 +424,8 @@ struct usb_dev_handle* LibUsb::OpenFortius()
     //
     // Now search for an INITIALISED Fortius device
     //
-    for (bus = usb_get_busses(); bus; bus = bus->next) {
+    firstBus = usb_get_busses();
+    for (bus = firstBus; bus; bus = bus->next) {
 
         for (dev = bus->devices; dev; dev = dev->next) {
 
@@ -413,12 +455,10 @@ struct usb_dev_handle* LibUsb::OpenFortius()
                                 if (rc < 0) {
                                     qDebug()<<"usb_claim_interface Error: "<< usb_strerror();
                                 } else {
-                                    if (OperatingSystem != OSX) {
-                                        // fails on Mac OS X, we don't actually need it anyway
-                                        rc = usb_set_altinterface(udev, alternate);
-                                        if (rc < 0) qDebug()<<"usb_set_altinterface Error: "<< usb_strerror();
-                                    }
-
+#ifdef LIBUSB_V_1
+                                    delete firstBus;
+#endif
+                                    qCDebug(gcUsb) << "Open initialized Fortius usb device" << udev << dev->filename;
                                     return udev;
                                 }
                             }
@@ -430,6 +470,11 @@ struct usb_dev_handle* LibUsb::OpenFortius()
             }
         }
     }
+
+#ifdef LIBUSB_V_1
+    delete firstBus;
+#endif
+
     return NULL;
 }
 
@@ -438,7 +483,7 @@ bool LibUsb::findImagic()
 #ifdef WIN32
     if (libNotInstalled) return false;
 #endif
-    struct usb_bus* bus;
+    struct usb_bus* bus, *firstBus;
     struct usb_device* dev;
 
     bool found = false;
@@ -446,7 +491,8 @@ bool LibUsb::findImagic()
     //
     // Search for an Imagic device
     //
-    for (bus = usb_get_busses(); bus; bus = bus->next) {
+    firstBus = usb_get_busses();
+    for (bus = firstBus; bus; bus = bus->next) {
 
         for (dev = bus->devices; dev; dev = dev->next) {
 
@@ -455,6 +501,12 @@ bool LibUsb::findImagic()
             }
         }
     }
+
+#ifdef LIBUSB_V_1
+    delete firstBus;
+#endif
+
+    qCDebug(gcUsb) << "findImagic returns" << found;
     return found;
 }
 
@@ -481,7 +533,7 @@ bool LibUsb::findImagic()
 // The same ezusb.c module is used to load the imagic firmware as is used
 // for Fortius (see above comments), although some new procedures have been
 // added specific to imagic
-struct usb_dev_handle* LibUsb::OpenImagic()
+usb_dev_handle* LibUsb::OpenImagic()
 {
     Prototype_EzUsb_control_msg usb_control_msg_ptr = 0;
 
@@ -493,20 +545,22 @@ struct usb_dev_handle* LibUsb::OpenImagic()
 #define IMAGIC_SLEEP sleep(3)
 #endif
 
-    struct usb_bus* bus;
+    struct usb_bus* bus, *firstBus;
     struct usb_device* dev;
-    struct usb_dev_handle* udev;
+    usb_dev_handle* udev;
 
     //
     // Search for an Imagic device
     //
-    for (bus = usb_get_busses(); bus; bus = bus->next) {
+    firstBus = usb_get_busses();
+    for (bus = firstBus; bus; bus = bus->next) {
         for (dev = bus->devices; dev; dev = dev->next) {
             if (dev->descriptor.idVendor == FORTIUS_VID && dev->descriptor.idProduct == IMAGIC_PID) {
 
                 if ((udev = usb_open(dev))) {
 
                     // LOAD THE FIRMWARE
+                    qCDebug(gcUsb) << "Load firmware to uninitialized Imagic usb device" << dev->filename;
                     int rc = ezusb_load_ram_imagic(udev, appsettings->value(NULL, IMAGIC_FIRMWARE, "").toString().toLatin1(), usb_control_msg_ptr);
 
                     if (rc < 0) {
@@ -538,6 +592,10 @@ struct usb_dev_handle* LibUsb::OpenImagic()
                                                 rc = usb_set_altinterface(udev, alternate);
                                                 if (rc < 0) qDebug()<<"usb_set_altinterface Error: "<< usb_strerror();
                                             }
+#ifdef LIBUSB_V_1
+                                            delete firstBus;
+#endif
+                                        qCDebug(gcUsb) << "Open initialized Imagic usb device" << udev << dev->filename;
                                         return udev;
                                         }
                                      }
@@ -550,6 +608,11 @@ struct usb_dev_handle* LibUsb::OpenImagic()
             }
         }
     }
+
+#ifdef LIBUSB_V_1
+    delete firstBus;
+#endif
+
     return NULL;
 }
 
@@ -560,10 +623,11 @@ bool LibUsb::findAntStick()
     if (libNotInstalled) return false;
 #endif
 
-    struct usb_bus* bus;
+    struct usb_bus* bus, *firstBus;
     struct usb_device* dev;
     bool found = false;
-    for (bus = usb_get_busses(); bus; bus = bus->next) {
+    firstBus = usb_get_busses();
+    for (bus = firstBus; bus; bus = bus->next) {
 
         for (dev = bus->devices; dev; dev = dev->next) {
 
@@ -573,21 +637,28 @@ bool LibUsb::findAntStick()
             }
         }
     }
+
+#ifdef LIBUSB_V_1
+    delete firstBus;
+#endif
+
+    qCDebug(gcUsb) << "findAnt returns" << found;
     return found;
 }
 
-struct usb_dev_handle* LibUsb::OpenAntStick()
+usb_dev_handle* LibUsb::OpenAntStick()
 {
 #ifdef WIN32
     if (libNotInstalled) return NULL;
 #endif
-    struct usb_bus* bus;
+    struct usb_bus* bus, *firstBus;
     struct usb_device* dev;
-    struct usb_dev_handle* udev;
+    usb_dev_handle* udev;
 
 // for Mac and Linux we do a bus reset on it first...
 #ifndef WIN32
-    for (bus = usb_get_busses(); bus; bus = bus->next) {
+    firstBus = usb_get_busses();
+    for (bus = firstBus; bus; bus = bus->next) {
 
         for (dev = bus->devices; dev; dev = dev->next) {
 
@@ -601,9 +672,14 @@ struct usb_dev_handle* LibUsb::OpenAntStick()
             }
         }
     }
+
+#ifdef LIBUSB_V_1
+    delete firstBus;
+#endif
 #endif
 
-    for (bus = usb_get_busses(); bus; bus = bus->next) {
+    firstBus = usb_get_busses();
+    for (bus = firstBus; bus; bus = bus->next) {
 
         for (dev = bus->devices; dev; dev = dev->next) {
 
@@ -623,7 +699,7 @@ struct usb_dev_handle* LibUsb::OpenAntStick()
                             usb_detach_kernel_driver_np(udev, interface);
 #endif
 
-                            int rc = usb_set_configuration(udev, 1);
+                            rc = usb_set_configuration(udev, 1);
                             if (rc < 0) {
                                 qDebug()<<"usb_set_configuration Error: "<< usb_strerror();
                                 if (OperatingSystem == LINUX) {
@@ -642,6 +718,10 @@ struct usb_dev_handle* LibUsb::OpenAntStick()
                                         if (rc < 0) qDebug()<<"usb_set_altinterface Error: "<< usb_strerror();
                                     }
 
+#ifdef LIBUSB_V_1
+                                    delete firstBus;
+#endif
+                                    qCDebug(gcUsb) << "Open Ant usb device" << udev << dev->filename;
                                     return udev;
                                 }
                             }
@@ -653,16 +733,21 @@ struct usb_dev_handle* LibUsb::OpenAntStick()
             }
         }
     }
+
+#ifdef LIBUSB_V_1
+    delete firstBus;
+#endif
+
     return NULL;
 }
 
-struct usb_interface_descriptor* LibUsb::usb_find_interface(struct usb_config_descriptor* config_descriptor)
+usb_interface_descriptor* LibUsb::usb_find_interface(usb_config_descriptor* config_descriptor)
 {
 #ifdef WIN32
     if (libNotInstalled) return NULL;
 #endif
 
-    struct usb_interface_descriptor* intf;
+    usb_interface_descriptor* intf;
 
     readEndpoint = -1;
     writeEndpoint = -1;
@@ -696,13 +781,13 @@ struct usb_interface_descriptor* LibUsb::usb_find_interface(struct usb_config_de
     return intf;
 }
 
-struct usb_interface_descriptor* LibUsb::usb_find_imagic_interface(struct usb_config_descriptor* config_descriptor)
+usb_interface_descriptor* LibUsb::usb_find_imagic_interface(usb_config_descriptor* config_descriptor)
 {
 #ifdef WIN32
     if (libNotInstalled) return NULL;
 #endif
 
-    struct usb_interface_descriptor* intf;
+    usb_interface_descriptor* intf;
 
     readEndpoint = -1;
     writeEndpoint = -1;
@@ -735,6 +820,220 @@ struct usb_interface_descriptor* LibUsb::usb_find_imagic_interface(struct usb_co
 
     return intf;
 }
+
+#ifdef LIBUSB_V_1
+
+usb_device::usb_device()
+    : descriptor()
+{
+}
+
+usb_device::~usb_device()
+{
+    libusb_free_config_descriptor(config);
+    libusb_unref_device(rawDev);
+
+    if (prev)
+    {
+        prev->next = NULL;
+        delete prev;
+    }
+
+    if (next)
+    {
+        next->prev = NULL;
+        delete next;
+    }
+}
+
+usb_bus::~usb_bus()
+{
+    if (devices)
+        delete devices;
+
+    if (prev)
+    {
+        prev->next = NULL;
+        delete prev;
+    }
+
+    if (next)
+    {
+        next->prev = NULL;
+        delete next;
+    }
+}
+
+void LibUsb::usb_init()
+{
+    rc = libusb_init(&ctx);
+    if (rc < 0)
+    {
+        qCritical() << "libusb_init failed with rc=" << rc;
+    }
+}
+
+void LibUsb::usb_set_debug(int logLevel)
+{
+    libusb_set_debug(ctx, logLevel);
+}
+
+usb_bus *LibUsb::usb_get_busses()
+{
+    libusb_device **list;
+    ssize_t listCount = libusb_get_device_list(ctx, &list);
+    if (listCount < 0)
+    {
+        qInfo() << "libusb_get_device_list returned rc=" << listCount;
+        return NULL;
+    }
+
+    usb_bus *firstBus;
+    usb_bus *bus = NULL;
+    usb_bus *lastBus = NULL;
+    int lastBusNumber = -1;
+    usb_device *lastDev = NULL;
+    for (int i = 0; i < listCount; i++)
+    {
+        libusb_device *rawDev = list[i];
+        libusb_device_descriptor deviceDescriptor;
+
+        rc = libusb_get_device_descriptor(rawDev, &deviceDescriptor);
+        if (rc < 0)
+        {
+            qDebug() << "libusb_get_device_descriptor returned rc=" << rc << " for dev no " << i;
+            libusb_unref_device(rawDev);
+            continue;
+        }
+
+        libusb_config_descriptor *configDescriptor;
+        rc = libusb_get_config_descriptor(rawDev, 0, &configDescriptor);
+        if (rc < 0)
+        {
+            qDebug() << "libusb_get_config_descriptor returned rc=" << rc << " for dev no " << i;
+            libusb_unref_device(rawDev);
+            continue;
+        }
+
+        int busNumber = libusb_get_bus_number(rawDev);
+        if (busNumber != lastBusNumber)
+        {
+            bus = new usb_bus;
+            bus->dirname = QString("%1").arg(busNumber, 3, 10, QChar('0')).toLatin1();
+
+            if (lastBus)
+            {
+                lastBus->next = bus;
+                bus->prev = lastBus;
+            }
+            else
+            {
+                firstBus = bus;
+            }
+
+            lastBusNumber = busNumber;
+            lastBus = bus;
+        }
+
+        usb_device *dev = new usb_device;
+        if (!lastDev)
+        {
+            bus->devices = dev;
+        }
+        else
+        {
+            lastDev->next = dev;
+            dev->prev = lastDev;
+        }
+
+        lastDev = dev;
+
+        int deviceAddress = libusb_get_device_address(rawDev);
+        dev->filename = QString("%1").arg(deviceAddress, 3, 10, QChar('0')).toLatin1();
+
+        dev->descriptor.idVendor = deviceDescriptor.idVendor;
+        dev->descriptor.idProduct = deviceDescriptor.idProduct;
+        dev->rawDev = rawDev;
+        dev->config = configDescriptor;
+    }
+
+    libusb_free_device_list(list, 0);
+    return firstBus;
+}
+
+usb_dev_handle *LibUsb::usb_open(usb_device *dev)
+{
+    usb_dev_handle *handle;
+    rc = libusb_open(dev->rawDev, &handle);
+    if (rc < 0)
+    {
+        qCritical() << "libusb_open failed with rc=" << rc;
+        return NULL;
+    }
+
+    return handle;
+}
+
+void LibUsb::usb_detach_kernel_driver_np(usb_dev_handle *udev, int interfaceNumber)
+{
+    rc = libusb_detach_kernel_driver(udev, interfaceNumber);
+
+    // LIBUSB_ERROR_NOT_FOUND means no kernel driver was attached
+    if (rc != LIBUSB_ERROR_NOT_FOUND && rc < 0)
+    {
+        qCritical() << "libusb_detach_kernel_driver failed with rc=" << rc;
+    }
+}
+
+int LibUsb::usb_set_altinterface(usb_dev_handle *udev, int alternate)
+{
+    return libusb_set_interface_alt_setting(udev, interface, alternate);
+}
+
+const char *LibUsb::usb_strerror()
+{
+    return libusb_strerror((libusb_error)rc);
+}
+
+int LibUsb::usb_bulk_read(usb_dev_handle *dev, int ep, char *bytes, int size, int timeout)
+{
+    int actualSize;
+    rc = libusb_bulk_transfer(dev, ep, (unsigned char*) bytes, size, &actualSize, timeout);
+
+    // don't report timeouts
+    if (rc < 0 && rc != LIBUSB_ERROR_TIMEOUT)
+    {
+        qWarning() << "libusb_bulk_transfer failed with rc=" << rc;
+        return rc;
+    }
+
+    return actualSize;
+}
+
+int LibUsb::usb_bulk_write(usb_dev_handle *dev, int ep, const char *bytes, int size, int timeout)
+{
+    int actualSize;
+    rc = libusb_bulk_transfer(dev, ep, (unsigned char*) bytes, size, &actualSize, timeout);
+    return rc < 0 ? rc : actualSize;
+}
+
+int LibUsb::usb_interrupt_write(usb_dev_handle *dev, int ep, const char *bytes, int size, int timeout)
+{
+    int actualSize;
+    rc = libusb_interrupt_transfer(dev, ep, (unsigned char*) bytes, size, &actualSize, timeout);
+    return rc < 0 ? rc : actualSize;
+}
+
+int LibUsb::ezusb_load_ram(usb_dev_handle *device, const char *path, int fx2, int stage, Prototype_EzUsb_control_msg uptr)
+{
+    return ezusb_load_ram(device, path, fx2, stage, uptr);
+}
+
+int LibUsb::ezusb_load_ram_imagic(usb_dev_handle *device, const char *path, Prototype_EzUsb_control_msg uptr)
+{
+    return ezusb_load_ram_imagic(device, path, uptr);
+}
+#endif
 
 #else
 

@@ -97,7 +97,7 @@ class LTMPlot : public QwtPlot
         QwtPlotCurve *highlighter;
 
         // keeping track of axes
-        QHash<QString, QwtPlotCurve*> curves; // metric symbol with curve object
+        QMultiHash<QString, QwtPlotCurve*> curves; // metric symbol with curve object
         QHash<QString, QwtAxisId> axes;             // units and associated axis
         QList<QObject*> axesObject;
         QList<QwtAxisId> axesId;
@@ -237,7 +237,7 @@ class LTMScaleDraw: public QwtScaleDraw
                 int year=group/12;
                 int month=group%12;
                 if (!month) { year--; month=12; }
-                label = QString("%1\n%2").arg(QDate::shortMonthName(month)).arg(year);
+                label = QString("%1\n%2").arg(QLocale::system().monthName(month, QLocale::ShortFormat)).arg(year);
             }
             break;
 

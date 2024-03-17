@@ -23,7 +23,7 @@
 #include "RideCacheModel.h"
 #include "Athlete.h"
 #include "Context.h"
-#include "TabView.h"
+#include "AbstractView.h"
 #include "HelpWhatsThis.h"
 
 DiaryWindow::DiaryWindow(Context *context) :
@@ -32,7 +32,7 @@ DiaryWindow::DiaryWindow(Context *context) :
     setControls(NULL);
 
     // get config
-    fieldDefinitions = context->athlete->rideMetadata()->getFields();
+    fieldDefinitions = GlobalContext::context()->rideMetadata->getFields();
 
     QVBoxLayout *vlayout = new QVBoxLayout;
     setChartLayout(vlayout);
@@ -42,7 +42,9 @@ DiaryWindow::DiaryWindow(Context *context) :
     QFont bold;
     bold.setPointSize(14);
     bold.setWeight(QFont::Bold);
-    title = new QLabel("", this);
+    title = new QDateEdit(this);
+    title->setDisplayFormat("MMMM yyyy");
+    title->setCurrentSection(QDateTimeEdit::YearSection);
     title->setAlignment(Qt::AlignCenter | Qt::AlignVCenter);
     title->setFont(bold);
 
@@ -70,13 +72,8 @@ DiaryWindow::DiaryWindow(Context *context) :
     monthlyView = new QTableView(this);
     monthlyView->setItemDelegate(new GcCalendarDelegate);
     monthlyView->setModel(calendarModel);
-#if QT_VERSION > 0x050000
     monthlyView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
     monthlyView->verticalHeader()->setSectionResizeMode(QHeaderView::Stretch);
-#else
-    monthlyView->horizontalHeader()->setResizeMode(QHeaderView::Stretch);
-    monthlyView->verticalHeader()->setResizeMode(QHeaderView::Stretch);
-#endif
     monthlyView->verticalHeader()->hide();
     monthlyView->viewport()->installEventFilter(this);
     monthlyView->setGridStyle(Qt::DotLine);
@@ -95,6 +92,7 @@ DiaryWindow::DiaryWindow(Context *context) :
     connect(context, SIGNAL(filterChanged()), this, SLOT(rideSelected()));
     connect(context, SIGNAL(homeFilterChanged()), this, SLOT(rideSelected()));
     connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
+    connect(title, SIGNAL(dateChanged(const QDate)), this, SLOT(dateChanged(const QDate)));
     connect(next, SIGNAL(clicked()), this, SLOT(nextClicked()));
     connect(prev, SIGNAL(clicked()), this, SLOT(prevClicked()));
 
@@ -106,14 +104,13 @@ void
 DiaryWindow::configChanged(qint32)
 {
     // get config
-    fieldDefinitions = context->athlete->rideMetadata()->getFields();
+    fieldDefinitions = GlobalContext::context()->rideMetadata->getFields();
 
     // change colors to reflect preferences
     setProperty("color", GColor(CPLOTBACKGROUND));
 
     QPalette palette;
     palette.setBrush(QPalette::Window, QBrush(GColor(CPLOTBACKGROUND)));
-    palette.setBrush(QPalette::Background, QBrush(GColor(CPLOTBACKGROUND)));
     palette.setBrush(QPalette::Base, QBrush(GColor(CPLOTBACKGROUND)));
     palette.setColor(QPalette::WindowText, GCColor::invertColor(GColor(CPLOTBACKGROUND)));
     palette.setColor(QPalette::Text, GCColor::invertColor(GColor(CPLOTBACKGROUND)));
@@ -130,8 +127,8 @@ DiaryWindow::configChanged(qint32)
                     .arg(GColor(CPLOTBACKGROUND).name())
                     .arg(GCColor::invertColor(GColor(CPLOTBACKGROUND)).name()));
 #ifndef Q_OS_MAC
-    monthlyView->verticalScrollBar()->setStyleSheet(TabView::ourStyleSheet());
-    monthlyView->horizontalScrollBar()->setStyleSheet(TabView::ourStyleSheet());
+    monthlyView->verticalScrollBar()->setStyleSheet(AbstractView::ourStyleSheet());
+    monthlyView->horizontalScrollBar()->setStyleSheet(AbstractView::ourStyleSheet());
 #endif
     title->setStyleSheet(QString("background: %1; color: %2;").arg(GColor(CPLOTBACKGROUND).name())
                                                               .arg(GColor(CPLOTMARKER).name()));
@@ -158,8 +155,7 @@ DiaryWindow::rideSelected()
 
     // set the date range to put the current ride in view...
     QDate when = ride->dateTime.date();
-    int month = when.month();
-    int year = when.year();
+    title->setDate(when);
 
     // monthly view updates
     calendarModel->setStale();
@@ -167,10 +163,15 @@ DiaryWindow::rideSelected()
 
     when = when.addDays(Qt::Monday - when.dayOfWeek());
 
-    title->setText(QString("%1 %2").arg(QDate::longMonthName(month)).arg(year));
     repaint();
     next->show();
     prev->show();
+}
+
+void
+DiaryWindow::dateChanged(const QDate &date)
+{
+    calendarModel->setMonth(date.month(), date.year());
 }
 
 void
@@ -180,7 +181,7 @@ DiaryWindow::prevClicked()
     int year = calendarModel->getYear();
     QDate when = QDate(year, month, 1).addDays(-1);
     calendarModel->setMonth(when.month(), when.year());
-    title->setText(QString("%1 %2").arg(QDate::longMonthName(when.month())).arg(when.year()));
+    title->setDate(when);
 }
 
 void
@@ -190,7 +191,7 @@ DiaryWindow::nextClicked()
     int year = calendarModel->getYear();
     QDate when = QDate(year, month, 1).addMonths(1);
     calendarModel->setMonth(when.month(), when.year());
-    title->setText(QString("%1 %2").arg(QDate::longMonthName(when.month())).arg(when.year()));
+    title->setDate(when);
 }
 
 bool

@@ -1,4 +1,11 @@
+Update Note: to build GoldenCheetah v3.6 we are using Microsoft Visual C++ 2019,
+included in Microsoft Visual Studio 2019 AppVeyor image, with Qt5.15.2 and GSL 2.7
+insalled with vcpkg, on AppVeyor continuous integration platform.
+You can check the appveyor.yml for the complete and updated build script,
+the minimum Qt version known to work is 5.13 with Qt WebEngine and Qt Charts.
+GSL - GNU Scientific Library is a mandatory dependency starting with v3.6
 
+Ale Martinez - Jul, 2022
                                  +++++++++++++++++++++++
                                  WIN32 BUILD WALKTHROUGH
                                  +++++++++++++++++++++++
@@ -6,6 +13,7 @@
                                      Joern Rischmueller
 
                                        February 2017
+
 
 This instruction will guide  you through a standard build of GoldenCheetah (without external
 dependencies or API based services included).
@@ -157,10 +165,6 @@ Info: I plan to provide a pre-compiled set of the dependencies for the Windows v
      The version currently used is: "CDM v2.10.00 WHQL Certified" - while there are more recent
 	 version available for download.
 	 
-- Google Earth .kml files (export)
-  -- Is part of the official build as a static lib - build is done with MSVC2015 - the build uses Release 1.2
-     (path of source code has changed to https://github.com/google/libkml)
-
 - iCal Calendar support (prerequisite for the "Diary" view)
   -- Is part of the official build as a static lib - the build uses Release 1.0.1
   
@@ -199,9 +203,3 @@ to contribute is to provide a pull-request.
 
 Cheers.
 Joern
- 
-
-
-
-
-

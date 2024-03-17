@@ -21,8 +21,9 @@
 #include "DataProcessor.h"
 #include "Context.h"
 #include "HelpWhatsThis.h"
-#include "HrvMeasuresDownload.h"
-#include "HrvMeasures.h"
+#include "MeasuresDownload.h"
+#include "Measures.h"
+#include "Athlete.h"
 
 void FilterHrv(XDataSeries *rr, double rr_min, double rr_max, double filt, int hwin)
 {
@@ -198,7 +199,7 @@ public:
                           "  - \"R-R min and maximum\" exclude samples outside (flag -1). Also excluded when filtering range.\n"
                           "  - \"Filter range\" of the average within a window (flag 0)\n"
                           "  - \"Filter window size\" distance on either side of the current interval\n"
-                          "  - \"Set Rest HRV\" if checked the computed HRV metrics are set as Rest HRV Measures\n"
+                          "  - \"Set Rest HRV\" if checked on interactive use the computed HRV metrics are set as Rest HRV Measures\n"
                           ""
                           )));
     }
@@ -235,7 +236,8 @@ public:
     bool postProcess(RideFile *, DataProcessorConfig* config, QString op);
 
     // the config widget
-    DataProcessorConfig* processorConfig(QWidget *parent) {
+    DataProcessorConfig* processorConfig(QWidget *parent, const RideFile * ride = NULL) {
+        Q_UNUSED(ride);
         return new FilterHrvOutliersConfig(parent);
     }
 
@@ -252,8 +254,8 @@ FilterHrvOutliers::postProcess(RideFile *ride, DataProcessorConfig *config=0, QS
 {
     Q_UNUSED(op)
 
-    if (ride->areDataPresent()->hrv) {
-        XDataSeries *series = ride->xdata("HRV");
+    XDataSeries *series = ride->xdata("HRV");
+    if (series && series->datapoints.count() > 0) {
 
         // Read settings
         double rrMax;
@@ -277,27 +279,44 @@ FilterHrvOutliers::postProcess(RideFile *ride, DataProcessorConfig *config=0, QS
             setRestHrv = (bool) ((FilterHrvOutliersConfig*)(config))->setRestHrv->checkState();
         }
         FilterHrv(series, rrMin, rrMax, rrFilt, rrWindow);
-        ride->context->rideItem()->refresh();
 
-        // Set HRV Measures according to user request
-        if (setRestHrv) {
-            RideItem *rideItem = ride->context->rideItem();
+        // refresh if present in RideCache
+        RideItem *rideItem = nullptr;
+        foreach(RideItem *item, ride->context->athlete->rideCache->rides()) {
+            if (item->dateTime == ride->startTime()) {
+                rideItem = item;
+                break;
+            }
+        }
+        if (rideItem) rideItem->refresh();
+
+        // Set HRV Measures according to user request if present in RideCache
+        if (setRestHrv && rideItem) {
+            QStringList fieldSymbols = ride->context->athlete->measures->getFieldSymbols(Measures::Hrv);
 
             double avnn = rideItem->getForSymbol("AVNN");
 
-            HrvMeasure hrvMeasure;
+            Measure hrvMeasure;
             hrvMeasure.when = rideItem->dateTime;
-            hrvMeasure.hr = !qFuzzyIsNull(avnn) ? 60000 / avnn : 0;
-            hrvMeasure.avnn = avnn;
-            hrvMeasure.sdnn = rideItem->getForSymbol("SDNN");
-            hrvMeasure.rmssd = rideItem->getForSymbol("rMSSD");
-            hrvMeasure.pnn50 = rideItem->getForSymbol("pNN50");
-            hrvMeasure.recovery_points = 1.5 * log(hrvMeasure.rmssd) + 2;
+            if (fieldSymbols.contains("HR"))
+                hrvMeasure.values[fieldSymbols.indexOf("HR")] = !qFuzzyIsNull(avnn) ? 60000 / avnn : 0;
+            if (fieldSymbols.contains("AVNN"))
+                hrvMeasure.values[fieldSymbols.indexOf("AVNN")] = avnn;
+            if (fieldSymbols.contains("SDNN"))
+                hrvMeasure.values[fieldSymbols.indexOf("SDNN")] = rideItem->getForSymbol("SDNN");
+            if (fieldSymbols.contains("RMSSD"))
+                hrvMeasure.values[fieldSymbols.indexOf("RMSSD")] = rideItem->getForSymbol("rMSSD");
+            if (fieldSymbols.contains("PNN50"))
+                hrvMeasure.values[fieldSymbols.indexOf("PNN50")] = rideItem->getForSymbol("pNN50");
+            if (fieldSymbols.contains("RECOVERY_POINTS"))
+                hrvMeasure.values[fieldSymbols.indexOf("RECOVERY_POINTS")] = 1.5 * log(rideItem->getForSymbol("rMSSD")) + 2;
 
-            QList<HrvMeasure> hrvMeasures;
+            QList<Measure> hrvMeasures;
             hrvMeasures.append(hrvMeasure);
 
-            HrvMeasuresDownload::updateMeasures(ride->context, hrvMeasures);
+            MeasuresDownload::updateMeasures(ride->context,
+                                             ride->context->athlete->measures->getGroup(Measures::Hrv),
+                                             hrvMeasures);
         }
 
         return true;

@@ -26,12 +26,13 @@
 #include "CsvRideFile.h"
 #include "Colors.h"
 #include "Units.h"
+#include "DataProcessor.h"  // to run auto data processors
+#include "RideMetadata.h"   // for linked defaults processing
 
 #include <QIcon>
 #include <QFileIconProvider>
 #include <QMessageBox>
 #include <QHeaderView>
-#include <QDesktopWidget>
 
 #include "../qzip/zipwriter.h"
 #include "../qzip/zipreader.h"
@@ -954,6 +955,9 @@ CloudServiceSyncDialog::cancelClicked()
 void
 CloudServiceSyncDialog::refreshClicked()
 {
+    double distanceFactor = GlobalContext().useMetricUnits ? 1.0 : MILES_PER_KM;
+    QString distanceUnits = GlobalContext().useMetricUnits ? tr("km") : tr("mi");
+
     progressLabel->setText(tr(""));
     progressBar->setMinimum(0);
     progressBar->setMaximum(1);
@@ -1099,7 +1103,7 @@ CloudServiceSyncDialog::refreshClicked()
                 sync->setTextAlignment(4, Qt::AlignCenter);
 
                 double distance = workouts[i]->distance;
-                sync->setText(5, QString("%1 km").arg(distance, 0, 'f', 1));
+                sync->setText(5, QString("%1 %2").arg(distance*distanceFactor, 0, 'f', 1).arg(distanceUnits));
                 sync->setTextAlignment(5, Qt::AlignRight | Qt::AlignVCenter);
             }
             sync->setText(6, tr("Download"));
@@ -1143,7 +1147,7 @@ CloudServiceSyncDialog::refreshClicked()
         add->setTextAlignment(4, Qt::AlignCenter);
 
         double distance = ride->getForSymbol("total_distance");
-        add->setText(5, QString("%1 km").arg(distance, 0, 'f', 1));
+        add->setText(5, QString("%1 %2").arg(distance*distanceFactor, 0, 'f', 1).arg(distanceUnits));
         add->setTextAlignment(5, Qt::AlignRight | Qt::AlignVCenter);
 
         // exists? - we ignore seconds, since TP seems to do odd
@@ -1181,7 +1185,7 @@ CloudServiceSyncDialog::refreshClicked()
             sync->setTextAlignment(3, Qt::AlignCenter);
             sync->setText(4, duration);
             sync->setTextAlignment(4, Qt::AlignCenter);
-            sync->setText(5, QString("%1 km").arg(distance, 0, 'f', 1));
+            sync->setText(5, QString("%1 %2").arg(distance*distanceFactor, 0, 'f', 1).arg(distanceUnits));
             sync->setTextAlignment(5, Qt::AlignRight | Qt::AlignVCenter);
             sync->setText(6, tr("Upload"));
             sync->setTextAlignment(6, Qt::AlignLeft | Qt::AlignVCenter);
@@ -1651,6 +1655,15 @@ CloudServiceSyncDialog::saveRide(RideFile *ride, QStringList &errors)
         return false;
     }
 
+    // process linked defaults
+    GlobalContext::context()->rideMetadata->setLinkedDefaults(ride);
+
+    // run the processor first... import
+    DataProcessorFactory::instance().autoProcess(ride, "Auto", "Import");
+    ride->recalculateDerivedSeries();
+    // now metrics have been calculated
+    DataProcessorFactory::instance().autoProcess(ride, "Save", "ADD");
+
     JsonFileReader reader;
     QFile file(filename);
     reader.writeRideFile(context, ride, file);
@@ -1933,6 +1946,15 @@ CloudServiceAutoDownload::readComplete(QByteArray*data,QString name,QString)
         return;
     }
 
+    // process linked defaults
+    GlobalContext::context()->rideMetadata->setLinkedDefaults(ride);
+
+    // run the processor first... import
+    DataProcessorFactory::instance().autoProcess(ride, "Auto", "Import");
+    ride->recalculateDerivedSeries();
+    // now metrics have been calculated
+    DataProcessorFactory::instance().autoProcess(ride, "Save", "ADD");
+
     JsonFileReader reader;
     QFile file(filename);
     reader.writeRideFile(context, ride, file);
@@ -2013,7 +2035,7 @@ CloudServiceAutoDownloadWidget::paintEvent(QPaintEvent*)
     QFontMetrics fm(font);
     painter.setFont(font);
     painter.setPen(GCColor::invertColor(GColor(CPLOTBACKGROUND)));
-    QRectF textbox = QRectF(0,0, fm.width(statusstring), height() / 2.0f);
+    QRectF textbox = QRectF(0,0, fm.horizontalAdvance(statusstring), height() / 2.0f);
     painter.drawText(textbox, Qt::AlignVCenter | Qt::AlignCenter, statusstring);
 
     // rectangle

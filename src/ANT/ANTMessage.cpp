@@ -1141,7 +1141,7 @@ ANTMessage ANTMessage::fecRequestCapabilities(const uint8_t channel)
                       FITNESS_EQUIPMENT_REQUEST_DATA_PAGE,        // data page request
                       0xFF, 0xFF,  // reserved
                       0xFF, 0xFF,  // descriptors
-                      0x01,        // requested transmission response (1 time only)
+                      0x04,        // requested transmission response
                       FITNESS_EQUIPMENT_TRAINER_CAPABILITIES_PAGE,        // requested page
                       0x01);       // request data page
 }
