@@ -63,7 +63,6 @@ INCLUDEPATH +=  ../qwt/src \
                 ../contrib/qtsolutions/json \
                 ../contrib/qtsolutions/qwtcurve \
                 ../contrib/lmfit \
-                ../contrib/levmar \
                 ../contrib/boost \
                 ../contrib/kmeans \
                 ../contrib/voronoi
@@ -683,7 +682,6 @@ HEADERS += ../contrib/qtsolutions/codeeditor/codeeditor.h ../contrib/qtsolutions
            ../contrib/qxt/src/qxtspanslider_p.h ../contrib/qxt/src/qxtstringspinbox.h ../contrib/qzip/zipreader.h \
            ../contrib/qzip/zipwriter.h ../contrib/lmfit/lmcurve.h  ../contrib/lmfit/lmcurve_tyd.h \
            ../contrib/lmfit/lmmin.h  ../contrib/lmfit/lmstruct.h \
-           ../contrib/levmar/compiler.h  ../contrib/levmar/levmar.h  ../contrib/levmar/lm.h  ../contrib/levmar/misc.h \
            ../contrib/boost/GeometricTools_BSplineCurve.h \
            ../contrib/kmeans/kmeans_dataset.h ../contrib/kmeans/kmeans_general_functions.h ../contrib/kmeans/hamerly_kmeans.h \
            ../contrib/kmeans/kmeans.h ../contrib/kmeans/original_space_kmeans.h ../contrib/kmeans/triangle_inequality_base_kmeans.h \
@@ -789,10 +787,6 @@ SOURCES += ../contrib/qtsolutions/codeeditor/codeeditor.cpp ../contrib/qtsolutio
            ../contrib/qtsolutions/qwtcurve/qwt_plot_gapped_curve.cpp \
            ../contrib/qxt/src/qxtspanslider.cpp ../contrib/qxt/src/qxtstringspinbox.cpp ../contrib/qzip/zip.cpp \
            ../contrib/lmfit/lmcurve.c ../contrib/lmfit/lmmin.c \
-           ../contrib/levmar/Axb.c ../contrib/levmar/lm_core.c ../contrib/levmar/lmbc_core.c \
-           ../contrib/levmar/lmblec_core.c ../contrib/levmar/lmbleic_core.c ../contrib/levmar/lmlec.c ../contrib/levmar/misc.c \
-           ../contrib/levmar/Axb_core.c ../contrib/levmar/lm.c ../contrib/levmar/lmbc.c ../contrib/levmar/lmblec.c ../contrib/levmar/lmbleic.c \
-           ../contrib/levmar/lmlec_core.c ../contrib/levmar/misc_core.c \
            ../contrib/kmeans/kmeans_dataset.cpp ../contrib/kmeans/kmeans_general_functions.cpp ../contrib/kmeans/hamerly_kmeans.cpp \
            ../contrib/kmeans/kmeans.cpp ../contrib/kmeans/original_space_kmeans.cpp ../contrib/kmeans/triangle_inequality_base_kmeans.cpp \
            ../contrib/voronoi/Voronoi.cpp
