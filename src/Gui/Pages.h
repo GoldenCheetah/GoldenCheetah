@@ -479,7 +479,6 @@ class ColorsPage : public QWidget
         QLineEdit *searchEdit;
         QTreeWidget *colors;
         QTreeWidget *themes;
-        const Colors *colorSet;
         QPushButton *applyTheme;
 
         struct {

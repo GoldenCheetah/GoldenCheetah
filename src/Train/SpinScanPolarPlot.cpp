@@ -77,8 +77,8 @@ SpinScanPolarPlot::SpinScanPolarPlot(QWidget *parent, uint8_t *spinData) : QwtPl
     QPalette pal;
     setAxisScale(QwtAxis::YLeft, -90, 90); // max 8 bit plus a little
     setAxisScale(QwtAxis::XBottom, -90, 90); // max 8 bit plus a little
-    pal.setColor(QPalette::WindowText, GColor(CSPINSCANLEFT));
-    pal.setColor(QPalette::Text, GColor(CSPINSCANLEFT));
+    pal.setColor(QPalette::WindowText, GColor(GCol::SPINSCANLEFT));
+    pal.setColor(QPalette::Text, GColor(GCol::SPINSCANLEFT));
     axisWidget(QwtAxis::YLeft)->setPalette(pal);
     axisWidget(QwtAxis::YLeft)->scaleDraw()->setTickLength(QwtScaleDiv::MajorTick, 3);
 
@@ -118,9 +118,9 @@ SpinScanPolarPlot::setAxisTitle(int axis, QString label)
 void
 SpinScanPolarPlot::configChanged(qint32)
 {
-    setCanvasBackground(GColor(CTRAINPLOTBACKGROUND));
+    setCanvasBackground(GColor(GCol::TRAINPLOTBACKGROUND));
 
-    QColor col = GColor(CSPINSCANRIGHT);
+    QColor col = GColor(GCol::SPINSCANRIGHT);
     col.setAlpha(120);
     QBrush brush = QBrush(col);
     QPen pen(col);
@@ -130,7 +130,7 @@ SpinScanPolarPlot::configChanged(qint32)
     rightCurve->setStyle(QwtPlotCurve::Lines);
     rightCurve->setData(rightSpinScanPolarData);
 
-    QColor col2 = GColor(CSPINSCANLEFT);
+    QColor col2 = GColor(GCol::SPINSCANLEFT);
     col2.setAlpha(120);
     QBrush brush2 = QBrush(col2);
     QPen pen2(col2);

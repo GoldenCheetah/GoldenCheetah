@@ -66,7 +66,7 @@ PfPvDoubleClickPicker::trackerTextF( const QPointF &pos ) const
     QString text = QString(tr("%1 rpm, %2 watts")).arg(p.x()).arg(p.y());
 
     QwtText returning(text);
-    returning.setColor(GColor(CPLOTMARKER));
+    returning.setColor(GColor(GCol::PLOTMARKER));
 
     // trigger plot doing interval hover ...
     pfPvPlot->mouseTrack(p.x(), p.y());
@@ -130,7 +130,7 @@ PfPvWindow::PfPvWindow(Context *context) :
     // allow zooming
     pfpvZoomer = new QwtPlotZoomer(pfPvPlot->canvas());
     pfpvZoomer->setRubberBand(QwtPicker::RectRubberBand);
-    pfpvZoomer->setRubberBandPen(GColor(CPLOTSELECT));
+    pfpvZoomer->setRubberBandPen(GColor(GCol::PLOTSELECT));
     pfpvZoomer->setTrackerMode(QwtPicker::AlwaysOff);
     pfpvZoomer->setEnabled(true);
     pfpvZoomer->setMousePattern(QwtEventPattern::MouseSelect1, Qt::LeftButton);
@@ -226,7 +226,7 @@ PfPvWindow::PfPvWindow(Context *context) :
 void
 PfPvWindow::configChanged(qint32)
 {
-    setProperty("color", GColor(CPLOTBACKGROUND)); // called on config change
+    setProperty("color", GColor(GCol::PLOTBACKGROUND)); // called on config change
 }
 
 bool

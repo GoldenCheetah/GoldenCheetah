@@ -107,7 +107,7 @@ GcOverlayWidget::GcOverlayWidget(Context *context, QWidget *parent) : QWidget(pa
 void
 GcOverlayWidget::configChanged(qint32)
 {
-    titleLabel->setStyleSheet(QString("color: %1;").arg(GCColor::invertColor(GColor(CCHROME)).name()));
+    titleLabel->setStyleSheet(QString("color: %1;").arg(GInvertColor(GCol::CHROME).name()));
 }
 
 void
@@ -207,13 +207,13 @@ GcOverlayWidget::paintBackground(QPaintEvent *)
     QRect all(0,0,width(),height());
     QRect boundary(0,0,width()-1,height()-1);
 
-    painter.fillRect(all, GColor(CPLOTBACKGROUND));
+    painter.fillRect(all, GColor(GCol::PLOTBACKGROUND));
     painter.setPen(QPen(Qt::darkGray));
     painter.drawRect(boundary);
 
     // linear gradients
-    QLinearGradient active = GCColor::linearGradient(23*dpiXFactor, true);
-    QLinearGradient inactive = GCColor::linearGradient(23*dpiYFactor, false);
+    QLinearGradient active = GCColor::inst()->linearGradient(23*dpiXFactor);
+    QLinearGradient inactive = GCColor::inst()->linearGradient(23*dpiYFactor);
 
     // title
     QRect title(1*dpiXFactor,1*dpiYFactor,width()-(2*dpiXFactor),22*dpiYFactor);

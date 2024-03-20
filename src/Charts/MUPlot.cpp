@@ -112,15 +112,15 @@ void
 MUPlot::configChanged(qint32)
 {
     QPalette palette;
-    palette.setBrush(QPalette::Window, QBrush(GColor(CPLOTBACKGROUND)));
-    palette.setColor(QPalette::WindowText, GColor(CPLOTMARKER));
-    palette.setColor(QPalette::Text, GColor(CPLOTMARKER));
+    palette.setBrush(QPalette::Window, QBrush(GColor(GCol::PLOTBACKGROUND)));
+    palette.setColor(QPalette::WindowText, GColor(GCol::PLOTMARKER));
+    palette.setColor(QPalette::Text, GColor(GCol::PLOTMARKER));
     setPalette(palette);
 
     axisWidget(QwtAxis::XBottom)->setPalette(palette);
     axisWidget(QwtAxis::YLeft)->setPalette(palette);
 
-    setCanvasBackground(GColor(CPLOTBACKGROUND));
+    setCanvasBackground(GColor(GCol::PLOTBACKGROUND));
 }
 
 // get the fonts and colors right for the axis scales
@@ -133,7 +133,7 @@ MUPlot::setAxisTitle(int axis, QString label)
     stGiles.setPointSize(appsettings->value(NULL, GC_FONT_CHARTLABELS_SIZE, 8).toInt());
 
     QwtText title(label);
-    title.setColor(GColor(CPLOTMARKER));
+    title.setColor(GColor(GCol::PLOTMARKER));
     title.setFont(stGiles);
     QwtPlot::setAxisFont(axis, stGiles);
     QwtPlot::setAxisTitle(axis, title);
@@ -246,7 +246,7 @@ MUPlot::setModel(int model)
             fastLine->attach(this);
 
             // now add a handle
-            QColor color = GColor(CPLOTBACKGROUND);
+            QColor color = GColor(GCol::PLOTBACKGROUND);
             double x = MU_FASTMEAN; // mean is ok
             double y = 0.05f * 40.0f; // variance scaled to w(x)
 
@@ -272,7 +272,7 @@ MUPlot::setModel(int model)
             slowCurve->setData(slowNormal = new MUNormal(MU_SLOWMEAN, 0.05f));
             slowCurve->attach(this);
 
-            QColor handleColor = GColor(CCP).darker(30);
+            QColor handleColor = GColor(GCol::CP).darker(30);
             handleColor.setAlpha(64);
 
             // now a mean line
@@ -284,7 +284,7 @@ MUPlot::setModel(int model)
             slowLine->attach(this);
 
             // now add a handle
-            QColor color = GColor(CPLOTBACKGROUND);
+            QColor color = GColor(GCol::PLOTBACKGROUND);
             double x = MU_SLOWMEAN; // mean is ok
             double y = 0.05f * 40.0f; // variance scaled to w(x)
 
@@ -335,7 +335,7 @@ MUPlot::setModel(int model)
         if (antialias) slowCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
 
         // color and brush
-        QColor color = GColor(CCP); // customise ?
+        QColor color = GColor(GCol::CP); // customise ?
         QPen pen(color);
         pen.setWidth(1.0);
 

@@ -318,25 +318,25 @@ AerolabWindow::zoomChanged()
 void
 AerolabWindow::configChanged(qint32)
 {
-  allZoomer->setRubberBandPen(GColor(CPLOTSELECT));
-  setProperty("color", GColor(CPLOTBACKGROUND));
+  allZoomer->setRubberBandPen(GColor(GCol::PLOTSELECT));
+  setProperty("color", GColor(GCol::PLOTBACKGROUND));
 
   QPalette palette;
 
-  palette.setColor(QPalette::Window, GColor(CPLOTBACKGROUND));
+  palette.setColor(QPalette::Window, GColor(GCol::PLOTBACKGROUND));
 
   // only change base if moved away from white plots
   // which is a Mac thing
 #ifndef Q_OS_MAC
-  if (GColor(CPLOTBACKGROUND) != Qt::white)
+  if (GColor(GCol::PLOTBACKGROUND) != Qt::white)
 #endif
   {
-      palette.setColor(QPalette::Base, GCColor::alternateColor(GColor(CPLOTBACKGROUND)));
-      palette.setColor(QPalette::Window,  GColor(CPLOTBACKGROUND));
+      palette.setColor(QPalette::Base, GAlternateColor(GCol::PLOTBACKGROUND));
+      palette.setColor(QPalette::Window,  GColor(GCol::PLOTBACKGROUND));
   }
 
-  palette.setColor(QPalette::WindowText, GCColor::invertColor(GColor(CPLOTBACKGROUND)));
-  palette.setColor(QPalette::Text, GCColor::invertColor(GColor(CPLOTBACKGROUND)));
+  palette.setColor(QPalette::WindowText, GInvertColor(GCol::PLOTBACKGROUND));
+  palette.setColor(QPalette::Text, GInvertColor(GCol::PLOTBACKGROUND));
   setPalette(palette);
   aerolab->setPalette(palette);
   crrLabel->setPalette(palette);

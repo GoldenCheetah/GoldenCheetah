@@ -651,30 +651,30 @@ CriticalPowerWindow::setEditFromSlider()
 void
 CriticalPowerWindow::configChanged(qint32)
 {
-    if (rangemode) setProperty("color", GColor(CTRENDPLOTBACKGROUND));
-    else setProperty("color", GColor(CPLOTBACKGROUND));
+    if (rangemode) setProperty("color", GColor(GCol::TRENDPLOTBACKGROUND));
+    else setProperty("color", GColor(GCol::PLOTBACKGROUND));
 
     // tinted palette for headings etc
     QPalette palette;
-    if (rangemode) palette.setBrush(QPalette::Window, QBrush(GColor(CTRENDPLOTBACKGROUND)));
-    else palette.setBrush(QPalette::Window, QBrush(GColor(CPLOTBACKGROUND)));
-    palette.setColor(QPalette::WindowText, GColor(CPLOTMARKER));
-    palette.setColor(QPalette::Text, GColor(CPLOTMARKER));
-    palette.setColor(QPalette::Base, GCColor::alternateColor(GColor(CPLOTBACKGROUND)));
+    if (rangemode) palette.setBrush(QPalette::Window, QBrush(GColor(GCol::TRENDPLOTBACKGROUND)));
+    else palette.setBrush(QPalette::Window, QBrush(GColor(GCol::PLOTBACKGROUND)));
+    palette.setColor(QPalette::WindowText, GColor(GCol::PLOTMARKER));
+    palette.setColor(QPalette::Text, GColor(GCol::PLOTMARKER));
+    palette.setColor(QPalette::Base, GAlternateColor(GCol::PLOTBACKGROUND));
     setPalette(palette);
 
     // inverted palette for data etc
     QPalette whitepalette;
     if (rangemode) {
-        whitepalette.setBrush(QPalette::Window, QBrush(GColor(CTRENDPLOTBACKGROUND)));
-        whitepalette.setColor(QPalette::WindowText, GCColor::invertColor(GColor(CTRENDPLOTBACKGROUND)));
-        whitepalette.setColor(QPalette::Base, GCColor::alternateColor(GColor(CPLOTBACKGROUND)));
-        whitepalette.setColor(QPalette::Text, GCColor::invertColor(GColor(CTRENDPLOTBACKGROUND)));
+        whitepalette.setBrush(QPalette::Window, QBrush(GColor(GCol::TRENDPLOTBACKGROUND)));
+        whitepalette.setColor(QPalette::WindowText, GInvertColor(GColor(GCol::TRENDPLOTBACKGROUND)));
+        whitepalette.setColor(QPalette::Base, GAlternateColor(GColor(GCol::PLOTBACKGROUND)));
+        whitepalette.setColor(QPalette::Text, GInvertColor(GColor(GCol::TRENDPLOTBACKGROUND)));
     } else {
-        whitepalette.setBrush(QPalette::Window, QBrush(GColor(CPLOTBACKGROUND)));
-        whitepalette.setColor(QPalette::WindowText, GCColor::invertColor(GColor(CPLOTBACKGROUND)));
-        whitepalette.setColor(QPalette::Base, GCColor::alternateColor(GColor(CPLOTBACKGROUND)));
-        whitepalette.setColor(QPalette::Text, GCColor::invertColor(GColor(CPLOTBACKGROUND)));
+        whitepalette.setBrush(QPalette::Window, QBrush(GColor(GCol::PLOTBACKGROUND)));
+        whitepalette.setColor(QPalette::WindowText, GInvertColor(GColor(GCol::PLOTBACKGROUND)));
+        whitepalette.setColor(QPalette::Base, GAlternateColor(GColor(GCol::PLOTBACKGROUND)));
+        whitepalette.setColor(QPalette::Text, GInvertColor(GColor(GCol::PLOTBACKGROUND)));
     }
 
     QFont font;
@@ -717,21 +717,21 @@ CriticalPowerWindow::configChanged(qint32)
 
 
 #ifndef Q_OS_MAC
-    QString style = QString("QSpinBox { background: %1; }").arg(GCColor::alternateColor(GColor(CPLOTBACKGROUND)).name());
+    QString style = QString("QSpinBox { background: %1; }").arg(GAlternateColor(GCol::PLOTBACKGROUND).name());
     CPEdit->setStyleSheet(style);
     //CPLabel->setStyleSheet(style);
     //CPSlider->setStyleSheet(style);
     if (dpiXFactor > 1) {
-        helper->setStyleSheet(QString("background: %1; color: %2;").arg(GColor(CPLOTBACKGROUND).name())
-                                                                      .arg(GColor(CPLOTMARKER).name()));
+        helper->setStyleSheet(QString("background: %1; color: %2;").arg(GColor(GCol::PLOTBACKGROUND).name())
+                                                                      .arg(GColor(GCol::PLOTMARKER).name()));
     }
 
     // do after cascade above
-    summary->setStyleSheet(QString("background-color: %1; color: %2;").arg(GColor(CPLOTBACKGROUND).name()).arg(QColor(Qt::gray).name()));
+    summary->setStyleSheet(QString("background-color: %1; color: %2;").arg(GColor(GCol::PLOTBACKGROUND).name()).arg(QColor(Qt::gray).name()));
 #endif
 
 
-    QPen gridPen(GColor(CPLOTGRID));
+    QPen gridPen(GColor(GCol::PLOTGRID));
     grid->setPen(gridPen);
 
     // set ride

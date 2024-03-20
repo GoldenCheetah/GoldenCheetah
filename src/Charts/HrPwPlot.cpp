@@ -54,7 +54,7 @@ HrPwPlot::HrPwPlot(Context *context, HrPwWindow *hrPwWindow) :
 
     // Linear Regression Curve
     regCurve = new QwtPlotCurve("reg");
-    regCurve->setPen(QPen(GColor(CPLOTMARKER)));
+    regCurve->setPen(QPen(GColor(GCol::PLOTMARKER)));
     regCurve->attach(this);
 
     // Power distribution
@@ -118,12 +118,12 @@ void
 HrPwPlot::configChanged(qint32)
 {
     // setColors bg
-    setCanvasBackground(GColor(CPLOTBACKGROUND));
+    setCanvasBackground(GColor(GCol::PLOTBACKGROUND));
 
     QPalette palette;
-    palette.setBrush(QPalette::Window, QBrush(GColor(CPLOTBACKGROUND)));
-    palette.setColor(QPalette::WindowText, GColor(CPLOTMARKER));
-    palette.setColor(QPalette::Text, GColor(CPLOTMARKER));
+    palette.setBrush(QPalette::Window, QBrush(GColor(GCol::PLOTBACKGROUND)));
+    palette.setColor(QPalette::WindowText, GColor(GCol::PLOTMARKER));
+    palette.setColor(QPalette::Text, GColor(GCol::PLOTMARKER));
     setPalette(palette);
 
     // tick draw
@@ -141,7 +141,7 @@ HrPwPlot::configChanged(qint32)
     axisWidget(QwtAxis::YLeft)->setPalette(palette);
 
     QPen gridPen;
-    gridPen.setColor(GColor(CPLOTGRID));
+    gridPen.setColor(GColor(GCol::PLOTGRID));
     grid->setPen(gridPen);
 }
 
@@ -323,12 +323,12 @@ HrPwPlot::recalc()
 
     QwtText textr = QwtText(labelp+"*x+"+labelo+" : R "+labelr+" ("+labeldelay+") \n Power@150:"+labelpower150+"W");
     textr.setFont(QFont("Helvetica", 10, QFont::Bold));
-    textr.setColor(GColor(CPLOTMARKER));
+    textr.setColor(GColor(GCol::PLOTMARKER));
 
     r_mrk1->setValue(0,0);
     r_mrk1->setLineStyle(QwtPlotMarker::VLine);
     r_mrk1->setLabelAlignment(Qt::AlignRight | Qt::AlignBottom);
-    r_mrk1->setLinePen(QPen(GColor(CPLOTMARKER), 0, Qt::DashDotLine));
+    r_mrk1->setLinePen(QPen(GColor(GCol::PLOTMARKER), 0, Qt::DashDotLine));
     double averagewatt = hrPwWindow->average(clipWatts, clipWatts.size());
     r_mrk1->setValue(averagewatt, 0.0);
     r_mrk1->setLabel(textr);
@@ -336,7 +336,7 @@ HrPwPlot::recalc()
     r_mrk2->setValue(0,0);
     r_mrk2->setLineStyle(QwtPlotMarker::HLine);
     r_mrk2->setLabelAlignment(Qt::AlignRight | Qt::AlignTop);
-    r_mrk2->setLinePen(QPen(GColor(CPLOTMARKER), 0, Qt::DashDotLine));
+    r_mrk2->setLinePen(QPen(GColor(GCol::PLOTMARKER), 0, Qt::DashDotLine));
     double averagehr = hrPwWindow->average(clipHr,  clipHr.size());
     r_mrk2->setValue(0.0,averagehr);
 

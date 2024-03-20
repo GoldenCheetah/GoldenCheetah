@@ -251,26 +251,26 @@ RealtimePlot::RealtimePlot(Context *context) :
 
     QPalette pal;
     setAxisScale(QwtAxis::YLeft, 0, 500); // watts
-    pal.setColor(QPalette::WindowText, GColor(CPOWER));
-    pal.setColor(QPalette::Text, GColor(CPOWER));
+    pal.setColor(QPalette::WindowText, GColor(GCol::POWER));
+    pal.setColor(QPalette::Text, GColor(GCol::POWER));
     axisWidget(QwtAxis::YLeft)->setPalette(pal);
     axisWidget(QwtAxis::YLeft)->scaleDraw()->setTickLength(QwtScaleDiv::MajorTick, 3);
 
     setAxisScale(QwtAxis::YRight, 0, 230); // cadence / hr
-    pal.setColor(QPalette::WindowText, GColor(CHEARTRATE));
-    pal.setColor(QPalette::Text, GColor(CHEARTRATE));
+    pal.setColor(QPalette::WindowText, GColor(GCol::HEARTRATE));
+    pal.setColor(QPalette::Text, GColor(GCol::HEARTRATE));
     axisWidget(QwtAxis::YRight)->setPalette(pal);
     axisWidget(QwtAxis::YRight)->scaleDraw()->setTickLength(QwtScaleDiv::MajorTick, 3);
 
     setAxisScale(QwtAxis::XBottom, MAXSAMPLES, 0, 15); // time ago
-    pal.setColor(QPalette::WindowText, GColor(CPLOTMARKER));
-    pal.setColor(QPalette::Text, GColor(CPLOTMARKER));
+    pal.setColor(QPalette::WindowText, GColor(GCol::PLOTMARKER));
+    pal.setColor(QPalette::Text, GColor(GCol::PLOTMARKER));
     axisWidget(QwtAxis::XBottom)->setPalette(pal);
     axisWidget(QwtAxis::XBottom)->scaleDraw()->setTickLength(QwtScaleDiv::MajorTick, 3);
 
     setAxisScale(QwtAxisId(QwtAxis::YRight,2).id, 0, 60); // speed km/h - 60kmh on a turbo is good going!
-    pal.setColor(QPalette::WindowText, GColor(CSPEED));
-    pal.setColor(QPalette::Text, GColor(CSPEED));
+    pal.setColor(QPalette::WindowText, GColor(GCol::SPEED));
+    pal.setColor(QPalette::Text, GColor(GCol::SPEED));
     axisWidget(QwtAxisId(QwtAxis::YRight,2).id)->setPalette(pal);
     axisWidget(QwtAxisId(QwtAxis::YRight,2).id)->scaleDraw()->setTickLength(QwtScaleDiv::MajorTick, 3);
 
@@ -387,44 +387,44 @@ RealtimePlot::configChanged(qint32)
 {
     double width = appsettings->value(this, GC_LINEWIDTH, 0.5).toDouble();
 
-    setCanvasBackground(GColor(CTRAINPLOTBACKGROUND));
-    QPen pwr30pen = QPen(GColor(CPOWER), width, Qt::DashLine);
+    setCanvasBackground(GColor(GCol::TRAINPLOTBACKGROUND));
+    QPen pwr30pen = QPen(GColor(GCol::POWER), width, Qt::DashLine);
     pwr30Curve->setPen(pwr30pen);
     pwr30Curve->setData(pwr30Data);
 
-    QPen pwrpen = QPen(GColor(CPOWER));
+    QPen pwrpen = QPen(GColor(GCol::POWER));
     pwrpen.setWidth(width);
     pwrCurve->setPen(pwrpen);
 
-    QPen apwrpen = QPen(GColor(CALTPOWER));
+    QPen apwrpen = QPen(GColor(GCol::ALTPOWER));
     apwrpen.setWidth(width);
     altPwrCurve->setPen(apwrpen);
 
-    QPen hrpen = QPen(GColor(CHEARTRATE));
+    QPen hrpen = QPen(GColor(GCol::HEARTRATE));
     hrpen.setWidth(width);
     hrCurve->setPen(hrpen);
 
-    QPen cadpen = QPen(GColor(CCADENCE));
+    QPen cadpen = QPen(GColor(GCol::CADENCE));
     cadpen.setWidth(width);
     cadCurve->setPen(cadpen);
 
-    QPen spdpen = QPen(GColor(CSPEED));
+    QPen spdpen = QPen(GColor(GCol::SPEED));
     spdpen.setWidth(width);
     spdCurve->setPen(spdpen);
 
-    QPen hhbpen = QPen(GColor(CHHB));
+    QPen hhbpen = QPen(GColor(GCol::HHB));
     hhbpen.setWidth(width);
     hhbCurve->setPen(hhbpen);
 
-    QPen o2hbpen = QPen(GColor(CO2HB));
+    QPen o2hbpen = QPen(GColor(GCol::O2HB));
     o2hbpen.setWidth(width);
     o2hbCurve->setPen(o2hbpen);
 
-    QPen smo2pen = QPen(GColor(CSMO2));
+    QPen smo2pen = QPen(GColor(GCol::SMO2));
     smo2pen.setWidth(width);
     smo2Curve->setPen(smo2pen);
 
-    QPen thbpen = QPen(GColor(CTHB));
+    QPen thbpen = QPen(GColor(GCol::THB));
     thbpen.setWidth(width);
     thbCurve->setPen(thbpen);
 

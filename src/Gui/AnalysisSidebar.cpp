@@ -108,7 +108,7 @@ AnalysisSidebar::AnalysisSidebar(Context *context) : QWidget(context->mainWindow
     QTreeWidgetItem *tree = new QTreeWidgetItem(intervalTree->invisibleRootItem(), RideFileInterval::USER);
     tree->setData(0, Qt::UserRole, QVariant::fromValue((void *)NULL)); // no intervalitem related
     tree->setText(0, RideFileInterval::typeDescription(RideFileInterval::USER));
-    tree->setForeground(0, GColor(CPLOTMARKER));
+    tree->setForeground(0, GColor(GCol::PLOTMARKER));
     QFont bold;
     bold.setWeight(QFont::Bold);
     tree->setFont(0, bold);
@@ -245,7 +245,7 @@ AnalysisSidebar::setRide(RideItem*ride)
                 tree = new QTreeWidgetItem(intervalTree->invisibleRootItem(), interval->type);
                 tree->setData(0, Qt::UserRole, QVariant::fromValue((void *)NULL)); // no intervalitem related
                 tree->setText(0, RideFileInterval::typeDescription(interval->type));
-                tree->setForeground(0, GColor(CPLOTMARKER));
+                tree->setForeground(0, GColor(GCol::PLOTMARKER));
                 tree->setFont(0, bold);
                 tree->setExpanded(true);
                 tree->setFlags(Qt::ItemIsEnabled);
@@ -321,23 +321,23 @@ AnalysisSidebar::close()
 void
 AnalysisSidebar::configChanged(qint32)
 {
-    //calendarWidget->setPalette(GCColor::palette());
-    //intervalSummaryWindow->setPalette(GCColor::palette());
-    //intervalSummaryWindow->setStyleSheet(GCColor::stylesheet());
+    //calendarWidget->setPalette(GCColor::inst()->palette());
+    //intervalSummaryWindow->setPalette(GCColor::inst()->palette());
+    //intervalSummaryWindow->setStyleSheet(GCColor::inst()->stylesheet());
 
-    splitter->setPalette(GCColor::palette());
-    activityHistory->setStyleSheet(QString("background: %1;").arg(GColor(CPLOTBACKGROUND).name()));
-    rideNavigator->tableView->viewport()->setPalette(GCColor::palette());
-    rideNavigator->tableView->viewport()->setStyleSheet(QString("background: %1;").arg(GColor(CPLOTBACKGROUND).name()));
+    splitter->setPalette(GCColor::inst()->palette());
+    activityHistory->setStyleSheet(QString("background: %1;").arg(GColor(GCol::PLOTBACKGROUND).name()));
+    rideNavigator->tableView->viewport()->setPalette(GCColor::inst()->palette());
+    rideNavigator->tableView->viewport()->setStyleSheet(QString("background: %1;").arg(GColor(GCol::PLOTBACKGROUND).name()));
 
     // interval tree
-    intervalTree->setPalette(GCColor::palette());
-    intervalTree->setStyleSheet(GCColor::stylesheet());
+    intervalTree->setPalette(GCColor::inst()->palette());
+    intervalTree->setStyleSheet(GCColor::inst()->stylesheet());
     QMapIterator<RideFileInterval::intervaltype, QTreeWidgetItem*> i(trees);
     i.toFront();
     while(i.hasNext()) {
         i.next();
-        i.value()->setForeground(0, GColor(CPLOTMARKER));
+        i.value()->setForeground(0, GColor(GCol::PLOTMARKER));
     }
 
     repaint();

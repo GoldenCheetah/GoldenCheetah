@@ -249,10 +249,10 @@ public:
             if (arr) {
                 foreach (int i, *arr) {
                     if (context->rideItem() && sourceModel()->data(index(i, dateIndex, QModelIndex())).toDateTime() == context->rideItem()->dateTime) {
-                        colors << GColor(CCALCURRENT); // its the current ride!
+                        colors << GColor(GCol::CALCURRENT); // its the current ride!
                     } else {
                         QColor user = QColor(sourceModel()->data(index(i, colorIndex, QModelIndex())).toString());
-                        if (user == QColor(1,1,1)) colors << GColor(CPLOTMARKER);
+                        if (user == QColor(1,1,1)) colors << GColor(GCol::PLOTMARKER);
                         else colors << user;
                     }
                 }
@@ -261,7 +261,7 @@ public:
 #ifdef GC_HAVE_ICAL
             // added planned workouts
             for (int k= context->athlete->rideCalendar->data(date(proxyIndex), EventCountRole).toInt(); k>0; k--)
-                colors.append(GColor(CCALPLANNED));
+                colors.append(GColor(GCol::CALPLANNED));
 #endif
 
             return QVariant::fromValue<QList<QColor> >(colors);
@@ -276,7 +276,7 @@ public:
                 foreach (int i, *arr) {
                     QString filename = sourceModel()->data(index(i, filenameIndex, QModelIndex())).toString();
                     if (context->isfiltered && context->filters.contains(filename))
-                        colors << GColor(CCALCURRENT);
+                        colors << GColor(GCol::CALCURRENT);
                     else
                         colors << QColor(Qt::black);
                 }
@@ -304,18 +304,18 @@ public:
 
         case CellColorRole:   // what color for the cell?
             if (date(proxyIndex) == QDate::currentDate())
-                return GColor(CCALTODAY);
+                return GColor(GCol::CALTODAY);
             if (date(proxyIndex).month() == month)
-                return GColor(CPLOTBACKGROUND);
+                return GColor(GCol::PLOTBACKGROUND);
             else
-                return GColor(CPLOTBACKGROUND).darker(200);
+                return GColor(GCol::PLOTBACKGROUND).darker(200);
             break;
 
         case HeaderColorRole: // what color for the cell heading
             if (date(proxyIndex).month() == month)
-                return GColor(CPLOTBACKGROUND);
+                return GColor(GCol::PLOTBACKGROUND);
             else
-                return GColor(CPLOTBACKGROUND).darker(200);
+                return GColor(GCol::PLOTBACKGROUND).darker(200);
             break;
 
         case FilenamesRole:
@@ -486,7 +486,7 @@ class GcCalendarDelegate : public QItemDelegate
         // date...
         QString datestring = index.data(GcCalendarModel::DateStringRole).toString();
         QTextOption textOption(Qt::AlignRight);
-        painter->setPen(GCColor::invertColor(hg));
+        painter->setPen(GInvertColor(hg));
         painter->drawText(hd, datestring, textOption);
 
         // text

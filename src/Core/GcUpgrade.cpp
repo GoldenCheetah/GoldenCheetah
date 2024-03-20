@@ -204,7 +204,7 @@ GcUpgrade::upgrade(const QDir &home)
         if (charts.exists()) charts.remove();
 
         // 3. Reset colour defaults **
-        GCColor::applyTheme(defaults.theme); // set to default theme
+        GCColor::inst()->applyTheme(defaults.theme); // set to default theme
 
         // 4. Theme and Chrome Color
 #if 0 // this is no longer required, but keeping in case we need to reinstate- XXX fixme
@@ -225,9 +225,10 @@ GcUpgrade::upgrade(const QDir &home)
         QString colorstring = QString("%1:%2:%3").arg(chromeColor.red())
                                                  .arg(chromeColor.green())
                                                  .arg(chromeColor.blue());
-        appsettings->setValue("CCHROME", colorstring);
-        GCColor::setColor(CCHROME, chromeColor);
+        appsettings->setValue("GCol::CHROME", colorstring);
+        GCColor::inst()->(GCol::CHROME, chromeColor);
 #endif
+
 
         // 5. Metrics and Notes keywords
         QString filename = home.canonicalPath()+"/metadata.xml";
@@ -394,11 +395,10 @@ GcUpgrade::upgrade(const QDir &home)
 
         // reset themes on basis of plot background (first 2 themes are default dark and light themes
 #if 0
-        if (GCColor::luminance(GColor(CPLOTBACKGROUND)) < 127)  GCColor::applyTheme(0);
-        else GCColor::applyTheme(1);
+        if (GCColor::luminance(GColor(GCol::PLOTBACKGROUND)) < 127)  GCColor::inst()->(0);
+        else GCColor::inst()->applyTheme(defaults.theme);
 #endif
-        GCColor::applyTheme(defaults.theme);
-
+        GCColor::inst()->applyTheme(defaults.theme);
     }
 
     //----------------------------------------------------------------------
@@ -641,8 +641,8 @@ GcUpgrade::upgrade(const QDir &home)
 
         // trend plot matches ride plot, as newly introduced
         // just do for first time we run 3.2 and set to ride plot
-        QColor color = GCColor::getColor(CRIDEPLOTBACKGROUND);
-        GCColor::setColor(CTRENDPLOTBACKGROUND, color);
+        QColor color = GColor(GCol::RIDEPLOTBACKGROUND);
+        GCColor::inst()->setQColor(GCol::TRENDPLOTBACKGROUND, color);
 
         // and update config
         QString colorstring = QString("%1:%2:%3").arg(color.red())

@@ -373,8 +373,8 @@ HistogramWindow::HistogramWindow(Context *context, bool rangemode) : GcChartWind
 void
 HistogramWindow::configChanged(qint32 state)
 {
-    if (!rangemode) setProperty("color", GColor(CPLOTBACKGROUND)); // called on config change
-    else setProperty("color", GColor(CTRENDPLOTBACKGROUND)); // called on config change
+    if (!rangemode) setProperty("color", GColor(GCol::PLOTBACKGROUND)); // called on config change
+    else setProperty("color", GColor(GCol::TRENDPLOTBACKGROUND)); // called on config change
     powerHist->configChanged(state);
 }
 

@@ -58,6 +58,5 @@ GcToolBar::paintBackground(QPaintEvent *)
     QRect all(0,0,width(),height());
 
     painter.setPen(Qt::NoPen);
-    painter.fillRect(all, GColor(CTOOLBAR));
-
+    painter.fillRect(all, GColor(GCol::TOOLBAR));
 }

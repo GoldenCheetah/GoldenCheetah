@@ -107,7 +107,6 @@ class GColorDialog : public QDialog
         QColorDialog *colordialog;
 
         // gc dialog (second tab)
-        const Colors *colorSet;
         QWidget *gcdialog;
         QLineEdit *searchEdit;
         QTreeWidget *colorlist;

@@ -183,8 +183,8 @@ class GenericAxisInfo {
 
         GenericAxisInfo() : type(AxisInfoType::CONTINUOUS), orientation(Qt::Vertical), align(Qt::AlignLeft),
                             miny(0), maxy(0), minx(0), maxx(0), visible (true), fixed(false), log(false),
-                            minorgrid(false), majorgrid(true), labelcolor(GColor(CPLOTMARKER)),
-                            axiscolor(GColor(CPLOTMARKER)), smooth(0), groupby(NONE) {}
+                            minorgrid(false), majorgrid(true), labelcolor(GColor(GCol::PLOTMARKER)),
+                            axiscolor(GColor(GCol::PLOTMARKER)), smooth(0), groupby(NONE) {}
 
         static int findAxis(QList<GenericAxisInfo>infos, QString name) {
             for (int i=0; i<infos.count(); i++)
@@ -200,7 +200,7 @@ class GenericAxisInfo {
             type=CONTINUOUS;
             smooth=0;
             groupby=NONE;
-            axiscolor=labelcolor=GColor(CPLOTMARKER);
+            axiscolor=labelcolor=GColor(GCol::PLOTMARKER);
         }
 
         void point(double x, double y) {

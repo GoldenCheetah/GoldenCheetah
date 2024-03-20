@@ -131,7 +131,7 @@ class ChartSpaceItem : public QGraphicsWidget
             this->setGraphicsEffect(effect);
 #endif
 
-            bgcolor = StandardColor(CCARDBACKGROUND).name();
+            bgcolor = GColorToRGBColor(GCol::CARDBACKGROUND).name();
 
             // watch geom changes
             connect(this, SIGNAL(geometryChanged()), SLOT(geometryChanged()));

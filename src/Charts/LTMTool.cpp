@@ -26,7 +26,7 @@
 #include "RideNavigator.h"
 #include "HelpWhatsThis.h"
 #include "Utils.h"
-#include "Colors.h" // NamedColor and RGBColor
+#include "Colors.h" // RGBColor
 #include "ColorButton.h" // GColorDialog
 
 #include <QApplication>
@@ -2112,7 +2112,7 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
  
     // color background...
     penColor = metricDetail->penColor;
-    setButtonIcon(RGBColor(penColor));
+    setButtonIcon(GRGBColorToQColor(penColor));
 
     QLabel *topN = new QLabel(tr("Highlight Highest"));
     showBest = new QDoubleSpinBox(this);
@@ -2484,7 +2484,7 @@ EditMetricDetailDialog::metricSelected()
         baseLine->setValue(ltmTool->metrics[index].baseline);
         penColor = ltmTool->metrics[index].penColor;
         trendType->setCurrentIndex(ltmTool->metrics[index].trendtype);
-        setButtonIcon(RGBColor(penColor));
+        setButtonIcon(GRGBColorToQColor(penColor));
 
         // curve style
         switch (ltmTool->metrics[index].curveStyle) {
@@ -2662,9 +2662,9 @@ EditMetricDetailDialog::colorClicked()
 {
     QColor color = GColorDialog::getColor(penColor.name());
 
-    if (NamedColor(color)) { // named color
+    if (GIsRGBColor(color)) { // named color
         penColor=color;
-        setButtonIcon(RGBColor(color));
+        setButtonIcon(GRGBColorToQColor(color));
     } else if (color.isValid()) setButtonIcon(penColor=color); // normal rgb color
 }
 

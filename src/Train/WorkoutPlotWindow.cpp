@@ -29,7 +29,7 @@ WorkoutPlotWindow::WorkoutPlotWindow(Context *context) :
 
     setContentsMargins(0,0,0,0);
     setControls(NULL);
-    setProperty("color", GColor(CTRAINPLOTBACKGROUND));
+    setProperty("color", GColor(GCol::TRAINPLOTBACKGROUND));
 
     QVBoxLayout *layout = new QVBoxLayout;
     setChartLayout(layout);
@@ -68,6 +68,6 @@ WorkoutPlotWindow::setNow(long now)
 void
 WorkoutPlotWindow::configChanged(qint32)
 {
-    setProperty("color", GColor(CTRAINPLOTBACKGROUND));
+    setProperty("color", GColor(GCol::TRAINPLOTBACKGROUND));
     repaint();
 }

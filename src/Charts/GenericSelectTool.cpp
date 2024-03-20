@@ -59,7 +59,7 @@ void GenericSelectTool::paint(QPainter*painter, const QStyleOptionGraphicsItem *
     if (hoveraxis) {
         QRectF fr = host->axisRect.value(hoveraxis, QRectF());
         if (fr != QRectF()) {
-            QColor color = GColor(CPLOTMARKER);
+            QColor color = GColor(GCol::PLOTMARKER);
             color.setAlphaF(0.2); // almost hidden if not moving/sizing
             painter->fillRect(mapRectFromScene(fr),QBrush(color));
         }
@@ -86,7 +86,7 @@ void GenericSelectTool::paint(QPainter*painter, const QStyleOptionGraphicsItem *
             //
             foreach(SeriesPoint p, hoverpoints) {
                 QPointF pos = mapFromScene(host->qchart->mapToPosition(p.xy,p.series));
-                QColor invert = GCColor::invertColor(GColor(CPLOTBACKGROUND));
+                QColor invert = GInvertColor(GCol::PLOTBACKGROUND);
                 painter->setBrush(invert);
                 painter->setPen(invert);
                 QRectF circle(0,0,gl_linemarker*dpiXFactor*host->scale_,gl_linemarker*dpiYFactor*host->scale_);
@@ -114,7 +114,7 @@ void GenericSelectTool::paint(QPainter*painter, const QStyleOptionGraphicsItem *
                     //
                     if (hoverpoint != GPointF()) {
                         // draw a circle using marker color
-                        QColor invert = GCColor::invertColor(GColor(CPLOTBACKGROUND));
+                        QColor invert = GInvertColor(GCol::PLOTBACKGROUND);
                         painter->setBrush(invert);
                         painter->setPen(invert);
                         QRectF circle(0,0,gl_scattermarker*dpiXFactor*host->scale_,gl_scattermarker*dpiYFactor*host->scale_);
@@ -187,7 +187,7 @@ void GenericSelectTool::paint(QPainter*painter, const QStyleOptionGraphicsItem *
                         posxp.setY(mapFromScene(host->qchart->plotArea().bottomLeft()).y()); // bottom of plot, 0 is not always origin
 
                         // x value
-                        painter->setPen(QPen(GColor(CPLOTMARKER)));
+                        painter->setPen(QPen(GColor(GCol::PLOTMARKER)));
                         // datetime?
                         if (xaxis && xaxis->type() == QAbstractAxis::AxisTypeDateTime)
                             label=QDateTime::fromMSecsSinceEpoch(v.x()).toString(static_cast<QDateTimeAxis*>(xaxis)->format());
@@ -209,7 +209,7 @@ void GenericSelectTool::paint(QPainter*painter, const QStyleOptionGraphicsItem *
 
                 // there is a rectangle to draw on the screen
                 QRectF r=QRectF(4,4,rect.width()-8,rect.height()-8);
-                QColor color = GColor(CPLOTMARKER);
+                QColor color = GColor(GCol::PLOTMARKER);
                 color.setAlphaF((state == ACTIVE && !isUnderMouse()) ? 0.05 : 0.2); // almost hidden if not moving/sizing
                 painter->fillRect(r,QBrush(color));
 
@@ -261,7 +261,7 @@ void GenericSelectTool::paint(QPainter*painter, const QStyleOptionGraphicsItem *
                             }
 
                             // draw slope line
-                            QColor col=GColor(CPLOTMARKER);
+                            QColor col=GColor(GCol::PLOTMARKER);
                             col.setAlphaF(1);
                             QPen line(col);
                             line.setStyle(Qt::SolidLine);
@@ -291,7 +291,7 @@ void GenericSelectTool::paint(QPainter*painter, const QStyleOptionGraphicsItem *
                         if (host->charttype == GC_CHART_SCATTER) avgxp.setY(mapFromScene(host->qchart->plotArea().bottomLeft()).y()-4);
                         else avgxp.setY(mapFromScene(host->qchart->plotArea().topLeft()).y()+fm.tightBoundingRect("XXX").height()+4);
 
-                        QColor linecol=GColor(CPLOTMARKER);
+                        QColor linecol=GColor(GCol::PLOTMARKER);
                         linecol.setAlphaF(0.25);
                         QPen gridpen(linecol);
                         gridpen.setStyle(Qt::DashLine);
@@ -304,7 +304,7 @@ void GenericSelectTool::paint(QPainter*painter, const QStyleOptionGraphicsItem *
                         stGiles.setPointSizeF(appsettings->value(NULL, GC_FONT_CHARTLABELS_SIZE, 8).toInt()*host->scale_);
                         painter->setFont(stGiles);
 
-                        QPen markerpen(GColor(CPLOTMARKER));
+                        QPen markerpen(GColor(GCol::PLOTMARKER));
                         painter->setPen(markerpen);
                         QString label;
                         QString datetimeformat;

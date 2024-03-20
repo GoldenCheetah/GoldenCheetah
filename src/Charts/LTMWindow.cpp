@@ -66,7 +66,7 @@ LTMWindow::LTMWindow(Context *context) :
     QVBoxLayout *mainLayout = new QVBoxLayout;
 
     QPalette palette;
-    palette.setBrush(QPalette::Window, QBrush(GColor(CTRENDPLOTBACKGROUND)));
+    palette.setBrush(QPalette::Window, QBrush(GColor(GCol::TRENDPLOTBACKGROUND)));
 
     // single plot
     plotWidget = new QWidget(this);
@@ -508,18 +508,18 @@ LTMWindow::configChanged(qint32)
 {
     // tinted palette for headings etc
     QPalette palette;
-    palette.setBrush(QPalette::Window, QBrush(GColor(CTRENDPLOTBACKGROUND)));
-    palette.setColor(QPalette::WindowText, GColor(CPLOTMARKER));
-    palette.setColor(QPalette::Text, GColor(CPLOTMARKER));
-    palette.setColor(QPalette::Base, GCColor::alternateColor(GColor(CPLOTBACKGROUND)));
+    palette.setBrush(QPalette::Window, QBrush(GColor(GCol::TRENDPLOTBACKGROUND)));
+    palette.setColor(QPalette::WindowText, GColor(GCol::PLOTMARKER));
+    palette.setColor(QPalette::Text, GColor(GCol::PLOTMARKER));
+    palette.setColor(QPalette::Base, GAlternateColor(GCol::PLOTBACKGROUND));
     setPalette(palette);
 
     // inverted palette for data etc
     QPalette whitepalette;
-    whitepalette.setBrush(QPalette::Window, QBrush(GColor(CTRENDPLOTBACKGROUND)));
-    whitepalette.setColor(QPalette::WindowText, GCColor::invertColor(GColor(CTRENDPLOTBACKGROUND)));
-    whitepalette.setColor(QPalette::Base, GCColor::alternateColor(GColor(CPLOTBACKGROUND)));
-    whitepalette.setColor(QPalette::Text, GCColor::invertColor(GColor(CTRENDPLOTBACKGROUND)));
+    whitepalette.setBrush(QPalette::Window, QBrush(GColor(GCol::TRENDPLOTBACKGROUND)));
+    whitepalette.setColor(QPalette::WindowText, GInvertColor(GColor(GCol::TRENDPLOTBACKGROUND)));
+    whitepalette.setColor(QPalette::Base, GAlternateColor(GColor(GCol::PLOTBACKGROUND)));
+    whitepalette.setColor(QPalette::Text, GInvertColor(GColor(GCol::TRENDPLOTBACKGROUND)));
 
     QFont font;
     font.setPointSize(12); // reasonably big
@@ -988,7 +988,7 @@ LTMWindow::useThruToday()
 void
 LTMWindow::refresh()
 {
-    setProperty("color", GColor(CTRENDPLOTBACKGROUND)); // called on config change
+    setProperty("color", GColor(GCol::TRENDPLOTBACKGROUND)); // called on config change
 
     // not if in compare mode
     if (isCompare()) return; 
@@ -1295,13 +1295,13 @@ LTMWindow::dataTable(bool html)
     // now set to new (avoids a weird crash)
     QString summary;
 
-    QColor bgColor = GColor(CTRENDPLOTBACKGROUND);
-    QColor altColor = GCColor::alternateColor(bgColor);
+    QColor bgColor = GColor(GCol::TRENDPLOTBACKGROUND);
+    QColor altColor = GAlternateColor(bgColor);
 
     // html page prettified with a title
     if (html) {
 
-        summary = GCColor::css();
+        summary = GCColor::inst()->css();
         summary += "<center>";
 
         // device summary for ride summary, otherwise how many activities?

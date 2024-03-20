@@ -636,7 +636,7 @@ SplitSelect::refreshMarkers()
             // vertical line will do for now
             add->setLineStyle(QwtPlotMarker::VLine);
             add->setLabelAlignment(Qt::AlignRight | Qt::AlignTop);
-            add->setLinePen(QPen(GColor(CPLOTMARKER), 0, Qt::DashDotLine));
+            add->setLinePen(QPen(GColor(GCol::PLOTMARKER), 0, Qt::DashDotLine));
             add->setValue(point / 60.0, 0.0);
             add->attach(wizard->smallPlot);
         }
@@ -654,7 +654,7 @@ SplitSelect::refreshMarkers()
             // vertical line will do for now
             add->setLineStyle(QwtPlotMarker::VLine);
             add->setLabelAlignment(Qt::AlignRight | Qt::AlignTop);
-            add->setLinePen(QPen(GColor(CPLOTMARKER), 0, Qt::DashDotLine));
+            add->setLinePen(QPen(GColor(GCol::PLOTMARKER), 0, Qt::DashDotLine));
             add->setValue(point / 60.0, 0.0);
             add->attach(wizard->smallPlot);
         }

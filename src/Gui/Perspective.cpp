@@ -123,7 +123,7 @@ Perspective::Perspective(Context *context, QString title, int type) :
 
     QPalette palette;
     //palette.setBrush(backgroundRole(), QColor("#B3B4B6"));
-    palette.setBrush(backgroundRole(), type == VIEW_TRAIN ? GColor(CTRAINPLOTBACKGROUND) : GColor(CPLOTBACKGROUND));
+    palette.setBrush(backgroundRole(), type == VIEW_TRAIN ? GColor(GCol::TRAINPLOTBACKGROUND) : GColor(GCol::PLOTBACKGROUND));
     setAutoFillBackground(false);
 
     // each style has its own container widget
@@ -328,7 +328,7 @@ Perspective::configChanged(qint32)
     tileArea->verticalScrollBar()->setStyleSheet(AbstractView::ourStyleSheet());
 //#endif
     QPalette palette;
-    palette.setBrush(backgroundRole(), type() == VIEW_TRAIN ? GColor(CTRAINPLOTBACKGROUND) : GColor(CPLOTBACKGROUND));
+    palette.setBrush(backgroundRole(), type() == VIEW_TRAIN ? GColor(GCol::TRAINPLOTBACKGROUND) : GColor(GCol::PLOTBACKGROUND));
     setPalette(palette);
     tileWidget->setPalette(palette);
     tileArea->setPalette(palette);
@@ -338,11 +338,11 @@ Perspective::configChanged(qint32)
     // basic chart setup
     for (int i=0; i<charts.count(); i++) {
         if (currentStyle == 0) {
-            if (charts[i]->type() == GcWindowTypes::Overview || charts[i]->type() == GcWindowTypes::OverviewTrends) chartbar->setColor(i, GColor(COVERVIEWBACKGROUND));
-            else if (charts[i]->type() == GcWindowTypes::UserAnalysis || charts[i]->type() == GcWindowTypes::UserTrends) chartbar->setColor(i, RGBColor(QColor(charts[i]->property("color").toString())));
+            if (charts[i]->type() == GcWindowTypes::Overview || charts[i]->type() == GcWindowTypes::OverviewTrends) chartbar->setColor(i, GColor(GCol::OVERVIEWBACKGROUND));
+            else if (charts[i]->type() == GcWindowTypes::UserAnalysis || charts[i]->type() == GcWindowTypes::UserTrends) chartbar->setColor(i, GRGBColorToQColor(QColor(charts[i]->property("color").toString())));
             else {
-                if (type() == VIEW_TRAIN)chartbar->setColor(i, GColor(CTRAINPLOTBACKGROUND));
-                else chartbar->setColor(i, GColor(CPLOTBACKGROUND));
+                if (type() == VIEW_TRAIN)chartbar->setColor(i, GColor(GCol::TRAINPLOTBACKGROUND));
+                else chartbar->setColor(i, GColor(GCol::PLOTBACKGROUND));
             }
         }
 
@@ -396,7 +396,7 @@ Perspective::userChartConfigChanged(UserChartWindow *chart)
         // let chartbar know...
         for(int index=0; index < charts.count(); index++) {
             if (charts[index] == (GcChartWindow*)(chart)) {
-                chartbar->setColor(index, RGBColor(QColor(charts[index]->property("color").toString())));
+                chartbar->setColor(index, GRGBColorToQColor(QColor(charts[index]->property("color").toString())));
                 return;
             }
         }
@@ -743,10 +743,10 @@ Perspective::addChart(GcChartWindow* newone)
             chartbar->addWidget(newone->property("title").toString());
 
             // tab colors
-            if (newone->type() == GcWindowTypes::Overview || newone->type() == GcWindowTypes::OverviewTrends) chartbar->setColor(chartnum, GColor(COVERVIEWBACKGROUND));
+            if (newone->type() == GcWindowTypes::Overview || newone->type() == GcWindowTypes::OverviewTrends) chartbar->setColor(chartnum, GColor(GCol::OVERVIEWBACKGROUND));
             else {
-                if (type() == VIEW_TRAIN)chartbar->setColor(chartnum, GColor(CTRAINPLOTBACKGROUND));
-                else chartbar->setColor(chartnum, GColor(CPLOTBACKGROUND));
+                if (type() == VIEW_TRAIN)chartbar->setColor(chartnum, GColor(GCol::TRAINPLOTBACKGROUND));
+                else chartbar->setColor(chartnum, GColor(GCol::PLOTBACKGROUND));
             }
 
             // lets not bother with a title in tab view- its in the name of the tab already!

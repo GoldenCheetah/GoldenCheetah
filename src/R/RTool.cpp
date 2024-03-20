@@ -424,9 +424,9 @@ RTool::configChanged()
                                "    col.lab=\"%3\", "
                                "    col.axis=\"%3\")\n"
                                "par.gc <- par()\n"
-                            ).arg(GColor(CPLOTBACKGROUND).name())
-                             .arg(GCColor::invertColor(GColor(CPLOTBACKGROUND)).name())
-                             .arg(GColor(CPLOTMARKER).name());
+                            ).arg(GColor(GCol::PLOTBACKGROUND).name())
+                             .arg(GInvertColor(GCol::PLOTBACKGROUND).name())
+                             .arg(GColor(GCol::PLOTMARKER).name());
 
     // fire and forget, don't care if it fails or not !!
     rtool->R->parseEvalNT(parCommand);
@@ -1095,7 +1095,7 @@ RTool::dfForRideItem(const RideItem *ri)
     if (item->color == QColor(1,1,1,1)) {
 
         // use the inverted color, not plot marker as that hideous
-        QColor col =GCColor::invertColor(GColor(CPLOTBACKGROUND));
+        QColor col = GInvertColor(GCol::PLOTBACKGROUND);
 
         // white is jarring on a dark background!
         if (col==QColor(Qt::white)) col=QColor(127,127,127);
@@ -1330,7 +1330,7 @@ RTool::dfForDateRange(bool all, DateRange range, SEXP filter)
             if (item->color == QColor(1,1,1,1)) {
 
                 // use the inverted color, not plot marker as that hideous
-                QColor col =GCColor::invertColor(GColor(CPLOTBACKGROUND));
+                QColor col = GInvertColor(GCol::PLOTBACKGROUND);
 
                 // white is jarring on a dark background!
                 if (col==QColor(Qt::white)) col=QColor(127,127,127);
@@ -1561,7 +1561,7 @@ RTool::dfForDateRangeIntervals(DateRange range, QStringList types)
             if (interval->color == QColor(1,1,1,1)) {
 
                 // use the inverted color, not plot marker as that hideous
-                QColor col =GCColor::invertColor(GColor(CPLOTBACKGROUND));
+                QColor col = GInvertColor(GCol::PLOTBACKGROUND);
 
                 // white is jarring on a dark background!
                 if (col==QColor(Qt::white)) col=QColor(127,127,127);
@@ -1989,7 +1989,7 @@ RTool::activityIntervals(SEXP pTypes, SEXP datetime)
         if (interval->color == QColor(1,1,1,1)) {
 
             // use the inverted color, not plot marker as that hideous
-            QColor col =GCColor::invertColor(GColor(CPLOTBACKGROUND));
+            QColor col = GInvertColor(GCol::PLOTBACKGROUND);
 
             // white is jarring on a dark background!
             if (col==QColor(Qt::white)) col=QColor(127,127,127);

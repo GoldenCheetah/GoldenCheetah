@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2010 Mark Liversedge (liversedge@gmail.com)
+ * GCol & GThmCol - Copyright (c) 2022 Paul Johnson (paul49457@gmail.com)
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
@@ -20,6 +21,7 @@
 #define _GC_Colors_h 1
 #include "GoldenCheetah.h"
 
+#include <map>
 #include <QString>
 #include <QObject>
 #include <QColor>
@@ -27,9 +29,126 @@
 #include <QGradient>
 #include <QLinearGradient>
 
+ // Define how many configurable metric colors are available
+enum class GCol : uint8_t {
+    PLOTBACKGROUND = 0,
+    RIDEPLOTBACKGROUND,
+    TRENDPLOTBACKGROUND,
+    TRAINPLOTBACKGROUND,
+    PLOTSYMBOL,
+    RIDEPLOTXAXIS,
+    RIDEPLOTYAXIS,
+    PLOTTHUMBNAIL,
+    PLOTTITLE,
+    PLOTSELECT,
+    PLOTTRACKER,
+    PLOTMARKER,
+    PLOTGRID,
+    INTERVALHIGHLIGHTER,
+    HEARTRATE,
+    CORETEMP,
+    SPEED,
+    ACCELERATION,
+    POWER,
+    NPOWER,
+    XPOWER,
+    APOWER,
+    TPOWER,
+    CP,
+    CADENCE,
+    ALTITUDE,
+    ALTITUDEBRUSH,
+    WINDSPEED,
+    TORQUE,
+    SLOPE,
+    GEAR,
+    RV,
+    RCAD,
+    RGCT,
+    SMO2,
+    THB,
+    O2HB,
+    HHB,
+    LOAD,
+    TSS,
+    STS,
+    LTS,
+    SB,
+    DAILYSTRESS,
+    BIKESCORE,
+    CALENDARTEXT,
+    ZONE1,
+    ZONE2,
+    ZONE3,
+    ZONE4,
+    ZONE5,
+    ZONE6,
+    ZONE7,
+    ZONE8,
+    ZONE9,
+    ZONE10,
+    HZONE1,
+    HZONE2,
+    HZONE3,
+    HZONE4,
+    HZONE5,
+    HZONE6,
+    HZONE7,
+    HZONE8,
+    HZONE9,
+    HZONE10,
+    AEROVE,
+    AEROEL,
+    CALCELL,
+    CALHEAD,
+    CALCURRENT,
+    CALACTUAL,
+    CALPLANNED,
+    CALTODAY,
+    POPUP,
+    POPUPTEXT,
+    TILEBAR ,
+    TILEBARSELECT,
+    TOOLBAR,
+    RIDEGROUP,
+    SPINSCANLEFT,
+    SPINSCANRIGHT,
+    TEMP,
+    DIAL,
+    ALTPOWER,
+    BALANCELEFT,
+    BALANCERIGHT,
+    WBAL,
+    RIDECP,
+    ATISS,
+    ANTISS,
+    LTE,
+    RTE,
+    LPS,
+    RPS,
+    CHROME,
+    OVERVIEWBACKGROUND,
+    CARDBACKGROUND,
+    VO2,
+    VENTILATION,
+    VCO2,
+    TIDALVOLUME,
+    RESPFREQUENCY,
+    FEO2,
+    HOVER,
+    CHARTBAR,
+    CARDBACKGROUND2,
+    CARDBACKGROUND3,
+    MAPROUTELINE,
+    COLORRR,
+    NUMOFCFGCOLORS
+};
+
+// Returned colors when functions are accessed with an out of range value
+#define INVALIDGCOLORLUMINANCE  127
+#define INVALIDGCOLOR           QColor(127, 127, 127)
 
 // A selection of distinct colours, user can adjust also
-extern QList<QColor> standardColors;
 extern QIcon colouredIconFromPNG(QString filename, QColor color);
 extern QPixmap colouredPixmapFromPNG(QString filename, QColor color);
 
@@ -37,72 +156,59 @@ extern QPixmap colouredPixmapFromPNG(QString filename, QColor color);
 extern double dpiXFactor, dpiYFactor;
 extern QFont baseFont;
 
-// turn color to rgb, checks if a named color
-#define StandardColor(x) (QColor(1,1,x))
-#define NamedColor(x) (x.red()==1 && x.green()==1)
-#define RGBColor(x) (NamedColor(x) ? GColor(x.blue()) : x)
-
 // get the pixel size for a font that is no taller
 // than height in pixels (let QT adapt for device ratios)
 int pixelSizeForFont(QFont &font, int height);
 
-class Context;
-
-// set appearace defaults based upon screen size
-struct SizeSettings {
-
-    // this applies up to the following geometry
-    int maxheight,
-        maxwidth;
-
-    // font size
-    int defaultFont,
-        titleFont,
-        markerFont,
-        labelFont,
-        calendarFont;
-
-    // screen dimension
-    int width,
-        height;
-};
-
-extern SizeSettings defaultAppearance[];
-extern float GCDPIScale; // font scaling for display
-extern QColor standardColor(int num);
-
-class Colors
-{
-public:
-        static unsigned long fingerprint(const Colors*set);
-        QString group,
-                name,
-                setting;
-        QColor  color;
+// Color definitions within a theme
+enum class GThmCol : uint8_t {
+    PLOTBACKGROUND = 0,         // Plot Background
+    TOOLBARANDSIDEBAR,          // Toolbar and Sidebar Chrome
+    ACCENTCOLORMARKERS,         // Accent color (markers" >
+    SELECTIONCOLOR,             // Selection color
+    CPWBALRIDECP,               // Critical Power and W'Bal
+    HEARTRATE,                  // Heartrate
+    SPEED,                      // Speed
+    POWER,                      // Power
+    CADENCE,                    // Cadence
+    TORQUE,                     // Toprque
+    OVERVIEWBACKGROUND,         // Overview Background
+    OVERVIEWTILEBACKGROUND1,    // Overview Tile Background
+    OVERVIEWTILEBACKGROUND2,    // Overview Tile Background 2
+    OVERVIEWTILEBACKGROUND3,    // Overview Tile Background 3
 };
 
 class ColorTheme
 {
     public:
-        ColorTheme(QString name, bool dark, QList<QColor>colors) : name(name), dark(dark), colors(colors) {}
+        ColorTheme() : name(""), dark(false), stealth(false) {};
 
         // all public
         QString name;
         bool dark;
         bool stealth;
-        QList<QColor> colors;
+        std::map<GThmCol, QColor> colors;
 };
 
 class Themes
 {
-
     Q_DECLARE_TR_FUNCTIONS(Themes);
 
     public:
-        Themes(); // will init the array of themes
 
         QList<ColorTheme> themes;
-};
+
+        Themes(Themes const&) = delete;
+        Themes& operator=(Themes const&) = delete;
+
+        static Themes* inst() {
+            static Themes* s{ new Themes };
+            return s;
+        }
+
+    private:
+        Themes();
+ };
 
 class ColorLabel : public QLabel
 {
@@ -116,48 +222,77 @@ class ColorLabel : public QLabel
         ColorTheme theme;
 };
 
+class Colors {
+public:
+    static unsigned long fingerprint(const std::map<GCol, Colors>& colorTable);
+
+    // all public
+    const QString group;
+    const QString name;
+    const QString setting;
+    const QColor  qDarkColor;
+    const QColor  qLightColor;
+    QColor  qColor;
+};
+
 class GCColor : public QObject
 {
     Q_OBJECT
 
     public:
-        static QColor getColor(int);
-        static void setColor(int,QColor);
-        static const Colors *colorSet();
-        static const Colors *defaultColorSet(bool dark);
-        static void resetColors();
-        static double luminance(QColor color); // return the relative luminance
-        static QColor invertColor(QColor); // return the contrasting color
-        static QColor alternateColor(QColor); // return the alternate background
-        static QColor selectedColor(QColor); // return the on select background color
-        static QColor htmlCode(QColor x) { return x.name(); } // return the alternate background
-        static Themes &themes(); 
-        static void applyTheme(int index);
+        GCColor(GCColor const&) = delete;
+        GCColor& operator=(GCColor const&) = delete;
+
+        static GCColor* inst() {
+            static GCColor* s{ new GCColor };
+            return s;
+        }
+
+        // gColor and qColor functions
+        QColor getQColor(const GCol& gColor);
+        bool setQColor(const GCol& gColor, const QColor& qColor);
+        double luminance(const GCol& gColor); // return the relative luminance
+        double luminance(const QColor& qColor); // return the relative luminance
+        QColor selectedQColor(const QColor& qColor);
+        QColor invertQColor(const GCol& gColor); // return the contrasting color
+        QColor invertQColor(const QColor& qColor); // return the contrasting color
+        QColor alternateQColor(const GCol& gColor); // return the alternate background
+        QColor alternateQColor(const QColor& qColor); // return the alternate background
+
+        // functions to convert between gColors -> rgb colors -> qColors
+        // An RGB color has red & green = 1, and blue is set to a GCol enumerated value
+        QColor gColorToRGBColor(const GCol& gColor);
+        bool isRGBColor(const QColor& qc);
+        QColor rgbColorToQColor(const QColor& qColor);
+
+        QColor determineThemeQColor(int index, const GCol& gColor);
+
+        void resetColors();
+        std::map<GCol, Colors>& getColorTable();
+
+        void applyTheme(int index);
 
         // for styling things with current preferences
-        static QLinearGradient linearGradient(int size, bool active, bool alternate=false);
-        static QString css(bool ridesummary=true);
-        static QPalette palette();
-        static QString stylesheet(bool train=false);
-        static void readConfig();
-        static void setupColors();
-        static void dumpColors();
+        QLinearGradient linearGradient(int size);
+        QString css(bool ridesummary = true);
+        QPalette palette();
+        QString stylesheet(bool train = false);
+        QColor standardQColor(int index);
+
+        void readConfig();
+        void dumpColors();
 
         // for upgrade/migration of Config
-        static QStringList getConfigKeys();
+        QStringList getConfigKeys();
 
+    private:
+        GCColor();
+
+        // Number of configurable metric colors
+        std::map<GCol, Colors> colorTable;
+
+        QList<QColor> standardColors;
 };
-
-// color chooser that also supports the standard colors (CPLOTMARKER, CPOWER)
-// and returns them as a QColor(1,1,1,<int>) where <int> is the color number
-// .e.g CPOWER is 18, see below for full list
-#if 0
-class GColorDialog : public QDialog
-{
-    GColorDialog(QWidget *parent);
-
-};
-#endif
 
 // return a color for a ride file
 class GlobalContext;
@@ -180,121 +315,21 @@ class ColorEngine : public QObject
         GlobalContext *gc; // bootstrapping
 };
 
+// shorthand macros due to number of instances
 
-// shorthand
-#define GColor(x) GCColor::getColor(x)
+#define GStandardQColor(x) (GCColor::inst()->standardQColor(x))
 
-// Define how many cconfigurable metric colors are available
-#define CNUMOFCFGCOLORS       110
+// gColor and qColor functions
+#define GColor(x) (GCColor::inst()->getQColor(x))
+#define GAlternateColor(x) (GCColor::inst()->alternateQColor(x))
+#define GLuminance(x) (GCColor::inst()->luminance(x))
+#define GInvertColor(x) (GCColor::inst()->invertQColor(x))
+#define GSelectedColor(x) (GCColor::inst()->selectedQColor(x))
 
-#define CPLOTBACKGROUND       0
-#define CRIDEPLOTBACKGROUND   1
-#define CTRENDPLOTBACKGROUND  2
-#define CTRAINPLOTBACKGROUND  3
-#define CPLOTSYMBOL           4
-#define CRIDEPLOTXAXIS        5
-#define CRIDEPLOTYAXIS        6
-#define CPLOTTHUMBNAIL        7
-#define CPLOTTITLE            8
-#define CPLOTSELECT           9
-#define CPLOTTRACKER          10
-#define CPLOTMARKER           11
-#define CPLOTGRID             12
-#define CINTERVALHIGHLIGHTER  13
-#define CHEARTRATE            14
-#define CCORETEMP             15
-#define CSPEED                16
-#define CACCELERATION         17
-#define CPOWER                18
-#define CNPOWER               19
-#define CXPOWER               20
-#define CAPOWER               21
-#define CTPOWER               22
-#define CCP                   23
-#define CCADENCE              24
-#define CALTITUDE             25
-#define CALTITUDEBRUSH        26
-#define CWINDSPEED            27
-#define CTORQUE               28
-#define CSLOPE                29
-#define CGEAR                 30
-#define CRV                   31
-#define CRCAD                 32
-#define CRGCT                 33
-#define CSMO2                 34
-#define CTHB                  35
-#define CO2HB                 36
-#define CHHB                  37
-#define CLOAD                 38
-#define CTSS                  39
-#define CSTS                  40
-#define CLTS                  41
-#define CSB                   42
-#define CDAILYSTRESS          43
-#define CBIKESCORE            44
-#define CCALENDARTEXT         45
-#define CZONE1                46
-#define CZONE2                47
-#define CZONE3                48
-#define CZONE4                49
-#define CZONE5                50
-#define CZONE6                51
-#define CZONE7                52
-#define CZONE8                53
-#define CZONE9                54
-#define CZONE10               55
-#define CHZONE1               56
-#define CHZONE2               57
-#define CHZONE3               58
-#define CHZONE4               59
-#define CHZONE5               60
-#define CHZONE6               61
-#define CHZONE7               62
-#define CHZONE8               63
-#define CHZONE9               64
-#define CHZONE10              65
-#define CAEROVE               66
-#define CAEROEL               67
-#define CCALCELL              68
-#define CCALHEAD              69
-#define CCALCURRENT           70
-#define CCALACTUAL            71
-#define CCALPLANNED           72
-#define CCALTODAY             73
-#define CPOPUP                74
-#define CPOPUPTEXT            75
-#define CTILEBAR              76
-#define CTILEBARSELECT        77
-#define CTOOLBAR              78
-#define CRIDEGROUP            79
-#define CSPINSCANLEFT         80
-#define CSPINSCANRIGHT        81
-#define CTEMP                 82
-#define CDIAL                 83
-#define CALTPOWER             84
-#define CBALANCELEFT          85
-#define CBALANCERIGHT         86
-#define CWBAL                 87
-#define CRIDECP               88
-#define CATISS                89
-#define CANTISS               90
-#define CLTE                  91
-#define CRTE                  92
-#define CLPS                  93
-#define CRPS                  94
-#define CCHROME               95
-#define COVERVIEWBACKGROUND   96
-#define CCARDBACKGROUND       97
-#define CVO2                  98
-#define CVENTILATION          99
-#define CVCO2                 100
-#define CTIDALVOLUME          101
-#define CRESPFREQUENCY        102
-#define CFEO2                 103
-#define CHOVER                104
-#define CCHARTBAR             105
-#define CCARDBACKGROUND2      106
-#define CCARDBACKGROUND3      107
-#define MAPROUTELINE          108
-#define COLORRR               109
+// functions to convert between gColors -> rgb colors -> qColors
+// An RGB color has red & green = 1, and blue is set to a GCol enumerated value
+#define GColorToRGBColor(x) (GCColor::inst()->gColorToRGBColor(x))
+#define GIsRGBColor(x) (GCColor::inst()->isRGBColor(x))
+#define GRGBColorToQColor(x) (GCColor::inst()->rgbColorToQColor(x))
+
 #endif

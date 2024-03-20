@@ -250,29 +250,29 @@ Aerolab::configChanged(qint32)
 {
 
   // set colors
-  setCanvasBackground(GColor(CPLOTBACKGROUND));
-  QPen vePen = QPen(GColor(CAEROVE));
+  setCanvasBackground(GColor(GCol::PLOTBACKGROUND));
+  QPen vePen = QPen(GColor(GCol::AEROVE));
   vePen.setWidth(appsettings->value(this, GC_LINEWIDTH, 0.5).toDouble());
   veCurve->setPen(vePen);
-  QPen altPen = QPen(GColor(CAEROEL));
+  QPen altPen = QPen(GColor(GCol::AEROEL));
   altPen.setWidth(appsettings->value(this, GC_LINEWIDTH, 0.5).toDouble());
   altCurve->setPen(altPen);
-  QPen gridPen(GColor(CPLOTGRID));
+  QPen gridPen(GColor(GCol::PLOTGRID));
   gridPen.setStyle(Qt::DotLine);
   grid->setPen(gridPen);
 
-  QPen ihlPen = QPen( GColor( CINTERVALHIGHLIGHTER ) );
+  QPen ihlPen = QPen( GColor( GCol::INTERVALHIGHLIGHTER ) );
   ihlPen.setWidth(1);
   intervalHighlighterCurve->setPen( ihlPen );
 
-  QColor ihlbrush = QColor(GColor(CINTERVALHIGHLIGHTER));
+  QColor ihlbrush = QColor(GColor(GCol::INTERVALHIGHLIGHTER));
   ihlbrush.setAlpha(40);
   intervalHighlighterCurve->setBrush(ihlbrush);   // fill below the line
 
   //XXX broken this->legend()->remove( intervalHighlighterCurve ); // don't show in legend
   QPalette palette;
-  palette.setColor(QPalette::WindowText, GColor(CPLOTMARKER));
-  palette.setColor(QPalette::Text, GColor(CPLOTMARKER));
+  palette.setColor(QPalette::WindowText, GColor(GCol::PLOTMARKER));
+  palette.setColor(QPalette::Text, GColor(GCol::PLOTMARKER));
   axisWidget(QwtAxis::XBottom)->setPalette(palette);
   axisWidget(QwtAxis::YLeft)->setPalette(palette);
 }
@@ -746,10 +746,10 @@ void Aerolab::refreshIntervalMarkers()
             mrk->attach(this);
             mrk->setLineStyle(QwtPlotMarker::VLine);
             mrk->setLabelAlignment(Qt::AlignRight | Qt::AlignTop);
-            mrk->setLinePen(QPen(GColor(CPLOTMARKER), 0, Qt::DashDotLine));
+            mrk->setLinePen(QPen(GColor(GCol::PLOTMARKER), 0, Qt::DashDotLine));
             QwtText text(interval->name);
             text.setFont(QFont("Helvetica", 10, QFont::Bold));
-            text.setColor(GColor(CPLOTMARKER));
+            text.setColor(GColor(GCol::PLOTMARKER));
             if (!bydist)
                 mrk->setValue(interval->start / 60.0, 0.0);
             else

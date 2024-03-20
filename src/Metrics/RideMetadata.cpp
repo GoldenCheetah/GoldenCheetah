@@ -412,24 +412,24 @@ RideMetadata::configChanged(qint32)
     }
 
     if (context) { // global doesn't have all the widgets etc
-        setProperty("color", GColor(CPLOTBACKGROUND));
+        setProperty("color", GColor(GCol::PLOTBACKGROUND));
 
         palette = QPalette();
 
-        palette.setColor(QPalette::Window, GColor(CPLOTBACKGROUND));
+        palette.setColor(QPalette::Window, GColor(GCol::PLOTBACKGROUND));
 
         // only change base if moved away from white plots
         // which is a Mac thing
 #ifndef Q_OS_MAC
-        if (GColor(CPLOTBACKGROUND) != Qt::white)
+        if (GColor(GCol::PLOTBACKGROUND) != Qt::white)
 #endif
         {
-            palette.setColor(QPalette::Base, GCColor::alternateColor(GColor(CPLOTBACKGROUND)));
-            palette.setColor(QPalette::Window,  GColor(CPLOTBACKGROUND));
+            palette.setColor(QPalette::Base, GAlternateColor(GCol::PLOTBACKGROUND));
+            palette.setColor(QPalette::Window,  GColor(GCol::PLOTBACKGROUND));
         }
 
-        palette.setColor(QPalette::WindowText, GCColor::invertColor(GColor(CPLOTBACKGROUND)));
-        palette.setColor(QPalette::Text, GCColor::invertColor(GColor(CPLOTBACKGROUND)));
+        palette.setColor(QPalette::WindowText, GInvertColor(GCol::PLOTBACKGROUND));
+        palette.setColor(QPalette::Text, GInvertColor(GCol::PLOTBACKGROUND));
         setPalette(palette);
         tabs->setPalette(palette);
 
@@ -501,14 +501,14 @@ RideMetadata::configChanged(qint32)
                               "               border-right: 0px;"
                               "               border-bottom: %3px solid %1; } "
                               "QTabBar::tab:selected { border-bottom-right-radius: 0px; border-bottom-left-radius: 0px; border-bottom-color: %2; }"
-                             ).arg(GColor(CPLOTBACKGROUND).name())                        // 1 tab background color
-                              .arg(GColor(CPLOTMARKER).name())                            // 2 selected bar color
+                             ).arg(GColor(GCol::PLOTBACKGROUND).name())                        // 1 tab background color
+                              .arg(GColor(GCol::PLOTMARKER).name())                            // 2 selected bar color
                               .arg(4*dpiYFactor)                                          // 3 selected bar width
                               .arg(2*dpiXFactor)                                          // 4 padding
                               .arg(75*dpiXFactor)                                         // 5 tab minimum width
-                              .arg(GCColor::invertColor(GColor(CPLOTBACKGROUND)).name())     // 6 tab text color
+                              .arg(GInvertColor(GCol::PLOTBACKGROUND).name())     // 6 tab text color
 #ifdef Q_OS_MAC
-                              .arg( GCColor::alternateColor(GColor(CPLOTBACKGROUND)).name()) // 7 lineedit background
+                              .arg( GAlternateColor(GCol::PLOTBACKGROUND).name()) // 7 lineedit background
 #endif
                             ;
         tabs->setStyleSheet(styling);
@@ -519,7 +519,7 @@ RideMetadata::configChanged(qint32)
                                                     "padding-top:  0px; padding-bottom: 0px; }"
                                       "QPushButton:hover { background-color: %3; }"
                                       "QPushButton:hover:pressed { background-color: %3; }"
-                                    ).arg(GColor(CPLOTBACKGROUND).name()).arg(3 * dpiXFactor).arg(GColor(CHOVER).name());
+                                    ).arg(GColor(GCol::PLOTBACKGROUND).name()).arg(3 * dpiXFactor).arg(GColor(GCol::HOVER).name());
 
         QFont df;
         QFontMetrics fm(df);

@@ -101,7 +101,7 @@ TreeMapPlot::paintEvent(QPaintEvent *)
 
     // Init paint settings
     QPainter painter(this);
-    QColor color = GColor(CTRENDPLOTBACKGROUND);
+    QColor color = GColor(GCol::TRENDPLOTBACKGROUND);
     QPen pen(color);
     pen.setWidth(10); // root
     QBrush brush(color);

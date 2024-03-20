@@ -149,7 +149,7 @@ ChartBar::configChanged(qint32)
     scrollArea->setFixedHeight(height);
     buttonBar->setFixedHeight(height);
 
-    QColor col=GColor(CCHARTBAR);
+    QColor col=GColor(GCol::CHARTBAR);
     scrollArea->setStyleSheet(QString("QScrollArea { background: rgb(%1,%2,%3); }").arg(col.red()).arg(col.green()).arg(col.blue()));
 
     foreach(ChartBarItem *b, buttons) {
@@ -165,7 +165,7 @@ ChartBar::configChanged(qint32)
                                                 "padding-top:  0px; padding-bottom: 0px; }"
                                   "QPushButton:hover { background-color: %3; }"
                                   "QPushButton:hover:pressed { background-color: %3; }"
-                                ).arg(GColor(CCHARTBAR).name()).arg(3 * dpiXFactor).arg(GColor(CHOVER).name());
+                                ).arg(GColor(GCol::CHARTBAR).name()).arg(3 * dpiXFactor).arg(GColor(GCol::HOVER).name());
     menuButton->setStyleSheet(buttonstyle);
     left->setStyleSheet(buttonstyle);
     right->setStyleSheet(buttonstyle);
@@ -393,7 +393,7 @@ ChartBar::paintBackground(QPaintEvent *)
     painter.save();
     QRect all(0,0,width(),height());
 
-    painter.fillRect(all, GColor(CCHARTBAR));
+    painter.fillRect(all, GColor(GCol::CHARTBAR));
 
     painter.restore();
 }
@@ -419,7 +419,7 @@ ButtonBar::paintBackground(QPaintEvent *)
     // fill with a linear gradient
     painter.setPen(Qt::NoPen);
     painter.fillRect(all, QColor(Qt::white));
-    painter.fillRect(all, GColor(CCHARTBAR));
+    painter.fillRect(all, GColor(GCol::CHARTBAR));
 
     painter.restore();
 }
@@ -450,25 +450,25 @@ ChartBarItem::paintEvent(QPaintEvent *)
     painter.setPen(Qt::NoPen);
 
     // background - chrome or slected colour
-    QBrush brush(GColor(CCHARTBAR));
-    if (underMouse() && !checked) brush = GColor(CHOVER);
+    QBrush brush(GColor(GCol::CHARTBAR));
+    if (underMouse() && !checked) brush = GColor(GCol::HOVER);
     if (checked) brush = color;
     painter.fillRect(body, brush);
 
     // now paint the text
-    QPen pen(GCColor::invertColor(brush.color()));
+    QPen pen(GInvertColor(brush.color()));
     painter.setPen(pen);
     painter.drawText(body, text, Qt::AlignHCenter | Qt::AlignVCenter);
 
     // draw the bar
     if (checked) {
         // at the top if the chartbar background is different to the plot background
-        if (GColor(CCHARTBAR) != color) painter.fillRect(QRect(0,0,geometry().width(), 3*dpiXFactor), QBrush(GColor(CPLOTMARKER)));
+        if (GColor(GCol::CHARTBAR) != color) painter.fillRect(QRect(0,0,geometry().width(), 3*dpiXFactor), QBrush(GColor(GCol::PLOTMARKER)));
         else {
             // only underline the text with a little extra (why adding "XXX" below)
             QFontMetrics fm(font());
             double width = fm.boundingRect(text+"XXX").width();
-            painter.fillRect(QRect((geometry().width()-width)/2.0,geometry().height()-(3*dpiXFactor),width, 3*dpiXFactor), QBrush(GColor(CPLOTMARKER)));
+            painter.fillRect(QRect((geometry().width()-width)/2.0,geometry().height()-(3*dpiXFactor),width, 3*dpiXFactor), QBrush(GColor(GCol::PLOTMARKER)));
         }
     }
 
@@ -481,13 +481,13 @@ ChartBarItem::paintEvent(QPaintEvent *)
         if (checked) {
 
             // different color if under mouse
-            QBrush brush(GCColor::invertColor(color));
-            if (hotspot.contains(mouse)) brush.setColor(GColor(CPLOTMARKER));
+            QBrush brush(GInvertColor(color));
+            if (hotspot.contains(mouse)) brush.setColor(GColor(GCol::PLOTMARKER));
             painter.fillPath (triangle, brush);
         } else {
 
             // visual clue there is a menu option when tab selected
-            QBrush brush(GColor(CHOVER));
+            QBrush brush(GColor(GCol::HOVER));
             painter.fillPath (triangle, brush);
         }
     }

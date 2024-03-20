@@ -188,8 +188,8 @@ RideNavigator::configChanged(qint32 state)
         QString("QHeaderView { background-color: %1; color: %2; }"
                 "QHeaderView::section { background-color: %1; color: %2; "
                 " border: 0px ; }")
-                .arg(GColor(CPLOTBACKGROUND).name())
-                .arg(GCColor::invertColor(GColor(CPLOTBACKGROUND)).name()));
+                .arg(GColor(GCol::PLOTBACKGROUND).name())
+                .arg(GInvertColor(GCol::PLOTBACKGROUND).name()));
     }
 
 #endif
@@ -1151,11 +1151,11 @@ void NavigatorCellDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
     if (userColor == QColor(1,1,1)) {
         rideBG = false; // default so don't swap round...
         isnormal = true; // just default so no bg or box
-        userColor = GColor(CPLOTMARKER);
+        userColor = GColor(GCol::PLOTMARKER);
     }
 
     // basic background
-    QBrush background = QBrush(GColor(CPLOTBACKGROUND));
+    QBrush background = QBrush(GColor(GCol::PLOTBACKGROUND));
 
     // runs are darker
     //if (isRun) {
@@ -1177,7 +1177,7 @@ void NavigatorCellDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
         // draw border of each cell
         QPen rpen;
         rpen.setWidth(1);
-        rpen.setColor(GColor(CPLOTBACKGROUND));
+        rpen.setColor(GColor(GCol::PLOTBACKGROUND));
         QPen isColor = painter->pen();
         QFont isFont = painter->font();
         painter->setPen(rpen);
@@ -1234,7 +1234,7 @@ void NavigatorCellDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
             if (!selected) {
                 // not selected, so invert ride plot color
                 if (hover) painter->setPen(QPen(Qt::black));
-                else painter->setPen(rideBG ? rideNavigator->reverseColor : GCColor::invertColor(GColor(CPLOTBACKGROUND)));
+                else painter->setPen(rideBG ? rideNavigator->reverseColor : GInvertColor(GCol::PLOTBACKGROUND));
             }
             painter->drawText(myOption.rect, Qt::AlignLeft | Qt::TextWordWrap, calendarText);
             painter->setPen(isColor);
@@ -1250,7 +1250,7 @@ void NavigatorCellDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
                 // border
                 QPen rpen;
                 rpen.setWidth(1);
-                rpen.setColor(GColor(CPLOTBACKGROUND));
+                rpen.setColor(GColor(GCol::PLOTBACKGROUND));
                 QPen isColor = painter->pen();
                 QFont isFont = painter->font();
                 painter->setPen(rpen);
@@ -1266,11 +1266,11 @@ void NavigatorCellDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
             myOption.rect.setX(0);
             myOption.rect.setHeight(rideNavigator->fontHeight + 2);
             myOption.rect.setWidth(rideNavigator->pwidth);
-            painter->fillRect(myOption.rect, GColor(CPLOTBACKGROUND));
+            painter->fillRect(myOption.rect, GColor(GCol::PLOTBACKGROUND));
         }
         QPen isColor = painter->pen();
-        painter->setPen(QPen(GColor(CPLOTMARKER)));
-        myOption.palette.setColor(QPalette::WindowText, QColor(GColor(CPLOTMARKER))); //XXX
+        painter->setPen(QPen(GColor(GCol::PLOTMARKER)));
+        myOption.palette.setColor(QPalette::WindowText, QColor(GColor(GCol::PLOTMARKER))); //XXX
         painter->drawText(myOption.rect, value);
         painter->setPen(isColor);
     }

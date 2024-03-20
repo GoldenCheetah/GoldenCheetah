@@ -28,7 +28,7 @@ RealtimePlotWindow::RealtimePlotWindow(Context *context) :
     this->setWhatsThis(helpContents->getWhatsThisText(HelpWhatsThis::ChartTrain_Realtime));
 
     setContentsMargins(0,0,0,0);
-    setProperty("color", GColor(CTRAINPLOTBACKGROUND));
+    setProperty("color", GColor(GCol::TRAINPLOTBACKGROUND));
 
     QWidget *c = new QWidget;
     HelpWhatsThis *helpConfig = new HelpWhatsThis(c);
@@ -135,7 +135,7 @@ RealtimePlotWindow::RealtimePlotWindow(Context *context) :
 void
 RealtimePlotWindow::configChanged(qint32)
 {
-    setProperty("color", GColor(CTRAINPLOTBACKGROUND));
+    setProperty("color", GColor(GCol::TRAINPLOTBACKGROUND));
     repaint();
 }
 

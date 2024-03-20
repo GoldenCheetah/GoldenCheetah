@@ -589,16 +589,13 @@ main(int argc, char *argv[])
             gcTranslator.load(":translations" + translation_file);
         application->installTranslator(&gcTranslator);
 
-        // Now the translator is installed, set default colors with translated names
-        GCColor::setupColors();
-
         // has a default theme been applied (first run) ?
         QString powercolor = appsettings->value(NULL, "COLORPOWER", "").toString();
-        if (powercolor == "")  GCColor::applyTheme(defaults.theme);
+        if (powercolor == "")  GCColor::inst()->applyTheme(defaults.theme);
 
         // migration
         appsettings->migrateQSettingsSystem(); // colors must be setup before migration can take place, but reading has to be from the migrated ones
-        GCColor::readConfig();
+        GCColor::inst()->readConfig();
 
         // Initialize metrics once the translator is installed
         RideMetricFactory::instance().initialize();

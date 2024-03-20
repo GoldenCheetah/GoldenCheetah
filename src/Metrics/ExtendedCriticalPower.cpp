@@ -278,7 +278,7 @@ ExtendedCriticalPower::getPlotCurveForExtendedCP_2_3(TestModel model)
     QwtPlotCurve *extendedCPCurve2 = new QwtPlotCurve("eCP");
     if (appsettings->value(NULL, GC_ANTIALIAS, true).toBool() == true)
         extendedCPCurve2->setRenderHint(QwtPlotItem::RenderAntialiased);
-    QPen e2pen(GColor(CHEARTRATE));
+    QPen e2pen(GColor(GCol::HEARTRATE));
     e2pen.setWidth(1);
     e2pen.setStyle(Qt::DashLine);
     extendedCPCurve2->setPen(e2pen);
@@ -693,7 +693,7 @@ ExtendedCriticalPower::getPlotLevelForExtendedCP_4_3(TestModel model)
     QwtPlotCurve *extendedCPCurve2 = new QwtPlotCurve("eCP2");
     if (appsettings->value(NULL, GC_ANTIALIAS, true).toBool() == true)
         extendedCPCurve2->setRenderHint(QwtPlotItem::RenderAntialiased);
-    QPen e2pen(GColor(CCP));
+    QPen e2pen(GColor(GCol::CP));
     e2pen.setWidth(1);
     e2pen.setStyle(Qt::NoPen);
     extendedCPCurve2->setPen(e2pen);
@@ -718,7 +718,7 @@ ExtendedCriticalPower::getPlotMarkerForExtendedCP(TestModel model)
 
     extendedCurve2_title.asprintf("CP=%.0f W, MMP60=%.0d W, Pmax=%.0d W, W'=%.0f kJ (%s)", model.ecp, model.mmp60, model.pMax, model.etau*model.ecp* 60.0 / 1000.0, model.version.toLatin1().constData());
     QwtText text(extendedCurve2_title, QwtText::PlainText);
-    text.setColor(GColor(CPLOTMARKER));
+    text.setColor(GColor(GCol::PLOTMARKER));
     extendedCurveTitle2->setLabel(text);
 
     return extendedCurveTitle2;
@@ -744,7 +744,7 @@ ExtendedCriticalPower::getPlotCurveForExtendedCP_4_3_WSecond(TestModel model)
     QwtPlotCurve *extendedCPCurve2 = new QwtPlotCurve("eCP_4_3_WSecond");
     if (appsettings->value(NULL, GC_ANTIALIAS, true).toBool() == true)
         extendedCPCurve2->setRenderHint(QwtPlotItem::RenderAntialiased);
-    QPen e2pen(GColor(CCADENCE));
+    QPen e2pen(GColor(GCol::CADENCE));
     e2pen.setWidth(1);
     e2pen.setStyle(Qt::DashLine);
     extendedCPCurve2->setPen(e2pen);
@@ -773,7 +773,7 @@ ExtendedCriticalPower::getPlotCurveForExtendedCP_4_3_WPrime(TestModel model)
     QwtPlotCurve *extendedCPCurve2 = new QwtPlotCurve("eCP_4_3_WPrime");
     if (appsettings->value(NULL, GC_ANTIALIAS, true).toBool() == true)
         extendedCPCurve2->setRenderHint(QwtPlotItem::RenderAntialiased);
-    QPen e2pen(GColor(CPOWER));
+    QPen e2pen(GColor(GCol::POWER));
     e2pen.setWidth(1);
     e2pen.setStyle(Qt::DashLine);
     extendedCPCurve2->setPen(e2pen);
@@ -802,7 +802,7 @@ ExtendedCriticalPower::getPlotCurveForExtendedCP_4_3_CP(TestModel model)
     QwtPlotCurve *extendedCPCurve2 = new QwtPlotCurve("eCP_4_3_CP");
     if (appsettings->value(NULL, GC_ANTIALIAS, true).toBool() == true)
         extendedCPCurve2->setRenderHint(QwtPlotItem::RenderAntialiased);
-    QPen e2pen(GColor(CHEARTRATE));
+    QPen e2pen(GColor(GCol::HEARTRATE));
     e2pen.setWidth(1);
     e2pen.setStyle(Qt::DashLine);
     extendedCPCurve2->setPen(e2pen);
@@ -833,7 +833,7 @@ ExtendedCriticalPower::getPlotCurveForExtendedCP_4_3_WPrime_CP(TestModel model)
     QwtPlotCurve *extendedCPCurve2 = new QwtPlotCurve("eCP_4_3_WPrime_CP");
     if (appsettings->value(NULL, GC_ANTIALIAS, true).toBool() == true)
         extendedCPCurve2->setRenderHint(QwtPlotItem::RenderAntialiased);
-    QPen e2pen(GColor(CCP));
+    QPen e2pen(GColor(GCol::CP));
     e2pen.setWidth(1);
     e2pen.setStyle(Qt::DashLine);
     extendedCPCurve2->setPen(e2pen);
@@ -1187,7 +1187,7 @@ ExtendedCriticalPower::getPlotCurveForExtendedCP_5_3(TestModel model)
     QwtPlotCurve *extendedCPCurve2 = new QwtPlotCurve("eCP_5_3");
     if (appsettings->value(NULL, GC_ANTIALIAS, true).toBool() == true)
         extendedCPCurve2->setRenderHint(QwtPlotItem::RenderAntialiased);
-    QPen e2pen(Qt::cyan); // Qt::cyan GColor(CCP)
+    QPen e2pen(Qt::cyan); // Qt::cyan GColor(GCol::CP)
     e2pen.setWidth(1);
     e2pen.setStyle(Qt::DashLine);
     extendedCPCurve2->setPen(e2pen);
@@ -1216,7 +1216,7 @@ ExtendedCriticalPower::getPlotLevelForExtendedCP_5_3(TestModel model)
     QwtPlotCurve *extendedCPCurve2 = new QwtPlotCurve("level_eCP_5_3");
     if (appsettings->value(NULL, GC_ANTIALIAS, true).toBool() == true)
         extendedCPCurve2->setRenderHint(QwtPlotItem::RenderAntialiased);
-    QPen e2pen(GColor(Qt::lightGray)); // Qt::cyan
+    QPen e2pen(GColor(GCol::RIDEPLOTYAXIS));
     e2pen.setWidth(1);
     e2pen.setStyle(Qt::SolidLine);
     extendedCPCurve2->setPen(e2pen);
@@ -1251,12 +1251,12 @@ ExtendedCriticalPower::getPlotCurveForExtendedCP_5_3_WSecond(TestModel model, bo
     if (appsettings->value(NULL, GC_ANTIALIAS, true).toBool() == true)
         extendedCPCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
 
-    QPen e2pen(GColor(CCADENCE));
+    QPen e2pen(GColor(GCol::CADENCE));
     e2pen.setWidth(1);
     e2pen.setStyle(Qt::DashLine);
     extendedCPCurve->setPen(e2pen);
 
-    QColor color1 = GColor(CCADENCE);
+    QColor color1 = GColor(GCol::CADENCE);
     color1.setAlpha(64);
     QColor color2 = color1.darker();
     QLinearGradient linearGradient(0, 0, 0, model.paa);
@@ -1295,12 +1295,12 @@ ExtendedCriticalPower::getPlotCurveForExtendedCP_5_3_WPrime(TestModel model, boo
     if (appsettings->value(NULL, GC_ANTIALIAS, true).toBool() == true)
         extendedCPCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
 
-    QPen e2pen(GColor(CPOWER));
+    QPen e2pen(GColor(GCol::POWER));
     e2pen.setWidth(1);
     e2pen.setStyle(Qt::DashLine);
     extendedCPCurve->setPen(e2pen);
 
-    QColor color1 = GColor(CPOWER);
+    QColor color1 = GColor(GCol::POWER);
     color1.setAlpha(64);
     QColor color2 = color1.darker();
     QLinearGradient linearGradient(0, 0, 0, model.ecp);
@@ -1340,12 +1340,12 @@ ExtendedCriticalPower::getPlotCurveForExtendedCP_5_3_CP(TestModel model, bool st
     if (appsettings->value(NULL, GC_ANTIALIAS, true).toBool() == true)
         extendedCPCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
 
-    QPen e2pen(GColor(CHEARTRATE));
+    QPen e2pen(GColor(GCol::HEARTRATE));
     e2pen.setWidth(1);
     e2pen.setStyle(Qt::DashLine);
     extendedCPCurve->setPen(e2pen);
 
-    QColor color1 = GColor(CHEARTRATE);
+    QColor color1 = GColor(GCol::HEARTRATE);
     color1.setAlpha(64);
     QColor color2 = color1.darker();
     QLinearGradient linearGradient(0, 0, 0, 1.1*model.ecp);
@@ -1668,12 +1668,12 @@ ExtendedCriticalPower::getPlotCurveForExtendedCP_6_3_WSecond(TestModel model, bo
     if (appsettings->value(NULL, GC_ANTIALIAS, true).toBool() == true)
         extendedCPCurve2->setRenderHint(QwtPlotItem::RenderAntialiased);
 
-    QPen e2pen(GColor(CCADENCE));
+    QPen e2pen(GColor(GCol::CADENCE));
     e2pen.setWidth(1);
     e2pen.setStyle(Qt::DashLine);
     extendedCPCurve2->setPen(e2pen);
 
-    QColor color1 = GColor(CCADENCE);
+    QColor color1 = GColor(GCol::CADENCE);
     color1.setAlpha(64);
     QColor color2 = color1.darker();
     QLinearGradient linearGradient(0, 0, 0, 100);
@@ -1710,12 +1710,12 @@ ExtendedCriticalPower::getPlotCurveForExtendedCP_6_3_WPrime(TestModel model, boo
     if (appsettings->value(NULL, GC_ANTIALIAS, true).toBool() == true)
         extendedCPCurve2->setRenderHint(QwtPlotItem::RenderAntialiased);
 
-    QPen e2pen(GColor(CPOWER));
+    QPen e2pen(GColor(GCol::POWER));
     e2pen.setWidth(1);
     e2pen.setStyle(Qt::DashLine);
     extendedCPCurve2->setPen(e2pen);
 
-    QColor color1 = GColor(CPOWER);
+    QColor color1 = GColor(GCol::POWER);
     color1.setAlpha(64);
     QColor color2 = color1.darker();
     QLinearGradient linearGradient(0, 0, 0, model.ecp);
@@ -1753,12 +1753,12 @@ ExtendedCriticalPower::getPlotCurveForExtendedCP_6_3_CP(TestModel model, bool st
     if (appsettings->value(NULL, GC_ANTIALIAS, true).toBool() == true)
         extendedCPCurve2->setRenderHint(QwtPlotItem::RenderAntialiased);
 
-    QPen e2pen(GColor(CHEARTRATE));
+    QPen e2pen(GColor(GCol::HEARTRATE));
     e2pen.setWidth(1);
     e2pen.setStyle(Qt::DashLine);
     extendedCPCurve2->setPen(e2pen);
 
-    QColor color1 = GColor(CHEARTRATE);
+    QColor color1 = GColor(GCol::HEARTRATE);
     color1.setAlpha(64);
     QColor color2 = color1.darker();
     QLinearGradient linearGradient(0, 0, 0, 1.1*model.ecp);
@@ -2318,7 +2318,7 @@ ExtendedCriticalPower::getPlotCurveForExtendedCP_7_3(TestModel model)
     QwtPlotCurve *extendedCPCurve2 = new QwtPlotCurve("eCP_7_3");
     if (appsettings->value(NULL, GC_ANTIALIAS, true).toBool() == true)
         extendedCPCurve2->setRenderHint(QwtPlotItem::RenderAntialiased);
-    QPen e2pen(Qt::yellow); // Qt::cyan GColor(CCP)
+    QPen e2pen(Qt::yellow); // Qt::cyan GColor(GCol::CP)
     e2pen.setWidth(1);
     e2pen.setStyle(Qt::DashLine);
     extendedCPCurve2->setPen(e2pen);
@@ -2353,7 +2353,7 @@ ExtendedCriticalPower::getPlotCurveForExtendedCP_7_3_balance(TestModel model, in
     QwtPlotCurve *extendedCPCurve2 = new QwtPlotCurve(QString("eCP_7_3 (%1%)").arg(depletion));
     if (appsettings->value(NULL, GC_ANTIALIAS, true).toBool() == true)
         extendedCPCurve2->setRenderHint(QwtPlotItem::RenderAntialiased);
-    QPen e2pen(Qt::yellow); // Qt::cyan GColor(CCP)
+    QPen e2pen(Qt::yellow); // Qt::cyan GColor(GCol::CP)
     e2pen.setWidth(1);
     e2pen.setStyle(Qt::DashDotDotLine);
     extendedCPCurve2->setPen(e2pen);

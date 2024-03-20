@@ -77,7 +77,7 @@ LiveMapWebPageWindow::LiveMapWebPageWindow(Context *context) : GcChartWindow(con
     HelpWhatsThis *helpConfig = new HelpWhatsThis(settingsWidget);
     settingsWidget->setWhatsThis(helpConfig->getWhatsThisText(HelpWhatsThis::ChartTrain_LiveMap));
     settingsWidget->setContentsMargins(0,0,0,0);
-    setProperty("color", GColor(CTRAINPLOTBACKGROUND));
+    setProperty("color", GColor(GCol::TRAINPLOTBACKGROUND));
 
     QFormLayout* commonLayout = new QFormLayout(settingsWidget);
 
@@ -214,10 +214,10 @@ void LiveMapWebPageWindow::configChanged(qint32)
 {
     // tinted palette for headings etc
     QPalette palette;
-    palette.setBrush(QPalette::Window, QBrush(GColor(CPLOTBACKGROUND)));
-    palette.setColor(QPalette::WindowText, GColor(CPLOTMARKER));
-    palette.setColor(QPalette::Text, GColor(CPLOTMARKER));
-    palette.setColor(QPalette::Base, GCColor::alternateColor(GColor(CPLOTBACKGROUND)));
+    palette.setBrush(QPalette::Window, QBrush(GColor(GCol::PLOTBACKGROUND)));
+    palette.setColor(QPalette::WindowText, GColor(GCol::PLOTMARKER));
+    palette.setColor(QPalette::Text, GColor(GCol::PLOTMARKER));
+    palette.setColor(QPalette::Base, GAlternateColor(GCol::PLOTBACKGROUND));
     setPalette(palette);
 
 }

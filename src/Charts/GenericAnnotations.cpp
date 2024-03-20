@@ -105,7 +105,7 @@ StraightLine::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*
     double scale = controller->plot->scale();
 
     QPen pen(Qt::lightGray);
-    pen.setColor(GColor(CPLOTMARKER));
+    pen.setColor(GColor(GCol::PLOTMARKER));
     pen.setStyle(style);
     pen.setWidth(pen.width() * scale);
     painter->setPen(pen);

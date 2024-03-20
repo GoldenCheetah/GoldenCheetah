@@ -459,7 +459,7 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     mainControls->addRow(smoothLabel, smoothLayout);
 
     QPalette palette;
-    palette.setBrush(QPalette::Window, QBrush(GColor(CRIDEPLOTBACKGROUND)));
+    palette.setBrush(QPalette::Window, QBrush(GColor(GCol::RIDEPLOTBACKGROUND)));
 
     allPlot = new AllPlot(this, this, context);
     allPlot->setContentsMargins(0,0,0,0);
@@ -482,7 +482,7 @@ AllPlotWindow::AllPlotWindow(Context *context) :
 
     allZoomer = new QwtPlotZoomer(allPlot->canvas());
     allZoomer->setRubberBand(QwtPicker::RectRubberBand);
-    allZoomer->setRubberBandPen(GColor(CPLOTSELECT));
+    allZoomer->setRubberBandPen(GColor(GCol::PLOTSELECT));
     allZoomer->setTrackerMode(QwtPicker::AlwaysOff);
     allZoomer->setEnabled(true);
 
@@ -662,7 +662,7 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     fullPlot = new AllPlot(this, this, context);
     fullPlot->standard->grid->enableY(false);
     fullPlot->setFixedHeight(100 *dpiYFactor);
-    fullPlot->setCanvasBackground(GColor(CRIDEPLOTBACKGROUND));
+    fullPlot->setCanvasBackground(GColor(GCol::RIDEPLOTBACKGROUND));
     fullPlot->setHighlightIntervals(false);
     fullPlot->setPaintBrush(0);
     static_cast<QwtPlotCanvas*>(fullPlot->canvas())->setBorderRadius(0);
@@ -674,7 +674,7 @@ AllPlotWindow::AllPlotWindow(Context *context) :
 
     intervalPlot = new AllPlotInterval(this, context);
     intervalPlot->setFixedHeight(100 *dpiYFactor);
-    intervalPlot->setCanvasBackground(GColor(CRIDEPLOTBACKGROUND));
+    intervalPlot->setCanvasBackground(GColor(GCol::RIDEPLOTBACKGROUND));
     static_cast<QwtPlotCanvas*>(intervalPlot->canvas())->setBorderRadius(0);
     intervalPlot->setContentsMargins(0,0,0,0);
 
@@ -838,14 +838,14 @@ AllPlotWindow::configChanged(qint32 state)
 {
     setUpdatesEnabled(false);
 
-    setProperty("color", GColor(CRIDEPLOTBACKGROUND));
+    setProperty("color", GColor(GCol::RIDEPLOTBACKGROUND));
 
     // Container widgets should not paint
     // since they tend to use naff defaults and
     // 'complicate' or 'make busy' the general
     // look and feel
     QPalette palette;
-    palette.setBrush(QPalette::Window, QBrush(GColor(CRIDEPLOTBACKGROUND)));
+    palette.setBrush(QPalette::Window, QBrush(GColor(GCol::RIDEPLOTBACKGROUND)));
     setPalette(palette); // propagates to children
 
     // set style sheets
@@ -874,25 +874,25 @@ AllPlotWindow::configChanged(qint32 state)
     scrollRight->setPalette(palette);
 
 
-    fullPlot->setCanvasBackground(GColor(CRIDEPLOTBACKGROUND));
+    fullPlot->setCanvasBackground(GColor(GCol::RIDEPLOTBACKGROUND));
     fullPlot->setPalette(palette);
     fullPlot->configChanged(state);
     fullPlot->update();
 
-    intervalPlot->setCanvasBackground(GColor(CRIDEPLOTBACKGROUND));
+    intervalPlot->setCanvasBackground(GColor(GCol::RIDEPLOTBACKGROUND));
     intervalPlot->setPalette(palette);
     intervalPlot->configChanged(state);
     intervalPlot->update();
 
     // allPlot of course
-    allPlot->setCanvasBackground(GColor(CRIDEPLOTBACKGROUND));
+    allPlot->setCanvasBackground(GColor(GCol::RIDEPLOTBACKGROUND));
     allPlot->setPalette(palette);
     allPlot->configChanged(state);
     allPlot->update();
 
     // and then the stacked plot
     foreach (AllPlot *plot, allPlots) {
-        plot->setCanvasBackground(GColor(CRIDEPLOTBACKGROUND));
+        plot->setCanvasBackground(GColor(GCol::RIDEPLOTBACKGROUND));
         plot->setPalette(palette);
         plot->configChanged(state);
         plot->update();
@@ -900,7 +900,7 @@ AllPlotWindow::configChanged(qint32 state)
 
     // and then the series plots
     foreach (AllPlot *plot, seriesPlots) {
-        plot->setCanvasBackground(GColor(CRIDEPLOTBACKGROUND));
+        plot->setCanvasBackground(GColor(GCol::RIDEPLOTBACKGROUND));
         plot->setPalette(palette);
         plot->configChanged(state);
         plot->update();
@@ -908,7 +908,7 @@ AllPlotWindow::configChanged(qint32 state)
 
     // and then the compaer plots
     foreach (AllPlot *plot, allComparePlots) {
-        plot->setCanvasBackground(GColor(CRIDEPLOTBACKGROUND));
+        plot->setCanvasBackground(GColor(GCol::RIDEPLOTBACKGROUND));
         plot->setPalette(palette);
         plot->configChanged(state);
         plot->update();
@@ -1650,7 +1650,7 @@ AllPlotWindow::redrawFullPlot()
     // hide the usual plot decorations etc
     fullPlot->setShowPower(1);
     //We now use the window background color
-    //fullPlot->setCanvasBackground(GColor(CPLOTTHUMBNAIL));
+    //fullPlot->setCanvasBackground(GColor(GCol::PLOTTHUMBNAIL));
     static_cast<QwtPlotCanvas*>(fullPlot->canvas())->setBorderRadius(0);
     fullPlot->standard->grid->enableY(false);
 

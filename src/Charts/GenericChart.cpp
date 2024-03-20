@@ -46,7 +46,7 @@ GenericChart::GenericChart(QWidget *parent, Context *context) : QWidget(parent),
 {
     // for scrollarea, since we see a little of it.
     QPalette palette;
-    palette.setBrush(QPalette::Window, QBrush(GColor(CRIDEPLOTBACKGROUND)));
+    palette.setBrush(QPalette::Window, QBrush(GColor(GCol::RIDEPLOTBACKGROUND)));
 
     // main layout for widget
     QVBoxLayout *main=new QVBoxLayout(this);
@@ -84,7 +84,7 @@ GenericChart::GenericChart(QWidget *parent, Context *context) : QWidget(parent),
     connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
 
     // default bgcolor
-    bgcolor = GColor(CPLOTBACKGROUND);
+    bgcolor = GColor(GCol::PLOTBACKGROUND);
     configChanged(0);
 }
 

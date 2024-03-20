@@ -688,21 +688,21 @@ ZoneOverviewItem::configChanged(qint32)
 
     // config changed...
     if (series == RideFile::hr) {
-        barset->setLabelColor(GColor(CHEARTRATE));
-        barset->setBorderColor(GColor(CHEARTRATE));
-        barset->setBrush(GColor(CHEARTRATE));
+        barset->setLabelColor(GColor(GCol::HEARTRATE));
+        barset->setBorderColor(GColor(GCol::HEARTRATE));
+        barset->setBrush(GColor(GCol::HEARTRATE));
     } else if (series == RideFile::watts) {
-        barset->setLabelColor(GColor(CPOWER));
-        barset->setBorderColor(GColor(CPOWER));
-        barset->setBrush(GColor(CPOWER));
+        barset->setLabelColor(GColor(GCol::POWER));
+        barset->setBorderColor(GColor(GCol::POWER));
+        barset->setBrush(GColor(GCol::POWER));
     } else if (series == RideFile::wbal) {
-        barset->setLabelColor(GColor(CWBAL));
-        barset->setBorderColor(GColor(CWBAL));
-        barset->setBrush(GColor(CWBAL));
+        barset->setLabelColor(GColor(GCol::WBAL));
+        barset->setBorderColor(GColor(GCol::WBAL));
+        barset->setBrush(GColor(GCol::WBAL));
     } else if (series == RideFile::kph) {
-        barset->setLabelColor(GColor(CSPEED));
-        barset->setBorderColor(GColor(CSPEED));
-        barset->setBrush(GColor(CSPEED));
+        barset->setLabelColor(GColor(GCol::SPEED));
+        barset->setBorderColor(GColor(GCol::SPEED));
+        barset->setBrush(GColor(GCol::SPEED));
     }
 
     categories.clear();
@@ -768,7 +768,7 @@ ZoneOverviewItem::configChanged(qint32)
     barcategoryaxis->setCategories(categories);
 
     // config axes
-    QPen axisPen(GColor(CCARDBACKGROUND));
+    QPen axisPen(GColor(GCol::CARDBACKGROUND));
     axisPen.setWidth(1); // almost invisible
     chart->createDefaultAxes();
     chart->setAxisX(barcategoryaxis, barseries);
@@ -1702,7 +1702,7 @@ TopNOverviewItem::setDateRange(DateRange dr)
         if (index >= 0 && index < stressdata.sb().count()) tsb = stressdata.sb()[index];
 
         // add to the list
-        QColor color = (item->color.red() == 1 && item->color.green() == 1 && item->color.blue() == 1) ? GColor(CPLOTMARKER) : item->color;
+        QColor color = (item->color.red() == 1 && item->color.green() == 1 && item->color.blue() == 1) ? GColor(GCol::PLOTMARKER) : item->color;
         ranked << topnentry(item->dateTime.date(), v, value, color, tsb, item);
 
         // biggest value?
@@ -1963,8 +1963,8 @@ DonutOverviewItem::setDateRange(DateRange dr)
 
     // now do the colors
     double i=1;
-    QColor min=GColor(CPLOTMARKER);
-    QColor max=GCColor::invertColor(GColor(CCARDBACKGROUND));
+    QColor min=GColor(GCol::PLOTMARKER);
+    QColor max=GInvertColor(GCol::CARDBACKGROUND);
     bool exploded=false;
     foreach(QPieSlice *slice, add->slices()) {
 
@@ -2379,7 +2379,7 @@ IntervalOverviewItem::setDateRange(DateRange dr)
         add.z = z;
         add.fill = item->color;
         add.item = item; // for click thru
-        if (add.fill.red() == 1 && add.fill.green() == 1 && add.fill.blue() == 1) add.fill = GColor(CPLOTMARKER);
+        if (GIsRGBColor(add.fill) && add.fill.blue() == 1) add.fill = GColor(GCol::PLOTMARKER);
         add.label = item->getText("Workout Code","blank");
         points << add;
 
@@ -2445,7 +2445,7 @@ IntervalOverviewItem::setData(RideItem *item, bool animate)
         add.y = y;
         add.z = z;
 
-        if (interval == this->hover || interval->selected) add.fill = GColor(CPLOTMARKER);
+        if (interval == this->hover || interval->selected) add.fill = GColor(GCol::PLOTMARKER);
         else add.fill = interval->color;
         add.label = interval->name;
         points << add;
@@ -2687,7 +2687,7 @@ KPIOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, 
     QFontMetrics fm(parent->bigfont);
     QRectF rect = QFontMetrics(parent->bigfont, parent->device()).boundingRect(value);
 
-    painter->setPen(GColor(CPLOTMARKER));
+    painter->setPen(GColor(GCol::PLOTMARKER));
     painter->setFont(parent->bigfont);
     painter->drawText(QPointF((geometry().width() - rect.width()) / 2.0f,
                               mid + (fm.ascent() / 3.0f)), value); // divided by 3 to account for "gap" at top of font
@@ -2731,7 +2731,7 @@ KPIOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, 
             if (!percenttext.startsWith("nan") && !percenttext.startsWith("inf") && percenttext != "0%") {
 
                 // title color, copied code from chartspace.cpp, should really be a cleaner way to get these
-                if (GCColor::luminance(GColor(CCARDBACKGROUND)) < 127) painter->setPen(QColor(200,200,200));
+                if (GLuminance(GCol::CARDBACKGROUND) < 127) painter->setPen(QColor(200,200,200));
                 else painter->setPen(QColor(70,70,70));
 
                 painter->setFont(parent->midfont);
@@ -2935,7 +2935,7 @@ DataOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *,
     bold.setBold(true);
 
     // normal just grey, we highlight with plot marker
-    QColor cnormal = (GCColor::luminance(GColor(CCARDBACKGROUND)) < 127) ? QColor(200,200,200) : QColor(70,70,70);
+    QColor cnormal = (GLuminance(GCol::CARDBACKGROUND) < 127) ? QColor(200,200,200) : QColor(70,70,70);
 
 
     // step 2: where is the mouse hovering, paint a background etc ....
@@ -3103,7 +3103,7 @@ DataOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *,
                 // highlight rows when hovering and click thru not available
                 if ((j == hoverrow || j == hoveredrow) && !scrollbar->isDragging()) {
                     painter->setFont(bold);
-                    painter->setPen(GColor(CPLOTMARKER));
+                    painter->setPen(GColor(GCol::PLOTMARKER));
                 } else {
                     painter->setFont(normal);
                     painter->setPen(cnormal);
@@ -3161,7 +3161,7 @@ RPEOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, 
     QFontMetrics fm(parent->bigfont);
     QRectF rect = QFontMetrics(parent->bigfont, parent->device()).boundingRect(value);
 
-    painter->setPen(GColor(CPLOTMARKER));
+    painter->setPen(GColor(GCol::PLOTMARKER));
     painter->setFont(parent->bigfont);
     painter->drawText(QPointF((geometry().width() - rect.width()) / 2.0f, mid + (fm.ascent() / 3.0f)), value); // divided by 3 to account for "gap" at top of font
     painter->drawText(QPointF((geometry().width() - rect.width()) / 2.0f, mid + (fm.ascent() / 3.0f)), value); // divided by 3 to account for "gap" at top of font
@@ -3226,7 +3226,7 @@ MetricOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem 
         painter->drawPixmap(QPointF(ROWHEIGHT, ROWHEIGHT*2), *medal);
 
         // rank
-        if (beststring == tr("Career"))  painter->setPen(GColor(CPLOTMARKER));
+        if (beststring == tr("Career"))  painter->setPen(GColor(GCol::PLOTMARKER));
         else painter->setPen(QPen(QColor(150,150,150)));
         painter->setFont(parent->midfont);
         painter->drawText(QRectF(0, (ROWHEIGHT*2)+medal->height()+10, medal->width()+(ROWHEIGHT*2), ROWHEIGHT*2), beststring, Qt::AlignTop|Qt::AlignHCenter);
@@ -3245,7 +3245,7 @@ MetricOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem 
     QFontMetrics fm(parent->bigfont);
     QRectF rect = QFontMetrics(parent->bigfont, parent->device()).boundingRect(value);
 
-    painter->setPen(GColor(CPLOTMARKER));
+    painter->setPen(GColor(GCol::PLOTMARKER));
     painter->setFont(parent->bigfont);
     painter->drawText(QPointF((geometry().width() - rect.width()) / 2.0f,
                               mid + (fm.ascent() / 3.0f)), value); // divided by 3 to account for "gap" at top of font
@@ -3404,7 +3404,7 @@ TopNOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *,
     QRectF barrect = QRectF(0,10, width, 30);
 
     // text color
-    QColor cnormal = (GCColor::luminance(GColor(CCARDBACKGROUND)) < 127) ? QColor(200,200,200) : QColor(70,70,70);
+    QColor cnormal = (GLuminance(GCol::CARDBACKGROUND) < 127) ? QColor(200,200,200) : QColor(70,70,70);
 
     // PAINT
     for (int i=0; i<maxrows && i<ranked.count(); i++) {
@@ -3485,7 +3485,7 @@ MetaOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *,
         } else {
 
             // any other kind of metadata just paint it
-            painter->setPen(GColor(CPLOTMARKER));
+            painter->setPen(GColor(GCol::PLOTMARKER));
             painter->setFont(parent->bigfont);
             painter->drawText(QPointF((geometry().width() - rect.width()) / 2.0f,
                                   mid + (fm.ascent() / 3.0f)), value); // divided by 3 to account for "gap" at top of font
@@ -3508,7 +3508,7 @@ MetaOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *,
         QFontMetrics fm(parent->bigfont);
         QRectF rect = QFontMetrics(parent->bigfont, parent->device()).boundingRect(value);
 
-        painter->setPen(GColor(CPLOTMARKER));
+        painter->setPen(GColor(GCol::PLOTMARKER));
         painter->setFont(parent->bigfont);
         painter->drawText(QPointF((geometry().width() - rect.width()) / 2.0f,
                                   mid + (fm.ascent() / 3.0f)), value); // divided by 3 to account for "gap" at top of font
@@ -3588,7 +3588,7 @@ PMCOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, 
                               nexty + (tfm.ascent() / 3.0f)), string); // divided by 3 to account for "gap" at top of font
     nexty += rect.height() + 30;
 
-    painter->setPen(PMCData::sbColor(sb, GColor(CPLOTMARKER)));
+    painter->setPen(PMCData::sbColor(sb, GColor(GCol::PLOTMARKER)));
     painter->setFont(parent->bigfont);
     string = QString("%1").arg(round(sb));
     rect = bfm.boundingRect(string);
@@ -3609,7 +3609,7 @@ PMCOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, 
                                       nexty + (tfm.ascent() / 3.0f)), string); // divided by 3 to account for "gap" at top of font
         nexty += rect.height() + 30;
 
-        painter->setPen(PMCData::ltsColor(lts, GColor(CPLOTMARKER)));
+        painter->setPen(PMCData::ltsColor(lts, GColor(GCol::PLOTMARKER)));
         painter->setFont(parent->bigfont);
         string = QString("%1").arg(round(lts));
         rect = bfm.boundingRect(string);
@@ -3632,7 +3632,7 @@ PMCOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, 
                                   nexty + (tfm.ascent() / 3.0f)), string); // divided by 3 to account for "gap" at top of font
         nexty += rect.height() + 30;
 
-        painter->setPen(PMCData::stsColor(sts, GColor(CPLOTMARKER)));
+        painter->setPen(PMCData::stsColor(sts, GColor(GCol::PLOTMARKER)));
         painter->setFont(parent->bigfont);
         string = QString("%1").arg(round(sts));
         rect = bfm.boundingRect(string);
@@ -3655,7 +3655,7 @@ PMCOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, 
                                   nexty + (tfm.ascent() / 3.0f)), string); // divided by 3 to account for "gap" at top of font
         nexty += rect.height() + 30;
 
-        painter->setPen(PMCData::rrColor(rr, GColor(CPLOTMARKER)));
+        painter->setPen(PMCData::rrColor(rr, GColor(GCol::PLOTMARKER)));
         painter->setFont(parent->bigfont);
         string = QString("%1").arg(round(rr));
         rect = bfm.boundingRect(string);
@@ -3674,7 +3674,7 @@ void ZoneOverviewItem::itemPaint(QPainter *, const QStyleOptionGraphicsItem *, Q
 void DonutOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
 {
     painter->setFont(parent->bigfont);
-    painter->setPen(GColor(CPLOTMARKER));
+    painter->setPen(GColor(GCol::PLOTMARKER));
     painter->drawText(chart->geometry(), Qt::AlignHCenter | Qt::AlignVCenter, value);
     painter->setPen(QColor(100,100,100));
     QFontMetrics fm(parent->midfont);
@@ -4272,7 +4272,7 @@ RPErating::setValue(QString value)
     this->value = value;
     int v = qRound(value.toDouble());
     if (v <0 || v>10) {
-        color = GColor(CPLOTMARKER);
+        color = GColor(GCol::PLOTMARKER);
         description = QObject::tr("Invalid");
     } else {
         description = FosterDesc[v];
@@ -4419,7 +4419,7 @@ RPErating::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
 
         // draw a rectangle with a 5px gap
         painter->setPen(Qt::NoPen);
-        painter->fillRect(geom.x()+parent->x()+(width *(i+1)), parent->y()+geom.y()+ROWHEIGHT*1.5f, width-5, ROWHEIGHT*0.25f, QBrush(GColor(CCARDBACKGROUND).darker(200)));
+        painter->fillRect(geom.x()+parent->x()+(width *(i+1)), parent->y()+geom.y()+ROWHEIGHT*1.5f, width-5, ROWHEIGHT*0.25f, QBrush(GColor(GCol::CARDBACKGROUND).darker(200)));
     }
 }
 
@@ -4667,7 +4667,7 @@ BubbleViz::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
     // blank when no points
     if (points.count() == 0 || miny==maxy || minx==maxx) return;
 
-    painter->setPen(GColor(CPLOTMARKER));
+    painter->setPen(GColor(GCol::PLOTMARKER));
 
     // chart canvas
     QRectF canvas= QRectF(parent->x()+geom.x(), parent->y()+geom.y(), geom.width(),geom.height());
@@ -4897,7 +4897,7 @@ BubbleViz::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
     painter->drawText(ylabelspace.right() - bminy.width(),  ylabelspace.bottom()-(miny*yratio) + (bminy.height()/2), QString("%1").arg(round(miny+yoff)));
 
     // hover point?
-    painter->setPen(GColor(CPLOTMARKER));
+    painter->setPen(GColor(GCol::PLOTMARKER));
 
     if (hover && nearvalue >= 0) {
 
@@ -4914,7 +4914,7 @@ BubbleViz::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
         else xlab = Utils::removeDP(QString("%1").arg(nearest.x+xoff,0,'f',parent->xdp));
         bminx = tfm.tightBoundingRect(QString("%1").arg(xlab));
         bminx.moveTo(center.x() - (bminx.width()/2),  xlabelspace.bottom()-bminx.height());
-        painter->fillRect(bminx, QBrush(GColor(CCARDBACKGROUND))); // overwrite range labels
+        painter->fillRect(bminx, QBrush(GColor(GCol::CARDBACKGROUND))); // overwrite range labels
         painter->drawText(center.x() - (bminx.width()/2),  xlabelspace.bottom(), xlab);
 
         // ylabel
@@ -4924,13 +4924,13 @@ BubbleViz::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
         else ylab = Utils::removeDP(QString("%1").arg(nearest.y+yoff,0,'f',parent->ydp));
         bminy = tfm.tightBoundingRect(QString("%1").arg(ylab));
         bminy.moveTo(ylabelspace.right() - bminy.width(),  center.y() - (bminy.height()/2));
-        painter->fillRect(bminy, QBrush(GColor(CCARDBACKGROUND))); // overwrite range labels
+        painter->fillRect(bminy, QBrush(GColor(GCol::CARDBACKGROUND))); // overwrite range labels
         painter->drawText(ylabelspace.right() - bminy.width(),  center.y() + (bminy.height()/2), ylab);
 
         // plot marker
         QPen pen(Qt::NoPen);
         painter->setPen(pen);
-        painter->setBrush(GColor(CPLOTMARKER));
+        painter->setBrush(GColor(GCol::PLOTMARKER));
 
         // draw  the one we are near with no alpha
         double size = (nearest.z/mean) * area;
@@ -4943,7 +4943,7 @@ BubbleViz::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
         painter->setClipping(false);
 
         // now put the label at the top of the canvas
-        painter->setPen(QPen(GColor(CPLOTMARKER)));
+        painter->setPen(QPen(GColor(GCol::PLOTMARKER)));
         bminx = tfm.tightBoundingRect(nearest.label);
         painter->drawText(canvas.center().x()-(bminx.width()/2.0f),
                           canvas.top()+bminx.height()-10, nearest.label);
@@ -5022,7 +5022,7 @@ Sparkline::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
         }
 
         if (fill) {
-            QColor fillColor=GColor(CPLOTMARKER);
+            QColor fillColor=GColor(GCol::PLOTMARKER);
             fillColor.setAlpha(64);
             QPainterPath fillpath = path;
             fillpath.lineTo((points.last().x()*xfactor)+xoffset,bottom);
@@ -5053,7 +5053,7 @@ Sparkline::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
             double x = (points.first().x()*xfactor)+xoffset-25;
             double y = bottom-((points.first().y()-min)*yfactor)-25;
             if (std::isfinite(x) && std::isfinite(y)) {
-                painter->setBrush(QBrush(GColor(CPLOTMARKER).darker(150)));
+                painter->setBrush(QBrush(GColor(GCol::PLOTMARKER).darker(150)));
                 painter->setPen(Qt::NoPen);
                 painter->drawEllipse(QRectF(x, y, 50, 50));
             }
@@ -5321,7 +5321,7 @@ ProgressBar::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
     if (factor < 0) factor = 0;
 
     QRectF bar(box.left(), box.top(), box.width() * factor, ROWHEIGHT/3.0);
-    painter->fillRect(bar, QBrush(GColor(CPLOTMARKER)));
+    painter->fillRect(bar, QBrush(GColor(GCol::PLOTMARKER)));
 
 }
 
@@ -5348,27 +5348,27 @@ Button::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
     painter->setRenderHint(QPainter::Antialiasing);
 
     // button background
-    QColor pc = GCColor::invertColor(GColor(CCARDBACKGROUND));
+    QColor pc = GInvertColor(GCol::CARDBACKGROUND);
     pc.setAlpha(64);
     QPen line(pc,gl_border, Qt::SolidLine);
     line.setJoinStyle(Qt::RoundJoin);
     painter->setPen(line);
     QPointF pos=mapToParent(geom.x(), geom.y());
     if (isUnderMouse()) {
-        QColor hover=GColor(CPLOTMARKER);
+        QColor hover=GColor(GCol::PLOTMARKER);
         if (state==Clicked) hover.setAlpha(200);
         else hover.setAlpha(100);
         painter->setBrush(QBrush(hover));
-    } else painter->setBrush(QBrush(GColor(CCARDBACKGROUND)));
+    } else painter->setBrush(QBrush(GColor(GCol::CARDBACKGROUND)));
     painter->drawRoundedRect(pos.x()+gl_border, pos.y()+gl_border, geom.width()-(gl_border*2), geom.height()-(gl_border*2), gl_radius, gl_radius);
 
     // text using large font clipped
     if (isUnderMouse()) {
-        QColor tc = GCColor::invertColor(CPLOTMARKER);
+        QColor tc = GInvertColor(GCol::PLOTMARKER);
         tc.setAlpha(200);
         painter->setPen(tc);
     } else {
-        QColor tc = GCColor::invertColor(GColor(CCARDBACKGROUND));
+        QColor tc = GInvertColor(GCol::CARDBACKGROUND);
         tc.setAlpha(200);
         painter->setPen(tc);
     }
@@ -5486,7 +5486,7 @@ VScrollBar::paint(QPainter*painter, const QStyleOptionGraphicsItem *, QWidget*)
         double barheight = geom.height() * (geom.height() / height);
         QColor barcolor(127,127,127,64);
         if (state == DRAG) {
-            barcolor = GColor(CPLOTMARKER);
+            barcolor = GColor(GCol::PLOTMARKER);
         } else if (hover) {
             if (barhover) barcolor = QColor(127,127,127,255);
             else barcolor = QColor(127,127,127,127);

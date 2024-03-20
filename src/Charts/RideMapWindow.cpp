@@ -371,7 +371,7 @@ RideMapWindow::osmCustomTSURLEditingFinished()
 void
 RideMapWindow::configChanged(qint32 value)
 {
-    setProperty("color", GColor(CPLOTBACKGROUND));
+    setProperty("color", GColor(GCol::PLOTBACKGROUND));
 #ifndef Q_OS_MAC
     overlayIntervals->setStyleSheet(AbstractView::ourStyleSheet());
 #endif
@@ -465,8 +465,8 @@ void RideMapWindow::createHtml()
     }
 
     // No GPS data, so sorry no map
-    QColor bgColor = GColor(CPLOTBACKGROUND);
-    QColor fgColor = GCColor::invertColor(bgColor);
+    QColor bgColor = GColor(GCol::PLOTBACKGROUND);
+    QColor fgColor = GInvertColor(bgColor);
     if (   (   context->isCompareIntervals
             && ! hasComparePositions)
         || (   ! context->isCompareIntervals
@@ -1045,7 +1045,7 @@ RideMapWindow::buildPositionList
 
 QColor RideMapWindow::GetColor(int watts)
 {
-    if (range < 0 || hideShadedZones()) return GColor(MAPROUTELINE);
+    if (range < 0 || hideShadedZones()) return GColor(GCol::MAPROUTELINE);
     else return zoneColor(context->athlete->zones(myRideItem ? myRideItem->sport : "Bike")->whichZone(range, watts), 7);
 }
 

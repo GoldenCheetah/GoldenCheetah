@@ -992,16 +992,16 @@ int Zones::getRangeSize() const
 QColor zoneColor(int z, int) {
 
     switch(z) {
-    case 0: return GColor(CZONE1); break;
-    case 1: return GColor(CZONE2); break;
-    case 2: return GColor(CZONE3); break;
-    case 3: return GColor(CZONE4); break;
-    case 4: return GColor(CZONE5); break;
-    case 5: return GColor(CZONE6); break;
-    case 6: return GColor(CZONE7); break;
-    case 7: return GColor(CZONE8); break;
-    case 8: return GColor(CZONE9); break;
-    case 9: return GColor(CZONE10); break;
+    case 0: return GColor(GCol::ZONE1); break;
+    case 1: return GColor(GCol::ZONE2); break;
+    case 2: return GColor(GCol::ZONE3); break;
+    case 3: return GColor(GCol::ZONE4); break;
+    case 4: return GColor(GCol::ZONE5); break;
+    case 5: return GColor(GCol::ZONE6); break;
+    case 6: return GColor(GCol::ZONE7); break;
+    case 7: return GColor(GCol::ZONE8); break;
+    case 8: return GColor(GCol::ZONE9); break;
+    case 9: return GColor(GCol::ZONE10); break;
     default: return QColor(128,128,128,128); break;
     }
 }

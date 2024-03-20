@@ -124,7 +124,7 @@ NewSideBar::configChanged(qint32)
     QFontMetrics fm(font);
     top->setFixedHeight(fm.height() + 16); // no scaling...
     bottom->setFixedHeight(22 * dpiXFactor);
-    QColor col=GColor(CCHROME);
+    QColor col=GColor(GCol::CHROME);
     QString style=QString("QWidget { background: rgb(%1,%2,%3); }").arg(col.red()).arg(col.green()).arg(col.blue());
     top->setStyleSheet(style);
     bottom->setStyleSheet(style);
@@ -219,12 +219,12 @@ void
 NewSideBarItem::configChanged(qint32)
 {
     // set background colors
-    bg_normal = GColor(CCHROME);
+    bg_normal = GColor(GCol::CHROME);
     QString style = QString("QWidget { background: rgb(%1,%2,%3); }").arg(bg_normal.red()).arg(bg_normal.green()).arg(bg_normal.blue());
     setStyleSheet(style);
 
     // set foreground colors
-    fg_normal = GCColor::invertColor(GColor(CCHROME));
+    fg_normal = GInvertColor(GCol::CHROME);
 
     // if foreground is white then we're "dark" if its
     // black the we're "light" so this controls palette
@@ -234,11 +234,11 @@ NewSideBarItem::configChanged(qint32)
     else fg_disabled = QColor(180,180,180);
 
     // on select
-    bg_select = GCColor::selectedColor(bg_normal);
-    fg_select = GCColor::invertColor(bg_select);
+    bg_select = GSelectedColor(bg_normal);
+    fg_select = GInvertColor(bg_select);
 
     // on hover
-    bg_hover =GColor(CHOVER);
+    bg_hover =GColor(GCol::HOVER);
 
     iconNormal = QPixmap::fromImage(imageRGB(icon, fg_normal), Qt::ColorOnly|Qt::PreferDither|Qt::DiffuseAlphaDither);
     iconNormal = iconNormal.scaled(24*dpiXFactor, 24*dpiXFactor, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
@@ -265,7 +265,7 @@ NewSideBarItem::paintEvent(QPaintEvent *)
     else painter.drawPixmap(27*dpiXFactor,6*dpiXFactor,24*dpiXFactor,24*dpiXFactor,iconDisabled);
 
     // block
-    if (selected) painter.fillRect(QRectF(0,0,3*dpiXFactor,gl_itemheight*dpiXFactor), QBrush(GColor(CPLOTMARKER)));
+    if (selected) painter.fillRect(QRectF(0,0,3*dpiXFactor,gl_itemheight*dpiXFactor), QBrush(GColor(GCol::PLOTMARKER)));
 
     // draw name
     QPen pen(fg_normal);

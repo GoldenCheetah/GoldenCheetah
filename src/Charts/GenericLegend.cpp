@@ -133,7 +133,7 @@ GenericLegendItem::paintEvent(QPaintEvent *)
 
     // under mouse show
     if (clickable && underMouse()) {
-        QColor color = GColor(CPLOTMARKER);
+        QColor color = GColor(GCol::PLOTMARKER);
         color.setAlphaF(0.2); // same as plotarea
         painter.setBrush(color);
         painter.setPen(Qt::NoPen);
@@ -160,7 +160,7 @@ GenericLegendItem::paintEvent(QPaintEvent *)
     if (hasstring)  string=this->string;
 
     // set pen to series color for now
-    if (enabled)  painter.setPen(GCColor::invertColor(legend->plot()->backgroundColor())); // use invert - usually black or white
+    if (enabled)  painter.setPen(GInvertColor(legend->plot()->backgroundColor())); // use invert - usually black or white
     else painter.setPen(Qt::gray);
 
     QFont f;
@@ -250,7 +250,7 @@ GenericLegend::addX(QString name, bool datetime, QString datetimeformat)
     // if it already exists remove it
     if (items.value(name,NULL) != NULL) removeSeries(name);
 
-    GenericLegendItem *add = new GenericLegendItem(context, this, name, GColor(CPLOTMARKER));
+    GenericLegendItem *add = new GenericLegendItem(context, this, name, GColor(GCol::PLOTMARKER));
     add->setClickable(false);
     add->setDateTime(datetime, datetimeformat);
     layout->insertWidget(0, add);

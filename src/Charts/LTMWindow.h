@@ -73,8 +73,8 @@ class LTMToolTip : public QwtPlotPicker
         stGiles.setWeight(QFont::Bold);
         text.setFont(stGiles);
 
-        text.setBackgroundBrush(QBrush( GColor(CPLOTMARKER)));
-        text.setColor(GColor(CRIDEPLOTBACKGROUND));
+        text.setBackgroundBrush(QBrush( GColor(GCol::PLOTMARKER)));
+        text.setColor(GColor(GCol::RIDEPLOTBACKGROUND));
         text.setBorderRadius(6);
         text.setRenderFlags(Qt::AlignCenter | Qt::AlignVCenter);
 
