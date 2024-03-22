@@ -396,8 +396,8 @@ void TrainBottom::updateStyles()
     QString bss = QString(
         "QWidget { background-color: %2; }"
         "QPushButton { border: 0px; } "
-        "QPushButton:hover { background-color: %1; }"
-        "QFrame { color: %3; background-color: %2; }"
+        "QPushButton:hover { background-color: %1; } "
+        "QFrame { color: %3; } "
         ).arg(hover.name(QColor::HexArgb))
          .arg(bg.name(QColor::HexArgb))
          .arg(frame.name(QColor::HexArgb));
@@ -424,7 +424,7 @@ QFrame* TrainBottom::newSep()
 {
     QFrame *sep = new QFrame(this);
     sep->setFrameShape(QFrame::VLine);
-    sep->setFrameShadow(QFrame::Sunken);
+    sep->setFrameShadow(QFrame::Plain);
     sep->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
     return sep;
 }
