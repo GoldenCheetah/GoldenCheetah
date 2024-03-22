@@ -121,19 +121,34 @@
         <file>xml/home-perspectives.xml</file>
         <file>ini/measures.ini</file>
         <file>html/ltm-summary.html</file>
-        <file>images/oxygen/power-off.png</file>
-        <file>images/oxygen/power-on.png</file>
-        <file>images/oxygen/play.png</file>
-        <file>images/oxygen/pause.png</file>
-        <file>images/oxygen/stop.png</file>
-        <file>images/oxygen/ffwd.png</file>
-        <file>images/oxygen/rewind.png</file>
-        <file>images/oxygen/lap.png</file>
-        <file>images/oxygen/fwd.png</file>
-        <file>images/oxygen/back.png</file>
-        <file>images/oxygen/save.png</file>
-        <file>images/oxygen/open.png</file>
-        <file>images/oxygen/cal.png</file>
+        <file>images/breeze/light/unknown.svg</file>
+        <file>images/breeze/light/offline.svg</file>
+        <file>images/breeze/light/online.svg</file>
+        <file>images/breeze/light/play.svg</file>
+        <file>images/breeze/light/pause.svg</file>
+        <file>images/breeze/light/ffwd.svg</file>
+        <file>images/breeze/light/rewind.svg</file>
+        <file>images/breeze/light/stop.svg</file>
+        <file>images/breeze/light/lap.svg</file>
+        <file>images/breeze/light/fwd.svg</file>
+        <file>images/breeze/light/back.svg</file>
+        <file>images/breeze/light/up.svg</file>
+        <file>images/breeze/light/down.svg</file>
+        <file>images/breeze/light/cal.svg</file>
+        <file>images/breeze/dark/unknown.svg</file>
+        <file>images/breeze/dark/offline.svg</file>
+        <file>images/breeze/dark/online.svg</file>
+        <file>images/breeze/dark/play.svg</file>
+        <file>images/breeze/dark/pause.svg</file>
+        <file>images/breeze/dark/ffwd.svg</file>
+        <file>images/breeze/dark/rewind.svg</file>
+        <file>images/breeze/dark/stop.svg</file>
+        <file>images/breeze/dark/lap.svg</file>
+        <file>images/breeze/dark/fwd.svg</file>
+        <file>images/breeze/dark/back.svg</file>
+        <file>images/breeze/dark/up.svg</file>
+        <file>images/breeze/dark/down.svg</file>
+        <file>images/breeze/dark/cal.svg</file>
         <file>images/toolbar/close-icon.png</file>
         <file>images/toolbar/save.png</file>
         <file>images/toolbar/saveas.png</file>
@@ -183,8 +198,6 @@
         <file>images/sidebar/movie.png</file>
         <file>images/sidebar/power.png</file>
         <file>images/sidebar/sync.png</file>
-        <file>images/oxygen/up.png</file>
-        <file>images/oxygen/down.png</file>
         <file>audio/lap.wav</file>
         <file>images/configure.png</file>
         <file>images/toolbar/cloud.png</file>
