@@ -367,11 +367,7 @@ StravaRoutesDownload::getFileList(QString &error)
     while (offset < resultCount) {
         QString urlstr = "https://www.strava.com/api/v3/athletes/" + athleteId + "/routes?";
 
-#if QT_VERSION > 0x050000
         QUrlQuery params;
-#else
-        QUrl params;
-#endif
 
         params.addQueryItem("per_page", QString("%1").arg(pageSize));
         params.addQueryItem("page",  QString("%1").arg(offset/pageSize+1));
