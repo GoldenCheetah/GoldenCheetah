@@ -21,9 +21,22 @@
 #include "RealtimeData.h"
 #include "Units.h"
 
+void VirtualPowerTrainer::to_string(std::string& s) const {
+    // poly|wheelrpm|name
+    s.clear();
+    m_pf->append(s);
+    s.append(m_fUseWheelRpm ? "|1|" : "|0|");
+    s.append(m_pName);
+    s.append("|");
+    s.append(QString::number(m_inertialMomentKGM2, 'f', 3).toStdString());
+}
+
 // Abstract base class for Realtime device controllers
 
-RealtimeController::RealtimeController(TrainSidebar *parent, DeviceConfiguration *dc) : parent(parent), dc(dc)
+RealtimeController::RealtimeController(TrainSidebar *parent, DeviceConfiguration *dc) :
+    parent(parent), dc(dc), polyFit(NULL), fUseWheelRpm(false), 
+    inertialMomentKGM2(0.), fAdvancedSpeedPowerMapping(true),
+    prevTime(), prevRpm(0.), prevWatts(0.)
 {
     if (dc != NULL)
     {
@@ -50,608 +63,728 @@ bool RealtimeController::doesLoad() { return false; }
 void RealtimeController::getRealtimeData(RealtimeData &) { }
 void RealtimeController::pushRealtimeData(RealtimeData &) { } // update realtime data with current values
 
-void
-RealtimeController::processRealtimeData(RealtimeData &rtData)
+// Estimate Power From Speed
+//
+// Simply mapping current speed sample to power has significant error for intervals
+// where speed has changed.
+//
+// - Determine average power during time span since previous device speed update.
+//     Uses average power over interval because point power is significantly
+//     wrong for intervals where speed has changed. An average still isn't perfect
+//     because acceleration probably isn't constant, probably the best general
+//     approach would weight lower velocities more heavily since for a speed/power
+//     curve the acceleration is greater at higher velocities.
+//
+// - Determine change in power due to change of device flywheel inertia.
+//     Inertial energy is what goes into spinning the trainer's flywheel (and rear
+//     wheel for wheel-on trainer). The InertialMomentKGM2 value is the 'I' of the
+//     bicycle and trainer. The inertial adjustment computes energy that has entered
+//     or left the trainer system in the form of rotational inertia, as must occur
+//     when speed changes.
+double RealtimeController::estimatePowerFromSpeed(double v, double wheelRpm, const std::chrono::high_resolution_clock::time_point & wheelRpmSampleTime) {
+
+    // Early Out: Simply compute power with raw fit function.
+    if (!fAdvancedSpeedPowerMapping) {
+        return polyFit->Fit(v);
+    }
+
+    // milliseconds since previous device rpm data
+    double ms = std::chrono::duration_cast<std::chrono::milliseconds>(wheelRpmSampleTime - prevTime).count();
+
+    // If sample data time has not changed then skip calculation and use old value.
+    if (ms <= 0.) {
+        return prevWatts;
+    }
+
+    // If speed has not changed significantly then skip calculation and use old value.
+    // Compute previous velocity using difference between old and new wheel rpm.    
+
+    double previousV = wheelRpm ? (prevRpm * (v / wheelRpm)) : 0.;
+    double deltaV = v - previousV;
+
+    static const double s_KphEpsilon = 0.01;
+    if (fabs(deltaV) < s_KphEpsilon) {
+        return prevWatts;
+    }
+
+    // Otherwise compute power from speed, previous speed and time delta.
+    double watts = 0;
+
+    // -------------------------------------------------------------------------------------
+    // Average Power Since Previous Data
+
+    // Average speed is area under power curve in speed range, divided by change
+    // in speed. Integrate across velocity interval then divide by delta v.
+    //
+    // Note that this will still overweight higher velocity since gradient is
+    // steeper at higher velocities.
+    watts = polyFit->Integrate(previousV, v) / deltaV;
+
+    // -------------------------------------------------------------------------------------
+    // Watt adjustment due to inertia change.
+    double dInertialWatts = 0.;
+
+    // If trainer's inertialMoment is defined
+    if (inertialMomentKGM2) {
+        // If time is less than 2 seconds then compute power interaction with trainer's moment of inertia
+        // Time greater than 2 seconds... something is wrong with sample rate, skip the
+        // adjustment to avoid power spikes.
+        static const double s_OutOfRangeTimeSampleMS = 2000;
+        if (ms <= s_OutOfRangeTimeSampleMS) {
+            // Compute Deltas
+            double dRadiansPS = (2 * M_PI * 60.) * (wheelRpm - prevRpm);          // rotations/minute to radians/second
+            double dRadiansPSSquared = dRadiansPS * fabs(dRadiansPS);             // sign preserving ^2
+            double dInertialJoules = inertialMomentKGM2 * dRadiansPSSquared / 2.; // K = m I w^2 / 2
+            dInertialWatts = dInertialJoules / (ms * 1000.);                      // watts = K / s
+        }
+    }
+
+    // Debug Summary
+    static const bool fPrintDebugSummary = false;
+    if (fPrintDebugSummary) {
+        double wattFit = polyFit->Fit(v);
+        qDebug() << "v: " << v << " Watts:" << (watts + dInertialWatts) << " accelAdjustment:" << (watts - wattFit) 
+            << " inertialAdjustment: " << dInertialWatts << " totalAdjust:" << ((watts+dInertialWatts) - wattFit);
+    }
+
+    // Keep Power Non-Negative
+    //
+    // Note: Negative watts while coasting indicates an error in the device inertia, or in the device
+    // speed to power fit function, but could also occur if rider uses their brakes.
+    watts = std::max(0., watts + dInertialWatts);
+
+    // Store watts, rpm and sample time for use as tehe next 'previous sample.'
+    prevWatts = watts;
+    prevRpm = wheelRpm;
+    prevTime = wheelRpmSampleTime;
+
+    return watts;
+}
+
+void RealtimeController::processRealtimeData(RealtimeData &rtData)
 {
-    if (!dc) return; // no config
-
-    // setup the algorithm or lookup tables
-    // for the device postprocessing type
-    switch(dc->postProcess) {
-    case 0 : // nothing!
-        break;
-    case 1 : // Kurt Kinetic - Cyclone
-        {
-        double mph = rtData.getSpeed() * MILES_PER_KM;
-        // using the algorithm from http://www.kurtkinetic.com/powercurve.php
-        rtData.setWatts((6.481090) * mph + (0.020106) * (mph*mph*mph));
-        }
-        break;
-    case 2 : // Kurt Kinetic - Road Machine
-        {
-        double mph = rtData.getSpeed() * MILES_PER_KM;
-        // using the algorithm from http://www.kurtkinetic.com/powercurve.php
-        rtData.setWatts((5.244820) * mph + (0.019168) * (mph*mph*mph));
-        }
-        break;
-    case 3 : // Cyclops Fluid 2
-        {
-        double mph = rtData.getSpeed() * MILES_PER_KM;
-        // using the algorithm from:
-        // http://thebikegeek.blogspot.com/2009/12/while-we-wait-for-better-and-better.html
-        rtData.setWatts((0.0115*(mph*mph*mph)) - ((0.0137)*(mph*mph)) + ((8.9788)*(mph)));
-        }
-        break;
-    case 4 : // BT-ATS - BT Advanced Training System
-        {
-        //        v is expressed in revs/second
-        double v = rtData.getWheelRpm()/60.0;
-        // using the algorithm from Steven Sansonetti of BT:
-        //  This is a 3rd order polynomial, where P = av3 + bv2 + cv + d
-        //  where:
-                double a =       2.90390167E-01; // ( 0.290390167)
-                double b =     - 4.61311774E-02; // ( -0.0461311774)
-                double c =       5.92125507E-01; // (0.592125507)
-                double d =       0.0;
-        rtData.setWatts(a*v*v*v + b*v*v +c*v + d);
-        }
-        break;
-
-    case 5 : // Lemond Revolution
-        {
-        double V = rtData.getSpeed() * 0.277777778;
-        // Tom Anhalt spent a lot of time working this all out
-        // for the data / analysis see: http://wattagetraining.com/forum/viewtopic.php?f=2&t=335
-        rtData.setWatts((0.21*pow(V,3))+(4.25*V));
-        }
-        break;
-
-    case 6 : // 1UP USA
-        {
-        double V = rtData.getSpeed() * MILES_PER_KM;
-        // Power curve provided by extraction from SportsTracks plugin
-        rtData.setWatts(25.00 + (2.65f*V) - (0.42f*pow(V,2)) + (0.058f*pow(V,3)));
-        }
-        break;
-
-    // MINOURA - Has many gears
-    case 7 : //MINOURA V100 on H
-        {
-        double V = rtData.getSpeed();
-        // 7 = V100 on H: y = -0.0036x^3 + 0.2815x^2 + 3.4978x - 9.7857 
-        rtData.setWatts(-0.0036*pow(V, 3) + 0.2815*pow(V,2) + (3.4978*V) - 9.7857);
-        }
-        break;
-
-    case 8 : //MINOURA V100 on 5
-        {
-        double V = rtData.getSpeed();
-        // 8 = V100 on 5: y = -0.0023x^3 + 0.2067x^2 + 3.8906x - 11.214 
-        rtData.setWatts(-0.0023*pow(V, 3) + 0.2067*pow(V,2) + (3.8906*V) - 11.214);
-        }
-        break;
-
-    case 9 : //MINOURA V100 on 4
-        {
-        double V = rtData.getSpeed();
-        // 9 = V100 on 4: y = -0.00173x^3 + 0.1825x^2 + 3.4036x - 10 
-        rtData.setWatts(-0.00173*pow(V, 3) + 0.1825*pow(V,2) + (3.4036*V) - 10.00);
-        }
-        break;
-
-    case 10 : //MINOURA V100 on 3
-        {
-        double V = rtData.getSpeed();
-        // 10 = V100 on 3: y = -0.0011x^3 + 0.1433x^2 + 2.8808x - 8.1429 
-        rtData.setWatts(-0.0011*pow(V, 3) + 0.1433*pow(V,2) + (2.8808*V) - 8.1429);
-        }
-        break;
-
-    case 11 : //MINOURA V100 on 2
-        {
-        double V = rtData.getSpeed();
-        // 11 = V100 on 2: y = -0.0007x^3 + 0.1348x^2 + 1.581x - 3.3571 
-        rtData.setWatts(-0.0007*pow(V, 3) + 0.1348*pow(V,2) + (1.581*V) - 3.3571);
-        }
-        break;
-
-    case 12 : //MINOURA V100 on 1
-        {
-        double V = rtData.getSpeed();
-        // 12 = V100 on 1: y = 0.0004x^3 + 0.057x^2 + 1.7797x - 5.0714 
-        rtData.setWatts(0.0004*pow(V, 3) + 0.057*pow(V,2) + (1.7797*V) - 5.0714);
-        }
-        break;
-
-    case 13 : //MINOURA V100 on L
-        {
-        double V = rtData.getSpeed();
-        // 13 = V100 on L: y = 0.0557x^2 + 1.231x - 3.7143 
-        rtData.setWatts(0.0557*pow(V, 2) + (1.231*V) - 3.7143);
-        }
-        break;
-
-    case 14 : //MINOURA V270/v130 on H
-        {
-        double V = rtData.getSpeed();
-        rtData.setWatts(-1.84615384615e-06*pow(V, 5) + 0.000338955162485*pow(V, 4) + -0.0237725215961*pow(V, 3) + 0.782320032908*pow(V, 2) + 0.538329905388*V + -0.628959276017);
-        }
-        break;
-
-    case 15 : //MINOURA V270/v130 on 5
-        {
-        double V = rtData.getSpeed();
-        rtData.setWatts(-9.35143288085e-07*pow(V, 5) + 0.000193281228575*pow(V, 4) + -0.0153105032223*pow(V, 3) + 0.587825311943*pow(V, 2) + 1.16395173454*V + -0.472850678733);
-        }
-        break;
-
-    case 16 : //MINOURA V270/v130 on 4
-        {
-        double V = rtData.getSpeed();
-        rtData.setWatts(-3.34841628959e-07*pow(V, 5) + 0.000114219114219*pow(V, 4) + -0.0117029686*pow(V, 3) + 0.52033045386*pow(V, 2) + 1.10649184149*V + -0.364253393665);
-        }
-        break;
-
-    case 17 : //MINOURA V270/v130 on 3
-        {
-        double V = rtData.getSpeed();
-        rtData.setWatts(2.32277526395e-07*pow(V, 5) + 3.96681749623e-05*pow(V, 4) + -0.00805837789661*pow(V, 3) + 0.439146098999*pow(V, 2) + 1.00085150144*V + -0.386877828054);
-        }
-        break;
-
-    case 18 : //MINOURA V270/v130 on 2
-        {
-        double V = rtData.getSpeed();
-        rtData.setWatts(-5.58069381599e-07*pow(V, 5) + 0.000123625394214*pow(V, 4) + -0.0103757370081*pow(V, 3) + 0.434414507062*pow(V, 2) + 0.278777594954*V + -0.00678733031682);
-        }
-        break;
-
-    case 19 : //MINOURA V270/v130 on 1
-        {
-        double V = rtData.getSpeed();
-        rtData.setWatts(3.74057315234e-07*pow(V, 5) + -1.7235705471e-05*pow(V, 4) + -0.00251391745509*pow(V, 3) + 0.237884615385*pow(V, 2) + 0.704304812834*V + -0.056561085973);
-        }
-        break;
-
-    case 20 : //MINOURA V270/v130 on L
-        {
-        double V = rtData.getSpeed();
-        rtData.setWatts(3.46907993967e-07*pow(V, 5) + -3.38406691348e-05*pow(V, 4) + -6.92787604552e-05*pow(V, 3) + 0.122555189908*pow(V, 2) + 0.642516796929*V + -0.0859728506788);
-        }
-        break;
-
-    case 21 : //SARIS POWERBEAM PRO
-        {
-        double V = rtData.getSpeed();
-        // 21 = 0.0008x^3 + 0.145x^2 + 2.5299x + 14.641 where x = speed in kph
-        rtData.setWatts(0.0008*pow(V, 3) + 0.145*pow(V, 2) + (2.5299*V) + 14.641);
-        }
-        break;
-
-    case 22 : //  TACX SATORI SETTING 2
-        {
-        double V = rtData.getSpeed();
-        double slope = 3.9;
-        double intercept = -19.5;
-        rtData.setWatts((slope * V) + intercept);
-        }
-        break;
-
-    case 23 : //  TACX SATORI SETTING 4
-        {
-        double V = rtData.getSpeed();
-        double slope = 6.66;
-        double intercept = -52.3;
-        rtData.setWatts((slope * V) + intercept);
-        }
-        break;
-
-    case 24 : //  TACX SATORI SETTING 6
-        {
-        double V = rtData.getSpeed();
-        double slope = 9.43;
-        double intercept = -43.65;
-        rtData.setWatts((slope * V) + intercept);
-        }
-        break;
-
-    case 25 : //  TACX SATORI SETTING 8
-        {
-        double V = rtData.getSpeed();
-        double slope = 13.73;
-        double intercept = -51.15;
-        rtData.setWatts((slope * V) + intercept);
-        }
-        break;
-
-    case 26 : //  TACX SATORI SETTING 10
-        {
-        double V = rtData.getSpeed();
-        double slope = 17.7;
-        double intercept = -76.0;
-        rtData.setWatts((slope * V) + intercept);
-        }
-        break;
-
-    case 27 : //  TACX FLOW SETTING 0
-        {
-        double V = rtData.getSpeed();
-        double slope = 7.75;
-        double intercept = -47.27;
-        rtData.setWatts((slope * V) + intercept);
-        }
-        break;
-
-    case 28 : //  TACX FLOW SETTING 2
-        {
-        double V = rtData.getSpeed();
-        double slope = 9.51;
-        double intercept = -66.69;
-        rtData.setWatts((slope * V) + intercept);
-        }
-        break;
-
-    case 29 : //  TACX FLOW SETTING 4
-        {
-        double V = rtData.getSpeed();
-        double slope = 11.03;
-        double intercept = -71.59;
-        rtData.setWatts((slope * V) + intercept);
-        }
-        break;
-
-    case 30 : //  TACX FLOW SETTING 6
-        {
-        double V = rtData.getSpeed();
-        double slope = 12.81;
-        double intercept = -95.05;
-        rtData.setWatts((slope * V) + intercept);
-        }
-        break;
-
-    case 31 : //  TACX FLOW SETTING 8
-        {
-        double V = rtData.getSpeed();
-        double slope = 14.37;
-        double intercept = -102.43;
-        rtData.setWatts((slope * V) + intercept);
-        }
-        break;
-        
-    case 32 : //  TACX BLUE TWIST SETTING 1
-        {
-        double V = rtData.getSpeed();
-        double slope = 3.2;
-        double intercept = -24.0;
-        rtData.setWatts((slope * V) + intercept);
-        }
-        break;
-
-    case 33 : //  TACX BLUE TWIST SETTING 3
-        {
-        double V = rtData.getSpeed();
-        double slope = 6.525;
-        double intercept = -46.5;
-        rtData.setWatts((slope * V) + intercept);
-        }
-        break;
-
-    case 34 : //  TACX BLUE TWIST SETTING 5
-        {
-        double V = rtData.getSpeed();
-        double slope = 9.775;
-        double intercept = -66.5;
-        rtData.setWatts((slope * V) + intercept);
-        }
-        break;
-
-    case 35 : //  TACX BLUE TWIST SETTING 7
-        {
-        double V = rtData.getSpeed();
-        double slope = 13.075;
-        double intercept = -89.5;
-        rtData.setWatts((slope * V) + intercept);
-        }
-        break;
-        
-    case 36 : //  TACX BLUE MOTION SETTING 2
-        {
-        double V = rtData.getSpeed();
-        double slope = 5.225;
-        double intercept = -36.5;
-        rtData.setWatts((slope * V) + intercept);
-        }
-        break;
-    
-    case 37 : //  TACX BLUE MOTION SETTING 4
-        {
-        double V = rtData.getSpeed();
-        double slope = 8.25;
-        double intercept = -53.0;
-        rtData.setWatts((slope * V) + intercept);
-        }
-        break;
-
-    case 38 : //  TACX BLUE MOTION SETTING 6
-        {
-        double V = rtData.getSpeed();
-        double slope = 11.45;
-        double intercept = -74.0;
-        rtData.setWatts((slope * V) + intercept);
-        }
-        break;
-
-    case 39 : //  TACX BLUE MOTION SETTING 8
-        {
-        double V = rtData.getSpeed();
-        double slope = 14.45;
-        double intercept = -89.0;
-        rtData.setWatts((slope * V) + intercept);
-        }
-        break;
-
-    case 40 : //  TACX BLUE MOTION SETTING 10
-        {
-        double V = rtData.getSpeed();
-        double slope = 17.575;
-        double intercept = -110.5;
-        rtData.setWatts((slope * V) + intercept);
-        }
-        break;
-
-    case 41 : // ELITE SUPERCRONO POWER MAG LEVEL 1
-        {
-        double V = rtData.getSpeed() * MILES_PER_KM;
-        // Power curve provided by extraction from SportsTracks plugin
-        rtData.setWatts(-0.000803192769148186*pow(V, 3) + 0.17689196198325*pow(V,2) + (3.62446277061515*V) - 1.16783216783223);
-        }
-        break;
-
-    case 42 : // ELITE SUPERCRONO POWER MAG LEVEL 2
-        {
-        double V = rtData.getSpeed() * MILES_PER_KM;
-        // Power curve provided by extraction from SportsTracks plugin
-        rtData.setWatts(-0.00590735326986424*pow(V, 3) + 0.442531768374482*pow(V,2) + (3.54843470904764*V) - 0.363636363636395);
-        }
-        break;
-
-    case 43 : // ELITE SUPERCRONO POWER MAG LEVEL 3
-        {
-        double V = rtData.getSpeed() * MILES_PER_KM;
-        // Power curve provided by extraction from SportsTracks plugin
-        rtData.setWatts(-0.00917194323478923*pow(V, 3) + 0.614352424962992*pow(V,2) + (5.08762781732785*V) - 1.48951048951047);
-        }
-        break;
-
-    case 44 : // ELITE SUPERCRONO POWER MAG LEVEL 4
-        {
-        double V = rtData.getSpeed() * MILES_PER_KM;
-        // Power curve provided by extraction from SportsTracks plugin
-        rtData.setWatts(-0.0150015681721553*pow(V, 3) + 0.880112976720764*pow(V,2) + (5.16903286351279*V) - 1.7342657342657);
-        }
-        break;
-
-    case 45 : // ELITE SUPERCRONO POWER MAG LEVEL 5
-        {
-        double V = rtData.getSpeed() * MILES_PER_KM;
-        // Power curve provided by extraction from SportsTracks plugin
-        rtData.setWatts(-0.0172621671756449*pow(V, 3) + 1.0207209560583*pow(V,2) + (6.23730215622854*V) - 3.18881118881126);
-        }
-        break;
-
-    case 46 : // ELITE SUPERCRONO POWER MAG LEVEL 6
-        {
-        double V = rtData.getSpeed() * MILES_PER_KM;
-        // Power curve provided by extraction from SportsTracks plugin
-        rtData.setWatts(-0.0195227661791347*pow(V, 3) + 1.15505017633569*pow(V,2) + (7.47138264900755*V) - 4.18881118881114);
-        }
-        break;
-
-    case 47 : // ELITE SUPERCRONO POWER MAG LEVEL 7
-        {
-        double V = rtData.getSpeed() * MILES_PER_KM;
-        // Power curve provided by extraction from SportsTracks plugin
-        rtData.setWatts(-0.0222497351776137*pow(V, 3) + 1.2917943039439*pow(V,2) + (8.74972948026508*V) - 5.11888111888112);
-        }
-        break;
-
-    case 48 : // ELITE SUPERCRONO POWER MAG LEVEL 8
-        {
-        double V = rtData.getSpeed() * MILES_PER_KM;
-        // Power curve provided by extraction from SportsTracks plugin
-        rtData.setWatts(-0.0255078477814972*pow(V, 3) + 1.42902141301828*pow(V,2) + (10.2050166192824*V) - 6.48951048951042);
-        }
-        break;
-
-    case 49: //ELITE TURBO MUIN 2013
-        {
-        double V = rtData.getSpeed();
-        // Power curve fit from data collected by Ray Maker at dcrainmaker.com
-        rtData.setWatts(2.30615942 * V -0.28395558 * pow(V,2) + 0.02099661 * pow(V,3));
-        }
-        break;
-    case 50: // ELITE QUBO POWER FLUID
-        {
-        double V = rtData.getSpeed();
-        // Power curve fit from powercurvesensor
-        //     f(x) = 4.31746 * x -2.59259e-002 * x^2 +  9.41799e-003 * x^3
-        rtData.setWatts(4.31746 * V - 2.59259e-002 * pow(V, 2) + 9.41799e-003 * pow(V, 3));
-        }
-        break;
-    case 51: // CYCLOPS MAGNETO PRO (ROAD)
-        {
-        double V = rtData.getSpeed();
-        //     Watts = 6.0f + (-0.93 * speed) + (0.275 * speed^2) + (-0.00175 * speed^3)
-        rtData.setWatts(6.0f + (-0.93f * V) + (0.275f * pow(V, 2)) + (-0.00175f * pow(V, 3)));
-        }
-        break;
-
-    case 52: // ELITE ARION MAG LEVEL 0
-        {
-        double v = rtData.getSpeed();
-        rtData.setWatts(pow(v, 1.217110021) * 3.335794377);
-        }
-        break;
-
-    case 53: // ELITE ARION MAG LEVEL 1
-        {
-        double v = rtData.getSpeed();
-        rtData.setWatts(pow(v, 1.206592577) * 4.362485081);
-        }
-        break;
-
-    case 54: // ELITE ARION MAG LEVEL 2
-        {
-        double v = rtData.getSpeed();
-        rtData.setWatts(pow(v, 1.206984321) * 6.374459698);
-        }
-        break;
-
-    case 55: // Blackburn Tech Fluid
-        {
-        double v = rtData.getSpeed();
-        rtData.setWatts(6.758241758241894 - 1.9995004995004955 * v + 0.24165834165834146 * pow(v, 2));
-        }
-        break;
-
-    case 56: // TACX SIRIUS LEVEL 1
-        {
-        double v = rtData.getSpeed();
-        rtData.setWatts(3.23874687 * v - 20.64808196);
-        }
-        break;
-
-    case 57: // TACX SIRIUS LEVEL 2
-        {
-        double v = rtData.getSpeed();
-        rtData.setWatts(4.30606133 * v - 27.25589246);
-        }
-        break;
-
-    case 58: // TACX SIRIUS LEVEL 3
-        {
-        double v = rtData.getSpeed();
-        rtData.setWatts(5.44879778 * v - 36.57159131);
-        }
-        break;
-
-    case 59: // TACX SIRIUS LEVEL 4
-        {
-        double v = rtData.getSpeed();
-        rtData.setWatts(6.48525956 * v - 40.48616615);
-        }
-        break;
-
-    case 60: // TACX SIRIUS LEVEL 5
-        {
-        double v = rtData.getSpeed();
-        rtData.setWatts(7.60643338 * v - 48.35481582);
-        }
-        break;
-
-    case 61: // TACX SIRIUS LEVEL 6
-        {
-        double v = rtData.getSpeed();
-        rtData.setWatts(8.73140257 * v - 58.57819586);
-        }
-        break;
-
-    case 62: // TACX SIRIUS LEVEL 7
-        {
-        double v = rtData.getSpeed();
-        rtData.setWatts(9.73079724 * v - 59.61416463);
-        }
-        break;
-
-    case 63: // TACX SIRIUS LEVEL 8
-        {
-        double v = rtData.getSpeed();
-        rtData.setWatts(10.94228338 * v - 73.08258491);
-        }
-        break;
-
-    case 64: // TACX SIRIUS LEVEL 9
-        {
-        double v = rtData.getSpeed();
-        rtData.setWatts(11.99373782 * v - 77.88781457);
-        }
-        break;
-
-    case 65: // TACX SIRIUS LEVEL 10
-        {
-        double v = rtData.getSpeed();
-        rtData.setWatts(13.09580164 * v - 85.38477516);
-        }
-        break;
-
-    case 66: // ELITE CRONO FLUID ELASTOGEL
-        {
-        double v = rtData.getSpeed();
-        rtData.setWatts(2.4508084253648112 * v - 0.0005622440886940634 * pow(v, 2) + 0.0031006831781331848 * pow(v, 3));
-        }
-        break;
-
-    case 67: // ELITE TURBO MUIN 2015
-        {
-        double V = rtData.getSpeed();
-        rtData.setWatts(3.01523235942763813175 * V - 0.12045521113635432750 * pow(V,2) + 0.01739165560254292102 * pow(V,3));
-        }
-        break;
-
-    case 68: // CycleOps JetFluid Pro
-        {
-        double V = rtData.getSpeed();
-        rtData.setWatts(0.94874757375670469046 * V + 0.11615123681031937322 * pow(V,2) + 0.00400691905019748630 * pow(V,3));
-        }
-        break;
-
-    case 69: // Elite Crono Mag elastogel
-        {
-        double V = rtData.getSpeed();
-        rtData.setWatts(7.34759700400455518172 * V - 0.00278841177590215417 * pow(V,2) + 0.00052233430180969281 * pow(V,3));
-        }
-        break;
-
-    case 70: // Tacx Magnetic T1820 (4/7)
-        {
-        double V = rtData.getSpeed();
-        rtData.setWatts(6.77999074563685972005 * V - 0.00148787143661883094 * pow(V,2) + 0.00085058630585658189 * pow(V,3));
-        }
-        break;
-
-    case 71: // Tacx Magnetic T1820 (7/7)
-        {
-        double V = rtData.getSpeed();
-        rtData.setWatts(9.80556623734881995572 * V - 0.00668894865103764724 * pow(V,2) + 0.00125560535410925628 * pow(V,3));
-        }
-        break;
-
-    default : // unknown - do nothing
-        break;
+    // Compute speed from power if a post-process is defined. At this point the postprocess id
+    // has been instantiated into polyfit.
+    if (polyFit) {
+        double wheelRpm = rtData.getWheelRpm();
+        double v = (fUseWheelRpm) ? wheelRpm : rtData.getSpeed();
+        double watts = estimatePowerFromSpeed(v, wheelRpm, rtData.getWheelRpmSampleTime());
+
+        rtData.setWatts(watts);
     }
 }
 
-// for future devices, we may need to setup algorithmic tables etc
+// Wrap static array in function to ensure it is init on use, which is after PolyFitGenerator
+// who is static init at load time.
+const VirtualPowerTrainer * PredefinedVirtualPowerTrainerArray(size_t &size) {
+
+    static const VirtualPowerTrainer s_PredefinedVirtualPowerTrainerArray[] =
+    {
+        {
+            "None",
+            PolyFitGenerator::GetPolyFit({ 0, 0, 0, 0 }, MILES_PER_KM),
+            false
+        },
+        {
+            "Power - Kurt Kinetic - Cyclone",
+            // using the algorithm from http://www.kurtkinetic.com/powercurve.php
+            PolyFitGenerator::GetPolyFit({ 0, 6.481090, 0, 0.020106 }, MILES_PER_KM),
+            false
+        },
+        {
+            "Power - Kurt Kinetic - Road Machine",
+            // using the algorithm from http://www.kurtkinetic.com/powercurve.php
+            PolyFitGenerator::GetPolyFit({ 0, 5.244820, 0, 0.019168 }, MILES_PER_KM),
+            false,
+        },
+        {
+            "Power - Cyclops Fluid 2",
+            // using the algorithm from:
+            // http://thebikegeek.blogspot.com/2009/12/while-we-wait-for-better-and-better.html
+            PolyFitGenerator::GetPolyFit({ 0, 8.9788, 0.0137, 0.0115 }, MILES_PER_KM),
+            false,
+        },
+        {
+            "Power - BT-ATS - BT Advanced Training System",
+            // using the algorithm from Steven Sansonetti of BT:
+
+            //  This is a 3rd order polynomial, where P = av3 + bv2 + cv + d
+            //  where:
+            //        v is expressed in revs/second
+            PolyFitGenerator::GetPolyFit({ 0.0,5.92125507E-01,-4.61311774E-02,2.90390167E-01 }, 1. / 60.),
+            true // use wheel rpm
+        },
+        {
+            "Power - Lemond Revolution",
+            // Tom Anhalt spent a lot of time working this all out
+            // for the data / analysis see: http://wattagetraining.com/forum/viewtopic.php?f=2&t=335
+            PolyFitGenerator::GetPolyFit({ 0, 4.25, 0, 0.21 }, 15. / 18.),
+            false
+        },
+        {
+            "Power - 1UP USA",
+            // Power curve provided by extraction from SportsTracks plugin
+            PolyFitGenerator::GetPolyFit({ 25, 2.65, 0.42, 0.058 }, MILES_PER_KM),
+            false
+        },
+        // MINOURA - Has many gears
+        {
+            "Power - MINOURA V100 on H",
+            // 7 = V100 on H: y = -0.0036x^3 + 0.2815x^2 + 3.4978x - 9.7857 
+            PolyFitGenerator::GetPolyFit({ -9.7857, 3.4978, 0.2815, -0.0036 }),
+            false
+        },
+        {
+            "Power - MINOURA V100 on 5",
+            // 8 = V100 on 5: y = -0.0023x^3 + 0.2067x^2 + 3.8906x - 11.214
+            PolyFitGenerator::GetPolyFit({ -11.214, 3.8906, 0.2067, -0.0023 }),
+            false
+        },
+        {
+            "Power - MINOURA V100 on 4",
+            // 9 = V100 on 4: y = -0.00173x^3 + 0.1825x^2 + 3.4036x - 10 
+            PolyFitGenerator::GetPolyFit({ -10, 3.4036, 0.1824, -0.00173 }),
+            false
+        },
+        {
+            "Power - MINOURA V100 on 3",
+            // 10 = V100 on 3: y = -0.0011x^3 + 0.1433x^2 + 2.8808x - 8.1429 
+            PolyFitGenerator::GetPolyFit({ -8.1429, 2.8808, 0.1433, -0.0011 }),
+            false,
+        },
+        {
+            "Power - MINOURA V100 on 2",
+            // 11 = V100 on 2: y = -0.0007x^3 + 0.1348x^2 + 1.581x - 3.3571 
+            PolyFitGenerator::GetPolyFit({ -3.3571, 1.581, 0.1348, -0.0007 }),
+            false
+        },
+        {
+            "Power - MINOURA V100 on 1",
+            // 12 = V100 on 1: y = 0.0004x^3 + 0.057x^2 + 1.7797x - 5.0714 
+            PolyFitGenerator::GetPolyFit({ -5.0714, 1.7797, 0.057, 0.0004 }),
+            false
+        },
+        {
+            "Power - MINOURA V100 on L",
+            // 13 = V100 on L: y = 0.0557x^2 + 1.231x - 3.7143 
+            PolyFitGenerator::GetPolyFit({ -3.7143, 1.231, 0.557 }),
+            false
+        },
+        {
+            "Power - MINOURA V270/v130 on H",
+            PolyFitGenerator::GetPolyFit({ -0.628959276017,  0.538329905388 , 0.782320032908 ,-0.0237725215961 ,0.000338955162485 ,-1.84615384615e-06 }),
+            false
+        },
+        {
+            "Power - MINOURA V270/v130 on 5",
+            PolyFitGenerator::GetPolyFit({ -0.472850678733, 1.16395173454 , 0.587825311943 ,-0.0153105032223 ,0.000193281228575 ,-9.35143288085e-07 }),
+            false
+        },
+        {
+            "Power - MINOURA V270/v130 on 4",
+            PolyFitGenerator::GetPolyFit({ -0.364253393665, 1.10649184149, 0.52033045386 ,-0.0117029686, 0.000114219114219 , -3.34841628959e-07 }),
+            false
+        },
+        {
+            "Power - MINOURA V270/v130 on 3",
+            PolyFitGenerator::GetPolyFit({ -0.386877828054 ,1.00085150144 , 0.439146098999, -0.00805837789661 , 3.96681749623e-05, 2.32277526395e-07 }),
+            false
+        },
+        {
+            "Power - MINOURA V270/v130 on 2",
+            PolyFitGenerator::GetPolyFit({ -0.00678733031682, 0.278777594954, 0.434414507062 , -0.0103757370081, 0.000123625394214 , -5.58069381599e-07 }),
+            false
+        },
+        {
+            "Power - MINOURA V270/v130 on 1",
+            PolyFitGenerator::GetPolyFit({ -0.056561085973, 0.704304812834, 0.237884615385 , -0.00251391745509 , -1.7235705471e-05, 3.74057315234e-07 }),
+            false
+        },
+        {
+            "Power - MINOURA V270/v130 on L",
+            PolyFitGenerator::GetPolyFit({ -0.0859728506788, 0.642516796929, 0.122555189908 , -6.92787604552e-05, -3.38406691348e-05, 3.46907993967e-07 }),
+            false
+        },
+        {
+            "Power - SARIS POWERBEAM PRO",
+            // 21 = 0.0008x^3 + 0.145x^2 + 2.5299x + 14.641 where x = speed in kph
+            PolyFitGenerator::GetPolyFit({ 14.641, 2.5299, 0.145, 0.0008 }),
+            false
+        },
+        {
+            "Power - TACX SATORI SETTING 2",
+            PolyFitGenerator::GetPolyFit({ -19.5, 3.9 }),
+            false
+        },
+        {
+            "Power - TACX SATORI SETTING 4",
+            PolyFitGenerator::GetPolyFit({ -52.3, 6.66 }),
+            false,
+        },
+        {
+            "Power - TACX SATORI SETTING 6",
+            PolyFitGenerator::GetPolyFit({ -43.65, 9.43 }),
+            false
+        },
+        {   "Power - TACX SATORI SETTING 8",
+            PolyFitGenerator::GetPolyFit({ -51.15, 13.73 }),
+            false
+        },
+        {
+            "Power - TACX SATORI SETTING 10",
+            PolyFitGenerator::GetPolyFit({ -76.0, 17.7 }),
+            false
+        },
+        {
+            "Power - TACX FLOW SETTING 0",
+            PolyFitGenerator::GetPolyFit({ -47.27, 7.75 }),
+            false
+        },
+        {
+            "Power - TACX FLOW SETTING 2",
+            PolyFitGenerator::GetPolyFit({ -66.69, 9.51 }),
+            false
+        },
+        { "Power - TACX FLOW SETTING 4",
+            PolyFitGenerator::GetPolyFit({ -71.59, 11.03 }),
+            false
+        },
+        {
+            "Power - TACX FLOW SETTING 6",
+            PolyFitGenerator::GetPolyFit({ -95.05, 12.81 }),
+            false
+        },
+        {
+            "Power - TACX FLOW SETTING 8",
+            PolyFitGenerator::GetPolyFit({ -102.43, 14.37 }),
+            false
+        },
+        {
+            "Power - TACX BLUE TWIST SETTING 1",
+            PolyFitGenerator::GetPolyFit({ -24, 3.2 }),
+            false
+        },
+        {
+            "Power - TACX BLUE TWIST SETTING 3",
+            PolyFitGenerator::GetPolyFit({ -46.5, 6.525 }),
+            false
+        },
+        {
+            "Power - TACX BLUE TWIST SETTING 5",
+            PolyFitGenerator::GetPolyFit({ -66.5, 9.775 }),
+            false
+        },
+        {
+            "Power - TACX BLUE TWIST SETTING 7",
+            PolyFitGenerator::GetPolyFit({ -89.5, 13.075 }),
+            false
+        },
+        {
+            "Power - TACX BLUE MOTION SETTING 2",
+            PolyFitGenerator::GetPolyFit({ -36.5, 5.225 }),
+            false
+        },
+        {
+            "Power - TACX BLUE MOTION SETTING 4",
+            PolyFitGenerator::GetPolyFit({ -53.0, 8.25 }),
+            false
+        },
+        {
+            "Power - TACX BLUE MOTION SETTING 6",
+            PolyFitGenerator::GetPolyFit({ -74.0, 11.45 }),
+            false
+        },
+        {
+            "Power - TACX BLUE MOTION SETTING 8",
+            PolyFitGenerator::GetPolyFit({ -89, 14.45 }),
+            false
+        },
+        {
+            "Power - TACX BLUE MOTION SETTING 10",
+            PolyFitGenerator::GetPolyFit({ -110.5, 17.575 }),
+            false
+        },
+        {
+            "Power - ELITE SUPERCRONO POWER MAG LEVEL 1",
+            // Power curve provided by extraction from SportsTracks plugin
+            PolyFitGenerator::GetPolyFit({ -1.16783216783223, 3.62446277061515, 0.17689196198325 , -0.000803192769148186 }, MILES_PER_KM),
+            false
+        },
+        {
+            "Power - ELITE SUPERCRONO POWER MAG LEVEL 2",
+            // Power curve provided by extraction from SportsTracks plugin
+            PolyFitGenerator::GetPolyFit({ -0.363636363636395, 3.54843470904764, 0.442531768374482 ,-0.00590735326986424 }, MILES_PER_KM),
+            false
+        },
+        {
+            "Power - ELITE SUPERCRONO POWER MAG LEVEL 3",
+            // Power curve provided by extraction from SportsTracks plugin
+            PolyFitGenerator::GetPolyFit({ -1.48951048951047, 5.08762781732785, 0.614352424962992 , -0.00917194323478923 }, MILES_PER_KM),
+            false
+        },
+        {
+            "Power - ELITE SUPERCRONO POWER MAG LEVEL 4",
+            // Power curve provided by extraction from SportsTracks plugin
+            PolyFitGenerator::GetPolyFit({ -1.7342657342657, 5.16903286351279, 0.880112976720764 ,-0.0150015681721553 }, MILES_PER_KM),
+            false
+        },
+        {
+            "Power - ELITE SUPERCRONO POWER MAG LEVEL 5",
+            // Power curve provided by extraction from SportsTracks plugin
+            PolyFitGenerator::GetPolyFit({ -3.18881118881126,6.23730215622854,1.0207209560583 ,-0.0172621671756449 }, MILES_PER_KM),
+            false
+        },
+        {
+            "Power - ELITE SUPERCRONO POWER MAG LEVEL 6",
+            // Power curve provided by extraction from SportsTracks plugin
+            PolyFitGenerator::GetPolyFit({ -4.18881118881114, 7.47138264900755, 1.15505017633569, -0.0195227661791347 }, MILES_PER_KM),
+            false
+        },
+        {
+            "Power - ELITE SUPERCRONO POWER MAG LEVEL 7",
+            // Power curve provided by extraction from SportsTracks plugin
+            PolyFitGenerator::GetPolyFit({ -5.11888111888112, 8.74972948026508, 1.2917943039439 , -0.0222497351776137 }, MILES_PER_KM),
+            false
+        },
+        {
+            "Power - ELITE SUPERCRONO POWER MAG LEVEL 8",
+            // Power curve provided by extraction from SportsTracks plugin
+            PolyFitGenerator::GetPolyFit({ -6.48951048951042, 10.2050166192824, 1.42902141301828 ,-0.0255078477814972 }, MILES_PER_KM),
+            false
+        },
+        {
+            "Power - ELITE TURBO MUIN 2013",
+            // Power curve fit from data collected by Ray Maker at dcrainmaker.com
+            PolyFitGenerator::GetPolyFit({ 0, 2.30615942, -0.28395558, 0.02099661 }),
+            false
+        },
+        {
+            "Power - ELITE QUBO POWER FLUID",
+            // Power curve fit from powercurvesensor
+            //     f(x) = 4.31746 * x -2.59259e-002 * x^2 +  9.41799e-003 * x^3
+            PolyFitGenerator::GetPolyFit({ 0, 4.31746, -2.59259e-002 , 9.41799e-003 }),
+            false
+        },
+        {
+            "Power - CYCLOPS MAGNETO PRO (ROAD)",
+            //     Watts = 6.0f + (-0.93 * speed) + (0.275 * speed^2) + (-0.00175 * speed^3)
+            PolyFitGenerator::GetPolyFit({ 0, -0.93, 0.275, -0.00175 }),
+            false
+        },
+        {
+            "Power - ELITE ARION MAG LEVEL 0",
+            PolyFitGenerator::GetFractionalPolyFit({ 3.335794377, 1.217110021, 0. }),
+            false
+        },
+        {
+            "Power - ELITE ARION MAG LEVEL 1",
+            PolyFitGenerator::GetFractionalPolyFit({ 1.206592577, 4.362485081, 0. }),
+            false
+        },
+        {
+            "Power - ELITE ARION MAG LEVEL 2",
+            PolyFitGenerator::GetFractionalPolyFit({ 1.206984321, 6.374459698, 0. }),
+            false
+        },
+        {
+            "Power - Blackburn Tech Fluid",
+            PolyFitGenerator::GetPolyFit({ 6.758241758241894, -1.9995004995004955, 0.24165834165834146 }),
+            false
+        },
+        {
+            "Power - TACX SIRIUS LEVEL 1",
+            PolyFitGenerator::GetPolyFit({ -20.64808196, 3.23874687 }),
+            false
+        },
+        {
+            "Power - TACX SIRIUS LEVEL 2",
+            PolyFitGenerator::GetPolyFit({ -27.25589246, 4.30606133 }),
+            false
+        },
+        {
+            "Power - TACX SIRIUS LEVEL 3",
+            PolyFitGenerator::GetPolyFit({ -36.57159131, 5.44879778 }),
+            false
+        },
+        {
+            "Power - TACX SIRIUS LEVEL 4",
+            PolyFitGenerator::GetPolyFit({ -40.48616615, 6.48525956 }),
+            false
+        },
+        {
+            "Power - TACX SIRIUS LEVEL 5",
+            PolyFitGenerator::GetPolyFit({ -48.35481582, 7.60643338 }),
+            false
+        },
+        {
+            "Power - TACX SIRIUS LEVEL 6",
+            PolyFitGenerator::GetPolyFit({ -58.57819586, 8.73140257 }),
+            false
+        },
+        {
+            "Power - TACX SIRIUS LEVEL 7",
+            PolyFitGenerator::GetPolyFit({ -59.61416463, 9.73079724 }),
+            false
+        },
+        {
+            "Power - TACX SIRIUS LEVEL 8",
+            PolyFitGenerator::GetPolyFit({ -73.08258491, 10.94228338 }),
+            false
+        },
+        {
+            "Power - TACX SIRIUS LEVEL 9",
+            PolyFitGenerator::GetPolyFit({ -77.88781457, 11.99373782 }),
+            false
+        },
+        {
+            "Power - TACX SIRIUS LEVEL 10",
+            PolyFitGenerator::GetPolyFit({ -85.38477516, 13.09580164 }),
+            false
+        },
+        {
+            "Power - ELITE CRONO FLUID ELASTOGEL",
+            PolyFitGenerator::GetPolyFit({ 0, 2.4508084253648112, -0.0005622440886940634 ,0.0031006831781331848 }),
+            false
+        },
+        {
+            "Power - ELITE TURBO MUIN 2015",
+            PolyFitGenerator::GetPolyFit({ 0, 3.01523235942763813175,  -0.12045521113635432750 , 0.01739165560254292102 }),
+            false
+        },
+        {
+            "Power - CycleOps JetFluid Pro",
+            PolyFitGenerator::GetPolyFit({ 0, 0.94874757375670469046 , 0.11615123681031937322 , 0.00400691905019748630 }),
+            false
+        },
+        {
+            "Power - Elite Crono Mag elastogel",
+            PolyFitGenerator::GetPolyFit({ 0, 7.34759700400455518172, -0.00278841177590215417, 0.00052233430180969281 }),
+            false
+        },
+        {
+            "Power - Tacx Magnetic T1820 (4/7)",
+            PolyFitGenerator::GetPolyFit({ 0, 6.77999074563685972005, -0.00148787143661883094, 0.00085058630585658189 }),
+            false
+        },
+        {
+            "Power - Tacx Magnetic T1820 (7/7)",
+            PolyFitGenerator::GetPolyFit({ 0, 9.80556623734881995572, -0.00668894865103764724,  0.00125560535410925628 }),
+            false
+        }
+    };
+
+    size = (int)(sizeof(s_PredefinedVirtualPowerTrainerArray) / sizeof(s_PredefinedVirtualPowerTrainerArray[0]));
+
+    return s_PredefinedVirtualPowerTrainerArray;
+}
+
+// Virtual Power Trainer Manager
+
+int VirtualPowerTrainerManager::GetPredefinedVirtualPowerTrainerCount() const {
+    return RealtimeController::GetPredefinedVirtualPowerTrainerCount();
+}
+
+bool VirtualPowerTrainerManager::IsPredefinedVirtualPowerTrainerIndex(int idx) {
+    return idx < RealtimeController::GetPredefinedVirtualPowerTrainerCount();
+}
+
+int VirtualPowerTrainerManager::GetCustomVirtualPowerTrainerCount() const {
+    return (int)customVirtualPowerTrainers.size();
+}
+
+const VirtualPowerTrainer* VirtualPowerTrainerManager::GetCustomVirtualPowerTrainer(int id) const {
+    if (id < 0 || id > GetCustomVirtualPowerTrainerCount())
+        return NULL;
+
+    return customVirtualPowerTrainers[id];
+}
+
+int VirtualPowerTrainerManager::GetVirtualPowerTrainerCount() const {
+    return
+        GetPredefinedVirtualPowerTrainerCount() +
+        GetCustomVirtualPowerTrainerCount();
+}
+
+const VirtualPowerTrainer* VirtualPowerTrainerManager::GetVirtualPowerTrainer(int id) const {
+    if (id <= 0 || id > GetVirtualPowerTrainerCount())
+        return NULL;
+
+    int predefinedCount = (int)RealtimeController::GetPredefinedVirtualPowerTrainerCount();
+    if (id < predefinedCount)
+        return RealtimeController::GetPredefinedVirtualPowerTrainer(id);
+
+    return GetCustomVirtualPowerTrainer(id - predefinedCount);
+}
+
+int VirtualPowerTrainerManager::PushCustomVirtualPowerTrainer(const VirtualPowerTrainer* vpt) {
+    customVirtualPowerTrainers.push_back(vpt);
+    return (int)customVirtualPowerTrainers.size();
+}
+
+void VirtualPowerTrainerManager::GetVirtualPowerTrainerAsString(int idx, QString& s) {
+    s.clear();
+
+    const VirtualPowerTrainer* p = GetVirtualPowerTrainer(idx);
+    if (p) {
+        // Stringify virtual trainer and store...
+        std::string string;
+        p->to_string(string);
+        s = string.c_str();
+    } else {
+        s = "";
+    }
+}
+
+// Synthesize a new custom power curve from string description.
+// Returns index of new virtualpowertrainer
+int VirtualPowerTrainerManager::PushCustomVirtualPowerTrainer(const QString& string) {
+
+    // parse string back into virtualtrainer.
+    //
+    // type,coefcount,numeratorcount|coefs,...|scale|usewheelrpm|name
+    // DEF,COEFS,SCALE,RPM,NAME
+
+    // DEF:   tla,coefcount,numeratorcount
+    // COEFS:   |coefs,...
+    // SCALE:   |scale}
+    // RPM:     |wheelrpm
+    // NAME:    |name
+    // INERTIA: |rotationInertiaGrams
+
+    do {
+        QStringList pieces = string.split("|");
+
+        size_t pieceCount = pieces.size();
+        if (pieceCount != 5 && pieceCount != 6) break; // no inertia supported for back compat
+
+        // section 0 DEF
+        QStringList defPieces = pieces.at(0).split(QRegularExpression(QRegExp::escape(",")));
+        size_t defCount = defPieces.size();
+        if (defCount != 3) break; // bad prefix section count...
+
+        // 0,0 DEF:TLA
+        bool isFractional = false;
+        if (!defPieces.at(0).compare("FPR")) isFractional = true;
+        else if (!defPieces.at(0).compare("RPR")) isFractional = false;
+        else break; // bad tla...
+
+        // 0,1 DEF:COEFCOUNT
+        int coefCount = defPieces.at(1).toInt();
+        if (coefCount <= 0 || coefCount > 14) break; // bad coef count
+
+        // 0,2 DEF:NUMERATORCOUNT
+        int numeratorCount = defPieces.at(2).toInt();
+        if (numeratorCount <= 0 || numeratorCount > 14) break; // bad numerator coef count
+
+        // section 1 COEFS
+        QStringList coefs = pieces.at(1).split(QRegularExpression(QRegExp::escape(",")));
+        size_t coefPieceCount = coefs.size();
+        if (coefPieceCount != coefCount) break; // wrong number of coefs in string
+
+        // Distribute coefs to numerator and denominator coefficient arrays.
+        // Denominator always has an implict constant 1. If denominator array
+        // is empty then fit is simple polynomial, otherwise it is rational.
+        std::vector<double> num, den;
+
+        int i = 0;
+        for (; i < numeratorCount; i++) num.push_back(coefs.at(i).toDouble());
+        for (; i < coefCount; i++) den.push_back(coefs.at(i).toDouble());
+
+        // section 2 SCALE
+        double scale = pieces.at(2).toDouble();
+
+        // section 3 RPM
+        bool fUseWheelRpm = pieces.at(3).compare("0") != 0;
+
+        // section 4 Name
+        QString namePiece = pieces.at(4);
+
+        // section 5 OPTIONAL: Rotational Inertia (grams)
+        double inertialMomentKGM2 = 0;
+        if (pieceCount == 6)
+            inertialMomentKGM2 = pieces.at(5).toDouble();
+
+        // Finished with parse errors. All memory allocated is held by new
+        // VirtualPowerTrainer and freed by manager when manager is destroyed.
+
+        std::string name = namePiece.toStdString();
+        char* pNameCopy = new char[name.size() + 1];
+        strcpy(pNameCopy, name.c_str());
+
+        VirtualPowerTrainer* p = new VirtualPowerTrainer();
+
+        p->m_pName = pNameCopy;
+
+        if (isFractional) 
+            p->m_pf = PolyFitGenerator::GetFractionalPolyFit(num, scale);
+        else if (numeratorCount == coefCount)
+            p->m_pf = PolyFitGenerator::GetPolyFit(num, scale);
+        else
+            p->m_pf = PolyFitGenerator::GetRationalPolyFit(num, den, scale);
+
+        p->m_fUseWheelRpm = fUseWheelRpm;
+
+        p->m_inertialMomentKGM2 = inertialMomentKGM2;
+
+        PushCustomVirtualPowerTrainer(p);
+
+        return GetVirtualPowerTrainerCount() - 1;
+
+    } while (false);
+
+    return 0;
+}
+
+VirtualPowerTrainerManager::~VirtualPowerTrainerManager() {
+    for (auto& i : customVirtualPowerTrainers) {
+        delete i->m_pName; // custom trainer name string is allocated on create but owned and freed by manager.
+        delete i;
+    }
+    customVirtualPowerTrainers.clear();
+}
+
+int RealtimeController::GetPredefinedVirtualPowerTrainerCount() {
+    size_t size;
+    PredefinedVirtualPowerTrainerArray(size);
+    return (int)size;
+}
+
+const VirtualPowerTrainer* RealtimeController::GetPredefinedVirtualPowerTrainer(int id) {
+    size_t size;
+    const VirtualPowerTrainer * const p = PredefinedVirtualPowerTrainerArray(size);
+    if (id < 0 || id >= size)
+        return NULL;
+
+    return &(p[id]);
+}
+
 void
 RealtimeController::processSetup()
 {
     if (!dc) return; // no config
 
-    // setup the algorithm or lookup tables
-    // for the device postProcessing type
-    switch(dc->postProcess) {
-    case 0 : // nothing!
-        break;
-    case 1 : // TODO Kurt Kinetic - use an algorithm...
-    case 2 : // TODO Kurt Kinetic - use an algorithm...
-        break;
-    case 3 : // TODO Cyclops Fluid 2 - use an algorithm
-        break;
-    case 4 : // TODO BT-ATS - BT Advanced Training System - use an algorithm
-        break;
-    default : // unknown - do nothing
-        break;
+    // Custom postprocess are stored with postprocess 0 AND a definition string.
+    int postProcess = dc->postProcess;
+    if (!postProcess && dc->virtualPowerDefinitionString.size() > 1) {
+        // Instantiate custom postprocess from device configuration.
+        postProcess = virtualPowerTrainerManager.PushCustomVirtualPowerTrainer(dc->virtualPowerDefinitionString);
     }
+
+    // Setup polyfit and rpm settings from postprocess id.
+    const VirtualPowerTrainer* pTrainer = virtualPowerTrainerManager.GetVirtualPowerTrainer(postProcess);
+    if (pTrainer) {
+        polyFit = pTrainer->m_pf;
+        fUseWheelRpm = pTrainer->m_fUseWheelRpm;
+        inertialMomentKGM2 = pTrainer->m_inertialMomentKGM2;
+    } else {
+        polyFit = NULL;
+        fUseWheelRpm = false;
+        inertialMomentKGM2 = 0.;
+    }
+
+    prevWatts = 0;
+    prevRpm = 0;
+    prevTime = std::chrono::high_resolution_clock::time_point();
 }
 
 void

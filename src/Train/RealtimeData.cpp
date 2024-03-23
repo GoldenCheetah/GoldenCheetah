@@ -18,6 +18,7 @@
  */
 
 #include "RealtimeData.h"
+#include "RideFile.h"
 
 #include <QtDebug>
 
@@ -28,9 +29,11 @@ RealtimeData::RealtimeData()
     cadence = distance = altDistance = virtualSpeed = wbal = 0.0;
     lap = msecs = lapMsecs = lapMsecsRemaining = ergMsecsRemaining = 0;
     thb = smo2 = o2hb = hhb = 0.0;
-    lrbalance = rte = lte = lps = rps = 0.0;
+    lrbalance = RideFile::NA;
+    rte = lte = lps = rps = 0.0;
     latitude = longitude = altitude = 0.0;
     rf = rmv = vo2 = vco2 = tv = feo2 = 0.0;
+    routeDistance = distanceRemaining = 0.0;
     trainerStatusAvailable = false;
     trainerReady = true;
     trainerRunning = true;
@@ -77,9 +80,12 @@ void RealtimeData::setVirtualSpeed(double speed)
 {
     this->virtualSpeed = speed;
 }
-void RealtimeData::setWheelRpm(double wheelRpm)
+void RealtimeData::setWheelRpm(double wheelRpm, bool fMarkWheelRpmTime)
 {
     this->wheelRpm = wheelRpm;
+
+    if (fMarkWheelRpmTime)
+        this->wheelRpmSampleTime = std::chrono::high_resolution_clock::now();
 }
 void RealtimeData::setCadence(double aCadence)
 {
@@ -114,6 +120,16 @@ void RealtimeData::setErgMsecsRemaining(long x)
 void RealtimeData::setDistance(double x)
 {
     this->distance = x;
+}
+
+void RealtimeData::setRouteDistance(double x)
+{
+    this->routeDistance = x;
+}
+
+void RealtimeData::setDistanceRemaining(double x)
+{
+    this->distanceRemaining = x;
 }
 
 void RealtimeData::setLapDistance(double x)
@@ -190,6 +206,10 @@ double RealtimeData::getWheelRpm() const
 {
     return wheelRpm;
 }
+std::chrono::high_resolution_clock::time_point RealtimeData::getWheelRpmSampleTime() const
+{
+    return this->wheelRpmSampleTime;
+}
 double RealtimeData::getCadence() const
 {
     return cadence;
@@ -213,6 +233,14 @@ long RealtimeData::getLapMsecs() const
 double RealtimeData::getDistance() const
 {
     return distance;
+}
+double RealtimeData::getRouteDistance() const
+{
+    return routeDistance;
+}
+double RealtimeData::getDistanceRemaining() const
+{
+    return distanceRemaining;
 }
 double RealtimeData::getLapDistance() const
 {
@@ -327,6 +355,12 @@ double RealtimeData::value(DataSeries series) const
         break;
 
     case Distance: return distance;
+        break;
+
+    case RouteDistance: return routeDistance;
+        break;
+
+    case DistanceRemaining: return distanceRemaining;
         break;
 
     case LapDistance: return lapDistance;
@@ -486,6 +520,8 @@ const QList<RealtimeData::DataSeries> &RealtimeData::listDataSeries()
         seriesList << Latitude;
         seriesList << Longitude;
         seriesList << Altitude;
+        seriesList << RouteDistance;
+        seriesList << DistanceRemaining;
     }
     return seriesList;
 }
@@ -544,6 +580,12 @@ QString RealtimeData::seriesName(DataSeries series)
         break;
 
     case Distance: return tr("Distance");
+        break;
+
+    case RouteDistance: return tr("Route Distance");
+        break;
+
+    case DistanceRemaining: return tr("Distance Remaining");
         break;
 
     case AltWatts: return tr("Alternate Power");
@@ -639,7 +681,7 @@ QString RealtimeData::seriesName(DataSeries series)
     case Rf: return tr("Respiratory Frequency");
         break;
 
-    case RMV: return tr("Respiratory Minute Volume");
+    case RMV: return tr("Ventilation");
         break;
 
     case VO2: return tr("VO2");

@@ -34,6 +34,7 @@
 #include <QUrl>
 #include <QtCharts>
 #include <QGraphicsItem>
+#include <QSyntaxHighlighter>
 
 #include "GoldenCheetah.h"
 #include "Context.h"
@@ -101,10 +102,10 @@ class PythonChart : public GcChartWindow, public PythonHost {
 
     public:
         PythonChart(Context *context, bool ridesummary);
+        ~PythonChart();
 
-        // reveal
-        bool hasReveal() { return true; }
         QCheckBox *showCon, *web;
+        QLabel *noPython;
 
         // receives all the events
         QTextEdit *script;
@@ -136,9 +137,9 @@ class PythonChart : public GcChartWindow, public PythonHost {
     signals:
         void setUrl(QUrl);
         void emitChart(QString title, int type, bool animate, int legpos, bool stack, int orientation);
-        void emitCurve(QString name, QVector<double> xseries, QVector<double> yseries, QString xname, QString yname,
+        void emitCurve(QString name, QVector<double> xseries, QVector<double> yseries, QStringList fseries, QString xname, QString yname,
                       QStringList labels, QStringList colors,
-                      int line, int symbol, int size, QString color, int opacity, bool opengl, bool legend, bool datalabels);
+                      int line, int symbol, int size, QString color, int opacity, bool opengl, bool legend, bool datalabels, bool fill);
         void emitAxis(QString name, bool visible, int align, double min, double max,
                       int type, QString labelcolor, QString color, bool log, QStringList categories);
         void emitAnnotation(QString, QStringList);
@@ -162,6 +163,7 @@ class PythonChart : public GcChartWindow, public PythonHost {
         Context *context;
         QString text; // if Rtool not alive
         bool ridesummary;
+        QSyntaxHighlighter *syntax;
 };
 
 

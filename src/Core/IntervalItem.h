@@ -21,7 +21,6 @@
 #include "GoldenCheetah.h"
 
 #include "RideItem.h"
-#include "RideItem.h"
 #include <QtGui>
 #include <QDialog>
 #include <QLabel>
@@ -88,9 +87,9 @@ class IntervalItem
         // extracted sample data
         RideFileInterval *rideInterval;
 
-        // used by qSort()
-        bool operator< (IntervalItem right) const {
-            return (start < right.start);
+        // used by std::sort
+        bool operator< (const IntervalItem& right) const {
+            return std::tie(start, stop) < std::tie(right.start, right.stop);
         }
 };
 

@@ -53,6 +53,8 @@ public:
     uint8_t  getCalibrationType() { return CALIBRATION_TYPE_COMPUTRAINER; }
 
 private:
+    bool f1Depressed;
+    bool f2Depressed;
     bool f3Depressed;
 };
 

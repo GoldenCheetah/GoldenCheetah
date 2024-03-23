@@ -84,10 +84,10 @@ bool SeasonParser::endElement( const QString&, const QString&, const QString &qN
         if (season.getStart().isValid() && season.getEnd().isValid()) {
 
             // just check the dates are the right way around
-            if (season.start > season.end) {
-                QDate temp = season.start;
-                season.start = season.end;
-                season.end = temp;
+            if (season.getStart() > season.getEnd()) {
+                QDate temp = season.getStart();
+                season.setStart(season.getEnd());
+                season.setEnd(temp);
             }
 
             seasons.append(season);
@@ -182,7 +182,9 @@ SeasonParser::serialize(QString filename, QList<Season>Seasons)
     };
     file.resize(0);
     QTextStream out(&file);
+#if QT_VERSION < 0x060000
     out.setCodec("UTF-8");
+#endif
 
     // begin document
     out << "<seasons>\n";

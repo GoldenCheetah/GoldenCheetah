@@ -29,7 +29,6 @@
 
 #include "qwt_plot.h"
 #include "qwt_plot_curve.h"
-#include "qwt_compat.h"
 #include <limits>
 
 
@@ -54,11 +53,11 @@ public:
     }
     void setYAxisTitle(QString title)
     {
-        setAxisTitle(QwtPlot::yLeft, title);
+        setAxisTitle(QwtAxis::YLeft, title);
     }
     void setXAxisTitle(QString title)
     {
-        setAxisTitle(QwtPlot::xBottom,title);
+        setAxisTitle(QwtAxis::XBottom,title);
     }
     void setData(QVector<double> &xData, QVector<double> &yData)
     {
@@ -76,11 +75,7 @@ WorkoutEditorBase::WorkoutEditorBase(QStringList &colms, QWidget *parent) :QFram
 
     table->setColumnCount(colms.count());
     table->setHorizontalHeaderLabels(colms);
-#if QT_VERSION > 0x050000
     table->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
-#else
-    table->horizontalHeader()->setResizeMode(QHeaderView::ResizeToContents);
-#endif
     table->setShowGrid(true);
     table->setAlternatingRowColors(true);
     table->resizeColumnsToContents();
@@ -232,7 +227,7 @@ void WorkoutTypePage::initializePage()
     buttonGroupBox = new QButtonGroup(this);
     absWattageRadioButton = new QRadioButton(tr("Absolute Wattage"));
     absWattageRadioButton->click();
-    relWattageRadioButton = new QRadioButton(tr("% FTP Wattage"));
+    relWattageRadioButton = new QRadioButton(tr("Relative Wattage"));
     gradientRadioButton = new QRadioButton(tr("Gradient"));
 
     if (hackContext->rideItem()) {
@@ -290,8 +285,8 @@ void AbsWattagePage::initializePage()
     plot = new WorkoutPlot();
     plot->setYAxisTitle(tr("Wattage"));
     plot->setXAxisTitle(tr("Time (minutes)"));
-    plot->setAxisScale(QwtPlot::yLeft,0,500,0);
-    plot->setAxisScale(QwtPlot::xBottom,0,120,0);
+    plot->setAxisScale(QwtAxis::YLeft,0,500,0);
+    plot->setAxisScale(QwtAxis::XBottom,0,120,0);
     summaryLayout->addWidget(plot);
     summaryLayout->addStretch(1);
     layout->addLayout(summaryLayout);
@@ -303,8 +298,8 @@ void AbsWattagePage::initializePage()
 void AbsWattagePage::updateMetrics()
 {
     QVector<QPair<QString,QString> > data;
-    QwtArray<double> x;
-    QwtArray<double> y;
+    QVector<double> x;
+    QVector<double> y;
 
     we->rawData(data);
 
@@ -339,8 +334,8 @@ void AbsWattagePage::updateMetrics()
 
     }
     // replot workoutplot
-    plot->setAxisAutoScale(QwtPlot::yLeft);
-    plot->setAxisAutoScale(QwtPlot::xBottom);
+    plot->setAxisAutoScale(QwtAxis::YLeft);
+    plot->setAxisAutoScale(QwtAxis::XBottom);
     plot->setData(x,y);
     plot->replot();
 
@@ -355,7 +350,7 @@ void AbsWattagePage::updateMetrics()
 #if 0 //XXX REFACTOR METRICS
     const RideMetricFactory &factory = RideMetricFactory::instance();
     const RideMetric *rm = factory.rideMetric("skiba_xpower");
-    QHash<QString,RideMetricPtr> results = rm->computeMetrics(NULL,&*workout,hackContext->athlete->zones(false),hackContext->athlete->hrZones(),metrics);
+    QHash<QString,RideMetricPtr> results = rm->computeMetrics(NULL,&*workout,hackContext->athlete->zones("Bike"),hackContext->athlete->hrZones(),metrics);
     metricsSummary->updateMetrics(metrics,results);
 #endif
 }
@@ -379,22 +374,22 @@ void AbsWattagePage::SaveWorkout()
     QVector<QPair<QString, QString> > rawData;
     we->rawData(rawData);
     double currentX = 0;
-    stream << "[COURSE DATA]" << endl;
+    stream << "[COURSE DATA]" << Qt::endl;
     QPair<QString, QString > p;
     foreach (p,rawData)
     {
         if(p.first == "LAP")
         {
-            stream << currentX << " LAP" << endl;
+            stream << currentX << " LAP" << Qt::endl;
         }
         else
         {
-            stream << currentX << " " << p.second << endl;
+            stream << currentX << " " << p.second << Qt::endl;
             currentX += p.first.toDouble();
-            stream << currentX << " " << p.second << endl;
+            stream << currentX << " " << p.second << Qt::endl;
         }
     }
-    stream << "[END COURSE DATA]" << endl;
+    stream << "[END COURSE DATA]" << Qt::endl;
     f.close();
 
     // import them via the workoutimporter
@@ -409,24 +404,28 @@ RelWattagePage::RelWattagePage(QWidget *parent) : WorkoutPage(parent) {}
 
 void RelWattagePage::initializePage()
 {
-    int zoneRange = hackContext->athlete->zones(false)->whichRange(QDate::currentDate());
-    ftp = hackContext->athlete->zones(false)->getCP(zoneRange);
+    if (hackContext->athlete->zones("Bike") && hackContext->athlete->zones("Bike")->whichRange(QDate::currentDate()) >= 0) {
+        int zoneRange = hackContext->athlete->zones("Bike")->whichRange(QDate::currentDate());
+        ftp = hackContext->athlete->zones("Bike")->getCP(zoneRange);
+    } else {
+        ftp = 100; // if zones are not available let's make absolute watts match percentajes
+    }
 
     setTitle(tr("Workout Wizard"));
-    QString subTitle = tr("Relative Wattage Workout Wizard, current CP60 = ") + QString::number(ftp);
+    QString subTitle = tr("Relative Wattage Workout Creator, current CP = ") + QString::number(ftp);
     setSubTitle(subTitle);
 
     plot = new WorkoutPlot();
-    plot->setYAxisTitle(tr("% of FTP"));
+    plot->setYAxisTitle(tr("%"));
     plot->setXAxisTitle(tr("Time (minutes)"));
-    plot->setAxisScale(QwtPlot::yLeft,0,200,0);
-    plot->setAxisScale(QwtPlot::xBottom,0,120,0);
+    plot->setAxisScale(QwtAxis::YLeft,0,200,0);
+    plot->setAxisScale(QwtAxis::XBottom,0,120,0);
 
     QHBoxLayout *layout = new QHBoxLayout();
     setLayout(layout);
     QStringList colms;
     colms.append(tr("Minutes"));
-    colms.append(tr("% of FTP"));
+    colms.append(tr("%"));
     colms.append(tr("Wattage"));
     we = new WorkoutEditorRel(colms,ftp);
     layout->addWidget(we);
@@ -443,8 +442,8 @@ void RelWattagePage::initializePage()
 void RelWattagePage::updateMetrics()
 {
     QVector<QPair<QString,QString> > data;
-    QwtArray<double> x;
-    QwtArray<double> y;
+    QVector<double> x;
+    QVector<double> y;
 
     we->rawData(data);
 
@@ -475,8 +474,8 @@ void RelWattagePage::updateMetrics()
     }
 
     // replot workoutplot
-    plot->setAxisAutoScale(QwtPlot::yLeft);
-    plot->setAxisAutoScale(QwtPlot::xBottom);
+    plot->setAxisAutoScale(QwtAxis::YLeft);
+    plot->setAxisAutoScale(QwtAxis::XBottom);
     plot->setData(x,y);;
     plot->replot();
 
@@ -490,7 +489,7 @@ void RelWattagePage::updateMetrics()
 #if 0 //XXX REFACTOR METRICS
     const RideMetricFactory &factory = RideMetricFactory::instance();
     const RideMetric *rm = factory.rideMetric("skiba_xpower");
-    QHash<QString,RideMetricPtr> results = rm->computeMetrics(NULL,&*workout,hackContext->athlete->zones(false),hackContext->athlete->hrZones(),metrics);
+    QHash<QString,RideMetricPtr> results = rm->computeMetrics(NULL,&*workout,hackContext->athlete->zones("Bike"),hackContext->athlete->hrZones(),metrics);
     metricsSummary->updateMetrics(metrics,results);
 #endif
 }
@@ -514,22 +513,22 @@ void RelWattagePage::SaveWorkout()
     QVector<QPair<QString, QString> > rawData;
     we->rawData(rawData);
     double currentX = 0;
-    stream << "[COURSE DATA]" << endl;
+    stream << "[COURSE DATA]" << Qt::endl;
     QPair<QString, QString > p;
     foreach (p,rawData)
     {
         if(p.first == "LAP")
         {
-            stream << currentX << " LAP" << endl;
+            stream << currentX << " LAP" << Qt::endl;
         }
         else
         {
-            stream << currentX << " " << p.second << endl;
+            stream << currentX << " " << p.second << Qt::endl;
             currentX += p.first.toDouble();
-            stream << currentX << " " << p.second << endl;
+            stream << currentX << " " << p.second << Qt::endl;
         }
     }
-    stream << "[END COURSE DATA]" << endl;
+    stream << "[END COURSE DATA]" << Qt::endl;
     f.close();
 
     // import them via the workoutimporter
@@ -543,9 +542,7 @@ GradientPage::GradientPage(QWidget *parent) : WorkoutPage(parent) {}
 
 void GradientPage::initializePage()
 {
-    int zoneRange = hackContext->athlete->zones(false)->whichRange(QDate::currentDate());
-    ftp = hackContext->athlete->zones(false)->getCP(zoneRange);
-    metricUnits = hackContext->athlete->useMetricUnits;
+    metricUnits = GlobalContext::context()->useMetricUnits;
     setTitle(tr("Workout Wizard"));
 
     setSubTitle(tr("Manually create a workout based on gradient (slope) and distance, maximum grade is +-40."));
@@ -615,15 +612,22 @@ void GradientPage::SaveWorkout()
     SaveWorkoutHeader(stream,f.fileName(),QString("golden cheetah"),QString("DISTANCE GRADE WIND"));
     QVector<QPair<QString, QString> > rawData;
     we->rawData(rawData);
-    stream << "[COURSE DATA]" << endl;
+    stream << "[COURSE DATA]" << Qt::endl;
     QPair<QString, QString > p;
     foreach (p,rawData)
     {
-        // header indicates metric units, so convert accordingly
-        double currentX = p.first.toDouble()*(metricUnits ? 1.0 : KM_PER_MILE);
-        stream << currentX << " " << p.second << " 0" << endl;
+        if(p.first == "LAP")
+        {
+            stream << "LAP" << Qt::endl;
+        }
+        else
+        {
+            // header indicates metric units, so convert accordingly
+            double currentX = p.first.toDouble()*(metricUnits ? 1.0 : KM_PER_MILE);
+            stream << currentX << " " << p.second << " 0" << Qt::endl;
+        }
     }
-    stream << "[END COURSE DATA]" << endl;
+    stream << "[END COURSE DATA]" << Qt::endl;
     f.close();
 
     // import them via the workoutimporter
@@ -646,7 +650,7 @@ void ImportPage::initializePage()
         setSubTitle(tr("Import current activity as a Gradient ride (slope based)"));
         setFinalPage(true);
         plot = new WorkoutPlot();
-        metricUnits = hackContext->athlete->useMetricUnits;
+        metricUnits = GlobalContext::context()->useMetricUnits;
         QString s = (metricUnits ? tr("KM") : tr("Miles"));
         QString distance = QString(tr("Distance (")) + s + QString(")");
         plot->setXAxisTitle(distance);
@@ -698,8 +702,8 @@ void ImportPage::initializePage()
 
 void ImportPage::updatePlot()
 {
-    QwtArray<double> x;
-    QwtArray<double> y;
+    QVector<double> x;
+    QVector<double> y;
     QPair<double,double> p;
 
     int segmentLength = segmentBox->value();
@@ -763,17 +767,17 @@ void ImportPage::SaveWorkout()
     QTextStream stream(&f);
     // create the header
     SaveWorkoutHeader(stream,f.fileName(),QString("golden cheetah"),QString("DISTANCE GRADE WIND"));
-    stream << "[COURSE DATA]" << endl;
+    stream << "[COURSE DATA]" << Qt::endl;
     QPair<double,double> p;
     double prevDistance = 0;
     foreach (p,rideProfile)
     {
         // header indicates metric units, so convert accordingly
         double curDistance = p.first * (metricUnits ? 1.0 : KM_PER_MILE);
-        stream << curDistance - prevDistance << " " << p.second <<" 0" << endl;
+        stream << curDistance - prevDistance << " " << p.second <<" 0" << Qt::endl;
         prevDistance = curDistance;
     }
-    stream << "[END COURSE DATA]" << endl;
+    stream << "[END COURSE DATA]" << Qt::endl;
     f.close();
 
     // import them via the workoutimporter

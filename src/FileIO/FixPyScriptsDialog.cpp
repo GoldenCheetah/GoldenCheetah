@@ -3,7 +3,7 @@
 #include "FixPyScriptsDialog.h"
 #include "MainWindow.h"
 #include "Colors.h"
-#include "TabView.h"
+#include "AbstractView.h"
 #include "PythonEmbed.h"
 #include "PythonSyntax.h"
 
@@ -104,7 +104,7 @@ EditFixPyScriptDialog::EditFixPyScriptDialog(Context *context, FixPyScript *fix,
     : QDialog(parent), context(context), pyFixScript(fix)
 {
     setWindowTitle(tr("Edit Python Fix"));
-    setMinimumSize(QSize(1200 * dpiXFactor, 1000 * dpiYFactor));
+    setMinimumSize(QSize(1200 * dpiXFactor, 650 * dpiYFactor));
 
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
 
@@ -140,7 +140,7 @@ EditFixPyScriptDialog::EditFixPyScriptDialog(Context *context, FixPyScript *fix,
     p.setColor(QPalette::Base, GColor(CPLOTBACKGROUND));
     p.setColor(QPalette::Text, GCColor::invertColor(GColor(CPLOTBACKGROUND)));
     script->setPalette(p);
-    script->setStyleSheet(TabView::ourStyleSheet());
+    script->setStyleSheet(AbstractView::ourStyleSheet());
     scriptLayout->addWidget(script);
 
     // syntax highlighter
@@ -157,14 +157,16 @@ EditFixPyScriptDialog::EditFixPyScriptDialog(Context *context, FixPyScript *fix,
     outerSplitter->addWidget(splitter);
 
     // ride editor
-    GcChartWindow *win = GcWindowRegistry::newGcWindow(GcWindowTypes::RideEditor, context);
-    win->setProperty("nomenu", true);
+    GcChartWindow *win = GcWindowRegistry::newGcWindow(GcWindowTypes::MetadataWindow, context);
+    if (win) {
+        win->setProperty("nomenu", true);
 
-    RideItem *notconst = (RideItem*)context->currentRideItem();
-    win->setProperty("ride", QVariant::fromValue<RideItem*>(notconst));
-    DateRange dr = context->currentDateRange();
-    win->setProperty("dateRange", QVariant::fromValue<DateRange>(dr));
-    outerSplitter->addWidget(win);
+        RideItem *notconst = (RideItem*)context->currentRideItem();
+        win->setProperty("ride", QVariant::fromValue<RideItem*>(notconst));
+        DateRange dr = context->currentDateRange();
+        win->setProperty("dateRange", QVariant::fromValue<DateRange>(dr));
+        outerSplitter->addWidget(win);
+    }
 
     mainLayout->addWidget(outerSplitter);
 

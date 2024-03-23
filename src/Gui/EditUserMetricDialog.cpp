@@ -22,12 +22,13 @@
 #include "Context.h"
 #include "Athlete.h"
 #include "MainWindow.h"
-#include "Tab.h"
+#include "AthleteTab.h"
 #include "RideNavigator.h"
 #include "DataFilter.h"
 #include "Zones.h"
 #include "HrZones.h"
 #include "RideMetric.h"
+#include "HelpWhatsThis.h"
 
 #include <QFont>
 #include <QFontMetrics>
@@ -46,8 +47,8 @@ EditUserMetricDialog::EditUserMetricDialog(QWidget *parent, Context *context, Us
     setWindowTitle(tr("User Defined Metric"));
     setMinimumHeight(680 *dpiYFactor);
 
-    //HelpWhatsThis *help = new HelpWhatsThis(this);
-    //this->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::ChartTrends_MetricTrends_Curves_Settings));
+    HelpWhatsThis *help = new HelpWhatsThis(this);
+    this->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::Preferences_Metrics_UserMetrics));
 
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
 
@@ -106,7 +107,7 @@ EditUserMetricDialog::EditUserMetricDialog(QWidget *parent, Context *context, Us
     QFont courier("Courier", QFont().pointSize());
     QFontMetrics fm(courier);
     formulaEdit->setFont(courier);
-    formulaEdit->setTabStopWidth(4 * fm.width(' ')); // 4 char tabstop
+    formulaEdit->setTabStopDistance(4 * fm.horizontalAdvance(' ')); // 4 char tabstop
     formulaEdit->setText(settings.program);
     // get suitably formated list XXX XXX ffs, refactor this into FormulEdit !!! XXX XXX
     QList<QString> list;
@@ -114,10 +115,10 @@ EditUserMetricDialog::EditUserMetricDialog(QWidget *parent, Context *context, Us
     SpecialFields sp;
 
     // get sorted list
-    QStringList names = context->tab->rideNavigator()->logicalHeadings;
+    QStringList names = context->rideNavigator->logicalHeadings;
 
     // start with just a list of functions
-    list = DataFilter::builtins();
+    list = DataFilter::builtins(context);
 
     // ridefile data series symbols
     list += RideFile::symbols();
@@ -125,14 +126,18 @@ EditUserMetricDialog::EditUserMetricDialog(QWidget *parent, Context *context, Us
     // add special functions (older code needs fixing !)
     list << "config(cranklength)";
     list << "config(cp)";
+    list << "config(aetp)";
     list << "config(ftp)";
     list << "config(w')";
     list << "config(pmax)";
     list << "config(cv)";
-    list << "config(scv)";
+    list << "config(aetv)";
+    list << "config(sex)";
+    list << "config(dob)";
     list << "config(height)";
     list << "config(weight)";
     list << "config(lthr)";
+    list << "config(aethr)";
     list << "config(maxhr)";
     list << "config(rhr)";
     list << "config(units)";
@@ -159,7 +164,7 @@ EditUserMetricDialog::EditUserMetricDialog(QWidget *parent, Context *context, Us
     list << "best(vam, 3600)";
     list << "best(wpk, 3600)";
 
-    qSort(names.begin(), names.end(), insensitiveLessThan);
+    std::sort(names.begin(), names.end(), insensitiveLessThan);
 
     foreach(QString name, names) {
 
@@ -282,7 +287,8 @@ EditUserMetricDialog::setErrors(QStringList &list)
 void
 EditUserMetricDialog::enableOk()
 {
-    okButton->setEnabled(!symbol->text().isEmpty() && !name->text().isEmpty());
+    // Check symbol and name are non-empty, and "_" is not used in name.
+    okButton->setEnabled(!symbol->text().isEmpty() && !name->text().isEmpty() && !name->text().contains("_"));
 }
 
 bool

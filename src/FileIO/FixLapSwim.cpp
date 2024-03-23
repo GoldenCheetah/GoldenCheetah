@@ -23,6 +23,7 @@
 #include "HelpWhatsThis.h"
 #include <algorithm>
 #include <QVector>
+#include <QHash>
 
 #include <cmath>
 
@@ -117,12 +118,11 @@ static bool FixLapSwimAdded = DataProcessorFactory::instance().registerProcessor
 bool
 FixLapSwim::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString op="")
 {
-    Q_UNUSED(op)
-
     // get settings
     double pl;
     if (config == NULL) { // being called automatically
-        pl = appsettings->value(NULL, GC_DPFLS_PL, "0").toDouble();
+        // when the file is created use poll length in the file
+        pl = (op == "NEW") ? 0.0 : appsettings->value(NULL, GC_DPFLS_PL, "0").toDouble();
     } else { // being called manually
         pl = ((FixLapSwimConfig*)(config))->pl->value();
     }
@@ -154,11 +154,11 @@ FixLapSwim::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString o
     QVariant GarminHWM = appsettings->value(NULL, GC_GARMIN_HWMARK);
     if (GarminHWM.isNull() || GarminHWM.toInt() == 0) GarminHWM.setValue(25); // default to 25 seconds.
 
-    // Preserve HR data
-    QVector<double> hrdata(ride->dataPoints().count());
-    for (int i=0; i<ride->dataPoints().count(); i++)
-        hrdata[i] = ride->dataPoints()[i]->hr;
-
+    // Preserve existing data (HR, Temp, etc.)
+    QHash<double, RideFilePoint> ptHash;
+    foreach (const RideFilePoint* pt, ride->dataPoints()) {
+        ptHash.insert(pt->secs, *pt);
+    }
     // delete current lap markers
     ride->clearIntervals();
     // ok, lets start a transaction and drop existing samples
@@ -183,14 +183,14 @@ FixLapSwim::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString o
         // another pool length or pause
         double length_distance = (p->number[typeIdx] ? pl / 1000.0 : 0.0);
 
-        // Adjust length duration using fractional carry
+        // Adjust truncated length duration using fractional carry
         double length_duration = p->number[durationIdx] + frac_time;
         frac_time = modf(length_duration, &length_duration);
 
         // Cadence from Strokes and Duration, if Strokes available
-        if (p->number[typeIdx] > 0.0 && length_duration > 0.0) {
+        if (p->number[typeIdx] > 0.0 && p->number[durationIdx] > 0.0) {
             cad = (strokesIdx == -1) ? 0.0 :
-                  round(60.0 * p->number[strokesIdx] / length_duration);
+                  60.0 * p->number[strokesIdx] / p->number[durationIdx];
         } else { // pause length
             cad = 0.0;
         }
@@ -200,23 +200,19 @@ FixLapSwim::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString o
        // or corrupt files
        if (length_duration > 0 && length_duration < 100*GarminHWM.toInt()) {
            QVector<struct RideFilePoint> newRows;
-           kph = 3600.0 * length_distance / length_duration;
+           kph = 3600.0 * length_distance / p->number[durationIdx];
+           double deltaDist = length_duration > 1 ? length_distance / (length_duration - 1) : 0.0;
            if (length_distance == 0.0) interval++; // pauses mark laps
            for (int i = 0; i < length_duration; i++) {
-               double hr = hrdata.value(last_time + i, 0.0); // recover HR data
-               newRows << RideFilePoint(
-                   last_time + i, cad, hr,
-                   last_distance + (length_distance * i/length_duration),
-                   kph, 0.0, 0.0, 0.0, 0.0, 0.0,
-                   0.0, 0.0,
-                   RideFile::NA,RideFile::NA,
-                   0.0, 0.0,0.0, 0.0,
-                   0.0, 0.0,
-                   0.0, 0.0,0.0, 0.0,
-                   0.0, 0.0,0.0, 0.0,
-                   0.0, 0.0,
-                   0.0, 0.0, 0.0, 0.0,
-                   interval);
+               // recover previous data or create a new sample point,
+               // and fix time/speed/distance/cadence/interval
+               RideFilePoint pt = ptHash.value(last_time + i);
+               pt.secs = last_time + i;
+               pt.cad = cad;
+               pt.km = last_distance + i * deltaDist;
+               pt.kph = pt.secs > 0 ? kph : 0.0;
+               pt.interval = interval;
+               newRows << pt;
             }
             ride->command->appendPoints(newRows);
             last_time += length_duration;
@@ -228,20 +224,15 @@ FixLapSwim::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString o
            QVector<struct RideFilePoint> newRows;
            interval++; // pauses mark laps
            for (int i=0; i<p->number[restIdx] && i<100*GarminHWM.toInt(); i++) {
-               double hr = hrdata.value(last_time + i, 0.0); // recover HR data
-               newRows << RideFilePoint(
-                   last_time + i, 0.0, hr,
-                   last_distance,
-                   0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
-                   0.0, 0.0,
-                   RideFile::NA,RideFile::NA,
-                   0.0, 0.0,0.0, 0.0,
-                   0.0, 0.0,
-                   0.0, 0.0,0.0, 0.0,
-                   0.0, 0.0,0.0, 0.0,
-                   0.0, 0.0,
-                   0.0, 0.0, 0.0, 0.0,
-                   interval);
+               // recover previous data or create a new sample point,
+               // and fix time/speed/distance/cadence/interval
+               RideFilePoint pt = ptHash.value(last_time + i);
+               pt.secs = last_time + i;
+               pt.cad = 0.0;
+               pt.km = last_distance;
+               pt.kph = 0.0;
+               pt.interval = interval;
+               newRows << pt;
            }
            ride->command->appendPoints(newRows);
            last_time += p->number[restIdx];
@@ -257,10 +248,12 @@ FixLapSwim::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString o
     ride->setDataPresent(ride->kph, true);
     ride->setDataPresent(ride->cad, strokesIdx>0);
     ride->command->endLUW();
-    // rebuild intervals and force metric update
-    ride->fillInIntervals();
-    ride->context->rideItem()->isstale = true;
-    ride->context->rideItem()->refresh();
+    if (op != "NEW") {
+        // rebuild intervals and force metric update
+        ride->fillInIntervals();
+        ride->context->rideItem()->isstale = true;
+        ride->context->rideItem()->refresh();
+    }
 
     return true;
 }

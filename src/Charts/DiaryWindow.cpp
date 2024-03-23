@@ -23,7 +23,7 @@
 #include "RideCacheModel.h"
 #include "Athlete.h"
 #include "Context.h"
-#include "TabView.h"
+#include "AbstractView.h"
 #include "HelpWhatsThis.h"
 
 DiaryWindow::DiaryWindow(Context *context) :
@@ -32,7 +32,7 @@ DiaryWindow::DiaryWindow(Context *context) :
     setControls(NULL);
 
     // get config
-    fieldDefinitions = context->athlete->rideMetadata()->getFields();
+    fieldDefinitions = GlobalContext::context()->rideMetadata->getFields();
 
     QVBoxLayout *vlayout = new QVBoxLayout;
     setChartLayout(vlayout);
@@ -72,13 +72,8 @@ DiaryWindow::DiaryWindow(Context *context) :
     monthlyView = new QTableView(this);
     monthlyView->setItemDelegate(new GcCalendarDelegate);
     monthlyView->setModel(calendarModel);
-#if QT_VERSION > 0x050000
     monthlyView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
     monthlyView->verticalHeader()->setSectionResizeMode(QHeaderView::Stretch);
-#else
-    monthlyView->horizontalHeader()->setResizeMode(QHeaderView::Stretch);
-    monthlyView->verticalHeader()->setResizeMode(QHeaderView::Stretch);
-#endif
     monthlyView->verticalHeader()->hide();
     monthlyView->viewport()->installEventFilter(this);
     monthlyView->setGridStyle(Qt::DotLine);
@@ -109,14 +104,13 @@ void
 DiaryWindow::configChanged(qint32)
 {
     // get config
-    fieldDefinitions = context->athlete->rideMetadata()->getFields();
+    fieldDefinitions = GlobalContext::context()->rideMetadata->getFields();
 
     // change colors to reflect preferences
     setProperty("color", GColor(CPLOTBACKGROUND));
 
     QPalette palette;
     palette.setBrush(QPalette::Window, QBrush(GColor(CPLOTBACKGROUND)));
-    palette.setBrush(QPalette::Background, QBrush(GColor(CPLOTBACKGROUND)));
     palette.setBrush(QPalette::Base, QBrush(GColor(CPLOTBACKGROUND)));
     palette.setColor(QPalette::WindowText, GCColor::invertColor(GColor(CPLOTBACKGROUND)));
     palette.setColor(QPalette::Text, GCColor::invertColor(GColor(CPLOTBACKGROUND)));
@@ -133,8 +127,8 @@ DiaryWindow::configChanged(qint32)
                     .arg(GColor(CPLOTBACKGROUND).name())
                     .arg(GCColor::invertColor(GColor(CPLOTBACKGROUND)).name()));
 #ifndef Q_OS_MAC
-    monthlyView->verticalScrollBar()->setStyleSheet(TabView::ourStyleSheet());
-    monthlyView->horizontalScrollBar()->setStyleSheet(TabView::ourStyleSheet());
+    monthlyView->verticalScrollBar()->setStyleSheet(AbstractView::ourStyleSheet());
+    monthlyView->horizontalScrollBar()->setStyleSheet(AbstractView::ourStyleSheet());
 #endif
     title->setStyleSheet(QString("background: %1; color: %2;").arg(GColor(CPLOTBACKGROUND).name())
                                                               .arg(GColor(CPLOTMARKER).name()));

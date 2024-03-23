@@ -124,7 +124,7 @@ class MetricDetail {
                      penColor(Qt::black), penAlpha(0), penWidth(1.0), penStyle(0),
                      brushColor(Qt::black), brushAlpha(0), fillCurve(false), labels(false), curve(NULL) {}
 
-    bool operator< (MetricDetail right) const { return name < right.name; }
+    bool operator< (MetricDetail right) const { return name.localeAwareCompare(right.name) < 0; }
 
     int type;
     bool stack; // should this be stacked?
@@ -221,8 +221,10 @@ class LTMSettings {
     public:
 
         LTMSettings() {
+#if QT_VERSION < 0x060000
             // we need to register the stream operators
             qRegisterMetaTypeStreamOperators<LTMSettings>("LTMSettings");
+#endif
             bests = NULL;
             ltmTool = NULL;
         }

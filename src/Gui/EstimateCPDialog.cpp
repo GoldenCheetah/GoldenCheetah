@@ -20,6 +20,7 @@
 #include "HelpWhatsThis.h"
 #include "Settings.h"
 #include "Colors.h"
+#include "Context.h"
 
 QHBoxLayout*
 EstimateCPDialog::setupMinsSecs(QDoubleSpinBoxPtr &minsSpinBox,
@@ -133,8 +134,8 @@ EstimateCPDialog::EstimateCPDialog(QWidget *parent) : QDialog(parent)
 void
 EstimateCPDialog::changeSport()
 {
-    QString rnSuffix = appsettings->value(this, GC_PACE, true).toBool() ? tr(" km") : tr(" mi");
-    QString swSuffix = appsettings->value(this, GC_SWIMPACE, true).toBool() ? tr(" m") : tr(" yd");
+    QString rnSuffix = appsettings->value(this, GC_PACE, GlobalContext::context()->useMetricUnits).toBool() ? tr(" km") : tr(" mi");
+    QString swSuffix = appsettings->value(this, GC_SWIMPACE, GlobalContext::context()->useMetricUnits).toBool() ? tr(" m") : tr(" yd");
     switch (sportCombo->currentIndex()) {
         case 0: // Bike
             shortWattsSpinBox->setDecimals(0);
@@ -145,9 +146,9 @@ EstimateCPDialog::changeSport()
             labelWP->setText(tr("Your W':"));
             break;
         case 1: // Run
-            shortWattsSpinBox->setDecimals(1);
+            shortWattsSpinBox->setDecimals(3);
             shortWattsSpinBox->setSuffix(rnSuffix);
-            longWattsSpinBox->setDecimals(1);
+            longWattsSpinBox->setDecimals(3);
             longWattsSpinBox->setSuffix(rnSuffix);
             labelCP->setText(tr("Your critical pace:"));
             labelWP->setText(tr("Your D':"));
@@ -174,8 +175,8 @@ void EstimateCPDialog::on_btnOK_clicked()
 
 void EstimateCPDialog::on_btnCalculate_clicked()
 {
-    bool metricRnPace = appsettings->value(this, GC_PACE, true).toBool();
-    bool metricSwPace = appsettings->value(this, GC_PACE, true).toBool();
+    bool metricRnPace = appsettings->value(this, GC_PACE, GlobalContext::context()->useMetricUnits).toBool();
+    bool metricSwPace = appsettings->value(this, GC_SWIMPACE, GlobalContext::context()->useMetricUnits).toBool();
     double shortSecs =
         shortMinsSpinBox->value() * 60.0 + shortSecsSpinBox->value();
     double shortWatts = shortWattsSpinBox->value();

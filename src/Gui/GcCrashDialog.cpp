@@ -37,10 +37,10 @@
 #define COMPILER_VERSION QString("%1").arg(_MSC_VER)
 #endif
 
-#ifndef Q_OS_MAC
-#include "VideoWindow.h"
-#else
+#if defined(GC_VIDEO_AV) || defined(GC_VIDEO_QUICKTIME)
 #include "QtMacVideoWindow.h"
+#else
+#include "VideoWindow.h"
 #endif
 
 #ifdef GC_HAVE_ICAL
@@ -68,7 +68,9 @@
 #include "PythonEmbed.h"
 #endif
 
-#include "levmar.h"
+#include <gsl/gsl_version.h>
+
+QString gl_version;
 
 GcCrashDialog::GcCrashDialog(QDir homeDir) : QDialog(NULL, Qt::Dialog), home(homeDir)
 {
@@ -126,23 +128,12 @@ GcCrashDialog::GcCrashDialog(QDir homeDir) : QDialog(NULL, Qt::Dialog), home(hom
 
     QFont defaultFont; // mainwindow sets up the defaults.. we need to apply
 
-#ifdef NOWEBKIT
     report = new QWebEngineView(this);
     report->setContentsMargins(0,0,0,0);
-    report->page()->view()->setContentsMargins(0,0,0,0);
     report->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     report->setAcceptDrops(false);
     report->settings()->setFontSize(QWebEngineSettings::DefaultFontSize, defaultFont.pointSize()+1);
     report->settings()->setFontFamily(QWebEngineSettings::StandardFont, defaultFont.family());
-#else
-    report = new QWebView(this);
-    report->setContentsMargins(0,0,0,0);
-    report->page()->view()->setContentsMargins(0,0,0,0);
-    report->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    report->setAcceptDrops(false);
-    report->settings()->setFontSize(QWebSettings::DefaultFontSize, defaultFont.pointSize()+1);
-    report->settings()->setFontFamily(QWebSettings::StandardFont, defaultFont.family());
-#endif
 
     layout->addWidget(report);
 
@@ -160,33 +151,15 @@ GcCrashDialog::GcCrashDialog(QDir homeDir) : QDialog(NULL, Qt::Dialog), home(hom
     setHTML();
 }
 
+GcCrashDialog::~GcCrashDialog()
+{
+    if (report) delete report->page();
+}
+
 QString GcCrashDialog::versionHTML()
 {
     // -- OS ----
-    QString os = "";
-
-    #ifdef Q_OS_LINUX
-    os = "Linux";
-    #endif
-
-    #ifdef WIN32
-    os = "Win";
-    #endif
-
-    #ifdef Q_OS_MAC
-    os = QString("Mac OS X 10.%1").arg(QSysInfo::MacintoshVersion - 2);
-    if (QSysInfo::MacintoshVersion == QSysInfo::MV_SNOWLEOPARD)
-        os += " Snow Leopard";
-    else if (QSysInfo::MacintoshVersion == QSysInfo::MV_LION)
-        os += " Lion";
-    else if (QSysInfo::MacintoshVersion == 10)
-        os += " Mountain Lion";
-    else if (QSysInfo::MacintoshVersion == 11)
-        os += " Mavericks";
-    else if (QSysInfo::MacintoshVersion == 12)
-        os += " Yosemite";
-
-    #endif
+    QString os = QSysInfo::prettyProductName();
 
     // -- SCHEMA VERSION ----
     QString schemaVersion = QString("%1").arg(DBSchemaVersion);
@@ -207,13 +180,6 @@ QString GcCrashDialog::versionHTML()
 
     #ifdef GC_HAVE_D2XX
     d2xx = "yes";
-    #endif
-
-    // -- KML ----
-    QString kml = "none";
-
-    #ifdef GC_HAVE_KML
-    kml = "yes";
     #endif
 
     // -- ICAL ----
@@ -242,19 +208,18 @@ QString GcCrashDialog::versionHTML()
     // -- VLC ----
     QString vlc = "none";
     #ifdef GC_HAVE_VLC
-    vlc = "yes";
+    vlc = libvlc_get_version();
     #endif
 
-    // -- WEBKIT ---
-    QString webkit = "yes";
-    #ifdef NOWEBKIT
-    webkit = "none";
-    #endif
     #ifdef GC_HAVE_SAMPLERATE
     QString src = QString(src_get_version()).mid(14,6);
     #else
     QString src = "none";
     #endif
+
+    // -- GSL --
+    QString gsl = "none";
+    gsl = GSL_VERSION;
 
     const RideMetricFactory &factory = RideMetricFactory::instance();
     QString gc_version = tr(
@@ -264,6 +229,10 @@ QString GcCrashDialog::versionHTML()
             "<br>DB Schema: %5"
             "<br>Metrics: %7"
             "<br>OS: %6"
+#ifdef Q_OS_LINUX
+            "<br>OpenGL: %10"
+#endif
+            "<br>UI: dpi scale (%8) font size (%9)"
             "<br>")
             .arg(__DATE__)
             .arg(__TIME__)
@@ -275,7 +244,13 @@ QString GcCrashDialog::versionHTML()
 #endif
             .arg(schemaVersion)
             .arg(os)
-            .arg(factory.metricCount());
+            .arg(factory.metricCount())
+            .arg(dpiXFactor)
+            .arg(QFont().pointSizeF())
+#ifdef Q_OS_LINUX
+            .arg(gl_version)
+#endif
+            ;
 
     QString lib_version = tr(
             "<table>"
@@ -284,7 +259,6 @@ QString GcCrashDialog::versionHTML()
             "<tr><td colspan=\"2\">%3</td><td>%4</td></tr>"
             "<tr><td colspan=\"2\">SRMIO</td><td>%5</td></tr>"
             "<tr><td colspan=\"2\">D2XX</td><td>%6</td></tr>"
-            "<tr><td colspan=\"2\">KML</td><td>%8</td></tr>"
             "<tr><td colspan=\"2\">ICAL</td><td>%9</td></tr>"
             "<tr><td colspan=\"2\">USBXPRESS</td><td>%10</td></tr>"
             "<tr><td colspan=\"2\">LIBUSB</td><td>%11</td></tr>"
@@ -294,9 +268,8 @@ QString GcCrashDialog::versionHTML()
             "<tr><td colspan=\"2\">SSL</td><td>%15</td></tr>"
             "<tr><td colspan=\"2\">R</td><td>%16</td></tr>"
             "<tr><td colspan=\"2\">Python</td><td>%18</td></tr>"
-            "<tr><td colspan=\"2\">WEBKIT</td><td>%17</td></tr>"
             "<tr><td colspan=\"2\">LMFIT</td><td>7.0</td></tr>"
-            "<tr><td colspan=\"2\">LEVMAR</td><td>%19</td></tr>"
+            "<tr><td colspan=\"2\">GSL</td><td>%19</td></tr>"
             "</table>"
             )
             .arg(QT_VERSION_STR)
@@ -305,7 +278,6 @@ QString GcCrashDialog::versionHTML()
             .arg(COMPILER_VERSION)
             .arg(srmio)
             .arg(d2xx)
-            .arg(kml)
             .arg(ical)
             .arg(usbxpress)
             .arg(libusb)
@@ -326,13 +298,12 @@ QString GcCrashDialog::versionHTML()
 #else
             .arg("none")
 #endif
-            .arg(webkit)
 #ifdef GC_HAVE_PYTHON
             .arg(QString("%1 [%2]").arg(python ? python->version.split(" ").at(0) : QString("none")).arg(PythonEmbed::buildVersion()))
 #else
             .arg("none")
 #endif
-            .arg(LM_VERSION)
+            .arg(gsl)
             ;
 
     QString versionText = QString("<center>"  + gc_version  + lib_version + "</center>");
@@ -480,11 +451,7 @@ GcCrashDialog::setHTML()
     }
     text += "</table></center>";
 
-#ifdef NOWEBKIT
     report->page()->setHtml(text);
-#else
-    report->page()->mainFrame()->setHtml(text);
-#endif
 }
 
 void
@@ -496,17 +463,12 @@ GcCrashDialog::saveAs()
     QFile file(fileName);
     file.resize(0);
     QTextStream out(&file);
+#if QT_VERSION < 0x060000
     out.setCodec("UTF-8");
-
-    if (file.open(QIODevice::WriteOnly)) {
-
-        // write the texts
-#ifdef NOWEBKIT
-        //TODO WEBENGINE out << report->page()->mainFrame()->toPlainText();
-#else
-        out << report->page()->mainFrame()->toPlainText();
 #endif
 
+    if (file.open(QIODevice::WriteOnly)) {
+        // write the texts
         file.close();
     }
 }

@@ -20,9 +20,9 @@
 #include "TimeUtils.h"
 #include "Colors.h"
 #include <cmath>
-#include <QRegExpValidator>
 #include <QFormLayout>
 #include <QLabel>
+#include <QRegExp>
 
 QString time_to_string(double secs, bool forceMinutes)
 {
@@ -183,6 +183,7 @@ DateRange::DateRange(const DateRange &other) : QObject()
     to=other.to;
     name=other.name;
     color=other.color;
+    id = other.id;
     valid = from.isValid() && to.isValid();
 }
 

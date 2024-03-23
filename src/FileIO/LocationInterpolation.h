@@ -24,13 +24,13 @@
 
 #include "qwt_math.h"
 
-struct geolocation;
-
 #if defined(_MSC_VER)
 #define NOINLINE __declspec(noinline)
 #else
 #define NOINLINE
 #endif
+
+struct geolocation;
 
 class v3
 {
@@ -41,6 +41,7 @@ public:
     v3(double a, double b, double c) : m_t(a, b, c) {};
 
     v3(const v3& o) : m_t(o.m_t) {}
+    v3& operator=(const v3& o) { m_t = o.m_t; return *this; }
 
     double  x() const { return std::get<0>(m_t); }
     double  y() const { return std::get<1>(m_t); }
@@ -124,12 +125,19 @@ struct geolocation : v3
         return dist;
     }
 
+    bool IsReasonableAltitude() const {
+        return (this->Alt() >= -1000 && this->Alt() < 10000);
+    }
+
     bool IsReasonableGeoLocation() const {
         return  (this->Lat() && this->Lat() >= double(-90) && this->Lat() <= double(90) &&
             this->Long() && this->Long() >= double(-180) && this->Long() <= double(180) &&
-            this->Alt() >= -1000 && this->Alt() < 10000);
+            IsReasonableAltitude());
     }
 
+    // Compute initial bearing from this geoloc to another, in RADIANS.
+    // Note that unless bearing is 0 or pi it will vary on the path from one to the other.
+    double BearingTo(const geolocation& to) const;
 };
 
 // Class to wrap classic game spherical interpolation
@@ -337,7 +345,7 @@ template <size_t T_bitsize> class MyBitset
         return (((x + (x >> 4)) & 0xF0F0F0F) * 0x1010101) >> 24;
     }
 
-    void truncate() { m_mask &= (((unsigned)(-1 << (32 - T_bitsize))) >> (32 - T_bitsize)); }
+    void truncate() { m_mask &= ((~0U << (32 - T_bitsize)) >> (32 - T_bitsize)); }
 
 public:
 
@@ -752,7 +760,7 @@ public:
         // Remove frame speed from tangent vector.
         double frameSpeed = m_DistanceWindow.FrameSpeed(bracketRatio);
         double tangentSpeed = tangentVector.magnitude();
-        double correctionScale = frameSpeed / (tangentSpeed * tangentSpeed);
+        double correctionScale = tangentSpeed ? (frameSpeed / (tangentSpeed * tangentSpeed)) : 1.;
 
         // This rescale converts tangent vector into a unit vector
         // WRT parametric route velocity.

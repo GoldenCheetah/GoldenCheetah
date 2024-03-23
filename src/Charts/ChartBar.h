@@ -24,6 +24,7 @@
 #include <QAction>
 #include <QHBoxLayout>
 #include <QScrollArea>
+#include <QPushButton>
 #include <QToolButton>
 #include <QObject>
 #include <QEvent>
@@ -53,8 +54,10 @@ public slots:
     void addWidget(QString);
     void clear();
     void clicked(int);
+    void triggerContextMenu(int);
     void removeWidget(int);
     void setText(int index, QString);
+    void setColor(int index, QColor);
     void setCurrentIndex(int index);
     void scrollLeft();
     void scrollRight();
@@ -64,6 +67,7 @@ public slots:
     void configChanged(qint32); // appearance
 
 signals:
+    void contextMenu(int,int);
     void currentIndexChanged(int);
     void itemMoved(int from, int to);
 
@@ -81,12 +85,12 @@ private:
     Context *context;
 
     ButtonBar *buttonBar;
-    QToolButton *left, *right; // scrollers, hidden if menu fits
+    QPushButton *left, *right; // scrollers, hidden if menu fits
     QPropertyAnimation *anim; // scroll left and right - animated to show whats happening
-    QToolButton *menuButton;
+    QPushButton *menuButton;
 
     QFont buttonFont;
-    QSignalMapper *signalMapper;
+    QSignalMapper *signalMapper, *menuMapper;
 
     QMenu *barMenu, *chartMenu;
 
@@ -120,7 +124,8 @@ class ChartBarItem : public QWidget
     public:
         ChartBarItem(ChartBar *parent);
         void setText(QString _text) { text = _text; }
-        void setChecked(bool _checked) { checked = _checked; repaint(); }
+        void setColor(QColor _color) { color = _color; update(); }
+        void setChecked(bool _checked) { checked = _checked; update(); }
         bool isChecked() { return checked; }
         void setWidth(int x) { setFixedWidth(x); }
         void setHighlighted(bool x) { highlighted = x; }
@@ -130,6 +135,7 @@ class ChartBarItem : public QWidget
         QString text;
     signals:
         void clicked(bool);
+        void contextMenu();
 
     public slots:
         void paintEvent(QPaintEvent *);
@@ -145,8 +151,11 @@ class ChartBarItem : public QWidget
         int indexPos(int); // calculating drop position
         ChartBarItem *dragging;
 
+        QColor color; // background when selected
         bool checked;
         bool highlighted;
         bool red;
+
+        QPainterPath triangle, hotspot;
 };
 #endif

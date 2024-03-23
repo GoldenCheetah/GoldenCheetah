@@ -24,7 +24,7 @@
 #include "Context.h"
 #include "Settings.h"
 #include "Colors.h"
-#include "TabView.h"
+#include "AbstractView.h"
 #include "HelpWhatsThis.h"
 #include "HrZones.h"
 #include "XDataDialog.h"
@@ -79,9 +79,9 @@ getPaste(QVector<QVector<double> >&cells, QStringList &seps, QStringList &head, 
     regexpStr = "[";
     foreach (QString sep, seps) regexpStr += sep;
     regexpStr += "]";
-    QRegExp sep(regexpStr); // RegExp for separators
+    QRegularExpression sep(regexpStr); // RegExp for separators
 
-    QRegExp ELine(("\n|\r|\r\n")); //RegExp for line endings
+    QRegularExpression ELine(("\n|\r|\r\n")); //RegExp for line endings
 
     foreach(QString line, text.split(ELine)) {
         if (line == "") continue;
@@ -113,14 +113,12 @@ getPaste(QVector<QVector<double> >&cells, QStringList &seps, QStringList &head, 
     }
 }
 
-RideEditor::RideEditor(Context *context) : GcChartWindow(context), data(NULL), ride(NULL), context(context), inLUW(false), colMapper(NULL)
+RideEditor::RideEditor(Context *context) : QWidget(context->mainWindow), data(NULL), ride(NULL), context(context), inLUW(false), colMapper(NULL)
 {
-    setControls(NULL);
-
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->setSpacing(0);
     mainLayout->setContentsMargins(2,0,2,2);
-    setChartLayout(mainLayout);
+    setLayout(mainLayout);
 
     //Left in the code to display a title, but
     //its a waste of screen estate, maybe uncomment
@@ -192,7 +190,7 @@ RideEditor::RideEditor(Context *context) : GcChartWindow(context), data(NULL), r
     model = new RideFileTableModel(NULL);
 
     // set up the table
-    table = new QTableView();
+    table = new QTableView(this);
 
     stack->addWidget(table);
     stack->setCurrentIndex(0);
@@ -220,14 +218,16 @@ RideEditor::RideEditor(Context *context) : GcChartWindow(context), data(NULL), r
 
     // layout the widget
     //mainLayout->addWidget(title);
+    mainLayout->addSpacing(20*dpiXFactor); // bit of white space
     mainLayout->addWidget(toolbar);
+    mainLayout->addSpacing(20*dpiXFactor);
     mainLayout->addWidget(stack);
     mainLayout->addWidget(tabbar);
 
     // trap GC signals
     connect(context, SIGNAL(intervalSelected()), this, SLOT(intervalSelected()));
     //connect(main, SIGNAL(rideSelected()), this, SLOT(rideSelected()));
-    connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideSelected()));
+    //connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(rideSelected()));
     connect(context, SIGNAL(rideDirty(RideItem*)), this, SLOT(rideDirty()));
     connect(context, SIGNAL(rideClean(RideItem*)), this, SLOT(rideClean()));
     connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
@@ -258,7 +258,6 @@ RideEditor::configChanged(qint32)
 
     QPalette palette;
     palette.setBrush(QPalette::Window, QBrush(GColor(CPLOTBACKGROUND)));
-    palette.setBrush(QPalette::Background, QBrush(GColor(CPLOTBACKGROUND)));
     palette.setBrush(QPalette::Base, QBrush(GColor(CPLOTBACKGROUND)));
     palette.setColor(QPalette::WindowText, GCColor::invertColor(GColor(CPLOTBACKGROUND)));
     palette.setColor(QPalette::Text, GCColor::invertColor(GColor(CPLOTBACKGROUND)));
@@ -267,27 +266,30 @@ RideEditor::configChanged(qint32)
     tabbar->setPalette(palette);
     QColor faded = GCColor::invertColor(GColor(CPLOTBACKGROUND));
     tabbar->setStyleSheet(QString("QTabBar::tab { background-color: %1; border: 0.5px solid %1; color: rgba(%3,%4,%5,50%) }"
-                                  "QTabBar::tab:selected { background-color: %1; color: %2; border: 2px solid %1; border-bottom-color: %6 }"
+                                  "QTabBar::tab:selected { background-color: %1; color: %2; border-bottom: %7px solid %1; border-bottom-color: %6 }"
                                   "QTabBar::close-button:!selected { background-color: %1; }")
                     .arg(GColor(CPLOTBACKGROUND).name())
                     .arg(GCColor::invertColor(GColor(CPLOTBACKGROUND)).name())
                     .arg(faded.red()).arg(faded.green()).arg(faded.blue())
-                    .arg(GColor(CPLOTMARKER).name()));
+                    .arg(GColor(CPLOTMARKER).name())
+                    .arg(4 * dpiXFactor));
     table->setPalette(palette);
     table->setStyleSheet(QString("QTableView { background-color: %1; color: %2; border: %1 }"
                                  "QTableView QTableCornerButton::section { background-color: %1; color: %2; border: %1 }"
                                  "QHeaderView { background-color: %1; color: %2; border: %1 }")
                     .arg(GColor(CPLOTBACKGROUND).name())
                     .arg(GCColor::invertColor(GColor(CPLOTBACKGROUND)).name()));
-    table->horizontalHeader()->setStyleSheet(QString("QHeaderView::section { background-color: %1; color: %2; border: 0px }")
+    table->horizontalHeader()->setStyleSheet(QString("QHeaderView::section { background-color: %1; color: %2; border: 0px; border-bottom: %3px solid %2; }")
                     .arg(GColor(CPLOTBACKGROUND).name())
-                    .arg(GCColor::invertColor(GColor(CPLOTBACKGROUND)).name()));
+                    .arg(GCColor::invertColor(GColor(CPLOTBACKGROUND)).name())
+                    .arg(2 * dpiYFactor));
     table->verticalHeader()->setStyleSheet(QString("QHeaderView::section { background-color: %1; color: %2; border: 0px }")
                     .arg(GColor(CPLOTBACKGROUND).name())
                     .arg(GCColor::invertColor(GColor(CPLOTBACKGROUND)).name()));
+    table->horizontalHeader()->setDefaultAlignment(Qt::AlignLeft | Qt::AlignVCenter);
 #ifndef Q_OS_MAC
-    table->verticalScrollBar()->setStyleSheet(TabView::ourStyleSheet());
-    table->horizontalScrollBar()->setStyleSheet(TabView::ourStyleSheet());
+    table->verticalScrollBar()->setStyleSheet(AbstractView::ourStyleSheet());
+    table->horizontalScrollBar()->setStyleSheet(AbstractView::ourStyleSheet());
 #endif
     toolbar->setStyleSheet(QString("::enabled { background: %1; color: %2; border: 0px; } ").arg(GColor(CPLOTBACKGROUND).name())
                     .arg(GCColor::invertColor(GColor(CPLOTBACKGROUND)).name()));
@@ -502,7 +504,7 @@ AnomalyDialog::check()
     anomalyList->horizontalHeader()->hide();
 
     // use MaxHR if available for suspicious, otherwise 200
-    const HrZones *hrZones = rideEditor->context->athlete->hrZones(rideEditor->ride->isRun);
+    const HrZones *hrZones = rideEditor->context->athlete->hrZones(rideEditor->ride->sport);
     int hrZR = hrZones ? hrZones->whichRange(rideEditor->ride->dateTime.date()) : -1;
     int maxHR = hrZR > 0 ? hrZones->getMaxHr(hrZR) : 200;
 
@@ -517,10 +519,11 @@ AnomalyDialog::check()
     QVector<double> power;
     QVector<double> cad;
     QVector<double> secs;
-    double lastdistance=9;
+    double lastdistance=0;
     double lastpower=0;
     double lastcad=0;
     int count = 0;
+    int nSpeedDist = 0;
 
     foreach (RideFilePoint *point, rideEditor->ride->ride()->dataPoints()) {
         power.append(point->watts);
@@ -555,6 +558,13 @@ AnomalyDialog::check()
                                        tr("Cadence/Power duplicated when freewheeling."));
                 }
             }
+        }
+
+        // check for the first 10 speed/distance inconsistencies
+        if (nSpeedDist < 10 && abs(lastdistance + point->kph*rideEditor->ride->ride()->recIntSecs()/3600.0 - point->km) > 0.001) {
+            nSpeedDist++;
+            rideEditor->data->anomalies.insert(xsstring(count, RideFile::kph),
+                                   tr("Speed Inconsistent with Distance/Time, stopping at 10 examples"));
         }
 
         // so we can look back one quickly
@@ -859,7 +869,7 @@ RideEditor::borderMenu(const QPoint &pos)
         // add menu options for each column
         if (colMapper) delete colMapper;
         colMapper = new QSignalMapper(this);
-        connect(colMapper, SIGNAL(mapped(const QString &)), this, SLOT(insColumn(const QString &)));
+        connect(colMapper, &QSignalMapper::mappedString, this, &RideEditor::insColumn);
 
         foreach(QString heading, whatColumns()) {
             QAction *insColAct = new QAction(heading, table);
@@ -893,9 +903,9 @@ RideEditor::copy()
 
             for (int column = selection[0].column();  column <= selection[selection.count()-1].column(); column++) {
                 if (column == selection[selection.count()-1].column())
-                    text += QString("%1").arg(getValue(row,column), 0, 'g', 11);
+                    text += QString("%L1").arg(getValue(row,column), 0, 'g', 11);
                 else
-                    text += QString("%1\t").arg(getValue(row,column), 0, 'g', 11);
+                    text += QString("%L1\t").arg(getValue(row,column), 0, 'g', 11);
             }
             text += "\n";
         }
@@ -1090,9 +1100,10 @@ RideEditor::pasteSpecial()
     PasteSpecialDialog *paster = new PasteSpecialDialog(this);
 
     // center the dialog
-    QDesktopWidget *desktop = QApplication::desktop();
-    int x = (desktop->width() - paster->size().width()) / 2;
-    int y = ((desktop->height() - paster->size().height()) / 2) -(50*dpiYFactor);
+    QScreen* screen = QGuiApplication::primaryScreen();
+    auto availableGeometry = screen->availableGeometry();
+    int x = (availableGeometry.width() - paster->size().width()) / 2;
+    int y = ((availableGeometry.height() - paster->size().height()) / 2) - (50 * dpiYFactor);
 
     // move window to desired coordinates
     paster->move(x,y);
@@ -1296,8 +1307,8 @@ void CellDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option,
     if (rideEditor->isTooPrecise(index.row(), index.column())) {
         QPolygon triangle(3);
         triangle.putPoints(0, 3, option.rect.x(), option.rect.y(),
-                                option.rect.x()+4, option.rect.y(),
-                                option.rect.x(), option.rect.y()+4);
+                                option.rect.x()+(4*int(dpiXFactor)), option.rect.y(),
+                                option.rect.x(), option.rect.y()+(4*int(dpiXFactor)));
         painter->setBrush(QBrush(QColor(Qt::darkGreen)));
         painter->setPen(QPen(QColor(Qt::darkGreen)));
         painter->drawPolygon(triangle);
@@ -1331,6 +1342,7 @@ QWidget *XDataCellDelegate::createEditor(QWidget *parent, const QStyleOptionView
     default:
     {
         QDoubleSpinBox *valueEdit = new QDoubleSpinBox(parent);
+        valueEdit->setDecimals(3);
         valueEdit->setMaximum(std::numeric_limits<double>::max());
         valueEdit->setMinimum(-std::numeric_limits<double>::max());
         connect(valueEdit, SIGNAL(editingFinished()), this, SLOT(commitAndCloseEditor()));
@@ -1478,20 +1490,17 @@ RideEditor::intervalSelected()
 }
 
 void
-RideEditor::rideSelected()
+RideEditor::rideSelected(RideItem *selected)
 {
     findTool->hide(); // hide the dialog!
     anomalyTool->hide();
     xdataTool->hide();
 
-    RideItem *current = myRideItem;
+    RideItem *current = selected;
     if (!current || !current->ride() || !current->ride()->dataPoints().count()) {
         model->setRide(NULL);
-        setIsBlank(true);
         findTool->rideSelected();
         return;
-    } else {
-        setIsBlank(false);
     }
 
     ride = current;
@@ -1572,7 +1581,7 @@ RideEditor::setTabBar(bool force)
     QStringList xd, tabs;
     for(int i=0; i< tabbar->count()-1; i++) tabs << tabbar->tabText(i);
     QMapIterator<QString, XDataSeries *>ie(ride->ride()->xdata());
-    xd<<tr("STANDARD");
+    xd<<tr("Basic Data");
     ie.toFront();
     while(ie.hasNext()) {
        ie.next();
@@ -1596,7 +1605,7 @@ RideEditor::setTabBar(bool force)
 
     while(tabbar->count()) tabbar->removeTab(0);
     tabbar->hide();
-    tabbar->addTab(tr("STANDARD"));
+    tabbar->addTab(tr("Basic Data"));
 
     // disable close button on STANDARD tab
     tabbar->setTabButton(0, QTabBar::RightSide, 0);
@@ -3028,6 +3037,7 @@ XDataEditor::XDataEditor(QWidget *parent, QString xdata) : QTableView(parent), x
     setGridStyle(Qt::NoPen);
     setItemDelegate(new XDataCellDelegate(this));
     setContextMenuPolicy(Qt::CustomContextMenu);
+    horizontalHeader()->setDefaultAlignment(Qt::AlignLeft | Qt::AlignVCenter);
 
     setContentsMargins(0,0,0,0);
     installEventFilter(this);
@@ -3039,31 +3049,32 @@ void XDataEditor::configChanged()
 {
 
     QPalette palette;
-    palette.setColor(QPalette::Active, QPalette::Background, GColor(CPLOTBACKGROUND));
+    palette.setColor(QPalette::Active, QPalette::Window, GColor(CPLOTBACKGROUND));
     palette.setColor(QPalette::Active, QPalette::Base, GColor(CPLOTBACKGROUND));
     palette.setColor(QPalette::Active, QPalette::WindowText, GCColor::invertColor(GColor(CPLOTBACKGROUND)));
     palette.setColor(QPalette::Active, QPalette::Text, GCColor::invertColor(GColor(CPLOTBACKGROUND)));
     palette.setColor(QPalette::Active, QPalette::Window, GCColor::invertColor(GColor(CPLOTBACKGROUND)));
-    palette.setColor(QPalette::Inactive, QPalette::Background, GColor(CPLOTBACKGROUND));
+    palette.setColor(QPalette::Inactive, QPalette::Window, GColor(CPLOTBACKGROUND));
     palette.setColor(QPalette::Inactive, QPalette::Base, GColor(CPLOTBACKGROUND));
     palette.setColor(QPalette::Inactive, QPalette::WindowText, GCColor::invertColor(GColor(CPLOTBACKGROUND)));
     palette.setColor(QPalette::Inactive, QPalette::Text, GCColor::invertColor(GColor(CPLOTBACKGROUND)));
     palette.setColor(QPalette::Inactive, QPalette::Window, GCColor::invertColor(GColor(CPLOTBACKGROUND)));
     setPalette(palette);
-    //setFrameStyle(QFrame::NoFrame);
+    setFrameStyle(QFrame::NoFrame);
     setStyleSheet(QString("QTableView QTableCornerButton::section { background-color: %1; color: %2; border: %1 }"
                                   "QHeaderView { background-color: %1; color: %2; border: %1 }")
                     .arg(GColor(CPLOTBACKGROUND).name())
                     .arg(GCColor::invertColor(GColor(CPLOTBACKGROUND)).name()));
-    horizontalHeader()->setStyleSheet(QString("QHeaderView::section { background-color: %1; color: %2; border: 0px }")
+    horizontalHeader()->setStyleSheet(QString("QHeaderView::section { background-color: %1; color: %2; border: 0px; border-bottom: %3px solid %2; }")
                     .arg(GColor(CPLOTBACKGROUND).name())
-                    .arg(GCColor::invertColor(GColor(CPLOTBACKGROUND)).name()));
+                    .arg(GCColor::invertColor(GColor(CPLOTBACKGROUND)).name())
+                    .arg(2 * dpiYFactor));
     verticalHeader()->setStyleSheet(QString("QHeaderView::section { background-color: %1; color: %2; border: 0px }")
                     .arg(GColor(CPLOTBACKGROUND).name())
                     .arg(GCColor::invertColor(GColor(CPLOTBACKGROUND)).name()));
 #ifndef Q_OS_MAC
-    verticalScrollBar()->setStyleSheet(TabView::ourStyleSheet());
-    horizontalScrollBar()->setStyleSheet(TabView::ourStyleSheet());
+    verticalScrollBar()->setStyleSheet(AbstractView::ourStyleSheet());
+    horizontalScrollBar()->setStyleSheet(AbstractView::ourStyleSheet());
 #endif
 }
 
@@ -3076,7 +3087,7 @@ void XDataEditor::setRideItem(RideItem *item)
 
     // but time is xx:xx:xx:xxx
     QFontMetrics fm(font());
-    int cwidth=fm.charWidth("X",0);
+    int cwidth=fm.horizontalAdvance(QChar('X'));
     setColumnWidth(0, 15 * cwidth * dpiXFactor);
 }
 

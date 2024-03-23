@@ -19,7 +19,6 @@
 #include "Context.h"
 #include "Athlete.h"
 #include "MainWindow.h"
-#include "NewMainWindow.h"
 #include "Settings.h"
 #include "CloudService.h"
 #include "TrainDB.h"
@@ -28,14 +27,11 @@
 #include "IdleTimer.h"
 #include "PowerProfile.h"
 #include "GcCrashDialog.h" // for versionHTML
+#include "OverviewItems.h"
 
 #include <QApplication>
-#include <QDesktopWidget>
 #include <QtGui>
 #include <QFile>
-#ifndef NOWEBKIT
-#include <QWebSettings>
-#endif
 #include <QMessageBox>
 #include "ChooseCyclistDialog.h"
 #ifdef GC_WANT_HTTP
@@ -52,13 +48,13 @@
 #include <signal.h>
 
 
-#ifdef Q_OS_X11
+#ifdef GC_WANT_X11
 #include <X11/Xlib.h>
 #endif
 
-#if QT_VERSION > 0x050000
 #include <QStandardPaths>
-#endif
+
+#include <gsl/gsl_errno.h>
 
 //
 // bootstrap state
@@ -72,7 +68,6 @@ static int gc_opened=0;
 //
 QString gcroot;
 QApplication *application;
-QDesktopWidget *desktop = NULL;
 
 #ifdef GC_WANT_HTTP
 #include "APIWebService.h"
@@ -115,14 +110,10 @@ void terminate(int code)
 // redirect logging
 //
 #ifdef GC_WANT_HTTP
-#if QT_VERSION > 0x50000
 void myMessageOutput(QtMsgType type, const QMessageLogContext &, const QString &string)
  {
-    const char *msg = string.toLocal8Bit().constData();
-#else
-void myMessageOutput(QtMsgType type, const char *msg)
- {
-#endif
+    QByteArray ba = string.toLocal8Bit();
+    const char *msg = ba.constData();
      //in this function, you can write the message to any stream!
      switch (type) {
      default: // QtInfoMsg from 5.5 would arrive here
@@ -147,24 +138,62 @@ void sigabort(int x)
 }
 #endif
 
-// redirect errors to `home'/goldencheetah.log
-// sadly, no equivalent on Windows
-#ifndef WIN32
-#include "stdio.h"
-#include "unistd.h"
-void nostderr(QString dir)
-{
-    // redirect stderr to a file
-    QFile fp(QString("%1/goldencheetah.log").arg(dir));
-    if (fp.open(QIODevice::WriteOnly|QIODevice::Truncate) == true) {
-        close(STDERR_FILENO);
-        if(dup(fp.handle()) != STDERR_FILENO) fprintf(stderr, "GoldenCheetah: cannot redirect stderr\n");
-        fp.close();
-    } else {
-        fprintf(stderr, "GoldenCheetah: cannot redirect stderr\n");
-    }
-}
+//
+// redirect stderr to `home'/goldencheetah.log or to the file specified with --debug-file
+//
+#include <stdio.h>
+#include <cstdio>
+#include <iostream>
+
+#ifdef WIN32
+#include <windows.h>
+#include <io.h>
+#else
+#include <unistd.h>
 #endif
+
+void nostderr(QString file)
+{
+    int fd;
+    int fd_stderr = 2;
+    FILE *fp;
+
+    // On Windows, stderr is not connected to fd_stderr = 2
+    // freopen seems the only function available to redirect stderr
+    qDebug() << "GoldenCheetah: redirecting log messages (stderr) to file " << file;
+    fp = freopen(file.toLocal8Bit(), "w", stderr);
+    if (fp == NULL) {
+        qDebug() << "GoldenCheetah: cannot redirect stderr, unable to open file " << file;
+        return;
+    }
+
+    fd = fileno(stderr); 
+    if (fd < 0) {
+        qDebug() << "GoldenCheetah: invalid handle obtained from stderr " << fd;
+        return;
+    }
+
+    // We redirect fd_stderr to this new file with dup2(), in case some libraries write fd_stderr.
+    // Normally we would close fd right after it is duplicated, but not in this case.
+    // Indeed stderr still uses fd. Both fd and fd_stderr may be used interchangeably after dup2().
+    int ret = dup2(fd, fd_stderr);
+    if (ret < 0) {
+        qDebug() << "Goldencheetah: cannot redirect STDERR_FILENO, dup2 failed with return value " << ret;
+        return;
+    }
+
+    // Synchronize cerr with the new stderr
+    std::ios::sync_with_stdio();
+
+#ifdef WIN32
+    // Redirect STD_ERROR_HANDLE to the new file   
+    HANDLE fileHandle = (HANDLE)_get_osfhandle(fd_stderr);
+    if(fileHandle == INVALID_HANDLE_VALUE) qDebug() << "GoldenCheetah: cannot get Win32 HANDLE for stderr";
+    
+    bool res = SetStdHandle(STD_ERROR_HANDLE, fileHandle);
+    if (!res) qDebug() << "GoldenCheetah: cannot redirect STD_ERROR_HANDLE";
+#endif
+}
 
 //
 // By default will open last athlete, but will also provide
@@ -180,6 +209,19 @@ int
 main(int argc, char *argv[])
 {
     int ret=2; // return code from qapplication, default to error
+
+#ifdef Q_OS_WIN
+    // On Windows without console, we try to attach to the parent's console
+    // and redirect stderr and stdout on success, to have a more Unix-like
+    // behavior when launched from cmd or PowerShell.
+    if (_fileno(stderr) == -2 && AttachConsole(ATTACH_PARENT_PROCESS )) {
+        freopen("CONOUT$", "w", stderr);
+        freopen("CONOUT$", "w", stdout);
+    }
+#if QT_VERSION < 0x060000
+    bool angle=true;
+#endif
+#endif
 
     //
     // PROCESS COMMAND LINE SWITCHES
@@ -197,16 +239,26 @@ main(int argc, char *argv[])
 #endif
 #ifdef GC_DEBUG
     bool debug = true;
+    QString debugFormat = QString("[%{time h:mm:ss.zzz}] %{type}: %{message} (%{file}:%{line})");
 #else
     bool debug = false;
+    QString debugFormat = QString("[%{time h:mm:ss.zzz}] %{type}: %{message}");
 #endif
+
+    // By default, print messages from all categories, but not those from
+    // specialised categories like qt.* or gc.* which can be quite verbose
+    QString debugRules = QString("*.debug=true;gc.*.debug=false;qt.*.debug=false");
+    QString debugFile = QString();
+
     bool server = false;
     nogui = false;
     bool help = false;
-    bool newgui = false;
 
     // honour command line switches
-    foreach (QString arg, sargs) {
+    QString arg;
+    for(int i = 0; i < sargs.length();) {
+        arg = sargs[i];
+        i++;
 
         // help, usage or version requested, basic information
         if (arg == "--help" || arg == "--usage" || arg == "--version") {
@@ -222,7 +274,6 @@ main(int argc, char *argv[])
             fprintf(stderr, "usage: GoldenCheetah [[directory] athlete]\n\n");
             fprintf(stderr, "--help or --usage   to print this message and exit\n");
             fprintf(stderr, "--version           to print detailed version information and exit\n");
-            fprintf(stderr, "--newgui            to open the new gui (WIP)\n");
 #ifdef GC_WANT_HTTP
             fprintf(stderr, "--server            to run as an API server\n");
 #endif
@@ -231,6 +282,10 @@ main(int argc, char *argv[])
 #else
             fprintf(stderr, "--debug             to direct diagnostic messages to the terminal instead of goldencheetah.log\n");
 #endif
+            fprintf(stderr, "--debug-file file   to direct diagnostic messages to file\n");
+            fprintf(stderr, "--debug-rules \"rules\" to specify which diagnostic messages to output, using the same syntax as QT_LOGGING_RULES\n");
+            fprintf(stderr, "--debug-format \"format\" to specify the format of diagnostic messages, using the same syntax as QT_MESSAGE_PATTERN\n");
+
 #ifdef GC_HAS_CLOUD_DB
             fprintf(stderr, "--clouddbcurator    to add CloudDB curator specific functions to the menus\n");
 #endif
@@ -239,6 +294,11 @@ main(int argc, char *argv[])
 #endif
 #ifdef GC_WANT_R
             fprintf(stderr, "--no-r              to disable R startup\n");
+#endif
+#ifdef Q_OS_WIN
+#if QT_VERSION < 0x060000
+            fprintf(stderr, "--no-angle          to disable ANGLE rendering\n");
+#endif
 #endif
             fprintf (stderr, "\nSpecify the folder and/or athlete to open on startup\n");
             fprintf(stderr, "If no parameters are passed it will reopen the last athlete.\n\n");
@@ -252,9 +312,6 @@ main(int argc, char *argv[])
             QByteArray ba = text.toLocal8Bit();
             const char *c_str = ba.data();
             fprintf(stderr, "\n%s\n\n", c_str);
-
-        } else if (arg == "--newgui") {
-            newgui = true;
 
         } else if (arg == "--server") {
 #ifdef GC_WANT_HTTP
@@ -282,12 +339,27 @@ main(int argc, char *argv[])
 #else
             debug = true;
 #endif
+        } else if (arg == "--debug-file" && i < sargs.length()) {
+            debugFile = QString(sargs[i]);
+            i++;
+        } else if (arg == "--debug-format" && i < sargs.length()) {
+            debugFormat = QString(sargs[i]);
+            i++;
+        } else if (arg == "--debug-rules" && i < sargs.length()) {
+            debugRules = QString(sargs[i]);
+            i++;
         } else if (arg == "--clouddbcurator") {
 #ifdef GC_HAS_CLOUD_DB
             CloudDBCommon::addCuratorFeatures = true;
 #else
             fprintf(stderr, "CloudDB support not compiled in, exiting.\n");
             exit(1);
+#endif
+#ifdef Q_OS_WIN
+#if QT_VERSION < 0x060000
+        } else if (arg == "--no-angle") {
+            angle = false;
+#endif
 #endif
         } else {
 
@@ -323,17 +395,8 @@ main(int argc, char *argv[])
     listener = NULL;
 #endif
 
-#ifdef Q_OS_X11
+#ifdef GC_WANT_X11
     XInitThreads();
-#endif
-
-#ifdef Q_OS_MACX
-    if ( QSysInfo::MacintoshVersion > QSysInfo::MV_10_8 )
-    {
-        // fix Mac OS X 10.9 (mavericks) font issue
-        // https://bugreports.qt-project.org/browse/QTBUG-32789
-        QFont::insertSubstitution("LucidaGrande", "Lucida Grande");
-    }
 #endif
 
 #ifdef GC_WANT_R
@@ -349,91 +412,60 @@ main(int argc, char *argv[])
     unsetenv("QT_SCALE_FACTOR");
 #endif
 
+    // we don't want program aborts when maths routines don't know
+    // what to do. We may add our own error handler later.
+    gsl_set_error_handler_off();
+
+#ifdef Q_OS_WIN
+#if QT_VERSION < 0x060000
+    if (angle) {
+        // windows we use ANGLE for opengl on top of DirectX/Direct3D
+        // it avoids issues with bad graphics drivers
+        QCoreApplication::setAttribute(Qt::AA_UseOpenGLES);
+    }
+#endif
+#endif
+
     // create the application -- only ever ONE regardless of restarts
     application = new QApplication(argc, argv);
+
     //XXXIdleEventFilter idleFilter;
     //XXXapplication->installEventFilter(&idleFilter);
 
     // read defaults
     initPowerProfile();
 
-    // set default colors
-    GCColor::setupColors();
-    appsettings->migrateQSettingsSystem(); // colors must be setup before migration can take place, but reading has to be from the migrated ones
-    GCColor::readConfig();
+    // output colors as configured so we can cut and paste into Colors.cpp
+    // uncomment when developers working on theme colors
+    //GCColor::dumpColors();
 
-    // set defaultfont - may be adjusted below
+    // get defaults in case need them later
+    AppearanceSettings defaults = GSettings::defaultAppearanceSettings();
+
+    // set font family and size
     QFont font;
-    font.fromString(appsettings->value(NULL, GC_FONT_DEFAULT, QFont().toString()).toString());
-    font.setPointSize(11);
+    font.fromString(appsettings->value(NULL, GC_FONT_DEFAULT, defaults.fontfamily).toString());
+    font.setPointSize(defaults.fontpointsize);
 
     // use the default before taking into account screen size
     baseFont = font;
 
-    // hidpi ratios -- single desktop for now
-    desktop = QApplication::desktop();
+    // hidpi ratios
+    dpiXFactor = defaults.xfactor;
+    dpiYFactor = defaults.yfactor;
 
-
-    // since almost all dialogs are sized for a screen resolution
-    // of 1280x1024, to save issues we will scale DIALOGS to the
-    // overall screen estate when supporting HI-DPI. For widgetry
-    // all code needs to be changed to set height based upon font
-    // sizing instead.
-    dpiXFactor = 1.0;
-    dpiYFactor = 1.0;
-
-#if QT_VERSION_MAJOR >= 5
 #ifndef Q_OS_MAC // not needed on a Mac
 
-    // We will set screen ratio factor for sizing when a screen
-    // is greater than the Surface Pro 3 2160x1440, since its a break
-    // point with resolutions above that being devices like the
-    // 2560x1700 chromebook pixel before we get to truly hi-dpi
-    // resolutions like apples MBP retina 2880x1800 up through
-    // UHD, 4k and 5k displays at 3840x2160, 4096x2304 and 5120 x 2160.
-    QRect screenSize = desktop->availableGeometry();
+    application->setStyleSheet(QString("QPushButton { padding-left: %1px; padding-right: %1px; "
+                                       "              padding-top: %2px; padding-bottom: %2px; }"
+                                       "QComboBox   { padding-left: %1px; padding-right: %1px; }")
+                                       .arg(15*dpiXFactor)
+                                       .arg(3*dpiYFactor));
 
-    // if we're running with dpiawareness of 0 the screen resolution
-    // will be expressed taking into account the scaling applied
-    // so for example a 3840x2160 screen will likely be expressed as
-    // being 1920 x 1080 rather than the native resolution
-    if (desktop->screen()->devicePixelRatio() <= 1 && screenSize.width() > 2160) {
-       // we're on a hidpi screen - lets create a multiplier - always use smallest
-       dpiXFactor = screenSize.width() / 1280.0;
-       dpiYFactor = screenSize.height() / 1024.0;
-
-       if (dpiYFactor < dpiXFactor) dpiXFactor = dpiYFactor;
-       else if (dpiXFactor < dpiYFactor) dpiYFactor = dpiXFactor;
-
-       // set default font size -- all others will scale off this
-       // choose a font size that would allow 60 lines of text on screen
-       // we can include the option for the user to set a scaling factor
-       // in settings before we release this in v3.5
-       double height = screenSize.height() / 70;
-
-       // points = height in inches * dpi
-       double pointsize = (height / QApplication::desktop()->logicalDpiY()) * 72;
-       baseFont.setPointSizeF(pointsize);
-
-       // fixup some style issues from QT not adjusting defaults on hidpi displays
-       // initially just pushbutton and combobox spacing...
-       application->setStyleSheet(QString("QPushButton { padding-left: %1px; padding-right: %1px; "
-                                          "              padding-top: %2px; padding-bottom: %2px; }"
-                                          "QComboBox   { padding-left: %1px; padding-right: %1px; }")
-                                          .arg(15*dpiXFactor)
-                                          .arg(3*dpiYFactor));
-
-       //qDebug()<<"geom:"<<QApplication::desktop()->geometry()<<"default font size:"<<pointsize<<"hidpi scaling:"<<dpiXFactor<<"physcial DPI:"<<QApplication::desktop()->physicalDpiX()<<"logical DPI:"<<QApplication::desktop()->logicalDpiX();
-    } else {
-       //qDebug()<<"geom:"<<QApplication::desktop()->geometry()<<"no need for hidpi scaling"<<"physcial DPI:"<<QApplication::desktop()->physicalDpiX()<<"logical DPI:"<<QApplication::desktop()->logicalDpiX();
-    }
-#endif
-#else
-       //qDebug()<<"geom:"<<QApplication::desktop()->geometry()<<"no hidpi support available";
 #endif
 
     // scale up to user scale factor
-    double fontscale = appsettings->value(NULL, GC_FONT_SCALE, 1.0).toDouble();
+    double fontscale = appsettings->value(NULL, GC_FONT_SCALE, defaults.fontscale).toDouble();
     font.setPointSizeF(baseFont.pointSizeF() * fontscale);
 
     // now apply !
@@ -444,6 +476,7 @@ main(int argc, char *argv[])
     appsettings->setValue(GC_FONT_CHARTLABELS, font.toString());
     appsettings->setValue(GC_FONT_DEFAULT_SIZE, font.pointSizeF());
     appsettings->setValue(GC_FONT_CHARTLABELS_SIZE, font.pointSizeF() * 0.8);
+
 
     // what filestores are registered (whilst we refactor)
     //qDebug()<<"Cloud services registered:"<<CloudServiceFactory::instance().serviceNames();
@@ -490,12 +523,8 @@ main(int argc, char *argv[])
 #if defined(Q_OS_MACX)
         QString libraryPath="Library/GoldenCheetah";
 #elif defined(Q_OS_WIN)
-#if QT_VERSION > 0x050000 // windows and qt5
-        QStringList paths=QStandardPaths::standardLocations(QStandardPaths::DataLocation);
+        QStringList paths=QStandardPaths::standardLocations(QStandardPaths::AppLocalDataLocation);
         QString libraryPath = paths.at(0); 
-#else // windows not qt5
-        QString libraryPath=QDesktopServices::storageLocation(QDesktopServices::DataLocation) + "/GoldenCheetah";
-#endif // qt5
 #else // not windows or osx (must be Linux or OpenBSD)
         // Q_OS_LINUX et al
         QString libraryPath=".goldencheetah";
@@ -536,12 +565,11 @@ main(int argc, char *argv[])
         appsettings->initializeQSettingsGlobal(gcroot);
 
 
-        // now redirect stderr
-#ifndef WIN32
-        if (!debug) nostderr(home.canonicalPath());
-#else
-        Q_UNUSED(debug)
-#endif
+        // now redirect stderr and set the log filter and format
+        if (debugFile != QString()) nostderr(debugFile);
+        else if (!debug) nostderr(QString("%1/%2").arg(home.canonicalPath()).arg("goldencheetah.log"));
+        qSetMessagePattern(debugFormat);
+        QLoggingCategory::setFilterRules(debugRules.replace(";", "\n")); // accept ; as separator like QT_LOGGING_RULES
 
         // install QT Translator to enable QT Dialogs translation
         // we may have restarted JUST to get this!
@@ -561,11 +589,25 @@ main(int argc, char *argv[])
             gcTranslator.load(":translations" + translation_file);
         application->installTranslator(&gcTranslator);
 
+        // Now the translator is installed, set default colors with translated names
+        GCColor::setupColors();
+
+        // has a default theme been applied (first run) ?
+        QString powercolor = appsettings->value(NULL, "COLORPOWER", "").toString();
+        if (powercolor == "")  GCColor::applyTheme(defaults.theme);
+
+        // migration
+        appsettings->migrateQSettingsSystem(); // colors must be setup before migration can take place, but reading has to be from the migrated ones
+        GCColor::readConfig();
+
         // Initialize metrics once the translator is installed
         RideMetricFactory::instance().initialize();
 
         // Initialize global registry once the translator is installed
         GcWindowRegistry::initialize();
+
+        // initialize Overview Items once the translator is installed
+        OverviewItemConfig::registerItems();
 
         // initialise the trainDB
         trainDB = new TrainDB(home);
@@ -588,7 +630,7 @@ main(int argc, char *argv[])
             // folder and athlete
             lastOpened = args.at(2);
 
-        } else {
+        } else if (appsettings->value(NULL, GC_OPENLASTATHLETE, true).toBool()) {
 
             // no parameters passed lets open the last athlete we worked with
             lastOpened = appsettings->value(NULL, GC_SETTINGS_LAST);
@@ -619,11 +661,7 @@ main(int argc, char *argv[])
             } else {
                 // switch off warnings if in gui mode
 #ifndef GC_WANT_ALLDEBUG
-#if QT_VERSION > 0x50000
                 qInstallMessageHandler(myMessageOutput);
-#else
-                qInstallMsgHandler(myMessageOutput);
-#endif
 #endif
             }
 
@@ -678,7 +716,7 @@ main(int argc, char *argv[])
 
         // lets attempt to open as asked/remembered
         bool anyOpened = false;
-        if (lastOpened != QVariant() && !newgui) {
+        if (lastOpened != QVariant()) {
             QStringList list = lastOpened.toStringList();
             QStringListIterator i(list);
             while (i.hasNext()) {
@@ -705,7 +743,7 @@ main(int argc, char *argv[])
         // ack, didn't manage to open an athlete
         // and the upgradeWarning was
         // lets ask the user which / create a new one
-        if (!anyOpened && !newgui) {
+        if (!anyOpened) {
             ChooseCyclistDialog d(home, true);
             d.setModal(true);
 
@@ -737,12 +775,6 @@ main(int argc, char *argv[])
             }
         }
 
-        // start with the new gui, a prototype in progress
-        if (newgui) {
-            NewMainWindow *newgui = new NewMainWindow(application);
-            newgui->show();
-        }
-
         ret=application->exec();
 
         // close trainDB
@@ -750,11 +782,6 @@ main(int argc, char *argv[])
 
         // reset QSettings (global & Athlete)
         appsettings->clearGlobalAndAthletes();
-
-#ifndef NOWEBKIT
-        // clear web caches (stop warning of WebKit leaks)
-        QWebSettings::clearMemoryCaches();
-#endif
 
     } while (restarting);
 

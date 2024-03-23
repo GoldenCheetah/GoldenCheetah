@@ -9,9 +9,9 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>3.5.0</string>
+	<string>3.6.0</string>
 	<key>CFBundleVersion</key>
-	<string>3.5.0</string>
+	<string>3.6.0</string>
 	<key>CFBundleSignature</key>
 	<string>@TYPEINFO@</string>
 	<key>CFBundleExecutable</key>
@@ -20,5 +20,9 @@
 	<string>@BUNDLEIDENTIFIER@</string>
 	<key>NSSupportsAutomaticGraphicsSwitching</key>
 	<true/>
+	<key>NSBluetoothPeripheralUsageDescription</key>
+	<string>Used to connect to BTLE sensors in Train</string>
+	<key>NSBluetoothAlwaysUsageDescription</key>
+	<string>Used to connect to BTLE sensors in Train</string>
 </dict>
 </plist>

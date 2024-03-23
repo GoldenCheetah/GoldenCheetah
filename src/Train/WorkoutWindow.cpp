@@ -20,16 +20,120 @@
 #include "WorkoutWindow.h"
 #include "WorkoutWidget.h"
 #include "WorkoutWidgetItems.h"
+#include "HelpWhatsThis.h"
 
 static int MINTOOLHEIGHT = 350; // smaller than this, lose the toolbar
 
 WorkoutWindow::WorkoutWindow(Context *context) :
-    GcChartWindow(context), draw(true), context(context), active(false), recording(false)
+    GcChartWindow(context), draw(true), context(context), active(false), recording(false),
+    plotHr(true),
+    plotPwr(true),
+    plotCadence(true),
+    plotWbal(true),
+    plotVo2(true),
+    plotVentilation(true),
+    plotSpeed(true),
+    plotHrAvg(1),
+    plotPwrAvg(1),
+    plotCadenceAvg(1),
+    plotVo2Avg(1),
+    plotVentilationAvg(1),
+    plotSpeedAvg(1)
 {
+    HelpWhatsThis *helpContents = new HelpWhatsThis(this);
+    this->setWhatsThis(helpContents->getWhatsThisText(HelpWhatsThis::ChartTrain_WorkoutEditor));
+
     setContentsMargins(0,0,0,0);
     setProperty("color", GColor(CTRAINPLOTBACKGROUND));
 
-    setControls(NULL);
+    //
+    // Chart settings
+    //
+
+    QWidget *settingsWidget = new QWidget(this);
+    HelpWhatsThis *helpConfig = new HelpWhatsThis(settingsWidget);
+    settingsWidget->setWhatsThis(helpConfig->getWhatsThisText(HelpWhatsThis::ChartTrain_WorkoutEditor));
+    settingsWidget->setContentsMargins(0,0,0,0);
+
+    QGridLayout *gridLayout = new QGridLayout(settingsWidget);
+
+
+    plotHrCB = new QCheckBox();
+    plotPwrCB = new QCheckBox();
+    plotCadenceCB = new QCheckBox();
+    plotWbalCB = new QCheckBox();
+    plotVo2CB = new QCheckBox();
+    plotVentilationCB = new QCheckBox();
+    plotSpeedCB = new QCheckBox();
+
+    plotHrSB = new QSpinBox(); plotHrSB->setMinimum(1);
+    plotPwrSB = new QSpinBox(); plotPwrSB->setMinimum(1);
+    plotCadenceSB = new QSpinBox(); plotCadenceSB->setMinimum(1);
+    plotVo2SB = new QSpinBox(); plotVo2SB->setMinimum(1);
+    plotVentilationSB = new QSpinBox(); plotVentilationSB->setMinimum(1);
+    plotSpeedSB = new QSpinBox(); plotSpeedSB->setMinimum(1);
+
+    plotHrCB->setCheckState(plotHr ? Qt::Checked : Qt::Unchecked);
+    plotPwrCB->setCheckState(plotPwr ? Qt::Checked : Qt::Unchecked);
+    plotCadenceCB->setCheckState(plotCadence ? Qt::Checked : Qt::Unchecked);
+    plotWbalCB->setCheckState(plotWbal ? Qt::Checked : Qt::Unchecked);
+    plotVo2CB->setCheckState(plotVo2 ? Qt::Checked : Qt::Unchecked);
+    plotVentilationCB->setCheckState(plotVentilation ? Qt::Checked : Qt::Unchecked);
+    plotSpeedCB->setCheckState(plotSpeed ? Qt::Checked : Qt::Unchecked);
+
+    connect(plotHrCB, SIGNAL(stateChanged(int)), this, SLOT(plotHrChanged(int)));
+    connect(plotPwrCB, SIGNAL(stateChanged(int)), this, SLOT(plotPwrChanged(int)));
+    connect(plotCadenceCB, SIGNAL(stateChanged(int)), this, SLOT(plotCadenceChanged(int)));
+    connect(plotWbalCB, SIGNAL(stateChanged(int)), this, SLOT(plotWbalChanged(int)));
+    connect(plotVo2CB, SIGNAL(stateChanged(int)), this, SLOT(plotVo2Changed(int)));
+    connect(plotVentilationCB, SIGNAL(stateChanged(int)), this, SLOT(plotVentilationChanged(int)));
+    connect(plotSpeedCB, SIGNAL(stateChanged(int)), this, SLOT(plotSpeedChanged(int)));
+
+    connect(plotHrSB, SIGNAL(valueChanged(int)), this, SLOT(plotHrAvgChanged(int)));
+    connect(plotPwrSB, SIGNAL(valueChanged(int)), this, SLOT(plotPwrAvgChanged(int)));
+    connect(plotCadenceSB, SIGNAL(valueChanged(int)), this, SLOT(plotCadenceAvgChanged(int)));
+    connect(plotVo2SB, SIGNAL(valueChanged(int)), this, SLOT(plotVo2AvgChanged(int)));
+    connect(plotVentilationSB, SIGNAL(valueChanged(int)), this, SLOT(plotVentilationAvgChanged(int)));
+    connect(plotSpeedSB, SIGNAL(valueChanged(int)), this, SLOT(plotSpeedAvgChanged(int)));
+
+
+    int row = 0;
+    gridLayout->addWidget(new QLabel(tr("Show Heartrate")),row,0);
+    gridLayout->addWidget(plotHrCB,row,1);
+    gridLayout->addWidget(new QLabel(tr("Seconds to average")),row,2);
+    gridLayout->addWidget(plotHrSB,row++,3);
+
+    gridLayout->addWidget(new QLabel(tr("Show Power")),row,0);
+    gridLayout->addWidget(plotPwrCB,row,1);
+    gridLayout->addWidget(new QLabel(tr("Seconds to average")),row,2);
+    gridLayout->addWidget(plotPwrSB,row++,3);
+
+    gridLayout->addWidget(new QLabel(tr("Show Cadence")),row,0);
+    gridLayout->addWidget(plotCadenceCB,row,1);
+    gridLayout->addWidget(new QLabel(tr("Seconds to average")),row,2);
+    gridLayout->addWidget(plotCadenceSB,row++,3);
+
+    gridLayout->addWidget(new QLabel(tr("Show VO2")),row,0);
+    gridLayout->addWidget(plotVo2CB,row,1);
+    gridLayout->addWidget(new QLabel(tr("Seconds to average")),row,2);
+    gridLayout->addWidget(plotVo2SB,row++,3);
+
+    gridLayout->addWidget(new QLabel(tr("Show Ventilation")),row,0);
+    gridLayout->addWidget(plotVentilationCB,row,1);
+    gridLayout->addWidget(new QLabel(tr("Seconds to average")),row,2);
+    gridLayout->addWidget(plotVentilationSB,row++,3);
+
+    gridLayout->addWidget(new QLabel(tr("Show Speed")),row,0);
+    gridLayout->addWidget(plotSpeedCB,row,1);
+    gridLayout->addWidget(new QLabel(tr("Seconds to average")),row,2);
+    gridLayout->addWidget(plotSpeedSB,row++,3);
+
+    gridLayout->addWidget(new QLabel(tr("Show WBal")),row,0);
+    gridLayout->addWidget(plotWbalCB,row++,1);
+    gridLayout->addItem(new QSpacerItem(1,1,QSizePolicy::Preferred,QSizePolicy::Expanding),row,0);
+
+
+    setControls(settingsWidget);
     ergFile = NULL;
 
     QVBoxLayout *main = new QVBoxLayout;
@@ -258,7 +362,7 @@ WorkoutWindow::configChanged(qint32)
     xlabel->setFixedWidth(fm.boundingRect(" 00:00:00 ").width());
     ylabel->setFixedWidth(fm.boundingRect(" 1000w ").width());
 
-    scroll->setStyleSheet(TabView::ourStyleSheet());
+    scroll->setStyleSheet(AbstractView::ourStyleSheet());
     toolbar->setStyleSheet(QString("::enabled { background: %1; color: %2; border: 0px; } ")
                            .arg(GColor(CTRAINPLOTBACKGROUND).name())
                            .arg(GCColor::invertColor(GColor(CTRAINPLOTBACKGROUND)).name()));
@@ -276,7 +380,6 @@ WorkoutWindow::configChanged(qint32)
     // text edit colors
     QPalette palette;
     palette.setColor(QPalette::Window, GColor(CTRAINPLOTBACKGROUND));
-    palette.setColor(QPalette::Background, GColor(CTRAINPLOTBACKGROUND));
 
     // only change base if moved away from white plots
     // which is a Mac thing
@@ -290,7 +393,7 @@ WorkoutWindow::configChanged(qint32)
     }
 
 #ifndef Q_OS_MAC // the scrollers appear when needed on Mac, we'll keep that
-    code->setStyleSheet(TabView::ourStyleSheet());
+    code->setStyleSheet(AbstractView::ourStyleSheet());
 #endif
 
     palette.setColor(QPalette::WindowText, GCColor::invertColor(GColor(CTRAINPLOTBACKGROUND)));
@@ -433,7 +536,7 @@ WorkoutWindow::saveAs()
 {
     QString filename = QFileDialog::getSaveFileName(this, tr("Save Workout File"),
                                                     appsettings->value(this, GC_WORKOUTDIR, "").toString(),
-                                                    "ERG workout (*.erg);;Zwift workout (*.zwo)");
+                                                    "ERG workout (*.erg);;MRC workout (*.mrc);;Zwift workout (*.zwo)");
 
     // if they didn't select, give up.
     if (filename.isEmpty()) {
@@ -441,7 +544,7 @@ WorkoutWindow::saveAs()
     }
 
     // filetype defaults to .erg
-    if(!filename.endsWith(".erg") && !filename.endsWith(".zwo")) {
+    if(!filename.endsWith(".erg") && !filename.endsWith(".mrc") && !filename.endsWith(".zwo")) {
         filename.append(".erg");
     }
 
@@ -536,4 +639,88 @@ WorkoutWindow::stop()
     recording = false;
     if (height() > MINTOOLHEIGHT) toolbar->show();
     workout->stop();
+}
+
+void
+WorkoutWindow::plotHrChanged(int value)
+{
+    plotHr = (value != Qt::Unchecked);
+}
+
+void
+WorkoutWindow::plotPwrChanged(int value)
+{
+    plotPwr = (value != Qt::Unchecked);
+}
+
+void
+WorkoutWindow::plotCadenceChanged(int value)
+{
+    plotCadence = (value != Qt::Unchecked);
+}
+
+void
+WorkoutWindow::plotWbalChanged(int value)
+{
+    plotWbal = (value != Qt::Unchecked);
+}
+
+void
+WorkoutWindow::plotVo2Changed(int value)
+{
+    plotVo2 = (value != Qt::Unchecked);
+}
+
+void
+WorkoutWindow::plotVentilationChanged(int value)
+{
+    plotVentilation = (value != Qt::Unchecked);
+}
+
+void
+WorkoutWindow::plotSpeedChanged(int value)
+{
+    plotSpeed = (value != Qt::Unchecked);
+}
+
+void
+WorkoutWindow::plotHrAvgChanged(int value)
+{
+    plotHrAvg = value;
+    workout->hrAvg.clear();
+}
+
+void
+WorkoutWindow::plotPwrAvgChanged(int value)
+{
+    plotPwrAvg = value;
+    workout->pwrAvg.clear();
+}
+
+void
+WorkoutWindow::plotCadenceAvgChanged(int value)
+{
+    plotCadenceAvg = value;
+    workout->cadenceAvg.clear();
+}
+
+void
+WorkoutWindow::plotVo2AvgChanged(int value)
+{
+    plotVo2Avg = value;
+    workout->vo2Avg.clear();
+}
+
+void
+WorkoutWindow::plotVentilationAvgChanged(int value)
+{
+    plotVentilationAvg = value;
+    workout->ventilationAvg.clear();
+}
+
+void
+WorkoutWindow::plotSpeedAvgChanged(int value)
+{
+    plotSpeedAvg = value;
+    workout->speedAvg.clear();
 }

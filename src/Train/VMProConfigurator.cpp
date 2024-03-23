@@ -24,7 +24,7 @@ void VMProConfigurator::setupCharNotifications(QLowEnergyService * service)
     connect(m_service, SIGNAL(characteristicChanged(QLowEnergyCharacteristic,QByteArray)),
             this, SLOT(onDeviceReply(QLowEnergyCharacteristic,QByteArray)));
 
-    const QLowEnergyDescriptor notificationDesc = m_comOutChar.descriptor(QBluetoothUuid::ClientCharacteristicConfiguration);
+    const QLowEnergyDescriptor notificationDesc = m_comOutChar.descriptor(QBluetoothUuid::DescriptorType::ClientCharacteristicConfiguration);
     if (notificationDesc.isValid()) {
         m_service->writeDescriptor(notificationDesc, QByteArray::fromHex("0100"));
     }
@@ -292,5 +292,16 @@ QString VMProErrorToStringHelper::errorDescription(int errorCode)
     case (DiagnosticErrorOffset + 16):
     default:
         return tr("Error Code: %1").arg(errorCode);
+    }
+}
+
+void VMProConfigurator::startCalibration()
+{
+    if (m_comInChar.isValid())
+    {
+        QByteArray cmd;
+        cmd.append(VM_BLE_SET_STATE);
+        cmd.append(VM_STATE_CALIB);
+        m_service->writeCharacteristic(m_comInChar, cmd);
     }
 }

@@ -35,7 +35,7 @@ BlankStatePage::BlankStatePage(Context *context) : GcWindow(context), context(co
     homeLayout->addSpacing(20); // left margin
     setAutoFillBackground(true);
     setProperty("color", QColor(Qt::white));
-    setProperty("nomenu", true);
+    showMore(false);
 
     // left part
     QWidget *left = new QWidget(this);

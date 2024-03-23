@@ -1,0 +1,83 @@
+/*!
+  \page curvescreenshots Curve Plots
+
+  <table border="0" cellspacing="20">
+    <tr>
+       <td> \image html bode-blue-600x400.png
+       <td> \image html bode-rosy-600x400.png
+    </tr>
+    <tr>
+       <td> \image html cpuplot-600x400.png
+       <td> \image html scatterplot-600x400.png
+    </tr>
+    <tr>
+       <td> \image html cpuplot-oily-600x400.png
+       <td> \image html curves.png
+    </tr>
+    <tr>
+       <td> \image html friedberg-tube-600x400.png
+       <td> \image html friedberg-bars-600x400.png
+    </tr>
+  </table>
+
+  \page spectrogramscreenshots Spectrogram, Contour Plot
+
+  <table border="0" cellspacing="20">
+    <tr>
+       <td> \image html spectrogram-rgb-600x400.png
+       <td> \image html spectrogram-hue-600x400.png
+    </tr>
+    <tr>
+       <td> \image html spectrogram-value-600x400.png
+       <td> \image html spectrogram-saturation-600x400.png
+    </tr>
+    <tr>
+       <td> \image html spectrogram-contour1-600x400.png
+       <td> \image html spectrogram-contour2-600x400.png
+    </tr>
+  </table>
+
+  \page barchartscreenshots Bar Charts, Histograms
+  <table border="0" cellspacing="20">
+    <tr>
+       <td> \image html distrowatch-600x400.png
+       <td> \image html tvplot-600x400.png
+    </tr>
+    <tr>
+       <td> \image html barchart-grouped-600x400.png
+       <td> \image html barchart-stacked-600x400.png
+    </tr>
+  </table>
+
+  \page otherscreenshots Other Plots
+  <table border="0" cellspacing="20">
+    <tr>
+       <td> \image html scatterplot-600x400.png
+       <td> \image html itemeditor-600x400.png
+    </tr>
+    <tr>
+       <td> \image html stockchart-600x400.png
+    </tr>
+  </table>
+
+  \page controlscreenshots Dials, Compasses, Knobs, Wheels, Sliders, Thermos
+
+  <table border="0" cellspacing="20">
+    <tr>
+       <td> \image html radio.png
+    </tr>
+    <tr>
+       <td> \image html sliders.png
+    </tr>
+    <tr>
+       <td> \image html sysinfo.png
+    </tr>
+    <tr>
+       <td> \image html dials1.png
+    </tr>
+    <tr>
+       <td> \image html dials2.png
+    </tr>
+  </table>
+
+*/

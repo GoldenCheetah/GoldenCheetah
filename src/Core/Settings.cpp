@@ -24,6 +24,8 @@
 #include <QSettings>
 #include <QDebug>
 
+#include <QFontDatabase>
+
 #ifdef Q_OS_MAC
 int OperatingSystem = OSX;
 #elif defined Q_OS_WIN32
@@ -33,6 +35,8 @@ int OperatingSystem = LINUX;
 #elif defined Q_OS_OPENBSD
 int OperatingSystem = OPENBSD;
 #endif
+
+double scalefactors[13] = { 0.5f, 0.6f, 0.8, 0.9, 1.0f, 1.1f, 1.25f, 1.5f, 2.0f, 2.5f, 3.0f, 5.0f, 0 };
 
 // -------------- Initializer for the "extern" variable "appsettings" ----------------//
 
@@ -93,7 +97,7 @@ static QString DetermineKey(QString & key, int& store, int& fileIndex) {
     }
 
     // and make sure <> text is removed
-    return key.remove(QRegExp("^<.*>"));
+    return key.remove(QRegularExpression("^<.*>"));
 
 }
 
@@ -136,7 +140,7 @@ GSettings::value(const QObject * /*me*/, const QString key, const QVariant def) 
         }
 
     } else {
-        keyVar.remove(QRegExp("^<.*>"));
+        keyVar.remove(QRegularExpression("^<.*>"));
         return systemsettings->value(keyVar, def);
     }
     return QVariant();
@@ -163,7 +167,7 @@ GSettings::setValue(QString key, QVariant value)
 
         }
     } else {
-        keyVar.remove(QRegExp("^<.*>"));
+        keyVar.remove(QRegularExpression("^<.*>"));
         systemsettings->setValue(keyVar, value);
     }
 
@@ -199,7 +203,7 @@ GSettings::cvalue(QString athleteName, QString key, QVariant def) {
         }
 
     } else {
-        keyVar.remove(QRegExp("^<.*>"));
+        keyVar.remove(QRegularExpression("^<.*>"));
         return systemsettings->value(athleteName+"/"+keyVar, def);
     }
     return QVariant();
@@ -227,7 +231,7 @@ GSettings::setCValue(QString athleteName, QString key, QVariant value) {
             }
         } // if we do have have the athlete - then we do not store anything
     } else {
-        keyVar.remove(QRegExp("^<.*>"));
+        keyVar.remove(QRegularExpression("^<.*>"));
         systemsettings->setValue(athleteName + "/" + keyVar,value);
 
     }
@@ -301,7 +305,7 @@ GSettings::contains(const QString & key) const {
             break;
         }
     } else {
-        keyVar.remove(QRegExp("^<.*>"));
+        keyVar.remove(QRegularExpression("^<.*>"));
         return systemsettings->contains(keyVar);
     }
     return false;
@@ -314,7 +318,6 @@ GSettings::migrateQSettingsSystem() {
 
     // do the migration for the System Settings - if not yet done
     // - System is only migrated once per PC (since it only exists once
-    // on MAC GC_CHROME is already set previously - so migrate anyway
 
     bool migrateMac = false;
     QStringList currentKeys = systemsettings->allKeys();
@@ -471,7 +474,7 @@ void
 GSettings::migrateValue(QString key) {
 
     QString oldKey = key;
-    oldKey.remove(QRegExp("^<.*>"));
+    oldKey.remove(QRegularExpression("^<.*>"));
     if (oldsystemsettings->contains(oldKey)) {
         setValue(key, oldsystemsettings->value(oldKey));
     }
@@ -481,7 +484,7 @@ void
 GSettings::migrateCValue(QString athlete, QString key) {
 
     QString oldKey = key;
-    oldKey.remove(QRegExp("^<.*>"));
+    oldKey.remove(QRegularExpression("^<.*>"));
     if (oldsystemsettings->contains(athlete+"/"+oldKey)) {
         setCValue(athlete, key, oldsystemsettings->value(athlete+"/"+oldKey));
     }
@@ -490,7 +493,7 @@ GSettings::migrateCValue(QString athlete, QString key) {
 void
 GSettings::migrateAndRenameCValue(QString athlete, QString wrongKey, QString key) {
 
-    wrongKey.remove(QRegExp("^<.*>"));
+    wrongKey.remove(QRegularExpression("^<.*>"));
     if (oldsystemsettings->contains(athlete+"/"+wrongKey)) {
         setCValue(athlete, key, oldsystemsettings->value(athlete+"/"+wrongKey));
     }
@@ -500,7 +503,7 @@ void
 GSettings::migrateValueToCValue(QString athlete, QString key) {
 
     QString oldKey = key;
-    oldKey.remove(QRegExp("^<.*>"));
+    oldKey.remove(QRegularExpression("^<.*>"));
     if (oldsystemsettings->contains(oldKey)) {
         setCValue(athlete, key, oldsystemsettings->value(oldKey));
     }
@@ -512,7 +515,7 @@ GSettings::migrateCValueToValue(QString athlete, QString key) {
     // only migrate if the value does not yet exist on the target INI file
     if (!contains(key)) {
         QString oldKey = key;
-        oldKey.remove(QRegExp("^<.*>"));
+        oldKey.remove(QRegularExpression("^<.*>"));
         oldKey = athlete+"/"+oldKey;
         if (oldsystemsettings->contains(oldKey)) {
             setValue(key, oldsystemsettings->value(oldKey));
@@ -556,9 +559,6 @@ GSettings::upgradeSystem() {
         QString key = QString(colorIterator.next().data());
         migrateValue(key);
     }
-    migrateValue(GC_CHROME);
-
-
 }
 
 void
@@ -568,11 +568,7 @@ GSettings::upgradeGlobal() {
     // only the properties still in use are migrated - and not any orphans for previous releases
 
     // NOTE: Migrating values is only required for settings introduced in GC version until v3.3
-
-
-    migrateValue(GC_SETTINGS_SUMMARY_METRICS);
-    migrateValue(GC_SETTINGS_BESTS_METRICS);
-    migrateValue(GC_SETTINGS_INTERVAL_METRICS);
+    migrateValue(GC_SETTINGS_FAVOURITE_METRICS);
     migrateValue(GC_TABBAR);
     migrateValue(GC_WBALFORM);
     migrateValue(GC_BIKESCOREDAYS);
@@ -618,7 +614,7 @@ GSettings::upgradeGlobal() {
     // handle the Device configuration
     migrateValue(GC_DEV_COUNT);
     QString devCountKey = GC_DEV_COUNT;
-    devCountKey.remove(QRegExp("^<.*>"));
+    devCountKey.remove(QRegularExpression("^<.*>"));
     QVariant configVal = oldsystemsettings->value(devCountKey);
     int devicecount;
     if (configVal.isNull()) {
@@ -636,8 +632,6 @@ GSettings::upgradeGlobal() {
         configStr = QString("%1%2").arg(GC_DEV_SPEC).arg(i+1);
         migrateValue(configStr);
         configStr = QString("%1%2").arg(GC_DEV_PROF).arg(i+1);
-        migrateValue(configStr);
-        configStr = QString("%1%2").arg(GC_DEV_DEF).arg(i+1);
         migrateValue(configStr);
         configStr = QString("%1%2").arg(GC_DEV_VIRTUAL).arg(i+1);
         migrateValue(configStr);
@@ -711,8 +705,6 @@ GSettings::upgradeAthlete(QString athlete) {
     migrateCValue(athlete, GC_DVUSER);
     migrateCValue(athlete, GC_DVPASS);
     migrateCValue(athlete, GC_DVCALDAVTYPE);
-    migrateCValue(athlete, GC_DVGOOGLE_CALID);
-    migrateCValue(athlete, GC_GOOGLE_CALENDAR_REFRESH_TOKEN);
     migrateCValue(athlete, GC_STRAVA_TOKEN);
     migrateCValue(athlete, GC_CYCLINGANALYTICS_TOKEN);
 
@@ -722,6 +714,147 @@ GSettings::upgradeAthlete(QString athlete) {
 
 }
 
+static QString fontfamilyfallback[] = {
+#ifdef Q_OS_LINUX
+    // try pretty fonts first (you never know)
+    "Noto Sans Display", // google free font
+    "Clear Sans", // intel free font
+    "DejaVu Sans", // gnome free font
+    "Liberation Sans", // red hat free font
+
+    // then distro specific ones
+    "Ubuntu",
+    "Red Hat Display",
+
+#endif
+#ifdef Q_OS_WIN
+    "Segoe UI",
+    "Calibri",
+    "Microsoft Sans Serif",
+#endif
+#ifdef Q_OS_MAC
+    "SF Pro Display",
+    "PT Sans",
+    "Helvetica Neue",
+#endif
+
+    // common fonts
+    "Trebuchet MS",
+    "Helvetica",
+
+    // on all OS these two should exist at a minimum
+    "Verdana",
+    "Arial",
+    NULL
+};
+
+
+// font selection and scaling uses slightly smaller fonts on MacOS
+#ifdef Q_OS_MAC
+#define FONTROWS 48
+#else
+#define FONTROWS 43
+#endif
+
+AppearanceSettings
+GSettings::defaultAppearanceSettings()
+{
+    AppearanceSettings returning;
+
+    // lets get the geometry of the window next
+    // since its used to scale and set other
+    // appearance settings
+    QRect screensize = QApplication::primaryScreen()->availableGeometry();
+
+    // leave 12% of the screen free to the left and right of the main window
+    // and same number of pixels above and below
+    double width = screensize.width() * 0.88;
+    double margin = (screensize.width() - width) / 2.0;
+    returning.windowsize.setWidth(screensize.width() - margin);
+    returning.windowsize.setHeight(screensize.height() - margin);
+    returning.windowsize.setX(margin);
+    returning.windowsize.setY(margin);
+
+    // sidebars should be about 20% of width and no more
+    returning.sidebarwidth = returning.windowsize.width() / 5;
+
+    // lets find an appropriate font
+    returning.fontfamily = QFont().toString(); // ultimately fall back to QT default
+    QFontDatabase fontdb;
+    for(int i=0; !fontfamilyfallback[i].isEmpty(); i++) {
+
+        foreach(QString family, fontdb.families()) {
+
+            // is it installed ?
+            if (family == fontfamilyfallback[i]) {
+                returning.fontfamily = fontfamilyfallback[i];
+                goto breakout;
+            }
+        }
+    }
+
+breakout:
+
+    returning.fontpointsize = 11; // default
+
+    // scaling only applies on hidpi displays
+    returning.fontscale = 1.0;
+    returning.fontscaleindex = 4;
+    returning.xfactor = 1.0;
+    returning.yfactor = 1.0;
+
+    // dpiXFactor and dpiYFactor are used to scale across the code
+    // typically to increase the size of widgets but also some other
+    // graphical elements
+    if (QApplication::primaryScreen()->devicePixelRatio() <= 1 && screensize.width() > 2160) {
+       // we're on a hidpi screen - lets create a multiplier - always use smallest
+       returning.xfactor = screensize.width() / 1280.0;
+       returning.yfactor = screensize.height() / 1024.0;
+
+        // always make the same, use smallest scaling when x and y differ
+       if (returning.yfactor < returning.xfactor) returning.xfactor = returning.yfactor;
+       else if (returning.xfactor < returning.yfactor) returning.yfactor = returning.xfactor;
+
+    }
+
+    // we also need to make sure fonts are scaled to be large/small enough
+    // to use the screen estate reasonably- whilst some users will prefer
+    // small fonts, we scale to a size that looks the same on all resolutions
+    // and avoid overly small fonts. Users can of course adjust the scaling
+    // to their own preferences later
+    for (int i=0; scalefactors[i] != 0; i++) {
+
+        QFont font(returning.fontfamily);
+        font.setPointSizeF(returning.fontpointsize * scalefactors[i]);
+        QFontMetricsF metrics(font);
+        double height = metrics.boundingRect("TEST").height();
+
+        if (returning.windowsize.height() / height < FONTROWS) {
+            returning.fontscale = scalefactors[i];
+            returning.fontscaleindex = i;
+            break;
+        }
+    }
+
+    // best settings for UI as now designed
+    returning.theme = 5; // team purple colors
+    returning.antialias = true;
+    returning.scrollbar = true;
+    returning.head = false;
+    returning.sideanalysis = false;
+    returning.sidetrend = false;
+    returning.sidetrain = true;
+
+    // linewidth must be wholly divisible by 0.5
+    // default is historically 2px but 4px is too thick
+    // on hidpi displays typically, so we adjust to 3px
+    returning.linewidth = dpiXFactor > 1 ? 1.5 * dpiXFactor : 2.0;
+    double factor = returning.linewidth / 0.5;
+    factor=qRound(factor);
+    returning.linewidth = 0.5 * factor;
+
+    return returning;
+}
 
 //----------------------------------------------------------------------------------------------//
 

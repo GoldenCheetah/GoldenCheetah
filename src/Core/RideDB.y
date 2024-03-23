@@ -83,32 +83,21 @@ ride: '{' rideelement_list '}'                                  {
                                                                     #endif
                                                                     } else {
 
-                                                                        // we're loading the cache
-                                                                        bool found = false;
-                                                                        foreach(RideItem *i, jc->cache->rides()) {
-                                                                            if (i->fileName == jc->item.fileName) {
+                                                                        double progress= double(jc->loading++) / double(jc->cache->rides().count()) * 100.0f;
+                                                                        if (jc->context->mainWindow->progress) {
 
-                                                                                found = true;
-
-                                                                                // progress update
-                                                                                if (jc->context->mainWindow->progress) {
-
-                                                                                    // percentage progress
-                                                                                    QString m = QString("%1%")
-                                                                                    .arg(double(jc->context->mainWindow->loading++) /
-                                                                                         double(jc->cache->rides().count()) * 100.0f, 0, 'f', 0);
-                                                                                    jc->context->mainWindow->progress->setText(m);
-                                                                                    QApplication::processEvents();
-                                                                                }
-
-                                                                                // update from our loaded value
-                                                                                i->setFrom(jc->item);
-                                                                                break;
-                                                                            }
+                                                                            // percentage progress
+                                                                            QString m = QString("%1%").arg(progress , 0, 'f', 0);
+                                                                            jc->context->mainWindow->progress->setText(m);
+                                                                            QApplication::processEvents();
+                                                                        } else {
+                                                                            jc->context->notifyLoadProgress(jc->folder,progress);
                                                                         }
-                                                                        // not found !
-                                                                        if (found == false)
-                                                                            qDebug()<<"unable to load:"<<jc->item.fileName<<jc->item.dateTime<<jc->item.weight;
+
+                                                                        // find entry and update it
+                                                                        int index=jc->cache->find(&jc->item);
+                                                                        if (index==-1)  qDebug()<<"unable to load:"<<jc->item.fileName<<jc->item.dateTime<<jc->item.weight;
+                                                                        else  jc->cache->rides().at(index)->setFrom(jc->item);
                                                                     }
 
                                                                     // now set our ride item clean again, so we don't
@@ -155,12 +144,14 @@ ride_tuple: string ':' string                                   {
                                                                      else if ($1 == "dbversion") jc->item.dbversion = $3.toInt();
                                                                      else if ($1 == "udbversion") jc->item.udbversion = $3.toInt();
                                                                      else if ($1 == "color") jc->item.color = QColor($3);
+                                                                     else if ($1 == "aero") jc->item.isAero = $3.toInt() ? true: false;
                                                                      else if ($1 == "sport") {
                                                                          jc->item.sport = ($3);
-                                                                         jc->item.isBike=jc->item.isRun=jc->item.isSwim=jc->item.isXtrain=false;
+                                                                         jc->item.isBike=jc->item.isRun=jc->item.isSwim=jc->item.isXtrain=jc->item.isAero=false;
                                                                          if ($3 == "Bike") jc->item.isBike = true;
                                                                          else if ($3 == "Run") jc->item.isRun = true;
                                                                          else if ($3 == "Swim") jc->item.isSwim = true;
+                                                                         else if ($3 == "Aero") jc->item.isAero = true;
                                                                          else jc->item.isXtrain = true;
                                                                      }
                                                                      else if ($1 == "present") jc->item.present = $3;
@@ -344,13 +335,11 @@ RideCache::load()
         QDir plannedDirectory = context->athlete->home->planned();
 
         // ok, lets read it in
-        QTextStream stream(&rideDB);
-        stream.setCodec("UTF-8");
 
         // Read the entire file into a QString -- we avoid using fopen since it
         // doesn't handle foreign characters well. Instead we use QFile and parse
         // from a QString
-        QString contents = stream.readAll();
+        QString contents = QString(rideDB.readAll());
         rideDB.close();
 
         // create scanner context for reentrant parsing
@@ -359,6 +348,8 @@ RideCache::load()
         jc->cache = this;
         jc->api = NULL;
         jc->old = false;
+        jc->loading = 0;
+        jc->folder = context->athlete->home->root().canonicalPath();
 
         // clean item
         jc->item.path = directory.canonicalPath(); // TODO use plannedDirectory for planned
@@ -504,7 +495,9 @@ void RideCache::save(bool opendata, QString filename)
 
         // ok, lets write out the cache
         QTextStream stream(&rideDB);
+#if QT_VERSION < 0x060000
         stream.setCodec("UTF-8");
+#endif
 
         // no BOM needed for opendata as it doesn't contain textual data
         if (!opendata) stream.setGenerateByteOrderMark(true);
@@ -553,6 +546,7 @@ void RideCache::save(bool opendata, QString filename)
                 stream << "\t\t\"color\":\"" <<item->color.name() <<"\",\n";
                 stream << "\t\t\"present\":\"" <<item->present <<"\",\n";
                 stream << "\t\t\"sport\":\"" <<item->sport <<"\",\n";
+                stream << "\t\t\"aero\":\"" << (item->isAero ? "1" : "0") <<"\",\n";
                 stream << "\t\t\"weight\":\"" <<item->weight <<"\",\n";
 
                 if (item->zoneRange >= 0) stream << "\t\t\"zonerange\":\"" <<item->zoneRange <<"\",\n";
@@ -730,7 +724,7 @@ void RideCache::save(bool opendata, QString filename)
                 for (i=item->metadata().constBegin(); i != item->metadata().constEnd(); i++) {
 
                     stream << "\t\t\t\"" << i.key() << "\":\"" << protect(i.value()) << "\"";
-                    if (i+1 != item->metadata().constEnd()) stream << ",\n";
+                    if (std::next(i) != item->metadata().constEnd()) stream << ",\n";
                     else stream << "\n";
                 }
 
@@ -756,7 +750,7 @@ void RideCache::save(bool opendata, QString filename)
                         first=false;
                     }
 
-                    if (i+1 != item->xdata().constEnd()) stream << "],\n";
+                    if (std::next(i) != item->xdata().constEnd()) stream << "],\n";
                     else stream << "]\n";
                 }
 
@@ -922,8 +916,7 @@ APIWebService::listRides(QString athlete, HttpRequest &request, HttpResponse &re
     if (metadata.toUpper() != "NONE" && metadata != "") {
 
         // first lets read in meta config
-        QDir config(home.absolutePath() + "/" + athlete + "/config");
-        QString metaConfig = config.canonicalPath()+"/metadata.xml";
+        QString metaConfig = home.canonicalPath()+"/metadata.xml";
         if (!QFile(metaConfig).exists()) metaConfig = ":/xml/metadata.xml";
 
         // params to readXML - we ignore them
@@ -1003,7 +996,9 @@ APIWebService::listRides(QString athlete, HttpRequest &request, HttpResponse &re
 
             // ok, lets read it in
             QTextStream stream(&rideDB);
+#if QT_VERSION < 0x060000
             stream.setCodec("UTF-8");
+#endif
 
             // Read the entire file into a QString -- we avoid using fopen since it
             // doesn't handle foreign characters well. Instead we use QFile and parse

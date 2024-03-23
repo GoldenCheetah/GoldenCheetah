@@ -22,8 +22,7 @@
 #include "GoldenCheetah.h"
 
 #include "RideMetric.h"
-#include "BodyMeasures.h"
-#include "HrvMeasures.h"
+#include "Measures.h"
 
 #include <QString>
 #include <QMap>
@@ -38,8 +37,6 @@ class IntervalSummaryWindow;
 class Context;
 class UserData;
 class ComparePane;
-
-Q_DECLARE_METATYPE(RideItem*)
 
 class RideItem : public QObject
 {
@@ -97,6 +94,8 @@ class RideItem : public QObject
 
     public:
 
+        bool operator==(RideItem &other) { return other.dateTime == dateTime; }
+
         Context *context; // to notify widgets when date/time changes
         bool isdirty;     // ride data has changed and needs saving
         bool isstale;     // metric data is out of date and needs recomputing
@@ -130,9 +129,21 @@ class RideItem : public QObject
         // as a well formatted string
         QString getStringForSymbol(QString name, bool useMetricUnits=true);
 
+        // add an image to the ride- store it in the media folder and add metadata for it
+        // note that in all cases the return list is the filename only, the location they
+        // are stored is managed here (callers should not implement filepath)
+        bool addImage(QString filename);
+        bool removeImage(QString filename);
+
+        QStringList images() const;
+
+        // these two are path based
+        QStringList imagePaths() const;
+        int importImages(QStringList files);
+
         // access the metadata
-        QString getText(QString name, QString fallback) { return metadata_.value(name, fallback); }
-        bool hasText(QString name) { return metadata_.contains(name); }
+        QString getText(QString name, QString fallback) const;
+        bool hasText(QString name) const;
 
         // get at the first class data
         QString path;
@@ -142,7 +153,7 @@ class RideItem : public QObject
         QColor color;
         bool planned;
         QString sport;
-        bool isBike,isRun,isSwim,isXtrain;
+        bool isBike,isRun,isSwim,isXtrain,isAero;
         bool samples; // has samples data
 
         // which range to use?
@@ -156,7 +167,6 @@ class RideItem : public QObject
         double weight; // what weight was used ?
 
         // access to the cached data !
-        BodyMeasure weightData;
         RideFile *ride(bool open=true);
         RideFileCache *fileCache();
         QVector<double> &metrics() { return metrics_; }
@@ -165,7 +175,7 @@ class RideItem : public QObject
         QMap <int, double>&stdvariances() { return stdvariance_; }
         const QStringList errors() { return errors_; }
         double getWeight(int type=0);
-        double getHrvMeasure(int type=HrvMeasure::RMSSD);
+        double getHrvMeasure(QString fieldSymbol);
         unsigned short getHrvFingerprint();
 
         // when retrieving interval lists we can provide criteria too
@@ -216,10 +226,12 @@ class RideItem : public QObject
 
         // sorting
         bool operator<(RideItem right) const { return dateTime < right.dateTime; }
-        bool operator>(RideItem right) const { return dateTime < right.dateTime; }
 
     private:
         void updateIntervals();
 };
+
+Q_DECLARE_OPAQUE_POINTER(RideItem*);
+Q_DECLARE_METATYPE(RideItem*)
 
 #endif // _GC_RideItem_h

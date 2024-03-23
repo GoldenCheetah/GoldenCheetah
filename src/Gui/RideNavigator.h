@@ -50,6 +50,7 @@ class EditMetricDetailDialog;
 class EditUserDataDialog;
 class EditUserMetricDialog;
 class EditUserSeriesDialog;
+class OverviewItemConfig;
 
 //
 // The RideNavigator
@@ -80,6 +81,7 @@ class RideNavigator : public GcChartWindow
     friend class ::EditUserDataDialog;
     friend class ::EditUserMetricDialog;
     friend class ::EditUserSeriesDialog;
+    friend class ::OverviewItemConfig;
 
     public:
         RideNavigator(Context *, bool mainwindow = false);
@@ -183,6 +185,7 @@ class RideNavigator : public GcChartWindow
         NavigatorCellDelegate *delegate;
         QVBoxLayout *mainLayout;
         RideItem *currentItem;
+        bool hasCalendarText;
 
         // properties
         int _sortByIndex;

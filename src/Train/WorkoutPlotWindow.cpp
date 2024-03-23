@@ -19,10 +19,14 @@
 
 #include "WorkoutPlotWindow.h"
 #include "Context.h"
+#include "HelpWhatsThis.h"
 
 WorkoutPlotWindow::WorkoutPlotWindow(Context *context) :
     GcChartWindow(context), context(context)
 {
+    HelpWhatsThis *helpContents = new HelpWhatsThis(this);
+    this->setWhatsThis(helpContents->getWhatsThisText(HelpWhatsThis::ChartTrain_Workout));
+
     setContentsMargins(0,0,0,0);
     setControls(NULL);
     setProperty("color", GColor(CTRAINPLOTBACKGROUND));

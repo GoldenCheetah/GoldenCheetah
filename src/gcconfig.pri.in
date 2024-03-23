@@ -8,8 +8,16 @@
 #CONFIG += debug
 #CONFIG += release
 
-# Uncomment when WebKit is not available (e.g. QT >= 5.6)
-#DEFINES += NOWEBKIT
+# uncomment below and configure the location of the GNU scientific library,
+# this is a mandatory dependency.
+#
+# Linux/Mac - use apt/homebrew to install and edit to your install location
+#GSL_INCLUDES = /usr/include
+#GSL_LIBS = -lgsl -lgslcblas -lm
+#
+# Windows - use vcpkg to install and edit to your install location
+#GSL_INCLUDES = c:\vcpkg\installed\x64-windows\include
+#GSL_LIBS = -LC:\vcpkg\installed\x64-windows\lib -lgsl -lgslcblas
 
 # Uncomment below if you want an R chart
 # You will need R installed along with the Rcpp and RInside
@@ -69,16 +77,15 @@
 # You may need to specify the full path if things don't work.
 #QMAKE_LEX  = flex
 #QMAKE_YACC = bison
+# If you are using bison 3.7 or higher, uncomment the line below
+#QMAKE_MOVE = cp
 # If you're compiling with nmake and VC then you
 # will likely also use win_flex and win_bison
 # so uncomment below
-#QMAKE_LEX = win_flex
-#QMAKE_YACC = win_bison
-#win32 {
-#  QMAKE_YACC = bison --file-prefix=y -t
-#  QMAKE_MOVE = cmd /c move
-#  QMAKE_DEL_FILE = rm -f
-#}
+#QMAKE_LEX  = win_flex --wincompat
+#QMAKE_YACC = win_bison --file-prefix=y -t
+# If you are using bison 3.7 or higher, uncomment the line below
+#QMAKE_MOVE = copy
 
 # If you want SRM download support you must install SRMIO
 #     http://www.zuto.de/project/srmio/
@@ -104,26 +111,6 @@
 # You *must* define D2XX_INCLUDE to use this feature.
 #D2XX_INCLUDE = 
 #D2XX_LIBS    =
-
-# If you want support for Google Earth .kml files then you need
-# to install the Google libkml library
-#
-# http://code.google.com/p/libkml/
-# or on Linux sudo apt-get install libkml-dev
-#
-# then set the following variable appropriately
-# to the root of the libs/include path
-#KML_INSTALL = /usr/local
-#KML_INCLUDE = 
-#KML_LIBS    = 
-# Since KML also requires BOOST you will need to install
-# that too and then set BOOST_INCLUDE to that location
-# If the files are in /usr/include/boost then set
-#BOOST_INCLUDE = /usr/include
-#Additionally, on MAC the latest libs also need the following
-#QMAKE_CFLAGS_X86_64 += -mmacosx-version-min=10.7
-#QMAKE_CXXFLAGS_X86_64 = $$QMAKE_CFLAGS_X86_64
-#LIBS += -lexpat -luriparser -lminizip
 
 # If you want support for downloading from iCal calendars you will need libical
 #     http://sourceforge.net/projects/freeassociation/
@@ -166,7 +153,7 @@
 
 # if you want video playback on training mode then
 # download and install vlc (videolan) from
-# ftp.videolan.org/pub/vlc/1.1.8 or http://download.videolan.org/vlc/ for 
+# ftp.videolan.org/pub/vlc/3.0.8 or http://download.videolan.org/vlc/ for
 # your platform there are sdks for Mac and Windows. On Linux you
 # will need to use the latest distro (e.g. Meerkat
 # on Ubuntu) to be sure apt-get installs the latest
@@ -174,23 +161,17 @@
 # Set path to the root of the VLC installation
 # If the are installed in /usr/local/vlc then set
 # VLC_INSTALL = /usr/local/vlc
-# This will automatically set (Windows and Unix):
+# This will automatically set (Windows, Unix and macOS):
 # VLC_INCLUDE = $${VLC_INSTALL}/include 
 # For Windows
 # VLC_LIBS    = $${VLC_INSTALL}/lib/libvlc.dll.a
-# For Unix
+# For Unix and macOS
 # VLC_LIBS    = -lvlc
 # You may override the INCLUDE and LIB files if you like.
 # You *must* define VLC_INSTALL to use this feature.
 #VLC_INSTALL = 
 #VLC_INCLUDE = 
 #VLC_LIBS    = 
-
-# *** Mac users NOTE ***
-# On MAC you don't need libvlc since we use the
-# native QTKit (OSX framework) for video playback
-# using Quicktime and on 10.6 or higher Quicktime X
-#
 
 # if you want to resample with high fidelity we can use the
 # libsamplerate libraries, this is used in RideFile::resample()
@@ -253,19 +234,16 @@ macx {
 #DEFINES += GC_DROPBOX_CLIENT_ID=\\\"xxxxxxxxxxxxxxx\\\"
 #DEFINES += GC_DROPBOX_CLIENT_SECRET=\\\"xxxxxxxxxxxxxxx\\\"
 
-# if you have your own MAPQUEST KEY
-#DEFINES += GC_MAPQUESTAPI_KEY=\\\"xxxxxxxxxxxxxxxxxxxxxx\\\"
-
-# USING THE WITHINGS API (http://oauth.withings.com/api)
-#DEFINES += GC_WITHINGS_CONSUMER_KEY=\\\"xxxxxxxxxxxxxxx\\\"
-#DEFINES += GC_WITHINGS_CONSUMER_SECRET=\\\"xxxxxxxxxxxxxxx\\\"
+# USING THE WITHINGS API (http://oauth.withings.com/api, use https://www.goldencheetah.org as CALLBACK URL)
+#DEFINES += GC_NOKIA_CLIENT_ID=\\\"xxxxxxxxxxxxxxx\\\"
+#DEFINES += GC_NOKIA_CLIENT_SECRET=\\\"xxxxxxxxxxxxxxx\\\"
 
 # What video playback do you want?
 DEFINES += GC_VIDEO_NONE             # dont add any video playback support
-#DEFINES += GC_VIDEO_QUICKTIME        # mac only and the default
-#DEFINES += GC_VIDEO_QT5              # use QT5 qvideowidget if QT > 5.2.1
-#DEFINES += GC_VIDEO_VLC               # use VideoLan library needs VLC_INSTALL defined above
-#DEFINES += GC_VIDEO_AV                 # use AV Foundation on Mac now QTKit is deprecated
+#DEFINES += GC_VIDEO_QUICKTIME       # mac only and the default
+#DEFINES += GC_VIDEO_QT5             # use QT5 qvideowidget if QT > 5.2.1
+#DEFINES += GC_VIDEO_VLC             # use VideoLan library needs VLC_INSTALL defined above
+#DEFINES += GC_VIDEO_AV              # use AV Foundation on Mac now QTKit is deprecated
 
 
 # Using the GoldenCheetah/CloudDB feature (with a private CloudDB instance)

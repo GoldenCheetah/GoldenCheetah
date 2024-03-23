@@ -23,12 +23,7 @@
 
 #include <QtGui>
 #include <QStackedWidget>
-#ifdef NOWEBKIT
 #include <QWebEngineView>
-#else
-#include <QWebView>
-#include <QWebFrame>
-#endif
 #include <QTimer>
 #include "Context.h"
 #include "Season.h"
@@ -51,7 +46,6 @@ class AllPlot;
 #include <qwt_plot_picker.h>
 #include <qwt_text_engine.h>
 #include <qwt_picker_machine.h>
-#include <qwt_compat.h>
 
 #include "qxtstringspinbox.h" // for reveal control groupby selection
 
@@ -258,12 +252,7 @@ class LTMWindow : public GcChartWindow
         QStackedWidget *stackWidget;
 
         // summary view
-#ifdef NOWEBKIT
         QWebEngineView *dataSummary;
-#else
-        QWebView *dataSummary;
-#endif
-
 
         // popup - the GcPane to display within
         //         and the LTMPopup contents widdget

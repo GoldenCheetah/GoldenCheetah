@@ -161,7 +161,7 @@ class ScatterWindow : public GcChartWindow
 
         RideItem *current;
 
-        bool firstShow;
+        bool firstShow = true;
         bool event(QEvent *event);
 
     private:

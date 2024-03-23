@@ -33,7 +33,6 @@
 #include <QFileIconProvider>
 #include <QMessageBox>
 #include <QHeaderView>
-#include <QDesktopWidget>
 
 #include "../qzip/zipwriter.h"
 #include "../qzip/zipreader.h"
@@ -956,6 +955,9 @@ CloudServiceSyncDialog::cancelClicked()
 void
 CloudServiceSyncDialog::refreshClicked()
 {
+    double distanceFactor = GlobalContext().useMetricUnits ? 1.0 : MILES_PER_KM;
+    QString distanceUnits = GlobalContext().useMetricUnits ? tr("km") : tr("mi");
+
     progressLabel->setText(tr(""));
     progressBar->setMinimum(0);
     progressBar->setMaximum(1);
@@ -1101,7 +1103,7 @@ CloudServiceSyncDialog::refreshClicked()
                 sync->setTextAlignment(4, Qt::AlignCenter);
 
                 double distance = workouts[i]->distance;
-                sync->setText(5, QString("%1 km").arg(distance, 0, 'f', 1));
+                sync->setText(5, QString("%1 %2").arg(distance*distanceFactor, 0, 'f', 1).arg(distanceUnits));
                 sync->setTextAlignment(5, Qt::AlignRight | Qt::AlignVCenter);
             }
             sync->setText(6, tr("Download"));
@@ -1145,7 +1147,7 @@ CloudServiceSyncDialog::refreshClicked()
         add->setTextAlignment(4, Qt::AlignCenter);
 
         double distance = ride->getForSymbol("total_distance");
-        add->setText(5, QString("%1 km").arg(distance, 0, 'f', 1));
+        add->setText(5, QString("%1 %2").arg(distance*distanceFactor, 0, 'f', 1).arg(distanceUnits));
         add->setTextAlignment(5, Qt::AlignRight | Qt::AlignVCenter);
 
         // exists? - we ignore seconds, since TP seems to do odd
@@ -1183,7 +1185,7 @@ CloudServiceSyncDialog::refreshClicked()
             sync->setTextAlignment(3, Qt::AlignCenter);
             sync->setText(4, duration);
             sync->setTextAlignment(4, Qt::AlignCenter);
-            sync->setText(5, QString("%1 km").arg(distance, 0, 'f', 1));
+            sync->setText(5, QString("%1 %2").arg(distance*distanceFactor, 0, 'f', 1).arg(distanceUnits));
             sync->setTextAlignment(5, Qt::AlignRight | Qt::AlignVCenter);
             sync->setText(6, tr("Upload"));
             sync->setTextAlignment(6, Qt::AlignLeft | Qt::AlignVCenter);
@@ -1654,7 +1656,7 @@ CloudServiceSyncDialog::saveRide(RideFile *ride, QStringList &errors)
     }
 
     // process linked defaults
-    context->athlete->rideMetadata()->setLinkedDefaults(ride);
+    GlobalContext::context()->rideMetadata->setLinkedDefaults(ride);
 
     // run the processor first... import
     DataProcessorFactory::instance().autoProcess(ride, "Auto", "Import");
@@ -1945,7 +1947,7 @@ CloudServiceAutoDownload::readComplete(QByteArray*data,QString name,QString)
     }
 
     // process linked defaults
-    context->athlete->rideMetadata()->setLinkedDefaults(ride);
+    GlobalContext::context()->rideMetadata->setLinkedDefaults(ride);
 
     // run the processor first... import
     DataProcessorFactory::instance().autoProcess(ride, "Auto", "Import");
@@ -2033,7 +2035,7 @@ CloudServiceAutoDownloadWidget::paintEvent(QPaintEvent*)
     QFontMetrics fm(font);
     painter.setFont(font);
     painter.setPen(GCColor::invertColor(GColor(CPLOTBACKGROUND)));
-    QRectF textbox = QRectF(0,0, fm.width(statusstring), height() / 2.0f);
+    QRectF textbox = QRectF(0,0, fm.horizontalAdvance(statusstring), height() / 2.0f);
     painter.drawText(textbox, Qt::AlignVCenter | Qt::AlignCenter, statusstring);
 
     // rectangle

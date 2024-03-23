@@ -17,6 +17,7 @@
 */
 
 #include <assert.h>
+#include <algorithm>
 #include "LocationInterpolation.h"
 #include "BlinnSolver.h"
 
@@ -53,6 +54,27 @@ xyz geolocation::toxyz() const
     double dz = ((n*(1 - e2) + alt)*sin(lat));           //ECEF z
     return(xyz(dx, dy, dz));                             //Return x, y, z in ECEF
 }
+
+// Compute initial bearing from this geoloc to another, in RADIANS.
+// Note that unless bearing is 0 or pi it will vary on the path from one to the other.
+double geolocation::BearingTo(const geolocation& to) const
+{
+    if (this->Lat() == to.Lat() && this->Long() == to.Long())
+        return 0.;
+
+    double phi0   = degreestoradians(this->Lat());
+    double phi1   = degreestoradians(to.Lat());
+    double lamda0 = degreestoradians(this->Long());
+    double lamda1 = degreestoradians(to.Long());
+
+    double y = sin(lamda1 - lamda0) * cos(phi1);
+    double x = cos(phi0) * sin(phi1) - sin(phi0) * cos(phi1) * cos(lamda1 - lamda0);
+
+    double bearing = atan2(y, x);
+
+    return bearing;
+}
+
 
 geolocation xyz::togeolocation() const
 {
@@ -254,10 +276,10 @@ bool UnitCatmullRomInterpolator::Inverse(double r, double &u) const
     // for monotonic distance mapping.
     bool ret = false;    
     for (unsigned i = 0; i < roots.resultcount(); i++) {
-        double r = roots.result(i).x / roots.result(i).w;
+        double rt = roots.result(i).x / roots.result(i).w;
         // Take the first root we find in range 0..1.
-        if (r >= 0. && r <= 1.) {
-            u = r;
+        if (rt >= 0. && rt <= 1.) {
+            u = rt;
             ret = true;
             break;
         }
@@ -321,14 +343,15 @@ geolocation GeoPointInterpolator::Location(double distance, double &slope)
     double rise = l1.Alt() - l0.Alt();
 
     // Tangent vector's magnitude is velocity in terms of distance spline.
-    // Will be unit vector when distance spline has constant rate.
+    // Will be unit vector when distance spline has constant rate. Can have
+    // zero length when processing points without motion.
     double hyp = tangentVector.magnitude();
 
     // Compute adjacent speed.
-    double run = sqrt(fabs((hyp * hyp) - (rise * rise)));
+    double adj = fabs((hyp * hyp) - (rise * rise));
 
     // Gradient.
-    slope = run ? rise / run : 0;
+    slope = (adj > 0.) ? rise / sqrt(adj) : 0.;
 
     // No matter what we still don't permit slopes above 40%.
     slope = std::min(slope,  .4);

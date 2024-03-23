@@ -32,13 +32,11 @@
 #include "ImagicController.h"
 #endif
 #include "ComputrainerController.h"
-#if QT_VERSION >= 0x050000
 #include "MonarkController.h"
 #include "KettlerController.h"
 #include "KettlerRacerController.h"
 #include "ErgofitController.h"
 #include "DaumController.h"
-#endif
 #include "ANTlocalController.h"
 #include "ANTChannel.h"
 #include "NullController.h"
@@ -51,6 +49,7 @@
 #include <QFileDialog>
 #include <QCommandLinkButton>
 #include <QScrollArea>
+#include <QtCharts>
 
 class DeviceScanner;
 
@@ -75,6 +74,13 @@ public:
     QString profile;
 
     DeviceScanner *scanner;
+
+    // Device Data
+    int    virtualPowerIndex;   // index of selected virtual power function
+    QString virtualPowerName;   // name of selected virtual power curve
+    int    wheelSize;
+    int    strideLength;
+    double inertialMomentKGM2;  // inertial moment of trainer in (KG M^2)
 
 public slots:
 
@@ -217,11 +223,69 @@ class AddPairBTLE : public QWizardPage
         bool validatePage();
         void cleanupPage();
 
+    private slots:
+        void scanFinished(bool foundDevices);
+
     private:
         AddDeviceWizard *wizard;
         QTreeWidget *channelWidget;
+        QProgressBar *bar;
 
+        static const int NameRole = Qt::UserRole + 1;
+        static const int AddressRole = Qt::UserRole + 2;
+        static const int UuidRole = Qt::UserRole + 3;
 };
+
+class AddVirtualPower : public QWizardPage
+{
+    Q_OBJECT
+
+public:
+    AddVirtualPower(AddDeviceWizard*);
+    void initializePage();
+    bool validatePage();
+
+private:
+    AddDeviceWizard* wizard;
+    RealtimeController* controller; // copy of controller, for lazy re-init
+
+    QLineEdit*      name;
+    QComboBox*      virtualPower;
+    QComboBox*      rimSizeCombo;
+    QComboBox*      tireSizeCombo;
+    QLineEdit*      wheelSizeEdit;
+    QLineEdit*      stridelengthEdit;
+    QDoubleSpinBox* inertialMomentKGM2Edit;
+
+    QLabel*         virtualPowerNameLabel;
+    QLineEdit*      virtualPowerNameEdit;
+    QPushButton*    virtualPowerCreateButton;
+
+    QTableWidget*   virtualPowerTableWidget;
+    QChart*         virtualPowerScatterChart;
+    QChartView*     virtualPowerScatterChartView;
+
+    QLabel*         fitOrderSpinBoxLabel;
+    QSpinBox*       fitOrderSpinBox;
+    QLabel*         fitEpsilonSpinBoxLabel;
+    QDoubleSpinBox* fitEpsilonSpinBox;
+    QLabel*         fitStdDevLabel;
+    QLabel*         fitOrderLabel;
+
+    void drawConfig();
+
+private slots:
+    void calcWheelSize();
+    void resetWheelSize();
+    void myCellChanged(int row, int col);
+    void mySpinBoxChanged(int i);
+    void myDoubleSpinBoxChanged(double d);
+    void mySortTable(int i);
+    void mySetTableFromComboBox(int i);
+    void virtualPowerNameChanged();
+    void myCreateCustomPowerCurve();
+};
+
 
 class AddFinal : public QWizardPage
 {
@@ -237,20 +301,9 @@ class AddFinal : public QWizardPage
         AddDeviceWizard *wizard;
 
         QLineEdit *name;
-        QComboBox *virtualPower;
-        QComboBox *rimSizeCombo;
-        QComboBox *tireSizeCombo;
-        QLineEdit *wheelSizeEdit;
-        QLineEdit *stridelengthEdit;
         QLineEdit *port;
         QLineEdit *profile;
-        QGroupBox *selectDefault;
-        QCheckBox *defWatts, *defBPM, *defKPH, *defRPM;
-
-    private slots:
-        void calcWheelSize();
-        void resetWheelSize();
-
+        QLineEdit *virtualPowerName;
 };
 
 class DeviceScanner : public QThread

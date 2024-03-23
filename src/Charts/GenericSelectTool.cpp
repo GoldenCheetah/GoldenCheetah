@@ -19,11 +19,12 @@
 #include "GenericSelectTool.h"
 
 #include "Colors.h"
-#include "TabView.h"
+#include "AbstractView.h"
 #include "RideFileCommand.h"
 #include "Utils.h"
 
 #include <limits>
+#include <cmath> // for isinf() isnan()
 
 GenericSelectTool::GenericSelectTool(GenericPlot *host) : QObject(host), QGraphicsItem(NULL), host(host)
 {
@@ -32,7 +33,7 @@ GenericSelectTool::GenericSelectTool(GenericPlot *host) : QObject(host), QGraphi
     mode = RECTANGLE;
     setVisible(true); // always visible - paints on axis
     setZValue(100); // always on top.
-    hoverpoint = QPointF();
+    hoverpoint = GPointF();
     hoverseries = NULL;
     hoveraxis = NULL;
     rect = QRectF(0,0,0,0);
@@ -49,7 +50,7 @@ void GenericSelectTool::paint(QPainter*painter, const QStyleOptionGraphicsItem *
     // min max texts
     QFont stGiles; // hoho - Chart Font St. Giles ... ok you have to be British to get this joke
     stGiles.fromString(appsettings->value(NULL, GC_FONT_CHARTLABELS, QFont().toString()).toString());
-    stGiles.setPointSize(appsettings->value(NULL, GC_FONT_CHARTLABELS_SIZE, 8).toInt());
+    stGiles.setPointSizeF(appsettings->value(NULL, GC_FONT_CHARTLABELS_SIZE, 8).toInt()*host->scale_);
     QFontMetrics fm(stGiles); // adjust position to align centre
 
     //
@@ -88,7 +89,7 @@ void GenericSelectTool::paint(QPainter*painter, const QStyleOptionGraphicsItem *
                 QColor invert = GCColor::invertColor(GColor(CPLOTBACKGROUND));
                 painter->setBrush(invert);
                 painter->setPen(invert);
-                QRectF circle(0,0,gl_linemarker*dpiXFactor,gl_linemarker*dpiYFactor);
+                QRectF circle(0,0,gl_linemarker*dpiXFactor*host->scale_,gl_linemarker*dpiYFactor*host->scale_);
                 circle.moveCenter(pos);
                 painter->drawEllipse(circle);
                 painter->setBrush(Qt::NoBrush);
@@ -111,12 +112,12 @@ void GenericSelectTool::paint(QPainter*painter, const QStyleOptionGraphicsItem *
                     //
                     // SCATTER PLOT HOVERED POINT
                     //
-                    if (hoverpoint != QPointF()) {
+                    if (hoverpoint != GPointF()) {
                         // draw a circle using marker color
                         QColor invert = GCColor::invertColor(GColor(CPLOTBACKGROUND));
                         painter->setBrush(invert);
                         painter->setPen(invert);
-                        QRectF circle(0,0,gl_scattermarker*dpiXFactor,gl_scattermarker*dpiYFactor);
+                        QRectF circle(0,0,gl_scattermarker*dpiXFactor*host->scale_,gl_scattermarker*dpiYFactor*host->scale_);
                         circle.moveCenter(hoverpoint);
                         painter->drawEllipse(circle);
                         painter->setBrush(Qt::NoBrush);
@@ -161,10 +162,11 @@ void GenericSelectTool::paint(QPainter*painter, const QStyleOptionGraphicsItem *
                         if (yaxis) axisColor = yaxis->labelsColor();
                         else if (series->type() == QAbstractSeries::SeriesTypeScatter) axisColor = static_cast<QScatterSeries*>(series)->color();
                         else if (series->type() == QAbstractSeries::SeriesTypeLine) axisColor = static_cast<QLineSeries*>(series)->color();
+                        else if (series->type() == QAbstractSeries::SeriesTypeArea) axisColor = static_cast<QAreaSeries*>(series)->color();
                         painter->setPen(QPen(axisColor));
 
                         // y value
-                        QString label=QString("%1").arg(v.y(),0,'f',0); // no decimal places XXX fixup on series info
+                        QString label=QString("%1").arg(v.y(),0,'f',2); // no decimal places XXX fixup on series info
                         label = Utils::removeDP(label); // remove unneccessary decimal places
                         painter->drawText(posyp+QPointF(0,fm.tightBoundingRect(label).height()/2.0), label);
 
@@ -190,7 +192,7 @@ void GenericSelectTool::paint(QPainter*painter, const QStyleOptionGraphicsItem *
                         if (xaxis && xaxis->type() == QAbstractAxis::AxisTypeDateTime)
                             label=QDateTime::fromMSecsSinceEpoch(v.x()).toString(static_cast<QDateTimeAxis*>(xaxis)->format());
                         else
-                            label=QString("%1").arg(v.x(),0,'f',0); // no decimal places XXX fixup on series info
+                            label=QString("%1").arg(v.x(),0,'f',2); // no decimal places XXX fixup on series info
                         label = Utils::removeDP(label); // remove unneccessary decimal places
                         painter->setClipRect(mapRectFromScene(host->qchart->plotArea()));
                         painter->drawText(posxp-(QPointF(fm.tightBoundingRect(label).width()/2.0,4)), label);
@@ -263,7 +265,7 @@ void GenericSelectTool::paint(QPainter*painter, const QStyleOptionGraphicsItem *
                             col.setAlphaF(1);
                             QPen line(col);
                             line.setStyle(Qt::SolidLine);
-                            line.setWidthF(0.5 * dpiXFactor);
+                            line.setWidthF(0.5 * dpiXFactor*host->scale_);
                             painter->setPen(line);
                             if (host->charttype == GC_CHART_LINE) painter->setClipRect(r); // too jarring on a line plot
                             else painter->setClipRect(mapRectFromScene(host->qchart->plotArea())); // need context for a scatter plot
@@ -299,7 +301,7 @@ void GenericSelectTool::paint(QPainter*painter, const QStyleOptionGraphicsItem *
                         // min max texts
                         QFont stGiles; // hoho - Chart Font St. Giles ... ok you have to be British to get this joke
                         stGiles.fromString(appsettings->value(NULL, GC_FONT_CHARTLABELS, QFont().toString()).toString());
-                        stGiles.setPointSize(appsettings->value(NULL, GC_FONT_CHARTLABELS_SIZE, 8).toInt());
+                        stGiles.setPointSizeF(appsettings->value(NULL, GC_FONT_CHARTLABELS_SIZE, 8).toInt()*host->scale_);
                         painter->setFont(stGiles);
 
                         QPen markerpen(GColor(CPLOTMARKER));
@@ -379,7 +381,6 @@ QRectF GenericSelectTool::boundingRect() const { return rect; }
 
 // trap events and redirect to plot event handler
 bool GenericSelectTool::sceneEventFilter(QGraphicsItem *watched, QEvent *event) { return host->eventHandler(0, watched,event); }
-bool GenericPlot::eventFilter(QObject *obj, QEvent *e) { return eventHandler(1, obj, e); }
 
 bool
 GenericSelectTool::reset()
@@ -389,7 +390,7 @@ GenericSelectTool::reset()
     start=QPointF(0,0);
     finish=QPointF(0,0);
     rect = QRectF(0,0,0,0);
-    hoverpoint = QPointF();
+    hoverpoint = GPointF();
     hoverseries = NULL;
     hoverpoints.clear();
     hoveraxis = NULL;
@@ -402,16 +403,35 @@ GenericSelectTool::reset()
 
 // handle mouse events in selector
 bool
+GenericSelectTool::seriesClicked()
+{
+    // clicked on a point in the series
+    return clicked(QPointF()); // ignore mostly
+}
+
+bool
 GenericSelectTool::clicked(QPointF pos)
 {
     bool updatescene = false;
+
+    // click on a point to click-thru
+    if (hoverpoint.index != -1) { // scatter plot
+        emit seriesClicked(hoverseries, hoverpoint);
+
+        // not sure need to do this....
+        hoverpoints.clear();
+        hoverpoint=GPointF();
+        return false;
+
+    } else if (pos == QPointF()) { // series clicked and not hovering
+        return false;
+
+    }
 
     if (mode == XRANGE || mode == RECTANGLE) {
 
         if (hoveraxis) return false;
 
-        hoverpoints.clear();
-        hoverpoint=QPointF();
 
         if (state==ACTIVE && sceneBoundingRect().contains(pos)) {
 
@@ -487,7 +507,8 @@ GenericSelectTool::released(QPointF pos)
                 QPointF v = host->qchart->mapToValue(pos,yseries);
 
                 // add to chart
-                host->addAnnotation(GenericPlot::LINE, yseries, v.y());
+                // not implemented yet, need to decide how they persist, will do in 3.7
+                // host->addAnnotation(GenericPlot::LINE, yseries, v.y());
             }
 
             return true; // don't drop through into selection logic
@@ -505,7 +526,7 @@ GenericSelectTool::released(QPointF pos)
 
             // finishing move/resize
             state = ACTIVE;
-            hoverpoint=QPointF();
+            hoverpoint=GPointF();
             hoverpoints.clear();
             rectchanged = true;
             update(rect);
@@ -599,8 +620,8 @@ GenericSelectTool::moved(QPointF pos)
             // this needs to be super quick as mouse
             // movements are very fast, so we use a
             // quadtree to find the nearest points
-            QPointF hoverv; // value                    // series x,y co-ord used in signal (and legend later)
-            hoverpoint = QPointF(); // screen coordinates
+            GPointF hoverv; // value                    // series x,y co-ord used in signal (and legend later)
+            hoverpoint = GPointF(); // screen coordinates
             QAbstractSeries *originalhoverseries = hoverseries;
             hoverseries = NULL;
             foreach(QAbstractSeries *series, host->qchart->series()) {
@@ -617,18 +638,18 @@ GenericSelectTool::moved(QPointF pos)
                     //QPointF vpos = host->qchart->mapToValue(pos, series);
 
                     // find candidates all close by using paint co-ords
-                    QList<QPointF> tohere;
+                    QList<GPointF> tohere;
                     tree->candidates(vrect, tohere);
 
                     QPointF cursorpos=mapFromScene(pos);
-                    foreach(QPointF p, tohere) {
+                    foreach(GPointF p, tohere) {
                         QPointF scpos = mapFromScene(host->qchart->mapToPosition(p, series));
-                        if (hoverpoint == QPointF()) {
-                            hoverpoint = scpos;
+                        if (hoverpoint == GPointF()) {
+                            hoverpoint = GPointF(scpos.x(), scpos.y(), p.index);
                             hoverseries = series;
                             hoverv = p;
                         } else if ((cursorpos-scpos).manhattanLength() < (cursorpos-hoverpoint).manhattanLength()) {
-                            hoverpoint=scpos; // not happy with this XXX needs more work
+                            hoverpoint=GPointF(scpos.x(), scpos.y(), p.index);
                             hoverseries = series;
                             hoverv = p;
                         }
@@ -640,14 +661,17 @@ GenericSelectTool::moved(QPointF pos)
             }
 
             // hoverpoint changed - either a new series selected, a new point, or no point at all
-            if (originalhoverseries != hoverseries || hoverv != QPointF()) {
+            if (originalhoverseries != hoverseries || hoverv != GPointF()) {
                 if (hoverseries != originalhoverseries && originalhoverseries != NULL) emit (unhover(originalhoverseries->name())); // old hover changed
                 if (hoverseries != NULL)  emit hover(hoverv, hoverseries->name(), hoverseries); // new hover changed
             }
 
             // we need to clear x-axis if we aren't hovering on anything at all
-            if (hoverv == QPointF()) {
-                emit unhoverx();
+            // but bar and stack charts already get status in hover signals
+            // so don't do this for those chart types.
+            if (hoverv == GPointF()) {
+                if (host->charttype != GC_CHART_BAR && host->charttype != GC_CHART_STACK && host->charttype != GC_CHART_PERCENT)
+                    emit unhoverx();
             }
 
             // for mouse moves..
@@ -659,7 +683,7 @@ GenericSelectTool::moved(QPointF pos)
             // user hovers with a vertical line, but can select a range on the x axis
             // lets get x axis value (any old series will do as they should have a common x axis
             spos = pos;
-            QMap<QAbstractSeries*,QPointF> vals; // what values were found
+            QMap<QAbstractSeries*,GPointF> vals; // what values were found
             double nearestx=-9999;
             foreach(QAbstractSeries *series, host->qchart->series()) {
 
@@ -675,10 +699,11 @@ GenericSelectTool::moved(QPointF pos)
                 double xvalue=host->qchart->mapToValue(spos,series).x();
 
                 // pointsVector
-                if (series->type() == QAbstractSeries::SeriesTypeLine) {
+                if (series->type() == QAbstractSeries::SeriesTypeLine || series->type() == QAbstractSeries::SeriesTypeArea) {
 
                     // we take a copy, would love to avoid this.
-                    QVector<QPointF> p = static_cast<QLineSeries*>(series)->pointsVector();
+                    QVector<QPointF> p = series->type() == QAbstractSeries::SeriesTypeLine ? static_cast<QLineSeries*>(series)->pointsVector() :
+                                                                              static_cast<QAreaSeries*>(series)->upperSeries()->pointsVector();
 
                     // value we want
                     QPointF x= QPointF(xvalue,0);
@@ -686,18 +711,20 @@ GenericSelectTool::moved(QPointF pos)
                     // lower_bound to value near x
                     QVector<QPointF>::const_iterator i = std::lower_bound(p.begin(), p.end(), x, CompareQPointFX());
 
-                    // collect them away
-                    vals.insert(series, QPointF(*i));
+                    if (i != p.end()) {
+                        // collect them away
+                        vals.insert(series, GPointF(i->x(), i->y(), i-p.begin()));
 
-                    // nearest x?
-                    if (i->x() != 0 && (nearestx == -9999 || (std::fabs(i->x()-xvalue)) < std::fabs((nearestx-xvalue)))) nearestx = i->x();
+                        // nearest x?
+                        if (i->x() != 0 && (nearestx == -9999 || (std::fabs(i->x()-xvalue)) < std::fabs((nearestx-xvalue)))) nearestx = i->x();
+                    }
                 }
 
             }
 
             // run over what we found, updating paint points and signal (for legend)
             hoverpoints.clear();
-            QMapIterator<QAbstractSeries*, QPointF> i(vals);
+            QMapIterator<QAbstractSeries*, GPointF> i(vals);
             while (i.hasNext()) {
                 i.next();
                 if (i.value().x() == nearestx) {
@@ -822,6 +849,7 @@ GenericCalculator::initialise()
     x.max = x.min = x.sum = x.mean =
     y.max = y.min = y.sum = y.mean = 0;
     xaxis=yaxis=NULL;
+    actual.clear();
     midnight=QDateTime(QDate::currentDate(), QTime(0,0,0));
 
 }
@@ -834,6 +862,9 @@ GenericCalculator::addPoint(QPointF point)
     // we need original values for linear regress, all other calcs are fine
     // at this point
     QPointF lr=point;
+
+    // if nan/inf ignore it
+    if (std::isinf(point.x()) || std::isnan(point.x()) || std::isinf(point.y()) || std::isnan(point.y())) return;
 
     // X
     if (xaxis && xaxis->type() == QAbstractAxis::AxisTypeDateTime &&
@@ -916,7 +947,7 @@ GenericSelectTool::setSeriesVisible(QString name, bool visible)
     // but for now this is the quickes and simplest way
     // to avoid artefacts
     hoverpoints.clear();
-    hoverpoint=QPointF();
+    hoverpoint=GPointF();
 
     // hide/show and updatescenes may overlap/get out of sync
     // so we update scene to be absolutely sure the scene
@@ -955,8 +986,8 @@ GenericSelectTool::updateScene()
 
                 switch(x->type()) {
                 case QAbstractSeries::SeriesTypeLine: {
-                    QLineSeries *line = static_cast<QLineSeries*>(x);
-
+                    QLineSeries *line = x->type() == QAbstractSeries::SeriesTypeLine ? static_cast<QLineSeries*>(x) :
+                                                                                       static_cast<QAreaSeries*>(x)->upperSeries() ;
                     // ignore empty series
                     if (line->count() < 1) continue;
 
@@ -976,13 +1007,16 @@ GenericSelectTool::updateScene()
                         selection->setName(QString("%1_select").arg(line->name()));
 
                         // all of this curve cloning should be in a new method xxx todo
+#if QT_VERSION < 0x060400
                         selection->setUseOpenGL(line->useOpenGL());
+#endif
                         selection->setPen(line->pen());
                         if (line->useOpenGL())
                             selection->setColor(Qt::gray); // use opengl ignores changing colors
                         else {
                             selection->setColor(line->color());
-                            static_cast<QLineSeries*>(x)->setColor(Qt::gray);
+                            if (x->type() == QAbstractSeries::SeriesTypeLine) static_cast<QLineSeries*>(x)->setColor(Qt::gray);
+                            else if (x->type() == QAbstractSeries::SeriesTypeArea) static_cast<QAreaSeries*>(x)->setColor(Qt::gray);
                         }
                         selections.insert(x, selection);
                         ignore.append(selection);
@@ -1051,7 +1085,9 @@ GenericSelectTool::updateScene()
 
                         // all of this curve cloning should be in a new method xxx todo
                         host->qchart->addSeries(selection); // before adding data and axis
+#if QT_VERSION < 0x060400
                         selection->setUseOpenGL(scatter->useOpenGL());
+#endif
                         if (selection->useOpenGL())
                             selection->setColor(Qt::gray); // use opengl ignores changing colors
                         else {
@@ -1145,8 +1181,10 @@ GenericSelectTool::updateScene()
                     // rememember when opengl is in use setColor is ignored
                     // so we didn't change it on selection, so no need to
                     // set it back to original in that case
-                    if (!selection->useOpenGL())
-                        static_cast<QLineSeries*>(x)->setColor(static_cast<QLineSeries*>(selection)->color());
+                    if (!selection->useOpenGL()) {
+                        if (x->type() == QAbstractSeries::SeriesTypeLine)  static_cast<QLineSeries*>(x)->setColor(static_cast<QLineSeries*>(selection)->color());
+                        else if (x->type() == QAbstractSeries::SeriesTypeArea)  static_cast<QAreaSeries*>(x)->setColor(static_cast<QLineSeries*>(selection)->color());
+                    }
 
                     // clear points, remove from axis and remove from chart
                     selection->clear();

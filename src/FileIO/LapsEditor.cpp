@@ -22,6 +22,7 @@
 #include "Colors.h"
 #include "Units.h"
 #include "HelpWhatsThis.h"
+#include "Context.h"
 
 #include <QHeaderView>
 
@@ -131,7 +132,7 @@ LapsEditor::okClicked()
     dataPoints_.clear();
 
     // Select metric units setting according to sport
-    bool metricPace = appsettings->value(this, isSwim ? GC_SWIMPACE : GC_PACE, true).toBool();
+    bool metricPace = appsettings->value(this, isSwim ? GC_SWIMPACE : GC_PACE, GlobalContext::context()->useMetricUnits).toBool();
     double distance_factor = isSwim ? (metricPace ? 1.0 : METERS_PER_YARD) :
                                       (metricPace ? 1.0 : KM_PER_MILE) * 1000.0;
 

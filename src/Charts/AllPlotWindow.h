@@ -62,7 +62,8 @@ class AllPlotWindow : public GcChartWindow
     Q_PROPERTY(int stackWidth READ _stackWidth WRITE setStackWidth USER true)
     Q_PROPERTY(int showGrid READ isShowGrid WRITE setShowGrid USER true)
     Q_PROPERTY(int showFull READ isShowFull WRITE setShowFull USER true)
-    Q_PROPERTY(int showInterval READ isShowInterval WRITE setShowInterval USER true)
+    Q_PROPERTY(int showIntervalMarkers READ isShowIntervalMarkers WRITE setShowIntervalMarkers USER true)
+    Q_PROPERTY(int showIntervalNavigator READ isShowIntervalNavigator WRITE setShowIntervalNavigator USER true)
     Q_PROPERTY(int hovering READ isHovering WRITE setHovering USER true)
     Q_PROPERTY(int showHelp READ isShowHelp WRITE setShowHelp USER true)
     Q_PROPERTY(int showATISS READ isShowATISS WRITE setShowATISS USER true)
@@ -129,7 +130,8 @@ class AllPlotWindow : public GcChartWindow
         int _stackWidth() const { return stackWidth; }
         int isShowGrid() const { return showGrid->checkState(); }
         int isShowFull() const { return showFull->checkState(); }
-        int isShowInterval() const { return showInterval->checkState(); }
+        int isShowIntervalMarkers() const { return showIntervalMarkers->checkState(); }
+        int isShowIntervalNavigator() const { return showIntervalNavigator->checkState(); }
         int isShowHelp() const { return showHelp->checkState(); }
         int isShowATISS() const { return showATISS->checkState(); }
         int isShowANTISS() const { return showANTISS->checkState(); }
@@ -227,7 +229,8 @@ class AllPlotWindow : public GcChartWindow
         void setShowGrid(int state);
         void setPaintBrush(int state);
         void setShowFull(int state);
-        void setShowInterval(int state);
+        void setShowIntervalNavigator(int state);
+        void setShowIntervalMarkers(int state);
         void setShowHelp(int state);
         void setSmoothing(int value);
         void setByDistance(int value);
@@ -319,7 +322,8 @@ class AllPlotWindow : public GcChartWindow
         QCheckBox *showBySeries;
         QCheckBox *showGrid;
         QCheckBox *showFull;
-        QCheckBox *showInterval;
+        QCheckBox *showIntervalMarkers;
+        QCheckBox *showIntervalNavigator;
         QCheckBox *showHelp;
         QCheckBox *paintBrush;
         QCheckBox *showAlt;

@@ -184,11 +184,7 @@ Strava::readdir(QString path, QStringList &errors, QDateTime from, QDateTime to)
     while (offset < resultCount) {
         QString urlstr = "https://www.strava.com/api/v3/athlete/activities?";
 
-#if QT_VERSION > 0x050000
         QUrlQuery params;
-#else
-        QUrl params;
-#endif
 
         // use toMSecsSinceEpoch for compatibility with QT4
         params.addQueryItem("before", QString::number(to.addDays(1).toMSecsSinceEpoch()/1000.0f, 'f', 0));
@@ -311,9 +307,9 @@ Strava::writeFile(QByteArray &data, QString remotename, RideFile *ride)
                       :  QUrl( "https://www.strava.com/api/v3/uploads" );
     QNetworkRequest request = QNetworkRequest(url);
 
-    //QString boundary = QString::number(qrand() * (90000000000) / (RAND_MAX + 1) + 10000000000, 16);
-    QString boundary = QVariant(qrand()).toString() +
-        QVariant(qrand()).toString() + QVariant(qrand()).toString();
+    //QString boundary = QString::number(QRandomGenerator::global()->generate() * (90000000000) / (RAND_MAX + 1) + 10000000000, 16);
+    QString boundary = QVariant(QRandomGenerator::global()->generate()).toString() +
+        QVariant(QRandomGenerator::global()->generate()).toString() + QVariant(QRandomGenerator::global()->generate()).toString();
 
     // MULTIPART *****************
 
@@ -332,20 +328,22 @@ Strava::writeFile(QByteArray &data, QString remotename, RideFile *ride)
                                       : QVariant("form-data; name=\"activity_type\""));
 
     // Map some known sports and default to ride for anything else
-    QString sport = ride->getTag("Sport", "");
-    QString subSport = ride->getTag("SubSport", "");
     if (ride->isRun())
-      activityTypePart.setBody("run");
+      activityTypePart.setBody("Run");
     else if (ride->isSwim())
-      activityTypePart.setBody("swim");
-    else if (sport == "Rowing")
+      activityTypePart.setBody("Swim");
+    else if (ride->sport() == "Row")
       activityTypePart.setBody("Rowing");
-    else if (sport == "XC Ski" || sport == "Cross country skiing")
-      activityTypePart.setBody("BackcountrySki");
-    else if (sport == "Strength" || subSport == "strength_training")
+    else if (ride->sport() == "Ski")
+      activityTypePart.setBody("NordicSki");
+    else if (ride->sport() == "Gym")
       activityTypePart.setBody("WeightTraining");
+    else if (ride->sport() == "Walk")
+      activityTypePart.setBody("Walk");
+    else if (ride->xdata("TRAIN") && ride->isDataPresent(RideFile::lat))
+      activityTypePart.setBody("VirtualRide");
     else
-      activityTypePart.setBody("ride");
+      activityTypePart.setBody("Ride");
     multiPart->append(activityTypePart);
 
     QHttpPart activityNamePart;
@@ -377,17 +375,18 @@ Strava::writeFile(QByteArray &data, QString remotename, RideFile *ride)
     //XXXprivatePart.setBody(parent->privateChk->isChecked() ? "1" : "0");
     //XXXmultiPart->append(privatePart);
 
-    //XXXQHttpPart commutePart;
-    //XXXcommutePart.setHeader(QNetworkRequest::ContentDispositionHeader,
-    //XXX                      QVariant("form-data; name=\"commute\""));
-    //XXXcommutePart.setBody(parent->commuteChk->isChecked() ? "1" : "0");
-    //XXXmultiPart->append(commutePart);
+    QHttpPart commutePart;
+    commutePart.setHeader(QNetworkRequest::ContentDispositionHeader,
+                          QVariant("form-data; name=\"commute\""));
+    commutePart.setBody(ride->getTag("Commute", "0").toInt() ? "1" : "0");
+    multiPart->append(commutePart);
 
-    //XXXQHttpPart trainerPart;
-    //XXXtrainerPart.setHeader(QNetworkRequest::ContentDispositionHeader,
-    //XXX                      QVariant("form-data; name=\"trainer\""));
-    //XXXtrainerPart.setBody(parent->trainerChk->isChecked() ? "1" : "0");
-    //XXXmultiPart->append(trainerPart);
+    QHttpPart trainerPart;
+    trainerPart.setHeader(QNetworkRequest::ContentDispositionHeader,
+                          QVariant("form-data; name=\"trainer\""));
+    trainerPart.setBody((ride->getTag("Trainer", "0").toInt() ||
+                         ride->xdata("TRAIN") && !ride->isDataPresent(RideFile::lat)) ? "1" : "0");
+    multiPart->append(trainerPart);
 
     if (manual) {
 
@@ -692,12 +691,8 @@ Strava::addSamples(RideFile* ret, QString remoteid)
 void
 Strava:: fixLapSwim(RideFile* ret, QJsonArray laps)
 {
-    QVariant isGarminSmartRecording = appsettings->value(NULL, GC_GARMIN_SMARTRECORD,Qt::Checked);
-
     // Lap Swim & SmartRecording enabled: use distance from laps to fix samples
-    if (isGarminSmartRecording.toInt() != 0 && ret->isSwim() &&
-        ret->isDataPresent(RideFile::km) &&
-        !ret->isDataPresent(RideFile::lat)) {
+    if (ret->isSwim() && ret->isDataPresent(RideFile::km) && !ret->isDataPresent(RideFile::lat)) {
 
         int lastSecs = 0;
         double lastDist = 0.0;
@@ -712,7 +707,7 @@ Strava:: fixLapSwim(RideFile* ret, QJsonArray laps)
             double deltaDist = (start>lastSecs && km>lastDist+0.001) ? (km-lastDist)/(start-lastSecs) : 0;
             double kph = 3600.0*deltaDist;
             for (int secs=lastSecs; secs<start; secs++) {
-                ret->appendOrUpdatePoint(secs, 0.0, 0.0, lastDist,
+                ret->appendOrUpdatePoint(secs, 0.0, 0.0, lastDist+deltaDist,
                         kph, 0.0, 0.0, 0.0,
                         0.0, 0.0, 0.0, 0.0,
                         RideFile::NA, 0.0,
@@ -733,7 +728,7 @@ Strava:: fixLapSwim(RideFile* ret, QJsonArray laps)
             deltaDist = 0.001*lap["distance"].toDouble()/(end-start);
             kph = 3600.0*deltaDist;
             for (int secs=start; secs<end; secs++) {
-                ret->appendOrUpdatePoint(secs, 0.0, 0.0, lastDist,
+                ret->appendOrUpdatePoint(secs, 0.0, 0.0, lastDist+deltaDist,
                         kph, 0.0, 0.0, 0.0,
                         0.0, 0.0, 0.0, 0.0,
                         RideFile::NA, 0.0,
@@ -903,6 +898,10 @@ Strava::prepareResponse(QByteArray* data)
             if (stype.endsWith("Ride")) ride->setTag("Sport", "Bike");
             else if (stype.endsWith("Run")) ride->setTag("Sport", "Run");
             else if (stype.endsWith("Swim")) ride->setTag("Sport", "Swim");
+            else if (stype.endsWith("Rowing")) ride->setTag("Sport", "Row");
+            else if (stype.endsWith("Ski")) ride->setTag("Sport", "Ski");
+            else if (stype.startsWith("Weight")) ride->setTag("Sport", "Gym");
+            else if (stype.endsWith("Walk")) ride->setTag("Sport", "Walking");
             else ride->setTag("Sport", stype);
             // Set SubSport to preserve the original when Sport was mapped
             if (stype != ride->getTag("Sport", "")) ride->setTag("SubSport", stype);
@@ -923,6 +922,25 @@ Strava::prepareResponse(QByteArray* data)
         if (!each["description"].isNull()) {
             QString meta = getSetting(GC_STRAVA_ACTIVITY_NAME, QVariant("")).toString();
             if (meta != "Notes") ride->setTag("Notes", each["description"].toString());
+        }
+
+        if (!each["commute"].isNull()) {
+            ride->setTag("Commute", each["commute"].toBool() ? "1" : "0");
+        }
+
+        if (!each["trainer"].isNull()) {
+            ride->setTag("Trainer", each["trainer"].toBool() ? "1" : "0");
+        }
+
+        if (each["gear"].isObject()) {
+            QJsonObject gear = each["gear"].toObject();
+            if (gear["name"].isString()) {
+                ride->setTag("Equipment", gear["name"].toString());
+            }
+        }
+
+        if (!each["perceived_exertion"].isNull()) {
+            ride->setTag("RPE", QString("%1").arg(each["perceived_exertion"].toDouble()));
         }
 
         if (each["manual"].toBool()) {
@@ -949,6 +967,7 @@ Strava::prepareResponse(QByteArray* data)
 
         } else {
             addSamples(ride, QString("%1").arg(each["id"].toVariant().toULongLong()));
+
             // laps?
             if (!each["laps"].isNull()) {
                 QJsonArray laps = each["laps"].toArray();
@@ -957,12 +976,9 @@ Strava::prepareResponse(QByteArray* data)
                 foreach (QJsonValue value, laps) {
                     QJsonObject lap = value.toObject();
 
-                    int lap_start = lap["start_index"].toInt();  
-
-                    double start = ride->getPoint(lap_start, RideFile::secs).toDouble();
-                    if (last_lap == 0)
-                        last_lap = start;
-                    double end = start + lap["elapsed_time"].toDouble();
+                    double start = starttime.secsTo(QDateTime::fromString(lap["start_date_local"].toString(), Qt::ISODate));
+                    if (start < last_lap) start = last_lap + 1; // Don't overlap
+                    double end = start + std::max(lap["elapsed_time"].toDouble(), 1.0) - 1;
 
                     last_lap = end;
 
@@ -995,4 +1011,3 @@ static bool addStrava() {
 }
 
 static bool add = addStrava();
-

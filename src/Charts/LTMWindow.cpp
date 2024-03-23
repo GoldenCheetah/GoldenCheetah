@@ -21,7 +21,7 @@
 #include "LTMPlot.h"
 #include "LTMSettings.h"
 #include "LTMChartParser.h"
-#include "TabView.h"
+#include "AbstractView.h"
 #include "Context.h"
 #include "Context.h"
 #include "Athlete.h"
@@ -35,10 +35,7 @@
 #include "HelpWhatsThis.h"
 #include "GcOverlayWidget.h"
 
-#ifdef NOWEBKIT
 #include <QWebEngineSettings>
-#include <QDesktopWidget>
-#endif
 
 #include <QtGlobal>
 #include <QtGui>
@@ -69,7 +66,7 @@ LTMWindow::LTMWindow(Context *context) :
     QVBoxLayout *mainLayout = new QVBoxLayout;
 
     QPalette palette;
-    palette.setBrush(QPalette::Background, QBrush(GColor(CTRENDPLOTBACKGROUND)));
+    palette.setBrush(QPalette::Window, QBrush(GColor(CTRENDPLOTBACKGROUND)));
 
     // single plot
     plotWidget = new QWidget(this);
@@ -113,11 +110,7 @@ LTMWindow::LTMWindow(Context *context) :
     // BUG in QMacStyle and painting of spanSlider
     // so we use a plain style to avoid it, but only
     // on a MAC, since win and linux are fine
-#if QT_VERSION > 0x5000
     QStyle *style = QStyleFactory::create("fusion");
-#else
-    QStyle *style = QStyleFactory::create("Cleanlooks");
-#endif
     spanSlider->setStyle(style);
     scrollLeft->setStyle(style);
     scrollRight->setStyle(style);
@@ -144,28 +137,19 @@ LTMWindow::LTMWindow(Context *context) :
 
     // the data table
     QFont defaultFont; // mainwindow sets up the defaults.. we need to apply
-#ifdef NOWEBKIT
     dataSummary = new QWebEngineView(this);
-#if QT_VERSION >= 0x050800
     // stop stealing focus!
     dataSummary->settings()->setAttribute(QWebEngineSettings::FocusOnNavigationEnabled, false);
-#endif
     //XXXdataSummary->setEnabled(false); // stop grabbing focus
     if (dpiXFactor > 1) {
     // 80 lines per page on hidpi screens (?)
-        int pixelsize = pixelSizeForFont(defaultFont, QApplication::desktop()->geometry().height()/80);
+        int pixelsize = pixelSizeForFont(defaultFont, QApplication::primaryScreen()->geometry().height()/80);
         dataSummary->settings()->setFontSize(QWebEngineSettings::DefaultFontSize, pixelsize);
     } else {
         dataSummary->settings()->setFontSize(QWebEngineSettings::DefaultFontSize, defaultFont.pointSize()+1);
     }
     dataSummary->settings()->setFontFamily(QWebEngineSettings::StandardFont, defaultFont.family());
-#else
-    dataSummary = new QWebView(this);
-    dataSummary->settings()->setFontSize(QWebSettings::DefaultFontSize, defaultFont.pointSize()+1);
-    dataSummary->settings()->setFontFamily(QWebSettings::StandardFont, defaultFont.family());
-#endif
     dataSummary->setContentsMargins(0,0,0,0);
-    dataSummary->page()->view()->setContentsMargins(0,0,0,0);
     dataSummary->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     dataSummary->setAcceptDrops(false);
 
@@ -233,6 +217,8 @@ LTMWindow::LTMWindow(Context *context) :
 
     // add additional menu items before setting
     // controls since the menu is SET from setControls
+    QAction *showsettings = new QAction(tr("Chart Settings..."));
+    addAction(showsettings);
     QAction *exportData = new QAction(tr("Export Chart Data..."), this);
     addAction(exportData);
 
@@ -281,7 +267,7 @@ LTMWindow::LTMWindow(Context *context) :
     t2label1 = new QLabel(tr("Negative decay"), this);
     t2label2 = new QLabel(tr("days"), this);
     RMSElabel = new QLabel(this);
-    RMSElabel->setText("RMSE 2.9 for 22 tests.");
+    RMSElabel->setText(tr("RMSE 2.9 for 22 tests."));
 
     // add to layout
     bang->addWidget(ilabel,0,0);
@@ -314,6 +300,8 @@ LTMWindow::LTMWindow(Context *context) :
     connect(this, SIGNAL(dateRangeChanged(DateRange)), this, SLOT(dateRangeChanged(DateRange)));
     connect(this, SIGNAL(styleChanged(int)), this, SLOT(styleChanged(int)));
     connect(ltmTool, SIGNAL(filterChanged()), this, SLOT(filterChanged()));
+    connect(this, SIGNAL(perspectiveFilterChanged(QString)), this, SLOT(filterChanged()));
+    connect(this, SIGNAL(perspectiveChanged(Perspective*)), this, SLOT(filterChanged()));
     connect(context, SIGNAL(homeFilterChanged()), this, SLOT(filterChanged()));
     connect(ltmTool->groupBy, SIGNAL(currentIndexChanged(int)), this, SLOT(groupBySelected(int)));
     connect(rGroupBy, SIGNAL(valueChanged(int)), this, SLOT(rGroupBySelected(int)));
@@ -349,6 +337,7 @@ LTMWindow::LTMWindow(Context *context) :
 
     // custom menu item
     connect(exportData, SIGNAL(triggered()), this, SLOT(exportData()));
+    connect(showsettings, SIGNAL(triggered()), this, SIGNAL(showControls()));
 
     // normal view
     connect(spanSlider, SIGNAL(lowerPositionChanged(int)), this, SLOT(spanSliderChanged()));
@@ -367,6 +356,7 @@ LTMWindow::LTMWindow(Context *context) :
 LTMWindow::~LTMWindow()
 {
     delete popup;
+    if (dataSummary) delete dataSummary->page();
 }
 
 void
@@ -449,7 +439,7 @@ LTMWindow::event(QEvent *event)
         }
 
         // if off the screen move on screen
-        if (helperWidget()->geometry().x() > geometry().width()) {
+        if (helperWidget()->geometry().x() > geometry().width() || helperWidget()->geometry().x() < geometry().x()) {
             helperWidget()->move(mainWidget()->geometry().width()-(500*dpiXFactor), 90*dpiYFactor);
         }
     }
@@ -496,14 +486,14 @@ LTMWindow::refreshBanister()
         QDate when = banister->getPeakPerf(settings.start.date(), settings.end.date(), perf, CP);
 
         // set peak label
-        if (CP >0 && when != QDate()) peaklabel ->setText(QString("%1 watts on %2").arg(CP).arg(when.toString("d MMM yyyy")));
-        else if (perf >0.0 && when != QDate()) peaklabel ->setText(QString("%1 on %2").arg(perf, 0, 'f', 1).arg(when.toString("d MMM yyyy")));
+        if (CP >0 && when != QDate()) peaklabel ->setText(tr("%1 watts on %2").arg(CP).arg(when.toString("d MMM yyyy")));
+        else if (perf >0.0 && when != QDate()) peaklabel ->setText(tr("%1 on %2").arg(perf, 0, 'f', 1).arg(when.toString("d MMM yyyy")));
         else peaklabel->setText("");
 
         // set RMSE for current view
         int count;
         double RMSE = banister->RMSE(settings.start.date(), settings.end.date(), count);
-        if (count && RMSE >0) RMSElabel->setText(QString("RMSE %1 for %2 tests.").arg(RMSE, 0, 'f', 2).arg(count));
+        if (count && RMSE >0) RMSElabel->setText(tr("RMSE %1 for %2 tests.").arg(RMSE, 0, 'f', 2).arg(count));
         else RMSElabel->setText("");
 
     } else {
@@ -527,7 +517,6 @@ LTMWindow::configChanged(qint32)
     // inverted palette for data etc
     QPalette whitepalette;
     whitepalette.setBrush(QPalette::Window, QBrush(GColor(CTRENDPLOTBACKGROUND)));
-    whitepalette.setBrush(QPalette::Background, QBrush(GColor(CTRENDPLOTBACKGROUND)));
     whitepalette.setColor(QPalette::WindowText, GCColor::invertColor(GColor(CTRENDPLOTBACKGROUND)));
     whitepalette.setColor(QPalette::Base, GCColor::alternateColor(GColor(CPLOTBACKGROUND)));
     whitepalette.setColor(QPalette::Text, GCColor::invertColor(GColor(CTRENDPLOTBACKGROUND)));
@@ -561,11 +550,11 @@ LTMWindow::configChanged(qint32)
     RMSElabel->setPalette(whitepalette);
 
 #ifndef Q_OS_MAC
-    banT1->setStyleSheet(TabView::ourStyleSheet());
-    banT2->setStyleSheet(TabView::ourStyleSheet());
-    banCombo->setStyleSheet(TabView::ourStyleSheet());
-    plotArea->setStyleSheet(TabView::ourStyleSheet());
-    compareplotArea->setStyleSheet(TabView::ourStyleSheet());
+    banT1->setStyleSheet(AbstractView::ourStyleSheet());
+    banT2->setStyleSheet(AbstractView::ourStyleSheet());
+    banCombo->setStyleSheet(AbstractView::ourStyleSheet());
+    plotArea->setStyleSheet(AbstractView::ourStyleSheet());
+    compareplotArea->setStyleSheet(AbstractView::ourStyleSheet());
 #endif
     refresh();
 }
@@ -645,6 +634,7 @@ LTMWindow::presetSelected(int index)
         fs.addFilter(context->isfiltered, context->filters);
         fs.addFilter(context->ishomefiltered, context->homeFilters);
         fs.addFilter(ltmTool->isFiltered(), ltmTool->filters());
+        if (myPerspective) fs.addFilter(myPerspective->isFiltered(), myPerspective->filterlist(myDateRange));
         settings.specification.setFilterSet(fs);
         settings.specification.setDateRange(DateRange(settings.start.date(), settings.end.date()));
 
@@ -702,7 +692,7 @@ void
 LTMWindow::spanSliderChanged()
 {
     // so reset the axis range for ltmPlot
-    ltmPlot->setAxisScale(QwtPlot::xBottom, spanSlider->lowerValue(), spanSlider->upperValue());
+    ltmPlot->setAxisScale(QwtAxis::XBottom, spanSlider->lowerValue(), spanSlider->upperValue());
     ltmPlot->replot();
 }
 
@@ -742,8 +732,8 @@ LTMWindow::refreshPlot()
                 stackWidget->setCurrentIndex(0);
                 dirty = false;
 
-                spanSlider->setMinimum(ltmPlot->axisScaleDiv(QwtPlot::xBottom).lowerBound());
-                spanSlider->setMaximum(ltmPlot->axisScaleDiv(QwtPlot::xBottom).upperBound());
+                spanSlider->setMinimum(ltmPlot->axisScaleDiv(QwtAxis::XBottom).lowerBound());
+                spanSlider->setMaximum(ltmPlot->axisScaleDiv(QwtAxis::XBottom).upperBound());
                 spanSlider->setLowerValue(spanSlider->minimum());
                 spanSlider->setUpperValue(spanSlider->maximum());
             }
@@ -1082,6 +1072,7 @@ LTMWindow::filterChanged()
     fs.addFilter(context->isfiltered, context->filters);
     fs.addFilter(context->ishomefiltered, context->homeFilters);
     fs.addFilter(ltmTool->isFiltered(), ltmTool->filters());
+    if (myPerspective) fs.addFilter(myPerspective->isFiltered(), myPerspective->filterlist(myDateRange));
     settings.specification.setFilterSet(fs);
     settings.specification.setDateRange(DateRange(settings.start.date(), settings.end.date()));
 
@@ -1208,6 +1199,7 @@ LTMWindow::applyClicked()
         fs.addFilter(context->isfiltered, context->filters);
         fs.addFilter(context->ishomefiltered, context->homeFilters);
         fs.addFilter(ltmTool->isFiltered(), ltmTool->filters());
+        if (myPerspective) fs.addFilter(myPerspective->isFiltered(), myPerspective->filterlist(myDateRange));
         settings.specification.setFilterSet(fs);
         settings.specification.setDateRange(DateRange(settings.start.date(), settings.end.date()));
 
@@ -1267,20 +1259,11 @@ class GroupedData {
 void
 LTMWindow::refreshDataTable()
 {
-#ifndef NOWEBKIT
-    // clear to force refresh
-    dataSummary->page()->mainFrame()->setHtml("");
-#endif
-
     // get string
     QString summary = dataTable(true);
 
     // now set it
-#ifdef NOWEBKIT
     dataSummary->page()->setHtml(summary);
-#else
-    dataSummary->page()->mainFrame()->setHtml(summary);
-#endif
 }
 
 // for storing curve data without using a curve
@@ -1364,7 +1347,13 @@ LTMWindow::dataTable(bool html)
         TableCurveData add;
 
         ltmPlot->settings=&settings; // for stack mode ltmPlot isn't set
-        ltmPlot->createCurveData(context, &settings, metricDetail, add.x, add.y, add.n, true);
+        if (settings.groupBy != LTM_TOD)
+            ltmPlot->createCurveData(context, &settings, metricDetail, add.x, add.y, add.n, true);
+        else
+            ltmPlot->createTODCurveData(context, &settings, metricDetail, add.x, add.y, add.n, true);
+
+        // adjust to avoid empty chart when there is only 1 group
+        if (settings.groupBy != LTM_TOD) add.n++;
 
         columns << add;
 
@@ -1430,14 +1419,15 @@ LTMWindow::dataTable(bool html)
         // formatting ...
         LTMScaleDraw lsd(settings.start, groupForDate(settings.start.date()), settings.groupBy);
 
+        QString sLabel = (settings.groupBy == LTM_TOD) ? tr("Time of Day") : tr("Date");
         if (html) {
             // table and headings 50% for 1 metric, 70% for 2 metrics, 90% for 3 metrics or more
             QString tableStart = "<table border=0 cellspacing=3 width=\"%1%%\"><tr><td align=\"center\" valigne=\"top\"><b>%2</b></td>";
-            tableStart = tableStart.arg(settings.metrics.count() >= 3 ? 90 : (30 + (settings.metrics.count() * 20))).arg(tr("Date"));
+            tableStart = tableStart.arg(settings.metrics.count() >= 3 ? 90 : (30 + (settings.metrics.count() * 20))).arg(sLabel);
 
             summary += tableStart;
         } else {
-            summary += tr("Date");
+            summary += sLabel;
         }
 
         QList<QVector<double> > hdatas;
@@ -1555,7 +1545,7 @@ LTMWindow::dataTable(bool html)
             summary += "\n";
         }
 
-        for(int row=0; row<=rows; row++) {
+        for(int row=0; row<rows; row++) {
 
             QString rowSummary;
 
@@ -1578,9 +1568,9 @@ LTMWindow::dataTable(bool html)
             }
 
             // First column, date / month year etc
-            if (html) rowSummary += "<td align=\"center\" valign=\"top\">%1</td>";
-            else rowSummary += "%1";
-            rowSummary = rowSummary.arg(lsd.label(columns[0].x[row]+0.5).text().replace("\n", " "));
+            QString sDate = lsd.label(columns[0].x[row]+0.5).text().replace("\n", " ");
+            if (html) rowSummary += QString("<td align=\"center\" valign=\"top\">%1</td>").arg(sDate);
+            else rowSummary += (settings.groupBy == LTM_ALL || settings.groupBy == LTM_TOD) ? sDate : lsd.toDate(columns[0].x[row]+0.5).toString(Qt::ISODate);
 
             // Remaining columns - each metric value
             for(int j=0; j<columns.count(); j++) {
@@ -1676,6 +1666,9 @@ LTMWindow::exportData()
 
         // open stream and write header
         QTextStream stream(&f);
+#if QT_VERSION < 0x060000
+        stream.setCodec("UTF-8"); // Names and Units can be translated
+#endif
         stream << content;
 
         // and we're done

@@ -20,9 +20,15 @@
 #define _MeterWidget_h 1
 
 #include <QWidget>
+#include "Context.h"
+#include <QtWebChannel>
+#include <QWebEnginePage>
+#include <QWebEngineView>
 
 class MeterWidget : public QWidget
 {
+    Q_OBJECT
+
   public:
     explicit MeterWidget(QString name, QWidget *parent = 0, QString Source = QString("None"));
     QString Source() const { return m_Source; };
@@ -41,29 +47,37 @@ class MeterWidget : public QWidget
     virtual void AdjustSizePos();
     virtual void ComputeSize();
     virtual void paintEvent(QPaintEvent* paintevent);
+    virtual void startPlayback(Context* context);
+    virtual void stopPlayback();
     virtual QSize sizeHint() const;
     virtual QSize minimumSize() const;
     void    setColor(QColor  mainColor);
     void    setBoundingRectVisibility(bool show, QColor  boundingRectColor = QColor(255,0,0,255));
 
     float Value, ValueMin, ValueMax;
-    QString Text, AltText;
+    QString Text, AltText, AltTextSuffix;
+    Qt::Alignment alignment;
+    int textWidth;
 
   protected:
     QString  m_Name;
     QWidget* m_container;
     QString  m_Source;
+    QWidget* m_VideoContainer;
+    QRegion  videoContainerRegion;
     float    m_RelativeWidth, m_RelativeHeight;
     float    m_RelativePosX, m_RelativePosY;
     int      m_PosX, m_PosY, m_Width, m_Height;
     float    m_RangeMin, m_RangeMax;
     float    m_Angle;
     int      m_SubRange;
+    bool     forceSquareRatio;
 
     QColor  m_MainColor;
     QColor  m_ScaleColor;
     QColor  m_OutlineColor;
     QColor  m_BackgroundColor;
+    QColor  m_BoundingRectColor;
     QFont   m_MainFont;
     QFont   m_AltFont;
 
@@ -73,8 +87,8 @@ class MeterWidget : public QWidget
     QPen   m_OutlinePen;
     QPen   m_ScalePen;
 
+    bool    backgroundVisibility;
     bool    boundingRectVisibility;
-    QColor  boundingRectColor;
 
     friend class VideoLayoutParser;
 };
@@ -83,7 +97,6 @@ class TextMeterWidget : public MeterWidget
 {
   public:
     explicit TextMeterWidget(QString name, QWidget *parent = 0, QString Source = QString("None"));
-    virtual void ComputeSize();
     virtual void paintEvent(QPaintEvent* paintevent);
 };
 
@@ -109,5 +122,73 @@ class NeedleMeterWidget : public MeterWidget
     virtual void paintEvent(QPaintEvent* paintevent);
 };
 
+class ElevationMeterWidget : public MeterWidget
+{
+    Q_OBJECT
+
+    Context* context;
+    QPolygon m_elevationPolygon;
+    double m_minX, m_maxX;
+    int m_savedWidth, m_savedHeight, m_savedMinY, m_savedMaxY;
+
+  protected:
+    virtual void paintEvent(QPaintEvent* paintevent);
+
+    void lazySetup(void);
+
+  public:
+    explicit ElevationMeterWidget(QString name, QWidget *parent = 0, QString Source = QString("None"), Context *context = NULL);
+    void setContext(Context* context) { this->context = context; }
+    float gradientValue;
+};
+
+// Connect JS with C++
+class WebClass : public QObject
+{
+    Q_OBJECT
+    //Q_PROPERTY(QString jsFuncName MEMBER m_jsFuncName)
+public slots:
+    Q_INVOKABLE void jscallme(const QString &datafromjs);
+    //Q_INVOKABLE void jscallme();
+
+public:
+    QString jsFuncReturn;
+    bool jsFuncinitMapLoaded, jsFuncmoveMarkerLoaded, jsFuncshowMyMarkerLoaded, jsFunccenterMapLoaded, jsFuncshowRouteLoaded = false;
+};
+
+// Display live map as overlay on video
+class LiveMapWidget : public MeterWidget
+{
+    Q_OBJECT
+    Context* context;
+
+public:
+    explicit LiveMapWidget(QString name, QWidget* parent = 0, QString Source = QString("None"), Context* context = NULL);
+    ~LiveMapWidget();
+    virtual void startPlayback(Context* context);
+    virtual void stopPlayback();
+    void setContext(Context* context) { this->context = context; }
+    void plotNewLatLng(double newLat, double newLong);
+    void initLiveMap(Context* context);
+    void loadingLiveMap();
+    int  m_Zoom;
+    QString  m_osmURL;
+
+private slots:
+
+protected:
+    void createHtml(QString sBaseUrl, QString autoRunJS);
+    void buildRouteArrayLatLngs(Context* context);
+    void resizeEvent(QResizeEvent*);
+    QWebEngineView *liveMapView;
+    QWebEnginePage *webPage;
+    WebClass *webobj;
+    QWebChannel *channel;
+
+    QString routeLatLngs;
+    QString currentPage;
+    bool routeInitialized, mapInitialized;
+   
+};
 
 #endif // _MeterWidget_h

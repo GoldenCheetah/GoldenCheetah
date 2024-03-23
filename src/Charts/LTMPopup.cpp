@@ -55,11 +55,7 @@ LTMPopup::LTMPopup(Context *context) : QWidget(context->mainWindow), context(con
     // ride list...
     rides = new QTableWidget(this);
 #ifdef Q_OS_LINUX // QT 4.7 bug on Linux, selection-background-color is ignored (no transparency)
-#if QT_VERSION > 0x5000
     QStyle *style = QStyleFactory::create("fusion");
-#else
-    QStyle *style = QStyleFactory::create("Cleanlooks");
-#endif
     rides->setStyle(style);
 #endif
     rides->setFrameStyle(QFrame::NoFrame);
@@ -103,7 +99,7 @@ LTMPopup::LTMPopup(Context *context) : QWidget(context->mainWindow), context(con
     mainLayout->addWidget(notes);
 
     connect(rides, SIGNAL(itemSelectionChanged()), this, SLOT(rideSelected()));
-    connect(rides, SIGNAL(itemDoubleClicked(QTableWidgetItem*)), this, SLOT(rideOpen()));
+    connect(rides, SIGNAL(itemClicked(QTableWidgetItem*)), this, SLOT(rideOpen()));
 
 }
 
@@ -153,7 +149,7 @@ LTMPopup::setData(Specification spec, const RideMetric *metric, QString title)
         // metrics
         double d = item->getForSymbol(metric->symbol());
         const_cast<RideMetric *>(metric)->setValue(d);
-        QString value = metric->toString(context->athlete->useMetricUnits);
+        QString value = metric->toString(GlobalContext::context()->useMetricUnits);
 
         h = new QTableWidgetItem(value,QTableWidgetItem::Type);
         h->setFlags(t->flags() & (~Qt::ItemIsEditable));
@@ -303,7 +299,7 @@ LTMPopup::setData(LTMSettings &settings, QDate start, QDate end, QTime time)
                  if (d.type == METRIC_DB || d.type == METRIC_META) {
 
                      // get the value to show as a string
-                     value = item->getStringForSymbol(d.symbol, context->athlete->useMetricUnits);
+                     value = item->getStringForSymbol(d.symbol, GlobalContext::context()->useMetricUnits);
 
                  } else if (d.type == METRIC_BEST) {
 
@@ -380,7 +376,7 @@ LTMPopup::setSummaryHTML(RideItem *item)
         << "average_power"
         << "average_hr"
         << "average_cad"
-        << (item->isSwim ? "pace_swim" : "pace");
+        << (item->isSwim ? "pace_swim" : (item->sport=="Row" ? "pace_row" : "pace"));
 
     static const QStringList maximumColumn = QStringList()
         << "max_speed"
@@ -391,10 +387,10 @@ LTMPopup::setSummaryHTML(RideItem *item)
 
 
     // user defined
-    QString s = appsettings->value(this, GC_SETTINGS_SUMMARY_METRICS, GC_SETTINGS_SUMMARY_METRICS_DEFAULT).toString();
+    QString s = appsettings->value(this, GC_SETTINGS_FAVOURITE_METRICS, GC_SETTINGS_FAVOURITE_METRICS_DEFAULT).toString();
 
     // in case they were set tand then unset
-    if (s == "") s = GC_SETTINGS_SUMMARY_METRICS_DEFAULT;
+    if (s == "") s = GC_SETTINGS_FAVOURITE_METRICS_DEFAULT;
     QStringList metricColumn = s.split(",");
 
     // foreach of the metrics get the ride value
@@ -455,16 +451,16 @@ LTMPopup::setSummaryHTML(RideItem *item)
         QString value;
         if (metric) {
             const_cast<RideMetric*>(metric)->setValue(d);
-            value = metric->toString(context->athlete->useMetricUnits);
+            value = metric->toString(GlobalContext::context()->useMetricUnits);
         }
 
         // Maximum Max and Average Average looks nasty, remove from name for display
-        QString s = metric ? metric->name().replace(QRegExp(tr("^(Average|Max) ")), "") : "unknown";
+        QString s = metric ? metric->name().replace(QRegularExpression(tr("^(Average|Max) ")), "") : "unknown";
 
         // don't show units for time values
-        if (metric && (metric->units(context->athlete->useMetricUnits) == "seconds" ||
-                       metric->units(context->athlete->useMetricUnits) == tr("seconds") ||
-                       metric->units(context->athlete->useMetricUnits) == "")) {
+        if (metric && (metric->units(GlobalContext::context()->useMetricUnits) == "seconds" ||
+                       metric->units(GlobalContext::context()->useMetricUnits) == tr("seconds") ||
+                       metric->units(GlobalContext::context()->useMetricUnits) == "")) {
 
           summaryText += QString("<tr><td>%1:</td><td align=\"right\"> %2</td></tr>")
                                  .arg(s)
@@ -473,7 +469,7 @@ LTMPopup::setSummaryHTML(RideItem *item)
         } else {
           summaryText += QString("<tr><td>%1(%2):</td><td align=\"right\"> %3</td></tr>")
                                  .arg(s)
-                                 .arg(metric ? metric->units(context->athlete->useMetricUnits) : "unknown")
+                                 .arg(metric ? metric->units(GlobalContext::context()->useMetricUnits) : "unknown")
                                  .arg(value);
         }
       }
@@ -537,8 +533,6 @@ LTMPopup::rideOpen()
 
             // Select Activity in Activities view
             context->notifyRideSelected(have);
-            // Select Activities view
-            context->mainWindow->selectAnalysis();
         }
     }
 }

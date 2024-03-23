@@ -74,10 +74,11 @@ class VideoSyncFile
 
         static bool isVideoSync(QString); // is this a supported videosync?
 
-        void reload();          // reload after messed about
-        void parseRLV();        // its a rlv file
-        void parseTTS();        // its a tts file
-        bool isValid();         // is the file valid or not?
+        void reload();                    // reload after messed about
+        void parseRLV();                  // its a rlv file
+        void parseTTS();                  // its a tts file
+        void parseFromRideFileFactory();  // try an skrimp video sync info from a ride file.
+        bool isValid() const;             // is the file valid or not?
 
         double VideoFrameRate;
 
@@ -93,8 +94,6 @@ class VideoSyncFile
         long    Duration;       // Duration of this workout in msecs
         double  Distance;       // Distance of this workout in km
         bool    valid;          // did it parse ok?
-        float   manualOffset;   // when user seek video manually
-        double  km;             // current cyclist position
 
         QVector<VideoSyncFilePoint> Points;    // points in workout
 

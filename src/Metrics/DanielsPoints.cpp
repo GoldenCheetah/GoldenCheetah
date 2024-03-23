@@ -175,12 +175,12 @@ private:
         double lastSecs = 0.0;
         double weighted = 0.0;
 
-	if (item->context->athlete->zones(item->isRun) == NULL || item->zoneRange < 0) {
+	if (item->context->athlete->zones(item->sport) == NULL || item->zoneRange < 0) {
             setValue(RideFile::NIL);
             setCount(0);
             return;
 	}
-        double cp = item->context->athlete->zones(item->isRun)->getCP(item->zoneRange);
+        double cp = item->context->athlete->zones(item->sport)->getCP(item->zoneRange);
 
         score = 0.0;
 
@@ -281,13 +281,13 @@ class DanielsEquivalentPower : public RideMetric {
     void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &deps) {
 
         // no zones
-        if (item->context->athlete->zones(item->isRun) == NULL || item->zoneRange < 0) {
+        if (item->context->athlete->zones(item->sport) == NULL || item->zoneRange < 0) {
             setValue(RideFile::NIL);
             setCount(0);
             return;
         }
 
-        double cp = item->context->athlete->zones(item->isRun)->getCP(item->zoneRange);
+        double cp = item->context->athlete->zones(item->sport)->getCP(item->zoneRange);
 
         assert(deps.contains("daniels_points"));
         assert(deps.contains("time_riding"));

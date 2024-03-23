@@ -18,7 +18,6 @@
 
 #ifndef GC_CloudService_h
 #define GC_CloudService_h
-
 #include <QList>
 #include <QMap>
 #include <QString>
@@ -513,7 +512,7 @@ class CloudServiceFactory {
 
     // sorted list of service names
     const QStringList serviceNames() const { QStringList returning = names_;
-                                              qSort(returning);
+                                              std::sort(returning.begin(), returning.end(), Utils::qstringascend);
                                               return returning; }
 
     const CloudService *service(QString name) const { return services_.value(name, NULL); }

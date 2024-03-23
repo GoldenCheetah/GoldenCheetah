@@ -108,7 +108,7 @@ class FixSpeed : public DataProcessor {
         }
 };
 
-static bool FixSpeedAdded = DataProcessorFactory::instance().registerProcessor(QString("Fix Speed"), new FixSpeed());
+static bool FixSpeedAdded = DataProcessorFactory::instance().registerProcessor(QString("Fix Speed from Distance"), new FixSpeed());
 
 bool
 FixSpeed::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString op="")
@@ -161,7 +161,7 @@ FixSpeed::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString op=
             // ok, lets start a luw if not already changed
             if (!changed) {
                 changed = true;
-                ride->command->startLUW("Fix Speed");
+                ride->command->startLUW("Fix Speed from Distance");
             }
             ride->command->setPointValue(i, RideFile::kph, kph);
         }
@@ -171,7 +171,7 @@ FixSpeed::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString op=
         km = p->km;
     }
 
-    if (changed) {
+    if (changed || !ride->areDataPresent()->kph) {
         ride->setDataPresent(ride->kph, true);
         ride->command->endLUW();
         return true;

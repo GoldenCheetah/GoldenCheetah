@@ -48,7 +48,7 @@
  * - so... hack around this with currentRequest + dispatchRequest TODO: fix
  */
 
-const QString VELOHERO_URL( "http://app.velohero.com" );
+const QString VELOHERO_URL( "https://app.velohero.com" );
 
 class VeloHeroParser : public QXmlDefaultHandler
 {

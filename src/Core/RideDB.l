@@ -39,19 +39,44 @@
 // Un-Escape special characters (JSON compliance)
 static QString unprotect(char *string)
 {
-    // sending UTF-8 to FLEX demands symetric conversion back to QString
-    QString string2 = QString::fromUtf8(string);
 
-    // this is a lexer string so it will be enclosed
-    // in quotes. Lets strip those first
-    QStringRef r = string2.midRef(1,string2.length()-2);
+    char *s = string;
+    char *target = static_cast<char*>(malloc(strlen(string)+1));
+    char *p = target;
 
-    // does it end with a space (to avoid token conflict) ?
-    if (r.endsWith(" ")) r = r.mid(0, r.length()-1);
+    // first "
+    s++;
 
-    QString s = Utils::RidefileUnEscape(r);
+    while (*s != '\0') {
+        if (*s == '\\') {
+            switch(*++s) {
+            case '\\' : *p++ = '\\'; break;
+            case 't' : *p++ = '\t'; break;
+            case 'n' : *p++ = '\n'; break;
+            case 'r' : *p++ = '\r'; break;
+            case 'b' : *p++ = '\b'; break;
+            case 'f' : *p++ = '\f'; break;
+            case '/' : *p++ = '/'; break;
+            case '"' : *p++ = '"'; break;
+            default:
+            *p++ = '\\'; *p++ = *s;
+            }
+        } else *p++ = *s;
+        s++;
+    }
 
-    return s;
+    // trailing "
+    p--;
+
+    // trailing SINGLE space used to protect tokens
+    *p-- = '\0';
+    if(p>=target && *p == ' ') *p = '\0';
+
+    // as a qstring
+    QString r = QString::fromUtf8(target);
+    free(target);
+
+    return r;
 }
 
 // we reimplement these to remove compiler warnings

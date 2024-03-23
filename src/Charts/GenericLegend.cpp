@@ -20,20 +20,21 @@
 #include "GenericPlot.h"
 
 #include "Colors.h"
-#include "TabView.h"
+#include "AbstractView.h"
 #include "RideFileCommand.h"
 #include "Utils.h"
 
 #include <limits>
 
-GenericLegendItem::GenericLegendItem(Context *context, QWidget *parent, QString name, QColor color) :
-    QWidget(parent), context(context), name(name), color(color), datetime(false)
+GenericLegendItem::GenericLegendItem(Context *context, GenericLegend *parent, QString name, QColor color) :
+    QWidget(parent), context(context), name(name), color(color), legend(parent), datetime(false)
 {
 
     value=0;
     enabled=true;
     clickable=true;
     hasvalue=false;
+    hasstring=false;
 
     // set height and width, gets reset when configchanges
     configChanged(0);
@@ -51,24 +52,29 @@ GenericLegendItem::GenericLegendItem(Context *context, QWidget *parent, QString 
 void
 GenericLegendItem::configChanged(qint32)
 {
-    static const double gl_margin = 5 * dpiXFactor;
-    static const double gl_spacer = 2 * dpiXFactor;
-    static const double gl_block = 7 * dpiXFactor;
-    static const double gl_linewidth = 1 * dpiXFactor;
-
     // we just set geometry for now.
     QFont f; // based on what just got set in prefs
+    // we need to scale...
+    f.setPointSizeF(f.pointSizeF() * legend->plot()->scale());
     QFontMetricsF fm(f);
 
     // so now the string we would display
     QString valuelabel = QString ("%1").arg("9999999.999"); // xxx later we might have scale/dp
+    double textheight = fm.boundingRect(valuelabel).height();
+
+    double gl_linefactor = 0.1; // width is proportional to text height
+    double gl_spacefactor = 0.05; // spacing is proportional to text height
+    double gl_margin = 4 * dpiXFactor*legend->plot()->scale();
+    double gl_block = 4 * dpiXFactor*legend->plot()->scale();
+    double gl_spacer = gl_spacefactor * textheight;
+    double gl_linewidth = gl_linefactor * textheight;
 
     // maximum width of widget = margin + block + space + name + space + value + margin
     double width = gl_margin + gl_block + gl_spacer + fm.boundingRect(name).width()
                               + gl_spacer + fm.boundingRect(valuelabel).width() + gl_margin;
 
     // maximum height of widget = margin + textheight + spacer + line
-    double height = (gl_margin*2) + fm.boundingRect(valuelabel).height() + gl_spacer + gl_linewidth;
+    double height = (gl_margin*3) + fm.boundingRect(valuelabel).height() + gl_spacer + gl_linewidth;
 
     // now set geometry of widget
     setFixedWidth(width);
@@ -92,7 +98,11 @@ GenericLegendItem::eventFilter(QObject *obj, QEvent *e)
     if (obj != this) return false;
 
     switch (e->type()) {
-    case QEvent::MouseButtonRelease: // for now just one event, but may do more later
+
+    // release is not propagated when embedded in chartspace
+    // so we respond to press not release events, see:
+    // https://github.com/GoldenCheetah/GoldenCheetah/issues/3992
+    case QEvent::MouseButtonPress:
         {
             if (clickable && underMouse()) {
                 enabled=!enabled;
@@ -100,9 +110,10 @@ GenericLegendItem::eventFilter(QObject *obj, QEvent *e)
                 emit clicked(name, enabled);
             }
         }
-        // fall through
-    default:
-        //fprintf(stderr, "event %d on %s\n", e->type(), name.toStdString().c_str()); fflush(stderr);
+
+    case QEvent::Enter:
+    case QEvent::Leave:
+        // hover indicator show/hide as mouse hovers over the item
         update();
         break;
     }
@@ -116,7 +127,7 @@ GenericLegendItem::paintEvent(QPaintEvent *)
     painter.save();
 
     // fill background first
-    painter.setBrush(QBrush(GColor(CPLOTBACKGROUND)));
+    painter.setBrush(QBrush(legend->plot()->backgroundColor()));
     painter.setPen(Qt::NoPen);
     painter.drawRect(0,0,geometry().width()-1, geometry().height()-1);
 
@@ -140,25 +151,30 @@ GenericLegendItem::paintEvent(QPaintEvent *)
     QString string;
     if (hasvalue) {
         if (datetime) string=QDateTime::fromMSecsSinceEpoch(value).toString(datetimeformat);
-        else string=QString("%1").arg(value, 0, 'f', 2);
+        else {
+            string=QString("%1").arg(value, 0, 'f', 2);
+            string = Utils::removeDP(string);
+        }
     } else string="   ";
 
-    // remove redundat dps (e.g. trailing zeroes)
-    string = Utils::removeDP(string);
+    if (hasstring)  string=this->string;
 
     // set pen to series color for now
-    if (enabled)  painter.setPen(GCColor::invertColor(GColor(CPLOTBACKGROUND))); // use invert - usually black or white
+    if (enabled)  painter.setPen(GCColor::invertColor(legend->plot()->backgroundColor())); // use invert - usually black or white
     else painter.setPen(Qt::gray);
-    painter.setFont(QFont());
+
+    QFont f;
+    f.setPointSizeF(f.pointSize() * legend->plot()->scale());
+    painter.setFont(f);
 
     // series
-    painter.drawText(namerect, name, Qt::AlignHCenter|Qt::AlignVCenter);
+    painter.drawText(namerect, Qt::TextSingleLine, name);
     painter.drawText(valuerect, string, Qt::AlignHCenter|Qt::AlignVCenter);
     painter.restore();
 
 }
 
-GenericLegend::GenericLegend(Context *context, GenericPlot *plot) : context(context), plot(plot)
+GenericLegend::GenericLegend(Context *context, GenericPlot *plot) : context(context), plot_(plot)
 {
     layout = new QHBoxLayout(this);
     layout->addStretch();
@@ -166,7 +182,7 @@ GenericLegend::GenericLegend(Context *context, GenericPlot *plot) : context(cont
     orientation=Qt::Horizontal;
     xname="";
     clickable=true;
-    setAutoFillBackground(true);
+    setAutoFillBackground(false);
 
     connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
 
@@ -178,7 +194,7 @@ void
 GenericLegend::configChanged(qint32)
 {
     QPalette pal;
-    pal.setBrush(backgroundRole(), GColor(CPLOTBACKGROUND));
+    pal.setBrush(backgroundRole(), plot()->backgroundColor());
     setPalette(pal);
     repaint();
 }
@@ -256,6 +272,13 @@ GenericLegend::addLabel(QLabel *label)
     layout->addWidget(label);
 }
 
+// removes from layout but does not delete it.
+void
+GenericLegend::removeLabel(QLabel *label)
+{
+    layout->removeWidget(label);
+}
+
 void
 GenericLegend::removeSeries(QString name)
 {
@@ -279,14 +302,17 @@ GenericLegend::removeAllSeries()
 }
 
 void
-GenericLegend::setValue(QPointF value, QString name)
+GenericLegend::setValue(GPointF value, QString name, QString label)
 {
     GenericLegendItem *call = items.value(name, NULL);
     if (call) call->setValue(value.y());
 
     // xaxis
     GenericLegendItem *xaxis = items.value(xname, NULL);
-    if (xaxis) xaxis->setValue(value.x());
+    if (xaxis) {
+        if (label != "(null)") xaxis->setValue(label);
+        else xaxis->setValue(value.x());
+    }
 }
 
 void

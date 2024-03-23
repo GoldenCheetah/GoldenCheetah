@@ -19,9 +19,11 @@
 #if !defined(BICYCLESIM_H)
 #define BICYCLESIM_H
 
+#include <chrono>
+
 #include "RealtimeData.h"
 #include "PhysicsUtility.h"
-#include <chrono>
+#include "ErgFile.h"
 
 class BicycleWheel
 {
@@ -46,22 +48,24 @@ public:
 
 struct BicycleConstants
 {
-    double m_crr;       // coefficient rolling resistance
-    double m_Cm;        // coefficient of powertrain loss
-    double m_Cd;        // coefficient of drag
-    double m_A;         // frontal area (m2)
-    double m_T;         // temp in kelvin
+    double m_crr;                      // coefficient rolling resistance
+    double m_Cm;                       // coefficient of powertrain loss
+    double m_Cd;                       // coefficient of drag
+    double m_A;                        // frontal area (m2)
+    double m_T;                        // temp in kelvin
+    double m_AltitudeCorrectionFactor; // inverse of altitude cp penalty
 
     BicycleConstants() :
         m_crr(0.004),
         m_Cm(1.0),
         m_Cd(1.0 - 0.0045),
         m_A(0.5),
-        m_T(293.15)
+        m_T(293.15),
+        m_AltitudeCorrectionFactor(1.)
     {}
 
-    BicycleConstants(double crr, double Cm, double Cd, double A, double T) :
-        m_crr(crr), m_Cm(Cm), m_Cd(Cd), m_A(A), m_T(T)
+    BicycleConstants(double crr, double Cm, double Cd, double A, double T, double acf) :
+        m_crr(crr), m_Cm(Cm), m_Cd(Cd), m_A(A), m_T(T), m_AltitudeCorrectionFactor(acf)
     {}
 };
 
@@ -103,6 +107,14 @@ public:
         this->Watts()    = rtData.getWatts();
     }
 
+    BicycleSimState(double watts, double slope, double altitude)
+    {
+        Clear();
+        this->Altitude() = altitude;
+        this->Slope()    = slope;
+        this->Watts()    = watts;
+    }
+
     // Linear interpolate all fields to new sim state.
     static BicycleSimState Interpolate(const BicycleSimState &v0, const BicycleSimState &v1, double t0, double t1, double t)
     {
@@ -128,6 +140,7 @@ class Bicycle
     BicycleWheel m_frontWheel, m_rearWheel;
     double m_bicycleMassWithoutWheelsKG, m_riderMassKG;
     double m_KEMass; // effective mass used for computing kinetic energy
+    bool m_useSimulatedHypoxia;
 
     // Dynamic data persisted for modelling momentum.
     BicycleSimState m_state;
@@ -136,10 +149,12 @@ class Bicycle
     bool            m_isFirstSample;
     std::chrono::high_resolution_clock::time_point m_prevSampleTime;
 
-    void Init(BicycleConstants constants, double riderWeightKG, double bicycleMassWithoutWheelsKG, BicycleWheel frontWheel, BicycleWheel rearWheel);
+    void Init(bool fUseSimulateHypoxia, BicycleConstants constants, double riderWeightKG, double bicycleMassWithoutWheelsKG, BicycleWheel frontWheel, BicycleWheel rearWheel);
 
-    double SampleDT();                       // Gather sample time stamp and return dt (in seconds)
-    double FilterWattIncrease(double watts); // Reduce power spikes by limiting power growth per sample period
+    double SampleDT(); // Gather sample time stamp and return dt (in seconds)
+
+     // Reduce power spikes by limiting power growth per sample period, also apply altitude penalty.
+    double FilterWattIncrease(double watts, double altitude);
 
 public:
 
@@ -147,14 +162,19 @@ public:
     Bicycle(Context* context);
     SpeedDistance SampleSpeed(BicycleSimState &newState);
 
+    void Reset(Context* context);
+
     double MassKG() const;                   // Actual mass of bike and rider.
     double EquivalentMassKG() const;         // Additional mass due to rotational inertia
     double KEMass() const;                   // Total effective kinetic mass
+    double RollingResistance() const { return m_constants.m_crr; }
+    double WindResistance(double altitude) const { return m_constants.m_Cd * m_constants.m_A * AirDensity(altitude, m_constants.m_T); }
+
     const BicycleWheel &FrontWheel() const { return m_frontWheel; }
     const BicycleWheel &RearWheel() const { return m_rearWheel; }
 
     // Reset timer. This forces next sample to use 0.1s as its dt.
-    void reset()
+    void resettimer()
     {
         m_isFirstSample = true;
     }
@@ -163,7 +183,7 @@ public:
     void clear()
     {
         m_Velocity = 0.0;
-        reset();
+        resettimer();
         this->m_state.Clear();
     }
 
@@ -181,5 +201,6 @@ public:
              double v) const;                        // current velocity
 
 };
+
 
 #endif // BICYCLESIM_H

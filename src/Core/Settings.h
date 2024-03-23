@@ -21,6 +21,7 @@
 #define _GC_Settings_h 1
 #include "GoldenCheetah.h"
 #include <QDebug>
+#include <QRect>
 
 
 /*
@@ -31,17 +32,9 @@
 #ifndef GC_SETTINGS_APP
 #define GC_SETTINGS_APP                       "GoldenCheetah"
 #endif
-#define GC_SETTINGS_BESTS_METRICS_DEFAULT "5s_critical_power,1m_critical_power,5m_critical_power,20m_critical_power,60m_critical_power,3m_critical_pace,20m_critical_pace,3m_critical_pace_swim,20m_critical_pace_swim"
-#define GC_SETTINGS_SUMMARY_METRICS_DEFAULT "triscore,skiba_xpower,skiba_relative_intensity,xPace,swimscore_xpace,trimp_points,aerobic_decoupling"
-#define GC_SETTINGS_INTERVAL_METRICS_DEFAULT "workout_time,total_distance,total_work,average_power,average_hr,average_cad,average_speed,pace,pace_swim,distance_swim"
+#define GC_SETTINGS_FAVOURITE_METRICS_DEFAULT "workout_time,time_recording,time_riding,total_distance,distance_swim,total_work,average_power,average_hr,average_cad,average_run_cad,average_speed,pace,pace_swim"
 #define GC_UNIT_METRIC                       "Metric"
 #define GC_UNIT_IMPERIAL                     "Imperial"
-
-//Google Calendar-CALDAV oauthkeys / see also Athlete parameter
-#define GC_GOOGLE_CALENDAR_CLIENT_ID      "426009671216-c588t1u6hafep30tfs7g0g1nuo72s8ko.apps.googleusercontent.com"
-
-//Today's Plan
-#define GC_TODAYSPLAN_CLIENT_ID    "GoldenCheetah" // app id
 
 //Cycling Analytics / see also Athlete parameter
 #define GC_CYCLINGANALYTICS_CLIENT_ID    "1504958" // app id
@@ -64,6 +57,17 @@
 // PolarFlow client ID
 #ifndef GC_POLARFLOW_CLIENT_ID
 #define GC_POLARFLOW_CLIENT_ID "Not defined"
+#endif
+
+// Azum
+#ifndef GC_AZUM_CLIENT_ID
+#define GC_AZUM_CLIENT_ID "2XVhIzyXCSyM2gzq4zcK0YM0R5TJRBuH4CgtdpSw"
+#endif
+
+
+// Xert
+#ifndef GC_XERT_CLIENT_ID
+#define GC_XERT_CLIENT_ID "xert_goldencheetah"
 #endif
 
 /*
@@ -110,6 +114,7 @@
 #define GC_SETTINGS_LAST                "<system>mainwindow/lastOpened"
 #define GC_SETTINGS_MAIN_GEOM           "<system>mainwindow/geometry"
 #define GC_SETTINGS_MAIN_STATE          "<system>mainwindow/state"
+#define GC_SETTINGS_MAIN_SIDEBAR        "<system>mainwindow/sidebar/"
 #define GC_SETTINGS_LAST_IMPORT_PATH    "<system>mainwindow/lastImportPath"
 #define GC_SETTINGS_LAST_WORKOUT_PATH   "<system>mainwindow/lastWorkoutPath"
 #define GC_LAST_DOWNLOAD_DEVICE         "<system>mainwindow/lastDownloadDevice"
@@ -125,9 +130,6 @@
 #define GC_FONT_CHARTLABELS_SIZE        "<system>font/chartlabelssize"
 #define GC_FONT_SCALE                   "<system>font/scale"
 
-// Colors/Chrome - see special treatment sections (also stored in <system>)
-#define GC_CHROME                       "<system>chrome" // mac or flat only so far
-
 // Location of R Installation - follows R_HOME semantics
 #define GC_R_HOME                       "<system>r_home"
 
@@ -139,15 +141,14 @@
 // --------------------------------------------------------------------
 
 
-#define GC_SETTINGS_SUMMARY_METRICS     "<global-general>rideSummaryWindow/summaryMetrics"
-#define GC_SETTINGS_BESTS_METRICS       "<global-general>rideSummaryWindow/bestsMetrics"
-#define GC_SETTINGS_INTERVAL_METRICS    "<global-general>rideSummaryWindow/intervalMetrics"
+#define GC_SETTINGS_FAVOURITE_METRICS    "<global-general>rideSummaryWindow/intervalMetrics"
 #define GC_TABBAR                       "<global-general>show/tabbar"                        // show tabbar
 #define GC_WBALFORM                     "<global-general>wbal/formula"                       // wbal formula to use
 #define GC_BIKESCOREDAYS                    "<global-general>bikeScoreDays"
 #define GC_BIKESCOREMODE                    "<global-general>bikeScoreMode"
 #define GC_WARNCONVERT                  "<global-general>warnconvert"
 #define GC_WARNEXIT                     "<global-general>warnexit"
+#define GC_OPENLASTATHLETE              "<global-general>openlastathlete"
 #define GC_HIST_BIN_WIDTH               "<global-general>histogamWindow/binWidth"
 #define GC_WORKOUTDIR                   "<global-general>workoutDir"                         // used for Workouts and Videosyn files
 #define GC_LINEWIDTH                    "<global-general>linewidth"
@@ -179,6 +180,8 @@
 #define GC_DPFG_STOP                    "<global-general>dataprocess/fixgaps/stop"
 #define GC_DPFS_MAX                     "<global-general>dataprocess/fixspikes/max"
 #define GC_DPFS_VARIANCE                "<global-general>dataprocess/fixspikes/variance"
+#define GC_DPFS_MEDWINSIZ               "<global-general>dataprocess/fixspikes/medwinsiz"
+#define GC_DPFS_MEDALGO                 "<global-general>dataprocess/fixspikes/medalgo"
 #define GC_DPTA                         "<global-general>dataprocess/torqueadjust/adjustment"
 #define GC_DPPA                         "<global-general>dataprocess/poweradjust/adjustment"
 #define GC_DPPA_ABS                     "<global-general>dataprocess/poweradjust/adjustment_abs"
@@ -220,16 +223,20 @@
 #define GC_DEV_PROF                     "<global-trainmode>deviceprof"
 #define GC_DEV_TYPE                     "<global-trainmode>devicetype"
 #define GC_DEV_STRIDE                   "<global-trainmode>devicestride"
-#define GC_DEV_DEF                      "<global-trainmode>devicedef"
 #define GC_DEV_WHEEL                    "<global-trainmode>devicewheel"
 #define GC_DEV_VIRTUAL                  "<global-trainmode>devicepostProcess"
+#define GC_DEV_VIRTUALPOWER             "<global-trainmode>devicevirtualPower"
 #define FORTIUS_FIRMWARE                "<global-trainmode>fortius/firmware"
+#define FORTIUS_CALIBRATION             "<global-trainmode>fortius/calibration"
 #define IMAGIC_FIRMWARE                 "<global-trainmode>imagic/firmware"
+#define SRM_OFFSET                      "<global-trainmode>srm/offset"
 #define TRAIN_MULTI                     "<global-trainmode>train/multi"
 #define TRAIN_AUTOCONNECT               "<global-trainmode>train/autoconnect"
+#define TRAIN_STARTDELAY                "<global-trainmode>train/startdelay"
 #define TRAIN_AUTOHIDE                  "<global-trainmode>train/autohide"
 #define TRAIN_LAPALERT                  "<global-trainmode>train/lapalert"
 #define TRAIN_USESIMULATEDSPEED         "<global-trainmode>train/usesimulatedspeed"
+#define TRAIN_USESIMULATEDHYPOXIA       "<global-trainmode>train/usesimulatedhypoxia"
 #define GC_REMOTE_START                 "<global-trainmode>remote/start"
 #define GC_REMOTE_STOP                  "<global-trainmode>remote/stop"
 #define GC_REMOTE_LAP                   "<global-trainmode>remote/lap"
@@ -279,7 +286,6 @@
 #define GC_CRANKLENGTH                  "<athlete-preferences>crankLength"
 #define GC_WHEELSIZE                    "<athlete-preferences>wheelsize"
 #define GC_USE_CP_FOR_FTP               "<athlete-preferences>cp/useforftp"                       // use CP for FTP
-#define GC_USE_CP_FOR_FTP_RUN           "<athlete-preferences>cp/useforftprun"                    // use CP for FTP
 #define GC_NETWORKFILESTORE_FOLDER      "<athlete-preferences>networkfilestore/folder"            // folder to sync with
 #define GC_AUTOBACKUP_FOLDER            "<athlete-preferences>autobackup/folder"
 #define GC_AUTOBACKUP_PERIOD            "<athlete-preferences>autobackup/period"                  // how often is the Athlete Folder backuped up / 0 == never
@@ -338,9 +344,11 @@
 #define GC_SIM_BICYCLE_Cd                     "<athlete-preferences>sim_bicycle/Cd"
 #define GC_SIM_BICYCLE_Am2                    "<athlete-preferences>sim_bicycle/Am2"
 #define GC_SIM_BICYCLE_Tk                     "<athlete-preferences>sim_bicycle/Tk"
+#define GC_SIM_BICYCLE_ACTUALTRAINERALTITUDEM "<athlete-preferences>sim_bicycle/ActualTrainerAltitudeM"
 
 #define GC_RWGPSUSER                    "<athlete-private>rwgps/user"
 #define GC_RWGPSPASS                    "<athlete-private>rwgps/pass"
+#define GC_RWGPS_AUTH_TOKEN             "<athlete-private>rwgps/auth_token"
 #define GC_TTBUSER                      "<athlete-private>ttb/user"
 #define GC_TTBPASS                      "<athlete-private>ttb/pass"
 #define GC_VELOHEROUSER                 "<athlete-private>velohero/user"
@@ -356,75 +364,71 @@
 #define GC_DVUSER                       "<athlete-private>dv/user"
 #define GC_DVPASS                       "<athlete-private>dv/pass"
 #define GC_DVCALDAVTYPE                 "<athlete-private>dv/type"
-#define GC_DVGOOGLE_CALID               "<athlete-private>dv/googlecalid"
-#define GC_DVGOOGLE_DRIVE               "<athlete-private>dv/googledrive"
+
 //Dropbox oauth keys
 #define GC_DROPBOX_TOKEN                "<athlete-private>dropbox/token"
 #define GC_DROPBOX_FOLDER               "<athlete-private>dropbox/folder"
 
-//Google oauth keys
-#define GC_GOOGLE_DRIVE_AUTH_SCOPE      "<athlete-private>google-drive/auth_scope"
-#define GC_GOOGLE_DRIVE_ACCESS_TOKEN   "<athlete-private>google-drive/access_token"
-#define GC_GOOGLE_DRIVE_REFRESH_TOKEN   "<athlete-private>google-drive/refresh_token"
-#define GC_GOOGLE_DRIVE_LAST_ACCESS_TOKEN_REFRESH "<athlete-private>google-drive/last_access_token_refresh"
-
-#define GC_GOOGLE_DRIVE_FOLDER          "<athlete-private>google-drive/folder"
-#define GC_GOOGLE_DRIVE_FOLDER_ID       "<athlete-private>google-drive/folder_id"
-
-//University of Kent (same as google drive)
-#define GC_UOK_CONSENT                      "<athlete-private>uok-google-drive/consent"
-#define GC_UOK_GOOGLE_DRIVE_AUTH_SCOPE      "<athlete-private>uok-google-drive/auth_scope"
-#define GC_UOK_GOOGLE_DRIVE_ACCESS_TOKEN   "<athlete-private>uok-google-drive/access_token"
-#define GC_UOK_GOOGLE_DRIVE_REFRESH_TOKEN   "<athlete-private>uok-google-drive/refresh_token"
-#define GC_UOK_GOOGLE_DRIVE_LAST_ACCESS_TOKEN_REFRESH "<athlete-private>uok-google-drive/last_access_token_refresh"
-
-#define GC_UOK_GOOGLE_DRIVE_FOLDER          "<athlete-private>uok-google-drive/folder"
-#define GC_UOK_GOOGLE_DRIVE_FOLDER_ID       "<athlete-private>uok-google-drive/folder_id"
-
 //Withings
 #define GC_WITHINGS_TOKEN               "<athlete-private>withings_token"
 #define GC_WITHINGS_SECRET              "<athlete-private>withings_secret"
+
 //Nokia
 #define GC_NOKIA_TOKEN                  "<athlete-private>nokia_token"
 #define GC_NOKIA_REFRESH_TOKEN          "<athlete-private>nokia_refresh_token"
-//Google Calendar-CALDAV oauthkeys
-#define GC_GOOGLE_CALENDAR_REFRESH_TOKEN  "<athlete-private>google_cal_refresh_token"
+
 //Strava
 #define GC_STRAVA_TOKEN                 "<athlete-private>strava_token"
 #define GC_STRAVA_REFRESH_TOKEN         "<athlete-private>strava_refresh_token"
 #define GC_STRAVA_LAST_REFRESH          "<athlete-private>strava_last_refresh"
 #define GC_STRAVA_ACTIVITY_NAME         "<athlete-private>strava_metaname"
+
 //Cycling Analytics
 #define GC_CYCLINGANALYTICS_TOKEN       "<athlete-private>cyclinganalytics_token"
-//Today's Plan
-#define GC_TODAYSPLAN_TOKEN             "<athlete-private>todaysplan_token"
-#define GC_TODAYSPLAN_URL               "<athlete-private>todaysplan_url"
-#define GC_TODAYSPLAN_USERKEY           "<athlete-private>todaysplan_userkey"
-#define GC_TODAYSPLAN_ATHLETE_ID        "<athlete-private>todaysplan_athlete_id"
-#define GC_TODAYSPLAN_ATHLETE_NAME      "<athlete-private>todaysplan_athlete_name"
 
 //SixCycle
 #define GC_SIXCYCLE_USER                "<athlete-private>sixcycle_user"
 #define GC_SIXCYCLE_PASS                "<athlete-private>sixcycle_pass"
 #define GC_SIXCYCLE_URL                 "<athlete-private>sixcycle_url"
+
+// Azum
+#define GC_AZUM_ACCESS_TOKEN            "<athlete-private>azum_access_token"
+#define GC_AZUM_REFRESH_TOKEN           "<athlete-private>azum_refresh_token"
+#define GC_AZUM_USERKEY                 "<athlete-private>azum_userkey"
+#define GC_AZUM_URL                     "<athlete-private>azum_url"
+#define GC_AZUM_ATHLETE_ID              "<athlete-private>azum_athlete_id"
+
 // Polar Flow
 #define GC_POLARFLOW_TOKEN             "<athlete-private>polarflow_token"
 #define GC_POLARFLOW_USER_ID           "<athlete-private>polarflow_user_id"
+
 // SportTracks
 #define GC_SPORTTRACKS_TOKEN           "<athlete-private>sporttracks/sporttracks_token"
 #define GC_SPORTTRACKS_REFRESH_TOKEN   "<athlete-private>sporttracks/refresh_token"
 #define GC_SPORTTRACKS_LAST_REFRESH    "<athlete-private>sporttracks/last_refresh"
+
 // Xert
 #define GC_XERTUSER                    "<athlete-private>xert/user"
 #define GC_XERTPASS                    "<athlete-private>xert/pass"
 #define GC_XERT_TOKEN                  "<athlete-private>xert/xert_token"
 #define GC_XERT_REFRESH_TOKEN          "<athlete-private>xert/refresh_token"
 #define GC_XERT_LAST_REFRESH           "<athlete-private>xert/last_refresh"
+
+// Nolio
+#define GC_NOLIO_ACCESS_TOKEN          "<global-general>nolio_access_token"
+#define GC_NOLIO_REFRESH_TOKEN         "<global-general>nolio_refresh_token"
+#define GC_NOLIO_LAST_REFRESH          "<global-general>nolio_last_refresh"
+#define GC_NOLIO_URL                   "<athlete-private>nolio_url"
+#define GC_NOLIO_ATHLETE_ID            "<athlete-private>nolio_athlete_id"
+#define GC_NOLIO_ATHLETE_NAME          "<athlete-private>nolio_athlete_name"
+
 // --------------------------------------------------------------------------------
 #include <QSettings>
 #include <QFileInfo>
 
 // Helper Class for the Athlete QSettings
+
+extern double scalefactors[];
 
 class AthleteQSettings {
     public:
@@ -440,6 +444,31 @@ class AthleteQSettings {
 
 };
 
+
+typedef struct {
+
+    // gui sizing
+    double xfactor, yfactor; // scaling of widgets
+    QRect windowsize; // size of the window in pixels
+
+    // fonts
+    QString fontfamily;
+    int fontpointsize;
+    double fontscale; // scaling of fonts
+    int fontscaleindex; // index into the list
+
+    // ui elements, mostly standard defaults
+    int theme; // theme number to use
+    bool antialias; // antialias fonts- always true
+    bool scrollbar; //scroller on ride list- always false
+    bool head; // false for MAC, true for everyone else
+    int sidebarwidth; // width of sidebars in pixels
+    bool sideanalysis;
+    bool sidetrend;
+    bool sidetrain;
+    double linewidth; // default line width
+
+} AppearanceSettings;
 
 // wrap the standard QSettings so we can offer members
 // to get global or atheleteName specific settings
@@ -482,6 +511,9 @@ public:
     // Cleanup if AthleteDir is changed
     void clearGlobalAndAthletes();
 
+    // reset appearance settings like theme, font, color and geometry
+    static AppearanceSettings defaultAppearanceSettings();
+
 private:
     bool newFormat;
     QSettings *systemsettings;
@@ -511,9 +543,5 @@ extern int OperatingSystem;
 #define OSX     3
 #define OPENBSD 4
 
-#if QT_VERSION > 0x050000
 #define OS_STYLE "Fusion"
-#else
-#define OS_STYLE "Plastique"
-#endif
 #endif // _GC_Settings_h

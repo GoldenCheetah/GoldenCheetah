@@ -207,18 +207,18 @@ ScatterPlot::ScatterPlot(Context *context) : context(context)
     ride = NULL;
     static_cast<QwtPlotCanvas*>(canvas())->setFrameStyle(QFrame::NoFrame);
 
-    setAxisMaxMinor(xBottom, 0);
-    setAxisMaxMinor(yLeft, 0);
+    setAxisMaxMinor(QwtAxis::XBottom, 0);
+    setAxisMaxMinor(QwtAxis::YLeft, 0);
 
     QwtScaleDraw *sd = new QwtScaleDraw;
     sd->setTickLength(QwtScaleDiv::MajorTick, 3);
-    setAxisScaleDraw(QwtPlot::xBottom, sd);
+    setAxisScaleDraw(QwtAxis::XBottom, sd);
 
     sd = new QwtScaleDraw;
     sd->setTickLength(QwtScaleDiv::MajorTick, 3);
     sd->enableComponent(QwtScaleDraw::Ticks, false);
     sd->enableComponent(QwtScaleDraw::Backbone, false);
-    setAxisScaleDraw(QwtPlot::yLeft, sd);
+    setAxisScaleDraw(QwtAxis::YLeft, sd);
 
     connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
     connect(context, SIGNAL(intervalHover(IntervalItem*)), this, SLOT(intervalHover(IntervalItem*)));
@@ -322,8 +322,8 @@ void ScatterPlot::setData (ScatterSettings *settings)
 
             foreach(const RideFilePoint *point, settings->ride->ride()->dataPoints()) {
 
-                double xv = pointType(point, settings->x, side, context->athlete->useMetricUnits, cranklength);
-                double yv = pointType(point, settings->y, side, context->athlete->useMetricUnits, cranklength);
+                double xv = pointType(point, settings->x, side, GlobalContext::context()->useMetricUnits, cranklength);
+                double yv = pointType(point, settings->y, side, GlobalContext::context()->useMetricUnits, cranklength);
 
                 // skip values ? Like zeroes...
                 if (skipValues(xv, yv, settings))
@@ -353,8 +353,8 @@ void ScatterPlot::setData (ScatterSettings *settings)
                 // extract interval data
                 foreach(const RideFilePoint *point, settings->ride->ride()->dataPoints()) {
 
-                    double x = pointType(point, settings->x, side, context->athlete->useMetricUnits, cranklength);
-                    double y = pointType(point, settings->y, side, context->athlete->useMetricUnits, cranklength);
+                    double x = pointType(point, settings->x, side, GlobalContext::context()->useMetricUnits, cranklength);
+                    double y = pointType(point, settings->y, side, GlobalContext::context()->useMetricUnits, cranklength);
 
                     if (!(settings->ignore && (x == 0 && y ==0))) {
 
@@ -487,17 +487,17 @@ void ScatterPlot::setData (ScatterSettings *settings)
                         double y;
                         if (settings->compareMode == 1) {
                             const RideFilePoint *refPoint = context->compareIntervals.at(0).data->dataPoints().at(context->compareIntervals.at(0).data->timeIndex(point->secs));
-                            x = pointType(refPoint, settings->x, side, context->athlete->useMetricUnits, cranklength);
-                            y = pointType(point, settings->y, side, context->athlete->useMetricUnits, cranklength);
+                            x = pointType(refPoint, settings->x, side, GlobalContext::context()->useMetricUnits, cranklength);
+                            y = pointType(point, settings->y, side, GlobalContext::context()->useMetricUnits, cranklength);
                         }
                         else if (settings->compareMode == 2) {
                             const RideFilePoint *refPoint = context->compareIntervals.at(0).data->dataPoints().at(context->compareIntervals.at(0).data->timeIndex(point->secs));
-                            x = pointType(point, settings->x, side, context->athlete->useMetricUnits, cranklength);
-                            y = pointType(refPoint, settings->y, side, context->athlete->useMetricUnits, cranklength);
+                            x = pointType(point, settings->x, side, GlobalContext::context()->useMetricUnits, cranklength);
+                            y = pointType(refPoint, settings->y, side, GlobalContext::context()->useMetricUnits, cranklength);
                         }
                         else {
-                            x = pointType(point, settings->x, side, context->athlete->useMetricUnits, cranklength);
-                            y = pointType(point, settings->y, side, context->athlete->useMetricUnits, cranklength);
+                            x = pointType(point, settings->x, side, GlobalContext::context()->useMetricUnits, cranklength);
+                            y = pointType(point, settings->y, side, GlobalContext::context()->useMetricUnits, cranklength);
                         }
 
 
@@ -565,18 +565,18 @@ void ScatterPlot::setData (ScatterSettings *settings)
     }
 
     // axis titles
-    setAxisTitle(yLeft, describeType(settings->y, true, context->athlete->useMetricUnits));
-    setAxisTitle(xBottom, describeType(settings->x, true, context->athlete->useMetricUnits));
+    setAxisTitle(QwtAxis::YLeft, describeType(settings->y, true, GlobalContext::context()->useMetricUnits));
+    setAxisTitle(QwtAxis::XBottom, describeType(settings->x, true, GlobalContext::context()->useMetricUnits));
 
     // axis scale
-    if (settings->y == MODEL_AEPF) setAxisScale(yLeft, 0, 600);
-    else setAxisScale(yLeft, minY, maxY);
-    if (settings->x == MODEL_CPV) setAxisScale(xBottom, 0, 3);
-    else setAxisScale(xBottom, minX, maxX);
+    if (settings->y == MODEL_AEPF) setAxisScale(QwtAxis::YLeft, 0, 600);
+    else setAxisScale(QwtAxis::YLeft, minY, maxY);
+    if (settings->x == MODEL_CPV) setAxisScale(QwtAxis::XBottom, 0, 3);
+    else setAxisScale(QwtAxis::XBottom, minX, maxX);
 
     // gear
-    if (settings->x == MODEL_GEAR) setAxisScale(xBottom, 0, 7);
-    if (settings->y == MODEL_GEAR) setAxisScale(yLeft, 0, 7);
+    if (settings->x == MODEL_GEAR) setAxisScale(QwtAxis::XBottom, 0, 7);
+    if (settings->y == MODEL_GEAR) setAxisScale(QwtAxis::YLeft, 0, 7);
 
 
     // and those interval markers
@@ -599,7 +599,7 @@ void ScatterPlot::mouseMoved()
         int index = 0;
         foreach (QwtPlotMarker *is, intervalMarkers) {
 
-            QPoint mpos = canvas()->mapToGlobal(QPoint(transform(xBottom, is->value().x()), transform(yLeft, is->value().y())));
+            QPoint mpos = canvas()->mapToGlobal(QPoint(transform(QwtAxis::XBottom, is->value().x()), transform(QwtAxis::YLeft, is->value().y())));
 
             int dx = mpos.x() - pos.x();
             int dy = mpos.y() - pos.y();
@@ -654,8 +654,8 @@ ScatterPlot::intervalHover(IntervalItem *ri)
         QVector<double> xArray, yArray;
         foreach(const RideFilePoint *p1, ride->ride()->dataPoints()) {
 
-            double y = pointType(p1, xseries, side, context->athlete->useMetricUnits, cranklength);
-            double x = pointType(p1, yseries, side, context->athlete->useMetricUnits, cranklength);
+            double y = pointType(p1, xseries, side, GlobalContext::context()->useMetricUnits, cranklength);
+            double x = pointType(p1, yseries, side, GlobalContext::context()->useMetricUnits, cranklength);
 
             if (p1->secs < ri->start || p1->secs > ri->stop) continue;
 
@@ -732,10 +732,10 @@ ScatterPlot::refreshIntervalMarkers(ScatterSettings *settings)
 
         foreach (RideFilePoint *point, settings->ride->ride()->dataPoints()) {
 
-            double x0 = pointType(point, settings->x, 0, context->athlete->useMetricUnits, cranklength);
-            double y0 = pointType(point, settings->y, 0, context->athlete->useMetricUnits, cranklength);
-            double x1 = pointType(point, settings->x, 1, context->athlete->useMetricUnits, cranklength);
-            double y1 = pointType(point, settings->y, 1, context->athlete->useMetricUnits, cranklength);
+            double x0 = pointType(point, settings->x, 0, GlobalContext::context()->useMetricUnits, cranklength);
+            double y0 = pointType(point, settings->y, 0, GlobalContext::context()->useMetricUnits, cranklength);
+            double x1 = pointType(point, settings->x, 1, GlobalContext::context()->useMetricUnits, cranklength);
+            double y1 = pointType(point, settings->y, 1, GlobalContext::context()->useMetricUnits, cranklength);
 
             // average of left and right (even if both the same)
             double x = (x0 + x1) / 2.00f;
@@ -772,7 +772,7 @@ ScatterPlot::refreshIntervalMarkers(ScatterSettings *settings)
 
             QwtPlotMarker *p = new QwtPlotMarker();
             p->setValue(x, y);
-            p->setYAxis(yLeft);
+            p->setYAxis(QwtAxis::YLeft);
             p->setZ(100);
             p->setSymbol(sym);
             p->attach(this);
@@ -794,8 +794,8 @@ ScatterPlot::configChanged(qint32)
     palette.setColor(QPalette::WindowText, GColor(CPLOTMARKER));
     palette.setColor(QPalette::Text, GColor(CPLOTMARKER));
 
-    axisWidget(QwtPlot::xBottom)->setPalette(palette);
-    axisWidget(QwtPlot::yLeft)->setPalette(palette);
+    axisWidget(QwtAxis::XBottom)->setPalette(palette);
+    axisWidget(QwtAxis::YLeft)->setPalette(palette);
 
     replot();
 }
@@ -827,7 +827,7 @@ ScatterPlot::addTrendLine(QVector<double> xval, QVector<double> yval, int nbPoin
     if (appsettings->value(this, GC_ANTIALIAS, true).toBool()==true)
         trend->setRenderHint(QwtPlotItem::RenderAntialiased);
     trend->setBaseline(0);
-    trend->setYAxis(yLeft);
+    trend->setYAxis(QwtAxis::YLeft);
     trend->setStyle(QwtPlotCurve::Lines);
 
     // perform linear regression
@@ -852,7 +852,7 @@ ScatterPlot::addTrendLine(QVector<double> xval, QVector<double> yval, int nbPoin
     text.setColor(intervalColor.darker(200));
     label->setLabel(text);
     label->setValue(xtrend[1]*0.8, ytrend[1]*0.9);
-    label->setYAxis(yLeft);
+    label->setYAxis(QwtAxis::YLeft);
     label->setSpacing(6 *dpiXFactor); // not px but by yaxis value !? mad.
     label->setLabelAlignment(Qt::AlignTop | Qt::AlignCenter);
 

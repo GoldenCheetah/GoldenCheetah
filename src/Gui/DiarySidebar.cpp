@@ -157,18 +157,10 @@ GcLabel::paintEvent(QPaintEvent *)
     if (text() != "<" && text() != ">") {
         painter.setFont(this->font());
 
-        if (!GCColor::isFlat() && (xoff || yoff)) {
-
-            // draw text in white behind...
-            QRectF off(xoff,yoff,width(),height());
-            painter.setPen(QColor(255,255,255,200));
-            painter.drawText(off, alignment(), text());
-        }
-
         if (filtered && !selected && !underMouse()) painter.setPen(GColor(CCALCURRENT));
         else {
 
-            if (isChrome && GCColor::isFlat()) {
+            if (isChrome) {
 
                 if (GCColor::luminance(GColor(CCHROME)) < 127)
                     painter.setPen(QColor(Qt::white));
@@ -224,7 +216,7 @@ GcMiniCalendar::GcMiniCalendar(Context *context, bool master) : context(context)
     layout->setContentsMargins(0,0,0,0);
 
     // get the model
-    fieldDefinitions = context->athlete->rideMetadata()->getFields();
+    fieldDefinitions = GlobalContext::context()->rideMetadata->getFields();
     calendarModel = new GcCalendarModel(this, &fieldDefinitions, context);
     calendarModel->setSourceModel(context->athlete->rideCache->model());
 
@@ -377,7 +369,7 @@ GcMiniCalendar::GcMiniCalendar(Context *context, bool master) : context(context)
     layout->addStretch();
 
     // day clicked
-    connect(signalMapper, SIGNAL(mapped(int)), this, SLOT(dayClicked(int)));
+    connect(signalMapper, &QSignalMapper::mappedInt, this, &GcMiniCalendar::dayClicked);
 
     // set up for current selections - and watch for future changes
     connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
@@ -483,7 +475,7 @@ void
 GcMiniCalendar::previous()
 {
     QList<QDateTime> allDates = context->athlete->rideCache->getAllDates();
-    qSort(allDates);
+    std::sort(allDates.begin(), allDates.end());
 
     // begin of month
     QDateTime bom(QDate(year,month,01), QTime(0,0,0));
@@ -517,7 +509,7 @@ void
 GcMiniCalendar::next()
 {
     QList<QDateTime> allDates = context->athlete->rideCache->getAllDates();
-    qSort(allDates);
+    std::sort(allDates.begin(), allDates.end());
 
     // end of month
     QDateTime eom(QDate(year,month,01).addMonths(1), QTime(00,00,00));
@@ -697,7 +689,7 @@ GcMultiCalendar::GcMultiCalendar(Context *context) : QScrollArea(context->mainWi
 
     connect(mini, SIGNAL(dateChanged(int,int)), this, SLOT(dateChanged(int,int)));
     connect (context, SIGNAL(filterChanged()), this, SLOT(filterChanged()));
-    connect (context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
+    connect (GlobalContext::context(), SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
 
     configChanged(CONFIG_APPEARANCE);
 }

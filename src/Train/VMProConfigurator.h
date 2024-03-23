@@ -98,6 +98,8 @@ public slots:
     void setIdleTimeout(VMProIdleTimeout timeoutState);
     void setVolumeCorrectionMode(VMProVolumeCorrectionMode mode);
 
+    void startCalibration();
+
     void setupCharNotifications(QLowEnergyService * service);
 
 private slots:

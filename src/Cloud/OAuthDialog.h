@@ -27,28 +27,16 @@
 #include <QStackedLayout>
 #include <QUrl>
 #include <QSslSocket>
-#ifndef NOWEBKIT
-#include <QtWebKit>
-#include <QWebView>
-#include <QWebFrame>
-#endif
 
 // QUrl split into QUrlQuerty in QT5
-#if QT_VERSION > 0x050000
 #include <QUrlQuery>
-#endif
-// QWebEngine if on Mac, -or- we don't have webkit
-#if defined(NOWEBKIT) || ((QT_VERSION > 0x050000) && defined(Q_OS_MAC))
+
 #include <QWebEngineHistory>
 #include <QWebEngineHistoryItem>
 #include <QWebEnginePage>
 #include <QWebEngineView>
 #include <QWebEngineProfile>
-#if (QT_VERSION >= 0x050600)
 #include <QWebEngineCookieStore>
-#endif
-#endif
-
 
 class OAuthDialog : public QDialog
 {
@@ -61,25 +49,24 @@ public:
         STRAVA,
         DROPBOX,
         CYCLING_ANALYTICS,
-        GOOGLE_CALENDAR,
-        GOOGLE_DRIVE,
+        NOLIO,
         SPORTTRACKS,
-        TODAYSPLAN,
         WITHINGS,
         POLAR,
-        KENTUNI,
-        XERT
+        XERT,
+        RIDEWITHGPS,
+        AZUM
     } OAuthSite;
 
     // will work with old config via site and new via cloudservice (which is null for calendar and withings for now)
     OAuthDialog(Context *context, OAuthSite site, CloudService *service, QString baseURL="", QString clientsecret="");
+    ~OAuthDialog();
 
     bool sslLibMissing() { return noSSLlib; }
 
 private slots:
-    // Strava/Cyclinganalytics/Google
+    // Strava/Cyclinganalytics
     void urlChanged(const QUrl& url);
-    void loadFinished(bool ok);
     void networkRequestFinished(QNetworkReply *reply);
     void onSslErrors(QNetworkReply *reply, const QList<QSslError>&error);
 
@@ -96,11 +83,7 @@ private:
     QVBoxLayout *layout;
 
     // QUrl split into QUrlQuerty in QT5
-#if defined(NOWEBKIT) || ((QT_VERSION > 0x050000) && defined(Q_OS_MAC))
     QWebEngineView *view;
-#else
-    QWebView *view;
-#endif
 
     QNetworkAccessManager* manager;
 

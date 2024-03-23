@@ -1,74 +1,230 @@
 version: ci.{build}
-image: Visual Studio 2017
+image: Visual Studio 2019
 clone_depth: 1
+
+environment:
+  GC_GOOGLE_CALENDAR_CLIENT_SECRET:
+    secure: hwjHTrSAMEbKd9PA+5x/zI4x5Uk4KQm1hdfZzkwiu8k=
+  GC_GOOGLE_DRIVE_CLIENT_ID:
+    secure: mNqG+pqpMl21ZFVvAMKvhm2rfOdv42fFpnLwfrvX5QqpWVcHEeBuUFeJeUAZfTR0GQGfWfPOEmhb9CG0W1ZJ05TIyb+kTLrWF7iijCiVR6s=
+  GC_GOOGLE_DRIVE_CLIENT_SECRET:
+    secure: T+BaB/L7x4dPPf592e0kfw4sTlAslUXl10irJqiUjpY=
+  GC_GOOGLE_DRIVE_API_KEY:
+    secure: oxTAhK/kiLUsXdYvITAgzSqeB5FRcL+XANFuAYpoW5P/xBb7XaLbNnL2gyrmzQeG
+  GC_CLOUD_OPENDATA_SECRET:
+    secure: 6fPhBiHKvJeOMqXdHGqpkPS+NpUDMczEXjedx8GcjbHr82ISX+gwSuXfOUDLq/S9
+  GC_WITHINGS_CONSUMER_SECRET:
+    secure: 86xAkdoQB8mLXq964/lGCp3ElTSF4k3a27R3UUXt3618guWLyBfsEK5Q0+XSOI3Q38w80CTpmNdwejoISv8Ilg==
+  GC_NOKIA_CLIENT_SECRET:
+    secure: pvPWraDplrKeRNamt5MKga8fzDmI2+zgFx+y3lsQE6gmBadZU2xkTIc/xCaP7UPv2erNCmKivfMOh2NIcRmqvIHynDoifNVy2P61KyG5v3E=
+  GC_DROPBOX_CLIENT_SECRET:
+    secure: 7pCVnVEKKmSU4SZN6IFqUw==
+  GC_STRAVA_CLIENT_SECRET:
+    secure: n3cMS1yy709xhSnTeWABMsoAIkJzy5euh3Pw4ehv0BzszJKoWkypF0cyW8RXSm3M
+  GC_CYCLINGANALYTICS_CLIENT_SECRET:
+    secure: UY+m3YypNNLUzKyGdrLw8xdCvxuQWRZi9EHS3j1ubLC4qyRL7iEVW6ubumfdh6gT
+  GC_CLOUD_DB_BASIC_AUTH:
+    secure: OEBetrOnXjsY7wN8hYqmMj6482oDORmAmCq8PI7mfnfiWE6Z4jB676JvgdNlP98q
+  GC_CLOUD_DB_APP_NAME:
+    secure: bpkyuw/BsJw0OrpuBqQwZ46CHbhkbmcjcMttVtfJoZU=
+  GC_POLARFLOW_CLIENT_SECRET:
+    secure: h2JdlC1i4QOmwpkz+Xxbrw==
+  GC_SPORTTRACKS_CLIENT_SECRET:
+    secure: n6a8nJgqMyg+VsVeoIIR8TFzxyDFVi2w/ggetQk5agY=
+  GC_RWGPS_API_KEY:
+    secure: uUtCyF5ByZ1VYJOztUngIA==
+  GC_NOLIO_CLIENT_ID:
+    secure: /OFVjEBwU7o3SItIQVf/YlJ8XErxneXIT2N0JyPMSXR1tCbdZVWixMHpqKNWoNk4
+  GC_NOLIO_SECRET:
+    secure: mmMksvVnfBiXufBDn2gAhQY53n0J9BokSCtDY51uU918QJ/LL4XOojtJp5tMFn8T7ugyDhNASpqZXiK55vxSD53vm+tjufpfzppKEeh93Babvc/VrndLB1X/RZCRUQTR6rka05fYl4e0eBzP1H091A==
+  GC_XERT_CLIENT_SECRET:
+    secure: /1rVLT8LyJCZ4xNJ5W+NtAcZ1rtKaUjW9SYm/T3gHoc=
+  GC_AZUM_CLIENT_SECRET:
+    secure: 2ZpXsA3TQv1zftYVyZSF6f83ftCzza+K22ZX1doj7Yc/5dmGl1bnsSeVChJgJ8lQ2fRPYpdmun9cjqwcrtG/zXTTsYuTvYWegHz/4Y0u6Mg=
+
 init:
-# Setup QT 5.12 - 64Bit
-
-- set QTDIR=C:\Qt\5.12\msvc2017_64
+# Setup QT 5.15 - 64Bit
+- set QTDIR=C:\Qt\5.15\msvc2019_64
 - set PATH=%QTDIR%\bin;%PATH%
+- qmake --version
 
-# Setup MSVC - VS 2017
+# Setup MSVC - VS 2019
+- call c:\"Program Files (x86)"\"Microsoft Visual Studio"\2019\Community\VC\Auxiliary\Build\vcvarsall.bat amd64
 
-- call c:\"Program Files (x86)"\"Microsoft Visual Studio"\2017\Community\VC\Auxiliary\Build\vcvarsall.bat amd64
+# Setup NSIS
+- set PATH=%PATH%;C:\"Program Files (x86)"\NSIS
 
-# Get the libraries
-
-- ps: Start-FileDownload 'https://github.com/GoldenCheetah/WindowsSDK/releases/download/v0.1.1/gc-ci-libs.zip' -Filename 'c:/gc-ci-libs.zip'
-- 7z x c:/gc-ci-libs.zip -oC:\libs
+cache:
+- gc-ci-libs.zip -> appveyor.yml
+- jom_1_1_3.zip
+- sip-4.19.8.zip
+- C:\R
+- C:\Python -> src\Python\requirements.txt
+- c:\tools\vcpkg\installed\
+- qwt -> qwt/qwtconfig.pri.in
 
 install:
-# choco install winflexbison
+# Get the libraries
+- if not exist gc-ci-libs.zip appveyor DownloadFile "https://github.com/GoldenCheetah/WindowsSDK/releases/download/v0.1.1/gc-ci-libs.zip"
+- 7z x -y gc-ci-libs.zip -oC:\libs
+# GSL
+- vcpkg install gsl:x64-windows
+
+# Get config
 - copy qwt\qwtconfig.pri.in qwt\qwtconfig.pri
 - copy c:\libs\gcconfig64-Release.appveyor.pri src\gcconfig.pri
 
 # Get jom
-- ps: Start-FileDownload 'https://download.qt.io/official_releases/jom/jom_1_1_3.zip'
-- 7z x jom_1_1_3.zip -oc:\jom\
+- if not exist jom_1_1_3.zip appveyor DownloadFile "https://download.qt.io/official_releases/jom/jom_1_1_3.zip"
+- 7z x -y jom_1_1_3.zip -oc:\jom\
 - set PATH=%PATH%;c:\jom\;
 
 # Get R and add to config
-- ps: $rurl = $(ConvertFrom-JSON $(Invoke-WebRequest https://rversions.r-pkg.org/r-release-win).Content).URL
-- ps: Start-FileDownload $rurl "R-win.exe"
-- ps: Start-Process -FilePath .\R-win.exe -ArgumentList "/VERYSILENT /DIR=C:\R" -NoNewWindow -Wait
+- ps: >-
+    if (-not (Test-Path 'C:\R')) {
+      # Lets use 4.1 until 4.2 issues are fixed
+      #$rurl = $(ConvertFrom-JSON $(Invoke-WebRequest https://rversions.r-pkg.org/r-release-win).Content).URL
+      $rurl = "https://cran.r-project.org/bin/windows/base/old/4.1.3/R-4.1.3-win.exe"
+      Start-FileDownload $rurl "R-win.exe"
+      Start-Process -FilePath .\R-win.exe -ArgumentList "/VERYSILENT /DIR=C:\R" -NoNewWindow -Wait
+    }
 - set PATH=%PATH%;c:\R\bin\;
 - R --version
 - echo DEFINES+=GC_WANT_R >> src\gcconfig.pri
 
-# Get SIP and add Python to config
-- c:\python36-x64\python --version
-- ps: Start-FileDownload https://sourceforge.net/projects/pyqt/files/sip/sip-4.19.8/sip-4.19.8.zip
+# Get Python embeddable and install packages
+- ps: >-
+    if (-not (Test-Path 'C:\Python')) {
+      Start-FileDownload "https://www.python.org/ftp/python/3.7.9/python-3.7.9-embed-amd64.zip" Python.zip
+      7z x Python.zip -oC:\Python\
+      echo python37.zip . '' 'import site' | Out-File C:\Python\python37._pth -Encoding ascii
+      mkdir C:\Python\lib\site-packages
+      c:\python37-x64\python -m pip install --upgrade pip
+      c:\python37-x64\python -m pip install -r src\Python\requirements.txt -t C:\Python\lib\site-packages
+    }
+
+# Get SIP and and install on Python
+- c:\python37-x64\python --version
+- if not exist sip-4.19.8.zip appveyor DownloadFile "https://sourceforge.net/projects/pyqt/files/sip/sip-4.19.8/sip-4.19.8.zip"
 - 7z x sip-4.19.8.zip
-- ps: cd sip-4.19.8
-- c:\python36-x64\python configure.py
+- cd sip-4.19.8
+- c:\python37-x64\python configure.py
 - jom -j4
 - nmake install
-- ps: cd ..
+- cd ..
+
+# Add Python (avoiding colision between GC Context.h and Python context.h)
 - echo DEFINES+=GC_WANT_PYTHON >> src\gcconfig.pri
-- echo PYTHONINCLUDES=-I\"c:\python36-x64\include\" >> src\gcconfig.pri
-- echo PYTHONLIBS=-L\"c:\python36-x64\libs\" -lpython36 >> src\gcconfig.pri
+- echo PYTHONINCLUDES=-ICore -I\"c:\python37-x64\include\" >> src\gcconfig.pri
+- echo PYTHONLIBS=-L\"c:\python37-x64\libs\" -lpython37 >> src\gcconfig.pri
+
+# GSL
+- echo GSL_INCLUDES=c:\tools\vcpkg\installed\x64-windows\include >> src\gcconfig.pri
+- echo GSL_LIBS=-Lc:\tools\vcpkg\installed\x64-windows\lib -lgsl -lgslcblas >> src\gcconfig.pri
+
+before_build:
+# Define GC version string, only for tagged builds
+- if %APPVEYOR_REPO_TAG%==true echo DEFINES+=GC_VERSION=VERSION_STRING >> src\gcconfig.pri
+
+# Enable CloudDB
+- echo CloudDB=active >> src\gcconfig.pri
+
+# Add Train Robot
+- echo DEFINES+=GC_WANT_ROBOT >> src\gcconfig.pri
+
+# Avoid macro redefinition warnings
+- echo DEFINES+=_MATH_DEFINES_DEFINED >> src\gcconfig.pri
+
+# Add debug console
+#- echo CONFIG+=console >> src\gcconfig.pri
+
+# Patch Secrets.h
+- ps: (Get-Content src\Core\Secrets.h) -replace '__GC_GOOGLE_CALENDAR_CLIENT_SECRET__', $env:GC_GOOGLE_CALENDAR_CLIENT_SECRET | Set-Content src\Core\Secrets.h
+- ps: (Get-Content src\Core\Secrets.h) -replace '__GC_GOOGLE_DRIVE_CLIENT_ID__', $env:GC_GOOGLE_DRIVE_CLIENT_ID | Set-Content src\Core\Secrets.h
+- ps: (Get-Content src\Core\Secrets.h) -replace '__GC_GOOGLE_DRIVE_CLIENT_SECRET__', $env:GC_GOOGLE_DRIVE_CLIENT_SECRET | Set-Content src\Core\Secrets.h
+- ps: (Get-Content src\Core\Secrets.h) -replace '__GC_GOOGLE_DRIVE_API_KEY__', $env:GC_GOOGLE_DRIVE_API_KEY | Set-Content src\Core\Secrets.h
+- ps: (Get-Content src\Core\Secrets.h) -replace 'OPENDATA_DISABLE', 'OPENDATA_ENABLE' | Set-Content src\Core\Secrets.h
+- ps: (Get-Content src\Core\Secrets.h) -replace '__GC_CLOUD_OPENDATA_SECRET__', $env:GC_CLOUD_OPENDATA_SECRET | Set-Content src\Core\Secrets.h
+- ps: (Get-Content src\Core\Secrets.h) -replace '__GC_WITHINGS_CONSUMER_SECRET__', $env:GC_WITHINGS_CONSUMER_SECRET | Set-Content src\Core\Secrets.h
+- ps: (Get-Content src\Core\Secrets.h) -replace '__GC_NOKIA_CLIENT_SECRET__', $env:GC_NOKIA_CLIENT_SECRET | Set-Content src\Core\Secrets.h
+- ps: (Get-Content src\Core\Secrets.h) -replace '__GC_DROPBOX_CLIENT_SECRET__', $env:GC_DROPBOX_CLIENT_SECRET | Set-Content src\Core\Secrets.h
+- ps: (Get-Content src\Core\Secrets.h) -replace '__GC_STRAVA_CLIENT_SECRET__', $env:GC_STRAVA_CLIENT_SECRET | Set-Content src\Core\Secrets.h
+- ps: (Get-Content src\Core\Secrets.h) -replace '__GC_CYCLINGANALYTICS_CLIENT_SECRET__', $env:GC_CYCLINGANALYTICS_CLIENT_SECRET | Set-Content src\Core\Secrets.h
+- ps: (Get-Content src\Core\Secrets.h) -replace '__GC_CLOUD_DB_BASIC_AUTH__', $env:GC_CLOUD_DB_BASIC_AUTH | Set-Content src\Core\Secrets.h
+- ps: (Get-Content src\Core\Secrets.h) -replace '__GC_CLOUD_DB_APP_NAME__', $env:GC_CLOUD_DB_APP_NAME | Set-Content src\Core\Secrets.h
+- ps: (Get-Content src\Core\Secrets.h) -replace '__GC_POLARFLOW_CLIENT_SECRET__', $env:GC_POLARFLOW_CLIENT_SECRET | Set-Content src\Core\Secrets.h
+- ps: (Get-Content src\Core\Secrets.h) -replace '__GC_SPORTTRACKS_CLIENT_SECRET__', $env:GC_SPORTTRACKS_CLIENT_SECRET | Set-Content src\Core\Secrets.h
+- ps: (Get-Content src\Core\Secrets.h) -replace '__GC_RWGPS_API_KEY__', $env:GC_RWGPS_API_KEY | Set-Content src\Core\Secrets.h
+- ps: (Get-Content src\Core\Secrets.h) -replace '__GC_NOLIO_CLIENT_ID__', $env:GC_NOLIO_CLIENT_ID | Set-Content src\Core\Secrets.h
+- ps: (Get-Content src\Core\Secrets.h) -replace '__GC_NOLIO_SECRET__', $env:GC_NOLIO_SECRET | Set-Content src\Core\Secrets.h
+- ps: (Get-Content src\Core\Secrets.h) -replace '__GC_XERT_CLIENT_SECRET__', $env:GC_XERT_CLIENT_SECRET | Set-Content src\Core\Secrets.h
+- ps: (Get-Content src\Core\Secrets.h) -replace '__GC_AZUM_CLIENT_SECRET__', $env:GC_AZUM_CLIENT_SECRET | Set-Content src\Core\Secrets.h
 
 build_script:
 - qmake.exe build.pro -r -spec win32-msvc
+- cd qwt\
+- jom -j1
+- cd ..
 - jom -j4
+
+after_build:
 - cd src\release
+
 # copy dependencies
 - windeployqt --release GoldenCheetah.exe
 - copy c:\libs\10_Precompiled_DLL\usbexpress_3.5.1\USBXpress\USBXpress_API\Host\x64\SiUSBXp.dll
 - copy c:\libs\10_Precompiled_DLL\libsamplerate64\lib\libsamplerate-0.dll
 - copy c:\libs\10_Precompiled_DLL\VLC\win64\lib\libvlc*.dll
+- xcopy /s /i /e /q c:\libs\10_Precompiled_DLL\VLC\win64\plugins plugins
 - copy c:\OpenSSL-v111-Win64\bin\lib*.dll
-- copy c:\python36-x64\python36.dll
-# minimum test
-- GoldenCheetah --version
-# cleanup
-- del *.h *.cpp *.obj *.pdb *.res
-# pack and upload to transfer.sh
-- 7z a GoldenCheetah.zip *
-- curl --upload-file GoldenCheetah.zip https://transfer.sh/GoldenCheetah.zip
-- cd ..\..
+- copy c:\OpenSSL-v111-Win64\license.txt "OpenSSL License.txt"
+- xcopy /s /i /e /q C:\Python .
+- copy C:\Python\LICENSE.txt "PYTHON LICENSE.txt"
+- copy c:\tools\vcpkg\installed\x64-windows\bin\gsl*.dll
 
-#notifications:
-#- provider: GitHubPullRequest
-#  on_build_success: true
-#  on_build_failure: true
-#  on_build_status_changed: true
+# ReadMe, license and icon files
+- copy ..\Resources\win32\ReadMe.txt
+- echo GoldenCheetah is licensed under the GNU General Public License v2 > license.txt
+- echo. >> license.txt
+- type ..\..\COPYING >> license.txt
+- copy ..\Resources\win32\gc.ico
+
+# Installer script
+- copy ..\Resources\win32\GC3.6-Master-W64-QT5.nsi
+
+# Build the installer
+- makensis GC3.6-Master-W64-QT5.nsi
+- move GoldenCheetah_v3.6_64bit_Windows.exe ..\..\GoldenCheetah_v3.6_x64.exe
+- cd ..\..
+- ps: Set-AppveyorBuildVariable -Name 'PUBLISH_BINARIES' -Value false
+- ps: if ($env:APPVEYOR_REPO_COMMIT_MESSAGE_EXTENDED -Match "\[publish binaries\]") { Set-AppveyorBuildVariable -Name 'PUBLISH_BINARIES' -Value true }
+
+test_script:
+# minimum test
+- src\release\GoldenCheetah --version 2>GCversionWindows.txt
+- git log -1 >> GCversionWindows.txt
+- ps: CertUtil -hashfile GoldenCheetah_v3.6_x64.exe sha256 | Select-Object -First 2 | Add-Content GCversionWindows.txt
+- type GCversionWindows.txt
+
+artifacts:
+- path: GoldenCheetah_v3.6_x64.exe
+  name: GCinstaller
+- path: GCversionWindows.txt
+  name: GCversionWindows
+
+deploy:
+# deploy continuous builds to s3
+  - provider: S3
+    access_key_id:
+      secure: RoEkfKfOnF7JHOiLZX5qfZM08X+bu4oaDzzSKgdooNM=
+    secret_access_key:
+      secure: GPAArawatirYwgpHJBthdrbvyFU5bBzPOdK7VYYPiG2YHYi/DNJZ5Q5qGK1A440p
+    bucket: goldencheetah-binaries
+    region: us-east-1
+    remove_files: true
+    set_public: true
+    folder: Windows
+    artifact: GCinstaller, GCversionWindows
+    on:
+      PUBLISH_BINARIES: true
+      APPVEYOR_REPO_NAME: "GoldenCheetah/GoldenCheetah"

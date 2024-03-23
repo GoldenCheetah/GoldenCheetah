@@ -134,9 +134,11 @@ class GenericSelectTool : public QObject, public QGraphicsItem
 
     public slots:
         void dragStart();
+        bool seriesClicked();
 
     Q_SIGNALS:
-        void hover(QPointF value, QString name, QAbstractSeries*series); // mouse cursor is over a point on the chart
+        void seriesClicked(QAbstractSeries*,GPointF);
+        void hover(GPointF value, QString name, QAbstractSeries*series); // mouse cursor is over a point on the chart
         void unhover(QString name); // mouse cursor is no longer over a point on the chart
         void unhoverx(); // when we aren't hovering on anything at all
 
@@ -150,7 +152,7 @@ class GenericSelectTool : public QObject, public QGraphicsItem
         QPointF spos; // last point we saw
 
         // scatter does this xxx TODO refactor into hoverpoints
-        QPointF hoverpoint;
+        GPointF hoverpoint;
         QAbstractSeries *hoverseries;
 
         // line plot uses this

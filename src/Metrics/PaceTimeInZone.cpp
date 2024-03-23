@@ -33,9 +33,6 @@ class PaceZoneTime : public RideMetric {
     int level;
     double seconds;
 
-    QList<int> lo;
-    QList<int> hi;
-
     public:
 
     PaceZoneTime() : level(0), seconds(0.0)
@@ -53,9 +50,9 @@ class PaceZoneTime : public RideMetric {
     void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &) {
 
         // no ride or no samples
-        if (spec.isEmpty(item->ride()) &&
+        if (spec.isEmpty(item->ride()) || 
             // pace only makes sense for running or swimming
-            !item->isRun && !item->isSwim) {
+            (!item->isRun && !item->isSwim)) {
             setValue(RideFile::NIL);
             setCount(0);
             return;
@@ -752,7 +749,347 @@ class PaceZonePTime10 : public RideMetric {
         RideMetric *clone() const { return new PaceZonePTime10(*this); }
 };
 
+// Time in Zones I, II and III
+class PaceZoneTimeI : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(PaceZoneTimeI)
+    double seconds;
+
+    public:
+
+    PaceZoneTimeI() : seconds(0.0)
+    {
+        setType(RideMetric::Total);
+        setMetricUnits(tr("seconds"));
+        setImperialUnits(tr("seconds"));
+        setPrecision(0);
+        setConversion(1.0);
+        setSymbol("time_in_zone_PI");
+        setInternalName("PI Time in Pace Zone");
+    }
+
+    void initialize ()
+    {
+        setName(tr("PI Time in Pace Zone"));
+        setMetricUnits(tr("seconds"));
+        setImperialUnits(tr("seconds"));
+        setDescription(tr("Time in Pace Zone I - Below AeT"));
+    }
+
+    bool isTime() const { return true; }
+
+    void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &)
+    {
+        // no ride or no samples
+        if (spec.isEmpty(item->ride()) ||
+            // pace only makes sense for running or swimming
+            (!item->isRun && !item->isSwim)) {
+            setValue(RideFile::NIL);
+            setCount(0);
+            return;
+        }
+
+        double totalSecs = 0.0;
+        seconds = 0;
+
+        const PaceZones *zone = item->context->athlete->paceZones(item->isSwim);
+        int zoneRange = item->paceZoneRange;
+
+        // get zone ranges
+        if (zone && zoneRange >= 0) {
+
+            double AeT = zone->getAeT(zoneRange);
+
+            // iterate and compute
+            RideFileIterator it(item->ride(), spec);
+            while (it.hasNext()) {
+                struct RideFilePoint *point = it.next();
+                totalSecs += item->ride()->recIntSecs();
+                if (point->kph < AeT)
+                    seconds += item->ride()->recIntSecs();
+            }
+        }
+        setValue(seconds);
+        setCount(totalSecs);
+    }
+
+    bool canAggregate() { return false; }
+    void aggregateWith(const RideMetric &) {}
+    MetricClass classification() const { return Undefined; }
+    MetricValidity validity() const { return Unknown; }
+    RideMetric *clone() const { return new PaceZoneTimeI(*this); }
+};
+
+class PaceZoneTimeII : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(PaceZoneTimeII)
+    double seconds;
+
+    public:
+
+    PaceZoneTimeII() : seconds(0.0)
+    {
+        setType(RideMetric::Total);
+        setMetricUnits(tr("seconds"));
+        setImperialUnits(tr("seconds"));
+        setPrecision(0);
+        setConversion(1.0);
+        setSymbol("time_in_zone_PII");
+        setInternalName("PII Time in Pace Zone");
+    }
+
+    void initialize ()
+    {
+        setName(tr("PII Time in Pace Zone"));
+        setMetricUnits(tr("seconds"));
+        setImperialUnits(tr("seconds"));
+        setDescription(tr("Time in Pace Zone II - Between AeT and CV"));
+    }
+
+    bool isTime() const { return true; }
+
+    void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &)
+    {
+        // no ride or no samples
+        if (spec.isEmpty(item->ride()) ||
+            // pace only makes sense for running or swimming
+            (!item->isRun && !item->isSwim)) {
+            setValue(RideFile::NIL);
+            setCount(0);
+            return;
+        }
+
+        double totalSecs = 0.0;
+        seconds = 0;
+
+        const PaceZones *zone = item->context->athlete->paceZones(item->isSwim);
+        int zoneRange = item->paceZoneRange;
+
+        // get zone ranges
+        if (zone && zoneRange >= 0) {
+
+            double AeT = zone->getAeT(zoneRange);
+            double CV = zone->getCV(zoneRange);
+
+            // iterate and compute
+            RideFileIterator it(item->ride(), spec);
+            while (it.hasNext()) {
+                struct RideFilePoint *point = it.next();
+                totalSecs += item->ride()->recIntSecs();
+                if (point->kph >= AeT && point->kph < CV)
+                    seconds += item->ride()->recIntSecs();
+            }
+        }
+        setValue(seconds);
+        setCount(totalSecs);
+    }
+
+    bool canAggregate() { return false; }
+    void aggregateWith(const RideMetric &) {}
+    MetricClass classification() const { return Undefined; }
+    MetricValidity validity() const { return Unknown; }
+    RideMetric *clone() const { return new PaceZoneTimeII(*this); }
+};
+
+class PaceZoneTimeIII : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(PaceZoneTimeIII)
+    double seconds;
+
+    public:
+
+    PaceZoneTimeIII() : seconds(0.0)
+    {
+        setType(RideMetric::Total);
+        setMetricUnits(tr("seconds"));
+        setImperialUnits(tr("seconds"));
+        setPrecision(0);
+        setConversion(1.0);
+        setSymbol("time_in_zone_PIII");
+        setInternalName("PIII Time in Pace Zone");
+    }
+
+    void initialize ()
+    {
+        setName(tr("PIII Time in Pace Zone"));
+        setMetricUnits(tr("seconds"));
+        setImperialUnits(tr("seconds"));
+        setDescription(tr("Time in Pace Zone III - Above CV"));
+    }
+
+    bool isTime() const { return true; }
+
+    void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &)
+    {
+        // no ride or no samples
+        if (spec.isEmpty(item->ride()) ||
+            // pace only makes sense for running or swimming
+            (!item->isRun && !item->isSwim)) {
+            setValue(RideFile::NIL);
+            setCount(0);
+            return;
+        }
+
+        double totalSecs = 0.0;
+        seconds = 0;
+
+        const PaceZones *zone = item->context->athlete->paceZones(item->isSwim);
+        int zoneRange = item->paceZoneRange;
+
+        // get zone ranges
+        if (zone && zoneRange >= 0) {
+
+            double CV = zone->getCV(zoneRange);
+
+            // iterate and compute
+            RideFileIterator it(item->ride(), spec);
+            while (it.hasNext()) {
+                struct RideFilePoint *point = it.next();
+                totalSecs += item->ride()->recIntSecs();
+                if (point->kph >= CV)
+                    seconds += item->ride()->recIntSecs();
+            }
+        }
+        setValue(seconds);
+        setCount(totalSecs);
+    }
+
+    bool canAggregate() { return false; }
+    void aggregateWith(const RideMetric &) {}
+    MetricClass classification() const { return Undefined; }
+    MetricValidity validity() const { return Unknown; }
+    RideMetric *clone() const { return new PaceZoneTimeIII(*this); }
+};
+
+// Now for Time In Zone as a Percentage of Ride Time
+class PaceZonePTimeI : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(PaceZonePTimeI)
+
+    public:
+
+    PaceZonePTimeI()
+    {
+        setSymbol("percent_in_zone_PI");
+        setInternalName("PI Percent in Pace Zone");
+        setType(RideMetric::Average);
+        setMetricUnits("%");
+        setImperialUnits("%");
+        setPrecision(0);
+        setConversion(1.0);
+    }
+
+    void initialize ()
+    {
+        setName(tr("PI Percent in Pace Zone"));
+        setDescription(tr("Percent of Time in Pace Zone I - Below AeT"));
+    }
+
+    void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &deps)
+    {
+        assert(deps.contains("time_in_zone_PI"));
+
+        // compute
+        double time = deps.value("time_in_zone_PI")->count();
+        double inzone = deps.value("time_in_zone_PI")->value(true);
+
+        if (time && inzone) setValue((inzone / time) * 100.00);
+        else setValue(0);
+        setCount(time);
+    }
+
+    bool aggregateZero() const { return true; }
+    bool canAggregate() { return false; }
+    void aggregateWith(const RideMetric &) {}
+    MetricClass classification() const { return Undefined; }
+    MetricValidity validity() const { return Unknown; }
+    RideMetric *clone() const { return new PaceZonePTimeI(*this); }
+};
+
+class PaceZonePTimeII : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(PaceZonePTimeII)
+
+    public:
+
+    PaceZonePTimeII()
+    {
+        setSymbol("percent_in_zone_PII");
+        setInternalName("PII Percent in Pace Zone");
+        setType(RideMetric::Average);
+        setMetricUnits("%");
+        setImperialUnits("%");
+        setPrecision(0);
+        setConversion(1.0);
+    }
+
+    void initialize ()
+    {
+        setName(tr("PII Percent in Pace Zone"));
+        setDescription(tr("Percent of Time in Pace Zone II - Between AeT and CV"));
+    }
+
+    void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &deps)
+    {
+        assert(deps.contains("time_in_zone_PII"));
+
+        // compute
+        double time = deps.value("time_in_zone_PII")->count();
+        double inzone = deps.value("time_in_zone_PII")->value(true);
+
+        if (time && inzone) setValue((inzone / time) * 100.00);
+        else setValue(0);
+        setCount(time);
+    }
+
+    bool aggregateZero() const { return true; }
+    bool canAggregate() { return false; }
+    void aggregateWith(const RideMetric &) {}
+    MetricClass classification() const { return Undefined; }
+    MetricValidity validity() const { return Unknown; }
+    RideMetric *clone() const { return new PaceZonePTimeII(*this); }
+};
+
+class PaceZonePTimeIII : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(PaceZonePTimeIII)
+
+    public:
+
+    PaceZonePTimeIII()
+    {
+        setSymbol("percent_in_zone_PIII");
+        setInternalName("PIII Percent in Pace Zone");
+        setType(RideMetric::Average);
+        setMetricUnits("%");
+        setImperialUnits("%");
+        setPrecision(0);
+        setConversion(1.0);
+    }
+
+    void initialize ()
+    {
+        setName(tr("PIII Percent in Pace Zone"));
+        setDescription(tr("Percent of Time in Pace Zone III - Above CV"));
+    }
+
+    void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &deps)
+    {
+        assert(deps.contains("time_in_zone_PIII"));
+
+        // compute
+        double time = deps.value("time_in_zone_PIII")->count();
+        double inzone = deps.value("time_in_zone_PIII")->value(true);
+
+        if (time && inzone) setValue((inzone / time) * 100.00);
+        else setValue(0);
+        setCount(time);
+    }
+
+    bool aggregateZero() const { return true; }
+    bool canAggregate() { return false; }
+    void aggregateWith(const RideMetric &) {}
+    MetricClass classification() const { return Undefined; }
+    MetricValidity validity() const { return Unknown; }
+    RideMetric *clone() const { return new PaceZonePTimeIII(*this); }
+};
+
 static bool addAllZones() {
+
     RideMetricFactory::instance().addMetric(PaceZoneTime1());
     RideMetricFactory::instance().addMetric(PaceZoneTime2());
     RideMetricFactory::instance().addMetric(PaceZoneTime3());
@@ -763,6 +1100,7 @@ static bool addAllZones() {
     RideMetricFactory::instance().addMetric(PaceZoneTime8());
     RideMetricFactory::instance().addMetric(PaceZoneTime9());
     RideMetricFactory::instance().addMetric(PaceZoneTime10());
+
     QVector<QString> deps;
     deps.append("time_in_zone_P1");
     RideMetricFactory::instance().addMetric(PaceZonePTime1(), &deps);
@@ -793,6 +1131,21 @@ static bool addAllZones() {
     deps.clear();
     deps.append("time_in_zone_P10");
     RideMetricFactory::instance().addMetric(PaceZonePTime10(), &deps);
+
+    RideMetricFactory::instance().addMetric(PaceZoneTimeI());
+    RideMetricFactory::instance().addMetric(PaceZoneTimeII());
+    RideMetricFactory::instance().addMetric(PaceZoneTimeIII());
+
+    deps.clear();
+    deps.append("time_in_zone_PI");
+    RideMetricFactory::instance().addMetric(PaceZonePTimeI(), &deps);
+    deps.clear();
+    deps.append("time_in_zone_PII");
+    RideMetricFactory::instance().addMetric(PaceZonePTimeII(), &deps);
+    deps.clear();
+    deps.append("time_in_zone_PIII");
+    RideMetricFactory::instance().addMetric(PaceZonePTimeIII(), &deps);
+
     return true;
 }
 

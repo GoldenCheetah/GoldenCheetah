@@ -33,14 +33,16 @@ class DeviceConfiguration
     int type;
     QString name,
          portSpec,
-         deviceProfile;        // device specific data
+         deviceProfile;         // device specific data
                                 // used by ANT to store ANTIDs
                                 // available for use by all devices
 
-    QString defaultString;      // PHCS for power/heartrate/cadence/speed from this device
-    int  wheelSize;             // set wheel size for each device
-    int  stridelength;          // stride length in cm
-    int  postProcess;           // virtualChannel
+    int wheelSize;              // set wheel size for each device
+    double inertialMomentKGM2;  // trainer inertial moment in kg m^2
+    int stridelength;           // stride length in cm
+
+    int postProcess;
+    QString virtualPowerDefinitionString;
 
     RealtimeController *controller; // can be used to allocate controller for this device
                                     // although a bit odd, it makes synchronising the config

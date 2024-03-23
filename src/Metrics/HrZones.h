@@ -45,7 +45,7 @@ struct HrZoneInfo {
     HrZoneInfo(const QString &n, const QString &d, int l, int h, double t) :
         name(n), desc(d), lo(l), hi(h), trimp(t) {}
 
-    // used by qSort()
+    // used by std::sort
     bool operator< (HrZoneInfo right) const {
         return ((lo < right.lo) || ((lo == right.lo) && (hi < right.hi)));
     }
@@ -60,17 +60,18 @@ struct HrZoneInfo {
 struct HrZoneRange {
     QDate begin, end;
     int lt;
+    int aet;
     int restHr;
     int maxHr;
 
     QList<HrZoneInfo> zones;
     bool hrZonesSetFromLT;
     HrZoneRange(const QDate &b, const QDate &e) :
-        begin(b), end(e), lt(0), hrZonesSetFromLT(false) {}
-    HrZoneRange(const QDate &b, const QDate &e, int _lt, int _restHr, int _maxHr) :
-        begin(b), end(e), lt(_lt), restHr(_restHr), maxHr(_maxHr), hrZonesSetFromLT(false) {}
+        begin(b), end(e), lt(0), aet(0), hrZonesSetFromLT(false) {}
+    HrZoneRange(const QDate &b, const QDate &e, int _lt, int _aet, int _restHr, int _maxHr) :
+        begin(b), end(e), lt(_lt), aet(_aet), restHr(_restHr), maxHr(_maxHr), hrZonesSetFromLT(false) {}
 
-    // used by qSort()
+    // used by std::sort
     bool operator< (HrZoneRange right) const {
         return (((! right.begin.isNull()) &&
                 (begin.isNull() || begin < right.begin )) ||
@@ -89,7 +90,7 @@ class HrZones : public QObject
     private:
 
         // Sport
-        bool run;
+        QString sport_;
 
         // Scheme
         bool defaults_from_user;
@@ -104,7 +105,7 @@ class HrZones : public QObject
 
     public:
 
-        HrZones(bool run=false) : run(run), defaults_from_user(false) {
+        HrZones(QString sport="Bike") : sport_(sport), defaults_from_user(false) {
                 initializeZoneParameters();
         }
 
@@ -123,7 +124,7 @@ class HrZones : public QObject
         void initializeZoneParameters();
 
         // Sport
-        bool isRun() { return run; }
+        const QString& sport() const { return sport_; }
 
         //
         // Zone history - Ranges
@@ -132,8 +133,8 @@ class HrZones : public QObject
         int getRangeSize() const;
 
         // Add ranges
-        void addHrZoneRange(QDate _start, QDate _end, int _lt, int _restHr, int _maxHr);
-        int addHrZoneRange(QDate _start, int _lt, int _restHr, int _maxHr);
+        void addHrZoneRange(QDate _start, QDate _end, int _lt, int _aet, int _restHr, int _maxHr);
+        int addHrZoneRange(QDate _start, int _lt, int _aet, int _restHr, int _maxHr);
         void addHrZoneRange();
 
         // insert a range from the given date to the end date of the range
@@ -147,6 +148,10 @@ class HrZones : public QObject
         // get and set LT for a given range
         int getLT(int rnum) const;
         void setLT(int rnum, int cp);
+
+        // get and set AeT Hr for a given range
+        int getAeT(int rnum) const;
+        void setAeT(int rnum, int aet);
 
         // get and set Rest Hr for a given range
         int getRestHr(int rnum) const;

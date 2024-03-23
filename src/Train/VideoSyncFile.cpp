@@ -30,7 +30,9 @@ static bool setSupported()
 {
     ::supported << ".rlv";
     ::supported << ".tts";
-//TODO    ::supported << ".gpx";
+    ::supported << ".json";
+    ::supported << ".gpx";
+
     return true;
 }
 static bool isinit = setSupported();
@@ -55,16 +57,18 @@ VideoSyncFile::VideoSyncFile(Context *context) : context(context)
 
 void VideoSyncFile::reload()
 {
+    // These types are enabled using ::supported list at top of this file.
+    QRegExp fact(".+[.](gpx|json)$", Qt::CaseInsensitive);
+
     // which parser to call?
-    if (filename.endsWith(".rlv", Qt::CaseInsensitive)) parseRLV();
-    if (filename.endsWith(".tts", Qt::CaseInsensitive)) parseTTS();
-//TODO    else if (filename.endsWith(".gpx", Qt::CaseInsensitive)) parseGPX();
+    if      (filename.endsWith(".rlv", Qt::CaseInsensitive)) parseRLV();
+    else if (filename.endsWith(".tts", Qt::CaseInsensitive)) parseTTS();
+    else if (fact.exactMatch(filename))                      parseFromRideFileFactory();
 }
 
 void VideoSyncFile::parseTTS()
 {
     // Initialise
-    manualOffset = 0;
     Version = "";
     Units = "";
     Filename = "";
@@ -92,15 +96,9 @@ void VideoSyncFile::parseTTS()
 
             // -----------------------------------------------------------------
             // VideoSyncFilePoint
-            const std::vector<NS_TTSReader::Point> &ttsPoints = ttsReader.getPoints();
             if (ttsReader.hasFrameMapping()) {
 
-                NS_TTSReader::Point fakeFirstPoint;
-
-                fakeFirstPoint = ttsPoints[1];
-                fakeFirstPoint.setDistanceFromStart(0);
-                fakeFirstPoint.setTime(0);
-
+                const std::vector<NS_TTSReader::Point>& ttsPoints = ttsReader.getPoints();
                 size_t pointCount = ttsPoints.size();
                 for (size_t i = 0; i < pointCount; i++) {
 
@@ -137,7 +135,6 @@ void VideoSyncFile::parseTTS()
 void VideoSyncFile::parseRLV()
 {
     // Initialise
-    manualOffset = 0;
     Version = "";
     Units = "";
     Filename = "";
@@ -348,6 +345,103 @@ void VideoSyncFile::parseRLV()
     }
 }
 
+void VideoSyncFile::parseFromRideFileFactory()
+{
+    // Initialise
+    Version = "";
+    Units = "";
+    Filename = "";
+    Name = "";
+    Duration = -1;
+    valid = false;  // did it parse ok as sync file?
+    format = RLV;
+    Points.clear();
+
+    static double km = 0;
+
+    QFile rideFile(filename);
+
+    // Check file exists
+    if (!rideFile.exists())
+        return;
+
+    // Instantiate RideFile
+    QStringList errors_;
+    RideFile* ride = RideFileFactory::instance().openRideFile(context, rideFile, errors_);
+    if (ride == NULL)
+        return;
+
+    // Enumerate the data types that are available.
+    bool fHasKm   = ride->areDataPresent()->km;
+    bool fHasTime = ride->areDataPresent()->secs;
+    bool fHasKph  = ride->areDataPresent()->kph;
+
+    // These files have no frame rate. Let use determine
+    VideoFrameRate = 0;
+
+    // Video sync needs distance and time.
+    if (!(fHasKm && fHasTime))
+        return;
+
+    double d0 = ride->dataPoints()[1]->km   - ride->dataPoints()[0]->km;
+    double t0 = ride->dataPoints()[1]->secs - ride->dataPoints()[0]->secs;
+
+    double v0 = (d0 / t0) * 60. * 60.; // initial kph, use second kph
+
+    // If out of range set kph to zero.
+    if (v0 > 1000. || v0 < 0.) v0 = 0.;
+
+    double initialSecs = ride->dataPoints()[0]->secs;
+
+    int pointCount = ride->dataPoints().count();
+    for (int i = 0; i < pointCount; i++) {
+
+        VideoSyncFilePoint add;
+
+        const RideFilePoint& point = *ride->dataPoints()[i];
+
+        // distance
+        add.km = point.km;
+
+        // time (first entry in file is 0.)
+        add.secs = point.secs - initialSecs;
+
+        // speed
+        double kph = 0.;
+        if (fHasKph) {
+            kph = point.kph;
+        } else if (i == 0) {
+            kph = v0;
+        } else {
+            const RideFilePoint& prevPoint = *ride->dataPoints()[i-1];
+
+            double distDelta = point.km   - prevPoint.km;
+            double timeDelta = point.secs - prevPoint.secs;
+
+            double kph = 0.;
+            if (timeDelta) {
+                kph = (distDelta / timeDelta) * 60. * 60.; // initial kph, use second kph
+            } else {
+                // Propagate previous speed if time is unchanged.
+                kph = Points.last().kph;
+            }
+            // If out of range set kph to zero.
+            if (kph > 1000. || kph < 0.) v0 = 0.;
+        }
+
+        add.kph = kph;
+
+        Points.append(add);
+    }
+
+    // set RLVFile duration
+    Duration = Points.last().secs * 1000.0;      // last is the end point in msecs
+    Distance = Points.last().km;
+
+    rideFile.close();
+
+    valid = true;
+}
 
 VideoSyncFile::~VideoSyncFile()
 {
@@ -356,7 +450,7 @@ VideoSyncFile::~VideoSyncFile()
 
 
 bool
-VideoSyncFile::isValid()
+VideoSyncFile::isValid() const
 {
     return valid;
 }

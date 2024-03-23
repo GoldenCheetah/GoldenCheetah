@@ -18,7 +18,7 @@ class NewSideBar : public QWidget
 
         // managing items - the id can be assigned or will get a default
         //                  it returns the id used
-        int addItem(QImage icon, QString name, int id=-1);
+        int addItem(QImage icon, QString name, int id=-1, QString whatsThisText="");
 
         // leave a gap- we have main icons, gap, apps, gap, sync, prefs
         void addStretch();
@@ -91,8 +91,8 @@ class NewSideBarItem : public QWidget
 
         // pre-rendered/calculated icons and colors
         QImage icon;
-        QPixmap iconNormal, iconDisabled;
-        QColor fg_normal, fg_disabled;
+        QPixmap iconNormal, iconDisabled, iconSelect;
+        QColor fg_normal, fg_disabled, fg_select;
         QColor bg_normal, bg_hover, bg_select, bg_disable;
         QFont textfont;
 
