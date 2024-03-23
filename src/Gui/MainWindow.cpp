@@ -2437,6 +2437,27 @@ MainWindow::downloadErgDB()
 }
 
 /*----------------------------------------------------------------------
+ * Strava Routes as Workouts
+ *--------------------------------------------------------------------*/
+
+void
+MainWindow::downloadStravaRoutes()
+{
+    QString workoutDir = appsettings->value(this, GC_WORKOUTDIR).toString();
+
+    QFileInfo fi(workoutDir);
+
+    if (fi.exists() && fi.isDir()) {
+        StravaRoutesDownload *d = new StravaRoutesDownload(currentAthleteTab->context);
+        d->exec();
+    } else{
+        QMessageBox::critical(this, tr("Workout Directory Invalid"),
+        tr("The workout directory is not configured, or the directory selected no longer exists.\n\n"
+        "Please check your preference settings."));
+    }
+}
+
+/*----------------------------------------------------------------------
  * Workout/Media Library
  *--------------------------------------------------------------------*/
 void
