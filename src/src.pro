@@ -694,7 +694,7 @@ HEADERS += Train/AddDeviceWizard.h Train/CalibrationData.h Train/ComputrainerCon
            Train/Library.h Train/LibraryParser.h Train/MeterWidget.h Train/NullController.h Train/RealtimeController.h \
            Train/RealtimeData.h Train/RealtimePlot.h Train/RealtimePlotWindow.h Train/RemoteControl.h Train/SpinScanPlot.h \
            Train/SpinScanPlotWindow.h Train/SpinScanPolarPlot.h Train/GarminServiceHelper.h Train/PhysicsUtility.h Train/BicycleSim.h \
-           Train/PolynomialRegression.h Train/MultiRegressionizer.h
+           Train/PolynomialRegression.h Train/MultiRegressionizer.h Train/StravaRoutesDownload.h
 
 HEADERS += Train/TrainBottom.h Train/TrainDB.h Train/TrainSidebar.h \
            Train/VideoLayoutParser.h Train/VideoSyncFile.h Train/WorkoutPlotWindow.h Train/WebPageWindow.h \
@@ -798,7 +798,7 @@ SOURCES += Train/AddDeviceWizard.cpp Train/CalibrationData.cpp Train/Computraine
            Train/Library.cpp Train/LibraryParser.cpp Train/MeterWidget.cpp Train/NullController.cpp Train/RealtimeController.cpp \
            Train/RealtimeData.cpp Train/RealtimePlot.cpp Train/RealtimePlotWindow.cpp Train/RemoteControl.cpp Train/SpinScanPlot.cpp \
            Train/SpinScanPlotWindow.cpp Train/SpinScanPolarPlot.cpp Train/GarminServiceHelper.cpp Train/PhysicsUtility.cpp Train/BicycleSim.cpp \
-           Train/PolynomialRegression.cpp
+           Train/PolynomialRegression.cpp Train/StravaRoutesDownload.cpp
 
 SOURCES += Train/TrainBottom.cpp Train/TrainDB.cpp Train/TrainSidebar.cpp \
            Train/VideoLayoutParser.cpp Train/VideoSyncFile.cpp Train/WorkoutPlotWindow.cpp Train/WebPageWindow.cpp \
