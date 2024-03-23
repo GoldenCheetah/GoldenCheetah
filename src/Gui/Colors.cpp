@@ -467,13 +467,6 @@ GCColor::readConfig()
             }
         }
     }
-#ifdef Q_OS_MAC
-    // if on yosemite set default chrome to #e5e5e5
-    // TODO dgr
-    if (QSysInfo::productVersion().toFloat() >= 12 | QSysInfo::productVersion().toFloat() < 13) {
-        ColorList[CCHROME].color = QColor(0xe5,0xe5,0xe5);
-    }
-#endif
 }
 
 QColor
@@ -1048,19 +1041,6 @@ GCColor::applyTheme(int index)
         appsettings->setValue(ColorList[i].setting, colorstring);
     }
 
-#ifdef Q_OS_MAC
-    // if on yosemite we always set default chrome to #e5e5e5 and flat
-    // TODO dgr
-    qDebug() << "productVersion:" << QSysInfo::productVersion();
-    if (QSysInfo::productVersion().toFloat() >= 12 | QSysInfo::productVersion().toFloat() < 13) {
-        QColor color = QColor(0xe5,0xe5,0xe5);
-        ColorList[CCHROME].color = color;
-        QString colorstring = QString("%1:%2:%3").arg(color.red())
-                                                 .arg(color.green())
-                                                 .arg(color.blue());
-        appsettings->setValue(ColorList[CCHROME].setting, colorstring);
-    }
-#endif
 }
 
 //

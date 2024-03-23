@@ -1631,9 +1631,6 @@ void TrainSidebar::Disconnect()
     // don't try to disconnect if running or not connected
     if ((status&RT_RUNNING) || ((status&RT_CONNECTED) == 0)) return;
 
-    static QIcon connectedIcon(":images/oxygen/power-on.png");
-    static QIcon disconnectedIcon(":images/oxygen/power-off.png");
-
     qDebug() << "disconnecting..";
 
     foreach(int dev, activeDevices) {

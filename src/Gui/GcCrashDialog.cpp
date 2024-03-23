@@ -70,8 +70,6 @@
 
 #include <gsl/gsl_version.h>
 
-#include "levmar.h"
-
 QString gl_version;
 
 GcCrashDialog::GcCrashDialog(QDir homeDir) : QDialog(NULL, Qt::Dialog), home(homeDir)
@@ -271,8 +269,7 @@ QString GcCrashDialog::versionHTML()
             "<tr><td colspan=\"2\">R</td><td>%16</td></tr>"
             "<tr><td colspan=\"2\">Python</td><td>%18</td></tr>"
             "<tr><td colspan=\"2\">LMFIT</td><td>7.0</td></tr>"
-            "<tr><td colspan=\"2\">LEVMAR</td><td>%19</td></tr>"
-            "<tr><td colspan=\"2\">GSL</td><td>%20</td></tr>"
+            "<tr><td colspan=\"2\">GSL</td><td>%19</td></tr>"
             "</table>"
             )
             .arg(QT_VERSION_STR)
@@ -306,7 +303,6 @@ QString GcCrashDialog::versionHTML()
 #else
             .arg("none")
 #endif
-            .arg(LM_VERSION)
             .arg(gsl)
             ;
 
