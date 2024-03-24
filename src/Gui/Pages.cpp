@@ -696,7 +696,7 @@ bool deviceModel::setData(const QModelIndex &index, const QVariant &value, int r
                 case 3 : // Profile
                     p.deviceProfile = value.toString();
                     break;
-                case 4 : // Profile
+                case 4 : // Virtual
                     p.postProcess = value.toInt();
                     break;
             }
