@@ -195,8 +195,8 @@ WorkoutWindow::WorkoutWindow(Context *context) :
     toolbar->setFloatable(true);
     toolbar->setIconSize(QSize(18 *dpiXFactor,18 *dpiYFactor));
 
-    newAct = new QAction("ERG", this);
-    QAction *newMrcAct = new QAction("MRC", this);
+    newAct = new QAction(tr("ERG - Absolute Watts"), this);
+    QAction *newMrcAct = new QAction(tr("MRC - Relative Watts"), this);
     connect(newAct, SIGNAL(triggered()), this, SLOT(newErgFile()));
     connect(newMrcAct, SIGNAL(triggered()), this, SLOT(newMrcFile()));
 
@@ -324,7 +324,7 @@ WorkoutWindow::WorkoutWindow(Context *context) :
     codeContainer->hide();
 
     // erg/mrc format
-    codeFormat = new QLabel(tr("Format: %1").arg("ERG"));
+    codeFormat = new QLabel(tr("ERG - Absolute Watts"));
     codeFormat->setStyleSheet("QLabel { color : white; }");
 
     // editing the code...
@@ -543,9 +543,8 @@ WorkoutWindow::ergFileSelected(ErgFile*f, int format)
 
     // just get on with it.
     format = f ? f->format : format;
-    QString formatText = tr("Format: %1");
-    if (format == MRC) codeFormat->setText(formatText.arg("MRC"));
-    else codeFormat->setText(formatText.arg("ERG"));
+    if (format == MRC) codeFormat->setText(tr("MRC - Relative Watts"));
+    else codeFormat->setText(tr("ERG - Absolute Watts"));
 
     ergFile = f;
     this->format = format;
@@ -584,7 +583,8 @@ WorkoutWindow::saveAs()
 
     // filetype defaults to .erg
     if(!filename.endsWith(".erg") && !filename.endsWith(".mrc") && !filename.endsWith(".zwo")) {
-        filename.append(".erg");
+        if (format == MRC) filename.append(".mrc");
+        else filename.append(".erg");
     }
 
     // New ergfile will be created almost empty
