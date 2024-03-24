@@ -572,9 +572,11 @@ WorkoutWindow::newMrcFile()
 void
 WorkoutWindow::saveAs()
 {
+    QString selected = format == MRC ? "MRC workout (*.mrc)" : "ERG workout (*.erg)";
     QString filename = QFileDialog::getSaveFileName(this, tr("Save Workout File"),
                                                     appsettings->value(this, GC_WORKOUTDIR, "").toString(),
-                                                    "ERG workout (*.erg);;MRC workout (*.mrc);;Zwift workout (*.zwo)");
+                                                    "ERG workout (*.erg);;MRC workout (*.mrc);;Zwift workout (*.zwo)",
+                                                    &selected);
 
     // if they didn't select, give up.
     if (filename.isEmpty()) {
