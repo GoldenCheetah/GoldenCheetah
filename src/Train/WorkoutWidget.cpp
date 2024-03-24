@@ -1578,10 +1578,10 @@ WorkoutWidget::recompute(bool editing)
         parent->TSSlabel->setText("- Stress");
         parent->IFlabel->setText("- Intensity");
     } else {
-        WPRIME = context->athlete->zones(false)->getWprime(rnum);
-        CP = context->athlete->zones(false)->getCP(rnum);
-        PMAX = context->athlete->zones(false)->getPmax(rnum);
-        FTP = context->athlete->zones(false)->getFTP(rnum);
+        WPRIME = context->athlete->zones("Bike")->getWprime(rnum);
+        CP = context->athlete->zones("Bike")->getCP(rnum);
+        PMAX = context->athlete->zones("Bike")->getPmax(rnum);
+        FTP = context->athlete->zones("Bike")->getFTP(rnum);
     }
 
     bool useCPForFTP = (appsettings->cvalue(context->athlete->cyclist,
