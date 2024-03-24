@@ -100,6 +100,8 @@ WorkoutWidget::WorkoutWidget(WorkoutWindow *parent, Context *context) :
 
     onDrag = onCreate = onRect = atRect = QPointF(-1,-1);
     qwkactive = false;
+    format = 0;
+    ftp = 300;
 
     // watch mouse events for user interaction
     adjustLayout();
@@ -877,7 +879,7 @@ WorkoutWidget::setBlockCursor()
     //
     // QWKCODE TEXT
     //
-    if (!parent->code->isHidden()) {
+    if (!parent->codeContainer->isHidden()) {
 
         qwkactive = true;
 
@@ -1426,7 +1428,7 @@ WorkoutWidget::selectClear()
 }
 
 void
-WorkoutWidget::ergFileSelected(ErgFile *ergFile)
+WorkoutWidget::ergFileSelected(ErgFile *ergFile, int format)
 {
     // reset state and stack
     state = none;
@@ -1445,7 +1447,9 @@ WorkoutWidget::ergFileSelected(ErgFile *ergFile)
     foreach(WWPoint *point, points_) delete point;
     points_.clear();
 
-    // we suport ERG but not MRC/CRS currently
+    this->format = ergFile ? ergFile->format : format;
+
+    // we suport ERG/MRC but not CRS/CRS_LOC currently
     if (ergFile && (ergFile->format == MRC || ergFile->format == ERG)) {
 
         this->ergFile = ergFile;
@@ -1557,31 +1561,35 @@ WorkoutWidget::recompute(bool editing)
     //
     setBlockCursor();
 
-    int rnum=-1;
-    if (context->athlete->zones("Bike") == NULL ||
-        (rnum = context->athlete->zones("Bike")->whichRange(QDate::currentDate())) == -1) {
-
-        // no cp or ftp set
-        parent->TSSlabel->setText("- Stress");
-        parent->IFlabel->setText("- Intensity");
-
-        return; // nothing to do if zones are not available to get CP et.al.
-    }
-
     //
     // PREPARE DATA
     //
 
     // get CP/FTP to use in calculation
-    int WPRIME = context->athlete->zones("Bike")->getWprime(rnum);
-    int CP = context->athlete->zones("Bike")->getCP(rnum);
-    int PMAX = context->athlete->zones("Bike")->getPmax(rnum);
-    int FTP = context->athlete->zones("Bike")->getFTP(rnum);
+    int rnum=-1;
+    int CP, FTP, WPRIME, PMAX;
+    if (context->athlete->zones("Bike") == NULL ||
+        (rnum = context->athlete->zones("Bike")->whichRange(QDate::currentDate())) == -1) {
+
+        // no cp or ftp set
+        CP = FTP = 300;
+        WPRIME = 20000;
+        PMAX = 1000;
+        parent->TSSlabel->setText("- Stress");
+        parent->IFlabel->setText("- Intensity");
+    } else {
+        WPRIME = context->athlete->zones(false)->getWprime(rnum);
+        CP = context->athlete->zones(false)->getCP(rnum);
+        PMAX = context->athlete->zones(false)->getPmax(rnum);
+        FTP = context->athlete->zones(false)->getFTP(rnum);
+    }
+
     bool useCPForFTP = (appsettings->cvalue(context->athlete->cyclist,
                         context->athlete->zones("Bike")->useCPforFTPSetting(), 0).toInt() == 0);
     if (useCPForFTP) FTP=CP;
     if (PMAX<=0) PMAX=1000;
     int K=WPRIME/(PMAX-CP);
+    ftp = FTP;
 
     // truncate
     wattsArray.resize(0);
@@ -1787,11 +1795,11 @@ WorkoutWidget::qwkcode()
     //
     //       N - repeat N times
     //     ttt - duration N[ms]
-    //    @iii - watts
-    //    @iii-ppp - from iii to ppp watts
+    //    @iii - watts (if format=ERG), %CP (if format=MRC)
+    //    @iii-ppp - from iii to ppp watts/%CP
     //    rttt - recovery for ttt
-    //    @rrr - recovery watts
-    //    @rrr-sss - from rrr to sss watts
+    //    @rrr - recovery watts/%CP
+    //    @rrr-sss - from rrr to sss watts/%CP
     //
     //    e.g.
     //    4x10@300r3m@200  - 4 time 10 mins at 300W followed by 3m at 200w
@@ -1811,10 +1819,12 @@ WorkoutWidget::qwkcode()
     //    3) 5 sets of 5 minutes at 105% of CP with 3 minutes recovery at 65% of CPXXX
     //    4) 10minutes at 65% of CP to cool downXXX
 
+    double denom = format == MRC ? ftp / 100.0 : 1;
+
     // just loop through for now doing xx@yy and optionally add rxx
     if (points_.count() == 1) {
         // just a single point?
-        codeStrings << QString("%1@0-%2").arg(qduration(points_[0]->x)).arg(round(points_[0]->y));
+        codeStrings << QString("%1@0-%2").arg(qduration(points_[0]->x)).arg(round(points_[0]->y/denom));
         codePoints<<0;
     }
 
@@ -1850,7 +1860,7 @@ WorkoutWidget::qwkcode()
             if (i==0 || points_[i]->x - points_[i-1]->x <= 0) {
 
                 // its a block
-                section = QString("0@%1-%2").arg(round(points_[i]->y)).arg(round(points_[i+1]->y));
+                section = QString("0@%1-%2").arg(round(points_[i]->y/denom)).arg(round(points_[i+1]->y/denom));
                 ap = points_[i]->y;
 
             } else {
@@ -1864,14 +1874,14 @@ WorkoutWidget::qwkcode()
         if (doubles_equal(points_[i+1]->y, points_[i]->y)) {
 
             // its a block
-            section = QString("%1@%2").arg(qduration(duration)).arg(round(points_[i]->y));
+            section = QString("%1@%2").arg(qduration(duration)).arg(round(points_[i]->y/denom));
             ap = points_[i]->y;
 
         } else {
             // its a rise
             section = QString("%1@%2-%3").arg(qduration(duration))
-                                         .arg(round(points_[i]->y))
-                                         .arg(round(points_[i+1]->y));
+                                         .arg(round(points_[i]->y/denom))
+                                         .arg(round(points_[i+1]->y/denom));
             ap = ((points_[i]->y + points_[i+1]->y) / 2);
         }
 
@@ -2050,6 +2060,9 @@ WorkoutWidget::apply(QString code)
 
     laps_.clear();
 
+    // transform if mrc
+    double factor = format == MRC ? ftp / 100.0 : 1;
+
     foreach(QString line, code.split("\n")) {
 
         //
@@ -2060,11 +2073,11 @@ WorkoutWidget::apply(QString code)
         // [Nx]t1@w1[-w2][rt2@w3[-w4]][L]
         //
         // Where Nx      - Repeat N times
-        //       t1@w1   - Time t1 at Watts w1
-        //       -w2     - Optionally Time t from watts w1 to w2
+        //       t1@w1   - Time t1 at Watts/%CP w1
+        //       -w2     - Optionally Time t from watts/%CP w1 to w2
         //
-        //       rt2@w3  - Optional recovery time t2 at watts w3
-        //       -w4     - Optionally recover from time t2 watts w3 to watts w4
+        //       rt2@w3  - Optional recovery time t2 at watts/%CP w3
+        //       -w4     - Optionally recover from time t2 watts/%CP w to watts/%CP w
         //       L       - Optionally add laps to encapsulate sections added by this qwkcode line
         //
         //       time t2/t2 can be expressed as a number and may
@@ -2077,11 +2090,11 @@ WorkoutWidget::apply(QString code)
         // 0 - The entire line
         // 1 - Count with trailing x e.g. "4x"
         // 2 - Duration with trailing units (optional) e.g. "10m"
-        // 3 - Watts without units e.g. "120"
-        // 4 - Watts rise to with leading minus e.g. "-150"
+        // 3 - Watts/%CP without units e.g. "120"
+        // 4 - Watts/%CP rise to with leading minus e.g. "-150"
         // 5 - The entire recovery string (optional)
         // 6 - Recovery Duration with trailing units (optional) e.g. "3m"
-        // 7 - Recovery watts without units e.g. "70"
+        // 7 - Recovery watts/%CP without units e.g. "70"
         // 8 - Recovert rise to with leading minus e.g. "-100"
         // 9 - Trailing L if lap markers is to be added
         //
@@ -2167,7 +2180,7 @@ WorkoutWidget::apply(QString code)
                 // add a point for starting watts if not already there
                 if (w1 != watts || points_.isEmpty()) {
                     index++;
-                    new WWPoint(this, secs, w1);
+                    new WWPoint(this, secs, w1*factor);
                     bool addLap = laps_.isEmpty() ? secs != 0 : (laps_.last().x != secs*1000) && secs != 0;
                     if (insertLapMarkers && addLap)
                     {
@@ -2184,7 +2197,7 @@ WorkoutWidget::apply(QString code)
                 secs += t1;
                 watts = w2 > 0 ? w2 : w1;
                 index++;
-                new WWPoint(this, secs, watts);
+                new WWPoint(this, secs, watts*factor);
 
                 bool addLap = laps_.isEmpty() ? true : (laps_.last().x != secs*1000);
                 if (insertLapMarkers && addLap)
@@ -2201,7 +2214,7 @@ WorkoutWidget::apply(QString code)
                 if (t2 > 0) {
                     if (w3 != watts) {
                         index++;
-                        new WWPoint(this, secs, w3);
+                        new WWPoint(this, secs, w3*factor);
                         bool addLap = laps_.isEmpty() ? true : (laps_.last().x != secs*1000);
                         if (insertLapMarkers && addLap)
                         {
@@ -2218,7 +2231,7 @@ WorkoutWidget::apply(QString code)
                     secs += t2;
                     watts = w4 >0 ? w4 : w3;
                     index++;
-                    new WWPoint(this,secs,watts);
+                    new WWPoint(this,secs,watts*factor);
                     bool addLap = laps_.isEmpty() ? true : (laps_.last().x != secs*1000);
                     if (insertLapMarkers && addLap)
                     {
