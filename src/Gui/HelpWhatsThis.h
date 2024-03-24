@@ -71,6 +71,7 @@ Q_OBJECT
                  MenuBar_Tools_Download_Measures,
                  MenuBar_Tools_Download_ERGDB,
                  MenuBar_Tools_Download_TP,
+                 MenuBar_Tools_Download_StravaRoutes,
                  MenuBar_Tools_CreateWorkout,
                  MenuBar_Tools_ScanDisk_WorkoutVideo,
                  MenuBar_Tools_CreateHeatMap,

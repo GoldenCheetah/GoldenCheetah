@@ -93,7 +93,7 @@ OAuthDialog::OAuthDialog(Context *context, OAuthSite site, CloudService *service
 
         urlstr = QString("https://www.strava.com/oauth/authorize?");
         urlstr.append("client_id=").append(GC_STRAVA_CLIENT_ID).append("&");
-        urlstr.append("scope=activity:read_all,activity:write&");
+        urlstr.append("scope=read_all,activity:read_all,activity:write&");
         urlstr.append("redirect_uri=http://www.goldencheetah.org/&");
         urlstr.append("response_type=code&");
         urlstr.append("approval_prompt=force");
