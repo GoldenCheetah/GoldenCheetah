@@ -55,7 +55,7 @@ QuarqParser::incrementTime( const double new_time )
 
     seconds_from_start += SAMPLE_INTERVAL;
   }
-  time.setTime_t(new_time);
+  time.setSecsSinceEpoch(new_time);
 }
 
 bool

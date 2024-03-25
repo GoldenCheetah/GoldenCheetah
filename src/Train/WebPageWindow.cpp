@@ -38,7 +38,11 @@
 
 #include <QtWebChannel>
 #include <QWebEngineProfile>
+#if QT_VERSION < 0x060000
 #include <QWebEngineDownloadItem>
+#else
+#include <QWebEngineDownloadRequest>
+#endif
 
 // overlay helper
 #include "AbstractView.h"
@@ -160,7 +164,6 @@ WebPageWindow::WebPageWindow(Context *context) : GcChartWindow(context), context
 
     view->setPage(new simpleWebPage());
     view->setContentsMargins(0,0,0,0);
-    view->page()->view()->setContentsMargins(0,0,0,0);
     view->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     view->setAcceptDrops(false);
     layout->addWidget(view);
@@ -175,7 +178,11 @@ WebPageWindow::WebPageWindow(Context *context) : GcChartWindow(context), context
     configChanged(CONFIG_APPEARANCE);
 
     // intercept downloads
+#if QT_VERSION < 0x060000
     connect(view->page()->profile(), SIGNAL(downloadRequested(QWebEngineDownloadItem*)), this, SLOT(downloadRequested(QWebEngineDownloadItem*)));
+#else
+    connect(view->page()->profile(), SIGNAL(downloadRequested(QWebEngineDownloadRequest*)), this, SLOT(downloadRequested(QWebEngineDownloadRequest*)));
+#endif
     connect(view->page(), SIGNAL(linkHovered(QString)), this, SLOT(linkHovered(QString)));
 }
 
@@ -256,7 +263,11 @@ WebPageWindow::event(QEvent *event)
 }
 
 void
+#if QT_VERSION < 0x060000
 WebPageWindow::downloadRequested(QWebEngineDownloadItem *item)
+#else
+WebPageWindow::downloadRequested(QWebEngineDownloadRequest *item)
+#endif
 {
     // only do it if I am visible, as shared across web page instances
     if (!amVisible()) return;
@@ -270,11 +281,15 @@ WebPageWindow::downloadRequested(QWebEngineDownloadItem *item)
 
     // lets go get it!
     filenames.clear();
-    filenames << item->path();
+    filenames << QDir(item->downloadDirectory()).absoluteFilePath(item->downloadFileName());
 
     // set save
+#if QT_VERSION < 0x060000
     connect(item, SIGNAL(downloadProgress(qint64, qint64)), this, SLOT(downloadProgress(qint64,qint64)));
     connect(item, SIGNAL(finished()), this, SLOT(downloadFinished()));
+#else
+    connect(item, SIGNAL(isFinishedChanged()), this, SLOT(downloadFinished()));
+#endif
 
     // kick off download
     item->accept(); // lets download it!

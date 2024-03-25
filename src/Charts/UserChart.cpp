@@ -87,7 +87,6 @@ UserChart::configChanged(qint32)
     // tinted palette for headings etc
     QPalette palette;
     palette.setBrush(QPalette::Window, RGBColor(chartinfo.bgcolor));
-    palette.setBrush(QPalette::Background, RGBColor(chartinfo.bgcolor));
     palette.setColor(QPalette::WindowText, GColor(CPLOTMARKER));
     palette.setColor(QPalette::Text, GColor(CPLOTMARKER));
     palette.setColor(QPalette::Base, RGBColor(chartinfo.bgcolor) /*GCColor::alternateColor(bgcolor)*/);
@@ -566,7 +565,9 @@ UserChart::settings() const
     QString returning;
 
     QTextStream out(&returning);
+#if QT_VERSION < 0x060000
     out.setCodec("UTF-8");
+#endif
     out << "{ ";
 
     // chartinfo
@@ -957,9 +958,9 @@ UserChartSettings::UserChartSettings(Context *context, bool rangemode, GenericCh
     // watch for chartinfo edits (the series/axis stuff is managed by separate dialogs)
     connect(title, SIGNAL(textChanged(QString)), this, SLOT(updateChartInfo()));
     connect(description, SIGNAL(textChanged()), this, SLOT(updateChartInfo()));
-    connect(type, SIGNAL(currentIndexChanged(QString)), this, SLOT(updateChartInfo()));
+    connect(type, SIGNAL(currentIndexChanged(int)), this, SLOT(updateChartInfo()));
     connect(animate, SIGNAL(stateChanged(int)), this, SLOT(updateChartInfo()));
-    connect(legpos, SIGNAL(currentIndexChanged(QString)), this, SLOT(updateChartInfo()));
+    connect(legpos, SIGNAL(currentIndexChanged(int)), this, SLOT(updateChartInfo()));
     connect(stack, SIGNAL(stateChanged(int)), this, SLOT(updateChartInfo()));
     connect(intervalrefresh, SIGNAL(stateChanged(int)), this, SLOT(updateChartInfo()));
     connect(orientation, SIGNAL(currentIndexChanged(int)), this, SLOT(updateChartInfo()));
@@ -1398,7 +1399,7 @@ EditUserSeriesDialog::EditUserSeriesDialog(Context *context, bool rangemode, Gen
 
     // set the dialog
     QVBoxLayout *main = new QVBoxLayout(this);
-    main->setMargin(10*dpiXFactor);
+    main->setContentsMargins(10*dpiXFactor,10*dpiXFactor,10*dpiXFactor,10*dpiXFactor);
     QHBoxLayout *hf = new QHBoxLayout();
     QVBoxLayout *pl = new QVBoxLayout();
     QFormLayout *cf = new QFormLayout();
@@ -1731,7 +1732,7 @@ EditUserAxisDialog::EditUserAxisDialog(Context *context, GenericAxisInfo &info)
 
     // set the dialog
     QVBoxLayout *main = new QVBoxLayout(this);
-    main->setMargin(10*dpiXFactor);
+    main->setContentsMargins(10*dpiXFactor,10*dpiXFactor,10*dpiXFactor,10*dpiXFactor);
     QFormLayout *cf = new QFormLayout();
     main->addLayout(cf);
     main->addStretch();

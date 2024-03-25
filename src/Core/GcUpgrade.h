@@ -104,8 +104,10 @@
 // 4009 - V3.6 DEVELOPMENT 2110 (NOV 2021) (Pre-release)
 // 4010 - V3.6 DEVELOPMENT 2202 (FEB 2022) (Pre-release RC1)
 // 4011 - V3.6 DEVELOPMENT 2208 (AUG 2022) (Pre-release RC2)
-// 4012 - V3.6 DEVELOPMENT 2210 (OCT 2022) (Pre-release RC3) - triggered 29/10
-// 4013 - V3.6 DEVELOPMENT 2303 (MAR 2023) (Pre-release RC4) - updated 21/3 - latest snapshot 30/7
+// 4012 - V3.6 DEVELOPMENT 2210 (OCT 2022) (Pre-release RC3)
+// 4013 - V3.6 DEVELOPMENT 2303 (MAR 2023) (Pre-release RC4)
+// 5000 - V3.6 RELEASE (August 2023) - latest snapshot 12/3/24
+// 5001 - V3.7 DEVELOPMENT
 
 #define VERSION3_BUILD    3010 // released
 #define VERSION3_SP1      3030 // released
@@ -116,14 +118,15 @@
 #define VERSION33_BUILD   3933 // development release
 #define VERSION34_BUILD   3955 // released
 #define VERSION35_BUILD   3990 // released
-#define VERSION36_BUILD   4013 // fourth release candidate
+#define VERSION36_BUILD   5000 // released 5/8/23
+#define VERSION37_BUILD   5001 // development release
 
 // will keep changing during testing and before final release
 #define VERSION31_BUILD VERSION31_UPG
 
 // the next two will with each build/release
-#define VERSION_LATEST 4013
-#define VERSION_STRING "V3.6-RC4"
+#define VERSION_LATEST 5000
+#define VERSION_STRING "V3.6"
 
 // default config for this release cycle
 #define VERSION_CONFIG_PREFIX "http://www.goldencheetah.org/defaults/3.6"

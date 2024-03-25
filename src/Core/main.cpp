@@ -30,7 +30,6 @@
 #include "OverviewItems.h"
 
 #include <QApplication>
-#include <QDesktopWidget>
 #include <QtGui>
 #include <QFile>
 #include <QMessageBox>
@@ -69,7 +68,6 @@ static int gc_opened=0;
 //
 QString gcroot;
 QApplication *application;
-QDesktopWidget *desktop = NULL;
 
 #ifdef GC_WANT_HTTP
 #include "APIWebService.h"
@@ -220,7 +218,9 @@ main(int argc, char *argv[])
         freopen("CONOUT$", "w", stderr);
         freopen("CONOUT$", "w", stdout);
     }
+#if QT_VERSION < 0x060000
     bool angle=true;
+#endif
 #endif
 
     //
@@ -248,7 +248,7 @@ main(int argc, char *argv[])
     // By default, print messages from all categories, but not those from
     // specialised categories like qt.* or gc.* which can be quite verbose
     QString debugRules = QString("*.debug=true;gc.*.debug=false;qt.*.debug=false");
-    QString debugFile = NULL;
+    QString debugFile = QString();
 
     bool server = false;
     nogui = false;
@@ -296,7 +296,9 @@ main(int argc, char *argv[])
             fprintf(stderr, "--no-r              to disable R startup\n");
 #endif
 #ifdef Q_OS_WIN
+#if QT_VERSION < 0x060000
             fprintf(stderr, "--no-angle          to disable ANGLE rendering\n");
+#endif
 #endif
             fprintf (stderr, "\nSpecify the folder and/or athlete to open on startup\n");
             fprintf(stderr, "If no parameters are passed it will reopen the last athlete.\n\n");
@@ -354,8 +356,10 @@ main(int argc, char *argv[])
             exit(1);
 #endif
 #ifdef Q_OS_WIN
+#if QT_VERSION < 0x060000
         } else if (arg == "--no-angle") {
             angle = false;
+#endif
 #endif
         } else {
 
@@ -395,15 +399,6 @@ main(int argc, char *argv[])
     XInitThreads();
 #endif
 
-#ifdef Q_OS_MACX
-    if ( QSysInfo::MacintoshVersion > QSysInfo::MV_10_8 )
-    {
-        // fix Mac OS X 10.9 (mavericks) font issue
-        // https://bugreports.qt-project.org/browse/QTBUG-32789
-        QFont::insertSubstitution("LucidaGrande", "Lucida Grande");
-    }
-#endif
-
 #ifdef GC_WANT_R
     rtool = NULL;
 #endif
@@ -422,18 +417,17 @@ main(int argc, char *argv[])
     gsl_set_error_handler_off();
 
 #ifdef Q_OS_WIN
+#if QT_VERSION < 0x060000
     if (angle) {
         // windows we use ANGLE for opengl on top of DirectX/Direct3D
         // it avoids issues with bad graphics drivers
         QCoreApplication::setAttribute(Qt::AA_UseOpenGLES);
     }
 #endif
+#endif
 
     // create the application -- only ever ONE regardless of restarts
     application = new QApplication(argc, argv);
-
-    // select the desktop (used in defaultAppearanceSettings below and elsewhere)
-    desktop = QApplication::desktop();
 
     //XXXIdleEventFilter idleFilter;
     //XXXapplication->installEventFilter(&idleFilter);
@@ -456,9 +450,7 @@ main(int argc, char *argv[])
     // use the default before taking into account screen size
     baseFont = font;
 
-    // hidpi ratios -- single desktop for now
-    desktop = QApplication::desktop();
-
+    // hidpi ratios
     dpiXFactor = defaults.xfactor;
     dpiYFactor = defaults.yfactor;
 
@@ -469,6 +461,7 @@ main(int argc, char *argv[])
                                        "QComboBox   { padding-left: %1px; padding-right: %1px; }")
                                        .arg(15*dpiXFactor)
                                        .arg(3*dpiYFactor));
+
 #endif
 
     // scale up to user scale factor
@@ -530,7 +523,7 @@ main(int argc, char *argv[])
 #if defined(Q_OS_MACX)
         QString libraryPath="Library/GoldenCheetah";
 #elif defined(Q_OS_WIN)
-        QStringList paths=QStandardPaths::standardLocations(QStandardPaths::DataLocation);
+        QStringList paths=QStandardPaths::standardLocations(QStandardPaths::AppLocalDataLocation);
         QString libraryPath = paths.at(0); 
 #else // not windows or osx (must be Linux or OpenBSD)
         // Q_OS_LINUX et al
@@ -573,7 +566,7 @@ main(int argc, char *argv[])
 
 
         // now redirect stderr and set the log filter and format
-        if (debugFile != NULL) nostderr(debugFile);
+        if (debugFile != QString()) nostderr(debugFile);
         else if (!debug) nostderr(QString("%1/%2").arg(home.canonicalPath()).arg("goldencheetah.log"));
         qSetMessagePattern(debugFormat);
         QLoggingCategory::setFilterRules(debugRules.replace(";", "\n")); // accept ; as separator like QT_LOGGING_RULES

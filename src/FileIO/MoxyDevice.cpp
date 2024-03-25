@@ -283,7 +283,7 @@ MoxyDevice::download( const QDir &tmpdir,
             QString tmpl = tmpdir.absoluteFilePath(".mxdl.XXXXXX");
             tmpFile = new QTemporaryFile(tmpl);
             if (!tmpFile->open()) {
-                err = tr("Failed to create temporary file ") + tmpl + ": " + tmpFile->error();
+                err = tr("Failed to create temporary file ") + tmpl + ": " + tmpFile->errorString();
                 return false;
             }
 

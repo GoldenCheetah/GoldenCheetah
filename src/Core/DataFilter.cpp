@@ -393,6 +393,10 @@ static struct {
     //{ "string", 1 },     // coerce value to string (listed above, removes decimal places, not sure why)
     { "double", 1 },     // coerce value to double
 
+    { "xdataseries", 1 }, // returns a string vector of all the series in an xdata e.g. xdataseries("SESSION")
+    { "xdataunits", 1 },  // returns a string vector of all the units in an xdata e.g. xdataunits("SESSION");
+    { "xdatavalues", 1 }, // returns a vector of doubles of all vales in an xdata suitable for display in an overview tile
+
     // add new ones above this line
     { "", -1 }
 };
@@ -1729,6 +1733,7 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
                     !df->dataSeriesSymbols.contains(symbol) &&
                     symbol != "isRide" && symbol != "isSwim" &&
                     symbol != "isRun" && symbol != "isXtrain" &&
+                    symbol != "isAero" &&
                     !isCoggan(symbol)) {
 
                     // unknown, is it user defined ?
@@ -2113,6 +2118,13 @@ void Leaf::validateFilter(Context *context, DataFilterRuntime *df, Leaf *leaf)
                             DataFiltererrors << QString(tr("xdata expects a string, 'km' or 'secs' for second parameters"));
                             leaf->inerror = true;
                         }
+                    }
+
+                } else if (leaf->function == "xdataseries" || leaf->function == "xdataunits" || leaf->function == "xdatavalues") {
+
+                    if (leaf->fparms.count() != 1 || leaf->fparms[0]->type != Leaf::String) {
+                        leaf->inerror=true;
+                        DataFiltererrors << QString(tr("%s expects a string name (the tab name in the raw data view)").arg(leaf->function));
                     }
 
                 } else if (leaf->function == "samples") {
@@ -3166,11 +3178,13 @@ DataFilter::DataFilter(QObject *parent, Context *context, QString formula) : QOb
         treeRoot->validateFilter(context, &rt, treeRoot);
     else
         treeRoot=NULL;
+
+    errors = DataFiltererrors;
 }
 
 Result DataFilter::evaluate(RideItem *item, RideFilePoint *p)
 {
-    if (!item || !treeRoot || DataFiltererrors.count())
+    if (!item || !treeRoot || errors.count())
         return Result(0);
 
     // reset stack
@@ -3199,7 +3213,7 @@ Result DataFilter::evaluate(Specification spec, DateRange dr)
     // if there is no current ride item then there is no data
     // so it really is ok to baulk at no current ride item here
     // we must always have a ride since context is used
-    if (context->currentRideItem() == NULL || !treeRoot || DataFiltererrors.count()) return Result(0);
+    if (context->currentRideItem() == NULL || !treeRoot || errors.count()) return Result(0);
 
     Result res(0);
 
@@ -3358,6 +3372,7 @@ void DataFilter::clearFilter()
         treeRoot->clear(treeRoot);
         delete treeRoot;
         treeRoot = NULL;
+        errors.clear();
     }
     rt.isdynamic = false;
     sig = "";
@@ -4459,7 +4474,10 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
 
             // by is coerced to strings if it isn't a string list already
             // this simplifies all the logic for watching it change
-            if (by.asString().count()==0) by.asString() << by.string();
+            if (by.asString().count()==0) {
+                if (by.isNumber) by.asNumeric() << by.number();
+                else by.asString() << by.string();
+            }
 
             // state as we loop through a group
             QString laststring =by.asString()[0];
@@ -4688,6 +4706,43 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
             }
             return returning;
         }
+
+        if (leaf->function == "xdataseries" || leaf->function == "xdataunits" || leaf->function=="xdatavalues") {
+            Result returning(0);
+
+            QString name = *(leaf->fparms[0]->lvalue.s);
+
+            // lets get the xdata series - only if the item is already open to avoid accidentally
+            // iterating over all ride data, same approach as in the samples function below
+            if (m == NULL || !m->isOpen() || m->ride(false) == NULL) {
+                return Result(0);
+
+            } else {
+                XDataSeries *xds = m->ride()->xdata(name);
+                if (xds == NULL) return returning;
+
+                // return a vector of all the column names
+                if (leaf->function == "xdataseries") returning = Result(xds->valuename);
+                if (leaf->function == "xdataunits") returning = Result(xds->unitname);
+
+
+                // now we need to get all the values into returning
+                // for every row we have
+                if (leaf->function == "xdatavalues") {
+
+                    for (int idx=0; idx <xds->valuename.count(); idx++) {
+                        foreach(XDataPoint *p, xds->datapoints) {
+
+                            returning.asNumeric() << p->number[idx];
+                            returning.number()  += p->number[idx];
+                        }
+                    }
+                }
+            }
+
+            return returning;
+        }
+
         if (leaf->function == "samples") {
 
             // nothing to return -- note we check if the ride is open
@@ -7656,6 +7711,10 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
             lhsdouble = m->isXtrain ? 1 : 0;
             lhsisNumber = true;
 
+        } else if (symbol == "isAero") {
+            lhsdouble = m->isAero ? 1 : 0;
+            lhsisNumber = true;
+
         } else if (!symbol.compare("NA", Qt::CaseInsensitive)) {
 
             lhsdouble = RideFile::NA;
@@ -8052,7 +8111,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
                 // CPU and 'hang' for badly written code..
                 static int maxwhile = 1000000;
                 int count=0;
-                QTime timer;
+                QElapsedTimer timer;
                 timer.start();
 
                 Result returning(0);

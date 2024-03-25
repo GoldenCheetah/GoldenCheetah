@@ -82,7 +82,7 @@ class CTableWidgetItem : public QTableWidgetItem
                              int factor;
                              double t1 = 0;
                              // split seconds, minutes, hours into a list and compute Seconds (Right to Left)
-                             list = text().split(":", QString::SkipEmptyParts, Qt::CaseInsensitive);
+                             list = text().split(":", Qt::SkipEmptyParts, Qt::CaseInsensitive);
                              factor = 1;
                              while (!list.isEmpty()) {
                                  t1 += list.takeLast().toInt() * factor; // start from the end
@@ -90,7 +90,7 @@ class CTableWidgetItem : public QTableWidgetItem
                              }
                              double t2 = 0;
                              // split seconds, minutes, hours into a list and compute Seconds (Right to Left)
-                             list = other.text().split(":", QString::SkipEmptyParts, Qt::CaseInsensitive);
+                             list = other.text().split(":", Qt::SkipEmptyParts, Qt::CaseInsensitive);
                              factor = 1;
                              while (!list.isEmpty()) {
                                  t2 += list.takeLast().toInt() * factor; // start from the end
@@ -99,8 +99,8 @@ class CTableWidgetItem : public QTableWidgetItem
 
                              return t1 < t2;
 
-                         } else if (text().contains(QRegExp("[^0-9.,]")) ||
-                                    other.text().contains(QRegExp("[^0-9.,]"))) { // alpha
+                         } else if (text().contains(QRegularExpression("[^0-9.,]")) ||
+                                    other.text().contains(QRegularExpression("[^0-9.,]"))) { // alpha
 
                               return text() < other.text();
 

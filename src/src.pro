@@ -5,10 +5,7 @@
 #                                                                             #
 ###############################################################################
 
-!versionAtLeast(QT_VERSION, 5.13):error("Use at least Qt version 5.13")
-greaterThan(QT_MAJOR_VERSION, 5) {
-    error("Qt6 is unsupported whilst we wait for key dependencies to be included.")
-}
+!versionAtLeast(QT_VERSION, 5.15):error("Use at least Qt version 5.15")
 
 ###==========================
 ### IMPORT USER CONFIGURATION
@@ -40,7 +37,12 @@ CONFIG(debug, debug|release) { QMAKE_CXXFLAGS += -DGC_DEBUG }
 
 # always
 QT += xml sql network svg  widgets concurrent serialport multimedia multimediawidgets \
-      webengine webenginecore webenginewidgets webchannel positioning
+      webenginecore webenginewidgets webchannel positioning
+greaterThan(QT_MAJOR_VERSION, 5) {
+    QT += webenginequick core5compat
+} else {
+    QT += webengine
+}
 CONFIG += c++11
 
 
@@ -61,7 +63,6 @@ INCLUDEPATH +=  ../qwt/src \
                 ../contrib/qtsolutions/json \
                 ../contrib/qtsolutions/qwtcurve \
                 ../contrib/lmfit \
-                ../contrib/levmar \
                 ../contrib/boost \
                 ../contrib/kmeans \
                 ../contrib/voronoi
@@ -135,8 +136,10 @@ win32 {
 }
 
 macx {
-    # Mac native widget support
-    QT += macextras
+    lessThan(QT_MAJOR_VERSION, 6) {
+        # Mac native widget support
+        QT += macextras
+    }
 
     # we have our own plist
     QMAKE_INFO_PLIST = ./Resources/mac/Info.plist.app
@@ -245,10 +248,6 @@ notsupported += $${QT_VERSION}
 
 contains(DEFINES, "GC_WANT_PYTHON") {
 
-    greaterThan(QT_MAJOR_VERSION, 4) {
-
-        greaterThan(QT_MINOR_VERSION, 7) {
-
             # add Python subdirectory to include path
             INCLUDEPATH += ./Python
 
@@ -277,17 +276,6 @@ contains(DEFINES, "GC_WANT_PYTHON") {
 
             SOURCES += FileIO/FixPyScriptsDialog.cpp FileIO/FixPySettings.cpp FileIO/FixPyRunner.cpp \
                        FileIO/FixPyDataProcessor.cpp
-
-         } else {
-            # QT5 but not 5.5 or higher
-            message($$notsupported)
-        }
-
-    } else {
-
-        # QT5 but not 5.5 or higher
-        message($$notsupported)
-    }
 
 }
 
@@ -359,32 +347,6 @@ contains(DEFINES, "GC_WANT_R") {
     # add support for srm downloads
     HEADERS     += FileIO/SrmDevice.h
     SOURCES     += FileIO/SrmDevice.cpp
-}
-
-
-###=====================================
-### OPTIONAL => GOOGLE KML IMPORT EXPORT
-###=====================================
-
-!isEmpty(KML_INSTALL) {
-
-    # we will work out the rest if you tell use where it is installed
-    isEmpty(KML_INCLUDE) { KML_INCLUDE = $${KML_INSTALL}/include }
-    isEmpty(KML_LIBS)    { KML_LIBS    = -L$${KML_INSTALL}/lib/ \
-                                         -lkmldom -lkmlconvenience -lkmlengine -lkmlbase
-    }
-
-    # on MS VS the linker wants /LTCG for libkmldom due to
-    # "MSIL .netmodule or module compiled with /GL found"
-    win32-msvc* { QMAKE_LFLAGS +=  /LTCG }
-
-    DEFINES     += GC_HAVE_KML
-    INCLUDEPATH += $${KML_INCLUDE}  $${BOOST_INCLUDE}
-    LIBS        += $${KML_LIBS}
-
-    # add kml file i/o
-    SOURCES     += FileIO/KmlRideFile.cpp
-    HEADERS     += FileIO/KmlRideFile.h
 }
 
 
@@ -552,10 +514,6 @@ notsupported += $${QT_VERSION}
 
 equals(CloudDB, active) {
 
-    greaterThan(QT_MAJOR_VERSION, 4) {
-
-        greaterThan(QT_MINOR_VERSION, 4) {
-
             HEADERS += Cloud/CloudDBChart.h Cloud/CloudDBCommon.h \
                        Cloud/CloudDBCurator.h Cloud/CloudDBStatus.h \
                        Cloud/CloudDBVersion.h Cloud/CloudDBTelemetry.h \
@@ -566,18 +524,6 @@ equals(CloudDB, active) {
                        Cloud/CloudDBUserMetric.cpp
 
             DEFINES += GC_HAS_CLOUD_DB
-
-        } else {
-
-            # QT5 but not 5.5 or higher
-            message($$notsupported)
-        }
-
-    } else {
-
-        # QT4 not supported
-        message($$notsupported)
-    }
 }
 
 
@@ -595,72 +541,55 @@ equals(CloudDB, active) {
 ### FEATURES ENABLED WHEN HAVE QT5 [or higher]
 ###===========================================
 
-greaterThan(QT_MAJOR_VERSION, 4) {
+# Features that only work with QT5 or higher
+SOURCES += Cloud/Dropbox.cpp
+HEADERS += Cloud/Dropbox.h
+SOURCES += Cloud/OpenData.cpp
+HEADERS += Cloud/OpenData.h
 
-    # Features that only work with QT5 or higher
-    SOURCES += Cloud/Dropbox.cpp
-    HEADERS += Cloud/Dropbox.h
-    SOURCES += Cloud/OpenData.cpp
-    HEADERS += Cloud/OpenData.h
+SOURCES += Cloud/SixCycle.cpp
+HEADERS += Cloud/SixCycle.h
+SOURCES += Cloud/PolarFlow.cpp
+HEADERS += Cloud/PolarFlow.h
+SOURCES += Cloud/SportTracks.cpp
+HEADERS += Cloud/SportTracks.h
+SOURCES += Cloud/Nolio.cpp
+HEADERS += Cloud/Nolio.h
 
-    greaterThan(QT_MINOR_VERSION, 3) {
-        SOURCES += Cloud/SixCycle.cpp
-        HEADERS += Cloud/SixCycle.h
-        SOURCES += Cloud/PolarFlow.cpp
-        HEADERS += Cloud/PolarFlow.h
-        SOURCES += Cloud/SportTracks.cpp
-        HEADERS += Cloud/SportTracks.h
-        SOURCES += Cloud/TodaysPlan.cpp
-        HEADERS += Cloud/TodaysPlan.h
-        SOURCES += Cloud/Nolio.cpp
-        HEADERS += Cloud/Nolio.h
-    }
+SOURCES += Train/MonarkController.cpp Train/MonarkConnection.cpp
+HEADERS += Train/MonarkController.h Train/MonarkConnection.h
+SOURCES += Train/Kettler.cpp Train/KettlerController.cpp Train/KettlerConnection.cpp
+HEADERS += Train/Kettler.h Train/KettlerController.h Train/KettlerConnection.h
+SOURCES += Train/KettlerRacer.cpp Train/KettlerRacerController.cpp Train/KettlerRacerConnection.cpp
+HEADERS += Train/KettlerRacer.h Train/KettlerRacerController.h Train/KettlerRacerConnection.h
+SOURCES += Train/Ergofit.cpp Train/ErgofitController.cpp Train/ErgofitConnection.cpp
+HEADERS += Train/Ergofit.h Train/ErgofitController.h Train/ErgofitConnection.h
+SOURCES += Train/DaumController.cpp Train/Daum.cpp
+HEADERS += Train/DaumController.h Train/Daum.h
+SOURCES += Train/KurtInRide.cpp Train/KurtSmartControl.cpp
+HEADERS += Train/KurtInRide.h Train/KurtSmartControl.h
 
-    SOURCES += Train/MonarkController.cpp Train/MonarkConnection.cpp
-    HEADERS += Train/MonarkController.h Train/MonarkConnection.h
-    SOURCES += Train/Kettler.cpp Train/KettlerController.cpp Train/KettlerConnection.cpp
-    HEADERS += Train/Kettler.h Train/KettlerController.h Train/KettlerConnection.h
-    SOURCES += Train/KettlerRacer.cpp Train/KettlerRacerController.cpp Train/KettlerRacerConnection.cpp
-    HEADERS += Train/KettlerRacer.h Train/KettlerRacerController.h Train/KettlerRacerConnection.h
-    SOURCES += Train/Ergofit.cpp Train/ErgofitController.cpp Train/ErgofitConnection.cpp
-    HEADERS += Train/Ergofit.h Train/ErgofitController.h Train/ErgofitConnection.h
-    SOURCES += Train/DaumController.cpp Train/Daum.cpp
-    HEADERS += Train/DaumController.h Train/Daum.h
-    SOURCES += Train/KurtInRide.cpp Train/KurtSmartControl.cpp
-    HEADERS += Train/KurtInRide.h Train/KurtSmartControl.h
+QT += bluetooth
+HEADERS += Train/BT40Controller.h Train/BT40Device.h
+SOURCES += Train/BT40Controller.cpp Train/BT40Device.cpp
+HEADERS += Train/VMProConfigurator.h Train/VMProWidget.h
+SOURCES += Train/VMProConfigurator.cpp Train/VMProWidget.cpp
+SOURCES += Train/Ftms.cpp
+HEADERS += Train/Ftms.h
 
-    # bluetooth in QT5.5 or higher(5.4 was only a tech preview)
-    greaterThan(QT_MINOR_VERSION, 4) {
-        QT += bluetooth
-        HEADERS += Train/BT40Controller.h Train/BT40Device.h
-        SOURCES += Train/BT40Controller.cpp Train/BT40Device.cpp
-        HEADERS += Train/VMProConfigurator.h Train/VMProWidget.h
-        SOURCES += Train/VMProConfigurator.cpp Train/VMProWidget.cpp
-        SOURCES += Train/Ftms.cpp
-        HEADERS += Train/Ftms.h
-    }
+QT += charts opengl
 
-    # qt charts is officially supported from QT5.8 or higher
-    # in 5.7 it is a tech preview and not always available
-    greaterThan(QT_MINOR_VERSION, 7) {
+# Dashboard uses qt charts, so needs at least Qt 5.7
+DEFINES += GC_HAVE_OVERVIEW
+HEADERS += Gui/ChartSpace.h Charts/OverviewItems.h Charts/Overview.h
+SOURCES += Gui/ChartSpace.cpp Charts/OverviewItems.cpp Charts/Overview.cpp
 
-        QT += charts opengl
-
-        # Dashboard uses qt charts, so needs at least Qt 5.7
-        DEFINES += GC_HAVE_OVERVIEW
-        HEADERS += Gui/ChartSpace.h Charts/OverviewItems.h Charts/Overview.h
-        SOURCES += Gui/ChartSpace.cpp Charts/OverviewItems.cpp Charts/Overview.cpp
-
-        # generic chart
-        DEFINES += GC_HAVE_GENERIC
-        HEADERS += Charts/UserChartWindow.h Charts/UserChartOverviewItem.h Charts/UserChart.h Charts/UserChartData.h \
-                   Charts/GenericChart.h Charts/GenericPlot.h Charts/GenericSelectTool.h Charts/GenericLegend.h Charts/GenericAnnotations.h
-        SOURCES += Charts/UserChartWindow.cpp Charts/UserChartOverviewItem.cpp Charts/UserChart.cpp Charts/UserChartData.cpp \
-                   Charts/GenericChart.cpp Charts/GenericPlot.cpp Charts/GenericSelectTool.cpp Charts/GenericLegend.cpp Charts/GenericAnnotations.cpp
-
-    }
-}
-
+# generic chart
+DEFINES += GC_HAVE_GENERIC
+HEADERS += Charts/UserChartWindow.h Charts/UserChartOverviewItem.h Charts/UserChart.h Charts/UserChartData.h \
+           Charts/GenericChart.h Charts/GenericPlot.h Charts/GenericSelectTool.h Charts/GenericLegend.h Charts/GenericAnnotations.h
+SOURCES += Charts/UserChartWindow.cpp Charts/UserChartOverviewItem.cpp Charts/UserChart.cpp Charts/UserChartData.cpp \
+           Charts/GenericChart.cpp Charts/GenericPlot.cpp Charts/GenericSelectTool.cpp Charts/GenericLegend.cpp Charts/GenericAnnotations.cpp
 
 ###=====================
 ### LEX AND YACC SOURCES
@@ -697,7 +626,7 @@ HEADERS += Charts/Aerolab.h Charts/AerolabWindow.h Charts/AllPlot.h Charts/AllPl
 
 # cloud services
 HEADERS += Cloud/CalendarDownload.h Cloud/CloudService.h \
-           Cloud/LocalFileStore.h Cloud/OAuthDialog.h Cloud/TodaysPlanBodyMeasures.h \
+           Cloud/LocalFileStore.h Cloud/OAuthDialog.h \
            Cloud/WithingsDownload.h Cloud/Strava.h Cloud/CyclingAnalytics.h Cloud/RideWithGPS.h \
            Cloud/TrainingsTageBuch.h Cloud/Selfloops.h Cloud/Velohero.h Cloud/SportsPlusHealth.h \
            Cloud/AddCloudWizard.h Cloud/Withings.h Cloud/MeasuresDownload.h Cloud/Xert.h \
@@ -708,7 +637,7 @@ HEADERS += Core/Athlete.h Core/Context.h Core/DataFilter.h Core/FreeSearch.h Cor
            Core/IdleTimer.h Core/IntervalItem.h Core/NamedSearch.h Core/RideCache.h Core/RideCacheModel.h Core/RideDB.h \
            Core/RideItem.h Core/Route.h Core/RouteParser.h Core/Season.h Core/SeasonParser.h Core/Secrets.h Core/Settings.h \
            Core/Specification.h Core/TimeUtils.h Core/Units.h Core/UserData.h Core/Utils.h \
-           Core/Measures.h Core/Quadtree.h
+           Core/Measures.h Core/Quadtree.h Core/SplineLookup.h
 
 # device and file IO or edit
 HEADERS += FileIO/ArchiveFile.h FileIO/AthleteBackup.h  FileIO/Bin2RideFile.h FileIO/BinRideFile.h \
@@ -753,7 +682,6 @@ HEADERS += ../contrib/qtsolutions/codeeditor/codeeditor.h ../contrib/qtsolutions
            ../contrib/qxt/src/qxtspanslider_p.h ../contrib/qxt/src/qxtstringspinbox.h ../contrib/qzip/zipreader.h \
            ../contrib/qzip/zipwriter.h ../contrib/lmfit/lmcurve.h  ../contrib/lmfit/lmcurve_tyd.h \
            ../contrib/lmfit/lmmin.h  ../contrib/lmfit/lmstruct.h \
-           ../contrib/levmar/compiler.h  ../contrib/levmar/levmar.h  ../contrib/levmar/lm.h  ../contrib/levmar/misc.h \
            ../contrib/boost/GeometricTools_BSplineCurve.h \
            ../contrib/kmeans/kmeans_dataset.h ../contrib/kmeans/kmeans_general_functions.h ../contrib/kmeans/hamerly_kmeans.h \
            ../contrib/kmeans/kmeans.h ../contrib/kmeans/original_space_kmeans.h ../contrib/kmeans/triangle_inequality_base_kmeans.h \
@@ -766,11 +694,7 @@ HEADERS += Train/AddDeviceWizard.h Train/CalibrationData.h Train/ComputrainerCon
            Train/Library.h Train/LibraryParser.h Train/MeterWidget.h Train/NullController.h Train/RealtimeController.h \
            Train/RealtimeData.h Train/RealtimePlot.h Train/RealtimePlotWindow.h Train/RemoteControl.h Train/SpinScanPlot.h \
            Train/SpinScanPlotWindow.h Train/SpinScanPolarPlot.h Train/GarminServiceHelper.h Train/PhysicsUtility.h Train/BicycleSim.h \
-           Train/PolynomialRegression.h Train/MultiRegressionizer.h
-
-greaterThan(QT_MAJOR_VERSION, 4) {
-    HEADERS += Train/TodaysPlanWorkoutDownload.h
-}
+           Train/PolynomialRegression.h Train/MultiRegressionizer.h Train/StravaRoutesDownload.h
 
 HEADERS += Train/TrainBottom.h Train/TrainDB.h Train/TrainSidebar.h \
            Train/VideoLayoutParser.h Train/VideoSyncFile.h Train/WorkoutPlotWindow.h Train/WebPageWindow.h \
@@ -800,7 +724,7 @@ SOURCES += Charts/Aerolab.cpp Charts/AerolabWindow.cpp Charts/AllPlot.cpp Charts
 
 ## Cloud Services / Web resources
 SOURCES += Cloud/CalendarDownload.cpp Cloud/CloudService.cpp \
-           Cloud/LocalFileStore.cpp Cloud/OAuthDialog.cpp Cloud/TodaysPlanBodyMeasures.cpp \
+           Cloud/LocalFileStore.cpp Cloud/OAuthDialog.cpp \
            Cloud/WithingsDownload.cpp Cloud/Strava.cpp Cloud/CyclingAnalytics.cpp Cloud/RideWithGPS.cpp \
            Cloud/TrainingsTageBuch.cpp Cloud/Selfloops.cpp Cloud/Velohero.cpp Cloud/SportsPlusHealth.cpp \
            Cloud/AddCloudWizard.cpp Cloud/Withings.cpp Cloud/MeasuresDownload.cpp Cloud/Xert.cpp \
@@ -811,7 +735,7 @@ SOURCES += Core/Athlete.cpp Core/Context.cpp Core/DataFilter.cpp Core/FreeSearch
            Core/IntervalItem.cpp Core/main.cpp Core/NamedSearch.cpp Core/RideCache.cpp Core/RideCacheModel.cpp Core/RideItem.cpp \
            Core/Route.cpp Core/RouteParser.cpp Core/Season.cpp Core/SeasonParser.cpp Core/Settings.cpp Core/Specification.cpp \
            Core/TimeUtils.cpp Core/Units.cpp Core/UserData.cpp Core/Utils.cpp \
-           Core/Measures.cpp Core/Quadtree.cpp
+           Core/Measures.cpp Core/Quadtree.cpp Core/SplineLookup.cpp
 
 ## File and Device IO and Editing
 SOURCES += FileIO/ArchiveFile.cpp FileIO/AthleteBackup.cpp FileIO/Bin2RideFile.cpp FileIO/BinRideFile.cpp \
@@ -863,10 +787,6 @@ SOURCES += ../contrib/qtsolutions/codeeditor/codeeditor.cpp ../contrib/qtsolutio
            ../contrib/qtsolutions/qwtcurve/qwt_plot_gapped_curve.cpp \
            ../contrib/qxt/src/qxtspanslider.cpp ../contrib/qxt/src/qxtstringspinbox.cpp ../contrib/qzip/zip.cpp \
            ../contrib/lmfit/lmcurve.c ../contrib/lmfit/lmmin.c \
-           ../contrib/levmar/Axb.c ../contrib/levmar/lm_core.c ../contrib/levmar/lmbc_core.c \
-           ../contrib/levmar/lmblec_core.c ../contrib/levmar/lmbleic_core.c ../contrib/levmar/lmlec.c ../contrib/levmar/misc.c \
-           ../contrib/levmar/Axb_core.c ../contrib/levmar/lm.c ../contrib/levmar/lmbc.c ../contrib/levmar/lmblec.c ../contrib/levmar/lmbleic.c \
-           ../contrib/levmar/lmlec_core.c ../contrib/levmar/misc_core.c \
            ../contrib/kmeans/kmeans_dataset.cpp ../contrib/kmeans/kmeans_general_functions.cpp ../contrib/kmeans/hamerly_kmeans.cpp \
            ../contrib/kmeans/kmeans.cpp ../contrib/kmeans/original_space_kmeans.cpp ../contrib/kmeans/triangle_inequality_base_kmeans.cpp \
            ../contrib/voronoi/Voronoi.cpp
@@ -878,11 +798,7 @@ SOURCES += Train/AddDeviceWizard.cpp Train/CalibrationData.cpp Train/Computraine
            Train/Library.cpp Train/LibraryParser.cpp Train/MeterWidget.cpp Train/NullController.cpp Train/RealtimeController.cpp \
            Train/RealtimeData.cpp Train/RealtimePlot.cpp Train/RealtimePlotWindow.cpp Train/RemoteControl.cpp Train/SpinScanPlot.cpp \
            Train/SpinScanPlotWindow.cpp Train/SpinScanPolarPlot.cpp Train/GarminServiceHelper.cpp Train/PhysicsUtility.cpp Train/BicycleSim.cpp \
-           Train/PolynomialRegression.cpp
-
-greaterThan(QT_MAJOR_VERSION, 4) {
-    SOURCES  += Train/TodaysPlanWorkoutDownload.cpp
-}
+           Train/PolynomialRegression.cpp Train/StravaRoutesDownload.cpp
 
 SOURCES += Train/TrainBottom.cpp Train/TrainDB.cpp Train/TrainSidebar.cpp \
            Train/VideoLayoutParser.cpp Train/VideoSyncFile.cpp Train/WorkoutPlotWindow.cpp Train/WebPageWindow.cpp \

@@ -20,6 +20,7 @@
 { "manu":32, "prod":0, "name":"Wahoo fitness" },
 { "manu":32, "prod":28, "name":"Wahoo ELEMNT" },
 { "manu":32, "prod":31, "name":"Wahoo ELEMNT BOLT" },
+{ "manu":32, "prod":41, "name":"Wahoo PowrLink" },
 { "manu":38, "prod":1, "name":"o_synce navi2coach" },
 { "manu":48, "prod":2, "name":"Pioneer SGX-CA500" },
 { "manu":54, "prod":1, "name":"IpBike" },

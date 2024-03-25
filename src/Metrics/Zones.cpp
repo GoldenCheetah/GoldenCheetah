@@ -105,7 +105,9 @@ bool Zones::read(QFile &file)
         return false;
     }
     QTextStream fileStream(&file);
+#if QT_VERSION < 0x060000
     fileStream.setCodec("UTF-8");
+#endif
 
     QRegExp commentrx("\\s*#.*$");
     QRegExp blankrx("^[ \t]*$");
@@ -892,7 +894,9 @@ void Zones::write(QDir home)
     if (file.open(QFile::WriteOnly)) {
 
         QTextStream stream(&file);
+#if QT_VERSION < 0x060000
         stream.setCodec("UTF-8");
+#endif
         stream << strzones;
         file.close();
     } else {
@@ -1052,7 +1056,11 @@ Zones::getFingerprint() const
     QByteArray ba = QByteArray::number(x);
 
     // we spot other things separately
+#if QT_VERSION < 0x060000
     return qChecksum(ba, ba.length());
+#else
+    return qChecksum(ba);
+#endif
 }
 
 // get fingerprint just for the range that applies on this date
@@ -1088,7 +1096,11 @@ Zones::getFingerprint(QDate forDate) const
     QByteArray ba = QByteArray::number(x);
 
     // limits to only zones now as we sport weight separately
+#if QT_VERSION < 0x060000
     return qChecksum(ba, ba.length());
+#else
+    return qChecksum(ba);
+#endif
 }
 
 QString

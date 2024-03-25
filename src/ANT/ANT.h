@@ -606,7 +606,7 @@ public:
     }
     float getCadence(void) { return telemetry.getCadence(); }
     void setSecondaryCadence(float x) {
-        if (lastCadenceMessage.toTime_t() == 0 || (QDateTime::currentDateTime().toTime_t() - lastCadenceMessage.toTime_t())>10)  {
+        if (lastCadenceMessage.toSecsSinceEpoch() == 0 || (QDateTime::currentDateTime().toSecsSinceEpoch() - lastCadenceMessage.toSecsSinceEpoch())>10)  {
             telemetry.setCadence(x);
         }
     }

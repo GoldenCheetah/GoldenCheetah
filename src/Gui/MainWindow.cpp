@@ -21,7 +21,6 @@
 #include <QApplication>
 #include <QtGui>
 #include <QRegExp>
-#include <QDesktopWidget>
 #include <QNetworkProxyQuery>
 #include <QMenuBar>
 #include <QStyle>
@@ -43,7 +42,7 @@
 #include "RideFile.h"
 #include "Settings.h"
 #include "ErgDB.h"
-#include "TodaysPlanWorkoutDownload.h"
+#include "StravaRoutesDownload.h"
 #include "Library.h"
 #include "LibraryParser.h"
 #include "TrainDB.h"
@@ -67,7 +66,6 @@
 #include "MergeActivityWizard.h"
 #include "GenerateHeatMapDialog.h"
 #include "BatchProcessingDialog.h"
-#include "TodaysPlan.h"
 #include "MeasuresDownload.h"
 #include "WorkoutWizard.h"
 #include "ErgDBDownloadDialog.h"
@@ -121,7 +119,6 @@
 
 // We keep track of all theopen mainwindows
 QList<MainWindow *> mainwindows;
-extern QDesktopWidget *desktop;
 extern ConfigDialog *configdialog_ptr;
 extern QString gl_version;
 extern double gl_major; // 1.x 2.x 3.x - we insist on 2.x or higher to enable OpenGL
@@ -178,8 +175,9 @@ MainWindow::MainWindow(const QDir &home)
 
     // if no workout directory is configured, default to the
     // top level GoldenCheetah directory
-    if (appsettings->value(NULL, GC_WORKOUTDIR).toString() == "")
-        appsettings->setValue(GC_WORKOUTDIR, QFileInfo(context->athlete->home->root().canonicalPath() + "/../").canonicalPath());
+    if (appsettings->value(NULL, GC_WORKOUTDIR, "").toString() == ""){
+        appsettings->setValue(GC_WORKOUTDIR, QFileInfo(context->athlete->home->root().canonicalPath()).canonicalPath());
+    }
 
     /*----------------------------------------------------------------------
      *  GUI setup
@@ -447,6 +445,19 @@ MainWindow::MainWindow(const QDir &home)
     tablayout->addWidget(viewStack);
     setCentralWidget(central);
 
+#if QT_VERSION >= 0x060000
+    /*----------------------------------------------------------------------
+     * Hack to avoid a flickering MainWindow when showing a QWebEngineView in a chart, e.g. a Map:
+     * Temporarily add a dummy QWebEngineView with some random content before the MainWindow is shown
+     * https://forum.qt.io/topic/141398/qwebengineview-closes-reopens-window-when-added-dynamically
+     *--------------------------------------------------------------------*/
+    QWebEngineView *dummywev = new QWebEngineView();
+    dummywev->page()->setHtml("<html></html>");
+    mainLayout->addWidget(dummywev);
+    mainLayout->removeWidget(dummywev);
+    delete dummywev;
+#endif
+
     /*----------------------------------------------------------------------
      * Application Menus
      *--------------------------------------------------------------------*/
@@ -464,19 +475,19 @@ MainWindow::MainWindow(const QDir &home)
     connect(openTabMenu, SIGNAL(aboutToShow()), this, SLOT(setOpenTabMenu()));
 
     tabMapper = new QSignalMapper(this); // maps each option
-    connect(tabMapper, SIGNAL(mapped(const QString &)), this, SLOT(openAthleteTab(const QString &)));
+    connect(tabMapper, &QSignalMapper::mappedString, this, &MainWindow::openAthleteTab);
 
     fileMenu->addSeparator();
     backupAthleteMenu = fileMenu->addMenu(tr("Backup..."));
     connect(backupAthleteMenu, SIGNAL(aboutToShow()), this, SLOT(setBackupAthleteMenu()));
     backupMapper = new QSignalMapper(this); // maps each option
-    connect(backupMapper, SIGNAL(mapped(const QString &)), this, SLOT(backupAthlete(const QString &)));
+    connect(backupMapper, &QSignalMapper::mappedString, this, &MainWindow::backupAthlete);
 
     fileMenu->addSeparator();
     deleteAthleteMenu = fileMenu->addMenu(tr("Delete..."));
     connect(deleteAthleteMenu, SIGNAL(aboutToShow()), this, SLOT(setDeleteAthleteMenu()));
     deleteMapper = new QSignalMapper(this); // maps each option
-    connect(deleteMapper, SIGNAL(mapped(const QString &)), this, SLOT(deleteAthlete(const QString &)));
+    connect(deleteMapper, &QSignalMapper::mappedString, this, &MainWindow::deleteAthlete);
 
     fileMenu->addSeparator();
     fileMenu->addAction(tr("Settings..."), this, SLOT(athleteSettings()));
@@ -491,20 +502,20 @@ MainWindow::MainWindow(const QDir &home)
 
     // ACTIVITY MENU
     QMenu *rideMenu = menuBar()->addMenu(tr("A&ctivity"));
-    rideMenu->addAction(tr("&Download from device..."), this, SLOT(downloadRide()), tr("Ctrl+D"));
-    rideMenu->addAction(tr("&Import from file..."), this, SLOT (importFile()), tr ("Ctrl+I"));
-    rideMenu->addAction(tr("&Manual entry..."), this, SLOT(manualRide()), tr("Ctrl+M"));
+    rideMenu->addAction(tr("&Download from device..."), this, SLOT(downloadRide()), QKeySequence("Ctrl+D"));
+    rideMenu->addAction(tr("&Import from file..."), this, SLOT (importFile()), QKeySequence("Ctrl+I"));
+    rideMenu->addAction(tr("&Manual entry..."), this, SLOT(manualRide()), QKeySequence("Ctrl+M"));
     rideMenu->addSeparator ();
-    rideMenu->addAction(tr("&Export..."), this, SLOT(exportRide()), tr("Ctrl+E"));
-    rideMenu->addAction(tr("&Batch Processing..."), this, SLOT(batchProcessing()), tr("Ctrl+B"));
+    rideMenu->addAction(tr("&Export..."), this, SLOT(exportRide()), QKeySequence("Ctrl+E"));
+    rideMenu->addAction(tr("&Batch Processing..."), this, SLOT(batchProcessing()), QKeySequence("Ctrl+B"));
 
     rideMenu->addSeparator ();
-    rideMenu->addAction(tr("&Save activity"), this, SLOT(saveRide()), tr("Ctrl+S"));
+    rideMenu->addAction(tr("&Save activity"), this, SLOT(saveRide()), QKeySequence("Ctrl+S"));
     rideMenu->addAction(tr("D&elete activity..."), this, SLOT(deleteRide()));
     rideMenu->addAction(tr("Split &activity..."), this, SLOT(splitRide()));
     rideMenu->addAction(tr("Combine activities..."), this, SLOT(mergeRide()));
     rideMenu->addSeparator ();
-    rideMenu->addAction(tr("Find intervals..."), this, SLOT(addIntervals()), tr (""));
+    rideMenu->addAction(tr("Find intervals..."), this, SLOT(addIntervals()), QKeySequence(""));
 
     HelpWhatsThis *helpRideMenu = new HelpWhatsThis(rideMenu);
     rideMenu->setWhatsThis(helpRideMenu->getWhatsThisText(HelpWhatsThis::MenuBar_Activity));
@@ -514,7 +525,7 @@ MainWindow::MainWindow(const QDir &home)
 
     // default options
     shareAction = new QAction(tr("Add Cloud Account..."), this);
-    shareAction->setShortcut(tr("Ctrl+A"));
+    shareAction->setShortcut(QKeySequence("Ctrl+A"));
     connect(shareAction, SIGNAL(triggered(bool)), this, SLOT(addAccount()));
     shareMenu->addAction(shareAction);
     shareMenu->addSeparator();
@@ -524,7 +535,7 @@ MainWindow::MainWindow(const QDir &home)
     measuresMenu = shareMenu->addMenu(tr("Get Measures..."));
     shareMenu->addSeparator();
     checkAction = new QAction(tr("Check For New Activities"), this);
-    checkAction->setShortcut(tr("Ctrl-C"));
+    checkAction->setShortcut(QKeySequence("")); // Ctrl+C is already in use for clipboard copy
     connect(checkAction, SIGNAL(triggered(bool)), this, SLOT(checkCloud()));
     shareMenu->addAction(checkAction);
 
@@ -551,12 +562,12 @@ MainWindow::MainWindow(const QDir &home)
     optionsMenu->addSeparator();
     optionsMenu->addAction(tr("Create a new workout..."), this, SLOT(showWorkoutWizard()));
     optionsMenu->addAction(tr("Download workouts from ErgDB..."), this, SLOT(downloadErgDB()));
-    optionsMenu->addAction(tr("Download workouts from Today's Plan..."), this, SLOT(downloadTodaysPlanWorkouts()));
+    optionsMenu->addAction(tr("Download workouts from Strava Routes..."), this, SLOT(downloadStravaRoutes()));
     optionsMenu->addAction(tr("Import workouts, videos, videoSyncs..."), this, SLOT(importWorkout()));
     optionsMenu->addAction(tr("Scan disk for workouts, videos, videoSyncs..."), this, SLOT(manageLibrary()));
 
-    optionsMenu->addAction(tr("Create Heat Map..."), this, SLOT(generateHeatMap()), tr(""));
-    optionsMenu->addAction(tr("Export Metrics as CSV..."), this, SLOT(exportMetrics()), tr(""));
+    optionsMenu->addAction(tr("Create Heat Map..."), this, SLOT(generateHeatMap()));
+    optionsMenu->addAction(tr("Export Metrics as CSV..."), this, SLOT(exportMetrics()));
 
 #ifdef GC_HAS_CLOUD_DB
     // CloudDB options
@@ -594,7 +605,7 @@ MainWindow::MainWindow(const QDir &home)
 
         toolMapper = new QSignalMapper(this); // maps each option
         QMapIterator<QString, DataProcessor*> i(processors);
-        connect(toolMapper, SIGNAL(mapped(const QString &)), this, SLOT(manualProcess(const QString &)));
+        connect(toolMapper, &QSignalMapper::mappedString, this, &MainWindow::manualProcess);
 
         i.toFront();
         while (i.hasNext()) {
@@ -770,7 +781,7 @@ MainWindow::setSplash(bool first)
 
     if (first) {
         // middle of screen
-        splash->move(desktop->availableGeometry().center()-QPoint(50, 25));
+        splash->move(QGuiApplication::primaryScreen()->availableGeometry().center()-QPoint(50, 25));
     } else {
         // middle of mainwindow is appropriate
         splash->move(geometry().center()-QPoint(50, 25));
@@ -1062,7 +1073,7 @@ void
 MainWindow::toggleFullScreen()
 {
 #ifdef Q_OS_MAC
-    QRect screenSize = desktop->availableGeometry();
+    QRect screenSize = QGuiApplication::primaryScreen()->availableGeometry();
     if (screenSize.width() > frameGeometry().width() ||
         screenSize.height() > frameGeometry().height())
         showFullScreen();
@@ -1601,11 +1612,11 @@ MainWindow::dropEvent(QDropEvent *event)
     // is this a chart file ?
     QStringList filenames;
     QList<LTMSettings> imported;
-    QStringList list, workouts;
+    QStringList list, workouts, images;
     for(int i=0; i<urls.count(); i++) {
 
         QString filename = QFileInfo(urls.value(i).toLocalFile()).absoluteFilePath();
-        fprintf(stderr, "%s\n", filename.toStdString().c_str()); fflush(stderr);
+        //fprintf(stderr, "%s\n", filename.toStdString().c_str()); fflush(stderr);
 
         if (filename.endsWith(".gchart", Qt::CaseInsensitive)) {
             // add to the list of charts to import
@@ -1625,6 +1636,9 @@ MainWindow::dropEvent(QDropEvent *event)
             // parse and get return values
             xmlReader.parse(source);
             imported += handler.getSettings();
+
+        } else if (Utils::isImage(filename)) {
+            images << filename;
 
         // Look for Workout files only in Train view
         } else if (currentAthleteTab->currentView() == 3 && ErgFile::isWorkout(filename)) {
@@ -1659,6 +1673,9 @@ MainWindow::dropEvent(QDropEvent *event)
     // import workouts
     if (workouts.count()) Library::importFiles(currentAthleteTab->context, workouts, true);
 
+    // import images (these will be attached to the current ride)
+    if (images.count()) importImages(images);
+
     // if there is anything left, process based upon view...
     if (filenames.count()) {
 
@@ -1667,6 +1684,21 @@ MainWindow::dropEvent(QDropEvent *event)
         dialog->process(); // do it!
     }
     return;
+}
+
+void
+MainWindow::importImages(QStringList list)
+{
+    // we need to be on activities view and with a current
+    // ride otherwise we just ignore the list
+    if (currentAthleteTab->currentView() != 1 || currentAthleteTab->context->ride == NULL) {
+        QMessageBox::critical(this, tr("Import Images Failed"), tr("You can only import images on the activities view with an activity selected."));
+        return;
+    }
+
+    // lets import them
+    int count = currentAthleteTab->context->ride->importImages(list);
+    QMessageBox::information(this, tr("Import Images to Activity"), QString(tr("%1 images imported.")).arg(count));
 }
 
 void
@@ -1802,7 +1834,7 @@ MainWindow::importFile()
 
     const RideFileFactory &rff = RideFileFactory::instance();
     QStringList suffixList = rff.suffixes();
-    suffixList.replaceInStrings(QRegExp("^"), "*.");
+    suffixList.replaceInStrings(QRegularExpression("^"), "*.");
     QStringList fileNames;
     QStringList allFormats;
     allFormats << QString("All Supported Formats (%1)").arg(suffixList.join(" "));
@@ -2138,6 +2170,8 @@ MainWindow::setOpenTabMenu()
 
         QString name = i.next();
         SKIP_QTWE_CACHE  // skip Folder Names created by QTWebEngine on Windows
+        if (name.startsWith(".")) continue; // ignore dot folders
+
         // new action
         QAction *action = new QAction(QString("%1").arg(name), this);
 
@@ -2165,7 +2199,7 @@ MainWindow::setOpenTabMenu()
 
     // add create new option
     openTabMenu->addSeparator();
-    openTabMenu->addAction(tr("&New Athlete..."), this, SLOT(newCyclistTab()), tr("Ctrl+N"));
+    openTabMenu->addAction(tr("&New Athlete..."), this, SLOT(newCyclistTab()), QKeySequence("Ctrl+N"));
 }
 
 void
@@ -2180,6 +2214,8 @@ MainWindow::setBackupAthleteMenu()
 
         QString name = i.next();
         SKIP_QTWE_CACHE  // skip Folder Names created by QTWebEngine on Windows
+        if (name.startsWith(".")) continue; // ignore dot folders
+
         // new action
         QAction *action = new QAction(QString("%1").arg(name), this);
 
@@ -2217,6 +2253,8 @@ MainWindow::setDeleteAthleteMenu()
 
         QString name = i.next();
         SKIP_QTWE_CACHE  // skip Folder Names created by QTWebEngine on Windows
+        if (name.startsWith(".")) continue; // ignore dot folders
+
         // new action
         QAction *action = new QAction(QString("%1").arg(name), this);
 
@@ -2399,18 +2437,18 @@ MainWindow::downloadErgDB()
 }
 
 /*----------------------------------------------------------------------
- * TodaysPlan Workouts
+ * Strava Routes as Workouts
  *--------------------------------------------------------------------*/
 
 void
-MainWindow::downloadTodaysPlanWorkouts()
+MainWindow::downloadStravaRoutes()
 {
     QString workoutDir = appsettings->value(this, GC_WORKOUTDIR).toString();
 
     QFileInfo fi(workoutDir);
 
     if (fi.exists() && fi.isDir()) {
-        TodaysPlanWorkoutDownload *d = new TodaysPlanWorkoutDownload(currentAthleteTab->context);
+        StravaRoutesDownload *d = new StravaRoutesDownload(currentAthleteTab->context);
         d->exec();
     } else{
         QMessageBox::critical(this, tr("Workout Directory Invalid"),
@@ -2505,7 +2543,7 @@ MainWindow::configChanged(qint32)
 
     // perspective selector mimics sidebar colors
     QColor selected;
-    if (GCColor::invertColor(GColor(CTOOLBAR)).name() == Qt::white) selected = QColor(Qt::lightGray);
+    if (GCColor::invertColor(GColor(CTOOLBAR)) == Qt::white) selected = QColor(Qt::lightGray);
     else selected = QColor(Qt::darkGray);
     perspectiveSelector->setStyleSheet(QString("QComboBox { background: %1; color: %2; }"
                                                "QComboBox::item { background: %1; color: %2; }"

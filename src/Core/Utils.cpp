@@ -25,6 +25,7 @@
 #include <QDir>
 #include <QVector>
 #include <QRegularExpression>
+#include <QStringRef>
 
 #include "GenericChart.h"
 #include "RideMetric.h"
@@ -84,14 +85,14 @@ protected:
 
 public:
 
-    QString BuildSubstitutedString(QStringRef s) const
+    QString BuildSubstitutedString(QString s) const
     {
         QRegularExpression qr = GetFindAnyRegex();
 
         QRegularExpressionMatchIterator i = qr.globalMatch(s);
 
         if (!i.hasNext())
-            return s.toString();
+            return s;
 
         QString newstring;
 
@@ -135,7 +136,7 @@ struct RidefileUnEscaper : public StringSubstitutionizer
     }
 };
 
-QString RidefileUnEscape(const QStringRef s)
+QString RidefileUnEscape(const QString s)
 {
     // Static const object constructs it's search regex at load time.
     static const RidefileUnEscaper s_RidefileUnescaper;
@@ -591,7 +592,7 @@ number(QString x)
         if (QString("0123456789").contains(x[i])) {
             innumber = true;
             extract += x[i];
-        } else if (innumber && (x[i] == "," ||  x[i]==".")) {
+        } else if (innumber && (x[i] == QChar(',') ||  x[i] == QChar('.'))) {
             if (seendp) break;
             else {
                 seendp = true;
@@ -620,6 +621,21 @@ heatcolor(double value)
     returning.setHslF((1-value)/2, 1, 0.5f); // hue goes red-yellow-green-cyan then blue-magenta-purple-red - we want the first half
 
     return returning;
+}
+
+// setup list of image extensions we will support
+static QVector<QString> imageexts;
+static bool initextensions() { imageexts << ".png" << ".gif" << ".jpeg" << ".jpg" << ".bmp"; return true; }
+static bool initexts = initextensions();
+
+// is the file an image?
+bool isImage(QString filename)
+{
+    QString lowername = filename.toLower();
+    foreach(QString ext, imageexts) {
+        if (lowername.endsWith(ext)) return true;
+    }
+    return false;
 }
 
 // used std::sort, std::lower_bound et al

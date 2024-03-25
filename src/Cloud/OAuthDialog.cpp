@@ -44,7 +44,6 @@ OAuthDialog::OAuthDialog(Context *context, OAuthSite site, CloudService *service
         if (service->id() == "Dropbox") site = this->site = DROPBOX;
         if (service->id() == "Cycling Analytics") site = this->site = CYCLING_ANALYTICS;
         if (service->id() == "Nolio") site = this->site = NOLIO;
-        if (service->id() == "Today's Plan") site = this->site = TODAYSPLAN;
         if (service->id() == "Withings") site = this->site = WITHINGS;
         if (service->id() == "PolarFlow") site = this->site = POLAR;
         if (service->id() == "SportTracks.mobi") site = this->site = SPORTTRACKS;
@@ -79,7 +78,6 @@ OAuthDialog::OAuthDialog(Context *context, OAuthSite site, CloudService *service
     view->page()->profile()->cookieStore()->deleteAllCookies();
 
     view->setContentsMargins(0,0,0,0);
-    view->page()->view()->setContentsMargins(0,0,0,0);
     view->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     view->setAcceptDrops(false);
     layout->addWidget(view);
@@ -95,7 +93,7 @@ OAuthDialog::OAuthDialog(Context *context, OAuthSite site, CloudService *service
 
         urlstr = QString("https://www.strava.com/oauth/authorize?");
         urlstr.append("client_id=").append(GC_STRAVA_CLIENT_ID).append("&");
-        urlstr.append("scope=activity:read_all,activity:write&");
+        urlstr.append("scope=read_all,activity:read_all,activity:write&");
         urlstr.append("redirect_uri=http://www.goldencheetah.org/&");
         urlstr.append("response_type=code&");
         urlstr.append("approval_prompt=force");
@@ -125,13 +123,6 @@ OAuthDialog::OAuthDialog(Context *context, OAuthSite site, CloudService *service
         urlstr.append("redirect_uri=http://www.goldencheetah.org/&");
         urlstr.append("response_type=code&");
         urlstr.append("approval_prompt=force");
-
-    } else if (site == TODAYSPLAN) {
-
-        //urlstr = QString("https://whats.todaysplan.com.au/en/authorize/"); //XXX fixup below when pages.cpp goes
-        if (baseURL=="") baseURL=service->getSetting(GC_TODAYSPLAN_URL, "https://whats.todaysplan.com.au").toString();
-        urlstr = QString("%1/authorize/").arg(baseURL);
-        urlstr.append(GC_TODAYSPLAN_CLIENT_ID);
 
     } else if (site == POLAR) {
 
@@ -175,7 +166,7 @@ OAuthDialog::OAuthDialog(Context *context, OAuthSite site, CloudService *service
     //
     // STEP 1: LOGIN AND AUTHORISE THE APPLICATION
     //
-    if (site == NOLIO || site == DROPBOX || site == STRAVA || site == CYCLING_ANALYTICS || site == POLAR || site == SPORTTRACKS || site == TODAYSPLAN || site == WITHINGS || site == AZUM) {
+    if (site == NOLIO || site == DROPBOX || site == STRAVA || site == CYCLING_ANALYTICS || site == POLAR || site == SPORTTRACKS || site == WITHINGS || site == AZUM) {
         url = QUrl(urlstr);
         view->setUrl(url);
         // connects
@@ -211,7 +202,7 @@ OAuthDialog::urlChanged(const QUrl &url)
     QString authheader;
 
     // sites that use this scheme
-    if (site == NOLIO || site == DROPBOX || site == STRAVA || site == CYCLING_ANALYTICS || site == TODAYSPLAN || site == POLAR || site == SPORTTRACKS || site == XERT || site == RIDEWITHGPS || site == WITHINGS || site == AZUM) {
+    if (site == NOLIO || site == DROPBOX || site == STRAVA || site == CYCLING_ANALYTICS || site == POLAR || site == SPORTTRACKS || site == XERT || site == RIDEWITHGPS || site == WITHINGS || site == AZUM) {
 
         if (url.toString().startsWith("http://www.goldencheetah.org/?state=&code=") ||
                 url.toString().contains("blank.html?code=") ||
@@ -281,23 +272,6 @@ OAuthDialog::urlChanged(const QUrl &url)
 #endif
                 params.addQueryItem("grant_type", "authorization_code");
 
-            }  else if (site == TODAYSPLAN) {
-
-                if (baseURL=="") baseURL=service->getSetting(GC_TODAYSPLAN_URL, "https://whats.todaysplan.com.au").toString();
-                urlstr = QString("%1/rest/oauth/access_token?").arg(baseURL);
-                params.addQueryItem("client_id", GC_TODAYSPLAN_CLIENT_ID);
-#ifdef GC_TODAYSPLAN_CLIENT_SECRET
-                if (clientsecret != "") //XXX get rid when pages.cpp goes
-                    params.addQueryItem("client_secret", clientsecret);
-                else if (service->getSetting(GC_TODAYSPLAN_USERKEY, "").toString() != "")
-                    params.addQueryItem("client_secret", service->getSetting(GC_TODAYSPLAN_USERKEY, "").toString());
-                else
-                    params.addQueryItem("client_secret", GC_TODAYSPLAN_CLIENT_SECRET);
-
-#endif
-                params.addQueryItem("grant_type", "authorization_code");
-                params.addQueryItem("redirect_uri", "https://goldencheetah.github.io/blank.html");
-
             } else if (site == XERT) {
 
                 urlstr = QString("https://www.xertonline.com/oauth/token");
@@ -339,7 +313,7 @@ OAuthDialog::urlChanged(const QUrl &url)
             // all services will need us to send the temporary code received
             params.addQueryItem("code", code);
 
-            data.append(params.query(QUrl::FullyEncoded));
+            data.append(params.query(QUrl::FullyEncoded).toUtf8());
 
             // trade-in the temporary access code retrieved by the Call-Back URL for the finale token
             QUrl url = QUrl(urlstr);
@@ -436,7 +410,7 @@ OAuthDialog::networkRequestFinished(QNetworkReply *reply)
 
             // data to post
             QByteArray data;
-            data.append(QString("{\"member-id\":\"%1\"}").arg(context->athlete->cyclist));
+            data.append(QString("{\"member-id\":\"%1\"}").arg(context->athlete->cyclist).toUtf8());
 
             // the request will fallback to this method on networkRequestFinished
             // but we are done, so set ignore= true to get this function to just
@@ -470,13 +444,6 @@ OAuthDialog::networkRequestFinished(QNetworkReply *reply)
 
             service->setSetting(GC_CYCLINGANALYTICS_TOKEN, access_token);
             QString info = QString(tr("Cycling Analytics authorization was successful."));
-            QMessageBox information(QMessageBox::Information, tr("Information"), info);
-            information.exec();
-
-        } else if (site == TODAYSPLAN) {
-
-            service->setSetting(GC_TODAYSPLAN_TOKEN, access_token);
-            QString info = QString(tr("Today's Plan authorization was successful."));
             QMessageBox information(QMessageBox::Information, tr("Information"), info);
             information.exec();
 

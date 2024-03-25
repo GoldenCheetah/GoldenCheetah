@@ -319,7 +319,7 @@ class Pace : public RideMetric {
         setCount(as->count());
     }
 
-    bool isRelevantForRide(const RideItem *ride) const { return ride->isRun; }
+    bool isRelevantForRide(const RideItem *ride) const { return ride->isRun || ride->sport == "Walk"; }
 
     MetricClass classification() const { return Undefined; }
     MetricValidity validity() const { return Unknown; }

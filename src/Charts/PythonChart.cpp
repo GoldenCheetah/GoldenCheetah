@@ -299,6 +299,7 @@ PythonChart::PythonChart(Context *context, bool ridesummary) : GcChartWindow(con
     // sert no render widget
     canvas=NULL;
     plot=NULL;
+    syntax=NULL;
 
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->setSpacing(0);
@@ -437,7 +438,6 @@ PythonChart::setWeb(bool x)
         // setup the canvas
         canvas = new QWebEngineView(this);
         canvas->setContentsMargins(0,0,0,0);
-        canvas->page()->view()->setContentsMargins(0,0,0,0);
         canvas->setZoomFactor(dpiXFactor);
         canvas->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
         // stop stealing focus!
@@ -515,8 +515,12 @@ PythonChart::configChanged(qint32)
     palette.setColor(QPalette::Text, GColor(CPLOTMARKER));
     palette.setColor(QPalette::Base, GCColor::alternateColor(GColor(CPLOTBACKGROUND)));
     setPalette(palette);
+    script->setPalette(palette);
+    script->setStyleSheet(AbstractView::ourStyleSheet());
 
-    // refresh
+    // refresh highlighter
+    if (syntax) delete syntax;
+    syntax = new PythonSyntax(script->document(), GCColor::luminance(GColor(CPLOTBACKGROUND)) < 127);
     runScript();
 }
 
@@ -549,7 +553,6 @@ PythonChart::setScript(QString string)
 {
     if (python && script) {
         script->setText(string);
-        new PythonSyntax(script->document());
     }
     text = string;
 }

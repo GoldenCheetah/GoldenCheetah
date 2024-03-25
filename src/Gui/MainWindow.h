@@ -70,10 +70,10 @@ class Athlete;
 class AthleteLoader;
 class Context;
 class AthleteTab;
+class GGraphicsView;
 
 
 extern QList<MainWindow *> mainwindows; // keep track of all the MainWindows we have open
-extern QDesktopWidget *desktop;         // how many screens / res etc
 extern QString gcroot;                  // root directory for gc
 
 class MainWindow : public QMainWindow
@@ -109,6 +109,7 @@ class MainWindow : public QMainWindow
         // have already been opened
         friend class ::ChooseCyclistDialog;
         friend class ::AthleteLoader;
+        friend class ::GGraphicsView;
         QMap<QString,AthleteTab*> athletetabs;
         AthleteTab *currentAthleteTab;
         QList<AthleteTab*> tabList;
@@ -155,6 +156,9 @@ class MainWindow : public QMainWindow
 
         // chart importing
         void importCharts(QStringList);
+
+        // import images into the current ride
+        void importImages(QStringList);
 
         // open and closing windows and tabs
         void closeWindow();
@@ -230,7 +234,7 @@ class MainWindow : public QMainWindow
         // Training View
         void addDevice();
         void downloadErgDB();
-        void downloadTodaysPlanWorkouts();
+        void downloadStravaRoutes();
         void manageLibrary();
         void showWorkoutWizard();
         void importWorkout();

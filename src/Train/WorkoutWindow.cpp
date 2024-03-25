@@ -135,9 +135,11 @@ WorkoutWindow::WorkoutWindow(Context *context) :
 
     setControls(settingsWidget);
     ergFile = NULL;
+    format = 0;
 
     QVBoxLayout *main = new QVBoxLayout;
     QHBoxLayout *layout = new QHBoxLayout;
+    QVBoxLayout *codeLayout = new QVBoxLayout;
     QVBoxLayout *editor = new QVBoxLayout;
     setChartLayout(main);
 
@@ -193,10 +195,23 @@ WorkoutWindow::WorkoutWindow(Context *context) :
     toolbar->setFloatable(true);
     toolbar->setIconSize(QSize(18 *dpiXFactor,18 *dpiYFactor));
 
+    newAct = new QAction(tr("ERG - Absolute Watts"), this);
+    QAction *newMrcAct = new QAction(tr("MRC - Relative Watts"), this);
+    connect(newAct, SIGNAL(triggered()), this, SLOT(newErgFile()));
+    connect(newMrcAct, SIGNAL(triggered()), this, SLOT(newMrcFile()));
+
+    QMenu *menu = new QMenu();
+    menu->addAction(newAct);
+    menu->addAction(newMrcAct);
+
     QIcon newIcon(":images/toolbar/new doc.png");
-    newAct = new QAction(newIcon, tr("New"), this);
-    connect(newAct, SIGNAL(triggered()), this, SLOT(newFile()));
-    toolbar->addAction(newAct);
+    QToolButton *toolButton = new QToolButton();
+    toolButton->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+    toolButton->setText(tr("New"));
+    toolButton->setIcon(newIcon);
+    toolButton->setMenu(menu);
+    toolButton->setPopupMode(QToolButton::InstantPopup);
+    toolbar->addWidget(toolButton);
 
     QIcon saveIcon(":images/toolbar/save.png");
     saveAct = new QAction(saveIcon, tr("Save"), this);
@@ -303,18 +318,28 @@ WorkoutWindow::WorkoutWindow(Context *context) :
     telemetryUpdate(RealtimeData());
 #endif
 
+    codeContainer = new QWidget;
+    codeContainer->setLayout(codeLayout);
+    codeContainer->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Preferred);
+    codeContainer->hide();
+
+    // erg/mrc format
+    codeFormat = new QLabel(tr("ERG - Absolute Watts"));
+    codeFormat->setStyleSheet("QLabel { color : white; }");
+
     // editing the code...
     code = new CodeEditor(this);
     code->setContextMenuPolicy(Qt::NoContextMenu); // no context menu
     code->installEventFilter(this); // filter the undo/redo stuff
-    code->hide();
 
     // WATTS and Duration for the cursor
     main->addWidget(toolbar);
     editor->addWidget(workout);
     editor->addWidget(scroll);
     layout->addLayout(editor);
-    layout->addWidget(code);
+    codeLayout->addWidget(codeFormat);
+    codeLayout->addWidget(code);
+    layout->addWidget(codeContainer);
     main->addLayout(layout);
 
     // make it look right
@@ -380,7 +405,6 @@ WorkoutWindow::configChanged(qint32)
     // text edit colors
     QPalette palette;
     palette.setColor(QPalette::Window, GColor(CTRAINPLOTBACKGROUND));
-    palette.setColor(QPalette::Background, GColor(CTRAINPLOTBACKGROUND));
 
     // only change base if moved away from white plots
     // which is a Mac thing
@@ -496,7 +520,7 @@ WorkoutWindow::scrollMoved()
 }
 
 void
-WorkoutWindow::ergFileSelected(ErgFile*f)
+WorkoutWindow::ergFileSelected(ErgFile*f, int format)
 {
     if (active) return;
 
@@ -518,26 +542,41 @@ WorkoutWindow::ergFileSelected(ErgFile*f)
     }
 
     // just get on with it.
+    format = f ? f->format : format;
+    if (format == MRC) codeFormat->setText(tr("MRC - Relative Watts"));
+    else codeFormat->setText(tr("ERG - Absolute Watts"));
+
     ergFile = f;
-    workout->ergFileSelected(f);
+    this->format = format;
+    workout->ergFileSelected(f, format);
 
     // almost certainly hides it on load
     setScroller(QPointF(workout->minVX(), workout->maxVX()));
 }
 
 void
-WorkoutWindow::newFile()
+WorkoutWindow::newErgFile()
 {
     // new blank file clear points .. texts .. metadata etc
-    ergFileSelected(NULL);
+    ergFileSelected(NULL, ERG);
+}
+
+
+void
+WorkoutWindow::newMrcFile()
+{
+    // new blank file clear points .. texts .. metadata etc
+    ergFileSelected(NULL, MRC);
 }
 
 void
 WorkoutWindow::saveAs()
 {
+    QString selected = format == MRC ? "MRC workout (*.mrc)" : "ERG workout (*.erg)";
     QString filename = QFileDialog::getSaveFileName(this, tr("Save Workout File"),
                                                     appsettings->value(this, GC_WORKOUTDIR, "").toString(),
-                                                    "ERG workout (*.erg);;MRC workout (*.mrc);;Zwift workout (*.zwo)");
+                                                    "ERG workout (*.erg);;MRC workout (*.mrc);;Zwift workout (*.zwo)",
+                                                    &selected);
 
     // if they didn't select, give up.
     if (filename.isEmpty()) {
@@ -546,7 +585,8 @@ WorkoutWindow::saveAs()
 
     // filetype defaults to .erg
     if(!filename.endsWith(".erg") && !filename.endsWith(".mrc") && !filename.endsWith(".zwo")) {
-        filename.append(".erg");
+        if (format == MRC) filename.append(".mrc");
+        else filename.append(".erg");
     }
 
     // New ergfile will be created almost empty
@@ -561,7 +601,7 @@ WorkoutWindow::saveAs()
     newergFile->Name = "New Workout";
     newergFile->Ftp = newergFile->CP;
     newergFile->valid = true;
-    newergFile->format = ERG; // default to couse until we know
+    newergFile->format = format;
 
     // if we're save as from an existing keep all the data
     // EXCEPT filename, which has just been changed!
@@ -598,7 +638,7 @@ void
 WorkoutWindow::properties()
 {
     // metadata etc -- needs a dialog
-    code->setHidden(!code->isHidden());
+    codeContainer->setHidden(!codeContainer->isHidden());
 }
 
 void
@@ -630,7 +670,7 @@ WorkoutWindow::start()
     recording = true;
     scroll->hide();
     toolbar->hide();
-    code->hide();
+    codeContainer->hide();
     workout->start();
 }
 

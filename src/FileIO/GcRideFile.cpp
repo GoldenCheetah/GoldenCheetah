@@ -38,7 +38,7 @@ GcFileReader::openRideFile(QFile &file, QStringList &errors, QList<RideFile*>*) 
         return NULL;
     }
 
-    bool parsed = doc.setContent(&file);
+    bool parsed = bool(doc.setContent(&file));
     file.close();
     if (!parsed) {
         errors << "Could not parse file.";
@@ -275,7 +275,9 @@ GcFileReader::writeRideFile(Context *,const RideFile *ride, QFile &file) const
         return false;
     file.resize(0);
     QTextStream out(&file);
+#if QT_VERSION < 0x060000
     out.setCodec("UTF-8");
+#endif
     out.setGenerateByteOrderMark(true);
     out << xml;
     out.flush();

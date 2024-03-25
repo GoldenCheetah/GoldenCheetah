@@ -23,7 +23,6 @@
 #include "Context.h"
 
 #include "WithingsDownload.h"
-#include "TodaysPlanBodyMeasures.h"
 #include "MeasuresCsvImport.h"
 
 #include <QDialog>
@@ -53,7 +52,6 @@ private:
      MeasuresGroup *measuresGroup;
 
      WithingsDownload *withingsDownload;
-     TodaysPlanBodyMeasures *todaysPlanBodyMeasureDownload;
      MeasuresCsvImport *csvFileImport;
 
      QPushButton *downloadButton;
@@ -61,9 +59,8 @@ private:
 
      QCheckBox *discardExistingMeasures;
 
-     // withings, todaysplan, csv file
+     // withings, csv file
      QRadioButton *downloadWithings;
-     QRadioButton *downloadTP;
      QRadioButton *downloadCSV;
 
      //  all, from last measure, manual date interval
@@ -95,7 +92,6 @@ private slots:
      void dateRangeManualSettingChanged(bool);
 
      void downloadWithingsSettingChanged(bool);
-     void downloadTPSettingChanged(bool);
      void downloadCSVSettingChanged(bool);
 
      void downloadProgressStart(int);

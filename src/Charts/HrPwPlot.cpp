@@ -35,6 +35,7 @@
 #include <qwt_legend.h>
 #include <qwt_series_data.h>
 #include <qwt_scale_widget.h>
+#include <qwt_scale_map.h>
 
 
 static inline double
@@ -121,7 +122,6 @@ HrPwPlot::configChanged(qint32)
 
     QPalette palette;
     palette.setBrush(QPalette::Window, QBrush(GColor(CPLOTBACKGROUND)));
-    palette.setBrush(QPalette::Background, QBrush(GColor(CPLOTBACKGROUND)));
     palette.setColor(QPalette::WindowText, GColor(CPLOTMARKER));
     palette.setColor(QPalette::Text, GColor(CPLOTMARKER));
     setPalette(palette);
@@ -130,15 +130,15 @@ HrPwPlot::configChanged(qint32)
     QwtScaleDraw *sd = new QwtScaleDraw;
     sd->setTickLength(QwtScaleDiv::MajorTick, 3);
     sd->setTickLength(QwtScaleDiv::MinorTick, 0);
-    setAxisScaleDraw(QwtPlot::xBottom, sd);
-    axisWidget(QwtPlot::xBottom)->setPalette(palette);
+    setAxisScaleDraw(QwtAxis::XBottom, sd);
+    axisWidget(QwtAxis::XBottom)->setPalette(palette);
 
     sd = new QwtScaleDraw;
     sd->setTickLength(QwtScaleDiv::MajorTick, 3);
     sd->enableComponent(QwtScaleDraw::Ticks, false);
     sd->enableComponent(QwtScaleDraw::Backbone, false);
-    setAxisScaleDraw(QwtPlot::yLeft, sd);
-    axisWidget(QwtPlot::yLeft)->setPalette(palette);
+    setAxisScaleDraw(QwtAxis::YLeft, sd);
+    axisWidget(QwtAxis::YLeft)->setPalette(palette);
 
     QPen gridPen;
     gridPen.setColor(GColor(CPLOTGRID));
@@ -297,11 +297,11 @@ HrPwPlot::recalc()
 
     // Clean up memory
     for (int i = 0; i < 36; ++i) {
-        delete plotedWattsArray[i];
-        delete plotedHrArray[i];
-    }       
+        delete[] plotedWattsArray[i];
+        delete[] plotedHrArray[i];
+    }
 
-    setAxisScale(xBottom, 0.0, maxWatt);
+    setAxisScale(QwtAxis::XBottom, 0.0, maxWatt);
 
     setYMax();
     refreshZoneLabels();
@@ -359,8 +359,8 @@ HrPwPlot::setYMax()
             ymax = max(ymax, hrCurves[i]->maxYValue());
         }
     }
-    setAxisScale(yLeft, minHr, ymax * 1.2);
-    setAxisTitle(yLeft, tr("Heart Rate(BPM)"));
+    setAxisScale(QwtAxis::YLeft, minHr, ymax * 1.2);
+    setAxisTitle(QwtAxis::YLeft, tr("Heart Rate(BPM)"));
 }
 
 void
@@ -466,7 +466,7 @@ HrPwPlot::addRegLinCurve( double rslope, double rintercept)
 void
 HrPwPlot::setXTitle()
 {
-    setAxisTitle(xBottom, tr("Power (Watts)"));
+    setAxisTitle(QwtAxis::XBottom, tr("Power (Watts)"));
 }
 
 void

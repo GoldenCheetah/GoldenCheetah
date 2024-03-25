@@ -856,7 +856,7 @@ int Computrainer::openPort()
     // if deviceFilename references a port above COM9
     // then we need to open "\\.\COMX" not "COMX"
     QString portSpec;
-    int portnum = deviceFilename.midRef(3).toString().toInt();
+    int portnum = deviceFilename.mid(3).toInt();
     if (portnum < 10)
        portSpec = deviceFilename;
     else

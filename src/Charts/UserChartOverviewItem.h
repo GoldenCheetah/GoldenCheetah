@@ -56,6 +56,7 @@ class UserChartOverviewItem : public ChartSpaceItem
         QString getConfig() const { return chart->settings(); }
         void setConfig(QString config) { chart->applySettings(config); }
 
+        QGraphicsProxyWidget *proxy;
     protected:
         bool sceneEvent(QEvent *) override { return false; } // override the default one
 
@@ -66,7 +67,6 @@ class UserChartOverviewItem : public ChartSpaceItem
 
     private:
         // embedding
-        QGraphicsProxyWidget *proxy;
         UserChart *chart;
         ChartSpace *space_;
 

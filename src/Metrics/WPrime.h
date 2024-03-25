@@ -25,9 +25,9 @@
 #include "Athlete.h"
 #include "Zones.h"
 #include "RideMetric.h"
+#include "SplineLookup.h"
 #include <QVector>
 #include <QThread>
-#include <qwt_spline.h> // smoothing
 #include <cmath>
 
 struct Match {
@@ -37,10 +37,10 @@ struct Match {
 };
 
 class WPrime {
-	
+
     Q_DECLARE_TR_FUNCTIONS(WPrime)
 
-    public: 
+    public:
 
         // construct and calculate series/metrics
         WPrime();
@@ -90,12 +90,13 @@ class WPrime {
         QVector<double> values;      // W' time series in 1s intervals
         QVector<double> xvalues;      // W' time series in 1s intervals
         QVector<double> xdvalues;      // W' distance
-    
+
         QVector<double> mvalues;      // W' time series in 1s intervals
         QVector<double> mxvalues;      // W' time series in 1s intervals
         QVector<double> mxdvalues;      // W' distance
 
-        QwtSpline smoothed, distance;
+        SplineLookup smoothed;
+        SplineLookup distance;
         int last;
 
         void check(); // check we don't need to recompute

@@ -36,7 +36,6 @@
 #include "GcOverlayWidget.h"
 
 #include <QWebEngineSettings>
-#include <QDesktopWidget>
 
 #include <QtGlobal>
 #include <QtGui>
@@ -67,7 +66,7 @@ LTMWindow::LTMWindow(Context *context) :
     QVBoxLayout *mainLayout = new QVBoxLayout;
 
     QPalette palette;
-    palette.setBrush(QPalette::Background, QBrush(GColor(CTRENDPLOTBACKGROUND)));
+    palette.setBrush(QPalette::Window, QBrush(GColor(CTRENDPLOTBACKGROUND)));
 
     // single plot
     plotWidget = new QWidget(this);
@@ -144,14 +143,13 @@ LTMWindow::LTMWindow(Context *context) :
     //XXXdataSummary->setEnabled(false); // stop grabbing focus
     if (dpiXFactor > 1) {
     // 80 lines per page on hidpi screens (?)
-        int pixelsize = pixelSizeForFont(defaultFont, QApplication::desktop()->geometry().height()/80);
+        int pixelsize = pixelSizeForFont(defaultFont, QApplication::primaryScreen()->geometry().height()/80);
         dataSummary->settings()->setFontSize(QWebEngineSettings::DefaultFontSize, pixelsize);
     } else {
         dataSummary->settings()->setFontSize(QWebEngineSettings::DefaultFontSize, defaultFont.pointSize()+1);
     }
     dataSummary->settings()->setFontFamily(QWebEngineSettings::StandardFont, defaultFont.family());
     dataSummary->setContentsMargins(0,0,0,0);
-    dataSummary->page()->view()->setContentsMargins(0,0,0,0);
     dataSummary->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     dataSummary->setAcceptDrops(false);
 
@@ -519,7 +517,6 @@ LTMWindow::configChanged(qint32)
     // inverted palette for data etc
     QPalette whitepalette;
     whitepalette.setBrush(QPalette::Window, QBrush(GColor(CTRENDPLOTBACKGROUND)));
-    whitepalette.setBrush(QPalette::Background, QBrush(GColor(CTRENDPLOTBACKGROUND)));
     whitepalette.setColor(QPalette::WindowText, GCColor::invertColor(GColor(CTRENDPLOTBACKGROUND)));
     whitepalette.setColor(QPalette::Base, GCColor::alternateColor(GColor(CPLOTBACKGROUND)));
     whitepalette.setColor(QPalette::Text, GCColor::invertColor(GColor(CTRENDPLOTBACKGROUND)));
@@ -695,7 +692,7 @@ void
 LTMWindow::spanSliderChanged()
 {
     // so reset the axis range for ltmPlot
-    ltmPlot->setAxisScale(QwtPlot::xBottom, spanSlider->lowerValue(), spanSlider->upperValue());
+    ltmPlot->setAxisScale(QwtAxis::XBottom, spanSlider->lowerValue(), spanSlider->upperValue());
     ltmPlot->replot();
 }
 
@@ -735,8 +732,8 @@ LTMWindow::refreshPlot()
                 stackWidget->setCurrentIndex(0);
                 dirty = false;
 
-                spanSlider->setMinimum(ltmPlot->axisScaleDiv(QwtPlot::xBottom).lowerBound());
-                spanSlider->setMaximum(ltmPlot->axisScaleDiv(QwtPlot::xBottom).upperBound());
+                spanSlider->setMinimum(ltmPlot->axisScaleDiv(QwtAxis::XBottom).lowerBound());
+                spanSlider->setMaximum(ltmPlot->axisScaleDiv(QwtAxis::XBottom).upperBound());
                 spanSlider->setLowerValue(spanSlider->minimum());
                 spanSlider->setUpperValue(spanSlider->maximum());
             }
@@ -1669,7 +1666,9 @@ LTMWindow::exportData()
 
         // open stream and write header
         QTextStream stream(&f);
+#if QT_VERSION < 0x060000
         stream.setCodec("UTF-8"); // Names and Units can be translated
+#endif
         stream << content;
 
         // and we're done

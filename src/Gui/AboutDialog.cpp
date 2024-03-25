@@ -117,6 +117,7 @@ ContributorsPage::ContributorsPage(Context *context) : context(context)
     contributors.append("Alex Harsanyi");
     contributors.append("Alexandre Prokoudine");
     contributors.append("Andre Heider");
+    contributors.append("Andreas Buhr");
     contributors.append("Andrew Bryson");
     contributors.append("Andy Froncioni");
     contributors.append("Antonius Riha");
@@ -151,6 +152,7 @@ ContributorsPage::ContributorsPage(Context *context) : context(context)
     contributors.append("Jan de Visser");
     contributors.append("Jim Ley");
     contributors.append("J&#246;rn Rischm&#252;ller");
+    contributors.append("Joachim Kohlhammer");
     contributors.append("Johan Martensson");
     contributors.append("John Ehrlinger");
     contributors.append("Jon Beverley");

@@ -26,6 +26,7 @@
 #include <QXmlSimpleReader>
 
 #include <stdint.h>
+#include <cmath>
 #include "Units.h"
 #include "Utils.h"
 
@@ -144,7 +145,7 @@ void ErgFile::parseZwift()
     Ftp = 0;       // FTP this file was targetted at
     MaxWatts = 0;  // maxWatts in this ergfile (scaling)
     valid = false; // did it parse ok?
-    format = ERG;  // default to couse until we know
+    mode = format = ERG;  // default to couse until we know
     Points.clear();
     Laps.clear();
     Texts.clear();
@@ -599,13 +600,12 @@ void ErgFile::parseComputrainer(QString p)
                 switch (format) {
 
                 case ERG:       // its an absolute wattage
-                    if (Ftp) { // adjust if target FTP is set.
+                    if (Ftp && Ftp != CP) { // adjust if target FTP is set.
                         // if ftp is set then convert to the users CP
-
                         double watts = add.y;
                         double ftp = Ftp;
                         watts *= CP/ftp;
-                        add.y = add.val = int(watts);
+                        add.y = add.val = int(std::round(watts));
                     }
                     break;
                 case MRC:       // its a percent relative to CP (mrc file)
@@ -1215,7 +1215,9 @@ ErgFile::save(QStringList &errors)
 
         // setup output stream to file
         QTextStream out(&f);
+#if QT_VERSION < 0x060000
         out.setCodec("UTF-8");
+#endif
 
         // write the header
         //
@@ -1262,7 +1264,9 @@ ErgFile::save(QStringList &errors)
             double minutes = double(p.x) / (1000.0f*60.0f);
 
             // we scale back if needed
-            if (Ftp && CP) watts = (double(p.y)/CP) * Ftp;
+            if (Ftp && CP && Ftp != CP) {
+                 watts = std::round(p.y / CP * Ftp);
+            }
 
             // check if a lap marker should be inserted
             foreach(ErgFileLap l, Laps) {
@@ -1325,7 +1329,9 @@ ErgFile::save(QStringList &errors)
 
         // setup output stream to file
         QTextStream out(&f);
+#if QT_VERSION < 0x060000
         out.setCodec("UTF-8");
+#endif
 
         // write the header
         //
@@ -1430,7 +1436,9 @@ ErgFile::save(QStringList &errors)
 
         // setup output stream to file
         QTextStream out(&f);
+#if QT_VERSION < 0x060000
         out.setCodec("UTF-8");
+#endif
 
         out << "<workout_file>\n";
 
@@ -1662,7 +1670,7 @@ ErgFile::currentLap(double x) const
 
     // If the current position is before the start of the next lap, return this lap
     for (int i=0; i<Laps.count() - 1; i++) {
-        if (x<Laps.at(i+1).x) return Laps.at(i).x;
+        if (x>=Laps.at(i).x && x<Laps.at(i+1).x) return Laps.at(i).x;
     }
     return -1; // No matching lap
 }
