@@ -159,7 +159,7 @@ void ErgFile::parseZwift()
     maxWatts(0);  // maxWatts in this ergfile
     valid = false; // did it parse ok?
     mode(ErgFileFormat::erg);
-    format(ErgFileFormat::mrc);  // default to mrc until we know
+    format(ErgFileFormat::mrc);  // default to couse until we know
     Points.clear();
     Laps.clear();
     Texts.clear();
