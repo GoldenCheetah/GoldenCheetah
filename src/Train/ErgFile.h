@@ -139,6 +139,8 @@ private:
         void sortTexts() const;
 public:
 
+        void coalescePoints();
+
         double nextLap(double) const;    // return the start value (erg - time(ms) or slope - distance(m)) for the next lap
         double prevLap(double) const;    // return the start value (erg - time(ms) or slope - distance(m)) for the prev lap
         double currentLap(double) const; // return the start value (erg - time(ms) or slope - distance(m)) for the current lap
@@ -170,6 +172,7 @@ public:
         bool    fHasGPS;        // has Lat/Lon?
 
         QList<ErgFilePoint>         Points; // points in workout
+        QList<ErgFilePoint>         CoalescedPoints; // points in workout with neighbouring points having same power coalesced
         mutable QList<ErgFileLap>   Laps;   // interval markers in the file
         mutable QList<ErgFileText>  Texts;  // texts to display
 
@@ -221,7 +224,7 @@ public:
     int      addNewLap(double loc) const;
 
 private:
-    const QList<ErgFilePoint>& Points() const { return ergFile->Points; }
+    const QList<ErgFilePoint>& Points() const { return ergFile->CoalescedPoints; }
     const QList<ErgFileLap>  & Laps()   const { return ergFile->Laps; }
     const QList<ErgFileText> & Texts()  const { return ergFile->Texts; }
 
@@ -243,7 +246,7 @@ public:
         return !ergFile ? false : ergFile->textsInRange(searchStart, searchRange, rangeStart, rangeEnd);
     }
 
-    double currentTime() const { return !ergFile ? 0. : ergFile->Points.at(qs.rightPoint).x; }
+    double currentTime() const { return !ergFile ? 0. : ergFile->CoalescedPoints.at(qs.rightPoint).x; }
 
     double Duration(void) const { return !ergFile ? 0. : ergFile->Duration; }
 
