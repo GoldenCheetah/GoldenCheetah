@@ -25,6 +25,8 @@
 #include "LocationInterpolation.h"
 #include <QWebEngineScriptCollection>
 #include <QWebEngineProfile>
+#include <qwt_compass_rose.h>
+#include <qwt_dial_needle.h>
 
 MeterWidget::MeterWidget(QString Name, QWidget *parent, QString Source) : QWidget(parent), m_Name(Name), m_container(parent), m_Source(Source)
 {
@@ -362,6 +364,34 @@ void NeedleMeterWidget::paintEvent(QPaintEvent* paintevent)
     painter.drawPath(my_painterPath);
     painter.restore();
 }
+
+CompassWidget::CompassWidget(QString Name, QWidget *parent, QString Source) : MeterWidget(Name, parent, Source)
+{
+    m_Compass.setAttribute(Qt::WA_TranslucentBackground, true);
+    m_Compass.setNeedle(new QwtCompassMagnetNeedle(QwtCompassMagnetNeedle::TriangleStyle, Qt::white, Qt::red));
+    m_Compass.setMode(QwtCompass::RotateScale);
+    QwtSimpleCompassRose *rose = new QwtSimpleCompassRose( 16, 2 );
+    rose->setWidth( 0.15 );
+    m_Compass.setRose(rose);
+}
+
+void CompassWidget::paintEvent(QPaintEvent* paintevent)
+{
+    MeterWidget::paintEvent(paintevent);
+
+
+    //painter
+    QPainter painter(this);
+    painter.setClipRegion(videoContainerRegion);
+    painter.setRenderHint(QPainter::Antialiasing);
+
+    painter.save();
+    m_Compass.setGeometry(0, 0, m_Width, m_Height);
+    m_Compass.setValue(Value);
+    m_Compass.render(&painter);
+    painter.restore();
+}
+
 
 ElevationMeterWidget::ElevationMeterWidget(QString Name, QWidget *parent, QString Source, Context *context) : MeterWidget(Name, parent, Source), context(context),
     m_minX(0.), m_maxX(0.), m_savedWidth(0), m_savedHeight(0), m_savedMinY(0), m_savedMaxY(0), gradientValue(0.)

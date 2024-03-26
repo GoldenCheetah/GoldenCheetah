@@ -40,6 +40,7 @@ RealtimeData::RealtimeData()
     trainerCalibRequired = false;
     trainerConfigRequired = false;
     trainerBrakeFault = false;
+    bearing = 0.0;
     memset(spinScan, 0, 24);
 }
 
@@ -167,6 +168,11 @@ void RealtimeData::setRPS(double x)
     this->rps = x;
 }
 
+void RealtimeData::setBearing(double x)
+{
+    this->bearing = x;
+}
+
 const char *
 RealtimeData::getName() const
 {
@@ -269,6 +275,10 @@ double RealtimeData::getLPS() const
 double RealtimeData::getRPS() const
 {
     return rps;
+}
+double RealtimeData::getBearing() const
+{
+    return bearing;
 }
 
 double RealtimeData::getTorque() const
@@ -449,6 +459,8 @@ double RealtimeData::value(DataSeries series) const
 
     case FeO2: return feo2;
         break;
+    case Bearing: return bearing;
+        break;
 
     case None:
     default:
@@ -522,6 +534,7 @@ const QList<RealtimeData::DataSeries> &RealtimeData::listDataSeries()
         seriesList << Altitude;
         seriesList << RouteDistance;
         seriesList << DistanceRemaining;
+        seriesList << Bearing;
     }
     return seriesList;
 }
@@ -697,6 +710,9 @@ QString RealtimeData::seriesName(DataSeries series)
         break;
 
     case FeO2: return tr("Fraction O2 Expired");
+        break;
+
+    case Bearing: return tr("Bearing");
         break;
     }
 }

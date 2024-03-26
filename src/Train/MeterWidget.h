@@ -24,6 +24,7 @@
 #include <QtWebChannel>
 #include <QWebEnginePage>
 #include <QWebEngineView>
+#include <qwt_compass.h>
 
 class MeterWidget : public QWidget
 {
@@ -121,6 +122,17 @@ class NeedleMeterWidget : public MeterWidget
     explicit NeedleMeterWidget(QString name, QWidget *parent = 0, QString Source = QString("None"));
     virtual void paintEvent(QPaintEvent* paintevent);
 };
+
+class CompassWidget : public MeterWidget
+{
+  private:
+    QwtCompass  m_Compass;
+  public:
+    explicit CompassWidget(QString name, QWidget *parent = 0, QString Source = QString("None"));
+    virtual void paintEvent(QPaintEvent* paintevent);
+};
+
+
 
 class ElevationMeterWidget : public MeterWidget
 {

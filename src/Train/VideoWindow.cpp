@@ -664,6 +664,12 @@ void VideoWindow::telemetryUpdate(RealtimeData rtd)
                 p_meterWidget->Text = tr("");
             }
         }
+        else if (p_meterWidget->Source() == QString("Bearing"))
+        {
+            p_meterWidget->Value = rtd.getBearing();
+            p_meterWidget->Text = QString::number((int) p_meterWidget->Value).rightJustified(p_meterWidget->textWidth);
+            p_meterWidget->AltText = tr(" °") + p_meterWidget->AltTextSuffix;
+        }
     }
 
     // The Meter Widgets need to follow the Video Window when it moves

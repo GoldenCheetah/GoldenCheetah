@@ -522,6 +522,9 @@ DialWindow::telemetryUpdate(const RealtimeData &rtData)
     case RealtimeData::Altitude:
         valueLabel->setText(QString("%1").arg(value, 0, 'f', 1));
         break;
+    case RealtimeData::Bearing:
+        valueLabel->setText(QString("%1°").arg(value, 0, 'f', 0));
+        break;
 
     case RealtimeData::VO2:
     case RealtimeData::VCO2:
@@ -606,6 +609,7 @@ void DialWindow::seriesChanged()
     case RealtimeData::LapDistance:
     case RealtimeData::LapDistanceRemaining:
     case RealtimeData::RER:
+    case RealtimeData::Bearing:
     case RealtimeData::None:
             foreground = GColor(CDIAL);
             break;

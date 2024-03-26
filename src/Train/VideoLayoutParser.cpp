@@ -173,6 +173,10 @@ bool VideoLayoutParser::startElement( const QString&, const QString&,
         {
             meterWidget = new NeedleMeterWidget(meterName, containerWidget, source);
         }
+        else if (meterType == QString("Compass"))
+        {
+            meterWidget = new CompassWidget(meterName, containerWidget, source);
+        }
         else if (meterType == QString("CircularMeter"))
         {
             meterWidget = new CircularIndicatorMeterWidget(meterName, containerWidget, source);
