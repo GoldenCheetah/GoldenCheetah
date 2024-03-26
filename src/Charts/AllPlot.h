@@ -733,6 +733,10 @@ class AllPlot : public QwtPlot
         RideFile::SeriesType scope;
         RideFile::SeriesType secondaryScope;
 
+        // mouse control
+        bool isPanning;
+        int panOriginX;
+
     protected:
         friend class ::AllPlotObject;
         Context *context;
