@@ -545,6 +545,30 @@ void VideoWindow::telemetryUpdate(RealtimeData rtd)
                 elevationMeterWidget->gradientValue = rtd.getSlope();
             }
         }
+
+
+
+        else if (p_meterWidget->Source() == QString("ElevationZoomed"))
+        {
+            // Do not show in ERG mode
+            if (rtd.mode == ERG || rtd.mode == MRC)
+            {
+                p_meterWidget->setWindowOpacity(0); // Hide the widget
+            }
+            p_meterWidget->Value = rtd.getRouteDistance();
+            ElevationZoomedMeterWidget* elevationZoomedMeterWidget = dynamic_cast<ElevationZoomedMeterWidget*>(p_meterWidget);
+            if (!elevationZoomedMeterWidget)
+                qDebug() << "Error: ElevationZoomed keyword used but widget is not elevation type";
+            else
+            {
+                elevationZoomedMeterWidget->setContext(context);
+                elevationZoomedMeterWidget->gradientValue = rtd.getSlope();
+            }
+        }
+
+
+
+
         else if (p_meterWidget->Source() == QString("LiveMap"))
         {
             LiveMapWidget* liveMapWidget = dynamic_cast<LiveMapWidget*>(p_meterWidget);
