@@ -36,6 +36,7 @@ static QList<QString> _setSeasonTypes()
 {
     QList<QString> returning;
     returning << "Season"
+              << "Year to date"
               << "Cycle"
               << "Adhoc"
               << "System";
@@ -122,7 +123,9 @@ QDate Season::getStart(QDate reference) const
 {
     QDate start = _offset.getStart(reference);
 
-    if (start==QDate()) {
+    if (getType() == Season::yearToDate) {
+        return _start;
+    } else if (start==QDate()) {
         if (getLength()==SeasonLength()) {
             // fixed season
             return _start;
@@ -140,7 +143,19 @@ QDate Season::getEnd(QDate reference) const
 {
     QDate start = _offset.getStart(reference);
 
-    if (start==QDate()) {
+    if (getType() == Season::yearToDate) {
+        QDate end(_start.year(), reference.month(), reference.day());
+        if (   ! end.isValid()
+            && QDate::isLeapYear(reference.year())
+            && reference.month() == 2
+            && reference.day() == 29) {
+            end.setDate(_start.year(), 2, 28);
+        }
+        if (end < getStart(reference)) {
+            end = end.addYears(1);
+        }
+        return end;
+    } else if (start==QDate()) {
         if (getLength()==SeasonLength()) {
             // fixed season
             return _end;
@@ -164,7 +179,7 @@ QDate Season::getEnd() const
     return getEnd(QDate::currentDate());
 }
 
-int Season::getType()
+int Season::getType() const
 {
     return type;
 }
@@ -230,7 +245,7 @@ EditSeasonDialog::EditSeasonDialog(Context *context, Season *season) :
     QLabel *name = new QLabel(tr("Name"));
     QLabel *type = new QLabel(tr("Type"));
     QLabel *from = new QLabel(tr("From"));
-    QLabel *to = new QLabel(tr("To"));
+    to = new QLabel(tr("To"));
     QLabel *seed = new QLabel(tr("Starting LTS"));
     QLabel *low  = new QLabel(tr("Lowest SB"));
 
@@ -239,9 +254,11 @@ EditSeasonDialog::EditSeasonDialog(Context *context, Season *season) :
 
     typeEdit = new QComboBox;
     typeEdit->addItem(tr("Season"), Season::season);
+    typeEdit->addItem(tr("Year to date"), Season::yearToDate);
     typeEdit->addItem(tr("Cycle"), Season::cycle);
     typeEdit->addItem(tr("Adhoc"), Season::adhoc);
     typeEdit->setCurrentIndex(typeEdit->findData(season->getType()));
+    connect(typeEdit, SIGNAL(currentIndexChanged(int)), this, SLOT(typeChanged()));
 
     fromEdit = new QDateEdit(this);
     fromEdit->setDate(season->getStart());
@@ -299,6 +316,7 @@ EditSeasonDialog::EditSeasonDialog(Context *context, Season *season) :
 
     // initialize button state
     nameChanged();
+    typeChanged();
 }
 
 void
@@ -307,8 +325,12 @@ EditSeasonDialog::applyClicked()
     // get the values back
     season->setName(nameEdit->text());
     season->setType(typeEdit->itemData(typeEdit->currentIndex()).toInt());
-    season->setStart(fromEdit->date());
-    season->setEnd(toEdit->date());
+    if (season->getType() == Season::yearToDate) {
+        season->setStart(fromEdit->date());
+    } else {
+        season->setStart(fromEdit->date());
+        season->setEnd(toEdit->date());
+    }
     season->setSeed(seedEdit->value());
     season->setLow(lowEdit->value());
     accept();
@@ -322,6 +344,16 @@ EditSeasonDialog::cancelClicked()
 void EditSeasonDialog::nameChanged()
 {
     applyButton->setEnabled(!nameEdit->text().isEmpty());
+}
+
+
+void
+EditSeasonDialog::typeChanged
+()
+{
+    bool isYTD = (typeEdit->currentData().toInt() == Season::yearToDate);
+    to->setEnabled(! isYTD);
+    toEdit->setEnabled(! isYTD);
 }
 
 /*----------------------------------------------------------------------
@@ -527,8 +559,12 @@ void
 Seasons::updateSeason(int index, QString name, QDate start, QDate end, int type)
 {
     seasons[index].setName(name);
-    seasons[index].setStart(start);
-    seasons[index].setEnd(end);
+    if (type == Season::yearToDate) {
+        seasons[index].setStart(start);
+    } else {
+        seasons[index].setStart(start);
+        seasons[index].setEnd(end);
+    }
     seasons[index].setType(type);
 
     // save changes away

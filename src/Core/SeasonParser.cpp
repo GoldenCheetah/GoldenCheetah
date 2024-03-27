@@ -45,6 +45,10 @@ bool SeasonParser::endElement( const QString&, const QString&, const QString &qN
             phase.setEnd(seasonDateToDate(buffer.trimmed()));
         else
             season.setEnd(seasonDateToDate(buffer.trimmed()));
+    } else if(qName == "yearToDate") {
+        if (! isPhase) {
+            season.setStart(seasonDateToDate(buffer.trimmed()));
+        }
     } else if (qName == "type") {
         if (isPhase)
             phase.setType(buffer.trimmed().toInt());
@@ -75,22 +79,27 @@ bool SeasonParser::endElement( const QString&, const QString&, const QString &qN
 
     } else if(qName == "season") {
 
-        if(seasons.size() >= 1) {
-            // only set end date for previous season if
-            // it is not null
-            if (seasons[seasons.size()-1].getEnd() == QDate())
-                seasons[seasons.size()-1].setEnd(season.getStart());
-        }
-        if (season.getStart().isValid() && season.getEnd().isValid()) {
-
-            // just check the dates are the right way around
-            if (season.getStart() > season.getEnd()) {
-                QDate temp = season.getStart();
-                season.setStart(season.getEnd());
-                season.setEnd(temp);
+        if (season.getType() == Season::yearToDate) {
+            if (! season.getStart().isValid()) {
+                season.setStart(QDate(2000, 1, 1));
             }
-
             seasons.append(season);
+        } else {
+            if(seasons.size() >= 1) {
+                // only set end date for previous season if
+                // it is not null
+                if (seasons[seasons.size()-1].getType() != Season::yearToDate && seasons[seasons.size()-1].getEnd() == QDate())
+                    seasons[seasons.size()-1].setEnd(season.getStart());
+            }
+            if (season.getStart().isValid() && season.getEnd().isValid()) {
+                // just check the dates are the right way around
+                if (season.getStart() > season.getEnd()) {
+                    QDate temp = season.getStart();
+                    season.setStart(season.getEnd());
+                    season.setEnd(temp);
+                }
+                seasons.append(season);
+            }
         }
     } else if(qName == "phase") {
         season.phases.append(phase);
@@ -216,20 +225,26 @@ SeasonParser::serialize(QString filename, QList<Season>Seasons)
             }
 
             // season infos
-            out<<QString("\t\t<name>%1</name>\n"
-                  "\t\t<startdate>%2</startdate>\n"
-                  "\t\t<enddate>%3</enddate>\n"
-                  "\t\t<type>%4</type>\n"
-                  "\t\t<id>%5</id>\n"
-                  "\t\t<seed>%6</seed>\n"
-                  "\t\t<low>%7</low>\n") .arg(Utils::xmlprotect(season.getName()))
-                                         .arg(season.getStart().toString("yyyy-MM-dd"))
-                                         .arg(season.getEnd().toString("yyyy-MM-dd"))
-                                         .arg(season.getType())
-                                         .arg(season.id().toString())
-                                         .arg(season.getSeed())
-                                         .arg(season.getLow());
-                                    
+            out << QString("\t\t<name>%1</name>\n"
+                           "\t\t<type>%2</type>\n"
+                           "\t\t<id>%3</id>\n"
+                           "\t\t<seed>%4</seed>\n"
+                           "\t\t<low>%5</low>\n")
+                          .arg(Utils::xmlprotect(season.getName()))
+                          .arg(season.getType())
+                          .arg(season.id().toString())
+                          .arg(season.getSeed())
+                          .arg(season.getLow());
+            if (season.getType() == Season::yearToDate) {
+                out << QString("\t\t<startdate>%1</startdate>\n")
+                              .arg(season.getStart().toString("yyyy-MM-dd"));
+            } else {
+                out << QString("\t\t<startdate>%1</startdate>\n"
+                               "\t\t<enddate>%2</enddate>\n")
+                              .arg(season.getStart().toString("yyyy-MM-dd"))
+                              .arg(season.getEnd().toString("yyyy-MM-dd"));
+            }
+
 
             // load profile
             for (int i=9; i<season.load().count(); i++)
