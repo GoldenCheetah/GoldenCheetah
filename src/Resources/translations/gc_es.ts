@@ -9025,7 +9025,7 @@ le sugerirá los posibles nombres
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="2111"/>
         <source>Data labels</source>
-        <translation>Eiquetas de datos</translation>
+        <translation>Etiquetas de datos</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="2118"/>
@@ -9045,7 +9045,7 @@ le sugerirá los posibles nombres
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="2142"/>
         <source>Baseline</source>
-        <translation>Linea base</translation>
+        <translation>Línea base</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="2150"/>
