@@ -19,6 +19,7 @@
 #include "Views.h"
 #include "RideCache.h"
 #include "AnalysisSidebar.h"
+#include "EquipmentSidebar.h"
 #include "DiarySidebar.h"
 #include "TrainSidebar.h"
 #include "LTMSidebar.h"
@@ -340,4 +341,59 @@ TrainView::onSelectionChanged()
     if (isSelected()) {
         setBottomRequested(true);
     }
+}
+
+EquipView::EquipView(Context* context, QStackedWidget* controls) : AbstractView(context, VIEW_EQUIPMENT)
+{
+	equipmentSidebar_ = new EquipmentSidebar(context, true);
+	equipmentRefsSidebar_ = new EquipmentSidebar(context, false);
+
+	setSidebar(equipmentRefsSidebar_);
+	setSidebar(equipmentSidebar_);
+
+	// collapsing the equipment navigators doesn't make sense in the
+	// equipment view, so disable the QSplitters collaspsing capability.
+	splitter->setCollapsible(0, false);
+	splitter->setCollapsible(1, false);
+
+	// perspectives are stacked
+	pstack = new QStackedWidget(this);
+	setPages(pstack);
+
+	// each perspective has a stack of controls
+	cstack = new QStackedWidget(this);
+	controls->addWidget(cstack);
+	controls->setCurrentIndex(0);
+
+	setSidebarEnabled(true);
+}
+
+EquipView::~EquipView()
+{
+	delete equipmentSidebar_;
+	delete equipmentRefsSidebar_;
+}
+
+void
+EquipView::restoreConfiguration(bool& useDefault, QString& content)
+{
+	// Equipment view has a single persistent perspective,
+	// so lets define it here rather than load it from a file.
+	content = QString("<layouts> ") +
+		"<layout name = \"Equipment\" style = \"1\" type = \"16\" expression = \"\" trainswitch = \"0\" > " +
+		"<chart id = \"51\" name = \"\" title = \"Equipment\" > " +
+		"<property name = \"title\" type = \"QString\" value = \"\" /> " +
+		"<property name = \"subtitle\" type = \"QString\" value = \"\" /> " +
+		"<property name = \"widthFactor\" type = \"double\" value = \"2\" /> " +
+		"<property name = \"heightFactor\" type = \"double\" value = \"2\" /> " +
+		"<property name = \"style\" type = \"int\" value = \"0\" /> " +
+		"<property name = \"resizable\" type = \"bool\" value = \"1\" /> " +
+		"</chart> </layout> </layouts>";
+	useDefault = false;
+}
+
+bool
+EquipView::isBlank()
+{
+	return true;
 }
