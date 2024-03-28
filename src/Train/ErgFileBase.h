@@ -75,9 +75,6 @@ class ErgFileBase
         QString typeString() const;
         QString ergSubTypeString() const;
 
-        double cp() const;
-        void cp(double cp);
-
         ErgFileFormat format() const;
         QString formatString() const;
         void format(ErgFileFormat format);
