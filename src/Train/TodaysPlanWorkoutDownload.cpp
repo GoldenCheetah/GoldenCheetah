@@ -261,8 +261,8 @@ TodaysPlanWorkoutDownload::downloadFiles()
 
             QString filename;
             ErgFile *p = ErgFile::fromContent(content, context);
-            if (p->Filename != "") {
-                filename = workoutDir + "/TP-" + p->Filename.replace("/", "-").simplified();
+            if (p->originalFilename() != "") {
+                filename = workoutDir + "/TP-" + p->originalFilename().replace("/", "-").simplified();
             } else {
                 filename = workoutDir + "/TP-Workout-" + current->text(1).replace(" ", "_") + ".erg";
             }
@@ -298,7 +298,7 @@ TodaysPlanWorkoutDownload::downloadFiles()
 
                     downloads++;
                     current->setText(5, tr("Saved")); QApplication::processEvents();
-                    trainDB->importWorkout(filename, p); // add to library
+                    trainDB->importWorkout(filename, *p); // add to library
 
                 } else {
 

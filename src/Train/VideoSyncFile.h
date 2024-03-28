@@ -21,6 +21,7 @@
 #define _VideoSyncFile_h
 #include "GoldenCheetah.h"
 #include "Context.h"
+#include "VideoSyncFileBase.h"
 
 #include <QtGui>
 #include <QObject>
@@ -64,7 +65,7 @@ class VideoSyncCourseInfo
         QString TextFile;
 };
 
-class VideoSyncFile
+class VideoSyncFile : public VideoSyncFileBase
 {
     public:
         VideoSyncFile(QString, int&, Context *context);       // constructor uses filename
@@ -80,24 +81,9 @@ class VideoSyncFile
         void parseFromRideFileFactory();  // try an skrimp video sync info from a ride file.
         bool isValid() const;             // is the file valid or not?
 
-        double VideoFrameRate;
-
-        int format;             // RLV or GPX currently supported
-
-        QString Version,        // version number / identifer
-                Units,          // units used
-                Filename,       // filename from inside file
-                filename,       // filename on disk
-                Name,           // description in file
-                Source;         // where did this come from
-
-        long    Duration;       // Duration of this workout in msecs
-        double  Distance;       // Distance of this workout in km
         bool    valid;          // did it parse ok?
 
         QVector<VideoSyncFilePoint> Points;    // points in workout
-
-        // Metrics for this workout
 
         Context *context;
 };

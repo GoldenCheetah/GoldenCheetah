@@ -224,7 +224,7 @@ ErgDBDownloadDialog::downloadFiles()
 
                     downloads++;
                     current->setText(5, tr("Saved")); QApplication::processEvents();
-                    trainDB->importWorkout(filename, p); // add to library
+                    trainDB->importWorkout(filename, *p); // add to library
 
                 } else {
 

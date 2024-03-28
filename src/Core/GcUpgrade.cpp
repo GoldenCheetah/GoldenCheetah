@@ -29,6 +29,7 @@
 #include "DataProcessor.h"
 #include "MainWindow.h"
 #include "TrainDB.h"
+#include "Library.h"
 #include "CloudService.h"
 
 #include <QDebug>
@@ -802,6 +803,16 @@ GcUpgrade::upgradeLate(Context *context)
         // user can only select "Accept" to end with the upgrade step
         return 0;
 
+    }
+
+    if (trainDB->needsUpgrade()) {
+        QStringList files = trainDB->getMigrateableWorkoutPaths();
+        files << trainDB->getMigrateableVideoPaths();
+        files << trainDB->getMigrateableVideoSyncPaths();
+        if (files.size() > 0) {
+            Library::importFiles(context, files, LibraryBatchImportConfirmation::noDialog);
+        }
+        trainDB->dropLegacyTables();
     }
 
     return 0;

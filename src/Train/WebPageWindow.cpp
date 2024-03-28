@@ -311,7 +311,7 @@ WebPageWindow::downloadFinished()
         dialog->process(); // do it!
     }
     if (workouts.count()) {
-        Library::importFiles(context, filenames, true);
+        Library::importFiles(context, filenames, LibraryBatchImportConfirmation::forcedDialog);
     }
 }
 

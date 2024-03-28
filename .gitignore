@@ -14,6 +14,8 @@ Makefile
 *.swp
 *.user
 *.AppImage
+*.tab.c
+*.tab.h
 
 # osx noise
 .DS_Store

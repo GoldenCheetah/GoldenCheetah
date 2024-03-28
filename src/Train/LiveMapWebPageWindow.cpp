@@ -135,7 +135,7 @@ LiveMapWebPageWindow::~LiveMapWebPageWindow()
 void LiveMapWebPageWindow::ergFileSelected(ErgFile* f)
 {
     // rename window to workout name and draw route if data exists
-    if (f && f->filename != "" )
+    if (f && f->filename() != "" )
     {
         setIsBlank(false);
         // these values need extended precision or place marker jumps around.

@@ -32,6 +32,8 @@
 #include "RemoteControl.h"
 #include "AthleteTab.h"
 #include "PhysicsUtility.h"
+#include "MultiFilterProxyModel.h"
+#include "InfoWidget.h"
 
 // standard stuff
 #include <QDir>
@@ -45,6 +47,7 @@
 #include <QFormLayout>
 #include <QSqlTableModel>
 #include <QMutex>
+#include <QAction>
 
 #include "cmath" // for round()
 #include "Units.h" // for MILES_PER_KM
@@ -96,6 +99,7 @@ class TrainSidebar : public GcWindow
     public:
 
         TrainSidebar(Context *context);
+        ~TrainSidebar();
         Context *context;
         void setTrainView(TrainView*x) { trainView=x; }
 
@@ -143,6 +147,8 @@ class TrainSidebar : public GcWindow
         void workoutTreeWidgetSelectionChanged();
         void videosyncTreeWidgetSelectionChanged();
         void mediaTreeWidgetSelectionChanged();
+
+        void workoutFilterChanged(const QString &text);
 
         void deviceTreeMenuPopup(const QPoint &);
         void deleteDevice();
@@ -224,20 +230,24 @@ class TrainSidebar : public GcWindow
         GcSplitter   *trainSplitter;
         GcSplitterItem *deviceItem,
                        *workoutItem,
+                       *workoutInfoItem,
                        *videosyncItem,
                        *mediaItem;
 
-        QSqlTableModel *videoModel;
-        QSqlTableModel *videosyncModel;
-        QSqlTableModel *workoutModel;
+        QAbstractTableModel *videoModel = nullptr;
+        QAbstractTableModel *videosyncModel = nullptr;
+        QAbstractTableModel *workoutModel = nullptr;
 
         DeviceTreeView *deviceTree;
         QTreeView *workoutTree;
         QTreeView *videosyncTree;
         QTreeView *mediaTree;
-        QSortFilterProxyModel *sortModel;  // sorting workout list
+        InfoWidget *workoutInfo;
+        MultiFilterProxyModel *sortModel;  // sorting workout list
         QSortFilterProxyModel *vsortModel; // sorting video list
         QSortFilterProxyModel *vssortModel; // sorting videosync list
+
+        QAction *workoutFilterErrorAction;
 
         int lastAppliedIntensity;// remember how we scaled last time
 
@@ -271,6 +281,8 @@ class TrainSidebar : public GcWindow
         int status;
         int displaymode;
 
+        QString codeWorkoutKey;     // traindb-key of the workout in the case of a code-workout; empty otherwise
+        QString codeWorkoutTitle;   // title of the workout in the case of a code-workout; empty otherwise
         QFile *recordFile;      // where we record!
         int lastRecordSecs;     // to avoid duplicates
         QMutex rrMutex;         // to coordinate async recording from ANT+ thread
@@ -309,7 +321,7 @@ class TrainSidebar : public GcWindow
         Bicycle bicycle;
 
     public:
-        int mode;
+        ErgFileFormat mode;
         QString mediafile, workoutfile;
         // everyone else wants this
         TrainView *trainView;

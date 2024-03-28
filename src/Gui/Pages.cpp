@@ -42,6 +42,7 @@
 #include "LocalFileStore.h"
 #include "Secrets.h"
 #include "Utils.h"
+#include "StyledItemDelegates.h"
 #ifdef GC_WANT_PYTHON
 #include "PythonEmbed.h"
 #include "FixPySettings.h"
@@ -1179,6 +1180,209 @@ SimBicyclePage::saveClicked()
     qint32 state = CONFIG_ATHLETE;
 
     return state;
+}
+
+
+////////////////////////////////////////////////////
+// Workout Tag Manager page
+//
+
+WorkoutTagManagerPage::WorkoutTagManagerPage
+(TagStore *tagStore, QWidget *parent)
+: QWidget(parent), tagStore(tagStore)
+{
+    UniqueLabelEditDelegate *labelEditDelegate = new UniqueLabelEditDelegate(0, this);
+    connect(labelEditDelegate, SIGNAL(closeEditor(QWidget*, QAbstractItemDelegate::EndEditHint)), this, SLOT(editorClosed(QWidget*, QAbstractItemDelegate::EndEditHint)));
+
+    QVBoxLayout *layout = new QVBoxLayout();
+    layout->setContentsMargins(0, 0, 0, 0);
+    tw = new QTreeWidget();
+    tw->setColumnCount(4);
+#if 1
+    tw->hideColumn(2);
+    tw->hideColumn(3);
+#endif
+    tw->setRootIsDecorated(false);
+    tw->setSortingEnabled(true);
+    tw->sortByColumn(0, Qt::AscendingOrder);
+    tw->setEditTriggers(  QAbstractItemView::DoubleClicked
+                        | QAbstractItemView::EditKeyPressed
+                        | QAbstractItemView::SelectedClicked);
+    tw->setColumnWidth(0, 240 * dpiXFactor);
+    tw->setItemDelegateForColumn(0, labelEditDelegate);
+    tw->setItemDelegateForColumn(1, new NoEditDelegate(this));
+    connect(tw, SIGNAL(currentItemChanged(QTreeWidgetItem*, QTreeWidgetItem*)), this, SLOT(currentItemChanged(QTreeWidgetItem*, QTreeWidgetItem*)));
+
+    QStringList headers;
+    headers << tr("Tag")
+            << tr("Assigned to # workouts");
+    tw->setHeaderLabels(headers);
+
+    QList<QTreeWidgetItem *> items;
+    for (const auto &tag: tagStore->getTags()) {
+        QTreeWidgetItem *item = new QTreeWidgetItem();
+        item->setData(0, Qt::DisplayRole, tag.label);
+        item->setData(1, Qt::DisplayRole, tagStore->countTagUsage(tag.id));
+        item->setData(2, Qt::DisplayRole, tag.id);
+        item->setData(3, Qt::DisplayRole, false);
+        item->setFlags(item->flags() | Qt::ItemIsEditable);
+        items.append(item);
+    }
+    tw->insertTopLevelItems(0, items);
+
+    connect(tw->model(), SIGNAL(dataChanged(const QModelIndex&, const QModelIndex&, const QVector<int>&)), this, SLOT(dataChanged(const QModelIndex&, const QModelIndex&, const QVector<int>&)));
+
+
+    layout->addWidget(tw);
+
+    QHBoxLayout *buttonLayout = new QHBoxLayout();
+
+    QPushButton *addButton = new QPushButton(tr("+"),this);
+    QPushButton *delButton = new QPushButton(tr("-"),this);
+#ifdef Q_OS_MAC
+    addButton->setText(tr("Add"));
+    delButton->setText(tr("Delete"));
+    deviceList->setAttribute(Qt::WA_MacShowFocusRect, 0);
+#else
+    addButton->setFixedSize(20 * dpiXFactor, 20 * dpiYFactor);
+    delButton->setFixedSize(20 * dpiXFactor, 20 * dpiYFactor);
+#endif
+    connect(addButton, SIGNAL(released()), this, SLOT(addTag()));
+    connect(delButton, SIGNAL(released()), this, SLOT(deleteTag()));
+    buttonLayout->addStretch(100);
+    buttonLayout->addWidget(addButton);
+    buttonLayout->addWidget(delButton);
+    layout->addItem(buttonLayout);
+
+    setLayout(layout);
+
+    connect(dynamic_cast<QObject*>(tagStore), SIGNAL(tagsChanged(int, int, int)), this, SLOT(tagStoreChanged(int, int, int)));
+}
+
+
+WorkoutTagManagerPage::~WorkoutTagManagerPage
+()
+{
+}
+
+
+qint32
+WorkoutTagManagerPage::saveClicked
+()
+{
+    tagStore->deferTagSignals(true);
+    QList<QTreeWidgetItem*> foundItems = tw->findItems(QString::number(TAGSTORE_UNDEFINED_ID), Qt::MatchExactly, 2);
+    for (auto &item : foundItems) {
+        tagStore->addTag(item->data(0, Qt::DisplayRole).toString());
+        delete item;
+    }
+    for (auto &id : deleted) {
+        tagStore->deleteTag(id);
+    }
+    deleted.clear();
+    tagStore->deferTagSignals(false);
+    return foundItems.size() > 0 ? CONFIG_WORKOUTTAGMANAGER : 0;
+}
+
+
+void
+WorkoutTagManagerPage::currentItemChanged
+(QTreeWidgetItem *current, QTreeWidgetItem *previous)
+{
+    Q_UNUSED(previous);
+    tw->setCurrentItem(current, 0);
+}
+
+
+void
+WorkoutTagManagerPage::dataChanged
+(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles)
+{
+    Q_UNUSED(bottomRight);
+    Q_UNUSED(roles);
+    if (topLeft.column() == 3 && topLeft.data().toBool()) {
+        tagStore->updateTag(topLeft.siblingAtColumn(2).data().toInt(), topLeft.siblingAtColumn(0).data().toString());
+        tw->model()->setData(topLeft, false);
+    }
+}
+
+
+void
+WorkoutTagManagerPage::tagStoreChanged
+(int idAdded, int idRemoved, int idUpdated)
+{
+    QList<QTreeWidgetItem*> foundItems;
+
+    if (   idAdded != TAGSTORE_UNDEFINED_ID
+        && tw->findItems(QString::number(idAdded), Qt::MatchExactly, 2).size() == 0) {
+        QTreeWidgetItem *item = new QTreeWidgetItem();
+        item->setData(0, Qt::DisplayRole, tagStore->getTagLabel(idAdded));
+        item->setData(1, Qt::DisplayRole, tagStore->countTagUsage(idAdded));
+        item->setData(2, Qt::DisplayRole, idAdded);
+        item->setData(3, Qt::DisplayRole, false);
+        item->setFlags(item->flags() | Qt::ItemIsEditable);
+        tw->addTopLevelItem(item);
+    }
+    if (   idRemoved != TAGSTORE_UNDEFINED_ID
+        && (foundItems = tw->findItems(QString::number(idRemoved), Qt::MatchExactly, 2)).size() == 1) {
+        delete foundItems.takeFirst();
+    }
+    if (   idUpdated != TAGSTORE_UNDEFINED_ID
+        && (foundItems = tw->findItems(QString::number(idUpdated), Qt::MatchExactly, 2)).size() == 1) {
+        foundItems[0]->setData(0, Qt::DisplayRole, tagStore->getTagLabel(idUpdated));
+        foundItems[0]->setData(1, Qt::DisplayRole, tagStore->countTagUsage(idUpdated));
+    }
+}
+
+
+void
+WorkoutTagManagerPage::deleteTag
+()
+{
+    if (tw->currentItem() != nullptr) {
+        int id = tw->currentItem()->data(2, Qt::DisplayRole).toInt();
+        if (id != TAGSTORE_UNDEFINED_ID) {
+            deleted << id;
+        }
+        delete tw->currentItem();
+    }
+}
+
+
+void
+WorkoutTagManagerPage::addTag
+()
+{
+    QTreeWidgetItem *item = new QTreeWidgetItem();
+    item->setData(0, Qt::DisplayRole, "");
+    item->setData(1, Qt::DisplayRole, 0);
+    item->setData(2, Qt::DisplayRole, TAGSTORE_UNDEFINED_ID);
+    item->setData(3, Qt::DisplayRole, true);
+    item->setFlags(item->flags() | Qt::ItemIsEditable);
+    tw->addTopLevelItem(item);
+    tw->setCurrentItem(item);
+    tw->editItem(item, 0);
+}
+
+
+void
+WorkoutTagManagerPage::editorClosed
+(QWidget *editor, QAbstractItemDelegate::EndEditHint hint)
+{
+    Q_UNUSED(editor);
+    Q_UNUSED(hint);
+    QTimer::singleShot(0, this, SLOT(modelCleaner()));
+}
+
+
+void
+WorkoutTagManagerPage::modelCleaner
+()
+{
+    QList<QTreeWidgetItem*> foundItems = tw->findItems(QString(), Qt::MatchExactly, 0);
+    for (auto &item : foundItems) {
+        delete item;
+    }
 }
 
 

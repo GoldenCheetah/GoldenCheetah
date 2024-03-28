@@ -265,7 +265,7 @@ class WorkoutWidget : public QWidget
         void telemetryUpdate(RealtimeData rtData);
 
         // and erg file was selected
-        void ergFileSelected(ErgFile *, int format = 0);
+        void ergFileSelected(ErgFile *, ErgFileFormat format = ErgFileFormat::unknown);
 
         // save or save as (when erfile is NULL)
         void save();
@@ -366,7 +366,7 @@ class WorkoutWidget : public QWidget
         bool qwkactive; // we're editing it, not the user
         QStringList codeStrings;
         QList<int> codePoints; // index into points_ for each line
-        int format;
+        ErgFileFormat format;
 
         // the lap definitions
         QList<ErgFileLap>   laps_;      // interval markers in the file

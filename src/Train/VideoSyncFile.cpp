@@ -44,15 +44,16 @@ bool VideoSyncFile::isVideoSync(QString name)
     }
     return false;
 }
-VideoSyncFile::VideoSyncFile(QString filename, int& /*mode*/, Context *context) :
-    filename(filename), context(context)
+VideoSyncFile::VideoSyncFile(QString filename, int& /*mode*/, Context *context)
+: context(context)
 {
+    this->filename(filename);
     reload();
 }
 
 VideoSyncFile::VideoSyncFile(Context *context) : context(context)
 {
-    filename ="";
+    filename("");
 }
 
 void VideoSyncFile::reload()
@@ -61,24 +62,24 @@ void VideoSyncFile::reload()
     QRegExp fact(".+[.](gpx|json)$", Qt::CaseInsensitive);
 
     // which parser to call?
-    if      (filename.endsWith(".rlv", Qt::CaseInsensitive)) parseRLV();
-    else if (filename.endsWith(".tts", Qt::CaseInsensitive)) parseTTS();
-    else if (fact.exactMatch(filename))                      parseFromRideFileFactory();
+    if      (filename().endsWith(".rlv", Qt::CaseInsensitive)) parseRLV();
+    else if (filename().endsWith(".tts", Qt::CaseInsensitive)) parseTTS();
+    else if (fact.exactMatch(filename()))                      parseFromRideFileFactory();
 }
 
 void VideoSyncFile::parseTTS()
 {
     // Initialise
-    Version = "";
-    Units = "";
-    Filename = "";
-    Name = "";
-    Duration = -1;
+    version("");
+    units("");
+    originalFilename("");
+    name("");
+    duration(-1);
     valid = false;  // did it parse ok as sync file?
-    format = RLV;
+    format(VideoSyncFileFormat::rlv);
     Points.clear();
 
-    QFile ttsFile(filename);
+    QFile ttsFile(filename());
     if (ttsFile.open(QIODevice::ReadOnly)) {
 
         QStringList errors_;
@@ -92,7 +93,7 @@ void VideoSyncFile::parseTTS()
 
             // -----------------------------------------------------------------
             // VideoFrameRate
-            VideoFrameRate = ttsReader.getFrameRate();
+            videoFrameRate(ttsReader.getFrameRate());
 
             // -----------------------------------------------------------------
             // VideoSyncFilePoint
@@ -118,8 +119,8 @@ void VideoSyncFile::parseTTS()
                     Points.append(add);
                 }
 
-                Duration = Points.last().secs * 1000.0;
-                Distance = Points.last().km;
+                duration(Points.last().secs * 1000.0);
+                distance(Points.last().km);
 
                 valid = true;
 
@@ -135,13 +136,13 @@ void VideoSyncFile::parseTTS()
 void VideoSyncFile::parseRLV()
 {
     // Initialise
-    Version = "";
-    Units = "";
-    Filename = "";
-    Name = "";
-    Duration = -1;
+    version("");
+    units("");
+    originalFilename("");
+    name("");
+    duration(-1);
     valid = false;             // did it parse ok?
-    format = RLV; // default to rlv until we know
+    format(VideoSyncFileFormat::rlv); // default to rlv until we know
     Points.clear();
 
     // running totals
@@ -149,7 +150,7 @@ void VideoSyncFile::parseRLV()
     double rend = 0;  // Length of entire course
 
     // open the file for binary reading and open a datastream
-    QFile RLVFile(filename);
+    QFile RLVFile(filename());
     if (RLVFile.open(QIODevice::ReadOnly) == false) return;
     QDataStream input(&RLVFile);
     input.setByteOrder(QDataStream::LittleEndian);
@@ -231,7 +232,7 @@ void VideoSyncFile::parseRLV()
                     input>>videoInfo.orgrunWeight;
                     input>>videoInfo.frameOffset;
 
-                    VideoFrameRate = videoInfo.frameRate;
+                    videoFrameRate(videoInfo.frameRate);
                 }
                 break;
 
@@ -251,7 +252,7 @@ void VideoSyncFile::parseRLV()
                         if (record == 0) PreviousDistance = framemapping.distance;
                         VideoSyncFilePoint add;
 
-                        if (format == RLV) {
+                        if (format() == VideoSyncFileFormat::rlv) {
                             // Calculate average distance per video frame between this sync point and the last
                             // using the formula (2a+b)/3 where a is the point of lower speed and b is the higher.
                             double distance = framemapping.distance;
@@ -261,10 +262,10 @@ void VideoSyncFile::parseRLV()
                             add.km = rdist / 1000.0;
 
                             // time
-                            add.secs = (float) framemapping.frameNbr / VideoFrameRate; //FIXME : are we sure that video frame rate will be given prior to mapping?
+                            add.secs = (float) framemapping.frameNbr / videoFrameRate(); //FIXME : are we sure that video frame rate will be given prior to mapping?
 
                             // speed
-                            add.kph = (distance / 1000.0) * (3600.0 * VideoFrameRate);
+                            add.kph = (distance / 1000.0) * (3600.0 * videoFrameRate());
 
                             // FIXME : do we have to consider video offset and weight ?
                             PreviousFrameNbr = framemapping.frameNbr;
@@ -340,26 +341,26 @@ void VideoSyncFile::parseRLV()
         valid = true;
 
         // set RLVFile duration
-        Duration = Points.last().secs * 1000.0;      // last is the end point in msecs
-        Distance = Points.last().km;
+        duration(Points.last().secs * 1000.0);      // last is the end point in msecs
+        distance(Points.last().km);
     }
 }
 
 void VideoSyncFile::parseFromRideFileFactory()
 {
     // Initialise
-    Version = "";
-    Units = "";
-    Filename = "";
-    Name = "";
-    Duration = -1;
+    version("");
+    units("");
+    originalFilename("");
+    name("");
+    duration(-1);
     valid = false;  // did it parse ok as sync file?
-    format = RLV;
+    format(VideoSyncFileFormat::rlv);
     Points.clear();
 
     static double km = 0;
 
-    QFile rideFile(filename);
+    QFile rideFile(filename());
 
     // Check file exists
     if (!rideFile.exists())
@@ -377,7 +378,7 @@ void VideoSyncFile::parseFromRideFileFactory()
     bool fHasKph  = ride->areDataPresent()->kph;
 
     // These files have no frame rate. Let use determine
-    VideoFrameRate = 0;
+    videoFrameRate(0);
 
     // Video sync needs distance and time.
     if (!(fHasKm && fHasTime))
@@ -435,8 +436,8 @@ void VideoSyncFile::parseFromRideFileFactory()
     }
 
     // set RLVFile duration
-    Duration = Points.last().secs * 1000.0;      // last is the end point in msecs
-    Distance = Points.last().km;
+    duration(Points.last().secs * 1000.0);      // last is the end point in msecs
+    distance(Points.last().km);
 
     rideFile.close();
 
