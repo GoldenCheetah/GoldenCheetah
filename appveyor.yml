@@ -113,7 +113,7 @@ install:
 - nmake install
 - cd ..
 
-# Add Python (avoiding colision between GC Context.h and Python context.h)
+# Add Python (avoiding collision between GC Context.h and Python context.h)
 - echo DEFINES+=GC_WANT_PYTHON >> src\gcconfig.pri
 - echo PYTHONINCLUDES=-ICore -I\"c:\python37-x64\include\" >> src\gcconfig.pri
 - echo PYTHONLIBS=-L\"c:\python37-x64\libs\" -lpython37 >> src\gcconfig.pri

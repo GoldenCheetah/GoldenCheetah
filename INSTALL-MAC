@@ -48,7 +48,7 @@ This walkthrough was performed on a MacBook Air running 14.4 (Sonoma)
 To install Xcode on macOS you need to download it via the App Store. You can
 launch the App Store from launchpad, or it may be already in your dock.
 
-Under the search box type in Xcode and it will return a few optios, generally
+Under the search box type in Xcode and it will return a few options, generally
 Xcode is the first item and shows a blueprint with a hammer icon. Click on
 this to install it. It should be free. The usual app store process will apply
 as the application is downloaded and installed. The download is about 4GB

@@ -26,6 +26,7 @@
 #include <QXmlSimpleReader>
 
 #include <stdint.h>
+#include <cmath>
 #include "Units.h"
 #include "Utils.h"
 
@@ -638,13 +639,11 @@ void ErgFile::parseComputrainer(QString p)
                 switch (format()) {
 
                 case ErgFileFormat::erg:       // its an absolute wattage
-                    if (ftp()) { // adjust if target FTP is set.
+                    if (ftp() && ftp() != CP()) { // adjust if target FTP is set.
                         // if ftp is set then convert to the users CP
-
                         double watts = add.y;
-                        // TODO: WHY WAS THIS VARIABLE DEFINED: double ftp = Ftp;
-                        watts *= CP()/ftp();
-                        add.y = add.val = int(watts);
+                        watts *= CP()/double(ftp());
+                        add.y = add.val = int(std::round(watts));
                     }
                     break;
                 case ErgFileFormat::mrc:       // its a percent relative to CP (mrc file)
@@ -1312,7 +1311,9 @@ ErgFile::save(QStringList &errors)
             double minutes = double(p.x) / (1000.0f*60.0f);
 
             // we scale back if needed
-            if (ftp() && lCP) watts = (double(p.y)/lCP) * ftp();
+            if (ftp() && CP() && ftp() != CP()) {
+                 watts = std::round(p.y / CP() * ftp());
+            }
 
             // check if a lap marker should be inserted
             foreach(ErgFileLap l, Laps) {
