@@ -494,7 +494,11 @@ MainWindow::MainWindow(const QDir &home)
     fileMenu->addSeparator();
     fileMenu->addAction(tr("Save all modified activities"), this, SLOT(saveAllUnsavedRides()));
     fileMenu->addSeparator();
-    fileMenu->addAction(tr("Close Window"), this, SLOT(closeWindow()));
+    QAction *actionQuit = new QAction(tr("&Quit"), fileMenu);
+    actionQuit->setShortcuts(QKeySequence::Quit);
+    actionQuit->setShortcutContext(Qt::ApplicationShortcut);
+    connect(actionQuit, SIGNAL(triggered()), this, SLOT(closeWindow()));
+    fileMenu->addAction(actionQuit);
     //fileMenu->addAction(tr("&Close Tab"), this, SLOT(closeTab())); use athlete view
 
     HelpWhatsThis *fileMenuHelp = new HelpWhatsThis(fileMenu);
@@ -1131,6 +1135,7 @@ MainWindow::moveEvent(QMoveEvent*)
 void
 MainWindow::closeEvent(QCloseEvent* event)
 {
+    QGuiApplication::setOverrideCursor(Qt::WaitCursor);
     QList<AthleteTab*> closing = tabList;
     bool needtosave = false;
     bool importrunning = false;
@@ -1143,7 +1148,9 @@ MainWindow::closeEvent(QCloseEvent* event)
         if (tab->context->athlete->autoImport) {
             if (tab->context->athlete->autoImport->importInProcess() ) {
                 importrunning = true;
+                QGuiApplication::restoreOverrideCursor();
                 QMessageBox::information(this, tr("Activity Import"), tr("Closing of athlete window not possible while background activity import is in progress..."));
+                QGuiApplication::setOverrideCursor(Qt::WaitCursor);
             }
         }
 
@@ -1178,6 +1185,7 @@ MainWindow::closeEvent(QCloseEvent* event)
     }
     appsettings->setValue(GC_SETTINGS_MAIN_GEOM, saveGeometry());
     appsettings->setValue(GC_SETTINGS_MAIN_STATE, saveState());
+    QGuiApplication::restoreOverrideCursor();
 }
 
 MainWindow::~MainWindow()
@@ -1989,8 +1997,10 @@ MainWindow::newCyclistTab()
 void
 MainWindow::closeWindow()
 {
+    QGuiApplication::setOverrideCursor(Qt::WaitCursor);
     // just call close, we might do more later
     appsettings->syncQSettings();
+    QGuiApplication::restoreOverrideCursor();
     close();
 }
 
