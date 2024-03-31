@@ -1,6 +1,6 @@
 Update Note: to build GoldenCheetah v3.6 we are using Microsoft Visual C++ 2019,
 included in Microsoft Visual Studio 2019 AppVeyor image, with Qt5.15.2 and GSL 2.7
-insalled with vcpkg, on AppVeyor continuous integration platform.
+installed with vcpkg, on AppVeyor continuous integration platform.
 You can check the appveyor.yml for the complete and updated build script,
 the minimum Qt version known to work is 5.13 with Qt WebEngine and Qt Charts.
 GSL - GNU Scientific Library is a mandatory dependency starting with v3.6
@@ -50,7 +50,7 @@ You need:
 - Flex and Bison (below the version working for me)
   -- Download from here: https://sourceforge.net/projects/winflexbison/
   -- Use the "win_flex_bison-latest.zip" version
-  -- Unzip whereever you like and make sure that the location "win_bison.exe" and "win_flex.exe
+  -- Unzip wherever you like and make sure that the location "win_bison.exe" and "win_flex.exe
      are added to your "Path" environment variable
 	 
 - Qt C++ Framework
@@ -186,7 +186,7 @@ Building with integration to external services (via APIs)
 As of today a number of integrations with external services like Strava, Cyclinganalytics,
 Google Calendar, Dropbox, Today's Plan, Google Drive, CloudDB) exist in the official GoldenCheetah
 builds. The permission to use API's of such services requires a dedicated registration (in this case
-for "GoldenCheetah" as the consumer of the services) where in return the GoldenCheetah team get's 
+for "GoldenCheetah" as the consumer of the services) where in return the GoldenCheetah team gets 
 specific credentials to access the services.
 
 All of the services request that the access credentials are kept private and are under responsibility
