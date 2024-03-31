@@ -327,6 +327,10 @@ WorkoutWindow::WorkoutWindow(Context *context) :
     codeFormat = new QLabel(tr("ERG - Absolute Watts"));
     codeFormat->setStyleSheet("QLabel { color : white; }");
 
+    coalescedSections = new QLabel(tr("Coalesced sections of same wattage"));
+    coalescedSections->setStyleSheet("QLabel { color : white; }");
+    coalescedSections->setVisible(ergFile != nullptr && ergFile->hasCoalescedSections());
+
     // editing the code...
     code = new CodeEditor(this);
     code->setContextMenuPolicy(Qt::NoContextMenu); // no context menu
@@ -338,6 +342,7 @@ WorkoutWindow::WorkoutWindow(Context *context) :
     editor->addWidget(scroll);
     layout->addLayout(editor);
     codeLayout->addWidget(codeFormat);
+    codeLayout->addWidget(coalescedSections);
     codeLayout->addWidget(code);
     layout->addWidget(codeContainer);
     main->addLayout(layout);
@@ -549,6 +554,7 @@ WorkoutWindow::ergFileSelected(ErgFile*f, int format)
     ergFile = f;
     this->format = format;
     workout->ergFileSelected(f, format);
+    coalescedSections->setVisible(f != nullptr && ergFile->hasCoalescedSections());
 
     // almost certainly hides it on load
     setScroller(QPointF(workout->minVX(), workout->maxVX()));

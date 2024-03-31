@@ -2848,7 +2848,9 @@ void TrainSidebar::adjustIntensity(int value)
         // remember last
         last = ergFile->Points.at(i);
     }
-    ergFile->coalescePoints();
+    if (appsettings->value(nullptr, TRAIN_COALESCE_SECTIONS, false).toBool()) {
+        ergFile->coalesceSections();
+    }
 
     // recalculate metrics
     ergFile->calculateMetrics();

@@ -238,6 +238,7 @@ class TrainOptionsPage : public QWidget
         QSpinBox    *startDelay;
         QCheckBox   *autoHide;
         QCheckBox   *lapAlert;
+        QCheckBox   *coalesce;
 };
 
 class RemotePage : public QWidget

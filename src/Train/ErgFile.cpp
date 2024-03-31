@@ -1597,25 +1597,41 @@ void ErgFile::sortTexts() const
 
 
 void
-ErgFile::coalescePoints
+ErgFile::coalesceSections
 ()
 {
-    CoalescedPoints.clear();
+    if (! hasWatts()) {
+        return;
+    }
+    QList<ErgFilePoint> coalescedPoints;
     double lastVal = -1;
     int repeated = 0;
     for (int i = 0; i < Points.size(); ++i) {
         if (i > 0 && std::abs(lastVal - Points[i].val) < std::numeric_limits<double>::epsilon()) {
             ++repeated;
             if (repeated >= 2) {
-                CoalescedPoints.removeLast();
+                coalescedPoints.removeLast();
+                coalescedSections = true;
             }
         } else {
             repeated = 0;
         }
-        CoalescedPoints << Points[i];
+        coalescedPoints << Points[i];
         lastVal = Points[i].val;
     }
+    if (coalescedSections) {
+        Points = coalescedPoints;
+    }
 }
+
+
+bool
+ErgFile::hasCoalescedSections
+() const
+{
+    return coalescedSections;
+}
+
 
 void ErgFile::finalize()
 {
@@ -1638,7 +1654,11 @@ void ErgFile::finalize()
         Laps.append(lap);
     }
 
-    coalescePoints();
+    if (appsettings->value(nullptr, TRAIN_COALESCE_SECTIONS, false).toBool()) {
+        coalesceSections();
+    } else {
+        coalescedSections = false;
+    }
 
     sortLaps();
     sortTexts();
