@@ -7222,17 +7222,18 @@ AllPlot::eventFilter(QObject *obj, QEvent *event)
         }
     }
 
-     // mouse wheel zoom logic (only in normal mode for now)
-    if (event->type() == QEvent::Wheel && isPlotCanvas(obj) && !window->showStack->isChecked()) {
+     // mouse wheel zoom logic with ctrl modifier
+    if (event->type() == QEvent::Wheel && isPlotCanvas(obj) &&
+        static_cast<QInputEvent*>(event)->modifiers() & Qt::ControlModifier) {
         static ulong lastEvent = 0;
         QWheelEvent* wheelEvent = static_cast<QWheelEvent*>(event);
-        const bool increasingZoom = wheelEvent->delta() > 0;
+        const bool increasingZoom = wheelEvent->angleDelta().y() > 0;
         ulong timeDiff = QDateTime::currentMSecsSinceEpoch() - lastEvent;
         lastEvent = QDateTime::currentMSecsSinceEpoch();
         QxtSpanSlider* slider = window->spanSlider;
 
         QwtPlotCanvas* canvas = static_cast<QwtPlotCanvas*>(obj);
-        float posPercent = wheelEvent->x() / static_cast<float>(canvas->width());
+        float posPercent = wheelEvent->position().x() / static_cast<float>(canvas->width());
         if (timeDiff > 120)
             timeDiff = 120;
         int adjustment = 150 - timeDiff;
