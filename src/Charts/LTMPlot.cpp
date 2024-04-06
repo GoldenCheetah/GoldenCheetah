@@ -1798,10 +1798,14 @@ LTMPlot::setCompareData(LTMSettings *set)
 
             // Create a curve
             QwtPlotCurve *current;
-            if (metricDetail.ignoreZeros) {
-                current = new QwtPlotGappedCurve(cd.name, 1);
+            if (metricDetail.type == METRIC_ESTIMATE || metricDetail.type == METRIC_BANISTER || metricDetail.type == METRIC_D_MEASURE) {
+                current = new QwtPlotGappedCurve(metricDetail.uname, 1);
             } else {
-                current = new QwtPlotCurve(cd.name);
+                if (metricDetail.ignoreZeros) {
+                    current = new QwtPlotGappedCurve(cd.name, 1);
+                } else {
+                    current = new QwtPlotCurve(cd.name);
+                }
             }
 
             if (metricDetail.type == METRIC_BEST)
