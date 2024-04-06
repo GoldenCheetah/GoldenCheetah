@@ -1799,7 +1799,7 @@ LTMPlot::setCompareData(LTMSettings *set)
             // Create a curve
             QwtPlotCurve *current;
             if (metricDetail.type == METRIC_ESTIMATE || metricDetail.type == METRIC_BANISTER || metricDetail.type == METRIC_D_MEASURE) {
-                current = new QwtPlotGappedCurve(metricDetail.uname, 1);
+                current = new QwtPlotGappedCurve(cd.name, 1);
             } else {
                 if (metricDetail.ignoreZeros) {
                     current = new QwtPlotGappedCurve(cd.name, 1);
@@ -3626,8 +3626,6 @@ LTMPlot::createBanisterData(Context *context, LTMSettings *settings, MetricDetai
 
     for (QDate date=settings->start.date(); date <= settings->end.date(); date = date.addDays(1)) {
         bool plotData = true;
-        // past ?
-        bool past = date.daysTo(QDate::currentDate())>0;
 
         // day we are on
         int currentDay = groupForDate(date, settings->groupBy);
