@@ -2157,7 +2157,7 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
     trendType->addItem(tr("Simple Average"));
     trendType->setCurrentIndex(metricDetail->trendtype);
 
-    QLabel *ignoreZerosLbl = new QLabel(tr("Ignore Zeros"));
+    ignoreZerosLbl = new QLabel(tr("Ignore Zeros"));
     ignoreZeros = new QCheckBox("", this);
     ignoreZeros->setChecked(metricDetail->ignoreZeros);
 
@@ -2177,17 +2177,14 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
     grid->addWidget(curveStyle, 5,1);
     grid->addWidget(symbol, 6,0);
     grid->addWidget(curveSymbol, 6,1);
-    QWidget *spacer2 = new QWidget(this);
-    spacer2->setFixedHeight(10);
-    grid->addWidget(spacer2, 7,0);
+    grid->addWidget(ignoreZerosLbl, 7,0);
+    grid->addWidget(ignoreZeros, 7,1);
     grid->addWidget(stackLabel, 8, 0);
     grid->addWidget(stack, 8, 1);
     grid->addWidget(color, 9,0);
     grid->addWidget(curveColor, 9,1);
     grid->addWidget(fill, 10,0);
     grid->addWidget(fillCurve, 10,1);
-    grid->addWidget(ignoreZerosLbl, 11,0);
-    grid->addWidget(ignoreZeros, 11,1);
     grid->addWidget(topN, 4,2);
     grid->addWidget(showBest, 4,3);
     grid->addWidget(bottomN, 5,2);
@@ -2276,6 +2273,8 @@ EditMetricDetailDialog::typeChanged()
         performanceWidget->hide();
         banisterWidget->hide();
         typeStack->setCurrentIndex(0);
+        ignoreZerosLbl->setVisible(true);
+        ignoreZeros->setVisible(true);
     }
 
     if (chooseBest->isChecked()) {
@@ -2288,6 +2287,8 @@ EditMetricDetailDialog::typeChanged()
         performanceWidget->hide();
         banisterWidget->hide();
         typeStack->setCurrentIndex(1);
+        ignoreZerosLbl->setVisible(true);
+        ignoreZeros->setVisible(true);
     }
 
     if (chooseEstimate->isChecked()) {
@@ -2300,6 +2301,8 @@ EditMetricDetailDialog::typeChanged()
         performanceWidget->hide();
         banisterWidget->hide();
         typeStack->setCurrentIndex(2);
+        ignoreZerosLbl->setVisible(false);
+        ignoreZeros->setVisible(false);
     }
 
     if (chooseStress->isChecked()) {
@@ -2312,6 +2315,8 @@ EditMetricDetailDialog::typeChanged()
         performanceWidget->hide();
         banisterWidget->hide();
         typeStack->setCurrentIndex(0);
+        ignoreZerosLbl->setVisible(true);
+        ignoreZeros->setVisible(true);
     }
 
     if (chooseFormula->isChecked()) {
@@ -2324,6 +2329,8 @@ EditMetricDetailDialog::typeChanged()
         performanceWidget->hide();
         banisterWidget->hide();
         typeStack->setCurrentIndex(3);
+        ignoreZerosLbl->setVisible(true);
+        ignoreZeros->setVisible(true);
     }
 
     if (chooseMeasure->isChecked()) {
@@ -2336,6 +2343,8 @@ EditMetricDetailDialog::typeChanged()
         performanceWidget->hide();
         banisterWidget->hide();
         typeStack->setCurrentIndex(4);
+        ignoreZerosLbl->setVisible(false);
+        ignoreZeros->setVisible(false);
     }
 
     if (choosePerformance->isChecked()) {
@@ -2347,6 +2356,8 @@ EditMetricDetailDialog::typeChanged()
         stressWidget->hide();
         banisterWidget->hide();
         typeStack->setCurrentIndex(5);
+        ignoreZerosLbl->setVisible(true);
+        ignoreZeros->setVisible(true);
     }
 
     if (chooseBanister->isChecked()) {
@@ -2359,6 +2370,8 @@ EditMetricDetailDialog::typeChanged()
         performanceWidget->hide();
         banisterWidget->show();
         typeStack->setCurrentIndex(0);
+        ignoreZerosLbl->setVisible(false);
+        ignoreZeros->setVisible(false);
     }
     adjustSize();
 }
