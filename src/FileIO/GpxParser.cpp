@@ -123,7 +123,7 @@ bool
     {
         alt = buffer.toDouble();  // metric
     }
-    else if (qName == "gpxtpx:hr" || qName == "heartrate")
+    else if (qName == "gpxtpx:hr" || qName == "ns3:hr" || qName == "heartrate")
     {
         hr = buffer.toInt();
     }
@@ -131,15 +131,15 @@ bool
     {
         hr = buffer.toDouble(); // on suunto ambit export file, there are sometimes double values
     }
-    else if (qName == "gpxdata:temp" || (qName == "gpxtpx:atemp"))
+    else if (qName == "gpxdata:temp" || qName == "gpxtpx:atemp" || qName == "ns3:atemp")
     {
         temp = buffer.toDouble();
     }
-    else if ((qName == "gpxdata:cadence") || (qName == "gpxtpx:cad") || qName == "cadence")
+    else if (qName == "gpxdata:cadence" || qName == "gpxtpx:cad" || qName == "ns3:cad" || qName == "cadence")
     {
         cad = buffer.toDouble();
     }
-    else if (qName == "power" || qName == "gpxdata:power") // from suunto ambit export file
+    else if (qName == "power" || qName == "gpxdata:power" || qName.endsWith("PowerInWatts")) // from suunto ambit export file and UrbanBiker
     {
         watts = buffer.toDouble();
     }

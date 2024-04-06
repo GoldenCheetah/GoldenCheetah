@@ -56,7 +56,7 @@ class DownloadRideDialog : public QDialog
         void closeClicked();
         void setReadyInstruct();
         void scanCommPorts();
-        void deviceChanged(QString);
+        void deviceChanged();
         void updateStatus(const QString &statusText);
         void updateProgress(const QString &progressText);
 

@@ -19,6 +19,7 @@
 #include "LTMSettings.h"
 #include "MainWindow.h"
 #include "LTMTool.h"
+#include "Colors.h" //dpixfactor
 #include "Context.h"
 #include "LTMChartParser.h"
 #include "Utils.h"
@@ -56,7 +57,7 @@ EditChartDialog::EditChartDialog(Context *context, LTMSettings *settings, QList<
     mainLayout->addLayout(buttonLayout);
 
     // make it wide enough
-    setMinimumWidth(250);
+    setMinimumWidth(250 *dpiXFactor);
 
     // connect up slots
     connect(okButton, SIGNAL(clicked()), this, SLOT(okClicked()));
@@ -183,7 +184,7 @@ QDataStream &operator<<(QDataStream &out, const LTMSettings &settings)
     out<<settings.field2;
     out<<int(-1);
     out<<int(LTM_VERSION_NUMBER); // defined in LTMSettings.h
-    out<<settings.metrics.count();
+    out<<int(settings.metrics.count());
     foreach(MetricDetail metric, settings.metrics) {
         bool discard = false;
         out<<metric.type;
@@ -222,6 +223,7 @@ QDataStream &operator<<(QDataStream &out, const LTMSettings &settings)
         out<<metric.estimateDuration;
         out<<metric.estimateDuration_units;
         out<<metric.wpk;
+        out<<metric.run;
         out<<metric.stressType;
         out<<metric.units;
         out<<metric.formula;
@@ -232,6 +234,7 @@ QDataStream &operator<<(QDataStream &out, const LTMSettings &settings)
         out<<metric.tests;
         out<<metric.perfs;
         out<<metric.submax;
+        out<<metric.perfSymbol;
         out<<metric.ignoreZeros;
     }
     out<<settings.showData;
@@ -342,6 +345,9 @@ while(counter-- && !in.atEnd()) {
         if (version >= 11) {
             in >> m.wpk;
         }
+        if (version >= 20) {
+            in >> m.run;
+        }
         if (version >= 12) {
             in >> m.stressType;
         }
@@ -367,7 +373,8 @@ while(counter-- && !in.atEnd()) {
             in >> m.perfs;
         }
         if (version >= 19) in >> m.submax;
-        if (version >= 20) {
+        if (version >= 21) in >> m.perfSymbol;
+        if (version >= 22) {
             in >> m.ignoreZeros;
         }
 

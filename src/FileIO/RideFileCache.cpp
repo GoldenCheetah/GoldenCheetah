@@ -35,6 +35,18 @@
 
 static const int maxcache = 25; // lets max out at 25 caches
 
+// predefined binsize for the dist arrays
+static const double wattsDelta = 1.0;
+static const double wattsKgDelta = 0.01;
+static const double nmDelta    = 0.1;
+static const double hrDelta    = 1.0;
+static const double kphDelta   = 0.1;
+static const double cadDelta   = 1.0;
+static const double gearDelta  = 0.01; //RideFileCache creates POW(10) * decimals section
+static const double smo2Delta  = 1;
+static const double wbalDelta  = 1;
+
+
 // cache from ride
 RideFileCache::RideFileCache(Context *context, QString fileName, double weight, RideFile *passedride, bool check, bool refresh) :
                incomplete(false), context(context), rideFileName(fileName), ride(passedride)
@@ -303,7 +315,7 @@ static long countForMeanMax(RideFileCacheHeader head, RideFile::SeriesType serie
     return 0;
 }
 
-QVector<float> RideFileCache::meanMaxPowerFor(Context *context, QVector<float> &wpk, QDate from, QDate to, QVector<QDate>*dates, bool wantruns)
+QVector<float> RideFileCache::meanMaxPowerFor(Context *context, QVector<float> &wpk, QDate from, QDate to, QVector<QDate>*dates, QString sport)
 {
     QVector<float> returning;
     QVector<float> returningwpk;
@@ -314,7 +326,7 @@ QVector<float> RideFileCache::meanMaxPowerFor(Context *context, QVector<float> &
 
         if (item->dateTime.date() < from || item->dateTime.date() > to) continue; // not one we want
 
-        if (item->isRun && !wantruns) continue; // they don't want runs
+        if (item->sport != sport) continue; // they don't want these
 
         // get the power data
         if (first == true) {
@@ -364,7 +376,7 @@ QVector<float> RideFileCache::meanMaxPowerFor(Context *context, QVector<float> &
 
 QVector<float> RideFileCache::meanMaxPowerFor(Context *context, QVector<float>&wpk, QString fileName)
 {
-    QTime start;
+    QElapsedTimer start;
     start.start();
 
     QVector<float> returning;
@@ -424,7 +436,7 @@ QVector<float> RideFileCache::meanMaxPowerFor(Context *context, QVector<float>&w
 // API bests for a ride
 QVector<float> RideFileCache::meanMaxFor(QString cacheFilename, RideFile::SeriesType series)
 {
-    QTime start;
+    QElapsedTimer start;
     start.start();
 
     QVector<float> returning;
@@ -473,7 +485,7 @@ QVector<float> RideFileCache::meanMaxFor(QString cacheFilename, RideFile::Series
 // API bests for a date range
 QVector<float> RideFileCache::meanMaxFor(QString cacheDir, RideFile::SeriesType series, QDate from, QDate to)
 {
-    QTime start;
+    QElapsedTimer start;
     start.start();
 
     bool first = true;
@@ -582,7 +594,7 @@ RideFileCache::decimalsFor(RideFile::SeriesType series)
         case RideFile::watts : return 0; break;
         case RideFile::xPower : return 0; break;
         case RideFile::IsoPower : return 0; break;
-        case RideFile::alt : return 1; break;
+        case RideFile::alt : return 6; break;
         case RideFile::lon : return 6; break;
         case RideFile::lat : return 6; break;
         case RideFile::headwind : return 1; break;
@@ -1551,21 +1563,33 @@ RideFileCache::computeDistribution(QVector<float> &array, RideFile::SeriesType s
     if (ride->isDataPresent(needSeries) == false) return;
 
     // get zones that apply, if any
-    int zoneRange = context->athlete->zones(ride->isRun()) ? context->athlete->zones(ride->isRun())->whichRange(ride->startTime().date()) : -1;
-    int hrZoneRange = context->athlete->hrZones(ride->isRun()) ? context->athlete->hrZones(ride->isRun())->whichRange(ride->startTime().date()) : -1;
+    int zoneRange = context->athlete->zones(ride->sport()) ? context->athlete->zones(ride->sport())->whichRange(ride->startTime().date()) : -1;
+    int hrZoneRange = context->athlete->hrZones(ride->sport()) ? context->athlete->hrZones(ride->sport())->whichRange(ride->startTime().date()) : -1;
     int paceZoneRange = context->athlete->paceZones(ride->isSwim()) ? context->athlete->paceZones(ride->isSwim())->whichRange(ride->startTime().date()) : -1;
 
-    if (zoneRange != -1) CP=context->athlete->zones(ride->isRun())->getCP(zoneRange);
-    else CP=0;
+    CP=0;
+    int AeTP=0;
+    if (zoneRange != -1) {
+        CP=context->athlete->zones(ride->sport())->getCP(zoneRange);
+        AeTP=context->athlete->zones(ride->sport())->getAeT(zoneRange);
+    }
 
-    if (zoneRange != -1) WPRIME=context->athlete->zones(ride->isRun())->getWprime(zoneRange);
+    if (zoneRange != -1) WPRIME=context->athlete->zones(ride->sport())->getWprime(zoneRange);
     else WPRIME=0;
 
-    if (hrZoneRange != -1) LTHR=context->athlete->hrZones(ride->isRun())->getLT(hrZoneRange);
-    else LTHR=0;
+    LTHR=0;
+    int AeTHR=0;
+    if (hrZoneRange != -1) {
+        LTHR=context->athlete->hrZones(ride->sport())->getLT(hrZoneRange);
+        AeTHR=context->athlete->hrZones(ride->sport())->getAeT(hrZoneRange);
+    }
 
-    if (paceZoneRange != -1) CV=context->athlete->paceZones(ride->isSwim())->getCV(paceZoneRange);
-    else CV=0;
+    CV=0;
+    double AeTV=0;
+    if (paceZoneRange != -1) {
+        CV=context->athlete->paceZones(ride->isSwim())->getCV(paceZoneRange);
+        AeTV=context->athlete->paceZones(ride->isSwim())->getAeT(paceZoneRange);
+    }
 
     // setup the array based upon the ride
     int decimals = decimalsFor(series); //RideFile::decimalsFor(series) ? 1 : 0;
@@ -1617,15 +1641,15 @@ RideFileCache::computeDistribution(QVector<float> &array, RideFile::SeriesType s
 
             // watts time in zone
             if (series == RideFile::watts && zoneRange != -1) {
-                int index = context->athlete->zones(ride->isRun())->whichZone(zoneRange, dp->value(series));
+                int index = context->athlete->zones(ride->sport())->whichZone(zoneRange, dp->value(series));
                 if (index >=0) wattsTimeInZone[index] += ride->recIntSecs();
             }
 
-            // Polarized zones :- I(<0.85*CP), II (<CP and >0.85*CP), III (>CP)
+            // Polarized zones :- I(<AeTP), II (<CP and >0.85*CP), III (>CP)
             if (series == RideFile::watts && zoneRange != -1 && CP) {
                 if (dp->value(series) < 1) // I zero watts
                     wattsCPTimeInZone[0] += ride->recIntSecs();
-                else if (dp->value(series) < (CP*0.85f)) // I
+                else if (dp->value(series) < AeTP) // I
                     wattsCPTimeInZone[1] += ride->recIntSecs();
                 else if (dp->value(series) < CP) // II
                     wattsCPTimeInZone[2] += ride->recIntSecs();
@@ -1635,15 +1659,15 @@ RideFileCache::computeDistribution(QVector<float> &array, RideFile::SeriesType s
 
             // hr time in zone
             if (series == RideFile::hr && hrZoneRange != -1) {
-                int index = context->athlete->hrZones(ride->isRun())->whichZone(hrZoneRange, dp->value(series));
+                int index = context->athlete->hrZones(ride->sport())->whichZone(hrZoneRange, dp->value(series));
                 if (index >= 0) hrTimeInZone[index] += ride->recIntSecs();
             }
 
-            // Polarized zones :- I(<0.9*LTHR), II (<LTHR and >0.9*LTHR), III (>LTHR)
+            // Polarized zones :- I(<AeTHR), II (<LTHR and >0.9*LTHR), III (>LTHR)
             if (series == RideFile::hr && hrZoneRange != -1 && LTHR) {
                 if (dp->value(series) < 1) // I zero
                     hrCPTimeInZone[0] += ride->recIntSecs();
-                else if (dp->value(series) < (LTHR*0.9f)) // I
+                else if (dp->value(series) < AeTHR) // I
                     hrCPTimeInZone[1] += ride->recIntSecs();
                 else if (dp->value(series) < LTHR) // II
                     hrCPTimeInZone[2] += ride->recIntSecs();
@@ -1657,14 +1681,11 @@ RideFileCache::computeDistribution(QVector<float> &array, RideFile::SeriesType s
                 if (index >= 0) paceTimeInZone[index] += ride->recIntSecs();
             }
 
-            // Polarized zones Run:- I(<0.9*CV), II (<CV and >0.9*CV), III (>CV)
-            // Polarized zones Swim:- I(<0.975*CV), II (<CV and >0.975*CV), III (>CV)
+            // Polarized Pace Zones: I(<AeTV), II (>=AeTV and <CV), III (>=CV)
             if (series == RideFile::kph && paceZoneRange != -1 && CV && (ride->isRun() || ride->isSwim())) {
                 if (dp->value(series) < 0.1) // I zero
                     paceCPTimeInZone[0] += ride->recIntSecs();
-                else if (ride->isRun() && dp->value(series) < (CV*0.9f)) // I for run
-                    paceCPTimeInZone[1] += ride->recIntSecs();
-                else if (ride->isSwim() && dp->value(series) < (CV*0.975f)) // I for swim
+                else if (dp->value(series) < AeTV) // I
                     paceCPTimeInZone[1] += ride->recIntSecs();
                 else if (dp->value(series) < CV) // II
                     paceCPTimeInZone[2] += ride->recIntSecs();
@@ -1786,7 +1807,7 @@ RideFileCache::RideFileCache(Context *context, QDate start, QDate end, bool filt
             if (context->isfiltered && !context->filters.contains(item->fileName)) continue;
             if (onhome && context->ishomefiltered && !context->homeFilters.contains(item->fileName)) continue;
             // skip other sports if rideItem is given
-            if (rideItem && ((rideItem->isRun != item->isRun) || (rideItem->isSwim != item->isSwim))) continue;
+            if (rideItem && (rideItem->sport != item->sport)) continue;
 
             // get its cached values (will NOT! refresh if needed...)
             // the true means it will check only
@@ -2140,7 +2161,7 @@ int RideFileCache::rank(Context *context, RideFile::SeriesType series, int durat
     }
 
     // sort the list
-    qSort(values.begin(), values.end(), qGreater<double>());
+    std::sort(values.begin(), values.end());
 
     // get the ranking and count
     of = values.count();
@@ -2320,6 +2341,69 @@ RideFileCache::getAllBestsFor(Context *context, QList<MetricDetail> metrics, Spe
     return results;
 }
 
+QVector<double>
+RideFileCache::getAllBestsFor(Context *context, RideFile::SeriesType series, int duration, Specification specification)
+{
+    QDate earliest(1900,01,01);
+    QVector<double> results;
+
+    // get a list of rides & iterate over them
+    foreach(RideItem *ride, context->athlete->rideCache->rides()) {
+
+        if (!specification.pass(ride)) continue;
+
+        // get the ride cache name
+
+        // CPX ?
+        QFileInfo rideFileInfo(context->athlete->home->activities().canonicalPath() + "/" + ride->fileName);
+        QString cacheFileName(context->athlete->home->cache().canonicalPath() + "/" + rideFileInfo.baseName() + ".cpx");
+        RideFileCacheHeader head;
+        QFile cacheFile(cacheFileName);
+
+        // open ok ?
+        if (cacheFile.open(QIODevice::ReadOnly | QIODevice::Unbuffered) == false) continue;
+
+        // get header
+        QDataStream inFile(&cacheFile);
+        inFile.readRawData((char *) &head, sizeof(head));
+
+        // out of date - just skip
+        if (head.version != RideFileCacheVersion) {
+            cacheFile.close();
+            continue;
+        }
+
+        if (series == RideFile::none) {
+
+            double date= earliest.daysTo(ride->dateTime.date());
+            results << date;
+
+        } else {
+
+            float value = 0.0;
+            if (duration <= countForMeanMax(head, series)) {
+
+                // get the values and place into the summarymetric map
+                long offset = offsetForMeanMax(head, series) + sizeof(head) + (sizeof(float) * duration);
+
+                cacheFile.seek(qint64(offset));
+                inFile.readRawData((char*)&value, sizeof(float));
+                double divisor = pow(10, decimalsFor(series));
+                value = value / divisor;
+
+            }
+            results << double(value);
+
+        }
+
+        // close CPX file
+        cacheFile.close();
+    }
+
+    // all done, return results
+    return results;
+}
+
 static
 const RideMetric *metricForSymbol(QString symbol)
 {
@@ -2351,4 +2435,23 @@ RideFileCache::bestTime(double km)
            double(kphMeanMax[secs] * secs) / divisor < km) secs++;
     if (secs < kphMeanMax.count()) return secs;
     return RideFile::NIL;
+}
+
+
+double
+RideFileCache::binsize(RideFile::SeriesType type)
+{
+
+    switch(type) {
+    default:
+    case RideFile::watts: return wattsDelta;
+    case RideFile::wattsKg: return wattsKgDelta;
+    case RideFile::nm: return nmDelta;
+    case RideFile::hr: return hrDelta;
+    case RideFile::kph: return kphDelta;
+    case RideFile::cad: return cadDelta;
+    case RideFile::gear: return gearDelta;
+    case RideFile::smo2: return smo2Delta;
+    case RideFile::wbal: return wbalDelta;
+    }
 }

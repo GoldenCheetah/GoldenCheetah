@@ -36,7 +36,6 @@
 #include <qwt_plot_marker.h>
 #include <qwt_plot_spectrocurve.h>
 #include <qwt_point_3d.h>
-#include <qwt_compat.h>
 
 #include <QtGui>
 #include <QMessageBox>
@@ -66,6 +65,7 @@ class CPPlot : public QwtPlot
         void setRide(RideItem *rideItem);
         void setDateRange(const QDate &start, const QDate &end, bool stale=false);
         void setShowPercent(bool x);
+        void setShowPowerIndex(bool x);
         void setShowTest(bool x);
         void setShowBest(bool x);
         void setFilterBest(bool x);
@@ -79,7 +79,7 @@ class CPPlot : public QwtPlot
         void setVeloCP(int x) { veloCP = x; }
         void setDateCP(int x) { dateCP = x; }
         void setDateCV(double x) { dateCV = x; }
-        void setSport(bool run, bool swim) { isRun = run; isSwim = swim; }
+        void setSport(QString s) { sport = s; }
         void setSeries(CriticalPowerWindow::CriticalSeriesType);
         void setPlotType(int index);
         void showXAxisLinear(bool x);
@@ -111,6 +111,7 @@ class CPPlot : public QwtPlot
         void pointHover(QwtPlotCurve *curve, int index);
 
         // filter being applied
+        void perspectiveFilterChanged();
         void clearFilter();
         void setFilter(QStringList);
 
@@ -161,7 +162,7 @@ class CPPlot : public QwtPlot
         int veloCP;
         int dateCP;
         double dateCV;
-        bool isRun, isSwim;
+        QString sport;
         QTime lastupdate;
 
         // settings
@@ -175,6 +176,7 @@ class CPPlot : public QwtPlot
         bool showTest;
         bool showBest;
         bool filterBest;
+        bool showPowerIndex;
         bool showPercent;
         bool showHeat;
         bool showEffort;

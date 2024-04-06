@@ -32,12 +32,11 @@
 #include "ImagicController.h"
 #endif
 #include "ComputrainerController.h"
-#if QT_VERSION >= 0x050000
 #include "MonarkController.h"
 #include "KettlerController.h"
 #include "KettlerRacerController.h"
+#include "ErgofitController.h"
 #include "DaumController.h"
-#endif
 #include "ANTlocalController.h"
 #include "ANTChannel.h"
 #include "NullController.h"
@@ -49,6 +48,8 @@
 #include <QProgressBar>
 #include <QFileDialog>
 #include <QCommandLinkButton>
+#include <QScrollArea>
+#include <QtCharts>
 
 class DeviceScanner;
 
@@ -74,6 +75,13 @@ public:
 
     DeviceScanner *scanner;
 
+    // Device Data
+    int    virtualPowerIndex;   // index of selected virtual power function
+    QString virtualPowerName;   // name of selected virtual power curve
+    int    wheelSize;
+    int    strideLength;
+    double inertialMomentKGM2;  // inertial moment of trainer in (KG M^2)
+
 public slots:
 
 signals:
@@ -97,6 +105,7 @@ class AddType : public QWizardPage
         void clicked(QString);
 
     private:
+        QScrollArea *scrollarea;
         AddDeviceWizard *wizard;
         QSignalMapper *mapper;
         QLabel *label;
@@ -214,24 +223,69 @@ class AddPairBTLE : public QWizardPage
         bool validatePage();
         void cleanupPage();
 
-    public slots:
+    private slots:
+        void scanFinished(bool foundDevices);
 
-        void getChannelValues();
-        // we found a device on a channel
-        void channelInfo(int channel, int device_number, int device_id);
-        // we failed to find a device on the channel
-        void searchTimeout(int channel);
-
-        // user interactions
-        void sensorChanged(int channel); // sensor selection changed
     private:
         AddDeviceWizard *wizard;
         QTreeWidget *channelWidget;
-        QSignalMapper *signalMapper;
-        QTimer updateValues;
-        QString cyclist;
+        QProgressBar *bar;
 
+        static const int NameRole = Qt::UserRole + 1;
+        static const int AddressRole = Qt::UserRole + 2;
+        static const int UuidRole = Qt::UserRole + 3;
 };
+
+class AddVirtualPower : public QWizardPage
+{
+    Q_OBJECT
+
+public:
+    AddVirtualPower(AddDeviceWizard*);
+    void initializePage();
+    bool validatePage();
+
+private:
+    AddDeviceWizard* wizard;
+    RealtimeController* controller; // copy of controller, for lazy re-init
+
+    QLineEdit*      name;
+    QComboBox*      virtualPower;
+    QComboBox*      rimSizeCombo;
+    QComboBox*      tireSizeCombo;
+    QLineEdit*      wheelSizeEdit;
+    QLineEdit*      stridelengthEdit;
+    QDoubleSpinBox* inertialMomentKGM2Edit;
+
+    QLabel*         virtualPowerNameLabel;
+    QLineEdit*      virtualPowerNameEdit;
+    QPushButton*    virtualPowerCreateButton;
+
+    QTableWidget*   virtualPowerTableWidget;
+    QChart*         virtualPowerScatterChart;
+    QChartView*     virtualPowerScatterChartView;
+
+    QLabel*         fitOrderSpinBoxLabel;
+    QSpinBox*       fitOrderSpinBox;
+    QLabel*         fitEpsilonSpinBoxLabel;
+    QDoubleSpinBox* fitEpsilonSpinBox;
+    QLabel*         fitStdDevLabel;
+    QLabel*         fitOrderLabel;
+
+    void drawConfig();
+
+private slots:
+    void calcWheelSize();
+    void resetWheelSize();
+    void myCellChanged(int row, int col);
+    void mySpinBoxChanged(int i);
+    void myDoubleSpinBoxChanged(double d);
+    void mySortTable(int i);
+    void mySetTableFromComboBox(int i);
+    void virtualPowerNameChanged();
+    void myCreateCustomPowerCurve();
+};
+
 
 class AddFinal : public QWizardPage
 {
@@ -247,20 +301,9 @@ class AddFinal : public QWizardPage
         AddDeviceWizard *wizard;
 
         QLineEdit *name;
-        QComboBox *virtualPower;
-        QComboBox *rimSizeCombo;
-        QComboBox *tireSizeCombo;
-        QLineEdit *wheelSizeEdit;
-        QLineEdit *stridelengthEdit;
         QLineEdit *port;
         QLineEdit *profile;
-        QGroupBox *selectDefault;
-        QCheckBox *defWatts, *defBPM, *defKPH, *defRPM;
-
-    private slots:
-        void calcWheelSize();
-        void resetWheelSize();
-
+        QLineEdit *virtualPowerName;
 };
 
 class DeviceScanner : public QThread

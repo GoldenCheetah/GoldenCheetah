@@ -1,0 +1,106 @@
+===============================
+Fast K-means Clustering Toolkit
+===============================
+
+----------------------
+Version 0.1 (Sat May 17 17:41:11 CDT 2014)
+    - Initial release.
+
+----------------------
+WHAT:
+This software is a testbed for comparing variants of Lloyd's k-means clustering
+algorithm.  It includes implementations of several algorithms that accelerate
+the algorithm by avoiding unnecessary distance calculations.
+
+----------------------
+WHO:
+Greg Hamerly (hamerly@cs.baylor.edu, primary contact) and Jonathan Drake
+(drakej@hp.com).
+
+----------------------
+HOW TO BUILD THE SOFTWARE:
+type "make" (and hope for the best)
+
+----------------------
+HOW TO RUN THE SOFTWARE:
+The driver is designed to take commands from standard input, usually a file
+that's been redirected as input:
+
+    ./kmeans < commands.txt
+
+You can read the source to find all the possible commands, but here is a
+summary:
+    - threads T -- use T threads for clustering
+    - maxiterations I -- use at most I iterations; default (or negative)
+      indicates an unlimited number
+    - dataset D -- use the given path name to a file as the dataset for
+      clustering. The dataset should have a first line with the number of points
+      n and dimension d. The next (nd) tokens are taken as the n vectors
+      to cluster.
+    - initialize k {kpp|random} -- use the given method (k-means++ or a random
+      sample of the points) to initialize k centers
+    - lloyd, hamerly, annulus, elkan, compare, sort, heap, adaptive -- perform
+      k-means clustering with the given algorithm (requires first having
+      initialized the centers). The adaptive algorithm is Drake's algorithm with
+      a heuristic for choosing an initial B
+    - drake B -- use Drake's algorithm with B lower bounds
+    - kernel [gaussian T | linear | polynomial P] -- use kernelized k-means with
+      the given kernel
+    - elkan_kernel [gaussian T | linear | polynomial P] -- use kernelized
+      k-means with the given kernel, and Elkan's accelerations
+    - center -- give the previously-loaded dataset a mean of 0.
+    - quit -- quit the program
+
+Note that when a set of centers is initialized, that same set of centers is used
+from then on (until a new initialization occurs). So running a clustering
+algorithm multiple times will use the same initialization each time.
+
+Here is an example of a simple set of commands:
+
+    dataset smallDataset.txt
+    initialize 10 kpp
+
+    annulus
+    hamerly
+    adaptive
+    heap
+    elkan
+    sort
+    compare
+
+
+----------------------
+CAVEATS:
+- This software has been developed and tested on Linux. Other platforms may not
+  work. Please let us know if you have difficulties, and if possible fixes for
+  the code.
+
+- This software uses a non-standard pthreads function called
+  pthread_barrier_wait(), which is implemented on Linux but not on OSX.
+  Therefore, multithreading doesn't currently work on OSX.  To turn it off,
+  comment out the lines in the Makefile that say:
+
+    CPPFLAGS += -DUSE_THREADS
+    LDFLAGS += -lpthread
+
+
+----------------------
+REFERENCES:
+
+Phillips, Steven J. "Acceleration of k-means and related clustering algorithms."
+In Algorithm Engineering and Experiments, pp. 166-177. Springer Berlin
+Heidelberg, 2002.
+
+Elkan, Charles. "Using the triangle inequality to accelerate k-means." In ICML,
+vol. 3, pp. 147-153. 2003.
+
+Hamerly, Greg. "Making k-means Even Faster." In SDM, pp. 130-140. 2010.
+
+Drake, Jonathan, and Greg Hamerly. "Accelerated k-means with adaptive distance
+bounds." In 5th NIPS Workshop on Optimization for Machine Learning. 2012.
+
+Drake, Jonathan. "Faster k-means clustering." MS thesis, 2013.
+
+Hamerly, Greg, and Jonathan Drake. "Accelerating Lloyd's algorithm for k-means
+clustering." To appear in Partitional Clustering Algorithms, Springer, 2014.
+

@@ -22,11 +22,11 @@
 #include "Athlete.h"
 #include "RideCache.h"
 #include "Secrets.h"
-#include "BodyMeasures.h"
+#include "Measures.h"
 #include <QMessageBox>
 
 #ifndef WITHINGS_DEBUG
-#define WITHINGS_DEBUG true
+#define WITHINGS_DEBUG false
 #endif
 #ifdef Q_CC_MSVC
 #define printd(fmt, ...) do {                                                \
@@ -55,7 +55,7 @@ WithingsDownload::WithingsDownload(Context *context) : context(context)
 }
 
 bool
-WithingsDownload::getBodyMeasures(QString &error, QDateTime from, QDateTime to, QList<BodyMeasure> &data)
+WithingsDownload::getBodyMeasures(QString &error, QDateTime from, QDateTime to, QList<Measure> &data)
 {
     response = "";
 
@@ -81,20 +81,17 @@ WithingsDownload::getBodyMeasures(QString &error, QDateTime from, QDateTime to, 
     if(!strNokiaRefreshToken.isEmpty()) {
         printd("OAuth 2.0 API\n");
 
-#if QT_VERSION > 0x050000
         QUrlQuery postData;
-#else
-        QUrl postData;
-#endif
 
         QString refresh_token = appsettings->cvalue(context->athlete->cyclist, GC_NOKIA_REFRESH_TOKEN).toString();
 
+        postData.addQueryItem("action", "requesttoken");
         postData.addQueryItem("grant_type", "refresh_token");
         postData.addQueryItem("client_id", GC_NOKIA_CLIENT_ID );
         postData.addQueryItem("client_secret", GC_NOKIA_CLIENT_SECRET );
         postData.addQueryItem("refresh_token", refresh_token );
 
-        QUrl url = QUrl( "https://account.withings.com/oauth2/token" );
+        QUrl url = QUrl( "https://wbsapi.withings.net/v2/oauth2" );
 
         emit downloadStarted(100);
 
@@ -114,9 +111,9 @@ WithingsDownload::getBodyMeasures(QString &error, QDateTime from, QDateTime to, 
                 QJsonParseError parseResult;
                 QJsonDocument migrateJson = QJsonDocument::fromJson(response.toUtf8(), &parseResult);
 
-                access_token = migrateJson.object()["access_token"].toString();
-                QString refresh_token = migrateJson.object()["refresh_token"].toString();
-                QString userid = QString("%1").arg(migrateJson.object()["userid"].toInt());
+                access_token = migrateJson.object()["body"].toObject()["access_token"].toString();
+                QString refresh_token = migrateJson.object()["body"].toObject()["refresh_token"].toString();
+                QString userid = QString("%1").arg(migrateJson.object()["body"].toObject()["userid"].toInt());
 
 
                 if (access_token != "") appsettings->setCValue(context->athlete->cyclist, GC_NOKIA_TOKEN, access_token);
@@ -124,11 +121,7 @@ WithingsDownload::getBodyMeasures(QString &error, QDateTime from, QDateTime to, 
                 if (userid != "") appsettings->setCValue(context->athlete->cyclist, GC_WIUSER, userid);
 
 
-            #if QT_VERSION > 0x050000
                 QUrlQuery params;
-            #else
-                QUrl params;
-            #endif
 
                 emit downloadStarted(100);
 
@@ -139,7 +132,7 @@ WithingsDownload::getBodyMeasures(QString &error, QDateTime from, QDateTime to, 
                 params.addQueryItem("enddate", QString::number(to.toMSecsSinceEpoch()/1000));
 
 
-                QUrl url = QUrl( "https://api.health.nokia.com/measure?" + params.toString() );
+                QUrl url = QUrl( "https://wbsapi.withings.net/measure?" + params.toString() );
 
                 printd("URL: %s\n", url.url().toStdString().c_str());
 
@@ -186,7 +179,7 @@ WithingsDownload::getBodyMeasures(QString &error, QDateTime from, QDateTime to, 
 
 
 QJsonParseError
-WithingsDownload::parse(QString text, QList<BodyMeasure> &bodyMeasures)
+WithingsDownload::parse(QString text, QList<Measure> &bodyMeasures)
 {
 
     QJsonParseError parseResult;
@@ -199,16 +192,18 @@ WithingsDownload::parse(QString text, QList<BodyMeasure> &bodyMeasures)
 
     // convert from Withings to general format
     foreach(WithingsReading r, readings) {
-        BodyMeasure w;
+        Measure w;
         // we just take
         if (r.weightkg > 0 && r.when.isValid()) {
             w.when =  r.when;
             w.comment = r.comment;
-            w.weightkg = r.weightkg;
-            w.fatkg = r.fatkg;
-            w.leankg = r.leankg;
-            w.fatpercent = r.fatpercent;
-            w.source = BodyMeasure::Withings;
+            w.values[Measure::WeightKg] = r.weightkg;
+            w.values[Measure::FatKg] = r.fatkg;
+            w.values[Measure::LeanKg] = r.leankg;
+            w.values[Measure::FatPercent] = r.fatpercent;
+            w.values[Measure::MuscleKg] = r.musclekg;
+            w.values[Measure::BonesKg] = r.boneskg;
+            w.source = Measure::Withings;
             bodyMeasures.append(w);
         }
     }
@@ -241,7 +236,7 @@ WithingsDownload::jsonDocumentToWithingsReading(QJsonDocument doc) {
         thisReading.groupId = grpid;
         thisReading.attribution = attrib;
         thisReading.category = category;
-        thisReading.when.setTime_t(date);
+        thisReading.when.setSecsSinceEpoch(date);
         thisReading.comment = comment;
 
         //Iterate the individual measurements in each group to create a WithingsReading object
@@ -259,6 +254,8 @@ WithingsDownload::jsonDocumentToWithingsReading(QJsonDocument doc) {
                 case 5 : thisReading.leankg = value; break;
                 case 6 : thisReading.fatpercent = value; break;
                 case 8 : thisReading.fatkg = value; break;
+                case 76: thisReading.musclekg = value; break;
+                case 88: thisReading.boneskg = value; break;
                 default: break;
             }
         }

@@ -31,6 +31,7 @@ class UserMetricParser : public QXmlDefaultHandler
 
 public:
     static void serialize(QString, QList<UserMetricSettings>);
+    static void serializeToQTextStream(QTextStream&, QList<UserMetricSettings>);
     QList<UserMetricSettings> &getSettings() { return settings; }
 
     // unmarshall

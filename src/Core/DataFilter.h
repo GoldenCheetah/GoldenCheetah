@@ -29,6 +29,9 @@
 #include <QTextDocument>
 #include "RideCache.h"
 #include "RideFile.h" //for SeriesType
+#include "Utils.h" //for SeriesType
+
+#include <gsl/gsl_randist.h>
 
 class Context;
 class RideItem;
@@ -41,15 +44,71 @@ class Result {
     public:
 
         // construct a result
-        Result (double value) : isNumber(true), string(""), number(value) {}
-        Result (QString value) : isNumber(false), string(value), number(0.0f) {}
-        Result () : isNumber(true), string(""), number(0) {}
+        Result (double value) : isNumber(true), string_(""), number_(value) {}
+        Result (QVector<double>x) : isNumber(true), string_(""), number_(0), vector(x) { foreach(double n, x) number_ += n; }
+        Result (QString value) : isNumber(false), string_(value), number_(0.0f) {}
+#if QT_VERSION < 0x060000
+        Result (QVector<QString> &list) : isNumber(false), string_(""), number_(0.0f), strings(list) {}
+#endif
+        Result (QStringList &list) : isNumber(false), string_(""), number_(0.0f) { foreach (QString string, list) strings<<string; }
+        Result () : isNumber(true), string_(""), number_(0) {}
+
+        // vectorize, turn into vector of size n
+        void vectorize(int size);
 
         // we can't use QString with union
         bool isNumber;           // if true, value is numeric
-        QString string;
-        double number;
+        bool isVector() const { return vector.count() > 0 || strings.count() > 0; }
+
+        // return as number or string, coerce if needed
+        double &number() {
+            if (!isNumber) {
+                if (!isVector()) number_ = string_.toDouble();
+                else asNumeric(); // this will coerce and crucially compute sum
+            }
+            return number_;
+        }
+
+        QString &string() { if (isNumber) string_ = Utils::removeDP("%1").arg(number_);
+                            else if (strings.count() == 1) string_ = strings.at(0); // when vector is only 1 entry
+                            return string_; }
+
+        // coerce strings to numbers
+        QVector<double>&asNumeric() {
+            if (!isNumber) {
+                if (strings.count() == vector.count()) return vector;
+                else {
+                    vector.clear();
+                    number_=0;
+                    for(int i=0; i<strings.count(); i++) {
+                        double v = strings.at(i).toDouble();
+                        vector << v;
+                        number_ += v;
+                    }
+                }
+            }
+            return vector;
+        }
+
+        // coerce numbers to strings
+        QVector<QString> &asString() {
+            if (isNumber) {
+                if (strings.count() == vector.count()) return strings;
+                else {
+                    strings.clear();
+                    for(int i=0; i<vector.count(); i++)  strings << Utils::removeDP(QString("%1").arg(vector.at(i)));
+                }
+            }
+            return strings;
+        }
+
+    private:
+
+        QString string_;
+        double number_;
         QVector<double> vector;
+        QVector<QString> strings;
+
 };
 
 class DataFilterRuntime;
@@ -58,7 +117,7 @@ class Leaf {
 
     public:
 
-        Leaf(int loc, int leng) : type(none),op(0),series(NULL),dynamic(false),loc(loc),leng(leng),inerror(false) { }
+        Leaf(int loc, int leng) : type(none),lvalue(),rvalue(),cond(),op(0),series(NULL),dynamic(false),loc(loc),leng(leng),inerror(false) { }
 
         // evaluate against a RideItem using its context
         //
@@ -70,7 +129,7 @@ class Leaf {
         // User Metric - using symbols from QHash<..> (RideItem + Interval) and
         // Spec to delimit samples in R/Python Scripts
         //
-        Result eval(DataFilterRuntime *df, Leaf *, float x, RideItem *m, RideFilePoint *p = NULL, const QHash<QString,RideMetric*> *metrics=NULL, Specification spec=Specification());
+        Result eval(DataFilterRuntime *df, Leaf *, const Result &x, long it, RideItem *m, RideFilePoint *p = NULL, const QHash<QString,RideMetric*> *metrics=NULL, const Specification &spec=Specification(), const  DateRange &d=DateRange());
 
         // tree traversal etc
         void print(int level, DataFilterRuntime*);  // print leaf and all children
@@ -78,16 +137,18 @@ class Leaf {
         bool isDynamic(Leaf *);
         void validateFilter(Context *context, DataFilterRuntime *, Leaf*); // validate
         bool isNumber(DataFilterRuntime *df, Leaf *leaf);
+        void findSymbols(QStringList &symbols); // when working with formulas
         void clear(Leaf*);
         QString toString(); // return as string
         QString signature() { return toString(); }
 
         enum { none, Float, Integer, String, Symbol, 
                Logical, Operation, BinaryOperation, UnaryOperation,
-               Function, Conditional, Vector, Index,
+               Function, Conditional, Index, Select,
                Compound, Script } type;
 
         union value {
+            value() { l = NULL; };
             float f;
             int i;
             QString *s;
@@ -108,6 +169,8 @@ class Leaf {
         RideFile::XDataJoin xjoin; // how to join xdata with main
 };
 
+class UserChart;
+class GenericAnnotationInfo;
 class DataFilterRuntime {
 
     // allocated for each thread to avoid race
@@ -117,10 +180,14 @@ class DataFilterRuntime {
 public:
 
     // stack count (to stop recursion 'hanging'
-    int stack;
+    int stack = 0;
 
     // needs to be reapplied as the ride selection changes
     bool isdynamic;
+
+    // the user chart if were used for that
+    // enables use of cache() command
+    UserChart *chart;
 
     // Lookup tables
     QMap<QString,QString> lookupMap;
@@ -145,6 +212,7 @@ public:
     double runPythonScript(Context *context, QString script, RideItem *m, const QHash<QString,RideMetric*> *metrics, Specification spec);
 #endif
 
+    DataFilter *owner;
 };
 
 class DataFilter : public QObject
@@ -154,9 +222,14 @@ class DataFilter : public QObject
     public:
         DataFilter(QObject *parent, Context *context);
         DataFilter(QObject *parent, Context *context, QString formula);
+        ~DataFilter() { clearFilter(); }
 
         // runtime passed by datafilter
         DataFilterRuntime rt;
+        QObject *parent() { return parent_; }
+
+        // compile time errors
+        QStringList &errorList() { return errors; }
 
         // get a signature for a datafilter
         static QString fingerprint(QString &query);
@@ -166,12 +239,18 @@ class DataFilter : public QObject
         QString signature() { return sig; }
         Leaf *root() { return treeRoot; }
 
+        // for random number generation
+        const gsl_rng_type *T;
+        gsl_rng *r;
+
         // RideItem always available and supplies th context
         Result evaluate(RideItem *rideItem, RideFilePoint *p);
+        Result evaluate(DateRange dr, QString filter="");
+        Result evaluate(Specification spec, DateRange dr);
         QStringList getErrors() { return errors; };
         void colorSyntax(QTextDocument *content, int pos);
 
-        static QStringList builtins(); // return list of functions supported
+        static QStringList builtins(Context *); // return list of functions supported
 
         int refcount; // used by user metrics
 
@@ -187,9 +266,9 @@ class DataFilter : public QObject
     signals:
         void parseGood();
         void parseBad(QStringList erorrs);
-
         void results(QStringList);
 
+        void annotate(GenericAnnotationInfo&);
 
     private:
         void setSignature(QString &query);
@@ -200,8 +279,64 @@ class DataFilter : public QObject
         QStringList filenames;
         QStringList *list;
         QString sig;
+
+        QObject *parent_;
 };
 
+// general purpose model fitting to x/y data
+class DFModel : public PDModel
+{
+    Q_OBJECT
+
+    public:
+        DFModel(RideItem *item, Leaf *formula, DataFilterRuntime *df);
+
+        // we override locally because we are more general
+        // purpose and also, always use lmfit
+        // we don't fit in to the usual PDModel framework
+        // so just do our own thing mostly.
+        bool fitData(QVector<double>&x, QVector<double>&y);
+
+        // synthetic data for a curve
+        virtual double y(double t) const;
+
+        //  number of parameters (not including t)
+        int nparms() { return parameters.count(); }
+
+        // passed value t and candidate parameters
+        // must unpack into df symbols and calulate a result
+        // used during the fitting process
+        double f(double t, const double *parms);
+
+        // managing the formula and parameters
+        RideItem *item;
+        Leaf *formula;          // the actual formula
+        DataFilterRuntime *df;  // runtime with symbols and values
+        QStringList parameters; // parameter names and position
+
+        // basically everything else below here is
+        // ignored for the most part
+        bool setParms(double *) {  return true;}
+
+        // model methods for CP chart are irrelevant
+        // but we need to set them anyway
+        bool hasWPrime() { return false; }  // can estimate W'
+        bool hasCP()     { return false; }  // can CP
+        bool hasFTP()    { return false; }  // can estimate FTP
+        bool hasPMax()   { return false; }  // can estimate p-Max
+
+        QString name()   { return "Datafilter General Purpose Model"; }
+        QString code()   { return "DF Model"; }        // short name used in metric names e.g. 2P model
+
+        void saveParameters(QList<double>&) {}
+        void loadParameters(QList<double>&) {}
+
+    public slots:
+
+        // we are only used in data filter expressions
+        void onDataChanged() {}
+        void onIntervalsChanged() {}
+};
 extern int DataFilterdebug;
 
 // some constants we provide to help accessed via const(name)

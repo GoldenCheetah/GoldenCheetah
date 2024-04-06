@@ -30,3 +30,4 @@ otool -L ./GoldenCheetah.app/Contents/MacOS/GoldenCheetah
 echo "MOVE TO DESKTOP"
 mkdir ~/Desktop/GoldenCheetah
 mv GoldenCheetah.app ~/Desktop/GoldenCheetah
+hdiutil create -fs JHFS+ ~/Desktop/GoldenCheeetah.dmg -srcfolder ~/Desktop/GoldenCheetah -ov -format UDBZ

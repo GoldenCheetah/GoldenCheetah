@@ -21,7 +21,7 @@
 #include "Context.h"
 #include "Context.h"
 #include "Athlete.h"
-#include "TabView.h"
+#include "AbstractView.h"
 #include "AllPlotInterval.h"
 #include "AllPlotWindow.h"
 #include "AllPlot.h"
@@ -249,9 +249,13 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     showFull->setCheckState(Qt::Checked);
     guiControls->addRow(new QLabel(""), showFull);
 
-    showInterval = new QCheckBox(tr("Interval Navigator"), this);
-    showInterval->setCheckState(Qt::Checked);
-    guiControls->addRow(new QLabel(""), showInterval);
+    showIntervalMarkers = new QCheckBox(tr("Show Interval Markers"), this);
+    showIntervalMarkers->setCheckState(Qt::Checked);
+    guiControls->addRow(new QLabel(""), showIntervalMarkers);
+
+    showIntervalNavigator = new QCheckBox(tr("Interval Navigator"), this);
+    showIntervalNavigator->setCheckState(Qt::Checked);
+    guiControls->addRow(new QLabel(""), showIntervalNavigator);
 
     showHover = new QCheckBox(tr("Hover intervals"), this);
     showHover->setCheckState(Qt::Checked);
@@ -314,7 +318,6 @@ AllPlotWindow::AllPlotWindow(Context *context) :
 
     // running !
     seriesRight->addRow(new QLabel(""), new QLabel(""));
-    seriesRight->addRow(new QLabel(""), new QLabel(""));
 
     showRV = new QCheckBox(tr("Vertical Oscillation"), this);
     showRV->setCheckState(Qt::Checked);
@@ -352,10 +355,6 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     showHr = new QCheckBox(tr("Heart Rate"), this);
     showHr->setCheckState(Qt::Checked);
     seriesLeft->addRow(new QLabel(tr("Data series")), showHr);
-
-    showHRV= new QCheckBox(tr("R-R Rate"), this);
-    showHRV->setCheckState(Qt::Unchecked);
-    seriesLeft->addRow(new QLabel(), showHRV);
 
     showTcore = new QCheckBox(tr("Core Temperature"), this);
     showTcore->setCheckState(Qt::Unchecked); // don't show unless user insists
@@ -460,14 +459,13 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     mainControls->addRow(smoothLabel, smoothLayout);
 
     QPalette palette;
-    palette.setBrush(QPalette::Background, QBrush(GColor(CRIDEPLOTBACKGROUND)));
+    palette.setBrush(QPalette::Window, QBrush(GColor(CRIDEPLOTBACKGROUND)));
 
     allPlot = new AllPlot(this, this, context);
     allPlot->setContentsMargins(0,0,0,0);
-    allPlot->enableAxis(QwtPlot::xBottom, true);
-    allPlot->setAxisVisible(QwtPlot::xBottom, true);
+    allPlot->setAxisVisible(QwtAxis::XBottom, true);
     //allPlot->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    //allPlot->axisWidget(QwtPlot::yLeft)->installEventFilter(this);
+    //allPlot->axisWidget(QwtAxis::YLeft)->installEventFilter(this);
 
     allStack = new QStackedWidget(this);
     allStack->addWidget(allPlot);
@@ -501,12 +499,12 @@ AllPlotWindow::AllPlotWindow(Context *context) :
                                Qt::RightButton);
 
     allPanner = new QwtPlotPanner(allPlot->canvas());
-    allPanner->setMouseButton(Qt::MidButton);
+    allPanner->setMouseButton(Qt::MiddleButton);
 
     // TODO: zoomer doesn't interact well with automatic axis resizing
 
     // tooltip on hover over point
-    allPlot->tooltip = new LTMToolTip(QwtPlot::xBottom, QwtAxisId(QwtAxis::yLeft, 2).id,
+    allPlot->tooltip = new LTMToolTip(QwtAxis::XBottom, QwtAxisId(QwtAxis::YLeft, 2).id,
                                QwtPicker::VLineRubberBand,
                                QwtPicker::AlwaysOn,
                                allPlot->canvas(),
@@ -655,11 +653,7 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     // BUG in QMacStyle and painting of spanSlider
     // so we use a plain style to avoid it, but only
     // on a MAC, since win and linux are fine
-#if QT_VERSION > 0x5000
     QStyle *style = QStyleFactory::create("fusion");
-#else
-    QStyle *style = QStyleFactory::create("Cleanlooks");
-#endif
     spanSlider->setStyle(style);
     scrollLeft->setStyle(style);
     scrollRight->setStyle(style);
@@ -687,7 +681,7 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     connect(allPlot, SIGNAL(resized()), this, SLOT(allPlotResized()));
 
     // tooltip on hover over point
-    /*intervalPlot->tooltip = new LTMToolTip(QwtPlot::xBottom, QwtAxis::yLeft,
+    /*intervalPlot->tooltip = new LTMToolTip(QwtAxis::XBottom, QwtAxis::YLeft,
                                QwtPicker::VLineRubberBand,
                                QwtPicker::AlwaysOn,
                                intervalPlot->canvas(),
@@ -759,7 +753,6 @@ AllPlotWindow::AllPlotWindow(Context *context) :
     connect(showCad, SIGNAL(stateChanged(int)), this, SLOT(setShowCad(int)));
     connect(showTorque, SIGNAL(stateChanged(int)), this, SLOT(setShowTorque(int)));
     connect(showHr, SIGNAL(stateChanged(int)), this, SLOT(setShowHr(int)));
-    connect(showHRV, SIGNAL(stateChanged(int)), this, SLOT(setShowHRV(int)));
     connect(showTcore, SIGNAL(stateChanged(int)), this, SLOT(setShowTcore(int)));
     connect(showPowerD, SIGNAL(stateChanged(int)), this, SLOT(setShowPowerD(int)));
     connect(showCadD, SIGNAL(stateChanged(int)), this, SLOT(setShowCadD(int)));
@@ -795,7 +788,8 @@ AllPlotWindow::AllPlotWindow(Context *context) :
 
     connect(showGrid, SIGNAL(stateChanged(int)), this, SLOT(setShowGrid(int)));
     connect(showFull, SIGNAL(stateChanged(int)), this, SLOT(setShowFull(int)));
-    connect(showInterval, SIGNAL(stateChanged(int)), this, SLOT(setShowInterval(int)));
+    connect(showIntervalNavigator, SIGNAL(stateChanged(int)), this, SLOT(setShowIntervalNavigator(int)));
+    connect(showIntervalMarkers, SIGNAL(stateChanged(int)), this, SLOT(setShowIntervalMarkers(int)));
     connect(showHelp, SIGNAL(stateChanged(int)), this, SLOT(setShowHelp(int)));
     connect(showStack, SIGNAL(stateChanged(int)), this, SLOT(showStackChanged(int)));
     connect(rStack, SIGNAL(stateChanged(int)), this, SLOT(showStackChanged(int)));
@@ -851,16 +845,16 @@ AllPlotWindow::configChanged(qint32 state)
     // 'complicate' or 'make busy' the general
     // look and feel
     QPalette palette;
-    palette.setBrush(QPalette::Background, QBrush(GColor(CRIDEPLOTBACKGROUND)));
+    palette.setBrush(QPalette::Window, QBrush(GColor(CRIDEPLOTBACKGROUND)));
     setPalette(palette); // propagates to children
 
     // set style sheets
 #ifndef Q_OS_MAC
-    allPlotFrame->setStyleSheet(TabView::ourStyleSheet());
-    comparePlotFrame->setStyleSheet(TabView::ourStyleSheet());
-    seriesstackFrame->setStyleSheet(TabView::ourStyleSheet());
-    stackFrame->setStyleSheet(TabView::ourStyleSheet());
-    overlayIntervals->setStyleSheet(TabView::ourStyleSheet());
+    allPlotFrame->setStyleSheet(AbstractView::ourStyleSheet());
+    comparePlotFrame->setStyleSheet(AbstractView::ourStyleSheet());
+    seriesstackFrame->setStyleSheet(AbstractView::ourStyleSheet());
+    stackFrame->setStyleSheet(AbstractView::ourStyleSheet());
+    overlayIntervals->setStyleSheet(AbstractView::ourStyleSheet());
 #endif
 
     // set palettes
@@ -1062,6 +1056,7 @@ AllPlotWindow::editUserData()
     UserData edit(userDataSeries[index]->name,
                   userDataSeries[index]->units,
                   userDataSeries[index]->formula,
+                  userDataSeries[index]->zstring,
                   userDataSeries[index]->color);
 
     EditUserDataDialog dialog(context, &edit);
@@ -1070,6 +1065,7 @@ AllPlotWindow::editUserData()
 
         // apply!
         userDataSeries[index]->formula = edit.formula;
+        userDataSeries[index]->zstring = edit.zstring;
         userDataSeries[index]->name = edit.name;
         userDataSeries[index]->units = edit.units;
         userDataSeries[index]->color = edit.color;
@@ -1093,6 +1089,7 @@ AllPlotWindow::doubleClicked( int row, int )
     UserData edit(userDataSeries[row]->name,
                   userDataSeries[row]->units,
                   userDataSeries[row]->formula,
+                  userDataSeries[row]->zstring,
                   userDataSeries[row]->color);
 
     EditUserDataDialog dialog(context, &edit);
@@ -1101,6 +1098,7 @@ AllPlotWindow::doubleClicked( int row, int )
 
         // apply!
         userDataSeries[row]->formula = edit.formula;
+        userDataSeries[row]->zstring = edit.zstring;
         userDataSeries[row]->name = edit.name;
         userDataSeries[row]->units = edit.units;
         userDataSeries[row]->color = edit.color;
@@ -1149,7 +1147,7 @@ AllPlotWindow::addUserData()
 
     if (dialog.exec()) {
         // apply
-        userDataSeries.append(new UserData(add.name, add.units, add.formula, add.color));
+        userDataSeries.append(new UserData(add.name, add.units, add.formula, add.zstring, add.color));
 
         // refresh
         refreshCustomTable();
@@ -1172,7 +1170,7 @@ AllPlotWindow::moveUserDataUp()
     int index = customTable->row(items.first());
 
     if (index > 0) {
-        userDataSeries.swap(index, index-1);
+        userDataSeries.swapItemsAt(index, index-1);
          // refresh
         refreshCustomTable(index-1);
 
@@ -1194,7 +1192,7 @@ AllPlotWindow::moveUserDataDown()
     int index = customTable->row(items.first());
 
     if (index+1 <  userDataSeries.size()) {
-        userDataSeries.swap(index, index+1);
+        userDataSeries.swapItemsAt(index, index+1);
          // refresh
         refreshCustomTable(index+1);
 
@@ -1226,7 +1224,7 @@ AllPlotWindow::event(QEvent *event)
         }
 
         // if off the screen move on screen
-        if (helperWidget()->geometry().x() > geometry().width()) {
+        if (helperWidget()->geometry().x() > geometry().width() || helperWidget()->geometry().x() < geometry().x()) {
             helperWidget()->move(mainWidget()->geometry().width()-(275*dpiXFactor), 50*dpiYFactor);
         }
     }
@@ -1263,7 +1261,7 @@ AllPlotWindow::compareChanged()
         foreach(CompareInterval ci, context->compareIntervals) {
             QList<UserData*> list;
             foreach(UserData *u, userDataSeries) {
-                UserData *p = new UserData(u->name, u->units, u->formula, ci.color); // use context for interval
+                UserData *p = new UserData(u->name, u->units, u->formula, u->zstring, ci.color); // use context for interval
                 p->setRideItem(ci.rideItem);
                 list << p;
             }
@@ -1313,8 +1311,8 @@ AllPlotWindow::compareChanged()
         }
 
         // what is the longest compareInterval?
-        if (fullPlot->bydist) fullPlot->setAxisScale(QwtPlot::xBottom, 0, maxKM);
-        else fullPlot->setAxisScale(QwtPlot::xBottom, 0, maxSECS/60);
+        if (fullPlot->bydist) fullPlot->setAxisScale(QwtAxis::XBottom, 0, maxKM);
+        else fullPlot->setAxisScale(QwtAxis::XBottom, 0, maxSECS/60);
 
         // now set it it in all the compare objects so they all get set
         // to the same time / duration and all the data is set too
@@ -1368,7 +1366,7 @@ AllPlotWindow::compareChanged()
             if (!ci.isChecked()) ap->hide();
 
             // tooltip on hover over point -- consider moving this to AllPlot (!)
-            ap->tooltip = new LTMToolTip(QwtPlot::xBottom, QwtAxisId(QwtAxis::yLeft, 2).id,
+            ap->tooltip = new LTMToolTip(QwtAxis::XBottom, QwtAxisId(QwtAxis::YLeft, 2).id,
                                     QwtPicker::VLineRubberBand,
                                     QwtPicker::AlwaysOn,
                                     ap->canvas(),
@@ -1385,8 +1383,8 @@ AllPlotWindow::compareChanged()
             connect(ap->_canvasPicker, SIGNAL(pointHover(QwtPlotCurve*, int)), ap, SLOT(pointHover(QwtPlotCurve*, int)));
 
             // format it for our purposes
-            if (fullPlot->bydist) ap->setAxisScale(QwtPlot::xBottom, 0, maxKM);
-            else ap->setAxisScale(QwtPlot::xBottom, 0, maxSECS/60.00f);
+            if (fullPlot->bydist) ap->setAxisScale(QwtAxis::XBottom, 0, maxKM);
+            else ap->setAxisScale(QwtAxis::XBottom, 0, maxSECS/60.00f);
             ap->setFixedHeight((120*dpiXFactor) + (stackWidth *4));
 
             // add to layout
@@ -1416,7 +1414,6 @@ AllPlotWindow::compareChanged()
         if (showW->isChecked()) { s.one = RideFile::wprime; s.two = RideFile::none; wanted << s;};
         if (showPowerD->isChecked()) { s.one = RideFile::wattsd; s.two = RideFile::none; wanted << s;};
         if (showHr->isChecked()) { s.one = RideFile::hr; s.two = RideFile::none; wanted << s;};
-        if (showHRV->isChecked()) { s.one = RideFile::hrv; s.two = RideFile::none; wanted << s;};
         if (showTcore->isChecked()) { s.one = RideFile::tcore; s.two = RideFile::none; wanted << s;};
         if (showHrD->isChecked()) { s.one = RideFile::hrd; s.two = RideFile::none; wanted << s;};
         if (showSpeed->isChecked()) { s.one = RideFile::kph; s.two = RideFile::none; wanted << s;};
@@ -1475,7 +1472,7 @@ AllPlotWindow::compareChanged()
 
         // create blank and add to gui
         QPalette palette;
-        palette.setBrush(QPalette::Background, Qt::NoBrush);
+        palette.setBrush(QPalette::Window, Qt::NoBrush);
 
         foreach(SeriesWanted x, wanted) {
 
@@ -1486,7 +1483,7 @@ AllPlotWindow::compareChanged()
             plot->setFixedHeight((120*dpiYFactor)+(stackWidth*4));
 
             // tooltip on hover over point -- consider moving this to AllPlot (!)
-            plot->tooltip = new LTMToolTip(QwtPlot::xBottom, QwtAxisId(QwtAxis::yLeft, 2).id,
+            plot->tooltip = new LTMToolTip(QwtAxis::XBottom, QwtAxisId(QwtAxis::YLeft, 2).id,
                                     QwtPicker::VLineRubberBand,
                                     QwtPicker::AlwaysOn,
                                     plot->canvas(),
@@ -1505,20 +1502,19 @@ AllPlotWindow::compareChanged()
             plot->bydist = fullPlot->bydist;
             if (x.one == RideFile::watts) plot->setShadeZones(showPower->currentIndex() == 0);
             else plot->setShadeZones(false);
-            plot->setAxisVisible(QwtPlot::xBottom, true);
-            plot->enableAxis(QwtPlot::xBottom, true);
-            plot->setAxisTitle(QwtPlot::xBottom,NULL);
+            plot->setAxisVisible(QwtAxis::XBottom, true);
+            plot->setAxisTitle(QwtAxis::XBottom,NULL);
 
             // get rid of the User Data axis
             for(int k=0; k<userDataSeries.count(); k++) 
-                plot->setAxisVisible(QwtAxisId(QwtAxis::yRight,4 + k), false);
+                plot->setAxisVisible(QwtAxisId(QwtAxis::YRight,4 + k), false);
 
             // common y axis
             QwtScaleDraw *sd = new QwtScaleDraw;
             sd->setTickLength(QwtScaleDiv::MajorTick, 3);
             sd->enableComponent(QwtScaleDraw::Ticks, false);
             sd->enableComponent(QwtScaleDraw::Backbone, false);
-            plot->setAxisScaleDraw(QwtPlot::yLeft, sd);
+            plot->setAxisScaleDraw(QwtAxis::YLeft, sd);
    
             // default paletter override below if needed 
             QPalette pal;
@@ -1529,7 +1525,7 @@ AllPlotWindow::compareChanged()
             if (x.one == RideFile::alt && x.two == RideFile::slope) {
 
                 // alt/slope special case
-                plot->setAxisTitle(QwtPlot::yLeft, tr("Alt/Slope"));
+                plot->setAxisTitle(QwtAxis::YLeft, tr("Alt/Slope"));
                 plot->showAltSlopeState = allPlot->showAltSlopeState;
                 plot->setAltSlopePlotStyle(allPlot->standard->altSlopeCurve);
 
@@ -1538,16 +1534,16 @@ AllPlotWindow::compareChanged()
                 // user defined series
                 if (x.one > RideFile::none) {
                     int index = (int)(x.one) - (RideFile::none + 1);
-                    plot->setAxisTitle(QwtPlot::yLeft, userDataSeries[index]->name);
+                    plot->setAxisTitle(QwtAxis::YLeft, userDataSeries[index]->name);
                     pal.setColor(QPalette::WindowText, userDataSeries[index]->color);
                     pal.setColor(QPalette::Text, userDataSeries[index]->color);
                 } else {
                     // everything else
-                    plot->setAxisTitle(QwtPlot::yLeft, RideFile::seriesName(x.one));
+                    plot->setAxisTitle(QwtAxis::YLeft, RideFile::seriesName(x.one));
                 }
             }
 
-            plot->axisWidget(QwtPlot::yLeft)->setPalette(pal);
+            plot->axisWidget(QwtAxis::YLeft)->setPalette(pal);
 
             // remember them
             seriesstackPlotLayout->addWidget(plot);
@@ -1565,8 +1561,8 @@ AllPlotWindow::compareChanged()
 
             // format it for our purposes
             compare->bydist = fullPlot->bydist;
-            if (fullPlot->bydist) compare->setAxisScale(QwtPlot::xBottom, 0, maxKM);
-            else compare->setAxisScale(QwtPlot::xBottom, 0, maxSECS/60.00f);
+            if (fullPlot->bydist) compare->setAxisScale(QwtAxis::XBottom, 0, maxKM);
+            else compare->setAxisScale(QwtAxis::XBottom, 0, maxSECS/60.00f);
             compare->setXTitle();
 
             compare->replot();
@@ -1586,7 +1582,7 @@ AllPlotWindow::compareChanged()
 
     } else {
 
-        if (showInterval->isChecked())
+        if (showIntervalNavigator->isChecked())
             intervalPlot->show();
 
         // reset to normal view?
@@ -1661,11 +1657,11 @@ AllPlotWindow::redrawFullPlot()
 
     // use the ride to decide
     if (fullPlot->bydist)
-        fullPlot->setAxisScale(QwtPlot::xBottom,
-        ride->ride()->dataPoints().first()->km * (context->athlete->useMetricUnits ? 1 : MILES_PER_KM),
-        ride->ride()->dataPoints().last()->km * (context->athlete->useMetricUnits ? 1 : MILES_PER_KM));
+        fullPlot->setAxisScale(QwtAxis::XBottom,
+        ride->ride()->dataPoints().first()->km * (GlobalContext::context()->useMetricUnits ? 1 : MILES_PER_KM),
+        ride->ride()->dataPoints().last()->km * (GlobalContext::context()->useMetricUnits ? 1 : MILES_PER_KM));
     else
-        fullPlot->setAxisScale(QwtPlot::xBottom, ride->ride()->dataPoints().first()->secs/60,
+        fullPlot->setAxisScale(QwtAxis::XBottom, ride->ride()->dataPoints().first()->secs/60,
                                                  ride->ride()->dataPoints().last()->secs/60);
 
     fullPlot->replot();
@@ -1685,11 +1681,11 @@ AllPlotWindow::redrawIntervalPlot()
 
     // use the ride to decide
     if (intervalPlot->bydist)
-        intervalPlot->setAxisScale(QwtPlot::xBottom,
-        ride->ride()->dataPoints().first()->km * (context->athlete->useMetricUnits ? 1 : MILES_PER_KM),
-        ride->ride()->dataPoints().last()->km * (context->athlete->useMetricUnits ? 1 : MILES_PER_KM));
+        intervalPlot->setAxisScale(QwtAxis::XBottom,
+        ride->ride()->dataPoints().first()->km * (GlobalContext::context()->useMetricUnits ? 1 : MILES_PER_KM),
+        ride->ride()->dataPoints().last()->km * (GlobalContext::context()->useMetricUnits ? 1 : MILES_PER_KM));
     else
-        intervalPlot->setAxisScale(QwtPlot::xBottom, ride->ride()->dataPoints().first()->secs/60,
+        intervalPlot->setAxisScale(QwtAxis::XBottom, ride->ride()->dataPoints().first()->secs/60,
                                                 ride->ride()->dataPoints().last()->secs/60);
 
     intervalPlot->replot();
@@ -1738,16 +1734,16 @@ AllPlotWindow::zoomChanged()
 
         // zoom in all the compare plots
         foreach (AllPlot *plot, allComparePlots) {
-            if (fullPlot->bydist) plot->setAxisScale(QwtPlot::xBottom, spanSlider->lowerValue()/1000.00f, spanSlider->upperValue()/1000.00f);
-            else plot->setAxisScale(QwtPlot::xBottom, spanSlider->lowerValue() / 60.00f, spanSlider->upperValue() / 60.00f);
+            if (fullPlot->bydist) plot->setAxisScale(QwtAxis::XBottom, spanSlider->lowerValue()/1000.00f, spanSlider->upperValue()/1000.00f);
+            else plot->setAxisScale(QwtAxis::XBottom, spanSlider->lowerValue() / 60.00f, spanSlider->upperValue() / 60.00f);
 
             plot->replot();
         }
 
         // and the series plots
         foreach (AllPlot *plot, seriesPlots) {
-            if (fullPlot->bydist) plot->setAxisScale(QwtPlot::xBottom, spanSlider->lowerValue()/1000.00f, spanSlider->upperValue()/1000.00f);
-            else plot->setAxisScale(QwtPlot::xBottom, spanSlider->lowerValue() / 60.00f, spanSlider->upperValue() / 60.00f);
+            if (fullPlot->bydist) plot->setAxisScale(QwtAxis::XBottom, spanSlider->lowerValue()/1000.00f, spanSlider->upperValue()/1000.00f);
+            else plot->setAxisScale(QwtAxis::XBottom, spanSlider->lowerValue() / 60.00f, spanSlider->upperValue() / 60.00f);
 
             plot->replot();
         }
@@ -1815,8 +1811,10 @@ AllPlotWindow::rideSelected()
         return;
     }
 
-    // ignore if null, or manual / empty
-    if (!ride || !ride->ride() || !ride->ride()->dataPoints().count()) {
+    // ignore if null, or manual / empty, or x-axis series is not present
+    if (!ride || !ride->ride() || !ride->ride()->dataPoints().count() ||
+        (comboDistance->currentIndex() == 1 && !ride->ride()->isDataPresent(RideFile::km)) ||
+        (comboDistance->currentIndex() != 1 && !ride->ride()->isDataPresent(RideFile::secs))) {
         current = NULL;
         setIsBlank(true);
         return;
@@ -2076,7 +2074,6 @@ AllPlotWindow::setAllPlotWidgets(RideItem *ride)
             showCad->setEnabled(dataPresent->cad);
             showTorque->setEnabled(dataPresent->nm);
             showHr->setEnabled(dataPresent->hr);
-            showHRV->setEnabled(dataPresent->hrv);
             showTcore->setEnabled(dataPresent->hr);
             showSpeed->setEnabled(dataPresent->kph);
             showAccel->setEnabled(dataPresent->kph);
@@ -2094,7 +2091,6 @@ AllPlotWindow::setAllPlotWidgets(RideItem *ride)
             showHrD->setEnabled(false);
             showPower->setEnabled(false);
             showHr->setEnabled(false);
-            showHRV->setEnabled(false);
             showTcore->setEnabled(false);
             showSpeed->setEnabled(false);
             showCad->setEnabled(false);
@@ -2243,7 +2239,7 @@ AllPlotWindow::plotPickerSelected(const QPoint &pos)
 
     QwtPlotPicker* pick = qobject_cast<QwtPlotPicker *>(sender());
     AllPlot* plot = qobject_cast<AllPlot *>(pick->plot());
-    double xValue = plot->invTransform(QwtPlot::xBottom, pos.x());
+    double xValue = plot->invTransform(QwtAxis::XBottom, pos.x());
 
     setStartSelection(plot, xValue);
 }
@@ -2273,31 +2269,31 @@ AllPlotWindow::plotPickerMoved(const QPoint &pos)
 
             if (_plot->y()<=plot->y() && posY<_plot->y()){
 
-                if (_plot->transform(QwtPlot::xBottom, _plot->standard->allMarker2->xValue())>0) {
+                if (_plot->transform(QwtAxis::XBottom, _plot->standard->allMarker2->xValue())>0) {
                     setEndSelection(_plot, 0, false, name);
                     _plot->standard->allMarker2->setLabel(QString(""));
                 }
 
             } else if (_plot->y()>=plot->y() && posY>_plot->y()+_plot->height()) {
 
-                if (_plot->transform(QwtPlot::xBottom, _plot->standard->allMarker2->xValue())<plot->width()){
-                    setEndSelection(_plot, _plot->transform(QwtPlot::xBottom, plot->width()), false, name);
+                if (_plot->transform(QwtAxis::XBottom, _plot->standard->allMarker2->xValue())<plot->width()){
+                    setEndSelection(_plot, _plot->transform(QwtAxis::XBottom, plot->width()), false, name);
                 }
             }
             else if (posY>_plot->y() && posY<_plot->y()+_plot->height()) {
 
                 if (pos.x()<6) {
                     posX = 6;
-                } else if (!_plot->bydist && pos.x()>_plot->transform(QwtPlot::xBottom,
+                } else if (!_plot->bydist && pos.x()>_plot->transform(QwtAxis::XBottom,
                                         fullPlot->standard->timeArray[fullPlot->standard->timeArray.size()-1])) {
-                    posX = _plot->transform(QwtPlot::xBottom, fullPlot->standard->timeArray[fullPlot->standard->timeArray.size()-1]);
-                } else if (plot->bydist && pos.x()>_plot->transform(QwtPlot::xBottom,
+                    posX = _plot->transform(QwtAxis::XBottom, fullPlot->standard->timeArray[fullPlot->standard->timeArray.size()-1]);
+                } else if (plot->bydist && pos.x()>_plot->transform(QwtAxis::XBottom,
                                         fullPlot->standard->distanceArray[fullPlot->standard->distanceArray.size()-1])) {
-                    posX = fullPlot->transform(QwtPlot::xBottom,
+                    posX = fullPlot->transform(QwtAxis::XBottom,
                                         fullPlot->standard->distanceArray[fullPlot->standard->distanceArray.size()-1]);
                 }
 
-                setEndSelection(_plot, _plot->invTransform(QwtPlot::xBottom, posX), true, name);
+                setEndSelection(_plot, _plot->invTransform(QwtAxis::XBottom, posX), true, name);
 
                 if (plot->y()<_plot->y()) {
                     plot->standard->allMarker1->setLabel(_plot->standard->allMarker1->label());
@@ -2315,7 +2311,7 @@ AllPlotWindow::plotPickerMoved(const QPoint &pos)
     } else {
 
         // working on AllPlot
-        double xValue = plot->invTransform(QwtPlot::xBottom, pos.x());
+        double xValue = plot->invTransform(QwtAxis::XBottom, pos.x());
         setEndSelection(plot, xValue, true, name);
     }
 }
@@ -2375,7 +2371,7 @@ AllPlotWindow::setEndSelection(AllPlot* plot, double xValue, bool newInterval, Q
         // code.
         if (plot->bydist) {
 
-            if (context->athlete->useMetricUnits == false) {
+            if (GlobalContext::context()->useMetricUnits == false) {
                 // convert to metric
                 x1 *= KM_PER_MILE;
                 x2 *=  KM_PER_MILE;
@@ -2545,27 +2541,6 @@ AllPlotWindow::setShowTcore(int value)
     // and the series stacks too
     forceSetupSeriesStackPlots(); // scope changed so force redraw
 }
-
-void
-AllPlotWindow::setShowHRV(int value)
-{
-    showHRV->setChecked(value);
-
-    // compare mode selfcontained update
-    if (isCompare()) {
-        compareChanged();
-        return;
-    }
-
-    bool checked = ( ( value == Qt::Checked ) && showHRV->isEnabled()) ? true : false;
-
-    allPlot->setShowHRV(checked);
-    foreach (AllPlot *plot, allPlots)
-        plot->setShowHRV(checked);
-    // and the series stacks too
-    forceSetupSeriesStackPlots(); // scope changed so force redraw
-}
-
 
 void
 AllPlotWindow::setShowNP(int value)
@@ -3293,10 +3268,23 @@ AllPlotWindow::setShowFull(int value)
 }
 
 void
-AllPlotWindow::setShowInterval(int value)
+AllPlotWindow::setShowIntervalMarkers(int value)
 {
-    showInterval->setChecked(value);
-    if (showInterval->isChecked()) {
+    showIntervalMarkers->setChecked(value);
+
+    allPlot->setShowMarkers(value);
+    foreach (AllPlot *plot, allPlots)
+        plot->setShowMarkers(value);
+    // and the series stacks too
+    forceSetupSeriesStackPlots(); // scope changed so force redraw
+    fullPlot->setShowMarkers(value);
+}
+
+void
+AllPlotWindow::setShowIntervalNavigator(int value)
+{
+    showIntervalNavigator->setChecked(value);
+    if (showIntervalNavigator->isChecked()) {
         intervalPlot->show();
         //allPlotLayout->setStretch(1,20);
     }
@@ -3370,16 +3358,8 @@ AllPlotWindow::setByDistance(int value)
     intervalPlot->setByDistance(value);
     allPlot->setByDistance(value);
 
-    // refresh controls, specifically spanSlider
-    setAllPlotWidgets(fullPlot->rideItem);
-
-    // refresh
-    setupSeriesStack = setupStack = false;
-    redrawFullPlot();
-    redrawAllPlot();
-    setupStackPlots();
-    setupSeriesStackPlots();
-    redrawIntervalPlot();
+    // replot
+    forceReplot();
 
     active = false;
 }
@@ -3459,9 +3439,9 @@ AllPlotWindow::resetStackedDatas()
         int startIndex, stopIndex;
         if (plot->bydist) {
             startIndex = allPlot->rideItem->ride()->distanceIndex(
-                        (context->athlete->useMetricUnits ? 1 : KM_PER_MILE) * _stackWidth*i);
+                        (GlobalContext::context()->useMetricUnits ? 1 : KM_PER_MILE) * _stackWidth*i);
             stopIndex  = allPlot->rideItem->ride()->distanceIndex(
-                        (context->athlete->useMetricUnits ? 1 : KM_PER_MILE) * _stackWidth*(i+1));
+                        (GlobalContext::context()->useMetricUnits ? 1 : KM_PER_MILE) * _stackWidth*(i+1));
         } else {
             startIndex = allPlot->rideItem->ride()->timeIndex(60*_stackWidth*i);
             stopIndex  = allPlot->rideItem->ride()->timeIndex(60*_stackWidth*(i+1));
@@ -3649,7 +3629,7 @@ AllPlotWindow::setupSeriesStackPlots()
     seriesstackFrame->setUpdatesEnabled(false);
 
     QPalette palette;
-    palette.setBrush(QPalette::Background, Qt::NoBrush);
+    palette.setBrush(QPalette::Window, Qt::NoBrush);
 
     QList<SeriesWanted> serieslist;
     SeriesWanted s;
@@ -3658,7 +3638,6 @@ AllPlotWindow::setupSeriesStackPlots()
     if (showW->isChecked() && rideItem->ride()->areDataPresent()->watts) { s.one = RideFile::wprime; s.two = RideFile::none; serieslist << s; }
     if (showPowerD->isChecked() && rideItem->ride()->areDataPresent()->watts) { s.one = RideFile::wattsd;s.two = RideFile::none; serieslist << s; }
     if (showHr->isChecked() && rideItem->ride()->areDataPresent()->hr) { s.one = RideFile::hr; s.two = RideFile::none; serieslist << s; }
-    if (showHRV->isChecked() && rideItem->ride()->areDataPresent()->hrv) { s.one = RideFile::hrv; s.two = RideFile::none; serieslist << s; }
     if (showTcore->isChecked() && rideItem->ride()->areDataPresent()->hr) { s.one = RideFile::tcore; s.two = RideFile::none; serieslist << s; }
     if (showHrD->isChecked() && rideItem->ride()->areDataPresent()->hr) { s.one = RideFile::hrd; s.two = RideFile::none; serieslist << s; }
     if (showSmO2->isChecked() && rideItem->ride()->areDataPresent()->smo2) { s.one = RideFile::smo2; s.two = RideFile::none; serieslist << s; }
@@ -3717,6 +3696,7 @@ AllPlotWindow::setupSeriesStackPlots()
 
         if (x.one == RideFile::watts) _allPlot->setShadeZones(showPower->currentIndex() == 0);
         else _allPlot->setShadeZones(false);
+        _allPlot->setShowMarkers(allPlot->showMarkers);
         first = false;
 
         // add to the list
@@ -3726,15 +3706,14 @@ AllPlotWindow::setupSeriesStackPlots()
         _allPlot->setFixedHeight((120*dpiYFactor)+(stackWidth*4));
 
         // No x axis titles
-        _allPlot->setAxisVisible(QwtPlot::xBottom, true);
-        _allPlot->enableAxis(QwtPlot::xBottom, true);
-        _allPlot->setAxisTitle(QwtPlot::xBottom,NULL);
-        _allPlot->setAxisMaxMinor(QwtPlot::xBottom, 0);
-        _allPlot->setAxisMaxMinor(QwtPlot::yLeft, 0);
-        _allPlot->setAxisMaxMinor(QwtAxisId(QwtAxis::yLeft,1), 0);
-        _allPlot->setAxisMaxMinor(QwtPlot::yRight, 0);
-        _allPlot->setAxisMaxMinor(QwtAxisId(QwtAxis::yRight,2).id, 0);
-        _allPlot->setAxisMaxMinor(QwtAxisId(QwtAxis::yRight,3).id, 0);
+        _allPlot->setAxisVisible(QwtAxis::XBottom, true);
+        _allPlot->setAxisTitle(QwtAxis::XBottom,NULL);
+        _allPlot->setAxisMaxMinor(QwtAxis::XBottom, 0);
+        _allPlot->setAxisMaxMinor(QwtAxis::YLeft, 0);
+        _allPlot->setAxisMaxMinor(QwtAxisId(QwtAxis::YLeft,1), 0);
+        _allPlot->setAxisMaxMinor(QwtAxis::YRight, 0);
+        _allPlot->setAxisMaxMinor(QwtAxisId(QwtAxis::YRight,2).id, 0);
+        _allPlot->setAxisMaxMinor(QwtAxisId(QwtAxis::YRight,3).id, 0);
 
         // controls
         _allPlot->replot();
@@ -3810,7 +3789,7 @@ AllPlotWindow::setupStackPlots()
     if (!rideItem || !rideItem->ride() || rideItem->ride()->dataPoints().isEmpty()) return;
 
     double duration = rideItem->ride()->dataPoints().last()->secs;
-    double distance =  (context->athlete->useMetricUnits ? 1 : MILES_PER_KM) * rideItem->ride()->dataPoints().last()->km;
+    double distance =  (GlobalContext::context()->useMetricUnits ? 1 : MILES_PER_KM) * rideItem->ride()->dataPoints().last()->km;
     int nbplot;
 
     if (fullPlot->bydist)
@@ -3819,16 +3798,16 @@ AllPlotWindow::setupStackPlots()
         nbplot = (int)floor(duration/_stackWidth/60)+1;
 
     QPalette palette;
-    palette.setBrush(QPalette::Background, Qt::NoBrush);
+    palette.setBrush(QPalette::Window, Qt::NoBrush);
 
     for(int i = 0 ; i < nbplot ; i++) {
 
         // calculate the segment of ride this stack plot contains
         int startIndex, stopIndex;
         if (fullPlot->bydist) {
-            startIndex = fullPlot->rideItem->ride()->distanceIndex((context->athlete->useMetricUnits ?
+            startIndex = fullPlot->rideItem->ride()->distanceIndex((GlobalContext::context()->useMetricUnits ?
                             1 : KM_PER_MILE) * _stackWidth*i);
-            stopIndex  = fullPlot->rideItem->ride()->distanceIndex((context->athlete->useMetricUnits ?
+            stopIndex  = fullPlot->rideItem->ride()->distanceIndex((GlobalContext::context()->useMetricUnits ?
                             1 : KM_PER_MILE) * _stackWidth*(i+1));
         } else {
             startIndex = fullPlot->rideItem->ride()->timeIndex(60*_stackWidth*i);
@@ -3851,26 +3830,24 @@ AllPlotWindow::setupStackPlots()
 
         // Update AllPlot for stacked view
         _allPlot->setDataFromPlot(fullPlot, startIndex, stopIndex);
-        _allPlot->setAxisScale(QwtPlot::xBottom, _stackWidth*i, _stackWidth*(i+1), 15/stackWidth);
+        _allPlot->setAxisScale(QwtAxis::XBottom, _stackWidth*i, _stackWidth*(i+1), 15/stackWidth);
 
         _allPlot->setFixedHeight((120*dpiYFactor)+stackWidth*4);
 
         // No x axis titles
-        _allPlot->setAxisVisible(QwtPlot::xBottom, true);
-        _allPlot->enableAxis(QwtPlot::xBottom, true);
-        _allPlot->setAxisTitle(QwtPlot::xBottom,NULL);
-        _allPlot->setAxisMaxMinor(QwtPlot::xBottom, 0);
-        _allPlot->setAxisMaxMinor(QwtPlot::yLeft, 0);
-        _allPlot->setAxisMaxMinor(QwtAxisId(QwtAxis::yLeft,1), 0);
-        _allPlot->setAxisMaxMinor(QwtPlot::yRight, 0);
-        _allPlot->setAxisMaxMinor(QwtAxisId(QwtAxis::yRight,2).id, 0);
-        _allPlot->setAxisMaxMinor(QwtAxisId(QwtAxis::yRight,3).id, 0);
+        _allPlot->setAxisVisible(QwtAxis::XBottom, true);
+        _allPlot->setAxisTitle(QwtAxis::XBottom,NULL);
+        _allPlot->setAxisMaxMinor(QwtAxis::XBottom, 0);
+        _allPlot->setAxisMaxMinor(QwtAxis::YLeft, 0);
+        _allPlot->setAxisMaxMinor(QwtAxisId(QwtAxis::YLeft,1), 0);
+        _allPlot->setAxisMaxMinor(QwtAxis::YRight, 0);
+        _allPlot->setAxisMaxMinor(QwtAxisId(QwtAxis::YRight,2).id, 0);
+        _allPlot->setAxisMaxMinor(QwtAxisId(QwtAxis::YRight,3).id, 0);
 
         // controls
         _allPlot->setShadeZones(showPower->currentIndex() == 0);
         _allPlot->setShowPower(showPower->currentIndex());
         _allPlot->setShowHr( (showHr->isEnabled()) ? ( showHr->checkState() == Qt::Checked ) : false );
-        _allPlot->setShowHRV( (showHRV->isEnabled()) ? ( showHRV->checkState() == Qt::Checked ) : false );
         _allPlot->setShowTcore( (showTcore->isEnabled()) ? ( showTcore->checkState() == Qt::Checked ) : false );
         _allPlot->setShowSpeed((showSpeed->isEnabled()) ? ( showSpeed->checkState() == Qt::Checked ) : false );
         _allPlot->setShowAccel((showAccel->isEnabled()) ? ( showAccel->checkState() == Qt::Checked ) : false );
@@ -3955,7 +3932,7 @@ AllPlotWindow::addPickers(AllPlot *_allPlot)
     _allPlot->standard->allMarker2 = allMarker2;
 
     // use the tooltip picker rather than a standard picker
-    _allPlot->tooltip = new LTMToolTip(QwtPlot::xBottom, QwtAxisId(QwtAxis::yLeft, 2).id,
+    _allPlot->tooltip = new LTMToolTip(QwtAxis::XBottom, QwtAxisId(QwtAxis::YLeft, 2).id,
                                QwtPicker::VLineRubberBand,
                                QwtPicker::AlwaysOn,
                                _allPlot->canvas(),
@@ -3979,7 +3956,7 @@ void
 AllPlotWindow::allPlotResized()
 {
     QwtPlotCanvas *allPlotCanvas = static_cast<QwtPlotCanvas *>(allPlot->canvas());
-    QwtScaleWidget *xAxis = allPlot->axisWidget(QwtAxisId(QwtPlot::xBottom));
+    QwtScaleWidget *xAxis = allPlot->axisWidget(QwtAxisId(QwtAxis::XBottom));
     QwtScaleDraw *xAxisScaleDraw = xAxis->scaleDraw();
     int left = xAxis->x() + xAxisScaleDraw->pos().x() - 3;
     int right = allPlot->width() - allPlotCanvas->width() - allPlotCanvas->x() + 1;

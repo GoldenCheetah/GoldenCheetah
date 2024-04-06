@@ -42,7 +42,7 @@ class Library : QObject
 
         static void initialise(QDir); // init
         static Library *findLibrary(QString);
-        static void importFiles(Context *context, QStringList files);
+        static void importFiles(Context *context, QStringList files, bool forcedialog=false);
         void removeRef(Context *context, QString ref);
 };
 

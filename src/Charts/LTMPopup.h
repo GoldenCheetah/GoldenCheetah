@@ -59,6 +59,7 @@ class LTMPopup : public QWidget
 
     private slots:
         void rideSelected(); // scrolling up and down the popup ride list
+        void rideOpen(); // double click an item on the popup ride list
         virtual void resizeEvent(QResizeEvent *);
         bool eventFilter(QObject *object, QEvent *e);
 

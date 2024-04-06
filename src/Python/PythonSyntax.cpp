@@ -21,56 +21,56 @@
 #include "PythonSyntax.h"
 
 
-PythonSyntax::PythonSyntax(QTextDocument *parent) : QSyntaxHighlighter(parent)
+PythonSyntax::PythonSyntax(QTextDocument *parent, bool dark) : QSyntaxHighlighter(parent)
 {
     HighlightingRule rule;
 
-    assignmentFormat.setForeground(QColor(255,204,000));
-    rule.pattern = QRegExp("<{1,2}[-]");
+    assignmentFormat.setForeground(dark ? QColor(255,204,000): Qt::black);
+    rule.pattern = QRegularExpression("<{1,2}[-]");
     rule.format = assignmentFormat;
     highlightingRules.append(rule);
-    rule.pattern = QRegExp("[-]>{1,2}");
+    rule.pattern = QRegularExpression("[-]>{1,2}");
     rule.format = assignmentFormat;
     highlightingRules.append(rule);
 
 
     // function: anything followed by (
-    functionFormat.setForeground(Qt::cyan);
+    functionFormat.setForeground(dark ? Qt::cyan : Qt::darkBlue);
     //functionFormat.setFontItalic(true);
-    rule.pattern = QRegExp("\\b[A-Za-z0-9_\\.]+(?=[ ]*\\()");
+    rule.pattern = QRegularExpression("\\b[A-Za-z0-9_\\.]+(?=[ ]*\\()");
     rule.format = functionFormat;
     highlightingRules.append(rule);
 
     // argument: anything followed by =, but not at the start(???)
     // unfortunately look behind assertions are not supported
     argumentFormat.setFontItalic(true);
-    rule.pattern = QRegExp("[A-Za-z0-9_\\.]+(?=[ ]*=[^=])");
+    rule.pattern = QRegularExpression("[A-Za-z0-9_\\.]+(?=[ ]*=[^=])");
     rule.format = argumentFormat;
     highlightingRules.append(rule);
 
     // numbers
-    numberFormat.setForeground(Qt::red);
+    numberFormat.setForeground(dark ? Qt::red : Qt::darkRed);
     QStringList numberPatterns;
     numberPatterns << "\\b[0-9]+[\\.]?[0-9]*\\b"  << "\\b[\\.][0-9]+\\b";
     foreach (QString pattern, numberPatterns) {
-        rule.pattern = QRegExp(pattern);
+        rule.pattern = QRegularExpression(pattern);
         rule.format = numberFormat;
         highlightingRules.append(rule);
     }
 
     // constants: TRUE FALSE NA NULL Inf NaN
-    constantFormat.setForeground(Qt::red);
+    constantFormat.setForeground(dark ? Qt::red : Qt::darkRed);
     QStringList constantPatterns;
     constantPatterns << "\\bTrue\\b" << "\\bFalse\\b" << "\\bNone\\b"  << "\\bNull\\b" << "\\bInf\\b" << "\\bNaN\\b";
     foreach (QString pattern, constantPatterns) {
-        rule.pattern = QRegExp(pattern);
+        rule.pattern = QRegularExpression(pattern);
         rule.format = constantFormat;
         highlightingRules.append(rule);
     }
 
     // keywords: while for in repeat if else switch break next
     // function return message warning stop
-    keywordFormat.setForeground(QColor(255,204,000));
+    keywordFormat.setForeground(dark ? QColor(255,204,000) : Qt::black);
     //keywordFormat.setFontItalic(true);
     QStringList keywordPatterns;
     keywordPatterns  << "\\bas\\b" << "\\bassert\\b" << "\\bbreak\\b"
@@ -81,24 +81,24 @@ PythonSyntax::PythonSyntax(QTextDocument *parent) : QSyntaxHighlighter(parent)
                      << "\\bwith\\b" << "\\byield\\b";
 
     foreach (QString pattern, keywordPatterns) {
-        rule.pattern = QRegExp(pattern);
+        rule.pattern = QRegularExpression(pattern);
         rule.format = keywordFormat;
         highlightingRules.append(rule);
     }
 
     // common functions (says who? (I hate attach)): library attach
     // detach source require
-    commonFunctionFormat.setForeground(QColor(40,255,40));
+    commonFunctionFormat.setForeground(dark ? QColor(40,255,40) : Qt::darkGray);
     QStringList commonFunctionPatterns;
     commonFunctionPatterns << "\\bGC\\b" << "\\bdef\\b" << "\\bself\\b";
     foreach (QString pattern, commonFunctionPatterns) {
-        rule.pattern = QRegExp(pattern);
+        rule.pattern = QRegularExpression(pattern);
         rule.format = commonFunctionFormat;
         highlightingRules.append(rule);
     }
 
     // operators
-    operatorFormat.setForeground(QColor(255,204,000));
+    operatorFormat.setForeground(dark ? QColor(255,204,000) : Qt::black);
     //operatorFormat.setForeground(Qt::darkCyan);
     //operatorFormat.setFontWeight(QFont::Bold);
     QStringList operatorPatterns;
@@ -107,30 +107,30 @@ PythonSyntax::PythonSyntax(QTextDocument *parent) : QSyntaxHighlighter(parent)
     operatorPatterns << "\\band\\b" << "\\bor\\b" << "\\bnot\\b" << "[\\.\\&\\$\\@\\|\\:\\~\\{\\}\\(\\)!]" ;
 
     foreach (QString pattern, operatorPatterns) {
-        rule.pattern = QRegExp(pattern);
+        rule.pattern = QRegularExpression(pattern);
         rule.format = operatorFormat;
         highlightingRules.append(rule);
     }
 
     // namespace: anything followed by ::
     //namespaceFormat.setForeground(Qt::magenta);
-    //rule.pattern = QRegExp("\\b[A-Za-z0-9_\\.]+(?=::)");
+    //rule.pattern = QRegularExpression("\\b[A-Za-z0-9_\\.]+(?=::)");
     //rule.format = namespaceFormat;
     //highlightingRules.append(rule);
 
     // quotes: only activated after quotes are closed.  Does not
     // span lines.
-    quotationFormat.setForeground(Qt::red);
-    rule.pattern = QRegExp("\"[^\"]*\"");
+    quotationFormat.setForeground(dark ? Qt::red : Qt::darkRed);
+    rule.pattern = QRegularExpression("\"[^\"]*\"");
     rule.format = quotationFormat;
     highlightingRules.append(rule);
-    rule.pattern = QRegExp("'[^']*\'");
+    rule.pattern = QRegularExpression("'[^']*\'");
     rule.format = quotationFormat;
     highlightingRules.append(rule);
 
     // comments (should override everything else)
-    commentFormat.setForeground(QColor(100,149,237));
-    rule.pattern = QRegExp("#[^\n]*");
+    commentFormat.setForeground(dark ? QColor(100,149,237) : Qt::darkBlue);
+    rule.pattern = QRegularExpression("#[^\n]*");
     rule.format = commentFormat;
     highlightingRules.append(rule);
 }
@@ -139,13 +139,14 @@ PythonSyntax::PythonSyntax(QTextDocument *parent) : QSyntaxHighlighter(parent)
 void PythonSyntax::highlightBlock(const QString &text)
 {
     foreach (HighlightingRule rule, highlightingRules) {
-        QRegExp expression(rule.pattern);
-        int index = text.indexOf(expression);
+        QRegularExpression expression(rule.pattern);
+        QRegularExpressionMatch match;
+        int index = text.indexOf(expression, 0, &match);
         // NB: this is index in block, not full document
         while (index >= 0) {
-            int length = expression.matchedLength();
+            int length = match.capturedLength();
             setFormat(index, length, rule.format);
-            index = text.indexOf(expression, index + length);
+            index = text.indexOf(expression, index + length, &match);
         }
     }
 }

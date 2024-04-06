@@ -18,6 +18,7 @@
  */
 
 #include "RealtimeData.h"
+#include "RideFile.h"
 
 #include <QtDebug>
 
@@ -28,7 +29,11 @@ RealtimeData::RealtimeData()
     cadence = distance = altDistance = virtualSpeed = wbal = 0.0;
     lap = msecs = lapMsecs = lapMsecsRemaining = ergMsecsRemaining = 0;
     thb = smo2 = o2hb = hhb = 0.0;
-    lrbalance = rte = lte = lps = rps = 0.0;
+    lrbalance = RideFile::NA;
+    rte = lte = lps = rps = 0.0;
+    latitude = longitude = altitude = 0.0;
+    rf = rmv = vo2 = vco2 = tv = feo2 = 0.0;
+    routeDistance = distanceRemaining = 0.0;
     trainerStatusAvailable = false;
     trainerReady = true;
     trainerRunning = true;
@@ -75,9 +80,12 @@ void RealtimeData::setVirtualSpeed(double speed)
 {
     this->virtualSpeed = speed;
 }
-void RealtimeData::setWheelRpm(double wheelRpm)
+void RealtimeData::setWheelRpm(double wheelRpm, bool fMarkWheelRpmTime)
 {
     this->wheelRpm = wheelRpm;
+
+    if (fMarkWheelRpmTime)
+        this->wheelRpmSampleTime = std::chrono::high_resolution_clock::now();
 }
 void RealtimeData::setCadence(double aCadence)
 {
@@ -112,6 +120,16 @@ void RealtimeData::setErgMsecsRemaining(long x)
 void RealtimeData::setDistance(double x)
 {
     this->distance = x;
+}
+
+void RealtimeData::setRouteDistance(double x)
+{
+    this->routeDistance = x;
+}
+
+void RealtimeData::setDistanceRemaining(double x)
+{
+    this->distanceRemaining = x;
 }
 
 void RealtimeData::setLapDistance(double x)
@@ -188,6 +206,10 @@ double RealtimeData::getWheelRpm() const
 {
     return wheelRpm;
 }
+std::chrono::high_resolution_clock::time_point RealtimeData::getWheelRpmSampleTime() const
+{
+    return this->wheelRpmSampleTime;
+}
 double RealtimeData::getCadence() const
 {
     return cadence;
@@ -211,6 +233,14 @@ long RealtimeData::getLapMsecs() const
 double RealtimeData::getDistance() const
 {
     return distance;
+}
+double RealtimeData::getRouteDistance() const
+{
+    return routeDistance;
+}
+double RealtimeData::getDistanceRemaining() const
+{
+    return distanceRemaining;
 }
 double RealtimeData::getLapDistance() const
 {
@@ -327,6 +357,12 @@ double RealtimeData::value(DataSeries series) const
     case Distance: return distance;
         break;
 
+    case RouteDistance: return routeDistance;
+        break;
+
+    case DistanceRemaining: return distanceRemaining;
+        break;
+
     case LapDistance: return lapDistance;
         break;
 
@@ -384,6 +420,36 @@ double RealtimeData::value(DataSeries series) const
     case Slope: return slope;
         break;
 
+    case Latitude: return latitude;
+        break;
+
+    case Longitude: return longitude;
+        break;
+
+    case Altitude: return altitude;
+        break;
+
+    case Rf: return rf;
+        break;
+
+    case RMV: return rmv;
+        break;
+
+    case VO2: return vo2;
+        break;
+
+    case VCO2: return vco2;
+        break;
+
+    case RER: return rer;
+        break;
+
+    case TidalVolume: return tv;
+        break;
+
+    case FeO2: return feo2;
+        break;
+
     case None:
     default:
         return 0;
@@ -424,6 +490,13 @@ const QList<RealtimeData::DataSeries> &RealtimeData::listDataSeries()
         seriesList << tHb;
         seriesList << HHb;
         seriesList << O2Hb;
+        seriesList << Rf;
+        seriesList << RMV;
+        seriesList << VO2;
+        seriesList << VCO2;
+        seriesList << RER;
+        seriesList << TidalVolume;
+        seriesList << FeO2;
         seriesList << AvgWatts;
         seriesList << AvgSpeed;
         seriesList << AvgCadence;
@@ -444,6 +517,11 @@ const QList<RealtimeData::DataSeries> &RealtimeData::listDataSeries()
         seriesList << LapDistance;
         seriesList << LapDistanceRemaining;
         seriesList << ErgTimeRemaining;
+        seriesList << Latitude;
+        seriesList << Longitude;
+        seriesList << Altitude;
+        seriesList << RouteDistance;
+        seriesList << DistanceRemaining;
     }
     return seriesList;
 }
@@ -502,6 +580,12 @@ QString RealtimeData::seriesName(DataSeries series)
         break;
 
     case Distance: return tr("Distance");
+        break;
+
+    case RouteDistance: return tr("Route Distance");
+        break;
+
+    case DistanceRemaining: return tr("Distance Remaining");
         break;
 
     case AltWatts: return tr("Alternate Power");
@@ -584,6 +668,36 @@ QString RealtimeData::seriesName(DataSeries series)
 
     case LapDistanceRemaining: return tr("Lap Distance Remaining");
         break;
+
+    case Latitude: return tr("Latitude");
+        break;
+
+    case Longitude: return tr("Longitude");
+        break;
+
+    case Altitude: return tr("Altitude");
+        break;
+
+    case Rf: return tr("Respiratory Frequency");
+        break;
+
+    case RMV: return tr("Ventilation");
+        break;
+
+    case VO2: return tr("VO2");
+        break;
+
+    case VCO2: return tr("VCO2");
+        break;
+
+    case RER: return tr("Respiratory Exchange Ratio");
+        break;
+
+    case TidalVolume: return tr("Tidal Volume");
+        break;
+
+    case FeO2: return tr("Fraction O2 Expired");
+        break;
     }
 }
 
@@ -617,3 +731,34 @@ long RealtimeData::getLap() const
 {
     return lap;
 }
+
+double RealtimeData::getLatitude() const { return latitude; }
+double RealtimeData::getLongitude() const { return longitude; }
+double RealtimeData::getAltitude() const { return altitude; }
+
+void RealtimeData::setLatitude(double d) { latitude = d; }
+void RealtimeData::setLongitude(double d) { longitude = d; }
+void RealtimeData::setAltitude(double d) { altitude = d; }
+
+void RealtimeData::setRf(double rf) { this->rf = rf; }
+void RealtimeData::setRMV(double rmv) { this->rmv = rmv; }
+void RealtimeData::setTv(double tv) { this->tv = tv; }
+void RealtimeData::setFeO2(double feo2) {this->feo2 = feo2; }
+
+void RealtimeData::setVO2_VCO2(double vo2, double vco2)
+{
+    this->vo2 = vo2;
+    this->vco2 = vco2;
+
+    if (vo2 > 0 && vco2 > 0) {
+        rer = vco2/vo2;
+    }
+}
+
+double RealtimeData::getRf() const { return rf; }
+double RealtimeData::getRMV() const { return rmv; }
+double RealtimeData::getVO2() const { return vo2; }
+double RealtimeData::getVCO2() const { return vco2; }
+double RealtimeData::getRER() const { return rer; }
+double RealtimeData::getTv() const { return tv; }
+double RealtimeData::getFeO2() const { return feo2; }

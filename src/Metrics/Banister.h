@@ -32,7 +32,7 @@
 extern const double typical_CP, typical_WPrime, typical_Pmax;
 
 // calculate power index, used to model in cp plot too
-extern double powerIndex(double averagepower, double duration);
+extern double powerIndex(double averagepower, double duration, QString sport="Bike");
 
 // gap with no training that constitutes break in seasons
 extern const int typical_SeasonBreak;
@@ -76,11 +76,16 @@ class Banister : public QObject {
 
 public:
 
-    Banister(Context *context, QString symbol, double t1, double t2, double k1=0, double k2=0);
+    Banister(Context *context, QString symbol, QString perf_symbol, double t1, double t2, double k1=0, double k2=0);
     double value(QDate date, int type);
+
+    // utility
+    QDate getPeakPerf(QDate from, QDate to, double &perf, int &CP);
+    double RMSE(QDate from, QDate to, int &n); // only look at it for a date range
 
     // model parameters - initial 'priors' to use
     QString symbol;         // load metric
+    QString perf_symbol;    // performance metric
     double k1, k2;          // nte/pte coefficients
     double t1, t2;          // nte/pte decay constants
 
@@ -110,6 +115,7 @@ public slots:
     void init();        // reset previous fits
     void invalidate();  // mark as stale
     void refresh();     // collect data from rides etc
+    void setDecay(double t1, double t2); // adjust the t1/t2 parameters
     void fit();         // perform fits along windows
 
 private:

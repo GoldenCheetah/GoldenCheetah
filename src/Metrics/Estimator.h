@@ -35,11 +35,12 @@ class Performance {
 
     public:
         Performance(QDate wc, double power, double duration, double powerIndex) :
-            weekcommencing(wc), power(power), duration(duration), powerIndex(powerIndex), submaximal(false) {}
+            weekcommencing(wc), power(power), duration(duration), powerIndex(powerIndex), submaximal(false), sport("Bike") {}
 
         QDate when, weekcommencing;
         double power, duration, powerIndex;
         bool submaximal; // set by the filter, user can choose to include.
+        QString sport;
 
         double x; // different units, but basically when as a julian day
 };
@@ -72,7 +73,8 @@ class Estimator : public QThread {
         void calculate();
 
         // get a performance for a given day
-        Performance getPerformanceForDate(QDate date);
+        Performance getPerformanceForDate(QDate date, QString sport);
+        QList<Performance> &allPerformances() { return performances; }
 
     protected:
 

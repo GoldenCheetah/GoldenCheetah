@@ -23,12 +23,7 @@
 
 #include <QtGui>
 #include <QStackedWidget>
-#ifdef NOWEBKIT
 #include <QWebEngineView>
-#else
-#include <QWebView>
-#include <QWebFrame>
-#endif
 #include <QTimer>
 #include "Context.h"
 #include "Season.h"
@@ -51,7 +46,6 @@ class AllPlot;
 #include <qwt_plot_picker.h>
 #include <qwt_text_engine.h>
 #include <qwt_picker_machine.h>
-#include <qwt_compat.h>
 
 #include "qxtstringspinbox.h" // for reveal control groupby selection
 
@@ -110,6 +104,7 @@ class LTMWindow : public GcChartWindow
     Q_PROPERTY(int stackWidth READ stackW WRITE setStackW USER true)
     Q_PROPERTY(bool legend READ legend WRITE setLegend USER true)
     Q_PROPERTY(bool events READ events WRITE setEvents USER true)
+    Q_PROPERTY(bool banister READ banister WRITE setBanister USER true)
     Q_PROPERTY(QString filter READ filter WRITE setFilter USER true)
     Q_PROPERTY(QDate fromDate READ fromDate WRITE setFromDate USER true)
     Q_PROPERTY(QDate toDate READ toDate WRITE setToDate USER true)
@@ -146,6 +141,8 @@ class LTMWindow : public GcChartWindow
         void setLegend(bool x) { ltmTool->showLegend->setChecked(x); }
         bool events() const { return ltmTool->showEvents->isChecked(); }
         void setEvents(bool x) { ltmTool->showEvents->setChecked(x); }
+        bool banister() const { return ltmTool->showBanister->isChecked(); }
+        void setBanister(bool x) { ltmTool->showBanister->setChecked(x); }
         bool stack() const { return ltmTool->showStack->isChecked(); }
         void setStack(bool x) { ltmTool->showStack->setChecked(x); }
         int stackW() const { return ltmTool->stackSlider->value(); }
@@ -193,6 +190,12 @@ class LTMWindow : public GcChartWindow
         void rideSelected();        // notification to refresh
         void presetSelected(int index); // when a preset is selected in the sidebar
 
+
+        // show the banister helper
+        void showBanister(bool relevant);    // show banister helper if relevant to plot
+        void tuneBanister();                 // when t1/t2 change
+        void refreshBanister();              // refresh banister helper
+
         void refreshPlot();         // normal mode
         void refreshCompare();      // compare mode
         void refreshStackPlots();   // stacked plots
@@ -232,6 +235,11 @@ class LTMWindow : public GcChartWindow
 
         void configChanged(qint32);
 
+    protected:
+
+        // receive events
+        bool event(QEvent *event);
+
     private:
         // passed from Context *
         DateRange plotted;
@@ -244,12 +252,7 @@ class LTMWindow : public GcChartWindow
         QStackedWidget *stackWidget;
 
         // summary view
-#ifdef NOWEBKIT
         QWebEngineView *dataSummary;
-#else
-        QWebView *dataSummary;
-#endif
-
 
         // popup - the GcPane to display within
         //         and the LTMPopup contents widdget
@@ -290,7 +293,15 @@ class LTMWindow : public GcChartWindow
         QCheckBox           *rData,
                             *rStack;
 
+        // banister helper
+        QComboBox *banCombo;
+        QComboBox *banPerf;
+        QDoubleSpinBox *banT1;
+        QDoubleSpinBox *banT2;
+        QLabel *ilabel, *plabel, *peaklabel, *t1label1, *t1label2, *t2label1, *t2label2, *RMSElabel, *perflabel;
+
         QTime lastRefresh;
+        bool firstshow;
 };
 
 #endif // _GC_LTMWindow_h

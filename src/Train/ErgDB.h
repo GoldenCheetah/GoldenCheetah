@@ -27,12 +27,14 @@
 
 struct ErgDBItem
 {
-    int   id;
-    QString   workoutType,
-              author,
-              name;
-    int       duration;
-    QDateTime added;
+    int             id;
+    QString         workoutType,
+                    author,
+                    name,
+                    description;
+    int             duration;
+    QDateTime       added;
+    QJsonDocument   document;
 };
 
 // get workout list
@@ -46,12 +48,11 @@ public:
     ErgDB(QObject *parent = 0);
 
     QList<ErgDBItem> &items() { return _items; } // get the list of files available
-    QString getFile(int id, int ftp);            // get the file contents for id
+    QString getWorkout(int id);            // get the file contents for id
 
 private slots:
 
     void getListFinished(QNetworkReply *reply);
-    void getFileFinished(QNetworkReply *reply);
 
 private:
     void getList(); // refresh the db

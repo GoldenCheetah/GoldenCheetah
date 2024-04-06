@@ -31,7 +31,7 @@
 #include <QFileInfo>
 
 // helpers
-#ifdef Q_OS_MAC
+#if defined(GC_VIDEO_AV) || defined(GC_VIDEO_QUICKTIME)
 #include "QtMacVideoWindow.h"
 #else
 #include "VideoWindow.h"
@@ -91,7 +91,7 @@ Library::initialise(QDir home)
 }
 
 void
-Library::importFiles(Context *context, QStringList files)
+Library::importFiles(Context *context, QStringList files, bool forcedialog)
 {
     QStringList videos, workouts, videosyncs;
     MediaHelper helper;
@@ -133,7 +133,7 @@ Library::importFiles(Context *context, QStringList files)
 
     // with only 1 of each max, lets import without any
     // fuss and select the items imported
-    if (videos.count()<=1 && workouts.count() <= 1 && videosyncs.count() <= 1) {
+    if (!forcedialog && videos.count()<=1 && workouts.count() <= 1 && videosyncs.count() <= 1) {
 
         trainDB->startLUW();
 
@@ -174,10 +174,14 @@ Library::importFiles(Context *context, QStringList files)
             // set target filename
             targetSync = videosyncDir + "/" + QFileInfo(source).fileName();
 
-            if (!source.copy(targetSync)) {
+            if (targetSync != QFileInfo(source).absoluteFilePath() && QFile(targetSync).exists()) {
 
                 QMessageBox::warning(NULL, tr("Copy VideoSync Failed"),
                     QString(tr("%1 already exists in videoSync library: %2")).arg(QFileInfo(targetSync).fileName()).arg(videosyncDir));
+            } else if (targetSync != QFileInfo(source).absoluteFilePath() && !source.copy(targetSync)) {
+
+                QMessageBox::warning(NULL, tr("Copy VideoSync Failed"),
+                    QString(tr("%1 cannot be written to videoSync library %2. Check library path, permissions and free space")).arg(QFileInfo(targetSync).fileName()).arg(videosyncDir));
             }
 
             // still add it, it may not have been scanned
@@ -202,17 +206,27 @@ Library::importFiles(Context *context, QStringList files)
 
             // set target filename
             targetWorkout = workoutDir + "/" + QFileInfo(source).fileName();
-            if (targetWorkout != QFileInfo(source).absoluteFilePath() && !source.copy(targetWorkout)) {
 
-                QMessageBox::warning(NULL, tr("Copy Workout Failed"),
-                    QString(tr("%1 cannot be written to workout library %2, check permissions and free space")).arg(QFileInfo(targetWorkout).fileName()).arg(workoutDir));
+            // Some (highly advanced) files can be both workouts and videosync.
+            // If we find a videosync here in the workout list then it was
+            // emplaced above so don't the file copy again.
+
+            if (!VideoSyncFile::isVideoSync(QFileInfo(source).fileName())) {
+                if (targetWorkout != QFileInfo(source).absoluteFilePath() && QFile(targetWorkout).exists()) {
+
+                    QMessageBox::warning(NULL, tr("Copy Workout Failed"),
+                        QString(tr("%1 already exists in workout library: %2")).arg(QFileInfo(source).fileName()).arg(workoutDir));
+                } else if (targetWorkout != QFileInfo(source).absoluteFilePath() && !source.copy(targetWorkout)) {
+
+                    QMessageBox::warning(NULL, tr("Copy Workout Failed"),
+                        QString(tr("%1 cannot be written to workout library %2. Check library path, permissions and free space")).arg(QFileInfo(targetWorkout).fileName()).arg(workoutDir));
+                }
             }
 
-            // still add it, it may noit have been scanned...
+            // still add it, it may not have been scanned...
             int mode=0;
             ErgFile file(targetWorkout, mode, context);
             trainDB->importWorkout(targetWorkout, &file);
-
         }
 
         trainDB->endLUW();
@@ -261,7 +275,7 @@ LibrarySearchDialog::LibrarySearchDialog(Context *context) : context(context)
     findWorkouts->setChecked(true);
     findMedia = new QCheckBox(tr("Video files (.mp4, .avi etc)"), this);
     findMedia->setChecked(true);
-    findVideoSyncs = new QCheckBox(tr("VideoSync files (.rlv)"), this);
+    findVideoSyncs = new QCheckBox(tr("VideoSync files (.rlv, .tts etc)"), this);
     findVideoSyncs->setChecked(true);
     addPath = new QPushButton("+", this);
     removePath = new QPushButton("-", this);

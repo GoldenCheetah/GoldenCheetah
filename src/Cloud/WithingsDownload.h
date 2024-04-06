@@ -26,7 +26,7 @@
 
 #include "Context.h"
 #include "Settings.h"
-#include "BodyMeasures.h"
+#include "Measures.h"
 #include "WithingsReading.h"
 
 class WithingsDownload : public QObject
@@ -37,7 +37,7 @@ class WithingsDownload : public QObject
 
 public:
     WithingsDownload(Context *context);
-    bool getBodyMeasures(QString &error, QDateTime from, QDateTime to, QList<BodyMeasure> &data);
+    bool getBodyMeasures(QString &error, QDateTime from, QDateTime to, QList<Measure> &data);
 
 signals:
     void downloadStarted(int);
@@ -51,7 +51,7 @@ private:
 
     QEventLoop loop;
 
-    QJsonParseError parse(QString text, QList<BodyMeasure> &bodyMeasures);
+    QJsonParseError parse(QString text, QList<Measure> &bodyMeasures);
     QList<WithingsReading> jsonDocumentToWithingsReading(QJsonDocument withingsJson);
 
 private slots:

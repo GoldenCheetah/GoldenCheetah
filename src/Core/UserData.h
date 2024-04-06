@@ -52,7 +52,7 @@ class UserData : public QObject {
 
         UserData();
         UserData(QString settings);
-        UserData(QString name, QString units, QString formula, QColor color);
+        UserData(QString name, QString units, QString formula, QString zstring, QColor color);
         ~UserData();
 
         // does it have values other than NA?
@@ -62,7 +62,8 @@ class UserData : public QObject {
         // as get/set is tedious for these kinds of attrs
         QString name, 
                 units,
-                formula;
+                formula,
+                zstring;
         QColor color;
 
         QVector<double> vector; // the actuall data series !
@@ -107,7 +108,8 @@ class EditUserDataDialog : public QDialog
 
         // name, units
         QLineEdit *nameEdit,
-                  *unitsEdit;
+                  *unitsEdit,
+                  *zstringEdit;
         QPushButton *seriesColor;
         QColor color; // remember what we edited
         void setButtonIcon(QColor);

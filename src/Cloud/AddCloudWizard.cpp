@@ -27,6 +27,7 @@
 #include "OAuthDialog.h"
 
 #include <QMessageBox>
+#include <QPixmap>
 #include <QRegExp>
 
 // WIZARD FLOW
@@ -41,7 +42,7 @@
 //
 
 // Main wizard - if passed a service name we are in edit mode, not add mode.
-AddCloudWizard::AddCloudWizard(Context *context, QString sname) : QWizard(context->mainWindow), context(context), service(sname)
+AddCloudWizard::AddCloudWizard(Context *context, QString sname, bool sync) : QWizard(context->mainWindow), context(context), service(sname), fsync(sync)
 {
 #ifdef Q_OS_MAC
     setWizardStyle(QWizard::ModernStyle);
@@ -92,7 +93,7 @@ AddClass::AddClass(AddCloudWizard *parent) : QWizardPage(parent), wizard(parent)
     setLayout(layout);
 
     mapper = new QSignalMapper(this);
-    connect(mapper, SIGNAL(mapped(int)), this, SLOT(clicked(int)));
+    connect(mapper, &QSignalMapper::mappedInt, this, &AddClass::clicked);
 
     // Activities
     QFont font;
@@ -103,7 +104,7 @@ AddClass::AddClass(AddCloudWizard *parent) : QWizardPage(parent), wizard(parent)
     layout->addWidget(p);
 
     // Measures
-    p = new QCommandLinkButton(tr("Measurements"), tr("Sync measurements such as weight, body fat, HRV and sleep."));
+    p = new QCommandLinkButton(tr("Measures"), tr("Download measures such as weight, body fat, HRV and sleep."));
     p->setStyleSheet(QString("font-size: %1px;").arg(font.pointSizeF() * dpiXFactor));
     connect(p, SIGNAL(clicked()), mapper, SLOT(map()));
     mapper->setMapping(p, CloudService::Measures);
@@ -146,7 +147,7 @@ AddService::AddService(AddCloudWizard *parent) : QWizardPage(parent), wizard(par
     scrollarea->setWidget(buttons);
 
     mapper = new QSignalMapper(this);
-    connect(mapper, SIGNAL(mapped(QString)), this, SLOT(clicked(QString)));
+    connect(mapper, &QSignalMapper::mappedString, this, &AddService::clicked);
 
     layout->addWidget(scrollarea);
 
@@ -271,12 +272,14 @@ AddAuth::AddAuth(AddCloudWizard *parent) : QWizardPage(parent), wizard(parent)
     pass = new QLineEdit(this);
     pass->setEchoMode(QLineEdit::Password);
     pass->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-    auth = new QPushButton(tr("Authorise"), this);
-    auth->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     token = new QLabel(this);
     token->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
     message = new QLabel(this);
     message->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+
+    // is there an icon for the authorise button?
+    auth = new QPushButton(tr("Authorise"), this);
+    auth->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 
     // labels
     comboLabel = new QLabel("");
@@ -367,6 +370,24 @@ AddAuth::initializePage()
     // clone to do next few steps!
     setSubTitle(QString(tr("%1 Credentials and authorisation")).arg(wizard->cloudService->uiName()));
 
+    // icon on the authorize button
+    if (wizard->cloudService && wizard->cloudService->authiconpath() != "") {
+
+        // scaling icon hack (193x48 is strava icon size)
+        QPixmap pix(wizard->cloudService->authiconpath());
+        QIcon authicon(pix.scaled(193*dpiXFactor, 48*dpiXFactor));
+        auth->setIconSize(QSize(193*dpiXFactor, 48*dpiYFactor));
+
+        // set the pushbutton
+        auth->setText("");
+        auth->setIcon(authicon);
+    } else {
+
+        // standard pushbutton (reset after used by strava)
+        auth->setText(tr("Authorise"));
+        auth->setIcon(QIcon());
+    }
+
     // show  all the widgets relevant for this service and update the value from the
     // settings we have collected (which will have been defaulted).
     QString cname;
@@ -451,7 +472,7 @@ AddAthlete::AddAthlete(AddCloudWizard *parent) : QWizardPage(parent), wizard(par
     scrollarea->setWidget(buttons);
 
     mapper = new QSignalMapper(this);
-    connect(mapper, SIGNAL(mapped(int)), this, SLOT(clicked(int)));
+    connect(mapper, &QSignalMapper::mappedInt, this, &AddAthlete::clicked);
 
     layout->addWidget(scrollarea);
 
@@ -505,7 +526,7 @@ AddSettings::AddSettings(AddCloudWizard *parent) : QWizardPage(parent), wizard(p
     metaCombo = new QComboBox(this);
     metaCombo->addItem("None", QVariant("")); // default "None" .. before adding the rest
     // add an entry for every single metadata field, which is a text
-    foreach(FieldDefinition field, wizard->context->athlete->rideMetadata()->getFields()) {
+    foreach(FieldDefinition field, GlobalContext::context()->rideMetadata->getFields()) {
 
         // only add text fields
         if (field.type < 3) metaCombo->addItem(field.name, QVariant(field.name));
@@ -669,7 +690,7 @@ AddFinish::initializePage()
             case CloudService::Local3:
             case CloudService::Local4:
             case CloudService::Local5:
-            case CloudService::Local6: label=want.value().split(QRegExp("[<>/]")).last(); break;
+            case CloudService::Local6: label=want.value().split(QRegularExpression("[<>/]")).last(); break;
             case CloudService::Consent:
             case CloudService::DefaultURL: break;
         }
@@ -700,7 +721,15 @@ AddFinish::validatePage()
     // in the athlete preferences
     appsettings->setCValue(wizard->context->athlete->cyclist, wizard->cloudService->activeSettingName(), "true");
 
+    // start a sync straight away
+    if (wizard->fsync) {
+        CloudService *db = CloudServiceFactory::instance().newService(wizard->cloudService->id(), wizard->context);
+        CloudServiceSyncDialog *syncnow = new CloudServiceSyncDialog(wizard->context, db);
+        syncnow->open();
+    }
+
     // delete the instance
     delete wizard->cloudService;
+
     return true;
 }

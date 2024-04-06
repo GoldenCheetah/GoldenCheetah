@@ -44,7 +44,7 @@ struct ZoneInfo {
     ZoneInfo(const QString &n, const QString &d, int l, int h) :
         name(n), desc(d), lo(l), hi(h) {}
 
-    // used by qSort()
+    // used by std::sort
     bool operator< (ZoneInfo right) const {
         return ((lo < right.lo) || ((lo == right.lo) && (hi < right.hi)));
     }
@@ -59,17 +59,18 @@ struct ZoneInfo {
 struct ZoneRange {
     QDate begin, end;
     int cp;
+    int aet;
     int ftp;
     int wprime; // aka awc
     int pmax;
     QList<ZoneInfo> zones;
     bool zonesSetFromCP;
     ZoneRange(const QDate &b, const QDate &e) :
-        begin(b), end(e), cp(0), ftp(0), wprime(0), pmax(0), zonesSetFromCP(false) {}
-    ZoneRange(const QDate &b, const QDate &e, int _cp, int _ftp, int _wprime, int pmax) :
-        begin(b), end(e), cp(_cp), ftp(_ftp), wprime(_wprime), pmax(pmax), zonesSetFromCP(false) {}
+        begin(b), end(e), cp(0), aet(0), ftp(0), wprime(0), pmax(0), zonesSetFromCP(false) {}
+    ZoneRange(const QDate &b, const QDate &e, int _cp, int _aet, int _ftp, int _wprime, int pmax) :
+        begin(b), end(e), cp(_cp), aet(_aet), ftp(_ftp), wprime(_wprime), pmax(pmax), zonesSetFromCP(false) {}
 
-    // used by qSort()
+    // used by std::sort
     bool operator< (ZoneRange right) const {
         return (((! right.begin.isNull()) &&
                 (begin.isNull() || begin < right.begin )) ||
@@ -88,7 +89,7 @@ class Zones : public QObject
     private:
 
         // Sport
-        bool run;
+        QString sport_;
 
         // Scheme
         bool defaults_from_user;
@@ -103,7 +104,7 @@ class Zones : public QObject
 
     public:
 
-        Zones(bool run=false) : run(run), defaults_from_user(false) {
+        Zones(QString sport="Bike") : sport_(sport), defaults_from_user(false) {
                 initializeZoneParameters();
         }
 
@@ -122,7 +123,7 @@ class Zones : public QObject
         void initializeZoneParameters();
 
         // Sport
-        bool isRun() { return run; }
+        QString sport() { return sport_; }
 
         //
         // Zone history - Ranges
@@ -131,8 +132,8 @@ class Zones : public QObject
         int getRangeSize() const;
 
         // Add ranges
-        void addZoneRange(QDate _start, QDate _end, int _cp, int _ftp, int _wprime, int _pmax);
-        int addZoneRange(QDate _start, int _cp, int _ftp, int _wprime, int _pmax);
+        void addZoneRange(QDate _start, QDate _end, int _cp, int _aet, int _ftp, int _wprime, int _pmax);
+        int addZoneRange(QDate _start, int _cp, int _aet, int _ftp, int _wprime, int _pmax);
         void addZoneRange();
 
         // Get / Set ZoneRange details
@@ -142,6 +143,8 @@ class Zones : public QObject
         // get and set CP for a given range
         int getCP(int rnum) const;
         void setCP(int rnum, int cp);
+        int getAeT(int rnum) const;
+        void setAeT(int rnum, int aet);
         int getFTP(int rnum) const;
         void setFTP(int rnum, int ftp);
         int getWprime(int rnum) const;

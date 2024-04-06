@@ -35,7 +35,7 @@
 #include "Context.h"
 #include "RideFile.h" // for data series types
 #include "Library.h"  // workout library
-#include "TabView.h"  // stylesheet for scroller
+#include "AbstractView.h"  // stylesheet for scroller
 
 #include "Settings.h"
 #include "Units.h"
@@ -68,8 +68,12 @@ class WorkoutWindow : public GcChartWindow
 
         // the ergfile we are editing
         ErgFile *ergFile;
+        int format;
 
         // edit the definition
+        QLabel *codeFormat;
+        QLabel *coalescedSections;
+        QWidget *codeContainer;
         CodeEditor *code;
 
         // workout widget updates these
@@ -88,7 +92,8 @@ class WorkoutWindow : public GcChartWindow
    public slots:
 
         // toolbar functions
-        void newFile();
+        void newErgFile();
+        void newMrcFile();
         void saveFile();
         void saveAs();
         void properties();
@@ -107,7 +112,7 @@ class WorkoutWindow : public GcChartWindow
         void scrollMoved();
 
         // and erg file was selected
-        void ergFileSelected(ErgFile *);
+        void ergFileSelected(ErgFile *, int format = 0);
 
         // qwkcode edited!
         void qwkcodeChanged();
@@ -122,6 +127,37 @@ class WorkoutWindow : public GcChartWindow
         // show hide toolbar if too small
         void resizeEvent(QResizeEvent * event);
 
+        // settings changes
+        void plotHrChanged(int value);
+        void plotPwrChanged(int value);
+        void plotCadenceChanged(int value);
+        void plotWbalChanged(int value);
+        void plotVo2Changed(int value);
+        void plotVentilationChanged(int value);
+        void plotSpeedChanged(int value);
+        void plotHrAvgChanged(int value);
+        void plotPwrAvgChanged(int value);
+        void plotCadenceAvgChanged(int value);
+        void plotVo2AvgChanged(int value);
+        void plotVentilationAvgChanged(int value);
+        void plotSpeedAvgChanged(int value);
+
+        // get settings
+        bool shouldPlotHr() { return plotHr;}
+        bool shouldPlotPwr() { return plotPwr;}
+        bool shouldPlotCadence() { return plotCadence;}
+        bool shouldPlotWbal() { return plotWbal;}
+        bool shouldPlotVo2() { return plotVo2;}
+        bool shouldPlotVentilation() { return plotVentilation;}
+        bool shouldPlotSpeed() { return plotSpeed;}
+
+        int hrPlotAvgLength() { return plotHrAvg; }
+        int pwrPlotAvgLength() { return plotPwrAvg; }
+        int cadencePlotAvgLength() { return plotCadenceAvg; }
+        int vo2PlotAvgLength() { return plotVo2Avg; }
+        int ventilationPlotAvgLength() { return plotVentilationAvg; }
+        int speedPlotAvgLength() { return plotSpeedAvg; }
+
     protected:
         bool eventFilter(QObject *obj, QEvent *event);
 
@@ -132,6 +168,8 @@ class WorkoutWindow : public GcChartWindow
         QToolBar *toolbar;
         WorkoutWidget *workout; // will become editor.
         QScrollBar *scroll;     // for controlling the position
+        QCheckBox *plotHrCB, *plotPwrCB, *plotCadenceCB, *plotWbalCB, *plotVo2CB, *plotVentilationCB, *plotSpeedCB;
+        QSpinBox *plotHrSB, *plotPwrSB, *plotCadenceSB, *plotVo2SB, *plotVentilationSB, *plotSpeedSB;
 
         WWPowerScale *powerscale;
         WWWBalScale *wbalscale;
@@ -149,6 +187,8 @@ class WorkoutWindow : public GcChartWindow
 
         bool active;
         bool recording;
+        bool plotHr, plotPwr, plotCadence, plotWbal, plotVo2, plotVentilation, plotSpeed;
+        int plotHrAvg, plotPwrAvg, plotCadenceAvg, plotVo2Avg, plotVentilationAvg, plotSpeedAvg;
 };
 
 #endif // _GC_WorkoutWindow_h

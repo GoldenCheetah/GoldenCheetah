@@ -22,10 +22,12 @@
 #include "Athlete.h"
 #include "Settings.h"
 #include "Units.h"
-#include "Tab.h"
+#include "AthleteTab.h"
 #include "RideNavigator.h"
 #include "HelpWhatsThis.h"
 #include "Utils.h"
+#include "Colors.h" // NamedColor and RGBColor
+#include "ColorButton.h" // GColorDialog
 
 #include <QApplication>
 #include <QtGui>
@@ -112,6 +114,10 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
     showEvents = new QCheckBox(tr("Show Events"));
     basicsettingsLayout->addRow(new QLabel(""), showEvents);
 
+    showBanister = new QCheckBox(tr("Show Banister Helper"));
+    showBanister->setChecked(true); //enable by default
+    basicsettingsLayout->addRow(new QLabel(""), showBanister);
+
     stackSlider = new QSlider(Qt::Horizontal,this);
     stackSlider->setMinimum(0);
     stackSlider->setMaximum(7);
@@ -149,7 +155,7 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
     charts->setEditTriggers(QAbstractItemView::SelectedClicked); // allow edit
     charts->setIndentation(0);
 
-    presetLayout->addWidget(charts, 0,0);
+    presetLayout->addWidget(charts, 0, Qt::Alignment());
 
     applyButton = new QPushButton(tr("Apply")); // connected in LTMWindow.cpp (weird!?)
     newButton = new QPushButton(tr("Add Current"));
@@ -181,7 +187,6 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
 
         adds.symbol = factory.metricName(i);
         adds.metric = factory.rideMetric(factory.metricName(i));
-        qsrand(QTime::currentTime().msec());
         cHSV.setHsv((i%6)*(255/(factory.metricCount()/5)), 255, 255);
         adds.penColor = cHSV.convertTo(QColor::Rgb);
         adds.curveStyle = curveStyle(factory.metricType(i));
@@ -194,7 +199,7 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
 
         // set default for the user overiddable fields
         adds.uname  = adds.name;
-        adds.units = adds.metric->units(context->athlete->useMetricUnits);
+        adds.units = adds.metric->units(GlobalContext::context()->useMetricUnits);
         adds.uunits = adds.units;
 
         // default units to metric name if it is blank
@@ -214,7 +219,7 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
 
     // metadata metrics
     SpecialFields sp;
-    foreach (FieldDefinition field, context->athlete->rideMetadata()->getFields()) {
+    foreach (FieldDefinition field, GlobalContext::context()->rideMetadata->getFields()) {
         if (!sp.isMetric(field.name) && (field.type == 3 || field.type == 4)) {
             MetricDetail metametric;
             metametric.type = METRIC_META;
@@ -236,7 +241,7 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
     }
 
     // sort the list
-    qSort(metrics);
+    std::sort(metrics.begin(), metrics.end());
 
     //----------------------------------------------------------------------------------------------------------
     // Custom Curves (4th TAB)
@@ -1426,7 +1431,7 @@ LTMTool::moveMetricUp()
     int index = customTable->row(items.first());
 
     if (index > 0) {
-        settings->metrics.swap(index, index-1);
+        settings->metrics.swapItemsAt(index, index-1);
          // refresh
         refreshCustomTable(index-1);
         curvesChanged();
@@ -1442,7 +1447,7 @@ LTMTool::moveMetricDown()
     int index = customTable->row(items.first());
 
     if (index+1 <  settings->metrics.size()) {
-        settings->metrics.swap(index, index+1);
+        settings->metrics.swapItemsAt(index, index+1);
          // refresh
         refreshCustomTable(index+1);
         curvesChanged();
@@ -1474,8 +1479,8 @@ LTMTool::applySettings()
                 // usemetricUnits changed since charts.xml was
                 // written
                 if (saved && saved->conversion() != 1.0 &&
-                    metrics[i].uunits.contains(saved->units(!context->athlete->useMetricUnits)))
-                    metrics[i].uunits.replace(saved->units(!context->athlete->useMetricUnits), saved->units(context->athlete->useMetricUnits));
+                    metrics[i].uunits.contains(saved->units(!GlobalContext::context()->useMetricUnits)))
+                    metrics[i].uunits.replace(saved->units(!GlobalContext::context()->useMetricUnits), saved->units(GlobalContext::context()->useMetricUnits));
 
 
                 break;
@@ -1734,9 +1739,9 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
     // working with estimates, local utility functions
     models << new CP2Model(context);
     models << new CP3Model(context);
-    models << new MultiModel(context);
+    //models << new MultiModel(context); disabled in v3.6
     models << new ExtendedModel(context);
-    models << new WSModel(context);
+    //models << new WSModel(context); disabled in v3.6
     foreach(PDModel *model, models) {
         modelSelect->addItem(model->name(), model->code());
     }
@@ -1808,7 +1813,7 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
     QFontMetrics fm(courier);
 
     formulaEdit->setFont(courier);
-    formulaEdit->setTabStopWidth(4 * fm.width(' ')); // 4 char tabstop
+    formulaEdit->setTabStopDistance(4 * fm.horizontalAdvance(' ')); // 4 char tabstop
     //formulaEdit->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     formulaType = new QComboBox(this);
     formulaType->addItem(tr("Total"), static_cast<int>(RideMetric::Total));
@@ -1856,10 +1861,10 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
     SpecialFields sp;
 
     // get sorted list
-    QStringList names = context->tab->rideNavigator()->logicalHeadings;
+    QStringList names = context->rideNavigator->logicalHeadings;
 
     // start with just a list of functions
-    list = DataFilter::builtins();
+    list = DataFilter::builtins(context);
 
     // ridefile data series symbols
     list += RideFile::symbols();
@@ -1867,14 +1872,18 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
     // add special functions (older code needs fixing !)
     list << "config(cranklength)";
     list << "config(cp)";
+    list << "config(aetp)";
     list << "config(ftp)";
     list << "config(w')";
     list << "config(pmax)";
     list << "config(cv)";
-    list << "config(scv)";
+    list << "config(aetv)";
+    list << "config(sex)";
+    list << "config(dob)";
     list << "config(height)";
     list << "config(weight)";
     list << "config(lthr)";
+    list << "config(aethr)";
     list << "config(maxhr)";
     list << "config(rhr)";
     list << "config(units)";
@@ -1896,12 +1905,12 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
     list << "best(cadence, 3600)";
     list << "best(speed, 3600)";
     list << "best(torque, 3600)";
-    list << "best(np, 3600)";
+    list << "best(isopower, 3600)";
     list << "best(xpower, 3600)";
     list << "best(vam, 3600)";
     list << "best(wpk, 3600)";
 
-    qSort(names.begin(), names.end(), insensitiveLessThan);
+    std::sort(names.begin(), names.end(), insensitiveLessThan);
 
     foreach(QString name, names) {
 
@@ -1949,14 +1958,30 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
     banisterTypeSelect->addItem(tr("Predicted CP (Watts)"),  BANISTER_CP);
     banisterTypeSelect->setCurrentIndex(metricDetail->stressType < 4 ? metricDetail->stressType : 2);
 
+    // banister performance metric
+    banisterPerfMetric = new QComboBox(this);
+    foreach(MetricDetail metric, ltmTool->metrics)
+        if (metric.metric != NULL && metric.metric->type() == RideMetric::Peak)
+            banisterPerfMetric->addItem(metric.name,  metric.symbol);
+    banisterPerfMetric->setCurrentIndex(banisterPerfMetric->findData(metricDetail->perfSymbol));
+
     banisterWidget = new QWidget(this);
     banisterWidget->setContentsMargins(0,0,0,0);
-    QHBoxLayout *banisterLayout = new QHBoxLayout(banisterWidget);
-    banisterLayout->setContentsMargins(0,0,0,0);
-    banisterLayout->setSpacing(5 *dpiXFactor);
-    banisterLayout->addWidget(new QLabel(tr("Curve Type"), this));
-    banisterLayout->addWidget(banisterTypeSelect);
+    QVBoxLayout *banisterLayout = new QVBoxLayout(banisterWidget);
 
+    QHBoxLayout *banisterTypeLayout = new QHBoxLayout();
+    banisterTypeLayout->setContentsMargins(0,0,0,0);
+    banisterTypeLayout->setSpacing(5 *dpiXFactor);
+    banisterTypeLayout->addWidget(new QLabel(tr("Curve Type"), this));
+    banisterTypeLayout->addWidget(banisterTypeSelect);
+    banisterLayout->addLayout(banisterTypeLayout);
+
+    QHBoxLayout *banisterPerfLayout = new QHBoxLayout();
+    banisterPerfLayout->setContentsMargins(0,0,0,0);
+    banisterPerfLayout->setSpacing(5 *dpiXFactor);
+    banisterPerfLayout->addWidget(new QLabel(tr("Perf. Metric"), this));
+    banisterPerfLayout->addWidget(banisterPerfMetric);
+    banisterLayout->addLayout(banisterPerfLayout);
 
     metricWidget = new QWidget(this);
     metricWidget->setContentsMargins(0,0,0,0);
@@ -2076,6 +2101,7 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
 
     QLabel *color = new QLabel(tr("Color"));
     curveColor = new QPushButton(this);
+    curveColor->setAutoDefault(false);
 
     QLabel *fill = new QLabel(tr("Fill curve"));
     fillCurve = new QCheckBox("", this);
@@ -2086,7 +2112,7 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
  
     // color background...
     penColor = metricDetail->penColor;
-    setButtonIcon(penColor);
+    setButtonIcon(RGBColor(penColor));
 
     QLabel *topN = new QLabel(tr("Highlight Highest"));
     showBest = new QDoubleSpinBox(this);
@@ -2180,7 +2206,9 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
     QHBoxLayout *buttonLayout = new QHBoxLayout;
     buttonLayout->addStretch();
     applyButton = new QPushButton(tr("&OK"), this);
+    applyButton->setAutoDefault(false);
     cancelButton = new QPushButton(tr("&Cancel"), this);
+    cancelButton->setAutoDefault(false);
     buttonLayout->addWidget(cancelButton);
     buttonLayout->addWidget(applyButton);
     mainLayout->addLayout(buttonLayout);
@@ -2371,7 +2399,7 @@ EditMetricDetailDialog::banisterName()
     if (chooseBanister->isChecked() == false) return;
 
     // re-use bestSymbol like PMC does
-    metricDetail->bestSymbol = metricDetail->symbol;
+    metricDetail->bestSymbol = metricDetail->symbol+"_"+metricDetail->perfSymbol;
 
     // append type
     switch(banisterTypeSelect->currentIndex()) {
@@ -2462,7 +2490,7 @@ EditMetricDetailDialog::metricSelected()
         baseLine->setValue(ltmTool->metrics[index].baseline);
         penColor = ltmTool->metrics[index].penColor;
         trendType->setCurrentIndex(ltmTool->metrics[index].trendtype);
-        setButtonIcon(penColor);
+        setButtonIcon(RGBColor(penColor));
 
         // curve style
         switch (ltmTool->metrics[index].curveStyle) {
@@ -2592,7 +2620,10 @@ EditMetricDetailDialog::applyClicked()
     metricDetail->stack = stack->isChecked();
     metricDetail->trendtype = trendType->currentIndex();
     if (chooseStress->isChecked()) metricDetail->stressType = stressTypeSelect->currentIndex();
-    if (chooseBanister->isChecked()) metricDetail->stressType = banisterTypeSelect->currentIndex();
+    if (chooseBanister->isChecked()) {
+        metricDetail->stressType = banisterTypeSelect->currentIndex();
+        metricDetail->perfSymbol = banisterPerfMetric->currentData().toString();
+    }
     metricDetail->formula = formulaEdit->toPlainText();
     metricDetail->formulaType = static_cast<RideMetric::MetricType>(formulaType->itemData(formulaType->currentIndex()).toInt());
     metricDetail->measureGroup = measureGroupSelect->currentIndex();
@@ -2636,16 +2667,12 @@ EditMetricDetailDialog::cancelClicked()
 void
 EditMetricDetailDialog::colorClicked()
 {
-    QColorDialog picker(context->mainWindow);
-    picker.setCurrentColor(penColor);
+    QColor color = GColorDialog::getColor(penColor.name());
 
-    // don't use native dialog, since there is a nasty bug causing focus loss
-    // see https://bugreports.qt-project.org/browse/QTBUG-14889
-    QColor color = picker.getColor(metricDetail->penColor, this, tr("Choose Metric Color"), QColorDialog::DontUseNativeDialog);
-
-    if (color.isValid()) {
-        setButtonIcon(penColor=color);
-    }
+    if (NamedColor(color)) { // named color
+        penColor=color;
+        setButtonIcon(RGBColor(color));
+    } else if (color.isValid()) setButtonIcon(penColor=color); // normal rgb color
 }
 
 void
@@ -2688,6 +2715,9 @@ LTMTool::setFilter(QStringList files)
 DataFilterEdit::DataFilterEdit(QWidget *parent, Context *context)
 : QTextEdit(parent), c(0), context(context)
 {
+    QFont font;
+    font.setFamily("Courier");
+    setFont(font);
     connect(this, SIGNAL(cursorPositionChanged()), this, SLOT(checkErrors()));
 }
 
@@ -2703,8 +2733,10 @@ DataFilterEdit::checkErrors()
     QStringList errors = checker.check(toPlainText());
     checker.colorSyntax(document(), textCursor().position()); // syntax + error highlighting
 
-    // need to fixup for errors!
-    // XXX next commit
+    if (checker.rt.functions.contains("sample")) errors << tr("Warning: sample() is slow -- update code to use samples()");
+
+    // even if no errors need to tell folks
+    emit syntaxErrors(errors);
 }
 
 bool
@@ -2810,7 +2842,7 @@ void DataFilterEdit::keyPressEvent(QKeyEvent *e)
 
     // are we in a comment ?
     QString line = textCursor().block().text().trimmed();
-    for(int i=textCursor().positionInBlock(); i>=0; i--)
+    for(int i=textCursor().positionInBlock(); i>=0 && i<line.size(); i--)
         if (line[i]=='#') return;
 
     if (!isShortcut && (hasModifier || e->text().isEmpty()|| completionPrefix.length() < 1

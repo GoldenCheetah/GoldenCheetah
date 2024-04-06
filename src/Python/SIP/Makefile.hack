@@ -4,7 +4,7 @@
 #
 
 SRC= sipgoldencheetahBindings.cpp sipgoldencheetahcmodule.cpp sipAPIgoldencheetah.h \
-     sipgoldencheetahQString.cpp sipgoldencheetahQStringRef.cpp
+     sipgoldencheetahQString.cpp sipgoldencheetahQStringRef.cpp sipgoldencheetahQStringList.cpp
 
 DEPS= goldencheetah.sip
 

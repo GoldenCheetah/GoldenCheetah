@@ -22,6 +22,15 @@
 #include <QBluetoothDeviceInfo>
 #include <QLowEnergyController>
 #include <QLowEnergyService>
+#include <QQueue>
+
+#include "CalibrationData.h"
+#include "Ftms.h"
+
+typedef struct btle_sensor_type {
+    const char *descriptive_name;
+    const char *iconname;
+} btle_sensor_type_t;
 
 class BT40Device: public QObject
 {
@@ -32,6 +41,24 @@ public:
     ~BT40Device();
     void connectDevice();
     void disconnectDevice();
+    static QMap<QBluetoothUuid, btle_sensor_type_t> supportedServices;
+    QBluetoothDeviceInfo deviceInfo() const;
+
+    void setLoad(double);
+    void setGradient(double);
+    void setMode(int);
+    void setWindSpeed(double);
+    void setWeight(double);
+    void setRollingResistance(double);
+    void setWindResistance(double);
+    void setWheelCircumference(double);
+
+    uint8_t  getCalibrationType()         { return calibrationData.getType(); }
+    uint8_t  getCalibrationState()        { return calibrationData.getState(); }
+    uint16_t getCalibrationZeroOffset()   { return calibrationData.getZeroOffset(); }
+    uint16_t getCalibrationSpindownTime() { return calibrationData.getSpindownTime(); }
+    double   getCalibrationTargetSpeed()  { return calibrationData.getTargetSpeed(); }
+    uint16_t getCalibrationSlope()        { return calibrationData.getSlope(); }
 
 private slots:
     void deviceConnected();
@@ -44,22 +71,58 @@ private slots:
 		     const QByteArray &value);
     void confirmedDescriptorWrite(const QLowEnergyDescriptor &d,
 				  const QByteArray &value);
+    void confirmedCharacteristicWrite(const QLowEnergyCharacteristic &c, 
+                                      const QByteArray &value);
     void serviceError(QLowEnergyService::ServiceError e);
 
+signals:
+    void setNotification(QString msg, int timeout);
 private:
     QObject *parent;
     QBluetoothDeviceInfo m_currentDevice;
     QLowEnergyController *m_control;
-    static QList<QBluetoothUuid> supportedServiceUuids;
     QList<QLowEnergyService*> m_services;
     int prevCrankStaleness;
     quint16 prevCrankTime;
     quint16 prevCrankRevs;
+    bool prevWheelStaleness;
     quint16 prevWheelTime;
     quint32 prevWheelRevs;
+    double load;
+    double gradient;
+    double prevGradient;
+    int mode;
+    double windSpeed;
+    double weight;
+    double rollingResistance;
+    double windResistance;
+    double wheelSize;
+    bool has_power;
+    bool has_controllable_service;
+    CalibrationData calibrationData;
+
+    // Service and Characteristic to set load
+    enum {Load_None, Tacx_UART, Wahoo_Kickr, Kurt_InRide, Kurt_SmartControl, FTMS_Device} loadType;
+    QLowEnergyCharacteristic loadCharacteristic;
+    QLowEnergyService* loadService;
+    QQueue<QByteArray> commandQueue;
+    int commandRetry;
+
+    // FTMS Device Configuration
+    FtmsDeviceInformation ftmsDeviceInfo;
+
     bool connected;
     void getCadence(QDataStream& ds);
     void getWheelRpm(QDataStream& ds);
+    void setLoadErg(double);
+    void setLoadIntensity(double);
+    void setLoadLevel(int);
+    void setRiderCharacteristics(double weight, double rollingResistance, double windResistance);
+    void sendSimulationParameters();
+    void commandSend(QByteArray &command);
+    void commandWrite(QByteArray &command);
+    void commandWriteFailed();
+    void commandWritten();
 };
 
 #endif

@@ -26,12 +26,17 @@
 #include <windows.h>
 #endif
 
+#ifdef LIBUSB_V_1
+#include <libusb-1.0/libusb.h>
+#include "EzUsb-1.0.h"
+#else
 #include <usb.h> // for the constants etc
 
 // EZ-USB firmware loader for Fortius
 extern "C" {
 #include "EzUsb.h"
 }
+#endif
 
 #ifdef WIN32
 #include <QLibrary> // for dynamically loading libusb0.dll
@@ -51,12 +56,49 @@ extern "C" {
 #define TYPE_FORTIUS 1
 #define TYPE_IMAGIC  2
 
+#ifdef LIBUSB_V_1
+typedef libusb_device_handle usb_dev_handle;
+typedef libusb_config_descriptor usb_config_descriptor;
+typedef const libusb_interface_descriptor usb_interface_descriptor;
+
+struct usb_device_descriptor
+{
+    uint16_t idVendor;
+    uint16_t idProduct;
+    uint8_t  bNumConfigurations = 1;
+};
+
+struct usb_device
+{
+    usb_device();
+    ~usb_device();
+
+    usb_device *next = nullptr, *prev = nullptr;
+    usb_device_descriptor descriptor;
+    libusb_device *rawDev = nullptr;
+    usb_config_descriptor *config = nullptr;
+
+    const char *filename;
+};
+
+struct usb_bus
+{
+    ~usb_bus();
+
+    usb_bus *next = nullptr, *prev = nullptr;
+    usb_device *devices = nullptr;
+
+    const char *dirname;
+};
+#endif
+
 class Context;
 
 class LibUsb {
 
 public:
     LibUsb(int type);
+    ~LibUsb();
     int open();
     void close();
     int read(char *buf, int bytes);
@@ -66,18 +108,38 @@ public:
     bool find();
 private:
 
-    struct usb_dev_handle* OpenAntStick();
-    struct usb_dev_handle* OpenFortius();
-    struct usb_dev_handle* OpenImagic();
+    usb_dev_handle* OpenAntStick();
+    usb_dev_handle* OpenFortius();
+    usb_dev_handle* OpenImagic();
     bool findAntStick();
     bool findFortius();
     bool findImagic();
 
 
-    struct usb_interface_descriptor* usb_find_interface(struct usb_config_descriptor* config_descriptor);
-    struct usb_interface_descriptor* usb_find_imagic_interface(struct usb_config_descriptor* config_descriptor);
-    struct usb_dev_handle* device;
-    struct usb_interface_descriptor* intf;
+    usb_interface_descriptor* usb_find_interface(usb_config_descriptor* config_descriptor);
+    usb_interface_descriptor* usb_find_imagic_interface(usb_config_descriptor* config_descriptor);
+    usb_dev_handle* device;
+    usb_interface_descriptor* intf;
+
+#if LIBUSB_V_1
+    void usb_init();
+    void usb_set_debug(int logLevel);
+    void usb_find_busses() { /* no-op */ }
+    void usb_find_devices() { /* no-op */ }
+    usb_bus *usb_get_busses();
+    usb_dev_handle *usb_open(usb_device *dev);
+    void usb_detach_kernel_driver_np(usb_dev_handle *udev, int interfaceNumber);
+    int usb_set_altinterface(usb_dev_handle *udev, int alternate);
+    const char *usb_strerror();
+    int usb_bulk_read(usb_dev_handle *dev, int ep, char *bytes, int size, int timeout);
+    int usb_bulk_write(usb_dev_handle *dev, int ep, const char *bytes, int size, int timeout);
+    int usb_interrupt_write(usb_dev_handle *dev, int ep, const char *bytes, int size, int timeout);
+
+    int ezusb_load_ram(usb_dev_handle *device, const char *path, int fx2, int stage, Prototype_EzUsb_control_msg uptr);
+    int ezusb_load_ram_imagic(usb_dev_handle *device, const char *path, Prototype_EzUsb_control_msg uptr);
+
+    libusb_context *ctx = nullptr;
+#endif
 
     int readEndpoint, writeEndpoint;
     int interface;
@@ -88,6 +150,7 @@ private:
     int readBufSize;
 
     int type;
+    int rc;
 
 #ifdef WIN32
     bool libNotInstalled;

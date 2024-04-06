@@ -64,29 +64,37 @@ HelpWhatsThis::getText(GCHelp chapter) {
 
     default:
     case Default:
-        return text.arg("Main-Page_Table-of-contents").arg("Table of Contents");
+        return text.arg("Main-Page_Table-of-contents").arg(tr("Table of Contents"));
 
     // Scope Bar
+    case ScopeBar:
+         return text.arg("ScopeBar_Views").arg(tr("Quick access to main Views and common actions"));
+    case ScopeBar_Athletes:
+         return text.arg("ScopeBar_Views#athletes").arg(tr("Athletes Status and Configuration"));
     case ScopeBar_Trends:
          return text.arg("ScopeBar_Views#trends").arg(tr("Analysis of a number of activities (e.g. a date range ) like PMC, long term metrics view, ... and data summaries"));
-    case ScopeBar_Diary:
-         return text.arg("ScopeBar_Views#diary").arg(tr("Extended Calendar view and configurable activity list, plus long term metrics charts and diagram types"));
     case ScopeBar_Rides:
          return text.arg("ScopeBar_Views#activities").arg(tr("Analysis of a single activity with diagrams like activity plot, W'bal, ... and Chung's Aerolab"));
-    case ScopeBar_Intervals:
-        return text.arg("ScopeBar_Views#intervals").arg("Intervals");
     case ScopeBar_Train:
         return text.arg("ScopeBar_Views#train").arg(tr("Ride indoors, following pre-programmed workouts - with multi device and video playback support"));
+    case ScopeBar_Sync:
+        return text.arg("ScopeBar_Views#sync").arg(tr("Sync with all Cloud Services with Sync on Start Up option enabled"));
+    case ScopeBar_Options:
+        return text.arg("ScopeBar_Views#options").arg(tr("Application level Options/Preferences for all athletes"));
 
     // Tool Bar
-    case ToolBar_Download:
-        return text.arg("First-Steps_Download-or-import#downloading-a-activity-from-device").arg(tr("Direct download from Powertap, SRM, Joule, Joule GPS, Moxy Monitor or Macro-X device"));
-    case ToolBar_Manual:
-        return text.arg("Menu%20Bar_Activity").arg(tr("Import any activity file - supported by Golden Cheetah - mass import is supported here"));
+    case ToolBar_Back:
+        return text.arg("Tool%20Bar_Functions#back").arg(tr("Navigate backward"));
+    case ToolBar_Forward:
+        return text.arg("Tool%20Bar_Functions#forward").arg(tr("Navigate forward"));
+    case ToolBar_PerspectiveSelector:
+        return text.arg("Tool%20Bar_Functions#perspective-selector").arg(tr("Select active perspective for the current view, create new perspectives and manage existing ones"));
     case ToolBar_ToggleSidebar:
-        return text.arg("Menu%20Bar_View").arg(tr("Activate / De-activate the Sidebar - which provides different sub-sections to select data shown in the main view"));
+        return text.arg("Tool%20Bar_Functions#side-bar").arg(tr("Activate / De-activate the Sidebar - which provides different sub-sections to select data shown in the main view"));
     case ToolBar_ToggleComparePane:
-        return text.arg("Compare-Pane_General").arg(tr("Activate / De-activate the Compare Pane - which allows to compare activities, intervals or date ranges - also across athletes"));
+        return text.arg("Tool%20Bar_Functions#bottom-bar").arg(tr("Activate / De-activate the Compare Pane - which allows to compare activities and intervals in Activities View or date ranges in Trends View - also across athletes. In Train View it shows/hide the Intensity Adjustments and Workout Control Pane."));
+    case ToolBar_TabTile:
+        return text.arg("Tool%20Bar_Functions#tabtile").arg(tr("Changes the current view layout between Tabbed and Tiled"));
 
     // Menus
     case MenuBar_Athlete:
@@ -103,8 +111,8 @@ HelpWhatsThis::getText(GCHelp chapter) {
     case MenuBar_Activity_Manual_LapsEditor:
         return text.arg("Menu%20Bar_Activity").arg(tr("Laps Editor allows to enter a sequence of work-rest intervals series -defined by number of repetitions (reps), distance (dist, units according to preferences in Pace Zones) and duration (min and sec)- to generate the data points for the activity"));
 
-    case MenuBar_Activity_BatchExport:
-        return text.arg("Menu%20Bar_Activity").arg(tr("Exports a (selectable) set of activties in one of the supported export formats"));
+    case MenuBar_Activity_BatchProcessing:
+        return text.arg("Menu%20Bar_Activity").arg(tr("Batch processes a (selectable) set of activties"));
     case MenuBar_Activity_SplitRide:
         return text.arg("Menu%20Bar_Activity").arg(tr("Wizard to split an activity into multiple activities based on configurable criteria"));
     case MenuBar_Activity_CombineRides:
@@ -123,13 +131,15 @@ HelpWhatsThis::getText(GCHelp chapter) {
     case MenuBar_Tools_AirDens_EST:
         return text.arg("Menu%20Bar_Tools").arg(tr("Estimation of Air Density (Rho)"));
     case MenuBar_Tools_Download_BodyMeasures:
-        return text.arg("Menu%20Bar_Tools").arg(tr("Downloading of Body Measurements (e.g. weight) from multiple sources"));
+        return text.arg("Menu%20Bar_Tools").arg(tr("Downloading of Body Measures (e.g. weight) from multiple sources"));
     case MenuBar_Tools_VDOT_CALC:
         return text.arg("Menu%20Bar_Tools").arg(tr("Calculation of VDOT and Threshold Pace according to Daniels' Running Formula"));
     case MenuBar_Tools_Download_ERGDB:
         return text.arg("Menu%20Bar_Tools").arg(tr("Downloading of Workouts from the ERGDB (online workout DB) for Train - Indoor Riding"));
     case MenuBar_Tools_Download_TP:
         return text.arg("Menu%20Bar_Tools").arg(tr("Downloading of Workouts from your Today's Plan account for Train - Indoor Riding"));
+    case MenuBar_Tools_Download_StravaRoutes:
+        return text.arg("Menu%20Bar_Tools").arg(tr("Downloading of Routes from your Strava account for Train - Indoor Riding"));
     case MenuBar_Tools_CreateWorkout:
         return text.arg("Menu%20Bar_Tools").arg(tr("Creation of a new Workout for Train - Indoor Riding"));
     case MenuBar_Tools_ScanDisk_WorkoutVideo:
@@ -207,10 +217,14 @@ HelpWhatsThis::getText(GCHelp chapter) {
         return text.arg("ChartTypes_Diary#calendar").arg(tr("Calendar"));
     case ChartDiary_Navigator:
         return text.arg("ChartTypes_Diary#navigator").arg(tr("Configurable activity log - with build in search capabilities"));
+    case ChartRides_Overview:
+        return text.arg("ChartTypes_Activities#Overview").arg(tr("Dashboard for a single activity - the tiles shown here are configurable"));
+    case ChartRides_Overview_Config:
+        return text.arg("ChartTypes_Activities#Overview-%1");
     case ChartRides_Summary:
         return text.arg("ChartTypes_Activities#activity-summary").arg(tr("Detailed information of a single activity - the metrics shown here are configurable"));
     case ChartRides_Details:
-        return text.arg("ChartTypes_Activities#details").arg("Configurable tabbed view of activity detail data, plus technical details and change log");
+        return text.arg("ChartTypes_Activities#details").arg(tr("Configurable tabbed view of activity detail data, plus technical details and change log"));
     case ChartRides_Editor:
         return text.arg("ChartTypes_Activities#editor").arg(tr("Editor for activity file data - allowing to change/correct data, find entries and find anomalies"));
 
@@ -235,7 +249,7 @@ HelpWhatsThis::getText(GCHelp chapter) {
     case ChartRides_HRvsPw:
         return text.arg("ChartTypes_Activities#heartrate-vs-power").arg(tr("Analysis of heartrate vs. power along the activity data"));
     case ChartRides_Map:
-        return text.arg("ChartTypes_Activities#google-map--bing-map").arg(tr("Map of activity"));
+        return text.arg("ChartTypes_Activities#map").arg(tr("Map of activity"));
     case ChartRides_2D:
         return text.arg("ChartTypes_Activities#2d-plot").arg(tr("Configurable 2D scatter plot of the current activity"));
     case ChartRides_3D:
@@ -247,6 +261,33 @@ HelpWhatsThis::getText(GCHelp chapter) {
         return text.arg("ChartTypes_Trends#summary").arg(tr("Overview/summary of the selected data range - data shown in 'Athlete's Best' are configurable"));
     case Chart_Summary_Config:
         return text.arg("ChartTypes_Trends#summary").arg(tr("Chart specific filter/search and date range settings"));
+    case Chart_Overview:
+        return text.arg("ChartTypes_Trends#Overview").arg(tr("Dashboard for the selected data range - the tiles shown are configurable"));
+    case Chart_Overview_Config:
+        return text.arg("ChartTypes_Trends#Overview-%1");
+    case Chart_R:
+        return text.arg("Special-Topics_Working-with-R").arg(tr("Embedded R Chart"));
+    case Chart_Python:
+        return text.arg("Special-Topics_Working-with-Python").arg(tr("Embedded Python Chart"));
+    case Chart_User:
+        return text.arg("Special-Topics_Working-with-User-Charts").arg(tr("Native chart programable using simple formulas with visualization control"));
+    case Chart_Web:
+        return text.arg("Special-Topics_Web-Chart").arg(tr("Configurable web page with file download intercept"));
+
+    case ChartTrain_Telemetry:
+        return text.arg("ChartTypes_Train#telemetry").arg(tr("Real time data display"));
+    case ChartTrain_Workout:
+        return text.arg("ChartTypes_Train#workout").arg(tr("Display of the content of the currently selected workout"));
+    case ChartTrain_Realtime:
+        return text.arg("ChartTypes_Train#realtime").arg(tr("Real time graph over time of the selected metrics"));
+    case ChartTrain_PedalStroke:
+        return text.arg("ChartTypes_Train#pedal-stroke").arg(tr("Computrainer SpinScan, displays the torque on each pedal as a function of the angle, over the past few rotations"));
+    case ChartTrain_VideoPlayer:
+        return text.arg("ChartTypes_Train#video-player").arg(tr("Reproduces the currently selected media file"));
+    case ChartTrain_WorkoutEditor:
+        return text.arg("ChartTypes_Train#workout-editor").arg(tr("Edition and diplay of ergometer type workout files"));
+    case ChartTrain_LiveMap:
+        return text.arg("ChartTypes_Train#live-map").arg(tr("Real time display of the route of simulation workouts in an Open Street Map"));
 
     // Sidebars
     case SideBarTrendsView_DateRanges:
@@ -270,29 +311,47 @@ HelpWhatsThis::getText(GCHelp chapter) {
     case SideBarDiaryView_Summary:
         return text.arg("Side%20Bar_Diary%20view#summary").arg(tr("Simple summary view"));
 
+    case SideBarTrainView_Devices:
+        return text.arg("Side-Bar_Train-view#devices").arg(tr("Configurable list of training devices"));
+    case SideBarTrainView_Workouts:
+        return text.arg("Side-Bar_Train-view#workouts").arg(tr("Configurable list of workout files"));
+    case SideBarTrainView_Media:
+        return text.arg("Side-Bar_Train-view#media").arg(tr("Configurable list of video files"));
+    case SideBarTrainView_VideoSync:
+        return text.arg("Side-Bar_Train-view#videosync").arg(tr("Configurable list of video sync files"));
+
     // Cross Functions
     case SearchFilterBox:
         return text.arg("Special-Topics_SearchFilter").arg(tr("Entry field for sophisticated Searching and Filtering of activities"));
     case FindIntervals:
         return text.arg("Side-Bar_Activities-view#intervals").arg(tr("Adding intervals to an activity using simple query methods"));
+    case ComparePane:
+        return text.arg("Compare-Pane_General").arg(tr("To compare Activities/Intervals in Activity View and Date Ranges in Trends View"));
+    case WorkoutControl:
+        return text.arg("Workout-Control_General").arg(tr("Workout Control, Intensity Adjustments and Notifications Display"));
 
     // Preferences
-    case Preferences_General:
-        return text.arg("Preferences_General").arg(tr("General"));
     case Preferences_Athlete_About:
         return text.arg("Preferences_Athlete").arg(tr("Athlete"));
-    case Preferences_Athlete_About_Phys:
-        return text.arg("Preferences_Athlete_Phys").arg(tr("Athlete"));
+    case Preferences_Athlete_About_Model:
+        return text.arg("Preferences_Athlete#model").arg(tr("Athlete Model"));
     case Preferences_Athlete_TrainingZones_Power:
         return text.arg("Preferences_Athlete_Training-Zones#power-zones").arg(tr("Training Zone definition for power"));
     case Preferences_Athlete_TrainingZones_HR:
         return text.arg("Preferences_Athlete_Training-Zones#heartrate-zones").arg(tr("Training Zone definition for heartrate"));
     case Preferences_Athlete_TrainingZones_Pace:
         return text.arg("Preferences_Athlete_Training-Zones#pace-zones").arg(tr("Training Zone definition for Swim and Run"));
+    case Preferences_Athlete_Measures:
+        return text.arg("Preferences_Athlete#measures").arg(tr("Athlete Measures"));
     case Preferences_Athlete_Autoimport:
-        return text.arg("Preferences_Athlete_Autoimport").arg(tr("Autoimport"));
+        return text.arg("Preferences_Athlete#auto-import").arg(tr("Auto Import"));
+    case Preferences_Athlete_Backup:
+        return text.arg("Preferences_Athlete#backup").arg(tr("Backup"));
     case Preferences_Passwords:
-        return text.arg("Preferences_Passwords").arg(tr("Passwords"));
+        return text.arg("Preferences_Accounts").arg(tr("Cloud Accounts"));
+
+    case Preferences_General:
+        return text.arg("Preferences_General").arg(tr("General"));
     case Preferences_Appearance:
         return text.arg("Preferences_Appearance").arg(tr("Appearance"));
     case Preferences_Intervals:
@@ -309,18 +368,26 @@ HelpWhatsThis::getText(GCHelp chapter) {
         return text.arg("Preferences_Data%20Fields#processing").arg(tr("Definition of processing default parameters for the fix, adjust,... tools"));
     case Preferences_Metrics:
         return text.arg("Preferences_Metrics").arg(tr("Metrics"));
-    case Preferences_Metrics_Best:
-        return text.arg("Preferences_Metrics#bests").arg(tr("Metrics shown in 'Bests'"));
-    case Preferences_Metrics_Summary:
-        return text.arg("Preferences_Metrics#summary").arg(tr("Metrics shown in 'Summary'"));
-    case Preferences_Metrics_Intervals:
-        return text.arg("Preferences_Metrics#intervals").arg(tr("Metrics shown in 'Intervals'"));
+    case Preferences_Metrics_Favourites:
+        return text.arg("Preferences_Metrics#favourites").arg(tr("Metrics shown in 'Intervals' and 'Summary'"));
+    case Preferences_Metrics_Custom:
+        return text.arg("Preferences_Metrics#custom").arg(tr("User/Custom Metrics"));
+    case Preferences_Metrics_UserMetrics:
+        return text.arg("Special-Topics_Creating-User-Metrics").arg(tr("Create or Edit a User Metric"));
+    case Preferences_Measures:
+        return text.arg("Preferences_Measures").arg(tr("Measures"));
     case Preferences_Training:
-        return text.arg("Preferences_Training").arg(tr("Training"));
+        return text.arg("Preferences_Training").arg(tr("Train View devices configuration and preferences"));
+    case Preferences_Training_Preferences:
+        return text.arg("Preferences_Training#preferences").arg(tr("Train View Preferences"));
     case Preferences_Training_RemoteControls:
-        return text.arg("Preferences_Training_Remote Controls").arg(tr("Remote Controls"));
+        return text.arg("Preferences_Training#remote-controls").arg(tr("Remote Controls Configuration"));
     case Preferences_Training_TrainDevices:
-        return text.arg("Preferences_Training_Train Devices").arg(tr("Train Devices"));
+        return text.arg("Preferences_Training#train-devices").arg(tr("Add/Remove Train Devices"));
+    case Preferences_Training_AddDeviceWizard:
+        return text.arg("Preferences_Training#add-device-wizard").arg(tr("Add Train Devices"));
+    case Preferences_Training_VirtualBicycleSpecifications:
+        return text.arg("Preferences_Training#virtual-bicycle-specifications").arg(tr("Virtual Bicycle configuration for simulation rides"));
 
     }
 

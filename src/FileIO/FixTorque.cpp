@@ -95,7 +95,8 @@ class FixTorque : public DataProcessor {
         bool postProcess(RideFile *, DataProcessorConfig* config, QString op);
 
         // the config widget
-        DataProcessorConfig* processorConfig(QWidget *parent) {
+        DataProcessorConfig* processorConfig(QWidget *parent, const RideFile * ride = NULL) {
+            Q_UNUSED(ride);
             return new FixTorqueConfig(parent);
         }
 

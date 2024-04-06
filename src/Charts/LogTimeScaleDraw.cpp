@@ -32,16 +32,9 @@
 #include "qwt_scale_div.h"
 #include "qwt_scale_map.h"
 #include "qwt_scale_draw.h"
+#include "qwt_text.h"
 
-#if QT_VERSION < 0x040000
-#include <qwmatrix.h>
-#define QwtMatrix QWMatrix
-#define QwtPointArray QPointArray
-#else
-#include <qmatrix.h>
-#define QwtMatrix QMatrix
 #define QwtPointArray QPolygon
-#endif
 
 struct tick_info_t {
     double x;
@@ -99,14 +92,10 @@ LogTimeScaleDraw::drawLabel(QPainter *painter, double value) const
     if ( labelSize.toSize().height() % 2 )
         labelSize.setHeight(labelSize.height() + 1);
 
-    const QwtMatrix m = labelTransformation( pos, labelSize).toAffine();
+    const QTransform m = labelTransformation( pos, labelSize);
 
     painter->save();
-#if QT_VERSION < 0x040000
-    painter->setWorldMatrix(m, true);
-#else
-    painter->setMatrix(m, true);
-#endif
+    painter->setTransform(m, true);
 
     lbl.draw (painter, QRect(QPoint(0, 0), labelSize.toSize()) );
     painter->restore();

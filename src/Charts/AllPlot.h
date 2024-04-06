@@ -32,7 +32,6 @@
 #include <qwt_plot_intervalcurve.h>
 #include <qwt_point_3d.h>
 #include <qwt_scale_widget.h>
-#include <qwt_compat.h>
 #include <QtGui>
 #include <QFont>
 
@@ -86,11 +85,7 @@ class CurveColors : public QObject
             // BUG in QMacStyle and painting of spanSlider
             // so we use a plain style to avoid it, but only
             // on a MAC, since win and linux are fine
-#if QT_VERSION > 0x5000
             QStyle *style = QStyleFactory::create("fusion");
-#else
-            QStyle *style = QStyleFactory::create("Cleanlooks");
-#endif
             slider->setStyle(style);
 #endif
             slider->hide();
@@ -249,7 +244,7 @@ class CurveColors : public QObject
                 c.next();
 
                 // isolate on axis hover (but leave huighlighters alone)
-                if (c.key()->yAxis() == id || c.key()->yAxis() == QwtAxisId(QwtAxis::yLeft,2)) {
+                if (c.key()->yAxis() == id || c.key()->yAxis() == QwtAxisId(QwtAxis::YLeft,2)) {
 
                     // show and remember color
                     c.key()->setVisible(c.value());
@@ -263,7 +258,7 @@ class CurveColors : public QObject
 
                     if (showslider && c.key()->yAxis() == id) {
 
-                        if (c.key()->yAxis().pos == QwtAxis::yLeft)
+                        if (c.key()->yAxis().pos == QwtAxis::YLeft)
                             slider->move(plot->canvas()->pos().x(), 10);
                         else
                             slider->move(plot->canvas()->pos().x() +
@@ -348,6 +343,7 @@ struct UserObject {
     QVector<double> array;
     QVector<double> smooth;
     QwtPlotGappedCurve    *curve;
+    QVector<QwtZone> zones;
     QColor          color;
 };
 
@@ -370,6 +366,7 @@ class AllPlotObject : public QObject
     void setColor(QColor color); // set ALL curves the same color
     void hideUnwanted(); // hide curves we are not interested in
                          // using setVisible ...
+    QVector<QwtZone> parseZoneString(QString zstring);
 
     QwtPlotGrid *grid;
     QVector<QwtPlotMarker*> d_mrk;
@@ -403,7 +400,6 @@ class AllPlotObject : public QObject
     QwtPlotCurve *xpCurve;
     QwtPlotCurve *apCurve;
     QwtPlotCurve *hrCurve;
-    QwtPlotCurve *hrvCurve;
     QwtPlotCurve *tcoreCurve;
     QwtPlotCurve *speedCurve;
     QwtPlotCurve *accelCurve;
@@ -441,7 +437,6 @@ class AllPlotObject : public QObject
     QVector<double> wprimeDist;
 
     QVector<double> hrArray;
-  //    QVector<double> hrvArray;
     QVector<double> tcoreArray;
     QVector<double> wattsArray;
     QVector<double> atissArray;
@@ -503,8 +498,6 @@ class AllPlotObject : public QObject
     QVector<double> smoothAP;
     QVector<double> smoothXP;
     QVector<double> smoothHr;
-    QVector<double> smoothHrv;
-    QVector<double> smoothHrv_time;
     QVector<double> smoothTcore;
     QVector<double> smoothSpeed;
     QVector<double> smoothAccel;
@@ -593,8 +586,8 @@ class AllPlot : public QwtPlot
         // refresh data / plot parameters
         void recalc(AllPlotObject *objects);
         void setYMax();
-        void setLeftOnePalette(); // color of yLeft,1 axis
-        void setRightPalette(); // color of yRight,0 axis
+        void setLeftOnePalette(); // color of YLeft,1 axis
+        void setRightPalette(); // color of YRight,0 axis
         void setXTitle();
         void setHighlightIntervals(bool);
 
@@ -630,7 +623,6 @@ class AllPlot : public QwtPlot
         void setShowXP(bool show);
         void setShowAP(bool show);
         void setShowHr(bool show);
-        void setShowHRV(bool show);
         void setShowTcore(bool show);
         void setShowSpeed(bool show);
         void setShowCad(bool show);
@@ -653,6 +645,7 @@ class AllPlot : public QwtPlot
         void setShowPCO(bool show);
         void setShowDC(bool show);
         void setShowPPP(bool show);
+        void setShowMarkers(bool show);
         void setShowGrid(bool show);
         void setPaintBrush(int state);
         void setShadeZones(bool x) { shade_zones=x; }
@@ -692,7 +685,6 @@ class AllPlot : public QwtPlot
         bool showXP;
         bool showAP;
         bool showHr;
-        bool showHRV;
         bool showTcore;
         bool showSpeed;
         bool showAccel;
@@ -721,6 +713,7 @@ class AllPlot : public QwtPlot
         bool showO2Hb;
         bool showHHb;
         bool showGear;
+        bool showMarkers;
 
         // plot objects
         AllPlotObject *standard;
@@ -739,6 +732,10 @@ class AllPlot : public QwtPlot
         // scope of plot (none means all, or just for a specific series
         RideFile::SeriesType scope;
         RideFile::SeriesType secondaryScope;
+
+        // mouse control
+        bool isPanning;
+        int panOriginX;
 
     protected:
         friend class ::AllPlotObject;

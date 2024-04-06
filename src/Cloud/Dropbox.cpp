@@ -103,7 +103,7 @@ bool Dropbox::createFolder(QString path)
     request.setRawHeader("Content-Type", "application/json");
 
     QByteArray data;
-    data.append(QString("{ \"path\": \"%1\", \"autorename\": false }").arg(path));
+    data.append(QString("{ \"path\": \"%1\", \"autorename\": false }").arg(path).toUtf8());
     QNetworkReply *reply = nam->post(request, data);
 
     // blocking request
@@ -146,11 +146,11 @@ Dropbox::readdir(QString path, QStringList &errors)
         QByteArray data;
 
         if (firstRequest) {
-            data.append(QString("{ \"path\": \"%1\", \"recursive\": false ,\"include_deleted\": false }").arg(path));
+            data.append(QString("{ \"path\": \"%1\", \"recursive\": false ,\"include_deleted\": false }").arg(path).toUtf8());
             firstRequest = false;
         } else {
             request.setUrl(QUrl("https://api.dropboxapi.com/2/files/list_folder/continue"));
-            data.append(QString("{ \"cursor\": \"%1\" }").arg(cursor));
+            data.append(QString("{ \"cursor\": \"%1\" }").arg(cursor).toUtf8());
         }
         QNetworkReply *reply = nam->post(request, data);
 
@@ -158,6 +158,12 @@ Dropbox::readdir(QString path, QStringList &errors)
         QEventLoop loop;
         connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
         loop.exec();
+
+        // oops, no dice
+        if (reply->error() != 0) {
+            errors << reply->errorString();
+            return returning;
+        }
 
         // did we get a good response ?
         QByteArray r = reply->readAll();

@@ -38,10 +38,12 @@
 #include <qwt_plot_zoomer.h>
 #include <qwt_plot_marker.h>
 #include <qwt_point_3d.h>
-#include <qwt_compat.h>
 #include <qwt_scale_draw.h>
+#include <qwt_scale_map.h>
+#include <qwt_text.h>
 #include <qsettings.h>
 #include <qvariant.h>
+#include <algorithm> // for std::min()
 
 
 class QwtPlotCurve;
@@ -170,6 +172,7 @@ class PowerHist : public QwtPlot
         void setWithZeros(bool value);
         void setZoned(bool value);
         void setCPZoned(bool value);
+        void setZoneLimited(bool value);
         void setSumY(bool value);
         void configChanged(qint32);
         void setAxisTitle(int axis, QString label);
@@ -214,6 +217,9 @@ class PowerHist : public QwtPlot
         bool shadeHRZones() const; // check if zone shading is both wanted and possible
         bool shadePaceZones() const; // check if zone shading is both wanted and possible
 
+        // Warning: the chart crashes when precision > 2
+        static int validatePrecision(int precision) { return std::min(precision, 2); }
+
         // plot settings
         RideItem *rideItem;
         Context *context;
@@ -222,6 +228,7 @@ class PowerHist : public QwtPlot
         bool shade;
         bool zoned;        // show in zones
         bool cpzoned;        // show in cp zones
+        bool zoneLimited;  // show zone limits
         double binw;
         bool withz;        // whether zeros are included in histogram
         double dt;         // length of sample
@@ -276,6 +283,7 @@ class PowerHist : public QwtPlot
         bool LASTlny;
         bool LASTzoned;        // show in zones
         bool LASTcpzoned;        // show in zones
+        bool LASTzoneLimited;  // show zone limits
         double LASTbinw;
         bool LASTwithz;        // whether zeros are included in histogram
         double LASTdt;         // length of sample
@@ -315,7 +323,7 @@ public:
 	if (! rideItem)
 	    return;
 
-	const Zones *zones = parent->context->athlete->zones(rideItem->isRun);
+	const Zones *zones = parent->context->athlete->zones(rideItem->sport);
         int zone_range = -1;
         if (zones) zone_range = zones->whichRange(rideItem->dateTime.date());
 
@@ -378,7 +386,7 @@ public:
 	if (! rideItem)
 	    return;
 
-	const Zones *zones = parent->context->athlete->zones(rideItem->isRun);
+	const Zones *zones = parent->context->athlete->zones(rideItem->sport);
         int zone_range = -1;
         if (zones) zone_range = zones->whichRange(rideItem->dateTime.date());
 
@@ -469,7 +477,7 @@ public:
 	if (! rideItem)
 	    return;
 
-	const HrZones *zones = parent->context->athlete->hrZones(rideItem->isRun);
+	const HrZones *zones = parent->context->athlete->hrZones(rideItem->sport);
         int zone_range = -1;
         if (zones) zone_range = zones->whichRange(rideItem->dateTime.date());
 
@@ -520,7 +528,7 @@ public:
 	if (! rideItem)
 	    return;
 
-	const HrZones *zones = parent->context->athlete->hrZones(rideItem->isRun);
+	const HrZones *zones = parent->context->athlete->hrZones(rideItem->sport);
         int zone_range = -1;
         if (zones) zone_range = zones->whichRange(rideItem->dateTime.date());
 
@@ -614,7 +622,7 @@ public:
 	int zone_range = zones ? zones->whichRange(rideItem->dateTime.date()) : -1;
 
     // unit conversion factor for imperial units
-    const double speed_factor  = (parent->context->athlete->useMetricUnits ? 1.0 : MILES_PER_KM);
+    const double speed_factor  = (GlobalContext::context()->useMetricUnits ? 1.0 : MILES_PER_KM);
 
 	if (parent->shadePaceZones() && (zone_range >= 0)) {
 	    QList <double> zone_lows = zones->getZoneLows(zone_range);
@@ -667,7 +675,7 @@ public:
 	int zone_range = zones ? zones->whichRange(rideItem->dateTime.date()) : -1;
 
     // unit conversion factor for imperial units
-    const double speed_factor  = (parent->context->athlete->useMetricUnits ? 1.0 : MILES_PER_KM);
+    const double speed_factor  = (GlobalContext::context()->useMetricUnits ? 1.0 : MILES_PER_KM);
 
 	setZ(1.0 + zone_number / 100.0);
 

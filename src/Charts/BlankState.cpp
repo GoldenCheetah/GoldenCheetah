@@ -35,7 +35,7 @@ BlankStatePage::BlankStatePage(Context *context) : GcWindow(context), context(co
     homeLayout->addSpacing(20); // left margin
     setAutoFillBackground(true);
     setProperty("color", QColor(Qt::white));
-    setProperty("nomenu", true);
+    showMore(false);
 
     // left part
     QWidget *left = new QWidget(this);
@@ -77,8 +77,10 @@ BlankStatePage::BlankStatePage(Context *context) : GcWindow(context), context(co
     mainLayout->addLayout(bottomRow);
 
     dontShow = new QCheckBox(tr("Don't show this next time."), this);
+    dontShow->setStyleSheet("QCheckBox {color: black}");
     dontShow->setFocusPolicy(Qt::NoFocus);
     closeButton = new QPushButton(tr("Close"), this);
+    closeButton->setStyleSheet("QPushButton {color: black }");
     closeButton->setFocusPolicy(Qt::NoFocus);
     bottomRow->addWidget(dontShow);
     bottomRow->addStretch();
@@ -129,7 +131,7 @@ BlankStatePage::addToShortCuts(ShortCut shortCut)
     shortCutButton->setIconSize(QSize(40,40));
     //importButton->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
     //importButton->setStyleSheet("QToolButton {text-align: left;color : blue;background: transparent}");
-    shortCutButton->setStyleSheet("QPushButton {border-radius: 10px;border-style: outset; background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #DDDDDD, stop: 1 #BBBBBB); border-width: 1px; border-color: #555555;} QPushButton:pressed {background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #BBBBBB, stop: 1 #999999);}");
+    shortCutButton->setStyleSheet("QPushButton {color: black; border-radius: 10px;border-style: outset; background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #DDDDDD, stop: 1 #BBBBBB); border-width: 1px; border-color: #555555;} QPushButton:pressed {background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #BBBBBB, stop: 1 #999999);}");
     shortCutButton->setFixedSize(200*dpiXFactor, 60*dpiYFactor);
     leftLayout->addWidget(shortCutButton);
 
@@ -147,6 +149,14 @@ BlankStateAnalysisPage::BlankStateAnalysisPage(Context *context) : BlankStatePag
 
     img->setIcon(QPixmap(":images/analysis.png"));
     img->setIconSize(QSize(800,330));
+
+    ShortCut scCloud;
+    scCloud.label = tr("Connect to cloud service and download");
+    scCloud.buttonLabel = tr("Cloud Download");
+    scCloud.buttonIconPath = ":images/mac/download.png";
+    QPushButton *cloudButton = addToShortCuts(scCloud);
+    connect(cloudButton, SIGNAL(clicked()), context->mainWindow, SLOT(importCloud()));
+
 
     ShortCut scImport;
     scImport.label = tr("Import files from your disk or usb device");

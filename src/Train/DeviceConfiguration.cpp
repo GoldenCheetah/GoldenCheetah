@@ -22,6 +22,7 @@
 #include "Settings.h"
 #include "DeviceTypes.h"
 #include "DeviceConfiguration.h"
+#include "RealtimeController.h"
 
 #define PI M_PI
 
@@ -33,11 +34,11 @@ DeviceConfiguration::DeviceConfiguration()
 {
     // just set all to empty!
     type=0;
-    defaultString="";
     wheelSize=2100;
     postProcess=0;
-    controller=NULL;
     stridelength=80;
+    controller = NULL;
+    virtualPowerDefinitionString = "";
 }
 
 
@@ -114,13 +115,13 @@ DeviceConfigurations::readConfig()
             configVal = appsettings->value(NULL, configStr);
             Entry.deviceProfile = configVal.toString();
 
-            configStr = QString("%1%2").arg(GC_DEV_DEF).arg(i+1);
-            configVal = appsettings->value(NULL, configStr);
-            Entry.defaultString = configVal.toString();
-
             configStr = QString("%1%2").arg(GC_DEV_VIRTUAL).arg(i+1);
             configVal = appsettings->value(NULL, configStr);
             Entry.postProcess = configVal.toInt();
+
+            configStr = QString("%1%2").arg(GC_DEV_VIRTUALPOWER).arg(i+1);
+            configVal = appsettings->value(NULL, configStr);
+            Entry.virtualPowerDefinitionString = configVal.toString();
 
             Entries.append(Entry);
     }
@@ -161,15 +162,26 @@ DeviceConfigurations::writeConfig(QList<DeviceConfiguration> Configuration)
         configStr = QString("%1%2").arg(GC_DEV_PROF).arg(i+1);
         appsettings->setValue(configStr, Configuration.at(i).deviceProfile);
 
-        // default string
-        configStr = QString("%1%2").arg(GC_DEV_DEF).arg(i+1);
-        appsettings->setValue(configStr, Configuration.at(i).defaultString);
+        // virtual post Process and definition string
+        VirtualPowerTrainerManager& vptm = Configuration.at(i).controller->virtualPowerTrainerManager;
 
-        // virtual post Process...
-        configStr = QString("%1%2").arg(GC_DEV_VIRTUAL).arg(i+1);
-        appsettings->setValue(configStr, Configuration.at(i).postProcess);
+        int postProcess = Configuration.at(i).postProcess;
+        bool isPredefinedPostProcess = vptm.IsPredefinedVirtualPowerTrainerIndex(postProcess);
+
+        int postProcessStoreValue = postProcess;
+        QString s = Configuration.at(i).virtualPowerDefinitionString;
+
+        if (!isPredefinedPostProcess) {
+            postProcessStoreValue = 0;
+            vptm.GetVirtualPowerTrainerAsString(postProcess, s);
+        }
+
+        configStr = QString("%1%2").arg(GC_DEV_VIRTUAL).arg(i + 1);
+        appsettings->setValue(configStr, postProcessStoreValue);
+
+        configStr = QString("%1%2").arg(GC_DEV_VIRTUALPOWER).arg(i + 1);
+        appsettings->setValue(configStr, QString(s));
     }
-
 }
 
 const QStringList
@@ -181,7 +193,7 @@ const QStringList
 WheelSize::TIRE_SIZES = QStringList() << "--" << "20mm" << "23mm" << "25mm" << "28mm" << "1.00\"" << "1.50\"" << "1.75\"" << "1.90\"" << "1.95\"" << "2.00\"" << "2.10\"" << "2.125\"";
 
                                     // -- 20mm 23mm 25mm 28mm 1.00"  1.50"  1.75"  1.90"  1.95"  2.00"  2.10"  2.125"
-static const float TIRE_DIAMETERS[] = {0, 40,  46,  50,  56,  50.8,  76.2,  88.9,  96.5,  99.1,  101.6, 106.7, 108};
+static const float TIRE_DIAMETERS[] = {0, 40,  46,  50,  56,  50.8f,  76.2f,  88.9f,  96.5f,  99.1f,  101.6f, 106.7f, 108};
 
 int
 WheelSize::calcPerimeter(int rimSizeIndex, int tireSizeIndex)

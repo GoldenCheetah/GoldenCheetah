@@ -81,6 +81,20 @@ FitlogParser::startElement( const QString&, const QString&,
         QString source = qAttributes.value("Source");
         if (source != "") rideFile->setDeviceType(source);
 
+    } else if (qName == "Location") {
+
+        QString location = qAttributes.value("Name");
+        if (location != "") rideFile->setTag("Route", location);
+
+    } else if (qName == "EquipmentItem") {
+
+        QString equipment = qAttributes.value("Name");
+        if (equipment != "") {
+            QString prevEq = rideFile->getTag("Equipment", "");
+            if (prevEq != "") equipment = prevEq + ", " + equipment;
+            rideFile->setTag("Equipment", equipment);
+        }
+
     } else if (qName == "pt") {
 
         // set point values to zero
@@ -212,6 +226,10 @@ FitlogParser::endElement( const QString&, const QString&, const QString& qName)
             }
         }
         rideFile->setRecIntSecs(populardelta);
+
+    } else if (qName == "Name") {
+
+        rideFile->setTag("Objective", buffer);
 
     } else if (qName == "Notes") {
 

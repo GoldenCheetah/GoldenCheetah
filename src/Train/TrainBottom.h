@@ -20,6 +20,9 @@
 #define _GC_TrainBottom_h
 
 #include <QWidget>
+#include <QFrame>
+#include <QMap>
+#include <QString>
 
 class TrainSidebar;
 class QPushButton;
@@ -32,13 +35,26 @@ class TrainBottom : public QWidget
 
 public:
     TrainBottom(TrainSidebar * trainSidebar, QWidget *parent = 0);
+
+public slots:
+    void configChanged(qint32);
+
 private:
     TrainSidebar *m_trainSidebar;
     QPushButton *m_playButton, *m_rewindButton, *m_stopButton, *m_forwardButton;
-    QPushButton *m_lapButton, *m_connectButton, *loadDown, *loadUp, *cal;
+    QPushButton *m_lapButton, *m_connectButton, *loadDown, *loadUp, *cal, *fwdLap, *backLap;
     QSlider *intensitySlider;
     QPlainTextEdit *notificationText;
     QTimer *notificationTimer;
+    QMap<void*, QString> iconNames;
+
+    void updateStyles();
+    QFrame *newSep();
+    void applyIcon(QPushButton *button, QString iconName, bool dark);
+    void applyIcon(QPushButton *button, QString iconName);
+    void reapplyIcon(QPushButton *button, bool dark);
+    void reapplyIcon(QPushButton *button);
+    bool isDark() const;
 
 private slots:
     void updatePlayButtonIcon();

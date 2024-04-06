@@ -90,18 +90,11 @@ Athlete::Athlete(Context *context, const QDir &homeDir)
     int returnCode = v3.upgrade(home->root());
     if (returnCode != 0) return;
 
-    // metric / non-metric
-    QVariant unit = appsettings->value(NULL, GC_UNIT, GC_UNIT_METRIC);
-    if (unit == 0) {
-        // Default to system locale
-        unit = QLocale::system().measurementSystem() == QLocale::MetricSystem ? GC_UNIT_METRIC : GC_UNIT_IMPERIAL;
-        appsettings->setValue(GC_UNIT, unit);
-    }
-    useMetricUnits = (unit.toString() == GC_UNIT_METRIC);
 
     // Power Zones for Bike & Run
-    for (int i=0; i < 2; i++) {
-        zones_[i] = new Zones(i>0);
+    foreach (QString sport, GlobalContext::context()->rideMetadata->sports()) {
+        QString i = RideFile::sportTag(sport);
+        zones_[i] = new Zones(i);
         QFile zonesFile(home->config().canonicalPath() + "/" + zones_[i]->fileName());
         if (zonesFile.exists()) {
             if (!zones_[i]->read(zonesFile)) {
@@ -110,17 +103,18 @@ Athlete::Athlete(Context *context, const QDir &homeDir)
                 QMessageBox::warning(context->mainWindow, tr("Reading Zones File %1").arg(zones_[i]->fileName()), zones_[i]->warningString());
             }
         }
-        if (i == 1 && zones_[i]->getRangeSize() == 0) { // No running Power zones
+        if (i != "Bike" && zones_[i]->getRangeSize() == 0) { // No Power zones
             // Start with Cycling Power zones for backward compatibilty
-            QFile zonesFile(home->config().canonicalPath() + "/" + zones_[0]->fileName());
+            QFile zonesFile(home->config().canonicalPath() + "/" + Zones().fileName());
             // Load without error/warning report to avoid repetition
             if (zonesFile.exists()) zones_[i]->read(zonesFile);
         }
     }
 
-    // Heartrate Zones for Bike & Run
-    for (int i=0; i < 2; i++) {
-        hrzones_[i] = new HrZones(i>0);
+    // Heartrate Zones
+    foreach (QString sport, GlobalContext::context()->rideMetadata->sports()) {
+        QString i = RideFile::sportTag(sport);
+        hrzones_[i] = new HrZones(i);
         QFile hrzonesFile(home->config().canonicalPath() + "/" + hrzones_[i]->fileName());
         if (hrzonesFile.exists()) {
             if (!hrzones_[i]->read(hrzonesFile)) {
@@ -129,9 +123,9 @@ Athlete::Athlete(Context *context, const QDir &homeDir)
                 QMessageBox::warning(context->mainWindow, tr("Reading HR Zones File %1").arg(hrzones_[i]->fileName()), hrzones_[i]->warningString());
             }
         }
-        if (i == 1 && hrzones_[i]->getRangeSize() == 0) { // No running HR zones
+        if (i != "Bike" && hrzones_[i]->getRangeSize() == 0) { // No HR zones
             // Start with Cycling HR zones for backward compatibilty
-            QFile hrzonesFile(home->config().canonicalPath() + "/" + hrzones_[0]->fileName());
+            QFile hrzonesFile(home->config().canonicalPath() + "/" + HrZones().fileName());
             // Load without error/warning report to avoid repetition
             if (hrzonesFile.exists()) hrzones_[i]->read(hrzonesFile);
         }
@@ -157,9 +151,6 @@ Athlete::Athlete(Context *context, const QDir &homeDir)
 
     // Metadata
     rideCache = NULL; // let metadata know we don't have a ridecache yet
-    rideMetadata_ = new RideMetadata(context,true);
-    rideMetadata_->hide();
-    colorEngine = new ColorEngine(context);
 
     // Date Ranges
     seasons = new Seasons(home->config());
@@ -178,8 +169,19 @@ Athlete::Athlete(Context *context, const QDir &homeDir)
     connect(context, SIGNAL(refreshEnd()), cloudAutoDownload, SLOT(autoDownload()));
 
     // now most dependencies are in get cache
+    QEventLoop loop;
     rideCache = new RideCache(context);
+    connect(rideCache, SIGNAL(loadComplete()), &loop, SLOT(quit()));
+    connect(rideCache, SIGNAL(loadComplete()), this, SLOT(loadComplete()));
 
+    // we need to block on load complete if first (before mainwindow ready)
+    if (context->mainWindow->progress)  loop.exec();
+}
+
+void
+Athlete::loadComplete()
+{
+    // once ridecache is up and running load the rest
     // read athlete's charts.xml and translate etc, it needs to be
     // after RideCache creation to allow for Custom Metrics initialization
     loadCharts();
@@ -198,11 +200,17 @@ Athlete::Athlete(Context *context, const QDir &homeDir)
     connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
     connect(context,SIGNAL(rideAdded(RideItem*)),this,SLOT(checkCPX(RideItem*)));
     connect(context,SIGNAL(rideDeleted(RideItem*)),this,SLOT(checkCPX(RideItem*)));
+
+    // done, tell main window
+    context->notifyLoadCompleted(cyclist, context);
 }
 
 void
 Athlete::close()
 {
+    // let everyone know we're going
+    context->notifyAthleteClose(cyclist, context);
+
     // set to latest so we don't repeat
     appsettings->setCValue(context->athlete->home->root().dirName(), GC_VERSION_USED, VERSION_LATEST);
     appsettings->setCValue(context->athlete->home->root().dirName(), GC_SAFEEXIT, true);
@@ -218,7 +226,7 @@ Athlete::loadCharts()
 {
     presets.clear();
     LTMSettings reader;
-    reader.readChartXML(context->athlete->home->config(), context->athlete->useMetricUnits, presets);
+    reader.readChartXML(context->athlete->home->config(), GlobalContext::context()->useMetricUnits, presets);
     translateDefaultCharts(presets);
 }
 
@@ -245,10 +253,8 @@ Athlete::~Athlete()
     delete seasons;
     delete measures;
 
-    delete rideMetadata_;
-    delete colorEngine;
-    for (int i=0; i<2; i++) delete zones_[i];
-    for (int i=0; i<2; i++) delete hrzones_[i];
+    foreach (Zones* zones, zones_) delete zones;
+    foreach (HrZones* hrzones, hrzones_) delete hrzones;
     for (int i=0; i<2; i++) delete pacezones_[i];
     delete autoImportConfig;
     delete autoImport;
@@ -264,8 +270,11 @@ void Athlete::selectRideFile(QString fileName)
     foreach (RideItem *rideItem, rideCache->rides()) {
 
         context->ride = (RideItem*) rideItem;
-        if (context->ride->fileName == fileName) 
+        if (context->ride->fileName == fileName)  {
+            // lets open it before we let folks know
+            context->ride->ride();
             break;
+        }
     }
     context->notifyRideSelected(context->ride);
 }
@@ -346,12 +355,6 @@ Athlete::translateDefaultCharts(QList<LTMSettings>&charts)
 void
 Athlete::configChanged(qint32 state)
 {
-    // change units
-    if (state & CONFIG_UNITS) {
-        QVariant unit = appsettings->value(NULL, GC_UNIT, GC_UNIT_METRIC);
-        useMetricUnits = (unit.toString() == GC_UNIT_METRIC);
-    }
-
     // invalidate PMC data
     if (state & (CONFIG_PMC | CONFIG_SEASONS)) {
         QMapIterator<QString, PMCData *> pmcs(pmcData);
@@ -399,12 +402,13 @@ AthleteDirectoryStructure::AthleteDirectoryStructure(const QDir home){
     athlete_quarantine = "quarantine";
     athlete_planned = "planned";
     athlete_snippets = "snippets";
+    athlete_media = "media";
 
 }
 
 AthleteDirectoryStructure::~AthleteDirectoryStructure() {
 
-    myhome = NULL;
+    myhome = QDir();
 
 }
 
@@ -426,6 +430,7 @@ AthleteDirectoryStructure::createAllSubdirs() {
     myhome.mkdir(athlete_quarantine);
     myhome.mkdir(athlete_planned);
     myhome.mkdir(athlete_snippets);
+    myhome.mkdir(athlete_media);
 
 }
 
@@ -446,7 +451,8 @@ AthleteDirectoryStructure::subDirsExist() {
             temp().exists() &&
             quarantine().exists()&&
             planned().exists() &&
-            snippets().exists()
+            snippets().exists() &&
+            media().exists()
             );
 }
 
@@ -484,7 +490,10 @@ Athlete::getWeight(QDate date, RideFile *ride)
     double weight;
 
     // daily weight first
-    weight = measures->getGroup(Measures::Body)->getFieldValue(date);
+    if (measures->getGroup(Measures::Body))
+        weight = measures->getGroup(Measures::Body)->getFieldValue(date);
+    else
+        weight = 0.0;
 
     // ride (if available)
     if (!weight && ride)
@@ -522,19 +531,19 @@ Athlete::getHeight(RideFile *ride)
 
 // working with Banister data series
 Banister *
-Athlete::getBanisterFor(QString metricName, int t1 , int t2)
+Athlete::getBanisterFor(QString metricName, QString perfMetricName, int t1 , int t2)
 {
     Banister *returning = NULL;
 
     // if we don't already have one, create it
-    returning = banisterData.value(metricName, NULL); // we do
+    returning = banisterData.value(metricName+perfMetricName, NULL); // we do
     if (!returning) {
 
         // specification is blank and passes for all
-        returning = new Banister(context, metricName, t1, t2); // we don't seed t1/t2 yet. (maybe never will)
+        returning = new Banister(context, metricName, perfMetricName, t1, t2); // we don't seed t1/t2 yet. (maybe never will)
 
         // add to our collection
-        banisterData.insert(metricName, returning);
+        banisterData.insert(metricName+perfMetricName, returning);
     }
 
     return returning;
@@ -581,11 +590,11 @@ Athlete::getPMCFor(Leaf *expr, DataFilterRuntime *df, int stsdays, int ltsdays)
 }
 
 PDEstimate
-Athlete::getPDEstimateFor(QDate date, QString model, bool wpk)
+Athlete::getPDEstimateFor(QDate date, QString model, bool wpk, QString sport)
 {
     // whats the estimate for this date
     foreach(PDEstimate est, getPDEstimates()) {
-        if (est.model == model && est.wpk == wpk && est.from <= date && est.to >= date)
+        if (est.model == model && est.wpk == wpk && est.sport == sport && est.from <= date && est.to >= date)
             return est;
     }
     return PDEstimate();

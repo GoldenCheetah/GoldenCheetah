@@ -42,12 +42,16 @@ class DistanceSwim : public RideMetric {
     }
     // Overrides to use Swim Pace units setting
     QString units(bool) const {
-        bool metricSwPace = appsettings->value(NULL, GC_SWIMPACE, true).toBool();
-        return RideMetric::units(metricSwPace);
+        bool metricPace = appsettings->value(NULL, GC_SWIMPACE, GlobalContext::context()->useMetricUnits).toBool();
+        return RideMetric::units(metricPace);
     }
     double value(bool) const {
-        bool metricSwPace = appsettings->value(NULL, GC_SWIMPACE, true).toBool();
-        return RideMetric::value(metricSwPace);
+        bool metricPace = appsettings->value(NULL, GC_SWIMPACE, GlobalContext::context()->useMetricUnits).toBool();
+        return RideMetric::value(metricPace);
+    }
+    double value(double v, bool) const {
+        bool metricPace = appsettings->value(NULL, GC_SWIMPACE, GlobalContext::context()->useMetricUnits).toBool();
+        return RideMetric::value(v, metricPace);
     }
     void initialize() {
         setName(tr("Distance Swim"));
@@ -103,17 +107,26 @@ class PaceSwim : public RideMetric {
 
     // Overrides to use Swim Pace units setting
     QString units(bool) const {
-        bool metricRunPace = appsettings->value(NULL, GC_SWIMPACE, true).toBool();
-        return RideMetric::units(metricRunPace);
+        bool metricPace = appsettings->value(NULL, GC_SWIMPACE, GlobalContext::context()->useMetricUnits).toBool();
+        return RideMetric::units(metricPace);
     }
 
     double value(bool) const {
-        bool metricRunPace = appsettings->value(NULL, GC_SWIMPACE, true).toBool();
-        return RideMetric::value(metricRunPace);
+        bool metricPace = appsettings->value(NULL, GC_SWIMPACE, GlobalContext::context()->useMetricUnits).toBool();
+        return RideMetric::value(metricPace);
+    }
+
+    double value(double v, bool) const {
+        bool metricPace = appsettings->value(NULL, GC_SWIMPACE, GlobalContext::context()->useMetricUnits).toBool();
+        return RideMetric::value(v, metricPace);
     }
 
     QString toString(bool metric) const {
         return time_to_string(value(metric)*60, true);
+    }
+
+    QString toString(double v) const {
+        return time_to_string(v*60, true);
     }
 
     void initialize() {
@@ -126,7 +139,13 @@ class PaceSwim : public RideMetric {
         setDescription(tr("Average Speed expressed in swim pace units: min/100m or min/100yd"));
    }
 
-    void compute(RideItem *, Specification, const QHash<QString,RideMetric*> &deps) {
+    void compute(RideItem *item, Specification, const QHash<QString,RideMetric*> &deps) {
+        // not a swim
+        if (!item->isSwim) {
+            setValue(RideFile::NIL);
+            setCount(0);
+            return;
+        }
 
         RideMetric *as = deps.value("average_speed");
 
@@ -173,17 +192,26 @@ class SwimPace : public RideMetric {
 
     // Overrides to use Swim Pace units setting
     QString units(bool) const {
-        bool metric = appsettings->value(NULL, GC_SWIMPACE, true).toBool();
-        return RideMetric::units(metric);
+        bool metricPace = appsettings->value(NULL, GC_SWIMPACE, GlobalContext::context()->useMetricUnits).toBool();
+        return RideMetric::units(metricPace);
     }
 
     double value(bool) const {
-        bool metric = appsettings->value(NULL, GC_SWIMPACE, true).toBool();
-        return RideMetric::value(metric);
+        bool metricPace = appsettings->value(NULL, GC_SWIMPACE, GlobalContext::context()->useMetricUnits).toBool();
+        return RideMetric::value(metricPace);
+    }
+
+    double value(double v, bool) const {
+        bool metricPace = appsettings->value(NULL, GC_SWIMPACE, GlobalContext::context()->useMetricUnits).toBool();
+        return RideMetric::value(v, metricPace);
     }
 
     QString toString(bool metric) const {
         return time_to_string(value(metric)*60, true);
+    }
+
+    QString toString(double v) const {
+        return time_to_string(v*60, true);
     }
 
     void initialize() {
@@ -456,17 +484,26 @@ class SwimPaceStroke : public RideMetric {
 
     // Overrides to use Swim Pace units setting
     QString units(bool) const {
-        bool metric = appsettings->value(NULL, GC_SWIMPACE, true).toBool();
-        return RideMetric::units(metric);
+        bool metricPace = appsettings->value(NULL, GC_SWIMPACE, GlobalContext::context()->useMetricUnits).toBool();
+        return RideMetric::units(metricPace);
     }
 
     double value(bool) const {
-        bool metric = appsettings->value(NULL, GC_SWIMPACE, true).toBool();
-        return RideMetric::value(metric);
+        bool metricPace = appsettings->value(NULL, GC_SWIMPACE, GlobalContext::context()->useMetricUnits).toBool();
+        return RideMetric::value(metricPace);
+    }
+
+    double value(double v, bool) const {
+        bool metricPace = appsettings->value(NULL, GC_SWIMPACE, GlobalContext::context()->useMetricUnits).toBool();
+        return RideMetric::value(v, metricPace);
     }
 
     QString toString(bool metric) const {
         return time_to_string(value(metric)*60, true);
+    }
+
+    QString toString(double v) const {
+        return time_to_string(v*60, true);
     }
 
     void initialize() {

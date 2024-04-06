@@ -18,7 +18,7 @@
 
 #include "SearchBox.h"
 #include "Context.h"
-#include "Tab.h"
+#include "AthleteTab.h"
 #include "Athlete.h"
 #include "NamedSearch.h"
 #include "RideNavigator.h"
@@ -33,13 +33,13 @@
 #include <QDebug>
 
 SearchBox::SearchBox(Context *context, QWidget *parent, bool nochooser)
-    : QLineEdit(parent), context(context), parent(parent), filtered(false), nochooser(nochooser), active(false)
+    : QLineEdit(parent), context(context), parent(parent), filtered(false), nochooser(nochooser), active(false), fixed(false)
 {
-    setFixedHeight(21 *dpiYFactor);
+    setFixedHeight(28 *dpiYFactor);
     //clear button
     clearButton = new QToolButton(this);
     clearButton->setStyleSheet("QToolButton { border: none; padding: 0px; }");
-    QIcon pixmap(":images/toolbar/popbutton.png");
+    QIcon pixmap = QPixmap::fromImage(QImage(":images/toolbar/popbutton.png").scaled(12*dpiXFactor, 12*dpiXFactor));
     clearButton->setIcon(QIcon(pixmap));
     clearButton->setIconSize(QSize(12 *dpiXFactor,12 *dpiYFactor));
     clearButton->setCursor(Qt::ArrowCursor);
@@ -50,12 +50,13 @@ SearchBox::SearchBox(Context *context, QWidget *parent, bool nochooser)
 
     // make sure its underneath the toggle button
     toolButton = new QToolButton(this);
-    toolButton->setFixedSize(QSize(16 *dpiXFactor,16 *dpiYFactor));
+    toolButton->setFixedSize(QSize(12 *dpiXFactor,12 *dpiYFactor));
 #ifdef Q_OS_MAC
     toolButton->setStyleSheet("QToolButton { background: transparent; }");
 #else
     toolButton->setStyleSheet("QToolButton { border: none; padding: 0px; }");
 #endif
+    toolButton->move(10*dpiXFactor,0);
     toolButton->setCursor(Qt::ArrowCursor);
     toolButton->setPopupMode(QToolButton::InstantPopup);
 
@@ -66,11 +67,12 @@ SearchBox::SearchBox(Context *context, QWidget *parent, bool nochooser)
 
     // search button
     searchButton = new QToolButton(this);
-    QIcon search = iconFromPNG(":images/toolbar/search3.png", false);
-    searchButton->setStyleSheet("QToolButton { border: none; padding: 0px; }");
+    searchButton->setStyleSheet("QToolButton { border: none; padding: 1px; }");
+    QIcon search = iconFromPNG(":images/toolbar/search3.png", QSize(12 *dpiXFactor,12*dpiYFactor));
+    searchButton->setIconSize(QSize(12 *dpiXFactor,12 *dpiYFactor));
     searchButton->setIcon(search);
-    searchButton->setIconSize(QSize(11 *dpiXFactor,11 *dpiYFactor));
     searchButton->setCursor(Qt::ArrowCursor);
+    searchButton->move(3*dpiXFactor,6*dpiYFactor);
     connect(searchButton, SIGNAL(clicked()), this, SLOT(toggleMode()));
 
     // create an empty completer, configchanged will fix it
@@ -103,49 +105,24 @@ SearchBox::configChanged(qint32)
     int frameWidth = style()->pixelMetric(QStyle::PM_DefaultFrameWidth);
     QColor color = QPalette().color(QPalette::Highlight);
 
-    // flat mode has square corners
-    if (GCColor::isFlat()) {
-
-        setStyleSheet(QString( //"QLineEdit { padding-right: %1px; } "
-                          "QLineEdit#SearchBox {"
-                          "    border-radius: 3px; "
-                          "    border: 1px solid rgba(127,127,127,127);"
-                          "    padding: 0px %1px;"
-                          "}"
-                          "QLineEdit#SearchBox:focus {"
-                          "    border-radius: 3px; "
+    setStyleSheet(QString( //"QLineEdit { padding-right: %1px; } "
+                      "QLineEdit#SearchBox {"
+                      "    border-radius: 3px; "
+                      "    border: 1px solid rgba(127,127,127,127);"
+                      "    padding: 0px %1px;"
+                      "}"
+                      "QLineEdit#SearchBox:focus {"
+                      "    border-radius: 3px; "
 #ifdef WIN32
-                          "    border: 1px solid rgba(%2,%3,%4,255);"
+                      "    border: 1px solid rgba(%2,%3,%4,255);"
 #else
-                          "    border: 2px solid rgba(%2,%3,%4,255);"
+                      "    border: 2px solid rgba(%2,%3,%4,255);"
 #endif
-                          "    padding: 0px %5px;"
-                          "}"
-                 ).arg(clearButton->sizeHint().width() + frameWidth + 12)
-                  .arg(color.red()).arg(color.green()).arg(color.blue())
-                  .arg(clearButton->sizeHint().width() + frameWidth + 12));
-
-    } else { 
-        setStyleSheet(QString( //"QLineEdit { padding-right: %1px; } "
-                          "QLineEdit#SearchBox {"
-                          "    border-radius: 10px; "
-                          "    border: 1px solid rgba(127,127,127,127);"
-                          "    padding: 0px %1px;"
-                          "}"
-                          "QLineEdit#SearchBox:focus {"
-                          "    border-radius: 10px; "
-#ifdef WIN32
-                          "    border: 1px solid rgba(%2,%3,%4,255);"
-#else
-                          "    border: 2px solid rgba(%2,%3,%4,255);"
-#endif
-                          "    padding: 0px %5px;"
-                          "}"
-                 ).arg(clearButton->sizeHint().width() + frameWidth + 12)
-                  .arg(color.red()).arg(color.green()).arg(color.blue())
-                  .arg(clearButton->sizeHint().width() + frameWidth + 12));
-
-    }
+                      "    padding: 0px %5px;"
+                      "}"
+             ).arg(clearButton->sizeHint().width() + frameWidth + 12)
+              .arg(color.red()).arg(color.green()).arg(color.blue())
+              .arg(clearButton->sizeHint().width() + frameWidth + 12));
 
     // get suitably formated list
     QList<QString> list;
@@ -153,19 +130,23 @@ SearchBox::configChanged(qint32)
     SpecialFields sp;
 
     // start with just a list of functions
-    list = DataFilter::builtins();
+    list = DataFilter::builtins(context);
 
     // add special functions (older code needs fixing !)
     list << "config(cranklength)";
     list << "config(cp)";
+    list << "config(aetp)";
     list << "config(ftp)";
     list << "config(w')";
     list << "config(pmax)";
     list << "config(cv)";
-    list << "config(scv)";
+    list << "config(aetv)";
+    list << "config(sex)";
+    list << "config(dob)";
     list << "config(height)";
     list << "config(weight)";
     list << "config(lthr)";
+    list << "config(aethr)";
     list << "config(maxhr)";
     list << "config(rhr)";
     list << "config(units)";
@@ -196,8 +177,8 @@ SearchBox::configChanged(qint32)
     list << "NA";
 
     // get sorted list
-    QStringList names = context->tab->rideNavigator()->logicalHeadings;
-    qSort(names.begin(), names.end(), insensitiveLessThan);
+    QStringList names = context->rideNavigator->logicalHeadings;
+    std::sort(names.begin(), names.end(), insensitiveLessThan);
 
     foreach(QString name, names) {
 
@@ -217,7 +198,7 @@ SearchBox::configChanged(qint32)
     }
 
     // sort the list
-    qSort(list.begin(), list.end(), insensitiveLessThan);
+    std::sort(list.begin(), list.end(), insensitiveLessThan);
 
     // set new list
     completer->setList(list);
@@ -259,19 +240,25 @@ void SearchBox::resizeEvent(QResizeEvent *)
     QSize sz = clearButton->sizeHint();
     int frameWidth = style()->pixelMetric(QStyle::PM_DefaultFrameWidth);
     clearButton->move(rect().right() - frameWidth - sz.width() - 1, 3);
-    searchButton->move(5 *dpiXFactor, 3 *dpiYFactor);
+    searchButton->move(3 *dpiXFactor, 6 *dpiYFactor);
 #ifndef Q_OS_MAC
-    toolButton->move(15, 0);
+    toolButton->move(10*dpiXFactor, 0);
 #else
-    toolButton->move(13, 0);
+    toolButton->move(10*dpiXFactor, 0);
 #endif
 
     //container->move(rect().left(), rect().bottom() + 3); // named dialog...
     //checkMenu(); // not needed
 }
 
+void SearchBox::setFixedMode(bool fixed)
+{
+    this->fixed = fixed;
+}
 void SearchBox::toggleMode()
 {
+    if (fixed) return;
+
     clear(); // clear whatever is there first
     if (mode == Search) setMode(Filter);
     else setMode(Search);
@@ -283,9 +270,11 @@ void SearchBox::setMode(SearchBoxMode mode)
 
         case Filter:
         {
-            QIcon filter = iconFromPNG(":images/toolbar/filter3.png", false);
+            QIcon filter = iconFromPNG(":images/toolbar/filter3.png", QSize(12 *dpiXFactor,12*dpiYFactor));
+            searchButton->setStyleSheet("QToolButton { border: none; padding: 1px; }");
+            searchButton->setIconSize(QSize(12 *dpiXFactor,12 *dpiYFactor));
             searchButton->setIcon(filter);
-            searchButton->setIconSize(QSize(11 *dpiXFactor,11 *dpiYFactor));
+            searchButton->move(3 *dpiXFactor, 6 *dpiYFactor);
             setPlaceholderText(tr("Filter..."));
         }
         break;
@@ -293,9 +282,11 @@ void SearchBox::setMode(SearchBoxMode mode)
         case Search:
         default:
         {
-            QIcon search = iconFromPNG(":images/toolbar/search3.png", false);
+            QIcon search = iconFromPNG(":images/toolbar/search3.png", QSize(12 *dpiXFactor,12*dpiYFactor));
+            searchButton->setStyleSheet("QToolButton { border: none; padding: 1px; }");
+            searchButton->setIconSize(QSize(12 *dpiXFactor,12 *dpiYFactor));
             searchButton->setIcon(search);
-            searchButton->setIconSize(QSize(11 *dpiXFactor,11 *dpiYFactor));
+            searchButton->move(3 *dpiXFactor, 6 *dpiYFactor);
             setPlaceholderText(tr("Search..."));
         }
         break;
@@ -365,7 +356,7 @@ void SearchBox::runMenu(QAction *x)
 
     } else if (x->text() == tr("Column Chooser")) {
 
-        ColumnChooser *selector = new ColumnChooser(context->tab->rideNavigator()->logicalHeadings);
+        ColumnChooser *selector = new ColumnChooser(context->rideNavigator->logicalHeadings);
         selector->show();
 
     } else {
@@ -456,7 +447,7 @@ SearchBox::addNamed()
 }
 
 //
-// Working with the the autocompleter
+// Working with the autocompleter
 //
 void SearchBox::setCompleter(DataFilterCompleter *completer)
 {

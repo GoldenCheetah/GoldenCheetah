@@ -20,6 +20,7 @@
 #define _GC_Athlete_h 1
 
 #include "Measures.h"
+#include "DataFilter.h"
 
 #include <QDir>
 #include <QSqlDatabase>
@@ -58,7 +59,7 @@ class IntervalCache;
 class Context;
 class ColorEngine;
 class AnalysisSidebar;
-class Tab;
+class AthleteTab;
 class Leaf;
 class DataFilterRuntime;
 class CloudServiceAutoDownload;
@@ -76,20 +77,15 @@ class Athlete : public QObject
         // basic athlete info
         QString cyclist; // the cyclist name
         QUuid id; // unique identifier
-        bool useMetricUnits;
         AthleteDirectoryStructure *home;
         const AthleteDirectoryStructure *directoryStructure() const {return home; }
 
-        // metadata definitions
-        RideMetadata *rideMetadata_;
-        ColorEngine *colorEngine;
-
         // zones
-        const Zones *zones(bool isRun) const { return zones_[isRun]; }
-        const HrZones *hrZones(bool isRun) const { return hrzones_[isRun]; }
+        const Zones *zones(QString sport) const { return zones_.value(sport, zones_.value("Bike")); }
+        const HrZones *hrZones(QString sport) const { return hrzones_.value(sport, hrzones_.value("Bike")); }
         const PaceZones *paceZones(bool isSwim) const { return pacezones_[isSwim]; }
-        Zones *zones_[2];
-        HrZones *hrzones_[2];
+        QHash<QString, Zones*> zones_;
+        QHash<QString, HrZones*> hrzones_;
         PaceZones *pacezones_[2];
         void setCriticalPower(int cp);
 
@@ -104,7 +100,7 @@ class Athlete : public QObject
         CloudServiceAutoDownload *cloudAutoDownload;
 
         // Estimates
-        PDEstimate getPDEstimateFor(QDate, QString model, bool wpk);
+        PDEstimate getPDEstimateFor(QDate, QString model, bool wpk, QString sport);
         QList<PDEstimate> getPDEstimates();
 
         // PMC Data
@@ -113,7 +109,7 @@ class Athlete : public QObject
         QMap<QString, PMCData*> pmcData; // all the different PMC series
 
         // Banister Data
-        Banister *getBanisterFor(QString metricName, int t1, int t2); // t1/t2 not used yet
+        Banister *getBanisterFor(QString metricName, QString perfMetricName, int t1, int t2); // t1/t2 not used yet
         QMap<QString, Banister*> banisterData;
 
         // athlete measures
@@ -132,9 +128,6 @@ class Athlete : public QObject
         RideImportWizard *autoImport;
         RideAutoImportConfig *autoImportConfig;
 
-        // ride metadata definitions
-        RideMetadata *rideMetadata() { return rideMetadata_; }
-
         // preset charts
         QList<LTMSettings> presets;
         void loadCharts(); // load charts.xml
@@ -142,6 +135,9 @@ class Athlete : public QObject
 
         // named filters / queries
         NamedSearches *namedSearches;
+
+        // DataFilter global storage/cache
+        QMap<QString,Result> dfcache;
 
         Context *context;
 
@@ -166,6 +162,7 @@ class Athlete : public QObject
     public slots:
         void checkCPX(RideItem*ride);
         void configChanged(qint32);
+        void loadComplete();
 
 };
 
@@ -193,6 +190,7 @@ class AthleteDirectoryStructure : public QObject {
             QDir quarantine() { return QDir(myhome.absolutePath()+"/"+athlete_quarantine);}
             QDir planned() { return QDir(myhome.absolutePath()+"/"+athlete_planned);}
             QDir snippets() { return QDir(myhome.absolutePath()+"/"+athlete_snippets);}
+            QDir media() { return QDir(myhome.absolutePath()+"/"+athlete_media);}
             QDir root() { return myhome; }
 
             // supporting functions to work with the subDirs
@@ -219,8 +217,8 @@ class AthleteDirectoryStructure : public QObject {
             QString athlete_quarantine;
             QString athlete_planned;
             QString athlete_snippets;
+            QString athlete_media;
 
 };
-
 
 #endif

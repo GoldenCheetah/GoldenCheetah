@@ -110,8 +110,18 @@ UserMetricParser::serialize(QString filename, QList<UserMetricSettings> metrics)
         return;
     };
     file.resize(0);
+
     QTextStream out(&file);
+    serializeToQTextStream(out, metrics);
+    file.close();
+}
+
+void
+UserMetricParser::serializeToQTextStream(QTextStream& out, QList<UserMetricSettings> metrics)
+{
+#if QT_VERSION < 0x060000
     out.setCodec("UTF-8");
+#endif
 
     // begin document
     out << QString("<usermetrics version=\"%1\">\n").arg(USER_METRICS_VERSION_NUMBER);
@@ -145,6 +155,6 @@ UserMetricParser::serialize(QString filename, QList<UserMetricSettings> metrics)
     // end document
     out << "</usermetrics>\n";
 
-    // close file
-    file.close();
+    // flush stream
+    out.flush();
 }

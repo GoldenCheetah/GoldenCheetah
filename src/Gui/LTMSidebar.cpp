@@ -28,7 +28,7 @@
 #include "HelpWhatsThis.h"
 
 #include "GcWindowRegistry.h" // for GcWinID types
-#include "HomeWindow.h" // for GcWindowDialog
+#include "Perspective.h" // for GcWindowDialog
 #include "LTMWindow.h" // for LTMWindow::settings()
 #include "LTMChartParser.h" // for LTMChartParser::serialize && ChartTreeView
 
@@ -226,7 +226,6 @@ LTMSidebar::LTMSidebar(Context *context) : QWidget(context->mainWindow), context
     // our date ranges
     connect(dateRangeTree,SIGNAL(itemSelectionChanged()), this, SLOT(dateRangeTreeWidgetSelectionChanged()));
     connect(dateRangeTree,SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(dateRangePopup(const QPoint &)));
-    connect(dateRangeTree,SIGNAL(itemChanged(QTreeWidgetItem *,int)), this, SLOT(dateRangeChanged(QTreeWidgetItem*, int)));
     connect(dateRangeTree,SIGNAL(itemMoved(QTreeWidgetItem *,int, int)), this, SLOT(dateRangeMoved(QTreeWidgetItem*, int, int)));
 
     // filters
@@ -324,6 +323,33 @@ LTMSidebar::configChanged(qint32)
  *----------------------------------------------------------------------*/
 
 void
+LTMSidebar::selectDateRange(DateRange dr)
+{
+    for(int i=0; i<seasons->seasons.count(); i++) {
+        Season s = seasons->seasons.at(i);
+        if (s.getStart() == dr.from && s.getEnd() == dr.to && s.name == dr.name) {
+            // bingo
+            dateRangeTree->selectionModel()->clearSelection(); // clear selection
+            allDateRanges->child(i)->setSelected(true); // select ours
+            return;
+        } else {
+            QStringList names=dr.name.split("/");
+            if (names.count() == 2 && s.name == names.at(0)) {
+                for (int j=0; j<s.phases.count(); j++) {
+                    Phase p = s.phases.at(j);
+                    if (p.getStart() == dr.from && p.getEnd() == dr.to && p.name == names.at(1)) {
+                        // bingo
+                        dateRangeTree->selectionModel()->clearSelection(); // clear selection
+                        allDateRanges->child(i)->child(j)->setSelected(true); // select ours
+                        return;
+                    }
+                }
+            }
+        }
+    }
+}
+
+void
 LTMSidebar::dateRangeTreeWidgetSelectionChanged()
 {
     if (active == true) return;
@@ -381,8 +407,8 @@ LTMSidebar::dateRangeTreeWidgetSelectionChanged()
     }
 
     // Let the view know its changed....
-    if (phase) emit dateRangeChanged(DateRange(phase->start, phase->end, dateRange->name + "/" + phase->name));
-    else if (dateRange) emit dateRangeChanged(DateRange(dateRange->start, dateRange->end, dateRange->name));
+    if (phase) emit dateRangeChanged(DateRange(phase->getStart(), phase->getEnd(), dateRange->name + "/" + phase->name));
+    else if (dateRange) emit dateRangeChanged(DateRange(dateRange->getStart(), dateRange->getEnd(), dateRange->name));
     else emit dateRangeChanged(DateRange());
 
 }
@@ -714,7 +740,7 @@ LTMSidebar::setAutoFilterMenu()
 
     // Convert field names for Internal to Display (to work with the translated values)
     SpecialFields sp;
-    foreach(FieldDefinition field, context->athlete->rideMetadata()->getFields()) {
+    foreach(FieldDefinition field, GlobalContext::context()->rideMetadata->getFields()) {
 
         if (field.tab != "" && (field.type == 0 || field.type == 2)) { // we only do text or shorttext fields
 
@@ -786,7 +812,7 @@ LTMSidebar::autoFilterChanged()
             // Convert field names for Internal to Display (to work with the translated values)
             SpecialFields sp;
             // update the values available in the tree
-            foreach(FieldDefinition field, context->athlete->rideMetadata()->getFields()) {
+            foreach(FieldDefinition field, GlobalContext::context()->rideMetadata->getFields()) {
                 if (sp.displayName(field.name) == action->text()) {
                     foreach (QString value, context->athlete->rideCache->getDistinctValues(field.name)) {
                         if (value == "") value = tr("(blank)");
@@ -919,7 +945,16 @@ LTMSidebar::filterNotify()
         } else {
 
             // both are set, so merge results
-            QStringList merged = autoFilterFiles.toSet().intersect(queryFilterFiles.toSet()).toList();
+            auto mergedSet =
+                    QSet<QString>(
+                            autoFilterFiles.begin(),
+                            autoFilterFiles.end()).intersect(
+                    QSet<QString>(
+                            queryFilterFiles.begin(),
+                            queryFilterFiles.end()
+                            )
+                    );
+            QStringList merged = QStringList(mergedSet.begin(), mergedSet.end());
             context->setHomeFilter(merged);
         }
 
@@ -944,7 +979,7 @@ LTMSidebar::autoFilterRefresh()
         QString fieldname = sp.internalName(item->splitterHandle->title());
 
         // update the values available in the tree
-        foreach(FieldDefinition field, context->athlete->rideMetadata()->getFields()) {
+        foreach(FieldDefinition field, GlobalContext::context()->rideMetadata->getFields()) {
             if (field.name == fieldname) {
                 foreach (QString value, context->athlete->rideCache->getDistinctValues(field.name)) {
                     if (value == "") value = tr("(blank)");
@@ -1012,7 +1047,7 @@ LTMSidebar::autoFilterSelectionChanged()
     }
 
     // all done
-    autoFilterFiles = matched.toList();
+    autoFilterFiles = matched.values();
 
     // tell the world
     filterNotify();
@@ -1087,23 +1122,6 @@ LTMSidebar::deleteFilter()
 }
 
 void
-LTMSidebar::dateRangeChanged(QTreeWidgetItem*item, int)
-{
-    if (active == true) return;
-
-    int index = allDateRanges->indexOfChild(item);
-    seasons->seasons[index].setName(item->text(0));
-
-    // save changes away
-    active = true;
-    seasons->writeSeasons();
-    active = false;
-
-    // signal date selected changed
-    //dateRangeSelected(&seasons->seasons[index]);
-}
-
-void
 LTMSidebar::dateRangeMoved(QTreeWidgetItem*item, int oldposition, int newposition)
 {
     // report the move in the seasons
@@ -1132,10 +1150,10 @@ LTMSidebar::addRange()
         active = true;
 
         // check dates are right way round...
-        if (newOne.start > newOne.end) {
-            QDate temp = newOne.start;
-            newOne.start = newOne.end;
-            newOne.end = temp;
+        if (newOne.getStart() > newOne.getEnd()) {
+            QDate temp = newOne.getStart();
+            newOne.setStart(newOne.getEnd());
+            newOne.setEnd(temp);
         }
 
         // save 
@@ -1183,20 +1201,20 @@ LTMSidebar::editRange()
 
         if (phaseIdx> -1) {
             // check dates are right way round...
-            if (seasons->seasons[seasonIdx].phases[phaseIdx].start > seasons->seasons[seasonIdx].phases[phaseIdx].end) {
-                QDate temp = seasons->seasons[seasonIdx].phases[phaseIdx].start;
-                seasons->seasons[seasonIdx].phases[phaseIdx].start = seasons->seasons[seasonIdx].phases[phaseIdx].end;
-                seasons->seasons[seasonIdx].phases[phaseIdx].end = temp;
+            if (seasons->seasons[seasonIdx].phases[phaseIdx].getStart() > seasons->seasons[seasonIdx].phases[phaseIdx].getEnd()) {
+                QDate temp = seasons->seasons[seasonIdx].phases[phaseIdx].getStart();
+                seasons->seasons[seasonIdx].phases[phaseIdx].setStart(seasons->seasons[seasonIdx].phases[phaseIdx].getEnd());
+                seasons->seasons[seasonIdx].phases[phaseIdx].setEnd(temp);
             }
 
             // update name
             dateRangeTree->selectedItems().first()->setText(0, seasons->seasons[seasonIdx].phases[phaseIdx].getName());
         } else {
             // check dates are right way round...
-            if (seasons->seasons[seasonIdx].start > seasons->seasons[seasonIdx].end) {
-                QDate temp = seasons->seasons[seasonIdx].start;
-                seasons->seasons[seasonIdx].start = seasons->seasons[seasonIdx].end;
-                seasons->seasons[seasonIdx].end = temp;
+            if (seasons->seasons[seasonIdx].getStart() > seasons->seasons[seasonIdx].getEnd()) {
+                QDate temp = seasons->seasons[seasonIdx].getStart();
+                seasons->seasons[seasonIdx].setStart(seasons->seasons[seasonIdx].getEnd());
+                seasons->seasons[seasonIdx].setEnd(temp);
             }
 
             // update name

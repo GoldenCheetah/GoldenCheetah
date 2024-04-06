@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2010 Mark Liversedge (liversedge@gmail.com)
+ * Median Filter Copyright (c) 2021 Paul Johnson (paulj49457@gmail.com)
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
@@ -23,6 +24,8 @@
 #include "HelpWhatsThis.h"
 #include <algorithm>
 #include <QVector>
+#include <gsl/gsl_statistics.h>
+#include <gsl/gsl_sort.h>
 
 // Config widget used by the Preferences/Options config panes
 class FixSpikes;
@@ -33,9 +36,11 @@ class FixSpikesConfig : public DataProcessorConfig
     friend class ::FixSpikes;
     protected:
         QHBoxLayout *layout;
-        QLabel *maxLabel, *varianceLabel;
+        QLabel *maxLabel, *varianceLabel, *medWinLabel;
         QDoubleSpinBox *max,
                        *variance;
+        QSpinBox* medWinSize;
+        QCheckBox* algo;
 
     public:
         FixSpikesConfig(QWidget *parent) : DataProcessorConfig(parent) {
@@ -48,6 +53,8 @@ class FixSpikesConfig : public DataProcessorConfig
             layout->setContentsMargins(0,0,0,0);
             setContentsMargins(0,0,0,0);
 
+            algo = new QCheckBox(tr("Median"));
+
             maxLabel = new QLabel(tr("Max"));
             varianceLabel = new QLabel(tr("Variance"));
 
@@ -59,12 +66,28 @@ class FixSpikesConfig : public DataProcessorConfig
             variance = new QDoubleSpinBox();
             variance->setMaximum(9999);
             variance->setMinimum(0);
-            variance->setSingleStep(50);
+            variance->setSingleStep(5);
 
+            medWinLabel = new QLabel(tr("Window"));
+
+            medWinSize = new QSpinBox();
+            medWinSize->setMaximum(21);
+            medWinSize->setMinimum(5);
+            medWinSize->setSingleStep(2);
+            medWinSize->setValue(13);
+
+            // Ensure only odd numbers are set for the median window
+            connect(medWinSize, QOverload<int>::of(&QSpinBox::valueChanged),
+                [=](int i) {(i % 2) ? medWinSize->setValue(i) : medWinSize->setValue(i + 1); });
+
+            layout->addWidget(algo);
             layout->addWidget(maxLabel);
             layout->addWidget(max);
             layout->addWidget(varianceLabel);
             layout->addWidget(variance);
+            layout->addWidget(medWinLabel);
+            layout->addWidget(medWinSize);
+
             layout->addStretch();
         }
 
@@ -72,37 +95,49 @@ class FixSpikesConfig : public DataProcessorConfig
                               // the widget and its children when the config pane is deleted
 
         QString explain() {
-            return(QString(tr("Occasionally power meters will erroneously "
-                           "report high values for power. For crank based "
-                           "power meters such as SRM and Quarq this is "
-                           "caused by an erroneous cadence reading "
-                           "as a result of triggering a reed switch "
-                           "whilst pushing off\n\n"
-                           "This function will look for spikes/anomalies "
-                           "in power data and replace the erroneous data "
-                           "by smoothing/interpolating the data from either "
-                           "side of the point in question\n\n"
-                           "It takes the following parameters:\n\n"
-                           "Absolute Max - this defines an absolute value "
-                           "for watts, and will smooth any values above this "
-                           "absolute value that have been identified as being "
-                           "anomalies (i.e. at odds with the data surrounding it)\n\n"
-                           "Variance (%) - this will smooth any values which "
-                           "are higher than this percentage of the rolling "
-                           "average wattage for the 30 seconds leading up "
-                           "to the spike.")));
+            return(QString(tr("Power meters will occasionally report erroneously high values "
+                           "for power. For crank based power meters such as SRM and Quarq this "
+                           "is caused by an erroneous cadence reading as a result of triggering "
+                           "a reed switch whilst pushing off.\n\n"
+                           "This function provides two algorithms that look for spikes/anomalies "
+                           "in power data and replace the erroneous data by: \n\n"
+                           "i) Replacing the point in question with smoothed/interpolated data from "
+                           "either side of the point in question, it takes the following parameters:\n\n"
+                           "Absolute Max (Watts)- this defines an absolute value for watts, and will "
+                           "smooth any values above this absolute value that have been identified "
+                           "as being anomalies (i.e. at odds with the data surrounding it)\n\n"
+                           "Variance (Watts) - This determines the threshold beyond which a data point "
+                           "will be smoothed/interpolated, if the difference between the data point "
+                           "value and the 30 second rolling average wattage prior to the spike exceeds "
+                           "this parameter.\n\n"
+                           "ii) Replacing the point in question with the median value of a window "
+                           "centred upon the erronous data point. This approach is robust to local "
+                           "outliers, and preserves sharp edges, it takes the following parameters:\n\n"
+                           "Window Size - this defines the number of neighbouring points used to "
+                           "determine a median value; the window size is always odd to ensure we "
+                           "have a central median value.\n\n"
+                           "Variance (Watts) - Determines the threshold beyond which a data point will "
+                           "be fixed, if the difference between the data point value and the median "
+                           "value exceeds this parameter.\n\n")));
         }
 
         void readConfig() {
-            double tol = appsettings->value(NULL, GC_DPFS_MAX, "1500").toDouble();
-            double stop = appsettings->value(NULL, GC_DPFS_VARIANCE, "1000").toDouble();
+            double tol = appsettings->value(NULL, GC_DPFS_MAX, "200").toDouble();
+            double stop = appsettings->value(NULL, GC_DPFS_VARIANCE, "10").toDouble();
+            bool medAlgo = appsettings->value(NULL, GC_DPFS_MEDALGO, Qt::Unchecked).toBool();
+            int mWin = appsettings->value(NULL, GC_DPFS_MEDWINSIZ, "13").toInt();
+
             max->setValue(tol);
             variance->setValue(stop);
+            medWinSize->setValue(mWin);
+            algo->setCheckState(medAlgo ? Qt::Checked : Qt::Unchecked);
         }
 
         void saveConfig() {
             appsettings->setValue(GC_DPFS_MAX, max->value());
             appsettings->setValue(GC_DPFS_VARIANCE, variance->value());
+            appsettings->setValue(GC_DPFS_MEDWINSIZ, medWinSize->value());
+            appsettings->setValue(GC_DPFS_MEDALGO, algo->checkState());
         }
 };
 
@@ -122,7 +157,8 @@ class FixSpikes : public DataProcessor {
         bool postProcess(RideFile *, DataProcessorConfig* config, QString op);
 
         // the config widget
-        DataProcessorConfig* processorConfig(QWidget *parent) {
+        DataProcessorConfig* processorConfig(QWidget *parent, const RideFile * ride = NULL) {
+            Q_UNUSED(ride);
             return new FixSpikesConfig(parent);
         }
 
@@ -142,64 +178,132 @@ FixSpikes::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString op
     // does this ride have power?
     if (ride->areDataPresent()->watts == false) return false;
 
-    // get settings
-    double variance, max;
-    if (config == NULL) { // being called automatically
-        max = appsettings->value(NULL, GC_DPFS_MAX, "1500").toDouble();
-        variance = appsettings->value(NULL, GC_DPFS_VARIANCE, "1000").toDouble();
-    } else { // being called manually
-        max = ((FixSpikesConfig*)(config))->max->value();
-        variance = ((FixSpikesConfig*)(config))->variance->value();
-    }
-
-    int windowsize = 30 / ride->recIntSecs();
-
-    // We use a window size of 30s to find spikes
-    // if the ride is shorter, don't bother
-    // is no way of post processing anyway (e.g. manual workouts)
-    if (windowsize > ride->dataPoints().count()) return false;
-
-    // Find the power outliers
-
+    // Keep track of the power outliers
     int spikes = 0;
     double spiketime = 0.0;
+    
+    bool medAlgo;
+    double variance, max;
+    int medianWinSize; // this nummber must be odd to align the centre of the median window with the point being tested/corrected
 
-    // create a data array for the outlier algorithm
-    QVector<double> power;
-    QVector<double> secs;
-
-    foreach (RideFilePoint *point, ride->dataPoints()) {
-        power.append(point->watts);
-        secs.append(point->secs);
+    if (config == NULL) { // being called automatically
+        medAlgo = appsettings->value(NULL, GC_DPFS_MEDALGO, Qt::Unchecked).toBool();
+        max = appsettings->value(NULL, GC_DPFS_MAX, "200").toDouble();
+        variance = appsettings->value(NULL, GC_DPFS_VARIANCE, "10").toInt();
+        medianWinSize = appsettings->value(NULL, GC_DPFS_MEDWINSIZ, "13").toInt();
+    }
+    else {// being called manually
+        medAlgo = ((FixSpikesConfig*)(config))->algo->isChecked();
+        max = ((FixSpikesConfig*)(config))->max->value();
+        variance = ((FixSpikesConfig*)(config))->variance->value();
+        medianWinSize = ((FixSpikesConfig*)(config))->medWinSize->value();
     }
 
-    LTMOutliers *outliers = new LTMOutliers(secs.data(), power.data(), power.count(), windowsize, false);
-    ride->command->startLUW("Fix Spikes in Recording");
-    for (int i=0; i<secs.count(); i++) {
+    if (!medAlgo) {
 
-        // is this over variance threshold?
-        if (outliers->getDeviationForRank(i) < variance) break;
+        int windowsize = 30 / ride->recIntSecs();
 
-        // ok, so its highly variant but is it over
-        // the max value we are willing to accept?
-        if (outliers->getYForRank(i) < max) continue;
+        // We use a window size of 30s to find spikes
+        // if the ride is shorter, don't bother
+        // is no way of post processing anyway (e.g. manual workouts)
+        if (windowsize > ride->dataPoints().count()) return false;
 
-        // Houston, we have a spike
-        spikes++;
-        spiketime += ride->recIntSecs();
+        // create a data array for the outlier algorithm
+        QVector<double> power;
+        QVector<double> secs;
 
-        // which one is it
-        int pos = outliers->getIndexForRank(i);
-        double left=0.0, right=0.0;
+        foreach (RideFilePoint *point, ride->dataPoints()) {
+            power.append(point->watts);
+            secs.append(point->secs);
+        }
 
-        if (pos > 0) left = ride->dataPoints()[pos-1]->watts;
-        if (pos < (ride->dataPoints().count()-1)) right = ride->dataPoints()[pos+1]->watts;
+        LTMOutliers *outliers = new LTMOutliers(secs.data(), power.data(), power.count(), windowsize, false);
+        ride->command->startLUW("Fix Spikes in Recording");
+        for (int i=0; i<secs.count(); i++) {
 
-        ride->command->setPointValue(pos, RideFile::watts, (left+right)/2.0);
+            // An entry is a fixup candidate only if its variance is high AND it is above a concerning power level.
+            double y = outliers->getYForRank(i);
+            if (   outliers->getDeviationForRank(i) < variance
+                || y < max)
+                continue;
+
+            // Houston, we have a spike
+            spikes++;
+            spiketime += ride->recIntSecs();
+
+            // which one is it
+            int pos = outliers->getIndexForRank(i);
+            double left=0.0, right=0.0;
+
+            if (pos > 0) left = ride->dataPoints()[pos-1]->watts;
+            if (pos < (ride->dataPoints().count()-1)) right = ride->dataPoints()[pos+1]->watts;
+
+            ride->command->setPointValue(pos, RideFile::watts, (left+right)/2.0);
+        }
+
+        delete outliers;
+
+    } else {
+
+        // We use a median window to find spikes if the ride is
+        // shorter than the window don't bother, as there is no way
+        // of post processing anyway (e.g. manual workouts)
+        if (medianWinSize > ride->dataPoints().count()) return false;
+
+        double* data = new double[medianWinSize];
+        int halfMedianWin = medianWinSize / 2;
+
+        ride->command->startLUW("Fix Spikes Median in Recording");
+        int numDataPnts = ride->dataPoints().count();
+        for (int dataPntPosn = 0; dataPntPosn < ride->dataPoints().count(); dataPntPosn++) {
+
+            double wattsAtPnt = ride->dataPoints()[dataPntPosn]->watts;
+
+            // load median window with values
+            for (int medianWin = 0; medianWin < medianWinSize; medianWin++) {
+
+                int dp = dataPntPosn + medianWin - halfMedianWin;
+
+                // Load the median window...
+
+                if (dp < 0) {
+                    // At the beginning of the ride, the left-hand side of the median window doesn't align with any ride data, it's
+                    // somewhat arbitrary how to pad this data, but choosing a single data point to replicate runs the risk of
+                    // skewing the median filter so choose some reasonably close ride data to avoid this scenario.
+                    data[medianWin] = ride->dataPoints()[dataPntPosn + medianWin + halfMedianWin + 1]->watts;
+                }
+                else if (dp > numDataPnts - 1) {
+                    // Again at the end of the ride, the right-hand side of the median window doesn't align with any ride data, it's
+                    // best to avoid a single data point to replicate as this runs the risk of skewing the median filter
+                    // so choose some reasonably close ride data to avoid this scenario.
+                    data[medianWin] = ride->dataPoints()[dataPntPosn - halfMedianWin - (medianWinSize - medianWin)]->watts;
+                }
+                else {
+                    // The Median window lies completely within the ride data.
+                    data[medianWin] = ride->dataPoints()[dp]->watts;
+                }
+            }
+
+            // Sort entries into ascending numerical order. 
+            gsl_sort(data, 1, medianWinSize);
+
+            double medianVal = gsl_stats_median_from_sorted_data(data, 1, medianWinSize);
+
+            // An entry is a fixup candidate if it differs by more than the variance threshold.
+            if (fabs(medianVal - wattsAtPnt) < variance) continue; // Note: Only works for two positive numbers.
+
+            // Record spike
+            spikes++;
+            spiketime += ride->recIntSecs();
+
+            // Fix data point
+            ride->command->setPointValue(dataPntPosn, RideFile::watts, medianVal);
+        }
+
+        delete[] data;
     }
+
     ride->command->endLUW();
-
-    delete outliers;
 
     ride->setTag("Spikes", QString("%1").arg(spikes));
     ride->setTag("Spike Time", QString("%1").arg(spiketime));

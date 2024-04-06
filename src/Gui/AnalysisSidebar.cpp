@@ -61,8 +61,8 @@ AnalysisSidebar::AnalysisSidebar(Context *context) : QWidget(context->mainWindow
     calendarWidget->setWhatsThis(helpCalendar->getWhatsThisText(HelpWhatsThis::SideBarRidesView_Calendar));
 
     // Activity History
-    rideNavigator = new RideNavigator(context, true);
-    rideNavigator->setProperty("nomenu", true);
+    context->rideNavigator = rideNavigator = new RideNavigator(context, true);
+    rideNavigator->showMore(false);
     groupByMapper = NULL;
 
     // retrieve settings (properties are saved when we close the window)
@@ -74,7 +74,7 @@ AnalysisSidebar::AnalysisSidebar(Context *context) : QWidget(context->mainWindow
         rideNavigator->setWidths(appsettings->cvalue(context->athlete->cyclist, GC_NAVHEADINGWIDTHS).toString());
     }
 
-    QWidget *activityHistory = new QWidget(this);
+    activityHistory = new QWidget(this);
     activityHistory->setContentsMargins(0,0,0,0);
 #ifndef Q_OS_MAC // not on mac thanks
     activityHistory->setStyleSheet("padding: 0px; border: 0px; margin: 0px;");
@@ -106,7 +106,7 @@ AnalysisSidebar::AnalysisSidebar(Context *context) : QWidget(context->mainWindow
 
     // create tree for user intervals, so its always at the top
     QTreeWidgetItem *tree = new QTreeWidgetItem(intervalTree->invisibleRootItem(), RideFileInterval::USER);
-    tree->setData(0, Qt::UserRole, qVariantFromValue((void *)NULL)); // no intervalitem related
+    tree->setData(0, Qt::UserRole, QVariant::fromValue((void *)NULL)); // no intervalitem related
     tree->setText(0, RideFileInterval::typeDescription(RideFileInterval::USER));
     tree->setForeground(0, GColor(CPLOTMARKER));
     QFont bold;
@@ -243,7 +243,7 @@ AnalysisSidebar::setRide(RideItem*ride)
             QTreeWidgetItem *tree = trees.value(interval->type, NULL);
             if (tree == NULL) {
                 tree = new QTreeWidgetItem(intervalTree->invisibleRootItem(), interval->type);
-                tree->setData(0, Qt::UserRole, qVariantFromValue((void *)NULL)); // no intervalitem related
+                tree->setData(0, Qt::UserRole, QVariant::fromValue((void *)NULL)); // no intervalitem related
                 tree->setText(0, RideFileInterval::typeDescription(interval->type));
                 tree->setForeground(0, GColor(CPLOTMARKER));
                 tree->setFont(0, bold);
@@ -257,13 +257,11 @@ AnalysisSidebar::setRide(RideItem*ride)
             // add this interval to the tree
             QTreeWidgetItem *add = new QTreeWidgetItem(tree, interval->type);
             add->setText(0, interval->name);
-            add->setData(0, Qt::UserRole, qVariantFromValue((void*)interval));
+            add->setData(0, Qt::UserRole, QVariant::fromValue((void*)interval));
             add->setData(0, Qt::UserRole+1, QVariant(interval->color));
             add->setData(0, Qt::UserRole+2, QVariant(interval->test));
             add->setFlags(Qt::ItemIsEnabled
-#if QT_VERSION >= 0x50101
                           | Qt::ItemNeverHasChildren
-#endif
                           | Qt::ItemIsSelectable 
                           | Qt::ItemIsDragEnabled 
                           | Qt::ItemIsEditable);
@@ -327,6 +325,8 @@ AnalysisSidebar::configChanged(qint32)
     //intervalSummaryWindow->setPalette(GCColor::palette());
     //intervalSummaryWindow->setStyleSheet(GCColor::stylesheet());
 
+    splitter->setPalette(GCColor::palette());
+    activityHistory->setStyleSheet(QString("background: %1;").arg(GColor(CPLOTBACKGROUND).name()));
     rideNavigator->tableView->viewport()->setPalette(GCColor::palette());
     rideNavigator->tableView->viewport()->setStyleSheet(QString("background: %1;").arg(GColor(CPLOTBACKGROUND).name()));
 
@@ -382,7 +382,7 @@ AnalysisSidebar::showActivityMenu(const QPoint &pos)
     RideItem *rideItem = context->ride;
 
     if (rideItem != NULL) { 
-        QMenu menu(rideNavigator);
+        QMenu menu(this);
 
 
         QAction *actSaveRide = new QAction(tr("Save Changes"), rideNavigator);
@@ -431,7 +431,7 @@ AnalysisSidebar::showActivityMenu(const QPoint &pos)
             // add menu options for each column
             if (groupByMapper) delete groupByMapper;
             groupByMapper = new QSignalMapper(this);
-            connect(groupByMapper, SIGNAL(mapped(const QString &)), rideNavigator, SLOT(setGroupByColumnName(QString)));
+            connect(groupByMapper, &QSignalMapper::mappedString, rideNavigator, &RideNavigator::setGroupByColumnName);
 
             foreach(QString heading, rideNavigator->columnNames()) {
                 if (heading == "*") continue; // special hidden column
@@ -470,7 +470,7 @@ AnalysisSidebar::intervalPopup()
     // to manipulate the interval tree
 
     // always show the 'find best' 'find peaks' options
-    QMenu menu(intervalItem);
+    QMenu menu(this);
 
     RideItem *rideItem = context->ride;
 
@@ -549,7 +549,7 @@ AnalysisSidebar::showIntervalMenu(const QPoint &pos)
         //bool isUser = interval->rideInterval != NULL;
 
         activeInterval = interval;
-        QMenu menu(intervalTree);
+        QMenu menu(this);
 
         // ZOOM IN AND OUT FOR ALL
         QAction *actZoomOut = new QAction(tr("Zoom Out"), intervalTree);
@@ -804,6 +804,17 @@ AnalysisSidebar::deleteIntervalSelected()
     QTreeWidgetItem *userIntervals = trees.value(RideFileInterval::USER, NULL);
 
     if (userIntervals) {
+        // Are you sure ?
+        QMessageBox msgBox;
+        msgBox.setText(tr("Are you sure you want to delete selected interval?"));
+        QPushButton *deleteButton = msgBox.addButton(tr("Remove"),QMessageBox::YesRole);
+        msgBox.setStandardButtons(QMessageBox::Cancel);
+        msgBox.setDefaultButton(QMessageBox::Cancel);
+        msgBox.setIcon(QMessageBox::Critical);
+        msgBox.exec();
+
+        // nope, don't want to
+        if(msgBox.clickedButton() != deleteButton) return;
 
         QList <QTreeWidgetItem*> deleteList;
 
@@ -825,7 +836,7 @@ AnalysisSidebar::deleteIntervalSelected()
                     QMessageBox::warning(this, tr("Delete Interval"), tr("Unable to delete interval"));
                 }
             }
-        }
+        } 
 
         // now wipe the trees
         foreach (QTreeWidgetItem*item, deleteList) {
@@ -841,6 +852,18 @@ AnalysisSidebar::deleteRoute()
 {
     // stop tracking this route across rides
     if (activeInterval) {
+
+        // Are you sure ?
+        QMessageBox msgBox;
+        msgBox.setText(tr("Are you sure you want to stop tracking this segment?"));
+        QPushButton *deleteButton = msgBox.addButton(tr("Remove"),QMessageBox::YesRole);
+        msgBox.setStandardButtons(QMessageBox::Cancel);
+        msgBox.setDefaultButton(QMessageBox::Cancel);
+        msgBox.setIcon(QMessageBox::Critical);
+        msgBox.exec();
+
+        // nope, don't want to
+        if(msgBox.clickedButton() != deleteButton) return;
 
         // if refresh is running cancel it !
         context->athlete->rideCache->cancel();
@@ -863,9 +886,11 @@ AnalysisSidebar::editRoute()
         context->athlete->rideCache->cancel();
 
         QString name = activeInterval->name;
-        editInterval();
-        if (name != activeInterval->name) {
-            context->athlete->routes->renameRoute(activeInterval->route, activeInterval->name);
+        RenameIntervalDialog dialog(name, this);
+        dialog.setFixedWidth(320);
+
+        if (dialog.exec() && name != activeInterval->name) {
+            context->athlete->routes->renameRoute(activeInterval->route, name);
 
             // loop through rides finding intervals on this route
             foreach(RideItem *ride, context->athlete->rideCache->rides()) {

@@ -19,16 +19,18 @@
 #ifndef GC_R_Library_H
 #define GC_R_Library_H
 
-// QFunctionPointer typedef introduced in QT5
-#include <QtGlobal>
-#if QT_VERSION < 0x050000
-typedef void *QFunctionPointer;
+#ifdef __GNUC__
+#pragma GCC diagnostic ignored "-Wparentheses"
 #endif
 
+// QFunctionPointer typedef introduced in QT5
+#include <QtGlobal>
+#include <QCoreApplication>
 #include <QStringList>
 class QString;
 class QLibrary;
 class RLibrary {
+    Q_DECLARE_TR_FUNCTIONS(RLibrary)
 
     public:
 

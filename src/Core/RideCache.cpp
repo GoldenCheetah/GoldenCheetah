@@ -15,7 +15,6 @@
  * with this program; if not, write to the Free Software Foundation, Inc., 51
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
-
 #include "RideCache.h"
 
 #include "Context.h"
@@ -48,6 +47,18 @@
 // for sorting
 bool rideCacheGreaterThan(const RideItem *a, const RideItem *b) { return a->dateTime > b->dateTime; }
 bool rideCacheLessThan(const RideItem *a, const RideItem *b) { return a->dateTime < b->dateTime; }
+
+class RideCacheLoader : public QThread
+{
+public:
+
+    RideCacheLoader(RideCache *cache) : cache(cache) {}
+    void run() { cache->load(); }
+
+private:
+
+        RideCache *cache;
+};
 
 RideCache::RideCache(Context *context) : context(context)
 {
@@ -88,7 +99,7 @@ RideCache::RideCache(Context *context) : context(context)
         }
 
         // reset special fields to take into account user metrics
-        context->specialFields = SpecialFields();
+        GlobalContext::context()->specialFields = SpecialFields();
     }
 
     // set the list
@@ -124,12 +135,19 @@ RideCache::RideCache(Context *context) : context(context)
         }
     }
 
+    // now sort it - we need to use find on it
+    std::sort(rides_.begin(), rides_.end(), rideCacheLessThan);
+
     // load the store - will unstale once cache restored
-    load();
+    RideCacheLoader *rideCacheLoader = new RideCacheLoader(this);
+    connect(rideCacheLoader, SIGNAL(finished()), this, SLOT(postLoad()));
+    connect(rideCacheLoader, SIGNAL(finished()), this, SIGNAL(loadComplete()));
+    rideCacheLoader->start();
+}
 
-    // now sort it
-    qSort(rides_.begin(), rides_.end(), rideCacheLessThan);
-
+void
+RideCache::postLoad()
+{
     // set model once we have the basics
     model_ = new RideCacheModel(context, this);
 
@@ -143,13 +161,20 @@ RideCache::RideCache(Context *context) : context(context)
     // do we have any stale items ?
     connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
 
+}
 
-    // future watching
-    connect(&watcher, SIGNAL(finished()), this, SLOT(garbageCollect()));
-    connect(&watcher, SIGNAL(finished()), this, SLOT(save()));
-    connect(&watcher, SIGNAL(finished()), context, SLOT(notifyRefreshEnd()));
-    connect(&watcher, SIGNAL(started()), context, SLOT(notifyRefreshStart()));
-    connect(&watcher, SIGNAL(progressValueChanged(int)), this, SLOT(progressing(int)));
+struct comparerideitem { bool operator()(const RideItem *p1, const RideItem *p2) { return p1->dateTime < p2->dateTime; } };
+
+int
+RideCache::find(RideItem *dt)
+{
+    // use lower_bound to binary search
+    QVector<RideItem*>::const_iterator i = std::lower_bound(rides_.begin(), rides_.end(), dt, comparerideitem());
+    int index = i - rides_.begin();
+
+    // did it find the right value?
+    if (index < 0 || index >= rides_.count() || rides_.at(index)->dateTime != dt->dateTime) return -1;
+    return index;
 }
 
 RideCache::~RideCache()
@@ -185,6 +210,7 @@ RideCache::initEstimates()
 void
 RideCache::configChanged(qint32 what)
 {
+
     // if the wbal formula changed invalidate all cached values
     if (what & CONFIG_WBAL) {
         foreach(RideItem *item, rides()) {
@@ -195,7 +221,7 @@ RideCache::configChanged(qint32 what)
     // if metadata changed then recompute diary text
     if (what & CONFIG_FIELDS) {
         foreach(RideItem *item, rides()) {
-            item->metadata_.insert("Calendar Text", context->athlete->rideMetadata()->calendarText(item));
+            item->metadata_.insert("Calendar Text", GlobalContext::context()->rideMetadata->calendarText(item));
         }
     }
 
@@ -265,7 +291,7 @@ RideCache::addRide(QString name, bool dosignal, bool select, bool useTempActivit
     if (!added) {
         model_->beginReset();
         rides_ << last;
-        qSort(rides_.begin(), rides_.end(), rideCacheLessThan);
+        std::sort(rides_.begin(), rides_.end(), rideCacheLessThan);
         model_->endReset();
     }
 
@@ -292,37 +318,51 @@ RideCache::addRide(QString name, bool dosignal, bool select, bool useTempActivit
     estimator->refresh();
 }
 
-void
-RideCache::removeCurrentRide()
-{
-    if (context->ride == NULL) return;
+bool
+RideCache::removeCurrentRide() {
 
-    RideItem *select = NULL; // ride to select once its gone
-    RideItem *todelete = context->ride;
+    // if there is no current activity to delete then return
+    if (context->ride == NULL) return false;
 
-    bool found = false;
-    int index=0; // index to wipe out
+    // pass the current ride filename for deletion
+    return removeRide(context->ride->fileName);
+}
 
-    // find ours in the list and select the one
-    // immediately after it, but if it is the last
-    // one on the list select the one before
-    for(index=0; index < rides_.count(); index++) {
+bool
+RideCache::removeRide(const QString& filenameToDelete) {
+  
+    // if there is no file activity to delete then return
+    if (filenameToDelete.isEmpty()) return false;
 
-       if (rides_[index]->fileName == context->ride->fileName) {
+    RideItem* select = NULL; // ride to select once its gone
+    RideItem* todelete = NULL;
+    int index = 0; // index to wipe out
 
-          // bingo!
-          found = true;
-          if (rides_.count()-index > 1) select = rides_[index+1];
-          else if (index > 0) select = rides_[index-1];
-          break;
+    // find the filenameToDelete in the list and if it happens to be the
+    // the current ride then select another one immediately after it, but
+    // if it is the last one on the list select the one before
+    for (index = 0; index < rides_.count(); index++) {
 
-       }
+        RideItem* rideI = rides_[index];
+
+        if (rideI->fileName == filenameToDelete) {
+
+            // bingo!
+            todelete = rideI;
+
+            // if the ride to be deleted happens to be the current ride, then select another
+            if (context->ride == todelete) {
+                if (rides_.count() - index > 1) select = rides_[index + 1];
+                else if (index > 0) select = rides_[index - 1];
+            }
+            break;
+        }
     }
 
     // WTAF!?
-    if (!found) {
+    if (!todelete) {
         qDebug()<<"ERROR: delete not found.";
-        return;
+        return false;
     }
 
     // dataprocessor runs on "save" which is a short
@@ -339,11 +379,10 @@ RideCache::removeCurrentRide()
     model_->endRemove(index);
 
     // delete the file by renaming it
-    QString strOldFileName = context->ride->fileName;
+    QFile file((todelete->planned ? plannedDirectory : directory).canonicalPath() + "/" + filenameToDelete);
 
-    QFile file((context->ride->planned ? plannedDirectory : directory).canonicalPath() + "/" + strOldFileName);
     // purposefully don't remove the old ext so the user wouldn't have to figure out what the old file type was
-    QString strNewName = strOldFileName + ".bak";
+    QString strNewName = filenameToDelete + ".bak";
 
     // in case there was an existing bak file, delete it
     // ignore errors since it probably isn't there.
@@ -351,7 +390,7 @@ RideCache::removeCurrentRide()
 
     if (!file.rename(context->athlete->home->fileBackup().canonicalPath() + "/" + strNewName)) {
         QMessageBox::critical(NULL, "Rename Error", tr("Can't rename %1 to %2 in %3")
-            .arg(strOldFileName).arg(strNewName).arg(context->athlete->home->fileBackup().canonicalPath()));
+            .arg(filenameToDelete).arg(strNewName).arg(context->athlete->home->fileBackup().canonicalPath()));
     }
 
     // remove any other derived/additional files; notes, cpi etc (they can only exist in /cache )
@@ -359,29 +398,37 @@ RideCache::removeCurrentRide()
     extras << "notes" << "cpi" << "cpx";
     foreach (QString extension, extras) {
 
-        QString deleteMe = QFileInfo(strOldFileName).baseName() + "." + extension;
+        QString deleteMe = QFileInfo(filenameToDelete).baseName() + "." + extension;
         QFile::remove(context->athlete->home->cache().canonicalPath() + "/" + deleteMe);
-
     }
 
-    // we don't want the whole delete, select next flicker
-    context->mainWindow->setUpdatesEnabled(false);
+    if (select) {
 
-    // select a different ride
-    context->ride = select;
+        // we don't want the whole delete, select next flicker
+        context->mainWindow->setUpdatesEnabled(false);
 
-    // notify after removed from list
-    context->notifyRideDeleted(todelete);
+        // select a different ride
+        context->ride = select;
 
-    // now we can update
-    context->mainWindow->setUpdatesEnabled(true);
-    QApplication::processEvents();
+        // notify after removed from list
+        context->notifyRideDeleted(todelete);
 
-    // now select another ride
-    context->notifyRideSelected(select);
+        // now we can update
+        context->mainWindow->setUpdatesEnabled(true);
+        QApplication::processEvents();
+
+        // now select another ride
+        context->notifyRideSelected(select);
+
+    } else {
+        // re-select the context ride (if it exists) when deleting a non current ride
+        context->notifyRideSelected(context->ride);
+    }
 
     // model estimates (lazy refresh)
     estimator->refresh();
+
+    return true;
 }
 
 // NOTE:
@@ -415,6 +462,9 @@ RideCache::writeAsCSV(QString filename)
     };
     file.resize(0);
     QTextStream out(&file);
+#if QT_VERSION < 0x060000
+    out.setCodec("UTF-8"); // Metric names can be translated
+#endif
 
     // write headings
     out<<"date, time, filename";
@@ -430,7 +480,7 @@ RideCache::writeAsCSV(QString filename)
     foreach(RideItem *item, rides()) {
 
         // date, time, filename
-        out << item->dateTime.date().toString("MM/dd/yy");
+        out << item->dateTime.date().toString(Qt::ISODate);
         out << "," << item->dateTime.time().toString("hh:mm:ss");
         out << "," << item->fileName;
 
@@ -444,20 +494,35 @@ RideCache::writeAsCSV(QString filename)
     file.close();
 }
 
-void
-itemRefresh(RideItem *&item)
+int
+RideCache::nextRefresh()
 {
-    // need parser to be reentrant !item->refresh();
-    if (item->isstale) {
-        item->refresh();
+    int returning=-1;
+    updateMutex.lock();
 
-        // and trap changes during refresh to current ride
-        if (item == item->context->currentRideItem())
-            item->context->notifyRideChanged(item);
+    if (updates < 0) {
+        returning = -1; // force termination by returning -1
+    } else if (updates < reverse_.count()) {
+        returning = updates;
+        updates++;
+        progressing(returning);
+    }
+    updateMutex.unlock();
+    return(returning);
+}
 
-#ifdef SLOW_REFRESH
-        sleep(1);
-#endif
+void
+RideCache::threadCompleted(RideCacheRefreshThread*thread)
+{
+    updateMutex.lock();
+    refreshThreads.removeOne(thread);
+    updateMutex.unlock();
+
+    if (refreshThreads.count() == 0) {
+        //fprintf(stderr,"refresh ended\n"); fflush(stderr);
+        context->notifyRefreshEnd();
+        garbageCollect();
+        save();
     }
 }
 
@@ -465,8 +530,10 @@ void
 RideCache::progressing(int value)
 {
     // we're working away, notfy everyone where we got
-    progress_ = 100.0f * (double(value) / double(watcher.progressMaximum()));
-    if (value) {
+    progress_ = 100.0f * (double(value) / double(reverse_.count()));
+
+    // Avoid GUI event queue overflow- update every for every decile
+    if (reverse_.count() && (reverse_.count()/10) && (value == reverse_.count() || value % (reverse_.count()/10) == 1)) {
         QDate here = reverse_.at(value-1)->dateTime.date();
         context->notifyRefreshUpdate(here);
     }
@@ -476,9 +543,16 @@ RideCache::progressing(int value)
 void
 RideCache::cancel()
 {
-    if (future.isRunning()) {
-        future.cancel();
-        future.waitForFinished();
+    updateMutex.lock();
+    QVector<RideCacheRefreshThread*>current = refreshThreads;
+    updates=-1;
+    updateMutex.unlock();
+
+    // wait till threads are empty, but use our copy as the master
+    // is going to be changing as threads terminate and we need to be
+    // sure all our threads have stopped before returning.
+    foreach(RideCacheRefreshThread *thread, current) {
+        thread->wait();
     }
 }
 
@@ -487,13 +561,12 @@ void
 RideCache::refresh()
 {
     // already on it !
-    if (future.isRunning()) return;
+    if (refreshThreads.count()) return;
 
     // how many need refreshing ?
     int staleCount = 0;
 
     foreach(RideItem *item, rides_) {
-
         // ok set stale so we refresh
         if (item->checkStale())
             staleCount++;
@@ -502,15 +575,33 @@ RideCache::refresh()
     // start if there is work to do
     // and future watcher can notify of updates
     if (staleCount)  {
+
         reverse_ = rides_;
-        qSort(reverse_.begin(), reverse_.end(), rideCacheGreaterThan);
-        future = QtConcurrent::map(reverse_, itemRefresh);
-        watcher.setFuture(future);
+        std::sort(reverse_.begin(), reverse_.end(), rideCacheGreaterThan);
+        //future = QtConcurrent::map(reverse_, itemRefresh);
+        //watcher.setFuture(future);
+
+        // calculate number of threads and work per thread
+        int maxthreads = QThreadPool::globalInstance()->maxThreadCount();
+        int threads = maxthreads / 2;
+        if (threads==0) threads=1; // need at least one!
+        int n=0;
+
+        // refresh happenning
+        updates = 0;
+        context->notifyRefreshStart();
+
+        while(n++ < threads) {
+
+            // if goes past last make it the last
+            RideCacheRefreshThread *thread = new RideCacheRefreshThread(this);
+            refreshThreads << thread;
+            thread->start();
+        }
+
 
     } else {
 
-        // nothing to do, notify its started and done immediately
-        context->notifyRefreshStart();
 
         // wait five seconds, so mainwindow can get up and running...
         QTimer::singleShot(5000, context, SLOT(notifyRefreshEnd()));
@@ -539,7 +630,7 @@ RideCache::getAggregate(QString name, Specification spec, bool useMetricUnits, b
 
         // get this value
         double value = item->getForSymbol(name);
-        double count = item->getForSymbol("workout_time"); // for averaging
+        double count = item->getCountForSymbol(name); // for averaging
 
         // check values are bounded, just in case
         if (std::isnan(value) || std::isinf(value)) value = 0;
@@ -647,7 +738,7 @@ RideCache::getBests(QString symbol, int n, Specification specification, bool use
     }
 
     // now sort
-    qStableSort(results.begin(), results.end(), metric->isLowerBetter() ?
+    std::stable_sort(results.begin(), results.end(), metric->isLowerBetter() ?
                                                 rideCachesummaryBestLowerThan :
                                                 rideCachesummaryBestGreaterThan);
 
@@ -735,7 +826,7 @@ RideCache::getDistinctValues(QString field)
     }
 
     // sort from big to small
-    qSort(ranked.begin(), ranked.end(), rideCacheOrderListGreaterThan);
+    std::sort(ranked.begin(), ranked.end(), rideCacheOrderListGreaterThan);
 
     // extract ordered values
     foreach(OrderedList x, ranked)
@@ -746,9 +837,10 @@ RideCache::getDistinctValues(QString field)
 
 void
 RideCache::getRideTypeCounts(Specification specification, int& nActivities,
-                             int& nRides, int& nRuns, int& nSwims)
+                             int& nRides, int& nRuns, int& nSwims, QString& sport)
 {
     nActivities = nRides = nRuns = nSwims = 0;
+    sport = "";
 
     // loop through and aggregate
     foreach (RideItem *ride, rides_) {
@@ -756,10 +848,14 @@ RideCache::getRideTypeCounts(Specification specification, int& nActivities,
         // skip filtered rides
         if (!specification.pass(ride)) continue;
 
+        // sport is not empty only when all activities are from the same sport
+        if (nActivities == 0) sport = ride->sport;
+        else if (sport != ride-> sport) sport = "";
+
         nActivities++;
         if (ride->isSwim) nSwims++;
         else if (ride->isRun) nRuns++;
-        else nRides++;
+        else if (ride->isBike) nRides++;
     }
 }
 
@@ -775,12 +871,40 @@ RideCache::isMetricRelevantForRides(Specification specification,
         if (!specification.pass(ride)) continue;
 
         // skip non selected sports when restriction supplied
-        if ((sport == OnlyRides) && (ride->isSwim || ride->isRun)) continue;
+        if ((sport == OnlyRides) && !ride->isBike) continue;
         if ((sport == OnlyRuns) && !ride->isRun) continue;
         if ((sport == OnlySwims) && !ride->isSwim) continue;
+        if ((sport == OnlyXtrains) && !ride->isXtrain) continue;
 
         if (metric->isRelevantForRide(ride)) return true;
     }
 
     return false;
+}
+
+// refresh metrics
+void RideCacheRefreshThread::run()
+{
+    //fprintf(stderr, "worker thread starts!\n"); fflush(stderr);
+    while (1) {
+
+        int n = cache->nextRefresh();
+        //fprintf(stderr, "refreshing %d of %d\n", n+1, cache->reverse_.count()); fflush(stderr);
+        if (n<0) {
+            //fprintf(stderr, "worker thread exits!\n"); fflush(stderr);
+            goto exitthread;
+        }
+
+        // we have one to do
+        RideItem *item = cache->reverse_[n];
+        if(item->isstale) {
+            item->refresh();
+            if (item == item->context->currentRideItem())
+                item->context->notifyRideChanged(item);
+        }
+    }
+
+exitthread:
+    cache->threadCompleted(this);
+    return;
 }

@@ -51,6 +51,8 @@
 //
 // ManualDataProcessorDialog is a dialog box to manually execute a
 // dataprocessor on the current ride and is called from the mainWindow menus
+// when no ride but DataProcessorConfig is provided it allows edit and confirm
+// to apply to multiple ride in BatchProcessingDialog
 //
 
 // every data processor must supply a configuration Widget
@@ -76,8 +78,9 @@ class DataProcessor
         DataProcessor() {}
         virtual ~DataProcessor() {}
         virtual bool postProcess(RideFile *, DataProcessorConfig*settings=0, QString op="") = 0;
-        virtual DataProcessorConfig *processorConfig(QWidget *parent) = 0;
+        virtual DataProcessorConfig *processorConfig(QWidget *parent, const RideFile* ride = NULL) = 0;
         virtual QString name() = 0; // Localized Name for user interface
+        virtual bool isCoreProcessor() { return true; }
 };
 
 // all data processors
@@ -93,9 +96,11 @@ class DataProcessorFactory {
 
     public:
 
+        ~DataProcessorFactory();
         static DataProcessorFactory &instance();
         bool registerProcessor(QString name, DataProcessor *processor);
-        QMap<QString,DataProcessor*> getProcessors() const { return processors; }
+        void unregisterProcessor(QString name);
+        QMap<QString,DataProcessor*> getProcessors(bool coreProcessorsOnly = false) const;
         bool autoProcess(RideFile *, QString mode, QString op); // run auto processes (after open rideFile)
         void setAutoProcessRule(bool b) { autoprocess = b; } // allows to switch autoprocess off (e.g. for Upgrades)
 };
@@ -108,7 +113,7 @@ class ManualDataProcessorDialog : public QDialog
 
 
     public:
-        ManualDataProcessorDialog(Context *, QString, RideItem *);
+        ManualDataProcessorDialog(Context *, QString, RideItem *, DataProcessorConfig *conf=nullptr);
 
     private slots:
         void cancelClicked();
@@ -121,6 +126,7 @@ class ManualDataProcessorDialog : public QDialog
         DataProcessor *processor;
         DataProcessorConfig *config;
         QTextEdit *explain;
+        QCheckBox *saveAsDefault;
         QPushButton *ok, *cancel;
 };
 #endif // _DataProcessor_h

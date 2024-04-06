@@ -78,7 +78,7 @@ class TreeMap
 
         void sort() {
             // sort the children in descending order
-            qSort(children.begin(), children.end(), TreeMapLessThan);
+            std::sort(children.begin(), children.end(), TreeMapLessThan);
             foreach (TreeMap *child, children) child->sort();
         }
 
@@ -261,7 +261,7 @@ class TreeMapPlot : public QWidget
         TMSettings *settings;
 
         TreeMap *root;      // the tree map data structure
-        TreeMap *highlight; // currently needs to be highlighted
+        TreeMap *highlight = nullptr; // currently needs to be highlighted
 };
 
 

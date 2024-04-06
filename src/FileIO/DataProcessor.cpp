@@ -23,6 +23,10 @@
 #include "Settings.h"
 #include "Units.h"
 #include "Colors.h"
+#ifdef GC_WANT_PYTHON
+#include "PythonEmbed.h"
+#include "FixPySettings.h"
+#endif
 
 DataProcessorFactory *DataProcessorFactory::instance_;
 DataProcessorFactory &DataProcessorFactory::instance()
@@ -33,12 +37,46 @@ DataProcessorFactory &DataProcessorFactory::instance()
 
 bool DataProcessorFactory::autoprocess = true;
 
+DataProcessorFactory::~DataProcessorFactory()
+{
+    qDeleteAll(processors);
+}
+
 bool
 DataProcessorFactory::registerProcessor(QString name, DataProcessor *processor)
 {
     if (processors.contains(name)) return false; // don't register twice!
     processors.insert(name, processor);
     return true;
+}
+
+void
+DataProcessorFactory::unregisterProcessor(QString name)
+{
+    if (!processors.contains(name)) return;
+    DataProcessor *processor = processors.value(name);
+    processors.remove(name);
+    delete processor;
+}
+
+QMap<QString, DataProcessor *>
+DataProcessorFactory::getProcessors(bool coreProcessorsOnly) const
+{
+#ifdef GC_WANT_PYTHON
+    fixPySettings->initialize();
+#endif
+
+    if (!coreProcessorsOnly) return processors;
+
+    QMap<QString, DataProcessor *> coreProcessors;
+    QMapIterator<QString, DataProcessor*> i(processors);
+    i.toFront();
+    while (i.hasNext()) {
+        i.next();
+        if (i.value()->isCoreProcessor()) coreProcessors.insert(i.key(), i.value());
+    }
+
+    return coreProcessors;
 }
 
 bool
@@ -49,6 +87,10 @@ DataProcessorFactory::autoProcess(RideFile *ride, QString mode, QString op)
 
     // check if autoProcess is allow at all
     if (!autoprocess) return false;
+
+#ifdef GC_WANT_PYTHON
+    fixPySettings->initialize();
+#endif
 
     bool changed = false;
 
@@ -67,9 +109,9 @@ DataProcessorFactory::autoProcess(RideFile *ride, QString mode, QString op)
     return changed;
 }
 
-ManualDataProcessorDialog::ManualDataProcessorDialog(Context *context, QString name, RideItem *ride) : context(context), ride(ride)
+ManualDataProcessorDialog::ManualDataProcessorDialog(Context *context, QString name, RideItem *ride, DataProcessorConfig *conf) : context(context), ride(ride), config(conf)
 {
-    setAttribute(Qt::WA_DeleteOnClose);
+    if (config == nullptr) setAttribute(Qt::WA_DeleteOnClose); // don't destroy received config
     setWindowTitle(name);
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
 
@@ -92,7 +134,7 @@ ManualDataProcessorDialog::ManualDataProcessorDialog(Context *context, QString n
     QLabel *explainLabel = new QLabel(tr("Description"), this);
     explainLabel->setFont(font);
 
-    config = processor->processorConfig(this);
+    if (config == nullptr) config = processor->processorConfig(this, ride ? ride->ride() : nullptr);
     config->readConfig();
     explain = new QTextEdit(this);
     explain->setText(config->explain());
@@ -103,9 +145,12 @@ ManualDataProcessorDialog::ManualDataProcessorDialog(Context *context, QString n
     mainLayout->addWidget(explainLabel);
     mainLayout->addWidget(explain);
 
+    saveAsDefault = new QCheckBox(tr("Save parameters as default"), this);
+    saveAsDefault->setChecked(false);
     ok = new QPushButton(tr("OK"), this);
     cancel = new QPushButton(tr("Cancel"), this);
     QHBoxLayout *buttons = new QHBoxLayout();
+    buttons->addWidget(saveAsDefault);
     buttons->addStretch();
     buttons->addWidget(cancel);
     buttons->addWidget(ok);
@@ -128,6 +173,9 @@ ManualDataProcessorDialog::okClicked()
     if (ride && ride->ride() && processor->postProcess((RideFile *)ride->ride(), config, "UPDATE") == true) {
         context->notifyRideSelected(ride);     // to remain compatible with rest of GC for now
     }
+
+    // Save parameters as default on user request
+    if (saveAsDefault->isChecked()) config->saveConfig();
 
     // reset cursor and wait
     QApplication::restoreOverrideCursor();

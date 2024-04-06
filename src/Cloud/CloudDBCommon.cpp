@@ -235,6 +235,8 @@ CloudDBCommon::processReplyStatusCodes(QNetworkReply *reply) {
         CloudDBStatusClient::displayCloudDBStatus();
         break;
     default:
+        QByteArray body = reply->readAll();
+        qDebug()<<"CloudDB error reply:"<<body;
         QMessageBox::warning(0, tr("CloudDB"), QString(tr("Technical problem with CloudDB - response code: %1 - please try again later."))
                              .arg(QString::number(code, 10)));
     }
@@ -335,6 +337,44 @@ CloudDBCommon::marshallAPIHeaderV1Object(QJsonObject& json_header, CommonAPIHead
 
 }
 
+
+QString
+CloudDBCommon::encodeHTML ( const QString& encodeMe )
+{
+    QString temp;
+
+    for (int index(0); index < encodeMe.size(); index++)
+    {
+        QChar character(encodeMe.at(index));
+
+        switch (character.unicode())
+        {
+        case '&':
+            temp += "&amp;"; break;
+
+        case '\'':
+            temp += "&apos;"; break;
+
+        case '"':
+            temp += "&quot;"; break;
+
+        case '<':
+            temp += "&lt;"; break;
+
+        case '>':
+            temp += "&gt;"; break;
+
+        case '\n':
+            temp += "<br>"; break;
+
+        default:
+            temp += character;
+            break;
+        }
+    }
+
+    return temp;
+}
 
 
 
@@ -456,7 +496,7 @@ CloudDBHeader::getAllCachedHeader(QList<CommonAPIHeaderV1> *objectHeader, CloudD
         selectAfter = objectHeader->at(0).LastChanged.addSecs(1); // DB has Microseconds - we not - so round up to next full second
     } else {
         // we do not have charts before 2000 :-)
-        selectAfter = QDateTime(QDate(2000,01,01));
+        selectAfter = QDateTime(QDate(2000,01,01).startOfDay());
     }
 
     // now get the missing headers (in bulks of xxx - since GAE is not nicely handling high single call volumes)

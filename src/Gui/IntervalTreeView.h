@@ -37,8 +37,12 @@ class IntervalTreeView : public QTreeWidget
         IntervalTreeView(Context *context);
 
         // for drag/drop
-        QStringList mimeTypes () const;
-        QMimeData * mimeData ( const QList<QTreeWidgetItem *> items ) const;
+        QStringList mimeTypes () const override;
+#if QT_VERSION < 0x060000
+        QMimeData *mimeData(const QList<QTreeWidgetItem *> items) const override;
+#else
+        QMimeData *mimeData(const QList<QTreeWidgetItem *> &items) const override;
+#endif
 
         // access protected members .. why do the Trolls do this to us?
         QTreeWidgetItem *itemFromIndexPublic(QModelIndex index) { return itemFromIndex(index); }
@@ -50,7 +54,8 @@ class IntervalTreeView : public QTreeWidget
     protected:
         Context *context;
 
-        void dropEvent(QDropEvent* event);
+        void dragEnterEvent(QDragEnterEvent* event) override;
+        void dropEvent(QDropEvent* event) override;
 
 };
 

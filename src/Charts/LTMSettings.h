@@ -53,9 +53,11 @@ class RideBest;
 // 17        01 Nov 2017 Ale Martinez     Added Daily Measure type (Body/Hrv)
 // 18        05 Jan 2018 Mark Liversedge  Performance tests and weekly performances
 // 19        07 Jan 2018 Mark Liversedge  Flagged as possibly submaximal weekly best
-// 20        14 Sep 2018 Riccio Clista    Added IgnoreZeros
+// 20        15 Apr 2019 Ale Martinez     Added run flag to Estimate
+// 21        31 Jul 2019 Ale Martinez     Added perfSymbol for Banister
+// 22        06 Mar 2024 Riccio Clista    Added IgnoreZeros
 
-#define LTM_VERSION_NUMBER 20
+#define LTM_VERSION_NUMBER 22
 
 // group by settings
 #define LTM_DAY     1
@@ -117,14 +119,14 @@ class MetricDetail {
     public:
 
     MetricDetail() : type(METRIC_DB), stack(false), hidden(false), model(""), formulaType(RideMetric::Average), name(""), 
-                     metric(NULL), stressType(0), measureGroup(0), measureField(0), tests(true), perfs(true),
+                     metric(NULL), stressType(0), measureGroup(0), measureField(0), tests(true), perfs(true), perfSymbol("power_index"),
                      smooth(false), trendtype(0), topN(0), lowestN(0), topOut(0), baseline(0.0), 
                      curveStyle(QwtPlotCurve::Lines), symbolStyle(QwtSymbol::NoSymbol),
                      penColor(Qt::black), penAlpha(0), penWidth(1.0), penStyle(0),
                      brushColor(Qt::black), brushAlpha(0), fillCurve(false), labels(false),
                      ignoreZeros(false), curve(NULL) {}
 
-    bool operator< (MetricDetail right) const { return name < right.name; }
+    bool operator< (MetricDetail right) const { return name.localeAwareCompare(right.name) < 0; }
 
     int type;
     bool stack; // should this be stacked?
@@ -135,6 +137,7 @@ class MetricDetail {
     int estimateDuration;       // n x units below for seconds
     int estimateDuration_units; // 1=secs, 60=mins, 3600=hours
     bool wpk; // absolute or wpk 
+    bool run; // cycling or running
 
     // for FORMULAs
     QString formula;
@@ -162,6 +165,9 @@ class MetricDetail {
     bool tests;
     bool perfs;
     bool submax;
+
+    // for Banister
+    QString perfSymbol;
 
     // GENERAL SETTINGS FOR A METRIC
     QString uname, uunits; // user specified name and units (axis choice)
@@ -220,8 +226,10 @@ class LTMSettings {
     public:
 
         LTMSettings() {
+#if QT_VERSION < 0x060000
             // we need to register the stream operators
             qRegisterMetaTypeStreamOperators<LTMSettings>("LTMSettings");
+#endif
             bests = NULL;
             ltmTool = NULL;
         }

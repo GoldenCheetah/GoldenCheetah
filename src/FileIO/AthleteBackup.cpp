@@ -19,9 +19,7 @@
 #include <QProgressDialog>
 #include <QMessageBox>
 #include <QFileDialog>
-#if QT_VERSION > 0x050400
 #include <QStorageInfo>
-#endif
 
 #include "Athlete.h"
 #include "AthleteBackup.h"
@@ -49,6 +47,7 @@ AthleteBackup::AthleteBackup(QDir athleteHome)
     sourceFolderList.append(athleteDirs->config());
     sourceFolderList.append(athleteDirs->calendar());
     sourceFolderList.append(athleteDirs->workouts());
+    sourceFolderList.append(athleteDirs->media());
 }
 
 AthleteBackup::~AthleteBackup()
@@ -132,7 +131,6 @@ AthleteBackup::backup(QString progressText)
        return false;
     }
 
-#if QT_VERSION > 0x050400
     // if if there is enough space available for the backup
     QStorageInfo storage(backupFolder);
     if (storage.isValid() && storage.isReady()) {
@@ -145,13 +143,6 @@ AthleteBackup::backup(QString progressText)
         QMessageBox::warning(NULL, tr("Athlete Backup"), tr("Directory %1 not available. No backup .zip file created for athlete %2.").arg(backupFolder).arg(athlete));
         return false;
     }
-#else
-    QDir checkDir(backupFolder);
-    if (!checkDir.exists()) {
-        QMessageBox::warning(NULL, tr("Athlete Backup"), tr("Directory %1 not available. No backup .zip file created for athlete %2.").arg(backupFolder).arg(athlete));
-        return false;
-    }
-#endif
 
     QChar zero = QLatin1Char('0');
     QString targetFileName = QString( "GC_%1_%2_%3_%4_%5_%6_%7_%8.zip" )

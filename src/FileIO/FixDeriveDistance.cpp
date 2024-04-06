@@ -24,8 +24,7 @@
 #include "HelpWhatsThis.h"
 #include <algorithm>
 #include <QVector>
-
-#define pi 3.14159265358979323846
+#include "LocationInterpolation.h"
 
 // Config widget used by the Preferences/Options config panes
 class FixDeriveDistance;
@@ -36,10 +35,7 @@ class FixDeriveDistanceConfig : public DataProcessorConfig
     friend class ::FixDeriveDistance;
     protected:
         QHBoxLayout *layout;
-        QLabel *bikeWeightLabel;
-        QDoubleSpinBox *bikeWeight;
-        QLabel *crrLabel;
-        QDoubleSpinBox *crr;
+        QCheckBox *useCubicSplines;
 
     public:
         FixDeriveDistanceConfig(QWidget *parent) : DataProcessorConfig(parent) {
@@ -48,6 +44,10 @@ class FixDeriveDistanceConfig : public DataProcessorConfig
             parent->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::MenuBar_Edit_EstimateDistanceValues));
 
             layout = new QHBoxLayout(this);
+
+            useCubicSplines = new QCheckBox(tr("Use Cubic Splines"), this);
+            useCubicSplines->setCheckState(Qt::Unchecked);
+            layout->addWidget(useCubicSplines);
 
             layout->setContentsMargins(0,0,0,0);
             setContentsMargins(0,0,0,0);
@@ -59,17 +59,20 @@ class FixDeriveDistanceConfig : public DataProcessorConfig
                               // the widget and its children when the config pane is deleted
 
         void readConfig() {
+            useCubicSplines->setCheckState(appsettings->value(NULL, GC_DPDD_UCS, Qt::Unchecked).toBool() ? Qt::Checked : Qt::Unchecked);
         }
 
         void saveConfig() {
+            appsettings->setValue(GC_DPDD_UCS, useCubicSplines->checkState());
         }
 
         QString explain() {
             return(QString(tr("Derive distance based on "
-                              "GPS position\n\n"
-                              "Some unit doesn't record distance without "
-                              "a speedometer but record position "
-                              "(eg Timex Cycle Trainer)\n\n")));
+                              "ridefile's GPS locations\n\n"
+                              "This process will populate distance information (and override existing distance information if present.)"
+                              "The cubic splines processing estimates distance across polynomial curve, "
+                              "otherwise this feature will compute geometric arc distance between ride points."
+                              "\n\n")));
         }
 
 };
@@ -88,7 +91,8 @@ class FixDeriveDistance : public DataProcessor {
         bool postProcess(RideFile *, DataProcessorConfig* config, QString op);
 
         // the config widget
-        DataProcessorConfig* processorConfig(QWidget *parent) {
+        DataProcessorConfig* processorConfig(QWidget *parent, const RideFile * ride = NULL) {
+            Q_UNUSED(ride);
             return new FixDeriveDistanceConfig(parent);
         }
 
@@ -101,32 +105,103 @@ class FixDeriveDistance : public DataProcessor {
 static bool FixDeriveDistanceAdded = DataProcessorFactory::instance().registerProcessor(QString("Estimate Distance Values"), new FixDeriveDistance());
 
 double _deg2rad(double deg) {
-  return (deg * pi / 180);
+  return (deg * M_PI / 180);
 }
 
 bool
 FixDeriveDistance::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString op="")
 {
-    Q_UNUSED(config)
     Q_UNUSED(op)
 
-    // if its already there do nothing !
-    if (ride->areDataPresent()->km) return false;
+    bool fUseCubicSplines = false;
+    bool fUseSpeedAndTime = false;
 
-    // no dice if we don't have alt and speed
-    if (!ride->areDataPresent()->lat) return false;
+    if (config == NULL) { // being called automatically
+        fUseCubicSplines = appsettings->value(NULL, GC_DPDD_UCS, Qt::Unchecked).toBool();
+    } else { // being called manually
+        fUseCubicSplines = ((FixDeriveDistanceConfig*)(config))->useCubicSplines->isChecked();
+    }
+
+    GeoPointInterpolator gpi;
+    int ii = 0;      // interpolator index
+    int goodii = 0;  // last reasonable geolocation
+    double cubicDistanceKM = 0.0;
+
+    double distanceFromSpeedTime = 0.0;
+    double lastSecs = 0.0;
+    bool fHasSpeedTime = (ride->areDataPresent()->kph && ride->areDataPresent()->secs);
+
+    if (fUseSpeedAndTime && !fHasSpeedTime)
+        return false;
+
+    // if its already there do nothing !
+    //if (ride->areDataPresent()->km) return false;
+
+    // no dice if we don't have any gps location information.
+    if (!fUseSpeedAndTime && !ride->areDataPresent()->lat)
+        return false;
+
+    bool fHasAlt = ride->areDataPresent()->alt;
 
     // apply the change
     ride->command->startLUW("Estimate Distance");
 
-    if (ride->areDataPresent()->lat) {
+    {
         double km = 0.0;
         double lastLat = 0;
         double lastLon = 0;
 
+
         for (int i=0; i<ride->dataPoints().count(); i++) {
+
             RideFilePoint *p = ride->dataPoints()[i];
 
+            // Compute distance using cubic splines.
+            while (gpi.WantsInput(i)) {
+
+                // If bracket is present, always sum its length before any push.
+                // This maintains cubicDistanceKM as distance to current bracket
+                // start.
+                double d0, d1;
+                if (gpi.GetBracket(d0, d1)) {
+                    cubicDistanceKM += (gpi.SplineLength(d0, d1) / 1000.0);
+                }
+
+                if (ii >= ride->dataPoints().count()) {
+                    RideFilePoint *pii = ride->dataPoints()[goodii];
+                    geolocation geo(pii->lat, pii->lon, fHasAlt ? pii->alt : 0.0);
+                    gpi.Push(ii, geo);
+                    ii++;
+                } else {
+                    // Use index for distance, since we just use it as an enumeration
+                    RideFilePoint *pii = ride->dataPoints()[ii];
+                    geolocation geo(pii->lat, pii->lon, fHasAlt ? pii->alt : 0.0);
+                    if (geo.IsReasonableGeoLocation()) {
+                        goodii = ii;
+                        gpi.Push(ii, geo);
+                    }
+                    ii++;
+                }
+            }
+
+            // Compute distance using speed and time (has high variance.)
+            // Currently computed because it is interesting to see, but no
+            // option enabled to apply it.
+            double distDelta = 0.0;
+            if (fHasSpeedTime)
+            {
+                double secs = p->secs;
+                double kph = p->kph;
+
+                double secDelta = secs - lastSecs;
+                distDelta = secDelta * kph / 3600;
+
+                distanceFromSpeedTime += distDelta;
+
+                lastSecs = secs;
+            }
+
+            // Compute distance using geometric arc length between points.
             double _theta, _dist;
             _theta = lastLon - p->lon;
             if (lastLat == 0.0 || lastLon == 0.0 || p->lat == 0.0 || p->lon == 0.0 || (_theta == 0.0 && (lastLat - p->lat) == 0.0)) {
@@ -141,7 +216,20 @@ FixDeriveDistance::postProcess(RideFile *ride, DataProcessorConfig *config=0, QS
             lastLat = p->lat;
             lastLon = p->lon;
 
-            ride->command->setPointValue(i, RideFile::km, km);
+            // Write distance into ride file.
+            double distanceKM = km;
+
+            // Select distance estimate to use
+            if (fUseSpeedAndTime) {
+                distanceKM = distanceFromSpeedTime;
+            } else if (fUseCubicSplines) {
+                distanceKM = cubicDistanceKM;
+            } else {
+                distanceKM = km;
+            }
+
+            // Apply selected distance estimate to ride file
+            ride->command->setPointValue(i, RideFile::km, distanceKM);
         }
 
         ride->setDataPresent(ride->km, true);

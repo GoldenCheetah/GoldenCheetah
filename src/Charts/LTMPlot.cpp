@@ -75,15 +75,15 @@ LTMPlot::LTMPlot(LTMWindow *parent, Context *context, int position) :
 
     // setup my axes
     // for now we limit to 4 on left and 4 on right
-    setAxesCount(QwtAxis::yLeft, 4);
-    setAxesCount(QwtAxis::yRight, 4);
-    setAxesCount(QwtAxis::xBottom, 1);
-    setAxesCount(QwtAxis::xTop, 0);
+    setAxesCount(QwtAxis::YLeft, 4);
+    setAxesCount(QwtAxis::YRight, 4);
+    setAxesCount(QwtAxis::XBottom, 1);
+    setAxesCount(QwtAxis::XTop, 0);
 
     for (int i=0; i<4; i++) {
 
         // lefts
-        QwtAxisId left(QwtAxis::yLeft, i);
+        QwtAxisId left(QwtAxis::YLeft, i);
         supportedAxes << left;
         
         QwtScaleDraw *sd = new QwtScaleDraw;
@@ -95,7 +95,7 @@ LTMPlot::LTMPlot(LTMWindow *parent, Context *context, int position) :
         setAxisMaxMinor(left, 0);
         setAxisVisible(left, false);
 
-        QwtAxisId right(QwtAxis::yRight, i);
+        QwtAxisId right(QwtAxis::YRight, i);
         supportedAxes << right;
 
         // lefts
@@ -110,12 +110,11 @@ LTMPlot::LTMPlot(LTMWindow *parent, Context *context, int position) :
 
     // get application settings
     insertLegend(new QwtLegend(), QwtPlot::BottomLegend);
-    setAxisTitle(QwtAxis::xBottom, tr("Date"));
-    enableAxis(QwtAxis::xBottom, true);
-    setAxisVisible(QwtAxis::xBottom, true);
-    setAxisVisible(QwtAxis::xTop, false);
-    setAxisMaxMinor(QwtPlot::xBottom,-1);
-    setAxisScaleDraw(QwtPlot::xBottom, new LTMScaleDraw(QDateTime::currentDateTime(), 0, LTM_DAY));
+    setAxisTitle(QwtAxis::XBottom, tr("Date"));
+    setAxisVisible(QwtAxis::XBottom, true);
+    setAxisVisible(QwtAxis::XTop, false);
+    setAxisMaxMinor(QwtAxis::XBottom,-1);
+    setAxisScaleDraw(QwtAxis::XBottom, new LTMScaleDraw(QDateTime::currentDateTime(), 0, LTM_DAY));
 
     static_cast<QwtPlotCanvas*>(canvas())->setFrameStyle(QFrame::NoFrame);
 
@@ -124,7 +123,7 @@ LTMPlot::LTMPlot(LTMWindow *parent, Context *context, int position) :
     grid->attach(this);
 
     // manage our own picker
-    picker = new LTMToolTip(QwtPlot::xBottom, QwtPlot::yLeft, QwtPicker::VLineRubberBand, QwtPicker::AlwaysOn, canvas(), "");
+    picker = new LTMToolTip(QwtAxis::XBottom, QwtAxis::YLeft, QwtPicker::VLineRubberBand, QwtPicker::AlwaysOn, canvas(), "");
     picker->setMousePattern(QwtEventPattern::MouseSelect1, Qt::LeftButton);
     picker->setTrackerPen(QColor(Qt::black));
 
@@ -182,7 +181,7 @@ LTMPlot::configChanged(qint32)
         axesId << x;
 
     }
-    axisWidget(QwtPlot::xBottom)->setPalette(palette);
+    axisWidget(QwtAxis::XBottom)->setPalette(palette);
 
     QwtLegend *l = static_cast<QwtLegend *>(this->legend());
     foreach(QwtPlotCurve *p, curves) {
@@ -223,12 +222,14 @@ LTMPlot::setAxisTitle(QwtAxisId axis, QString label)
 void
 LTMPlot::setData(LTMSettings *set)
 {
-    QTime timer;
+    QElapsedTimer timer;
     timer.start();
 
     curveColors->isolated = false;
     isolation = false;
     int user=0;
+
+    bool haveBanister=false; // do we want to show the banister helper?
 
     //qDebug()<<"Starting.."<<timer.elapsed();
 
@@ -271,15 +272,18 @@ LTMPlot::setData(LTMSettings *set)
 
     //setTitle(settings->title);
     if (settings->groupBy != LTM_TOD)
-        setAxisTitle(xBottom, tr("Date"));
+        setAxisTitle(QwtAxis::XBottom, tr("Date"));
     else
-        setAxisTitle(xBottom, tr("Time of Day"));
-    enableAxis(QwtAxis::xBottom, true);
-    setAxisVisible(QwtAxis::xBottom, true);
-    setAxisVisible(QwtAxis::xTop, false);
+        setAxisTitle(QwtAxis::XBottom, tr("Time of Day"));
+    setAxisVisible(QwtAxis::XBottom, true);
+    setAxisVisible(QwtAxis::XTop, false);
 
     // wipe existing curves/axes details
+#if QT_VERSION >= 0x060000
+    QMultiHashIterator<QString, QwtPlotCurve*> c(curves);
+#else
     QHashIterator<QString, QwtPlotCurve*> c(curves);
+#endif
     while (c.hasNext()) {
         c.next();
         QString symbol = c.key();
@@ -310,7 +314,6 @@ LTMPlot::setData(LTMSettings *set)
     // disable all y axes until we have populated
     for (int i=0; i<8; i++) {
         setAxisVisible(supportedAxes[i], false);
-        enableAxis(supportedAxes[i].id, false);
     }
     axes.clear();
     axesObject.clear();
@@ -321,18 +324,17 @@ LTMPlot::setData(LTMSettings *set)
 
     // how many ?
     maxX = groupForDate(settings->end.date(), settings->groupBy) -
-           groupForDate(settings->start.date(), settings->groupBy);
+           groupForDate(settings->start.date(), settings->groupBy) + 1;
 
     // no data to display so that all folks
     if (context->athlete->rideCache->rides().count() == 0 || maxX <= 0) {
 
 
-        setAxisScale(xBottom, 0, maxX);
-        setAxisScaleDraw(QwtPlot::xBottom, new LTMScaleDraw(settings->start,
+        setAxisScale(QwtAxis::XBottom, 0, maxX);
+        setAxisScaleDraw(QwtAxis::XBottom, new LTMScaleDraw(settings->start,
                 groupForDate(settings->start.date(), settings->groupBy), settings->groupBy));
-        enableAxis(QwtAxis::xBottom, true);
-        setAxisVisible(QwtAxis::xBottom, true);
-        setAxisVisible(QwtAxis::xTop, false);
+        setAxisVisible(QwtAxis::XBottom, true);
+        setAxisVisible(QwtAxis::XTop, false);
 
         // remove the shading if it exists
         refreshZoneLabels(QwtAxisId(-1,-1)); // turn em off
@@ -378,6 +380,9 @@ LTMPlot::setData(LTMSettings *set)
     int r=0;
 
     foreach (MetricDetail metricDetail, settings->metrics) {
+
+        // if we have at least one banister curve visible then helper is relevant
+        if (metricDetail.hidden == false && metricDetail.type == METRIC_BANISTER) haveBanister=true;
 
         if (metricDetail.stack == true) {
 
@@ -444,7 +449,7 @@ LTMPlot::setData(LTMSettings *set)
         if (count <= 0) continue;
 
         // Create a curve
-        QwtPlotCurve *current = (metricDetail.type == METRIC_ESTIMATE || metricDetail.type == METRIC_BANISTER)
+        QwtPlotCurve *current = (metricDetail.type == METRIC_ESTIMATE || metricDetail.type == METRIC_BANISTER || metricDetail.type == METRIC_D_MEASURE)
                 ? new QwtPlotGappedCurve(metricDetail.uname, 1)
                 : new QwtPlotCurve(metricDetail.uname);
         current->setVisible(!metricDetail.hidden);
@@ -457,7 +462,7 @@ LTMPlot::setData(LTMSettings *set)
         stacks.insert(current, stackcounter+1);
         if (appsettings->value(this, GC_ANTIALIAS, true).toBool() == true)
             current->setRenderHint(QwtPlotItem::RenderAntialiased);
-        QPen cpen = QPen(metricDetail.penColor);
+        QPen cpen = QPen(RGBColor(metricDetail.penColor));
         cpen.setWidth(width);
         current->setPen(cpen);
         current->setStyle(metricDetail.curveStyle);
@@ -489,7 +494,7 @@ LTMPlot::setData(LTMSettings *set)
         if (metricDetail.curveStyle == QwtPlotCurve::Steps) {
             
             // fill the bars
-            QColor brushColor = metricDetail.penColor;
+            QColor brushColor = RGBColor(metricDetail.penColor);
             if (metricDetail.stack == true) {
                 brushColor.setAlpha(255);
                 QBrush brush = QBrush(brushColor);
@@ -600,7 +605,7 @@ LTMPlot::setData(LTMSettings *set)
 
         // Create a curve
         QwtPlotCurve *current;
-        if (metricDetail.type == METRIC_ESTIMATE || metricDetail.type == METRIC_BANISTER) {
+        if (metricDetail.type == METRIC_ESTIMATE || metricDetail.type == METRIC_BANISTER || metricDetail.type == METRIC_D_MEASURE) {
             current = new QwtPlotGappedCurve(metricDetail.uname, 1);
         } else {
             if (metricDetail.ignoreZeros){
@@ -619,7 +624,7 @@ LTMPlot::setData(LTMSettings *set)
             curves.insert(metricDetail.symbol, current);
         if (appsettings->value(this, GC_ANTIALIAS, true).toBool() == true)
             current->setRenderHint(QwtPlotItem::RenderAntialiased);
-        QPen cpen = QPen(metricDetail.penColor);
+        QPen cpen = QPen(RGBColor(metricDetail.penColor));
         cpen.setWidth(width);
         current->setPen(cpen);
         current->setStyle(metricDetail.curveStyle);
@@ -671,7 +676,7 @@ LTMPlot::setData(LTMSettings *set)
                 trend->setVisible(!metricDetail.hidden);
 
                 // cosmetics
-                QPen cpen = QPen(metricDetail.penColor.darker(200));
+                QPen cpen = QPen(RGBColor(metricDetail.penColor).darker(200));
                 cpen.setWidth(2); // double thickness for trend lines
                 cpen.setStyle(Qt::SolidLine);
                 trend->setPen(cpen);
@@ -709,7 +714,7 @@ LTMPlot::setData(LTMSettings *set)
                 trend->setVisible(!metricDetail.hidden);
 
                 // cosmetics
-                QPen cpen = QPen(metricDetail.penColor.darker(200));
+                QPen cpen = QPen(RGBColor(metricDetail.penColor).darker(200));
                 cpen.setWidth(2); // double thickness for trend lines
                 cpen.setStyle(Qt::SolidLine);
                 trend->setPen(cpen);
@@ -751,7 +756,7 @@ LTMPlot::setData(LTMSettings *set)
                 trend->setVisible(!metricDetail.hidden);
 
                 // cosmetics
-                QPen cpen = QPen(metricDetail.penColor.darker(200));
+                QPen cpen = QPen(RGBColor(metricDetail.penColor).darker(200));
                 cpen.setWidth(2); // double thickness for trend lines
                 cpen.setStyle(Qt::SolidLine);
                 trend->setPen(cpen);
@@ -831,7 +836,7 @@ LTMPlot::setData(LTMSettings *set)
                 trend->setVisible(!metricDetail.hidden);
 
                 // cosmetics
-                QPen cpen = QPen(metricDetail.penColor.darker(200));
+                QPen cpen = QPen(RGBColor(metricDetail.penColor).darker(200));
                 cpen.setWidth(2); // double thickness for trend lines
                 cpen.setStyle(Qt::SolidLine);
                 trend->setPen(cpen);
@@ -905,9 +910,9 @@ LTMPlot::setData(LTMSettings *set)
                 sym->setStyle(metricDetail.symbolStyle);
                 sym->setSize(20*dpiXFactor);
             }
-            QColor lighter = metricDetail.penColor;
+            QColor lighter = RGBColor(metricDetail.penColor);
             lighter.setAlpha(50);
-            sym->setPen(metricDetail.penColor);
+            sym->setPen(RGBColor(metricDetail.penColor));
             sym->setBrush(lighter);
 
             out->setSymbol(sym);
@@ -997,9 +1002,9 @@ LTMPlot::setData(LTMSettings *set)
                 sym->setStyle(metricDetail.symbolStyle);
                 sym->setSize(12*dpiXFactor);
             }
-            QColor lighter = metricDetail.penColor;
+            QColor lighter = RGBColor(metricDetail.penColor);
             lighter.setAlpha(200);
-            sym->setPen(metricDetail.penColor);
+            sym->setPen(RGBColor(metricDetail.penColor));
             sym->setBrush(lighter);
 
             top->setSymbol(sym);
@@ -1052,7 +1057,7 @@ LTMPlot::setData(LTMSettings *set)
                         // Qwt uses its own text objects
                         QwtText text(labelString);
                         text.setFont(labelFont);
-                        text.setColor(metricDetail.penColor);
+                        text.setColor(RGBColor(metricDetail.penColor));
 
                         // make that mark -- always above with topN
                         QwtPlotMarker *label = new QwtPlotMarker();
@@ -1074,9 +1079,9 @@ LTMPlot::setData(LTMSettings *set)
         if (metricDetail.curveStyle == QwtPlotCurve::Steps) {
             
             // fill the bars
-            QColor brushColor = metricDetail.penColor;
+            QColor brushColor = RGBColor(metricDetail.penColor);
             brushColor.setAlpha(200); // now side by side, less transparency required
-            QColor brushColor1 = metricDetail.penColor.darker();
+            QColor brushColor1 = RGBColor(metricDetail.penColor).darker();
             QLinearGradient linearGradient(0, 0, 0, height());
             linearGradient.setColorAt(0.0, brushColor1);
             linearGradient.setColorAt(1.0, brushColor);
@@ -1133,19 +1138,19 @@ LTMPlot::setData(LTMSettings *set)
 
         } else if (metricDetail.curveStyle == QwtPlotCurve::Lines) {
 
-            QPen cpen = QPen(metricDetail.penColor);
+            QPen cpen = QPen(RGBColor(metricDetail.penColor));
             cpen.setWidth(width);
             QwtSymbol *sym = new QwtSymbol;
             sym->setSize(6*dpiXFactor);
             sym->setStyle(metricDetail.symbolStyle);
-            sym->setPen(QPen(metricDetail.penColor));
-            sym->setBrush(QBrush(metricDetail.penColor));
+            sym->setPen(QPen(RGBColor(metricDetail.penColor)));
+            sym->setBrush(QBrush(RGBColor(metricDetail.penColor)));
             current->setSymbol(sym);
             current->setPen(cpen);
 
             // fill below the line
             if (metricDetail.fillCurve) {
-                QColor fillColor = metricDetail.penColor;
+                QColor fillColor = RGBColor(metricDetail.penColor);
                 fillColor.setAlpha(100);
                 current->setBrush(fillColor);
             }
@@ -1158,8 +1163,8 @@ LTMPlot::setData(LTMSettings *set)
                 double testfactor = metricDetail.type == METRIC_PERFORMANCE ? 2 : 1;
                 sym->setSize(6*dpiXFactor*testfactor);
                 sym->setStyle(metricDetail.symbolStyle);
-                sym->setPen(QPen(metricDetail.penColor));
-                sym->setBrush(QBrush(metricDetail.penColor));
+                sym->setPen(QPen(RGBColor(metricDetail.penColor)));
+                sym->setBrush(QBrush(RGBColor(metricDetail.penColor)));
                 current->setSymbol(sym);
             } else {
                 current->setStyle(QwtPlotCurve::NoCurve);
@@ -1170,7 +1175,7 @@ LTMPlot::setData(LTMSettings *set)
             QwtSymbol *sym = new QwtSymbol;
             sym->setSize(4*dpiXFactor);
             sym->setStyle(metricDetail.symbolStyle);
-            sym->setPen(QPen(metricDetail.penColor));
+            sym->setPen(QPen(RGBColor(metricDetail.penColor)));
             sym->setBrush(QBrush(Qt::white));
             current->setSymbol(sym);
 
@@ -1221,7 +1226,7 @@ LTMPlot::setData(LTMSettings *set)
                     // Qwt uses its own text objects
                     QwtText text(labelString);
                     text.setFont(labelFont);
-                    text.setColor(metricDetail.penColor);
+                    text.setColor(RGBColor(metricDetail.penColor));
 
                     // make that mark
                     QwtPlotMarker *label = new QwtPlotMarker();
@@ -1304,7 +1309,7 @@ LTMPlot::setData(LTMSettings *set)
         // make start date always fall on a Monday
         if (settings->groupBy == LTM_WEEK) {
             int dow = settings->start.date().dayOfWeek(); // 1-7, where 1=monday
-            settings->start = QDateTime(settings->start.date().addDays((dow-1)*-1));
+            settings->start = QDateTime(settings->start.date().addDays((dow-1)*-1).startOfDay());
         }
 
         // setup the xaxis at the bottom
@@ -1316,23 +1321,22 @@ LTMPlot::setData(LTMSettings *set)
         } else {
             tics = 1 + maxX/10;
         }
-        setAxisScale(xBottom, -0.5, maxX, tics);
-        setAxisScaleDraw(QwtPlot::xBottom, new LTMScaleDraw(settings->start,
+        setAxisScale(QwtAxis::XBottom, -0.5, maxX, tics);
+        setAxisScaleDraw(QwtAxis::XBottom, new LTMScaleDraw(settings->start,
                     groupForDate(settings->start.date(), settings->groupBy), settings->groupBy));
 
     } else {
-        setAxisScale(xBottom, 0, 24, 2);
-        setAxisScaleDraw(QwtPlot::xBottom, new LTMScaleDraw(settings->start,
+        setAxisScale(QwtAxis::XBottom, 0, 24, 2);
+        setAxisScaleDraw(QwtAxis::XBottom, new LTMScaleDraw(settings->start,
                     groupForDate(settings->start.date(), settings->groupBy), settings->groupBy));
     }
-    enableAxis(QwtAxis::xBottom, true);
-    setAxisVisible(QwtAxis::xBottom, true);
-    setAxisVisible(QwtAxis::xTop, false);
+    setAxisVisible(QwtAxis::XBottom, true);
+    setAxisVisible(QwtAxis::XTop, false);
 
     // run through the Y axis
     for (int i=0; i<8; i++) {
         // set the scale on the axis
-        if (i != xBottom && i != xTop) {
+        if (i != QwtAxis::XBottom && i != QwtAxis::XTop) {
             maxY[i] *= 1.1; // add 10% headroom
             if (maxY[i] == minY[i] && maxY[i] == 0)
                 setAxisScale(supportedAxes[i], 0.0f, 100.0f); // to stop ugly
@@ -1341,8 +1345,8 @@ LTMPlot::setData(LTMSettings *set)
         }
     }
 
-    QString format = axisTitle(yLeft).text();
-    picker->setAxes(xBottom, yLeft);
+    QString format = axisTitle(QwtAxis::YLeft).text();
+    picker->setAxes(QwtAxis::XBottom, QwtAxis::YLeft);
     picker->setFormat(format);
 
     // draw zone labels axisid of -1 means delete whats there
@@ -1355,7 +1359,11 @@ LTMPlot::setData(LTMSettings *set)
         refreshZoneLabels(QwtAxisId(-1,-1)); // turn em off
     }
 
+#if QT_VERSION >= 0x060000
+    QMultiHashIterator<QString, QwtPlotCurve*> p(curves);
+#else
     QHashIterator<QString, QwtPlotCurve*> p(curves);
+#endif
     while (p.hasNext()) {
         p.next();
 
@@ -1383,6 +1391,9 @@ LTMPlot::setData(LTMSettings *set)
     // update colours etc for plot chrome will also save state
     configChanged(CONFIG_APPEARANCE);
 
+    // we have banister?
+    parent->showBanister(haveBanister);
+
     // plot
     replot();
 
@@ -1393,7 +1404,7 @@ LTMPlot::setData(LTMSettings *set)
 void
 LTMPlot::setCompareData(LTMSettings *set)
 {
-    QTime timer;
+    QElapsedTimer timer;
     timer.start();
 
     MAXX=0.0; // maximum value for x, always from 0-n
@@ -1403,7 +1414,11 @@ LTMPlot::setCompareData(LTMSettings *set)
     //qDebug()<<"Starting.."<<timer.elapsed();
 
     // wipe existing curves/axes details
+#if QT_VERSION >= 0x060000
+    QMultiHashIterator<QString, QwtPlotCurve*> c(curves);
+#else
     QHashIterator<QString, QwtPlotCurve*> c(curves);
+#endif
     while (c.hasNext()) {
         c.next();
         QString symbol = c.key();
@@ -1433,7 +1448,6 @@ LTMPlot::setCompareData(LTMSettings *set)
     // disable all y axes until we have populated
     for (int i=0; i<8; i++) {
         setAxisVisible(supportedAxes[i], false);
-        enableAxis(supportedAxes[i].id, false);
     }
     axes.clear();
     axesObject.clear();
@@ -1442,8 +1456,8 @@ LTMPlot::setCompareData(LTMSettings *set)
     // reset all min/max Y values
     for (int i=0; i<10; i++) minY[i]=0, maxY[i]=0;
 
-    // which yAxis did we use (should be yLeft)
-    QwtAxisId axisid(QwtPlot::yLeft, 0);
+    // which yAxis did we use (should be YLeft)
+    QwtAxisId axisid(QwtAxis::YLeft, 0);
 
     // which compare date range are we on?
     int cdCount =0;
@@ -1509,30 +1523,29 @@ LTMPlot::setCompareData(LTMSettings *set)
 
         switch (settings->groupBy) {
             case LTM_TOD:
-                setAxisTitle(xBottom, tr("Time of Day"));
+                setAxisTitle(QwtAxis::XBottom, tr("Time of Day"));
                 break;
             case LTM_DAY:
-                setAxisTitle(xBottom, tr("Day"));
+                setAxisTitle(QwtAxis::XBottom, tr("Day"));
                 break;
             case LTM_WEEK:
-                setAxisTitle(xBottom, tr("Week"));
+                setAxisTitle(QwtAxis::XBottom, tr("Week"));
                 break;
             case LTM_MONTH:
-                setAxisTitle(xBottom, tr("Month"));
+                setAxisTitle(QwtAxis::XBottom, tr("Month"));
                 break;
             case LTM_YEAR:
-                setAxisTitle(xBottom, tr("Year"));
+                setAxisTitle(QwtAxis::XBottom, tr("Year"));
                 break;
             case LTM_ALL:
-                setAxisTitle(xBottom, tr("All"));
+                setAxisTitle(QwtAxis::XBottom, tr("All"));
                 break;
             default:
-                setAxisTitle(xBottom, tr("Date"));
+                setAxisTitle(QwtAxis::XBottom, tr("Date"));
                 break;
         }
-        enableAxis(QwtAxis::xBottom, true);
-        setAxisVisible(QwtAxis::xBottom, true);
-        setAxisVisible(QwtAxis::xTop, false);
+        setAxisVisible(QwtAxis::XBottom, true);
+        setAxisVisible(QwtAxis::XTop, false);
 
 
         //qDebug()<<"Wiped previous.."<<timer.elapsed();
@@ -1670,9 +1683,9 @@ LTMPlot::setCompareData(LTMSettings *set)
             
                 // fill the bars
                 QColor merge;
-                merge.setRed((metricDetail.penColor.red() + cd.color.red()) / 2);
-                merge.setGreen((metricDetail.penColor.green() + cd.color.green()) / 2);
-                merge.setBlue((metricDetail.penColor.blue() + cd.color.blue()) / 2);
+                merge.setRed((RGBColor(metricDetail.penColor).red() + cd.color.red()) / 2);
+                merge.setGreen((RGBColor(metricDetail.penColor).green() + cd.color.green()) / 2);
+                merge.setBlue((RGBColor(metricDetail.penColor).blue() + cd.color.blue()) / 2);
 
                 QColor brushColor = merge;
                 if (metricDetail.stack == true) {
@@ -1923,7 +1936,7 @@ LTMPlot::setCompareData(LTMSettings *set)
                     trend->setVisible(!metricDetail.hidden);
 
                     // cosmetics
-                    QPen cpen = QPen(metricDetail.penColor.darker(200));
+                    QPen cpen = QPen(RGBColor(metricDetail.penColor).darker(200));
                     cpen.setWidth(2); // double thickness for trend lines
                     cpen.setStyle(Qt::SolidLine);
                     trend->setPen(cpen);
@@ -2431,23 +2444,22 @@ LTMPlot::setCompareData(LTMSettings *set)
         } else {
             tics = 1 + MAXX/10;
         }
-        setAxisScale(xBottom, -0.498f, MAXX+0.498f, tics);
-        setAxisScaleDraw(QwtPlot::xBottom, new CompareScaleDraw());
+        setAxisScale(QwtAxis::XBottom, -0.498f, MAXX+0.498f, tics);
+        setAxisScaleDraw(QwtAxis::XBottom, new CompareScaleDraw());
 
 
     } else {
-        setAxisScale(xBottom, 0, 24, 2);
-        setAxisScaleDraw(QwtPlot::xBottom, new LTMScaleDraw(settings->start,
+        setAxisScale(QwtAxis::XBottom, 0, 24, 2);
+        setAxisScaleDraw(QwtAxis::XBottom, new LTMScaleDraw(settings->start,
                     groupForDate(settings->start.date(), settings->groupBy), settings->groupBy));
     }
-    enableAxis(QwtAxis::xBottom, true);
-    setAxisVisible(QwtAxis::xBottom, true);
-    setAxisVisible(QwtAxis::xTop, false);
+    setAxisVisible(QwtAxis::XBottom, true);
+    setAxisVisible(QwtAxis::XTop, false);
 
     // run through the Y axis
     for (int i=0; i<8; i++) {
         // set the scale on the axis
-        if (i != xBottom && i != xTop) {
+        if (i != QwtAxis::XBottom && i != QwtAxis::XTop) {
             maxY[i] *= 1.2; // add 20% headroom
             setAxisScale(supportedAxes[i], minY[i], maxY[i]);
         }
@@ -2479,15 +2491,19 @@ LTMPlot::setCompareData(LTMSettings *set)
         axisWidget(axisid)->setPalette(pal);
     }
 
-    QString format = axisTitle(yLeft).text();
-    picker->setAxes(xBottom, yLeft);
+    QString format = axisTitle(QwtAxis::YLeft).text();
+    picker->setAxes(QwtAxis::XBottom, QwtAxis::YLeft);
     picker->setFormat(format);
 
     // show legend?
     if (settings->legend == false) this->legend()->hide();
     else this->legend()->show();
 
+#if QT_VERSION >= 0x060000
+    QMultiHashIterator<QString, QwtPlotCurve*> p(curves);
+#else
     QHashIterator<QString, QwtPlotCurve*> p(curves);
+#endif
     while (p.hasNext()) {
         p.next();
 
@@ -2528,8 +2544,8 @@ LTMPlot::setMaxX(int x)
     } else {
         tics = 1 + MAXX/10;
     }
-    setAxisScale(xBottom, -0.498f, MAXX+0.498f, tics);
-    setAxisScaleDraw(QwtPlot::xBottom, new CompareScaleDraw());
+    setAxisScale(QwtAxis::XBottom, -0.498f, MAXX+0.498f, tics);
+    setAxisScaleDraw(QwtAxis::XBottom, new CompareScaleDraw());
 }
 
 void
@@ -2564,7 +2580,7 @@ LTMPlot::createTODCurveData(Context *context, LTMSettings *settings, MetricDetai
         // Special computed metrics (LTS/STS) have a null metric pointer
         if (metricDetail.metric) {
             // convert from stored metric value to imperial
-            if (context->athlete->useMetricUnits == false) {
+            if (GlobalContext::context()->useMetricUnits == false) {
                 value *= metricDetail.metric->conversion();
                 value += metricDetail.metric->conversionSum();
             }
@@ -2615,7 +2631,7 @@ LTMPlot::createCurveData(Context *context, LTMSettings *settings, MetricDetail m
 {
     // resize the curve array to maximum possible size
     int maxdays = groupForDate(settings->end.date(), settings->groupBy)
-                    - groupForDate(settings->start.date(), settings->groupBy);
+                  - groupForDate(settings->start.date(), settings->groupBy) + 1;
 
     if (maxdays <= 0) return;
 
@@ -2655,7 +2671,7 @@ LTMPlot::createMetricData(Context *context, LTMSettings *settings, MetricDetail 
 
     // resize the curve array to maximum possible size
     int maxdays = groupForDate(settings->end.date(), settings->groupBy)
-                    - groupForDate(settings->start.date(), settings->groupBy);
+                  - groupForDate(settings->start.date(), settings->groupBy) + 1;
 
     x.resize(maxdays+3); // one for start from zero plus two for 0 value added at head and tail
     y.resize(maxdays+3); // one for start from zero plus two for 0 value added at head and tail
@@ -2704,7 +2720,7 @@ LTMPlot::createMetricData(Context *context, LTMSettings *settings, MetricDetail 
 
         if (metricDetail.metric) {
             // convert from stored metric value to imperial
-            if (context->athlete->useMetricUnits == false) {
+            if (GlobalContext::context()->useMetricUnits == false) {
                 value *= metricDetail.metric->conversion();
                 value += metricDetail.metric->conversionSum();
             }
@@ -2740,6 +2756,7 @@ LTMPlot::createMetricData(Context *context, LTMSettings *settings, MetricDetail 
 
                 // only increment counter if nonzero or we aggregate zeroes
                 if (value || aggZero) secondsPerGroupBy = seconds; 
+                else secondsPerGroupBy = 0;
 
             } else {
                 // sum totals, average averages and choose best for Peaks
@@ -2798,7 +2815,8 @@ LTMPlot::createMetricData(Context *context, LTMSettings *settings, MetricDetail 
                         }
                     break;
                 }
-                secondsPerGroupBy += seconds; // increment for same group
+                // increment group counter if nonzero or we aggregate zeroes
+                if (value || aggZero) secondsPerGroupBy += seconds;
             }
             lastDay = currentDay;
         }
@@ -2812,7 +2830,7 @@ LTMPlot::createFormulaData(Context *context, LTMSettings *settings, MetricDetail
 
     // resize the curve array to maximum possible size
     int maxdays = groupForDate(settings->end.date(), settings->groupBy)
-                    - groupForDate(settings->start.date(), settings->groupBy);
+                  - groupForDate(settings->start.date(), settings->groupBy) + 1;
 
     x.resize(maxdays+3); // one for start from zero plus two for 0 value added at head and tail
     y.resize(maxdays+3); // one for start from zero plus two for 0 value added at head and tail
@@ -2847,7 +2865,7 @@ LTMPlot::createFormulaData(Context *context, LTMSettings *settings, MetricDetail
 
         // PARSE + EVALUATE
         Result res = parser.evaluate(ride, NULL);
-        if (res.isNumber) value = res.number;
+        if (res.isNumber) value = res.number();
 
         // check values are bounded to stop QWT going berserk
         if (std::isnan(value) || std::isinf(value)) value = 0;
@@ -2883,6 +2901,7 @@ LTMPlot::createFormulaData(Context *context, LTMSettings *settings, MetricDetail
 
                 // only increment counter if nonzero or we aggregate zeroes
                 if (value || aggZero) secondsPerGroupBy = seconds; 
+                else secondsPerGroupBy = 0;
 
             } else {
                 // sum totals, average averages and choose best for Peaks
@@ -2914,7 +2933,8 @@ LTMPlot::createFormulaData(Context *context, LTMSettings *settings, MetricDetail
                     if (value) y[n] = sqrt((pow(y[n],2)*secondsPerGroupBy + pow(value,2)*value)/(secondsPerGroupBy+seconds));
                     break;
                 }
-                secondsPerGroupBy += seconds; // increment for same group
+                // increment group counter if nonzero or we aggregate zeroes
+                if (value || aggZero) secondsPerGroupBy += seconds;
             }
             lastDay = currentDay;
         }
@@ -2935,7 +2955,7 @@ LTMPlot::createBestsData(Context *, LTMSettings *settings, MetricDetail metricDe
 {
     // resize the curve array to maximum possible size
     int maxdays = groupForDate(settings->end.date(), settings->groupBy)
-                    - groupForDate(settings->start.date(), settings->groupBy);
+                  - groupForDate(settings->start.date(), settings->groupBy) + 1;
 
     x.resize(maxdays+3); // one for start from zero plus two for 0 value added at head and tail
     y.resize(maxdays+3); // one for start from zero plus two for 0 value added at head and tail
@@ -3009,6 +3029,7 @@ LTMPlot::createBestsData(Context *, LTMSettings *settings, MetricDetail metricDe
 
                 // only increment counter if nonzero or we aggregate zeroes
                 if (value || aggZero) secondsPerGroupBy = seconds; 
+                else secondsPerGroupBy = 0;
 
             } else {
                 // sum totals, average averages and choose best for Peaks
@@ -3044,7 +3065,8 @@ LTMPlot::createBestsData(Context *, LTMSettings *settings, MetricDetail metricDe
                     if (value) y[n] = sqrt((pow(y[n],2)*secondsPerGroupBy + pow(value,2)*value)/(secondsPerGroupBy+seconds));
                     break;
                 }
-                secondsPerGroupBy += seconds; // increment for same group
+                // increment group counter if nonzero or we aggregate zeroes
+                if (value || aggZero) secondsPerGroupBy += seconds;
             }
             lastDay = currentDay;
         }
@@ -3055,9 +3077,18 @@ void
 LTMPlot::createEstimateData(Context *context, LTMSettings *settings, MetricDetail metricDetail,
                                               QVector<double>&x,QVector<double>&y,int&n, bool)
 {
+    // curve specific filter, used to figure out if all activities are from the same sport
+    Specification spec = settings->specification;
+    if (!SearchFilterBox::isNull(metricDetail.datafilter))
+        spec.addMatches(SearchFilterBox::matches(context, metricDetail.datafilter));
+    int nActivities, nRides, nRuns, nSwims;
+    QString sport;
+    context->athlete->rideCache->getRideTypeCounts(spec, nActivities, nRides, nRuns, nSwims, sport);
+    if (sport.isEmpty()) sport = "Bike"; // Mixed sports use Bike estimates for backward compatibility
+
     // resize the curve array to maximum possible size (even if we don't need it)
     int maxdays = groupForDate(settings->end.date(), settings->groupBy)
-                    - groupForDate(settings->start.date(), settings->groupBy);
+                  - groupForDate(settings->start.date(), settings->groupBy) + 1;
 
     n = 0;
     x.resize(maxdays+3); // one for start from zero plus two for 0 value added at head and tail
@@ -3078,6 +3109,9 @@ LTMPlot::createEstimateData(Context *context, LTMSettings *settings, MetricDetai
 
     // loop through all the estimate data
     foreach(PDEstimate est, context->athlete->getPDEstimates()) {
+
+        // skip if not the requested sport
+        if (est.sport != sport) continue;
 
         // wpk skip for now
         if (est.wpk != metricDetail.wpk) continue;
@@ -3420,7 +3454,7 @@ LTMPlot::createPMCData(Context *context, LTMSettings *settings, MetricDetail met
     PMCData *pmcData = localPMC ? localPMC : athletePMC;
 
     int maxdays = groupForDate(settings->end.date(), settings->groupBy)
-                    - groupForDate(settings->start.date(), settings->groupBy);
+                  - groupForDate(settings->start.date(), settings->groupBy) + 1;
 
     // skip for negative or empty time periods.
     if (maxdays <=0) return;
@@ -3513,7 +3547,6 @@ LTMPlot::createPMCData(Context *context, LTMSettings *settings, MetricDetail met
                 y[n] = value;
                 x[n] = currentDay - groupForDate(settings->start.date(), settings->groupBy);
 
-                // only increment counter if nonzero or we aggregate zeroes
                 secondsPerGroupBy = seconds; 
 
             } else {
@@ -3563,7 +3596,7 @@ LTMPlot::createBanisterData(Context *context, LTMSettings *settings, MetricDetai
                                               QVector<double>&x,QVector<double>&y,int&n, bool)
 {
     // banister model
-    Banister *banister = context->athlete->getBanisterFor(metricDetail.symbol, 0,0);
+    Banister *banister = context->athlete->getBanisterFor(metricDetail.symbol, metricDetail.perfSymbol, 50,11);
 
     // should never happen...
     if (banister==NULL) {
@@ -3572,7 +3605,7 @@ LTMPlot::createBanisterData(Context *context, LTMSettings *settings, MetricDetai
     }
 
     int maxdays = groupForDate(settings->end.date(), settings->groupBy)
-                    - groupForDate(settings->start.date(), settings->groupBy);
+                  - groupForDate(settings->start.date(), settings->groupBy) + 1;
 
     // skip for negative or empty time periods.
     if (maxdays <=0) return;
@@ -3615,7 +3648,6 @@ LTMPlot::createBanisterData(Context *context, LTMSettings *settings, MetricDetai
                 y[n] = value;
                 x[n] = currentDay - groupForDate(settings->start.date(), settings->groupBy);
 
-                // only increment counter if nonzero or we aggregate zeroes
                 secondsPerGroupBy = seconds;
 
             } else {
@@ -3661,7 +3693,7 @@ void
 LTMPlot::createMeasureData(Context *context, LTMSettings *settings, MetricDetail metricDetail, QVector<double>&x,QVector<double>&y,int&n, bool)
 {
     int maxdays = groupForDate(settings->end.date(), settings->groupBy)
-                    - groupForDate(settings->start.date(), settings->groupBy);
+                  - groupForDate(settings->start.date(), settings->groupBy) + 1;
 
     // skip for negative or empty time periods.
     if (maxdays <=0) return;
@@ -3681,7 +3713,7 @@ LTMPlot::createMeasureData(Context *context, LTMSettings *settings, MetricDetail
         int currentDay = groupForDate(date, settings->groupBy);
 
         // value for day
-        double value = context->athlete->measures->getFieldValue(metricDetail.measureGroup, date, metricDetail.measureField, context->athlete->useMetricUnits);
+        double value = context->athlete->measures->getFieldValue(metricDetail.measureGroup, date, metricDetail.measureField, GlobalContext::context()->useMetricUnits);
 
         if (value || wantZero) {
             unsigned long seconds = 1;
@@ -3700,7 +3732,6 @@ LTMPlot::createMeasureData(Context *context, LTMSettings *settings, MetricDetail
                 y[n] = value;
                 x[n] = currentDay - groupForDate(settings->start.date(), settings->groupBy);
 
-                // only increment counter if nonzero or we aggregate zeroes
                 secondsPerGroupBy = seconds;
 
             } else {
@@ -3742,8 +3773,17 @@ LTMPlot::createMeasureData(Context *context, LTMSettings *settings, MetricDetail
 void
 LTMPlot::createPerformanceData(Context *context, LTMSettings *settings, MetricDetail metricDetail, QVector<double>&x,QVector<double>&y,int&n, bool)
 {
+    // curve specific filter, used to figure out if all activities are from the same sport
+    Specification spec = settings->specification;
+    if (!SearchFilterBox::isNull(metricDetail.datafilter))
+        spec.addMatches(SearchFilterBox::matches(context, metricDetail.datafilter));
+    int nActivities, nRides, nRuns, nSwims;
+    QString sport;
+    context->athlete->rideCache->getRideTypeCounts(spec, nActivities, nRides, nRuns, nSwims, sport);
+    if (sport.isEmpty()) sport = "Bike"; // Mixed sports use Bike performances for backward compatibility
+
     int maxdays = groupForDate(settings->end.date(), settings->groupBy)
-                    - groupForDate(settings->start.date(), settings->groupBy);
+                  - groupForDate(settings->start.date(), settings->groupBy) + 1;
 
     // skip for negative or empty time periods.
     if (maxdays <=0) return;
@@ -3760,6 +3800,9 @@ LTMPlot::createPerformanceData(Context *context, LTMSettings *settings, MetricDe
     // scan for performance tests and create a map so we can lookup quickly
     QHash<QDate, Performance> tests;
     foreach (RideItem *item, context->athlete->rideCache->rides()) {
+
+        if (!spec.pass(item)) continue; // skip filtered out activities
+
         if (item->dateTime.date() >= settings->start.date() && item->dateTime.date() <= settings->end.date()) {
             foreach(IntervalItem *i, item->intervals()) {
                 if (i->istest()) {
@@ -3799,12 +3842,12 @@ LTMPlot::createPerformanceData(Context *context, LTMSettings *settings, MetricDe
         }
         if (metricDetail.perfs && value <= 0) {
             // is there a weekly performance today?
-            Performance p = context->athlete->rideCache->estimator->getPerformanceForDate(date);
+            Performance p = context->athlete->rideCache->estimator->getPerformanceForDate(date, sport);
             if (!p.submaximal) value = p.powerIndex;
         }
         if (metricDetail.submax && value <= 0) {
             // is there a submax weekly performance today?
-            Performance p = context->athlete->rideCache->estimator->getPerformanceForDate(date);
+            Performance p = context->athlete->rideCache->estimator->getPerformanceForDate(date, sport);
             if (p.submaximal) value = p.powerIndex;
         }
 
@@ -3825,7 +3868,6 @@ LTMPlot::createPerformanceData(Context *context, LTMSettings *settings, MetricDe
                 y[n] = value;
                 x[n] = currentDay - groupForDate(settings->start.date(), settings->groupBy);
 
-                // only increment counter if nonzero or we aggregate zeroes
                 secondsPerGroupBy = seconds;
 
             } else {
@@ -3874,14 +3916,13 @@ LTMPlot::chooseYAxis(QString units)
         chosen = supportedAxes[axes.count()];
         if (units == "seconds" || units == tr("seconds")) setAxisTitle(chosen, tr("hours")); // we convert seconds to hours
         else setAxisTitle(chosen, units);
-        enableAxis(chosen.id, true);
         setAxisVisible(chosen, true);
         axes.insert(units, chosen);
         return chosen;
 
     } else {
         // eek!
-        return QwtAxis::yLeft; // just re-use the current yLeft axis
+        return QwtAxis::YLeft; // just re-use the current YLeft axis
     }
 }
 
@@ -3914,10 +3955,10 @@ LTMPlot::eventFilter(QObject *obj, QEvent *event)
 
         if (replotNeeded) {
             // keep min/max scale though
-            int min = axisScaleDiv(QwtPlot::xBottom).lowerBound();
-            int max = axisScaleDiv(QwtPlot::xBottom).upperBound();
+            int min = axisScaleDiv(QwtAxis::XBottom).lowerBound();
+            int max = axisScaleDiv(QwtAxis::XBottom).upperBound();
             setData(settings);
-            setAxisScale(xBottom, min, max);
+            setAxisScale(QwtAxis::XBottom, min, max);
             replot();
         }
     }
@@ -4017,12 +4058,16 @@ LTMPlot::pointHover(QwtPlotCurve *curve, int index)
 
         // we reference the metric definitions of name and
         // units to decide on the level of precision required
+#if QT_VERSION >= 0x060000
+        QMultiHashIterator<QString, QwtPlotCurve*> c(curves);
+#else
         QHashIterator<QString, QwtPlotCurve*> c(curves);
+#endif
         while (c.hasNext()) {
             c.next();
             if (c.value() == curve) {
                 const RideMetric *metric =factory.rideMetric(c.key());
-                units = metric ? metric->units(context->athlete->useMetricUnits) : "";
+                units = metric ? metric->units(GlobalContext::context()->useMetricUnits) : "";
                 precision = metric ? metric->precision() : 1;
 
                 // BikeScore, RI and Daniels Points have no units
@@ -4120,7 +4165,7 @@ class LTMPlotBackground: public QwtPlotItem
 
         LTMPlotBackground(LTMPlot *_parent, QwtAxisId axisid)
         {
-            //setAxis(QwtPlot::xBottom, axisid);
+            //setAxis(QwtAxis::XBottom, axisid);
             setXAxis(axisid);
             setZ(0.0);
             parent = _parent;
@@ -4135,8 +4180,8 @@ class LTMPlotBackground: public QwtPlotItem
                       const QwtScaleMap &xMap, const QwtScaleMap &yMap,
                       const QRectF &rect) const
     {
-        const Zones *zones       = parent->parent->context->athlete->zones(false);
-        int zone_range_size     = parent->parent->context->athlete->zones(false)->getRangeSize();
+        const Zones *zones      = parent->parent->context->athlete->zones("Bike");
+        int zone_range_size     = parent->parent->context->athlete->zones("Bike")->getRangeSize();
 
         if (zone_range_size >= 0) { //parent->shadeZones() &&
             for (int i = 0; i < zone_range_size; i ++) {
@@ -4192,7 +4237,7 @@ class LTMPlotZoneLabel: public QwtPlotItem
             parent = _parent;
             zone_number = _zone_number;
 
-            const Zones *zones       = parent->parent->context->athlete->zones(false);
+            const Zones *zones = parent->parent->context->athlete->zones("Bike");
             int zone_range     = zones->whichRange(settings->start.addDays((settings->end.date().toJulianDay()-settings->start.date().toJulianDay())/2).date());
 
             // which axis has watts?
@@ -4255,52 +4300,50 @@ LTMPlot::refreshMarkers(LTMSettings *settings, QDate from, QDate to, int groupby
     // seasons and season events
     if (settings->events) {
         QList<Season> tmpSeasons = context->athlete->seasons->seasons;
-        qSort(tmpSeasons.begin(),tmpSeasons.end(),Season::LessThanForStarts);
-        foreach (Season s, tmpSeasons) {
-
-            if (s.type != Season::temporary && s.getName() != settings->title && s.getStart() >= from && s.getStart() <= to) {
-                QwtIndPlotMarker *mrk = new QwtIndPlotMarker;
-                markers.append(mrk);
-                mrk->attach(this);
-                mrk->setLineStyle(QwtIndPlotMarker::VLine);
-                mrk->setLabelAlignment(Qt::AlignRight | Qt::AlignTop);
-                mrk->setLinePen(QPen(color, 0, Qt::DashLine));
-                mrk->setValue(double(groupForDate(s.getStart(), groupby)) - baseday,0);
-
-                if (position % viewDepth == 0) {
-                    QwtText text(s.getName());
-                    text.setFont(QFont("Helvetica", 10, QFont::Bold));
-                    text.setColor(color);
-                    mrk->setLabel(text);
-                }
-            }
-        } //end foreach season
+        std::sort(tmpSeasons.begin(),tmpSeasons.end(),Season::LessThanForStarts);
 
         foreach (Season s, tmpSeasons) {
-            /* if (s.type != Season::temporary && s.name != settings->title && s.getStart() >= from && s.getStart() < to) { */
-            if ((s.getStart() >= from && s.getStart() <= to) || (s.getEnd() >= from && s.getEnd() <= to)) {
-            foreach (SeasonEvent event, s.events) {
-                if (event.date >= from && event.date <= to) {
-
-                    // and the events...
+            // for each season that intersects the date range
+            if (s.getStart() <= to && s.getEnd() >= from) {
+                // add a season marker
+                if (s.type != Season::temporary && s.getName() != settings->title && s.getStart() >= from) {
                     QwtIndPlotMarker *mrk = new QwtIndPlotMarker;
                     markers.append(mrk);
                     mrk->attach(this);
                     mrk->setLineStyle(QwtIndPlotMarker::VLine);
                     mrk->setLabelAlignment(Qt::AlignRight | Qt::AlignTop);
-                    mrk->setLinePen(QPen(color, 0, Qt::SolidLine));
-                    mrk->setValue(double(groupForDate(event.date, groupby)) - baseday, 10.0);
+                    mrk->setLinePen(QPen(color, 0, Qt::DashLine));
+                    mrk->setValue(double(groupForDate(s.getStart(), groupby)) - baseday,0);
 
                     if (position % viewDepth == 0) {
-                        QwtText text(event.name);
+                        QwtText text(s.getName());
                         text.setFont(QFont("Helvetica", 10, QFont::Bold));
-                        text.setColor(Qt::red);
+                        text.setColor(color);
                         mrk->setLabel(text);
                     }
                 }
+
+                // add event markers
+                foreach (SeasonEvent event, s.events) {
+                    if (event.date >= from && event.date <= to) {
+                        QwtIndPlotMarker *mrk = new QwtIndPlotMarker;
+                        markers.append(mrk);
+                        mrk->attach(this);
+                        mrk->setLineStyle(QwtIndPlotMarker::VLine);
+                        mrk->setLabelAlignment(Qt::AlignCenter | Qt::AlignTop);
+                        mrk->setLinePen(QPen(color, 0, Qt::SolidLine));
+                        mrk->setValue(double(groupForDate(event.date, groupby)) - baseday, 10.0);
+
+                        if (position % viewDepth == 0) {
+                            QwtText text(event.name);
+                            text.setFont(QFont("Helvetica", 10, QFont::Bold));
+                            text.setColor(Qt::red);
+                            mrk->setLabel(text);
+                        }
+                    }
+                }
             }
-            }
-        }//end foreach season
+        } //end foreach season
     }
 
     // Add marker for today when the date range goes to the future
@@ -4340,7 +4383,7 @@ void LTMPlot::refreshZoneLabels(QwtAxisId axisid)
     }
     if (axisid == QwtAxisId(-1,-1)) return; // our job is done - no zones to plot
 
-    const Zones *zones       = context->athlete->zones(false);
+    const Zones *zones       = context->athlete->zones("Bike");
 
     if (zones == NULL || zones->getRangeSize()==0) return; // no zones to plot
 
@@ -4361,5 +4404,7 @@ void LTMPlot::refreshZoneLabels(QwtAxisId axisid)
 
 bool LTMPlot::isMinutes(QString units)
 {
-    return units == "minutes" || units == tr("minutes") || PaceZones::isPaceUnit(units);
+    static const QSet<QString> MinutesHash = { "minutes", tr("minutes") };
+
+    return MinutesHash.contains(units) || PaceZones::isPaceUnit(units);
 }

@@ -27,8 +27,12 @@
 #include <QVector>
 #include <assert.h>
 #include <QDebug>
+#include <QStringRef>
 #define DATETIME_FORMAT "yyyy/MM/dd hh:mm:ss' UTC'"
 
+namespace Utils {
+    QString RidefileUnEscape(QString);
+};
 
 struct JsonFileReader : public RideFileReader {
     virtual RideFile *openRideFile(QFile &file, QStringList &errors, QList<RideFile*>* = 0) const; 

@@ -28,7 +28,7 @@
 
 // trends view
 #include "Season.h" // for data series types
-#include "TabView.h"  // stylesheet for scroller
+#include "AbstractView.h"  // stylesheet for scroller
 
 // qt
 #include <QtGui>

@@ -89,7 +89,7 @@ ManualRideDialog::deriveFactors()
 
         // total values, not just last 'n' days -- but avoid divide by zero
         if (totalseconds && totaldistance) {
-            if (!context->athlete->useMetricUnits) totaldistance *= MILES_PER_KM;
+            if (!GlobalContext::context()->useMetricUnits) totaldistance *= MILES_PER_KM;
             timeBS = (totalbs * 3600) / totalseconds;  // BS per hour
             distanceBS = totalbs / totaldistance;  // BS per mile or km
             timeDP = (totaldp * 3600) / totalseconds;  // DP per hour
@@ -102,7 +102,7 @@ ManualRideDialog::deriveFactors()
 
         // don't use defaults if we have rides in last 'n' days
         if (rides) {
-            if (!context->athlete->useMetricUnits) distance *= MILES_PER_KM;
+            if (!GlobalContext::context()->useMetricUnits) distance *= MILES_PER_KM;
             timeBS = (bs * 3600) / seconds;  // BS per hour
             distanceBS = bs / distance;  // BS per mile or km
             timeDP = (dp * 3600) / seconds;  // DP per hour
@@ -161,7 +161,7 @@ ManualRideDialog::ManualRideDialog(Context *context) : context(context)
     duration->setDisplayFormat("hh:mm:ss");
 
     // ride distance
-    QString distanceString = QString(tr("Distance (%1):")).arg(context->athlete->useMetricUnits ? "km" : "miles");
+    QString distanceString = QString(tr("Distance (%1):")).arg(GlobalContext::context()->useMetricUnits ? "km" : "miles");
     QLabel *distanceLabel = new QLabel(distanceString, this);
     distance = new QDoubleSpinBox(this);
     distance->setSingleStep(1.0);
@@ -175,15 +175,16 @@ ManualRideDialog::ManualRideDialog(Context *context) : context(context)
     sport = new QLineEdit(this);
     QLabel *notesLabel = new QLabel(tr("Notes:"), this);
     notes = new QTextEdit(this);
+    notes->setAcceptRichText(false);
 
     // Set completer for Sport and Workout Code fields
-    RideMetadata *rideMetadata = context->athlete->rideMetadata();
+    RideMetadata *rideMetadata = GlobalContext::context()->rideMetadata;
     if (rideMetadata) {
         foreach (FieldDefinition field, rideMetadata->getFields()) {
             if (field.name == "Sport")
-                sport->setCompleter(field.getCompleter(this));
+                sport->setCompleter(field.getCompleter(this, context->athlete->rideCache));
             else if (field.name == "Workout Code")
-                wcode->setCompleter(field.getCompleter(this));
+                wcode->setCompleter(field.getCompleter(this, context->athlete->rideCache));
         }
     }
 
@@ -453,7 +454,7 @@ ManualRideDialog::okClicked()
     // basic data
     if (distance->value()) {
         QMap<QString,QString> override;
-        if (!context->athlete->useMetricUnits) {
+        if (!GlobalContext::context()->useMetricUnits) {
             override.insert("value", QString("%1").arg(distance->value() * KM_PER_MILE));
         }else{
             override.insert("value", QString("%1").arg(distance->value()));
@@ -476,7 +477,7 @@ ManualRideDialog::okClicked()
     // basic metadata
     rideFile->setTag("Sport", sport->text());
     rideFile->setTag("Workout Code", wcode->text());
-    rideFile->setTag("Notes", notes->toPlainText());
+    rideFile->setTag("Notes", notes->document()->toPlainText());
 
     // average metrics
     if (avgBPM->value()) {
@@ -492,7 +493,7 @@ ManualRideDialog::okClicked()
     if (avgKPH->value()) {
         QMap<QString,QString> override;
         // Avg Speed is shown according to units preferences
-        double kph = (context->athlete->useMetricUnits ? 1.0 : KM_PER_MILE) * avgKPH->value();
+        double kph = (GlobalContext::context()->useMetricUnits ? 1.0 : KM_PER_MILE) * avgKPH->value();
         override.insert("value", QString("%1").arg(kph));
         rideFile->metricOverrides.insert("average_speed", override);
     }
@@ -525,7 +526,7 @@ ManualRideDialog::okClicked()
     }
 
     // process linked defaults
-    context->athlete->rideMetadata()->setLinkedDefaults(rideFile);
+    GlobalContext::context()->rideMetadata->setLinkedDefaults(rideFile);
 
     // what should the filename be?
     QChar zero = QLatin1Char ('0');
@@ -584,6 +585,6 @@ ManualRideDialog::lapsClicked()
     if (lapsEditor && lapsEditor->exec() && lapsEditor->dataPoints().count() > 0) {
         // update duration and distance
         duration->setTime(QTime(0, 0, 0).addSecs(lapsEditor->dataPoints().count()));
-        distance->setValue(lapsEditor->dataPoints()[lapsEditor->dataPoints().count()-1]->km / (context->athlete->useMetricUnits ? 1.0 : KM_PER_MILE));
+        distance->setValue(lapsEditor->dataPoints()[lapsEditor->dataPoints().count()-1]->km / (GlobalContext::context()->useMetricUnits ? 1.0 : KM_PER_MILE));
     }
 }

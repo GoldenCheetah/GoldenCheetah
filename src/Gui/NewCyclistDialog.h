@@ -65,6 +65,8 @@ class NewCyclistDialog : public QDialog
         QTextEdit  *bio;
         QPushButton *avatarButton;
         QPixmap     avatar;
+        QLabel *templatelabel;
+        QComboBox *templateCombo;
 
         QPushButton *cancel, *save;
 };

@@ -36,6 +36,11 @@ plugins/
 resources/
 src/debug/
 src/release/
+doc/doxygen/latex
+doc/doxygen/html
+
+# qt creator builds
+build-src*
 
 qwt/src/debug/
 qwt/src/release/
@@ -50,4 +55,6 @@ qwt/src/Makefile.Debug
 qwt/textengines/mathml/debug/
 qwt/textengines/mathml/release/
 build.pro.user
+build.pro.user.*
 doc/contrib/WASP Packet Protocol.pdf
+

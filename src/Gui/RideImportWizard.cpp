@@ -113,7 +113,7 @@ RideImportWizard::RideImportWizard(RideAutoImportConfig *dirs, Context *context,
     // and get the allowed files formats
     const RideFileFactory &rff = RideFileFactory::instance();
     QStringList suffixList = rff.suffixes();
-    suffixList.replaceInStrings(QRegExp("^"), "*.");
+    suffixList.replaceInStrings(QRegularExpression("^"), "*.");
     QStringList allFormats;
     foreach(QString suffix, rff.suffixes())
         allFormats << QString("*.%1").arg(suffix);
@@ -211,7 +211,9 @@ RideImportWizard::RideImportWizard(RideAutoImportConfig *dirs, Context *context,
                 case RideAutoImportRule::importBackground90:
                 case RideAutoImportRule::importBackground180:
                 case RideAutoImportRule::importBackground360:
-                    if (f.created().date() >= selectAfter || f.lastModified().date() >= selectAfter) {
+                    if (f.birthTime().date() >= selectAfter
+                        || f.metadataChangeTime().date() >= selectAfter
+                        || f.lastModified().date() >= selectAfter) {
                         files.append(f.absoluteFilePath());
                         j++;
                     };
@@ -244,10 +246,24 @@ void
 RideImportWizard::init(QList<QString> original, Context * /*mainWindow*/)
 {
 
+    // save target dir for the file import
+    this->homeImports = context->athlete->home->imports();
+    this->homeActivities = context->athlete->home->activities();
+    this->tmpActivities = context->athlete->home->tmpActivities();
+
     // expand files if they are archives - this may involve unzipping or extracting
     //                                     files into a subdirectory, so we also clean-up
     //                                     before we close.
-    QList<QString> files = expandFiles(original);
+    QList<QString> expanded = expandFiles(original);
+
+    QList<QString> files;
+    if (autoImportMode) {
+        // on auto-import skip files present in imports folder to avoid re-import
+        foreach (QString fname, expanded) if (homeImports.entryList(QStringList()<<QFileInfo(fname).baseName()+"*").isEmpty()) files<<fname;
+    } else {
+        // all files on manual import
+        files = expanded;
+    }
 
     // setup Help
     HelpWhatsThis *help = new HelpWhatsThis(this);
@@ -272,6 +288,7 @@ RideImportWizard::init(QList<QString> original, Context * /*mainWindow*/)
     todayButton->addItem(tr("Last Sunday"));
     todayButton->addItem(tr("Choose Date"));
     cancelButton = new QPushButton(tr("Cancel"));
+    cancelButton->setAutoDefault(false);
     abortButton = new QPushButton(tr("Abort"));
     //overFiles = new QCheckBox(tr("Overwrite Existing Files"));  // deprecate for this release... XXX
     // initially the cancel, overwrite and today widgets are hidden
@@ -317,11 +334,6 @@ RideImportWizard::init(QList<QString> original, Context * /*mainWindow*/)
     statusHeading->setText(tr("Import Status"));
     tableWidget->setHorizontalHeaderItem(STATUS_COLUMN, statusHeading);
 
-    // save target dir for the file import
-    this->homeImports = context->athlete->home->imports();
-    this->homeActivities = context->athlete->home->activities();
-    this->tmpActivities = context->athlete->home->tmpActivities();
-
     // Fill in the filenames and all the textItems
     for (int i=0; i < files.count(); i++) {
         QTableWidgetItem *t;
@@ -342,7 +354,7 @@ RideImportWizard::init(QList<QString> original, Context * /*mainWindow*/)
         t = new QTableWidgetItem();
         t->setText(tr(""));
         t->setFlags(t->flags()  | Qt::ItemIsEditable);
-        t->setBackgroundColor(Qt::red);
+        t->setBackground(Qt::red);
         tableWidget->setItem(i,DATE_COLUMN,t);
 
         // Time
@@ -603,7 +615,7 @@ RideImportWizard::process()
                      t = new QTableWidgetItem();
                      t->setText(tr(""));
                      t->setFlags(t->flags()  | Qt::ItemIsEditable);
-                     t->setBackgroundColor(Qt::red);
+                     t->setBackground(Qt::red);
                      tableWidget->setItem(here+counter,DATE_COLUMN,t);
 
                      // Time
@@ -699,7 +711,7 @@ RideImportWizard::process()
                    tableWidget->item(i,DURATION_COLUMN)->setTextAlignment(Qt::AlignHCenter | Qt::AlignVCenter); // put in the middle
 
                    // show distance by looking at last data point
-                   QString dist = context->athlete->useMetricUnits
+                   QString dist = GlobalContext::context()->useMetricUnits
                        ? QString ("%1 km").arg(km, 0, 'f', 1)
                        : QString ("%1 mi").arg(km * MILES_PER_KM, 0, 'f', 1);
                    tableWidget->item(i,DISTANCE_COLUMN)->setText(dist);
@@ -957,7 +969,8 @@ RideImportWizard::abortClicked()
     // NOTE: abort button morphs into save and finish button later - so all 3 variants are processed here
 
     // if done when labelled abort we kill off this dialog
-    QString label = abortButton->text();
+    // & removed to avoid issues with kde AutoCheckAccelerators
+    QString label = QString(abortButton->text()).replace("&", "");
 
     // Process "ABORT"
     if (label == tr("Abort")) {
@@ -1083,12 +1096,15 @@ RideImportWizard::abortClicked()
                 ride->setTag("Import errors", errors.join("\n"));
 
             // process linked defaults
-            context->athlete->rideMetadata()->setLinkedDefaults(ride);
+            GlobalContext::context()->rideMetadata->setLinkedDefaults(ride);
 
             // run the processor first... import
             tableWidget->item(i,STATUS_COLUMN)->setText(tr("Processing..."));
             DataProcessorFactory::instance().autoProcess(ride, "Auto", "Import");
             ride->recalculateDerivedSeries();
+            // now metrics have been calculated
+            DataProcessorFactory::instance().autoProcess(ride, "Save", "ADD");
+
 
             tableWidget->item(i,STATUS_COLUMN)->setText(tr("Saving file..."));
 
@@ -1119,9 +1135,6 @@ RideImportWizard::abortClicked()
         } else {
             tableWidget->item(i,STATUS_COLUMN)->setText(tr("Error - Import of activitiy file failed"));
         }
-
-        // now metrics have been calculated
-        DataProcessorFactory::instance().autoProcess(ride, "Save", "ADD");
 
         // clear
         delete ride;

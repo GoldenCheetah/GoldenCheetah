@@ -71,7 +71,7 @@ GpxFileReader::toByteArray(Context *, const RideFile *ride, bool withAlt, bool w
                      "http://www.garmin.com/xmlschemas/PowerExtensionv1.xsd"        );
 
     gpx.setAttribute("version", "1.1");
-    gpx.setAttribute("creator", QString("GoldenCheetah (build %1)").arg(VERSION_LATEST));
+    gpx.setAttribute("creator", QString("GoldenCheetah (build %1) with Barometer").arg(VERSION_LATEST));
     doc.appendChild(gpx);
 
 
@@ -83,12 +83,16 @@ GpxFileReader::toByteArray(Context *, const RideFile *ride, bool withAlt, bool w
         QDomElement trkseg = doc.createElement("trkseg");
         trk.appendChild(trkseg);        
 
+        QLocale cLocale(QLocale::Language::C);
+
         foreach (const RideFilePoint *point, ride->dataPoints()) {
             QDomElement trkpt = doc.createElement("trkpt");
             trkseg.appendChild(trkpt);
 
-            trkpt.setAttribute("lat", point->lat);
-            trkpt.setAttribute("lon", point->lon);
+            QString strLat = cLocale.toString(point->lat, 'g', 12);
+            trkpt.setAttribute("lat", strLat);
+            QString strLon = cLocale.toString(point->lon, 'g', 12);
+            trkpt.setAttribute("lon", strLon);
 
             // GPX standard requires <ele>, if present, to be first
             if (withAlt && ride->areDataPresent()->alt) {
@@ -174,7 +178,9 @@ GpxFileReader::writeRideFile(Context *context, const RideFile *ride, QFile &file
     if (!file.open(QIODevice::WriteOnly)) return(false);
     file.resize(0);
     QTextStream out(&file);
+#if QT_VERSION < 0x060000
     out.setCodec("UTF-8");
+#endif
     //out.setGenerateByteOrderMark(true);
     out << xml;
     out.flush();

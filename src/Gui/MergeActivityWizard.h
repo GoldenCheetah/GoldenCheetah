@@ -82,7 +82,7 @@ class MergeActivityWizard : public QWizard
 
         // method for combining
         int mode; // 0 = merge, 1 = join
-        int strategy; // 0=clock, 1=shared, 2=start, 3=end
+        int strategy; // 0=clock, 1=shared, 2=start, 3=end, 4=distance
 
         // recording interval to use
         double recIntSecs;
@@ -108,6 +108,8 @@ class MergeActivityWizard : public QWizard
         void combine(); // combine rides using the current parameters
 
     private:
+
+        void mergeRideSamplesByDistance();
 
         SmallPlot *smallPlot1, *smallPlot2;
 

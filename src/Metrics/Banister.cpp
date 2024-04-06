@@ -33,6 +33,7 @@
 #include "Banister.h"
 
 #include "RideMetric.h"
+#include "RideFileCache.h"
 #include "Athlete.h"
 #include "Context.h"
 #include "Settings.h"
@@ -57,8 +58,10 @@ const double typical_CP = 261,
              typical_WPrime = 15500,
              typical_Pmax = 1100;
 
-// minimum number of days that is gap in seasons
+// used to control breaking into windows, but the performance is good enough
+// that we don't need to, and more data stops the fit from going bad.
 const int typical_SeasonBreak = 42;
+const int typical_SeasonSize = 700; // a good couple of years needed
 
 // for debugging
 #ifndef BANISTER_DEBUG
@@ -100,13 +103,16 @@ const int typical_SeasonBreak = 42;
 // e.g. supramaximal work to pmax, above threshold to v02max etc.
 //
 //
-Banister::Banister(Context *context, QString symbol, double t1, double t2, double k1, double k2) :
-    symbol(symbol), k1(k1), k2(k2), t1(t1), t2(t2), days(0), context(context), isstale(true)
+Banister::Banister(Context *context, QString symbol, QString perf_symbol, double t1, double t2, double k1, double k2) :
+    symbol(symbol), perf_symbol(perf_symbol), k1(k1), k2(k2), t1(t1), t2(t2), days(0), context(context), isstale(true)
 {
     // when they all change we are ready to invalidate and refresh
     // don't worry about upstream events, this is what we are dependant on
     connect(context, SIGNAL(estimatesRefreshed()), this, SLOT(invalidate()));
-    connect(context, SIGNAL(estimatesRefreshed()), this, SLOT(refresh()));
+
+    // if not passed set to a default
+    if (t1==0) t1=50;
+    if (t2==0) t2=11;
 
     // refresh
     refresh();
@@ -119,6 +125,9 @@ Banister::value(QDate date, int type)
     // check in range
     if (date > stop || date < start) return 0;
 
+    // triger refresh on read.
+    if (isstale) refresh();
+
     // offset, bouinds check just in case.
     long index=date.toJulianDay()-start.toJulianDay();
     if (index <0 || index>=data.length()) return 0;
@@ -126,10 +135,63 @@ Banister::value(QDate date, int type)
     switch(type) {
     case BANISTER_NTE: return data[index].h;
     case BANISTER_PTE: return data[index].g;
-    case BANISTER_CP: return data[index].perf > 0 ? data[index].perf * typical_CP / 100 : 0; // avoid -ve values and divzero
+    case BANISTER_CP: return perf_symbol == "power_index" && data[index].perf > 0 ? data[index].perf * typical_CP / 100 : 0; // avoid -ve values and divzero
     default:
     case BANISTER_PERFORMANCE: return data[index].perf;
     }
+}
+
+double
+Banister::RMSE(QDate from, QDate to, int &count)
+{
+    // not sure it makes much sense to only look at
+    // a portion of the curve, but lets do as asked
+    long starti = from.toJulianDay() - start.toJulianDay();
+    long stopi = to.toJulianDay() - start.toJulianDay();
+
+    // check bounds
+    if ((stopi-starti)<= 0 || starti < 0 || starti > data.length() || stopi < 0 || stopi > data.length()) return 0;
+
+    double se=0;
+    count=0;
+    while(starti < stopi) {
+        if (data[starti].test > 0) {
+            se += pow(data[starti].perf - data[starti].test, 2);
+            count++;
+        }
+
+        starti++;
+    }
+
+    // RMSE
+    return count > 0 ? sqrt(se / count) : 0;
+}
+
+QDate
+Banister::getPeakPerf(QDate from, QDate to, double &perf, int &CP)
+{
+    // not sure it makes much sense to only look at
+    // a portion of the curve, but lets do as asked
+    long starti = from.toJulianDay() - start.toJulianDay();
+    long stopi = to.toJulianDay() - start.toJulianDay();
+
+    // check bounds
+    if ((stopi-starti)<= 0 || starti < 0 || starti > data.length() || stopi < 0 || stopi > data.length()) return QDate();
+
+    double max=0.0;
+    int index=-1;
+    while(starti < stopi) {
+        if (data[starti].perf > max) {
+            max = data[starti].perf;
+            index = starti;
+        }
+        starti++;
+    }
+    perf = max;
+    // We compute CP only when performance metric is power_index
+    CP = (perf_symbol == "power_index") ? max * typical_CP / 100.0 : 0;
+
+    return start.addDays(index);
 }
 
 void
@@ -147,8 +209,10 @@ Banister::init()
     // default values
     k1=0.2;
     k2=0.2;
-    t1=31;
-    t2=15;
+
+    // t1,t2 if set to zero?
+    if (t1<=0) t1=50;
+    if (t2<=0) t2=11;
 }
 
 void
@@ -172,9 +236,14 @@ Banister::refresh()
     QDate f, l;
     if (context->athlete->rideCache->rides().count()) {
 
-        // set date range - extend to a year after last ride
+        // always start on first ride
         f= context->athlete->rideCache->rides().first()->dateTime.date();
-        l= context->athlete->rideCache->rides().last()->dateTime.date().addYears(1);
+
+        // set date range - extend to a year after last ride
+        // or a year from today whichever is later
+        QDate lastride = context->athlete->rideCache->rides().last()->dateTime.date().addYears(1);
+        QDate yearaway = QDate::currentDate().addYears(1);
+        l = yearaway > lastride ? yearaway : lastride;
 
     } else
         return;
@@ -206,45 +275,26 @@ Banister::refresh()
         // load measure
         double score = item->getForSymbol(symbol);
         long day = item->dateTime.date().toJulianDay() - start.toJulianDay();
-        data[day].score = score;
+        data[day].score += score;
 
         // average out measures
         if (score>0) {
             rides++;
             meanscore += score; // averaged at end
-        }
 
-        // get best scoring performance *test* in the ride
-        double todaybest=0;
-        foreach(IntervalItem *i, item->intervals()) {
-            if (i->istest()) {
-                double pix=i->getForSymbol("power_index");
-                if (pix > todaybest)  todaybest = pix;
+            // get best scoring performance *test* in the ride
+            double todaybest=0;
+            foreach(IntervalItem *i, item->intervals()) {
+                if (i->istest()) {
+                    double pix=i->getForSymbol(perf_symbol);
+                    if (pix > todaybest)  todaybest = pix;
+                }
             }
-        }
 
-        // is there a performance test already there for today?
-        if (todaybest > 0) {
-            if (performances > 0 && performanceDay[performances-1] == day) {
-                if (performanceScore[performances-1] < todaybest)
-                    performanceScore[performances-1] = todaybest;
-            } else {
-                performanceDay[performances] = day;
-                performanceScore[performances] = todaybest;
-                performances++;
-            }
-        }
-
-        // if we didn't find a performance test in the ride lets see if there
-        // is a weekly performance already identified
-        if (!(todaybest > 0)) {
-            Performance p = context->athlete->rideCache->estimator->getPerformanceForDate(item->dateTime.date());
-            if (!p.submaximal && p.powerIndex > 0) {
-
-                // its not submax
-                todaybest = p.powerIndex;
+            // is there a performance test already there for today?
+            if (todaybest > 0) {
                 if (performances > 0 && performanceDay[performances-1] == day) {
-                    if (performanceScore[performances-1] < todaybest) // validating with '<=' not '<' is vital for 2-a-days
+                    if (performanceScore[performances-1] < todaybest)
                         performanceScore[performances-1] = todaybest;
                 } else {
                     performanceDay[performances] = day;
@@ -252,12 +302,32 @@ Banister::refresh()
                     performances++;
                 }
             }
-        }
 
-        // add more space
-        if (performances == performanceDay.size()) {
-            performanceDay.resize(performanceDay.size() + (days/2));
-            performanceScore.resize(performanceDay.size() + (days/2));
+            // if we didn't find a performance test in the ride lets see if there
+            // is a weekly performance already identified
+            // This applies only when performance metric is power_index
+            if (!(todaybest > 0) && perf_symbol == "power_index") {
+                Performance p = context->athlete->rideCache->estimator->getPerformanceForDate(item->dateTime.date(), item->sport);
+                if (!p.submaximal && p.powerIndex > 0) {
+
+                    // its not submax
+                    todaybest = p.powerIndex;
+                    if (performances > 0 && performanceDay[performances-1] == day) {
+                        if (performanceScore[performances-1] < todaybest) // validating with '<=' not '<' is vital for 2-a-days
+                            performanceScore[performances-1] = todaybest;
+                    } else {
+                        performanceDay[performances] = day;
+                        performanceScore[performances] = todaybest;
+                        performances++;
+                    }
+                }
+            }
+
+            // add more space
+            if (performances == performanceDay.size()) {
+                performanceDay.resize(performanceDay.size() + (days/2));
+                performanceScore.resize(performanceDay.size() + (days/2));
+            }
         }
     }
 
@@ -268,7 +338,7 @@ Banister::refresh()
     // the performanceDay and performanceScore vectors are just there
     // for model fitting calls to lmcurve.
     for(int i=0; i<performances; i++) {
-        printd("Performance %d on day=%g score=%g\n", i, performanceDay[i], performanceScore[i]);
+        printd("Performance %d on day=%g performance score=%g\n", i, performanceDay[i], performanceScore[i]);
         data[performanceDay[i]].test = performanceScore[i];
     }
 
@@ -305,16 +375,24 @@ Banister::refresh()
         if (data[i].test >0) testoffset++;
 
         // found the end of a season
-        if (inwindow && data[i].score <= 0 && i-lastworkoutday > typical_SeasonBreak) {
+        if (inwindow && ((data[i].score <= 0 && i-lastworkoutday > typical_SeasonBreak) || (i-adding.startIndex) > typical_SeasonSize)) {
 
             // only useful if we have 2 or more tests to fit to
             if (adding.tests >= 2) {
                 adding.stopIndex=i;
-                adding.stopDate=start.addDays(i);
+                adding.stopDate=adding.startDate.addDays(adding.stopIndex-adding.startIndex);
                 windows<<adding;
             }
             inwindow=false;
         }
+    }
+
+    // did we end in a window?
+    if (inwindow) {
+        adding.stopIndex=data.length()-1;
+        adding.stopDate=start.addDays(adding.stopIndex-adding.startIndex);
+        windows<<adding;
+
     }
 
     foreach(banisterFit f, windows) {
@@ -326,16 +404,21 @@ Banister::refresh()
     }
 
     //
-    // EXPAND A FITTING WINDOW WHERE <5 TESTS
+    // EXPAND A FITTING WINDOW
     //
-    int i=0;
-    while(i < windows.length() && windows.count() > 1) {
+    for(int i=windows.count()-1; i>0 && windows.count() > 1; i--) {
 
         // combine and remove prior
-        if (windows[i].tests < 5 && i>0) {
+        if (windows[i].tests < 5 || windows[i].stopIndex-windows[i].startIndex < typical_SeasonSize) {
             windows[i].combine(windows[i-1]);
-            windows.removeAt(--i);
-        } else i++;
+            windows.removeAt(i-1);
+        }
+    }
+
+    // make them contiguous
+    for(int i=0; i<windows.count(); i++) {
+        if (i<(windows.count()-1)) windows[i].stopIndex = windows[i+1].stopIndex;
+        else  windows[i].stopIndex = data.length()-1;
     }
 
     foreach(banisterFit f, windows) {
@@ -358,16 +441,15 @@ banisterFit::f(double d, const double *parms)
 {
     if (k1 > parms[0] || k1 < parms[0] ||
         k2 > parms[1] || k2 < parms[1] ||
-        t1 > parms[2] || t1 < parms[2] ||
-        t2 > parms[3] || t2 < parms[3] ||
-        p0 > parms[4] || p0 < parms[4]) {
+        p0 > parms[2] || p0 < parms[2]) {
 
         // we'll keep the parameters passed
         k1 = parms[0];
         k2 = parms[1];
-        t1 = parms[2];
-        t2 = parms[3];
-        p0 = parms[4];
+        p0 = parms[2];
+        // we fixed t1/t2 (for now)
+        t1 = parent->t1;
+        t2 = parent->t2;
 
         //printd("fit iter %s to %s [k1=%g k2=%g t1=%g t2=%g p0=%g]\n", startDate.toString().toStdString().c_str(), stopDate.toString().toStdString().c_str(), k1,k2,t1,t2,p0); // too much info even in debug, unless you want it
         compute(startIndex, stopIndex);
@@ -390,14 +472,14 @@ banisterFit::compute(long start, long stop)
             parent->data[index].g =  parent->data[index].h = 0;
             first = false;
         } else {
-            parent->data[index].g = (parent->data[index-1].g * exp (-1/t1)) + parent->data[index].score;
-            parent->data[index].h = (parent->data[index-1].h * exp (-1/t2)) + parent->data[index].score;
+            parent->data[index].g = (parent->data[index-1].g * exp (-1/parent->t1)) + parent->data[index].score;
+            parent->data[index].h = (parent->data[index-1].h * exp (-1/parent->t2)) + parent->data[index].score;
         }
 
         // apply coefficients
         parent->data[index].pte = parent->data[index].g * k1;
         parent->data[index].nte = parent->data[index].h * k2;
-        parent->data[index].perf = p0 + parent->data[index].pte - parent->data[index].nte;
+        parent->data[index].perf = p0 + (parent->data[index].pte - parent->data[index].nte);
     }
 }
 
@@ -417,38 +499,48 @@ banisterFit::combine(banisterFit other)
 }
 
 // used to wrap a function call when deriving parameters
-static QMutex calllmfit;
-static banisterFit *calllmfitmodel = NULL;
-static double calllmfitf(double t, const double *p) {
-return static_cast<banisterFit*>(calllmfitmodel)->f(t, p);
+static banisterFit *calllmfitm = NULL;
+static double calllmfitb(double t, const double *p) {
+return static_cast<banisterFit*>(calllmfitm)->f(t, p);
+}
+
+void Banister::setDecay(double one, double two)
+{
+    // we will need to refit too...
+    t1 = one;
+    t2 = two;
+
+    // no need to refresh, just refit
+    fit();
 
 }
 void Banister::fit()
 {
     for(int i=0; i<windows.length(); i++) {
 
-        double prior[5]={ k1, k2, t1, t2, performanceScore[windows[i].testoffset] };
+        double prior[3]={ k1, k2, performanceScore[windows[i].testoffset] };
 
         lm_control_struct control = lm_control_double;
         control.patience = 1000; // more than this and there really is a problem
         lm_status_struct status;
 
-        printd("fitting window %d start=%s [k1=%g k2=%g t1=%g t2=%g p0=%g]\n", i, windows[i].startDate.toString().toStdString().c_str(), prior[0], prior[1], prior[2], prior[3], prior[4]);
+        printd("fitting window %d start=%s [k1=%g k2=%g p0=%g]\n", i, windows[i].startDate.toString().toStdString().c_str(), prior[0], prior[1], prior[2]);
 
         // use forwarder via global variable, so mutex around this !
         calllmfit.lock();
-        calllmfitmodel=&windows[i];
-
+        calllmfitm=&windows[i];
 
         //fprintf(stderr, "Fitting ...\n" ); fflush(stderr);
-        lmcurve(5, prior, windows[i].tests, performanceDay.constData()+windows[i].testoffset, performanceScore.constData()+windows[i].testoffset,
-                calllmfitf, &control, &status);
+        lmcurve(3, prior, windows[i].tests, performanceDay.constData()+windows[i].testoffset, performanceScore.constData()+windows[i].testoffset,
+                calllmfitb, &control, &status);
 
         // release for others
         calllmfit.unlock();
 
         if (status.outcome >= 0) {
-            printd("window %d %s [k1=%g k2=%g t1=%g t2=%g p0=%g]\n", i, lm_infmsg[status.outcome], prior[0], prior[1], prior[2], prior[3], prior[4]);
+            int n=0;
+            double x=RMSE(windows[i].startDate, windows[i].stopDate, n);
+            printd("RMSE %g for %d points: window %d %s [k1=%g k2=%g p0=%g]\n", x, n, i, lm_infmsg[status.outcome], prior[0], prior[1], prior[2]);
         }
     }
 
@@ -475,8 +567,10 @@ void Banister::fit()
 //
 
 // power index metric
-double powerIndex(double averagepower, double duration)
+double powerIndex(double averagepower, double duration, QString sport)
 {
+    Q_UNUSED(sport) // TODO: different parameters for other sports?
+
     // so now lets work out what the 3p model says the
     // typical athlete would do for the same duration
     //
@@ -544,7 +638,7 @@ class PowerIndex : public RideMetric {
         }
 
         // calculate power index, 0=out of bounds
-        double pix = powerIndex(averagepower, duration);
+        double pix = powerIndex(averagepower, duration, item->sport);
 
         // we could convert to linear work time model before
         // indexing, but they cancel out so no value in doing so
@@ -557,4 +651,62 @@ class PowerIndex : public RideMetric {
     RideMetric *clone() const { return new PowerIndex(*this); }
 };
 
-static bool countAdded = RideMetricFactory::instance().addMetric(PowerIndex());
+class PeakPowerIndex : public RideMetric {
+    Q_DECLARE_TR_FUNCTIONS(PeakPowerIndex)
+    public:
+
+    PeakPowerIndex()
+    {
+        setSymbol("peak_power_index");
+        setInternalName("PeakPowerIndex");
+        setPrecision(1);
+        setType(Peak); // not even sure aggregation makes sense
+    }
+    void initialize() {
+        setName(tr("PeakPowerIndex"));
+        setMetricUnits(tr("%"));
+        setImperialUnits(tr("%"));
+        setDescription(tr("Peak Power Index"));
+    }
+
+    void compute(RideItem *item, Specification spec, const QHash<QString,RideMetric*> &) {
+
+        // no ride or no samples or is interval (metric only valid for a ride)
+        if (spec.isEmpty(item->ride()) || spec.secsStart() != -1) {
+            setValue(RideFile::NIL);
+            setCount(0);
+            return;
+        }
+
+        // calculate for this interval/ride
+        double peakpix = 0;
+        if (item->ride()->areDataPresent()->watts) {
+
+            QVector<float>vector;
+            MeanMaxComputer thread1(item->ride(), vector, RideFile::watts);
+            thread1.run();
+            thread1.wait();
+
+            // calculate peak power index, starting from 3 mins, 0=out of bounds
+            for (int secs=180; secs<vector.count(); secs++) {
+                double pix = powerIndex(vector[secs], secs, item->sport);
+                if (pix > peakpix) {
+                    peakpix=pix;
+                }
+            }
+
+        }
+
+        // we could convert to linear work time model before
+        // indexing, but they cancel out so no value in doing so
+        setValue(peakpix);
+        setCount(1);
+    }
+
+    MetricClass classification() const { return Undefined; }
+    MetricValidity validity() const { return Unknown; }
+    RideMetric *clone() const { return new PeakPowerIndex(*this); }
+};
+
+static bool countAdded = RideMetricFactory::instance().addMetric(PowerIndex()) &&
+                         RideMetricFactory::instance().addMetric(PeakPowerIndex());

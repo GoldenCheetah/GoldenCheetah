@@ -215,7 +215,7 @@ double ANT::channelValue(int channel)
 }
 
 void ANT::setWheelRpm(float x) {
-    telemetry.setWheelRpm(x);
+    telemetry.setWheelRpm(x, true); // record time sample for new rpm data
 
     // devConf will be NULL if we are are running the add device wizard
     // we can default to the global setting

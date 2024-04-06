@@ -83,6 +83,7 @@ class LTMTool : public QWidget
         QCheckBox *showLegend;
         QCheckBox *showData;
         QCheckBox *showEvents;
+        QCheckBox *showBanister;
         QCheckBox *showStack;
         QSlider *stackSlider;
 
@@ -214,6 +215,7 @@ class EditMetricDetailDialog : public QDialog
 
         // banister
         QComboBox *banisterTypeSelect; // PTE, NTE, Performance
+        QComboBox *banisterPerfMetric; // default Power Index
 
         // formula
         DataFilterEdit *formulaEdit; // edit your formula
@@ -262,6 +264,9 @@ public:
 protected:
     void keyPressEvent(QKeyEvent *e);
     void focusInEvent(QFocusEvent *e);
+
+Q_SIGNALS:
+    void syntaxErrors(QStringList&);
 
 public slots:
     void setText(const QString&);

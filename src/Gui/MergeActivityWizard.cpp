@@ -23,6 +23,7 @@
 #include "RideCache.h"
 #include "MainWindow.h"
 #include "HelpWhatsThis.h"
+#include "LocationInterpolation.h"
 
 // minimum R-squared fit when trying to find offsets to
 // merge ride files. Lower numbers mean happier to take
@@ -258,6 +259,7 @@ MergeActivityWizard::analyse()
             break;
 
     case 3: // align end
+        {
             int offset = ride1->dataPoints().count() - ride2->dataPoints().count();
             if (offset < 0) {
                 offset1 = abs(offset);
@@ -266,7 +268,130 @@ MergeActivityWizard::analyse()
                 offset2 = abs(offset);
                 offset1 = 0;
             }
-            break;
+        }
+        break;
+
+    case 4: // merge (and interpolate) on distance
+            // In this case merge iterator will find its own way populating samples with data
+            // from ride2 samples that have overlapped distance.
+        offset1 = 0;
+        offset2 = 0;
+        break;
+    }
+}
+
+// Distance merge:
+// Each data point in both rides has a distance. This merge pulls selected properties
+// from ride2 data onto ride1, keeping distance in sync and interpolating location
+// from ride1's distance and ride2's location data.
+void
+MergeActivityWizard::mergeRideSamplesByDistance()
+{
+    offset1 = 0;
+    offset2 = 0;
+
+    RideFilePoint last;
+
+    GeoPointInterpolator gpi;
+
+    int j = 0;  // copy index
+    int ii = 0; // interpolation index
+    int ride1nextdistanceindex = 0;
+    double ride1nextdistance = 0.0;
+
+    for (int i = 0; i < ride1->dataPoints().count(); i++) {
+
+        // fresh point
+        RideFilePoint add;
+        add.secs = i * recIntSecs;
+        add.km = last.km; // if not getting copied at least stay in same place!
+
+        // fold in ride 1 values
+        if (offset1 <= i && i < ride1->dataPoints().count() + offset1) {
+
+            RideFilePoint source = *(ride1->dataPoints()[i - offset1]);
+
+            // copy across the data we want
+            QMapIterator<RideFile::SeriesType, QCheckBox*> io(leftSeries);
+            while (io.hasNext()) {
+                io.next();
+                // we want this series !
+                if (io.value()->isChecked()) {
+                    add.setValue(io.key(), source.value(io.key()));
+                }
+            }
+        }
+
+        // maintain ride1 'nextdistance' index and distance (used for interpolating slope.)
+        if (add.km >= ride1nextdistance) {
+            while (offset1 <= ride1nextdistanceindex && ride1nextdistanceindex < ride1->dataPoints().count() + offset1) {
+                RideFilePoint* point = (ride1->dataPoints()[ride1nextdistanceindex - offset1]);
+                if (point->km != add.km) {
+                    ride1nextdistance = point->km;
+                    break;
+                }
+
+                ride1nextdistanceindex++;
+            }
+        }
+
+        // Additional samples to interpolator
+        while (gpi.WantsInput(add.km)) {
+            if (ii < ride2->dataPoints().count()) {
+                const RideFilePoint * pii = (ride2->dataPoints()[ii]);
+                geolocation geo(pii->lat, pii->lon, pii->alt);
+                gpi.Push(pii->km, geo);
+
+                ii++;
+            } else {
+                gpi.NotifyInputComplete();
+                break;
+            }
+        }
+
+        // Maintain ride2 copy index
+        while ((j < ride2->dataPoints().count()) && (ride2->dataPoints()[j]->km < add.km)) {
+            j++;
+        }
+
+        // Compute interpolated location from current distance.
+        double interpSlope = 0.;
+        geolocation interpLoc = gpi.Location(add.km, interpSlope);
+
+        RideFilePoint source = *(ride2->dataPoints()[j]);
+
+        // fold in ride 2 values
+        {
+            // copy across the data we want
+            QMapIterator<RideFile::SeriesType, QCheckBox*> io(rightSeries);
+            while (io.hasNext()) {
+                io.next();
+                // we want this series !
+                if (io.value()->isChecked()) {
+                    // For location data substitute interpolated value for ride2 value.
+                    switch (io.key()) {
+                    case RideFile::lat:
+                        add.setValue(io.key(), interpLoc.Lat());
+                        break;
+                    case RideFile::lon:
+                        add.setValue(io.key(), interpLoc.Long());
+                        break;
+                    case RideFile::alt:
+                        add.setValue(io.key(), interpLoc.Alt());
+                        break;
+                    case RideFile::slope:
+                        add.setValue(io.key(), interpSlope * 100);
+                        break;
+                    default:
+                        add.setValue(io.key(), source.value(io.key()));
+                        break;
+                    }
+                }
+            }
+        }
+
+        combined->appendPoint(add);
+        last = add;
     }
 }
 
@@ -319,12 +444,33 @@ MergeActivityWizard::combine()
         // and XData from second ride, append if series already present
         foreach (XDataSeries *xdata, ride2->xdata()) {
             if (combined->xdata().contains(xdata->name)) {
+
+                // Reorder to match the series present in the first activity
+                QStringList names = combined->xdata()[xdata->name]->valuename;
+                QVector<int> indexMap;
+                for (int i=0; i<names.count() && i<XDATA_MAXVALUES; i++)
+                    if (xdata->valuename.contains(names[i]))
+                        indexMap << xdata->valuename.indexOf(names[i]);
+
+                // Add the remaining ones to the end only if there is space
+                for (int i=0; i<xdata->valuename.count(); i++)
+                    if (!names.contains(xdata->valuename[i]) && combined->xdata().count()<XDATA_MAXVALUES) {
+                        combined->xdata()[xdata->name]->valuename << xdata->valuename[i];
+                        indexMap << i;
+                    }
+
+                // finally copy the data
                 foreach (XDataPoint *point, xdata->datapoints) {
-                    XDataPoint *pt = new XDataPoint(*point);
+                    XDataPoint *pt = new XDataPoint();
                     pt->secs = point->secs + timeOffset;
                     pt->km = point->km + distanceOffset;
+                    for (int i=0; i<indexMap.count(); i++) {
+                        pt->number[i] = point->number[indexMap[i]];
+                        pt->string[i] = point->string[indexMap[i]];
+                    }
                     combined->xdata(xdata->name)->datapoints.append(pt);
                 }
+
             } else {
                 XDataSeries *xd = new XDataSeries(*xdata);
                 xd->datapoints.clear();
@@ -360,7 +506,11 @@ MergeActivityWizard::combine()
                                   interval->name);
         }
 
-    } else { // MERGE
+    }
+    else if(strategy == 4) {
+        mergeRideSamplesByDistance();
+    }
+    else { // MERGE
 
         RideFilePoint last;
 
@@ -473,7 +623,7 @@ MergeSource::MergeSource(MergeActivityWizard *parent) : QWizardPage(parent), wiz
     setLayout(layout);
 
     mapper = new QSignalMapper(this);
-    connect(mapper, SIGNAL(mapped(QString)), this, SLOT(clicked(QString)));
+    connect(mapper, &QSignalMapper::mappedString, this, &MergeSource::clicked);
 
     // select a file
     QCommandLinkButton *p = new QCommandLinkButton(tr("Import from a File"), 
@@ -552,7 +702,7 @@ MergeSource::importFile()
 
     const RideFileFactory &rff = RideFileFactory::instance();
     QStringList suffixList = rff.suffixes();
-    suffixList.replaceInStrings(QRegExp("^"), "*.");
+    suffixList.replaceInStrings(QRegularExpression("^"), "*.");
     QStringList fileNames;
     QStringList allFormats;
     allFormats << QString(tr("All Supported Formats (%1)")).arg(suffixList.join(" "));
@@ -574,9 +724,6 @@ MergeSource::importFile()
 bool
 MergeSource::importFile(QList<QString> files)
 {
-    // get fullpath name for processing
-    QFileInfo filename = QFileInfo(files[0]).absoluteFilePath();
-
     QFile thisfile(files[0]);
     QFileInfo thisfileinfo(files[0]);
     QStringList errors;
@@ -780,7 +927,7 @@ MergeMode::MergeMode(MergeActivityWizard *parent) : QWizardPage(parent), wizard(
     setLayout(layout);
 
     mapper = new QSignalMapper(this);
-    connect(mapper, SIGNAL(mapped(QString)), this, SLOT(clicked(QString)));
+    connect(mapper, &QSignalMapper::mappedString, this, &MergeMode::clicked);
 
     // merge
     QCommandLinkButton *p = new QCommandLinkButton(tr("Merge Data to add another data series"), 
@@ -842,7 +989,7 @@ MergeStrategy::MergeStrategy(MergeActivityWizard *parent) : QWizardPage(parent),
     setLayout(layout);
 
     mapper = new QSignalMapper(this);
-    connect(mapper, SIGNAL(mapped(QString)), this, SLOT(clicked(QString)));
+    connect(mapper, &QSignalMapper::mappedString, this, &MergeStrategy::clicked);
 
     // time
     QCommandLinkButton *p = new QCommandLinkButton(tr("Align using start time"), 
@@ -878,6 +1025,12 @@ MergeStrategy::MergeStrategy(MergeActivityWizard *parent) : QWizardPage(parent),
     mapper->setMapping(p, "right");
     layout->addWidget(p);
 
+    // start at same time
+    p = new QCommandLinkButton(tr("Interpolate location data based upon distance"),
+        tr("Merge the two activity streams, interpolating location and slope values based upon mutual distance."), this);
+    connect(p, SIGNAL(clicked()), mapper, SLOT(map()));
+    mapper->setMapping(p, "distance");
+    layout->addWidget(p);
     label = new QLabel("", this);
     layout->addWidget(label);
 
@@ -916,6 +1069,8 @@ MergeStrategy::clicked(QString p)
         wizard->strategy = 2; // merge ...
     } else if (p == "right" ) {
         wizard->strategy = 3; // merge ...
+    } else if (p == "distance") {
+        wizard->strategy = 4; // merge ...
     }
 
     // now run strategy and get on
@@ -951,11 +1106,7 @@ MergeAdjust::MergeAdjust(MergeActivityWizard *parent) : QWizardPage(parent), wiz
     // BUG in QMacStyle and painting of spanSlider
     // so we use a plain style to avoid it, but only
     // on a MAC, since win and linux are fine
-#if QT_VERSION > 0x5000
     QStyle *style = QStyleFactory::create("fusion");
-#else
-    QStyle *style = QStyleFactory::create("Cleanlooks");
-#endif
     spanSlider->setStyle(style);
 #endif
 
@@ -970,7 +1121,7 @@ MergeAdjust::MergeAdjust(MergeActivityWizard *parent) : QWizardPage(parent), wiz
     static_cast<QwtPlotCanvas*>(fullPlot->canvas())->setBorderRadius(0);
     fullPlot->setWantAxis(false, true);
     QPalette pal = palette();
-    fullPlot->axisWidget(QwtPlot::xBottom)->setPalette(pal);
+    fullPlot->axisWidget(QwtAxis::XBottom)->setPalette(pal);
 
     layout->addWidget(spanSlider);
     layout->addWidget(fullPlot);
@@ -1080,7 +1231,7 @@ MergeAdjust::resetClicked()
 void
 MergeAdjust::zoomChanged()
 {
-    fullPlot->setAxisScale(QwtPlot::xBottom, spanSlider->lowerValue()/60.0f, spanSlider->upperValue()/60.0f);
+    fullPlot->setAxisScale(QwtAxis::XBottom, spanSlider->lowerValue()/60.0f, spanSlider->upperValue()/60.0f);
     fullPlot->replot();
 }
 

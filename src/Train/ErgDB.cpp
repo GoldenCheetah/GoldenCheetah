@@ -17,8 +17,32 @@
  */
 
 #include "ErgDB.h"
+#include <QJsonDocument>
+#include <QTextDocumentFragment>
 
-static const QString ErgDBUrl = "https://www.73summits.com/ergdb/";
+#ifndef ERG_DEBUG
+#define ERG_DEBUG false
+#endif
+#ifdef Q_CC_MSVC
+#define printd(fmt, ...) do {                                                \
+    if (STRAVA_DEBUG) {                                 \
+        printf("[%s:%d %s] " fmt , __FILE__, __LINE__,        \
+               __FUNCTION__, __VA_ARGS__);                    \
+        fflush(stdout);                                       \
+    }                                                         \
+} while(0)
+#else
+#define printd(fmt, args...)                                            \
+    do {                                                                \
+        if (ERG_DEBUG) {                                       \
+            printf("[%s:%d %s] " fmt , __FILE__, __LINE__,              \
+                   __FUNCTION__, ##args);                               \
+            fflush(stdout);                                             \
+        }                                                               \
+    } while(0)
+#endif
+
+static const QString ErgDBUrl = "https://shared-web.s3.amazonaws.com/ergdb/";
 
 ErgDB::ErgDB(QObject *parent) : QObject(parent)
 {
@@ -35,10 +59,11 @@ ErgDB::getList()
 
     connect(&networkMgr, SIGNAL(finished(QNetworkReply*)), this, SLOT(getListFinished(QNetworkReply*)));
     connect(&networkMgr, SIGNAL(finished(QNetworkReply *)), &eventLoop, SLOT(quit()));
+
     QByteArray out;
 
     // construct and make the call
-    QNetworkRequest request = QNetworkRequest(QUrl(ErgDBUrl + "api/list"));
+    QNetworkRequest request = QNetworkRequest(QUrl(ErgDBUrl + "json/public_workouts.json"));
     networkMgr.get(request);
 
     // holding pattern
@@ -51,54 +76,58 @@ ErgDB::getListFinished(QNetworkReply *reply)
     _items.clear();
 
     // we got something
-    QString line;
-    bool first=true;
-    while((line=reply->readLine().data()) != "") {
+    QByteArray r = reply->readAll();
+    //printd("response: %s\n", r.toStdString().c_str());
 
-        if (first == true) { // skip csv header line
-            first = false;
-            continue;
-        }
+    QJsonParseError parseError;
+    QJsonDocument document = QJsonDocument::fromJson(r, &parseError);
 
-        QStringList tokens = line.split(",");
-        if (tokens.count() == 6) {
-            ErgDBItem add;
-            add.id = tokens[0].toInt();
-            add.workoutType = tokens[1];
-            add.author = tokens[2];
-            add.name = tokens[3];
-            add.duration = tokens[4].toInt();
-            add.added = QDateTime::fromString(tokens[5].replace("\n",""), "yyyy-MM-dd hh:mm:ss");
-            _items << add;
+    if (parseError.error == QJsonParseError::NoError) {
+
+        QJsonArray results = document.array();
+
+        // lets look at that then
+        if (results.size()>0) {
+            for(int i=0; i<results.size(); i++) {
+                QJsonObject each = results.at(i).toObject();
+
+                ErgDBItem add;
+                add.id = each["id"].toInt();
+                // title is HTML encoded and may contain "/", lets try to make it a readable and valid filename
+                add.name = QTextDocumentFragment::fromHtml(each["title"].toString()).toPlainText().replace("/", "-");
+                QString type = each["user_wo_type"].toString();
+                if (type != each["ergdb_wo_type"].toString())
+                    type += "/"+each["ergdb_wo_type"].toString();
+                add.workoutType = type;
+                add.author = each["author"].toString();
+                add.duration = each["minutes"].toString().toInt();
+                add.added = QDateTime::fromString(each["create_date"].toString(), "yyyy-MM-ddT00:00:00:00");
+                add.description = each["description"].toString();
+
+                QJsonDocument doc(each);
+                add.document = doc;
+
+                _items << add;
+            }
         }
     }
+
+
+
 }
 
 // fetch a file from ErgDB
 QString
-ErgDB::getFile(int id, int ftp)
+ErgDB::getWorkout(int id)
 {
+    fileContents = "";
 
-    QEventLoop eventLoop; // holding pattern whilst waiting for a reply...
-    QNetworkAccessManager networkMgr; // for getting request
+    for(int i=0; i<_items.size(); i++) {
+        ErgDBItem each = _items.at(i);
+        if (each.id == id) {
+            fileContents = each.document.toJson(QJsonDocument::Indented);
+        }
+    }
 
-    connect(&networkMgr, SIGNAL(finished(QNetworkReply*)), this, SLOT(getFileFinished(QNetworkReply*)));
-    connect(&networkMgr, SIGNAL(finished(QNetworkReply *)), &eventLoop, SLOT(quit()));
-    QByteArray out;
-
-    // construct and make the call
-    QNetworkRequest request = QNetworkRequest(QUrl(ErgDBUrl + QString("api/workout/%1/%2").arg(id).arg(ftp)));
-    networkMgr.get(request);
-
-    // holding pattern
-    eventLoop.exec();
-
-    // return the file
     return fileContents;
-}
-
-void
-ErgDB::getFileFinished(QNetworkReply *reply)
-{
-    fileContents = reply->readAll().data();
 }

@@ -22,6 +22,7 @@
 #include "TimeUtils.h"
 #include <QtGui>
 #include <QtAlgorithms>
+#include <QRegExp>
 #include <qcolor.h>
 #include <assert.h>
 #include <cmath>
@@ -53,10 +54,10 @@ void HrZones::initializeZoneParameters()
     sizeof(initial_zone_default) /
     sizeof(initial_zone_default[0]);
 
-    if (run) {
-        fileName_ = "run-hr.zones";
-    } else {
+    if (sport_.isEmpty() || sport_ == "Bike") {
         fileName_ = "hr.zones";
+    } else {
+        fileName_ = sport_.toLower() + "-hr.zones";
     }
 
     scheme.zone_default.clear();
@@ -112,6 +113,9 @@ bool HrZones::read(QFile &file)
         return false;
     }
     QTextStream fileStream(&file);
+#if QT_VERSION < 0x060000
+    fileStream.setCodec("UTF-8");
+#endif
 
     QRegExp commentrx("\\s*#.*$");
     QRegExp blankrx("^[ \t]*$");
@@ -121,6 +125,7 @@ bool HrZones::read(QFile &file)
                 "\\s*([,:]?\\s*(LT)\\s*=\\s*(\\d+))?"                // optional {LT = integer (optional %)}
                 "\\s*([,:]?\\s*(RestHr)\\s*=\\s*(\\d+))?"            // optional {RestHr = integer (optional %)}
                 "\\s*([,:]?\\s*(MaxHr)\\s*=\\s*(\\d+))?"             // optional {MaxHr = integer (optional %)}
+                "\\s*:?,?\\s*((AeT)\\s*=\\s*(\\d+))?"                // optional {AeT = integer (optional %)}
                 "\\s*:?\\s*$",                                       // optional :
                 Qt::CaseInsensitive),
         QRegExp("^\\s*(?:from\\s+)?"                                 // optional "from"
@@ -130,6 +135,7 @@ bool HrZones::read(QFile &file)
                 "\\s*:?,?\\s*((LT)\\s*=\\s*(\\d+))?"                 // optional {LT = integer (optional %)}
                 "\\s*:?,?\\s*((RestHr)\\s*=\\s*(\\d+))?"             // optional {RestHr = integer (optional %)}
                 "\\s*:?,?\\s*((MaxHr)\\s*=\\s*(\\d+))?"              // optional {MaxHr = integer (optional %)}
+                "\\s*:?,?\\s*((AeT)\\s*=\\s*(\\d+))?"                // optional {AeT = integer (optional %)}
                 "\\s*:?\\s*$",                                       // optional :
                 Qt::CaseInsensitive)
     };
@@ -146,6 +152,7 @@ bool HrZones::read(QFile &file)
     bool in_range = false;
     QDate begin = date_zero, end = date_infinity;
     int lt = 0;
+    int aet = 0;
     int restHr = 0;
     int maxHr = 0;
     QList<HrZoneInfo> zoneInfos;
@@ -201,7 +208,7 @@ bool HrZones::read(QFile &file)
                 if (in_range) {
 
                     // if zones are empty, then generate them
-                    HrZoneRange range(begin, end, lt, restHr, maxHr);
+                    HrZoneRange range(begin, end, lt, aet, restHr, maxHr);
                     range.zones = zoneInfos;
 
                     if (range.zones.empty()) {
@@ -213,7 +220,7 @@ bool HrZones::read(QFile &file)
                             return false;
                         }
                     } else {
-                        qSort(range.zones);
+                        std::sort(range.zones.begin(), range.zones.end());
                     }
                     ranges.append(range);
                 }
@@ -256,6 +263,10 @@ bool HrZones::read(QFile &file)
                 int nMaxHr = (r ? 17 : 13);
                 if (rangerx[r].captureCount() >= (nRestHr)) maxHr = rangerx[r].cap(nMaxHr).toInt();
                 else maxHr = 0;
+
+                int nAeT = (r ? 20 : 16);
+                if (rangerx[r].captureCount() >= (nAeT)) aet = rangerx[r].cap(nAeT).toInt();
+                else aet = 0;
 
                 // bleck
                 goto next_line;
@@ -311,7 +322,7 @@ bool HrZones::read(QFile &file)
 
     // did we drop out mid way through ?
     if (in_range) {
-        HrZoneRange range(begin, end, lt, restHr, maxHr);
+        HrZoneRange range(begin, end, lt, aet, restHr, maxHr);
         range.zones = zoneInfos;
         if (range.zones.empty()) {
             if (range.lt > 0)
@@ -323,7 +334,7 @@ bool HrZones::read(QFile &file)
             }
         } else {
 
-            qSort(range.zones);
+            std::sort(range.zones.begin(), range.zones.end());
         }
         ranges.append(range);
     }
@@ -332,7 +343,7 @@ bool HrZones::read(QFile &file)
     file.close();
 
     // sort the ranges
-    qSort(ranges);
+    std::sort(ranges.begin(), ranges.end());
 
     //
     // POST-PROCESS / FIX-UP ZONES
@@ -495,6 +506,19 @@ int HrZones::lowsFromLT(QList <int> *lows, int lt) const {
     return scheme.nzones_default;
 }
 
+int HrZones::getAeT(int rnum) const
+{
+    if (rnum < 0 || rnum > ranges.size()) return 0;
+    if (ranges[rnum].aet > 0) return ranges[rnum].aet;
+    return round(0.9 * ranges[rnum].lt); // Default to 90% LTHR when not set
+}
+
+void HrZones::setAeT(int rnum, int aet)
+{
+    ranges[rnum].aet = aet;
+    modificationTime = QDateTime::currentDateTime();
+}
+
 int HrZones::getRestHr(int rnum) const
 {
     if (rnum < 0 || rnum > ranges.size()) return 0;
@@ -547,7 +571,7 @@ void HrZones::setHrZonesFromLT(HrZoneRange &range) {
 
     // sort the zones (some may be pct, others absolute, so zones need to be sorted,
     // rather than the defaults
-    qSort(range.zones);
+    std::sort(range.zones.begin(), range.zones.end());
 
     // set zone end dates
     for (int i = 0; i < range.zones.size(); i ++)
@@ -682,32 +706,35 @@ void HrZones::write(QDir home)
 
     for (int i = 0; i < ranges.size(); i++) {
         int lt = getLT(i);
+        int aet = getAeT(i);
         int restHr = getRestHr(i);
         int maxHr = getMaxHr(i);
 
-    // print header for range
-    // note this explicitly sets the first and last ranges such that all time is spanned
+        // print header for range
+        // note this explicitly sets the first and last ranges such that all time is spanned
 
         // note: BEGIN is not needed anymore
         //       since it becomes Jan 01 1900
-        strzones += QString("%1: LT=%2, RestHr=%3, MaxHr=%4").arg(getStartDate(i).toString("yyyy/MM/dd")).arg(lt).arg(restHr).arg(maxHr);
-    strzones += QString("\n");
-
-    // step through and print the zones if they've been explicitly set
-    if (! ranges[i].hrZonesSetFromLT) {
-        for (int j = 0; j < ranges[i].zones.size(); j ++) {
-                const HrZoneInfo &zi = ranges[i].zones[j];
-        strzones += QString("%1,%2,%3,%4\n").arg(zi.name).arg(zi.desc).arg(zi.lo).arg(zi.trimp);
-            }
+        strzones += QString("%1: LT=%2, RestHr=%3, MaxHr=%4, AeT=%5").arg(getStartDate(i).toString("yyyy/MM/dd")).arg(lt).arg(restHr).arg(maxHr).arg(aet);
         strzones += QString("\n");
-    }
+
+        // step through and print the zones if they've been explicitly set
+        if (! ranges[i].hrZonesSetFromLT) {
+            for (int j = 0; j < ranges[i].zones.size(); j ++) {
+                const HrZoneInfo &zi = ranges[i].zones[j];
+                strzones += QString("%1,%2,%3,%4\n").arg(zi.name).arg(zi.desc).arg(zi.lo).arg(zi.trimp);
+            }
+            strzones += QString("\n");
+        }
     }
 
     QFile file(home.canonicalPath() + "/" + fileName_);
     if (file.open(QFile::WriteOnly))
     {
         QTextStream stream(&file);
+#if QT_VERSION < 0x060000
         stream.setCodec("UTF-8");
+#endif
         stream << strzones;
         file.close();
     } else {
@@ -720,14 +747,14 @@ void HrZones::write(QDir home)
     }
 }
 
-void HrZones::addHrZoneRange(QDate _start, QDate _end, int _lt, int _restHr, int _maxHr)
+void HrZones::addHrZoneRange(QDate _start, QDate _end, int _lt, int _aet, int _restHr, int _maxHr)
 {
-    ranges.append(HrZoneRange(_start, _end, _lt, _restHr, _maxHr));
+    ranges.append(HrZoneRange(_start, _end, _lt, _aet, _restHr, _maxHr));
 }
 
 // insert a new zone range using the current scheme
 // return the range number
-int HrZones::addHrZoneRange(QDate _start, int _lt, int _restHr, int _maxHr)
+int HrZones::addHrZoneRange(QDate _start, int _lt, int _aet, int _restHr, int _maxHr)
 {
     int rnum;
 
@@ -735,8 +762,8 @@ int HrZones::addHrZoneRange(QDate _start, int _lt, int _restHr, int _maxHr)
     for(rnum=0; rnum < ranges.count(); rnum++) if (ranges[rnum].begin > _start) break;
 
     // at the end ?
-    if (rnum == ranges.count()) ranges.append(HrZoneRange(_start, date_infinity, _lt, _restHr, _maxHr));
-    else ranges.insert(rnum, HrZoneRange(_start, ranges[rnum].begin, _lt, _restHr, _maxHr));
+    if (rnum == ranges.count()) ranges.append(HrZoneRange(_start, date_infinity, _lt, _aet, _restHr, _maxHr));
+    else ranges.insert(rnum, HrZoneRange(_start, ranges[rnum].begin, _lt, _aet, _restHr, _maxHr));
 
     // modify previous end date
     if (rnum) ranges[rnum-1].end = _start;
@@ -878,8 +905,17 @@ HrZones::getFingerprint() const
         // to
         x += ranges[i].end.toJulianDay();
 
-        // CP
+        // LT
         x += ranges[i].lt;
+
+        // AeT
+        x += ranges[i].aet;
+
+        // Rest HR
+        x += ranges[i].restHr;
+
+        // Max HR
+        x += ranges[i].maxHr;
 
         // each zone definition (manual edit/default changed)
         for (int j=0; j<ranges[i].zones.count(); j++) {
@@ -888,7 +924,11 @@ HrZones::getFingerprint() const
         }
     }
     QByteArray ba = QByteArray::number(x);
+#if QT_VERSION < 0x060000
     return qChecksum(ba, ba.length());
+#else
+    return qChecksum(ba);
+#endif
 }
 
 quint16
@@ -901,6 +941,7 @@ HrZones::getFingerprint(QDate forDate) const
 
         // zone parameters...
         x += ranges[i].lt;
+        x += ranges[i].aet;
         x += ranges[i].restHr;
         x += ranges[i].maxHr;
 
@@ -911,5 +952,9 @@ HrZones::getFingerprint(QDate forDate) const
         }
     }
     QByteArray ba = QByteArray::number(x);
+#if QT_VERSION < 0x060000
     return qChecksum(ba, ba.length());
+#else
+    return qChecksum(ba);
+#endif
 }

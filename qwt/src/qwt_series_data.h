@@ -1,4 +1,4 @@
-/* -*- mode: C++ ; c-file-style: "stroustrup" -*- *****************************
+/******************************************************************************
  * Qwt Widget Library
  * Copyright (C) 1997   Josef Wilgen
  * Copyright (C) 2002   Uwe Rathmann
@@ -8,14 +8,16 @@
  *****************************************************************************/
 
 #ifndef QWT_SERIES_DATA_H
-#define QWT_SERIES_DATA_H 1
+#define QWT_SERIES_DATA_H
 
 #include "qwt_global.h"
 #include "qwt_samples.h"
 #include "qwt_point_3d.h"
-#include "qwt_point_polar.h"
+
 #include <qvector.h>
 #include <qrect.h>
+
+class QwtPointPolar;
 
 /*!
    \brief Abstract interface for iterating over samples
@@ -25,43 +27,51 @@
    needs to be displayed, without having to copy it, it is recommended
    to implement an individual data access.
 
-   A subclass of QwtSeriesData<QPointF> must implement: 
+   A subclass of QwtSeriesData<QPointF> must implement:
 
-   - size()\n 
+   - size()\n
      Should return number of data points.
 
    - sample()\n
      Should return values x and y values of the sample at specific position
      as QPointF object.
 
-   - boundingRect()\n 
+   - boundingRect()\n
      Should return the bounding rectangle of the data series.
      It is used for autoscaling and might help certain algorithms for displaying
      the data. You can use qwtBoundingRect() for an implementation
-     but often it is possible to implement a more efficient algorithm 
+     but often it is possible to implement a more efficient algorithm
      depending on the characteristics of the series.
-     The member d_boundingRect is intended for caching the calculated rectangle.
-    
-*/
-template <typename T>
+     The member cachedBoundingRect is intended for caching the calculated rectangle.
+
+ */
+template< typename T >
 class QwtSeriesData
 {
-public:
+  public:
     //! Constructor
     QwtSeriesData();
 
     //! Destructor
     virtual ~QwtSeriesData();
 
+#ifndef QWT_PYTHON_WRAPPER
+
     //! \return Number of samples
     virtual size_t size() const = 0;
 
     /*!
-      Return a sample
-      \param i Index
-      \return Sample at position i
+       Return a sample
+       \param i Index
+       \return Sample at position i
      */
     virtual T sample( size_t i ) const = 0;
+
+#else
+    // Needed for generating the python bindings, but not for using them !
+    virtual size_t size() const { return 0; }
+    virtual T sample( size_t i ) const { return T(); }
+#endif
 
     /*!
        Calculate the bounding rect of all samples
@@ -71,11 +81,17 @@ public:
 
        qwtBoundingRect(...) offers slow implementations iterating
        over the samples. For large sets it is recommended to implement
-       something faster f.e. by caching the bounding rectangle.
+       something faster.
 
        \return Bounding rectangle
      */
-    virtual QRectF boundingRect() const = 0;
+     virtual QRectF boundingRect() const
+     {
+        if ( cachedBoundingRect.width() < 0.0 )
+            cachedBoundingRect = qwtBoundingRect( *this );
+
+        return cachedBoundingRect;
+     }
 
     /*!
        Set a the "rect of interest"
@@ -85,183 +101,153 @@ public:
        It can be used to implement different levels of details.
 
        The default implementation does nothing.
-   
+
        \param rect Rectangle of interest
-    */
-    virtual void setRectOfInterest( const QRectF &rect );
+     */
+    virtual void setRectOfInterest( const QRectF& rect );
 
-protected:
+  protected:
     //! Can be used to cache a calculated bounding rectangle
-    mutable QRectF d_boundingRect;
+    mutable QRectF cachedBoundingRect;
 
-private:
-    QwtSeriesData<T> &operator=( const QwtSeriesData<T> & );
+  private:
+    QwtSeriesData< T >& operator=( const QwtSeriesData< T >& );
 };
 
-template <typename T>
-QwtSeriesData<T>::QwtSeriesData():
-    d_boundingRect( 0.0, 0.0, -1.0, -1.0 )
+template< typename T >
+QwtSeriesData< T >::QwtSeriesData()
+    : cachedBoundingRect( 0.0, 0.0, -1.0, -1.0 )
 {
 }
 
-template <typename T>
-QwtSeriesData<T>::~QwtSeriesData()
+template< typename T >
+QwtSeriesData< T >::~QwtSeriesData()
 {
 }
 
-template <typename T>
-void QwtSeriesData<T>::setRectOfInterest( const QRectF & )
+template< typename T >
+void QwtSeriesData< T >::setRectOfInterest( const QRectF& )
 {
 }
 
 /*!
-  \brief Template class for data, that is organized as QVector
+   \brief Template class for data, that is organized as QVector
 
-  QVector uses implicit data sharing and can be
-  passed around as argument efficiently.
-*/
-template <typename T>
-class QwtArraySeriesData: public QwtSeriesData<T>
+   QVector uses implicit data sharing and can be
+   passed around as argument efficiently.
+ */
+template< typename T >
+class QwtArraySeriesData : public QwtSeriesData< T >
 {
-public:
+  public:
     //! Constructor
     QwtArraySeriesData();
 
     /*!
        Constructor
        \param samples Array of samples
-    */
-    QwtArraySeriesData( const QVector<T> &samples );
+     */
+    explicit QwtArraySeriesData( const QVector< T >& samples );
 
     /*!
-      Assign an array of samples
-      \param samples Array of samples
-    */
-    void setSamples( const QVector<T> &samples );
+       Assign an array of samples
+       \param samples Array of samples
+     */
+    void setSamples( const QVector< T >& samples );
 
     //! \return Array of samples
-    const QVector<T> samples() const;
+    const QVector< T > samples() const;
 
     //! \return Number of samples
-    virtual size_t size() const;
+    virtual size_t size() const QWT_OVERRIDE;
 
     /*!
-      \return Sample at a specific position
+       \return Sample at a specific position
 
-      \param index Index
-      \return Sample at position index
-    */
-    virtual T sample( size_t index ) const;
+       \param index Index
+       \return Sample at position index
+     */
+    virtual T sample( size_t index ) const QWT_OVERRIDE;
 
-protected:
+  protected:
     //! Vector of samples
-    QVector<T> d_samples;
+    QVector< T > m_samples;
 };
 
-template <typename T>
-QwtArraySeriesData<T>::QwtArraySeriesData()
+template< typename T >
+QwtArraySeriesData< T >::QwtArraySeriesData()
 {
 }
 
-template <typename T>
-QwtArraySeriesData<T>::QwtArraySeriesData( const QVector<T> &samples ):
-    d_samples( samples )
+template< typename T >
+QwtArraySeriesData< T >::QwtArraySeriesData( const QVector< T >& samples )
+    : m_samples( samples )
 {
 }
 
-template <typename T>
-void QwtArraySeriesData<T>::setSamples( const QVector<T> &samples )
+template< typename T >
+void QwtArraySeriesData< T >::setSamples( const QVector< T >& samples )
 {
-    QwtSeriesData<T>::d_boundingRect = QRectF( 0.0, 0.0, -1.0, -1.0 );
-    d_samples = samples;
+    QwtSeriesData< T >::cachedBoundingRect = QRectF( 0.0, 0.0, -1.0, -1.0 );
+    m_samples = samples;
 }
 
-template <typename T>
-const QVector<T> QwtArraySeriesData<T>::samples() const
+template< typename T >
+const QVector< T > QwtArraySeriesData< T >::samples() const
 {
-    return d_samples;
+    return m_samples;
 }
 
-template <typename T>
-size_t QwtArraySeriesData<T>::size() const
+template< typename T >
+size_t QwtArraySeriesData< T >::size() const
 {
-    return d_samples.size();
+    return m_samples.size();
 }
 
-template <typename T>
-T QwtArraySeriesData<T>::sample( size_t i ) const
+template< typename T >
+T QwtArraySeriesData< T >::sample( size_t i ) const
 {
-    return d_samples[ static_cast<int>( i ) ];
+    return m_samples[ static_cast< int >( i ) ];
 }
 
 //! Interface for iterating over an array of points
-class QWT_EXPORT QwtPointSeriesData: public QwtArraySeriesData<QPointF>
-{
-public:
-    QwtPointSeriesData(
-        const QVector<QPointF> & = QVector<QPointF>() );
+typedef QwtArraySeriesData< QPointF > QwtPointSeriesData;
 
-    virtual QRectF boundingRect() const;
-};
 
+typedef QwtArraySeriesData< QwtPoint3D > QwtPoint3DSeriesData;
 //! Interface for iterating over an array of 3D points
-class QWT_EXPORT QwtPoint3DSeriesData: public QwtArraySeriesData<QwtPoint3D>
-{
-public:
-    QwtPoint3DSeriesData(
-        const QVector<QwtPoint3D> & = QVector<QwtPoint3D>() );
-    virtual QRectF boundingRect() const;
-};
+
+typedef QwtArraySeriesData< QwtIntervalSample > QwtIntervalSeriesData;
 
 //! Interface for iterating over an array of intervals
-class QWT_EXPORT QwtIntervalSeriesData: public QwtArraySeriesData<QwtIntervalSample>
-{
-public:
-    QwtIntervalSeriesData(
-        const QVector<QwtIntervalSample> & = QVector<QwtIntervalSample>() );
+typedef QwtArraySeriesData< QwtSetSample > QwtSetSeriesData;
 
-    virtual QRectF boundingRect() const;
-};
 
+typedef QwtArraySeriesData< QwtVectorFieldSample > QwtVectorFieldData;
 //! Interface for iterating over an array of samples
-class QWT_EXPORT QwtSetSeriesData: public QwtArraySeriesData<QwtSetSample>
-{
-public:
-    QwtSetSeriesData(
-        const QVector<QwtSetSample> & = QVector<QwtSetSample>() );
 
-    virtual QRectF boundingRect() const;
-};
-
-/*!
-    Interface for iterating over an array of OHLC samples
-*/
-class QWT_EXPORT QwtTradingChartData: public QwtArraySeriesData<QwtOHLCSample>
-{
-public:
-    QwtTradingChartData(
-        const QVector<QwtOHLCSample> & = QVector<QwtOHLCSample>() );
-
-    virtual QRectF boundingRect() const;
-};
+typedef QwtArraySeriesData< QwtOHLCSample > QwtTradingChartData;
 
 QWT_EXPORT QRectF qwtBoundingRect(
-    const QwtSeriesData<QPointF> &, int from = 0, int to = -1 );
+    const QwtSeriesData< QPointF >&, int from = 0, int to = -1 );
 
 QWT_EXPORT QRectF qwtBoundingRect(
-    const QwtSeriesData<QwtPoint3D> &, int from = 0, int to = -1 );
+    const QwtSeriesData< QwtPoint3D >&, int from = 0, int to = -1 );
 
 QWT_EXPORT QRectF qwtBoundingRect(
-    const QwtSeriesData<QwtPointPolar> &, int from = 0, int to = -1 );
+    const QwtSeriesData< QwtPointPolar >&, int from = 0, int to = -1 );
 
 QWT_EXPORT QRectF qwtBoundingRect(
-    const QwtSeriesData<QwtIntervalSample> &, int from = 0, int to = -1 );
+    const QwtSeriesData< QwtIntervalSample >&, int from = 0, int to = -1 );
 
 QWT_EXPORT QRectF qwtBoundingRect(
-    const QwtSeriesData<QwtSetSample> &, int from = 0, int to = -1 );
+    const QwtSeriesData< QwtSetSample >&, int from = 0, int to = -1 );
 
 QWT_EXPORT QRectF qwtBoundingRect(
-    const QwtSeriesData<QwtOHLCSample> &, int from = 0, int to = -1 );
+    const QwtSeriesData< QwtOHLCSample >&, int from = 0, int to = -1 );
+
+QWT_EXPORT QRectF qwtBoundingRect(
+    const QwtSeriesData< QwtVectorFieldSample >&, int from = 0, int to = -1 );
 
 /*!
     Binary search for a sorted series of samples
@@ -271,63 +257,60 @@ QWT_EXPORT QRectF qwtBoundingRect(
     value will be 0. Is the value greater or equal than the largest
     value the return value will be -1.
 
-  \par Example
+   \par Example
     The following example shows finds a point of curve from an x
     coordinate
+    \code
+ #include <qwt_series_data.h>
+ #include <qwt_plot_curve.h>
 
-  \verbatim
-#include <qwt_series_data.h>
-#include <qwt_plot_curve.h>
+      struct compareX
+      {
+          inline bool operator()( const double x, const QPointF &pos ) const
+          {
+              return ( x < pos.x() );
+          }
+      };
 
-struct compareX
-{
-    inline bool operator()( const double x, const QPointF &pos ) const
-    {
-        return ( x < pos.x() );
-    }
-};
+      QLineF curveLineAt( const QwtPlotCurve *curve, double x )
+      {
+          int index = qwtUpperSampleIndex<QPointF>(
+ * curve->data(), x, compareX() );
 
-QLineF curveLineAt( const QwtPlotCurve *curve, double x )
-{
-    int index = qwtUpperSampleIndex<QPointF>( 
-        *curve->data(), x, compareX() );
-            
-    if ( index == -1 && 
-        x == curve->sample( curve->dataSize() - 1 ).x() )
-    {   
-        // the last sample is excluded from qwtUpperSampleIndex
-        index = curve->dataSize() - 1;
-    }
+          if ( index == -1 &&
+              x == curve->sample( curve->dataSize() - 1 ).x() )
+          {
+              // the last sample is excluded from qwtUpperSampleIndex
+              index = curve->dataSize() - 1;
+          }
 
-    QLineF line; // invalid
-    if ( index > 0 )
-    {
-        line.setP1( curve->sample( index - 1 ) );
-        line.setP2( curve->sample( index ) );
-    }
+          QLineF line; // invalid
+          if ( index > 0 )
+          {
+              line.setP1( curve->sample( index - 1 ) );
+              line.setP2( curve->sample( index ) );
+          }
 
-    return line;
-}
+          return line;
+      }
 
-\endverbatim
+    \endcode
+   \endpar
 
+   \param series Series of samples
+   \param value Value
+   \param lessThan Compare operation
 
-    \param series Series of samples
-    \param value Value
-    \param lessThan Compare operation
-
-    \note The samples must be sorted according to the order specified 
-          by the lessThan object
-
-of the range [begin, end) and returns the position of the one-past-the-last occurrence of value. If no such item is found, returns the position where the item should be inserted.
+   \note The samples must be sorted according to the order specified
+        by the lessThan object
  */
-template <typename T, typename LessThan>
-inline int qwtUpperSampleIndex( const QwtSeriesData<T> &series,
-    double value, LessThan lessThan  ) 
+template< typename T, typename LessThan >
+inline int qwtUpperSampleIndex( const QwtSeriesData< T >& series,
+    double value, LessThan lessThan  )
 {
     const int indexMax = series.size() - 1;
 
-    if ( indexMax < 0 || !lessThan( value, series.sample( indexMax ) )  )
+    if ( indexMax < 0 || !lessThan( value, series.sample( indexMax ) ) )
         return -1;
 
     int indexMin = 0;

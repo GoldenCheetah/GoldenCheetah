@@ -19,26 +19,26 @@
 #include "UserData.h"
 
 #include "RideNavigator.h"
-#include "Tab.h"
+#include "AthleteTab.h"
 #include "HelpWhatsThis.h"
 #include "Utils.h"
 
 #include <QTextEdit> // for parsing trademark symbols (!)
 
 UserData::UserData() 
-    : name(""), units(""), formula(""), color(QColor(0,0,0)), rideItem(NULL)
+    : name(""), units(""), formula(""), zstring(""), color(QColor(0,0,0)), rideItem(NULL)
 {
 }
 
 UserData::UserData(QString settings) 
-    : name(""), units(""), formula(""), color(QColor(0,0,0)), rideItem(NULL)
+    : name(""), units(""), formula(""), zstring(""), color(QColor(0,0,0)), rideItem(NULL)
 {
     // and apply settings
     setSettings(settings);
 }
 
-UserData::UserData(QString name, QString units, QString formula, QColor color)
-    : name(name), units(units), formula(formula), color(color), rideItem(NULL)
+UserData::UserData(QString name, QString units, QString formula, QString zstring, QColor color)
+    : name(name), units(units), formula(formula), zstring(zstring), color(color), rideItem(NULL)
 {
 }
 
@@ -86,13 +86,15 @@ EditUserDataDialog::EditUserDataDialog(Context *context, UserData *here) :
     nameEdit->setText(here->name);
     unitsEdit = new QLineEdit(this);
     unitsEdit->setText(here->units);
+    zstringEdit = new QLineEdit(this);
+    zstringEdit->setText(here->zstring);
 
     // formula editor
     formulaEdit = new DataFilterEdit(this, context);
     QFont courier("Courier", QFont().pointSize());
     QFontMetrics fm(courier);
     formulaEdit->setFont(courier);
-    formulaEdit->setTabStopWidth(4 * fm.width(' ')); // 4 char tabstop
+    formulaEdit->setTabStopDistance(4 * fm.horizontalAdvance(' ')); // 4 char tabstop
     formulaEdit->setText(here->formula);
     if (here->formula == "") {
         // lets put a template in there
@@ -110,10 +112,10 @@ EditUserDataDialog::EditUserDataDialog(Context *context, UserData *here) :
     SpecialFields sp;
 
     // get sorted list
-    QStringList names = context->tab->rideNavigator()->logicalHeadings;
+    QStringList names = context->rideNavigator->logicalHeadings;
 
     // start with just a list of functions
-    list = DataFilter::builtins();
+    list = DataFilter::builtins(context);
 
     // ridefile data series symbols
     list += RideFile::symbols();
@@ -121,14 +123,18 @@ EditUserDataDialog::EditUserDataDialog(Context *context, UserData *here) :
     // add special functions (older code needs fixing !)
     list << "config(cranklength)";
     list << "config(cp)";
+    list << "config(aetp)";
     list << "config(ftp)";
     list << "config(w')";
     list << "config(pmax)";
     list << "config(cv)";
-    list << "config(scv)";
+    list << "config(aetv)";
+    list << "config(sex)";
+    list << "config(dob)";
     list << "config(height)";
     list << "config(weight)";
     list << "config(lthr)";
+    list << "config(aethr)";
     list << "config(maxhr)";
     list << "config(rhr)";
     list << "config(units)";
@@ -157,7 +163,7 @@ EditUserDataDialog::EditUserDataDialog(Context *context, UserData *here) :
     list << "RECINTSECS";
     list << "NA";
 
-    qSort(names.begin(), names.end(), insensitiveLessThan);
+    std::sort(names.begin(), names.end(), insensitiveLessThan);
 
     foreach(QString name, names) {
 
@@ -194,8 +200,10 @@ EditUserDataDialog::EditUserDataDialog(Context *context, UserData *here) :
     widgets->addWidget(unitsEdit, 1, 1);
     widgets->addWidget(new QLabel(tr("Formula")), 2, 0, Qt::AlignLeft|Qt::AlignTop);
     widgets->addWidget(formulaEdit, 2, 1);
-    widgets->addWidget(new QLabel(tr("Color")), 3, 0);
-    widgets->addWidget(seriesColor, 3, 1);
+    widgets->addWidget(new QLabel(tr("Zone string")), 3, 0, Qt::AlignLeft|Qt::AlignTop);
+    widgets->addWidget(zstringEdit, 3, 1);
+    widgets->addWidget(new QLabel(tr("Color")), 4, 0);
+    widgets->addWidget(seriesColor, 4, 1);
     mainLayout->addLayout(widgets);
     widgets->setColumnStretch(1,100);
     widgets->setRowStretch(2,100);
@@ -222,6 +230,7 @@ EditUserDataDialog::applyClicked()
     here->units = unitsEdit->text();
     here->name = nameEdit->text();
     here->formula = formulaEdit->toPlainText();
+    here->zstring = zstringEdit->text();
     accept();
 }
 
@@ -234,12 +243,9 @@ EditUserDataDialog::cancelClicked()
 void
 EditUserDataDialog::colorClicked()
 {
-    QColorDialog picker(context->mainWindow);
-    picker.setCurrentColor(color);
-
     // don't use native dialog, since there is a nasty bug causing focus loss
     // see https://bugreports.qt-project.org/browse/QTBUG-14889
-    QColor newcolor = picker.getColor(color, this, tr("Choose Metric Color"), QColorDialog::DontUseNativeDialog);
+    QColor newcolor = QColorDialog::getColor(color, this, tr("Choose Metric Color"), QColorDialog::DontUseNativeDialog);
 
     if (newcolor.isValid()) {
         setButtonIcon(color=newcolor);
@@ -271,7 +277,7 @@ UserData::settings() const
 {
     QString returning;
     returning = "<userdata name=\"" + Utils::xmlprotect(name) + "\" units=\"" +  Utils::xmlprotect(units)+ "\"";
-    returning += " color=\""+ color.name() + "\">";
+    returning += " color=\""+ color.name() + "\" zstring=\"" + Utils::xmlprotect(zstring) + "\">";
     returning += Utils::xmlprotect(formula);
     returning += "</userdata>";
 
@@ -313,6 +319,7 @@ bool UserDataParser::startElement( const QString&, const QString&, const QString
         // only 3 attributes for now
         if (attrs.qName(i) == "color") here->color = QColor(attrs.value(i));
         if (attrs.qName(i) == "name")  here->name  = Utils::unprotect(attrs.value(i));
+        if (attrs.qName(i) == "zstring") here->zstring  = Utils::unprotect(attrs.value(i));
         if (attrs.qName(i) == "units") here->units = Utils::unprotect(attrs.value(i));
     }
     return true;
@@ -353,7 +360,7 @@ UserData::setRideItem(RideItem*m)
             // run through each sample and create an equivalent
             foreach(RideFilePoint *p, rideItem->ride()->dataPoints()) {
                 Result res = parser.evaluate(rideItem, p);
-                vector << res.number;
+                vector << res.number();
             }
 
             // cache for next time !
