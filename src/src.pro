@@ -699,7 +699,8 @@ HEADERS += Train/AddDeviceWizard.h Train/CalibrationData.h Train/ComputrainerCon
 HEADERS += Train/TrainBottom.h Train/TrainDB.h Train/TrainSidebar.h \
            Train/VideoLayoutParser.h Train/VideoSyncFile.h Train/WorkoutPlotWindow.h Train/WebPageWindow.h \
            Train/WorkoutWidget.h Train/WorkoutWidgetItems.h Train/WorkoutWindow.h Train/WorkoutWizard.h Train/ZwoParser.h \
-           Train/LiveMapWebPageWindow.h
+           Train/LiveMapWebPageWindow.h \
+           Train/ScalingLabel.h
 
 
 ###=============
@@ -803,7 +804,8 @@ SOURCES += Train/AddDeviceWizard.cpp Train/CalibrationData.cpp Train/Computraine
 SOURCES += Train/TrainBottom.cpp Train/TrainDB.cpp Train/TrainSidebar.cpp \
            Train/VideoLayoutParser.cpp Train/VideoSyncFile.cpp Train/WorkoutPlotWindow.cpp Train/WebPageWindow.cpp \
            Train/WorkoutWidget.cpp Train/WorkoutWidgetItems.cpp Train/WorkoutWindow.cpp Train/WorkoutWizard.cpp Train/ZwoParser.cpp \
-           Train/LiveMapWebPageWindow.cpp
+           Train/LiveMapWebPageWindow.cpp \
+           Train/ScalingLabel.cpp
 
 ## Crash Handling
 win32-msvc* {
