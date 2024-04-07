@@ -175,7 +175,9 @@ Athlete::Athlete(Context *context, const QDir &homeDir)
     connect(rideCache, SIGNAL(loadComplete()), this, SLOT(loadComplete()));
 
     // we need to block on load complete if first (before mainwindow ready)
-    if (context->mainWindow->progress)  loop.exec();
+    if (context->mainWindow->isStarting()) {
+        loop.exec();
+    }
 }
 
 void
