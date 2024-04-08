@@ -82,17 +82,8 @@ ride: '{' rideelement_list '}'                                  {
                                                                         jc->api->writeRideLine(jc->item, jc->request, jc->response);
                                                                     #endif
                                                                     } else {
-
                                                                         double progress= double(jc->loading++) / double(jc->cache->rides().count()) * 100.0f;
-                                                                        if (jc->context->mainWindow->progress) {
-
-                                                                            // percentage progress
-                                                                            QString m = QString("%1%").arg(progress , 0, 'f', 0);
-                                                                            jc->context->mainWindow->progress->setText(m);
-                                                                            QApplication::processEvents();
-                                                                        } else {
-                                                                            jc->context->notifyLoadProgress(jc->folder,progress);
-                                                                        }
+                                                                        jc->context->notifyLoadProgress(jc->folder,progress);
 
                                                                         // find entry and update it
                                                                         int index=jc->cache->find(&jc->item);

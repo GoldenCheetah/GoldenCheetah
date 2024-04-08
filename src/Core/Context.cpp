@@ -137,6 +137,8 @@ Context::Context(MainWindow *mainWindow): mainWindow(mainWindow)
     isCompareIntervals = isCompareDateRanges = false;
     isRunning = isPaused = false;
 
+    connect(this, SIGNAL(loadProgress(QString, double)), mainWindow, SLOT(loadProgress(QString, double)));
+
 #ifdef GC_HAS_CLOUD_DB
     cdbChartListDialog = NULL;
     cdbUserMetricListDialog = NULL;
