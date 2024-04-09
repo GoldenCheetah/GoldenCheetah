@@ -125,11 +125,11 @@
 #define VERSION31_BUILD VERSION31_UPG
 
 // the next two will with each build/release
-#define VERSION_LATEST 5000
-#define VERSION_STRING "V3.6"
+#define VERSION_LATEST 5001
+#define VERSION_STRING "V3.7-DEV"
 
 // default config for this release cycle
-#define VERSION_CONFIG_PREFIX "http://www.goldencheetah.org/defaults/3.6"
+#define VERSION_CONFIG_PREFIX "http://www.goldencheetah.org/defaults/3.7"
 
 class GcUpgradeLogDialog : public QDialog
 {
