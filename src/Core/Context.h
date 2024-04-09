@@ -168,7 +168,7 @@ class Context : public QObject
         void notifyConfigChanged(qint32); // Global and athlete specific changes communicated via this signal
 
         // athlete load/close
-        void notifyLoadProgress(QString folder, double progress) { emit loadProgress(folder,progress); }
+        void notifyLoadProgress(QString folder, int progress) { emit loadProgress(folder,progress); }
         void notifyLoadCompleted(QString folder, Context *context) { emit loadCompleted(folder,context); } // Athlete loaded
         void notifyAthleteClose(QString folder, Context *context) { emit athleteClose(folder,context); }
         void notifyLoadDone(QString folder, Context *context) { emit loadDone(folder, context); } // MainWindow finished
@@ -258,7 +258,7 @@ class Context : public QObject
     signals:
 
         // loading an athlete
-        void loadProgress(QString,double);
+        void loadProgress(QString,int);
         void loadCompleted(QString, Context*);
         void loadDone(QString, Context*);
         void athleteClose(QString, Context*);

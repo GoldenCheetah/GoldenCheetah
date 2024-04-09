@@ -2635,11 +2635,11 @@ MainWindow::actionClicked(int index)
 
 void
 MainWindow::loadProgress
-(QString folder, double progress)
+(QString folder, int progress)
 {
     Q_UNUSED(folder)
     if (splash) {
-        splash->showMessage(QString(tr("Loading activities: %1\%")).arg(static_cast<int>(progress)));
+        splash->showMessage(QString(tr("Loading activities: %1 %")).arg(progress));
     }
 }
 

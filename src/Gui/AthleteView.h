@@ -44,7 +44,7 @@ class AthleteCard : public ChartSpaceItem
         // opening/closing etc
         void opening(QString, Context*);
         void closing(QString, Context*);
-        void loadProgress(QString, double);
+        void loadProgress(QString, int);
         void loadDone(QString, Context*);
 
         // metric refreshing

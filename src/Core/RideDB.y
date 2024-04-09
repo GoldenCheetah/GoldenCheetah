@@ -82,8 +82,14 @@ ride: '{' rideelement_list '}'                                  {
                                                                         jc->api->writeRideLine(jc->item, jc->request, jc->response);
                                                                     #endif
                                                                     } else {
-                                                                        double progress= double(jc->loading++) / double(jc->cache->rides().count()) * 100.0f;
-                                                                        jc->context->notifyLoadProgress(jc->folder,progress);
+
+                                                                        int progress = static_cast<int>((double(jc->loading++) / double(jc->cache->rides().count()) * 100.0f) + 0.5);
+
+                                                                        // limit the number of notifyLoadProgress updates to a maximum of 100.
+                                                                        if (progress > jc->loadProgress) {
+
+                                                                            jc->context->notifyLoadProgress(jc->folder,++(jc->loadProgress));
+                                                                        }
 
                                                                         // find entry and update it
                                                                         int index=jc->cache->find(&jc->item);
@@ -340,6 +346,7 @@ RideCache::load()
         jc->api = NULL;
         jc->old = false;
         jc->loading = 0;
+        jc->loadProgress = 0;
         jc->folder = context->athlete->home->root().canonicalPath();
 
         // clean item

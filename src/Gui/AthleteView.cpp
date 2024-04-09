@@ -222,7 +222,7 @@ AthleteCard::opening(QString name, Context*context)
         loadprogress = 100;
         button->setText(tr("Close"));
         button->hide();
-        connect(context,SIGNAL(loadProgress(QString,double)), this, SLOT(loadProgress(QString,double)));
+        connect(context,SIGNAL(loadProgress(QString,int)), this, SLOT(loadProgress(QString,int)));
         connect(context,SIGNAL(loadDone(QString,Context*)), this, SLOT(loadDone(QString,Context*)));
         connect(context,SIGNAL(athleteClose(QString,Context*)), this, SLOT(closing(QString,Context*)));
 
@@ -274,7 +274,7 @@ AthleteCard::closing(QString name, Context *)
 }
 
 void
-AthleteCard::loadProgress(QString, double prog)
+AthleteCard::loadProgress(QString, int prog)
 {
     loadprogress = prog > 100 ? 100 : prog;
     update();
