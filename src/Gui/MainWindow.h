@@ -144,7 +144,7 @@ class MainWindow : public QMainWindow
         void support();
         void actionClicked(int);
 
-        void loadProgress(QString folder, double progress);
+        void loadProgress(QString folder, int progress);
 
 
         // perspective selected
