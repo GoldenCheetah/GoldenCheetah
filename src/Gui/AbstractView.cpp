@@ -33,11 +33,11 @@
 #include "GcUpgrade.h"
 #include "LTMWindow.h"
 
-AbstractView::AbstractView(Context *context, int type) : 
-    QWidget(context->tab), context(context), type(type),
+AbstractView::AbstractView(Context* context, int type, const QString& name) :
+    QWidget(context->tab), context(context), type(type), name(name),
     _sidebar(true), _tiled(false), _selected(false), lastHeight(130*dpiYFactor), sidewidth(0),
     active(false), bottomRequested(false), bottomHideOnIdle(false), perspectiveactive(false),
-    stack(NULL), splitter(NULL), mainSplitter(NULL), 
+    stack(NULL), splitter(NULL), mainSplitter(NULL),
     sidebar_(NULL), bottom_(NULL), perspective_(NULL), blank_(NULL),
     loaded(false)
 {
@@ -271,9 +271,7 @@ AbstractView::saveState()
     // we're not interested in them
     // NOTE: currently we support QString, int, double and bool types - beware custom types!!
 
-    QString view = viewName();
-
-    QString filename = context->athlete->home->config().canonicalPath() + "/" + view + "-perspectives.xml";
+    QString filename = context->athlete->home->config().canonicalPath() + "/" + name + "-perspectives.xml";
     QFile file(filename);
     if (!file.open(QFile::WriteOnly)) {
         QMessageBox msgBox;
@@ -308,11 +306,8 @@ AbstractView::restoreState(bool useDefault)
     QString content = "";
     bool legacy = false;
 
-    QString view(viewName());
-    restoreConfiguration(useDefault, content);
-
     // restore window state
-    QString filename = context->athlete->home->config().canonicalPath() + "/" + view + "-perspectives.xml";
+    QString filename = context->athlete->home->config().canonicalPath() + "/" + name + "-perspectives.xml";
     QFileInfo finfo(filename);
 
     // set content from the default
@@ -327,7 +322,7 @@ AbstractView::restoreState(bool useDefault)
         // fetch from the goldencheetah.org website
         QString request = QString("%1/%2-perspectives.xml")
                              .arg(VERSION_CONFIG_PREFIX)
-                             .arg(view);
+                             .arg(name);
 
         QNetworkReply *reply = nam.get(QNetworkRequest(QUrl(request)));
 
@@ -362,7 +357,7 @@ AbstractView::restoreState(bool useDefault)
         // renamed as "Legacy" and prepended to default perspectives,
         // except when useDefault is requested
         if (!finfo.exists() && !useDefault) {
-            filename = context->athlete->home->config().canonicalPath() + "/" + view + "-layout.xml";
+            filename = context->athlete->home->config().canonicalPath() + "/" + name + "-layout.xml";
             legacy = true;
             QFile file(filename);
             if (file.open(QIODevice::ReadOnly)) {
@@ -391,7 +386,7 @@ AbstractView::restoreState(bool useDefault)
 
         // drop back to what is baked in
         if (!finfo.exists()) {
-            filename = QString(":xml/%1-perspectives.xml").arg(view);
+            filename = QString(":xml/%1-perspectives.xml").arg(name);
             useDefault = true;
         }
         QFile file(filename);
@@ -450,13 +445,6 @@ AbstractView::restoreState(bool useDefault)
             context->athlete->selectRideFile(context->athlete->rideCache->rides().last()->fileName);
         }
     }
-}
-
-void
-AbstractView::restoreConfiguration(bool& , QString& )
-{
-    // prevents c++11 compiler warning about unused parameters,
-    // for derived classes to modify parameters if required.
 }
 
 void

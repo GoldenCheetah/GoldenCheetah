@@ -55,7 +55,7 @@ class AbstractView : public QWidget
 
     public:
 
-        AbstractView(Context *context, int type);
+        AbstractView(Context *context, int type, const QString& name);
         virtual ~AbstractView();
         virtual void close() {};
 
@@ -80,7 +80,7 @@ class AbstractView : public QWidget
 
         // load/save perspectives
         void restoreState(bool useDefault = false);
-        virtual void saveState();
+        void saveState();
         void appendPerspective(Perspective *page);
 
         void setPerspectives(QComboBox *perspectiveSelector, bool selectChart=false); // set the combobox when view selected
@@ -149,13 +149,11 @@ class AbstractView : public QWidget
 
     protected:
 
-        virtual QString viewName() = 0;
-        virtual void restoreConfiguration(bool& useDefault, QString& content);
-
         Context *context;
-        int type; // used by windowregistry; e.g VIEW_TRAIN VIEW_ANALYSIS VIEW_DIARY VIEW_TRENDS VIEW_EQUIPMENT
-                  // we don't care what values are pass through to the GcWindowRegistry to decide
-                  // what charts are relevant for this view.
+        const int type; // used by windowregistry; e.g VIEW_TRAIN VIEW_ANALYSIS VIEW_DIARY VIEW_TRENDS VIEW_EQUIPMENT
+                        // we don't care what values are pass through to the GcWindowRegistry to decide
+                        // what charts are relevant for this view.
+        const QString name; // name of the view:  "train", "analysis", "diary", "home", "equipment"
 
         // properties
         bool _filtered;

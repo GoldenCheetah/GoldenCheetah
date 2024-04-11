@@ -29,7 +29,7 @@
 #include "TrainBottom.h"
 #include "Specification.h"
 
-AnalysisView::AnalysisView(Context *context, QStackedWidget *controls) : AbstractView(context, VIEW_ANALYSIS)
+AnalysisView::AnalysisView(Context *context, QStackedWidget *controls) : AbstractView(context, VIEW_ANALYSIS, "analysis")
 {
     analSidebar = new AnalysisSidebar(context);
     BlankStateAnalysisPage *b = new BlankStateAnalysisPage(context);
@@ -127,7 +127,7 @@ AnalysisView::isBlank()
     else return true;
 }
 
-DiaryView::DiaryView(Context *context, QStackedWidget *controls) : AbstractView(context, VIEW_DIARY)
+DiaryView::DiaryView(Context *context, QStackedWidget *controls) : AbstractView(context, VIEW_DIARY, "diary")
 {
     diarySidebar = new DiarySidebar(context);
     BlankStateDiaryPage *b = new BlankStateDiaryPage(context);
@@ -177,7 +177,7 @@ DiaryView::isBlank()
     else return true;
 }
 
-TrendsView::TrendsView(Context *context, QStackedWidget *controls) : AbstractView(context, VIEW_TRENDS)
+TrendsView::TrendsView(Context *context, QStackedWidget *controls) : AbstractView(context, VIEW_TRENDS, "home")
 {
     sidebar = new LTMSidebar(context);
     BlankStateHomePage *b = new BlankStateHomePage(context);
@@ -283,7 +283,7 @@ TrendsView::justSelected()
     }
 }
 
-TrainView::TrainView(Context *context, QStackedWidget *controls) : AbstractView(context, VIEW_TRAIN)
+TrainView::TrainView(Context *context, QStackedWidget *controls) : AbstractView(context, VIEW_TRAIN, "train")
 {
     trainTool = new TrainSidebar(context);
     trainTool->setTrainView(this);
@@ -343,7 +343,7 @@ TrainView::onSelectionChanged()
     }
 }
 
-EquipView::EquipView(Context* context, QStackedWidget* controls) : AbstractView(context, VIEW_EQUIPMENT)
+EquipView::EquipView(Context* context, QStackedWidget* controls) : AbstractView(context, VIEW_EQUIPMENT, "equipment")
 {
     equipmentSidebar_ = new EquipmentSidebar(context);
 
@@ -368,24 +368,6 @@ EquipView::EquipView(Context* context, QStackedWidget* controls) : AbstractView(
 EquipView::~EquipView()
 {
     delete equipmentSidebar_;
-}
-
-void
-EquipView::restoreConfiguration(bool& useDefault, QString& content)
-{
-    // Equipment view has a single persistent perspective,
-    // so lets define it here rather than load it from a file.
-    content = QString("<layouts> ") +
-        "<layout name = \"Equipment\" style = \"1\" type = \"16\" expression = \"\" trainswitch = \"0\" > " +
-        "<chart id = \"51\" name = \"\" title = \"Equipment\" > " +
-        "<property name = \"title\" type = \"QString\" value = \"\" /> " +
-        "<property name = \"subtitle\" type = \"QString\" value = \"\" /> " +
-        "<property name = \"widthFactor\" type = \"double\" value = \"2\" /> " +
-        "<property name = \"heightFactor\" type = \"double\" value = \"2\" /> " +
-        "<property name = \"style\" type = \"int\" value = \"0\" /> " +
-        "<property name = \"resizable\" type = \"bool\" value = \"1\" /> " +
-        "</chart> </layout> </layouts>";
-    useDefault = false;
 }
 
 bool

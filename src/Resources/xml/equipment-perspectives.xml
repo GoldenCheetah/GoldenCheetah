@@ -1,0 +1,12 @@
+<layouts>
+<layout name="equipment" style="1" type="16" expression="" trainswitch="0">
+	<chart id="51" name="" title="" >
+		<property name="title" type="QString" value="" />
+		<property name="subtitle" type="QString" value="" />
+		<property name="widthFactor" type="double" value="2" />
+		<property name="heightFactor" type="double" value="2" />
+		<property name="style" type="int" value="1" />
+		<property name="resizable" type="bool" value="0" />
+	</chart>
+</layout>
+</layouts>
