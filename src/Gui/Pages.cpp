@@ -754,6 +754,9 @@ TrainOptionsPage::TrainOptionsPage(QWidget *parent, Context *context) : QWidget(
     lapAlert = new QCheckBox(tr("Play sound before new lap"), this);
     lapAlert->setChecked(appsettings->value(this, TRAIN_LAPALERT, false).toBool());
 
+    coalesce = new QCheckBox(tr("Coalesce contiguous sections of same wattage"), this);
+    coalesce->setChecked(appsettings->value(this, TRAIN_COALESCE_SECTIONS, false).toBool());
+
     delayLabel = new QLabel(tr("Start Countdown"));
     startDelay = new QSpinBox(this);
     startDelay->setMaximum(600);
@@ -776,6 +779,7 @@ TrainOptionsPage::TrainOptionsPage(QWidget *parent, Context *context) : QWidget(
     all->addWidget(autoConnect);
     all->addWidget(autoHide);
     all->addWidget(lapAlert);
+    all->addWidget(coalesce);
 
     QHBoxLayout *delayLayout = new QHBoxLayout;
     delayLayout->addWidget(delayLabel);
@@ -799,6 +803,7 @@ TrainOptionsPage::saveClicked()
     appsettings->setValue(TRAIN_STARTDELAY, startDelay->value());
     appsettings->setValue(TRAIN_AUTOHIDE, autoHide->isChecked());
     appsettings->setValue(TRAIN_LAPALERT, lapAlert->isChecked());
+    appsettings->setValue(TRAIN_COALESCE_SECTIONS, coalesce->isChecked());
 
     return 0;
 }

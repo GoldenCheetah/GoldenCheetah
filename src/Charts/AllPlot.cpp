@@ -7166,11 +7166,99 @@ AllPlot::intervalHover(IntervalItem *chosen)
     replot();
 }
 
+static bool isPlotCanvas(const QObject* const object)
+{
+    return object->objectName() == "QwtPlotCanvas";
+}
+
 bool
 AllPlot::eventFilter(QObject *obj, QEvent *event)
 {
     if (event->type() == QEvent::Resize) {
         emit resized();
+    }
+
+    // panning activation / deactivation
+    if (event->type() == QEvent::MouseButtonPress)
+    {
+        QMouseEvent* mouseEvent = static_cast<QMouseEvent*>(event);
+        if (mouseEvent->button() == Qt::MouseButton::MiddleButton)
+        {
+            isPanning = true;
+            panOriginX = mouseEvent->globalX();
+        }
+    }
+    else if (event->type() == QEvent::MouseButtonRelease)
+    {
+        QMouseEvent* mouseEvent = static_cast<QMouseEvent*>(event);
+        if (mouseEvent->button() == Qt::MouseButton::MiddleButton)
+            isPanning = false;
+    }
+    else if (isPanning && event->type() == QEvent::MouseMove)
+    {
+        // the actual panning logic
+        QMouseEvent* mouseEvent = static_cast<QMouseEvent*>(event);
+        int diffX = mouseEvent->globalX() - panOriginX;
+        QxtSpanSlider* slider = window->spanSlider;
+
+        // ride length in seconds
+        int total = slider->maximum() - slider->minimum();
+        int movement = (int)(diffX * (total / 1000.0));
+        if (movement != 0)
+        {
+            panOriginX = mouseEvent->globalX();
+            int newLower = slider->lowerValue() + movement;
+            int newUpper = slider->upperValue() + movement;
+            if (newUpper <= slider->maximum() && newLower >= slider->minimum())
+            {
+                slider->setLowerValue(newLower);
+                slider->setUpperValue(newUpper);
+                if (slider->lowerValue() < slider->minimum())
+                    slider->setLowerValue(slider->minimum());
+                if (slider->upperValue() > slider->maximum())
+                    slider->setUpperValue(slider->maximum());
+                window->zoomChanged();
+            }
+        }
+    }
+
+     // mouse wheel zoom logic with ctrl modifier
+    if (event->type() == QEvent::Wheel && isPlotCanvas(obj) &&
+        static_cast<QInputEvent*>(event)->modifiers() & Qt::ControlModifier) {
+        static ulong lastEvent = 0;
+        QWheelEvent* wheelEvent = static_cast<QWheelEvent*>(event);
+        const bool increasingZoom = wheelEvent->angleDelta().y() > 0;
+        ulong timeDiff = QDateTime::currentMSecsSinceEpoch() - lastEvent;
+        lastEvent = QDateTime::currentMSecsSinceEpoch();
+        QxtSpanSlider* slider = window->spanSlider;
+
+        QwtPlotCanvas* canvas = static_cast<QwtPlotCanvas*>(obj);
+        float posPercent = wheelEvent->position().x() / static_cast<float>(canvas->width());
+        if (timeDiff > 120)
+            timeDiff = 120;
+        int adjustment = 150 - timeDiff;
+        // the slider is in seconds but we want the zoom speed to be of roughly consistent behavior for files of all durations
+        // so normalize the adjustment to a duration of 30 mins or 1800 s which was used for tuning the magic values here
+        adjustment = adjustment * ((slider->maximum() - slider->minimum()) / 1800.0);
+        if (!increasingZoom)
+            adjustment = -adjustment;
+
+        int lower = slider->lowerValue();
+        lower += adjustment * posPercent;
+        int upper = slider->upperValue();
+        upper += -adjustment * (1.0-posPercent);
+        if (lower < slider->minimum())
+            lower = slider->minimum();
+        if (upper > slider->maximum())
+            upper = slider->maximum();
+        const float maxZoomPercent = 0.05f;
+        const int totalRange = slider->maximum() - slider->minimum();
+        if (upper > lower && (!increasingZoom || (upper - lower) >= (totalRange * maxZoomPercent))) {
+            slider->setLowerValue(lower);
+            slider->setUpperValue(upper);
+            window->zoomChanged();
+        }
+        return true;
     }
 
     // REFERENCE LINE FOR POWER

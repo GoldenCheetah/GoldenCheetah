@@ -2072,8 +2072,8 @@ void TrainSidebar::guiUpdate()           // refreshes the telemetry
                             ErgFileText cue = ergFile->Texts.at(idx);
                             emit setNotification(cue.text, cue.duration);
                         }
+                        textPositionEmitted = lapPosition + searchRange;
                     }
-                    textPositionEmitted = lapPosition + searchRange;
                 }
 
                 // Maintain time in ERGO mode
@@ -2978,6 +2978,9 @@ void TrainSidebar::adjustIntensity(int value)
 
         // remember last
         last = ergFile->Points.at(i);
+    }
+    if (appsettings->value(nullptr, TRAIN_COALESCE_SECTIONS, false).toBool()) {
+        ergFile->coalesceSections();
     }
 
     // recalculate metrics

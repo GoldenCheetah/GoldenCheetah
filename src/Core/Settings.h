@@ -237,6 +237,7 @@
 #define TRAIN_LAPALERT                  "<global-trainmode>train/lapalert"
 #define TRAIN_USESIMULATEDSPEED         "<global-trainmode>train/usesimulatedspeed"
 #define TRAIN_USESIMULATEDHYPOXIA       "<global-trainmode>train/usesimulatedhypoxia"
+#define TRAIN_COALESCE_SECTIONS         "<global-trainmode>train/coalesceSections"
 #define GC_REMOTE_START                 "<global-trainmode>remote/start"
 #define GC_REMOTE_STOP                  "<global-trainmode>remote/stop"
 #define GC_REMOTE_LAP                   "<global-trainmode>remote/lap"
@@ -308,9 +309,13 @@
 
 // OSM Tileserver
 #define GC_OSM_TS_DEFAULT               "<athlete-preferences>osmts/default"
+#define GC_OSM_DEFAULT_GRAY             "<athlete-preferences>osm/default_gray"
 #define GC_OSM_TS_A                     "<athlete-preferences>osmts/a"
+#define GC_OSM_A_GRAY                   "<athlete-preferences>osm/a_gray"
 #define GC_OSM_TS_B                     "<athlete-preferences>osmts/b"
+#define GC_OSM_B_GRAY                   "<athlete-preferences>osm/b_gray"
 #define GC_OSM_TS_C                     "<athlete-preferences>osmts/c"
+#define GC_OSM_C_GRAY                   "<athlete-preferences>osm/c_gray"
 
 // BodyMeasures Download
 #define GC_BM_LAST_TYPE                 "<athlete-preferences>bm/last_type"

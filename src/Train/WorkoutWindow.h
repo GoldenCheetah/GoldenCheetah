@@ -72,6 +72,7 @@ class WorkoutWindow : public GcChartWindow
 
         // edit the definition
         QLabel *codeFormat;
+        QLabel *coalescedSections;
         QWidget *codeContainer;
         CodeEditor *code;
 
