@@ -194,7 +194,7 @@ after_build:
 
 # Build the installer
 - makensis GC3.7-Master-W64-QT5.nsi
-- move GoldenCheetah_v3.7_DEV_64bit_Windows.exe ..\..\GoldenCheetah_v3.7-DEV_x64.exe
+- move GoldenCheetah_v3.7-DEV_64bit_Windows.exe ..\..\GoldenCheetah_v3.7-DEV_x64.exe
 - cd ..\..
 - ps: Set-AppveyorBuildVariable -Name 'PUBLISH_BINARIES' -Value false
 - ps: if ($env:APPVEYOR_REPO_COMMIT_MESSAGE_EXTENDED -Match "\[publish binaries\]") { Set-AppveyorBuildVariable -Name 'PUBLISH_BINARIES' -Value true }
