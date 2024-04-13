@@ -81,7 +81,7 @@ then echo "AppImage not generated, check the errors"; exit 1
 fi
 
 echo "Renaming AppImage file to branch and build number ready for deploy"
-export FINAL_NAME=GoldenCheetah_v3.6-DEV_x64.AppImage
+export FINAL_NAME=GoldenCheetah_v3.7-DEV_x64.AppImage
 mv GoldenCheetah*.AppImage $FINAL_NAME
 ls -l $FINAL_NAME
 

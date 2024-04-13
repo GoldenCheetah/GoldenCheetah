@@ -190,11 +190,11 @@ after_build:
 - copy ..\Resources\win32\gc.ico
 
 # Installer script
-- copy ..\Resources\win32\GC3.6-Master-W64-QT5.nsi
+- copy ..\Resources\win32\GC3.7-Master-W64-QT5.nsi
 
 # Build the installer
-- makensis GC3.6-Master-W64-QT5.nsi
-- move GoldenCheetah_v3.6_64bit_Windows.exe ..\..\GoldenCheetah_v3.6_x64.exe
+- makensis GC3.7-Master-W64-QT5.nsi
+- move GoldenCheetah_v3.7_DEV_64bit_Windows.exe ..\..\GoldenCheetah_v3.7-DEV_x64.exe
 - cd ..\..
 - ps: Set-AppveyorBuildVariable -Name 'PUBLISH_BINARIES' -Value false
 - ps: if ($env:APPVEYOR_REPO_COMMIT_MESSAGE_EXTENDED -Match "\[publish binaries\]") { Set-AppveyorBuildVariable -Name 'PUBLISH_BINARIES' -Value true }
@@ -203,11 +203,11 @@ test_script:
 # minimum test
 - src\release\GoldenCheetah --version 2>GCversionWindows.txt
 - git log -1 >> GCversionWindows.txt
-- ps: CertUtil -hashfile GoldenCheetah_v3.6_x64.exe sha256 | Select-Object -First 2 | Add-Content GCversionWindows.txt
+- ps: CertUtil -hashfile GoldenCheetah_v3.7-DEV_x64.exe sha256 | Select-Object -First 2 | Add-Content GCversionWindows.txt
 - type GCversionWindows.txt
 
 artifacts:
-- path: GoldenCheetah_v3.6_x64.exe
+- path: GoldenCheetah_v3.7-DEV_x64.exe
   name: GCinstaller
 - path: GCversionWindows.txt
   name: GCversionWindows
