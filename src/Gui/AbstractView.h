@@ -55,7 +55,7 @@ class AbstractView : public QWidget
 
     public:
 
-        AbstractView(Context *context, int type, const QString& name);
+        AbstractView(Context *context, int type, const QString& name, const QString& heading);
         virtual ~AbstractView();
         virtual void close() {};
 
@@ -79,16 +79,16 @@ class AbstractView : public QWidget
         bool isTiled() const { return _tiled; }
 
         // load/save perspectives
-        void restoreState(bool useDefault = false);
+        virtual void restoreState(bool useDefault = false);
         void saveState();
         void appendPerspective(Perspective *page);
 
-        void setPerspectives(QComboBox *perspectiveSelector, bool selectChart=false); // set the combobox when view selected
+        virtual void setPerspectives(QComboBox *perspectiveSelector, bool selectChart=false); // set the combobox when view selected
         void perspectiveSelected(int index); // combobox selections changed because the user selected a perspective
         int currentPerspective() const { if (pstack && pstack->currentIndex() >=0) return pstack->currentIndex(); else return 0; }
 
         // add a new perspective
-        Perspective *addPerspective(QString);
+        virtual Perspective *addPerspective(QString);
         void removePerspective(Perspective *);
         void swapPerspective(int from, int to); // reorder by moving 1 pos at a time
 
@@ -138,7 +138,7 @@ class AbstractView : public QWidget
 
         // Let the base class handle the splitter movement and
         // hiding the sidebar by dragging it closed.
-        void splitterMoved(int, int);
+        virtual void splitterMoved(int, int);
 
         //void mediaSelected(QString filename);
         //void ergSelected(ErgFile *erg);

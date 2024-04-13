@@ -48,8 +48,11 @@ EquipmentModelManager::EquipmentModelManager(Context* context) :
 
 EquipmentModelManager::~EquipmentModelManager()
 {
-    // delete the equipment models
-    delete equipModel_;
+    // The equipModel_ memory created in the constructor is deleted by Qt when the Equipment Navigator's
+    // QTreeView is deleted, QTreeView is derived from QAbstractItemModel and this is mentioned
+    // in https://doc.qt.io/qt-5/qabstractitemview.html#setModel, and is the case when checking the GC
+    // destruction stack :"The view does not take ownership of the model unless it is the model's parent
+    // object because the model may be shared between many different views."
 }
 
 void

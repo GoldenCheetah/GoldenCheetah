@@ -41,6 +41,12 @@ class AnalysisView : public AbstractView
         void setRide(RideItem*ride) override;
         void addIntervals();
 
+        // Analysis view specific additions
+        void restoreState(bool useDefault = false) override;
+        void splitterMoved(int pos, int) override;
+        void sidebarChanged() override;
+        void setPerspectives(QComboBox* perspectiveSelector, bool selectChart) override;
+
         RideNavigator *rideNavigator();
         AnalysisSidebar *analSidebar;
 
@@ -87,6 +93,7 @@ class TrainView : public AbstractView
         ~TrainView();
 
         void close() override;
+        virtual Perspective* addPerspective(QString) override;
 
     public slots:
 

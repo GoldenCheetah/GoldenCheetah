@@ -32,7 +32,7 @@ class EquipmentTab: public QWidget
     public:
 
         EquipmentTab(Context *context);
-        ~EquipmentTab();
+        virtual ~EquipmentTab();
 
         void close();
         

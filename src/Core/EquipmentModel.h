@@ -37,7 +37,7 @@ class EquipmentModel : public QAbstractItemModel
     public:
     
         EquipmentModel(Context* context);
-        ~EquipmentModel();
+        virtual ~EquipmentModel();
 
         void resetModel();
 

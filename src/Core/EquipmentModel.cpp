@@ -473,8 +473,16 @@ EquipmentModel::equipmentDeleted(EquipmentNode* eqNode)
     case eqNodeType::EQ_LINK:
     case eqNodeType::EQ_BANNER:
     case eqNodeType::EQ_DIST_ITEM:
-    case eqNodeType::EQ_TIME_ITEM:
+    case eqNodeType::EQ_TIME_ITEM: {
+        removeAndDeleteEquipment(eqNode);
+    } break;
+
     case eqNodeType::EQ_ITEM_REF: {
+
+        // Remove reference from related Equipment Shared Distance Item
+        if (static_cast<EquipmentRef*>(eqNode)->eqDistNode_ != nullptr)
+                static_cast<EquipmentRef*>(eqNode)->eqDistNode_->linkedRefs_.removeOne(eqNode);
+
         removeAndDeleteEquipment(eqNode);
     } break;
 

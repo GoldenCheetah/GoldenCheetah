@@ -338,8 +338,6 @@ EquipmentRef::EquipmentRef(double refDistance, const QDateTime& start, const QDa
 
 EquipmentRef::~EquipmentRef()
 {
-    // Remove reference from related Equipment Shared Distance Item
-    if (eqDistNode_ != nullptr) eqDistNode_->linkedRefs_.removeOne(this);
 }
 
 QVariant

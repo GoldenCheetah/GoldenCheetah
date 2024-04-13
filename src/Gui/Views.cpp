@@ -29,7 +29,8 @@
 #include "TrainBottom.h"
 #include "Specification.h"
 
-AnalysisView::AnalysisView(Context *context, QStackedWidget *controls) : AbstractView(context, VIEW_ANALYSIS, "analysis")
+AnalysisView::AnalysisView(Context *context, QStackedWidget *controls) :
+        AbstractView(context, VIEW_ANALYSIS, "analysis", "Compare Activities and Intervals")
 {
     analSidebar = new AnalysisSidebar(context);
     BlankStateAnalysisPage *b = new BlankStateAnalysisPage(context);
@@ -64,6 +65,8 @@ AnalysisView::~AnalysisView()
     appsettings->setValue(GC_SETTINGS_MAIN_SIDEBAR "analysis", _sidebar);
     delete analSidebar;
     //delete hw; tabview deletes after save state
+
+    saveState(); // writes analysis-perspectives.xml
 }
 
 void
@@ -103,6 +106,77 @@ AnalysisView::setRide(RideItem *ride)
 }
 
 void
+AnalysisView::restoreState(bool useDefault)
+{
+    AbstractView::restoreState(useDefault);
+
+    // analysis view then lets select the first ride now
+    // used to happen in Tab.cpp on create, but we do it later now
+    QDateTime now = QDateTime::currentDateTime();
+    for (int i = context->athlete->rideCache->rides().count(); i > 0; --i) {
+        if (context->athlete->rideCache->rides()[i - 1]->dateTime <= now) {
+            context->athlete->selectRideFile(context->athlete->rideCache->rides()[i - 1]->fileName);
+            break;
+        }
+    }
+
+    // otherwise just the latest
+    if (context->currentRideItem() == NULL && context->athlete->rideCache->rides().count() != 0) {
+        context->athlete->selectRideFile(context->athlete->rideCache->rides().last()->fileName);
+    }
+}
+
+void
+AnalysisView::splitterMoved(int pos, int)
+{
+    AbstractView::splitterMoved(pos, 0);
+
+    // if user moved us then tell ride navigator if
+    // we are the analysis view
+    // all a bit of a hack to stop the column widths from
+    // being adjusted as the splitter gets resized and reset
+    if (active == false && context->rideNavigator->geometry().width() != 100)
+        context->rideNavigator->setWidth(context->rideNavigator->geometry().width());
+}
+
+void
+AnalysisView::sidebarChanged()
+{
+    // wait for main window to catch up
+    if (sidebar_ == NULL) return;
+
+    AbstractView::sidebarChanged();
+
+    if (sidebarEnabled()) {
+
+        // if user moved us then tell ride navigator if
+        // we are the analysis view
+        // all a bit of a hack to stop the column widths from
+        // being adjusted as the splitter gets resized and reset
+        if (context->mainWindow->init && context->tab->init && active == false && context->rideNavigator->geometry().width() != 100)
+            context->rideNavigator->setWidth(context->rideNavigator->geometry().width());
+        setUpdatesEnabled(true);
+
+    }
+}
+
+void
+AnalysisView::setPerspectives(QComboBox* perspectiveSelector, bool selectChart = false)
+{
+    AbstractView::setPerspectives(perspectiveSelector, selectChart);
+
+    if (loaded) {
+        // On analysis view the perspective is selected on the basis
+        // of the currently selected ride
+        RideItem* notconst = (RideItem*)context->currentRideItem();
+        if (notconst != NULL) setRide(notconst);
+
+        // due to visibility optimisation we need to force the first tab to be selected in tab mode
+        if (perspective_->currentStyle == 0 && perspective_->charts.count()) perspective_->tabSelected(0);
+    }
+}
+
+void
 AnalysisView::addIntervals()
 {
     static_cast<AnalysisSidebar*>(sidebar())->addIntervals(); // save settings
@@ -127,7 +201,8 @@ AnalysisView::isBlank()
     else return true;
 }
 
-DiaryView::DiaryView(Context *context, QStackedWidget *controls) : AbstractView(context, VIEW_DIARY, "diary")
+DiaryView::DiaryView(Context *context, QStackedWidget *controls) :
+        AbstractView(context, VIEW_DIARY, "diary", "Compare Activities and Intervals")
 {
     diarySidebar = new DiarySidebar(context);
     BlankStateDiaryPage *b = new BlankStateDiaryPage(context);
@@ -152,6 +227,8 @@ DiaryView::~DiaryView()
     appsettings->setValue(GC_SETTINGS_MAIN_SIDEBAR "diary", _sidebar);
     delete diarySidebar;
     //delete hw; tabview deletes after save state
+
+    saveState(); // writes diary-perspectives.xml
 }
 
 void
@@ -177,7 +254,8 @@ DiaryView::isBlank()
     else return true;
 }
 
-TrendsView::TrendsView(Context *context, QStackedWidget *controls) : AbstractView(context, VIEW_TRENDS, "home")
+TrendsView::TrendsView(Context *context, QStackedWidget *controls) :
+        AbstractView(context, VIEW_TRENDS, "home", "Compare Date Ranges")
 {
     sidebar = new LTMSidebar(context);
     BlankStateHomePage *b = new BlankStateHomePage(context);
@@ -206,6 +284,8 @@ TrendsView::~TrendsView()
     appsettings->setValue(GC_SETTINGS_MAIN_SIDEBAR "trend", _sidebar);
     delete sidebar;
     //delete hw; tabview deletes after save state
+
+    saveState(); // writes home-perspectives.xml
 }
 
 void
@@ -283,7 +363,8 @@ TrendsView::justSelected()
     }
 }
 
-TrainView::TrainView(Context *context, QStackedWidget *controls) : AbstractView(context, VIEW_TRAIN, "train")
+TrainView::TrainView(Context *context, QStackedWidget *controls) :
+        AbstractView(context, VIEW_TRAIN, "train", "Intensity Adjustments and Workout Control")
 {
     trainTool = new TrainSidebar(context);
     trainTool->setTrainView(this);
@@ -320,12 +401,27 @@ TrainView::~TrainView()
     appsettings->setValue(GC_SETTINGS_MAIN_SIDEBAR "train", _sidebar);
     delete trainTool;
     //delete hw; tabview deletes after save state
+
+    saveState(); // writes train-perspectives.xml
 }
 
 void
 TrainView::close()
 {
     trainTool->Stop();
+}
+
+Perspective*
+TrainView::addPerspective(QString name)
+{
+    Perspective* page = new Perspective(context, name, type);
+
+    // no tabs on train view
+    page->styleChanged(2);
+
+    // append
+    appendPerspective(page);
+    return page;
 }
 
 bool
@@ -343,7 +439,8 @@ TrainView::onSelectionChanged()
     }
 }
 
-EquipView::EquipView(Context* context, QStackedWidget* controls) : AbstractView(context, VIEW_EQUIPMENT, "equipment")
+EquipView::EquipView(Context* context, QStackedWidget* controls) :
+        AbstractView(context, VIEW_EQUIPMENT, "equipment", "Equipment Management")
 {
     equipmentSidebar_ = new EquipmentSidebar(context);
 
@@ -368,6 +465,9 @@ EquipView::EquipView(Context* context, QStackedWidget* controls) : AbstractView(
 EquipView::~EquipView()
 {
     delete equipmentSidebar_;
+
+    // equipment view has a single persistent perspective and is always
+    // loaded from the "baked" in configuration, so is never saved.
 }
 
 bool
