@@ -764,7 +764,7 @@ void ElevationZoomedMeterWidget::startPlayback(Context* context) {
 
     windowWidthMeters = 300; // We are ploting ### meters
     windowHeightMeters = 96; // fixed height shown in graph
-    totalRideDistance = floor(ergFile->Duration);
+    totalRideDistance = floor(ergFile->duration());
     xScale = -1;
     yScale = -1;
     translateX = 0;

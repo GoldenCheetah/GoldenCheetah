@@ -551,7 +551,7 @@ void VideoWindow::telemetryUpdate(RealtimeData rtd)
         else if (p_meterWidget->Source() == QString("ElevationZoomed"))
         {
             // Do not show in ERG mode
-            if (rtd.mode == ERG || rtd.mode == MRC)
+            if (rtd.mode == ErgFileFormat::erg || rtd.mode == ErgFileFormat::mrc)
             {
                 p_meterWidget->setWindowOpacity(0); // Hide the widget
             }
