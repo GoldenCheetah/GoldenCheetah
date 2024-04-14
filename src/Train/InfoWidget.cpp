@@ -124,7 +124,7 @@ InfoWidget::setContent
 {
     if (lastRun > 0) {
         QDateTime timestamp;
-        timestamp.setTime_t(lastRun);
+        timestamp.setSecsSinceEpoch(lastRun);
         int daysAgo = timestamp.daysTo(QDateTime::currentDateTime());
         QString ago;
         if (daysAgo == 0) {
