@@ -52,6 +52,7 @@
 #include "RideAutoImportConfig.h"
 #include "RemoteControl.h"
 #include "Measures.h"
+#include "TagStore.h"
 
 class QGroupBox;
 class QHBoxLayout;
@@ -315,6 +316,36 @@ private:
     QDoubleSpinBox  *m_SpinBoxArr[LastPart];
     QLabel          *m_StatsLabelArr[StatsLastPart];
 };
+
+
+
+class WorkoutTagManagerPage: public QWidget
+{
+    Q_OBJECT
+
+public:
+    WorkoutTagManagerPage(TagStore *tagStore, QWidget *parent = nullptr);
+    ~WorkoutTagManagerPage();
+
+    qint32 saveClicked();
+
+public slots:
+    void currentItemChanged(QTreeWidgetItem *current, QTreeWidgetItem *previous);
+    void dataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles);
+    void tagStoreChanged(int idAdded, int idRemoved, int idUpdated);
+    void deleteTag();
+    void addTag();
+
+    void editorClosed(QWidget *editor, QAbstractItemDelegate::EndEditHint hint);
+    void modelCleaner();
+
+private:
+    TagStore *tagStore;
+    QTreeWidget *tw;
+    QList<int> deleted;
+};
+
+
 
 class CustomMetricsPage : public QWidget
 {

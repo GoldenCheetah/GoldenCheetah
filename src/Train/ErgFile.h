@@ -18,6 +18,8 @@
 
 #ifndef _ErgFile_h
 #define _ErgFile_h
+#include "ErgFileBase.h"
+
 #include "GoldenCheetah.h"
 #include "Context.h"
 
@@ -99,10 +101,10 @@ class ErgFileLap
         bool selected; // used by the editor
 };
 
-class ErgFile
+class ErgFile : public ErgFileBase
 {
     public:
-        ErgFile(QString, int, Context *context);       // constructor uses filename
+        ErgFile(QString, ErgFileFormat, Context *context);       // constructor uses filename
         ErgFile(Context *context); // no filename, going to use a string
 
         ~ErgFile();             // delete the contents
@@ -128,13 +130,6 @@ class ErgFile
 
         bool isValid() const;            // is the file valid or not?
 
-        double Cp;
-        int format;             // ERG, CRS, MRC, ERG2 currently supported
-
-        bool hasGradient() const { return CRS == format; } // Has Gradient and Altitude
-        bool hasWatts()    const { return ERG == format || MRC == format; }
-        bool hasGPS()      const { return fHasGPS; } // Has Lat/Lon
-
 private:
         void sortLaps() const;
         void sortTexts() const;
@@ -157,23 +152,7 @@ public:
         // than a list of points
         QList<ErgFileSection> Sections();
 
-        QString Version,        // version number / identifer
-                Units,          // units used
-                Filename,       // filename from inside file
-                filename,       // filename on disk
-                Name,           // description in file
-                Description,    // long narrative for workout
-                ErgDBId,        // if downloaded from ergdb
-                Source;         // where did this come from
-        QStringList Tags;       // tagged strings
-
-        long    Duration;       // Duration of this workout in msecs
-        int     Ftp;            // FTP this file was targetted at
-        int     MaxWatts;       // maxWatts in this ergfile (scaling)
         bool    valid;          // did it parse ok?
-        int     mode;
-        bool    StrictGradient; // should gradient be strict or smoothed?
-        bool    fHasGPS;        // has Lat/Lon?
 
         QList<ErgFilePoint>         Points; // points in workout
         mutable QList<ErgFileLap>   Laps;   // interval markers in the file
@@ -182,13 +161,6 @@ public:
         GeoPointInterpolator gpi;      // Location interpolator
 
         void calculateMetrics();       // calculate IsoPower value for ErgFile
-
-        // Metrics for this workout
-        double minY, maxY;             // minimum and maximum Y value
-        double CP;
-        double AP, IsoPower, IF, BikeStress, VI; // Coggan for erg / mrc
-        double XP, RI, BS, SVI;        // Skiba for erg / mrc
-        double ELE, ELEDIST, GRADE;    // crs
 
         Context *context;
 };
@@ -251,7 +223,7 @@ public:
 
     double currentTime() const { return !ergFile ? 0. : ergFile->Points.at(qs.rightPoint).x; }
 
-    double Duration(void) const { return !ergFile ? 0. : ergFile->Duration; }
+    double Duration(void) const { return !ergFile ? 0. : ergFile->duration(); }
 
     // State queries (maintain mutable state.)
     double wattsAt(double msec, int& lapnum) const;
