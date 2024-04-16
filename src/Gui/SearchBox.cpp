@@ -34,8 +34,8 @@
 
 const int BUTTON_SIZE = 12;
 
-SearchBox::SearchBox(Context *context, QWidget *parent, bool nochooser)
-    : QLineEdit(parent), context(context), parent(parent), filtered(false), nochooser(nochooser), active(false), fixed(false)
+SearchBox::SearchBox(Context *context, QWidget *parent, bool nochooser, bool useTheme)
+    : QLineEdit(parent), context(context), parent(parent), filtered(false), nochooser(nochooser), active(false), fixed(false), useTheme(useTheme)
 {
     setFixedHeight(28*dpiYFactor);
     //clear button
@@ -103,27 +103,8 @@ static bool insensitiveLessThan(const QString &a, const QString &b)
 void
 SearchBox::configChanged(qint32)
 {
-    int frameWidth = style()->pixelMetric(QStyle::PM_DefaultFrameWidth);
-    QColor color = QPalette().color(QPalette::Highlight);
-
-    setStyleSheet(QString( //"QLineEdit { padding-right: %1px; } "
-                      "QLineEdit#SearchBox {"
-                      "    border-radius: 3px; "
-                      "    border: 1px solid rgba(127,127,127,127);"
-                      "    padding: 0px %1px;"
-                      "}"
-                      "QLineEdit#SearchBox:focus {"
-                      "    border-radius: 3px; "
-#ifdef WIN32
-                      "    border: 1px solid rgba(%2,%3,%4,255);"
-#else
-                      "    border: 2px solid rgba(%2,%3,%4,255);"
-#endif
-                      "    padding: 0px %5px;"
-                      "}"
-             ).arg(clearButton->sizeHint().width() + frameWidth + 12)
-              .arg(color.red()).arg(color.green()).arg(color.blue())
-              .arg(clearButton->sizeHint().width() + frameWidth + 12));
+    QColor textColor = useTheme ? GColor(CTOOLBAR) : palette().color(QPalette::Base);
+    setSearchBoxStyle(GCColor::invertColor(textColor), 128, true);
 
     // get suitably formated list
     QList<QString> list;
@@ -203,6 +184,44 @@ SearchBox::configChanged(qint32)
 
     // set new list
     completer->setList(list);
+}
+
+void
+SearchBox::setSearchBoxStyle(const QColor& textColor, int alpha, bool configChange /* = false */)
+{
+    // setSearchBoxStyle gets called numerous times, so limit the stylesheet updates 
+    if ((textColor != currTextColor) || (alpha != currTextAplha) || configChange) {
+
+        int frameWidth = style()->pixelMetric(QStyle::PM_DefaultFrameWidth);
+        QColor borderColor = QPalette().color(QPalette::Highlight);
+        currTextColor = textColor;
+        currTextAplha = alpha;
+
+        QColor bkgdColor = useTheme ? GColor(CTOOLBAR) : palette().color(QPalette::Base);
+
+        setStyleSheet(QString(
+            "QLineEdit#SearchBox {"
+            "    color: rgba(%6,%7,%8,%9);"
+            "    background: rgba(%10,%11,%12,255);"
+            "    border-radius: 3px; "
+            "    border: 1px solid rgba(127,127,127,127);"
+            "    padding: 0px %1px;"
+            "}"
+            "QLineEdit#SearchBox:focus {"
+            "    border-radius: 3px; "
+#ifdef WIN32
+            "    border: 1px solid rgba(%2,%3,%4,255);"
+#else
+            "    border: 2px solid rgba(%2,%3,%4,255);"
+#endif
+            "    padding: 0px %5px;"
+            "}"
+        ).arg(clearButton->sizeHint().width() + frameWidth + 12)
+            .arg(borderColor.red()).arg(borderColor.green()).arg(borderColor.blue())
+            .arg(clearButton->sizeHint().width() + frameWidth + 12)
+            .arg(textColor.red()).arg(textColor.green()).arg(textColor.blue()).arg(alpha)
+            .arg(bkgdColor.red()).arg(bkgdColor.green()).arg(bkgdColor.blue()));
+    }
 }
 
 void
@@ -299,10 +318,8 @@ void SearchBox::setMode(SearchBoxMode mode)
 void SearchBox::updateCloseButton(const QString& text)
 {
     if (clearButton->isVisible() && text.isEmpty()) mode == Search ? clearQuery() : clearFilter();
-    clearButton->setVisible(!text.isEmpty());
 
-    //REMOVED SINCE TOO HEAVY NOW AFFECTS CHARTS TOO
-    //if (mode == Search) searchSubmit(); // only do search as you type in search mode
+    clearButton->setVisible(!text.isEmpty());
 
     setGood(); // if user changing then don't stay red - wait till resubmitted
     checkMenu();
@@ -319,9 +336,10 @@ void SearchBox::searchSubmit()
 
 void SearchBox::clearClicked()
 {
-    setText("");
+    clear();
     filtered = false;
-    //mode == Search ? clearQuery() : clearFilter();
+    mode == Search ? clearQuery() : clearFilter();
+
     setGood();
 }
 
@@ -374,23 +392,19 @@ void SearchBox::runMenu(QAction *x)
 
 void SearchBox::setBad(QStringList errors)
 {
-    QPalette pal;
-    pal.setColor(QPalette::Text, Qt::red);
-    setPalette(pal);
+    setSearchBoxStyle(QColor(Qt::red), 255);
 
     setToolTip(errors.join(tr(" and ")));
 }
 
 void SearchBox::setGood()
 {
-    QPalette pal;
-    pal.setColor(QPalette::Text, Qt::black);
-    setPalette(pal);
+    QColor bkgd = useTheme ? GColor(CTOOLBAR) : palette().color(QPalette::Base);
+
+    setSearchBoxStyle(GCColor::invertColor(bkgd), 255);
 
     setToolTip("");
 }
-
-
 
 // Drag and drop columns from the chooser...
 void

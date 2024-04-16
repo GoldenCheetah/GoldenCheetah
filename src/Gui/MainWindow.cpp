@@ -336,7 +336,7 @@ MainWindow::MainWindow(const QDir &home)
     HelpWhatsThis *helpPerspectiveSelector = new HelpWhatsThis(perspectiveSelector);
     perspectiveSelector->setWhatsThis(helpPerspectiveSelector->getWhatsThisText(HelpWhatsThis::ToolBar_PerspectiveSelector));
 
-    searchBox = new SearchFilterBox(this,context,false);
+    searchBox = new SearchFilterBox(this,context,false, true);
 
     searchBox->setStyle(toolStyle);
     searchBox->setFixedWidth(400 * dpiXFactor);
