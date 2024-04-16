@@ -33,12 +33,11 @@
 #include <QDebug>
 
 const int BUTTON_SIZE = 12;
-const int TB_ICON_SIZE = 10;
 
 SearchBox::SearchBox(Context *context, QWidget *parent, bool nochooser)
     : QLineEdit(parent), context(context), parent(parent), filtered(false), nochooser(nochooser), active(false), fixed(false)
 {
-    setFixedHeight(28 *dpiYFactor);
+    setFixedHeight(28*dpiYFactor);
     //clear button
     clearButton = new QToolButton(this);
     clearButton->setStyleSheet("QToolButton { border: none; padding: 0px; }");
@@ -52,7 +51,7 @@ SearchBox::SearchBox(Context *context, QWidget *parent, bool nochooser)
 
     // tool button
     toolButton = new QToolButton(this);
-    QIcon toolB = iconFromPNG(":images/sidebar/extra.png", QSize(TB_ICON_SIZE * dpiXFactor, TB_ICON_SIZE * dpiYFactor)); 
+    QIcon toolB = iconFromPNG(":images/sidebar/extra.png", QSize(BUTTON_SIZE*dpiXFactor, BUTTON_SIZE*dpiYFactor));
 #ifdef Q_OS_MAC
     toolButton->setStyleSheet("QToolButton { background: transparent; }");
 #else
@@ -69,7 +68,7 @@ SearchBox::SearchBox(Context *context, QWidget *parent, bool nochooser)
 
     // search button
     searchButton = new QToolButton(this);
-    QIcon search = iconFromPNG(":images/toolbar/search3.png", QSize(BUTTON_SIZE * dpiXFactor, BUTTON_SIZE * dpiYFactor));
+    QIcon search = iconFromPNG(":images/toolbar/search3.png", QSize(BUTTON_SIZE*dpiXFactor, BUTTON_SIZE*dpiYFactor));
     searchButton->setStyleSheet("QToolButton { border: none; padding: 1px; }");
     searchButton->setIconSize(QSize(BUTTON_SIZE*dpiXFactor, BUTTON_SIZE *dpiYFactor));
     searchButton->setIcon(search);
@@ -246,8 +245,8 @@ void SearchBox::resizeEvent(QResizeEvent *)
     // Create layout order left to right
     searchButton->move(3*dpiXFactor, 6*dpiYFactor);
     setTextMargins(0, 0, frameWidth + tsz.width(), 0);
-    clearButton->move(rect().right() - frameWidth - tsz.width() - cbz.width() - 3, 3);
-    toolButton->move(rect().right() - frameWidth - tsz.width() - 1, 3);
+    clearButton->move(rect().right() - frameWidth - tsz.width() - cbz.width() - 3*dpiXFactor, 6*dpiYFactor);
+    toolButton->move(rect().right() - frameWidth - tsz.width() - 3*dpiXFactor, 6*dpiYFactor);
 }
 
 void SearchBox::setFixedMode(bool fixed)
@@ -269,9 +268,9 @@ void SearchBox::setMode(SearchBoxMode mode)
 
         case Filter:
         {
-            QIcon filter = iconFromPNG(":images/toolbar/filter3.png", QSize(BUTTON_SIZE * dpiXFactor, BUTTON_SIZE * dpiYFactor));
+            QIcon filter = iconFromPNG(":images/toolbar/filter3.png", QSize(BUTTON_SIZE*dpiXFactor, BUTTON_SIZE*dpiYFactor));
             searchButton->setStyleSheet("QToolButton { border: none; padding: 1px; }");
-            searchButton->setIconSize(QSize(BUTTON_SIZE * dpiXFactor, BUTTON_SIZE * dpiYFactor));
+            searchButton->setIconSize(QSize(BUTTON_SIZE*dpiXFactor, BUTTON_SIZE*dpiYFactor));
             searchButton->setIcon(filter);
             setPlaceholderText(tr("Filter..."));
         }
@@ -280,9 +279,9 @@ void SearchBox::setMode(SearchBoxMode mode)
         case Search:
         default:
         {
-            QIcon search = iconFromPNG(":images/toolbar/search3.png", QSize(BUTTON_SIZE * dpiXFactor, BUTTON_SIZE * dpiYFactor));
+            QIcon search = iconFromPNG(":images/toolbar/search3.png", QSize(BUTTON_SIZE*dpiXFactor, BUTTON_SIZE*dpiYFactor));
             searchButton->setStyleSheet("QToolButton { border: none; padding: 1px; }");
-            searchButton->setIconSize(QSize(BUTTON_SIZE * dpiXFactor, BUTTON_SIZE * dpiYFactor));
+            searchButton->setIconSize(QSize(BUTTON_SIZE*dpiXFactor, BUTTON_SIZE*dpiYFactor));
             searchButton->setIcon(search);
             setPlaceholderText(tr("Search..."));
         }
