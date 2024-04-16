@@ -246,7 +246,11 @@ void SearchBox::resizeEvent(QResizeEvent *)
     searchButton->move(3*dpiXFactor, 6*dpiYFactor);
     setTextMargins(0, 0, frameWidth + tsz.width(), 0);
     clearButton->move(rect().right() - frameWidth - tsz.width() - cbz.width() - 3*dpiXFactor, 6*dpiYFactor);
+#ifdef Q_OS_MAC
+    toolButton->move(rect().right() - frameWidth - tsz.width() - 3*dpiXFactor, 3*dpiYFactor);
+#else
     toolButton->move(rect().right() - frameWidth - tsz.width() - 3*dpiXFactor, 6*dpiYFactor);
+#endif
 }
 
 void SearchBox::setFixedMode(bool fixed)
