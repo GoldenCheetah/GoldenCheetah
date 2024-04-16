@@ -25,7 +25,7 @@
 #include "RideCache.h"
 #include "RideItem.h"
 
-SearchFilterBox::SearchFilterBox(QWidget *parent, Context *context, bool nochooser) : QWidget(parent), context(context)
+SearchFilterBox::SearchFilterBox(QWidget *parent, Context *context, bool nochooser, bool manageFilters, bool useTheme) : QWidget(parent), context(context)
 {
 
     setContentsMargins(0,0,0,0);
@@ -34,7 +34,7 @@ SearchFilterBox::SearchFilterBox(QWidget *parent, Context *context, bool nochoos
     contents->setContentsMargins(0,0,0,0);
 
     // no column chooser if my parent widget is a modal widget
-    searchbox = new SearchBox(context, this, nochooser);
+    searchbox = new SearchBox(context, this, nochooser, manageFilters, useTheme);
     searchbox->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed));
     contents->addWidget(searchbox);
 

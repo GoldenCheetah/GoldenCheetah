@@ -42,7 +42,7 @@ public:
     enum searchboxmode { Search, Filter };
     typedef enum searchboxmode SearchBoxMode;
 
-    SearchBox(Context *context, QWidget *parent = 0, bool nochooser=true);
+    SearchBox(Context *context, QWidget *parent, bool nochooser = true, bool manageFilters = true, bool useTheme = false);
 
     // either search box or filter box
     void setMode(SearchBoxMode mode);
@@ -94,6 +94,7 @@ private slots:
     void keyPressEvent(QKeyEvent *e);
 
     void configChanged(qint32);
+    void setSearchBoxStyle(const QColor& textColor, int alpha, bool configChange = false);
 
 signals:
     // text search mode
@@ -119,6 +120,10 @@ private:
     DataFilterCompleter *completer;
     bool active;
     bool fixed;
+    bool useTheme;
+    bool manageFilters;
+    int currTextAplha;
+    QColor currTextColor;
 };
 
 class DataFilterCompleter : public QCompleter

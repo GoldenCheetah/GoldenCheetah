@@ -256,7 +256,7 @@ EditNamedSearches::EditNamedSearches(QWidget *parent, Context *context) : QDialo
     layout->addLayout(row2);
     QLabel *filter = new QLabel(tr("Filter"), this);
     row2->addWidget(filter);
-    editSearch = new SearchBox(context, this, true);
+    editSearch = new SearchBox(context, this, true, false);
     row2->addWidget(editSearch);
 
     // add/update buttons
@@ -301,6 +301,29 @@ EditNamedSearches::EditNamedSearches(QWidget *parent, Context *context) : QDialo
     row4->addStretch();
     deleteButton = new QPushButton(tr("Delete"), this);
     row4->addWidget(deleteButton);
+    row4->addStretch();
+    closeButton = new QPushButton(tr("Close"), this);
+    row4->addWidget(closeButton);
+
+    // The QlineEdit & QTreeWidget pick up the style from the location they launched and
+    // as the popup diagloues do not follow the theme, in these cases a correction is required.
+    QColor color = QPalette().color(QPalette::Highlight);
+    QString qbaseStyle = QString(" {  background-color: rgbs(255,255,255,255); "
+                                 "    color: rgbs(0, 0, 0, 255); "
+                                 "    border-radius: 3px; "
+                                 "    border: 1px solid rgba(127,127,127,127); } ");
+
+    QString qfocusStyle = QString("   QLineEdit:focus { "
+                                 "    border-radius: 3px; "
+#ifdef WIN32
+                                 "    border: 1px solid rgba(%1,%2,%3,255);"
+#else
+                                 "    border: 2px solid rgba(%1,%2,%3,255);"
+#endif
+                                 "}" ).arg(color.red()).arg(color.green()).arg(color.blue());
+
+    editName->setStyleSheet(QString(" QLineEdit ") + qbaseStyle + qfocusStyle);
+    searchList->setStyleSheet(QString(" QTreeWidget ") + qbaseStyle);
 
     // Populate the list of named searches
     foreach(NamedSearch x, context->athlete->namedSearches->getList()) {
@@ -319,6 +342,7 @@ EditNamedSearches::EditNamedSearches(QWidget *parent, Context *context) : QDialo
     // connect the buttons
     connect(addButton, SIGNAL(clicked()), this, SLOT(addClicked()));
     connect(deleteButton, SIGNAL(clicked()), this, SLOT(deleteClicked()));
+    connect(closeButton, SIGNAL(clicked()), this, SLOT(close()));
     connect(updateButton, SIGNAL(clicked()), this, SLOT(updateClicked()));
     connect(upButton, SIGNAL(clicked()), this, SLOT(upClicked()));
     connect(downButton, SIGNAL(clicked()), this, SLOT(downClicked()));
