@@ -2,8 +2,9 @@
 set -ev
 
 date
-# update to use latest Qt5 version
-brew update
+# Don't update to use included Qt version
+export HOMEBREW_NO_AUTO_UPDATE=1
+export HOMEBREW_NO_INSTALL_CLEANUP=1
 
 brew install qt5
 brew install bison@2.7
