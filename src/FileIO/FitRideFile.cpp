@@ -437,7 +437,7 @@ struct FitFileParser
     double last_distance;
     QMap<int, FitMessage> local_msg_types;
     QMap<QString, FitFieldDefinition>  local_deve_fields; // All developer fields
-    QMap<int, FitDeveApp> local_deve_fields_app; // All developper apps
+    QMap<QString, FitDeveApp> local_deve_fields_app; // All developper apps
     QMap<int, int> record_extra_fields;
     QMap<QString, int> record_deve_fields; // Developer fields in DEVELOPER XDATA or STANDARD DATA
     QMap<QString, int> record_deve_native_fields; // Developer fields with native values
@@ -1580,8 +1580,9 @@ struct FitFileParser
             record_deve_fields.insert(key, -1);
 
         // Add field for app
-        if (local_deve_fields_app.contains(deveField.dev_id)) {
-            local_deve_fields_app[deveField.dev_id].fields.append(deveField);
+        QString appKey = QString("%1").arg(deveField.dev_id);
+        if (local_deve_fields_app.contains(appKey)) {
+            local_deve_fields_app[appKey].fields.append(deveField);
         }
     }
 
@@ -3770,9 +3771,16 @@ genericnext:
         if (FIT_DEBUG && FIT_DEBUG_LEVEL>2)
             qDebug() << "DEVE ID" << deve.dev_id.c_str() << "app_id" << deve.app_id.c_str() << "man_id" << deve.man_id << "dev_data_id" << deve.dev_data_id << "app_version" << deve.app_version;
 
-        if (!local_deve_fields_app.contains(deve.dev_data_id)) {
-            local_deve_fields_app.insert(deve.dev_data_id, deve);
+        QString appKey = QString("%1").arg(deve.dev_data_id);
+        if (local_deve_fields_app.contains(appKey)) {
+            FitDeveApp lastDeveApp = local_deve_fields_app[appKey];
+            if (lastDeveApp.app_id != deve.app_id) {
+                local_deve_fields_app.insert(deve.app_id.c_str(), lastDeveApp);
+            }
         }
+        local_deve_fields_app.insert(appKey, deve);
+
+
     }
 
     void decodeDeveloperFieldDescription(const FitMessage &def, int time_offset,
@@ -3846,9 +3854,9 @@ genericnext:
 
         QString key = QString("%1.%2").arg(fieldDef.dev_id).arg(fieldDef.num);
 
-        if (!local_deve_fields.contains(key)) {
-            local_deve_fields.insert((key), fieldDef);
-        }
+        // add or replace with new definition
+        local_deve_fields.insert((key), fieldDef);
+
 
         if (fieldDef.native > -1 && !record_deve_native_fields.values().contains(fieldDef.native)) {
             record_deve_native_fields.insert(key, fieldDef.native);
