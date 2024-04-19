@@ -1682,7 +1682,7 @@ struct FitFileParser
                 QString const& key = sle.key();
                 // meta data is prefixed w/ '_', otherwise its a ride file tag
                 if (key.startsWith('_')) {
-                    if (0 == QString::compare(key, "_timestamp", Qt::CaseInsensitive)) {
+                    if (0 == QString::compare(key, "_stop_time", Qt::CaseInsensitive)) {
                         stop = sle->toUInt();
                     } else if (start == 0 && 0 == QString::compare(key, "_start_time", Qt::CaseInsensitive)) {
                         // only do once
@@ -2089,14 +2089,16 @@ genericnext:
                 case 254: //index
                 case 0:   //event
                 case 1:    /* event_type */
+                    break; // do nothing
                 case 2:    /* start_time */
                     this_start_time = value + qbase_time.toSecsSinceEpoch();
                     active_session_["_start_time"] = static_cast<quint32>(this_start_time);
                     break;
                 case 3:    /* start_position_lat */
                 case 4:    /* start_position_long */
+                    break; // do nothing
                 case 7:    /* total elapsed time */
-                    this_elapsed_time = value + qbase_time.toSecsSinceEpoch();
+                    this_elapsed_time = value;
                     active_session_["_total_elapsed_time"] = static_cast<quint32>(this_elapsed_time);
                     break;
                 case 8:    /* total timer time */
@@ -2159,6 +2161,7 @@ genericnext:
             rideFile->setTag("SubSport", subsport);
         }
 
+
         // same procedure as for laps, code is c/p until a better solution is found
         if (this_timestamp == 0 && this_elapsed_time > 0) {
             this_timestamp = iniTime + this_elapsed_time - 1;
@@ -2175,6 +2178,11 @@ genericnext:
                 errors << QString("lap %1 is ignored (invalid end time)").arg(interval);
                 return;
             }
+        }
+
+        if (this_elapsed_time > 0) {
+            time_t this_stop_time = this_start_time + round(this_elapsed_time/1000.0);
+            active_session_["_stop_time"] = static_cast<quint32>(this_stop_time);
         }
 
         session_tags_.append(active_session_);
