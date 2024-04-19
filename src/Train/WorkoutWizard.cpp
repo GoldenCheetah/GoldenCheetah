@@ -355,12 +355,14 @@ void AbsWattagePage::updateMetrics()
 #endif
 }
 
-void AbsWattagePage::SaveWorkout()
+bool AbsWattagePage::SaveWorkout()
 {
     QString workoutDir = appsettings->value(this,GC_WORKOUTDIR).toString();
 
     QString filename = QFileDialog::getSaveFileName(this,QString(tr("Save Workout")),
                                                     workoutDir,tr("Computrainer Format *.erg"));
+    if (filename.isEmpty()) return false;
+
     if(!filename.endsWith(".erg"))
     {
         filename.append(".erg");
@@ -396,6 +398,7 @@ void AbsWattagePage::SaveWorkout()
     QStringList files;
     files << filename;
     Library::importFiles(hackContext, files);
+    return true;
 }
 
 /// RelativeWattagePage
@@ -494,12 +497,14 @@ void RelWattagePage::updateMetrics()
 #endif
 }
 
-void RelWattagePage::SaveWorkout()
+bool RelWattagePage::SaveWorkout()
 {
     QString workoutDir = appsettings->value(this,GC_WORKOUTDIR).toString();
 
     QString filename = QFileDialog::getSaveFileName(this,QString(tr("Save Workout")),
                                                     workoutDir,tr("Computrainer Format *.mrc"));
+    if (filename.isEmpty()) return false;
+
     if(!filename.endsWith(".mrc"))
     {
         filename.append(".mrc");
@@ -535,6 +540,7 @@ void RelWattagePage::SaveWorkout()
     QStringList files;
     files << filename;
     Library::importFiles(hackContext, files);
+    return true;
 }
 
 /// GradientPage
@@ -594,12 +600,14 @@ void GradientPage::updateMetrics()
     metricsSummary->updateMetrics(metricSummaryMap);
 }
 
-void GradientPage::SaveWorkout()
+bool GradientPage::SaveWorkout()
 {
     QString workoutDir = appsettings->value(this,GC_WORKOUTDIR).toString();
 
     QString filename = QFileDialog::getSaveFileName(this,QString(tr("Save Workout")),
                                                     workoutDir,tr("Computrainer Format *.crs"));
+    if (filename.isEmpty()) return false;
+
     if(!filename.endsWith(".crs"))
     {
         filename.append(".crs");
@@ -634,6 +642,7 @@ void GradientPage::SaveWorkout()
     QStringList files;
     files << filename;
     Library::importFiles(hackContext, files);
+    return true;
 }
 
 
@@ -752,11 +761,13 @@ void ImportPage::updatePlot()
     update();
 }
 
-void ImportPage::SaveWorkout()
+bool ImportPage::SaveWorkout()
 {
     QString workoutDir = appsettings->value(this,GC_WORKOUTDIR).toString();
     QString filename = QFileDialog::getSaveFileName(this,QString(tr("Save Workout")),
                                                     workoutDir,tr("Computrainer Format *.crs"));
+    if (filename.isEmpty()) return false;
+
     if(!filename.endsWith(".crs"))
     {
         filename.append(".crs");
@@ -784,6 +795,7 @@ void ImportPage::SaveWorkout()
     QStringList files;
     files << filename;
     Library::importFiles(hackContext, files);
+    return true;
 }
 
 WorkoutWizard::WorkoutWizard(Context *context) :QWizard(context->mainWindow)
@@ -805,6 +817,5 @@ WorkoutWizard::WorkoutWizard(Context *context) :QWizard(context->mainWindow)
 void WorkoutWizard::accept()
 {
     WorkoutPage *page = (WorkoutPage *)this->currentPage();
-    page->SaveWorkout();
-    done(0);
+    if (page->SaveWorkout()) done(0);
 }
