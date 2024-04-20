@@ -33,6 +33,7 @@
 #include <QRegExp>
 #include "Zones.h"      // For zones ... see below vvvv
 #include "LocationInterpolation.h"
+#include "Settings.h"
 
 // which section of the file are we in?
 #define NOMANSLAND  0
@@ -137,7 +138,12 @@ class ErgFile
 private:
         void sortLaps() const;
         void sortTexts() const;
+
+        bool coalescedSections = false;
+
 public:
+        void coalesceSections();
+        bool hasCoalescedSections() const;
 
         double nextLap(double) const;    // return the start value (erg - time(ms) or slope - distance(m)) for the next lap
         double prevLap(double) const;    // return the start value (erg - time(ms) or slope - distance(m)) for the prev lap

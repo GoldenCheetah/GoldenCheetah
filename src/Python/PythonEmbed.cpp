@@ -77,7 +77,7 @@ bool PythonEmbed::pythonInstalled(QString &pybin, QString &pypath, QString PYTHO
             if (installnames.count() >0) break;
         }
 
-        printd("Binary found:%d\n", installnames.count());
+        printd("Binary found:%d\n", (int)installnames.count());
         // if we failed, its not installed
         if (installnames.count()==0) return false;
 

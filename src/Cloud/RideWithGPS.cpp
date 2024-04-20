@@ -160,7 +160,7 @@ RideWithGPS::writeFile(QByteArray &, QString remotename, RideFile *ride)
         data += ",\"y\":";
         data += QString("%1").arg(point->lat,0,'f',GPS_COORD_TO_STRING);
         data += ",\"t\":";
-        data += QString("%1").arg(rideDateTime.toTime_t());
+        data += QString("%1").arg(rideDateTime.toSecsSinceEpoch());
         data += ",\"e\":";
         data += QString("%1").arg(point->alt);
         data += ",\"p\":";

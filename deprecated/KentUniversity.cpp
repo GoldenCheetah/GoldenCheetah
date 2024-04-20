@@ -216,7 +216,7 @@ bool KentUniversity::createFolder(QString path) {
         return true;
     }
     // TODO(gille): This only supports directories in the root. Fix that.
-    QStringList parts = path.split("/", QString::SkipEmptyParts);
+    QStringList parts = path.split("/", Qt::SkipEmptyParts);
     QString dir_name = parts.back();
     FileInfo* parent_fi = WalkFileInfo(path, true);
     if (parent_fi == NULL) {
@@ -273,7 +273,7 @@ bool KentUniversity::createFolder(QString path) {
 
 KentUniversity::FileInfo* KentUniversity::WalkFileInfo(const QString& path,
                                                  bool foo) {
-    QStringList parts = path.split("/", QString::SkipEmptyParts);
+    QStringList parts = path.split("/", Qt::SkipEmptyParts);
     FileInfo* target = root_dir_.data();
     // Lets walk!
     for (QStringList::iterator it = parts.begin(); it != parts.end(); ++it) {
@@ -772,7 +772,7 @@ KentUniversity::FileInfo* KentUniversity::BuildDirectoriesForAthleteDirectory(
         return NULL;
     }
     printd("GC_UOK_GOOGLE_DRIVE_FOLDER_ID: %s\n", id.toStdString().c_str());
-    QStringList parts = path.split("/", QString::SkipEmptyParts);
+    QStringList parts = path.split("/", Qt::SkipEmptyParts);
     FileInfo *fi = root_dir_.data();
 
     for (QStringList::iterator it = parts.begin(); it != parts.end(); ++it) {

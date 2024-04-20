@@ -451,7 +451,12 @@ ChartTableWidget::mimeTypes() const
 }
 
 QMimeData *
-ChartTableWidget::mimeData (const QList<QTableWidgetItem *> items) const
+ChartTableWidget::mimeData
+#if QT_VERSION < 0x060000
+(const QList<QTableWidgetItem *> items) const
+#else
+(const QList<QTableWidgetItem *> &items) const
+#endif
 {
     QMimeData *returning = new QMimeData;
 

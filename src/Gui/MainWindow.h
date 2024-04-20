@@ -36,6 +36,8 @@
 #include "CloudDBTelemetry.h"
 #endif
 
+#include "SplashScreen.h"
+
 #ifdef Q_OS_MAC
 // What versions are supported by this SDK?
 #include <AvailabilityMacros.h>
@@ -70,10 +72,10 @@ class Athlete;
 class AthleteLoader;
 class Context;
 class AthleteTab;
+class GGraphicsView;
 
 
 extern QList<MainWindow *> mainwindows; // keep track of all the MainWindows we have open
-extern QDesktopWidget *desktop;         // how many screens / res etc
 extern QString gcroot;                  // root directory for gc
 
 class MainWindow : public QMainWindow
@@ -89,10 +91,6 @@ class MainWindow : public QMainWindow
         void byebye() { close(); } // go bye bye for a restart
         bool init; // if constructor has completed set to true
 
-        // when loading athlete
-        QLabel *progress;
-        int loading;
-
         // currently selected tab
         AthleteTab *athleteTab() { return currentAthleteTab; }
         NewSideBar *newSidebar() { return sidebar; }
@@ -103,12 +101,15 @@ class MainWindow : public QMainWindow
         // switch perspective
         void switchPerspective(int index);
 
+        bool isStarting() const;
+
     protected:
 
         // used by ChooseCyclistDialog to see which athletes
         // have already been opened
         friend class ::ChooseCyclistDialog;
         friend class ::AthleteLoader;
+        friend class ::GGraphicsView;
         QMap<QString,AthleteTab*> athletetabs;
         AthleteTab *currentAthleteTab;
         QList<AthleteTab*> tabList;
@@ -120,8 +121,8 @@ class MainWindow : public QMainWindow
         virtual void dropEvent(QDropEvent *);
 
         // working with splash screens
-        QWidget *splash;
-        void setSplash(bool first=false);
+        SplashScreen *splash;
+        void setSplash();
         void clearSplash();
 
     signals:
@@ -132,7 +133,6 @@ class MainWindow : public QMainWindow
         void deletedAthlete(QString);
 
     public slots:
-
         bool eventFilter(QObject*,QEvent*);
 
         // GUI
@@ -143,6 +143,9 @@ class MainWindow : public QMainWindow
         void logBug();
         void support();
         void actionClicked(int);
+
+        void loadProgress(QString folder, double progress);
+
 
         // perspective selected
         void perspectiveSelected(int index);
@@ -155,6 +158,9 @@ class MainWindow : public QMainWindow
 
         // chart importing
         void importCharts(QStringList);
+
+        // import images into the current ride
+        void importImages(QStringList);
 
         // open and closing windows and tabs
         void closeWindow();
@@ -230,7 +236,7 @@ class MainWindow : public QMainWindow
         // Training View
         void addDevice();
         void downloadErgDB();
-        void downloadTodaysPlanWorkouts();
+        void downloadStravaRoutes();
         void manageLibrary();
         void showWorkoutWizard();
         void importWorkout();
@@ -294,6 +300,7 @@ class MainWindow : public QMainWindow
 
     private:
 
+        // when loading athlete
         NewSideBar *sidebar;
         AthleteView *athleteView;
 

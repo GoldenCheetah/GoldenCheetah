@@ -35,7 +35,7 @@
 #include <QJsonArray>
 #include <QXmlInputSource>
 #include <QXmlSimpleReader>
-#include <QDesktopWidget>
+#include <QRegularExpressionValidator>
 
 CloudDBUserMetricClient::CloudDBUserMetricClient()
 {
@@ -652,7 +652,7 @@ CloudDBUserMetricListDialog::updateCurrentPresets(int index, int count) {
         QTableWidgetItem *newItem = new QTableWidgetItem(preset.name);
         newItem->setFlags(newItem->flags() & ~Qt::ItemIsEditable);
         tableWidget->setItem(i, 0, newItem);
-        tableWidget->item(i,0)->setBackgroundColor(Qt::darkGray);
+        tableWidget->item(i,0)->setBackground(Qt::darkGray);
         tableWidget->setRowHeight(i, 80*dpiYFactor);
 
         QString cellText = QString(tr("%1<h4>Last Edited At: %2 - Creator: %3</h4>"))
@@ -949,7 +949,7 @@ CloudDBUserMetricListDialog::applyAllFilters() {
     g_currentHeaderList->clear();
     if (!textFilter->text().isEmpty()) {
         // split by any whitespace
-        searchList = textFilter->text().split(QRegExp("\\s+"), QString::SkipEmptyParts);
+        searchList = textFilter->text().split(QRegularExpression("\\s+"), Qt::SkipEmptyParts);
     }
     foreach (CommonAPIHeaderV1 usermetric, *g_fullHeaderList) {
 
@@ -1036,8 +1036,8 @@ CloudDBUserMetricObjectDialog::CloudDBUserMetricObjectDialog(UserMetricAPIv1 dat
        name->setText(data.Header.Name);
        nameOk = true; // no need to re-check
    }
-   QRegExp name_rx("^.{5,50}$");
-   QValidator *name_validator = new QRegExpValidator(name_rx, this);
+   QRegularExpression name_rx("^.{5,50}$");
+   QValidator *name_validator = new QRegularExpressionValidator(name_rx, this);
    name->setValidator(name_validator);
 
    QLabel* langLabel = new QLabel(tr("Language"));
@@ -1071,8 +1071,8 @@ CloudDBUserMetricObjectDialog::CloudDBUserMetricObjectDialog(UserMetricAPIv1 dat
        email->setText(appsettings->cvalue(athlete, GC_CLOUDDB_EMAIL, "").toString());
    }
    // regexp: simple e-mail validation / also allow long domain types & subdomains
-   QRegExp email_rx("^.+@([a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,10}$");
-   QValidator *email_validator = new QRegExpValidator(email_rx, this);
+   QRegularExpression email_rx("^.+@([a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,10}$");
+   QValidator *email_validator = new QRegularExpressionValidator(email_rx, this);
    email->setValidator(email_validator);
    emailOk = !email->text().isEmpty(); // email from properties is ok when loaded
 

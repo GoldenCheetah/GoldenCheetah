@@ -173,7 +173,7 @@ AbstractView::ourStyleSheet()
     return QString::fromUtf8("QScrollBar { background-color: %1; border: 0px; }"
            "QTabWidget { background: %1; }"
            "QTabWidget::pane { border: 1px solid %2; } "
-           "QTextEdit { background: %1; }"
+           "QTextEdit { background: %1; color: %7; }"
            "QTextEdit#metadata { background: %3; }"
            "QTreeView { background: %1; }"
            "QScrollBar:vertical {"
@@ -247,6 +247,7 @@ AbstractView::ourStyleSheet()
             .arg(8 * dpiXFactor) // width
             .arg(4 * dpiXFactor) // border radius
             .arg(GColor(CPLOTMARKER).name())
+            .arg(GCColor::invertColor(GColor(CPLOTBACKGROUND)).name())
             ;
 }
 
@@ -289,7 +290,9 @@ AbstractView::saveState()
     };
     file.resize(0);
     QTextStream out(&file);
+#if QT_VERSION < 0x060000
     out.setCodec("UTF-8");
+#endif
 
     // is just a collection of layout (aka old HomeWindow name-layout.xml)
     out<<"<layouts>\n";

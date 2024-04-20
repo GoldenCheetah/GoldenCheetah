@@ -1,36 +1,29 @@
-Update Note: to build GoldenCheetah v3.6 we are using the Homebrew Package
-Manager to install dependencies, including Qt and GSL, on Travis-ci
-macOS Mojave build environment.
-You can check the travis/osx folder for the complete and updated build scripts,
-the minimum Qt version known to work is 5.13 with Qt WebEngine and Qt Charts.
-GSL - GNU Scientific Library is a mandatory dependency starting with v3.6 and
-minimum bison version is 2.7, both can be installed using Homebrew.
-
-Ale Martinez - Oct, 2022
-
                                  +++++++++++++++++++++++
-                                MAC OSX BUILD WALKTHROUGH
+                                 MACOS BUILD WALKTHROUGH
                                  +++++++++++++++++++++++
 
                                      Mark Liversedge
+                                     Ale Martinez
 
-                                        Jan 2015
-                                      Version 1.2
+                                        Mar 2024
+                                      Version 3.7
 
 A walkthrough of building GoldenCheetah from scratch on Mac OSX. This was performed
-on Mac OSX Lion (10.7) but the instructions are largely the same for all versions of
-Mac OS X.
+on macOS Sonoma (14.4) but the instructions are largely the same for all current
+versions of macOS.
 
 CONTENTS
 
 1. BASIC INSTALLATION WITH MANDATORY DEPENDENCIES
    - Xcode
+   - HomeBrew
    - Qt
+   - GSL
+   - Bison
 
 2. ADDING OPTIONAL DEPENDENCIES
    - FTDI D2XX
    - SRMIO
-   - libkml
    - libusb
    - libical
 
@@ -41,28 +34,24 @@ CONTENTS
 Depending upon the speed of your internet connection and availability of the
 required software the steps in section 1 will take approximately 1 hour.
 
-1.1 Ensure OS X is up-to-date
------------------------------
+1.1 Ensure macOS is up-to-date
+------------------------------
 
 Make sure you have applied all the latest updates to Mac OS X. This can be
 found from the system menu, apple, about this mac, software update.
 
-This walkthrough was performed on an iMac running 10.7.2 (Lion)
+This walkthrough was performed on a MacBook Air running 14.4 (Sonoma)
 
 1.2 Install XCode from App Store
 --------------------------------
 
-If you are building on 10.6 or higher you should install Xcode4, for earlier
-releases you will need Xcode 3.1.4. If you have capable hardware you should
-consider upgrading to Lion to get the latest bug fixes and capabilities.
-
-To install Xcode on Lion you need to download it via the App Store. You can
+To install Xcode on macOS you need to download it via the App Store. You can
 launch the App Store from launchpad, or it may be already in your dock.
 
-Under the search box type in Xcode and it will return a few optios, generally
+Under the search box type in Xcode and it will return a few options, generally
 Xcode is the first item and shows a blueprint with a hammer icon. Click on
 this to install it. It should be free. The usual app store process will apply
-as the application is downloaded and installed. The download is about 2GB
+as the application is downloaded and installed. The download is about 4GB
 so do bear this in mind if you have limits on your internet bandwidth or cap.
 
 1.3 Run the Xcode installer
@@ -76,11 +65,7 @@ SDKs. It also installs the 'git' tool for working with Git repositories.
 
 It will run through a wizard to install, just read and then accept the license
 agreement and let it get on with it. If you don't like the license then quit
-and use the development builds from goldencheetah.stand2surtf.net.
-
-You may find it borks at iTunes helper running, you will
-need to force quit the iTunes helper via Finder, Applications, Utilities,
-Activity Monitor if this happens.
+and use the developemnt or snapshot builds from https://www.goldencheetah.org
 
 1.4 Get the source code
 -----------------------
@@ -93,7 +78,7 @@ First open up a terminal session, then;
 $ cd
 $ mkdir Projects
 $ cd Projects
-$ git clone git://github.com/GoldenCheetah/GoldenCheetah.git
+$ git clone https://github.com/GoldenCheetah/GoldenCheetah.git
 
 You will now have the GoldenCheetah sources downloaded into a 'GoldenCheetah'
 directory in your home directory, under another folder called 'Projects'.
@@ -107,65 +92,44 @@ build a release you need to checkout the code at the tag for the release.
 
 A list of releases can be found at: https://github.com/GoldenCheetah/GoldenCheetah/tags
 
-$ git checkout V3.3-RC1
+$ git checkout V3.6
 $ ls
 
-You will now see an updated version of this walkthrough, please jump to using
-that since it may be more up-to-date than this walkthrough (depending upon
-where you got it from of course!).
+The following walkthrough is based on latest master, if you want to build v3.6 please
+see the travis scripts in the repository.
 
-1.5 Install the QT SDK
-----------------------
+1.5 Install HomeBrew
+--------------------
 
-GoldenCheetah is developed using the Nokia QT toolkit, it is large and will
-need to be downloaded and installed from their website. Alternatively, you 
-can intall qt via macports (http://www.macports.org) as described in section 
-1.5.1. 
+The easiest way to install GoldenCheetah dependencies on macOS is via HomeBrew package
+manager, if you don't have it installed yet, follow the instructions in their home page:
+https://brew.sh/
 
-As of today, the latest stable release is 5.6.0, we need 4.7 or higher so
-go ahead and download the offline installer - it has everything you need
-but is about 1.3GB. Please make sure you download the installer for Mac
-OS X 10.6 or later, 64-bit.
-
-The url for QT downloads is: https://www.qt.io/download-open-source/#section-2 and 
-whilst the offline installer is only 12mb it will still call back and download the
-required objects as you install, I think it is better to get it all in
-one hit (and you can save it to reinstall on another computer or if you
-want to rebuild/reinstall for any other reason).
-
-Once the QT SDK is downloaded you will have a .dmg (disk image) that you
-need to mount by double clicking on it. You will then get a volume mounted
-and shown on your desktop. Go ahead and double click that to start the install
-process. It is probably called something like 'Qt SDK Installer'.
-
-It will popup with a dialog warning that this is downloaded from the internet
-and are you sure you want to open it? Go ahead and click Open.
-
-A wizard will now guide you through the QT install process. Go ahead and accept
-all the defaults, it will install in your home directory and avoid updating the
-system directories, this means you are less likely to bork your Mac OSX installation.
-
-Read and accept the license agreement and then continue and install.
-
-We need to make sure that a program called qmake is installed in a directory where
-it can be found. So, we need to create a link from what we just installed in the
-user programs folder. For QT SDK (5.6) we need to:
-
-$ sudo ln -s ~/Qt5.6.0/5.6/clang_64/bin/qmake /usr/local/bin/qmake
-
-1.5.1 Install via Mac Ports
----------------------------
-
-If you have macports installed, you can install the qt dependices 
-with the following commands: 
-
-$ sudo port install qt4-mac
-$ sudo port install qt4-mac-sqlite3-plugin
-
-1.6 DEPRECATED
+1.6 Install Qt
 --------------
 
-No longer need this step (install boost)
+Latest stable release can be installed as:
+$ brew update
+$ brew install Qt6
+
+Follow the instructions to add Qt to PATH and test using:
+$ qmake --version
+
+1.6 Install GSL and Bison
+-------------------------
+
+GSL is a mandatory dependency from v3.6, you can install using HomeBrew:
+
+$ brew install gsl
+
+The Bison version included in Xcode is too old (2.3), you can install a
+newer version using HomeBrew:
+
+$ brew install bison
+
+adding it to PATH as indicated, check version using:
+
+$ bison --version
 
 1.7 Configure and Build GoldenCheetah (with no optional dependencies)
 ---------------------------------------------------------------------
@@ -182,37 +146,23 @@ $ vi gcconfig.pri
 
 In that last step you can use whatever editor you feel most comfortable with.
 
-For now we will comment out some of the dependencies we have not installed
-support for yet:
-
-#SRMIO_INSTALL = /usr/local/srmio
-#D2XX_INCLUDE = /usr/local/include/D2XX
-
 we may need to additionally configure to use the local compression
 libraries (at least I did), by adding the following line:
 
 LIBS += -lz
 
-Lastly, since we are on Lion, we can also uncomment and change the following line:
+and GSL location:
 
-DEFINES += GC_HAVE_LION
+GSL_INCLUDES = /usr/include
+GSL_LIBS = -L/opt/homebrew/lib/ -lgsl -lgslcblas -lm
 
-Once the changes have been made we are now ready to build for the first time. You
-may notice a lot of warning messages about the version of O/S not being supported.
-This is because QT does not officially support Lion at this point in time (but it
-does work). You can either ignore the warning messages or (like me) go and edit out
-the warning (once you have seen the message once you don't need reminding every
-time you compile).
+Lastly, we can also uncomment and change the following line:
 
-To do this, edit the file in question as an administrator:
+QMAKE_MOVE = cp
 
-$ sudo vi ~/QtSDK/Desktop/Qt/474/gcc/include/QtCore/qglobal.h
+if Bison version is higher than 3.7
 
-And comment out line 320 (or thereabouts):
-
-//#    warning "This version of Mac OS X is unsupported"
-
-Once this is done you can kick off the build:
+Once the changes have been made we are now ready to build for the first time.
 
 $ cd .. #this should put you in the top level dir containing this file
 $ qmake -recursive
@@ -222,12 +172,6 @@ When build first time you get number of error messages on .qm files missing:
     "RCC: Error in 'Resources/application.qrc': Cannot find file 'translations/gc_fr.qm'"
 You can ignore these messages for your build. The .qm files will be created during the
 build at a later point in time via the "lrelease" command you configured in gcconfig.pri)
-
-If make fails to find a Makefile then qmake is configured, by default, to create
-an xcode project file. You will need to change the qmake command above to tell it
-to create a makefile with the following:
-$ qmake -spec macx-g++ -recursive
-$ make
 
 Once this completes you will have a GoldenCheetah.app in the src directory which
 can be launched:
@@ -250,55 +194,19 @@ $ open src/GoldenCheetah.app
 2. ADDING OPTIONAL DEPENDENCIES
 ===============================
 
+   - D2XX
    - SRMIO
-   - libkml
    - libusb
    - libical
+   - Python embedding
+   - R embedding
 
 Since these optional dependencies are more complex and require more advanced
 technical skills we do not provide a walkthrough for building them all but
 instead provide the configure settings and any special considerations that
 should be taken into account.
 
-2.1 SRMIO - For working with PC 5/6/7
--------------------------------------
-
-SRMIO (git)
-./configure CFLAGS="-isysroot /Developer/SDKs/MacOSX10.7.sdk -arch x86_64" CPPFLAGS=-I/usr/local/D2XX/ --disable-dependency-tracking
-
-2.2 libkml - For export to Google Earth
----------------------------------------
-
-expat (2.0.1)
-./configure CFLAGS="-isysroot /Developer/SDKs/MacOSX10.7.sdk -arch x86_64" --disable-dependency-tracking 
-
-libkml (pulled down from the svn repo)
-
-./configure CFLAGS="-isysroot /Developer/SDKs/MacOSX10.7.sdk -arch x86_64" --disable-dependency-tracking --with-expat-include-dir=/usr/local/include --with-expat-lib-dir=/usr/local/lib --disable-swig CXXFLAGS="-isysroot /Developer/SDKs/MacOSX10.7.sdk -arch x86_64"
-
-note: the added CXXFLAGS helped clear the -Werror flag that stopped compilation.
-
-2.3 libusb - For Garmin USB2 stick support
-------------------------------------------
-
-libusb (0.1.12)
-
-To compile on OSX you need to apply the patch here:
-https://trac.macports.org/browser/trunk/dports/devel/libusb-legacy/files?rev=97840
-
-Then:
-./configure --prefix=/opt/libusb/ CFLAGS="-arch x86_64" CXXFLAGS="-arch x86_64" --disable-dependency-tracking
-then 
-sed -i 'bak' 's|CC -dynamiclib|CC -dynamiclib -arch x86_64|g' libtool
-make
-make install
-
-note: that the sed line updates some commands in libtool.  not sure why the arch clags are not getting passed.  
-
-2.4 libical
------------
-
-libical (0.46)
-first run autogen.sh
-then
-./configure CFLAGS="-isysroot /Developer/SDKs/MacOSX10.7.sdk -arch x86_64" --disable-dependency-tracking
+See Travis scripts in the repository for the changes you need to make:
+- travis/osx/before_install.sh
+- travis/osx/before_script.sh
+and then rebuild.

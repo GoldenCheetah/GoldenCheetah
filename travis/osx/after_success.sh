@@ -2,7 +2,8 @@
 set -ev
 cd src
 echo "Checking GoldenCheetah.app can execute"
-GoldenCheetah.app/Contents/MacOS/GoldenCheetah --version
+GoldenCheetah.app/Contents/MacOS/GoldenCheetah --version 2>GCversionMacOS.txt
+cat GCversionMacOS.txt
 
 echo "About to create dmg file and fix up"
 mkdir GoldenCheetah.app/Contents/Frameworks
@@ -48,18 +49,16 @@ do
 done
 popd
 
-# Final deployment to generate dmg (may take longer than 10' wihout output)
+# Final deployment to generate dmg (may take longer than 10' without output)
 python3.7 -m pip install travis-wait-improved
-/Library/Frameworks/Python.framework/Versions/3.7/bin/travis-wait-improved --timeout 20m /usr/local/opt/qt5/bin/macdeployqt GoldenCheetah.app -verbose=2 -fs=hfs+ -dmg
+/Library/Frameworks/Python.framework/Versions/3.7/bin/travis-wait-improved --timeout 30m /usr/local/opt/qt5/bin/macdeployqt GoldenCheetah.app -verbose=2 -fs=hfs+ -dmg
 
 echo "Renaming dmg file to branch and build number ready for deploy"
-export FINAL_NAME=GoldenCheetah_v3.6-DEV_x64.dmg
+export FINAL_NAME=GoldenCheetah_v3.7-DEV_x64.dmg
 mv GoldenCheetah.dmg $FINAL_NAME
 ls -l $FINAL_NAME
 
-echo "Mounting dmg file and testing it can execute"
-hdiutil mount $FINAL_NAME
-/Volumes/GoldenCheetah/GoldenCheetah.app/Contents/MacOS/GoldenCheetah --version 2>GCversionMacOS.txt
+# Add last commit message and SHA256 to txt file
 git log -1 >> GCversionMacOS.txt
 echo "SHA256 hash of $FINAL_NAME:" >> GCversionMacOS.txt
 shasum -a 256 $FINAL_NAME | cut -f 1 -d ' ' >> GCversionMacOS.txt

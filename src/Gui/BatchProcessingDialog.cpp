@@ -245,7 +245,7 @@ processed(0), fails(0), numFilesToProcess(0) {
     connect(selectDir, SIGNAL(clicked()), this, SLOT(selectClicked()));
 
     // radio buttons
-    connect(radioGroup, SIGNAL(buttonClicked(int)), this, SLOT(radioClicked(int)));
+    connect(radioGroup, SIGNAL(idClicked(int)), this, SLOT(radioClicked(int)));
 
     connect(all, SIGNAL(stateChanged(int)), this, SLOT(allClicked()));
     connect(ok, SIGNAL(clicked()), this, SLOT(okClicked()));

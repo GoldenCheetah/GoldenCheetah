@@ -48,6 +48,14 @@ class RideMapWindow;
 class IntervalSummaryWindow;
 class SmallPlot;
 
+
+struct PositionItem {
+    PositionItem(double lat, double lng): lat(lat), lng(lng) {}
+
+    double lat, lng;
+};
+
+
 // trick the maps api into ignoring gestures by
 // pretending to be chrome. see: http://developer.qt.nokia.com/forums/viewthread/1643/P15
 class mapWebPage : public QWebEnginePage
@@ -62,15 +70,15 @@ class MapWebBridge : public QObject
         Context *context;
         RideMapWindow *mw;
 
-        RideFilePoint* point;
+        RideFilePoint const * point = nullptr;
         bool m_startDrag = false;
         bool m_drag = false;
         int selection = 1;
 
-        QList<RideFilePoint*> searchPoint(double lat, double lng);
+        RideFilePoint const *searchPoint(double lat, double lng) const;
 
     public:
-        MapWebBridge(Context *context, RideMapWindow *mw) : context(context), mw(mw), selection(0) {}
+        MapWebBridge(Context *context, RideMapWindow *mw) : context(context), mw(mw) {}
 
     public slots:
         Q_INVOKABLE void call(int count);
@@ -92,10 +100,15 @@ class MapWebBridge : public QObject
         Q_INVOKABLE void clickPath(double lat, double lng);
         Q_INVOKABLE void mouseup();
 
+        // Comparemode
+        Q_INVOKABLE QVariantList setCompareIntervals();
+
         void intervalsChanged() { emit drawIntervals(); }
+        void compareIntervalsChanged() { emit drawCompareIntervals(); }
 
     signals:
         void drawIntervals();
+        void drawCompareIntervals();
 };
 
 class RideMapWindow : public GcChartWindow
@@ -168,6 +181,7 @@ class RideMapWindow : public GcChartWindow
         void hideRouteLineOpacityChanged(int value);
         void showIntervalsChanged(int value);
         void osmCustomTSURLEditingFinished();
+        void osmGrayValueChanged(int value);
 
 
         void forceReplot();
@@ -180,6 +194,12 @@ class RideMapWindow : public GcChartWindow
         void drawTempInterval(IntervalItem *current);
         void clearTempInterval();
 
+        void showPosition(double mins);
+        void hidePosition();
+
+        void compareIntervalsStateChanged(bool state);
+        void compareIntervalsChanged();
+
     private:
 
         bool first;
@@ -189,6 +209,8 @@ class RideMapWindow : public GcChartWindow
         QCheckBox* hideShadedZonesCk, * hideYellowLineCk, * hideRouteLineOpacityCk;
         QLabel *osmTSTitle, *osmTSLabel, *osmTSUrlLabel;
         QLineEdit *osmTSUrl;
+        QLabel *osmGrayLabel;
+        QSlider *osmGraySlider;
 
         QLineEdit *gkey;
         QLabel *gkeylabel;
@@ -207,10 +229,17 @@ class RideMapWindow : public GcChartWindow
         bool firstShow;
         IntervalSummaryWindow *overlayIntervals;
 
+        QList<PositionItem> positionItems;
+
         QString osmTileServerUrlDefault;
 
         QColor GetColor(int watts);
         void createHtml();
+        void buildPositionList();
+
+        bool getCompareBoundingBox(double &minLat, double &maxLat, double &minLon, double &maxLon) const;
+
+        int countCompareIntervals = 0;
 
     private slots:
         void loadRide();
@@ -223,6 +252,7 @@ class RideMapWindow : public GcChartWindow
 
         void setCustomTSWidgetVisible(bool value);
         void setTileServerUrlForTileType(int x);
+        void setGrayscaleForTileType(int x);
 };
 
 #endif

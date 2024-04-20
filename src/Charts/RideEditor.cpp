@@ -79,9 +79,9 @@ getPaste(QVector<QVector<double> >&cells, QStringList &seps, QStringList &head, 
     regexpStr = "[";
     foreach (QString sep, seps) regexpStr += sep;
     regexpStr += "]";
-    QRegExp sep(regexpStr); // RegExp for separators
+    QRegularExpression sep(regexpStr); // RegExp for separators
 
-    QRegExp ELine(("\n|\r|\r\n")); //RegExp for line endings
+    QRegularExpression ELine(("\n|\r|\r\n")); //RegExp for line endings
 
     foreach(QString line, text.split(ELine)) {
         if (line == "") continue;
@@ -258,7 +258,6 @@ RideEditor::configChanged(qint32)
 
     QPalette palette;
     palette.setBrush(QPalette::Window, QBrush(GColor(CPLOTBACKGROUND)));
-    palette.setBrush(QPalette::Background, QBrush(GColor(CPLOTBACKGROUND)));
     palette.setBrush(QPalette::Base, QBrush(GColor(CPLOTBACKGROUND)));
     palette.setColor(QPalette::WindowText, GCColor::invertColor(GColor(CPLOTBACKGROUND)));
     palette.setColor(QPalette::Text, GCColor::invertColor(GColor(CPLOTBACKGROUND)));
@@ -870,7 +869,7 @@ RideEditor::borderMenu(const QPoint &pos)
         // add menu options for each column
         if (colMapper) delete colMapper;
         colMapper = new QSignalMapper(this);
-        connect(colMapper, SIGNAL(mapped(const QString &)), this, SLOT(insColumn(const QString &)));
+        connect(colMapper, &QSignalMapper::mappedString, this, &RideEditor::insColumn);
 
         foreach(QString heading, whatColumns()) {
             QAction *insColAct = new QAction(heading, table);
@@ -1101,9 +1100,10 @@ RideEditor::pasteSpecial()
     PasteSpecialDialog *paster = new PasteSpecialDialog(this);
 
     // center the dialog
-    QDesktopWidget *desktop = QApplication::desktop();
-    int x = (desktop->width() - paster->size().width()) / 2;
-    int y = ((desktop->height() - paster->size().height()) / 2) -(50*dpiYFactor);
+    QScreen* screen = QGuiApplication::primaryScreen();
+    auto availableGeometry = screen->availableGeometry();
+    int x = (availableGeometry.width() - paster->size().width()) / 2;
+    int y = ((availableGeometry.height() - paster->size().height()) / 2) - (50 * dpiYFactor);
 
     // move window to desired coordinates
     paster->move(x,y);
@@ -3049,12 +3049,12 @@ void XDataEditor::configChanged()
 {
 
     QPalette palette;
-    palette.setColor(QPalette::Active, QPalette::Background, GColor(CPLOTBACKGROUND));
+    palette.setColor(QPalette::Active, QPalette::Window, GColor(CPLOTBACKGROUND));
     palette.setColor(QPalette::Active, QPalette::Base, GColor(CPLOTBACKGROUND));
     palette.setColor(QPalette::Active, QPalette::WindowText, GCColor::invertColor(GColor(CPLOTBACKGROUND)));
     palette.setColor(QPalette::Active, QPalette::Text, GCColor::invertColor(GColor(CPLOTBACKGROUND)));
     palette.setColor(QPalette::Active, QPalette::Window, GCColor::invertColor(GColor(CPLOTBACKGROUND)));
-    palette.setColor(QPalette::Inactive, QPalette::Background, GColor(CPLOTBACKGROUND));
+    palette.setColor(QPalette::Inactive, QPalette::Window, GColor(CPLOTBACKGROUND));
     palette.setColor(QPalette::Inactive, QPalette::Base, GColor(CPLOTBACKGROUND));
     palette.setColor(QPalette::Inactive, QPalette::WindowText, GCColor::invertColor(GColor(CPLOTBACKGROUND)));
     palette.setColor(QPalette::Inactive, QPalette::Text, GCColor::invertColor(GColor(CPLOTBACKGROUND)));
@@ -3087,7 +3087,7 @@ void XDataEditor::setRideItem(RideItem *item)
 
     // but time is xx:xx:xx:xxx
     QFontMetrics fm(font());
-    int cwidth=fm.charWidth("X",0);
+    int cwidth=fm.horizontalAdvance(QChar('X'));
     setColumnWidth(0, 15 * cwidth * dpiXFactor);
 }
 

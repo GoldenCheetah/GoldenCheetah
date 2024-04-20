@@ -406,6 +406,52 @@ GcUpgrade::upgrade(const QDir &home)
     //----------------------------------------------------------------------
 
 
+    //----------------------------------------------------------------------
+    // Current development release processing
+    //----------------------------------------------------------------------
+    if (last < VERSION37_BUILD) {
+        // remove FITmetadata.json since it now has message number metadata
+        // any previously cached version would ordinarily override the internal
+        // version, and if there is no internet it will never get refreshed
+        // so we delete the cache to ensure the built-in (current latest) is used
+        QString filename = home.canonicalPath()+"/../FITmetadata.json";
+        QFile::remove(filename);
+
+        // update metadata.xml to include interval metadata
+        // just add some very basic fields as an example
+        QList<KeywordDefinition> keywordDefinitions;
+        QList<FieldDefinition>   fieldDefinitions;
+        QString colorfield;
+        QList<DefaultDefinition> defaultDefinitions;
+
+        // read em in (should be in parent directory of athlete home)
+        filename = home.canonicalPath()+"/../metadata.xml";
+        RideMetadata::readXML(filename, keywordDefinitions, fieldDefinitions, colorfield, defaultDefinitions);
+
+        // just check we haven't already added Interval metadata
+        bool hasIntervalMetadata=false;
+        foreach(FieldDefinition x, fieldDefinitions)
+            if (x.interval == true)
+                hasIntervalMetadata = true;
+
+        // just add a couple of basic fields to help user get started
+        // if we read in some definitions successfully and there were no
+        // interval specific metadata fields already defined
+        if (fieldDefinitions.count() && !hasIntervalMetadata) {
+
+            FieldDefinition add;
+            add.name = "Interval Notes";
+            add.tab = "Interval";
+            add.type = FIELD_TEXTBOX;
+            add.interval = 1;
+            fieldDefinitions << add;
+
+            add.name = "Interval Goal";
+            fieldDefinitions << add;
+
+            RideMetadata::serialize(filename, keywordDefinitions, fieldDefinitions, colorfield, defaultDefinitions);
+        }
+    }
 
     //----------------------------------------------------------------------
     // All Version dependent Upgrade Steps are done ...
@@ -957,7 +1003,6 @@ GcUpgradeLogDialog::GcUpgradeLogDialog(QDir homeDir) : QDialog(NULL, Qt::Dialog)
 
     report = new QWebEngineView(this);
     report->setContentsMargins(0,0,0,0);
-    report->page()->view()->setContentsMargins(0,0,0,0);
     report->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     //XXX WEBENGINE report->page()->setLinkDelegationPolicy(QWebPage::DelegateAllLinks);
     report->setContextMenuPolicy(Qt::NoContextMenu);
@@ -1007,7 +1052,9 @@ GcUpgradeLogDialog::saveAs()
     QFile file(fileName);
     file.resize(0);
     QTextStream out(&file);
+#if QT_VERSION < 0x060000
     out.setCodec("UTF-8");
+#endif
 
     if (file.open(QIODevice::WriteOnly)) {
 

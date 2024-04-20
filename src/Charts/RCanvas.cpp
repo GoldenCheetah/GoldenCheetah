@@ -22,7 +22,9 @@
 #include "Colors.h"
 #include "AbstractView.h"
 
+#if QT_VERSION < 0x060000
 #include <QGLWidget>
+#endif
 
 //
 //
@@ -50,12 +52,14 @@ RCanvas::RCanvas(Context *context, QWidget *parent) : QGraphicsView(parent), con
     // no frame, its ugly
     setFrameStyle(QFrame::NoFrame);
 
+#if QT_VERSION < 0x060000
 #ifdef Q_OS_LINUX // mac and windows both have issues. sigh.
     // Enabled on Linux depending on Open GL version
     if (QGLFormat::openGLVersionFlags().testFlag(QGLFormat::OpenGL_Version_2_0)) {
         setViewport(new QGLWidget( QGLFormat(QGL::SampleBuffers)));
         setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
     }
+#endif
 #endif
 
     // allow to click and drag
@@ -95,7 +99,7 @@ RCanvas::wheelEvent(QWheelEvent *event){
     setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
     // Scale the view / do the zoom
     double scaleFactor = 1.15;
-    if(event->delta() > 0) {
+    if(event->angleDelta().y() > 0) {
         // Zoom in
         scale(scaleFactor, scaleFactor);
 

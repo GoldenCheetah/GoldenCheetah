@@ -420,9 +420,6 @@ void Fortius::run()
     if (openDevice()) return;
     isDeviceOpen = true;
 
-    QTime timer;
-    timer.start();
-
     while(1) {
 
         if (isDeviceOpen == true) {
@@ -574,8 +571,6 @@ void Fortius::run()
 
             if (openDevice()) return;
             isDeviceOpen = true;        
-                        
-            timer.restart();
         }
     }
 }

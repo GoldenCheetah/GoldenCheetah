@@ -175,7 +175,9 @@ Athlete::Athlete(Context *context, const QDir &homeDir)
     connect(rideCache, SIGNAL(loadComplete()), this, SLOT(loadComplete()));
 
     // we need to block on load complete if first (before mainwindow ready)
-    if (context->mainWindow->progress)  loop.exec();
+    if (context->mainWindow->isStarting()) {
+        loop.exec();
+    }
 }
 
 void
@@ -270,8 +272,11 @@ void Athlete::selectRideFile(QString fileName)
     foreach (RideItem *rideItem, rideCache->rides()) {
 
         context->ride = (RideItem*) rideItem;
-        if (context->ride->fileName == fileName) 
+        if (context->ride->fileName == fileName)  {
+            // lets open it before we let folks know
+            context->ride->ride();
             break;
+        }
     }
     context->notifyRideSelected(context->ride);
 }
@@ -405,7 +410,7 @@ AthleteDirectoryStructure::AthleteDirectoryStructure(const QDir home){
 
 AthleteDirectoryStructure::~AthleteDirectoryStructure() {
 
-    myhome = NULL;
+    myhome = QDir();
 
 }
 

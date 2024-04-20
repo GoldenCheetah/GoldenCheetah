@@ -52,6 +52,25 @@ class ChartSpaceItemFactory;
 // we need a scope for a chart space, one or more of
 enum OverviewScope { ANALYSIS=0x01, TRENDS=0x02, ATHLETES=0x04 };
 
+// we need to intercept the graphics scene drag and drop
+// events and send them to MainWindow
+class GGraphicsView : public QGraphicsView
+{
+    public:
+        GGraphicsView(Context *context, QWidget *parent) : QGraphicsView(parent), context(context) {
+            setAcceptDrops(true);
+        }
+
+    protected:
+        void dragEnterEvent(QDragEnterEvent *event) { context->mainWindow->dragEnterEvent(event); }
+        void dragLeaveEvent(QDragLeaveEvent *event) { context->mainWindow->dragLeaveEvent(event); }
+        void dropEvent(QDropEvent *event) { context->mainWindow->dropEvent(event); }
+        void dragMoveEvent(QDragMoveEvent *event) { context->mainWindow->dragMoveEvent(event); }
+
+    private:
+        Context *context;
+};
+
 // must be subclassed to add items to a ChartSpace
 class ChartSpaceItem : public QGraphicsWidget
 {
@@ -89,7 +108,7 @@ class ChartSpaceItem : public QGraphicsWidget
         ChartSpaceItem(ChartSpace *parent, QString name) : QGraphicsWidget(NULL),
                                        parent(parent), name(name),
                                        column(0), order(0), deep(5), onscene(false),
-                                       placing(false), drag(false), invisible(false),
+                                       placing(false), drag(false), incorner(false), invisible(false),
                                        showconfig(true)  {
 
             setAutoFillBackground(false);

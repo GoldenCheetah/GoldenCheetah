@@ -155,7 +155,7 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
     charts->setEditTriggers(QAbstractItemView::SelectedClicked); // allow edit
     charts->setIndentation(0);
 
-    presetLayout->addWidget(charts, 0,0);
+    presetLayout->addWidget(charts, 0, Qt::Alignment());
 
     applyButton = new QPushButton(tr("Apply")); // connected in LTMWindow.cpp (weird!?)
     newButton = new QPushButton(tr("Add Current"));
@@ -187,7 +187,6 @@ LTMTool::LTMTool(Context *context, LTMSettings *settings) : QWidget(context->mai
 
         adds.symbol = factory.metricName(i);
         adds.metric = factory.rideMetric(factory.metricName(i));
-        qsrand(QTime::currentTime().msec());
         cHSV.setHsv((i%6)*(255/(factory.metricCount()/5)), 255, 255);
         adds.penColor = cHSV.convertTo(QColor::Rgb);
         adds.curveStyle = curveStyle(factory.metricType(i));
@@ -1432,7 +1431,7 @@ LTMTool::moveMetricUp()
     int index = customTable->row(items.first());
 
     if (index > 0) {
-        settings->metrics.swap(index, index-1);
+        settings->metrics.swapItemsAt(index, index-1);
          // refresh
         refreshCustomTable(index-1);
         curvesChanged();
@@ -1448,7 +1447,7 @@ LTMTool::moveMetricDown()
     int index = customTable->row(items.first());
 
     if (index+1 <  settings->metrics.size()) {
-        settings->metrics.swap(index, index+1);
+        settings->metrics.swapItemsAt(index, index+1);
          // refresh
         refreshCustomTable(index+1);
         curvesChanged();
@@ -1814,7 +1813,7 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
     QFontMetrics fm(courier);
 
     formulaEdit->setFont(courier);
-    formulaEdit->setTabStopWidth(4 * fm.width(' ')); // 4 char tabstop
+    formulaEdit->setTabStopDistance(4 * fm.horizontalAdvance(' ')); // 4 char tabstop
     //formulaEdit->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     formulaType = new QComboBox(this);
     formulaType->addItem(tr("Total"), static_cast<int>(RideMetric::Total));
@@ -2158,6 +2157,10 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
     trendType->addItem(tr("Simple Average"));
     trendType->setCurrentIndex(metricDetail->trendtype);
 
+    ignoreZerosLbl = new QLabel(tr("Ignore Zeros"));
+    ignoreZeros = new QCheckBox("", this);
+    ignoreZeros->setChecked(metricDetail->ignoreZeros);
+
     // add to grid
     grid->addWidget(filter, 0,0);
     grid->addWidget(dataFilter, 0,1,1,3);
@@ -2174,9 +2177,8 @@ EditMetricDetailDialog::EditMetricDetailDialog(Context *context, LTMTool *ltmToo
     grid->addWidget(curveStyle, 5,1);
     grid->addWidget(symbol, 6,0);
     grid->addWidget(curveSymbol, 6,1);
-    QWidget *spacer2 = new QWidget(this);
-    spacer2->setFixedHeight(10);
-    grid->addWidget(spacer2, 7,0);
+    grid->addWidget(ignoreZerosLbl, 7,0);
+    grid->addWidget(ignoreZeros, 7,1);
     grid->addWidget(stackLabel, 8, 0);
     grid->addWidget(stack, 8, 1);
     grid->addWidget(color, 9,0);
@@ -2271,6 +2273,8 @@ EditMetricDetailDialog::typeChanged()
         performanceWidget->hide();
         banisterWidget->hide();
         typeStack->setCurrentIndex(0);
+        ignoreZerosLbl->setVisible(true);
+        ignoreZeros->setVisible(true);
     }
 
     if (chooseBest->isChecked()) {
@@ -2283,6 +2287,8 @@ EditMetricDetailDialog::typeChanged()
         performanceWidget->hide();
         banisterWidget->hide();
         typeStack->setCurrentIndex(1);
+        ignoreZerosLbl->setVisible(true);
+        ignoreZeros->setVisible(true);
     }
 
     if (chooseEstimate->isChecked()) {
@@ -2295,6 +2301,8 @@ EditMetricDetailDialog::typeChanged()
         performanceWidget->hide();
         banisterWidget->hide();
         typeStack->setCurrentIndex(2);
+        ignoreZerosLbl->setVisible(false);
+        ignoreZeros->setVisible(false);
     }
 
     if (chooseStress->isChecked()) {
@@ -2307,6 +2315,8 @@ EditMetricDetailDialog::typeChanged()
         performanceWidget->hide();
         banisterWidget->hide();
         typeStack->setCurrentIndex(0);
+        ignoreZerosLbl->setVisible(true);
+        ignoreZeros->setVisible(true);
     }
 
     if (chooseFormula->isChecked()) {
@@ -2319,6 +2329,8 @@ EditMetricDetailDialog::typeChanged()
         performanceWidget->hide();
         banisterWidget->hide();
         typeStack->setCurrentIndex(3);
+        ignoreZerosLbl->setVisible(true);
+        ignoreZeros->setVisible(true);
     }
 
     if (chooseMeasure->isChecked()) {
@@ -2331,6 +2343,8 @@ EditMetricDetailDialog::typeChanged()
         performanceWidget->hide();
         banisterWidget->hide();
         typeStack->setCurrentIndex(4);
+        ignoreZerosLbl->setVisible(false);
+        ignoreZeros->setVisible(false);
     }
 
     if (choosePerformance->isChecked()) {
@@ -2342,6 +2356,8 @@ EditMetricDetailDialog::typeChanged()
         stressWidget->hide();
         banisterWidget->hide();
         typeStack->setCurrentIndex(5);
+        ignoreZerosLbl->setVisible(true);
+        ignoreZeros->setVisible(true);
     }
 
     if (chooseBanister->isChecked()) {
@@ -2354,6 +2370,8 @@ EditMetricDetailDialog::typeChanged()
         performanceWidget->hide();
         banisterWidget->show();
         typeStack->setCurrentIndex(0);
+        ignoreZerosLbl->setVisible(false);
+        ignoreZeros->setVisible(false);
     }
     adjustSize();
 }
@@ -2608,6 +2626,7 @@ EditMetricDetailDialog::applyClicked()
     metricDetail->symbolStyle = symbolMap[curveSymbol->currentIndex()];
     metricDetail->penColor = penColor;
     metricDetail->fillCurve = fillCurve->isChecked();
+    metricDetail->ignoreZeros = ignoreZeros->isChecked();
     metricDetail->labels = labels->isChecked();
     metricDetail->uname = userName->text();
     metricDetail->uunits = userUnits->text();
@@ -2836,7 +2855,7 @@ void DataFilterEdit::keyPressEvent(QKeyEvent *e)
 
     // are we in a comment ?
     QString line = textCursor().block().text().trimmed();
-    for(int i=textCursor().positionInBlock(); i>=0; i--)
+    for(int i=textCursor().positionInBlock(); i>=0 && i<line.size(); i--)
         if (line[i]=='#') return;
 
     if (!isShortcut && (hasModifier || e->text().isEmpty()|| completionPrefix.length() < 1

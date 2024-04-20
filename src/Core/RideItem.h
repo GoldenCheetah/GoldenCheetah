@@ -129,9 +129,21 @@ class RideItem : public QObject
         // as a well formatted string
         QString getStringForSymbol(QString name, bool useMetricUnits=true);
 
+        // add an image to the ride- store it in the media folder and add metadata for it
+        // note that in all cases the return list is the filename only, the location they
+        // are stored is managed here (callers should not implement filepath)
+        bool addImage(QString filename);
+        bool removeImage(QString filename);
+
+        QStringList images() const;
+
+        // these two are path based
+        QStringList imagePaths() const;
+        int importImages(QStringList files);
+
         // access the metadata
-        QString getText(QString name, QString fallback) const { return metadata_.value(name, fallback); }
-        bool hasText(QString name) { return metadata_.contains(name); }
+        QString getText(QString name, QString fallback) const;
+        bool hasText(QString name) const;
 
         // get at the first class data
         QString path;
@@ -141,7 +153,7 @@ class RideItem : public QObject
         QColor color;
         bool planned;
         QString sport;
-        bool isBike,isRun,isSwim,isXtrain;
+        bool isBike,isRun,isSwim,isXtrain,isAero;
         bool samples; // has samples data
 
         // which range to use?
@@ -214,7 +226,6 @@ class RideItem : public QObject
 
         // sorting
         bool operator<(RideItem right) const { return dateTime < right.dateTime; }
-        bool operator>(RideItem right) const { return dateTime < right.dateTime; }
 
     private:
         void updateIntervals();

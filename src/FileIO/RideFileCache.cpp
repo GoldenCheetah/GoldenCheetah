@@ -376,7 +376,7 @@ QVector<float> RideFileCache::meanMaxPowerFor(Context *context, QVector<float> &
 
 QVector<float> RideFileCache::meanMaxPowerFor(Context *context, QVector<float>&wpk, QString fileName)
 {
-    QTime start;
+    QElapsedTimer start;
     start.start();
 
     QVector<float> returning;
@@ -436,7 +436,7 @@ QVector<float> RideFileCache::meanMaxPowerFor(Context *context, QVector<float>&w
 // API bests for a ride
 QVector<float> RideFileCache::meanMaxFor(QString cacheFilename, RideFile::SeriesType series)
 {
-    QTime start;
+    QElapsedTimer start;
     start.start();
 
     QVector<float> returning;
@@ -485,7 +485,7 @@ QVector<float> RideFileCache::meanMaxFor(QString cacheFilename, RideFile::Series
 // API bests for a date range
 QVector<float> RideFileCache::meanMaxFor(QString cacheDir, RideFile::SeriesType series, QDate from, QDate to)
 {
-    QTime start;
+    QElapsedTimer start;
     start.start();
 
     bool first = true;

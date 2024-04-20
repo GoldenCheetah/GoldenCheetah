@@ -71,6 +71,7 @@ Q_OBJECT
                  MenuBar_Tools_Download_Measures,
                  MenuBar_Tools_Download_ERGDB,
                  MenuBar_Tools_Download_TP,
+                 MenuBar_Tools_Download_StravaRoutes,
                  MenuBar_Tools_CreateWorkout,
                  MenuBar_Tools_ScanDisk_WorkoutVideo,
                  MenuBar_Tools_CreateHeatMap,
@@ -195,9 +196,9 @@ Q_OBJECT
                  Preferences_DataFields_Processing,
 
                  Preferences_Metrics,
-                 Preferences_Metrics_Best,
-                 Preferences_Metrics_Summary,
-                 Preferences_Metrics_Intervals,
+                 Preferences_Metrics_Favourites,
+                 Preferences_Metrics_Custom,
+                 Preferences_Metrics_UserMetrics,
 
                  Preferences_Training,
                  Preferences_Training_Preferences,

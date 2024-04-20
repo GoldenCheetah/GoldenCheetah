@@ -21,6 +21,9 @@
 #include "TTSReader.h"
 #include "LocationInterpolation.h"
 
+#include <map>
+#include <cstring>
+
 // -------------------------------------------------------------
 // LOG CONTROL
 //

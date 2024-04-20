@@ -21,8 +21,6 @@ environment:
     secure: 7pCVnVEKKmSU4SZN6IFqUw==
   GC_STRAVA_CLIENT_SECRET:
     secure: n3cMS1yy709xhSnTeWABMsoAIkJzy5euh3Pw4ehv0BzszJKoWkypF0cyW8RXSm3M
-  GC_TODAYSPLAN_CLIENT_SECRET:
-    secure: 7PnFB8cfahFT6LyP64eB7N1vkbwVaULpB2ORmEkn+J75zNB1xxGClFNXSHZ7kXhB
   GC_CYCLINGANALYTICS_CLIENT_SECRET:
     secure: UY+m3YypNNLUzKyGdrLw8xdCvxuQWRZi9EHS3j1ubLC4qyRL7iEVW6ubumfdh6gT
   GC_CLOUD_DB_BASIC_AUTH:
@@ -63,7 +61,7 @@ cache:
 - C:\R
 - C:\Python -> src\Python\requirements.txt
 - c:\tools\vcpkg\installed\
-- qwt
+- qwt -> qwt/qwtconfig.pri.in
 
 install:
 # Get the libraries
@@ -115,7 +113,7 @@ install:
 - nmake install
 - cd ..
 
-# Add Python (avoiding colision between GC Context.h and Python context.h)
+# Add Python (avoiding collision between GC Context.h and Python context.h)
 - echo DEFINES+=GC_WANT_PYTHON >> src\gcconfig.pri
 - echo PYTHONINCLUDES=-ICore -I\"c:\python37-x64\include\" >> src\gcconfig.pri
 - echo PYTHONLIBS=-L\"c:\python37-x64\libs\" -lpython37 >> src\gcconfig.pri
@@ -151,7 +149,6 @@ before_build:
 - ps: (Get-Content src\Core\Secrets.h) -replace '__GC_NOKIA_CLIENT_SECRET__', $env:GC_NOKIA_CLIENT_SECRET | Set-Content src\Core\Secrets.h
 - ps: (Get-Content src\Core\Secrets.h) -replace '__GC_DROPBOX_CLIENT_SECRET__', $env:GC_DROPBOX_CLIENT_SECRET | Set-Content src\Core\Secrets.h
 - ps: (Get-Content src\Core\Secrets.h) -replace '__GC_STRAVA_CLIENT_SECRET__', $env:GC_STRAVA_CLIENT_SECRET | Set-Content src\Core\Secrets.h
-- ps: (Get-Content src\Core\Secrets.h) -replace '__GC_TODAYSPLAN_CLIENT_SECRET__', $env:GC_TODAYSPLAN_CLIENT_SECRET | Set-Content src\Core\Secrets.h
 - ps: (Get-Content src\Core\Secrets.h) -replace '__GC_CYCLINGANALYTICS_CLIENT_SECRET__', $env:GC_CYCLINGANALYTICS_CLIENT_SECRET | Set-Content src\Core\Secrets.h
 - ps: (Get-Content src\Core\Secrets.h) -replace '__GC_CLOUD_DB_BASIC_AUTH__', $env:GC_CLOUD_DB_BASIC_AUTH | Set-Content src\Core\Secrets.h
 - ps: (Get-Content src\Core\Secrets.h) -replace '__GC_CLOUD_DB_APP_NAME__', $env:GC_CLOUD_DB_APP_NAME | Set-Content src\Core\Secrets.h
@@ -193,11 +190,11 @@ after_build:
 - copy ..\Resources\win32\gc.ico
 
 # Installer script
-- copy ..\Resources\win32\GC3.6-Dev-Master-W64-QT5.nsi
+- copy ..\Resources\win32\GC3.7-Master-W64-QT5.nsi
 
 # Build the installer
-- makensis GC3.6-Dev-Master-W64-QT5.nsi
-- move GoldenCheetah_v3.6-DEV_64bit_Windows.exe ..\..\GoldenCheetah_v3.6-DEV_x64.exe
+- makensis GC3.7-Master-W64-QT5.nsi
+- move GoldenCheetah_v3.7-DEV_64bit_Windows.exe ..\..\GoldenCheetah_v3.7-DEV_x64.exe
 - cd ..\..
 - ps: Set-AppveyorBuildVariable -Name 'PUBLISH_BINARIES' -Value false
 - ps: if ($env:APPVEYOR_REPO_COMMIT_MESSAGE_EXTENDED -Match "\[publish binaries\]") { Set-AppveyorBuildVariable -Name 'PUBLISH_BINARIES' -Value true }
@@ -206,11 +203,11 @@ test_script:
 # minimum test
 - src\release\GoldenCheetah --version 2>GCversionWindows.txt
 - git log -1 >> GCversionWindows.txt
-- ps: CertUtil -hashfile GoldenCheetah_v3.6-DEV_x64.exe sha256 | Select-Object -First 2 | Add-Content GCversionWindows.txt
+- ps: CertUtil -hashfile GoldenCheetah_v3.7-DEV_x64.exe sha256 | Select-Object -First 2 | Add-Content GCversionWindows.txt
 - type GCversionWindows.txt
 
 artifacts:
-- path: GoldenCheetah_v3.6-DEV_x64.exe
+- path: GoldenCheetah_v3.7-DEV_x64.exe
   name: GCinstaller
 - path: GCversionWindows.txt
   name: GCversionWindows

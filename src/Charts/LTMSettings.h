@@ -55,8 +55,9 @@ class RideBest;
 // 19        07 Jan 2018 Mark Liversedge  Flagged as possibly submaximal weekly best
 // 20        15 Apr 2019 Ale Martinez     Added run flag to Estimate
 // 21        31 Jul 2019 Ale Martinez     Added perfSymbol for Banister
+// 22        06 Mar 2024 Riccio Clista    Added IgnoreZeros
 
-#define LTM_VERSION_NUMBER 21
+#define LTM_VERSION_NUMBER 22
 
 // group by settings
 #define LTM_DAY     1
@@ -122,7 +123,8 @@ class MetricDetail {
                      smooth(false), trendtype(0), topN(0), lowestN(0), topOut(0), baseline(0.0), 
                      curveStyle(QwtPlotCurve::Lines), symbolStyle(QwtSymbol::NoSymbol),
                      penColor(Qt::black), penAlpha(0), penWidth(1.0), penStyle(0),
-                     brushColor(Qt::black), brushAlpha(0), fillCurve(false), labels(false), curve(NULL) {}
+                     brushColor(Qt::black), brushAlpha(0), fillCurve(false), labels(false),
+                     ignoreZeros(false), curve(NULL) {}
 
     bool operator< (MetricDetail right) const { return name.localeAwareCompare(right.name) < 0; }
 
@@ -205,6 +207,9 @@ class MetricDetail {
     // text labels against values
     bool labels;
 
+    // ignore zeros in plot
+    bool ignoreZeros;
+
     // curve on the chart to spot this...
     QwtPlotCurve *curve;
 };
@@ -221,8 +226,10 @@ class LTMSettings {
     public:
 
         LTMSettings() {
+#if QT_VERSION < 0x060000
             // we need to register the stream operators
             qRegisterMetaTypeStreamOperators<LTMSettings>("LTMSettings");
+#endif
             bests = NULL;
             ltmTool = NULL;
         }

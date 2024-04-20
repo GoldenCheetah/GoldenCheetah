@@ -112,26 +112,6 @@
 #D2XX_INCLUDE = 
 #D2XX_LIBS    =
 
-# If you want support for Google Earth .kml files then you need
-# to install the Google libkml library
-#
-# http://code.google.com/p/libkml/
-# or on Linux sudo apt-get install libkml-dev
-#
-# then set the following variable appropriately
-# to the root of the libs/include path
-#KML_INSTALL = /usr/local
-#KML_INCLUDE = 
-#KML_LIBS    = 
-# Since KML also requires BOOST you will need to install
-# that too and then set BOOST_INCLUDE to that location
-# If the files are in /usr/include/boost then set
-#BOOST_INCLUDE = /usr/include
-#Additionally, on MAC the latest libs also need the following
-#QMAKE_CFLAGS_X86_64 += -mmacosx-version-min=10.7
-#QMAKE_CXXFLAGS_X86_64 = $$QMAKE_CFLAGS_X86_64
-#LIBS += -lexpat -luriparser -lminizip
-
 # If you want support for downloading from iCal calendars you will need libical
 #     http://sourceforge.net/projects/freeassociation/
 # Set path to the root of the libical installation

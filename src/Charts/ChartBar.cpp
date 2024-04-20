@@ -110,10 +110,10 @@ ChartBar::ChartBar(Context *context) : QWidget(context->mainWindow), context(con
     //connect(p, SIGNAL(clicked()), action, SLOT(trigger()));
 
     signalMapper = new QSignalMapper(this); // maps each option
-    connect(signalMapper, SIGNAL(mapped(int)), this, SLOT(clicked(int)));
+    connect(signalMapper, &QSignalMapper::mappedInt, this, &ChartBar::clicked);
 
     menuMapper = new QSignalMapper(this); // maps each option
-    connect(menuMapper, SIGNAL(mapped(int)), this, SLOT(triggerContextMenu(int)));
+    connect(menuMapper, &QSignalMapper::mappedInt, this, &ChartBar::triggerContextMenu);
 
     barMenu = new QMenu("Add");
     chartMenu = barMenu->addMenu(tr("New Chart"));
@@ -153,7 +153,7 @@ ChartBar::configChanged(qint32)
     scrollArea->setStyleSheet(QString("QScrollArea { background: rgb(%1,%2,%3); }").arg(col.red()).arg(col.green()).arg(col.blue()));
 
     foreach(ChartBarItem *b, buttons) {
-        int width = fs.width(b->text) + (60 * dpiXFactor);
+        int width = fs.horizontalAdvance(b->text) + (60 * dpiXFactor);
         if (width < (90*dpiXFactor)) width=90*dpiXFactor;
     	b->setFont(buttonFont);
         b->setFixedWidth(width);
@@ -180,7 +180,7 @@ ChartBar::addWidget(QString title)
 
     // make the right size
     QFontMetrics fontMetric(buttonFont);
-    int width = fontMetric.width(title) + (60 * dpiXFactor);
+    int width = fontMetric.horizontalAdvance(title) + (60 * dpiXFactor);
     int height = (fontMetric.height()+(spacing_*dpiXFactor));
     if (width < (90*dpiXFactor)) width=90*dpiXFactor;
     newbutton->setFixedWidth(width);
@@ -228,7 +228,7 @@ ChartBar::setText(int index, QString text)
 {
     buttons[index]->setText(text);
     QFontMetrics fontMetric(buttonFont);
-    int width = fontMetric.width(text) + (60*dpiXFactor);
+    int width = fontMetric.horizontalAdvance(text) + (60*dpiXFactor);
     buttons[index]->setWidth(width < (90*dpiXFactor) ? (90*dpiXFactor) : width);
     buttons[index]->update();
 

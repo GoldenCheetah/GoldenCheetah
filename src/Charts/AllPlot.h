@@ -32,7 +32,6 @@
 #include <qwt_plot_intervalcurve.h>
 #include <qwt_point_3d.h>
 #include <qwt_scale_widget.h>
-#include <qwt_compat.h>
 #include <QtGui>
 #include <QFont>
 
@@ -245,7 +244,7 @@ class CurveColors : public QObject
                 c.next();
 
                 // isolate on axis hover (but leave huighlighters alone)
-                if (c.key()->yAxis() == id || c.key()->yAxis() == QwtAxisId(QwtAxis::yLeft,2)) {
+                if (c.key()->yAxis() == id || c.key()->yAxis() == QwtAxisId(QwtAxis::YLeft,2)) {
 
                     // show and remember color
                     c.key()->setVisible(c.value());
@@ -259,7 +258,7 @@ class CurveColors : public QObject
 
                     if (showslider && c.key()->yAxis() == id) {
 
-                        if (c.key()->yAxis().pos == QwtAxis::yLeft)
+                        if (c.key()->yAxis().pos == QwtAxis::YLeft)
                             slider->move(plot->canvas()->pos().x(), 10);
                         else
                             slider->move(plot->canvas()->pos().x() +
@@ -587,8 +586,8 @@ class AllPlot : public QwtPlot
         // refresh data / plot parameters
         void recalc(AllPlotObject *objects);
         void setYMax();
-        void setLeftOnePalette(); // color of yLeft,1 axis
-        void setRightPalette(); // color of yRight,0 axis
+        void setLeftOnePalette(); // color of YLeft,1 axis
+        void setRightPalette(); // color of YRight,0 axis
         void setXTitle();
         void setHighlightIntervals(bool);
 
@@ -733,6 +732,10 @@ class AllPlot : public QwtPlot
         // scope of plot (none means all, or just for a specific series
         RideFile::SeriesType scope;
         RideFile::SeriesType secondaryScope;
+
+        // mouse control
+        bool isPanning;
+        int panOriginX;
 
     protected:
         friend class ::AllPlotObject;

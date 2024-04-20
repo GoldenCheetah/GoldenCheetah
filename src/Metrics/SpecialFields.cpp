@@ -64,6 +64,10 @@ SpecialFields::SpecialFields()
     namesmap.insert("Performance Condition", tr("Performance Condition"));// Garmin Performance Condition
     namesmap.insert("LTHR detected", tr("LTHR detected"));           // Garmin LTHR detected
     namesmap.insert("LTS detected", tr("LTS detected"));             // Garmin LTS detected
+    namesmap.insert("Interval Notes", tr("Interval Notes"));         // Interval Notes for the new Interval tab
+    namesmap.insert("Interval Goal", tr("Interval Goal"));           // Interval Goal for the new Interval tab
+    namesmap.insert("Spike Time", tr("Spike Time"));                 // Spike Time from FixSpikes DP
+    namesmap.insert("Spikes", tr("Spikes"));                         // Spikes from FixSpikes DP
 
     // now add all the metric fields (for metric overrides)
     const RideMetricFactory &factory = RideMetricFactory::instance();
@@ -107,7 +111,7 @@ SpecialFields::makeTechName(QString name) const
     // strip spaces and only keep alpha values - everything else
     // becomes an underscore
     QString s = name;
-    return s.replace(QRegExp("[^0-9A-Za-z]"), "_");
+    return s.replace(QRegularExpression("[^0-9A-Za-z]"), "_");
 }
 
 QString
@@ -154,6 +158,7 @@ SpecialTabs::SpecialTabs()
     namesmap.insert("Raw Data", tr("Raw Data"));
     namesmap.insert("Device", tr("Device"));
     namesmap.insert("Athlete", tr("Athlete"));
+    namesmap.insert("Interval", tr("Interval"));
 }
 
 QString

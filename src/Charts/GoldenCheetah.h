@@ -44,8 +44,15 @@ class Perspective;
 
 #include "GcWindowRegistry.h"
 #include "TimeUtils.h"
-
 class RideItem;
+
+#if QT_VERSION >= 0x060000
+// For RideItem and Perspective properties, this is required.
+// A normal include would lead to a circular dependency here.
+Q_MOC_INCLUDE("RideItem.h");
+Q_MOC_INCLUDE("Perspective.h");
+#endif
+
 class GcOverlayWidget;
 class Perspective;
 
@@ -103,14 +110,14 @@ private:
     double _heightFactor;
     bool _resizable;
     bool _gripped;
-    int _style;
+    int _style = 0;
     bool _noevents; // don't work with events
     Perspective *_perspective;
 
     enum drag { None, Close, Flip, Move, Left, Right, Top, Bottom, TLCorner, TRCorner, BLCorner, BRCorner };
     typedef enum drag DragState;
     // state data for resizing tiles
-    DragState dragState;
+    DragState dragState = None;
     int oWidth, oHeight, oX, oY, mX, mY;
     double oHeightFactor, oWidthFactor;
 

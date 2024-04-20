@@ -711,11 +711,13 @@ GenericSelectTool::moved(QPointF pos)
                     // lower_bound to value near x
                     QVector<QPointF>::const_iterator i = std::lower_bound(p.begin(), p.end(), x, CompareQPointFX());
 
-                    // collect them away
-                    vals.insert(series, GPointF(i->x(), i->y(), i-p.begin()));
+                    if (i != p.end()) {
+                        // collect them away
+                        vals.insert(series, GPointF(i->x(), i->y(), i-p.begin()));
 
-                    // nearest x?
-                    if (i->x() != 0 && (nearestx == -9999 || (std::fabs(i->x()-xvalue)) < std::fabs((nearestx-xvalue)))) nearestx = i->x();
+                        // nearest x?
+                        if (i->x() != 0 && (nearestx == -9999 || (std::fabs(i->x()-xvalue)) < std::fabs((nearestx-xvalue)))) nearestx = i->x();
+                    }
                 }
 
             }
@@ -1005,7 +1007,9 @@ GenericSelectTool::updateScene()
                         selection->setName(QString("%1_select").arg(line->name()));
 
                         // all of this curve cloning should be in a new method xxx todo
+#if QT_VERSION < 0x060400
                         selection->setUseOpenGL(line->useOpenGL());
+#endif
                         selection->setPen(line->pen());
                         if (line->useOpenGL())
                             selection->setColor(Qt::gray); // use opengl ignores changing colors
@@ -1081,7 +1085,9 @@ GenericSelectTool::updateScene()
 
                         // all of this curve cloning should be in a new method xxx todo
                         host->qchart->addSeries(selection); // before adding data and axis
+#if QT_VERSION < 0x060400
                         selection->setUseOpenGL(scatter->useOpenGL());
+#endif
                         if (selection->useOpenGL())
                             selection->setColor(Qt::gray); // use opengl ignores changing colors
                         else {

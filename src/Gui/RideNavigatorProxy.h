@@ -223,7 +223,7 @@ public:
         //}
     }
 
-    QStringList mimeTypes() const {
+    QStringList mimeTypes() const override {
 
         QStringList returning;
         returning << "application/x-gc-intervals";
@@ -231,7 +231,7 @@ public:
         return returning;
     }
 
-    QMimeData *mimeData (const QModelIndexList & /*indexes*/) const {
+    QMimeData *mimeData(const QModelIndexList & /*indexes*/) const override {
 
         QMimeData *returning = new QMimeData;
 
@@ -240,7 +240,7 @@ public:
         QDataStream stream(&rawData, QIODevice::WriteOnly);
         stream.setVersion(QDataStream::Qt_4_6);
 
-        // pack data 
+        // pack data
         stream << (quint64)(rideNavigator->context); // where did this come from?
 
         RideItem *ride = rideNavigator->context->ride;  // the currently selected ride
@@ -533,7 +533,7 @@ public:
             }
 
             // sort by row again
-            qStableSort(rankedRows.begin(), rankedRows.end(), rankx::sortByRow);
+            std::stable_sort(rankedRows.begin(), rankedRows.end(), rankx::sortByRow);
 
 
             // create a QMap from 'group' string to list of rows in that group

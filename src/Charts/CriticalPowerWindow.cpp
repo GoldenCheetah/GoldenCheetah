@@ -39,7 +39,6 @@
 #include <qwt_plot_curve.h>
 #include <qwt_series_data.h>
 #include <qwt_scale_div.h>
-#include <qwt_compat.h>
 #include <QFile>
 #include "Season.h"
 #include "SeasonParser.h"
@@ -431,9 +430,9 @@ CriticalPowerWindow::CriticalPowerWindow(Context *context, bool rangemode) :
     grid->enableX(false); // not needed
     grid->enableY(true);
     grid->setZ(-20);
-    QwtValueList ytick[QwtScaleDiv::NTickTypes];
+    QList<double> ytick[QwtScaleDiv::NTickTypes];
     for (double i=0.0; i<=2500; i+= 100) ytick[QwtScaleDiv::MajorTick]<<i;
-    cpPlot->setAxisScaleDiv(QwtPlot::yLeft,QwtScaleDiv(0.0,2500.0,ytick));
+    cpPlot->setAxisScaleDiv(QwtAxis::YLeft,QwtScaleDiv(0.0,2500.0,ytick));
     grid->attach(cpPlot);
 
     // the model helper -- showing model parameters etc
@@ -668,13 +667,11 @@ CriticalPowerWindow::configChanged(qint32)
     QPalette whitepalette;
     if (rangemode) {
         whitepalette.setBrush(QPalette::Window, QBrush(GColor(CTRENDPLOTBACKGROUND)));
-        whitepalette.setBrush(QPalette::Background, QBrush(GColor(CTRENDPLOTBACKGROUND)));
         whitepalette.setColor(QPalette::WindowText, GCColor::invertColor(GColor(CTRENDPLOTBACKGROUND)));
         whitepalette.setColor(QPalette::Base, GCColor::alternateColor(GColor(CPLOTBACKGROUND)));
         whitepalette.setColor(QPalette::Text, GCColor::invertColor(GColor(CTRENDPLOTBACKGROUND)));
     } else {
         whitepalette.setBrush(QPalette::Window, QBrush(GColor(CPLOTBACKGROUND)));
-        whitepalette.setBrush(QPalette::Background, QBrush(GColor(CPLOTBACKGROUND)));
         whitepalette.setColor(QPalette::WindowText, GCColor::invertColor(GColor(CPLOTBACKGROUND)));
         whitepalette.setColor(QPalette::Base, GCColor::alternateColor(GColor(CPLOTBACKGROUND)));
         whitepalette.setColor(QPalette::Text, GCColor::invertColor(GColor(CPLOTBACKGROUND)));
@@ -1168,7 +1165,7 @@ CriticalPowerWindow::intervalHover(IntervalItem* x)
         hoverCurve = new QwtPlotCurve("Interval");
         hoverCurve->setPen(pen);
         if (appsettings->value(this, GC_ANTIALIAS, true).toBool() == true) hoverCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
-        hoverCurve->setYAxis(QwtPlot::yLeft);
+        hoverCurve->setYAxis(QwtAxis::YLeft);
         hoverCurve->setSamples(array);
         hoverCurve->setVisible(true);
         hoverCurve->setZ(100);

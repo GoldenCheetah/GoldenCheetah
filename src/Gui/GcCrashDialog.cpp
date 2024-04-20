@@ -70,8 +70,6 @@
 
 #include <gsl/gsl_version.h>
 
-#include "levmar.h"
-
 QString gl_version;
 
 GcCrashDialog::GcCrashDialog(QDir homeDir) : QDialog(NULL, Qt::Dialog), home(homeDir)
@@ -132,7 +130,6 @@ GcCrashDialog::GcCrashDialog(QDir homeDir) : QDialog(NULL, Qt::Dialog), home(hom
 
     report = new QWebEngineView(this);
     report->setContentsMargins(0,0,0,0);
-    report->page()->view()->setContentsMargins(0,0,0,0);
     report->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     report->setAcceptDrops(false);
     report->settings()->setFontSize(QWebEngineSettings::DefaultFontSize, defaultFont.pointSize()+1);
@@ -183,13 +180,6 @@ QString GcCrashDialog::versionHTML()
 
     #ifdef GC_HAVE_D2XX
     d2xx = "yes";
-    #endif
-
-    // -- KML ----
-    QString kml = "none";
-
-    #ifdef GC_HAVE_KML
-    kml = "yes";
     #endif
 
     // -- ICAL ----
@@ -269,7 +259,6 @@ QString GcCrashDialog::versionHTML()
             "<tr><td colspan=\"2\">%3</td><td>%4</td></tr>"
             "<tr><td colspan=\"2\">SRMIO</td><td>%5</td></tr>"
             "<tr><td colspan=\"2\">D2XX</td><td>%6</td></tr>"
-            "<tr><td colspan=\"2\">KML</td><td>%8</td></tr>"
             "<tr><td colspan=\"2\">ICAL</td><td>%9</td></tr>"
             "<tr><td colspan=\"2\">USBXPRESS</td><td>%10</td></tr>"
             "<tr><td colspan=\"2\">LIBUSB</td><td>%11</td></tr>"
@@ -280,8 +269,7 @@ QString GcCrashDialog::versionHTML()
             "<tr><td colspan=\"2\">R</td><td>%16</td></tr>"
             "<tr><td colspan=\"2\">Python</td><td>%18</td></tr>"
             "<tr><td colspan=\"2\">LMFIT</td><td>7.0</td></tr>"
-            "<tr><td colspan=\"2\">LEVMAR</td><td>%19</td></tr>"
-            "<tr><td colspan=\"2\">GSL</td><td>%20</td></tr>"
+            "<tr><td colspan=\"2\">GSL</td><td>%19</td></tr>"
             "</table>"
             )
             .arg(QT_VERSION_STR)
@@ -290,7 +278,6 @@ QString GcCrashDialog::versionHTML()
             .arg(COMPILER_VERSION)
             .arg(srmio)
             .arg(d2xx)
-            .arg(kml)
             .arg(ical)
             .arg(usbxpress)
             .arg(libusb)
@@ -316,7 +303,6 @@ QString GcCrashDialog::versionHTML()
 #else
             .arg("none")
 #endif
-            .arg(LM_VERSION)
             .arg(gsl)
             ;
 
@@ -477,7 +463,9 @@ GcCrashDialog::saveAs()
     QFile file(fileName);
     file.resize(0);
     QTextStream out(&file);
+#if QT_VERSION < 0x060000
     out.setCodec("UTF-8");
+#endif
 
     if (file.open(QIODevice::WriteOnly)) {
         // write the texts

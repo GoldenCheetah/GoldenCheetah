@@ -124,7 +124,9 @@ Snippets::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString op=
         // setup streamer
         QTextStream out(&outfile);
         // unified codepage and BOM for identification on all platforms
+#if QT_VERSION < 0x060000
         out.setCodec("UTF-8");
+#endif
         //out.setGenerateByteOrderMark(true); << make it easier to parse with no BOM
 
         out << "{\n\t\"" << op << "\": {\n";
@@ -148,7 +150,7 @@ Snippets::postProcess(RideFile *ride, DataProcessorConfig *config=0, QString op=
             for (i=ride->tags().constBegin(); i != ride->tags().constEnd(); i++) {
 
                     out << "\t\t\t\"" << i.key() << "\": \"" << protect(i.value()) << "\"";
-                    if (i+1 != ride->tags().constEnd()) out << ",\n";
+                    if (std::next(i) != ride->tags().constEnd()) out << ",\n";
                     else out << "\n";
             }
 

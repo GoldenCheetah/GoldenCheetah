@@ -169,7 +169,7 @@ DeviceConfigurations::writeConfig(QList<DeviceConfiguration> Configuration)
         bool isPredefinedPostProcess = vptm.IsPredefinedVirtualPowerTrainerIndex(postProcess);
 
         int postProcessStoreValue = postProcess;
-        QString s = "";
+        QString s = Configuration.at(i).virtualPowerDefinitionString;
 
         if (!isPredefinedPostProcess) {
             postProcessStoreValue = 0;
