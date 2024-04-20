@@ -394,7 +394,7 @@ bool Daum::ResetDevice() {
     if (profile_ == "OLD_DAUM"){
         answer_len = 3;   // Old cockpits send 3 bytes answer
     };
-    return WriteDataAndGetAnswer(dat, answer_len).length() == answer_len; // device tells pedalling state too
+    return WriteDataAndGetAnswer(dat, 3).length() == answer_len; // device tells pedalling state too
 }
 int Daum::GetAddress() {
     QByteArray dat;
@@ -436,7 +436,7 @@ bool Daum::SetProgram(unsigned int prog) {
     if (profile_ == "OLD_DAUM"){
         answer_len = 3;   // Old cockpits send 3 bytes answer
     };
-    return WriteDataAndGetAnswer(dat, answer_len).length() == answer_len; // device tells pedalling state too
+    return WriteDataAndGetAnswer(dat, dat.length() + 1).length() == answer_len; // device tells pedalling state too
 }
 bool Daum::StartProgram(unsigned int prog) {
     Q_UNUSED(prog);
