@@ -21,7 +21,14 @@
 #include "Context.h"
 #include "Units.h"
 
+#include <qwt_picker_machine.h>
+
 #include <unordered_map>
+
+
+static const int sectionAlphaHovered = 128;
+static const int sectionAlphaNeutral = 255;
+
 
 // Bridge between QwtPlot and ErgFile to avoid having to
 // create a separate array for the ergfile data, we plot
@@ -66,7 +73,7 @@ QRectF ErgFileData::boundingRect() const
 }
 
 // Now bar
-double NowData::x(size_t) const { 
+double NowData::x(size_t) const {
     if (!bydist || GlobalContext::context()->useMetricUnits) return context->getNow();
     else return context->getNow() * MILES_PER_KM;
 }
@@ -92,6 +99,8 @@ QPointF NowData::sample(size_t i) const
 
 ErgFilePlot::ErgFilePlot(Context *context) : context(context)
 {
+    workoutActive = context->isRunning;
+
     //insertLegend(new QwtLegend(), QwtPlot::BottomLegend);
     setCanvasBackground(GColor(CTRAINPLOTBACKGROUND));
     static_cast<QwtPlotCanvas*>(canvas())->setFrameStyle(QFrame::NoFrame);
@@ -161,6 +170,7 @@ ErgFilePlot::ErgFilePlot(Context *context) : context(context)
     LodCurve = new QwtPlotCurve("Course Load");
     LodCurve->setSamples(lodData);
     LodCurve->attach(this);
+    LodCurve->setVisible(workoutActive);
     LodCurve->setBaseline(-1000);
     LodCurve->setYAxis(QwtAxis::YLeft);
 
@@ -254,6 +264,12 @@ ErgFilePlot::ErgFilePlot(Context *context) : context(context)
     CPMarker->setYValue(274);
     CPMarker->attach(this);
 
+    // Dummy curve for ensuring headroom in Ergmode
+    powerHeadroom = new QwtPlotCurve("Dummy Headroom");
+    powerHeadroom->setYAxis(QwtAxis::YLeft);
+    powerHeadroom->setPen(QColor(0, 0, 0, 0));
+    powerHeadroom->attach(this);
+    powerHeadroom->setVisible(false);
 
     // Now pointer
     NowCurve = new QwtPlotCurve("Now");
@@ -263,16 +279,29 @@ ErgFilePlot::ErgFilePlot(Context *context) : context(context)
     NowCurve->attach(this);
     NowCurve->setYAxis(QwtAxis::YLeft);
 
+    tooltip = new penTooltip(static_cast<QwtPlotCanvas*>(canvas()));
+    tooltip->setMousePattern(QwtEventPattern::MouseSelect1, Qt::LeftButton, Qt::ShiftModifier);
+
+    picker = new QwtPlotPicker(QwtAxis::XBottom, QwtAxis::YLeft, canvas());
+    picker->setTrackerMode(QwtPlotPicker::AlwaysOff);
+    picker->setStateMachine(new QwtPickerTrackerMachine());
+    connect(picker, SIGNAL(moved(const QPoint&)), this, SLOT(hover(const QPoint&)));
+    connect(context, SIGNAL(start()), this, SLOT(startWorkout()));
+    connect(context, SIGNAL(stop()), this, SLOT(stopWorkout()));
+
     bydist = false;
     ergFile = NULL;
 
+    selectTooltip();
+
     setAutoReplot(false);
-	setData(ergFile);
+    setData(ergFile);
 
     configChanged(CONFIG_ZONES);
 
     connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
 }
+
 
 void
 ErgFilePlot::configChanged(qint32)
@@ -339,7 +368,7 @@ public:
         //
         // Build mapping from lapRangeId to index of first/last lap markers in the
         // group.
-        // 
+        //
         // Map provides instant access to start and end of rangeid.
         int lapCount = laps.count();
 
@@ -417,6 +446,11 @@ void
 ErgFilePlot::setData(ErgFile *ergfile)
 {
     reset();
+    powerHeadroom->setVisible(false);
+    for (int i = 0; i < powerSectionCurves.length(); ++i) {
+        delete powerSectionCurves[i];
+    }
+    powerSectionCurves.clear();
 
     ergFile = ergfile;
     // clear the previous marks (if any)
@@ -454,8 +488,32 @@ ErgFilePlot::setData(ErgFile *ergfile)
             LodCurve->setBrush(linearGradient);   // fill below the line
             QPen Lodpen = QPen(Qt::gray, 1.0);
             LodCurve->setPen(Lodpen);
+            LodCurve->show();
 
         } else {
+            QList<ErgFileZoneSection> zoneSections = ergFile->ZoneSections();
+            bool antiAlias = appsettings->value(this, GC_ANTIALIAS, false).toBool();
+            for (int i = 0; i < zoneSections.length(); ++i) {
+                QVector<QPointF> sectionData;
+                sectionData << QPointF(zoneSections[i].start, zoneSections[i].startValue)
+                            << QPointF(zoneSections[i].end, zoneSections[i].endValue);
+                QColor color = QColor(zoneColor(zoneSections[i].zone, 0));
+                color.setAlpha(sectionAlphaNeutral);
+                QwtPlotCurve *sectionCurve = new QwtPlotCurve("Course Load");
+                sectionCurve->setSamples(sectionData);
+                sectionCurve->setBaseline(-1000);
+                sectionCurve->setYAxis(QwtAxis::YLeft);
+                sectionCurve->setZ(-100);
+                sectionCurve->setPen(QColor(0, 0, 0, 0));
+                sectionCurve->setBrush(color);
+                sectionCurve->setRenderHint(QwtPlotItem::RenderAntialiased, antiAlias);
+                sectionCurve->attach(this);
+                sectionCurve->hide();
+                powerSectionCurves.append(sectionCurve);
+            }
+            selectCurves();
+            powerHeadroom->setVisible(true);
+            powerHeadroom->setSamples(QVector<QPointF> { dynamic_cast<QwtPointArrayData<double>*>(lodData)->boundingRect().bottomLeft() });
 
             QColor brush_color1 = QColor(GColor(CTPOWER));
             brush_color1.setAlpha(200);
@@ -470,8 +528,8 @@ ErgFilePlot::setData(ErgFile *ergfile)
             LodCurve->setBrush(linearGradient);   // fill below the line
             QPen Lodpen = QPen(GColor(CTPOWER), 1.0);
             LodCurve->setPen(Lodpen);
-
         }
+        selectTooltip();
 
         LapRowDistributor lapRowDistributor(ergFile->Laps);
 
@@ -512,7 +570,7 @@ ErgFilePlot::setData(ErgFile *ergfile)
             // Literal row translation. We loves ascii art...
             QString prefix = (row > 0) ? QString("\n").repeated(row) : "";
             QwtText text(prefix + decoratedName);
-                
+
             text.setFont(QFont("Helvetica", 10, QFont::Bold));
             text.setColor(GColor(CPLOTMARKER));
 
@@ -524,7 +582,7 @@ ErgFilePlot::setData(ErgFile *ergfile)
             // convert to imperial according to settings
             double unitsFactor = (!bydist || GlobalContext::context()->useMetricUnits) ? 1.0 : MILES_PER_KM;
             add->setValue(lap.x * unitsFactor, 0);
-            
+
             add->setLabel(text);
             add->attach(this);
 
@@ -618,6 +676,53 @@ ErgFilePlot::setNow(long /*msecs*/)
 {
     replot(); // and update
 }
+
+
+bool
+ErgFilePlot::eventFilter
+(QObject *obj, QEvent *event)
+{
+    if (obj == canvas() && event->type() == QEvent::Leave) {
+        highlightSectionCurve(nullptr);
+        tooltip->setText("");
+    }
+    return false;
+}
+
+
+int
+ErgFilePlot::showColorZones
+() const
+{
+    return _showColorZones;
+}
+
+
+void
+ErgFilePlot::setShowColorZones
+(int index)
+{
+    _showColorZones = index;
+    selectCurves();
+}
+
+
+int
+ErgFilePlot::showTooltip
+() const
+{
+    return _showTooltip;
+}
+
+
+void
+ErgFilePlot::setShowTooltip
+(int index)
+{
+    _showTooltip = index;
+    selectTooltip();
+}
+
 
 void
 ErgFilePlot::performancePlot(RealtimeData rtdata)
@@ -713,6 +818,221 @@ ErgFilePlot::reset()
     speedData->clear();
     speedCurve->setSamples(speedData->x(), speedData->y(), speedData->count());
 }
+
+
+void
+ErgFilePlot::hover
+(const QPoint &point)
+{
+    if (   bydist
+        || _showTooltip == 0
+        || (   _showTooltip == 1
+            && workoutActive)
+        || ergFile == nullptr
+        || ergFile->Duration == 0) {
+        tooltip->setText("");
+        return;
+    }
+    double xvalue = invTransform(QwtAxis::XBottom, point.x());
+    double yvalue = invTransform(QwtAxis::YLeft, point.y());
+    const int fullSecs = std::min(std::max(0, int(xvalue)), int(ergFile->Duration) - 1000) / 1000;
+    int duration = 0;
+    int startPower = 0;
+    int endPower = 0;
+    QwtPlotCurve *hoverCurve = nullptr;
+    for (QwtPlotCurve*& curve : powerSectionCurves) {
+        if (curve->minXValue() <= xvalue && xvalue <= curve->maxXValue()) {
+            duration = (curve->maxXValue() - curve->minXValue()) / 1000;
+            startPower = curve->sample(0).y();
+            endPower = curve->sample(1).y();
+            hoverCurve = curve;
+            break;
+        }
+    }
+    int watts = startPower;
+    if (hoverCurve != nullptr && startPower != endPower) {
+        QPointF pl = hoverCurve->sample(0);
+        QPointF pr = hoverCurve->sample(1);
+        watts = (pr.y() - pl.y()) / (pr.x() - pl.x()) * (xvalue - pl.x()) + pl.y();
+    }
+    if (watts == 0 || yvalue > watts) {
+        highlightSectionCurve(nullptr);
+        tooltip->setText("");
+        return;
+    }
+    if (hoverCurve->brush().color().alpha() != sectionAlphaNeutral) {
+        return;
+    }
+
+    double sectionStart = hoverCurve->sample(0).x();
+    double sectionEnd = hoverCurve->sample(1).x();
+
+    highlightSectionCurve(hoverCurve);
+    QString tooltipText;
+    tooltipText = QString("%1\n%4: ")
+                         .arg(tr("Section of %1 starts at %2")
+                                .arg(secsToString(duration))
+                                .arg(secsToString(sectionStart / 1000)))
+                         .arg(tr("Power"));
+    if (startPower == endPower) {
+        tooltipText = QString("%1%2 %3")
+                             .arg(tooltipText)
+                             .arg(startPower)
+                             .arg(tr("watts"));
+    } else {
+        tooltipText = QString("%1%2..%3 %4")
+                             .arg(tooltipText)
+                             .arg(startPower)
+                             .arg(endPower)
+                             .arg(tr("watts"));
+    }
+    const Zones *zones = context->athlete->zones("Bike");
+    int zoneRange = zones->whichRange(QDate::currentDate());
+    if (zoneRange >= 0) {
+        tooltipText = QString("%1 (%2)")
+                             .arg(tooltipText)
+                             .arg(zones->getZoneNames(zoneRange)[zones->whichZone(zoneRange, startPower)]);
+    }
+    if (wbalCurvePredict != nullptr && wbalCurvePredict->dataSize() >= fullSecs) {
+        int secsStart = std::min(int(sectionStart / 1000), int(wbalCurvePredict->dataSize() - 1));
+        int secsEnd = std::min(int(sectionEnd / 1000), int(wbalCurvePredict->dataSize() - 1));
+        double wbalIn = wbalCurvePredict->sample(secsStart).y();
+        double wbalOut = wbalCurvePredict->sample(secsEnd).y();
+        if (int(wbalIn / 100) == int(wbalOut / 100)) {
+            tooltipText = QString("%1\n%2: %3 %4")
+                                 .arg(tooltipText)
+                                 .arg(tr("W' Balance"))
+                                 .arg(wbalIn / 1000.0 , 0, 'f', 1)
+                                 .arg(tr("kJ"));
+        } else {
+            tooltipText = QString("%1\n%2: %3..%4 (%5) %6")
+                                 .arg(tooltipText)
+                                 .arg(tr("W' Balance"))
+                                 .arg(wbalIn / 1000.0 , 0, 'f', 1)
+                                 .arg(wbalOut / 1000.0 , 0, 'f', 1)
+                                 .arg((wbalOut - wbalIn) / 1000.0 , 0, 'f', 1)
+                                 .arg(tr("kJ"));
+        }
+    }
+    tooltip->setText(tooltipText);
+}
+
+
+void
+ErgFilePlot::startWorkout
+()
+{
+    workoutActive = true;
+    selectTooltip();
+    selectCurves();
+}
+
+
+void
+ErgFilePlot::stopWorkout
+()
+{
+    workoutActive = false;
+    selectCurves();
+    selectTooltip();
+}
+
+
+void
+ErgFilePlot::selectCurves
+()
+{
+    bool showColored =    ergFile
+                       && ! bydist
+                       && (   _showColorZones == 1
+                           || (_showColorZones == 2 && ! workoutActive));
+    if (showColored) {
+        LodCurve->hide();
+        for (int i = 0; i < powerSectionCurves.size(); ++i) {
+            powerSectionCurves[i]->show();
+        }
+    } else {
+        LodCurve->show();
+        for (int i = 0; i < powerSectionCurves.size(); ++i) {
+            powerSectionCurves[i]->hide();
+        }
+    }
+    replot();
+}
+
+
+void
+ErgFilePlot::selectTooltip
+()
+{
+    if (   ergFile
+        && ! bydist
+        && (_showTooltip == 1 && ! workoutActive)) {
+        installEventFilter(canvas());
+        picker->setEnabled(true);
+    } else {
+        removeEventFilter(canvas());
+        picker->setEnabled(false);
+    }
+}
+
+
+QString
+ErgFilePlot::secsToString
+(int fullSecs) const
+{
+    int secs = fullSecs % 60;
+    int mins = (fullSecs / 60) % 60;
+    int hours = fullSecs / 3600;
+    QString time;
+    if (hours > 0) {
+        if (secs > 0) {
+            time = QString("%1h %2m %3s").arg(hours).arg(mins).arg(secs);
+        } else {
+            time = QString("%1h %2m").arg(hours).arg(mins);
+        }
+    } else if (mins > 0) {
+        if (secs > 0) {
+            time = QString("%1m %2s").arg(mins).arg(secs);
+        } else {
+            time = QString("%2m").arg(mins);
+        }
+    } else {
+        time = QString("%1s").arg(secs);
+    }
+    return time;
+}
+
+
+void
+ErgFilePlot::highlightSectionCurve
+(QwtPlotCurve const * const highlightedCurve)
+{
+    bool needsReplot = false;
+    for (QwtPlotCurve*& curve : powerSectionCurves) {
+        QBrush brush = curve->brush();
+        QColor color = brush.color();
+        if (curve != highlightedCurve) {
+            if (color.alpha() != sectionAlphaNeutral) {
+                color.setAlpha(sectionAlphaNeutral);
+                brush.setColor(color);
+                curve->setBrush(brush);
+                needsReplot = true;
+            }
+        } else {
+            if (color.alpha() == sectionAlphaNeutral) {
+                color.setAlpha(sectionAlphaHovered);
+                brush.setColor(color);
+                curve->setBrush(brush);
+                needsReplot = true;
+            }
+        }
+    }
+    if (needsReplot) {
+        replot();
+    }
+}
+
 
 // curve data.. code snaffled in from the Qwt example (realtime_plot)
 CurveData::CurveData(): d_count(0) { }
