@@ -1483,11 +1483,20 @@ struct FitFileParser
             case 133: // Pulse Ox
                 return "PULSEOX";
 
+            case 136: // Wrist HR
+                return "WRISTHR";
+
             case 137: // Potential Stamina
                 return "POTENTIALSTAMINA";
 
             case 138: // Stamina
                 return "STAMINA";
+
+            case 143: // Body Battery
+                return "BODYBATTERY";
+
+            case 144: // External HR
+                return "EXTERNALHR";
 
             default:
                 return QString("FIELD_%1").arg(native_num);
@@ -1804,6 +1813,7 @@ struct FitFileParser
     // the contents into an XDATA tab
     void decodeGeneric(QString message, const FitMessage &def, int time_offset,
                        const std::vector<FitValue>& values) {
+        Q_UNUSED(time_offset);
 
         // we don't do it for all messages, it would get out of hand!
         if (!GenericDecodeList.contains(message)) return;
