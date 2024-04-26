@@ -362,6 +362,7 @@ PythonChart::PythonChart(Context *context, bool ridesummary) : GcChartWindow(con
 
         if (ridesummary) {
             connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(runScript()));
+            connect(context, SIGNAL(rideChanged(RideItem*)), this, SLOT(runScript()));
 
             // refresh when comparing
             connect(context, SIGNAL(compareIntervalsStateChanged(bool)), this, SLOT(runScript()));
