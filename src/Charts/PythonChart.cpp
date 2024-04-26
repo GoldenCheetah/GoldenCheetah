@@ -443,6 +443,7 @@ PythonChart::setWeb(bool x)
         // stop stealing focus!
         canvas->settings()->setAttribute(QWebEngineSettings::FocusOnNavigationEnabled, false);
         canvas->settings()->setAttribute(QWebEngineSettings::LocalContentCanAccessRemoteUrls, true);
+        canvas->setAcceptDrops(false);
         renderlayout->insertWidget(0, canvas);
     }
 
