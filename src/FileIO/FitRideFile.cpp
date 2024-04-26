@@ -1492,6 +1492,9 @@ struct FitFileParser
             case 138: // Stamina
                 return "STAMINA";
 
+            case 140: // Gap
+                return "GAP";
+
             case 143: // Body Battery
                 return "BODYBATTERY";
 
@@ -1507,6 +1510,7 @@ struct FitFileParser
         switch (native_num) {
 
             case 32: // VERTICAL_SPEED
+            case 140: // GAP
                     return 1000.0;
 
             case 40: // STANCE_TIME_PERCENT
