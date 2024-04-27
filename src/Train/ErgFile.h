@@ -76,6 +76,20 @@ class ErgFileSection
         double start, end;
 };
 
+class ErgFileZoneSection
+: public ErgFileSection
+{
+    public:
+        ErgFileZoneSection() : ErgFileSection(), startValue(0), endValue(0), zone(0) {}
+        ErgFileZoneSection(int startMSecs, int startValue, int endMSecs, int endValue, int zone)
+         : ErgFileSection(endMSecs - startMSecs, startMSecs, endMSecs), startValue(startValue), endValue(endValue), zone(zone)
+        {}
+
+        int startValue;
+        int endValue;
+        int zone;
+};
+
 class ErgFileText
 {
     public:
@@ -151,6 +165,7 @@ public:
         // turn the ergfile into a series of sections rather
         // than a list of points
         QList<ErgFileSection> Sections();
+        QList<ErgFileZoneSection> ZoneSections();
 
         bool    valid;          // did it parse ok?
 

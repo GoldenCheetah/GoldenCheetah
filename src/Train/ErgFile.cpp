@@ -1225,6 +1225,64 @@ ErgFile::Sections()
     return returning;
 }
 
+
+// convert points to set of sections, every section will be strictly in one zone
+QList<ErgFileZoneSection>
+ErgFile::ZoneSections()
+{
+    QList<ErgFileZoneSection> ret;
+
+    const Zones *zones = context->athlete->zones("Bike");
+    int zoneRange = zones->whichRange(QDate::currentDate());
+    QList<QString> zoneNames = zones->getZoneNames(zoneRange);
+    if (hasWatts() && duration() > 0) {
+        for (int i = 0; i < Points.size() - 1; ++i) {
+            const ErgFilePoint &pl = Points[i];
+            const ErgFilePoint &pr = Points[i + 1];
+            if (long(pl.x) != long(pr.x)) {
+                int zoneL = 0;
+                int zoneR = 0;
+                if (zoneRange >= 0) {
+                    zoneL = zones->whichZone(zoneRange, pl.y);
+                    zoneR = zones->whichZone(zoneRange, pr.y);
+                }
+                if (zoneL == zoneR) {
+                    ret << ErgFileZoneSection(pl.x, pl.y, pr.x, pr.y, zoneL);
+                } else {
+                    double m = (pr.y - pl.y) / (pr.x - pl.x);
+                    int oldZone = 0;
+                    if (zoneRange >= 0) {
+                        oldZone = zones->whichZone(zoneRange, pl.y);
+                    }
+                    double oldTime = pl.x;
+                    double oldWatts = pl.y;
+                    double sectionStartTime = pl.x;
+                    double sectionStartWatts = pl.y;
+                    for (double i = pl.x; i < pr.x; i += 1000) {
+                        double watts = m * (i - pl.x) + pl.y;
+                        int newZone = 0;
+                        if (zoneRange >= 0) {
+                            newZone = zones->whichZone(zoneRange, watts);
+                        }
+                        if (newZone != oldZone) {
+                            ret << ErgFileZoneSection(sectionStartTime, sectionStartWatts, oldTime, oldWatts, oldZone);
+                            sectionStartTime = oldTime;
+                            sectionStartWatts = watts;
+                            oldZone = newZone;
+                        }
+                        oldTime = i;
+                        oldWatts = watts;
+                    }
+                    ret << ErgFileZoneSection(sectionStartTime, sectionStartWatts, pr.x, pr.y, oldZone);
+                }
+            }
+        }
+    }
+
+    return ret;
+}
+
+
 bool
 ErgFile::save(QStringList &errors)
 {

@@ -220,7 +220,7 @@ class WorkoutPage : public QWizardPage
 {
 public:
     WorkoutPage(QWidget *parent) : QWizardPage(parent) {}
-    virtual void SaveWorkout() = 0;
+    virtual bool SaveWorkout() = 0;
     void SaveWorkoutHeader(QTextStream &stream, QString fileName, QString description, QString units)
     {
         stream << "[COURSE HEADER]" << Qt::endl;
@@ -257,7 +257,7 @@ private slots:
 public:
     AbsWattagePage(QWidget *parent=0);
     void initializePage();
-    void SaveWorkout();
+    bool SaveWorkout();
     bool isFinalPage() const { return true; }
     int nextId() const { return -1; }
 };
@@ -277,7 +277,7 @@ public:
     bool isFinalPage() const { return true; }
     int nextId()  const { return -1; }
 
-    void SaveWorkout();
+    bool SaveWorkout();
 };
 
 class GradientPage : public WorkoutPage
@@ -295,7 +295,7 @@ private slots:
 public:
     GradientPage(QWidget *parent=0);
     void initializePage();
-    void SaveWorkout();
+    bool SaveWorkout();
     bool isFinalPage() const { return true; }
     int nextId() const { return -1; }
 };
@@ -314,8 +314,8 @@ public slots:
      void updatePlot();
 public:
     ImportPage(QWidget * parent=0);
-     void initializePage();
-    void SaveWorkout();
+    void initializePage();
+    bool SaveWorkout();
     bool isFinalPage() const { return true; }
 };
 
