@@ -1,6 +1,6 @@
 <layouts>
-<layout name="equipment" style="1" type="16" expression="" trainswitch="0">
-	<chart id="51" name="" title="" >
+<layout name="General" style="1" type="16" expression="" trainswitch="0">
+	<chart id="51" name="" title="Equipment" >
 		<property name="title" type="QString" value="" />
 		<property name="subtitle" type="QString" value="" />
 		<property name="widthFactor" type="double" value="2" />

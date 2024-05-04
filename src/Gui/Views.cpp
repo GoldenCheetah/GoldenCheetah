@@ -470,6 +470,13 @@ EquipView::~EquipView()
     // loaded from the "baked" in configuration, so is never saved.
 }
 
+void
+EquipView::restoreState(bool useDefault)
+{
+    // always load the "baked" in qt resources configuration :xml/equipment-perspectives.xml file.
+    AbstractView::restoreState(false);
+}
+
 bool
 EquipView::isBlank()
 {

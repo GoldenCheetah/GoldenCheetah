@@ -148,6 +148,9 @@ class EquipView : public AbstractView
         // Don't want the base class behaviour for this...
         virtual void setRide(RideItem*) override {}
 
+        // always load the "baked" in qt resources configuration :xml/equipment-perspectives.xml file.
+        virtual void restoreState(bool useDefault) override;
+
         EquipmentSidebar* equipmentSidebar_;
 
     public slots:

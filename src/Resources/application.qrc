@@ -118,6 +118,7 @@
         <file>xml/train-perspectives.xml</file>
         <file>xml/video-layout.xml</file>
         <file>xml/diary-perspectives.xml</file>
+        <file>xml/equipment-perspectives.xml</file>
         <file>xml/analysis-perspectives.xml</file>
         <file>xml/home-perspectives.xml</file>
         <file>ini/measures.ini</file>
