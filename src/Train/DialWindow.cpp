@@ -80,7 +80,10 @@ DialWindow::DialWindow(Context *context) :
     QVBoxLayout *layout = new QVBoxLayout;
     layout->setSpacing(0);
     layout->setContentsMargins(3,3,3,3);
-    valueLabel = new QLabel(this);
+    valueLabel = new ScalingLabel(this);
+    QFont vlFont = valueLabel->font();
+    vlFont.setWeight(QFont::Bold);
+    valueLabel->setFont(vlFont);
     valueLabel->setAlignment(Qt::AlignCenter | Qt::AlignVCenter);
     layout->addWidget(valueLabel);
     setChartLayout(layout);
@@ -98,9 +101,6 @@ DialWindow::DialWindow(Context *context) :
 
     // setup colors
     seriesChanged();
-
-    // setup fontsize etc
-    resizeEvent(NULL);
 
     // set to zero
     resetValues();
@@ -544,21 +544,6 @@ DialWindow::telemetryUpdate(const RealtimeData &rtData)
         break;
 
     }
-}
-
-void DialWindow::resizeEvent(QResizeEvent * )
-{
-    QFont font;
-
-    // set point size within reasonable limits for low dpi screens
-    int size = (geometry().height() - 24) * 72 / logicalDpiY();
-    if (size <= 0) size = 4;
-    if (size >= 64) size = 64;
-
-    font.setPointSize(size);
-
-    font.setWeight(QFont::Bold);
-    valueLabel->setFont(font);
 }
 
 void DialWindow::seriesChanged()
