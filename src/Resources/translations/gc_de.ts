@@ -17593,7 +17593,7 @@ Drehmomentkorrektur - Der absolute Korrekturwert in Nm (oder Pfund pro Quadratin
     </message>
     <message>
         <location filename="../../Charts/LTMWindow.cpp" line="201"/>
-        <location filename="../../Charts/LTMWindow.cpp" line="1327"/>
+        <location filename="../../Charts/LTMWindow.cpp" line="1337"/>
         <source>All</source>
         <translation>Alles</translation>
     </message>
@@ -17674,78 +17674,78 @@ Drehmomentkorrektur - Der absolute Korrekturwert in Nm (oder Pfund pro Quadratin
         <translation>RMSE %1 aus %2 Tests.</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMWindow.cpp" line="1308"/>
+        <location filename="../../Charts/LTMWindow.cpp" line="1318"/>
         <source> grouped by </source>
         <translation> gruppiert nach </translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMWindow.cpp" line="1312"/>
+        <location filename="../../Charts/LTMWindow.cpp" line="1322"/>
         <source>day</source>
         <translation>Tag</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMWindow.cpp" line="1315"/>
+        <location filename="../../Charts/LTMWindow.cpp" line="1325"/>
         <source>week</source>
         <translation>Woche</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMWindow.cpp" line="1318"/>
+        <location filename="../../Charts/LTMWindow.cpp" line="1328"/>
         <source>month</source>
         <translation>Monat</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMWindow.cpp" line="1321"/>
+        <location filename="../../Charts/LTMWindow.cpp" line="1331"/>
         <source>year</source>
         <translation>Jahr</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMWindow.cpp" line="1324"/>
+        <location filename="../../Charts/LTMWindow.cpp" line="1334"/>
         <source>time of day</source>
         <translation>Tageszeit</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMWindow.cpp" line="1422"/>
+        <location filename="../../Charts/LTMWindow.cpp" line="1432"/>
         <source>Time of Day</source>
         <translation>Tageszeit</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMWindow.cpp" line="1532"/>
-        <location filename="../../Charts/LTMWindow.cpp" line="1599"/>
+        <location filename="../../Charts/LTMWindow.cpp" line="1542"/>
+        <location filename="../../Charts/LTMWindow.cpp" line="1609"/>
         <source>seconds</source>
         <translation>Sekunden</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMWindow.cpp" line="1422"/>
+        <location filename="../../Charts/LTMWindow.cpp" line="1432"/>
         <source>Date</source>
         <translation>Datum</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMWindow.cpp" line="1504"/>
+        <location filename="../../Charts/LTMWindow.cpp" line="1514"/>
         <source>Coggan Acute Training Load</source>
         <translation>Coggan Kurzzeit-Trainingsbelastung</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMWindow.cpp" line="1505"/>
+        <location filename="../../Charts/LTMWindow.cpp" line="1515"/>
         <source>Coggan Chronic Training Load</source>
         <translation>Coggan Langzeit-Trainingsbelastung</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMWindow.cpp" line="1506"/>
+        <location filename="../../Charts/LTMWindow.cpp" line="1516"/>
         <source>Coggan Training Stress Balance</source>
         <translation>Coggan Trainingsbelastungsbilanz (SB)</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMWindow.cpp" line="1532"/>
+        <location filename="../../Charts/LTMWindow.cpp" line="1542"/>
         <source>hours</source>
         <translation>Stunden</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMWindow.cpp" line="1643"/>
+        <location filename="../../Charts/LTMWindow.cpp" line="1653"/>
         <source>Export Chart Config</source>
         <translation>Diagrammeinstellungen exportieren</translation>
     </message>
     <message>
-        <location filename="../../Charts/LTMWindow.cpp" line="1656"/>
+        <location filename="../../Charts/LTMWindow.cpp" line="1666"/>
         <source>Save Chart Data as CSV</source>
         <translation>Diagramdaten als CSV-Datei speichern</translation>
     </message>
@@ -19148,10 +19148,6 @@ Sie sind dabei, alle Diagramme auf die Voreinstellungen zurückzusetzen</transla
         <location filename="../../Gui/MainWindow.cpp" line="498"/>
         <source>Save all modified activities</source>
         <translation>Alle geänderten Aktivitäten speichern</translation>
-    </message>
-    <message>
-        <source>Close Window</source>
-        <translation type="vanished">Fenster schließen</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="531"/>
@@ -28326,6 +28322,11 @@ Möchten Sie fortfahren?</translation>
 </context>
 <context>
     <name>SaveOnExitDialogWidget</name>
+    <message>
+        <location filename="../../Gui/SaveDialogs.cpp" line="297"/>
+        <source>Save Changes</source>
+        <translation type="unfinished">Änderungen speichern</translation>
+    </message>
     <message>
         <location filename="../../Gui/SaveDialogs.cpp" line="302"/>
         <source>WARNING
