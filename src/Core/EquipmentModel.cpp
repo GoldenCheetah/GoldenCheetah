@@ -35,6 +35,8 @@ EquipmentModel::EquipmentModel(Context *context) :
 
     connect(context_, SIGNAL(equipmentAdded(EquipmentNode*, int)), this, SLOT(equipmentAdded(EquipmentNode*, int)));
     connect(context_, SIGNAL(equipmentDeleted(EquipmentNode*)), this, SLOT(equipmentDeleted(EquipmentNode*)));
+    connect(context_, SIGNAL(makeEquipmentRef(EquipmentNode*)), this, SLOT(makeEquipmentRef(EquipmentNode*)));
+    connect(context_, SIGNAL(breakEquipmentRef(EquipmentNode*)), this, SLOT(breakEquipmentRef(EquipmentNode*)));
     connect(context_, SIGNAL(equipmentMove(EquipmentNode*, int)), this, SLOT(equipmentMove(EquipmentNode*, int)));
 
     connect(context_, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
@@ -333,7 +335,7 @@ EquipmentModel::copyItemTreeToRefTree(EquipmentNode* copyNodeTree) {
     EquipmentNode* refNode = new EquipmentRef();
 
     // Add the equipment to the reference
-    static_cast<EquipmentRef*>(refNode)->eqDistNode_ = static_cast<EquipmentSharedDistanceItem*>(copyNodeTree);
+    static_cast<EquipmentRef*>(refNode)->eqSharedDistNode_ = static_cast<EquipmentSharedDistanceItem*>(copyNodeTree);
 
     // Add the reference to the equipment
     static_cast<EquipmentSharedDistanceItem*>(copyNodeTree)->linkedRefs_.push_back(static_cast<EquipmentRef*>(refNode));
@@ -480,8 +482,8 @@ EquipmentModel::equipmentDeleted(EquipmentNode* eqNode)
     case eqNodeType::EQ_ITEM_REF: {
 
         // Remove reference from related Equipment Shared Distance Item
-        if (static_cast<EquipmentRef*>(eqNode)->eqDistNode_ != nullptr)
-                static_cast<EquipmentRef*>(eqNode)->eqDistNode_->linkedRefs_.removeOne(eqNode);
+        if (static_cast<EquipmentRef*>(eqNode)->eqSharedDistNode_ != nullptr)
+                static_cast<EquipmentRef*>(eqNode)->eqSharedDistNode_->linkedRefs_.removeOne(eqNode);
 
         removeAndDeleteEquipment(eqNode);
     } break;
@@ -490,6 +492,85 @@ EquipmentModel::equipmentDeleted(EquipmentNode* eqNode)
         qDebug() << "Trying to delete invalid equipment node id:"
                  << static_cast<int>(eqNode->getEqNodeType());
     } break;
+    }
+}
+
+void
+EquipmentModel::makeEquipmentRef(EquipmentNode* eqNode) {
+
+    SharedEquipment* eqSharedNode = nullptr;
+
+    // find the root item's shared equipment node
+    for (EquipmentNode* rootChild : rootItem_->getChildren()) {
+
+        if (rootChild->getEqNodeType() == eqNodeType::EQ_SHARED) {
+            eqSharedNode = static_cast<SharedEquipment*>(rootChild);
+            break;
+        }
+    }
+
+    // ensure the equipment is correctly configured before converting it to a reference
+    if ((eqNode != nullptr) &&
+        (eqNode->getEqNodeType() == eqNodeType::EQ_DIST_ITEM) &&
+        (eqSharedNode != nullptr))
+    {
+        const EquipmentDistanceItem* eqDistCopy = static_cast<EquipmentDistanceItem*>(eqNode);
+
+        // Create the shared distance equipment
+        EquipmentSharedDistanceItem* eqSharedDistNode = new EquipmentSharedDistanceItem(eqDistCopy->description_, eqDistCopy->notes_,
+            eqDistCopy->getNonGCDistance(), eqDistCopy->getGCDistance(), eqDistCopy->replacementDistance_);
+
+        // Create the equipment ref
+        EquipmentRef* eqRefNode = new EquipmentRef(eqDistCopy->getGCDistance(), eqDistCopy->start_, eqDistCopy->end_);
+
+        // Set up the cross reference links
+        eqSharedDistNode->linkedRefs_.push_back(eqRefNode);
+        eqRefNode->eqSharedDistNode_ = eqSharedDistNode;
+
+        emit layoutAboutToBeChanged();
+
+        // Add new shared distance equipment
+        addChildToParent(eqSharedDistNode, eqSharedNode);
+
+        // Add new equipment reference
+        addChildToParent(eqRefNode, eqNode->getParentItem());
+
+        // Delete distance equipment
+        removeAndDeleteEquipment(eqNode);
+
+        emit layoutChanged();
+    }
+}
+
+void
+EquipmentModel::breakEquipmentRef(EquipmentNode* eqNode) {
+
+    // ensure the equipment is correctly configured before breaking its reference
+    if ((eqNode != nullptr) &&
+        (eqNode->getEqNodeType() == eqNodeType::EQ_ITEM_REF))
+    {
+        EquipmentRef* eqRefNode = static_cast<EquipmentRef*>(eqNode);
+        const EquipmentSharedDistanceItem* eqSharedCopy = static_cast<EquipmentRef*>(eqRefNode)->eqSharedDistNode_;
+
+        if (eqSharedCopy != nullptr)
+        {
+            EquipmentDistanceItem* eqDistNode = new EquipmentDistanceItem(eqSharedCopy->description_, eqSharedCopy->notes_,
+                eqSharedCopy->getNonGCDistance(), eqRefNode->getRefDistanceCovered(), eqSharedCopy->replacementDistance_,
+                eqRefNode->start_, eqRefNode->end_);
+
+            // Remove reference from related Shared Equipment Distance Item
+            eqRefNode->eqSharedDistNode_->linkedRefs_.removeOne(eqRefNode);
+
+            emit layoutAboutToBeChanged();
+
+            // Add new distance equipment
+            addChildToParent(eqDistNode, eqRefNode->getParentItem());
+
+            // Delete equipmentRef
+            removeAndDeleteEquipment(eqRefNode);
+
+            emit layoutChanged();
+        }
     }
 }
 

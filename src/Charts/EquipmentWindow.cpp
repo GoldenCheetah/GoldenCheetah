@@ -470,7 +470,7 @@ EquipmentWindow::displayReference(EquipmentRef* eqRef) {
 
     static_cast<QLabel*>(pageWids[2].labelPtr)->setText(tr("Reference Distance") + unitString());
 
-    EquipmentSharedDistanceItem* eqNode = eqRef->eqDistNode_;
+    EquipmentSharedDistanceItem* eqNode = eqRef->eqSharedDistNode_;
 
     if (eqNode) {
 

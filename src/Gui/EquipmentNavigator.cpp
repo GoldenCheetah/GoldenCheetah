@@ -196,10 +196,10 @@ void EquipmentNavigatorCellDelegate::paint(QPainter* painter, const QStyleOption
         } break;
 
         case eqNodeType::EQ_ITEM_REF: {
-            if (static_cast<EquipmentRef*>(eqNode)->eqDistNode_ == nullptr)
+            if (static_cast<EquipmentRef*>(eqNode)->eqSharedDistNode_ == nullptr)
                 userColor = odtColour;
             else
-                if (static_cast<EquipmentRef*>(eqNode)->eqDistNode_ == eqNav_->currentEqItem_) {
+                if (static_cast<EquipmentRef*>(eqNode)->eqSharedDistNode_ == eqNav_->currentEqItem_) {
 
                     painter->fillRect(myOption.rect, selectBkgdColor);
                     userColor = selectTxtColor;

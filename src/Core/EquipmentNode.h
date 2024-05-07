@@ -239,7 +239,7 @@ public:
     bool endNotSet() const { return end_.isNull(); }
 
     // Reference back to the equipment
-    EquipmentSharedDistanceItem* eqDistNode_;
+    EquipmentSharedDistanceItem* eqSharedDistNode_;
     QDateTime start_;
     QDateTime end_;
 

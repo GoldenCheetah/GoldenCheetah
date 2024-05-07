@@ -171,12 +171,9 @@ EquipmentSidebar::showEquipmentMenu(const QPoint &pos)
 {
     if (currentEqItem_ != nullptr) {
 
-        QAction* addEquipment = nullptr;
-        QAction* addSharedEquipment = nullptr;
-        QAction* addTimeEquipment = nullptr;
-        QAction* addEquipmentBanner = nullptr;
-        QAction* deleteEquipment = nullptr;
-        QAction* leftShiftEquipment = nullptr;
+        QAction* addEquipment = nullptr, *addSharedEquipment = nullptr, *addTimeEquipment = nullptr;
+        QAction* addEquipmentBanner = nullptr, *deleteEquipment = nullptr, *leftShiftEquipment = nullptr;
+        QAction* makeRefEquipment = nullptr, *breakRefEquipment = nullptr;
 
         switch (currentEqItem_->getEqNodeType()) {
 
@@ -188,9 +185,15 @@ EquipmentSidebar::showEquipmentMenu(const QPoint &pos)
                 addEquipment = new QAction(tr("Add Distance"), equipmentNavigator_);
                 addTimeEquipment = new QAction(tr("Add Time"), equipmentNavigator_);
                 addEquipmentBanner = new QAction(tr("Add Banner"), equipmentNavigator_);
-                deleteEquipment = (currentEqItem_->getEqNodeType() == eqNodeType::EQ_ITEM_REF) ?
-                    new QAction(tr("Remove Ref"), equipmentNavigator_) :
-                    new QAction(tr("Delete"), equipmentNavigator_);
+                if (currentEqItem_->getEqNodeType() == eqNodeType::EQ_ITEM_REF) {
+                    breakRefEquipment = new QAction(tr("Break Ref"), equipmentNavigator_);
+                    deleteEquipment = new QAction(tr("Remove Ref"), equipmentNavigator_);
+                } else {
+                    deleteEquipment = new QAction(tr("Delete"), equipmentNavigator_);
+                }
+                if (currentEqItem_->getEqNodeType() == eqNodeType::EQ_DIST_ITEM) {
+                    makeRefEquipment = new QAction(tr("Make Ref"), equipmentNavigator_);
+                }
                 if ((currentEqItem_->getParentItem()->getEqNodeType() == eqNodeType::EQ_DIST_ITEM) ||
                     (currentEqItem_->getParentItem()->getEqNodeType() == eqNodeType::EQ_ITEM_REF) ||
                     (currentEqItem_->getParentItem()->getEqNodeType() == eqNodeType::EQ_TIME_ITEM) ||
@@ -235,12 +238,26 @@ EquipmentSidebar::showEquipmentMenu(const QPoint &pos)
             connect(addEquipmentBanner, SIGNAL(triggered(void)), this, SLOT(addEquipmentBannerHandler()));
             menu.addAction(addEquipmentBanner);
         }
+        if (makeRefEquipment) {
+            connect(makeRefEquipment, SIGNAL(triggered(void)), this, SLOT(makeRefEquipmentHandler()));
+            makeRefEquipment->setEnabled((currentEqItem_->childCount() == 0));
+            menu.addAction(makeRefEquipment);
+            menu.addSeparator();
+        }
         if (deleteEquipment) {
             menu.addSeparator();
+
+            if (breakRefEquipment) {
+                connect(breakRefEquipment, SIGNAL(triggered(void)), this, SLOT(breakRefEquipmentHandler()));
+                breakRefEquipment->setEnabled((currentEqItem_->childCount() == 0));
+                menu.addAction(breakRefEquipment);
+            }
+
             connect(deleteEquipment, SIGNAL(triggered(void)), this, SLOT(deleteEquipmentHandler()));
             deleteEquipment->setEnabled((currentEqItem_->childCount() == 0));
             menu.addAction(deleteEquipment);
         }
+
         menu.addSeparator();
 
         QVector<EquipmentNode*>& parentsChildren = currentEqItem_->getParentItem()->getChildren();
@@ -296,6 +313,17 @@ EquipmentSidebar::addEquipmentBannerHandler() {
 void
 EquipmentSidebar::deleteEquipmentHandler() {
     context_->notifyEquipmentDeleted(currentEqItem_);
+}
+
+
+void
+EquipmentSidebar::makeRefEquipmentHandler() {
+    context_->notifyMakeEquipmentRef(currentEqItem_);
+}
+
+void
+EquipmentSidebar::breakRefEquipmentHandler() {
+    context_->notifyBreakEquipmentRef(currentEqItem_);
 }
 
 void

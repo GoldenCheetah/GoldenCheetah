@@ -166,7 +166,7 @@ EquipmentModelManager::threadCompleted(EquipmentModelRecalculationThread* thread
 void
 EquipmentModelManager::RecalculateEq(RideItem* rideItem)
 {
-    // iterate through the top level Equipment LInks to match against ride metadata
+    // iterate through the root item's links to find the equipment links to match against ride metadata
     for (EquipmentNode* rootChild : equipModel_->rootItem_->getChildren()) {
 
         if (rootChild->getEqNodeType() == eqNodeType::EQ_LINK) {
@@ -359,7 +359,7 @@ EquipmentModelManager::createEquipmentNodeTree(QVector<flatEqNode>& flatEqNodes)
                     (flatNodeSearch.eqId_ == flatNode.eqIdRef_)) {
 
                     // Add the equipment to the reference
-                    static_cast<EquipmentRef*>(flatNode.eqNode_)->eqDistNode_ = static_cast<EquipmentSharedDistanceItem*>(flatNodeSearch.eqNode_);
+                    static_cast<EquipmentRef*>(flatNode.eqNode_)->eqSharedDistNode_ = static_cast<EquipmentSharedDistanceItem*>(flatNodeSearch.eqNode_);
 
                     // Add the reference to the equipment
                     static_cast<EquipmentSharedDistanceItem*>(flatNodeSearch.eqNode_)->linkedRefs_.push_back(static_cast<EquipmentRef*>(flatNode.eqNode_));

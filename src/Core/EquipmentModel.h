@@ -52,6 +52,8 @@ class EquipmentModel : public QAbstractItemModel
         void configChanged(qint32);
         void equipmentAdded(EquipmentNode* eqParent, int eqToAdd);
         void equipmentDeleted(EquipmentNode* eqNode);
+        void makeEquipmentRef(EquipmentNode* eqNode);
+        void breakEquipmentRef(EquipmentNode* eqNode);
         void equipmentMove(EquipmentNode* eqNode, int move);
 
     protected:

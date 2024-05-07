@@ -325,13 +325,13 @@ operator<<(QTextStream& out, const EquipmentTimeItem& eqNode) {
 // ---------------------------------- Equipment Reference  ---------------------------------
 
 EquipmentRef::EquipmentRef() :
-    EquipmentNode(), eqDistNode_(nullptr),
+    EquipmentNode(), eqSharedDistNode_(nullptr),
     refDistanceCovered_(0),    start_(QDateTime()), end_(QDateTime())
 {
 }
 
 EquipmentRef::EquipmentRef(double refDistance, const QDateTime& start, const QDateTime& end) :
-    EquipmentNode(), eqDistNode_(nullptr),
+    EquipmentNode(), eqSharedDistNode_(nullptr),
     refDistanceCovered_(refDistance), start_(start), end_(end)
 {
 }
@@ -357,7 +357,7 @@ EquipmentRef::data(int /*column*/) const {
         else
             dataString += start_.toString("d MMM yyyy->") + end_.toString("d MMM yyyy~ Ref: ");
 
-    dataString += (eqDistNode_) ? eqDistNode_->description_ + " [" + QString::number(refDistanceCovered_, 'f', 0) + "]" : tr("Referenced Equipment Missing!");
+    dataString += (eqSharedDistNode_) ? eqSharedDistNode_->description_ + " [" + QString::number(refDistanceCovered_, 'f', 0) + "]" : tr("Referenced Equipment Missing!");
 
     return dataString;
 }
@@ -401,7 +401,7 @@ EquipmentRef::incrementDistanceCovered(double addDistance) {
         ;
 
     // Update the referenced original equipment item
-    if (eqDistNode_) eqDistNode_->incrementDistanceCovered(addDistance);
+    if (eqSharedDistNode_) eqSharedDistNode_->incrementDistanceCovered(addDistance);
 }
 
 QTextStream& operator<<(QTextStream& out, const EquipmentRef& eqRef)
@@ -409,8 +409,8 @@ QTextStream& operator<<(QTextStream& out, const EquipmentRef& eqRef)
     out << "<eqRefs "
         << "id=\"" << &eqRef << "\" "
         << "parentId=\"" << eqRef.parentItem_ << "\" ";
-    if (eqRef.eqDistNode_)
-        out << "eqId=\"" << eqRef.eqDistNode_ << "\" ";
+    if (eqRef.eqSharedDistNode_)
+        out << "eqId=\"" << eqRef.eqSharedDistNode_ << "\" ";
     else
         out << "eqId=\"eqReferenceMissing\" ";
     if (eqRef.refDistanceCovered_ != 0) {

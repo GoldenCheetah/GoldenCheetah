@@ -66,6 +66,8 @@ class EquipmentSidebar : public QWidget
         void addEquipmentTimeHandler();
         void addEquipmentBannerHandler();
         void deleteEquipmentHandler();
+        void makeRefEquipmentHandler();
+        void breakRefEquipmentHandler();
         void moveUpEquipmentHandler();
         void moveTopEquipmentHandler();
         void moveDownEquipmentHandler();

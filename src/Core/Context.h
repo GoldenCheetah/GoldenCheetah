@@ -255,6 +255,8 @@ class Context : public QObject
         void notifyEquipmentSelected(EquipmentNode* eqNode) { equipmentSelected(eqNode); }
         void notifyEquipmentAdded(EquipmentNode* eqParent, int eqToAdd) { equipmentAdded(eqParent, eqToAdd); }
         void notifyEquipmentDeleted(EquipmentNode* eqNode) { equipmentDeleted(eqNode); }
+        void notifyMakeEquipmentRef(EquipmentNode* eqNode) { makeEquipmentRef(eqNode); }
+        void notifyBreakEquipmentRef(EquipmentNode* eqNode) { breakEquipmentRef(eqNode); }
         void notifyEquipmentMove(EquipmentNode* eqNode, int move) { equipmentMove(eqNode, move); }
         void notifyEqRecalculationStart() { eqRecalculationStart(); }
         void notifyEqRecalculationEnd() { eqRecalculationEnd(); }
@@ -351,8 +353,10 @@ class Context : public QObject
 
         // Equipment
         void equipmentSelected(EquipmentNode* eqNode);
-        void equipmentAdded(EquipmentNode*, int eqToAdd);
-        void equipmentDeleted(EquipmentNode*);
+        void equipmentAdded(EquipmentNode* eqParent, int eqToAdd);
+        void equipmentDeleted(EquipmentNode* eqNode);
+        void makeEquipmentRef(EquipmentNode* eqNode);
+        void breakEquipmentRef(EquipmentNode* eqNode);
         void equipmentMove(EquipmentNode* eqNode, int move);
         void eqRecalculationStart();
         void eqRecalculationEnd();
