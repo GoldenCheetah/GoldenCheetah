@@ -415,7 +415,11 @@ FilterEditorHelper::evaluateCompletion
     cp += modCompletion.size();
 
     // Insert trailing space
-    if (newText[cp] != ' ') {
+    if (cp >= newText.length()) {
+        if (! newText.endsWith(" ")) {
+            newText.append(" ");
+        }
+    } else if (newText[cp] != ' ') {
         newText.insert(cp, " ");
     }
     ++cp;
