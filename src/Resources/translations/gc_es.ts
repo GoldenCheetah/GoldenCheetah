@@ -9064,7 +9064,7 @@ le sugerirá los posibles nombres
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="2160"/>
         <source>Ignore Zeros</source>
-        <translation type="unfinished"></translation>
+        <translation>Ignorar ceros</translation>
     </message>
     <message>
         <location filename="../../Charts/LTMTool.cpp" line="2205"/>
@@ -10036,30 +10036,30 @@ le sugerirá los posibles nombres
     <message>
         <location filename="../../Train/ErgFilePlot.cpp" line="873"/>
         <source>Section of %1 starts at %2</source>
-        <translation type="unfinished"></translation>
+        <translation>La sección de %1 comienza en %2</translation>
     </message>
     <message>
         <location filename="../../Train/ErgFilePlot.cpp" line="876"/>
         <source>Power</source>
-        <translation type="unfinished">Potencia</translation>
+        <translation>Potencia</translation>
     </message>
     <message>
         <location filename="../../Train/ErgFilePlot.cpp" line="881"/>
         <location filename="../../Train/ErgFilePlot.cpp" line="887"/>
         <source>watts</source>
-        <translation type="unfinished">W</translation>
+        <translation>W</translation>
     </message>
     <message>
         <location filename="../../Train/ErgFilePlot.cpp" line="904"/>
         <location filename="../../Train/ErgFilePlot.cpp" line="910"/>
         <source>W&apos; Balance</source>
-        <translation type="unfinished">Balance de W&apos;</translation>
+        <translation>Balance de W&apos;</translation>
     </message>
     <message>
         <location filename="../../Train/ErgFilePlot.cpp" line="906"/>
         <location filename="../../Train/ErgFilePlot.cpp" line="914"/>
         <source>kJ</source>
-        <translation type="unfinished">kJ</translation>
+        <translation>kJ</translation>
     </message>
 </context>
 <context>
@@ -12575,7 +12575,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Gui/GcCrashDialog.cpp" line="255"/>
         <source>&lt;table&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;QT&lt;/td&gt;&lt;td&gt;%1&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;QWT&lt;/td&gt;&lt;td&gt;%2&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;%3&lt;/td&gt;&lt;td&gt;%4&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;SRMIO&lt;/td&gt;&lt;td&gt;%5&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;D2XX&lt;/td&gt;&lt;td&gt;%6&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;ICAL&lt;/td&gt;&lt;td&gt;%9&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;USBXPRESS&lt;/td&gt;&lt;td&gt;%10&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;LIBUSB&lt;/td&gt;&lt;td&gt;%11&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;VLC&lt;/td&gt;&lt;td&gt;%12&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;VIDEO&lt;/td&gt;&lt;td&gt;%13&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;SAMPLERATE&lt;/td&gt;&lt;td&gt;%14&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;SSL&lt;/td&gt;&lt;td&gt;%15&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;R&lt;/td&gt;&lt;td&gt;%16&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;Python&lt;/td&gt;&lt;td&gt;%18&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;LMFIT&lt;/td&gt;&lt;td&gt;7.0&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;GSL&lt;/td&gt;&lt;td&gt;%19&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;table&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;QT&lt;/td&gt;&lt;td&gt;%1&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;QWT&lt;/td&gt;&lt;td&gt;%2&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;%3&lt;/td&gt;&lt;td&gt;%4&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;SRMIO&lt;/td&gt;&lt;td&gt;%5&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;D2XX&lt;/td&gt;&lt;td&gt;%6&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;ICAL&lt;/td&gt;&lt;td&gt;%9&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;USBXPRESS&lt;/td&gt;&lt;td&gt;%10&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;LIBUSB&lt;/td&gt;&lt;td&gt;%11&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;VLC&lt;/td&gt;&lt;td&gt;%12&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;VIDEO&lt;/td&gt;&lt;td&gt;%13&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;SAMPLERATE&lt;/td&gt;&lt;td&gt;%14&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;SSL&lt;/td&gt;&lt;td&gt;%15&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;R&lt;/td&gt;&lt;td&gt;%16&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;Python&lt;/td&gt;&lt;td&gt;%18&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;LMFIT&lt;/td&gt;&lt;td&gt;7.0&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td colspan=&quot;2&quot;&gt;GSL&lt;/td&gt;&lt;td&gt;%19&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;</translation>
     </message>
     <message>
         <location filename="../../Gui/GcCrashDialog.cpp" line="460"/>
@@ -13891,7 +13891,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="142"/>
         <source>Downloading of Routes from your Strava account for Train - Indoor Riding</source>
-        <translation type="unfinished"></translation>
+        <translation>Descargando rutas de su cuenta de Strava para actividad bajo techo</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="149"/>
@@ -14227,17 +14227,17 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="372"/>
         <source>Metrics shown in &apos;Intervals&apos; and &apos;Summary&apos;</source>
-        <translation type="unfinished"></translation>
+        <translation>Métricas mostradas en &quot;Intervalos&quot; y &quot;Resumen&quot;</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="374"/>
         <source>User/Custom Metrics</source>
-        <translation type="unfinished"></translation>
+        <translation>Métricas de usuario personalizadas</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="376"/>
         <source>Create or Edit a User Metric</source>
-        <translation type="unfinished"></translation>
+        <translation>Crear o editar métrica personalizada</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="378"/>
@@ -18962,12 +18962,12 @@ encendido y muestra &quot;PC-Link&quot;</translation>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="182"/>
         <source>Setting up GUI...</source>
-        <translation type="unfinished"></translation>
+        <translation>Iniciando el entorno gráfico...</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="202"/>
         <source>Setting up GUI: Scopebar...</source>
-        <translation type="unfinished"></translation>
+        <translation>Iniciando el entorno gráfico: barra principal...</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="208"/>
@@ -19024,12 +19024,12 @@ encendido y muestra &quot;PC-Link&quot;</translation>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="240"/>
         <source>Setting up GUI: Context Help...</source>
-        <translation type="unfinished"></translation>
+        <translation>Iniciando el entorno gráfico: ayuda...</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="253"/>
         <source>Setting up GUI: Toolbar...</source>
-        <translation type="unfinished"></translation>
+        <translation>Iniciando el entorno gráfico: barra de herramientas...</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="315"/>
@@ -19044,12 +19044,12 @@ encendido y muestra &quot;PC-Link&quot;</translation>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="398"/>
         <source>Setting up GUI: Central Widget...</source>
-        <translation type="unfinished"></translation>
+        <translation>Iniciando el entorno gráfico: widgets...</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="466"/>
         <source>Setting up GUI: Application Menus...</source>
-        <translation type="unfinished"></translation>
+        <translation>Iniciando el entorno gráfico: menús...</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="477"/>
@@ -19069,7 +19069,7 @@ encendido y muestra &quot;PC-Link&quot;</translation>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="500"/>
         <source>&amp;Quit</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Salir</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="525"/>
@@ -19084,7 +19084,7 @@ encendido y muestra &quot;PC-Link&quot;</translation>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="572"/>
         <source>Download workouts from Strava Routes...</source>
-        <translation type="unfinished"></translation>
+        <translation>Descargando entrenamientos de las rutas de Strava...</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="1751"/>
@@ -19292,22 +19292,22 @@ encendido y muestra &quot;PC-Link&quot;</translation>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="705"/>
         <source>Selecting ride...</source>
-        <translation type="unfinished"></translation>
+        <translation>Seleccionando actividad...</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="732"/>
         <source>Checking for udates...</source>
-        <translation type="unfinished"></translation>
+        <translation>Comprobando actualizaciones...</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="739"/>
         <source>Asking for telemetry...</source>
-        <translation type="unfinished"></translation>
+        <translation>Solicitando telemetría...</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="773"/>
         <source>%1 - build %2</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 - compilación %2</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="928"/>
@@ -19378,22 +19378,22 @@ encendido y muestra &quot;PC-Link&quot;</translation>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="1690"/>
         <source>Import Images Failed</source>
-        <translation type="unfinished"></translation>
+        <translation>Fallo en la importación de imágenes</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="1690"/>
         <source>You can only import images on the activities view with an activity selected.</source>
-        <translation type="unfinished"></translation>
+        <translation>Hay que seleccionar una actividad para poder importar imágenes.</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="1696"/>
         <source>Import Images to Activity</source>
-        <translation type="unfinished"></translation>
+        <translation>Importar imágenes a la actividad</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="1696"/>
         <source>%1 images imported.</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 imagen/imágenes importada(s).</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="1928"/>
@@ -19540,7 +19540,7 @@ Por favor, verifique la configuración de preferencias.</translation>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="2642"/>
         <source>Loading activities: %1%</source>
-        <translation type="unfinished"></translation>
+        <translation>Cargando actividades: %1%</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="2680"/>
@@ -26722,12 +26722,12 @@ Do you want to continue?</source>
     <message>
         <location filename="../../FileIO/RideFile.cpp" line="245"/>
         <source>Walk</source>
-        <translation type="unfinished"></translation>
+        <translation>Caminata</translation>
     </message>
     <message>
         <location filename="../../FileIO/RideFile.cpp" line="246"/>
         <source>Walking</source>
-        <translation type="unfinished"></translation>
+        <translation>Caminata</translation>
     </message>
     <message>
         <location filename="../../FileIO/RideFile.cpp" line="365"/>
@@ -28028,7 +28028,7 @@ Do you want to continue?</source>
     <message>
         <location filename="../../Charts/RideMapWindow.cpp" line="103"/>
         <source>Map Grayscale Filter</source>
-        <translation type="unfinished"></translation>
+        <translation>Mapa de escala de grises</translation>
     </message>
     <message>
         <location filename="../../Charts/RideMapWindow.cpp" line="111"/>
@@ -28255,7 +28255,7 @@ Do you want to continue?</source>
     <message>
         <location filename="../../Gui/SaveDialogs.cpp" line="297"/>
         <source>Save Changes</source>
-        <translation type="unfinished">Guardar cambios</translation>
+        <translation>Guardar cambios</translation>
     </message>
     <message>
         <location filename="../../Gui/SaveDialogs.cpp" line="302"/>
@@ -30487,42 +30487,42 @@ Si la nueva actividad colisiona con una existente (misma fecha y hora) el asiste
     <message>
         <location filename="../../Train/StravaRoutesDownload.cpp" line="33"/>
         <source>Download Routes as workouts from Strava</source>
-        <translation type="unfinished"></translation>
+        <translation>Descargar rutas de Strava como entrenamientos</translation>
     </message>
     <message>
         <location filename="../../Train/StravaRoutesDownload.cpp" line="48"/>
         <source>check/uncheck all</source>
-        <translation type="unfinished">marcar/desmarcar todo</translation>
+        <translation>marcar/desmarcar todo</translation>
     </message>
     <message>
         <location filename="../../Train/StravaRoutesDownload.cpp" line="51"/>
         <source>Refresh List</source>
-        <translation type="unfinished">Actualizar lista de actividades</translation>
+        <translation>Actualizar lista de actividades</translation>
     </message>
     <message>
         <location filename="../../Train/StravaRoutesDownload.cpp" line="66"/>
         <source>Name</source>
-        <translation type="unfinished">Nombre</translation>
+        <translation>Nombre</translation>
     </message>
     <message>
         <location filename="../../Train/StravaRoutesDownload.cpp" line="67"/>
         <source>Description</source>
-        <translation type="unfinished">Descripción</translation>
+        <translation>Descripción</translation>
     </message>
     <message>
         <location filename="../../Train/StravaRoutesDownload.cpp" line="68"/>
         <source>Action</source>
-        <translation type="unfinished">Acción</translation>
+        <translation>Acción</translation>
     </message>
     <message>
         <location filename="../../Train/StravaRoutesDownload.cpp" line="83"/>
         <source>Overwrite existing workouts</source>
-        <translation type="unfinished">Sobrescribir entrenamientos existentes</translation>
+        <translation>Sobrescribir entrenamientos existentes</translation>
     </message>
     <message>
         <location filename="../../Train/StravaRoutesDownload.cpp" line="84"/>
         <source>Close</source>
-        <translation type="unfinished">Cerrar</translation>
+        <translation>Cerrar</translation>
     </message>
     <message>
         <location filename="../../Train/StravaRoutesDownload.cpp" line="85"/>
@@ -30530,83 +30530,83 @@ Si la nueva actividad colisiona con una existente (misma fecha y hora) el asiste
         <location filename="../../Train/StravaRoutesDownload.cpp" line="133"/>
         <location filename="../../Train/StravaRoutesDownload.cpp" line="185"/>
         <source>Download</source>
-        <translation type="unfinished">Descargar</translation>
+        <translation>Descargar</translation>
     </message>
     <message>
         <location filename="../../Train/StravaRoutesDownload.cpp" line="127"/>
         <source>Download...</source>
-        <translation type="unfinished">Descargar...</translation>
+        <translation>Descargar...</translation>
     </message>
     <message>
         <location filename="../../Train/StravaRoutesDownload.cpp" line="130"/>
         <location filename="../../Train/StravaRoutesDownload.cpp" line="140"/>
         <source>Abort</source>
-        <translation type="unfinished"></translation>
+        <translation>Abortar</translation>
     </message>
     <message>
         <location filename="../../Train/StravaRoutesDownload.cpp" line="132"/>
         <source>%1 workouts downloaded, %2 failed or skipped.</source>
-        <translation type="unfinished">%1 entrenamientos descargados, %2 fallaron o fueron omitidos.</translation>
+        <translation>%1 entrenamientos descargados, %2 fallaron o fueron omitidos.</translation>
     </message>
     <message>
         <location filename="../../Train/StravaRoutesDownload.cpp" line="166"/>
         <source>Today&apos;s Plan Workout Download</source>
-        <translation type="unfinished">Descargar entrenamientos desde Today&apos;s Plan</translation>
+        <translation>Descargar entrenamientos desde Today&apos;s Plan</translation>
     </message>
     <message>
         <location filename="../../Train/StravaRoutesDownload.cpp" line="166"/>
         <source>The following error occured: %1</source>
-        <translation type="unfinished">Ocurrió el siguiente problema: %1</translation>
+        <translation>Ocurrió el siguiente problema: %1</translation>
     </message>
     <message>
         <location filename="../../Train/StravaRoutesDownload.cpp" line="221"/>
         <source>Downloading...</source>
-        <translation type="unfinished">Descargando ...</translation>
+        <translation>Descargando ...</translation>
     </message>
     <message>
         <location filename="../../Train/StravaRoutesDownload.cpp" line="227"/>
         <source>Error downloading</source>
-        <translation type="unfinished">Error descargando</translation>
+        <translation>Error en la descarga</translation>
     </message>
     <message>
         <location filename="../../Train/StravaRoutesDownload.cpp" line="260"/>
         <source>Exists already</source>
-        <translation type="unfinished">Ya existe</translation>
+        <translation>Ya existe</translation>
     </message>
     <message>
         <location filename="../../Train/StravaRoutesDownload.cpp" line="269"/>
         <source>Removing...</source>
-        <translation type="unfinished">Eliminando...</translation>
+        <translation>Eliminando...</translation>
     </message>
     <message>
         <location filename="../../Train/StravaRoutesDownload.cpp" line="282"/>
         <source>Saved</source>
-        <translation type="unfinished">Guardado</translation>
+        <translation>Guardado</translation>
     </message>
     <message>
         <location filename="../../Train/StravaRoutesDownload.cpp" line="288"/>
         <source>Write failed</source>
-        <translation type="unfinished"></translation>
+        <translation>Falló la escritura</translation>
     </message>
     <message>
         <location filename="../../Train/StravaRoutesDownload.cpp" line="298"/>
         <source>Invalid File</source>
-        <translation type="unfinished">Archivo inválido</translation>
+        <translation>Archivo no válido</translation>
     </message>
     <message>
         <location filename="../../Train/StravaRoutesDownload.cpp" line="351"/>
         <source>You must authorise with Strava first</source>
-        <translation type="unfinished">Primero tiene que identificarse en Strava</translation>
+        <translation>Primero tiene que identificarse en Strava</translation>
     </message>
     <message>
         <location filename="../../Train/StravaRoutesDownload.cpp" line="358"/>
         <source>Unable to determine authenticated user id</source>
-        <translation type="unfinished"></translation>
+        <translation>No ha sido posible determinar el identificador de usuario</translation>
     </message>
     <message>
         <location filename="../../Train/StravaRoutesDownload.cpp" line="391"/>
         <source>Network Problem reading Strava data</source>
-        <translation type="unfinished">Problema de red leyendo datos de Strava</translation>
+        <translation>Problema de red leyendo datos de Strava</translation>
     </message>
 </context>
 <context>
@@ -31241,7 +31241,7 @@ de acuerdo a la altitud y la configuración.</translation>
     <message>
         <location filename="../../Gui/Pages.cpp" line="756"/>
         <source>Coalesce contiguous sections of same wattage</source>
-        <translation type="unfinished"></translation>
+        <translation>Fusionar secciones contiguas de la misma potencia</translation>
     </message>
     <message>
         <location filename="../../Gui/Pages.cpp" line="759"/>
@@ -31584,7 +31584,7 @@ Permita que la rueda gire libremente.</translation>
     <message>
         <location filename="../../Train/TrainSidebar.cpp" line="442"/>
         <source>Get Workouts from Strava Routes</source>
-        <translation type="unfinished"></translation>
+        <translation>Obtener entrenamientos de rutas de Strava</translation>
     </message>
     <message>
         <location filename="../../Train/TrainSidebar.cpp" line="556"/>
@@ -33288,13 +33288,13 @@ Puede eliminar las referencias cuando administra la biblioteca usando el menú d
         <location filename="../../Train/WorkoutPlotWindow.cpp" line="40"/>
         <location filename="../../Train/WorkoutPlotWindow.cpp" line="104"/>
         <source>Ergmode specific settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Configuración específica de Ergmode</translation>
     </message>
     <message>
         <location filename="../../Train/WorkoutPlotWindow.cpp" line="46"/>
         <location filename="../../Train/WorkoutPlotWindow.cpp" line="105"/>
         <source>Color power zones</source>
-        <translation type="unfinished"></translation>
+        <translation>Color de las zonas de potencia</translation>
     </message>
     <message>
         <location filename="../../Train/WorkoutPlotWindow.cpp" line="48"/>
@@ -33302,13 +33302,13 @@ Puede eliminar las referencias cuando administra la biblioteca usando el menú d
         <location filename="../../Train/WorkoutPlotWindow.cpp" line="106"/>
         <location filename="../../Train/WorkoutPlotWindow.cpp" line="111"/>
         <source>Never</source>
-        <translation type="unfinished"></translation>
+        <translation>Nunca</translation>
     </message>
     <message>
         <location filename="../../Train/WorkoutPlotWindow.cpp" line="49"/>
         <location filename="../../Train/WorkoutPlotWindow.cpp" line="107"/>
         <source>Always</source>
-        <translation type="unfinished"></translation>
+        <translation>Siempre</translation>
     </message>
     <message>
         <location filename="../../Train/WorkoutPlotWindow.cpp" line="50"/>
@@ -33316,13 +33316,13 @@ Puede eliminar las referencias cuando administra la biblioteca usando el menú d
         <location filename="../../Train/WorkoutPlotWindow.cpp" line="108"/>
         <location filename="../../Train/WorkoutPlotWindow.cpp" line="112"/>
         <source>When stopped</source>
-        <translation type="unfinished"></translation>
+        <translation>Cuando se detenga</translation>
     </message>
     <message>
         <location filename="../../Train/WorkoutPlotWindow.cpp" line="54"/>
         <location filename="../../Train/WorkoutPlotWindow.cpp" line="110"/>
         <source>Show tooltip</source>
-        <translation type="unfinished"></translation>
+        <translation>Mostrar ayuda emergente</translation>
     </message>
 </context>
 <context>
@@ -33447,13 +33447,13 @@ Puede eliminar las referencias cuando administra la biblioteca usando el menú d
         <location filename="../../Train/WorkoutWindow.cpp" line="327"/>
         <location filename="../../Train/WorkoutWindow.cpp" line="552"/>
         <source>ERG - Absolute Watts</source>
-        <translation type="unfinished"></translation>
+        <translation>ERG - Potencia absoluta</translation>
     </message>
     <message>
         <location filename="../../Train/WorkoutWindow.cpp" line="199"/>
         <location filename="../../Train/WorkoutWindow.cpp" line="551"/>
         <source>MRC - Relative Watts</source>
-        <translation type="unfinished"></translation>
+        <translation>MRC - Potencia relativa</translation>
     </message>
     <message>
         <location filename="../../Train/WorkoutWindow.cpp" line="210"/>
@@ -33523,7 +33523,7 @@ Puede eliminar las referencias cuando administra la biblioteca usando el menú d
     <message>
         <location filename="../../Train/WorkoutWindow.cpp" line="330"/>
         <source>Coalesced sections of same wattage</source>
-        <translation type="unfinished"></translation>
+        <translation>Secciones de la misma potencia fusionadas</translation>
     </message>
     <message>
         <location filename="../../Train/WorkoutWindow.cpp" line="534"/>
@@ -34920,7 +34920,7 @@ Puede eliminar las referencias cuando administra la biblioteca usando el menú d
     <message>
         <location filename="../../Metrics/WPrime.cpp" line="77"/>
         <source>Low Fatigue</source>
-        <translation type="unfinished"></translation>
+        <translation>Fatiga baja</translation>
     </message>
     <message>
         <location filename="../../Metrics/WPrime.cpp" line="78"/>
