@@ -106,7 +106,7 @@ EquipmentSidebar::equipmentPopup()
 {
     QMenu popMenu(this);
 
-    QAction* recalculateEquipment = new QAction(tr("Recalculate Distances"), equipmentNavigator_);
+    QAction* recalculateEquipment = new QAction(tr("Recalculate"), equipmentNavigator_);
     connect(recalculateEquipment, SIGNAL(triggered(void)), context_, SLOT(notifyEqRecalculationStart()));
     popMenu.addAction(recalculateEquipment);
     popMenu.addSeparator();

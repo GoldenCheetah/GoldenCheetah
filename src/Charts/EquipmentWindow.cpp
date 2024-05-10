@@ -53,10 +53,12 @@ EquipmentWindow::EquipmentWindow(Context *context) :
     stackedWidget_->addWidget(createWidsEquipmentBanner());
 
     QVBoxLayout* saveCancellayout = new QVBoxLayout;
+    recalcButton_ = new QPushButton(tr("Recalcuate"));
     saveButton_ = new QPushButton(tr("Save"));
     undoButton_ = new QPushButton(tr("Undo"));
     saveCancellayout->addWidget(new QLabel());
     saveCancellayout->addWidget(new QLabel());
+    saveCancellayout->addWidget(recalcButton_);
     saveCancellayout->addWidget(saveButton_);
     saveCancellayout->addWidget(undoButton_);
     saveCancellayout->insertStretch(-1);
@@ -75,9 +77,13 @@ EquipmentWindow::EquipmentWindow(Context *context) :
 
     setChartLayout(vlayout);
 
+    // Listen for internal events
     connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
     connect(saveButton_, SIGNAL(clicked()), this, SLOT(saveButtonClicked()));
     connect(undoButton_, SIGNAL(clicked()), this, SLOT(undoButtonClicked()));
+    connect(recalcButton_, SIGNAL(clicked(void)), context_, SLOT(notifyEqRecalculationStart()));
+
+    // Listen for signals
     connect(context, SIGNAL(equipmentSelected(EquipmentNode*)), this, SLOT(equipmentSelected(EquipmentNode*)));
     connect(context, SIGNAL(eqRecalculationStart()), this, SLOT(eqRecalculationStart()));
     connect(context, SIGNAL(eqRecalculationEnd()), this, SLOT(eqRecalculationEnd()));
@@ -125,6 +131,7 @@ void
 EquipmentWindow::updateEquipmentDisplay()
 {
     bool hideButtons = false;
+    bool hideRecalcButton = false;
 
     if (selectedNode_) {
 
@@ -157,11 +164,12 @@ EquipmentWindow::updateEquipmentDisplay()
 
         case eqNodeType::EQ_TIME_ITEM: {
             displayEquipmentTimeItem(static_cast<EquipmentTimeItem*>(selectedNode_));
+            hideRecalcButton = true;
         } break;
 
         case eqNodeType::EQ_SHARED: {
             displaySharedEquipment(static_cast<SharedEquipment*>(selectedNode_));
-            hideButtons = true;
+            hideRecalcButton = hideButtons = true;
         } break;
 
         case eqNodeType::EQ_SHARED_DIST_ITEM: {
@@ -170,14 +178,16 @@ EquipmentWindow::updateEquipmentDisplay()
 
         case eqNodeType::EQ_BANNER: {
             displayEquipmentBanner(static_cast<EquipmentBanner*>(selectedNode_));
+            hideRecalcButton = true;
         } break;
         }
     }
     else {
         stackedWidget_->setCurrentIndex(int(eqWinType::BLANK_PAGE));
-        hideButtons = true;
+        hideRecalcButton = hideButtons = true;
     }
 
+    recalcButton_->setHidden(hideRecalcButton || savingDisabled_);
     saveButton_->setHidden(hideButtons || savingDisabled_);
     undoButton_->setHidden(hideButtons || savingDisabled_);
 }

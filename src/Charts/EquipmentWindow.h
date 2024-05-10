@@ -108,8 +108,7 @@ class EquipmentWindow : public GcChartWindow
         QLabel* lastUpdated_;
         bool metricUnits_;
         bool savingDisabled_; // during recalcuation
-        QPushButton* saveButton_;
-        QPushButton* undoButton_;
+        QPushButton* saveButton_, *undoButton_, *recalcButton_;
         QPalette palette_; // applied to all widgets
 
 };
