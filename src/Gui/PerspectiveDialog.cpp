@@ -53,6 +53,7 @@ PerspectiveDialog::PerspectiveDialog(QWidget *parent, AbstractView *tabView) : Q
     perspectiveTable->setShowGrid(false);
     perspectiveTable->setSelectionMode(QAbstractItemView::SingleSelection);
     perspectiveTable->setSelectionBehavior(QAbstractItemView::SelectRows);
+    perspectiveTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
     perspectiveTable->setAcceptDrops(true);
     //perspectiveTable->setDropIndicatorShown(true);
 
@@ -121,6 +122,7 @@ PerspectiveDialog::PerspectiveDialog(QWidget *parent, AbstractView *tabView) : Q
     connect(perspectiveTable, SIGNAL(currentItemChanged(QTableWidgetItem*,QTableWidgetItem*)), this, SLOT(perspectiveSelected()));
     connect(perspectiveTable, SIGNAL(chartMoved(GcChartWindow*)), this, SLOT(perspectiveSelected())); // just reset the chart list
     connect(perspectiveTable, SIGNAL(itemChanged(QTableWidgetItem*)), this, SLOT(perspectiveNameChanged(QTableWidgetItem*))); // user edit
+    connect(perspectiveTable, SIGNAL(itemDoubleClicked(QTableWidgetItem*)), this, SLOT(editPerspectiveClicked())); // Double click -> edit
 
     connect(editButton, SIGNAL(clicked(bool)), this, SLOT(editPerspectiveClicked()));
     connect(importPerspective, SIGNAL(clicked(bool)), this, SLOT(importPerspectiveClicked()));
