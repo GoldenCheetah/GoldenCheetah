@@ -424,7 +424,7 @@ AnalysisSidebar::showActivityMenu(const QPoint &pos)
 
         } else {
 
-            QMenu *groupByMenu = new QMenu(tr("Group By"), this);
+            QMenu *groupByMenu = new QMenu(tr("Group By"), rideNavigator);
             groupByMenu->setEnabled(true);
             menu.addMenu(groupByMenu);
 
