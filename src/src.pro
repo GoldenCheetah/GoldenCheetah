@@ -62,6 +62,7 @@ INCLUDEPATH +=  ../qwt/src \
                 ../contrib/qxt/src \
                 ../contrib/qtsolutions/json \
                 ../contrib/qtsolutions/qwtcurve \
+                ../contrib/qtsolutions/flowlayout \
                 ../contrib/lmfit \
                 ../contrib/boost \
                 ../contrib/kmeans \
@@ -597,11 +598,13 @@ SOURCES += Charts/UserChartWindow.cpp Charts/UserChartOverviewItem.cpp Charts/Us
 
 YACCSOURCES += Core/DataFilter.y \
                FileIO/JsonRideFile.y \
-               Core/RideDB.y
+               Core/RideDB.y \
+               Train/WorkoutFilter.y
 
 LEXSOURCES  += Core/DataFilter.l \
                FileIO/JsonRideFile.l \
-               Core/RideDB.l
+               Core/RideDB.l \
+               Train/WorkoutFilter.l
 
 
 ###=========================================
@@ -665,7 +668,7 @@ HEADERS += Gui/AboutDialog.h Gui/AddIntervalDialog.h Gui/AnalysisSidebar.h Gui/C
            Gui/Views.h Gui/BatchProcessingDialog.h Gui/DownloadRideDialog.h Gui/ManualRideDialog.h Gui/NewSideBar.h \
            Gui/MergeActivityWizard.h Gui/RideImportWizard.h Gui/SplitActivityWizard.h Gui/SolverDisplay.h Gui/MetricSelect.h \
            Gui/AddTileWizard.h Gui/NavigationModel.h Gui/AthleteView.h Gui/AthleteConfigDialog.h Gui/AthletePages.h Gui/Perspective.h \
-           Gui/PerspectiveDialog.h Gui/SplashScreen.h
+           Gui/PerspectiveDialog.h Gui/SplashScreen.h Gui/StyledItemDelegates.h
 
 # metrics and models
 HEADERS += Metrics/Banister.h Metrics/CPSolver.h Metrics/Estimator.h Metrics/ExtendedCriticalPower.h Metrics/HrZones.h Metrics/PaceZones.h \
@@ -678,6 +681,7 @@ HEADERS += Planning/PlanningWindow.h
 
 # contrib
 HEADERS += ../contrib/qtsolutions/codeeditor/codeeditor.h ../contrib/qtsolutions/json/mvjson.h \
+           ../contrib/qtsolutions/flowlayout/flowlayout.h \
            ../contrib/qtsolutions/qwtcurve/qwt_plot_gapped_curve.h  ../contrib/qxt/src/qxtspanslider.h \
            ../contrib/qxt/src/qxtspanslider_p.h ../contrib/qxt/src/qxtstringspinbox.h ../contrib/qzip/zipreader.h \
            ../contrib/qzip/zipwriter.h ../contrib/lmfit/lmcurve.h  ../contrib/lmfit/lmcurve_tyd.h \
@@ -694,12 +698,18 @@ HEADERS += Train/AddDeviceWizard.h Train/CalibrationData.h Train/ComputrainerCon
            Train/Library.h Train/LibraryParser.h Train/MeterWidget.h Train/NullController.h Train/RealtimeController.h \
            Train/RealtimeData.h Train/RealtimePlot.h Train/RealtimePlotWindow.h Train/RemoteControl.h Train/SpinScanPlot.h \
            Train/SpinScanPlotWindow.h Train/SpinScanPolarPlot.h Train/GarminServiceHelper.h Train/PhysicsUtility.h Train/BicycleSim.h \
-           Train/PolynomialRegression.h Train/MultiRegressionizer.h Train/StravaRoutesDownload.h
+           Train/PolynomialRegression.h Train/MultiRegressionizer.h Train/StravaRoutesDownload.h \
+           Train/VideoSyncFileBase.h Train/ErgFileBase.h \
+           Train/ModelFilter.h Train/MultiFilterProxyModel.h Train/WorkoutFilter.h Train/FilterEditor.h \
+           Train/TagBar.h Train/Taggable.h Train/TagStore.h Train/TagWidget.h
 
 HEADERS += Train/TrainBottom.h Train/TrainDB.h Train/TrainSidebar.h \
            Train/VideoLayoutParser.h Train/VideoSyncFile.h Train/WorkoutPlotWindow.h Train/WebPageWindow.h \
            Train/WorkoutWidget.h Train/WorkoutWidgetItems.h Train/WorkoutWindow.h Train/WorkoutWizard.h Train/ZwoParser.h \
-           Train/LiveMapWebPageWindow.h
+           Train/LiveMapWebPageWindow.h \
+           Train/InfoWidget.h Train/PowerInfoWidget.h Train/PowerZonesWidget.h Train/RatingWidget.h \
+           Train/ErgOverview.h Train/Shy.h \
+           Train/WorkoutTagWrapper.h
 
 
 ###=============
@@ -766,7 +776,7 @@ SOURCES += Gui/AboutDialog.cpp Gui/AddIntervalDialog.cpp Gui/AnalysisSidebar.cpp
            Gui/BatchProcessingDialog.cpp Gui/DownloadRideDialog.cpp Gui/ManualRideDialog.cpp Gui/EditUserMetricDialog.cpp Gui/NewSideBar.cpp \
            Gui/MergeActivityWizard.cpp Gui/RideImportWizard.cpp Gui/SplitActivityWizard.cpp Gui/SolverDisplay.cpp Gui/MetricSelect.cpp \
            Gui/AddTileWizard.cpp Gui/NavigationModel.cpp Gui/AthleteView.cpp Gui/AthleteConfigDialog.cpp Gui/AthletePages.cpp Gui/Perspective.cpp \
-           Gui/PerspectiveDialog.cpp Gui/SplashScreen.cpp
+           Gui/PerspectiveDialog.cpp Gui/SplashScreen.cpp Gui/StyledItemDelegates.cpp
 
 ## Models and Metrics
 SOURCES += Metrics/aBikeScore.cpp Metrics/aCoggan.cpp Metrics/AerobicDecoupling.cpp Metrics/Banister.cpp Metrics/BasicRideMetrics.cpp \
@@ -784,6 +794,7 @@ SOURCES += Planning/PlanningWindow.cpp
 
 ## Contributed solutions
 SOURCES += ../contrib/qtsolutions/codeeditor/codeeditor.cpp ../contrib/qtsolutions/json/mvjson.cpp \
+           ../contrib/qtsolutions/flowlayout/flowlayout.cpp \
            ../contrib/qtsolutions/qwtcurve/qwt_plot_gapped_curve.cpp \
            ../contrib/qxt/src/qxtspanslider.cpp ../contrib/qxt/src/qxtstringspinbox.cpp ../contrib/qzip/zip.cpp \
            ../contrib/lmfit/lmcurve.c ../contrib/lmfit/lmmin.c \
@@ -798,12 +809,18 @@ SOURCES += Train/AddDeviceWizard.cpp Train/CalibrationData.cpp Train/Computraine
            Train/Library.cpp Train/LibraryParser.cpp Train/MeterWidget.cpp Train/NullController.cpp Train/RealtimeController.cpp \
            Train/RealtimeData.cpp Train/RealtimePlot.cpp Train/RealtimePlotWindow.cpp Train/RemoteControl.cpp Train/SpinScanPlot.cpp \
            Train/SpinScanPlotWindow.cpp Train/SpinScanPolarPlot.cpp Train/GarminServiceHelper.cpp Train/PhysicsUtility.cpp Train/BicycleSim.cpp \
-           Train/PolynomialRegression.cpp Train/StravaRoutesDownload.cpp
+           Train/PolynomialRegression.cpp Train/StravaRoutesDownload.cpp \
+           Train/VideoSyncFileBase.cpp Train/ErgFileBase.cpp \
+           Train/ModelFilter.cpp Train/MultiFilterProxyModel.cpp Train/WorkoutFilter.cpp Train/FilterEditor.cpp \
+           Train/TagBar.cpp Train/TagWidget.cpp
 
 SOURCES += Train/TrainBottom.cpp Train/TrainDB.cpp Train/TrainSidebar.cpp \
            Train/VideoLayoutParser.cpp Train/VideoSyncFile.cpp Train/WorkoutPlotWindow.cpp Train/WebPageWindow.cpp \
            Train/WorkoutWidget.cpp Train/WorkoutWidgetItems.cpp Train/WorkoutWindow.cpp Train/WorkoutWizard.cpp Train/ZwoParser.cpp \
-           Train/LiveMapWebPageWindow.cpp
+           Train/LiveMapWebPageWindow.cpp \
+           Train/InfoWidget.cpp Train/PowerInfoWidget.cpp Train/PowerZonesWidget.cpp Train/RatingWidget.cpp \
+           Train/ErgOverview.cpp Train/Shy.cpp \
+           Train/WorkoutTagWrapper.cpp
 
 ## Crash Handling
 win32-msvc* {

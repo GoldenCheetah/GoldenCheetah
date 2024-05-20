@@ -575,6 +575,8 @@ GCColor::stylesheet(bool train)
                    "QTreeView::item:selected { color: %4; background-color: %3; }"
                    "QTableWidget { color: %2; background-color: %1; }"
                    "QTableWidget::item:hover { color: black; background-color: lightGray; }"
+                   "QLabel { color: %2; background-color: %1; }"
+                   "QFrame { background-color: %1; }"
 #ifndef Q_OS_MAC
                    "QHeaderView { background-color: %1; color: %2; }"
                    "QHeaderView::section { background-color: %1; color: %2; border: 0px ; }"

@@ -382,9 +382,9 @@ void ElevationMeterWidget::lazySetup(void)
 
     // Compute if size has changed. Store truncated values to allow equality comparison.
     double minX = 0.;
-    double maxX = floor(ergFile->Duration);
-    double minY = floor(ergFile->minY);
-    double maxY = floor(ergFile->maxY);
+    double maxX = floor(ergFile->duration());
+    double minY = floor(ergFile->minY());
+    double maxY = floor(ergFile->maxY());
 
     if (m_savedWidth != m_Width || m_savedHeight != m_Height || m_savedMinY != minY || m_savedMaxY != maxY) {
 
@@ -764,7 +764,7 @@ void ElevationZoomedMeterWidget::startPlayback(Context* context) {
 
     windowWidthMeters = 300; // We are ploting ### meters
     windowHeightMeters = 96; // fixed height shown in graph
-    totalRideDistance = floor(ergFile->Duration);
+    totalRideDistance = floor(ergFile->duration());
     xScale = -1;
     yScale = -1;
     translateX = 0;
