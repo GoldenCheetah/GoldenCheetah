@@ -480,6 +480,4 @@ bool QwtPolarRenderer::exportTo( QwtPolarPlot* plot,
     return true;
 }
 
-#if QWT_MOC_INCLUDE
 #include "moc_qwt_polar_renderer.cpp"
-#endif

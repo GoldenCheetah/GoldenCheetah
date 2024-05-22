@@ -587,7 +587,7 @@ QRegion QwtPicker::rubberBandMask() const
             if ( pa.count() < 2 )
                 return mask;
 
-             switch ( rubberBand() )
+            switch ( rubberBand() )
             {
                 case RectRubberBand:
                 {
@@ -1608,6 +1608,4 @@ const QwtWidgetOverlay* QwtPicker::trackerOverlay() const
     return m_data->trackerOverlay;
 }
 
-#if QWT_MOC_INCLUDE
 #include "moc_qwt_picker.cpp"
-#endif

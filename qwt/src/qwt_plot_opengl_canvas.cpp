@@ -56,7 +56,7 @@ QwtPlotOpenGLCanvas::QwtPlotOpenGLCanvas( QwtPlot* plot )
 /*!
    \brief Constructor
 
-   \param int Number of samples, see QSurfaceFormat::samples()
+   \param numSamples Number of samples, see QSurfaceFormat::samples()
    \param plot Parent plot widget
    \sa QwtPlot::setCanvas()
  */
@@ -72,7 +72,7 @@ QwtPlotOpenGLCanvas::QwtPlotOpenGLCanvas( int numSamples, QwtPlot* plot )
     {
         fmt.setSamples( numSamples );
         setFormat( fmt );
-}
+    }
 
     init();
 }
@@ -272,6 +272,4 @@ void QwtPlotOpenGLCanvas::resizeGL( int, int )
     // nothing to do
 }
 
-#if QWT_MOC_INCLUDE
 #include "moc_qwt_plot_opengl_canvas.cpp"
-#endif

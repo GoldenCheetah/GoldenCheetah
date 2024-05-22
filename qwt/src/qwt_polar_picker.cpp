@@ -24,7 +24,7 @@ class QwtPolarPicker::PrivateData
 
 QwtPolarPicker::QwtPolarPicker( QwtPolarCanvas* canvas )
     : QwtPicker( canvas )
-    , m_data( nullptr )
+    , m_data( NULL )
 {
 }
 
@@ -43,7 +43,7 @@ QwtPolarPicker::QwtPolarPicker( QwtPolarCanvas* canvas )
 QwtPolarPicker::QwtPolarPicker(
         RubberBand rubberBand, DisplayMode trackerMode, QwtPolarCanvas* canvas )
     : QwtPicker( rubberBand, trackerMode, canvas )
-    , m_data( nullptr )
+    , m_data( NULL )
 {
 }
 
@@ -239,6 +239,4 @@ QPainterPath QwtPolarPicker::pickArea() const
     return crPath.intersected( prPath );
 }
 
-#if QWT_MOC_INCLUDE
 #include "moc_qwt_polar_picker.cpp"
-#endif
