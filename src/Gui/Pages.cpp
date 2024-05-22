@@ -1247,7 +1247,6 @@ WorkoutTagManagerPage::WorkoutTagManagerPage
 #ifdef Q_OS_MAC
     addButton->setText(tr("Add"));
     delButton->setText(tr("Delete"));
-    deviceList->setAttribute(Qt::WA_MacShowFocusRect, 0);
 #else
     addButton->setFixedSize(20 * dpiXFactor, 20 * dpiYFactor);
     delButton->setFixedSize(20 * dpiXFactor, 20 * dpiYFactor);
