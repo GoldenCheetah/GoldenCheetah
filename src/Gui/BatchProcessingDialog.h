@@ -63,23 +63,19 @@ private slots:
 
 private:
 
-    typedef enum {
+    enum class bpFailureType {
         unknownF,
         finishedF,
         userF,
         dateFormatF,
         timeFormatF,
-        noRideMFoundF,
-        noDataProcessorF
-    } bpFailureType;
+        noDataProcessorF };
 
-    typedef enum {
+    enum class batchRadioBType {
         exportB,
         dataProcessorB,
         metadataSetB,
-        metricSetB,
-        metricClearB,
-        deleteB } batchRadioBType;
+        deleteB };
 
     Context *context;
     bool aborted;
@@ -90,12 +86,11 @@ private:
     QTreeWidget *files; // choose files to export
 
     QWidget *disableContainer, *dpContainer, *exportContainer;
-    QWidget *metaDataContainer, *metricDataContainer, *clearMetricDataContainer;
+    QWidget *metaDataContainer;
 
     QComboBox *fileFormat, *dataProcessorToRun;
-    QComboBox *metadataFieldToSet, *metricFieldToSet, *metricFieldToClear;
-    QLineEdit *metadataEditField, *metricDataEditField;
-    QLabel *metricUnitsLabel;
+    QComboBox *metadataFieldToSet;
+    QLineEdit *metadataEditField;
 
     QLabel *dirName, *status;
     QCheckBox *overwrite, *all;
@@ -106,18 +101,14 @@ private:
     void fileSelected(QTreeWidgetItem* current);
     void updateNumberSelected();
     void updateMetadataTypeField();
-    void updateMetricDataTypeField();
+
+    bool noMatchingMetric(const QString& fieldDisplayName);
 
     bpFailureType exportFiles();
     bpFailureType deleteFiles();
     bpFailureType runDataProcessorOnActivities(const QString& processorName);
     bpFailureType setMetadataForActivities(const QString& metaDataFieldName,
-        QString metaDataValue);
-    bpFailureType setMetricFieldForActivities(const QString& metricDataFieldName,
-        QString metricDataValue);
-    bpFailureType clearMetricFieldForActivities(const QString& metricDataFieldName);
-
-    RideMetric* displayNametoRideMetric(const QString& fieldDisplayName);
+                                           QString metaDataValue);
     void failedToProcessEntry(QTreeWidgetItem* current);
 
 };
