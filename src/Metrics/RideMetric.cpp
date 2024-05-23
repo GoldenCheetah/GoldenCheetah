@@ -166,8 +166,9 @@
 // 156 18  Mar 2021 Ale Martinez       Added Time and % in Zones I, II and III
 // 157 27  May 2021 Ale Martinez       Added Pace Row
 // 158 28  Feb 2024 Ale Martinez       Enabled Pace for Walking
+// 159 28  Apr 2024 Ale Martinez       Fix Avg Speed aggregation
 
-int DBSchemaVersion = 158;
+int DBSchemaVersion = 159;
 
 RideMetricFactory *RideMetricFactory::_instance;
 QVector<QString> RideMetricFactory::noDeps;

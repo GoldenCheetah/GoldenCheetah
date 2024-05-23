@@ -14,7 +14,7 @@ FunctionEnd
 
 ; HM NIS Edit Wizard helper defines
 !define PRODUCT_NAME "Golden Cheetah"
-!define PRODUCT_VERSION "v3.6"
+!define PRODUCT_VERSION "v3.7-DEV"
 !define PRODUCT_BIT "64"
 !define PRODUCT_STARTMENU "Golden Cheetah"
 !define PRODUCT_WEB_SITE_FILENAME "GoldenCheetah WebSite"
@@ -311,23 +311,12 @@ Section /o "Visual C++ Redistributable" Sec2
   
 SectionEnd
 
-;Section /o "R-Project (3.6.3)" Sec3
-;
-;  SetOutPath "$INSTDIR"
-;  SetOverwrite ifnewer
-;  File "R-3.6.3-win.exe"
-;  ExecWait 'R-3.6.3-win.exe'
-;
-;SectionEnd
-
 LangString DESC_Sec1 ${LANG_ENGLISH} "Golden Cheetah for Windows - 64Bit"
 LangString DESC_Sec2 ${LANG_ENGLISH} "Microsoft Visual C++ 2015-2019 Redistributable (x64) is required to run Golden Cheetah for Windows"
-;LangString DESC_Sec3 ${LANG_ENGLISH} "R (3.6.x) for Windows is required to use R-based Charts in Golden Cheetah"
 
 !insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
   !insertmacro MUI_DESCRIPTION_TEXT ${Sec1} $(DESC_Sec1)
   !insertmacro MUI_DESCRIPTION_TEXT ${Sec2} $(DESC_Sec2)
-;  !insertmacro MUI_DESCRIPTION_TEXT ${Sec3} $(DESC_Sec3)
 !insertmacro MUI_FUNCTION_DESCRIPTION_END
 
 

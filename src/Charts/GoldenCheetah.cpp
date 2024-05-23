@@ -647,7 +647,11 @@ GcWindow::setCursorShape(DragState d)
 }
 
 void
+#if QT_VERSION >= 0x060000
+GcWindow::enterEvent(QEnterEvent *)
+#else
 GcWindow::enterEvent(QEvent *)
+#endif
 {
     if (_noevents) return;
 

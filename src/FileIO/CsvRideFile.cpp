@@ -1542,7 +1542,7 @@ CsvFileReader::writeRideFile(Context *, const RideFile *ride, QFile &file, CsvTy
         foreach (const RideFilePoint *point, ride->dataPoints()) {
             out << point->secs;
             out << ",";
-            out << point->cad;
+            out << (ride->isRun() ? point->rcad : point->cad);
             out << ",";
             out << point->hr;
             out << ",";

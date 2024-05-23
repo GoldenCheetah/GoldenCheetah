@@ -191,7 +191,7 @@ public:
     void setResizable(bool);
     bool resizable() const;
 
-    void moveEvent(QMoveEvent *); // we trap move events to ungrab during resize
+    void moveEvent(QMoveEvent *) override; // we trap move events to ungrab during resize
     void setGripped(bool);
     bool gripped() const;
 
@@ -206,7 +206,7 @@ public:
 
     // popover controls
     virtual bool hasReveal() { return false;}
-    virtual void reveal() {} 
+    virtual void reveal() {}
     virtual void unreveal() {}
     bool revealed;
 
@@ -224,11 +224,15 @@ public:
 
     // mouse actions -- resizing and dragging tiles
     //bool eventFilter(QObject *object, QEvent *e);
-    void mousePressEvent(QMouseEvent *);
-    void mouseReleaseEvent(QMouseEvent *);
-    void mouseMoveEvent(QMouseEvent *);
-    void enterEvent(QEvent *);
-    void leaveEvent(QEvent *);
+    void mousePressEvent(QMouseEvent *) override;
+    void mouseReleaseEvent(QMouseEvent *) override;
+    void mouseMoveEvent(QMouseEvent *) override;
+#if QT_VERSION >= 0x060000
+    void enterEvent(QEnterEvent *) override;
+#else
+    void enterEvent(QEvent *) override;
+#endif
+    void leaveEvent(QEvent *) override;
     void setDragState(DragState);
     void setCursorShape(DragState);
     DragState spotHotSpot(QMouseEvent *);

@@ -437,7 +437,7 @@ struct FitFileParser
     double last_distance;
     QMap<int, FitMessage> local_msg_types;
     QMap<QString, FitFieldDefinition>  local_deve_fields; // All developer fields
-    QMap<int, FitDeveApp> local_deve_fields_app; // All developper apps
+    QMap<QString, FitDeveApp> local_deve_fields_app; // All developper apps
     QMap<int, int> record_extra_fields;
     QMap<QString, int> record_deve_fields; // Developer fields in DEVELOPER XDATA or STANDARD DATA
     QMap<QString, int> record_deve_native_fields; // Developer fields with native values
@@ -1483,11 +1483,23 @@ struct FitFileParser
             case 133: // Pulse Ox
                 return "PULSEOX";
 
+            case 136: // Wrist HR
+                return "WRISTHR";
+
             case 137: // Potential Stamina
                 return "POTENTIALSTAMINA";
 
             case 138: // Stamina
                 return "STAMINA";
+
+            case 140: // Gap
+                return "GAP";
+
+            case 143: // Body Battery
+                return "BODYBATTERY";
+
+            case 144: // External HR
+                return "EXTERNALHR";
 
             default:
                 return QString("FIELD_%1").arg(native_num);
@@ -1498,6 +1510,7 @@ struct FitFileParser
         switch (native_num) {
 
             case 32: // VERTICAL_SPEED
+            case 140: // GAP
                     return 1000.0;
 
             case 40: // STANCE_TIME_PERCENT
@@ -1580,8 +1593,9 @@ struct FitFileParser
             record_deve_fields.insert(key, -1);
 
         // Add field for app
-        if (local_deve_fields_app.contains(deveField.dev_id)) {
-            local_deve_fields_app[deveField.dev_id].fields.append(deveField);
+        QString appKey = QString("%1").arg(deveField.dev_id);
+        if (local_deve_fields_app.contains(appKey)) {
+            local_deve_fields_app[appKey].fields.append(deveField);
         }
     }
 
@@ -1682,7 +1696,7 @@ struct FitFileParser
                 QString const& key = sle.key();
                 // meta data is prefixed w/ '_', otherwise its a ride file tag
                 if (key.startsWith('_')) {
-                    if (0 == QString::compare(key, "_timestamp", Qt::CaseInsensitive)) {
+                    if (0 == QString::compare(key, "_stop_time", Qt::CaseInsensitive)) {
                         stop = sle->toUInt();
                     } else if (start == 0 && 0 == QString::compare(key, "_start_time", Qt::CaseInsensitive)) {
                         // only do once
@@ -1803,6 +1817,7 @@ struct FitFileParser
     // the contents into an XDATA tab
     void decodeGeneric(QString message, const FitMessage &def, int time_offset,
                        const std::vector<FitValue>& values) {
+        Q_UNUSED(time_offset);
 
         // we don't do it for all messages, it would get out of hand!
         if (!GenericDecodeList.contains(message)) return;
@@ -2089,14 +2104,16 @@ genericnext:
                 case 254: //index
                 case 0:   //event
                 case 1:    /* event_type */
+                    break; // do nothing
                 case 2:    /* start_time */
                     this_start_time = value + qbase_time.toSecsSinceEpoch();
                     active_session_["_start_time"] = static_cast<quint32>(this_start_time);
                     break;
                 case 3:    /* start_position_lat */
                 case 4:    /* start_position_long */
+                    break; // do nothing
                 case 7:    /* total elapsed time */
-                    this_elapsed_time = value + qbase_time.toSecsSinceEpoch();
+                    this_elapsed_time = value;
                     active_session_["_total_elapsed_time"] = static_cast<quint32>(this_elapsed_time);
                     break;
                 case 8:    /* total timer time */
@@ -2159,6 +2176,7 @@ genericnext:
             rideFile->setTag("SubSport", subsport);
         }
 
+
         // same procedure as for laps, code is c/p until a better solution is found
         if (this_timestamp == 0 && this_elapsed_time > 0) {
             this_timestamp = iniTime + this_elapsed_time - 1;
@@ -2175,6 +2193,11 @@ genericnext:
                 errors << QString("lap %1 is ignored (invalid end time)").arg(interval);
                 return;
             }
+        }
+
+        if (this_elapsed_time > 0) {
+            time_t this_stop_time = this_start_time + round(this_elapsed_time/1000.0);
+            active_session_["_stop_time"] = static_cast<quint32>(this_stop_time);
         }
 
         session_tags_.append(active_session_);
@@ -3762,9 +3785,16 @@ genericnext:
         if (FIT_DEBUG && FIT_DEBUG_LEVEL>2)
             qDebug() << "DEVE ID" << deve.dev_id.c_str() << "app_id" << deve.app_id.c_str() << "man_id" << deve.man_id << "dev_data_id" << deve.dev_data_id << "app_version" << deve.app_version;
 
-        if (!local_deve_fields_app.contains(deve.dev_data_id)) {
-            local_deve_fields_app.insert(deve.dev_data_id, deve);
+        QString appKey = QString("%1").arg(deve.dev_data_id);
+        if (local_deve_fields_app.contains(appKey)) {
+            FitDeveApp lastDeveApp = local_deve_fields_app[appKey];
+            if (lastDeveApp.app_id != deve.app_id) {
+                local_deve_fields_app.insert(deve.app_id.c_str(), lastDeveApp);
+            }
         }
+        local_deve_fields_app.insert(appKey, deve);
+
+
     }
 
     void decodeDeveloperFieldDescription(const FitMessage &def, int time_offset,
@@ -3838,9 +3868,9 @@ genericnext:
 
         QString key = QString("%1.%2").arg(fieldDef.dev_id).arg(fieldDef.num);
 
-        if (!local_deve_fields.contains(key)) {
-            local_deve_fields.insert((key), fieldDef);
-        }
+        // add or replace with new definition
+        local_deve_fields.insert((key), fieldDef);
+
 
         if (fieldDef.native > -1 && !record_deve_native_fields.values().contains(fieldDef.native)) {
             record_deve_native_fields.insert(key, fieldDef.native);

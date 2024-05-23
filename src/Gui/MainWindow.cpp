@@ -532,7 +532,7 @@ MainWindow::MainWindow(const QDir &home)
 
     // default options
     shareAction = new QAction(tr("Add Cloud Account..."), this);
-    shareAction->setShortcut(QKeySequence("Ctrl+A"));
+    shareAction->setShortcut(QKeySequence("")); // Ctrl+A is already in use for select all
     connect(shareAction, SIGNAL(triggered(bool)), this, SLOT(addAccount()));
     shareMenu->addAction(shareAction);
     shareMenu->addSeparator();

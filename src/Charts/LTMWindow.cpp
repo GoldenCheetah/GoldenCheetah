@@ -785,8 +785,11 @@ LTMWindow::refreshCompare()
     int position = 0;
 
     // create ltmPlot with this
+    // Reserving space in list to prevent reallocations and reorderings that break the pointers
+    // to the LTMSettings
     if (plotSetting.metrics.count()) {
 
+        compareplotSettings.reserve(1 + settings.metrics.size());
         compareplotSettings << plotSetting;
 
         // create and setup the plot
@@ -797,6 +800,8 @@ LTMWindow::refreshCompare()
         // now add
         compareplotsLayout->addWidget(stacked);
         compareplots << stacked;
+    } else {
+        compareplotSettings.reserve(settings.metrics.size());
     }
 
     // OK, now one plot for each curve
@@ -888,8 +893,11 @@ LTMWindow::refreshStackPlots()
     int position = 0;
 
     // create ltmPlot with this
+    // Reserving space in list to prevent reallocations and reorderings that break the pointers
+    // to the LTMSettings
     if (plotSetting.metrics.count()) {
 
+        plotSettings.reserve(1 + settings.metrics.size());
         plotSettings << plotSetting;
 
         // create and setup the plot
@@ -900,6 +908,8 @@ LTMWindow::refreshStackPlots()
         // now add
         plotsLayout->addWidget(stacked);
         plots << stacked;
+    } else {
+        plotSettings.reserve(settings.metrics.size());
     }
 
     // OK, now one plot for each curve

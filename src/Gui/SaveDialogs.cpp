@@ -294,7 +294,7 @@ SaveSingleDialogWidget::warnSettingClicked()
 SaveOnExitDialogWidget::SaveOnExitDialogWidget(MainWindow *mainWindow, Context *context, QList<RideItem *>dirtyList) :
     QDialog(mainWindow, Qt::Dialog), mainWindow(mainWindow), context(context), dirtyList(dirtyList)
 {
-    setWindowTitle("Save Changes");
+    setWindowTitle(tr("Save Changes"));
     setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
 
