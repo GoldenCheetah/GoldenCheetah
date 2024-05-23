@@ -102,8 +102,6 @@ private:
     void updateNumberSelected();
     void updateMetadataTypeField();
 
-    bool noMatchingMetric(const QString& fieldDisplayName);
-
     bpFailureType exportFiles();
     bpFailureType deleteFiles();
     bpFailureType runDataProcessorOnActivities(const QString& processorName);

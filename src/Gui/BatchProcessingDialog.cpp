@@ -203,6 +203,8 @@ processed(0), fails(0), numFilesToProcess(0) {
     metadataFieldToSet = new QComboBox(this);
     metadataEditField = new QLineEdit(this);
 
+    SpecialFields specialFields;
+
     // Now add the ride metadata fields to the comboBox
     foreach(FieldDefinition field, GlobalContext::context()->rideMetadata->getFields()) {
 
@@ -211,7 +213,7 @@ processed(0), fails(0), numFilesToProcess(0) {
             field.name == "Recording Interval" || field.name == "Calendar Text") continue;
 
         // Add metadata which do not match metric names (remove metric overrides)
-        if (noMatchingMetric(field.name)) metadataFieldToSet->addItem(field.name);
+        if (!specialFields.isMetric(field.name)) metadataFieldToSet->addItem(field.name);
     }
 
     // Setup the type field to match the selected metadata field
@@ -300,27 +302,6 @@ processed(0), fails(0), numFilesToProcess(0) {
     updateActionColumn();
     updateNumberSelected();
 }
-
-bool
-BatchProcessingDialog::noMatchingMetric(const QString & fieldDisplayName) {
-
-    // The metadata BikeScore omits the "tm" otherwise it
-    // would match the metric, so return a match.
-    if (fieldDisplayName.startsWith("BikeScore")) return false;
-
-    // lookup metrics
-    RideMetricFactory & factory = RideMetricFactory::instance();
-    QHash<QString, RideMetric*> metrics = factory.metricHash();
-
-    // find the metric from the display name
-    QHashIterator<QString, RideMetric*> itr(metrics);
-    while (itr.hasNext()) {
-        itr.next();
-        if (itr.value()->name()==fieldDisplayName) return false;
-    }
-    return true;
-}
-
 
 void
 BatchProcessingDialog::updateNumberSelected() {
