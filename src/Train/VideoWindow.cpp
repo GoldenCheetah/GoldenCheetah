@@ -398,9 +398,9 @@ void VideoWindow::startPlayback()
             }
         }
 #endif
-#if defined(GC_VIDEO_QT5)
+#ifdef GC_VIDEO_QT5
         // QT doesn't expose media frame rate so make due with duration.
-        double videoSyncDuration = currentVideoSyncFile->Duration;
+        double videoSyncDuration = currentVideoSyncFile->duration();
         if (videoSyncDuration > 0) {
             double mediaDuration = (double)mp->duration();
             if (mediaDuration > 0) {
