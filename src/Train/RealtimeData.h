@@ -20,6 +20,7 @@
 #ifndef _GC_RealtimeData_h
 #define _GC_RealtimeData_h 1
 #include "GoldenCheetah.h"
+#include "ErgFileBase.h"
 
 #include <stdint.h> // uint8_t
 #include <QString>
@@ -31,7 +32,7 @@ class RealtimeData
 
 public:
 
-    int mode;
+    ErgFileFormat mode;
 
     // abstract to dataseries
     enum dataseries { None=0, Time, LapTime, Distance, Lap,

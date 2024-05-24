@@ -25,19 +25,33 @@
 SpecialFields::SpecialFields()
 {
     namesmap.insert("Start Date", tr("Start Date"));                 // linked to RideFile::starttime
+    specialset.insert("Start Date");
     namesmap.insert("Start Time", tr("Start Time"));                 // linked to RideFile::starttime
+    specialset.insert("Start Time");
     namesmap.insert("Identifier", tr("Identifier"));                 // linked to RideFile::id
+    specialset.insert("Identifier");
     namesmap.insert("Recording Interval", tr("Recording Interval")); // linked to RideFile::recIntSecs
+    specialset.insert("Recording Interval");
     namesmap.insert("Change History", tr("Change History"));         // set by RideFileCommand
+    specialset.insert("Change History");
     namesmap.insert("Calendar Text", "Calendar Text");               // set by openRideFile and rideMetadata DO NOT TRANSLATE
+    specialset.insert("Calendar Text");
     namesmap.insert("Source Filename", tr("Source Filename"));       // set by openRideFile
+    specialset.insert("Source Filename");
     namesmap.insert("Athlete", tr("Athlete"));                       // athlete name
+    specialset.insert("Athlete");
     namesmap.insert("Data", tr("Data"));                             // data present
+    specialset.insert("Data");
     namesmap.insert("File Format", tr("File Format"));               // file format
+    specialset.insert("File Format");
     namesmap.insert("Filename", tr("Filename"));                     // filename
+    specialset.insert("Filename");
     namesmap.insert("Month", tr("Month"));                           // month name
+    specialset.insert("Month");
     namesmap.insert("Weekday", tr("Weekday"));                       // weekday name
+    specialset.insert("Weekday");
     namesmap.insert("Year", tr("Year"));                             // year
+    specialset.insert("Year");
 
     namesmap.insert("Route", tr("Route"));                           // GPS map Route tag
     namesmap.insert("Sport", tr("Sport"));                           // Sport Code
@@ -89,13 +103,13 @@ SpecialFields::SpecialFields()
 bool
 SpecialFields::isSpecial(QString &name) const
 {
-    return namesmap.contains(name);
+    return specialset.contains(name);
 }
 
 bool
 SpecialFields::isUser(QString &name) const
 {
-    return !namesmap.contains(name);
+    return !isSpecial(name) && !isMetric(name);
 }
 
 bool

@@ -100,7 +100,7 @@ WorkoutWidget::WorkoutWidget(WorkoutWindow *parent, Context *context) :
 
     onDrag = onCreate = onRect = atRect = QPointF(-1,-1);
     qwkactive = false;
-    format = 0;
+    format = ErgFileFormat::unknown;
     ftp = 300;
 
     // watch mouse events for user interaction
@@ -120,10 +120,10 @@ WorkoutWidget::updateErgFile(ErgFile *f)
     // update f with current values etc
     // just the points FOR NOW
     f->Points.clear();
-    f->Duration = 0;
+    f->duration(0);
     foreach(WWPoint *p, points_) {
         f->Points.append(ErgFilePoint(p->x * 1000, p->y, p->y));
-        f->Duration = p->x * 1000; // whatever the last is
+        f->duration(p->x * 1000); // whatever the last is
     }
 
     f->Laps = laps_;
@@ -1428,7 +1428,7 @@ WorkoutWidget::selectClear()
 }
 
 void
-WorkoutWidget::ergFileSelected(ErgFile *ergFile, int format)
+WorkoutWidget::ergFileSelected(ErgFile *ergFile, ErgFileFormat format)
 {
     // reset state and stack
     state = none;
@@ -1447,10 +1447,10 @@ WorkoutWidget::ergFileSelected(ErgFile *ergFile, int format)
     foreach(WWPoint *point, points_) delete point;
     points_.clear();
 
-    this->format = ergFile ? ergFile->format : format;
+    this->format = ergFile ? ergFile->format() : format;
 
     // we suport ERG/MRC but not CRS/CRS_LOC currently
-    if (ergFile && (ergFile->format == MRC || ergFile->format == ERG)) {
+    if (ergFile && (ergFile->format() == ErgFileFormat::mrc || ergFile->format() == ErgFileFormat::erg)) {
 
         this->ergFile = ergFile;
 
@@ -1510,10 +1510,10 @@ WorkoutWidget::save()
     // so do not need to be scaled back, that happens when
     // they are read/written to file on disk
     ergFile->Points.clear();
-    ergFile->Duration = 0;
+    ergFile->duration(0);
     foreach(WWPoint *p, points_) {
         ergFile->Points.append(ErgFilePoint(p->x * 1000, p->y, p->y));
-        ergFile->Duration = p->x * 1000; // whatever the last is
+        ergFile->duration(p->x * 1000); // whatever the last is
     }
     ergFile->Laps = laps_;
     ergFile->Texts = texts_;
@@ -1819,7 +1819,7 @@ WorkoutWidget::qwkcode()
     //    3) 5 sets of 5 minutes at 105% of CP with 3 minutes recovery at 65% of CPXXX
     //    4) 10minutes at 65% of CP to cool downXXX
 
-    double denom = format == MRC ? ftp / 100.0 : 1;
+    double denom = format == ErgFileFormat::mrc ? ftp / 100.0 : 1;
 
     // just loop through for now doing xx@yy and optionally add rxx
     if (points_.count() == 1) {
@@ -2061,7 +2061,7 @@ WorkoutWidget::apply(QString code)
     laps_.clear();
 
     // transform if mrc
-    double factor = format == MRC ? ftp / 100.0 : 1;
+    double factor = format == ErgFileFormat::mrc ? ftp / 100.0 : 1;
 
     foreach(QString line, code.split("\n")) {
 

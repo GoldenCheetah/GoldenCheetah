@@ -45,6 +45,8 @@ GlobalContext::GlobalContext()
 void
 GlobalContext::notifyConfigChanged(qint32 state)
 {
+    QApplication::setOverrideCursor(Qt::WaitCursor);
+
     // read it in - global only
     readConfig(state);
 
@@ -55,6 +57,8 @@ GlobalContext::notifyConfigChanged(qint32 state)
     foreach(Context *p, _contexts)
         if (Context::isValid(p))
             p->notifyConfigChanged(state);
+
+    QApplication::restoreOverrideCursor();
 }
 
 void
@@ -186,6 +190,8 @@ Context::notifyCompareDateRangesChanged()
 void
 Context::notifyConfigChanged(qint32 state)
 {
+    QApplication::setOverrideCursor(Qt::WaitCursor);
     emit configChanged(state);
+    QApplication::restoreOverrideCursor();
 }
 
