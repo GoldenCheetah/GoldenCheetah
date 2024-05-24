@@ -80,6 +80,8 @@ private:
     Context *context;
     bool aborted;
 
+    SpecialFields specialFields;
+
     int processed, fails, numFilesToProcess;
     batchRadioBType outputMode;
 
@@ -104,9 +106,8 @@ private:
 
     bpFailureType exportFiles();
     bpFailureType deleteFiles();
-    bpFailureType runDataProcessorOnActivities(const QString& processorName);
-    bpFailureType setMetadataForActivities(const QString& metaDataFieldName,
-                                           QString metaDataValue);
+    bpFailureType runDataProcessorOnActivities();
+    bpFailureType setMetadataForActivities();
     void failedToProcessEntry(QTreeWidgetItem* current);
 
 };

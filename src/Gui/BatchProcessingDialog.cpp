@@ -203,13 +203,11 @@ processed(0), fails(0), numFilesToProcess(0) {
     metadataFieldToSet = new QComboBox(this);
     metadataEditField = new QLineEdit(this);
 
-    SpecialFields specialFields;
-
     // Now add the ride metadata fields to the comboBox
     foreach(FieldDefinition field, GlobalContext::context()->rideMetadata->getFields()) {
 
-        // Only add the user mutable metadata fields
-        if (specialFields.isUser(field.name)) metadataFieldToSet->addItem(field.name);
+        // Add the display names for the user mutable metadata fields
+        if (specialFields.isUser(field.name)) metadataFieldToSet->addItem(specialFields.displayName(field.name));
     }
 
     // Setup the type field to match the selected metadata field
@@ -426,11 +424,11 @@ BatchProcessingDialog::okClicked()
             } break;
 
             case batchRadioBType::dataProcessorB: {
-                result = runDataProcessorOnActivities(dataProcessorToRun->currentData().toString());
+                result = runDataProcessorOnActivities();
             } break;
 
             case batchRadioBType::metadataSetB: {
-                result = setMetadataForActivities(metadataFieldToSet->currentText(), metadataEditField->text());
+                result = setMetadataForActivities();
             } break;
 
             case batchRadioBType::deleteB: {
@@ -694,9 +692,10 @@ BatchProcessingDialog::deleteFiles() {
 }
 
 BatchProcessingDialog::bpFailureType
-BatchProcessingDialog::runDataProcessorOnActivities(const QString& processorName) {
+BatchProcessingDialog::runDataProcessorOnActivities() {
 
     // lookup processor
+    QString processorName(dataProcessorToRun->currentData().toString());
     DataProcessor *dp = DataProcessorFactory::instance().getProcessors().value(processorName, NULL);
 
     if (!dp) return bpFailureType::noDataProcessorF; // No such data processor
@@ -754,8 +753,12 @@ BatchProcessingDialog::runDataProcessorOnActivities(const QString& processorName
 }
 
 BatchProcessingDialog::bpFailureType
-BatchProcessingDialog::setMetadataForActivities(const QString& metadataFieldName,
-                                                QString metadataValue) {
+BatchProcessingDialog::setMetadataForActivities() {
+
+    // Convert from metdata diosplay name to internal name
+    QString metadataFieldName(specialFields.internalName(metadataFieldToSet->currentText()));
+    QString metadataValue(metadataEditField->text());
+
 
     // find the selected metadata field and validate the format of time & date fields
     foreach(FieldDefinition field, GlobalContext::context()->rideMetadata->getFields()) {
