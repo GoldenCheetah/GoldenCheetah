@@ -27,6 +27,8 @@
 #include "HelpWhatsThis.h"
 #include "CsvRideFile.h"
 #include "DataProcessor.h"
+#include "RideMetadata.h"
+
 #ifdef GC_WANT_PYTHON
 #include "FixPyScriptsDialog.h"
 #endif
@@ -100,7 +102,7 @@ processed(0), fails(0), numFilesToProcess(0) {
 
         add->setText(1, rideItem->fileName);
         add->setText(2, rideItem->dateTime.toString(tr("dd MMM yyyy")));
-        add->setText(3, rideItem->dateTime.toString("hh:mm:ss"));
+        add->setText(3, rideItem->dateTime.toString(tr("hh:mm:ss")));
         add->setText(4, tr(""));
 
         numFilesToProcess++;
@@ -115,7 +117,7 @@ processed(0), fails(0), numFilesToProcess(0) {
     QHBoxLayout* exportGrid2 = new QHBoxLayout;
 
     QRadioButton* exportRadioBox = new QRadioButton(tr("Export"), this);
-    radioGroup->addButton(exportRadioBox, int(BatchProcessingDialog::exportB));
+    radioGroup->addButton(exportRadioBox, int(batchRadioBType::exportB));
 
     QLabel* formatLabel = new QLabel(tr("As"), this);
 
@@ -128,7 +130,7 @@ processed(0), fails(0), numFilesToProcess(0) {
 
     QPushButton* selectDir = new QPushButton(tr("Browse"), this);
 
-    QLabel* dirLabel = new QLabel(tr("To"), this);
+    QLabel* dirLabel = new QLabel(tr("To  "), this);
 
     // default to last used
     QString dirDefault = appsettings->value(this, GC_BE_LASTDIR, QDir::home().absolutePath()).toString();
@@ -161,7 +163,7 @@ processed(0), fails(0), numFilesToProcess(0) {
     dpGrid->setContentsMargins(0, 0, 0, 0);
 
     QRadioButton* dpRadioBox = new QRadioButton(tr("Run Data Processor"), this);
-    radioGroup->addButton(dpRadioBox, int(BatchProcessingDialog::dataProcessorB));
+    radioGroup->addButton(dpRadioBox, int(batchRadioBType::dataProcessorB));
 
     dataProcessorToRun = new QComboBox(this);
 
@@ -190,13 +192,45 @@ processed(0), fails(0), numFilesToProcess(0) {
     dpGrid->addWidget(dpRadioBox);
     dpGrid->addWidget(dpContainer);
 
+    //  --------------- Set Meta Data Processing menu items -----------------------
+
+    QHBoxLayout* setMetadataGrid = new QHBoxLayout;
+    setMetadataGrid->setContentsMargins(0, 0, 0, 0);
+
+    QRadioButton* setMetadataRadioBox = new QRadioButton(tr("Update Metadata"), this);
+    radioGroup->addButton(setMetadataRadioBox, int(batchRadioBType::metadataSetB));
+
+    metadataFieldToSet = new QComboBox(this);
+    metadataEditField = new QLineEdit(this);
+
+    // Now add the ride metadata fields to the comboBox
+    foreach(FieldDefinition field, GlobalContext::context()->rideMetadata->getFields()) {
+
+        // Add the display names for the user mutable metadata fields
+        if (specialFields.isUser(field.name)) metadataFieldToSet->addItem(specialFields.displayName(field.name));
+    }
+
+    // Setup the type field to match the selected metadata field
+    updateMetadataTypeField();
+
+    metaDataContainer = new QWidget;
+    QHBoxLayout* metaDataLayout = new QHBoxLayout(metaDataContainer);
+    metaDataLayout->addWidget(metadataFieldToSet);
+    metaDataLayout->addSpacing(5);
+    metaDataLayout->addWidget(metadataEditField);
+    metaDataLayout->addSpacing(5);
+    metaDataContainer->setEnabled(false);
+
+    setMetadataGrid->addWidget(setMetadataRadioBox);
+    setMetadataGrid->addWidget(metaDataContainer);
+
     //  --------------- Delete menu items -----------------------
 
     QHBoxLayout* deleteGrid = new QHBoxLayout;
     deleteGrid->setContentsMargins(0, 0, 0, 0);
 
     QRadioButton* deleteRadioBox = new QRadioButton(tr("Delete All Selected Activities"), this);
-    radioGroup->addButton(deleteRadioBox, int(BatchProcessingDialog::deleteB));
+    radioGroup->addButton(deleteRadioBox, int(batchRadioBType::deleteB));
 
     deleteGrid->addWidget(deleteRadioBox);
 
@@ -218,6 +252,7 @@ processed(0), fails(0), numFilesToProcess(0) {
 
     layout1->addRow(exportGrid);
     layout1->addRow(dpGrid);
+    layout1->addRow(setMetadataGrid);
     layout1->addRow(deleteGrid);
     layout->addRow(fileSelection);
     layout->addRow(buttons);
@@ -244,6 +279,9 @@ processed(0), fails(0), numFilesToProcess(0) {
     connect(fileFormat, SIGNAL(currentIndexChanged(int)), this, SLOT(comboSelected()));
     connect(selectDir, SIGNAL(clicked()), this, SLOT(selectClicked()));
 
+    // metadata signals
+    connect(metadataFieldToSet, SIGNAL(currentIndexChanged(int)), this, SLOT(comboSelected()));
+
     // radio buttons
     connect(radioGroup, SIGNAL(idClicked(int)), this, SLOT(radioClicked(int)));
 
@@ -253,8 +291,9 @@ processed(0), fails(0), numFilesToProcess(0) {
 
     // Set default button to export after signals connected as this is the least destructive option
     exportRadioBox->setChecked(true);
-    outputMode = BatchProcessingDialog::exportB;
+    outputMode = batchRadioBType::exportB;
     comboSelected();
+    updateActionColumn();
     updateNumberSelected();
 }
 
@@ -279,7 +318,6 @@ BatchProcessingDialog::selectClicked()
 
 void
 BatchProcessingDialog::dpButtonClicked() {
-
 #ifdef GC_WANT_PYTHON
     FixPyScript* pyScript = fixPySettings->getScript(dataProcessorToRun->currentText());
     if (pyScript) {
@@ -294,12 +332,12 @@ BatchProcessingDialog::comboSelected() {
 
     // ensures the Action column matches the Combobox selections
     updateActionColumn();
-
 #ifdef GC_WANT_PYTHON
     // lookup processor and enable dpButton for Python fixes
     DataProcessor* dp = DataProcessorFactory::instance().getProcessors().value(dataProcessorToRun->currentText(), NULL);
     dpButton->setVisible(dp && !dp->isCoreProcessor());
 #endif
+    updateMetadataTypeField();
 }
 
 void
@@ -309,20 +347,23 @@ BatchProcessingDialog::radioClicked(int buttonId) {
     outputMode = batchRadioBType(buttonId);
     updateActionColumn();
 
+    exportContainer->setEnabled(false);
+    dpContainer->setEnabled(false);
+    metaDataContainer->setEnabled(false);
+
     // enable only useful widgets
     switch (outputMode) {
-    case BatchProcessingDialog::exportB:
-        exportContainer->setEnabled(true);
-        dpContainer->setEnabled(false);
-	break;
-    case BatchProcessingDialog::dataProcessorB:
-        exportContainer->setEnabled(false);
-        dpContainer->setEnabled(true);
-	break;
-    case BatchProcessingDialog::deleteB:
-        exportContainer->setEnabled(false);
-        dpContainer->setEnabled(false);
-	break;
+        case batchRadioBType::exportB:
+            exportContainer->setEnabled(true);
+            break;
+        case batchRadioBType::dataProcessorB:
+            dpContainer->setEnabled(true);
+            break;
+        case batchRadioBType::metadataSetB:
+             metaDataContainer->setEnabled(true);
+             break;
+         case batchRadioBType::deleteB:
+             break;
     }
 }
 
@@ -371,39 +412,51 @@ BatchProcessingDialog::okClicked()
 
         status->setText(tr("Processing..."));
         ok->setText(tr("Abort"));
-        bpFailureType result = BatchProcessingDialog::unknownF;
+        bpFailureType result = bpFailureType::unknownF;
 
         QString summaryType(tr("Processed "));
 
         // call the selected type of batch processing
         switch (outputMode) {
-            case BatchProcessingDialog::exportB: {
+            case batchRadioBType::exportB: {
                 result = exportFiles();
                 summaryType = tr("Exported ");
             } break;
 
-            case BatchProcessingDialog::dataProcessorB: {
-                result = runDataProcessorOnActivities(dataProcessorToRun->currentData().toString());
+            case batchRadioBType::dataProcessorB: {
+                result = runDataProcessorOnActivities();
             } break;
 
-            case BatchProcessingDialog::deleteB: {
+            case batchRadioBType::metadataSetB: {
+                result = setMetadataForActivities();
+            } break;
+
+            case batchRadioBType::deleteB: {
                 result = deleteFiles();
                 summaryType = tr("Deleted ");
             } break;
         }
-    
+
         switch (result) {
 
-            case BatchProcessingDialog::userF: {
+            case bpFailureType::dateFormatF: {
+                status->setText(tr("Processing failed due date format error..."));
+                break;
+            }
+            case bpFailureType::timeFormatF: {
+                status->setText(tr("Processing failed due time format error..."));
+                break;
+            }
+            case bpFailureType::userF: {
                 status->setText(tr("Processing aborted by the user..."));
                 break;
             }
-            case BatchProcessingDialog::noDataProcessorF: {
+            case bpFailureType::noDataProcessorF: {
                 status->setText(tr("Processing failed as the data processor cannot be found..."));
                 break;
             }
-            case BatchProcessingDialog::finishedF: {
-                status->setText(summaryType + QString(tr("%1 activities successfully, %2 failed or skipped.")).arg(processed).arg(fails));
+            case bpFailureType::finishedF: {
+                status->setText(summaryType + QString(tr("%1 successful, %2 failed or skipped.")).arg(processed).arg(fails));
                 ok->setText(tr("Finish"));
                 break;
             }
@@ -424,6 +477,45 @@ void
 BatchProcessingDialog::cancelClicked()
 {
     reject();
+}
+
+void
+BatchProcessingDialog::updateMetadataTypeField() {
+
+    // find the selected metadata field and update the display with its type
+    foreach(FieldDefinition field, GlobalContext::context()->rideMetadata->getFields()) {
+        if (metadataFieldToSet->currentText() == field.name) {
+            switch (field.type) {
+                case FIELD_INTEGER: {
+                    metadataEditField->setText(tr("0"));
+                    return;
+                }
+                case FIELD_DOUBLE: {
+                    metadataEditField->setText(tr("0.00"));
+                    return;
+                }
+                case FIELD_DATE: {
+                    metadataEditField->setText(tr("dd/mm/yyyy"));
+                    return;
+                }
+                case FIELD_TIME: {
+                    metadataEditField->setText(tr("hh:mm:ss"));
+                    return;
+                }
+                case FIELD_CHECKBOX: {
+                    metadataEditField->setText(tr("1|0"));
+                    return;
+                }
+                case FIELD_TEXT:
+                case FIELD_TEXTBOX:
+                case FIELD_SHORTTEXT:
+                default: {
+                    metadataEditField->setText(tr(""));
+                    return;
+                }
+            }
+        }
+    }
 }
 
 void
@@ -451,17 +543,21 @@ BatchProcessingDialog::getActionColumnText() {
 
     // provides the Action info text for the various processing options
     switch (outputMode) {
-    case BatchProcessingDialog::exportB: {
-        return tr("Export as ") + fileFormat->currentText();
-    }
+        case batchRadioBType::exportB: {
+            return tr("Export as ") + fileFormat->currentText();
+        }
 
-    case BatchProcessingDialog::dataProcessorB: {
-        return dataProcessorToRun->currentText();
-    }
+        case batchRadioBType::dataProcessorB: {
+            return dataProcessorToRun->currentText();
+        }
 
-    case BatchProcessingDialog::deleteB: {
-        return tr("Delete");
-    }
+        case batchRadioBType::metadataSetB: {
+            return tr("Update Metadata field - ") + metadataFieldToSet->currentText();
+        }
+
+        case batchRadioBType::deleteB: {
+            return tr("Delete");
+        }
     }
     return QString(tr("Undefined"));
 }
@@ -476,13 +572,13 @@ BatchProcessingDialog::exportFiles()
     QString type = fileFormat->currentIndex() > 0 ? RideFileFactory::instance().writeSuffixes().at(fileFormat->currentIndex()-1) : "csv";
 
     // loop through the table and export all selected
-    for(int i=0; i<files->invisibleRootItem()->childCount(); i++) {
+    for (int i=0; i<files->invisibleRootItem()->childCount(); i++) {
 
         // give user a chance to abort..
         QApplication::processEvents();
 
         // did they?
-        if (aborted == true) return BatchProcessingDialog::userF; // user aborted!
+        if (aborted == true) return bpFailureType::userF; // user aborted!
 
         QTreeWidgetItem *current = files->invisibleRootItem()->child(i);
 
@@ -550,7 +646,7 @@ BatchProcessingDialog::exportFiles()
         }
     }
 
-    return BatchProcessingDialog::finishedF;
+    return bpFailureType::finishedF;
 }
 
 BatchProcessingDialog::bpFailureType
@@ -558,7 +654,7 @@ BatchProcessingDialog::deleteFiles() {
 
     QMessageBox msgBox;
     msgBox.setText(tr("Are you sure you want to delete all selected activities?"));
-    QPushButton *deleteButton = msgBox.addButton(tr("Delete"),QMessageBox::YesRole);
+    QPushButton *deleteButton = msgBox.addButton(tr("Delete"), QMessageBox::YesRole);
     msgBox.setStandardButtons(QMessageBox::Cancel);
     msgBox.setDefaultButton(QMessageBox::Cancel);
     msgBox.setIcon(QMessageBox::Critical);
@@ -572,7 +668,7 @@ BatchProcessingDialog::deleteFiles() {
         QApplication::processEvents();
 
         // did they?
-        if (aborted == true) return BatchProcessingDialog::userF; // user aborted!
+        if (aborted == true) return bpFailureType::userF; // user aborted!
 
         QTreeWidgetItem* current = files->invisibleRootItem()->child(i);
 
@@ -592,22 +688,23 @@ BatchProcessingDialog::deleteFiles() {
         }
     }
 
-    return BatchProcessingDialog::finishedF;
+    return bpFailureType::finishedF;
 }
 
 BatchProcessingDialog::bpFailureType
-BatchProcessingDialog::runDataProcessorOnActivities(const QString& processorName) {
+BatchProcessingDialog::runDataProcessorOnActivities() {
 
     // lookup processor
-    DataProcessor* dp = DataProcessorFactory::instance().getProcessors().value(processorName, NULL);
+    QString processorName(dataProcessorToRun->currentData().toString());
+    DataProcessor *dp = DataProcessorFactory::instance().getProcessors().value(processorName, NULL);
 
-    if (!dp) return BatchProcessingDialog::noDataProcessorF; // No such data processor
+    if (!dp) return bpFailureType::noDataProcessorF; // No such data processor
 
     // get processor config
-    DataProcessorConfig *config = dp->processorConfig(this);
+    DataProcessorConfig* config = dp->processorConfig(this);
 
     // Allow the user to set parameters and confirm or cancel
-    ManualDataProcessorDialog *p = new ManualDataProcessorDialog(context, processorName, nullptr, config);
+    ManualDataProcessorDialog* p = new ManualDataProcessorDialog(context, processorName, nullptr, config);
     p->setWindowModality(Qt::ApplicationModal); // don't allow select other ride or it all goes wrong!
     bool ok = p->exec();
 
@@ -618,7 +715,7 @@ BatchProcessingDialog::runDataProcessorOnActivities(const QString& processorName
         QApplication::processEvents();
 
         // did they?
-        if (aborted == true) return BatchProcessingDialog::userF; // user aborted!
+        if (aborted == true) return bpFailureType::userF; // user aborted!
 
         QTreeWidgetItem* current = files->invisibleRootItem()->child(i);
 
@@ -652,7 +749,75 @@ BatchProcessingDialog::runDataProcessorOnActivities(const QString& processorName
 
     delete p; // no parent and WA_DeleteOnClose not set, lets delete it.
 
-    return BatchProcessingDialog::finishedF;
+    return bpFailureType::finishedF;
+}
+
+BatchProcessingDialog::bpFailureType
+BatchProcessingDialog::setMetadataForActivities() {
+
+    // Convert from metdata diosplay name to internal name
+    QString metadataFieldName(specialFields.internalName(metadataFieldToSet->currentText()));
+    QString metadataValue(metadataEditField->text());
+
+
+    // find the selected metadata field and validate the format of time & date fields
+    foreach(FieldDefinition field, GlobalContext::context()->rideMetadata->getFields()) {
+        if (metadataFieldName == field.name) {
+
+            if (field.type == FIELD_TIME) {
+                metadataValue.simplified().remove(' ');
+                QRegularExpression re("([0-1]?[0-9]|2[0-3]):([0-5]?[0-9]):([0-5]?[0-9])");
+                if (!re.match(metadataValue).hasMatch()) return bpFailureType::timeFormatF;
+            }
+
+            if (field.type == FIELD_DATE) {
+                metadataValue.simplified().remove(' ');
+                QRegularExpression re("([0]?[1-9]|[1][0-9]|3[0-1])/([0]?[1-9]|[1][0-2])/([0-9]{4})");
+                if (!re.match(metadataValue).hasMatch()) return bpFailureType::dateFormatF;
+            }
+            break;
+        }
+    }
+
+    // loop through the table and set the metdata on each selected activity
+    for (int i = 0; i < files->invisibleRootItem()->childCount(); i++) {
+
+        // give user a chance to abort..
+        QApplication::processEvents();
+
+        // did they?
+        if (aborted == true) return bpFailureType::userF; // user aborted!
+
+        QTreeWidgetItem* current = files->invisibleRootItem()->child(i);
+
+        // is it selected for metadata update ?
+        if (static_cast<QCheckBox*>(files->itemWidget(current, 0))->isChecked()) {
+
+            RideItem* rideI = context->athlete->rideCache->getRide(current->text(1));
+
+            if (!rideI) { failedToProcessEntry(current); continue; } // eek!
+
+            // ack ! we need to autoprocess, so open the ride
+            RideFile* rideF = rideI->ride();
+
+            if (!rideF) { failedToProcessEntry(current); continue; } // eek!
+
+            // Set the new metadata value
+            rideF->setTag(metadataFieldName, metadataValue);
+
+            // rideFile is now dirty!
+            rideI->setDirty(true);
+
+            // get refresh done, coz overrides state has changed
+            rideI->notifyRideMetadataChanged();
+
+            // Update the files entry
+            current->setText(4, tr("Metadata Tag Set"));
+            processed++;
+        }
+    }
+
+    return bpFailureType::finishedF;
 }
 
 void
@@ -660,3 +825,4 @@ BatchProcessingDialog::failedToProcessEntry(QTreeWidgetItem* current) {
     current->setText(4, tr("Failed to process activity"));
     fails++;
 }
+
