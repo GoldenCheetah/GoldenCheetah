@@ -79,7 +79,7 @@ double NowData::x(size_t) const {
 }
 double NowData::y(size_t i) const {
     if (i) {
-        if (context->currentErgFile()) return context->currentErgFile()->maxY;
+        if (context->currentErgFile()) return context->currentErgFile()->maxY();
         else return 0;
     } else return 0;
 }
@@ -469,7 +469,7 @@ ErgFilePlot::setData(ErgFile *ergfile)
     if (ergfile) {
 
         // is this by distance or time?
-        bydist = (ergfile->format == CRS) ? true : false;
+        bydist = (ergfile->format() == ErgFileFormat::crs) ? true : false;
         nowData->setByDist(bydist);
         lodData->setByDist(bydist);
 
@@ -829,13 +829,13 @@ ErgFilePlot::hover
         || (   _showTooltip == 1
             && workoutActive)
         || ergFile == nullptr
-        || ergFile->Duration == 0) {
+        || ergFile->duration() == 0) {
         tooltip->setText("");
         return;
     }
     double xvalue = invTransform(QwtAxis::XBottom, point.x());
     double yvalue = invTransform(QwtAxis::YLeft, point.y());
-    const int fullSecs = std::min(std::max(0, int(xvalue)), int(ergFile->Duration) - 1000) / 1000;
+    const int fullSecs = std::min(std::max(0, int(xvalue)), int(ergFile->duration()) - 1000) / 1000;
     int duration = 0;
     int startPower = 0;
     int endPower = 0;

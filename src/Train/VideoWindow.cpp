@@ -363,11 +363,11 @@ void VideoWindow::startPlayback()
         // tts used for videosync. Example: CH_Umbrail, or pretty much any older
         // tacx video where tts doesn't contain location data.
         // Only applies to distance-slope (CRS) workouts
-        double videoSyncDistanceMeters = currentVideoSyncFile->Distance * 1000.;
+        double videoSyncDistanceMeters = currentVideoSyncFile->distance() * 1000.;
         if (videoSyncDistanceMeters > 0.) {
             ErgFile* currentErgFile = context->currentErgFile();
-            if (currentErgFile && currentErgFile->mode == CRS) {
-                double ergFileDistanceMeters = currentErgFile->Duration;
+            if (currentErgFile && currentErgFile->mode() == ErgFileFormat::crs) {
+                double ergFileDistanceMeters = currentErgFile->duration();
                 if (ergFileDistanceMeters > 0.) {
                     videoSyncDistanceAdjustFactor = ergFileDistanceMeters / videoSyncDistanceMeters;
                 }
@@ -389,7 +389,7 @@ void VideoWindow::startPlayback()
 
         // This issue occurs on almost all tacx virtual rides.
 #ifdef GC_VIDEO_VLC
-        double videoSyncFrameRate = currentVideoSyncFile->VideoFrameRate;
+        double videoSyncFrameRate = currentVideoSyncFile->videoFrameRate();
         if (videoSyncFrameRate > 0.) {
             libvlc_media_player_t* capture_mp = this->mp;
             double mediaFrameRate = vlcDispatch.SyncCall<double>([capture_mp] () { return libvlc_media_player_get_fps(capture_mp); });
@@ -398,9 +398,9 @@ void VideoWindow::startPlayback()
             }
         }
 #endif
-#if defined(GC_VIDEO_QT5)
+#ifdef GC_VIDEO_QT5
         // QT doesn't expose media frame rate so make due with duration.
-        double videoSyncDuration = currentVideoSyncFile->Duration;
+        double videoSyncDuration = currentVideoSyncFile->duration();
         if (videoSyncDuration > 0) {
             double mediaDuration = (double)mp->duration();
             if (mediaDuration > 0) {
@@ -531,7 +531,7 @@ void VideoWindow::telemetryUpdate(RealtimeData rtd)
         else if (p_meterWidget->Source() == QString("Elevation"))
         {
             // Do not show in ERG mode
-            if (rtd.mode == ERG || rtd.mode == MRC)
+            if (rtd.mode == ErgFileFormat::erg || rtd.mode == ErgFileFormat::mrc)
             {
                 p_meterWidget->setWindowOpacity(0); // Hide the widget
             }
@@ -551,7 +551,7 @@ void VideoWindow::telemetryUpdate(RealtimeData rtd)
         else if (p_meterWidget->Source() == QString("ElevationZoomed"))
         {
             // Do not show in ERG mode
-            if (rtd.mode == ERG || rtd.mode == MRC)
+            if (rtd.mode == ErgFileFormat::erg || rtd.mode == ErgFileFormat::mrc)
             {
                 p_meterWidget->setWindowOpacity(0); // Hide the widget
             }
@@ -615,7 +615,7 @@ void VideoWindow::telemetryUpdate(RealtimeData rtd)
         }
         else if (p_meterWidget->Source() == QString("Load"))
         {
-            if (rtd.mode == ERG || rtd.mode == MRC) {
+            if (rtd.mode == ErgFileFormat::erg || rtd.mode == ErgFileFormat::mrc) {
                 p_meterWidget->Value = rtd.getLoad();
                 p_meterWidget->Text = QString("%1").arg(round(p_meterWidget->Value)).rightJustified(p_meterWidget->textWidth);
                 p_meterWidget->AltText = tr("w") +  p_meterWidget->AltTextSuffix;
@@ -717,7 +717,7 @@ void VideoWindow::telemetryUpdate(RealtimeData rtd)
             curPosition = 1; // minimum curPosition is 1 as we will use [curPosition-1]
 
         // Ensure distance is within bounds of the videosyncfile.
-        double CurrentDistance = qBound(0.0, rtd.getRouteDistance(), context->currentVideoSyncFile()->Distance);
+        double CurrentDistance = qBound(0.0, rtd.getRouteDistance(), context->currentVideoSyncFile()->distance());
 
         // make sure the current position is less than the new distance
         while ((VideoSyncPointAdjust(VideoSyncFiledataPoints[curPosition]).km > CurrentDistance) && (curPosition > 1))

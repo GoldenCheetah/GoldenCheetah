@@ -244,7 +244,7 @@ StravaRoutesDownload::downloadFiles()
             ufile.write(content);
             ufile.close();
 
-            ErgFile *p = new ErgFile(tmp, CRS, context);
+            ErgFile *p = new ErgFile(tmp, ErgFileFormat::crs, context);
 
             // now zap the temporary file
             ufile.remove();
@@ -280,7 +280,7 @@ StravaRoutesDownload::downloadFiles()
 
                     downloads++;
                     current->setText(3, tr("Saved")); QApplication::processEvents();
-                    trainDB->importWorkout(filename, p); // add to library
+                    trainDB->importWorkout(filename, *p); // add to library
 
                 } else {
 

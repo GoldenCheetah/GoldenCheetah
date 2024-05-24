@@ -1465,6 +1465,9 @@ struct FitFileParser
             case 85: // STEP_LENGTH
                     return "STEPLENGTH"; // Step Length
 
+            case 87: // CYCLE_LENGTH
+                return "CYCLELENGTH"; // Cycle Length (Rowing, paddle)
+
             case 90: // PERFORMANCE_CONDITION
                     return "PERFORMANCECONDITION"; // Performance Contition
 
@@ -1519,6 +1522,9 @@ struct FitFileParser
 
             case 85: // STEP_LENGTH
                     return 10.0;
+
+            case 87: // CYCLE_LENGTH
+                return 100.0;
 
             case 47: // COMBINED_PEDAL_SMOOTHNES
             case 81: // BATTERY_SOC
@@ -2958,7 +2964,8 @@ genericnext:
                     case 85: // STEP_LENGTH
                              native_num = -1;
                              break;
-                    case 87: // ???
+                    case 87: // Cycle length (16)
+                             native_num = -1;
                              break;
                     case 90: // PERFORMANCE_CONDITION
                              native_num = -1;
