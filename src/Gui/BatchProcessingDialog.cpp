@@ -208,12 +208,8 @@ processed(0), fails(0), numFilesToProcess(0) {
     // Now add the ride metadata fields to the comboBox
     foreach(FieldDefinition field, GlobalContext::context()->rideMetadata->getFields()) {
 
-        // Remove technical fields fields, as batch editing these could be very destructive
-        if (field.name == "Start Time" || field.name == "Start Date" || field.name == "Data" ||
-            field.name == "Recording Interval" || field.name == "Calendar Text") continue;
-
-        // Add metadata which do not match metric names (remove metric overrides)
-        if (!specialFields.isMetric(field.name)) metadataFieldToSet->addItem(field.name);
+        // Only add the user mutable metadata fields
+        if (specialFields.isUser(field.name)) metadataFieldToSet->addItem(field.name);
     }
 
     // Setup the type field to match the selected metadata field
