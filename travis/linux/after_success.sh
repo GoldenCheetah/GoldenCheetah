@@ -98,7 +98,7 @@ aws s3 rm s3://goldencheetah-binaries/Linux --recursive # keep only the last one
 aws s3 cp --acl public-read $FINAL_NAME s3://goldencheetah-binaries/Linux/$FINAL_NAME
 aws s3 cp --acl public-read GCversionLinux.txt s3://goldencheetah-binaries/Linux/GCversionLinux.txt
 else
-curl --max-time 300 --upload-file $FINAL_NAME https://free.keep.sh/$FINAL_NAME
+curl --max-time 300 -F "file=@$FINAL_NAME" https://temp.sh/upload
 fi
 
 cd ${TRAVIS_BUILD_DIR}
