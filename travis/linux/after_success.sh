@@ -94,9 +94,10 @@ cat GCversionLinux.txt
 
 ### upload for testing
 if [[ $TRAVIS_PULL_REQUEST == "false" && $TRAVIS_COMMIT_MESSAGE == *"[publish binaries]"* ]]; then
-aws s3 rm s3://goldencheetah-binaries/Linux --recursive # keep only the last one
-aws s3 cp --acl public-read $FINAL_NAME s3://goldencheetah-binaries/Linux/$FINAL_NAME
-aws s3 cp --acl public-read GCversionLinux.txt s3://goldencheetah-binaries/Linux/GCversionLinux.txt
+mkdir out
+mv $FINAL_NAME out
+mv GCversionLinux.txt out
+~/go/bin/ghr snapshot out
 else
 curl --max-time 300 -F "file=@$FINAL_NAME" https://temp.sh/upload
 fi

@@ -57,10 +57,7 @@ cd ${TRAVIS_BUILD_DIR}
 # GSL
 sudo apt-get -qq install libgsl-dev
 
-# AWS S3 client to upload binaries
-curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-unzip -qq awscliv2.zip
-sudo ./aws/install
-aws --version
+# GHR to upload binaries to GitHub releases
+go install github.com/tcnksm/ghr@latest
 
 exit
