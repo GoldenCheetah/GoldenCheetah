@@ -1633,8 +1633,110 @@ ColorsPage::applyThemeIndex(int index)
 
         for (int i=0; colorSet[i].name != ""; i++) {
 
+            QColor color;
+
             // apply theme to color
-            QColor color = GCColor::getThemeColor(theme, i);
+            switch(i) {
+
+            case CPLOTBACKGROUND:
+            case CRIDEPLOTBACKGROUND:
+            case CTRENDPLOTBACKGROUND:
+                color = theme.colors[0]; // background color
+                break;
+
+            case CTRAINPLOTBACKGROUND:
+                // always, and I mean always default to a black background
+                color = QColor(Qt::black);
+                break;
+
+
+            case COVERVIEWBACKGROUND:
+                // set back to light black for dark themes
+                // and gray for light themes
+                color = theme.colors[10];
+                break;
+
+            case CCARDBACKGROUND:
+                // set back to light black for dark themes
+                // and gray for light themes
+                color = theme.colors[11];
+                break;
+
+            case CCARDBACKGROUND2:
+                // set back to light black for dark themes
+                // and gray for light themes
+                color = theme.colors[12];
+                break;
+
+            case CCARDBACKGROUND3:
+                // set back to light black for dark themes
+                // and gray for light themes
+                color = theme.colors[13];
+                break;
+
+            case CCHROME:
+            case CCHARTBAR:
+            case CTOOLBAR: // we always keep them the same, but user can make different
+                //  set to black for dark themese and grey for light themes
+                color = theme.colors[1];
+                break;
+
+            case CHOVER:
+                color = theme.stealth ? theme.colors[11] : (theme.dark ? QColor(50,50,50) : QColor(200,200,200));
+                break;
+
+            case CPLOTSYMBOL:
+            case CRIDEPLOTXAXIS:
+            case CRIDEPLOTYAXIS:
+            case CPLOTMARKER:
+                color = theme.colors[2]; // accent color
+                break;
+
+            case CPLOTSELECT:
+            case CPLOTTRACKER:
+            case CINTERVALHIGHLIGHTER:
+                color = theme.colors[3]; // select color
+                break;
+
+
+            case CPLOTGRID: // grid doesn't have a theme color
+                            // we make it barely distinguishable from background
+                {
+                    QColor bg = theme.colors[0];
+                    if(bg == QColor(Qt::black)) color = QColor(30,30,30);
+                    else color = bg.darker(110);
+                }
+                break;
+
+            case CCP:
+            case CWBAL:
+            case CRIDECP:
+                color = theme.colors[4];
+                break;
+
+            case CHEARTRATE:
+                color = theme.colors[5];
+                break;
+
+            case CSPEED:
+                color = theme.colors[6];
+                break;
+
+            case CPOWER:
+                color = theme.colors[7];
+                break;
+
+            case CCADENCE:
+                color = theme.colors[8];
+                break;
+
+            case CTORQUE:
+                color = theme.colors[9];
+                break;
+
+                default:
+                    color = colorSet[i].color;
+            }
 
             QTreeWidgetItem *add;
             ColorButton *colorButton = new ColorButton(this, colorSet[i].name, color);

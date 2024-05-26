@@ -32,7 +32,7 @@ class SearchFilterBox : public QWidget
     Q_PROPERTY(int xwidth READ xwidth WRITE setXWidth USER true)
 
 public:
-    SearchFilterBox(QWidget *parent, Context *context, bool nochooser = true);
+    SearchFilterBox(QWidget *parent, Context *context, bool nochooser = true, bool useToolbarBkgd = false);
     void setMode(SearchBox::SearchBoxMode x) { searchbox->setMode(x); }
 
     QString filter();

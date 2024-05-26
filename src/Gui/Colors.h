@@ -132,7 +132,6 @@ class GCColor : public QObject
         static QColor htmlCode(QColor x) { return x.name(); } // return the alternate background
         static Themes &themes();
         static void applyTheme(int index);
-        static QColor getThemeColor(const ColorTheme& theme, int colorIdx);
 
         // for styling things with current preferences
         static QLinearGradient linearGradient(int size, bool active, bool alternate=false);
