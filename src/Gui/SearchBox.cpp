@@ -34,8 +34,8 @@
 
 const int BUTTON_SIZE = 12;
 
-SearchBox::SearchBox(Context *context, QWidget *parent, bool nochooser)
-    : QLineEdit(parent), context(context), parent(parent), filtered(false), nochooser(nochooser), active(false), fixed(false)
+SearchBox::SearchBox(Context *context, QWidget *parent, bool nochooser, bool useToolbarBkgd)
+    : QLineEdit(parent), context(context), parent(parent), filtered(false), nochooser(nochooser), active(false), fixed(false), useToolbarBkgd(useToolbarBkgd)
 {
     setFixedHeight(28*dpiYFactor);
     //clear button
@@ -106,11 +106,17 @@ SearchBox::configChanged(qint32)
     int frameWidth = style()->pixelMetric(QStyle::PM_DefaultFrameWidth);
     QColor color = QPalette().color(QPalette::Highlight);
 
+    // Override the default dialogue colours when the searchbox is located within the main window toolbar.
+    QColor bkgdColor = useToolbarBkgd ? GColor(CTOOLBAR) : palette().color(QPalette::Base);
+    QColor textColor = useToolbarBkgd ? GCColor::invertColor(bkgdColor) : palette().color(QPalette::Text);
+
     setStyleSheet(QString( //"QLineEdit { padding-right: %1px; } "
                       "QLineEdit#SearchBox {"
                       "    border-radius: 3px; "
                       "    border: 1px solid rgba(127,127,127,127);"
                       "    padding: 0px %1px;"
+                      "    color: rgba(%6,%7,%8,255);"
+                      "    background: rgba(%9,%10,%11,255);"
                       "}"
                       "QLineEdit#SearchBox:focus {"
                       "    border-radius: 3px; "
@@ -123,7 +129,9 @@ SearchBox::configChanged(qint32)
                       "}"
              ).arg(clearButton->sizeHint().width() + frameWidth + 12)
               .arg(color.red()).arg(color.green()).arg(color.blue())
-              .arg(clearButton->sizeHint().width() + frameWidth + 12));
+              .arg(clearButton->sizeHint().width() + frameWidth + 12)
+              .arg(textColor.red()).arg(textColor.green()).arg(textColor.blue())
+              .arg(bkgdColor.red()).arg(bkgdColor.green()).arg(bkgdColor.blue()));
 
     // get suitably formated list
     QList<QString> list;

@@ -42,7 +42,7 @@ public:
     enum searchboxmode { Search, Filter };
     typedef enum searchboxmode SearchBoxMode;
 
-    SearchBox(Context *context, QWidget *parent = 0, bool nochooser=true);
+    SearchBox(Context *context, QWidget *parent = 0, bool nochooser=true, bool useToolbarBkgd=false);
 
     // either search box or filter box
     void setMode(SearchBoxMode mode);
@@ -119,6 +119,7 @@ private:
     DataFilterCompleter *completer;
     bool active;
     bool fixed;
+    bool useToolbarBkgd;
 };
 
 class DataFilterCompleter : public QCompleter
