@@ -423,6 +423,7 @@ GCColor::readConfig()
     for (unsigned int i=0; ColorList[i].name != ""; i++) {
         QString colortext = appsettings->value(NULL, ColorList[i].setting, "").toString();
         if (colortext != "") {
+
             // color definitions are stored as "r:g:b"
             QStringList rgb = colortext.split(":");
             ColorList[i].color = QColor(rgb[0].toInt(),
@@ -431,14 +432,14 @@ GCColor::readConfig()
         } else {
 
             // set sensible defaults for any not set (as new colors are added)
-            if (ColorList[i].name == "CTOOLBAR") {
+            if (ColorList[i].setting == "CTOOLBAR") {
                 QPalette def;
                 ColorList[i].color = def.color(QPalette::Window);
             }
-            if (ColorList[i].name == "CCHARTBAR") {
+            if (ColorList[i].setting == "CCHARTBAR") {
                 ColorList[i].color = ColorList[CTOOLBAR].color;
             }
-            if (ColorList[i].name == "CCALCURRENT") {
+            if (ColorList[i].setting == "CCALCURRENT") {
                 QPalette def;
                 ColorList[i].color = def.color(QPalette::Highlight);
 
