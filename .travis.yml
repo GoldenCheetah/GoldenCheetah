@@ -46,7 +46,8 @@ env:
 
 jobs:
   include:
-  - os: osx
+  - if: commit_message !~ /\[skip osx\]/
+    os: osx
     osx_image: xcode14.2
     compiler: clang
   - if: commit_message !~ /\[skip linux\]/

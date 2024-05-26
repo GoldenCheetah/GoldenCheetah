@@ -222,7 +222,7 @@ deploy:
     description: 'Snapshot Builds'
     artifact: GCinstaller, GCversionWindows
     draft: false
-    prerelease: false
+    prerelease: true
     force_update: true
     on:
       PUBLISH_BINARIES: true
