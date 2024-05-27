@@ -946,8 +946,8 @@ QColor GCColor::getThemeColor(const ColorTheme& theme, int colorIdx)
     case CPLOTBACKGROUND:
     case CRIDEPLOTBACKGROUND:
     case CTRENDPLOTBACKGROUND:
-
-        color = theme.colors[0]; // background color
+        // background color
+        color = theme.colors[0];
         break;
 
     case CTRAINPLOTBACKGROUND:
@@ -983,7 +983,7 @@ QColor GCColor::getThemeColor(const ColorTheme& theme, int colorIdx)
     case CCHARTBAR:
     case CTOOLBAR:
         // we always keep them the same, but user can make different
-        //  set to black for dark themes and grey for light themes
+        // set to black for dark themes and grey for light themes
         color = theme.colors[1];
         break;
 
@@ -991,8 +991,6 @@ QColor GCColor::getThemeColor(const ColorTheme& theme, int colorIdx)
         // stealthy themes use overview card background for hover color since they are close
         // all other themes get a boring default
         color = theme.stealth ? ColorList[96].color : (theme.dark ? QColor(50, 50, 50) : QColor(200, 200, 200));
-
-        // color = theme.stealth ? theme.colors[11] : (theme.dark ? QColor(50, 50, 50) : QColor(200, 200, 200)); - Pages.cpp version
         break;
 
     case CPLOTSYMBOL:
@@ -1008,7 +1006,8 @@ QColor GCColor::getThemeColor(const ColorTheme& theme, int colorIdx)
         color = theme.colors[3]; // select color
         break;
 
-    case CPLOTGRID: // grid doesn't have a theme color
+    case CPLOTGRID:
+        // grid doesn't have a theme color
         // we make it barely distinguishable from background
     {
         QColor bg = theme.colors[0];
@@ -1047,8 +1046,6 @@ QColor GCColor::getThemeColor(const ColorTheme& theme, int colorIdx)
     default:
         if (theme.dark) color = DarkDefaultColorList[colorIdx].color;
         else color = LightDefaultColorList[colorIdx].color;
-
-        // color = colorSet[colorIdx].color;  -- Pages.cpp version
     }
 
     return color;
