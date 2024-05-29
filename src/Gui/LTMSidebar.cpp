@@ -724,7 +724,7 @@ LTMSidebar::eventPopup()
 void
 LTMSidebar::manageFilters()
 {
-    EditNamedSearches *editor = new EditNamedSearches(parentWidget(), context);
+    EditNamedSearches *editor = new EditNamedSearches(context->mainWindow, context);
     editor->move(QCursor::pos()+QPoint(10,-200));
     editor->show();
 }

@@ -354,7 +354,7 @@ void SearchBox::runMenu(QAction *x)
     if (x->text() == tr("Add to Named Filters")) addNamed();
     else if (x->text() == tr("Manage Filters")) {
 
-        EditNamedSearches *editor = new EditNamedSearches(parent->parentWidget(), context);
+        EditNamedSearches *editor = new EditNamedSearches(context->mainWindow, context);
         editor->move(QCursor::pos() - QPoint(460, -5));
         editor->show();
 
