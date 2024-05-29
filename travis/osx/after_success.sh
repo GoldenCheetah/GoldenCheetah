@@ -67,11 +67,12 @@ cat GCversionMacOS.txt
 echo "Uploading for user tests"
 ### upload for testing
 if [[ $TRAVIS_PULL_REQUEST == "false" && $TRAVIS_COMMIT_MESSAGE == *"[publish binaries]"* ]]; then
-aws s3 rm s3://goldencheetah-binaries/MacOS --recursive # keep only the last one
-aws s3 cp --acl public-read $FINAL_NAME s3://goldencheetah-binaries/MacOS/$FINAL_NAME
-aws s3 cp --acl public-read GCversionMacOS.txt s3://goldencheetah-binaries/MacOS/GCversionMacOS.txt
+mkdir out
+mv $FINAL_NAME out
+mv GCversionMacOS.txt out
+ghr -b "Snapshot Builds" -replace snapshot out
 else
-curl --max-time 300 --upload-file $FINAL_NAME https://free.keep.sh/$FINAL_NAME
+curl --max-time 300 -F "file=@$FINAL_NAME" https://temp.sh/upload
 fi
 
 echo "Make sure we are back in the Travis build directory"

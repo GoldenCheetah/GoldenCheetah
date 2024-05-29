@@ -299,6 +299,7 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
     connect(context, SIGNAL(ergFileSelected(ErgFileBase*)), workoutInfo, SLOT(ergFileSelected(ErgFileBase*)));
     QScrollArea *workoutInfoScroller = new QScrollArea();
     workoutInfoScroller->setWidgetResizable(true);
+    workoutInfoScroller->setFrameStyle(QFrame::NoFrame);
     workoutInfoScroller->setWidget(workoutInfo);
 #ifdef Q_OS_WIN
     xde = QStyleFactory::create(OS_STYLE);
