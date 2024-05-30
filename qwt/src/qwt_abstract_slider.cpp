@@ -831,6 +831,4 @@ void QwtAbstractSlider::sliderChange()
     update();
 }
 
-#if QWT_MOC_INCLUDE
 #include "moc_qwt_abstract_slider.cpp"
-#endif

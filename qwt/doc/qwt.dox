@@ -36,9 +36,8 @@ to control or display values, arrays, or ranges of type double.
 
   \section platforms Platforms
 
-  Qwt 6.2 might be usable in all environments where you find
-  <a href="https://www.qt.io">Qt</a>.
-  It is compatible with Qt 4.8 and all Qt5 versions.
+  Qwt 6.4 might be usable in all environments where you find
+  <a href="https://www.qt.io">Qt</a>.  It is compatible with Qt >= Qt 5.6
 
   \section changelogonmainpage What's new
   Read the \ref qwtchangelog "summary" of the most important changes.
@@ -54,10 +53,6 @@ to control or display values, arrays, or ranges of type double.
   \section downloads Downloads
   Stable releases or prereleases are available at the Qwt <a href="http://sourceforge.net/projects/qwt/files">project page</a>, or from the <a href="https://sourceforge.net/p/qwt/git">git repository</a>.
 
-  Active development will happen in the develop branch supporting Qt >= 5.6 and relying
-  on at least C++11. However all versions >= Qt 4.8 will actively be supported in the
-  6.x branches.\n The popular multiaxes branch is derived from develop.
- 
   \section installonmainpage Installation
 
   Qwt doesn't distribute binary packages, but today all major Linux distributors
@@ -69,7 +64,6 @@ to control or display values, arrays, or ranges of type double.
   \section support Support
   - Mailing list\n
   For all kind of Qwt related questions use the Qwt <a href="http://sourceforge.net/mail/?group_id=13693">mailing list</a>.\n 
-  If you prefer newsgroups use the mail to news gateway of <a href="http://dir.gmane.org/gmane.comp.graphics.qwt.general">Gmane</a>. 
 
   - Forum\n
   <a href="http://www.qtcentre.org">Qt Centre</a> is a great resource for Qt

@@ -22,6 +22,7 @@
 
 #include <qpainter.h>
 #include <qpainterpath.h>
+#include <qnumeric.h>
 
 #include <climits>
 
@@ -897,7 +898,6 @@ void QwtPlotCurve::fillCurve( QPainter* painter,
     if ( m_data->brush.style() == Qt::NoBrush )
         return;
 
-    double avg=(yMap.invTransform(polygon[0].y())+yMap.invTransform(polygon[1].y())) / 2.00;
     closePolyline( painter, xMap, yMap, polygon );
     if ( polygon.count() <= 2 ) // a line can't be filled
         return;
@@ -916,27 +916,6 @@ void QwtPlotCurve::fillCurve( QPainter* painter,
 
     painter->setPen( Qt::NoPen );
     painter->setBrush( brush );
-
-    // if we have zones we need to process the polygon point by point...
-    if (m_data->zones.count()>0 && polygon.count() == 4) {
-
-        // we need to set color based upon zone
-        double alpha = m_data->brush.color().alphaF();
-        QColor color = m_data->brush.color();
-
-        if (avg < 1) color=Qt::black;
-        else{
-        for(int i=0; i<m_data->zones.count(); i++) {
-            if (avg < m_data->zones[i].lim) {
-                color = m_data->zones[i].color;
-                color.setAlphaF(alpha);
-                break;
-            }
-        }
-        }
-        brush.setColor(color);
-        painter->setBrush(brush);
-    }
 
     QwtPainter::drawPolygon( painter, polygon );
 
@@ -1054,15 +1033,6 @@ void QwtPlotCurve::setBaseline( double value )
     }
 }
 
-void QwtPlotCurve::setZones(QVector<QwtZone> zones)
-{
-    m_data->zones = zones;
-}
-
-QVector<QwtZone> &QwtPlotCurve::zones() {
-    return m_data->zones;
-}
-
 /*!
    \return Value of the baseline
    \sa setBaseline()
@@ -1070,6 +1040,15 @@ QVector<QwtZone> &QwtPlotCurve::zones() {
 double QwtPlotCurve::baseline() const
 {
     return m_data->baseline;
+}
+
+void QwtPlotCurve::setZones(QVector<QwtZone> zones)
+{
+    m_data->zones = zones;
+}
+
+QVector<QwtZone> &QwtPlotCurve::zones() {
+    return m_data->zones;
 }
 
 /*!
@@ -1140,7 +1119,7 @@ int QwtPlotCurve::closestPoint( const QPointF& pos, double* dist ) const
 int QwtPlotCurve::adjacentPoint( Qt::Orientation orientation, qreal value ) const
 {
     const QwtSeriesData< QPointF >* data = this->data();
-    if ( data == nullptr )
+    if ( data == NULL )
         return -1;
 
     if ( orientation == Qt::Horizontal )

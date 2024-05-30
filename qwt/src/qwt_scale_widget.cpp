@@ -208,10 +208,10 @@ void QwtScaleWidget::setTitle( const QwtText& title )
  */
 void QwtScaleWidget::setAlignment( QwtScaleDraw::Alignment alignment )
 {
-    if ( m_data->scaleDraw == nullptr )
+    if ( m_data->scaleDraw == NULL )
         return;
 
-        m_data->scaleDraw->setAlignment( alignment );
+    m_data->scaleDraw->setAlignment( alignment );
 
     if ( !testAttribute( Qt::WA_WState_OwnSizePolicy ) )
     {
@@ -977,6 +977,4 @@ const QwtColorMap* QwtScaleWidget::colorMap() const
     return m_data->colorBar.colorMap;
 }
 
-#if QWT_MOC_INCLUDE
 #include "moc_qwt_scale_widget.cpp"
-#endif

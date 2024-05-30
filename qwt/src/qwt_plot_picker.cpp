@@ -106,8 +106,8 @@ QwtPlotPicker::QwtPlotPicker( QwtAxisId xAxisId, QwtAxisId yAxisId, QWidget* can
 /*!
    Create a plot picker
 
-   \param xAxis X axis of the picker
-   \param yAxis Y axis of the picker
+   \param xAxisId X axis of the picker
+   \param yAxisId Y axis of the picker
    \param rubberBand Rubber band style
    \param trackerMode Tracker mode
    \param canvas Plot canvas to observe, also the parent object
@@ -427,6 +427,4 @@ void QwtPlotPicker::axesChanged()
 {
 }
 
-#if QWT_MOC_INCLUDE
 #include "moc_qwt_plot_picker.cpp"
-#endif

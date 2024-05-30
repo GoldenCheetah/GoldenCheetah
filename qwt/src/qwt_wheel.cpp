@@ -1303,6 +1303,4 @@ double QwtWheel::alignedValue( double value ) const
     return value;
 }
 
-#if QWT_MOC_INCLUDE
 #include "moc_qwt_wheel.cpp"
-#endif
