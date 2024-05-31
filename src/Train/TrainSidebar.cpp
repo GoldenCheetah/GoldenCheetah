@@ -288,10 +288,12 @@ TrainSidebar::TrainSidebar(Context *context) : GcWindow(context), context(contex
 
 
     int zonerange = context->athlete->zones("Bike")->whichRange(QDateTime::currentDateTime().date());
-    int numZones = context->athlete->zones("Bike")->numZones(zonerange);
     QList<QColor> zoneColors;
-    for (int i = 0; i < numZones; ++i) {
-        zoneColors << zoneColor(i, numZones);
+    if (zonerange != -1) {
+        int numZones = context->athlete->zones("Bike")->numZones(zonerange);
+        for (int i = 0; i < numZones; ++i) {
+            zoneColors << zoneColor(i, numZones);
+        }
     }
     workoutInfo = new InfoWidget(zoneColors, context->athlete->zones("Bike")->getZoneDescriptions(zonerange));
     workoutInfo->setFrameStyle(QFrame::NoFrame);
@@ -700,10 +702,12 @@ TrainSidebar::configChanged(qint32 why)
     deviceTree->setStyleSheet(GCColor::stylesheet(true));
 
     int zonerange = context->athlete->zones("Bike")->whichRange(QDateTime::currentDateTime().date());
-    int numZones = context->athlete->zones("Bike")->numZones(zonerange);
     QList<QColor> zoneColors;
-    for (int i = 0; i < numZones; ++i) {
-        zoneColors << zoneColor(i, numZones);
+    if (zonerange != -1) {
+        int numZones = context->athlete->zones("Bike")->numZones(zonerange);
+        for (int i = 0; i < numZones; ++i) {
+            zoneColors << zoneColor(i, numZones);
+        }
     }
     workoutInfo->setPowerZoneColors(zoneColors);
     workoutInfo->setPowerZoneNames(context->athlete->zones("Bike")->getZoneDescriptions(zonerange));
