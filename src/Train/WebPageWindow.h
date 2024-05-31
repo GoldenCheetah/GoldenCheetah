@@ -36,9 +36,6 @@
 #include <QSslSocket>
 #include <QWebEnginePage>
 #include <QWebEngineView>
-#if QT_VERSION >= 0x060000
-#include <QWebEngineProfile>
-#endif
 
 class QMouseEvent;
 class RideItem;
@@ -59,10 +56,6 @@ class QWebEngineDownloadRequest;
 #endif
 class simpleWebPage : public QWebEnginePage
 {
-#if QT_VERSION >= 0x060000
-    public:
-        simpleWebPage() : QWebEnginePage(new QWebEngineProfile("Default")) {}
-#endif
 };
 
 class WebPageWindow : public GcChartWindow
