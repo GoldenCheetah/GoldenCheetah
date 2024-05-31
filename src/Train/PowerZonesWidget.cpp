@@ -100,7 +100,7 @@ void
 PowerZonesWidget::paintEvent
 (QPaintEvent *event)
 {
-    if (dominantZone == 0) {
+    if (zones.length() == 0 || dominantZone == 0) {
         event->accept();
         return;
     }
