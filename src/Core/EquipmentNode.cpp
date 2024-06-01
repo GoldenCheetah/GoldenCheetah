@@ -184,7 +184,7 @@ EquipmentDistanceItem::isWithin(const QDateTime& time) const {
 
     if (start_.isNull())
         if (end_.isNull())
-            return true; // no range set
+            return false; // no range set
         else
             return (time < end_); // end set but not beginning !
     else

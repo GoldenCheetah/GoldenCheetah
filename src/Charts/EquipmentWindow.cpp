@@ -53,12 +53,10 @@ EquipmentWindow::EquipmentWindow(Context *context) :
     stackedWidget_->addWidget(createWidsEquipmentBanner());
 
     QVBoxLayout* saveCancellayout = new QVBoxLayout;
-    recalcButton_ = new QPushButton(tr("Recalcuate"));
     saveButton_ = new QPushButton(tr("Save"));
     undoButton_ = new QPushButton(tr("Undo"));
     saveCancellayout->addWidget(new QLabel());
     saveCancellayout->addWidget(new QLabel());
-    saveCancellayout->addWidget(recalcButton_);
     saveCancellayout->addWidget(saveButton_);
     saveCancellayout->addWidget(undoButton_);
     saveCancellayout->insertStretch(-1);
@@ -68,8 +66,14 @@ EquipmentWindow::EquipmentWindow(Context *context) :
     hlayout->addLayout(saveCancellayout);
     hlayout->insertStretch(-1);
 
+    QHBoxLayout* hReclacLayout = new QHBoxLayout();
+    recalcButton_ = new QPushButton(tr("Recalcuate"));
+    hReclacLayout->addWidget(recalcButton_);
+    hReclacLayout->insertStretch(-1);
+
     QVBoxLayout* vlayout = new QVBoxLayout();
     lastUpdated_ = new QLabel();
+    vlayout->addLayout(hReclacLayout);
     vlayout->addWidget(lastUpdated_);
     vlayout->addWidget(new QLabel());
     vlayout->addLayout(hlayout);

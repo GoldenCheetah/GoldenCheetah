@@ -171,72 +171,63 @@ void EquipmentNavigatorCellDelegate::paint(QPainter* painter, const QStyleOption
     myOption.displayAlignment = Qt::AlignLeft | Qt::AlignTop;
     QRect rect(myOption.rect.x(), myOption.rect.y() + 1, myOption.rect.width(), myOption.rect.height());
 
-    // render text based upon hierarchy & types
-     QColor userColor = GColor(CPLOTTRACKER).darker(150);
-
     static QColor odtColour = GColor(CHEARTRATE).darker(130);
-    static QColor rootTimeColour = GColor(CCADENCE).lighter(110);
-    static QColor rootDistColor = GColor(CPLOTTRACKER).lighter(120);
-    static QColor timeColour = GColor(CCADENCE).darker(140);
-    static QColor distColor = GColor(CPLOTTRACKER).darker(110);
-    static QColor selectTxtColor = distColor;
-    static QColor selectBkgdColor = GCColor::alternateColor(GColor(CPLOTBACKGROUND));
+    static QColor LinkAndSharedColor = GColor(CPLOTTRACKER).lighter(120);
 
+    static QColor inactiveTimeColour = GColor(CCADENCE).darker(180);
+    static QColor timeColour = GColor(CCADENCE).lighter(110);
+    static QColor distColor = GColor(CPLOTTRACKER).darker(110);
+    static QColor bannerColor = distColor;
+
+    static QColor indirectSelectedTextColor = distColor;
+    static QColor indirectSelectedBkgdColor = GCColor::alternateColor(GColor(CPLOTBACKGROUND));
+
+    QColor userTextColor = distColor;
+    QColor userTimeColor = timeColour;
+
+    bool indirectlySelected(false);
     EquipmentNode* eqNode = eqModel_->equipmentFromIndex(index);
 
+    // render text based upon hierarchy & types
     if (eqNode) {
 
         switch (eqNode->getEqNodeType()) {
 
         case eqNodeType::EQ_TIME_ITEM: {
-            if (eqNode->getParentItem()->getEqNodeType() == eqNodeType::EQ_ROOT)
-                userColor = rootTimeColour;
-            else
-                userColor = timeColour;
+            userTextColor = timeColour;
         } break;
 
         case eqNodeType::EQ_ITEM_REF: {
-            if (static_cast<EquipmentRef*>(eqNode)->eqSharedDistNode_ == nullptr)
-                userColor = odtColour;
-            else
+            if (static_cast<EquipmentRef*>(eqNode)->eqSharedDistNode_ == nullptr) {
+                userTextColor = odtColour;
+            } else {
                 if (static_cast<EquipmentRef*>(eqNode)->eqSharedDistNode_ == eqNav_->currentEqItem_) {
-
-                    painter->fillRect(myOption.rect, selectBkgdColor);
-                    userColor = selectTxtColor;
+                    indirectlySelected = true;
+                } else {
+                    userTextColor = distColor;
                 }
-                else
-                    userColor = distColor;
+            }
         } break;
 
         case eqNodeType::EQ_SHARED:
         case eqNodeType::EQ_LINK: {
-            if (eqNode->getParentItem()->getEqNodeType() == eqNodeType::EQ_ROOT)
-                userColor = rootDistColor;
-            else
-                userColor = distColor;
+            userTextColor = LinkAndSharedColor;
         } break;
 
         case eqNodeType::EQ_DIST_ITEM: {
-            if (eqNode->getParentItem()->getEqNodeType() == eqNodeType::EQ_ROOT)
-                userColor = rootDistColor;
-            else
-                userColor = distColor;
+            userTextColor = distColor;
         } break;
 
         case eqNodeType::EQ_BANNER: {
-            userColor = distColor;
+            userTextColor = bannerColor;
         } break;
 
         case eqNodeType::EQ_SHARED_DIST_ITEM: {
             if (static_cast<EquipmentSharedDistanceItem*>(eqNode)->linkedRefs_.indexOf(eqNav_->currentEqItem_) != -1) {
-                painter->fillRect(myOption.rect, selectBkgdColor);
-                userColor = selectTxtColor;
+                indirectlySelected = true;
+            } else {
+                userTextColor = distColor;
             }
-            else
-                if (eqNode->getParentItem()->getEqNodeType() == eqNodeType::EQ_ROOT)
-                    userColor = rootDistColor;
-                else
-                    userColor = distColor;
         } break;
 
         default: {
@@ -254,57 +245,84 @@ void EquipmentNavigatorCellDelegate::paint(QPainter* painter, const QStyleOption
 
     myOption.rect.setHeight(eqNav_->fontHeight + 1);
 
-    // not selected, so invert ride plot color
-    if (!selected) {
+    // not selected, so apply any required overr
+    if (indirectlySelected) {
+
+        painter->fillRect(myOption.rect, indirectSelectedBkgdColor);
+        userTextColor = indirectSelectedTextColor;
+        userTimeColor = indirectSelectedTextColor;
+
+    } else if (!selected) {
+
         switch (eqNode->getEqNodeType()) {
 
         case eqNodeType::EQ_DIST_ITEM: {
-            painter->setPen(static_cast<EquipmentDistanceItem*>(eqNode)->overDistance() ? odtColour : userColor);
+
+            // overwrite the date in either time color, inactive time or overdistance if range invalid
+            if ((static_cast<EquipmentDistanceItem*>(eqNode)->overDistance()) ||
+                (!static_cast<EquipmentDistanceItem*>(eqNode)->rangeIsValid())) {
+                userTextColor = odtColour;
+                userTimeColor = odtColour;
+            } else {
+                if (static_cast<EquipmentDistanceItem*>(eqNode)->isWithin(QDateTime::currentDateTime())) {
+                    userTimeColor = timeColour;
+                } else {
+                    userTimeColor = inactiveTimeColour;
+                }
+            }
         } break;
 
         case eqNodeType::EQ_SHARED_DIST_ITEM: {
-            painter->setPen(static_cast<EquipmentSharedDistanceItem*>(eqNode)->overDistance() ? odtColour : userColor);
+            if (static_cast<EquipmentSharedDistanceItem*>(eqNode)->overDistance()) userTextColor = odtColour;
+        } break;
+
+        case eqNodeType::EQ_ITEM_REF: {
+
+            // overwrite the date in either time color, inactive time or overdistance if range invalid
+            if ((static_cast<EquipmentRef*>(eqNode)->eqSharedDistNode_->overDistance()) ||
+                (!static_cast<EquipmentRef*>(eqNode)->rangeIsValid())) {
+                userTextColor = odtColour;
+                userTimeColor = odtColour;
+            } else {
+                if (static_cast<EquipmentRef*>(eqNode)->isWithin(QDateTime::currentDateTime())) {
+                    userTimeColor = timeColour;
+                }
+                else {
+                    userTimeColor = inactiveTimeColour;
+                }
+            }
         } break;
 
         case eqNodeType::EQ_TIME_ITEM: {
-            painter->setPen(static_cast<EquipmentTimeItem*>(eqNode)->overTime() ? odtColour : userColor);
+            if (static_cast<EquipmentTimeItem*>(eqNode)->overTime()) userTextColor = odtColour;
         } break;
 
         default: {
-            painter->setPen(userColor);
         }break;
         }
     }
    
-    if ((eqNode->getEqNodeType() == eqNodeType::EQ_ITEM_REF) &&
-        (static_cast<EquipmentRef*>(eqNode)->isTimeRestrictionSet()))
+    if (((eqNode->getEqNodeType() == eqNodeType::EQ_ITEM_REF) &&
+        (static_cast<EquipmentRef*>(eqNode)->isTimeRestrictionSet())) ||
+        ((eqNode->getEqNodeType() == eqNodeType::EQ_DIST_ITEM) &&
+            (static_cast<EquipmentDistanceItem*>(eqNode)->isTimeRestrictionSet())))
     {
         static QRegularExpression rx("\\~");
         QStringList strList = value.split(rx);
 
-        // draw the whole string with any '#'
+        // draw the whole string without any '~'
+        painter->setPen(userTextColor);
         painter->drawText(rect, value.remove(QChar('~')));
 
-        // overwrite the date in either time color or overdistance if range invalid
-        painter->setPen(static_cast<EquipmentRef*>(eqNode)->rangeIsValid() ? timeColour : odtColour);
+        // draw the time part of the string
+        painter->setPen(userTimeColor);
         painter->drawText(rect, strList[0]);
 
-    } else if ((eqNode->getEqNodeType() == eqNodeType::EQ_DIST_ITEM) &&
-        (static_cast<EquipmentDistanceItem*>(eqNode)->isTimeRestrictionSet()))
-    {
-        static QRegularExpression rx("\\~");
-        QStringList strList = value.split(rx);
-
-        // draw the whole string with any '#'
-        painter->drawText(rect, value.remove(QChar('~')));
-
-        // overwrite the date in either time color or overdistance if range invalid
-        painter->setPen(static_cast<EquipmentDistanceItem*>(eqNode)->rangeIsValid() ? timeColour : odtColour);
-        painter->drawText(rect, strList[0]);
     }
     else {
 
         // draw the whole string
+        painter->setPen(userTextColor);
         painter->drawText(rect, value);
     }
     
