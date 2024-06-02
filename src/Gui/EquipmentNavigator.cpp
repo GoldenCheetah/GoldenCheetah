@@ -236,18 +236,17 @@ void EquipmentNavigatorCellDelegate::paint(QPainter* painter, const QStyleOption
         }
     }
 
-    // clear first
-    drawDisplay(painter, myOption, myOption.rect, "");
-
     // save original painter values to restore later
     QPen isColor = painter->pen();
     QFont isFont = painter->font();
 
-    myOption.rect.setHeight(eqNav_->fontHeight + 1);
+    // clear first
+    drawDisplay(painter, myOption, myOption.rect, "");
 
     // not selected, so apply any required overr
     if (indirectlySelected) {
 
+        myOption.rect.setHeight(eqNav_->fontHeight + 1);
         painter->fillRect(myOption.rect, indirectSelectedBkgdColor);
         userTextColor = indirectSelectedTextColor;
         userTimeColor = indirectSelectedTextColor;
@@ -298,10 +297,12 @@ void EquipmentNavigatorCellDelegate::paint(QPainter* painter, const QStyleOption
         } break;
 
         default: {
+            // No overrides required.
         }break;
         }
     }
    
+    // Draw text 
     if (((eqNode->getEqNodeType() == eqNodeType::EQ_ITEM_REF) &&
         (static_cast<EquipmentRef*>(eqNode)->isTimeRestrictionSet())) ||
         ((eqNode->getEqNodeType() == eqNodeType::EQ_DIST_ITEM) &&

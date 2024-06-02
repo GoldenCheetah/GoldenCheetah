@@ -67,7 +67,7 @@ EquipmentWindow::EquipmentWindow(Context *context) :
     hlayout->insertStretch(-1);
 
     QHBoxLayout* hReclacLayout = new QHBoxLayout();
-    recalcButton_ = new QPushButton(tr("Recalcuate"));
+    recalcButton_ = new QPushButton(tr("Recalculate"));
     hReclacLayout->addWidget(recalcButton_);
     hReclacLayout->insertStretch(-1);
 
