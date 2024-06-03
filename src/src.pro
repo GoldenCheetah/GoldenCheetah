@@ -694,7 +694,7 @@ HEADERS += ../contrib/qtsolutions/codeeditor/codeeditor.h ../contrib/qtsolutions
 
 # Train View
 HEADERS += Train/AddDeviceWizard.h Train/CalibrationData.h Train/ComputrainerController.h Train/Computrainer.h Train/DeviceConfiguration.h \
-           Train/DeviceTypes.h Train/DialWindow.h Train/ErgDBDownloadDialog.h Train/ErgDB.h Train/ErgFile.h Train/ErgFilePlot.h \
+           Train/DeviceTypes.h Train/DialWindow.h Train/TrainerDayDownloadDialog.h Train/TrainerDay.h Train/ErgFile.h Train/ErgFilePlot.h \
            Train/Library.h Train/LibraryParser.h Train/MeterWidget.h Train/NullController.h Train/RealtimeController.h \
            Train/RealtimeData.h Train/RealtimePlot.h Train/RealtimePlotWindow.h Train/RemoteControl.h Train/SpinScanPlot.h \
            Train/SpinScanPlotWindow.h Train/SpinScanPolarPlot.h Train/GarminServiceHelper.h Train/PhysicsUtility.h Train/BicycleSim.h \
@@ -805,7 +805,7 @@ SOURCES += ../contrib/qtsolutions/codeeditor/codeeditor.cpp ../contrib/qtsolutio
 
 ## Train View Components
 SOURCES += Train/AddDeviceWizard.cpp Train/CalibrationData.cpp Train/ComputrainerController.cpp Train/Computrainer.cpp Train/DeviceConfiguration.cpp \
-           Train/DeviceTypes.cpp Train/DialWindow.cpp Train/ErgDB.cpp Train/ErgDBDownloadDialog.cpp Train/ErgFile.cpp Train/ErgFilePlot.cpp \
+           Train/DeviceTypes.cpp Train/DialWindow.cpp Train/TrainerDay.cpp Train/TrainerDayDownloadDialog.cpp Train/ErgFile.cpp Train/ErgFilePlot.cpp \
            Train/Library.cpp Train/LibraryParser.cpp Train/MeterWidget.cpp Train/NullController.cpp Train/RealtimeController.cpp \
            Train/RealtimeData.cpp Train/RealtimePlot.cpp Train/RealtimePlotWindow.cpp Train/RemoteControl.cpp Train/SpinScanPlot.cpp \
            Train/SpinScanPlotWindow.cpp Train/SpinScanPolarPlot.cpp Train/GarminServiceHelper.cpp Train/PhysicsUtility.cpp Train/BicycleSim.cpp \

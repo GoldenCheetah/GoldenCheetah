@@ -4964,7 +4964,7 @@ Commençons par la configuration.</translation>
     <message>
         <location filename="../../Charts/BlankState.cpp" line="266"/>
         <source>Download workout files from the Erg DB.</source>
-        <translation>Télécharger des entrainements depuis ErgDB.</translation>
+        <translation>Télécharger des entrainements depuis TrainerDay.</translation>
     </message>
     <message>
         <location filename="../../Charts/BlankState.cpp" line="267"/>
@@ -9897,113 +9897,113 @@ Vous devez peut-être (ré)installer le driver FTDI ou PL2303 avant de télécha
     </message>
 </context>
 <context>
-    <name>ErgDBDownloadDialog</name>
+    <name>TrainerDayDownloadDialog</name>
     <message>
-        <location filename="../../Train/ErgDBDownloadDialog.cpp" line="28"/>
-        <source>Download workouts from ErgDB</source>
-        <translation>Télécharger des entrainements depuis ErgDB</translation>
+        <location filename="../../Train/TrainerDayDownloadDialog.cpp" line="28"/>
+        <source>Download workouts from TrainerDay</source>
+        <translation>Télécharger des entrainements depuis TrainerDay</translation>
     </message>
     <message>
-        <location filename="../../Train/ErgDBDownloadDialog.cpp" line="46"/>
+        <location filename="../../Train/TrainerDayDownloadDialog.cpp" line="46"/>
         <source>Name</source>
         <translation>Nom</translation>
     </message>
     <message>
-        <location filename="../../Train/ErgDBDownloadDialog.cpp" line="47"/>
+        <location filename="../../Train/TrainerDayDownloadDialog.cpp" line="47"/>
         <source>Type</source>
         <translation>Type</translation>
     </message>
     <message>
-        <location filename="../../Train/ErgDBDownloadDialog.cpp" line="48"/>
+        <location filename="../../Train/TrainerDayDownloadDialog.cpp" line="48"/>
         <source>Author</source>
         <translation>Auteur</translation>
     </message>
     <message>
-        <location filename="../../Train/ErgDBDownloadDialog.cpp" line="49"/>
+        <location filename="../../Train/TrainerDayDownloadDialog.cpp" line="49"/>
         <source>Dated</source>
         <translation>Date</translation>
     </message>
     <message>
-        <location filename="../../Train/ErgDBDownloadDialog.cpp" line="50"/>
+        <location filename="../../Train/TrainerDayDownloadDialog.cpp" line="50"/>
         <source>Action</source>
         <translation>Action</translation>
     </message>
     <message>
-        <location filename="../../Train/ErgDBDownloadDialog.cpp" line="76"/>
+        <location filename="../../Train/TrainerDayDownloadDialog.cpp" line="76"/>
         <source>dd MMM yyyy</source>
         <translation>dd MMM yyyy</translation>
     </message>
     <message>
-        <location filename="../../Train/ErgDBDownloadDialog.cpp" line="79"/>
-        <location filename="../../Train/ErgDBDownloadDialog.cpp" line="94"/>
-        <location filename="../../Train/ErgDBDownloadDialog.cpp" line="128"/>
+        <location filename="../../Train/TrainerDayDownloadDialog.cpp" line="79"/>
+        <location filename="../../Train/TrainerDayDownloadDialog.cpp" line="94"/>
+        <location filename="../../Train/TrainerDayDownloadDialog.cpp" line="128"/>
         <source>Download</source>
         <translation>Télécharger</translation>
     </message>
     <message>
-        <location filename="../../Train/ErgDBDownloadDialog.cpp" line="85"/>
+        <location filename="../../Train/TrainerDayDownloadDialog.cpp" line="85"/>
         <source>check/uncheck all</source>
         <translation>cocher/décocher tout</translation>
     </message>
     <message>
-        <location filename="../../Train/ErgDBDownloadDialog.cpp" line="92"/>
+        <location filename="../../Train/TrainerDayDownloadDialog.cpp" line="92"/>
         <source>Overwrite existing workouts</source>
         <translation>Ecraser les entraînement actuels</translation>
     </message>
     <message>
-        <location filename="../../Train/ErgDBDownloadDialog.cpp" line="93"/>
+        <location filename="../../Train/TrainerDayDownloadDialog.cpp" line="93"/>
         <source>Cancel</source>
         <translation>Annuler</translation>
     </message>
     <message>
-        <location filename="../../Train/ErgDBDownloadDialog.cpp" line="132"/>
+        <location filename="../../Train/TrainerDayDownloadDialog.cpp" line="132"/>
         <source>Download...</source>
         <translation>Téléchargement...</translation>
     </message>
     <message>
-        <location filename="../../Train/ErgDBDownloadDialog.cpp" line="135"/>
-        <location filename="../../Train/ErgDBDownloadDialog.cpp" line="142"/>
+        <location filename="../../Train/TrainerDayDownloadDialog.cpp" line="135"/>
+        <location filename="../../Train/TrainerDayDownloadDialog.cpp" line="142"/>
         <source>Abort</source>
         <translation>Abandonner</translation>
     </message>
     <message>
-        <location filename="../../Train/ErgDBDownloadDialog.cpp" line="137"/>
+        <location filename="../../Train/TrainerDayDownloadDialog.cpp" line="137"/>
         <source>%1 workouts downloaded, %2 failed or skipped.</source>
         <translation>%1 entraînements téléchargés, %2 échoués ou sautés.</translation>
     </message>
     <message>
-        <location filename="../../Train/ErgDBDownloadDialog.cpp" line="138"/>
-        <location filename="../../Train/ErgDBDownloadDialog.cpp" line="144"/>
+        <location filename="../../Train/TrainerDayDownloadDialog.cpp" line="138"/>
+        <location filename="../../Train/TrainerDayDownloadDialog.cpp" line="144"/>
         <source>Finish</source>
         <translation>Terminé</translation>
     </message>
     <message>
-        <location filename="../../Train/ErgDBDownloadDialog.cpp" line="187"/>
+        <location filename="../../Train/TrainerDayDownloadDialog.cpp" line="187"/>
         <source>Downloading...</source>
         <translation>Téléchargement...</translation>
     </message>
     <message>
-        <location filename="../../Train/ErgDBDownloadDialog.cpp" line="204"/>
+        <location filename="../../Train/TrainerDayDownloadDialog.cpp" line="204"/>
         <source>Exists already</source>
         <translation>Déjà existant</translation>
     </message>
     <message>
-        <location filename="../../Train/ErgDBDownloadDialog.cpp" line="213"/>
+        <location filename="../../Train/TrainerDayDownloadDialog.cpp" line="213"/>
         <source>Removing...</source>
         <translation>Suppression...</translation>
     </message>
     <message>
-        <location filename="../../Train/ErgDBDownloadDialog.cpp" line="226"/>
+        <location filename="../../Train/TrainerDayDownloadDialog.cpp" line="226"/>
         <source>Saved</source>
         <translation>Enregistré</translation>
     </message>
     <message>
-        <location filename="../../Train/ErgDBDownloadDialog.cpp" line="232"/>
+        <location filename="../../Train/TrainerDayDownloadDialog.cpp" line="232"/>
         <source>Write failed</source>
         <translation>Erreur d&apos;écriture</translation>
     </message>
     <message>
-        <location filename="../../Train/ErgDBDownloadDialog.cpp" line="242"/>
+        <location filename="../../Train/TrainerDayDownloadDialog.cpp" line="242"/>
         <source>Invalid File</source>
         <translation>Fichier invalide</translation>
     </message>
@@ -14078,7 +14078,7 @@ La correction de couple - cette valeur définie une valeur absolue en newton mè
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="138"/>
         <source>Downloading of Workouts from the ERGDB (online workout DB) for Train - Indoor Riding</source>
-        <translation>Téléchargement d&apos;entraînement ErgDB (DB d’entraînement en ligne) pour les entraînements à l&apos;intérieur</translation>
+        <translation>Téléchargement d&apos;entraînement TrainerDay (DB d’entraînement en ligne) pour les entraînements à l&apos;intérieur</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="140"/>
@@ -18954,8 +18954,8 @@ on and that its display says, &quot;PC Link&quot;</source>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="571"/>
-        <source>Download workouts from ErgDB...</source>
-        <translation>Télécharger des entraînements depuis ErgDB...</translation>
+        <source>Download workouts from TrainerDay...</source>
+        <translation>Télécharger des entraînements depuis TrainerDay...</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="1656"/>
@@ -31277,8 +31277,8 @@ tab.</source>
     </message>
     <message>
         <location filename="../../Train/TrainSidebar.cpp" line="441"/>
-        <source>Get Workouts from ErgDB</source>
-        <translation>Télécharger des entraînements depuis ErgDB</translation>
+        <source>Get Workouts from TrainerDay</source>
+        <translation>Télécharger des entraînements depuis TrainerDay</translation>
     </message>
     <message>
         <location filename="../../Train/TrainSidebar.cpp" line="443"/>

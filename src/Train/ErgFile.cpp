@@ -610,7 +610,7 @@ void ErgFile::parseComputrainer(QString p)
                 if (pname.exactMatch(settings.cap(1))) description(settings.cap(2));
 
                 QRegExp iname("^ERGDBID *", Qt::CaseInsensitive);
-                if (iname.exactMatch(settings.cap(1))) ergDBId(settings.cap(2));
+                if (iname.exactMatch(settings.cap(1))) trainerDayId(settings.cap(2));
 
                 QRegExp sname("^SOURCE *", Qt::CaseInsensitive);
                 if (sname.exactMatch(settings.cap(1))) source(settings.cap(2));
@@ -1330,7 +1330,7 @@ ErgFile::save(QStringList &errors)
         //
         // [COURSE HEADER]
         // FTP=300
-        // SOURCE=ErgDB
+        // SOURCE=TrainerDay
         // ERGDBID=455
         // VERSION=2
         // UNITS=ENGLISH
@@ -1341,7 +1341,7 @@ ErgFile::save(QStringList &errors)
         out << "[COURSE HEADER]\n";
         if (ftp()) out <<"FTP="<<QString("%1").arg(ftp())<<"\n";
         if (source() != "") out<<"SOURCE="<<source()<<"\n";
-        if (ergDBId() != "") out<<"ERGDBID="<<ergDBId()<<"\n";
+        if (trainerDayId() != "") out<<"ERGDBID="<<trainerDayId()<<"\n";
         if (version() != "") out<<"VERSION="<<version()<<"\n";
         if (units() != "") out<<"UNITS="<<units()<<"\n";
         if (description() != "") out<<"DESCRIPTION="<<description()<<"\n";
@@ -1444,7 +1444,7 @@ ErgFile::save(QStringList &errors)
         //
         // [COURSE HEADER]
         // FTP=300
-        // SOURCE=ErgDB
+        // SOURCE=TrainerDay
         // ERGDBID=455
         // VERSION=2
         // UNITS=ENGLISH
@@ -1454,7 +1454,7 @@ ErgFile::save(QStringList &errors)
         // [END COURSE HEADER]
         out << "[COURSE HEADER]\n";
         if (source() != "") out<<"SOURCE="<<source()<<"\n";
-        if (ergDBId() != "") out<<"ERGDBID="<<ergDBId()<<"\n";
+        if (trainerDayId() != "") out<<"ERGDBID="<<trainerDayId()<<"\n";
         if (version() != "") out<<"VERSION="<<version()<<"\n";
         if (units() != "") out<<"UNITS="<<units()<<"\n";
         if (description() != "") out<<"DESCRIPTION="<<description()<<"\n";

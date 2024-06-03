@@ -4956,7 +4956,7 @@ Let&apos;s get you setup.</source>
     <message>
         <location filename="../../Charts/BlankState.cpp" line="266"/>
         <source>Download workout files from the Erg DB.</source>
-        <translation>从ErgDB下载训练课程</translation>
+        <translation>从TrainerDay下载训练课程</translation>
     </message>
     <message>
         <location filename="../../Charts/BlankState.cpp" line="267"/>
@@ -9873,113 +9873,113 @@ You may need to (re)install the FTDI or PL2303 drivers before downloading.</sour
     </message>
 </context>
 <context>
-    <name>ErgDBDownloadDialog</name>
+    <name>TrainerDayDownloadDialog</name>
     <message>
-        <location filename="../../Train/ErgDBDownloadDialog.cpp" line="28"/>
-        <source>Download workouts from ErgDB</source>
-        <translation>从ErgDB下载训练课程</translation>
+        <location filename="../../Train/TrainerDayDownloadDialog.cpp" line="28"/>
+        <source>Download workouts from TrainerDay</source>
+        <translation>从TrainerDay下载训练课程</translation>
     </message>
     <message>
-        <location filename="../../Train/ErgDBDownloadDialog.cpp" line="46"/>
+        <location filename="../../Train/TrainerDayDownloadDialog.cpp" line="46"/>
         <source>Name</source>
         <translation>名称</translation>
     </message>
     <message>
-        <location filename="../../Train/ErgDBDownloadDialog.cpp" line="47"/>
+        <location filename="../../Train/TrainerDayDownloadDialog.cpp" line="47"/>
         <source>Type</source>
         <translation>类型</translation>
     </message>
     <message>
-        <location filename="../../Train/ErgDBDownloadDialog.cpp" line="48"/>
+        <location filename="../../Train/TrainerDayDownloadDialog.cpp" line="48"/>
         <source>Author</source>
         <translation>作者</translation>
     </message>
     <message>
-        <location filename="../../Train/ErgDBDownloadDialog.cpp" line="49"/>
+        <location filename="../../Train/TrainerDayDownloadDialog.cpp" line="49"/>
         <source>Dated</source>
         <translation>日期</translation>
     </message>
     <message>
-        <location filename="../../Train/ErgDBDownloadDialog.cpp" line="50"/>
+        <location filename="../../Train/TrainerDayDownloadDialog.cpp" line="50"/>
         <source>Action</source>
         <translation>操作</translation>
     </message>
     <message>
-        <location filename="../../Train/ErgDBDownloadDialog.cpp" line="76"/>
+        <location filename="../../Train/TrainerDayDownloadDialog.cpp" line="76"/>
         <source>dd MMM yyyy</source>
         <translation>yyyy年M月d日</translation>
     </message>
     <message>
-        <location filename="../../Train/ErgDBDownloadDialog.cpp" line="79"/>
-        <location filename="../../Train/ErgDBDownloadDialog.cpp" line="94"/>
-        <location filename="../../Train/ErgDBDownloadDialog.cpp" line="128"/>
+        <location filename="../../Train/TrainerDayDownloadDialog.cpp" line="79"/>
+        <location filename="../../Train/TrainerDayDownloadDialog.cpp" line="94"/>
+        <location filename="../../Train/TrainerDayDownloadDialog.cpp" line="128"/>
         <source>Download</source>
         <translation>下载</translation>
     </message>
     <message>
-        <location filename="../../Train/ErgDBDownloadDialog.cpp" line="85"/>
+        <location filename="../../Train/TrainerDayDownloadDialog.cpp" line="85"/>
         <source>check/uncheck all</source>
         <translation>全选/取消全选</translation>
     </message>
     <message>
-        <location filename="../../Train/ErgDBDownloadDialog.cpp" line="92"/>
+        <location filename="../../Train/TrainerDayDownloadDialog.cpp" line="92"/>
         <source>Overwrite existing workouts</source>
         <translation>覆盖已有训练课程</translation>
     </message>
     <message>
-        <location filename="../../Train/ErgDBDownloadDialog.cpp" line="93"/>
+        <location filename="../../Train/TrainerDayDownloadDialog.cpp" line="93"/>
         <source>Cancel</source>
         <translation>取消</translation>
     </message>
     <message>
-        <location filename="../../Train/ErgDBDownloadDialog.cpp" line="132"/>
+        <location filename="../../Train/TrainerDayDownloadDialog.cpp" line="132"/>
         <source>Download...</source>
         <translation>下载中...</translation>
     </message>
     <message>
-        <location filename="../../Train/ErgDBDownloadDialog.cpp" line="135"/>
-        <location filename="../../Train/ErgDBDownloadDialog.cpp" line="142"/>
+        <location filename="../../Train/TrainerDayDownloadDialog.cpp" line="135"/>
+        <location filename="../../Train/TrainerDayDownloadDialog.cpp" line="142"/>
         <source>Abort</source>
         <translation>放弃</translation>
     </message>
     <message>
-        <location filename="../../Train/ErgDBDownloadDialog.cpp" line="137"/>
+        <location filename="../../Train/TrainerDayDownloadDialog.cpp" line="137"/>
         <source>%1 workouts downloaded, %2 failed or skipped.</source>
         <translation>完成%1个训练课程下载,失败或跳过%2个.</translation>
     </message>
     <message>
-        <location filename="../../Train/ErgDBDownloadDialog.cpp" line="138"/>
-        <location filename="../../Train/ErgDBDownloadDialog.cpp" line="144"/>
+        <location filename="../../Train/TrainerDayDownloadDialog.cpp" line="138"/>
+        <location filename="../../Train/TrainerDayDownloadDialog.cpp" line="144"/>
         <source>Finish</source>
         <translation>完成</translation>
     </message>
     <message>
-        <location filename="../../Train/ErgDBDownloadDialog.cpp" line="187"/>
+        <location filename="../../Train/TrainerDayDownloadDialog.cpp" line="187"/>
         <source>Downloading...</source>
         <translation>下载中...</translation>
     </message>
     <message>
-        <location filename="../../Train/ErgDBDownloadDialog.cpp" line="204"/>
+        <location filename="../../Train/TrainerDayDownloadDialog.cpp" line="204"/>
         <source>Exists already</source>
         <translation>已存在</translation>
     </message>
     <message>
-        <location filename="../../Train/ErgDBDownloadDialog.cpp" line="213"/>
+        <location filename="../../Train/TrainerDayDownloadDialog.cpp" line="213"/>
         <source>Removing...</source>
         <translation>删除中...</translation>
     </message>
     <message>
-        <location filename="../../Train/ErgDBDownloadDialog.cpp" line="226"/>
+        <location filename="../../Train/TrainerDayDownloadDialog.cpp" line="226"/>
         <source>Saved</source>
         <translation>已保存</translation>
     </message>
     <message>
-        <location filename="../../Train/ErgDBDownloadDialog.cpp" line="232"/>
+        <location filename="../../Train/TrainerDayDownloadDialog.cpp" line="232"/>
         <source>Write failed</source>
         <translation>写入失败</translation>
     </message>
     <message>
-        <location filename="../../Train/ErgDBDownloadDialog.cpp" line="242"/>
+        <location filename="../../Train/TrainerDayDownloadDialog.cpp" line="242"/>
         <source>Invalid File</source>
         <translation>无效的文件</translation>
     </message>
@@ -14164,7 +14164,7 @@ Torque Adjust - this defines an absolute value in poinds per square inch or newt
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="138"/>
         <source>Downloading of Workouts from the ERGDB (online workout DB) for Train - Indoor Riding</source>
-        <translation>从ErgDB(线上训练数据库)下载训练课程 - 室内骑行</translation>
+        <translation>从TrainerDay(线上训练数据库)下载训练课程 - 室内骑行</translation>
     </message>
     <message>
         <location filename="../../Gui/HelpWhatsThis.cpp" line="140"/>
@@ -18995,8 +18995,8 @@ Please check your preference settings.</source>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="571"/>
-        <source>Download workouts from ErgDB...</source>
-        <translation>从ErgDB下载训练课程...</translation>
+        <source>Download workouts from TrainerDay...</source>
+        <translation>从TrainerDay下载训练课程...</translation>
     </message>
     <message>
         <location filename="../../Gui/MainWindow.cpp" line="566"/>
@@ -31184,8 +31184,8 @@ tab.</source>
     </message>
     <message>
         <location filename="../../Train/TrainSidebar.cpp" line="441"/>
-        <source>Get Workouts from ErgDB</source>
-        <translation>从ErgDB获取训练课程</translation>
+        <source>Get Workouts from TrainerDay</source>
+        <translation>从TrainerDay获取训练课程</translation>
     </message>
     <message>
         <location filename="../../Train/TrainSidebar.cpp" line="443"/>

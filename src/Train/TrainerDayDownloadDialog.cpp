@@ -16,16 +16,16 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#include "ErgDBDownloadDialog.h"
+#include "TrainerDayDownloadDialog.h"
 #include "MainWindow.h"
 #include "TrainDB.h"
 #include "HelpWhatsThis.h"
 
-ErgDBDownloadDialog::ErgDBDownloadDialog(Context *context) : QDialog(context->mainWindow), context(context)
+TrainerDayDownloadDialog::TrainerDayDownloadDialog(Context *context) : QDialog(context->mainWindow), context(context)
 {
     setAttribute(Qt::WA_DeleteOnClose);
     setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
-    setWindowTitle(tr("Download workouts from ErgDB"));
+    setWindowTitle(tr("Download workouts from TrainerDay"));
 
     // help
     HelpWhatsThis *help = new HelpWhatsThis(this);
@@ -60,7 +60,7 @@ ErgDBDownloadDialog::ErgDBDownloadDialog(Context *context) : QDialog(context->ma
     files->setUniformRowHeights(true);
     files->setIndentation(0);
 
-    foreach(ErgDBItem item, ergdb.items()) {
+    foreach(TrainerDayItem item, ergdb.items()) {
 
         QTreeWidgetItem *add = new QTreeWidgetItem(files->invisibleRootItem());
         add->setFlags(add->flags() | Qt::ItemIsEditable);
@@ -111,7 +111,7 @@ ErgDBDownloadDialog::ErgDBDownloadDialog(Context *context) : QDialog(context->ma
 }
 
 void
-ErgDBDownloadDialog::allClicked()
+TrainerDayDownloadDialog::allClicked()
 {
     // set/uncheck all rides according to the "all"
     bool checked = all->isChecked();
@@ -123,7 +123,7 @@ ErgDBDownloadDialog::allClicked()
 }
 
 void
-ErgDBDownloadDialog::okClicked()
+TrainerDayDownloadDialog::okClicked()
 {
     if (ok->text() == tr("Download")) {
         aborted = false;
@@ -147,13 +147,13 @@ ErgDBDownloadDialog::okClicked()
 }
 
 void
-ErgDBDownloadDialog::cancelClicked()
+TrainerDayDownloadDialog::cancelClicked()
 {
     reject();
 }
 
 void
-ErgDBDownloadDialog::downloadFiles()
+TrainerDayDownloadDialog::downloadFiles()
 {
     // where to place them
     QString workoutDir = appsettings->value(this, GC_WORKOUTDIR).toString();

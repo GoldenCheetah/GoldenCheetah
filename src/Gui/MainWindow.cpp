@@ -41,7 +41,7 @@
 #include "IntervalItem.h"
 #include "RideFile.h"
 #include "Settings.h"
-#include "ErgDB.h"
+#include "TrainerDay.h"
 #include "StravaRoutesDownload.h"
 #include "Library.h"
 #include "LibraryParser.h"
@@ -68,7 +68,7 @@
 #include "BatchProcessingDialog.h"
 #include "MeasuresDownload.h"
 #include "WorkoutWizard.h"
-#include "ErgDBDownloadDialog.h"
+#include "TrainerDayDownloadDialog.h"
 #include "AddDeviceWizard.h"
 #include "Dropbox.h"
 #include "SixCycle.h"
@@ -568,7 +568,7 @@ MainWindow::MainWindow(const QDir &home)
 
     optionsMenu->addSeparator();
     optionsMenu->addAction(tr("Create a new workout..."), this, SLOT(showWorkoutWizard()));
-    optionsMenu->addAction(tr("Download workouts from ErgDB..."), this, SLOT(downloadErgDB()));
+    optionsMenu->addAction(tr("Download workouts from TrainerDay..."), this, SLOT(downloadTrainerDay()));
     optionsMenu->addAction(tr("Download workouts from Strava Routes..."), this, SLOT(downloadStravaRoutes()));
     optionsMenu->addAction(tr("Import workouts, videos, videoSyncs..."), this, SLOT(importWorkout()));
     optionsMenu->addAction(tr("Scan disk for workouts, videos, videoSyncs..."), this, SLOT(manageLibrary()));
@@ -2413,18 +2413,18 @@ MainWindow::importWorkout()
     }
 }
 /*----------------------------------------------------------------------
- * ErgDB
+ * TrainerDay
  *--------------------------------------------------------------------*/
 
 void
-MainWindow::downloadErgDB()
+MainWindow::downloadTrainerDay()
 {
     QString workoutDir = appsettings->value(this, GC_WORKOUTDIR).toString();
 
     QFileInfo fi(workoutDir);
 
     if (fi.exists() && fi.isDir()) {
-        ErgDBDownloadDialog *d = new ErgDBDownloadDialog(currentAthleteTab->context);
+        TrainerDayDownloadDialog *d = new TrainerDayDownloadDialog(currentAthleteTab->context);
         d->exec();
     } else{
         QMessageBox::critical(this, tr("Workout Directory Invalid"),

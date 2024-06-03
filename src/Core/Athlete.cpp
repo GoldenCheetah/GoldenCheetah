@@ -37,7 +37,7 @@
 #include "CalendarDownload.h"
 #include "PMCData.h"
 #include "Banister.h"
-#include "ErgDB.h"
+#include "TrainerDay.h"
 #ifdef GC_HAVE_ICAL
 #include "ICalendar.h"
 #include "CalDAV.h"

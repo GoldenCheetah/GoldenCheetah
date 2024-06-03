@@ -97,8 +97,8 @@ class ErgFileBase
         QString description() const;
         void description(QString description);
 
-        QString ergDBId() const;
-        void ergDBId(QString ergDBId);
+        QString trainerDayId() const;
+        void trainerDayId(QString trainerDayId);
 
         QString source() const;
         void source(QString source);
@@ -205,7 +205,7 @@ class ErgFileBase
         QString _filename;       // filename on disk
         QString _Name;           // description in file
         QString _Description;    // long narrative for workout
-        QString _ErgDBId;        // if downloaded from ergdb
+        QString _TrainerDayId;   // if downloaded from TrainerDay
         QString _Source;         // where did this come from
         QStringList _Tags;       // tagged strings
 

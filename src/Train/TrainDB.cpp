@@ -1464,7 +1464,7 @@ TrainDB::bindWorkout
     query.bindValue(":filepath", filepath);
     query.bindValue(":type", ergFileBase.typeString());
     bindIfValue(query, ":source", ergFileBase.source());
-    bindIfValue(query, ":source_id", ergFileBase.ergDBId());
+    bindIfValue(query, ":source_id", ergFileBase.trainerDayId());
     if (! bindIfValue(query, ":displayname", ergFileBase.name().trimmed())) {
         query.bindValue(":displayname", QFileInfo(filepath).baseName());
     }

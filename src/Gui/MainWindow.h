@@ -235,7 +235,7 @@ class MainWindow : public QMainWindow
 
         // Training View
         void addDevice();
-        void downloadErgDB();
+        void downloadTrainerDay();
         void downloadStravaRoutes();
         void manageLibrary();
         void showWorkoutWizard();

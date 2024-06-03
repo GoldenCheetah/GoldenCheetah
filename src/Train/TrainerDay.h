@@ -16,8 +16,8 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#ifndef _Gc_ErgDB_h
-#define _Gc_ErgDB_h
+#ifndef _Gc_TrainerDay_h
+#define _Gc_TrainerDay_h
 #include "GoldenCheetah.h"
 #include "ErgFile.h"
 #include <QNetworkReply>
@@ -25,7 +25,7 @@
 #include <QEventLoop>
 #include <QObject>
 
-struct ErgDBItem
+struct TrainerDayItem
 {
     int             id;
     QString         workoutType,
@@ -38,16 +38,16 @@ struct ErgDBItem
 };
 
 // get workout list
-class ErgDB : public QObject
+class TrainerDay : public QObject
 {
     Q_OBJECT
     G_OBJECT
 
 public:
 
-    ErgDB(QObject *parent = 0);
+    TrainerDay(QObject *parent = 0);
 
-    QList<ErgDBItem> &items() { return _items; } // get the list of files available
+    QList<TrainerDayItem> &items() { return _items; } // get the list of files available
     QString getWorkout(int id);            // get the file contents for id
 
 private slots:
@@ -56,7 +56,7 @@ private slots:
 
 private:
     void getList(); // refresh the db
-    QList<ErgDBItem> _items;
+    QList<TrainerDayItem> _items;
 
     QString fileContents; // not thread safe!
 };

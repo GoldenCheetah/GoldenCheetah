@@ -267,7 +267,7 @@ BlankStateTrainPage::BlankStateTrainPage(Context *context) : BlankStatePage(cont
     scDownloadWorkout.buttonLabel = tr("Download workouts");
     scDownloadWorkout.buttonIconPath = ":images/mac/download.png";
     QPushButton *downloadWorkoutButton = addToShortCuts(scDownloadWorkout);
-    connect(downloadWorkoutButton, SIGNAL(clicked()), context->mainWindow, SLOT(downloadErgDB()));
+    connect(downloadWorkoutButton, SIGNAL(clicked()), context->mainWindow, SLOT(downloadTrainerDay()));
 
     canShow_ = !appsettings->cvalue(context->athlete->cyclist, GC_BLANK_TRAIN).toBool();
 }
