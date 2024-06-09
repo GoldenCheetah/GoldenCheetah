@@ -1118,6 +1118,4 @@ bool QwtPlotRenderer::exportTo( QwtPlot* plot, const QString& documentName,
     return true;
 }
 
-#if QWT_MOC_INCLUDE
 #include "moc_qwt_plot_renderer.cpp"
-#endif

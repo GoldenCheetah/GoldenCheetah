@@ -705,7 +705,7 @@ void Zones::setZonesFromCP(int rnum)
 // return the list of starting values of zones for a given range
 QList <int> Zones::getZoneLows(int rnum) const
 {
-    if (rnum >= ranges.size()) return QList <int>();
+    if (rnum < 0 || rnum >= ranges.size()) return QList <int>();
 
     const ZoneRange &range = ranges[rnum];
     QList <int> return_values;
@@ -721,7 +721,7 @@ QList <int> Zones::getZoneLows(int rnum) const
 QList <int> Zones::getZoneHighs(int rnum) const
 {
 
-    if (rnum >= ranges.size()) return QList <int>();
+    if (rnum < 0 || rnum >= ranges.size()) return QList <int>();
 
     const ZoneRange &range = ranges[rnum];
     QList <int> return_values;
@@ -736,13 +736,28 @@ QList <int> Zones::getZoneHighs(int rnum) const
 // return the list of zone names
 QList <QString> Zones::getZoneNames(int rnum) const
 {
-    if (rnum >= ranges.size()) return QList <QString>(); 
+    if (rnum < 0 || rnum >= ranges.size()) return QList <QString>(); 
 
     const ZoneRange &range = ranges[rnum];
     QList <QString> return_values;
 
     for (int i = 0; i < range.zones.size(); i++) {
         return_values.append(ranges[rnum].zones[i].name);
+    }
+
+    return return_values;
+}
+
+// return the list of zone names
+QList <QString> Zones::getZoneDescriptions(int rnum) const
+{
+    if (rnum < 0 || rnum >= ranges.size()) return QList <QString>();
+
+    const ZoneRange &range = ranges[rnum];
+    QList <QString> return_values;
+
+    for (int i = 0; i < range.zones.size(); i++) {
+        return_values.append(ranges[rnum].zones[i].desc);
     }
 
     return return_values;

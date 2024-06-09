@@ -82,16 +82,10 @@ ride: '{' rideelement_list '}'                                  {
                                                                         jc->api->writeRideLine(jc->item, jc->request, jc->response);
                                                                     #endif
                                                                     } else {
-
-                                                                        double progress= double(jc->loading++) / double(jc->cache->rides().count()) * 100.0f;
-                                                                        if (jc->context->mainWindow->progress) {
-
-                                                                            // percentage progress
-                                                                            QString m = QString("%1%").arg(progress , 0, 'f', 0);
-                                                                            jc->context->mainWindow->progress->setText(m);
-                                                                            QApplication::processEvents();
-                                                                        } else {
+                                                                        double progress= round(double(jc->loading++) / double(jc->cache->rides().count()) * 100.0f);
+                                                                        if (progress > jc->lastProgressUpdate) {
                                                                             jc->context->notifyLoadProgress(jc->folder,progress);
+                                                                            jc->lastProgressUpdate = progress;
                                                                         }
 
                                                                         // find entry and update it
@@ -349,6 +343,7 @@ RideCache::load()
         jc->api = NULL;
         jc->old = false;
         jc->loading = 0;
+        jc->lastProgressUpdate = 0.0;
         jc->folder = context->athlete->home->root().canonicalPath();
 
         // clean item

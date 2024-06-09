@@ -734,7 +734,7 @@ class AllPlot : public QwtPlot
         RideFile::SeriesType secondaryScope;
 
         // mouse control
-        bool isPanning;
+        bool isPanning = false;
         int panOriginX;
 
     protected:

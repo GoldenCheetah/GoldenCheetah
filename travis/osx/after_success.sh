@@ -51,10 +51,10 @@ popd
 
 # Final deployment to generate dmg (may take longer than 10' without output)
 python3.7 -m pip install travis-wait-improved
-/Library/Frameworks/Python.framework/Versions/3.7/bin/travis-wait-improved --timeout 20m /usr/local/opt/qt5/bin/macdeployqt GoldenCheetah.app -verbose=2 -fs=hfs+ -dmg
+/Library/Frameworks/Python.framework/Versions/3.7/bin/travis-wait-improved --timeout 30m /usr/local/opt/qt5/bin/macdeployqt GoldenCheetah.app -verbose=2 -fs=hfs+ -dmg
 
 echo "Renaming dmg file to branch and build number ready for deploy"
-export FINAL_NAME=GoldenCheetah_v3.6-DEV_x64.dmg
+export FINAL_NAME=GoldenCheetah_v3.7-DEV_x64.dmg
 mv GoldenCheetah.dmg $FINAL_NAME
 ls -l $FINAL_NAME
 
@@ -67,11 +67,12 @@ cat GCversionMacOS.txt
 echo "Uploading for user tests"
 ### upload for testing
 if [[ $TRAVIS_PULL_REQUEST == "false" && $TRAVIS_COMMIT_MESSAGE == *"[publish binaries]"* ]]; then
-aws s3 rm s3://goldencheetah-binaries/MacOS --recursive # keep only the last one
-aws s3 cp --acl public-read $FINAL_NAME s3://goldencheetah-binaries/MacOS/$FINAL_NAME
-aws s3 cp --acl public-read GCversionMacOS.txt s3://goldencheetah-binaries/MacOS/GCversionMacOS.txt
+mkdir out
+mv $FINAL_NAME out
+mv GCversionMacOS.txt out
+ghr -b "Snapshot Builds" -replace snapshot out
 else
-curl --max-time 300 --upload-file $FINAL_NAME https://free.keep.sh/$FINAL_NAME
+curl --max-time 300 -F "file=@$FINAL_NAME" https://temp.sh/upload
 fi
 
 echo "Make sure we are back in the Travis build directory"

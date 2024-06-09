@@ -58,7 +58,7 @@ void QwtPolarMagnifier::setUnzoomKey( int key, int modifiers )
 }
 
 /*!
-   \return Key, and modifiers that are used for unzooming
+   Return key, and modifiers that are used for unzooming
 
    \param key Key code
    \param modifiers Modifiers
@@ -167,6 +167,4 @@ void QwtPolarMagnifier::unzoom()
     plt->replot();
 }
 
-#if QWT_MOC_INCLUDE
 #include "moc_qwt_polar_magnifier.cpp"
-#endif

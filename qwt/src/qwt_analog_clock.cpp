@@ -250,6 +250,4 @@ void QwtAnalogClock::drawHand( QPainter* painter, Hand hd,
     }
 }
 
-#if QWT_MOC_INCLUDE
 #include "moc_qwt_analog_clock.cpp"
-#endif

@@ -14,8 +14,8 @@
 
 // QWT_VERSION is (major << 16) + (minor << 8) + patch.
 
-#define QWT_VERSION       0x060400
-#define QWT_VERSION_STR   "6.4.0"
+#define QWT_VERSION       0x060800
+#define QWT_VERSION_STR   "6.8.0"
 
 #if defined( _MSC_VER ) /* MSVC Compiler */
 /* template-class specialization 'identifier' is already instantiated */

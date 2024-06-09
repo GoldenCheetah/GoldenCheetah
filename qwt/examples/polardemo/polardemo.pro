@@ -8,13 +8,13 @@ include( $${PWD}/../examples.pri )
 TARGET       = polardemo
 
 HEADERS = \
-	Pixmaps.h \
-	PlotBox.h \
-	Plot.h \
-	SettingsEditor.h
+    Pixmaps.h \
+    PlotBox.h \
+    Plot.h \
+    SettingsEditor.h
 
 SOURCES = \
-	PlotBox.cpp \
-	Plot.cpp \
-	SettingsEditor.cpp \
-	main.cpp
+    PlotBox.cpp \
+    Plot.cpp \
+    SettingsEditor.cpp \
+    main.cpp

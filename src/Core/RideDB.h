@@ -82,6 +82,9 @@ struct RideDBContext {
     // is cache/rideDB.json an older version ?
     bool old;
     int loading;
+
+    // tracks the last progress update sent
+    double lastProgressUpdate;
 };
 
 #endif

@@ -1216,7 +1216,7 @@ ExtendedCriticalPower::getPlotLevelForExtendedCP_5_3(TestModel model)
     QwtPlotCurve *extendedCPCurve2 = new QwtPlotCurve("level_eCP_5_3");
     if (appsettings->value(NULL, GC_ANTIALIAS, true).toBool() == true)
         extendedCPCurve2->setRenderHint(QwtPlotItem::RenderAntialiased);
-    QPen e2pen(GColor(Qt::lightGray)); // Qt::cyan
+    QPen e2pen(GColor(CRIDEPLOTYAXIS));
     e2pen.setWidth(1);
     e2pen.setStyle(Qt::SolidLine);
     extendedCPCurve2->setPen(e2pen);

@@ -43,7 +43,7 @@
 class BatchProcessingDialog : public QDialog
 {
     Q_OBJECT
-    G_OBJECT
+        G_OBJECT
 
 public:
     BatchProcessingDialog(Context *context);
@@ -63,20 +63,24 @@ private slots:
 
 private:
 
-    typedef enum {
+    enum class bpFailureType {
         unknownF,
         finishedF,
         userF,
-        noDataProcessorF
-    } bpFailureType;
+        dateFormatF,
+        timeFormatF,
+        noDataProcessorF };
 
-    typedef enum {
+    enum class batchRadioBType {
         exportB,
         dataProcessorB,
-        deleteB } batchRadioBType;
+        metadataSetB,
+        deleteB };
 
     Context *context;
     bool aborted;
+
+    SpecialFields specialFields;
 
     int processed, fails, numFilesToProcess;
     batchRadioBType outputMode;
@@ -84,8 +88,11 @@ private:
     QTreeWidget *files; // choose files to export
 
     QWidget *disableContainer, *dpContainer, *exportContainer;
+    QWidget *metaDataContainer;
 
     QComboBox *fileFormat, *dataProcessorToRun;
+    QComboBox *metadataFieldToSet;
+    QLineEdit *metadataEditField;
 
     QLabel *dirName, *status;
     QCheckBox *overwrite, *all;
@@ -95,12 +102,13 @@ private:
     QString getActionColumnText();
     void fileSelected(QTreeWidgetItem* current);
     void updateNumberSelected();
+    void updateMetadataTypeField();
 
     bpFailureType exportFiles();
     bpFailureType deleteFiles();
-    bpFailureType runDataProcessorOnActivities(const QString& processorName);
-
+    bpFailureType runDataProcessorOnActivities();
+    bpFailureType setMetadataForActivities();
     void failedToProcessEntry(QTreeWidgetItem* current);
-    
+
 };
 #endif // _BatchProcessingDialog_h

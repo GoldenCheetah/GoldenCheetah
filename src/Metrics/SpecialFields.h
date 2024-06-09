@@ -47,6 +47,7 @@ class SpecialFields
 
     private:
         QMap<QString, QString> namesmap; // Map Internal (english) name to external (Localized) name
+        QSet<QString> specialset; // Internal names of special fields
         QMap<QString, const RideMetric *> metricmap;
         QStringListModel *model_;
 };

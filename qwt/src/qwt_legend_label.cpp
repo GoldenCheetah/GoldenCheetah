@@ -420,6 +420,4 @@ void QwtLegendLabel::keyReleaseEvent( QKeyEvent* e )
     QwtTextLabel::keyReleaseEvent( e );
 }
 
-#if QWT_MOC_INCLUDE
 #include "moc_qwt_legend_label.cpp"
-#endif

@@ -341,6 +341,4 @@ int QwtTextLabel::defaultIndent() const
     return QwtPainter::horizontalAdvance( QFontMetrics( fnt ), 'x' ) / 2;
 }
 
-#if QWT_MOC_INCLUDE
 #include "moc_qwt_text_label.cpp"
-#endif

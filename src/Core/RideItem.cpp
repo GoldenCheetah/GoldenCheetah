@@ -1665,6 +1665,8 @@ RideItem::addImage(QString filename)
 
         // make sure it gets saved !
         setDirty(true);
+        // lets others know metadata has changed
+        notifyRideMetadataChanged();
         return true;
     }
     return false;

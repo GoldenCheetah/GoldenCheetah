@@ -17,15 +17,15 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#ifndef _ErgDBDownloadDialog_h
-#define _ErgDBDownloadDialog_h
+#ifndef _TrainerDayDownloadDialog_h
+#define _TrainerDayDownloadDialog_h
 #include "GoldenCheetah.h"
 #include "Context.h"
 #include "Settings.h"
 #include "Units.h"
 
-#include "ErgDB.h" // for interacting with the ErgDB site
-#include "ErgFile.h" // for interacting with the ErgDB site
+#include "TrainerDay.h" // for interacting with the TrainerDay site
+#include "ErgFile.h" // for interacting with the TrainerDay site
 
 #include "TrainSidebar.h"
 
@@ -40,14 +40,14 @@
 // Dialog class to show filenames, import progress and to capture user input
 // of ride date and time
 
-class ErgDBDownloadDialog : public QDialog
+class TrainerDayDownloadDialog : public QDialog
 {
     Q_OBJECT
     G_OBJECT
 
 
 public:
-    ErgDBDownloadDialog(Context *context);
+    TrainerDayDownloadDialog(Context *context);
 
     QTreeWidget *files; // choose files to export
 
@@ -71,7 +71,7 @@ private:
     int downloads, fails;
     QLabel *status;
 
-    ErgDB ergdb;
+    TrainerDay ergdb;
 };
-#endif // _ErgDBDownloadDialog_h
+#endif // _TrainerDayDownloadDialog_h
 

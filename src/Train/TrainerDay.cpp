@@ -16,7 +16,7 @@
  * Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
-#include "ErgDB.h"
+#include "TrainerDay.h"
 #include <QJsonDocument>
 #include <QTextDocumentFragment>
 
@@ -42,16 +42,16 @@
     } while(0)
 #endif
 
-static const QString ErgDBUrl = "https://shared-web.s3.amazonaws.com/ergdb/";
+static const QString TrainerDayUrl = "https://shared-web.s3.amazonaws.com/ergdb/";
 
-ErgDB::ErgDB(QObject *parent) : QObject(parent)
+TrainerDay::TrainerDay(QObject *parent) : QObject(parent)
 {
     getList(); // get all the files...
 }
 
-// fetch a list from ErgDB
+// fetch a list from TrainerDay
 void
-ErgDB::getList()
+TrainerDay::getList()
 {
 
     QEventLoop eventLoop; // holding pattern whilst waiting for a reply...
@@ -63,7 +63,7 @@ ErgDB::getList()
     QByteArray out;
 
     // construct and make the call
-    QNetworkRequest request = QNetworkRequest(QUrl(ErgDBUrl + "json/public_workouts.json"));
+    QNetworkRequest request = QNetworkRequest(QUrl(TrainerDayUrl + "json/public_workouts.json"));
     networkMgr.get(request);
 
     // holding pattern
@@ -71,7 +71,7 @@ ErgDB::getList()
 }
 
 void
-ErgDB::getListFinished(QNetworkReply *reply)
+TrainerDay::getListFinished(QNetworkReply *reply)
 {
     _items.clear();
 
@@ -91,7 +91,7 @@ ErgDB::getListFinished(QNetworkReply *reply)
             for(int i=0; i<results.size(); i++) {
                 QJsonObject each = results.at(i).toObject();
 
-                ErgDBItem add;
+                TrainerDayItem add;
                 add.id = each["id"].toInt();
                 // title is HTML encoded and may contain "/", lets try to make it a readable and valid filename
                 add.name = QTextDocumentFragment::fromHtml(each["title"].toString()).toPlainText().replace("/", "-");
@@ -116,14 +116,14 @@ ErgDB::getListFinished(QNetworkReply *reply)
 
 }
 
-// fetch a file from ErgDB
+// fetch a file from TrainerDay
 QString
-ErgDB::getWorkout(int id)
+TrainerDay::getWorkout(int id)
 {
     fileContents = "";
 
     for(int i=0; i<_items.size(); i++) {
-        ErgDBItem each = _items.at(i);
+        TrainerDayItem each = _items.at(i);
         if (each.id == id) {
             fileContents = each.document.toJson(QJsonDocument::Indented);
         }

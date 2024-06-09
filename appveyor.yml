@@ -1,6 +1,7 @@
 version: ci.{build}
 image: Visual Studio 2019
 clone_depth: 1
+skip_tags: true
 
 environment:
   GC_GOOGLE_CALENDAR_CLIENT_SECRET:
@@ -190,11 +191,11 @@ after_build:
 - copy ..\Resources\win32\gc.ico
 
 # Installer script
-- copy ..\Resources\win32\GC3.6-Master-W64-QT5.nsi
+- copy ..\Resources\win32\GC3.7-Master-W64-QT5.nsi
 
 # Build the installer
-- makensis GC3.6-Master-W64-QT5.nsi
-- move GoldenCheetah_v3.6_64bit_Windows.exe ..\..\GoldenCheetah_v3.6_x64.exe
+- makensis GC3.7-Master-W64-QT5.nsi
+- move GoldenCheetah_v3.7-DEV_64bit_Windows.exe ..\..\GoldenCheetah_v3.7-DEV_x64.exe
 - cd ..\..
 - ps: Set-AppveyorBuildVariable -Name 'PUBLISH_BINARIES' -Value false
 - ps: if ($env:APPVEYOR_REPO_COMMIT_MESSAGE_EXTENDED -Match "\[publish binaries\]") { Set-AppveyorBuildVariable -Name 'PUBLISH_BINARIES' -Value true }
@@ -203,28 +204,26 @@ test_script:
 # minimum test
 - src\release\GoldenCheetah --version 2>GCversionWindows.txt
 - git log -1 >> GCversionWindows.txt
-- ps: CertUtil -hashfile GoldenCheetah_v3.6_x64.exe sha256 | Select-Object -First 2 | Add-Content GCversionWindows.txt
+- ps: CertUtil -hashfile GoldenCheetah_v3.7-DEV_x64.exe sha256 | Select-Object -First 2 | Add-Content GCversionWindows.txt
 - type GCversionWindows.txt
 
 artifacts:
-- path: GoldenCheetah_v3.6_x64.exe
+- path: GoldenCheetah_v3.7-DEV_x64.exe
   name: GCinstaller
 - path: GCversionWindows.txt
   name: GCversionWindows
 
 deploy:
-# deploy continuous builds to s3
-  - provider: S3
-    access_key_id:
-      secure: RoEkfKfOnF7JHOiLZX5qfZM08X+bu4oaDzzSKgdooNM=
-    secret_access_key:
-      secure: GPAArawatirYwgpHJBthdrbvyFU5bBzPOdK7VYYPiG2YHYi/DNJZ5Q5qGK1A440p
-    bucket: goldencheetah-binaries
-    region: us-east-1
-    remove_files: true
-    set_public: true
-    folder: Windows
+# deploy continuous builds to GitHub release
+  - provider: GitHub
+    auth_token:
+      secure: 807DE/9vib/Kjz5Tah/Zc6zkoigLEWRzASw/DUWjLwZ5d8HHomXqWQ7iln4VtOqL
+    release: snapshot
+    description: 'Snapshot Builds'
     artifact: GCinstaller, GCversionWindows
+    draft: false
+    prerelease: true
+    force_update: true
     on:
       PUBLISH_BINARIES: true
       APPVEYOR_REPO_NAME: "GoldenCheetah/GoldenCheetah"

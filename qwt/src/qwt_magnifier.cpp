@@ -507,6 +507,4 @@ const QWidget* QwtMagnifier::parentWidget() const
     return qobject_cast< const QWidget* >( parent() );
 }
 
-#if QWT_MOC_INCLUDE
 #include "moc_qwt_magnifier.cpp"
-#endif

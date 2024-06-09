@@ -74,6 +74,18 @@ class QwtSeriesData
 #endif
 
     /*!
+        Returns the first sample in the list.
+        \warning This function assumes that the list isn't empty.
+     */
+    inline T firstSample() const { return sample( 0 ); }
+
+    /*!
+        Returns the first sample in the list.
+        \warning This function assumes that the list isn't empty.
+     */
+    inline T lastSample() const { return sample( size() - 1 ); }
+
+    /*!
        Calculate the bounding rect of all samples
 
        The bounding rect is necessary for autoscaling and can be used
@@ -213,19 +225,19 @@ T QwtArraySeriesData< T >::sample( size_t i ) const
 //! Interface for iterating over an array of points
 typedef QwtArraySeriesData< QPointF > QwtPointSeriesData;
 
-
-typedef QwtArraySeriesData< QwtPoint3D > QwtPoint3DSeriesData;
 //! Interface for iterating over an array of 3D points
-
-typedef QwtArraySeriesData< QwtIntervalSample > QwtIntervalSeriesData;
+typedef QwtArraySeriesData< QwtPoint3D > QwtPoint3DSeriesData;
 
 //! Interface for iterating over an array of intervals
+typedef QwtArraySeriesData< QwtIntervalSample > QwtIntervalSeriesData;
+
+//! Interface for iterating over an array of samples
 typedef QwtArraySeriesData< QwtSetSample > QwtSetSeriesData;
 
-
+//! Interface for iterating over an array of vector field samples
 typedef QwtArraySeriesData< QwtVectorFieldSample > QwtVectorFieldData;
-//! Interface for iterating over an array of samples
 
+//!  Interface for iterating over an array of OHLC samples
 typedef QwtArraySeriesData< QwtOHLCSample > QwtTradingChartData;
 
 QWT_EXPORT QRectF qwtBoundingRect(
