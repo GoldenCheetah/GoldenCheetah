@@ -716,7 +716,7 @@ HEADERS += Train/TrainBottom.h Train/TrainDB.h Train/TrainSidebar.h \
 ### SOURCE FILES
 ###=============
 
-## ANT+ 
+## ANT+
 SOURCES += ANT/ANTChannel.cpp ANT/ANT.cpp ANT/ANTlocalController.cpp ANT/ANTLogger.cpp ANT/ANTMessage.cpp
 
 ## Charts and related

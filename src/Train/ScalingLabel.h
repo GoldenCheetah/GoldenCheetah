@@ -25,15 +25,20 @@ enum class ScalingLabelReason : uint8_t {
     TextLengthChanged,
     FontChanged,
     ResizeEvent,
-    CounterExceeded
+    CounterExceeded,
+    StrategyChanged
 };
+
+enum class ScalingLabelStrategy : uint8_t {
+    Exact,
+    Linear,
+    HeightOnly
+};
+
 
 class ScalingLabel : public QLabel
 {
     Q_OBJECT
-    Q_PROPERTY(int minFontPointSize READ getMinFontPointSize WRITE setMinFontPointSize USER false)
-    Q_PROPERTY(int maxFontPointSize READ getMaxFontPointSize WRITE setMaxFontPointSize USER false)
-    Q_PROPERTY(bool linear READ isLinear WRITE setLinear USER false)
 
     public:
         ScalingLabel(QWidget *parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
@@ -45,23 +50,24 @@ class ScalingLabel : public QLabel
 
         int getMinFontPointSize() const;
         int getMaxFontPointSize() const;
-        bool isLinear() const;
+        ScalingLabelStrategy getStrategy() const;
 
     public slots:
         void setText(const QString &text);
         void setMinFontPointSize(int size);
         void setMaxFontPointSize(int size);
-        void setLinear(bool linear);
+        void setStrategy(ScalingLabelStrategy strategy);
 
     private:
         bool scaleFont(const QString &text, const QFont &font, ScalingLabelReason reason);
         bool scaleFont(const QString &text, ScalingLabelReason reason);
         bool scaleFontExact(const QString &text, const QFont &font, ScalingLabelReason reason);
         bool scaleFontLinear(const QString &text, const QFont &font, ScalingLabelReason reason);
+        bool scaleFontHeightOnly(const QString &text, const QFont &font, ScalingLabelReason reason);
 
         int minFontPointSize;
         int maxFontPointSize;
-        bool linear = true;
+        ScalingLabelStrategy strategy = ScalingLabelStrategy::Linear;
         int counter = 0;
 };
 

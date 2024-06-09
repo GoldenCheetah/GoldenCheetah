@@ -28,7 +28,6 @@ ScalingLabel::ScalingLabel
 }
 
 
-
 ScalingLabel::ScalingLabel
 (int minFontPointSize, int maxFontPointSize, QWidget *parent, Qt::WindowFlags f)
 : QLabel(parent, f), minFontPointSize(minFontPointSize), maxFontPointSize(maxFontPointSize)
@@ -49,7 +48,7 @@ void
 ScalingLabel::resizeEvent
 (QResizeEvent *evt)
 {
-    Q_UNUSED(evt);
+    Q_UNUSED(evt)
     scaleFont(text(), ScalingLabelReason::ResizeEvent);
 }
 
@@ -110,19 +109,22 @@ ScalingLabel::setMaxFontPointSize
 }
 
 
-bool
-ScalingLabel::isLinear
+ScalingLabelStrategy
+ScalingLabel::getStrategy
 () const
 {
-    return linear;
+    return strategy;
 }
 
 
 void
-ScalingLabel::setLinear
-(bool linear)
+ScalingLabel::setStrategy
+(ScalingLabelStrategy strategy)
 {
-    this->linear = linear;
+    if (this->strategy != strategy) {
+        this->strategy = strategy;
+        scaleFont(text(), ScalingLabelReason::StrategyChanged);
+    }
 }
 
 
@@ -139,11 +141,36 @@ ScalingLabel::scaleFont
 (const QString &text, const QFont &font, ScalingLabelReason reason)
 {
     counter = 0;
-    if (linear) {
+    switch (strategy) {
+    case ScalingLabelStrategy::Linear:
         return scaleFontLinear(text, font, reason);
-    } else {
+    case ScalingLabelStrategy::Exact:
         return scaleFontExact(text, font, reason);
+    case ScalingLabelStrategy::HeightOnly:
+    default:
+        return scaleFontHeightOnly(text, font, reason);
     }
+}
+
+
+bool
+ScalingLabel::scaleFontHeightOnly
+(const QString &text, const QFont &font, ScalingLabelReason reason)
+{
+    Q_UNUSED(text)
+    if (   reason != ScalingLabelReason::ResizeEvent
+        && reason != ScalingLabelReason::StrategyChanged) {
+        return false;
+    }
+
+    QFont f(font);
+    // set point size within reasonable limits for low dpi screens
+    int size = (geometry().height() - 24) * 72 / logicalDpiY();
+    size = std::min(maxFontPointSize, std::max(minFontPointSize, size));
+    f.setPointSize(size);
+    setFont(f);
+
+    return true;
 }
 
 

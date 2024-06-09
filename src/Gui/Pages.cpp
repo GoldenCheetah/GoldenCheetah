@@ -757,6 +757,12 @@ TrainOptionsPage::TrainOptionsPage(QWidget *parent, Context *context) : QWidget(
     coalesce = new QCheckBox(tr("Coalesce contiguous sections of same wattage"), this);
     coalesce->setChecked(appsettings->value(this, TRAIN_COALESCE_SECTIONS, false).toBool());
 
+    telemetryScalingLabel = new QLabel(tr("Telemetry font scaling"));
+    telemetryScaling = new QComboBox();
+    telemetryScaling->addItem(tr("Fit to height only"), 0);
+    telemetryScaling->addItem(tr("Fit to height and width"), 1);
+    telemetryScaling->setCurrentIndex(appsettings->value(this, TRAIN_TELEMETRY_FONT_SCALING, 0).toInt());
+
     delayLabel = new QLabel(tr("Start Countdown"));
     startDelay = new QSpinBox(this);
     startDelay->setMaximum(600);
@@ -765,29 +771,22 @@ TrainOptionsPage::TrainOptionsPage(QWidget *parent, Context *context) : QWidget(
     startDelay->setValue(appsettings->value(this, TRAIN_STARTDELAY, 0).toUInt());
     startDelay->setToolTip(tr("Countdown for workout start"));
 
-    QVBoxLayout *all = new QVBoxLayout(this);
+    QFormLayout *all = new QFormLayout(this);
 
     QGridLayout *wdLayout = new QGridLayout;
-    wdLayout->addWidget(workoutLabel, 0,0, Qt::AlignRight);
     wdLayout->addWidget(workoutDirectory, 0,1);
     wdLayout->addWidget(workoutBrowseButton, 0,2);
-    all->addLayout(wdLayout);
 
-    all->addWidget(useSimulatedSpeed);
-    all->addWidget(useSimulatedHypoxia);
-    all->addWidget(multiCheck);
-    all->addWidget(autoConnect);
-    all->addWidget(autoHide);
-    all->addWidget(lapAlert);
-    all->addWidget(coalesce);
-
-    QHBoxLayout *delayLayout = new QHBoxLayout;
-    delayLayout->addWidget(delayLabel);
-    delayLayout->addWidget(startDelay);
-    delayLayout->addStretch();
-    all->addLayout(delayLayout);
-
-    all->addStretch();
+    all->addRow(workoutLabel, wdLayout);
+    all->addRow("", useSimulatedSpeed);
+    all->addRow("", useSimulatedHypoxia);
+    all->addRow("", multiCheck);
+    all->addRow("", autoConnect);
+    all->addRow("", autoHide);
+    all->addRow("", lapAlert);
+    all->addRow("", coalesce);
+    all->addRow(delayLabel, startDelay);
+    all->addRow(telemetryScalingLabel, telemetryScaling);
 }
 
 
@@ -804,6 +803,7 @@ TrainOptionsPage::saveClicked()
     appsettings->setValue(TRAIN_AUTOHIDE, autoHide->isChecked());
     appsettings->setValue(TRAIN_LAPALERT, lapAlert->isChecked());
     appsettings->setValue(TRAIN_COALESCE_SECTIONS, coalesce->isChecked());
+    appsettings->setValue(TRAIN_TELEMETRY_FONT_SCALING, telemetryScaling->currentIndex());
 
     return 0;
 }
