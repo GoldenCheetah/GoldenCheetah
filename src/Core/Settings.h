@@ -238,6 +238,7 @@
 #define TRAIN_USESIMULATEDSPEED         "<global-trainmode>train/usesimulatedspeed"
 #define TRAIN_USESIMULATEDHYPOXIA       "<global-trainmode>train/usesimulatedhypoxia"
 #define TRAIN_COALESCE_SECTIONS         "<global-trainmode>train/coalesceSections"
+#define TRAIN_TELEMETRY_FONT_SCALING    "<global-trainmode>train/telemetryFontScaling"
 #define GC_REMOTE_START                 "<global-trainmode>remote/start"
 #define GC_REMOTE_STOP                  "<global-trainmode>remote/stop"
 #define GC_REMOTE_LAP                   "<global-trainmode>remote/lap"

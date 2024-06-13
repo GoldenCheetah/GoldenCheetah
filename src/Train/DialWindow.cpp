@@ -80,7 +80,11 @@ DialWindow::DialWindow(Context *context) :
     QVBoxLayout *layout = new QVBoxLayout;
     layout->setSpacing(0);
     layout->setContentsMargins(3,3,3,3);
-    valueLabel = new QLabel(this);
+    valueLabel = new ScalingLabel(this);
+    valueLabel->setStrategy(appsettings->value(this, TRAIN_TELEMETRY_FONT_SCALING, 0).toInt() == 0 ? ScalingLabelStrategy::HeightOnly : ScalingLabelStrategy::Linear);
+    QFont vlFont = valueLabel->font();
+    vlFont.setWeight(QFont::Bold);
+    valueLabel->setFont(vlFont);
     valueLabel->setAlignment(Qt::AlignCenter | Qt::AlignVCenter);
     layout->addWidget(valueLabel);
     setChartLayout(layout);
@@ -98,9 +102,6 @@ DialWindow::DialWindow(Context *context) :
 
     // setup colors
     seriesChanged();
-
-    // setup fontsize etc
-    resizeEvent(NULL);
 
     // set to zero
     resetValues();
@@ -546,21 +547,6 @@ DialWindow::telemetryUpdate(const RealtimeData &rtData)
     }
 }
 
-void DialWindow::resizeEvent(QResizeEvent * )
-{
-    QFont font;
-
-    // set point size within reasonable limits for low dpi screens
-    int size = (geometry().height() - 24) * 72 / logicalDpiY();
-    if (size <= 0) size = 4;
-    if (size >= 64) size = 64;
-
-    font.setPointSize(size);
-
-    font.setWeight(QFont::Bold);
-    valueLabel->setFont(font);
-}
-
 void DialWindow::seriesChanged()
 {
     // we got some!
@@ -719,6 +705,7 @@ void DialWindow::seriesChanged()
            break;
     }
 
+    valueLabel->setStrategy(appsettings->value(this, TRAIN_TELEMETRY_FONT_SCALING, 0).toInt() == 0 ? ScalingLabelStrategy::HeightOnly : ScalingLabelStrategy::Linear);
     // ugh. we use style sheets because palettes don't work on labels
     background = GColor(CTRAINPLOTBACKGROUND);
     setProperty("color", background);
