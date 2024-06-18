@@ -28,6 +28,7 @@
 #include "Settings.h"
 #include "Colors.h"
 #include "Units.h"
+#include "SplineLookup.h"
 
 #include <QtXml/QtXml>
 #include <algorithm> // for std::lower_bound
@@ -36,7 +37,6 @@
 #include <float.h>
 #endif
 #include <cmath>
-#include <qwt_spline.h>
 
 #ifdef GC_HAVE_SAMPLERATE
 // we have libsamplerate
@@ -80,7 +80,7 @@ RideFile::RideFile(const QDateTime &startTime, double recIntSecs) :
 // and we want to get special fields and ESPECIALLY "CP" and "Weight"
 RideFile::RideFile(RideFile *p) :
     wstale(true), recIntSecs_(p->recIntSecs_), data(NULL), wprime_(NULL),
-    weight_(p->weight_), totalCount(0), dstale(true)
+    weight_(p->weight_), totalCount(0), totalTemp(0), dstale(true)
 {
     startTime_ = p->startTime_;
     tags_ = p->tags_;
@@ -101,7 +101,7 @@ RideFile::RideFile(RideFile *p) :
 
 RideFile::RideFile() : 
     wstale(true), recIntSecs_(0.0), data(NULL), wprime_(NULL),
-    weight_(0), totalCount(0), dstale(true)
+    weight_(0), totalCount(0), totalTemp(0), dstale(true)
 {
     command = new RideFileCommand(this);
 
@@ -155,7 +155,11 @@ RideFile::computeFileCRC(QString filename)
     rawstream->readRawData(&data[0], file.size());
     file.close();
 
+#if QT_VERSION < 0x060000
     return qChecksum(&data[0], file.size());
+#else
+    return qChecksum(QByteArrayView(&data[0], file.size()));
+#endif
 }
 
 void
@@ -237,6 +241,9 @@ RideFile::sportTag(QString sport)
 
         { tr("Gym"), "Gym" },
         { "Strength", "Gym" }, { tr("Strength"), "Gym" },
+
+        { tr("Walk"), "Walk" },
+        { "Walking", "Walk" }, { tr("Walking"), "Walk" },
     };
 
     return sports.value(sport, sport);
@@ -958,7 +965,7 @@ RideFile *RideFileFactory::openRideFile(Context *context, QFile &file,
         // override the file ride time with that set from the filename
         // but only if it matches the GC format
         QFileInfo fileInfo(file.fileName());
-        
+
         // Regular expression to match either date format, including a mix of dashes and underscores
         // yyyy-MM-dd-hh-mm-ss.extension
         // or yyyy_MM_dd_hh_mm_ss.extension
@@ -3124,19 +3131,18 @@ RideFile::resample(double newRecIntSecs, int interpolate)
 RideFile *
 RideFile::resample(double newRecIntSecs, int /*interpolate*/)
 {
-
     // resample if interval has changed
     if (newRecIntSecs != recIntSecs()) {
+        QwtSplineBasis spline;
+        QMap<SeriesType, SplineLookup*> splineLookups;
 
-        QMap<SeriesType, QwtSpline *> splines;
-
-        // we remember the last point in time with data 
+        // we remember the last point in time with data
         double last = 0;
 
         // create a spline for every series present in the ridefile
         for(int i=0; i < static_cast<int>(none); i++) {
 
-            // save us casting all the time 
+            // save us casting all the time
             SeriesType series = static_cast<SeriesType>(i);
 
             if (series == secs) continue; // don't resample that !
@@ -3184,15 +3190,14 @@ RideFile::resample(double newRecIntSecs, int /*interpolate*/)
                 }
 
                 // Now create a spline with the values we've cleaned
-                QwtSpline *spline = new QwtSpline();
-                spline->setSplineType(QwtSpline::Periodic);
-                spline->setPoints(QPolygonF(points));
-                splines.insert(series,spline);
+                SplineLookup *splineLookup = new SplineLookup();
+                splineLookup->update(spline, QPolygonF(points), 1);
+                splineLookups.insert(series, splineLookup);
             }
         }
 
         // no data to resample
-        if (splines.count() == 0 || last == 0) return NULL;
+        if (splineLookups.count() == 0 || last == 0) return NULL;
 
         // we have a bunch of splines so lets add resampled
         // data points to a clone of the current ride (ie. we
@@ -3209,18 +3214,18 @@ RideFile::resample(double newRecIntSecs, int /*interpolate*/)
             p.secs = seconds;
 
             // for each spline get the value for point secs
-            QMapIterator<SeriesType, QwtSpline *> iterator(splines);
+            QMapIterator<SeriesType, SplineLookup*> iterator(splineLookups);
             while (iterator.hasNext()) {
                 iterator.next();
 
                 SeriesType series = iterator.key();
-                QwtSpline *spline = iterator.value();
+                SplineLookup *splineLookup = iterator.value();
 
                 double sum = 0;
                 for (double i=0; i<1; i+= 0.25) {
                     double dt = seconds + (newRecIntSecs * i);
                     double dtn = seconds + (newRecIntSecs * (i+0.25f));
-                    sum += (spline->value(dt) + spline->value(dtn)) /2.0f;
+                    sum += (splineLookup->valueY(dt) + splineLookup->valueY(dtn)) / 2.0f;
                 }
                 sum /= 4.0f;
 
@@ -3248,16 +3253,14 @@ RideFile::resample(double newRecIntSecs, int /*interpolate*/)
 
         // clean up and return
         // wipe away any splines created
-        QMapIterator<SeriesType, QwtSpline *> iterator(splines);
+        QMapIterator<SeriesType, SplineLookup*> iterator(splineLookups);
         while (iterator.hasNext()) {
             iterator.next();
             delete iterator.value();
         }
 
         return returning;
-
     } else {
-
         // not resampling but cloning a working copy
         // and removing gaps in recording
         RideFile *returning = new RideFile(this);

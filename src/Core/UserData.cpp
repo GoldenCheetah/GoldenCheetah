@@ -94,7 +94,7 @@ EditUserDataDialog::EditUserDataDialog(Context *context, UserData *here) :
     QFont courier("Courier", QFont().pointSize());
     QFontMetrics fm(courier);
     formulaEdit->setFont(courier);
-    formulaEdit->setTabStopWidth(4 * fm.width(' ')); // 4 char tabstop
+    formulaEdit->setTabStopDistance(4 * fm.horizontalAdvance(' ')); // 4 char tabstop
     formulaEdit->setText(here->formula);
     if (here->formula == "") {
         // lets put a template in there

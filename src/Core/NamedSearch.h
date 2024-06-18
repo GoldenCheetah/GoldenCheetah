@@ -115,7 +115,8 @@ class EditNamedSearches : public QDialog
                     *updateButton,
                     *upButton,
                     *downButton,
-                    *deleteButton;
+                    *deleteButton,
+                    *closeButton;
         QIcon searchIcon, filterIcon;
 
     private slots:

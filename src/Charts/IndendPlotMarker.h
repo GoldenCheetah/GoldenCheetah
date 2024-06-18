@@ -53,7 +53,7 @@ class QwtIndPlotMarker: public QwtPlotMarker
 {
 public:
 
-    explicit QwtIndPlotMarker( const QString &title = QString::null );
+    explicit QwtIndPlotMarker( const QString &title = QString() );
     explicit QwtIndPlotMarker( const QwtText &title );
 
     virtual ~QwtIndPlotMarker();

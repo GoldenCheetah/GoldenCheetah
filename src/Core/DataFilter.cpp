@@ -4474,7 +4474,10 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
 
             // by is coerced to strings if it isn't a string list already
             // this simplifies all the logic for watching it change
-            if (by.asString().count()==0) by.asString() << by.string();
+            if (by.asString().count()==0) {
+                if (by.isNumber) by.asNumeric() << by.number();
+                else by.asString() << by.string();
+            }
 
             // state as we loop through a group
             QString laststring =by.asString()[0];
@@ -8108,7 +8111,7 @@ Result Leaf::eval(DataFilterRuntime *df, Leaf *leaf, const Result &x, long it, R
                 // CPU and 'hang' for badly written code..
                 static int maxwhile = 1000000;
                 int count=0;
-                QTime timer;
+                QElapsedTimer timer;
                 timer.start();
 
                 Result returning(0);

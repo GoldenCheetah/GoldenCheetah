@@ -39,7 +39,6 @@
 #include <qwt_plot_curve.h>
 #include <qwt_series_data.h>
 #include <qwt_scale_div.h>
-#include <qwt_compat.h>
 #include <QFile>
 #include "Season.h"
 #include "SeasonParser.h"
@@ -431,9 +430,9 @@ CriticalPowerWindow::CriticalPowerWindow(Context *context, bool rangemode) :
     grid->enableX(false); // not needed
     grid->enableY(true);
     grid->setZ(-20);
-    QwtValueList ytick[QwtScaleDiv::NTickTypes];
+    QList<double> ytick[QwtScaleDiv::NTickTypes];
     for (double i=0.0; i<=2500; i+= 100) ytick[QwtScaleDiv::MajorTick]<<i;
-    cpPlot->setAxisScaleDiv(QwtPlot::yLeft,QwtScaleDiv(0.0,2500.0,ytick));
+    cpPlot->setAxisScaleDiv(QwtAxis::YLeft,QwtScaleDiv(0.0,2500.0,ytick));
     grid->attach(cpPlot);
 
     // the model helper -- showing model parameters etc
@@ -668,13 +667,11 @@ CriticalPowerWindow::configChanged(qint32)
     QPalette whitepalette;
     if (rangemode) {
         whitepalette.setBrush(QPalette::Window, QBrush(GColor(CTRENDPLOTBACKGROUND)));
-        whitepalette.setBrush(QPalette::Background, QBrush(GColor(CTRENDPLOTBACKGROUND)));
         whitepalette.setColor(QPalette::WindowText, GCColor::invertColor(GColor(CTRENDPLOTBACKGROUND)));
         whitepalette.setColor(QPalette::Base, GCColor::alternateColor(GColor(CPLOTBACKGROUND)));
         whitepalette.setColor(QPalette::Text, GCColor::invertColor(GColor(CTRENDPLOTBACKGROUND)));
     } else {
         whitepalette.setBrush(QPalette::Window, QBrush(GColor(CPLOTBACKGROUND)));
-        whitepalette.setBrush(QPalette::Background, QBrush(GColor(CPLOTBACKGROUND)));
         whitepalette.setColor(QPalette::WindowText, GCColor::invertColor(GColor(CPLOTBACKGROUND)));
         whitepalette.setColor(QPalette::Base, GCColor::alternateColor(GColor(CPLOTBACKGROUND)));
         whitepalette.setColor(QPalette::Text, GCColor::invertColor(GColor(CPLOTBACKGROUND)));
@@ -751,6 +748,120 @@ CriticalPowerWindow::fitChanged()
 }
 
 void
+CriticalPowerWindow::showAnaerobicIntervals(bool show)
+{
+    if (show) {
+        anLabel->show();
+        anI1SpinBox->show();
+        anI2SpinBox->show();
+    } else {
+        anLabel->hide();
+        anI1SpinBox->hide();
+        anI2SpinBox->hide();
+    }
+}
+
+void
+CriticalPowerWindow::showAerobicIntervals(bool show)
+{
+    if (show) {
+        aeLabel->show();
+        aeI1SpinBox->show();
+        aeI2SpinBox->show();
+    } else {
+        aeLabel->hide();
+        aeI1SpinBox->hide();
+        aeI2SpinBox->hide();
+    }
+}
+void
+CriticalPowerWindow::showShortAnaerobicIntervals(bool show)
+{
+    if (show) {
+        sanLabel->show();
+        sanI1SpinBox->show();
+        sanI2SpinBox->show();
+    } else {
+        sanLabel->hide();
+        sanI1SpinBox->hide();
+        sanI2SpinBox->hide();
+    }
+}
+
+void
+CriticalPowerWindow::showLongAerobicIntervals(bool show)
+{
+    if (show) {
+        laeLabel->show();
+        laeI1SpinBox->show();
+        laeI2SpinBox->show();
+    } else {
+        laeLabel->hide();
+        laeI1SpinBox->hide();
+        laeI2SpinBox->hide();
+    }
+}
+
+/** 
+ * Shows or hides the interval spinboxes relevant for the current selection.
+ *
+ * The decision depends on both, the model and the fitting method.
+ */
+void
+CriticalPowerWindow::showRelevantIntervals()
+{
+    // interval selection has no effect for fits other than envelope. In this
+    // case hide them all.
+    if (fitCombo->currentIndex() != 0) {
+        intervalLabel->hide();
+        secondsLabel->hide();
+        showShortAnaerobicIntervals(false);
+        showAnaerobicIntervals(false);
+        showAerobicIntervals(false);
+        showLongAerobicIntervals(false);
+        return;
+    }
+    // if we have come here, we have envelope fits and the required
+    // intervals depend on the chosen model.
+    intervalLabel->show();
+    secondsLabel->show();
+    switch(modelCombo->currentIndex()) {
+    // no model
+    case 0:
+        intervalLabel->hide();
+        secondsLabel->hide();
+        showShortAnaerobicIntervals(false);
+        showAnaerobicIntervals(false);
+        showAerobicIntervals(false);
+        showLongAerobicIntervals(false);
+        break;
+    // 2 parameter model
+    case 1:
+    // 3 parameter model
+    case 2:
+    // WS-model
+    case 5:
+        showShortAnaerobicIntervals(false);
+        showAnaerobicIntervals(true);
+        showAerobicIntervals(true);
+        showLongAerobicIntervals(false);
+        break;
+    case 3:
+        showShortAnaerobicIntervals(true);
+        showAnaerobicIntervals(true);
+        showAerobicIntervals(true);
+        showLongAerobicIntervals(true);
+        break;
+    default:
+        // we should not reach this point, since models >= 3 have been handled
+        // before.
+        break;
+
+
+    }
+}
+
+void
 CriticalPowerWindow::modelChanged()
 {
     // we changed from/to a 2 or 3 parameter model
@@ -789,21 +900,6 @@ CriticalPowerWindow::modelChanged()
     switch (modelCombo->currentIndex()) {
 
     case 0 : // None
-
-            intervalLabel->hide();
-            secondsLabel->hide();
-            sanLabel->hide();
-            sanI1SpinBox->hide();
-            sanI2SpinBox->hide();
-            anLabel->hide();
-            anI1SpinBox->hide();
-            anI2SpinBox->hide();
-            aeLabel->hide();
-            aeI1SpinBox->hide();
-            aeI2SpinBox->hide();
-            laeLabel->hide();
-            laeI1SpinBox->hide();
-            laeI2SpinBox->hide();
             modelDecayCheck->hide();
             modelDecayLabel->hide();
 
@@ -823,22 +919,6 @@ CriticalPowerWindow::modelChanged()
             // and drop through into case 1 below ...
 
     case 1 : // Classic 2 param model 2-20 default (per literature)
-
-            intervalLabel->show();
-            secondsLabel->show();
-            anLabel->show();
-            sanLabel->hide();
-            sanI1SpinBox->hide();
-            sanI2SpinBox->hide();
-            anLabel->show();
-            anI1SpinBox->show();
-            anI2SpinBox->show();
-            aeLabel->show();
-            aeI1SpinBox->show();
-            aeI2SpinBox->show();
-            laeLabel->hide();
-            laeI1SpinBox->hide();
-            laeI2SpinBox->hide();
             modelDecayCheck->hide();
             modelDecayLabel->hide();
 
@@ -852,21 +932,6 @@ CriticalPowerWindow::modelChanged()
 
     case 2 : // 3 param model: 30-60 model
     case 5 : // WS model: 30-60 model
-
-            intervalLabel->show();
-            secondsLabel->show();
-            sanLabel->hide();
-            sanI1SpinBox->hide();
-            sanI2SpinBox->hide();
-            anLabel->show();
-            anI1SpinBox->show();
-            anI2SpinBox->show();
-            aeLabel->show();
-            aeI1SpinBox->show();
-            aeI2SpinBox->show();
-            laeLabel->hide();
-            laeI1SpinBox->hide();
-            laeI2SpinBox->hide();
             modelDecayLabel->show();
             modelDecayCheck->show();
 
@@ -879,21 +944,6 @@ CriticalPowerWindow::modelChanged()
             break;
 
     case 3 : // ExtendedCP
-
-            intervalLabel->show();
-            secondsLabel->show();
-            sanLabel->show();
-            sanI1SpinBox->show();
-            sanI2SpinBox->show();
-            anLabel->show();
-            anI1SpinBox->show();
-            anI2SpinBox->show();
-            aeLabel->show();
-            aeI1SpinBox->show();
-            aeI2SpinBox->show();
-            laeLabel->show();
-            laeI1SpinBox->show();
-            laeI2SpinBox->show();
             modelDecayCheck->hide();
             modelDecayLabel->hide();
 
@@ -965,6 +1015,14 @@ CriticalPowerWindow::modelParametersChanged()
     // and apply
     if (amVisible() && myRideItem != NULL) {
         cpPlot->setRide(myRideItem);
+    }
+    showRelevantIntervals();
+    // disable data selection for envelope fits, since it has no effect for
+    // these.
+    if (fitCombo->currentIndex() == 0) {
+        fitdataCombo->setEnabled(false);
+    } else {
+        fitdataCombo->setEnabled(true);
     }
 }
 
@@ -1168,7 +1226,7 @@ CriticalPowerWindow::intervalHover(IntervalItem* x)
         hoverCurve = new QwtPlotCurve("Interval");
         hoverCurve->setPen(pen);
         if (appsettings->value(this, GC_ANTIALIAS, true).toBool() == true) hoverCurve->setRenderHint(QwtPlotItem::RenderAntialiased);
-        hoverCurve->setYAxis(QwtPlot::yLeft);
+        hoverCurve->setYAxis(QwtAxis::YLeft);
         hoverCurve->setSamples(array);
         hoverCurve->setVisible(true);
         hoverCurve->setZ(100);

@@ -234,7 +234,8 @@ class EditMetricDetailDialog : public QDialog
                   *curveSymbol;
         QCheckBox *stack;
         QPushButton *curveColor;
-        QCheckBox *fillCurve;
+        QCheckBox *fillCurve, *ignoreZeros;
+        QLabel *ignoreZerosLbl;
         QCheckBox *labels;
         QDoubleSpinBox *showBest,
                        *showLowest,

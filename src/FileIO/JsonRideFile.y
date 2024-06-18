@@ -262,11 +262,7 @@ xdata_list: xdata_series
             | xdata_list ',' xdata_series
             ;
 
-xdata_series: '{' xdata_items '}'              { XDataSeries *add = new XDataSeries;
-                                                 add->name=jc->xdataseries.name;
-                                                 add->datapoints=jc->xdataseries.datapoints;
-                                                 add->valuename=jc->xdataseries.valuename;
-                                                 add->unitname=jc->xdataseries.unitname;
+xdata_series: '{' xdata_items '}'              { XDataSeries *add = new XDataSeries(jc->xdataseries);
                                                  jc->JsonRide->addXData(add->name, add);
 
                                                  // clear for next one
@@ -408,7 +404,9 @@ JsonFileReader::openRideFile(QFile &file, QStringList &errors, QList<RideFile*>*
         // read in the whole thing
         QTextStream in(&file);
         // GC .JSON is stored in UTF-8 with BOM(Byte order mark) for identification
+#if QT_VERSION < 0x060000
         in.setCodec ("UTF-8");
+#endif
         contents = in.readAll();
         file.close();
 
@@ -417,7 +415,11 @@ JsonFileReader::openRideFile(QFile &file, QStringList &errors, QList<RideFile*>*
         if (contents.contains(QChar::ReplacementCharacter)) {
            if (file.exists() && file.open(QFile::ReadOnly | QFile::Text)) {
              QTextStream in(&file);
+#if QT_VERSION < 0x060000
              in.setCodec ("ISO 8859-1");
+#else
+             in.setEncoding (QStringConverter::Latin1);
+#endif
              contents = in.readAll();
              file.close();
            }
@@ -468,7 +470,7 @@ JsonFileReader::openRideFile(QFile &file, QStringList &errors, QList<RideFile*>*
 QByteArray
 JsonFileReader::toByteArray(Context *, const RideFile *ride, bool withAlt, bool withWatts, bool withHr, bool withCad) const
 {
-    QByteArray out;
+    QString out;
 
     // start of document and ride
     out += "{\n\t\"RIDE\":{\n";
@@ -506,9 +508,9 @@ JsonFileReader::toByteArray(Context *, const RideFile *ride, bool withAlt, bool 
 
                 // comma separated
                 out += "\"" + j.key() + "\":\"" + j.value() + "\"";
-                if (j+1 != k.value().constEnd()) out += ", ";
+                if (std::next(j) != k.value().constEnd()) out += ", ";
             }
-            if (k+1 != ride->metricOverrides.constEnd()) out += " }},\n";
+            if (std::next(k) != ride->metricOverrides.constEnd()) out += " }},\n";
             else out += " }}\n";
         }
 
@@ -529,7 +531,7 @@ JsonFileReader::toByteArray(Context *, const RideFile *ride, bool withAlt, bool 
         for (i=ride->tags().constBegin(); i != ride->tags().constEnd(); i++) {
 
                 out += "\t\t\t\"" + i.key() + "\":\"" + protect(i.value()) + "\"";
-                if (i+1 != ride->tags().constEnd()) out += ",\n";
+                if (std::next(i) != ride->tags().constEnd()) out += ",\n";
         }
 
         foreach(RideFileInterval *inter, ride->intervals()) {
@@ -542,7 +544,7 @@ JsonFileReader::toByteArray(Context *, const RideFile *ride, bool withAlt, bool 
                         first=false;
                     }
                     out += "\t\t\t\"" + inter->name + "##" + i.key() + "\":\"" + protect(i.value()) + "\"";
-                    if (i+1 != inter->tags().constEnd()) out += ",\n";
+                    if (std::next(i) != inter->tags().constEnd()) out += ",\n";
             }
         }
 
@@ -780,7 +782,7 @@ JsonFileReader::toByteArray(Context *, const RideFile *ride, bool withAlt, bool 
     // end of ride and document
     out += "\n\t}\n}\n";
 
-    return out;
+    return out.toUtf8();
 }
 
 // Writes valid .json (validated at www.jsonlint.com)
@@ -798,7 +800,9 @@ JsonFileReader::writeRideFile(Context *context, const RideFile *ride, QFile &fil
     // setup streamer
     QTextStream out(&file);
     // unified codepage and BOM for identification on all platforms
+#if QT_VERSION < 0x060000
     out.setCodec("UTF-8");
+#endif
     out.setGenerateByteOrderMark(true);
 
     out << xml;

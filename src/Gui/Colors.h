@@ -29,7 +29,6 @@
 
 
 // A selection of distinct colours, user can adjust also
-extern QList<QColor> standardColors;
 extern QIcon colouredIconFromPNG(QString filename, QColor color);
 extern QPixmap colouredPixmapFromPNG(QString filename, QColor color);
 
@@ -131,8 +130,9 @@ class GCColor : public QObject
         static QColor alternateColor(QColor); // return the alternate background
         static QColor selectedColor(QColor); // return the on select background color
         static QColor htmlCode(QColor x) { return x.name(); } // return the alternate background
-        static Themes &themes(); 
+        static Themes &themes();
         static void applyTheme(int index);
+        static QColor getThemeColor(const ColorTheme& theme, int colorIdx);
 
         // for styling things with current preferences
         static QLinearGradient linearGradient(int size, bool active, bool alternate=false);
@@ -145,7 +145,6 @@ class GCColor : public QObject
 
         // for upgrade/migration of Config
         static QStringList getConfigKeys();
-
 };
 
 // color chooser that also supports the standard colors (CPLOTMARKER, CPOWER)

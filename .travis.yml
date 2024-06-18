@@ -42,13 +42,16 @@ env:
   - secure: Qk+gzBLwjrB8abUYzxap10dYSpIeKpB1gqhdoMbqS23G0r1lejnsjutIfReuJGK/efCmhisKN1xIX/InvJWD8z6GsLJFmf3F0oRj7aDJ/X5UIn9Upflje9xgHQafP1FJuzZBWtzandNfPE8EmEOgAQsJZ3c7xBE1SY/6xcJaQTc=
   - secure: m4+k3/QcYvqmMoRO8uq3ef2jAO1FWeRVDG/XtlbjBlgmB5OR/zW5c7c1Ywm6IM5yzsi1rRks8GFffZ6gYqXhML10EfGKVbnyBcZZ7HVylNtvxDF68W1BLacChzDs4mGYQSV8kJRGI3EaVNdyFJ5yln/HUZ6qBbQ473MtxprO6BI=
   - secure: GEyUuLuIc7D3F4noKhtTCbWbQAlm61Y7Vh2mOKBEgmyfoV1johwlEL0RaeRyr9MnU2MN+4jeFthvDjxm3LGP19zrpB46GTGHU6/H9BZBodDCJsFTqj32T+5QTcAF2RQ66ZgYpSyTf063/RLlfy7YjCb8KLiJ2asCaoYtQIjx3hA=
+  - secure: LvO6/hNrhZo/4GCy4QoXV4V1UucnSt1upKg5K5LF0KgVOrAENYny0zdOJZgT5f6rTWLTU4WlY9ZXzipEhsyBMeWF8SH2LmDYvqHj5gTb3ANNgvvgVyutwq2XqnMTTrJy38CJaoLHHAF4uxkKr22omjSNzHKntAis95VjnIXLxug=
 
 jobs:
   include:
-  - os: osx
-    osx_image: xcode14.1
+  - if: commit_message !~ /\[skip osx\]/
+    os: osx
+    osx_image: xcode14.2
     compiler: clang
-  - os: linux
+  - if: commit_message !~ /\[skip linux\]/
+    os: linux
     dist: focal
     compiler: gcc
 

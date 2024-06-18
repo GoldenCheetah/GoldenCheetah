@@ -29,6 +29,7 @@
 #include "DataProcessor.h"
 #include "MainWindow.h"
 #include "TrainDB.h"
+#include "Library.h"
 #include "CloudService.h"
 
 #include <QDebug>
@@ -804,6 +805,16 @@ GcUpgrade::upgradeLate(Context *context)
 
     }
 
+    if (trainDB->needsUpgrade()) {
+        QStringList files = trainDB->getMigrateableWorkoutPaths();
+        files << trainDB->getMigrateableVideoPaths();
+        files << trainDB->getMigrateableVideoSyncPaths();
+        if (files.size() > 0) {
+            Library::importFiles(context, files, LibraryBatchImportConfirmation::noDialog);
+        }
+        trainDB->dropLegacyTables();
+    }
+
     return 0;
 }
 
@@ -1003,7 +1014,6 @@ GcUpgradeLogDialog::GcUpgradeLogDialog(QDir homeDir) : QDialog(NULL, Qt::Dialog)
 
     report = new QWebEngineView(this);
     report->setContentsMargins(0,0,0,0);
-    report->page()->view()->setContentsMargins(0,0,0,0);
     report->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     //XXX WEBENGINE report->page()->setLinkDelegationPolicy(QWebPage::DelegateAllLinks);
     report->setContextMenuPolicy(Qt::NoContextMenu);
@@ -1053,7 +1063,9 @@ GcUpgradeLogDialog::saveAs()
     QFile file(fileName);
     file.resize(0);
     QTextStream out(&file);
+#if QT_VERSION < 0x060000
     out.setCodec("UTF-8");
+#endif
 
     if (file.open(QIODevice::WriteOnly)) {
 

@@ -670,7 +670,7 @@ void
 ANT::getRealtimeData(RealtimeData &rtData)
 {
     rtData = telemetry;
-    rtData.mode = mode;
+    rtData.mode = static_cast<ErgFileFormat>(mode);
     rtData.setLoad(load);
     rtData.setSlope(gradient);
 }

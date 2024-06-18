@@ -36,9 +36,6 @@
 #define GC_UNIT_METRIC                       "Metric"
 #define GC_UNIT_IMPERIAL                     "Imperial"
 
-//Today's Plan
-#define GC_TODAYSPLAN_CLIENT_ID    "GoldenCheetah" // app id
-
 //Cycling Analytics / see also Athlete parameter
 #define GC_CYCLINGANALYTICS_CLIENT_ID    "1504958" // app id
 
@@ -240,6 +237,8 @@
 #define TRAIN_LAPALERT                  "<global-trainmode>train/lapalert"
 #define TRAIN_USESIMULATEDSPEED         "<global-trainmode>train/usesimulatedspeed"
 #define TRAIN_USESIMULATEDHYPOXIA       "<global-trainmode>train/usesimulatedhypoxia"
+#define TRAIN_COALESCE_SECTIONS         "<global-trainmode>train/coalesceSections"
+#define TRAIN_TELEMETRY_FONT_SCALING    "<global-trainmode>train/telemetryFontScaling"
 #define GC_REMOTE_START                 "<global-trainmode>remote/start"
 #define GC_REMOTE_STOP                  "<global-trainmode>remote/stop"
 #define GC_REMOTE_LAP                   "<global-trainmode>remote/lap"
@@ -311,9 +310,13 @@
 
 // OSM Tileserver
 #define GC_OSM_TS_DEFAULT               "<athlete-preferences>osmts/default"
+#define GC_OSM_DEFAULT_GRAY             "<athlete-preferences>osm/default_gray"
 #define GC_OSM_TS_A                     "<athlete-preferences>osmts/a"
+#define GC_OSM_A_GRAY                   "<athlete-preferences>osm/a_gray"
 #define GC_OSM_TS_B                     "<athlete-preferences>osmts/b"
+#define GC_OSM_B_GRAY                   "<athlete-preferences>osm/b_gray"
 #define GC_OSM_TS_C                     "<athlete-preferences>osmts/c"
+#define GC_OSM_C_GRAY                   "<athlete-preferences>osm/c_gray"
 
 // BodyMeasures Download
 #define GC_BM_LAST_TYPE                 "<athlete-preferences>bm/last_type"
@@ -388,13 +391,6 @@
 
 //Cycling Analytics
 #define GC_CYCLINGANALYTICS_TOKEN       "<athlete-private>cyclinganalytics_token"
-
-//Today's Plan
-#define GC_TODAYSPLAN_TOKEN             "<athlete-private>todaysplan_token"
-#define GC_TODAYSPLAN_URL               "<athlete-private>todaysplan_url"
-#define GC_TODAYSPLAN_USERKEY           "<athlete-private>todaysplan_userkey"
-#define GC_TODAYSPLAN_ATHLETE_ID        "<athlete-private>todaysplan_athlete_id"
-#define GC_TODAYSPLAN_ATHLETE_NAME      "<athlete-private>todaysplan_athlete_name"
 
 //SixCycle
 #define GC_SIXCYCLE_USER                "<athlete-private>sixcycle_user"

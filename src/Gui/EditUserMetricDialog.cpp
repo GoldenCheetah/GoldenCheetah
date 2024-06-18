@@ -28,6 +28,7 @@
 #include "Zones.h"
 #include "HrZones.h"
 #include "RideMetric.h"
+#include "HelpWhatsThis.h"
 
 #include <QFont>
 #include <QFontMetrics>
@@ -46,8 +47,8 @@ EditUserMetricDialog::EditUserMetricDialog(QWidget *parent, Context *context, Us
     setWindowTitle(tr("User Defined Metric"));
     setMinimumHeight(680 *dpiYFactor);
 
-    //HelpWhatsThis *help = new HelpWhatsThis(this);
-    //this->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::ChartTrends_MetricTrends_Curves_Settings));
+    HelpWhatsThis *help = new HelpWhatsThis(this);
+    this->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::Preferences_Metrics_UserMetrics));
 
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
 
@@ -106,7 +107,7 @@ EditUserMetricDialog::EditUserMetricDialog(QWidget *parent, Context *context, Us
     QFont courier("Courier", QFont().pointSize());
     QFontMetrics fm(courier);
     formulaEdit->setFont(courier);
-    formulaEdit->setTabStopWidth(4 * fm.width(' ')); // 4 char tabstop
+    formulaEdit->setTabStopDistance(4 * fm.horizontalAdvance(' ')); // 4 char tabstop
     formulaEdit->setText(settings.program);
     // get suitably formated list XXX XXX ffs, refactor this into FormulEdit !!! XXX XXX
     QList<QString> list;

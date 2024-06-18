@@ -20,6 +20,7 @@
 #include <QSettings>
 
 #include "Context.h"
+#include "TrainDB.h"
 #include "Athlete.h"
 #include "ConfigDialog.h"
 #include "RideCache.h"
@@ -73,7 +74,7 @@ ConfigDialog::ConfigDialog(QDir _home, Context *context) :
     // Setup the signal mapping so the right config
     // widget is displayed when the icon is clicked
     QSignalMapper *iconMapper = new QSignalMapper(this); // maps each option
-    connect(iconMapper, SIGNAL(mapped(int)), this, SLOT(changePage(int)));
+    connect(iconMapper, &QSignalMapper::mappedInt, this, &ConfigDialog::changePage);
     head->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
     head->setIconSize(QSize(32*dpiXFactor,32*dpiXFactor)); // use XFactor for both to ensure aspect ratio maintained
 
@@ -268,7 +269,7 @@ void ConfigDialog::saveClicked()
             //       has been zapped along with the windows we need to get out
             //       as quickly as possible.
             close();
-            return; 
+            return;
 
         } else {
 
@@ -276,7 +277,7 @@ void ConfigDialog::saveClicked()
             appsettings->setValue(GC_HOMEDIR, general->generalPage->athleteWAS);
         }
 
-    } 
+    }
 
     // global context changed, will be cascaded to each athlete context
     GlobalContext::context()->notifyConfigChanged(changed);
@@ -424,6 +425,7 @@ TrainConfig::TrainConfig(QDir home, Context *context) :
     optionsPage = new TrainOptionsPage(this, context);
     remotePage = new RemotePage(this, context);
     simBicyclePage = new SimBicyclePage(this, context);
+    workoutTagManagerPage = new WorkoutTagManagerPage(trainDB, this);
 
     setContentsMargins(0,0,0,0);
     QHBoxLayout *mainLayout = new QHBoxLayout(this);
@@ -435,6 +437,7 @@ TrainConfig::TrainConfig(QDir home, Context *context) :
     tabs->addTab(optionsPage, tr("Preferences"));
     tabs->addTab(remotePage, tr("Remote Controls"));
     tabs->addTab(simBicyclePage, tr("Virtual Bicycle Specifications"));
+    tabs->addTab(workoutTagManagerPage, tr("Workout Tags"));
 
     mainLayout->addWidget(tabs);
 }
@@ -447,6 +450,7 @@ qint32 TrainConfig::saveClicked()
     state |= optionsPage->saveClicked();
     state |= remotePage->saveClicked();
     state |= simBicyclePage->saveClicked();
+    state |= workoutTagManagerPage->saveClicked();
 
     return state;
 }

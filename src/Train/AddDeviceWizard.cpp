@@ -102,7 +102,7 @@ AddType::AddType(AddDeviceWizard *parent) : QWizardPage(parent), wizard(parent)
     buttons->setLayout(layout);
 
     mapper = new QSignalMapper(this);
-    connect(mapper, SIGNAL(mapped(QString)), this, SLOT(clicked(QString)));
+    connect(mapper, &QSignalMapper::mappedString, this, &AddType::clicked);
 
     foreach(DeviceType t, wizard->deviceTypes.Supported) {
         if (t.type) {
@@ -836,7 +836,7 @@ AddPair::initializePage()
     enableDisable(channelWidget);
 
     updateValues.start(200); // 5hz
-    connect(signalMapper, SIGNAL(mapped(int)), this, SLOT(sensorChanged(int)));
+    connect(signalMapper, &QSignalMapper::mappedInt, this, &AddPair::sensorChanged);
     connect(&updateValues, SIGNAL(timeout()), this, SLOT(getChannelValues()));
     connect(wizard->controller, SIGNAL(foundDevice(int,int,int)), this, SLOT(channelInfo(int,int,int)));
     connect(wizard->controller, SIGNAL(searchTimeout(int)), this, SLOT(searchTimeout(int)));
@@ -867,7 +867,7 @@ AddPair::sensorChanged(int channel)
         // for a remote control we are the master, so there is nothing for us to pair
         // just generate a random device number between 1 & 65535
         dynamic_cast<QLabel*>(channelWidget->itemWidget(item,3))->setText(tr("Master"));
-        uint16_t deviceNumber = (qrand() % 65535) + 1;
+        uint16_t deviceNumber = (QRandomGenerator::global()->generate() % 65535) + 1;
         dynamic_cast<QLineEdit *>(channelWidget->itemWidget(item,1))->setText(QString("%1").arg(deviceNumber));
         dynamic_cast<ANTlocalController*>(wizard->controller)->myANTlocal->setChannel(channel, deviceNumber, channel_type);
     } else {

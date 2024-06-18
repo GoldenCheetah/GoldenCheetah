@@ -381,7 +381,7 @@ static QString extractComponents(QString document)
 
     // parse the document and extract the multistatus node (there is only one of those)
     QDomDocument doc;
-    if (document == "" || doc.setContent(document) == false) return "";
+    if (document == "" || bool(doc.setContent(document)) == false) return "";
     QDomNode multistatus = doc.documentElement();
     if (multistatus.isNull())  return "";
 

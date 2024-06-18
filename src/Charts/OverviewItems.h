@@ -264,7 +264,8 @@ class MetricOverviewItem : public ChartSpaceItem
         const RideMetric *metric;
         QString units;
 
-        bool up, showrange;
+        bool up;
+        bool showrange = false;
         QString value, upper, lower, mean;
 
         Sparkline *sparkline;
@@ -332,12 +333,12 @@ class TopNOverviewItem : public ChartSpaceItem
         double maxv,minv;
 
         // animation
-        int transition;
+        int transition = 0;
         QPropertyAnimation *animator;
 
         // interaction
-        bool click;
-        RideItem *clickthru;
+        bool click = false;
+        RideItem *clickthru = nullptr;
 
         OverviewItemConfig *configwidget;
 };
@@ -533,7 +534,7 @@ class IntervalOverviewItem : public ChartSpaceItem
 
         bool block; // block when signals occur too quickly
         RideItem *item;  // remember what we are showing
-        IntervalItem *hover; // currently being hovered
+        IntervalItem *hover = nullptr; // currently being hovered
 
         OverviewItemConfig *configwidget;
 
@@ -551,7 +552,7 @@ class IntervalOverviewItem : public ChartSpaceItem
 class BPointF {
 public:
 
-    BPointF() : x(0), y(0), z(0), xoff(0), yoff(0), fill(GColor(Qt::gray)), item(NULL) {}
+    BPointF() : x(0), y(0), z(0), xoff(0), yoff(0), fill(GColor(CRIDEPLOTXAXIS)), item(NULL) {}
 
     double score(BPointF &other);
 

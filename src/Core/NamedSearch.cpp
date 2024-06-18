@@ -198,7 +198,9 @@ NamedSearchParser::serialize(QString filename, QList<NamedSearch>NamedSearches)
     };
     file.resize(0);
     QTextStream out(&file);
+#if QT_VERSION < 0x060000
     out.setCodec("UTF-8");
+#endif
 
     // begin document
     out << "<NamedSearches>\n";
@@ -299,6 +301,9 @@ EditNamedSearches::EditNamedSearches(QWidget *parent, Context *context) : QDialo
     row4->addStretch();
     deleteButton = new QPushButton(tr("Delete"), this);
     row4->addWidget(deleteButton);
+    row4->addStretch();
+    closeButton = new QPushButton(tr("Close"), this);
+    row4->addWidget(closeButton);
 
     // Populate the list of named searches
     foreach(NamedSearch x, context->athlete->namedSearches->getList()) {
@@ -317,6 +322,7 @@ EditNamedSearches::EditNamedSearches(QWidget *parent, Context *context) : QDialo
     // connect the buttons
     connect(addButton, SIGNAL(clicked()), this, SLOT(addClicked()));
     connect(deleteButton, SIGNAL(clicked()), this, SLOT(deleteClicked()));
+    connect(closeButton, SIGNAL(clicked()), this, SLOT(close()));
     connect(updateButton, SIGNAL(clicked()), this, SLOT(updateClicked()));
     connect(upButton, SIGNAL(clicked()), this, SLOT(upClicked()));
     connect(downButton, SIGNAL(clicked()), this, SLOT(downClicked()));

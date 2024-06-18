@@ -82,16 +82,10 @@ ride: '{' rideelement_list '}'                                  {
                                                                         jc->api->writeRideLine(jc->item, jc->request, jc->response);
                                                                     #endif
                                                                     } else {
-
-                                                                        double progress= double(jc->loading++) / double(jc->cache->rides().count()) * 100.0f;
-                                                                        if (jc->context->mainWindow->progress) {
-
-                                                                            // percentage progress
-                                                                            QString m = QString("%1%").arg(progress , 0, 'f', 0);
-                                                                            jc->context->mainWindow->progress->setText(m);
-                                                                            QApplication::processEvents();
-                                                                        } else {
+                                                                        double progress= round(double(jc->loading++) / double(jc->cache->rides().count()) * 100.0f);
+                                                                        if (progress > jc->lastProgressUpdate) {
                                                                             jc->context->notifyLoadProgress(jc->folder,progress);
+                                                                            jc->lastProgressUpdate = progress;
                                                                         }
 
                                                                         // find entry and update it
@@ -335,13 +329,11 @@ RideCache::load()
         QDir plannedDirectory = context->athlete->home->planned();
 
         // ok, lets read it in
-        QTextStream stream(&rideDB);
-        stream.setCodec("UTF-8");
 
         // Read the entire file into a QString -- we avoid using fopen since it
         // doesn't handle foreign characters well. Instead we use QFile and parse
         // from a QString
-        QString contents = stream.readAll();
+        QString contents = QString(rideDB.readAll());
         rideDB.close();
 
         // create scanner context for reentrant parsing
@@ -351,6 +343,7 @@ RideCache::load()
         jc->api = NULL;
         jc->old = false;
         jc->loading = 0;
+        jc->lastProgressUpdate = 0.0;
         jc->folder = context->athlete->home->root().canonicalPath();
 
         // clean item
@@ -497,7 +490,9 @@ void RideCache::save(bool opendata, QString filename)
 
         // ok, lets write out the cache
         QTextStream stream(&rideDB);
+#if QT_VERSION < 0x060000
         stream.setCodec("UTF-8");
+#endif
 
         // no BOM needed for opendata as it doesn't contain textual data
         if (!opendata) stream.setGenerateByteOrderMark(true);
@@ -724,7 +719,7 @@ void RideCache::save(bool opendata, QString filename)
                 for (i=item->metadata().constBegin(); i != item->metadata().constEnd(); i++) {
 
                     stream << "\t\t\t\"" << i.key() << "\":\"" << protect(i.value()) << "\"";
-                    if (i+1 != item->metadata().constEnd()) stream << ",\n";
+                    if (std::next(i) != item->metadata().constEnd()) stream << ",\n";
                     else stream << "\n";
                 }
 
@@ -750,7 +745,7 @@ void RideCache::save(bool opendata, QString filename)
                         first=false;
                     }
 
-                    if (i+1 != item->xdata().constEnd()) stream << "],\n";
+                    if (std::next(i) != item->xdata().constEnd()) stream << "],\n";
                     else stream << "]\n";
                 }
 
@@ -996,7 +991,9 @@ APIWebService::listRides(QString athlete, HttpRequest &request, HttpResponse &re
 
             // ok, lets read it in
             QTextStream stream(&rideDB);
+#if QT_VERSION < 0x060000
             stream.setCodec("UTF-8");
+#endif
 
             // Read the entire file into a QString -- we avoid using fopen since it
             // doesn't handle foreign characters well. Instead we use QFile and parse

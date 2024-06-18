@@ -80,7 +80,11 @@ DialWindow::DialWindow(Context *context) :
     QVBoxLayout *layout = new QVBoxLayout;
     layout->setSpacing(0);
     layout->setContentsMargins(3,3,3,3);
-    valueLabel = new QLabel(this);
+    valueLabel = new ScalingLabel(this);
+    valueLabel->setStrategy(appsettings->value(this, TRAIN_TELEMETRY_FONT_SCALING, 0).toInt() == 0 ? ScalingLabelStrategy::HeightOnly : ScalingLabelStrategy::Linear);
+    QFont vlFont = valueLabel->font();
+    vlFont.setWeight(QFont::Bold);
+    valueLabel->setFont(vlFont);
     valueLabel->setAlignment(Qt::AlignCenter | Qt::AlignVCenter);
     layout->addWidget(valueLabel);
     setChartLayout(layout);
@@ -98,9 +102,6 @@ DialWindow::DialWindow(Context *context) :
 
     // setup colors
     seriesChanged();
-
-    // setup fontsize etc
-    resizeEvent(NULL);
 
     // set to zero
     resetValues();
@@ -170,7 +171,7 @@ DialWindow::telemetryUpdate(const RealtimeData &rtData)
         }
 
         // if we have a target load and erg mode then red background if not on target...
-        if (series == RealtimeData::Watts && (rtData.mode == ERG || rtData.mode == MRC) && rtData.getLoad() > 0) {
+        if (series == RealtimeData::Watts && (rtData.mode == ErgFileFormat::erg || rtData.mode == ErgFileFormat::mrc) && rtData.getLoad() > 0) {
 
             // background for power, if we have a target load
             double load=rtData.getLoad();
@@ -482,7 +483,7 @@ DialWindow::telemetryUpdate(const RealtimeData &rtData)
         break;
 
     case RealtimeData::Load:
-        if (rtData.mode == ERG || rtData.mode == MRC) {
+        if (rtData.mode == ErgFileFormat::erg || rtData.mode == ErgFileFormat::mrc) {
             value = rtData.getLoad();
             valueLabel->setText(QString("%1").arg(round(value)));
         } else {
@@ -544,21 +545,6 @@ DialWindow::telemetryUpdate(const RealtimeData &rtData)
         break;
 
     }
-}
-
-void DialWindow::resizeEvent(QResizeEvent * )
-{
-    QFont font;
-
-    // set point size within reasonable limits for low dpi screens
-    int size = (geometry().height() - 24) * 72 / logicalDpiY();
-    if (size <= 0) size = 4;
-    if (size >= 64) size = 64;
-
-    font.setPointSize(size);
-
-    font.setWeight(QFont::Bold);
-    valueLabel->setFont(font);
 }
 
 void DialWindow::seriesChanged()
@@ -724,6 +710,7 @@ void DialWindow::seriesChanged()
            break;
     }
 
+    valueLabel->setStrategy(appsettings->value(this, TRAIN_TELEMETRY_FONT_SCALING, 0).toInt() == 0 ? ScalingLabelStrategy::HeightOnly : ScalingLabelStrategy::Linear);
     // ugh. we use style sheets because palettes don't work on labels
     background = GColor(CTRAINPLOTBACKGROUND);
     setProperty("color", background);

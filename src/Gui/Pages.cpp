@@ -42,6 +42,7 @@
 #include "LocalFileStore.h"
 #include "Secrets.h"
 #include "Utils.h"
+#include "StyledItemDelegates.h"
 #ifdef GC_WANT_PYTHON
 #include "PythonEmbed.h"
 #include "FixPySettings.h"
@@ -631,7 +632,7 @@ QVariant deviceModel::data(const QModelIndex &index, int role) const
                 {
                 DeviceTypes all;
                 DeviceType lookupType = all.getType (Entry.type);
-                return lookupType.name;
+                return (const char*)(lookupType.name);
                 }
                 break;
             case 2 :
@@ -696,7 +697,7 @@ bool deviceModel::setData(const QModelIndex &index, const QVariant &value, int r
                 case 3 : // Profile
                     p.deviceProfile = value.toString();
                     break;
-                case 4 : // Profile
+                case 4 : // Virtual
                     p.postProcess = value.toInt();
                     break;
             }
@@ -753,6 +754,15 @@ TrainOptionsPage::TrainOptionsPage(QWidget *parent, Context *context) : QWidget(
     lapAlert = new QCheckBox(tr("Play sound before new lap"), this);
     lapAlert->setChecked(appsettings->value(this, TRAIN_LAPALERT, false).toBool());
 
+    coalesce = new QCheckBox(tr("Coalesce contiguous sections of same wattage"), this);
+    coalesce->setChecked(appsettings->value(this, TRAIN_COALESCE_SECTIONS, false).toBool());
+
+    telemetryScalingLabel = new QLabel(tr("Telemetry font scaling"));
+    telemetryScaling = new QComboBox();
+    telemetryScaling->addItem(tr("Fit to height only"), 0);
+    telemetryScaling->addItem(tr("Fit to height and width"), 1);
+    telemetryScaling->setCurrentIndex(appsettings->value(this, TRAIN_TELEMETRY_FONT_SCALING, 0).toInt());
+
     delayLabel = new QLabel(tr("Start Countdown"));
     startDelay = new QSpinBox(this);
     startDelay->setMaximum(600);
@@ -761,28 +771,22 @@ TrainOptionsPage::TrainOptionsPage(QWidget *parent, Context *context) : QWidget(
     startDelay->setValue(appsettings->value(this, TRAIN_STARTDELAY, 0).toUInt());
     startDelay->setToolTip(tr("Countdown for workout start"));
 
-    QVBoxLayout *all = new QVBoxLayout(this);
+    QFormLayout *all = new QFormLayout(this);
 
     QGridLayout *wdLayout = new QGridLayout;
-    wdLayout->addWidget(workoutLabel, 0,0, Qt::AlignRight);
     wdLayout->addWidget(workoutDirectory, 0,1);
     wdLayout->addWidget(workoutBrowseButton, 0,2);
-    all->addLayout(wdLayout);
 
-    all->addWidget(useSimulatedSpeed);
-    all->addWidget(useSimulatedHypoxia);
-    all->addWidget(multiCheck);
-    all->addWidget(autoConnect);
-    all->addWidget(autoHide);
-    all->addWidget(lapAlert);
-
-    QHBoxLayout *delayLayout = new QHBoxLayout;
-    delayLayout->addWidget(delayLabel);
-    delayLayout->addWidget(startDelay);
-    delayLayout->addStretch();
-    all->addLayout(delayLayout);
-
-    all->addStretch();
+    all->addRow(workoutLabel, wdLayout);
+    all->addRow("", useSimulatedSpeed);
+    all->addRow("", useSimulatedHypoxia);
+    all->addRow("", multiCheck);
+    all->addRow("", autoConnect);
+    all->addRow("", autoHide);
+    all->addRow("", lapAlert);
+    all->addRow("", coalesce);
+    all->addRow(delayLabel, startDelay);
+    all->addRow(telemetryScalingLabel, telemetryScaling);
 }
 
 
@@ -798,6 +802,8 @@ TrainOptionsPage::saveClicked()
     appsettings->setValue(TRAIN_STARTDELAY, startDelay->value());
     appsettings->setValue(TRAIN_AUTOHIDE, autoHide->isChecked());
     appsettings->setValue(TRAIN_LAPALERT, lapAlert->isChecked());
+    appsettings->setValue(TRAIN_COALESCE_SECTIONS, coalesce->isChecked());
+    appsettings->setValue(TRAIN_TELEMETRY_FONT_SCALING, telemetryScaling->currentIndex());
 
     return 0;
 }
@@ -836,7 +842,7 @@ RemotePage::RemotePage(QWidget *parent, Context *context) : QWidget(parent), con
 
     fields->setCurrentItem(fields->invisibleRootItem()->child(0));
 
-    mainLayout->addWidget(fields, 0,0);
+    mainLayout->addWidget(fields, 0, Qt::Alignment());
 
     // Load the native command list
     QList <RemoteCmd> nativeCmds = remote->getNativeCmds();
@@ -1182,6 +1188,208 @@ SimBicyclePage::saveClicked()
 }
 
 
+////////////////////////////////////////////////////
+// Workout Tag Manager page
+//
+
+WorkoutTagManagerPage::WorkoutTagManagerPage
+(TagStore *tagStore, QWidget *parent)
+: QWidget(parent), tagStore(tagStore)
+{
+    UniqueLabelEditDelegate *labelEditDelegate = new UniqueLabelEditDelegate(0, this);
+    connect(labelEditDelegate, SIGNAL(closeEditor(QWidget*, QAbstractItemDelegate::EndEditHint)), this, SLOT(editorClosed(QWidget*, QAbstractItemDelegate::EndEditHint)));
+
+    QVBoxLayout *layout = new QVBoxLayout();
+    layout->setContentsMargins(0, 0, 0, 0);
+    tw = new QTreeWidget();
+    tw->setColumnCount(4);
+#if 1
+    tw->hideColumn(2);
+    tw->hideColumn(3);
+#endif
+    tw->setRootIsDecorated(false);
+    tw->setSortingEnabled(true);
+    tw->sortByColumn(0, Qt::AscendingOrder);
+    tw->setEditTriggers(  QAbstractItemView::DoubleClicked
+                        | QAbstractItemView::EditKeyPressed
+                        | QAbstractItemView::SelectedClicked);
+    tw->setColumnWidth(0, 240 * dpiXFactor);
+    tw->setItemDelegateForColumn(0, labelEditDelegate);
+    tw->setItemDelegateForColumn(1, new NoEditDelegate(this));
+    connect(tw, SIGNAL(currentItemChanged(QTreeWidgetItem*, QTreeWidgetItem*)), this, SLOT(currentItemChanged(QTreeWidgetItem*, QTreeWidgetItem*)));
+
+    QStringList headers;
+    headers << tr("Tag")
+            << tr("Assigned to # workouts");
+    tw->setHeaderLabels(headers);
+
+    QList<QTreeWidgetItem *> items;
+    for (const auto &tag: tagStore->getTags()) {
+        QTreeWidgetItem *item = new QTreeWidgetItem();
+        item->setData(0, Qt::DisplayRole, tag.label);
+        item->setData(1, Qt::DisplayRole, tagStore->countTagUsage(tag.id));
+        item->setData(2, Qt::DisplayRole, tag.id);
+        item->setData(3, Qt::DisplayRole, false);
+        item->setFlags(item->flags() | Qt::ItemIsEditable);
+        items.append(item);
+    }
+    tw->insertTopLevelItems(0, items);
+
+    connect(tw->model(), SIGNAL(dataChanged(const QModelIndex&, const QModelIndex&, const QVector<int>&)), this, SLOT(dataChanged(const QModelIndex&, const QModelIndex&, const QVector<int>&)));
+
+
+    layout->addWidget(tw);
+
+    QHBoxLayout *buttonLayout = new QHBoxLayout();
+
+    QPushButton *addButton = new QPushButton(tr("+"),this);
+    QPushButton *delButton = new QPushButton(tr("-"),this);
+#ifdef Q_OS_MAC
+    addButton->setText(tr("Add"));
+    delButton->setText(tr("Delete"));
+#else
+    addButton->setFixedSize(20 * dpiXFactor, 20 * dpiYFactor);
+    delButton->setFixedSize(20 * dpiXFactor, 20 * dpiYFactor);
+#endif
+    connect(addButton, SIGNAL(released()), this, SLOT(addTag()));
+    connect(delButton, SIGNAL(released()), this, SLOT(deleteTag()));
+    buttonLayout->addStretch(100);
+    buttonLayout->addWidget(addButton);
+    buttonLayout->addWidget(delButton);
+    layout->addItem(buttonLayout);
+
+    setLayout(layout);
+
+    connect(dynamic_cast<QObject*>(tagStore), SIGNAL(tagsChanged(int, int, int)), this, SLOT(tagStoreChanged(int, int, int)));
+}
+
+
+WorkoutTagManagerPage::~WorkoutTagManagerPage
+()
+{
+}
+
+
+qint32
+WorkoutTagManagerPage::saveClicked
+()
+{
+    tagStore->deferTagSignals(true);
+    QList<QTreeWidgetItem*> foundItems = tw->findItems(QString::number(TAGSTORE_UNDEFINED_ID), Qt::MatchExactly, 2);
+    for (auto &item : foundItems) {
+        tagStore->addTag(item->data(0, Qt::DisplayRole).toString());
+        delete item;
+    }
+    for (auto &id : deleted) {
+        tagStore->deleteTag(id);
+    }
+    deleted.clear();
+    tagStore->deferTagSignals(false);
+    return foundItems.size() > 0 ? CONFIG_WORKOUTTAGMANAGER : 0;
+}
+
+
+void
+WorkoutTagManagerPage::currentItemChanged
+(QTreeWidgetItem *current, QTreeWidgetItem *previous)
+{
+    Q_UNUSED(previous);
+    tw->setCurrentItem(current, 0);
+}
+
+
+void
+WorkoutTagManagerPage::dataChanged
+(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles)
+{
+    Q_UNUSED(bottomRight);
+    Q_UNUSED(roles);
+    if (topLeft.column() == 3 && topLeft.data().toBool()) {
+        tagStore->updateTag(topLeft.siblingAtColumn(2).data().toInt(), topLeft.siblingAtColumn(0).data().toString());
+        tw->model()->setData(topLeft, false);
+    }
+}
+
+
+void
+WorkoutTagManagerPage::tagStoreChanged
+(int idAdded, int idRemoved, int idUpdated)
+{
+    QList<QTreeWidgetItem*> foundItems;
+
+    if (   idAdded != TAGSTORE_UNDEFINED_ID
+        && tw->findItems(QString::number(idAdded), Qt::MatchExactly, 2).size() == 0) {
+        QTreeWidgetItem *item = new QTreeWidgetItem();
+        item->setData(0, Qt::DisplayRole, tagStore->getTagLabel(idAdded));
+        item->setData(1, Qt::DisplayRole, tagStore->countTagUsage(idAdded));
+        item->setData(2, Qt::DisplayRole, idAdded);
+        item->setData(3, Qt::DisplayRole, false);
+        item->setFlags(item->flags() | Qt::ItemIsEditable);
+        tw->addTopLevelItem(item);
+    }
+    if (   idRemoved != TAGSTORE_UNDEFINED_ID
+        && (foundItems = tw->findItems(QString::number(idRemoved), Qt::MatchExactly, 2)).size() == 1) {
+        delete foundItems.takeFirst();
+    }
+    if (   idUpdated != TAGSTORE_UNDEFINED_ID
+        && (foundItems = tw->findItems(QString::number(idUpdated), Qt::MatchExactly, 2)).size() == 1) {
+        foundItems[0]->setData(0, Qt::DisplayRole, tagStore->getTagLabel(idUpdated));
+        foundItems[0]->setData(1, Qt::DisplayRole, tagStore->countTagUsage(idUpdated));
+    }
+}
+
+
+void
+WorkoutTagManagerPage::deleteTag
+()
+{
+    if (tw->currentItem() != nullptr) {
+        int id = tw->currentItem()->data(2, Qt::DisplayRole).toInt();
+        if (id != TAGSTORE_UNDEFINED_ID) {
+            deleted << id;
+        }
+        delete tw->currentItem();
+    }
+}
+
+
+void
+WorkoutTagManagerPage::addTag
+()
+{
+    QTreeWidgetItem *item = new QTreeWidgetItem();
+    item->setData(0, Qt::DisplayRole, "");
+    item->setData(1, Qt::DisplayRole, 0);
+    item->setData(2, Qt::DisplayRole, TAGSTORE_UNDEFINED_ID);
+    item->setData(3, Qt::DisplayRole, true);
+    item->setFlags(item->flags() | Qt::ItemIsEditable);
+    tw->addTopLevelItem(item);
+    tw->setCurrentItem(item);
+    tw->editItem(item, 0);
+}
+
+
+void
+WorkoutTagManagerPage::editorClosed
+(QWidget *editor, QAbstractItemDelegate::EndEditHint hint)
+{
+    Q_UNUSED(editor);
+    Q_UNUSED(hint);
+    QTimer::singleShot(0, this, SLOT(modelCleaner()));
+}
+
+
+void
+WorkoutTagManagerPage::modelCleaner
+()
+{
+    QList<QTreeWidgetItem*> foundItems = tw->findItems(QString(), Qt::MatchExactly, 0);
+    for (auto &item : foundItems) {
+        delete item;
+    }
+}
+
+
 
 //
 // Appearances page
@@ -1425,110 +1633,8 @@ ColorsPage::applyThemeIndex(int index)
 
         for (int i=0; colorSet[i].name != ""; i++) {
 
-            QColor color;
-
             // apply theme to color
-            switch(i) {
-
-            case CPLOTBACKGROUND:
-            case CRIDEPLOTBACKGROUND:
-            case CTRENDPLOTBACKGROUND:
-                color = theme.colors[0]; // background color
-                break;
-
-            case CTRAINPLOTBACKGROUND:
-                // always, and I mean always default to a black background
-                color = QColor(Qt::black);
-                break;
-
-
-            case COVERVIEWBACKGROUND:
-                // set back to light black for dark themes
-                // and gray for light themes
-                color = theme.colors[10];
-                break;
-
-            case CCARDBACKGROUND:
-                // set back to light black for dark themes
-                // and gray for light themes
-                color = theme.colors[11];
-                break;
-
-            case CCARDBACKGROUND2:
-                // set back to light black for dark themes
-                // and gray for light themes
-                color = theme.colors[12];
-                break;
-
-            case CCARDBACKGROUND3:
-                // set back to light black for dark themes
-                // and gray for light themes
-                color = theme.colors[13];
-                break;
-
-            case CCHROME:
-            case CCHARTBAR:
-            case CTOOLBAR: // we always keep them the same, but user can make different
-                //  set to black for dark themese and grey for light themes
-                color = theme.colors[1];
-                break;
-
-            case CHOVER:
-                color = theme.stealth ? theme.colors[11] : (theme.dark ? QColor(50,50,50) : QColor(200,200,200));
-                break;
-
-            case CPLOTSYMBOL:
-            case CRIDEPLOTXAXIS:
-            case CRIDEPLOTYAXIS:
-            case CPLOTMARKER:
-                color = theme.colors[2]; // accent color
-                break;
-
-            case CPLOTSELECT:
-            case CPLOTTRACKER:
-            case CINTERVALHIGHLIGHTER:
-                color = theme.colors[3]; // select color
-                break;
-
-
-            case CPLOTGRID: // grid doesn't have a theme color
-                            // we make it barely distinguishable from background
-                {
-                    QColor bg = theme.colors[0];
-                    if(bg == QColor(Qt::black)) color = QColor(30,30,30);
-                    else color = bg.darker(110);
-                }
-                break;
-
-            case CCP:
-            case CWBAL:
-            case CRIDECP:
-                color = theme.colors[4];
-                break;
-
-            case CHEARTRATE:
-                color = theme.colors[5];
-                break;
-
-            case CSPEED:
-                color = theme.colors[6];
-                break;
-
-            case CPOWER:
-                color = theme.colors[7];
-                break;
-
-            case CCADENCE:
-                color = theme.colors[8];
-                break;
-
-            case CTORQUE:
-                color = theme.colors[9];
-                break;
-
-                default:
-                    color = colorSet[i].color;
-            }
+            QColor color = GCColor::getThemeColor(theme, i);
 
             QTreeWidgetItem *add;
             ColorButton *colorButton = new ColorButton(this, colorSet[i].name, color);
@@ -1619,7 +1725,7 @@ FavouriteMetricsPage::FavouriteMetricsPage(QWidget *parent) :
     QWidget(parent), changed(false)
 {
     HelpWhatsThis *help = new HelpWhatsThis(this);
-    this->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::Preferences_Metrics_Intervals));
+    this->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::Preferences_Metrics_Favourites));
 
     availList = new QListWidget;
     availList->setSortingEnabled(true);
@@ -1825,6 +1931,9 @@ static quint16 userMetricsCRC(QList<UserMetricSettings> userMetrics)
 CustomMetricsPage::CustomMetricsPage(QWidget *parent, Context *context) :
     QWidget(parent), context(context)
 {
+    HelpWhatsThis *help = new HelpWhatsThis(this);
+    this->setWhatsThis(help->getWhatsThisText(HelpWhatsThis::Preferences_Metrics_Custom));
+
     // copy as current, so we can edit...
     metrics = _userMetrics;
     b4.crc = userMetricsCRC(metrics);
@@ -2512,7 +2621,7 @@ KeywordsPage::getDefinitions(QList<KeywordDefinition> &keywordList)
 
         add.name = item->text(0);
         add.color = ((ColorButton*)keywords->itemWidget(item, 1))->getColor();
-        add.tokens = item->text(2).split(",", QString::SkipEmptyParts);
+        add.tokens = item->text(2).split(",", Qt::SkipEmptyParts);
 
         keywordList.append(add);
     }
@@ -2739,7 +2848,7 @@ FieldsPage::getDefinitions(QList<FieldDefinition> &fieldList)
 
         add.tab = st.internalName(item->text(0));
         add.name = sp.internalName(item->text(1));
-        add.values = item->text(3).split(QRegExp("(, *|,)"), QString::KeepEmptyParts);
+        add.values = item->text(3).split(QRegularExpression("(, *|,)"), Qt::KeepEmptyParts);
         add.diary = ((QCheckBox*)fields->itemWidget(item, 4))->isChecked();
         add.interval = ((QCheckBox*)fields->itemWidget(item, 5))->isChecked();
         add.expression = item->text(6);

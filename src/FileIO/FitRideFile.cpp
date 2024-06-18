@@ -437,7 +437,7 @@ struct FitFileParser
     double last_distance;
     QMap<int, FitMessage> local_msg_types;
     QMap<QString, FitFieldDefinition>  local_deve_fields; // All developer fields
-    QMap<int, FitDeveApp> local_deve_fields_app; // All developper apps
+    QMap<QString, FitDeveApp> local_deve_fields_app; // All developper apps
     QMap<int, int> record_extra_fields;
     QMap<QString, int> record_deve_fields; // Developer fields in DEVELOPER XDATA or STANDARD DATA
     QMap<QString, int> record_deve_native_fields; // Developer fields with native values
@@ -1466,6 +1466,9 @@ struct FitFileParser
             case 85: // STEP_LENGTH
                     return "STEPLENGTH"; // Step Length
 
+            case 87: // CYCLE_LENGTH
+                return "CYCLELENGTH"; // Cycle Length (Rowing, paddle)
+
             case 90: // PERFORMANCE_CONDITION
                     return "PERFORMANCECONDITION"; // Performance Contition
 
@@ -1484,11 +1487,23 @@ struct FitFileParser
             case 133: // Pulse Ox
                 return "PULSEOX";
 
+            case 136: // Wrist HR
+                return "WRISTHR";
+
             case 137: // Potential Stamina
                 return "POTENTIALSTAMINA";
 
             case 138: // Stamina
                 return "STAMINA";
+
+            case 140: // Gap
+                return "GAP";
+
+            case 143: // Body Battery
+                return "BODYBATTERY";
+
+            case 144: // External HR
+                return "EXTERNALHR";
 
             default:
                 return QString("FIELD_%1").arg(native_num);
@@ -1499,6 +1514,7 @@ struct FitFileParser
         switch (native_num) {
 
             case 32: // VERTICAL_SPEED
+            case 140: // GAP
                     return 1000.0;
 
             case 40: // STANCE_TIME_PERCENT
@@ -1507,6 +1523,9 @@ struct FitFileParser
 
             case 85: // STEP_LENGTH
                     return 10.0;
+
+            case 87: // CYCLE_LENGTH
+                return 100.0;
 
             case 47: // COMBINED_PEDAL_SMOOTHNES
             case 81: // BATTERY_SOC
@@ -1581,8 +1600,9 @@ struct FitFileParser
             record_deve_fields.insert(key, -1);
 
         // Add field for app
-        if (local_deve_fields_app.contains(deveField.dev_id)) {
-            local_deve_fields_app[deveField.dev_id].fields.append(deveField);
+        QString appKey = QString("%1").arg(deveField.dev_id);
+        if (local_deve_fields_app.contains(appKey)) {
+            local_deve_fields_app[appKey].fields.append(deveField);
         }
     }
 
@@ -1688,7 +1708,7 @@ struct FitFileParser
                 QString const& key = sle.key();
                 // meta data is prefixed w/ '_', otherwise its a ride file tag
                 if (key.startsWith('_')) {
-                    if (0 == QString::compare(key, "_timestamp", Qt::CaseInsensitive)) {
+                    if (0 == QString::compare(key, "_stop_time", Qt::CaseInsensitive)) {
                         stop = sle->toUInt();
                     } else if (start == 0 && 0 == QString::compare(key, "_start_time", Qt::CaseInsensitive)) {
                         // only do once
@@ -1809,6 +1829,7 @@ struct FitFileParser
     // the contents into an XDATA tab
     void decodeGeneric(QString message, const FitMessage &def, int time_offset,
                        const std::vector<FitValue>& values) {
+        Q_UNUSED(time_offset);
 
         // we don't do it for all messages, it would get out of hand!
         if (!GenericDecodeList.contains(message)) return;
@@ -1931,7 +1952,7 @@ genericnext:
         // what timestamp to use for this row if XDATA ?
         if (timestamp <= 0) timestamp=0;
         QDateTime time= qbase_time.addSecs(timestamp);
-        QDateTime start= QDateTime::fromTime_t(start_time);
+        QDateTime start= QDateTime::fromSecsSinceEpoch(start_time);
         if (timestamp <= 0 || time < start) time=start;
 
         // update the xdata series with the timestamp and add for our record
@@ -2077,7 +2098,7 @@ genericnext:
 
                 // other fields are ignored at present
                 case 253: //timestamp
-                    this_timestamp = value + qbase_time.toTime_t();
+                    this_timestamp = value + qbase_time.toSecsSinceEpoch();
                     active_session_["_timestamp"] = static_cast<quint32>(this_timestamp);
                     break;
                 case 168:   /* undocumented: Firstbeat EPOC based Exercise Load */
@@ -2095,14 +2116,16 @@ genericnext:
                 case 254: //index
                 case 0:   //event
                 case 1:    /* event_type */
+                    break; // do nothing
                 case 2:    /* start_time */
-                    this_start_time = value + qbase_time.toTime_t();
+                    this_start_time = value + qbase_time.toSecsSinceEpoch();
                     active_session_["_start_time"] = static_cast<quint32>(this_start_time);
                     break;
                 case 3:    /* start_position_lat */
                 case 4:    /* start_position_long */
+                    break; // do nothing
                 case 7:    /* total elapsed time */
-                    this_elapsed_time = value + qbase_time.toTime_t();
+                    this_elapsed_time = value;
                     active_session_["_total_elapsed_time"] = static_cast<quint32>(this_elapsed_time);
                     break;
                 case 8:    /* total timer time */
@@ -2165,6 +2188,7 @@ genericnext:
             rideFile->setTag("SubSport", subsport);
         }
 
+
         // same procedure as for laps, code is c/p until a better solution is found
         if (this_timestamp == 0 && this_elapsed_time > 0) {
             this_timestamp = iniTime + this_elapsed_time - 1;
@@ -2181,6 +2205,11 @@ genericnext:
                 errors << QString("lap %1 is ignored (invalid end time)").arg(interval);
                 return;
             }
+        }
+
+        if (this_elapsed_time > 0) {
+            time_t this_stop_time = this_start_time + round(this_elapsed_time/1000.0);
+            active_session_["_stop_time"] = static_cast<quint32>(this_stop_time);
         }
 
         session_tags_.append(active_session_);
@@ -2276,7 +2305,7 @@ genericnext:
                         const std::vector<FitValue>& values) {
         int i = 0;
 
-        const int delta = qbase_time.toTime_t();
+        const int delta = qbase_time.toSecsSinceEpoch();
         int event = -1, event_type = -1, local_timestamp = -1, timestamp = -1;
 
         foreach(const FitField &field, def.fields) {
@@ -2328,6 +2357,16 @@ genericnext:
         if (0 == local_timestamp && 0 == timestamp)
             return;
 
+        // In the new file structure activity comes first,
+        // so we set start time when it is not already set.
+        if (start_time == 0) {
+            start_time = timestamp - 1; // recording interval?
+            last_reference_time = start_time;
+            QDateTime t;
+            t.setSecsSinceEpoch(start_time);
+            rideFile->setStartTime(t);
+        }
+
         QDateTime t(rideFile->startTime().toUTC());
         if (0 == local_timestamp) {
             // ZWift FIT files are not reporting local timestamp
@@ -2354,7 +2393,7 @@ genericnext:
 
             switch (field.num) {
                 case 253: // timestamp field (s)
-                    time = value + qbase_time.toTime_t();
+                    time = value + qbase_time.toSecsSinceEpoch();
                           break;
                 case 0: // event field
                     event = value; break;
@@ -2455,6 +2494,7 @@ genericnext:
                             // qDebug() << QString("Rider position event received %1 type %2 data %3").arg(event).arg(event_type).arg(data32);
                             break;
                         default:
+                            delete p;
                             errors << QString("Unknown rider position change event %1 type %2").arg(event).arg(event_type);
                             break;
                     }
@@ -2579,10 +2619,10 @@ genericnext:
 
             switch (field.num) {
                 case 253:
-                    time = value.v + qbase_time.toTime_t();
+                    time = value.v + qbase_time.toSecsSinceEpoch();
                     break;
                 case 2:
-                    this_start_time = value.v + qbase_time.toTime_t();
+                    this_start_time = value.v + qbase_time.toSecsSinceEpoch();
                     break;
                 case 9:
                     total_distance = value.v / 100000.0;
@@ -2626,6 +2666,12 @@ genericnext:
             time = iniTime + total_elapsed_time - 1;
         }
 
+        // In the new file format lap messages come first
+        // and timestamp doesn't match lap stop time anymore
+        if (time <= this_start_time) {
+            time = this_start_time + total_elapsed_time - 1;
+        }
+
         if (this_start_time == 0 || this_start_time-start_time < 0) {
             //errors << QString("lap %1 has invalid start time").arg(interval);
             this_start_time = start_time; // time was corrected after lap start
@@ -2653,7 +2699,9 @@ genericnext:
                 last_length = secs;
             }
             ++interval;
-        } else if (rideFile->dataPoints().count()) { // no samples means no laps
+        } else {
+            // Lap messages can occur before record messages,
+            // so we add them without checking for samples.
             ++interval;
             if (lap_name == "") {
                 lap_name = QObject::tr("Lap %1").arg(interval);
@@ -2754,7 +2802,7 @@ genericnext:
 
                 switch (native_num) {
                     case 253: // TIMESTAMP
-                              time = value + qbase_time.toTime_t();
+                              time = value + qbase_time.toSecsSinceEpoch();
                               // Time MUST NOT go backwards
                               // You canny break the laws of physics, Jim
                               if (time < last_time)
@@ -2947,7 +2995,8 @@ genericnext:
                     case 85: // STEP_LENGTH
                              native_num = -1;
                              break;
-                    case 87: // ???
+                    case 87: // Cycle length (16)
+                             native_num = -1;
                              break;
                     case 90: // PERFORMANCE_CONDITION
                              native_num = -1;
@@ -3090,7 +3139,7 @@ genericnext:
             start_time = time - 1; // recording interval?
             last_reference_time = start_time;
             QDateTime t;
-            t.setTime_t(start_time);
+            t.setSecsSinceEpoch(start_time);
             rideFile->setStartTime(t);
         }
 
@@ -3248,7 +3297,7 @@ genericnext:
                         if (FIT_DEBUG && FIT_DEBUG_LEVEL>2) qDebug() << " event_type:" << value;
                         break;
                 case 2: // start time
-                        time = value + qbase_time.toTime_t();
+                        time = value + qbase_time.toSecsSinceEpoch();
                         // Time MUST NOT go backwards
                         // You canny break the laws of physics, Jim
 
@@ -3303,7 +3352,7 @@ genericnext:
             start_time = time - 1; // recording interval?
             last_reference_time = start_time;
             QDateTime t;
-            t.setTime_t(start_time);
+            t.setSecsSinceEpoch(start_time);
             rideFile->setStartTime(t);
             interval = 1;
         }
@@ -3331,7 +3380,7 @@ genericnext:
 
             switch (field.num) {
                 case 253: // Timestamp
-                          time = value + qbase_time.toTime_t();
+                          time = value + qbase_time.toSecsSinceEpoch();
                           break;
                 case 8:   // Weather station name
                           // ignored
@@ -3394,7 +3443,7 @@ genericnext:
 
             switch (field.num) {
                 case 253: // Timestamp
-                          time = value.v + qbase_time.toTime_t();
+                          time = value.v + qbase_time.toSecsSinceEpoch();
                           break;
                 case 0:   // fractional_timestamp
                           break;
@@ -3539,10 +3588,10 @@ genericnext:
 
             switch (field.num) {
                 case 253: // Message timestamp
-                    time = value.v + qbase_time.toTime_t();
+                    time = value.v + qbase_time.toSecsSinceEpoch();
                     break;
                 case 2:   // start timestamp ?
-                    this_start_time = value.v + qbase_time.toTime_t();
+                    this_start_time = value.v + qbase_time.toSecsSinceEpoch();
                     break;
                 case 3:  // start latitude
                          // ignored
@@ -3774,9 +3823,16 @@ genericnext:
         if (FIT_DEBUG && FIT_DEBUG_LEVEL>2)
             qDebug() << "DEVE ID" << deve.dev_id.c_str() << "app_id" << deve.app_id.c_str() << "man_id" << deve.man_id << "dev_data_id" << deve.dev_data_id << "app_version" << deve.app_version;
 
-        if (!local_deve_fields_app.contains(deve.dev_data_id)) {
-            local_deve_fields_app.insert(deve.dev_data_id, deve);
+        QString appKey = QString("%1").arg(deve.dev_data_id);
+        if (local_deve_fields_app.contains(appKey)) {
+            FitDeveApp lastDeveApp = local_deve_fields_app[appKey];
+            if (lastDeveApp.app_id != deve.app_id) {
+                local_deve_fields_app.insert(deve.app_id.c_str(), lastDeveApp);
+            }
         }
+        local_deve_fields_app.insert(appKey, deve);
+
+
     }
 
     void decodeDeveloperFieldDescription(const FitMessage &def, int time_offset,
@@ -3850,9 +3906,9 @@ genericnext:
 
         QString key = QString("%1.%2").arg(fieldDef.dev_id).arg(fieldDef.num);
 
-        if (!local_deve_fields.contains(key)) {
-            local_deve_fields.insert((key), fieldDef);
-        }
+        // add or replace with new definition
+        local_deve_fields.insert((key), fieldDef);
+
 
         if (fieldDef.native > -1 && !record_deve_native_fields.values().contains(fieldDef.native)) {
             record_deve_native_fields.insert(key, fieldDef.native);
@@ -4805,7 +4861,7 @@ void write_file_id(QByteArray *array, const RideFile *ride) {
     write_int16(array, value, true);
 
     // 4. time_created
-    value = ride->startTime().toTime_t() - qbase_time.toTime_t();
+    value = ride->startTime().toSecsSinceEpoch() - qbase_time.toSecsSinceEpoch();
     write_int32(array, value, true);
 
     // 5. serial
@@ -4861,7 +4917,7 @@ void write_session(QByteArray *array, const RideFile *ride, QHash<QString,RideMe
     write_int8(array, record_header);
 
     // 1. timestamp (253)
-    int value = ride->startTime().toTime_t() - qbase_time.toTime_t();;
+    int value = ride->startTime().toSecsSinceEpoch() - qbase_time.toSecsSinceEpoch();;
     if (ride->dataPoints().count() > 0) {
         value += ride->dataPoints().last()->secs+ride->recIntSecs();
     }
@@ -4879,7 +4935,7 @@ void write_session(QByteArray *array, const RideFile *ride, QHash<QString,RideMe
     write_int8(array, value);
 
     // 5. start_time (4)
-    value = ride->startTime().toTime_t() - qbase_time.toTime_t();
+    value = ride->startTime().toSecsSinceEpoch() - qbase_time.toSecsSinceEpoch();
     write_int32(array, value, true);
 
     // 6. sport
@@ -4919,7 +4975,7 @@ void write_lap(QByteArray *array, const RideFile *ride) {
     write_int8(array, record_header);
 
     // 1. timestamp
-    int value = ride->startTime().toTime_t() - qbase_time.toTime_t();;
+    int value = ride->startTime().toSecsSinceEpoch() - qbase_time.toSecsSinceEpoch();;
     if (ride->dataPoints().count() > 0) {
         value += ride->dataPoints().last()->secs+ride->recIntSecs();
     }
@@ -4937,7 +4993,7 @@ void write_lap(QByteArray *array, const RideFile *ride) {
     write_int8(array, value);
 
     // 5. start_time
-    value = ride->startTime().toTime_t() - qbase_time.toTime_t();;
+    value = ride->startTime().toSecsSinceEpoch() - qbase_time.toSecsSinceEpoch();;
     write_int32(array, value, true);
 
     // 6. trigger
@@ -4962,7 +5018,7 @@ void write_start_event(QByteArray *array, const RideFile *ride) {
     write_int8(array, record_header);
 
     // 1. timestamp
-    int value = ride->startTime().toTime_t() - qbase_time.toTime_t();
+    int value = ride->startTime().toSecsSinceEpoch() - qbase_time.toSecsSinceEpoch();
     write_int32(array, value, true);
 
     // 2. event
@@ -4997,7 +5053,7 @@ void write_stop_event(QByteArray *array, const RideFile *ride) {
     write_int8(array, record_header);
 
     // 1. timestamp
-    int value = ride->startTime().toTime_t() + 2 - qbase_time.toTime_t();
+    int value = ride->startTime().toSecsSinceEpoch() + 2 - qbase_time.toSecsSinceEpoch();
     write_int32(array, value, true);
 
     // 2. event
@@ -5033,7 +5089,7 @@ void write_activity(QByteArray *array, const RideFile *ride, QHash<QString,RideM
     write_int8(array, record_header);
 
     // 1. timestamp
-    int value = ride->startTime().toTime_t() - qbase_time.toTime_t();
+    int value = ride->startTime().toSecsSinceEpoch() - qbase_time.toSecsSinceEpoch();
     if (ride->dataPoints().count() > 0) {
         value += ride->dataPoints().last()->secs+ride->recIntSecs();
     }
@@ -5138,7 +5194,7 @@ void write_record(QByteArray *array, const RideFile *ride, bool withAlt, bool wi
         QByteArray *ridePoint = new QByteArray();
         write_int8(ridePoint, record_header);
 
-        int value = point->secs + ride->startTime().toTime_t() - qbase_time.toTime_t();
+        int value = point->secs + ride->startTime().toSecsSinceEpoch() - qbase_time.toSecsSinceEpoch();
         write_int32(ridePoint, value, true);
 
         if ( ride->areDataPresent()->lat ) {

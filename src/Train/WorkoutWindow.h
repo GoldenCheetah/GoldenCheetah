@@ -68,8 +68,12 @@ class WorkoutWindow : public GcChartWindow
 
         // the ergfile we are editing
         ErgFile *ergFile;
+        ErgFileFormat format;
 
         // edit the definition
+        QLabel *codeFormat;
+        QLabel *coalescedSections;
+        QWidget *codeContainer;
         CodeEditor *code;
 
         // workout widget updates these
@@ -88,7 +92,8 @@ class WorkoutWindow : public GcChartWindow
    public slots:
 
         // toolbar functions
-        void newFile();
+        void newErgFile();
+        void newMrcFile();
         void saveFile();
         void saveAs();
         void properties();
@@ -107,7 +112,7 @@ class WorkoutWindow : public GcChartWindow
         void scrollMoved();
 
         // and erg file was selected
-        void ergFileSelected(ErgFile *);
+        void ergFileSelected(ErgFile *, ErgFileFormat format = ErgFileFormat::unknown);
 
         // qwkcode edited!
         void qwkcodeChanged();

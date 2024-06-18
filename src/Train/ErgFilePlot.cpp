@@ -21,7 +21,14 @@
 #include "Context.h"
 #include "Units.h"
 
+#include <qwt_picker_machine.h>
+
 #include <unordered_map>
+
+
+static const int sectionAlphaHovered = 128;
+static const int sectionAlphaNeutral = 255;
+
 
 // Bridge between QwtPlot and ErgFile to avoid having to
 // create a separate array for the ergfile data, we plot
@@ -66,13 +73,13 @@ QRectF ErgFileData::boundingRect() const
 }
 
 // Now bar
-double NowData::x(size_t) const { 
+double NowData::x(size_t) const {
     if (!bydist || GlobalContext::context()->useMetricUnits) return context->getNow();
     else return context->getNow() * MILES_PER_KM;
 }
 double NowData::y(size_t i) const {
     if (i) {
-        if (context->currentErgFile()) return context->currentErgFile()->maxY;
+        if (context->currentErgFile()) return context->currentErgFile()->maxY();
         else return 0;
     } else return 0;
 }
@@ -92,68 +99,70 @@ QPointF NowData::sample(size_t i) const
 
 ErgFilePlot::ErgFilePlot(Context *context) : context(context)
 {
+    workoutActive = context->isRunning;
+
     //insertLegend(new QwtLegend(), QwtPlot::BottomLegend);
     setCanvasBackground(GColor(CTRAINPLOTBACKGROUND));
     static_cast<QwtPlotCanvas*>(canvas())->setFrameStyle(QFrame::NoFrame);
     //courseData = data;                      // what we plot
     setAutoDelete(false);
-    setAxesCount(QwtAxis::yRight, 4);
+    setAxesCount(QwtAxis::YRight, 4);
 
     // Setup the left axis (Power)
-    setAxisTitle(yLeft, "Watts");
-    enableAxis(yLeft, true);
+    setAxisTitle(QwtAxis::YLeft, "Watts");
+    setAxisVisible(QwtAxis::YLeft, true);
     QwtScaleDraw *sd = new QwtScaleDraw;
     sd->setTickLength(QwtScaleDiv::MajorTick, 3);
-    setAxisMaxMinor(yLeft, 0);
-    //setAxisScaleDraw(QwtPlot::yLeft, sd);
+    setAxisMaxMinor(QwtAxis::YLeft, 0);
+    //setAxisScaleDraw(QwtAxis::YLeft, sd);
 
     QPalette pal;
     pal.setColor(QPalette::WindowText, GColor(CRIDEPLOTYAXIS));
     pal.setColor(QPalette::Text, GColor(CRIDEPLOTYAXIS));
-    axisWidget(QwtPlot::yLeft)->setPalette(pal);
+    axisWidget(QwtAxis::YLeft)->setPalette(pal);
 
     QFont stGiles;
     stGiles.fromString(appsettings->value(this, GC_FONT_CHARTLABELS, QFont().toString()).toString());
     stGiles.setPointSize(appsettings->value(NULL, GC_FONT_CHARTLABELS_SIZE, 8).toInt());
     QwtText title("Watts");
     title.setFont(stGiles);
-    QwtPlot::setAxisFont(yLeft, stGiles);
-    QwtPlot::setAxisTitle(yLeft, title);
+    QwtPlot::setAxisFont(QwtAxis::YLeft, stGiles);
+    QwtPlot::setAxisTitle(QwtAxis::YLeft, title);
 
-    enableAxis(xBottom, true);
+    setAxisVisible(QwtAxis::XBottom, true);
     distdraw = new DistScaleDraw;
     distdraw->setTickLength(QwtScaleDiv::MajorTick, 3);
     timedraw = new HourTimeScaleDraw;
     timedraw->setTickLength(QwtScaleDiv::MajorTick, 3);
-    setAxisMaxMinor(xBottom, 0);
-    setAxisScaleDraw(QwtPlot::xBottom, timedraw);
+    setAxisMaxMinor(QwtAxis::XBottom, 0);
+    setAxisScaleDraw(QwtAxis::XBottom, timedraw);
 
     // set the axis so we default to an hour workout
-    setAxisScale(xBottom, (double)0, 1000 * 60  * 60 , 15 * 60 * 1000);
+    setAxisScale(QwtAxis::XBottom, (double)0, 1000 * 60  * 60 , 15 * 60 * 1000);
 
     title.setFont(stGiles);
     title.setText("Time (mins)");
-    QwtPlot::setAxisFont(xBottom, stGiles);
-    QwtPlot::setAxisTitle(xBottom, title);
+    QwtPlot::setAxisFont(QwtAxis::XBottom, stGiles);
+    QwtPlot::setAxisTitle(QwtAxis::XBottom, title);
 
     pal.setColor(QPalette::WindowText, GColor(CRIDEPLOTXAXIS));
     pal.setColor(QPalette::Text, GColor(CRIDEPLOTXAXIS));
-    axisWidget(QwtPlot::xBottom)->setPalette(pal);
+    axisWidget(QwtAxis::XBottom)->setPalette(pal);
 
     // axis 1 not currently used
-    setAxisVisible(QwtAxisId(QwtAxis::yRight,1), false); // max speed of 60mph/60kmh seems ok to me!
-    enableAxis(QwtAxisId(QwtAxis::yRight,1).id, false);
+    setAxisVisible(QwtAxisId(QwtAxis::YRight,1), false); // max speed of 60mph/60kmh seems ok to me!
+    setAxisVisible(QwtAxisId(QwtAxis::YRight,1).id, false);
 
     // set all the orher axes off but scaled
-    setAxisScale(yLeft, 0, 300); // max cadence and hr
-    enableAxis(yLeft, true);
-    setAxisAutoScale(QwtPlot::yLeft, true);// we autoscale, since peaks are so much higher than troughs
+    setAxisScale(QwtAxis::YLeft, 0, 300); // max cadence and hr
+    setAxisVisible(QwtAxis::YLeft, true);
+    setAxisAutoScale(QwtAxis::YLeft, true);// we autoscale, since peaks are so much higher than troughs
 
-    setAxisScale(yRight, 0, 250); // max cadence and hr
-    enableAxis(yRight, false);
-    setAxisScale(QwtAxisId(QwtAxis::yRight,2), 0, 60); // max speed of 60mph/60kmh seems ok to me!
-    setAxisVisible(QwtAxisId(QwtAxis::yRight,2), false); // max speed of 60mph/60kmh seems ok to me!
-    enableAxis(QwtAxisId(QwtAxis::yRight,2).id, false);
+    setAxisScale(QwtAxis::YRight, 0, 250); // max cadence and hr
+    setAxisVisible(QwtAxis::YRight, false);
+    setAxisScale(QwtAxisId(QwtAxis::YRight,2), 0, 60); // max speed of 60mph/60kmh seems ok to me!
+    setAxisVisible(QwtAxisId(QwtAxis::YRight,2), false); // max speed of 60mph/60kmh seems ok to me!
+    setAxisVisible(QwtAxisId(QwtAxis::YRight,2).id, false);
 
     // data bridge to ergfile
     lodData = new ErgFileData(context);
@@ -161,8 +170,9 @@ ErgFilePlot::ErgFilePlot(Context *context) : context(context)
     LodCurve = new QwtPlotCurve("Course Load");
     LodCurve->setSamples(lodData);
     LodCurve->attach(this);
+    LodCurve->setVisible(workoutActive);
     LodCurve->setBaseline(-1000);
-    LodCurve->setYAxis(QwtPlot::yLeft);
+    LodCurve->setYAxis(QwtAxis::YLeft);
 
     // load curve is blue for time and grey for gradient
     QColor brush_color = QColor(GColor(CTPOWER));
@@ -173,7 +183,7 @@ ErgFilePlot::ErgFilePlot(Context *context) : context(context)
 
     wbalCurvePredict = new QwtPlotCurve("W'bal Predict");
     wbalCurvePredict->attach(this);
-    wbalCurvePredict->setYAxis(QwtAxisId(QwtAxis::yRight, 3));
+    wbalCurvePredict->setYAxis(QwtAxisId(QwtAxis::YRight, 3));
     QColor predict = GColor(CWBAL).darker();
     predict.setAlpha(200);
     QPen wbalPen = QPen(predict, 2.0); // predict darker...
@@ -182,7 +192,7 @@ ErgFilePlot::ErgFilePlot(Context *context) : context(context)
 
     wbalCurve = new QwtPlotCurve("W'bal Actual");
     wbalCurve->attach(this);
-    wbalCurve->setYAxis(QwtAxisId(QwtAxis::yRight, 3));
+    wbalCurve->setYAxis(QwtAxisId(QwtAxis::YRight, 3));
     QPen wbalPenA = QPen(GColor(CWBAL), 1.0); // actual lighter
     wbalCurve->setPen(wbalPenA);
     wbalData = new CurveData;
@@ -193,21 +203,21 @@ ErgFilePlot::ErgFilePlot(Context *context) : context(context)
     sd->enableComponent(QwtScaleDraw::Backbone, false);
     sd->setLabelRotation(90);// in the 000s
     sd->setTickLength(QwtScaleDiv::MajorTick, 3);
-    setAxisScaleDraw(QwtAxisId(QwtAxis::yRight, 3), sd);
+    setAxisScaleDraw(QwtAxisId(QwtAxis::YRight, 3), sd);
     pal.setColor(QPalette::WindowText, GColor(CWBAL));
     pal.setColor(QPalette::Text, GColor(CWBAL));
-    axisWidget(QwtAxisId(QwtAxis::yRight, 3))->setPalette(pal);
-    QwtPlot::setAxisFont(QwtAxisId(QwtAxis::yRight, 3), stGiles);
+    axisWidget(QwtAxisId(QwtAxis::YRight, 3))->setPalette(pal);
+    QwtPlot::setAxisFont(QwtAxisId(QwtAxis::YRight, 3), stGiles);
     QwtText title2("W'bal");
     title2.setFont(stGiles);
-    QwtPlot::setAxisTitle(QwtAxisId(QwtAxis::yRight,3), title2);
+    QwtPlot::setAxisTitle(QwtAxisId(QwtAxis::YRight,3), title2);
 
     // telemetry history
     wattsCurve = new QwtPlotCurve("Power");
     QPen wattspen = QPen(GColor(CPOWER));
     wattsCurve->setPen(wattspen);
     wattsCurve->attach(this);
-    wattsCurve->setYAxis(QwtPlot::yLeft);
+    wattsCurve->setYAxis(QwtAxis::YLeft);
     // dgr wattsCurve->setPaintAttribute(QwtPlotCurve::PaintFiltered);
     wattsData = new CurveData;
     wattsCurve->setSamples(wattsData->x(), wattsData->y(), wattsData->count());
@@ -217,7 +227,7 @@ ErgFilePlot::ErgFilePlot(Context *context) : context(context)
     QPen hrpen = QPen(GColor(CHEARTRATE));
     hrCurve->setPen(hrpen);
     hrCurve->attach(this);
-    hrCurve->setYAxis(QwtPlot::yRight);
+    hrCurve->setYAxis(QwtAxis::YRight);
     hrData = new CurveData;
     hrCurve->setSamples(hrData->x(), hrData->y(), hrData->count());
 
@@ -226,7 +236,7 @@ ErgFilePlot::ErgFilePlot(Context *context) : context(context)
     QPen cadpen = QPen(GColor(CCADENCE));
     cadCurve->setPen(cadpen);
     cadCurve->attach(this);
-    cadCurve->setYAxis(QwtPlot::yRight);
+    cadCurve->setYAxis(QwtAxis::YRight);
     cadData = new CurveData;
     cadCurve->setSamples(cadData->x(), cadData->y(), cadData->count());
 
@@ -235,7 +245,7 @@ ErgFilePlot::ErgFilePlot(Context *context) : context(context)
     QPen speedpen = QPen(GColor(CSPEED));
     speedCurve->setPen(speedpen);
     speedCurve->attach(this);
-    speedCurve->setYAxis(QwtAxisId(QwtAxis::yRight,2).id);
+    speedCurve->setYAxis(QwtAxisId(QwtAxis::YRight,2).id);
     speedData = new CurveData;
     speedCurve->setSamples(speedData->x(), speedData->y(), speedData->count());
 
@@ -250,10 +260,16 @@ ErgFilePlot::ErgFilePlot(Context *context) : context(context)
     CPMarker->setLinePen(GColor(CPLOTMARKER), 1, Qt::DotLine);
     CPMarker->setLabel(CPText);
     CPMarker->setLabelAlignment(Qt::AlignLeft | Qt::AlignTop);
-    CPMarker->setYAxis(QwtPlot::yLeft);
+    CPMarker->setYAxis(QwtAxis::YLeft);
     CPMarker->setYValue(274);
     CPMarker->attach(this);
 
+    // Dummy curve for ensuring headroom in Ergmode
+    powerHeadroom = new QwtPlotCurve("Dummy Headroom");
+    powerHeadroom->setYAxis(QwtAxis::YLeft);
+    powerHeadroom->setPen(QColor(0, 0, 0, 0));
+    powerHeadroom->attach(this);
+    powerHeadroom->setVisible(false);
 
     // Now pointer
     NowCurve = new QwtPlotCurve("Now");
@@ -261,18 +277,31 @@ ErgFilePlot::ErgFilePlot(Context *context) : context(context)
     NowCurve->setPen(Nowpen);
     NowCurve->setSamples(nowData);
     NowCurve->attach(this);
-    NowCurve->setYAxis(QwtPlot::yLeft);
+    NowCurve->setYAxis(QwtAxis::YLeft);
+
+    tooltip = new penTooltip(static_cast<QwtPlotCanvas*>(canvas()));
+    tooltip->setMousePattern(QwtEventPattern::MouseSelect1, Qt::LeftButton, Qt::ShiftModifier);
+
+    picker = new QwtPlotPicker(QwtAxis::XBottom, QwtAxis::YLeft, canvas());
+    picker->setTrackerMode(QwtPlotPicker::AlwaysOff);
+    picker->setStateMachine(new QwtPickerTrackerMachine());
+    connect(picker, SIGNAL(moved(const QPoint&)), this, SLOT(hover(const QPoint&)));
+    connect(context, SIGNAL(start()), this, SLOT(startWorkout()));
+    connect(context, SIGNAL(stop()), this, SLOT(stopWorkout()));
 
     bydist = false;
     ergFile = NULL;
 
+    selectTooltip();
+
     setAutoReplot(false);
-	setData(ergFile);
+    setData(ergFile);
 
     configChanged(CONFIG_ZONES);
 
     connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
 }
+
 
 void
 ErgFilePlot::configChanged(qint32)
@@ -339,7 +368,7 @@ public:
         //
         // Build mapping from lapRangeId to index of first/last lap markers in the
         // group.
-        // 
+        //
         // Map provides instant access to start and end of rangeid.
         int lapCount = laps.count();
 
@@ -417,6 +446,11 @@ void
 ErgFilePlot::setData(ErgFile *ergfile)
 {
     reset();
+    powerHeadroom->setVisible(false);
+    for (int i = 0; i < powerSectionCurves.length(); ++i) {
+        delete powerSectionCurves[i];
+    }
+    powerSectionCurves.clear();
 
     ergFile = ergfile;
     // clear the previous marks (if any)
@@ -435,7 +469,7 @@ ErgFilePlot::setData(ErgFile *ergfile)
     if (ergfile) {
 
         // is this by distance or time?
-        bydist = (ergfile->format == CRS) ? true : false;
+        bydist = (ergfile->format() == ErgFileFormat::crs) ? true : false;
         nowData->setByDist(bydist);
         lodData->setByDist(bydist);
 
@@ -454,8 +488,32 @@ ErgFilePlot::setData(ErgFile *ergfile)
             LodCurve->setBrush(linearGradient);   // fill below the line
             QPen Lodpen = QPen(Qt::gray, 1.0);
             LodCurve->setPen(Lodpen);
+            LodCurve->show();
 
         } else {
+            QList<ErgFileZoneSection> zoneSections = ergFile->ZoneSections();
+            bool antiAlias = appsettings->value(this, GC_ANTIALIAS, false).toBool();
+            for (int i = 0; i < zoneSections.length(); ++i) {
+                QVector<QPointF> sectionData;
+                sectionData << QPointF(zoneSections[i].start, zoneSections[i].startValue)
+                            << QPointF(zoneSections[i].end, zoneSections[i].endValue);
+                QColor color = QColor(zoneColor(zoneSections[i].zone, 0));
+                color.setAlpha(sectionAlphaNeutral);
+                QwtPlotCurve *sectionCurve = new QwtPlotCurve("Course Load");
+                sectionCurve->setSamples(sectionData);
+                sectionCurve->setBaseline(-1000);
+                sectionCurve->setYAxis(QwtAxis::YLeft);
+                sectionCurve->setZ(-100);
+                sectionCurve->setPen(QColor(0, 0, 0, 0));
+                sectionCurve->setBrush(color);
+                sectionCurve->setRenderHint(QwtPlotItem::RenderAntialiased, antiAlias);
+                sectionCurve->attach(this);
+                sectionCurve->hide();
+                powerSectionCurves.append(sectionCurve);
+            }
+            selectCurves();
+            powerHeadroom->setVisible(true);
+            powerHeadroom->setSamples(QVector<QPointF> { dynamic_cast<QwtPointArrayData<double>*>(lodData)->boundingRect().bottomLeft() });
 
             QColor brush_color1 = QColor(GColor(CTPOWER));
             brush_color1.setAlpha(200);
@@ -470,8 +528,8 @@ ErgFilePlot::setData(ErgFile *ergfile)
             LodCurve->setBrush(linearGradient);   // fill below the line
             QPen Lodpen = QPen(GColor(CTPOWER), 1.0);
             LodCurve->setPen(Lodpen);
-
         }
+        selectTooltip();
 
         LapRowDistributor lapRowDistributor(ergFile->Laps);
 
@@ -512,7 +570,7 @@ ErgFilePlot::setData(ErgFile *ergfile)
             // Literal row translation. We loves ascii art...
             QString prefix = (row > 0) ? QString("\n").repeated(row) : "";
             QwtText text(prefix + decoratedName);
-                
+
             text.setFont(QFont("Helvetica", 10, QFont::Bold));
             text.setColor(GColor(CPLOTMARKER));
 
@@ -524,7 +582,7 @@ ErgFilePlot::setData(ErgFile *ergfile)
             // convert to imperial according to settings
             double unitsFactor = (!bydist || GlobalContext::context()->useMetricUnits) ? 1.0 : MILES_PER_KM;
             add->setValue(lap.x * unitsFactor, 0);
-            
+
             add->setLabel(text);
             add->attach(this);
 
@@ -543,47 +601,47 @@ ErgFilePlot::setData(ErgFile *ergfile)
                 else if (maxX < 5000) step = 1000;
 
                 // axis setup for distance
-                setAxisScale(xBottom, (double)0, maxX, step);
+                setAxisScale(QwtAxis::XBottom, (double)0, maxX, step);
                 QwtText title;
                 title.setFont(stGiles);
                 title.setText("Distance " + ((GlobalContext::context()->useMetricUnits) ? tr("(km)") : tr("(mi)")));
-                QwtPlot::setAxisFont(xBottom, stGiles);
-                QwtPlot::setAxisTitle(xBottom, title);
+                QwtPlot::setAxisFont(QwtAxis::XBottom, stGiles);
+                QwtPlot::setAxisTitle(QwtAxis::XBottom, title);
 
                 pal.setColor(QPalette::WindowText, Qt::gray);
                 pal.setColor(QPalette::Text, Qt::gray);
-                axisWidget(QwtPlot::xBottom)->setPalette(pal);
+                axisWidget(QwtAxis::XBottom)->setPalette(pal);
 
                 // only allocate a new one if its not the current (they get freed by Qwt)
-                if (axisScaleDraw(xBottom) != distdraw)
-                    setAxisScaleDraw(QwtPlot::xBottom, (distdraw=new DistScaleDraw()));
+                if (axisScaleDraw(QwtAxis::XBottom) != distdraw)
+                    setAxisScaleDraw(QwtAxis::XBottom, (distdraw=new DistScaleDraw()));
 
             } else {
 
                 // tics every 15 minutes, if workout shorter tics every minute
-                setAxisScale(xBottom, (double)0, maxX, maxX > (15*60*1000) ? 15*60*1000 : 60*1000);
+                setAxisScale(QwtAxis::XBottom, (double)0, maxX, maxX > (15*60*1000) ? 15*60*1000 : 60*1000);
                 QwtText title;
                 title.setFont(stGiles);
                 title.setText("Time (mins)");
-                QwtPlot::setAxisFont(xBottom, stGiles);
-                QwtPlot::setAxisTitle(xBottom, title);
+                QwtPlot::setAxisFont(QwtAxis::XBottom, stGiles);
+                QwtPlot::setAxisTitle(QwtAxis::XBottom, title);
 
                 pal.setColor(QPalette::WindowText, GColor(CRIDEPLOTXAXIS));
                 pal.setColor(QPalette::Text, GColor(CRIDEPLOTXAXIS));
-                axisWidget(QwtPlot::xBottom)->setPalette(pal);
+                axisWidget(QwtAxis::XBottom)->setPalette(pal);
 
                 // only allocate a new one if its not the current (they get freed by Qwt)
-                if (axisScaleDraw(xBottom) != timedraw)
-                    setAxisScaleDraw(QwtPlot::xBottom, (timedraw=new HourTimeScaleDraw()));
+                if (axisScaleDraw(QwtAxis::XBottom) != timedraw)
+                    setAxisScaleDraw(QwtAxis::XBottom, (timedraw=new HourTimeScaleDraw()));
             }
         }
 
         // compute wbal curve for the erg file
         calculator.setErg(ergfile);
 
-        setAxisTitle(QwtAxisId(QwtAxis::yRight, 3), tr("W' Balance (j)"));
-        setAxisScale(QwtAxisId(QwtAxis::yRight, 3),qMin(double(calculator.minY-1000),double(0)),calculator.maxY+1000);
-        setAxisLabelAlignment(QwtAxisId(QwtAxis::yRight, 3),Qt::AlignVCenter);
+        setAxisTitle(QwtAxisId(QwtAxis::YRight, 3), tr("W' Balance (j)"));
+        setAxisScale(QwtAxisId(QwtAxis::YRight, 3),qMin(double(calculator.minY-1000),double(0)),calculator.maxY+1000);
+        setAxisLabelAlignment(QwtAxisId(QwtAxis::YRight, 3),Qt::AlignVCenter);
 
         // and the values ... but avoid sharing!
         wbalCurvePredict->setSamples(calculator.xdata(false), calculator.ydata());
@@ -596,22 +654,21 @@ ErgFilePlot::setData(ErgFile *ergfile)
         QwtText title;
         title.setFont(stGiles);
         title.setText("Time (mins)");
-        QwtPlot::setAxisFont(xBottom, stGiles);
-        QwtPlot::setAxisTitle(xBottom, title);
+        QwtPlot::setAxisFont(QwtAxis::XBottom, stGiles);
+        QwtPlot::setAxisTitle(QwtAxis::XBottom, title);
 
         pal.setColor(QPalette::WindowText, GColor(CRIDEPLOTXAXIS));
         pal.setColor(QPalette::Text, GColor(CRIDEPLOTXAXIS));
-        axisWidget(QwtPlot::xBottom)->setPalette(pal);
+        axisWidget(QwtAxis::XBottom)->setPalette(pal);
 
         // set the axis so we default to an hour workout
-        if (axisScaleDraw(xBottom) != timedraw)
-            setAxisScaleDraw(QwtPlot::xBottom, (timedraw=new HourTimeScaleDraw()));
-        setAxisScale(xBottom, (double)0, 1000 * 60 * 60, 15*60*1000);
+        if (axisScaleDraw(QwtAxis::XBottom) != timedraw)
+            setAxisScaleDraw(QwtAxis::XBottom, (timedraw=new HourTimeScaleDraw()));
+        setAxisScale(QwtAxis::XBottom, (double)0, 1000 * 60 * 60, 15*60*1000);
     }
 
-    // make the xBottom scale visible
-    enableAxis(xBottom, true);
-    setAxisVisible(xBottom, true);
+    // make the XBottom scale visible
+    setAxisVisible(QwtAxis::XBottom, true);
 }
 
 void
@@ -619,6 +676,53 @@ ErgFilePlot::setNow(long /*msecs*/)
 {
     replot(); // and update
 }
+
+
+bool
+ErgFilePlot::eventFilter
+(QObject *obj, QEvent *event)
+{
+    if (obj == canvas() && event->type() == QEvent::Leave) {
+        highlightSectionCurve(nullptr);
+        tooltip->setText("");
+    }
+    return false;
+}
+
+
+int
+ErgFilePlot::showColorZones
+() const
+{
+    return _showColorZones;
+}
+
+
+void
+ErgFilePlot::setShowColorZones
+(int index)
+{
+    _showColorZones = index;
+    selectCurves();
+}
+
+
+int
+ErgFilePlot::showTooltip
+() const
+{
+    return _showTooltip;
+}
+
+
+void
+ErgFilePlot::setShowTooltip
+(int index)
+{
+    _showTooltip = index;
+    selectTooltip();
+}
+
 
 void
 ErgFilePlot::performancePlot(RealtimeData rtdata)
@@ -632,9 +736,9 @@ ErgFilePlot::performancePlot(RealtimeData rtdata)
     // when not using a workout we need to extend the axis when we
     // go out of bounds -- we do not use autoscale for x, because we
     // want to control stepping and tick marking add another 30 mins
-    if (!ergFile && axisScaleDiv(QwtPlot::xBottom).upperBound() <= x) {
+    if (!ergFile && axisScaleDiv(QwtAxis::XBottom).upperBound() <= x) {
         double maxX = x + ( 30 * 60 * 1000);
-        setAxisScale(xBottom, (double)0, maxX, maxX > (15*60*1000) ? 15*60*1000 : 60*1000);
+        setAxisScale(QwtAxis::XBottom, (double)0, maxX, maxX > (15*60*1000) ? 15*60*1000 : 60*1000);
     }
 
     double watts = rtdata.getWatts();
@@ -714,6 +818,221 @@ ErgFilePlot::reset()
     speedData->clear();
     speedCurve->setSamples(speedData->x(), speedData->y(), speedData->count());
 }
+
+
+void
+ErgFilePlot::hover
+(const QPoint &point)
+{
+    if (   bydist
+        || _showTooltip == 0
+        || (   _showTooltip == 1
+            && workoutActive)
+        || ergFile == nullptr
+        || ergFile->duration() == 0) {
+        tooltip->setText("");
+        return;
+    }
+    double xvalue = invTransform(QwtAxis::XBottom, point.x());
+    double yvalue = invTransform(QwtAxis::YLeft, point.y());
+    const int fullSecs = std::min(std::max(0, int(xvalue)), int(ergFile->duration()) - 1000) / 1000;
+    int duration = 0;
+    int startPower = 0;
+    int endPower = 0;
+    QwtPlotCurve *hoverCurve = nullptr;
+    for (QwtPlotCurve*& curve : powerSectionCurves) {
+        if (curve->minXValue() <= xvalue && xvalue <= curve->maxXValue()) {
+            duration = (curve->maxXValue() - curve->minXValue()) / 1000;
+            startPower = curve->sample(0).y();
+            endPower = curve->sample(1).y();
+            hoverCurve = curve;
+            break;
+        }
+    }
+    int watts = startPower;
+    if (hoverCurve != nullptr && startPower != endPower) {
+        QPointF pl = hoverCurve->sample(0);
+        QPointF pr = hoverCurve->sample(1);
+        watts = (pr.y() - pl.y()) / (pr.x() - pl.x()) * (xvalue - pl.x()) + pl.y();
+    }
+    if (watts == 0 || yvalue > watts) {
+        highlightSectionCurve(nullptr);
+        tooltip->setText("");
+        return;
+    }
+    if (hoverCurve->brush().color().alpha() != sectionAlphaNeutral) {
+        return;
+    }
+
+    double sectionStart = hoverCurve->sample(0).x();
+    double sectionEnd = hoverCurve->sample(1).x();
+
+    highlightSectionCurve(hoverCurve);
+    QString tooltipText;
+    tooltipText = QString("%1\n%4: ")
+                         .arg(tr("Section of %1 starts at %2")
+                                .arg(secsToString(duration))
+                                .arg(secsToString(sectionStart / 1000)))
+                         .arg(tr("Power"));
+    if (startPower == endPower) {
+        tooltipText = QString("%1%2 %3")
+                             .arg(tooltipText)
+                             .arg(startPower)
+                             .arg(tr("watts"));
+    } else {
+        tooltipText = QString("%1%2..%3 %4")
+                             .arg(tooltipText)
+                             .arg(startPower)
+                             .arg(endPower)
+                             .arg(tr("watts"));
+    }
+    const Zones *zones = context->athlete->zones("Bike");
+    int zoneRange = zones->whichRange(QDate::currentDate());
+    if (zoneRange >= 0) {
+        tooltipText = QString("%1 (%2)")
+                             .arg(tooltipText)
+                             .arg(zones->getZoneNames(zoneRange)[zones->whichZone(zoneRange, startPower)]);
+    }
+    if (wbalCurvePredict != nullptr && wbalCurvePredict->dataSize() >= fullSecs) {
+        int secsStart = std::min(int(sectionStart / 1000), int(wbalCurvePredict->dataSize() - 1));
+        int secsEnd = std::min(int(sectionEnd / 1000), int(wbalCurvePredict->dataSize() - 1));
+        double wbalIn = wbalCurvePredict->sample(secsStart).y();
+        double wbalOut = wbalCurvePredict->sample(secsEnd).y();
+        if (int(wbalIn / 100) == int(wbalOut / 100)) {
+            tooltipText = QString("%1\n%2: %3 %4")
+                                 .arg(tooltipText)
+                                 .arg(tr("W' Balance"))
+                                 .arg(wbalIn / 1000.0 , 0, 'f', 1)
+                                 .arg(tr("kJ"));
+        } else {
+            tooltipText = QString("%1\n%2: %3..%4 (%5) %6")
+                                 .arg(tooltipText)
+                                 .arg(tr("W' Balance"))
+                                 .arg(wbalIn / 1000.0 , 0, 'f', 1)
+                                 .arg(wbalOut / 1000.0 , 0, 'f', 1)
+                                 .arg((wbalOut - wbalIn) / 1000.0 , 0, 'f', 1)
+                                 .arg(tr("kJ"));
+        }
+    }
+    tooltip->setText(tooltipText);
+}
+
+
+void
+ErgFilePlot::startWorkout
+()
+{
+    workoutActive = true;
+    selectTooltip();
+    selectCurves();
+}
+
+
+void
+ErgFilePlot::stopWorkout
+()
+{
+    workoutActive = false;
+    selectCurves();
+    selectTooltip();
+}
+
+
+void
+ErgFilePlot::selectCurves
+()
+{
+    bool showColored =    ergFile
+                       && ! bydist
+                       && (   _showColorZones == 1
+                           || (_showColorZones == 2 && ! workoutActive));
+    if (showColored) {
+        LodCurve->hide();
+        for (int i = 0; i < powerSectionCurves.size(); ++i) {
+            powerSectionCurves[i]->show();
+        }
+    } else {
+        LodCurve->show();
+        for (int i = 0; i < powerSectionCurves.size(); ++i) {
+            powerSectionCurves[i]->hide();
+        }
+    }
+    replot();
+}
+
+
+void
+ErgFilePlot::selectTooltip
+()
+{
+    if (   ergFile
+        && ! bydist
+        && (_showTooltip == 1 && ! workoutActive)) {
+        installEventFilter(canvas());
+        picker->setEnabled(true);
+    } else {
+        removeEventFilter(canvas());
+        picker->setEnabled(false);
+    }
+}
+
+
+QString
+ErgFilePlot::secsToString
+(int fullSecs) const
+{
+    int secs = fullSecs % 60;
+    int mins = (fullSecs / 60) % 60;
+    int hours = fullSecs / 3600;
+    QString time;
+    if (hours > 0) {
+        if (secs > 0) {
+            time = QString("%1h %2m %3s").arg(hours).arg(mins).arg(secs);
+        } else {
+            time = QString("%1h %2m").arg(hours).arg(mins);
+        }
+    } else if (mins > 0) {
+        if (secs > 0) {
+            time = QString("%1m %2s").arg(mins).arg(secs);
+        } else {
+            time = QString("%2m").arg(mins);
+        }
+    } else {
+        time = QString("%1s").arg(secs);
+    }
+    return time;
+}
+
+
+void
+ErgFilePlot::highlightSectionCurve
+(QwtPlotCurve const * const highlightedCurve)
+{
+    bool needsReplot = false;
+    for (QwtPlotCurve*& curve : powerSectionCurves) {
+        QBrush brush = curve->brush();
+        QColor color = brush.color();
+        if (curve != highlightedCurve) {
+            if (color.alpha() != sectionAlphaNeutral) {
+                color.setAlpha(sectionAlphaNeutral);
+                brush.setColor(color);
+                curve->setBrush(brush);
+                needsReplot = true;
+            }
+        } else {
+            if (color.alpha() == sectionAlphaNeutral) {
+                color.setAlpha(sectionAlphaHovered);
+                brush.setColor(color);
+                curve->setBrush(brush);
+                needsReplot = true;
+            }
+        }
+    }
+    if (needsReplot) {
+        replot();
+    }
+}
+
 
 // curve data.. code snaffled in from the Qwt example (realtime_plot)
 CurveData::CurveData(): d_count(0) { }

@@ -42,9 +42,13 @@ Measure::getFingerprint() const
     for (int i = 0; i<MAX_MEASURES; i++) x += 1000.0 * values[i];
 
     QByteArray ba = QByteArray::number(x);
-    ba.append(comment);
+    ba.append(comment.toUtf8());
 
+#if QT_VERSION < 0x060000
     return qChecksum(ba, ba.length());
+#else
+    return qChecksum(ba);
+#endif
 }
 
 QString
@@ -56,8 +60,6 @@ Measure::getSourceDescription() const
         return tr("Manual entry");
     case Measure::Withings:
         return tr("Withings");
-    case Measure::TodaysPlan:
-        return tr("Today's Plan");
     case Measure::CSV:
         return tr("CSV Upload");
     default:
@@ -164,7 +166,9 @@ MeasuresGroup::serialize(QString filename, QList<Measure> &data)
     };
     file.resize(0);
     QTextStream out(&file);
+#if QT_VERSION < 0x060000
     out.setCodec("UTF-8");
+#endif
 
     Measure *m = NULL;
     QJsonArray measures;
@@ -355,7 +359,10 @@ Measures::Measures(QDir dir, bool withData) : dir(dir), withData(withData)
     }
 
     QSettings config(filename, QSettings::IniFormat);
+
+#if QT_VERSION < 0x060000
     config.setIniCodec("UTF-8"); // to allow translated names
+#endif
 
     foreach (QString group, config.value("Measures", "").toStringList()) {
 
@@ -423,7 +430,11 @@ Measures::saveConfig()
     // save measures configuration to measures.ini
     QString filename = QDir(gcroot).canonicalPath() + "/measures.ini";
     QSettings config(filename, QSettings::IniFormat);
+
+#if QT_VERSION < 0x060000
     config.setIniCodec("UTF-8"); // to allow translated names
+#endif
+
     config.clear();
 
     config.setValue("Measures", getGroupSymbols());

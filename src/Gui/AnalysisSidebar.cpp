@@ -106,7 +106,7 @@ AnalysisSidebar::AnalysisSidebar(Context *context) : QWidget(context->mainWindow
 
     // create tree for user intervals, so its always at the top
     QTreeWidgetItem *tree = new QTreeWidgetItem(intervalTree->invisibleRootItem(), RideFileInterval::USER);
-    tree->setData(0, Qt::UserRole, qVariantFromValue((void *)NULL)); // no intervalitem related
+    tree->setData(0, Qt::UserRole, QVariant::fromValue((void *)NULL)); // no intervalitem related
     tree->setText(0, RideFileInterval::typeDescription(RideFileInterval::USER));
     tree->setForeground(0, GColor(CPLOTMARKER));
     QFont bold;
@@ -243,7 +243,7 @@ AnalysisSidebar::setRide(RideItem*ride)
             QTreeWidgetItem *tree = trees.value(interval->type, NULL);
             if (tree == NULL) {
                 tree = new QTreeWidgetItem(intervalTree->invisibleRootItem(), interval->type);
-                tree->setData(0, Qt::UserRole, qVariantFromValue((void *)NULL)); // no intervalitem related
+                tree->setData(0, Qt::UserRole, QVariant::fromValue((void *)NULL)); // no intervalitem related
                 tree->setText(0, RideFileInterval::typeDescription(interval->type));
                 tree->setForeground(0, GColor(CPLOTMARKER));
                 tree->setFont(0, bold);
@@ -257,7 +257,7 @@ AnalysisSidebar::setRide(RideItem*ride)
             // add this interval to the tree
             QTreeWidgetItem *add = new QTreeWidgetItem(tree, interval->type);
             add->setText(0, interval->name);
-            add->setData(0, Qt::UserRole, qVariantFromValue((void*)interval));
+            add->setData(0, Qt::UserRole, QVariant::fromValue((void*)interval));
             add->setData(0, Qt::UserRole+1, QVariant(interval->color));
             add->setData(0, Qt::UserRole+2, QVariant(interval->test));
             add->setFlags(Qt::ItemIsEnabled
@@ -424,14 +424,14 @@ AnalysisSidebar::showActivityMenu(const QPoint &pos)
 
         } else {
 
-            QMenu *groupByMenu = new QMenu(tr("Group By"), rideNavigator);
+            QMenu *groupByMenu = new QMenu(tr("Group By"), menu.window());
             groupByMenu->setEnabled(true);
             menu.addMenu(groupByMenu);
 
             // add menu options for each column
             if (groupByMapper) delete groupByMapper;
             groupByMapper = new QSignalMapper(this);
-            connect(groupByMapper, SIGNAL(mapped(const QString &)), rideNavigator, SLOT(setGroupByColumnName(QString)));
+            connect(groupByMapper, &QSignalMapper::mappedString, rideNavigator, &RideNavigator::setGroupByColumnName);
 
             foreach(QString heading, rideNavigator->columnNames()) {
                 if (heading == "*") continue; // special hidden column

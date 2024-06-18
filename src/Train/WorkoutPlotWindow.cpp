@@ -21,14 +21,45 @@
 #include "Context.h"
 #include "HelpWhatsThis.h"
 
+#include <QFormLayout>
+#include <QGroupBox>
+
+
 WorkoutPlotWindow::WorkoutPlotWindow(Context *context) :
     GcChartWindow(context), context(context)
 {
     HelpWhatsThis *helpContents = new HelpWhatsThis(this);
     this->setWhatsThis(helpContents->getWhatsThisText(HelpWhatsThis::ChartTrain_Workout));
 
+    // Chart settings
+    QWidget *settingsWidget = new QWidget(this);
+    settingsWidget->setContentsMargins(0, 0, 0, 0);
+
+    QVBoxLayout *commonLayout = new QVBoxLayout(settingsWidget);
+
+    ctrlsGroupBox = new QGroupBox(tr("Ergmode specific settings"));
+    commonLayout->addWidget(ctrlsGroupBox);
+    commonLayout->addStretch();
+
+    QFormLayout *ergmodeLayout = new QFormLayout(ctrlsGroupBox);
+
+    ctrlsSituationLabel = new QLabel(tr("Color power zones"));
+    ctrlsSituation = new QComboBox();
+    ctrlsSituation->addItem(tr("Never"));
+    ctrlsSituation->addItem(tr("Always"));
+    ctrlsSituation->addItem(tr("When stopped"));
+    connect(ctrlsSituation, SIGNAL(currentIndexChanged(int)), this, SLOT(setShowColorZones(int)));
+    ergmodeLayout->addRow(ctrlsSituationLabel, ctrlsSituation);
+
+    ctrlsShowTooltipLabel = new QLabel(tr("Show tooltip"));
+    ctrlsShowTooltip = new QComboBox();
+    ctrlsShowTooltip->addItem(tr("Never"));
+    ctrlsShowTooltip->addItem(tr("When stopped"));
+    connect(ctrlsShowTooltip, SIGNAL(currentIndexChanged(int)), this, SLOT(setShowTooltip(int)));
+    ergmodeLayout->addRow(ctrlsShowTooltipLabel, ctrlsShowTooltip);
+
     setContentsMargins(0,0,0,0);
-    setControls(NULL);
+    setControls(settingsWidget);
     setProperty("color", GColor(CTRAINPLOTBACKGROUND));
 
     QVBoxLayout *layout = new QVBoxLayout;
@@ -52,7 +83,7 @@ void
 WorkoutPlotWindow::ergFileSelected(ErgFile *f)
 {
     // rename window to workout name
-    if (f && f->Name != "") setProperty("subtitle", f->Name);
+    if (f && f->name() != "") setProperty("subtitle", f->name());
     else setProperty("subtitle", "");
 
     ergPlot->setData(f);
@@ -69,5 +100,50 @@ void
 WorkoutPlotWindow::configChanged(qint32)
 {
     setProperty("color", GColor(CTRAINPLOTBACKGROUND));
+
+    ctrlsGroupBox->setTitle(tr("Ergmode specific settings"));
+    ctrlsSituationLabel->setText(tr("Color power zones"));
+    ctrlsSituation->setItemText(0, tr("Never"));
+    ctrlsSituation->setItemText(1, tr("Always"));
+    ctrlsSituation->setItemText(2, tr("When stopped"));
+
+    ctrlsShowTooltipLabel->setText(tr("Show tooltip"));
+    ctrlsShowTooltip->setItemText(0, tr("Never"));
+    ctrlsShowTooltip->setItemText(1, tr("When stopped"));
+
     repaint();
+}
+
+
+int
+WorkoutPlotWindow::showColorZones
+() const
+{
+    return ctrlsSituation->currentIndex();
+}
+
+
+void
+WorkoutPlotWindow::setShowColorZones
+(int index)
+{
+    ctrlsSituation->setCurrentIndex(index);
+    ergPlot->setShowColorZones(index);
+}
+
+
+int
+WorkoutPlotWindow::showTooltip
+() const
+{
+    return ctrlsShowTooltip->currentIndex();
+}
+
+
+void
+WorkoutPlotWindow::setShowTooltip
+(int index)
+{
+    ctrlsShowTooltip->setCurrentIndex(index);
+    ergPlot->setShowTooltip(index);
 }

@@ -108,8 +108,7 @@ LiveMapWebPageWindow::LiveMapWebPageWindow(Context *context) : GcChartWindow(con
     webPage = view->page();
     view->setPage(webPage);
 
-    view->setContentsMargins(0,0,0,0);
-    view->page()->view()->setContentsMargins(0,10,0,0);
+    view->setContentsMargins(0,10,0,0);
     view->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     view->setAcceptDrops(false);
     layout->addWidget(view);
@@ -136,7 +135,7 @@ LiveMapWebPageWindow::~LiveMapWebPageWindow()
 void LiveMapWebPageWindow::ergFileSelected(ErgFile* f)
 {
     // rename window to workout name and draw route if data exists
-    if (f && f->filename != "" )
+    if (f && f->filename() != "" )
     {
         setIsBlank(false);
         // these values need extended precision or place marker jumps around.

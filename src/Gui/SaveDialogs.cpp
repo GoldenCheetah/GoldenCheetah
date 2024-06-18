@@ -105,7 +105,9 @@ MainWindow::saveRideExitDialog(Context *context)
     // we have some files to save...
     if (dirtyList.count() > 0) {
         SaveOnExitDialogWidget dialog(this, context, dirtyList);
+        QGuiApplication::setOverrideCursor(Qt::ArrowCursor);
         int result = dialog.exec();
+        QGuiApplication::restoreOverrideCursor();
         if (result == QDialog::Rejected) return false; // cancel that closeEvent!
     }
 
@@ -119,6 +121,7 @@ MainWindow::saveRideExitDialog(Context *context)
 void
 MainWindow::saveSilent(Context *context, RideItem *rideItem)
 {
+    QGuiApplication::setOverrideCursor(Qt::WaitCursor);
     QFile   currentFile(rideItem->path + QDir::separator() + rideItem->fileName);
     QFileInfo currentFI(currentFile);
     QString currentType =  currentFI.completeSuffix().toUpper();
@@ -201,6 +204,7 @@ MainWindow::saveSilent(Context *context, RideItem *rideItem)
 
     // model estimates (lazy refresh)
     context->athlete->rideCache->estimator->refresh();
+    QGuiApplication::restoreOverrideCursor();
 }
 
 
@@ -217,8 +221,7 @@ MainWindow::saveAllFilesSilent(Context *context)
     // we have some files to save...
     if (dirtyList.count() > 0) {
         for (int i=0; i<dirtyList.count(); i++) {
-                this->saveRideSingleDialog(context, dirtyList.at(i));
-
+            this->saveRideSingleDialog(context, dirtyList.at(i));
         }
     }
 }
@@ -291,7 +294,7 @@ SaveSingleDialogWidget::warnSettingClicked()
 SaveOnExitDialogWidget::SaveOnExitDialogWidget(MainWindow *mainWindow, Context *context, QList<RideItem *>dirtyList) :
     QDialog(mainWindow, Qt::Dialog), mainWindow(mainWindow), context(context), dirtyList(dirtyList)
 {
-    setWindowTitle("Save Changes");
+    setWindowTitle(tr("Save Changes"));
     setWindowFlags(windowFlags() | Qt::WindowStaysOnTopHint);
     QVBoxLayout *mainLayout = new QVBoxLayout(this);
 

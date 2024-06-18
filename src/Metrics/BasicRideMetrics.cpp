@@ -1055,6 +1055,7 @@ class AvgSpeed : public RideMetric {
             }
 
             setValue(secsMoving ? km / secsMoving * 3600.0 : 0.0);
+            setCount(secsMoving);
 
         } else {
 
@@ -1062,6 +1063,7 @@ class AvgSpeed : public RideMetric {
             assert(deps.contains("workout_time"));
             secsMoving = deps.value("workout_time")->value(true);
             setValue(secsMoving ? km / secsMoving * 3600.0 : 0.0);
+            setCount(secsMoving);
 
         }
     }

@@ -827,7 +827,7 @@ public:
         if (item->getHrvMeasure("RECOVERY_POINTS") > 0)
             setValue(item->getHrvMeasure("RECOVERY_POINTS"));
         else if (item->getHrvMeasure("RMSSD") > 0)
-            setValue(1.5 * log(item->getHrvMeasure("RMSSD")) + 2);
+            setValue(2 * log(item->getHrvMeasure("RMSSD")));
         else
             setValue(0.0);
         setCount(0);

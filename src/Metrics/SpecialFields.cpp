@@ -25,19 +25,33 @@
 SpecialFields::SpecialFields()
 {
     namesmap.insert("Start Date", tr("Start Date"));                 // linked to RideFile::starttime
+    specialset.insert("Start Date");
     namesmap.insert("Start Time", tr("Start Time"));                 // linked to RideFile::starttime
+    specialset.insert("Start Time");
     namesmap.insert("Identifier", tr("Identifier"));                 // linked to RideFile::id
+    specialset.insert("Identifier");
     namesmap.insert("Recording Interval", tr("Recording Interval")); // linked to RideFile::recIntSecs
+    specialset.insert("Recording Interval");
     namesmap.insert("Change History", tr("Change History"));         // set by RideFileCommand
+    specialset.insert("Change History");
     namesmap.insert("Calendar Text", "Calendar Text");               // set by openRideFile and rideMetadata DO NOT TRANSLATE
+    specialset.insert("Calendar Text");
     namesmap.insert("Source Filename", tr("Source Filename"));       // set by openRideFile
+    specialset.insert("Source Filename");
     namesmap.insert("Athlete", tr("Athlete"));                       // athlete name
+    specialset.insert("Athlete");
     namesmap.insert("Data", tr("Data"));                             // data present
+    specialset.insert("Data");
     namesmap.insert("File Format", tr("File Format"));               // file format
+    specialset.insert("File Format");
     namesmap.insert("Filename", tr("Filename"));                     // filename
+    specialset.insert("Filename");
     namesmap.insert("Month", tr("Month"));                           // month name
+    specialset.insert("Month");
     namesmap.insert("Weekday", tr("Weekday"));                       // weekday name
+    specialset.insert("Weekday");
     namesmap.insert("Year", tr("Year"));                             // year
+    specialset.insert("Year");
 
     namesmap.insert("Route", tr("Route"));                           // GPS map Route tag
     namesmap.insert("Sport", tr("Sport"));                           // Sport Code
@@ -64,6 +78,10 @@ SpecialFields::SpecialFields()
     namesmap.insert("Performance Condition", tr("Performance Condition"));// Garmin Performance Condition
     namesmap.insert("LTHR detected", tr("LTHR detected"));           // Garmin LTHR detected
     namesmap.insert("LTS detected", tr("LTS detected"));             // Garmin LTS detected
+    namesmap.insert("Interval Notes", tr("Interval Notes"));         // Interval Notes for the new Interval tab
+    namesmap.insert("Interval Goal", tr("Interval Goal"));           // Interval Goal for the new Interval tab
+    namesmap.insert("Spike Time", tr("Spike Time"));                 // Spike Time from FixSpikes DP
+    namesmap.insert("Spikes", tr("Spikes"));                         // Spikes from FixSpikes DP
 
     // now add all the metric fields (for metric overrides)
     const RideMetricFactory &factory = RideMetricFactory::instance();
@@ -85,13 +103,13 @@ SpecialFields::SpecialFields()
 bool
 SpecialFields::isSpecial(QString &name) const
 {
-    return namesmap.contains(name);
+    return specialset.contains(name);
 }
 
 bool
 SpecialFields::isUser(QString &name) const
 {
-    return !namesmap.contains(name);
+    return !isSpecial(name) && !isMetric(name);
 }
 
 bool
@@ -107,7 +125,7 @@ SpecialFields::makeTechName(QString name) const
     // strip spaces and only keep alpha values - everything else
     // becomes an underscore
     QString s = name;
-    return s.replace(QRegExp("[^0-9A-Za-z]"), "_");
+    return s.replace(QRegularExpression("[^0-9A-Za-z]"), "_");
 }
 
 QString
@@ -154,6 +172,7 @@ SpecialTabs::SpecialTabs()
     namesmap.insert("Raw Data", tr("Raw Data"));
     namesmap.insert("Device", tr("Device"));
     namesmap.insert("Athlete", tr("Athlete"));
+    namesmap.insert("Interval", tr("Interval"));
 }
 
 QString

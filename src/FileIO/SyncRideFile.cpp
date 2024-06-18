@@ -187,11 +187,11 @@ struct SyncFileReaderState
 
                 QDateTime t = QDateTime(QDate(2000+year,month,day), QTime(hour,min,sec));
 
-                if (secs == 0.0) { // || rideFile->startTime().toTime_t()<0
+                if (secs == 0.0) { // || rideFile->startTime().toSecsSinceEpoch()<0
                     rideFile->setStartTime(t);
                 }
                 else {
-                    int gap = (t.toTime_t() - rideFile->startTime().toTime_t()) - secs;
+                    int gap = (t.toSecsSinceEpoch() - rideFile->startTime().toSecsSinceEpoch()) - secs;
                     secs += gap;
                 }
 

@@ -191,6 +191,14 @@
        <Zoom>16</Zoom>
        <osmURL>https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png</osmURL>
    </meter>
+   <meter name="elevationzoomed" container="Video" source="ElevationZoomed" type="ElevationZoomed">
+       <RelativeSize Width="15.0" Height="15.0" />
+       <RelativePosition X="88.0" Y="50.0" />
+       <BackgroundColor R="200" G="200" B="200" A="200" />
+       <OutlineColor R="255" G="255" B="255" A="250" />
+       <MainColor R="255" G="0" B="0" A="250" />
+       <BackgroundColor R="200" G="200" B="200" A="225" />
+   </meter>
 </layout>
 
 <layout name="Text Meters">

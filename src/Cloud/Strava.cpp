@@ -307,9 +307,9 @@ Strava::writeFile(QByteArray &data, QString remotename, RideFile *ride)
                       :  QUrl( "https://www.strava.com/api/v3/uploads" );
     QNetworkRequest request = QNetworkRequest(url);
 
-    //QString boundary = QString::number(qrand() * (90000000000) / (RAND_MAX + 1) + 10000000000, 16);
-    QString boundary = QVariant(qrand()).toString() +
-        QVariant(qrand()).toString() + QVariant(qrand()).toString();
+    //QString boundary = QString::number(QRandomGenerator::global()->generate() * (90000000000) / (RAND_MAX + 1) + 10000000000, 16);
+    QString boundary = QVariant(QRandomGenerator::global()->generate()).toString() +
+        QVariant(QRandomGenerator::global()->generate()).toString() + QVariant(QRandomGenerator::global()->generate()).toString();
 
     // MULTIPART *****************
 
@@ -338,7 +338,7 @@ Strava::writeFile(QByteArray &data, QString remotename, RideFile *ride)
       activityTypePart.setBody("NordicSki");
     else if (ride->sport() == "Gym")
       activityTypePart.setBody("WeightTraining");
-    else if (ride->sport() == "Walking")
+    else if (ride->sport() == "Walk")
       activityTypePart.setBody("Walk");
     else if (ride->xdata("TRAIN") && ride->isDataPresent(RideFile::lat))
       activityTypePart.setBody("VirtualRide");

@@ -417,7 +417,6 @@ RideMetadata::configChanged(qint32)
         palette = QPalette();
 
         palette.setColor(QPalette::Window, GColor(CPLOTBACKGROUND));
-        palette.setColor(QPalette::Background, GColor(CPLOTBACKGROUND));
 
         // only change base if moved away from white plots
         // which is a Mac thing
@@ -730,7 +729,7 @@ Form::arrange()
     // special case -- a textbox and its the only field on the tab needs no label
     //                 this is how the "Notes" tab is created
     if (fields.count() == 1 && fields[0]->definition.type == FIELD_TEXTBOX) {
-        hlayout->addWidget(fields[0]->widget, 0, 0);
+        hlayout->addWidget(fields[0]->widget, 0, Qt::Alignment());
         ((GTextEdit*)(fields[0]->widget))->setFrameStyle(QFrame::NoFrame);
         ((GTextEdit*)(fields[0]->widget))->viewport()->setAutoFillBackground(false);
         return;
@@ -764,7 +763,7 @@ Form::arrange()
         Qt::Alignment labelalignment = Qt::AlignLeft|Qt::AlignTop;
         Qt::Alignment alignment = Qt::AlignLeft|Qt::AlignTop;
 
-        if (fields[i]->definition.type < FIELD_SHORTTEXT) alignment = 0; // text types
+        if (fields[i]->definition.type < FIELD_SHORTTEXT) alignment = Qt::Alignment(); // text types
 
         here->addWidget(fields[i]->label, y, 0, labelalignment);
 
@@ -1588,14 +1587,18 @@ FieldDefinition::fingerprint(QList<FieldDefinition> list)
 
     foreach(FieldDefinition def, list) {
 
-        ba.append(def.tab);
-        ba.append(def.name);
+        ba.append(def.tab.toUtf8());
+        ba.append(def.name.toUtf8());
         ba.append(def.type);
         ba.append(def.diary);
-        ba.append(def.values.join(""));
+        ba.append(def.values.join("").toUtf8());
     }
 
+#if QT_VERSION < 0x060000
     return qChecksum(ba, ba.length());
+#else
+    return qChecksum(ba);
+#endif
 }
 
 QCompleter *
@@ -1651,12 +1654,16 @@ KeywordDefinition::fingerprint(QList<KeywordDefinition> list)
 
     foreach(KeywordDefinition def, list) {
 
-        ba.append(def.name);
-        ba.append(def.color.name());
-        ba.append(def.tokens.join(""));
+        ba.append(def.name.toUtf8());
+        ba.append(def.color.name().toUtf8());
+        ba.append(def.tokens.join("").toUtf8());
     }
 
+#if QT_VERSION < 0x060000
     return qChecksum(ba, ba.length());
+#else
+    return qChecksum(ba);
+#endif
 }
 
 /*----------------------------------------------------------------------
@@ -1678,7 +1685,9 @@ RideMetadata::serialize(QString filename, QList<KeywordDefinition>keywordDefinit
     };
     file.resize(0);
     QTextStream out(&file);
+#if QT_VERSION < 0x060000
     out.setCodec("UTF-8");
+#endif
 
     // begin document
     out << "<metadata>\n";
@@ -1839,7 +1848,7 @@ bool MetadataXMLParser::endElement( const QString&, const QString&, const QStrin
         if (field.tab != "" && field.type < 3 && field.name != "Filename" &&
             field.name != "Change History") field.diary = true; // default!
     } else if(qName == "fieldvalues") {
-        field.values = Utils::unprotect(buffer).split(",", QString::SkipEmptyParts);
+        field.values = Utils::unprotect(buffer).split(",", Qt::SkipEmptyParts);
     } else if (qName == "fielddiary") field.diary = (buffer.trimmed().toInt() != 0);
     else if (qName == "fieldinterval") field.interval = (buffer.trimmed().toInt() != 0);
     else if(qName == "defaultfield") adefault.field =  Utils::unprotect(buffer);

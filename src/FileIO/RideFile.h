@@ -27,6 +27,7 @@
 #include <QMap>
 #include <QVector>
 #include <QObject>
+#include <QRegExp>
 
 class RideItem;
 class RideCache;
@@ -578,13 +579,17 @@ public:
             string[i]="";
         }
     }
-    XDataPoint (const XDataPoint &other) {
+    XDataPoint(const XDataPoint &other) {
+        *this = other;
+    }
+    XDataPoint& operator=(const XDataPoint &other) {
         this->secs=other.secs;
         this->km=other.km;
         for(int i=0; i<XDATA_MAXVALUES; i++) {
             this->number[i]= other.number[i];
             this->string[i]= other.string[i];
         }
+        return *this;
     }
 
     double secs, km;
@@ -595,16 +600,21 @@ public:
 class XDataSeries {
 public:
     XDataSeries() {}
-    XDataSeries(XDataSeries &other) {
+    XDataSeries(const XDataSeries& other) { *this = other; }
+    XDataSeries& operator=(const XDataSeries &other) {
         name = other.name;
         valuename = other.valuename;
         unitname = other.unitname;
         valuetype = other.valuetype;
+        // we need to delete objects pointed by the assignment target
+        foreach(XDataPoint *p, datapoints) delete p;
+        datapoints.clear();
         // we need to create new objects since we are holding pointers to objects
         // otherwise we would end up w/ multiple frees or dangling ptrs!
         foreach (XDataPoint *p, other.datapoints) {
             datapoints.push_back(new XDataPoint(*p));
         }
+        return *this;
     }
 
     ~XDataSeries() { foreach(XDataPoint *p, datapoints) delete p; }

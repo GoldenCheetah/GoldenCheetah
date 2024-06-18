@@ -75,15 +75,15 @@ LTMPlot::LTMPlot(LTMWindow *parent, Context *context, int position) :
 
     // setup my axes
     // for now we limit to 4 on left and 4 on right
-    setAxesCount(QwtAxis::yLeft, 4);
-    setAxesCount(QwtAxis::yRight, 4);
-    setAxesCount(QwtAxis::xBottom, 1);
-    setAxesCount(QwtAxis::xTop, 0);
+    setAxesCount(QwtAxis::YLeft, 4);
+    setAxesCount(QwtAxis::YRight, 4);
+    setAxesCount(QwtAxis::XBottom, 1);
+    setAxesCount(QwtAxis::XTop, 0);
 
     for (int i=0; i<4; i++) {
 
         // lefts
-        QwtAxisId left(QwtAxis::yLeft, i);
+        QwtAxisId left(QwtAxis::YLeft, i);
         supportedAxes << left;
         
         QwtScaleDraw *sd = new QwtScaleDraw;
@@ -95,7 +95,7 @@ LTMPlot::LTMPlot(LTMWindow *parent, Context *context, int position) :
         setAxisMaxMinor(left, 0);
         setAxisVisible(left, false);
 
-        QwtAxisId right(QwtAxis::yRight, i);
+        QwtAxisId right(QwtAxis::YRight, i);
         supportedAxes << right;
 
         // lefts
@@ -110,12 +110,11 @@ LTMPlot::LTMPlot(LTMWindow *parent, Context *context, int position) :
 
     // get application settings
     insertLegend(new QwtLegend(), QwtPlot::BottomLegend);
-    setAxisTitle(QwtAxis::xBottom, tr("Date"));
-    enableAxis(QwtAxis::xBottom, true);
-    setAxisVisible(QwtAxis::xBottom, true);
-    setAxisVisible(QwtAxis::xTop, false);
-    setAxisMaxMinor(QwtPlot::xBottom,-1);
-    setAxisScaleDraw(QwtPlot::xBottom, new LTMScaleDraw(QDateTime::currentDateTime(), 0, LTM_DAY));
+    setAxisTitle(QwtAxis::XBottom, tr("Date"));
+    setAxisVisible(QwtAxis::XBottom, true);
+    setAxisVisible(QwtAxis::XTop, false);
+    setAxisMaxMinor(QwtAxis::XBottom,-1);
+    setAxisScaleDraw(QwtAxis::XBottom, new LTMScaleDraw(QDateTime::currentDateTime(), 0, LTM_DAY));
 
     static_cast<QwtPlotCanvas*>(canvas())->setFrameStyle(QFrame::NoFrame);
 
@@ -124,7 +123,7 @@ LTMPlot::LTMPlot(LTMWindow *parent, Context *context, int position) :
     grid->attach(this);
 
     // manage our own picker
-    picker = new LTMToolTip(QwtPlot::xBottom, QwtPlot::yLeft, QwtPicker::VLineRubberBand, QwtPicker::AlwaysOn, canvas(), "");
+    picker = new LTMToolTip(QwtAxis::XBottom, QwtAxis::YLeft, QwtPicker::VLineRubberBand, QwtPicker::AlwaysOn, canvas(), "");
     picker->setMousePattern(QwtEventPattern::MouseSelect1, Qt::LeftButton);
     picker->setTrackerPen(QColor(Qt::black));
 
@@ -182,7 +181,7 @@ LTMPlot::configChanged(qint32)
         axesId << x;
 
     }
-    axisWidget(QwtPlot::xBottom)->setPalette(palette);
+    axisWidget(QwtAxis::XBottom)->setPalette(palette);
 
     QwtLegend *l = static_cast<QwtLegend *>(this->legend());
     foreach(QwtPlotCurve *p, curves) {
@@ -223,7 +222,7 @@ LTMPlot::setAxisTitle(QwtAxisId axis, QString label)
 void
 LTMPlot::setData(LTMSettings *set)
 {
-    QTime timer;
+    QElapsedTimer timer;
     timer.start();
 
     curveColors->isolated = false;
@@ -273,15 +272,18 @@ LTMPlot::setData(LTMSettings *set)
 
     //setTitle(settings->title);
     if (settings->groupBy != LTM_TOD)
-        setAxisTitle(xBottom, tr("Date"));
+        setAxisTitle(QwtAxis::XBottom, tr("Date"));
     else
-        setAxisTitle(xBottom, tr("Time of Day"));
-    enableAxis(QwtAxis::xBottom, true);
-    setAxisVisible(QwtAxis::xBottom, true);
-    setAxisVisible(QwtAxis::xTop, false);
+        setAxisTitle(QwtAxis::XBottom, tr("Time of Day"));
+    setAxisVisible(QwtAxis::XBottom, true);
+    setAxisVisible(QwtAxis::XTop, false);
 
     // wipe existing curves/axes details
+#if QT_VERSION >= 0x060000
+    QMultiHashIterator<QString, QwtPlotCurve*> c(curves);
+#else
     QHashIterator<QString, QwtPlotCurve*> c(curves);
+#endif
     while (c.hasNext()) {
         c.next();
         QString symbol = c.key();
@@ -312,7 +314,6 @@ LTMPlot::setData(LTMSettings *set)
     // disable all y axes until we have populated
     for (int i=0; i<8; i++) {
         setAxisVisible(supportedAxes[i], false);
-        enableAxis(supportedAxes[i].id, false);
     }
     axes.clear();
     axesObject.clear();
@@ -329,12 +330,11 @@ LTMPlot::setData(LTMSettings *set)
     if (context->athlete->rideCache->rides().count() == 0 || maxX <= 0) {
 
 
-        setAxisScale(xBottom, 0, maxX);
-        setAxisScaleDraw(QwtPlot::xBottom, new LTMScaleDraw(settings->start,
+        setAxisScale(QwtAxis::XBottom, 0, maxX);
+        setAxisScaleDraw(QwtAxis::XBottom, new LTMScaleDraw(settings->start,
                 groupForDate(settings->start.date(), settings->groupBy), settings->groupBy));
-        enableAxis(QwtAxis::xBottom, true);
-        setAxisVisible(QwtAxis::xBottom, true);
-        setAxisVisible(QwtAxis::xTop, false);
+        setAxisVisible(QwtAxis::XBottom, true);
+        setAxisVisible(QwtAxis::XTop, false);
 
         // remove the shading if it exists
         refreshZoneLabels(QwtAxisId(-1,-1)); // turn em off
@@ -604,9 +604,17 @@ LTMPlot::setData(LTMSettings *set)
         //qDebug()<<"Create curve data.."<<timer.elapsed();
 
         // Create a curve
-        QwtPlotCurve *current = (metricDetail.type == METRIC_ESTIMATE || metricDetail.type == METRIC_BANISTER || metricDetail.type == METRIC_D_MEASURE)
-                ? new QwtPlotGappedCurve(metricDetail.uname, 1)
-                : new QwtPlotCurve(metricDetail.uname);
+        QwtPlotCurve *current;
+        if (metricDetail.type == METRIC_ESTIMATE || metricDetail.type == METRIC_BANISTER || metricDetail.type == METRIC_D_MEASURE) {
+            current = new QwtPlotGappedCurve(metricDetail.uname, 1);
+        } else {
+            if (metricDetail.ignoreZeros){
+                current = new QwtPlotGappedCurve(metricDetail.uname, 1);
+            } else {
+                current = new QwtPlotCurve(metricDetail.uname);
+            }
+        }
+
         current->setVisible(!metricDetail.hidden);
         settings->metrics[m].curve = current;
         if (metricDetail.type == METRIC_BEST || metricDetail.type == METRIC_STRESS || metricDetail.type == METRIC_BANISTER) {
@@ -1301,7 +1309,7 @@ LTMPlot::setData(LTMSettings *set)
         // make start date always fall on a Monday
         if (settings->groupBy == LTM_WEEK) {
             int dow = settings->start.date().dayOfWeek(); // 1-7, where 1=monday
-            settings->start = QDateTime(settings->start.date().addDays((dow-1)*-1));
+            settings->start = QDateTime(settings->start.date().addDays((dow-1)*-1).startOfDay());
         }
 
         // setup the xaxis at the bottom
@@ -1313,23 +1321,22 @@ LTMPlot::setData(LTMSettings *set)
         } else {
             tics = 1 + maxX/10;
         }
-        setAxisScale(xBottom, -0.5, maxX, tics);
-        setAxisScaleDraw(QwtPlot::xBottom, new LTMScaleDraw(settings->start,
+        setAxisScale(QwtAxis::XBottom, -0.5, maxX, tics);
+        setAxisScaleDraw(QwtAxis::XBottom, new LTMScaleDraw(settings->start,
                     groupForDate(settings->start.date(), settings->groupBy), settings->groupBy));
 
     } else {
-        setAxisScale(xBottom, 0, 24, 2);
-        setAxisScaleDraw(QwtPlot::xBottom, new LTMScaleDraw(settings->start,
+        setAxisScale(QwtAxis::XBottom, 0, 24, 2);
+        setAxisScaleDraw(QwtAxis::XBottom, new LTMScaleDraw(settings->start,
                     groupForDate(settings->start.date(), settings->groupBy), settings->groupBy));
     }
-    enableAxis(QwtAxis::xBottom, true);
-    setAxisVisible(QwtAxis::xBottom, true);
-    setAxisVisible(QwtAxis::xTop, false);
+    setAxisVisible(QwtAxis::XBottom, true);
+    setAxisVisible(QwtAxis::XTop, false);
 
     // run through the Y axis
     for (int i=0; i<8; i++) {
         // set the scale on the axis
-        if (i != xBottom && i != xTop) {
+        if (i != QwtAxis::XBottom && i != QwtAxis::XTop) {
             maxY[i] *= 1.1; // add 10% headroom
             if (maxY[i] == minY[i] && maxY[i] == 0)
                 setAxisScale(supportedAxes[i], 0.0f, 100.0f); // to stop ugly
@@ -1338,8 +1345,8 @@ LTMPlot::setData(LTMSettings *set)
         }
     }
 
-    QString format = axisTitle(yLeft).text();
-    picker->setAxes(xBottom, yLeft);
+    QString format = axisTitle(QwtAxis::YLeft).text();
+    picker->setAxes(QwtAxis::XBottom, QwtAxis::YLeft);
     picker->setFormat(format);
 
     // draw zone labels axisid of -1 means delete whats there
@@ -1352,7 +1359,11 @@ LTMPlot::setData(LTMSettings *set)
         refreshZoneLabels(QwtAxisId(-1,-1)); // turn em off
     }
 
+#if QT_VERSION >= 0x060000
+    QMultiHashIterator<QString, QwtPlotCurve*> p(curves);
+#else
     QHashIterator<QString, QwtPlotCurve*> p(curves);
+#endif
     while (p.hasNext()) {
         p.next();
 
@@ -1393,7 +1404,7 @@ LTMPlot::setData(LTMSettings *set)
 void
 LTMPlot::setCompareData(LTMSettings *set)
 {
-    QTime timer;
+    QElapsedTimer timer;
     timer.start();
 
     MAXX=0.0; // maximum value for x, always from 0-n
@@ -1403,7 +1414,11 @@ LTMPlot::setCompareData(LTMSettings *set)
     //qDebug()<<"Starting.."<<timer.elapsed();
 
     // wipe existing curves/axes details
+#if QT_VERSION >= 0x060000
+    QMultiHashIterator<QString, QwtPlotCurve*> c(curves);
+#else
     QHashIterator<QString, QwtPlotCurve*> c(curves);
+#endif
     while (c.hasNext()) {
         c.next();
         QString symbol = c.key();
@@ -1433,7 +1448,6 @@ LTMPlot::setCompareData(LTMSettings *set)
     // disable all y axes until we have populated
     for (int i=0; i<8; i++) {
         setAxisVisible(supportedAxes[i], false);
-        enableAxis(supportedAxes[i].id, false);
     }
     axes.clear();
     axesObject.clear();
@@ -1442,8 +1456,8 @@ LTMPlot::setCompareData(LTMSettings *set)
     // reset all min/max Y values
     for (int i=0; i<10; i++) minY[i]=0, maxY[i]=0;
 
-    // which yAxis did we use (should be yLeft)
-    QwtAxisId axisid(QwtPlot::yLeft, 0);
+    // which yAxis did we use (should be YLeft)
+    QwtAxisId axisid(QwtAxis::YLeft, 0);
 
     // which compare date range are we on?
     int cdCount =0;
@@ -1509,30 +1523,29 @@ LTMPlot::setCompareData(LTMSettings *set)
 
         switch (settings->groupBy) {
             case LTM_TOD:
-                setAxisTitle(xBottom, tr("Time of Day"));
+                setAxisTitle(QwtAxis::XBottom, tr("Time of Day"));
                 break;
             case LTM_DAY:
-                setAxisTitle(xBottom, tr("Day"));
+                setAxisTitle(QwtAxis::XBottom, tr("Day"));
                 break;
             case LTM_WEEK:
-                setAxisTitle(xBottom, tr("Week"));
+                setAxisTitle(QwtAxis::XBottom, tr("Week"));
                 break;
             case LTM_MONTH:
-                setAxisTitle(xBottom, tr("Month"));
+                setAxisTitle(QwtAxis::XBottom, tr("Month"));
                 break;
             case LTM_YEAR:
-                setAxisTitle(xBottom, tr("Year"));
+                setAxisTitle(QwtAxis::XBottom, tr("Year"));
                 break;
             case LTM_ALL:
-                setAxisTitle(xBottom, tr("All"));
+                setAxisTitle(QwtAxis::XBottom, tr("All"));
                 break;
             default:
-                setAxisTitle(xBottom, tr("Date"));
+                setAxisTitle(QwtAxis::XBottom, tr("Date"));
                 break;
         }
-        enableAxis(QwtAxis::xBottom, true);
-        setAxisVisible(QwtAxis::xBottom, true);
-        setAxisVisible(QwtAxis::xTop, false);
+        setAxisVisible(QwtAxis::XBottom, true);
+        setAxisVisible(QwtAxis::XTop, false);
 
 
         //qDebug()<<"Wiped previous.."<<timer.elapsed();
@@ -1784,7 +1797,17 @@ LTMPlot::setCompareData(LTMSettings *set)
             //qDebug()<<"Create curve data.."<<timer.elapsed();
 
             // Create a curve
-            QwtPlotCurve *current = new QwtPlotCurve(cd.name);
+            QwtPlotCurve *current;
+            if (metricDetail.type == METRIC_ESTIMATE || metricDetail.type == METRIC_BANISTER || metricDetail.type == METRIC_D_MEASURE) {
+                current = new QwtPlotGappedCurve(cd.name, 1);
+            } else {
+                if (metricDetail.ignoreZeros) {
+                    current = new QwtPlotGappedCurve(cd.name, 1);
+                } else {
+                    current = new QwtPlotCurve(cd.name);
+                }
+            }
+
             if (metricDetail.type == METRIC_BEST)
                 curves.insert(cd.name, current);
             else
@@ -2425,23 +2448,22 @@ LTMPlot::setCompareData(LTMSettings *set)
         } else {
             tics = 1 + MAXX/10;
         }
-        setAxisScale(xBottom, -0.498f, MAXX+0.498f, tics);
-        setAxisScaleDraw(QwtPlot::xBottom, new CompareScaleDraw());
+        setAxisScale(QwtAxis::XBottom, -0.498f, MAXX+0.498f, tics);
+        setAxisScaleDraw(QwtAxis::XBottom, new CompareScaleDraw());
 
 
     } else {
-        setAxisScale(xBottom, 0, 24, 2);
-        setAxisScaleDraw(QwtPlot::xBottom, new LTMScaleDraw(settings->start,
+        setAxisScale(QwtAxis::XBottom, 0, 24, 2);
+        setAxisScaleDraw(QwtAxis::XBottom, new LTMScaleDraw(settings->start,
                     groupForDate(settings->start.date(), settings->groupBy), settings->groupBy));
     }
-    enableAxis(QwtAxis::xBottom, true);
-    setAxisVisible(QwtAxis::xBottom, true);
-    setAxisVisible(QwtAxis::xTop, false);
+    setAxisVisible(QwtAxis::XBottom, true);
+    setAxisVisible(QwtAxis::XTop, false);
 
     // run through the Y axis
     for (int i=0; i<8; i++) {
         // set the scale on the axis
-        if (i != xBottom && i != xTop) {
+        if (i != QwtAxis::XBottom && i != QwtAxis::XTop) {
             maxY[i] *= 1.2; // add 20% headroom
             setAxisScale(supportedAxes[i], minY[i], maxY[i]);
         }
@@ -2473,15 +2495,19 @@ LTMPlot::setCompareData(LTMSettings *set)
         axisWidget(axisid)->setPalette(pal);
     }
 
-    QString format = axisTitle(yLeft).text();
-    picker->setAxes(xBottom, yLeft);
+    QString format = axisTitle(QwtAxis::YLeft).text();
+    picker->setAxes(QwtAxis::XBottom, QwtAxis::YLeft);
     picker->setFormat(format);
 
     // show legend?
     if (settings->legend == false) this->legend()->hide();
     else this->legend()->show();
 
+#if QT_VERSION >= 0x060000
+    QMultiHashIterator<QString, QwtPlotCurve*> p(curves);
+#else
     QHashIterator<QString, QwtPlotCurve*> p(curves);
+#endif
     while (p.hasNext()) {
         p.next();
 
@@ -2522,8 +2548,8 @@ LTMPlot::setMaxX(int x)
     } else {
         tics = 1 + MAXX/10;
     }
-    setAxisScale(xBottom, -0.498f, MAXX+0.498f, tics);
-    setAxisScaleDraw(QwtPlot::xBottom, new CompareScaleDraw());
+    setAxisScale(QwtAxis::XBottom, -0.498f, MAXX+0.498f, tics);
+    setAxisScaleDraw(QwtAxis::XBottom, new CompareScaleDraw());
 }
 
 void
@@ -3600,8 +3626,6 @@ LTMPlot::createBanisterData(Context *context, LTMSettings *settings, MetricDetai
 
     for (QDate date=settings->start.date(); date <= settings->end.date(); date = date.addDays(1)) {
         bool plotData = true;
-        // past ?
-        bool past = date.daysTo(QDate::currentDate())>0;
 
         // day we are on
         int currentDay = groupForDate(date, settings->groupBy);
@@ -3894,14 +3918,13 @@ LTMPlot::chooseYAxis(QString units)
         chosen = supportedAxes[axes.count()];
         if (units == "seconds" || units == tr("seconds")) setAxisTitle(chosen, tr("hours")); // we convert seconds to hours
         else setAxisTitle(chosen, units);
-        enableAxis(chosen.id, true);
         setAxisVisible(chosen, true);
         axes.insert(units, chosen);
         return chosen;
 
     } else {
         // eek!
-        return QwtAxis::yLeft; // just re-use the current yLeft axis
+        return QwtAxis::YLeft; // just re-use the current YLeft axis
     }
 }
 
@@ -3934,10 +3957,10 @@ LTMPlot::eventFilter(QObject *obj, QEvent *event)
 
         if (replotNeeded) {
             // keep min/max scale though
-            int min = axisScaleDiv(QwtPlot::xBottom).lowerBound();
-            int max = axisScaleDiv(QwtPlot::xBottom).upperBound();
+            int min = axisScaleDiv(QwtAxis::XBottom).lowerBound();
+            int max = axisScaleDiv(QwtAxis::XBottom).upperBound();
             setData(settings);
-            setAxisScale(xBottom, min, max);
+            setAxisScale(QwtAxis::XBottom, min, max);
             replot();
         }
     }
@@ -4037,7 +4060,11 @@ LTMPlot::pointHover(QwtPlotCurve *curve, int index)
 
         // we reference the metric definitions of name and
         // units to decide on the level of precision required
+#if QT_VERSION >= 0x060000
+        QMultiHashIterator<QString, QwtPlotCurve*> c(curves);
+#else
         QHashIterator<QString, QwtPlotCurve*> c(curves);
+#endif
         while (c.hasNext()) {
             c.next();
             if (c.value() == curve) {
@@ -4140,7 +4167,7 @@ class LTMPlotBackground: public QwtPlotItem
 
         LTMPlotBackground(LTMPlot *_parent, QwtAxisId axisid)
         {
-            //setAxis(QwtPlot::xBottom, axisid);
+            //setAxis(QwtAxis::XBottom, axisid);
             setXAxis(axisid);
             setZ(0.0);
             parent = _parent;

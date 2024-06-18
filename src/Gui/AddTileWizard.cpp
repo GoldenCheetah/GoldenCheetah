@@ -83,7 +83,7 @@ AddTileType::AddTileType(AddTileWizard *parent) : QWizardPage(parent), wizard(pa
     scrollarea->setWidget(buttons);
 
     mapper = new QSignalMapper(this);
-    connect(mapper, SIGNAL(mapped(int)), this, SLOT(clicked(int)));
+    connect(mapper, &QSignalMapper::mappedInt, this, &AddTileType::clicked);
 
     layout->addWidget(scrollarea);
 

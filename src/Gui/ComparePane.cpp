@@ -38,11 +38,6 @@
 #include <QTextEdit>
 
 
-QColor standardColor(int num)
-{
-   return standardColors.at(num % standardColors.count());
-}
-
 // we need to fix the sort order! (fixed for time fields)
 class CTableWidgetItem : public QTableWidgetItem
 {
@@ -82,7 +77,7 @@ class CTableWidgetItem : public QTableWidgetItem
                              int factor;
                              double t1 = 0;
                              // split seconds, minutes, hours into a list and compute Seconds (Right to Left)
-                             list = text().split(":", QString::SkipEmptyParts, Qt::CaseInsensitive);
+                             list = text().split(":", Qt::SkipEmptyParts, Qt::CaseInsensitive);
                              factor = 1;
                              while (!list.isEmpty()) {
                                  t1 += list.takeLast().toInt() * factor; // start from the end
@@ -90,7 +85,7 @@ class CTableWidgetItem : public QTableWidgetItem
                              }
                              double t2 = 0;
                              // split seconds, minutes, hours into a list and compute Seconds (Right to Left)
-                             list = other.text().split(":", QString::SkipEmptyParts, Qt::CaseInsensitive);
+                             list = other.text().split(":", Qt::SkipEmptyParts, Qt::CaseInsensitive);
                              factor = 1;
                              while (!list.isEmpty()) {
                                  t2 += list.takeLast().toInt() * factor; // start from the end
@@ -99,8 +94,8 @@ class CTableWidgetItem : public QTableWidgetItem
 
                              return t1 < t2;
 
-                         } else if (text().contains(QRegExp("[^0-9.,]")) ||
-                                    other.text().contains(QRegExp("[^0-9.,]"))) { // alpha
+                         } else if (text().contains(QRegularExpression("[^0-9.,]")) ||
+                                    other.text().contains(QRegularExpression("[^0-9.,]"))) { // alpha
 
                               return text() < other.text();
 
@@ -780,7 +775,7 @@ ComparePane::dropEvent(QDropEvent *event)
             // just use standard colors and cycle round
             // we will of course repeat, but the user can
             // just edit them using the button
-            add.color = standardColors.at((i + context->compareIntervals.count()) % standardColors.count());
+            add.color = standardColor(i + context->compareIntervals.count());
 
             // construct a fake RideItem, slightly hacky need to fix this later XXX fixme
             //                            mostly cut and paste from RideItem::refresh
@@ -962,7 +957,7 @@ ComparePane::dropEvent(QDropEvent *event)
                             // just use standard colors and cycle round
                             // we will of course repeat, but the user can
                             // just edit them using the button
-                            add.color = standardColors.at((newOnes.count()) % standardColors.count());
+                            add.color = standardColor(newOnes.count());
 
                             // now add but only if not empty
                             if (!add.data->dataPoints().empty()) newOnes << add;
@@ -1015,7 +1010,7 @@ ComparePane::dropEvent(QDropEvent *event)
             // just use standard colors and cycle round
             // we will of course repeat, but the user can
             // just edit them using the button
-            add.color = standardColors.at((i + context->compareDateRanges.count()) % standardColors.count());
+            add.color = standardColor(i + context->compareDateRanges.count());
 
             // even empty date ranges are valid
             newOnes << add;

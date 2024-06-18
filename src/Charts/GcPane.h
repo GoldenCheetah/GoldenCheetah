@@ -50,14 +50,18 @@ class GcPane : public QWidget
     private slots:
 
     protected:
-        virtual void paintEvent(QPaintEvent *);
-        virtual void mousePressEvent(QMouseEvent *);
-        virtual void mouseReleaseEvent(QMouseEvent *);
-        virtual void mouseMoveEvent(QMouseEvent *);
-        virtual void enterEvent(QEvent *);
-        virtual void leaveEvent(QEvent *);
-        bool eventFilter(QObject *object, QEvent *e);
-        virtual void resizeEvent (QResizeEvent * e);
+        virtual void paintEvent(QPaintEvent *) override;
+        virtual void mousePressEvent(QMouseEvent *) override;
+        virtual void mouseReleaseEvent(QMouseEvent *) override;
+        virtual void mouseMoveEvent(QMouseEvent *) override;
+#if QT_VERSION >= 0x060000
+        virtual void enterEvent(QEnterEvent *) override;
+#else
+        virtual void enterEvent(QEvent *) override;
+#endif
+        virtual void leaveEvent(QEvent *) override;
+        virtual bool eventFilter(QObject *object, QEvent *e) override;
+        virtual void resizeEvent (QResizeEvent * e) override;
         void flip();
 
     private:

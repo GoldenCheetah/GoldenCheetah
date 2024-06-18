@@ -113,7 +113,7 @@ RideImportWizard::RideImportWizard(RideAutoImportConfig *dirs, Context *context,
     // and get the allowed files formats
     const RideFileFactory &rff = RideFileFactory::instance();
     QStringList suffixList = rff.suffixes();
-    suffixList.replaceInStrings(QRegExp("^"), "*.");
+    suffixList.replaceInStrings(QRegularExpression("^"), "*.");
     QStringList allFormats;
     foreach(QString suffix, rff.suffixes())
         allFormats << QString("*.%1").arg(suffix);
@@ -211,7 +211,9 @@ RideImportWizard::RideImportWizard(RideAutoImportConfig *dirs, Context *context,
                 case RideAutoImportRule::importBackground90:
                 case RideAutoImportRule::importBackground180:
                 case RideAutoImportRule::importBackground360:
-                    if (f.created().date() >= selectAfter || f.lastModified().date() >= selectAfter) {
+                    if (f.birthTime().date() >= selectAfter
+                        || f.metadataChangeTime().date() >= selectAfter
+                        || f.lastModified().date() >= selectAfter) {
                         files.append(f.absoluteFilePath());
                         j++;
                     };
@@ -352,7 +354,7 @@ RideImportWizard::init(QList<QString> original, Context * /*mainWindow*/)
         t = new QTableWidgetItem();
         t->setText(tr(""));
         t->setFlags(t->flags()  | Qt::ItemIsEditable);
-        t->setBackgroundColor(Qt::red);
+        t->setBackground(Qt::red);
         tableWidget->setItem(i,DATE_COLUMN,t);
 
         // Time
@@ -613,7 +615,7 @@ RideImportWizard::process()
                      t = new QTableWidgetItem();
                      t->setText(tr(""));
                      t->setFlags(t->flags()  | Qt::ItemIsEditable);
-                     t->setBackgroundColor(Qt::red);
+                     t->setBackground(Qt::red);
                      tableWidget->setItem(here+counter,DATE_COLUMN,t);
 
                      // Time

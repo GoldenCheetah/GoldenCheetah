@@ -32,47 +32,47 @@
 #include <QMenu>
 #include <QDebug>
 
+const int BUTTON_SIZE = 12;
+
 SearchBox::SearchBox(Context *context, QWidget *parent, bool nochooser)
     : QLineEdit(parent), context(context), parent(parent), filtered(false), nochooser(nochooser), active(false), fixed(false)
 {
-    setFixedHeight(28 *dpiYFactor);
+    setFixedHeight(28*dpiYFactor);
     //clear button
     clearButton = new QToolButton(this);
     clearButton->setStyleSheet("QToolButton { border: none; padding: 0px; }");
-    QIcon pixmap = QPixmap::fromImage(QImage(":images/toolbar/popbutton.png").scaled(12*dpiXFactor, 12*dpiXFactor));
+    QIcon pixmap = QPixmap::fromImage(QImage(":images/toolbar/popbutton.png").scaled(BUTTON_SIZE*dpiXFactor, BUTTON_SIZE*dpiXFactor));
     clearButton->setIcon(QIcon(pixmap));
-    clearButton->setIconSize(QSize(12 *dpiXFactor,12 *dpiYFactor));
+    clearButton->setIconSize(QSize(BUTTON_SIZE*dpiXFactor, BUTTON_SIZE*dpiYFactor));
     clearButton->setCursor(Qt::ArrowCursor);
     clearButton->hide();
-    //connect(clearButton, SIGNAL(clicked()), this, SLOT(clear()));
     connect(clearButton, SIGNAL(clicked()), this, SLOT(clearClicked()));
     connect(this, SIGNAL(textChanged(const QString&)), this, SLOT(updateCloseButton(const QString&)));
 
-    // make sure its underneath the toggle button
+    // tool button
     toolButton = new QToolButton(this);
-    toolButton->setFixedSize(QSize(12 *dpiXFactor,12 *dpiYFactor));
+    QIcon toolB = iconFromPNG(":images/sidebar/extra.png", QSize(BUTTON_SIZE*dpiXFactor, BUTTON_SIZE*dpiYFactor));
 #ifdef Q_OS_MAC
     toolButton->setStyleSheet("QToolButton { background: transparent; }");
 #else
-    toolButton->setStyleSheet("QToolButton { border: none; padding: 0px; }");
+    toolButton->setStyleSheet("QToolButton { border: none; padding: 0px; background-color: none; }");
 #endif
-    toolButton->move(10*dpiXFactor,0);
+    toolButton->setIconSize(QSize(BUTTON_SIZE*dpiXFactor, BUTTON_SIZE*dpiYFactor));
+    toolButton->setIcon(toolB);
     toolButton->setCursor(Qt::ArrowCursor);
-    toolButton->setPopupMode(QToolButton::InstantPopup);
 
+    // drop menu
     dropMenu = new QMenu(this);
-    toolButton->setMenu(dropMenu);
-    connect(dropMenu, SIGNAL(aboutToShow()), this, SLOT(setMenu()));
+    connect(toolButton, SIGNAL(clicked()), this, SLOT(setMenu()));
     connect(dropMenu, SIGNAL(triggered(QAction*)), this, SLOT(runMenu(QAction*)));
 
     // search button
     searchButton = new QToolButton(this);
+    QIcon search = iconFromPNG(":images/toolbar/search3.png", QSize(BUTTON_SIZE*dpiXFactor, BUTTON_SIZE*dpiYFactor));
     searchButton->setStyleSheet("QToolButton { border: none; padding: 1px; }");
-    QIcon search = iconFromPNG(":images/toolbar/search3.png", QSize(12 *dpiXFactor,12*dpiYFactor));
-    searchButton->setIconSize(QSize(12 *dpiXFactor,12 *dpiYFactor));
+    searchButton->setIconSize(QSize(BUTTON_SIZE*dpiXFactor, BUTTON_SIZE *dpiYFactor));
     searchButton->setIcon(search);
     searchButton->setCursor(Qt::ArrowCursor);
-    searchButton->move(3*dpiXFactor,6*dpiYFactor);
     connect(searchButton, SIGNAL(clicked()), this, SLOT(toggleMode()));
 
     // create an empty completer, configchanged will fix it
@@ -83,10 +83,11 @@ SearchBox::SearchBox(Context *context, QWidget *parent, bool nochooser)
     setAttribute(Qt::WA_MacShowFocusRect, 0);
 #endif
     setObjectName("SearchBox");
-    setPlaceholderText(tr("Search..."));
+    resizeEvent(nullptr);
     mode = Search;
+    setMode(mode);
     setDragEnabled(true);
-    checkMenu();
+
     connect(this, SIGNAL(returnPressed()), this, SLOT(searchSubmit()));
     connect(context, SIGNAL(configChanged(qint32)), this, SLOT(configChanged(qint32)));
 
@@ -237,18 +238,19 @@ SearchBox::updateCompleter(const QString &text)
 
 void SearchBox::resizeEvent(QResizeEvent *)
 {
-    QSize sz = clearButton->sizeHint();
+    QSize cbz = clearButton->sizeHint();
+    QSize tsz = toolButton->sizeHint();
     int frameWidth = style()->pixelMetric(QStyle::PM_DefaultFrameWidth);
-    clearButton->move(rect().right() - frameWidth - sz.width() - 1, 3);
-    searchButton->move(3 *dpiXFactor, 6 *dpiYFactor);
-#ifndef Q_OS_MAC
-    toolButton->move(10*dpiXFactor, 0);
-#else
-    toolButton->move(10*dpiXFactor, 0);
-#endif
 
-    //container->move(rect().left(), rect().bottom() + 3); // named dialog...
-    //checkMenu(); // not needed
+    // Create layout order left to right
+    searchButton->move(3*dpiXFactor, 6*dpiYFactor);
+    setTextMargins(0, 0, frameWidth + tsz.width(), 0);
+    clearButton->move(rect().right() - frameWidth - tsz.width() - cbz.width() - 3*dpiXFactor, 6*dpiYFactor);
+#ifdef Q_OS_MAC
+    toolButton->move(rect().right() - frameWidth - tsz.width() - 3*dpiXFactor, 3*dpiYFactor);
+#else
+    toolButton->move(rect().right() - frameWidth - tsz.width() - 3*dpiXFactor, 6*dpiYFactor);
+#endif
 }
 
 void SearchBox::setFixedMode(bool fixed)
@@ -270,11 +272,10 @@ void SearchBox::setMode(SearchBoxMode mode)
 
         case Filter:
         {
-            QIcon filter = iconFromPNG(":images/toolbar/filter3.png", QSize(12 *dpiXFactor,12*dpiYFactor));
+            QIcon filter = iconFromPNG(":images/toolbar/filter3.png", QSize(BUTTON_SIZE*dpiXFactor, BUTTON_SIZE*dpiYFactor));
             searchButton->setStyleSheet("QToolButton { border: none; padding: 1px; }");
-            searchButton->setIconSize(QSize(12 *dpiXFactor,12 *dpiYFactor));
+            searchButton->setIconSize(QSize(BUTTON_SIZE*dpiXFactor, BUTTON_SIZE*dpiYFactor));
             searchButton->setIcon(filter);
-            searchButton->move(3 *dpiXFactor, 6 *dpiYFactor);
             setPlaceholderText(tr("Filter..."));
         }
         break;
@@ -282,16 +283,17 @@ void SearchBox::setMode(SearchBoxMode mode)
         case Search:
         default:
         {
-            QIcon search = iconFromPNG(":images/toolbar/search3.png", QSize(12 *dpiXFactor,12*dpiYFactor));
+            QIcon search = iconFromPNG(":images/toolbar/search3.png", QSize(BUTTON_SIZE*dpiXFactor, BUTTON_SIZE*dpiYFactor));
             searchButton->setStyleSheet("QToolButton { border: none; padding: 1px; }");
-            searchButton->setIconSize(QSize(12 *dpiXFactor,12 *dpiYFactor));
+            searchButton->setIconSize(QSize(BUTTON_SIZE*dpiXFactor, BUTTON_SIZE*dpiYFactor));
             searchButton->setIcon(search);
-            searchButton->move(3 *dpiXFactor, 6 *dpiYFactor);
             setPlaceholderText(tr("Search..."));
         }
         break;
     }
     this->mode = mode;
+
+    checkMenu();
 }
 
 void SearchBox::updateCloseButton(const QString& text)
@@ -342,6 +344,8 @@ void SearchBox::setMenu()
         dropMenu->addAction(tr("Manage Filters"));
     }
     if (!nochooser) dropMenu->addAction(tr("Column Chooser"));
+
+    dropMenu->exec(mapToGlobal((QPoint(toolButton->pos().x() + toolButton->width() - 20, toolButton->pos().y()))));
 }
 
 void SearchBox::runMenu(QAction *x)
@@ -350,8 +354,8 @@ void SearchBox::runMenu(QAction *x)
     if (x->text() == tr("Add to Named Filters")) addNamed();
     else if (x->text() == tr("Manage Filters")) {
 
-        EditNamedSearches *editor = new EditNamedSearches(this, context);
-        editor->move(QCursor::pos()-QPoint(230,-5));
+        EditNamedSearches *editor = new EditNamedSearches(context->mainWindow, context);
+        editor->move(QCursor::pos() - QPoint(460, -5));
         editor->show();
 
     } else if (x->text() == tr("Column Chooser")) {

@@ -87,7 +87,7 @@ QLayoutItem *GcWindowLayout::takeAt(int index)
 
 Qt::Orientations GcWindowLayout::expandingDirections() const
 {
-    return 0;
+    return Qt::Orientations();
 }
 
 bool GcWindowLayout::hasHeightForWidth() const
@@ -119,7 +119,8 @@ QSize GcWindowLayout::minimumSize() const
     foreach (item, itemList)
         size = size.expandedTo(item->minimumSize());
 
-    size += QSize(2*margin(), 2*margin());
+    QMargins m = contentsMargins();
+    size += QSize(m.left()+m.right(), m.top()+m.bottom());
     return size;
 }
 

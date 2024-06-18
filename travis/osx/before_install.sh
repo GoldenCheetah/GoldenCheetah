@@ -13,8 +13,6 @@ brew install libical
 brew upgrade libusb
 brew install libsamplerate
 rm -rf '/usr/local/include/c++'
-## Disable KML for now
-## brew install --HEAD travis/libkml.rb
 sudo chmod -R +w /usr/local
 
 # R 4.1.1
@@ -54,9 +52,7 @@ if [[ -z "$(ls -A VLC)" ]]; then
 fi
 sudo cp VLC/lib/libvlc*.dylib /usr/local/lib
 
-# AWS client to upload binaries to S3 bucket
-curl -O https://awscli.amazonaws.com/AWSCLIV2.pkg
-sudo installer -pkg AWSCLIV2.pkg -target /
-aws --version
+# GHR to updload binaries to GitHub releases
+brew install ghr
 
 exit

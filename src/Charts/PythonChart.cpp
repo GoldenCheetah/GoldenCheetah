@@ -362,6 +362,7 @@ PythonChart::PythonChart(Context *context, bool ridesummary) : GcChartWindow(con
 
         if (ridesummary) {
             connect(this, SIGNAL(rideItemChanged(RideItem*)), this, SLOT(runScript()));
+            connect(context, SIGNAL(rideChanged(RideItem*)), this, SLOT(runScript()));
 
             // refresh when comparing
             connect(context, SIGNAL(compareIntervalsStateChanged(bool)), this, SLOT(runScript()));
@@ -438,12 +439,12 @@ PythonChart::setWeb(bool x)
         // setup the canvas
         canvas = new QWebEngineView(this);
         canvas->setContentsMargins(0,0,0,0);
-        canvas->page()->view()->setContentsMargins(0,0,0,0);
         canvas->setZoomFactor(dpiXFactor);
         canvas->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
         // stop stealing focus!
         canvas->settings()->setAttribute(QWebEngineSettings::FocusOnNavigationEnabled, false);
         canvas->settings()->setAttribute(QWebEngineSettings::LocalContentCanAccessRemoteUrls, true);
+        canvas->setAcceptDrops(false);
         renderlayout->insertWidget(0, canvas);
     }
 

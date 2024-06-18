@@ -282,7 +282,7 @@ PowerTapDevice::download( const QDir &tmpdir,
     tmp.setAutoRemove(false);
     if (!tmp.open()) {
         err = tr("Failed to create temporary file ")
-            + tmpl + ": " + tmp.error();
+            + tmpl + ": " + tmp.errorString();
         return false;
     }
     // QTemporaryFile initially has permissions set to 0600.
@@ -296,7 +296,7 @@ PowerTapDevice::download( const QDir &tmpdir,
     file.name = tmp.fileName();
 
     QTextStream os(&tmp);
-    os << hex;
+    os << Qt::hex;
     os.setPadChar('0');
 
     bool time_set = false;
@@ -315,7 +315,7 @@ PowerTapDevice::download( const QDir &tmpdir,
         if (!time_set && PowerTapUtil::is_time(data + i, bIsVer81)) {
             struct tm time;
             time_t timet = PowerTapUtil::unpack_time(data + i, &time, bIsVer81);
-            file.startTime.setTime_t( timet );
+            file.startTime.setSecsSinceEpoch( timet );
             time_set = true;
         }
     }

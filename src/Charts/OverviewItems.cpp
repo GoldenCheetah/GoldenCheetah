@@ -41,7 +41,6 @@
 
 #include <cmath>
 #include <QGraphicsSceneMouseEvent>
-#include <QGLWidget>
 
 #include <QJsonDocument>
 #include <QJsonObject>
@@ -745,7 +744,7 @@ ZoneOverviewItem::configChanged(qint32)
     // W'BAL and Polarized
     //
     if (series == RideFile::wbal) {
-        categories << "Low" << "Med" << "High" << "Ext";
+        categories << "Low" << "Med" << "High" << "Sev";
         *barset << 0 << 0 << 0 << 0;
     } else if (polarized) {
         categories << "I" << "II" << "III";
@@ -846,7 +845,7 @@ MetricOverviewItem::~MetricOverviewItem()
     delete sparkline;
 }
 
-TopNOverviewItem::TopNOverviewItem(ChartSpace *parent, QString name, QString symbol) : ChartSpaceItem(parent, name), click(false), clickthru(NULL)
+TopNOverviewItem::TopNOverviewItem(ChartSpace *parent, QString name, QString symbol) : ChartSpaceItem(parent, name)
 {
     // metric
     this->type = OverviewItemType::TOPN;
@@ -2698,7 +2697,7 @@ KPIOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, 
         painter->setPen(QColor(100,100,100));
         painter->setFont(parent->smallfont);
 
-        painter->drawText(QPointF((geometry().width() - QFontMetrics(parent->smallfont).width(units)) / 2.0f,
+        painter->drawText(QPointF((geometry().width() - QFontMetrics(parent->smallfont).horizontalAdvance(units)) / 2.0f,
                               mid + (fm.ascent() / 3.0f) + addy), units); // divided by 3 to account for "gap" at top of font
     }
 
@@ -2717,7 +2716,7 @@ KPIOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, 
 
         QString stoptext = istime ? time_to_string(stop, true) : Utils::removeDP(QString("%1").arg(stop));
         QString starttext = istime ? time_to_string (start, true) : Utils::removeDP(QString("%1").arg(start));
-        painter->drawText(QPointF(right - QFontMetrics(parent->smallfont).width(stoptext), bottom), stoptext);
+        painter->drawText(QPointF(right - QFontMetrics(parent->smallfont).horizontalAdvance(stoptext), bottom), stoptext);
         painter->drawText(QPointF(left, bottom), starttext);
 
         // percentage in mid font...
@@ -2864,7 +2863,9 @@ DataOverviewItem::exportData()
     // stream, output without a BOM, unlikely to be expected (?)
     QTextStream out(&file);
     // unified codepage and BOM for identification on all platforms
+#if QT_VERSION < 0x060000
     out.setCodec("UTF-8");
+#endif
     //out.setGenerateByteOrderMark(true);
 
     // headers- taking care to protect for csv output
@@ -3176,13 +3177,13 @@ RPEOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *, 
         painter->setPen(QColor(100,100,100));
         painter->setFont(parent->smallfont);
 
-        painter->drawText(QPointF(right - QFontMetrics(parent->smallfont).width(upper) - 80,
+        painter->drawText(QPointF(right - QFontMetrics(parent->smallfont).horizontalAdvance(upper) - 80,
                               top - 40 + (fm.ascent() / 2.0f)), upper);
-        painter->drawText(QPointF(right - QFontMetrics(parent->smallfont).width(lower) - 80,
+        painter->drawText(QPointF(right - QFontMetrics(parent->smallfont).horizontalAdvance(lower) - 80,
                               bottom -40), lower);
 
         painter->setPen(QColor(50,50,50));
-        painter->drawText(QPointF(right - QFontMetrics(parent->smallfont).width(mean) - 80,
+        painter->drawText(QPointF(right - QFontMetrics(parent->smallfont).horizontalAdvance(mean) - 80,
                               ((top+bottom)/2) + (fm.tightBoundingRect(mean).height()/2) - 60), mean);
     }
 
@@ -3256,7 +3257,7 @@ MetricOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem 
         painter->setPen(QColor(100,100,100));
         painter->setFont(parent->smallfont);
 
-        painter->drawText(QPointF((geometry().width() - QFontMetrics(parent->smallfont).width(units)) / 2.0f,
+        painter->drawText(QPointF((geometry().width() - QFontMetrics(parent->smallfont).horizontalAdvance(units)) / 2.0f,
                               mid + (fm.ascent() / 3.0f) + addy), units); // divided by 3 to account for "gap" at top of font
     }
 
@@ -3272,13 +3273,13 @@ MetricOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem 
         painter->setPen(QColor(100,100,100));
         painter->setFont(parent->smallfont);
 
-        painter->drawText(QPointF(right - QFontMetrics(parent->smallfont).width(upper) - 80,
+        painter->drawText(QPointF(right - QFontMetrics(parent->smallfont).horizontalAdvance(upper) - 80,
                               top - 40 + (fm.ascent() / 2.0f)), upper);
-        painter->drawText(QPointF(right - QFontMetrics(parent->smallfont).width(lower) - 80,
+        painter->drawText(QPointF(right - QFontMetrics(parent->smallfont).horizontalAdvance(lower) - 80,
                               bottom -40), lower);
 
         painter->setPen(QColor(50,50,50));
-        painter->drawText(QPointF(right - QFontMetrics(parent->smallfont).width(mean) - 80,
+        painter->drawText(QPointF(right - QFontMetrics(parent->smallfont).horizontalAdvance(mean) - 80,
                               ((top+bottom)/2) + (fm.tightBoundingRect(mean).height()/2) - 60), mean);
     }
 
@@ -3528,14 +3529,14 @@ MetaOverviewItem::itemPaint(QPainter *painter, const QStyleOptionGraphicsItem *,
             painter->setPen(QColor(100,100,100));
             painter->setFont(parent->smallfont);
 
-            painter->drawText(QPointF(right - QFontMetrics(parent->smallfont).width(upper) - 80,
+            painter->drawText(QPointF(right - QFontMetrics(parent->smallfont).horizontalAdvance(upper) - 80,
                                   top - 40 + (fm.ascent() / 2.0f)), upper);
-            painter->drawText(QPointF(right - QFontMetrics(parent->smallfont).width(lower) - 80,
+            painter->drawText(QPointF(right - QFontMetrics(parent->smallfont).horizontalAdvance(lower) - 80,
                                   bottom -40), lower);
 
 
             painter->setPen(QColor(50,50,50));
-            painter->drawText(QPointF(right - QFontMetrics(parent->smallfont).width(mean) - 80,
+            painter->drawText(QPointF(right - QFontMetrics(parent->smallfont).horizontalAdvance(mean) - 80,
                                   ((top+bottom)/2) + (fm.tightBoundingRect(mean).height()/2) - 60), mean);
             }
 
@@ -4267,7 +4268,7 @@ static QColor FosterColors[11]={
 void
 RPErating::setValue(QString value)
 {
-    // RPE values from other sources (e.g. TodaysPlan) are "double"
+    // RPE values from other sources are "double"
     this->value = value;
     int v = qRound(value.toDouble());
     if (v <0 || v>10) {

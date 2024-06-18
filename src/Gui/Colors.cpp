@@ -63,28 +63,6 @@ int pixelSizeForFont(QFont &font, int height)
     return pixelsize;
 }
 
-//
-// A selection of distinct colours, user can adjust also
-//
-QList<QColor> standardColors;
-static bool initStandardColors()
-{
-    standardColors << QColor(Qt::magenta);
-    standardColors << QColor(Qt::cyan);
-    standardColors << QColor(Qt::yellow);
-    standardColors << QColor(Qt::red);
-    standardColors << QColor(Qt::blue);
-    standardColors << QColor(Qt::gray);
-    standardColors << QColor(Qt::darkCyan);
-    standardColors << QColor(Qt::green);
-    standardColors << QColor(Qt::darkRed);
-    standardColors << QColor(Qt::darkGreen);
-    standardColors << QColor(Qt::darkBlue);
-    standardColors << QColor(Qt::darkMagenta);
-
-    return true;
-}
-static bool init = initStandardColors();
 
 // the standard themes, a global object
 static Themes allThemes;
@@ -104,10 +82,14 @@ unsigned long Colors::fingerprint(const Colors *set)
 {
     QByteArray ba;
     while(set->name != "") {
-        ba.append(set->color.name());
+        ba.append(set->color.name().toUtf8());
         set++;
     }
+#if QT_VERSION < 0x060000
     return qChecksum(ba, ba.length());
+#else
+    return qChecksum(ba);
+#endif
 }
 
 #ifdef Q_OS_WIN
@@ -441,6 +423,7 @@ GCColor::readConfig()
     for (unsigned int i=0; ColorList[i].name != ""; i++) {
         QString colortext = appsettings->value(NULL, ColorList[i].setting, "").toString();
         if (colortext != "") {
+
             // color definitions are stored as "r:g:b"
             QStringList rgb = colortext.split(":");
             ColorList[i].color = QColor(rgb[0].toInt(),
@@ -449,26 +432,20 @@ GCColor::readConfig()
         } else {
 
             // set sensible defaults for any not set (as new colors are added)
-            if (ColorList[i].name == "CTOOLBAR") {
+            if (ColorList[i].setting == "CTOOLBAR") {
                 QPalette def;
                 ColorList[i].color = def.color(QPalette::Window);
             }
-            if (ColorList[i].name == "CCHARTBAR") {
+            if (ColorList[i].setting == "CCHARTBAR") {
                 ColorList[i].color = ColorList[CTOOLBAR].color;
             }
-            if (ColorList[i].name == "CCALCURRENT") {
+            if (ColorList[i].setting == "CCALCURRENT") {
                 QPalette def;
                 ColorList[i].color = def.color(QPalette::Highlight);
 
             }
         }
     }
-#ifdef Q_OS_MAC
-    // if on yosemite set default chrome to #e5e5e5
-    if (QSysInfo::MacintoshVersion == 12) {
-        ColorList[CCHROME].color = QColor(0xe5,0xe5,0xe5);
-    }
-#endif
 }
 
 QColor
@@ -556,13 +533,13 @@ GCColor::css(bool ridesummary)
 		   ".tooltip .tooltiptext { visibility: hidden; background-color: %2; color: %1; text-align: center; padding: %4px 0; border-radius: %5px; position: absolute; z-index: 1; width: %6px; margin-left: -%7px; top: 100%; left: 50%; opacity: 0; transition: opacity 0.3s; } "
 		   ".tooltip:hover .tooltiptext { visibility: visible; opacity: 1; } "
 #ifdef Q_OS_MAC
-                   "::-webkit-scrollbar-thumb { border-radius: 4px; background: rgba(0,0,0,0.5);  "
+                   "::-webkit-scrollbar-thumb { border-radius: 4px; background-color: rgba(0,0,0,0.5);  "
                    "-webkit-box-shadow: inset 0 0 1px rgba(255,255,255,0.6); }"
-                   "::-webkit-scrollbar { width: 9; background: %2; } "
+                   "::-webkit-scrollbar { width: 9; background-color: %2; } "
 #else
-                   "::-webkit-scrollbar-thumb { background: darkGray; } "
-                   "::-webkit-scrollbar-thumb:hover { background: lightGray; } "
-                   "::-webkit-scrollbar { width: %5px; background: %2; } "
+                   "::-webkit-scrollbar-thumb { background-color: darkGray; } "
+                   "::-webkit-scrollbar-thumb:hover { background-color: lightGray; } "
+                   "::-webkit-scrollbar { width: %5px; background-color: %2; } "
 #endif
                    "</style> ").arg(GColor(CPLOTMARKER).name())
                                .arg(bgColor.name())
@@ -578,7 +555,6 @@ GCColor::palette()
     // make it to order, to reflect current config
     QPalette palette;
     palette.setBrush(QPalette::Window, QBrush(GColor(CPLOTBACKGROUND)));
-    palette.setBrush(QPalette::Background, QBrush(GColor(CPLOTBACKGROUND)));
     palette.setBrush(QPalette::Base, QBrush(GColor(CPLOTBACKGROUND)));
     palette.setColor(QPalette::WindowText, GCColor::invertColor(GColor(CPLOTBACKGROUND)));
     palette.setColor(QPalette::Text, GCColor::invertColor(GColor(CPLOTBACKGROUND)));
@@ -587,7 +563,7 @@ GCColor::palette()
     return palette;
 }
 
-QString 
+QString
 GCColor::stylesheet(bool train)
 {
     // make it to order to reflect current config
@@ -595,16 +571,17 @@ GCColor::stylesheet(bool train)
     QColor fgColor = GCColor::invertColor(bgColor);
     QColor bgSelColor = selectedColor(bgColor);
     QColor fgSelColor = GCColor::invertColor(bgSelColor);
-    return QString("QTreeView { color: %2; background: %1; }"
-                   "%3"
-                   "QTableWidget { color: %2; background: %1; }"
+    return QString("QTreeView { color: %2; background-color: %1; }"
+                   "QTreeView::item:hover { color: black; background-color: lightGray; }"
+                   "QTreeView::item:selected { color: %4; background-color: %3; }"
+                   "QTableWidget { color: %2; background-color: %1; }"
+                   "QTableWidget::item:hover { color: black; background-color: lightGray; }"
+                   "QLabel { color: %2; background-color: %1; }"
+                   "QFrame { background-color: %1; }"
 #ifndef Q_OS_MAC
                    "QHeaderView { background-color: %1; color: %2; }"
                    "QHeaderView::section { background-color: %1; color: %2; border: 0px ; }"
 #endif
-                   "QTableWidget::item:hover { color: black; background: lightGray; }"
-                   "QTreeView::item:hover { color: black; background: lightGray; }"
-                   "QTreeView::item:selected { color: %4; background-color: %3; }"
                   ).arg(bgColor.name()).arg(fgColor.name()).arg(bgSelColor.name()).arg(fgSelColor.name());
 }
 
@@ -663,6 +640,47 @@ GCColor::getConfigKeys() {
         result.append(ColorList[i].setting);
     }
     return result;
+}
+
+
+QColor
+standardColor
+(int index)
+{
+    static const QList<QColor> darkThemeColors = {
+        QColor(1,202,152),
+        QColor(208,100,166),
+        QColor(185,138,255),
+        QColor(156,143,0),
+        QColor(0,145,186),
+        QColor(163,87,39),
+        QColor(118,54,115),
+        QColor(124,85,0),
+        QColor(66,98,140),
+        QColor(147,32,47),
+        QColor(255,161,104),
+        QColor(167,245,171)
+    };
+    static const QList<QColor> lightThemeColors = {
+        QColor(117,162,0),
+        QColor(211,0,153),
+        QColor(69,13,120),
+        QColor(50,108,255),
+        QColor(210,99,0),
+        QColor(255,95,87),
+        QColor(1,85,154),
+        QColor(184,0,34),
+        QColor(121,154,242),
+        QColor(128,63,0),
+        QColor(224,119,207),
+        QColor(189,108,90)
+    };
+
+    if (GCColor::luminance(GColor(CPLOTBACKGROUND)) < 127) {
+        return darkThemeColors[index % darkThemeColors.size()];
+    } else {
+        return lightThemeColors[index % lightThemeColors.size()];
+    }
 }
 
 
@@ -919,8 +937,121 @@ Themes::Themes()
 
 }
 
-// NOTE: this is duplicated in Pages.cpp:1407:ColorsPage::applyThemeClicked()
-//       you need to change there too. Sorry.
+QColor GCColor::getThemeColor(const ColorTheme& theme, int colorIdx)
+{
+    QColor color;
+
+    // apply theme to color
+    switch (colorIdx) {
+
+    case CPLOTBACKGROUND:
+    case CRIDEPLOTBACKGROUND:
+    case CTRENDPLOTBACKGROUND:
+        // background color
+        color = theme.colors[0];
+        break;
+
+    case CTRAINPLOTBACKGROUND:
+        // always, and I mean always default to a black background
+        color = QColor(Qt::black);
+        break;
+
+    case CCARDBACKGROUND:
+        // set back to light black for dark themes
+        // and gray for light themes
+        color = theme.colors[11];
+        break;
+
+    case CCARDBACKGROUND2:
+        // set back to light black for dark themes
+        // and gray for light themes
+        color = theme.colors[12];
+        break;
+
+    case CCARDBACKGROUND3:
+        // set back to light black for dark themes
+        // and gray for light themes
+        color = theme.colors[13];
+        break;
+
+    case COVERVIEWBACKGROUND:
+        // set back to light black for dark themes
+        // and gray for light themes
+        color = theme.colors[10];
+        break;
+
+    case CCHROME:
+    case CCHARTBAR:
+    case CTOOLBAR:
+        // we always keep them the same, but user can make different
+        // set to black for dark themes and grey for light themes
+        color = theme.colors[1];
+        break;
+
+    case CHOVER:
+        // stealthy themes use overview card background for hover color since they are close
+        // all other themes get a boring default
+        color = theme.stealth ? ColorList[96].color : (theme.dark ? QColor(50, 50, 50) : QColor(200, 200, 200));
+        break;
+
+    case CPLOTSYMBOL:
+    case CRIDEPLOTXAXIS:
+    case CRIDEPLOTYAXIS:
+    case CPLOTMARKER:
+        color = theme.colors[2]; // accent color
+        break;
+
+    case CPLOTSELECT:
+    case CPLOTTRACKER:
+    case CINTERVALHIGHLIGHTER:
+        color = theme.colors[3]; // select color
+        break;
+
+    case CPLOTGRID:
+        // grid doesn't have a theme color
+        // we make it barely distinguishable from background
+    {
+        QColor bg = theme.colors[0];
+        if (bg == QColor(Qt::black)) color = QColor(30, 30, 30);
+        else color = bg.darker(110);
+    }
+    break;
+
+    case CCP:
+    case CWBAL:
+    case CRIDECP:
+        color = theme.colors[4];
+        break;
+
+    case CHEARTRATE:
+        color = theme.colors[5];
+        break;
+
+    case CSPEED:
+        color = theme.colors[6];
+        break;
+
+    case CPOWER:
+        color = theme.colors[7];
+        break;
+
+    case CCADENCE:
+        color = theme.colors[8];
+        break;
+
+    case CTORQUE:
+        color = theme.colors[9];
+        break;
+
+
+    default:
+        if (theme.dark) color = DarkDefaultColorList[colorIdx].color;
+        else color = LightDefaultColorList[colorIdx].color;
+    }
+
+    return color;
+}
+
 void
 GCColor::applyTheme(int index) 
 {
@@ -929,111 +1060,7 @@ GCColor::applyTheme(int index)
 
     for (int i=0; ColorList[i].name != ""; i++) {
 
-        QColor color;
-
-        // apply theme to color
-        switch(i) {
-
-        case CPLOTBACKGROUND:
-        case CRIDEPLOTBACKGROUND:
-        case CTRENDPLOTBACKGROUND:
-
-            color = theme.colors[0]; // background color
-            break;
-
-        case CTRAINPLOTBACKGROUND:
-            // always, and I mean always default to a black background
-            color = QColor(Qt::black);
-            break;
-
-        case CCARDBACKGROUND:
-            // set back to light black for dark themes
-            // and gray for light themes
-            color = theme.colors[11];
-            break;
-
-        case CCARDBACKGROUND2:
-            // set back to light black for dark themes
-            // and gray for light themes
-            color = theme.colors[12];
-            break;
-
-        case CCARDBACKGROUND3:
-            // set back to light black for dark themes
-            // and gray for light themes
-            color = theme.colors[13];
-            break;
-
-        case COVERVIEWBACKGROUND:
-            color = theme.colors[10];
-            break;
-
-        case CCHROME:
-        case CCHARTBAR:
-        case CTOOLBAR: // we always keep them the same, but user can make different
-            color = theme.colors[1];
-            break;
-
-        case CHOVER:
-            // stealthy themes use overview card background for hover color since they are close
-            // all other themes get a boring default
-            color = theme.stealth ? ColorList[96].color : (theme.dark ? QColor(50,50,50) : QColor(200,200,200));
-            break;
-
-        case CPLOTSYMBOL:
-        case CRIDEPLOTXAXIS:
-        case CRIDEPLOTYAXIS:
-        case CPLOTMARKER:
-            color = theme.colors[2]; // accent color
-            break;
-
-        case CPLOTSELECT:
-        case CPLOTTRACKER:
-        case CINTERVALHIGHLIGHTER:
-            color = theme.colors[3]; // select color
-            break;
-
-
-        case CPLOTGRID: // grid doesn't have a theme color
-                        // we make it barely distinguishable from background
-            {
-                QColor bg = theme.colors[0];
-                if(bg == QColor(Qt::black)) color = QColor(30,30,30);
-                else color = bg.darker(110);
-            }
-            break;
-
-        case CCP:
-        case CWBAL:
-        case CRIDECP:
-            color = theme.colors[4];
-            break;
-
-        case CHEARTRATE:
-            color = theme.colors[5];
-            break;
-
-        case CSPEED:
-            color = theme.colors[6];
-            break;
-
-        case CPOWER:
-            color = theme.colors[7];
-            break;
-
-        case CCADENCE:
-            color = theme.colors[8];
-            break;
-
-        case CTORQUE:
-            color = theme.colors[9];
-            break;
-
-
-        default:
-            if (theme.dark) color = DarkDefaultColorList[i].color;
-            else color = LightDefaultColorList[i].color;
-        }
+        QColor color = getThemeColor(theme, i);
 
         // theme applied !
         ColorList[i].color = color;
@@ -1044,17 +1071,6 @@ GCColor::applyTheme(int index)
         appsettings->setValue(ColorList[i].setting, colorstring);
     }
 
-#ifdef Q_OS_MAC
-    // if on yosemite we always set default chrome to #e5e5e5 and flat
-    if (QSysInfo::MacintoshVersion == 12) {
-        QColor color = QColor(0xe5,0xe5,0xe5);
-        ColorList[CCHROME].color = color;
-        QString colorstring = QString("%1:%2:%3").arg(color.red())
-                                                 .arg(color.green())
-                                                 .arg(color.blue());
-        appsettings->setValue(ColorList[CCHROME].setting, colorstring);
-    }
-#endif
 }
 
 //

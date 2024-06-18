@@ -969,7 +969,7 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                         QDateTime time;
 
                         if (seconds < 1000000000000.0L)
-                            time = QDateTime::fromTime_t(seconds);
+                            time = QDateTime::fromSecsSinceEpoch(seconds);
                         else
                             time = QDateTime::fromMSecsSinceEpoch(seconds);
 
@@ -1273,7 +1273,7 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                        }
                    } else if (xdataSeries != NULL) {
 
-                       QStringList els = line.split(",", QString::KeepEmptyParts);
+                       QStringList els = line.split(",", Qt::KeepEmptyParts);
                        if (els.count() != xdataSeries->valuename.count()+2) continue;
                        // add ALL data series to XDATA
                        XDataPoint *p = new XDataPoint();
@@ -1534,7 +1534,7 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors, QList<Ri
                 if (lineno > 1) {
 
                     // split comma separated secs, hr, msecs
-                    QStringList values = line.split(",", QString::KeepEmptyParts);
+                    QStringList values = line.split(",", Qt::KeepEmptyParts);
 
                     // and add
                     XDataPoint *p = new XDataPoint();
@@ -1792,7 +1792,7 @@ CsvFileReader::writeRideFile(Context *, const RideFile *ride, QFile &file, CsvTy
                 if (valueName == "secs") {
                     csvLineData << QString::number(point->secs);
                 } else if (valueName == "cad") {
-                    csvLineData << QString::number(point->cad);
+                    csvLineData << QString::number((ride->isRun() ? point->rcad : point->cad));
                 } else if (valueName == "hr") {
                     csvLineData << QString::number(point->hr);
                 } else if (valueName == "km") {

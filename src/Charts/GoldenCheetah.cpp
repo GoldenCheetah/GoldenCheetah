@@ -189,7 +189,7 @@ bool GcWindow::gripped() const
     return _gripped;
 }
 
-GcWindow::GcWindow(Context *context) : QFrame(context->mainWindow), dragState(None) 
+GcWindow::GcWindow(Context *context) : QFrame(context->mainWindow)
 {
     qRegisterMetaType<QWidget*>("controls");
     qRegisterMetaType<RideItem*>("ride");
@@ -647,7 +647,11 @@ GcWindow::setCursorShape(DragState d)
 }
 
 void
+#if QT_VERSION >= 0x060000
+GcWindow::enterEvent(QEnterEvent *)
+#else
 GcWindow::enterEvent(QEvent *)
+#endif
 {
     if (_noevents) return;
 
@@ -935,7 +939,9 @@ GcChartWindow::saveChart()
 
     // lets go to it
     QTextStream out(&outfile);
+#if QT_VERSION < 0x060000
     out.setCodec ("UTF-8");
+#endif
 
     serializeChartToQTextStream(out);
 
@@ -959,7 +965,7 @@ GcChartWindow::serializeChartToQTextStream(QTextStream& out) {
 
     for (int i=0; i<m->propertyCount(); i++) {
         QMetaProperty p = m->property(i);
-        if (p.isUser(this)) {
+        if (p.isUser()) {
             if (QString(p.typeName()) == "int")      out<<"\t\t\t\""<<p.name()<<"\":\""<<p.read(this).toInt()<<"\",\n";
             if (QString(p.typeName()) == "double")   out<<"\t\t\t\""<<p.name()<<"\":\""<<p.read(this).toDouble()<<"\",\n";
             if (QString(p.typeName()) == "QDate")    out<<"\t\t\t\""<<p.name()<<"\":\""<<p.read(this).toDate().toString()<<"\",\n";
@@ -999,7 +1005,9 @@ GcChartWindow::chartPropertiesFromFile(QString filename)
         // read in the whole thing
         QTextStream in(&file);
         // GC .JSON is stored in UTF-8 with BOM(Byte order mark) for identification
+#if QT_VERSION < 0x060000
         in.setCodec ("UTF-8");
+#endif
         contents = in.readAll();
         file.close();
     }
@@ -1082,7 +1090,9 @@ GcChartWindow::exportChartToCloudDB()
     chart.Header.GcVersion =  QString::number(version);
     // get the gchart - definition json
     QTextStream out(&chart.ChartDef);
+#if QT_VERSION < 0x060000
     out.setCodec ("UTF-8");
+#endif
     serializeChartToQTextStream(out);
     out.flush();
     // get Type and View from properties
@@ -1164,7 +1174,7 @@ GcChartWindow::chartHasUserMetrics() {
 
     for (int i=0; i<m->propertyCount(); i++) {
         QMetaProperty p = m->property(i);
-        if (p.isUser(this)) {
+        if (p.isUser()) {
             if (QString(p.typeName()) == "LTMSettings") {
                 LTMSettings x = p.read(this).value<LTMSettings>();
                 foreach (MetricDetail metricDetail, x.metrics) {
