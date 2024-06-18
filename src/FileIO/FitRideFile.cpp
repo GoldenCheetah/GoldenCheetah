@@ -2494,6 +2494,7 @@ genericnext:
                             // qDebug() << QString("Rider position event received %1 type %2 data %3").arg(event).arg(event_type).arg(data32);
                             break;
                         default:
+                            delete p;
                             errors << QString("Unknown rider position change event %1 type %2").arg(event).arg(event_type);
                             break;
                     }
