@@ -19,6 +19,10 @@
 #GSL_INCLUDES = c:\vcpkg\installed\x64-windows\include
 #GSL_LIBS = -LC:\vcpkg\installed\x64-windows\lib -lgsl -lgslcblas
 
+# If you have conflicts with min/max macros defined in windows.h
+# then uncomment the following line.
+#DEFINES += NOMINMAX
+
 # Uncomment below if you want an R chart
 # You will need R installed along with the Rcpp and RInside
 # packages. There is an R script in the `util' directory that
