@@ -361,15 +361,15 @@ class EfficiencyIndex : public RideMetric {
         double avg_power = deps.value("average_power")->value(true);
         double avg_speed = deps.value("average_speed")->value(true);
 
-        double workout_time = deps.value("workout_time")->value(true);
+        double time_recording = deps.value("time_recording")->value(true);
         double time_moving = deps.value("time_riding")->value(true);
 
         double ei=0;
-        if (avg_power > 0.00f && workout_time > 0.00f)
-            ei = 1000 * avg_speed * time_moving / 60.0 / avg_power / workout_time;
+        if (avg_power > 0.00f && time_recording > 0.00f)
+            ei = 1000 * avg_speed * time_moving / 60.0 / avg_power / time_recording;
 
         setValue(ei);
-        setCount(1);
+        setCount(time_moving);
     }
 
     bool isRelevantForRide(const RideItem *ride) const { return ride->isRun && ride->present.contains("P") && ride->present.contains("S"); }
@@ -384,7 +384,7 @@ static bool addEfficiencyIndex()
     QVector<QString> deps;
     deps.append("average_power");
     deps.append("average_speed");
-    deps.append("workout_time");
+    deps.append("time_recording");
     deps.append("time_riding");
     RideMetricFactory::instance().addMetric(EfficiencyIndex(), &deps);
     return true;
