@@ -208,9 +208,10 @@ ErgFilePlot::ErgFilePlot(Context *context) : context(context)
     pal.setColor(QPalette::Text, GColor(CWBAL));
     axisWidget(QwtAxisId(QwtAxis::YRight, 3))->setPalette(pal);
     QwtPlot::setAxisFont(QwtAxisId(QwtAxis::YRight, 3), stGiles);
-    QwtText title2("W'bal");
+    QwtText title2(tr("W' Balance (J)"));
     title2.setFont(stGiles);
-    QwtPlot::setAxisTitle(QwtAxisId(QwtAxis::YRight,3), title2);
+    QwtPlot::setAxisTitle(QwtAxisId(QwtAxis::YRight, 3), title2);
+    setAxisLabelAlignment(QwtAxisId(QwtAxis::YRight, 3), Qt::AlignVCenter);
 
     // telemetry history
     wattsCurve = new QwtPlotCurve("Power");
@@ -288,6 +289,7 @@ ErgFilePlot::ErgFilePlot(Context *context) : context(context)
     connect(picker, SIGNAL(moved(const QPoint&)), this, SLOT(hover(const QPoint&)));
     connect(context, SIGNAL(start()), this, SLOT(startWorkout()));
     connect(context, SIGNAL(stop()), this, SLOT(stopWorkout()));
+    connect(context, SIGNAL(intensityChanged(int)), this, SLOT(intensityChanged(int)));
 
     bydist = false;
     ergFile = NULL;
@@ -491,29 +493,7 @@ ErgFilePlot::setData(ErgFile *ergfile)
             LodCurve->show();
 
         } else {
-            QList<ErgFileZoneSection> zoneSections = ergFile->ZoneSections();
-            bool antiAlias = appsettings->value(this, GC_ANTIALIAS, false).toBool();
-            for (int i = 0; i < zoneSections.length(); ++i) {
-                QVector<QPointF> sectionData;
-                sectionData << QPointF(zoneSections[i].start, zoneSections[i].startValue)
-                            << QPointF(zoneSections[i].end, zoneSections[i].endValue);
-                QColor color = QColor(zoneColor(zoneSections[i].zone, 0));
-                color.setAlpha(sectionAlphaNeutral);
-                QwtPlotCurve *sectionCurve = new QwtPlotCurve("Course Load");
-                sectionCurve->setSamples(sectionData);
-                sectionCurve->setBaseline(-1000);
-                sectionCurve->setYAxis(QwtAxis::YLeft);
-                sectionCurve->setZ(-100);
-                sectionCurve->setPen(QColor(0, 0, 0, 0));
-                sectionCurve->setBrush(color);
-                sectionCurve->setRenderHint(QwtPlotItem::RenderAntialiased, antiAlias);
-                sectionCurve->attach(this);
-                sectionCurve->hide();
-                powerSectionCurves.append(sectionCurve);
-            }
-            selectCurves();
-            powerHeadroom->setVisible(true);
-            powerHeadroom->setSamples(QVector<QPointF> { dynamic_cast<QwtPointArrayData<double>*>(lodData)->boundingRect().bottomLeft() });
+            createSectionCurve();
 
             QColor brush_color1 = QColor(GColor(CTPOWER));
             brush_color1.setAlpha(200);
@@ -636,16 +616,6 @@ ErgFilePlot::setData(ErgFile *ergfile)
             }
         }
 
-        // compute wbal curve for the erg file
-        calculator.setErg(ergfile);
-
-        setAxisTitle(QwtAxisId(QwtAxis::YRight, 3), tr("W' Balance (j)"));
-        setAxisScale(QwtAxisId(QwtAxis::YRight, 3),qMin(double(calculator.minY-1000),double(0)),calculator.maxY+1000);
-        setAxisLabelAlignment(QwtAxisId(QwtAxis::YRight, 3),Qt::AlignVCenter);
-
-        // and the values ... but avoid sharing!
-        wbalCurvePredict->setSamples(calculator.xdata(false), calculator.ydata());
-
     } else {
 
         // clear the plot we have nothing selected
@@ -666,6 +636,8 @@ ErgFilePlot::setData(ErgFile *ergfile)
             setAxisScaleDraw(QwtAxis::XBottom, (timedraw=new HourTimeScaleDraw()));
         setAxisScale(QwtAxis::XBottom, (double)0, 1000 * 60 * 60, 15*60*1000);
     }
+
+    updateWBalCurvePredict();
 
     // make the XBottom scale visible
     setAxisVisible(QwtAxis::XBottom, true);
@@ -977,6 +949,16 @@ ErgFilePlot::selectTooltip
 }
 
 
+void
+ErgFilePlot::intensityChanged
+(int intensity)
+{
+    Q_UNUSED(intensity);
+    createSectionCurve();
+    updateWBalCurvePredict();
+}
+
+
 QString
 ErgFilePlot::secsToString
 (int fullSecs) const
@@ -1030,6 +1012,61 @@ ErgFilePlot::highlightSectionCurve
     }
     if (needsReplot) {
         replot();
+    }
+}
+
+
+void
+ErgFilePlot::updateWBalCurvePredict
+()
+{
+    if (ergFile && ergFile->hasWatts()) {
+        // compute wbal curve for the erg file
+        calculator.setErg(ergFile);
+
+        setAxisScale(QwtAxisId(QwtAxis::YRight, 3),qMin(double(calculator.minY-1000),double(0)),calculator.maxY+1000);
+
+        // and the values ... but avoid sharing!
+        wbalCurvePredict->setSamples(calculator.xdata(false), calculator.ydata());
+        wbalCurvePredict->setVisible(true);
+    } else {
+        wbalCurvePredict->setVisible(false);
+    }
+}
+
+
+void
+ErgFilePlot::createSectionCurve
+()
+{
+    if (ergFile && ergFile->hasWatts()) {
+        for (int i = 0; i < powerSectionCurves.length(); ++i) {
+            delete powerSectionCurves[i];
+        }
+        powerSectionCurves.clear();
+        QList<ErgFileZoneSection> zoneSections = ergFile->ZoneSections();
+        bool antiAlias = appsettings->value(this, GC_ANTIALIAS, false).toBool();
+        for (int i = 0; i < zoneSections.length(); ++i) {
+            QVector<QPointF> sectionData;
+            sectionData << QPointF(zoneSections[i].start, zoneSections[i].startValue)
+                        << QPointF(zoneSections[i].end, zoneSections[i].endValue);
+            QColor color = QColor(zoneColor(zoneSections[i].zone, 0));
+            color.setAlpha(sectionAlphaNeutral);
+            QwtPlotCurve *sectionCurve = new QwtPlotCurve("Course Load");
+            sectionCurve->setSamples(sectionData);
+            sectionCurve->setBaseline(-1000);
+            sectionCurve->setYAxis(QwtAxis::YLeft);
+            sectionCurve->setZ(-100);
+            sectionCurve->setPen(QColor(0, 0, 0, 0));
+            sectionCurve->setBrush(color);
+            sectionCurve->setRenderHint(QwtPlotItem::RenderAntialiased, antiAlias);
+            sectionCurve->attach(this);
+            sectionCurve->hide();
+            powerSectionCurves.append(sectionCurve);
+        }
+        selectCurves();
+        powerHeadroom->setVisible(true);
+        powerHeadroom->setSamples(QVector<QPointF> { dynamic_cast<QwtPointArrayData<double>*>(lodData)->boundingRect().bottomLeft() });
     }
 }
 

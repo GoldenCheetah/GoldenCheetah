@@ -161,6 +161,7 @@ class ErgFilePlot : public QwtPlot
         void stopWorkout();
         void selectCurves();
         void selectTooltip();
+        void intensityChanged(int intensity);
 
         int showColorZones() const;
         void setShowColorZones(int index);
@@ -212,6 +213,8 @@ class ErgFilePlot : public QwtPlot
         penTooltip *tooltip;
         bool workoutActive = false;
 
+        void updateWBalCurvePredict();
+        void createSectionCurve();
         void highlightSectionCurve(QwtPlotCurve const * const highlightedCurve);
         QString secsToString(int fullSecs) const;
 };

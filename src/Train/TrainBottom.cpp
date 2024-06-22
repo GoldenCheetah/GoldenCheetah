@@ -209,7 +209,7 @@ TrainBottom::TrainBottom(TrainSidebar *trainSidebar, QWidget *parent) :
     connect(loadUp, SIGNAL(clicked()), m_trainSidebar, SLOT(Higher()));
     connect(loadDown, SIGNAL(clicked()), m_trainSidebar, SLOT(Lower()));
     connect(intensitySlider, SIGNAL(valueChanged(int)), m_trainSidebar, SLOT(adjustIntensity(int)));
-    connect(m_trainSidebar, SIGNAL(intensityChanged(int)), intensitySlider, SLOT(setValue(int)));
+    connect(m_trainSidebar->context, SIGNAL(intensityChanged(int)), intensitySlider, SLOT(setValue(int)));
 
     connect(m_trainSidebar, SIGNAL(setNotification(QString, int)), this, SLOT(setNotification(QString, int)));
     connect(m_trainSidebar, SIGNAL(clearNotification(void)), this, SLOT(clearNotification(void)));

@@ -137,7 +137,6 @@ class TrainSidebar : public GcWindow
         void start();
         void pause();
         void stop();
-        void intensityChanged(int value);
         void statusChanged(int status);
         void setNotification(QString msg, int timeout);
         void clearNotification(void);
