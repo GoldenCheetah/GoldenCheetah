@@ -3002,7 +3002,7 @@ void TrainSidebar::adjustIntensity(int value)
     // force replot
     context->notifySetNow(context->getNow());
 
-    emit intensityChanged(lastAppliedIntensity);
+    context->notifyIntensityChanged(lastAppliedIntensity);
 }
 
 MultiDeviceDialog::MultiDeviceDialog(Context *, TrainSidebar *traintool) : traintool(traintool)

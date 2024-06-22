@@ -209,6 +209,7 @@ class Context : public QObject
         void notifyPause() { emit pause(); }
         void notifyStop() { emit stop(); }
         void notifySeek(long x) { emit seek(x); }
+        void notifyIntensityChanged(int intensity) { emit intensityChanged(intensity); };
 
         // date range selection
         void notifyDateRangeChanged(DateRange x) { dr_=x; emit dateRangeSelected(x); }
@@ -327,6 +328,7 @@ class Context : public QObject
         void unpause();
         void pause();
         void stop();
+        void intensityChanged(int intensity);
 
         // R messages
         void rMessage(QString);
