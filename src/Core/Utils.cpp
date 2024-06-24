@@ -526,8 +526,8 @@ smooth_sma(QVector<double>&data, int pos, int window, int samples)
         break;
 
     case GC_SMOOTH_BACKWARD:
-        window_end=0;
-        window_start=window *-1;
+        window_end=1;
+        window_start=window *-1 + 1;
         break;
 
     case GC_SMOOTH_CENTERED: // we should handle odd/even size better
